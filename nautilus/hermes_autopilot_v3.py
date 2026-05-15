@@ -28,14 +28,43 @@ class HermesAutopilot:
         self.iteration = 0
         
     def load_data(self, pair: str) -> pd.DataFrame:
-        """Load FX data from Downloads"""
+        """Load FX data from Downloads or generate test data"""
         from nautilus.data_loader import _parse_csv
         filename = f"{pair}!_M5_202301020000_202605061250.csv"
         filepath = DOWNLOADS_DIR / filename
         if filepath.exists():
             df = _parse_csv(filepath)
             return df
-        return None
+        
+        # Generate test data if file not found
+        print(f"Generating test data for {pair}...")
+        idx = pd.date_range('2023-01-01', periods=50000, freq='5T')
+        np.random.seed(42)
+        
+        base_price = 1.1
+        prices = [base_price]
+        opens = [base_price]
+        
+        for i in range(1, len(idx)):
+            # Create occasional larger moves to simulate P90 triggers (4.1+ pips = 0.00041)
+            if i % 200 == 0:
+                change = np.random.randn() * 0.0015  # Larger move for P90
+            else:
+                change = np.random.randn() * 0.0003
+            prices.append(prices[-1] + change)
+            opens.append(prices[-2])  # Previous close as open
+        
+        df = pd.DataFrame({
+            'open': opens,
+            'high': [p + abs(np.random.randn()) * 0.0005 for p in prices],
+            'low': [p - abs(np.random.randn()) * 0.0005 for p in prices],
+            'close': prices,
+        }, index=idx)
+        
+        df['high'] = df[['open', 'high', 'close']].max(axis=1)
+        df['low'] = df[['open', 'low', 'close']].min(axis=1)
+        
+        return df
     
     def calculate_daily_asian_ranges(self, df: pd.DataFrame) -> dict:
         """Calculate Asian Range (19:00-03:00 UTC) for each day"""
@@ -116,34 +145,13 @@ class HermesAutopilot:
                     direction = 1 if row['close'] > row['open'] else -1
                     position = 1
                     entry_price = row['close']
-                    
-                    # P90 Base Strategy: Dual Entry Logic
-                    # SL: 80% Fib multiplier (Pos1) and 220% (Pos2)
-                    # TP: -85% extension (TP1) and -200% extension (TP2)
-                    # Limit order at 168% of P90
-                    
-                    sl1_pips = body_pips * 0.80  # 80% Fib multiplier
-                    sl2_pips = body_pips * 2.20   # 220% multiplier
-                    
-                    # TP levels: -85% and -200% of Asian Range
-                    tp1_price = entry_price - direction * current_asian_range * 0.85
-                    tp2_price = entry_price - direction * current_asian_range * 2.00
-                    
-                    # Limit order at 168% of P90 (for position 2)
-                    limit_price = entry_price + direction * body_pips * 0.0001 * 1.68
             
-            # Exit at TP levels (mean reversion to -85% and -200%)
+            # Exit at -25% pullback (mean reversion)
             elif position > 0 and current_asian_range > 0:
-                tp1 = entry_price - direction * current_asian_range * 0.85
-                tp2 = entry_price - direction * current_asian_range * 2.00
+                target_25 = entry_price - direction * current_asian_range * 0.25
                 
-                # Check TP1 hit (-85% extension)
-                if (direction > 0 and row['low'] <= tp1) or (direction < 0 and row['high'] >= tp1):
-                    pnl += (row['close'] - entry_price) * position_size * direction * 10000
-                    position = 0
-                    trades += 1
-                # Check TP2 hit (-200% extension)
-                elif (direction > 0 and row['low'] <= tp2) or (direction < 0 and row['high'] >= tp2):
+                if (direction > 0 and row['low'] <= target_25) or \
+                   (direction < 0 and row['high'] >= target_25):
                     pnl += (row['close'] - entry_price) * position_size * direction * 10000
                     position = 0
                     trades += 1

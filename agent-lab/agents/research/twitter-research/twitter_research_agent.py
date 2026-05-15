@@ -13,18 +13,18 @@ Usage:
   - As cron job:     Runs on schedule via Hermes cron system
 """
 
-import asyncio
 import hashlib
 import json
 import logging
 import os
-import re
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
-from dataclasses import dataclass, field, asdict
+from typing import Dict, List, Optional
+from dataclasses import dataclass, field
 from enum import Enum
+
+import tweepy
 
 # ── Workspace paths ──────────────────────────────────────────────────────────
 LAB_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
@@ -177,16 +177,15 @@ class TwitterResearchAgent:
     # ── Twitter API integration ──────────────────────────────────────────
 
     def _get_client(self):
-        """Lazy import and initialize tweepy client."""
+        """Initialize tweepy client."""
         try:
-            import tweepy
             client = tweepy.Client(
                 bearer_token=self.bearer_token,
                 wait_on_rate_limit=True,
             )
             return client
-        except ImportError:
-            logger.warning("tweepy not installed — run: pip install tweepy")
+        except Exception as e:
+            logger.error(f"tweepy client init failed: {e}")
             return None
 
     def search_ai_updates(
