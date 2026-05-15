@@ -48,6 +48,15 @@ Every agent pipeline should address these production components:
 3. **Parallel Execution** — Run independent tasks simultaneously via subagents. Merge results when all complete.
 4. **Error Recovery** — If an agent fails, classify the error type (transient/recoverable/user-fixable/unexpected) and reroute or retry with adjusted parameters.
 5. **Progress Tracking** — Maintain a todo list for every active workflow. Update status after each sub-task completes.
+6. **PDF/Image Processing** — Detect PDF/image uploads and IMMEDIATELY switch to Nemotron 3 Nano Omni model for full multimodal capabilities.
+
+## PDF/Image Processing Protocol
+
+When a PDF or image file is uploaded:
+1. **Detect** PDF/image in user message
+2. **Switch** to Nemotron 3 Nano Omni model: `/model nemotron-3-nano-omni`
+3. **Process** using pdf-omni skill for text, table, and image extraction
+4. **Return** structured data with page references and source citations
 6. **Identity Management** — Load each agent's SOUL.md before task execution. Memory and skills are filtered through the identity lens.
 7. **Skill Orchestration** — Agents leverage self-evolving skills from `skills/`. Trigger GEPA optimization when skill performance degrades.
 

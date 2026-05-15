@@ -1,0 +1,239 @@
+{
+  "iteration": 10,
+  "profitable_count": 3,
+  "profitable_strategies": [
+    {
+      "strategy": "P90_Base_Strategy",
+      "pair": "EURUSD",
+      "trades": 147,
+      "pnl": 11.01,
+      "return_pct": 0.11
+    },
+    {
+      "strategy": "RSI_Reversion",
+      "pair": "EURUSD",
+      "trades": 349,
+      "pnl": 32.84,
+      "return_pct": 0.33
+    },
+    {
+      "strategy": "Asian_Breakout",
+      "pair": "EURUSD",
+      "trades": 1270,
+      "pnl": 6.24,
+      "return_pct": 0.06
+    }
+  ],
+  "all_results": [
+    {
+      "strategy": "P90_Base_Strategy",
+      "pair": "EURUSD",
+      "trades": 147,
+      "pnl": 11.01,
+      "return_pct": 0.11
+    },
+    {
+      "strategy": "RSI_Reversion",
+      "pair": "EURUSD",
+      "trades": 349,
+      "pnl": 32.84,
+      "return_pct": 0.33
+    },
+    {
+      "strategy": "Asian_Breakout",
+      "pair": "EURUSD",
+      "trades": 1270,
+      "pnl": 6.24,
+      "return_pct": 0.06
+    },
+    {
+      "strategy": "P90_Base_Strategy",
+      "pair": "EURUSD",
+      "trades": 147,
+      "pnl": 11.01,
+      "return_pct": 0.11
+    },
+    {
+      "strategy": "RSI_Reversion",
+      "pair": "EURUSD",
+      "trades": 349,
+      "pnl": 32.84,
+      "return_pct": 0.33
+    },
+    {
+      "strategy": "Asian_Breakout",
+      "pair": "EURUSD",
+      "trades": 1270,
+      "pnl": 6.24,
+      "return_pct": 0.06
+    },
+    {
+      "strategy": "P90_Base_Strategy",
+      "pair": "EURUSD",
+      "trades": 147,
+      "pnl": 11.01,
+      "return_pct": 0.11
+    },
+    {
+      "strategy": "RSI_Reversion",
+      "pair": "EURUSD",
+      "trades": 349,
+      "pnl": 32.84,
+      "return_pct": 0.33
+    },
+    {
+      "strategy": "Asian_Breakout",
+      "pair": "EURUSD",
+      "trades": 1270,
+      "pnl": 6.24,
+      "return_pct": 0.06
+    },
+    {
+      "strategy": "P90_Base_Strategy",
+      "pair": "EURUSD",
+      "trades": 147,
+      "pnl": 11.01,
+      "return_pct": 0.11
+    },
+    {
+      "strategy": "RSI_Reversion",
+      "pair": "EURUSD",
+      "trades": 349,
+      "pnl": 32.84,
+      "return_pct": 0.33
+    },
+    {
+      "strategy": "Asian_Breakout",
+      "pair": "EURUSD",
+      "trades": 1270,
+      "pnl": 6.24,
+      "return_pct": 0.06
+    },
+    {
+      "strategy": "P90_Base_Strategy",
+      "pair": "EURUSD",
+      "trades": 147,
+      "pnl": 11.01,
+      "return_pct": 0.11
+    },
+    {
+      "strategy": "RSI_Reversion",
+      "pair": "EURUSD",
+      "trades": 349,
+      "pnl": 32.84,
+      "return_pct": 0.33
+    },
+    {
+      "strategy": "Asian_Breakout",
+      "pair": "EURUSD",
+      "trades": 1270,
+      "pnl": 6.24,
+      "return_pct": 0.06
+    },
+    {
+      "strategy": "P90_Base_Strategy",
+      "pair": "EURUSD",
+      "trades": 147,
+      "pnl": 11.01,
+      "return_pct": 0.11
+    },
+    {
+      "strategy": "RSI_Reversion",
+      "pair": "EURUSD",
+      "trades": 349,
+      "pnl": 32.84,
+      "return_pct": 0.33
+    },
+    {
+      "strategy": "Asian_Breakout",
+      "pair": "EURUSD",
+      "trades": 1270,
+      "pnl": 6.24,
+      "return_pct": 0.06
+    },
+    {
+      "strategy": "P90_Base_Strategy",
+      "pair": "EURUSD",
+      "trades": 147,
+      "pnl": 11.01,
+      "return_pct": 0.11
+    },
+    {
+      "strategy": "RSI_Reversion",
+      "pair": "EURUSD",
+      "trades": 349,
+      "pnl": 32.84,
+      "return_pct": 0.33
+    },
+    {
+      "strategy": "Asian_Breakout",
+      "pair": "EURUSD",
+      "trades": 1270,
+      "pnl": 6.24,
+      "return_pct": 0.06
+    },
+    {
+      "strategy": "P90_Base_Strategy",
+      "pair": "EURUSD",
+      "trades": 147,
+      "pnl": 11.01,
+      "return_pct": 0.11
+    },
+    {
+      "strategy": "RSI_Reversion",
+      "pair": "EURUSD",
+      "trades": 349,
+      "pnl": 32.84,
+      "return_pct": 0.33
+    },
+    {
+      "strategy": "Asian_Breakout",
+      "pair": "EURUSD",
+      "trades": 1270,
+      "pnl": 6.24,
+      "return_pct": 0.06
+    },
+    {
+      "strategy": "P90_Base_Strategy",
+      "pair": "EURUSD",
+      "trades": 147,
+      "pnl": 11.01,
+      "return_pct": 0.11
+    },
+    {
+      "strategy": "RSI_Reversion",
+      "pair": "EURUSD",
+      "trades": 349,
+      "pnl": 32.84,
+      "return_pct": 0.33
+    },
+    {
+      "strategy": "Asian_Breakout",
+      "pair": "EURUSD",
+      "trades": 1270,
+      "pnl": 6.24,
+      "return_pct": 0.06
+    },
+    {
+      "strategy": "P90_Base_Strategy",
+      "pair": "EURUSD",
+      "trades": 147,
+      "pnl": 11.01,
+      "return_pct": 0.11
+    },
+    {
+      "strategy": "RSI_Reversion",
+      "pair": "EURUSD",
+      "trades": 349,
+      "pnl": 32.84,
+      "return_pct": 0.33
+    },
+    {
+      "strategy": "Asian_Breakout",
+      "pair": "EURUSD",
+      "trades": 1270,
+      "pnl": 6.24,
+      "return_pct": 0.06
+    }
+  ]
+}

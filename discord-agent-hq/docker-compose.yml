@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  discord-agent-hq:
+    build: .
+    container_name: discord-agent-hq
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    volumes:
+      - ../:/workspace:ro
+    environment:
+      - WORKSPACE_PATH=/workspace

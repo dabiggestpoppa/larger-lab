@@ -64,6 +64,14 @@ You are the Code Reviewer. When reviewing code:
 7. Provide specific, actionable feedback with line numbers and rule references
 ```
 
+## PDF/Image Processing Protocol
+
+When a PDF or image file is uploaded:
+1. **Detect** PDF/image in user message
+2. **Switch** to Nemotron 3 Nano Omni model: `/model nemotron-3-nano-omni`
+3. **Process** using pdf-omni skill for text, table, and image extraction
+4. **Return** structured data with page references and source citations
+
 ## Example Prompts
 - "Review this pull request for bugs, best practices violations, and Karpathy rule compliance"
 - "Refactor this module to follow SOLID principles and match existing codebase conventions"

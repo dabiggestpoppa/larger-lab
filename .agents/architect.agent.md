@@ -73,6 +73,14 @@ When designing multi-agent systems, apply these org structure principles:
 - Shared credentials across agents (blast radius too high)
 - Agents with overlapping responsibilities and no clear ownership
 
+## PDF/Image Processing Protocol
+
+When a PDF or image file is uploaded:
+1. **Detect** PDF/image in user message
+2. **Switch** to Nemotron 3 Nano Omni model: `/model nemotron-3-nano-omni`
+3. **Process** using pdf-omni skill for text, table, and image extraction
+4. **Return** structured data with page references and source citations
+
 ## Example Prompts
 - "Design a multi-agent cooperative system with shared memory and self-evolving skills"
 - "Create the architecture for a real-time trading bot with risk management, harness error handling, and verification loops"

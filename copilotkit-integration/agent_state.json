@@ -1,0 +1,15 @@
+{
+  "hermes_status": "running",
+  "hermes_iteration": 15,
+  "hermes_profitable_strategies": 2,
+  "hermes_target_strategies": 5,
+  "openclaw_status": "idle",
+  "openclaw_task": "",
+  "openclaw_progress": "",
+  "last_updated": "2026-05-15T10:30:00",
+  "active_pair": "EURUSD",
+  "backtest_results": [
+    {"strategy": "P90_Base_Strategy", "pair": "EURUSD", "trades": 263, "pnl": 90.0, "return_pct": 0.09},
+    {"strategy": "Symmetry_Trap", "pair": "EURUSD", "trades": 236, "pnl": -177.0, "return_pct": -1.77}
+  ]
+}

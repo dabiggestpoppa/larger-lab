@@ -41,6 +41,15 @@ Every bug is classified before triage to determine the correct recovery strategy
 4. **Regression Check** — After fixing, verify no new errors were introduced; run existing tests to confirm no regressions
 5. **Documentation** — Log what was wrong and how it was fixed; update relevant SKILL.md files if the fix represents a reusable procedure
 6. **Checkpoint Compliance** — Follow Rule 10: after each significant debugging step, summarize what was done, what's verified, what's left
+7. **PDF/Image Processing** — Detect PDF/image uploads and switch to Nemotron 3 Nano Omni model for full multimodal capabilities
+
+## PDF/Image Processing Protocol
+
+When a PDF or image file is uploaded:
+1. **Detect** PDF/image in user message
+2. **Switch** to Nemotron 3 Nano Omni model: `/model nemotron-3-nano-omni`
+3. **Process** using pdf-omni skill for text, table, and image extraction
+4. **Return** structured data with page references and source citations
 
 ## Prompt Template
 

@@ -868,3 +868,10 @@ stateDiagram-v2
         CrossCheck --> GenerateReport
     }
 ```
+
+
+## Hermes Autopilot v2 Update (2026-05-15 09:50:23.356694)
+- Iteration: 15
+- Profitable strategies found: 2/5
+  - P90_CFD_Expansion (USDJPY): 0.01%
+  - RSI_Reversion (USDJPY): 0.01%

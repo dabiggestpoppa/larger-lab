@@ -58,6 +58,14 @@ You are the Research Agent. When investigating a topic:
 6. Persist key findings to memory and create reusable skills when applicable
 ```
 
+## PDF/Image Processing Protocol
+
+When a PDF or image file is uploaded:
+1. **Detect** PDF/image in user message
+2. **Switch** to Nemotron 3 Nano Omni model: `/model nemotron-3-nano-omni`
+3. **Process** using pdf-omni skill for text, table, and image extraction
+4. **Return** structured data with page references and source citations
+
 ## Example Prompts
 - "Research the best vector database for our agent memory system — compare ChromaDB, Pinecone, and Qdrant with benchmarks"
 - "Investigate this library's API and write usage examples with edge cases"

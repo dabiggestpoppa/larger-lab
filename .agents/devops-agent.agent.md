@@ -79,6 +79,14 @@ For deploying agent fleets on a VPS (e.g., Hostinger KVM2):
 5. Enable free malware scanner
 6. Create a Claude Code project (`vps-agents`) to manage all agents — stores IPs, passwords, container info
 
+## PDF/Image Processing Protocol
+
+When a PDF or image file is uploaded:
+1. **Detect** PDF/image in user message
+2. **Switch** to Nemotron 3 Nano Omni model: `/model nemotron-3-nano-omni`
+3. **Process** using pdf-omni skill for text, table, and image extraction
+4. **Return** structured data with page references and source citations
+
 ## Example Prompts
 - "Dockerize this multi-agent Python application with all dependencies and volume mounts for memory/skills"
 - "Set up a GitHub Actions workflow for testing and deploying agent harnesses"
