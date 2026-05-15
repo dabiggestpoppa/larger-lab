@@ -160,7 +160,7 @@ class HermesAutopilot:
         return {"strategy": "P90_Base_Strategy", "pair": df.attrs.get('pair', 'UNKNOWN'), "trades": trades, "pnl": round(pnl, 2), "return_pct": round(total_return, 2)}
     
     def run_symmetry_trap(self, df: pd.DataFrame) -> dict:
-        """Symmetry Trap from CEREBUS manual - Fixed"""
+        """Symmetry Trap from CEREBUS manual - Enhanced"""
         if df is None or len(df) < 500:
             return None
         
@@ -179,6 +179,8 @@ class HermesAutopilot:
         current_asian_high = 0
         current_asian_low = 0
         position_size = 0.1  # 10 micro lots
+        highest = 0
+        lowest = 0
         
         for i in range(100, len(df) - 1):
             row = df.iloc[i]
@@ -190,8 +192,12 @@ class HermesAutopilot:
                 current_asian_high = asian_ranges[date_str]['high']
                 current_asian_low = asian_ranges[date_str]['low']
             
-            # Layer 1: Bias Lock (8-17 UTC)
-            if not bias_locked and 8 <= hour_utc <= 17:
+            # Skip Asian session
+            if 19 <= hour_utc or hour_utc < 3:
+                continue
+            
+            # Layer 1: Bias Lock (8-17 UTC) - breakout of Asian range
+            if not bias_locked and 8 <= hour_utc <= 17 and current_asian_range > 0:
                 if row['close'] > current_asian_high:
                     bias_direction = 1
                     bias_locked = True
@@ -199,21 +205,31 @@ class HermesAutopilot:
                     bias_direction = -1
                     bias_locked = True
             
-            # Layer 2: Atomic Entry
+            # Layer 2: Atomic Entry - retest of Asian range
             elif bias_locked and position == 0 and current_asian_range > 0:
                 if bias_direction > 0 and row['close'] > current_asian_high:
                     position = 1
                     entry_price = row['close']
+                    highest = entry_price
+                    lowest = entry_price
                 elif bias_direction < 0 and row['close'] < current_asian_low:
                     position = 1
                     entry_price = row['close']
+                    highest = entry_price
+                    lowest = entry_price
             
-            # Layer 3: Exit at -25% pullback
+            # Layer 3: Exit with trailing stop
             elif position > 0 and current_asian_range > 0:
-                target = entry_price - bias_direction * current_asian_range * 0.25
+                highest = max(highest, row['high'])
+                lowest = min(lowest, row['low'])
                 
-                if (bias_direction > 0 and row['low'] <= target) or (bias_direction < 0 and row['high'] >= target):
-                    pnl += (row['close'] - entry_price) * position_size * bias_direction * 10000
+                # Trailing stop: 20 pips
+                if bias_direction > 0 and row['low'] <= highest - 0.0020:
+                    pnl += (row['close'] - entry_price) * position_size * 10000
+                    position = 0
+                    trades += 1
+                elif bias_direction < 0 and row['high'] >= lowest + 0.0020:
+                    pnl += (entry_price - row['close']) * position_size * 10000
                     position = 0
                     trades += 1
             
@@ -229,7 +245,7 @@ class HermesAutopilot:
         return {"strategy": "Symmetry_Trap", "pair": df.attrs.get('pair', 'UNKNOWN'), "trades": trades, "pnl": round(pnl, 2), "return_pct": round(total_return, 2)}
     
     def run_ema_cross(self, df: pd.DataFrame) -> dict:
-        """EMA Cross strategy"""
+        """EMA Cross strategy - Enhanced with trailing stop"""
         if df is None or len(df) < 100:
             return None
         
@@ -242,6 +258,9 @@ class HermesAutopilot:
         pnl = 0
         trades = 0
         position_size = 0.1  # 10 micro lots
+        direction = 0
+        highest = 0
+        lowest = 0
         
         for i in range(21, len(df) - 1):
             row = df.iloc[i]
@@ -250,13 +269,45 @@ class HermesAutopilot:
             curr_fast = row['ema_fast']
             curr_slow = row['ema_slow']
             
+            # Golden cross entry
             if position == 0 and prev_fast <= prev_slow and curr_fast > curr_slow:
                 position = 1
                 entry_price = row['close']
-            elif position > 0 and prev_fast >= prev_slow and curr_fast < curr_slow:
-                pnl += (row['close'] - entry_price) * position_size * 10000
-                position = 0
-                trades += 1
+                direction = 1
+                highest = entry_price
+                lowest = entry_price
+            # Death cross entry (short)
+            elif position == 0 and prev_fast >= prev_slow and curr_fast < curr_slow:
+                position = 1
+                entry_price = row['close']
+                direction = -1
+                highest = entry_price
+                lowest = entry_price
+            
+            # Manage open position with trailing stop
+            elif position > 0:
+                highest = max(highest, row['high'])
+                lowest = min(lowest, row['low'])
+                
+                # Trailing stop: 15 pips for long, 15 pips for short
+                if direction > 0 and row['low'] <= highest - 0.0015:
+                    pnl += (row['close'] - entry_price) * position_size * 10000
+                    position = 0
+                    trades += 1
+                elif direction < 0 and row['high'] >= lowest + 0.0015:
+                    pnl += (entry_price - row['close']) * position_size * 10000
+                    position = 0
+                    trades += 1
+                
+                # Exit on opposite signal
+                elif direction > 0 and prev_fast >= prev_slow and curr_fast < curr_slow:
+                    pnl += (row['close'] - entry_price) * position_size * 10000
+                    position = 0
+                    trades += 1
+                elif direction < 0 and prev_fast <= prev_slow and curr_fast > curr_slow:
+                    pnl += (entry_price - row['close']) * position_size * 10000
+                    position = 0
+                    trades += 1
         
         total_return = (pnl / 10000) * 100
         return {"strategy": "EMA_Cross", "pair": df.attrs.get('pair', 'UNKNOWN'), "trades": trades, "pnl": round(pnl, 2), "return_pct": round(total_return, 2)}
@@ -310,6 +361,7 @@ class HermesAutopilot:
         pnl = 0
         trades = 0
         position_size = 0.1  # 10 micro lots
+        direction = 0
         
         for i in range(200, len(df) - 1):
             row = df.iloc[i]
@@ -330,18 +382,23 @@ class HermesAutopilot:
             if 19 <= hour_utc or hour_utc < 3:
                 continue
             
-            # Breakout entry
+            # Breakout entry with direction
             if position == 0 and hour_utc >= 8 and hour_utc < 17:
                 if row['close'] > asian_high:
                     position = 1
                     entry_price = row['close']
+                    direction = 1
                 elif row['close'] < asian_low:
                     position = 1
                     entry_price = row['close']
+                    direction = -1
             
-            # Exit at next bar
+            # Exit at next bar with direction
             elif position > 0:
-                pnl += (row['close'] - entry_price) * position_size * 10000
+                if direction > 0:
+                    pnl += (row['close'] - entry_price) * position_size * 10000
+                else:
+                    pnl += (entry_price - row['close']) * position_size * 10000
                 position = 0
                 trades += 1
         
@@ -370,11 +427,14 @@ class HermesAutopilot:
                     df.attrs['pair'] = pair
                     df = df.tail(30000)
                     result = func(df)
-                    if result and result['return_pct'] > 0:
+                    if result:
                         self.all_results.append(result)
-                        if result not in self.profitable_strategies:
-                            self.profitable_strategies.append(result)
-                            print(f"✅ PROFITABLE: {name} on {pair} - {result['return_pct']}%")
+                        if result['return_pct'] > 0:
+                            if result not in self.profitable_strategies:
+                                self.profitable_strategies.append(result)
+                                print(f"✅ PROFITABLE: {name} on {pair} - {result['return_pct']}%")
+                        else:
+                            print(f"   {name}: {result['return_pct']}% (trades: {result['trades']}, pnl: {result['pnl']})")
         
         return len(self.profitable_strategies)
     

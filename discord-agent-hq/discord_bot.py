@@ -17,8 +17,9 @@ from orchestrator import AgentTeamOrchestrator
 
 # Bot setup
 intents = discord.Intents.default()
-intents.message_content = True
-intents.members = True
+# Disable privileged intents - not needed for slash commands
+# intents.message_content = True
+# intents.members = True
 
 bot = discord.Client(intents=intents)
 tree = app_commands.CommandTree(bot)

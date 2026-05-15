@@ -1,0 +1,57 @@
+{
+  "iteration": 1,
+  "profitable_count": 2,
+  "profitable_strategies": [
+    {
+      "strategy": "P90_Base_Strategy",
+      "pair": "EURUSD",
+      "trades": 147,
+      "pnl": 11.01,
+      "return_pct": 0.11
+    },
+    {
+      "strategy": "RSI_Reversion",
+      "pair": "EURUSD",
+      "trades": 349,
+      "pnl": 32.84,
+      "return_pct": 0.33
+    }
+  ],
+  "all_results": [
+    {
+      "strategy": "P90_Base_Strategy",
+      "pair": "EURUSD",
+      "trades": 147,
+      "pnl": 11.01,
+      "return_pct": 0.11
+    },
+    {
+      "strategy": "Symmetry_Trap",
+      "pair": "EURUSD",
+      "trades": 114,
+      "pnl": -92.83,
+      "return_pct": -0.93
+    },
+    {
+      "strategy": "EMA_Cross",
+      "pair": "EURUSD",
+      "trades": 830,
+      "pnl": -8.7,
+      "return_pct": -0.09
+    },
+    {
+      "strategy": "RSI_Reversion",
+      "pair": "EURUSD",
+      "trades": 349,
+      "pnl": 32.84,
+      "return_pct": 0.33
+    },
+    {
+      "strategy": "Asian_Breakout",
+      "pair": "EURUSD",
+      "trades": 1270,
+      "pnl": -44.92,
+      "return_pct": -0.45
+    }
+  ]
+}

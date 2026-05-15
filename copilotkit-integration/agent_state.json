@@ -1,15 +1,16 @@
 {
   "hermes_status": "running",
-  "hermes_iteration": 15,
-  "hermes_profitable_strategies": 2,
+  "hermes_iteration": 19,
+  "hermes_profitable_strategies": 3,
   "hermes_target_strategies": 5,
   "openclaw_status": "idle",
   "openclaw_task": "",
   "openclaw_progress": "",
-  "last_updated": "2026-05-15T10:30:00",
+  "last_updated": "2026-05-15T11:00:00",
   "active_pair": "EURUSD",
   "backtest_results": [
-    {"strategy": "P90_Base_Strategy", "pair": "EURUSD", "trades": 263, "pnl": 90.0, "return_pct": 0.09},
-    {"strategy": "Symmetry_Trap", "pair": "EURUSD", "trades": 236, "pnl": -177.0, "return_pct": -1.77}
+    {"strategy": "P90_Base_Strategy", "pair": "EURUSD", "trades": 147, "pnl": 11.01, "return_pct": 0.11},
+    {"strategy": "RSI_Reversion", "pair": "EURUSD", "trades": 349, "pnl": 32.84, "return_pct": 0.33},
+    {"strategy": "Asian_Breakout", "pair": "EURUSD", "trades": 1270, "pnl": 6.24, "return_pct": 0.06}
   ]
 }
