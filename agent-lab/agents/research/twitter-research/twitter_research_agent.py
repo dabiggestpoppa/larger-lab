@@ -308,7 +308,7 @@ class TwitterResearchAgent:
         self.discoveries_log.parent.mkdir(parents=True, exist_ok=True)
         timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
-        with open(self.discoveries_log, "a") as f:
+        with open(self.discoveries_log, "a", encoding="utf-8") as f:
             f.write(f"\n## Twitter Research — {timestamp}\n\n")
 
             # Group by type
@@ -320,7 +320,7 @@ class TwitterResearchAgent:
                 f.write(f"### {itype.upper()}\n\n")
                 for item in sorted(group, key=lambda x: x.relevance_score, reverse=True):
                     f.write(f"- **[{item.relevance_score:.1f}]** {item.text[:120]}... ")
-                    f.write(f"[🔗]({item.url}) | {', '.join(item.keywords_matched[:3])}\n")
+                    f.write(f"[Link]({item.url}) | {', '.join(item.keywords_matched[:3])}\n")
                 f.write("\n")
 
         logger.info(f"Wrote discoveries to {self.discoveries_log}")

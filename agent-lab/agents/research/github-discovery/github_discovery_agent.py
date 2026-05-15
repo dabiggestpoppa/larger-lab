@@ -437,9 +437,9 @@ def main():
 
     if args.known_search:
         results = agent.search_known(args.known_search)
-        print(f"\n🔍 Known repos matching '{args.known_search}':\n")
+        print(f"\n[Search] Known repos matching '{args.known_search}':\n")
         for r in results:
-            print(f"  ⭐{r.get('stars', 0)} {r.get('full_name', '')}")
+            print(f"  [stars]{r.get('stars', 0)} {r.get('full_name', '')}")
             print(f"    {r.get('description', '')[:80]}...")
             print(f"    {r.get('url', '')}\n")
         return
@@ -450,10 +450,10 @@ def main():
 
     discoveries = agent.discover(args.concept, niche=args.niche, max_results=args.max)
 
-    print(f"\n✅ Discovered {len(discoveries)} repos for '{args.concept}':\n")
+    print(f"\n[OK] Discovered {len(discoveries)} repos for '{args.concept}':\n")
     for d in discoveries[:15]:
         print(f"  [{d.relevance_score:.1f}] {d.full_name} — {d.description[:60]}...")
-        print(f"       ⭐{d.stars} 🍴{d.forks} `{d.language}` {d.url}\n")
+        print(f"       [stars]{d.stars} [forks]{d.forks} `{d.language}` {d.url}\n")
 
 
 if __name__ == "__main__":

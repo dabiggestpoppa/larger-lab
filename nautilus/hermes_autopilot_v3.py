@@ -94,27 +94,62 @@ class HermesAutopilot:
                     trades += 1
                 continue
             
-            # P90 detection (activation window 7-15 UTC)
+            # P90 detection (activation window 7-15 UTC = 2-11 AM EST)
             if position == 0 and 7 <= hour_utc <= 15 and current_asian_range > 0:
-                threshold = 4.1 if 7 <= hour_utc < 9 else (4.6 if 9 <= hour_utc < 13 else 5.9)
+                # P90 thresholds by time window (per CEREBUS manual)
+                if 7 <= hour_utc < 9:
+                    threshold = 4.1
+                elif 9 <= hour_utc < 11:
+                    threshold = 4.6
+                elif 11 <= hour_utc < 13:
+                    threshold = 4.6
+                elif 13 <= hour_utc < 15:
+                    threshold = 5.9
+                elif 15 <= hour_utc < 17:
+                    threshold = 6.2
+                else:
+                    threshold = 0
+                    
                 body_pips = abs(row['close'] - row['open']) * 10000
                 
                 if body_pips >= threshold:
                     direction = 1 if row['close'] > row['open'] else -1
                     position = 1
                     entry_price = row['close']
+                    
+                    # P90 Base Strategy: Dual Entry Logic
+                    # SL: 80% Fib multiplier (Pos1) and 220% (Pos2)
+                    # TP: -85% extension (TP1) and -200% extension (TP2)
+                    # Limit order at 168% of P90
+                    
+                    sl1_pips = body_pips * 0.80  # 80% Fib multiplier
+                    sl2_pips = body_pips * 2.20   # 220% multiplier
+                    
+                    # TP levels: -85% and -200% of Asian Range
+                    tp1_price = entry_price - direction * current_asian_range * 0.85
+                    tp2_price = entry_price - direction * current_asian_range * 2.00
+                    
+                    # Limit order at 168% of P90 (for position 2)
+                    limit_price = entry_price + direction * body_pips * 0.0001 * 1.68
             
-            # Exit at -25% pullback (mean reversion)
+            # Exit at TP levels (mean reversion to -85% and -200%)
             elif position > 0 and current_asian_range > 0:
-                target = entry_price - direction * current_asian_range * 0.25
+                tp1 = entry_price - direction * current_asian_range * 0.85
+                tp2 = entry_price - direction * current_asian_range * 2.00
                 
-                if (direction > 0 and row['low'] <= target) or (direction < 0 and row['high'] >= target):
+                # Check TP1 hit (-85% extension)
+                if (direction > 0 and row['low'] <= tp1) or (direction < 0 and row['high'] >= tp1):
+                    pnl += (row['close'] - entry_price) * position_size * direction * 10000
+                    position = 0
+                    trades += 1
+                # Check TP2 hit (-200% extension)
+                elif (direction > 0 and row['low'] <= tp2) or (direction < 0 and row['high'] >= tp2):
                     pnl += (row['close'] - entry_price) * position_size * direction * 10000
                     position = 0
                     trades += 1
         
-        total_return = (pnl / 10000) * 100  # 10 micro lots = 10000 units
-        return {"strategy": "P90_CFD_Expansion", "pair": df.attrs.get('pair', 'UNKNOWN'), "trades": trades, "pnl": round(pnl, 2), "return_pct": round(total_return, 2)}
+        total_return = (pnl / 10000) * 100
+        return {"strategy": "P90_Base_Strategy", "pair": df.attrs.get('pair', 'UNKNOWN'), "trades": trades, "pnl": round(pnl, 2), "return_pct": round(total_return, 2)}
     
     def run_symmetry_trap(self, df: pd.DataFrame) -> dict:
         """Symmetry Trap from CEREBUS manual - Fixed"""
@@ -313,7 +348,7 @@ class HermesAutopilot:
         print(f"{'='*60}")
         
         strategies = [
-            ("P90_CFD_Expansion", self.run_p90_strategy),
+            ("P90_Base_Strategy", self.run_p90_strategy),
             ("Symmetry_Trap", self.run_symmetry_trap),
             ("EMA_Cross", self.run_ema_cross),
             ("RSI_Reversion", self.run_rsi_reversion),

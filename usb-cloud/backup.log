@@ -3,3 +3,22 @@
 [2026-05-15 08:42:44] [INFO] =========================================
 [2026-05-15 08:42:44] [INFO] Starting Git backup...
 [2026-05-15 08:42:44] [INFO] Changes detected, committing...
+[2026-05-15 08:42:45] [INFO] Commit created: Backup: 2026-05-15 08:42
+[2026-05-15 08:42:48] [INFO] Pushed to GitHub successfully
+[2026-05-15 08:42:48] [INFO] Starting USB backup...
+[2026-05-15 08:42:49] [INFO] Synced: data -> D:
+[2026-05-15 08:42:49] [INFO] Synced: models -> D:
+[2026-05-15 08:42:49] [INFO] Synced: backtests -> D:
+[2026-05-15 08:42:49] [INFO] Synced: strategies -> D:
+[2026-05-15 08:42:49] [INFO] Synced: notebooks -> D:
+[2026-05-15 08:42:50] [INFO] Synced: nautilus\data -> D:
+[2026-05-15 08:42:50] [INFO] Synced: data -> E:
+[2026-05-15 08:42:50] [INFO] Synced: models -> E:
+[2026-05-15 08:42:50] [INFO] Synced: backtests -> E:
+[2026-05-15 08:42:50] [INFO] Synced: strategies -> E:
+[2026-05-15 08:42:50] [INFO] Synced: notebooks -> E:
+[2026-05-15 08:42:50] [INFO] Synced: nautilus\data -> E:
+[2026-05-15 08:42:50] [INFO] USB backup complete
+[2026-05-15 08:42:50] [INFO] =========================================
+[2026-05-15 08:42:50] [INFO] Backup Complete!
+[2026-05-15 08:42:50] [INFO] =========================================

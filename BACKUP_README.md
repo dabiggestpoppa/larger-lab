@@ -10,13 +10,13 @@
 ### Restore on New Computer
 ```powershell
 # From USB drive (auto-detected)
-.\restore-workspace.ps1 -Source USB
+.\restore.bat -Source USB
 
 # From Git only
-.\restore-workspace.ps1 -Source Git
+.\restore.bat -Source Git
 
 # From both
-.\restore-workspace.ps1 -Source Both -DriveLetter E
+.\restore.bat -Source Both -DriveLetter E
 ```
 
 ### One-Command Setup on New Computer
@@ -30,10 +30,12 @@ curl -fsSL https://raw.githubusercontent.com/dabiggestpoppa/larger-lab/main/quic
 
 | Command | What it does |
 |---------|--------------|
-| `.\backup-workspace.ps1` | USB sync only |
-| `.\backup-workspace.ps1 -PushGit` | USB + Git push |
-| `.\backup-workspace.ps1 -CloudSync` | USB + Cloud (rclone) |
-| `.\backup-workspace.ps1 -FullBackup` | USB + Git + Cloud |
+| `.\backup.bat` | USB sync only |
+| `.\backup.bat -PushGit` | USB + Git push |
+| `.\backup.bat -CloudSync` | USB + Cloud (rclone) |
+| `.\backup.bat -FullBackup` | USB + Git + Cloud |
+
+**Note:** Use `.bat` files to bypass PowerShell execution policy.
 
 ---
 
