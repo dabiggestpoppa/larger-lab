@@ -5,13 +5,17 @@ param(
     [string]$Action = "status"
 )
 
+# Auto-detect workspace root
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$WorkspaceRoot = Split-Path -Parent $ScriptDir
+
 $Config = @{
     StorageDir    = "agent-storage"
-    WorkspaceRoot = "C:\Users\wifik\Desktop\projects\larger-lab"
+    WorkspaceRoot = $WorkspaceRoot
     SyncPaths     = @("data", "models", "backtests", "strategies", "nautilus\data", "notebooks")
     LocalOnly     = @(".venv", "node_modules", ".git", "nautilus_trader")
     CloudTargets  = @("gdrive:agent-backup", "mega:agent-backup")
-    LogFile       = "C:\Users\wifik\Desktop\projects\larger-lab\usb-cloud\mesh.log"
+    LogFile       = "$WorkspaceRoot\usb-cloud\mesh.log"
 }
 
 function Write-Log {

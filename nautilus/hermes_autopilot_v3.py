@@ -19,7 +19,7 @@ DOWNLOADS_DIR = Path(r"C:\Users\wifik\Downloads")
 RESULTS_DIR = Path(r"C:\Users\wifik\Desktop\projects\larger-lab\nautilus\results")
 RESULTS_DIR.mkdir(exist_ok=True)
 
-FX_PAIRS = ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCAD", "NZDUSD", "USDCHF"]
+FX_PAIRS = ["EURUSD"]  # Focus on EUR/USD per user request
 
 class HermesAutopilot:
     def __init__(self):

@@ -348,7 +348,7 @@ class GitHubDiscoveryAgent:
         """Append discoveries to markdown log."""
         timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
-        with open(self.discoveries_log, "a") as f:
+        with open(self.discoveries_log, "a", encoding="utf-8") as f:
             f.write(f"\n## GitHub Discovery — {timestamp}\n\n")
 
             for item in discoveries[:20]:  # Top 20 in the log
@@ -356,8 +356,8 @@ class GitHubDiscoveryAgent:
                 topics_str = ", ".join(item.topics[:5]) if item.topics else ""
                 f.write(f"- **[{item.relevance_score:.1f}]** **{item.full_name}**  ")
                 f.write(f"{item.description[:100]}...  ")
-                f.write(f"\n  ⭐{item.stars} 🍴{item.forks} `{item.language}`{license_str}  ")
-                f.write(f"[🔗]({item.url})\n")
+                f.write(f"\n  [stars]{item.stars} [forks]{item.forks} `{item.language}`{license_str}  ")
+                f.write(f"[Link]({item.url})\n")
                 if topics_str:
                     f.write(f"  Topics: {topics_str}\n")
                 f.write("\n")
