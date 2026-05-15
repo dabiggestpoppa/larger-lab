@@ -488,3 +488,39 @@ The old XHAAK/Kulu vision was designed for a world without OpenClaw or Hermes. T
 - Profitable strategies found: 2/5
   - P90_CFD_Expansion (USDJPY): 0.01%
   - RSI_Reversion (USDJPY): 0.01%
+
+
+## Backup & Portability Pipeline (2026-05-15)
+- ✅ Created `backup-workspace.ps1` - Complete backup to USB + Git + Cloud
+- ✅ Created `backup.bat` - Wrapper to bypass PowerShell execution policy
+- ✅ Created `restore-workspace.ps1` - Restore on new computer from USB/Git
+- ✅ Created `restore.bat` - Wrapper for restore
+- ✅ Created `quick-setup.ps1` - One-command fresh setup on new machine
+- ✅ Created `BACKUP_README.md` - Documentation
+- ✅ Tested backup: Successfully pushed to GitHub + synced to USB drives (D: and E:)
+- ✅ USB sync working: data/, models/, backtests/, strategies/, notebooks/, nautilus/data/
+
+### Usage
+```powershell
+# Backup everything
+.\backup.bat -FullBackup
+
+# Restore on new computer
+.\restore.bat -Source Both
+
+# One-command fresh setup
+curl -fsSL https://raw.githubusercontent.com/dabiggestpoppa/larger-lab/main/quick-setup.ps1 | pwsh -File -
+```
+
+## Pine Strategy Conversion (2026-05-15)
+- ✅ Received P90 base strategy (CEREBUS V5) - 649 lines of Pine Script
+- ✅ Strategy includes: Asian Range P90 system, tier-based thresholds, position sizing, mean reversion exits
+- ✅ Key functions identified for Nautilus conversion:
+  - Asian Range calculation (19:00-03:00 EST)
+  - P90 bull/bear signal detection (2-11 AM EST)
+  - Tier-based target calculation (T1/T2/T3)
+  - Position 1/2/3 entry logic with 45-min add
+  - Mean reversion exits at -25% pullback
+  - 132% violation stop-out
+  - Daily drawdown protection
+- ⏳ Next: Extract core logic into Nautilus Python strategy
