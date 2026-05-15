@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "pine-optimizer": {
+      "source": "traderspost/pinescript-agents",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/pine-optimizer/SKILL.md",
+      "computedHash": "9dc64e97c0a53bb027deca24892deb20c3b55e042ea627736bd3dec5991cc00d"
+    },
+    "python-expert": {
+      "source": "shubhamsaboo/awesome-llm-apps",
+      "sourceType": "github",
+      "skillPath": "awesome_agent_skills/python-expert/SKILL.md",
+      "computedHash": "63800ddcf406ccfb4d7dec69b1b7026de6ad465512b95ffdbe955e4e5728483f"
+    }
+  }
+}

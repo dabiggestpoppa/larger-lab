@@ -1,0 +1,21 @@
+{
+    "folders": [
+        {
+            "path": ".agents"
+        },
+        {
+            "path": ".github"
+        },
+        {
+            "path": ".hermes"
+        },
+        {
+            "path": ".roo"
+        }
+    ],
+    "settings": {
+        "files.associations": {
+            "*.pine": "pine"
+        }
+    }
+}

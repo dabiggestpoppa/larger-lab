@@ -1,0 +1,74 @@
+# ROSE Research Project Rules
+
+# Coding Standards
+rule "modularity" {
+    description = "Components must be loosely coupled for easier maintenance and scalability"
+    pattern = "class|interface|module"
+    validation = "Ensure each component has a single responsibility"
+}
+
+rule "scalability" {
+    description = "Design components to handle increased workloads through horizontal scaling"
+    pattern = "async|await|parallel"
+    validation = "Use asynchronous processing where applicable"
+}
+
+rule "performance" {
+    description = "Optimize code for low-latency processing of large datasets"
+    pattern = "algorithm|performance|optimize"
+    validation = "Implement efficient algorithms and data structures"
+}
+
+# Naming Conventions
+rule "component_naming" {
+    description = "Use PascalCase for component names"
+    pattern = "^[A-Z][a-zA-Z0-9]+$"
+    files = "*.{ts,js,py}"
+}
+
+rule "config_naming" {
+    description = "Use lowercase with underscores for configuration files"
+    pattern = "^[a-z][a-z0-9_]+\\.yaml$"
+    files = "*.yaml"
+}
+
+rule "variable_naming" {
+    description = "Use camelCase for variables and functions"
+    pattern = "^[a-z][a-zA-Z0-9]+$"
+    files = "*.{ts,js,py}"
+}
+
+# Documentation
+rule "code_documentation" {
+    description = "Provide clear comments and documentation"
+    pattern = "//|#|/\\*\\*"
+    validation = "Ensure all core components are documented"
+}
+
+# Testing
+rule "unit_testing" {
+    description = "Write comprehensive unit tests"
+    pattern = "test|spec|should"
+    files = "*test*.{ts,js,py}"
+}
+
+# Error Handling
+rule "error_handling" {
+    description = "Implement robust error handling"
+    pattern = "try|catch|except|finally"
+    validation = "Handle all potential error cases"
+}
+
+# Security
+rule "data_protection" {
+    description = "Encrypt sensitive data"
+    pattern = "encrypt|decrypt|secure"
+    validation = "Ensure data protection both at rest and in transit"
+}
+
+# Version Control
+rule "commit_messages" {
+    description = "Write descriptive commit messages"
+    pattern = "^(feat|fix|docs|style|refactor|test|chore):\\s.+"
+    validation = "Follow conventional commit format"
+}

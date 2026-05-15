@@ -1,0 +1,15 @@
+pydantic-ai
+accelerate
+asyncpg
+cuda-python
+evaluate
+fasttext
+git-python
+mkdocs
+mkdocs-material
+optimum
+sacremoses
+sentencepiece
+pyotp
+pytest-asyncio==0.25.3
+uvicorn==0.23.0

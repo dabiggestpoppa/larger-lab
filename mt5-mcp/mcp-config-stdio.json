@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "mt5": {
+      "command": "python",
+      "args": [
+        "C:/Users/wifik/Desktop/projects/larger-lab/mt5-mcp/mt5_mcp_server.py"
+      ],
+      "env": {
+        "PATH": "C:/Program Files/MetaTrader 5:$PATH"
+      }
+    }
+  }
+}

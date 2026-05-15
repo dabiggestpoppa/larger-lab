@@ -1,0 +1,23 @@
+# Personal files - don't commit
+CEREBUS_FX_v4_Complete_Manual.pdf
+TVBridge.exe
+Telegram.lnk
+Visual Studio Code.lnk
+flows concept.jpg
+
+# Large binary files
+*.exe
+*.pdf
+*.jpg
+*.png
+*.lnk
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Sensitive
+.env
+
+# Large directories
+memory-bank/
