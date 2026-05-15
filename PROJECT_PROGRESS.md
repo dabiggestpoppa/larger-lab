@@ -538,3 +538,56 @@ curl -fsSL https://raw.githubusercontent.com/dabiggestpoppa/larger-lab/main/quic
 - Profitable strategies found: 2/5
   - P90_CFD_Expansion (USDJPY): 0.01%
   - RSI_Reversion (USDJPY): 0.01%
+
+
+## Hermes Autopilot v2 Update (2026-05-15 09:33:04.377789)
+- Iteration: 14
+- Profitable strategies found: 2/5
+  - P90_CFD_Expansion (USDJPY): 0.01%
+  - RSI_Reversion (USDJPY): 0.01%
+
+
+## 🔥 LARGER BUILD PLAN - PHASE 1 INITIATED (2026-05-15)
+
+### Objective
+Build the complete agentic trading system with P90 strategy converted to Nautilus, full backup pipeline, and cloud deployment ready.
+
+### Phase 1: Pine → Nautilus Conversion (IN PROGRESS)
+- [ ] Extract P90 core logic from Pine Script (649 lines)
+- [ ] Create `nautilus/strategies/p90_cerebus_v5.py`
+- [ ] Implement Asian Range calculation (19:00-03:00 EST)
+- [ ] Implement P90 signal detection (2-11 AM EST)
+- [ ] Implement tier-based targets (T1/T2/T3)
+- [ ] Implement position 1/2/3 logic with 45-min add
+- [ ] Implement mean reversion exits (-25% pullback)
+- [ ] Implement 132% violation stop-out
+- [ ] Test with `hermes_autopilot_v3.py`
+
+### Phase 2: Data Pipeline (READY)
+- [ ] Verify CSV data in Downloads (29 files)
+- [ ] Run `nautilus/step1_prep_data.py`
+- [ ] Convert to parquet format
+- [ ] Verify data integrity
+
+### Phase 3: Backtest & Optimize
+- [ ] Run P90 strategy on EURUSD, GBPUSD, USDJPY
+- [ ] Parameter sweep for optimal thresholds
+- [ ] Generate performance reports
+
+### Phase 4: Cloud Deployment
+- [ ] Provision Oracle Cloud ARM (24GB RAM)
+- [ ] Deploy workspace via `agent-setup.sh`
+- [ ] Configure SSH tunnel
+- [ ] Test agent connectivity
+
+### Phase 5: Full System Integration
+- [ ] Connect Hermes Telegram bot
+- [ ] Set up cron jobs for daily backtests
+- [ ] Configure alerts for profitable signals
+- [ ] Document full workflow
+
+### Success Criteria
+- P90 strategy running in Nautilus with positive expectancy
+- Backup/restore working on any computer
+- Cloud instance accessible from anywhere
+- Agents can run autonomously 24/7
