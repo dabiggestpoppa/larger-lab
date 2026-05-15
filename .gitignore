@@ -18,6 +18,13 @@ Thumbs.db
 
 # Sensitive
 .env
+*.env
+.larger-lab/
+hermes-credentials.env
+hetzner-credentials.env
+gmail-credentials.json
+token.json
+credentials.json
 
 # Large directories
 memory-bank/

@@ -1,0 +1,9 @@
+[
+  {
+    "timestamp": "2026-05-15T00:00:00Z",
+    "task": "platform_shift",
+    "summary": "Removed MT5 backtesting plan. Switched primary backtest engine to NautilusTrader. Hermes config updated to target Nautilus workflows.",
+    "impact": "All MT5 compile/backtest steps are deprecated; future backtests will use nautilus/run_backtest.py and nautilus/run_all_backtests.py.",
+    "next_action": "Implement Nautilus ports of priority strategies (Symmetry Trap, EMA Cross) and run data prep via nautilus/step1_prep_data.py."
+  }
+]

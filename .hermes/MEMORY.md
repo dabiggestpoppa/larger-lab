@@ -20,8 +20,18 @@
 ## Agent Architecture
 - **Orchestrator**: Master coordinator, task decomposition, dependency mapping
 - **Hermes**: On-the-go agent via Telegram, 5 Pillars (Memory/Skills/Soul/Crons/Self-Improving)
-- **OpenClaw/Claude Code**: Desk-based coding assistant, file operations, git management
+- **OpenClaw**: Messaging-first agent, gateway on ws://127.0.0.1:18789, model: anthropic/claude-sonnet-4-20250514
+- **Claude Code**: Desk-based coding assistant, file operations, git management
 - **8 specialists**: Debugger, Architect, Memory Engineer, QA, DevOps, Research, Code Reviewer
+
+## OpenClaw Setup (May 2026)
+- Version 2026.5.7 installed globally via npm
+- Workspace: C:\Users\wifik\Desktop\projects\larger-lab
+- MT5 MCP server configured in ~/.openclaw/openclaw.json
+- Skills loaded from .hermes/skills/ + mt5-mcp/skills/
+- Gateway running on port 18789
+- Use `openclaw.cmd` (not `openclaw`) due to PowerShell execution policy
+- Refresh PATH: `$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")`
 
 ## Key Decisions
 - Hermes 5 Pillars as mental model (Memory, Skills, Soul, Crons, Self-Improving Loop)
@@ -29,6 +39,8 @@
 - Multi-agent org: split when separate credentials/memory/ongoing role needed
 - Security: each agent gets own accounts, scoped API keys, least privilege
 - GitHub backup cron: nightly push of skills/memory to private repo (no secrets)
+- Structure over tools: architecture-first, thin harness, decoupled layers
+- Twitter AI Research Bot: mid-term project for continuous AI best practices ingestion
 
 ## Lessons Learned
 - Stale memory.md is #1 cause of weird agent behavior — audit regularly

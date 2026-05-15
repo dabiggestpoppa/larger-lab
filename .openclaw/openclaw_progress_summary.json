@@ -1,0 +1,9 @@
+[
+  {
+    "timestamp": "2026-05-15T00:00:00Z",
+    "task": "platform_shift",
+    "summary": "MT5-based plans archived. OpenClaw will coordinate Nautilus parsing and job submission. Any MT5 artifacts should be archived to archive/mt5/.",
+    "impact": "OpenClaw will prepare Nautilus commands, parameter sweep plans, and structured checklists for Hermes.",
+    "next_action": "Extract deterministic rules from manual_text.txt and produce parameter sweep lists for Symmetry Trap."
+  }
+]

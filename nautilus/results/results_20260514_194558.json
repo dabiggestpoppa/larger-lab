@@ -1,0 +1,14 @@
+[
+  {
+    "return_pct": 0.05,
+    "trades": 2919,
+    "strategy": "RSI_Reversion",
+    "pair": "USDJPY"
+  },
+  {
+    "return_pct": 0.03,
+    "trades": 426,
+    "strategy": "Breakout",
+    "pair": "USDJPY"
+  }
+]

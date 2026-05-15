@@ -1,0 +1,11 @@
+[
+  {
+    "timestamp": "2026-05-15T00:00:00Z",
+    "level": "INFO",
+    "source": "system",
+    "message": "Error tracking initialized. No errors at boot.",
+    "context": {},
+    "resolved": true,
+    "resolution": "N/A"
+  }
+]

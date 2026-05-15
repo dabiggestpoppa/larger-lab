@@ -1,0 +1,72 @@
+{
+  "agent_name": "Hermes_Nautilus_v1",
+  "description": "Hermes agent for Nautilus-based strategy development — implement and backtest CEREBUS strategies using NautilusTrader",
+  "model_config": {
+    "main_agent": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+    "orchestrator": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+    "code_reviewer": "inclusionai/ring-2.6-1t:free",
+    "working": "poolside/laguna-m.1:free",
+    "fallback_chain": [
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "inclusionai/ring-2.6-1t:free",
+      "nvidia/owl-alpha:free"
+    ],
+    "rate_limit_switches_after": 2
+  },
+  "goal": "Implement and validate CEREBUS strategies using NautilusTrader backtesting (no MT5). Prioritize reproducible Python strategy implementations and Nautilus reports.",
+  "workspace": "C:/Users/wifik/Desktop/projects/larger-lab/agent-lab/agents/hermes/hermes_workspace",
+  "original_strategies_dir": "C:/Users/wifik/Desktop/projects/larger-lab/nautilus/strategies",
+  "auto_run": true,
+  "mission": {
+    "target_strategies": 2,
+    "winning_criteria": {
+      "min_win_rate": 45,
+      "max_drawdown_pct": -20,
+      "min_sharpe": 0.5,
+      "min_trades": 10,
+      "positive_pnl": true
+    },
+    "strategies_to_implement": [
+      "Symmetry Trap — Nautilus implementation",
+      "EMA Cross — Nautilus implementation",
+      "Option B logic ported to Nautilus (as Python strategy)",
+      "Any other manual strategy ported and validated on Nautilus"
+    ]
+  },
+  "tasks": [
+    {
+      "name": "analyze_manual",
+      "description": "Parse CEREBUS manual and extract deterministic rules for Nautilus implementation",
+      "priority": 1
+    },
+    {
+      "name": "implement_strategies",
+      "description": "Implement each strategy as a Nautilus-compatible Python strategy module",
+      "priority": 2
+    },
+    {
+      "name": "backtest_and_optimize",
+      "description": "Run Nautilus backtests, collect reports, and run parameter sweeps/optimizations",
+      "priority": 3
+    },
+    {
+      "name": "evaluate_and_iterate",
+      "description": "Evaluate Nautilus backtest reports and iterate until target criteria are met",
+      "priority": 4
+    }
+  ],
+  "schedule": {
+    "check_interval_minutes": 30,
+    "max_iterations": 200,
+    "backtest_symbol": "EURUSD",
+    "backtest_timeframe": "M5",
+    "backtest_engine": "nautilus",
+    "backtest_bars": 2000
+  },
+  "telegram": {
+    "enabled": true,
+    "notify_on_iteration": true,
+    "notify_on_winner": true,
+    "notify_on_error": true
+  }
+}

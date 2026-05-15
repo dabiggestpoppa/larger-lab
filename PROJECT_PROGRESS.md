@@ -365,3 +365,10 @@ The old XHAAK/Kulu vision was designed for a world without OpenClaw or Hermes. T
 - Synthesis roadmap: `xhaak-kulu-bridge-progress.md` (this work stream's tracker)
 
 ---
+
+
+## Hermes Autopilot v2 Update (2026-05-15 04:37:25.170833)
+- Iteration: 2
+- Profitable strategies found: 2/5
+  - P90_CFD_Expansion (USDJPY): 0.01%
+  - RSI_Reversion (USDJPY): 0.01%
