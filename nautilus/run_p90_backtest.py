@@ -39,6 +39,41 @@ class P90Backtester:
             return df
         return None
     
+    def calculate_daily_asian_ranges(self, df: pd.DataFrame) -> dict:
+        """Calculate Asian Range (19:00-03:00 UTC) for each day"""
+        df = df.copy()
+        df['hour_utc'] = df.index.hour
+        df['date'] = df.index.date
+        
+        asian_ranges = {}
+        for date in df['date'].unique():
+            day_data = df[df['date'] == date]
+            asian_mask = (day_data['hour_utc'] >= 19) | (day_data['hour_utc'] < 3)
+            asian_data = day_data[asian_mask]
+            if len(asian_data) > 0:
+                asian_ranges[str(date)] = {
+                    'high': asian_data['high'].max(),
+                    'low': asian_data['low'].min(),
+                    'range': asian_data['high'].max() - asian_data['low'].min()
+                }
+        return asian_ranges
+    
+    def _get_p90_threshold(self, hour_utc: float) -> float:
+        """Get P90 threshold based on hour (EST time)"""
+        # Convert UTC to EST (UTC - 5 hours, or UTC - 4 during DST)
+        est_hour = (hour_utc - 5) % 24
+        
+        if 2 <= est_hour < 4:
+            return P90_THRESHOLDS["early"]["threshold"]
+        elif 4 <= est_hour < 6:
+            return P90_THRESHOLDS["mid"]["threshold"]
+        elif 6 <= est_hour < 8:
+            return P90_THRESHOLDS["late"]["threshold"]
+        elif 8 <= est_hour < 10:
+            return P90_THRESHOLDS["cutoff"]["threshold"]
+        else:
+            return 6.2  # Default threshold
+    
     def run_p90_strategy(self, df: pd.DataFrame) -> dict:
         """
         Run P90 CFD Expansion strategy from CEREBUS manual
@@ -49,28 +84,28 @@ class P90Backtester:
             return {"error": "Insufficient data"}
         
         df = df.copy()
-        df['returns'] = df['close'].pct_change()
-        df['body'] = abs(df['close'] - df['open'])
-        # Timestamp is in the index
         df['hour_utc'] = df.index.hour + df.index.minute / 60
         df['date'] = df.index.date
         
-        position = 0
-        entry_price = 0
-        pnl = 0
-        trades = 0
-        direction = 0
-        daily_asian_range = {}  # Cache for daily Asian ranges
+        # Calculate daily Asian ranges
+        asian_ranges = self.calculate_daily_asian_ranges(df)
         
         position = 0
         entry_price = 0
         pnl = 0
         trades = 0
         direction = 0
+        current_asian_range = 0
+        position_size = 0.1  # 10 micro lots
         
         for i in range(100, len(df) - 1):
             row = df.iloc[i]
             hour_utc = row['hour_utc']
+            date_str = str(row['date'])
+            
+            # Get today's Asian range
+            if date_str in asian_ranges:
+                current_asian_range = asian_ranges[date_str]['range']
             
             # Skip Asian session
             if 19 <= hour_utc or hour_utc < 3:
@@ -79,40 +114,40 @@ class P90Backtester:
             # Skip after 12 PM EST (17:00 UTC)
             if hour_utc >= 17:
                 if position > 0:
-                    pnl += (row['close'] - entry_price) * position
+                    pnl += (row['close'] - entry_price) * position_size * direction * 10000
                     position = 0
                     trades += 1
                 continue
             
             # P90 detection (activation window 7-15 UTC = 2-11 AM EST)
-            if position == 0 and 7 <= hour_utc <= 15:
+            if position == 0 and 7 <= hour_utc <= 15 and current_asian_range > 0:
                 threshold = self._get_p90_threshold(hour_utc)
-                body_pips = row['body'] * 10000  # Convert to pips for EUR/USD
+                body_pips = abs(row['close'] - row['open']) * 10000  # Convert to pips
                 
                 if body_pips >= threshold:
                     direction = 1 if row['close'] > row['open'] else -1
                     position = 1
                     entry_price = row['close']
             
-            # Exit at targets
-            elif position > 0:
-                target_25 = entry_price + direction * asian_range * 0.25
-                target_50 = entry_price + direction * asian_range * 0.50
+            # Exit at -25% pullback (FIXED: mean reversion)
+            elif position > 0 and current_asian_range > 0:
+                target_25 = entry_price - direction * current_asian_range * 0.25
                 
-                if (direction > 0 and row['high'] >= target_25) or \
-                   (direction < 0 and row['low'] <= target_25):
-                    pnl += (row['close'] - entry_price) * position * direction
+                if (direction > 0 and row['low'] <= target_25) or \
+                   (direction < 0 and row['high'] >= target_25):
+                    pnl += (row['close'] - entry_price) * position_size * direction * 10000
                     position = 0
                     trades += 1
         
-        total_return = (pnl / 100000) * 100
+        total_return = (pnl / 10000) * 100
+        avg_asian_range = np.mean([v['range'] for v in asian_ranges.values()]) * 10000 if asian_ranges else 0
         return {
             "strategy": "P90_CFD_Expansion",
             "pair": "EUR/USD",
             "trades": trades,
             "pnl": round(pnl, 2),
             "return_pct": round(total_return, 2),
-            "asian_range_pips": round(asian_range * 10000, 1)
+            "asian_range_pips": round(avg_asian_range, 1)
         }
     
     def run_symmetry_trap(self, df: pd.DataFrame) -> dict:
@@ -124,14 +159,11 @@ class P90Backtester:
             return {"error": "Insufficient data"}
         
         df = df.copy()
-        # Timestamp is in the index
         df['hour_utc'] = df.index.hour + df.index.minute / 60
+        df['date'] = df.index.date
         
-        # Calculate Asian Range
-        asian_mask = (df['hour_utc'] >= 19) | (df['hour_utc'] < 3)
-        asian_high = df[asian_mask]['high'].max()
-        asian_low = df[asian_mask]['low'].min()
-        asian_range = asian_high - asian_low
+        # Calculate daily Asian ranges
+        asian_ranges = self.calculate_daily_asian_ranges(df)
         
         position = 0
         entry_price = 0
@@ -139,66 +171,68 @@ class P90Backtester:
         trades = 0
         bias_locked = False
         bias_direction = 0
+        current_asian_range = 0
+        current_asian_high = 0
+        current_asian_low = 0
+        position_size = 0.1  # 10 micro lots
         
         for i in range(100, len(df) - 1):
             row = df.iloc[i]
             hour_utc = row['hour_utc']
+            date_str = str(row['date'])
+            
+            # Get today's Asian range
+            if date_str in asian_ranges:
+                current_asian_range = asian_ranges[date_str]['range']
+                current_asian_high = asian_ranges[date_str]['high']
+                current_asian_low = asian_ranges[date_str]['low']
             
             # Layer 1: Bias Lock (8-17 UTC)
-            if not bias_locked and 8 <= hour_utc <= 17:
-                if row['close'] > asian_high:
+            if not bias_locked and 8 <= hour_utc <= 17 and current_asian_range > 0:
+                if row['close'] > current_asian_high:
                     bias_direction = 1
                     bias_locked = True
-                elif row['close'] < asian_low:
+                elif row['close'] < current_asian_low:
                     bias_direction = -1
                     bias_locked = True
             
             # Layer 2: Atomic Entry
-            elif bias_locked and position == 0:
+            elif bias_locked and position == 0 and current_asian_range > 0:
                 # Look for impulse + pullback
-                if bias_direction > 0 and row['close'] > asian_high:
+                if bias_direction > 0 and row['close'] > current_asian_high:
                     position = 1
                     entry_price = row['close']
-                elif bias_direction < 0 and row['close'] < asian_low:
+                elif bias_direction < 0 and row['close'] < current_asian_low:
                     position = 1
                     entry_price = row['close']
             
-            # Layer 3: Exit at targets
-            elif position > 0:
-                target = entry_price - bias_direction * asian_range * 0.25
+            # Layer 3: Exit at targets (pullback to -25% range)
+            elif position > 0 and current_asian_range > 0:
+                target = entry_price - bias_direction * current_asian_range * 0.25
                 if (bias_direction > 0 and row['low'] <= target) or \
                    (bias_direction < 0 and row['high'] >= target):
-                    pnl += (row['close'] - entry_price) * position * bias_direction
+                    pnl += (row['close'] - entry_price) * position_size * bias_direction * 10000
                     position = 0
                     trades += 1
             
             # Hard exit at 17:00 UTC
-            if hour_utc >= 17 and position > 0:
-                pnl += (row['close'] - entry_price) * position * bias_direction
-                position = 0
-                trades += 1
+            if hour_utc >= 17:
+                bias_locked = False
+                if position > 0:
+                    pnl += (row['close'] - entry_price) * position_size * bias_direction * 10000
+                    position = 0
+                    trades += 1
         
-        total_return = (pnl / 100000) * 100
+        total_return = (pnl / 10000) * 100
+        avg_asian_range = np.mean([v['range'] for v in asian_ranges.values()]) * 10000 if asian_ranges else 0
         return {
             "strategy": "Symmetry_Trap",
             "pair": "EUR/USD",
             "trades": trades,
             "pnl": round(pnl, 2),
             "return_pct": round(total_return, 2),
-            "asian_range_pips": round(asian_range * 10000, 1)
+            "asian_range_pips": round(avg_asian_range, 1)
         }
-    
-    def _get_p90_threshold(self, hour_utc: float) -> float:
-        """Get P90 threshold based on time window"""
-        if 7 <= hour_utc < 9:
-            return 4.1
-        elif 9 <= hour_utc < 11:
-            return 4.6
-        elif 11 <= hour_utc < 13:
-            return 4.6
-        elif 13 <= hour_utc < 15:
-            return 5.9
-        return 6.2
     
     def run_all_manual_strategies(self):
         """Run all CEREBUS manual strategies"""

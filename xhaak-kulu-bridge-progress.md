@@ -29,7 +29,7 @@
   - [ ] **1b.** Add CØD logging pattern to `MEMORY.md` after each significant agent decision
   - [ ] **1c.** Create `fmp_audit.py` — periodic script that reads MEMORY.md entries, computes clarity-outcome deltas, flags drift
   - [ ] **1d.** Hermes skill: `fmp-audit` — reports drift metrics on Telegram command
-- **Status:** 📋 Not Started
+- **Status:** ⏳ In Progress (Task XKB-001 created)
 - **Acceptance Criteria:** Agent can report its own clarity-vs-outcome delta for any recent decision when asked via Telegram
 
 #### SCOPE Protocol — Semantic Causality Operations (Breathfold Recursion)
@@ -44,7 +44,7 @@
     - Tracks causal links between reasoning steps
   - [ ] **2b.** Expose as OpenClaw skill: `scope-recurse <question>`
   - [ ] **2c.** Store recursion traces in structured format for later analysis
-- **Status:** 📋 Not Started
+- **Status:** 📋 Not Started (Pending FMP completion)
 - **Acceptance Criteria:** Can recursively decompose any analytical question through 3+ thesis/antithesis cycles and produce a causal trace
 
 ### 🟡 MEDIUM PRIORITY

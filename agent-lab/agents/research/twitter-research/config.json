@@ -1,0 +1,49 @@
+{
+  "agent_name": "twitter-research",
+  "version": "1.0.0",
+  "description": "Autonomous Twitter/X research agent for AI updates, tools, and trends",
+  "platform": "hermes-skill",
+  "environment": {
+    "TWITTER_BEARER_TOKEN": "required — https://developer.twitter.com/en/portal/dashboard"
+  },
+  "permissions": {
+    "twitter_api": "read — search recent tweets",
+    "filesystem": "write — workspace/ and shared/ directories"
+  },
+  "defaults": {
+    "search_keywords": [
+      "AI agent", "LLM", "machine learning", "prompt engineering",
+      "open source AI", "AI tools", "AI research", "fine-tuning",
+      "RAG", "vector database", "AI framework", "MCP", "OpenClaw",
+      "Hermes agent", "autonomous agent", "multi-agent",
+      "trading AI", "quantitative trading", "backtesting"
+    ],
+    "hours_back": 24,
+    "max_tweets_per_search": 100,
+    "max_insights_stored": 2000,
+    "max_seen_cache": 5000
+  },
+  "commands": {
+    "/twitter-research": "Run AI-focused Twitter search and store findings",
+    "/twitter-research <keywords>": "Search for specific topics",
+    "/twitter-research --hours 48": "Extend search window",
+    "/twitter-research --extract-tools": "Extract tool mentions from results",
+    "/twitter-top": "Show top insights from knowledge base",
+    "/twitter-search <query>": "Search existing knowledge base"
+  },
+  "schedule": {
+    "cron": "0 */6 * * *",
+    "description": "Run every 6 hours for continuous research",
+    "context_from": "twitter-research"
+  },
+  "output": {
+    "knowledge_db": "workspace/twitter-knowledge.json",
+    "discoveries_log": "workspace/recent-discoveries.md",
+    "overlap_channel": "shared/overlap-log.jsonl"
+  },
+  "oph_alignment": {
+    "observer_patch": "twitter-research",
+    "overlap_protocol": "append-to-shared-jsonl",
+    "consensus_role": "partial-observer — provides external signal data"
+  }
+}

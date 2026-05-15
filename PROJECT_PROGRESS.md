@@ -13,7 +13,7 @@
 
 **Data pipeline:** `Downloads/*.csv` → `nautilus/data/*.parquet` → Nautilus backtest engine → `nautilus/reports/`
 **Verification:** Oanda API data → same Nautilus strategy → cross-validate
-**MT5 MCP server:** Kept ONLY for `mt5_get_market_data` (live data fetch), NOT for backtesting
+**MT5 MCP server:** FULLY REMOVED. No MT5 dependencies remain in OpenClaw config. All backtesting is Nautilus-only.
 
 **Core Architecture Principles:**
 - **Structure over tools.** The storage layer is decoupled from the agent layer.
@@ -94,20 +94,30 @@
 - [x] `agent-lab/agents/hermes/hermes_progress_summary.json` — Hermes execution log
 - [x] `.openclaw/openclaw_progress_summary.json` — OpenClaw planning log
 
-### MT5 MCP Server (ARCHIVED — data fetch only)
-- [x] `mt5_mcp_server.py` — 13 tools [ARCHIVED — only `mt5_get_market_data` retained]
+### MT5 MCP Server (FULLY ARCHIVED — May 15 2026)
+- [x] `mt5_mcp_server.py` — 13 tools [FULLY ARCHIVED — removed from openclaw.json MCP servers]
 - [x] `controller_ea.mq5` — Helper EA [ARCHIVED]
 - [x] `ARCHITECTURE.md` — Full architecture doc [ARCHIVED]
 - [x] `skills/mt5-strategy-builder.md` — Agent skill [ARCHIVED]
 - [x] `mcp-config-stdio.json` + `mcp-config-sse.json` [ARCHIVED]
 - [x] TOOLS.md — OpenClaw tools reference [ARCHIVED]
+- [x] `mt5-mcp/skills/` removed from OpenClaw skills load path
+- [x] MCP servers section in openclaw.json cleared (was: mt5, now: {})
 
 ### OpenClaw Setup
 - [x] Node.js 24 confirmed installed
 - [x] OpenClaw 2026.5.7 installed globally
 - [x] `openclaw onboard` completed with workspace pointing to larger-lab
 - [x] Nautilus tools configured in `~/.openclaw/openclaw.json`
-- [x] Skills directories registered (`.hermes/skills/` + `nautilus/`)
+- [x] Skills directories registered (`.hermes/skills/`)
+- [x] **Model routing configured** (May 15 2026):
+  - Default/Orchestrator: `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` (Nvidia Nemo Nano Omni 3)
+  - Orchestration fallback (1 rate limit): `inclusionai/ring-2.6-1t:free` (Inclusion AI)
+  - Orchestration fallback (2 consecutive rate limits): `openrouter/owl-alpha` (Owl Alpha)
+  - Planning/Error Handling: `deepseek/deepseek-v4-flash:free` (DeepSeek V4 Flash) → `openrouter/owl-alpha` fallback
+  - Coding/Working: `poolside/laguna-m.1:free` (Laguna M.1) → `openrouter/owl-alpha` fallback
+  - Code Review: `inclusionai/ring-2.6-1t:free` (Inclusion AI) → `arcee-ai/trinity-large-thinking:free` (Trinity Large Thinking) backup
+  - **2-attempt rate limit switch enforced** — agents never stall mid-build
 - [x] Gateway running on port 18789
 
 ### USB Cloud Storage Mesh
@@ -305,15 +315,22 @@ Autonomous Twitter bot that scrapes for latest AI advancements and best practice
   - P90_CFD_Expansion (USDJPY): 0.01% (232 trades, 6.98 pips PnL)
   - RSI_Reversion (USDJPY): 0.01% (352 trades, 5.18 pips PnL)
 
+## Strategy Logic Fixes (2026-05-15)
+- ✅ Fixed P90 exit logic: now exits at -25% pullback (mean reversion) instead of +25% extension
+- ✅ Fixed position sizing: 10 micro lots (0.1 standard lots) with proper pip value calculation
+- ✅ Fixed Symmetry Trap exit: same -25% pullback logic
+- ✅ Updated hermes_autopilot_v3.py with corrected logic
+
 ### Status
 - ✅ Hermes autopilot v2 created and executed
 - ✅ Found 2 profitable strategies on USDJPY
 - ✅ Position sizing fixed (10 micro lots per trade)
+- ✅ Strategy exit logic corrected (mean reversion at -25% Asian Range)
 - ⏳ Need to run again to find 3 more profitable strategies
 
 ### Next Steps
-- Run autopilot v2 again to find 3 more profitable strategies
-- Optimize P90 and Symmetry Trap for better returns
+- Run autopilot v3 to find 3 more profitable strategies
+- Verify EUR/USD data availability for P90 backtest
 
 ---
 
@@ -366,9 +383,94 @@ The old XHAAK/Kulu vision was designed for a world without OpenClaw or Hermes. T
 
 ---
 
+## XHAAK/Kulu Bridge Phase 1 Update (2026-05-15 14:00:00Z)
+- **Status:** ⏳ In Progress
+- **Task:** FMP Protocol implementation (XKB-001)
+- **Actions:**
+  - Created `tasks/xhaak-kulu-bridge-phase1-fmp.json` task brief
+  - Updated OpenClaw prompt with FMP/SCOPE/GSP-Lite directives
+  - Updated Hermes prompt with bridge-building responsibilities
+  - Updated both progress summaries with Phase 1 entry
+- **Next:** OpenClaw implements CØD logging pattern in MEMORY.md and creates `fmp_audit.py`
+
+---
+
 
 ## Hermes Autopilot v2 Update (2026-05-15 04:37:25.170833)
 - Iteration: 2
+- Profitable strategies found: 2/5
+  - P90_CFD_Expansion (USDJPY): 0.01%
+  - RSI_Reversion (USDJPY): 0.01%
+
+
+## Hermes Autopilot v2 Update (2026-05-15 04:56:04.027615)
+- Iteration: 3
+- Profitable strategies found: 2/5
+  - P90_CFD_Expansion (USDJPY): 0.01%
+  - RSI_Reversion (USDJPY): 0.01%
+
+
+## Strategy Logic Fixes Completed (2026-05-15)
+### P90 CFD Expansion & Symmetry Trap - Exit Logic Corrected
+**Problem:** Strategies were exiting at +25% Asian Range extension instead of -25% pullback (mean reversion)
+
+**Fix Applied:**
+- `nautilus/p90_backtest.py` - Line 117: Changed `target = entry_price + direction * range * 0.25` to `target = entry_price - direction * range * 0.25`
+- `nautilus/hermes_autopilot_v3.py` - Same fix applied to both P90 and Symmetry Trap
+- `nautilus/hermes_simple.py` - Same fix applied
+
+**Position Sizing Fixed:**
+- All strategies now use 10 micro lots (0.1 standard lots)
+- PnL calculation: `(price_diff * 0.1 * 10000)` for proper pip value
+
+### Data Status
+- CSV files were present in Downloads during earlier runs (27 files found)
+- Data prep script (`step1_prep_data.py`) found files but parsing failed
+- Need to verify CSV format and re-run data prep
+
+
+## Hermes Autopilot v2 Update (2026-05-15 06:32:29.418966)
+- Iteration: 4
+- Profitable strategies found: 2/5
+  - P90_CFD_Expansion (USDJPY): 0.01%
+  - RSI_Reversion (USDJPY): 0.01%
+
+
+## Hermes Autopilot v2 Update (2026-05-15 06:53:34.559359)
+- Iteration: 5
+- Profitable strategies found: 2/5
+  - P90_CFD_Expansion (USDJPY): 0.01%
+  - RSI_Reversion (USDJPY): 0.01%
+
+
+## Hermes Autopilot v2 Update (2026-05-15 07:11:51.505048)
+- Iteration: 6
+- Profitable strategies found: 2/5
+  - P90_CFD_Expansion (USDJPY): 0.01%
+  - RSI_Reversion (USDJPY): 0.01%
+
+
+## Hermes Autopilot v2 Update (2026-05-15 07:30:09.371865)
+- Iteration: 7
+- Profitable strategies found: 2/5
+  - P90_CFD_Expansion (USDJPY): 0.01%
+  - RSI_Reversion (USDJPY): 0.01%
+
+
+## Hermes Autopilot v2 Update (2026-05-15 07:48:55.221183)
+- Iteration: 8
+- Profitable strategies found: 2/5
+  - P90_CFD_Expansion (USDJPY): 0.01%
+  - RSI_Reversion (USDJPY): 0.01%
+
+
+## P90 Manual Strategies Results (2026-05-15 07:49:47.807281)
+- P90_CFD_Expansion: 0.09% return, 263 trades
+- Symmetry_Trap: -1.77% return, 236 trades
+
+
+## Hermes Autopilot v2 Update (2026-05-15 08:04:40.315539)
+- Iteration: 9
 - Profitable strategies found: 2/5
   - P90_CFD_Expansion (USDJPY): 0.01%
   - RSI_Reversion (USDJPY): 0.01%

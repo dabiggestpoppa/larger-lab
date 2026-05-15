@@ -101,8 +101,9 @@ class HermesAutopilot:
                     entry_price = row['close']
             
             elif position > 0 and current_asian_range > 0:
-                target_25 = entry_price + direction * current_asian_range * 0.25
-                if (direction > 0 and row['high'] >= target_25) or (direction < 0 and row['low'] <= target_25):
+                # Target is in OPPOSITE direction (pullback to -25% of range)
+                target_25 = entry_price - direction * current_asian_range * 0.25
+                if (direction > 0 and row['low'] <= target_25) or (direction < 0 and row['high'] >= target_25):
                     pnl += (row['close'] - entry_price) * direction * 10  # 10 micro lots
                     position = 0
                     trades += 1

@@ -1,0 +1,50 @@
+{
+  "agent_name": "github-discovery",
+  "version": "1.0.0",
+  "description": "Autonomous GitHub agent for discovering repos, tools, and code",
+  "platform": "hermes-skill",
+  "environment": {
+    "GITHUB_TOKEN": "required — https://github.com/settings/tokens (repo + public_repo scopes)"
+  },
+  "permissions": {
+    "github_api": "read — search repos, fetch details and READMEs",
+    "filesystem": "write — workspace/ and shared/ directories"
+  },
+  "defaults": {
+    "max_results_per_search": 30,
+    "niche_mode": true,
+    "known_repos_limit": 1000,
+    "search_strategies": [
+      "{concept} in:name,description stars:10..500",
+      "{concept} language:python language:javascript",
+      "{concept} topic:machine-learning topic:deep-learning",
+      "awesome {concept}",
+      "{concept} tutorial example implementation",
+      "{concept} library framework tool",
+      "{concept} alternative lightweight",
+      "{concept} stars:5..50 pushed:>2024-01-01"
+    ]
+  },
+  "commands": {
+    "/github-discover <concept>": "Search GitHub for repos related to a concept",
+    "/github-discover <concept> --niche": "Find lesser-known but valuable repos",
+    "/github-known <query>": "Search already-discovered repos",
+    "/github-stats": "Show agent statistics",
+    "/github-top <concept>": "Show top discoveries for a concept"
+  },
+  "schedule": {
+    "cron": "0 8 * * *",
+    "description": "Daily at 8 AM UTC — discover tools relevant to current goals",
+    "context_from": "github-discovery"
+  },
+  "output": {
+    "known_repos": "workspace/known-repos.json",
+    "discoveries_log": "workspace/github-discoveries.md",
+    "overlap_channel": "shared/overlap-log.jsonl"
+  },
+  "oph_alignment": {
+    "observer_patch": "github-discovery",
+    "overlap_protocol": "append-to-shared-jsonl",
+    "consensus_role": "partial-observer — provides tool/code discovery data"
+  }
+}

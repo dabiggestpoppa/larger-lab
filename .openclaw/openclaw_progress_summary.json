@@ -5,5 +5,19 @@
     "summary": "MT5-based plans archived. OpenClaw will coordinate Nautilus parsing and job submission. Any MT5 artifacts should be archived to archive/mt5/.",
     "impact": "OpenClaw will prepare Nautilus commands, parameter sweep plans, and structured checklists for Hermes.",
     "next_action": "Extract deterministic rules from manual_text.txt and produce parameter sweep lists for Symmetry Trap."
+  },
+  {
+    "timestamp": "2026-05-15T12:00:00Z",
+    "task": "model_config_update",
+    "summary": "Updated OpenClaw model routing with correct model IDs and rate limit fallback chain. Default: nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free. Fallback chain: Nvidia Nemo → Inclusion AI (inclusionai/ring-2.6-1t:free) → Owl Alpha (openrouter/owl-alpha). Planning/Error Handling: Inclusion AI primary, DeepSeek (poolside/laguna-m.1:free) fallback. Working/Coding: DeepSeek. MT5 MCP server removed. MT5 skills path removed. 2-attempt rate limit switch enforced across all tiers.",
+    "impact": "OpenClaw and Hermes will no longer stall mid-build due to rate limits. Automatic model switching after 2 consecutive rate limit hits.",
+    "next_action": "Run nautilus/step1_prep_data.py to prepare parquet data for backtesting."
+  },
+  {
+    "timestamp": "2026-05-15T14:00:00Z",
+    "task": "xhaak_kulu_bridge_phase1",
+    "summary": "XHAAK/Kulu bridge Phase 1 initiated. Created task brief XKB-001 for FMP Protocol implementation. Updated OpenClaw and Hermes prompts with bridge-building responsibilities. Created tasks/xhaak-kulu-bridge-phase1-fmp.json.",
+    "impact": "Agents now have clear directives for building FMP Protocol (clarity-outcome delta tracking), SCOPE Protocol (recursive reasoning), and GSP-Lite (structured agent communication).",
+    "next_action": "OpenClaw to implement CØD logging pattern in MEMORY.md and create fmp_audit.py script."
   }
 ]

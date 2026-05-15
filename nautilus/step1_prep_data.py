@@ -48,50 +48,13 @@ def parse_file(filepath):
     
     key = f"{symbol}_{timeframe}"
     
-    # Try different separators
-    df = None
-    for sep in [',', ';', '\t']:
-        try:
-            df = pd.read_csv(filepath, sep=sep, low_memory=False)
-            if len(df.columns) >= 4:
-                break
-        except:
-            continue
+    # Use data_loader for OX Securities format
+    sys.path.insert(0, str(Path(__file__).parent))
+    from data_loader import _parse_csv
     
-    if df is None or len(df.columns) < 4:
-        try:
-            df = pd.read_csv(filepath, low_memory=False)
-        except:
-            return None
-    
-    # Standardize columns
-    col_map = {}
-    for c in df.columns:
-        cl = c.lower().strip()
-        if cl in ['open', 'o']: col_map[c] = 'open'
-        elif cl in ['high', 'h']: col_map[c] = 'high'
-        elif cl in ['low', 'l']: col_map[c] = 'low'
-        elif cl in ['close', 'c']: col_map[c] = 'close'
-        elif cl in ['volume', 'vol', 'v', 'tick_volume', 'tickvolume']: col_map[c] = 'volume'
-        elif cl in ['time', 'date', 'datetime', 'timestamp']: col_map[c] = 'time'
-    
-    df = df.rename(columns=col_map)
-    
-    # Parse time
-    if 'time' in df.columns:
-        df['time'] = pd.to_datetime(df['time'], errors='coerce')
-        df = df.dropna(subset=['time']).set_index('time')
-    
-    # Validate
-    for col in ['open', 'high', 'low', 'close']:
-        if col not in df.columns:
-            return None
-    
-    if 'volume' not in df.columns:
-        df['volume'] = 0
-    
-    df = df[['open', 'high', 'low', 'close', 'volume']].sort_index()
-    df = df[~df.index.duplicated(keep='first')]
+    df = _parse_csv(filepath)
+    if df is None or len(df) == 0:
+        return None
     
     return (key, df)
 

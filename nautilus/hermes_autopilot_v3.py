@@ -72,6 +72,7 @@ class HermesAutopilot:
         trades = 0
         direction = 0
         current_asian_range = 0
+        position_size = 0.1  # 10 micro lots = 0.1 standard lots
         
         for i in range(100, len(df) - 1):
             row = df.iloc[i]
@@ -88,7 +89,7 @@ class HermesAutopilot:
             # Hard exit at 17:00 UTC
             if hour_utc >= 17:
                 if position > 0:
-                    pnl += (row['close'] - entry_price) * direction
+                    pnl += (row['close'] - entry_price) * position_size * direction * 10000
                     position = 0
                     trades += 1
                 continue
@@ -103,16 +104,16 @@ class HermesAutopilot:
                     position = 1
                     entry_price = row['close']
             
-            # Exit at -25% Asian Range target
+            # Exit at -25% pullback (mean reversion)
             elif position > 0 and current_asian_range > 0:
-                target = entry_price + direction * current_asian_range * 0.25
+                target = entry_price - direction * current_asian_range * 0.25
                 
-                if (direction > 0 and row['high'] >= target) or (direction < 0 and row['low'] <= target):
-                    pnl += (row['close'] - entry_price) * direction
+                if (direction > 0 and row['low'] <= target) or (direction < 0 and row['high'] >= target):
+                    pnl += (row['close'] - entry_price) * position_size * direction * 10000
                     position = 0
                     trades += 1
         
-        total_return = pnl * 100  # 1 pip = 10 units per micro lot
+        total_return = (pnl / 10000) * 100  # 10 micro lots = 10000 units
         return {"strategy": "P90_CFD_Expansion", "pair": df.attrs.get('pair', 'UNKNOWN'), "trades": trades, "pnl": round(pnl, 2), "return_pct": round(total_return, 2)}
     
     def run_symmetry_trap(self, df: pd.DataFrame) -> dict:
@@ -134,6 +135,7 @@ class HermesAutopilot:
         current_asian_range = 0
         current_asian_high = 0
         current_asian_low = 0
+        position_size = 0.1  # 10 micro lots
         
         for i in range(100, len(df) - 1):
             row = df.iloc[i]
@@ -168,7 +170,7 @@ class HermesAutopilot:
                 target = entry_price - bias_direction * current_asian_range * 0.25
                 
                 if (bias_direction > 0 and row['low'] <= target) or (bias_direction < 0 and row['high'] >= target):
-                    pnl += (row['close'] - entry_price) * bias_direction
+                    pnl += (row['close'] - entry_price) * position_size * bias_direction * 10000
                     position = 0
                     trades += 1
             
@@ -176,11 +178,11 @@ class HermesAutopilot:
             if hour_utc >= 17:
                 bias_locked = False
                 if position > 0:
-                    pnl += (row['close'] - entry_price) * bias_direction
+                    pnl += (row['close'] - entry_price) * position_size * bias_direction * 10000
                     position = 0
                     trades += 1
         
-        total_return = pnl * 100
+        total_return = (pnl / 10000) * 100
         return {"strategy": "Symmetry_Trap", "pair": df.attrs.get('pair', 'UNKNOWN'), "trades": trades, "pnl": round(pnl, 2), "return_pct": round(total_return, 2)}
     
     def run_ema_cross(self, df: pd.DataFrame) -> dict:
@@ -196,6 +198,7 @@ class HermesAutopilot:
         entry_price = 0
         pnl = 0
         trades = 0
+        position_size = 0.1  # 10 micro lots
         
         for i in range(21, len(df) - 1):
             row = df.iloc[i]
@@ -208,11 +211,11 @@ class HermesAutopilot:
                 position = 1
                 entry_price = row['close']
             elif position > 0 and prev_fast >= prev_slow and curr_fast < curr_slow:
-                pnl += (row['close'] - entry_price)
+                pnl += (row['close'] - entry_price) * position_size * 10000
                 position = 0
                 trades += 1
         
-        total_return = pnl * 100
+        total_return = (pnl / 10000) * 100
         return {"strategy": "EMA_Cross", "pair": df.attrs.get('pair', 'UNKNOWN'), "trades": trades, "pnl": round(pnl, 2), "return_pct": round(total_return, 2)}
     
     def run_rsi_reversion(self, df: pd.DataFrame) -> dict:
@@ -233,6 +236,7 @@ class HermesAutopilot:
         entry_price = 0
         pnl = 0
         trades = 0
+        position_size = 0.1  # 10 micro lots
         
         for i in range(14, len(df) - 1):
             row = df.iloc[i]
@@ -242,11 +246,11 @@ class HermesAutopilot:
                 position = 1
                 entry_price = row['close']
             elif position > 0 and rsi > 70:
-                pnl += (row['close'] - entry_price)
+                pnl += (row['close'] - entry_price) * position_size * 10000
                 position = 0
                 trades += 1
         
-        total_return = pnl * 100
+        total_return = (pnl / 10000) * 100
         return {"strategy": "RSI_Reversion", "pair": df.attrs.get('pair', 'UNKNOWN'), "trades": trades, "pnl": round(pnl, 2), "return_pct": round(total_return, 2)}
     
     def run_breakout(self, df: pd.DataFrame) -> dict:
@@ -262,6 +266,7 @@ class HermesAutopilot:
         entry_price = 0
         pnl = 0
         trades = 0
+        position_size = 0.1  # 10 micro lots
         
         for i in range(200, len(df) - 1):
             row = df.iloc[i]
@@ -293,11 +298,11 @@ class HermesAutopilot:
             
             # Exit at next bar
             elif position > 0:
-                pnl += (row['close'] - entry_price)
+                pnl += (row['close'] - entry_price) * position_size * 10000
                 position = 0
                 trades += 1
         
-        total_return = pnl * 100
+        total_return = (pnl / 10000) * 100
         return {"strategy": "Asian_Breakout", "pair": df.attrs.get('pair', 'UNKNOWN'), "trades": trades, "pnl": round(pnl, 2), "return_pct": round(total_return, 2)}
     
     def run_iteration(self):

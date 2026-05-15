@@ -54,7 +54,7 @@ class P90Backtester:
         """
         Run P90 CFD Expansion strategy from CEREBUS manual
         Entry: P90 candle (M5 close with body >= threshold)
-        Exit: -25% / -50% Asian Range targets
+        Exit: Pullback to -25% of Asian Range (mean reversion)
         """
         if df is None or len(df) < 500:
             return {"error": "Insufficient data"}
@@ -72,6 +72,7 @@ class P90Backtester:
         trades = 0
         direction = 0
         current_asian_range = 0
+        position_size = 0.1  # 10 micro lots = 0.1 standard lots
         
         for i in range(100, len(df) - 1):
             row = df.iloc[i]
@@ -89,7 +90,7 @@ class P90Backtester:
             # Hard exit at 12 PM EST (17:00 UTC)
             if hour_utc >= 17:
                 if position > 0:
-                    pnl += (row['close'] - entry_price) * position * direction
+                    pnl += (row['close'] - entry_price) * position_size * direction * 10000
                     position = 0
                     trades += 1
                 continue
@@ -104,17 +105,18 @@ class P90Backtester:
                     position = 1
                     entry_price = row['close']
             
-            # Exit at targets
+            # Exit at -25% pullback target (mean reversion)
             elif position > 0 and current_asian_range > 0:
-                target_25 = entry_price + direction * current_asian_range * 0.25
+                # Target is in OPPOSITE direction (pullback to -25% of range)
+                target_25 = entry_price - direction * current_asian_range * 0.25
                 
-                if (direction > 0 and row['high'] >= target_25) or \
-                   (direction < 0 and row['low'] <= target_25):
-                    pnl += (row['close'] - entry_price) * position * direction
+                if (direction > 0 and row['low'] <= target_25) or \
+                   (direction < 0 and row['high'] >= target_25):
+                    pnl += (row['close'] - entry_price) * position_size * direction * 10000
                     position = 0
                     trades += 1
         
-        total_return = (pnl / 100000) * 100
+        total_return = (pnl / 10000) * 100  # 10 micro lots = 10000 units
         avg_asian_range = np.mean([v['range'] for v in asian_ranges.values()]) * 10000 if asian_ranges else 0
         return {
             "strategy": "P90_CFD_Expansion",
@@ -149,6 +151,7 @@ class P90Backtester:
         current_asian_range = 0
         current_asian_high = 0
         current_asian_low = 0
+        position_size = 0.1  # 10 micro lots = 0.1 standard lots
         
         for i in range(100, len(df) - 1):
             row = df.iloc[i]
@@ -180,14 +183,14 @@ class P90Backtester:
                     position = 1
                     entry_price = row['close']
             
-            # Layer 3: Exit at targets
+            # Layer 3: Exit at targets (pullback to -25% range)
             elif position > 0 and current_asian_range > 0:
-                # Target is in bias direction (pullback to -25% range)
+                # Target is in OPPOSITE direction (pullback to -25% range)
                 target_25 = entry_price - bias_direction * current_asian_range * 0.25
                 
                 if (bias_direction > 0 and row['low'] <= target_25) or \
                    (bias_direction < 0 and row['high'] >= target_25):
-                    pnl += (row['close'] - entry_price) * position * bias_direction
+                    pnl += (row['close'] - entry_price) * position_size * bias_direction * 10000
                     position = 0
                     trades += 1
             
@@ -195,11 +198,11 @@ class P90Backtester:
             if hour_utc >= 17:
                 bias_locked = False
                 if position > 0:
-                    pnl += (row['close'] - entry_price) * position * bias_direction
+                    pnl += (row['close'] - entry_price) * position_size * bias_direction * 10000
                     position = 0
                     trades += 1
         
-        total_return = (pnl / 100000) * 100
+        total_return = (pnl / 10000) * 100  # 10 micro lots = 10000 units
         avg_asian_range = np.mean([v['range'] for v in asian_ranges.values()]) * 10000 if asian_ranges else 0
         return {
             "strategy": "Symmetry_Trap",

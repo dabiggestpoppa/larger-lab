@@ -1,0 +1,30 @@
+{
+  "task_id": "XKB-001",
+  "created_at": "2026-05-15T14:00:00Z",
+  "created_by": "openclaw",
+  "goal": "Implement FMP Protocol (Fracture Margin Protocol) for clarity-outcome delta tracking",
+  "strategy": "Add CØD logging pattern to MEMORY.md, create fmp_audit.py analysis script, add Hermes Telegram skill",
+  "parameters": {
+    "protocol": "FMP",
+    "components": ["cod_logging", "fmp_audit_script", "telegram_skill"],
+    "priority": "high"
+  },
+  "data_requirements": {
+    "source": "MEMORY.md entries",
+    "format": "CØD pattern: Clarity, Outcome, Delta, Drift"
+  },
+  "expected_outputs": [
+    "fmp_audit.py - analysis script",
+    "MEMORY.md updated with CØD entries",
+    "hermes_skill_fmp.md - Telegram interface"
+  ],
+  "constraints": [
+    "No MT5 — Nautilus only",
+    "Must integrate with existing MEMORY.md structure",
+    "Telegram command: /fmp-report"
+  ],
+  "priority": "high",
+  "assigned_to": "openclaw",
+  "status": "pending",
+  "notes": "Phase 1 of XHAAK/Kulu bridge. See xhaak-kulu-bridge-progress.md for full roadmap."
+}

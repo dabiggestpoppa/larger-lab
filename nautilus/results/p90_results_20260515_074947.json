@@ -1,0 +1,18 @@
+[
+  {
+    "strategy": "P90_CFD_Expansion",
+    "pair": "EUR/USD",
+    "trades": 263,
+    "pnl": 9.12,
+    "return_pct": 0.09,
+    "asian_range_pips": 52.5
+  },
+  {
+    "strategy": "Symmetry_Trap",
+    "pair": "EUR/USD",
+    "trades": 236,
+    "pnl": -177.33,
+    "return_pct": -1.77,
+    "asian_range_pips": 52.5
+  }
+]

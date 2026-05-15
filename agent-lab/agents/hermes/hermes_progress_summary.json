@@ -5,5 +5,19 @@
     "summary": "Removed MT5 backtesting plan. Switched primary backtest engine to NautilusTrader. Hermes config updated to target Nautilus workflows.",
     "impact": "All MT5 compile/backtest steps are deprecated; future backtests will use nautilus/run_backtest.py and nautilus/run_all_backtests.py.",
     "next_action": "Implement Nautilus ports of priority strategies (Symmetry Trap, EMA Cross) and run data prep via nautilus/step1_prep_data.py."
+  },
+  {
+    "timestamp": "2026-05-15T12:00:00Z",
+    "task": "model_config_update",
+    "summary": "Updated Hermes model routing with correct model IDs and rate limit fallback chain. Default/Orchestrator: nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free. Code Review: inclusionai/ring-2.6-1t:free. Working/Coding: poolside/laguna-m.1:free (DeepSeek). Planning/Error Handling: Inclusion AI primary, DeepSeek fallback. Full fallback chain: Nvidia Nemo → Inclusion AI → Owl Alpha (openrouter/owl-alpha). 2-attempt rate limit switch enforced.",
+    "impact": "Hermes will no longer stall mid-build due to rate limits. Automatic model switching after 2 consecutive rate limit hits.",
+    "next_action": "Run nautilus/step1_prep_data.py to prepare parquet data for backtesting."
+  },
+  {
+    "timestamp": "2026-05-15T14:00:00Z",
+    "task": "xhaak_kulu_bridge_phase1",
+    "summary": "XHAAK/Kulu bridge Phase 1 initiated. Updated Hermes prompt with FMP, SCOPE, GSP-Lite, and Browser Ritual Agent responsibilities. Task brief XKB-001 created for FMP Protocol.",
+    "impact": "Hermes now has directives to implement FMP Protocol logging, SCOPE recursive reasoning, and GSP-Lite glyph communication.",
+    "next_action": "Await OpenClaw's FMP implementation, then integrate CØD logging into Telegram interface."
   }
 ]

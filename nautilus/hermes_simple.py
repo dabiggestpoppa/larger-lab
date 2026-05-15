@@ -70,8 +70,8 @@ def main():
                 entry_price = row['close']
         
         elif position > 0 and current_asian_range > 0:
-            target = entry_price + direction * current_asian_range * 0.25
-            if (direction > 0 and row['high'] >= target) or (direction < 0 and row['low'] <= target):
+            target = entry_price - direction * current_asian_range * 0.25
+            if (direction > 0 and row['low'] <= target) or (direction < 0 and row['high'] >= target):
                 pnl += (row['close'] - entry_price) * direction * 10
                 position = 0
                 trades += 1
