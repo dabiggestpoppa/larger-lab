@@ -1,113 +1,134 @@
 ---
-name: twitter-research
+name: twitter-bookmarks
 description: >
-  Autonomous Twitter/X research agent. Searches for AI updates, tools, tips,
-  and trending research — feeds findings into workspace knowledge base.
-  Use when the user wants to discover latest AI developments, find new tools,
-  or monitor research trends.
-version: 1.0.0
+  Access and organize Twitter/X bookmarks. Use when the user wants Hermes to
+  read saved bookmarks, organize posts by topic, extract links, or summarize
+  saved content. No API needed — uses browser automation or manual paste.
+version: 2.0.0
 author: agent
 platforms: [linux, macos, windows]
 ---
 
-# Twitter AI Research Agent
+# Twitter Bookmarks Agent
 
 ## Overview
 
-This agent autonomously searches Twitter/X for AI-related content, classifies
-insights by type (tool, tip, research, announcement, trend), and persists
-findings to the workspace for other agents to consume.
+Simple workflow for Hermes/OpenClaw to access your Twitter bookmarks and
+organize the content into the workspace. **No Twitter API needed.**
 
-It operates as an **observer patch** in the SRRS+OPH cognitive architecture —
-contributing external signal data to the shared overlap channel.
+The agent reads what YOU saved, organizes it, and the team can build on it.
 
-## Prerequisites
+## Workflow
 
-1. **Twitter API Bearer Token**
-   - Get one at: https://developer.twitter.com/en/portal/dashboard
-   - Set as environment variable: `TWITTER_BEARER_TOKEN`
-   - Required for all Twitter API calls
+### Step 1: You Save Bookmarks
+Save posts to Twitter bookmarks as you normally would.
 
-2. **Python dependencies**
-   ```
-   pip install tweepy
-   ```
+### Step 2: Agent Accesses Bookmarks
+
+**Option A — Browser Automation (preferred):**
+1. Open Twitter bookmarks page (https://twitter.com/i/bookmarks)
+2. Scroll through saved posts
+3. Extract: text, links, author, date
+4. Save structured data to workspace
+
+**Option B — Manual Paste (fallback):**
+1. Open Twitter bookmarks in your browser
+2. Copy/paste the content into chat with Hermes
+3. Agent organizes and saves to workspace
+
+### Step 3: Agent Organizes Content
+- Parse each bookmark (text, links, author, timestamp)
+- Classify by topic (AI, trading, tools, research, etc.)
+- Extract links and summarize content
+- Save to `workspace/twitter-bookmarks/`
+- Update knowledge base with findings
 
 ## Commands
 
-### `/twitter-research`
-Run a full AI-focused Twitter search and store findings.
-
+### `/bookmarks`
+Process all Twitter bookmarks and organize into workspace.
 ```
-/twitter-research
-```
-
-Optional parameters:
-```
-/twitter-research --keywords "AI agent,LLM,RAG" --hours 48 --max 200
+/bookmarks
 ```
 
-### `/twitter-research <keywords>`
-Search for specific topics:
+### `/bookmarks --topic <topic>`
+Filter bookmarks by topic:
 ```
-/twitter-research retrieval augmented generation
-/twitter-research AI agents frameworks
-/twitter-research MCP model context protocol
-```
-
-### `/twitter-research --extract-tools`
-Run search AND extract tool/repo mentions from results:
-```
-/twitter-research --extract-tools
+/bookmarks --topic AI
+/bookmarks --topic trading
+/bookmarks --topic tools
 ```
 
-### `/twitter-top`
-Show top insights from existing knowledge base (no API call):
+### `/bookmarks --summarize`
+Process bookmarks and produce a summary report:
 ```
-/twitter-top
-/twitter-top --min-score 5.0
-```
-
-### `/twitter-search <query>`
-Search already-collected knowledge:
-```
-/twitter-search vector database
-/twitter-search LangChain
+/bookmarks --summarize
 ```
 
-## Output Files
-
-| File | Purpose |
-|------|---------|
-| `workspace/twitter-knowledge.json` | Full knowledge base (last 2000 entries) |
-| `workspace/recent-discoveries.md` | Human-readable markdown log |
-| `shared/overlap-log.jsonl` | OPH overlap channel entries |
-| `workspace/seen-tweets.json` | Deduplication cache |
-
-## Architecture Role
-
+### `/bookmarks --links`
+Extract all links from bookmarks, organized by domain:
 ```
-Twitter API → TwitterResearchAgent → ┬─ Knowledge DB (local patch)
-                                      ├─ Discoveries log (human review)
-                                      └─ Overlap channel (OPH shared state)
-                                            ↓
-                                   Other agents read overlap
-                                   for cross-patch reconciliation
+/bookmarks --links
 ```
 
-## Scheduling
+### `/bookmarks --since <date>`
+Only process bookmarks saved after a date:
+```
+/bookmarks --since 2026-05-01
+```
 
-For continuous research, schedule via Hermes cron:
+### `/bookmarks add <url>`
+Manually add a URL to the collection:
 ```
-/goal every 6 hours, run /twitter-research and report top 5 findings to me
+/bookmarks add https://twitter.com/user/status/12345
 ```
+
+## Output Structure
+
+```
+workspace/twitter-bookmarks/
+├── index.md              # Master index of all bookmarks
+├── by-topic/
+│   ├── ai.md             # AI-related bookmarks
+│   ├── trading.md        # Trading-related bookmarks
+│   ├── tools.md          # Tool/library bookmarks
+│   └── other.md          # Uncategorized
+├── by-date/
+│   ├── 2026-05.md        # Monthly archives
+│   └── 2026-04.md
+└── links.md              # All extracted links by domain
+```
+
+## Topic Classification
+
+| Topic | Keywords |
+|-------|----------|
+| AI | AI, LLM, GPT, machine learning, neural, agent, model |
+| Trading | forex, trading, pips, strategy, backtest, market |
+| Tools | tool, library, framework, github, app, extension |
+| Research | paper, study, arxiv, research, findings |
+| News | announced, launch, release, update, breaking |
+
+## Team Integration
+
+Once bookmarks are organized, the team can:
+
+1. **GitHub Agent** — Find repos/tools mentioned in bookmarks
+2. **Research Agent** — Deep-dive into linked articles
+3. **Memory Engineer** — Extract key insights into MEMORY.md
+4. **Code Reviewer** — Evaluate tools/libraries found
+5. **Strategy Team** — Apply trading insights to CEREBUS strategies
+
+## Future Enhancements (Team Builds Over Time)
+
+- [ ] Automatic bookmark monitoring (check for new saves)
+- [ ] Deep link analysis (read full articles, not just tweets)
+- [ ] Cross-reference with GitHub discoveries
+- [ ] Auto-generate skills from tool bookmarks
+- [ ] Trading signal extraction from bookmarked analysis
+- [ ] Weekly bookmark digest via Telegram
 
 ## OPH Integration
 
-Each discovery is written to `shared/overlap-log.jsonl` with:
-- `observer_patch`: "twitter-research"
-- `overlap_hash`: content-addressable SHA256 for deduplication
-- `data`: full insight record
-
-Other agent patches can read this channel to reconcile with their
-own observations (e.g., GitHub discoveries about the same tool).
+Bookmarks are written to `shared/overlap-log.jsonl` as observer patch data,
+enabling cross-patch reconciliation with GitHub discoveries and other agents.

@@ -19,5 +19,12 @@
     "summary": "XHAAK/Kulu bridge Phase 1 initiated. Created task brief XKB-001 for FMP Protocol implementation. Updated OpenClaw and Hermes prompts with bridge-building responsibilities. Created tasks/xhaak-kulu-bridge-phase1-fmp.json.",
     "impact": "Agents now have clear directives for building FMP Protocol (clarity-outcome delta tracking), SCOPE Protocol (recursive reasoning), and GSP-Lite (structured agent communication).",
     "next_action": "OpenClaw to implement CØD logging pattern in MEMORY.md and create fmp_audit.py script."
+  },
+  {
+    "timestamp": "2026-05-15T14:30:00Z",
+    "task": "github_search_tools",
+    "summary": "Created GitHub search tools for both agents. Added .hermes/skills/github-search/SKILL.md and .openclaw/skills/github-search/SKILL.md. Created tools/github_search.py with problem-based discovery, advanced search, and trading-specific queries.",
+    "impact": "Both agents can now search GitHub by problem statement to find trading libraries, Monte Carlo simulations, and agent development tools.",
+    "next_action": "Test GitHub search with trading queries: monte_carlo, kelly_criterion, portfolio_optimization."
   }
 ]

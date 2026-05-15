@@ -26,3 +26,9 @@ OpenClaw Agent — Mission Prompt
   - **SCOPE Protocol:** Create `scope_chain.py` for thesis/antithesis/synthesis reasoning loops. Expose as skill: `scope-recurse <question>`.
   - **GSP-Lite:** Define GlyphMessage JSON schema. Build `glyph_router.py` for structured agent communication.
   - **Task Handoff:** Use `TASK_BRIEF_TEMPLATE.json` for all inter-agent tasks. Log progress to `xhaak-kulu-bridge-progress.md`.
+
+- **GitHub Discovery Tools:**
+  - Use `tools/github_search.py` for problem-based repo discovery
+  - `/github-find "problem statement"` — semantic search for trading libraries
+  - `/github-search "query" language:python` — advanced GitHub search
+  - Pre-defined queries: monte_carlo, kelly_criterion, portfolio_optimization, nautilus_examples

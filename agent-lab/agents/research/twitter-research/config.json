@@ -1,49 +1,41 @@
 {
-  "agent_name": "twitter-research",
-  "version": "1.0.0",
-  "description": "Autonomous Twitter/X research agent for AI updates, tools, and trends",
+  "agent_name": "twitter-bookmarks",
+  "version": "2.0.0",
+  "description": "Twitter/X bookmarks reader and organizer — no API needed",
   "platform": "hermes-skill",
-  "environment": {
-    "TWITTER_BEARER_TOKEN": "required — https://developer.twitter.com/en/portal/dashboard"
-  },
+  "environment": {},
   "permissions": {
-    "twitter_api": "read — search recent tweets",
-    "filesystem": "write — workspace/ and shared/ directories"
+    "browser": "read — access twitter.com/i/bookmarks",
+    "filesystem": "write — workspace/twitter-bookmarks/ and shared/"
   },
   "defaults": {
-    "search_keywords": [
-      "AI agent", "LLM", "machine learning", "prompt engineering",
-      "open source AI", "AI tools", "AI research", "fine-tuning",
-      "RAG", "vector database", "AI framework", "MCP", "OpenClaw",
-      "Hermes agent", "autonomous agent", "multi-agent",
-      "trading AI", "quantitative trading", "backtesting"
-    ],
-    "hours_back": 24,
-    "max_tweets_per_search": 100,
-    "max_insights_stored": 2000,
-    "max_seen_cache": 5000
+    "bookmarks_url": "https://twitter.com/i/bookmarks",
+    "workspace_dir": "workspace/twitter-bookmarks",
+    "topics": ["AI", "trading", "tools", "research", "news"],
+    "overlap_channel": "shared/overlap-log.jsonl"
   },
   "commands": {
-    "/twitter-research": "Run AI-focused Twitter search and store findings",
-    "/twitter-research <keywords>": "Search for specific topics",
-    "/twitter-research --hours 48": "Extend search window",
-    "/twitter-research --extract-tools": "Extract tool mentions from results",
-    "/twitter-top": "Show top insights from knowledge base",
-    "/twitter-search <query>": "Search existing knowledge base"
+    "/bookmarks": "Read and organize all Twitter bookmarks",
+    "/bookmarks --topic <topic>": "Filter bookmarks by topic",
+    "/bookmarks --summarize": "Process bookmarks and produce summary report",
+    "/bookmarks --links": "Extract all links organized by domain",
+    "/bookmarks --since <date>": "Only process bookmarks after date",
+    "/bookmarks add <url>": "Manually add a URL to collection"
   },
   "schedule": {
-    "cron": "0 */6 * * *",
-    "description": "Run every 6 hours for continuous research",
-    "context_from": "twitter-research"
+    "cron": "manual",
+    "description": "Run on-demand when user requests bookmark processing"
   },
   "output": {
-    "knowledge_db": "workspace/twitter-knowledge.json",
-    "discoveries_log": "workspace/recent-discoveries.md",
+    "index": "workspace/twitter-bookmarks/index.md",
+    "by_topic": "workspace/twitter-bookmarks/by-topic/",
+    "by_date": "workspace/twitter-bookmarks/by-date/",
+    "links": "workspace/twitter-bookmarks/links.md",
     "overlap_channel": "shared/overlap-log.jsonl"
   },
   "oph_alignment": {
-    "observer_patch": "twitter-research",
+    "observer_patch": "twitter-bookmarks",
     "overlap_protocol": "append-to-shared-jsonl",
-    "consensus_role": "partial-observer — provides external signal data"
+    "consensus_role": "partial-observer — provides user-curated signal data"
   }
 }

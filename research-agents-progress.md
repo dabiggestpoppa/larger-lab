@@ -27,7 +27,7 @@
 | `config.json` | ✅ Complete | Agent configuration and command definitions |
 | `SKILL.md` | ✅ Complete | Hermes skill definition |
 | `workspace/` directory | ✅ Created | Knowledge DB, discoveries log, seen cache |
-| Twitter API integration | ⏳ Needs token | `TWITTER_BEARER_TOKEN` env var required |
+| Twitter API integration | ⏳ Needs paid tier | Bearer token set, but Twitter API returns 402 (free tier doesn't support search). Need Twitter Basic ($100/mo) or alternative search method |
 | `/twitter-research` command | ✅ Implemented | Supports keywords, hours, max params |
 | `/twitter-top` command | ✅ Implemented | Shows top insights by relevance |
 | `/twitter-search` command | ✅ Implemented | Searches existing knowledge base |

@@ -19,5 +19,12 @@
     "summary": "XHAAK/Kulu bridge Phase 1 initiated. Updated Hermes prompt with FMP, SCOPE, GSP-Lite, and Browser Ritual Agent responsibilities. Task brief XKB-001 created for FMP Protocol.",
     "impact": "Hermes now has directives to implement FMP Protocol logging, SCOPE recursive reasoning, and GSP-Lite glyph communication.",
     "next_action": "Await OpenClaw's FMP implementation, then integrate CØD logging into Telegram interface."
+  },
+  {
+    "timestamp": "2026-05-15T14:30:00Z",
+    "task": "github_search_tools",
+    "summary": "Added GitHub search tools to Hermes skill set. Created .hermes/skills/github-search/SKILL.md with Telegram commands: /github-find, /github-search, /github-analyze. Created tools/github_search.py with trading-specific queries.",
+    "impact": "Hermes can now discover GitHub repos by problem statement (e.g., 'monte carlo position sizing trading python') and return formatted results for Telegram.",
+    "next_action": "Test GitHub search with trading queries and integrate into agent workflows."
   }
 ]

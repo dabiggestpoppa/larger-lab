@@ -1,0 +1,211 @@
+#!/usr/bin/env python3
+"""
+Twitter Bookmark Processor
+===========================
+Processes pasted Twitter bookmark content and organizes it by topic.
+Run this when the user pastes bookmark content into the terminal.
+
+Usage:
+  python bookmark_processor.py
+  (then paste the bookmark content and press Ctrl+D / Ctrl+Z)
+"""
+
+import json
+import re
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+WORKSPACE = Path(__file__).parent
+TOPICS_DIR = WORKSPACE / "by-topic"
+LINKS_FILE = WORKSPACE / "links.md"
+INDEX_FILE = WORKSPACE / "index.md"
+
+TOPICS_DIR.mkdir(parents=True, exist_ok=True)
+
+TOPIC_KEYWORDS = {
+    "ai": ["ai", "llm", "gpt", "machine learning", "neural", "agent", "model", "claude", "openai", "gemini", "copilot", "rag", "fine-tun", "prompt"],
+    "trading": ["forex", "trading", "pips", "strategy", "backtest", "market", "price", "bull", "bear", "long", "short", "sl", "tp", "stop loss", "take profit"],
+    "tools": ["tool", "library", "framework", "github", "app", "extension", "pip install", "npm", "api", "sdk", "open source"],
+    "research": ["paper", "study", "arxiv", "research", "findings", "benchmark", "evaluation", "survey"],
+    "news": ["announced", "launch", "release", "update", "breaking", "just shipped", "new"],
+}
+
+
+def classify_topic(text: str) -> str:
+    """Classify a bookmark by topic."""
+    text_lower = text.lower()
+    scores = {}
+    for topic, keywords in TOPIC_KEYWORDS.items():
+        scores[topic] = sum(1 for kw in keywords if kw in text_lower)
+    best = max(scores, key=scores.get)
+    return best if scores[best] > 0 else "other"
+
+
+def extract_urls(text: str) -> list:
+    """Extract URLs from text."""
+    return re.findall(r'https?://[^\s<>"\')]+', text)
+
+
+def extract_tweet_id(text: str) -> str:
+    """Extract tweet ID from URL or text."""
+    match = re.search(r'twitter\.com/\w+/status/(\d+)', text)
+    return match.group(1) if match else ""
+
+
+def process_bookmarks(raw_text: str) -> list:
+    """Parse raw bookmark text into structured entries."""
+    entries = []
+
+    # Split by common delimiters (double newline, tweet separators)
+    chunks = re.split(r'\n\n+|---+', raw_text)
+
+    for chunk in chunks:
+        chunk = chunk.strip()
+        if not chunk or len(chunk) < 10:
+            continue
+
+        urls = extract_urls(chunk)
+        tweet_id = extract_tweet_id(chunk)
+        topic = classify_topic(chunk)
+
+        entry = {
+            "text": chunk[:500],
+            "urls": urls,
+            "tweet_id": tweet_id,
+            "topic": topic,
+            "processed_at": datetime.now(timezone.utc).isoformat(),
+        }
+        entries.append(entry)
+
+    return entries
+
+
+def save_by_topic(entries: list):
+    """Save entries organized by topic."""
+    by_topic = {}
+    for entry in entries:
+        by_topic.setdefault(entry["topic"], []).append(entry)
+
+    for topic, topic_entries in by_topic.items():
+        topic_file = TOPICS_DIR / f"{topic}.md"
+        with open(topic_file, "a", encoding="utf-8") as f:
+            f.write(f"\n## {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}\n\n")
+            for entry in topic_entries:
+                tweet_url = f"https://twitter.com/i/status/{entry['tweet_id']}" if entry['tweet_id'] else ""
+                f.write(f"- {entry['text'][:200]}\n")
+                if tweet_url:
+                    f.write(f"  [Link]({tweet_url})\n")
+                for url in entry["urls"]:
+                    if "twitter.com" not in url:
+                        f.write(f"  [Ext Link]({url})\n")
+                f.write("\n")
+
+
+def save_links(entries: list):
+    """Save all extracted links."""
+    all_urls = []
+    for entry in entries:
+        for url in entry["urls"]:
+            if "twitter.com" not in url:
+                all_urls.append({"url": url, "topic": entry["topic"]})
+
+    if not all_urls:
+        return
+
+    with open(LINKS_FILE, "a", encoding="utf-8") as f:
+        f.write(f"\n## {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}\n\n")
+        for item in all_urls:
+            domain = re.match(r'https?://([^/]+)', item["url"])
+            domain_name = domain.group(1) if domain else "unknown"
+            f.write(f"- [{domain_name}] {item['url']} ({item['topic']})\n")
+
+
+def update_index(entries: list):
+    """Update the index file with new stats."""
+    # Count existing entries
+    total = 0
+    topic_counts = {}
+    for topic_file in TOPICS_DIR.glob("*.md"):
+        content = topic_file.read_text(encoding="utf-8")
+        count = content.count("\n- ")
+        topic_counts[topic_file.stem] = count
+        total += count
+
+    links_count = 0
+    if LINKS_FILE.exists():
+        links_count = LINKS_FILE.read_text(encoding="utf-8").count("\n- ")
+
+    with open(INDEX_FILE, "w", encoding="utf-8") as f:
+        f.write(f"""# Twitter Bookmarks Index
+
+> Auto-generated by Hermes/OpenClaw team. Organized from your saved Twitter bookmarks.
+
+## Quick Stats
+
+| Metric | Count |
+|--------|-------|
+| Total Bookmarks | {total} |
+| AI Posts | {topic_counts.get('ai', 0)} |
+| Trading Posts | {topic_counts.get('trading', 0)} |
+| Tools Posts | {topic_counts.get('tools', 0)} |
+| Research Posts | {topic_counts.get('research', 0)} |
+| Links Extracted | {links_count} |
+| Last Updated | {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')} |
+
+## By Topic
+
+| Topic | File | Count |
+|-------|------|-------|
+| AI | [by-topic/ai.md](./by-topic/ai.md) | {topic_counts.get('ai', 0)} |
+| Trading | [by-topic/trading.md](./by-topic/trading.md) | {topic_counts.get('trading', 0)} |
+| Tools | [by-topic/tools.md](./by-topic/tools.md) | {topic_counts.get('tools', 0)} |
+| Research | [by-topic/research.md](./by-topic/research.md) | {topic_counts.get('research', 0)} |
+| Other | [by-topic/other.md](./by-topic/other.md) | {topic_counts.get('other', 0)} |
+
+## Recent Bookmarks
+
+_Last batch: {len(entries)} bookmarks processed_
+
+## How to Use
+
+1. Save interesting posts to Twitter bookmarks
+2. Tell Hermes: `/bookmarks` or `/bookmarks --summarize`
+3. Hermes reads, organizes, and saves to this workspace
+4. Team agents can then: find GitHub repos, deep-dive articles, extract trading insights
+""")
+
+
+def main():
+    print("Twitter Bookmark Processor")
+    print("=" * 40)
+    print("Paste your bookmark content below (Ctrl+D or Ctrl+Z when done):")
+    print()
+
+    raw_text = sys.stdin.read()
+
+    if not raw_text.strip():
+        print("No content provided.")
+        return
+
+    entries = process_bookmarks(raw_text)
+
+    if not entries:
+        print("No bookmarks found in the provided text.")
+        return
+
+    save_by_topic(entries)
+    save_links(entries)
+    update_index(entries)
+
+    print(f"\n✅ Processed {len(entries)} bookmarks:")
+    topics = {}
+    for e in entries:
+        topics[e["topic"]] = topics.get(e["topic"], 0) + 1
+    for topic, count in sorted(topics.items(), key=lambda x: x[1], reverse=True):
+        print(f"  {topic}: {count}")
+    print(f"\nSaved to {WORKSPACE}")
+
+
+if __name__ == "__main__":
+    main()

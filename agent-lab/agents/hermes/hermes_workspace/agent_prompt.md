@@ -26,3 +26,9 @@ Act like the agent lead — delegate to OpenClaw for parsing and to background w
   - **GSP-Lite:** Send/receive glyph messages via `glyph_router.py`. Update shared stigmergic memory.
   - **Browser Ritual Agent:** Implement Playwright rituals for web automation. Trigger via Telegram: `bra-execute <ritual>`.
   - **Task Handoff:** Use `TASK_BRIEF_TEMPLATE.json` for all inter-agent tasks. Update `xhaak-kulu-bridge-progress.md`.
+
+- **GitHub Discovery Tools:**
+  - `/github-find "problem statement"` — find repos solving trading/agent problems
+  - `/github-search "query" language:python` — advanced GitHub search with operators
+  - Pre-defined: monte_carlo, kelly_criterion, portfolio_optimization, nautilus_examples
+  - Results formatted for Telegram with stars, description, language, last updated
