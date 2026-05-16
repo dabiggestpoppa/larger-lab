@@ -80,3 +80,16 @@ _(Newest at bottom)_
 - Phase 3 (Emergent Topology) — ✅ Complete (4/4 tests)
 - Phase 3 Book 2 (Updated Architecture) — ✅ Complete (6/6 tests)
 - Phase 4 (Workspace Integration) — ✅ Complete (6/6 tests)
+
+---
+
+### [HERMES] 2026-05-16 00:12:00Z — Hermes Telegram Bot Online
+@CC @AS @OC @PM — Hermes is now online as a separate Telegram bot (@HERMESBLRRBOT).
+
+**Status:**
+- Bot connected and polling successfully
+- Responding to direct messages and commands
+- Reads from shared workspace progress files
+- Commands: /status, /workspace, /plan, /decision, /team, /memory, /help
+
+**Note:** Hermes can now receive instructions from MAD directly via Telegram and coordinate with the team through the shared workspace files.

@@ -1,16 +1,15 @@
 """
-Dual Discord Bot Runner - Threaded
-Each bot runs in its own thread with its own event loop.
+Dual Discord Bot Runner
+blrr city + hermes boa in one process via asyncio.
 """
 
 import discord
 from discord import app_commands
-import os, re, subprocess, sys, threading
+import os, re, subprocess, sys, asyncio
 from pathlib import Path
 from datetime import datetime
 from dotenv import load_dotenv
 
-# Fix Windows encoding
 if sys.platform == 'win32':
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
     sys.stderr.reconfigure(encoding='utf-8', errors='replace')
@@ -21,9 +20,7 @@ load_dotenv(env_path, override=True)
 WORKSPACE = Path(os.getenv("WORKSPACE_PATH", str(Path(__file__).parent.parent)))
 PROGRESS_FILE = WORKSPACE / "PROJECT_PROGRESS_CLEAN.md"
 
-# ── Shared State (thread-safe via GIL) ──
 active_agent = "hermes"
-responded_lock = threading.Lock()
 responded_messages = set()
 
 
@@ -95,19 +92,16 @@ def openclaw_handle(content):
     return f'OPENCLAW: "{content[:150]}" -- try status, workspace, run <script>, edit: <text>'
 
 
-def is_duplicate(message_id):
-    with responded_lock:
-        if message_id in responded_messages:
-            return True
-        responded_messages.add(message_id)
-        if len(responded_messages) > 3000:
-            responded_messages.clear()
-        return False
+def is_dup(msg_id):
+    if msg_id in responded_messages:
+        return True
+    responded_messages.add(msg_id)
+    if len(responded_messages) > 3000:
+        responded_messages.clear()
+    return False
 
 
-# ═══════════════════════════════════════
-# BOT 1: blrr city (combined)
-# ═══════════════════════════════════════
+# ── Bot 1: blrr city ──
 
 intents1 = discord.Intents.default()
 intents1.message_content = True
@@ -118,16 +112,16 @@ blrr_tree = app_commands.CommandTree(blrr)
 
 @blrr.event
 async def on_ready():
-    print(f'[OK] blrr city connected (id={blrr.user.id})')
+    print(f'[OK] blrr city: {blrr.user} (id={blrr.user.id})', flush=True)
     try:
         gid = os.getenv("DISCORD_GUILD_ID")
         if gid:
             guild = discord.Object(id=int(gid))
             blrr_tree.copy_global_to(guild=guild)
             synced = await blrr_tree.sync(guild=guild)
-            print(f'  Synced {len(synced)} commands')
+            print(f'  Synced {len(synced)} commands', flush=True)
     except Exception as e:
-        print(f'  Sync error: {e}')
+        print(f'  Sync error: {e}', flush=True)
     await blrr.change_presence(activity=discord.Activity(
         type=discord.ActivityType.watching, name='@mentions | /hermes | /openclaw'))
 
@@ -136,25 +130,19 @@ async def on_ready():
 async def on_message(message):
     if message.author.id == blrr.user.id:
         return
-    if is_duplicate(message.id):
+    if is_dup(message.id):
         return
-
     bot_id = blrr.user.id
     mentioned = f'<@{bot_id}>' in message.content or f'<@!{bot_id}>' in message.content
     if not mentioned:
         return
-
-    print(f'[blrr] {message.author}: {message.content[:80]}')
+    print(f'[blrr] {message.author}: {message.content[:80]}', flush=True)
     clean = message.content.replace(f'<@{bot_id}>', '').replace(f'<@!{bot_id}>', '').strip()
     if not clean:
         name = 'Hermes' if active_agent == 'hermes' else 'OpenClaw'
         await message.channel.send(f'Active: **{name}**. Use /hermes or /openclaw to switch.')
         return
-
-    if active_agent == 'hermes':
-        response = hermes_handle(clean)
-    else:
-        response = openclaw_handle(clean)
+    response = hermes_handle(clean) if active_agent == 'hermes' else openclaw_handle(clean)
     await message.channel.send(response)
 
 
@@ -185,9 +173,7 @@ async def blrr_status(interaction: discord.Interaction):
     await interaction.response.send_message(embed=embed)
 
 
-# ═══════════════════════════════════════
-# BOT 2: hermes boa (dedicated Hermes)
-# ═══════════════════════════════════════
+# ── Bot 2: hermes boa ──
 
 intents2 = discord.Intents.default()
 intents2.message_content = True
@@ -198,16 +184,16 @@ hermes_tree = app_commands.CommandTree(hermes_bot)
 
 @hermes_bot.event
 async def on_ready():
-    print(f'[OK] hermes boa connected (id={hermes_bot.user.id})')
+    print(f'[OK] hermes boa: {hermes_bot.user} (id={hermes_bot.user.id})', flush=True)
     try:
         gid = os.getenv("DISCORD_GUILD_ID")
         if gid:
             guild = discord.Object(id=int(gid))
             hermes_tree.copy_global_to(guild=guild)
             synced = await hermes_tree.sync(guild=guild)
-            print(f'  Synced {len(synced)} commands')
+            print(f'  Synced {len(synced)} commands', flush=True)
     except Exception as e:
-        print(f'  Sync error: {e}')
+        print(f'  Sync error: {e}', flush=True)
     await hermes_bot.change_presence(activity=discord.Activity(
         type=discord.ActivityType.listening, name='architecture'))
 
@@ -216,22 +202,18 @@ async def on_ready():
 async def on_message(message):
     if message.author.id == hermes_bot.user.id:
         return
-    if is_duplicate(message.id):
+    if is_dup(message.id):
         return
-
     bot_id = hermes_bot.user.id
     mentioned = f'<@{bot_id}>' in message.content or f'<@!{bot_id}>' in message.content
     if not mentioned:
         return
-
-    print(f'[hermes] {message.author}: {message.content[:80]}')
+    print(f'[hermes] {message.author}: {message.content[:80]}', flush=True)
     clean = message.content.replace(f'<@{bot_id}>', '').replace(f'<@!{bot_id}>', '').strip()
     if not clean:
         await message.channel.send('HERMES - Architect & Planner. Ask about status, workspace, plans, or decisions.')
         return
-
-    response = hermes_handle(clean)
-    await message.channel.send(response)
+    await message.channel.send(hermes_handle(clean))
 
 
 @hermes_tree.command(name='hermes', description='Talk to Hermes (Architect & Planner)')
@@ -245,25 +227,19 @@ async def hermes_status(interaction: discord.Interaction):
     await interaction.response.send_message(hermes_handle('status'))
 
 
-# ═══════════════════════════════════════
-# RUN BOTH IN SEPARATE THREADS
-# ═══════════════════════════════════════
+# ── Main ──
 
-def run_blrr():
-    blrr.run(os.getenv('DISCORD_BOT_TOKEN'))
-
-def run_hermes():
-    hermes_bot.run(os.getenv('DISCORD_HERMES_TOKEN'))
+async def main():
+    t1 = os.getenv('DISCORD_BOT_TOKEN')
+    t2 = os.getenv('DISCORD_HERMES_TOKEN')
+    print(f'Starting dual bot...', flush=True)
+    print(f'  blrr city token: {len(t1)} chars', flush=True)
+    print(f'  hermes token: {len(t2)} chars', flush=True)
+    await asyncio.gather(
+        blrr.start(t1),
+        hermes_bot.start(t2),
+    )
 
 
 if __name__ == '__main__':
-    t1 = threading.Thread(target=run_blrr, daemon=True)
-    t2 = threading.Thread(target=run_hermes, daemon=True)
-    t1.start()
-    t2.start()
-    print('Both bot threads started. Press Ctrl+C to stop.')
-    try:
-        t1.join()
-        t2.join()
-    except KeyboardInterrupt:
-        print('\nStopping...')
+    asyncio.run(main())

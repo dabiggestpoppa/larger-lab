@@ -1,0 +1,56 @@
+[23:32:47] ============================================================
+[23:32:47] FIXED DATA PREP - MT5 Tab-Separated Format
+[23:32:47] ============================================================
+[23:32:47] Found 27 CSV files
+[23:32:47] Grouped into 25 symbol/timeframe combos
+[23:32:47] 
+--- AUDUSD_M1 (1 files) ---
+[23:32:47]   Parsing AUDUSD!_M1_202301020000_202605061253.csv...
+[23:32:51]   Parse error: arg must be a list, tuple, 1-d array, or Series
+[23:34:28] ============================================================
+[23:34:28] FIXED DATA PREP - MT5 Tab-Separated Format
+[23:34:28] ============================================================
+[23:34:28] Found 27 CSV files
+[23:34:28] Grouped into 25 symbol/timeframe combos
+[23:34:28] 
+--- AUDUSD_M1 (1 files) ---
+[23:34:28]   Parsing AUDUSD!_M1_202301020000_202605061253.csv...
+[23:35:04]   Parse error: can only concatenate str (not "method") to str
+[23:35:05]   FAIL AUDUSD!_M1_202301020000_202605061253.csv: parse failed
+[23:35:05]   SKIP: no valid data
+[23:35:05] 
+--- AUDUSD_M5 (1 files) ---
+[23:35:05]   Parsing AUDUSD!_M5_202301020000_202605061250.csv...
+[23:35:09]   Parse error: can only concatenate str (not "method") to str
+[23:35:09]   FAIL AUDUSD!_M5_202301020000_202605061250.csv: parse failed
+[23:35:09]   SKIP: no valid data
+[23:35:09] 
+--- CHFJPY_M1 (2 files) ---
+[23:35:09]   Parsing CHFJPY!_M1_202201030000_202605061253.csv...
+[23:35:41]   Parse error: can only concatenate str (not "method") to str
+[23:35:43]   FAIL CHFJPY!_M1_202201030000_202605061253.csv: parse failed
+[23:35:43]   Parsing CHFJPY!_M1_202301020000_202605061253.csv...
+[23:36:08]   Parse error: can only concatenate str (not "method") to str
+[23:36:09]   FAIL CHFJPY!_M1_202301020000_202605061253.csv: parse failed
+[23:36:09]   SKIP: no valid data
+[23:36:09] 
+--- CHFJPY_M5 (1 files) ---
+[23:36:09]   Parsing CHFJPY!_M5_202201030000_202605061250.csv...
+[23:36:12]   Parse error: can only concatenate str (not "method") to str
+[23:36:12]   FAIL CHFJPY!_M5_202201030000_202605061250.csv: parse failed
+[23:36:12]   SKIP: no valid data
+[23:36:12] 
+--- DE30_M1 (1 files) ---
+[23:36:12]   Parsing DE30_M1_202306120637_202604302259.csv...
+[23:36:25]   Parse error: can only concatenate str (not "method") to str
+[23:36:27]   FAIL DE30_M1_202306120637_202604302259.csv: parse failed
+[23:36:27]   SKIP: no valid data
+[23:36:27] 
+--- DE30_M5 (1 files) ---
+[23:36:27]   Parsing DE30_M5_202301020200_202604302255.csv...
+[23:36:35]   Parse error: can only concatenate str (not "method") to str
+[23:36:35]   FAIL DE30_M5_202301020200_202604302255.csv: parse failed
+[23:36:35]   SKIP: no valid data
+[23:36:35] 
+--- EURUSD.PRO_202407010000 (1 files) ---
+[23:36:35]   Parsing EURUSD.PRO_202407010000_202605132122.csv...

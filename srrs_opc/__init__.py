@@ -38,7 +38,7 @@ from .reconstruction_safe_exec import ReconstructionSafeExecutor, ExecutionSafet
 from .trajectory_fields import TrajectoryFragment, TrajectoryReconstructionField
 from .continuity_collars import ContinuityCollar, ContinuityCollarManager, TemporalOverlap
 from .temporal_attractors import TemporalAttractor, AttractorField
-from .drift_tracker import DriftTracker, DriftSignal
+from .drift_tracker import LongTermDriftTracker, DriftSignal
 from .reinforcement_engine import ReinforcementEngine, ReinforcementRecord
 
 __all__ = [

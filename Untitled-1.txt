@@ -1,0 +1,366 @@
+pine indicator to convert to strategy : //@version=6
+// CEREBUS Symmetry ASAIN Sniper [MP] — 13 pairs
+// Tier-specific atom filtering — atoms only show for confirmed tier's range
+// EURUSD USDCHF BTCUSD ETHUSD XAUUSD NAS100 DE30 FR40 HK50 CHFJPY GBPUSD USDJPY NZDUSD
+// + Asian Atom continuous loop (19:00-03:00 EST, no bias filter, orange labels)
+// PLAIN TEXT ALERTS for MetaTrader Copier EA
+
+indicator("CEREBUS Symmetry ASAIN Sniper [MP]", overlay=true,
+     max_lines_count=500, max_boxes_count=200, max_labels_count=500)
+
+i_tz         = input.string("America/New_York", "Timezone", options=["America/New_York","UTC","Europe/London"])
+i_show_tier  = input.bool(true, "Show Tier Impulses")
+i_show_atom  = input.bool(true, "Show Atomic Moves")
+i_show_dz    = input.bool(true, "Show Density Zone")
+i_show_panel = input.bool(true, "Show Truth Panel")
+
+DZ_LO = 0.80
+DZ_HI = 1.20
+
+_sym    = syminfo.ticker
+_eu     = str.contains(_sym, "EURUSD")
+_uc     = str.contains(_sym, "USDCHF")
+_btc    = str.contains(_sym, "BTC")
+_eth    = str.contains(_sym, "ETH")
+_xau    = str.contains(_sym, "XAUUSD") or str.contains(_sym, "GOLD")
+_nas    = str.contains(_sym, "NAS100") or str.contains(_sym, "USTEC") or str.contains(_sym, "US100") or str.contains(_sym, "NASDAQ")
+_de30   = str.contains(_sym, "DE30") or str.contains(_sym, "GER40") or str.contains(_sym, "DAX")
+_fr40   = str.contains(_sym, "FR40") or str.contains(_sym, "CAC40")
+_hk50   = str.contains(_sym, "HK50") or str.contains(_sym, "HSI")
+_chfjpy = str.contains(_sym, "CHFJPY")
+_gbpusd = str.contains(_sym, "GBPUSD")
+_usdjpy = str.contains(_sym, "USDJPY")
+_nzdusd = str.contains(_sym, "NZDUSD")
+_idx    = _de30 or _fr40
+
+pair_supported = _eu or _uc or _btc or _eth or _xau or _nas or _idx or _hk50 or _chfjpy or _gbpusd or _usdjpy or _nzdusd
+pip = _btc or _eth or _xau or _nas or _idx or _hk50 ? 1.0 : _chfjpy or _usdjpy ? 0.01 : 0.0001
+
+T1_ar_p   = _btc?750.0  :_eth?70.0  :_xau?32.0 :_nas?68.0  :_idx?39.0 :_hk50?185.0:_chfjpy?28.0:_gbpusd?26.0:_usdjpy?32.0:_nzdusd?28.0:20.0
+T2_ar_p   = _btc?1700.0 :_eth?105.0 :_xau?58.0 :_nas?128.0 :_idx?74.0 :_hk50?340.0:_chfjpy?48.0:_gbpusd?39.0:_usdjpy?52.0:_nzdusd?42.0:30.0
+T3_ar_p   = _btc?3000.0 :_eth?160.0 :_xau?95.0 :_nas?245.0 :_idx?142.0:_hk50?650.0:_chfjpy?85.0:_gbpusd?59.0:_usdjpy?88.0:_nzdusd?64.0:45.0
+T1_trig_p = _btc?246.0  :_eth?42.0  :_xau?19.0 :_nas?41.0  :_idx?23.0 :_hk50?110.0:_chfjpy?17.0:_gbpusd?16.0:_usdjpy?19.0:_nzdusd?17.0:12.0
+T2_trig_p = _btc?654.0  :_eth?52.0  :_xau?35.0 :_nas?77.0  :_idx?44.0 :_hk50?204.0:_chfjpy?29.0:_gbpusd?19.0:_usdjpy?31.0:_nzdusd?20.0:15.0
+T3_trig_p = _btc?1392.0 :_eth?65.0  :_xau?58.0 :_nas?146.0 :_idx?85.0 :_hk50?390.0:_chfjpy?50.0:_gbpusd?24.0:_usdjpy?53.0:_nzdusd?25.0:19.0
+T1_atom_p = _btc?205.0  :_eth?35.0  :_xau?16.0 :_nas?34.0  :_idx?19.0 :_hk50?92.0 :_chfjpy?14.0:_gbpusd?13.0:_usdjpy?16.0:_nzdusd?14.0:10.0
+T2_atom_p = _btc?545.0  :_eth?42.0  :_xau?29.0 :_nas?64.0  :_idx?37.0 :_hk50?170.0:_chfjpy?24.0:_gbpusd?16.0:_usdjpy?26.0:_nzdusd?17.0:12.0
+T3_atom_p = _btc?1160.0 :_eth?52.0  :_xau?48.0 :_nas?122.0 :_idx?71.0 :_hk50?325.0:_chfjpy?42.0:_gbpusd?20.0:_usdjpy?44.0:_nzdusd?21.0:15.0
+
+MIN_P       = T1_atom_p
+atom_buffer = 0.90
+
+f_atom(_t)            => _t == 1 ? T1_atom_p : _t == 2 ? T2_atom_p : T3_atom_p
+f_tier_from_move(_p)  => _p >= T3_trig_p ? 3 : _p >= T2_trig_p ? 2 : 1
+f_tier_from_range(_p) => _p <= T1_ar_p   ? 1 : _p <= T2_ar_p   ? 2 : _p <= T3_ar_p ? 3 : 0
+
+asian_sess    = "1900-0300"
+is_crypto     = _btc or _eth
+bias_sess     = is_crypto ? "0300-1500" : "0300-1200"
+in_asian      = timeframe.isintraday and not na(time(timeframe.period, asian_sess, i_tz))
+in_bias       = timeframe.isintraday and not na(time(timeframe.period, bias_sess,  i_tz))
+asian_started = in_asian and not in_asian[1]
+asian_ended   = not in_asian and in_asian[1]
+bias_started  = in_bias and not in_bias[1]
+
+var float ar_hi = na
+var float ar_lo = na
+
+if asian_started
+    ar_hi := high
+    ar_lo := low
+if in_asian and not asian_started
+    ar_hi := math.max(ar_hi, high)
+    ar_lo := math.min(ar_lo, low)
+
+var float swing_origin   = na
+var int   swing_sbar     = na
+var float swing_spx      = na
+var float rolling_hi     = na
+var float rolling_lo     = na
+var int   rolling_hi_bar = na
+var int   rolling_lo_bar = na
+var int   working_tier   = 1
+var bool  tier_ok        = false
+var float dz_origin      = na
+var int   dz_dir         = 0
+var box   dz_box         = na
+
+sl_buf_p = _btc?100.0:_eth?5.0:_xau?4.0:_nas?12.0:_idx?7.0:_hk50?35.0:_gbpusd?(working_tier==1?5.0:working_tier==2?6.0:8.0):_usdjpy?(working_tier==1?6.0:working_tier==2?10.0:18.0):_nzdusd?(working_tier==1?6.0:working_tier==2?7.0:8.0):5.0
+sl_buf   = sl_buf_p * pip
+
+if bias_started
+    swing_origin   := close
+    swing_sbar     := bar_index
+    swing_spx      := close
+    rolling_hi     := high
+    rolling_lo     := low
+    rolling_hi_bar := bar_index
+    rolling_lo_bar := bar_index
+    dz_dir         := 0
+    tier_ok        = false
+    working_tier   = 1
+
+if asian_ended and not tier_ok and not na(ar_hi) and not na(ar_lo)
+    ar_range = (ar_hi - ar_lo) / pip
+    final_t  = f_tier_from_range(ar_range)
+    if final_t != 0
+        working_tier := final_t
+        tier_ok      = true
+        if dz_dir != 0 and not na(dz_origin) and not na(dz_box)
+            new_atom = f_atom(working_tier) * pip
+            if dz_dir == -1
+                box.set_top(dz_box, dz_origin - new_atom * DZ_LO)
+                box.set_bottom(dz_box, dz_origin - new_atom * DZ_HI)
+            else
+                box.set_top(dz_box, dz_origin + new_atom * DZ_HI)
+                box.set_bottom(dz_box, dz_origin + new_atom * DZ_LO)
+
+if na(swing_origin) and barstate.isconfirmed
+    swing_origin   := close
+    rolling_hi     := high
+    rolling_lo     := low
+    rolling_hi_bar := bar_index
+    rolling_lo_bar := bar_index
+    swing_sbar     := bar_index
+    swing_spx      := close
+
+if not na(rolling_hi) and high > rolling_hi
+    rolling_hi     := high
+    rolling_hi_bar := bar_index
+if not na(rolling_lo) and low < rolling_lo
+    rolling_lo     := low
+    rolling_lo_bar := bar_index
+
+up_move_p   = not na(rolling_hi) and not na(swing_origin) ? (rolling_hi - swing_origin) / pip : 0.0
+down_move_p = not na(rolling_lo) and not na(swing_origin) ? (swing_origin - rolling_lo)  / pip : 0.0
+
+cur_atom_p = working_tier == 1 ? T1_atom_p : working_tier == 2 ? T2_atom_p : T3_atom_p
+cur_trig_p = working_tier == 1 ? T1_trig_p : working_tier == 2 ? T2_trig_p : T3_trig_p
+
+bear_atom_cond  = pair_supported and in_bias and tier_ok and up_move_p >= (cur_atom_p * atom_buffer) and up_move_p < cur_trig_p and close < open and barstate.isconfirmed
+bull_atom_cond  = pair_supported and in_bias and tier_ok and down_move_p >= (cur_atom_p * atom_buffer) and down_move_p < cur_trig_p and close > open and barstate.isconfirmed
+bear_tier_cond  = pair_supported and in_bias and up_move_p >= T1_trig_p and close < open and barstate.isconfirmed
+bull_tier_cond  = pair_supported and in_bias and down_move_p >= T1_trig_p and close > open and barstate.isconfirmed
+asian_bear_atom = pair_supported and in_asian and up_move_p >= (cur_atom_p * atom_buffer) and up_move_p < cur_trig_p and close < open and barstate.isconfirmed
+asian_bull_atom = pair_supported and in_asian and down_move_p >= (cur_atom_p * atom_buffer) and down_move_p < cur_trig_p and close > open and barstate.isconfirmed
+
+cur_atom = f_atom(working_tier) * pip
+dz_top   = dz_dir == -1 ? dz_origin - cur_atom * DZ_LO : dz_dir == 1 ? dz_origin + cur_atom * DZ_HI : na
+dz_bot   = dz_dir == -1 ? dz_origin - cur_atom * DZ_HI : dz_dir == 1 ? dz_origin + cur_atom * DZ_LO : na
+in_dz    = not na(dz_top) and not na(dz_bot) and close <= dz_top and close >= dz_bot
+unit_str = pip == 1.0 ? "pt" : "p"
+
+// ── ATOM SHORT ─────────────────
+if bear_atom_cond
+    if i_show_atom
+        label.new(rolling_hi_bar, rolling_hi, text="ATOM " + str.tostring(math.round(up_move_p)) + unit_str, style=label.style_label_down, color=color.new(color.aqua, 25), textcolor=color.white, size=size.tiny)
+    au_px   = f_atom(working_tier) * pip
+    sl_px   = high + sl_buf
+    tp_px   = close - au_px
+    be_px   = close - au_px * 0.50
+    risk_px = math.max(sl_px - close, pip)
+    r_val   = au_px / risk_px
+    tp_p    = f_atom(working_tier)
+    sl_p    = -sl_buf_p
+    be_p    = math.round(tp_p * 0.50)
+    alert("SELL " + _sym + " | Entry:" + str.tostring(close, format.mintick) + " | SL:" + str.tostring(sl_px, format.mintick) + " | TP:" + str.tostring(tp_px, format.mintick) + " | BE:" + str.tostring(be_px, format.mintick) + " | SL:" + str.tostring(sl_p, "0") + unit_str + " TP:" + str.tostring(tp_p, "0") + unit_str + " BE:" + str.tostring(be_p, "0") + unit_str + " R:" + str.tostring(r_val, "#.##") + "R | ATOM SHORT", alert.freq_once_per_bar_close)
+    swing_origin   := rolling_hi
+    swing_sbar     := rolling_hi_bar
+    swing_spx      := rolling_hi
+    rolling_hi     := high
+    rolling_lo     := low
+    rolling_hi_bar := bar_index
+    rolling_lo_bar := bar_index
+
+// ── ATOM LONG ─────────────────
+if bull_atom_cond
+    if i_show_atom
+        label.new(rolling_lo_bar, rolling_lo, text="ATOM " + str.tostring(math.round(down_move_p)) + unit_str, style=label.style_label_up, color=color.new(color.fuchsia, 25), textcolor=color.white, size=size.tiny)
+    au_px   = f_atom(working_tier) * pip
+    sl_px   = low - sl_buf
+    tp_px   = close + au_px
+    be_px   = close + au_px * 0.50
+    risk_px = math.max(close - sl_px, pip)
+    r_val   = au_px / risk_px
+    tp_p    = f_atom(working_tier)
+    sl_p    = -sl_buf_p
+    be_p    = math.round(tp_p * 0.50)
+    alert("BUY " + _sym + " | Entry:" + str.tostring(close, format.mintick) + " | SL:" + str.tostring(sl_px, format.mintick) + " | TP:" + str.tostring(tp_px, format.mintick) + " | BE:" + str.tostring(be_px, format.mintick) + " | SL:" + str.tostring(sl_p, "0") + unit_str + " TP:" + str.tostring(tp_p, "0") + unit_str + " BE:" + str.tostring(be_p, "0") + unit_str + " R:" + str.tostring(r_val, "#.##") + "R | ATOM LONG", alert.freq_once_per_bar_close)
+    swing_origin   := rolling_lo
+    swing_sbar     := rolling_lo_bar
+    swing_spx      := rolling_lo
+    rolling_hi     := high
+    rolling_lo     := low
+    rolling_hi_bar := bar_index
+    rolling_lo_bar := bar_index
+
+// ── TIER SHORT ─────────────────
+if bear_tier_cond
+    anchor     = rolling_hi
+    anchor_bar = rolling_hi_bar
+    sig_pips   = math.round(up_move_p)
+    if not tier_ok
+        working_tier := f_tier_from_move(up_move_p)
+    if not na(swing_sbar) and not na(swing_spx) and i_show_tier
+        line.new(swing_sbar, swing_spx, anchor_bar, anchor, color=color.new(color.lime, 0), width=2)
+    if i_show_tier
+        label.new(anchor_bar, anchor, text="TIER " + str.tostring(sig_pips) + unit_str, style=label.style_label_down, color=color.new(color.lime, 15), textcolor=color.white, size=size.small)
+    if i_show_dz
+        this_atom = f_atom(working_tier) * pip
+        if not na(dz_box)
+            box.delete(dz_box)
+        dz_box    := box.new(anchor_bar, anchor - this_atom * DZ_LO, anchor_bar + 80, anchor - this_atom * DZ_HI, bgcolor=color.new(color.lime, 75), border_color=color.new(color.lime, 0), border_width=2)
+        dz_origin := anchor
+        dz_dir    := -1
+    au_px   = f_atom(working_tier) * pip
+    sl_px   = high + sl_buf
+    tp_px   = close - au_px
+    be_px   = close - au_px * 0.50
+    risk_px = math.max(sl_px - close, pip)
+    r_val   = au_px / risk_px
+    tp_p    = f_atom(working_tier)
+    sl_p    = -sl_buf_p
+    be_p    = math.round(tp_p * 0.50)
+    alert("SELL " + _sym + " | Entry:" + str.tostring(close, format.mintick) + " | SL:" + str.tostring(sl_px, format.mintick) + " | TP:" + str.tostring(tp_px, format.mintick) + " | BE:" + str.tostring(be_px, format.mintick) + " | SL:" + str.tostring(sl_p, "0") + unit_str + " TP:" + str.tostring(tp_p, "0") + unit_str + " BE:" + str.tostring(be_p, "0") + unit_str + " R:" + str.tostring(r_val, "#.##") + "R | TIER SHORT", alert.freq_once_per_bar_close)
+    swing_origin   := anchor
+    swing_sbar     := anchor_bar
+    swing_spx      := anchor
+    rolling_hi     := high
+    rolling_lo     := low
+    rolling_hi_bar := bar_index
+    rolling_lo_bar := bar_index
+
+// ── TIER LONG ─────────────────
+if bull_tier_cond
+    anchor     = rolling_lo
+    anchor_bar = rolling_lo_bar
+    sig_pips   = math.round(down_move_p)
+    if not tier_ok
+        working_tier := f_tier_from_move(down_move_p)
+    if not na(swing_sbar) and not na(swing_spx) and i_show_tier
+        line.new(swing_sbar, swing_spx, anchor_bar, anchor, color=color.new(color.red, 0), width=2)
+    if i_show_tier
+        label.new(anchor_bar, anchor, text="TIER " + str.tostring(sig_pips) + unit_str, style=label.style_label_up, color=color.new(color.red, 15), textcolor=color.white, size=size.small)
+    if i_show_dz
+        this_atom = f_atom(working_tier) * pip
+        if not na(dz_box)
+            box.delete(dz_box)
+        dz_box    := box.new(anchor_bar, anchor + this_atom * DZ_HI, anchor_bar + 80, anchor + this_atom * DZ_LO, bgcolor=color.new(color.red, 75), border_color=color.new(color.red, 0), border_width=2)
+        dz_origin := anchor
+        dz_dir    := 1
+    au_px   = f_atom(working_tier) * pip
+    sl_px   = low - sl_buf
+    tp_px   = close + au_px
+    be_px   = close + au_px * 0.50
+    risk_px = math.max(close - sl_px, pip)
+    r_val   = au_px / risk_px
+    tp_p    = f_atom(working_tier)
+    sl_p    = -sl_buf_p
+    be_p    = math.round(tp_p * 0.50)
+    alert("BUY " + _sym + " | Entry:" + str.tostring(close, format.mintick) + " | SL:" + str.tostring(sl_px, format.mintick) + " | TP:" + str.tostring(tp_px, format.mintick) + " | BE:" + str.tostring(be_px, format.mintick) + " | SL:" + str.tostring(sl_p, "0") + unit_str + " TP:" + str.tostring(tp_p, "0") + unit_str + " BE:" + str.tostring(be_p, "0") + unit_str + " R:" + str.tostring(r_val, "#.##") + "R | TIER LONG", alert.freq_once_per_bar_close)
+    swing_origin   := anchor
+    swing_sbar     := anchor_bar
+    swing_spx      := anchor
+    rolling_hi     := high
+    rolling_lo     := low
+    rolling_hi_bar := bar_index
+    rolling_lo_bar := bar_index
+
+// ── ASIAN ATOM SHORT ─────────────────
+if asian_bear_atom
+    if i_show_atom
+        label.new(rolling_hi_bar, rolling_hi, text="ASIAN " + str.tostring(math.round(up_move_p)) + unit_str, style=label.style_label_down, color=color.new(color.orange, 25), textcolor=color.white, size=size.tiny)
+    au_px   = f_atom(working_tier) * pip
+    sl_px   = high + sl_buf
+    tp_px   = close - au_px
+    be_px   = close - au_px * 0.50
+    risk_px = math.max(sl_px - close, pip)
+    r_val   = au_px / risk_px
+    tp_p    = f_atom(working_tier)
+    sl_p    = -sl_buf_p
+    be_p    = math.round(tp_p * 0.50)
+    alert("SELL " + _sym + " | Entry:" + str.tostring(close, format.mintick) + " | SL:" + str.tostring(sl_px, format.mintick) + " | TP:" + str.tostring(tp_px, format.mintick) + " | BE:" + str.tostring(be_px, format.mintick) + " | SL:" + str.tostring(sl_p, "0") + unit_str + " TP:" + str.tostring(tp_p, "0") + unit_str + " BE:" + str.tostring(be_p, "0") + unit_str + " R:" + str.tostring(r_val, "#.##") + "R | ASIAN ATOM SHORT", alert.freq_once_per_bar_close)
+    swing_origin   := rolling_hi
+    swing_sbar     := rolling_hi_bar
+    swing_spx      := rolling_hi
+    rolling_hi     := high
+    rolling_lo     := low
+    rolling_hi_bar := bar_index
+    rolling_lo_bar := bar_index
+
+// ── ASIAN ATOM LONG ─────────────────
+if asian_bull_atom
+    if i_show_atom
+        label.new(rolling_lo_bar, rolling_lo, text="ASIAN " + str.tostring(math.round(down_move_p)) + unit_str, style=label.style_label_up, color=color.new(color.orange, 25), textcolor=color.white, size=size.tiny)
+    au_px   = f_atom(working_tier) * pip
+    sl_px   = low - sl_buf
+    tp_px   = close + au_px
+    be_px   = close + au_px * 0.50
+    risk_px = math.max(close - sl_px, pip)
+    r_val   = au_px / risk_px
+    tp_p    = f_atom(working_tier)
+    sl_p    = -sl_buf_p
+    be_p    = math.round(tp_p * 0.50)
+    alert("BUY " + _sym + " | Entry:" + str.tostring(close, format.mintick) + " | SL:" + str.tostring(sl_px, format.mintick) + " | TP:" + str.tostring(tp_px, format.mintick) + " | BE:" + str.tostring(be_px, format.mintick) + " | SL:" + str.tostring(sl_p, "0") + unit_str + " TP:" + str.tostring(tp_p, "0") + unit_str + " BE:" + str.tostring(be_p, "0") + unit_str + " R:" + str.tostring(r_val, "#.##") + "R | ASIAN ATOM LONG", alert.freq_once_per_bar_close)
+    swing_origin   := rolling_lo
+    swing_sbar     := rolling_lo_bar
+    swing_spx      := rolling_lo
+    rolling_hi     := high
+    rolling_lo     := low
+    rolling_hi_bar := bar_index
+    rolling_lo_bar := bar_index
+
+if not na(dz_box) and dz_dir != 0 and barstate.islast
+    box.set_right(dz_box, bar_index + 30)
+
+bgcolor(pair_supported and in_dz and dz_dir == -1 ? color.new(color.lime, 88) : na, title="Long DZ BG")
+bgcolor(pair_supported and in_dz and dz_dir == 1  ? color.new(color.red,  88) : na, title="Short DZ BG")
+bgcolor(pair_supported and in_bias  ? color.new(color.teal,   97) : na, title="Bias Window")
+bgcolor(pair_supported and in_asian ? color.new(color.yellow, 97) : na, title="Asian 7PM-3AM")
+
+plot(pair_supported and not na(ar_hi) ? ar_hi : na, "Asian High", color=color.new(color.blue, 30), linewidth=2, style=plot.style_linebr)
+plot(pair_supported and not na(ar_lo) ? ar_lo : na, "Asian Low",  color=color.new(color.blue, 30), linewidth=2, style=plot.style_linebr)
+
+tier_str  = "T" + str.tostring(working_tier) + (tier_ok ? "" : "?")
+tier_col  = working_tier == 1 ? color.lime : working_tier == 2 ? color.yellow : color.orange
+ar_str    = not na(ar_hi) and not na(ar_lo) ? str.tostring(math.round((ar_hi - ar_lo) / pip)) + unit_str : "--"
+atom_str  = str.tostring(f_atom(working_tier), "#") + unit_str
+sess_str  = in_bias ? "ACTIVE" : in_asian ? "ASIAN" : "CLOSED"
+sess_col  = in_bias ? color.lime : in_asian ? color.yellow : color.gray
+bias_end  = is_crypto ? "3PM" : "12PM"
+pair_str  = not pair_supported ? "UNSUPPORTED" : _btc?"BTCUSD":_eth?"ETHUSD":_xau?"XAUUSD":_nas?"NAS100":_de30?"DE30":_fr40?"FR40":_hk50?"HK50":_chfjpy?"CHFJPY":_gbpusd?"GBPUSD":_usdjpy?"USDJPY":_nzdusd?"NZDUSD":_uc?"USDCHF":"EURUSD"
+pair_col  = not pair_supported ? color.red : color.aqua
+_dt       = str.format("{0,date,yyyyMMdd}", time)
+_hm       = str.format("{0,date,HHmm}", time)
+state_id  = _sym + "_" + _dt + "_" + _hm + "_sniper"
+valid_str = str.format("{0,date,HH:mm}", time_close)
+
+var table tp = table.new(position.top_right, 2, 9, bgcolor=color.new(color.black, 8), border_width=1, border_color=color.new(color.gray, 50), frame_width=1, frame_color=color.new(color.gray, 30))
+
+if i_show_panel and barstate.islast
+    table.cell(tp, 0, 0, "SNIPER",      text_color=color.white,  text_size=size.small, bgcolor=color.new(color.navy, 15), text_halign=text.align_center)
+    table.cell(tp, 1, 0, "MULTI-PAIR",  text_color=color.orange, text_size=size.small, bgcolor=color.new(color.navy, 15), text_halign=text.align_center)
+    table.cell(tp, 0, 1, "PAIR",        text_color=color.white,  text_size=size.small, text_halign=text.align_left)
+    table.cell(tp, 1, 1, pair_str,      text_color=pair_col,     text_size=size.small, text_halign=text.align_center)
+    table.cell(tp, 0, 2, "SESSION",     text_color=color.white,  text_size=size.small, text_halign=text.align_left)
+    table.cell(tp, 1, 2, sess_str,      text_color=sess_col,     text_size=size.small, text_halign=text.align_center)
+    table.cell(tp, 0, 3, "BIAS END",    text_color=color.white,  text_size=size.small, text_halign=text.align_left)
+    table.cell(tp, 1, 3, bias_end,      text_color=color.teal,   text_size=size.small, text_halign=text.align_center)
+    table.cell(tp, 0, 4, "TIER",        text_color=color.white,  text_size=size.small, text_halign=text.align_left)
+    table.cell(tp, 1, 4, tier_str,      text_color=tier_col,     text_size=size.small, text_halign=text.align_center)
+    table.cell(tp, 0, 5, "AR RANGE",    text_color=color.white,  text_size=size.small, text_halign=text.align_left)
+    table.cell(tp, 1, 5, ar_str,        text_color=color.silver, text_size=size.small, text_halign=text.align_center)
+    table.cell(tp, 0, 6, "ATOM",        text_color=color.white,  text_size=size.small, text_halign=text.align_left)
+    table.cell(tp, 1, 6, atom_str,      text_color=color.aqua,   text_size=size.small, text_halign=text.align_center)
+    table.cell(tp, 0, 7, "STATE ID",    text_color=color.white,  text_size=size.tiny,  text_halign=text.align_left)
+    table.cell(tp, 1, 7, state_id,      text_color=color.yellow, text_size=size.tiny,  text_halign=text.align_center)
+    table.cell(tp, 0, 8, "VALID UNTIL", text_color=color.white,  text_size=size.tiny,  text_halign=text.align_left)
+    table.cell(tp, 1, 8, valid_str,     text_color=color.white,  text_size=size.tiny,  text_halign=text.align_center)
+
+// ── ALERT CONDITIONS (plain text for EA parsing) ─────────────────
+alertcondition(bear_tier_cond,  "SNIPER TIER SHORT", "SELL {{ticker}} | Entry:{{close}} | TIER SHORT")
+alertcondition(bull_tier_cond,  "SNIPER TIER LONG",  "BUY {{ticker}} | Entry:{{close}} | TIER LONG")
+alertcondition(bear_atom_cond,  "SNIPER ATOM SHORT", "SELL {{ticker}} | Entry:{{close}} | ATOM SHORT")
+alertcondition(bull_atom_cond,  "SNIPER ATOM LONG",  "BUY {{ticker}} | Entry:{{close}} | ATOM LONG")
+alertcondition(asian_bear_atom, "ASIAN ATOM SHORT",  "SELL {{ticker}} | Entry:{{close}} | ASIAN ATOM SHORT")
+alertcondition(asian_bull_atom, "ASIAN ATOM LONG",   "BUY {{ticker}} | Entry:{{close}} | ASIAN ATOM LONG")
