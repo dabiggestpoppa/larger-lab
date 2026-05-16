@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "updatedAt": "2026-05-16T19:50:34.708Z",
+  "entries": {
+    "memory:memory/2026-05-16.md:42:77": {
+      "key": "memory:memory/2026-05-16.md:42:77",
+      "path": "memory/2026-05-16.md",
+      "startLine": 42,
+      "endLine": 77,
+      "source": "memory",
+      "snippet": "7. **Twitter/X posts** — Most behind login walls, low value. ### Not Implemented Yet: - Permission gate system for agent tool calls - Context compaction pipeline - Hook system (PreToolUse, PostToolUse, Stop) - AGENTS.md for our project - CLI-Anything integration - Daily brief agent ## Key Decisions - Discord deprioritized — Telegram is primary communication channel - Hermes Telegram bot is the secondary agent alongside OWL (this session) - Resource assessment action items feed into next phase of SRRA-OPH ## Pending - MAD to test Hermes Telegram bot responses - Implement top-priority items from resource assessment - Continue SRRA-OPH Phase 5 work - P90 parameter tuning (TP/SL levels) # 202",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-16T19:50:34.708Z",
+      "lastRecalledAt": "2026-05-16T19:50:34.708Z",
+      "queryHashes": [
+        "ee46829a0471"
+      ],
+      "recallDays": [
+        "2026-05-16"
+      ],
+      "conceptTags": [
+        "twitter/x",
+        "agents.md",
+        "cli-anything",
+        "srra-oph",
+        "top-priority",
+        "tp/sl",
+        "twitter",
+        "posts"
+      ]
+    },
+    "memory:memory/2026-05-16.md:1:28": {
+      "key": "memory:memory/2026-05-16.md:1:28",
+      "path": "memory/2026-05-16.md",
+      "startLine": 1,
+      "endLine": 28,
+      "source": "memory",
+      "snippet": "# 2026-05-16 Daily Notes ## Session Start (~01:00 EDT) - MAD returned after stepping away - Checked on Polymorph (PM) progress — standing by, no tasks assigned - AS monitoring active, 17/17 tests passing across all phases - CC Workflow Engine had been running Phase 4, tests all passing ## Discord Bot Work (~01:15-02:30 EDT) - Attempted to fix blrr city Discord bot — token was expired/invalid (401 Unauthorized) - MAD provided new tokens for both blrr city and new Hermes bot - Updated .env with both tokens — verified both work via Discord API - Wrote dual_bot.py to run both blrr city and hermes boa simultaneously - **Discord issue**: `on_message` handler not firing reliably with `discord.py",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-16T19:50:34.708Z",
+      "lastRecalledAt": "2026-05-16T19:50:34.708Z",
+      "queryHashes": [
+        "ee46829a0471"
+      ],
+      "recallDays": [
+        "2026-05-16"
+      ],
+      "conceptTags": [
+        "17/17",
+        "15-02",
+        "expired/invalid",
+        "dual-bot.py",
+        "on-message",
+        "discord.py",
+        "start",
+        "edt"
+      ]
+    },
+    "memory:memory/2026-05-16.md:114:131": {
+      "key": "memory:memory/2026-05-16.md:114:131",
+      "path": "memory/2026-05-16.md",
+      "startLine": 114,
+      "endLine": 131,
+      "source": "memory",
+      "snippet": "- MAD sent 3 translation skills from SkillsMP - Reviewed: unified-brain-text-decoding-mandarin (SKIP - neuroscience, not translation), heygen-translate (SaaS API, costs money), translate-language (YAML-specific, not general) - Conclusion: Agent handles Chinese↔English natively, Violin handles video translation — no additional tools needed ## Key Decisions - Discord deprioritized — Telegram is primary - Content farm is the main strategic focus going forward - DeekeScript ecosystem is the ENGINE of the content farm - Most content farm products come from Chinese developers — translation capability essential - All new tools get installed as skills + registered in TOOLS.md + announced to team ch",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.6319429310420329,
+      "maxScore": 0.6319429310420329,
+      "firstRecalledAt": "2026-05-16T19:50:34.708Z",
+      "lastRecalledAt": "2026-05-16T19:50:34.708Z",
+      "queryHashes": [
+        "ee46829a0471"
+      ],
+      "recallDays": [
+        "2026-05-16"
+      ],
+      "conceptTags": [
+        "heygen-translate",
+        "translate-language",
+        "yaml-specific",
+        "tools.md",
+        "mad",
+        "sent",
+        "translation",
+        "skills"
+      ]
+    }
+  }
+}

@@ -88,15 +88,18 @@ def start_gateway() -> bool:
     try:
         env = {
             "OPENCLAW_HOME": str(OPENCLAW_HOME),
+            "TMPDIR": str(Path.home() / "AppData/Local/Temp"),
             "PATH": str(Path.home() / "AppData/Roaming/npm") + ";" + 
                     str(Path("C:/Program Files/nodejs")) + ";" + 
                     subprocess.os.environ.get("PATH", "")
         }
+        # Use cmd /c to start in background (CREATE_NO_WINDOW doesn't work reliably from Python)
+        cmd_line = f'node "{Path.home() / "AppData/Roaming/npm/node_modules/openclaw/dist/index.js"}" gateway run --port {OC2_PORT} --allow-unconfigured'
         subprocess.Popen(
-            GATEWAY_CMD,
-            creationflags=subprocess.CREATE_NO_WINDOW,
+            ["cmd", "/c", "start", "/B", cmd_line],
             env={**subprocess.os.environ, **env},
-            cwd=str(Path(__file__).parent.parent)
+            cwd=str(OPENCLAW_HOME.parent),
+            shell=True
         )
         # Wait for it to come up
         for i in range(15):
