@@ -273,11 +273,12 @@ def extract_key_updates(messages: list) -> dict:
             elif score >= 2 and subject:
                 update_parts.append(f"**{subject}**")
 
-            # For general updates, only add if it's a phase transition or major status change
+            # For general updates (score 1), only add phase transitions — not every bullet
             elif score >= 1:
                 for line in msg["content"]:
                     line_stripped = line.strip()
-                    if any(m in line_stripped for m in ["Phase", "✅ Complete", "Kickoff", "Status Update"]):
+                    # Only catch explicit phase transitions, not every line with "Phase"
+                    if any(m in line_stripped for m in ["Kickoff:", "Status Update:", "Complete.", "In Progress."]):
                         clean = line_stripped.lstrip("#-*•").strip()
                         if len(clean) > 10 and len(clean) < 150:
                             update_parts.append(clean[:120])

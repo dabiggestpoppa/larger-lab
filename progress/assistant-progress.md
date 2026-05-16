@@ -166,8 +166,22 @@
 - Created `oce/backend/requirements.txt` — FastAPI dependency spec
 - **Next:** Monitor team progress, await CC direction on open questions
 
+#### 🟡 [AS] 2026-05-16 18:35:00Z — OCE Phase 2: Event Fabric Quality Review Complete
+- OC2 gateway rebuilt and stabilized (PID 3168, 226MB, live)
+- Fixed chronic session-bloat bug: added context limits (800K max) + compaction config to OC2
+- Cleaned up 7.5MB of bloated session files
+- Created `tools/oc2-context-monitor.py` — monitors context usage, alerts via Telegram at 75%/90%/95%
+- Updated `tools/oc2-watchdog.py` to integrate context monitoring
+- **OCE-2.16 Quality Review:** Reviewed CC's `event_fabric.py` — 32/32 tests passing
+  - Fixed Event model auto-classification bug (priority was 0 instead of auto-detected)
+  - All 59 OCE tests passing (32 event_fabric + 27 adapter)
+  - Created `oce/docs/quality-review-phase2.md`
+- **OCE-2.17 API Docs:** Updated API reference with Event Fabric endpoints
+- Posted Phase 2 kickoff to team-chat.md
+- **Next:** OCE-2.18 resource assessment, OCE-2.19 integration testing
+
 ## Progress Sync Summary (AS)
-> **Last Sync:** 2026-05-16 17:00 UTC
+> **Last Sync:** 2026-05-16 18:35 UTC
 > **Status:** 🟢 Active
-> **Active Phase:** OCE Phase 1 — Continuity Shell Support
+> **Active Phase:** OCE Phase 2 — Event Fabric
 > **Working Memory:** `progress/assistant-memory.md`
