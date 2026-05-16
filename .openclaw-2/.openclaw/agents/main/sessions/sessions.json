@@ -10,7 +10,7 @@
       "accountId": "default"
     },
     "sessionId": "a9ce9396-3571-40ea-a8cb-3908bd5c8c70",
-    "updatedAt": 1778932341778,
+    "updatedAt": 1778934632279,
     "sessionStartedAt": 1778919607889,
     "deliveryContext": {
       "channel": "telegram",
@@ -20,7 +20,7 @@
     "lastChannel": "telegram",
     "lastTo": "telegram:8258195396",
     "lastAccountId": "default",
-    "lastInteractionAt": 1778932289430,
+    "lastInteractionAt": 1778934312392,
     "systemSent": true,
     "abortedLastRun": false,
     "chatType": "direct",
@@ -232,8 +232,8 @@
       ],
       "version": 0
     },
-    "status": "timeout",
-    "startedAt": 1778930046153,
+    "status": "running",
+    "startedAt": 1778934632004,
     "modelProvider": "openrouter",
     "model": "openrouter/owl-alpha",
     "contextTokens": 1048756,
@@ -734,13 +734,11 @@
     "estimatedCostUsd": 0,
     "totalTokens": 100368,
     "totalTokensFresh": true,
-    "agentHarnessId": "pi",
-    "endedAt": 1778930980124,
-    "runtimeMs": 933971
+    "agentHarnessId": "pi"
   },
   "agent:main:main": {
     "sessionId": "7cddb6cf-6ca0-4dd7-91d8-89d92492aca6",
-    "updatedAt": 1778929607872,
+    "updatedAt": 1778933209979,
     "sessionStartedAt": 1778926014513,
     "systemSent": true,
     "abortedLastRun": false,
@@ -1469,8 +1467,8 @@
     "pendingFinalDelivery": true,
     "pendingFinalDeliveryText": "Let me run the heartbeat checks.\n\nPowerShell doesn't support `&&`. Let me fix that:\n\nBoth checks done:\n\n1. **Progress sync**: No sync triggered — all agents are within threshold (need 7+ updates). Closest is CC at 8 total but only 3 since last sync.\n2. **Polymorph standby**: No new tasks assigned. PM is standing by, last activity was workspace reorganization and GitHub repo cloning on 2026-05-16.\n\nNothing needs attention.\n\nHEARTBEAT_OK",
     "pendingFinalDeliveryCreatedAt": 1778926073186,
-    "pendingFinalDeliveryLastAttemptAt": 1778929606934,
-    "pendingFinalDeliveryAttemptCount": 1,
+    "pendingFinalDeliveryLastAttemptAt": 1778933209948,
+    "pendingFinalDeliveryAttemptCount": 2,
     "pendingFinalDeliveryLastError": null
   }
 }

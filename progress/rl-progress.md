@@ -69,3 +69,14 @@
 - **Status**: After restart, OC1 health check failed — needs further investigation in new chat
 - **OC2**: Working fine throughout, no changes needed
 - **Detailed notes**: See `/memories/session/oc1-gateway-diagnosis.md`
+
+#### 🦉 [RL] 2026-05-16 — Gateway Diagnostics Complete, Ready for Fix
+- **Current state**: Both gateways running (OC1 PID 14520, OC2 PID 21768)
+- **OC2 issue identified**: Stuck Telegram session `agent:main:telegram:direct:8258195396` blocking event loop for 1000+ seconds
+- **Root cause**: Event-loop starvation from stuck session → Telegram polling stalls every ~180s → forced restarts
+- **Fixes needed**:
+  1. Clear stuck session from OC2's `sessions.json`
+  2. Disable native Telegram commands (`channels.telegram.commands.native: false`) to avoid 203-command overload
+  3. Restart both gateways cleanly
+- **PowerShell spam issue**: `openclaw gateway probe` without `--token` hangs forever → terminal timeout → new terminal spawned → infinite loop
+- **Solution**: Use venv-based Python scripts for gateway management instead of CLI commands

@@ -1,0 +1,121 @@
+{
+  "agents": {
+    "defaults": {
+      "workspace": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab",
+      "model": "openrouter/owl-alpha",
+      "models": {
+        "poolside/laguna-m.1:free": {
+          "alias": "laguna"
+        },
+        "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": {
+          "alias": "nemotron"
+        },
+        "deepseek/deepseek-v4-flash:free": {
+          "alias": "deepseek"
+        },
+        "openrouter/owl-alpha": {
+          "alias": "owl"
+        }
+      }
+    }
+  },
+  "gateway": {
+    "mode": "local",
+    "auth": {
+      "mode": "token",
+      "token": "oc2-68cdb0729953cce1aecaf09a9dffddac574c9a674f46aa77"
+    },
+    "port": 18790,
+    "bind": "loopback",
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    }
+  },
+  "session": {
+    "dmScope": "per-channel-peer"
+  },
+  "tools": {
+    "profile": "coding"
+  },
+  "skills": {
+    "install": {
+      "nodeManager": "npm"
+    },
+    "load": {
+      "extraDirs": [
+        "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\.openclaw-2\\skills",
+        "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\.agents\\skills",
+        "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\skills"
+      ]
+    }
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "botToken": "8945439460:AAHZT2Xx0jHaApejRJYi-xORG5FkKNAQ5yM",
+      "dmPolicy": "pairing",
+      "groups": {
+        "*": {
+          "requireMention": true
+        }
+      }
+    }
+  },
+  "commands": {
+    "ownerAllowFrom": [
+      "telegram:8258195396"
+    ]
+  },
+  "models": {
+    "providers": {
+      "poolside": {
+        "baseUrl": "https://api.poolside.ai/v1",
+        "apiKey": "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",
+        "models": [
+          {
+            "id": "laguna-m.1:free",
+            "name": "laguna-m.1:free"
+          }
+        ]
+      },
+      "nvidia": {
+        "baseUrl": "https://integrate.api.nvidia.com/v1",
+        "apiKey": "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",
+        "models": [
+          {
+            "id": "nemotron-3-nano-omni-30b-a3b-reasoning:free",
+            "name": "nemotron-3-nano-omni-30b-a3b-reasoning:free"
+          }
+        ]
+      },
+      "deepseek": {
+        "baseUrl": "https://api.deepseek.com/v1",
+        "apiKey": "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",
+        "models": [
+          {
+            "id": "deepseek-v4-flash:free",
+            "name": "deepseek-v4-flash:free"
+          }
+        ]
+      }
+    }
+  },
+  "plugins": {
+    "entries": {
+      "openrouter": {
+        "enabled": true
+      },
+      "nvidia": {
+        "enabled": true
+      },
+      "deepseek": {
+        "enabled": true
+      }
+    }
+  },
+  "meta": {
+    "lastTouchedVersion": "2026.5.7",
+    "lastTouchedAt": "2026-05-16T12:16:57.113Z"
+  }
+}

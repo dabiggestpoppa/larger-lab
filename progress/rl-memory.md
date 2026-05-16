@@ -6,22 +6,25 @@
 
 ---
 
-## Current Context (2026-05-16 11:30:00 UTC)
+## Current Context (2026-05-16 12:00:00 UTC)
 
 ### Status
-🟡 Partial — OC1 needs further debugging
+🟢 Ready for fix — diagnostics complete
 
 ### Active Phase
-OC1 Telegram connectivity — diagnosed but not fully resolved
+Gateway stabilization — clearing stuck sessions and fixing command overload
 
 ### Pending Tasks
-- OC1 gateway restart failed after config update — needs investigation
-- OC1 models.json has placeholder API key (OPENROUTER_API_KEY) — needs actual key
-- OC1 has 203 Telegram commands registered (limit 100) — needs reduction
-- Optional: Run tools/register-gateway-tasks.ps1 as Admin for Scheduled Tasks
+- Clear stuck session from OC2's sessions.json (session `agent:main:telegram:direct:8258195396`)
+- Disable native Telegram commands in both configs to avoid 203-command limit
+- Restart both gateways cleanly
+- Set up venv-based gateway management to avoid PowerShell spam
 
-### Key Finding
-OC1's openclaw.json was missing the openrouter provider. Added it, but after restart OC1 health check failed. OC2 working fine throughout. See /memories/session/oc1-gateway-diagnosis.md for full details.
+### Key Findings
+1. **OC2 stuck session**: Session `a9ce9396-3571-40ea-a8cb-3908bd5c8c70` stuck in "processing" state for 1000+ seconds, blocking event loop
+2. **Event-loop starvation**: Stuck session → Telegram polling stalls → forced restarts every ~180s
+3. **PowerShell spam**: `openclaw gateway probe` without `--token` hangs forever, causing terminal timeout loop
+4. **Both gateways running**: OC1 PID 14520 (port 18789), OC2 PID 21768 (port 18790)
 
 ### Recent Activity
 #### 🦉 [RL] 2026-05-16 — Agent Initialized & Registered

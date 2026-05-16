@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>Oransim · 社媒广告效果预测 × 反事实沙盘</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="styles.css">
+<script src="js/api.js" defer></script>
+<script src="js/society.js" defer></script>
+<script src="js/cascade.js" defer></script>
+<script src="js/hero.js" defer></script>
+<script src="app.js" defer></script>
+<script src="js/tabs.js" defer></script>
+</head>
+<body>
+
+<header>
+  <h1><span class="logo-dot"></span>Oransim</h1>
+  <span class="tag">百万智能体 × 因果反事实 × 社媒广告效果预测</span>
+  <span style="margin-left:auto" class="tag api-pill">API · <span id="api-status">…</span></span>
+</header>
+
+<!-- ── Hero (T-A) · 100 万智能体意见传播背景 + 单 CTA ─────────────────── -->
+<section id="hero">
+  <canvas id="hero-canvas" width="1800" height="900"></canvas>
+  <div class="hero-inner">
+    <span class="hero-eyebrow">Causal Digital Twin · 花钱之前先预演</span>
+    <h1 class="hero-title">60 秒预演，<span class="grad">100 万虚拟消费者</span>告诉你这条广告会不会火</h1>
+    <p class="hero-sub">
+      粘一段广告文案，看 AI 用户真实反应、14 天扩散曲线、反事实 ROI —— 以及整个消费者网络如何在背景里传播你的内容。
+    </p>
+    <div class="hero-input-row">
+      <input type="text" id="hero-caption" placeholder="例：新品芋泥奶茶 夏日限定 小众咖啡店上新 真实试喝不踩雷"
+             onkeydown="if(event.key==='Enter') heroLaunch()">
+      <button class="hero-cta" onclick="heroLaunch()">▶ 看一次完整预测</button>
+    </div>
+    <a class="hero-secondary" onclick="heroScrollToForm()">或向下滚动手动调参 ↓</a>
+    <div class="hero-legend">
+      <span><span class="hero-legend-dot" style="background:#22c55e"></span>点击 / 好感</span>
+      <span><span class="hero-legend-dot" style="background:#a855f7"></span>强购买冲动</span>
+      <span><span class="hero-legend-dot" style="background:#ef4444"></span>跳过 / 厌恶</span>
+      <span><span class="hero-legend-dot" style="background:#6ea8fe"></span>好奇观望</span>
+    </div>
+  </div>
+</section>
+
+<main>
+  <!-- Left: Creative upload + plan -->
+  <section class="panel">
+    <h3>① 素材 & 投放计划</h3>
+    <div style="display:flex; gap:6px; margin-bottom:10px;">
+      <button class="secondary" style="flex:1; padding:9px 8px; font-size:12px; font-weight:600;"
+              onclick="applyPreset('quick')" title="100k 统计 + 8 LLM 灵魂 + 基础校准 · 15 秒">
+        ⚡ 极速
+        <div style="font-size:10px; font-weight:400; color:var(--muted); margin-top:2px;">15 秒 · 基础预测</div>
+      </button>
+      <button class="secondary" style="flex:1; padding:9px 8px; font-size:12px; font-weight:600; border-color:#a855f7; color:#cba8ff;"
+              onclick="applyPreset('expert')" title="100k 统计 + 100 LLM 灵魂 + ABCDE 全栈分析 · 约 2-3 分钟">
+        🧠 完整
+        <div style="font-size:10px; font-weight:400; color:var(--muted); margin-top:2px;">90s · 因果全栈</div>
+      </button>
+      <button class="secondary" style="flex:0 0 auto; padding:9px 12px; font-size:12px;"
+              onclick="document.getElementById('help-panel').open=!document.getElementById('help-panel').open"
+              title="术语白话解释">📖</button>
+    </div>
+    <details style="margin-bottom:10px; font-size:11px;">
+      <summary style="color:var(--muted); cursor:pointer; padding:4px 0;">特殊场景预设 ›</summary>
+      <div style="display:flex; gap:4px; padding:6px 0; flex-wrap:wrap;">
+        <button class="secondary" style="flex:1 1 30%; padding:5px; font-size:11px;" onclick="applyPreset('viral')"
+                title="100k 统计 + 50 LLM + 群聊 + 评论区辩论 · 约 60s">🔥 爆款</button>
+        <button class="secondary" style="flex:1 1 30%; padding:5px; font-size:11px;" onclick="applyPreset('crisis')"
+                title="100k 统计 + 80 LLM + 90 天品牌追踪 · 约 2-3min">⚠️ 危机</button>
+        <button class="secondary" style="flex:1 1 30%; padding:5px; font-size:11px; background:#2a1a3a; border-color:#a855f7;"
+                onclick="applyPreset('mega')" title="1M 虚拟消费者 + 5k AI 灵魂 · 4-8 分钟 · ¥2-5 成本">🌍 1M 壮观</button>
+      </div>
+    </details>
+
+    <details id="help-panel" style="margin-bottom:10px; padding:8px; background:#0f141c; border-radius:5px; border:1px solid #1e2a3d;">
+      <summary style="color:var(--accent); cursor:pointer; font-size:12px; font-weight:bold;">💡 这是什么？怎么看？（点开看新手指南）</summary>
+      <div style="font-size:11.5px; line-height:1.7; margin-top:8px; color:#c8d4e6;">
+        <b style="color:#a855f7">👉 一句话：</b>上传广告文案 → 60 秒内，AI 告诉你"这条广告会不会火、能带多少曝光/点击"，花钱之前先预演。<br><br>
+        <b style="color:var(--accent)">🎯 三步上手：</b><br>
+        1. 直接点上面 <b>⚡ 轻量</b> 预设（其他参数已填好）<br>
+        2. 点底下 <b>🚀 预测</b> 按钮<br>
+        3. 右侧面板看结果：<b>KPI</b>（曝光/点击/ROI）、<b>灵魂发言</b>（AI 用户的真话）<br><br>
+        <b style="color:var(--accent)">🌍 想看"上万 AI 用户仿真"的壮观画面？</b><br>
+        点 <b>🌍 极限壮观</b> 预设（紫色那个）→ 点预测 → 等 5-8 分钟 → 预测完自动跳到 "<b>🌍 100万智能体社会</b>" tab 看 3 万粒子可视化。<br><br>
+        <b style="color:var(--accent)">📖 常见术语白话解释：</b><br>
+        <table style="width:100%; border-collapse:collapse; font-size:11px; margin-top:4px;">
+          <tr><td style="padding:3px; color:#8ab0e0;"><b>明星/头部达人</b></td><td style="padding:3px;">勾选 = 投给大 V（刘畊宏/董宇辉那种）曝光广但贵；不勾 = 中小 KOL 精准但粉少</td></tr>
+          <tr><td style="padding:3px; color:#8ab0e0;"><b>LLM 校准 KPI</b></td><td style="padding:3px;">让 GPT-5 读完广告文案后投票，对纯统计预测做修正（更接近真人反应）</td></tr>
+          <tr><td style="padding:3px; color:#8ab0e0;"><b>LLM Soul 数量</b></td><td style="padding:3px;">让多少个 AI 扮演真人去看你的广告。越多越准但越贵（¥0.0004/个）</td></tr>
+          <tr><td style="padding:3px; color:#8ab0e0;"><b>D. 跨平台身份解析</b></td><td style="padding:3px;">开 = 抖音+小红书同一个人只算一次（避免重复花钱预估）；关 = 按平台独立算</td></tr>
+          <tr><td style="padding:3px; color:#8ab0e0;"><b>C. RecSys RL 冷启破圈</b></td><td style="padding:3px;">开 = 模拟"新内容能不能从 0 观众破圈到 10 万"的过程；关 = 只看稳定态</td></tr>
+          <tr><td style="padding:3px; color:#8ab0e0;"><b>A. 评论区辩论</b></td><td style="padding:3px;">开 = 让 12-20 个 AI 真的在虚拟评论区吵架（看情绪走向）；关 = 跳过</td></tr>
+          <tr><td style="padding:3px; color:#8ab0e0;"><b>E. 多轮群聊</b></td><td style="padding:3px;">开 = AI 们互相看对方发言后更新立场（模拟传播）；关 = 各 AI 独立判断</td></tr>
+          <tr><td style="padding:3px; color:#8ab0e0;"><b>B. 90 天品牌记忆</b></td><td style="padding:3px;">开 = 预测 90 天后还有多少人记得这品牌；关 = 只看投放当天</td></tr>
+          <tr><td style="padding:3px; color:#8ab0e0;"><b>蒙特卡洛</b></td><td style="padding:3px;">重复模拟 10 次取平均，避免一次偶然结果</td></tr>
+          <tr><td style="padding:3px; color:#8ab0e0;"><b>Hawkes</b></td><td style="padding:3px;">14 天生命周期曲线（广告发出后每天还剩多少热度）</td></tr>
+          <tr><td style="padding:3px; color:#8ab0e0;"><b>SCM / 因果图</b></td><td style="padding:3px;">64 个变量组成的因果关系网（素材→情绪→点击→转化）</td></tr>
+          <tr><td style="padding:3px; color:#8ab0e0;"><b>CATE</b></td><td style="padding:3px;">同一个广告对不同人群（28 岁女 vs 45 岁男）效果差多少</td></tr>
+          <tr><td style="padding:3px; color:#8ab0e0;"><b>SLOC</b></td><td style="padding:3px;">用 100 个 GPT 代表 10 万人的数学方法，比美国同行便宜 1000 倍</td></tr>
+        </table>
+      </div>
+    </details>
+    <label>素材文案</label>
+    <textarea id="caption">新品芋泥奶茶 夏日限定 小众咖啡店上新 真实试喝不踩雷</textarea>
+    <div style="display:flex; gap:8px;">
+      <div style="flex:1"><label>视觉风格</label>
+        <select id="visual"><option>bright</option><option>dark</option><option>minimal</option><option>flashy</option></select></div>
+      <div style="flex:1"><label>BGM 情绪</label>
+        <select id="music"><option>upbeat</option><option>calm</option><option>asmr</option><option>dramatic</option></select></div>
+    </div>
+    <label title="勾选 = 刘畊宏/董宇辉这种千万粉大 V 带货，曝光广但成本高；不勾 = 10-50 万粉的中小 KOL，精准但粉少"><input type="checkbox" id="celeb"> 有明星/头部达人 <span style="color:#888; font-size:10px">ⓘ</span></label>
+    <label title="勾选 = 调用 GPT-5 让 AI 用户真的看完文案再投票；不勾 = 用模板快速出统计结果（便宜但不懂内容）"><input type="checkbox" id="use_llm"> 用真 LLM（让 GPT 真读你的文案） <span style="color:#888; font-size:10px">ⓘ</span></label>
+    <label>总预算 (元)</label>
+    <input type="number" id="budget" value="50000">
+    <label>KOL 赛道（可选）</label>
+    <select id="niche">
+      <option value="">自动匹配</option>
+      <option value="beauty">美妆</option><option value="mom">母婴</option><option value="tech">数码</option>
+      <option value="food">美食</option><option value="fashion">穿搭</option><option value="fitness">健身</option>
+      <option value="finance">理财</option><option value="travel">旅行</option>
+    </select>
+
+    <details style="margin-top:10px"><summary style="color:var(--accent); cursor:pointer; font-size:13px;">⚙️ 高级参数（人群定向 / 时段 / 节日 / LLM）</summary>
+      <label>投放日期（影响节日/季节）</label>
+      <input type="text" id="today" placeholder="YYYY-MM-DD（默认今天）">
+      <label>时段</label>
+      <select id="daypart">
+        <option value="auto">全天</option>
+        <option value="morning">06-10 早通勤</option>
+        <option value="noon">11-13 午休</option>
+        <option value="afternoon">14-17 摸鱼</option>
+        <option value="evening" selected>18-22 黄金档</option>
+        <option value="late">22-02 睡前</option>
+      </select>
+      <label>人群-性别</label>
+      <select id="aud_gender">
+        <option value="">不限</option><option value="0">女</option><option value="1">男</option>
+      </select>
+      <label>人群-年龄段（多选）</label>
+      <select id="aud_age" multiple size="3" style="height:auto">
+        <option value="0">15-24</option><option value="1">25-34</option><option value="2">35-44</option>
+        <option value="3">45-54</option><option value="4">55-64</option><option value="5">65+</option>
+      </select>
+      <label>人群-城市等级（多选）</label>
+      <select id="aud_city" multiple size="3" style="height:auto">
+        <option value="0">一线</option><option value="1">新一线</option><option value="2">二线</option>
+        <option value="3">三四线</option><option value="4">五线及以下</option>
+      </select>
+      <label>跨平台用户重叠率: <span id="overlap_v">25%</span></label>
+      <input type="range" id="overlap" min="0" max="60" value="25" oninput="document.getElementById('overlap_v').textContent=this.value+'%'">
+      <label title="这是'外部大盘当前的舆论氛围'（比如当下平台在热议什么、整体积极还是悲观），不是你这条广告的预测情感。你这条广告的预测情感在结果里 → '预测情感分布'">平台当前大盘氛围 <span style="color:#888; font-size:10px">ⓘ 非预测值</span>
+        <span style="font-size:10px; color:var(--muted); margin-left:8px;">(广告本身的情感预测见结果页"AI 投票情感分布")</span></label>
+      <select id="sentiment">
+        <option value="neutral" selected>中性 / 自动（默认）</option>
+        <option value="crisis">危机期（大盘低迷 ×0.7）</option>
+        <option value="negative">负面（大盘偏冷 ×0.85）</option>
+        <option value="positive">正面（大盘偏热 ×1.1）</option>
+        <option value="viral">爆款期（大盘沸腾 ×1.25）</option>
+      </select>
+      <label>气温 ℃</label><input type="number" id="temp" value="20" step="1">
+      <label><input type="checkbox" id="rainy"> 下雨</label>
+      <label title="灵魂池共 10000 个预建 persona。本次抽 N 个让真 GPT-5 投票。100 个 ≈ ¥0.04 / 1000 个 ≈ ¥0.4 / 10000 个（全量）≈ ¥4">本次真问的 AI 用户数（灵魂池 10000 / 本次抽 <span id="nsouls_v">100</span> 个）<span style="color:#888; font-size:10px">ⓘ</span></label>
+      <input type="range" id="nsouls" min="5" max="10000" step="5" value="100"
+             oninput="document.getElementById('nsouls_v').textContent=this.value+' · 预估 ¥'+(this.value*0.0004).toFixed(3)">
+      <label title="开 = 让 AI 用户读完文案后投票，用投票结果修正纯统计预测（让数字更贴近真人反应）；关 = 只用统计模型"><input type="checkbox" id="llm_calibrate" checked> 让 AI 投票校准数字（更贴近真人） <span style="color:#888; font-size:10px">ⓘ</span></label>
+
+      <hr style="border-color:var(--border); margin:10px 0;">
+      <div style="color:var(--accent); font-size:12px; margin:4px 0;">🚀 高级分析模块（开越多越慢但越全面）</div>
+      <label title="开 = 抖音+小红书同一个人只算 1 次曝光（unique reach），避免你以为触达了 100 万其实只有 60 万；关 = 按平台独立统计"><input type="checkbox" id="enable_crossplat" checked> D. 跨平台去重（抖+小红书同人只算 1 次） <span style="color:#888; font-size:10px">ⓘ</span></label>
+      <label title="开 = 模拟新内容从 0 观众被推荐系统推到 10 万的完整破圈曲线（看能不能出圈）；关 = 跳过冷启阶段，只看稳定投放"><input type="checkbox" id="enable_recsys_rl"> C. 冷启破圈模拟（新内容能否出圈） <span style="color:#888; font-size:10px">ⓘ</span></label>
+      <label title="开 = 让 12-20 个不同背景的 AI 真的在虚拟评论区互相吵架（看情绪极化/共识）；关 = 跳过"><input type="checkbox" id="enable_discourse"> A. AI 评论区辩论（吵架模拟） <span style="color:#888; font-size:10px">ⓘ</span></label>
+      <label>&nbsp;&nbsp;&nbsp;&nbsp;评论数量: <span id="ndisc_v">12</span></label>
+      <input type="range" id="ndisc" min="5" max="40" step="1" value="12" oninput="document.getElementById('ndisc_v').textContent=this.value">
+      <label title="开 = AI 们互相看对方发言后更新自己立场（模拟朋友圈/群里谁说了什么会影响谁），涌现群体极化；关 = 各 AI 独立判断，不受别人影响"><input type="checkbox" id="enable_groupchat"> E. 多轮 AI 群聊（互相影响立场） <span style="color:#888; font-size:10px">ⓘ</span></label>
+      <label>&nbsp;&nbsp;&nbsp;&nbsp;AI 数量 × 轮数: <span id="ngc_v">12×3</span></label>
+      <input type="range" id="ngc_a" min="3" max="20" step="1" value="12" oninput="document.getElementById('ngc_v').textContent=this.value+'×'+document.getElementById('ngc_r').value">
+      <input type="range" id="ngc_r" min="2" max="6" step="1" value="3" oninput="document.getElementById('ngc_v').textContent=document.getElementById('ngc_a').value+'×'+this.value">
+      <label title="开 = 模拟 90 天后用户对你品牌还有多少印象/好感（用艾宾浩斯遗忘曲线）；关 = 只看投放当天曝光"><input type="checkbox" id="enable_brand_memory"> B. 90 天品牌记忆追踪 <span style="color:#888; font-size:10px">ⓘ</span></label>
+      <label>&nbsp;&nbsp;&nbsp;&nbsp;追踪天数: <span id="nbm_v">60</span></label>
+      <input type="range" id="nbm" min="7" max="180" step="1" value="60" oninput="document.getElementById('nbm_v').textContent=this.value">
+
+      <hr style="border-color:var(--border); margin:10px 0;">
+      <div style="color:var(--accent); font-size:12px; margin:4px 0;">📋 竞品 / KOL 优化 / 搜索弹性</div>
+      <label title="本品牌名 — 给 GPT 做竞品对比时用">本品牌名（可选）</label>
+      <input type="text" id="own_brand" placeholder="如：元气森林" style="width:100%; padding:4px;">
+      <label title="品类 — 给 GPT 做竞品对比时用">品类（可选）</label>
+      <input type="text" id="category" placeholder="如：气泡水 / 咖啡 / 美妆" style="width:100%; padding:4px;">
+      <label title="竞品品牌名，逗号分隔。填写 + 勾 LLM 后，GPT-5.4 会估算每个竞品的受众重叠 + TGI + 抢夺 ROI">竞品（逗号分隔，需勾 "用真 LLM" 才起效）</label>
+      <input type="text" id="competitors" placeholder="如：喜茶, 蜜雪冰城, 霸王茶姬" style="width:100%; padding:4px;">
+      <label title="让 scipy milp 求解器从 合成 KOL 池按预算选最优组合（头部/腰部/KOC 配比）"><input type="checkbox" id="enable_kol_ilp" checked> 启用 KOL 组合优化（3000 真 KOL 池 ILP） <span style="color:#888; font-size:10px">ⓘ</span></label>
+      <label title="用 log-log OLS 估算互动→搜索弹性系数 ε；目前从 Hawkes 曲线合成数据演示方法（接 DataProvider 真实数据源后可换真数据）"><input type="checkbox" id="enable_search_elasticity" checked> 启用搜索弹性回归 (ε + R²) <span style="color:#888; font-size:10px">ⓘ</span></label>
+    </details>
+
+    <hr style="border-color:var(--border); margin:14px 0;">
+    <button id="btn-predict" onclick="runPredict()">🚀 预测 & 开启沙盘</button>
+    <button class="secondary" onclick="resetDemo()">重置</button>
+    <div id="macro-panel" style="margin-top:8px; font-size:11px; color:var(--muted);"></div>
+    <details style="margin-top:6px"><summary style="color:var(--accent); cursor:pointer; font-size:12px;">🌍 当前世界状态（broad-spectrum events）</summary>
+      <button class="secondary" style="font-size:11px; padding:3px 8px; margin:6px 0;" onclick="refreshWorld()">🔄 让 GPT 拉一次最新事件</button>
+      <div id="world-panel" style="font-size:11px; color:var(--muted); max-height:240px; overflow:auto;"></div>
+    </details>
+
+    <h3 style="margin-top:20px">② 反事实沙盘</h3>
+    <div class="hint">拖动滑块实时查看"如果把预算从 A 挪到 B 会怎样"。与基线对比。</div>
+    <div class="slider-row"><span>抖音 %</span>
+      <input type="range" id="douyin_slider" min="0" max="100" value="60" oninput="onSlide()">
+      <span id="douyin_v">60%</span></div>
+    <div class="slider-row"><span>小红书 %</span>
+      <input type="range" id="xhs_slider" min="0" max="100" value="40" oninput="onSlide()">
+      <span id="xhs_v">40%</span></div>
+    <div class="slider-row"><span>总预算</span>
+      <input type="range" id="budget_slider" min="5000" max="500000" step="5000" value="50000" oninput="onSlide()">
+      <span id="budget_v">5万</span></div>
+    <div style="margin-top:8px"><button class="secondary" onclick="undo()">↶ 撤销</button>
+      <button class="secondary" onclick="explain()">💬 刷新灵魂解释</button></div>
+    <div id="log"></div>
+  </section>
+
+  <!-- Center: KPIs + DAG + CATE -->
+  <section class="panel" style="display:flex; flex-direction:column;">
+    <h3>③ 预测 & 反事实对比</h3>
+    <div class="tab-row" style="position:relative;">
+      <div class="tab active" data-tab="kpi" onclick="setTab('kpi')">KPI</div>
+      <div class="tab" data-tab="society" onclick="setTab('society')">🌍 百万智能体</div>
+      <div class="tab" data-tab="chat" onclick="setTab('chat')">🗣️ AI 群聊</div>
+      <div class="tab" id="tab-more-btn" onclick="toggleTabMore(event)" style="margin-left:auto;">更多 ›</div>
+      <div id="tab-more-menu" style="display:none; position:absolute; top:34px; right:0; background:#0f141c; border:1px solid var(--border); border-radius:6px; padding:4px 0; z-index:10; min-width:180px; box-shadow:0 6px 24px rgba(0,0,0,0.4);">
+        <div class="tab" data-tab="life" onclick="setTab('life'); toggleTabMore()" style="display:block; border:0; padding:8px 14px;">📈 Hawkes 14 天曲线</div>
+        <div class="tab" data-tab="front" onclick="setTab('front'); toggleTabMore()" style="display:block; border:0; padding:8px 14px;">🚀 前沿分析 ABCDE</div>
+        <div class="tab" data-tab="dag" onclick="setTab('dag'); toggleTabMore()" style="display:block; border:0; padding:8px 14px;">🕸️ SCM 因果图</div>
+        <div class="tab" data-tab="cate" onclick="setTab('cate'); toggleTabMore()" style="display:block; border:0; padding:8px 14px;">📊 CATE 异质效应</div>
+        <div class="tab" data-tab="v1" onclick="setTab('v1'); toggleTabMore()" style="display:block; border:0; padding:8px 14px;">∞ V1 CCG 架构</div>
+        <div class="tab" data-tab="schema" onclick="setTab('schema'); toggleTabMore()" style="display:block; border:0; padding:8px 14px;">📋 结构化输出</div>
+      </div>
+    </div>
+
+    <div id="tab-kpi">
+      <div style="color:var(--muted); font-size:12px;">当前方案 vs 基线：</div>
+      <div class="kpi-grid" id="kpis"></div>
+
+      <div style="margin-top:14px;"><b style="font-size:12px;">按平台拆分</b></div>
+      <div id="per-plat" style="font-size:12px;"></div>
+
+      <div style="margin-top:14px;"><b style="font-size:12px;">蒙特卡洛不确定性：</b>
+        <span class="hint">所有 KPI 均为 10 次模拟均值；std 见 tooltip。</span></div>
+    </div>
+
+    <div id="tab-society" style="display:none;">
+      <div class="hint" style="padding:8px; background:#0f141c; border-radius:4px; border-left:3px solid #a855f7;">
+        <b style="color:#a855f7">🌍 这是什么？</b>100 万虚拟中国消费者的 persona-embedding 星图（借鉴 MiroFish 的可视化思路）。<br>
+        每个点 = 1 个虚拟用户；<b>位置</b>来自 256 维兴趣+人口学向量的 2D 投影（兴趣相近的人聚在一起，不是地理位置）。<br>
+        <b>👆 鼠标悬停 AI 用户点</b>上可以看到他/她的年龄/城市/投票理由/评论原话。<br>
+        <b>两种模式</b>（下方按钮切换）：<br>
+        &nbsp;&nbsp;• <b>👥 人口分布</b>：按城市等级上色，看整个虚拟中国的demographic
+        &nbsp;&nbsp;• <b>🎯 预测结果着色</b>：跑完预测后 AI 用户按投票结果发光（绿=点了 / 红=跳过 / 紫=高购意），其他人群变暗灰色
+      </div>
+      <div id="society-wrap" style="position:relative; width:100%; margin-top:8px; aspect-ratio:900/500; background:#0a0e16; border-radius:6px; overflow:hidden;">
+        <canvas id="society-canvas-gl" width="1800" height="1000" style="position:absolute; top:0; left:0; width:100%; height:100%;"></canvas>
+        <canvas id="society-canvas" width="1800" height="1000" style="position:absolute; top:0; left:0; width:100%; height:100%; cursor:crosshair;"></canvas>
+      </div>
+      <div id="society-stats" style="margin-top:8px; font-size:12px; color:var(--muted);"></div>
+      <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;">
+        <button class="secondary" onclick="renderSociety(30000)" style="font-size:11px; padding:4px 8px;">🔄 3 万点</button>
+        <button class="secondary" onclick="renderSociety(100000)" style="font-size:11px; padding:4px 8px;">💪 10 万点</button>
+        <button class="secondary" onclick="renderSociety(300000)" style="font-size:11px; padding:4px 8px; background:#2a1a3a; border-color:#a855f7;">🚀 WebGL 30 万</button>
+        <button class="secondary" onclick="renderSociety(1000000)" style="font-size:11px; padding:4px 8px; background:#2a1a3a; border-color:#a855f7;">💥 WebGL 100 万（全量）</button>
+        <button class="secondary" onclick="animateSociety()" style="font-size:11px; padding:4px 8px;">🌊 舆论波</button>
+      </div>
+    </div>
+
+    <div id="tab-v1" style="display:none;">
+      <h4 style="color:var(--accent); margin:0 0 6px; font-size:13px">Universal Embedding Bus（无限维度，越多越准）</h4>
+      <div class="hint">每加一个数据源 = 注册一个 50 行 Embedder。下游所有模块自动受益。<br>
+        启发式曲线：err ≈ 0.30 / √N（中心极限形状，非严格 PAC-Bayes 上界），**累 4 倍数据 → 误差减半**</div>
+      <div id="ueb-stats" style="margin:8px 0;"></div>
+      <div style="display:flex; gap:6px; margin:6px 0;">
+        <button onclick="refreshUEB()">🔄 刷新</button>
+        <button class="secondary" onclick="indexMockData()">📥 注入 1000 mock 评论看 scaling law</button>
+        <button class="secondary" onclick="registerCustomSource()">➕ 注册新数据源</button>
+      </div>
+      <div id="ueb-sources" style="font-size:11px; max-height:200px; overflow:auto;"></div>
+
+      <h4 style="color:var(--accent); margin:18px 0 6px; font-size:13px">Causal Computation Graph（声明式 DAG runtime）</h4>
+      <div class="hint">把整条预测流水线编译成有向图，自动并行/缓存/可观测/可干预。每个节点级 do(X=x) 反事实直达。</div>
+      <div id="ccg-graph" style="margin-top:8px;"></div>
+      <div id="ccg-trace" style="font-size:11px; margin-top:8px;"></div>
+    </div>
+
+    <div id="tab-chat" style="display:none;">
+      <div class="hint" style="padding:8px; background:#0f141c; border-radius:4px; border-left:3px solid #a855f7;">
+        <b style="color:#a855f7">怎么看</b>：真 GPT-5.4 让 N 个虚拟用户在评论区**多轮辩论**。每条发言都让其他 agent 看到 → 立场漂移 → 涌现群体极化 / 共识 / 分歧。
+        <br><b>触发条件</b>：左栏 "⚙️ 高级参数" → 勾 "<b>E. 多轮 AI 群聊</b>" → 🚀 预测。
+        <br><b>注意</b>：群聊结果对最终 KPI 影响力有限（SCM mediator 系数 0.5，未经真实数据校准），主要价值在质性观察。
+      </div>
+      <div id="chat-summary" style="margin:8px 0;"></div>
+      <div id="chat-empty-hint" style="padding:14px; color:var(--muted); text-align:center; font-size:12px;">
+        💡 还未跑群聊 — 勾"E. 多轮 AI 群聊"再点 🚀 预测后这里出 6-20 条 AI 辩论 + 立场轨迹图 + 影响网络。
+      </div>
+      <canvas id="chat-stance-canvas" width="900" height="320" style="width:100%; background:#0f141c; border-radius:6px; margin-top:8px;"></canvas>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:12px;">
+        <div>
+          <h4 style="font-size:12px; color:var(--accent); margin:0 0 6px;">💬 对话流（点 reply 看连接）</h4>
+          <div id="chat-stream" style="font-size:11px; max-height:420px; overflow:auto;"></div>
+        </div>
+        <div>
+          <h4 style="font-size:12px; color:var(--accent); margin:0 0 6px;">🕸️ 影响网络（点节点选 agent · 右键查看 persona）</h4>
+          <svg id="chat-network" viewBox="0 0 400 380" style="width:100%; background:#0f141c; border-radius:6px;"></svg>
+          <div id="chat-agent-panel" style="margin-top:8px; padding:8px; background:#0f141c; border-radius:6px; min-height:60px; font-size:11px;">
+            <div class="hint">点击网络里任意节点 → 看 agent 详情、试 do() 干预</div>
+          </div>
+          <div id="chat-final-stances" style="margin-top:10px; font-size:11px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-front" style="display:none;">
+      <div id="frontier-d" style="margin-bottom:14px;"></div>
+      <div id="frontier-c" style="margin-bottom:14px;"></div>
+      <div id="frontier-a" style="margin-bottom:14px;"></div>
+      <div id="frontier-b" style="margin-bottom:14px;"></div>
+      <div id="frontier-e" style="margin-bottom:14px;"></div>
+      <div class="hint">勾上左边的 ABCDE 再点 🚀 预测 才会有对应内容。E（群聊）+ LLM 大约 30-60s。</div>
+    </div>
+
+    <div id="tab-life" style="display:none;">
+      <div class="hint">付费曝光 + 自然二次传播（Hawkes 点过程），展示 14 天生命周期。自然占比 = 组织性扩散比例（越高越"viral"）。</div>
+      <canvas id="life-canvas" width="720" height="280" style="width:100%; background:#0f141c; border-radius:6px; margin-top:8px;"></canvas>
+      <div id="life-stats" style="font-size:12px; color:var(--muted); margin-top:6px;"></div>
+    </div>
+
+    <div id="tab-dag" style="display:none;">
+      <div class="hint">64 节点 / 117 因果边 / 8 层。<b>白色描边 = 可干预（do()）</b> · 虚线描边 = 时变 · 节点名带 ✓ = 已实现 · 横向滚动看完整图。</div>
+      <div style="overflow:auto; max-height:600px; background:#0f141c; border-radius:6px; margin-top:8px;">
+        <svg id="dag-svg" style="display:block; min-width:1500px; min-height:600px;">
+          <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#556"/></marker></defs>
+        </svg>
+      </div>
+    </div>
+
+    <div id="tab-cate" style="display:none;">
+      <div class="hint" style="padding:8px; background:#0f141c; border-radius:4px; border-left:3px solid #a855f7;">
+        <b style="color:#a855f7">CATE 怎么看</b>：
+        条件平均处理效应 = "同一个改动对不同人群的影响差多少"。绝对值越大 = 对这类人改动越敏感。
+        <br><b>触发方式</b>：左侧"② 反事实沙盘"调预算/抖音占比/小红书占比滑块 → 后端算反事实 → 这里出表。还没动滑块就是空的（当前状态）。
+      </div>
+      <div id="cate-content"></div>
+      <div id="cate-empty-hint" style="padding:14px; color:var(--muted); text-align:center; font-size:12px;">
+        💡 还未触发反事实 — 去左侧 "② 反事实沙盘" 拉一下"总预算"或"抖音 %"滑块试试。
+      </div>
+    </div>
+
+    <div id="tab-schema" style="display:none;">
+      <div class="hint" style="padding:8px; background:#0f141c; border-radius:4px; border-left:3px solid #a855f7;">
+        <b style="color:#a855f7">📋 结构化输出</b>：从当前预测状态派生的各维度表格（漏斗 β 拟合 / 扩散模拟 / persona / 涌现指标 / 敏感性分析 / 策略报告），零额外 LLM 调用。
+      </div>
+      <div id="schema-content" style="font-size:11px;"></div>
+    </div>
+
+  </section>
+
+  <!-- Right: Soul agents -->
+  <section class="panel">
+    <h3>④ AI 用户投票 & 情感</h3>
+    <div class="hint">上万 AI 用户各自读完广告后给出的点/跳 + 情绪 + 理由 + 购意。顶部是聚合情感分布，下面可筛选分页看单个反应。</div>
+    <div id="predicted-sentiment" style="margin:6px 0;"></div>
+    <div id="souls"></div>
+  </section>
+</main>
+
+</script>
+</body>
+</html>

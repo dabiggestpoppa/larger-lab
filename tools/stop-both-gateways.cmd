@@ -1,12 +1,16 @@
 @echo off
-rem ============================================================
-rem  Stop Both OpenClaw Gateways (OC1 + OC2)
-rem ============================================================
+rem Stop all OpenClaw gateway processes cleanly
 
-echo [INFO] Stopping all OpenClaw gateway processes...
-taskkill /F /IM node.exe /FI "WINDOWTITLE eq OC1 Gateway*" 2>nul
-taskkill /F /IM node.exe /FI "WINDOWTITLE eq OC2 Gateway*" 2>nul
-taskkill /F /IM node.exe 2>nul
+echo Stopping OC1 Gateway (port 18789)...
+taskkill /F /IM node.exe /FI "COMMANDLINE eq *openclaw*18789*" 2>nul
 
-echo [INFO] Both gateways stopped.
-netstat -ano | findstr "18789 18790"
+echo Stopping OC2 Gateway (port 18790)...
+taskkill /F /IM node.exe /FI "COMMANDLINE eq *openclaw*18790*" 2>nul
+
+echo Stopping Watchdog...
+taskkill /F /IM cmd.exe /FI "COMMANDLINE eq *gateway-watchdog*" 2>nul
+
+echo Stopping any remaining gateway cmd processes...
+taskkill /F /IM cmd.exe /FI "COMMANDLINE eq *openclaw*gateway*" 2>nul
+
+echo All gateway processes stopped.

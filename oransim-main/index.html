@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Oransim: Causal Digital Twin for Marketing at Scale</title>
+<meta name="description" content="Oransim: an open-source framework combining a Causal Transformer world model, a Causal Neural Hawkes diffusion forecaster, a 64-node causal graph, and an IPF-calibrated virtual-consumer population (configurable POP_SIZE, 100k default) with LLM-driven soul agents for marketing performance prediction."/>
+<meta property="og:title" content="Oransim · Causal Digital Twin for Marketing at Scale"/>
+<meta property="og:description" content="Causal Transformer + Causal Neural Hawkes + 64-node causal graph + agent-based simulation. Apache-2.0."/>
+<meta property="og:image" content="https://raw.githubusercontent.com/OranAi-Ltd/oransim/main/assets/social-preview.svg"/>
+<meta property="og:url" content="https://oranai-ltd.github.io/oransim/"/>
+<meta property="og:type" content="website"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<link rel="icon" type="image/svg+xml" href="assets/logo.svg"/>
+
+<!-- Paper-style serif typography: EB Garamond (body+display) + IBM Plex Mono (code). Both SIL OFL. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  /* =================================================================
+     Academic paper aesthetic — arXiv / conference project-page style.
+     Cream paper background, ink-black text, serif body, narrow column.
+     No gradients, no animations, no grain, no dark mode, no big CTAs.
+     ================================================================= */
+
+  :root {
+    --paper:         #FEFDF8;
+    --paper-deep:    #F4EEDD;
+    --ink:           #1A1A1A;
+    --ink-mid:       #3A3A3A;
+    --muted:         #5A5A5A;
+    --faint:         #8A8A7E;
+    --rule:          #D8D0BE;
+    --rule-soft:     #E8E2D1;
+    --link:          #8E2E0D;
+    --link-hover:    #B8390E;
+    --accent:        #B8390E;
+    --col:           680px;
+    --col-wide:      900px;
+    --col-figure:    1040px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'EB Garamond', 'Times New Roman', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.6;
+    font-feature-settings: "kern", "liga", "onum", "pnum";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Layout column helpers */
+  .col       { max-width: var(--col);        margin: 0 auto; padding: 0 24px; }
+  .col-wide  { max-width: var(--col-wide);   margin: 0 auto; padding: 0 24px; }
+  .col-fig   { max-width: var(--col-figure); margin: 0 auto; padding: 0 24px; }
+
+  a {
+    color: var(--link);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+  }
+  a:hover { color: var(--link-hover); border-bottom-color: var(--link-hover); }
+  a.plain { border-bottom: none; }
+
+  code, pre, .mono {
+    font-family: 'IBM Plex Mono', 'Consolas', 'Menlo', monospace;
+    font-feature-settings: "zero" on;
+    font-size: 0.87em;
+  }
+  code {
+    background: var(--paper-deep);
+    padding: 1px 5px;
+    border-radius: 2px;
+    border: 1px solid var(--rule);
+  }
+
+  /* ============== HEADER ============== */
+
+  header {
+    padding: 22px 24px;
+    border-bottom: 1px solid var(--rule);
+    background: var(--paper);
+  }
+  .header-inner {
+    max-width: var(--col-fig);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+  }
+  .mark {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .mark .logo { width: 22px; height: 22px; }
+  .mark .name {
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    color: var(--ink);
+    border: none;
+  }
+  .mark .version {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    padding: 2px 6px;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+  }
+  .nav-links {
+    display: flex;
+    gap: 22px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+  }
+  .nav-links a {
+    color: var(--muted);
+    border-bottom: none;
+  }
+  .nav-links a:hover { color: var(--accent); border-bottom: 1px solid var(--accent); }
+  @media (max-width: 680px) {
+    .nav-links { gap: 14px; font-size: 11px; }
+    .nav-links .nv { display: none; }
+  }
+
+  /* ============== TITLE BLOCK ============== */
+
+  .paper-head {
+    padding: 80px 24px 44px;
+    text-align: center;
+    max-width: var(--col-wide);
+    margin: 0 auto;
+  }
+  .paper-head h1 {
+    font-family: 'EB Garamond', serif;
+    font-weight: 600;
+    font-size: clamp(34px, 5vw, 48px);
+    line-height: 1.18;
+    letter-spacing: -0.005em;
+    margin-bottom: 22px;
+    color: var(--ink);
+    font-feature-settings: "kern" on, "liga" on, "onum" on;
+  }
+  .paper-head h1 em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .authors {
+    font-size: 18px;
+    color: var(--ink-mid);
+    margin-bottom: 6px;
+  }
+  .authors .sep { color: var(--faint); margin: 0 10px; }
+  .authors sup { font-size: 0.7em; color: var(--faint); }
+  .affiliations {
+    font-size: 15px;
+    font-style: italic;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .affiliations sup { font-style: normal; }
+  .paper-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--faint);
+    margin-top: 12px;
+    letter-spacing: 0.02em;
+  }
+
+  .pill-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 32px;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--ink-mid);
+    border-radius: 2px;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+  }
+  .pill:hover {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .pill.primary {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .pill.primary:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .pill.ghost {
+    color: var(--muted);
+    border-color: var(--rule);
+  }
+  .pill.ghost:hover {
+    color: var(--ink);
+    border-color: var(--muted);
+    background: var(--paper);
+  }
+
+  /* ============== SECTIONS ============== */
+
+  section { padding: 40px 0; }
+
+  .section-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  h2 {
+    font-family: 'EB Garamond', serif;
+    font-weight: 600;
+    font-size: 28px;
+    line-height: 1.25;
+    margin-bottom: 20px;
+    letter-spacing: -0.003em;
+    color: var(--ink);
+  }
+  h2 em { font-style: italic; color: var(--accent); font-weight: 500; }
+
+  h3 {
+    font-family: 'EB Garamond', serif;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 1.3;
+    margin-top: 26px;
+    margin-bottom: 10px;
+    color: var(--ink);
+  }
+  h3 .sub {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--muted);
+    font-size: 18px;
+    margin-left: 6px;
+  }
+
+  p {
+    text-align: justify;
+    text-justify: inter-word;
+    hyphens: auto;
+    margin-bottom: 14px;
+    color: var(--ink-mid);
+  }
+  p.lead { color: var(--ink); }
+
+  /* Body lists */
+  ul, ol { padding-left: 22px; margin-bottom: 14px; color: var(--ink-mid); }
+  li { margin-bottom: 4px; }
+
+  /* Citations — superscript link like [1] in running text */
+  .cite {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72em;
+    vertical-align: super;
+    padding: 0 1px;
+  }
+  .cite a { border-bottom: none; color: var(--accent); }
+
+  /* ============== ABSTRACT ============== */
+
+  .abstract {
+    padding: 36px 40px;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    background: var(--paper);
+  }
+  .abstract-inner { max-width: var(--col); margin: 0 auto; }
+  .abstract-label {
+    font-family: 'EB Garamond', serif;
+    font-weight: 600;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink);
+    margin-bottom: 14px;
+    display: inline-block;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 3px;
+  }
+  .abstract p {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink);
+    margin-bottom: 0;
+  }
+
+  /* ============== FIGURES ============== */
+
+  figure {
+    margin: 32px auto;
+    text-align: center;
+  }
+  figure img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    padding: 16px;
+  }
+  figcaption {
+    font-size: 14.5px;
+    color: var(--muted);
+    margin-top: 12px;
+    font-style: italic;
+    max-width: 620px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.5;
+  }
+  figcaption b { font-style: normal; color: var(--ink); font-weight: 600; }
+
+  /* ============== TABLES ============== */
+
+  .tbl-wrap { overflow-x: auto; margin: 24px 0; }
+  table.paper {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 15.5px;
+  }
+  table.paper caption {
+    font-size: 14.5px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    font-style: italic;
+    caption-side: bottom;
+    text-align: left;
+  }
+  table.paper th, table.paper td {
+    padding: 9px 12px;
+    text-align: left;
+    vertical-align: top;
+  }
+  table.paper thead th {
+    border-top: 1.5px solid var(--ink);
+    border-bottom: 0.8px solid var(--ink);
+    font-weight: 600;
+    color: var(--ink);
+  }
+  table.paper tbody td { border-bottom: 0.5px solid var(--rule-soft); }
+  table.paper tbody tr:last-child td { border-bottom: 1.5px solid var(--ink); }
+  table.paper td.num { font-family: 'IBM Plex Mono', monospace; font-size: 14px; }
+  table.paper td.us { color: var(--ink); }
+  table.paper td.us b { color: var(--accent); }
+  table.paper td.dash { color: var(--faint); }
+
+  /* ============== CODE BLOCK (QUICKSTART) ============== */
+
+  .code-plate {
+    margin: 22px 0;
+    border: 1px solid var(--rule);
+    background: var(--paper-deep);
+    padding: 18px 22px;
+    overflow-x: auto;
+  }
+  .code-plate pre {
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--ink);
+    white-space: pre;
+  }
+  .code-plate .cmt { color: var(--muted); font-style: italic; }
+  .code-plate .cmd { color: var(--accent); font-weight: 500; }
+  .code-plate .str { color: #6B4E1D; }
+  .code-plate .kw  { color: #3F2F64; font-weight: 500; }
+
+  /* ============== PLATFORM MATRIX ============== */
+
+  .plat-tbl td.stat-live    { color: #1F5F3B; font-weight: 500; }
+  .plat-tbl td.stat-mvp     { color: #7A5A10; font-weight: 500; }
+  .plat-tbl td.stat-stub    { color: #7A5A10; }
+  .plat-tbl td.stat-planned { color: var(--muted); font-style: italic; }
+
+  /* ============== REFERENCES ============== */
+
+  .references {
+    padding: 36px 0 20px;
+    border-top: 1px solid var(--rule);
+  }
+  .references ol {
+    padding-left: 28px;
+    font-size: 15px;
+    color: var(--ink-mid);
+  }
+  .references li {
+    margin-bottom: 8px;
+    line-height: 1.45;
+    padding-left: 4px;
+  }
+  .references li a { font-style: italic; }
+
+  /* ============== BIBTEX ============== */
+
+  .bibtex {
+    margin: 22px 0;
+    border: 1px solid var(--rule);
+    background: var(--paper-deep);
+    padding: 18px 22px;
+    overflow-x: auto;
+  }
+  .bibtex pre {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--ink);
+    white-space: pre;
+  }
+
+  /* ============== FOOTER ============== */
+
+  footer {
+    margin-top: 60px;
+    padding: 30px 24px;
+    border-top: 1px solid var(--rule);
+    text-align: center;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  footer p { margin: 0 0 6px; color: var(--muted); text-align: center; }
+  footer a { color: var(--muted); border-bottom-color: var(--rule); }
+  footer a:hover { color: var(--ink); border-bottom-color: var(--ink); }
+
+  /* Star history demoted to tiny block */
+  .star-block {
+    max-width: 620px;
+    margin: 16px auto 0;
+    text-align: center;
+  }
+  .star-block img {
+    max-width: 100%;
+    border: 1px solid var(--rule);
+  }
+
+  /* Horizontal rule between sections — classic paper */
+  hr.rule {
+    border: none;
+    border-top: 0.5px solid var(--rule);
+    margin: 32px 0;
+  }
+  hr.rule-strong {
+    border: none;
+    border-top: 1.5px solid var(--ink);
+    margin: 36px 0 28px;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ========== HEADER ========== -->
+<header>
+  <div class="header-inner">
+    <div class="mark">
+      <img class="logo" src="assets/logo.svg" alt=""/>
+      <a class="name" href="#">Oransim</a>
+      <span class="version">v0.2.0-alpha</span>
+    </div>
+    <div class="nav-links">
+      <a href="#abstract" class="nv">Abstract</a>
+      <a href="#method" class="nv">Method</a>
+      <a href="#quickstart" class="nv">Code</a>
+      <a href="#bibtex" class="nv">Cite</a>
+      <a href="https://github.com/OranAi-Ltd/oransim">GitHub ↗</a>
+    </div>
+  </div>
+</header>
+
+<!-- ========== TITLE ========== -->
+<section class="paper-head">
+  <h1>
+    Oransim: A Causal Digital Twin for<br/>
+    Marketing Performance <em>Prediction</em>
+  </h1>
+  <div class="authors">
+    Fakong&nbsp;Yin<sup>1</sup>
+    <span class="sep">·</span>
+    Oransim&nbsp;Contributors<sup>1</sup>
+  </div>
+  <div class="affiliations">
+    <sup>1</sup>OranAI&nbsp;Ltd. (橙果视界（深圳）科技有限公司)
+  </div>
+  <div class="paper-meta">
+    2026-04-18 · Apache-2.0 · Python&nbsp;≥&nbsp;3.10 · v0.2.0-alpha
+  </div>
+  <div class="pill-row">
+    <a href="https://github.com/OranAi-Ltd/oransim" class="pill primary">[Code]&nbsp;GitHub</a>
+    <a href="https://github.com/OranAi-Ltd/oransim/releases/tag/v0.2.0-alpha" class="pill">[Release]&nbsp;v0.2.0-alpha</a>
+    <a href="#bibtex" class="pill">[Cite]&nbsp;BibTeX</a>
+    <a href="README.zh-CN.md" class="pill ghost">[中文]</a>
+  </div>
+</section>
+
+<!-- ========== ABSTRACT ========== -->
+<section class="abstract" id="abstract">
+  <div class="abstract-inner">
+    <span class="abstract-label">Abstract</span>
+    <p>
+      We present <strong>Oransim</strong>, an open-source causal digital twin for
+      marketing performance prediction. Oransim integrates four primary
+      modeling components: (i) a <em>Causal Transformer</em> world model with
+      explicit treatment–covariate–outcome factorization, DAG-aware attention,
+      per-arm counterfactual heads, and representation-balancing regularization
+      drawing from CaT<span class="cite"><a href="#r1">[1]</a></span>,
+      CausalDAG-Transformer, TARNet/Dragonnet<span class="cite"><a href="#r2">[2]</a></span>,
+      BCAUSS, and CInA<span class="cite"><a href="#r3">[3]</a></span>;
+      (ii) a <em>Causal Neural Hawkes</em> temporal point process with
+      intervention-aware intensity for 14-day diffusion rollouts, building on
+      Mei &amp; Eisner<span class="cite"><a href="#r4">[4]</a></span>,
+      Zuo et&nbsp;al.<span class="cite"><a href="#r5">[5]</a></span>, and
+      Geng et&nbsp;al.<span class="cite"><a href="#r6">[6]</a></span>;
+      (iii) a hand-designed 64-node causal graph with <code>do</code>-calculus<span class="cite"><a href="#r7">[7]</a></span>
+      interventions — the graph encodes long-term marketing feedback (e.g.
+      repeat-purchase → brand equity → CPM bid → next-cycle impression),
+      evaluated as a cyclic-SCM fixed point in the OSS release; a fully
+      time-unrolled DAG formulation ships with the Enterprise Edition;
+      and (iv) a population of one&nbsp;million IPF-calibrated virtual consumers with
+      10k LLM-driven persona agents. The framework is released under Apache-2.0
+      with a deterministic synthetic training corpus, a pretrained LightGBM
+      quantile baseline, and a reference <em>Xiaohongshu</em> (XHS) platform
+      adapter. TikTok, Instagram, YouTube Shorts, and Douyin ship as
+      <em>MVP adapters</em> driven by the synthetic LightGBM baseline; real-panel
+      calibration lands in v0.5.
+    </p>
+  </div>
+</section>
+
+<!-- ========== INTRODUCTION ========== -->
+<section id="introduction">
+  <div class="col">
+    <span class="section-num">1 &nbsp; Introduction</span>
+    <h2>Motivation</h2>
+    <p class="lead">
+      Marketing prediction has long oscillated between two extremes. Academic
+      simulators model causal structure but rarely ship; commercial predictors
+      ship but rarely explain. Oransim is an attempt to bridge the gap:
+      counterfactual reasoning as a first-class interface, packaged as a
+      <code>pip install</code>-shaped service.
+    </p>
+    <p>
+      Prior open-source efforts in causal inference have focused on either
+      estimator libraries (DoWhy, EconML, CausalML) or observational-study
+      pipelines. Oransim differs by assembling an end-to-end <em>digital twin</em>:
+      agent-based exposure simulation, a causal world model with per-treatment
+      counterfactual heads, and an intervention-aware diffusion forecaster,
+      unified behind a single prediction API. The design prioritizes three
+      properties: (i)&nbsp;<em>causal fidelity</em> — treatment effects are
+      estimated under explicit <code>do</code>-interventions rather than inferred
+      post-hoc from correlational features; (ii)&nbsp;<em>extensibility</em> —
+      platforms and data providers form two independent axes so that a single
+      platform can consume multiple data sources without changing its world
+      model; and (iii)&nbsp;<em>reproducibility</em> — synthetic data, pretrained
+      baseline weights, and deterministic seeds all ship with the repository.
+    </p>
+  </div>
+</section>
+
+<!-- ========== METHOD / STACK ========== -->
+<section id="method">
+  <div class="col">
+    <span class="section-num">2 &nbsp; The Causal Stack</span>
+    <h2>Components</h2>
+    <p>
+      Oransim is organized as six composable engines, each separable and
+      individually replaceable through a registry. Primary models are
+      research-grade and ship architecture + training + inference code today
+      (v0.2.0-alpha); pretrained weights land with OrancBench v0.5.
+      Classical baselines accompany every primary model so that ablation
+      comparisons remain tractable on commodity CPUs.
+    </p>
+
+    <h3>2.1 Causal Transformer World Model <span class="sub">primary</span></h3>
+    <p>
+      A six-layer, 256-dimensional encoder with a 7-modality feature tokenizer
+      (creative embedding, platform, KOL, demographic, budget, time, class
+      token). Input tokens carry a <em>type</em> embedding distinguishing
+      covariates, treatments, and outcomes, following the CaT formulation of
+      Melnychuk et&nbsp;al.<span class="cite"><a href="#r1">[1]</a></span>.
+      Multi-head self-attention uses an additive DAG bias derived from the
+      64-node Pearl SCM, with a per-head learnable gate controlling the
+      strength of the topological restriction. Output heads include a factual
+      quantile regressor (P35 / P50 / P65) per KPI and a per-arm counterfactual
+      regressor in the spirit of TARNet<span class="cite"><a href="#r2">[2]</a></span>
+      and Dragonnet. A representation-balancing loss (biased HSIC<span class="cite"><a href="#r8">[8]</a></span>
+      or adversarial IPTW) decorrelates the learned representation from the
+      discrete treatment assignment, reducing confounding when treatment is
+      non-random. An optional in-context amortization hook, inspired by
+      CInA<span class="cite"><a href="#r3">[3]</a></span>, enables zero-shot
+      causal inference conditional on a set of prior campaigns.
+    </p>
+
+    <h3>2.2 Causal Neural Hawkes Process <span class="sub">primary</span></h3>
+    <p>
+      A four-layer Transformer temporal point process for 14-day cascading
+      engagement. Events carry both a type (impression, like, comment, share,
+      save, conversion) and a treatment identifier (organic versus paid boost),
+      with a softplus intensity decoder. Training minimizes negative log
+      likelihood with a piecewise-constant compensator estimator. At inference
+      time, the model supports counterfactual rollouts under <code>do</code>
+      interventions such as <code>mute_at_min</code> (terminate boosting at a
+      chosen time) and <code>treatment_boost_factor</code> (scale the intensity
+      of paid events). The construction follows the neural Hawkes work of Mei
+      and Eisner<span class="cite"><a href="#r4">[4]</a></span>, the Transformer
+      Hawkes process of Zuo et&nbsp;al.<span class="cite"><a href="#r5">[5]</a></span>,
+      and the counterfactual temporal-point-process formulation of Geng
+      et&nbsp;al.<span class="cite"><a href="#r6">[6]</a></span>.
+    </p>
+
+    <h3>2.3 64-Node Pearl SCM <span class="sub">causal backbone</span></h3>
+    <p>
+      A hand-designed directed acyclic graph with 64 nodes and 117 edges,
+      covering the marketing funnel from macro environment through exposure,
+      awareness, consideration, conversion, repeat purchase, and brand memory.
+      Mediators encode group discourse and information cascades. The graph
+      serves two roles: it generates the attention bias used by the Causal
+      Transformer, and it defines the structural equations evaluated under
+      Pearl's three-step <code>do</code>-calculus<span class="cite"><a href="#r7">[7]</a></span>
+      (abduction → action → prediction).
+    </p>
+
+    <h3>2.4 Agent Population <span class="sub">IPF + LLM personas</span></h3>
+    <p>
+      One&nbsp;million virtual consumers are generated by iterative proportional
+      fitting (Deming–Stephan 1940) against published demographic marginals.
+      Each agent carries demographic attributes, platform-specific engagement
+      priors, niche affinities, and time-of-day activity curves. At run time,
+      the top 10k agents most relevant to a scenario are upgraded to
+      LLM-backed personas for qualitative feedback, with request coalescing to
+      bound inference cost.
+    </p>
+
+    <h3>2.5 Baselines <span class="sub">fast, zero-GPU</span></h3>
+    <p>
+      A LightGBM<span class="cite"><a href="#r9">[9]</a></span> quantile world
+      model (three P35 / P50 / P65 regressors per KPI) and a classical
+      exponential-kernel Hawkes process<span class="cite"><a href="#r10">[10]</a></span>
+      ship alongside the primary models as fast baselines. Both run on CPU at
+      sub-millisecond latency and serve as ablation anchors. A pretrained
+      LightGBM pkl trained on the shipped synthetic corpus accompanies the
+      v0.2.0-alpha release (R<sup>2</sup> of 0.89, 0.78, 0.73, and 0.69 for
+      impressions, clicks, conversions, and revenue respectively).
+    </p>
+
+    <h3>2.6 Platform × DataProvider <span class="sub">two axes</span></h3>
+    <p>
+      Platforms and data sources are orthogonal. The <code>PlatformAdapter</code>
+      abstract class encodes platform-specific semantics (what constitutes a
+      post, a conversion, a KOL); the <code>DataProvider</code> abstract class
+      encodes data provenance. A single platform can be driven by multiple
+      providers (synthetic, CSV, JSON dump, OpenAPI endpoint, or custom) without
+      changes to the platform logic, and vice versa.
+    </p>
+  </div>
+
+  <!-- Figure 1: Architecture -->
+  <div class="col-fig">
+    <figure>
+      <img src="assets/architecture.svg" alt="Oransim architecture"/>
+      <figcaption><b>Figure&nbsp;1.</b>&nbsp;Architecture. A prediction request flows
+        <code>Creative + Budget</code> → <code>PlatformAdapter</code> (backed by
+        a pluggable <code>DataProvider</code>) → Causal Transformer World Model
+        (factual + per-arm counterfactual quantile predictions) with parallel
+        agent-layer simulation → 64-node Pearl SCM counterfactual evaluation →
+        Causal Neural Hawkes 14-day diffusion with intervention rollouts → a
+        structured JSON response spanning 14–19 schemas.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ========== BENCHMARKS ========== -->
+<section id="benchmarks">
+  <div class="col-wide">
+    <span class="section-num">3 &nbsp; Benchmarks</span>
+    <h2>Pretrained baseline on <em>synthetic</em> data</h2>
+    <p style="max-width: var(--col); margin-left:auto; margin-right:auto;">
+      Table&nbsp;1 reports the pretrained LightGBM quantile baseline shipped
+      with v0.2.0-alpha, trained on the deterministic 2k-scenario synthetic
+      corpus (<code>data/synthetic/scenarios_v0_1.jsonl</code>). Numbers reflect
+      performance on a 10% held-out split of synthetic data and should not be
+      read as real-world calibration; the OranAI Enterprise Edition trains the
+      same architectures on proprietary real-world data and publishes separate
+      benchmarks.
+    </p>
+
+    <div class="tbl-wrap col">
+      <table class="paper">
+        <thead>
+          <tr>
+            <th>KPI</th>
+            <th>Pinball&nbsp;P35</th>
+            <th>Pinball&nbsp;P50</th>
+            <th>Pinball&nbsp;P65</th>
+            <th>R<sup>2</sup>&nbsp;P50</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>impressions</td>     <td class="num">10.56</td><td class="num">12.53</td><td class="num">12.32</td><td class="num us"><b>0.886</b></td></tr>
+          <tr><td>clicks</td>          <td class="num">0.251</td><td class="num">0.289</td><td class="num">0.279</td><td class="num us"><b>0.778</b></td></tr>
+          <tr><td>conversions</td>     <td class="num">0.002</td><td class="num">0.002</td><td class="num">0.003</td><td class="num us"><b>0.727</b></td></tr>
+          <tr><td>revenue</td>         <td class="num">0.777</td><td class="num">0.895</td><td class="num">0.914</td><td class="num us"><b>0.687</b></td></tr>
+        </tbody>
+        <caption><b>Table&nbsp;1.</b>&nbsp;Held-out pinball loss and R<sup>2</sup>
+          on the synthetic evaluation split for the pretrained LightGBM quantile
+          baseline. Pinball loss values are quantile-level; R<sup>2</sup> is
+          computed against the median (P50) prediction.</caption>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ========== QUICKSTART ========== -->
+<section id="quickstart">
+  <div class="col">
+    <span class="section-num">4 &nbsp; Reproducibility</span>
+    <h2>Code and runnable example</h2>
+    <p>
+      The shipped synthetic data and pretrained LightGBM pkl together make up
+      a <em>plug-and-play</em> deployment: a clone plus an LLM API key is
+      sufficient for the full prediction pipeline. No separate data generation
+      or training step is required.
+    </p>
+
+    <div class="code-plate">
+<pre><span class="cmt"># 1. Clone and install.</span>
+<span class="cmd">git clone</span> https://github.com/OranAi-Ltd/oransim.git
+<span class="cmd">cd</span> oransim
+<span class="cmd">pip install</span> -e <span class="str">'.[dev]'</span>
+
+<span class="cmt"># 2. Optional: research-grade models (PyTorch, CPU or GPU).</span>
+<span class="cmd">pip install</span> -e <span class="str">'.[ml]'</span>
+
+<span class="cmt"># 3. Run. The LightGBM baseline + synthetic agents work without an LLM;</span>
+<span class="cmt">#    set LLM_API_KEY to enable the persona layer (soul agents).</span>
+<span class="cmd">LLM_API_KEY</span>=sk-... <span class="cmd">python</span> -m uvicorn oransim.api:app --port 8001</pre>
+    </div>
+
+    <p>
+      Training the research-grade Causal Transformer and Causal Neural Hawkes
+      on the shipped synthetic corpus is a single command each:
+    </p>
+
+    <div class="code-plate">
+<pre><span class="cmd">python</span> -m backend.scripts.train_transformer_wm \
+    --data data/synthetic/scenarios_v0_1.jsonl --epochs 50
+<span class="cmd">python</span> -m backend.scripts.train_neural_hawkes \
+    --data data/synthetic/event_streams_v0_1.jsonl --epochs 30</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ========== PLATFORM MATRIX ========== -->
+<section id="platforms">
+  <div class="col-wide">
+    <span class="section-num">5 &nbsp; Platform Adapter Matrix</span>
+    <h2>Coverage and roadmap</h2>
+
+    <div class="tbl-wrap">
+      <table class="paper plat-tbl">
+        <thead>
+          <tr>
+            <th>Platform</th>
+            <th>Region</th>
+            <th>Status</th>
+            <th>World&nbsp;Model</th>
+            <th>Milestone</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Xiaohongshu (XHS)</td>   <td>Greater China</td>  <td class="stat-live">v1 live</td>      <td>Causal Transformer + LightGBM</td><td class="dash">—</td></tr>
+          <tr><td>TikTok</td>              <td>Global</td>         <td class="stat-mvp">MVP (synthetic)</td>  <td>LightGBM baseline</td>          <td>v0.5 · real panels</td></tr>
+          <tr><td>Instagram Reels</td>     <td>Global</td>         <td class="stat-mvp">MVP (synthetic)</td>  <td>LightGBM baseline</td>          <td>v0.5 · real panels</td></tr>
+          <tr><td>YouTube Shorts</td>      <td>Global</td>         <td class="stat-mvp">MVP (synthetic)</td>  <td>LightGBM baseline</td>          <td>v0.5 · real panels</td></tr>
+          <tr><td>Douyin</td>              <td>Greater China</td>  <td class="stat-mvp">MVP (synthetic)</td>  <td>LightGBM baseline</td>          <td>v0.5 · real panels</td></tr>
+          <tr><td>Twitter / X</td>         <td>Global</td>         <td class="stat-planned">planned</td>  <td class="dash">—</td>                 <td>v0.5</td></tr>
+          <tr><td>Bilibili</td>            <td>Greater China</td>  <td class="stat-planned">planned</td>  <td class="dash">—</td>                 <td>v1.0</td></tr>
+          <tr><td>LinkedIn</td>            <td>Global</td>         <td class="stat-planned">planned</td>  <td class="dash">—</td>                 <td>v1.0</td></tr>
+        </tbody>
+        <caption><b>Table&nbsp;2.</b>&nbsp;Platform adapter matrix. MVP adapters
+          are wired end-to-end on the synthetic LightGBM baseline; real-panel
+          calibration lands in v0.5. See
+          <a href="https://github.com/OranAi-Ltd/oransim/blob/main/ROADMAP.md">ROADMAP.md</a>.</caption>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ENTERPRISE ========== -->
+<section id="enterprise">
+  <div class="col">
+    <span class="section-num">6 &nbsp; OranAI Enterprise Edition</span>
+    <h2>Real data, vertical models, custom deployment</h2>
+    <p>
+      The open-source release trains exclusively on synthetic data for
+      transparency and reproducibility. An accompanying enterprise edition
+      maintained by OranAI Ltd. retrains the same architectures on
+      continuously-updated proprietary marketing campaigns, with
+      higher-performance vertical variants (beauty, fashion, 3C, food and
+      beverage, luxury, automotive) and bespoke customization including
+      on-premise deployment, domain-specific DAGs, branded persona libraries,
+      and a SOC&nbsp;2 / ISO&nbsp;27001 / GDPR compliance track. Academic and
+      non-commercial research use of the open-source release is unrestricted
+      under Apache-2.0. Enterprise inquiries:
+      <a href="mailto:cto@orannai.com">cto@orannai.com</a>.
+    </p>
+  </div>
+</section>
+
+<!-- ========== RELATED WORK ========== -->
+<section id="related">
+  <div class="col">
+    <span class="section-num">7 &nbsp; Related Work</span>
+    <h2>Positioning</h2>
+    <p>
+      Oransim sits at the intersection of three research threads. In causal
+      machine learning, Transformer-based treatment-effect estimators (CaT,
+      CausalDAG-Transformer) and per-arm counterfactual heads (TARNet,
+      Dragonnet, BCAUSS) have recently matured; Oransim combines their design
+      choices in one framework and packages them for end-to-end use. In
+      temporal point processes, the neural-intensity family (Neural Hawkes,
+      Transformer Hawkes, Intensity-Free TPP<span class="cite"><a href="#r11">[11]</a></span>,
+      Neural STPP<span class="cite"><a href="#r12">[12]</a></span>) has moved
+      beyond parametric models; counterfactual TPPs (Geng et&nbsp;al.;
+      Noorbakhsh and Rodriguez) formalize <code>do</code>-queries on event
+      streams — Oransim operationalizes these in a marketing setting with
+      organic-versus-paid event typing. In agent-based simulation, large
+      language models increasingly serve as qualitative behavioral proxies; we
+      pair 10k LLM personas with one&nbsp;million statistically-calibrated agents
+      so that aggregate KPIs and individual-level narratives are generated
+      from a single representation.
+    </p>
+  </div>
+</section>
+
+<!-- ========== BIBTEX + REFERENCES ========== -->
+<section id="bibtex">
+  <div class="col">
+    <span class="section-num">8 &nbsp; Citation</span>
+    <h2>BibTeX</h2>
+    <div class="bibtex">
+<pre>@software{oransim2026,
+  author       = {Yin, Fakong and {Oransim contributors}},
+  title        = {Oransim: A Causal Digital Twin for Marketing at Scale},
+  version      = {0.2.0-alpha},
+  date         = {2026-04-18},
+  url          = {https://github.com/OranAi-Ltd/oransim},
+  organization = {OranAI Ltd.}
+}</pre>
+    </div>
+  </div>
+</section>
+
+<section class="references">
+  <div class="col">
+    <span class="section-num">References</span>
+    <ol>
+      <li id="r1">V.&nbsp;Melnychuk, D.&nbsp;Frauen, S.&nbsp;Feuerriegel. <a href="https://arxiv.org/abs/2204.07258">Causal Transformer for Estimating Counterfactual Outcomes</a>. ICML 2022.</li>
+      <li id="r2">U.&nbsp;Shalit, F.&nbsp;D.&nbsp;Johansson, D.&nbsp;Sontag. Estimating individual treatment effect: generalization bounds and algorithms (TARNet). ICML 2017. &nbsp;C.&nbsp;Shi, D.&nbsp;Blei, V.&nbsp;Veitch. Adapting neural networks for the estimation of treatment effects (Dragonnet). NeurIPS 2019.</li>
+      <li id="r3">S.&nbsp;Ö.&nbsp;Arik, T.&nbsp;Pfister. Causal In-context Amortized Learning. NeurIPS 2023.</li>
+      <li id="r4">H.&nbsp;Mei, J.&nbsp;Eisner. The Neural Hawkes Process. NeurIPS 2017.</li>
+      <li id="r5">S.&nbsp;Zuo, H.&nbsp;Jiang, Z.&nbsp;Zheng, et&nbsp;al. Transformer Hawkes Process. ICML 2020.</li>
+      <li id="r6">J.&nbsp;Geng, et&nbsp;al. Counterfactual Temporal Point Processes. NeurIPS 2022.</li>
+      <li id="r7">J.&nbsp;Pearl. <em>Causality: Models, Reasoning, and Inference</em>, 2nd ed. Cambridge Univ. Press, 2009.</li>
+      <li id="r8">A.&nbsp;Gretton, O.&nbsp;Bousquet, A.&nbsp;Smola, B.&nbsp;Schölkopf. Measuring Statistical Dependence with Hilbert–Schmidt Norms. ALT 2005.</li>
+      <li id="r9">G.&nbsp;Ke, Q.&nbsp;Meng, T.&nbsp;Finley, et&nbsp;al. LightGBM: A Highly Efficient Gradient Boosting Decision Tree. NeurIPS 2017.</li>
+      <li id="r10">A.&nbsp;G.&nbsp;Hawkes. Spectra of some self-exciting and mutually exciting point processes. <em>Biometrika</em>, 1971. &nbsp;Y.&nbsp;Ogata. On Lewis' simulation method for point processes. <em>IEEE Trans. Inform. Theory</em>, 1981.</li>
+      <li id="r11">O.&nbsp;Shchur, M.&nbsp;Biloš, S.&nbsp;Günnemann. Intensity-Free Learning of Temporal Point Processes. ICLR 2020.</li>
+      <li id="r12">R.&nbsp;T.&nbsp;Q.&nbsp;Chen, B.&nbsp;Amos, M.&nbsp;Nickel. Neural Spatio-Temporal Point Processes. ICLR 2021.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer>
+  <p>
+    Oransim is released under the Apache License, Version 2.0.
+  </p>
+  <p>
+    Copyright © 2026 OranAI Ltd. (橙果视界（深圳）科技有限公司) and contributors.
+  </p>
+  <p style="margin-top: 18px;">
+    <a href="https://github.com/OranAi-Ltd/oransim">GitHub</a>&nbsp;·&nbsp;
+    <a href="https://github.com/OranAi-Ltd/oransim/releases">Releases</a>&nbsp;·&nbsp;
+    <a href="https://github.com/OranAi-Ltd/oransim/blob/main/ROADMAP.md">Roadmap</a>&nbsp;·&nbsp;
+    <a href="https://github.com/OranAi-Ltd/oransim/blob/main/CHANGELOG.md">Changelog</a>&nbsp;·&nbsp;
+    <a href="README.zh-CN.md">中文</a>
+  </p>
+
+  <div class="star-block">
+    <a class="plain" href="https://star-history.com/#OranAi-Ltd/oransim&Date">
+      <img src="https://api.star-history.com/svg?repos=OranAi-Ltd/oransim&type=Date" alt="Star history"/>
+    </a>
+  </div>
+</footer>
+
+</body>
+</html>
