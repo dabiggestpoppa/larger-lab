@@ -6,7 +6,7 @@
 
 ---
 
-## Current Context (2026-05-16 20:26:17 UTC)
+## Current Context (2026-05-16 20:35:27 UTC)
 
 ### Status
 Unknown
@@ -18,17 +18,6 @@ None
 - None
 
 ### Recent Activity
-#### 🦉 [RL] 2026-05-16 — OC1 Telegram Not Responding (Diagnosis)
-- **Symptom**: OC1 gateway running (port 18789) but Telegram bot @finalstrawclawbot not responding
-- **Root cause 1**: Missing `openrouter` provider in OC1's `openclaw.json` — only had poolside/nvidia/deepseek, causing fallback to `openai` provider → "No API key found" error
-- **Root cause 2**: OC1's `models.json` has placeholder `"apiKey": "OPENROUTER_API_KEY"` instead of actual key
-- **Root cause 3**: Telegram API connectivity issues — DNS resolution slow, fetch timeouts, event loop delays up to 104s
-- **Root cause 4**: 203 Telegram commands registered (limit 100), causing command sync failures
-- **Fix applied**: Added openrouter provider to OC1's `openclaw.json`
-- **Status**: After restart, OC1 health check failed — needs further investigation in new chat
-- **OC2**: Working fine throughout, no changes needed
-- **Detailed notes**: See `/memories/session/oc1-gateway-diagnosis.md`
-
 #### 🦉 [RL] 2026-05-16 — Self-Healing Framework Built & Deployed
 - **Built complete self-healing startup system**
 - `db/schema.py` — SQLite error DB with tables: errors, bug_annotations, startup_checks, self_healing_actions
@@ -52,10 +41,18 @@ None
 - **PowerShell spam issue**: `openclaw gateway probe` without `--token` hangs forever → terminal timeout → new terminal spawned → infinite loop
 - **Solution**: Use venv-based Python scripts for gateway management instead of CLI commands
 
+#### 🦉 [RL] 2026-05-16 — Phase A+B Complete + System Health Skill
+- **Phase A (Desktop Control)**: `tools/operator/desktop-control.py` — Screen capture (PIL ImageGrab), input simulation (SendInput), window management (ctypes), UI detection (OpenCV). Tested: screenshot 1920x1080 ✅, window list ✅
+- **Phase B (VS Code Bridge)**: `tools/operator/vscode_bridge.py` — 23 methods covering files, editor, terminal, extensions, workspace, git. Uses `code` CLI + desktop hotkeys. Import verified ✅
+- **Desktop API**: `tools/operator/desktop_api.py` — FastAPI on port 8001 with endpoints for desktop control + VS Code
+- **System Health Skill**: `skills/system-health/SKILL.md` — 10-point self-audit covering gateway, config, sessions, workspace, skills, code, OCE, SRRA-OPH, operator, disk
+- **Sub-agent Phase C (System Operator)**: Still running — building `tools/operator/system-operator.py`
+- **CC workspace cleanup survived**: All operator files intact after CC reorganization
+
 ---
 
 ## Sync Metadata
-- **Last Sync:** 2026-05-16 20:26:17 UTC
+- **Last Sync:** 2026-05-16 20:35:27 UTC
 - **Progress File:** `progress/rl-progress.md`
 - **Working Memory:** `progress/rl-memory.md`
 - **Sync Threshold:** 7 updates

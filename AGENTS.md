@@ -1,7 +1,8 @@
 # AGENTS.md — SRRA-OPH Team Manifest
 
 > **Last Updated:** May 16, 2026
-> **Current Phase:** Phase 8 — Sovereign Coevolution (Active)
+> **Current Phase:** OCE Phase 3 — Observer Runtime (Active)
+> **SRRA-OPH:** Phases 1-9 complete — 77/77 tests passing
 
 ---
 

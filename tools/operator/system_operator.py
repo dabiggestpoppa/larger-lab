@@ -44,13 +44,21 @@ def _run(cmd: str, timeout: int = 30, shell: bool = True,
 
 def _ps(cmd: str, timeout: int = 30) -> str:
     """Run a PowerShell command, return stdout."""
-    r = _run(f'powershell -NoProfile -Command "{cmd}"', timeout=timeout)
+    r = subprocess.run(
+        ["powershell", "-NoProfile", "-Command", cmd],
+        capture_output=True, text=True, timeout=timeout,
+        encoding="utf-8", errors="replace",
+    )
     return r.stdout.strip()
 
 
 def _json_ps(cmd: str, timeout: int = 30) -> Any:
-    """Run a PowerShell command that outputs JSON, return parsed object."""
-    r = _run(f'powershell -NoProfile -Command "{cmd} | ConvertTo-Json"', timeout=timeout)
+    """Run a PowerShell command that already outputs JSON, return parsed object."""
+    r = subprocess.run(
+        ["powershell", "-NoProfile", "-Command", cmd],
+        capture_output=True, text=True, timeout=timeout,
+        encoding="utf-8", errors="replace",
+    )
     if r.returncode == 0 and r.stdout.strip():
         try:
             return json.loads(r.stdout)

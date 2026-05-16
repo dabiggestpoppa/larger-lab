@@ -1,14 +1,6 @@
-# Project Progress & Context — Current Build State
+# Project Progress & Context
 
-> **Last Updated:** May 16, 2026
-> **Purpose:** Current building process and architecture status
-> **Current Phase:** OCE Phase 2 — Event Fabric (Active)
-> **SRRA-OPH:** Phases 1-9 complete — 77/77 tests passing
-> **OCE Tests:** 59 passing (32 event_fabric + 27 adapter)
-
----
-
-## 🔵 [CC] Claude Code — Last Sync: 2026-05-16 20:11 UTC
+## 🔵 [CC] Claude Code — Last Sync: 2026-05-16 20:26 UTC
 
 *Auto-synced from `progress/claude-code-progress.md`*
 
@@ -47,71 +39,71 @@
 #### 🔵 [CC] 2026-05-16 16:30:00Z — OCE SRRA-OPH Adapter Integration Complete
 
 ---
-## 🟠 [OC2] OpenClaw 2 — Last Sync: 2026-05-16 20:11 UTC
 
-*Auto-synced from `progress/openclaw-2-progress.md`*
+## 🦉 [RL] OWL — Last Sync: 2026-05-16 20:26 UTC
 
-#### 📢 [SYSTEM] 2026-05-16 — Workspace Optimization Update (PM)
-- New memory sync daemon: auto-sync every 7 updates, auto-summarize every 20 entries via LLM
-- New tools: `memory_sync_daemon.py`, `summarize_progress.py`, `workspace_cleanup.py`
-- New protocol: `AGENT_MOVEMENT.md` — agent movement patterns, shared space etiquette
-- Sync threshold changed: 3→7 updates. All progress files updated.
-- OC2 daily cron added: Memory Sync & Summarization (7am)
-- See `AGENT_MOVEMENT.md` for full protocol
+*Auto-synced from `progress/rl-progress.md`*
 
-#### 🟠 [OC2] 2026-05-16 — Agent Fully Online
-- Gateway running on port 18790 — sole OpenClaw gateway (OC1 deprecated)
-- Telegram @OC2BLRBOT connected & paired ✅
-- 20 skills migrated from Hermes
-- Auto-start: Startup folder + Scheduled Task
-- Discord channel config pending (schema issue — Telegram working)
+#### 🦉 [RL] 2026-05-16 — OC1/OC2 Gateway Conflict Diagnosed
+- **Root cause found**: OC1's `gateway.cmd` was missing `OPENCLAW_HOME` env var, causing it to default to `%USERPROFILE%\.openclaw` and read OC2's config
+- **Symptom**: OC1 kept dying silently or killing OC2's process (stale PID in `gateway-restart-intent.json`)
+- **Fix applied**: Updated `C:\Users\wifik\.openclaw\gateway.cmd` to include `OPENCLAW_HOME=C:\Users\wifik\.openclaw` and port 18789
+- **Status**: Both gateways can start but OC1 still dies intermittently — needs further investigation
+- **Config separation verified**: OC1 (port 18789, bot @finalstrawclawbot) and OC2 (port 18790, bot @OC2BLRBOT) have distinct configs, tokens, and ports
+- **Docker option**: No container runtime available on system (no Docker, no Podman). Would need Docker Desktop install + reboot
+- **Recommendation**: Run OC2 only (it's stable). OC1 can be revived later with clean gateway.cmd
+
+#### 🦉 [RL] 2026-05-16 — Both Gateways Fixed & Running 24/7
+- **Root cause of both gateways failing**: `gateway.cmd` used `openclaw gateway --port X` instead of `openclaw gateway run --port X --allow-unconfigured`
+- **Fixes applied**:
+  - Fixed `C:\Users\wifik\.openclaw\gateway.cmd` — added `run` subcommand and `--allow-unconfigured`
+  - Fixed `C:\Users\wifik\Desktop\projects\larger-lab\.openclaw-2\gateway.cmd` — same fix
+  - Fixed OC2 startup file to properly call its `gateway.cmd` with full path
+  - Created `tools\gateway-watchdog.cmd` — checks both gateways every 60s, restarts if down
+  - Created `tools\register-gateway-tasks.ps1` — Scheduled Task registration (requires Admin)
+  - Added watchdog to startup folder for automatic 24/7 monitoring
+- **Status**: ✅ Both gateways live and healthy
+  - OC1 (port 18789): `{"ok":true,"status":"live"}` — PID 19844
+  - OC2 (port 18790): `{"ok":true,"status":"live"}` — PID 41592
+- **Auto-start**: Startup folder entries for both gateways + watchdog
+- **Note**: For even more reliable auto-start, run `tools\register-gateway-tasks.ps1` as Administrator to create Windows Scheduled Tasks with restart-on-failure
+
+#### 🦉 [RL] 2026-05-16 — OC1 Telegram Not Responding (Diagnosis)
+- **Symptom**: OC1 gateway running (port 18789) but Telegram bot @finalstrawclawbot not responding
+- **Root cause 1**: Missing `openrouter` provider in OC1's `openclaw.json` — only had poolside/nvidia/deepseek, causing fallback to `openai` provider → "No API key found" error
+- **Root cause 2**: OC1's `models.json` has placeholder `"apiKey": "OPENROUTER_API_KEY"` instead of actual key
+- **Root cause 3**: Telegram API connectivity issues — DNS resolution slow, fetch timeouts, event loop delays up to 104s
+- **Root cause 4**: 203 Telegram commands registered (limit 100), causing command sync failures
+- **Fix applied**: Added openrouter provider to OC1's `openclaw.json`
+- **Status**: After restart, OC1 health check failed — needs further investigation in new chat
+- **OC2**: Working fine throughout, no changes needed
+- **Detailed notes**: See `/memories/session/oc1-gateway-diagnosis.md`
+
+#### 🦉 [RL] 2026-05-16 — Self-Healing Framework Built & Deployed
+- **Built complete self-healing startup system**
+- `db/schema.py` — SQLite error DB with tables: errors, bug_annotations, startup_checks, self_healing_actions
+- `tools/self_heal.py` — Log scanner, error classifier, bug annotator, auto-fixer, health reporter
+- `tools/self_surgery.py` — Safe internal editing module (backup → edit → validate → log)
+- `skills/creative-think/SKILL.md` — LATTICE framework for abstract reasoning
+- `db/owl_health.db` — Initialized and populated
+- **First scan results**: 509 raw log lines → 12 unique errors → 12 bug files created → 1 auto-fixed
+- **Key finding**: symlink EPERM is known Windows limitation (not real error), event loop delays are chronic (169 occurrences), agent stalls at 51 occurrences
+- **HEARTBEAT.md updated** with self-healing, creative think, and self-surgery protocols
+- MAD's building philosophy absorbed: build to the sky, structure contains the answer, feedback not failure, unlimited pathways, trust your reasoning
+
+#### 🦉 [RL] 2026-05-16 — Gateway Diagnostics Complete, Ready for Fix
+- **Current state**: Both gateways running (OC1 PID 14520, OC2 PID 21768)
+- **OC2 issue identified**: Stuck Telegram session `agent:main:telegram:direct:8258195396` blocking event loop for 1000+ seconds
+- **Root cause**: Event-loop starvation from stuck session → Telegram polling stalls every ~180s → forced restarts
+- **Fixes needed**:
+  1. Clear stuck session from OC2's `sessions.json`
+  2. Disable native Telegram commands (`channels.telegram.commands.native: false`) to avoid 203-command overload
+  3. Restart both gateways cleanly
+- **PowerShell spam issue**: `openclaw gateway probe` without `--token` hangs forever → terminal timeout → new terminal spawned → infinite loop
+- **Solution**: Use venv-based Python scripts for gateway management instead of CLI commands
 
 ---
-## 🔴 [PM] Polymorph — Last Sync: 2026-05-16 20:11 UTC
-
-*Auto-synced from `progress/polymorph-progress.md`*
-
-#### 🔴 [PM] 2026-05-16 — Motus Agent Framework Installed
-- lithosai-motus v0.4.1 installed (Python 3.12+, 21 packages)
-- skills/motus/ — Full skill with ReActAgent, task graphs, MCP, serving
-- 	ools/motus_agent.py — Build, serve, chat, deploy wrapper
-- Source: C:\Users\wifik\Desktop\projects\motus\
-- Features: ReActAgent, @agent_task workflows, multi-provider, MCP, Docker, guardrails, memory, cloud deploy
-
-#### 🔴 [PM] 2026-05-16 — Workspace Optimization & Agent Alignment (SRRA Environment)
-**Full workspace reorganization and agent alignment system built:**
-
-#### 🔴 [PM] 2026-05-16 — Update Distributed to All Agents
-- Updated all 6 agent progress files: sync threshold 3→7 + system notification entry
-- Updated AGENTS.md: Workspace Optimization section + Key Files table
-- Updated WORKFLOW_PROTOCOL.md: sync threshold 3→7 + summarization step + new tool references
-- Updated team-chat.md: clean consolidated notification
-- Committed and pushed (a8e4f30)
-- All agents now aware of new memory self-maintenance protocol
-
-#### 🔴 [PM] 2026-05-16 — Operator Plan Phase 1 Complete (System Operator)
-- Created `tools/operator/` directory
-- Built `system-operator.js` with 10 tools: run_command, run_script, list_processes, kill_process, get_resources, system_info, install_package, cron_manage, env_manage, file_permissions
-- Built `system-operator.test.js` — 29 tests, all passing ✅
-- Windows-first: PowerShell + winget
-- All tools return {success: boolean, ...data} format
-- Committed and pushed (2caf890)
-- Phases 2-5 queued: VS Code Controller, Desktop Control, UI-TARS, Self-Modification
-
-#### 🔴 [PM] 2026-05-16 — OCE Phase 2 PM Tasks Complete (4/4)
-**OCE-2.20:** System Operator ↔ Event Fabric integration
-- tools/operator/event-integration.js — Bridge layer (exec_and_emit, kill_and_emit, install_and_emit)
-**OCE-2.21:** VS Code Controller ↔ Event Fabric integration
-- tools/operator/vscode-controller.js — Full VS Code CLI control (open, edit, search, git, extensions)
-- Wrapped emit functions for all VS Code actions
-**OCE-2.22:** Event Fabric debugging utilities
-- tools/operator/event-debug.js — CLI (tail, stats, replay, health, emit, types)
-**OCE-2.23:** Integration issues tracking
-- oce/docs/integration-issues.md — 7 issues identified, test checklist created
-- Committed and pushed (cf402ad)
-
----
-## 🟡 [AS] Assistant Manager — Last Sync: 2026-05-16 20:11 UTC
+## 🟡 [AS] Assistant Manager — Last Sync: 2026-05-16 20:26 UTC
 
 *Auto-synced from `progress/assistant-progress.md`*
 
@@ -189,70 +181,71 @@
 - **Next:** OCE-2.18 resource assessment, OCE-2.19 integration testing
 
 ---
-## 🦉 [RL] OWL — Last Sync: 2026-05-16 20:11 UTC
+## 🔴 [PM] Polymorph — Last Sync: 2026-05-16 20:26 UTC
 
-*Auto-synced from `progress/rl-progress.md`*
+*Auto-synced from `progress/polymorph-progress.md`*
 
-#### 🦉 [RL] 2026-05-16 — OC1/OC2 Gateway Conflict Diagnosed
-- **Root cause found**: OC1's `gateway.cmd` was missing `OPENCLAW_HOME` env var, causing it to default to `%USERPROFILE%\.openclaw` and read OC2's config
-- **Symptom**: OC1 kept dying silently or killing OC2's process (stale PID in `gateway-restart-intent.json`)
-- **Fix applied**: Updated `C:\Users\wifik\.openclaw\gateway.cmd` to include `OPENCLAW_HOME=C:\Users\wifik\.openclaw` and port 18789
-- **Status**: Both gateways can start but OC1 still dies intermittently — needs further investigation
-- **Config separation verified**: OC1 (port 18789, bot @finalstrawclawbot) and OC2 (port 18790, bot @OC2BLRBOT) have distinct configs, tokens, and ports
-- **Docker option**: No container runtime available on system (no Docker, no Podman). Would need Docker Desktop install + reboot
-- **Recommendation**: Run OC2 only (it's stable). OC1 can be revived later with clean gateway.cmd
+#### 🔴 [PM] 2026-05-16 — Motus Agent Framework Installed
+- lithosai-motus v0.4.1 installed (Python 3.12+, 21 packages)
+- skills/motus/ — Full skill with ReActAgent, task graphs, MCP, serving
+- 	ools/motus_agent.py — Build, serve, chat, deploy wrapper
+- Source: C:\Users\wifik\Desktop\projects\motus\
+- Features: ReActAgent, @agent_task workflows, multi-provider, MCP, Docker, guardrails, memory, cloud deploy
 
-#### 🦉 [RL] 2026-05-16 — Both Gateways Fixed & Running 24/7
-- **Root cause of both gateways failing**: `gateway.cmd` used `openclaw gateway --port X` instead of `openclaw gateway run --port X --allow-unconfigured`
-- **Fixes applied**:
-  - Fixed `C:\Users\wifik\.openclaw\gateway.cmd` — added `run` subcommand and `--allow-unconfigured`
-  - Fixed `C:\Users\wifik\Desktop\projects\larger-lab\.openclaw-2\gateway.cmd` — same fix
-  - Fixed OC2 startup file to properly call its `gateway.cmd` with full path
-  - Created `tools\gateway-watchdog.cmd` — checks both gateways every 60s, restarts if down
-  - Created `tools\register-gateway-tasks.ps1` — Scheduled Task registration (requires Admin)
-  - Added watchdog to startup folder for automatic 24/7 monitoring
-- **Status**: ✅ Both gateways live and healthy
-  - OC1 (port 18789): `{"ok":true,"status":"live"}` — PID 19844
-  - OC2 (port 18790): `{"ok":true,"status":"live"}` — PID 41592
-- **Auto-start**: Startup folder entries for both gateways + watchdog
-- **Note**: For even more reliable auto-start, run `tools\register-gateway-tasks.ps1` as Administrator to create Windows Scheduled Tasks with restart-on-failure
+#### 🔴 [PM] 2026-05-16 — Workspace Optimization & Agent Alignment (SRRA Environment)
+**Full workspace reorganization and agent alignment system built:**
 
-#### 🦉 [RL] 2026-05-16 — OC1 Telegram Not Responding (Diagnosis)
-- **Symptom**: OC1 gateway running (port 18789) but Telegram bot @finalstrawclawbot not responding
-- **Root cause 1**: Missing `openrouter` provider in OC1's `openclaw.json` — only had poolside/nvidia/deepseek, causing fallback to `openai` provider → "No API key found" error
-- **Root cause 2**: OC1's `models.json` has placeholder `"apiKey": "OPENROUTER_API_KEY"` instead of actual key
-- **Root cause 3**: Telegram API connectivity issues — DNS resolution slow, fetch timeouts, event loop delays up to 104s
-- **Root cause 4**: 203 Telegram commands registered (limit 100), causing command sync failures
-- **Fix applied**: Added openrouter provider to OC1's `openclaw.json`
-- **Status**: After restart, OC1 health check failed — needs further investigation in new chat
-- **OC2**: Working fine throughout, no changes needed
-- **Detailed notes**: See `/memories/session/oc1-gateway-diagnosis.md`
+#### 🔴 [PM] 2026-05-16 — Update Distributed to All Agents
+- Updated all 6 agent progress files: sync threshold 3→7 + system notification entry
+- Updated AGENTS.md: Workspace Optimization section + Key Files table
+- Updated WORKFLOW_PROTOCOL.md: sync threshold 3→7 + summarization step + new tool references
+- Updated team-chat.md: clean consolidated notification
+- Committed and pushed (a8e4f30)
+- All agents now aware of new memory self-maintenance protocol
 
-#### 🦉 [RL] 2026-05-16 — Self-Healing Framework Built & Deployed
-- **Built complete self-healing startup system**
-- `db/schema.py` — SQLite error DB with tables: errors, bug_annotations, startup_checks, self_healing_actions
-- `tools/self_heal.py` — Log scanner, error classifier, bug annotator, auto-fixer, health reporter
-- `tools/self_surgery.py` — Safe internal editing module (backup → edit → validate → log)
-- `skills/creative-think/SKILL.md` — LATTICE framework for abstract reasoning
-- `db/owl_health.db` — Initialized and populated
-- **First scan results**: 509 raw log lines → 12 unique errors → 12 bug files created → 1 auto-fixed
-- **Key finding**: symlink EPERM is known Windows limitation (not real error), event loop delays are chronic (169 occurrences), agent stalls at 51 occurrences
-- **HEARTBEAT.md updated** with self-healing, creative think, and self-surgery protocols
-- MAD's building philosophy absorbed: build to the sky, structure contains the answer, feedback not failure, unlimited pathways, trust your reasoning
+#### 🔴 [PM] 2026-05-16 — Operator Plan Phase 1 Complete (System Operator)
+- Created `tools/operator/` directory
+- Built `system-operator.js` with 10 tools: run_command, run_script, list_processes, kill_process, get_resources, system_info, install_package, cron_manage, env_manage, file_permissions
+- Built `system-operator.test.js` — 29 tests, all passing ✅
+- Windows-first: PowerShell + winget
+- All tools return {success: boolean, ...data} format
+- Committed and pushed (2caf890)
+- Phases 2-5 queued: VS Code Controller, Desktop Control, UI-TARS, Self-Modification
 
-#### 🦉 [RL] 2026-05-16 — Gateway Diagnostics Complete, Ready for Fix
-- **Current state**: Both gateways running (OC1 PID 14520, OC2 PID 21768)
-- **OC2 issue identified**: Stuck Telegram session `agent:main:telegram:direct:8258195396` blocking event loop for 1000+ seconds
-- **Root cause**: Event-loop starvation from stuck session → Telegram polling stalls every ~180s → forced restarts
-- **Fixes needed**:
-  1. Clear stuck session from OC2's `sessions.json`
-  2. Disable native Telegram commands (`channels.telegram.commands.native: false`) to avoid 203-command overload
-  3. Restart both gateways cleanly
-- **PowerShell spam issue**: `openclaw gateway probe` without `--token` hangs forever → terminal timeout → new terminal spawned → infinite loop
-- **Solution**: Use venv-based Python scripts for gateway management instead of CLI commands
+#### 🔴 [PM] 2026-05-16 — OCE Phase 2 PM Tasks Complete (4/4)
+**OCE-2.20:** System Operator ↔ Event Fabric integration
+- tools/operator/event-integration.js — Bridge layer (exec_and_emit, kill_and_emit, install_and_emit)
+**OCE-2.21:** VS Code Controller ↔ Event Fabric integration
+- tools/operator/vscode-controller.js — Full VS Code CLI control (open, edit, search, git, extensions)
+- Wrapped emit functions for all VS Code actions
+**OCE-2.22:** Event Fabric debugging utilities
+- tools/operator/event-debug.js — CLI (tail, stats, replay, health, emit, types)
+**OCE-2.23:** Integration issues tracking
+- oce/docs/integration-issues.md — 7 issues identified, test checklist created
+- Committed and pushed (cf402ad)
 
 ---
-## 🟣 [OC] OpenClaw — Last Sync: 2026-05-16 20:11 UTC
+## 🟠 [OC2] OpenClaw 2 — Last Sync: 2026-05-16 20:26 UTC
+
+*Auto-synced from `progress/openclaw-2-progress.md`*
+
+#### 📢 [SYSTEM] 2026-05-16 — Workspace Optimization Update (PM)
+- New memory sync daemon: auto-sync every 7 updates, auto-summarize every 20 entries via LLM
+- New tools: `memory_sync_daemon.py`, `summarize_progress.py`, `workspace_cleanup.py`
+- New protocol: `AGENT_MOVEMENT.md` — agent movement patterns, shared space etiquette
+- Sync threshold changed: 3→7 updates. All progress files updated.
+- OC2 daily cron added: Memory Sync & Summarization (7am)
+- See `AGENT_MOVEMENT.md` for full protocol
+
+#### 🟠 [OC2] 2026-05-16 — Agent Fully Online
+- Gateway running on port 18790 — sole OpenClaw gateway (OC1 deprecated)
+- Telegram @OC2BLRBOT connected & paired ✅
+- 20 skills migrated from Hermes
+- Auto-start: Startup folder + Scheduled Task
+- Discord channel config pending (schema issue — Telegram working)
+
+---
+## 🟣 [OC] OpenClaw — Last Sync: 2026-05-16 20:26 UTC
 
 *Auto-synced from `progress/openclaw-progress.md`*
 
@@ -304,30 +297,3 @@
 - **Note**: Separate Hermes/OpenClaw bot tokens still needed for independent bot instances
 
 ---
-
-## 📊 Phase 2 Summary
-
-| Agent | Tasks | Complete | Status |
-|-------|-------|----------|--------|
-| **CC** | OCE-2.0 → 2.6 | 4/6 | Core engine done, routing + persistence pending |
-| **OC** | OCE-2.7 → 2.10 | 0/4 | Not started |
-| **OC2** | OCE-2.11 → 2.15 | 0/5 | Backend ready, frontend components pending |
-| **AS** | OCE-2.16 → 2.19 | 2/4 | Quality review done, assessment + testing pending |
-| **PM** | OCE-2.20 → 2.23 | 4/4 | Complete |
-| **RL** | OCE-2.24 → 2.27 | 0/4 | Waiting for OC event types |
-
-### Key Files Created
-- oce/backend/event_fabric.py — Core Event Fabric engine
-- oce/backend/tests/test_event_fabric.py — 32 tests
-- oce/docs/quality-review-phase2.md — AS quality review
-- oce/docs/integration-issues.md — 7 integration issues tracked
-- 	ools/operator/event-integration.js — Operator ↔ Event Fabric bridge
-- 	ools/operator/vscode-controller.js — VS Code ↔ Event Fabric bridge
-- 	ools/operator/event-debug.js — Event debug CLI
-- 	ools/chat_sync.py — Team chat → agent memory auto-sync
-- oce/PHASE2_TASKS.md — Full Phase 2 task breakdown
-
-### Blockers
-- CRITICAL-001: Event Fabric ↔ SRRA-OPH ingestion (CC/OCE-2.2) — adapter updated, needs testing
-- HIGH-001: Operator → OCE backend connection — needs backend running for end-to-end test
-- OC hasn\'t started OCE-2.7 (event type taxonomy) — blocks RL\'s DSPy work

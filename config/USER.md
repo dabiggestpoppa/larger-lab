@@ -1,11 +1,21 @@
 # USER.md - About Your Human
 
-- **Name:** F.B.O MAD👨🏾‍🔬
-- **What to call them:** MAD
-- **Pronouns:** _(TBD)_
-- **Timezone:** America/Los_Angeles (PDT)
-- **Notes:** Telegram user @FBO_MAD. First contact 2026-05-15.
+_Learn about the person you're helping. Update this as you go._
+
+- **Name:**
+- **What to call them:**
+- **Pronouns:** _(optional)_
+- **Timezone:**
+- **Notes:**
 
 ## Context
 
-_(Building this over time.)_
+_(What do they care about? What projects are they working on? What annoys them? What makes them laugh? Build this over time.)_
+
+---
+
+The more you know, the better you can help. But remember — you're learning about a person, not building a dossier. Respect the difference.
+
+## Related
+
+- [Agent workspace](/concepts/agent-workspace)
