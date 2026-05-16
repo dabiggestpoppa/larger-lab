@@ -88,8 +88,8 @@ PHASES = {
         "status": "pending",
     },
     "PHASE_5": {
-        "name": "Long Horizon Adaptation",
-        "description": "Persistent adaptive identity over time.",
+        "name": "Long-Horizon Continuity",
+        "description": "Identity is reconstructable trajectory, not persistent state.",
         "success_criteria": [
             "Long-term drift tracking operational",
             "Operator trajectory modeling",
@@ -97,11 +97,61 @@ PHASES = {
             "Recursive compression (memory doesn't grow linearly)",
             "System retains continuity over weeks/months",
         ],
+        "status": "complete",
+    },
+    "PHASE_6": {
+        "name": "Recursive Topology Introspection",
+        "description": "System models itself, optimizes its own repair.",
+        "success_criteria": [
+            "Internal topology awareness",
+            "Synchronization self-analysis",
+            "Repair efficiency optimization",
+            "Recursive coherence measurement",
+            "Adaptive topology restructuring",
+            "Self-directed entropy minimization",
+        ],
+        "status": "complete",
+    },
+    "PHASE_7": {
+        "name": "Overlap Cognition",
+        "description": "Cognition emerges in overlap, not inside observers.",
+        "success_criteria": [
+            "Overlap-native cognition",
+            "Collar entropy tracking",
+            "Prediction contracts",
+            "Attractor reasoning",
+            "Multi-scale metrics",
+            "Structural memory",
+        ],
+        "status": "complete",
+    },
+    "PHASE_8": {
+        "name": "Sovereign Coevolution",
+        "description": "Human-SRRA continuity ecology.",
+        "success_criteria": [
+            "Operator pattern stabilization",
+            "Strategic preference modeling",
+            "Constraint alignment adaptation",
+            "Long-horizon operator continuity tracking",
+            "Bidirectional coherence reinforcement",
+            "Anti-manipulation safeguards",
+        ],
+        "status": "pending",
+    },
+    "PHASE_9": {
+        "name": "Entropy Economics",
+        "description": "Coherence-per-resource optimization.",
+        "success_criteria": [
+            "Coherence-per-resource optimization",
+            "Entropy-aware scaling",
+            "Adaptive compression economics",
+            "Synchronization efficiency maximization",
+            "Recoverability preservation under load",
+            "Sustainability governance",
+        ],
         "status": "pending",
     },
 }
-
-
 def load_phase_state() -> dict:
     """Load phase tracking state."""
     if PHASE_FILE.exists():

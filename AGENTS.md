@@ -1,7 +1,7 @@
 # AGENTS.md — SRRA-OPH Team Manifest
 
 > **Last Updated:** May 16, 2026
-> **Current Phase:** Phase 8 — Sovereign Coevolution (Planned)
+> **Current Phase:** Phase 8 — Sovereign Coevolution (Active)
 
 ---
 
