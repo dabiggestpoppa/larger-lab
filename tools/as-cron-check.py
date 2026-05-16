@@ -70,6 +70,7 @@ def check_team_chat():
     return {"open_items": open_count, "last_lines": content[-500:]}
 
 def main():
+    os.chdir(LAB_ROOT)
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     print(f"\n{'='*60}")
     print(f"AS Cron Check — {now}")

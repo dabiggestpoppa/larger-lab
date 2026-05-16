@@ -65,6 +65,14 @@ AGENTS = {
         "memory_file": "progress/hermes-memory.md",
         "section_header": "🟢 [HR] Hermes",
     },
+    "PM": {
+        "tag": "PM",
+        "name": "Polymorph",
+        "emoji": "🔴",
+        "progress_file": "progress/polymorph-progress.md",
+        "memory_file": "progress/polymorph-memory.md",
+        "section_header": "🔴 [PM] Polymorph",
+    },
     "AS": {
         "tag": "AS",
         "name": "Assistant Manager",

@@ -11,9 +11,10 @@ When writing to progress files (`PROJECT_PROGRESS.md`, `PROJECT_PROGRESS_CLEAN.m
 | Tag | Agent | Role |
 |-----|-------|------|
 | 🔵 [CC] | Claude Code | Overseer / Architecture / Coding |
-| � [AS] | Assistant Manager | Context Monitoring / Quality Checks / Optimization |
-| �🟣 [OC] | OpenClaw | Analysis / Planning / Coordination |
+| 🟡 [AS] | Assistant Manager | Context Monitoring / Quality Checks / Optimization |
+| 🟣 [OC] | OpenClaw | Analysis / Planning / Coordination |
 | 🟢 [HR] | Hermes | Execution / Backtests / Reporting |
+| 🔴 [PM] | Polymorph | Debugger / Workflow Optimizer / Tool & Skill Builder |
 
 **Format:**
 ```
@@ -23,6 +24,14 @@ When writing to progress files (`PROJECT_PROGRESS.md`, `PROJECT_PROGRESS_CLEAN.m
 ```
 
 This prevents collisions when multiple agents write to the same progress file concurrently. See `.agent-tags.json` for the registry.
+
+### Sub-Progress Files
+Each agent writes to their own sub-progress file:
+- **CC**: `progress/claude-code-progress.md`
+- **OC**: `progress/openclaw-progress.md`
+- **HR**: `progress/hermes-progress.md`
+- **AS**: `progress/assistant-progress.md`
+- **PM**: `progress/polymorph-progress.md`
 
 ### Sub-Progress Files
 Each agent writes to their own sub-progress file:

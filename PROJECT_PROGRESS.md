@@ -1,6 +1,16 @@
 # Project Progress & Context
 
-> **Last Updated:** May 15, 2026
+> **Last Updated:** May 15, 2026 18:27 UTC
+
+## 🟣 [OC] P90 Unified Engine — Bug Fix + Baseline Results (2026-05-15 18:27 UTC)
+
+- Built `nautilus/strategies/p90_unified.py` — unified backtest engine with 3 strategies
+- **Critical bug fixed**: Asian Range classification was dead code (`est_h == 3` inside `est_h >= 19 or est_h < 3` block)
+- Baseline EUR/USD results (50k bars): Cascade_Combo 34.2% WR/-7.71p, Cascade 33.9% WR/-40.51p, Base 35.6% WR/-138.47p
+- **Issue**: TP2 (-50% AR) rarely hit — need parameter tuning
+- All 3 strategies need optimization before live deployment
+
+---
 > **Maintain this file:** Update after every significant work session. This is the single source of truth for project state across long-horizon tasks.
 
 ---

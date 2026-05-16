@@ -27,6 +27,13 @@
       "role": "Context Monitoring / Task Support / Quality Checks",
       "color": "🟡",
       "progress_prefix": "AS"
+    },
+    "polymorph": {
+      "tag": "PM",
+      "name": "Polymorph",
+      "role": "Debugger / Workflow Optimizer / Tool & Skill Builder",
+      "color": "🔴",
+      "progress_prefix": "PM"
     }
   },
   "progress_header_format": "{emoji} [{tag}] {agent-name} — {timestamp}",

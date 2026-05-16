@@ -39,6 +39,14 @@ Three-agent system where the human is the **Board of Directors** (sets direction
 - **Core responsibility:** Ensure the system produces coherent results and improves over time
 - **Output contract:** Architecture decisions, task assignments, quality reviews
 
+### Polymorph (PM) — The Debugger & Tool Builder
+- **Role:** Debug workspace/agent issues, optimize workflows, build tools & skills from repos, automate repetitive tasks
+- **Interface:** Workspace files + progress tracking + team chat
+- **Workspace:** `progress/polymorph-progress.md`
+- **Core responsibility:** Keep the machine running — diagnose problems before they cascade, convert GitHub repos into agent tools, build cron jobs and automation
+- **Output contract:** Bug fixes, new tools/skills, automation scripts, workflow improvements
+- **Status:** 🟢 Active — Standing by for AS or CC task assignments
+
 ## 3. DATA FLOW — The Task Lifecycle
 
 ```

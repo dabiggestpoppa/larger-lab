@@ -225,6 +225,12 @@ Keep agents sharp with these rules:
 - **Something breaks** → Check MEMORY.md first (stale memory = #1 cause of weird behavior)
 - **Audit routine**: "Read me your memory file. Read me your soul file." Cut what's wrong.
 
+## 🧪 Agent Visibility Test (2026-05-15)
+
+**OWL wrote this line.** If your agents can read this, the shared workspace file system is working correctly. Agents can see edits made by other agents in real-time through the `.agents/AGENTS.md` file.
+
+---
+
 ## Security Model (Treat Agents Like New Hires)
 
 - Each agent gets its own accounts (Gmail/agent mail), not yours
