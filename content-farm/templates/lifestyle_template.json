@@ -1,0 +1,61 @@
+{
+  "niche": "lifestyle",
+  "version": "1.0",
+  "description": "Lifestyle content template for short video generation",
+  "script_structure": {
+    "hook": {
+      "duration_sec": 5,
+      "style": "relatable",
+      "examples": [
+        "一个人的{time}可以做什么",
+        "坚持{habit}天，我的人生变了",
+        "这才是{life_aspect}的正确打开方式"
+      ]
+    },
+    "body": {
+      "duration_sec": 30,
+      "style": "storytelling",
+      "elements": ["scene_setting", "daily_routine", "tips_sharing", "personal_touch"]
+    },
+    "cta": {
+      "duration_sec": 5,
+      "style": "community",
+      "examples": [
+        "你的{topic}是什么样的？评论区聊聊",
+        "关注我，一起变更好",
+        "转发给你在乎的人"
+      ]
+    }
+  },
+  "variables": {
+    "time": ["周末", "早晨", "下班后", "假期", "深夜"],
+    "habit": ["早起", "阅读", "运动", "冥想", "写日记"],
+    "life_aspect": ["独处", "生活", "工作", "社交", "休息"],
+    "topic": ["生活方式", "日常", "自律", "独处", "旅行"]
+  },
+  "title_templates": [
+    "🌅 坚持{habit}100天，我的变化惊呆了",
+    "✨ 一个人的{time}｜治愈系日常",
+    "💫 {life_aspect}的正确打开方式",
+    "📖 我的{topic}分享｜看完你会想改变"
+  ],
+  "description_templates": [
+    "分享我的{topic}，坚持{habit}真的让生活变得不一样了。{cta}",
+    "一个人的{time}也可以很充实，今天分享几个小tips。"
+  ],
+  "hashtag_sets": {
+    "douyin": ["#生活", "#日常", "#vlog", "#lifestyle", "#旅行", "#自律"],
+    "xiaohongshu": ["生活方式", "日常vlog", "自律生活", "旅行日记", "好物分享"],
+    "tiktok": ["#lifestyle", "#vlog", "#dailyroutine", "#travel", "#selfcare", "#aesthetic"]
+  },
+  "voice_profile": {
+    "type": "casual_female",
+    "speed": 1.0,
+    "pitch": "medium"
+  },
+  "music_profile": {
+    "genre": "indie_acoustic",
+    "energy": "low_medium",
+    "bpm_range": [70, 100]
+  }
+}

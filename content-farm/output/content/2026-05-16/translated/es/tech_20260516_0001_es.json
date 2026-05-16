@@ -1,0 +1,112 @@
+{
+  "id": "tech_20260516_0001_es",
+  "source_language": "zh",
+  "target_language": "es",
+  "topic": "AI tools 2024",
+  "niche": "tech",
+  "script": {
+    "hook": {
+      "text": "[Spanish] 99%的人不知道的Windows隐藏功能",
+      "duration_sec": 5,
+      "style": "curiosity_gap",
+      "original_text": "99%的人不知道的Windows隐藏功能"
+    },
+    "body": {
+      "text": "[Auto-generated body for topic: AI tools 2024]",
+      "duration_sec": 20,
+      "style": "demo_walkthrough",
+      "elements": [
+        "problem_statement",
+        "solution_demo",
+        "key_features",
+        "comparison"
+      ],
+      "original_text": "[Auto-generated body for topic: AI tools 2024]"
+    },
+    "cta": {
+      "text": "[Spanish] 收藏起来慢慢研究",
+      "duration_sec": 5,
+      "style": "value_driven",
+      "original_text": "收藏起来慢慢研究"
+    }
+  },
+  "metadata": {
+    "douyin": {
+      "title": "[Spanish] 💡 Excel隐藏功能｜10倍的人不知道",
+      "description": "[Spanish] 今天给大家推荐一个超好用的编程工具，效率直接提升5倍！{cta}",
+      "hashtags": [
+        "#科技",
+        "#AI",
+        "#数码",
+        "#tech",
+        "#人工智能",
+        "#手机",
+        "#电脑"
+      ],
+      "tags": [
+        "科技",
+        "AI",
+        "数码",
+        "tech",
+        "人工智能",
+        "手机",
+        "电脑"
+      ],
+      "platform": "douyin",
+      "language": "es",
+      "original_title": "💡 Excel隐藏功能｜10倍的人不知道",
+      "original_description": "今天给大家推荐一个超好用的编程工具，效率直接提升5倍！{cta}"
+    },
+    "xiaohongshu": {
+      "title": "[Spanish] 🔥 2024最火的自动化工具推荐",
+      "description": "[Spanish] 今天给大家推荐一个超好用的自动化工具，效率直接提升100%！{cta}",
+      "hashtags": [
+        "数码测评",
+        "AI工具",
+        "科技好物",
+        "效率工具",
+        "App推荐"
+      ],
+      "tags": [
+        "数码测评",
+        "AI工具",
+        "科技好物",
+        "效率工具",
+        "App推荐"
+      ],
+      "platform": "xiaohongshu",
+      "language": "es",
+      "original_title": "🔥 2024最火的自动化工具推荐",
+      "original_description": "今天给大家推荐一个超好用的自动化工具，效率直接提升100%！{cta}"
+    },
+    "tiktok": {
+      "title": "[Spanish] 🤖 ChatGPT太强了！100%提升效率",
+      "description": "[Spanish] 这个iPhone的隐藏功能太实用了，300%的人都不知道。",
+      "hashtags": [
+        "#tech",
+        "#ai",
+        "#gadgets",
+        "#technology",
+        "#productivity",
+        "#coding"
+      ],
+      "tags": [
+        "tech",
+        "ai",
+        "gadgets",
+        "technology",
+        "productivity",
+        "coding"
+      ],
+      "platform": "tiktok",
+      "language": "es",
+      "original_title": "🤖 ChatGPT太强了！100%提升效率",
+      "original_description": "这个iPhone的隐藏功能太实用了，300%的人都不知道。"
+    }
+  },
+  "target_platforms": [
+    "tiktok",
+    "youtube_shorts"
+  ],
+  "translated_at": "2026-05-16T16:40:54.294829+00:00"
+}

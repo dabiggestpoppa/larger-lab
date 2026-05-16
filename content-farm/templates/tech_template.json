@@ -1,0 +1,62 @@
+{
+  "niche": "tech",
+  "version": "1.0",
+  "description": "Tech content template for short video generation",
+  "script_structure": {
+    "hook": {
+      "duration_sec": 5,
+      "style": "curiosity_gap",
+      "examples": [
+        "这个{tech}工具让我效率提升了{percent}",
+        "99%的人不知道的{platform}隐藏功能",
+        "用{ai_tool}一分钟搞定{hour}小时的工作"
+      ]
+    },
+    "body": {
+      "duration_sec": 20,
+      "style": "demo_walkthrough",
+      "elements": ["problem_statement", "solution_demo", "key_features", "comparison"]
+    },
+    "cta": {
+      "duration_sec": 5,
+      "style": "value_driven",
+      "examples": [
+        "关注我，每天一个效率技巧",
+        "评论区领取完整教程",
+        "收藏起来慢慢研究"
+      ]
+    }
+  },
+  "variables": {
+    "tech": ["AI", "自动化", "编程", "效率工具", "ChatGPT"],
+    "percent": ["300%", "10倍", "5倍", "100%"],
+    "platform": ["iPhone", "Windows", "Mac", "Excel", "Notion"],
+    "ai_tool": ["ChatGPT", "Claude", "Midjourney", "Cursor", "Copilot"],
+    "hour": ["1", "3", "8", "24"]
+  },
+  "title_templates": [
+    "🤖 {ai_tool}太强了！{percent}提升效率",
+    "💡 {platform}隐藏功能｜{percent}的人不知道",
+    "⚡ 用{tech}搞定{hour}小时的工作",
+    "🔥 2024最火的{tech}工具推荐"
+  ],
+  "description_templates": [
+    "今天给大家推荐一个超好用的{tech}工具，效率直接提升{percent}！{cta}",
+    "这个{platform}的隐藏功能太实用了，{percent}的人都不知道。"
+  ],
+  "hashtag_sets": {
+    "douyin": ["#科技", "#AI", "#数码", "#tech", "#人工智能", "#手机", "#电脑"],
+    "xiaohongshu": ["数码测评", "AI工具", "科技好物", "效率工具", "App推荐"],
+    "tiktok": ["#tech", "#ai", "#gadgets", "#technology", "#productivity", "#coding"]
+  },
+  "voice_profile": {
+    "type": "neutral_male",
+    "speed": 1.0,
+    "pitch": "medium_low"
+  },
+  "music_profile": {
+    "genre": "tech_ambient",
+    "energy": "medium",
+    "bpm_range": [100, 130]
+  }
+}

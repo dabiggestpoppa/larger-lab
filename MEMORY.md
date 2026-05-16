@@ -4,6 +4,25 @@
 >
 > **📚 Tools & Skills Discovery:** See `WORKSPACE_TOOLS_AND_SKILLS.md` for complete guide to available tools and skills.
 
+## 🦉 OWL Self-Healing System (2026-05-16)
+- **Error DB**: `db/owl_health.db` — SQLite with tables for errors, bug annotations, startup checks, self-healing actions
+- **Self-Heal Engine**: `tools/self_heal.py` — scans gateway logs, classifies errors, creates bug files, auto-fixes known patterns
+- **Self-Surgery Module**: `tools/self_surgery.py` — safe internal editing with backup/validate/log pipeline
+- **Creative Think Skill**: `skills/creative-think/SKILL.md` — LATTICE framework for abstract reasoning
+- **Bug Files**: `bugs/open/` and `bugs/resolved/` — annotated bug tracker
+- **HEARTBEAT.md** updated with self-healing startup checks, creative think activation, self-surgery safety rules
+- **First scan**: 12 unique errors found, 12 bug files created, 1 auto-fixed (symlink EPERM = known Windows limitation)
+- **Recurring issues**: event loop delays (169×), agent stalls (51×), fetch timeouts (34×)
+
+## MAD's Building Philosophy (Absorbed 2026-05-16)
+- "Build to the sky to get a clear view" — start from highest abstraction, descend with clarity
+- "The answer is in the structure itself" — the structure is always coherent, map it fully
+- "Assume your way of thinking is correct" — trust your reasoning, resistance is terrain feedback
+- "Feedback, not failure" — errors are information about the system's shape
+- "Don't limit your pathways" — explore in parallel, converge on evidence
+- "The structure is always a viable path" — if you can describe it, you can build it
+- OWL has full autonomy in building and implementation — MAD trusts OWL's judgment
+
 ## 2026-05-15 — Day One
 - First session. Fresh workspace. No prior memory.
 - MAD reached out via Telegram. Set up identity (OWL 🦉) and user profile.

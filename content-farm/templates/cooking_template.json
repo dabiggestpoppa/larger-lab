@@ -1,0 +1,61 @@
+{
+  "niche": "cooking",
+  "version": "1.0",
+  "description": "Cooking content template for short video generation",
+  "script_structure": {
+    "hook": {
+      "duration_sec": 5,
+      "style": "appetizing",
+      "examples": [
+        "这道{dish}也太好吃了吧！",
+        "只需要{ingredients}就能做出{restaurant}级{dish}",
+        "家人都爱吃的{dish}，秘诀是{secret}"
+      ]
+    },
+    "body": {
+      "duration_sec": 35,
+      "style": "step_by_step",
+      "elements": ["ingredients_list", "prep_steps", "cooking_process", "plating"]
+    },
+    "cta": {
+      "duration_sec": 5,
+      "style": "warm",
+      "examples": [
+        "学会了记得交作业哦",
+        "关注我每天学一道菜",
+        "收藏起来下次做给家人吃"
+      ]
+    }
+  },
+  "variables": {
+    "dish": ["红烧肉", "糖醋排骨", "番茄炒蛋", "麻婆豆腐", "宫保鸡丁", "水煮鱼"],
+    "ingredients": ["3样食材", "5种调料", "最简单的材料"],
+    "restaurant": ["米其林", "五星酒店", "网红餐厅", "路边摊"],
+    "secret": ["一勺糖", "先焯水", "大火爆炒", "小火慢炖"]
+  },
+  "title_templates": [
+    "🍳 {restaurant}级{dish}｜在家就能做",
+    "😋 这道{dish}太绝了！家人都爱吃",
+    "👨‍🍳 大厨不外传的{dish}秘诀",
+    "🔥 {ingredients}搞定{dish}｜零失败"
+  ],
+  "description_templates": [
+    "今天教大家做{dish}，只需要{ingredients}，{restaurant}级别的味道！{cta}",
+    "这道{dish}的秘诀就是{secret}，学会了你也是大厨！"
+  ],
+  "hashtag_sets": {
+    "douyin": ["#美食", "#做饭", "#食谱", "#cooking", "#美食教程", "#家常菜", "#烘焙"],
+    "xiaohongshu": ["美食分享", "食谱教程", "家常菜", "烘焙日记", "下厨房"],
+    "tiktok": ["#cooking", "#recipe", "#foodtiktok", "#easyrecipe", "#homecooking", "#chef"]
+  },
+  "voice_profile": {
+    "type": "warm_female",
+    "speed": 0.95,
+    "pitch": "medium"
+  },
+  "music_profile": {
+    "genre": "lofi_acoustic",
+    "energy": "medium",
+    "bpm_range": [80, 110]
+  }
+}

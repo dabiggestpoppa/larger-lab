@@ -1,0 +1,11 @@
+{
+  "platform": "douyin",
+  "keywords": "健身教程",
+  "dry_run": true,
+  "elapsed_seconds": 0.01,
+  "output_dirs": [
+    "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\content-farm\\output\\2026-05-16\\media_crawler_douyin"
+  ],
+  "log_file": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\content-farm\\logs\\crawler_20260516_122645.log",
+  "timestamp": "2026-05-16T16:26:45.494611+00:00"
+}

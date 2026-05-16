@@ -16,7 +16,7 @@ SRRA-OPH Phase 8 — Sovereign Coevolution (Planned)
 ### Recent Entries
 
 #### 🟠 [OC2] 2026-05-16 — Agent Fully Online
-- Gateway running on port 18790 (OC1 uses 18789)
+- Gateway running on port 18790 — sole OpenClaw gateway (OC1 deprecated)
 - Telegram @OC2BLRBOT connected & paired ✅
 - 20 skills migrated from Hermes
 - Auto-start: Startup folder + Scheduled Task

@@ -10,39 +10,29 @@ Each patch is a bounded observer with:
 """
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
 from typing import Optional, Dict, Any, List
 from datetime import datetime
 import uuid
 import json
+from pydantic import BaseModel, Field, field_validator
 
 
-@dataclass
-class CollarState:
+class CollarState(BaseModel):
     """Structured overlap state between patches."""
     patch_id: str
     timestamp: str
     objective: str
-    constraints: List[str] = field(default_factory=list)
-    confidence: float = 0.0
+    constraints: List[str] = Field(default_factory=list)
+    confidence: float = Field(default=0.0, ge=0.0, le=1.0)
     state_hash: str = ""
-    repair_flags: List[str] = field(default_factory=list)
+    repair_flags: List[str] = Field(default_factory=list)
     
     def to_json(self) -> str:
-        return json.dumps({
-            "patch_id": self.patch_id,
-            "timestamp": self.timestamp,
-            "objective": self.objective,
-            "constraints": self.constraints,
-            "confidence": self.confidence,
-            "state_hash": self.state_hash,
-            "repair_flags": self.repair_flags
-        })
+        return self.model_dump_json()
     
     @classmethod
     def from_json(cls, data: str) -> 'CollarState':
-        d = json.loads(data)
-        return cls(**d)
+        return cls.model_validate_json(data)
 
 
 class BasePatch(ABC):

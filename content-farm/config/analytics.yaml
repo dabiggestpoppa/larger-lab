@@ -1,0 +1,161 @@
+# MAD Content Farm — Analytics Configuration
+# Controls metrics tracking, report scheduling, and Oransim model settings.
+
+farm:
+  id: mad-content-farm-001
+  name: MAD Content Farm
+  timezone: America/Los_Angeles
+
+# ── Metrics to Track Per Platform ──────────────────────────────────
+metrics:
+  douyin:
+    - views          # 播放量
+    - likes          # 点赞数
+    - comments       # 评论数
+    - shares         # 转发数
+    - followers      # 粉丝增长
+    - completion_rate # 完播率
+    - avg_watch_time  # 平均观看时长 (sec)
+  xiaohongshu:
+    - views          # 阅读量
+    - likes          # 点赞数
+    - collections    # 收藏数
+    - comments       # 评论数
+    - shares         # 转发数
+    - followers      # 粉丝增长
+    - click_through  # 点击率 (链接)
+  tiktok:
+    - views
+    - likes
+    - comments
+    - shares
+    - followers
+    - completion_rate
+  kuaishou:
+    - views
+    - likes
+    - comments
+    - shares
+    - followers
+
+# ── Engagement Rate Benchmarks (by niche) ─────────────────────────
+# Used to classify content as "scale", "keep", or "kill"
+benchmarks:
+  fitness:
+    good_engagement_rate: 0.05    # 5%+ = good
+    viral_threshold: 0.15         # 15%+ = viral
+    min_views_for_analysis: 100
+  cooking:
+    good_engagement_rate: 0.04
+    viral_threshold: 0.12
+    min_views_for_analysis: 100
+  tech:
+    good_engagement_rate: 0.03
+    viral_threshold: 0.10
+    min_views_for_analysis: 100
+  lifestyle:
+    good_engagement_rate: 0.04
+    viral_threshold: 0.12
+    min_views_for_analysis: 100
+  finance:
+    good_engagement_rate: 0.03
+    viral_threshold: 0.10
+    min_views_for_analysis: 100
+  default:
+    good_engagement_rate: 0.04
+    viral_threshold: 0.12
+    min_views_for_analysis: 100
+
+# ── Report Generation Schedule ─────────────────────────────────────
+reports:
+  daily:
+    enabled: true
+    time: "06:00"          # Generate at 6 AM (before posting starts)
+    output_dir: "content-farm/output/reports"
+    format: "markdown"
+    include:
+      - summary_stats
+      - top_performers
+      - bottom_performers
+      - recommendations
+      - oransim_predictions
+  weekly:
+    enabled: true
+    day: sunday
+    time: "08:00"
+    output_dir: "content-farm/output/reports/weekly"
+    format: "markdown"
+    include:
+      - week_over_week
+      - trend_analysis
+      - niche_comparison
+      - oransim_forecast
+
+# ── Oransim Model Settings ─────────────────────────────────────────
+oransim:
+  # Path to the oransim backend (relative to workspace root)
+  backend_path: "oransim/backend"
+  # Run mode: "mock" (no API key) or "api" (requires LLM key)
+  mode: "mock"
+  # LLM settings (only used when mode = "api")
+  llm:
+    provider: "openai"         # openai | anthropic | gemini | qwen
+    model: "gpt-4o-mini"
+    api_key_env: "LLM_API_KEY"
+  # Prediction defaults
+  defaults:
+    total_budget: 50000        # CNY
+    platform_alloc:
+      douyin: 0.6
+      xhs: 0.4
+    n_souls: 100               # Agent population size
+    lifecycle_days: 14
+    use_llm: false
+    llm_calibrate: true
+  # Feature toggles
+  features:
+    enable_crossplat: true
+    enable_discourse: false
+    enable_brand_memory: false
+    enable_recsys_rl: false
+    enable_groupchat: false
+    enable_kol_ilp: true
+    enable_search_elasticity: true
+  # Niches to simulate (must match oransim/data/niches.json keys)
+  niches:
+    - fitness
+    - cooking
+    - tech
+    - lifestyle
+    - finance
+
+# ── Content Classification Rules ───────────────────────────────────
+classification:
+  # Engagement rate = (likes + comments + shares) / views
+  scale_threshold: 1.5    # 1.5x benchmark = scale this content
+  keep_threshold: 0.8     # 0.8x–1.5x = keep, minor tweaks
+  kill_threshold: 0.5     # Below 0.5x = kill this content type
+  # Minimum data points before making a decision
+  min_posts_for_decision: 5
+  # Lookback window (days)
+  lookback_days: 7
+
+# ── Database ───────────────────────────────────────────────────────
+database:
+  path: "content-farm/data/performance.db"
+  backup:
+    enabled: true
+    interval_days: 7
+    keep_backups: 4
+
+# ── shortLink Attribution ──────────────────────────────────────────
+shortlink:
+  base_url: "http://localhost:3000"
+  track_utm: true
+  utm_defaults:
+    source: "content-farm"
+    medium: "auto-post"
+  platforms_to_track:
+    - douyin
+    - xiaohongshu
+    - tiktok

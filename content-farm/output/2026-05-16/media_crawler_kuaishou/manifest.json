@@ -1,0 +1,12 @@
+{
+  "backend": "media_crawler",
+  "platform": "kuaishou",
+  "mc_platform": "ks",
+  "keywords": "健身, 美食, 科技",
+  "limit": 2,
+  "get_comments": true,
+  "save_format": "json",
+  "start_page": 1,
+  "timestamp": "2026-05-16T16:27:54.637708+00:00",
+  "cmd": "uv run main.py --platform ks --lt qrcode --type search --keywords 健身, 美食, 科技 --start 1 --get_comment true --save_data_option json"
+}

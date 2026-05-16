@@ -1,0 +1,62 @@
+{
+  "niche": "fitness",
+  "version": "1.0",
+  "description": "Fitness content template for short video generation",
+  "script_structure": {
+    "hook": {
+      "duration_sec": 5,
+      "style": "attention_grabbing",
+      "examples": [
+        "想{goal}？这个方法90%的人都不知道",
+        "每天只需要{minutes}分钟，{result}",
+        "别再{wrong_action}了，这样做才对"
+      ]
+    },
+    "body": {
+      "duration_sec": 20,
+      "style": "instructional",
+      "elements": ["step_by_step", "visual_demo", "key_tips"]
+    },
+    "cta": {
+      "duration_sec": 5,
+      "style": "engagement",
+      "examples": [
+        "关注我，每天分享健身干货",
+        "评论区告诉我你的{topic}进展",
+        "收藏起来慢慢练"
+      ]
+    }
+  },
+  "variables": {
+    "goal": ["瘦肚子", "增肌", "减脂", "练马甲线", "改善体态"],
+    "minutes": ["5", "10", "15", "20"],
+    "result": ["一个月见效", "两周瘦5斤", "练出马甲线", "告别小肚腩"],
+    "wrong_action": ["节食", "只做有氧", "盲目大重量", "不热身就练"],
+    "topic": ["健身", "减肥", "增肌", "体态"]
+  },
+  "title_templates": [
+    "🔥 {minutes}分钟{goal}｜在家就能练",
+    "💪 {result}！这个动作太绝了",
+    "⚠️ {wrong_action}越练越废！正确做法看这里",
+    "🏋️ 健身博主私藏{goal}攻略"
+  ],
+  "description_templates": [
+    "今天分享一个超有效的{goal}方法，坚持{minutes}天就能看到效果！{cta}",
+    "很多人{wrong_action}，结果越练越伤。今天教你正确{goal}，安全又高效。"
+  ],
+  "hashtag_sets": {
+    "douyin": ["#健身", "#减肥", "#运动", "#fitness", "#workout", "#减脂", "#增肌", "#马甲线"],
+    "xiaohongshu": ["健身打卡", "减脂餐", "运动日常", "健身干货", "瘦身日记"],
+    "tiktok": ["#fitness", "#workout", "#gym", "#fitnessmotivation", "#weightloss", "#homeworkout"]
+  },
+  "voice_profile": {
+    "type": "energetic_female",
+    "speed": 1.1,
+    "pitch": "medium_high"
+  },
+  "music_profile": {
+    "genre": "electronic_upbeat",
+    "energy": "high",
+    "bpm_range": [120, 140]
+  }
+}

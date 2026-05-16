@@ -15,11 +15,10 @@
 - **Stack**: Python 3.11+, Nautilus Trader, VectorBT, FastAPI
 - **Package manager**: uv
 - **OS**: Windows
-- **Gateway port**: 18790 (OC1 uses 18789)
+- **Gateway port**: 18790 (sole gateway — OC1 deprecated)
 
 ## Agent Architecture
-- **OC1 (OpenClaw)**: Analysis / Planning — port 18789, Telegram @finalstrawclawbot
-- **OC2 (OpenClaw 2)**: Execution / Discord — port 18790, Telegram @OC2BLRBOT + Discord
+- **OC2 (OpenClaw 2)**: Execution / Discord / Telegram — port 18790, Telegram @OC2BLRBOT + Discord (sole OpenClaw gateway)
 - **CC (Claude Code)**: Overseer / Architecture
 - **AS (Assistant Manager)**: Quality / Testing / Docs
 - **PM (Polymorph)**: Debugger / Tool Builder
@@ -29,7 +28,7 @@
 2. Always tag entries with 🟠 [OC2] and timestamp
 3. Run progress-sync after completing significant work
 4. CC is the only agent who can advance phases
-5. Full workspace access — same as OC1
+5. Full workspace access
 
 ## SRRA-OPH Status
 - Phases 1-7: ✅ Complete (38/38 tests passing)

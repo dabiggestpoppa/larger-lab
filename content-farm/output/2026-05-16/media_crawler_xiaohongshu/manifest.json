@@ -1,0 +1,12 @@
+{
+  "backend": "media_crawler",
+  "platform": "xiaohongshu",
+  "mc_platform": "xhs",
+  "keywords": "健身, 美食, 科技, 生活方式, 理财",
+  "limit": 2,
+  "get_comments": true,
+  "save_format": "json",
+  "start_page": 1,
+  "timestamp": "2026-05-16T16:27:54.632062+00:00",
+  "cmd": "uv run main.py --platform xhs --lt qrcode --type search --keywords 健身, 美食, 科技, 生活方式, 理财 --start 1 --get_comment true --save_data_option json"
+}

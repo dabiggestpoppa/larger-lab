@@ -54,7 +54,7 @@ larger-lab/
 ```mermaid
 graph TB
     subgraph "Human Interface"
-        A[Claude Code<br/>VS Code] --> B[OpenClaw<br/>CLI Gateway :18789]
+        A[Claude Code<br/>VS Code] --> B[OpenClaw 2<br/>CLI Gateway :18790]
         C[Hermes<br/>Telegram Bot] --> B
     end
 

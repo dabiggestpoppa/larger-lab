@@ -55,6 +55,9 @@
                                       "enabled":  true,
                                       "botToken":  "8945439460:AAHZT2Xx0jHaApejRJYi-xORG5FkKNAQ5yM",
                                       "dmPolicy":  "pairing",
+                                      "commands":  {
+                                          "native":  false
+                                      },
                                       "groups":  {
                                                      "*":  {
                                                                "requireMention":  true

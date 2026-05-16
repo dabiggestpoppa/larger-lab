@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "jobs": [
+    {
+      "id": "5fddd1f3-46e6-454d-8040-0cbba6f6319b",
+      "agentId": "main",
+      "sessionKey": "agent:main:telegram:direct:8258195396",
+      "name": "Content Farm - Daily Sourcing",
+      "enabled": true,
+      "createdAtMs": 1778942642133,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 6 * * *",
+        "tz": "America/New_York"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run the content sourcing pipeline: Use MediaCrawler and Spider_XHS to scrape trending content from ÃƒÂ¦Ã…Â Ã¢â‚¬â€œÃƒÂ©Ã…Â¸Ã‚Â³, ÃƒÂ¥Ã‚Â°Ã‚ÂÃƒÂ§Ã‚ÂºÃ‚Â¢ÃƒÂ¤Ã‚Â¹Ã‚Â¦, ÃƒÂ¥Ã‚Â¿Ã‚Â«ÃƒÂ¦Ã¢â‚¬Â°Ã¢â‚¬Â¹, ÃƒÂ¥Ã‚Â¾Ã‚Â®ÃƒÂ¥Ã‚ÂÃ…Â¡. Identify top 10 trending topics and save to content-farm/sourcing/YYYY-MM-DD.json. Then post a summary to the team chat.",
+        "timeoutSeconds": 300
+      },
+      "delivery": {
+        "mode": "announce",
+        "to": "telegram:8258195396",
+        "channel": "telegram",
+        "accountId": "default"
+      },
+      "state": {}
+    },
+    {
+      "agentId": "main",
+      "wakeMode": "now",
+      "id": "87b9fd68-3c68-427f-abfc-3125015f46a0",
+      "enabled": true,
+      "createdAtMs": 1778951487894,
+      "payload": {
+        "message": "Run daily memory sync: 1) python tools/progress-sync.py --force 2) python tools/summarize_progress.py --all 3) python tools/workspace_cleanup.py --scan 4) Post summary to team-chat.md",
+        "timeoutSeconds": 300,
+        "kind": "agentTurn"
+      },
+      "schedule": {
+        "expr": "0 7 * * *",
+        "tz": "America/New_York",
+        "kind": "cron"
+      },
+      "sessionTarget": "isolated",
+      "name": "Daily Memory Sync & Summarization",
+      "sessionKey": "agent:main:telegram:direct:8258195396",
+      "delivery": {
+        "to": "telegram:8258195396",
+        "channel": "telegram",
+        "accountId": "default",
+        "mode": "announce"
+      },
+      "state": {}
+    }
+  ]
+}

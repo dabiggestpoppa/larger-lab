@@ -1,0 +1,12 @@
+{
+  "backend": "media_crawler",
+  "platform": "douyin",
+  "mc_platform": "dy",
+  "keywords": "健身教程, 美食制作, 科技数码, 生活技巧, 财经知识",
+  "limit": 2,
+  "get_comments": true,
+  "save_format": "json",
+  "start_page": 1,
+  "timestamp": "2026-05-16T16:27:54.618568+00:00",
+  "cmd": "uv run main.py --platform dy --lt qrcode --type search --keywords 健身教程, 美食制作, 科技数码, 生活技巧, 财经知识 --start 1 --get_comment true --save_data_option json"
+}

@@ -100,3 +100,12 @@ Default to surfacing uncertainty, not hiding it.
 - Create custom skills: use `skill-creator-meta-skill` pattern
 - Skills self-evolve: agents create SKILL.md files for reusable procedures
 - Curator prunes unused skills (≥30 days stale, ≥90 days archived)
+
+### Workspace Movement Protocol
+- **Before working:** Read team-chat.md + your progress + memory files
+- **While working:** Surgical changes only, tag all entries, forward-facing responses
+- **After working:** Update progress, sync if significant, post to team-chat.md
+- **Every 7 updates:** Memory auto-syncs (progress to working memory to persistent)
+- **Every 20 entries:** Progress file auto-summarized via LLM (Nemotron 3 Nano Omni)
+- **Cleanup:** Run python tools/workspace_cleanup.py when workspace gets sloppy
+- **Full protocol:** See AGENT_MOVEMENT.md

@@ -1,0 +1,61 @@
+{
+    "farm_id": "mad-content-farm-001",
+    "farm_name": "MAD Content Farm",
+    "created": "2026-05-16",
+    "accounts": [
+        {
+            "id": "account_001",
+            "platform": "douyin",
+            "niche": "fitness",
+            "username": "",
+            "password": "",
+            "device": "emulator_001",
+            "status": "inactive",
+            "created": "",
+            "last_active": "",
+            "daily_limits": {
+                "posts": 20,
+                "likes": 200,
+                "comments": 50,
+                "follows": 30
+            },
+            "stats": {
+                "followers": 0,
+                "following": 0,
+                "posts": 0,
+                "likes": 0
+            }
+        }
+    ],
+    "devices": [
+        {
+            "id": "emulator_001",
+            "type": "BlueStacks",
+            "android_version": "11",
+            "resolution": "1080x1920",
+            "status": "not_configured",
+            "accounts": [],
+            "proxy": {
+                "enabled": false,
+                "type": "socks5",
+                "host": "",
+                "port": 0
+            }
+        }
+    ],
+    "proxies": {
+        "enabled": false,
+        "provider": "",
+        "rotation_interval_hours": 6,
+        "proxies": []
+    },
+    "content": {
+        "niches": ["fitness", "cooking", "tech", "lifestyle", "finance"],
+        "languages": ["zh-CN", "en-US", "es-ES", "ja-JP", "ko-KR"],
+        "posting_schedule": {
+            "douyin": ["10:00", "14:00", "18:00", "22:00"],
+            "xiaohongshu": ["09:00", "12:00", "19:00", "21:00"],
+            "tiktok": ["11:00", "15:00", "20:00"]
+        }
+    }
+}

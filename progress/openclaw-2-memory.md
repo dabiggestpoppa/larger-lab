@@ -1,12 +1,12 @@
 # 🟠 OpenClaw 2 — Working Memory
 
-> **Auto-synced** from `progress/openclaw-2-progress.md` on every 3th update.
+> **Auto-synced** from `progress/openclaw-2-progress.md` on every 7th update.
 > This is working memory — compact, current, task-focused.
 > Max ~2,000 chars. Prune old entries when full.
 
 ---
 
-## Current Context (2026-05-16 13:18:36 UTC)
+## Current Context (2026-05-16 17:06:11 UTC)
 
 ### Status
 🟢 Active
@@ -21,7 +21,7 @@ SRRA-OPH Phase 8 — Sovereign Coevolution (Planned)
 
 ### Recent Activity
 #### 🟠 [OC2] 2026-05-16 — Agent Fully Online
-- Gateway running on port 18790 (OC1 uses 18789)
+- Gateway running on port 18790 — sole OpenClaw gateway (OC1 deprecated)
 - Telegram @OC2BLRBOT connected & paired ✅
 - 20 skills migrated from Hermes
 - Auto-start: Startup folder + Scheduled Task
@@ -30,7 +30,7 @@ SRRA-OPH Phase 8 — Sovereign Coevolution (Planned)
 ---
 
 ## Sync Metadata
-- **Last Sync:** 2026-05-16 13:18:36 UTC
+- **Last Sync:** 2026-05-16 17:06:11 UTC
 - **Progress File:** `progress/openclaw-2-progress.md`
 - **Working Memory:** `progress/openclaw-2-memory.md`
-- **Sync Threshold:** 3 updates
+- **Sync Threshold:** 7 updates

@@ -1,0 +1,13 @@
+{
+  "platform": "all",
+  "keywords": "",
+  "dry_run": true,
+  "elapsed_seconds": 0.02,
+  "output_dirs": [
+    "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\content-farm\\output\\2026-05-16\\media_crawler_douyin",
+    "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\content-farm\\output\\2026-05-16\\media_crawler_xiaohongshu",
+    "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\content-farm\\output\\2026-05-16\\media_crawler_kuaishou"
+  ],
+  "log_file": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\content-farm\\logs\\crawler_20260516_122754.log",
+  "timestamp": "2026-05-16T16:27:54.639737+00:00"
+}

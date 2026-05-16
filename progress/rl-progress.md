@@ -4,6 +4,28 @@
 
 ---
 
+#### 🦉 [RL] 2026-05-16 — DSPy + Pydantic Integration Complete
+- **Pydantic:** Converted `CollarState` from `@dataclass` to `BaseModel` with validation (confidence: 0.0-1.0 range)
+- **DSPy:** Created `dspy_contracts.py` with `ContractGenerationSignature` and `DSPyContractManager` for optimized prediction contracts
+- **Integration:** Added optional DSPy imports (graceful fallback when dspy not installed)
+- **Tests:** All 7 Phase 2 tests passing with Pydantic changes
+- **Files modified:** `srrs_opc/base_patch.py`, `srrs_opc/dspy_contracts.py` (new), `srrs_opc/__init__.py`
+
+---
+
+#### 🦉 [RL] 2026-05-16 — OC2 Fixed: Stuck Session + Telegram Command Overload
+- **Root cause:** Stuck session `agent:main:telegram:direct:8258195396` blocking event loop + 203 Telegram commands registered (limit 100)
+- **Fixes applied:**
+  - Killed stuck node process (PID 15844)
+  - Removed stuck session files from `.openclaw-2/.openclaw/agents/main/sessions/`
+  - Removed stuck session entry from `sessions.json`
+  - Added `"commands": { "native": false }` to Telegram config to prevent command overload
+  - Updated watchdog to OC2-only (removed OC1 references)
+- **Status:** ✅ OC2 gateway live (PID 1756) — Telegram bot @OC2BLRBOT responding
+- **Note:** OC1 deleted per user request — only OC2 remains active
+
+---
+
 #### 🦉 [RL] 2026-05-16 — OC1 Gateway Fixed (Root Cause: gateway.cmd)
 
 **Root cause of chronic OC1 failures:** `gateway.cmd` was never updated with the `run` subcommand and `--allow-unconfigured` flag that OC2 had. Additionally, port was wrong (18790 instead of 18789) and `OPENCLAW_HOME` was missing.
@@ -26,6 +48,14 @@
 - Posted findings to team chat with 5 open questions for CC
 - **Key insight:** Existing codebase is ~60% ready — entropy tracking, drift detection, reinforcement dynamics, and anti-manipulation safeguards already provide measurement infrastructure
 - **Build order:** CoherenceYieldAnalyzer → EntropyBudgetManager → RecoverabilityEconomics → AdaptiveCompressionEngine → SyncCostOptimizer → ResourceConstrainedCognition → SustainabilityGovernance
+
+#### 🦉 [RL] 2026-05-16 — OCE Planning: RL Tasks OCE-6.1 through OCE-6.4
+- Created `oce/RL_OCE_PLAN.md` with comprehensive OCE task planning
+- OCE-6.1: Evaluated external resources (Redis Streams HIGH, FastAPI HIGH, Next.js HIGH, DSPy HIGH, PyMDP MEDIUM, EventStoreDB MEDIUM, Ray LOW)
+- OCE-6.2: Designed 3 DSPy pipelines (Contract Generation, Event Routing, Evolution Planning)
+- OCE-6.3: Planned Phase 9 adaptive evolution with feedback loops and 7 component integration
+- OCE-6.4: Researched entropy economics applications for OCE (40% bandwidth reduction, 60% CPU reduction targets)
+- Updated `progress/rl-memory.md` with current OCE planning context
 - **Test plan:** `srrs_opc/tests/test_phase9_e2e.py` — 7 tests (one per component)
 - Awaiting CC decisions on 5 open questions before implementation begins
 
@@ -135,6 +165,18 @@
 - **Status**: After restart, OC1 health check failed — needs further investigation in new chat
 - **OC2**: Working fine throughout, no changes needed
 - **Detailed notes**: See `/memories/session/oc1-gateway-diagnosis.md`
+
+#### 🦉 [RL] 2026-05-16 — Self-Healing Framework Built & Deployed
+- **Built complete self-healing startup system**
+- `db/schema.py` — SQLite error DB with tables: errors, bug_annotations, startup_checks, self_healing_actions
+- `tools/self_heal.py` — Log scanner, error classifier, bug annotator, auto-fixer, health reporter
+- `tools/self_surgery.py` — Safe internal editing module (backup → edit → validate → log)
+- `skills/creative-think/SKILL.md` — LATTICE framework for abstract reasoning
+- `db/owl_health.db` — Initialized and populated
+- **First scan results**: 509 raw log lines → 12 unique errors → 12 bug files created → 1 auto-fixed
+- **Key finding**: symlink EPERM is known Windows limitation (not real error), event loop delays are chronic (169 occurrences), agent stalls at 51 occurrences
+- **HEARTBEAT.md updated** with self-healing, creative think, and self-surgery protocols
+- MAD's building philosophy absorbed: build to the sky, structure contains the answer, feedback not failure, unlimited pathways, trust your reasoning
 
 #### 🦉 [RL] 2026-05-16 — Gateway Diagnostics Complete, Ready for Fix
 - **Current state**: Both gateways running (OC1 PID 14520, OC2 PID 21768)

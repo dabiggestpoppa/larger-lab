@@ -66,7 +66,7 @@ When you encounter a problem, check if a skill exists:
 |------|---------|-------|
 | `claude_hermes_mcp.py` | Hermes MCP bridge CLI | `uv run python tools/claude_hermes_mcp.py doctor` |
 | `hermes_workflows.py` | Hermes workflow automation | `uv run python tools/hermes_workflows.py` |
-| `gateway-status.cmd` | Check OC1/OC2 gateway status | `tools\gateway-status.cmd` |
+| `gateway-status.cmd` | Check OC2 gateway status | `tools\gateway-status.cmd` |
 
 ---
 

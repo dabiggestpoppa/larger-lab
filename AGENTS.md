@@ -42,9 +42,30 @@
 | Phase 6 (Recursive Topology Introspection) | ✅ Complete | 5/5 passing |
 | Phase 7 (Overlap Cognition) | ✅ Complete | 6/6 passing |
 | Phase 8 (Sovereign Coevolution) | ✅ Complete | 6/6 passing |
-| Phase 9 | ⏳ Planned | — |
+| Phase 9 (Entropy Economics) | 🔄 In Progress | 32/32 passing |
 
-**Total: 45 tests passing**
+**Total: 77 tests passing**
+
+---
+
+## OCE Implementation (Parallel Track)
+
+| Phase | Status | Lead |
+|-------|--------|------|
+| OCE Phase 1 (Continuity Shell) | 🔄 In Progress | CC |
+| OCE Phase 2 (Event Fabric) | Pending | OC |
+| OCE Phase 3 (Observer Runtime) | Pending | OC2 |
+| OCE Phase 4 (Structural Memory) | Pending | AS |
+| OCE Phase 5 (Observability) | Pending | PM |
+| OCE Phase 6 (Execution Substrate) | Pending | RL |
+
+**OCE Project:** `oce/` directory
+
+**Phase 1 Progress:**
+- ✅ Project structure created
+- ✅ FastAPI backend scaffolded (`oce/backend/main.py`)
+- ✅ Next.js frontend scaffolded (`oce/frontend/package.json`)
+- ✅ SRRA-OPH substrate adapter (`oce/backend/srrs_adapter.py`)
 
 ---
 
@@ -55,6 +76,9 @@
 | `srrs_opc/` | SRRA-OPH core module (33 Python files) |
 | `srrs_opc/tests/` | Test suites (7 files, 39 tests) |
 | `srrs_opc/docs/` | Design docs, resource assessment |
+| `oce/` | Operator Continuity Engine project |
+| `oce/backend/` | FastAPI Continuity Core API |
+| `oce/frontend/` | Next.js Shell UI |
 | `progress/` | Agent sub-progress files + memory |
 | `shared-conversations/team-chat.md` | Team coordination hub |
 | `tools/progress-sync.py` | Auto-sync agent progress → main files |
@@ -68,7 +92,7 @@
 ## Memory Architecture
 
 Each agent has two memory layers:
-1. **Working Memory** (`progress/{agent}-memory.md`) — auto-synced every 3 updates, compact & current
+1. **Working Memory** (`progress/{agent}-memory.md`) — auto-synced every 7 updates, compact & current
 2. **Persistent Memory** (`.openclaw/MEMORY.md`, `.hermes/MEMORY.md`, etc.) — hand-managed, append-only sync
 
 The workspace files ARE the global memory. Keep them updated.

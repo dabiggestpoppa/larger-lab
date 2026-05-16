@@ -1,0 +1,93 @@
+# Content Farm — Unified Crawler Configuration
+# Last updated: 2026-05-16
+
+farm:
+  id: mad-content-farm-001
+  name: MAD Content Farm
+  output_base: content-farm/output
+  log_dir: content-farm/logs
+
+# Crawler backend selection
+backends:
+  # MediaCrawler: supports xhs, dy, ks, bili, wb, tieba, zhihu
+  media_crawler:
+    path: MediaCrawler
+    python: uv run
+    main: main.py
+    platforms:
+      - xiaohongshu
+      - douyin
+      - kuaishou
+      - bilibili
+      - weibo
+      - tieba
+      - zhihu
+  # Spider_XHS: dedicated XHS crawler (more features for XHS)
+  spider_xhs:
+    path: Spider_XHS
+    python: python
+    main: main.py
+    platforms:
+      - xiaohongshu
+
+# Platform-specific defaults
+platforms:
+  xiaohongshu:
+    backend: media_crawler          # or spider_xhs for XHS-specific features
+    keywords:
+      - 健身
+      - 美食
+      - 科技
+      - 生活方式
+      - 理财
+    crawl_type: search              # search | detail | creator
+    max_notes: 50
+    get_comments: true
+    get_sub_comments: false
+    save_format: json               # json | csv | sqlite
+    sort_type: popularity_descending
+    start_page: 1
+    sleep_seconds: 2
+
+  douyin:
+    backend: media_crawler
+    keywords:
+      - 健身教程
+      - 美食制作
+      - 科技数码
+      - 生活技巧
+      - 财经知识
+    crawl_type: search
+    max_notes: 50
+    get_comments: true
+    get_sub_comments: false
+    save_format: json
+    start_page: 1
+    sleep_seconds: 2
+
+  kuaishou:
+    backend: media_crawler
+    keywords:
+      - 健身
+      - 美食
+      - 科技
+    crawl_type: search
+    max_notes: 50
+    get_comments: true
+    get_sub_comments: false
+    save_format: json
+    start_page: 1
+    sleep_seconds: 2
+
+# Proxy settings
+proxy:
+  enabled: false
+  provider: kuaidaili
+  pool_count: 2
+  rotation_interval_hours: 6
+
+# Rate limiting
+rate_limit:
+  max_concurrency: 1
+  request_delay_seconds: 2
+  daily_max_requests_per_platform: 500

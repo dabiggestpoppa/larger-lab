@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "jobs": {
+    "5fddd1f3-46e6-454d-8040-0cbba6f6319b": {
+      "updatedAtMs": 1778942642133,
+      "scheduleIdentity": "{\"version\":1,\"enabled\":true,\"schedule\":{\"kind\":\"cron\",\"expr\":\"0 6 * * *\",\"tz\":\"America/New_York\"}}",
+      "state": {
+        "nextRunAtMs": 1779012000000
+      }
+    },
+    "87b9fd68-3c68-427f-abfc-3125015f46a0": {
+      "updatedAtMs": 1778951487894,
+      "scheduleIdentity": "{\"version\":1,\"enabled\":true,\"schedule\":{\"kind\":\"cron\",\"expr\":\"0 7 * * *\",\"tz\":\"America/New_York\"}}",
+      "state": {
+        "nextRunAtMs": 1779015600000
+      }
+    }
+  }
+}

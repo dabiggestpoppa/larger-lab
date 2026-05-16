@@ -1,0 +1,17 @@
+2026-05-16 12:26:45,397 [INFO] ============================================================
+2026-05-16 12:26:45,397 [INFO] Content Farm — Unified Crawler
+2026-05-16 12:26:45,397 [INFO]   platform : douyin
+2026-05-16 12:26:45,397 [INFO]   keywords : 健身教程
+2026-05-16 12:26:45,487 [INFO]   limit    : 5
+2026-05-16 12:26:45,487 [INFO]   backend  : (auto)
+2026-05-16 12:26:45,487 [INFO]   dry_run  : True
+2026-05-16 12:26:45,487 [INFO] ============================================================
+2026-05-16 12:26:45,487 [INFO] === MediaCrawler  platform=douyin  keywords=健身教程  limit=5 ===
+2026-05-16 12:26:45,487 [INFO] CMD: uv run main.py --platform dy --lt qrcode --type search --keywords 健身教程 --start 1 --get_comment true --save_data_option json  cwd=C:\Users\wifik\Desktop\projects\larger-lab\MediaCrawler
+2026-05-16 12:26:45,494 [INFO] [DRY RUN] skipping execution
+2026-05-16 12:26:45,496 [INFO] ============================================================
+2026-05-16 12:26:45,496 [INFO] Done.  Output dirs: ['C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\content-farm\\output\\2026-05-16\\media_crawler_douyin']
+2026-05-16 12:26:45,496 [INFO] Summary : C:\Users\wifik\Desktop\projects\larger-lab\content-farm\logs\summary_20260516_122645.json
+2026-05-16 12:26:45,496 [INFO] Log     : C:\Users\wifik\Desktop\projects\larger-lab\content-farm\logs\crawler_20260516_122645.log
+2026-05-16 12:26:45,496 [INFO] Elapsed : 0.0 s
+2026-05-16 12:26:45,498 [INFO] ============================================================

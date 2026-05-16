@@ -3,20 +3,7 @@
 
 $ErrorActionPreference = "Stop"
 
-# OC1 Gateway Task
-$oc1Action = New-ScheduledTaskAction -Execute "cmd.exe" -Argument '/min /c "C:\Users\wifik\.openclaw\gateway.cmd"' -WorkingDirectory "C:\Users\wifik\.openclaw"
-$oc1Trigger = New-ScheduledTaskTrigger -AtLogon
-$oc1Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
-
-try {
-    Register-ScheduledTask -TaskName "OpenClaw-1-Gateway" -Action $oc1Action -Trigger $oc1Trigger -Settings $oc1Settings -Description "OpenClaw 1 Gateway (OC1) - Port 18789" -Force
-    Write-Output "OC1 scheduled task created successfully"
-} catch {
-    Write-Output "OC1 task creation failed: $($_.Exception.Message)"
-    Write-Output "Run this script as Administrator to create scheduled tasks"
-}
-
-# OC2 Gateway Task
+# OC2 Gateway Task (sole gateway — OC1 deprecated)
 $oc2Action = New-ScheduledTaskAction -Execute "cmd.exe" -Argument '/min /c "C:\Users\wifik\Desktop\projects\larger-lab\.openclaw-2\gateway.cmd"' -WorkingDirectory "C:\Users\wifik\Desktop\projects\larger-lab\.openclaw-2"
 $oc2Trigger = New-ScheduledTaskTrigger -AtLogon
 $oc2Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
@@ -29,5 +16,5 @@ try {
     Write-Output "Run this script as Administrator to create scheduled tasks"
 }
 
-Write-Output "`nNote: Startup folder entries are already configured as fallback."
-Write-Output "Both gateways will auto-start on login via the startup folder."
+Write-Output "\nNote: Startup folder entry is already configured as fallback."
+Write-Output "OC2 gateway will auto-start on login via the startup folder."

@@ -1,0 +1,122 @@
+{
+  "id": "tech_20260516_0001",
+  "version": "1.0",
+  "created_at": "2026-05-16T16:40:23.286001+00:00",
+  "topic": "AI tools 2024",
+  "niche": "tech",
+  "language": "zh",
+  "target_duration_sec": 30,
+  "script": {
+    "hook": {
+      "text": "99%的人不知道的Windows隐藏功能",
+      "duration_sec": 5,
+      "style": "curiosity_gap"
+    },
+    "body": {
+      "text": "[Auto-generated body for topic: AI tools 2024]",
+      "duration_sec": 20,
+      "style": "demo_walkthrough",
+      "elements": [
+        "problem_statement",
+        "solution_demo",
+        "key_features",
+        "comparison"
+      ]
+    },
+    "cta": {
+      "text": "收藏起来慢慢研究",
+      "duration_sec": 5,
+      "style": "value_driven"
+    },
+    "total_duration_sec": 30
+  },
+  "metadata": {
+    "douyin": {
+      "title": "💡 Excel隐藏功能｜10倍的人不知道",
+      "description": "今天给大家推荐一个超好用的编程工具，效率直接提升5倍！{cta}",
+      "hashtags": [
+        "#科技",
+        "#AI",
+        "#数码",
+        "#tech",
+        "#人工智能",
+        "#手机",
+        "#电脑"
+      ],
+      "tags": [
+        "科技",
+        "AI",
+        "数码",
+        "tech",
+        "人工智能",
+        "手机",
+        "电脑"
+      ],
+      "platform": "douyin",
+      "language": "zh"
+    },
+    "xiaohongshu": {
+      "title": "🔥 2024最火的自动化工具推荐",
+      "description": "今天给大家推荐一个超好用的自动化工具，效率直接提升100%！{cta}",
+      "hashtags": [
+        "数码测评",
+        "AI工具",
+        "科技好物",
+        "效率工具",
+        "App推荐"
+      ],
+      "tags": [
+        "数码测评",
+        "AI工具",
+        "科技好物",
+        "效率工具",
+        "App推荐"
+      ],
+      "platform": "xiaohongshu",
+      "language": "zh"
+    },
+    "tiktok": {
+      "title": "🤖 ChatGPT太强了！100%提升效率",
+      "description": "这个iPhone的隐藏功能太实用了，300%的人都不知道。",
+      "hashtags": [
+        "#tech",
+        "#ai",
+        "#gadgets",
+        "#technology",
+        "#productivity",
+        "#coding"
+      ],
+      "tags": [
+        "tech",
+        "ai",
+        "gadgets",
+        "technology",
+        "productivity",
+        "coding"
+      ],
+      "platform": "tiktok",
+      "language": "zh"
+    }
+  },
+  "production": {
+    "voice_profile": {
+      "type": "neutral_male",
+      "speed": 1.0,
+      "pitch": "medium_low"
+    },
+    "music_profile": {
+      "genre": "tech_ambient",
+      "energy": "medium",
+      "bpm_range": [
+        100,
+        130
+      ]
+    },
+    "resolution": "1080x1920",
+    "fps": 30,
+    "transition_effects": true,
+    "subtitle_enabled": true
+  },
+  "moneyprinter_compatible": true,
+  "violin_compatible": true
+}

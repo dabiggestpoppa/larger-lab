@@ -30,6 +30,6 @@
 - **Next**: AS/PM/RL to implement coherence-per-resource optimization
 
 ### Gateway Status
-- **OC1** (port 18789): Operational
-- **OC2** (port 18790): Operational
+- **OC1** (port 18789): Deprecated — not in use
+- **OC2** (port 18790): ✅ Operational — sole OpenClaw gateway
 - **Hermes** (port 8642): Configured, awaiting activation

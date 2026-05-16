@@ -1,0 +1,123 @@
+{
+  "id": "fitness_20260516_0001",
+  "version": "1.0",
+  "created_at": "2026-05-16T16:42:29.739276+00:00",
+  "topic": "减脂餐",
+  "niche": "fitness",
+  "language": "zh",
+  "target_duration_sec": 25,
+  "script": {
+    "hook": {
+      "text": "别再盲目大重量了，这样做才对",
+      "duration_sec": 5,
+      "style": "attention_grabbing"
+    },
+    "body": {
+      "text": "[Auto-generated body for topic: 减脂餐]",
+      "duration_sec": 15,
+      "style": "instructional",
+      "elements": [
+        "step_by_step",
+        "visual_demo",
+        "key_tips"
+      ]
+    },
+    "cta": {
+      "text": "收藏起来慢慢练",
+      "duration_sec": 5,
+      "style": "engagement"
+    },
+    "total_duration_sec": 25
+  },
+  "metadata": {
+    "douyin": {
+      "title": "🏋️ 健身博主私藏增肌攻略",
+      "description": "很多人盲目大重量，结果越练越伤。今天教你正确增肌，安全又高效。",
+      "hashtags": [
+        "#健身",
+        "#减肥",
+        "#运动",
+        "#fitness",
+        "#workout",
+        "#减脂",
+        "#增肌",
+        "#马甲线"
+      ],
+      "tags": [
+        "健身",
+        "减肥",
+        "运动",
+        "fitness",
+        "workout",
+        "减脂",
+        "增肌",
+        "马甲线"
+      ],
+      "platform": "douyin",
+      "language": "zh"
+    },
+    "xiaohongshu": {
+      "title": "🏋️ 健身博主私藏改善体态攻略",
+      "description": "今天分享一个超有效的减脂方法，坚持20天就能看到效果！{cta}",
+      "hashtags": [
+        "健身打卡",
+        "减脂餐",
+        "运动日常",
+        "健身干货",
+        "瘦身日记"
+      ],
+      "tags": [
+        "健身打卡",
+        "减脂餐",
+        "运动日常",
+        "健身干货",
+        "瘦身日记"
+      ],
+      "platform": "xiaohongshu",
+      "language": "zh"
+    },
+    "tiktok": {
+      "title": "🔥 5分钟增肌｜在家就能练",
+      "description": "今天分享一个超有效的瘦肚子方法，坚持10天就能看到效果！{cta}",
+      "hashtags": [
+        "#fitness",
+        "#workout",
+        "#gym",
+        "#fitnessmotivation",
+        "#weightloss",
+        "#homeworkout"
+      ],
+      "tags": [
+        "fitness",
+        "workout",
+        "gym",
+        "fitnessmotivation",
+        "weightloss",
+        "homeworkout"
+      ],
+      "platform": "tiktok",
+      "language": "zh"
+    }
+  },
+  "production": {
+    "voice_profile": {
+      "type": "energetic_female",
+      "speed": 1.1,
+      "pitch": "medium_high"
+    },
+    "music_profile": {
+      "genre": "electronic_upbeat",
+      "energy": "high",
+      "bpm_range": [
+        120,
+        140
+      ]
+    },
+    "resolution": "1080x1920",
+    "fps": 30,
+    "transition_effects": true,
+    "subtitle_enabled": true
+  },
+  "moneyprinter_compatible": true,
+  "violin_compatible": true
+}

@@ -9,7 +9,7 @@
     {
       "id": "gateway-status",
       "schedule": "every 30 minutes",
-      "description": "Check OC1/OC2/Hermes gateway status",
+      "description": "Check OC2 gateway status",
       "enabled": true
     }
   ]

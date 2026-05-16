@@ -1,0 +1,60 @@
+{
+  "niche": "finance",
+  "version": "1.0",
+  "description": "Finance content template for short video generation",
+  "script_structure": {
+    "hook": {
+      "duration_sec": 5,
+      "style": "shock_value",
+      "examples": [
+        "月薪{salary}也能存下{amount}的方法",
+        "这个理财习惯让我一年多赚了{amount}",
+        "90%的人都踩过的{money_topic}坑"
+      ]
+    },
+    "body": {
+      "duration_sec": 25,
+      "style": "educational",
+      "elements": ["common_mistake", "correct_approach", "real_example", "actionable_steps"]
+    },
+    "cta": {
+      "duration_sec": 5,
+      "style": "authority",
+      "examples": [
+        "关注我，带你搞钱不迷路",
+        "评论区告诉我你的{money_topic}困惑",
+        "收藏起来慢慢看，别刷过就忘了"
+      ]
+    }
+  },
+  "variables": {
+    "salary": ["3000", "5000", "8000", "10000"],
+    "amount": ["5万", "10万", "100万", "第一个10万"],
+    "money_topic": ["理财", "投资", "存钱", "副业", "基金", "股票"]
+  },
+  "title_templates": [
+    "💰 月薪{salary}存下{amount}｜亲测有效",
+    "📈 这个理财习惯一年多赚{amount}",
+    "⚠️ {money_topic}的3大坑｜90%的人都踩过",
+    "🔥 普通人如何实现{amount}？"
+  ],
+  "description_templates": [
+    "今天分享一个超实用的{money_topic}方法，月薪{salary}也能存下{amount}！{cta}",
+    "关于{money_topic}，90%的人都踩过这些坑。今天一次讲清楚。"
+  ],
+  "hashtag_sets": {
+    "douyin": ["#理财", "#投资", "#搞钱", "#finance", "#股票", "#基金", "#副业"],
+    "xiaohongshu": ["理财入门", "搞钱日记", "基金定投", "副业收入", "财务自由"],
+    "tiktok": ["#finance", "#investing", "#moneytips", "#sidehustle", "#personalfinance", "#wealth"]
+  },
+  "voice_profile": {
+    "type": "authoritative_male",
+    "speed": 0.95,
+    "pitch": "low"
+  },
+  "music_profile": {
+    "genre": "corporate_piano",
+    "energy": "medium",
+    "bpm_range": [90, 120]
+  }
+}

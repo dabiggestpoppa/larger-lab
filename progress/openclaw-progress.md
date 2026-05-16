@@ -14,6 +14,13 @@ P90 Pine → Nautilus Conversion + Backtest Engine
 
 ### Recent Entries
 
+#### 🟣 [OC] 2026-05-16 — Gateway Infrastructure Notes
+- OC1 gateway fixed by RL — gateway.cmd was missing `run` subcommand, had wrong port (18790→18789), missing OPENCLAW_HOME
+- Both gateways now live: OC1 (18789) PID 21288, OC2 (18790) PID 15844
+- **Prevention:** Always update BOTH gateway.cmd files after any `npm update openclaw`
+- OC2 @OC2BLRBOT is primary working Telegram bot
+- OC1 @finalstrawclawbot gateway live but Telegram session may still need separate fix
+
 #### 🟣 [OC] 2026-05-15 18:27:00Z — P90 Unified Engine Bug Fix + Results
 - **Bug found**: `est_h == 3` classification was DEAD CODE inside Asian session block
   - Asian block: `if est_h >= 19 or est_h < 3` — est_h==3 never enters this block

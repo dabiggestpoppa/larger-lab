@@ -46,6 +46,13 @@ from .topology_observer import TopologyObserver, TopologySnapshot
 from .collar_topology_engine import CollarTopologyEngine, CollarMetrics
 from .prediction_contracts import PredictionContractManager, PredictionContract, ContractStatus
 
+# DSPy Integration (optional)
+try:
+    from .dspy_contracts import DSPyContractManager, DSPyContractGenerator
+except ImportError:
+    DSPyContractManager = None
+    DSPyContractGenerator = None
+
 # Phase 7: Multi-Scale Overlap Ecologies
 from .attractor_reasoning import AttractorReasoningEngine, AttractorState
 from .structural_memory import StructuralMemoryFields, StructuralMemoryEntry, MemoryLayer
@@ -98,6 +105,8 @@ __all__ = [
     "OperatorContinuityTracker", "SessionAnchor", "StrategicTrajectory",
     "BidirectionalCoherenceEngine", "FeedbackEvent",
     "AntiManipulationSafeguards", "ManipulationRisk",
+    # DSPy Integration
+    "DSPyContractManager", "DSPyContractGenerator",
     # Phase 9
     "CoherenceYieldAnalyzer", "YieldRecord",
     "EntropyBudgetManager", "EntropyBudget",

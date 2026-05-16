@@ -39,7 +39,7 @@
 ## Agent Architecture
 - **Orchestrator**: Master coordinator, task decomposition, dependency mapping
 - **Hermes**: On-the-go agent via Telegram, 5 Pillars (Memory/Skills/Soul/Crons/Self-Improving)
-- **OpenClaw**: Messaging-first agent, gateway on ws://127.0.0.1:18789, model: anthropic/claude-sonnet-4-20250514
+- **OpenClaw 2**: Messaging-first agent, gateway on ws://127.0.0.1:18790 (sole gateway — OC1 deprecated)
 - **Claude Code**: Desk-based coding assistant, file operations, git management
 - **8 specialists**: Debugger, Architect, Memory Engineer, QA, DevOps, Research, Code Reviewer
 

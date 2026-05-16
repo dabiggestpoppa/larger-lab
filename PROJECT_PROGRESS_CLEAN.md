@@ -7,21 +7,9 @@
 
 ---
 
-## 🦉 [RL] OWL — Last Sync: 2026-05-16 13:18 UTC
+## 🦉 [RL] OWL — Last Sync: 2026-05-16 17:06 UTC
 
 *Auto-synced from `progress/rl-progress.md`*
-
-#### 🦉 [RL] 2026-05-16 — Scrapling Skill Installed for All Agents
-- Installed `scrapling` v0.4.8 + Playwright Chromium
-- Created `skills/scrapling/SKILL.md` — concise reference for all agents
-- Copied to `.agents/skills/scrapling/SKILL.md` for agent harness loading
-- Updated `TOOLS.md` with Scrapling section
-- Posted announcement to `shared-conversations/team-chat.md`
-- **DSPy evaluation complete**: Recommended integration points identified
-  - Skill creator eval loop (automatic prompt optimization)
-  - Parallel thought synthesis (cleaner module abstraction)
-  - Agent task briefs (type-safe signatures)
-  - Workspace integration (adapter pattern alignment)
 
 #### 🦉 [RL] 2026-05-16 — OC1/OC2 Gateway Conflict Diagnosed
 - **Root cause found**: OC1's `gateway.cmd` was missing `OPENCLAW_HOME` env var, causing it to default to `%USERPROFILE%\.openclaw` and read OC2's config
@@ -58,6 +46,18 @@
 - **OC2**: Working fine throughout, no changes needed
 - **Detailed notes**: See `/memories/session/oc1-gateway-diagnosis.md`
 
+#### 🦉 [RL] 2026-05-16 — Self-Healing Framework Built & Deployed
+- **Built complete self-healing startup system**
+- `db/schema.py` — SQLite error DB with tables: errors, bug_annotations, startup_checks, self_healing_actions
+- `tools/self_heal.py` — Log scanner, error classifier, bug annotator, auto-fixer, health reporter
+- `tools/self_surgery.py` — Safe internal editing module (backup → edit → validate → log)
+- `skills/creative-think/SKILL.md` — LATTICE framework for abstract reasoning
+- `db/owl_health.db` — Initialized and populated
+- **First scan results**: 509 raw log lines → 12 unique errors → 12 bug files created → 1 auto-fixed
+- **Key finding**: symlink EPERM is known Windows limitation (not real error), event loop delays are chronic (169 occurrences), agent stalls at 51 occurrences
+- **HEARTBEAT.md updated** with self-healing, creative think, and self-surgery protocols
+- MAD's building philosophy absorbed: build to the sky, structure contains the answer, feedback not failure, unlimited pathways, trust your reasoning
+
 #### 🦉 [RL] 2026-05-16 — Gateway Diagnostics Complete, Ready for Fix
 - **Current state**: Both gateways running (OC1 PID 14520, OC2 PID 21768)
 - **OC2 issue identified**: Stuck Telegram session `agent:main:telegram:direct:8258195396` blocking event loop for 1000+ seconds
@@ -70,19 +70,19 @@
 - **Solution**: Use venv-based Python scripts for gateway management instead of CLI commands
 
 ---
-## 🟠 [OC2] OpenClaw 2 — Last Sync: 2026-05-16 13:18 UTC
+## 🟠 [OC2] OpenClaw 2 — Last Sync: 2026-05-16 17:06 UTC
 
 *Auto-synced from `progress/openclaw-2-progress.md`*
 
 #### 🟠 [OC2] 2026-05-16 — Agent Fully Online
-- Gateway running on port 18790 (OC1 uses 18789)
+- Gateway running on port 18790 — sole OpenClaw gateway (OC1 deprecated)
 - Telegram @OC2BLRBOT connected & paired ✅
 - 20 skills migrated from Hermes
 - Auto-start: Startup folder + Scheduled Task
 - Discord channel config pending (schema issue — Telegram working)
 
 ---
-## 🔴 [PM] Polymorph — Last Sync: 2026-05-16 13:18 UTC
+## 🔴 [PM] Polymorph — Last Sync: 2026-05-16 17:06 UTC
 
 *Auto-synced from `progress/polymorph-progress.md`*
 
@@ -113,17 +113,9 @@ All 6 repos from `dabiggestpoppa` account now cloned to `C:\Users\wifik\Desktop\
 - Features: ReActAgent, @agent_task workflows, multi-provider, MCP, Docker, guardrails, memory, cloud deploy
 
 ---
-## 🟡 [AS] Assistant Manager — Last Sync: 2026-05-16 13:18 UTC
+## 🟡 [AS] Assistant Manager — Last Sync: 2026-05-16 17:06 UTC
 
 *Auto-synced from `progress/assistant-progress.md`*
-
-#### 🟡 [AS] 2026-05-16 00:30:00Z — Phase 6-9 Resource Assessment Task
-- Received Phase 6-9 plan with GitHub repos and research papers
-- Created `tasks/PHASE-6-9-RESOURCES.md` with full repo list and assessment criteria
-- **Repos to evaluate:** Neo4j Agent Memory, MemoryGraph MCP, Graphonomous, ArqonDB, AgentMesh, Open Multi-Agent, orxhestra, Skillrunner, OpenLoci, GraphPalace
-- **Papers to evaluate:** SAGE, VMAO, Topology Matters
-- Deliverables: `srrs_opc/docs/resource_assessment.md`, `srrs_opc/docs/integration_plan.md`
-- Starting assessment now — will update progress file with findings
 
 #### 🟡 [AS] 2026-05-16 01:30:00Z — Resource Assessment Complete + Delegation
 - Completed full resource assessment: 12 repos/papers evaluated
@@ -175,6 +167,23 @@ All 6 repos from `dabiggestpoppa` account now cloned to `C:\Users\wifik\Desktop\
 - [ ] Run cron check every 30min while stepping away
 - [ ] Review Phase 2 test results
 - [ ] Monitor team progress files
+
+#### 🟡 [AS] 2026-05-16 17:00:00Z — OCE Phase 1 Documentation + Quality Review
+- Verified all 56 SRRA-OPH tests still passing (Phases 1-9)
+- Created `oce/docs/srra-integration-points.md` — full OCE↔SRRA integration map
+  - Maps all 9 OCE phases to SRRA-OPH module dependencies
+  - Includes dependency graph and integration sequence
+  - Lists 4 open questions for CC (process boundary, event fabric, streaming, auth)
+- Created `oce/docs/api-reference.md` — complete API documentation
+  - All 6 current endpoints documented with request/response schemas
+  - WebSocket protocol documented
+  - 11 future endpoints planned by phase
+- Created `oce/docs/quality-review-phase1.md` — CC's backend code review
+  - 6 issues found: 2 low, 3 medium, 1 high
+  - High: frontend has no source files (OC2 blocked)
+  - Approved for Phase 1 scaffold
+- Created `oce/backend/requirements.txt` — FastAPI dependency spec
+- **Next:** Monitor team progress, await CC direction on open questions
 
 ---
 ## 🟢 [HR] Hermes — Last Sync: 2026-05-16 06:43 UTC
@@ -234,9 +243,16 @@ All 6 repos from `dabiggestpoppa` account now cloned to `C:\Users\wifik\Desktop\
 - Updated hermes_autopilot_v3.py with corrected logic
 
 ---
-## 🟣 [OC] OpenClaw — Last Sync: 2026-05-16 13:18 UTC
+## 🟣 [OC] OpenClaw — Last Sync: 2026-05-16 17:06 UTC
 
 *Auto-synced from `progress/openclaw-progress.md`*
+
+#### 🟣 [OC] 2026-05-16 — Gateway Infrastructure Notes
+- OC1 gateway fixed by RL — gateway.cmd was missing `run` subcommand, had wrong port (18790→18789), missing OPENCLAW_HOME
+- Both gateways now live: OC1 (18789) PID 21288, OC2 (18790) PID 15844
+- **Prevention:** Always update BOTH gateway.cmd files after any `npm update openclaw`
+- OC2 @OC2BLRBOT is primary working Telegram bot
+- OC1 @finalstrawclawbot gateway live but Telegram session may still need separate fix
 
 #### 🟣 [OC] 2026-05-15 18:27:00Z — P90 Unified Engine Bug Fix + Results
 - **Bug found**: `est_h == 3` classification was DEAD CODE inside Asian session block
@@ -271,37 +287,9 @@ All 6 repos from `dabiggestpoppa` account now cloned to `C:\Users\wifik\Desktop\
 - **Note**: Separate Hermes/OpenClaw bot tokens still needed for independent bot instances
 
 ---
-## 🔵 [CC] Claude Code — Last Sync: 2026-05-16 13:18 UTC
+## 🔵 [CC] Claude Code — Last Sync: 2026-05-16 17:06 UTC
 
 *Auto-synced from `progress/claude-code-progress.md`*
-
-#### 🔵 [CC] 2026-05-15 22:30:00Z — Full Team Workflow Infrastructure
-- Created `tools/codemap-updater.py` — auto-generates Mermaid diagrams for CODEMAP.md
-- Created `tools/task-runner.py` — lightweight task queue for CC/OC/HR
-- Created `tools/phase-gate.py` — SRRA-OPH phase transition manager (Phases 0-5)
-- Created `tools/workflow-runner.py` — continuous workflow heartbeat
-- Created `skills/agent-team-workflow/SKILL.md` — team SOP
-- Updated `.openclaw/openclaw_prompt.md` — full workflow instructions for OC
-- Updated `agent-lab/agents/hermes/hermes_workspace/agent_prompt.md` — full workflow for HR
-- Fixed Windows encoding (cp1252) for emoji in all tools
-- Initialized phase tracking: Phase 1 ✅ → Phase 2 🔄
-- Tested full pipeline: all tools working
-
-#### 🔵 [CC] 2026-05-15 23:00:00Z — Phase 2 Core Build + Team Expansion
-- Built all Phase 2 components:
-  - `srrs_opc/recovery_anchors.py` — SQLite-based sparse persistence
-  - `srrs_opc/drift_detector.py` — staleness + weight drift detection
-  - `srrs_opc/consistency_validator.py` — direct/temporal contradiction detection
-  - `srrs_opc/reconstruction_synthesizer.py` — continuity from sparse anchors
-  - `srrs_opc/contradiction_resolver.py` — weight-wins auto-resolution
-  - `srrs_opc/constraint_propagator.py` — event-driven constraint propagation
-  - `srrs_opc/tests/test_phase2_e2e.py` — 7/7 integration tests passing
-- Added Assistant Manager (AS) agent to team registry
-- Created `progress/assistant-progress.md` and `shared-conversations/assistant-prompt.md`
-- Updated `tools/progress-sync.py` to include AS agent
-- Delegated tasks to OC (architecture review), HR (testing), AS (quality/docs)
-- Set up `shared-conversations/team-chat.md` as team coordination hub
-- Awaiting Phase 6-9 plan file from user
 
 #### 🔵 [CC] 2026-05-16 00:30:00Z — Phase 3 Complete + Phase 4 Kickoff
 - Built Phase 3 components:
@@ -332,6 +320,10 @@ All 6 repos from `dabiggestpoppa` account now cloned to `C:\Users\wifik\Desktop\
 - All 11 tests still passing after new code
 - CC workflow engine running in background (2min cycle)
 - AS working on Phase 6-9 resource assessment
+
+#### 🔵 [CC] 2026-05-16 16:00:00Z — POST DEPLOYMENT PLAN Analysis + OCE Task Planning
+
+#### 🔵 [CC] 2026-05-16 16:30:00Z — OCE SRRA-OPH Adapter Integration Complete
 
 ---
 

@@ -104,7 +104,7 @@ LEGACY_FILES = [
     "xhaak-kulu-bridge-progress.md",
 ]
 
-SYNC_THRESHOLD = 3  # Sync every 3 updates per agent
+SYNC_THRESHOLD = 7  # Sync every 7 updates per agent
 
 # ── Counter Management ───────────────────────────────────────────────────────
 

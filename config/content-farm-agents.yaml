@@ -1,0 +1,104 @@
+# Content Farm Agent Configuration
+# Each sub-agent has a specific role in the content farm pipeline
+
+agents:
+  sourcing:
+    name: "Sourcing Agent"
+    role: "Content research and trend detection"
+    tools:
+      - MediaCrawler
+      - Spider_XHS
+      - Scrapling
+    schedule: "0 6 * * *"  # Daily at 06:00
+    tasks:
+      - Scrape trending content from 抖音, 小红书, 快手, 微博
+      - Identify high-engagement patterns
+      - Build content formula database
+      - Competitor analysis
+
+  production:
+    name: "Production Agent"
+    role: "AI content generation and localization"
+    tools:
+      - MoneyPrinterPlus
+      - ad-voice
+      - Violin
+    schedule: "0 8 * * *"  # Daily at 08:00
+    tasks:
+      - Generate AI videos from trending topics
+      - Clone voices for narration
+      - Translate content to target languages
+      - Edit and format for each platform
+
+  distribution:
+    name: "Distribution Agent"
+    role: "Multi-platform publishing"
+    tools:
+      - ad-deeke
+      - ad-dke
+      - ad-tiktok
+      - GroupControlApp
+    schedule: "0 10,14,18,22 * * *"  # 4x daily
+    tasks:
+      - Auto-post content to all platforms
+      - Manage posting schedule per platform
+      - Handle device/account rotation
+      - Monitor post status
+
+  engagement:
+    name: "Engagement Agent"
+    role: "Growth hacking and community engagement"
+    tools:
+      - ad-deeke
+      - ad-dke
+      - ad-ai-chat
+    schedule: "0 9,12,15,19,21 * * *"  # 5x daily
+    tasks:
+      - Auto-like relevant content
+      - AI-powered commenting (DeepSeek-V3)
+      - Auto-DM for lead generation
+      - Follow/unfollow strategies
+      - Live stream engagement
+
+  lead_gen:
+    name: "Lead Generation Agent"
+    role: "Lead collection and outreach"
+    tools:
+      - deeke-uid
+      - shortLink
+      - ad-voice
+    schedule: "*/30 * * * *"  # Every 30 minutes
+    tasks:
+      - Collect UIDs from comment sections
+      - Track attribution per platform
+      - Auto-DM leads with AI sales
+      - Build lead database
+
+  analytics:
+    name: "Analytics Agent"
+    role: "ROI tracking and optimization"
+    tools:
+      - Oransim
+      - ad-douyin-report
+      - shortLink
+    schedule: "0 23 * * *"  # Daily at 23:00
+    tasks:
+      - Track performance per account/content
+      - Predict ROI with Oransim
+      - Generate daily reports
+      - Recommend optimizations
+      - Kill losers, scale winners
+
+  device_manager:
+    name: "Device Manager Agent"
+    role: "Emulator and account management"
+    tools:
+      - GroupControlApp
+      - BlueStacks/LDPlayer
+    schedule: "0 0 * * *"  # Daily at 00:00
+    tasks:
+      - Health check all emulators
+      - Rotate IPs/proxies
+      - Warm up new accounts
+      - Monitor for bans/suspensions
+      - Scale device fleet

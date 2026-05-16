@@ -1,0 +1,84 @@
+# Translation Pipeline Configuration
+# For working with Chinese-source tools and content
+
+translation:
+  # Primary translation approach: Agent-native (no external API needed)
+  # The agent can read and translate Chinese text directly
+  
+  # For video translation:
+  video:
+    primary: "Violin"  # Local Python package, 33 languages
+    fallback: "heygen-translate"  # SaaS API (requires HEYGEN_API_KEY)
+    supported_languages:
+      - Chinese (Simplified)
+      - Chinese (Traditional)
+      - English
+      - Spanish
+      - Japanese
+      - Korean
+      - French
+      - German
+      - Portuguese
+      - Arabic
+      - Hindi
+      - # ... 22 more via Violin
+  
+  # For text translation (docs, UI, comments):
+  text:
+    primary: "agent-native"  # Agent reads Chinese directly
+    fallback: "web_fetch"  # Can use web translation services
+    
+  # For website translation:
+  website:
+    primary: "web_fetch"  # Fetch and translate in one pass
+    fallback: "agent-native"  # Read raw Chinese and translate
+
+# Chinese platforms we operate on:
+platforms:
+  douyin:
+    name: "抖音"
+    language: "zh-CN"
+    content_language: "Chinese"
+    primary_hashtags: ["#抖音", "#热门", "#推荐"]
+    
+  xiaohongshu:
+    name: "小红书"
+    language: "zh-CN"
+    content_language: "Chinese"
+    primary_hashtags: ["#小红书", "#好物分享", "#种草"]
+    
+  kuaishou:
+    name: "快手"
+    language: "zh-CN"
+    content_language: "Chinese"
+    primary_hashtags: ["#快手", "#热门"]
+    
+  wechat:
+    name: "微信"
+    language: "zh-CN"
+    content_language: "Chinese"
+    channels: ["朋友圈", "公众号", "视频号"]
+
+# Target markets for translated content:
+target_markets:
+  english:
+    languages: ["en-US", "en-GB"]
+    platforms: ["TikTok", "Instagram Reels", "YouTube Shorts"]
+  spanish:
+    languages: ["es-ES", "es-MX", "es-419"]
+    platforms: ["TikTok", "Instagram Reels", "YouTube Shorts"]
+  japanese:
+    languages: ["ja-JP"]
+    platforms: ["TikTok", "Instagram Reels", "YouTube Shorts"]
+  korean:
+    languages: ["ko-KR"]
+    platforms: ["TikTok", "Instagram Reels", "YouTube Shorts"]
+  french:
+    languages: ["fr-FR"]
+    platforms: ["TikTok", "Instagram Reels"]
+  german:
+    languages: ["de-DE"]
+    platforms: ["TikTok", "Instagram Reels"]
+  portuguese:
+    languages: ["pt-BR", "pt-PT"]
+    platforms: ["TikTok", "Instagram Reels"]

@@ -1,0 +1,130 @@
+# MAD Content Farm — Content Configuration
+# Generated: 2026-05-16
+
+niches:
+  fitness:
+    description: "Workout tips, transformation stories, exercise demos"
+    tone: "energetic, motivational, punchy"
+    default_duration: 30
+    platforms: [douyin, xiaohongshu, tiktok]
+    hashtags:
+      douyin: ["#健身", "#减肥", "#运动", "#fitness", "#workout", "#减脂", "#增肌", "#马甲线"]
+      xiaohongshu: ["健身打卡", "减脂餐", "运动日常", "健身干货", "瘦身日记"]
+      tiktok: ["#fitness", "#workout", "#gym", "#fitnessmotivation", "#weightloss", "#homeworkout"]
+    bgmusic: ["upbeat_electronic.mp3", "motivational_hiphop.mp3"]
+    voice: "energetic_female_zh"
+
+  cooking:
+    description: "Quick recipes, food hacks, cooking tutorials"
+    tone: "warm, friendly, instructional"
+    default_duration: 45
+    platforms: [douyin, xiaohongshu, tiktok]
+    hashtags:
+      douyin: ["#美食", "#做饭", "#食谱", "#cooking", "#美食教程", "#家常菜", "#烘焙"]
+      xiaohongshu: ["美食分享", "食谱教程", "家常菜", "烘焙日记", "下厨房"]
+      tiktok: ["#cooking", "#recipe", "#foodtiktok", "#easyrecipe", "#homecooking", "#chef"]
+    bgmusic: ["lofi_chill.mp3", "acoustic_guitar.mp3"]
+    voice: "warm_female_zh"
+
+  tech:
+    description: "Gadget reviews, AI tools, productivity tips"
+    tone: "informative, concise, slightly geeky"
+    default_duration: 30
+    platforms: [douyin, xiaohongshu, tiktok]
+    hashtags:
+      douyin: ["#科技", "#AI", "#数码", "#tech", "#人工智能", "#手机", "#电脑"]
+      xiaohongshu: ["数码测评", "AI工具", "科技好物", "效率工具", "App推荐"]
+      tiktok: ["#tech", "#ai", "#gadgets", "#technology", "#productivity", "#coding"]
+    bgmusic: ["tech_ambient.mp3", "minimal_electronic.mp3"]
+    voice: "neutral_male_zh"
+
+  lifestyle:
+    description: "Daily routines, travel, self-improvement, vlogs"
+    tone: "casual, relatable, aspirational"
+    default_duration: 40
+    platforms: [douyin, xiaohongshu, tiktok]
+    hashtags:
+      douyin: ["#生活", "#日常", "#vlog", "#lifestyle", "#旅行", "#自律"]
+      xiaohongshu: ["生活方式", "日常vlog", "自律生活", "旅行日记", "好物分享"]
+      tiktok: ["#lifestyle", "#vlog", "#dailyroutine", "#travel", "#selfcare", "#aesthetic"]
+    bgmusic: ["indie_acoustic.mp3", "sunny_pop.mp3"]
+    voice: "casual_female_zh"
+
+  finance:
+    description: "Money tips, investing basics, side hustles"
+    tone: "authoritative, clear, trustworthy"
+    default_duration: 35
+    platforms: [douyin, xiaohongshu, tiktok]
+    hashtags:
+      douyin: ["#理财", "#投资", "#搞钱", "#finance", "#股票", "#基金", "#副业"]
+      xiaohongshu: ["理财入门", "搞钱日记", "基金定投", "副业收入", "财务自由"]
+      tiktok: ["#finance", "#investing", "#moneytips", "#sidehustle", "#personalfinance", "#wealth"]
+    bgmusic: ["corporate_motivation.mp3", "piano_calm.mp3"]
+    voice: "authoritative_male_zh"
+
+target_languages:
+  - code: "en"
+    name: "English"
+    voice_preference: "native_speaker"
+    platforms: [tiktok, youtube_shorts]
+  - code: "es"
+    name: "Spanish"
+    voice_preference: "native_speaker"
+    platforms: [tiktok, youtube_shorts]
+  - code: "ja"
+    name: "Japanese"
+    voice_preference: "native_speaker"
+    platforms: [tiktok]
+  - code: "ko"
+    name: "Korean"
+    voice_preference: "native_speaker"
+    platforms: [tiktok]
+  - code: "fr"
+    name: "French"
+    voice_preference: "native_speaker"
+    platforms: [tiktok]
+  - code: "de"
+    name: "German"
+    voice_preference: "native_speaker"
+    platforms: [tiktok]
+  - code: "pt"
+    name: "Portuguese"
+    voice_preference: "native_speaker"
+    platforms: [tiktok]
+  - code: "zh"
+    name: "Chinese"
+    voice_preference: "native_speaker"
+    platforms: [douyin, xiaohongshu, kuaishou]
+
+video_settings:
+  min_duration: 15
+  max_duration: 60
+  default_duration: 30
+  resolutions:
+    vertical: "1080x1920"
+    horizontal: "1920x1080"
+    square: "1080x1080"
+  fps: 30
+  transition_effects: true
+  subtitle_enabled: true
+  bgmusic_volume: 0.3
+
+output:
+  base_dir: "content-farm/output/content"
+  date_format: "%Y-%m-%d"
+  formats:
+    - json
+    - txt
+
+moneyprinter:
+  script: "MoneyPrinterPlus/gui.py"
+  requirements: ["ffmpeg", "python3.10+"]
+  llm_providers: ["openai", "moonshot", "deepseek", "ollama"]
+  tts_providers: ["azure", "aliyun", "tencent", "chattts"]
+
+violin:
+  cli: "violin"
+  supported_languages: 33
+  default_style: "standard"
+  styles: ["standard", "kids", "academic", "casual", "storyteller", "news"]
+  pipeline: "ffmpeg | Whisper | LLM | TTS | ffmpeg"
