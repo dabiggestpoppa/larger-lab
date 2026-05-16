@@ -385,6 +385,204 @@ async def plan_evolution(request: dict):
         logger.error(f"Evolution planning error: {e}")
         raise HTTPException(status_code=503, detail=f"Pipeline service unavailable: {str(e)}")
 
+# ─── Observer Runtime Endpoints ──────────────────────────────────────────────
+
+@app.post("/observers")
+async def create_observer(request: dict):
+    """Create a new observer."""
+    try:
+        runtime = get_runtime()
+        config = ObserverConfig(**request)
+        observer = await runtime.create_observer(config)
+        return {
+            "observer_id": observer.observer_id,
+            "state": observer.state.value,
+            "created_at": observer.created_at.isoformat(),
+        }
+    except Exception as e:
+        logger.error(f"Create observer error: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/observers")
+async def list_observers(
+    state: Optional[str] = None,
+    observer_type: Optional[str] = None,
+):
+    """List all observers with optional filters."""
+    try:
+        runtime = get_runtime()
+        state_enum = ObserverState(state) if state else None
+        observers = runtime.list_observers(state=state_enum, observer_type=observer_type)
+        return [
+            {
+                "observer_id": o.observer_id,
+                "name": o.config.name,
+                "type": o.config.observer_type,
+                "state": o.state.value,
+                "health_score": o.health_score,
+                "event_count": o.event_count,
+                "created_at": o.created_at.isoformat(),
+            }
+            for o in observers
+        ]
+    except Exception as e:
+        logger.error(f"List observers error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/observers/{observer_id}")
+async def get_observer(observer_id: str):
+    """Get observer details."""
+    try:
+        runtime = get_runtime()
+        observer = runtime.get_observer(observer_id)
+        if not observer:
+            raise HTTPException(status_code=404, detail="Observer not found")
+        return {
+            "observer_id": observer.observer_id,
+            "config": observer.config.model_dump(),
+            "state": observer.state.value,
+            "health_score": observer.health_score,
+            "entropy": observer.entropy,
+            "event_count": observer.event_count,
+            "error_count": observer.error_count,
+            "created_at": observer.created_at.isoformat(),
+            "activated_at": observer.activated_at.isoformat() if observer.activated_at else None,
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Get observer error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/observers/{observer_id}/health")
+async def get_observer_health(observer_id: str):
+    """Get observer health metrics."""
+    try:
+        runtime = get_runtime()
+        health = runtime.get_observer_health(observer_id)
+        if not health:
+            raise HTTPException(status_code=404, detail="Observer not found")
+        return health.model_dump()
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Observer health error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.post("/observers/{observer_id}/activate")
+async def activate_observer(observer_id: str):
+    """Activate an observer."""
+    try:
+        runtime = get_runtime()
+        observer = await runtime.activate_observer(observer_id)
+        if not observer:
+            raise HTTPException(status_code=404, detail="Observer not found or destroyed")
+        return {"observer_id": observer.observer_id, "state": observer.state.value}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Activate observer error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.post("/observers/{observer_id}/suspend")
+async def suspend_observer(observer_id: str):
+    """Suspend an observer."""
+    try:
+        runtime = get_runtime()
+        observer = await runtime.suspend_observer(observer_id)
+        if not observer:
+            raise HTTPException(status_code=404, detail="Observer not found or destroyed")
+        return {"observer_id": observer.observer_id, "state": observer.state.value}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Suspend observer error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.delete("/observers/{observer_id}")
+async def destroy_observer(observer_id: str):
+    """Destroy an observer."""
+    try:
+        runtime = get_runtime()
+        success = await runtime.destroy_observer(observer_id)
+        if not success:
+            raise HTTPException(status_code=404, detail="Observer not found")
+        return {"observer_id": observer_id, "state": "destroyed"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Destroy observer error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.post("/observers/{observer_id}/subscribe")
+async def subscribe_observer(observer_id: str, request: dict):
+    """Subscribe an observer to event types."""
+    try:
+        runtime = get_runtime()
+        observer = runtime.get_observer(observer_id)
+        if not observer:
+            raise HTTPException(status_code=404, detail="Observer not found")
+        event_types = request.get("event_types", [])
+        if event_types:
+            fabric = get_fabric()
+            fabric.subscribe(
+                callback=lambda e, oid=observer_id: runtime._handle_event(oid, e),
+                event_types=event_types,
+            )
+        return {"observer_id": observer_id, "subscribed_to": event_types}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Subscribe observer error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/observers/stats")
+async def get_observer_stats():
+    """Get Observer Runtime statistics."""
+    try:
+        runtime = get_runtime()
+        return runtime.get_stats()
+    except Exception as e:
+        logger.error(f"Observer stats error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.websocket("/ws/observers")
+async def websocket_observers(websocket: WebSocket):
+    """WebSocket endpoint for real-time observer updates."""
+    await manager.connect(websocket)
+    try:
+        while True:
+            # Send periodic observer health updates
+            runtime = get_runtime()
+            stats = runtime.get_stats()
+            await websocket.send_text(json.dumps({
+                "type": "observer_stats",
+                "data": stats,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }))
+            await asyncio.sleep(5)
+    except WebSocketDisconnect:
+        logger.info("Observer WebSocket client disconnected")
+    except asyncio.CancelledError:
+        logger.info("Observer WebSocket connection cancelled")
+    except Exception as e:
+        logger.error(f"Observer WebSocket error: {e}")
+    finally:
+        try:
+            manager.disconnect(websocket)
+        except Exception:
+            pass
+
+
 @app.websocket("/ws/events")
 async def websocket_events(websocket: WebSocket):
     """WebSocket endpoint for real-time event stream from Event Fabric."""

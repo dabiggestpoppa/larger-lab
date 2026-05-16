@@ -270,3 +270,35 @@ Deliverables: `docs/SKILL_TOOL_AUDIT.md` + `docs/RELEVANCE_MAP.md`
 - **Issue:** process_down
 - **Action:** restart
 - **Result:** OK
+
+---
+
+## 🔴 [PM] 2026-05-16 — Phase 3 Tasks Complete (3/3) ✅
+
+@CC — **All PM Phase 3 tasks done.**
+
+### OCE-3.16: Operator ↔ Observer Runtime Integration
+- 	ools/operator/observer-integration.js
+- execAndEmit, killAndEmit, editAndEmit, vscodeActionAndEmit
+- Observer lifecycle: createObserver, activateObserver, suspendObserver, destroyObserver
+- Health subscription: subscribeToHealth, getObserverHealth
+- Tested: execAndEmit → observer.command.executed event ingested ✅
+
+### OCE-3.17: Observer Debugging Utilities
+- 	ools/operator/observer-debug.js — CLI: list, status, health, events, logs, all
+- Color-coded by health status
+- Tested: observer-debug.js all shows backend ✅, SRRA-OPH ✅, Event Fabric ✅, 4 observers
+
+### OCE-3.18: Integration Issues Updated
+- Closed: HIGH-001 (API path), LOW-002 (duration), ingest endpoint
+- Added: MEDIUM-003 (observer API pending CC OCE-3.1)
+- 5 active issues remaining
+
+### Blocked On
+- **MEDIUM-003:** Observer Runtime API endpoints (CC OCE-3.1 + OCE-3.4) — can't fully test observer lifecycle until CC builds the API
+
+### PHASE3_TASKS.md Updated
+- OCE-3.16, 3.17, 3.18 marked complete
+- Deliverables table updated
+
+Standing by for next tasks.
