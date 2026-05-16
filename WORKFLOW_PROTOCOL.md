@@ -289,7 +289,42 @@ The heartbeat checks sync status automatically. No manual intervention needed du
 
 ---
 
-## 9. PHASE 3+ WORKFLOW — Emergent Topology
+## 9. CODE FLOW PROTOCOL — Read Before Write (CRITICAL)
+
+**GOLDEN RULE: CC builds first, AS tests second, PM debugs third, HR runs fourth.**
+
+### Before Writing ANY New Code:
+1. **READ** CC's latest files in the relevant directory first
+2. **CHECK** what classes/functions CC already exports
+3. **IMPORT** from CC's modules — do NOT create parallel implementations
+4. **WRITE** only what is genuinely missing (gap-filling, not duplicating)
+5. **FLAG** issues via `team-chat.md` — do NOT silently fix CC's code
+
+### AS Specific Rules:
+- NEVER write a new file without reading CC's existing files in that directory first
+- NEVER guess at class/function names — read the source to get exact names
+- NEVER create `WorkspaceIntegrationLayer` when CC already has `ToolAdapter`
+- NEVER write `reconstruction_safe_exec.py` when CC already built execution safety
+- If CC's code has import errors, post to team-chat.md — don't fix it directly
+- Write TESTS for CC's code, not REPLACEMENTS for CC's code
+
+### What AS Should Actually Do:
+- Write tests for CC's NEW code (not rewrite existing tests)
+- Write complementary components that IMPORT from CC's modules
+- Write design docs and resource assessments
+- Monitor team progress via cron check
+- Update CODEMAP and WORKFLOW_PROTOCOL
+- Create skills for reusable patterns
+
+### What AS Should NOT Do:
+- Rewrite CC's code to match AS's understanding
+- Create parallel implementations of CC's classes
+- Fix CC's "simple mistakes" without flagging via chat
+- Write new files without reading existing ones first
+
+---
+
+## 10. PHASE 3+ WORKFLOW — Emergent Topology
 
 ### AS (Assistant Manager) Role During Phase 3+
 The AS agent actively monitors and assists:
