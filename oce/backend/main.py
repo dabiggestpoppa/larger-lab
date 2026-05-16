@@ -11,13 +11,18 @@ Provides endpoints for:
 - Memory view
 """
 
-from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone
 import asyncio
 import json
+import logging
+import traceback
+
+logger = logging.getLogger("oce")
 
 # Import SRRA-OPH adapter
 from srrs_adapter import get_adapter, SRRSAdapter
@@ -38,6 +43,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    logger.error(f"Unhandled exception: {exc}\n{traceback.format_exc()}")
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": "Internal server error", "type": type(exc).__name__},
+    )
 
 
 # ─── Models ───────────────────────────────────────────────────────────────────
@@ -95,21 +109,29 @@ async def continuity_chat(request: ContinuityChatRequest):
     Continuity chat endpoint.
     Preserves goals, trajectories, observer state, operational context.
     """
-    adapter = await get_adapter()
-    result = await adapter.process_continuity_message(request.message, request.context)
-    return {
-        "response": result.get("response", "No response"),
-        "session_id": request.session_id or "new_session",
-        "continuity_preserved": True
-    }
+    try:
+        adapter = await get_adapter()
+        result = await adapter.process_continuity_message(request.message, request.context)
+        return {
+            "response": result.get("response", "No response"),
+            "session_id": request.session_id or "new_session",
+            "continuity_preserved": True
+        }
+    except Exception as e:
+        logger.error(f"Chat error: {e}")
+        raise HTTPException(status_code=503, detail=f"Continuity service unavailable: {str(e)}")
 
 
 @app.get("/observers", response_model=List[ObserverStatus])
 async def get_observer_status():
     """Live observer status panel."""
-    adapter = await get_adapter()
-    status = await adapter.get_observer_status()
-    return [ObserverStatus(**s) for s in status]
+    try:
+        adapter = await get_adapter()
+        obs_status = await adapter.get_observer_status()
+        return [ObserverStatus(**s) for s in obs_status]
+    except Exception as e:
+        logger.error(f"Observer status error: {e}")
+        raise HTTPException(status_code=503, detail=f"Observer service unavailable: {str(e)}")
 
 
 @app.get("/events", response_model=List[EventResponse])
@@ -120,66 +142,98 @@ async def get_events(
     min_priority: Optional[int] = Query(None, ge=0, le=3),
 ):
     """Query event history from the Event Fabric."""
-    fabric = get_fabric()
-    events = fabric.get_history(
-        event_type=event_type,
-        source=source,
-        limit=limit,
-        min_priority=min_priority,
-    )
-    return [_event_to_response(e) for e in events]
+    try:
+        fabric = get_fabric()
+        events = fabric.get_history(
+            event_type=event_type,
+            source=source,
+            limit=limit,
+            min_priority=min_priority,
+        )
+        return [_event_to_response(e) for e in events]
+    except Exception as e:
+        logger.error(f"Events query error: {e}")
+        raise HTTPException(status_code=503, detail=f"Event service unavailable: {str(e)}")
 
 
 @app.get("/events/types")
 async def get_event_types():
     """List all registered event types."""
-    fabric = get_fabric()
-    return fabric.get_event_types()
+    try:
+        fabric = get_fabric()
+        return fabric.get_event_types()
+    except Exception as e:
+        logger.error(f"Event types error: {e}")
+        raise HTTPException(status_code=503, detail=f"Event service unavailable: {str(e)}")
 
 
 @app.get("/events/stats")
 async def get_event_stats():
     """Event throughput statistics."""
-    fabric = get_fabric()
-    return fabric.get_stats()
+    try:
+        fabric = get_fabric()
+        return fabric.get_stats()
+    except Exception as e:
+        logger.error(f"Event stats error: {e}")
+        raise HTTPException(status_code=503, detail=f"Event service unavailable: {str(e)}")
 
 
 @app.get("/attractor", response_model=AttractorState)
 async def get_attractor_state():
     """Current operational goals and convergence state."""
-    adapter = await get_adapter()
-    state = await adapter.get_attractor_state()
-    return AttractorState(**state)
+    try:
+        adapter = await get_adapter()
+        state = await adapter.get_attractor_state()
+        return AttractorState(**state)
+    except Exception as e:
+        logger.error(f"Attractor error: {e}")
+        raise HTTPException(status_code=503, detail=f"Attractor service unavailable: {str(e)}")
 
 
 @app.get("/memory")
 async def get_memory_view():
     """Trajectory memory, structural memory, repair memory."""
-    adapter = await get_adapter()
-    structural = await adapter.get_structural_memory()
-    trajectory = await adapter.get_trajectory_memory()
-    return {
-        "trajectory_memory": trajectory,
-        "structural_memory": structural,
-        "repair_memory": []  # TODO: Add repair memory
-    }
+    try:
+        adapter = await get_adapter()
+        structural = await adapter.get_structural_memory()
+        trajectory = await adapter.get_trajectory_memory()
+        return {
+            "trajectory_memory": trajectory,
+            "structural_memory": structural,
+            "repair_memory": []
+        }
+    except Exception as e:
+        logger.error(f"Memory error: {e}")
+        raise HTTPException(status_code=503, detail=f"Memory service unavailable: {str(e)}")
 
 
 @app.get("/health/srrs")
 async def srrs_health():
     """Check SRRA-OPH substrate health."""
-    adapter = await get_adapter()
-    return await adapter.health_check()
+    try:
+        adapter = await get_adapter()
+        return await adapter.health_check()
+    except Exception as e:
+        logger.error(f"SRRS health error: {e}")
+        return {"status": "unhealthy", "error": str(e)}
 
 
 # ─── Event Fabric Helpers ─────────────────────────────────────────────────────
 
 def _event_to_response(event) -> Dict[str, Any]:
     """Convert an Event to an API response dict."""
+    ts = event.timestamp
+    if isinstance(ts, str):
+        ts_str = ts
+    else:
+        try:
+            ts_str = ts.isoformat()
+        except Exception:
+            ts_str = str(ts)
     return {
         "event_id": event.event_id,
         "event_type": event.event_type,
-        "timestamp": event.timestamp.isoformat(),
+        "timestamp": ts_str,
         "source": event.source,
         "priority": event.priority,
         "payload": event.payload,
@@ -194,23 +248,31 @@ def _event_to_dict(event) -> Dict[str, Any]:
 @app.on_event("startup")
 async def startup_event():
     """Initialize Event Fabric on startup."""
-    fabric = get_fabric()
-    await fabric.ingest(
-        event_type="system.startup",
-        source="oce-continuity-core",
-        payload={"version": "1.0.0", "message": "OCE Continuity Core started"},
-    )
+    try:
+        fabric = get_fabric()
+        await fabric.ingest(
+            event_type="system.startup",
+            source="oce-continuity-core",
+            payload={"version": "1.0.0", "message": "OCE Continuity Core started"},
+        )
+        logger.info("OCE Continuity Core started successfully")
+    except Exception as e:
+        logger.error(f"Startup error: {e}")
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """Emit shutdown event."""
-    fabric = get_fabric()
-    await fabric.ingest(
-        event_type="system.shutdown",
-        source="oce-continuity-core",
-        payload={"message": "OCE Continuity Core shutting down"},
-    )
+    try:
+        fabric = get_fabric()
+        await fabric.ingest(
+            event_type="system.shutdown",
+            source="oce-continuity-core",
+            payload={"message": "OCE Continuity Core shutting down"},
+        )
+        logger.info("OCE Continuity Core shutting down")
+    except Exception as e:
+        logger.error(f"Shutdown error: {e}")
 
 
 # ─── WebSocket for Real-time Updates ──────────────────────────────────────────
@@ -242,41 +304,57 @@ pipeline_manager = OCEPipelineManager()
 @app.get("/pipelines/status")
 async def get_pipeline_status():
     """Get status of all DSPy pipelines."""
-    return pipeline_manager.get_status()
+    try:
+        return pipeline_manager.get_status()
+    except Exception as e:
+        logger.error(f"Pipeline status error: {e}")
+        raise HTTPException(status_code=503, detail=f"Pipeline service unavailable: {str(e)}")
 
 
 @app.post("/pipelines/contract/generate")
 async def generate_contract(request: dict):
     """Generate optimized prediction contract parameters."""
-    result = pipeline_manager.generate_contract(
-        mutation_type=request.get("mutation_type", "unknown"),
-        target=request.get("target", "unknown"),
-        historical_accuracy=request.get("historical_accuracy", 0.5),
-        coherence_metrics=request.get("coherence_metrics"),
-    )
-    return result
+    try:
+        result = pipeline_manager.generate_contract(
+            mutation_type=request.get("mutation_type", "unknown"),
+            target=request.get("target", "unknown"),
+            historical_accuracy=request.get("historical_accuracy", 0.5),
+            coherence_metrics=request.get("coherence_metrics"),
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Contract generation error: {e}")
+        raise HTTPException(status_code=503, detail=f"Pipeline service unavailable: {str(e)}")
 
 
 @app.post("/pipelines/event/route")
 async def route_event(request: dict):
     """Route an event through optimal path."""
-    result = pipeline_manager.route_event(
-        event_type=request.get("event_type", "unknown"),
-        observer_state=request.get("observer_state", {}),
-        entropy_level=request.get("entropy_level", 0.0),
-    )
-    return result
+    try:
+        result = pipeline_manager.route_event(
+            event_type=request.get("event_type", "unknown"),
+            observer_state=request.get("observer_state", {}),
+            entropy_level=request.get("entropy_level", 0.0),
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Event routing error: {e}")
+        raise HTTPException(status_code=503, detail=f"Pipeline service unavailable: {str(e)}")
 
 
 @app.post("/pipelines/evolution/plan")
 async def plan_evolution(request: dict):
     """Plan adaptive evolution."""
-    result = pipeline_manager.plan_evolution(
-        current_metrics=request.get("current_metrics", {}),
-        budget=request.get("entropy_budget_remaining", 500.0),
-        targets=request.get("coherence_targets", {}),
-    )
-    return result
+    try:
+        result = pipeline_manager.plan_evolution(
+            current_metrics=request.get("current_metrics", {}),
+            budget=request.get("entropy_budget_remaining", 500.0),
+            targets=request.get("coherence_targets", {}),
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Evolution planning error: {e}")
+        raise HTTPException(status_code=503, detail=f"Pipeline service unavailable: {str(e)}")
 
 @app.websocket("/ws/events")
 async def websocket_events(websocket: WebSocket):
@@ -287,7 +365,6 @@ async def websocket_events(websocket: WebSocket):
     try:
         async for event in fabric.stream_events(queue):
             if event is None:
-                # Heartbeat
                 await websocket.send_text(json.dumps({
                     "type": "heartbeat",
                     "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -298,12 +375,27 @@ async def websocket_events(websocket: WebSocket):
                     "data": _event_to_dict(event),
                 }))
     except WebSocketDisconnect:
-        pass
-    except Exception:
-        pass
+        logger.info("WebSocket client disconnected")
+    except asyncio.CancelledError:
+        logger.info("WebSocket connection cancelled")
+    except Exception as e:
+        logger.error(f"WebSocket error: {e}")
+        try:
+            await websocket.send_text(json.dumps({
+                "type": "error",
+                "message": str(e),
+            }))
+        except Exception:
+            pass
     finally:
-        fabric.close_stream(queue)
-        manager.disconnect(websocket)
+        try:
+            fabric.close_stream(queue)
+        except Exception:
+            pass
+        try:
+            manager.disconnect(websocket)
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":

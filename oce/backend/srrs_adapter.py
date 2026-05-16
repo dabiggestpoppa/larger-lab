@@ -11,10 +11,13 @@ This adapter provides:
 - Entropy economics metrics
 """
 
+import logging
 import sys
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timezone
+
+logger = logging.getLogger("oce.adapter")
 
 # Add parent directory to path for srrs_opc imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -141,8 +144,8 @@ class SRRSAdapter:
                 payload=payload,
             )
             return event.event_id
-        except Exception:
-            # Don't let Event Fabric errors break the adapter
+        except Exception as e:
+            logger.warning(f"Event Fabric ingest failed, using fallback ID: {e}")
             return f"event_{datetime.now().timestamp()}_{self._event_counter}"
 
     async def get_trajectory_memory(self, limit: int = 50) -> List[Dict[str, Any]]:

@@ -126,3 +126,29 @@ All agents maintain own memory hygiene. See `AGENT_MOVEMENT.md` for full protoco
 3. **Memory must compress** — linear growth is failure
 4. **Consensus must emerge** — never hardcode truth authority
 5. **Test everything** — all code must have tests before advancing phases
+
+## Diagnostic Soft Logic (Not Hard Rules)
+
+> **Source:** OC2 chronic bug postmortem (May 16, 2026) — 8 hours of repair caused by 2 simple config issues that were always visible in the logs.
+
+These are PATTERNS to follow, not rules to obey. They adapt to context.
+
+### The Core Instinct: Read Logs First
+When something seems broken, **read the actual error log** — not the health endpoint, not the status page. The answer is always in the logs. Health endpoints say "live" when the agent is dead.
+
+### Diagnostic Sequence (Soft Pattern)
+1. **Starting something new** → Read startup logs. Verify EVERY layer: process running, port listening, service ready, agent model loaded, channels connected, can process messages.
+2. **Something seems stuck** → Read the error log from the LAST action. Not the health check. The error message is always more specific than your assumption.
+3. **Making config changes** → One change at a time. Test. Next change. Never batch config edits.
+4. **Stuck >30 minutes** → Stop guessing. Read the log file. The error is always there.
+5. **Service won't start** → Check for config schema validation errors FIRST. Invalid keys fail silently.
+6. **Behavior doesn't match config** → Check for override files. Agent-level config can override workspace config.
+
+### Why Soft Logic, Not Hard Rules
+Hard rules break when the environment changes. Soft logic is a diagnostic PATTERN — it works for ANY service, not just OC2. The pattern is: **observe first, assume second, verify always**.
+
+### Tools That Embed This Pattern
+- `tools/oc2-start.cmd` — validates config + API key + agent model BEFORE starting
+- `tools/oc2-doctor.cmd` — full 6-layer diagnostic on demand
+- `tools/oc2-watchdog.py` — monitors context usage, alerts at 75%/90%/95%
+- `tools/oc2-context-monitor.py` — session-level context tracking

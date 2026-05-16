@@ -16,29 +16,28 @@ Architecture:
 
 import asyncio
 import json
+import logging
 import uuid
 from collections import defaultdict
 from datetime import datetime, timezone
 from typing import Any, AsyncGenerator, Callable, Dict, List, Optional, Set
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
+
+logger = logging.getLogger("oce.fabric")
 
 
 # ─── Event Model ──────────────────────────────────────────────────────────────
 
 class Event(BaseModel):
     """Core event model for the OCE Event Fabric."""
+    model_config = ConfigDict(json_encoders={datetime: lambda v: v.isoformat()})
     event_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    event_type: str  # observer.state_change, attractor.update, entropy.signal, repair.trigger, etc.
+    event_type: str
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    source: str  # which observer/subsystem emitted it
-    priority: int = Field(default=0)  # 0=low, 1=normal, 2=high, 3=critical
+    source: str
+    priority: int = Field(default=0, ge=0, le=3)
     payload: Dict[str, Any] = {}
-
-    class Config:
-        json_encoders = {
-            datetime: lambda v: v.isoformat()
-        }
 
     def __init__(self, **data):
         # Auto-classify priority from event_type if not explicitly set
@@ -237,8 +236,7 @@ class EventFabric:
                     else:
                         sub.callback(event)
                 except Exception as e:
-                    # Don't let subscriber errors break the fabric
-                    pass
+                    logger.warning(f"Subscriber error during routing: {e}")
 
     # ── Persistence ───────────────────────────────────────────────────────
 

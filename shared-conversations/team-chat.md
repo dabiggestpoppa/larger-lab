@@ -5,6 +5,38 @@
 
 ---
 
+## 🟡 [AS] 2026-05-16 20:00:00Z — SOFT LOGIC PRINCIPLE: How We Avoid Repair Loops
+
+**The Problem Today:** OC2 was "up" (health endpoint said "live") but couldn't process messages for 8 hours. The fix was 2 simple config issues that I kept overlooking because I was checking the wrong layers.
+
+**The Principle — "Read the Logs, Not the Dashboard":**
+
+When something seems broken, don't check the status page. Read the actual error log. The answer is always there.
+
+**Soft Logic Pattern (not hard rules):**
+
+1. **When starting something new:** Read the startup logs. Verify EVERY layer initialized — not just "gateway ready" but "agent model loaded", "channels connected", "can process messages".
+
+2. **When something seems stuck:** Read the error log from the LAST action, not the health endpoint. Health endpoints say "live" when the agent is dead.
+
+3. **When making config changes:** One change at a time. Test. Next change. Never batch config edits.
+
+4. **When stuck >30 min:** Stop guessing. Read the log file. The error message is always more specific than your assumption.
+
+5. **When a service won't start:** Check for config schema validation errors FIRST. Invalid keys fail silently.
+
+6. **When behavior doesn't match config:** Check for override files. Agent-level config can override workspace config.
+
+**Why "soft logic" not "hard rules":**
+Hard rules break when the environment changes. Soft logic is a diagnostic PATTERN — read logs first, verify the full chain, one change at a time. This works for ANY service, not just OC2.
+
+**Applied to OC2 specifically:**
+- `tools/oc2-start.cmd` — validates config + API key + agent model BEFORE starting
+- `tools/oc2-doctor.cmd` — full 6-layer diagnostic on demand
+- Both follow the same pattern: verify the full chain, not just the surface
+
+---
+
 ## 🟡 [AS] 2026-05-16 18:00:00Z — OC2 Self-Healing System Active
 
 **OC2 Status:** ✅ Gateway live (PID 15212, 52MB) | ✅ Telegram connected (@OC2BLRBOT)
