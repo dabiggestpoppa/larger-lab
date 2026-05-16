@@ -5136,7 +5136,7 @@
       "accountId": "default"
     },
     "sessionId": "61cd4f6f-c0fb-4119-b861-350cb16af7fe",
-    "updatedAt": 1778966275092,
+    "updatedAt": 1778966886390,
     "sessionStartedAt": 1778960707898,
     "deliveryContext": {
       "channel": "telegram",
@@ -5146,7 +5146,7 @@
     "lastChannel": "telegram",
     "lastTo": "telegram:8258195396",
     "lastAccountId": "default",
-    "lastInteractionAt": 1778966267474,
+    "lastInteractionAt": 1778966884792,
     "systemSent": true,
     "abortedLastRun": false,
     "chatType": "direct",
@@ -5650,10 +5650,10 @@
           "requiredEnv": []
         }
       ],
-      "version": 1778966153271
+      "version": 1778966675655
     },
-    "status": "running",
-    "startedAt": 1778966275085,
+    "status": "failed",
+    "startedAt": 1778966565300,
     "modelProvider": "openrouter",
     "model": "openrouter/owl-alpha",
     "contextTokens": 1048756,
@@ -6269,7 +6269,11 @@
     "totalTokens": 182716,
     "totalTokensFresh": true,
     "channel": "telegram",
-    "agentHarnessId": "pi"
+    "agentHarnessId": "pi",
+    "memoryFlushAt": 1778966556984,
+    "memoryFlushCompactionCount": 0,
+    "endedAt": 1778966557017,
+    "runtimeMs": 0
   },
   "agent:main:subagent:7213b758-6cbb-4fbd-8837-c9d6095790f9": {
     "spawnDepth": 1,

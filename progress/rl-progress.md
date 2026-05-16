@@ -45,3 +45,11 @@
 - oce/backend/main.py (error handling)
 - oce/backend/event_fabric.py (Pydantic v2 fix + error handling)
 - oce/backend/srrs_adapter.py (error handling)
+#### [RL] 2026-05-16 21:22 UTC — Living Error Correction System
+- Created tools/error_logger.py — error logging API with pattern detection
+- Created tools/error_analyzer.py — PM-focused pattern analysis + skill suggestions
+- Seeded error-db.json with 6 known errors from today
+- Updated AGENTS.md with Living Error Correction System section
+- All agents now have error logging rules + PM has weekly analysis workflow
+- Pattern → Action table: ≥3 occurrences → create skill, ≥2 agents → update logic, critical → add check
+- Key principle: errors are features, system learns without hard-coded handlers
