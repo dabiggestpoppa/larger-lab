@@ -126,8 +126,9 @@ class SRRSAdapter:
         if not self._initialized:
             await self.initialize()
 
-        self._topology_observer.record_event(event_type, payload)
-        return f"event_{datetime.now().timestamp()}"
+        self._topology_observer.record_edge("planner", "execution", event_type)
+        self._event_counter += 1
+        return f"event_{datetime.now().timestamp()}_{self._event_counter}"
 
     async def get_trajectory_memory(self, limit: int = 50) -> List[Dict[str, Any]]:
         """Get trajectory memory from SRRA-OPH."""
@@ -260,7 +261,7 @@ class SRRSAdapter:
             "mutation_type": contract.mutation_type,
             "target": contract.target,
             "status": contract.status.value,
-            "created_at": contract.created_at.isoformat(),
+            "created_at": contract.created_at,
         }
 
     async def validate_contract(self, contract_id: str) -> Dict[str, Any]:
@@ -268,7 +269,7 @@ class SRRSAdapter:
         if not self._initialized:
             await self.initialize()
 
-        result = self._contract_manager.validate_contract(contract_id)
+        result = self._contract_manager.validate_contract(contract_id, actual_coherence_gain=0.0, actual_entropy_cost=0.0)
         return {"contract_id": contract_id, "valid": result}
 
 
