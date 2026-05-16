@@ -5136,7 +5136,7 @@
       "accountId": "default"
     },
     "sessionId": "61cd4f6f-c0fb-4119-b861-350cb16af7fe",
-    "updatedAt": 1778960708287,
+    "updatedAt": 1778960788732,
     "sessionStartedAt": 1778960707898,
     "deliveryContext": {
       "channel": "telegram",
@@ -5147,9 +5147,509 @@
     "lastTo": "telegram:8258195396",
     "lastAccountId": "default",
     "lastInteractionAt": 1778960708285,
-    "systemSent": false,
+    "systemSent": true,
     "abortedLastRun": false,
     "chatType": "direct",
-    "sessionFile": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\.openclaw-2\\.openclaw\\agents\\main\\sessions\\61cd4f6f-c0fb-4119-b861-350cb16af7fe.jsonl"
-  }
-}
+    "sessionFile": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\.openclaw-2\\.openclaw\\agents\\main\\sessions\\61cd4f6f-c0fb-4119-b861-350cb16af7fe.jsonl",
+    "skillsSnapshot": {
+      "prompt": "⚠️ Skills truncated: included 97 of 163 (compact format, descriptions omitted). Run `openclaw skills check` to audit.\n\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its name.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>accessibility</name>\n    <location>~/Desktop\\projects\\larger-lab\\.agents\\skills\\accessibility\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-accounts-payable-agent</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-accounts-payable-agent\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-agentic-identity-trust</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-agentic-identity-trust\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-agents</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-agents\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-agents-orchestrator</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-agents-orchestrator\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-automation-governance-architect</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-automation-governance-architect\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-blockchain-security-auditor</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-blockchain-security-auditor\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-compliance-auditor</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-compliance-auditor\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-corporate-training-designer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-corporate-training-designer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-customer-service</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-customer-service\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-data-consolidation-agent</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-data-consolidation-agent\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-design-brand-guardian</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-design-brand-guardian\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-design-image-prompt-engineer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-design-image-prompt-engineer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-design-inclusive-visuals-specialist</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-design-inclusive-visuals-specialist\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-design-ui-designer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-design-ui-designer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-design-ux-architect</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-design-ux-architect\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-design-ux-researcher</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-design-ux-researcher\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-design-visual-storyteller</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-design-visual-storyteller\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-design-whimsy-injector</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-design-whimsy-injector\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-ai-data-remediation-engineer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-ai-data-remediation-engineer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-ai-engineer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-ai-engineer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-autonomous-optimization-architect</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-autonomous-optimization-architect\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-backend-architect</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-backend-architect\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-cms-developer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-cms-developer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-code-reviewer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-code-reviewer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-codebase-onboarding-engineer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-codebase-onboarding-engineer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-data-engineer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-data-engineer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-database-optimizer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-database-optimizer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-devops-automator</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-devops-automator\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-email-intelligence-engineer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-email-intelligence-engineer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-embedded-firmware-engineer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-embedded-firmware-engineer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-feishu-integration-developer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-feishu-integration-developer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-filament-optimization-specialist</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-filament-optimization-specialist\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-frontend-developer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-frontend-developer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-git-workflow-master</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-git-workflow-master\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-incident-response-commander</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-incident-response-commander\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-minimal-change-engineer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-minimal-change-engineer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-mobile-app-builder</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-mobile-app-builder\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-rapid-prototyper</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-rapid-prototyper\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-security-engineer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-security-engineer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-senior-developer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-senior-developer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-software-architect</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-software-architect\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-solidity-smart-contract-engineer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-solidity-smart-contract-engineer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-sre</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-sre\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-technical-writer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-technical-writer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-threat-detection-engineer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-threat-detection-engineer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-voice-ai-integration-engineer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-voice-ai-integration-engineer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-engineering-wechat-mini-program-developer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-engineering-wechat-mini-program-developer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-government-digital-presales-consultant</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-government-digital-presales-consultant\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-healthcare-customer-service</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-healthcare-customer-service\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-healthcare-marketing-compliance</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-healthcare-marketing-compliance\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-hospitality-guest-services</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-hospitality-guest-services\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-hr-onboarding</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-hr-onboarding\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-identity-graph-operator</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-identity-graph-operator\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-language-translator</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-language-translator\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-legal-billing-time-tracking</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-legal-billing-time-tracking\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-legal-client-intake</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-legal-client-intake\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-legal-document-review</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-legal-document-review\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-loan-officer-assistant</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-loan-officer-assistant\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-lsp-index-engineer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-lsp-index-engineer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-project-management-experiment-tracker</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-project-management-experiment-tracker\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-project-management-jira-workflow-steward</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-project-management-jira-workflow-steward\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-project-management-project-shepherd</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-project-management-project-shepherd\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-project-management-studio-operations</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-project-management-studio-operations\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-project-management-studio-producer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-project-management-studio-producer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-project-manager-senior</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-project-manager-senior\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-real-estate-buyer-seller</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-real-estate-buyer-seller\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-recruitment-specialist</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-recruitment-specialist\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-report-distribution-agent</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-report-distribution-agent\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-retail-customer-returns</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-retail-customer-returns\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-sales-data-extraction-agent</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-sales-data-extraction-agent\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-sales-outreach</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-sales-outreach\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-specialized-chief-of-staff</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-specialized-chief-of-staff\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-specialized-civil-engineer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-specialized-civil-engineer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-specialized-cultural-intelligence-strategist</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-specialized-cultural-intelligence-strategist\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-specialized-developer-advocate</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-specialized-developer-advocate\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-specialized-document-generator</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-specialized-document-generator\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-specialized-french-consulting-market</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-specialized-french-consulting-market\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-specialized-korean-business-navigator</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-specialized-korean-business-navigator\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-specialized-mcp-builder</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-specialized-mcp-builder\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-specialized-model-qa</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-specialized-model-qa\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-specialized-salesforce-architect</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-specialized-salesforce-architect\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-specialized-workflow-architect</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-specialized-workflow-architect\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-study-abroad-advisor</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-study-abroad-advisor\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-supply-chain-strategist</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-supply-chain-strategist\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-testing-accessibility-auditor</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-testing-accessibility-auditor\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-testing-api-tester</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-testing-api-tester\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-testing-evidence-collector</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-testing-evidence-collector\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-testing-performance-benchmarker</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-testing-performance-benchmarker\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-testing-reality-checker</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-testing-reality-checker\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-testing-test-results-analyzer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-testing-test-results-analyzer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-testing-tool-evaluator</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-testing-tool-evaluator\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-testing-workflow-optimizer</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-testing-workflow-optimizer\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agency-zk-steward</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agency-zk-steward\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agent-harness-sop</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agent-harness-sop\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agent-onboarding</name>\n    <location>~/Desktop\\projects\\larger-lab\\.agents\\skills\\agent-onboarding\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>agent-team-workflow</name>\n    <location>~/Desktop\\projects\\larger-lab\\skills\\agent-team-workflow\\SKILL.md</location>\n  </skill>\n</available_skills>",
+      "skills": [
+        {
+          "name": "accessibility"
+        },
+        {
+          "name": "agency-accounts-payable-agent"
+        },
+        {
+          "name": "agency-agentic-identity-trust"
+        },
+        {
+          "name": "agency-agents"
+        },
+        {
+          "name": "agency-agents-orchestrator"
+        },
+        {
+          "name": "agency-automation-governance-architect"
+        },
+        {
+          "name": "agency-blockchain-security-auditor"
+        },
+        {
+          "name": "agency-compliance-auditor"
+        },
+        {
+          "name": "agency-corporate-training-designer"
+        },
+        {
+          "name": "agency-customer-service"
+        },
+        {
+          "name": "agency-data-consolidation-agent"
+        },
+        {
+          "name": "agency-design-brand-guardian"
+        },
+        {
+          "name": "agency-design-image-prompt-engineer"
+        },
+        {
+          "name": "agency-design-inclusive-visuals-specialist"
+        },
+        {
+          "name": "agency-design-ui-designer"
+        },
+        {
+          "name": "agency-design-ux-architect"
+        },
+        {
+          "name": "agency-design-ux-researcher"
+        },
+        {
+          "name": "agency-design-visual-storyteller"
+        },
+        {
+          "name": "agency-design-whimsy-injector"
+        },
+        {
+          "name": "agency-engineering-ai-data-remediation-engineer"
+        },
+        {
+          "name": "agency-engineering-ai-engineer"
+        },
+        {
+          "name": "agency-engineering-autonomous-optimization-architect"
+        },
+        {
+          "name": "agency-engineering-backend-architect"
+        },
+        {
+          "name": "agency-engineering-cms-developer"
+        },
+        {
+          "name": "agency-engineering-code-reviewer"
+        },
+        {
+          "name": "agency-engineering-codebase-onboarding-engineer"
+        },
+        {
+          "name": "agency-engineering-data-engineer"
+        },
+        {
+          "name": "agency-engineering-database-optimizer"
+        },
+        {
+          "name": "agency-engineering-devops-automator"
+        },
+        {
+          "name": "agency-engineering-email-intelligence-engineer"
+        },
+        {
+          "name": "agency-engineering-embedded-firmware-engineer"
+        },
+        {
+          "name": "agency-engineering-feishu-integration-developer"
+        },
+        {
+          "name": "agency-engineering-filament-optimization-specialist"
+        },
+        {
+          "name": "agency-engineering-frontend-developer"
+        },
+        {
+          "name": "agency-engineering-git-workflow-master"
+        },
+        {
+          "name": "agency-engineering-incident-response-commander"
+        },
+        {
+          "name": "agency-engineering-minimal-change-engineer"
+        },
+        {
+          "name": "agency-engineering-mobile-app-builder"
+        },
+        {
+          "name": "agency-engineering-rapid-prototyper"
+        },
+        {
+          "name": "agency-engineering-security-engineer"
+        },
+        {
+          "name": "agency-engineering-senior-developer"
+        },
+        {
+          "name": "agency-engineering-software-architect"
+        },
+        {
+          "name": "agency-engineering-solidity-smart-contract-engineer"
+        },
+        {
+          "name": "agency-engineering-sre"
+        },
+        {
+          "name": "agency-engineering-technical-writer"
+        },
+        {
+          "name": "agency-engineering-threat-detection-engineer"
+        },
+        {
+          "name": "agency-engineering-voice-ai-integration-engineer"
+        },
+        {
+          "name": "agency-engineering-wechat-mini-program-developer"
+        },
+        {
+          "name": "agency-government-digital-presales-consultant"
+        },
+        {
+          "name": "agency-healthcare-customer-service"
+        },
+        {
+          "name": "agency-healthcare-marketing-compliance"
+        },
+        {
+          "name": "agency-hospitality-guest-services"
+        },
+        {
+          "name": "agency-hr-onboarding"
+        },
+        {
+          "name": "agency-identity-graph-operator"
+        },
+        {
+          "name": "agency-language-translator"
+        },
+        {
+          "name": "agency-legal-billing-time-tracking"
+        },
+        {
+          "name": "agency-legal-client-intake"
+        },
+        {
+          "name": "agency-legal-document-review"
+        },
+        {
+          "name": "agency-loan-officer-assistant"
+        },
+        {
+          "name": "agency-lsp-index-engineer"
+        },
+        {
+          "name": "agency-project-management-experiment-tracker"
+        },
+        {
+          "name": "agency-project-management-jira-workflow-steward"
+        },
+        {
+          "name": "agency-project-management-project-shepherd"
+        },
+        {
+          "name": "agency-project-management-studio-operations"
+        },
+        {
+          "name": "agency-project-management-studio-producer"
+        },
+        {
+          "name": "agency-project-manager-senior"
+        },
+        {
+          "name": "agency-real-estate-buyer-seller"
+        },
+        {
+          "name": "agency-recruitment-specialist"
+        },
+        {
+          "name": "agency-report-distribution-agent"
+        },
+        {
+          "name": "agency-retail-customer-returns"
+        },
+        {
+          "name": "agency-sales-data-extraction-agent"
+        },
+        {
+          "name": "agency-sales-outreach"
+        },
+        {
+          "name": "agency-specialized-chief-of-staff"
+        },
+        {
+          "name": "agency-specialized-civil-engineer"
+        },
+        {
+          "name": "agency-specialized-cultural-intelligence-strategist"
+        },
+        {
+          "name": "agency-specialized-developer-advocate"
+        },
+        {
+          "name": "agency-specialized-document-generator"
+        },
+        {
+          "name": "agency-specialized-french-consulting-market"
+        },
+        {
+          "name": "agency-specialized-korean-business-navigator"
+        },
+        {
+          "name": "agency-specialized-mcp-builder"
+        },
+        {
+          "name": "agency-specialized-model-qa"
+        },
+        {
+          "name": "agency-specialized-salesforce-architect"
+        },
+        {
+          "name": "agency-specialized-workflow-architect"
+        },
+        {
+          "name": "agency-study-abroad-advisor"
+        },
+        {
+          "name": "agency-supply-chain-strategist"
+        },
+        {
+          "name": "agency-testing-accessibility-auditor"
+        },
+        {
+          "name": "agency-testing-api-tester"
+        },
+        {
+          "name": "agency-testing-evidence-collector"
+        },
+        {
+          "name": "agency-testing-performance-benchmarker"
+        },
+        {
+          "name": "agency-testing-reality-checker"
+        },
+        {
+          "name": "agency-testing-test-results-analyzer"
+        },
+        {
+          "name": "agency-testing-tool-evaluator"
+        },
+        {
+          "name": "agency-testing-workflow-optimizer"
+        },
+        {
+          "name": "agency-zk-steward"
+        },
+        {
+          "name": "agent-harness-sop"
+        },
+        {
+          "name": "agent-onboarding"
+        },
+        {
+          "name": "agent-team-workflow"
+        },
+        {
+          "name": "as-code-review"
+        },
+        {
+          "name": "browser-automation"
+        },
+        {
+          "name": "claude-hermes-mcp"
+        },
+        {
+          "name": "cli-anything"
+        },
+        {
+          "name": "context-compaction"
+        },
+        {
+          "name": "create-tool"
+        },
+        {
+          "name": "fastapi-python"
+        },
+        {
+          "name": "fastapi-templates"
+        },
+        {
+          "name": "frontend-design"
+        },
+        {
+          "name": "gh-issues",
+          "primaryEnv": "GH_TOKEN",
+          "requiredEnv": []
+        },
+        {
+          "name": "github",
+          "requiredEnv": []
+        },
+        {
+          "name": "healthcheck"
+        },
+        {
+          "name": "hermes-workflows"
+        },
+        {
+          "name": "md2html"
+        },
+        {
+          "name": "motus"
+        },
+        {
+          "name": "mt5-strategy-tester"
+        },
+        {
+          "name": "next-best-practices"
+        },
+        {
+          "name": "next-cache-components"
+        },
+        {
+          "name": "next-upgrade"
+        },
+        {
+          "name": "node-connect"
+        },
+        {
+          "name": "nodejs-backend-patterns"
+        },
+        {
+          "name": "pandas-pro"
+        },
+        {
+          "name": "pdf-omni"
+        },
+        {
+          "name": "pine-debugger"
+        },
+        {
+          "name": "pine-developer"
+        },
+        {
+          "name": "pine-manager"
+        },
+        {
+          "name": "pine-publisher"
+        },
+        {
+          "name": "pine-visualizer"
+        },
+        {
+          "name": "project-workflow-analysis-blueprint-generator"
+        },
+        {
+          "name": "python-executor"
+        },
+        {
+          "name": "python-patterns"
+        },
+        {
+          "name": "python-testing-patterns"
+        },
+        {
+          "name": "quant-analyst"
+        },
+        {
+          "name": "quantitative-research"
+        },
+        {
+          "name": "scikit-learn"
+        },
+        {
+          "name": "senior-data-scientist"
+        },
+        {
+          "name": "seo"
+        },
+        {
+          "name": "skill-creator"
+        },
+        {
+          "name": "sleek-design-mobile-apps"
+        },
+        {
+          "name": "social-media-agent"
+        },
+        {
+          "name": "srra-oph-build"
+        },
+        {
+          "name": "statistical-analysis"
+        },
+        {
+          "name": "subagent-manager"
+        },
+        {
+          "name": "taskflow"
+        },
+        {
+          "name": "taskflow-inbox-triage"
+        },
+        {
+          "name": "threejs-animation"
+        },
+        {
+          "name": "threejs-fundamentals"
+        },
+        {
+          "name": "threejs-geometry"
+        },
+        {
+          "name": "threejs-interaction"
+        },
+        {
+          "name": "threejs-lighting"
+        },
+        {
+          "name": "threejs-loaders"
+        },
+        {
+          "name": "threejs-materials"
+        },
+        {
+          "name": "threejs-postprocessing"
+        },
+        {
+          "name": "threejs-shaders"
+        },
+        {
+          "name": "threejs-textures"
+        },
+        {
+          "name": "tradingview-quantitative"
+        },
+        {
+          "name": "twitter-bookmarks"
+        },
+        {
+          "name": "use-my-browser"
+        },
+        {
+          "name": "variance-analysis"
+        },
+        {
+          "name": "vectorbt-expert"
+        },
+        {
+          "name": "vercel-composition-patterns"
+        },
+        {
+          "name": "vercel-react-best-practices"
+        },
+        {
+          "name": "video-frames",
+          "requiredEnv": []
+        },
+        {
+          "name": "weather",
+          "requiredEnv": []
+        },
+        {
+          "name": "web-design-guidelines"
+        },
+        {
+          "name": "xurl",
+          "requiredEnv": []
+        }
+      ],
+      "version": 0
+    },
+    
