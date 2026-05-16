@@ -28,8 +28,8 @@ def test_1_topology_tracking():
 
     topology = observer.get_topology_map()
     assert len(topology["patches"]) == 4
-    assert topology["edge_count"] == 4
-    print(f"  OK: {len(topology['patches'])} patches, {topology['edge_count']} edges")
+    assert len(topology["edges"]) == 4
+    print(f"  OK: {len(topology['patches'])} patches, {len(topology['edges'])} edges")
     print("  PASS Test 1")
 
 

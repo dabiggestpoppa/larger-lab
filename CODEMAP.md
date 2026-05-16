@@ -1,6 +1,6 @@
 # CODEMAP — Larger-Lab Workspace Guide
 
-> **Last Updated:** 2026-05-16 | **Phase:** 4 (Workspace Integration)
+> **Last Updated:** 2026-05-16 | **Phase:** 7 (Overlap Cognition) — COMPLETE
 > **Purpose:** Quick orientation for agents joining the workspace. For full architecture, see `SYSTEM_ARCHITECTURE.md`.
 
 ---
@@ -19,10 +19,8 @@ uv venv .venv
 # 3. Install deps
 uv pip install -r requirements.txt
 
-# 4. Run all SRRA-OPH tests
-python -m srrs_opc.tests.test_phase2_e2e
-python -m srrs_opc.tests.test_phase3_e2e
-python -m srrs_opc.tests.test_phase4_e2e
+# 4. Run all SRRA-OPH tests (39 total)
+python -m pytest srrs_opc/tests/ -v
 ```
 
 ---
@@ -31,17 +29,20 @@ python -m srrs_opc.tests.test_phase4_e2e
 
 ```
 larger-lab/
-  srrs_opc/           ← SRRA-OPH core (25 Python files + tests + docs)
+  srrs_opc/           ← SRRA-OPH core (33 Python files + tests + docs)
   nautilus/           ← NautilusTrader backtesting (strategies, data, reports)
   agent-lab/agents/   ← Hermes + OpenClaw agent configs
   skills/             ← Workspace skills (srra-oph-build, twitter-bookmarks, etc.)
   .agents/skills/     ← Agent-specific skills (40+ trading, quant, ML, Pine)
   .github/skills/     ← GitHub skills (docx, xlsx, pptx, pdf, etc.)
-  progress/           ← Agent sub-progress files (CC/OC/HR/AS/PM)
+  progress/           ← Agent sub-progress files (CC/OC/OC2/AS/PM/RL)
   all-mermaids/       ← All Mermaid diagrams (phase1-5, phase6-9)
   docs/               ← Documentation, images, phase progress files
   tools/              ← Automation scripts, binaries, workspace files
   shared-conversations/ ← Team chat (team-chat.md)
+  tasks/              ← Phase task plans and resource assessments
+  copilotkit-integration/ ← CopilotKit server integration
+  memory/             ← Memory bank and session storage
 ```
 
 > 📊 **All Mermaid diagrams** have been extracted to `all-mermaids/` for easy reference.
@@ -88,15 +89,20 @@ graph TB
 
 | Directory | Purpose | Key Files |
 |-----------|---------|-----------|
-| `srrs_opc/` | SRRA-OPH Phase 1 implementation | `base_patch.py`, `planner_patch.py`, `execution_patch.py`, `memory_patch.py`, `repair_patch.py`, `collar_layer.py` |
+| `srrs_opc/` | SRRA-OPH core (all 7 phases) | `base_patch.py`, `collar_layer.py`, `collar_topology_engine.py`, `structural_memory.py`, `prediction_contracts.py`, `attractor_reasoning.py`, 33 total Python files |
+| `srrs_opc/tests/` | Test suites (7 files, 39 tests) | `test_phase1.py` through `test_phase7_e2e.py` |
 | `nautilus/` | Trading strategies & backtests | `strategies/`, `data/`, `reports/` |
 | `.hermes/` | Hermes agent configuration | `MEMORY.md`, `SOUL.md`, `skills/` |
 | `.openclaw/` | OpenClaw configuration | `openclaw.json`, `openclaw_prompt.md` |
-| `usb-cloud/` | Cloud storage mesh | `usb-mesh.ps1`, `cloud-server-setup.sh` |
+| `.openclaw-2/` | OpenClaw 2 configuration | `MEMORY.md`, gateway config |
+| `progress/` | Agent sub-progress files | CC, OC, OC2, AS, PM, RL progress + memory |
+| `tasks/` | Phase task plans | `RESOURCE-ASSESSMENT-2026-05-16.md`, phase plans |
+| `copilotkit-integration/` | CopilotKit server | `server.py`, `Dockerfile`, `docker-compose.yml` |
+| `memory/` | Memory bank storage | Session and repo memory |
 
 ---
 
-## SRRA-OPH Architecture (Phases 1-5, Book 2 Updated)
+## SRRA-OPH Architecture (Phases 1-7, Book 2 Updated)
 
 ### Phase 1: Foundational Observer Mesh ✅
 - 4 observer patches (Planner, Execution, Memory, Repair)
@@ -113,7 +119,7 @@ graph TB
 - **Constraint Propagator** — Event-driven constraint propagation
 - 7/7 integration tests passing
 
-### Phase 3: Emergent Topology (Book 2 Updated) 🔄
+### Phase 3: Emergent Topology (Book 2 Updated) ✅
 **Core shift:** Overlap collars are now the continuity engine, not observer nodes.
 
 - **Active Collar Fields** — Edges are active computational reconciliation regions
@@ -123,9 +129,9 @@ graph TB
 - **Constraint Resonance Clustering** — Clusters form from overlap compatibility
 - **Minimal Stable Realization (MSR)** — min topology for recoverable coherence
 - **Entropy-Aware Overlap Scaling** — Sublinear overlap density growth
-- 4/4 original tests passing + new overlap-first tests needed
+- 4/4 original tests passing + 6/6 Book 2 tests passing = 10/10 total
 
-### Phase 4: Workspace Integration (Book 2 Updated) 📋
+### Phase 4: Workspace Integration (Book 2 Updated) ✅
 **Core shift:** Tools become capability fields, not isolated endpoints.
 
 - **Capability Fields** — Distributed execution potentials with entropy/reconstruction profiles
@@ -134,8 +140,9 @@ graph TB
 - **Repair-Mediated Orchestration** — Continuous contradiction mediation
 - **Entropy-Aware Scheduling** — Optimizes coherence per resource cost
 - **Minimal Execution Realization (MER)** — Min execution topology for recoverable outcomes
+- 6/6 tests passing
 
-### Phase 5: Long-Horizon Continuity (Book 2 Updated) 📋
+### Phase 5: Long-Horizon Continuity (Book 2 Updated) ✅
 **Core shift:** Identity is reconstructable trajectory, not persistent state.
 
 - **Trajectory Reconstruction Fields** — Continuity from sparse overlap evidence
@@ -144,6 +151,27 @@ graph TB
 - **Repair-Generated Persistence** — Active repair-driven persistence
 - **Temporal Attractor Stabilization** — Soft constraints on reconstruction paths
 - **Minimal Continuity Realization (MCR)** — Min continuity structure for recoverability
+- 5/5 tests passing
+
+### Phase 6: Recursive Topology Introspection ✅
+**Core shift:** System models itself, optimizes its own repair.
+
+- **Topology Observer** — Self-modeling + efficiency analysis
+- **Synchronization Analytics** — Sync cost analysis
+- **Repair Efficiency** — Repair optimization suggestions
+- **Snapshot History** — Topology snapshots over time
+- 5/5 tests passing
+
+### Phase 7: Overlap Cognition ✅
+**Core shift:** Cognition emerges in overlap, not inside observers.
+
+- **Overlap-Native Cognition** — Cognition emerges in overlap
+- **Collar Entropy Tracking** — Instability in overlap
+- **Prediction Contracts** — Falsifiable evolution
+- **Attractor Reasoning** — Directional coherence
+- **Multi-Scale Metrics** — System-wide metrics
+- **Structural Memory** — Persistent cognitive structure
+- 6/6 tests passing
 
 ### Full SRRA-OPH Topology (Phases 1-9, Book 2)
 

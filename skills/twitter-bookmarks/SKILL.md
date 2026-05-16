@@ -1,10 +1,11 @@
 ---
 name: twitter-bookmarks
 description: >
-  Read and organize Twitter/X bookmarks using OpenClaw's built-in browser tool.
+  Read and organize Twitter/X bookmarks and tweets using OpenClaw's built-in browser tool.
   No API keys needed — uses your existing Chrome login session.
   Trigger when user says "get my bookmarks", "pull bookmarks", "read twitter bookmarks",
-  "what did I save on twitter", "twitter bookmarks", or "/bookmarks".
+  "what did I save on twitter", "twitter bookmarks", "/bookmarks", "read tweet", "twitter",
+  or any request to access Twitter/X content.
 platforms: [windows, linux, macos]
 ---
 

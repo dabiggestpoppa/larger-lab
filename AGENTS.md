@@ -1,7 +1,7 @@
 # AGENTS.md — SRRA-OPH Team Manifest
 
 > **Last Updated:** May 16, 2026
-> **Current Phase:** Phase 4 — Workspace Integration
+> **Current Phase:** Phase 8 — Sovereign Coevolution (Planned)
 
 ---
 
@@ -11,9 +11,10 @@
 |-----|-------|------|---------------|
 | 🔵 CC | Claude Code | Overseer / Architecture / Core Build | `progress/claude-code-progress.md` |
 | 🟣 OC | OpenClaw | Analysis / Planning / Coordination | `progress/openclaw-progress.md` |
-| 🟢 HR | Hermes | Execution / Testing / Reporting | `progress/hermes-progress.md` |
+| 🟠 OC2 | OpenClaw 2 | Execution / Testing / Reporting / Discord | `progress/openclaw-2-progress.md` |
 | 🟡 AS | Assistant Manager | Context Monitoring / Quality / Documentation | `progress/assistant-progress.md` |
 | 🔴 PM | Polymorph (Hawk) | Debugger / Tool & Skill Builder | `progress/polymorph-progress.md` |
+| 🟢 RL | OWL (Research Lead) | Research / DSPy Integration / Pipeline Optimization | `progress/rl-progress.md` |
 
 ---
 
@@ -36,10 +37,13 @@
 | Phase 2 (Reconstruction + Recoverability) | ✅ Complete | 7/7 passing |
 | Phase 3 (Emergent Topology) | ✅ Complete | 4/4 passing |
 | Phase 3 Book 2 (Updated Architecture) | ✅ Complete | 6/6 passing |
-| Phase 4 (Workspace Integration) | 🔄 Active | 6/6 passing |
-| Phase 5-9 | ⏳ Planned | AS resource assessment complete |
+| Phase 4 (Workspace Integration) | ✅ Complete | 6/6 passing |
+| Phase 5 (Long-Horizon Continuity) | ✅ Complete | 5/5 passing |
+| Phase 6 (Recursive Topology Introspection) | ✅ Complete | 5/5 passing |
+| Phase 7 (Overlap Cognition) | ✅ Complete | 6/6 passing |
+| Phase 8-9 | ⏳ Planned | AS resource assessment complete |
 
-**Total: 23 tests passing**
+**Total: 39 tests passing**
 
 ---
 
@@ -47,8 +51,8 @@
 
 | File | Purpose |
 |------|---------|
-| `srrs_opc/` | SRRA-OPH core module (22 Python files) |
-| `srrs_opc/tests/` | Test suites (4 files, 23 tests) |
+| `srrs_opc/` | SRRA-OPH core module (33 Python files) |
+| `srrs_opc/tests/` | Test suites (7 files, 39 tests) |
 | `srrs_opc/docs/` | Design docs, resource assessment |
 | `progress/` | Agent sub-progress files + memory |
 | `shared-conversations/team-chat.md` | Team coordination hub |

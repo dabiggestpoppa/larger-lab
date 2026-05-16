@@ -14,12 +14,12 @@
       "color": "🟣",
       "progress_prefix": "OC"
     },
-    "hermes": {
-      "tag": "HR",
-      "name": "Hermes",
-      "role": "Execution / Backtests / Testing / Reporting",
-      "color": "🟢",
-      "progress_prefix": "Hermes"
+    "openclaw-2": {
+      "tag": "OC2",
+      "name": "OpenClaw 2",
+      "role": "Execution / Backtests / Reporting / Discord + Telegram",
+      "color": "🟠",
+      "progress_prefix": "OC2"
     },
     "assistant": {
       "tag": "AS",
@@ -34,6 +34,13 @@
       "role": "Debugger / Workflow Optimizer / Tool & Skill Builder",
       "color": "🔴",
       "progress_prefix": "PM"
+    },
+    "research-lead": {
+      "tag": "RL",
+      "name": "OWL",
+      "role": "Research Lead / DSPy Integration / Pipeline Optimization",
+      "color": "🦉",
+      "progress_prefix": "RL"
     }
   },
   "progress_header_format": "{emoji} [{tag}] {agent-name} — {timestamp}",

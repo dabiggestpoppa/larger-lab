@@ -1,11 +1,11 @@
 # SYSTEM ARCHITECTURE — Quant Lab Agent Network
-> Version: 1.0 | Date: 2026-05-15 | Status: ACTIVE
+> Version: 1.1 | Date: 2026-05-16 | Status: ACTIVE
 
 ---
 
 ## 1. OVERVIEW
 
-Three-agent system where the human is the **Board of Directors** (sets direction, approves strategy), I am the **CEO** (architect, delegator, quality gate), and Hermes + OpenClaw are **autonomous execution agents** that operate in the background.
+Six-agent system where the human is the **Board of Directors** (sets direction, approves strategy), CC is the **Overseer/Architect**, and OC/OC2/AS/PM/RL are **autonomous execution agents** that operate in the background.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -33,11 +33,12 @@ Three-agent system where the human is the **Board of Directors** (sets direction
 - **Core responsibility:** Take structured task briefs from OpenClaw, execute Nautilus backtests, report results
 - **Output contract:** Every backtest produces a Nautilus report JSON + a progress summary entry
 
-### Overseer (Me) — The CEO
+### Claude Code (CC) — The Overseer
 - **Role:** Define objectives, architect workflows, review outputs, handle escalations, maintain system integrity
-- **Interface:** This conversation + file system inspection
+- **Interface:** VS Code + this conversation + file system inspection
 - **Core responsibility:** Ensure the system produces coherent results and improves over time
 - **Output contract:** Architecture decisions, task assignments, quality reviews
+- **Phase authority:** Only CC can advance phases via `python tools/phase-gate.py --advance`
 
 ### Polymorph (PM) — The Debugger & Tool Builder
 - **Role:** Debug workspace/agent issues, optimize workflows, build tools & skills from repos, automate repetitive tasks
@@ -46,6 +47,14 @@ Three-agent system where the human is the **Board of Directors** (sets direction
 - **Core responsibility:** Keep the machine running — diagnose problems before they cascade, convert GitHub repos into agent tools, build cron jobs and automation
 - **Output contract:** Bug fixes, new tools/skills, automation scripts, workflow improvements
 - **Status:** 🟢 Active — Standing by for AS or CC task assignments
+
+### OWL (RL) — The Research Lead
+- **Role:** Research, DSPy integration, pipeline optimization, tool evaluation
+- **Interface:** Workspace files + progress tracking + team chat
+- **Workspace:** `progress/rl-progress.md`
+- **Core responsibility:** Evaluate and integrate new AI tools with minimal disruption
+- **Output contract:** Research reports, integration plans, pipeline improvements
+- **Status:** 🟢 Active — Registered 2026-05-16
 
 ## 3. DATA FLOW — The Task Lifecycle
 

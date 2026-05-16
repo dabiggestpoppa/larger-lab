@@ -62,13 +62,13 @@ AGENTS = {
         "memory_file": "progress/openclaw-memory.md",
         "section_header": "🟣 [OC] OpenClaw",
     },
-    "HR": {
-        "tag": "HR",
-        "name": "Hermes",
-        "emoji": "🟢",
-        "progress_file": "progress/hermes-progress.md",
-        "memory_file": "progress/hermes-memory.md",
-        "section_header": "🟢 [HR] Hermes",
+    "OC2": {
+        "tag": "OC2",
+        "name": "OpenClaw 2",
+        "emoji": "🟠",
+        "progress_file": "progress/openclaw-2-progress.md",
+        "memory_file": "progress/openclaw-2-memory.md",
+        "section_header": "🟠 [OC2] OpenClaw 2",
     },
     "PM": {
         "tag": "PM",
@@ -85,6 +85,14 @@ AGENTS = {
         "progress_file": "progress/assistant-progress.md",
         "memory_file": "progress/assistant-memory.md",
         "section_header": "🟡 [AS] Assistant Manager",
+    },
+    "RL": {
+        "tag": "RL",
+        "name": "OWL",
+        "emoji": "🦉",
+        "progress_file": "progress/rl-progress.md",
+        "memory_file": "progress/rl-memory.md",
+        "section_header": "🦉 [RL] OWL",
     },
 }
 
@@ -354,7 +362,7 @@ def append_to_persistent_memory(agent_tag: str):
     # Persistent memory file paths (hand-managed, contains credentials etc.)
     persistent_map = {
         "OC": ".openclaw/MEMORY.md",
-        "HR": ".hermes/MEMORY.md",
+        "OC2": ".openclaw-2/MEMORY.md",
         "CC": "",  # Claude Code doesn't have a separate persistent file
         "AS": "progress/assistant-memory.md",
         "PM": "progress/polymorph-memory.md",
@@ -471,7 +479,7 @@ def main():
     parser.add_argument("--force", action="store_true", help="Force sync regardless of count")
     parser.add_argument("--reset", action="store_true", help="Reset all counters")
     parser.add_argument("--status", action="store_true", help="Show current counts and last sync")
-    parser.add_argument("--agent", choices=["CC", "OC", "HR"], help="Sync specific agent only")
+    parser.add_argument("--agent", choices=["CC", "OC", "OC2", "PM", "AS"], help="Sync specific agent only")
     args = parser.parse_args()
 
     counters = load_counters()

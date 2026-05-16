@@ -41,6 +41,15 @@ from .temporal_attractors import TemporalAttractor, AttractorField
 from .drift_tracker import LongTermDriftTracker, DriftSignal
 from .reinforcement_engine import ReinforcementEngine, ReinforcementRecord
 
+# Phase 6: Recursive Topology Introspection
+from .topology_observer import TopologyObserver, TopologySnapshot
+from .collar_topology_engine import CollarTopologyEngine, CollarMetrics
+from .prediction_contracts import PredictionContractManager, PredictionContract, ContractStatus
+
+# Phase 7: Multi-Scale Overlap Ecologies
+from .attractor_reasoning import AttractorReasoningEngine, AttractorState
+from .structural_memory import StructuralMemoryFields, StructuralMemoryEntry, MemoryLayer
+
 __all__ = [
     # Phase 1
     "BasePatch", "CollarState",
