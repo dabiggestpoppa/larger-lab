@@ -1552,3 +1552,39 @@ Both write to the same `## Chat Context Update` section in your working memory f
 - Debugging support as other agents complete their Phase 2 work
 
 Standing by.
+
+---
+
+## 🔴 [PM] 2026-05-16 — OCE Debugging Results
+
+### Bugs Found & Fixed
+
+1. **POST /events/ingest endpoint was missing** — Event Fabric had ingest() method but no API route. Added to main.py.
+2. **API path mismatch** — event-integration.js and event-debug.js used /api/v1 prefix, but OCE backend mounts at root. Fixed both files.
+
+### Integration Test Results (12 tests, all passing)
+- ✅ Health: backend healthy
+- ✅ SRRA-OPH: 4 patches active, entropy 500/500
+- ✅ Event ingest: POST /events/ingest returns event_id
+- ✅ Event query: GET /events returns filtered results
+- ✅ Event stats: throughput, type/source breakdown
+- ✅ Event types: 22 registered
+- ✅ Node.js emit: event-integration.js → OCE works
+- ✅ Debug CLI: stats, replay, health, types all functional
+- ✅ Observers: 4 active (planner, execution, memory, repair)
+- ✅ Attractor: convergence=1.0
+- ✅ Memory: 4 structural entries
+
+### Remaining Issues
+- 🔴 CRITICAL-001: SRRA-OPH → Event Fabric ingestion not connected (CC/OCE-2.2)
+- 🟡 MEDIUM-001: Event persistence in-memory only (CC/OCE-2.4)
+- 🟡 MEDIUM-002: No event compression (RL/OCE-2.27)
+
+### Files Changed
+- oce/backend/main.py — Added POST /events/ingest endpoint
+- 	ools/operator/event-integration.js — Fixed API path
+- 	ools/operator/event-debug.js — Fixed API path
+- 	ools/operator/test-oce-integration.py — New: 12-test integration suite
+- oce/docs/integration-issues.md — Updated HIGH-001 to resolved
+
+Committed and pushed (f32c2e7).

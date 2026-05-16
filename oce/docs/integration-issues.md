@@ -24,11 +24,10 @@
 - **Assigned:** CC (OCE-2.2)
 
 ### 🟠 HIGH-001: Operator Tools Can't Reach OCE Backend
-- **Status:** Open
-- **Discovered:** 2026-05-16
-- **Description:** `event-integration.js` assumes OCE backend at `127.0.0.1:8000`. If backend isn't running, all operator→event calls fail silently.
-- **Impact:** Operator actions don't appear in Event Fabric. No error surfaced to user.
-- **Fix Required:** Add connection retry, fallback to local queue, and health check before emitting.
+- **Status:** ✅ Resolved
+- **Discovered:** 2026-05-16 | **Fixed:** 2026-05-16
+- **Description:** `event-integration.js` used `/api/v1` prefix but OCE backend mounts routes at root.
+- **Fix:** Removed `/api/v1` prefix from event-integration.js and event-debug.js. Added health check endpoint.
 - **Assigned:** PM (OCE-2.20)
 
 ### 🟠 HIGH-002: VS Code Controller CLI Detection Fails on Clean Windows
