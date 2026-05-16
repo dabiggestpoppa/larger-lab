@@ -74,20 +74,24 @@ def _run_code(args: List[str], timeout: int = 30, capture: bool = True) -> Tuple
 
 
 def _get_desktop_controller():
-    """Lazy-import DesktopController to avoid circular deps."""
-    try:
-        from tools.operator.desktop_control import DesktopController
-        return DesktopController()
-    except ImportError:
-        # Fallback: try direct import if running from tools/operator/
-        try:
-            from desktop_control import DesktopController
-            return DesktopController()
-        except ImportError:
-            raise ImportError(
-                "Cannot import DesktopController. "
-                "Run from workspace root or ensure tools/operator/ is on PYTHONPATH."
-            )
+    """Lazy-import DesktopController, handling hyphenated filename."""
+    import importlib
+    import sys
+    import os
+
+    # The file is named desktop-control.py (hyphen), which Python can't import directly.
+    # Use importlib to load it by path.
+    op_dir = os.path.dirname(os.path.abspath(__file__))
+    dc_path = os.path.join(op_dir, "desktop-control.py")
+
+    if not os.path.isfile(dc_path):
+        raise ImportError(f"desktop-control.py not found at: {dc_path}")
+
+    # Check if already loaded
+    spec = importlib.util.spec_from_file_location("desktop_control", dc_path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.DesktopController()
 
 
 # ─── VS Code Bridge ──────────────────────────────────────────────────────────
@@ -229,7 +233,7 @@ class VSCodeBridge:
         extensions = []
         for line in out.splitlines():
             line = line.strip()
-            if "@' in line:
+            if "@" in line:
                 name, version = line.rsplit("@", 1)
                 extensions.append({"id": name, "version": version})
             elif line:

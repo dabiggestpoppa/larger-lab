@@ -43,7 +43,21 @@ COUNTER_FILE = LAB_ROOT / ".progress-sync-counters.json"
 
 SYNC_THRESHOLD = 7  # Sync every 7 updates per agent
 SUMMARIZE_THRESHOLD = 20  # Summarize progress file when entries exceed this
+ERROR_SYNC_THRESHOLD = 7  # Sync errors file every 7 new entries
 SCAN_INTERVAL = 60  # Seconds between scans
+
+# Files tracked by the daemon (beyond agent progress files)
+TRACKED_FILES = {
+    "errors": {
+        "path": "memory-bank/errors-and-solutions.md",
+        "counter_key": "errors_and_solutions",
+        "max_entry_lines": 10,  # Anti-bloat: max 10 lines per error entry
+    },
+    "workspace_state": {
+        "path": "memory-bank/workspace-state.md",
+        "counter_key": "workspace_state",
+    },
+}
 
 # OpenRouter config
 OPENROUTER_API_KEY = "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"

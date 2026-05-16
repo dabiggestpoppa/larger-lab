@@ -13,7 +13,17 @@ from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 import uvicorn
 
-from desktop_control import DesktopController, ScreenRegion
+import importlib
+import os as _os
+
+_op_dir = _os.path.dirname(_os.path.abspath(__file__))
+_dc_spec = importlib.util.spec_from_file_location(
+    "desktop_control", _os.path.join(_op_dir, "desktop-control.py")
+)
+_dc_mod = importlib.util.module_from_spec(_dc_spec)
+_dc_spec.loader.exec_module(_dc_mod)
+DesktopController = _dc_mod.DesktopController
+ScreenRegion = _dc_mod.ScreenRegion
 
 app = FastAPI(
     title="OCE Desktop Control API",
@@ -331,6 +341,196 @@ async def vscode_status():
             "workspaces": workspaces,
             "extensions_count": extensions.get("count", 0),
         }
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+# ─── System Operator ──────────────────────────────────────────────────────
+
+from system_operator import SystemOperator
+
+sysop = SystemOperator()
+
+
+# ─── System Models ──────────────────────────────────────────────────────────
+
+class ProcessFilterRequest(BaseModel):
+    filter: Optional[str] = None
+
+class ProcessKillRequest(BaseModel):
+    pid: Optional[int] = None
+    name: Optional[str] = None
+
+class ProcessStartRequest(BaseModel):
+    command: str
+    detached: bool = True
+
+class PackageRequest(BaseModel):
+    package: str
+    manager: str = "pip"
+
+class EnvSetRequest(BaseModel):
+    name: str
+    value: str
+
+class ServiceControlRequest(BaseModel):
+    name: str
+    action: str  # start, stop
+
+class PingRequest(BaseModel):
+    host: str
+    count: int = 4
+
+class PortCheckRequest(BaseModel):
+    host: str
+    port: int
+
+
+# ─── System Endpoints ───────────────────────────────────────────────────────
+
+@app.get("/system/processes")
+async def system_processes(filter: Optional[str] = None):
+    """List running processes. Optional ?filter=name."""
+    try:
+        procs = sysop.processes.list_processes(filter)
+        return {"ok": True, "processes": procs, "count": len(procs)}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.post("/system/process/kill")
+async def system_kill_process(req: ProcessKillRequest):
+    """Kill a process by PID or name."""
+    try:
+        result = sysop.processes.kill_process(pid=req.pid, name=req.name)
+        return result
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.post("/system/process/start")
+async def system_start_process(req: ProcessStartRequest):
+    """Start a new process."""
+    try:
+        result = sysop.processes.start_process(req.command, req.detached)
+        return result
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.get("/system/packages")
+async def system_packages(manager: str = "pip"):
+    """List installed packages (pip or npm)."""
+    try:
+        pkgs = sysop.packages.list_packages(manager)
+        return {"ok": True, "packages": pkgs, "count": len(pkgs), "manager": manager}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.post("/system/package/install")
+async def system_install_package(req: PackageRequest):
+    """Install a package via pip or npm."""
+    try:
+        result = sysop.packages.install_package(req.package, req.manager)
+        return result
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.get("/system/env")
+async def system_env():
+    """Get environment variables."""
+    try:
+        env = sysop.environment.get_env_vars()
+        return {"ok": True, "env": env, "count": len(env)}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.post("/system/env/set")
+async def system_set_env(req: EnvSetRequest):
+    """Set an environment variable (user scope)."""
+    try:
+        result = sysop.environment.set_env_var(req.name, req.value)
+        return result
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.get("/system/info")
+async def system_info():
+    """Get system info (OS, CPU, memory)."""
+    try:
+        info = sysop.environment.get_system_info()
+        return {"ok": True, "info": info}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.get("/system/disk")
+async def system_disk():
+    """Get disk usage per drive."""
+    try:
+        disks = sysop.environment.get_disk_usage()
+        return {"ok": True, "disks": disks}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.get("/system/services")
+async def system_services(filter: Optional[str] = None):
+    """List Windows services. Optional ?filter=name."""
+    try:
+        services = sysop.services.list_services(filter)
+        return {"ok": True, "services": services, "count": len(services)}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.post("/system/service/control")
+async def system_service_control(req: ServiceControlRequest):
+    """Start or stop a Windows service."""
+    try:
+        if req.action == "start":
+            result = sysop.services.start_service(req.name)
+        elif req.action == "stop":
+            result = sysop.services.stop_service(req.name)
+        else:
+            raise HTTPException(400, f"Unknown action: {req.action}. Use 'start' or 'stop'.")
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.get("/system/network")
+async def system_network():
+    """Get network info (IP addresses, interfaces)."""
+    try:
+        info = sysop.network.get_network_info()
+        return {"ok": True, "network": info}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.post("/system/ping")
+async def system_ping(req: PingRequest):
+    """Ping a host."""
+    try:
+        result = sysop.network.ping(req.host, req.count)
+        return result
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.post("/system/port/check")
+async def system_check_port(req: PortCheckRequest):
+    """Check if a port is open on a host."""
+    try:
+        result = sysop.network.check_port(req.host, req.port)
+        return result
     except Exception as e:
         raise HTTPException(500, str(e))
 
