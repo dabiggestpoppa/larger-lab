@@ -202,7 +202,7 @@ def test_5_bidirectional_coherence():
         ("Consider reducing position size", "reduced position size", True),
         ("Consider reducing position size", "kept position same", False),
         ("Look at mean-reversion setups", "looked at mean-reversion setups", True),
-        ("Look at mean-reversion setups", "looked at momentum instead", True),
+        ("Look at mean-reversion setups", "looked at momentum instead", False),
         ("Review stop loss levels", "reviewed stop loss levels", True),
         ("Review stop loss levels", "reviewed stop loss levels", True),
         ("Consider taking profits", "took profits", True),

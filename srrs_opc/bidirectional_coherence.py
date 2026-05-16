@@ -106,9 +106,27 @@ class BidirectionalCoherenceEngine:
         if suggestion_lower == action_lower:
             return True
 
-        stop_words = {"the", "a", "an", "to", "is", "of", "in", "at", "on", "for"}
+        stop_words = {"the", "a", "an", "to", "is", "of", "in", "at", "on", "for", "instead"}
+
+        # Common irregular verb mappings (past/participle -> base)
+        irregular_verbs = {
+            "took": "take", "taken": "take",
+            "looked": "look", "looking": "look",
+            "reduced": "reduce", "reducing": "reduce",
+            "reviewed": "review", "reviewing": "review",
+            "held": "hold", "holding": "hold",
+            "went": "go", "going": "go",
+            "ran": "run", "running": "run",
+            "gave": "give", "giving": "give",
+            "made": "make", "making": "make",
+            "said": "say", "saying": "say",
+            "got": "get", "getting": "get",
+            "set": "set", "setting": "set",
+        }
 
         def stem(word: str) -> str:
+            if word in irregular_verbs:
+                return irregular_verbs[word]
             for suffix in ("ing", "ed", "es", "s", "ly", "er", "est"):
                 if word.endswith(suffix) and len(word) > len(suffix) + 2:
                     return word[:-len(suffix)]
@@ -117,15 +135,20 @@ class BidirectionalCoherenceEngine:
         suggestion_terms = [stem(w) for w in suggestion_lower.split() if w not in stop_words]
         action_terms = [stem(w) for w in action_lower.split() if w not in stop_words]
 
-        if not suggestion_terms:
+        if not suggestion_terms or not action_terms:
             return False
 
         matches = 0
         for s_term in suggestion_terms:
             for a_term in action_terms:
-                if s_term in a_term or a_term in s_term:
+                if s_term == a_term or s_term in a_term or a_term in s_term:
                     matches += 1
                     break
+                # Shared prefix of 3+ chars (catches near-matches)
+                if len(s_term) >= 3 and len(a_term) >= 3:
+                    if s_term[:3] == a_term[:3]:
+                        matches += 1
+                        break
 
         return matches >= len(suggestion_terms) * 0.5
 
