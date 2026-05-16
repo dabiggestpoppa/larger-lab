@@ -11,7 +11,7 @@ Provides endpoints for:
 - Memory view
 """
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
@@ -107,7 +107,7 @@ async def get_observer_status():
 
 
 @app.get("/events", response_model=List[Event])
-async def get_events(limit: int = 50):
+async def get_events(limit: int = Query(50, ge=1, le=1000)):
     """Live event feed from event fabric."""
     adapter = await get_adapter()
     # TODO: Integrate with Redis Streams/NATS for real events
@@ -180,6 +180,8 @@ async def websocket_events(websocket: WebSocket):
             }))
             await asyncio.sleep(5)
     except WebSocketDisconnect:
+        manager.disconnect(websocket)
+    except Exception as e:
         manager.disconnect(websocket)
 
 

@@ -6,10 +6,7 @@
   },
   "agents": {
     "defaults": {
-      "timeoutSeconds": 600,
-      "subagents": {
-        "maxConcurrent": 4
-      }
+      "timeoutSeconds": 600
     }
   }
 }
