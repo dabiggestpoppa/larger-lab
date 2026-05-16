@@ -1,13 +1,40 @@
 # 🟡 Assistant Manager — Sub-Progress Log
 
 > **Agent:** Assistant Manager (AS)
-> **Role:** Context Monitoring / Task Support / Quality Checks
+> **Role:** Context Monitoring / Task Support / Quality Checks / Documentation
 > **Sync Rule:** Every 3 updates → auto-sync to PROJECT_PROGRESS_CLEAN.md + update local memory
 > **Reports to:** CC (Claude Code)
 
 ---
 
-## Status: 🟢 Active
+## Status: 🟢 Active — Phase 4 Support
+
+### Session Summary (May 16, 2026)
+**What was done:**
+- Skills assessment: Created `srra-oph-build` v2, `as-code-review`, updated `agent-team-workflow`
+- Book 2 integration: Created `active_collar_fields.py`, `local_consensus.py`, `capability_fields.py`, `trajectory_fields.py`
+- Tests: All 17 pass (Phase 2: 7/7, Phase 3: 4/4, Book 2: 6/6)
+- Resource assessment: 12 repos/papers evaluated, 8 approved
+- Design docs: `phase3_design.md`, `phase4_design.md`, `phase5_design.md`, `resource-reference.md`
+- Delegated tasks to OC, HR, PM via team-chat
+- Created `tools/as-cron-check.py` for monitoring
+- Fixed `__init__.py` imports to match CC's `workspace_integration.py` class names
+- Fixed `overlap_aware_tooling.py` imports to use CC's `ToolAdapter`/`ToolRole`
+- Posted unified code flow protocol to team-chat
+
+**Key Lesson:** CC builds first, AS tests second. Don't duplicate CC's work — write complementary components that import from CC's modules.
+
+**Actual Fixes This Session (infrastructure only, not CC's core code):**
+1. `progress-sync.py`: Fixed regex `re.sub` bad escape with lambda wrapper
+2. `progress-sync.py`: Fixed `persistent_map` empty string for CC causing PermissionError
+3. `overlap_aware_tooling.py`: Updated imports to use CC's `ToolAdapter`/`ToolRole` class names
+4. `team-chat.md`: Posted unified code flow protocol for all agents
+
+**Going Forward:**
+- Write Phase 5 component stubs (CC hasn't built these yet)
+- Write tests for CC's NEW code (not rewrite existing tests)
+- Monitor OC/HR/PM progress via cron check
+- Don't fix simple import mismatches — let CC know via chat
 
 ### Current Phase
 SRRA-OPH Phase 2 — Reconstruction + Recoverability

@@ -17,7 +17,7 @@ import json
 import hashlib
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
-from enum import ExecutionSafety
+from enum import Enum
 
 
 class ExecutionSafety(str, Enum):

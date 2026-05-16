@@ -4,6 +4,15 @@
 > Auto-extracted and updated by Hermes as work happens.
 > **Also auto-synced from `progress/hermes-progress.md` every 3 updates.**
 
+## 🟢 Hermes v2 Upgrade (2026-05-16)
+- **New agent prompt:** `agent-lab/agents/hermes/hermes_workspace/agent_prompt_v2.md`
+- **Soul file:** `agent-lab/agents/hermes/hermes_workspace/SOUL.md`
+- **Skills index:** `agent-lab/agents/hermes/hermes_workspace/SKILLS_INDEX.md`
+- **Skills directory:** `agent-lab/agents/hermes/skills/` (18+ skills copied)
+- **Team chat:** Hermes can write to `shared-conversations/team-chat.md`
+- **Chat format:** `### [HR] YYYY-MM-DD HH:MM:SSZ — <description>` with @mentions
+- **Loaded skills:** vectorbt-expert, quant-analyst, quantitative-research, pandas-pro, scikit-learn, statistical-analysis, python-patterns, python-testing-patterns, skill-creator, pine-developer, pine-debugger, pine-manager, pine-publisher, pine-visualizer, tradingview-quantitative, mt5-strategy-tester, variance-analysis, senior-data-scientist, srra-oph-build, agent-team-workflow, as-code-review, twitter-bookmarks
+
 ## 🔑 API Keys & Credentials
 > **RULE:** All API keys and credentials are stored in `C:\Users\wifik\Downloads\keys.txt`. Always check this file first when a key is needed. Never ask the user for keys that are already in this file.
 
@@ -73,7 +82,7 @@
 - Same instruction twice → write a skill for it
 
 ## Progress Sync Summary (HR)
-> **Last Sync:** 2026-05-16 01:58 UTC
+> **Last Sync:** 2026-05-16 02:45 UTC
 > **Status:** 🟡 Standby
 > **Active Phase:** Awaiting task assignment from Overseer / OpenClaw
 > **Working Memory:** `progress/hermes-memory.md`

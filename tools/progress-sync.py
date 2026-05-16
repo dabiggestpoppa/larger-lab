@@ -249,7 +249,7 @@ def sync_agent_to_main_progress(agent_tag: str):
 
     section_pattern = rf"## {re.escape(agent['section_header'])}.*?---\n"
     if re.search(section_pattern, main_content, re.DOTALL):
-        main_content = re.sub(section_pattern, section_text, main_content, flags=re.DOTALL)
+        main_content = re.sub(section_pattern, lambda m: section_text, main_content, flags=re.DOTALL)
     else:
         insert_marker = "---\n\n## "
         if insert_marker in main_content:
@@ -350,12 +350,16 @@ def append_to_persistent_memory(agent_tag: str):
     persistent_map = {
         "OC": ".openclaw/MEMORY.md",
         "HR": ".hermes/MEMORY.md",
-        "CC": "MEMORY.md",  # Claude Code doesn't have a separate persistent file
-        "AS": "progress/assistant-progress.md",  # AS uses its sub-progress as persistent
+        "CC": "",  # Claude Code doesn't have a separate persistent file
+        "AS": "progress/assistant-memory.md",
+        "PM": "progress/polymorph-memory.md",
     }
 
-    persistent_path = LAB_ROOT / persistent_map.get(agent_tag, "")
-    if not persistent_path or not persistent_path.exists():
+    persistent_rel = persistent_map.get(agent_tag, "")
+    if not persistent_rel:
+        return
+    persistent_path = LAB_ROOT / persistent_rel
+    if not persistent_path.exists():
         return
 
     # Read existing persistent memory

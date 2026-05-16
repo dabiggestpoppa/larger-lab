@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "godfery-tw": {
+      "version": "1.0.0",
+      "installedAt": 1778897446355
+    },
+    "use-my-browser": {
+      "version": "1.0.0",
+      "installedAt": 1778897453923
+    },
+    "social-media-agent": {
+      "version": "1.0.0",
+      "installedAt": 1778897519745
+    }
+  }
+}

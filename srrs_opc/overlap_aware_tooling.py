@@ -18,7 +18,8 @@ from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional, Tuple
 
 from .active_collar_fields import ActiveCollarField, CollarFieldManager
-from .workspace_integration import WorkspaceIntegrationLayer, WorkspaceToolAdapter, ToolRole
+from .workspace_integration import ToolRole, ToolAdapter
+from .capability_fields import CapabilityField, CapabilityFieldRegistry
 
 
 class ExecutionRequest:
@@ -50,7 +51,7 @@ class OverlapAwareTooling:
     This ensures reconstruction-safe execution.
     """
 
-    def __init__(self, integration_layer: WorkspaceIntegrationLayer):
+    def __init__(self, integration_layer: "WorkspaceIntegrationLayer"):
         self.integration = integration_layer
         self.pending_requests: List[ExecutionRequest] = []
         self.completed_requests: List[dict] = []

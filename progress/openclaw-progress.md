@@ -36,6 +36,16 @@ P90 Pine → Nautilus Conversion + Backtest Engine
 - Skills loaded from `.hermes/skills/` + `nautilus/`
 - SRRA-OPH Phase 1 directives added to openclaw_prompt.md
 
+#### 🟣 [OC] 2026-05-15 22:25:00Z — Discord Bot Setup Complete
+- **blrr city** bot connected to Discord gateway
+- Slash commands registered: `/hermes`, `/openclaw`, `/agent_status`
+- @mention routing working — responds as active agent (Hermes default)
+- Agent switching via `/hermes` and `/openclaw` commands
+- Webhooks pre-configured in .env (Hermes + OpenClaw)
+- Windows encoding fix applied (UTF-8 stdout)
+- Bot running as background process on blrrr host
+- **Note**: Separate Hermes/OpenClaw bot tokens still needed for independent bot instances
+
 ### Pending Tasks
 - [x] Verify CSV data inventory in Downloads — 24 CSV files, 4 major pairs M5
 - [x] Build unified P90 backtest engine — p90_unified.py complete

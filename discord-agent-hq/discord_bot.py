@@ -12,6 +12,11 @@ from pathlib import Path
 from datetime import datetime
 from dotenv import load_dotenv
 
+# Fix Windows encoding
+if sys.platform == 'win32':
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+
 env_path = Path(__file__).parent.parent / '.env'
 load_dotenv(env_path)
 
@@ -125,7 +130,7 @@ def openclaw_handle(content: str) -> str:
 # ── Bot events ──
 @bot.event
 async def on_ready():
-    print(f'✅ {bot.user} connected')
+    print(f'[OK] {bot.user} connected')
     try:
         gid = os.getenv("DISCORD_GUILD_ID")
         if gid:
@@ -138,18 +143,16 @@ async def on_ready():
             print(f"Synced {len(synced)} global commands")
     except Exception as e:
         print(f"Sync error: {e}")
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="@mentions + /hermes /openclaw"))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="@mentions | /hermes | /openclaw"))
 
 
 @bot.event
 async def on_interaction(interaction: discord.Interaction):
-    """Debug: log all interactions and process commands."""
+    """Debug: log all interactions."""
     print(f"[INTERACTION] type={interaction.type} user={interaction.user}")
     if interaction.type == discord.InteractionType.application_command:
         print(f"  command={interaction.data.get('name')}")
         print(f"  options={interaction.data.get('options')}")
-        # Process the command through the tree
-        await tree.process_commands(interaction)
 
 
 @bot.event
@@ -166,7 +169,7 @@ async def on_message(message):
     clean = message.content.replace(f"<@{bot_id}>", "").replace(f"<@!{bot_id}>", "").strip()
     if not clean:
         agent_name = "Hermes" if active_agent == "hermes" else "OpenClaw"
-        emoji = "🔱" if active_agent == "hermes" else "🦀"
+        emoji = "[H]" if active_agent == "hermes" else "[O]"
         await message.channel.send(f"{emoji} Active agent: **{agent_name}**. Use `/hermes` or `/openclaw` to switch.")
         return
 

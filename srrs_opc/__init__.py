@@ -30,7 +30,7 @@ from .local_consensus import LocalConsensusEngine
 
 # Phase 4: Workspace Integration (Book 2 updated)
 from .capability_fields import CapabilityField, CapabilityFieldRegistry
-from .workspace_integration import WorkspaceIntegrationLayer, WorkspaceToolAdapter, ToolRole
+from .workspace_integration import WorkspaceIntegrationLayer, ToolRole, ToolAdapter
 from .overlap_aware_tooling import OverlapAwareTooling, ExecutionRequest
 from .reconstruction_safe_exec import ReconstructionSafeExecutor, ExecutionSafety, ExecutionRecord
 
@@ -52,7 +52,7 @@ __all__ = [
     "LocalConsensusEngine",
     # Phase 4
     "CapabilityField", "CapabilityFieldRegistry",
-    "WorkspaceIntegrationLayer", "WorkspaceToolAdapter", "ToolRole",
+    "WorkspaceIntegrationLayer", "ToolAdapter", "ToolRole",
     "OverlapAwareTooling", "ExecutionRequest",
     "ReconstructionSafeExecutor", "ExecutionSafety", "ExecutionRecord",
     # Phase 5

@@ -118,8 +118,14 @@ def test_4_tool_replaceability():
             super().__init__()
             self.tool_name = "BackupStrategic"
 
+        def health_check(self) -> bool:
+            self.is_available = True
+            return True
+
+        def execute(self, command, params=None):
+            return {"status": "delegated", "tool": "backup_strategic", "command": command}
+
     backup = BackupStrategicAdapter()
-    backup.is_available = True
     layer.register(backup)
 
     # Should now have 2 strategic synthesis adapters
