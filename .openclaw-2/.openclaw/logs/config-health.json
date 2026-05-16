@@ -8,15 +8,15 @@
         "ctimeMs": 1778918759817.8235,
         "dev": "3465847700",
         "ino": "2533274791387901",
-        "mode": 438,
+        "mode": 33206,
         "nlink": 1,
         "uid": 0,
         "gid": 0,
         "hasMeta": false,
         "gatewayMode": "local",
-        "observedAt": "2026-05-16T18:13:46.748Z"
+        "observedAt": "2026-05-16T18:22:32.396Z"
       },
-      "lastObservedSuspiciousSignature": null,
+      "lastObservedSuspiciousSignature": "8a8139eb53d0ae52a95aaad60e62391b387b2859326b4a4a5010f58a1259a489:size-drop-vs-last-good:6462->3178",
       "lastPromotedGood": {
         "hash": "3a9fe8875fa0943385432c850837432534db178e42025d3d9fee8a804fd13934",
         "bytes": 6462,
@@ -30,7 +30,7 @@
         "gid": 0,
         "hasMeta": false,
         "gatewayMode": "local",
-        "observedAt": "2026-05-16T18:11:01.792Z"
+        "observedAt": "2026-05-16T18:22:32.396Z"
       }
     }
   }

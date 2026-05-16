@@ -32,13 +32,23 @@ class Event(BaseModel):
     event_type: str  # observer.state_change, attractor.update, entropy.signal, repair.trigger, etc.
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     source: str  # which observer/subsystem emitted it
-    priority: int = 0  # 0=low, 1=normal, 2=high, 3=critical
+    priority: int = Field(default=0)  # 0=low, 1=normal, 2=high, 3=critical
     payload: Dict[str, Any] = {}
 
     class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
+
+    def __init__(self, **data):
+        # Auto-classify priority from event_type if not explicitly set
+        super().__init__(**data)
+        if self.priority == 0 and self.event_type:
+            classification = classify_event(self.event_type)
+            # Only override if the default (0) was used, not if explicitly set to 0
+            # We check if 'priority' was in the original data
+            if 'priority' not in data:
+                self.priority = classification.get("priority", 1)
 
 
 # ─── Event Type Registry ─────────────────────────────────────────────────────

@@ -561,6 +561,18 @@ def main():
         print("\n🔄 Syncing repo memory...")
         sync_repo_memory(counters)
 
+    # ── Chat → Agent Memory Sync ──────────────────────────────────────────
+    # Every progress-sync run, also check for new team-chat messages
+    # and distribute context updates to agent memory files.
+    print("\n🔄 Checking team-chat for new messages...")
+    try:
+        from chat_sync import run_sync as run_chat_sync
+        run_chat_sync(force=args.force)
+    except ImportError:
+        print("  ⚠️ chat-sync module not available, skipping.")
+    except Exception as e:
+        print(f"  ⚠️ Chat sync error: {e}")
+
     print("\n✅ Sync complete.")
 
     # Append to update log (preserves full history)

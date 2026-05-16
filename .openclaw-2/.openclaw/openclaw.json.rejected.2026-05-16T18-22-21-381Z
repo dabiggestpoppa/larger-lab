@@ -16,17 +16,6 @@
         "openrouter/owl-alpha": {
           "alias": "owl"
         }
-      },
-      "contextLimit": 800000,
-      "compaction": {
-        "mode": "safeguard",
-        "reserveTokensFloor": 20000,
-        "memoryFlush": {
-          "enabled": true,
-          "softThresholdTokens": 600000,
-          "hardThresholdTokens": 750000,
-          "systemPrompt": "Session context was compacted. Previous conversation summary: {summary}"
-        }
       }
     }
   },
@@ -86,8 +75,7 @@
         "models": [
           {
             "id": "laguna-m.1:free",
-            "name": "laguna-m.1:free",
-            "contextWindow": 30000
+            "name": "laguna-m.1:free"
           }
         ]
       },
@@ -97,8 +85,7 @@
         "models": [
           {
             "id": "nemotron-3-nano-omni-30b-a3b-reasoning:free",
-            "name": "nemotron-3-nano-omni-30b-a3b-reasoning:free",
-            "contextWindow": 120000
+            "name": "nemotron-3-nano-omni-30b-a3b-reasoning:free"
           }
         ]
       },
@@ -108,11 +95,27 @@
         "models": [
           {
             "id": "deepseek-v4-flash:free",
-            "name": "deepseek-v4-flash:free",
-            "contextWindow": 120000
+            "name": "deepseek-v4-flash:free"
           }
         ]
       }
     }
+  },
+  "plugins": {
+    "entries": {
+      "openrouter": {
+        "enabled": true
+      },
+      "nvidia": {
+        "enabled": true
+      },
+      "deepseek": {
+        "enabled": true
+      }
+    }
+  },
+  "meta": {
+    "lastTouchedVersion": "2026.5.7",
+    "lastTouchedAt": "2026-05-16T18:22:21.377Z"
   }
 }

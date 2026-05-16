@@ -15,11 +15,13 @@ from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
+from datetime import datetime, timezone
 import asyncio
 import json
 
 # Import SRRA-OPH adapter
 from srrs_adapter import get_adapter, SRRSAdapter
+from event_fabric import get_fabric, EventFabric
 from dspy_pipelines import OCEPipelineManager
 
 app = FastAPI(
@@ -59,9 +61,12 @@ class ObserverStatus(BaseModel):
     task: str
 
 
-class Event(BaseModel):
+class EventResponse(BaseModel):
+    event_id: str
     event_type: str
     timestamp: str
+    source: str
+    priority: int
     payload: Dict[str, Any]
 
 
@@ -107,13 +112,36 @@ async def get_observer_status():
     return [ObserverStatus(**s) for s in status]
 
 
-@app.get("/events", response_model=List[Event])
-async def get_events(limit: int = Query(50, ge=1, le=1000)):
-    """Live event feed from event fabric."""
-    adapter = await get_adapter()
-    # TODO: Integrate with Redis Streams/NATS for real events
-    # For now, return empty list - events will come via WebSocket
-    return []
+@app.get("/events", response_model=List[EventResponse])
+async def get_events(
+    limit: int = Query(50, ge=1, le=1000),
+    event_type: Optional[str] = None,
+    source: Optional[str] = None,
+    min_priority: Optional[int] = Query(None, ge=0, le=3),
+):
+    """Query event history from the Event Fabric."""
+    fabric = get_fabric()
+    events = fabric.get_history(
+        event_type=event_type,
+        source=source,
+        limit=limit,
+        min_priority=min_priority,
+    )
+    return [_event_to_response(e) for e in events]
+
+
+@app.get("/events/types")
+async def get_event_types():
+    """List all registered event types."""
+    fabric = get_fabric()
+    return fabric.get_event_types()
+
+
+@app.get("/events/stats")
+async def get_event_stats():
+    """Event throughput statistics."""
+    fabric = get_fabric()
+    return fabric.get_stats()
 
 
 @app.get("/attractor", response_model=AttractorState)
@@ -142,6 +170,47 @@ async def srrs_health():
     """Check SRRA-OPH substrate health."""
     adapter = await get_adapter()
     return await adapter.health_check()
+
+
+# ─── Event Fabric Helpers ─────────────────────────────────────────────────────
+
+def _event_to_response(event) -> Dict[str, Any]:
+    """Convert an Event to an API response dict."""
+    return {
+        "event_id": event.event_id,
+        "event_type": event.event_type,
+        "timestamp": event.timestamp.isoformat(),
+        "source": event.source,
+        "priority": event.priority,
+        "payload": event.payload,
+    }
+
+
+def _event_to_dict(event) -> Dict[str, Any]:
+    """Convert an Event to a dict for WebSocket transmission."""
+    return _event_to_response(event)
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize Event Fabric on startup."""
+    fabric = get_fabric()
+    await fabric.ingest(
+        event_type="system.startup",
+        source="oce-continuity-core",
+        payload={"version": "1.0.0", "message": "OCE Continuity Core started"},
+    )
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Emit shutdown event."""
+    fabric = get_fabric()
+    await fabric.ingest(
+        event_type="system.shutdown",
+        source="oce-continuity-core",
+        payload={"message": "OCE Continuity Core shutting down"},
+    )
 
 
 # ─── WebSocket for Real-time Updates ──────────────────────────────────────────
@@ -211,22 +280,29 @@ async def plan_evolution(request: dict):
 
 @app.websocket("/ws/events")
 async def websocket_events(websocket: WebSocket):
-    """WebSocket endpoint for real-time event stream."""
+    """WebSocket endpoint for real-time event stream from Event Fabric."""
     await manager.connect(websocket)
-    adapter = await get_adapter()
+    fabric = get_fabric()
+    queue = fabric.create_stream()
     try:
-        while True:
-            # Send entropy metrics from SRRA-OPH substrate
-            metrics = await adapter.get_entropy_metrics()
-            await websocket.send_text(json.dumps({
-                "type": "entropy_metrics",
-                "timestamp": "2026-05-16T16:00:00Z",
-                "payload": metrics
-            }))
-            await asyncio.sleep(5)
+        async for event in fabric.stream_events(queue):
+            if event is None:
+                # Heartbeat
+                await websocket.send_text(json.dumps({
+                    "type": "heartbeat",
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                }))
+            else:
+                await websocket.send_text(json.dumps({
+                    "type": "event",
+                    "data": _event_to_dict(event),
+                }))
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
-    except Exception as e:
+        pass
+    except Exception:
+        pass
+    finally:
+        fabric.close_stream(queue)
         manager.disconnect(websocket)
 
 

@@ -122,14 +122,28 @@ class SRRSAdapter:
 
         return status
 
-    async def emit_event(self, event_type: str, payload: Dict[str, Any]) -> str:
-        """Emit an event to the OCE event fabric."""
+    async def emit_event(self, event_type: str, payload: Dict[str, Any], source: str = "srrs_opc") -> str:
+        """Emit an event to the OCE Event Fabric."""
         if not self._initialized:
             await self.initialize()
 
+        # Record in topology observer
         self._topology_observer.record_edge("planner", "execution", event_type)
         self._event_counter += 1
-        return f"event_{datetime.now().timestamp()}_{self._event_counter}"
+
+        # Ingest into Event Fabric
+        try:
+            from event_fabric import get_fabric
+            fabric = get_fabric()
+            event = await fabric.ingest(
+                event_type=event_type,
+                source=source,
+                payload=payload,
+            )
+            return event.event_id
+        except Exception:
+            # Don't let Event Fabric errors break the adapter
+            return f"event_{datetime.now().timestamp()}_{self._event_counter}"
 
     async def get_trajectory_memory(self, limit: int = 50) -> List[Dict[str, Any]]:
         """Get trajectory memory from SRRA-OPH."""
