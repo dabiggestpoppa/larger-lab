@@ -168,16 +168,226 @@ All errors follow this format:
 }
 ```
 
+## Observer Runtime (Phase 3)
+
+### `POST /observers`
+
+Create a new observer.
+
+**Request Body:**
+```json
+{
+  "observer_type": "trading | repair | entropy | content | system",
+  "name": "string",
+  "config": {
+    "event_types": ["observer.state_change", "attractor.update"],
+    "priority_threshold": 1,
+    "entropy_limit": 0.8
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "observer_id": "string",
+  "status": "created",
+  "observer_type": "trading",
+  "created_at": "ISO-8601"
+}
+```
+
+---
+
+### `GET /observers`
+
+List all observers with status and health summary.
+
+**Response:**
+```json
+{
+  "observers": [
+    {
+      "observer_id": "string",
+      "name": "string",
+      "observer_type": "trading",
+      "status": "active | suspended | created | destroyed",
+      "health": {
+        "entropy": 0.32,
+        "drift": 0.05,
+        "budget_remaining": 450.0
+      },
+      "last_activity": "ISO-8601"
+    }
+  ],
+  "total": 5,
+  "active": 3
+}
+```
+
+---
+
+### `GET /observers/{id}`
+
+Get full observer details.
+
+**Response:**
+```json
+{
+  "observer_id": "string",
+  "name": "string",
+  "observer_type": "trading",
+  "status": "active",
+  "config": {},
+  "health": {
+    "entropy": 0.32,
+    "drift": 0.05,
+    "budget_remaining": 450.0,
+    "events_processed": 1523,
+    "last_repair": null
+  },
+  "state": {
+    "last_snapshot": "ISO-8601",
+    "snapshot_count": 42
+  },
+  "subscriptions": ["observer.state_change", "attractor.update"],
+  "created_at": "ISO-8601"
+}
+```
+
+---
+
+### `GET /observers/{id}/health`
+
+Detailed health metrics for an observer.
+
+**Response:**
+```json
+{
+  "observer_id": "string",
+  "entropy": {
+    "current": 0.32,
+    "trend": "stable",
+    "history": [0.30, 0.31, 0.32]
+  },
+  "drift": {
+    "current": 0.05,
+    "threshold": 0.15,
+    "direction": "positive"
+  },
+  "budget": {
+    "total": 500.0,
+    "consumed": 50.0,
+    "remaining": 450.0
+  },
+  "events": {
+    "processed": 1523,
+    "errors": 2,
+    "last_event": "ISO-8601"
+  }
+}
+```
+
+---
+
+### `POST /observers/{id}/activate`
+
+Activate an observer (start processing events).
+
+**Response:**
+```json
+{
+  "observer_id": "string",
+  "status": "activated",
+  "activated_at": "ISO-8601"
+}
+```
+
+---
+
+### `POST /observers/{id}/suspend`
+
+Suspend an observer (pause event processing).
+
+**Response:**
+```json
+{
+  "observer_id": "string",
+  "status": "suspended",
+  "suspended_at": "ISO-8601"
+}
+```
+
+---
+
+### `DELETE /observers/{id}`
+
+Destroy an observer permanently.
+
+**Response:**
+```json
+{
+  "observer_id": "string",
+  "status": "destroyed"
+}
+```
+
+---
+
+### `POST /observers/{id}/subscribe`
+
+Subscribe an observer to event types.
+
+**Request Body:**
+```json
+{
+  "event_types": ["observer.state_change", "entropy.budget_warning"]
+}
+```
+
+**Response:**
+```json
+{
+  "observer_id": "string",
+  "subscriptions": ["observer.state_change", "entropy.budget_warning"]
+}
+```
+
+---
+
+### `WS /ws/observers`
+
+Real-time observer updates via WebSocket.
+
+**Connection:** `ws://localhost:8000/ws/observers`
+
+**Message Format:**
+```json
+{
+  "type": "observer.status_change | observer.health_update | observer.event_processed",
+  "timestamp": "ISO-8601",
+  "data": {
+    "observer_id": "string",
+    "status": "active",
+    "health": {}
+  }
+}
+```
+
+---
+
 ## Future Endpoints (Planned)
 
 | Endpoint | Phase | Purpose |
 |----------|-------|---------|
-| `POST /observers` | 3 | Create new observer |
-| `DELETE /observers/{id}` | 3 | Destroy observer |
-| `POST /observers/{id}/repair` | 3 | Trigger repair |
 | `GET /topology` | 4 | Current topology graph |
 | `POST /memory/compress` | 4 | Trigger memory compression |
 | `GET /metrics` | 5 | Observability metrics |
+| `GET /cost` | 5 | Cost/entropy budget status |
+| `POST /execute` | 6 | Execute tool via capability fields |
+| `GET /goals` | 7 | List active goals |
+| `POST /goals` | 7 | Set new goal |
+| `GET /self-model` | 9 | Current self-model state |
 | `GET /cost` | 5 | Cost/entropy budget status |
 | `POST /execute` | 6 | Execute tool via capability fields |
 | `GET /goals` | 7 | List active goals |

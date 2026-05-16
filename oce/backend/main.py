@@ -27,6 +27,7 @@ logger = logging.getLogger("oce")
 # Import SRRA-OPH adapter
 from srrs_adapter import get_adapter, SRRSAdapter
 from event_fabric import get_fabric, EventFabric
+from observer_runtime import get_runtime, ObserverRuntime, ObserverConfig, ObserverState
 from dspy_pipelines import OCEPipelineManager
 
 app = FastAPI(

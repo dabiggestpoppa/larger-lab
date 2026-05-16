@@ -1,0 +1,21 @@
+[2026-05-16T20:38:48Z] [INFO] ============================================================
+[2026-05-16T20:38:48Z] [INFO] Starting OC2 monitoring cycle
+[2026-05-16T20:38:48Z] [INFO] Health: live ✓
+[2026-05-16T20:38:49Z] [ERROR] Process: NOT RUNNING
+[2026-05-16T20:38:49Z] [INFO] Sessions: 8 total, 0 stale
+[2026-05-16T20:38:49Z] [WARN] Watchdog errors (recent): 3
+[2026-05-16T20:38:49Z] [INFO]   [2026-05-16T20:04:55Z] OC2 restarted successfully (restart #1)
+[2026-05-16T20:38:49Z] [INFO]   [2026-05-16T20:11:07Z] OC2 restarted successfully (restart #1)
+[2026-05-16T20:38:49Z] [INFO]   [2026-05-16T20:12:13Z] OC2 restarted successfully (restart #2)
+[2026-05-16T20:38:49Z] [WARN] Restart needed but --repair not specified
+[2026-05-16T20:38:49Z] [INFO] Cycle complete: status=OK, action=restart
+[2026-05-16T20:41:00Z] [INFO] ============================================================
+[2026-05-16T20:41:00Z] [INFO] Starting OC2 monitoring cycle
+[2026-05-16T20:41:00Z] [INFO] Health: live ✓
+[2026-05-16T20:41:00Z] [INFO] Process: PID 1396, Memory: 319.3MB
+[2026-05-16T20:41:00Z] [INFO] Sessions: 8 total, 0 stale
+[2026-05-16T20:41:00Z] [WARN] Watchdog errors (recent): 3
+[2026-05-16T20:41:00Z] [INFO]   [2026-05-16T20:04:55Z] OC2 restarted successfully (restart #1)
+[2026-05-16T20:41:00Z] [INFO]   [2026-05-16T20:11:07Z] OC2 restarted successfully (restart #1)
+[2026-05-16T20:41:00Z] [INFO]   [2026-05-16T20:12:13Z] OC2 restarted successfully (restart #2)
+[2026-05-16T20:41:00Z] [INFO] Cycle complete: status=OK, action=none

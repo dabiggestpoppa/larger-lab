@@ -184,18 +184,20 @@ SRRA-OPH Substrate (srrs_opc/)
 
 #### Tasks
 
-- [ ] **OCE-3.16** Integrate Operator with Observer Runtime
-  - System commands → observer actions
-  - Operator events → observer triggers
-  - File: `tools/operator/observer-integration.js`
+- [x] **OCE-3.16** Integrate Operator with Observer Runtime ✅
+  - `tools/operator/observer-integration.js` — execAndEmit, killAndEmit, editAndEmit, vscodeActionAndEmit
+  - Observer lifecycle: createObserver, activateObserver, suspendObserver, destroyObserver
+  - Health subscription: subscribeToHealth, getObserverHealth
 
-- [ ] **OCE-3.17** Build observer debugging utilities
-  - `tools/operator/observer-debug.js` — CLI for inspecting observers
-  - Commands: list, status, health, events, logs
+- [x] **OCE-3.17** Build observer debugging utilities ✅
+  - `tools/operator/observer-debug.js` — CLI: list, status, health, events, logs, all
+  - Color-coded by health status
 
-- [ ] **OCE-3.18** Update integration issues
-  - Update `oce/docs/integration-issues.md`
-  - Close resolved issues, add new ones
+- [x] **OCE-3.18** Update integration issues ✅
+  - Updated `oce/docs/integration-issues.md`
+  - Closed: HIGH-001 (API path), LOW-002 (duration), ingest endpoint
+  - Added: MEDIUM-003 (observer API pending CC)
+  - 5 active issues remaining
 
 ---
 
@@ -240,8 +242,8 @@ SRRA-OPH Substrate (srrs_opc/)
 | Quality review | AS | `oce/docs/quality-review-phase3.md` | Pending |
 | API docs | AS | `oce/docs/api-reference.md` | Pending |
 | Integration testing | AS | `oce/backend/tests/test_phase3_e2e.py` | Pending |
-| Operator integration | PM | `tools/operator/observer-integration.js` | Pending |
-| Debug utilities | PM | `tools/operator/observer-debug.js` | Pending |
+| Operator integration | PM | `tools/operator/observer-integration.js` | ✅ |
+| Debug utilities | PM | `tools/operator/observer-debug.js` | ✅ |
 | DSPy observer config | RL | `oce/backend/dspy_observer_config.py` | Pending |
 | DSPy observer repair | RL | `oce/backend/dspy_observer_repair.py` | Pending |
 

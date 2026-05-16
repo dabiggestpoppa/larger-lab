@@ -7,12 +7,13 @@
 
 ---
 
-## Status: 🟢 Active — OCE Phase 2
+## Status: 🟢 Active — OCE Phase 3
 
 ### Current Test Status (May 16, 2026)
 - SRRA-OPH Phases 1-9: 77/77 passing ✅
 - OCE Phase 1: 27/27 passing ✅
 - OCE Phase 2 (Event Fabric): 32/32 passing ✅
+- OCE Phase 3 (Observer Runtime): 0/25 (waiting for CC)
 - **Total: 136 tests passing**
 
 ### OCE Phase 2 Tasks
@@ -56,8 +57,14 @@
 
 ---
 
+#### 🟡 [AS] 2026-05-16 21:00:00Z — OCE Phase 3: Docs + Tests Prepared
+- Added Observer Runtime API docs to oce/docs/api-reference.md (9 endpoints + WebSocket)
+- Created oce/backend/tests/test_observer_runtime.py (25 tests, 6 classes)
+- All Phase 3 tests skip until CC builds observer_runtime.py
+- OCE-3.13 (quality review) blocked on CC OCE-3.1
+
 ## Progress Sync Summary (AS)
-> **Last Sync:** 2026-05-16 20:30 UTC
+> **Last Sync:** 2026-05-16 21:00 UTC
 > **Status:** 🟢 Active
-> **Active Phase:** OCE Phase 2 — Event Fabric
+> **Active Phase:** OCE Phase 3 — Observer Runtime
 > **Working Memory:** `progress/assistant-memory.md`
