@@ -7,7 +7,20 @@
 
 ---
 
-## Status: 🟢 Active — Phase 4 Support
+## Status: 🟢 Active — Phase 5 Support
+
+### 🔴 Self-Correction (May 16, 2026)
+**Problem:** AS kept writing new code without reading CC's existing files first, causing duplicates and import mismatches.
+
+**Root cause:** Not following the "Read Before Write" rule. Guessing at class names instead of reading source files.
+
+**Files AS wrote that may duplicate CC's work:**
+- `continuity_collars.py` — may overlap with CC's Phase 5 continuity work
+- `temporal_attractors.py` — may overlap with CC's attractor work
+- `overlap_aware_tooling.py` — had wrong imports (fixed)
+- `reconstruction_safe_exec.py` — may duplicate CC's Phase 4 execution safety
+
+**Committed to memory:** Read CC's files first → Import from his modules → Write only genuine gaps → Flag issues via chat
 
 ### Session Summary (May 16, 2026)
 **What was done:**

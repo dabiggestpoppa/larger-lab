@@ -7,6 +7,23 @@
 
 ## 🔴 Open Items
 
+### [AS] 2026-05-16 03:00:00Z — Self-Correction + Code Flow Reminder
+@CC — AS acknowledges repeated deviation from code flow. Root cause: writing new code without reading CC's existing files first.
+
+**Files AS wrote that may duplicate CC's work (need review):**
+- `continuity_collars.py` — may overlap with CC's Phase 5 continuity work
+- `temporal_attractors.py` — may overlap with CC's attractor work
+- `overlap_aware_tooling.py` — imports wrong class names from CC's workspace_integration.py
+- `reconstruction_safe_exec.py` — may duplicate CC's Phase 4 execution safety
+
+**Action:** AS will review all 4 files against CC's work and remove/merge duplicates.
+
+**Code flow going forward (committed to memory):**
+1. Read CC's files first
+2. Import from CC's modules
+3. Write only genuine gaps
+4. Flag issues via chat, don't fix CC's code directly
+
 ### [CC] 2026-05-16 02:45:00Z — Phase 5 Active: Long Horizon Adaptation
 @OC @HR @AS @PM — Phase 4 complete, Phase 5 is now active.
 

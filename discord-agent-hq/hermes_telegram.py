@@ -1,6 +1,6 @@
 """
-Hermes Telegram Bot - Architect & Planner
-Runs alongside OWL in the same Telegram chat.
+Hermes Telegram Bot - Architect & Planner v2
+Reads workspace state, understands context, responds intelligently.
 """
 
 import os, re, subprocess, sys, logging
@@ -10,25 +10,228 @@ from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 
-# Setup logging
 logging.basicConfig(format='%(asctime)s [HERMES] %(levelname)s: %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Load env
 env_path = Path(__file__).parent.parent / '.env'
 load_dotenv(env_path, override=True)
 
 WORKSPACE = Path(os.getenv("WORKSPACE_PATH", str(Path(__file__).parent.parent)))
 PROGRESS_FILE = WORKSPACE / "PROJECT_PROGRESS_CLEAN.md"
+TEAM_CHAT = WORKSPACE / "shared-conversations" / "team-chat.md"
+HERMES_PROGRESS = WORKSPACE / "progress" / "hermes-progress.md"
+ASSISTANT_PROGRESS = WORKSPACE / "progress" / "assistant-progress.md"
+CLAUDE_PROGRESS = WORKSPACE / "progress" / "claude-code-progress.md"
+OPENCLAW_PROGRESS = WORKSPACE / "progress" / "openclaw-progress.md"
+POLYMORPH_PROGRESS = WORKSPACE / "progress" / "polymorph-progress.md"
+SRRA_OPC = WORKSPACE / "srrs_opc"
+PHASE_STATE = WORKSPACE / ".phase-state.json"
 
-# ── Hermes Memory ──
-HERMES_MEMORY = WORKSPACE / "progress" / "hermes-progress.md"
+
+def read_file(path, max_chars=3000):
+    if path.exists():
+        return path.read_text(encoding='utf-8')[:max_chars]
+    return ""
 
 
-def read_progress():
-    if PROGRESS_FILE.exists():
-        return PROGRESS_FILE.read_text(encoding='utf-8')
-    return "No progress file found."
+def get_phase_state():
+    if PHASE_STATE.exists():
+        import json
+        return json.loads(PHASE_STATE.read_text())
+    return {}
+
+
+def get_all_progress():
+    """Read all agent progress files for full context."""
+    agents = {}
+    progress_dir = WORKSPACE / "progress"
+    if progress_dir.exists():
+        for f in progress_dir.glob("*-progress.md"):
+            name = f.stem.replace('-progress', '')
+            content = f.read_text(encoding='utf-8')
+            # Extract status and recent entries
+            lines = [l for l in content.split('\n') if l.strip()]
+            agents[name] = {
+                'file': f.name,
+                'lines': lines[-20:],  # last 20 lines
+                'status': 'unknown'
+            }
+            for line in lines:
+                if 'Status:' in line:
+                    agents[name]['status'] = line.split('Status:')[-1].strip()
+                    break
+    return agents
+
+
+def get_workspace_structure():
+    dirs = sorted([d.name for d in WORKSPACE.iterdir() if d.is_dir() and not d.name.startswith('.') and d.name != '.venv'])
+    key_files = []
+    for f in WORKSPACE.iterdir():
+        if f.is_file() and f.suffix in ('.py', '.md', '.json', '.txt', '.yml'):
+            key_files.append(f.name)
+    return dirs, sorted(key_files)[:15]
+
+
+def get_test_status():
+    """Check if tests are passing."""
+    try:
+        result = subprocess.run(
+            [sys.executable, '-m', 'pytest', str(SRRA_OPC / 'tests'), '-q', '--tb=no'],
+            capture_output=True, text=True, timeout=30, cwd=str(WORKSPACE)
+        )
+        output = result.stdout + result.stderr
+        if 'passed' in output:
+            # Extract count
+            match = re.search(r'(\d+) passed', output)
+            if match:
+                return f"{match.group(1)} tests passing"
+        return "Test status unknown"
+    except:
+        return "Could not run tests"
+
+
+def hermes_respond(user_message: str) -> str:
+    """
+    Generate intelligent response based on actual workspace state.
+    This is NOT a canned response — it reads real files and builds context.
+    """
+    c = user_message.lower().strip()
+    timestamp = datetime.now().strftime('%H:%M')
+
+    # ── Gather real context ──
+    phase = get_phase_state()
+    agents = get_all_progress()
+    dirs, files = get_workspace_structure()
+    progress_text = read_file(PROGRESS_FILE, 2000)
+    hermes_text = read_file(HERMES_PROGRESS, 1500)
+    team_text = read_file(TEAM_CHAT, 1000)
+
+    # ── STATUS / PROGRESS ──
+    if any(w in c for w in ['status', 'progress', 'update', 'how are we', 'what are you doing', 'ready']):
+        current_phase = phase.get('current_phase', 'Unknown')
+        phase_status = phase.get('status', 'Unknown')
+
+        # Build agent status
+        agent_lines = []
+        for name, data in agents.items():
+            status = data.get('status', '?')
+            # Clean up status
+            status = status.replace('**', '').strip()
+            agent_lines.append(f"  {name}: {status}")
+
+        agent_status = "\n".join(agent_lines) if agent_lines else "  No agent progress files found"
+
+        # Get recent progress entries
+        recent = [l for l in progress_text.split('\n') if l.strip() and ('[' in l or '-' in l[:5])][-8:]
+
+        return (
+            f"HERMES Status Report [{timestamp}]\n"
+            f"Phase: {current_phase} ({phase_status})\n"
+            f"\nAgents:\n{agent_status}\n"
+            f"\nRecent Activity:\n" + "\n".join(recent)[:800] +
+            f"\n\nWorkspace: {len(dirs)} dirs | {len(files)} key files"
+        )
+
+    # ── HELP ──
+    if any(w in c for w in ['help', 'what can', 'commands']):
+        return (
+            "HERMES - Architect & Planner\n\n"
+            "I read from the shared workspace to give you real status.\n\n"
+            "Commands:\n"
+            "/status - Full project status from all agents\n"
+            "/workspace - Workspace structure\n"
+            "/agents - Individual agent progress\n"
+            "/tests - Run test suite\n"
+            "/team - Team chat summary\n"
+            "/plan <text> - Log a plan\n"
+            "/decision <text> - Log a decision\n\n"
+            "Or just ask me anything about the project."
+        )
+
+    # ── WORKSPACE ──
+    if any(w in c for w in ['workspace', 'files', 'structure', 'dirs']):
+        return (
+            f"Workspace: {WORKSPACE.name}\n"
+            f"\nDirectories ({len(dirs)}):\n" + ", ".join(dirs) +
+            f"\n\nKey Files:\n" + ", ".join(files)
+        )
+
+    # ── AGENTS ──
+    if any(w in c for w in ['agents', 'team', 'who', 'claude', 'assistant', 'openclaw', 'polymorph']):
+        lines = []
+        for name, data in agents.items():
+            status = data.get('status', '?').replace('**', '').strip()
+            # Get last activity
+            last_activity = ""
+            for line in reversed(data['lines']):
+                if '[' in line and ']' in line:
+                    last_activity = line.strip()[:100]
+                    break
+            lines.append(f"{name}: {status}\n  Last: {last_activity}")
+        return "Agent Status:\n\n" + "\n\n".join(lines)
+
+    # ── TESTS ──
+    if any(w in c for w in ['test', 'tests', 'pytest']):
+        test_result = get_test_status()
+        return f"Test Results: {test_result}\n\nTest files:\n" + "\n".join(
+            [f.name for f in (SRRA_OPC / 'tests').glob('*.py')] if (SRRA_OPC / 'tests').exists() else ["No tests found"]
+        )
+
+    # ── TEAM CHAT ──
+    if any(w in c for w in ['team chat', 'chat', 'messages']):
+        recent_msgs = [l for l in team_text.split('\n') if l.strip() and ('@' in l or '###' in l or '---' in l)][:10]
+        return "Recent Team Chat:\n" + "\n".join(recent_msgs)[:1500]
+
+    # ── BUILD / WORK REQUESTS ──
+    if any(w in c for w in ['build', 'create', 'make', 'start', 'work', 'do', 'ready', 'code']):
+        current_phase = phase.get('current_phase', 'Unknown')
+        return (
+            f"Ready. Current phase: {current_phase}\n\n"
+            f"My pending tasks:\n" +
+            "\n".join([l.strip() for l in hermes_text.split('\n') if l.strip().startswith('- [ ]')][:5]) +
+            f"\n\nWhat do you want me to work on?"
+        )
+
+    # ── PLAN ──
+    if any(w in c for w in ['plan', 'idea', 'proposal', 'suggest']):
+        text = re.sub(r'^plan[:\s]*', '', c, flags=re.IGNORECASE).strip()
+        if len(text) > 3:
+            append_progress('PLAN: ' + text)
+            return f"Plan logged: {text}"
+        return "What's your idea? Send: /plan <your idea>"
+
+    # ── DECISION ──
+    if any(w in c for w in ['decision', 'decide', 'choose']):
+        text = c
+        if ':' in text:
+            text = text.split(':', 1)[-1].strip()
+        if len(text) > 3:
+            append_progress('DECISION: ' + text)
+            return f"Decision logged: {text}"
+        return "What's the decision? Send: /decision <text>"
+
+    # ── GREETING ──
+    if any(w in c for w in ['hi', 'hello', 'hey', 'yo', 'sup', 'yoo']):
+        current_phase = phase.get('current_phase', 'Unknown')
+        return f"HERMES online. Phase: {current_phase}. What do you need?"
+
+    # ── DEFAULT: Context-aware response ──
+    # Read the actual project context to give a meaningful response
+    current_phase = phase.get('current_phase', 'Unknown')
+    active_agents = len(agents)
+
+    return (
+        f"I heard: \"{user_message[:100]}\"\n\n"
+        f"Current state: Phase {current_phase}, {active_agents} agents active.\n\n"
+        f"I can help with:\n"
+        f"/status - Full project status\n"
+        f"/agents - Agent-by-agent breakdown\n"
+        f"/workspace - File structure\n"
+        f"/tests - Test results\n"
+        f"/team - Team chat\n"
+        f"/plan /decision - Log items\n\n"
+        f"Or tell me what to build."
+    )
 
 
 def append_progress(entry):
@@ -39,113 +242,15 @@ def append_progress(entry):
     return line
 
 
-def get_workspace_summary():
-    dirs = sorted([d.name for d in WORKSPACE.iterdir() if d.is_dir() and not d.name.startswith('.')])
-    files = sorted([f.name for f in WORKSPACE.iterdir() if f.is_file() and f.suffix in ('.py', '.md', '.json', '.txt')])
-    return dirs[:12], files[:12]
-
-
-def hermes_respond(content: str) -> str:
-    c = content.lower().strip()
-
-    # -- Status / Progress --
-    if any(w in c for w in ['status', 'progress', 'update', 'how are we', 'what are you doing', 'ready']):
-        lines = [l for l in read_progress().split('\n') if l.strip()][-15:]
-        dirs, files = get_workspace_summary()
-        return (
-            f"HERMES Status Report\n"
-            f"\nRecent Progress:\n" + "\n".join(lines)[:2000] +
-            f"\n\nWorkspace: {len(dirs)} dirs, {len(files)} key files\n"
-            f"Active Phase: SRRA-OPH Phase 4 (Workspace Integration)\n"
-            f"All systems operational. Ready to build."
-        )
-
-    # -- Help --
-    if any(w in c for w in ['help', 'what can', 'commands']):
-        return (
-            "HERMES - Architect & Planner\n\n"
-            "Commands:\n"
-            "/status - Project progress\n"
-            "/workspace - List files/dirs\n"
-            "/plan <idea> - Log a plan\n"
-            "/decision <text> - Log architecture decision\n"
-            "/team - Team status\n"
-            "/memory - Read Hermes memory\n\n"
-            "Or just talk to me directly about the project."
-        )
-
-    # -- Workspace --
-    if any(w in c for w in ['workspace', 'files', 'structure']):
-        dirs, files = get_workspace_summary()
-        return f"Workspace\nDirs: {', '.join(dirs)}\nKey Files: {', '.join(files)}"
-
-    # -- Plan --
-    if any(w in c for w in ['plan', 'idea', 'proposal', 'suggest']):
-        text = re.sub(r'^/?plan[:\s]*', '', c, flags=re.IGNORECASE).strip()
-        if text and len(text) > 3:
-            return f"Plan logged: {append_progress('PLAN: ' + text)}"
-        return "Usage: /plan <your idea>"
-
-    # -- Decision --
-    if any(w in c for w in ['decision', 'decide', 'choose']):
-        text = c
-        if ':' in text:
-            text = text.split(':', 1)[-1].strip()
-        if text and len(text) > 3:
-            return f"Decision logged: {append_progress('DECISION: ' + text)}"
-        return "Usage: /decision <your decision>"
-
-    # -- Team --
-    if any(w in c for w in ['team', 'agents', 'who']):
-        progress_dir = WORKSPACE / "progress"
-        agents = []
-        if progress_dir.exists():
-            for f in progress_dir.glob("*-progress.md"):
-                name = f.stem.replace('-progress', '').upper()
-                agents.append(name)
-        return f"Active Agents: {', '.join(agents) if agents else 'None detected'}\n\nI coordinate the team and track architecture decisions."
-
-    # -- Memory --
-    if any(w in c for w in ['memory', 'remember']):
-        if HERMES_MEMORY.exists():
-            mem = HERMES_MEMORY.read_text(encoding='utf-8')[:2000]
-            return f"Hermes Memory\n{mem}"
-        return "No dedicated memory file yet. I track everything in the shared workspace progress files."
-
-    # -- Build / Work requests --
-    if any(w in c for w in ['build', 'create', 'make', 'start', 'work', 'do', 'ready']):
-        return (
-            "Ready. What are we building?\n\n"
-            "Current focus areas:\n"
-            "- SRRA-OPH Phase 4: Workspace Integration\n"
-            "- P90 strategy parameter tuning\n"
-            "- Agent team coordination\n"
-            "\nTell me what you need and I'll architect it."
-        )
-
-    # -- Greeting --
-    if any(w in c for w in ['hi', 'hello', 'hey', 'yo', 'sup']):
-        return "HERMES online. What do you need?"
-
-    # -- Default: actually be useful --
-    return (
-        f"I heard: \"{content[:150]}\"\n\n"
-        f"I'm the Architect & Planner. I can help with:\n"
-        f"- Project status and progress tracking\n"
-        f"- Architecture decisions and planning\n"
-        f"- Team coordination\n"
-        f"- Workspace file management\n\n"
-        f"Try /status for a full update, or just tell me what you're working on."
-    )
-
-
 # ── Telegram Handlers ──
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    phase = get_phase_state()
+    current = phase.get('current_phase', 'Unknown')
     await update.message.reply_text(
-        "HERMES - Architect & Planner online.\n"
-        "I coordinate the agent team and track project architecture.\n"
-        "Use /help for commands or just talk to me."
+        f"HERMES - Architect & Planner online.\n"
+        f"Current phase: {current}\n"
+        f"Use /help for commands or just talk to me."
     )
 
 
@@ -161,6 +266,18 @@ async def workspace_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(hermes_respond("workspace"))
 
 
+async def agents_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(hermes_respond("agents"))
+
+
+async def tests_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(hermes_respond("tests"))
+
+
+async def team_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(hermes_respond("team chat"))
+
+
 async def plan_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = ' '.join(context.args) if context.args else ''
     await update.message.reply_text(hermes_respond(f"plan {text}"))
@@ -171,16 +288,7 @@ async def decision_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(hermes_respond(f"decision: {text}"))
 
 
-async def team_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(hermes_respond("team"))
-
-
-async def memory_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(hermes_respond("memory"))
-
-
 async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Don't respond to empty messages or commands
     if not update.message or not update.message.text:
         return
     if update.message.text.startswith('/'):
@@ -193,32 +301,26 @@ async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(response)
 
 
-# ── Main ──
-
 def main():
     token = os.getenv("TELEGRAM_HERMES_TOKEN")
     if not token:
         logger.error("TELEGRAM_HERMES_TOKEN not set")
         sys.exit(1)
 
-    logger.info("Starting Hermes Telegram bot...")
-
     app = Application.builder().token(token).build()
 
-    # Commands
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_cmd))
     app.add_handler(CommandHandler("status", status_cmd))
     app.add_handler(CommandHandler("workspace", workspace_cmd))
+    app.add_handler(CommandHandler("agents", agents_cmd))
+    app.add_handler(CommandHandler("tests", tests_cmd))
+    app.add_handler(CommandHandler("team", team_cmd))
     app.add_handler(CommandHandler("plan", plan_cmd))
     app.add_handler(CommandHandler("decision", decision_cmd))
-    app.add_handler(CommandHandler("team", team_cmd))
-    app.add_handler(CommandHandler("memory", memory_cmd))
-
-    # Regular messages
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, on_message))
 
-    logger.info("Hermes bot running. Waiting for messages...")
+    logger.info("Hermes bot starting...")
     app.run_polling(drop_pending_updates=True)
 
 

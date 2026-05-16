@@ -27,6 +27,22 @@
   - Missing: `backtesterpublic`, `backtesting-py-2022`, `market-structure`, `react-agent`, `rose-research`, `unsloth`
 - Standing by for AS or CC task assignments
 
+#### 🔴 [PM] 2026-05-16 — Skills Distributed to All Agents + OpenClaw Crons
+- Copied 4 new skills to ALL agent skill directories:
+  - `context-compaction` — 5-layer context compaction pipeline
+  - `subagent-manager` — Subagent sidechain file pattern
+  - `hermes-workflows` — 6 Chief of Staff workflows
+  - `agent-harness-sop` — Complete SOP for building agent tools
+- Skills now available in:
+  - `.openclaw/skills/` (OpenClaw)
+  - `.hermes/skills/` (Hermes persistent)
+  - `agent-lab/agents/hermes/skills/` (Hermes workspace)
+- Created 3 OpenClaw cron jobs:
+  - `Hermes_Daily_Brief` — 7am daily → Telegram
+  - `Hermes_Trending_Radar` — 8am daily → Telegram
+  - `Hermes_Weekly_Report` — Monday 9am → Telegram
+- Existing CEREBUS_Strategy_Recon cron still running (every 30m)
+
 #### 🔴 [PM] 2026-05-16 — External Resource Analysis & Implementation
 Analyzed 5 external resources and implemented what we can NOW:
 
