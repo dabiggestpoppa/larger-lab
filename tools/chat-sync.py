@@ -228,8 +228,16 @@ def extract_key_updates(messages: list) -> dict:
         relevance = classify_message_relevance(msg)
         subject = msg.get("subject", "")
 
+        # Skip self-authored messages — agent already knows what they posted
+        # (The author tag in the header matches the agent)
+        author_tag = msg.get("tag", "")
+
         for tag, score in relevance.items():
             update_parts = []
+
+            # Skip if this agent authored the message (they already know)
+            if tag == author_tag:
+                continue
 
             # For highly relevant messages (directly addressed), extract key items
             if score >= 3:

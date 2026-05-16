@@ -205,3 +205,15 @@ All 6 repos from `dabiggestpoppa` account now cloned to `C:\Users\wifik\Desktop\
 - Committed and pushed (2caf890)
 - Phases 2-5 queued: VS Code Controller, Desktop Control, UI-TARS, Self-Modification
 
+#### 🔴 [PM] 2026-05-16 — OCE Phase 2 PM Tasks Complete (4/4)
+**OCE-2.20:** System Operator ↔ Event Fabric integration
+- tools/operator/event-integration.js — Bridge layer (exec_and_emit, kill_and_emit, install_and_emit)
+**OCE-2.21:** VS Code Controller ↔ Event Fabric integration
+- tools/operator/vscode-controller.js — Full VS Code CLI control (open, edit, search, git, extensions)
+- Wrapped emit functions for all VS Code actions
+**OCE-2.22:** Event Fabric debugging utilities
+- tools/operator/event-debug.js — CLI (tail, stats, replay, health, emit, types)
+**OCE-2.23:** Integration issues tracking
+- oce/docs/integration-issues.md — 7 issues identified, test checklist created
+- Committed and pushed (cf402ad)
+
