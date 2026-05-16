@@ -5,6 +5,20 @@
 
 ---
 
+## 🔵 [CC] Claude Code — Agent Tag Registry (2026-05-15)
+
+Progress updates are now tagged by agent to avoid collisions when multiple agents write concurrently:
+
+| Tag | Agent | Role |
+|-----|-------|------|
+| 🔵 [CC] | Claude Code | Overseer / Architecture / Coding |
+| 🟣 [OC] | OpenClaw | Analysis / Planning / Coordination |
+| 🟢 [HR] | Hermes | Execution / Backtests / Reporting |
+
+Format: `## 🔵 [CC] Claude Code — <brief description> (2026-05-15 HH:MM:SSZ)`
+
+---
+
 ## Architecture Update (May 15, 2026)
 
 **MT5 is FULLY DEPRECATED for backtesting.** MetaEditor can't compile headlessly and Strategy Tester can't be automated. All strategy development and backtesting now runs through **NautilusTrader** (Python-based).
@@ -875,3 +889,51 @@ stateDiagram-v2
 - Profitable strategies found: 2/5
   - P90_CFD_Expansion (USDJPY): 0.01%
   - RSI_Reversion (USDJPY): 0.01%
+
+
+## P90 Manual Strategies Results (2026-05-15 12:10:07.379057)
+- P90_CFD_Expansion: 0.09% return, 263 trades
+- Symmetry_Trap: -1.77% return, 236 trades
+
+
+## P90 Manual Strategies Results (2026-05-15 12:10:24.341889)
+- P90_CFD_Expansion: 0.09% return, 263 trades
+- Symmetry_Trap: -1.77% return, 236 trades
+
+
+## 🔥 SRRA-OPH Phase 1: Foundational Observer Mesh (2026-05-15)
+
+### Objective
+Build bounded local cognition with repairable overlap for agent collaboration.
+
+### Completed
+- [x] Created `srrs_opc/` module with base patch infrastructure
+- [x] Implemented 4 observer patches:
+  - PlannerPatch - Strategic planning with bounded horizon
+  - ExecutionPatch - Action execution with bounded operations
+  - MemoryPatch - Memory with bounded retention
+  - RepairPatch - Self-repair monitoring
+- [x] Created CollarLayer for structured overlap synchronization
+- [x] Created AgentBridge for OpenClaw/Hermes integration
+- [x] Tested 3-cycle synchronization - all patches stable
+
+### Architecture
+```
+┌─────────────────────────────────────────────────────────┐
+│              Collar Layer (Coordinator)                │
+├─────────────────────────────────────────────────────────┤
+│  Planner  →  Execution  →  Memory  →  Repair             │
+│    (plans)    (acts)      (stores)    (fixes)           │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Key Features
+- **Bounded State**: Each patch has max limits (history, actions, horizon)
+- **Self-Repair**: Patches detect inconsistency and repair locally
+- **Collar Protocol**: JSON-based state synchronization between patches
+- **Agent Bridge**: Syncs patch states to OpenClaw and Hermes agents
+
+### Next Steps
+- [ ] Integrate with Hermes Telegram bot for real-time sync
+- [ ] Add Redis/NATS messaging for inter-agent communication
+- [ ] Implement Phase 2: Observer Mesh Expansion

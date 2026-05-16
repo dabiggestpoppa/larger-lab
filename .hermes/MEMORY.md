@@ -2,6 +2,16 @@
 
 > Tier 1 memory. Loaded at every session start. Max ~2,200 chars.
 > Auto-extracted and updated by Hermes as work happens.
+> **Also auto-synced from `progress/hermes-progress.md` every 3 updates.**
+
+## 🔑 API Keys & Credentials
+> **RULE:** All API keys and credentials are stored in `C:\Users\wifik\Downloads\keys.txt`. Always check this file first when a key is needed. Never ask the user for keys that are already in this file.
+
+- **OpenRouter API:** `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`
+- **GitHub PAT:** `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`
+- **Telegram Bot:** `8851242922:AAGWGZaEwA0LxBYISo460Z08WC4aE_JirvE`
+- **MT5 Login:** (see keys.txt)
+- **Kamtera Access:** `84908b7a4714aacd25c51715e0efe96e` / Secret: `9cd519e13f62ef5522736cb103328ba8`
 
 ## Environment
 - **Project**: larger-lab — AI agent harness + quantitative trading workspace
@@ -42,9 +52,28 @@
 - Structure over tools: architecture-first, thin harness, decoupled layers
 - Twitter AI Research Bot: mid-term project for continuous AI best practices ingestion
 
+## SRRA-OPH Phase 1 (May 15 2026)
+- **Module**: `srrs_opc/` — Foundational Observer Mesh
+- **Components**: PlannerPatch, ExecutionPatch, MemoryPatch, RepairPatch, CollarLayer, AgentBridge
+- **Status**: ✅ Tested and stable (3 cycles, all patches stable)
+- **Key Files**: `srrs_opc/base_patch.py`, `srrs_opc/collar_layer.py`, `srrs_opc/agent_bridge.py`
+- **Next**: Integrate with Hermes Telegram bot for real-time sync
+
+## Progress Sync (May 15 2026)
+- **Sub-progress file**: `progress/hermes-progress.md`
+- **Local memory**: `.hermes/MEMORY.md` (this file)
+- **Sync threshold**: 3 updates → auto-sync to PROJECT_PROGRESS_CLEAN.md + this memory
+- **Agent tag**: 🟢 [HR]
+
 ## Lessons Learned
 - Stale memory.md is #1 cause of weird agent behavior — audit regularly
 - Compaction fires at ~136K tokens — Hermes inserts fallback marker, pauses crons
 - Don't paste API keys in chat — use `hermes config set KEY value` → `.env`
 - Wrong twice on same thing → correct immediately + update skill/memory
 - Same instruction twice → write a skill for it
+
+## Progress Sync Summary (HR)
+> **Last Sync:** 2026-05-16 01:27 UTC
+> **Status:** 🟡 Standby
+> **Active Phase:** Awaiting task assignment from Overseer / OpenClaw
+> **Working Memory:** `progress/hermes-memory.md`

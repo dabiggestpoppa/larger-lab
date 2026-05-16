@@ -1,0 +1,34 @@
+{
+  "agents": {
+    "claude-code": {
+      "tag": "CC",
+      "name": "Claude Code",
+      "role": "Overseer / Architecture / Coding",
+      "color": "🔵",
+      "progress_prefix": "CC"
+    },
+    "openclaw": {
+      "tag": "OC",
+      "name": "OpenClaw",
+      "role": "Analysis / Planning / Coordination",
+      "color": "🟣",
+      "progress_prefix": "OC"
+    },
+    "hermes": {
+      "tag": "HR",
+      "name": "Hermes",
+      "role": "Execution / Backtests / Testing / Reporting",
+      "color": "🟢",
+      "progress_prefix": "Hermes"
+    },
+    "assistant": {
+      "tag": "AS",
+      "name": "Assistant Manager",
+      "role": "Context Monitoring / Task Support / Quality Checks",
+      "color": "🟡",
+      "progress_prefix": "AS"
+    }
+  },
+  "progress_header_format": "{emoji} [{tag}] {agent-name} — {timestamp}",
+  "example": "🔵 [CC] Claude Code — 2026-05-15 20:50:00Z"
+}

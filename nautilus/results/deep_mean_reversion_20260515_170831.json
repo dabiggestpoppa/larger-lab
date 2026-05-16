@@ -1,0 +1,18 @@
+{
+  "strategy": "Deep_Mean_Reversion",
+  "pair": "EUR/USD",
+  "total_trades": 70,
+  "wins": 2,
+  "losses": 68,
+  "win_rate": 2.9,
+  "total_pnl_pips": -400.22,
+  "avg_win_pips": 32.05,
+  "avg_loss_pips": -6.83,
+  "max_drawdown_pips": -400.22,
+  "profit_factor": 0.14,
+  "by_exit_reason": {
+    "sl_220": 67,
+    "tp1_0pct": 1,
+    "hard_exit_12pm": 2
+  }
+}

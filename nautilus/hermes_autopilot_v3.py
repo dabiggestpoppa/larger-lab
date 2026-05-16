@@ -33,10 +33,15 @@ class HermesAutopilot:
         filename = f"{pair}!_M5_202301020000_202605061250.csv"
         filepath = DOWNLOADS_DIR / filename
         if filepath.exists():
-            df = _parse_csv(filepath)
-            return df
+            try:
+                df = _parse_csv(filepath)
+                if len(df) > 50000:
+                    df = df.tail(50000)  # Limit to recent data
+                return df
+            except Exception as e:
+                print(f"Warning: Could not load {filename}: {e}")
         
-        # Generate test data if file not found
+        # Generate test data if file not found or too large
         print(f"Generating test data for {pair}...")
         idx = pd.date_range('2023-01-01', periods=50000, freq='5T')
         np.random.seed(42)
@@ -405,6 +410,113 @@ class HermesAutopilot:
         total_return = (pnl / 10000) * 100
         return {"strategy": "Asian_Breakout", "pair": df.attrs.get('pair', 'UNKNOWN'), "trades": trades, "pnl": round(pnl, 2), "return_pct": round(total_return, 2)}
     
+    def run_cerebus_wma(self, df: pd.DataFrame) -> dict:
+        """CEREBUS WMA Crossover with ATR stops and drawdown protection"""
+        if df is None or len(df) < 100:
+            return None
+        
+        df = df.copy()
+        df['hour_utc'] = df.index.hour
+        df['date'] = df.index.date
+        
+        # Calculate WMA(7)
+        weights = np.arange(1, 8)
+        df['wma'] = df['close'].rolling(7).apply(lambda x: np.dot(x, weights) / weights.sum(), raw=True)
+        
+        # Calculate ATR(14)
+        df['tr'] = df['high'] - df['low']
+        df['tr'] = df['tr'].combine(abs(df['high'] - df['close'].shift(1)), np.maximum)
+        df['tr'] = df['tr'].combine(abs(df['low'] - df['close'].shift(1)), np.maximum)
+        df['atr'] = df['tr'].rolling(14).mean()
+        
+        position = 0
+        entry_price = 0
+        pnl = 0
+        trades = 0
+        position_size = 0.1
+        direction = 0
+        day_equity_start = None
+        
+        for i in range(14, len(df) - 1):
+            row = df.iloc[i]
+            prev_row = df.iloc[i-1]
+            
+            # Daily drawdown tracking
+            if row['date'] != prev_row['date']:
+                day_equity_start = None
+            
+            if day_equity_start is None:
+                day_equity_start = 10000 + pnl  # Starting equity
+            
+            drawdown_today = 100 * (10000 + pnl - day_equity_start) / day_equity_start
+            drawdown_triggered = drawdown_today < -3.0
+            
+            # Session filter (UTC 2-18)
+            in_session = 2 <= row['hour_utc'] <= 18
+            
+            # Entry conditions
+            wma = row['wma']
+            prev_wma = prev_row['wma']
+            close = row['close']
+            prev_close = prev_row['close']
+            atr = row['atr']
+            
+            if pd.isna(wma) or pd.isna(atr):
+                continue
+            
+            # Long: close crosses above WMA and close > prev close
+            is_long = close > wma and prev_close <= prev_wma and close > prev_close
+            # Short: close crosses below WMA and close < prev close
+            is_short = close < wma and prev_close >= prev_wma and close < prev_close
+            
+            allow_trade = in_session and not drawdown_triggered
+            
+            # Entry logic
+            if position == 0 and allow_trade:
+                sl_distance = atr * 1.5
+                tp_distance = atr * 1.5 * 3  # 1:3 RR
+                
+                if is_long:
+                    position = 1
+                    entry_price = close
+                    direction = 1
+                elif is_short:
+                    position = 1
+                    entry_price = close
+                    direction = -1
+            
+            # Exit logic
+            elif position > 0:
+                sl_distance = row['atr'] * 1.5 if not pd.isna(row['atr']) else 0.001
+                tp_distance = sl_distance * 3
+                
+                sl_long = entry_price - sl_distance
+                tp_long = entry_price + tp_distance
+                sl_short = entry_price + sl_distance
+                tp_short = entry_price - tp_distance
+                
+                if direction > 0:
+                    if row['low'] <= sl_long:
+                        pnl += (sl_long - entry_price) * position_size * 10000
+                        position = 0
+                        trades += 1
+                    elif row['high'] >= tp_long:
+                        pnl += (tp_long - entry_price) * position_size * 10000
+                        position = 0
+                        trades += 1
+                else:
+                    if row['high'] >= sl_short:
+                        pnl += (entry_price - sl_short) * position_size * 10000
+                        position = 0
+                        trades += 1
+                    elif row['low'] <= tp_short:
+                        pnl += (entry_price - tp_short) * position_size * 10000
+                        position = 0
+                        trades += 1
+        
+        total_return = (pnl / 10000) * 100
+        return {"strategy": "CEREBUS_WMA_Strategy", "pair": df.attrs.get('pair', 'UNKNOWN'), "trades": trades, "pnl": round(pnl, 2), "return_pct": round(total_return, 2)}
+    
     def run_iteration(self):
         """Run one iteration of all strategies"""
         self.iteration += 1
@@ -418,6 +530,7 @@ class HermesAutopilot:
             ("EMA_Cross", self.run_ema_cross),
             ("RSI_Reversion", self.run_rsi_reversion),
             ("Asian_Breakout", self.run_breakout),
+            ("CEREBUS_WMA_Strategy", self.run_cerebus_wma),
         ]
         
         for name, func in strategies:

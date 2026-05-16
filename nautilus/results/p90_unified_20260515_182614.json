@@ -1,0 +1,48 @@
+[
+  {
+    "strategy": "P90_Cascade_Combo",
+    "pair": "EURUSD",
+    "total_trades": 263,
+    "total_sessions": 155,
+    "wins": 90,
+    "losses": 173,
+    "win_rate": 34.2,
+    "total_pnl_pips": -7.71,
+    "avg_win_pips": 10.54,
+    "avg_loss_pips": -5.53,
+    "max_drawdown_pips": -274.37,
+    "profit_factor": 0.99,
+    "by_activation_type": {
+      "initial_p90": {
+        "trades": 163,
+        "wins": 43,
+        "win_rate": 26.4,
+        "pnl_pips": -63.07
+      },
+      "cascade_1": {
+        "trades": 66,
+        "wins": 34,
+        "win_rate": 51.5,
+        "pnl_pips": 30.65
+      },
+      "cascade_2": {
+        "trades": 28,
+        "wins": 10,
+        "win_rate": 35.7,
+        "pnl_pips": -8.09
+      },
+      "add_45min": {
+        "trades": 6,
+        "wins": 3,
+        "win_rate": 50.0,
+        "pnl_pips": 32.8
+      }
+    },
+    "by_exit_reason": {
+      "sl": 143,
+      "hold_time": 97,
+      "kill_switch_132": 12,
+      "tp2_50": 11
+    }
+  }
+]

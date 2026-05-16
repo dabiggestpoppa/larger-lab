@@ -1,0 +1,113 @@
+{
+  "iteration": 2,
+  "profitable_count": 3,
+  "profitable_strategies": [
+    {
+      "strategy": "P90_Base_Strategy",
+      "pair": "EURUSD",
+      "trades": 147,
+      "pnl": 11.01,
+      "return_pct": 0.11
+    },
+    {
+      "strategy": "RSI_Reversion",
+      "pair": "EURUSD",
+      "trades": 349,
+      "pnl": 32.84,
+      "return_pct": 0.33
+    },
+    {
+      "strategy": "CEREBUS_WMA_Strategy",
+      "pair": "EURUSD",
+      "trades": 1109,
+      "pnl": 18.06,
+      "return_pct": 0.18
+    }
+  ],
+  "all_results": [
+    {
+      "strategy": "P90_Base_Strategy",
+      "pair": "EURUSD",
+      "trades": 147,
+      "pnl": 11.01,
+      "return_pct": 0.11
+    },
+    {
+      "strategy": "Symmetry_Trap",
+      "pair": "EURUSD",
+      "trades": 114,
+      "pnl": -92.83,
+      "return_pct": -0.93
+    },
+    {
+      "strategy": "EMA_Cross",
+      "pair": "EURUSD",
+      "trades": 830,
+      "pnl": -8.7,
+      "return_pct": -0.09
+    },
+    {
+      "strategy": "RSI_Reversion",
+      "pair": "EURUSD",
+      "trades": 349,
+      "pnl": 32.84,
+      "return_pct": 0.33
+    },
+    {
+      "strategy": "Asian_Breakout",
+      "pair": "EURUSD",
+      "trades": 1270,
+      "pnl": -44.92,
+      "return_pct": -0.45
+    },
+    {
+      "strategy": "CEREBUS_WMA_Strategy",
+      "pair": "EURUSD",
+      "trades": 1109,
+      "pnl": 18.06,
+      "return_pct": 0.18
+    },
+    {
+      "strategy": "P90_Base_Strategy",
+      "pair": "EURUSD",
+      "trades": 212,
+      "pnl": -7.54,
+      "return_pct": -0.08
+    },
+    {
+      "strategy": "Symmetry_Trap",
+      "pair": "EURUSD",
+      "trades": 114,
+      "pnl": -92.83,
+      "return_pct": -0.93
+    },
+    {
+      "strategy": "EMA_Cross",
+      "pair": "EURUSD",
+      "trades": 830,
+      "pnl": -8.7,
+      "return_pct": -0.09
+    },
+    {
+      "strategy": "RSI_Reversion",
+      "pair": "EURUSD",
+      "trades": 349,
+      "pnl": 32.84,
+      "return_pct": 0.33
+    },
+    {
+      "strategy": "Asian_Breakout",
+      "pair": "EURUSD",
+      "trades": 1270,
+      "pnl": -44.92,
+      "return_pct": -0.45
+    },
+    {
+      "strategy": "CEREBUS_WMA_Strategy",
+      "pair": "EURUSD",
+      "trades": 1109,
+      "pnl": 18.06,
+      "return_pct": 0.18
+    }
+  ]
+}

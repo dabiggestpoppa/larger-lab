@@ -1,0 +1,9 @@
+[
+  {
+    "strategy": "P90_CFD_Expansion",
+    "pair": "EUR/USD",
+    "trades": 133,
+    "pnl": 0.02,
+    "return_pct": 1.98
+  }
+]
