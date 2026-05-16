@@ -1,0 +1,174 @@
+{
+  "CFD_Expansion": {
+    "strategy": "CFD_Expansion",
+    "pair": "EUR/USD",
+    "total_trades": 764,
+    "wins": 170,
+    "losses": 594,
+    "win_rate": 22.3,
+    "total_pnl": -412.17,
+    "avg_win": 14.43,
+    "avg_loss": -4.82,
+    "max_dd": -566.0,
+    "profit_factor": 0.86,
+    "expectancy": -0.539,
+    "by_exit": {
+      "sl": 529,
+      "tp": 209,
+      "kill_switch_132": 24,
+      "end_data": 2
+    }
+  },
+  "P90_Cascade": {
+    "strategy": "P90_Cascade",
+    "pair": "EUR/USD",
+    "total_trades": 1291,
+    "wins": 355,
+    "losses": 936,
+    "win_rate": 27.5,
+    "total_pnl": -2364.81,
+    "avg_win": 13.04,
+    "avg_loss": -7.47,
+    "max_dd": -2672.73,
+    "profit_factor": 0.66,
+    "expectancy": -1.832,
+    "by_exit": {
+      "sl": 740,
+      "tp": 543,
+      "end_data": 8
+    }
+  },
+  "Cascade_Combo_45min": {
+    "strategy": "Cascade_Combo_45min",
+    "pair": "EUR/USD",
+    "total_trades": 1764,
+    "wins": 464,
+    "losses": 1300,
+    "win_rate": 26.3,
+    "total_pnl": -485.56,
+    "avg_win": 13.12,
+    "avg_loss": -5.06,
+    "max_dd": -1187.77,
+    "profit_factor": 0.93,
+    "expectancy": -0.275,
+    "by_exit": {
+      "sl": 1109,
+      "tp": 647,
+      "end_data": 8
+    }
+  },
+  "Deep_Mean_Reversion": {
+    "strategy": "Deep_Mean_Reversion",
+    "error": "single positional indexer is out-of-bounds",
+    "total_trades": 0
+  },
+  "Stall_Harvest_CFD": {
+    "strategy": "Stall_Harvest_CFD",
+    "pair": "EUR/USD",
+    "total_trades": 463,
+    "wins": 463,
+    "losses": 0,
+    "win_rate": 100.0,
+    "total_pnl": 4950.4,
+    "avg_win": 10.69,
+    "avg_loss": 0,
+    "max_dd": 0,
+    "profit_factor": 4950.4,
+    "expectancy": 10.692,
+    "by_exit": {
+      "sl": 463
+    }
+  },
+  "Constraint_Anchor": {
+    "strategy": "Constraint_Anchor",
+    "pair": "EUR/USD",
+    "total_trades": 607,
+    "wins": 353,
+    "losses": 254,
+    "win_rate": 58.2,
+    "total_pnl": -1450.4,
+    "avg_win": 5.83,
+    "avg_loss": -13.82,
+    "max_dd": -1562.85,
+    "profit_factor": 0.59,
+    "expectancy": -2.389,
+    "by_exit": {
+      "tp": 503,
+      "sl": 94,
+      "end_data": 10
+    }
+  },
+  "Monday_Asian_Float": {
+    "strategy": "Monday_Asian_Float",
+    "pair": "EUR/USD",
+    "total_trades": 148,
+    "wins": 84,
+    "losses": 64,
+    "win_rate": 56.8,
+    "total_pnl": 541.5,
+    "avg_win": 24.36,
+    "avg_loss": -23.51,
+    "max_dd": -207.8,
+    "profit_factor": 1.36,
+    "expectancy": 3.659,
+    "by_exit": {
+      "end_data": 70,
+      "tp": 50,
+      "sl": 28
+    }
+  },
+  "Daily_Asian_Float": {
+    "strategy": "Daily_Asian_Float",
+    "pair": "EUR/USD",
+    "total_trades": 36,
+    "wins": 36,
+    "losses": 0,
+    "win_rate": 100.0,
+    "total_pnl": 505.79,
+    "avg_win": 14.05,
+    "avg_loss": 0,
+    "max_dd": 0,
+    "profit_factor": 505.79,
+    "expectancy": 14.05,
+    "by_exit": {
+      "tp": 36
+    }
+  },
+  "Resolution_Amplifier": {
+    "strategy": "Resolution_Amplifier",
+    "pair": "EUR/USD",
+    "total_trades": 424,
+    "wins": 84,
+    "losses": 340,
+    "win_rate": 19.8,
+    "total_pnl": 221.66,
+    "avg_win": 11.28,
+    "avg_loss": -2.13,
+    "max_dd": -57.71,
+    "profit_factor": 1.31,
+    "expectancy": 0.523,
+    "by_exit": {
+      "sl": 340,
+      "tp": 84
+    }
+  },
+  "Full_Day_Regime": {
+    "strategy": "Full_Day_Regime",
+    "pair": "EUR/USD",
+    "total_trades": 764,
+    "wins": 198,
+    "losses": 566,
+    "win_rate": 25.9,
+    "total_pnl": -651.11,
+    "avg_win": 10.89,
+    "avg_loss": -4.96,
+    "max_dd": -863.67,
+    "profit_factor": 0.77,
+    "expectancy": -0.852,
+    "by_exit": {
+      "sl": 477,
+      "tp": 286,
+      "end_data": 1
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "entries": {
+    "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\.openclaw-2\\.openclaw\\openclaw.json": {
+      "lastKnownGood": {
+        "hash": "3a9fe8875fa0943385432c850837432534db178e42025d3d9fee8a804fd13934",
+        "bytes": 6462,
+        "mtimeMs": 1778918759817.8235,
+        "ctimeMs": 1778918759817.8235,
+        "dev": "3465847700",
+        "ino": "2533274791387901",
+        "mode": 438,
+        "nlink": 1,
+        "uid": 0,
+        "gid": 0,
+        "hasMeta": false,
+        "gatewayMode": "local",
+        "observedAt": "2026-05-16T08:32:22.741Z"
+      },
+      "lastObservedSuspiciousSignature": null,
+      "lastPromotedGood": {
+        "hash": "3a9fe8875fa0943385432c850837432534db178e42025d3d9fee8a804fd13934",
+        "bytes": 6462,
+        "mtimeMs": 1778918759817.8235,
+        "ctimeMs": 1778918759817.8235,
+        "dev": "3465847700",
+        "ino": "2533274791387901",
+        "mode": 33206,
+        "nlink": 1,
+        "uid": 0,
+        "gid": 0,
+        "hasMeta": false,
+        "gatewayMode": "local",
+        "observedAt": "2026-05-16T08:24:13.702Z"
+      }
+    }
+  }
+}
