@@ -44,6 +44,7 @@ def initialized_adapter(adapter):
 # ─── Initialization Tests ─────────────────────────────────────────────────────
 
 class TestAdapterInitialization:
+    pytestmark = pytest.mark.asyncio
     """Test adapter initialization."""
 
     @pytest.mark.asyncio
@@ -86,6 +87,7 @@ class TestAdapterInitialization:
 # ─── Observer Status Tests ────────────────────────────────────────────────────
 
 class TestObserverStatus:
+    pytestmark = pytest.mark.asyncio
     """Test observer status retrieval."""
 
     @pytest.mark.asyncio
@@ -115,6 +117,7 @@ class TestObserverStatus:
 # ─── Health Check Tests ───────────────────────────────────────────────────────
 
 class TestHealthCheck:
+    pytestmark = pytest.mark.asyncio
     """Test health check functionality."""
 
     @pytest.mark.asyncio
@@ -141,6 +144,7 @@ class TestHealthCheck:
 # ─── Entropy Economics Tests ──────────────────────────────────────────────────
 
 class TestEntropyEconomics:
+    pytestmark = pytest.mark.asyncio
     """Test entropy economics metrics."""
 
     @pytest.mark.asyncio
@@ -183,6 +187,7 @@ class TestEntropyEconomics:
 # ─── Attractor State Tests ────────────────────────────────────────────────────
 
 class TestAttractorState:
+    pytestmark = pytest.mark.asyncio
     """Test attractor state retrieval."""
 
     @pytest.mark.asyncio
@@ -210,6 +215,7 @@ class TestAttractorState:
 # ─── Memory Access Tests ──────────────────────────────────────────────────────
 
 class TestMemoryAccess:
+    pytestmark = pytest.mark.asyncio
     """Test memory access methods."""
 
     @pytest.mark.asyncio
@@ -237,6 +243,7 @@ class TestMemoryAccess:
 # ─── Event Emission Tests ─────────────────────────────────────────────────────
 
 class TestEventEmission:
+    pytestmark = pytest.mark.asyncio
     """Test event emission."""
 
     @pytest.mark.asyncio
@@ -258,6 +265,7 @@ class TestEventEmission:
 # ─── Prediction Contract Tests ────────────────────────────────────────────────
 
 class TestPredictionContracts:
+    pytestmark = pytest.mark.asyncio
     """Test prediction contract creation and validation."""
 
     @pytest.mark.asyncio
@@ -286,6 +294,7 @@ class TestPredictionContracts:
 # ─── Integration Tests ────────────────────────────────────────────────────────
 
 class TestIntegration:
+    pytestmark = pytest.mark.asyncio
     """Integration tests combining multiple adapter methods."""
 
     @pytest.mark.asyncio
