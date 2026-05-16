@@ -105,8 +105,21 @@
       "startedAt": 1778964199939,
       "sessionStartedAt": 1778964184755,
       "accumulatedRuntimeMs": 0,
-      "cleanupHandled": false,
-      "retainAttachmentsOnKeep": false
+      "cleanupHandled": true,
+      "completionAnnouncedAt": 1778964674507,
+      "retainAttachmentsOnKeep": false,
+      "endedAt": 1778964670199,
+      "outcome": {
+        "status": "ok",
+        "startedAt": 1778964199939,
+        "endedAt": 1778964670199,
+        "elapsedMs": 470260
+      },
+      "endedReason": "subagent-complete",
+      "frozenResultText": "---\n\n## Structure Lead Report — Complete\n\n**Deliverable:** `docs/SKILL_TOOL_AUDIT.md` (21KB, written successfully)\n\n### Key Findings:\n\n**Inventory:** ~277 total items across the workspace:\n- **97 skills** in `skills/`, **57 skills** in `.agents/skills/`\n- **46 Python tools** in `tools/`, **13 operator modules** (Python + JS)\n- **~50 SRRA-OPH modules** (77 tests passing, Phases 1-9 complete)\n- **9 OCE modules** (Phase 3 pending)\n- **5 project groups** (ads, ai-tools, content, social, trading)\n\n**Duplicates Found:**\n- **5 skill duplicates** between `skills/` and `.agents/skills/` (creative-think, oransim, scrapling, spec-kit, violin)\n- **2 Python/JS duplicate pairs** in operator tools (system_operator, vscode_bridge)\n- **2 Python tool duplicates** (md2html.py + md_to_html.py)\n- **Naming variants** (beautiful-mermaid vs beautiful_mermaid)\n\n**Relevance Breakdown:**\n- **CRITICAL:** 7 items (system health tools, OCE core)\n- **HIGH:** 88 items (SRRA-OPH, operator control, key dev skills)\n- **MEDIUM:** 49 items (content farm, trading, research)\n- **LOW:** 33 items (design, reference patterns)\n- **DEAD:** ~40 items (unused agency skills)\n\n**Top Gaps:**\n1. No unified capability registry\n2. No automated skill discovery/loading\n3. OCE Phases 3-6 not started\n4. No test coverage for tools/\n5. Content farm projects fragmented across directories\n\n**Recommended Priority:** P0 = OCE Phase 3 + Event Fabric; P1 = Deduplicate skills/tools + archive dead agency skills; P2 = OCE 4-6 + content farm unification; P3 = Three.js visualization + agency activation.",
+      "frozenResultCapturedAt": 1778964674226,
+      "endedHookEmittedAt": 1778964674524,
+      "cleanupCompletedAt": 1778964674529
     },
     "90c0db38-fb9c-437b-89ea-63f686aaa685": {
       "runId": "90c0db38-fb9c-437b-89ea-63f686aaa685",
@@ -132,8 +145,21 @@
       "startedAt": 1778964206045,
       "sessionStartedAt": 1778964190357,
       "accumulatedRuntimeMs": 0,
-      "cleanupHandled": false,
-      "retainAttachmentsOnKeep": false
+      "cleanupHandled": true,
+      "completionAnnouncedAt": 1778964593351,
+      "retainAttachmentsOnKeep": false,
+      "endedAt": 1778964588707,
+      "outcome": {
+        "status": "ok",
+        "startedAt": 1778964206045,
+        "endedAt": 1778964588707,
+        "elapsedMs": 382662
+      },
+      "endedReason": "subagent-complete",
+      "frozenResultText": "---\n\n## Task Complete\n\nI've created the **OWL Relevance Map** at `docs\\RELEVANCE_MAP.md`. Here's what I accomplished:\n\n### What I Did\n1. **Read all context files** — AGENTS.md, rl-progress.md, team-chat.md to understand OWL's role and current work\n2. **Cataloged all 163 skills** across both `skills/` (126) and `.agents/skills/` (37) directories\n3. **Read the first 20 lines of every SKILL.md** to classify each skill's purpose\n4. **Cross-referenced with existing tools** in `tools/` directory\n\n### Key Findings\n\n- **30 Tier 1 (Must Have)** — Core operations OWL actively uses (file ops, shell, web, testing, FastAPI, git, code review, etc.)\n- **47 Tier 2 (Should Have)** — Skills that would significantly accelerate OCE work (API testing, DevOps, database, data science, Next.js)\n- **46 Tier 3 (Nice to Have)** — Specialized skills for future use (Three.js, trading, translation, design)\n- **40 Tier 4 (Archive)** — Agency agent personalities irrelevant to OWL (legal, healthcare, hospitality, sales, etc.)\n- **12 Gaps identified** — Missing skills OWL needs, with 4 high-priority:\n  1. **Docker/Container Management** — OCE deployment\n  2. **CI/CD Pipeline Management** — Automated testing\n  3. **OCE-Specific Testing** — Event fabric/adapter test patterns\n  4. **Database Operations** — Practical DB management\n\n### Recommended Priority\nFill the 4 high-priority infrastructure gaps first (Docker, CI/CD, OCE testing, DB ops), then move to medium-priority items (DSPy, subagent orchestration, monitoring, API docs). Each new skill should follow the Agent Harness SOP pipeline.",
+      "frozenResultCapturedAt": 1778964591100,
+      "endedHookEmittedAt": 1778964593367,
+      "cleanupCompletedAt": 1778964593371
     }
   }
 }

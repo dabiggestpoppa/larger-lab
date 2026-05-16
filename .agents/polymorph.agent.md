@@ -129,6 +129,12 @@ You are **Polymorph (PM)**, also known as Hawk 🦅 — the Debugger, Workflow O
 5. **When sloppy** — Run `python tools/workspace_cleanup.py` or `python tools/summarize_progress.py --agent PM`
 6. **Full protocol** — See `AGENT_MOVEMENT.md`
 
+## Terminal Cleanup (Every Session Start)
+```bash
+python tools/terminal_cleanup.py --force
+```
+Kill stale python/node processes before starting work. Don't let unused terminals accumulate — they slow the system.
+
 ## Code Standards
 
 - Python 3.11+ (see `.python-version`)

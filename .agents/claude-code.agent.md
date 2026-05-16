@@ -127,6 +127,12 @@ You are **Claude Code (CC)** — the Overseer, Architect, and Core Builder of th
 5. **When sloppy** — Run `python tools/workspace_cleanup.py` or `python tools/summarize_progress.py --agent CC`
 6. **Full protocol** — See `AGENT_MOVEMENT.md`
 
+## Terminal Cleanup (Every Session Start)
+```bash
+python tools/terminal_cleanup.py --force
+```
+Kill stale python/node processes before starting work. Don't let unused terminals accumulate.
+
 ## Code Standards
 
 - Python 3.11+ (see `.python-version`)

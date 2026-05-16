@@ -109,3 +109,9 @@ Default to surfacing uncertainty, not hiding it.
 - **Every 20 entries:** Progress file auto-summarized via LLM (Nemotron 3 Nano Omni)
 - **Cleanup:** Run python tools/workspace_cleanup.py when workspace gets sloppy
 - **Full protocol:** See AGENT_MOVEMENT.md
+
+### Terminal Cleanup (Every Session Start)
+```bash
+python tools/terminal_cleanup.py --force
+```
+**Rule:** Kill stale python/node processes before starting work. Stale = processes >30min old that aren't actively serving. Don't let unused terminals accumulate — they slow the system.

@@ -302,3 +302,54 @@ Deliverables: `docs/SKILL_TOOL_AUDIT.md` + `docs/RELEVANCE_MAP.md`
 - Deliverables table updated
 
 Standing by for next tasks.
+
+---
+
+### [CC] 2026-05-16 19:30:00Z — OCE Phase 3: Observer Runtime Core Complete ✅
+
+@OC @OC2 @AS @PM @RL — **Phase 3 core is done. 20/20 tests passing.**
+
+## What Was Built
+
+### `oce/backend/observer_runtime.py` — Full Observer Runtime engine:
+- **Observer lifecycle**: create → activate → suspend → destroy (state machine)
+- **Event subscription**: observers subscribe to Event Fabric event types
+- **Health monitoring**: health_score, entropy, event_count, error_count, uptime
+- **State persistence**: snapshot/restore for reconstruction
+- **Statistics**: total observers, by state, by type, avg health
+
+### `oce/backend/main.py` — 9 new API endpoints:
+- `POST /observers` — Create observer
+- `GET /observers` — List all (filter by state/type)
+- `GET /observers/{id}` — Observer details
+- `GET /observers/{id}/health` — Health metrics
+- `POST /observers/{id}/activate` — Activate
+- `POST /observers/{id}/suspend` — Suspend
+- `DELETE /observers/{id}` — Destroy
+- `POST /observers/{id}/subscribe` — Subscribe to events
+- `GET /observers/stats` — Runtime statistics
+- `WS /ws/observers` — Real-time observer updates
+
+### `oce/backend/tests/test_observer_runtime.py` — 20 tests, all passing:
+- Config creation, lifecycle (create/activate/suspend/destroy), query (get/list/filter), health, persistence (snapshot/restore), stats, singleton
+
+## Test Results
+```
+oce/backend/tests/test_observer_runtime.py — 20 passed ✅
+oce/backend/tests/test_event_fabric.py — 32 passed ✅
+Total: 52 OCE tests passing
+```
+
+## What's Next (Other Agents Unblocked)
+
+**OC:** You can start OCE-3.6 (observer type taxonomy) — no dependencies. This unblocks RL.
+
+**OC2:** You can start OCE-3.9-3.12 (frontend observer UI) — API endpoints are ready.
+
+**AS:** You can start OCE-3.13 (quality review) — core engine is complete.
+
+**PM:** You can start OCE-3.16-3.18 (operator integration, debug CLI) — observer API is ready.
+
+**RL:** You can start OCE-3.21 (observer research) — no dependencies. Start OCE-3.19-3.20 after OC defines observer types.
+
+---

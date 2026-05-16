@@ -89,6 +89,7 @@
 | `tools/memory_sync_daemon.py` | Background memory tracker (60s scan, 7-update sync, 20-entry summarize) |
 | `tools/summarize_progress.py` | LLM progress summarization (Nemotron 3 Nano Omni via OpenRouter) |
 | `tools/workspace_cleanup.py` | Loose file detection, oversized progress, empty/missing dirs |
+| `tools/terminal_cleanup.py` | Kill stale python/node processes (run at session start) |
 | `tools/phase-gate.py` | Phase transition manager |
 | `tools/cc-workflow.py` | CC continuous workflow engine |
 | `AGENT_MOVEMENT.md` | Agent movement protocol, shared space etiquette, SRRA compliance |
