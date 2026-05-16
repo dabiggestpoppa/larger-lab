@@ -131,3 +131,11 @@ All 6 repos from `dabiggestpoppa` account now cloned to `C:\Users\wifik\Desktop\
 
 **Team chat updated** with HTML standard announcement and tool documentation.
 
+
+#### 🔴 [PM] 2026-05-16 — Motus Agent Framework Installed
+- lithosai-motus v0.4.1 installed (Python 3.12+, 21 packages)
+- skills/motus/ — Full skill with ReActAgent, task graphs, MCP, serving
+- 	ools/motus_agent.py — Build, serve, chat, deploy wrapper
+- Source: C:\Users\wifik\Desktop\projects\motus\
+- Features: ReActAgent, @agent_task workflows, multi-provider, MCP, Docker, guardrails, memory, cloud deploy
+

@@ -6,16 +6,22 @@
 
 ---
 
-## Current Context (2026-05-16 10:00:00 UTC)
+## Current Context (2026-05-16 11:30:00 UTC)
 
 ### Status
-🟢 Active — Both gateways resolved
+🟡 Partial — OC1 needs further debugging
 
 ### Active Phase
-Gateway infrastructure — 24/7 uptime established
+OC1 Telegram connectivity — diagnosed but not fully resolved
 
 ### Pending Tasks
-- Optional: Run tools/register-gateway-tasks.ps1 as Admin for Scheduled Tasks with restart-on-failure
+- OC1 gateway restart failed after config update — needs investigation
+- OC1 models.json has placeholder API key (OPENROUTER_API_KEY) — needs actual key
+- OC1 has 203 Telegram commands registered (limit 100) — needs reduction
+- Optional: Run tools/register-gateway-tasks.ps1 as Admin for Scheduled Tasks
+
+### Key Finding
+OC1's openclaw.json was missing the openrouter provider. Added it, but after restart OC1 health check failed. OC2 working fine throughout. See /memories/session/oc1-gateway-diagnosis.md for full details.
 
 ### Recent Activity
 #### 🦉 [RL] 2026-05-16 — Agent Initialized & Registered

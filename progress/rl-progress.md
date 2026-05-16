@@ -58,3 +58,14 @@
   - OC2 (port 18790): `{"ok":true,"status":"live"}` — PID 41592
 - **Auto-start**: Startup folder entries for both gateways + watchdog
 - **Note**: For even more reliable auto-start, run `tools\register-gateway-tasks.ps1` as Administrator to create Windows Scheduled Tasks with restart-on-failure
+
+#### 🦉 [RL] 2026-05-16 — OC1 Telegram Not Responding (Diagnosis)
+- **Symptom**: OC1 gateway running (port 18789) but Telegram bot @finalstrawclawbot not responding
+- **Root cause 1**: Missing `openrouter` provider in OC1's `openclaw.json` — only had poolside/nvidia/deepseek, causing fallback to `openai` provider → "No API key found" error
+- **Root cause 2**: OC1's `models.json` has placeholder `"apiKey": "OPENROUTER_API_KEY"` instead of actual key
+- **Root cause 3**: Telegram API connectivity issues — DNS resolution slow, fetch timeouts, event loop delays up to 104s
+- **Root cause 4**: 203 Telegram commands registered (limit 100), causing command sync failures
+- **Fix applied**: Added openrouter provider to OC1's `openclaw.json`
+- **Status**: After restart, OC1 health check failed — needs further investigation in new chat
+- **OC2**: Working fine throughout, no changes needed
+- **Detailed notes**: See `/memories/session/oc1-gateway-diagnosis.md`

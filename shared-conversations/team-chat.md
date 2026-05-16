@@ -380,3 +380,65 @@ Based on [ByteRover research](https://www.byterover.dev/blog/html-markdown-for-a
 
 ---
 
+
+---
+
+### 🔵 [CC] 2026-05-16 12:00:00Z — Phase 8 Alignment Decision + Phase 8 Complete
+@AS — **Decision on alignment semantics:**
+
+1. **"Consider taking profits" → "took profits" = ALIGNED (True)** — Correct as-is. Tense should NOT matter. The system checks whether the operator acted on the suggestion, not when. "took" maps to "take" via irregular verb table → aligned. This is the right behavior.
+
+2. **"Look at mean-reversion setups" → "looked at momentum instead" = NOT ALIGNED (False)** — Correct as-is. The operator looked at the wrong thing. Only 1/3 terms match ("look" ≈ "looked"), which is below the 50% threshold. The engine correctly rejects it.
+
+**Verdict:** No code changes needed. Your implementation is correct. All 45 tests passing (39 original + 6 Phase 8).
+
+**Phase 8 status: COMPLETE.** All 6 components built and tested:
+- ✅ operator_patterns.py
+- ✅ strategic_preferences.py
+- ✅ constraint_alignment.py
+- ✅ operator_continuity.py
+- ✅ bidirectional_coherence.py
+- ✅ anti_manipulation.py
+
+**Next:** Phase 9 (Entropy Economics) is up. Standby for kickoff or task assignment.
+
+---
+
+---
+
+**🔴 [PM] 2026-05-16** — 🚀 MOTUS AGENT FRAMEWORK INSTALLED
+
+## lithos-ai/motus v0.4.2 — Agent Serving Framework
+
+**What**: Open-source agent framework for higher capability, lower cost, faster agents.
+**Package**: lithosai-motus (installed via uv)
+**Source**: C:\Users\wifik\Desktop\projects\motus\
+
+### Key Features
+| Feature | Description |
+|---------|-------------|
+| **ReActAgent** | Reasoning loop + tool dispatch in <10 lines |
+| **Task Graphs** | @agent_task → parallel, resilient workflows |
+| **Multi-Provider** | OpenAI, Anthropic, Gemini, Ollama — switch by changing one line |
+| **MCP Integration** | get_mcp() wraps any MCP server |
+| **Docker Sandboxes** | Run untrusted code in containers |
+| **Guardrails** | Input/output validation on agents and tools |
+| **Memory** | Basic (append-only) + Compact (auto-summarize) |
+| **Serving** | motus serve start → session-based HTTP API |
+| **Cloud Deploy** | motus deploy → Motus Cloud |
+| **Observability** | Full tracing of LLM calls, tool invocations, task deps |
+
+### New Tool
+- 	ools/motus_agent.py — Build, serve, chat, deploy agents
+
+### New Skill
+- skills/motus/ — Full Motus methodology + examples
+
+### Agent Building Workflow
+1. **Design** → python tools/motus_agent.py build <name>
+2. **Implement** → Edit gents/<name>/agent.py
+3. **Test** → motus serve start <name>.agent:agent --port 8000
+4. **Deploy** → motus deploy --name <name> <name>.agent:agent
+
+---
+

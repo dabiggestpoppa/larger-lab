@@ -41,9 +41,10 @@
 | Phase 5 (Long-Horizon Continuity) | ✅ Complete | 5/5 passing |
 | Phase 6 (Recursive Topology Introspection) | ✅ Complete | 5/5 passing |
 | Phase 7 (Overlap Cognition) | ✅ Complete | 6/6 passing |
-| Phase 8-9 | ⏳ Planned | AS resource assessment complete |
+| Phase 8 (Sovereign Coevolution) | ✅ Complete | 6/6 passing |
+| Phase 9 | ⏳ Planned | — |
 
-**Total: 39 tests passing**
+**Total: 45 tests passing**
 
 ---
 
