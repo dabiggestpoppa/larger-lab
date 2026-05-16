@@ -17,7 +17,7 @@ const http = require('http');
 
 const OCE_HOST = process.env.OCE_HOST || '127.0.0.1';
 const OCE_PORT = process.env.OCE_PORT || 8000;
-const API = '/api/v1';
+const API = '';
 
 function request(method, path, body = null) {
     return new Promise((resolve) => {

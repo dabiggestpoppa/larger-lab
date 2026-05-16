@@ -161,3 +161,16 @@
 [2026-05-16T20:01:44Z] OC2 OK (PID None)
 [2026-05-16T20:02:44Z] OC2 OK (PID None)
 [2026-05-16T20:03:46Z] OC2 OK (PID None)
+[2026-05-16T20:04:51Z] OC2 UNHEALTHY — checking if process exists...
+[2026-05-16T20:04:53Z] Starting OC2 Gateway...
+[2026-05-16T20:04:55Z] OC2 Gateway started successfully (attempt 1s)
+[2026-05-16T20:04:55Z] OC2 restarted successfully (restart #1)
+[2026-05-16T20:05:57Z] OC2 OK (PID None)
+[2026-05-16T20:06:57Z] OC2 OK (PID None)
+[2026-05-16T20:07:58Z] OC2 OK (PID None)
+[2026-05-16T20:08:58Z] OC2 OK (PID None)
+[2026-05-16T20:09:59Z] OC2 OK (PID None)
+[2026-05-16T20:11:04Z] OC2 UNHEALTHY — checking if process exists...
+[2026-05-16T20:11:04Z] Starting OC2 Gateway...
+[2026-05-16T20:11:07Z] OC2 Gateway started successfully (attempt 1s)
+[2026-05-16T20:11:07Z] OC2 restarted successfully (restart #1)

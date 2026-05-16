@@ -19,7 +19,7 @@ const { URL } = require('url');
 
 const OCE_DEFAULT_HOST = '127.0.0.1';
 const OCE_DEFAULT_PORT = 8000;
-const OCE_API_PREFIX = '/api/v1';
+const OCE_API_PREFIX = '';
 
 let _config = {
     host: OCE_DEFAULT_HOST,

@@ -42,9 +42,11 @@
 | Phase 6 (Recursive Topology Introspection) | ✅ Complete | 5/5 passing |
 | Phase 7 (Overlap Cognition) | ✅ Complete | 6/6 passing |
 | Phase 8 (Sovereign Coevolution) | ✅ Complete | 6/6 passing |
-| Phase 9 (Entropy Economics) | 🔄 In Progress | 32/32 passing |
+| Phase 9 (Entropy Economics) | ✅ Complete | 32/32 passing |
 
 **Total: 77 tests passing**
+
+**OCE Tests: 59 passing (32 event_fabric + 27 adapter)**
 
 ---
 
@@ -52,7 +54,8 @@
 
 | Phase | Status | Lead |
 |-------|--------|------|
-| OCE Phase 1 (Continuity Shell) | 🔄 In Progress | CC |
+| OCE Phase 1 (Continuity Shell) | ✅ Complete | CC |
+| OCE Phase 2 (Event Fabric) | 🔄 In Progress | CC |
 | OCE Phase 2 (Event Fabric) | Pending | OC |
 | OCE Phase 3 (Observer Runtime) | Pending | OC2 |
 | OCE Phase 4 (Structural Memory) | Pending | AS |

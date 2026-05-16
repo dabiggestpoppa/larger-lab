@@ -156,6 +156,34 @@ async def get_events(
         raise HTTPException(status_code=503, detail=f"Event service unavailable: {str(e)}")
 
 
+class IngestEventRequest(BaseModel):
+    """Request model for event ingestion."""
+    event_type: str
+    source: str
+    payload: Dict[str, Any] = {}
+    priority: Optional[int] = None
+
+
+@app.post("/events/ingest")
+async def ingest_event(request: IngestEventRequest):
+    """
+    Ingest a new event into the Event Fabric.
+    Called by Operator tools, SRRA-OPH substrate, and external integrations.
+    """
+    try:
+        fabric = get_fabric()
+        event = await fabric.ingest(
+            event_type=request.event_type,
+            source=request.source,
+            payload=request.payload,
+            priority=request.priority,
+        )
+        return {"status": "ingested", "event_id": event.event_id}
+    except Exception as e:
+        logger.error(f"Event ingest error: {e}")
+        raise HTTPException(status_code=503, detail=f"Event ingest failed: {str(e)}")
+
+
 @app.get("/events/types")
 async def get_event_types():
     """List all registered event types."""
