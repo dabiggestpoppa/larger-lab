@@ -26,6 +26,42 @@
 - **GitHub:** https://github.com/shang-zhu/violin
 - **Demo:** https://www.violin-ai.com
 
+## DeekeScript — Android Automation
+
+- **Package:** `deeke-script-app` v1.9.3 (Node.js/TypeScript)
+- **Skill:** `skills/deeke-script/SKILL.md`
+- **Source:** `deekescript/` (cloned from GitHub)
+- **Use when:** Android automation, content farm bots, auto-posting, engagement automation
+- **Capabilities:** Simulate clicks, image recognition, multi-threading, device control
+- **Requires:** Node.js, npm, Android device or emulator
+- **GitHub:** https://github.com/DeekeScript/deekescript
+- **Website:** https://deeke.cn | Docs: https://doc.deeke.cn
+
+## Spec Kit - Spec-Driven Development
+
+- **CLI:** `specify` v0.8.9 (installed via `uv tool install`)
+- **Skill:** `skills/spec-kit/SKILL.md` / `.agents/skills/spec-kit/SKILL.md`
+- **Use when:** Starting new projects, structured AI-assisted development, multi-phase builds
+- **Workflow:** Constitution -> Spec -> Plan -> Tasks -> Implement
+- **Commands:** `specify init`, `specify integration list`
+- **30+ AI agent integrations** (Claude Code, Codex, Gemini, Cursor, etc.)
+- **GitHub:** https://github.com/github/spec-kit
+- **Docs:** https://github.github.io/spec-kit/
+
+## Oransim - Causal Marketing Simulation
+
+- **Package:** `oransim` v0.2.0a0 (Python)
+- **Skill:** `skills/oransim/SKILL.md` / `.agents/skills/oransim/SKILL.md`
+- **Source:** `oransim/` (cloned from GitHub)
+- **API:** `python -m uvicorn oransim.api:app --port 8001`
+- **Frontend:** `python -m http.server 8090 --directory oransim/frontend`
+- **Use when:** Marketing campaign ROI prediction, KOL selection, budget allocation, counterfactual analysis
+- **Features:** Pre-launch ROI ranking, mid-campaign intervention, post-mortem counterfactuals
+- **Stack:** LightGBM + causal graph (64 nodes) + Hawkes process + LLM agent personas
+- **Mock mode:** Works without API key (`LLM_MODE=mock`)
+- **GitHub:** https://github.com/OranAi-Ltd/oransim
+- **Website:** https://oran.cn/oransim
+
 ## MCP Servers
 
 ### MT5 MCP Server

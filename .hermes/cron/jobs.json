@@ -1,0 +1,16 @@
+{
+  "jobs": [
+    {
+      "id": "phase9-check",
+      "schedule": "every morning at 9am",
+      "description": "Check Phase 9 progress and update team chat",
+      "enabled": true
+    },
+    {
+      "id": "gateway-status",
+      "schedule": "every 30 minutes",
+      "description": "Check OC1/OC2/Hermes gateway status",
+      "enabled": true
+    }
+  ]
+}

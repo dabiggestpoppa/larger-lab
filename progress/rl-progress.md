@@ -4,6 +4,18 @@
 
 ---
 
+#### 🦉 [RL] 2026-05-16 — Phase 9 Research: Entropy Economics Complete
+- Published full research doc at `srrs_opc/docs/phase9_research.md`
+- Identified 5 entropy-based resource allocation patterns (Shannon, Landauer, Kolmogorov, Token Budgeting, Game-Theoretic)
+- Designed 7 Phase 9 components: CoherenceYieldAnalyzer, EntropyBudgetManager, RecoverabilityEconomics, AdaptiveCompressionEngine, SyncCostOptimizer, ResourceConstrainedCognition, SustainabilityGovernance
+- Verified all 7 existing component groups are importable and functional as integration points
+- Assessed 5 external resources (PyMDP HIGH, Skillrunner MEDIUM, EventStoreDB MEDIUM, Ray LOW, TLA+ LOW)
+- Posted findings to team chat with 5 open questions for CC
+- **Key insight:** Existing codebase is ~60% ready — entropy tracking, drift detection, reinforcement dynamics, and anti-manipulation safeguards already provide measurement infrastructure
+- **Build order:** CoherenceYieldAnalyzer → EntropyBudgetManager → RecoverabilityEconomics → AdaptiveCompressionEngine → SyncCostOptimizer → ResourceConstrainedCognition → SustainabilityGovernance
+- **Test plan:** `srrs_opc/tests/test_phase9_e2e.py` — 7 tests (one per component)
+- Awaiting CC decisions on 5 open questions before implementation begins
+
 #### 🦉 [RL] 2026-05-16 — Agent Initialized & Registered
 - Created identity file at `progress/RL_IDENTITY.md`
 - Registered in `.agent-tags.json` as RL (Research Lead)
@@ -14,6 +26,27 @@
 - Distributed onboarding skill to all agent skill directories
 - Updated `MEMORY.md` with OWL signature
 - Posted intro to `shared-conversations/team-chat.md`
+#### 🦉 [RL] 2026-05-16 — DeekeScript Installed + Content Farm Plan
+- Downloaded and installed `deeke-script-app` v1.9.3 (npm, 523 packages)
+- Created `skills/deeke-script/SKILL.md`
+- Wrote comprehensive content farm plan: `docs/content-farm-plan.md`
+- Full stack: DeekeScript + Scrapling + Violin + Oransim + OpenClaw
+- Updated TOOLS.md, MEMORY.md, team-chat.md
+
+#### 🦉 [RL] 2026-05-16 — Spec Kit + Oransim Installed
+- Installed `specify` CLI v0.8.9 via uv tool
+- Created `skills/spec-kit/SKILL.md` + `.agents/skills/spec-kit/SKILL.md`
+- Updated TOOLS.md, MEMORY.md, team-chat.md for both tools
+- Posted announcement to team chat
+
+#### 🦉 [RL] 2026-05-16 — Oransim Marketing Engine Installed
+- Cloned `oransim` from https://github.com/OranAi-Ltd/oransim (shallow clone failed, used zip download)
+- Installed `oransim` v0.2.0a0 + dev deps (lightgbm, scikit-learn, scipy, jieba, etc.)
+- Verified `import oransim` works
+- Created `skills/oransim/SKILL.md` + `.agents/skills/oransim/SKILL.md`
+- Updated `TOOLS.md`, `MEMORY.md`, `shared-conversations/team-chat.md`
+- **Note:** Mock mode works without API key. Enterprise data requires license.
+
 #### 🦉 [RL] 2026-05-16 — Violin Video Translation Skill Installed
 - Installed `violin` v0.1.1 + fixed f-string syntax bug in `pipeline/costs.py` (Python 3.11 compat)
 - Verified `violin --help` and `violin-api` both work

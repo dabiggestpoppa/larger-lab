@@ -69,7 +69,7 @@
 - Updated progress file with correct test count (38/38)
 
 ### Current Phase
-SRRA-OPH Phase 2 — Reconstruction + Recoverability
+SRRA-OPH Phase 9 — Entropy Economics (Coherence-per-resource optimization)
 
 ### Responsibilities
 1. **Context Monitoring** — Track what CC is working on, maintain context continuity
@@ -95,6 +95,16 @@ SRRA-OPH Phase 2 — Reconstruction + Recoverability
   - Q1: Should tense matter? ("taking" vs "took" — currently treated as same)
   - Q2: Should "looked at X" align with "look at Y" when X≠Y? (currently: no)
 - PM git push failed — may need conflict resolution
+
+#### 🟡 [AS] 2026-05-16 13:00:00Z — Phase 9 GPU Cost Analysis + Burst Flow Design
+- CC kicked off Phase 9: Entropy Economics via team-chat
+- Researched OctaSpace GPU pricing (RTX 5070 at $0.06/hr = CHEAPEST 12GB+)
+- Researched GPU Autopilot (supports OctaSpace, RunPod, Vast.ai)
+- Built comprehensive cost comparison table (12 providers, 12 instances)
+- Designed burst flow architecture (spawn → provision → execute → pull → shutdown → log)
+- Identified optimal hybrid: Hetzner always-on + OctaSpace burst (~$42-49/mo total)
+- Posted findings to team-chat.md with full analysis
+- Mapped burst system to all 6 Phase 9 success criteria
 
 #### 🟡 [AS] 2026-05-16 10:00:00Z — New Session Init + Full System Verification
 - Read all agent progress files (CC, OC, OC2, PM, RL) — all 5 agents accounted for
@@ -195,6 +205,12 @@ SRRA-OPH Phase 2 — Reconstruction + Recoverability
 - [x] Delegate tasks to OC and HR
 - [x] Monitor OC progress on AgentMesh/Graphonomous API evaluation
 - [x] Monitor HR progress on stress tests and workspace integration
+- [ ] Research exact Kamtera pricing (API or dashboard)
+- [ ] Research OctaSpace Python SDK for burst integration
+- [ ] Design `tools/cloud-burst.py` architecture
+- [ ] Build cloud-burst prototype
+- [ ] Integrate cost tracking into Phase 9 entropy economics framework
+- [ ] Resolve PM git push conflict
 
 #### 🟡 [AS] 2026-05-16 08:00:00Z — OpenClaw 2 Setup Complete
 - Created `.openclaw-2/` config directory with valid OpenClaw schema

@@ -5,14 +5,14 @@
       "last_changed": "2026-05-16T02:37:28.487449+00:00",
       "update_count": 8,
       "last_sync_count": 8,
-      "last_sync_time": "2026-05-16T08:39:49.696458+00:00"
+      "last_sync_time": "2026-05-16T13:18:36.046305+00:00"
     },
     "OC": {
       "fingerprint": "1778898396.9314294:2703",
       "last_changed": "2026-05-16T02:27:03.254949+00:00",
       "update_count": 3,
       "last_sync_count": 3,
-      "last_sync_time": "2026-05-16T08:39:49.753455+00:00"
+      "last_sync_time": "2026-05-16T13:18:36.078572+00:00"
     },
     "HR": {
       "fingerprint": "1778899981.5240772:2941",
@@ -22,32 +22,32 @@
       "last_sync_time": "2026-05-16T06:43:27.762333+00:00"
     },
     "AS": {
-      "fingerprint": "1778924732.4202087:11288",
-      "last_changed": "2026-05-16T09:47:24.453979+00:00",
-      "update_count": 33,
-      "last_sync_count": 33,
-      "last_sync_time": "2026-05-16T09:47:24.481583+00:00"
+      "fingerprint": "1778936606.4625494:13363",
+      "last_changed": "2026-05-16T13:06:27.698119+00:00",
+      "update_count": 36,
+      "last_sync_count": 36,
+      "last_sync_time": "2026-05-16T13:18:36.195829+00:00"
     },
     "PM": {
-      "fingerprint": "1778930098.924534:6764",
-      "last_changed": "2026-05-16T11:16:04.969319+00:00",
-      "update_count": 7,
-      "last_sync_count": 7,
-      "last_sync_time": "2026-05-16T11:16:05.177915+00:00"
+      "fingerprint": "1778932692.8830278:7185",
+      "last_changed": "2026-05-16T12:49:30.624455+00:00",
+      "update_count": 8,
+      "last_sync_count": 8,
+      "last_sync_time": "2026-05-16T13:18:36.149843+00:00"
     },
     "OC2": {
       "fingerprint": "1778921007.139717:961",
       "last_changed": "2026-05-16T09:14:12.053170+00:00",
       "update_count": 3,
-      "last_sync_count": 2,
-      "last_sync_time": "2026-05-16T08:39:49.822486+00:00"
+      "last_sync_count": 3,
+      "last_sync_time": "2026-05-16T13:18:36.111839+00:00"
     },
     "RL": {
-      "fingerprint": "1778928822.903226:4154",
-      "last_changed": "2026-05-16T10:54:08.344514+00:00",
-      "update_count": 4,
-      "last_sync_count": 3,
-      "last_sync_time": "2026-05-16T09:39:09.243464+00:00"
+      "fingerprint": "1778937774.1451986:8485",
+      "last_changed": "2026-05-16T13:22:54.631463+00:00",
+      "update_count": 8,
+      "last_sync_count": 7,
+      "last_sync_time": "2026-05-16T13:18:36.222830+00:00"
     }
   },
   "files": {
@@ -73,6 +73,6 @@
     }
   },
   "total_updates": 0,
-  "last_sync_count": 58,
-  "last_sync_time": "2026-05-16T11:16:05.552121+00:00"
+  "last_sync_count": 65,
+  "last_sync_time": "2026-05-16T13:18:36.229395+00:00"
 }

@@ -8,4 +8,4 @@ set "OPENCLAW_WINDOWS_TASK_NAME=OpenClaw 2 Gateway"
 set "OPENCLAW_SERVICE_MARKER=openclaw-2"
 set "OPENCLAW_SERVICE_KIND=gateway"
 set "OPENCLAW_SERVICE_VERSION=2026.5.7"
-"C:\Program Files\nodejs\node.exe" "C:\Users\wifik\AppData\Roaming\npm\node_modules\openclaw\dist\index.js" gateway run --port 18790 --allow-unconfigured
+start "" /min "C:\Program Files\nodejs\node.exe" "C:\Users\wifik\AppData\Roaming\npm\node_modules\openclaw\dist\index.js" gateway run --port 18790 --allow-unconfigured

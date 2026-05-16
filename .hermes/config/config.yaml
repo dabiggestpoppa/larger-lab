@@ -1,0 +1,28 @@
+# Hermes Configuration
+# Source of truth for model choice, terminal backend, tool enablement, MCP servers
+
+model:
+  default: "anthropic/claude-3-5-sonnet-20241022"
+  fallback: "openai/gpt-4o"
+
+terminal:
+  backend: "cmd"
+  shell: "powershell"
+
+tools:
+  enabled:
+    - hermes_ask
+    - hermes_cron
+    - hermes_memory
+    - hermes_skill
+
+mcp:
+  servers:
+    - name: "claude-hermes-mcp"
+      command: "python"
+      args: ["tools/claude_hermes_mcp.py", "serve"]
+      port: 8765
+
+gateway:
+  port: 8642
+  host: "127.0.0.1"

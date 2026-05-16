@@ -7,20 +7,9 @@
 
 ---
 
-## 🦉 [RL] OWL — Last Sync: 2026-05-16 09:39 UTC
+## 🦉 [RL] OWL — Last Sync: 2026-05-16 13:18 UTC
 
 *Auto-synced from `progress/rl-progress.md`*
-
-#### 🦉 [RL] 2026-05-16 — Agent Initialized & Registered
-- Created identity file at `progress/RL_IDENTITY.md`
-- Registered in `.agent-tags.json` as RL (Research Lead)
-- Added to `tools/progress-sync.py` AGENTS registry
-- Created standby prompt at `shared-conversations/research-lead-prompt.md`
-- Created `skills/agent-onboarding/SKILL.md` — reusable onboarding skill
-- Created `tools/agent-onboarding-tool.py` — CLI tool for onboarding
-- Distributed onboarding skill to all agent skill directories
-- Updated `MEMORY.md` with OWL signature
-- Posted intro to `shared-conversations/team-chat.md`
 
 #### 🦉 [RL] 2026-05-16 — Scrapling Skill Installed for All Agents
 - Installed `scrapling` v0.4.8 + Playwright Chromium
@@ -43,8 +32,45 @@
 - **Docker option**: No container runtime available on system (no Docker, no Podman). Would need Docker Desktop install + reboot
 - **Recommendation**: Run OC2 only (it's stable). OC1 can be revived later with clean gateway.cmd
 
+#### 🦉 [RL] 2026-05-16 — Both Gateways Fixed & Running 24/7
+- **Root cause of both gateways failing**: `gateway.cmd` used `openclaw gateway --port X` instead of `openclaw gateway run --port X --allow-unconfigured`
+- **Fixes applied**:
+  - Fixed `C:\Users\wifik\.openclaw\gateway.cmd` — added `run` subcommand and `--allow-unconfigured`
+  - Fixed `C:\Users\wifik\Desktop\projects\larger-lab\.openclaw-2\gateway.cmd` — same fix
+  - Fixed OC2 startup file to properly call its `gateway.cmd` with full path
+  - Created `tools\gateway-watchdog.cmd` — checks both gateways every 60s, restarts if down
+  - Created `tools\register-gateway-tasks.ps1` — Scheduled Task registration (requires Admin)
+  - Added watchdog to startup folder for automatic 24/7 monitoring
+- **Status**: ✅ Both gateways live and healthy
+  - OC1 (port 18789): `{"ok":true,"status":"live"}` — PID 19844
+  - OC2 (port 18790): `{"ok":true,"status":"live"}` — PID 41592
+- **Auto-start**: Startup folder entries for both gateways + watchdog
+- **Note**: For even more reliable auto-start, run `tools\register-gateway-tasks.ps1` as Administrator to create Windows Scheduled Tasks with restart-on-failure
+
+#### 🦉 [RL] 2026-05-16 — OC1 Telegram Not Responding (Diagnosis)
+- **Symptom**: OC1 gateway running (port 18789) but Telegram bot @finalstrawclawbot not responding
+- **Root cause 1**: Missing `openrouter` provider in OC1's `openclaw.json` — only had poolside/nvidia/deepseek, causing fallback to `openai` provider → "No API key found" error
+- **Root cause 2**: OC1's `models.json` has placeholder `"apiKey": "OPENROUTER_API_KEY"` instead of actual key
+- **Root cause 3**: Telegram API connectivity issues — DNS resolution slow, fetch timeouts, event loop delays up to 104s
+- **Root cause 4**: 203 Telegram commands registered (limit 100), causing command sync failures
+- **Fix applied**: Added openrouter provider to OC1's `openclaw.json`
+- **Status**: After restart, OC1 health check failed — needs further investigation in new chat
+- **OC2**: Working fine throughout, no changes needed
+- **Detailed notes**: See `/memories/session/oc1-gateway-diagnosis.md`
+
+#### 🦉 [RL] 2026-05-16 — Gateway Diagnostics Complete, Ready for Fix
+- **Current state**: Both gateways running (OC1 PID 14520, OC2 PID 21768)
+- **OC2 issue identified**: Stuck Telegram session `agent:main:telegram:direct:8258195396` blocking event loop for 1000+ seconds
+- **Root cause**: Event-loop starvation from stuck session → Telegram polling stalls every ~180s → forced restarts
+- **Fixes needed**:
+  1. Clear stuck session from OC2's `sessions.json`
+  2. Disable native Telegram commands (`channels.telegram.commands.native: false`) to avoid 203-command overload
+  3. Restart both gateways cleanly
+- **PowerShell spam issue**: `openclaw gateway probe` without `--token` hangs forever → terminal timeout → new terminal spawned → infinite loop
+- **Solution**: Use venv-based Python scripts for gateway management instead of CLI commands
+
 ---
-## 🟠 [OC2] OpenClaw 2 — Last Sync: 2026-05-16 08:39 UTC
+## 🟠 [OC2] OpenClaw 2 — Last Sync: 2026-05-16 13:18 UTC
 
 *Auto-synced from `progress/openclaw-2-progress.md`*
 
@@ -56,25 +82,9 @@
 - Discord channel config pending (schema issue — Telegram working)
 
 ---
-## 🔴 [PM] Polymorph — Last Sync: 2026-05-16 11:16 UTC
+## 🔴 [PM] Polymorph — Last Sync: 2026-05-16 13:18 UTC
 
 *Auto-synced from `progress/polymorph-progress.md`*
-
-#### 🔴 [PM] 2026-05-16 — Skills Distributed to All Agents + OpenClaw Crons
-- Copied 4 new skills to ALL agent skill directories:
-  - `context-compaction` — 5-layer context compaction pipeline
-  - `subagent-manager` — Subagent sidechain file pattern
-  - `hermes-workflows` — 6 Chief of Staff workflows
-  - `agent-harness-sop` — Complete SOP for building agent tools
-- Skills now available in:
-  - `.openclaw/skills/` (OpenClaw)
-  - `.hermes/skills/` (Hermes persistent)
-  - `agent-lab/agents/hermes/skills/` (Hermes workspace)
-- Created 3 OpenClaw cron jobs:
-  - `Hermes_Daily_Brief` — 7am daily → Telegram
-  - `Hermes_Trending_Radar` — 8am daily → Telegram
-  - `Hermes_Weekly_Report` — Monday 9am → Telegram
-- Existing CEREBUS_Strategy_Recon cron still running (every 30m)
 
 #### 🔴 [PM] 2026-05-16 — External Resource Analysis & Implementation
 Analyzed 5 external resources and implemented what we can NOW:
@@ -95,8 +105,15 @@ All 6 repos from `dabiggestpoppa` account now cloned to `C:\Users\wifik\Desktop\
 
 #### 🔴 [PM] 2026-05-16 — Full Tool Pipeline + HTML Standard + Agency-Agents Import
 
+#### 🔴 [PM] 2026-05-16 — Motus Agent Framework Installed
+- lithosai-motus v0.4.1 installed (Python 3.12+, 21 packages)
+- skills/motus/ — Full skill with ReActAgent, task graphs, MCP, serving
+- 	ools/motus_agent.py — Build, serve, chat, deploy wrapper
+- Source: C:\Users\wifik\Desktop\projects\motus\
+- Features: ReActAgent, @agent_task workflows, multi-provider, MCP, Docker, guardrails, memory, cloud deploy
+
 ---
-## 🟡 [AS] Assistant Manager — Last Sync: 2026-05-16 09:47 UTC
+## 🟡 [AS] Assistant Manager — Last Sync: 2026-05-16 13:18 UTC
 
 *Auto-synced from `progress/assistant-progress.md`*
 
@@ -217,7 +234,7 @@ All 6 repos from `dabiggestpoppa` account now cloned to `C:\Users\wifik\Desktop\
 - Updated hermes_autopilot_v3.py with corrected logic
 
 ---
-## 🟣 [OC] OpenClaw — Last Sync: 2026-05-16 08:39 UTC
+## 🟣 [OC] OpenClaw — Last Sync: 2026-05-16 13:18 UTC
 
 *Auto-synced from `progress/openclaw-progress.md`*
 
@@ -254,7 +271,7 @@ All 6 repos from `dabiggestpoppa` account now cloned to `C:\Users\wifik\Desktop\
 - **Note**: Separate Hermes/OpenClaw bot tokens still needed for independent bot instances
 
 ---
-## 🔵 [CC] Claude Code — Last Sync: 2026-05-16 08:39 UTC
+## 🔵 [CC] Claude Code — Last Sync: 2026-05-16 13:18 UTC
 
 *Auto-synced from `progress/claude-code-progress.md`*
 
