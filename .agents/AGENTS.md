@@ -1,4 +1,4 @@
-# AGENTS.md — Agent Team Manifest
+﻿# AGENTS.md — Agent Team Manifest
 
 > **Architecture**: All agents follow the **Agent Harness** pattern — a production-grade system of 12 components (orchestration loop, tools, memory, context management, prompt construction, output parsing, state management, error handling, guardrails, verification loops, subagent orchestration). Each agent has an identity layer (`SOUL.md`), tiered memory, and access to self-evolving skills via the `skills/` directory.
 >
@@ -8,6 +8,8 @@
 
 | Agent | Role | File | Key Responsibilities |
 |-------|------|------|---------------------|
+| **Claude Code (CC)** | Overseer / Architecture / Core Build | claude-code.agent.md | Phase authority, task decomposition, delegation, quality reviews, git discipline. Only CC can advance phases. |
+| **Polymorph (PM)** | Debugger / Tool & Skill Builder | polymorph.agent.md | Error triage, workflow optimization, tool/skill building, automation, repo cloning. Reports to CC + AS. |
 | 🎯 **Orchestrator** | Workflow coordinator & task routing | `orchestrator.agent.md` | Decomposes tasks, maps dependencies, runs parallel subagents, manages todo lists, triggers GEPA optimization |
 | 🐛 **Debugger** | Bug diagnosis & fix specialist | `debugger.agent.md` | Error triage, stack trace analysis, hypothesis testing, regression checks, harness error classification |
 | 🏗️ **Architect** | System design & blueprint creation | `architect.agent.md` | Component decomposition, data flow design, harness architecture, scalability planning |
