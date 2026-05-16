@@ -3,6 +3,29 @@
 > This file is auto-loaded by OpenClaw as part of the workspace context.
 > It defines available tools, MCP servers, and agent capabilities.
 
+## Scrapling — Web Scraping Framework
+
+- **Package:** `scrapling` v0.4.8 (Python)
+- **Skill:** `skills/scrapling/SKILL.md` / `.agents/skills/scrapling/SKILL.md`
+- **CLI:** `scrapling extract get|fetch|stealthy-fetch <url> <output>`
+- **Use when:** `web_fetch` fails, anti-bot protection, JS rendering, full crawls
+- **Key classes:** `Fetcher`, `StealthyFetcher`, `DynamicFetcher`, `Spider`
+- **Docs:** https://scrapling.readthedocs.io
+- **GitHub:** https://github.com/D4Vinci/Scrapling
+
+## Violin — Video Translation
+
+- **Package:** `violin` v0.1.1 (Python)
+- **Skill:** `skills/violin/SKILL.md` / `.agents/skills/violin/SKILL.md`
+- **CLI:** `violin <input> <output> --language <Lang>`
+- **API:** `violin-api` (FastAPI server)
+- **Use when:** User wants to translate/dub a video, generate subtitles, or add voice-over in another language
+- **Supports:** 33 target languages, 6 style profiles, SRT subtitle generation
+- **Requires:** `ffmpeg` on PATH, `TOGETHER_API_KEY`
+- **Pipeline:** ffmpeg | Whisper | LLM (DeepSeek V4 Pro) | TTS (Cartesia Sonic 3) | ffmpeg remux
+- **GitHub:** https://github.com/shang-zhu/violin
+- **Demo:** https://www.violin-ai.com
+
 ## MCP Servers
 
 ### MT5 MCP Server

@@ -7,7 +7,7 @@
 
 ---
 
-## 🦉 [RL] OWL — Last Sync: 2026-05-16 08:39 UTC
+## 🦉 [RL] OWL — Last Sync: 2026-05-16 09:39 UTC
 
 *Auto-synced from `progress/rl-progress.md`*
 
@@ -21,11 +21,27 @@
 - Distributed onboarding skill to all agent skill directories
 - Updated `MEMORY.md` with OWL signature
 - Posted intro to `shared-conversations/team-chat.md`
+
+#### 🦉 [RL] 2026-05-16 — Scrapling Skill Installed for All Agents
+- Installed `scrapling` v0.4.8 + Playwright Chromium
+- Created `skills/scrapling/SKILL.md` — concise reference for all agents
+- Copied to `.agents/skills/scrapling/SKILL.md` for agent harness loading
+- Updated `TOOLS.md` with Scrapling section
+- Posted announcement to `shared-conversations/team-chat.md`
 - **DSPy evaluation complete**: Recommended integration points identified
   - Skill creator eval loop (automatic prompt optimization)
   - Parallel thought synthesis (cleaner module abstraction)
   - Agent task briefs (type-safe signatures)
   - Workspace integration (adapter pattern alignment)
+
+#### 🦉 [RL] 2026-05-16 — OC1/OC2 Gateway Conflict Diagnosed
+- **Root cause found**: OC1's `gateway.cmd` was missing `OPENCLAW_HOME` env var, causing it to default to `%USERPROFILE%\.openclaw` and read OC2's config
+- **Symptom**: OC1 kept dying silently or killing OC2's process (stale PID in `gateway-restart-intent.json`)
+- **Fix applied**: Updated `C:\Users\wifik\.openclaw\gateway.cmd` to include `OPENCLAW_HOME=C:\Users\wifik\.openclaw` and port 18789
+- **Status**: Both gateways can start but OC1 still dies intermittently — needs further investigation
+- **Config separation verified**: OC1 (port 18789, bot @finalstrawclawbot) and OC2 (port 18790, bot @OC2BLRBOT) have distinct configs, tokens, and ports
+- **Docker option**: No container runtime available on system (no Docker, no Podman). Would need Docker Desktop install + reboot
+- **Recommendation**: Run OC2 only (it's stable). OC1 can be revived later with clean gateway.cmd
 
 ---
 ## 🟠 [OC2] OpenClaw 2 — Last Sync: 2026-05-16 08:39 UTC
@@ -40,19 +56,9 @@
 - Discord channel config pending (schema issue — Telegram working)
 
 ---
-## 🔴 [PM] Polymorph — Last Sync: 2026-05-16 08:39 UTC
+## 🔴 [PM] Polymorph — Last Sync: 2026-05-16 11:16 UTC
 
 *Auto-synced from `progress/polymorph-progress.md`*
-
-#### 🔴 [PM] 2026-05-16 — Agent Initialized & Registered
-- Registered in `.agent-tags.json` as PM (Polymorph)
-- Added to `tools/progress-sync.py` AGENTS registry
-- Created sub-progress file
-- **Git backup completed**: full workspace committed and pushed to `origin/master` (commit `00d3ce1`)
-- **GitHub repos audited**: 6 repos on `dabiggestpoppa` account identified
-  - Already cloned: `larger-lab`, `dydx_nautilus_bot`
-  - Missing: `backtesterpublic`, `backtesting-py-2022`, `market-structure`, `react-agent`, `rose-research`, `unsloth`
-- Standing by for AS or CC task assignments
 
 #### 🔴 [PM] 2026-05-16 — Skills Distributed to All Agents + OpenClaw Crons
 - Copied 4 new skills to ALL agent skill directories:
@@ -87,8 +93,10 @@ Analyzed 5 external resources and implemented what we can NOW:
 #### 🔴 [PM] 2026-05-16 — GitHub Repos Cloned
 All 6 repos from `dabiggestpoppa` account now cloned to `C:\Users\wifik\Desktop\projects\`:
 
+#### 🔴 [PM] 2026-05-16 — Full Tool Pipeline + HTML Standard + Agency-Agents Import
+
 ---
-## 🟡 [AS] Assistant Manager — Last Sync: 2026-05-16 08:49 UTC
+## 🟡 [AS] Assistant Manager — Last Sync: 2026-05-16 09:47 UTC
 
 *Auto-synced from `progress/assistant-progress.md`*
 

@@ -96,3 +96,38 @@ All 6 repos from `dabiggestpoppa` account now cloned to `C:\Users\wifik\Desktop\
 ### Waiting For
 - Task assignment from AS or CC
 - Direction on which repos to prioritize for tool/skill conversion
+
+#### 🔴 [PM] 2026-05-16 — Full Tool Pipeline + HTML Standard + Agency-Agents Import
+
+**create-tool pipeline built and tested:**
+- 	ools/create_tool.py — Automated GitHub repo → agent tool + skill pipeline (7 phases)
+- Tested successfully on lukilabs/beautiful-mermaid → tool + skill in seconds
+- Auto-detects repo type (CLI/lib/GUI/web/ML/docs) and chooses integration pattern
+- Distributes skills to all agent directories (.openclaw, .hermes, agent-lab)
+
+**HTML documentation standard implemented:**
+- 	ools/md_to_html.py — Converts all 73 workspace .md files to styled HTML
+- 	ools/md2html.py — Beautiful HTML via md2html template (Claude orange theme)
+- 	ools/html_viewer.py — Local HTTP server at http://127.0.0.1:8080/
+- html-viewer/index.html — Full navigation index with sidebar
+- Based on ByteRover research: HTML is 5.9% more accurate, 42.4% cheaper, 39.2% faster for agents
+
+**CLI-Anything integrated:**
+- skills/cli-anything/SKILL.md — Full CLI-Anything methodology
+- 	ools/cli_anything.py — Python wrapper for CLI-Hub operations
+- 57+ pre-built agent-native CLIs available (GIMP, Blender, LibreOffice, Draw.io, Mermaid, Ollama, etc.)
+
+**Agency-Agents imported (93 agents):**
+- skills/agency-*/ — 93 specialized agent personalities from msitarzewski/agency-agents
+- Divisions: Engineering (29), Specialized (41+), Testing (8), Design (8), Project Management (6)
+- Each agent has identity, personality, workflows, deliverables
+
+**Skills created/modified:**
+- skills/cli-anything/ — New
+- skills/create-tool/ — New
+- skills/md2html/ — New
+- skills/agency-agents/ — New (plus 93 sub-skills)
+- skills/beautiful-mermaid/ — Updated via pipeline
+
+**Team chat updated** with HTML standard announcement and tool documentation.
+

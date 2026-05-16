@@ -479,7 +479,7 @@ def main():
     parser.add_argument("--force", action="store_true", help="Force sync regardless of count")
     parser.add_argument("--reset", action="store_true", help="Reset all counters")
     parser.add_argument("--status", action="store_true", help="Show current counts and last sync")
-    parser.add_argument("--agent", choices=["CC", "OC", "OC2", "PM", "AS"], help="Sync specific agent only")
+    parser.add_argument("--agent", choices=["CC", "OC", "OC2", "PM", "AS", "RL"], help="Sync specific agent only")
     args = parser.parse_args()
 
     counters = load_counters()

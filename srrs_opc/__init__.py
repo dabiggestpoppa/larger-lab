@@ -50,6 +50,14 @@ from .prediction_contracts import PredictionContractManager, PredictionContract,
 from .attractor_reasoning import AttractorReasoningEngine, AttractorState
 from .structural_memory import StructuralMemoryFields, StructuralMemoryEntry, MemoryLayer
 
+# Phase 8: Sovereign Coevolution
+from .operator_patterns import OperatorPatternModel, PatternObservation
+from .strategic_preferences import StrategicPreferenceModel, PreferenceVector, PreferenceDriftSignal
+from .constraint_alignment import ConstraintAlignmentAdapter, Constraint, AlignmentSuggestion
+from .operator_continuity import OperatorContinuityTracker, SessionAnchor, StrategicTrajectory
+from .bidirectional_coherence import BidirectionalCoherenceEngine, FeedbackEvent
+from .anti_manipulation import AntiManipulationSafeguards, ManipulationRisk
+
 __all__ = [
     # Phase 1
     "BasePatch", "CollarState",
@@ -74,4 +82,11 @@ __all__ = [
     "TemporalAttractor", "AttractorField",
     "DriftTracker", "DriftSignal",
     "ReinforcementEngine", "ReinforcementRecord",
+    # Phase 8
+    "OperatorPatternModel", "PatternObservation",
+    "StrategicPreferenceModel", "PreferenceVector", "PreferenceDriftSignal",
+    "ConstraintAlignmentAdapter", "Constraint", "AlignmentSuggestion",
+    "OperatorContinuityTracker", "SessionAnchor", "StrategicTrajectory",
+    "BidirectionalCoherenceEngine", "FeedbackEvent",
+    "AntiManipulationSafeguards", "ManipulationRisk",
 ]

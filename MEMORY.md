@@ -23,3 +23,32 @@
 - **Focus:** Evaluating and integrating new AI tools (DSPy, etc.) with minimal disruption
 - **Onboarding skill:** `skills/agent-onboarding/SKILL.md`
 - **CLI tool:** `tools/agent-onboarding-tool.py`
+
+## 🎻 Violin — Video Translation (2026-05-16)
+- **Package:** `violin` v0.1.1 (Python)
+- **Skill:** `skills/violin/SKILL.md` / `.agents/skills/violin/SKILL.md`
+- **CLI:** `violin <input> <output> --language <Lang>`
+- **API:** `violin-api` (FastAPI server)
+- **Use when:** User wants to translate/dub a video, generate subtitles, or add voice-over
+- **Supports:** 33 target languages, 6 style profiles, SRT subtitle generation
+- **Requires:** `ffmpeg` on PATH, `TOGETHER_API_KEY`
+- **Pipeline:** ffmpeg | Whisper | LLM (DeepSeek V4 Pro) | TTS (Cartesia Sonic 3) | ffmpeg remux
+- **GitHub:** https://github.com/shang-zhu/violin
+- **Demo:** https://www.violin-ai.com
+- **Note:** Fixed f-string syntax bug in `pipeline/costs.py` for Python 3.11 compat
+
+## 🕷️ Scrapling — Web Scraping (2026-05-16)
+- **Package:** `scrapling` v0.4.8 (Python)
+- **Skill:** `skills/scrapling/SKILL.md` / `.agents/skills/scrapling/SKILL.md`
+- **CLI:** `scrapling extract get|fetch|stealthy-fetch <url> <output>`
+- **Use when:** `web_fetch` fails, anti-bot protection, JS rendering, full crawls
+- **Key classes:** `Fetcher`, `StealthyFetcher`, `DynamicFetcher`, `Spider`
+- **GitHub:** https://github.com/D4Vinci/Scrapling
+
+## 🔧 OC1/OC2 Gateway Status (2026-05-16)
+- **OC1** (port 18789, @finalstrawclawbot): Intermittent crashes. Fixed `gateway.cmd` to include `OPENCLAW_HOME`. Still unstable.
+- **OC2** (port 18790, @OC2BLRBOT): Stable and running.
+- **Root cause**: OC1's gateway.cmd was missing `OPENCLAW_HOME`, causing config cross-contamination with OC2
+- **Docker option**: Not available — no container runtime installed. Would need Docker Desktop + reboot.
+- **Current approach**: OC2 runs natively on desktop. OC1 gateway.cmd fixed but needs further stability work.
+- **Files modified**: `C:\Users\wifik\.openclaw\gateway.cmd` — added `OPENCLAW_HOME` + port 18789

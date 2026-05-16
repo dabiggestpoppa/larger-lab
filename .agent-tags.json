@@ -4,45 +4,975 @@
       "tag": "CC",
       "name": "Claude Code",
       "role": "Overseer / Architecture / Coding",
-      "color": "🔵",
+      "color": "\u00f0\u0178\u201d\u00b5",
       "progress_prefix": "CC"
     },
     "openclaw": {
       "tag": "OC",
       "name": "OpenClaw",
       "role": "Analysis / Planning / Coordination",
-      "color": "🟣",
+      "color": "\u00f0\u0178\u0178\u00a3",
       "progress_prefix": "OC"
     },
     "openclaw-2": {
       "tag": "OC2",
       "name": "OpenClaw 2",
       "role": "Execution / Backtests / Reporting / Discord + Telegram",
-      "color": "🟠",
+      "color": "\u00f0\u0178\u0178\u00a0",
       "progress_prefix": "OC2"
     },
     "assistant": {
       "tag": "AS",
       "name": "Assistant Manager",
       "role": "Context Monitoring / Task Support / Quality Checks",
-      "color": "🟡",
+      "color": "\u00f0\u0178\u0178\u00a1",
       "progress_prefix": "AS"
     },
     "polymorph": {
       "tag": "PM",
       "name": "Polymorph",
       "role": "Debugger / Workflow Optimizer / Tool & Skill Builder",
-      "color": "🔴",
+      "color": "\u00f0\u0178\u201d\u00b4",
       "progress_prefix": "PM"
     },
     "research-lead": {
       "tag": "RL",
       "name": "OWL",
       "role": "Research Lead / DSPy Integration / Pipeline Optimization",
-      "color": "🦉",
+      "color": "\u00f0\u0178\u00a6\u2030",
       "progress_prefix": "RL"
+    },
+    "agency-engineering-ai-data-remediation-engineer": {
+      "name": "engineering-ai-data-remediation-engineer",
+      "display_name": "AI Data Remediation Engineer",
+      "division": "engineering",
+      "emoji": "\ud83e\uddec",
+      "skill": "skills/agency-engineering-ai-data-remediation-engineer/SKILL.md",
+      "html": "html-viewer/agency-engineering-ai-data-remediation-engineer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:37.744592+00:00"
+    },
+    "agency-engineering-ai-engineer": {
+      "name": "engineering-ai-engineer",
+      "display_name": "AI Engineer",
+      "division": "engineering",
+      "emoji": "\ud83e\udd16",
+      "skill": "skills/agency-engineering-ai-engineer/SKILL.md",
+      "html": "html-viewer/agency-engineering-ai-engineer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:37.800291+00:00"
+    },
+    "agency-engineering-autonomous-optimization-architect": {
+      "name": "engineering-autonomous-optimization-architect",
+      "display_name": "Autonomous Optimization Architect",
+      "division": "engineering",
+      "emoji": "\u26a1",
+      "skill": "skills/agency-engineering-autonomous-optimization-architect/SKILL.md",
+      "html": "html-viewer/agency-engineering-autonomous-optimization-architect.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:37.879294+00:00"
+    },
+    "agency-engineering-backend-architect": {
+      "name": "engineering-backend-architect",
+      "display_name": "Backend Architect",
+      "division": "engineering",
+      "emoji": "\ud83c\udfd7\ufe0f",
+      "skill": "skills/agency-engineering-backend-architect/SKILL.md",
+      "html": "html-viewer/agency-engineering-backend-architect.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:37.933292+00:00"
+    },
+    "agency-engineering-cms-developer": {
+      "name": "engineering-cms-developer",
+      "display_name": "CMS Developer",
+      "division": "engineering",
+      "emoji": "\ud83e\uddf1",
+      "skill": "skills/agency-engineering-cms-developer/SKILL.md",
+      "html": "html-viewer/agency-engineering-cms-developer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:38.079298+00:00"
+    },
+    "agency-engineering-code-reviewer": {
+      "name": "engineering-code-reviewer",
+      "display_name": "Code Reviewer",
+      "division": "engineering",
+      "emoji": "\ud83d\udc41\ufe0f",
+      "skill": "skills/agency-engineering-code-reviewer/SKILL.md",
+      "html": "html-viewer/agency-engineering-code-reviewer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:38.127302+00:00"
+    },
+    "agency-engineering-codebase-onboarding-engineer": {
+      "name": "engineering-codebase-onboarding-engineer",
+      "display_name": "Codebase Onboarding Engineer",
+      "division": "engineering",
+      "emoji": "\ud83e\udded",
+      "skill": "skills/agency-engineering-codebase-onboarding-engineer/SKILL.md",
+      "html": "html-viewer/agency-engineering-codebase-onboarding-engineer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:38.181302+00:00"
+    },
+    "agency-engineering-data-engineer": {
+      "name": "engineering-data-engineer",
+      "display_name": "Data Engineer",
+      "division": "engineering",
+      "emoji": "\ud83d\udd27",
+      "skill": "skills/agency-engineering-data-engineer/SKILL.md",
+      "html": "html-viewer/agency-engineering-data-engineer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:38.245295+00:00"
+    },
+    "agency-engineering-database-optimizer": {
+      "name": "engineering-database-optimizer",
+      "display_name": "Database Optimizer",
+      "division": "engineering",
+      "emoji": "\ud83d\uddc4\ufe0f",
+      "skill": "skills/agency-engineering-database-optimizer/SKILL.md",
+      "html": "html-viewer/agency-engineering-database-optimizer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:38.297295+00:00"
+    },
+    "agency-engineering-devops-automator": {
+      "name": "engineering-devops-automator",
+      "display_name": "DevOps Automator",
+      "division": "engineering",
+      "emoji": "\u2699\ufe0f",
+      "skill": "skills/agency-engineering-devops-automator/SKILL.md",
+      "html": "html-viewer/agency-engineering-devops-automator.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:38.335297+00:00"
+    },
+    "agency-engineering-email-intelligence-engineer": {
+      "name": "engineering-email-intelligence-engineer",
+      "display_name": "Email Intelligence Engineer",
+      "division": "engineering",
+      "emoji": "\ud83d\udce7",
+      "skill": "skills/agency-engineering-email-intelligence-engineer/SKILL.md",
+      "html": "html-viewer/agency-engineering-email-intelligence-engineer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:38.380302+00:00"
+    },
+    "agency-engineering-embedded-firmware-engineer": {
+      "name": "engineering-embedded-firmware-engineer",
+      "display_name": "Embedded Firmware Engineer",
+      "division": "engineering",
+      "emoji": "\ud83d\udd29",
+      "skill": "skills/agency-engineering-embedded-firmware-engineer/SKILL.md",
+      "html": "html-viewer/agency-engineering-embedded-firmware-engineer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:38.421299+00:00"
+    },
+    "agency-engineering-feishu-integration-developer": {
+      "name": "engineering-feishu-integration-developer",
+      "display_name": "Feishu Integration Developer",
+      "division": "engineering",
+      "emoji": "\ud83d\udd17",
+      "skill": "skills/agency-engineering-feishu-integration-developer/SKILL.md",
+      "html": "html-viewer/agency-engineering-feishu-integration-developer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:38.467293+00:00"
+    },
+    "agency-engineering-filament-optimization-specialist": {
+      "name": "engineering-filament-optimization-specialist",
+      "display_name": "Filament Optimization Specialist",
+      "division": "engineering",
+      "emoji": "\ud83d\udd27",
+      "skill": "skills/agency-engineering-filament-optimization-specialist/SKILL.md",
+      "html": "html-viewer/agency-engineering-filament-optimization-specialist.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:38.529297+00:00"
+    },
+    "agency-engineering-frontend-developer": {
+      "name": "engineering-frontend-developer",
+      "display_name": "Frontend Developer",
+      "division": "engineering",
+      "emoji": "\ud83d\udda5\ufe0f",
+      "skill": "skills/agency-engineering-frontend-developer/SKILL.md",
+      "html": "html-viewer/agency-engineering-frontend-developer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:38.553300+00:00"
+    },
+    "agency-engineering-git-workflow-master": {
+      "name": "engineering-git-workflow-master",
+      "display_name": "Git Workflow Master",
+      "division": "engineering",
+      "emoji": "\ud83c\udf3f",
+      "skill": "skills/agency-engineering-git-workflow-master/SKILL.md",
+      "html": "html-viewer/agency-engineering-git-workflow-master.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:38.592298+00:00"
+    },
+    "agency-engineering-incident-response-commander": {
+      "name": "engineering-incident-response-commander",
+      "display_name": "Incident Response Commander",
+      "division": "engineering",
+      "emoji": "\ud83d\udea8",
+      "skill": "skills/agency-engineering-incident-response-commander/SKILL.md",
+      "html": "html-viewer/agency-engineering-incident-response-commander.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:38.627299+00:00"
+    },
+    "agency-engineering-minimal-change-engineer": {
+      "name": "engineering-minimal-change-engineer",
+      "display_name": "Minimal Change Engineer",
+      "division": "engineering",
+      "emoji": "\ud83e\udea1",
+      "skill": "skills/agency-engineering-minimal-change-engineer/SKILL.md",
+      "html": "html-viewer/agency-engineering-minimal-change-engineer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:38.673844+00:00"
+    },
+    "agency-engineering-mobile-app-builder": {
+      "name": "engineering-mobile-app-builder",
+      "display_name": "Mobile App Builder",
+      "division": "engineering",
+      "emoji": "\ud83d\udcf2",
+      "skill": "skills/agency-engineering-mobile-app-builder/SKILL.md",
+      "html": "html-viewer/agency-engineering-mobile-app-builder.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:38.727600+00:00"
+    },
+    "agency-engineering-rapid-prototyper": {
+      "name": "engineering-rapid-prototyper",
+      "display_name": "Rapid Prototyper",
+      "division": "engineering",
+      "emoji": "\u26a1",
+      "skill": "skills/agency-engineering-rapid-prototyper/SKILL.md",
+      "html": "html-viewer/agency-engineering-rapid-prototyper.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:38.773603+00:00"
+    },
+    "agency-engineering-security-engineer": {
+      "name": "engineering-security-engineer",
+      "display_name": "Security Engineer",
+      "division": "engineering",
+      "emoji": "\ud83d\udd12",
+      "skill": "skills/agency-engineering-security-engineer/SKILL.md",
+      "html": "html-viewer/agency-engineering-security-engineer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:38.830602+00:00"
+    },
+    "agency-engineering-senior-developer": {
+      "name": "engineering-senior-developer",
+      "display_name": "Senior Developer",
+      "division": "engineering",
+      "emoji": "\ud83d\udc8e",
+      "skill": "skills/agency-engineering-senior-developer/SKILL.md",
+      "html": "html-viewer/agency-engineering-senior-developer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:38.903601+00:00"
+    },
+    "agency-engineering-software-architect": {
+      "name": "engineering-software-architect",
+      "display_name": "Software Architect",
+      "division": "engineering",
+      "emoji": "\ud83c\udfdb\ufe0f",
+      "skill": "skills/agency-engineering-software-architect/SKILL.md",
+      "html": "html-viewer/agency-engineering-software-architect.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:38.954614+00:00"
+    },
+    "agency-engineering-solidity-smart-contract-engineer": {
+      "name": "engineering-solidity-smart-contract-engineer",
+      "display_name": "Solidity Smart Contract Engineer",
+      "division": "engineering",
+      "emoji": "\u26d3\ufe0f",
+      "skill": "skills/agency-engineering-solidity-smart-contract-engineer/SKILL.md",
+      "html": "html-viewer/agency-engineering-solidity-smart-contract-engineer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:39.032607+00:00"
+    },
+    "agency-engineering-sre": {
+      "name": "engineering-sre",
+      "display_name": "SRE (Site Reliability Engineer)",
+      "division": "engineering",
+      "emoji": "\ud83d\udee1\ufe0f",
+      "skill": "skills/agency-engineering-sre/SKILL.md",
+      "html": "html-viewer/agency-engineering-sre.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:39.097614+00:00"
+    },
+    "agency-engineering-technical-writer": {
+      "name": "engineering-technical-writer",
+      "display_name": "Technical Writer",
+      "division": "engineering",
+      "emoji": "\ud83d\udcda",
+      "skill": "skills/agency-engineering-technical-writer/SKILL.md",
+      "html": "html-viewer/agency-engineering-technical-writer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:39.155610+00:00"
+    },
+    "agency-engineering-threat-detection-engineer": {
+      "name": "engineering-threat-detection-engineer",
+      "display_name": "Threat Detection Engineer",
+      "division": "engineering",
+      "emoji": "\ud83c\udfaf",
+      "skill": "skills/agency-engineering-threat-detection-engineer/SKILL.md",
+      "html": "html-viewer/agency-engineering-threat-detection-engineer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:39.245605+00:00"
+    },
+    "agency-engineering-voice-ai-integration-engineer": {
+      "name": "engineering-voice-ai-integration-engineer",
+      "display_name": "Voice AI Integration Engineer",
+      "division": "engineering",
+      "emoji": "\ud83c\udf99\ufe0f",
+      "skill": "skills/agency-engineering-voice-ai-integration-engineer/SKILL.md",
+      "html": "html-viewer/agency-engineering-voice-ai-integration-engineer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:39.315603+00:00"
+    },
+    "agency-engineering-wechat-mini-program-developer": {
+      "name": "engineering-wechat-mini-program-developer",
+      "display_name": "WeChat Mini Program Developer",
+      "division": "engineering",
+      "emoji": "\ud83d\udcac",
+      "skill": "skills/agency-engineering-wechat-mini-program-developer/SKILL.md",
+      "html": "html-viewer/agency-engineering-wechat-mini-program-developer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:50:39.395603+00:00"
+    },
+    "agency-accounts-payable-agent": {
+      "name": "accounts-payable-agent",
+      "display_name": "Accounts Payable Agent",
+      "division": "specialized",
+      "emoji": "\ud83d\udcb8",
+      "skill": "skills/agency-accounts-payable-agent/SKILL.md",
+      "html": "html-viewer/agency-accounts-payable-agent.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:02.595129+00:00"
+    },
+    "agency-agentic-identity-trust": {
+      "name": "agentic-identity-trust",
+      "display_name": "Agentic Identity & Trust Architect",
+      "division": "specialized",
+      "emoji": "\ud83d\udd10",
+      "skill": "skills/agency-agentic-identity-trust/SKILL.md",
+      "html": "html-viewer/agency-agentic-identity-trust.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:02.658026+00:00"
+    },
+    "agency-agents-orchestrator": {
+      "name": "agents-orchestrator",
+      "display_name": "Agents Orchestrator",
+      "division": "specialized",
+      "emoji": "\ud83c\udf9b\ufe0f",
+      "skill": "skills/agency-agents-orchestrator/SKILL.md",
+      "html": "html-viewer/agency-agents-orchestrator.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:02.728358+00:00"
+    },
+    "agency-automation-governance-architect": {
+      "name": "automation-governance-architect",
+      "display_name": "Automation Governance Architect",
+      "division": "specialized",
+      "emoji": "\u2699\ufe0f",
+      "skill": "skills/agency-automation-governance-architect/SKILL.md",
+      "html": "html-viewer/agency-automation-governance-architect.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:02.781573+00:00"
+    },
+    "agency-blockchain-security-auditor": {
+      "name": "blockchain-security-auditor",
+      "display_name": "Blockchain Security Auditor",
+      "division": "specialized",
+      "emoji": "\ud83d\udee1\ufe0f",
+      "skill": "skills/agency-blockchain-security-auditor/SKILL.md",
+      "html": "html-viewer/agency-blockchain-security-auditor.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:02.932971+00:00"
+    },
+    "agency-compliance-auditor": {
+      "name": "compliance-auditor",
+      "display_name": "Compliance Auditor",
+      "division": "specialized",
+      "emoji": "\ud83d\udccb",
+      "skill": "skills/agency-compliance-auditor/SKILL.md",
+      "html": "html-viewer/agency-compliance-auditor.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:02.997906+00:00"
+    },
+    "agency-corporate-training-designer": {
+      "name": "corporate-training-designer",
+      "display_name": "Corporate Training Designer",
+      "division": "specialized",
+      "emoji": "\ud83d\udcda",
+      "skill": "skills/agency-corporate-training-designer/SKILL.md",
+      "html": "html-viewer/agency-corporate-training-designer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:03.050153+00:00"
+    },
+    "agency-customer-service": {
+      "name": "customer-service",
+      "display_name": "Customer Service",
+      "division": "specialized",
+      "emoji": "\ud83c\udfa7",
+      "skill": "skills/agency-customer-service/SKILL.md",
+      "html": "html-viewer/agency-customer-service.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:03.115075+00:00"
+    },
+    "agency-data-consolidation-agent": {
+      "name": "data-consolidation-agent",
+      "display_name": "Data Consolidation Agent",
+      "division": "specialized",
+      "emoji": "\ud83d\uddc4\ufe0f",
+      "skill": "skills/agency-data-consolidation-agent/SKILL.md",
+      "html": "html-viewer/agency-data-consolidation-agent.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:03.201151+00:00"
+    },
+    "agency-government-digital-presales-consultant": {
+      "name": "government-digital-presales-consultant",
+      "display_name": "Government Digital Presales Consultant",
+      "division": "specialized",
+      "emoji": "\ud83c\udfdb\ufe0f",
+      "skill": "skills/agency-government-digital-presales-consultant/SKILL.md",
+      "html": "html-viewer/agency-government-digital-presales-consultant.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:03.296080+00:00"
+    },
+    "agency-healthcare-customer-service": {
+      "name": "healthcare-customer-service",
+      "display_name": "Healthcare Customer Service",
+      "division": "specialized",
+      "emoji": "\ud83c\udfe5",
+      "skill": "skills/agency-healthcare-customer-service/SKILL.md",
+      "html": "html-viewer/agency-healthcare-customer-service.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:03.358065+00:00"
+    },
+    "agency-healthcare-marketing-compliance": {
+      "name": "healthcare-marketing-compliance",
+      "display_name": "Healthcare Marketing Compliance Specialist",
+      "division": "specialized",
+      "emoji": "\u2695\ufe0f",
+      "skill": "skills/agency-healthcare-marketing-compliance/SKILL.md",
+      "html": "html-viewer/agency-healthcare-marketing-compliance.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:03.457340+00:00"
+    },
+    "agency-hospitality-guest-services": {
+      "name": "hospitality-guest-services",
+      "display_name": "Hospitality Guest Services",
+      "division": "specialized",
+      "emoji": "\ud83c\udfe8",
+      "skill": "skills/agency-hospitality-guest-services/SKILL.md",
+      "html": "html-viewer/agency-hospitality-guest-services.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:03.532175+00:00"
+    },
+    "agency-hr-onboarding": {
+      "name": "hr-onboarding",
+      "display_name": "HR Onboarding",
+      "division": "specialized",
+      "emoji": "\ud83e\udd1d",
+      "skill": "skills/agency-hr-onboarding/SKILL.md",
+      "html": "html-viewer/agency-hr-onboarding.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:03.647122+00:00"
+    },
+    "agency-identity-graph-operator": {
+      "name": "identity-graph-operator",
+      "display_name": "Identity Graph Operator",
+      "division": "specialized",
+      "emoji": "\ud83d\udd78\ufe0f",
+      "skill": "skills/agency-identity-graph-operator/SKILL.md",
+      "html": "html-viewer/agency-identity-graph-operator.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:03.708008+00:00"
+    },
+    "agency-language-translator": {
+      "name": "language-translator",
+      "display_name": "Language Translator",
+      "division": "specialized",
+      "emoji": "\ud83c\udf10",
+      "skill": "skills/agency-language-translator/SKILL.md",
+      "html": "html-viewer/agency-language-translator.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:03.772081+00:00"
+    },
+    "agency-legal-billing-time-tracking": {
+      "name": "legal-billing-time-tracking",
+      "display_name": "Legal Billing & Time Tracking",
+      "division": "specialized",
+      "emoji": "\u23f1\ufe0f",
+      "skill": "skills/agency-legal-billing-time-tracking/SKILL.md",
+      "html": "html-viewer/agency-legal-billing-time-tracking.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:03.842184+00:00"
+    },
+    "agency-legal-client-intake": {
+      "name": "legal-client-intake",
+      "display_name": "Legal Client Intake",
+      "division": "specialized",
+      "emoji": "\ud83d\udccb",
+      "skill": "skills/agency-legal-client-intake/SKILL.md",
+      "html": "html-viewer/agency-legal-client-intake.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:03.922360+00:00"
+    },
+    "agency-legal-document-review": {
+      "name": "legal-document-review",
+      "display_name": "Legal Document Review",
+      "division": "specialized",
+      "emoji": "\u2696\ufe0f",
+      "skill": "skills/agency-legal-document-review/SKILL.md",
+      "html": "html-viewer/agency-legal-document-review.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:04.003266+00:00"
+    },
+    "agency-loan-officer-assistant": {
+      "name": "loan-officer-assistant",
+      "display_name": "Loan Officer Assistant",
+      "division": "specialized",
+      "emoji": "\ud83c\udfe6",
+      "skill": "skills/agency-loan-officer-assistant/SKILL.md",
+      "html": "html-viewer/agency-loan-officer-assistant.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:04.140039+00:00"
+    },
+    "agency-lsp-index-engineer": {
+      "name": "lsp-index-engineer",
+      "display_name": "LSP/Index Engineer",
+      "division": "specialized",
+      "emoji": "\ud83d\udd0e",
+      "skill": "skills/agency-lsp-index-engineer/SKILL.md",
+      "html": "html-viewer/agency-lsp-index-engineer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:04.236088+00:00"
+    },
+    "agency-real-estate-buyer-seller": {
+      "name": "real-estate-buyer-seller",
+      "display_name": "Real Estate Buyer & Seller",
+      "division": "specialized",
+      "emoji": "\ud83c\udfe0",
+      "skill": "skills/agency-real-estate-buyer-seller/SKILL.md",
+      "html": "html-viewer/agency-real-estate-buyer-seller.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:04.319955+00:00"
+    },
+    "agency-recruitment-specialist": {
+      "name": "recruitment-specialist",
+      "display_name": "Recruitment Specialist",
+      "division": "specialized",
+      "emoji": "\ud83c\udfaf",
+      "skill": "skills/agency-recruitment-specialist/SKILL.md",
+      "html": "html-viewer/agency-recruitment-specialist.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:04.464113+00:00"
+    },
+    "agency-report-distribution-agent": {
+      "name": "report-distribution-agent",
+      "display_name": "Report Distribution Agent",
+      "division": "specialized",
+      "emoji": "\ud83d\udce4",
+      "skill": "skills/agency-report-distribution-agent/SKILL.md",
+      "html": "html-viewer/agency-report-distribution-agent.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:04.527681+00:00"
+    },
+    "agency-retail-customer-returns": {
+      "name": "retail-customer-returns",
+      "display_name": "Retail Customer Returns",
+      "division": "specialized",
+      "emoji": "\ud83d\uded2",
+      "skill": "skills/agency-retail-customer-returns/SKILL.md",
+      "html": "html-viewer/agency-retail-customer-returns.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:04.603244+00:00"
+    },
+    "agency-sales-data-extraction-agent": {
+      "name": "sales-data-extraction-agent",
+      "display_name": "Sales Data Extraction Agent",
+      "division": "specialized",
+      "emoji": "\ud83d\udcca",
+      "skill": "skills/agency-sales-data-extraction-agent/SKILL.md",
+      "html": "html-viewer/agency-sales-data-extraction-agent.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:04.657103+00:00"
+    },
+    "agency-sales-outreach": {
+      "name": "sales-outreach",
+      "display_name": "Sales Outreach",
+      "division": "specialized",
+      "emoji": "\ud83c\udfaf",
+      "skill": "skills/agency-sales-outreach/SKILL.md",
+      "html": "html-viewer/agency-sales-outreach.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:04.783076+00:00"
+    },
+    "agency-specialized-chief-of-staff": {
+      "name": "specialized-chief-of-staff",
+      "display_name": "Chief of Staff",
+      "division": "specialized",
+      "emoji": "\ud83e\udded",
+      "skill": "skills/agency-specialized-chief-of-staff/SKILL.md",
+      "html": "html-viewer/agency-specialized-chief-of-staff.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:04.864984+00:00"
+    },
+    "agency-specialized-civil-engineer": {
+      "name": "specialized-civil-engineer",
+      "display_name": "Civil Engineer",
+      "division": "specialized",
+      "emoji": "\ud83c\udfd7\ufe0f",
+      "skill": "skills/agency-specialized-civil-engineer/SKILL.md",
+      "html": "html-viewer/agency-specialized-civil-engineer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:04.933823+00:00"
+    },
+    "agency-specialized-cultural-intelligence-strategist": {
+      "name": "specialized-cultural-intelligence-strategist",
+      "display_name": "Cultural Intelligence Strategist",
+      "division": "specialized",
+      "emoji": "\ud83c\udf0d",
+      "skill": "skills/agency-specialized-cultural-intelligence-strategist/SKILL.md",
+      "html": "html-viewer/agency-specialized-cultural-intelligence-strategist.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:05.004230+00:00"
+    },
+    "agency-specialized-developer-advocate": {
+      "name": "specialized-developer-advocate",
+      "display_name": "Developer Advocate",
+      "division": "specialized",
+      "emoji": "\ud83d\udde3\ufe0f",
+      "skill": "skills/agency-specialized-developer-advocate/SKILL.md",
+      "html": "html-viewer/agency-specialized-developer-advocate.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:05.068070+00:00"
+    },
+    "agency-specialized-document-generator": {
+      "name": "specialized-document-generator",
+      "display_name": "Document Generator",
+      "division": "specialized",
+      "emoji": "\ud83d\udcc4",
+      "skill": "skills/agency-specialized-document-generator/SKILL.md",
+      "html": "html-viewer/agency-specialized-document-generator.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:05.126208+00:00"
+    },
+    "agency-specialized-french-consulting-market": {
+      "name": "specialized-french-consulting-market",
+      "display_name": "French Consulting Market Navigator",
+      "division": "specialized",
+      "emoji": "\ud83c\uddeb\ud83c\uddf7",
+      "skill": "skills/agency-specialized-french-consulting-market/SKILL.md",
+      "html": "html-viewer/agency-specialized-french-consulting-market.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:05.200925+00:00"
+    },
+    "agency-specialized-korean-business-navigator": {
+      "name": "specialized-korean-business-navigator",
+      "display_name": "Korean Business Navigator",
+      "division": "specialized",
+      "emoji": "\ud83c\uddf0\ud83c\uddf7",
+      "skill": "skills/agency-specialized-korean-business-navigator/SKILL.md",
+      "html": "html-viewer/agency-specialized-korean-business-navigator.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:05.360582+00:00"
+    },
+    "agency-specialized-mcp-builder": {
+      "name": "specialized-mcp-builder",
+      "display_name": "MCP Builder",
+      "division": "specialized",
+      "emoji": "\ud83d\udd0c",
+      "skill": "skills/agency-specialized-mcp-builder/SKILL.md",
+      "html": "html-viewer/agency-specialized-mcp-builder.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:05.469609+00:00"
+    },
+    "agency-specialized-model-qa": {
+      "name": "specialized-model-qa",
+      "display_name": "Model QA Specialist",
+      "division": "specialized",
+      "emoji": "\ud83d\udd2c",
+      "skill": "skills/agency-specialized-model-qa/SKILL.md",
+      "html": "html-viewer/agency-specialized-model-qa.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:05.649950+00:00"
+    },
+    "agency-specialized-salesforce-architect": {
+      "name": "specialized-salesforce-architect",
+      "display_name": "Salesforce Architect",
+      "division": "specialized",
+      "emoji": "\u2601\ufe0f",
+      "skill": "skills/agency-specialized-salesforce-architect/SKILL.md",
+      "html": "html-viewer/agency-specialized-salesforce-architect.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:05.849903+00:00"
+    },
+    "agency-specialized-workflow-architect": {
+      "name": "specialized-workflow-architect",
+      "display_name": "Workflow Architect",
+      "division": "specialized",
+      "emoji": "\\U0001F5FA\\uFE0F",
+      "skill": "skills/agency-specialized-workflow-architect/SKILL.md",
+      "html": "html-viewer/agency-specialized-workflow-architect.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:05.957031+00:00"
+    },
+    "agency-study-abroad-advisor": {
+      "name": "study-abroad-advisor",
+      "display_name": "Study Abroad Advisor",
+      "division": "specialized",
+      "emoji": "\ud83c\udf93",
+      "skill": "skills/agency-study-abroad-advisor/SKILL.md",
+      "html": "html-viewer/agency-study-abroad-advisor.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:06.070222+00:00"
+    },
+    "agency-supply-chain-strategist": {
+      "name": "supply-chain-strategist",
+      "display_name": "Supply Chain Strategist",
+      "division": "specialized",
+      "emoji": "\ud83d\udd17",
+      "skill": "skills/agency-supply-chain-strategist/SKILL.md",
+      "html": "html-viewer/agency-supply-chain-strategist.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:06.233879+00:00"
+    },
+    "agency-zk-steward": {
+      "name": "zk-steward",
+      "display_name": "ZK Steward",
+      "division": "specialized",
+      "emoji": "\ud83d\uddc3\ufe0f",
+      "skill": "skills/agency-zk-steward/SKILL.md",
+      "html": "html-viewer/agency-zk-steward.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:06.362105+00:00"
+    },
+    "agency-testing-accessibility-auditor": {
+      "name": "testing-accessibility-auditor",
+      "display_name": "Accessibility Auditor",
+      "division": "testing",
+      "emoji": "\u267f",
+      "skill": "skills/agency-testing-accessibility-auditor/SKILL.md",
+      "html": "html-viewer/agency-testing-accessibility-auditor.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:58.067927+00:00"
+    },
+    "agency-testing-api-tester": {
+      "name": "testing-api-tester",
+      "display_name": "API Tester",
+      "division": "testing",
+      "emoji": "\ud83d\udd0c",
+      "skill": "skills/agency-testing-api-tester/SKILL.md",
+      "html": "html-viewer/agency-testing-api-tester.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:58.133044+00:00"
+    },
+    "agency-testing-evidence-collector": {
+      "name": "testing-evidence-collector",
+      "display_name": "Evidence Collector",
+      "division": "testing",
+      "emoji": "\ud83d\udcf8",
+      "skill": "skills/agency-testing-evidence-collector/SKILL.md",
+      "html": "html-viewer/agency-testing-evidence-collector.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:58.172243+00:00"
+    },
+    "agency-testing-performance-benchmarker": {
+      "name": "testing-performance-benchmarker",
+      "display_name": "Performance Benchmarker",
+      "division": "testing",
+      "emoji": "\u23f1\ufe0f",
+      "skill": "skills/agency-testing-performance-benchmarker/SKILL.md",
+      "html": "html-viewer/agency-testing-performance-benchmarker.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:58.218258+00:00"
+    },
+    "agency-testing-reality-checker": {
+      "name": "testing-reality-checker",
+      "display_name": "Reality Checker",
+      "division": "testing",
+      "emoji": "\ud83e\uddd0",
+      "skill": "skills/agency-testing-reality-checker/SKILL.md",
+      "html": "html-viewer/agency-testing-reality-checker.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:58.265607+00:00"
+    },
+    "agency-testing-test-results-analyzer": {
+      "name": "testing-test-results-analyzer",
+      "display_name": "Test Results Analyzer",
+      "division": "testing",
+      "emoji": "\ud83d\udccb",
+      "skill": "skills/agency-testing-test-results-analyzer/SKILL.md",
+      "html": "html-viewer/agency-testing-test-results-analyzer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:58.310815+00:00"
+    },
+    "agency-testing-tool-evaluator": {
+      "name": "testing-tool-evaluator",
+      "display_name": "Tool Evaluator",
+      "division": "testing",
+      "emoji": "\ud83d\udd27",
+      "skill": "skills/agency-testing-tool-evaluator/SKILL.md",
+      "html": "html-viewer/agency-testing-tool-evaluator.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:58.359398+00:00"
+    },
+    "agency-testing-workflow-optimizer": {
+      "name": "testing-workflow-optimizer",
+      "display_name": "Workflow Optimizer",
+      "division": "testing",
+      "emoji": "\u26a1",
+      "skill": "skills/agency-testing-workflow-optimizer/SKILL.md",
+      "html": "html-viewer/agency-testing-workflow-optimizer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:58.406581+00:00"
+    },
+    "agency-design-brand-guardian": {
+      "name": "design-brand-guardian",
+      "display_name": "Brand Guardian",
+      "division": "design",
+      "emoji": "\ud83c\udfa8",
+      "skill": "skills/agency-design-brand-guardian/SKILL.md",
+      "html": "html-viewer/agency-design-brand-guardian.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:58.792703+00:00"
+    },
+    "agency-design-image-prompt-engineer": {
+      "name": "design-image-prompt-engineer",
+      "display_name": "Image Prompt Engineer",
+      "division": "design",
+      "emoji": "\ud83d\udcf7",
+      "skill": "skills/agency-design-image-prompt-engineer/SKILL.md",
+      "html": "html-viewer/agency-design-image-prompt-engineer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:58.836566+00:00"
+    },
+    "agency-design-inclusive-visuals-specialist": {
+      "name": "design-inclusive-visuals-specialist",
+      "display_name": "Inclusive Visuals Specialist",
+      "division": "design",
+      "emoji": "\ud83c\udf08",
+      "skill": "skills/agency-design-inclusive-visuals-specialist/SKILL.md",
+      "html": "html-viewer/agency-design-inclusive-visuals-specialist.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:58.899771+00:00"
+    },
+    "agency-design-ui-designer": {
+      "name": "design-ui-designer",
+      "display_name": "UI Designer",
+      "division": "design",
+      "emoji": "\ud83c\udfa8",
+      "skill": "skills/agency-design-ui-designer/SKILL.md",
+      "html": "html-viewer/agency-design-ui-designer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:58.945972+00:00"
+    },
+    "agency-design-ux-architect": {
+      "name": "design-ux-architect",
+      "display_name": "UX Architect",
+      "division": "design",
+      "emoji": "\ud83d\udcd0",
+      "skill": "skills/agency-design-ux-architect/SKILL.md",
+      "html": "html-viewer/agency-design-ux-architect.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:58.993974+00:00"
+    },
+    "agency-design-ux-researcher": {
+      "name": "design-ux-researcher",
+      "display_name": "UX Researcher",
+      "division": "design",
+      "emoji": "\ud83d\udd2c",
+      "skill": "skills/agency-design-ux-researcher/SKILL.md",
+      "html": "html-viewer/agency-design-ux-researcher.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:59.042998+00:00"
+    },
+    "agency-design-visual-storyteller": {
+      "name": "design-visual-storyteller",
+      "display_name": "Visual Storyteller",
+      "division": "design",
+      "emoji": "\ud83c\udfac",
+      "skill": "skills/agency-design-visual-storyteller/SKILL.md",
+      "html": "html-viewer/agency-design-visual-storyteller.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:59.085559+00:00"
+    },
+    "agency-design-whimsy-injector": {
+      "name": "design-whimsy-injector",
+      "display_name": "Whimsy Injector",
+      "division": "design",
+      "emoji": "\u2728",
+      "skill": "skills/agency-design-whimsy-injector/SKILL.md",
+      "html": "html-viewer/agency-design-whimsy-injector.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:59.134883+00:00"
+    },
+    "agency-project-management-experiment-tracker": {
+      "name": "project-management-experiment-tracker",
+      "display_name": "Experiment Tracker",
+      "division": "project-management",
+      "emoji": "\ud83e\uddea",
+      "skill": "skills/agency-project-management-experiment-tracker/SKILL.md",
+      "html": "html-viewer/agency-project-management-experiment-tracker.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:59.533958+00:00"
+    },
+    "agency-project-management-jira-workflow-steward": {
+      "name": "project-management-jira-workflow-steward",
+      "display_name": "Jira Workflow Steward",
+      "division": "project-management",
+      "emoji": "\ud83d\udccb",
+      "skill": "skills/agency-project-management-jira-workflow-steward/SKILL.md",
+      "html": "html-viewer/agency-project-management-jira-workflow-steward.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:59.587419+00:00"
+    },
+    "agency-project-management-project-shepherd": {
+      "name": "project-management-project-shepherd",
+      "display_name": "Project Shepherd",
+      "division": "project-management",
+      "emoji": "\ud83d\udc11",
+      "skill": "skills/agency-project-management-project-shepherd/SKILL.md",
+      "html": "html-viewer/agency-project-management-project-shepherd.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:59.638414+00:00"
+    },
+    "agency-project-management-studio-operations": {
+      "name": "project-management-studio-operations",
+      "display_name": "Studio Operations",
+      "division": "project-management",
+      "emoji": "\ud83c\udfed",
+      "skill": "skills/agency-project-management-studio-operations/SKILL.md",
+      "html": "html-viewer/agency-project-management-studio-operations.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:59.694416+00:00"
+    },
+    "agency-project-management-studio-producer": {
+      "name": "project-management-studio-producer",
+      "display_name": "Studio Producer",
+      "division": "project-management",
+      "emoji": "\ud83c\udfac",
+      "skill": "skills/agency-project-management-studio-producer/SKILL.md",
+      "html": "html-viewer/agency-project-management-studio-producer.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:59.754062+00:00"
+    },
+    "agency-project-manager-senior": {
+      "name": "project-manager-senior",
+      "display_name": "Senior Project Manager",
+      "division": "project-management",
+      "emoji": "\ud83d\udcdd",
+      "skill": "skills/agency-project-manager-senior/SKILL.md",
+      "html": "html-viewer/agency-project-manager-senior.html",
+      "source": "msitarzewski/agency-agents",
+      "added": "2026-05-16T10:51:59.817395+00:00"
     }
   },
-  "progress_header_format": "{emoji} [{tag}] {agent-name} — {timestamp}",
-  "example": "🔵 [CC] Claude Code — 2026-05-15 20:50:00Z"
+  "progress_header_format": "{emoji} [{tag}] {agent-name} \u00e2\u20ac\u201d {timestamp}",
+  "example": "\u00f0\u0178\u201d\u00b5 [CC] Claude Code \u00e2\u20ac\u201d 2026-05-15 20:50:00Z",
+  "tools": [
+    {
+      "name": "beautiful_mermaid",
+      "display_name": "beautiful-mermaid",
+      "category": "other",
+      "source": "C:\\Users\\wifik\\Desktop\\projects\\beautiful-mermaid",
+      "skill": "skills/beautiful_mermaid/SKILL.md",
+      "added": "2026-05-16T10:24:04.273097+00:00"
+    }
+  ]
 }
