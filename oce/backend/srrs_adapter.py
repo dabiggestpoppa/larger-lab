@@ -57,6 +57,7 @@ class SRRSAdapter:
         self._governance: Optional[SustainabilityGovernance] = None
         self._contract_manager: Optional[PredictionContractManager] = None
         self._topology_observer: Optional[TopologyObserver] = None
+        self._event_counter = 0
 
     async def initialize(self):
         """Initialize SRRA-OPH substrate components."""

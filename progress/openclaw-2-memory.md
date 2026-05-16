@@ -6,7 +6,7 @@
 
 ---
 
-## Current Context (2026-05-16 17:38:47 UTC)
+## Current Context (2026-05-16 18:20:05 UTC)
 
 ### Status
 🟢 Active
@@ -20,6 +20,14 @@ SRRA-OPH Phase 8 — Sovereign Coevolution (Planned)
 - Execute P90 backtests on all pairs
 
 ### Recent Activity
+#### 📢 [SYSTEM] 2026-05-16 — Workspace Optimization Update (PM)
+- New memory sync daemon: auto-sync every 7 updates, auto-summarize every 20 entries via LLM
+- New tools: `memory_sync_daemon.py`, `summarize_progress.py`, `workspace_cleanup.py`
+- New protocol: `AGENT_MOVEMENT.md` — agent movement patterns, shared space etiquette
+- Sync threshold changed: 3→7 updates. All progress files updated.
+- OC2 daily cron added: Memory Sync & Summarization (7am)
+- See `AGENT_MOVEMENT.md` for full protocol
+
 #### 🟠 [OC2] 2026-05-16 — Agent Fully Online
 - Gateway running on port 18790 — sole OpenClaw gateway (OC1 deprecated)
 - Telegram @OC2BLRBOT connected & paired ✅
@@ -30,7 +38,7 @@ SRRA-OPH Phase 8 — Sovereign Coevolution (Planned)
 ---
 
 ## Sync Metadata
-- **Last Sync:** 2026-05-16 17:38:47 UTC
+- **Last Sync:** 2026-05-16 18:20:05 UTC
 - **Progress File:** `progress/openclaw-2-progress.md`
 - **Working Memory:** `progress/openclaw-2-memory.md`
 - **Sync Threshold:** 7 updates
