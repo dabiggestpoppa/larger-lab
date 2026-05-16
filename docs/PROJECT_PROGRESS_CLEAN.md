@@ -1,6 +1,6 @@
 # Project Progress & Context
 
-## 🔵 [CC] Claude Code — Last Sync: 2026-05-16 20:26 UTC
+## 🔵 [CC] Claude Code — Last Sync: 2026-05-16 21:06 UTC
 
 *Auto-synced from `progress/claude-code-progress.md`*
 
@@ -40,148 +40,52 @@
 
 ---
 
-## 🦉 [RL] OWL — Last Sync: 2026-05-16 20:26 UTC
+## 🦉 [RL] OWL — Last Sync: 2026-05-16 21:06 UTC
 
 *Auto-synced from `progress/rl-progress.md`*
 
-#### 🦉 [RL] 2026-05-16 — OC1/OC2 Gateway Conflict Diagnosed
-- **Root cause found**: OC1's `gateway.cmd` was missing `OPENCLAW_HOME` env var, causing it to default to `%USERPROFILE%\.openclaw` and read OC2's config
-- **Symptom**: OC1 kept dying silently or killing OC2's process (stale PID in `gateway-restart-intent.json`)
-- **Fix applied**: Updated `C:\Users\wifik\.openclaw\gateway.cmd` to include `OPENCLAW_HOME=C:\Users\wifik\.openclaw` and port 18789
-- **Status**: Both gateways can start but OC1 still dies intermittently — needs further investigation
-- **Config separation verified**: OC1 (port 18789, bot @finalstrawclawbot) and OC2 (port 18790, bot @OC2BLRBOT) have distinct configs, tokens, and ports
-- **Docker option**: No container runtime available on system (no Docker, no Podman). Would need Docker Desktop install + reboot
-- **Recommendation**: Run OC2 only (it's stable). OC1 can be revived later with clean gateway.cmd
-
-#### 🦉 [RL] 2026-05-16 — Both Gateways Fixed & Running 24/7
-- **Root cause of both gateways failing**: `gateway.cmd` used `openclaw gateway --port X` instead of `openclaw gateway run --port X --allow-unconfigured`
-- **Fixes applied**:
-  - Fixed `C:\Users\wifik\.openclaw\gateway.cmd` — added `run` subcommand and `--allow-unconfigured`
-  - Fixed `C:\Users\wifik\Desktop\projects\larger-lab\.openclaw-2\gateway.cmd` — same fix
-  - Fixed OC2 startup file to properly call its `gateway.cmd` with full path
-  - Created `tools\gateway-watchdog.cmd` — checks both gateways every 60s, restarts if down
-  - Created `tools\register-gateway-tasks.ps1` — Scheduled Task registration (requires Admin)
-  - Added watchdog to startup folder for automatic 24/7 monitoring
-- **Status**: ✅ Both gateways live and healthy
-  - OC1 (port 18789): `{"ok":true,"status":"live"}` — PID 19844
-  - OC2 (port 18790): `{"ok":true,"status":"live"}` — PID 41592
-- **Auto-start**: Startup folder entries for both gateways + watchdog
-- **Note**: For even more reliable auto-start, run `tools\register-gateway-tasks.ps1` as Administrator to create Windows Scheduled Tasks with restart-on-failure
-
-#### 🦉 [RL] 2026-05-16 — OC1 Telegram Not Responding (Diagnosis)
-- **Symptom**: OC1 gateway running (port 18789) but Telegram bot @finalstrawclawbot not responding
-- **Root cause 1**: Missing `openrouter` provider in OC1's `openclaw.json` — only had poolside/nvidia/deepseek, causing fallback to `openai` provider → "No API key found" error
-- **Root cause 2**: OC1's `models.json` has placeholder `"apiKey": "OPENROUTER_API_KEY"` instead of actual key
-- **Root cause 3**: Telegram API connectivity issues — DNS resolution slow, fetch timeouts, event loop delays up to 104s
-- **Root cause 4**: 203 Telegram commands registered (limit 100), causing command sync failures
-- **Fix applied**: Added openrouter provider to OC1's `openclaw.json`
-- **Status**: After restart, OC1 health check failed — needs further investigation in new chat
-- **OC2**: Working fine throughout, no changes needed
-- **Detailed notes**: See `/memories/session/oc1-gateway-diagnosis.md`
-
-#### 🦉 [RL] 2026-05-16 — Self-Healing Framework Built & Deployed
-- **Built complete self-healing startup system**
-- `db/schema.py` — SQLite error DB with tables: errors, bug_annotations, startup_checks, self_healing_actions
-- `tools/self_heal.py` — Log scanner, error classifier, bug annotator, auto-fixer, health reporter
-- `tools/self_surgery.py` — Safe internal editing module (backup → edit → validate → log)
-- `skills/creative-think/SKILL.md` — LATTICE framework for abstract reasoning
-- `db/owl_health.db` — Initialized and populated
-- **First scan results**: 509 raw log lines → 12 unique errors → 12 bug files created → 1 auto-fixed
-- **Key finding**: symlink EPERM is known Windows limitation (not real error), event loop delays are chronic (169 occurrences), agent stalls at 51 occurrences
-- **HEARTBEAT.md updated** with self-healing, creative think, and self-surgery protocols
-- MAD's building philosophy absorbed: build to the sky, structure contains the answer, feedback not failure, unlimited pathways, trust your reasoning
-
-#### 🦉 [RL] 2026-05-16 — Gateway Diagnostics Complete, Ready for Fix
-- **Current state**: Both gateways running (OC1 PID 14520, OC2 PID 21768)
-- **OC2 issue identified**: Stuck Telegram session `agent:main:telegram:direct:8258195396` blocking event loop for 1000+ seconds
-- **Root cause**: Event-loop starvation from stuck session → Telegram polling stalls every ~180s → forced restarts
-- **Fixes needed**:
-  1. Clear stuck session from OC2's `sessions.json`
-  2. Disable native Telegram commands (`channels.telegram.commands.native: false`) to avoid 203-command overload
-  3. Restart both gateways cleanly
-- **PowerShell spam issue**: `openclaw gateway probe` without `--token` hangs forever → terminal timeout → new terminal spawned → infinite loop
-- **Solution**: Use venv-based Python scripts for gateway management instead of CLI commands
+#### [RL] 2026-05-16 - Phase 2+3 DSPy Pipelines + Observer Research + OC2 Monitor + Error Handling
 
 ---
-## 🟡 [AS] Assistant Manager — Last Sync: 2026-05-16 20:26 UTC
+## 🟡 [AS] Assistant Manager — Last Sync: 2026-05-16 21:06 UTC
 
 *Auto-synced from `progress/assistant-progress.md`*
 
-#### 🟡 [AS] 2026-05-16 01:00:00Z — Book 2 Integration: Phase 3-5 Updated Architecture
-- Read and analyzed updated Phase 3-5 plans (Book 2 integration)
-- Updated `srra-oph-build` skill to v2 with overlap-first architecture
-- Created new component stubs:
-  - `active_collar_fields.py` — Active collar fields (edges as computation)
-  - `local_consensus.py` — Local consensus engines (consensus != sync)
-  - `capability_fields.py` — Capability fields (tools as topology regions)
-  - `trajectory_fields.py` — Trajectory reconstruction fields (identity as trajectory)
-- Created design docs: `phase4_design.md`, `phase5_design.md`
-- Updated `__init__.py` with all new exports
-- Updated CODEMAP.md with Book 2 architecture diagrams
-- **Key architectural shifts documented:**
-  - Phase 3: Overlap collars are continuity engine (not observer nodes)
-  - Phase 4: Tools are capability fields (not isolated endpoints)
-  - Phase 5: Identity is reconstructable trajectory (not persistent state)
+#### 🟡 [AS] 2026-05-16 20:30:00Z — Chat Cleanup + Memory Structure
+- Cleaned team-chat.md (removed ~15 old entries, kept current state)
+- Cleaned assistant-progress.md (187 lines → focused)
+- Created memory-bank/errors-and-solutions.md (4 entries, template)
+- Updated memory_sync_daemon.py with TRACKED_FILES config
+- Embedded anti-bloat rules into workspace-state.md
 
-#### 🟡 [AS] 2026-05-16 02:00:00Z — Cron-Style Monitoring Active
-- All tests passing: Phase 2 (7/7), Phase 3 (4/4), Book 2 (6/6) = 17/17 total
-- Resource assessment complete: 8/12 repos approved for integration
-- Tasks delegated to OC and HR via team-chat.md
-- Cron check script created at `tools/as-cron-check.py`
-- **Current blockers**: None — all systems green
-- **Next check**: Monitor OC/HR progress on delegated tasks
+#### 🟡 [AS] 2026-05-16 20:00:00Z — OC2 Chronic Bug Fixed + Soft Logic Embedded
+- **Root cause:** Invalid config keys (contextLimit, hardThresholdTokens) + wrong API key in agent models.json
+- **Fix:** Removed invalid keys, fixed API key, restarted with correct OPENCLAW_HOME
+- **8-hour downtime caused by checking health endpoint instead of logs**
+- Created: oc2-start.cmd, oc2-doctor.cmd, oc2-context-monitor.py
+- Embedded 6 diagnostic soft logic patterns into AGENTS.md
+- Postmortem saved to /memories/session/oc2-chronic-bug-postmortem.md
 
-#### 🟡 [AS] 2026-05-16 08:00:00Z — OpenClaw 2 Setup Complete
-- Created `.openclaw-2/` config directory with valid OpenClaw schema
-- Configured Telegram @OC2BLRBOT (port 18790) — paired and working
-- Migrated 20 Hermes skills to `.openclaw-2/skills/`
-- Updated `.agent-tags.json` — HR → OC2
-- Updated `progress-sync.py` — OC2 added to AGENTS + CLI choices
-- Updated `team-chat.md` — OC2 online, Phase 6 tasks cleaned up, Phase 8 planning
-- Updated `AGENTS.md` — phase status → Phase 8
-- Updated `KEYS.md` — OC1 + OC2 bot tokens documented
-- Created startup shortcut `OpenClaw 2 Gateway.cmd` for auto-start
-- Discord channel config deferred (schema validation issue — Telegram working)
-- All 38 tests still passing ✅
-- **Next:** Add Discord config, implement Phase 8 components (Sovereignty Economics, Probabilistic Self-Models, MSR Compression)
-- [ ] Prepare Phase 4 component stubs based on resource assessment
-- [ ] Run cron check every 30min while stepping away
-- [ ] Review Phase 2 test results
-- [ ] Monitor team progress files
+#### 🟡 [AS] 2026-05-16 18:35:00Z — OCE Phase 2 Quality Review
+- Reviewed CC's event_fabric.py — 32/32 tests passing
+- Fixed Event model auto-classification bug (priority was 0 instead of auto-detected)
+- Created oce/docs/quality-review-phase2.md (approved)
+- All 59 OCE tests passing (32 event_fabric + 27 adapter)
 
-#### 🟡 [AS] 2026-05-16 17:00:00Z — OCE Phase 1 Documentation + Quality Review
-- Verified all 56 SRRA-OPH tests still passing (Phases 1-9)
-- Created `oce/docs/srra-integration-points.md` — full OCE↔SRRA integration map
-  - Maps all 9 OCE phases to SRRA-OPH module dependencies
-  - Includes dependency graph and integration sequence
-  - Lists 4 open questions for CC (process boundary, event fabric, streaming, auth)
-- Created `oce/docs/api-reference.md` — complete API documentation
-  - All 6 current endpoints documented with request/response schemas
-  - WebSocket protocol documented
-  - 11 future endpoints planned by phase
-- Created `oce/docs/quality-review-phase1.md` — CC's backend code review
-  - 6 issues found: 2 low, 3 medium, 1 high
-  - High: frontend has no source files (OC2 blocked)
-  - Approved for Phase 1 scaffold
-- Created `oce/backend/requirements.txt` — FastAPI dependency spec
-- **Next:** Monitor team progress, await CC direction on open questions
+#### 🟡 [AS] 2026-05-16 17:00:00Z — OCE Phase 1 Documentation Complete
+- Created oce/docs/srra-integration-points.md
+- Created oce/docs/api-reference.md
+- Created oce/docs/quality-review-phase1.md
+- Created oce/backend/requirements.txt
 
-#### 🟡 [AS] 2026-05-16 18:35:00Z — OCE Phase 2: Event Fabric Quality Review Complete
-- OC2 gateway rebuilt and stabilized (PID 3168, 226MB, live)
-- Fixed chronic session-bloat bug: added context limits (800K max) + compaction config to OC2
-- Cleaned up 7.5MB of bloated session files
-- Created `tools/oc2-context-monitor.py` — monitors context usage, alerts via Telegram at 75%/90%/95%
-- Updated `tools/oc2-watchdog.py` to integrate context monitoring
-- **OCE-2.16 Quality Review:** Reviewed CC's `event_fabric.py` — 32/32 tests passing
-  - Fixed Event model auto-classification bug (priority was 0 instead of auto-detected)
-  - All 59 OCE tests passing (32 event_fabric + 27 adapter)
-  - Created `oce/docs/quality-review-phase2.md`
-- **OCE-2.17 API Docs:** Updated API reference with Event Fabric endpoints
-- Posted Phase 2 kickoff to team-chat.md
-- **Next:** OCE-2.18 resource assessment, OCE-2.19 integration testing
+#### 🟡 [AS] 2026-05-16 21:00:00Z — OCE Phase 3: Docs + Tests Prepared
+- Added Observer Runtime API docs to oce/docs/api-reference.md (9 endpoints + WebSocket)
+- Created oce/backend/tests/test_observer_runtime.py (25 tests, 6 classes)
+- All Phase 3 tests skip until CC builds observer_runtime.py
+- OCE-3.13 (quality review) blocked on CC OCE-3.1
 
 ---
-## 🔴 [PM] Polymorph — Last Sync: 2026-05-16 20:26 UTC
+## 🔴 [PM] Polymorph — Last Sync: 2026-05-16 21:06 UTC
 
 *Auto-synced from `progress/polymorph-progress.md`*
 
@@ -225,7 +129,7 @@
 - Committed and pushed (cf402ad)
 
 ---
-## 🟠 [OC2] OpenClaw 2 — Last Sync: 2026-05-16 20:26 UTC
+## 🟠 [OC2] OpenClaw 2 — Last Sync: 2026-05-16 21:06 UTC
 
 *Auto-synced from `progress/openclaw-2-progress.md`*
 
@@ -245,7 +149,7 @@
 - Discord channel config pending (schema issue — Telegram working)
 
 ---
-## 🟣 [OC] OpenClaw — Last Sync: 2026-05-16 20:26 UTC
+## 🟣 [OC] OpenClaw — Last Sync: 2026-05-16 21:06 UTC
 
 *Auto-synced from `progress/openclaw-progress.md`*
 

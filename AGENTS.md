@@ -1,8 +1,10 @@
 # AGENTS.md — SRRA-OPH Team Manifest
 
 > **Last Updated:** May 16, 2026
-> **Current Phase:** OCE Phase 3 — Observer Runtime (Active)
+> **Current Phase:** OCE Phase 3 — Observer Runtime (Active) → Phase 4 — Structural Memory (Planning)
 > **SRRA-OPH:** Phases 1-9 complete — 77/77 tests passing
+> **OCE Tests:** 52 passing (32 event_fabric + 20 observer_runtime)
+> **Lead:** OC2 (CC handed off — user is away)
 
 ---
 
@@ -123,6 +125,24 @@ The workspace self-sustains through automated memory management:
 
 **Sync threshold:** 7 updates (was 3). **Summarize threshold:** 20 entries.
 All agents maintain own memory hygiene. See `AGENT_MOVEMENT.md` for full protocol.
+
+## Arch Commit — Keep Diagrams in Sync
+
+After any code change that affects system architecture, run:
+```bash
+python tools/arch-commit.py --agent <TAG> --file "<path>" --change "<description>"
+```
+
+This will:
+1. **Review alignment** — checks file exists, code matches description, correct diagram file, cross-references
+2. **Flag mismatches** — warns if the change doesn't match the claimed description
+3. **Update diagram** — appends a timestamped change note to the relevant `system-arch/` file
+4. **Log the change** — records to `system-arch/arch-changes.jsonl`
+
+Use `--review` for a full alignment check without committing.
+Use `--force` to commit even if misaligned (not recommended).
+
+**When to run:** After building new modules, changing API endpoints, modifying agent workflows, updating data pipelines, or any structural change.
 
 ## Build Rules
 

@@ -219,3 +219,27 @@
 [2026-05-16T20:51:36Z] OC2 OK (PID None)
 [2026-05-16T20:52:36Z] OC2 OK (PID None)
 [2026-05-16T20:53:37Z] OC2 OK (PID None)
+[2026-05-16T21:18:04Z] ============================================================
+[2026-05-16T21:18:04Z] OC2 Watchdog started
+[2026-05-16T21:18:04Z] Health URL: http://127.0.0.1:18790/health
+[2026-05-16T21:18:04Z] Check interval: 60s
+[2026-05-16T21:18:04Z] OpenClaw Home: C:\Users\wifik\Desktop\projects\larger-lab\.openclaw-2
+[2026-05-16T21:18:04Z] ============================================================
+[2026-05-16T21:18:05Z] OC2 OK (PID None) — All checks passed
+[2026-05-16T21:19:07Z] OC2 OK (PID None) — All checks passed
+[2026-05-16T21:19:16Z] ============================================================
+[2026-05-16T21:19:16Z] OC2 Watchdog started
+[2026-05-16T21:19:16Z] Health URL: http://127.0.0.1:18790/health
+[2026-05-16T21:19:16Z] Check interval: 60s
+[2026-05-16T21:19:16Z] OpenClaw Home: C:\Users\wifik\Desktop\projects\larger-lab\.openclaw-2
+[2026-05-16T21:19:16Z] ============================================================
+[2026-05-16T21:19:18Z] OC2 OK (PID None) — All checks passed
+[2026-05-16T21:19:58Z] ============================================================
+[2026-05-16T21:19:58Z] OC2 Watchdog started
+[2026-05-16T21:19:58Z] Health URL: http://127.0.0.1:18790/health
+[2026-05-16T21:19:58Z] Check interval: 60s
+[2026-05-16T21:19:58Z] OpenClaw Home: C:\Users\wifik\Desktop\projects\larger-lab\.openclaw-2
+[2026-05-16T21:19:58Z] ============================================================
+[2026-05-16T21:20:00Z] OC2 OK (PID None) — All checks passed
+[2026-05-16T21:20:08Z] OC2 OK (PID None) — All checks passed
+[2026-05-16T21:20:19Z] OC2 OK (PID None) — All checks passed

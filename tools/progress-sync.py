@@ -98,10 +98,10 @@ AGENTS = {
 
 # Legacy progress files (still tracked but not agent-specific)
 LEGACY_FILES = [
-    "PROJECT_PROGRESS.md",
-    "research-agents-progress.md",
-    "p90-conversion-progress.md",
-    "xhaak-kulu-bridge-progress.md",
+    "docs/PROJECT_PROGRESS.md",
+    "docs/research-agents-progress.md",
+    "docs/p90-conversion-progress.md",
+    "docs/xhaak-kulu-bridge-progress.md",
 ]
 
 SYNC_THRESHOLD = 7  # Sync every 7 updates per agent
@@ -234,7 +234,7 @@ def sync_agent_to_main_progress(agent_tag: str):
     """Sync an agent's sub-progress into their section of PROJECT_PROGRESS_CLEAN.md."""
     agent = AGENTS[agent_tag]
     progress_path = LAB_ROOT / agent["progress_file"]
-    main_path = LAB_ROOT / "PROJECT_PROGRESS_CLEAN.md"
+    main_path = LAB_ROOT / "docs" / "PROJECT_PROGRESS_CLEAN.md"
 
     if not progress_path.exists():
         return

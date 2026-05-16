@@ -202,3 +202,5 @@ graph TB
     WATCHDOG --> OC2
     CTXMON --> OC2
 ```
+
+<!-- ARCH-COMMIT [2026-05-16 21:19 UTC] AS: oce/backend/event_fabric.py -- Fixed Event model auto-classification bug -->

@@ -40,6 +40,7 @@ def log(msg: str):
         f.write(line + "\n")
 
 def check_health() -> bool:
+    """Basic health check — is the gateway responding?"""
     try:
         req = urllib.request.Request(HEALTH_URL, method="GET")
         with urllib.request.urlopen(req, timeout=5) as resp:
@@ -47,6 +48,42 @@ def check_health() -> bool:
             return data.get("ok", False)
     except Exception:
         return False
+
+def check_deep_health() -> tuple[bool, str]:
+    """
+    Deep health check — verify OC2 is actually processing messages, not just alive.
+    Returns (healthy, reason).
+    
+    Checks:
+    1. Health endpoint returns ok=true
+    2. Gateway status is 'live' (not 'starting', 'error', etc.)
+    3. No zombie state — process is actually responding to requests
+    """
+    # Layer 1: Basic health
+    try:
+        req = urllib.request.Request(HEALTH_URL, method="GET")
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            data = json.loads(resp.read())
+            if not data.get("ok", False):
+                return False, f"Health endpoint returned ok=false: {data}"
+            status = data.get("status", "unknown")
+            if status != "live":
+                return False, f"Gateway status is '{status}', expected 'live'"
+    except Exception as e:
+        return False, f"Health endpoint unreachable: {e}"
+    
+    # Layer 2: Verify it's not a stale/cached response by checking twice
+    time.sleep(1)
+    try:
+        req2 = urllib.request.Request(HEALTH_URL, method="GET")
+        with urllib.request.urlopen(req2, timeout=5) as resp2:
+            data2 = json.loads(resp2.read())
+            if not data2.get("ok", False):
+                return False, "Health check flaky — second check failed"
+    except Exception as e:
+        return False, f"Health check flaky — second request failed: {e}"
+    
+    return True, "All checks passed"
 
 def is_node_running() -> bool:
     try:
@@ -113,6 +150,32 @@ def start_gateway() -> bool:
         log(f"Failed to start gateway: {e}")
         return False
 
+# ─── Restart Logic ────────────────────────────────────────────────────────────
+def _do_restart(restart_count: int, last_restart_time: float):
+    """Kill existing OC2 and restart it."""
+    now = time.time()
+    
+    # Reset counter if more than 1 hour since last restart
+    if now - last_restart_time > 3600:
+        restart_count = 0
+    
+    if restart_count >= MAX_RESTARTS_PER_HOUR:
+        log(f"MAX RESTARTS ({MAX_RESTARTS_PER_HOUR}/hr) reached. Waiting 5 min...")
+        time.sleep(300)
+        return
+    
+    # Cooldown between restarts
+    if now - last_restart_time < RESTART_COOLDOWN:
+        time.sleep(RESTART_COOLDOWN - (now - last_restart_time))
+    
+    kill_existing()
+    success = start_gateway()
+    
+    if success:
+        log(f"OC2 restarted successfully (restart #{restart_count + 1})")
+    else:
+        log(f"OC2 restart FAILED (restart #{restart_count + 1})")
+
 # ─── Main Loop ────────────────────────────────────────────────────────────────
 def main():
     log("=" * 60)
@@ -125,42 +188,44 @@ def main():
     restart_count = 0
     last_restart_time = 0.0
 
+    # Track consecutive "healthy but not really" checks for flaky detection
+    deep_fail_count = 0
+    
     while True:
         try:
-            healthy = check_health()
+            # Layer 1: Quick basic check
+            basic_healthy = check_health()
             
-            if healthy:
-                pid = get_oc2_pid()
-                log(f"OC2 OK (PID {pid})")
-                # Reset restart counter on successful run
-                restart_count = 0
-            else:
-                log("OC2 UNHEALTHY — checking if process exists...")
-                
-                now = time.time()
-                # Reset counter if more than 1 hour since last restart
-                if now - last_restart_time > 3600:
-                    restart_count = 0
-                
-                if restart_count >= MAX_RESTARTS_PER_HOUR:
-                    log(f"MAX RESTARTS ({MAX_RESTARTS_PER_HOUR}/hr) reached. Waiting 5 min...")
-                    time.sleep(300)
-                    restart_count = 0
-                    continue
-                
-                # Cooldown between restarts
-                if now - last_restart_time < RESTART_COOLDOWN:
-                    time.sleep(RESTART_COOLDOWN - (now - last_restart_time))
-                
-                kill_existing()
-                success = start_gateway()
-                last_restart_time = time.time()
+            if not basic_healthy:
+                # OC2 is completely down — restart immediately
+                log("OC2 DOWN — basic health check failed")
+                _do_restart(restart_count, last_restart_time)
                 restart_count += 1
+                last_restart_time = time.time()
+                time.sleep(CHECK_INTERVAL)
+                continue
+            
+            # Layer 2: Deep health check — is OC2 actually processing?
+            deep_ok, reason = check_deep_health()
+            
+            if deep_ok:
+                pid = get_oc2_pid()
+                log(f"OC2 OK (PID {pid}) — {reason}")
+                restart_count = 0
+                deep_fail_count = 0
+            else:
+                deep_fail_count += 1
+                log(f"OC2 DEADLOCK DETECTED (streak: {deep_fail_count}) — {reason}")
                 
-                if success:
-                    log(f"OC2 restarted successfully (restart #{restart_count})")
+                # If deep check fails 2+ times in a row, OC2 is zombie — restart it
+                if deep_fail_count >= 2:
+                    log(f"OC2 ZOMBIE STATE — restarting (consecutive failures: {deep_fail_count})")
+                    _do_restart(restart_count, last_restart_time)
+                    restart_count += 1
+                    last_restart_time = time.time()
+                    deep_fail_count = 0
                 else:
-                    log(f"OC2 restart FAILED (restart #{restart_count})")
+                    log(f"Waiting for next check before restarting (failure {deep_fail_count}/2)")
 
         except KeyboardInterrupt:
             log("Watchdog stopped by user")

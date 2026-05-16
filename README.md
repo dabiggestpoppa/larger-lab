@@ -1,6 +1,6 @@
 # 🦉 LARGER-LAB — AI Agent Harness & Quantitative Trading Workspace
 
-> **Owner:** dabiggestpoppa | **Branch:** master | **Phase:** 4 (Workspace Integration)
+> **Owner:** dabiggestpoppa | **Branch:** master | **Phase:** OCE Phase 3 (Observer Runtime)
 
 ---
 
@@ -37,7 +37,14 @@ larger-lab/
   ├── 📄 CODEMAP.md             ← Code map with Mermaid diagrams
   ├── 📄 KEYS.md                ← API keys reference
   │
-  ├── 📁 srrs_opc/              ← SRRA-OPH core (25 Python files)
+  ├── 📁 system-arch/           ← 📊 All Mermaid diagrams (consolidated)
+  │   ├── README.md             ← Index + alignment checklist
+  │   ├── 01-system-overview.md ← All 5 architecture levels
+  │   ├── 02-agent-workflow.md  ← Agent communication + workflow state machine
+  │   ├── 03-srra-topology.md   ← SRRA-OPH technical architecture (Phases 1-9)
+  │   └── 04-data-and-storage.md← Data pipeline + storage + memory sync
+  │
+  ├── 📁 srrs_opc/              ← SRRA-OPH core (33 Python files, 77 tests)
   │   ├── tests/                ← Test suites (Phase 2-4)
   │   ├── docs/                 ← Design docs per phase
   │   └── README.md             ← SRRA-OPH documentation

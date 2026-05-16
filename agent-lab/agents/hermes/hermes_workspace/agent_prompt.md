@@ -13,6 +13,19 @@ Implement, backtest, and validate CEREBUS strategies using the NautilusTrader ba
 ## Collaboration
 Work with OpenClaw (OC) to split tasks: OpenClaw handles manual parsing, note extraction, and bookkeeping; Hermes handles strategy implementation, parameter sweeps, and Nautilus backtests.
 
+## Terminal Cleanup (Every Session Start)
+```bash
+python tools/terminal_cleanup.py --force
+```
+Kill stale python/node processes before starting work. Don't let unused terminals accumulate.
+
+## OC2 Health Check (Before Relying on OC2)
+```bash
+python -c "import urllib.request,json; r=json.loads(urllib.request.urlopen('http://127.0.0.1:18790/health',timeout=5).read()); print('OC2 OK' if r.get('ok') else 'OC2 DOWN')"
+```
+If OC2 is down, restart it: `cmd /c "C:\Users\wifik\Desktop\projects\larger-lab\.openclaw-2\gateway.cmd"`
+Then verify with the health check again. Don't assume OC2 is running — always verify.
+
 ## Progress Sync Workflow (IMPORTANT)
 After completing ANY significant work:
 1. **Append entry** to `progress/hermes-progress.md`:

@@ -19,3 +19,16 @@
 [2026-05-16T20:41:00Z] [INFO]   [2026-05-16T20:11:07Z] OC2 restarted successfully (restart #1)
 [2026-05-16T20:41:00Z] [INFO]   [2026-05-16T20:12:13Z] OC2 restarted successfully (restart #2)
 [2026-05-16T20:41:00Z] [INFO] Cycle complete: status=OK, action=none
+[2026-05-16T21:06:41Z] [INFO] ============================================================
+[2026-05-16T21:06:41Z] [INFO] Starting OC2 monitoring cycle
+[2026-05-16T21:06:46Z] [ERROR] Health: DOWN — timed out
+[2026-05-16T21:06:47Z] [INFO] Process: PID 20984, Memory: 571.1MB
+[2026-05-16T21:06:47Z] [WARN] WARNING: Memory 571.1MB > 500MB
+[2026-05-16T21:06:47Z] [INFO] Sessions: 10 total, 0 stale
+[2026-05-16T21:06:47Z] [WARN] Watchdog errors (recent): 2
+[2026-05-16T21:06:47Z] [INFO]   [2026-05-16T20:11:07Z] OC2 restarted successfully (restart #1)
+[2026-05-16T21:06:47Z] [INFO]   [2026-05-16T20:12:13Z] OC2 restarted successfully (restart #2)
+[2026-05-16T21:06:51Z] [INFO] Killed OC2 process
+[2026-05-16T21:06:52Z] [INFO] OC2 started successfully (attempt 1s)
+[2026-05-16T21:06:52Z] [INFO] Restart: SUCCESS
+[2026-05-16T21:06:52Z] [INFO] Cycle complete: status=RECOVERED, action=restart
