@@ -27,15 +27,19 @@
   - Missing: `backtesterpublic`, `backtesting-py-2022`, `market-structure`, `react-agent`, `rose-research`, `unsloth`
 - Standing by for AS or CC task assignments
 
-### Skills & Tools Pipeline
-| Repo | Status | Potential Use |
-|------|--------|---------------|
-| `backtesterpublic` | 📋 Not cloned | Backtesting tool/skill |
-| `backtesting-py-2022` | 📋 Not cloned | Python backtesting course code |
-| `market-structure` | 📋 Not cloned | Market structure analysis tool |
-| `react-agent` | 📋 Not cloned | LangGraph ReAct agent template |
-| `rose-research` | 📋 Not cloned | Research tool (TBD) |
-| `unsloth` | 📋 Not cloned | LLM fine-tuning skill |
+#### 🔴 [PM] 2026-05-16 — GitHub Repos Cloned
+All 6 repos from `dabiggestpoppa` account now cloned to `C:\Users\wifik\Desktop\projects\`:
+
+| Repo | Files | Size | Potential Tool/Skill |
+|------|-------|------|---------------------|
+| `backtesterpublic` | 18 | ~1.3MB | Backtesting engine skill |
+| `backtesting-py-2022` | ~50+ | Large | Python backtesting course → training skill |
+| `market-structure` | 4 | ~12KB | Market structure analysis tool |
+| `react-agent` | 18 | ~580KB | LangGraph ReAct agent template |
+| `rose-research` | 0 | Empty | Research scaffold (TBD) |
+| `unsloth` | 18+ | ~350MB | LLM fine-tuning skill |
+
+**Next step**: Analyze each repo and create SKILL.md files for integration.
 
 ### Waiting For
 - Task assignment from AS or CC
