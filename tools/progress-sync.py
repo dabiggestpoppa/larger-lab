@@ -38,6 +38,11 @@ if sys.platform == "win32":
 LAB_ROOT = Path(__file__).resolve().parent.parent
 COUNTER_FILE = LAB_ROOT / ".progress-sync-counters.json"
 REPO_MEMORY_FILE = Path("/memories/repo/workspace-state.md")
+UPDATE_LOG_FILE = LAB_ROOT.parent / "larger-db" / "update_log.jsonl"
+COMPACT_SUMMARY_FILE = LAB_ROOT.parent / "larger-db" / "compact_summary.json"
+
+# Max log entries before archiving to USB
+MAX_LOG_ENTRIES = 100
 
 # Agent registry: tag → {progress_file, memory_file, section_header}
 AGENTS = {
@@ -549,6 +554,59 @@ def main():
         sync_repo_memory(counters)
 
     print("\n✅ Sync complete.")
+
+    # Append to update log (preserves full history)
+    append_update_log(counters, agent_tags)
+
+
+def append_update_log(counters: dict, synced_tags: list):
+    """Append a log entry to the update log (append-only, never overwrites)."""
+    UPDATE_LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+
+    now = datetime.now(timezone.utc).isoformat()
+
+    # Build compact log entry
+    entry = {
+        "timestamp": now,
+        "synced_agents": synced_tags,
+        "agent_updates": {
+            tag: counters.get("agents", {}).get(tag, {}).get("update_count", 0)
+            for tag in synced_tags
+        },
+        "total_updates": counters.get("last_sync_count", 0),
+        "phase": get_current_phase(),
+    }
+
+    # Append to JSONL file
+    with open(UPDATE_LOG_FILE, "a", encoding="utf-8") as f:
+        f.write(json.dumps(entry) + "\n")
+
+    # Check if we should warn about log size
+    if UPDATE_LOG_FILE.exists():
+        line_count = sum(1 for _ in open(UPDATE_LOG_FILE, "r", encoding="utf-8"))
+        if line_count >= MAX_LOG_ENTRIES:
+            print(f"  ⚠ Update log has {line_count} entries. Consider archiving to USB.")
+            print(f"  📁 Log file: {UPDATE_LOG_FILE}")
+
+    # Update compact summary (small file, always current)
+    summary = {
+        "last_sync": now,
+        "total_agents": len(synced_tags),
+        "agent_updates": entry["agent_updates"],
+        "phase": entry["phase"],
+        "log_entries": line_count if UPDATE_LOG_FILE.exists() else 0,
+    }
+    with open(COMPACT_SUMMARY_FILE, "w", encoding="utf-8") as f:
+        json.dump(summary, f, indent=2)
+
+
+def get_current_phase() -> str:
+    """Get current phase from phase state file."""
+    phase_file = LAB_ROOT / ".phase-state.json"
+    if phase_file.exists():
+        with open(phase_file) as f:
+            return json.load(f).get("current_phase", "UNKNOWN")
+    return "UNKNOWN"
 
 
 if __name__ == "__main__":

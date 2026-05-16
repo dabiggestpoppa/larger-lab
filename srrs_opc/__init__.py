@@ -30,12 +30,16 @@ from .local_consensus import LocalConsensusEngine
 
 # Phase 4: Workspace Integration (Book 2 updated)
 from .capability_fields import CapabilityField, CapabilityFieldRegistry
-from .workspace_integration import WorkspaceIntegrationLayer, ToolRole, ToolAdapter
+from .workspace_integration import ToolRole, ToolAdapter
 from .overlap_aware_tooling import OverlapAwareTooling, ExecutionRequest
 from .reconstruction_safe_exec import ReconstructionSafeExecutor, ExecutionSafety, ExecutionRecord
 
 # Phase 5: Long-Horizon Continuity (Book 2 updated)
 from .trajectory_fields import TrajectoryFragment, TrajectoryReconstructionField
+from .continuity_collars import ContinuityCollar, ContinuityCollarManager, TemporalOverlap
+from .temporal_attractors import TemporalAttractor, AttractorField
+from .drift_tracker import DriftTracker, DriftSignal
+from .reinforcement_engine import ReinforcementEngine, ReinforcementRecord
 
 __all__ = [
     # Phase 1
@@ -57,4 +61,8 @@ __all__ = [
     "ReconstructionSafeExecutor", "ExecutionSafety", "ExecutionRecord",
     # Phase 5
     "TrajectoryFragment", "TrajectoryReconstructionField",
+    "ContinuityCollar", "ContinuityCollarManager", "TemporalOverlap",
+    "TemporalAttractor", "AttractorField",
+    "DriftTracker", "DriftSignal",
+    "ReinforcementEngine", "ReinforcementRecord",
 ]

@@ -1,25 +1,50 @@
-# CODEMAP - External Agent Onboarding Guide
+# CODEMAP — Larger-Lab Workspace Guide
 
-> **Last Updated:** 2026-05-16 00:00 UTC
-> **Purpose:** Quick orientation for agents joining the larger-lab workspace
+> **Last Updated:** 2026-05-16 | **Phase:** 4 (Workspace Integration)
+> **Purpose:** Quick orientation for agents joining the workspace. For full architecture, see `SYSTEM_ARCHITECTURE.md`.
 
 ---
 
 ## Quick Start
 
 ```bash
-# 1. Activate Python environment
-python -m venv .venv
-.\.venv\Scripts\activate  # Windows
-source .venv/bin/activate  # Linux/Mac
+# 1. Clone & enter
+git clone https://github.com/dabiggestpoppa/larger-lab.git
+cd larger-lab
 
-# 2. Install dependencies
-pip install -r requirements.txt
+# 2. Python environment (uv recommended)
+uv venv .venv
+.venv\Scripts\activate  # Windows
 
-# 3. Run SRRA-OPH Phase 1 test
-cd srrs_opc
-python test_phase1.py
+# 3. Install deps
+uv pip install -r requirements.txt
+
+# 4. Run all SRRA-OPH tests
+python -m srrs_opc.tests.test_phase2_e2e
+python -m srrs_opc.tests.test_phase3_e2e
+python -m srrs_opc.tests.test_phase4_e2e
 ```
+
+---
+
+## Workspace Map
+
+```
+larger-lab/
+  srrs_opc/           ← SRRA-OPH core (25 Python files + tests + docs)
+  nautilus/           ← NautilusTrader backtesting (strategies, data, reports)
+  agent-lab/agents/   ← Hermes + OpenClaw agent configs
+  skills/             ← Workspace skills (srra-oph-build, twitter-bookmarks, etc.)
+  .agents/skills/     ← Agent-specific skills (40+ trading, quant, ML, Pine)
+  .github/skills/     ← GitHub skills (docx, xlsx, pptx, pdf, etc.)
+  progress/           ← Agent sub-progress files (CC/OC/HR/AS/PM)
+  all-mermaids/       ← All Mermaid diagrams (phase1-5, phase6-9)
+  docs/               ← Documentation, images, phase progress files
+  tools/              ← Automation scripts, binaries, workspace files
+  shared-conversations/ ← Team chat (team-chat.md)
+```
+
+> 📊 **All Mermaid diagrams** have been extracted to `all-mermaids/` for easy reference.
 
 ---
 

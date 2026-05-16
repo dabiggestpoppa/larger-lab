@@ -8,7 +8,6 @@ Discord Bot -- blrr city
 
 import discord
 from discord import app_commands
-from discord.ext import commands
 import os, re, subprocess, sys
 from pathlib import Path
 from datetime import datetime
@@ -25,9 +24,8 @@ load_dotenv(env_path)
 intents = discord.Intents.default()
 intents.message_content = True
 
-# Use commands.Bot instead of discord.Client -- this gives us process_commands()
-bot = commands.Bot(command_prefix='!', intents=intents)
-tree = bot.tree  # commands.Bot already has a tree
+client = discord.Client(intents=intents)
+tree = app_commands.CommandTree(client)
 
 WORKSPACE = Path(os.getenv("WORKSPACE_PATH", str(Path(__file__).parent.parent)))
 PROGRESS_FILE = WORKSPACE / "PROJECT_PROGRESS_CLEAN.md"
@@ -63,8 +61,7 @@ def hermes_handle(content: str) -> str:
         lines = [l for l in read_progress().split('\n') if l.strip()][-10:]
         return f"HERMES Status\n```\n{chr(10).join(lines)[:1200]}\n```"
     if any(w in c for w in ['help', 'what can']):
-        return ("HERMES - Architect & Planner\n"
-                "status | workspace | plan: <text> | decision: <text>")
+        return "HERMES - Architect & Planner\nstatus | workspace | plan: <text> | decision: <text>"
     if any(w in c for w in ['workspace', 'files', 'structure']):
         dirs, files = get_workspace_summary()
         return f"HERMES Workspace\nDirs: {', '.join(dirs)}\nFiles: {', '.join(files)}"
@@ -83,8 +80,7 @@ def openclaw_handle(content: str) -> str:
         lines = [l for l in read_progress().split('\n') if l.strip()][-5:]
         return f"OPENCLAW Status\n```\n{chr(10).join(lines)[:800]}\n```\nReady for tasks!"
     if any(w in c for w in ['help', 'what can']):
-        return ("OPENCLAW - Builder & Executor\n"
-                "status | workspace | run <script> | edit: <text> | create: <file> | <content>")
+        return "OPENCLAW - Builder & Executor\nstatus | workspace | run <script> | edit: <text> | create: <file> | <content>"
     if any(w in c for w in ['workspace', 'files', 'structure']):
         dirs, files = get_workspace_summary()
         return f"OPENCLAW Workspace\nDirs: {', '.join(dirs)}\nFiles: {', '.join(files)}"
@@ -116,9 +112,9 @@ def openclaw_handle(content: str) -> str:
     return f'OPENCLAW: "{content[:150]}" -- try status, workspace, run <script>, edit: <text>'
 
 
-@bot.event
+@client.event
 async def on_ready():
-    print(f'[OK] {bot.user} connected (id={bot.user.id})')
+    print(f'[OK] {client.user} connected (id={client.user.id})')
     try:
         gid = os.getenv("DISCORD_GUILD_ID")
         if gid:
@@ -131,28 +127,33 @@ async def on_ready():
             print(f"Synced {len(synced)} global commands")
     except Exception as e:
         print(f"Sync error: {e}")
-    await bot.change_presence(activity=discord.Activity(
+    await client.change_presence(activity=discord.Activity(
         type=discord.ActivityType.watching, name="@mentions | /hermes | /openclaw"))
 
 
-@bot.event
+@client.event
 async def on_message(message):
-    # Skip own messages immediately
-    if message.author.id == bot.user.id:
+    print(f"[DEBUG] on_message: {message.author} ({message.author.id}): {message.content[:80]}")
+
+    # Skip own messages
+    if message.author.id == client.user.id:
+        print("  -> SKIP (self)")
         return
 
-    bot_id = bot.user.id
+    bot_id = client.user.id
     mentioned = f"<@{bot_id}>" in message.content or f"<@!{bot_id}>" in message.content
 
     if mentioned:
         # Prevent duplicate responses
         if message.id in responded_messages:
+            print("  -> SKIP (duplicate)")
             return
         responded_messages.add(message.id)
         if len(responded_messages) > 2000:
             responded_messages.clear()
 
         clean = message.content.replace(f"<@{bot_id}>", "").replace(f"<@!{bot_id}>", "").strip()
+        print(f"  -> mentioned, clean='{clean}'")
         if not clean:
             agent_name = "Hermes" if active_agent == "hermes" else "OpenClaw"
             await message.channel.send(f"Active agent: **{agent_name}**. Use `/hermes` or `/openclaw` to switch.")
@@ -163,10 +164,8 @@ async def on_message(message):
         else:
             response = openclaw_handle(clean)
 
+        print(f"  -> responding: {response[:80]}")
         await message.channel.send(response)
-
-    # ALWAYS process commands at the end -- this is critical for slash commands to work
-    await bot.process_commands(message)
 
 
 # -- Slash commands --
@@ -205,4 +204,4 @@ if __name__ == "__main__":
     if not token:
         print("Error: DISCORD_BOT_TOKEN not set")
         exit(1)
-    bot.run(token)
+    client.run(token)

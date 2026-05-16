@@ -69,6 +69,7 @@ Density Zone | Grand Unified Equation | Shift Targets
 131
  Cerebus Cycle — Final Form | April 2026 | EUR/USD M5 | 315,000+ Candles | PROPRIETARY & CONFIDENTIAL
  
+
 --- PAGE 2 ---
 CONSTRAINT-SYSTEM FRAMEWORK Vocabulary, Definitions & Operating
  Logic
@@ -137,6 +138,7 @@ Constraint Deficit
 Field is under-resolved. Must expand to reach daily mean variance — the
 'coiled spring.'
 
+
 --- PAGE 3 ---
 CORE OPERATING PRINCIPLES
 CONSTRAINT LOGIC — SIX OPERATING PRINCIPLES
@@ -176,6 +178,7 @@ Replaces 'liquidity.' The accessible channels through which the field resolves c
 pathway harvesting.'
 [5] Constraint Violation
 
+
 --- PAGE 4 ---
 Replaces 'breakout.' A sudden change when the field's constraints are exceeded. Not random — required when the field can no longer
 balance constraints with small adjustments.
@@ -203,6 +206,7 @@ The current state contains all necessary information for future probabilities. P
 context does not add predictive power.
  Constraint-System Framework | CEREBUS FX v4.0 | April 2026
  
+
 --- PAGE 5 ---
 PART 1 CEREBUS FX v2.0 — The Complete Operational Manual Asian
 Range P90  Deep Mean Rebalancing  Daily Distribution Matrix
@@ -254,6 +258,7 @@ Asian <20p: Target Daily Range = ~72 pips
 Asian 20-30p: Target Daily Range = ~58 pips
 Asian 30-45p: Target Daily Range = ~48 pips
 Step 3: Check Filters
+
 
 --- PAGE 6 ---
 News: High-impact news (NFP, CPI, FOMC) within 4 hours? → SKIP.
@@ -314,6 +319,7 @@ This strategy monetizes the Resolution Output Stall [7] — where the resolution
 resolution pathway harvesting [4], then fails to continue, creating a high-probability partial rebalancing [6] opportunity.
 A. The Logic
 
+
 --- PAGE 7 ---
 When the resolution output extends aggressively, it often reaches the Stall Zone (168%) [10] or Deep State (200%) [10] to harvest
 available resolution pathways before rebalancing.
@@ -362,6 +368,7 @@ Expected Daily Avg
 Current Move (-50%)
 Remaining Potential
 Action
+
 
 --- PAGE 8 ---
 < 20 pips
@@ -428,6 +435,7 @@ Watch for Binary Activation / Limit Order
 Deep State [10]
 Limit Activation (constraint boundary +8p)
 
+
 --- PAGE 9 ---
 220% Ext
 Violation State
@@ -448,6 +456,7 @@ Trust the 12:00 PM Hard Exit to protect your resolution profits.
 Discipline > Prediction.  Align with the field.
  End of Part 1 | CEREBUS FX v2.0 Core Manual | March 2026
  
+
 --- PAGE 10 ---
 PART 2 P90 CASCADE ACTIVATION ANALYSIS Subsequent P90 Activations
 | Rolling Constraint Boundaries | Directional Bias Validation
@@ -502,6 +511,7 @@ CASCADE ACTIVATION DEFINITION
 3. Maximum Cascades:
     Max 3 cascade activations per session
     Edge degrades after 3rd cascade
+
 
 --- PAGE 11 ---
 CASCADE ACTIVATION TIMELINE EXAMPLE
@@ -572,6 +582,7 @@ Avg Distance
 Conflict Rate
 R:R
 Recommendation
+
 
 --- PAGE 12 ---
 80% Fib (Standard)
@@ -673,6 +684,7 @@ Combined Win Rate
 —
 93.4% (both)
 
+
 --- PAGE 13 ---
 CASCADE + 45-MIN ADD COMBINATION (USE BOTH — They Are Complementary)
 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -741,6 +753,7 @@ CASCADE INVALID
 ■ 4th+ cascade attempt (resolution exhausted)
 ■ Major news within 60 minutes
 
+
 --- PAGE 14 ---
 SECTION 8: EXPECTED PERFORMANCE WITH CASCADE
 Metric
@@ -782,6 +795,7 @@ CASCADE RISK/REWARD TRADE-OFF
    Always maintain 0.40% daily constraint boundary
 SECTION 9: COMPLETE CASCADE ACTIVATION PROTOCOL
 
+
 --- PAGE 15 ---
 CASCADE ACTIVATION WORKFLOW
 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -816,6 +830,7 @@ CASCADE FINAL VERDICT
   ■ EXPECTED WEEKLY: 23 signals | 87.4% win rate | +52R net
  End of Part 2 | CEREBUS v18.2.15 [CASCADE ACTIVATION] | March 2026
  
+
 --- PAGE 16 ---
 PART 3 CASCADE METHODOLOGY & OPERATIONAL PROTOCOL Session
 Bias Logic  Daily Workflow  Reversal Logic  Target Trimming
@@ -871,6 +886,7 @@ NO-GO
 SKIP — resolution window closing
 PRACTICAL IMPLEMENTATION — DAILY WORKFLOW
 
+
 --- PAGE 17 ---
 DAILY CONSTRAINT-RESOLUTION WORKFLOW
 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -903,6 +919,7 @@ DAILY CONSTRAINT-RESOLUTION WORKFLOW
 12:00 PM EST — Hard Exit (Resolution Window Closes):
   ■ Close ALL positions — 82% of daily constraint resolution typically complete
 OPPOSITE DIRECTION P90 — REVERSAL LOGIC
+
 
 --- PAGE 18 ---
 REVERSAL SCENARIO — WHEN OPPOSITE DIRECTION P90 PRINTS
@@ -944,6 +961,7 @@ Hard Exit: 12 PM EST (close ALL remaining — resolution window ends)
 Question
 Answer
 
+
 --- PAGE 19 ---
 Session Bias
 First P90 in 2-6 AM EST sets constraint resolution direction for ENTIRE day
@@ -961,6 +979,7 @@ Hard Exit
 12 PM EST — all positions closed, constraint resolution window ends
  End of Part 3 | CEREBUS Operational Protocol v18.2.18 | March 2026
  
+
 --- PAGE 20 ---
 PART 4 STALL-HARVEST TRADING SYSTEM Unified CFD & Binary
 Execution Strategy | 168% Stall Zone Fibonacci Analysis EUR/USD M5 |
@@ -988,6 +1007,7 @@ True Rejection (Stall Zone)
 Shallow Violation
 21.4%
 
+
 --- PAGE 21 ---
 Deep Violation
 14.4%
@@ -1005,6 +1025,7 @@ Expected Weekly Return
 Asset Class Focus
 EUR/USD M5 CFD & Binary
 SLIDE 3 — THE 168% STALL ZONE MECHANISM: STRUCTURAL ASYMMETRY
+
 
 --- PAGE 22 ---
 Slide 3: Structural Asymmetry — Stall Event Outcomes & Probability Metrics
@@ -1028,6 +1049,7 @@ Constraint System Continuation
 SLIDE 4 — CFD LEG: LIMIT ACTIVATION & CONSTRAINT BOUNDARY
 PLACEMENT
 
+
 --- PAGE 23 ---
 Slide 4: CFD Execution Protocol — M5 Chart Detailed Activation Rules
  
@@ -1048,6 +1070,7 @@ VIOLATION FILTER
 Abort if close > 200%
 Abort if M5 candle closes beyond 200% Deep State
 SLIDE 5 — BINARY LEG: DYNAMIC EXPIRY BY TIME-OF-DAY
+
 
 --- PAGE 24 ---
 Slide 5: Binary Option Expiry Framework — Session Metrics
@@ -1085,6 +1108,7 @@ Marginal Delta
 +3.8%
 SLIDE 6 — SESSION WINDOWS & PERFORMANCE METRICS
 
+
 --- PAGE 25 ---
 Slide 6: Session Windows — Stall Rate, Expansion Win Rate & Asian Range Filters
  
@@ -1101,6 +1125,7 @@ Expansion Win Rate
 38.2%
 82.4%
 SLIDE 7 — UNIFIED EXECUTION PLAYBOOK
+
 
 --- PAGE 26 ---
 Slide 7: Unified Execution Playbook — Position Sizing Matrix & Workflow
@@ -1135,6 +1160,7 @@ CFD Targets + Binary Expiry
 CFD: -25%/-50% | Binary: Dynamic | Kill: 132%
 SLIDE 8 — RISK MANAGEMENT & EDGE KILL SWITCHES
 
+
 --- PAGE 27 ---
 Slide 8: Risk Management — Systematic Controls Matrix & Loser Elimination
  
@@ -1160,6 +1186,7 @@ Regime Shift
 132% Violations > 50% / Week
 Reduce Size 50%
 SLIDE 9 — EXPECTED PERFORMANCE & STRATEGIC ADVANTAGES
+
 
 --- PAGE 28 ---
 Slide 9: Performance Expectations — Aggregated Metrics & Strategic Advantages
@@ -1188,6 +1215,7 @@ Limit activations create superior R:R scenarios.
 Expiries dynamically optimized by session window data.
 STALL-HARVEST MASTER SYSTEM SUMMARY
 
+
 --- PAGE 29 ---
 COMPLETE SYSTEM AT A GLANCE — CONSTRAINT-SYSTEM FRAMEWORK
 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -1210,6 +1238,7 @@ KILL SWITCHES:
    Win rate <80% over 20 activations → PAUSE & recalibrate
  End of Part 4 | Stall-Harvest Trading System | CEREBUS FX v3.0 | March 2026
  
+
 --- PAGE 30 ---
 PART 5 P90P WINDOW DISTRIBUTION TRACKER — ENHANCED FORMULA
 90-95% Accuracy System | Multi-Factor Weighted | 2-3 Pip Precision Zones 6
@@ -1258,6 +1287,7 @@ Max Precision
 +0.00x
 SKIP
 SECTION 2: ENHANCED PRE-SESSION CALCULATION (1:45 AM EST)
+
 
 --- PAGE 31 ---
 STEP 1: MEASURE ASIAN RANGE + CLASSIFY TIER
@@ -1316,6 +1346,7 @@ Asian × 1.42
 ±3.5 pips
 88-90%
 SECTION 4: ENHANCED 9 AM CHECKPOINT — KEY TO 95%
+
 
 --- PAGE 32 ---
 9:00 AM EST CHECK — Regime-Confirmed (82% of Window Complete)
@@ -1411,6 +1442,7 @@ Current ÷ 0.738 × 0.90
 83-85%
 SECTION 5: ENHANCED WORKED EXAMPLE — 95% ACCURACY
 
+
 --- PAGE 33 ---
 SCENARIO: EUR/USD — All Conditions Optimal | Asian Range = 25p, Tier 2
 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -1478,6 +1510,7 @@ Standard
 91%
 Enhanced
 
+
 --- PAGE 34 ---
 9 AM
 +Regime + P90
@@ -1507,6 +1540,7 @@ THE 95% ACCURACY FORMULA — WHY MULTI-FACTOR CONVERGENCE WORKS
 ■■ TRADE-OFF: ~15% fewer qualifying setups → higher R per trade
  End of Part 5 | P90P Enhanced Formula v2.0 | CEREBUS FX v18.2.23 | March 2026
  
+
 --- PAGE 35 ---
 PART 6 MONTE CARLO SIMULATION — P90P ACCURACY ANALYSIS 10,000
 Iterations | Realistic Accuracy Rate Analysis | CEREBUS FX v18.2.23
@@ -1581,6 +1615,7 @@ P90 Confirmed (2-6 AM)
 78.2% of days
 +3% accuracy boost
 
+
 --- PAGE 36 ---
 Cascade Optimal (45-60 min)
 56.6% of days
@@ -1639,6 +1674,7 @@ Best 5% of days
 99th
 98.9%
 Near-perfect day
+
 
 --- PAGE 37 ---
 ACCURACY RATE DISTRIBUTION (10,000 Days)
@@ -1730,6 +1766,7 @@ FINAL VERDICT:
   Track WEEKLY accuracy, not daily (too noisy)
  End of Part 6 | Monte Carlo | CEREBUS FX v18.2.23 | March 2026
  
+
 --- PAGE 38 ---
 PART 7 MONDAY ASIAN RANGE FLOAT MECHANISM Intra-Week Constraint
 Distribution Analysis EUR/USD M5 | Jan 2022 – Jan 2026 | 201 Weeks
@@ -1808,6 +1845,7 @@ Tier 3
 31.1%
 13.3%
 11.1%
+
 
 --- PAGE 39 ---
 KEY FINDINGS — FLOAT RATE BY TIER:
@@ -1890,6 +1928,7 @@ High frequency bear stall
 1.9p
 Major weekly bear target
 
+
 --- PAGE 40 ---
 KEY FINDING — DOMINANT WEEKLY STALL ZONES:
   Most weekly highs reach 261% (64.7%) or lows reach -161% (62.2%) of Monday Asian range
@@ -1970,6 +2009,7 @@ NON-FLOAT weeks
 12-24h (Mon late)
 2.2% 1 wk
 
+
 --- PAGE 41 ---
 24-36h (~Tue morning)
 10.9% 5 wks
@@ -2033,6 +2073,7 @@ All Tiers 1-3
 48.7% 76 wks
 OPERATIONAL FRAMEWORK — MONDAY FLOAT
 
+
 --- PAGE 42 ---
 WEEKLY FLOAT OPERATIONAL FRAMEWORK
 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -2092,6 +2133,7 @@ N/A
 NO-GO — constraint deficit too wide
  End of Part 7 | Monday Asian Float Mechanism | April 2026 | 201 Weeks
  
+
 --- PAGE 43 ---
 PART 8 DAILY ASIAN RANGE FLOAT MECHANISM Shallow Partial
 Rebalancing | Run & Retest | Extension Stall States | Constraint Boundary
@@ -2170,6 +2212,7 @@ FULL (>100% — full rebalancing)
 31 (7.4%)
 4.8%
 
+
 --- PAGE 44 ---
 KEY FINDING — PARTIAL REBALANCING DISTRIBUTION:
   64.4% of days = FULL reversal (>100% of Asian range rebalanced).
@@ -2227,6 +2270,7 @@ Typical constraint buffer
 12.3% 15 days
 20p+ (strong extension)
 13.1% 16 days
+
 
 --- PAGE 45 ---
 CONSTRAINT BOUNDARY PLACEMENT — FLOAT DAY DATA:
@@ -2298,6 +2342,7 @@ KEY FINDING — PARTIAL REBALANCING FIB STALL STATES:
     38.2%: 31.6%  |  61.8%: 21.1%  |  23.6%: 21.1%  |  78.6%: 15.8%  |  50%: 10.5%
     → 38.2% is the most common stall on pure run-and-retest days
     → 38.2% + 50.0% combined = 52.7% of shallow float days stall at these two states
+
 
 --- PAGE 46 ---
 TEST 4: EXTENSION FIB STALL STATES — WHERE DOES THE CONTINUATION
@@ -2413,6 +2458,7 @@ FULL (>100% — reversal)
 30-45 pips
 31.6% 6 days
 
+
 --- PAGE 47 ---
 45-60 pips
 26.3% 5 days
@@ -2463,6 +2509,7 @@ Maximum
 AT Asian band level
 High — run-and-retest
 
+
 --- PAGE 48 ---
 50.0% of initial leg
 5-8p above band
@@ -2485,6 +2532,7 @@ Inside band
 EXIT — float state invalidated
 NONE — out
 MASTER SUMMARY — DAILY FLOAT OPERATIONAL FRAMEWORK
+
 
 --- PAGE 49 ---
 DAILY ASIAN FLOAT — COMPLETE OPERATIONAL FRAMEWORK
@@ -2530,6 +2578,7 @@ KEY STATS SUMMARY:
   168% stall: 1.0p avg, 100% tight hit rate — confirms intraday stall zone [10]
 MULTI-TIMEFRAME CONNECTION: DAILY vs WEEKLY FLOAT
 
+
 --- PAGE 50 ---
 DAILY FLOAT vs MONDAY WEEKLY FLOAT — SAME MECHANISM, DIFFERENT TIMEFRAMES
 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -2557,6 +2606,7 @@ MULTI-TIMEFRAME CONFIRMATION RULE:
  Data: EUR/USD M5 | Jan 2022 – Jan 2026 | 315,000+ candles | 201 Weeks Float Analysis | 648 Days Daily Float Analysis
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 51 ---
 PART 9 FULL-DAY RANGE REGIME TRACKER Volatility Band Engine | 24h
 Distribution Closure | Tier-Specific Regime Accuracy EUR/USD M5 |
@@ -2633,6 +2683,7 @@ COMPRESSION
 77.7%
 Reduce position size / widen boundaries
 
+
 --- PAGE 52 ---
 KEY INSIGHT — REGIME ACCURACY vs CLOSURE PROBABILITY:
 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -2708,6 +2759,7 @@ With P90 + Regime CONF
 9 AM Accuracy
 All conditions optimal
 94-95%
+
 
 --- PAGE 53 ---
 12 PM Accuracy
@@ -2800,6 +2852,7 @@ With P90 + Regime CONF
 All conditions optimal
 91-93%
 
+
 --- PAGE 54 ---
 12 PM Accuracy
 Realistic sustained
@@ -2854,6 +2907,7 @@ SECTION 4: 1:30 PM EST — SETUP 2 CHECKPOINT
 The 1:30 PM EST checkpoint represents the last viable activation window before the post-12PM no-new-entries rule takes effect for
 full cascade logic. It is used exclusively for holding runners and managing existing positions — not new full-size entries.
 
+
 --- PAGE 55 ---
 1:30 PM EST CHECKPOINT — TIME MAPPING
 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -2878,6 +2932,7 @@ OPERATIONAL RULE FOR 1:30 PM SETUP 2:
     → Hard exit at 7PM EST regardless
 SECTION 5: OPERATIONAL RULES DERIVED FROM BACKTEST
 Entry Confirmation — 12 PM EST Checkpoint
+
 
 --- PAGE 56 ---
 REGIME CLASSIFICATION LOGIC (12 PM EST)
@@ -2937,6 +2992,7 @@ Highest daily frequency
 1.5p avg
 7.1% of days
 Shallow float days — 21.1%
+
 
 --- PAGE 57 ---
 Runner
@@ -3008,6 +3064,7 @@ INTEGRATION WITH CEREBUS SYSTEM:
  Data: EUR/USD M5 | Jan 2022 – Jan 2026 | 315,000+ candles | Backtest: 500 Days | Monte Carlo: 10,000 iterations
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 58 ---
 PART 10 DUAL-ENGINE EXECUTION MODEL Constraint Anchor +
 Resolution Amplifiers | Full Tier Validation EUR/USD M5 | Jan 2022 – Mar
@@ -3028,6 +3085,7 @@ Constraint Anchor: A structural activation [9] at the Asian constraint band viol
 expansion [11] to the -50% distribution target. Constraint Boundary [8] is placed at the OPPOSITE Asian extreme — structural
 invalidation if resolution output [2] travels through the entire range.
 Anchor Definition — The Certainty Layer Algorithm
+
 
 --- PAGE 59 ---
 CONSTRAINT ANCHOR DEFINITION
@@ -3096,6 +3154,7 @@ KEY INSIGHT — CONSTRAINT ANCHOR:
   T2 (20-30p): 89.1% — strong, requires active boundary management.
   T3 (30-45p): 76.2% — edge degrading. NOT recommended for Anchor deployment.
                Use T3 Model 2 protocol instead (see Section 3).
+
 
 --- PAGE 60 ---
 SECTION 2: RESOLUTION AMPLIFIER PERFORMANCE — THE PATH
@@ -3169,6 +3228,7 @@ Profit Factor
 1.12
 Institutional vs
 marginal
+
 
 --- PAGE 61 ---
 CRITICAL FINDING — THE SYNERGY GAP:
@@ -3244,6 +3304,7 @@ Constraint violation close
 Opposite band
 -50% extension
 +1.9R
+
 
 --- PAGE 62 ---
 Resolution Amplifier
@@ -3334,6 +3395,7 @@ Model 2 (Post-Resolution
 Continuation)
 Verdict
 
+
 --- PAGE 63 ---
 Total Activations
 98
@@ -3413,6 +3475,7 @@ Validity Rate (held >2h)
 69.2%
 65.8%
 Tighter ranges hold better
+
 
 --- PAGE 64 ---
 Win Rate (1x Range target)
@@ -3497,6 +3560,7 @@ Overfilled (>40p)
 N/A
 STAND DOWN — negative expectancy
 
+
 --- PAGE 65 ---
 OVERFILLED FILTER — CRITICAL ALERT:
 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -3561,6 +3625,7 @@ Asian Band
 168% Stall
 100%
 
+
 --- PAGE 66 ---
 T1
 Overfilled (>40p)
@@ -3620,6 +3685,7 @@ NO-GO
 0%
 SECTION 11: COMPLETE DEPLOYMENT PROTOCOL — THE MACHINE
 
+
 --- PAGE 67 ---
 DUAL-ENGINE DEPLOYMENT PROTOCOL
 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -3669,6 +3735,7 @@ T1 Weeks (High Vol)
 91%
 +2.10R
 +25.2R
+
 
 --- PAGE 68 ---
 T2 Weeks (Normal)
@@ -3729,6 +3796,7 @@ Dual-Engine Model Validated  |  CEREBUS FX v18.2.37  |  March 2026
  Data: EUR/USD M5 | Jan 2022 – Mar 2026 | 315,000+ candles | 4,842 Signals Processed
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 69 ---
 PART 11 FAILURE SEQUENCE ANALYSIS — THE REPAIR MODEL
 Constraint Violation Failure Taxonomy | Day-of-Week Edge | First vs Second
@@ -3773,6 +3841,7 @@ Opposite constraint band edge
 51.0% of failures
 Opposite 1x resolution target
 20.0% of failures
+
 
 --- PAGE 70 ---
 POST-FAILURE SEQUENCE — DOMINANT PATTERN:
@@ -3832,6 +3901,7 @@ THE REAL POST-FAILURE STRUCTURE:
   Only answer question 3 AFTER 2 and only trade it AFTER a new 2h acceptance hold.
   Emotional reaction to failure = worst execution decision.
 SECTION 3: SECOND ACCEPTANCE ATTEMPT — THE REPAIR EDGE
+
 
 --- PAGE 71 ---
 Metric
@@ -3902,6 +3972,7 @@ Status
 36.5p
 57%
 Constraint violation activated
+
 
 --- PAGE 72 ---
 6:00 AM
@@ -3984,6 +4055,7 @@ SECTION 5: DAY-OF-WEEK EDGE — WIN RATE & SIGNAL QUALITY
 The constraint resolution edge [3] is NOT evenly distributed across the week. It clusters on Tuesday and Wednesday — the days when
 institutional constraint delivery is cleanest and the direction of constraint resolution [3] most persistent.
 
+
 --- PAGE 73 ---
 Day
 Win Rate
@@ -4061,6 +4133,7 @@ CORE INSIGHT — WEEKLY EDGE DISTRIBUTION:
   Thursday is NOT a breakout day — it is a partial rebalancing [6] day.
   Playing it as a breakout day (Tue/Wed style) destroys edge systematically.
 
+
 --- PAGE 74 ---
 SECTION 6: FIRST vs SECOND BREAK — BY DAY (THE EXECUTION EDGE)
 The critical execution question: is the FIRST constraint violation attempt real, or is it bait for a directional flip? This breakdown
@@ -4121,6 +4194,7 @@ Action
 Wick failure (fastest)
 Pattern A — fast rejection
 
+
 --- PAGE 75 ---
 15-30 minutes
 ~30%
@@ -4158,6 +4232,7 @@ FAILURE TIMING KEY NUMBERS:
 SECTION 8: THE FAIL BOX — WHERE FAILURES HAPPEN IN STRUCTURE
 Failed constraint violations [5] do not fail randomly. They fail in a consistent structural zone — the Fail Box — defined by the partial
 rebalancing range [6] immediately above the Asian constraint band.
+
 
 --- PAGE 76 ---
 THE FAIL BOX — STRUCTURAL ZONE
@@ -4205,6 +4280,7 @@ BEST FLIP DAY — failure here often means opposite is real
 Friday
 55-65%
 Moderate flip — but limited follow-through expected
+
 
 --- PAGE 77 ---
 FLIP EXECUTION SEQUENCE — THE MONEY PATTERN:
@@ -4281,6 +4357,7 @@ Activate opposite side — 84.6%
 win rate
 Opposite 1x target
 
+
 --- PAGE 78 ---
 PART 11 — FINAL VERDICT: THE REPAIR MODEL
 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -4311,6 +4388,7 @@ CEREBUS FX v18.2.40  |  April 2026  |  465 Setups Analyzed
  Data: EUR/USD M5 | Sep 2022 – Apr 2026 | 465 valid 2h-hold setups analyzed
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 79 ---
 PART 12 THE TWO PLAYS — FINAL EXECUTION FRAMEWORK Base 80
 Play | T3 Max Accuracy | Regime Confirmed Push CEREBUS FX v4 — Final
@@ -4352,6 +4430,7 @@ Tuesday or Wednesday = higher
 conviction
 Not required — but elevates win rate
 Execution
+
 
 --- PAGE 80 ---
 ENTRY:
@@ -4408,6 +4487,7 @@ If >40 pips by 9 AM → STAND DOWN
 Constraint deficit substantially resolved
 Execution — Defensive Mode
 
+
 --- PAGE 81 ---
 ENTRY:
   AFTER 2-hour acceptance hold confirmed
@@ -4462,6 +4542,7 @@ Tuesday or Wednesday
 Highest constraint resolution conviction days
 Execution — Aggressive Mode
 
+
 --- PAGE 82 ---
 SIZE (Upgrade from Base 80):
   T1: 100% (full conviction — maximum constraint deficit compression)
@@ -4492,6 +4573,7 @@ Weekly R
 +25-35R
 When Regime Confirmed fires on Tue/Wed
 THE ONE-PAGE CHEAT SHEET
+
 
 --- PAGE 83 ---
 BASE 80 PLAY (Your FLOOR — bet every qualifying day):
@@ -4553,6 +4635,7 @@ ENGINE 1 — full size (88-92% win rate)
 T2 + Not Overfilled
 ENGINE 1 — 75% size (81-86% win rate)
 
+
 --- PAGE 84 ---
 T3 + Not Overfilled
 T3 MODEL 2 — 50% size (76-82% win rate)
@@ -4609,6 +4692,7 @@ THE SIMPLEST VERSION:
  EUR/USD M5 | Jan 2022 – Apr 2026 | 315,000+ Candles
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 85 ---
 PART 13 DEEP DIVE MONTE CARLO — VARIANCE ANALYSIS ENGINE
 10,000 Simulated Years | Full Geometric Reality | Triple-Engine Validation
@@ -4669,6 +4753,7 @@ Kill-Switch State [10]
 1.2% annually
 Close all, stand down full day when triggered
 
+
 --- PAGE 86 ---
 SECTION 2: TRIPLE-ENGINE SYSTEM RESULTS — THE UPGRADE
 The Triple-Engine simulation combines three uncorrelated activation sources: Base 80 (morning constraint violation), Weekly
@@ -4726,6 +4811,7 @@ Normal statistical noise — will occur regularly
 Max consecutive losing days (95th %)
 9 days
 The pain zone — 1 in 20 years. Do not change strategy.
+
 
 --- PAGE 87 ---
 Worst case streak (entire simulation)
@@ -4793,6 +4879,7 @@ Interpretation
 Avg days to recover from DD
 11.4 days
 Fast — high win rate + 2.15R average drives recovery
+
 
 --- PAGE 88 ---
 Max days stuck in drawdown
@@ -4873,6 +4960,7 @@ T2 (20-30p)
 45%
 Volume driver — most frequent signals
 
+
 --- PAGE 89 ---
 T3 (30-45p)
 76-82%
@@ -4925,6 +5013,7 @@ SUMMARY (lock these numbers in):
  EUR/USD M5 | Jan 2022 – Apr 2026 | 10,000 simulation iterations | Beta Distribution Win Rate | Poisson Trade Frequency | Full Intraday Trailing DD Tracking
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 90 ---
 SECTION 8: ATOMIC DYNAMIC ENGINE — 4-YEAR VALIDATION (EUR/USD)
 The Atomic Dynamic Engine integrates Tier-specific Density Zone entries, Fixed Dollar Expectancy sizing, and EWS filtering. This
@@ -4991,6 +5080,7 @@ ATOMIC ENGINE VALIDATION — KEY INSIGHT:
   These are structural noise, not system failures.
  Cerebus Cycle — Final Form | Part 13 — Atomic Engine Validation | April 2026
  
+
 --- PAGE 91 ---
 SECTION 9: 800-DAY PORTFOLIO MONTE CARLO — 11 ASSETS (10,000 ITERATIONS)
 Extends the single-asset Monte Carlo (Sections 1-8) to a full 11-asset portfolio running the Distribution Symmetry Trap across an 800-day
@@ -5096,6 +5186,7 @@ $842,193
 84.2x
 ~613% ann.
 
+
 --- PAGE 92 ---
 800-DAY VALIDATED POSITION SIZING:
   TRAILING EQUITY ACCOUNTS (6% DD limit — e.g. Goat/Instant):
@@ -5140,6 +5231,7 @@ simulation performance does not guarantee future results.
  Cerebus Cycle — Final Form | Part 13 Section 9 — 800-Day Portfolio Monte Carlo | April 2026
  ■■ For educational purposes only — simulations do not guarantee future results.
  
+
 --- PAGE 93 ---
 PART 14 BLIND STRUCTURAL CHAIN LAW — THE RECURSIVE LOOP
 ENGINE Impulse → Partial Rebalancing → Continuation | Universal 4-Year
@@ -5191,6 +5283,7 @@ EXISTENCE PROOF CONCLUSION:
 SECTION 2: PARTIAL REBALANCING DEPTH — THE GOLDILOCKS ZONE
 Among the 658 valid chains, the partial rebalancing depth [6] was measured as a percentage of the initial impulse leg. Four zones
 identified.
+
 
 --- PAGE 94 ---
 Rebalancing Zone
@@ -5260,6 +5353,7 @@ THE 80% CLOSE — CONSTRAINT BOUNDARY INVALIDATION [8]:
   cascade plan immediately. The chain is invalidated.
   Do NOT confuse a wick touch with a candle close — only the close counts.
 
+
 --- PAGE 95 ---
 SECTION 4: NATURAL TEMPORAL BANDS — DISCOVERED POST-HOC
 No time windows were assumed. The following bands were measured from the 318 Goldilocks chains that succeeded. These are
@@ -5297,6 +5391,7 @@ NATURAL TEMPORAL BANDS — KEY FINDINGS:
                    has likely exhausted its energy for that cycle
 SECTION 5: THE COMPLETE CONSTRAINT CHAIN FORMULA
 
+
 --- PAGE 96 ---
 THE BLIND CHAIN LAW — COMPLETE FORMULA:
   SUCCESS = (Impulse > Tier Threshold)
@@ -5326,6 +5421,7 @@ Chop / Accumulation redefined: an incomplete constraint resolution cycle [11] th
 noise — it is Cycle N resetting before Cycle N+1 fires. The time window (2AM-12PM) is not a magic schedule; it is the institutional
 volume window that provides the activation energy for each cycle. By 12PM, that volume dries up and the loop mechanism shuts down.
 Recursive Loop Structure
+
 
 --- PAGE 97 ---
 THE RECURSIVE LOOP — HOW IT WORKS:
@@ -5391,6 +5487,7 @@ TIER CHARACTER — THE CORE INSIGHT:
       mistake. The edge is trading the second and third cycles (shallower pullbacks,
       higher probability entries) not the volatile first cycle.
 
+
 --- PAGE 98 ---
 SECTION 7: THE POST-12PM REALITY — WHY THE ENGINE SHUTS DOWN
 Tier
@@ -5441,6 +5538,7 @@ T1 (<20p Asian Range) — THE SNIPER PROTOCOL:
   Post-12PM: ZERO activity expected
 T2 Protocol — The Double-Tap
 
+
 --- PAGE 99 ---
 T2 (20-30p Asian Range) — THE WORKHORSE PROTOCOL:
   Expectation: 1 cycle (69%) or 2 cycles (26%)
@@ -5476,6 +5574,7 @@ Loop-Triggered Cascade: Instead of 'add at +45 minutes,' the rule becomes 'add w
 replaces a time guess with structural certainty — the cascade fires exactly when the field [1] has recharged its constraint deficit [11] for
 the next resolution leg.
 Phase 1 — The Anchor (Loop 1 Start)
+
 
 --- PAGE 100 ---
 PHASE 1: ANCHOR ACTIVATION (Loop 1)
@@ -5536,6 +5635,7 @@ Pure Anchor only
 N/A — no cascade in T3
 Phase 4 — Exits
 
+
 --- PAGE 101 ---
 PHASE 4: EXIT PROTOCOL (unchanged from base system)
   Time Exit:    12:00 PM EST — Close ALL (resolution engine shuts down)
@@ -5566,6 +5666,7 @@ STALL-HARVEST LOOP CASCADE — STRUCTURAL SEQUENCE:
     Loop 2 from this configuration targets the 200% Deep State [10]
     Average continuation from 50% rebalancing level: 25-35 pips
 SECTION 11: LIVE EXECUTION CHECKLIST — LOOP PROTOCOL
+
 
 --- PAGE 102 ---
 LOOP-TRIGGERED CASCADE EXECUTION CHECKLIST
@@ -5606,6 +5707,7 @@ SUMMARY:
  EUR/USD M5 | Sep 2022 – Apr 2026 | 1,008 Trading Days | 742 Chains Detected | 658 Valid Chains | CEREBUS FX v18.2.41
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 103 ---
 PART 15 FRACTAL RESOLUTION ENGINE — NESTED CYCLE ANALYSIS
 Monthly Fractal Cycle | Recursive Shift Mechanism | Trigger-Oppose
@@ -5651,6 +5753,7 @@ MONTHLY TARGET CALCULATION:
   ~215-235 pips on top of an already-expanded base.
   The fractal scales proportionally — larger base, lower multiplier.
 Time-to-Completion — When Does the Monthly Extreme Form?
+
 
 --- PAGE 104 ---
 Metric
@@ -5710,6 +5813,7 @@ The Coiled Spring law holds at monthly scale:
   Tight W1 = higher expansion ratio + cleaner entries.
   Wide W1 = lower expansion + fewer valid Goldilocks zones [6].
 
+
 --- PAGE 105 ---
 Monthly Operational Playbook
 MONTHLY FRACTAL PLAYBOOK — THREE PHASES:
@@ -5761,6 +5865,7 @@ Above 1.68x (over-extension)
 4.8%
 Rare — indicates full regime flip [3], not a simple shift
 
+
 --- PAGE 106 ---
 Path Distribution — Staircase vs Monolith by Tier
 Tier
@@ -5804,6 +5909,7 @@ PATH DISTRIBUTION — KEY INSIGHT:
   T3 = monolith = single burst = no valid cascade window [9]
 The Complete Shift Algorithm
 
+
 --- PAGE 107 ---
 THE RECURSIVE SHIFT ENGINE — COMPLETE FORMULA:
 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -5842,6 +5948,7 @@ CONTEXT FILTERS:
                                    → do NOT fade it — ride continuation [3]
 SECTION 3: TRIGGER-OPPOSE EXTREME SL — PRECISION CONSTRAINT
 BOUNDARY
+
 
 --- PAGE 108 ---
 Trigger-Oppose Pair: The two-candle structural unit that defines a shift. The Trigger Candle (C_trigger) is the last strong candle
@@ -5904,6 +6011,7 @@ Opposite Candle (green)
 Next M5 closes against impulse
 Low: 1.0824 | Close: 1.0836
 
+
 --- PAGE 109 ---
 Entry
 Market on C_opp close (LONG)
@@ -5937,6 +6045,7 @@ STRUCTURAL PIVOT LOGIC:
   not a genuine shift.
 Trigger-Oppose Protocol — Execution Checklist
 
+
 --- PAGE 110 ---
 TRIGGER-OPPOSE EXTREME SL — LIVE EXECUTION CHECKLIST:
   ■ IMPULSE DETECTED:
@@ -5967,6 +6076,7 @@ MAP
 All three components of Part 15 confirm the same underlying principle: the constraint resolution engine [11] operates recursively
 across all timeframes. The same Impulse → Partial Rebalancing → Continuation law governs the 5-minute candle, the daily
 session, the trading week, and the calendar month.
+
 
 --- PAGE 111 ---
 THE COMPLETE FRACTAL RESOLUTION MAP:
@@ -6018,6 +6128,7 @@ Monthly target calculation and phases
  EUR/USD | 2022–2026 | 48 Trading Months | 1,008 Days | 418 Shift Events | CEREBUS FX v18.2.42
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 112 ---
 DAILY SETUPS & IDEAS Live Research | Structural Setups | Executable
 Edge Concepts Cerebus Cycle — Final Form | Ongoing | CEREBUS FX
@@ -6067,6 +6178,7 @@ Notes
 Total signals
 917
 One per qualifying day
+
 
 --- PAGE 113 ---
 CEREBUS ATOMIC & MACRO LOGIC FRAMEWORK Context Transfer Document
@@ -6139,6 +6251,7 @@ DISTRIBUTION LAW:
   Trading the second half fights a dead engine.
 III. THE BLACK BOX MODEL — CORE EXPECTATION FORMULA
 
+
 --- PAGE 114 ---
 EXPECTED TARGET = (Current Range / Completion%) x Regime Multiplier x Tier Base
 COMPLETION% BY CHECKPOINT:
@@ -6200,6 +6313,7 @@ M5 close back inside band OR beyond 80% of impulse leg — exit immediately, no 
 Scalp Target
 Atomic Unit (T1:10p / T2:12p / T3:15p) — one full loop completion
 
+
 --- PAGE 115 ---
 Runner Target
 1.44x shift (daily) | 2.0x-2.68x (monthly) — never hold past completion window
@@ -6216,6 +6330,7 @@ THE SINGLE OPERATING STATEMENT:
   Use it to align with the field's resolution rhythm, not to predict it.
  Cerebus Cycle — Final Form | Atomic and Macro Logic Context | April 2026 | PROPRIETARY & CONFIDENTIAL
  
+
 --- PAGE 116 ---
 Hit rate — -25% target
 89.2%
@@ -6296,6 +6411,7 @@ On-Time %
 Late %
 Operational Note
 
+
 --- PAGE 117 ---
 CONFIRMED
 ≥ 1.50x
@@ -6354,6 +6470,7 @@ After 12 PM, target not hit
 Stand down — edge decays sharply past hard exit window
 Operational Framework — Live Execution
 
+
 --- PAGE 118 ---
 SETUP 1 — FIRST BREAKOUT CLOSE: LIVE EXECUTION FRAMEWORK
   3:00 AM EST:
@@ -6383,6 +6500,7 @@ SETUP 1 — FIRST BREAKOUT CLOSE: LIVE EXECUTION FRAMEWORK
  EUR/USD M5 | Jan 2022 – Apr 2026 | 917 Trading Days | Setup 1 of ongoing series
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 119 ---
 SETUP 2 — -50% TARGET TEMPORAL DELIVERY — TIER TIMING + EWS EXIT SIGNAL
 Extension of Setup 1. The -50% hit rate is lower than -25% not because edge decays, but because the field [1] must pass through
@@ -6453,6 +6571,7 @@ T1
 ~2.8 hours
 4.2 hours
 
+
 --- PAGE 120 ---
 T2
 ~2.2 hours
@@ -6511,6 +6630,7 @@ T1
 Fast → hold to -50%. Slow → exit at -25%. Unicorn (<2h to -25%): small runner
 to 168% Stall Zone [10]
 
+
 --- PAGE 121 ---
 T2
 < 3.0h
@@ -6537,6 +6657,7 @@ SLOW DELIVERY (T2 > 6h, T1 > 4h):
   Do not wait for the clock. Use the EWS as the exit trigger.
   Stand down after 10 AM — no new activations regardless of tier.
 Setup 2 — Execution Framework
+
 
 --- PAGE 122 ---
 SETUP 2 — TEMPORAL DELIVERY + EWS EXIT: LIVE FRAMEWORK
@@ -6567,6 +6688,7 @@ SETUP 2 — TEMPORAL DELIVERY + EWS EXIT: LIVE FRAMEWORK
  EUR/USD M5 | T1/T2 Only | Setup 2 of ongoing series
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 123 ---
 SETUP 3 — T3 FIRST BREAKOUT CLOSE — TIER-SPECIFIC RULES & EWS BEHAVIOR
 T3 days (Asian Range 30-45p) require a separate operational framework from T1/T2. The wider constraint deficit [11] generates
@@ -6633,6 +6755,7 @@ T3 EWS BEHAVIOR — KEY DISTINCTION FROM T1/T2:
   Hit rate drops to 56.1% — essentially a coin flip on -50%.
   In FAILED regime + T3: exit at -25% with full position. No runners.
 
+
 --- PAGE 124 ---
 T3 Execution Framework
 SETUP 3 — T3 FIRST BREAKOUT CLOSE: EXECUTION FRAMEWORK
@@ -6672,6 +6795,7 @@ SETUP 4 — CASCADE EWS — OPPOSITE P90 AT 45-MIN WINDOW: TRIM TOOL, NOT REVERS
 Objective: Test the opposite-direction P90 cascade firing in the 45-60 minute window after the initial activation signal [9]. Two
 questions: (a) is it a valid reversal entry? (b) is it a useful trim or exit signal for existing Anchor positions? 917 trading days tested.
 142 Cascade EWS events detected (15.5% of days).
+
 
 --- PAGE 125 ---
 Core Results
@@ -6762,6 +6886,7 @@ stalls and compresses. No full reversal.
 TRIM signal — exit 50-75% of Anchor. Hold
 small runner with tight boundary.
 
+
 --- PAGE 126 ---
 WHY THE SYNERGY GAP HOLDS HERE (Part 10):
   Aligned cascade P90s (same direction): 87.8% win rate
@@ -6788,6 +6913,7 @@ CASCADE EWS REVERSAL ENTRY — ONLY VALID WHEN ALL FOUR CONDITIONS MET:
   cascade context. The 2-hour hold is not optional — it is the confirmation
   that the direction of constraint resolution [3] has genuinely shifted.
 Setup 4 — Execution Framework
+
 
 --- PAGE 127 ---
 SETUP 4 — CASCADE EWS @ 45-MIN WINDOW: EXECUTION FRAMEWORK
@@ -6824,6 +6950,7 @@ SETUP 4 — CASCADE EWS @ 45-MIN WINDOW: EXECUTION FRAMEWORK
  EUR/USD M5 | Jan 2022 – Apr 2026 | Setup 3: 216 T3 Days | Setup 4: 917 Days / 142 Cascade EWS Events | Setups 3-4 of ongoing series
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 128 ---
 SETUP 5 — 5-DAY ANCHOR MACRO SETUP — MONTHLY CONSTRAINT RESOLUTION
 The macro setup uses the first five trading days of each month as the structural constraint anchor — the monthly equivalent of the
@@ -6894,6 +7021,7 @@ N/A — skip
 below 65%
 Stand down
 
+
 --- PAGE 129 ---
 TIER LOGIC — WHY THE THRESHOLDS SCALE:
   M-T1 (less than 60p): Compressed first week = coiled spring = violent expansion.
@@ -6947,6 +7075,7 @@ THREE REASONS THE 5-DAY ANCHOR MACRO SETUP WORKS:
      to arrive at its natural termination point. Average precision: ±1.5 pips.
 Setup 5 — Execution Framework
 
+
 --- PAGE 130 ---
 SETUP 5 — 5-DAY ANCHOR MACRO: EXECUTION FRAMEWORK
   STEP 1: PRE-SETUP (Day 5 Close)
@@ -6997,6 +7126,7 @@ No activation yet (Days 1-5)
 Standard intraday rules — no monthly filter
 Baseline intraday edge only
 
+
 --- PAGE 131 ---
 Post-Day-15
 Monthly engine done — intraday operates standalone
@@ -7031,6 +7161,7 @@ THE ONE RULE:
   Only candle closes matter.
   No exceptions.
 
+
 --- PAGE 132 ---
 SAME RULE — TWO TIMEFRAMES:
   INTRADAY (Parts 1-12):
@@ -7049,6 +7180,7 @@ SAME RULE — TWO TIMEFRAMES:
  EUR/USD Daily + M5 | 2022-2026 | 5-Day Anchor Macro Setup — validated | Setup 5 of ongoing series
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 133 ---
 SETUP 6 — POST-FAILURE REPAIR SEQUENCE — MIDPOINT AS DECISION ZONE, NOT
  REVERSAL
@@ -7114,6 +7246,7 @@ WHY 89% RECYCLE SAME-SIDE (NOT FLIP):
   ~5%: compression with no follow-through either direction
   Trading against 89% is not a strategy. It is prediction.
 
+
 --- PAGE 134 ---
 Correct Protocol After a Failed Activation
 Ste
@@ -7178,6 +7311,7 @@ TP2
 50-55%
 Standard continuation if momentum holds after TP1.
 
+
 --- PAGE 135 ---
 TP3
 168% extension (runner)
@@ -7198,6 +7332,7 @@ OPPOSITE SIDE FLIP ENTRY — ALL CONDITIONS REQUIRED:
   The midpoint is where 89% of the field's traffic reverses back to the original side.
   The opposite band + 2h hold is the only valid flip confirmation.
 Setup 6 — Live Execution Checklist
+
 
 --- PAGE 136 ---
 SETUP 6 — POST-FAILURE REPAIR: EXECUTION CHECKLIST
@@ -7231,6 +7366,7 @@ SETUP 6 — POST-FAILURE REPAIR: EXECUTION CHECKLIST
  EUR/USD M5 + Daily | Part 11 failure data (465 setups, 210 failures) applied to macro scale | Setup 6 of ongoing series
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 137 ---
 ATOMIC MARKET STRUCTURE Density Zone | Convergence Factor | Fixed Dollar
 Expectancy Grand Unified Equation | First Impulse Predictor | Shift Targets
@@ -7286,6 +7422,7 @@ Exit Rule
 Specification
 Logic
 
+
 --- PAGE 138 ---
 Target
 Next Atomic Unit (T1=10p, T2=12p, T3=15p from
@@ -7323,6 +7460,7 @@ FIXED DOLLAR EXPECTANCY (FDE) — TARGET-FIRST SIZING
 Stop sizing by fixed % risk. Size by fixed $ target. With 98.7% accuracy and EWS filtering, failure is rare and small. The only
 variable is pip distance to the target. FDE normalizes the payout so every trade prints the same dollar amount regardless of
 whether it is a tight T1 day or a wide T3 day.
+
 
 --- PAGE 139 ---
 LOT SIZE = Target Dollar Profit / (Atomic Target Pips x Pip Value)
@@ -7382,6 +7520,7 @@ Less than threshold
 Remains current tier
 85%
 Wait for 3AM confirmation
+
 
 --- PAGE 140 ---
 PREDICTOR LOGIC:
@@ -7455,6 +7594,7 @@ T3 Day: Expect 2-4 loops → Trade 1-2 setups ONLY with full Density Zone + Oppo
  Cerebus Cycle — Final Form | Atomic Market Structure | April 2026 | EUR/USD M5 ONLY
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 141 ---
 DISTRIBUTION SYMMETRY TRAP Asian Bias Lock | Atomic Loop Entry |
 Distribution Targets 11-Asset Validated | 800-Day Monte Carlo | Cerebus Cycle —
@@ -7525,6 +7665,7 @@ Notes
 Total Sessions
 847
 ~3.1 trades/day avg across the test period
+
 
 --- PAGE 142 ---
 Overall Win Rate
@@ -7716,6 +7857,7 @@ T50 hits ~31% | T100 hits ~10% | TIME exits ~18% | SL ~5-6%. This distribution i
 absolute volatility.
 OPERATIONAL RULES — DISTRIBUTION SYMMETRY TRAP
 
+
 --- PAGE 143 ---
 DISTRIBUTION SYMMETRY TRAP — EXECUTION PROTOCOL
   PRE-SESSION (2:45 AM EST):
@@ -7764,6 +7906,7 @@ Best balance of frequency and R-multiple
  Cerebus Cycle — Final Form | Distribution Symmetry Trap | April 2026 | PROPRIETARY & CONFIDENTIAL
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 144 ---
 THE INFINITE LADDER Distribution Harvesting Grid System Intraday |
 Intraweek | Macro | Nested Compounding Cerebus Cycle — Final Form |
@@ -7821,6 +7964,7 @@ Structural stop
 Beyond -15p (density zone hard stop)
 —
 
+
 --- PAGE 145 ---
 THE LADDER CLOSE — CAPITAL ADVANCEMENT:
   At 10p (approaching Atomic target):
@@ -7875,6 +8019,7 @@ capital advance.
 Place BUY STOPS at hedge SL
 level. Set and ride.
 The Wednesday Reference Shift
+
 
 --- PAGE 146 ---
 PRE-WEDNESDAY:
@@ -7933,6 +8078,7 @@ Rides it back up.
 Primary ran to 100%.
 Never filled.
 
+
 --- PAGE 147 ---
 HEDGE RULE — CASCADE TIMING LOGIC:
   The temporal hedge on Mon/Tue follows the same cascade timing as the
@@ -7951,6 +8097,7 @@ SECTION 4: THE NESTING SYSTEM — MULTI-TIMEFRAME COMPOUNDING
 The deepest grid entry from each day carries forward as a free position. After the macro anchor fires (Setup 5), every daily and
 weekly grid becomes a compounding layer on the same monthly target. By Day 13-15 the position stack is massive — all at
 near-zero cost basis.
+
 
 --- PAGE 148 ---
 MONTHLY NESTING TIMELINE:
@@ -7991,6 +8138,7 @@ THE SCALE EFFECT:
   with 81-94% accuracy on every layer and structural stops that almost
   never get hit because the field resolves before reaching them.
 SECTION 5: DAILY OPERATING PLAYBOOK
+
 
 --- PAGE 149 ---
 PRE-3AM:
@@ -8037,6 +8185,7 @@ Display
 Single line: INTRAWEEK: XX.X% — updates live as price moves
 No recalculation
 Set Monday Asian Range at 3AM Monday. Fixed for the week. No adjustments.
+
 
 --- PAGE 150 ---
 THE INFINITE LADDER — DISTRIBUTION PHASE LEVELS 60% and 80% Thresholds | Exact Pips | Fibonacci
@@ -8127,6 +8276,7 @@ DAILY PHASE ACTIONS:
   Between 60% and 80%: most aggressive momentum window.
     Add into the move — this is the cleanest phase.
 INTRAWEEK — FROM MONDAY ASIAN BAND EDGE
+
 
 --- PAGE 151 ---
 Same multipliers as daily — different base (Monday Asian Range). Weekly grid runs Mon-Fri with temporal hedge at 12PM
@@ -8259,6 +8409,7 @@ M-T2
 138.2%
 161.8%
 
+
 --- PAGE 152 ---
 M-T3
 90p
@@ -8299,6 +8450,7 @@ MACRO PHASE ACTIONS:
     Reset for next month.
 THE FIB ALIGNMENT — WHY THE THRESHOLDS WORK
 
+
 --- PAGE 153 ---
 The 60% and 80% thresholds are not arbitrary percentages chosen for aesthetics.
 They land on standard Fibonacci extension levels every time because the
@@ -8322,6 +8474,7 @@ or 5 weeks (macro). The physics scale. The Fibonacci levels stay the same.
  EUR/USD | All levels from constraint band edge | Intraday / Intraweek / Macro
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 154 ---
 Front-load the grid into the distribution.
 Trim at Atomic completion.
@@ -8338,6 +8491,7 @@ There is only physics-based delivery execution.
  EUR/USD | Intraday + Intraweek + Macro Distribution Harvesting | Pine Script Indicator Spec: Pending Code Integration
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 155 ---
 WORLD MARKETS ARE THE SAME
  Atomic Dynamic Engine | Universal Constraint Resolution Physics | 19 Instruments Validated
@@ -8424,6 +8578,7 @@ formula: 21-23h EST | 85-89% WR
  EUR/USD | GBP/USD | USD/CHF | USD/JPY | AUD/USD | NZD/USD | CHF/JPY | GBP/JPY | GBP/AUD | GBP/NZD | GBP/CHF | ETH/USD | BTC/USD | XAU/USD |
  XAG/USD | NAS100 | DE30 | FR40 | HK50 | US500
  
+
 --- PAGE 156 ---
 USD/CHF — The Sniper (11p Atomic Unit, Lowest Drawdown)
 Tier
@@ -8601,6 +8756,7 @@ NZD/USD
 41.8
 Kiwi — steady commodity companion
 
+
 --- PAGE 157 ---
 MATRIX RANKINGS:
   Highest Win Rate:    USD/CHF (98.9%)  — use for precision capital compounding
@@ -8667,6 +8823,7 @@ ASIAN SESSION TUNING (7PM-3AM) — ALL PAIRS:
   Win Rate:            Maintains ~96% with adjustments applied
   Apply same 20% reduction proportionally to all other pairs.
 THE CONSTRAINT RESOLUTION LAW IS UNIVERSAL
+
 
 --- PAGE 158 ---
 GBP/USD — THE SPRINTER: FULL ATOMIC MAP
@@ -8759,6 +8916,7 @@ USD/JPY — OPERATIONAL RULES (1 pip = 0.01):
   Hard Exit: 12:00 PM EST | Risk: 0.25% per trade
   BOJ NOTE: T3 days — do NOT use tight SL near intervention hours (5PM-7PM ET)
 NZD/USD — THE KIWI: FULL ATOMIC MAP
+
 
 --- PAGE 159 ---
 NZD/USD runs approximately 1.5x EUR/USD volatility. Commodity currency — heavily influenced by dairy prices and China demand. Pip
@@ -8875,6 +9033,7 @@ Precision Cross
  Parameters derived via CEREBUS FX v4 methodology: Asian Range clustering → Tier thresholds → Atomic Units → Density Zones
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 160 ---
 EXPECTED ATOMIC LOOPS — EUR/USD, USD/CHF, US500
 Session: 3 AM – 12 PM EST. Valid loop = Impulse >= Threshold + Pullback to Density Zone + Opposite Candle Close. Live
@@ -8991,6 +9150,7 @@ T3
 54.7 pts
 45.6 – 63.8 pts
 
+
 --- PAGE 161 ---
 HOW TO USE SHIFT TARGETS LIVE:
   1. Classify Tier from Asian Range pre-3AM
@@ -9089,6 +9249,7 @@ T3
 21 – 23 Pips
 +22p from entry
 
+
 --- PAGE 162 ---
 AUD/USD INSIGHT:
   Universal Atomic Unit: 13 pips
@@ -9101,6 +9262,7 @@ AUD/USD INSIGHT:
  Cerebus Cycle — Final Form | World Markets Are The Same | April 2026 | PROPRIETARY & CONFIDENTIAL
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 163 ---
 ETH/USD — ATOMIC MARKET STRUCTURE Ethereum | 4-Year Validated |
 2022-2026 | 1,284 Sessions
@@ -9175,6 +9337,7 @@ Identical loop frequency to forex (EUR: 4.2)
 Atomic Unit Hit Rate
 96.4%
 Primary scalp target — structural coherence step
+
 
 --- PAGE 164 ---
 Tier Impulse Hit Rate
@@ -9301,6 +9464,7 @@ less than 1.45x
 Reduce size 50% — exit at -25% of
 Asian Range
 
+
 --- PAGE 165 ---
 REGIME INSIGHT:
   Even in FAILED regime, atomic coherence holds at 91.3% —
@@ -9345,6 +9509,7 @@ GOLDILOCKS ZONE RULE (ETH = EUR):
   The physics scale. The structural law is universal.
 ETH/USD — Operational Rules
 
+
 --- PAGE 166 ---
 ETH SYMMETRY TRAP — EXECUTION FRAMEWORK
   PRE-SESSION (2:45 AM EST):
@@ -9375,6 +9540,7 @@ ETH SYMMETRY TRAP — EXECUTION FRAMEWORK
  ETH/USD M5 | 2022-2026 | 1,284 Sessions | ~4,980 Atomic Loops | k-means validated tier thresholds | CEREBUS FX v18.2.60
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 167 ---
 ETH/USD — PARITY CALIBRATION: RESTORING 95%+ COHERENCE
 IF LIVE RESULTS SHOW ~80% — IT IS NOT THE MARKET The Atomic Unit is the structural step-size of
@@ -9452,6 +9618,7 @@ T3
 Trigger=65pts | wider spread, typical of T3 regime
 behavior
 
+
 --- PAGE 168 ---
 DISTRIBUTION INSIGHT:
   T1 median impulse (42.0pts) = exactly the Tier Trigger (42pts).
@@ -9504,6 +9671,7 @@ ETH FINAL STATEMENT:
  Cerebus Cycle — Final Form | ETH/USD Parity Calibration | April 2026 | PROPRIETARY & CONFIDENTIAL
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 169 ---
 ETH/USD — OCC INVALIDATION TEST Atomic Activation + OCC Extreme Buffer Stop
 (Close-Only) 2022-2026 | 6,814 Loops | 3 Buffer Variants
@@ -9569,6 +9737,7 @@ T3 (105-160pts)
 7 pts
 Wider noise floor — use 7pt on T3 days
 Execution Code — ETH OCC Invalidation Test (Python)
+
 
 --- PAGE 170 ---
 import pandas as pd, numpy as np
@@ -9687,6 +9856,7 @@ CONFIRMED
 Best R:WR tradeoff across tiers
 CONFIRMED
 
+
 --- PAGE 171 ---
 7pt buffer correct for T3
 Accounts for wider noise floor
@@ -9695,6 +9865,7 @@ CONFIRMED
  ETH/USD M5 | 2022-2026 | 6,814 Atomic Loops | CEREBUS FX v18.2.60
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 172 ---
 BTC/USD — ATOMIC MARKET STRUCTURE Bitcoin | 4-Year Validated | Jul 2023-May 2026
 | 1,089 Sessions | 2,847 Trades
@@ -9780,6 +9951,7 @@ Trades
 Win Rate
 Avg R
 Median Duration
+
 
 --- PAGE 173 ---
 T1
@@ -9919,6 +10091,7 @@ Worst Losing Streak
 ~3-4x/year
 Normal variance
 
+
 --- PAGE 174 ---
 MONTE CARLO EQUITY GEOMETRY:
   98.9% of simulated accounts never breach the 6% trailing floor.
@@ -10014,6 +10187,7 @@ elif state=='PB':
 # df,s=run_btc_atomic_backtest(
 #   'BTCUSD_M5.csv')
 
+
 --- PAGE 175 ---
 BTC ATOMIC SYMMETRY TRAP — OPERATIONAL RULES
   PRE-SESSION (2:45 AM EST):
@@ -10070,6 +10244,7 @@ CONFIRMED
  BTC/USD M5 | Jul 2023-May 2026 | 1,089 Sessions | 2,847 Trades | k-means validated tiers | CEREBUS FX v18.2.60
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 176 ---
 WORLD MARKETS — EXTENDED ASSET MATRIX K-Means Tier Discovery | Tight
 SL Protocol | 7 New Instruments Gold | ETH Update | NAS100 | FR40 | HK50 | DE30
@@ -10144,6 +10319,7 @@ Win Rate
 Avg Win R
 Expectancy
 Notes
+
 
 --- PAGE 177 ---
 T1 (<70pts)
@@ -10247,6 +10423,7 @@ Tightest WR, lowest R
 95.3%
 +1.02R
 Structural baseline
+
 
 --- PAGE 178 ---
 GOLD — OPERATIONAL RULES:
@@ -10358,6 +10535,7 @@ T3 (128-245 pts)
 +1.76R
 +1.29R
 
+
 --- PAGE 179 ---
 NAS100 — OPERATIONAL RULES (TIGHT SL DEFAULT):
   T1 (<68pts): AU=34 | T2 (68-128pts): AU=64 | T3 (128-245pts): AU=122
@@ -10457,6 +10635,7 @@ HK50 (HONG KONG 50) — ATOMIC MARKET STRUCTURE
 HK50 saw the largest regime expansion of the index group: +21% in 2024-2026 driven by China stimulus cycles and PBOC sensitivity.
 Strong directional Asian session momentum — win rate barely drops with tight SL. Wide spread (30pts typical) — factor into sizing. 3,912
 trades.
+
 
 --- PAGE 180 ---
 Tier
@@ -10592,6 +10771,7 @@ Avg Win R
 +1.79R
 +79%
 
+
 --- PAGE 181 ---
 Expectancy/Trade
 +0.81R
@@ -10715,6 +10895,7 @@ T3 (48-85 pips)
 +1.71R
 +1.26R
 
+
 --- PAGE 182 ---
 CHF/JPY — OPERATIONAL RULES (2-DECIMAL PRICING: 1 pip = 0.01):
   T1 (<28p): AU=14p | T2 (28-48p): AU=24p | T3 (48-85p): AU=42p
@@ -10742,6 +10923,7 @@ NOTE
  Gold (XAU) | ETH Update | NAS100 | FR40 | HK50 | DE30 | CHF/JPY | All tiers k-means derived from actual Asian Range distributions | Tight SL = Default
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 183 ---
 XAG/USD (SILVER) — ATOMIC MARKET STRUCTURE
 Silver's Asian Range correlates strongly with Gold (~0.78 in the correlation matrix) but runs at lower absolute volatility. Avg Asian Range:
@@ -10811,6 +10993,7 @@ XAG/USD — OPERATIONAL RULES:
  Cerebus Cycle — Final Form | XAG/USD — World Markets Are The Same | April 2026 | PROPRIETARY & CONFIDENTIAL
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 184 ---
 GBP CROSSES — GBP/JPY | GBP/AUD | GBP/NZD | GBP/CHF Atomic Symmetry Trap | 4 Pairs |
 2023-2026 | 3,710 Total Trades
@@ -10986,6 +11169,7 @@ KEY FINDINGS — GBP CROSSES: Win rates cluster 89.8-91.3% — consistent with t
 rate only 4.1-5.4% across all four pairs — OCC extreme + buffer is structurally valid. T1 days dominate at 92.7-93.4% WR. GBP/JPY
 shows highest absolute PnL (34.2p avg) due to larger atomic units from higher volatility. TIME exits minimal at 4.5-5.3%.
 
+
 --- PAGE 185 ---
 GBP CROSSES — OPERATIONAL RULES (all four pairs):
   SL: OCC extreme + tier-specific buffer (close-only — wicks ignored)
@@ -11084,6 +11268,7 @@ trade (38.4pts vs ~58pts) due to lower atomic units. Both operate within the sam
 index choice — lower variance, tighter tier ranges, smaller SL buffers relative to NAS100. On FOMC/CPI days: consider skipping T3
 entries or using wider SL buffer.
 
+
 --- PAGE 186 ---
 US500 (S&P 500) — OPERATIONAL RULES:
   T1 (<42pts): AU=21pts | SL buffer=8pts
@@ -11118,6 +11303,7 @@ CONFIRMED
  GBP/JPY | GBP/AUD | GBP/NZD | GBP/CHF: 3,710 trades | US500: 1,142 trades | All k-means tier discovery + Atomic Symmetry Trap
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 187 ---
 OPTION B — CONTINUOUS LOOP SUPER SCALPER 3-5 Signals Per Session | All 19
 Assets | Same Tier Parameters Cerebus Cycle — Final Form | April 2026
@@ -11235,6 +11421,7 @@ indices despite 4x more trades. BTC/ETH WR dips to 78-79% — higher gap risk du
 (single entry) is recommended.
 OPTION B — OPERATIONAL RULES
 
+
 --- PAGE 188 ---
 OPTION B — CONTINUOUS LOOP SUPER SCALPER
   SAME AS OPTION A EXCEPT:
@@ -11300,6 +11487,7 @@ SL Buffer
 Win Rate
 84.6%
 88.1%
+
 
 --- PAGE 189 ---
 Profile
@@ -11446,6 +11634,7 @@ Max consec losses (95th)
 5 days
 Streak risk virtually eliminated by diversification
 
+
 --- PAGE 190 ---
 ASIAN ATOM B-TIER — VALIDATED POSITION SIZING:
   TRAILING EQUITY ACCOUNTS (6% DD limit — Goat/Instant):
@@ -11491,6 +11680,7 @@ CONFIRMED
  Continuous Loop: 19 assets | 3-5 signals/session | Asian Atom: 15 B-Tier assets | 19:00-03:00 EST | 87.6% weighted WR | Monte Carlo: 10,000 sims, 252 days
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 191 ---
 ATOMIC SYNERGY — COMBINED SESSION DEPLOYMENT Asian Atom (19:00-03:00 EST)
 + Symmetry Trap (03:00-12:00 EST) 19 Assets | ~12,800 Trades/Year | Dual-Engine
@@ -11659,6 +11849,7 @@ Max Drawdown
 4.2%
 Neutral
 
+
 --- PAGE 192 ---
 Sharpe Ratio
 3.68
@@ -11767,6 +11958,7 @@ Sharpe Ratio (estimated)
 3.91
 greater than 2.0 = Institutional
 
+
 --- PAGE 193 ---
 Session Synergy Lift
 +14.2% WR vs
@@ -11783,6 +11975,7 @@ designated window before the hard exit fires.
  19 assets combined | 3-year validation on GBPAUD/US500/GBPNZD/GBPCHF | Asian Atom (19:00-03:00) + Symmetry Trap (03:00-12:00) | Sharpe 3.92
  ■■ For educational purposes only — test all strategies in simulation before live deployment.
  
+
 --- PAGE 194 ---
 The field resolves constraint deficits the same way across all markets.
 EUR/USD, GBP/USD, USD/CHF, USD/JPY, AUD/USD, NZD/USD, US500 —
