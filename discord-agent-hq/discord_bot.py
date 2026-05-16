@@ -31,6 +31,7 @@ PROGRESS_FILE = WORKSPACE / "PROJECT_PROGRESS_CLEAN.md"
 
 # ── State: which agent is active for @mentions ──
 active_agent = "hermes"  # default
+processed_messages = set()  # prevent duplicate responses
 
 
 def read_progress():
@@ -157,9 +158,19 @@ async def on_interaction(interaction: discord.Interaction):
 
 @bot.event
 async def on_message(message):
-    global active_agent
+    global active_agent, processed_messages
+
+    # Skip own messages
     if message.author == bot.user:
         return
+
+    # Prevent duplicate processing
+    if message.id in processed_messages:
+        return
+    processed_messages.add(message.id)
+    # Keep set from growing too large
+    if len(processed_messages) > 1000:
+        processed_messages.clear()
 
     bot_id = bot.user.id
     mentioned = f"<@{bot_id}>" in message.content or f"<@!{bot_id}>" in message.content
@@ -188,8 +199,13 @@ async def on_message(message):
 async def hermes_cmd(interaction: discord.Interaction, message: str):
     global active_agent
     active_agent = "hermes"
-    response = hermes_handle(message)
-    await interaction.response.send_message(response)
+    try:
+        response = hermes_handle(message)
+        await interaction.response.send_message(response)
+    except Exception as e:
+        print(f"[ERROR] hermes cmd: {e}")
+        if not interaction.response.is_done():
+            await interaction.response.send_message(f"Hermes error: {str(e)[:100]}")
 
 
 @tree.command(name="openclaw", description="Switch to OpenClaw and get a response")

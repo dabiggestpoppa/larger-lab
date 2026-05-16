@@ -1,18 +1,33 @@
 # 🟢 Hermes — Sub-Progress Log
 
-> **Agent:** Hermes (HR)
-> **Role:** Execution / Backtests / Reporting
+> **Agent:** Hermes (HR) — **v2**
+> **Role:** Execution / Backtests / Reporting / Tool Builder
 > **Sync Rule:** Every 3 updates → auto-sync to PROJECT_PROGRESS_CLEAN.md + update local memory
 > **Memory File:** `.hermes/MEMORY.md`
+> **Agent Prompt:** `agent-lab/agents/hermes/hermes_workspace/agent_prompt_v2.md`
+> **Skills Index:** `agent-lab/agents/hermes/hermes_workspace/SKILLS_INDEX.md`
 
 ---
 
-## Status: 🟡 Standby
+## Status: 🟢 Active — Phase 4 Ready
 
 ### Current Phase
-Awaiting task assignment from Overseer / OpenClaw
+SRRA-OPH Phase 4 — Workspace Integration (Active)
+
+### Skills Loaded (22)
+`vectorbt-expert` | `quant-analyst` | `quantitative-research` | `pandas-pro` | `scikit-learn` | `statistical-analysis` | `python-patterns` | `python-testing-patterns` | `skill-creator` | `pine-developer` | `pine-debugger` | `pine-manager` | `pine-publisher` | `pine-visualizer` | `tradingview-quantitative` | `mt5-strategy-tester` | `variance-analysis` | `senior-data-scientist` | `srra-oph-build` | `agent-team-workflow` | `as-code-review` | `twitter-bookmarks`
 
 ### Recent Entries
+
+#### 🟢 [HR] 2026-05-16 — v2 Upgrade Complete
+- Upgraded from v1 (basic backtesting) to v2 (full agent)
+- New agent prompt: `agent_prompt_v2.md` with complete protocol
+- Soul file created: `SOUL.md` (identity, personality, hard limits)
+- Skills index created: `SKILLS_INDEX.md` (all 22 skills mapped)
+- Skills copied to `agent-lab/agents/hermes/skills/` (local skill directory)
+- Team chat access: can now write to `shared-conversations/team-chat.md`
+- Memory updated: `.hermes/MEMORY.md` logged v2 upgrade
+- Ready for Phase 4 workspace integration tasks
 
 #### 🟢 [HR] 2026-05-15 12:10:00Z — Autopilot v2 Results (Iteration 15)
 - P90_CFD_Expansion (USDJPY): 0.01% return, 232 trades
@@ -25,9 +40,11 @@ Awaiting task assignment from Overseer / OpenClaw
 - Fixed position sizing: 10 micro lots with proper pip value
 - Updated hermes_autopilot_v3.py with corrected logic
 
-### Pending Tasks
-- [ ] Run data prep script (`nautilus/step1_prep_data.py`)
-- [ ] Execute P90 backtests on EURUSD, GBPUSD, USDJPY
-- [ ] Run parameter sweeps per strategy per pair
-- [ ] Implement Option A/B strategies from CEREBUS manual
-- [ ] FMP Audit skill for Telegram
+### Pending Tasks (Phase 4)
+- [ ] Run ALL tests: `test_phase2_e2e`, `test_phase3_e2e`, `test_phase4_e2e` — verify all pass
+- [ ] Write stress tests for Phase 3 (100+ anchors, concurrent access, patch kill under load)
+- [ ] Write stress tests for Book 2 components (collar fields under high conflict, consensus under partition)
+- [ ] Begin Phase 4 workspace integration: map OpenClaw→strategic synthesis, Hermes→execution, Nautilus→verification
+- [ ] Write test report to `srrs_opc/reports/hr_phase3_test_report.md`
+- [ ] Evaluate external GitHub repos (AgentMesh, Graphonomous, Neo4j, MemoryGraph MCP)
+- [ ] Convert cloned repos into agent tools/skills (backtesterpublic, market-structure, react-agent, unsloth)

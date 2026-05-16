@@ -1,11 +1,13 @@
 # Project Progress & Context — Current Build State
 
-> **Last Updated:** May 15, 2026
+> **Last Updated:** May 16, 2026
 > **Purpose:** Current building process and architecture status
+> **Current Phase:** Phase 4 — Workspace Integration
+> **Tests:** 23 passing (Phase 2: 7/7, Phase 3: 4/4, Book 2: 6/6, Phase 4: 6/6)
 
 ---
 
-## 🔴 [PM] Polymorph — Last Sync: 2026-05-16 02:45 UTC
+## 🔴 [PM] Polymorph — Last Sync: 2026-05-16 02:53 UTC
 
 *Auto-synced from `progress/polymorph-progress.md`*
 
@@ -23,7 +25,7 @@
 All 6 repos from `dabiggestpoppa` account now cloned to `C:\Users\wifik\Desktop\projects\`:
 
 ---
-## 🟡 [AS] Assistant Manager — Last Sync: 2026-05-16 02:45 UTC
+## 🟡 [AS] Assistant Manager — Last Sync: 2026-05-16 02:53 UTC
 
 *Auto-synced from `progress/assistant-progress.md`*
 
@@ -76,9 +78,19 @@ All 6 repos from `dabiggestpoppa` account now cloned to `C:\Users\wifik\Desktop\
 - **Next check**: Monitor OC/HR progress on delegated tasks
 
 ---
-## 🟢 [HR] Hermes — Last Sync: 2026-05-16 02:45 UTC
+## 🟢 [HR] Hermes — Last Sync: 2026-05-16 02:53 UTC
 
 *Auto-synced from `progress/hermes-progress.md`*
+
+#### 🟢 [HR] 2026-05-16 — v2 Upgrade Complete
+- Upgraded from v1 (basic backtesting) to v2 (full agent)
+- New agent prompt: `agent_prompt_v2.md` with complete protocol
+- Soul file created: `SOUL.md` (identity, personality, hard limits)
+- Skills index created: `SKILLS_INDEX.md` (all 22 skills mapped)
+- Skills copied to `agent-lab/agents/hermes/skills/` (local skill directory)
+- Team chat access: can now write to `shared-conversations/team-chat.md`
+- Memory updated: `.hermes/MEMORY.md` logged v2 upgrade
+- Ready for Phase 4 workspace integration tasks
 
 #### 🟢 [HR] 2026-05-15 12:10:00Z — Autopilot v2 Results (Iteration 15)
 - P90_CFD_Expansion (USDJPY): 0.01% return, 232 trades
@@ -123,7 +135,7 @@ All 6 repos from `dabiggestpoppa` account now cloned to `C:\Users\wifik\Desktop\
 - Updated hermes_autopilot_v3.py with corrected logic
 
 ---
-## 🟣 [OC] OpenClaw — Last Sync: 2026-05-16 02:45 UTC
+## 🟣 [OC] OpenClaw — Last Sync: 2026-05-16 02:53 UTC
 
 *Auto-synced from `progress/openclaw-progress.md`*
 
@@ -160,7 +172,7 @@ All 6 repos from `dabiggestpoppa` account now cloned to `C:\Users\wifik\Desktop\
 - **Note**: Separate Hermes/OpenClaw bot tokens still needed for independent bot instances
 
 ---
-## 🔵 [CC] Claude Code — Last Sync: 2026-05-16 02:45 UTC
+## 🔵 [CC] Claude Code — Last Sync: 2026-05-16 02:53 UTC
 
 *Auto-synced from `progress/claude-code-progress.md`*
 

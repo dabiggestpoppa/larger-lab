@@ -5,35 +5,35 @@
       "last_changed": "2026-05-16T02:37:28.487449+00:00",
       "update_count": 8,
       "last_sync_count": 8,
-      "last_sync_time": "2026-05-16T02:45:41.144492+00:00"
+      "last_sync_time": "2026-05-16T02:53:00.851227+00:00"
     },
     "OC": {
       "fingerprint": "1778898396.9314294:2703",
       "last_changed": "2026-05-16T02:27:03.254949+00:00",
       "update_count": 3,
       "last_sync_count": 3,
-      "last_sync_time": "2026-05-16T02:45:41.178495+00:00"
+      "last_sync_time": "2026-05-16T02:53:00.875233+00:00"
     },
     "HR": {
-      "fingerprint": "1778881416.494155:1224",
-      "last_changed": "2026-05-15T21:58:41.526665+00:00",
-      "update_count": 1,
-      "last_sync_count": 1,
-      "last_sync_time": "2026-05-16T02:45:41.213781+00:00"
+      "fingerprint": "1778899930.35543:2941",
+      "last_changed": "2026-05-16T02:52:46.734756+00:00",
+      "update_count": 3,
+      "last_sync_count": 3,
+      "last_sync_time": "2026-05-16T02:53:00.898956+00:00"
     },
     "AS": {
       "fingerprint": "1778899498.6177044:8235",
       "last_changed": "2026-05-16T02:45:36.797417+00:00",
       "update_count": 26,
       "last_sync_count": 26,
-      "last_sync_time": "2026-05-16T02:45:41.326789+00:00"
+      "last_sync_time": "2026-05-16T02:53:00.960441+00:00"
     },
     "PM": {
       "fingerprint": "1778896695.569341:2229",
       "last_changed": "2026-05-16T01:58:18.805971+00:00",
       "update_count": 3,
       "last_sync_count": 3,
-      "last_sync_time": "2026-05-16T02:45:41.270790+00:00"
+      "last_sync_time": "2026-05-16T02:53:00.928706+00:00"
     }
   },
   "files": {
@@ -59,6 +59,6 @@
     }
   },
   "total_updates": 0,
-  "last_sync_count": 41,
-  "last_sync_time": "2026-05-16T02:45:41.332791+00:00"
+  "last_sync_count": 43,
+  "last_sync_time": "2026-05-16T02:53:00.962466+00:00"
 }
