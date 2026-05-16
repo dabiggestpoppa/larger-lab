@@ -166,8 +166,22 @@ SRRA-OPH Phase 2 — Reconstruction + Recoverability
 - [x] Write tests for Phase 5 components (trajectory fields)
 - [x] Resource assessment complete
 - [x] Delegate tasks to OC and HR
-- [ ] Monitor OC progress on AgentMesh/Graphonomous API evaluation
-- [ ] Monitor HR progress on stress tests and workspace integration
+- [x] Monitor OC progress on AgentMesh/Graphonomous API evaluation
+- [x] Monitor HR progress on stress tests and workspace integration
+
+#### 🟡 [AS] 2026-05-16 08:00:00Z — OpenClaw 2 Setup Complete
+- Created `.openclaw-2/` config directory with valid OpenClaw schema
+- Configured Telegram @OC2BLRBOT (port 18790) — paired and working
+- Migrated 20 Hermes skills to `.openclaw-2/skills/`
+- Updated `.agent-tags.json` — HR → OC2
+- Updated `progress-sync.py` — OC2 added to AGENTS + CLI choices
+- Updated `team-chat.md` — OC2 online, Phase 6 tasks cleaned up, Phase 8 planning
+- Updated `AGENTS.md` — phase status → Phase 8
+- Updated `KEYS.md` — OC1 + OC2 bot tokens documented
+- Created startup shortcut `OpenClaw 2 Gateway.cmd` for auto-start
+- Discord channel config deferred (schema validation issue — Telegram working)
+- All 38 tests still passing ✅
+- **Next:** Add Discord config, implement Phase 8 components (Sovereignty Economics, Probabilistic Self-Models, MSR Compression)
 - [ ] Prepare Phase 4 component stubs based on resource assessment
 - [ ] Run cron check every 30min while stepping away
 - [ ] Review Phase 2 test results

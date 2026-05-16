@@ -6,7 +6,7 @@
 
 ---
 
-## Current Context (2026-05-16 08:39:49 UTC)
+## Current Context (2026-05-16 08:49:36 UTC)
 
 ### Status
 🟢 Active — Phase 8 Planning
@@ -15,23 +15,12 @@
 SRRA-OPH Phase 2 — Reconstruction + Recoverability
 
 ### Pending Tasks
-- Monitor OC progress on AgentMesh/Graphonomous API evaluation
-- Monitor HR progress on stress tests and workspace integration
 - Prepare Phase 4 component stubs based on resource assessment
 - Run cron check every 30min while stepping away
 - Review Phase 2 test results
 - Monitor team progress files
 
 ### Recent Activity
-#### 🟡 [AS] 2026-05-16 01:30:00Z — Resource Assessment Complete + Delegation
-- Completed full resource assessment: 12 repos/papers evaluated
-- 8 approved for integration, 2 deferred, 2 need investigation
-- Created `srrs_opc/docs/resource_assessment.md` with integration plan
-- Created `srrs_opc/docs/resource-reference.md` consolidated reference
-- Delegated tasks to OC (API evaluation, Neo4j schema, Phase 4 design) and HR (stress tests, workspace integration)
-- All tests verified: Phase 2 (7/7), Phase 3 (4/4), Book 2 (6/6) — all passing
-- Next: monitor OC/HR progress, prepare Phase 4 component stubs
-
 #### 🟡 [AS] 2026-05-16 01:00:00Z — Book 2 Integration: Phase 3-5 Updated Architecture
 - Read and analyzed updated Phase 3-5 plans (Book 2 integration)
 - Updated `srra-oph-build` skill to v2 with overlap-first architecture
@@ -56,16 +45,34 @@ SRRA-OPH Phase 2 — Reconstruction + Recoverability
 - **Current blockers**: None — all systems green
 - **Next check**: Monitor OC/HR progress on delegated tasks
 
+#### 🟡 [AS] 2026-05-16 08:00:00Z — OpenClaw 2 Setup Complete
+- Created `.openclaw-2/` config directory with valid OpenClaw schema
+- Configured Telegram @OC2BLRBOT (port 18790) — paired and working
+- Migrated 20 Hermes skills to `.openclaw-2/skills/`
+- Updated `.agent-tags.json` — HR → OC2
+- Updated `progress-sync.py` — OC2 added to AGENTS + CLI choices
+- Updated `team-chat.md` — OC2 online, Phase 6 tasks cleaned up, Phase 8 planning
+- Updated `AGENTS.md` — phase status → Phase 8
+- Updated `KEYS.md` — OC1 + OC2 bot tokens documented
+- Created startup shortcut `OpenClaw 2 Gateway.cmd` for auto-start
+- Discord channel config deferred (schema validation issue — Telegram working)
+- All 38 tests still passing ✅
+- **Next:** Add Discord config, implement Phase 8 components (Sovereignty Economics, Probabilistic Self-Models, MSR Compression)
+- [ ] Prepare Phase 4 component stubs based on resource assessment
+- [ ] Run cron check every 30min while stepping away
+- [ ] Review Phase 2 test results
+- [ ] Monitor team progress files
+
 ---
 
 ## Sync Metadata
-- **Last Sync:** 2026-05-16 08:39:49 UTC
+- **Last Sync:** 2026-05-16 08:49:36 UTC
 - **Progress File:** `progress/assistant-progress.md`
 - **Working Memory:** `progress/assistant-memory.md`
 - **Sync Threshold:** 3 updates
 
 ## Progress Sync Summary (AS)
-> **Last Sync:** 2026-05-16 08:39 UTC
+> **Last Sync:** 2026-05-16 08:49 UTC
 > **Status:** 🟢 Active — Phase 8 Planning
 > **Active Phase:** SRRA-OPH Phase 2 — Reconstruction + Recoverability
 > **Working Memory:** `progress/assistant-memory.md`

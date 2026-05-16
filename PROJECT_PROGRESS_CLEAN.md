@@ -88,16 +88,9 @@ Analyzed 5 external resources and implemented what we can NOW:
 All 6 repos from `dabiggestpoppa` account now cloned to `C:\Users\wifik\Desktop\projects\`:
 
 ---
-## 🟡 [AS] Assistant Manager — Last Sync: 2026-05-16 08:39 UTC
+## 🟡 [AS] Assistant Manager — Last Sync: 2026-05-16 08:49 UTC
 
 *Auto-synced from `progress/assistant-progress.md`*
-
-#### 🟡 [AS] 2026-05-16 00:00:00Z — Skills Assessment Complete
-- Reviewed all 9 phases of SRRA-OPH plan
-- Created `srra-oph-build` skill with full phase map, component patterns, testing requirements
-- Updated `agent-team-workflow` skill with AS role
-- Created `as-code-review` skill for quality checks
-- Phase 2 tests verified: 7/7 passing
 
 #### 🟡 [AS] 2026-05-16 00:30:00Z — Phase 6-9 Resource Assessment Task
 - Received Phase 6-9 plan with GitHub repos and research papers
@@ -139,6 +132,24 @@ All 6 repos from `dabiggestpoppa` account now cloned to `C:\Users\wifik\Desktop\
 - Cron check script created at `tools/as-cron-check.py`
 - **Current blockers**: None — all systems green
 - **Next check**: Monitor OC/HR progress on delegated tasks
+
+#### 🟡 [AS] 2026-05-16 08:00:00Z — OpenClaw 2 Setup Complete
+- Created `.openclaw-2/` config directory with valid OpenClaw schema
+- Configured Telegram @OC2BLRBOT (port 18790) — paired and working
+- Migrated 20 Hermes skills to `.openclaw-2/skills/`
+- Updated `.agent-tags.json` — HR → OC2
+- Updated `progress-sync.py` — OC2 added to AGENTS + CLI choices
+- Updated `team-chat.md` — OC2 online, Phase 6 tasks cleaned up, Phase 8 planning
+- Updated `AGENTS.md` — phase status → Phase 8
+- Updated `KEYS.md` — OC1 + OC2 bot tokens documented
+- Created startup shortcut `OpenClaw 2 Gateway.cmd` for auto-start
+- Discord channel config deferred (schema validation issue — Telegram working)
+- All 38 tests still passing ✅
+- **Next:** Add Discord config, implement Phase 8 components (Sovereignty Economics, Probabilistic Self-Models, MSR Compression)
+- [ ] Prepare Phase 4 component stubs based on resource assessment
+- [ ] Run cron check every 30min while stepping away
+- [ ] Review Phase 2 test results
+- [ ] Monitor team progress files
 
 ---
 ## 🟢 [HR] Hermes — Last Sync: 2026-05-16 06:43 UTC
