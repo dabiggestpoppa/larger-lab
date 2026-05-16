@@ -212,26 +212,19 @@ OCE Continuity Core (main.py)
 
 #### Tasks
 
-- [ ] **OCE-2.20** Integrate System Operator with Event Fabric
-  - System events (command executed, process started/stopped) → Event Fabric
-  - `system_run_command` emits `system.command.executed` event
-  - `system_kill_process` emits `system.process.killed` event
+- [x] **OCE-2.20** Integrate System Operator with Event Fabric ✅
+  - `tools/operator/event-integration.js` — Bridge layer with emit functions
+  - Events: `operator.command.executed`, `operator.process.killed`, `operator.package.installed`
 
-- [ ] **OCE-2.21** Integrate VS Code Controller with Event Fabric
-  - VS Code events (file opened, command run, git commit) → Event Fabric
-  - `vscode_open_file` emits `vscode.file.opened` event
-  - `vscode_git_commit` emits `vscode.git.committed` event
+- [x] **OCE-2.21** Integrate VS Code Controller with Event Fabric ✅
+  - `tools/operator/vscode-controller.js` — Full VS Code CLI control
+  - Events: `operator.vscode.file_opened`, `operator.vscode.file_edited`, `operator.vscode.command`, `operator.vscode.git_commit`
 
-- [ ] **OCE-2.22** Build Event Fabric debugging utilities
-  - `tools/operator/event-debug.js` — CLI for inspecting event flow
-  - `event_tail` — Live tail of events (like `tail -f`)
-  - `event_stats` — Event throughput and type distribution
-  - `event_replay` — Replay events from history for testing
+- [x] **OCE-2.22** Build Event Fabric debugging utilities ✅
+  - `tools/operator/event-debug.js` — CLI (tail, stats, replay, health, emit, types)
 
-- [ ] **OCE-2.23** Debug OCE-SRRA integration issues
-  - Monitor Event Fabric for integration failures
-  - Log and classify errors
-  - File: `oce/docs/integration-issues.md`
+- [x] **OCE-2.23** Debug OCE-SRRA integration issues ✅
+  - `oce/docs/integration-issues.md` — 7 issues identified, test checklist created
 
 ---
 
@@ -281,8 +274,8 @@ OCE Continuity Core (main.py)
 | Quality review | AS | `oce/docs/quality-review-phase2.md` | Pending |
 | API docs update | AS | `oce/docs/api-reference.md` | Pending |
 | Resource assessment | AS | `oce/docs/phase2-resources.md` | Pending |
-| Operator integration | PM | `tools/operator/` | Pending |
-| Debugging utilities | PM | `tools/operator/event-debug.js` | Pending |
+| Operator integration | PM | `tools/operator/event-integration.js` | ✅ |
+| Debugging utilities | PM | `tools/operator/event-debug.js` | ✅ |
 | DSPy classification | RL | `oce/backend/dspy_event_classifier.py` | Pending |
 | DSPy routing | RL | `oce/backend/dspy_event_router.py` | Pending |
 

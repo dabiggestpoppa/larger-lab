@@ -2,35 +2,35 @@
   "entries": {
     "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\.openclaw-2\\.openclaw\\openclaw.json": {
       "lastKnownGood": {
-        "hash": "3a9fe8875fa0943385432c850837432534db178e42025d3d9fee8a804fd13934",
-        "bytes": 6462,
-        "mtimeMs": 1778918759817.8235,
-        "ctimeMs": 1778918759817.8235,
+        "hash": "a0ba1551129fce67699729b5d8bc7e1ed633b808a2532b468cba3497638deb7b",
+        "bytes": 2885,
+        "mtimeMs": 1778960682880.1475,
+        "ctimeMs": 1778960682890.3455,
         "dev": "3465847700",
-        "ino": "2533274791387901",
+        "ino": "3940649673956610",
         "mode": 33206,
         "nlink": 1,
         "uid": 0,
         "gid": 0,
-        "hasMeta": false,
+        "hasMeta": true,
         "gatewayMode": "local",
-        "observedAt": "2026-05-16T18:22:32.396Z"
+        "observedAt": "2026-05-16T19:44:55.747Z"
       },
-      "lastObservedSuspiciousSignature": "8a8139eb53d0ae52a95aaad60e62391b387b2859326b4a4a5010f58a1259a489:size-drop-vs-last-good:6462->3178",
+      "lastObservedSuspiciousSignature": null,
       "lastPromotedGood": {
-        "hash": "3a9fe8875fa0943385432c850837432534db178e42025d3d9fee8a804fd13934",
-        "bytes": 6462,
-        "mtimeMs": 1778918759817.8235,
-        "ctimeMs": 1778918759817.8235,
+        "hash": "a0ba1551129fce67699729b5d8bc7e1ed633b808a2532b468cba3497638deb7b",
+        "bytes": 2885,
+        "mtimeMs": 1778960682880.1475,
+        "ctimeMs": 1778960682890.3455,
         "dev": "3465847700",
-        "ino": "2533274791387901",
+        "ino": "3940649673956610",
         "mode": 33206,
         "nlink": 1,
         "uid": 0,
         "gid": 0,
-        "hasMeta": false,
+        "hasMeta": true,
         "gatewayMode": "local",
-        "observedAt": "2026-05-16T18:22:32.396Z"
+        "observedAt": "2026-05-16T19:44:55.747Z"
       }
     }
   }

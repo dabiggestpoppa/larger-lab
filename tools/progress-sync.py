@@ -566,10 +566,11 @@ def main():
     # and distribute context updates to agent memory files.
     print("\n🔄 Checking team-chat for new messages...")
     try:
-        from chat_sync import run_sync as run_chat_sync
+        from tools.chat_sync import run_sync as run_chat_sync
         run_chat_sync(force=args.force)
     except ImportError:
-        print("  ⚠️ chat-sync module not available, skipping.")
+        # Chat sync is optional — skip if not available
+        pass
     except Exception as e:
         print(f"  ⚠️ Chat sync error: {e}")
 

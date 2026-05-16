@@ -114,6 +114,7 @@ The workspace self-sustains through automated memory management:
 | Workspace Cleanup | `tools/workspace_cleanup.py` | Detects loose files, oversized progress, empty/missing dirs |
 | Agent Movement Protocol | `AGENT_MOVEMENT.md` | Shared movement patterns, etiquette, SRRA compliance |
 | Daily Cron (OC2) | 7am daily | Full pipeline: sync → summarize → cleanup → team-chat |
+| Chat Sync | `tools/chat_sync.py` | Auto-syncs team-chat.md → agent memory files every 5 messages |
 
 **Sync threshold:** 7 updates (was 3). **Summarize threshold:** 20 entries.
 All agents maintain own memory hygiene. See `AGENT_MOVEMENT.md` for full protocol.

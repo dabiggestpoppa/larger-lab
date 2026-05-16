@@ -5124,5 +5124,32 @@
     },
     "endedAt": 1778950087687,
     "runtimeMs": 15023
+  },
+  "agent:main:telegram:direct:8258195396": {
+    "origin": {
+      "label": "F.B.O MAD👨🏾‍🔬 (@FBO_MAD) id:8258195396",
+      "provider": "telegram",
+      "surface": "telegram",
+      "chatType": "direct",
+      "from": "telegram:8258195396",
+      "to": "telegram:8258195396",
+      "accountId": "default"
+    },
+    "sessionId": "61cd4f6f-c0fb-4119-b861-350cb16af7fe",
+    "updatedAt": 1778960708287,
+    "sessionStartedAt": 1778960707898,
+    "deliveryContext": {
+      "channel": "telegram",
+      "to": "telegram:8258195396",
+      "accountId": "default"
+    },
+    "lastChannel": "telegram",
+    "lastTo": "telegram:8258195396",
+    "lastAccountId": "default",
+    "lastInteractionAt": 1778960708285,
+    "systemSent": false,
+    "abortedLastRun": false,
+    "chatType": "direct",
+    "sessionFile": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\.openclaw-2\\.openclaw\\agents\\main\\sessions\\61cd4f6f-c0fb-4119-b861-350cb16af7fe.jsonl"
   }
 }

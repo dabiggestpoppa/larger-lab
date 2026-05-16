@@ -277,20 +277,25 @@ def extract_key_updates(messages: list) -> dict:
                             update_parts.append(f"**{clean[:100]}**")
                             break
 
-            # For moderately relevant messages (mentioned in content), only add subject
-            elif score >= 2 and subject:
-                update_parts.append(f"**{subject}**")
-
-            # For general updates (score 1), only add phase transitions — not every bullet
-            elif score >= 1:
+            # For moderately relevant messages (mentioned but not directly addressed),
+            # only extract lines where this agent's tag appears as a task assignment
+            elif score >= 2:
                 for line in msg["content"]:
                     line_stripped = line.strip()
-                    # Only catch explicit phase transitions, not every line with "Phase"
-                    if any(m in line_stripped for m in ["Kickoff:", "Status Update:", "Complete.", "In Progress."]):
-                        clean = line_stripped.lstrip("#-*•").strip()
-                        if len(clean) > 10 and len(clean) < 150:
-                            update_parts.append(clean[:120])
-                            break
+                    agent_ids = [id.lower() for id in AGENTS[tag]["chat_identifiers"]]
+                    if any(aid in line_stripped.lower() for aid in agent_ids):
+                        # Must be a task/action line — skip broadcast headers
+                        if any(m in line_stripped for m in ["**TASK", "**ACTION", "→ **", "- [ ]", "- [x]", "Stand by", "Start ", "First Action"]):
+                            clean = line_stripped.lstrip("#-*•").strip()
+                            if len(clean) > 5 and len(clean) < 150:
+                                update_parts.append(clean[:120])
+                        # Also catch "**Agent:** task description" patterns
+                        elif re.match(r"\*\*[A-Z]{2}[:\*]", line_stripped):
+                            clean = line_stripped.lstrip("#-*•").strip()
+                            if len(clean) > 5 and len(clean) < 150:
+                                update_parts.append(clean[:120])
+
+            # For general updates (score 1), skip — too noisy
 
             # Deduplicate and limit
             if update_parts:
