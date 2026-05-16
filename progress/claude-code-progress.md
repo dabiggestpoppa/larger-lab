@@ -2,7 +2,7 @@
 
 > **Agent:** Claude Code (CC)
 > **Role:** Overseer / Architecture / Coding
-> **Sync Rule:** Every 3 updates → auto-sync to PROJECT_PROGRESS_CLEAN.md + update local memory
+> **Sync Rule:** Every 7 updates → auto-sync to PROJECT_PROGRESS_CLEAN.md + update local memory. Every 20 entries → LLM summarization.
 
 ---
 
@@ -10,6 +10,14 @@
 
 ### Current Phase
 SRRA-OPH Phase 1 — Foundational Observer Mesh (COMPLETED)
+
+#### 📢 [SYSTEM] 2026-05-16 — Workspace Optimization Update (PM)
+- New memory sync daemon: auto-sync every 7 updates, auto-summarize every 20 entries via LLM
+- New tools: `memory_sync_daemon.py`, `summarize_progress.py`, `workspace_cleanup.py`
+- New protocol: `AGENT_MOVEMENT.md` — agent movement patterns, shared space etiquette
+- Sync threshold changed: 3→7 updates. All progress files updated.
+- OC2 daily cron added: Memory Sync & Summarization (7am)
+- See `AGENT_MOVEMENT.md` for full protocol
 
 ### Recent Entries
 
@@ -100,9 +108,11 @@ SRRA-OPH Phase 1 — Foundational Observer Mesh (COMPLETED)
 - [ ] Phase 6-9: Implement per plan (AS resource assessment in progress)
 - [x] OCE-1.1: Design Continuity Core API (FastAPI) ✅ DONE
 - [x] OCE-1.2: Create SRRA-OPH substrate adapter layer ✅ DONE
-- [ ] OCE-1.3: Implement event fabric bridge (Redis Streams)
-- [ ] OCE-1.4: Design observer state persistence model
+- [ ] OCE-1.3: Implement event fabric bridge (Redis Streams) — Phase 2
+- [ ] OCE-1.4: Design observer state persistence model — Phase 2
 - [x] OCE-1.5: Create OCE project structure and documentation ✅ DONE
+- [x] OCE-1.6: Create Next.js frontend scaffold (layout, page, globals.css, configs) ✅ DONE
+- [x] OCE-1.7: Respond to AS's 4 open questions in team chat ✅ DONE
 
 ---
 

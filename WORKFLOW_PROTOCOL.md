@@ -45,23 +45,35 @@ Each agent has two memory layers:
    - CC: `MEMORY.md` (workspace root)
    - OC: `.openclaw/MEMORY.md`
    - HR: `.hermes/MEMORY.md`
-2. **Working Memory** (auto-synced from sub-progress every 3 updates):
+2. **Working Memory** (auto-synced from sub-progress every 7 updates):
    - CC: `progress/claude-code-memory.md`
    - OC: `progress/openclaw-memory.md`
    - HR: `progress/hermes-memory.md`
+   - PM: `progress/polymorph-memory.md`
+   - AS: `progress/assistant-memory.md`
+   - RL: `progress/rl-memory.md`
 
 ### Sync Workflow
 ```
-Agent writes to sub-progress → every 3 updates:
+Agent writes to sub-progress → every 7 updates:
   1. Sync → PROJECT_PROGRESS_CLEAN.md (agent's tagged section)
   2. Sync → working memory file (compact, task-focused)
   3. Append summary → persistent memory (no overwrite)
   4. Sync → /memories/repo/workspace-state.md (global)
+
+Every 20 entries in progress file:
+  5. LLM summarization → oldest entries compressed via Nemotron 3 Nano Omni
+  6. Newest 5 entries preserved in full
 ```
 
 Run sync: `python tools/progress-sync.py`
 Force sync: `python tools/progress-sync.py --force`
 Check status: `python tools/progress-sync.py --status`
+Summarize: `python tools/summarize_progress.py --agent {TAG}`
+Cleanup: `python tools/workspace_cleanup.py`
+Start daemon: `python tools/memory_sync_daemon.py --background`
+
+Full protocol: See `AGENT_MOVEMENT.md`
 
 ---
 

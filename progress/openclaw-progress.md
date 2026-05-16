@@ -2,7 +2,7 @@
 
 > **Agent:** OpenClaw (OC)
 > **Role:** Analysis / Planning / Coordination
-> **Sync Rule:** Every 3 updates → auto-sync to PROJECT_PROGRESS_CLEAN.md + update local memory
+> **Sync Rule:** Every 7 updates → auto-sync to PROJECT_PROGRESS_CLEAN.md + update local memory. Every 20 entries → LLM summarization.
 > **Memory File:** `.openclaw/MEMORY.md`
 
 ---
@@ -11,6 +11,14 @@
 
 ### Current Phase
 P90 Pine → Nautilus Conversion + Backtest Engine
+
+#### 📢 [SYSTEM] 2026-05-16 — Workspace Optimization Update (PM)
+- New memory sync daemon: auto-sync every 7 updates, auto-summarize every 20 entries via LLM
+- New tools: `memory_sync_daemon.py`, `summarize_progress.py`, `workspace_cleanup.py`
+- New protocol: `AGENT_MOVEMENT.md` — agent movement patterns, shared space etiquette
+- Sync threshold changed: 3→7 updates. All progress files updated.
+- OC2 daily cron added: Memory Sync & Summarization (7am)
+- See `AGENT_MOVEMENT.md` for full protocol
 
 ### Recent Entries
 

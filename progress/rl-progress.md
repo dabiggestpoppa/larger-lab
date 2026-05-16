@@ -1,8 +1,16 @@
 # 🦉 [RL] OWL — Research Lead Progress
 
-> Auto-synced to PROJECT_PROGRESS_CLEAN.md every 3 updates
+> Auto-synced to PROJECT_PROGRESS_CLEAN.md every 7 updates. Every 20 entries → LLM summarization.
 
 ---
+
+#### 📢 [SYSTEM] 2026-05-16 — Workspace Optimization Update (PM)
+- New memory sync daemon: auto-sync every 7 updates, auto-summarize every 20 entries via LLM
+- New tools: `memory_sync_daemon.py`, `summarize_progress.py`, `workspace_cleanup.py`
+- New protocol: `AGENT_MOVEMENT.md` — agent movement patterns, shared space etiquette
+- Sync threshold changed: 3→7 updates. All progress files updated.
+- OC2 daily cron added: Memory Sync & Summarization (7am)
+- See `AGENT_MOVEMENT.md` for full protocol
 
 #### 🦉 [RL] 2026-05-16 — DSPy + Pydantic Integration Complete
 - **Pydantic:** Converted `CollarState` from `@dataclass` to `BaseModel` with validation (confidence: 0.0-1.0 range)

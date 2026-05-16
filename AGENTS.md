@@ -81,9 +81,13 @@
 | `oce/frontend/` | Next.js Shell UI |
 | `progress/` | Agent sub-progress files + memory |
 | `shared-conversations/team-chat.md` | Team coordination hub |
-| `tools/progress-sync.py` | Auto-sync agent progress → main files |
+| `tools/progress-sync.py` | Auto-sync agent progress → main files (7-update threshold) |
+| `tools/memory_sync_daemon.py` | Background memory tracker (60s scan, 7-update sync, 20-entry summarize) |
+| `tools/summarize_progress.py` | LLM progress summarization (Nemotron 3 Nano Omni via OpenRouter) |
+| `tools/workspace_cleanup.py` | Loose file detection, oversized progress, empty/missing dirs |
 | `tools/phase-gate.py` | Phase transition manager |
 | `tools/cc-workflow.py` | CC continuous workflow engine |
+| `AGENT_MOVEMENT.md` | Agent movement protocol, shared space etiquette, SRRA compliance |
 | `.agent-tags.json` | Agent registry |
 | `.phase-state.json` | Phase tracking state |
 
@@ -98,6 +102,21 @@ Each agent has two memory layers:
 The workspace files ARE the global memory. Keep them updated.
 
 ---
+
+## Workspace Optimization (Active)
+
+The workspace self-sustains through automated memory management:
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| Memory Sync Daemon | `tools/memory_sync_daemon.py` | Background scanner (60s), syncs at 7 updates, summarizes at 20 entries |
+| Progress Summarizer | `tools/summarize_progress.py` | LLM compression via Nemotron 3 Nano Omni (OpenRouter, free) |
+| Workspace Cleanup | `tools/workspace_cleanup.py` | Detects loose files, oversized progress, empty/missing dirs |
+| Agent Movement Protocol | `AGENT_MOVEMENT.md` | Shared movement patterns, etiquette, SRRA compliance |
+| Daily Cron (OC2) | 7am daily | Full pipeline: sync → summarize → cleanup → team-chat |
+
+**Sync threshold:** 7 updates (was 3). **Summarize threshold:** 20 entries.
+All agents maintain own memory hygiene. See `AGENT_MOVEMENT.md` for full protocol.
 
 ## Build Rules
 

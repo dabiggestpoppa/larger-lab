@@ -1,12 +1,13 @@
+// Only add session reset and agent timeout — merge recursively
 {
-  "session": {
-    "reset": {
-      "idleMinutes": 120
+  session: {
+    reset: {
+      idleMinutes: 120
     }
   },
-  "agents": {
-    "defaults": {
-      "timeoutSeconds": 600
+  agents: {
+    defaults: {
+      timeoutSeconds: 600
     }
   }
 }

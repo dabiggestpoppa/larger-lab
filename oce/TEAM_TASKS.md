@@ -48,10 +48,10 @@
 - Execution layer integration
 
 ### Tasks
-- [ ] **OCE-3.1** Set up Next.js frontend project
-- [ ] **OCE-3.2** Implement continuity chat UI
-- [ ] **OCE-3.3** Create live observer status panel
-- [ ] **OCE-3.4** Build event stream view component
+- [x] **OCE-3.1** Set up Next.js frontend project ✅ (scaffold created by CC)
+- [x] **OCE-3.2** Implement continuity chat UI ✅ (in page.tsx)
+- [x] **OCE-3.3** Create live observer status panel ✅ (in page.tsx)
+- [x] **OCE-3.4** Build event stream view component ✅ (WebSocket in page.tsx)
 - [ ] **OCE-3.5** Test OCE shell with SRRA-OPH substrate
 
 ---

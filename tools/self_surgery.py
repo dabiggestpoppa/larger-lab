@@ -32,6 +32,11 @@ import sqlite3
 import sys
 from datetime import datetime, timezone
 
+# Fix Windows console encoding
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 WORKSPACE = r"C:\Users\wifik\Desktop\projects\larger-lab"
 BACKUP_DIR = os.path.join(WORKSPACE, ".surgery-backups")
 DB_PATH = os.path.join(WORKSPACE, "db", "owl_health.db")

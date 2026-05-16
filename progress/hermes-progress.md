@@ -2,7 +2,7 @@
 
 > **Agent:** Hermes (HR) — **v2**
 > **Role:** Execution / Backtests / Reporting / Tool Builder
-> **Sync Rule:** Every 3 updates → auto-sync to PROJECT_PROGRESS_CLEAN.md + update local memory
+> **Sync Rule:** Every 7 updates → auto-sync to PROJECT_PROGRESS_CLEAN.md + update local memory. Every 20 entries → LLM summarization.
 > **Memory File:** `.hermes/MEMORY.md`
 > **Agent Prompt:** `agent-lab/agents/hermes/hermes_workspace/agent_prompt_v2.md`
 > **Skills Index:** `agent-lab/agents/hermes/hermes_workspace/SKILLS_INDEX.md`
@@ -13,6 +13,14 @@
 
 ### Current Phase
 SRRA-OPH Phase 4 — Workspace Integration (Active)
+
+#### 📢 [SYSTEM] 2026-05-16 — Workspace Optimization Update (PM)
+- New memory sync daemon: auto-sync every 7 updates, auto-summarize every 20 entries via LLM
+- New tools: `memory_sync_daemon.py`, `summarize_progress.py`, `workspace_cleanup.py`
+- New protocol: `AGENT_MOVEMENT.md` — agent movement patterns, shared space etiquette
+- Sync threshold changed: 3→7 updates. All progress files updated.
+- OC2 daily cron added: Memory Sync & Summarization (7am)
+- See `AGENT_MOVEMENT.md` for full protocol
 
 ### Skills Loaded (22)
 `vectorbt-expert` | `quant-analyst` | `quantitative-research` | `pandas-pro` | `scikit-learn` | `statistical-analysis` | `python-patterns` | `python-testing-patterns` | `skill-creator` | `pine-developer` | `pine-debugger` | `pine-manager` | `pine-publisher` | `pine-visualizer` | `tradingview-quantitative` | `mt5-strategy-tester` | `variance-analysis` | `senior-data-scientist` | `srra-oph-build` | `agent-team-workflow` | `as-code-review` | `twitter-bookmarks`

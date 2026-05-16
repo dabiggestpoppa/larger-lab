@@ -2,7 +2,7 @@
 
 > **Agent:** OpenClaw 2 (OC2)
 > **Role:** Execution / Backtests / Reporting / Discord + Telegram
-> **Sync Rule:** Every 3 updates → auto-sync to PROJECT_PROGRESS_CLEAN.md
+> **Sync Rule:** Every 7 updates → auto-sync to PROJECT_PROGRESS_CLEAN.md + update local memory. Every 20 entries → LLM summarization.
 > **Memory File:** `.openclaw-2/MEMORY.md`
 > **Replaces:** Hermes (HR)
 
@@ -12,6 +12,14 @@
 
 ### Current Phase
 SRRA-OPH Phase 8 — Sovereign Coevolution (Planned)
+
+#### 📢 [SYSTEM] 2026-05-16 — Workspace Optimization Update (PM)
+- New memory sync daemon: auto-sync every 7 updates, auto-summarize every 20 entries via LLM
+- New tools: `memory_sync_daemon.py`, `summarize_progress.py`, `workspace_cleanup.py`
+- New protocol: `AGENT_MOVEMENT.md` — agent movement patterns, shared space etiquette
+- Sync threshold changed: 3→7 updates. All progress files updated.
+- OC2 daily cron added: Memory Sync & Summarization (7am)
+- See `AGENT_MOVEMENT.md` for full protocol
 
 ### Recent Entries
 

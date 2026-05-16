@@ -2,12 +2,20 @@
 
 > **Agent:** Assistant Manager (AS)
 > **Role:** Context Monitoring / Task Support / Quality Checks / Documentation
-> **Sync Rule:** Every 3 updates → auto-sync to PROJECT_PROGRESS_CLEAN.md + update local memory
+> **Sync Rule:** Every 7 updates → auto-sync to PROJECT_PROGRESS_CLEAN.md + update local memory. Every 20 entries → LLM summarization.
 > **Reports to:** CC (Claude Code)
 
 ---
 
 ## Status: 🟢 Active — OCE Phase 1 Support
+
+#### 📢 [SYSTEM] 2026-05-16 — Workspace Optimization Update (PM)
+- New memory sync daemon: auto-sync every 7 updates, auto-summarize every 20 entries via LLM
+- New tools: `memory_sync_daemon.py`, `summarize_progress.py`, `workspace_cleanup.py`
+- New protocol: `AGENT_MOVEMENT.md` — agent movement patterns, shared space etiquette
+- Sync threshold changed: 3→7 updates. All progress files updated.
+- OC2 daily cron added: Memory Sync & Summarization (7am)
+- See `AGENT_MOVEMENT.md` for full protocol
 
 ### Current Test Status (May 16, 2026)
 - Phase 1: 3/3 passing ✅

@@ -1,3 +1,7 @@
+"""Script to write the fixed srrs_adapter.py"""
+import os
+
+content = '''\
 """
 SRRA-OPH Substrate Adapter for OCE
 ==================================
@@ -114,7 +118,7 @@ class SRRSAdapter:
 
             status.append({
                 "observer_id": name,
-                "state": "active" if patch_status.get("is_stable", False) else "repairing",
+                "state": patch_status.get("state", "active"),
                 "entropy": collar_entropy,
                 "task": patch_status.get("current_task", "none"),
             })
@@ -234,8 +238,8 @@ class SRRSAdapter:
         for name, patch in self._patches.items():
             status = patch.get_status()
             patch_health[name] = {
-                "state": "active" if status.get("is_stable", False) else "repairing",
-                "healthy": status.get("is_stable", False),
+                "state": status.get("state", "unknown"),
+                "healthy": status.get("state") == "active",
             }
 
         return {
@@ -282,3 +286,9 @@ async def get_adapter() -> SRRSAdapter:
         _adapter = SRRSAdapter()
         await _adapter.initialize()
     return _adapter
+'''
+
+target = os.path.join(os.path.dirname(__file__), 'srrs_adapter.py')
+with open(target, 'w', encoding='utf-8') as f:
+    f.write(content)
+print(f'Wrote {len(content)} bytes to {target}')
