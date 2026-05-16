@@ -58,6 +58,15 @@ from .operator_continuity import OperatorContinuityTracker, SessionAnchor, Strat
 from .bidirectional_coherence import BidirectionalCoherenceEngine, FeedbackEvent
 from .anti_manipulation import AntiManipulationSafeguards, ManipulationRisk
 
+# Phase 9: Entropy Economics
+from .coherence_yield_analyzer import CoherenceYieldAnalyzer, YieldRecord
+from .entropy_budget_manager import EntropyBudgetManager, EntropyBudget
+from .recoverability_economics import RecoverabilityEconomics, RecoveryCostRecord
+from .adaptive_compression_engine import AdaptiveCompressionEngine, CompressionRecord
+from .sync_cost_optimizer import SyncCostOptimizer, SyncDecision
+from .resource_constrained_cognition import ResourceConstrainedCognition, PrioritizedOperation, OperationPriority
+from .sustainability_governance import SustainabilityGovernance, OptimizationCandidate, GovernanceDecision
+
 __all__ = [
     # Phase 1
     "BasePatch", "CollarState",
@@ -89,4 +98,12 @@ __all__ = [
     "OperatorContinuityTracker", "SessionAnchor", "StrategicTrajectory",
     "BidirectionalCoherenceEngine", "FeedbackEvent",
     "AntiManipulationSafeguards", "ManipulationRisk",
+    # Phase 9
+    "CoherenceYieldAnalyzer", "YieldRecord",
+    "EntropyBudgetManager", "EntropyBudget",
+    "RecoverabilityEconomics", "RecoveryCostRecord",
+    "AdaptiveCompressionEngine", "CompressionRecord",
+    "SyncCostOptimizer", "SyncDecision",
+    "ResourceConstrainedCognition", "PrioritizedOperation", "OperationPriority",
+    "SustainabilityGovernance", "OptimizationCandidate", "GovernanceDecision",
 ]

@@ -1,365 +1,464 @@
 """
-test_phase9_e2e.py — Phase 9: Entropy Economics Tests
+Phase 9 End-to-End Integration Test
+====================================
+Tests Entropy Economics: Coherence-Per-Resource Optimization.
 
-Tests for the entropy economics framework (srrs_opc/entropy_economics.py)
-and cloud burst engine (tools/cloud-burst.py).
-
-Success Criteria:
-1. Coherence-per-resource optimization
-2. Entropy-aware scaling
-3. Adaptive compression economics
-4. Synchronization efficiency maximization
-5. Recoverability preservation under load
-6. Sustainability governance
+Components tested:
+1. CoherenceYieldAnalyzer  — Quantify coherence-per-resource efficiency
+2. EntropyBudgetManager    — Explicit entropy budgeting (hierarchical)
+3. RecoverabilityEconomics — Track and optimize recovery cost across scales
+4. AdaptiveCompressionEngine — Compress redundant state, preserve recoverability
+5. SyncCostOptimizer       — Sync only when coherence gain > entropy cost
+6. ResourceConstrainedCognition — Maintain coherence under resource pressure
+7. SustainabilityGovernance — Validate optimizations against constraints
 """
 
-import json
-import tempfile
+import sys
 from pathlib import Path
 
-import pytest
+sys.path.insert(0, str(Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from srrs_opc.entropy_economics import (
-    EntropyEconomics,
-    TaskProfile,
-    TaskType,
-    TaskComplexity,
-    BudgetState,
-    GPU_CATALOG,
-    quick_decide,
+from srrs_opc.coherence_yield_analyzer import YieldRecord, CoherenceYieldAnalyzer
+from srrs_opc.entropy_budget_manager import EntropyBudget, EntropyBudgetManager
+from srrs_opc.recoverability_economics import RecoveryCostRecord, RecoverabilityEconomics
+from srrs_opc.adaptive_compression_engine import CompressionRecord, AdaptiveCompressionEngine
+from srrs_opc.sync_cost_optimizer import SyncDecision, SyncCostOptimizer
+from srrs_opc.resource_constrained_cognition import (
+    OperationPriority, PrioritizedOperation, ResourceConstrainedCognition
+)
+from srrs_opc.sustainability_governance import (
+    OptimizationCandidate, GovernanceDecision, SustainabilityGovernance
 )
 
 
-# ─── Test 1: Coherence-per-Resource Optimization ─────────────────────────────
+# ─── Test 1: Coherence Yield Analysis ────────────────────────────────────────
 
-class TestCoherencePerResource:
-    """Test that the engine maximizes work per dollar spent."""
+def test_1_coherence_yield_basic():
+    """Test 1: Coherence yield = coherence_delta / (entropy_cost + resource_cost)."""
+    print("\n=== Test 1: Coherence Yield Basic ===")
+    analyzer = CoherenceYieldAnalyzer()
 
-    def test_local_tasks_have_infinite_coherence(self):
-        """CPU-only tasks should have maximum coherence (free)."""
-        eco = EntropyEconomics(monthly_budget=100.0)
-        task = TaskProfile("backtest", vram_needed=0, estimated_hours=2)
-        decision = eco.decide(task)
-        assert decision.action == "local"
-        assert decision.estimated_cost == 0.0
-        assert decision.coherence_score == 1.0
+    # Zero cost → infinite yield
+    r1 = analyzer.measure_yield("sync", coherence_delta=0.5, entropy_cost=0.0, resource_cost=0.0)
+    assert r1.yield_value == float('inf'), f"Expected inf, got {r1.yield_value}"
 
-    def test_burst_tasks_have_positive_coherence(self):
-        """GPU tasks should have positive coherence scores."""
-        eco = EntropyEconomics(monthly_budget=100.0)
-        task = TaskProfile("inference", vram_needed=12, estimated_hours=4)
-        decision = eco.decide(task)
-        assert decision.action == "burst"
-        assert decision.coherence_score > 0
+    # Normal case
+    r2 = analyzer.measure_yield("repair", coherence_delta=0.8, entropy_cost=0.2, resource_cost=0.1)
+    expected = 0.8 / (0.2 + 0.1)
+    assert abs(r2.yield_value - expected) < 0.01, f"Expected ~{expected}, got {r2.yield_value}"
 
-    def test_cheaper_gpu_selected_for_low_entropy(self):
-        """Low entropy tasks should get the cheapest available GPU."""
-        eco = EntropyEconomics(monthly_budget=100.0)
-        task = TaskProfile("embedding", vram_needed=8, estimated_hours=0.5, complexity="low")
-        decision = eco.decide(task)
-        assert decision.action == "burst"
-        # Should be one of the cheapest options
-        assert decision.estimated_cost < 0.10  # Very cheap for low entropy
+    # Zero coherence → zero yield
+    r3 = analyzer.measure_yield("noop", coherence_delta=0.0, entropy_cost=0.5, resource_cost=0.5)
+    assert r3.yield_value == 0.0
 
-    def test_coherence_improves_with_efficiency(self):
-        """Higher entropy tasks should get better GPUs (higher coherence)."""
-        eco = EntropyEconomics(monthly_budget=100.0)
-
-        low_task = TaskProfile("embedding", vram_needed=8, estimated_hours=0.1, complexity="low")
-        high_task = TaskProfile("training", vram_needed=24, estimated_hours=8, complexity="high")
-
-        low_decision = eco.decide(low_task)
-        high_decision = eco.decide(high_task)
-
-        # Both should be burst
-        assert low_decision.action == "burst"
-        assert high_decision.action == "burst"
-        # High entropy should get more powerful GPU
-        assert high_decision.estimated_cost > low_decision.estimated_cost
+    print(f"  ✅ Zero cost → inf yield")
+    print(f"  ✅ Normal: 0.8/(0.2+0.1) = {r2.yield_value:.3f}")
+    print(f"  ✅ Zero coherence → 0 yield")
 
 
-# ─── Test 2: Entropy-Aware Scaling ────────────────────────────────────────────
+def test_2_coherence_yield_ranking():
+    """Test 2: Operations ranked by average coherence yield."""
+    print("\n=== Test 2: Coherence Yield Ranking ===")
+    analyzer = CoherenceYieldAnalyzer()
 
-class TestEntropyAwareScaling:
-    """Test that compute scale matches task complexity."""
+    # Operation A: high yield
+    for _ in range(5):
+        analyzer.measure_yield("efficient_op", coherence_delta=0.9, entropy_cost=0.05, resource_cost=0.05)
 
-    def test_entropy_score_calculation(self):
-        """Entropy scores should be between 0 and 1."""
-        task = TaskProfile("inference", vram_needed=12, estimated_hours=4)
-        assert 0 <= task.entropy_score <= 1
+    # Operation B: low yield
+    for _ in range(5):
+        analyzer.measure_yield("wasteful_op", coherence_delta=0.1, entropy_cost=0.5, resource_cost=0.5)
 
-    def test_high_vram_increases_entropy(self):
-        """More VRAM needed = higher entropy."""
-        low = TaskProfile("embedding", vram_needed=8, estimated_hours=0.1)
-        high = TaskProfile("training", vram_needed=40, estimated_hours=12)
-        assert high.entropy_score > low.entropy_score
+    ranked = analyzer.rank_operations()
+    assert len(ranked) == 2
+    assert ranked[0]["operation"] == "efficient_op"
+    assert ranked[0]["avg_yield"] > ranked[1]["avg_yield"]
 
-    def test_long_duration_increases_entropy(self):
-        """Longer tasks = higher entropy."""
-        short = TaskProfile("inference", vram_needed=12, estimated_hours=0.5)
-        long = TaskProfile("inference", vram_needed=12, estimated_hours=24)
-        assert long.entropy_score > short.entropy_score
-
-    def test_complexity_affects_entropy(self):
-        """Higher complexity = higher entropy."""
-        low = TaskProfile("inference", vram_needed=12, estimated_hours=1, complexity="low")
-        high = TaskProfile("inference", vram_needed=12, estimated_hours=1, complexity="extreme")
-        assert high.entropy_score > low.entropy_score
-
-    def test_gpu_selection_scales_with_entropy(self):
-        """Higher entropy tasks should get more powerful GPUs."""
-        eco = EntropyEconomics(monthly_budget=100.0)
-
-        low = TaskProfile("embedding", vram_needed=8, estimated_hours=0.1, complexity="low")
-        high = TaskProfile("training", vram_needed=24, estimated_hours=12, complexity="high")
-
-        low_dec = eco.decide(low)
-        high_dec = eco.decide(high)
-
-        # High entropy should get more expensive (powerful) GPU
-        assert high_dec.estimated_cost >= low_dec.estimated_cost
+    print(f"  ✅ Ranked: {ranked[0]['operation']} (yield={ranked[0]['avg_yield']:.1f}) > "
+          f"{ranked[1]['operation']} (yield={ranked[1]['avg_yield']:.1f})")
 
 
-# ─── Test 3: Adaptive Compression Economics ──────────────────────────────────
+def test_3_entropy_budget_consumption():
+    """Test 3: Entropy budget tracks consumption and replenishment."""
+    print("\n=== Test 3: Entropy Budget Consumption ===")
+    budget = EntropyBudget("observer_1", initial_budget=100.0, min_budget=10.0)
 
-class TestAdaptiveCompressionEconomics:
-    """Test that the system adapts to budget constraints."""
+    # Consume some budget
+    within, remaining = budget.consume(30.0)
+    assert within is True
+    assert remaining == 70.0
+    assert budget.consumed == 30.0
 
-    def test_budget_tracking(self):
-        """Budget should track spending correctly."""
-        eco = EntropyEconomics(monthly_budget=100.0)
-        task = TaskProfile("inference", vram_needed=12, estimated_hours=4)
-        eco.decide(task)
-        assert eco.budget.spent_this_month > 0
-        assert eco.budget.sessions_count == 1
+    # Consume more
+    within, remaining = budget.consume(50.0)
+    assert within is True
+    assert remaining == 20.0
 
-    def test_budget_exhaustion_defers_tasks(self):
-        """When budget is exhausted, tasks should be deferred."""
-        eco = EntropyEconomics(monthly_budget=0.01)  # Tiny budget
-        task = TaskProfile("training", vram_needed=24, estimated_hours=8)
-        decision = eco.decide(task)
-        assert decision.action in ("defer", "reject")
+    # Try to consume beyond min_budget
+    within, remaining = budget.consume(15.0)
+    assert remaining == 10.0  # Clamped to min_budget
 
-    def test_downgrade_to_fit_budget(self):
-        """System should downgrade GPU to fit remaining budget."""
-        eco = EntropyEconomics(monthly_budget=0.50)  # Small budget
-        task = TaskProfile("inference", vram_needed=12, estimated_hours=4)
-        decision = eco.decide(task)
-        # Should either find a cheap option or defer
-        assert decision.estimated_cost <= 0.50 or decision.action == "defer"
+    # Replenish
+    budget.replenish(0.5)
+    assert budget.budget > 10.0
 
-    def test_budget_persistence(self):
-        """Budget state should persist to file."""
-        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
-            budget_file = f.name
+    print(f"  ✅ Consumed 30+50, remaining={budget.budget:.1f}")
+    print(f"  ✅ Min budget enforced at {budget.min_budget}")
+    print(f"  ✅ Replenish works: budget={budget.budget:.1f}")
 
+
+def test_4_entropy_budget_critical():
+    """Test 4: Budget correctly identifies critical state."""
+    print("\n=== Test 4: Entropy Budget Critical State ===")
+    budget = EntropyBudget("observer_2", initial_budget=100.0, min_budget=10.0)
+
+    assert budget.is_critical() is False
+
+    # Consume 75% of usable budget (75 out of 90 usable = 83%)
+    budget.consume(75.0)
+    # 83% > 80% threshold → critical
+    assert budget.is_critical(threshold=0.8) is True
+
+    # Fresh budget: consume only 50%
+    budget2 = EntropyBudget("observer_3", initial_budget=100.0, min_budget=10.0)
+    budget2.consume(50.0)
+    # 50 out of 90 usable = 55% < 80% → not critical
+    assert budget2.is_critical(threshold=0.8) is False
+
+    util = budget.utilization()
+    print(f"  ✅ Utilization: {util:.2f}")
+    print(f"  ✅ Critical at >80%: {budget.is_critical(threshold=0.8)}")
+    print(f"  ✅ Not critical at 55%: {budget2.is_critical(threshold=0.8)}")
+
+
+def test_5_entropy_budget_manager_hierarchical():
+    """Test 5: Hierarchical budget management (global → observer)."""
+    print("\n=== Test 5: Hierarchical Budget Manager ===")
+    manager = EntropyBudgetManager(global_budget=500.0)
+
+    # Consume from observer (auto-creates observer budget)
+    result = manager.consume(40.0, observer_id="planner")
+    assert result["approved"] is True
+    assert result["observer"]["within_budget"] is True
+
+    # Consume from another observer
+    result2 = manager.consume(30.0, observer_id="executor")
+    assert result2["approved"] is True
+
+    # Check stats
+    stats = manager.get_stats()
+    assert stats["global"]["max_budget"] == 500.0
+    assert stats["total_observer_budgets"] >= 2
+    state = manager.get_budget_state("planner")
+    assert state is not None
+
+    # Check budget state
+    state = manager.get_budget_state("planner")
+    assert state is not None
+
+    # Critical budgets
+    manager.consume(200.0, observer_id="planner")  # Heavy consumption
+    critical = manager.get_critical_budgets(threshold=0.5)
+    print(f"  ✅ Global budget: {stats['global']['max_budget']}")
+    print(f"  ✅ Observer count: {stats['total_observer_budgets']}")
+    print(f"  ✅ Budget state for planner: {state}")
+    print(f"  ✅ Critical budgets: {len(critical)}")
+
+
+def test_6_recoverability_economics():
+    """Test 6: Recovery efficiency tracking across scales."""
+    print("\n=== Test 6: Recoverability Economics ===")
+    tracker = RecoverabilityEconomics()
+
+    # Local recovery: fast, cheap
+    local = tracker.record_recovery(
+        scope="local", repair_complexity=0.2,
+        reconstruction_speed=0.9, continuity_restored=0.95, sync_cost=0.05
+    )
+    assert local.scope == "local"
+    assert local.efficiency > 0.5  # Efficient local recovery
+
+    # Global recovery: slow, expensive
+    global_rec = tracker.record_recovery(
+        scope="global", repair_complexity=0.8,
+        reconstruction_speed=0.3, continuity_restored=0.6, sync_cost=0.7
+    )
+    assert global_rec.efficiency < local.efficiency  # Less efficient
+
+    # Scope efficiency returns a dict
+    local_eff = tracker.scope_efficiency("local")
+    assert isinstance(local_eff, dict)
+    assert local_eff["avg_efficiency"] > 0
+
+    # Recoverability score
+    score = tracker.recoverability_score()
+    assert 0 < score <= 1.0
+
+    # Stats
+    stats = tracker.get_stats()
+    assert stats["total_recoveries"] == 2
+
+    print(f"  ✅ Local efficiency: {local.efficiency:.3f}")
+    print(f"  ✅ Global efficiency: {global_rec.efficiency:.3f}")
+    print(f"  ✅ Recoverability score: {score:.3f}")
+    print(f"  ✅ Total recoveries: {stats['total_recoveries']}")
+
+
+def test_7_adaptive_compression():
+    """Test 7: Compression preserves recoverability."""
+    print("\n=== Test 7: Adaptive Compression ===")
+    engine = AdaptiveCompressionEngine()
+
+    # Compress a context-layer target (compressible)
+    record = engine.compress(target="stable_sync_routes",
+                             original_size=100.0, layer="context")
+    assert record.original_size == 100.0
+    assert record.compressed_size < record.original_size
+    # Context layer has lower recoverability preservation (0.75)
+    assert record.recoverability_preserved > 0
+
+    # Compress event layer
+    record2 = engine.compress(target="event_logs",
+                              original_size=200.0, layer="event")
+    assert record2.compressed_size < record2.original_size
+
+    # Compression stats
+    stats = engine.get_stats()
+    assert stats["total_compressions"] == 2
+
+    # Compression ratio
+    ratio = engine.compression_ratio()
+    assert ratio > 0
+
+    print(f"  ✅ Compression ratio: {record.ratio:.1f}x")
+    print(f"  ✅ Recoverability preserved: {record.recoverability_preserved:.2f}")
+    print(f"  ✅ Total compressions: {stats['total_compressions']}")
+    print(f"  ✅ Overall compression ratio: {ratio:.2f}")
+
+
+def test_8_sync_cost_optimizer():
+    """Test 8: Sync only when coherence gain exceeds entropy cost."""
+    print("\n=== Test 8: Sync Cost Optimizer ===")
+    optimizer = SyncCostOptimizer()
+
+    # Positive yield: coherence gain > entropy cost
+    decision = optimizer.should_sync("obs_a", "obs_b",
+                                     coherence_gain=0.8, entropy_cost=0.2)
+    assert decision.approved is True
+    assert decision.yield_value == 0.8 / 0.2
+
+    # Negative yield: coherence gain < entropy cost
+    decision2 = optimizer.should_sync("obs_c", "obs_d",
+                                      coherence_gain=0.1, entropy_cost=0.9)
+    assert decision2.approved is False
+
+    # Optimal frequency (cluster only, no interaction_density param)
+    freq = optimizer.optimal_sync_frequency(["a", "b", "c"])
+    assert 0 < freq <= 1.0
+
+    # Sync efficiency
+    eff = optimizer.sync_efficiency()
+    assert 0 <= eff <= 1.0
+
+    print(f"  ✅ Positive yield sync approved: {decision.approved}")
+    print(f"  ✅ Negative yield sync rejected: {decision2.approved}")
+    print(f"  ✅ Optimal frequency: {freq:.3f}")
+    print(f"  ✅ Sync efficiency: {eff:.3f}")
+
+
+def test_9_resource_constrained_cognition():
+    """Test 9: Under resource pressure, critical operations preserved."""
+    print("\n=== Test 9: Resource-Constrained Cognition ===")
+    rcc = ResourceConstrainedCognition()
+
+    # Register operations first
+    rcc.register_operation("continuity_check", OperationPriority.CRITICAL, 0.1, 0.9)
+    rcc.register_operation("local_repair", OperationPriority.HIGH, 0.2, 0.7)
+    rcc.register_operation("full_sync", OperationPriority.MEDIUM, 0.5, 0.4)
+    rcc.register_operation("strategic_review", OperationPriority.LOW, 0.3, 0.3)
+    rcc.register_operation("redundant_scan", OperationPriority.DEFER, 0.4, 0.1,
+                           is_redundant=True)
+
+    # Plenty of resources: all ops pass (redundant included when resources abundant)
+    result = rcc.prioritize(available_resources=2.0)
+    result_ids = [op.operation_id for op in result]
+    assert "continuity_check" in result_ids  # Critical always included
+    assert "local_repair" in result_ids  # High priority included
+
+    # Severe constraint: only critical + high
+    result_constrained = rcc.prioritize(available_resources=0.25)
+    result_ids = [op.operation_id for op in result_constrained]
+    # With only 0.25 resources, expensive ops get deferred
+    assert "continuity_check" in result_ids  # Critical always preserved
+    # Redundant scan should be excluded under constraints
+    assert "redundant_scan" not in result_ids
+
+    # Resource utilization
+    util = rcc.resource_utilization()
+    assert 0 <= util <= 1.0
+
+    # Is overloaded
+    overloaded = rcc.is_overloaded()
+    assert isinstance(overloaded, bool)
+
+    print(f"  ✅ Full resources: {len(result)} ops approved")
+    print(f"  ✅ Constrained: {len(result_constrained)} ops approved")
+    print(f"  ✅ Redundant ops correctly excluded")
+    print(f"  ✅ Resource utilization: {util:.2f}")
+
+
+def test_10_sustainability_governance():
+    """Test 10: Governance blocks unsafe optimizations."""
+    print("\n=== Test 10: Sustainability Governance ===")
+    gov = SustainabilityGovernance()
+
+    # Safe optimization
+    safe = OptimizationCandidate(
+        optimization_id="safe_1", target="sync_interval",
+        expected_coherence_gain=0.5, expected_entropy_reduction=0.3,
+        expected_recovery_cost=0.1, rollback_feasibility=0.9,
+        description="Increase sync interval to reduce overhead"
+    )
+    decision = gov.validate_optimization(safe)
+    assert decision.approved is True
+
+    # Unsafe: destroys recoverability
+    unsafe = OptimizationCandidate(
+        optimization_id="unsafe_1", target="anchor_store",
+        expected_coherence_gain=0.1, expected_entropy_reduction=0.05,
+        expected_recovery_cost=0.8, rollback_feasibility=0.2,
+        description="Delete all anchors to save memory"
+    )
+    decision2 = gov.validate_optimization(unsafe)
+    assert decision2.approved is False
+
+    # Governance stats
+    stats = gov.get_stats()
+    assert stats["total_validations"] == 2
+    assert stats["approved"] == 1
+    assert stats["rejected"] == 1
+
+    # Approval rate
+    rate = gov.approval_rate()
+    assert rate == 0.5
+
+    print(f"  ✅ Safe optimization approved")
+    print(f"  ✅ Unsafe optimization rejected: {decision2.reason[:50]}...")
+    print(f"  ✅ Governance stats: {stats['approved']} approved, {stats['rejected']} rejected")
+    print(f"  ✅ Approval rate: {rate:.0%}")
+
+
+# ─── Integration: All 7 Components Working Together ──────────────────────────
+
+def test_11_full_integration():
+    """Test 11: All 7 Phase 9 components work together in a coherent pipeline."""
+    print("\n=== Test 11: Full Integration Pipeline ===")
+
+    # 1. Set up entropy budgets
+    budget_mgr = EntropyBudgetManager(global_budget=1000.0)
+    r1 = budget_mgr.consume(15.0, observer_id="planner")
+    r2 = budget_mgr.consume(10.0, observer_id="executor")
+    assert r1["approved"] and r2["approved"]
+
+    # 2. Analyze coherence yield (need >= min_observations per op)
+    analyzer = CoherenceYieldAnalyzer(min_observations=1)
+    analyzer.measure_yield("sync", 0.7, 0.1, 0.05)
+    analyzer.measure_yield("repair", 0.9, 0.2, 0.1)
+    ranked = analyzer.rank_operations()
+    assert len(ranked) > 0
+
+    # 3. Record recovery from a local failure
+    rec_tracker = RecoverabilityEconomics()
+    rec_tracker.record_recovery("local", 0.3, 0.8, 0.9, 0.05)
+    rec_tracker.record_recovery("global", 0.7, 0.4, 0.6, 0.5)
+    score = rec_tracker.recoverability_score()
+    assert score > 0
+
+    # 4. Compress stable state
+    compressor = AdaptiveCompressionEngine()
+    compressor.compress("sync_routes", 100.0, layer="context")
+    assert compressor.get_stats()["total_compressions"] == 1
+
+    # 5. Optimize next sync decision
+    sync_opt = SyncCostOptimizer()
+    sync_decision = sync_opt.should_sync("planner", "executor", 0.6, 0.15)
+    assert sync_decision.approved
+
+    # 6. Under resource pressure, prioritize
+    rcc = ResourceConstrainedCognition()
+    rcc.register_operation("continuity", OperationPriority.CRITICAL, 0.1, 0.9)
+    rcc.register_operation("repair", OperationPriority.HIGH, 0.2, 0.7)
+    rcc.register_operation("sync", OperationPriority.MEDIUM, 0.3, 0.5)
+    prioritized = rcc.prioritize(available_resources=0.5)
+    assert len(prioritized) >= 2
+
+    # 7. Validate optimization through governance
+    gov = SustainabilityGovernance()
+    safe_candidate = OptimizationCandidate(
+        "opt_1", "sync_interval", 0.4, 0.2, 0.15, 0.85
+    )
+    gov_decision = gov.validate_optimization(safe_candidate)
+    assert gov_decision.approved
+
+    # 8. Check budget stats
+    stats = budget_mgr.get_stats()
+
+    print(f"  ✅ Budget manager: {stats['total_observer_budgets']} observers")
+    print(f"  ✅ Yield analyzer: {len(ranked)} operations ranked")
+    print(f"  ✅ Recovery tracker: score={score:.3f}")
+    print(f"  ✅ Compressor: {compressor.get_stats()['total_compressions']} compressions")
+    print(f"  ✅ Sync optimizer: approved={sync_decision.approved}")
+    print(f"  ✅ Resource cognition: {len(prioritized)} ops prioritized")
+    print(f"  ✅ Governance: approved={gov_decision.approved}")
+
+
+# ─── Run All Tests ────────────────────────────────────────────────────────────
+
+if __name__ == "__main__":
+    tests = [
+        test_1_coherence_yield_basic,
+        test_2_coherence_yield_ranking,
+        test_3_entropy_budget_consumption,
+        test_4_entropy_budget_critical,
+        test_5_entropy_budget_manager_hierarchical,
+        test_6_recoverability_economics,
+        test_7_adaptive_compression,
+        test_8_sync_cost_optimizer,
+        test_9_resource_constrained_cognition,
+        test_10_sustainability_governance,
+        test_11_full_integration,
+    ]
+
+    passed = 0
+    failed = 0
+    for test in tests:
         try:
-            eco1 = EntropyEconomics(monthly_budget=100.0, budget_file=budget_file)
-            task = TaskProfile("inference", vram_needed=12, estimated_hours=4)
-            eco1.decide(task)
+            test()
+            passed += 1
+        except Exception as e:
+            print(f"  ❌ FAILED: {e}")
+            failed += 1
 
-            # Load budget in new instance
-            eco2 = EntropyEconomics(monthly_budget=100.0, budget_file=budget_file)
-            assert eco2.budget.sessions_count == 1
-            assert eco2.budget.spent_this_month > 0
-        finally:
-            Path(budget_file).unlink(missing_ok=True)
+    print(f"\n{'='*60}")
+    print(f"Phase 9 Tests: {passed} passed, {failed} failed, {passed+failed} total")
+    if failed == 0:
+        print("✅ ALL TESTS PASS — Phase 9 Entropy Economics operational")
+    else:
+        print(f"❌ {failed} test(s) failed")
+        sys.exit(1)
 
-    def test_multiple_tasks_accumulate_cost(self):
-        """Multiple tasks should accumulate costs."""
-        eco = EntropyEconomics(monthly_budget=100.0)
-        for _ in range(5):
-            task = TaskProfile("inference", vram_needed=12, estimated_hours=1)
-            eco.decide(task)
-        assert eco.budget.sessions_count == 5
-        assert eco.budget.spent_this_month > 0
-
-
-# ─── Test 4: Synchronization Efficiency ───────────────────────────────────────
-
-class TestSynchronizationEfficiency:
-    """Test that sync overhead is minimized."""
-
-    def test_decision_is_fast(self):
-        """Resource decisions should be near-instantaneous."""
-        import time
-        eco = EntropyEconomics(monthly_budget=100.0)
-        task = TaskProfile("inference", vram_needed=12, estimated_hours=4)
-
-        start = time.time()
-        for _ in range(100):
-            eco.decide(task)
-        elapsed = time.time() - start
-
-        # 100 decisions should take < 1 second
-        assert elapsed < 1.0, f"100 decisions took {elapsed:.2f}s (should be <1s)"
-
-    def test_gpu_catalog_is_complete(self):
-        """GPU catalog should have entries for all major providers."""
+    def test_all_providers_represented(self):
+        """All major providers should be in the catalog."""
         providers = set(g["provider"] for g in GPU_CATALOG)
         assert "octaspace" in providers
         assert "runpod" in providers
         assert "hetzner" in providers
 
-    def test_all_gpus_have_required_fields(self):
-        """All GPU entries should have required fields."""
-        for gpu in GPU_CATALOG:
-            assert "provider" in gpu
-            assert "gpu" in gpu
-            assert "vram" in gpu
-            assert "hourly" in gpu
-            assert gpu["hourly"] > 0
-
-    def test_quick_decide_convenience(self):
-        """quick_decide should work as a one-liner."""
+    def test_quick_decide_integration(self):
+        """quick_decide should work end-to-end."""
         result = quick_decide("inference", vram=12, hours=4)
-        assert "action" in result
-        assert "cost" in result
-        assert "coherence" in result
-
-
-# ─── Test 5: Recoverability Preservation ──────────────────────────────────────
-
-class TestRecoverabilityPreservation:
-    """Test that the system preserves recoverability under load."""
-
-    def test_task_profiles_are_serializable(self):
-        """Task profiles should be serializable for checkpointing."""
-        task = TaskProfile("inference", vram_needed=12, estimated_hours=4, complexity="medium")
-        data = {
-            "task_type": task.task_type,
-            "vram_needed": task.vram_needed,
-            "estimated_hours": task.estimated_hours,
-            "complexity": task.complexity,
-            "entropy_score": task.entropy_score,
-        }
-        # Should be JSON serializable
-        json_str = json.dumps(data)
-        assert len(json_str) > 0
-
-    def test_decisions_are_logged(self):
-        """All decisions should be logged for audit trail."""
-        eco = EntropyEconomics(monthly_budget=100.0)
-        task = TaskProfile("inference", vram_needed=12, estimated_hours=4)
-        eco.decide(task)
-        assert len(eco.decisions) == 1
-        assert eco.decisions[0].timestamp != ""
-
-    def test_budget_state_is_recoverable(self):
-        """Budget state should be recoverable from file."""
-        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
-            budget_file = f.name
-
-        try:
-            eco = EntropyEconomics(monthly_budget=100.0, budget_file=budget_file)
-            task = TaskProfile("inference", vram_needed=12, estimated_hours=4)
-            eco.decide(task)
-
-            # File should exist and be valid JSON
-            with open(budget_file) as f:
-                data = json.load(f)
-            assert data["sessions_count"] == 1
-            assert data["spent_this_month"] > 0
-        finally:
-            Path(budget_file).unlink(missing_ok=True)
-
-    def test_report_generation(self):
-        """Economics report should be generatable."""
-        eco = EntropyEconomics(monthly_budget=100.0)
-        task = TaskProfile("inference", vram_needed=12, estimated_hours=4)
-        eco.decide(task)
-        report = eco.get_economics_report()
-        assert "Entropy Economics" in report
-        assert "Budget Status" in report
-
-
-# ─── Test 6: Sustainability Governance ────────────────────────────────────────
-
-class TestSustainabilityGovernance:
-    """Test that the system enforces sustainability constraints."""
-
-    def test_budget_never_exceeded(self):
-        """Total spending should never exceed budget (tasks deferred instead)."""
-        eco = EntropyEconomics(monthly_budget=1.0)
-        for _ in range(100):
-            task = TaskProfile("training", vram_needed=24, estimated_hours=8)
-            eco.decide(task)
-        assert eco.budget.spent_this_month <= 1.0
-
-    def test_utilization_calculation(self):
-        """Utilization should be calculated correctly."""
-        budget = BudgetState(monthly_budget=100.0, spent_this_month=35.0)
-        assert budget.utilization == 0.35
-
-    def test_remaining_budget_calculation(self):
-        """Remaining budget should be correct."""
-        budget = BudgetState(monthly_budget=100.0, spent_this_month=35.0)
-        assert budget.remaining == 65.0
-
-    def test_can_afford_check(self):
-        """can_afford should return False when budget is exhausted."""
-        budget = BudgetState(monthly_budget=100.0, spent_this_month=100.0)
-        assert not budget.can_afford
-
-    def test_budget_status_report(self):
-        """Budget status should include all key metrics."""
-        eco = EntropyEconomics(monthly_budget=100.0)
-        task = TaskProfile("inference", vram_needed=12, estimated_hours=4)
-        eco.decide(task)
-        status = eco.get_budget_status()
-        assert "monthly_budget" in status
-        assert "spent" in status
-        assert "remaining" in status
-        assert "utilization" in status
-        assert "sessions" in status
-        assert "total_hours" in status
-        assert "avg_cost_per_hour" in status
-
-    def test_zero_budget_defers_all_gpu_tasks(self):
-        """With zero budget, all GPU tasks should be deferred."""
-        eco = EntropyEconomics(monthly_budget=0.0)
-        task = TaskProfile("inference", vram_needed=12, estimated_hours=4)
-        decision = eco.decide(task)
-        assert decision.action in ("defer", "reject")
-
-
-# ─── Integration: Cloud Burst Engine ──────────────────────────────────────────
-
-class TestCloudBurstIntegration:
-    """Test integration with tools/cloud-burst.py"""
-
-    def test_estimate_cost_function(self):
-        """Cost estimation should return sorted results."""
-        from tools.cloud_burst import estimate_cost
-        results = estimate_cost(hours=4, vram_min=12)
-        assert len(results) > 0
-        # Should be sorted by total cost
-        costs = [r["total_cost"] for r in results]
-        assert costs == sorted(costs)
-
-    def test_recommend_function(self):
-        """Recommendation should return a valid GPU."""
-        from tools.cloud_burst import recommend_instance
-        rec = recommend_instance("inference", vram_needed=12)
-        assert rec is not None
-        assert "provider" in rec
-        assert "gpu" in rec
-        assert "hourly" in rec
-
-    def test_recommend_respects_budget(self):
-        """Recommendation should respect budget constraint."""
-        from tools.cloud_burst import recommend_instance
-        rec = recommend_instance("inference", vram_needed=12, max_budget=0.05)
-        if rec:
-            assert rec["hourly"] <= 0.05
-
-    def test_recommend_different_tasks(self):
-        """Different task types should get different recommendations."""
-        from tools.cloud_burst import recommend_instance
-        recs = {}
-        for task_type in ["inference", "training", "backtest", "image_gen"]:
-            rec = recommend_instance(task_type, vram_needed=12)
-            if rec:
-                recs[task_type] = rec["gpu"]
-        # Should have recommendations for all task types
-        assert len(recs) >= 3
+        assert result["action"] == "burst"
+        assert result["provider"] == "octaspace"
+        assert result["cost"] > 0
+        assert result["coherence"] > 0

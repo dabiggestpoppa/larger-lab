@@ -4,6 +4,19 @@
 
 ---
 
+#### 🦉 [RL] 2026-05-16 — OC1 Gateway Fixed (Root Cause: gateway.cmd)
+
+**Root cause of chronic OC1 failures:** `gateway.cmd` was never updated with the `run` subcommand and `--allow-unconfigured` flag that OC2 had. Additionally, port was wrong (18790 instead of 18789) and `OPENCLAW_HOME` was missing.
+
+**Fix applied:**
+- `C:\Users\wifik\.openclaw\gateway.cmd` — added `OPENCLAW_HOME`, fixed port to 18789, added `run` subcommand + `--allow-unconfigured`, added `start "" /min`
+
+**Lesson learned:** When OpenClaw updates its CLI, ALL gateway.cmd files must be updated simultaneously. The `run` subcommand is required in v2026.5.7+. Created this entry as permanent record to prevent recurrence.
+
+**Status:** ✅ Both gateways live — OC1 (18789) PID 21288, OC2 (18790) PID 15844
+
+---
+
 #### 🦉 [RL] 2026-05-16 — Phase 9 Research: Entropy Economics Complete
 - Published full research doc at `srrs_opc/docs/phase9_research.md`
 - Identified 5 entropy-based resource allocation patterns (Shannon, Landauer, Kolmogorov, Token Budgeting, Game-Theoretic)
@@ -26,6 +39,26 @@
 - Distributed onboarding skill to all agent skill directories
 - Updated `MEMORY.md` with OWL signature
 - Posted intro to `shared-conversations/team-chat.md`
+#### 🦉 [RL] 2026-05-16 — Content Farm Project Setup
+- Created content-farm/ project directory with full structure
+- Created first DeekeScript automation script: dy_auto_engage.js
+- Created account config template: config/accounts.json
+- Created content farm README: README.md
+- Installed Android SDK platform-tools (ADB v37.0.0)
+- Created OpenClaw cron job: Daily sourcing pipeline (06:00 ET)
+- Wrote comprehensive architecture doc: docs/content-farm-architecture.md
+- Wrote US vs China tool comparison: docs/us-vs-china-tools.md
+- Created agent config: config/content-farm-agents.yaml
+- Created translation pipeline: config/translation-pipeline.yaml
+- Created orchestrator script: tools/content_farm_orchestrator.py
+
+#### 🦉 [RL] 2026-05-16 — DeekeScript Full Ecosystem Audit
+- Audited all 47 DeekeScript repos via GitHub API
+- Cloned 16 key repos (ad-deeke, ad-dke, MoneyPrinterPlus, ad-voice, ad-ai-chat, ad-tiktok, GroupControlApp, MediaCrawler, Spider_XHS, deeke-uid, shortLink, etc.)
+- Wrote comprehensive ecosystem blueprint: `docs/deeke-ecosystem-blueprint.md`
+- Full stack mapped: Content Production -> Distribution -> Data -> Monetization
+- Posted deep-dive to team chat
+
 #### 🦉 [RL] 2026-05-16 — DeekeScript Installed + Content Farm Plan
 - Downloaded and installed `deeke-script-app` v1.9.3 (npm, 523 packages)
 - Created `skills/deeke-script/SKILL.md`
