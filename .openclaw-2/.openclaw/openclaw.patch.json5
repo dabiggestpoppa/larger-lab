@@ -1,0 +1,15 @@
+{
+  "session": {
+    "reset": {
+      "idleMinutes": 120
+    }
+  },
+  "agents": {
+    "defaults": {
+      "timeoutSeconds": 600,
+      "subagents": {
+        "maxConcurrent": 4
+      }
+    }
+  }
+}

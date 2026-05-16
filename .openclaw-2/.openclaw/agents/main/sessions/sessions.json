@@ -5136,7 +5136,7 @@
       "accountId": "default"
     },
     "sessionId": "78929309-e69c-477d-a67d-0886e0f2659e",
-    "updatedAt": 1778951193135,
+    "updatedAt": 1778952413506,
     "sessionStartedAt": 1778948518880,
     "deliveryContext": {
       "channel": "telegram",
@@ -5146,7 +5146,7 @@
     "lastChannel": "telegram",
     "lastTo": "telegram:8258195396",
     "lastAccountId": "default",
-    "lastInteractionAt": 1778951169085,
+    "lastInteractionAt": 1778952411402,
     "systemSent": true,
     "abortedLastRun": false,
     "chatType": "direct",

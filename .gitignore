@@ -28,3 +28,12 @@ credentials.json
 
 # Large directories
 memory-bank/
+
+# OpenClaw runtime state
+.openclaw-2/.openclaw/agents/
+.openclaw-2/.openclaw/telegram/
+.openclaw/.openclaw/agents/
+.openclaw/.openclaw/telegram/
+
+# Nested git repos
+Spider_XHS/
