@@ -1,62 +1,42 @@
 # 🔴 Polymorph — Working Memory
 
-> **Auto-synced** from `progress/polymorph-progress.md` on every 7th update.
+> **Auto-synced** from `progress/polymorph-progress.md` every 7 updates.
 > This is working memory — compact, current, task-focused.
-> Max ~2,000 chars. Prune old entries when full.
 
 ---
 
-## Current Context (2026-05-16 20:11:37 UTC)
+## Current Context (2026-05-16 20:30:00 UTC)
 
 ### Status
-🟢 Active — OC2 Gateway Booted & OC1 Removed 🦅
+🟢 Active — OCE Phase 2 Complete, Standing By for CC Task
 
 ### Active Phase
-None
+OCE Phase 2 — Event Fabric (PM tasks complete)
 
 ### Pending Tasks
-- None
+- None assigned — standing by for CC next task
 
 ### Recent Activity
-#### 🔴 [PM] 2026-05-16 — Update Distributed to All Agents
-- Updated all 6 agent progress files: sync threshold 3→7 + system notification entry
-- Updated AGENTS.md: Workspace Optimization section + Key Files table
-- Updated WORKFLOW_PROTOCOL.md: sync threshold 3→7 + summarization step + new tool references
-- Updated team-chat.md: clean consolidated notification
-- Committed and pushed (a8e4f30)
-- All agents now aware of new memory self-maintenance protocol
-
-#### 🔴 [PM] 2026-05-16 — Operator Plan Phase 1 Complete (System Operator)
-- Created `tools/operator/` directory
-- Built `system-operator.js` with 10 tools: run_command, run_script, list_processes, kill_process, get_resources, system_info, install_package, cron_manage, env_manage, file_permissions
-- Built `system-operator.test.js` — 29 tests, all passing ✅
-- Windows-first: PowerShell + winget
-- All tools return {success: boolean, ...data} format
-- Committed and pushed (2caf890)
-- Phases 2-5 queued: VS Code Controller, Desktop Control, UI-TARS, Self-Modification
+#### 🔴 [PM] 2026-05-16 — OCE Debugging Results
+Fixed: POST /events/ingest endpoint (was missing from main.py), API path mismatch (/api/v1 vs root). 12/12 integration tests passing. Created test-oce-integration.py.
 
 #### 🔴 [PM] 2026-05-16 — OCE Phase 2 PM Tasks Complete (4/4)
-**OCE-2.20:** System Operator ↔ Event Fabric integration
-- tools/operator/event-integration.js — Bridge layer (exec_and_emit, kill_and_emit, install_and_emit)
-**OCE-2.21:** VS Code Controller ↔ Event Fabric integration
-- tools/operator/vscode-controller.js — Full VS Code CLI control (open, edit, search, git, extensions)
-- Wrapped emit functions for all VS Code actions
-**OCE-2.22:** Event Fabric debugging utilities
-- tools/operator/event-debug.js — CLI (tail, stats, replay, health, emit, types)
-**OCE-2.23:** Integration issues tracking
-- oce/docs/integration-issues.md — 7 issues identified, test checklist created
-- Committed and pushed (cf402ad)
+OCE-2.20: event-integration.js, OCE-2.21: vscode-controller.js, OCE-2.22: event-debug.js, OCE-2.23: integration-issues.md.
+
+#### 🔴 [PM] 2026-05-16 — Workspace Optimization Distributed
+All 6 agent progress files updated (sync 3→7), AGENTS.md, WORKFLOW_PROTOCOL.md, team-chat.md.
+
+#### 🔴 [PM] 2026-05-16 — Workspace Optimization Built
+memory_sync_daemon.py, summarize_progress.py, workspace_cleanup.py, AGENT_MOVEMENT.md.
+
+#### 🔴 [RL] 2026-05-16 — Desktop Control Layer Built (Python)
+RL built desktop-control.py (ScreenCapture, InputSimulator, UIElementDetector, WindowManager) + desktop_api.py (FastAPI port 8001). My Node.js tools still valid — connect via Event Fabric. Sub-agents working on Phase B (VS Code Bridge) + Phase C (System Operator).
 
 ---
 
 ## Sync Metadata
-- **Last Sync:** 2026-05-16 20:11:37 UTC
+- **Last Sync:** 2026-05-16 20:30:00 UTC
 - **Progress File:** `progress/polymorph-progress.md`
 - **Working Memory:** `progress/polymorph-memory.md`
 - **Sync Threshold:** 7 updates
-
-## Progress Sync Summary (PM)
-> **Last Sync:** 2026-05-16 20:11 UTC
-> **Status:** 🟢 Active — OC2 Gateway Booted & OC1 Removed 🦅
-> **Active Phase:** None
-> **Working Memory:** `progress/polymorph-memory.md`
+- **Summarize Threshold:** 20 entries

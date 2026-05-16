@@ -199,5 +199,141 @@ async def wait_for(req: FindTemplateRequest):
         raise HTTPException(500, str(e))
 
 
+# ─── VS Code Bridge ───────────────────────────────────────────────────────
+
+from vscode_bridge import VSCodeBridge
+
+vscode = VSCodeBridge()
+
+
+# ─── VS Code Models ─────────────────────────────────────────────────────────
+
+class VSCodeOpenRequest(BaseModel):
+    path: str
+    line: Optional[int] = None
+
+class VSCodeFolderRequest(BaseModel):
+    path: str
+
+class VSCodeTerminalRequest(BaseModel):
+    command: str
+
+class VSCodeExtensionRequest(BaseModel):
+    extension_id: str
+
+class VSCodeGitRequest(BaseModel):
+    action: str  # status, commit, push, pull, log, diff, branch
+    message: Optional[str] = None
+
+
+# ─── VS Code Endpoints ──────────────────────────────────────────────────────
+
+@app.post("/vscode/open")
+async def vscode_open(req: VSCodeOpenRequest):
+    """Open a file in VS Code."""
+    try:
+        result = vscode.open_file(req.path, req.line)
+        return result
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.post("/vscode/folder")
+async def vscode_folder(req: VSCodeFolderRequest):
+    """Open a folder/workspace in VS Code."""
+    try:
+        result = vscode.open_folder(req.path)
+        return result
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.post("/vscode/save")
+async def vscode_save():
+    """Save the current file."""
+    try:
+        result = vscode.save_file()
+        return result
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.post("/vscode/close")
+async def vscode_close():
+    """Close the current editor tab."""
+    try:
+        result = vscode.close_file()
+        return result
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.post("/vscode/terminal")
+async def vscode_terminal(req: VSCodeTerminalRequest):
+    """Open terminal and run a command."""
+    try:
+        result = vscode.run_in_terminal(req.command)
+        return result
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.post("/vscode/extension/install")
+async def vscode_install_extension(req: VSCodeExtensionRequest):
+    """Install a VS Code extension."""
+    try:
+        result = vscode.install_extension(req.extension_id)
+        return result
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.post("/vscode/git")
+async def vscode_git(req: VSCodeGitRequest):
+    """Git operations via VS Code terminal."""
+    try:
+        action = req.action.lower()
+        if action == "status":
+            result = vscode.git_status()
+        elif action == "commit":
+            if not req.message:
+                raise HTTPException(400, "Commit requires a message")
+            result = vscode.git_commit(req.message)
+        elif action == "push":
+            result = vscode.git_push()
+        elif action == "pull":
+            result = vscode.git_pull()
+        elif action == "log":
+            result = vscode.git_log()
+        elif action == "diff":
+            result = vscode.git_diff()
+        elif action == "branch":
+            result = vscode.git_branch()
+        else:
+            raise HTTPException(400, f"Unknown git action: {req.action}")
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.get("/vscode/status")
+async def vscode_status():
+    """Get VS Code status (active file, workspace info)."""
+    try:
+        active = vscode.get_active_file()
+        workspaces = vscode.get_workspace_folders()
+        extensions = vscode.list_extensions()
+        return {
+            "ok": True,
+            "active_file": active,
+            "workspaces": workspaces,
+            "extensions_count": extensions.get("count", 0),
+        }
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8001)

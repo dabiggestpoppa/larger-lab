@@ -8,13 +8,13 @@
         "ctimeMs": 1778960682890.3455,
         "dev": "3465847700",
         "ino": "3940649673956610",
-        "mode": 33206,
+        "mode": 438,
         "nlink": 1,
         "uid": 0,
         "gid": 0,
         "hasMeta": true,
         "gatewayMode": "local",
-        "observedAt": "2026-05-16T19:44:55.747Z"
+        "observedAt": "2026-05-16T20:14:44.668Z"
       },
       "lastObservedSuspiciousSignature": null,
       "lastPromotedGood": {
