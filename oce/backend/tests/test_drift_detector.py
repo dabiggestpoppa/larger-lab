@@ -5,11 +5,17 @@ Tests for OCE Drift Detector — OCE-7.4a
 queue depth, and full drift reports.
 """
 
+import os
+import sys
 import pytest
 import time
 import json
 from pathlib import Path
 from unittest.mock import patch
+
+# Ensure we import from the OCE backend, not SRRA-OPH
+BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, BACKEND_DIR)
 
 
 @pytest.fixture(autouse=True)
@@ -18,6 +24,7 @@ def reset_drift():
     from drift_detector import DriftDetector
     DriftDetector._instance = None
     yield
+    DriftDetector._instance = None
     DriftDetector._instance = None
 
 

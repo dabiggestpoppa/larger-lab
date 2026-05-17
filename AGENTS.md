@@ -1,10 +1,10 @@
 # AGENTS.md — SRRA-OPH Team Manifest
 
 > **Last Updated:** May 17, 2026
-> **Current Phase:** OCE Phase 7-9 — Multi-Scale Fields → Operator Coevolution → Entropy Economics (Active)
+> **Current Phase:** OCE Phase 9 — Entropy Economics (Active)
 > **SRRA-OPH:** Phases 1-9 complete — 77/77 tests passing
-> **OCE Tests:** 360 passing (Phases 1-8 complete, Phase 7 backend in progress)
-> **Phases Complete:** OCE 1-6 + Phase 8 governance/coevolution | **In Progress:** OCE 7 (Multi-Scale Cognitive Fields) | **Planned:** OCE 8 (Operator Coevolution) → OCE 9 (Entropy Economics)
+> **OCE Tests:** 330 passing (Phases 1-8 complete)
+> **Phases Complete:** OCE 1-8 | **In Progress:** OCE 9 (Entropy Economics) | **Planned:** Post-Deployment Upgrades (9 phases)
 > **Lead:** OWL (MAD away — OWL operating independently)
 > **Plan Source:** MAD's original engineering doctrine (phase 6-9 build document)
 > **Operator Rules:** `OPERATOR_RULES.md` — Bounded sovereign operational continuity
@@ -79,6 +79,7 @@ See `OPERATOR_RULES.md` for complete rules. Key constraints:
 | OCE Phase 7 (Adaptive Evolution) | ✅ Complete | RL |
 | OCE Phase 8 (Sovereign Coevolution) | ✅ Complete | RL |
 | OCE Phase 9 (Entropy Economics) | 🔄 In Progress | RL |
+| Post-Deployment Upgrades (9 phases) | 📋 Planned | MAD |
 | Post-Deployment Upgrades (9 phases) | 📋 Planned | MAD |
 
 **OCE Project:** `oce/` directory

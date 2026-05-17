@@ -170,5 +170,23 @@
 **OCE-7.4 Tests**: 39 new tests (19 drift + 20 healing), all passing
 
 **Total OCE Tests: 283 passing (Phases 1-7)**
+#### [RL] 2026-05-17 — Amended Plans Aligned with MAD Original Doctrine
 
+**Step back to align with MAD's original engineering doctrine for Phases 7-9.**
 
+**Phase 7 (Multi-Scale Cognitive Fields) — In Progress:**
+- 7 components: local observer fields, regional clusters, global attractor layer, hierarchical sync, nested repair, scale-adaptive routing, entropy containment
+- 80+ tests planned
+- Key principle: NOT hive mind, NOT universal sync — nested local/global coherence coordination
+
+**Phase 8 (Operator Coevolution) — Planned:**
+- 7 components: operator pattern extraction, constraint modeling, coherence reinforcement, bidirectional adaptation, cognitive load optimization, alignment tracking, anti-manipulation safeguards
+- 50+ tests planned
+- Key principle: NOT emotional mirroring — strategic alignment through recursive coherence reinforcement
+
+**Phase 9 (Entropy Economics) — Planned:**
+- 7 components: coherence yield analysis, entropy budgeting, adaptive compression, sync cost optimization, resource-constrained cognition, recoverability economics, sustainability governance
+- 35+ tests planned
+- Key principle: maximize coherence yield = (C×R×A)/(E×SC×RC)
+
+**Current Test Results: 360 passing (OCE + SRRA-OPH)**

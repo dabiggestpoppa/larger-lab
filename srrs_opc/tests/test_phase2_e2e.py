@@ -32,7 +32,7 @@ from srrs_opc.recovery_anchors import (
     create_anchor, get_anchor, get_top_anchors, get_anchor_count,
     get_stats, delete_weak_anchors, seed_initial_anchors, DB_PATH
 )
-from srrs_opc.drift_detector import DriftDetector
+from srrs_opc.srrs_drift_detector import DriftDetector
 from srrs_opc.consistency_validator import ConsistencyValidator
 from srrs_opc.reconstruction_synthesizer import ReconstructionSynthesizer
 from srrs_opc.contradiction_resolver import ContradictionResolver

@@ -43,9 +43,9 @@ from command_center import router as command_center_router
 from governance_engine import get_governance_engine, GovernanceEngine, ProposalStatus, ProposalType
 from consensus_engine import get_consensus_engine, ConsensusEngine
 from coevolution_protocol import get_coevolution_protocol, CoevolutionProtocol
-from governance_engine import get_governance_engine, GovernanceEngine, ProposalStatus, ProposalType
-from consensus_engine import get_consensus_engine, ConsensusEngine
-from coevolution_protocol import get_coevolution_protocol, CoevolutionProtocol
+from economics_engine import get_economics_engine, EconomicsEngine
+from sync_cost_optimizer import get_sync_cost_optimizer, SyncCostOptimizer
+from adaptive_compression import get_adaptive_compression, AdaptiveCompression
 
 app = FastAPI(
     title="OCE Continuity Core",
@@ -1218,6 +1218,112 @@ async def ws_alerts(websocket: WebSocket):
             await websocket.close()
         except Exception:
             pass
+
+
+# ─── Phase 9: Entropy Economics Endpoints ────────────────────────────────────
+
+@app.get("/economics/status")
+async def economics_status():
+    """Get current economics state: budget, yield, entropy debt."""
+    try:
+        engine = get_economics_engine()
+        return {
+            "budget": engine.get_budget_status(),
+            "yield": engine.get_coherence_yield(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/economics/yield")
+async def economics_yield():
+    """Get current coherence yield."""
+    try:
+        return get_economics_engine().get_coherence_yield()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/economics/budget")
+async def economics_budget():
+    """Get entropy budget status."""
+    try:
+        return get_economics_engine().get_budget_status()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.post("/economics/allocate")
+async def economics_allocate(request: dict):
+    """Allocate entropy budget to a task type."""
+    try:
+        engine = get_economics_engine()
+        return engine.allocate_budget(
+            task_type=request.get("task_type", "unknown"),
+            amount=request.get("amount", 0.0),
+            reason=request.get("reason", ""),
+        )
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.post("/economics/reallocate")
+async def economics_reallocate(request: dict):
+    """Reallocate entropy budget between task types."""
+    try:
+        engine = get_economics_engine()
+        return engine.reallocate_budget(
+            from_type=request.get("from_type", ""),
+            to_type=request.get("to_type", ""),
+            amount=request.get("amount", 0.0),
+            reason=request.get("reason", ""),
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/economics/sync-cost")
+async def economics_sync_cost():
+    """Get sync cost report."""
+    try:
+        return get_sync_cost_optimizer().get_sync_cost_report()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.post("/economics/optimize")
+async def economics_optimize():
+    """Run yield optimization and return suggestions."""
+    try:
+        engine = get_economics_engine()
+        return engine.optimize_yield()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/economics/forecast")
+async def economics_forecast(horizon_hours: int = Query(24, ge=1, le=720)):
+    """Forecast sustainability."""
+    try:
+        return get_economics_engine().forecast_sustainability(horizon_hours)
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.post("/economics/compress")
+async def economics_compress(request: dict):
+    """Compress a memory layer."""
+    try:
+        engine = get_adaptive_compression()
+        layer = request.get("layer", "WORK")
+        data = request.get("data", {})
+        target_ratio = request.get("target_ratio", 0.6)
+        return engine.compress_layer(layer, data, target_ratio)
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=str(e))
 
 
 if __name__ == "__main__":

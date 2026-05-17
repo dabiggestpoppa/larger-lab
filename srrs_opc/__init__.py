@@ -15,7 +15,7 @@ from .agent_bridge import AgentBridge
 
 # Phase 2: Reconstruction + Recoverability
 from .recovery_anchors import create_anchor, get_anchor, get_top_anchors
-from .drift_detector import DriftDetector
+from .srrs_drift_detector import DriftDetector
 from .consistency_validator import ConsistencyValidator
 from .reconstruction_synthesizer import ReconstructionSynthesizer
 from .contradiction_resolver import ContradictionResolver
