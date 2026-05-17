@@ -1,10 +1,22 @@
 # AGENTS.md — SRRA-OPH Team Manifest
 
-> **Last Updated:** May 16, 2026
-> **Current Phase:** OCE Phase 3 — Observer Runtime (Active) → Phase 4 — Structural Memory (Planning)
+> **Last Updated:** May 17, 2026
+> **Current Phase:** OCE Phase 5 — Observability (Active)
 > **SRRA-OPH:** Phases 1-9 complete — 77/77 tests passing
-> **OCE Tests:** 52 passing (32 event_fabric + 20 observer_runtime)
-> **Lead:** OC2 (CC handed off — user is away)
+> **OCE Tests:** 178 passing (32 event_fabric + 20 observer_runtime + 19 topology_routing + 30 structural_memory + 77 observability)
+> **Lead:** OWL (MAD away — OWL operating independently)
+> **Operator Rules:** `OPERATOR_RULES.md` — Bounded sovereign operational continuity
+
+## ⚠️ OPERATOR RULES (READ BEFORE ANY ACTION)
+
+See `OPERATOR_RULES.md` for complete rules. Key constraints:
+- **Max 5 concurrent sub-agents** — prevents topology fragmentation
+- **No unrestricted self-modification** — don't modify system prompts/safety rules
+- **No infinite agent spawning** — sub-agents cannot spawn sub-agents
+- **Repair before expansion** — stability > scale
+- **Entropy governance** — compute, attention, sync are finite
+- **All execution logged** — observable, replayable, reconstructable
+- **Human is strategic anchor** — MAD defines attractors, OWL executes
 
 ---
 
@@ -121,7 +133,8 @@ The workspace self-sustains through automated memory management:
 | Workspace Cleanup | `tools/workspace_cleanup.py` | Detects loose files, oversized progress, empty/missing dirs |
 | Agent Movement Protocol | `AGENT_MOVEMENT.md` | Shared movement patterns, etiquette, SRRA compliance |
 | Daily Cron (OC2) | 7am daily | Full pipeline: sync → summarize → cleanup → team-chat |
-| Chat Sync | `tools/chat_sync.py` | Auto-syncs team-chat.md → agent memory files every 5 messages |
+## Chat Sync | `tools/chat_sync.py` | Auto-syncs team-chat.md → agent memory files every 5 messages; auto-summarizes chat at 100+ messages |
+| Chat Summarizer | `tools/chat_summarizer.py` | Condenses team-chat.md every 100 messages; keeps last 30 intact, archives full history |
 
 **Sync threshold:** 7 updates (was 3). **Summarize threshold:** 20 entries.
 All agents maintain own memory hygiene. See `AGENT_MOVEMENT.md` for full protocol.

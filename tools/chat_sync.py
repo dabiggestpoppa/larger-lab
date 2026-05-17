@@ -114,6 +114,12 @@ def save_counters(counters: dict):
 # ── Chat Parsing ─────────────────────────────────────────────────────────────
 
 
+def count_messages_in_chat() -> int:
+    """Count top-level message entries in team-chat.md."""
+    content = TEAM_CHAT_FILE.read_text(encoding="utf-8")
+    return len(re.findall(r"^#{3,4}\s+\[", content, re.MULTILINE))
+
+
 def parse_chat_messages(content: str) -> list:
     """
     Parse team-chat.md into individual messages.
@@ -493,7 +499,19 @@ def run_sync(force: bool = False, dry_run: bool = False):
     # Post sync notification to team-chat
     post_sync_notification(counters, len(new_messages), agents_updated)
 
-    print(f"\n✅ Sync complete. {len(new_messages)} messages → {len(agents_updated)} agents updated.")
+    # Auto-summarize chat if total messages exceed threshold
+    total_msgs = count_messages_in_chat()
+    if total_msgs >= 100:
+        print(f"\n📋 Team chat has {total_msgs} messages (>=100). Running auto-summarizer...")
+        try:
+            from chat_summarizer import summarize_chat
+            stats = summarize_chat(threshold=100, keep=30)
+            if stats["action"] == "summarized":
+                print(f"   Summarized {stats['summarized']} messages, kept {stats['preserved']} recent.")
+        except Exception as e:
+            print(f"   Warning: Summarizer error (non-fatal): {e}")
+
+    print(f"\nSync complete. {len(new_messages)} messages -> {len(agents_updated)} agents updated.")
 
 
 # ── CLI ──────────────────────────────────────────────────────────────────────

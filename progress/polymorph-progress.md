@@ -7,7 +7,50 @@
 
 ---
 
-## Status: 🟢 Active — OC2 Gateway Booted & OC1 Removed 🦅
+## Status: 🟢 Active — Phase 5 PM Tasks Complete + P90 Reframed 🦅
+
+### Recent Entries
+
+#### 🔴 [PM] 2026-05-17 — Phase 5 PM Tasks Complete (2/2) + P90 Strategy Reframed
+
+**OCE-5.17: Operator ↔ Observability Integration**
+- `tools/operator/observability-integration.py` — 290 lines
+- Wraps operator actions (exec, kill, install) with metric recording + trace span lifecycle
+- `exec_and_record()`, `kill_and_record()`, `install_and_record()` — each records latency + count metrics
+- Observability query helpers: `get_metrics_summary()`, `get_metrics_history()`, `search_traces()`, `get_active_alerts()`, `acknowledge_alert()`, `add_alert_rule()`, `get_dashboard()`
+- Full CLI: `python observability-integration.py exec|kill|install|metrics|traces|alerts|dashboard`
+- Stdlib only, color-coded output, Windows compatible
+
+**OCE-5.18: Observability Debug CLI**
+- `tools/operator/observability-debug.py` — 400+ lines
+- 14 commands: metrics, metrics-history, traces, trace-detail, traces-by-obs, alerts, alert-history, alert-ack, rules, rule-add, dashboard, topology, health, all
+- Color-coded by health status (green/yellow/red)
+- Table renderer with no external dependencies
+- Quick health check: `python observability-debug.py health`
+- Full diagnostic: `python observability-debug.py all`
+
+**Integration Issues Updated**
+- Closed: MEDIUM-003 (observer API now live)
+- Added + resolved: MEDIUM-004 (observability endpoints), LOW-003 (operator tracing)
+- Added Phase 5 test checklist (11/14 complete, 3 pending OC2/AS)
+
+**P90 Strategy Reframing (MAD Directive)**
+- Updated `STRATEGY_TRACKER.md`: "Deep Mean Rebalancing" → "Deep Momentum Rebalancing", removed "mean reversion snap-back" language
+- Updated `LAB_PLAN.md`: 6 instances of "mean reversion" → "momentum/extension" framing
+- P90 Strategy Guide already had MAD directive at top — confirmed current
+- All strategy docs now consistent: P90 = momentum ride to distribution tails, NOT mean reversion
+
+### Recent Entries
+
+#### 🔴 [PM] 2026-05-17 — Assumed OC Role, Completed OCE-5.6/5.7/5.8
+- OC1 deprecated → PM assuming OC (OpenClaw) task slot per user directive
+- **OCE-5.6** Created `oce/docs/observability-data-model.md` — full data model for metrics, traces, alerts, WebSocket streams, DB schemas
+- **OCE-5.7** Created `oce/docs/observability-map.md` — what to monitor per layer, alert rules, dashboard layout
+- **OCE-5.8** Created `oce/docs/quality-review-phase5.md` — architecture review of all 3 observability engines (178 tests passing)
+- Updated `oce/PHASE5_TASKS.md` — OCE-5.1 through OCE-5.8 marked complete
+- Updated `oce/TEAM_TASKS.md` — OC tasks OCE-2.1 through OCE-2.4 marked complete
+- **OC2 gateway**: Verified live (ok=True, status=live) throughout
+- **No systems harmed** — all changes were documentation + task tracking
 
 ### Recent Entries
 
