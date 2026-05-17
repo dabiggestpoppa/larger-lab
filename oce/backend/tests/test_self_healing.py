@@ -5,14 +5,8 @@ Tests for OCE Self-Healing Engine — OCE-7.4b
 and healing history.
 """
 
-import os
-import sys
 import pytest
 import time
-
-# Ensure we import from the OCE backend, not SRRA-OPH
-BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, BACKEND_DIR)
 
 
 @pytest.fixture(autouse=True)

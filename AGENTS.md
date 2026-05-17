@@ -1,10 +1,10 @@
 # AGENTS.md — SRRA-OPH Team Manifest
 
 > **Last Updated:** May 17, 2026
-> **Current Phase:** OCE Phase 9 — Entropy Economics (Active)
+> **Current Phase:** Post-Deployment Upgrades (Active)
 > **SRRA-OPH:** Phases 1-9 complete — 77/77 tests passing
-> **OCE Tests:** 330 passing (Phases 1-8 complete)
-> **Phases Complete:** OCE 1-8 | **In Progress:** OCE 9 (Entropy Economics) | **Planned:** Post-Deployment Upgrades (9 phases)
+> **OCE Tests:** 426 passing (Phases 1-9 complete)
+> **Phases Complete:** OCE 1-9 | **In Progress:** Post-Deployment Upgrades (9 phases) | **Planned:** OCE v3.0
 > **Lead:** OWL (MAD away — OWL operating independently)
 > **Plan Source:** MAD's original engineering doctrine (phase 6-9 build document)
 > **Operator Rules:** `OPERATOR_RULES.md` — Bounded sovereign operational continuity
@@ -78,9 +78,8 @@ See `OPERATOR_RULES.md` for complete rules. Key constraints:
 | OCE Phase 6 (Execution Substrate) | ✅ Complete | RL/OC2 |
 | OCE Phase 7 (Adaptive Evolution) | ✅ Complete | RL |
 | OCE Phase 8 (Sovereign Coevolution) | ✅ Complete | RL |
-| OCE Phase 9 (Entropy Economics) | 🔄 In Progress | RL |
-| Post-Deployment Upgrades (9 phases) | 📋 Planned | MAD |
-| Post-Deployment Upgrades (9 phases) | 📋 Planned | MAD |
+| OCE Phase 9 (Entropy Economics) | ✅ Complete | RL |
+| Post-Deployment Upgrades (9 phases) | 🔄 In Progress | OWL |
 
 **OCE Project:** `oce/` directory
 
