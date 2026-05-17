@@ -7,11 +7,11 @@
 
 ---
 
-## Status: 🟢 Active — V3 PHASE 1 COMPLETE
+## Status: 🟢 Active — V3 PHASE 3 (TOPOLOGY)
 
 ### Current Phase
-**V3 Phase 1 — Resonant Signal Substrate (RSS)**
-✅ Complete — 121/121 tests passing, CLI operational.
+**V3 Phase 3 — Resonant Topology & BSP Emergence**
+✅ Core complete — 53/53 tests passing. CLI tool next.
 
 ### V3 Architecture Context
 - V3 = cognitive field system (not agent framework)
@@ -25,13 +25,11 @@
 - Total: 503+ tests passing
 - Key tools: system-operator.js, execution-integration.py, observability-integration.py
 
-### V3 Phase 1 PM Tasks
-- [x] **Deep-clean workspace** — Archived old OCE task files, cleaned stale data
-- [x] Debug signal_packet.py, field_state.py, boundary_mapper.py as CC builds them
-- [x] Debug resonance_engine.py, coherence_metrics.py, pressure_tracker.py
-- [x] Build tools/operator/resonance-debug.py CLI
-- [ ] Integration tests for resonance layer
-- [ ] Operator integration for resonance monitoring
+### V3 Phase 3 PM Tasks
+- [x] Debug topology modules (collar_field, bsp_projection, resonance_router, glyph_engine, field_pressure, attractor_stability, topology_metrics)
+- [x] Fix 4 failing tests (attractor_stability stability rules, bsp_projection SignalPacket import, glyph_engine decode iteration)
+- [ ] Build tools/operator/topology-debug.py CLI
+- [ ] Operator integration for topology monitoring
 
 ### Continuous Workflow
 - After every code edit: Update this file + polymorph-memory.md

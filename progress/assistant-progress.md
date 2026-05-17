@@ -1,70 +1,88 @@
 # 🟡 Assistant Manager — Sub-Progress Log
 
 > **Agent:** Assistant Manager (AS)
-> **Role:** Context Monitoring / Task Support / Quality Checks / Documentation
-> **Sync Rule:** Every 7 updates → auto-sync. Every 20 entries → LLM summarization.
+> **Role:** Context Monitoring / Quality Checks / Documentation
 > **Reports to:** CC (Claude Code)
+> **Sync Rule:** Every 7 updates → auto-sync. Every 20 entries → LLM summarization.
 
 ---
 
-## Status: 🟢 Active — OCE Phase 3
+## Status: 🟢 Active — V3 PHASE 3
 
-### Current Test Status (May 16, 2026)
-- SRRA-OPH Phases 1-9: 77/77 passing ✅
-- OCE Phase 1: 27/27 passing ✅
-- OCE Phase 2 (Event Fabric): 32/32 passing ✅
-- OCE Phase 3 (Observer Runtime): 0/25 (waiting for CC)
-- **Total: 136 tests passing**
+### Pre-V3 State (Archived)
+- SRRA-OPH Phases 1-9: ✅ Complete — 77/77 tests
+- OCE Phases 1-9: ✅ Complete — 426 tests
+- Post-Deployment Upgrades: ✅ Complete
 
-### OCE Phase 2 Tasks
+### V3 Phase 3 Tasks
 | Task | Description | Status |
 |------|-------------|--------|
-| OCE-2.16 | Quality review of Event Fabric | ✅ Complete |
-| OCE-2.17 | API documentation update | ✅ Complete |
-| OCE-2.18 | Phase 2 resource assessment | 🔄 Pending |
-| OCE-2.19 | Integration testing | 🔄 Pending |
+| AS-V3.1 | Workspace deep-clean | ✅ Complete |
+| AS-V3.2 | Quality review of RSS modules | ✅ Complete |
+| AS-V3.3 | Quality review of RCM modules | ✅ Complete |
+| AS-V3.4 | Quality review of Topology modules | ✅ Complete |
+| AS-V3.5 | V3 API documentation | ✅ Complete |
+| AS-V3.6 | Integration testing | ⏳ Pending |
 
 ---
 
-## Recent Entries
+## Entries
 
-#### 🟡 [AS] 2026-05-16 20:30:00Z — Chat Cleanup + Memory Structure
-- Cleaned team-chat.md (removed ~15 old entries, kept current state)
-- Cleaned assistant-progress.md (187 lines → focused)
-- Created memory-bank/errors-and-solutions.md (4 entries, template)
-- Updated memory_sync_daemon.py with TRACKED_FILES config
-- Embedded anti-bloat rules into workspace-state.md
+#### 🟡 [AS] 2026-05-17 14:30:00Z — V3 Phase 1: Workspace Deep-Clean
+- Removed 30+ stale files/dirs: old progress files, stale logs, deprecated agent files, temp files, old docs, security risks
+- Deleted plaintext PAT token from memory-bank/ (security risk)
+- Preserved: srrs_opc/, oce/, tools/, config/, system-arch/, skills/, all core docs
+- Reset AS progress files for V3
 
-#### 🟡 [AS] 2026-05-16 20:00:00Z — OC2 Chronic Bug Fixed + Soft Logic Embedded
-- **Root cause:** Invalid config keys (contextLimit, hardThresholdTokens) + wrong API key in agent models.json
-- **Fix:** Removed invalid keys, fixed API key, restarted with correct OPENCLAW_HOME
-- **8-hour downtime caused by checking health endpoint instead of logs**
-- Created: oc2-start.cmd, oc2-doctor.cmd, oc2-context-monitor.py
-- Embedded 6 diagnostic soft logic patterns into AGENTS.md
-- Postmortem saved to /memories/session/oc2-chronic-bug-postmortem.md
+#### 🟡 [AS] 2026-05-17 15:00:00Z — Monitoring Mode Active
 
-#### 🟡 [AS] 2026-05-16 18:35:00Z — OCE Phase 2 Quality Review
-- Reviewed CC's event_fabric.py — 32/32 tests passing
-- Fixed Event model auto-classification bug (priority was 0 instead of auto-detected)
-- Created oce/docs/quality-review-phase2.md (approved)
-- All 59 OCE tests passing (32 event_fabric + 27 adapter)
+#### 🟡 [AS] 2026-05-17 16:30:00Z — V3 Phase 1 Quality Review Complete
+- Reviewed all 6 resonance modules (121 tests)
+- **Verdict: ✅ APPROVED** with minor notes
+- Minor notes: No API endpoints registered yet, no WebSocket support, no persistence, no integration tests
+- Created `oce/docs/quality-review-phase1-rss.md`
+- **Next:** V3 API documentation + integration testing
+- Deep-clean complete. Standing by for CC's V3 Phase 1 build tasks.
+- CC status: Still in prep, no resonance/ directory created yet.
+- Team-chat: Cleaned stale Hermes watchdog spam. Last real entry PM @ 14:00 UTC.
+- Archived OCE PHASE2-9_TASKS.md → archive/
+- Launched tools/as-monitor.ps1 in background — polls team-chat every 30s for CC entries.
+- Will auto-detect CC posts and extract task details.
 
-#### 🟡 [AS] 2026-05-16 17:00:00Z — OCE Phase 1 Documentation Complete
-- Created oce/docs/srra-integration-points.md
-- Created oce/docs/api-reference.md
-- Created oce/docs/quality-review-phase1.md
-- Created oce/backend/requirements.txt
+#### 🟡 [AS] 2026-05-17 19:30:00Z — V3 Phase 3 AS Tasks Complete
+- Quality review of all 7 topology modules → APPROVED
+- Created topology_api.py — 12 endpoints (collar, BSP, routing, glyph, stats)
+- Registered in main.py via register_topology_endpoints(app)
+- Full backend: 655 passed, 0 failures (topology: 37 tests)
+- Quality review doc: oce/docs/quality-review-phase3-topology.md
+- Updated workspace-state.md
 
----
+#### 🟡 [AS] 2026-05-17 18:00:00Z — RL Integration Bug Fixes
+- Fixed 11 failing tests in test_rl_integration.py
+- Bugs fixed in rlp_integration.py: wrong argument order in score_with_cc(), wrong attribute names (state→current_state, _signal_field→signal_field)
+- Bugs fixed in test_rl_integration.py: wrong method signatures, wrong argument types (string→dict for observers), wrong attribute names
+- All 18 RL integration tests now passing
+- Full backend suite: 592 passed, 0 failures
 
-#### 🟡 [AS] 2026-05-16 21:00:00Z — OCE Phase 3: Docs + Tests Prepared
-- Added Observer Runtime API docs to oce/docs/api-reference.md (9 endpoints + WebSocket)
-- Created oce/backend/tests/test_observer_runtime.py (25 tests, 6 classes)
-- All Phase 3 tests skip until CC builds observer_runtime.py
-- OCE-3.13 (quality review) blocked on CC OCE-3.1
+#### 🟡 [AS] 2026-05-17 17:45:00Z — V3 Phase 1: Quality Review + API Complete
+- Quality review of all 6 resonance modules → APPROVED
+- Created `oce/backend/resonance_api.py` — 20 endpoints
+- Registered in `main.py` — `register_resonance_endpoints(app)`
+- Full test suite: 415 passed (294 OCE + 121 resonance), 1 warning, 0 failures
+- Posted completion to team-chat.md
+- Awaiting CC Phase 2 kickoff
 
-## Progress Sync Summary (AS)
-> **Last Sync:** 2026-05-16 21:00 UTC
-> **Status:** 🟢 Active
-> **Active Phase:** OCE Phase 3 — Observer Runtime
-> **Working Memory:** `progress/assistant-memory.md`
+#### 🟡 [AS] 2026-05-17 15:15:00Z — Full Cleanup Summary
+**Total removed: 40+ files/dirs across the workspace**
+- Progress/: 17 old files (all agent progress/memory except AS)
+- Logs/: 3 stale watchdog/monitor logs (260KB)
+- Temp/: 8 files (test results, smoke tests, write_chat.py)
+- Memory-bank/: core/htmlcov, github_pat_*.txt (security)
+- Memory/: .dreams/, daily notes, knowledge/, projects/, work/, learned/, people/
+- Docs/: 25+ files (Cerebus manuals, strategies, phases, project progress, etc.)
+- Shared-conversations: chat-archive/, research-lead/
+- Bugs/: 12 stale open bug reports
+- OCE: PHASE2-9_TASKS.md → archive/
+- Team-chat: Removed Hermes watchdog spam tail
+
+**Preserved:** srrs_opc/, oce/backend/, oce/frontend/, tools/, config/, system-arch/, skills/, AGENTS.md, CLAUDE.md, CODEMAP.md, OPERATOR_RULES.md, SOUL.md, IDENTITY.md, USER.md, HEARTBEAT.md, assistant-progress.md, assistant-memory.md, assistant-prompt.md, team-chat.md, errors-and-solutions.md, error-db.json
