@@ -3,7 +3,7 @@
 > **Maintained by:** PM (Polymorph)
 > **Last Updated:** 2026-05-17 06:00 UTC
 > **Purpose:** Track and classify integration issues between OCE and SRRA-OPH substrate
-> **Current Phase:** Phase 5 — Observability (178 tests passing)
+> **Current Phase:** Phase 6 — Execution Substrate (244+ tests passing)
 
 ## Issue Classification
 
@@ -120,7 +120,7 @@
 - [x] Operator → Memory integration
 - [x] Memory debug CLI
 
-### Phase 5 Tests (Ongoing)
+### Phase 5 Tests (Complete)
 - [x] Metrics collection (event rates, observer health, memory, entropy)
 - [x] Tracing engine (start/add_hop/end/search)
 - [x] Alerting engine (rules, evaluate, acknowledge)
@@ -128,6 +128,20 @@
 - [x] Dashboard endpoint
 - [x] Operator → Observability integration (OCE-5.17)
 - [x] Observability debug CLI (OCE-5.18)
-- [ ] Frontend observability dashboard (OCE-5.9-5.13) — Pending OC2
-- [ ] Quality review (OCE-5.14) — Pending AS
-- [ ] Integration tests (OCE-5.16) — Pending AS
+- [x] Frontend observability dashboard (OCE-5.9-5.13) — Complete
+- [x] Quality review (OCE-5.14) — Complete
+- [x] Integration tests (OCE-5.16) — Complete
+
+### Phase 6 Tests (Ongoing)
+- [x] Execution engine (49 tests) — worker pool, task queue, policies, history
+- [x] DSPy execution optimizer (17 tests) — 3 pipelines with heuristic fallbacks
+- [x] Execution analytics API — /analytics, /bottlenecks, /tune
+- [x] Operator → Execution integration (OCE-6.15)
+- [x] Execution debug CLI (OCE-6.16)
+- [ ] Execution policies doc (OCE-6.5) — Pending OC
+- [ ] Skill/tool registry doc (OCE-6.6) — Pending OC
+- [ ] Architecture review (OCE-6.7) — Pending OC
+- [ ] Frontend execution dashboard (OCE-6.8-6.11) — Pending OC2
+- [ ] Quality review (OCE-6.12) — Pending AS
+- [ ] API docs (OCE-6.13) — Pending AS
+- [ ] Integration tests (OCE-6.14) — Pending AS

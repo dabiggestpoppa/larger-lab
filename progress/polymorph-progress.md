@@ -7,9 +7,30 @@
 
 ---
 
-## Status: 🟢 Active — Phase 5 PM Tasks Complete + P90 Reframed 🦅
+## Status: 🟢 Active — Phase 6 PM Tasks Complete 🦅
 
 ### Recent Entries
+
+#### 🔴 [PM] 2026-05-17 — Phase 6 PM Tasks Complete (2/2)
+
+**OCE-6.15: Operator ↔ Execution Engine Integration**
+- `tools/operator/execution-integration.py` — 290 lines
+- Submits operator actions (exec, install) as execution tasks
+- Full task management: submit, cancel, status, list, replay, history
+- Engine inspection: workers, stats, analytics, bottlenecks, policies
+- Color-coded CLI, stdlib only, Windows compatible
+
+**OCE-6.16: Execution Debug CLI**
+- `tools/operator/execution-debug.py` — 350+ lines
+- 13 commands: queue, workers, task, list, replay, cancel, history, stats, analytics, bottlenecks, policies, policy-add, health, all
+- Color-coded by status (green=completed, yellow=running, red=failed, cyan=pending)
+- Table renderer with no external dependencies
+
+**Integration Issues Updated**
+- Phase 5 tests: all marked complete
+- Phase 6 checklist: 5/14 complete (2 PM done, 3 OC, 4 OC2, 3 AS pending)
+
+---
 
 #### 🔴 [PM] 2026-05-17 — Critical Bug Fix: PowerShell Window Flashing + Memory System Update
 
