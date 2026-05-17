@@ -13,7 +13,6 @@ import sqlite3
 import json
 import logging
 import uuid
-import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from threading import Lock

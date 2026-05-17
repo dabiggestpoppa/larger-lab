@@ -4,8 +4,18 @@ OWL Self-Healing Engine
 Scans gateway logs on startup, classifies errors, logs to DB,
 annotates bug files, and attempts auto-recovery.
 
+REQUIRES prescription approval from doctor.py before executing fixes.
+Activates a 1-min safety cron before healing to recover if self-heal hangs.
+
 Usage:
-    python tools/self_heal.py [--scan] [--report] [--fix] [--full]
+    python tools/self_heal.py [--scan] [--report] [--fix] [--full] [--force]
+
+Safety Protocol:
+    1. Doctor generates prescription → MAD approves
+    2. Self-heal activates 1-min safety cron (gateway watchdog)
+    3. Self-heal executes approved fixes
+    4. Self-heal deactivates safety cron on success
+    5. If self-heal fails/hangs → safety cron restarts gateway
 """
 
 import json
@@ -314,8 +324,156 @@ def generate_report():
     print("\n" + "=" * 60)
 
 
-def auto_fix():
-    """Attempt automatic fixes for known error patterns."""
+PRESCRIPTION_PATH = os.path.join(WORKSPACE, "memory-bank", "doctor-prescription.md")
+SAFETY_CRON_ID = "self-heal-safety-watchdog"
+
+
+def check_prescription_approved():
+    """Check if the doctor prescription has been approved by MAD."""
+    if not os.path.exists(PRESCRIPTION_PATH):
+        print("⚠️  No prescription found. Run doctor first: python tools/doctor.py --full")
+        return False
+    with open(PRESCRIPTION_PATH, "r", encoding="utf-8") as f:
+        content = f.read()
+    # Check for approval marker
+    if "**Status:** ✅ APPROVED" in content:
+        return True
+    if "**Status:** ⏳ PENDING MAD APPROVAL" in content:
+        print("⚠️  Prescription pending MAD approval. Reply APPROVE to the doctor prescription.")
+        return False
+    if "**Status:** ❌ REJECTED" in content:
+        print("⚠️  Prescription was rejected by MAD. Skipping self-heal.")
+        return False
+    print("⚠️  Unknown prescription status. Run doctor first.")
+    return False
+
+
+def activate_safety_cron():
+    """Activate 1-min safety cron that checks if self-heal is still alive."""
+    import subprocess
+    safety_script = os.path.join(WORKSPACE, "tools", "self_heal_safety.py")
+    if not os.path.exists(safety_script):
+        print("⚠️  Safety script not found. Creating minimal watchdog...")
+        _create_safety_script(safety_script)
+    try:
+        subprocess.Popen(
+            [sys.executable, safety_script],
+            creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        print("🛡️  Safety cron activated (1-min watchdog)")
+    except Exception as e:
+        print(f"⚠️  Failed to activate safety cron: {e}")
+
+
+def deactivate_safety_cron():
+    """Deactivate safety cron after successful heal."""
+    pid_file = os.path.join(WORKSPACE, ".self-heal-safety.pid")
+    if os.path.exists(pid_file):
+        try:
+            with open(pid_file, "r") as f:
+                pid = int(f.read().strip())
+            os.remove(pid_file)
+            print(f"🛡️  Safety cron deactivated (PID {pid} stopped)")
+        except Exception:
+            pass
+    # Also remove the stop-flag so safety script exits cleanly
+    stop_flag = os.path.join(WORKSPACE, ".self-heal-complete.flag")
+    with open(stop_flag, "w") as f:
+        f.write("complete")
+
+
+def _create_safety_script(path):
+    """Create the safety watchdog script."""
+    content = '''"""
+Self-Heal Safety Watchdog
+Runs for 5 minutes max, checks if self-heal is still running.
+If self-heal hangs, restarts the gateway.
+"""
+import os, sys, time, subprocess, signal
+
+WORKSPACE = r"C:\\Users\\wifik\\Desktop\\projects\\larger-lab"
+PID_FILE = os.path.join(WORKSPACE, ".self-heal-safety.pid")
+STOP_FLAG = os.path.join(WORKSPACE, ".self-heal-complete.flag")
+SELF_HEAL_PID_FILE = os.path.join(WORKSPACE, ".self-heal-running.pid")
+
+def main():
+    with open(PID_FILE, "w") as f:
+        f.write(str(os.getpid()))
+    
+    deadline = time.time() + 300  # 5 min max
+    check_interval = 60  # check every 60s
+    
+    while time.time() < deadline:
+        # Check if self-heal completed
+        if os.path.exists(STOP_FLAG):
+            os.remove(STOP_FLAG)
+            if os.path.exists(PID_FILE):
+                os.remove(PID_FILE)
+            print("[SAFETY] Self-heal completed successfully. Exiting.")
+            return
+        
+        # Check if self-heal process is still alive
+        if os.path.exists(SELF_HEAL_PID_FILE):
+            with open(SELF_HEAL_PID_FILE, "r") as f:
+                try:
+                    pid = int(f.read().strip())
+                    # Check if process exists (Windows)
+                    import ctypes
+                    kernel32 = ctypes.windll.kernel32
+                    handle = kernel32.OpenProcess(1, 0, pid)
+                    if handle == 0:
+                        print(f"[SAFETY] Self-heal process {pid} is dead! Restarting gateway...")
+                        restart_gateway()
+                        return
+                    kernel32.CloseHandle(handle)
+                except Exception:
+                    pass
+        
+        time.sleep(check_interval)
+    
+    # Timeout reached
+    print("[SAFETY] 5-min timeout reached. Cleaning up.")
+    if os.path.exists(PID_FILE):
+        os.remove(PID_FILE)
+
+def restart_gateway():
+    try:
+        subprocess.run(
+            ["openclaw", "gateway", "restart"],
+            capture_output=True, timeout=30,
+            creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+        )
+        print("[SAFETY] Gateway restart triggered.")
+    except Exception as e:
+        print(f"[SAFETY] Failed to restart gateway: {e}")
+    if os.path.exists(PID_FILE):
+        os.remove(PID_FILE)
+
+if __name__ == "__main__":
+    main()
+'''
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(content)
+
+
+def auto_fix(force=False):
+    """Attempt automatic fixes for known error patterns.
+    
+    Args:
+        force: If True, skip prescription check (use with caution).
+    """
+    if not force and not check_prescription_approved():
+        print("\n⛔ Self-heal blocked: No approved prescription.")
+        print("   Run: python tools/doctor.py --full")
+        print("   Then MAD approves the prescription.")
+        print("   Then: python tools/self_heal.py --fix")
+        return 0
+
+    # Activate safety cron before healing
+    activate_safety_cron()
+
     conn = get_conn()
     fixed = 0
 

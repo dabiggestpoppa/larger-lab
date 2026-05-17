@@ -20,8 +20,10 @@ import sys
 import time
 from pathlib import Path
 
+# Following official docs: https://docs.openclaw.ai/gateway
+# Default port is 18789 per OpenClaw docs
 GATEWAY_HOST = "127.0.0.1"
-GATEWAY_PORT = 18790
+GATEWAY_PORT = 18789
 HEALTH_URL = f"http://{GATEWAY_HOST}:{GATEWAY_PORT}/health"
 PID_FILE = Path(__file__).parent.parent / ".openclaw-watchdog.pid"
 LOG_FILE = Path(os.environ.get("TEMP", "/tmp")) / "openclaw" / "watchdog.log"
@@ -48,18 +50,13 @@ def is_gateway_up():
         return False
 
 def start_gateway():
-    workspace = Path(__file__).parent.parent
-    node_exe = r"C:\Program Files\nodejs\node.exe"
-    openclaw_js = Path(os.environ.get("APPDATA", "")) / "npm" / "node_modules" / "openclaw" / "dist" / "index.js"
+    """Start gateway using official openclaw CLI command per docs."""
+    log("Starting OpenClaw gateway via CLI...")
     
-    if not openclaw_js.exists():
-        log(f"ERROR: OpenClaw not found at {openclaw_js}")
-        return False
-    
-    log("Starting OpenClaw gateway...")
+    # Use the official openclaw CLI command (not manual node invocation)
+    # Per docs: "openclaw gateway run --port 18789"
     proc = subprocess.Popen(
-        [node_exe, str(openclaw_js), "gateway", "run", "--port", str(GATEWAY_PORT), "--allow-unconfigured"],
-        cwd=str(workspace),
+        ["openclaw", "gateway", "run", "--port", str(GATEWAY_PORT)],
         creationflags=subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP,
     )
     log(f"Gateway started (PID {proc.pid})")
