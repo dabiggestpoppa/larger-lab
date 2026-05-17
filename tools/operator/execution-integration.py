@@ -171,6 +171,55 @@ def create_policy(policy_id: str, name: str, max_concurrent: int = 5,
         "description": description,
     })
 
+# ─── Governance Engine operations (OCE-8.15) ────────────────────────────────
+
+def governance_status() -> dict:
+    """Get governance engine status."""
+    return _api_get("/governance/status")
+
+def governance_proposals(status: str = None, limit: int = 50) -> dict:
+    """List governance proposals."""
+    params = []
+    if status: params.append(f"status={status}")
+    params.append(f"limit={limit}")
+    return _api_get(f"/governance/proposals?{'&'.join(params)}")
+
+def governance_propose(proposal_type: str, title: str, description: str,
+                       changes: dict, reason: str, proposer: str = "operator") -> dict:
+    """Submit a governance proposal."""
+    return _api_post("/governance/propose", {
+        "proposal_type": proposal_type,
+        "title": title,
+        "description": description,
+        "changes": changes,
+        "reason": reason,
+        "proposer": proposer,
+    })
+
+def governance_approve(proposal_id: str, approver: str = "operator") -> dict:
+    """Approve a governance proposal."""
+    return _api_post(f"/governance/approve/{proposal_id}", {"approver": approver})
+
+def governance_reject(proposal_id: str, rejecter: str = "operator", reason: str = "") -> dict:
+    """Reject a governance proposal."""
+    return _api_post(f"/governance/reject/{proposal_id}", {"rejecter": rejecter, "reason": reason})
+
+def governance_override(decision_id: str, reason: str, mad_id: str = "mad") -> dict:
+    """MAD override an autonomous decision."""
+    return _api_post("/governance/override", {
+        "decision_id": decision_id,
+        "reason": reason,
+        "mad_id": mad_id,
+    })
+
+def governance_sovereignty() -> dict:
+    """Get sovereignty boundaries report."""
+    return _api_get("/governance/sovereignty")
+
+def governance_log(limit: int = 50) -> dict:
+    """Get governance audit log."""
+    return _api_get(f"/governance/log?limit={limit}")
+
 def get_analytics() -> dict:
     """Get execution analytics."""
     return _api_get("/execution/analytics")
@@ -292,13 +341,49 @@ Examples:
     pa.add_argument("--rate-limit", type=int, default=60)
     pa.add_argument("--sandboxed", action="store_true")
 
+    # ── Governance commands (OCE-8.15) ──────────────────────────────────
+
+    sp.add_parser("gov-status", help="Governance engine status")
+
+    pgp = sp.add_parser("gov-proposals", help="List governance proposals")
+    pgp.add_argument("--status", choices=["proposed","voting","approved","rejected","applied","overridden"])
+    pgp.add_argument("--limit", type=int, default=50)
+
+    pgp = sp.add_parser("gov-propose", help="Submit governance proposal")
+    pgp.add_argument("--type", required=True, dest="proposal_type",
+                     choices=["policy_change","drift_config","healing_strategy","topology_mutation","resource_allocation","attractor_update"])
+    pgp.add_argument("--title", required=True)
+    pgp.add_argument("--description", default="")
+    pgp.add_argument("--changes", default="{}", help="JSON changes string")
+    pgp.add_argument("--reason", required=True)
+    pgp.add_argument("--proposer", default="operator")
+
+    pga = sp.add_parser("gov-approve", help="Approve governance proposal")
+    pga.add_argument("proposal_id")
+    pga.add_argument("--approver", default="operator")
+
+    pgr = sp.add_parser("gov-reject", help="Reject governance proposal")
+    pgr.add_argument("proposal_id")
+    pgr.add_argument("--rejecter", default="operator")
+    pgr.add_argument("--reason", default="")
+
+    pgo = sp.add_parser("gov-override", help="MAD override a decision")
+    pgo.add_argument("decision_id")
+    pgo.add_argument("--reason", required=True)
+    pgo.add_argument("--mad-id", default="mad")
+
+    sp.add_parser("gov-sovereignty", help="Show sovereignty boundaries")
+
+    pgl = sp.add_parser("gov-log", help="Governance audit log")
+    pgl.add_argument("--limit", type=int, default=50)
+
     args = p.parse_args()
     if not args.action:
         p.print_help()
         sys.exit(1)
 
     print(f"\n{'='*60}")
-    print(f"  OCE-6.15 Operator <-> Execution Engine")
+    print(f"  OCE Operator <-> Engine Integration")
     print(f"  Backend: {OCE_BASE_URL}")
     print(f"{'='*60}\n")
 
@@ -333,6 +418,24 @@ Examples:
     elif args.action == "policy-add":
         r = create_policy(args.policy_id, args.name, args.max_concurrent,
                           args.rate_limit, sandboxed=args.sandboxed)
+    elif args.action == "gov-status":
+        r = governance_status()
+    elif args.action == "gov-proposals":
+        r = governance_proposals(args.status, args.limit)
+    elif args.action == "gov-propose":
+        changes = json.loads(args.changes)
+        r = governance_propose(args.proposal_type, args.title, args.description,
+                               changes, args.reason, args.proposer)
+    elif args.action == "gov-approve":
+        r = governance_approve(args.proposal_id, args.approver)
+    elif args.action == "gov-reject":
+        r = governance_reject(args.proposal_id, args.rejecter, args.reason)
+    elif args.action == "gov-override":
+        r = governance_override(args.decision_id, args.reason, args.mad_id)
+    elif args.action == "gov-sovereignty":
+        r = governance_sovereignty()
+    elif args.action == "gov-log":
+        r = governance_log(args.limit)
     else:
         p.print_help()
         sys.exit(1)
