@@ -47,7 +47,7 @@
 
 | Tool | Path | Purpose |
 |------|------|---------|
-| Hermes Watchdog | `tools/hermes-watchdog.py` | OWL health monitor (gateway, workspace, disk) |
+| OC2 Watchdog | `tools/hermes-watchdog.py` | OWL health monitor (gateway, workspace, disk) |
 | Progress Sync | `tools/progress-sync.py` | Agent progress → memory sync |
 | Chat Sync | `tools/chat_sync.py` | Team chat → agent memory sync |
 | Memory Sync Daemon | `tools/memory_sync_daemon.py` | Background memory tracker |
@@ -109,7 +109,7 @@
 
 | File | Purpose |
 |------|---------|
-| `~/.openclaw/openclaw.json` | OpenClaw gateway config |
+| `~/.openclaw-2/openclaw.json` | OpenClaw gateway config (OC2, primary) |
 | `config/tradingview-mcp.json` | TradingView MCP config |
 | `~/.agentmemory/.env` | AgentMemory config |
 
@@ -119,7 +119,6 @@
 
 | Port | Service |
 |------|---------|
-| 18789 | OpenClaw gateway (OC1) |
 | 18790 | OpenClaw gateway (OC2, primary) |
 | 3000 | OCE frontend (Next.js) |
 | 8000 | OCE backend (FastAPI) |
@@ -134,11 +133,9 @@
 | Tag | Agent | Status | Progress File |
 |-----|-------|--------|---------------|
 | 🔵 CC | Claude Code | Active | `progress/claude-code-progress.md` |
-| 🟣 OC | OpenClaw | Active | `progress/openclaw-progress.md` |
-| 🟠 OC2 | OpenClaw 2 | Active | `progress/openclaw-2-progress.md` |
+| 🟠 OC2 | OWL (OpenClaw 2) | **PRIMARY OPERATOR** | `progress/openclaw-2-progress.md` |
 | 🟡 AS | Assistant Manager | Active | `progress/assistant-progress.md` |
 | 🔴 PM | Polymorph | Active | `progress/polymorph-progress.md` |
-| 🟢 RL | OWL (Research Lead) | **OPERATOR** | `progress/rl-progress.md` |
 
 ---
 

@@ -9,9 +9,9 @@
 - **GitHub PAT:** `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`
 
 ## Telegram
-- **OC1 Bot Token (OpenClaw):** `8718444747:AAHdkkWQP0pGM4163uYEConZpGP82QmB2J4`
-- **OC2 Bot Token (@OC2BLRBOT):** `8945439460:AAHZT2Xx0jHaApejRJYi-xORG5FkKNAQ5yM`
-- **Hermes Bot Token (old):** `8851242922:AAGWGZaEwA0LxBYISo460Z08WC4aE_JirvE`
+- **OC2 Bot Token (@OC2BLRBOT) — PRIMARY:** `8945439460:AAHZT2Xx0jHaApejRJYi-xORG5FkKNAQ5yM`
+- ~~OC1 Bot Token~~ — removed (gateway decommissioned)
+- ~~Hermes Bot Token~~ — removed
 
 ## MT5
 - **Login:** (see `C:\Users\wifik\Downloads\keys.txt`)

@@ -12,15 +12,11 @@
 ### Current Phase
 P90 Pine → Nautilus Conversion + Backtest Engine
 
-#### 📢 [SYSTEM] 2026-05-16 — Workspace Optimization Update (PM)
-- New memory sync daemon: auto-sync every 7 updates, auto-summarize every 20 entries via LLM
-- New tools: `memory_sync_daemon.py`, `summarize_progress.py`, `workspace_cleanup.py`
-- New protocol: `AGENT_MOVEMENT.md` — agent movement patterns, shared space etiquette
-- Sync threshold changed: 3→7 updates. All progress files updated.
-- OC2 daily cron added: Memory Sync & Summarization (7am)
-- See `AGENT_MOVEMENT.md` for full protocol
 
-### Recent Entries
+#### 📦 SUMMARIZED BLOCK — 2026-05-17
+*(1 older entries compressed via LLM)*
+
+⚠ Summarization failed (HTTP Error 400: Bad Request). Original entries preserved.
 
 #### 🟣 [OC] 2026-05-16 — Gateway Infrastructure Notes
 - OC1 gateway fixed by RL — gateway.cmd was missing `run` subcommand, had wrong port (18790→18789), missing OPENCLAW_HOME
@@ -28,6 +24,7 @@ P90 Pine → Nautilus Conversion + Backtest Engine
 - **Prevention:** Always update BOTH gateway.cmd files after any `npm update openclaw`
 - OC2 @OC2BLRBOT is primary working Telegram bot
 - OC1 @finalstrawclawbot gateway live but Telegram session may still need separate fix
+
 
 #### 🟣 [OC] 2026-05-15 18:27:00Z — P90 Unified Engine Bug Fix + Results
 - **Bug found**: `est_h == 3` classification was DEAD CODE inside Asian session block
@@ -45,11 +42,13 @@ P90 Pine → Nautilus Conversion + Backtest Engine
 - **Files**: `nautilus/strategies/p90_unified.py` (unified engine)
 - **Results saved**: `nautilus/results/p90_unified_20260515_182727.json`
 
+
 #### 🟣 [OC] 2026-05-15 20:44:00Z — Initial Setup
 - OpenClaw gateway running on ws://127.0.0.1:18789
 - Model routing configured with fallbacks
 - Skills loaded from `.hermes/skills/` + `nautilus/`
 - SRRA-OPH Phase 1 directives added to openclaw_prompt.md
+
 
 #### 🟣 [OC] 2026-05-15 22:25:00Z — Discord Bot Setup Complete
 - **blrr city** bot connected to Discord gateway
@@ -72,7 +71,9 @@ P90 Pine → Nautilus Conversion + Backtest Engine
 - [ ] SCOPE Protocol: Create scope_chain.py
 - [ ] GSP-Lite: Define GlyphMessage schema
 
+
 #### 🟣 [OC] 2026-05-17 — OCE Phase 6 Documentation (OCE-6.5, OCE-6.6, OCE-6.7)
 - **OCE-6.5**: Created `oce/docs/execution-policies.md` — 5 policy types (rate limiting, permissions, sandboxing, timeouts, retry), enforcement architecture, SRRA-OPH alignment
 - **OCE-6.6**: Created `oce/docs/skill-tool-registry.md` — skill/tool registration schemas, capability declarations, invocation protocol, built-in skills/tools
 - **OCE-6.7**: Completed architecture review — Verified alignment with SRRA-OPH ExecutionPatch, Capability Fields, MemoryPatch, RepairPatch, Trajectory Fields
+

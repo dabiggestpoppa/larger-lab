@@ -36,7 +36,16 @@ from tracing_engine import get_tracing_engine, TracingEngine
 from alerting_engine import get_alerting_engine, AlertingEngine, AlertSeverity
 from execution_engine import get_execution_engine, ExecutionEngine, ExecutionTask, ExecutionStatus, ExecutionPriority
 from execution_api import register_execution_endpoints
+from drift_detector import get_drift_detector, DriftDetector
+from self_healing_engine import get_self_healing_engine, SelfHealingEngine
+from governance_api import register_governance_endpoints
 from command_center import router as command_center_router
+from governance_engine import get_governance_engine, GovernanceEngine, ProposalStatus, ProposalType
+from consensus_engine import get_consensus_engine, ConsensusEngine
+from coevolution_protocol import get_coevolution_protocol, CoevolutionProtocol
+from governance_engine import get_governance_engine, GovernanceEngine, ProposalStatus, ProposalType
+from consensus_engine import get_consensus_engine, ConsensusEngine
+from coevolution_protocol import get_coevolution_protocol, CoevolutionProtocol
 
 app = FastAPI(
     title="OCE Continuity Core",
@@ -851,7 +860,136 @@ register_phase4_endpoints(app)
 
 # Register Phase 6 Execution endpoints
 register_execution_endpoints(app)
+
+# Register Phase 8 Governance endpoints
+register_governance_endpoints(app)
+
 app.include_router(command_center_router)
+
+# ─── Phase 7: Evolution API ──────────────────────────────────────────────────
+
+@app.get("/evolution/status")
+async def evolution_status():
+    """Get current evolution state (drift + healing)."""
+    try:
+        drift = get_drift_detector()
+        healing = get_self_healing_engine()
+        return {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "drift": {
+                "thresholds": drift._thresholds,
+                "alert_callbacks_registered": len(drift._alert_callbacks),
+            },
+            "healing": healing.get_stats(),
+        }
+    except Exception as e:
+        logger.error(f"Evolution status error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/evolution/drift")
+async def evolution_drift(window_hours: int = Query(24, ge=1, le=168)):
+    """Get drift report for the specified time window."""
+    try:
+        drift = get_drift_detector()
+        report = drift.get_drift_report(window_hours=window_hours)
+        return report
+    except Exception as e:
+        logger.error(f"Evolution drift error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/evolution/recommendations")
+async def evolution_recommendations(time_range_hours: int = Query(24, ge=1, le=168)):
+    """Get self-healing recommendations based on failure analysis."""
+    try:
+        healing = get_self_healing_engine()
+        patterns = healing.analyze_failures(time_range_hours=time_range_hours)
+        recommendations = healing.generate_recommendations(patterns)
+        return {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "patterns_found": len(patterns),
+            "recommendations": [r.to_dict() for r in recommendations],
+        }
+    except Exception as e:
+        logger.error(f"Evolution recommendations error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.post("/evolution/tune")
+async def evolution_tune():
+    """Trigger auto-tuning (combines DSPy optimizer + drift data)."""
+    try:
+        from dspy_execution_optimizer import get_optimizer
+        engine = get_execution_engine()
+        drift = get_drift_detector()
+        history_stats = engine.history.get_stats()
+
+        optimizer = get_optimizer()
+        recommended = optimizer.recommend_workers(
+            current_workers=engine.max_workers,
+            history_stats=history_stats,
+        )
+
+        old_workers = engine.max_workers
+        engine.max_workers = recommended
+
+        # Also check drift for additional tuning
+        report = drift.get_drift_report(window_hours=6)
+        drift_detected = report.get("drift_detected", False)
+
+        return {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "previous_workers": old_workers,
+            "recommended_workers": recommended,
+            "tuned": recommended != old_workers,
+            "drift_detected": drift_detected,
+            "drift_report": report if drift_detected else None,
+        }
+    except Exception as e:
+        logger.error(f"Evolution tune error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.post("/evolution/heal")
+async def evolution_heal():
+    """Execute self-healing based on current drift report."""
+    try:
+        drift = get_drift_detector()
+        healing = get_self_healing_engine()
+
+        report = drift.get_drift_report(window_hours=6)
+        actions = healing.auto_heal(drift_report=report)
+
+        return {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "actions_taken": len(actions),
+            "actions": [a.to_dict() for a in actions],
+        }
+    except Exception as e:
+        logger.error(f"Evolution heal error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/evolution/history")
+async def evolution_history(limit: int = Query(50, ge=1, le=500)):
+    """Get evolution action history (drift reports + healing actions)."""
+    try:
+        drift = get_drift_detector()
+        healing = get_self_healing_engine()
+
+        drift_history = drift.get_drift_history(limit=limit)
+        healing_history = healing.get_healing_history(limit=limit)
+
+        return {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "drift_history": drift_history,
+            "healing_history": healing_history,
+        }
+    except Exception as e:
+        logger.error(f"Evolution history error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
 
 # ─── Observability Models (Phase 5) ──────────────────────────────────────────
 

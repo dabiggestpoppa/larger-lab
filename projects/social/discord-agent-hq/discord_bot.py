@@ -1,9 +1,8 @@
 """
-Discord Bot -- blrr city
-@mentions respond as the active agent (default: Hermes)
-/hermes -> switch to Hermes + respond
-/openclaw -> switch to OpenClaw + respond
-/agent_status -> show active agent + progress
+Discord Bot -- blrr city (OC2 / OWL)
+@mentions respond as OWL (OC2)
+/status -> show agent status + progress
+/help -> show available commands
 """
 
 import discord
@@ -31,7 +30,6 @@ WORKSPACE = Path(os.getenv("WORKSPACE_PATH", str(Path(__file__).parent.parent)))
 PROGRESS_FILE = WORKSPACE / "PROJECT_PROGRESS_CLEAN.md"
 
 # State
-active_agent = "hermes"
 responded_messages = set()
 
 
@@ -55,35 +53,17 @@ def get_workspace_summary():
     return dirs[:12], files[:12]
 
 
-def hermes_handle(content: str) -> str:
+def owl_handle(content: str) -> str:
     c = content.lower().strip()
-    if any(w in c for w in ['status', 'progress', 'update', 'how are we']):
+    if any(w in c for w in ['status', 'progress', 'update', 'how are we', 'ping']):
         lines = [l for l in read_progress().split('\n') if l.strip()][-10:]
-        return f"HERMES Status\n```\n{chr(10).join(lines)[:1200]}\n```"
+        return f"🦉 OWL (OC2) Status\n```\n{chr(10).join(lines)[:1200]}\n```"
     if any(w in c for w in ['help', 'what can']):
-        return "HERMES - Architect & Planner\nstatus | workspace | plan: <text> | decision: <text>"
+        return ("🦉 OWL (OC2) — Operator Shell\n"
+                "status | workspace | run <script> | edit: <text> | create: <file>")
     if any(w in c for w in ['workspace', 'files', 'structure']):
         dirs, files = get_workspace_summary()
-        return f"HERMES Workspace\nDirs: {', '.join(dirs)}\nFiles: {', '.join(files)}"
-    if c.startswith('plan ') or c.startswith('plan:'):
-        text = re.sub(r'^plan[:\s]*', '', c, flags=re.IGNORECASE).strip()
-        return f"HERMES Plan logged: {append_progress('PLAN: ' + text, 'Hermes')}"
-    if 'decision:' in c or c.startswith('decide'):
-        text = re.sub(r'^decide[:\s]*', '', c.split(':', 1)[-1].strip() if ':' in c else c, flags=re.IGNORECASE).strip()
-        return f"HERMES Decision logged: {append_progress('DECISION: ' + text, 'Hermes')}"
-    return f'HERMES: "{content[:150]}" -- try status, workspace, plan:, decision:'
-
-
-def openclaw_handle(content: str) -> str:
-    c = content.lower().strip()
-    if any(w in c for w in ['status', 'progress', 'what are you doing']):
-        lines = [l for l in read_progress().split('\n') if l.strip()][-5:]
-        return f"OPENCLAW Status\n```\n{chr(10).join(lines)[:800]}\n```\nReady for tasks!"
-    if any(w in c for w in ['help', 'what can']):
-        return "OPENCLAW - Builder & Executor\nstatus | workspace | run <script> | edit: <text> | create: <file> | <content>"
-    if any(w in c for w in ['workspace', 'files', 'structure']):
-        dirs, files = get_workspace_summary()
-        return f"OPENCLAW Workspace\nDirs: {', '.join(dirs)}\nFiles: {', '.join(files)}"
+        return f"🦉 Workspace\n📁 {', '.join(dirs)}\n📄 {', '.join(files)}"
     if c.startswith('run '):
         script = content[4:].strip()
         sp = WORKSPACE / script
@@ -99,22 +79,22 @@ def openclaw_handle(content: str) -> str:
         return f"Script not found: `{script}`"
     if c.startswith('edit:') or c.startswith('edit progress:'):
         text = re.sub(r'^edit( progress)?[:\s]*', '', c, flags=re.IGNORECASE).strip()
-        return f"Progress updated: {append_progress(text, 'OpenClaw')}"
+        return f"Progress updated: {append_progress(text, 'OC2')}"
     if c.startswith('create:') or c.startswith('create file:'):
         parts = re.sub(r'^create( file)?[:\s]*', '', c, flags=re.IGNORECASE).strip().split('|', 1)
         fname = parts[0].strip()
-        fcontent = parts[1].strip() if len(parts) > 1 else "# Created by OpenClaw\n"
+        fcontent = parts[1].strip() if len(parts) > 1 else "# Created by OC2\n"
         try:
             (WORKSPACE / fname).write_text(fcontent, encoding='utf-8')
             return f"Created: `{fname}`"
         except Exception as e:
             return f"Error: {e}"
-    return f'OPENCLAW: "{content[:150]}" -- try status, workspace, run <script>, edit: <text>'
+    return f'🦉 OWL: "{content[:150]}" — try status, workspace, run <script>, edit: <text>'
 
 
 @client.event
 async def on_ready():
-    print(f'[OK] {client.user} connected (id={client.user.id})')
+    print(f'[OK] blrr city (OC2): {client.user} connected (id={client.user.id})')
     try:
         gid = os.getenv("DISCORD_GUILD_ID")
         if gid:
@@ -128,14 +108,13 @@ async def on_ready():
     except Exception as e:
         print(f"Sync error: {e}")
     await client.change_presence(activity=discord.Activity(
-        type=discord.ActivityType.watching, name="@mentions | /hermes | /openclaw"))
+        type=discord.ActivityType.watching, name="@mentions | /status | /help"))
 
 
 @client.event
 async def on_message(message):
     print(f"[DEBUG] on_message: {message.author} ({message.author.id}): {message.content[:80]}")
 
-    # Skip own messages
     if message.author.id == client.user.id:
         print("  -> SKIP (self)")
         return
@@ -144,7 +123,6 @@ async def on_message(message):
     mentioned = f"<@{bot_id}>" in message.content or f"<@!{bot_id}>" in message.content
 
     if mentioned:
-        # Prevent duplicate responses
         if message.id in responded_messages:
             print("  -> SKIP (duplicate)")
             return
@@ -155,47 +133,31 @@ async def on_message(message):
         clean = message.content.replace(f"<@{bot_id}>", "").replace(f"<@!{bot_id}>", "").strip()
         print(f"  -> mentioned, clean='{clean}'")
         if not clean:
-            agent_name = "Hermes" if active_agent == "hermes" else "OpenClaw"
-            await message.channel.send(f"Active agent: **{agent_name}**. Use `/hermes` or `/openclaw` to switch.")
+            await message.channel.send("🦉 OWL (OC2) here. Use `/status` or just ask me anything.")
             return
 
-        if active_agent == "hermes":
-            response = hermes_handle(clean)
-        else:
-            response = openclaw_handle(clean)
-
+        response = owl_handle(clean)
         print(f"  -> responding: {response[:80]}")
         await message.channel.send(response)
 
 
 # -- Slash commands --
-@tree.command(name="hermes", description="Switch to Hermes and get a response")
-@app_commands.describe(message="Message for Hermes")
-async def hermes_cmd(interaction: discord.Interaction, message: str):
-    global active_agent
-    active_agent = "hermes"
-    response = hermes_handle(message)
-    await interaction.response.send_message(response)
-
-
-@tree.command(name="openclaw", description="Switch to OpenClaw and get a response")
-@app_commands.describe(message="Message for OpenClaw")
-async def openclaw_cmd(interaction: discord.Interaction, message: str):
-    global active_agent
-    active_agent = "openclaw"
-    response = openclaw_handle(message)
-    await interaction.response.send_message(response)
-
-
-@tree.command(name="agent_status", description="Show which agent is active + recent progress")
-async def agent_status(interaction: discord.Interaction):
-    global active_agent
-    name = "Hermes" if active_agent == "hermes" else "OpenClaw"
+@tree.command(name="status", description="Show OWL (OC2) status + recent progress")
+async def status_cmd(interaction: discord.Interaction):
     lines = [l for l in read_progress().split('\n') if l.strip()][-5:]
-    embed = discord.Embed(title="Agent Status", color=0x2ecc71)
-    embed.add_field(name="Active Agent", value=name, inline=True)
+    embed = discord.Embed(title="🦉 OWL (OC2) Status", color=0x2ecc71)
+    embed.add_field(name="Agent", value="OC2 / OWL", inline=True)
     embed.add_field(name="Recent Progress", value='\n'.join(lines)[:1024] or "No entries", inline=False)
-    embed.set_footer(text="Use /hermes or /openclaw to switch agents")
+    await interaction.response.send_message(embed=embed)
+
+
+@tree.command(name="help", description="Show available commands")
+async def help_cmd(interaction: discord.Interaction):
+    embed = discord.Embed(title="🦉 OWL (OC2) Commands", color=0x3498db)
+    embed.add_field(name="Mention me", value="@blrr city + your message", inline=False)
+    embed.add_field(name="/status", value="Show status + progress", inline=False)
+    embed.add_field(name="/help", value="This message", inline=False)
+    embed.add_field(name="Text commands", value="`status` `workspace` `run <script>` `edit: <text>` `create: <file> | <content>`", inline=False)
     await interaction.response.send_message(embed=embed)
 
 

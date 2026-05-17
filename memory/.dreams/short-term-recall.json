@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-17T09:54:24.934Z",
+  "updatedAt": "2026-05-17T11:31:35.992Z",
   "entries": {
     "memory:memory/2026-05-16.md:42:77": {
       "key": "memory:memory/2026-05-16.md:42:77",
@@ -9,16 +9,19 @@
       "endLine": 77,
       "source": "memory",
       "snippet": "7. **Twitter/X posts** — Most behind login walls, low value. ### Not Implemented Yet: - Permission gate system for agent tool calls - Context compaction pipeline - Hook system (PreToolUse, PostToolUse, Stop) - AGENTS.md for our project - CLI-Anything integration - Daily brief agent ## Key Decisions - Discord deprioritized — Telegram is primary communication channel - Hermes Telegram bot is the secondary agent alongside OWL (this session) - Resource assessment action items feed into next phase of SRRA-OPH ## Pending - MAD to test Hermes Telegram bot responses - Implement top-priority items from resource assessment - Continue SRRA-OPH Phase 5 work - P90 parameter tuning (TP/SL levels) # 202",
-      "recallCount": 2,
+      "recallCount": 5,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1.6311773764290922,
+      "totalScore": 4.631177376429092,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-16T19:50:34.708Z",
-      "lastRecalledAt": "2026-05-17T09:54:24.934Z",
+      "lastRecalledAt": "2026-05-17T11:31:35.992Z",
       "queryHashes": [
         "ee46829a0471",
-        "b5aed8571eec"
+        "b5aed8571eec",
+        "e9505e3896c2",
+        "b398beb864cd",
+        "f3e26ac112c2"
       ],
       "recallDays": [
         "2026-05-16",
@@ -42,16 +45,17 @@
       "endLine": 28,
       "source": "memory",
       "snippet": "# 2026-05-16 Daily Notes ## Session Start (~01:00 EDT) - MAD returned after stepping away - Checked on Polymorph (PM) progress — standing by, no tasks assigned - AS monitoring active, 17/17 tests passing across all phases - CC Workflow Engine had been running Phase 4, tests all passing ## Discord Bot Work (~01:15-02:30 EDT) - Attempted to fix blrr city Discord bot — token was expired/invalid (401 Unauthorized) - MAD provided new tokens for both blrr city and new Hermes bot - Updated .env with both tokens — verified both work via Discord API - Wrote dual_bot.py to run both blrr city and hermes boa simultaneously - **Discord issue**: `on_message` handler not firing reliably with `discord.py",
-      "recallCount": 2,
+      "recallCount": 3,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1.631220396592218,
+      "totalScore": 2.631220396592218,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-16T19:50:34.708Z",
-      "lastRecalledAt": "2026-05-17T09:54:24.934Z",
+      "lastRecalledAt": "2026-05-17T11:31:35.992Z",
       "queryHashes": [
         "ee46829a0471",
-        "b5aed8571eec"
+        "b5aed8571eec",
+        "f3e26ac112c2"
       ],
       "recallDays": [
         "2026-05-16",
@@ -170,15 +174,17 @@
       "endLine": 141,
       "source": "memory",
       "snippet": "- MAD sent 3 translation skills from SkillsMP - Reviewed: unified-brain-text-decoding-mandarin (SKIP - neuroscience, not translation), heygen-translate (SaaS API, costs money), translate-language (YAML-specific, not general) - Conclusion: Agent handles Chinese↔English natively, Violin handles video translation — no additional tools needed ## Key Decisions - Discord deprioritized — Telegram is primary - Content farm is the main strategic focus going forward - DeekeScript ecosystem is the ENGINE of the content farm - Most content farm products come from Chinese developers — translation capability essential - All new tools get installed as skills + registered in TOOLS.md + announced to team ch",
-      "recallCount": 1,
+      "recallCount": 3,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 2.874882872344995,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-17T09:54:24.934Z",
-      "lastRecalledAt": "2026-05-17T09:54:24.934Z",
+      "lastRecalledAt": "2026-05-17T11:08:58.011Z",
       "queryHashes": [
-        "b5aed8571eec"
+        "b5aed8571eec",
+        "e9505e3896c2",
+        "d41d06ade675"
       ],
       "recallDays": [
         "2026-05-17"
@@ -201,15 +207,16 @@
       "endLine": 98,
       "source": "memory",
       "snippet": "- Updated .env with both tokens — verified both work via Discord API - Wrote dual_bot.py to run both blrr city and hermes boa simultaneously - **Discord issue**: `on_message` handler not firing reliably with `discord.py Client` - Tried `commands.Bot` — same issue - Root cause: likely Message Content Intent not properly enabled in Discord Developer Portal - MAD confirmed intent was already on — re-invited bots with proper permissions - **Decision**: MAD said to drop Discord for now, focus on Telegram ## Hermes Telegram Bot (~02:30-03:00 EDT) - Created @HERMESBLRRBOT via BotFather - Added TELEGRAM_HERMES_TOKEN to .env - v1: Basic string-matching responses — too canned, MAD complained - v2: Ad",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 0.6311985033687395,
-      "maxScore": 0.6311985033687395,
+      "totalScore": 1.6311985033687395,
+      "maxScore": 1,
       "firstRecalledAt": "2026-05-17T09:54:24.934Z",
-      "lastRecalledAt": "2026-05-17T09:54:24.934Z",
+      "lastRecalledAt": "2026-05-17T11:31:35.992Z",
       "queryHashes": [
-        "b5aed8571eec"
+        "b5aed8571eec",
+        "f3e26ac112c2"
       ],
       "recallDays": [
         "2026-05-17"
@@ -223,6 +230,71 @@
         "30-03",
         "telegram-hermes-token",
         "string-matching"
+      ]
+    },
+    "memory:memory/2026-05-16.md:136:149": {
+      "key": "memory:memory/2026-05-16.md:136:149",
+      "path": "memory/2026-05-16.md",
+      "startLine": 136,
+      "endLine": 149,
+      "source": "memory",
+      "snippet": "- desktop_api.py: FastAPI on port 8001 with all endpoints - hermes-watchdog.py: background health monitor, checks gateway every 5 min - skills/system-health: 10-point self-audit - skills/harness-engineering: agent reliability patterns - skills/docker-ops: container management - skills/cicd-pipeline: GitHub Actions + local CI - skills/oce-testing: OCE test patterns - docs/IMPLEMENTATION_PLAN.md: 6-phase plan from MAD's links - docs/RELEVANCE_MAP.md: 163 skills classified by tier - docs/SKILL_TOOL_AUDIT.md: 277 items inventoried - 2 audit sub-agents completed (Structure Lead + Relevance Lead) - CC kicked off OCE Phase 3 (Observer Runtime) - MAD stepped away — OWL operating independently",
+      "recallCount": 3,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 3,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-17T11:07:18.860Z",
+      "lastRecalledAt": "2026-05-17T11:08:58.011Z",
+      "queryHashes": [
+        "e9505e3896c2",
+        "b398beb864cd",
+        "d41d06ade675"
+      ],
+      "recallDays": [
+        "2026-05-17"
+      ],
+      "conceptTags": [
+        "gateway",
+        "desktop-api.py",
+        "hermes-watchdog.py",
+        "skills/system-health",
+        "10-point",
+        "self-audit",
+        "skills/harness-engineering",
+        "skills/docker-ops"
+      ]
+    },
+    "memory:memory/2026-05-17.md:41:71": {
+      "key": "memory:memory/2026-05-17.md:41:71",
+      "path": "memory/2026-05-17.md",
+      "startLine": 41,
+      "endLine": 71,
+      "source": "memory",
+      "snippet": "- **P90 cascade_1 edge:** 51.5% WR on cascade_1 activations — the initial trade (26.4% WR) is the drag - **8 manual strategies not yet built** from the CEREBUS manual - **Blind_Structural_Chain:** 93.7% continuation in Goldilocks zone (32-50% rebalancing) - **P90P_Distribution_Tracker:** 90-95% accuracy TP calculator — should be a shared module ### Goals Status: - Goal 1 (All strategies backtested): 6/14 built, need 8 more - Goal 2 (80% profitable): Currently 2/9 = 22%, need to fix losers + build winners - Goal 3 (Max DD ≤ 12%): Not yet measured properly - Goal 4 (80% WR, 2 trades/day): Not yet achieved — Blind_Structural_Chain is the best candidate - Goal 5 (USD/CHF backtest): Not started",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-17T11:08:34.456Z",
+      "lastRecalledAt": "2026-05-17T11:08:58.011Z",
+      "queryHashes": [
+        "b398beb864cd",
+        "d41d06ade675"
+      ],
+      "recallDays": [
+        "2026-05-17"
+      ],
+      "conceptTags": [
+        "cascade-1",
+        "51.5",
+        "26.4",
+        "blind-structural-chain",
+        "93.7",
+        "32-50",
+        "p90p-distribution-tracker",
+        "90-95"
       ]
     }
   }

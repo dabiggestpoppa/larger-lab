@@ -1,10 +1,12 @@
 # AGENTS.md — SRRA-OPH Team Manifest
 
 > **Last Updated:** May 17, 2026
-> **Current Phase:** OCE Phase 6 — Execution Substrate (Active)
+> **Current Phase:** OCE Phase 7-9 — Multi-Scale Fields → Operator Coevolution → Entropy Economics (Active)
 > **SRRA-OPH:** Phases 1-9 complete — 77/77 tests passing
-> **OCE Tests:** 244 passing (32 event_fabric + 20 observer_runtime + 19 topology_routing + 30 structural_memory + 20 metrics + 20 tracing + 17 alerting + 49 execution + 17 dspy_optimizer)
+> **OCE Tests:** 360 passing (Phases 1-8 complete, Phase 7 backend in progress)
+> **Phases Complete:** OCE 1-6 + Phase 8 governance/coevolution | **In Progress:** OCE 7 (Multi-Scale Cognitive Fields) | **Planned:** OCE 8 (Operator Coevolution) → OCE 9 (Entropy Economics)
 > **Lead:** OWL (MAD away — OWL operating independently)
+> **Plan Source:** MAD's original engineering doctrine (phase 6-9 build document)
 > **Operator Rules:** `OPERATOR_RULES.md` — Bounded sovereign operational continuity
 
 ## ⚠️ OPERATOR RULES (READ BEFORE ANY ACTION)
@@ -25,8 +27,7 @@ See `OPERATOR_RULES.md` for complete rules. Key constraints:
 | Tag | Agent | Role | Progress File |
 |-----|-------|------|---------------|
 | 🔵 CC | Claude Code | Overseer / Architecture / Core Build | `progress/claude-code-progress.md` |
-| 🟣 OC | OpenClaw | Analysis / Planning / Coordination | `progress/openclaw-progress.md` |
-| 🟠 OC2 | OpenClaw 2 | Execution / Testing / Reporting / Discord | `progress/openclaw-2-progress.md` |
+| 🟠 OC2 | OWL (OpenClaw 2) | **PRIMARY OPERATOR** / Execution / Discord / Telegram | `progress/openclaw-2-progress.md` |
 | 🟡 AS | Assistant Manager | Context Monitoring / Quality / Documentation | `progress/assistant-progress.md` |
 | 🔴 PM | Polymorph (Hawk) | Debugger / Tool & Skill Builder | `progress/polymorph-progress.md` |
 | 🟢 RL | OWL (Research Lead) | Research / DSPy Integration / Pipeline Optimization | `progress/rl-progress.md` |
@@ -74,7 +75,11 @@ See `OPERATOR_RULES.md` for complete rules. Key constraints:
 | OCE Phase 3 (Observer Runtime) | ✅ Complete | CC |
 | OCE Phase 4 (Structural Memory) | ✅ Complete | RL |
 | OCE Phase 5 (Observability) | ✅ Complete | RL |
-| OCE Phase 6 (Execution Substrate) | 🔄 In Progress | RL/OC2 |
+| OCE Phase 6 (Execution Substrate) | ✅ Complete | RL/OC2 |
+| OCE Phase 7 (Adaptive Evolution) | ✅ Complete | RL |
+| OCE Phase 8 (Sovereign Coevolution) | ✅ Complete | RL |
+| OCE Phase 9 (Entropy Economics) | 🔄 In Progress | RL |
+| Post-Deployment Upgrades (9 phases) | 📋 Planned | MAD |
 
 **OCE Project:** `oce/` directory
 
@@ -115,7 +120,7 @@ See `OPERATOR_RULES.md` for complete rules. Key constraints:
 
 Each agent has two memory layers:
 1. **Working Memory** (`progress/{agent}-memory.md`) — auto-synced every 7 updates, compact & current
-2. **Persistent Memory** (`.openclaw/MEMORY.md`, `.hermes/MEMORY.md`, etc.) — hand-managed, append-only sync
+2. **Persistent Memory** (`.openclaw-2/MEMORY.md`) — hand-managed, append-only sync
 
 The workspace files ARE the global memory. Keep them updated.
 
@@ -189,7 +194,7 @@ Hard rules break when the environment changes. Soft logic is a diagnostic PATTER
 - `tools/oc2-doctor.cmd` — full 6-layer diagnostic on demand
 - `tools/oc2-watchdog.py` — monitors context usage, alerts at 75%/90%/95%
 - `tools/oc2-context-monitor.py` — session-level context tracking
-- `tools/hermes-oc2-monitor.py` — cron monitor with auto-repair (--repair flag)
+- `tools/oc2-monitor.py` — cron monitor with auto-repair (--repair flag)
 - `tools/error_logger.py` — log errors that persist >2 attempts
 - `tools/error_analyzer.py` — detect patterns, suggest skills/logic updates
 

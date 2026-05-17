@@ -103,3 +103,5 @@ flowchart LR
     EF -->|persist| TRAJ[Trajectory Memory]
     EF -->|query| API[/events endpoint]
 ```
+
+<!-- ARCH-COMMIT [2026-05-17 11:50 UTC] OC2: projects/social/discord-agent-hq/discord_bot.py -- Replaced Hermes/OC1 dual-agent bot with single OC2/OWL operator. Removed Hermes boa, OC1 gateway, and all standalone telegram bot scripts. blrr city is now the sole Discord bot running as OC2. -->

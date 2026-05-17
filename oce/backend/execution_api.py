@@ -423,129 +423,115 @@ def register_execution_endpoints(app: FastAPI):
             raise HTTPException(status_code=503, detail=str(e))
 
 
-# ─── Evolution API (Phase 7) ────────────────────────────────────────────────
+    # ─── Evolution API (Phase 7) ────────────────────────────────────────────
 
-@app.get("/evolution/status")
-async def evolution_status():
-    """Get current evolution state: drift + healing."""
-    try:
-        drift = get_drift_detector()
-        healing = get_self_healing_engine()
-        return {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-            "drift": {
-                "thresholds": drift._thresholds,
-            },
-            "healing": healing.get_stats(),
-        }
-    except Exception as e:
-        raise HTTPException(status_code=503, detail=str(e))
-
-
-@app.get("/evolution/drift")
-async def evolution_drift(
-    window_hours: int = Query(24, ge=1, le=168),
-):
-    """Get drift analysis report."""
-    try:
-        drift = get_drift_detector()
-        return drift.get_drift_report(window_hours=window_hours)
-    except Exception as e:
-        raise HTTPException(status_code=503, detail=str(e))
-
-
-@app.get("/evolution/recommendations")
-async def evolution_recommendations(
-    time_range_hours: int = Query(24, ge=1, le=168),
-):
-    """Get self-healing recommendations based on failure analysis."""
-    try:
-        healing = get_self_healing_engine()
-        patterns = healing.analyze_failures(time_range_hours)
-        recommendations = healing.generate_recommendations(patterns)
-        return {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-            "patterns": patterns,
-            "recommendations": [r.to_dict() for r in recommendations],
-        }
-    except Exception as e:
-        raise HTTPException(status_code=503, detail=str(e))
-
-
-@app.post("/evolution/tune")
-async def evolution_tune():
-    """
-    Trigger auto-tuning: combines drift analysis + DSPy optimizer.
-    Analyzes current state and applies optimal configuration.
-    """
-    try:
-        drift = get_drift_detector()
-        healing = get_self_healing_engine()
-
-        # Get drift report
-        report = drift.get_drift_report()
-
-        # Auto-heal based on drift
-        actions = healing.auto_heal(report)
-
-        return {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-            "drift_healthy": report.get("healthy", True),
-            "drift_level": report.get("overall_level", "none"),
-            "actions_taken": [a.to_dict() for a in actions],
-            "action_count": len(actions),
-        }
-    except Exception as e:
-        raise HTTPException(status_code=503, detail=str(e))
-
-
-@app.post("/evolution/heal")
-async def evolution_heal(request: dict):
-    """Execute a specific healing action."""
-    try:
-        from self_healing_engine import HealingAction, HealingActionType
-        healing = get_self_healing_engine()
-
-        action_type_str = request.get("action_type")
-        target = request.get("target", "unknown")
-        reason = request.get("reason", "Manual trigger via API")
-        params = request.get("params", {})
-
+    @app.get("/evolution/status")
+    async def evolution_status():
+        """Get current evolution state: drift + healing."""
         try:
-            action_type = HealingActionType(action_type_str)
-        except ValueError:
-            raise HTTPException(status_code=400,
-                                detail=f"Unknown action type: {action_type_str}")
+            drift = get_drift_detector()
+            healing = get_self_healing_engine()
+            return {
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "drift": {
+                    "thresholds": drift._thresholds,
+                },
+                "healing": healing.get_stats(),
+            }
+        except Exception as e:
+            raise HTTPException(status_code=503, detail=str(e))
 
-        action = HealingAction(
-            action_type=action_type,
-            target=target,
-            reason=reason,
-            params=params,
-        )
-        success = healing.apply_healing_action(action)
+    @app.get("/evolution/drift")
+    async def evolution_drift(
+        window_hours: int = Query(24, ge=1, le=168),
+    ):
+        """Get drift analysis report."""
+        try:
+            drift = get_drift_detector()
+            return drift.get_drift_report(window_hours=window_hours)
+        except Exception as e:
+            raise HTTPException(status_code=503, detail=str(e))
 
-        return {
-            "action": action.to_dict(),
-            "success": success,
-        }
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=503, detail=str(e))
+    @app.get("/evolution/recommendations")
+    async def evolution_recommendations(
+        time_range_hours: int = Query(24, ge=1, le=168),
+    ):
+        """Get self-healing recommendations based on failure analysis."""
+        try:
+            healing = get_self_healing_engine()
+            patterns = healing.analyze_failures(time_range_hours)
+            recommendations = healing.generate_recommendations(patterns)
+            return {
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "patterns": patterns,
+                "recommendations": [r.to_dict() for r in recommendations],
+            }
+        except Exception as e:
+            raise HTTPException(status_code=503, detail=str(e))
 
+    @app.post("/evolution/tune")
+    async def evolution_tune():
+        """
+        Trigger auto-tuning: combines drift analysis + DSPy optimizer.
+        Analyzes current state and applies optimal configuration.
+        """
+        try:
+            drift = get_drift_detector()
+            healing = get_self_healing_engine()
+            report = drift.get_drift_report()
+            actions = healing.auto_heal(report)
+            return {
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "drift_healthy": report.get("healthy", True),
+                "drift_level": report.get("overall_level", "none"),
+                "actions_taken": [a.to_dict() for a in actions],
+                "action_count": len(actions),
+            }
+        except Exception as e:
+            raise HTTPException(status_code=503, detail=str(e))
 
-@app.get("/evolution/history")
-async def evolution_history(
-    limit: int = Query(50, ge=1, le=500),
-):
-    """Get evolution action history (drift reports + healing actions)."""
-    try:
-        healing = get_self_healing_engine()
-        drift = get_drift_detector()
-        return {
-            "healing_history": healing.get_healing_history(limit),
-            "drift_history": drift.get_drift_history(limit),
-        }
-    except Exception as e:
-        raise HTTPException(status_code=503, detail=str(e))
+    @app.post("/evolution/heal")
+    async def evolution_heal(request: dict):
+        """Execute a specific healing action."""
+        try:
+            from self_healing_engine import HealingAction, HealingActionType
+            healing = get_self_healing_engine()
+            action_type_str = request.get("action_type")
+            target = request.get("target", "unknown")
+            reason = request.get("reason", "Manual trigger via API")
+            params = request.get("params", {})
+            try:
+                action_type = HealingActionType(action_type_str)
+            except ValueError:
+                raise HTTPException(status_code=400,
+                                    detail=f"Unknown action type: {action_type_str}")
+            action = HealingAction(
+                action_type=action_type,
+                target=target,
+                reason=reason,
+                params=params,
+            )
+            success = healing.apply_healing_action(action)
+            return {
+                "action": action.to_dict(),
+                "success": success,
+            }
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=503, detail=str(e))
+
+    @app.get("/evolution/history")
+    async def evolution_history(
+        limit: int = Query(50, ge=1, le=500),
+    ):
+        """Get evolution action history (drift reports + healing actions)."""
+        try:
+            healing = get_self_healing_engine()
+            drift = get_drift_detector()
+            return {
+                "healing_history": healing.get_healing_history(limit),
+                "drift_history": drift.get_drift_history(limit),
+            }
+        except Exception as e:
+            raise HTTPException(status_code=503, detail=str(e))
