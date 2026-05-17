@@ -70,4 +70,13 @@ Use this to verify the actual pipeline matches the original architecture:
 - [x] **BoundaryMapper:** Boundary detection → `oce/backend/resonance/boundary_mapper.py`
 - [x] **ResonanceEngine:** Resonance alignment → `oce/backend/resonance/resonance_engine.py`
 - [x] **PressureTracker:** Entropy pressure monitoring → `oce/backend/resonance/pressure_tracker.py`
+- [x] **RL Integration:** RL ↔ CC bridge → `oce/backend/resonance/rlp_integration.py`
 - [x] **Debug CLI:** `tools/operator/resonance-debug.py`
+
+### V3 Phase 2 Alignment Checklist
+
+- [x] **CausalGeometry:** Causal relationship mapping → `oce/backend/reconstruction/causal_geometry.py`
+- [x] **AttractorMemory:** Memory attractor patterns → `oce/backend/reconstruction/attractor_memory.py`
+- [x] **ReconstructionEngine:** State reconstruction → `oce/backend/reconstruction/reconstruction_engine.py`
+- [x] **OverlapManifold:** Overlap computation → `oce/backend/reconstruction/overlap_manifold.py`
+- [x] **ContinuityRepair:** Repair continuity gaps → `oce/backend/reconstruction/continuity_repair.py`

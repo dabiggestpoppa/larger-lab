@@ -241,10 +241,39 @@ graph TB
     RO --> PT
 ```
 
+## Level 7: V3 Phase 2 — Reconstructive Continuity Manifold (RCM)
+
+```mermaid
+graph TB
+    subgraph "Causal Layer"
+        CG[CausalGeometry<br/>causal_geometry.py]
+    end
+
+    subgraph "Memory Layer"
+        AM[AttractorMemory<br/>attractor_memory.py]
+    end
+
+    subgraph "Reconstruction Layer"
+        RE[ReconstructionEngine<br/>reconstruction_engine.py]
+        OM[OverlapManifold<br/>overlap_manifold.py]
+    end
+
+    subgraph "Repair Layer"
+        CR[ContinuityRepair<br/>continuity_repair.py]
+    end
+
+    CG --> AM
+    AM --> RE
+    RE --> OM
+    OM --> CR
+```
+
 <!-- ARCH-COMMIT [2026-05-16 21:19 UTC] AS: oce/backend/event_fabric.py -- Fixed Event model auto-classification bug -->
 
 <!-- ARCH-COMMIT [2026-05-17 10:34 UTC] OC: oce/docs/execution-policies.md -- Created execution policies framework with 5 policy types (rate limiting, permissions, sandboxing, timeouts, retry), enforcement architecture, and SRRA-OPH alignment -->
 
 <!-- ARCH-COMMIT [2026-05-17 10:34 UTC] OC: oce/docs/skill-tool-registry.md -- Created skill/tool registry specification with registration schemas, capability declarations, invocation protocol, and built-in skills/tools catalog -->
 
-<!-- ARCH-COMMIT [2026-05-17 16:00 UTC] CC: oce/backend/resonance/ -- V3 Phase 1 complete: 6 modules, 121 tests, debug CLI -->
+<!-- ARCH-COMMIT [2026-05-17 16:00 UTC] CC: oce/backend/resonance/ -- V3 Phase 1 complete: 7 modules, 139 tests, debug CLI -->
+
+<!-- ARCH-COMMIT [2026-05-17 17:00 UTC] CC: oce/backend/reconstruction/ -- V3 Phase 2 complete: 5 modules, 52 tests -->
