@@ -15,8 +15,8 @@
 V3 Phase 3 — Resonant Topology & BSP Emergence — ✅ Core complete (53 tests)
 
 ### V3 Role
-- ✅ Debug topology modules (53 tests passing)
-- ✅ Fix 4 failing tests (stability rules, SignalPacket import, decode iteration)
+- ✅ Debug topology modules (77 tests passing)
+- ✅ Fix 5 failing tests (stability rules, SignalPacket import, decode iteration, get_signal_count)
 - [ ] Build topology-debug.py CLI tool
 - [ ] Operator integration for topology monitoring
 

@@ -27,7 +27,7 @@
 
 ### V3 Phase 3 PM Tasks
 - [x] Debug topology modules (collar_field, bsp_projection, resonance_router, glyph_engine, field_pressure, attractor_stability, topology_metrics)
-- [x] Fix 4 failing tests (attractor_stability stability rules, bsp_projection SignalPacket import, glyph_engine decode iteration)
+- [x] Fix 5 failing tests (attractor_stability stability rules, bsp_projection SignalPacket import, glyph_engine decode iteration, field_state get_signal_count)
 - [ ] Build tools/operator/topology-debug.py CLI
 - [ ] Operator integration for topology monitoring
 
