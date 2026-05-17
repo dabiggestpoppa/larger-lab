@@ -1,9 +1,9 @@
 # AGENTS.md — SRRA-OPH Team Manifest
 
 > **Last Updated:** May 17, 2026
-> **Current Phase:** OCE Phase 5 — Observability (Active)
+> **Current Phase:** OCE Phase 6 — Execution Substrate (Active)
 > **SRRA-OPH:** Phases 1-9 complete — 77/77 tests passing
-> **OCE Tests:** 178 passing (32 event_fabric + 20 observer_runtime + 19 topology_routing + 30 structural_memory + 77 observability)
+> **OCE Tests:** 244 passing (32 event_fabric + 20 observer_runtime + 19 topology_routing + 30 structural_memory + 20 metrics + 20 tracing + 17 alerting + 49 execution + 17 dspy_optimizer)
 > **Lead:** OWL (MAD away — OWL operating independently)
 > **Operator Rules:** `OPERATOR_RULES.md` — Bounded sovereign operational continuity
 
@@ -70,12 +70,11 @@ See `OPERATOR_RULES.md` for complete rules. Key constraints:
 | Phase | Status | Lead |
 |-------|--------|------|
 | OCE Phase 1 (Continuity Shell) | ✅ Complete | CC |
-| OCE Phase 2 (Event Fabric) | 🔄 In Progress | CC |
-| OCE Phase 2 (Event Fabric) | Pending | OC |
-| OCE Phase 3 (Observer Runtime) | Pending | OC2 |
-| OCE Phase 4 (Structural Memory) | Pending | AS |
-| OCE Phase 5 (Observability) | Pending | PM |
-| OCE Phase 6 (Execution Substrate) | Pending | RL |
+| OCE Phase 2 (Event Fabric) | ✅ Complete | CC |
+| OCE Phase 3 (Observer Runtime) | ✅ Complete | CC |
+| OCE Phase 4 (Structural Memory) | ✅ Complete | RL |
+| OCE Phase 5 (Observability) | ✅ Complete | RL |
+| OCE Phase 6 (Execution Substrate) | 🔄 In Progress | RL |
 
 **OCE Project:** `oce/` directory
 

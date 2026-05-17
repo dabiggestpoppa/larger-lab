@@ -12,6 +12,7 @@ Provides:
 - Policy management
 """
 
+from datetime import datetime, timezone
 from fastapi import FastAPI, Query, HTTPException
 from pydantic import BaseModel
 from typing import Any, Dict, List, Optional
@@ -248,5 +249,173 @@ def register_execution_endpoints(app: FastAPI):
                 }
                 for p in engine._policies.values()
             ]
+        except Exception as e:
+            raise HTTPException(status_code=503, detail=str(e))
+
+    # ─── Execution Analytics ─────────────────────────────────────────────
+
+    @app.get("/execution/analytics")
+    async def execution_analytics():
+        """Get execution throughput, success rate, and latency per task type."""
+        try:
+            engine = get_execution_engine()
+            history_stats = engine.history.get_stats()
+
+            # Compute per-type analytics
+            by_type: Dict[str, Dict[str, Any]] = {}
+            for record in engine.history.list_recent(limit=500):
+                task_type = record.get("task_type", "unknown")
+                if task_type not in by_type:
+                    by_type[task_type] = {
+                        "total": 0, "completed": 0, "failed": 0,
+                        "total_latency_ms": 0, "count_with_latency": 0,
+                    }
+                by_type[task_type]["total"] += 1
+                status = record.get("status", "")
+                if status == "completed":
+                    by_type[task_type]["completed"] += 1
+                elif status == "failed":
+                    by_type[task_type]["failed"] += 1
+                latency = record.get("latency_ms", 0)
+                if latency > 0:
+                    by_type[task_type]["total_latency_ms"] += latency
+                    by_type[task_type]["count_with_latency"] += 1
+
+            # Compute averages and success rates
+            for task_type, data in by_type.items():
+                total = data["total"]
+                data["success_rate"] = round(data["completed"] / total, 3) if total > 0 else 0
+                if data["count_with_latency"] > 0:
+                    data["avg_latency_ms"] = round(data["total_latency_ms"] / data["count_with_latency"], 2)
+                else:
+                    data["avg_latency_ms"] = 0
+                del data["total_latency_ms"]
+                del data["count_with_latency"]
+
+            return {
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "summary": history_stats,
+                "by_type": by_type,
+                "engine_stats": engine.get_stats(),
+            }
+        except Exception as e:
+            raise HTTPException(status_code=503, detail=str(e))
+
+    @app.get("/execution/bottlenecks")
+    async def execution_bottlenecks():
+        """Identify execution bottlenecks: slow tasks, worker starvation, queue buildup."""
+        try:
+            engine = get_execution_engine()
+            stats = engine.get_stats()
+            history_stats = engine.history.get_stats()
+
+            bottlenecks = []
+
+            # Check queue buildup
+            queue_size = stats.get("queue_size", 0)
+            if queue_size > 20:
+                bottlenecks.append({
+                    "type": "queue_buildup",
+                    "severity": "critical" if queue_size > 50 else "warning",
+                    "message": f"Queue has {queue_size} pending tasks",
+                    "recommendation": "Increase worker pool size or reduce task submission rate",
+                })
+
+            # Check worker utilization
+            workers = stats.get("workers", [])
+            busy_count = sum(1 for w in workers if w.get("is_busy", False))
+            if workers and busy_count == len(workers) and queue_size > 5:
+                bottlenecks.append({
+                    "type": "worker_saturation",
+                    "severity": "warning",
+                    "message": f"All {len(workers)} workers are busy with {queue_size} tasks queued",
+                    "recommendation": f"Consider increasing workers from {len(workers)} to {len(workers) + 2}",
+                })
+
+            # Check failure rate
+            total = history_stats.get("total", 0)
+            by_status = history_stats.get("by_status", {})
+            failed = by_status.get("failed", 0)
+            if total > 10 and failed / total > 0.3:
+                bottlenecks.append({
+                    "type": "high_failure_rate",
+                    "severity": "critical",
+                    "message": f"Failure rate is {failed/total*100:.1f}% ({failed}/{total})",
+                    "recommendation": "Review task handlers and error logs for recurring issues",
+                })
+
+            # Check slow task types
+            recent = engine.history.list_recent(limit=200)
+            type_latencies: Dict[str, List[float]] = {}
+            for record in recent:
+                lt = record.get("latency_ms", 0)
+                if lt > 0:
+                    tt = record.get("task_type", "unknown")
+                    type_latencies.setdefault(tt, []).append(lt)
+
+            for task_type, latencies in type_latencies.items():
+                avg = sum(latencies) / len(latencies)
+                if avg > 5000:  # > 5 seconds
+                    bottlenecks.append({
+                        "type": "slow_task_type",
+                        "severity": "warning",
+                        "message": f"Task type '{task_type}' averages {avg:.0f}ms latency",
+                        "recommendation": f"Review '{task_type}' handler for performance optimization",
+                    })
+
+            # DSPy optimizer recommendation
+            from dspy_execution_optimizer import get_optimizer
+            optimizer = get_optimizer()
+            recommended_workers = optimizer.recommend_workers(
+                current_workers=engine.max_workers,
+                history_stats=history_stats,
+            )
+            if recommended_workers != engine.max_workers:
+                bottlenecks.append({
+                    "type": "suboptimal_worker_count",
+                    "severity": "info",
+                    "message": f"Current workers: {engine.max_workers}, recommended: {recommended_workers}",
+                    "recommendation": f"POST /execution/tune to auto-tune worker pool",
+                })
+
+            return {
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "bottleneck_count": len(bottlenecks),
+                "bottlenecks": bottlenecks,
+                "healthy": len(bottlenecks) == 0,
+            }
+        except Exception as e:
+            raise HTTPException(status_code=503, detail=str(e))
+
+    @app.post("/execution/tune")
+    async def execution_tune():
+        """Auto-tune worker pool size based on current load and history."""
+        try:
+            engine = get_execution_engine()
+            history_stats = engine.history.get_stats()
+
+            from dspy_execution_optimizer import get_optimizer
+            optimizer = get_optimizer()
+            recommended = optimizer.recommend_workers(
+                current_workers=engine.max_workers,
+                history_stats=history_stats,
+            )
+
+            old_workers = engine.max_workers
+            engine.max_workers = recommended
+
+            # If engine is running, restart workers
+            was_running = engine._running
+            if was_running:
+                await engine.stop()
+                await engine.start()
+
+            return {
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "previous_workers": old_workers,
+                "recommended_workers": recommended,
+                "tuned": recommended != old_workers,
+                "engine_restarted": was_running,
+            }
         except Exception as e:
             raise HTTPException(status_code=503, detail=str(e))

@@ -61,6 +61,13 @@
 - **Integration Path:** CivitAI scraper → remix pipeline (watermark, crop, filter) → DeekeScript automation → multi-platform posting
 - **Content farm projects:** `projects/content/` (DeekeScript, MediaCrawler, Spider_XHS, accounts, templates)
 - **Next:** Build scraper for trending/popular content, remix pipeline, account rotation
+- **API:** https://civitai.com/api/v1/ — /images, /models, /model-versions endpoints
+- **NSFW levels:** None, Soft, Mature, X — all accessible with API token
+- **Scraper tools:** Confuzu's Image Grabber + Model Grabber on GitHub
+- **Ready-made datasets:** 800+ NSFW videos model, 10k+ NSFW prompts dataset on CivitAI
+- **Integration doc:** `projects/content/content-farm/CIVITAI_INTEGRATION.md`
+- **Content funnel:** Free (TikTok/IG/X) → Followers → Paid (OF/Fansly) + Affiliates + Sponsorships
+- **MAD's key insight:** "We never start from ground 0. CivitAI is production-grade. We just curate, remix, and push."
 
 ## Quant Lab — 6 Goals & Agent Team (2026-05-17)
 - **GOALS.md:** `quant-lab/GOALS.md` — 6 non-negotiable goals with actionable steps

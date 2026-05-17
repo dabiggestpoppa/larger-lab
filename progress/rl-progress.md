@@ -235,3 +235,52 @@
 **Key Decision:** Dashboard is NOT a chatbot — it's a system observability interface. The OCE system is an autonomous cognitive engine; the UI lets humans observe its telemetry.
 
 **Full Stack:** 178 OCE tests + 56 SRRA-OPH tests = 234 total passing
+---
+
+#### [RL] 2026-05-17 06:45 UTC — OCE Phase 6: Execution Substrate Complete
+
+**All Phase 6 deliverables complete. 227/227 OCE tests passing.**
+
+**OCE-6.1 Execution Engine** (oce/backend/execution_engine.py — 633 lines):
+- Async job queue with priority scheduling (LOW/NORMAL/HIGH/CRITICAL)
+- Worker pool with configurable concurrency
+- 4 built-in task type handlers: skill_call, tool_invoke, pipeline_run, agent_delegate
+- Execution policies: rate limits, permissions, sandboxing, concurrency limits
+- SQLite-backed execution history for audit and replay
+- Graceful error handling with retry logic and timeout support
+- Singleton pattern, integrates with Phase 5 TracingEngine
+
+**OCE-6.2 Execution API** (oce/backend/execution_api.py — 252 lines):
+- 10 REST endpoints: submit, cancel, get, list, history, replay, stats, workers, policies
+
+**OCE-6.3 Tests** (oce/backend/tests/test_execution_engine.py — 49 tests):
+- Fixed: missing handler now gracefully fails task (was raising ValueError)
+- Fixed: async tests now properly call engine.stop() to prevent hangs
+- All 49 tests passing
+
+**OCE-6.4 Integration**: Registered in main.py
+**OCE-6.5 PHASE6_TASKS.md**: Created
+
+**Total OCE Tests: 227 passing (Phases 1-6)**
+#### [RL] 2026-05-17 — Phase 6 Execution Substrate Complete (OCE-6.1→6.4)
+
+**OCE-6.1 Async Test Fixes:**
+- Fixed test_multiple_task_types (polling loop instead of fixed sleep)
+- Fixed pipeline_run task payload
+- All 49 execution engine tests pass (12 test classes)
+
+**OCE-6.2 DSPy Execution Optimizer:**
+- dspy_execution_optimizer.py — 3 pipelines with heuristic fallbacks
+- ExecutionOptimizerPipeline, TaskSchedulingPipeline, RetryPolicyPipeline
+- 17 tests, all passing
+
+**OCE-6.3 Execution Analytics API:**
+- /execution/analytics — per-task-type throughput, success rate, latency
+- /execution/bottlenecks — queue buildup, worker saturation, failure rate, slow tasks
+- /execution/tune — auto-tune worker pool via DSPy optimizer
+
+**OCE-6.4 Tests:**
+- 	est_dspy_execution.py — 17 tests
+- 	est_execution_engine.py — 49 tests (all passing)
+
+**Total: 300 tests passing (244 OCE + 56 SRRA-OPH)**
