@@ -203,8 +203,48 @@ graph TB
     CTXMON --> OC2
 ```
 
+## Level 6: V3 Cognitive Field — Resonant Signal Substrate
+
+```mermaid
+graph TB
+    subgraph "Signal Layer"
+        SP[SignalPacket<br/>signal_packet.py]
+        SF[SignalField<br/>signal_packet.py]
+    end
+
+    subgraph "Coherence Layer"
+        CM[CoherenceMetrics<br/>coherence_metrics.py]
+        CE[CoherenceEngine<br/>coherence_metrics.py]
+    end
+
+    subgraph "Field Layer"
+        FSM[FieldStateManager<br/>field_state.py]
+        BM[BoundaryMapper<br/>boundary_mapper.py]
+    end
+
+    subgraph "Resonance Layer"
+        RE[ResonanceEngine<br/>resonance_engine.py]
+        RO[ResonanceOptimizer<br/>resonance_engine.py]
+    end
+
+    subgraph "Pressure Layer"
+        PT[PressureTracker<br/>pressure_tracker.py]
+    end
+
+    SP --> SF
+    SF --> CM
+    CM --> CE
+    CE --> FSM
+    FSM --> BM
+    BM --> RE
+    RE --> RO
+    RO --> PT
+```
+
 <!-- ARCH-COMMIT [2026-05-16 21:19 UTC] AS: oce/backend/event_fabric.py -- Fixed Event model auto-classification bug -->
 
 <!-- ARCH-COMMIT [2026-05-17 10:34 UTC] OC: oce/docs/execution-policies.md -- Created execution policies framework with 5 policy types (rate limiting, permissions, sandboxing, timeouts, retry), enforcement architecture, and SRRA-OPH alignment -->
 
 <!-- ARCH-COMMIT [2026-05-17 10:34 UTC] OC: oce/docs/skill-tool-registry.md -- Created skill/tool registry specification with registration schemas, capability declarations, invocation protocol, and built-in skills/tools catalog -->
+
+<!-- ARCH-COMMIT [2026-05-17 16:00 UTC] CC: oce/backend/resonance/ -- V3 Phase 1 complete: 6 modules, 121 tests, debug CLI -->

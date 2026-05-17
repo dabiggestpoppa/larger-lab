@@ -48,16 +48,26 @@ errors → errors-and-solutions.md → repo memory (every 7 entries)
 
 Use this to verify the actual pipeline matches the original architecture:
 
-- [ ] **Phase 1:** CollarLayer + 4 patches + AgentBridge → `srrs_opc/`
-- [ ] **Phase 2:** Recovery anchors, drift detector, reconstruction → `srrs_opc/`
-- [ ] **Phase 3:** Dynamic coupling, topological router, active collars → `srrs_opc/`
-- [ ] **Phase 4:** Capability fields, workspace integration → `srrs_opc/`
-- [ ] **Phase 5:** Trajectory fields, continuity collars → `srrs_opc/`
-- [ ] **Phase 6:** Topology observer, recursive routing → `srrs_opc/`
-- [ ] **Phase 7:** Overlap cognition, prediction contracts → `srrs_opc/`
-- [ ] **Phase 8:** Operator patterns, strategic preferences → `srrs_opc/`
-- [ ] **Phase 9:** Entropy economics, sustainability governance → `srrs_opc/`
-- [ ] **OCE Event Fabric:** Ingest → Route → Persist → Stream → `oce/backend/event_fabric.py`
-- [ ] **OCE Observer Runtime:** Lifecycle → Health → State → `oce/backend/observer_runtime.py`
-- [ ] **OC2 Gateway:** Telegram + Watchdog + Context Monitor → `.openclaw-2/`
-- [ ] **Memory Sync:** 7-update threshold, 20-entry summarize → `tools/progress-sync.py`
+- [x] **Phase 1:** CollarLayer + 4 patches + AgentBridge → `srrs_opc/`
+- [x] **Phase 2:** Recovery anchors, drift detector, reconstruction → `srrs_opc/`
+- [x] **Phase 3:** Dynamic coupling, topological router, active collars → `srrs_opc/`
+- [x] **Phase 4:** Capability fields, workspace integration → `srrs_opc/`
+- [x] **Phase 5:** Trajectory fields, continuity collars → `srrs_opc/`
+- [x] **Phase 6:** Topology observer, recursive routing → `srrs_opc/`
+- [x] **Phase 7:** Overlap cognition, prediction contracts → `srrs_opc/`
+- [x] **Phase 8:** Operator patterns, strategic preferences → `srrs_opc/`
+- [x] **Phase 9:** Entropy economics, sustainability governance → `srrs_opc/`
+- [x] **OCE Event Fabric:** Ingest → Route → Persist → Stream → `oce/backend/event_fabric.py`
+- [x] **OCE Observer Runtime:** Lifecycle → Health → State → `oce/backend/observer_runtime.py`
+- [x] **OC2 Gateway:** Telegram + Watchdog + Context Monitor → `.openclaw-2/`
+- [x] **Memory Sync:** 7-update threshold, 20-entry summarize → `tools/progress-sync.py`
+
+### V3 Phase 1 Alignment Checklist
+
+- [x] **SignalPacket:** Signal ontology with resonance scoring → `oce/backend/resonance/signal_packet.py`
+- [x] **CoherenceMetrics:** 6 metrics tracking → `oce/backend/resonance/coherence_metrics.py`
+- [x] **FieldStateManager:** Field state management → `oce/backend/resonance/field_state.py`
+- [x] **BoundaryMapper:** Boundary detection → `oce/backend/resonance/boundary_mapper.py`
+- [x] **ResonanceEngine:** Resonance alignment → `oce/backend/resonance/resonance_engine.py`
+- [x] **PressureTracker:** Entropy pressure monitoring → `oce/backend/resonance/pressure_tracker.py`
+- [x] **Debug CLI:** `tools/operator/resonance-debug.py`

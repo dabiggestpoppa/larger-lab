@@ -464,11 +464,63 @@ errors → errors-and-solutions.md → repo memory (every 7 entries)
 | `srrs_opc/` | SRRA-OPH core (33 Python files, 77 tests) |
 | `nautilus/` | NautilusTrader backtesting |
 | `oce/` | Operator Continuity Engine |
+| `oce/backend/resonance/` | V3 Phase 1 — Resonant Signal Substrate (121 tests) |
 | `progress/` | Agent sub-progress files |
 | `system-arch/` | All Mermaid diagrams |
 | `all-mermaids/` | Diagram archive by phase |
 | `tools/` | Automation & utilities |
 | `memory-bank/` | Error DB, solutions, patterns |
+
+---
+
+## 🔄 V3 Phase 1 — Resonant Signal Substrate (RSS)
+
+```mermaid
+graph TB
+    subgraph "Signal Layer"
+        SP[SignalPacket<br/>signal_packet.py]
+        SF[SignalField<br/>signal_packet.py]
+    end
+
+    subgraph "Coherence Layer"
+        CM[CoherenceMetrics<br/>coherence_metrics.py]
+        CE[CoherenceEngine<br/>coherence_metrics.py]
+    end
+
+    subgraph "Field Layer"
+        FSM[FieldStateManager<br/>field_state.py]
+        BM[BoundaryMapper<br/>boundary_mapper.py]
+    end
+
+    subgraph "Resonance Layer"
+        RE[ResonanceEngine<br/>resonance_engine.py]
+        RO[ResonanceOptimizer<br/>resonance_engine.py]
+    end
+
+    subgraph "Pressure Layer"
+        PT[PressureTracker<br/>pressure_tracker.py]
+    end
+
+    SP --> SF
+    SF --> CM
+    CM --> CE
+    CE --> FSM
+    FSM --> BM
+    BM --> RE
+    RE --> RO
+    RO --> PT
+```
+
+### V3 Phase 1 Modules
+
+| Module | File | Tests | Purpose |
+|--------|------|-------|---------|
+| SignalPacket | `oce/backend/resonance/signal_packet.py` | 29 | Signal ontology + resonance scoring |
+| CoherenceMetrics | `oce/backend/resonance/coherence_metrics.py` | 26 | 6 coherence metrics tracking |
+| FieldStateManager | `oce/backend/resonance/field_state.py` | 16 | Field state management |
+| BoundaryMapper | `oce/backend/resonance/boundary_mapper.py` | 14 | Boundary detection + pressure mapping |
+| ResonanceEngine | `oce/backend/resonance/resonance_engine.py` | 16 | Resonance alignment + scoring |
+| PressureTracker | `oce/backend/resonance/pressure_tracker.py` | 10 | Entropy pressure monitoring |
 
 ---
 
