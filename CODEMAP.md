@@ -464,7 +464,7 @@ errors → errors-and-solutions.md → repo memory (every 7 entries)
 | `srrs_opc/` | SRRA-OPH core (33 Python files, 77 tests) |
 | `nautilus/` | NautilusTrader backtesting |
 | `oce/` | Operator Continuity Engine |
-| `oce/backend/resonance/` | V3 Phase 1 — Resonant Signal Substrate (121 tests) |
+| `oce/backend/resonance/` | V3 Phase 1 — Resonant Signal Substrate (139 tests) |
 | `progress/` | Agent sub-progress files |
 | `system-arch/` | All Mermaid diagrams |
 | `all-mermaids/` | Diagram archive by phase |
@@ -515,12 +515,13 @@ graph TB
 
 | Module | File | Tests | Purpose |
 |--------|------|-------|---------|
-| SignalPacket | `oce/backend/resonance/signal_packet.py` | 29 | Signal ontology + resonance scoring |
-| CoherenceMetrics | `oce/backend/resonance/coherence_metrics.py` | 26 | 6 coherence metrics tracking |
+| SignalPacket | `oce/backend/resonance/signal_packet.py` | 34 | Signal ontology + resonance scoring |
+| CoherenceMetrics | `oce/backend/resonance/coherence_metrics.py` | 21 | 6 coherence metrics tracking |
 | FieldStateManager | `oce/backend/resonance/field_state.py` | 16 | Field state management |
-| BoundaryMapper | `oce/backend/resonance/boundary_mapper.py` | 14 | Boundary detection + pressure mapping |
-| ResonanceEngine | `oce/backend/resonance/resonance_engine.py` | 16 | Resonance alignment + scoring |
+| BoundaryMapper | `oce/backend/resonance/boundary_mapper.py` | 20 | Boundary detection + pressure mapping |
+| ResonanceEngine | `oce/backend/resonance/resonance_engine.py` | 20 | Resonance alignment + scoring |
 | PressureTracker | `oce/backend/resonance/pressure_tracker.py` | 10 | Entropy pressure monitoring |
+| RL Integration | `oce/backend/resonance/rlp_integration.py` | 18 | RL ↔ CC bridge |
 
 ---
 
