@@ -8,7 +8,7 @@ import { SystemMap } from "./components/SystemMap";
 import { api, DashboardData } from "./lib/api";
 import {
   Activity, GitBranch, Bell, Network, Shield, Cpu, Database, Zap,
-  Radio, AlertTriangle, XCircle,
+  Radio, AlertTriangle, XCircle, MessageSquare,
 } from "lucide-react";
 
 function StatusBadge({ status }: { status: "healthy" | "degraded" | "critical" }) {
@@ -145,6 +145,10 @@ export default function Home() {
             <NavItem icon={GitBranch} label="Traces" />
             <NavItem icon={Bell} label="Alerts" badge={dashboard?.alerts.stats.active_firing} />
             <NavItem icon={Network} label="Topology" />
+            <a href="/command-center" className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors text-gray-400 hover:text-gray-200 hover:bg-[#1a1a24]">
+              <MessageSquare className="w-4 h-4" />
+              <span>Command Center</span>
+            </a>
           </nav>
           <div className="flex items-center gap-3">
             <StatusBadge status={systemHealth} />

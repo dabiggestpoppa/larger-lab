@@ -1,2 +1,3 @@
 {"ts": "2026-05-16T21:18:36.635451+00:00", "agent": "AS", "file": "oce/backend/event_fabric.py", "change": "Fixed Event model auto-classification bug", "arch_file": "system-arch/01-system-overview.md", "aligned": true}
 {"ts": "2026-05-16T21:19:16.899954+00:00", "agent": "AS", "file": "oce/backend/event_fabric.py", "change": "Fixed Event model auto-classification bug", "arch_file": "system-arch/01-system-overview.md", "aligned": true}
+{"ts": "2026-05-17T12:30:00.000000+00:00", "agent": "CC", "file": "CODEMAP.md", "change": "Created unified CODEMAP with all 5 architecture levels, agent workflow, storage architecture, and ERR-0007 prevention rules", "arch_file": "system-arch/01-system-overview.md", "aligned": true}

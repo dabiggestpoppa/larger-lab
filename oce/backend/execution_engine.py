@@ -309,6 +309,10 @@ class ExecutionEngine:
         self._total_submitted = 0
         self._total_completed = 0
         self._total_failed = 0
+        self._worker_tasks: List[asyncio.Task] = []
+        self._queue_counter = 0
+        # Pre-create worker stats (workers are started in start())
+        self._workers = [WorkerStats(worker_id=f"worker-{i}") for i in range(self.max_workers)]
 
         # Register default handlers
         self._register_default_handlers()
@@ -351,15 +355,28 @@ class ExecutionEngine:
             return
         self._running = True
         self._queue = asyncio.PriorityQueue()
-        self._workers = [WorkerStats(worker_id=f"worker-{i}") for i in range(self.max_workers)]
+        self._worker_tasks = []
         for worker in self._workers:
-            asyncio.create_task(self._worker_loop(worker))
+            self._worker_tasks.append(asyncio.create_task(self._worker_loop(worker)))
         logger.info(f"Execution engine started with {self.max_workers} workers")
 
     async def stop(self):
         """Stop the execution engine."""
         self._running = False
-        # Cancel pending tasks
+        # Cancel all worker tasks
+        for t in self._worker_tasks:
+            t.cancel()
+        # Brief wait for workers to acknowledge cancellation
+        if self._worker_tasks:
+            try:
+                await asyncio.wait_for(
+                    asyncio.gather(*self._worker_tasks, return_exceptions=True),
+                    timeout=2.0
+                )
+            except (asyncio.TimeoutError, Exception):
+                pass
+        self._worker_tasks = []
+        # Cancel pending queue items
         while not self._queue.empty():
             try:
                 entry = self._queue.get_nowait()
@@ -528,7 +545,14 @@ class ExecutionEngine:
 
         handler = self._handlers.get(task.task_type)
         if not handler:
-            raise ValueError(f"No handler registered for task type: {task.task_type}")
+            task.status = ExecutionStatus.FAILED
+            task.error = f"No handler registered for task type: {task.task_type}"
+            task.completed_at = datetime.now(timezone.utc).isoformat()
+            self._total_failed += 1
+            worker.tasks_failed += 1
+            self.history.persist(task)
+            logger.warning(f"No handler for task type '{task.task_type}', task {task.task_id} marked FAILED")
+            return
 
         start_time = time.monotonic()
         try:

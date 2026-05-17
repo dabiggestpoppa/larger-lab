@@ -250,6 +250,22 @@ PM runs `python tools/error_analyzer.py --pm` to get:
 | Critical error, any service | >=1 | PM adds pre-flight check to relevant skill |
 | High total attempts (>5) | any | PM investigates root cause, suggests prevention |
 
+### ERR-0007: PowerShell Window Flashing Pattern
+
+**Pattern ID:** `WIN-SUBPROCESS-NO-WINDOW`
+
+**Symptom:** PowerShell/cmd windows flashing during background process execution (heartbeat monitoring, OC2 restarts, Telegram alerts)
+
+**Root Cause:** Subprocess calls missing `CREATE_NO_WINDOW` flag, no PID tracking allowing duplicates, inconsistent daemon implementation
+
+**Solution:** 
+- ALL `subprocess.run()` on Windows MUST use `creationflags=subprocess.CREATE_NO_WINDOW`
+- ALL `subprocess.Popen()` for background processes MUST use `DETACHED_PROCESS | CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP`
+- Always implement PID file tracking for daemon scripts
+- Use `pythonw` instead of `python` for GUI-less execution
+
+**Prevention:** See `OPERATOR_RULES.md` → "Windows Subprocess Execution Rules"
+
 ### Key Principle
 
 **Errors are features, not bugs.** Every error that persists teaches the system something new. The error DB is the team's collective memory of what breaks and how to fix it. Over time, the most common errors get preventive checks, new skills auto-generate, and the system becomes self-healing — without hard-coding specific error handlers.

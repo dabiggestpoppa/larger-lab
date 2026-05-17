@@ -5,7 +5,8 @@
       "updatedAtMs": 1778942642133,
       "scheduleIdentity": "{\"version\":1,\"enabled\":true,\"schedule\":{\"kind\":\"cron\",\"expr\":\"0 6 * * *\",\"tz\":\"America/New_York\"}}",
       "state": {
-        "nextRunAtMs": 1779012000000
+        "nextRunAtMs": 1779012000000,
+        "runningAtMs": 1779012000013
       }
     },
     "87b9fd68-3c68-427f-abfc-3125015f46a0": {
@@ -13,6 +14,34 @@
       "scheduleIdentity": "{\"version\":1,\"enabled\":true,\"schedule\":{\"kind\":\"cron\",\"expr\":\"0 7 * * *\",\"tz\":\"America/New_York\"}}",
       "state": {
         "nextRunAtMs": 1779015600000
+      }
+    },
+    "dbcbd379-bc1e-4017-8ed0-fa9796deba32": {
+      "updatedAtMs": 1779010166536,
+      "scheduleIdentity": "{\"version\":1,\"enabled\":true,\"schedule\":{\"kind\":\"every\",\"everyMs\":120000,\"anchorMs\":1779008419655}}",
+      "state": {
+        "nextRunAtMs": 1779013766536,
+        "lastRunAtMs": 1779010102990,
+        "lastRunStatus": "error",
+        "lastStatus": "error",
+        "lastDurationMs": 63546,
+        "lastDiagnostics": {
+          "summary": "cron: job execution timed out",
+          "entries": [
+            {
+              "ts": 1779010166536,
+              "source": "cron-setup",
+              "severity": "error",
+              "message": "cron: job execution timed out"
+            }
+          ]
+        },
+        "lastDiagnosticSummary": "cron: job execution timed out",
+        "lastErrorReason": "timeout",
+        "lastDeliveryStatus": "not-requested",
+        "consecutiveErrors": 5,
+        "consecutiveSkipped": 0,
+        "lastError": "cron: job execution timed out"
       }
     }
   }

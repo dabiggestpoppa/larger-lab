@@ -54,30 +54,6 @@
         "mode": "announce"
       },
       "state": {}
-    },
-    {
-      "id": "dbcbd379-bc1e-4017-8ed0-fa9796deba32",
-      "agentId": "main",
-      "sessionKey": "agent:main:telegram:direct:8258195396",
-      "name": "Drain Watchdog — Kill stuck sub-agents before restart",
-      "enabled": true,
-      "createdAtMs": 1779008419655,
-      "schedule": {
-        "kind": "every",
-        "everyMs": 120000,
-        "anchorMs": 1779008419655
-      },
-      "sessionTarget": "isolated",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "agentTurn",
-        "message": "You are the Drain Watchdog. Run these steps:\n\n1. Read the last 200 lines of today's gateway log at C:\\Users\\wifik\\AppData\\Local\\Temp\\openclaw\\openclaw-$(Get-Date -Format 'yyyy-MM-dd').log\n2. Count how many 'still draining' messages appear\n3. Check for 'drain timeout reached' or 'failed to reacquire gateway lock'\n\nIf drain stalls >= 3 OR drain timeout detected OR lock conflict detected:\n   - Use subagents(action='list') to get all active sub-agents\n   - Use subagents(action='kill') on each active sub-agent\n   - Wait 5 seconds\n   - Use gateway(action='restart') to restart the gateway\n   - Log the intervention to logs/drain-watchdog.log\n\nIf no issues found — reply NO_REPLY.\n\nKeep it fast. This runs every 2 minutes.",
-        "timeoutSeconds": 60
-      },
-      "delivery": {
-        "mode": "none"
-      },
-      "state": {}
     }
   ]
 }

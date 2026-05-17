@@ -1,246 +1,176 @@
 # CODEMAP — Larger-Lab Workspace Guide
 
-> **Last Updated:** 2026-05-16 | **Phase:** OCE Phase 4 (Structural Memory) — Complete
+> **Last Updated:** 2026-05-17 | **Phase:** OCE Phase 5 (Observability) — Active
 > **Purpose:** Quick orientation for agents joining the workspace.
 
 ---
 
 ## 1. SYSTEM ARCHITECTURE GRAPH
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                           MAD (Human Operator)                               │
-│                    Strategic Initiator / Attractor Definer                   │
-└──────────────────────────────────┬──────────────────────────────────────────┘
-                                   │
-                                   ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         OWL (Operator Shell)                                 │
-│              Bounded Sovereign Operational Continuity                        │
-│                                                                              │
-│  ┌──────────────────────────────────────────────────────────────────────┐   │
-│  │                        OCE Continuity Core                            │   │
-│  │                        (FastAPI :8000)                                 │   │
-│  │                                                                       │   │
-│  │  ┌─────────────┐  ┌──────────────┐  ┌─────────────────────────────┐  │   │
-│  │  │   Event      │  │   Observer   │  │   Structural Memory          │  │   │
-│  │  │   Fabric     │  │   Runtime    │  │   (Phase 4)                  │  │   │
-│  │  │   (Phase 2)  │  │   (Phase 3)  │  │                              │  │   │
-│  │  │              │  │              │  │  ┌──────┐ ┌────────┐ ┌─────┐ │  │   │
-│  │  │ ┌──────────┐ │  │ ┌──────────┐ │  │  │ WORK │ │LEARNED │ │KNOW │ │  │   │
-│  │  │ │Ingest    │ │  │ │Lifecycle │ │  │  └──────┘ └────────┘ └─────┘ │  │   │
-│  │  │ │Route     │ │  │ │Health    │ │  │                              │  │   │
-│  │  │ │Persist   │ │  │ │Events    │ │  │  FTS5 + SQLite + TTL        │  │   │
-│  │  │ │Stream    │ │  │ │Snapshots │ │  │  Compression + Wiki Export   │  │   │
-│  │  │ └──────────┘ │  │ └──────────┘ │  │  Graph + Reconstruction     │  │   │
-│  │  │              │  │              │  │                              │  │   │
-│  │  │ Topological  │  │  Observer   │  │  101 tests passing          │  │   │
-│  │  │ Router       │  │  Debug CLI  │  │                              │  │   │
-│  │  │ (Dijkstra)   │  │  Integration│  │                              │  │   │
-│  │  └─────────────┘  └──────────────┘  └─────────────────────────────┘  │   │
-│  │                                                                       │   │
-│  │  ┌──────────────────────────────────────────────────────────────────┐ │   │
-│  │  │                    SRRA-OPH Substrate                             │ │   │
-│  │  │                    (srrs_opc/ — 77 tests)                         │ │   │
-│  │  │                                                                   │ │   │
-│  │  │  Phases 1-9: Observer Mesh → Topology → Overlap → Coevolution   │ │   │
-│  │  │  Entropy Economics → Attractor Reasoning → Repair Patches       │ │   │
-│  │  └──────────────────────────────────────────────────────────────────┘ │   │
-│  └──────────────────────────────────────────────────────────────────────┘   │
-│                                                                              │
-│  ┌──────────────────────────────────────────────────────────────────────┐   │
-│  │                      Operator Control Layer                            │   │
-│  │                      (tools/operator/ :8001)                           │   │
-│  │                                                                       │   │
-│  │  ┌──────────────┐  ┌──────────────┐  ┌─────────────────────────────┐ │   │
-│  │  │   Desktop     │  │   VS Code    │  │   System Operator            │ │   │
-│  │  │   Control     │  │   Bridge     │  │   (Process/Package/Env/     │ │   │
-│  │  │              │  │              │  │    Service/Scheduler/Network) │ │   │
-│  │  │  Screen      │  │  Files       │  │                              │ │   │
-│  │  │  Input Sim   │  │  Editor      │  │  Observer Integration        │ │   │
-│  │  │  Window Mgr  │  │  Terminal    │  │  Observer Debug CLI          │ │   │
-│  │  │  OpenCV      │  │  Extensions  │  │                              │ │   │
-│  │  │  (SendInput) │  │  Git         │  │                              │ │   │
-│  │  └──────────────┘  └──────────────┘  └─────────────────────────────┘ │   │
-│  └──────────────────────────────────────────────────────────────────────┘   │
-│                                                                              │
-│  ┌──────────────────────────────────────────────────────────────────────┐   │
-│  │                      Memory & Knowledge Layer                         │   │
-│  │                                                                       │   │
-│  │  ┌──────────────┐  ┌──────────────┐  ┌─────────────────────────────┐ │   │
-│  │  │  Structural   │  │  AgentMemory │  │  LLM Wiki                   │ │   │
-│  │  │  Memory       │  │  (MCP :3111) │  │  (projects/llm_wiki/)      │ │   │
-│  │  │  (SQLite)     │  │              │  │                              │ │   │
-│  │  │              │  │  BM25+Vector │  │  Self-building knowledge    │ │   │
-│  │  │  WORK        │  │  Graph (RRF) │  │  base from documents        │ │   │
-│  │  │  LEARNED     │  │  Auto-capture│  │  Karpathy pattern           │ │   │
-│  │  │  KNOWLEDGE   │  │  12 hooks    │  │  Obsidian compatible        │ │   │
-│  │  └──────────────┘  └──────────────┘  └─────────────────────────────┘ │   │
-│  │                                                                       │   │
-│  │  ┌──────────────┐  ┌──────────────┐  ┌─────────────────────────────┐ │   │
-│  │  │  Team Chat    │  │  Progress    │  │  Error DB                   │ │   │
-│  │  │  (shared-     │  │  Files       │  │  (memory-bank/)            │ │   │
-│  │  │  conversations│  │  (progress/) │  │                              │ │   │
-│  │  │  /team-chat)  │  │              │  │  Pattern analysis           │ │   │
-│  │  │              │  │  Per-agent   │  │  Self-healing               │ │   │
-│  │  │  Coordination│  │  tracking    │  │  Error classification       │ │   │
-│  │  └──────────────┘  └──────────────┘  └─────────────────────────────┘ │   │
-│  └──────────────────────────────────────────────────────────────────────┘   │
-│                                                                              │
-│  ┌──────────────────────────────────────────────────────────────────────┐   │
-│  │                      External Tools Layer                             │   │
-│  │                                                                       │   │
-│  │  ┌──────────────┐  ┌──────────────┐  ┌─────────────────────────────┐ │   │
-│  │  │  CloakBrowser │  │  TradingView │  │  Supertonic TTS             │ │   │
-│  │  │  (Stealth     │  │  MCP         │  │  (31 languages,            │ │   │
-│  │  │   Chromium)   │  │  (Real-time  │  │   ONNX, on-device)         │ │   │
-│  │  │              │  │   market     │  │                              │ │   │
-│  │  │  Bot bypass   │  │   data +     │  │  Content farm voice         │ │   │
-│  │  │  30/30 tests  │  │   30+        │  │  generation                 │ │   │
-│  │  │              │  │   indicators) │  │                              │ │   │
-│  │  └──────────────┘  └──────────────┘  └─────────────────────────────┘ │   │
-│  │                                                                       │   │
-│  │  ┌──────────────┐  ┌──────────────┐  ┌─────────────────────────────┐ │   │
-│  │  │  TensorTrade  │  │  Scrapling   │  │  Agent Hooks                │ │   │
-│  │  │  (RL trading  │  │  (Adaptive   │  │  (Pre/post tool use,       │ │   │
-│  │  │   framework)  │  │   scraping)  │  │   session start/end)       │ │   │
-│  │  └──────────────┘  └──────────────┘  └─────────────────────────────┘ │   │
-│  └──────────────────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph "Level 1: Human Interface"
+        H[Human / Board]
+        CC[Claude Code<br/>🔵 Overseer]
+        OC[OpenClaw<br/>🟣 Analysis]
+        HR[Hermes<br/>🟢 Execution]
+        OC2[OpenClaw 2<br/>🟠 Telegram]
+    end
+
+    subgraph "Level 2: SRRA-OPH Substrate"
+        C1[Collar Protocol]
+        PP[PlannerPatch]
+        EP[ExecutionPatch]
+        MP[MemoryPatch]
+        RP[RepairPatch]
+        AC[Active Collars]
+        TF[Trajectory Fields]
+    end
+
+    subgraph "Level 3: OCE Engine"
+        API[FastAPI Backend<br/>Port 8000]
+        EF[Event Fabric]
+        OR[Observer Runtime]
+        UI[Next.js Frontend]
+    end
+
+    subgraph "Level 4: Data Pipeline"
+        CSV[Downloads/*.csv]
+        NT[Nautilus Trader]
+        REPORTS[Reports]
+    end
+
+    subgraph "Level 5: Infrastructure"
+        WIN[Windows Desktop]
+        CLOUD[Hetzner/Oracle Cloud]
+        TG[Telegram API]
+        OPENROUTER[OpenRouter LLMs]
+    end
+
+    H --> CC
+    CC --> OC
+    OC --> HR
+    HR --> OC2
+    OC2 --> TG
+
+    CC --> C1
+    OC --> C1
+    HR --> C1
+    C1 --> PP
+    C1 --> EP
+    C1 --> MP
+    C1 --> RP
+    PP --> AC
+    EP --> AC
+    MP --> AC
+    RP --> AC
+    AC --> TF
+
+    TF --> EF
+    EF --> OR
+    OR --> API
+    API --> UI
+    API --> EF
+
+    CSV --> NT
+    NT --> REPORTS
+    REPORTS --> TF
+
+    WIN --> OC2
+    WIN --> API
+    API --> OPENROUTER
+    WIN --> CLOUD
 ```
 
 ---
 
 ## 2. DATA FLOW / TOURING GRAPH
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         DATA FLOW THROUGH SYSTEM                             │
-└─────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph "Input"
+        EXT[External Event]
+        CSV[Downloads/*.csv]
+    end
 
-[External Event]
-      │
-      ▼
-┌─────────────┐     ┌──────────────┐     ┌─────────────────────────────────┐
-│  Event       │────▶│  Topological  │────▶│  Subscribers (Observers)        │
-│  Fabric      │     │  Router       │     │                                  │
-│  ingest()    │     │  (Dijkstra)   │     │  ┌────────┐ ┌────────┐ ┌──────┐ │
-│              │     │              │     │  │Trading │ │Repair  │ │Memory│ │
-│  Validate    │     │  Broadcast   │     │  │Observer│ │Observer│ │Obs.  │ │
-│  Classify    │     │  Targeted    │     │  └────────┘ └────────┘ └──────┘ │
-│  Timestamp   │     │  Path-based  │     └─────────────────────────────────┘
-└──────┬───────┘     └──────────────┘
-       │
-       ├──────────────────────────────────────┐
-       │                                      │
-       ▼                                      ▼
-┌──────────────┐                    ┌──────────────────┐
-│  Event        │                    │  Structural       │
-│  Persistence  │                    │  Memory           │
-│  (SQLite)     │                    │                   │
-│              │                    │  WORK → LEARNED    │
-│  Compress     │                    │    → KNOWLEDGE    │
-│  old events   │                    │                   │
-│  TTL expiry   │                    │  FTS5 search      │
-└──────────────┘                    │  Graph traversal  │
-                                    │  Wiki export      │
-                                    └──────────────────┘
-       │                                      │
-       ▼                                      ▼
-┌──────────────┐                    ┌──────────────────┐
-│  WebSocket    │                    │  Observer         │
-│  Stream       │                    │  Integration      │
-│              │                    │                   │
-│  Real-time    │                    │  exec_and_emit    │
-│  broadcast    │                    │  kill_and_emit    │
-│  to frontend  │                    │  install_and_emit │
-└──────────────┘                    └──────────────────┘
-       │                                      │
-       ▼                                      ▼
-┌──────────────┐                    ┌──────────────────┐
-│  OCE Frontend │                    │  SRRA-OPH         │
-│  (Next.js     │                    │  Substrate        │
-│   :3000)      │                    │                   │
-│              │                    │  77 tests          │
-│  Dashboard    │                    │  Phases 1-9        │
-│  Chat UI      │                    │  Entropy economics │
-│  Observer     │                    │  Attractor reason. │
-│  panels       │                    │  Repair patches    │
-└──────────────┘                    └──────────────────┘
+    subgraph "Event Fabric"
+        EF[Event Fabric]
+        ING[Ingest]
+        ROUTE[Topological Router]
+        PERSIST[Persistence]
+        STREAM[WebSocket Stream]
+    end
+
+    subgraph "Observer Runtime"
+        OR[Observer Runtime]
+        LIFECYCLE[Lifecycle]
+        HEALTH[Health Monitor]
+    end
+
+    subgraph "Output"
+        UI[OCE Frontend<br/>:3000]
+        TG[Telegram]
+        REPORTS[Reports]
+    end
+
+    EXT --> ING
+    ING --> ROUTE
+    ROUTE --> PERSIST
+    PERSIST --> STREAM
+    STREAM --> UI
+    STREAM --> TG
+
+    CSV --> NT[Nautilus Trader]
+    NT --> REPORTS
+    REPORTS --> TF[Trajectory Fields]
+    TF --> EF
 ```
 
 ---
 
 ## 3. LOGIC CHAIN (Execution Flow)
 
+```mermaid
+stateDiagram-v2
+    [*] --> StartSession
+    StartSession --> ReadRules: Read OPERATOR_RULES.md
+    ReadRules --> ReadAgents: Read AGENTS.md
+    ReadAgents --> ReadChat: Read team-chat.md
+    ReadChat --> LoadContext
+    LoadContext --> HealthCheck
+    HealthCheck --> PrioritizeTasks
+    PrioritizeTasks --> CanDoDirectly
+    CanDoDirectly -->|Yes| BuildDirectly
+    CanDoDirectly -->|No| SpawnSubagent
+    BuildDirectly --> VerifyOutput
+    SpawnSubagent --> MonitorProgress
+    VerifyOutput --> MoreTasks
+    MonitorProgress --> MoreTasks
+    MoreTasks -->|Yes| PrioritizeTasks
+    MoreTasks -->|No| EndSession
+    EndSession --> [*]
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         OWL EXECUTION LOGIC CHAIN                            │
-└─────────────────────────────────────────────────────────────────────────────┘
 
-[Start Session]
-      │
-      ▼
-[Read OPERATOR_RULES.md] ──▶ [Read AGENTS.md] ──▶ [Read team-chat.md]
-      │                            │                       │
-      ▼                            ▼                       ▼
-[Load Context]              [Check Phase Status]    [Check Sub-agents]
-      │                            │                       │
-      ▼                            ▼                       ▼
-[Health Check]              [Identify Blockers]     [Assess Progress]
-      │                            │                       │
-      └──────────────┬─────────────┘                       │
-                     │                                     │
-                     ▼                                     │
-            [Prioritize Tasks] ◀───────────────────────────┘
-                     │
-                     ▼
-         ┌───── Can I do it directly? ─────┐
-         │                                   │
-         ▼                                   ▼
-    [YES: Build directly]              [NO: Spawn sub-agent]
-         │                                   │
-         ▼                                   ▼
-    [Write code/docs]                  [Create task spec]
-    [Run tests]                        [Spawn with timeout]
-    [Update team-chat]                 [Monitor progress]
-         │                                   │
-         ▼                                   ▼
-    [Verify output]                    [Verify output]
-    [Update progress]                  [Update progress]
-         │                                   │
-         └──────────────┬───────────────────┘
-                        │
-                        ▼
-               [More tasks?] ──YES──▶ [Prioritize Tasks]
-                        │
-                        NO
-                        │
-                        ▼
-               [Health Check]
-                        │
-                        ▼
-               [Update team-chat]
-                        │
-                        ▼
-               [Yield / Wait for events]
+```mermaid
+sequenceDiagram
+    participant H as Human
+    participant CC as Claude Code
+    participant OC as OpenClaw
+    participant HR as Hermes
+    participant OC2 as OpenClaw 2
+    participant OCE as OCE Backend
+    participant SRRA as SRRA-OPH
 
-
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         SUB-AGENT LOGIC CHAIN                                │
-└─────────────────────────────────────────────────────────────────────────────┘
-
-[Receive Task]
-      │
-      ▼
-[Read context files] ──▶ [Understand scope] ──▶ [Identify deliverable]
-      │                                                │
-      ▼                                                ▼
-[Check existing code]                             [Write code/docs]
-      │                                                │
-      ▼                                                ▼
-[Build incrementally]                             [Run tests]
-      │                                                │
+    H->>CC: Set Direction / Review
+    CC->>OC: Task Brief
+    OC->>HR: Execution Plan
+    HR->>SRRA: Run Analysis
+    SRRA->>OCE: Emit Events
+    OCE->>OC2: Stream Updates
+    OC2->>H: Telegram Notification
+    HR->>CC: Progress Update
+    CC->>H: Status Report
+```
       ▼                                                ▼
 [Run tests]                                       [Fix failures]
       │                                                │
@@ -320,7 +250,66 @@
 
 ---
 
-## Workspace Map
+## 4. ERROR HANDLING CHAIN
+
+```mermaid
+flowchart LR
+    A[Error Detected] --> B[Read the LOG]
+    B --> C[Identify root cause]
+    C --> D[Fix ONE thing]
+    D --> E[Test]
+    E -->|Fail| B
+    E -->|Pass| F[Document fix pattern]
+    F --> G[Continue]
+```
+
+---
+
+## 5. ENTROPY GOVERNANCE CHAIN
+
+```mermaid
+flowchart LR
+    A[Before Action] --> B{Is this necessary?}
+    B -->|No| C[Skip]
+    B -->|Yes| D{Can existing tool do this?}
+    D -->|Yes| E[Use existing]
+    D -->|No| F[Build minimal solution]
+    F --> G[Test + Document]
+    G --> H[Compress / Clean up]
+    H --> I[Continue]
+```
+
+---
+
+## 6. Workspace Map
+
+```mermaid
+graph TD
+    ROOT[larger-lab/] --> CONFIG[config/]
+    ROOT --> DOCS[docs/]
+    ROOT --> OCE[oce/]
+    ROOT --> SRRA[srrs_opc/]
+    ROOT --> TOOLS[tools/]
+    ROOT --> SKILLS[skills/]
+    ROOT --> PROGRESS[progress/]
+    ROOT --> PROJECTS[projects/]
+    ROOT --> SHARED[shared-conversations/]
+    ROOT --> LOGS[logs/]
+    ROOT --> MEMBANK[memory-bank/]
+
+    CONFIG --> IDENTITY[IDENTITY.md<br/>SOUL.md<br/>OPERATOR_RULES.md]
+    DOCS --> CM[CODEMAP.md]
+    OCE --> BACKEND[oce/backend/]
+    OCE --> FRONTEND[oce/frontend/]
+    BACKEND --> MAIN[main.py<br/>101 tests]
+    BACKEND --> EF[event_fabric.py]
+    BACKEND --> OR[observer_runtime.py]
+    BACKEND --> SM[structural_memory.py]
+    SRRA --> OPC[srrs_opc/ - 77 tests]
+    TOOLS --> OP[tools/operator/]
+    TOOLS --> HOOKS[tools/agent-hooks/]
+    TOOLS --> SYNC[progress-sync.py<br/>chat_sync.py]
+```
 
 ```
 larger-lab/
@@ -455,9 +444,132 @@ npx @agentmemory/agentmemory
 
 ---
 
+## 7. SRRA-OPH Topology (Phases 1-9)
+
+```mermaid
+graph TD
+    subgraph "Phase 1: Observer Mesh"
+        O1[Observer A]
+        O2[Observer B]
+        O3[Observer C]
+        C1[CollarState]
+        PP[PlannerPatch]
+        EP[ExecutionPatch]
+        MP[MemoryPatch]
+        RP[RepairPatch]
+    end
+
+    subgraph "Phase 2: Reconstruction"
+        TF[Trajectory Fields]
+        CC[Continuity Collars]
+        RP2[Repair-First Continuity]
+    end
+
+    subgraph "Phase 3: Emergent Topology"
+        DC[Dynamic Coupling]
+        TR[Topological Router]
+        DCON[Distributed Consensus]
+        ACF[Active Collar Fields]
+    end
+
+    subgraph "Phase 4: Workspace Integration"
+        CF1[Claude]
+        CF2[VSCode]
+        CF3[Memory DB]
+        CF4[OpenClaw]
+        WT[Workspace Tools]
+    end
+
+    subgraph "Phase 5: Long-Horizon Continuity"
+        TC[Trajectory Compression]
+        ID[Identity Reconstruction]
+    end
+
+    subgraph "Phase 6-9: Advanced"
+        RT[Topology Observer]
+        OC6[Overlap Cognition]
+        SC[Sovereign Coevolution]
+        EB[Entropy Budget]
+    end
+
+    O1 --> C1
+    O2 --> C1
+    O3 --> C1
+    PP --> C1
+    EP --> C1
+    MP --> C1
+    RP --> C1
+    C1 --> PP
+    C1 --> EP
+    C1 --> MP
+    C1 --> RP
+
+    C1 --> TF
+    TF --> CC
+    TF --> RP2
+
+    O1 --> DC
+    O2 --> DC
+    O3 --> DC
+    DC --> TR
+    TR --> DCON
+    DCON --> ACF
+    ACF --> DC
+
+    CF1 --> WT
+    CF2 --> WT
+    CF3 --> WT
+    CF4 --> WT
+
+    TF --> TC
+    TC --> ID
+    CC --> ID
+    RP2 --> ID
+
+    RT --> OC6
+    OC6 --> SC
+    SC --> EB
+```
+
+---
+
+## 8. ERR-0007: Windows Subprocess Execution Rules
+
+```mermaid
+flowchart LR
+    A[subprocess.run] --> B[CREATE_NO_WINDOW]
+    C[subprocess.Popen] --> D[DETACHED_PROCESS<br/>CREATE_NO_WINDOW<br/>CREATE_NEW_PROCESS_GROUP]
+    E[Daemon Scripts] --> F[PID File Tracking]
+    G[Session Start] --> H[terminal_cleanup.py --force]
+```
+
+**Prevention Rules:**
+- ALL `subprocess.run()` on Windows MUST use `creationflags=subprocess.CREATE_NO_WINDOW`
+- ALL `subprocess.Popen()` for background processes MUST use `DETACHED_PROCESS | CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP`
+- Always implement PID file tracking for daemon scripts
+- Run `tools/terminal_cleanup.py --force` at session start
+
+---
+
 ## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0.0 | 2026-05-16 | Initial CODEMAP |
 | 2.0.0 | 2026-05-16 | Added mermaid graphs, updated for Phase 4 completion, added logic chains |
+| 3.0.0 | 2026-05-17 | Added ERR-0007 Windows subprocess rules, Phase 5 observability, unified diagrams |
+
+---
+
+## Quick Reference
+
+| Directory | Purpose |
+|-----------|---------|
+| `srrs_opc/` | SRRA-OPH core (33 Python files, 77 tests) |
+| `nautilus/` | NautilusTrader backtesting |
+| `oce/` | Operator Continuity Engine |
+| `progress/` | Agent sub-progress files |
+| `system-arch/` | All Mermaid diagrams |
+| `all-mermaids/` | Diagram archive by phase |
+| `tools/` | Automation & utilities |
+| `memory-bank/` | Error DB, solutions, patterns |

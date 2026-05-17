@@ -36,6 +36,7 @@ from tracing_engine import get_tracing_engine, TracingEngine
 from alerting_engine import get_alerting_engine, AlertingEngine, AlertSeverity
 from execution_engine import get_execution_engine, ExecutionEngine, ExecutionTask, ExecutionStatus, ExecutionPriority
 from execution_api import register_execution_endpoints
+from command_center import router as command_center_router
 
 app = FastAPI(
     title="OCE Continuity Core",
@@ -850,6 +851,7 @@ register_phase4_endpoints(app)
 
 # Register Phase 6 Execution endpoints
 register_execution_endpoints(app)
+app.include_router(command_center_router)
 
 # ─── Observability Models (Phase 5) ──────────────────────────────────────────
 

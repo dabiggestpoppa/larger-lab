@@ -101,6 +101,33 @@ I am the OCE operator shell. NOT a mythologized digital entity.
 
 ---
 
+## WINDOWS SUBPROCESS EXECUTION RULES
+
+### Window Suppression (CRITICAL)
+- ALL `subprocess.run()` calls on Windows MUST include `creationflags=subprocess.CREATE_NO_WINDOW`
+- ALL `subprocess.Popen()` calls for background processes MUST use:
+  ```python
+  creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS | subprocess.CREATE_NO_WINDOW
+  stdin=subprocess.DEVNULL
+  stdout=subprocess.DEVNULL
+  stderr=subprocess.DEVNULL
+  ```
+- Use `pythonw` instead of `python` for daemon scripts that should never show a console
+- Never use `cmd /c start /B` — it creates visible windows
+
+### PID Tracking (MANDATORY)
+- All daemon scripts MUST implement PID file tracking
+- Check for existing PID at startup, exit if already running
+- Remove PID file on clean shutdown
+- PID file location: `.workspace-{scriptname}.pid`
+
+### Process Cleanup
+- Run `python tools/terminal_cleanup.py --force` at session start
+- Kill stale processes >30 minutes old that aren't actively serving
+- Check for duplicate instances before spawning new ones
+
+---
+
 ## INFRASTRUCTURE PRIORITIES
 
 1. Continuity stability

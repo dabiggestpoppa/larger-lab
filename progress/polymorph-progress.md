@@ -11,6 +11,29 @@
 
 ### Recent Entries
 
+#### 🔴 [PM] 2026-05-17 — Critical Bug Fix: PowerShell Window Flashing + Memory System Update
+
+**ERR-0007: PowerShell Window Flashing During Background Execution**
+- **Root Cause**: Multiple monitoring scripts (`workspace-heartbeat.py`, `oc2-watchdog.py`, `hermes-oc2-monitor.py`) spawned subprocesses without `CREATE_NO_WINDOW` flag, causing visible PowerShell/cmd windows to flash during heartbeat monitoring and OC2 restarts
+- **Contributing Factors**: No PID tracking allowed duplicate instances, inconsistent daemon implementation, scattered scripts with copy-paste code
+- **Actions Taken**:
+  1. Added `CREATE_NO_WINDOW` to ALL `subprocess.run()` calls in `hermes-oc2-monitor.py`
+  2. Added `DETACHED_PROCESS | CREATE_NO_WINDOW` to `subprocess.Popen()` calls
+  3. Added `stdin=subprocess.DEVNULL` to prevent handle inheritance
+  4. Deleted `workspace-heartbeat.py` entirely — OpenClaw will rebuild from scratch
+  5. Killed all duplicate watchdog processes (6 Python processes running)
+  6. Cleaned up PID files, cache files, and log files
+- **Memory Updates**:
+  - Added ERR-0007 to `memory-bank/error-db.json` with pattern `WIN-SUBPROCESS-NO-WINDOW`
+  - Added Entry #5 to `memory-bank/errors-and-solutions.md` with full diagnostic pattern
+  - Created prevention pattern for future subprocess calls
+
+**Key Lessons**:
+- ALL subprocess calls in monitoring scripts MUST use `CREATE_NO_WINDOW` on Windows
+- Always implement PID file tracking for daemon scripts
+- Use `pythonw` instead of `python` for GUI-less execution
+- Run `tools/terminal_cleanup.py --force` at session start to kill stale processes
+
 #### 🔴 [PM] 2026-05-17 — Phase 5 PM Tasks Complete (2/2) + P90 Strategy Reframed
 
 **OCE-5.17: Operator ↔ Observability Integration**

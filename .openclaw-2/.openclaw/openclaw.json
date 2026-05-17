@@ -121,6 +121,17 @@
       }
     }
   },
+  "mcp": {
+    "servers": {
+      "lazyweb": {
+        "url": "https://www.lazyweb.com/mcp",
+        "transport": "streamable-http",
+        "headers": {
+          "Authorization": "Bearer 066457f3-c149-4c6e-90d7-e57972116a75"
+        }
+      }
+    }
+  },
   "meta": {
     "lastTouchedVersion": "2026.5.7",
     "lastTouchedAt": "2026-05-17T07:50:18.709Z"

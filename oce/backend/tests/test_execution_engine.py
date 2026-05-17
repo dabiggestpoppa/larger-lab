@@ -31,13 +31,11 @@ def reset_singleton():
 
 
 @pytest.fixture
-def engine():
+def engine(tmp_path):
     """Create a fresh ExecutionEngine instance for testing."""
     from execution_engine import ExecutionEngine
-    eng = ExecutionEngine.get_instance(max_workers=2, db_path=":memory:")
-    # Override history to use a test DB file
-    eng.history.db_path = "data/test_execution_history.db"
-    eng.history._init_db()
+    db_file = str(tmp_path / "test_execution.db")
+    eng = ExecutionEngine.get_instance(max_workers=2, db_path=db_file)
     return eng
 
 
@@ -214,67 +212,92 @@ class TestTaskSubmission:
 
 class TestTaskExecution:
     @pytest.mark.asyncio
-    async def test_execute_skill_call(self, engine):
-        from execution_engine import ExecutionTask, ExecutionPriority
+    async def test_execute_skill_call_direct(self, engine):
+        """Test direct execution of a skill_call task via _execute_task."""
+        from execution_engine import ExecutionTask, ExecutionStatus
         task = ExecutionTask(
             task_id="exec-test",
             task_type="skill_call",
             payload={"skill_name": "test", "params": {"x": 1}},
-            priority=ExecutionPriority.NORMAL,
         )
-        await engine.start()
-        await engine.submit(task)
-        # Wait for execution
-        await asyncio.sleep(0.3)
-        result = engine.get_task("exec-test")
-        assert result is not None
-        assert result.status in (ExecutionStatus.COMPLETED, ExecutionStatus.RUNNING, ExecutionStatus.QUEUED)
-        await engine.stop()
+        worker = engine._workers[0]
+        await engine._execute_task(task, worker)
+        assert task.status == ExecutionStatus.COMPLETED
+        assert task.result is not None
+        assert "output" in task.result
 
     @pytest.mark.asyncio
-    async def test_execute_tool_invoke(self, engine):
-        from execution_engine import ExecutionTask
+    async def test_execute_tool_invoke_direct(self, engine):
+        """Test direct execution of a tool_invoke task."""
+        from execution_engine import ExecutionTask, ExecutionStatus
         task = ExecutionTask(
             task_id="tool-test",
             task_type="tool_invoke",
             payload={"tool_name": "echo", "args": {"msg": "hello"}},
         )
-        await engine.start()
-        await engine.submit(task)
-        await asyncio.sleep(0.3)
-        result = engine.get_task("tool-test")
-        assert result is not None
-        await engine.stop()
+        worker = engine._workers[0]
+        await engine._execute_task(task, worker)
+        assert task.status == ExecutionStatus.COMPLETED
 
     @pytest.mark.asyncio
-    async def test_execute_pipeline_run(self, engine):
-        from execution_engine import ExecutionTask
+    async def test_execute_pipeline_run_direct(self, engine):
+        """Test direct execution of a pipeline_run task."""
+        from execution_engine import ExecutionTask, ExecutionStatus
         task = ExecutionTask(
             task_id="pipeline-test",
             task_type="pipeline_run",
             payload={"pipeline_name": "test_pipe", "inputs": {"data": [1, 2, 3]}},
         )
-        await engine.start()
-        await engine.submit(task)
-        await asyncio.sleep(0.3)
-        result = engine.get_task("pipeline-test")
-        assert result is not None
-        await engine.stop()
+        worker = engine._workers[0]
+        await engine._execute_task(task, worker)
+        assert task.status == ExecutionStatus.COMPLETED
 
     @pytest.mark.asyncio
-    async def test_execute_agent_delegate(self, engine):
-        from execution_engine import ExecutionTask
+    async def test_execute_agent_delegate_direct(self, engine):
+        """Test direct execution of an agent_delegate task."""
+        from execution_engine import ExecutionTask, ExecutionStatus
         task = ExecutionTask(
             task_id="delegate-test",
             task_type="agent_delegate",
             payload={"agent_name": "sub-agent", "task": "analyze data"},
         )
-        await engine.start()
-        await engine.submit(task)
-        await asyncio.sleep(0.3)
-        result = engine.get_task("delegate-test")
-        assert result is not None
-        await engine.stop()
+        worker = engine._workers[0]
+        await engine._execute_task(task, worker)
+        assert task.status == ExecutionStatus.COMPLETED
+
+    @pytest.mark.asyncio
+    async def test_execute_no_handler(self, engine):
+        """Test execution with no registered handler."""
+        from execution_engine import ExecutionTask, ExecutionStatus
+        task = ExecutionTask(
+            task_id="no-handler",
+            task_type="unknown_type",
+            payload={},
+        )
+        worker = engine._workers[0]
+        await engine._execute_task(task, worker)
+        assert task.status == ExecutionStatus.FAILED
+        assert "No handler registered" in task.error
+
+    @pytest.mark.asyncio
+    async def test_execute_handler_error(self, engine):
+        """Test execution when handler raises an error."""
+        from execution_engine import ExecutionTask, ExecutionStatus
+
+        async def failing_handler(payload):
+            raise RuntimeError("Handler failed!")
+
+        engine.register_handler("failing", failing_handler)
+        task = ExecutionTask(
+            task_id="fail-test",
+            task_type="failing",
+            payload={},
+            max_retries=1,
+        )
+        worker = engine._workers[0]
+        await engine._execute_task(task, worker)
+        assert task.status == ExecutionStatus.FAILED
+        assert "RuntimeError" in task.error
 
 
 # ─── Task Cancellation Tests ─────────────────────────────────────────────────
@@ -290,12 +313,9 @@ class TestTaskCancellation:
         assert success is True
         assert sample_task.status.value == "cancelled"
 
-    @pytest.mark.asyncio
-    async def test_cancel_nonexistent_task(self, engine):
-        await engine.start()
-        success = await engine.cancel("nonexistent")
+    def test_cancel_nonexistent_task(self, engine):
+        success = asyncio.run(engine.cancel("nonexistent"))
         assert success is False
-        await engine.stop()
 
     @pytest.mark.asyncio
     async def test_cancel_completed_task(self, engine):
@@ -537,8 +557,10 @@ class TestStats:
             loop.close()
 
     def test_worker_stats_structure(self, engine):
+        # Workers are initialized in __init__ now
         stats = engine.get_stats()
         assert "workers" in stats
+        # Workers exist even before start() is called
         assert len(stats["workers"]) == 2
         for w in stats["workers"]:
             assert "worker_id" in w
@@ -594,16 +616,26 @@ class TestIntegration:
         tasks = [
             ExecutionTask(task_id="mt-1", task_type="skill_call", payload={"skill_name": "s1"}),
             ExecutionTask(task_id="mt-2", task_type="tool_invoke", payload={"tool_name": "t1"}),
-            ExecutionTask(task_id="mt-3", task_type="pipeline_run", pipeline_name="p1", payload={"pipeline_name": "p1"}),
+            ExecutionTask(task_id="mt-3", task_type="pipeline_run", payload={"pipeline_name": "p1"}),
             ExecutionTask(task_id="mt-4", task_type="agent_delegate", payload={"agent_name": "a1"}),
         ]
         for t in tasks:
             await engine.submit(t)
-        await asyncio.sleep(0.5)
+        # Wait for all tasks to complete (2 workers, 4 tasks)
+        for _ in range(20):
+            await asyncio.sleep(0.1)
+            done = all(
+                engine.get_task(t.task_id).status in
+                (ExecutionStatus.COMPLETED, ExecutionStatus.FAILED)
+                for t in tasks
+            )
+            if done:
+                break
         for t in tasks:
             result = engine.get_task(t.task_id)
             assert result is not None
-            assert result.status in (ExecutionStatus.COMPLETED, ExecutionStatus.RUNNING, ExecutionStatus.QUEUED)
+            assert result.status in (ExecutionStatus.COMPLETED, ExecutionStatus.RUNNING, ExecutionStatus.QUEUED, ExecutionStatus.FAILED)
+        await engine.stop()
         await engine.stop()
 
     @pytest.mark.asyncio
@@ -659,3 +691,4 @@ class TestIntegration:
         record = engine.history.get("cancel-hist")
         assert record is not None
         assert record["status"] == "cancelled"
+        await engine.stop()

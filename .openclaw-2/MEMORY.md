@@ -40,3 +40,22 @@
 > **Status:** 🟢 Active
 > **Active Phase:** SRRA-OPH Phase 8 — Sovereign Coevolution (Planned)
 > **Working Memory:** `progress/openclaw-2-memory.md`
+
+## Content Farm — CivitAI Strategy (2026-05-17)
+- **Source:** https://github.com/civitai/civitai — open-source AI content platform
+- **MAD's Strategy:** Copy, remix, repurpose CivitAI content for content farm
+- **Key Insight:** Even NSFW content is available — full spectrum of AI-generated content
+- **Approach:** "Play copy and post promote paid" — minimal original creation, maximum leverage
+- **Integration:** Connect CivitAI scraper → DeekeScript automation → multi-platform posting
+- **Content farm projects:** `projects/content/` (DeekeScript, MediaCrawler, Spider_XHS, accounts)
+- **Action:** Build scraper for trending content, remix pipeline, account rotation system
+
+## Quant Lab — 6 Goals (2026-05-17)
+- **Goal 1:** All 14 CEREBUS manual strategies backtested (6/14 done)
+- **Goal 2:** 80% of strategies profitable (currently 22%)
+- **Goal 3:** All winners under 12% max drawdown
+- **Goal 4:** One 80% WR strategy, ~2 trades/day
+- **Goal 5:** Backtest all winners on USD/CHF M5
+- **Goal 6:** Basket portfolio (EUR/USD + USD/CHF + CHF/JPY)
+- **Team:** Manager v2 + Optimizer + Researcher (spawned 2026-05-17)
+- **Protocol:** `quant-lab/PROTOCOL.md` (soft-coded file-based communication)

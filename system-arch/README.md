@@ -8,6 +8,7 @@
 
 | File | Content | Phases |
 |------|---------|--------|
+| `CODEMAP.md` | **Unified system architecture** — all 5 levels + workflows + storage | All |
 | `01-system-overview.md` | Full system at all 5 levels | All |
 | `02-agent-workflow.md` | Agent communication, workflow state machine, event flow | All |
 | `03-srra-topology.md` | SRRA-OPH technical architecture per phase | 1-9 |

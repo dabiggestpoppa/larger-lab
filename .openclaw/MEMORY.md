@@ -53,3 +53,19 @@
 > **Status:** 🟢 Active
 > **Active Phase:** P90 Pine → Nautilus Conversion + Backtest Engine
 > **Working Memory:** `progress/openclaw-memory.md`
+
+## Content Farm — CivitAI Strategy (2026-05-17)
+- **Source:** https://github.com/civitai/civitai — open-source AI content platform (Next.js + tRPC + Prisma)
+- **MAD's Strategy:** Copy, remix, repurpose CivitAI content for content farm. "Play copy and post promote paid."
+- **Key Insight:** Massive library of AI-generated content including NSFW. All freely accessible.
+- **Integration Path:** CivitAI scraper → remix pipeline (watermark, crop, filter) → DeekeScript automation → multi-platform posting
+- **Content farm projects:** `projects/content/` (DeekeScript, MediaCrawler, Spider_XHS, accounts, templates)
+- **Next:** Build scraper for trending/popular content, remix pipeline, account rotation
+
+## Quant Lab — 6 Goals & Agent Team (2026-05-17)
+- **GOALS.md:** `quant-lab/GOALS.md` — 6 non-negotiable goals with actionable steps
+- **Team:** Manager v2 (orchestrator) + Optimizer (builds/runs) + Researcher (analyzes/designs)
+- **Communication:** File-based via `quant-lab/insights/`, `quant-lab/findings/`, `quant-lab/decisions/`
+- **Key Finding:** p90_cascade.py has TP bug (mean-reversion vs directional), Stall_Harvest 100% WR suspicious
+- **Command Center:** Built at `oce/frontend/app/command-center/` — MAD can talk to any agent, create rooms
+- **Lazyweb MCP:** Installed for design research — `lazyweb_search`, `lazyweb_health` tools available
