@@ -1,0 +1,373 @@
+PART 2 P90 CASCADE ACTIVATION ANALYSIS Subsequent P90 Activations
+| Rolling Constraint Boundaries | Directional Bias Validation
+Data Period: January 2022 – March 2026 | EUR/USD M5 | 315,000+ Candles
+EXECUTIVE SUMMARY
+Metric
+First P90 Only
+Cascade P90 (2nd)
+Cascade P90 (3rd+)
+Verdict
+Win Rate (-50% Target)
+83.3%
+87.8%
+84.2%
+VALIDATED
+Avg Extension
+18.4p
+22.6p
+19.8p
+Higher
+Avg Hold Time
+89 min
+76 min
+82 min
+Faster
+Constraint Conflict Rate
+16.7%
+12.2%
+15.8%
+Lower
+Edge vs Single Activation
+Baseline
++5.4% WR
++1.1% WR
+ADD
+VERDICT: Subsequent P90s in the SAME direction of constraint resolution [3] have HIGHER
+win rates (87.8% vs 83.3%) and faster delivery (76 min vs 89 min).
+This is a VALID cascade activation system [9].
+SECTION 1: CASCADE ACTIVATION LOGIC DEFINED
+CASCADE ACTIVATION DEFINITION
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+1. Initial P90 (Bias Setter):
+   • First P90 candle in 2-11 AM EST window
+   • Establishes direction of constraint resolution [3] for session
+   • Standard Constraint Boundary [8]: 80% of P90 body
+2. Cascade P90 (Momentum Confirmation):
+   • Subsequent P90 candle in SAME direction of constraint resolution [3]
+   • Must occur within 120 min of Initial P90
+   • New Constraint Boundary [8]: 168% of THIS P90 body (wider — allows normal partial rebalancing [6])
+   • Target: Same as Initial (-50% Asian Range constraint deficit resolution)
+3. Maximum Cascades:
+   • Max 3 cascade activations per session
+   • Edge degrades after 3rd cascade
+
+
+=== PAGE 11 ===
+CASCADE ACTIVATION TIMELINE EXAMPLE
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+2:30 AM: P90 LONG activation (4.2p) → Signal 1 @ 1.0850
+         Constraint Boundary: 1.0847 (80% of 4.2p = 3.4p)
+         Direction of Constraint Resolution: LONG established
+3:15 AM: P90 LONG activation (5.1p) → Signal 2 @ 1.0858
+         Constraint Boundary: 1.0849 (168% of 5.1p = 8.6p) ← WIDER
+         Same direction = VALID CASCADE
+4:00 AM: P90 LONG activation (4.8p) → Signal 3 @ 1.0865
+         Constraint Boundary: 1.0857 (168% of 4.8p = 8.1p)
+         Same direction = VALID CASCADE
+4:45 AM: P90 SHORT prints (5.2p) → IGNORE
+         Opposite direction of constraint resolution = NOT VALID
+12:00 PM: HARD EXIT — Close ALL positions (constraint resolution window ends)
+SECTION 2: CASCADE STATISTICS BY ACTIVATION NUMBER
+Cascade #
+Signals
+Win Rate
+Avg Extension
+Avg Hold
+Conflict Rate
+Recommendation
+1st (Initial)
+3,262
+83.3%
+18.4 pips
+89 min
+16.7%
+BASELINE
+2nd (Cascade)
+1,847
+87.8%
+22.6 pips
+76 min
+12.2%
+BEST
+3rd (Cascade)
+892
+84.2%
+19.8 pips
+82 min
+15.8%
+GOOD
+4th+ (Cascade)
+318
+76.4%
+16.2 pips
+94 min
+23.6%
+AVOID
+WHY THE 2ND CASCADE ACTIVATION OUTPERFORMS
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  1st P90: Initial activation signal (83.3% win rate) — direction set
+  2nd P90: Constraint resolution momentum confirmed (87.8%) ← BEST
+  3rd P90: Momentum sustained (84.2%) — still good
+  4th+ P90: Resolution momentum exhausted (76.4%) ← AVOID
+  Why 2nd is Best:
+  • Direction of constraint resolution [3] already validated by 1st P90
+  • Still early in session — resolution deficit has room to expand
+  • 168% Constraint Boundary [8] allows normal partial rebalancing [6]
+  OPERATIONAL RULE: Max 3 cascade activations per session.
+SECTION 3: CONSTRAINT BOUNDARY OPTIMIZATION FOR CASCADE
+Boundary Method
+Win Rate
+Avg Distance
+Conflict Rate
+R:R
+Recommendation
+
+
+=== PAGE 12 ===
+80% Fib (Standard)
+83.3%
+6.4 pips
+16.7%
+1:2.9
+Too tight for cascade
+1.5x Candle
+85.8%
+7.8 pips
+14.2%
+1:2.9
+GOOD
+168% Fib
+87.8%
+8.6 pips
+12.2%
+1:2.6
+BEST for cascade
+200% Fib
+88.2%
+10.2 pips
+11.8%
+1:2.2
+Too wide
+WHY 168% STALL ZONE STATE FOR CASCADE CONSTRAINT BOUNDARY
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  Standard 80% Fib: Good for initial activation, too tight for cascade partial rebalancing [6]
+  Cascade 168% Stall Zone [10]: 8.6p avg, conflict rate 12.2% (-4.5% vs standard)
+  Net EV: 168% boundary is +0.32R better than 80% boundary
+  Trade-off: Lower R:R (1:2.6) but HIGHER win rate (+4.5%)
+SECTION 4: CASCADE TIMING ANALYSIS
+Time After 1st P90
+Cascade Signals
+Win Rate
+Avg Extension
+Recommendation
+15-30 min
+412
+82.4%
+19.8 pips
+Too soon — resolution not confirmed
+30-45 min
+687
+86.8%
+21.4 pips
+GOOD
+45-60 min
+524
+88.2%
+23.2 pips
+BEST — Resolution Sweet Spot
+60-90 min
+224
+85.4%
+20.8 pips
+GOOD
+90-120 min
+98
+79.8%
+17.4 pips
+Late — Reduce size
+OPERATIONAL RULE:
+  • Allow cascade activations 30-90 min after 1st P90
+  • Optimal window: 45-60 min (resolution momentum peak)
+  • Skip cascades after 90 min from initial activation
+SECTION 5: CASCADE vs 45-MIN ADD LOGIC
+Metric
+45-Min Add (Original)
+Cascade P90 (New)
+Winner
+Trigger
+Time-based (+45 min)
+Signal-based (new P90)
+Cascade
+Condition
+Resolution output +8p
+New P90 candle
+Cascade
+Win Rate
+91.2%
+87.8%
+45-Min Add
+Frequency
+64.3% of signals
+56.6% of signals
+45-Min Add
+Boundary Method
+Breakeven
+168% of new P90
+Cascade
+Avg Extension
+26.8 pips
+22.6 pips
+45-Min Add
+Combined Win Rate
+—
+—
+93.4% (both)
+
+
+=== PAGE 13 ===
+CASCADE + 45-MIN ADD COMBINATION (USE BOTH — They Are Complementary)
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  When BOTH Trigger (Highest Resolution Conviction):
+    Signal 1: Initial P90 (40% size) | Signal 2: 45-Min Add (30%) | Signal 3: Cascade P90 (30%)
+    Total: 100% size across 3 activations | Combined Win Rate: 93.4%
+  When ONLY 45-Min Triggers:
+    Signal 1: Initial P90 (50%) | Signal 2: 45-Min Add (50%)
+  When ONLY Cascade Triggers:
+    Signal 1: Initial P90 (50%) | Signal 2: Cascade P90 (50%)
+SECTION 6: CASCADE POSITION SIZING
+Activation Type
+Size %
+Boundary
+Method
+Target
+Max Per Session
+Initial P90
+40%
+80% Fib
+-50% Asian
+1 per session
+45-Min Add
+30%
+Breakeven
+-50% Asian
+1 per session
+Cascade 1 (2nd P90)
+20%
+168% Fib
+-50% Asian
+1 per session
+Cascade 2 (3rd P90)
+10%
+168% Fib
+-50% Asian
+1 per session
+TOTAL
+100%
+Mixed
+-50% Asian
+Max 4 activations
+CASCADE SIZING EXAMPLE ($10,000 account)
+  Risk Per Activation: 0.12% = $12  |  Max Concurrent: 0.36% = $36
+  Signal 1 (Initial P90 @ 2:30 AM): 40% = $4 | Boundary: 80% of 4.2p = 3.4p | 11,764 units
+  Signal 2 (45-Min Add @ 3:15 AM):  30% = $3 | Boundary: Breakeven (already protected)
+  Signal 3 (Cascade P90 @ 3:45 AM): 20% = $2.40 | Boundary: 168% of 5.1p = 8.6p | 2,790 units
+  Signal 4 (Cascade 2 @ 4:30 AM):   10% = $1.20 | Boundary: 168% of 4.8p = 8.1p
+  TOTAL CONCURRENT RISK: $7.60 (0.076%) — Well under 0.36% max
+SECTION 7: CASCADE FILTERS & EXCLUSIONS
+CASCADE VALID
+CASCADE INVALID
+I Same direction of constraint resolution [3]
+I Within 90 minutes of Initial P90
+I Before 11:00 AM EST
+I Asian Range < 45 pips
+I -25% / -50% targets NOT already hit
+I 132% Kill-Switch NOT triggered
+I Max 3 cascades per session
+I Opposite direction of constraint resolution
+I More than 90 minutes after Initial P90
+I After 11:00 AM EST
+I Asian Range > 45 pips
+I -25%/-50% targets already hit
+I 132% Kill-Switch already triggered
+I 4th+ cascade attempt (resolution exhausted)
+I Major news within 60 minutes
+
+
+=== PAGE 14 ===
+SECTION 8: EXPECTED PERFORMANCE WITH CASCADE
+Metric
+Without Cascade
+With Cascade
+Improvement
+Signals/Week
+15
+23
++53%
+Activations/Week
+22
+31
++41%
+Win Rate
+86.8%
+87.4%
++0.6%
+Avg Extension
+24.2p
+23.8p
+-1.7%
+Weekly R
++38R
++52R
++37%
+Max DD
+12.4%
+13.8%
++1.4%
+CASCADE RISK/REWARD TRADE-OFF
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  Benefits: +37% more weekly R | +53% more signals | More constraint deficit captured
+  Costs:    -7.7% Sharpe | +11.3% Max DD | -9.2% Recovery Factor
+  Recommendation:
+  • Use cascade for GROWTH accounts (6%+ buffer)
+  • SKIP cascade for prop firm challenges (4% DD limit)
+  • Limit to 2 cascades max for conservative approach
+  • Always maintain 0.40% daily constraint boundary
+SECTION 9: COMPLETE CASCADE ACTIVATION PROTOCOL
+
+
+=== PAGE 15 ===
+CASCADE ACTIVATION WORKFLOW
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+STEP 1: Initial P90 Activation (2-11 AM EST)
+  → Wait for P90 candle close >= threshold
+  → Activate 40% size | Boundary: 80% of P90 body
+  → Set direction of constraint resolution [3]: LONG or SHORT
+  → Start 120-min resolution timer
+STEP 2: 45-Min Add Check (+45 min from Signal 1)
+  → Check if resolution output extended +8 pips
+  → If YES: Activate 30% size | Boundary: Breakeven (Signal 1 output)
+  → If NO: Skip, wait for cascade signal
+STEP 3: Cascade P90 Check (30-90 min from Signal 1)
+  → Watch for new P90 candle in SAME direction of constraint resolution
+  → If SAME: Activate 20% size | Boundary: 168% of THIS P90 body (Stall Zone [10])
+  → If OPPOSITE: IGNORE (opposite direction = noise, not reversal)
+STEP 4: Cascade 2 P90 Check (60-90 min from Signal 1)
+  → If SAME direction: Activate 10% size | Boundary: 168% of THIS P90 body
+  → STOP here (max 3 cascades — resolution momentum exhausts at 4th+)
+STEP 5: Exit Management
+  → TP1 (-25%): Close 50% of total, move boundary to Breakeven
+  → TP2 (-50%): Close remaining
+  → Hard Exit (12 PM EST): Close ALL (constraint resolution window ends)
+  → Kill Switch (132% State [10]): Close ALL immediately
+CASCADE FINAL VERDICT
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  I CASCADE VALIDATED: 2nd P90 = 87.8% | 3rd = 84.2% | 4th+ = AVOID (76.4%)
+  I OPTIMAL BOUNDARY: 168% Stall Zone | Conflict rate -4.5% | EV +0.32R
+  I OPTIMAL TIMING: 45-60 min after initial | 88.2% win rate | Skip after 90 min
+  I COMPLEMENTARY WITH 45-MIN ADD: Combined win rate = 93.4%
+  II RISK TRADE-OFF: +37% weekly R but +11.3% Max DD — use for growth accounts
+  I EXPECTED WEEKLY: 23 signals | 87.4% win rate | +52R net
+End of Part 2 | CEREBUS v18.2.15 [CASCADE ACTIVATION] | March 2026
+
+
+=== PAGE 16 ===

@@ -29,11 +29,55 @@ credentials.json
 # Large directories
 memory-bank/
 
+# Sensitive files
+github_pat_*.txt
+
 # OpenClaw runtime state
 .openclaw-2/.openclaw/agents/
 .openclaw-2/.openclaw/telegram/
+.openclaw-2/.openclaw/flows/
+.openclaw-2/.openclaw/tasks/
+.openclaw-2/.openclaw/logs/
+.openclaw-2/.openclaw/subagents/
 .openclaw/.openclaw/agents/
 .openclaw/.openclaw/telegram/
+.openclaw/.openclaw/flows/
+.openclaw/.openclaw/tasks/
+.openclaw/.openclaw/logs/
+.openclaw/.openclaw/subagents/
 
 # Nested git repos
 Spider_XHS/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Databases
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.db
+
+# Node / Frontend
+node_modules/
+.next/
+package-lock.json
+
+# Temp & logs
+temp/
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# OCE data directories
+oce/backend/data/
+oce/data/
+
+# Build artifacts
+dist/
+build/

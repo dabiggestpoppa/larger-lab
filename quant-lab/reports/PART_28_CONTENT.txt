@@ -1,0 +1,300 @@
+PART 12 THE TWO PLAYS — FINAL EXECUTION FRAMEWORK Base 80
+Play | T3 Max Accuracy | Regime Confirmed Push CEREBUS FX v4 — Final
+Form | April 2026
+The complete system synthesized into three executable plays. No optimization. No extra filters. Push the button.
+SYSTEM SYNTHESIS Everything in this manual — the constraint deficit [11], the activation signals [9], the partial
+rebalancing states [6], the regime tracker, the Dual-Engine architecture, the failure repair model — resolves into
+three execution modes. Base 80 is your floor. T3 Model 2 is your defensive edge. Regime Confirmed is your
+ceiling. Everything else is noise.
+PLAY 1 — BASE 80 (YOUR BREAD & BUTTER)
+85-90% filtered win rate. Trade this every qualifying day. No overthinking.
+Pre-Conditions — ALL must be TRUE
+Condition
+Requirement
+Notes
+Asian Range
+< 30 pips (T1: <20p or T2: 20-30p)
+Constraint deficit [11] — coiled spring
+Activation Window
+2:00 AM – 11:00 AM EST
+Full window — threshold increases by session
+P90 Body (2-4 AM)
+>= 4.1 pips
+Activation signal [9] — close only
+P90 Body (4-8 AM)
+>= 4.6 pips
+Activation signal [9]
+P90 Body (8-11 AM)
+>= 5.9-6.2 pips
+Activation signal [9]
+News filter
+No major news within 4 hours
+NFP / CPI / FOMC = SKIP
+Day filter (optional boost)
+Tuesday or Wednesday = higher
+conviction
+Not required — but elevates win rate
+Execution
+
+
+=== PAGE 80 ===
+ENTRY:
+  Wait for P90 candle CLOSE outside Asian constraint band
+  Enter MARKET on the close
+  Direction = P90 close direction (LONG if close above Asian High / SHORT if below Low)
+SIZE:
+  T1 (<20p):   100% of normal risk
+  T2 (20-30p): 75% of normal risk
+CONSTRAINT BOUNDARY [8]:
+  80% of P90 body from entry (structural invalidation — not arbitrary pip stop)
+TARGETS:
+  TP1: -25% of Asian Range → Close 50% of position | Move boundary to BE+2p
+  TP2: -50% of Asian Range → Close remaining 50%
+HARD EXIT:
+  12:00 PM EST → Close EVERYTHING. No exceptions. Edge window closes.
+Expected Outcome
+Value
+Notes
+Win Rate
+85-90%
+Filtered — all pre-conditions met
+Avg R:R
+1:2.5 to 1:3
+Per activation
+Daily expectation
+1 trade | 1.5-2R
+Bread & butter baseline
+PLAY 2 — T3 MAX ACCURACY (DEFENSIVE EDGE)
+T3 edge is thinner. This is the ONLY way to trade it with confidence. Pure Constraint Anchor. No Resolution
+Amplifiers.
+Pre-Conditions — ALL must be TRUE (Model 2 Protocol)
+Condition
+Requirement
+Notes
+Asian Range
+30-45 pips (T3 ONLY)
+Wider constraint deficit — T3 defensive mode
+Violation
+M5 candle CLOSES outside Asian constraint
+band
+Constraint violation [5] confirmed
+Body filter
+>= 4.6 pips
+P90 threshold — filters failed violations [5]
+2-Hour Hold
+Price MUST hold outside band for full 2 hours
+Non-negotiable. This IS the edge.
+Amplifiers
+NONE — Pure Anchor ONLY
+No P90 cascade adds in T3
+Overfilled check
+If >40 pips by 9 AM → STAND DOWN
+Constraint deficit substantially resolved
+Execution — Defensive Mode
+
+
+=== PAGE 81 ===
+ENTRY:
+  AFTER 2-hour acceptance hold confirmed
+  Enter on pullback to 32-50% partial rebalancing [6] of initial extension leg
+  Direction = original constraint violation direction [5]
+SIZE:
+  50-75% of normal risk (defensive — wider constraint deficit [11])
+CONSTRAINT BOUNDARY [8]:
+  AT Asian High (if LONG) or Asian Low (if SHORT)
+  M5 CLOSE back inside band = EXIT immediately (81.2% rule — do not wait)
+TARGET:
+  1x Asian Range extension ONLY
+  No runners. No deep fib states [10] in T3.
+  Regime FAILED at 9 AM (ratio < 1.45x): take profits -15% early
+HARD EXIT:
+  12:00 PM EST — 99% of T3 constraint deficit resolves by noon.
+Expected Outcome
+Value
+Notes
+Win Rate
+76.7%
+Model 2 strictly followed — 2h hold non-negotiable
+Avg R:R
++2.14R
+Structural boundary drives R-multiple
+Key discipline
+Lower frequency, higher
+discipline = consistent
+edge
+—
+PLAY 3 — REGIME CONFIRMED PUSH (YOUR CEILING)
+When all conditions align — push the button. Full size, cascade adds, extended fib states. This is where the
+account compounds.
+Regime Confirmed Checklist — ALL must be TRUE
+Condition
+Requirement
+Notes
+Base 80 conditions
+ALL met (Play 1 above)
+Foundation requirement
+Regime Ratio
+>= 1.5x by 9 AM EST
+Daily Range (3AM-9AM) ÷ Asian Range
+P90 confirmed
+2-6 AM EST window
+Direction of constraint resolution [3] set early
+Cascade timing
+45-60 min after initial P90
+Resolution momentum sweet spot
+Day
+Tuesday or Wednesday
+Highest constraint resolution conviction days
+Execution — Aggressive Mode
+
+
+=== PAGE 82 ===
+SIZE (Upgrade from Base 80):
+  T1: 100% (full conviction — maximum constraint deficit compression)
+  T2: 100% (upgraded from base 75%)
+CASCADE ADDS (Resolution Amplifiers — same direction of constraint resolution only):
+  T1: Up to 2 cascade P90s (same direction, 30-90 min from initial)
+      Boundary: 168% of NEW P90 body (Stall Zone [10])
+  T2: Max 1 cascade P90 (50% partial rebalancing entry ONLY)
+      Boundary: 168% of NEW P90 body
+  T3: NO AMPLIFIERS regardless of regime
+TARGETS (Extended — constraint deficit resolving fully):
+  TP1: -25% Asian Range → Close 50% | Move ALL boundaries to BE+2p
+  TP2: -50% Asian Range → Close 25%
+  TP3: 168% Stall Zone [10] → Close 20%
+  Runner: 200% Deep State [10] → Hold 5% (T1 only)
+HARD EXIT: 12:00 PM EST — still applies, no exceptions
+KILL SWITCH: 132% Kill-Switch State [10] → Close ALL immediately
+Expected Outcome
+Value
+Notes
+Win Rate
+92-95%
+All optimal conditions aligned — maximum confidence state
+Avg R:R
+1:3 to 1:5
+With cascade + extended fib state targets
+Weekly R
++25-35R
+When Regime Confirmed fires on Tue/Wed
+THE ONE-PAGE CHEAT SHEET
+
+
+=== PAGE 83 ===
+BASE 80 PLAY (Your FLOOR — bet every qualifying day):
+  Asian <30p + P90 2-11AM + Close outside constraint band
+  → Enter on P90 close | 80% body boundary | TP1 -25% / TP2 -50% | Exit 12PM
+  → T1: 100% size | T2: 75% size | Win rate: 85-90%
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+T3 MAX ACCURACY (Defensive — only when T3 prints):
+  Asian 30-45p + Close outside + HOLD 2 HOURS
+  → Enter pullback 32-50% | Boundary AT Asian band | Target 1x range | No cascade
+  → 50-75% size | Win rate: 76.7% | 81% rule: M5 close back inside = exit now
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+REGIME CONFIRMED PUSH (Your CEILING — when all boxes check):
+  Base 80 + Ratio >=1.5x + P90 confirmed + Tue/Wed
+  → Full size both tiers | Add cascade (T1:2 amps / T2:1 amp) | Targets to 168-200%
+  → Win rate: 92-95% | Exit 12PM | Kill switch: 132% Kill-Switch State = close all
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+STAND DOWN IMMEDIATELY IF:
+  • Asian Range > 45 pips (constraint deficit too wide)
+  • T2/T3 already >40 pips by 9 AM (constraint deficit resolved — overfilled)
+  • Major news within 4 hours
+  • Time > 12:00 PM EST (resolution window closed)
+  • Opposite P90 fires (ignore unless 200% Deep State + 132% Kill-Switch BOTH hit)
+  • Thursday + no second acceptance confirmation (first constraint violation = coin flip)
+BASE 80 MENTAL MODEL — LIVE DASHBOARD
+Read the dashboard. Execute. Nothing else required.
+Tier → Play → Win Rate
+Asian Range
+Tier
+What To Do
+Win Rate
+Size
+< 20 pips
+T1 (GOLD)
+Full send → ENGINE 1
+88-92%
+100%
+20-30 pips
+T2 (STANDARD)
+Standard → ENGINE 1
+81-86%
+75%
+30-45 pips
+T3 (DEFENSIVE)
+Defensive → T3 MODEL 2
+76-82%
+50%
+> 45 pips
+NO-GO
+STAND DOWN
+—
+0%
+Dashboard Read → Action
+Dashboard Shows
+Your Action
+T1 + Not Overfilled
+ENGINE 1 — full size (88-92% win rate)
+T2 + Not Overfilled
+ENGINE 1 — 75% size (81-86% win rate)
+
+
+=== PAGE 84 ===
+T3 + Not Overfilled
+T3 MODEL 2 — 50% size (76-82% win rate)
+Overfilled (any tier >40p by 9AM)
+REDUCE SIZE 50% or STAND DOWN (T2/T3)
+NO-GO
+SKIP THE DAY — no constraint deficit edge
+Time-Based Accuracy Windows
+Time (EST)
+Accuracy
+Action
+2-6 AM EST
+94-95%
+PRIMARY WINDOW — trust it, full conviction
+6-9 AM EST
+90-93%
+Still strong — standard execution
+9-12 PM EST
+85-88%
+Last activation window — tighter filter
+After 12 PM EST
+< 80%
+NO NEW ACTIVATIONS — resolution window closed
+Expected Weekly Performance
+Metric
+Value
+Notes
+Activation signals per week
+22-31
+Across all qualifying tiers
+Weighted win rate
+85-90%
+Filtered — all pre-conditions met
+Expected weekly R
++38-52R
+Full deployment including cascades
+Max drawdown (controlled)
+-4 to -6R
+Within prop firm safety parameters
+Live Execution Timeline
+1:45 AM EST  → Check Asian Range → Classify Tier (T1 / T2 / T3 / NO-GO)
+2:00-6:00 AM → Wait for P90 activation signal [9] → Engine 1 fires
+Signal fires → Execute based on Tier and Play call
+9:00 AM      → Check Regime Ratio → Adjust if Regime CONFIRMED or FAILED
+12:00 PM     → HARD EXIT → Close all positions — resolution window ends
+THE SIMPLEST VERSION:
+  T1 + ENGINE 1    → Go hard (90%+ win rate) — maximum constraint deficit edge
+  T2 + ENGINE 1    → Standard play (85% win rate) — balanced execution
+  T3 + T3 MODEL 2  → Defensive (78% win rate) — 2h hold, anchor only
+  Overfilled       → Cut size in half (T2/T3: stand down)
+  NO-GO            → Skip. Wait for tomorrow's constraint deficit.
+  The dashboard does the thinking. You execute.
+CEREBUS FX v4 — Final Form | April 2026 | PROPRIETARY & CONFIDENTIAL
+EUR/USD M5 | Jan 2022 – Apr 2026 | 315,000+ Candles
+II For educational purposes only — test all strategies in simulation before live deployment.
+
+
+=== PAGE 85 ===

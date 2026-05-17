@@ -100,5 +100,22 @@
         ]
       }
     }
+  },
+  "plugins": {
+    "entries": {
+      "openrouter": {
+        "enabled": true
+      },
+      "nvidia": {
+        "enabled": true
+      },
+      "deepseek": {
+        "enabled": true
+      }
+    }
+  },
+  "meta": {
+    "lastTouchedVersion": "2026.5.7",
+    "lastTouchedAt": "2026-05-16T19:44:42.876Z"
   }
 }

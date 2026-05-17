@@ -3,17 +3,13 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "OCE — Operator Continuity Engine",
-  description: "Persistent continuity shell powered by SRRA-OPH",
+  description: "System observability dashboard for the Operator Continuity Engine",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="bg-gray-950 text-gray-100 antialiased">
+      <body className="bg-[#0a0a0f] text-gray-100 antialiased min-h-screen">
         {children}
       </body>
     </html>

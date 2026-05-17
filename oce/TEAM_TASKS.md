@@ -1,8 +1,9 @@
 # OCE Team Tasks
 
-> **Generated:** 2026-05-16  
-> **Lead:** CC (Claude Code)  
-> **Status:** Phase 1 — OCE Continuity Shell
+> **Generated:** 2026-05-16
+> **Updated:** 2026-05-17
+> **Lead:** OWL (RL) — Phase 6 Lead
+> **Status:** Phase 6 — Execution Substrate (Active)
 
 ---
 
@@ -32,10 +33,10 @@
 - Coordination with CC
 
 ### Tasks
-- [ ] **OCE-2.1** Review OCE architecture against SRRA-OPH patterns
-- [ ] **OCE-2.2** Design event types and schemas
-- [ ] **OCE-2.3** Plan observer runtime integration
-- [ ] **OCE-2.4** Coordinate with CC on API contracts
+- [x] **OCE-2.1** Review OCE architecture against SRRA-OPH patterns
+- [x] **OCE-2.2** Design event types and schemas
+- [x] **OCE-2.3** Plan observer runtime integration
+- [x] **OCE-2.4** Coordinate with CC on API contracts
 
 ---
 
@@ -116,6 +117,60 @@
 | Event fabric bridge | CC | Pending |
 | Frontend setup | OC2 | Pending |
 | Resource assessment | AS | Pending |
+
+---
+
+---
+
+## Phase 5 — Observability (Active)
+
+> **Lead:** OWL (RL)  
+> **Status:** Engines + API Complete — 77/77 tests passing  
+> **Depends on:** OCE Phase 4 (Structural Memory) — ✅ Complete
+
+### Phase 5 Deliverables
+
+| Component | Owner | File | Status |
+|-----------|-------|------|--------|
+| Metrics Collector | RL | `oce/backend/metrics_collector.py` | ✅ Complete |
+| Tracing Engine | RL | `oce/backend/tracing_engine.py` | ✅ Complete |
+| Alerting Engine | RL | `oce/backend/alerting_engine.py` | ✅ Complete |
+| Observability API | RL | `oce/backend/main.py` (12 endpoints + 2 WS) | ✅ Complete |
+| Metrics tests | RL | `oce/backend/tests/test_metrics_collector.py` | ✅ 26 tests |
+| Tracing tests | RL | `oce/backend/tests/test_tracing_engine.py` | ✅ 23 tests |
+| Alerting tests | RL | `oce/backend/tests/test_alerting_engine.py` | ✅ 28 tests |
+| **Total Phase 5** | | | **✅ 77/77 passing** |
+
+### Observability API Endpoints (OCE-5.4)
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/metrics` | GET | Current metrics summary |
+| `/metrics/history` | GET | Historical metrics (query: metric_name, limit) |
+| `/traces` | GET | List/search traces (filters: event_type, outcome, source, min_latency_ms) |
+| `/traces/{id}` | GET | Full trace detail |
+| `/traces/observer/{id}` | GET | Traces by observer |
+| `/alerts` | GET | Active alerts |
+| `/alerts/history` | GET | Alert history |
+| `/alerts/{id}/acknowledge` | POST | Acknowledge alert |
+| `/alerts/rules` | POST | Add custom alert rule |
+| `/dashboard` | GET | Full dashboard data (metrics + alerts + traces) |
+| `/ws/metrics` | WS | Real-time metrics stream (5s interval) |
+| `/ws/alerts` | WS | Real-time alert stream (10s interval) |
+
+### Remaining Phase 5 Tasks
+
+| Task | Description | Owner | Status |
+|------|-------------|-------|--------|
+| OCE-5.6 | Observability data model docs | OC | ⏳ Pending |
+| OCE-5.7 | System observability map | OC | ⏳ Pending |
+| OCE-5.8 | Architecture review | OC | ⏳ Pending |
+| OCE-5.9–5.13 | Dashboard frontend (MetricsPanel, TraceView, AlertPanel, SystemMap, page) | OC2 | ⏳ Pending |
+| OCE-5.14 | Quality review | AS | ⏳ Pending |
+| OCE-5.15 | API documentation update | AS | ⏳ Pending |
+| OCE-5.16 | Integration tests (E2E) | AS | ⏳ Pending |
+| OCE-5.17 | Operator integration | PM | ⏳ Pending |
+| OCE-5.18 | Observability debug CLI | PM | ⏳ Pending |
 
 ---
 

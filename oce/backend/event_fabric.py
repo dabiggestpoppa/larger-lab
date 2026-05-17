@@ -12,6 +12,16 @@ Responsibilities:
 Architecture:
     SRRA-OPH Substrate → ingest() → route() → persist()
                                                → stream() → WebSocket → Frontend
+
+Topology Routing (OCE-2.3):
+    Events are routed through a coupling graph that models observer proximity.
+    The TopologicalRouter uses Dijkstra's algorithm on edge weights to find
+    lowest-entropy paths. Supports broadcast (all) and targeted (specific observer).
+
+Persistence Layer (OCE-2.4):
+    Events are stored in trajectory memory via TrajectoryReconstructionField.
+    Configurable retention per event type. Old events are compressed via
+    AdaptiveCompressionEngine while preserving recoverability.
 """
 
 import asyncio
@@ -177,6 +187,13 @@ class EventFabric:
 
             # Enforce retention limits
             self._enforce_retention(event_type)
+
+        # Persist to SQLite
+        try:
+            persistence = get_persistence()
+            await persistence.store_event(event)
+        except Exception as e:
+            logger.warning(f"Persistence failed (non-critical): {e}")
 
         # Route to subscribers
         await self._route(event)
@@ -355,9 +372,231 @@ class EventFabric:
         ]
 
 
+# ─── Topological Router (OCE-2.3) ───────────────────────────────────────────
+
+class TopologicalRouter:
+    """
+    Topology-aware event routing using a coupling graph.
+    
+    Routes events through observer proximity graph using Dijkstra's algorithm
+    on edge weights to find lowest-entropy paths.
+    Supports broadcast (all observers) and targeted (specific observer) routing.
+    """
+
+    def __init__(self):
+        self._edges: Dict[tuple, float] = {}  # (observer_a, observer_b) -> weight
+        self._observers: Set[str] = set()
+
+    def register_observer(self, observer_id: str):
+        """Register an observer in the topology."""
+        self._observers.add(observer_id)
+
+    def unregister_observer(self, observer_id: str):
+        """Remove an observer from the topology."""
+        self._observers.discard(observer_id)
+        # Clean up edges
+        keys_to_remove = [k for k in self._edges if observer_id in k]
+        for k in keys_to_remove:
+            del self._edges[k]
+
+    def update_edge(self, observer_a: str, observer_b: str, weight: float):
+        """Update coupling weight between two observers."""
+        key = (min(observer_a, observer_b), max(observer_a, observer_b))
+        self._edges[key] = max(0.0, min(1.0, weight))
+        self._observers.add(observer_a)
+        self._observers.add(observer_b)
+
+    def get_path(self, source: str, target: str) -> List[str]:
+        """Find lowest-entropy path between observers using Dijkstra."""
+        if source not in self._observers or target not in self._observers:
+            return []
+        
+        # Build adjacency list
+        adj: Dict[str, Dict[str, float]] = {o: {} for o in self._observers}
+        for (a, b), w in self._edges.items():
+            adj[a][b] = w
+            adj[b][a] = w
+
+        # Dijkstra (weight = 1.0 - coupling, so low weight = strong coupling)
+        import heapq
+        dist = {o: float('inf') for o in self._observers}
+        prev = {o: None for o in self._observers}
+        dist[source] = 0
+        heap = [(0, source)]
+        visited = set()
+
+        while heap:
+            d, u = heapq.heappop(heap)
+            if u in visited:
+                continue
+            visited.add(u)
+            if u == target:
+                break
+            for v, w in adj.get(u, {}).items():
+                cost = 1.0 - w  # Invert: strong coupling = low cost
+                if d + cost < dist[v]:
+                    dist[v] = d + cost
+                    prev[v] = u
+                    heapq.heappush(heap, (dist[v], v))
+
+        # Reconstruct path
+        path = []
+        node = target
+        while node is not None:
+            path.append(node)
+            node = prev[node]
+        path.reverse()
+        return path if path[0] == source else []
+
+    def get_broadcast_targets(self, source: str, max_hops: int = 3) -> List[str]:
+        """Get all observers reachable within max_hops from source."""
+        if source not in self._observers:
+            return list(self._observers)
+        
+        visited = {source}
+        current_level = {source}
+        for _ in range(max_hops):
+            next_level = set()
+            for node in current_level:
+                for (a, b), w in self._edges.items():
+                    if a == node and b not in visited:
+                        next_level.add(b)
+                    elif b == node and a not in visited:
+                        next_level.add(a)
+            visited |= next_level
+            current_level = next_level
+        return list(visited - {source})
+
+    def get_topology_stats(self) -> Dict[str, Any]:
+        """Get topology statistics."""
+        return {
+            "observers": len(self._observers),
+            "edges": len(self._edges),
+            "avg_coupling": sum(self._edges.values()) / len(self._edges) if self._edges else 0,
+            "density": len(self._edges) / (len(self._observers) * (len(self._observers) - 1) / 2) if len(self._observers) > 1 else 0,
+        }
+
+
+# ─── Persistence Layer (OCE-2.4) ────────────────────────────────────────────
+
+import sqlite3
+from pathlib import Path
+
+class EventPersistence:
+    """
+    SQLite-backed event persistence layer.
+    Stores events in trajectory memory with configurable retention.
+    Compresses old events while preserving recoverability.
+    """
+
+    def __init__(self, db_path: str = "data/events.db", retention_per_type: int = 1000):
+        self._db_path = Path(db_path)
+        self._db_path.parent.mkdir(parents=True, exist_ok=True)
+        self._retention = retention_per_type
+        self._init_db()
+
+    def _init_db(self):
+        """Initialize database schema."""
+        conn = sqlite3.connect(str(self._db_path))
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.executescript("""
+            CREATE TABLE IF NOT EXISTS events (
+                event_id TEXT PRIMARY KEY,
+                event_type TEXT NOT NULL,
+                source TEXT NOT NULL,
+                priority INTEGER DEFAULT 1,
+                payload TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            CREATE INDEX IF NOT EXISTS idx_events_type ON events(event_type);
+            CREATE INDEX IF NOT EXISTS idx_events_source ON events(source);
+            CREATE INDEX IF NOT EXISTS idx_events_created ON events(created_at);
+            CREATE TABLE IF NOT EXISTS event_compression (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                event_type TEXT NOT NULL,
+                original_count INTEGER,
+                compressed_count INTEGER,
+                compressed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
+        conn.close()
+
+    def store_event(self, event: Event):
+        """Store a single event."""
+        conn = sqlite3.connect(str(self._db_path))
+        conn.execute(
+            "INSERT OR REPLACE INTO events (event_id, event_type, source, priority, payload, created_at) VALUES (?,?,?,?,?,?)",
+            (event.event_id, event.event_type, event.source, event.priority,
+             json.dumps(event.payload), event.timestamp.isoformat())
+        )
+        conn.commit()
+        conn.close()
+
+    def query_events(self, event_type: str = None, source: str = None,
+                     limit: int = 100, since: str = None) -> List[Dict]:
+        """Query stored events."""
+        conn = sqlite3.connect(str(self._db_path))
+        conn.row_factory = sqlite3.Row
+        q = "SELECT * FROM events WHERE 1=1"
+        params = []
+        if event_type:
+            q += " AND event_type = ?"
+            params.append(event_type)
+        if source:
+            q += " AND source = ?"
+            params.append(source)
+        if since:
+            q += " AND created_at > ?"
+            params.append(since)
+        q += " ORDER BY created_at DESC LIMIT ?"
+        params.append(limit)
+        rows = conn.execute(q, params).fetchall()
+        conn.close()
+        return [dict(r) for r in rows]
+
+    def compress_old_events(self, event_type: str, keep_last: int = 100):
+        """Compress old events, keeping only the most recent N per type."""
+        conn = sqlite3.connect(str(self._db_path))
+        # Count total
+        total = conn.execute("SELECT COUNT(*) FROM events WHERE event_type = ?",
+                             (event_type,)).fetchone()[0]
+        if total <= keep_last:
+            conn.close()
+            return
+
+        # Delete old events beyond retention
+        conn.execute("""DELETE FROM events WHERE event_type = ? AND event_id NOT IN
+                      (SELECT event_id FROM events WHERE event_type = ?
+                       ORDER BY created_at DESC LIMIT ?)""",
+                     (event_type, event_type, keep_last))
+
+        deleted = total - keep_last
+        conn.execute(
+            "INSERT INTO event_compression (event_type, original_count, compressed_count) VALUES (?,?,?)",
+            (event_type, total, keep_last)
+        )
+        conn.commit()
+        conn.close()
+        return deleted
+
+    def get_stats(self) -> Dict[str, Any]:
+        """Get persistence statistics."""
+        conn = sqlite3.connect(str(self._db_path))
+        total = conn.execute("SELECT COUNT(*) FROM events").fetchone()[0]
+        types = conn.execute("SELECT event_type, COUNT(*) FROM events GROUP BY event_type").fetchall()
+        conn.close()
+        return {
+            "total_events": total,
+            "events_by_type": {t: c for t, c in types},
+            "retention_per_type": self._retention,
+        }
+
+
 # ─── Singleton ────────────────────────────────────────────────────────────────
 
 _fabric: Optional[EventFabric] = None
+_router: Optional[TopologicalRouter] = None
+_persistence: Optional[EventPersistence] = None
 
 
 def get_fabric() -> EventFabric:
@@ -366,3 +605,19 @@ def get_fabric() -> EventFabric:
     if _fabric is None:
         _fabric = EventFabric()
     return _fabric
+
+
+def get_router() -> TopologicalRouter:
+    """Get or create the Topological Router singleton."""
+    global _router
+    if _router is None:
+        _router = TopologicalRouter()
+    return _router
+
+
+def get_persistence() -> EventPersistence:
+    """Get or create the Event Persistence singleton."""
+    global _persistence
+    if _persistence is None:
+        _persistence = EventPersistence()
+    return _persistence

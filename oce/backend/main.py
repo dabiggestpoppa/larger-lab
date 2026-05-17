@@ -26,9 +26,16 @@ logger = logging.getLogger("oce")
 
 # Import SRRA-OPH adapter
 from srrs_adapter import get_adapter, SRRSAdapter
-from event_fabric import get_fabric, EventFabric
+from event_fabric import get_fabric, get_router, get_persistence, EventFabric, TopologicalRouter, EventPersistence
 from observer_runtime import get_runtime, ObserverRuntime, ObserverConfig, ObserverState
+from structural_memory import StructuralMemory, MemoryEntry, MemoryLayer, MemoryStats
 from dspy_pipelines import OCEPipelineManager
+from phase4_api import register_phase4_endpoints
+from metrics_collector import get_metrics_collector, MetricsCollector
+from tracing_engine import get_tracing_engine, TracingEngine
+from alerting_engine import get_alerting_engine, AlertingEngine, AlertSeverity
+from execution_engine import get_execution_engine, ExecutionEngine, ExecutionTask, ExecutionStatus, ExecutionPriority
+from execution_api import register_execution_endpoints
 
 app = FastAPI(
     title="OCE Continuity Core",
@@ -90,6 +97,39 @@ class AttractorState(BaseModel):
     confidence: float
     entropy_pressure: float
     convergence: float
+
+
+# ─── Structural Memory Models ────────────────────────────────────────────────
+
+class StoreMemoryRequest(BaseModel):
+    layer: str  # WORK, LEARNED, KNOWLEDGE
+    content: Dict[str, Any]
+    tags: List[str] = []
+    ttl_seconds: Optional[int] = None
+    source: str = "unknown"
+
+
+class SearchMemoryRequest(BaseModel):
+    q: str = ""
+    layer: Optional[str] = None
+    tags: Optional[List[str]] = None
+    limit: int = 20
+
+
+class CompressRequest(BaseModel):
+    layer: str = "WORK"
+    max_entries: int = 1000
+
+
+# Global structural memory instance
+_structural_memory: Optional[StructuralMemory] = None
+
+
+def get_structural_memory() -> StructuralMemory:
+    global _structural_memory
+    if _structural_memory is None:
+        _structural_memory = StructuralMemory()
+    return _structural_memory
 
 
 # ─── Endpoints ────────────────────────────────────────────────────────────────
@@ -205,6 +245,65 @@ async def get_event_stats():
     except Exception as e:
         logger.error(f"Event stats error: {e}")
         raise HTTPException(status_code=503, detail=f"Event service unavailable: {str(e)}")
+
+
+@app.get("/events/persistence/stats")
+async def get_persistence_stats():
+    """Event persistence statistics."""
+    try:
+        persistence = get_persistence()
+        return persistence.get_stats()
+    except Exception as e:
+        logger.error(f"Persistence stats error: {e}")
+        raise HTTPException(status_code=503, detail=f"Persistence service unavailable: {str(e)}")
+
+
+@app.post("/events/persistence/compress")
+async def compress_events(request: dict):
+    """Compress old events for a given type."""
+    try:
+        persistence = get_persistence()
+        event_type = request.get("event_type")
+        keep_last = request.get("keep_last", 100)
+        if not event_type:
+            raise HTTPException(status_code=400, detail="event_type required")
+        deleted = persistence.compress_old_events(event_type, keep_last)
+        return {"ok": True, "deleted": deleted}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Compression error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/topology/stats")
+async def get_topology_stats():
+    """Observer topology statistics."""
+    try:
+        router = get_router()
+        return router.get_topology_stats()
+    except Exception as e:
+        logger.error(f"Topology stats error: {e}")
+        raise HTTPException(status_code=503, detail=f"Topology service unavailable: {str(e)}")
+
+
+@app.post("/topology/edge")
+async def update_topology_edge(request: dict):
+    """Update coupling weight between two observers."""
+    try:
+        router = get_router()
+        observer_a = request.get("observer_a")
+        observer_b = request.get("observer_b")
+        weight = request.get("weight", 0.5)
+        if not observer_a or not observer_b:
+            raise HTTPException(status_code=400, detail="observer_a and observer_b required")
+        router.update_edge(observer_a, observer_b, weight)
+        return {"ok": True}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Topology update error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/attractor", response_model=AttractorState)
@@ -621,6 +720,362 @@ async def websocket_events(websocket: WebSocket):
             pass
         try:
             manager.disconnect(websocket)
+        except Exception:
+            pass
+
+
+# ─── Structural Memory Endpoints ────────────────────────────────────────────
+
+@app.post("/memory/store")
+async def memory_store(request: StoreMemoryRequest):
+    """Store a memory entry."""
+    try:
+        sm = get_structural_memory()
+        entry = MemoryEntry(
+            layer=MemoryLayer(request.layer.upper()),
+            content=request.content,
+            tags=request.tags,
+            ttl_seconds=request.ttl_seconds,
+            source=request.source,
+        )
+        entry_id = sm.store(entry)
+        return {"entry_id": entry_id, "status": "stored"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid layer: {request.layer}")
+    except Exception as e:
+        logger.error(f"Memory store error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/memory/search")
+async def memory_search(
+    q: str = "",
+    layer: Optional[str] = None,
+    tags: Optional[str] = None,
+    limit: int = 20,
+):
+    """Search memories by query, layer, and tags."""
+    try:
+        sm = get_structural_memory()
+        layer_enum = MemoryLayer(layer.upper()) if layer else None
+        tag_list = [t.strip() for t in tags.split(",")] if tags else None
+        entries = sm.search(query=q, layer=layer_enum, tags=tag_list, limit=limit)
+        return [
+            {
+                "entry_id": e.entry_id,
+                "layer": e.layer.value,
+                "content": e.content,
+                "tags": e.tags,
+                "created_at": e.created_at.isoformat(),
+                "updated_at": e.updated_at.isoformat(),
+                "source": e.source,
+            }
+            for e in entries
+        ]
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Memory search error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/memory/timeline/{observer_id}")
+async def memory_timeline(
+    observer_id: str,
+    start_time: Optional[str] = None,
+    end_time: Optional[str] = None,
+):
+    """Get chronological memory for an observer."""
+    try:
+        sm = get_structural_memory()
+        start = datetime.fromisoformat(start_time) if start_time else None
+        end = datetime.fromisoformat(end_time) if end_time else None
+        entries = sm.get_timeline(observer_id, start_time=start, end_time=end)
+        return [
+            {
+                "entry_id": e.entry_id,
+                "layer": e.layer.value,
+                "content": e.content,
+                "tags": e.tags,
+                "created_at": e.created_at.isoformat(),
+                "source": e.source,
+            }
+            for e in entries
+        ]
+    except Exception as e:
+        logger.error(f"Memory timeline error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.post("/memory/compress")
+async def memory_compress(request: CompressRequest):
+    """Trigger compression on a memory layer."""
+    try:
+        sm = get_structural_memory()
+        removed = sm.compress(MemoryLayer(request.layer.upper()), max_entries=request.max_entries)
+        return {"layer": request.layer.upper(), "removed": removed}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Memory compress error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/memory/export")
+async def memory_export():
+    """Export knowledge layer as wiki markdown."""
+    try:
+        sm = get_structural_memory()
+        md = sm.export_wiki()
+        return {"markdown": md}
+    except Exception as e:
+        logger.error(f"Memory export error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/memory/stats")
+async def memory_stats():
+    """Get memory statistics."""
+    try:
+        sm = get_structural_memory()
+        stats = sm.get_stats()
+        return stats.model_dump()
+    except Exception as e:
+        logger.error(f"Memory stats error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+# Register Phase 4 endpoints
+register_phase4_endpoints(app)
+
+# Register Phase 6 Execution endpoints
+register_execution_endpoints(app)
+
+# ─── Observability Models (Phase 5) ──────────────────────────────────────────
+
+class AlertRuleRequest(BaseModel):
+    name: str
+    metric: str
+    threshold: float
+    comparison: str = "lt"
+    severity: str = "warning"
+    cooldown_sec: int = 300
+    description: str = ""
+    auto_repair: bool = False
+
+
+# ─── Observability API: Metrics ──────────────────────────────────────────────
+
+@app.get("/metrics")
+async def get_metrics():
+    """Get current metrics summary."""
+    try:
+        collector = get_metrics_collector()
+        return collector.get_metrics_summary()
+    except Exception as e:
+        logger.error(f"Metrics error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/metrics/history")
+async def get_metrics_history(
+    metric_name: str = Query(..., description="Dot-path metric name, e.g., events.rate_per_sec"),
+    limit: int = Query(100, ge=1, le=1000),
+):
+    """Get historical metrics for a specific metric path."""
+    try:
+        collector = get_metrics_collector()
+        return collector.get_metrics_history(metric_name, limit)
+    except Exception as e:
+        logger.error(f"Metrics history error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+# ─── Observability API: Traces ───────────────────────────────────────────────
+
+@app.get("/traces")
+async def get_traces(
+    active: bool = Query(False, description="Return only active traces"),
+    event_type: Optional[str] = None,
+    outcome: Optional[str] = None,
+    source: Optional[str] = None,
+    min_latency_ms: Optional[float] = None,
+    limit: int = Query(50, ge=1, le=500),
+):
+    """List traces. Use active=true for in-flight, or search with filters."""
+    try:
+        engine = get_tracing_engine()
+        if active:
+            return engine.get_active_traces()
+        return engine.search_traces(
+            event_type=event_type,
+            outcome=outcome,
+            source=source,
+            min_latency_ms=min_latency_ms,
+            limit=limit,
+        )
+    except Exception as e:
+        logger.error(f"Traces error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/traces/{trace_id}")
+async def get_trace_detail(trace_id: str):
+    """Get full trace detail by ID."""
+    try:
+        engine = get_tracing_engine()
+        trace = engine.get_trace(trace_id)
+        if trace is None:
+            raise HTTPException(status_code=404, detail="Trace not found")
+        return trace
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Trace detail error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/traces/observer/{observer_id}")
+async def get_traces_by_observer(
+    observer_id: str,
+    limit: int = Query(50, ge=1, le=500),
+):
+    """Get all traces that passed through a specific observer."""
+    try:
+        engine = get_tracing_engine()
+        return engine.get_traces_by_observer(observer_id, limit)
+    except Exception as e:
+        logger.error(f"Traces by observer error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+# ─── Observability API: Alerts ───────────────────────────────────────────────
+
+@app.get("/alerts")
+async def get_alerts():
+    """Get all active alerts."""
+    try:
+        engine = get_alerting_engine()
+        return engine.get_active_alerts()
+    except Exception as e:
+        logger.error(f"Alerts error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/alerts/history")
+async def get_alert_history(
+    limit: int = Query(100, ge=1, le=1000),
+):
+    """Get alert history."""
+    try:
+        engine = get_alerting_engine()
+        return engine.get_alert_history(limit)
+    except Exception as e:
+        logger.error(f"Alert history error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.post("/alerts/{alert_id}/acknowledge")
+async def acknowledge_alert(alert_id: str):
+    """Acknowledge an active alert."""
+    try:
+        engine = get_alerting_engine()
+        if engine.acknowledge_alert(alert_id):
+            return {"ok": True, "alert_id": alert_id, "state": "acknowledged"}
+        raise HTTPException(status_code=404, detail="Alert not found")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Alert acknowledge error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.post("/alerts/rules")
+async def add_alert_rule(request: AlertRuleRequest):
+    """Add a custom alert rule."""
+    try:
+        engine = get_alerting_engine()
+        rule_id = engine.add_rule(
+            name=request.name,
+            metric=request.metric,
+            threshold=request.threshold,
+            comparison=request.comparison,
+            severity=request.severity,
+            cooldown_sec=request.cooldown_sec,
+            description=request.description,
+            auto_repair=request.auto_repair,
+        )
+        return {"ok": True, "rule_id": rule_id}
+    except Exception as e:
+        logger.error(f"Add alert rule error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+# ─── Observability API: Dashboard ────────────────────────────────────────────
+
+@app.get("/dashboard")
+async def get_dashboard():
+    """Full observability dashboard data (metrics + alerts + traces summary)."""
+    try:
+        collector = get_metrics_collector()
+        tracing = get_tracing_engine()
+        alerting = get_alerting_engine()
+        return {
+            "metrics": collector.get_metrics_summary(),
+            "alerts": {
+                "active": alerting.get_active_alerts(),
+                "stats": alerting.get_stats(),
+            },
+            "traces": {
+                "active_count": len(tracing.get_active_traces()),
+                "stats": tracing.get_stats(),
+            },
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+    except Exception as e:
+        logger.error(f"Dashboard error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+# ─── Observability API: WebSocket Streams ────────────────────────────────────
+
+@app.websocket("/ws/metrics")
+async def ws_metrics(websocket: WebSocket):
+    """Real-time metrics stream. Sends metrics snapshot every 5 seconds."""
+    await websocket.accept()
+    collector = get_metrics_collector()
+    try:
+        while True:
+            summary = collector.get_metrics_summary()
+            await websocket.send_json(summary)
+            await asyncio.sleep(5)
+    except WebSocketDisconnect:
+        logger.info("Metrics WebSocket disconnected")
+    except Exception as e:
+        logger.error(f"Metrics WS error: {e}")
+        try:
+            await websocket.close()
+        except Exception:
+            pass
+
+
+@app.websocket("/ws/alerts")
+async def ws_alerts(websocket: WebSocket):
+    """Real-time alert stream. Sends active alerts every 10 seconds."""
+    await websocket.accept()
+    engine = get_alerting_engine()
+    try:
+        while True:
+            alerts = engine.get_active_alerts()
+            stats = engine.get_stats()
+            await websocket.send_json({"alerts": alerts, "stats": stats})
+            await asyncio.sleep(10)
+    except WebSocketDisconnect:
+        logger.info("Alerts WebSocket disconnected")
+    except Exception as e:
+        logger.error(f"Alerts WS error: {e}")
+        try:
+            await websocket.close()
         except Exception:
             pass
 

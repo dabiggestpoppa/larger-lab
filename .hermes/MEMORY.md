@@ -4,7 +4,22 @@
 > Auto-extracted and updated by Hermes as work happens.
 > **Also auto-synced from `progress/hermes-progress.md` every 3 updates.**
 
-## 🟢 Hermes v2 Upgrade (2026-05-16)
+## � Workspace Heartbeat (2026-05-16) — CRITICAL
+- **File:** `tools/workspace-heartbeat.py` — runs in background, checks OC2 every 60s
+- **Auto-restart:** If OC2 down → heartbeat restarts it automatically
+- **Telegram alert:** If no messages in 10 min → sends alert to FBO_MAD
+- **Log:** `logs/workspace-heartbeat.log`
+- **Status:** `.workspace-heartbeat.status.json`
+- **PID file:** `.workspace-heartbeat.pid` — prevents duplicate instances
+- **DO NOT KILL** this process — it's the safety net for OC2 while MAD is away
+- **Commands:**
+  - `python tools/workspace-heartbeat.py --daemon` — start in background
+  - `python tools/workspace-heartbeat.py --stop` — stop background process
+  - `python tools/workspace-heartbeat.py --status` — check if running
+- **If heartbeat fails:** Restart with `python tools/workspace-heartbeat.py --daemon`
+- **Fix (2026-05-17):** Added `CREATE_NO_WINDOW` flag to all `subprocess.run()` calls AND `run_daemon()` subprocess.Popen to prevent PowerShell window flashing
+
+## �🟢 Hermes v2 Upgrade (2026-05-16)
 - **New agent prompt:** `agent-lab/agents/hermes/hermes_workspace/agent_prompt_v2.md`
 - **Soul file:** `agent-lab/agents/hermes/hermes_workspace/SOUL.md`
 - **Skills index:** `agent-lab/agents/hermes/hermes_workspace/SKILLS_INDEX.md`

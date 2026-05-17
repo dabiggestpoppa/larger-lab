@@ -1,6 +1,6 @@
 # Project Progress & Context
 
-## 🔵 [CC] Claude Code — Last Sync: 2026-05-16 21:26 UTC
+## 🔵 [CC] Claude Code — Last Sync: 2026-05-17 06:49 UTC
 
 *Auto-synced from `progress/claude-code-progress.md`*
 
@@ -40,23 +40,56 @@
 
 ---
 
-## 🦉 [RL] OWL — Last Sync: 2026-05-16 21:26 UTC
+## 🦉 [RL] OWL — Last Sync: 2026-05-17 06:49 UTC
 
 *Auto-synced from `progress/rl-progress.md`*
 
-#### [RL] 2026-05-16 - Phase 2+3 DSPy Pipelines + Observer Research + OC2 Monitor + Error Handling
+#### [RL] 2026-05-16 21:37 UTC — Final Validation Complete
+- Validated AS hermes-watchdog.py --once: gateway=live, workspace=healthy
+- Validated hermes-oc2-monitor.py --repair: health=live, PID=20984, 402MB, 15 sessions, 0 stale
+- Error DB: 6 errors seeded, analyzer working
+- All 83/83 tests passing
+- Checked all agent progress files: PM posted final status (all tasks complete), AS prepared Phase 3 docs+tests
+- CC handoff received. User gone. Standing by.
 
-#### [RL] 2026-05-16 21:22 UTC — Living Error Correction System
-- Created tools/error_logger.py — error logging API with pattern detection
-- Created tools/error_analyzer.py — PM-focused pattern analysis + skill suggestions
-- Seeded error-db.json with 6 known errors from today
-- Updated AGENTS.md with Living Error Correction System section
-- All agents now have error logging rules + PM has weekly analysis workflow
-- Pattern → Action table: ≥3 occurrences → create skill, ≥2 agents → update logic, critical → add check
-- Key principle: errors are features, system learns without hard-coded handlers
+#### [RL] 2026-05-16 22:00 UTC — OCE Phase 2-3 Code Complete + Phase 4 Spawned
+- Built TopologicalRouter (OCE-2.3): Dijkstra-based event routing through observer coupling graph
+- Built EventPersistence (OCE-2.4): SQLite-backed storage with compression
+- Fixed previous_state bug in observer_runtime.py (found by Sub-AS)
+- Added API endpoints: /events/persistence/stats, /events/persistence/compress, /topology/stats, /topology/edge
+- 71 OCE tests passing (32 + 20 + 19 new)
+- Spawned 3 sub-agents: sub-cc-phase4 (Structural Memory), sub-rl-research, sub-pm-integration
+- Sub-agent deliverables: event-types.md, event-protocol.md, observer-types.md, quality-review-phase3.md, observer-debug.py
+- Tools installed: TradingView MCP, TensorTrade, Supertonic TTS, Agent Hooks, LLM Wiki
+- Cleanup: 61 dead skills archived, 5 duplicates merged. Skills/: 97→57 dirs.
+
+#### [RL] 2026-05-16 22:20 UTC — All Sub-Agents Complete. 101 OCE Tests.
+- Sub-CC: structural_memory.py (230 lines, 30 tests) + 6 API endpoints
+- Sub-PM: observer-integration.py (181 lines, 5 functions)
+- Sub-RL: observer-research.md (1088 lines, 4 sections)
+- Sub-OC: event-types.md (86 types), event-protocol.md (968 lines), observer-types.md (940 lines)
+- Sub-AS: quality-review-phase3.md (found + fixed bug)
+- Sub-PM: observer-debug.py (252 lines)
+- Full OCE test suite: 101 tests passing
+- Tools: TradingView MCP, TensorTrade, Supertonic TTS, Agent Hooks, LLM Wiki
+- Hermes Watchdog running. Gateway: LIVE. Workspace: HEALTHY.
+
+#### [RL] 2026-05-16 23:00 UTC — Phase 4 Complete. 101 OCE Tests.
+- Built structural_memory.py (3-layer, FTS5, SQLite)
+- Built phase4_api.py (6 advanced endpoints)
+- Fixed all quality review issues: DB indexes, FTS5 validation, TTL expiration, pagination, timeline limit
+- Integrated phase4_api into main.py
+- 101 OCE tests passing
+- All Phase 3 + Phase 4 deliverables complete
+- OPERATOR_RULES.md + SUB_AGENT_RULES.md written
+- TOOLS.md fully updated
+- CloakBrowser + AgentMemory installed
+- 61 dead skills archived, 5 duplicates merged
+
+#### [RL] 2026-05-17 — Phase 5 Observability Engine Complete (OCE-5.1→5.5)
 
 ---
-## 🟡 [AS] Assistant Manager — Last Sync: 2026-05-16 21:26 UTC
+## 🟡 [AS] Assistant Manager — Last Sync: 2026-05-17 06:49 UTC
 
 *Auto-synced from `progress/assistant-progress.md`*
 
@@ -94,7 +127,7 @@
 - OCE-3.13 (quality review) blocked on CC OCE-3.1
 
 ---
-## 🔴 [PM] Polymorph — Last Sync: 2026-05-16 21:26 UTC
+## 🔴 [PM] Polymorph — Last Sync: 2026-05-17 06:49 UTC
 
 *Auto-synced from `progress/polymorph-progress.md`*
 
@@ -138,7 +171,7 @@
 - Committed and pushed (cf402ad)
 
 ---
-## 🟠 [OC2] OpenClaw 2 — Last Sync: 2026-05-16 21:26 UTC
+## 🟠 [OC2] OpenClaw 2 — Last Sync: 2026-05-17 06:49 UTC
 
 *Auto-synced from `progress/openclaw-2-progress.md`*
 
@@ -158,7 +191,7 @@
 - Discord channel config pending (schema issue — Telegram working)
 
 ---
-## 🟣 [OC] OpenClaw — Last Sync: 2026-05-16 21:26 UTC
+## 🟣 [OC] OpenClaw — Last Sync: 2026-05-17 06:49 UTC
 
 *Auto-synced from `progress/openclaw-progress.md`*
 

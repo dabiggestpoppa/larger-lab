@@ -1,0 +1,93 @@
+# Quant Lab Configuration
+# CEREBUS FX Strategy Lab — Nautilus Trader Backend
+
+lab:
+  name: "CEREBUS Quant Lab"
+  version: "1.0.0"
+  created: "2026-05-17"
+  
+# Trading Parameters (from CEREBUS manual)
+trading:
+  instrument: "EUR/USD"
+  timeframe: "M5"
+  data_source: "mt5"  # or nautilus built-in
+  
+  # Tier System (from Manual)
+  tiers:
+    T1:
+      name: "Gold"
+      asian_range_pips: "< 20"
+      position_size_pct: 100
+      expansion_factor: 3.12
+    T2:
+      name: "Silver"  
+      asian_range_pips: "20-35"
+      position_size_pct: 75
+      expansion_factor: 2.85
+    T3:
+      name: "Bronze"
+      asian_range_pips: "> 35"
+      position_size_pct: 50
+      expansion_factor: 2.50
+
+  # Risk Management (from Manual)
+  risk:
+    per_activation: 0.12  # % of equity
+    max_concurrent_risk: 0.36  # % of equity (3 signals max)
+    max_daily_drawdown: 0.50  # %
+    prop_firm_circuit_breaker: 0.40  # %
+    daily_return_target: "1.0-1.5%"
+    win_rate_target: "85-90%"
+
+# Nautilus Trader Config
+nautilus:
+  strategy_package: "quant_lab.strategies"
+  backtest_engine: "nautilus_trader.backtest"
+  data_path: "data/m5_eurusd"
+  results_path: "quant-lab/backtests"
+  
+# Agent Roles
+agents:
+  manager:
+    role: "Lab Manager"
+    responsibilities:
+      - Coordinate strategy development
+      - Monitor backtest results
+      - Manage agent tasks
+      - Report to OWL
+  optimizer:
+    role: "Optimizer/Coder"
+    responsibilities:
+      - Implement strategies in Nautilus
+      - Optimize parameters
+      - Run backtests
+      - Fix bugs
+  researcher:
+    role: "Research Agent"
+    responsibilities:
+      - Analyze CEREBUS manual
+      - Extract strategy logic
+      - Document findings
+      - Suggest improvements
+
+# Strategy Pipeline (from CEREBUS manual)
+strategies:
+  phase1:
+    - P90_Cascade_Activation
+    - P90_45Min_Add
+    - P90_Cascade_45Min_Combo
+  phase2:
+    - Deep_Mean_Rebalancing
+    - Over_Extension_Runner
+    - P90P_Distribution_Tracker
+  phase3:
+    - Stall_Harvest_System
+    - Monday_Asian_Float
+    - Daily_Asian_Float
+    - Full_Day_Range_Regime
+    - Dual_Engine_Execution
+  phase4:
+    - Failure_Repair_Model
+    - Two_Plays_Framework
+    - Monte_Carlo_Validation
+    - Fractal_Resolution_Engine

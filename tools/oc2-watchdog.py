@@ -102,7 +102,8 @@ def get_oc2_pid() -> int | None:
              f"Get-Process -Name node -ErrorAction SilentlyContinue | "
              f"Where-Object {{ $_.CommandLine -like '*18790*' }} | "
              f"Select-Object -ExpandProperty Id"],
-            capture_output=True, text=True, timeout=5
+            capture_output=True, text=True, timeout=5,
+            creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
         )
         pid_str = result.stdout.strip()
         return int(pid_str) if pid_str else None
@@ -130,13 +131,17 @@ def start_gateway() -> bool:
                     str(Path("C:/Program Files/nodejs")) + ";" + 
                     subprocess.os.environ.get("PATH", "")
         }
-        # Use cmd /c to start in background (CREATE_NO_WINDOW doesn't work reliably from Python)
-        cmd_line = f'node "{Path.home() / "AppData/Roaming/npm/node_modules/openclaw/dist/index.js"}" gateway run --port {OC2_PORT} --allow-unconfigured'
+        node_exe = str(Path.home() / "AppData/Roaming/npm/node_modules/openclaw/dist/index.js")
+        # Use DETACHED_PROCESS + CREATE_NO_WINDOW for silent background execution
         subprocess.Popen(
-            ["cmd", "/c", "start", "/B", cmd_line],
+            ["node", node_exe, "gateway", "run", "--port", str(OC2_PORT), "--allow-unconfigured"],
             env={**subprocess.os.environ, **env},
             cwd=str(OPENCLAW_HOME.parent),
-            shell=True
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            stdin=subprocess.DEVNULL,
+            creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS | subprocess.CREATE_NO_WINDOW,
+            close_fds=True
         )
         # Wait for it to come up
         for i in range(15):

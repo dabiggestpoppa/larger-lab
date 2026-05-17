@@ -16,6 +16,10 @@
         "openrouter/owl-alpha": {
           "alias": "owl"
         }
+      },
+      "subagents": {
+        "maxConcurrent": 5,
+        "runTimeoutSeconds": 900
       }
     }
   },
@@ -59,6 +63,9 @@
         "*": {
           "requireMention": true
         }
+      },
+      "commands": {
+        "native": false
       }
     }
   },
@@ -116,6 +123,6 @@
   },
   "meta": {
     "lastTouchedVersion": "2026.5.7",
-    "lastTouchedAt": "2026-05-16T19:44:42.876Z"
+    "lastTouchedAt": "2026-05-17T07:50:18.709Z"
   }
 }

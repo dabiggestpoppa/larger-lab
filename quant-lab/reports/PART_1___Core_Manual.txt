@@ -1,0 +1,250 @@
+PART 1 CEREBUS FX v2.0 — The Complete Operational Manual Asian
+Range P90 • Deep Mean Rebalancing • Daily Distribution Matrix
+1. EXECUTIVE SUMMARY: THE EDGE
+The CEREBUS System exploits the statistical correlation between the Asian Session Range and the Daily Distribution.
+Constraint Logic: Small Asian ranges create a Constraint Deficit [11]. The field is under-resolved and must expand to reach its daily
+mean variance. The Asian Range defines the day's constraint set. Resolution Outputs [2] then satisfy that deficit.
+Core Thesis: Small Asian ranges (<30 pips) act as a constraint deficit [11]. The field must expand to resolve it.
+CFD Expansion Engine: Captures the initial resolution output expansion with tight constraint boundaries [8] and pyramided
+activation signals [9].
+Binary/Mean Reversion Engine: Capitalizes on available resolution pathway harvesting [4] at deep states (168%-200%) [10]
+where the resolution output stalls [7] before reversing or continuing.
+Target Metric
+Value
+Win Rate (Filtered)
+85% – 90%
+Daily Goal
+1.0% – 1.5%
+Max Daily Drawdown
+< 0.50%
+Prop Firm Circuit Breaker
+Hard constraint boundary [8] at 0.40% loss
+2. PRE-SESSION CHECKLIST (Daily @ 1:45 AM EST)
+Step 1: Measure Asian Range
+Timeframe: 00:00 – 08:00 UTC (7:00 PM – 3:00 AM EST). Calculate the constraint deficit [11] — the distance between Asian High
+and Asian Low.
+Asian Range Size
+Field Status
+Action
+Position Sizing
+< 20 pips
+TIER 1 (Gold)
+Full Conviction
+100% Size
+20 – 30 pips
+TIER 2 (Standard)
+Moderate Conviction
+75% Size
+30 – 45 pips
+TIER 3 (Caution)
+Reduced Conviction
+50% Size
+> 45 pips
+NO-GO
+Stand Down
+0% (Skip Day)
+Step 2: Define Daily Targets (Expected Constraint Resolution Range)
+Asian <20p: Target Daily Range = ~72 pips
+Asian 20-30p: Target Daily Range = ~58 pips
+Asian 30-45p: Target Daily Range = ~48 pips
+Step 3: Check Filters
+
+
+=== PAGE 6 ===
+News: High-impact news (NFP, CPI, FOMC) within 4 hours? → SKIP.
+Day of Week: Monday (reduce size 25%). Friday (reduce size 50% after 10 AM).
+3. STRATEGY A: CFD EXPANSION ENGINE (The Primary Engine)
+This engine captures the initial Constraint Deficit expansion [11]. The P90 candle is the Activation Signal [9] that marks the start of a new
+resolution process. Stop-losses are Constraint Boundaries [8] — structurally defined invalidation points.
+A. Activation Signal Identification (P90 Candle)
+Wait for an M5 candle to close within the Activation Window (2:00 AM – 11:00 AM EST) meeting the threshold below. This is the
+P90 Activation Signal [9].
+Time Window (EST)
+Bullish/Bearish Threshold
+2:00 – 4:00 AM
+>= 4.1 pips
+4:00 – 6:00 AM
+>= 4.6 pips
+6:00 – 8:00 AM
+>= 4.6 pips
+8:00 – 10:00 AM
+>= 5.9 pips
+10:00 – 11:00 AM
+>= 6.2 pips
+B. Activation & Scaling Protocol
+Do not activate all at once. Use a pyramid model to manage constraint boundary exposure.
+Activation
+Timing
+Condition
+Size
+Constraint Boundary
+Target
+Signal 1
+P90 Close
+Activation Confirmed
+40%
+80% of P90 Body
+-25% Daily Range
+Signal 2
+P90 Close
+Simultaneous
+40%
+1.5x P90 Body
+-25% Daily Range
+Signal 3
++45 Mins
+Resolution Output +8 pips
+20%
+Breakeven (Signal 1)
+-50% Daily Range
+Regime Shift Confirmation (8:45 AM EST): If Current Daily Range > 1.5x Asian Range, proceed with full size. If not, reduce size
+by 50%.
+C. Exit Management
+TP1 (-25% of Asian Range):  Close 50% of total position. Move constraint boundaries to Breakeven.
+TP2 (-50% of Asian Range):  Close remaining core positions.
+Hard Exit (12:00 PM EST):   Close ALL positions — 82% of daily constraint resolution complete.
+Kill Switch (132% State):   Resolution output violates 132% of Asian Range [10] → Close ALL.
+4. STRATEGY B: DEEP MEAN REBALANCING (The Resolution Output Stall Play)
+This strategy monetizes the Resolution Output Stall [7] — where the resolution output taps a deep state (168%-200%) [10] via available
+resolution pathway harvesting [4], then fails to continue, creating a high-probability partial rebalancing [6] opportunity.
+A. The Logic
+
+
+=== PAGE 7 ===
+When the resolution output extends aggressively, it often reaches the Stall Zone (168%) [10] or Deep State (200%) [10] to harvest
+available resolution pathways before rebalancing.
+CFD Context: Usually a constraint boundary-out signal [8].
+Binary/Mean Reversion Context: A high-probability activation signal [9] for a rebalancing snap-back.
+B. The Setup
+Trigger: Resolution output touches Stall Zone (168%) or Deep State (200%) [10] of the P90 candle.
+Condition: Must occur before 12:00 PM EST.
+Filter: The -50% Daily Target has NOT yet been hit.
+C. Execution — Option 1: Binary Options (Time-Based)
+Session (EST)
+Dynamic Expiry
+Target Win Rate
+2 AM – 6 AM
+90 Minutes
+~84% (early session)
+6 AM – 9 AM
+60 Minutes
+~78%
+9 AM – 12 PM
+45 Minutes
+~74%
+After 12 PM
+No Trade
+—
+Direction: Same as the direction of constraint resolution [3] if Regime Shift confirmed. Counter-direction if resolution momentum is
+exhausted.
+C. Execution — Option 2: CFD Limit Order at Deep State (Deep Value)
+LIMIT ORDER at 200% Deep State Level [10]
+Constraint Boundary: 8 pips beyond 200% level (approx. 220% extension)
+  → Data shows 90% of violations do NOT exceed 6.5 pips past 200%.
+  → Filters noise while protecting capital.
+Take Profit:
+  TP1: Return to 0% (Activation Resolution Output [9])
+  TP2: -50% Daily Range
+R:R Potential: 1:5 to 1:7
+D. When to AVOID the Rebalancing Play
+  Resolution output CLOSES strongly beyond 220% level (True constraint violation)
+  Major news is imminent
+  Asian Range was >45 pips (constraint deficit too wide — edge exhausted)
+5. ADVANCED: PLAYING THE OVER-EXTENSION
+If the Asian -50% Target is hit before 11:00 AM EST, do not exit fully. Switch to Daily Distribution Targets — the resolution process
+has more constraint deficit to satisfy.
+Asian Size
+Expected Daily Avg
+Current Move (-50%)
+Remaining Potential
+Action
+
+
+=== PAGE 8 ===
+< 20 pips
+~72 pips
+~10 pips
+~60 pips left
+Hold Runner to Daily -50%
+20-30 pips
+~58 pips
+~15 pips
+~40 pips left
+Trail Boundary to Daily -25%
+> 30 pips
+~48 pips
+~24 pips
+~20 pips left
+Take Profit — Edge thinning
+Runner Protocol
+1. Close 50% at Asian -50% target.
+2. Move Constraint Boundary to Breakeven + 2 pips.
+3. Target Daily -50% (calculated from Asian High/Low constraint violation [5]).
+4. Hard Exit: 12:00 PM EST.
+6. RISK MANAGEMENT & PROP RULES
+Parameter
+Value
+Rule
+Risk Per Activation
+0.12% of Equity
+Per signal limit
+Max Concurrent Risk
+0.36% (3 signals)
+All open constraint positions combined
+Daily Constraint Boundary
+0.40%
+Close ALL if hit; no more activation that day
+Personal Daily Limit
+0.50%
+0.40% hard boundary preserves the buffer
+Correlation Warning
+Do not activate EUR/USD and GBP/USD simultaneously in the same direction of constraint resolution unless reduced size is
+applied. Treat them as one constraint position.
+Weekly Review — Pause & Recalibrate If:
+  Win rate drops below 80% over 20-activation sample
+  132% Kill-Switch State violations increase >50% in a week
+  Asian Range (constraint deficit) consistently >45 pips
+7. QUICK REFERENCE CHEAT SHEET
+GO CONDITIONS
+NO-GO CONDITIONS
+1. Asian Range < 45 pips (constraint deficit active)
+2. Time is 2:00 AM – 11:00 AM EST (activation window)
+3. -25% / -50% Targets NOT already hit
+4. 132% Kill-Switch NOT triggered
+1. Asian Range > 45 pips (constraint deficit too wide)
+2. Major News within 4 hours
+3. Daily Loss > 0.40%
+4. Time > 12:00 PM EST
+Level
+Constraint State
+Action
+168% Ext
+Stall Zone State [10]
+Watch for Binary Activation / Limit Order
+200% Ext
+Deep State [10]
+Limit Activation (constraint boundary +8p)
+
+
+=== PAGE 9 ===
+220% Ext
+Violation State
+Hard Constraint Boundary / Exit All
+132% Asian
+Kill-Switch State [10]
+Kill Switch — Close All Immediately
+12:00 PM EST
+End of Edge
+Hard Exit — All Positions
+8. FINAL THOUGHTS
+The CEREBUS system is not about predicting the future; it is about probabilistic alignment with the field's constraint
+resolution process.
+Trust the Asian Range to define the constraint deficit.
+Trust the P90 Candle to define the activation signal.
+Trust the 200% Deep State to define your deep value activations.
+Trust the 12:00 PM Hard Exit to protect your resolution profits.
+Discipline > Prediction.  Align with the field.
+End of Part 1 | CEREBUS FX v2.0 Core Manual | March 2026
+
+
+=== PAGE 10 ===

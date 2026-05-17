@@ -1,0 +1,15 @@
+{
+  "ts": "2026-05-17T08:00:38.326932+00:00",
+  "checks": [
+    "oc2_ok",
+    "no_messages_10min",
+    "pm_not_found"
+  ],
+  "oc2_healthy": true,
+  "last_msg_age_sec": 20184,
+  "pm": {
+    "watchdog": false,
+    "stuck": false,
+    "pid": null
+  }
+}

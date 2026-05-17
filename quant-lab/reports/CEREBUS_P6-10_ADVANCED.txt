@@ -1,0 +1,15 @@
+PART 6
+Monte Carlo Simulation
+35
+PART 7
+Monday Asian Range Float Mechanism
+38
+PART 8
+Daily Asian Range Float Mechanism
+43
+PART 9
+Full-Day Range Regime Tracker
+51
+PART 10
+Dual-Engine Execution Model
+58

@@ -137,6 +137,7 @@ class ObserverRuntime:
             if not observer or observer.state == ObserverState.DESTROYED:
                 return None
 
+            previous_state = observer.state
             observer.state = ObserverState.ACTIVE
             observer.activated_at = datetime.now(timezone.utc)
 
@@ -146,7 +147,7 @@ class ObserverRuntime:
                 payload={
                     "observer_id": observer_id,
                     "state": "active",
-                    "previous_state": observer.state.value,
+                    "previous_state": previous_state.value,
                 },
             )
 

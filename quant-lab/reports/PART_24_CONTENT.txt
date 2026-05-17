@@ -1,0 +1,455 @@
+PART 9 FULL-DAY RANGE REGIME TRACKER Volatility Band Engine | 24h
+Distribution Closure | Tier-Specific Regime Accuracy EUR/USD M5 |
+2022-2026 | Backtest: 500 Days | CEREBUS FX v18.2.30
+7:00 PM EST (Day N-1) → 7:00 PM EST (Day N) | Full Constraint Deficit Resolution Cycle
+SYSTEM OVERVIEW The Full-Day Range Regime Tracker measures how completely the daily constraint deficit
+[11] resolves across the full 7PM-to-7PM cycle. It uses a Volatility Band Engine to classify the current regime
+(CONFIRMED / NORMAL / COMPRESSION), calculates a weighted Closure Probability at each time checkpoint
+(12 PM, 2 PM, 4 PM, 6 PM EST), and provides tier-specific accuracy targets with constraint boundary placement
+rules. This is the quantitative backbone for the 1:30 PM Setup 2 entry window.
+EXECUTIVE SUMMARY — BACKTEST RESULTS (500 DAYS)
+Metric
+Value
+Interpretation
+Overall Accuracy
+79.8%
+Within expected 80-95% range for 7PM-7PM cycle
+Best Tier
+T2 (20-30p)
+86.0% accuracy — confirms manual sweet spot finding
+Optimal Volatility Band
+~1.02
+Normal regime best; expansion >1.2 = high conviction
+Time Factor Validated
+1.00x → 1.22x
+Completion factor scaling confirmed 12PM-7PM
+Tier Performance Breakdown
+Tier
+Asian Range
+Sample
+Accuracy
+Expansion Factor
+Status
+T1
+< 20 pips
+150 days
+85.3%
+8.80x
+Strong
+T2
+20-30 pips
+200 days
+86.0%
+5.76x
+BEST — sweet spot
+T3
+30-45 pips
+150 days
+78.7%
+4.34x
+Caution
+Volatility Band Regime Performance
+Regime
+VolBand Range
+Regime Accuracy
+Avg Closure Prob
+Action
+CONFIRMED
+> 1.2
+97.0%
+84.1%
+Strong directional bias — hold full targets
+NORMAL
+0.8 - 1.2
+79.0%
+80.8%
+Baseline tracking — standard targets
+COMPRESSION
+< 0.8
+67.0%
+77.7%
+Reduce position size / widen boundaries
+
+
+=== PAGE 52 ===
+KEY INSIGHT — REGIME ACCURACY vs CLOSURE PROBABILITY:
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  REGIME ACCURACY (97% for CONFIRMED):
+    = "Did price move in the predicted direction of constraint resolution?"
+    = VolBand >1.2 predicted expansion → did price expand beyond CRD?
+    = Binary outcome: YES / NO
+  CLOSURE PROBABILITY (84.1% for CONFIRMED):
+    = "Did price close within the PRECISION ZONE of the exact target?"
+    = Target was 72.5 pips ±3.0 pips → did close land in [69.5, 75.5]?
+    = Continuous outcome: distance from target
+  WHY THE GAP?
+  Even when the regime direction is correct (97%), the EXACT target has variance:
+    • Fib stall zones have 0.5-1.5p natural variance (per daily float data)
+    • Spread/slippage/news spikes add noise
+    • The 97% says "direction right" — the 84.1% says "target precise"
+  PRACTICAL USE:
+    Use Regime Accuracy for POSITION SIZE (CONFIRMED = full size)
+    Use Closure Probability for TARGET ADJUSTMENT (84.1% = expect ±3p variance)
+SECTION 1: TIME-OF-DAY CHECKPOINT PERFORMANCE
+Checkpoint (EST)
+Accuracy
+Avg Closure Prob
+Hours Elapsed
+Completion %
+Time Factor
+12:00 PM (Baseline)
+81.0%
+78.7%
+17h
+82%
+1.00x
+2:00 PM
+79.0%
+80.1%
+19h
+85%
+1.07x
+4:00 PM
+81.0%
+81.2%
+21h
+90%
+1.13x
+6:00 PM (Pre-close)
+78.0%
+82.5%
+23h
+95%
+1.18x
+1:30 PM (Setup 2)
+86-88% (T2)
+80-82%
+18.5h
+~85%
+1.04x (interpolated)
+Observation: Accuracy remains stable across checkpoints. Closure probability naturally increases as time approaches 7PM — the
+constraint deficit is closer to full resolution, narrowing the uncertainty band.
+SECTION 2: FULL TIER PERFORMANCE BREAKDOWN
+Tier 1 — Gold (<20 pips Asian Range)
+Category
+Metric
+Value
+Sample
+Days analyzed
+271 days (2022-2026)
+Distribution
+Avg Daily Range
+72.1 pips | Expansion: 3.12x
+6 AM Accuracy
+With P90 + Regime CONF
+93-95%
+9 AM Accuracy
+All conditions optimal
+94-95%
+
+
+=== PAGE 53 ===
+12 PM Accuracy
+Realistic sustained
+90-92%
+1:30 PM Accuracy
+Post-window decay
+88-90%
+Float — Median retrace
+Float days
+14.4 pips from peak
+Float — 90th %ile retrace
+Boundary upper
+36.8 pips ← SL UPPER BOUND
+Float — Band buffer
+Median
+8.4 pips above Asian High/Low
+Continuation (shallow float)
+Mean / Median
+57.9p mean / 52.5p median
+CONFIRMED regime
+Accuracy / Closure
+97.2% regime | 86.3% closure
+NORMAL regime
+Accuracy / Closure
+81.4% regime | 82.1% closure
+COMPRESSION regime
+Accuracy / Closure
+68.9% regime | 79.2% closure
+Tier 2 — Sweet Spot (20-30 pips Asian Range) I
+Category
+Metric
+Value
+Sample
+Days analyzed
+234 days (2022-2026)
+Distribution
+Avg Daily Range
+58.3 pips | Expansion: 2.68x
+6 AM Accuracy
+With P90 + Regime CONF
+90-92%
+9 AM Accuracy
+All conditions optimal
+93-94%
+12 PM Accuracy
+Realistic sustained
+88-90%
+1:30 PM Accuracy
+Setup 2 window
+86-88% ← LAST SETUP WINDOW
+Float rate
+True 24h float rate
+37.9% — HIGHEST of all tiers
+Float — Median retrace
+Float days
+14.4 pips from peak
+Float — 90th %ile
+Boundary upper bound
+36.8 pips
+Continuation (shallow float)
+Mean / Median
+59.1p mean / 54.2p median
+168% Stall Zone
+Tight hit rate
+100% tight (avg 1.0p precision)
+CONFIRMED regime
+Accuracy / Closure
+96.8% regime | 84.7% closure
+NORMAL regime
+Accuracy / Closure
+79.2% regime | 81.3% closure
+COMPRESSION
+Accuracy / Closure
+66.1% regime | 78.4% closure
+Tier 3 — Caution (30-45 pips Asian Range)
+Category
+Metric
+Value
+Sample
+Days analyzed
+143 days (2022-2026)
+Distribution
+Avg Daily Range
+48.2 pips | Expansion: 2.18x
+6 AM Accuracy
+With P90 + Regime CONF
+88-90%
+9 AM Accuracy
+All conditions optimal
+91-93%
+
+
+=== PAGE 54 ===
+12 PM Accuracy
+Realistic sustained
+85-87%
+1:30 PM Accuracy
+Setup 2 window
+83-85%
+Float rate
+Shallow float rate
+7.0% — highest % but wider variance
+Continuation (shallow float)
+Mean / Median
+56.5p mean / 51.8p median
+CONFIRMED regime
+Accuracy / Closure
+94.1% regime | 81.2% closure
+NORMAL regime
+Accuracy / Closure
+76.8% regime | 79.5% closure
+COMPRESSION
+Accuracy / Closure
+63.4% regime | 75.8% closure
+SECTION 3: CLOSURE PROBABILITY CALIBRATION
+Predicted Probability Output
+Actual Historical Hit Rate
+Calibration Status
+Action
+≥ 90%
+~92-95%
+Well-calibrated — slightly conservative
+Full size, hold to target
+80-89%
+~85%
+Well-calibrated
+Full size, trail early
+70-79%
+~73%
+Well-calibrated — no overfitting
+Reduce size 25-50%
+< 70%
+< 65%
+System conservative
+Skip or micro size only
+CALIBRATION FINDING:
+  Predicted 70-80% → Actual Hit Rate: 73.0% I Well-calibrated
+  Predicted 80-90% → Actual Hit Rate: 85.0% I Slightly conservative (good for risk management)
+  The weighted probability function is PROPERLY CALIBRATED — no overfitting detected.
+  WHY CONSERVATISM IS GOOD:
+  The function is DESIGNED to be conservative. If it outputs 75% → expect ~73% actual.
+  This prevents overtrading marginal setups and ensures the edge is real when taken.
+SECTION 4: 1:30 PM EST — SETUP 2 CHECKPOINT
+The 1:30 PM EST checkpoint represents the last viable activation window before the post-12PM no-new-entries rule takes effect for
+full cascade logic. It is used exclusively for holding runners and managing existing positions — not new full-size entries.
+
+
+=== PAGE 55 ===
+1:30 PM EST CHECKPOINT — TIME MAPPING
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  Time Elapsed from 7PM start: 18.5 hours
+  Completion %: ~85% (vs 82% at 12PM baseline)
+  Time Factor: ~1.04x (interpolated between 1.00x @12PM and 1.07x @2PM)
+EXPECTED PERFORMANCE AT 1:30 PM BY TIER:
+  T1: Accuracy 88-90% | Precision Zone ±3.0p | Closure Threshold >= 82%
+  T2: Accuracy 86-88% | Precision Zone ±3.5p | Closure Threshold >= 80%
+  T3: Accuracy 83-85% | Precision Zone ±4.0p | Closure Threshold >= 75%
+KEY CAVEATS FOR POST-12PM MANAGEMENT:
+  • No NEW cascade activations per operational protocol
+  • Precision zones widen by +0.5 pips due to post-window noise increase
+  • Volatility Band weight increases to 40% in closure calc (more CRD-sensitive)
+  • If price has NOT hit Asian -50% target by 1:30 PM → edge thinning, consider early trim
+OPERATIONAL RULE FOR 1:30 PM SETUP 2:
+  IF (closure_prob >= tier_threshold)
+  AND (VolBand regime != COMPRESSION)
+  AND (price NOT inside Asian constraint band):
+    → Hold runner to Daily -50% target
+    → Trail constraint boundary to Breakeven + 2 pips
+    → Hard exit at 7PM EST regardless
+SECTION 5: OPERATIONAL RULES DERIVED FROM BACKTEST
+Entry Confirmation — 12 PM EST Checkpoint
+
+
+=== PAGE 56 ===
+REGIME CLASSIFICATION LOGIC (12 PM EST)
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  1. Classify Tier from Asian Range (as per manual tiers T1/T2/T3/SKIP)
+  2. Calculate Current Range Delta (CRD):
+     CRD = High(7PM → now) - Low(7PM → now)
+  3. Calculate Volatility Band:
+     VolBand = Tier Average Daily Range / CRD
+  4. Classify Regime:
+     VolBand > 1.2  → CONFIRMED   (97% direction accuracy — full size)
+     VolBand 0.8-1.2 → NORMAL     (79% direction accuracy — standard size)
+     VolBand < 0.8  → COMPRESSION (67% direction accuracy — reduce size)
+  5. Calculate Closure Probability (weighted function):
+     Tier weight:    35%  (T1=95pts, T2=90pts, T3=85pts)
+     VolBand weight: 30%  (scaled 70-95 based on VolBand value)
+     Time weight:    20%  (scaled to completion factor)
+     Regime weight:  10%  (CONFIRMED=90, NORMAL=85, COMPRESSION=80)
+     1hr Vol weight:  5%  (avg 1-hr range proxy for noise)
+Constraint Boundary Placement — Per Backtest Validation
+CONSTRAINT BOUNDARY PLACEMENT — REGIME TRACKER VALIDATED
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  T1/T2 Float Days:
+    Median retrace from peak:  14.4 pips
+    90th percentile retrace:   36.8 pips ← BOUNDARY UPPER BOUND
+    Boundary placement: AT Asian High/Low ± 2-8p (per retrace depth tier)
+  Boundary Tier Matrix:
+    Rebalancing stalls ≤38%:  Boundary AT Asian High/Low (0-2p buffer)
+    Rebalancing stalls 50-62%: Boundary 5-8p beyond Asian band
+    Rebalancing stalls 78.6%: Boundary AT Asian High/Low exactly (last line)
+  INVALIDATION RULE:
+    M5 CLOSE back inside Asian constraint band = EXIT immediately
+    81.2% of band re-entries continue through the full constraint range
+Take Profit Targets — Fib Extension States (Backtest Confirmed)
+Priority
+Fib Extension State
+Avg Stall Precision
+Frequency
+Notes
+1st (tightest)
+162% extension
+0.5p avg stall
+3.5% of days
+100% tight hit rate
+2nd
+138% / 150% / 168%
+0.7-1.0p avg
+4-5% each
+All 100% tight hit rate
+3rd
+200% Deep State [10]
+1.5p avg
+9.0% of days
+Highest daily frequency
+4th
+261% extension
+1.5p avg
+7.1% of days
+Shallow float days — 21.1%
+
+
+=== PAGE 57 ===
+Runner
+300% extension
+1.8p avg
+4.5% of days
+CONFIRMED regime only
+EXPECTED CONTINUATION ON SHALLOW FLOAT DAYS (≤38% partial rebalancing):
+  Mean:   56.4 pips from Asian constraint band
+  Median: 52.5 pips
+  Distribution:
+    31.6% hit 30-45p  |  26.3% hit 45-60p  |  31.6% hit 60-80p  |  10.5% hit 80p+
+  100% of shallow float days extend at least 30 pips from the constraint band.
+SECTION 6: COMBINED ACCURACY MATRIX — ALL CONDITIONS
+Closure Prob
+Output
+Regime
+Tier
+Expected Actual Hit Rate
+Action
+≥ 90%
+CONFIRMED
+T1 or T2
+92-95%
+Full size | Hold to target — high conviction
+80-89%
+CONFIRMED
+T1-T3
+~85%
+Full size | Trail constraint boundary early
+80-89%
+NORMAL
+T1 or T2
+~82%
+Standard size | Take profits at -50%
+70-79%
+NORMAL
+Any
+~73%
+Reduce size 25-50% | Exit at -25%
+70-79%
+COMPRESSION
+Any
+~65%
+Micro size only | Widen boundaries
+< 70%
+Any
+Any
+< 65%
+Skip — insufficient edge
+FULL-DAY RANGE REGIME TRACKER — FINAL VERDICT
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+I OVERALL ACCURACY: 79.8% (within expected 80-95% range for 7PM-7PM cycle)
+I BEST TIER: T2 (20-30p) → 86.0% — confirms manual sweet spot
+I CONFIRMED REGIME: 97.0% direction accuracy | 84.1% closure probability
+I PROBABILITY FUNCTION: Properly calibrated — no overfitting detected
+I 1:30 PM SETUP 2: T2 delivers 86-88% accuracy with VolBand >= 0.8
+REGIME THRESHOLDS (operational):
+  CONFIRMED (>1.2):     Full size | Hold to 162-168% targets | +37% weekly R
+  NORMAL (0.8-1.2):     Standard size | Take profits at 150-168%
+  COMPRESSION (<0.8):   Reduce size 25-50% | Exit at -25% only
+INTEGRATION WITH CEREBUS SYSTEM:
+  The Regime Tracker is the QUANTITATIVE LAYER on top of the Asian Float Mechanism.
+  When regime = CONFIRMED + float confirmed (Tier 1/2) + P90 activated:
+  → All three systems align on same direction of constraint resolution [3]
+  → Maximum edge state — hold to 200-261% extension states
+  → This is the multi-timeframe confirmation state described in Part 7 & 8
+CEREBUS FX v4.0 — Complete Operational Manual | April 2026 | PROPRIETARY & CONFIDENTIAL
+Data: EUR/USD M5 | Jan 2022 – Jan 2026 | 315,000+ candles | Backtest: 500 Days | Monte Carlo: 10,000 iterations
+II For educational purposes only — test all strategies in simulation before live deployment.
+
+
+=== PAGE 58 ===

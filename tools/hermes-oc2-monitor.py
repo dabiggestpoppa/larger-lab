@@ -78,7 +78,8 @@ def check_node_process() -> dict:
             mem_result = subprocess.run(
                 ["powershell", "-Command",
                  f"(Get-Process -Id {pid} -ErrorAction SilentlyContinue).WorkingSet64 / 1MB"],
-                capture_output=True, text=True, timeout=5
+                capture_output=True, text=True, timeout=5,
+                creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
             )
             mem = float(mem_result.stdout.strip()) if mem_result.stdout.strip() else 0
             return {"running": True, "pid": pid, "memory_mb": round(mem, 1)}
@@ -134,7 +135,8 @@ def kill_oc2():
              f"Get-Process -Name node -ErrorAction SilentlyContinue | "
              f"Where-Object {{ $_.CommandLine -like '*{OC2_PORT}*' }} | "
              f"Stop-Process -Force"],
-            capture_output=True, timeout=10
+            capture_output=True, timeout=10,
+            creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
         )
         time.sleep(3)
         log("Killed OC2 process")
@@ -148,13 +150,16 @@ def start_oc2():
     try:
         env = os.environ.copy()
         env["OPENCLAW_HOME"] = str(OPENCLAW_HOME)
+        # Use CREATE_NO_WINDOW to prevent PowerShell/cmd windows from flashing
         subprocess.Popen(
             ["cmd", "/c", str(GATEWAY_CMD)],
             env=env,
             cwd=str(OPENCLAW_HOME.parent),
             shell=True,
             stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
+            stderr=subprocess.DEVNULL,
+            stdin=subprocess.DEVNULL,
+            creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
         )
         # Wait for health
         for i in range(15):

@@ -1,291 +1,227 @@
-"use client";
+﻿"use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect } from "react";
+import { MetricsPanel } from "./components/MetricsPanel";
+import { TraceView } from "./components/TraceView";
+import { AlertPanel } from "./components/AlertPanel";
+import { SystemMap } from "./components/SystemMap";
+import { api, DashboardData } from "./lib/api";
+import {
+  Activity, GitBranch, Bell, Network, Shield, Cpu, Database, Zap,
+  Radio, AlertTriangle, XCircle,
+} from "lucide-react";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-interface ObserverStatus {
-  observer_id: string;
-  state: "active" | "idle" | "monitoring";
-  entropy: number;
-  task: string;
-}
-
-interface AttractorState {
-  goal: string;
-  confidence: number;
-  entropy_pressure: number;
-  convergence: number;
-}
-
-interface MemoryView {
-  trajectory_memory: unknown[];
-  structural_memory: unknown;
-  repair_memory: unknown[];
-}
-
-interface ChatMessage {
-  role: "user" | "assistant";
-  content: string;
-  timestamp: string;
-}
-
-// ─── API Client ──────────────────────────────────────────────────────────────
-
-const API_BASE = "http://localhost:8000";
-
-async function fetchJSON<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`);
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
-  return res.json();
-}
-
-// ─── Components ──────────────────────────────────────────────────────────────
-
-function ObserverPanel({ observers }: { observers: ObserverStatus[] }) {
-  const stateColor = (s: string) =>
-    s === "active" ? "text-green-400" : s === "monitoring" ? "text-yellow-400" : "text-gray-500";
-
+function StatusBadge({ status }: { status: "healthy" | "degraded" | "critical" }) {
+  const config = {
+    healthy: { color: "bg-green-500/10 text-green-400 border-green-500/20", label: "Healthy" },
+    degraded: { color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20", label: "Degraded" },
+    critical: { color: "bg-red-500/10 text-red-400 border-red-500/20", label: "Critical" },
+  }[status];
   return (
-    <div className="bg-[#111118] border border-[#27272a] rounded-lg p-4">
-      <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Observers</h2>
-      <div className="space-y-2">
-        {observers.map((o) => (
-          <div key={o.observer_id} className="flex items-center justify-between py-2 px-3 bg-[#1a1a24] rounded">
-            <div className="flex items-center gap-3">
-              <span className={`text-xs font-mono font-bold ${stateColor(o.state)}`}>
-                {o.state.toUpperCase()}
-              </span>
-              <span className="text-sm text-gray-200">{o.observer_id}</span>
-            </div>
-            <div className="flex items-center gap-4 text-xs text-gray-500">
-              <span>H: {o.entropy.toFixed(3)}</span>
-              <span className="text-gray-400">{o.task}</span>
-            </div>
-          </div>
-        ))}
-        {observers.length === 0 && (
-          <p className="text-sm text-gray-600 italic">No observers connected</p>
+    <span className={`text-xs px-2 py-1 rounded-full border font-medium ${config.color}`}>
+      {config.label}
+    </span>
+  );
+}
+
+function QuickStat({ label, value, icon: Icon, color, trend }: {
+  label: string;
+  value: string;
+  icon: React.ComponentType<{ className?: string }>;
+  color: string;
+  trend?: "up" | "down" | "stable";
+}) {
+  return (
+    <div className="bg-[#111118] border border-[#27272a] rounded-lg p-4 hover:border-[#3a3a4a] transition-colors">
+      <div className="flex items-center justify-between mb-2">
+        <Icon className={`w-4 h-4 ${color}`} />
+        {trend && (
+          <span className={`text-xs ${
+            trend === "up" ? "text-green-400" : trend === "down" ? "text-red-400" : "text-gray-500"
+          }`}>
+            {trend === "up" ? "â†‘" : trend === "down" ? "â†“" : "â†’"}
+          </span>
         )}
       </div>
-    </div>
-  );
-}
-
-function AttractorPanel({ attractor }: { attractor: AttractorState | null }) {
-  if (!attractor) return null;
-  return (
-    <div className="bg-[#111118] border border-[#27272a] rounded-lg p-4">
-      <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Attractor</h2>
-      <p className="text-sm text-gray-200 mb-3">{attractor.goal}</p>
-      <div className="grid grid-cols-3 gap-3">
-        <Metric label="Confidence" value={attractor.confidence} color="text-indigo-400" />
-        <Metric label="Entropy Pressure" value={attractor.entropy_pressure} color="text-amber-400" />
-        <Metric label="Convergence" value={attractor.convergence} color="text-green-400" />
-      </div>
-    </div>
-  );
-}
-
-function Metric({ label, value, color }: { label: string; value: number; color: string }) {
-  return (
-    <div className="bg-[#1a1a24] rounded p-3 text-center">
-      <div className={`text-lg font-bold ${color}`}>{(value * 100).toFixed(0)}%</div>
+      <div className="text-xl font-bold text-white">{value}</div>
       <div className="text-xs text-gray-500 mt-1">{label}</div>
     </div>
   );
 }
 
-function MemoryPanel({ memory }: { memory: MemoryView | null }) {
-  if (!memory) return null;
+function NavItem({ icon: Icon, label, active, badge }: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  active?: boolean;
+  badge?: number;
+}) {
   return (
-    <div className="bg-[#111118] border border-[#27272a] rounded-lg p-4">
-      <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Memory</h2>
-      <div className="grid grid-cols-3 gap-3 text-center">
-        <div className="bg-[#1a1a24] rounded p-3">
-          <div className="text-lg font-bold text-gray-200">{memory.trajectory_memory.length}</div>
-          <div className="text-xs text-gray-500 mt-1">Trajectory</div>
-        </div>
-        <div className="bg-[#1a1a24] rounded p-3">
-          <div className="text-lg font-bold text-gray-200">
-            {Array.isArray(memory.structural_memory) ? memory.structural_memory.length : "—"}
-          </div>
-          <div className="text-xs text-gray-500 mt-1">Structural</div>
-        </div>
-        <div className="bg-[#1a1a24] rounded p-3">
-          <div className="text-lg font-bold text-gray-200">{memory.repair_memory.length}</div>
-          <div className="text-xs text-gray-500 mt-1">Repair</div>
-        </div>
-      </div>
-    </div>
+    <button className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors ${
+      active
+        ? "bg-indigo-600/10 text-indigo-400"
+        : "text-gray-400 hover:text-gray-200 hover:bg-[#1a1a24]"
+    }`}>
+      <Icon className="w-4 h-4" />
+      <span>{label}</span>
+      {badge !== undefined && badge > 0 && (
+        <span className="bg-red-500/20 text-red-400 text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+          {badge}
+        </span>
+      )}
+    </button>
   );
 }
 
-function ChatPanel() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const bottomRef = useRef<HTMLDivElement>(null);
-
-  const sendMessage = useCallback(async () => {
-    if (!input.trim() || loading) return;
-    const userMsg: ChatMessage = { role: "user", content: input, timestamp: new Date().toISOString() };
-    setMessages((prev) => [...prev, userMsg]);
-    setInput("");
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_BASE}/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: input }),
-      });
-      const data = await res.json();
-      const assistantMsg: ChatMessage = {
-        role: "assistant",
-        content: data.response || "No response",
-        timestamp: new Date().toISOString(),
-      };
-      setMessages((prev) => [...prev, assistantMsg]);
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "Error: Could not reach OCE backend", timestamp: new Date().toISOString() },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  }, [input, loading]);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  return (
-    <div className="bg-[#111118] border border-[#27272a] rounded-lg p-4 flex flex-col h-[500px]">
-      <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Continuity Chat</h2>
-      <div className="flex-1 overflow-y-auto space-y-3 mb-3">
-        {messages.map((m, i) => (
-          <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div
-              className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
-                m.role === "user" ? "bg-indigo-600 text-white" : "bg-[#1a1a24] text-gray-200"
-              }`}
-            >
-              {m.content}
-            </div>
-          </div>
-        ))}
-        {loading && (
-          <div className="flex justify-start">
-            <div className="bg-[#1a1a24] rounded-lg px-3 py-2 text-sm text-gray-500 italic">Thinking...</div>
-          </div>
-        )}
-        <div ref={bottomRef} />
-      </div>
-      <div className="flex gap-2">
-        <input
-          className="flex-1 bg-[#1a1a24] border border-[#27272a] rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-indigo-500"
-          placeholder="Ask OCE..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-        />
-        <button
-          onClick={sendMessage}
-          disabled={loading || !input.trim()}
-          className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
-        >
-          Send
-        </button>
-      </div>
-    </div>
-  );
+function formatBytes(bytes: number): string {
+  if (bytes === 0) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
 }
-
-// ─── Main Page ───────────────────────────────────────────────────────────────
 
 export default function Home() {
-  const [observers, setObservers] = useState<ObserverStatus[]>([]);
-  const [attractor, setAttractor] = useState<AttractorState | null>(null);
-  const [memory, setMemory] = useState<MemoryView | null>(null);
+  const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [wsStatus, setWsStatus] = useState<"connecting" | "connected" | "disconnected">("connecting");
-  const wsRef = useRef<WebSocket | null>(null);
 
-  // Poll observers, attractor, memory
   useEffect(() => {
-    const poll = async () => {
+    let ws: WebSocket | null = null;
+    let pollInterval: ReturnType<typeof setInterval>;
+
+    const loadDashboard = async () => {
       try {
-        const [obs, att, mem] = await Promise.all([
-          fetchJSON<ObserverStatus[]>("/observers"),
-          fetchJSON<AttractorState>("/attractor"),
-          fetchJSON<MemoryView>("/memory"),
-        ]);
-        setObservers(obs);
-        setAttractor(att);
-        setMemory(mem);
-      } catch {
-        // Backend not reachable yet
-      }
+        const d = await api.getDashboard();
+        setDashboard(d);
+      } catch { /* backend may not be up */ }
     };
-    poll();
-    const interval = setInterval(poll, 5000);
-    return () => clearInterval(interval);
-  }, []);
 
-  // WebSocket for real-time events
-  useEffect(() => {
-    const connect = () => {
-      setWsStatus("connecting");
-      const ws = new WebSocket("ws://localhost:8000/ws/events");
+    try {
+      ws = new WebSocket("ws://localhost:8000/ws/metrics");
       ws.onopen = () => setWsStatus("connected");
       ws.onclose = () => {
         setWsStatus("disconnected");
-        setTimeout(connect, 3000);
+        loadDashboard();
+        pollInterval = setInterval(loadDashboard, 5000);
       };
-      ws.onerror = () => ws.close();
-      ws.onmessage = () => {
-        // Could update a live event feed here
-      };
-      wsRef.current = ws;
+      ws.onerror = () => ws?.close();
+    } catch {
+      setWsStatus("disconnected");
+      loadDashboard();
+      pollInterval = setInterval(loadDashboard, 5000);
+    }
+
+    return () => {
+      ws?.close();
+      if (pollInterval) clearInterval(pollInterval);
     };
-    connect();
-    return () => wsRef.current?.close();
   }, []);
 
+  const systemHealth: "healthy" | "degraded" | "critical" = (() => {
+    if (!dashboard) return "healthy";
+    const criticalAlerts = dashboard.alerts.active.filter(
+      (a) => a.severity === "critical" && a.state === "firing"
+    ).length;
+    const avgHealth = dashboard.metrics.observers.avg_health;
+    if (criticalAlerts > 0 || avgHealth < 0.3) return "critical";
+    if (avgHealth < 0.7 || dashboard.alerts.stats.active_firing > 2) return "degraded";
+    return "healthy";
+  })();
+
   return (
-    <div className="min-h-screen p-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <header className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-white">OCE</h1>
-          <p className="text-sm text-gray-500">Operator Continuity Engine — Powered by SRRA-OPH</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-500">WebSocket:</span>
-          <span
-            className={`text-xs font-mono font-bold ${
-              wsStatus === "connected" ? "text-green-400" : wsStatus === "connecting" ? "text-yellow-400" : "text-red-400"
-            }`}
-          >
-            {wsStatus.toUpperCase()}
-          </span>
+    <div className="min-h-screen">
+      <header className="border-b border-[#27272a] bg-[#0a0a0f]/80 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+              <Shield className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <h1 className="text-sm font-bold text-white tracking-wide">OCE</h1>
+              <p className="text-[10px] text-gray-600 -mt-0.5">Operator Continuity Engine</p>
+            </div>
+          </div>
+          <nav className="flex items-center gap-1">
+            <NavItem icon={Activity} label="Overview" active />
+            <NavItem icon={GitBranch} label="Traces" />
+            <NavItem icon={Bell} label="Alerts" badge={dashboard?.alerts.stats.active_firing} />
+            <NavItem icon={Network} label="Topology" />
+          </nav>
+          <div className="flex items-center gap-3">
+            <StatusBadge status={systemHealth} />
+            <div className="flex items-center gap-1.5">
+              <span className={`w-2 h-2 rounded-full ${
+                wsStatus === "connected" ? "bg-green-500 animate-pulse" :
+                wsStatus === "connecting" ? "bg-yellow-500 animate-pulse" : "bg-red-500"
+              }`} />
+              <span className="text-xs text-gray-500">
+                {wsStatus === "connected" ? "Live" : wsStatus === "connecting" ? "Connecting" : "Offline"}
+              </span>
+            </div>
+          </div>
         </div>
       </header>
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left column */}
-        <div className="space-y-6">
-          <ObserverPanel observers={observers} />
-          <AttractorPanel attractor={attractor} />
-          <MemoryPanel memory={memory} />
+      <main className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+        {systemHealth !== "healthy" && (
+          <div className={`rounded-lg border p-4 flex items-center gap-3 ${
+            systemHealth === "critical"
+              ? "bg-red-900/10 border-red-900/30"
+              : "bg-yellow-900/10 border-yellow-900/30"
+          }`}>
+            {systemHealth === "critical" ? (
+              <XCircle className="w-5 h-5 text-red-400 shrink-0" />
+            ) : (
+              <AlertTriangle className="w-5 h-5 text-yellow-400 shrink-0" />
+            )}
+            <div>
+              <p className={`text-sm font-medium ${systemHealth === "critical" ? "text-red-400" : "text-yellow-400"}`}>
+                {systemHealth === "critical"
+                  ? "System health critical â€” immediate attention required"
+                  : "System health degraded â€” review active alerts"}
+              </p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {dashboard?.alerts.active.filter((a) => a.state === "firing").length} active alerts
+                {dashboard && ` Â· ${(dashboard.metrics.observers.avg_health * 100).toFixed(0)}% avg observer health`}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {dashboard && (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <QuickStat label="Event Rate" value={`${dashboard.metrics.events.rate_per_sec.toFixed(1)}/s`} icon={Activity} color="text-blue-400" />
+            <QuickStat label="Observers" value={String(dashboard.metrics.observers.count)} icon={Cpu} color="text-purple-400" trend={dashboard.metrics.observers.avg_health > 0.7 ? "stable" : "down"} />
+            <QuickStat label="Memory" value={formatBytes(dashboard.metrics.memory.total_size_bytes)} icon={Database} color="text-cyan-400" />
+            <QuickStat label="Entropy" value={`${dashboard.metrics.entropy.usage_pct.toFixed(1)}%`} icon={Zap} color={dashboard.metrics.entropy.usage_pct > 80 ? "text-red-400" : "text-amber-400"} trend={dashboard.metrics.entropy.usage_pct > 80 ? "up" : "stable"} />
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <MetricsPanel />
+            <TraceView />
+          </div>
+          <div className="space-y-6">
+            <AlertPanel />
+            <SystemMap />
+          </div>
         </div>
 
-        {/* Right column — Chat */}
-        <div className="lg:col-span-2">
-          <ChatPanel />
-        </div>
-      </div>
+        <footer className="border-t border-[#27272a] pt-4 pb-6">
+          <div className="flex items-center justify-between text-xs text-gray-600">
+            <div className="flex items-center gap-4">
+              <span>OCE v2.0.0</span>
+              <span>Â·</span>
+              <span>Powered by SRRA-OPH</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Radio className="w-3 h-3" />
+              <span>Observability Phase 5</span>
+            </div>
+          </div>
+        </footer>
+      </main>
     </div>
   );
+
 }

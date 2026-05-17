@@ -1,5 +1,6 @@
 # OWL Skills & Tools Master Index
 
+> **Last Cleaned**: 2026-05-16 — Archived 61 dead agency skills, merged 5 duplicates
 > **Generated**: 2026-05-16 21:25 EDT
 > **Total Items**: 277 inventoried | 163 skills | 46 tools | 39 SRRA-OPH modules | 9 OCE modules
 > **Mission**: Every skill and tool OWL needs to build without limits

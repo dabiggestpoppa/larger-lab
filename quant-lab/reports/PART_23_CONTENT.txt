@@ -1,0 +1,472 @@
+PART 8 DAILY ASIAN RANGE FLOAT MECHANISM Shallow Partial
+Rebalancing | Run & Retest | Extension Stall States | Constraint Boundary
+Placement EUR/USD M5 | Jan 2022 – Jan 2026 | 648 Qualifying Days
+Pattern: London open breaks Asian constraint band, shallow partial rebalancing holds, constraint deficit resolved.
+PATTERN TESTED After the daily Asian session closes (3 AM EST / 08:00 UTC), London open breaks out. This
+test measures: (1) how often the partial rebalancing [6] is shallow (38% or less of Asian range) and price never
+re-enters the constraint band — the daily run-and-retest; (2) which Fibonacci state the partial rebalancing stalls
+at — directly applicable to constraint boundary [8] placement on larger ideas; and (3) where the continuation run
+ultimately reaches — the daily extension stall state [7].
+Metric
+Value
+Notes
+Qualifying days (Tier 1-3)
+648
+Daily Asian range 3-45 pips
+Direction split
+330 Bull / 318 Bear
+Balanced sample
+Never re-entered Asian band
+122 (18.8%)
+Broad float — band held as constraint boundary
+all day
+Shallow float (<=38%, no reentry)
+19 (2.9%)
+Pure run-and-retest days
+Dominant partial rebalancing
+FULL >100% (64.4%)
+Market usually fully reverses through range
+Float day median partial rebalancing
+14.4 pips
+vs 33.5p on non-float days
+Float day median buffer from band
+8.4 pips
+Typical distance maintained outside constraint
+band
+Shallow float continuation
+56.4p mean / 52.5p median
+After run-and-retest, constraint deficit resolves far
+TEST 1: FLOAT FREQUENCY — HOW OFTEN IS PARTIAL REBALANCING
+SHALLOW?
+Partial Rebalancing Class
+Count
+% of Days
+Never Re-entered Band
+Float Rate
+MICRO (< 25% of Asian range)
+10
+1.5%
+6 (60.0%)
+0.9%
+SHALLOW (25-38% of Asian range)
+19
+2.9%
+13 (68.4%)
+2.0%
+MEDIUM (38-50%)
+36
+5.6%
+19 (52.8%)
+2.9%
+MEDIUM+ (50-62%)
+24
+3.7%
+10 (41.7%)
+1.5%
+DEEP (62-100%)
+142
+21.9%
+43 (30.3%)
+6.6%
+FULL (>100% — full rebalancing)
+417
+64.4%
+31 (7.4%)
+4.8%
+
+
+=== PAGE 44 ===
+KEY FINDING — PARTIAL REBALANCING DISTRIBUTION:
+  64.4% of days = FULL reversal (>100% of Asian range rebalanced).
+  The dominant daily behavior is a full constraint re-resolution, not a float.
+  Only 4.4% of days have a truly shallow partial rebalancing (<=38% of Asian range).
+  Of those, 68% never re-enter the constraint band — confirming the run-and-retest.
+  18.8% of ALL days see price NEVER re-enter the Asian constraint band (any depth).
+  This is the broader float population — the band held as intraday constraint boundary all day.
+  TIER CONSISTENCY: ~18.5-20.3% float rate across all tiers — remarkably uniform.
+  1 in 5 days holds outside the constraint band all day regardless of range size.
+TEST 2: PARTIAL REBALANCING DEPTH — SL PLACEMENT DATA
+Metric
+Float Days (no reentry)
+Non-Float Days
+Difference
+n Days
+122
+526
+—
+Partial Rebalancing — Mean
+18.1 pips
+38.9 pips
+20.8p shallower
+Partial Rebalancing — Median
+14.4 pips
+33.5 pips
+19.1p shallower
+Rebalancing — 90th pctile
+36.8 pips
+—
+Constraint Boundary
+upper bound
+Rebalancing — Maximum
+65.7 pips
+—
+Absolute worst case
+Buffer above band — Mean
+11.8 pips
+—
+How far outside band
+rebalancing stayed
+Buffer above band — Median
+8.4 pips
+—
+Typical constraint buffer
+0-3p (barely held)
+18.0% 22 days
+3-5p (tight buffer)
+14.8% 18 days
+5-8p (normal)
+14.8% 18 days
+8-12p (comfortable)
+23.8% 29 days
+12-20p (wide buffer)
+12.3% 15 days
+20p+ (strong extension)
+13.1% 16 days
+
+
+=== PAGE 45 ===
+CONSTRAINT BOUNDARY PLACEMENT — FLOAT DAY DATA:
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  Median partial rebalancing from extension peak on float days = 14.4 pips
+  90th percentile partial rebalancing                          = 36.8 pips ← BOUNDARY UPPER BOUND
+  Maximum ever on a float day                                  = 65.7 pips
+  Median buffer maintained above Asian constraint band = 8.4 pips
+  18% of float days come within 3 pips of band before continuing
+  DERIVED CONSTRAINT BOUNDARY RULE:
+  → For 90% confidence on float days: boundary must absorb up to 36.8p from peak
+  → In practice: Boundary AT or slightly inside the Asian High/Low covers this
+  → Price that M5-CLOSES back inside the constraint band has 81.2% chance of NOT floating
+  → Exit on M5 close back inside band — do not wait
+TEST 3: PARTIAL REBALANCING FIB STALL — WHERE DOES THE PULLBACK
+STOP?
+Fibonacci partial rebalancing levels measured from the INITIAL EXTENSION LEG (Asian High/Low to the first extension peak after
+London open breakout). These are the Partial Rebalancing Range states [10] where the pullback terminates.
+Fib State (% of Initial Leg)
+All Days
+Tight Hits (<=3p)
+Avg Dist (tight)
+Notes
+23.6% partial rebalancing
+9 (1.4%)
+8 (1.2%)
+1.8p
+Very shallow — rare
+38.2% partial rebalancing
+17 (2.6%)
+15 (2.3%)
+0.8p
+RUN-AND-RETEST CLASSIC —
+tightest
+50.0% partial rebalancing
+14 (2.2%)
+13 (2.0%)
+0.8p
+Half-rebalancing, very precise
+61.8% partial rebalancing
+27 (4.2%)
+26 (4.0%)
+0.9p
+Golden ratio — reliable hold
+78.6% partial rebalancing
+36 (5.6%)
+35 (5.4%)
+1.0p
+Deep — approaching constraint
+band
+100% partial rebalancing
+41 (6.3%)
+38 (5.9%)
+1.0p
+Back to breakout point (Asian
+band)
+127%+ (full re-resolution)
+504 (77.8%)
+47 (7.3%)
+1.3p
+Full reversal — dominant pattern
+KEY FINDING — PARTIAL REBALANCING FIB STALL STATES:
+  38.2%: avg 0.8p ← TIGHTEST SHALLOW STALL — run-and-retest classic
+  50.0%: avg 0.8p ← equally precise half-rebalancing
+  61.8%: avg 0.9p ← golden ratio, most reliable hold outside constraint band
+  78.6%: avg 1.0p ← last line before band
+  100%:  avg 1.0p ← band retest state
+  SHALLOW FLOAT DAYS specifically stall at:
+    38.2%: 31.6%  |  61.8%: 21.1%  |  23.6%: 21.1%  |  78.6%: 15.8%  |  50%: 10.5%
+    → 38.2% is the most common stall on pure run-and-retest days
+    → 38.2% + 50.0% combined = 52.7% of shallow float days stall at these two states
+
+
+=== PAGE 46 ===
+TEST 4: EXTENSION FIB STALL STATES — WHERE DOES THE CONTINUATION
+RUN TO?
+Extension State
+All Days
+Tight Hits (<=3p)
+Tight %
+Avg Dist
+Reliability
+50% (0.5x Asian above High)
+193 (29.8%)
+96 (14.8%)
+49.7%
+1.5p
+Highest frequency
+100% (1.0x above)
+114 (17.6%)
+63 (9.7%)
+55.3%
+1.5p
+Very high
+127% (1.27x above)
+57 (8.8%)
+52 (8.0%)
+91.2%
+1.2p
+Near-perfect tight rate
+138% (1.38x above)
+27 (4.2%)
+27 (4.2%)
+100%
+0.7p
+100% tight — very precise
+150% (1.5x above)
+17 (2.6%)
+17 (2.6%)
+100%
+0.8p
+100% tight rate
+162% (1.618x above)
+23 (3.5%)
+23 (3.5%)
+100%
+0.5p
+TIGHTEST OF ALL
+168% Stall Zone [10]
+34 (5.2%)
+34 (5.2%)
+100%
+1.0p
+100% tight — confirms model
+200% Deep State [10]
+58 (9.0%)
+37 (5.7%)
+63.8%
+1.5p
+High frequency
+261% Extension
+46 (7.1%)
+27 (4.2%)
+58.7%
+1.5p
+Moderate
+300% Extension
+29 (4.5%)
+21 (3.2%)
+72.4%
+1.8p
+Moderate
+KEY FINDING — EXTENSION FIB STALL STATE PRECISION RANKING:
+  162%: avg 0.5p ← TIGHTEST — every time it stalls here, within 0.5p precision
+  138%: avg 0.7p ← 100% tight hit rate
+  150%: avg 0.8p ← 100% tight hit rate
+  168% Stall Zone [10]: avg 1.0p ← 100% tight rate — CONFIRMS CEREBUS intraday model
+  127%: avg 1.2p ← 91.2% tight hit rate
+  FREQUENCY RANKING (most common daily stall states):
+    50%  extension: 14.8% of all days stall here within 3p (highest daily frequency)
+    100% extension: 9.7% | 127%: 8.0% | 168%: 5.2% (100% tight rate)
+  63.7% of all days stall within 3 pips of a fib extension state — very high precision.
+TEST 5: CONTINUATION PROFIT — HOW FAR AFTER SHALLOW FLOAT?
+Partial Rebalancing Class (float days
+only)
+n
+Initial Ext Mean
+Cont Ext Mean
+Full Day Ext
+MICRO (<25% rebalancing)
+6
+—
+50.6p
+57.9p
+SHALLOW (25-38%)
+13
+22.2p
+59.1p
+59.1p
+MEDIUM (38-50%)
+19
+—
+51.4p
+56.5p
+DEEP (62-100%)
+43
+—
+—
+40.1p
+FULL (>100% — reversal)
+31
+—
+3.2p
+26.1p
+30-45 pips
+31.6% 6 days
+
+
+=== PAGE 47 ===
+45-60 pips
+26.3% 5 days
+60-80 pips
+31.6% 6 days
+80+ pips
+10.5% 2 days
+KEY FINDING — CONTINUATION AFTER SHALLOW FLOAT (RUN-AND-RETEST):
+  100% of shallow float days extend at least 30 pips from the Asian constraint band.
+  Mean: 56.4p | Median: 52.5p
+  RETRACE DEPTH IS INVERSELY CORRELATED WITH CONTINUATION:
+    Shallow (<38%):   59.1p mean → run-and-retest = strong directional constraint resolution
+    Medium  (38-50%): 56.5p mean → still good
+    Deep    (62-100%):40.1p mean → weakening resolution momentum
+    Full reversal:     3.2p mean → constraint resolution exhausted — no continuation
+TEST 6: CONSTRAINT BOUNDARY PLACEMENT FRAMEWORK
+CONSTRAINT BOUNDARY PLACEMENT TIERS — DAILY FLOAT / RUN-AND-RETEST TRADES
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+TIER A — TIGHT BOUNDARY (Shallow float confirmed, 23.6-38.2% partial rebalancing stall):
+  Condition: Partial rebalancing stalls at 38.2% or 23.6% of initial extension leg
+  Boundary placement: AT Asian High (bull) or Asian Low (bear) — 0-2p buffer
+  Logic: 38.2% stall holds outside band with avg 0.8p precision.
+         Any M5 candle CLOSE back inside band = 81% chance of full reversal → exit.
+  Typical boundary distance from activation: initial_ext + 2p (usually 8-18p)
+TIER B — STANDARD BOUNDARY (Moderate stall, 50-61.8% of initial leg):
+  Condition: Partial rebalancing to 50% or 61.8% of leg, still above constraint band
+  Boundary placement: 5-8p below Asian High (bull) / above Asian Low (bear)
+  Logic: Median buffer on float days = 8.4p. Covers 82% of float days.
+  Breakeven trigger: move to breakeven when continuation reaches 20p from band
+TIER C — WIDE BOUNDARY (Deep stall, 78.6% of leg, approaching constraint band):
+  Condition: Partial rebalancing reaches 78.6% of initial extension leg
+  Boundary placement: AT Asian High/Low exactly (0p buffer — exit on M5 close inside)
+  Logic: 78.6% stall holds with 1.0p avg. Close inside band = invalidation.
+INVALIDATION RULE (all tiers):
+  M5 CANDLE CLOSE back INSIDE the Asian constraint band = EXIT immediately.
+  81.2% of band re-entries continue through the full constraint range.
+  This is the structural invalidation signal, not a wick touch.
+Partial Rebalancing Stalls At
+Typical Distance from Band
+Boundary Placement
+Confidence
+23.6% of initial leg
+15-20p above band
+AT Asian band level
+Maximum
+38.2% of initial leg
+8-12p above band
+AT Asian band level
+High — run-and-retest
+
+
+=== PAGE 48 ===
+50.0% of initial leg
+5-8p above band
+2-3p below Asian band
+High — half rebalancing
+61.8% of initial leg
+3-5p above band
+3-4p below Asian band
+Good — golden ratio
+78.6% of initial leg
+0-3p above band
+AT Asian band exactly
+Moderate — final line
+100% of leg (band retest)
+AT band
+2p below band / exit on close
+Low
+127%+ (re-entered band)
+Inside band
+EXIT — float state invalidated
+NONE — out
+MASTER SUMMARY — DAILY FLOAT OPERATIONAL FRAMEWORK
+
+
+=== PAGE 49 ===
+DAILY ASIAN FLOAT — COMPLETE OPERATIONAL FRAMEWORK
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+STEP 1: ASIAN SESSION CONSTRAINT BAND (00:00-08:00 UTC / 7PM-3AM EST)
+  Mark: Asian High and Asian Low (constraint deficit boundaries [11])
+  Classify: T1 (<20p) | T2 (20-30p) | T3 (30-45p) | T4: skip
+  Pre-mark extension states: 162%, 168%, 200% above High (or below Low)
+STEP 2: LONDON OPEN CONSTRAINT VIOLATION (08:00-09:00 UTC / 3-4 AM EST)
+  Determine direction of constraint resolution [3] — which side breaks first?
+  Measure initial extension from constraint band to first peak (LEG 1)
+  This is the anchor for partial rebalancing fib calculations
+STEP 3: PARTIAL REBALANCING PHASE — FLOAT QUALIFICATION (08:30-10:30 UTC)
+  Monitor pullback from initial extension peak:
+  < 38.2% of Leg 1 AND above constraint band = SHALLOW FLOAT (highest quality)
+    → Most common stall at 38.2% fib state (avg 0.8p precision)
+    → Continuation target: 56-59p mean from Asian constraint band
+  38.2-61.8% AND above band = STANDARD FLOAT (good quality)
+    → Common stall at 61.8% fib state (0.9p avg)
+    → Continuation target: 45-55p from band
+  78.6% of Leg 1, barely above band = DEEP FLOAT (marginal)
+    → Last-chance boundary level, low conviction
+  M5 candle CLOSES inside constraint band = EXIT — float invalidated (81% rule)
+STEP 4: CONSTRAINT BOUNDARY PLACEMENT
+  Shallow rebalancing (<=38%): Boundary AT Asian High/Low (0-2p buffer)
+  Standard rebalancing (50-62%): Boundary 5-8p beyond Asian band
+  Deep rebalancing (78.6%): Boundary AT Asian band, exit on M5 close inside
+  NEVER place boundary more than 8-10p beyond the constraint band on float setups
+STEP 5: EXTENSION STATE TARGETS (continuation run)
+  TP1: 162% of Asian range (avg 0.5p stall — tightest precision state of all)
+  TP2: 168% Stall Zone [10] (avg 1.0p, 100% tight rate — confirms CEREBUS model)
+  TP3: 200% Deep State [10] (avg 1.5p, 63.8% tight rate)
+  TP4: 261% (avg 1.5p — used on shallow float days 21% of time)
+  Full run (shallow float): expect 45-70p from Asian constraint band
+KEY STATS SUMMARY:
+  Broad float (never re-enters):           18.8% of all days
+  Shallow float (<=38%, no reentry):        2.9% — high-quality but low-frequency
+  Float day median partial rebalancing:    14.4p from initial peak
+  Float day 90th pctile rebalancing:       36.8p ← constraint boundary upper bound
+  Float day median buffer from band:        8.4p
+  Shallow float continuation:              56.4p mean / 52.5p median
+  162% stall precision: 0.5p avg ← tightest daily level
+  168% stall: 1.0p avg, 100% tight hit rate — confirms intraday stall zone [10]
+MULTI-TIMEFRAME CONNECTION: DAILY vs WEEKLY FLOAT
+
+
+=== PAGE 50 ===
+DAILY FLOAT vs MONDAY WEEKLY FLOAT — SAME MECHANISM, DIFFERENT TIMEFRAMES
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+DAILY FLOAT (Part 8):
+  Timeframe: Single trading day
+  Frequency: 18.8% of days never re-enter constraint band / 2.9% shallow float
+  Partial rebalancing: median 14.4p, stalls at 38.2-61.8% of initial extension leg
+  Target: 162%-200% extension states (45-70p continuation)
+  Boundary: Asian High/Low ± 2-8p depending on rebalancing depth
+WEEKLY MONDAY FLOAT (Part 7):
+  Timeframe: 24-48 hours (two Asian sessions)
+  Frequency: 29.5% true 24h float (Tier 1-2), 52.6% Tue Asian float
+  Partial rebalancing: counter-trend extreme forms median 26-27h from Mon Asian close
+  Target: 161-261% extension of Monday Asian range over the week
+  Boundary: Monday Asian High/Low as weekly structural constraint boundary
+MULTI-TIMEFRAME CONFIRMATION RULE:
+  If Monday float is confirmed (T1/T2, Tue Asian stays outside Mon range)
+  AND individual daily sessions show float behavior (rebalancing <38%, no re-entry):
+  → Both timeframes confirm same direction of constraint resolution [3]
+  → Daily boundary: daily Asian band level ± 2-8p
+  → Weekly boundary: Monday Asian band level (wider — structural)
+  → Daily targets: 162-168% for intraday
+  → Weekly targets: 200-261% for swing constraint deficit resolution
+CEREBUS FX v4.0 — Complete Operational Manual | April 2026 | PROPRIETARY & CONFIDENTIAL
+Data: EUR/USD M5 | Jan 2022 – Jan 2026 | 315,000+ candles | 201 Weeks Float Analysis | 648 Days Daily Float Analysis
+II For educational purposes only — test all strategies in simulation before live deployment.
+
+
+=== PAGE 51 ===
