@@ -200,6 +200,107 @@ export interface DashboardData {
   timestamp: string;
 }
 
+// ─── Execution Types ─────────────────────────────────────────────────────────
+
+export interface ExecutionTask {
+  task_id: string;
+  task_type: string;
+  payload: Record<string, unknown>;
+  status: string;
+  priority: number;
+  source: string;
+  tags: string[];
+  result: Record<string, unknown> | null;
+  error: string | null;
+  attempts: number;
+  max_retries: number;
+  timeout_sec: number;
+  created_at: string;
+  started_at: string | null;
+  completed_at: string | null;
+  parent_task_id: string | null;
+  policy_id: string;
+}
+
+export interface ExecutionWorker {
+  worker_id: string;
+  status: string;
+  current_task_id: string | null;
+  tasks_processed: number;
+  tasks_failed: number;
+  is_busy: boolean;
+}
+
+export interface ExecutionStats {
+  total_submitted: number;
+  total_completed: number;
+  total_failed: number;
+  total_cancelled: number;
+  active_count: number;
+  queue_size: number;
+  workers: ExecutionWorker[];
+}
+
+export interface ExecutionHistoryRecord {
+  task_id: string;
+  task_type: string;
+  status: string;
+  source: string;
+  created_at: string;
+  completed_at: string | null;
+  latency_ms: number;
+  attempts: number;
+  error: string | null;
+}
+
+export interface ExecutionAnalytics {
+  timestamp: string;
+  summary: Record<string, unknown>;
+  by_type: Record<string, {
+    total: number;
+    completed: number;
+    failed: number;
+    success_rate: number;
+    avg_latency_ms: number;
+  }>;
+  engine_stats: ExecutionStats;
+}
+
+export interface Bottleneck {
+  type: string;
+  severity: string;
+  message: string;
+  recommendation: string;
+}
+
+export interface ExecutionBottlenecks {
+  timestamp: string;
+  bottleneck_count: number;
+  bottlenecks: Bottleneck[];
+  healthy: boolean;
+}
+
+export interface ExecutionTuneResult {
+  timestamp: string;
+  previous_workers: number;
+  recommended_workers: number;
+  tuned: boolean;
+  engine_restarted: boolean;
+}
+
+export interface ExecutionPolicy {
+  policy_id: string;
+  name: string;
+  max_concurrent: number;
+  rate_limit_per_minute: number;
+  allowed_types: string[];
+  blocked_types: string[];
+  max_timeout_sec: number;
+  require_trace: boolean;
+  sandboxed: boolean;
+  description: string;
+}
+
 // ─── API Functions ───────────────────────────────────────────────────────────
 
 export const api = {
@@ -277,4 +378,55 @@ export const api = {
   // ─── Observability: Dashboard ──────────────────────────────────────────
 
   getDashboard: () => fetchJSON<DashboardData>("/dashboard"),
+
+  // ─── Execution: Task Management ───────────────────────────────────────
+
+  getExecutionTasks: (params?: { status?: string; task_type?: string; limit?: number; offset?: number }) => {
+    const q = new URLSearchParams();
+    if (params?.status) q.set("status", params.status);
+    if (params?.task_type) q.set("task_type", params.task_type);
+    if (params?.limit) q.set("limit", String(params.limit));
+    if (params?.offset) q.set("offset", String(params.offset));
+    return fetchJSON<ExecutionTask[]>(`/execution/tasks?${q}`);
+  },
+  getExecutionTask: (taskId: string) => fetchJSON<ExecutionTask>(`/execution/tasks/${taskId}`),
+  submitExecutionTask: (data: { task_type: string; payload?: Record<string, unknown>; priority?: number; max_retries?: number; timeout_sec?: number; source?: string; tags?: string[]; policy_id?: string }) =>
+    fetchJSON<{ task_id: string; status: string }>("/execution/tasks", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  cancelExecutionTask: (taskId: string) =>
+    fetchJSON<{ ok: boolean; task_id: string; status: string }>(`/execution/tasks/${taskId}/cancel`, { method: "POST" }),
+  replayExecutionTask: (taskId: string) =>
+    fetchJSON<{ task_id: string; parent_task_id: string; status: string }>(`/execution/tasks/${taskId}/replay`, { method: "POST" }),
+
+  // ─── Execution: Workers & Stats ───────────────────────────────────────
+
+  getExecutionStats: () => fetchJSON<ExecutionStats>("/execution/stats"),
+  getExecutionWorkers: () => fetchJSON<ExecutionWorker[]>("/execution/workers"),
+
+  // ─── Execution: History ───────────────────────────────────────────────
+
+  getExecutionHistory: (params?: { status?: string; task_type?: string; limit?: number }) => {
+    const q = new URLSearchParams();
+    if (params?.status) q.set("status", params.status);
+    if (params?.task_type) q.set("task_type", params.task_type);
+    if (params?.limit) q.set("limit", String(params.limit));
+    return fetchJSON<ExecutionHistoryRecord[]>(`/execution/history?${q}`);
+  },
+
+  // ─── Execution: Analytics ─────────────────────────────────────────────
+
+  getExecutionAnalytics: () => fetchJSON<ExecutionAnalytics>("/execution/analytics"),
+  getExecutionBottlenecks: () => fetchJSON<ExecutionBottlenecks>("/execution/bottlenecks"),
+  tuneExecution: () => fetchJSON<ExecutionTuneResult>("/execution/tune", { method: "POST" }),
+
+  // ─── Execution: Policies ──────────────────────────────────────────────
+
+  getExecutionPolicies: () => fetchJSON<ExecutionPolicy[]>("/execution/policies"),
+  createExecutionPolicy: (data: Partial<ExecutionPolicy>) =>
+    fetchJSON<{ policy_id: string; name: string; status: string }>("/execution/policies", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
 };

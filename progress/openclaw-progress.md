@@ -71,3 +71,8 @@ P90 Pine → Nautilus Conversion + Backtest Engine
 - [ ] FMP Protocol: Add CØD logging to MEMORY.md
 - [ ] SCOPE Protocol: Create scope_chain.py
 - [ ] GSP-Lite: Define GlyphMessage schema
+
+#### 🟣 [OC] 2026-05-17 — OCE Phase 6 Documentation (OCE-6.5, OCE-6.6, OCE-6.7)
+- **OCE-6.5**: Created `oce/docs/execution-policies.md` — 5 policy types (rate limiting, permissions, sandboxing, timeouts, retry), enforcement architecture, SRRA-OPH alignment
+- **OCE-6.6**: Created `oce/docs/skill-tool-registry.md` — skill/tool registration schemas, capability declarations, invocation protocol, built-in skills/tools
+- **OCE-6.7**: Completed architecture review — Verified alignment with SRRA-OPH ExecutionPatch, Capability Fields, MemoryPatch, RepairPatch, Trajectory Fields

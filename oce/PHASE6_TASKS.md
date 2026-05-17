@@ -72,20 +72,20 @@ The following already exist (built in previous session):
 
 #### Tasks
 
-- [ ] **OCE-6.5** Design execution policy framework
+- [x] **OCE-6.5** Design execution policy framework
   - Define policy types: rate limiting, permission levels, sandboxing rules, timeout defaults
   - Define policy enforcement points (pre-execution, during execution, post-execution)
-  - File: `oce/docs/execution-policies.md`
+  - File: `oce/docs/execution-policies.md` ✅
 
-- [ ] **OCE-6.6** Design skill/tool registry specification
+- [x] **OCE-6.6** Design skill/tool registry specification
   - How skills are registered, discovered, and invoked
   - Tool capability declarations and permission requirements
-  - File: `oce/docs/skill-tool-registry.md`
+  - File: `oce/docs/skill-tool-registry.md` ✅
 
-- [ ] **OCE-6.7** Review execution engine architecture
+- [x] **OCE-6.7** Review execution engine architecture
   - Review RL's execution engine design
   - Verify alignment with SRRA-OPH execution patterns (ExecutionPatch, capability fields)
-  - Post review to team-chat
+  - Post review to team-chat ✅
 
 ---
 
@@ -95,23 +95,23 @@ The following already exist (built in previous session):
 
 #### Tasks
 
-- [ ] **OCE-6.8** Implement execution monitor component
+- [x] **OCE-6.8** Implement execution monitor component
   - `oce/frontend/app/components/ExecutionMonitor.tsx`
   - Real-time task queue visualization (pending, running, completed, failed)
   - Worker pool status with utilization bars
-  - Auto-refreshing via WebSocket or polling
+  - Auto-refreshing via polling
 
-- [ ] **OCE-6.9** Implement task detail component
+- [x] **OCE-6.9** Implement task detail component
   - `oce/frontend/app/components/TaskDetail.tsx`
   - Full task info: payload, execution history, retry count, trace
   - Cancel/replay controls
 
-- [ ] **OCE-6.10** Implement execution analytics component
+- [x] **OCE-6.10** Implement execution analytics component
   - `oce/frontend/app/components/ExecutionAnalytics.tsx`
   - Throughput charts, success rate trends, bottleneck indicators
   - Auto-tune controls
 
-- [ ] **OCE-6.11** Create execution dashboard page
+- [x] **OCE-6.11** Create execution dashboard page
   - `oce/frontend/app/execution/page.tsx`
   - Combine ExecutionMonitor, TaskDetail, ExecutionAnalytics
   - Add to main navigation
@@ -145,13 +145,13 @@ The following already exist (built in previous session):
 
 #### Tasks
 
-- [ ] **OCE-6.15** Integrate Operator with Execution Engine
+- [x] **OCE-6.15** Integrate Operator with Execution Engine
   - Operator can submit tasks, monitor execution, cancel/replay
   - File: `tools/operator/execution-integration.py`
 
-- [ ] **OCE-6.16** Build execution debugging utilities
+- [x] **OCE-6.16** Build execution debugging utilities
   - `tools/operator/execution-debug.py` — CLI for inspecting execution state
-  - Commands: `queue`, `workers`, `task <id>`, `replay <id>`, `cancel <id>`, `history`
+  - Commands: `queue`, `workers`, `task <id>`, `replay <id>`, `cancel <id>`, `history`, `health`, `all`
 
 ---
 

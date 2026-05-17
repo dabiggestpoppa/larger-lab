@@ -204,3 +204,7 @@ graph TB
 ```
 
 <!-- ARCH-COMMIT [2026-05-16 21:19 UTC] AS: oce/backend/event_fabric.py -- Fixed Event model auto-classification bug -->
+
+<!-- ARCH-COMMIT [2026-05-17 10:34 UTC] OC: oce/docs/execution-policies.md -- Created execution policies framework with 5 policy types (rate limiting, permissions, sandboxing, timeouts, retry), enforcement architecture, and SRRA-OPH alignment -->
+
+<!-- ARCH-COMMIT [2026-05-17 10:34 UTC] OC: oce/docs/skill-tool-registry.md -- Created skill/tool registry specification with registration schemas, capability declarations, invocation protocol, and built-in skills/tools catalog -->

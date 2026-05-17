@@ -74,7 +74,7 @@ See `OPERATOR_RULES.md` for complete rules. Key constraints:
 | OCE Phase 3 (Observer Runtime) | ✅ Complete | CC |
 | OCE Phase 4 (Structural Memory) | ✅ Complete | RL |
 | OCE Phase 5 (Observability) | ✅ Complete | RL |
-| OCE Phase 6 (Execution Substrate) | 🔄 In Progress | RL |
+| OCE Phase 6 (Execution Substrate) | 🔄 In Progress | RL/OC2 |
 
 **OCE Project:** `oce/` directory
 

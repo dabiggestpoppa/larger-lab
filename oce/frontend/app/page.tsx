@@ -145,6 +145,10 @@ export default function Home() {
             <NavItem icon={GitBranch} label="Traces" />
             <NavItem icon={Bell} label="Alerts" badge={dashboard?.alerts.stats.active_firing} />
             <NavItem icon={Network} label="Topology" />
+            <a href="/execution" className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors text-gray-400 hover:text-gray-200 hover:bg-[#1a1a24]">
+              <Zap className="w-4 h-4" />
+              <span>Execution</span>
+            </a>
             <a href="/command-center" className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors text-gray-400 hover:text-gray-200 hover:bg-[#1a1a24]">
               <MessageSquare className="w-4 h-4" />
               <span>Command Center</span>

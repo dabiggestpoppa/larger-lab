@@ -6,7 +6,7 @@
 
 ---
 
-## Current Context (2026-05-17 06:49:57 UTC)
+## Current Context (2026-05-17 10:36:11 UTC)
 
 ### Status
 🟢 Active
@@ -24,22 +24,6 @@ P90 Pine → Nautilus Conversion + Backtest Engine
 - GSP-Lite: Define GlyphMessage schema
 
 ### Recent Activity
-#### 🟣 [OC] 2026-05-15 18:27:00Z — P90 Unified Engine Bug Fix + Results
-- **Bug found**: `est_h == 3` classification was DEAD CODE inside Asian session block
-  - Asian block: `if est_h >= 19 or est_h < 3` — est_h==3 never enters this block
-  - `ar_pips` was never set → all entry signals skipped
-  - Fixed by moving classification OUTSIDE the Asian block
-- **Fixed all 3 strategies**: cascade_combo, cascade_only, base
-- **Results on EUR/USD (50k bars)**:
-  - P90_Cascade_Combo: 34.2% WR, -7.71p P&L, 263 trades
-  - P90_Cascade: 33.9% WR, -40.51p P&L, 257 trades
-  - P90_Base: 35.6% WR, -138.47p P&L, 486 trades
-- **Root cause of losses**: Only 11 trades hit TP2 (-50% AR), 143+ hit SL
-  - Mean reversion target too far for most trades
-  - Need parameter tuning or TP logic adjustment
-- **Files**: `nautilus/strategies/p90_unified.py` (unified engine)
-- **Results saved**: `nautilus/results/p90_unified_20260515_182727.json`
-
 #### 🟣 [OC] 2026-05-15 20:44:00Z — Initial Setup
 - OpenClaw gateway running on ws://127.0.0.1:18789
 - Model routing configured with fallbacks
@@ -56,10 +40,15 @@ P90 Pine → Nautilus Conversion + Backtest Engine
 - Bot running as background process on blrrr host
 - **Note**: Separate Hermes/OpenClaw bot tokens still needed for independent bot instances
 
+#### 🟣 [OC] 2026-05-17 — OCE Phase 6 Documentation (OCE-6.5, OCE-6.6, OCE-6.7)
+- **OCE-6.5**: Created `oce/docs/execution-policies.md` — 5 policy types (rate limiting, permissions, sandboxing, timeouts, retry), enforcement architecture, SRRA-OPH alignment
+- **OCE-6.6**: Created `oce/docs/skill-tool-registry.md` — skill/tool registration schemas, capability declarations, invocation protocol, built-in skills/tools
+- **OCE-6.7**: Completed architecture review — Verified alignment with SRRA-OPH ExecutionPatch, Capability Fields, MemoryPatch, RepairPatch, Trajectory Fields
+
 ---
 
 ## Sync Metadata
-- **Last Sync:** 2026-05-17 06:49:57 UTC
+- **Last Sync:** 2026-05-17 10:36:11 UTC
 - **Progress File:** `progress/openclaw-progress.md`
 - **Working Memory:** `progress/openclaw-memory.md`
 - **Sync Threshold:** 7 updates
