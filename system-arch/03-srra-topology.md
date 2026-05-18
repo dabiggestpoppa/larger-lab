@@ -194,34 +194,133 @@ flowchart LR
     RP -->|Repair| IDENTITY
 ```
 
-## Phase 6-9: Advanced Features
+## Phase 6: Recursive Topology Introspection
 
 ```mermaid
-graph TD
-    subgraph "Phase 6: Recursive Topology"
-        RT[Topology Observer]
-        RTR[Recursive Router]
+flowchart LR
+    subgraph "Topology Observer"
+        TO[Topology Observer]
+        TI[Topology Inspector]
     end
 
-    subgraph "Phase 7: Overlap Cognition"
-        OC[Overlap Cognition]
-        PC[Prediction Contracts]
+    subgraph "Self-Reflection"
+        SR[Self-Reflection Loop]
+        MP[Meta-Consensus]
     end
 
-    subgraph "Phase 8: Sovereign Coevolution"
-        SC[Operator Patterns]
-        SP[Strategic Preferences]
+    TO --> TI
+    TI --> SR
+    SR --> MP
+```
+
+## Phase 7: Multi-Scale Cognitive Fields
+
+```mermaid
+graph TB
+    subgraph "Local Scale"
+        LF[LocalObserverField]
+        LFR[LocalFieldRegistry]
     end
 
-    subgraph "Phase 9: Entropy Economics"
-        EB[Entropy Budget]
-        SG[Sustainability Governance]
+    subgraph "Regional Scale"
+        RC[RegionalCluster]
+        CR[ClusterRegistry]
     end
 
-    RT --> OC
-    OC --> SC
-    SC --> EB
-    RTR --> PC
-    PC --> SP
-    SP --> SG
+    subgraph "Global Scale"
+        GA[GlobalAttractor]
+        GAL[GlobalAttractorLayer]
+    end
+
+    subgraph "Sync Layer"
+        SM[SyncManager]
+        SF[SyncFrequency]
+    end
+
+    subgraph "Repair Layer"
+        NR[NestedRepairSystem]
+        RR[RepairRequest]
+    end
+
+    subgraph "Routing Layer"
+        SAR[ScaleAdaptiveRouter]
+        SL[ScaleLevel]
+    end
+
+    subgraph "Containment Layer"
+        ECS[EntropyContainmentSystem]
+        CB[ContainmentBoundary]
+    end
+
+    LF --> LFR
+    RC --> CR
+    GA --> GAL
+    SM --> SF
+    NR --> RR
+    SAR --> SL
+    ECS --> CB
+
+    LF --> SM
+    RC --> SM
+    GA --> SM
+    SM --> NR
+    NR --> SAR
+    SAR --> ECS
+```
+
+## Phase 8: Operator Coevolution
+
+```mermaid
+graph TB
+    subgraph "Operator Modeling"
+        OM[OperatorModel]
+        CM[ConstraintModel]
+    end
+
+    subgraph "Alignment Layer"
+        CR[CoherenceReinforcement]
+        BA[BidirectionalAdaptation]
+    end
+
+    subgraph "Optimization Layer"
+        CLO[CognitiveLoadOptimizer]
+        AT[AlignmentTracker]
+    end
+
+    subgraph "Safety Layer"
+        AMS[AntiManipulationSafeguards]
+    end
+
+    OM --> CM
+    CM --> CR
+    CR --> BA
+    BA --> CLO
+    CLO --> AT
+    AT --> AMS
+```
+
+## Phase 9: Post-Deployment
+
+```mermaid
+graph TB
+    subgraph "Deployment"
+        DP[Deployment Pipeline]
+        MD[Monitoring Dashboard]
+    end
+
+    subgraph "Operations"
+        AS[Alert System]
+        BR[Backup & Recovery]
+    end
+
+    subgraph "Documentation"
+        DOC[Documentation]
+        PB[Performance Benchmarks]
+    end
+
+    DP --> MD
+    MD --> AS
+    AS --> BR
+    BR --> DOC
+    DOC --> PB
 ```

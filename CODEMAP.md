@@ -540,3 +540,123 @@ flowchart LR
 - ALL `subprocess.Popen()` for background processes MUST use `DETACHED_PROCESS | CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP`
 - Always implement PID file tracking for daemon scripts
 - Run `tools/terminal_cleanup.py --force` at session start
+
+---
+
+## 🔄 V3 Phase 7 — Multi-Scale Cognitive Fields (MSCF)
+
+```mermaid
+graph TB
+    subgraph "Local Scale"
+        LF[LocalObserverField<br/>local_fields.py]
+        LFR[LocalFieldRegistry]
+    end
+
+    subgraph "Regional Scale"
+        RC[RegionalCluster<br/>regional_clusters.py]
+        CR[ClusterRegistry]
+    end
+
+    subgraph "Global Scale"
+        GA[GlobalAttractor<br/>global_attractor.py]
+        GAL[GlobalAttractorLayer]
+    end
+
+    subgraph "Sync Layer"
+        SM[SyncManager<br/>hierarchical_sync.py]
+        SF[SyncFrequency]
+        SR[SyncRecord]
+    end
+
+    subgraph "Repair Layer"
+        NR[NestedRepairSystem<br/>nested_repair.py]
+        RR[RepairRequest]
+        RE[RepairEscalation]
+    end
+
+    subgraph "Routing Layer"
+        SAR[ScaleAdaptiveRouter<br/>scale_routing.py]
+        SL[ScaleLevel]
+        RM[RoutedMessage]
+    end
+
+    subgraph "Containment Layer"
+        ECS[EntropyContainmentSystem<br/>entropy_containment.py]
+        CB[ContainmentBoundary]
+    end
+
+    LF --> LFR
+    RC --> CR
+    GA --> GAL
+    SM --> SF
+    SM --> SR
+    NR --> RR
+    NR --> RE
+    SAR --> SL
+    SAR --> RM
+    ECS --> CB
+
+    LF --> SM
+    RC --> SM
+    GA --> SM
+    SM --> NR
+    NR --> SAR
+    SAR --> ECS
+```
+
+### V3 Phase 7 Modules
+
+| Module | File | Tests | Purpose |
+|--------|------|-------|---------|
+| LocalObserverField | `oce/backend/multiscale/local_fields.py` | 6 | Independent local cognition with bounded sync |
+| RegionalCluster | `oce/backend/multiscale/regional_clusters.py` | 4 | Self-organizing clusters by interaction density |
+| GlobalAttractor | `oce/backend/multiscale/global_attractor.py` | 4 | Low-frequency strategic stabilization |
+| SyncManager | `oce/backend/multiscale/hierarchical_sync.py` | 2 | Scale-appropriate sync frequency |
+| NestedRepairSystem | `oce/backend/multiscale/nested_repair.py` | 2 | Multi-scale repair escalation |
+| ScaleAdaptiveRouter | `oce/backend/multiscale/scale_routing.py` | 3 | Scale-adaptive information routing |
+| EntropyContainmentSystem | `oce/backend/multiscale/entropy_containment.py` | 3 | Localize instability, prevent cascade |
+
+---
+
+## 🔄 V3 Phase 8 — Operator Coevolution (Planned)
+
+```mermaid
+graph TB
+    subgraph "Operator Modeling"
+        OM[OperatorModel<br/>operator_model.py]
+        CM[ConstraintModel<br/>constraint_model.py]
+    end
+
+    subgraph "Alignment Layer"
+        CR[CoherenceReinforcement<br/>coherence_reinforcement.py]
+        BA[BidirectionalAdaptation<br/>bidirectional_adaptation.py]
+    end
+
+    subgraph "Optimization Layer"
+        CLO[CognitiveLoadOptimizer<br/>cognitive_load.py]
+        AT[AlignmentTracker<br/>alignment_tracking.py]
+    end
+
+    subgraph "Safety Layer"
+        AMS[AntiManipulationSafeguards<br/>anti_manipulation.py]
+    end
+
+    OM --> CM
+    CM --> CR
+    CR --> BA
+    BA --> CLO
+    CLO --> AT
+    AT --> AMS
+```
+
+### V3 Phase 8 Modules (Planned)
+
+| Module | File | Purpose |
+|--------|------|---------|
+| OperatorModel | `oce/backend/coevolution/operator_model.py` | Operator Pattern Extraction |
+| ConstraintModel | `oce/backend/coevolution/constraint_model.py` | Strategic Constraint Modeling |
+| CoherenceReinforcement | `oce/backend/coevolution/coherence_reinforcement.py` | Coherence Reinforcement |
+| BidirectionalAdaptation | `oce/backend/coevolution/bidirectional_adaptation.py` | Bidirectional Adaptation |
+| CognitiveLoadOptimizer | `oce/backend/coevolution/cognitive_load.py` | Cognitive Load Optimization |
+| AlignmentTracker | `oce/backend/coevolution/alignment_tracking.py` | Long-Horizon Alignment Tracking |
+| AntiManipulationSafeguards | `oce/backend/coevolution/anti_manipulation.py` | Anti-Manipulation Safeguards |
