@@ -4,7 +4,8 @@
     "name": "Meditation Room",
     "description": "IACER thinking space. New agents meditate here before joining the field.",
     "agents": [
-      "44801b35"
+      "44801b35",
+      "dashboard"
     ],
     "persistent": true,
     "createdAt": "2026-05-17T00:00:00.000Z"

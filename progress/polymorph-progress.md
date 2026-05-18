@@ -38,6 +38,12 @@
 - [ ] Debug coevolution modules (operator_model, constraint_model, coherence_reinforcement, bidirectional_adaptation, cognitive_load, alignment_tracking, anti_manipulation)
 - [ ] Operator integration for coevolution monitoring
 
+### V3 Phase 9 PM Tasks
+- [ ] Build tools/operator/field-debug.py CLI
+- [ ] Build tools/operator/resonance-debug.py CLI
+- [ ] Debug Phase 9 modules (resonance_engine, recursive_field_nodes, attractor_mapper, drift_governor, reconstruction_core, continuity_identity_engine)
+- [ ] field_core infrastructure setup
+
 ### Continuous Workflow
 - After every code edit: Update this file + polymorph-memory.md
 - After every 5 edits: Post summary to team-chat.md
