@@ -461,15 +461,33 @@ errors → errors-and-solutions.md → repo memory (every 7 entries)
 
 | Directory | Purpose |
 |-----------|---------|
-| `srrs_opc/` | SRRA-OPH core (33 Python files, 77 tests) |
+| `srrs_opc/` | SRRA-OPH core (33 Python files, 57 tests) |
 | `nautilus/` | NautilusTrader backtesting |
 | `oce/` | Operator Continuity Engine |
 | `oce/backend/resonance/` | V3 Phase 1 — Resonant Signal Substrate (139 tests) |
+| `oce/backend/reconstruction/` | V3 Phase 2 — Reconstructive Continuity Manifold (52 tests) |
+| `oce/backend/topology/` | V3 Phase 3 — Resonant Topology & BSP Emergence |
+| `oce/backend/sovereign/` | V3 Phase 4 — Sovereign Instrumentation & Embodiment |
+| `oce/backend/temporal/` | V3 Phase 5 — Long-Horizon Continuity & Temporal Compression |
+| `oce/backend/introspection/` | V3 Phase 6 — Recursive Topology Introspection |
+| `oce/backend/multiscale/` | V3 Phase 7 — Multi-Scale Cognitive Fields (70 tests) |
+| `oce/backend/coevolution/` | V3 Phase 8 — Operator Coevolution (76 tests) |
+| `oce/backend/field_core/` | V3 Phase 9 — Sovereign Field Emergence (169 tests) |
+| `oce/backend/phase10/` | V3 Phase 10 — Recursive Field Computation (23 tests) |
+| `oce/backend/recursive_compute/` | Recursive compute graph utilities |
+| `oce/backend/production/` | Production deployment tools |
+| `oce/backend/cognition/` | Cognitive processing engines |
+| `oce/backend/tests/` | System-level tests (11 capability tests) |
 | `progress/` | Agent sub-progress files |
-| `system-arch/` | All Mermaid diagrams |
+| `system-arch/` | Architecture documentation + Mermaid diagrams |
 | `all-mermaids/` | Diagram archive by phase |
 | `tools/` | Automation & utilities |
 | `memory-bank/` | Error DB, solutions, patterns |
+| `quant-lab/` | Quantitative research + strategy conversions |
+| `research/` | Research notes + resource index |
+| `skills/` | Workspace-level skills (30+) |
+| `.agents/skills/` | Agent-specific skills (40+) |
+| `.github/skills/` | GitHub skills |
 
 ---
 
@@ -598,6 +616,200 @@ graph TB
 
     LF --> SM
     RC --> SM
+
+---
+
+## 🔄 V3 Phase 8 — Operator Coevolution
+
+```mermaid
+graph TB
+    subgraph "Operator Modeling"
+        OM[OperatorModel<br/>operator_model.py]
+        CM[ConstraintModel<br/>constraint_model.py]
+    end
+
+    subgraph "Adaptation"
+        BA[BidirectionalAdaptation<br/>bidirectional_adaptation.py]
+        CR[CoherenceReinforcement<br/>coherence_reinforcement.py]
+    end
+
+    subgraph "Monitoring"
+        CL[CognitiveLoad<br/>cognitive_load.py]
+        AT[AlignmentTracking<br/>alignment_tracking.py]
+    end
+
+    subgraph "Protection"
+        AM[AntiManipulation<br/>anti_manipulation.py]
+    end
+
+    OM --> BA
+    CM --> BA
+    BA --> CR
+    CR --> AT
+    AT --> CL
+    AM --> OM
+```
+
+### V3 Phase 8 Modules
+
+| Module | File | Tests | Purpose |
+|--------|------|-------|---------|
+| OperatorModel | `oce/backend/coevolution/operator_model.py` | — | Models human operator preferences |
+| ConstraintModel | `oce/backend/coevolution/constraint_model.py` | — | Models system constraints |
+| CoherenceReinforcement | `oce/backend/coevolution/coherence_reinforcement.py` | — | Reinforces coherent behavior |
+| BidirectionalAdaptation | `oce/backend/coevolution/bidirectional_adaptation.py` | — | System ↔ Human adaptation |
+| CognitiveLoad | `oce/backend/coevolution/cognitive_load.py` | — | Monitors operator cognitive load |
+| AlignmentTracking | `oce/backend/coevolution/alignment_tracking.py` | — | Tracks system-operator alignment |
+| AntiManipulation | `oce/backend/coevolution/anti_manipulation.py` | — | Prevents operator manipulation |
+
+---
+
+## 🔄 V3 Phase 9 — Sovereign Field Emergence
+
+```mermaid
+graph TB
+    subgraph "Resonance"
+        RE[ResonanceEngine<br/>resonance_engine.py]
+    end
+
+    subgraph "Field Nodes"
+        RFN[RecursiveFieldNodes<br/>recursive_field_nodes.py]
+    end
+
+    subgraph "Attractors"
+        AM[AttractorMapper<br/>attractor_mapper.py]
+    end
+
+    subgraph "Governance"
+        DG[DriftGovernor<br/>drift_governor.py]
+    end
+
+    subgraph "Reconstruction"
+        RC[ReconstructionCore<br/>reconstruction_core.py]
+    end
+
+    subgraph "Identity"
+        CIE[ContinuityIdentityEngine<br/>continuity_identity_engine.py]
+    end
+
+    RE --> RFN
+    RFN --> AM
+    AM --> DG
+    DG --> RC
+    RC --> CIE
+    CIE --> RE
+```
+
+### V3 Phase 9 Modules
+
+| Module | File | Tests | Purpose |
+|--------|------|-------|---------|
+| ResonanceEngine | `oce/backend/field_core/resonance_engine.py` | — | Field-level resonance |
+| RecursiveFieldNodes | `oce/backend/field_core/recursive_field_nodes.py` | — | Recursive field computation |
+| AttractorMapper | `oce/backend/field_core/attractor_mapper.py` | — | Attractor mapping + convergence |
+| DriftGovernor | `oce/backend/field_core/drift_governor.py` | — | Drift governance + correction |
+| ReconstructionCore | `oce/backend/field_core/reconstruction_core.py` | — | Core reconstruction engine |
+| ContinuityIdentityEngine | `oce/backend/field_core/continuity_identity_engine.py` | — | Continuity identity management |
+
+---
+
+## 🔄 V3 Phase 10 — Recursive Field Computation
+
+```mermaid
+graph TB
+    subgraph "Compute Graph"
+        RCG[RecursiveComputeGraph<br/>rcg.py]
+        CN[ComputeNode]
+        SR[StabilizationResult]
+    end
+
+    subgraph "Reference System"
+        PRS[PositionalReferenceSystem<br/>prs.py]
+        POS[Position]
+        RF[ReferenceFrame]
+    end
+
+    subgraph "Propagation"
+        RPE[ResonancePropagationEngine<br/>rpe.py]
+        PR[PropagationResult]
+    end
+
+    subgraph "Constraint Topology"
+        DCT[DynamicConstraintTopology<br/>dct.py]
+        CE[ConstraintEdge]
+        TC[TopologyChange]
+    end
+
+    subgraph "Attractor Engine"
+        ACE[AttractorComputeEngine<br/>ace.py]
+        AS[AttractorSolution]
+    end
+
+    RCG --> CN
+    CN --> SR
+    PRS --> POS
+    POS --> RF
+    RPE --> PR
+    DCT --> CE
+    CE --> TC
+    ACE --> AS
+
+    RCG --> PRS
+    PRS --> RPE
+    RPE --> DCT
+    DCT --> ACE
+    ACE --> RCG
+```
+
+### V3 Phase 10 Modules
+
+| Module | File | Tests | Purpose |
+|--------|------|-------|---------|
+| RecursiveComputeGraph | `oce/backend/phase10/rcg.py` | 6 | Recursive compute graph + stabilization |
+| PositionalReferenceSystem | `oce/backend/phase10/prs.py` | 5 | Positional reference system |
+| ResonancePropagationEngine | `oce/backend/phase10/rpe.py` | 4 | Resonance propagation engine |
+| DynamicConstraintTopology | `oce/backend/phase10/dct.py` | 4 | Dynamic constraint topology |
+| AttractorComputeEngine | `oce/backend/phase10/ace.py` | 4 | Attractor compute engine |
+
+### V3 Phase 10 Test Results: 23/23 passed
+- TestRecursiveComputeGraph: 6 tests ✅
+- TestPositionalReferenceSystem: 5 tests ✅
+- TestResonancePropagationEngine: 4 tests ✅
+- TestDynamicConstraintTopology: 4 tests ✅
+- TestAttractorComputeEngine: 4 tests ✅
+
+---
+
+## 🔄 V3 — All 10 Phases Complete
+
+```mermaid
+graph LR
+    P1[Phase 1<br/>RSS<br/>7 modules]
+    P2[Phase 2<br/>RCM<br/>6 modules]
+    P3[Phase 3<br/>RT&BSP<br/>7 modules]
+    P4[Phase 4<br/>SIE<br/>8 modules]
+    P5[Phase 5<br/>LHCTC<br/>8 modules]
+    P6[Phase 6<br/>RTI<br/>4 modules]
+    P7[Phase 7<br/>MSCF<br/>7 modules]
+    P8[Phase 8<br/>OC<br/>8 modules]
+    P9[Phase 9<br/>SFE<br/>6 modules]
+    P10[Phase 10<br/>RFC<br/>5 modules]
+
+    P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7 --> P8 --> P9 --> P10
+
+    style P1 fill:#3498db,color:#fff
+    style P2 fill:#2ecc71,color:#fff
+    style P3 fill:#9b59b6,color:#fff
+    style P4 fill:#e74c3c,color:#fff
+    style P5 fill:#f39c12,color:#fff
+    style P6 fill:#1abc9c,color:#fff
+    style P7 fill:#34495e,color:#fff
+    style P8 fill:#e67e22,color:#fff
+    style P9 fill:#2c3e50,color:#fff
+    style P10 fill:#8e44ad,color:#fff
+```
+
+**Total: 67 V3 modules across 10 phases, 1403 tests passing**
     GA --> SM
     SM --> NR
     NR --> SAR

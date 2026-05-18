@@ -1,9 +1,9 @@
 # SRRA-OPH Topology — All Phases
 
-> **Purpose:** Technical architecture of the SRRA-OPH substrate across all 9 phases.
-> **Updated:** 2026-05-16
+> **Purpose:** Technical architecture of the SRRA-OPH substrate across all 10 V3 phases.
+> **Updated:** 2026-05-18
 
-## Full System Topology (Phases 1-9)
+## Full System Topology (Phases 1-10)
 
 ```mermaid
 graph TD
