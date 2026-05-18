@@ -72,25 +72,46 @@
 
 ---
 
-## Phase 9: Post-Deployment
+## Phase 9: Sovereign Field Emergence
 
-**Goal:** Production-ready deployment with monitoring and maintenance.
+**Goal:** Transform SRRA+OPH from event-driven orchestration into field-coherent recursive continuity.
 
 ### Components
 | Component | Description | Status |
 |-----------|-------------|--------|
-| Deployment Pipeline | Automated build/test/deploy | PLANNED |
-| Monitoring Dashboard | Real-time system health metrics | PLANNED |
-| Alert System | Notify on critical failures or drift | PLANNED |
-| Backup & Recovery | Automated backup of anchors and state | PLANNED |
-| Documentation | Complete system documentation | PLANNED |
-| Performance Benchmarks | Baseline performance metrics | PLANNED |
+| Resonance Engine | Measures coherence across system | PLANNED |
+| Recursive Field Nodes | Field participants with local awareness | PLANNED |
+| Attractor Mapper | Detects stable recurring configurations | PLANNED |
+| Drift Governor | Measures divergence, triggers reconstruction | PLANNED |
+| Reconstruction Core | Topology-constrained inference | PLANNED |
+| Continuity Identity Engine | Maintains operational continuity | PLANNED |
+
+### Key Principles
+- Continuity preservation under partial instability
+- Field coherence over explicit state management
+- Topology-constrained reconstruction
+- Resonance-based stability detection
+
+---
+
+## Phase 10: Recursive Field Computation
+
+**Goal:** Transform from continuity preservation into recursive field-based computation.
+
+### Components
+| Component | Description | Status |
+|-----------|-------------|--------|
+| Recursive Compute Graph | Nodes compute through recursive stabilization | PLANNED |
+| Positional Reference System | State transitions via relative relationships | PLANNED |
+| Resonance Propagation Engine | Propagate coherence, constraints | PLANNED |
+| Dynamic Constraint Topology | Adaptive topology rewiring | PLANNED |
+| Attractor Compute Engine | Solutions emerge through field convergence | PLANNED |
 
 ---
 
 ## Implementation Order
 ```
-Phase 3 (Emergent Topology) ← CURRENT
+Phase 3 (Emergent Topology) ← COMPLETE
     ↓
 Phase 4 (Workspace Integration) — map tools to SRRA roles
     ↓
@@ -102,5 +123,7 @@ Phase 7 (Multi-Scale Cognitive Fields) — nested coherence
     ↓
 Phase 8 (Operator Coevolution) — strategic alignment
     ↓
-Phase 9 (Post-Deployment) — production readiness
+Phase 9 (Sovereign Field Emergence) — field coherence
+    ↓
+Phase 10 (Recursive Field Computation) — field-based computation
 ```
