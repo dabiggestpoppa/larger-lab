@@ -11,6 +11,7 @@ const { WebSocketServer } = require('ws');
 
 const config = require('./utils/config');
 const logger = require('./utils/logger');
+const { escapeHtml } = require('./utils/escape');
 
 // Rooms
 const roomManager = require('./rooms/room-manager');
@@ -149,10 +150,11 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
 
-// Serve dashboard static files
-app.use(express.static(path.join(__dirname, '..', 'public', 'dashboard')));
-// Serve new env static assets (CSS, JS)
+// FIX #2: Serve public assets FIRST so they take priority over dashboard.
+// The original order had dashboard before public, which meant dashboard files
+// could shadow public assets with the same name.
 app.use(express.static(path.join(__dirname, '..', 'public')));
+app.use(express.static(path.join(__dirname, '..', 'public', 'dashboard')));
 
 // Request logging
 app.use((req, res, next) => {
@@ -344,19 +346,29 @@ app.get('/api/connections', (req, res) => {
 
 // ── Sandbox Endpoints ────────────────────────────────────────────
 app.post('/api/sandbox/python', async (req, res) => {
-  const { code, agentId, timeout } = req.body;
-  if (!code) return res.status(400).json({ success: false, error: 'Code required' });
-  logger.info('Python sandbox request', { agentId, codeLength: code.length });
-  const result = await runPython(code, { timeoutMs: timeout || config.sandbox.pythonTimeoutMs });
-  res.json({ success: true, ...result });
+  try {
+    const { code, agentId, timeout } = req.body;
+    if (!code) return res.status(400).json({ success: false, error: 'Code required' });
+    logger.info('Python sandbox request', { agentId, codeLength: code.length });
+    const result = await runPython(code, { timeoutMs: timeout || config.sandbox.pythonTimeoutMs });
+    res.json({ success: true, ...result });
+  } catch (err) {
+    logger.error('Python sandbox endpoint error', { error: err.message });
+    res.status(500).json({ success: false, error: 'Sandbox execution failed' });
+  }
 });
 
 app.post('/api/sandbox/node', async (req, res) => {
-  const { code, agentId, timeout } = req.body;
-  if (!code) return res.status(400).json({ success: false, error: 'Code required' });
-  logger.info('Node sandbox request', { agentId, codeLength: code.length });
-  const result = await runNode(code, { timeoutMs: timeout || config.sandbox.nodeTimeoutMs });
-  res.json({ success: true, ...result });
+  try {
+    const { code, agentId, timeout } = req.body;
+    if (!code) return res.status(400).json({ success: false, error: 'Code required' });
+    logger.info('Node sandbox request', { agentId, codeLength: code.length });
+    const result = await runNode(code, { timeoutMs: timeout || config.sandbox.nodeTimeoutMs });
+    res.json({ success: true, ...result });
+  } catch (err) {
+    logger.error('Node sandbox endpoint error', { error: err.message });
+    res.status(500).json({ success: false, error: 'Sandbox execution failed' });
+  }
 });
 
 // ── File Endpoints ───────────────────────────────────────────────
@@ -505,7 +517,19 @@ wss.on('connection', (ws, req) => {
         }
         agentSession.startSession(msg.agentId, ws);
         ws.send(JSON.stringify({ event: 'auth-ok', agentId: msg.agentId }));
-        logger.info('WS agent authenticated', { agentId: msg.agentId });
+
+        // FIX #1: Send full world state on connect/reconnect for state sync
+        // This ensures clients always have a consistent view after reconnecting.
+        worldEngine.updateWorldState();
+        ws.send(JSON.stringify({ event: 'world.state', ...worldEngine.getWorldState() }));
+
+        // Also send recent messages from the agent's current room
+        if (msg.roomId) {
+          const recentMessages = messageBus.getMessages(msg.roomId, { limit: 20 });
+          ws.send(JSON.stringify({ event: 'room.history', roomId: msg.roomId, messages: recentMessages.messages }));
+        }
+
+        logger.info('WS agent authenticated', { agentId: msg.agentId, roomId: msg.roomId });
         break;
       }
 
@@ -537,13 +561,27 @@ wss.on('connection', (ws, req) => {
       case 'room-message': {
         const client = wsClients.get(ws);
         if (!client || !client.roomId) { ws.send(JSON.stringify({ event: 'error', error: 'Not in a room' })); return; }
+        // FIX #3: Sanitize user-generated content to prevent XSS
+        const rawContent = msg.content;
+        if (!rawContent || typeof rawContent !== 'string' || rawContent.trim().length === 0) {
+          ws.send(JSON.stringify({ event: 'error', error: 'Message content required' })); return;
+        }
+        if (rawContent.length > MAX_MESSAGE_LENGTH) {
+          ws.send(JSON.stringify({ event: 'error', error: `Message too long (max ${MAX_MESSAGE_LENGTH})` })); return;
+        }
         const result = messageBus.postMessage(client.roomId, {
           from: client.agentId,
           type: msg.messageType || 'chat',
-          content: msg.content,
+          content: rawContent.trim(),
         });
         if (result.success) {
-          broadcast.broadcastToRoom(wsRoomSockets, client.roomId, result.message);
+          // Escape user-generated fields before broadcasting to clients
+          const safeMessage = {
+            ...result.message,
+            content: escapeHtml(result.message.content),
+            from: escapeHtml(result.message.from),
+          };
+          broadcast.broadcastToRoom(wsRoomSockets, client.roomId, safeMessage);
         }
         break;
       }
@@ -551,9 +589,19 @@ wss.on('connection', (ws, req) => {
       case 'direct-message': {
         const client = wsClients.get(ws);
         if (!client) return;
-        const result = directMessage.sendDirectMessage(client.agentId, msg.to, {
+        // Validate and sanitize DM content
+        if (!msg.to || typeof msg.to !== 'string') {
+          ws.send(JSON.stringify({ event: 'error', error: 'Recipient (to) required' })); return;
+        }
+        if (!msg.content || typeof msg.content !== 'string' || msg.content.trim().length === 0) {
+          ws.send(JSON.stringify({ event: 'error', error: 'Message content required' })); return;
+        }
+        if (msg.content.length > MAX_MESSAGE_LENGTH) {
+          ws.send(JSON.stringify({ event: 'error', error: `Message too long (max ${MAX_MESSAGE_LENGTH})` })); return;
+        }
+        const result = directMessage.sendDirectMessage(client.agentId, msg.to.trim(), {
           type: msg.messageType || 'dm',
-          content: msg.content,
+          content: escapeHtml(msg.content.trim()),
         });
         ws.send(JSON.stringify({ event: 'dm-result', ...result }));
         break;
@@ -615,14 +663,25 @@ wss.on('connection', (ws, req) => {
         if (!client) return;
         const lang = msg.language || 'python';
         const code = msg.code || '';
+        // FIX #4: Wrap async sandbox execution in try/catch to prevent unhandled rejections
         if (lang === 'python') {
-          runPython(code, { timeoutMs: msg.timeout || config.sandbox.pythonTimeoutMs }).then((result) => {
-            ws.send(JSON.stringify({ event: 'code-result', language: 'python', ...result }));
-          });
+          runPython(code, { timeoutMs: msg.timeout || config.sandbox.pythonTimeoutMs })
+            .then((result) => {
+              ws.send(JSON.stringify({ event: 'code-result', language: 'python', ...result }));
+            })
+            .catch((err) => {
+              logger.error('Python sandbox error', { error: err.message });
+              ws.send(JSON.stringify({ event: 'code-result', language: 'python', success: false, error: 'Sandbox execution failed' }));
+            });
         } else {
-          runNode(code, { timeoutMs: msg.timeout || config.sandbox.nodeTimeoutMs }).then((result) => {
-            ws.send(JSON.stringify({ event: 'code-result', language: 'node', ...result }));
-          });
+          runNode(code, { timeoutMs: msg.timeout || config.sandbox.nodeTimeoutMs })
+            .then((result) => {
+              ws.send(JSON.stringify({ event: 'code-result', language: 'node', ...result }));
+            })
+            .catch((err) => {
+              logger.error('Node sandbox error', { error: err.message });
+              ws.send(JSON.stringify({ event: 'code-result', language: 'node', success: false, error: 'Sandbox execution failed' }));
+            });
         }
         break;
       }
@@ -667,6 +726,35 @@ worldEngine.initialize();
 // Start world tick loop
 setInterval(() => worldEngine.tick(), 1000 / 30); // 30 FPS
 
+// Idle activity pulse — every 10 seconds, give registered agents with no recent activity a low-level pulse
+const IDLE_PULSE_INTERVAL = 10000;
+setInterval(() => {
+  const agents = agentRegistry.listAgents();
+  const now = Date.now();
+  for (const agent of agents) {
+    if (agent.status === 'offline') continue;
+    const lastActive = agent.lastActive ? new Date(agent.lastActive).getTime() : 0;
+    // If no activity in the last 15 seconds, give an idle pulse
+    if (now - lastActive > 15000) {
+      const idleActions = ['Standing by', 'Monitoring', 'Idle', 'Waiting for tasks', 'Observing'];
+      const action = idleActions[Math.floor(Math.random() * idleActions.length)];
+      worldEngine.recordActivity(agent.id, action, 0.15);
+    }
+  }
+}, IDLE_PULSE_INTERVAL);
+
+// ── Global Error Handler ────────────────────────────────────────
+// Catches any unhandled errors in middleware/routes
+app.use((err, req, res, next) => {
+  logger.error('Unhandled request error', { error: err.message, url: req.url, method: req.method });
+  res.status(500).json({ success: false, error: 'Internal server error' });
+});
+
+// ── 404 Handler ─────────────────────────────────────────────────
+app.use((req, res) => {
+  res.status(404).json({ success: false, error: 'Not found' });
+});
+
 // ── Start ────────────────────────────────────────────────────────
 server.listen(PORT, config.host, () => {
   logger.info(`Agent Virtual Environment running on http://${config.host}:${PORT}`);
@@ -676,17 +764,54 @@ server.listen(PORT, config.host, () => {
   logger.info(`Default rooms: ${roomManager.listRooms().map(r => r.name).join(', ')}`);
 });
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  logger.info('SIGTERM received — shutting down');
+// FIX #5: Graceful shutdown with proper cleanup and timeout
+let isShuttingDown = false;
+function gracefulShutdown(signal) {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+  logger.info(`${signal} received — shutting down gracefully`);
+
+  // Stop accepting new connections
   clearInterval(heartbeat);
-  wss.close();
-  server.close(() => process.exit(0));
+
+  // Close WebSocket server (notify clients)
+  try {
+    wss.clients.forEach((client) => {
+      try {
+        client.send(JSON.stringify({ event: 'server.shutdown', message: 'Server is shutting down' }));
+      } catch {}
+    });
+    wss.close();
+  } catch (err) {
+    logger.error('Error closing WebSocket server', { error: err.message });
+  }
+
+  // Close HTTP server with timeout
+  const shutdownTimeout = setTimeout(() => {
+    logger.warn('Shutdown timeout reached — forcing exit');
+    process.exit(1);
+  }, 10000);
+
+  server.close((err) => {
+    clearTimeout(shutdownTimeout);
+    if (err) {
+      logger.error('Error during server close', { error: err.message });
+      process.exit(1);
+    }
+    logger.info('Server closed cleanly');
+    process.exit(0);
+  });
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Handle uncaught errors to prevent silent crashes
+process.on('uncaughtException', (err) => {
+  logger.error('Uncaught exception', { error: err.message, stack: err.stack });
+  gracefulShutdown('uncaughtException');
 });
 
-process.on('SIGINT', () => {
-  logger.info('SIGINT received — shutting down');
-  clearInterval(heartbeat);
-  wss.close();
-  server.close(() => process.exit(0));
+process.on('unhandledRejection', (reason) => {
+  logger.error('Unhandled rejection', { reason: reason?.message || String(reason) });
 });

@@ -277,3 +277,5 @@ graph TB
 <!-- ARCH-COMMIT [2026-05-17 16:00 UTC] CC: oce/backend/resonance/ -- V3 Phase 1 complete: 7 modules, 139 tests, debug CLI -->
 
 <!-- ARCH-COMMIT [2026-05-17 17:00 UTC] CC: oce/backend/reconstruction/ -- V3 Phase 2 complete: 5 modules, 52 tests -->
+
+<!-- ARCH-COMMIT [2026-05-18 18:54 UTC] CC: oce/backend/phase10/rcg.py -- Phase 10 Recursive Field Computation modules built: rcg.py, prs.py, rpe.py, dct.py, ace.py with 23 tests passing -->

@@ -15,9 +15,9 @@ const ROOM_VISUALS = {
   },
   'quant-room': {
     icon: '📊',
-    color: '#00b894',
-    bgColor: 'rgba(0, 184, 148, 0.08)',
-    borderColor: 'rgba(0, 184, 148, 0.3)',
+    color: '#0984e3',
+    bgColor: 'rgba(9, 132, 227, 0.08)',
+    borderColor: 'rgba(9, 132, 227, 0.3)',
   },
   'chat-room': {
     icon: '💬',
@@ -30,6 +30,12 @@ const ROOM_VISUALS = {
     color: '#e17055',
     bgColor: 'rgba(225, 112, 85, 0.08)',
     borderColor: 'rgba(225, 112, 85, 0.3)',
+  },
+  'farm-room': {
+    icon: '🌾',
+    color: '#55efc4',
+    bgColor: 'rgba(85, 239, 196, 0.08)',
+    borderColor: 'rgba(85, 239, 196, 0.3)',
   },
 };
 
@@ -45,26 +51,34 @@ const DEFAULT_VISUAL = {
 const roomPositions = new Map();
 
 // Room dimensions
-const ROOM_WIDTH = 220;
-const ROOM_HEIGHT = 160;
-const ROOM_MARGIN = 30;
+const ROOM_WIDTH = 240;
+const ROOM_HEIGHT = 170;
+const ROOM_MARGIN = 24;
 const ROOM_PADDING = 12;
 
 /**
- * Compute room positions in a grid layout.
+ * Compute room positions in a responsive grid layout.
  * @param {Array} rooms - List of room objects from roomManager
+ * @param {number} containerWidth - Available width (optional, defaults to 800)
  */
-function computeRoomLayout(rooms) {
-  const cols = Math.min(rooms.length, 2);
-  const rows = Math.ceil(rooms.length / cols);
+function computeRoomLayout(rooms, containerWidth) {
+  // Responsive columns: each room needs ROOM_WIDTH + ROOM_MARGIN space
+  const minRoomSpace = ROOM_WIDTH + ROOM_MARGIN;
+  const defaultWidth = containerWidth || 1200;
+  // Calculate how many columns fit, min 1, max 4
+  const cols = Math.max(1, Math.min(4, Math.floor(defaultWidth / minRoomSpace)));
+  // For 8 rooms, aim for a balanced grid (3x3 or 4x2)
+  const optimalCols = rooms.length <= 4 ? Math.min(rooms.length, 2) : Math.min(cols, 4);
+  const finalCols = Math.max(1, optimalCols);
+  const rows = Math.ceil(rooms.length / finalCols);
 
   // Start position (offset for sidebar)
   const startX = 20;
   const startY = 20;
 
   rooms.forEach((room, i) => {
-    const col = i % cols;
-    const row = Math.floor(i / cols);
+    const col = i % finalCols;
+    const row = Math.floor(i / finalCols);
     const x = startX + col * (ROOM_WIDTH + ROOM_MARGIN);
     const y = startY + row * (ROOM_HEIGHT + ROOM_MARGIN);
 
@@ -80,8 +94,17 @@ function computeRoomLayout(rooms) {
     });
   });
 
-  logger.debug('Room layout computed', { rooms: rooms.length, cols, rows });
+  logger.debug('Room layout computed', { rooms: rooms.length, cols: finalCols, rows });
   return Array.from(roomPositions.values());
+}
+
+/**
+ * Recompute layout — call when rooms are added/removed.
+ */
+function recomputeLayout(containerWidth) {
+  const rooms = Array.from(roomPositions.values()).map(rv => ({ id: rv.id, name: rv.name, description: rv.description }));
+  roomPositions.clear();
+  return computeRoomLayout(rooms, containerWidth);
 }
 
 /**
@@ -150,6 +173,7 @@ function getCanvasSize() {
 
 module.exports = {
   computeRoomLayout,
+  recomputeLayout,
   getRoomVisual,
   getAllRoomVisuals,
   computeAgentPositions,

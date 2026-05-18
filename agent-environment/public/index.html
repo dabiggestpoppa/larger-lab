@@ -84,8 +84,8 @@
 
     <!-- Agents Tab -->
     <div class="tab-content" id="tab-agents">
-      <div class="messages" id="agents-container" style="padding:20px;overflow-y:auto;">
-        <div class="empty-state">
+      <div id="agents-container" style="padding:12px;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;align-content:start;">
+        <div class="empty-state" style="grid-column:1/-1;">
           <div class="icon">🤖</div>
           <div>No agents registered yet</div>
           <div style="font-size:11px;margin-top:8px;color:var(--text-dim);">Register agents below or click ▶ Demo</div>
@@ -152,6 +152,9 @@
     </div>
   </div>
 </div>
+
+<!-- Toast notification container -->
+<div id="toast-container" style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:6px;pointer-events:none;"></div>
 
 <script src="/js/env-renderer.js"></script>
 <script src="/js/env-client.js"></script>

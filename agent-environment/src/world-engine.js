@@ -42,9 +42,9 @@ function setBroadcastFunction(fn) {
  * Initialize the world engine — set up visuals for existing rooms and agents.
  */
 function initialize() {
-  // Compute room layout
+  // Compute room layout with responsive width
   const rooms = roomManager.listRooms();
-  roomVisual.computeRoomLayout(rooms);
+  roomVisual.computeRoomLayout(rooms, 1200);
 
   // Initialize visuals for existing agents
   const agents = agentRegistry.listAgents();
@@ -112,19 +112,26 @@ function updateWorldState() {
     agentVisual.updateAgentOnline(agent.id, onlineAgents.includes(agent.id));
   }
 
+  // Recompute layout if room count changed (new rooms added)
+  const currentRoomCount = roomVisual.getAllRoomVisuals().length;
+  if (rooms.length !== currentRoomCount) {
+    roomVisual.computeRoomLayout(rooms, 1200);
+  }
+
   // Build room states with agents
   const roomStates = rooms.map(room => {
     const roomAgents = agents
       .filter(a => a.currentRoom === room.id)
       .map(a => {
         const visual = agentVisual.getAgentVisual(a.id);
+        const isOnline = onlineAgents.includes(a.id) || ['active', 'working', 'meditating', 'idle'].includes(a.status);
         return {
           id: a.id,
           name: a.name,
           role: a.role,
           color: visual?.color || '#888',
           status: a.status,
-          online: onlineAgents.includes(a.id),
+          online: isOnline,
           activity: visual?.activity || { level: 0, lastAction: '' },
           avatar: visual?.avatar || { label: a.name, emoji: '🤖', radius: 18 },
         };
@@ -149,6 +156,7 @@ function updateWorldState() {
   // Build agent states
   const agentStates = agents.map(a => {
     const visual = agentVisual.getAgentVisual(a.id);
+    const isOnline = onlineAgents.includes(a.id) || ['active', 'working', 'meditating', 'idle'].includes(a.status);
     return {
       id: a.id,
       name: a.name,
@@ -156,7 +164,7 @@ function updateWorldState() {
       color: visual?.color || '#888',
       currentRoom: a.currentRoom,
       status: a.status,
-      online: onlineAgents.includes(a.id),
+      online: isOnline,
       activity: visual?.activity || { level: 0, lastAction: '' },
       avatar: visual?.avatar || { label: a.name, emoji: '🤖', radius: 18 },
       capabilities: a.capabilities || [],

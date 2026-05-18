@@ -78,5 +78,57 @@
 | researcherbscgap | Task B: Blind_Structural_Chain gap analysis | ⏳ Running |
 | resourceadapter | Resource Adapter — tool integration (Open Design, ViMax, Netviz, UI-TARS) | ⏳ Running |
 
+## Active Delegations (2026-05-18 15:05 EDT)
+| Agent | Task | Status |
+|-------|------|--------|
+| resourceadaptertimeout | Timeout analysis + Navtoor research + tool integration | ⏳ Running |
+| labmanagercheckpoint | Fix all 10 strategies with checkpointing | ⏳ Running |
+| farmmanagerday3 | Day 2 gaps + Day 3 plan | ⏳ Running |
+
+## MAD's Directives (15:05 EDT)
+- RA must fix sub-agent timeout issue for long-horizon tasks
+- RA must analyze @heynavtoor's X post (ID: 2056307663634612373)
+- All agents must use the agent environment (port 9000)
+- Lab: checkpoint progress after each strategy fix
+- Farm: finish Day 2 gaps + Day 3 plan
+
+## Key Insight: Timeout Problem
+- Previous labmanagerfull timed out with ZERO strategy fixes
+- Previous farmmanagerfull produced Day 2 files but no Day 3 plan
+- Root cause: too much work per spawn, no checkpointing
+- Fix: smaller tasks, progress files, sequential spawns
+
 ---
-*Last updated: 2026-05-18 07:53 EDT per MAD's SAGE recommendations + POLYGENT directive*
+*Last updated: 2026-05-18 15:16 EDT — Heartbeat audit complete*
+
+## Heartbeat Check (2026-05-18 ~17:00 EDT)
+- Lab: 10/10 strategies profitable (v3 backtests). 5/10 v3 PineScript done. 5 remaining v3 PineScript + 10 MQL5 need conversion.
+- Farm: Day 3 hashtag expansion (+350) and best posting times written. Still need: carousel, email sequence, ad copies, affiliate tracker, media kit.
+- SW Dev: Frontend dev completed 2/6 UI fixes (canvas render, drag/move). Backend dev timed out reading files. Server syntax OK.
+- Capital Maxer: Timed out, no output. Backend dev: Timed out, no output.
+- All sub-agents done. No active runs.
+
+## Heartbeat Check (2026-05-18 ~16:40 EDT)
+- Lab: All 5 v3 strategy code files now exist. 0 v3 Pine/MQL5 conversions done. TV push still blocked.
+- Farm: No new content since last check. Day 3 plan complete. Still missing: ad copies, media kit, affiliate tracker.
+- SW Dev: Project board created. Backend dev sub-agent spawned but timed out without changes.
+- Capital Maxer: Timed out, no output.
+- Tool repos: All clones successful (anime, video-search, manim, Personal_AI_Infrastructure, repowise)
+
+## Heartbeat Check (2026-05-18 ~19:30 EDT)
+- CEO Meditation complete: `meditation-room/SOFTWARE_CEO_MEDITATION.md`
+- Key recommendation: STOP building framework, START validating business
+- 3 new rooms created: validation-room/, sw-dev-room/, archive-room/
+- 7-room architecture recommended (was 5)
+- Agent allocation: room leads get full autonomy, OWL orchestrates only
+- 3-month vision: Month 1=Validate, Month 2=Ship, Month 3=Scale
+- Biggest risk: Validation debt cascade (strategies may fail with real costs)
+- Agent Environment (port 9000) deprioritized — shelfware with zero users
+
+## Heartbeat Check (2026-05-18 ~19:00 EDT)
+- Lab: Manager progress file written — v3 fixes identified for 5 strategies. 2/5 v3 files written (failure_repair, dual_engine). 3 remaining (two_plays, stall_harvest, constraint_anchor) need sub-agent.
+- Farm: Day 3 plan complete. Gumroad descriptions written. Still missing: ad copies, media kit, affiliate tracker.
+- Validation gate: ALL 3 SYSTEMS PASS
+- Navtoor: AI content creator (11.2K followers), posts practical AI guides. Specific post ID not accessible without X login.
+- Pattern: Managers consistently timeout at 10-19 min. Need smaller tasks or direct execution by OWL.
+- OWL wrote dual_engine_v3.py directly — exception due to timeout pattern. Normally delegates per MAD directive.

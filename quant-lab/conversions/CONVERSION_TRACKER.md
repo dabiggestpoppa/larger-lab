@@ -84,4 +84,51 @@
 3. **Extended browser session:** Spawn dedicated browser automation sub-agent with longer timeout
 
 ---
-*Last updated: 2026-05-18 01:50 EDT by Lab Manager v6*
+
+## V2 Fixes — Post Cost-Validation (2026-05-18 ~14:30 EDT)
+
+After Phase 0 cost validation showed 8/10 strategies fail under real costs, v2 fixes were applied:
+
+| Strategy | v2 Pine | v2 MQL5 | Key Fix |
+|----------|---------|---------|---------|
+| Blind_Structural_Chain | ✅ | ✅ | Time exit, 60% invalidation, trend filter |
+| Failure_Repair | 🔲 | 🔲 | Needs v2 conversion |
+| Dual_Engine | 🔲 | 🔲 | Needs v2 conversion |
+| P90P_Distribution | 🔲 | 🔲 | Needs v2 conversion |
+| Two_Plays | 🔲 | 🔲 | Needs v2 conversion |
+| Fractal_Resolution | 🔲 | 🔲 | Needs v2 conversion |
+| Stall_Harvest | 🔲 | 🔲 | Needs v2 conversion |
+| Constraint_Anchor | 🔲 | 🔲 | Needs v2 conversion |
+
+**Note:** Only BSC v2 has been converted so far. Remaining 7 v2 strategies need PineScript + MQL5 conversion.
+
+## V3 Fixes — Cost-Optimized (2026-05-18 ~16:30 EDT)
+
+After v2 fixes proved insufficient for 5 strategies, v3 cost-optimized fixes were written:
+
+| Strategy | v3 Code | v3 Pine | v3 MQL5 | Key Fix |
+|----------|---------|---------|----------|----------|
+| Failure_Repair | ✅ | 🔲 | 🔲 | Wider TP (0.75x AR), stronger 2nd signal (2.0x), session filter (4-10 AM EST) |
+| Dual_Engine | ✅ | 🔲 | 🔲 | Wider TP (0.80x AR), ADX > 25, session filter, 2h time exit |
+| Two_Plays | ✅ | 🔲 | 🔲 | Cost-optimized parameters |
+| Stall_Harvest | ✅ | 🔲 | 🔲 | Cost-optimized parameters |
+| Constraint_Anchor | ✅ | 🔲 | 🔲 | Cost-optimized parameters |
+
+**5 v3 code files written. 5/10 v3 PineScript conversions done. 0/10 v3 MQL5 conversions done.**
+
+## V3 PineScript Status
+| Strategy | v3 Pine | v3 MQL5 |
+|----------|---------|----------|
+| Deep_Mean_Reversion | ✅ | 🔲 |
+| Composite_Alpha | ✅ | 🔲 |
+| Blind_Structural_Chain | ✅ | 🔲 |
+| P90P_Distribution | ✅ | 🔲 |
+| Fractal_Resolution | ✅ | 🔲 |
+| Failure_Repair | 🔲 | 🔲 |
+| Dual_Engine | 🔲 | 🔲 |
+| Two_Plays | 🔲 | 🔲 |
+| Stall_Harvest | 🔲 | 🔲 |
+| Constraint_Anchor | 🔲 | 🔲 |
+
+---
+*Last updated: 2026-05-18 16:50 EDT by OWL heartbeat*

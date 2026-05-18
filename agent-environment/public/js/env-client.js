@@ -41,6 +41,8 @@ class EnvClient {
       document.getElementById('ws-status').textContent = 'Connected';
       ws.send(JSON.stringify({ type: 'auth', agentId: 'dashboard' }));
       ws.send(JSON.stringify({ type: 'request-world' }));
+      // Ensure canvas is sized correctly after connection
+      this.renderer.resize();
     };
 
     ws.onclose = () => {
@@ -102,11 +104,27 @@ class EnvClient {
     this.state.connections = state.connections || [];
     this.state.recentActivity = state.recentActivity || [];
     this.renderer.updateWorldState(state);
+    // Ensure canvas has valid dimensions after world state arrives
+    // This fixes the issue where rooms/agents aren't visible on initial load
+    // because the canvas was 0x0 when the renderer was constructed
+    const container = this.renderer.canvas.parentElement;
+    if (container) {
+      const cw = container.clientWidth;
+      const ch = container.clientHeight;
+      if ((cw > 0 && ch > 0) && (this.renderer.canvas.width !== cw || this.renderer.canvas.height !== ch)) {
+        this.renderer.resize();
+      }
+    }
     this._updateSidebar();
     this._updateStatusBar();
     this._updateActivityLog();
     if (this.state.selectedAgent) {
       this._updateAgentDetail(this.state.selectedAgent.id);
+    }
+    // Refresh agents tab if it's the active tab
+    const agentsTab = document.getElementById('tab-agents');
+    if (agentsTab && agentsTab.classList.contains('active')) {
+      this._renderAgentsTab();
     }
   }
 
@@ -128,7 +146,20 @@ class EnvClient {
     const agent = this.state.agents.find(a => a.id === msg.agentId);
     if (agent) {
       agent.status = msg.status;
+      // Also update online status based on status
+      if (msg.status === 'offline') {
+        agent.online = false;
+      } else if (msg.status === 'active' || msg.status === 'working') {
+        agent.online = true;
+      }
       this._updateAgentDetail(msg.agentId);
+      this._updateSidebar();
+      this._updateStatusBar();
+      // Refresh agents tab if active
+      const agentsTab = document.getElementById('tab-agents');
+      if (agentsTab && agentsTab.classList.contains('active')) {
+        this._renderAgentsTab();
+      }
     }
   }
 
@@ -183,6 +214,15 @@ class EnvClient {
       action: `Sent ${msg.type} message${msg.roomId ? ' in ' + msg.roomId : ''}`,
       color: fromAgent?.color || '#888',
     });
+    // If the message is for the currently selected room, append it to the chat view
+    if (msg.roomId && this.state.selectedRoom && msg.roomId === this.state.selectedRoom.id) {
+      this._appendMessage({
+        from: msg.from,
+        type: msg.type || 'chat',
+        content: msg.content || '',
+        timestamp: msg.timestamp || new Date().toISOString(),
+      });
+    }
   }
 
   _handleConnectionActive(msg) {
@@ -194,8 +234,10 @@ class EnvClient {
   }
 
   _handleRoomMessage(msg) {
-    if (msg.data && msg.roomId === this.state.selectedRoom?.id) {
-      this._appendMessage(msg.data);
+    // Handle both { data: {...} } and direct message formats
+    const messageData = msg.data || msg;
+    if (messageData && msg.roomId === this.state.selectedRoom?.id) {
+      this._appendMessage(messageData);
     }
   }
 
@@ -240,17 +282,19 @@ class EnvClient {
     if (!container) return;
     const entries = this.state.recentActivity || [];
     if (entries.length === 0) {
-      container.innerHTML = '<div style="color:var(--text-dim);font-size:11px;">No recent activity</div>';
+      container.innerHTML = '<div class="activity-empty-msg" style="color:var(--text-dim);font-size:11px;">No recent activity</div>';
       return;
     }
-    container.innerHTML = entries.slice(-8).reverse().map(e => {
+    // Show ALL agents' activity, not just the selected one
+    container.innerHTML = entries.slice(-12).reverse().map(e => {
       const agent = this.state.agents.find(a => a.id === e.agentId);
       const color = agent?.color || '#888';
+      const name = agent?.name || e.agentId;
       const time = e.timestamp ? new Date(e.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '';
       return `
         <div class="activity-entry">
           <span class="time">${time}</span>
-          <span class="agent-name" style="color:${color}">${agent?.name || e.agentId}</span>
+          <span class="agent-name" style="color:${color}">${this._escapeHtml(name)}</span>
           <span class="action">${this._escapeHtml(e.action)}</span>
         </div>
       `;
@@ -268,7 +312,8 @@ class EnvClient {
       <span class="agent-name" style="color:${color || '#888'}">${this._escapeHtml(agentName)}</span>
       <span class="action">${this._escapeHtml(action)}</span>
     `;
-    const empty = container.querySelector('.empty-state, [style*="No recent"]');
+    // Remove the "No recent activity" empty message if present
+    const empty = container.querySelector('.activity-empty-msg') || container.querySelector('[style*="No recent"]') || container.querySelector('.empty-state');
     if (empty) empty.remove();
     container.insertBefore(entry, container.firstChild);
     // Keep only last 20 entries
@@ -357,7 +402,10 @@ class EnvClient {
 
       // Load messages
       fetch(`/api/rooms/${roomId}/messages?limit=50`)
-        .then(r => r.json())
+        .then(r => {
+          if (!r.ok) throw new Error(`Failed to load messages (${r.status})`);
+          return r.json();
+        })
         .then(data => {
           const container = document.getElementById('messages-container');
           const msgs = data.messages || [];
@@ -376,6 +424,9 @@ class EnvClient {
             `).join('');
             container.scrollTop = container.scrollHeight;
           }
+        })
+        .catch(err => {
+          this._showToast(`Failed to load messages: ${err.message}`, 'error');
         });
 
       // Join room via WS
@@ -394,30 +445,53 @@ class EnvClient {
     const agentId = document.getElementById('msg-agent-select').value;
     const type = document.getElementById('msg-type-select').value;
     const text = document.getElementById('msg-input').value.trim();
-    if (!agentId || !text || !this.state.selectedRoom) return;
+    if (!agentId || !text || !this.state.selectedRoom) {
+      if (!agentId) this._showToast('Please select an agent', 'error');
+      else if (!text) this._showToast('Please type a message', 'error');
+      return;
+    }
 
     fetch(`/api/rooms/${this.state.selectedRoom.id}/messages`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ agentId, text, type }),
-    }).then(() => {
-      document.getElementById('msg-input').value = '';
-    });
+    })
+      .then(r => {
+        if (!r.ok) throw new Error(`Failed to send (${r.status})`);
+        document.getElementById('msg-input').value = '';
+      })
+      .catch(err => {
+        this._showToast(`Failed to send message: ${err.message}`, 'error');
+      });
   }
 
   registerAgent() {
     const name = document.getElementById('new-agent-name').value.trim();
     const role = document.getElementById('new-agent-role').value.trim() || 'general';
-    if (!name) return;
+    if (!name) {
+      this._showToast('Please enter an agent name', 'error');
+      return;
+    }
 
     fetch('/api/agents', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, role, capabilities: ['communicate'] }),
-    }).then(r => r.json()).then(() => {
-      document.getElementById('new-agent-name').value = '';
-      document.getElementById('new-agent-role').value = '';
-    });
+    })
+      .then(r => {
+        if (!r.ok) throw new Error(`Failed to register (${r.status})`);
+        return r.json();
+      })
+      .then(() => {
+        document.getElementById('new-agent-name').value = '';
+        document.getElementById('new-agent-role').value = '';
+        this._showToast(`Agent "${name}" registered!`, 'success');
+        // Refresh agents tab
+        setTimeout(() => this._renderAgentsTab(), 500);
+      })
+      .catch(err => {
+        this._showToast(`Failed to register agent: ${err.message}`, 'error');
+      });
   }
 
   moveAgentToRoom(agentId, roomId) {
@@ -430,6 +504,20 @@ class EnvClient {
     if (this.ws && this.ws.readyState === 1) {
       this.ws.send(JSON.stringify({ type: 'simulate-activity', agentId }));
     }
+  }
+
+  // ── Toast Notifications ──
+  _showToast(message, type = 'info', duration = 3000) {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add('toast-out');
+      setTimeout(() => toast.remove(), 300);
+    }, duration);
   }
 
   // ── Render Loop ──
@@ -454,7 +542,19 @@ class EnvClient {
         document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
         if (tab.dataset.tab === 'world') {
           // Resize canvas when switching to world tab
-          setTimeout(() => this.renderer.resize(), 50);
+          // Use double-rAF to ensure layout is complete after tab display change
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              this.renderer.resize();
+              // Force a re-render with current state
+              if (this.renderer.worldState) {
+                this.renderer.updateWorldState(this.renderer.worldState);
+              }
+            });
+          });
+        }
+        if (tab.dataset.tab === 'agents') {
+          this._renderAgentsTab();
         }
       });
     });
@@ -467,24 +567,9 @@ class EnvClient {
       });
     }
 
-    // Canvas click handling
+    // Canvas interaction — click, drag, and click-to-move
     this.canvas = document.getElementById('world-canvas');
-    this.canvas.addEventListener('click', (e) => {
-      const rect = this.canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      const agent = this.renderer.getAgentAt(x, y);
-      if (agent) {
-        this.selectAgent(agent.id);
-        return;
-      }
-
-      const room = this.renderer.getRoomAt(x, y);
-      if (room) {
-        this.selectRoom(room.id);
-      }
-    });
+    this._setupCanvasInteraction();
 
     // Map control buttons
     document.getElementById('btn-demo')?.addEventListener('click', () => {
@@ -497,6 +582,99 @@ class EnvClient {
       this.state.selectedRoom = null;
       this._updateSidebar();
       this._clearAgentDetail();
+    });
+  }
+
+  // ── Canvas Interaction (Click + Drag + Click-to-Move) ──
+  _setupCanvasInteraction() {
+    const canvas = this.canvas;
+    let isDragging = false;
+    let dragStarted = false;
+    let mouseDownAgent = null;
+    let mouseDownPos = null;
+
+    const getCanvasPos = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    };
+
+    canvas.addEventListener('mousedown', (e) => {
+      const pos = getCanvasPos(e);
+      const agent = this.renderer.getAgentAt(pos.x, pos.y);
+
+      if (agent) {
+        // Start potential drag or select
+        mouseDownAgent = agent;
+        mouseDownPos = pos;
+        isDragging = true;
+        dragStarted = false;
+        this.selectAgent(agent.id);
+      } else {
+        const room = this.renderer.getRoomAt(pos.x, pos.y);
+        if (room) {
+          // Click-to-move: if an agent is selected and we click a different room, move it
+          if (this.state.selectedAgent && this.state.selectedAgent.currentRoom !== room.id) {
+            this.moveAgentToRoom(this.state.selectedAgent.id, room.id);
+          }
+          this.selectRoom(room.id);
+        }
+      }
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (!isDragging || !mouseDownAgent) return;
+      const pos = getCanvasPos(e);
+
+      // Check if mouse has moved enough to start drag (5px threshold)
+      if (!dragStarted && mouseDownPos) {
+        const dx = pos.x - mouseDownPos.x;
+        const dy = pos.y - mouseDownPos.y;
+        if (dx * dx + dy * dy > 25) {
+          dragStarted = true;
+          this.renderer.startDrag(mouseDownAgent.id, mouseDownPos.x, mouseDownPos.y);
+        }
+      }
+
+      if (dragStarted) {
+        this.renderer.updateDrag(pos.x, pos.y);
+        canvas.style.cursor = 'grabbing';
+      }
+    });
+
+    const endDrag = (e) => {
+      if (isDragging) {
+        if (dragStarted && mouseDownAgent) {
+          // Find which room the agent was dropped in
+          const pos = getCanvasPos(e);
+          const targetRoom = this.renderer.getRoomAt(pos.x, pos.y);
+          if (targetRoom && targetRoom.id !== mouseDownAgent.currentRoom) {
+            this.moveAgentToRoom(mouseDownAgent.id, targetRoom.id);
+          }
+          this.renderer.endDrag();
+          canvas.style.cursor = 'default';
+        }
+        // If drag never started, it was just a click (already handled in mousedown)
+      }
+      isDragging = false;
+      dragStarted = false;
+      mouseDownAgent = null;
+      mouseDownPos = null;
+    };
+
+    canvas.addEventListener('mouseup', endDrag);
+    canvas.addEventListener('mouseleave', endDrag);
+
+    // Window resize — keep canvas sized correctly
+    window.addEventListener('resize', () => {
+      this.renderer.resize();
+    });
+
+    // Hover cursor feedback
+    canvas.addEventListener('mousemove', (e) => {
+      if (isDragging) return;
+      const pos = getCanvasPos(e);
+      const agent = this.renderer.getAgentAt(pos.x, pos.y);
+      canvas.style.cursor = agent ? 'pointer' : 'default';
     });
   }
 
@@ -528,6 +706,38 @@ class EnvClient {
       { id: 'demo-5', name: 'RL', color: '#74b9ff', emoji: '🟢' },
     ];
     this.renderer.enableDemo(demoAgents);
+  }
+
+  _renderAgentsTab() {
+    const container = document.getElementById('agents-container');
+    if (!container) return;
+    const agents = this.state.agents || [];
+    if (agents.length === 0) {
+      container.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="icon">🤖</div><div>No agents registered yet</div><div style="font-size:11px;margin-top:8px;color:var(--text-dim);">Register agents below or click ▶ Demo</div></div>';
+      return;
+    }
+    container.innerHTML = agents.map(a => {
+      const room = this.state.rooms.find(r => r.id === a.currentRoom);
+      const statusColor = a.online ? '#00b894' : '#636e72';
+      const statusLabel = a.online ? 'Online' : 'Offline';
+      return `
+        <div class="agent-card" onclick="envClient.selectAgent('${a.id}');" style="background:rgba(30,30,40,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='${a.color || '#888'}'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:${a.color || '#888'};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${a.avatar?.emoji || '🤖'}</div>
+            <div style="min-width:0;flex:1;">
+              <div style="font-weight:600;font-size:13px;color:#e0e0f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${this._escapeHtml(a.name)}</div>
+              <div style="font-size:11px;color:var(--text-dim);">${this._escapeHtml(a.role || '—')}</div>
+            </div>
+            <div style="width:8px;height:8px;border-radius:50%;background:${statusColor};flex-shrink:0;" title="${statusLabel}"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:11px;">
+            <div style="color:var(--text-dim);">Room:</div><div style="color:#ccc;">${this._escapeHtml(room ? room.name : (a.currentRoom || '—'))}</div>
+            <div style="color:var(--text-dim);">Status:</div><div style="color:${statusColor};">${this._escapeHtml(a.status || '—')}</div>
+          </div>
+          ${(a.capabilities && a.capabilities.length > 0) ? `<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;">${a.capabilities.slice(0, 4).map(c => `<span style="background:rgba(255,255,255,0.06);border-radius:4px;padding:2px 6px;font-size:10px;color:var(--text-dim);">${this._escapeHtml(c)}</span>`).join('')}</div>` : ''}
+        </div>
+      `;
+    }).join('');
   }
 
   _escapeHtml(s) {

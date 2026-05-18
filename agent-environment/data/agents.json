@@ -82,5 +82,181 @@
     "createdAt": "2026-05-18T06:22:08.541Z",
     "lastActive": "2026-05-18T06:22:08.580Z",
     "metadata": {}
+  },
+  "adbc914c": {
+    "id": "adbc914c",
+    "name": "labmanagerfull",
+    "role": "quant-manager",
+    "capabilities": [
+      "communicate",
+      "read_files",
+      "communicate",
+      "read_files",
+      "write_files",
+      "execute"
+    ],
+    "currentRoom": "quant-room",
+    "status": "active",
+    "createdAt": "2026-05-18T18:35:08.100Z",
+    "lastActive": "2026-05-18T18:35:08.479Z",
+    "metadata": {}
+  },
+  "5d61ace0": {
+    "id": "5d61ace0",
+    "name": "farmmanagerfull",
+    "role": "farm-manager",
+    "capabilities": [
+      "communicate",
+      "read_files",
+      "communicate",
+      "read_files",
+      "write_files",
+      "execute"
+    ],
+    "currentRoom": "farm-room",
+    "status": "active",
+    "createdAt": "2026-05-18T18:35:08.186Z",
+    "lastActive": "2026-05-18T18:35:08.542Z",
+    "metadata": {}
+  },
+  "ec4c2c69": {
+    "id": "ec4c2c69",
+    "name": "resourceadapterpermanent",
+    "role": "integrator",
+    "capabilities": [
+      "communicate",
+      "read_files",
+      "communicate",
+      "read_files",
+      "write_files",
+      "execute"
+    ],
+    "currentRoom": "war-room",
+    "status": "active",
+    "createdAt": "2026-05-18T18:35:08.197Z",
+    "lastActive": "2026-05-18T18:35:08.568Z",
+    "metadata": {}
+  },
+  "51a0ceca": {
+    "id": "51a0ceca",
+    "name": "softwareceo",
+    "role": "architect",
+    "capabilities": [
+      "communicate",
+      "read_files",
+      "communicate",
+      "read_files",
+      "write_files"
+    ],
+    "currentRoom": "meditation-room",
+    "status": "meditating",
+    "createdAt": "2026-05-18T20:05:32.688Z",
+    "lastActive": "2026-05-18T20:05:32.689Z",
+    "metadata": {}
+  },
+  "636db540": {
+    "id": "636db540",
+    "name": "capitalmaxer",
+    "role": "business",
+    "capabilities": [
+      "communicate",
+      "read_files",
+      "communicate",
+      "read_files",
+      "write_files"
+    ],
+    "currentRoom": "meditation-room",
+    "status": "meditating",
+    "createdAt": "2026-05-18T20:05:32.723Z",
+    "lastActive": "2026-05-18T20:05:32.723Z",
+    "metadata": {}
+  },
+  "01352af4": {
+    "id": "01352af4",
+    "name": "swdevmanager",
+    "role": "dev-manager",
+    "capabilities": [
+      "communicate",
+      "read_files",
+      "communicate",
+      "read_files",
+      "write_files",
+      "execute"
+    ],
+    "currentRoom": "sw-dev-room",
+    "status": "active",
+    "createdAt": "2026-05-18T20:05:32.729Z",
+    "lastActive": "2026-05-18T20:05:32.795Z",
+    "metadata": {}
+  },
+  "49663b4e": {
+    "id": "49663b4e",
+    "name": "swbackenddev",
+    "role": "backend-dev",
+    "capabilities": [
+      "communicate",
+      "read_files",
+      "communicate",
+      "read_files",
+      "write_files",
+      "execute"
+    ],
+    "currentRoom": "sw-dev-room",
+    "status": "active",
+    "createdAt": "2026-05-18T20:45:58.188Z",
+    "lastActive": "2026-05-18T20:45:58.836Z",
+    "metadata": {}
+  },
+  "93b94928": {
+    "id": "93b94928",
+    "name": "capitalmaxerplan",
+    "role": "business",
+    "capabilities": [
+      "communicate",
+      "read_files",
+      "communicate",
+      "read_files",
+      "write_files"
+    ],
+    "currentRoom": "meditation-room",
+    "status": "active",
+    "createdAt": "2026-05-18T20:45:58.515Z",
+    "lastActive": "2026-05-18T20:45:58.958Z",
+    "metadata": {}
+  },
+  "3945b68a": {
+    "id": "3945b68a",
+    "name": "swfrontenddev2",
+    "role": "frontend-dev",
+    "capabilities": [
+      "communicate",
+      "read_files",
+      "communicate",
+      "read_files",
+      "write_files",
+      "execute"
+    ],
+    "currentRoom": "sw-dev-room",
+    "status": "active",
+    "createdAt": "2026-05-18T20:54:43.590Z",
+    "lastActive": "2026-05-18T20:54:43.783Z",
+    "metadata": {}
+  },
+  "2bbe37f8": {
+    "id": "2bbe37f8",
+    "name": "farmday3exec2",
+    "role": "farm-manager",
+    "capabilities": [
+      "communicate",
+      "read_files",
+      "communicate",
+      "read_files",
+      "write_files"
+    ],
+    "currentRoom": "farm-room",
+    "status": "active",
+    "createdAt": "2026-05-18T20:54:43.693Z",
+    "lastActive": "2026-05-18T20:54:43.819Z",
+    "metadata": {}
   }
 }

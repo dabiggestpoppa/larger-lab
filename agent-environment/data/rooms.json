@@ -5,7 +5,8 @@
     "description": "IACER thinking space. New agents meditate here before joining the field.",
     "agents": [
       "44801b35",
-      "dashboard"
+      "dashboard",
+      "93b94928"
     ],
     "persistent": true,
     "createdAt": "2026-05-17T00:00:00.000Z"
@@ -16,7 +17,8 @@
     "description": "Quant Lab — strategy work, backtesting, analysis.",
     "agents": [
       "f3736bba",
-      "dashboard"
+      "dashboard",
+      "adbc914c"
     ],
     "persistent": true,
     "createdAt": "2026-05-17T00:00:00.000Z"
@@ -39,9 +41,49 @@
     "description": "Mission command — active operations and debugging.",
     "agents": [
       "dc6f6a54",
-      "dashboard"
+      "dashboard",
+      "ec4c2c69"
     ],
     "persistent": true,
     "createdAt": "2026-05-17T00:00:00.000Z"
+  },
+  "farm-room": {
+    "id": "farm-room",
+    "name": "Farm Room",
+    "description": "Content Farm - production, marketing, research",
+    "agents": [
+      "5d61ace0",
+      "2bbe37f8"
+    ],
+    "persistent": false,
+    "createdAt": "2026-05-18T18:35:07.776Z"
+  },
+  "sw-dev-room": {
+    "id": "sw-dev-room",
+    "name": "SW Dev Room",
+    "description": "Software Development - frontend, backend, and management. Build, ship, iterate.",
+    "agents": [
+      "01352af4",
+      "49663b4e",
+      "3945b68a"
+    ],
+    "persistent": false,
+    "createdAt": "2026-05-18T20:03:20.180Z"
+  },
+  "validation-room": {
+    "id": "validation-room",
+    "name": "Validation Room",
+    "description": "Quality gate. Nothing ships without PASS.",
+    "agents": [],
+    "persistent": false,
+    "createdAt": "2026-05-18T20:39:17.961Z"
+  },
+  "archive-room": {
+    "id": "archive-room",
+    "name": "Archive Room",
+    "description": "Compressed history, completed work, decision records.",
+    "agents": [],
+    "persistent": false,
+    "createdAt": "2026-05-18T20:39:18.592Z"
   }
 }
