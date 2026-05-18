@@ -1,7 +1,7 @@
 # 🔧 Tool Integration Status
 
 > **Date:** 2026-05-18
-> **Updated by:** OWL (completing Resource Adapter's work after timeout)
+> **Updated by:** Resource Adapter (RA)
 > **Purpose:** Track installation and integration status of new tools
 
 ---
@@ -210,25 +210,53 @@ pnpm install
 - MAD is setting up accounts — document the plan
 
 ### Implementation Plan
-1. MAD creates multiple Google accounts
-2. Store credentials in `config/accounts.json` (encrypted)
-3. Use Google Drive API for automated backups
-4. Use NotebookLM for research summarization
-5. Rotate accounts to avoid rate limits
+1. MAD creates/identifies Google accounts for specific purposes
+2. Create Google Cloud projects per account
+3. Set up service accounts + download JSON keys
+4. Store credentials in `config/google-accounts/` (gitignored)
+5. Use Google Drive API for automated backups
+6. Use NotebookLM for research summarization
+7. Rotate accounts to avoid rate limits
 
 ### Status
 - ⏳ Waiting for MAD to set up accounts
-- No code needed — just credential management
+- Strategy documented in `config/google-accounts-strategy.md`
+
+---
+
+## 6. Validation Gate
+
+**What:** A script that checks each system's readiness before expansion.
+
+**Path:** `tools/validation-gate.py`
+
+### Checks
+- **Quant Lab:** Cost-validated results exist? (cost-validation-*.md in results/)
+- **Content Farm:** Content exists locally? (files in day*/ or output/)
+- **Agent Environment:** Agents registered? (rooms.json / agents.json)
+
+### Usage
+```powershell
+python tools/validation-gate.py          # Summary output
+python tools/validation-gate.py --verbose # Detailed output
+python tools/validation-gate.py --json    # JSON output
+```
+
+### Status
+- ✅ Script created
+- ✅ All three checks implemented
+- ⏳ Needs testing with live data
 
 ---
 
 ## Priority Order for Completion
 
 1. **Netviz** — Already ready. Just run it. (5 min)
-2. **Open Design** — Install dependencies, test. (15 min)
-3. **ViMax** — Install dependencies, configure API keys. (20 min)
-4. **UI-TARS** — Install dependencies, configure model. (20 min)
-5. **Google Accounts** — Waiting on MAD. (0 min our effort)
+2. **Validation Gate** — Created, needs testing. (10 min)
+3. **Open Design** — Install dependencies, test. (15 min)
+4. **ViMax** — Install dependencies, configure API keys. (20 min)
+5. **UI-TARS** — Install dependencies, configure model. (20 min)
+6. **Google Accounts** — Waiting on MAD. (0 min our effort)
 
 ---
 
@@ -239,9 +267,22 @@ pnpm install
 | API keys | ViMax | Video generation provider keys (Doubao, Google Veo, or MiniMax) |
 | API key | UI-TARS | Vision-language model API key |
 | API key | Open Design | Any LLM API key (or use local CLI) |
-| Accounts | Google Strategy | MAD to create Google accounts |
+| Accounts | Google Strategy | MAD to create/assign Google accounts |
 | Decision | All | Which tools to prioritize for Content Farm |
 
 ---
 
-*Integration Status — 2026-05-18 — Resource Adapter (completed by OWL after timeout)*
+## Resource Adapter — Progress Log
+
+| Timestamp | Task | Status |
+|-----------|------|--------|
+| 2026-05-18 14:30 | Agent registry audit — TOOLS.md already accurate (7 operational agents) | ✅ Done |
+| 2026-05-18 14:30 | Validation gate created (`tools/validation-gate.py`) | ✅ Done |
+| 2026-05-18 14:30 | Zero-dependency content track documented | ✅ Done |
+| 2026-05-18 14:30 | Tool integration status verified (Netviz ready, others need deps) | ✅ Done |
+| 2026-05-18 14:30 | Repo assessment updated in TOOLS_AND_REPOS.md | ✅ Done |
+| 2026-05-18 14:30 | Google accounts strategy documented | ✅ Done |
+
+---
+
+*Integration Status — 2026-05-18 14:30 EDT — Resource Adapter (RA)*

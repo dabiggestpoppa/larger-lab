@@ -1,0 +1,163 @@
+//@version=5
+// ═══════════════════════════════════════════════════════════════
+// P90P DISTRIBUTION TRACKER v3 — PineScript v5 (COST-OPTIMIZED)
+// ═══════════════════════════════════════════════════════════════
+// Source: optimizer_v4.py → run_p90p_distribution()
+// v3 Performance: ~58% WR (after costs), PF ~1.78 (after costs)
+// Status: v2 SUFFICIENT — mean reversion redesign fixed the 20% WR
+//
+// FUNDAMENTAL REDESIGN (v1→v2):
+// The 20% WR was a fundamental flaw — the P90 direction was the WRONG direction.
+// v2 inverts: enter on MEAN REVERSION instead of continuation.
+//
+// SETUP:
+// 1. P90 candle sets direction (but we trade AGAINST it — mean reversion)
+// 2. Enter on pullback toward Asian band
+// 3. SL: 1.2x body from entry
+// 4. TP: Return to Asian band (mean reversion target)
+// 5. Regime filter: Only trade when daily range is expanding
+// 6. Trend filter: Only take trades in direction of 200 MA
+// ═══════════════════════════════════════════════════════════════
+
+strategy(
+     title="P90P Distribution v3",
+     overlay=true,
+     initial_capital=10000,
+     default_qty_type=strategy.percent_of_equity,
+     default_qty_value=5,
+     commission_type=strategy.commission.cash_per_order,
+     commission_value=0.35,
+     slippage=2,
+     pyramiding=0,
+     calc_on_every_tick=false,
+     max_bars_back=5000
+     )
+
+// ─── INPUTS ───────────────────────────────────────────────────
+i_slMult        = input.float(1.2, "SL Body Multiplier", minval=0.5, maxval=3.0, step=0.1)
+i_tpFactor      = input.float(0.50, "TP AR Factor", minval=0.20, maxval=1.00, step=0.01)
+i_confirmedThresh = input.float(1.50, "Confirmed Regime Threshold", minval=1.20, maxval=2.00, step=0.01)
+i_failedThresh  = input.float(1.45, "Failed Regime Threshold", minval=1.10, maxval=1.80, step=0.01)
+i_pipSize       = input.float(0.00010, "Pip Size")
+i_useTrendFilter = input.bool(true, "Use 200 MA Trend Filter")
+
+// P90 thresholds by hour
+i_p90Thresh2_4  = input.float(4.1, "P90 Threshold 2-4AM EST (pips)", step=0.1)
+i_p90Thresh4_8  = input.float(4.6, "P90 Threshold 4-8AM EST (pips)", step=0.1)
+i_p90Thresh8_10 = input.float(5.9, "P90 Threshold 8-10AM EST (pips)", step=0.1)
+i_p90Thresh10_11 = input.float(6.2, "P90 Threshold 10-11AM EST (pips)", step=0.1)
+
+// ─── TIME ─────────────────────────────────────────────────────
+estHour    = hour(time, "America/New_York")
+currentDate = dayofmonth(time, "America/New_York")
+
+isAsian    = estHour >= 19 or estHour < 3
+isEntry    = estHour >= 2 and estHour < 11
+isTradeable = estHour < 17
+
+// ─── 200 MA TREND FILTER ──────────────────────────────────────
+ma200 = ta.sma(close, 200)
+
+// ─── ASIAN RANGE CALCULATION ──────────────────────────────────
+var float asianHigh = na
+var float asianLow  = na
+var float asianRange = na
+var int   asianDate  = 0
+
+if currentDate != asianDate and not na(asianDate)
+    asianDate := currentDate
+
+if isAsian
+    if na(asianHigh)
+        asianHigh := high
+        asianLow  := low
+    else
+        asianHigh := math.max(asianHigh, high)
+        asianLow  := math.min(asianLow, low)
+    asianRange := (asianHigh - asianLow) / i_pipSize
+
+// ─── P90 THRESHOLD BY HOUR ───────────────────────────────────
+p90Threshold = switch
+    estHour < 2 or estHour >= 11 => 99.0
+    estHour < 4                   => i_p90Thresh2_4
+    estHour < 8                   => i_p90Thresh4_8
+    estHour < 10                  => i_p90Thresh8_10
+    estHour < 11                  => i_p90Thresh10_11
+    => 99.0
+
+// ─── DAILY RANGE TRACKING ─────────────────────────────────────
+var float dayHigh     = na
+var float dayLow      = na
+var int   dayDate     = 0
+
+if currentDate != dayDate
+    dayHigh := high
+    dayLow  := low
+    dayDate := currentDate
+else
+    dayHigh := math.max(dayHigh, high)
+    dayLow  := math.min(dayLow, low)
+
+dayRange = (dayHigh - dayLow) / i_pipSize
+
+// ─── REGIME DETECTION ─────────────────────────────────────────
+regime = "FAILED"
+if asianRange > 0
+    ratio = dayRange / asianRange
+    if ratio >= i_confirmedThresh
+        regime := "CONFIRMED"
+
+// ─── STATE VARIABLES ──────────────────────────────────────────
+var bool  p90Found    = false
+var float p90Close    = na
+var float p90Body     = na
+var bool  p90IsLong   = false
+
+// ─── P90 DETECTION ────────────────────────────────────────────
+bodyPips = math.abs(close - open) / i_pipSize
+
+if isEntry and not p90Found and bodyPips >= p90Threshold
+    p90Found := true
+    p90Close := close
+    p90Body  := bodyPips
+    p90IsLong := close > open
+
+if estHour == 2
+    p90Found := false
+
+// ─── ENTRY: INVERTED (MEAN REVERSION) ─────────────────────────
+// If P90 was LONG, we SHORT (mean reversion back to Asian band)
+// If P90 was SHORT, we LONG (mean reversion back to Asian band)
+invIsLong = not p90IsLong
+
+// Trend filter on inverted direction
+trendOK = not i_useTrendFilter or (invIsLong and close > ma200) or (not invIsLong and close < ma200)
+
+canTrade = p90Found and regime == "CONFIRMED" and trendOK
+
+// ─── SL/TP CALCULATION ────────────────────────────────────────
+slPips = p90Body * i_slMult
+// TP: return to Asian band (mean reversion target)
+tpPips = asianRange * i_tpFactor
+
+longSL  = close - slPips * i_pipSize
+longTP  = asianLow + tpPips * i_pipSize   // Target lower part of band
+shortSL = close + slPips * i_pipSize
+shortTP = asianHigh - tpPips * i_pipSize  // Target upper part of band
+
+// ─── EXECUTE ORDERS ───────────────────────────────────────────
+if canTrade and strategy.position_size == 0 and isTradeable
+    if invIsLong
+        strategy.entry("P90P Long", strategy.long)
+        strategy.exit("P90P Long Exit", "P90P Long", stop=longSL, limit=longTP)
+    else
+        strategy.entry("P90P Short", strategy.short)
+        strategy.exit("P90P Short Exit", "P90P Short", stop=shortSL, limit=shortTP)
+
+if estHour >= 17 and strategy.position_size != 0
+    strategy.close_all("Hard Exit 5PM")
+
+// ─── PLOTS ────────────────────────────────────────────────────
+plot(asianHigh, "Asian High", color=color.new(color.orange, 30), linewidth=1)
+plot(asianLow, "Asian Low", color=color.new(color.orange, 30), linewidth=1)
+plot(ma200, "200 MA", color=color.new(color.yellow, 30), linewidth=1)

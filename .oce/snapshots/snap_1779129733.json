@@ -1,0 +1,12 @@
+{
+  "snapshot_id": "snap_1779129733",
+  "timestamp": 1779129733.9921932,
+  "shell_state": {
+    "v2": true
+  },
+  "observer_count": 0,
+  "active_trajectories": [],
+  "entropy_budget": 1.0,
+  "field_health": 1.0,
+  "checksum": "a91a9297b9e5660d"
+}

@@ -17,14 +17,42 @@ class EnvRenderer {
     this.demoMode = false;
     this.demoAgents = [];
 
-    this.resize();
+    // Delay resize to ensure DOM layout is complete
+    // Use multiple strategies: immediate attempt, rAF, and timeout
+    this._tryResize();
     window.addEventListener('resize', () => this.resize());
+    // Also try resizing when the page fully loads
+    if (document.readyState !== 'complete') {
+      window.addEventListener('load', () => this.resize());
+    }
+  }
+
+  _tryResize() {
+    // Try immediate resize
+    if (this.resize()) return;
+    // Try after one rAF (browser may not have laid out yet)
+    requestAnimationFrame(() => {
+      if (this.resize()) return;
+      // Try after a short delay as fallback
+      setTimeout(() => this.resize(), 100);
+    });
   }
 
   resize() {
     const container = this.canvas.parentElement;
-    this.canvas.width = container.clientWidth;
-    this.canvas.height = container.clientHeight;
+    if (!container) return false;
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    // Only resize if we have valid dimensions (avoid 0x0 canvas)
+    if (w > 0 && h > 0) {
+      // Only actually resize if dimensions changed (avoids unnecessary clears)
+      if (this.canvas.width !== w || this.canvas.height !== h) {
+        this.canvas.width = w;
+        this.canvas.height = h;
+      }
+      return true;
+    }
+    return false;
   }
 
   updateWorldState(state) {
@@ -75,6 +103,12 @@ class EnvRenderer {
     // Draw grid
     this._drawGrid();
 
+    // Show loading state if no rooms and no demo mode
+    if (this.worldState.rooms.length === 0 && !this.demoMode) {
+      this._drawLoadingState();
+      return;
+    }
+
     // Draw connections first (under rooms)
     if (state.connections) {
       this._drawConnections(state.connections, state.agents);
@@ -115,6 +149,20 @@ class EnvRenderer {
         this._drawAgent(demo, { x: demo.x, y: demo.y }, false);
       }
     }
+  }
+
+  _drawLoadingState() {
+    const ctx = this.ctx;
+    ctx.fillStyle = 'rgba(108, 92, 231, 0.15)';
+    ctx.font = '16px "Segoe UI", system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('⏳ Waiting for world state...', this.canvas.width / 2, this.canvas.height / 2 - 10);
+    ctx.font = '12px "Segoe UI", system-ui, sans-serif';
+    ctx.fillStyle = 'rgba(136, 136, 170, 0.6)';
+    ctx.fillText('Connect to the server or click ▶ Demo to begin', this.canvas.width / 2, this.canvas.height / 2 + 16);
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
   }
 
   _drawGrid() {
@@ -378,9 +426,42 @@ class EnvRenderer {
     return `rgb(${r}, ${g}, ${b})`;
   }
 
+  // ── Drag State ──
+  startDrag(agentId, x, y) {
+    this.dragState = { agentId, offsetX: 0, offsetY: 0, active: true };
+    const pos = this.agentPositions.get(agentId);
+    if (pos) {
+      this.dragState.offsetX = pos.x - x;
+      this.dragState.offsetY = pos.y - y;
+    }
+  }
+
+  updateDrag(x, y) {
+    if (!this.dragState || !this.dragState.active) return;
+    const newX = x + this.dragState.offsetX;
+    const newY = y + this.dragState.offsetY;
+    this.agentPositions.set(this.dragState.agentId, { x: newX, y: newY });
+  }
+
+  endDrag() {
+    if (this.dragState) this.dragState.active = false;
+    return this.dragState ? { ...this.dragState } : null;
+  }
+
+  isDragging() {
+    return !!(this.dragState && this.dragState.active);
+  }
+
+  getDragAgentId() {
+    return this.isDragging() ? this.dragState.agentId : null;
+  }
+
   // Hit testing
   getAgentAt(x, y) {
-    for (const [agentId, pos] of this.agentPositions) {
+    // Check in reverse order so top-drawn agents are picked first
+    const entries = Array.from(this.agentPositions.entries());
+    for (let i = entries.length - 1; i >= 0; i--) {
+      const [agentId, pos] = entries[i];
       const dx = x - pos.x;
       const dy = y - pos.y;
       if (dx * dx + dy * dy < 18 * 18) {
