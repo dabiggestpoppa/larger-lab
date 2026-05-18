@@ -1,0 +1,106 @@
+{
+  "version": "1.0",
+  "created": "2026-05-18T01:32:32.010934",
+  "queue": [
+    {
+      "id": 1,
+      "file": "content-farm/output/tiktok/day1_tiktok_01_anime.png",
+      "platform": "tiktok",
+      "scheduled": "2026-05-20T12:00:00",
+      "caption": "A1 - Anime TikTok",
+      "tags": [],
+      "status": "queued",
+      "created": "2026-05-18T01:32:32.023941"
+    },
+    {
+      "id": 2,
+      "file": "content-farm/output/tiktok/day1_tiktok_02_realistic.png",
+      "platform": "tiktok",
+      "scheduled": "2026-05-21T18:00:00",
+      "caption": "R1 - Realistic TikTok",
+      "tags": [],
+      "status": "queued",
+      "created": "2026-05-18T01:32:32.171648"
+    },
+    {
+      "id": 3,
+      "file": "content-farm/output/tiktok/day1_tiktok_03_fantasy.png",
+      "platform": "tiktok",
+      "scheduled": "2026-05-22T12:00:00",
+      "caption": "F1 - Fantasy TikTok",
+      "tags": [],
+      "status": "queued",
+      "created": "2026-05-18T01:32:32.288585"
+    },
+    {
+      "id": 4,
+      "file": "content-farm/output/ig/day1_ig_04_abstract.png",
+      "platform": "ig",
+      "scheduled": "2026-05-20T11:00:00",
+      "caption": "AB2 - Abstract Instagram",
+      "tags": [],
+      "status": "queued",
+      "created": "2026-05-18T01:32:32.411398"
+    },
+    {
+      "id": 5,
+      "file": "content-farm/output/ig/day1_ig_05_nsfw.png",
+      "platform": "ig",
+      "scheduled": "2026-05-22T11:00:00",
+      "caption": "N2 - NSFW Instagram",
+      "tags": [],
+      "status": "queued",
+      "created": "2026-05-18T01:32:32.557577"
+    },
+    {
+      "id": 6,
+      "file": "content-farm/output/ig/day1_ig_06_anime.png",
+      "platform": "ig",
+      "scheduled": "2026-05-20T11:00:00",
+      "caption": "A2 - Anime Instagram",
+      "tags": [],
+      "status": "queued",
+      "created": "2026-05-18T01:32:32.684889"
+    },
+    {
+      "id": 7,
+      "file": "content-farm/output/x/day1_x_07_realistic.png",
+      "platform": "x",
+      "scheduled": "2026-05-19T12:00:00",
+      "caption": "R3 - Realistic X",
+      "tags": [],
+      "status": "queued",
+      "created": "2026-05-18T01:32:32.807652"
+    },
+    {
+      "id": 8,
+      "file": "content-farm/output/x/day1_x_08_fantasy.png",
+      "platform": "x",
+      "scheduled": "2026-05-22T12:00:00",
+      "caption": "F3 - Fantasy X",
+      "tags": [],
+      "status": "queued",
+      "created": "2026-05-18T01:32:32.930772"
+    },
+    {
+      "id": 9,
+      "file": "content-farm/output/reddit/day1_reddit_09_abstract.png",
+      "platform": "reddit",
+      "scheduled": "2026-05-19T10:00:00",
+      "caption": "AB4 - Abstract Reddit",
+      "tags": [],
+      "status": "queued",
+      "created": "2026-05-18T01:32:33.052988"
+    },
+    {
+      "id": 10,
+      "file": "content-farm/output/reddit/day1_reddit_10_nsfw.png",
+      "platform": "reddit",
+      "scheduled": "2026-05-22T11:00:00",
+      "caption": "N4 - NSFW Reddit",
+      "tags": [],
+      "status": "queued",
+      "created": "2026-05-18T01:32:33.178132"
+    }
+  ]
+}

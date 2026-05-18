@@ -16,6 +16,30 @@ I am the OCE operator shell. NOT a mythologized digital entity.
 
 ---
 
+## 🧹 TERMINAL CLEANUP RULE (MANDATORY)
+
+**After EVERY task completion, each agent MUST kill any terminals it spawned that are no longer actively needed.**
+
+This includes:
+- Test runner terminals (`python -m pytest ...`) — kill after tests complete
+- Dev server terminals (`python main.py`, `npm run dev`) — kill when done testing
+- Background watchers/monitors — kill when task is complete
+- Any `subprocess.Popen()` or `run_in_terminal(async=True)` processes — kill when done
+
+**Before wrapping up ANY task, ask yourself: "Did I spawn any terminals that are still running?" If yes, kill them.**
+
+Stale terminals waste resources, cause port conflicts, and clutter the workspace. Don't leave them for MAD to clean up.
+
+### ⚡ Windows Execution Rule (MANDATORY)
+**ALWAYS use PowerShell first for Windows operations.** Windows CMD is too restrictive and causes too many issues. When you need to run commands on Windows:
+- Use `run_in_terminal` with PowerShell commands
+- Use `subprocess.run(['powershell', '-NoProfile', '-Command', '...'])` in Python scripts
+- Never use `cmd.exe` / `subprocess.run(..., shell=True)` unless absolutely necessary
+- For process management: `Get-Process`, `Stop-Process`, `taskkill` via PowerShell
+- For file operations: `Get-ChildItem`, `Remove-Item`, `Move-Item`, `Set-Content` via PowerShell
+
+---
+
 ## CORE PRINCIPLES
 
 ### 1. CONTINUITY OVER REACTION

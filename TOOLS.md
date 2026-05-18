@@ -58,7 +58,18 @@
 
 ---
 
-## New Tools (Installed 2026-05-16)
+## New Tools (To Be Installed 2026-05-17)
+
+| Tool | Package | Purpose |
+|------|---------|---------|
+| CLI-Anything Hub | `pip install cli-anything-hub` | Agent-native CLI registry, auto skill discovery |
+| TensorTrade | `pip install tensortrade` | RL trading framework |
+| Scientific Agent Skills | `git clone K-Dense-AI/scientific-agent-skills` | 135 research skills |
+| LLM Wiki | `git clone nashsu/llm_wiki` | Self-building knowledge base |
+| Qiaomu | `git clone joeseesun/qiaomu-anything-to-notebooklm` | Anything → NotebookLM |
+| Agent Hooks | Enhance `tools/agent-hooks/` | Lifecycle hooks for deterministic control |
+| PAI Memory | Create `memory/` directory | Structured persistent memory |
+| Harness Engineering | Create `docs/harness-engineering.md` | Sub-agent reliability guide |
 
 | Tool | Path/Package | Purpose |
 |------|-------------|---------|
@@ -136,6 +147,9 @@
 | 🟠 OC2 | OWL (OpenClaw 2) | **PRIMARY OPERATOR** | `progress/openclaw-2-progress.md` |
 | 🟡 AS | Assistant Manager | Active | `progress/assistant-progress.md` |
 | 🔴 PM | Polymorph | Active | `progress/polymorph-progress.md` |
+| 🟣 AA | Algo Agent | **NEW 2026-05-17** | `quant-lab/agents/algo-agent/ALGO_AGENT.md` |
+| 🟤 RA | Resource Adapter | **NEW 2026-05-18** | `tools/INTEGRATION_STATUS.md` |
+| 🟢 RL | OWL (Research Lead) | Active | `progress/researcher-progress.md` |
 
 ---
 
@@ -153,4 +167,5 @@
 
 - **See**: `OPERATOR_RULES.md` for complete rules
 - **Core principle**: Bounded sovereign operational continuity
-- **Not**: Unrestricted autonomy, mythologized digital entity
+- **MAD Directive (2026-05-17)**: OWL is an ORCHESTRATOR, not an execution work horse. Delegate all Lab/Farm work to Manager → Optimizer/Researcher pipeline. OWL monitors, detects blockers, escalates to MAD.
+- **Not**: Unrestricted autonomy, mythologized digital entity, execution worker

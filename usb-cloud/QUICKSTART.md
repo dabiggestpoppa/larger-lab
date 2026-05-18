@@ -6,10 +6,10 @@ Open PowerShell as Administrator and run:
 
 ```powershell
 # 1. Create the server
-c:\Users\wifik\Desktop\projects\larger-lab\usb-cloud\cloudcli.exe server create --name larger-lab-agent --datacenter US-NY2 --image "Ubuntu 24.04" --cpu 2B --ram 4096 --disk id=0,size=50 --network id=0,name=wan,ip=auto --password "TempPass123!" --api-clientid 84908b7a4714aacd25c51715e0efe96e --api-secret 9cd519e13f62ef5522736cb103328ba8 --wait
+c:\Users\wifik\Desktop\projects\larger-lab\usb-cloud\cloudcli.exe server create --name larger-lab-agent --datacenter US-NY2 --image "Ubuntu 24.04" --cpu 2B --ram 4096 --disk id=0,size=50 --network id=0,name=wan,ip=auto --password "TempPass123!" --api-clientid YOUR_API_KEY --api-secret YOUR_API_SECRET --wait
 
 # 2. Get server IP (after creation)
-c:\Users\wifik\Desktop\projects\larger-lab\usb-cloud\cloudcli.exe server info --name larger-lab-agent --api-clientid 84908b7a4714aacd25c51715e0efe96e --api-secret 9cd519e13f62ef5522736cb103328ba8
+c:\Users\wifik\Desktop\projects\larger-lab\usb-cloud\cloudcli.exe server info --name larger-lab-agent --api-clientid YOUR_API_KEY --api-secret YOUR_API_SECRET
 ```
 
 ## After Server is Created

@@ -560,21 +560,95 @@ def auto_fix(force=False):
     conn.commit()
     conn.close()
     print(f"\n🔧 Auto-fixed {fixed} error(s).")
+
+    # Deactivate safety cron after successful heal
+    deactivate_safety_cron()
+
+    # Mark prescription as executed
+    _mark_prescription_executed(fixed)
+
     return fixed
+
+
+def _mark_prescription_approved():
+    """Mark the current prescription as approved by MAD."""
+    if not os.path.exists(PRESCRIPTION_PATH):
+        print("⚠️  No prescription found. Run doctor first: python tools/doctor.py --full")
+        return
+    with open(PRESCRIPTION_PATH, "r", encoding="utf-8") as f:
+        content = f.read()
+    content = content.replace(
+        "**Status:** ⏳ PENDING MAD APPROVAL",
+        "**Status:** ✅ APPROVED"
+    )
+    with open(PRESCRIPTION_PATH, "w", encoding="utf-8") as f:
+        f.write(content)
+    print("✅ Prescription approved. Run: python tools/self_heal.py --fix")
+
+
+def _mark_prescription_executed(fixed_count):
+    """Update prescription status to executed."""
+    if os.path.exists(PRESCRIPTION_PATH):
+        with open(PRESCRIPTION_PATH, "r", encoding="utf-8") as f:
+            content = f.read()
+        content = content.replace(
+            "**Status:** ✅ APPROVED",
+            f"**Status:** ✅ EXECUTED ({fixed_count} fixes applied)"
+        )
+        content = content.replace(
+            "**Status:** ⏳ PENDING MAD APPROVAL",
+            f"**Status:** ✅ EXECUTED ({fixed_count} fixes applied)"
+        )
+        with open(PRESCRIPTION_PATH, "w", encoding="utf-8") as f:
+            f.write(content)
+
+
+def run_self_heal_approved():
+    """Entry point: only runs if prescription is approved."""
+    if not check_prescription_approved():
+        return
+    print("\n🛡️  Prescription approved. Starting self-heal with safety cron...")
+    run_startup_check()
+    auto_fix(force=True)  # already checked approval above
+    generate_report()
 
 
 if __name__ == "__main__":
     args = sys.argv[1:]
-    if not args or "--full" in args:
+    if "--force" in args:
+        # Force mode: skip prescription check (MAD already approved via direct command)
+        print("⚡ Force mode: skipping prescription check")
         run_startup_check()
-        auto_fix()
+        auto_fix(force=True)
+        generate_report()
+    elif not args or "--full" in args:
+        # Standard flow: scan → prescribe → wait for approval → fix
+        run_startup_check()
+        print("\n📋 To execute fixes, MAD must approve the prescription.")
+        print(f"   Prescription: {PRESCRIPTION_PATH}")
+        print("   After approval: python tools/self_heal.py --force")
+        # Try to auto-fix only if prescription is already approved
+        if check_prescription_approved():
+            auto_fix(force=True)
         generate_report()
     elif "--scan" in args:
         run_startup_check()
     elif "--report" in args:
         generate_report()
     elif "--fix" in args:
-        auto_fix()
+        # Requires prescription approval
+        if check_prescription_approved():
+            auto_fix(force=True)
         generate_report()
+    elif "--approve" in args:
+        # Mark prescription as approved (called by MAD via Telegram)
+        _mark_prescription_approved()
     else:
-        print("Usage: python tools/self_heal.py [--scan] [--report] [--fix] [--full]")
+        print("Usage: python tools/self_heal.py [--scan] [--report] [--fix] [--full] [--force] [--approve]")
+        print("")
+        print("  --full     Full scan + report (default)")
+        print("  --scan     Scan logs only")
+        print("  --report   Show health report")
+        print("  --fix      Execute fixes (requires approved prescription)")
+        print("  --force    Execute fixes (skip prescription check)")
+        print("  --approve  Mark current prescription as approved")

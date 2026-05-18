@@ -1,0 +1,172 @@
+//@version=5
+strategy("Dual Engine", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=100, initial_capital=100000, commission_type=strategy.commission.cash_per_order, commission_value=0.5)
+
+// ═══════════════════════════════════════════════════════════════
+// Dual Engine — CEREBUS FX v4.0
+// Performance: 51.2% WR, +757p, PF 1.60
+//
+// Logic: Two-stage entry system. The "anchor" is the first P90
+// breakout from the Asian range. "Amplifier" entries are additional
+// entries in the same direction during a pullback.
+//
+// ANCHOR (first entry):
+// 1. P90 candle breaks above/below Asian range (close >= 2p outside)
+// 2. AR must be T1 or T2 (<= 30 pips)
+// 3. Enter at close of breakout candle
+// 4. SL: 1.5 x body from entry
+// 5. TP: AR * 0.35 in trade direction
+//
+// AMPLIFIER (additional entries):
+// 1. After anchor, look for same-direction P90 during pullback
+// 2. Pullback must retrace 32-50% of impulse from anchor
+// 3. Max amplifiers: 2 for T1, 1 for T2
+// 4. SL: 1.5 x amplifier body from entry
+// 5. TP: AR * 0.35 in trade direction
+// ═══════════════════════════════════════════════════════════════
+
+// === INPUTS ===
+maxAR              = input.float(30.0, "Max AR (pips)", minval=10.0)
+minAR              = input.float(3.0, "Min AR (pips)", minval=1.0)
+maxARQuality       = input.float(20.0, "Max AR Quality (pips)", minval=5.0)
+slBodyMult         = input.float(1.5, "SL Body Multiplier", minval=0.1, step=0.1)
+tpARFactor         = input.float(0.35, "TP AR Factor", minval=0.1, step=0.05)
+retraceMin         = input.float(0.32, "Retrace Min", minval=0.1, step=0.01)
+retraceMax         = input.float(0.50, "Retrace Max", minval=0.1, step=0.01)
+maxAmpsT1          = input.int(2, "Max Amplifiers T1", minval=0, maxval=5)
+maxAmpsT2          = input.int(1, "Max Amplifiers T2", minval=0, maxval=5)
+minCloseOutside    = input.float(2.0, "Min Close Outside AR (pips)", minval=0.5, step=0.5)
+pipValue           = input.float(0.0001, "Pip Value (EUR/USD=0.0001)")
+
+// === TIME FILTERS ===
+estOffset = -5
+utcHour = hour(time, "UTC")
+estHour = (utcHour + estOffset + 24) % 24
+
+isEntryWindow = estHour >= 2 and estHour < 12
+isTradeWindow = estHour < 17
+
+// === ASIAN RANGE CALCULATION (7PM - 3AM EST) ===
+var float asianHigh = na
+var float asianLow = na
+var float asianRange = na
+
+isAsianSession = estHour >= 19 or estHour < 3
+
+if isAsianSession and barstate.isconfirmed
+    if na(asianHigh)
+        asianHigh := high
+        asianLow := low
+    else
+        asianHigh := math.max(asianHigh, high)
+        asianLow := math.min(asianLow, low)
+
+if estHour == 3 and barstate.isconfirmed
+    asianRange := (asianHigh - asianLow) / pipValue
+    asianHigh := na
+    asianLow := na
+
+// === P90 THRESHOLDS BY HOUR ===
+p90Threshold = switch
+    estHour >= 2  and estHour < 4  => 4.1
+    estHour >= 4  and estHour < 8  => 4.6
+    estHour >= 8  and estHour < 11 => 5.9
+    estHour == 11                  => 6.2
+    => 999.0
+
+// === P90 DETECTION ===
+bodySize = math.abs(close - open) / pipValue
+isP90 = isEntryWindow and not na(asianRange) and bodySize >= p90Threshold and asianRange >= minAR and asianRange <= maxAR
+
+// === TIER CLASSIFICATION ===
+tier = asianRange < 20 ? "T1" : asianRange < 30 ? "T2" : asianRange < 45 ? "T3" : "NO_GO"
+
+// === STATE VARIABLES ===
+var bool anchorPlaced = false
+var int anchorDirection = 0     // 1=LONG, -1=SHORT
+var float anchorPrice = na
+var float anchorBodyPips = na
+var float arAtAnchor = na
+var int ampCount = 0
+var int maxAmps = 0
+var float impulseHigh = na
+var float impulseLow = na
+
+// === ANCHOR ENTRY ===
+if isP90 and barstate.isconfirmed and not anchorPlaced and tier == "T1" or tier == "T2"
+    dir = close > open ? 1 : -1
+    ep = close
+    
+    // Must close >= 2 pips outside Asian band
+    closeDist = dir == 1 ? (ep - asianHigh) / pipValue : (asianLow - ep) / pipValue
+    
+    if closeDist >= minCloseOutside and asianRange <= maxARQuality
+        anchorPlaced := true
+        anchorDirection := dir
+        anchorPrice := ep
+        anchorBodyPips := bodySize
+        arAtAnchor := asianRange
+        impulseHigh := high
+        impulseLow := low
+        maxAmps := tier == "T1" ? maxAmpsT1 : maxAmpsT2
+        ampCount := 0
+        
+        // Calculate SL/TP
+        slDist = bodySize * slBodyMult * pipValue
+        tpDist = asianRange * tpARFactor * pipValue
+        
+        slLevel = anchorPrice - slDist * anchorDirection
+        tpLevel = anchorPrice + tpDist * anchorDirection
+        
+        tradeDir = anchorDirection == 1 ? "LONG" : "SHORT"
+        labelText = "DE_Anchor_" + tradeDir
+        strategy.entry(labelText, anchorDirection == 1 ? strategy.long : strategy.short)
+        strategy.exit("DE_Anchor_SL/TP", labelText, stop=slLevel, limit=tpLevel)
+
+// === AMPLIFIER ENTRIES ===
+if anchorPlaced and ampCount < maxAmps and isP90 and barstate.isconfirmed
+    dir = close > open ? 1 : -1
+    
+    // Must be same direction as anchor
+    if dir == anchorDirection
+        // Update impulse extremes
+        impulseHigh := math.max(impulseHigh, high)
+        impulseLow := math.min(impulseLow, low)
+        
+        // Calculate impulse size and retrace
+        impulseSize = anchorDirection == 1 ? (impulseHigh - anchorPrice) / pipValue : (anchorPrice - impulseLow) / pipValue
+        
+        if impulseSize > 0
+            retrace = anchorDirection == 1 ? (impulseHigh - low) / pipValue : (high - impulseLow) / pipValue
+            retracePct = retrace / impulseSize
+            
+            if retracePct >= retraceMin and retracePct <= retraceMax
+                ampCount += 1
+                ep = close
+                slDist = bodySize * slBodyMult * pipValue
+                tpDist = arAtAnchor * tpARFactor * pipValue
+                
+                slLevel = ep - slDist * anchorDirection
+                tpLevel = ep + tpDist * anchorDirection
+                
+                labelText = "DE_Amp" + str.tostring(ampCount) + "_" + (anchorDirection == 1 ? "LONG" : "SHORT")
+                strategy.entry(labelText, anchorDirection == 1 ? strategy.long : strategy.short)
+                strategy.exit("DE_Amp_SL/TP_" + str.tostring(ampCount), labelText, stop=slLevel, limit=tpLevel)
+
+// === RESET STATE ===
+if anchorPlaced and strategy.position_size == 0
+    anchorPlaced := false
+    anchorDirection := 0
+    anchorPrice := na
+    anchorBodyPips := na
+    arAtAnchor := na
+    ampCount := 0
+    maxAmps := 0
+    impulseHigh := na
+    impulseLow := na
+
+// === HARD EXIT AT 5 PM EST ===
+if estHour >= 17 and barstate.isconfirmed
+    strategy.close_all("Hard Exit 5PM")
+    anchorPlaced := false
+    anchorDirection := 0
+    ampCount := 0

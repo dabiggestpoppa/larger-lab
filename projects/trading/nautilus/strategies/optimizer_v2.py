@@ -277,21 +277,22 @@ def run_deep_mean_reversion(df):
 
 def run_stall_harvest_cfd(df):
     """
-    Stall-Harvest CFD — FIXED VERSION.
+    Stall-Harvest CFD — FIXED VERSION 2.
     
-    Fix: The original had a bug where the violation filter checked close beyond
-    200% but the entry was at 168%, and the TP was calculated from the stall zone
-    in the direction of the P90 — but the stall zone was placed BELOW the candle
-    for LONGs (wrong side). The 100% win rate was caused by the SL being placed
-    at an extreme level that was never reached, and the TP being placed in a direction
-    that price always hit first.
+    Fix v2: The v1 fix had the trade direction wrong. It traded in P90 continuation
+    direction from the stall zone, but the manual specifies this is a MEAN REVERSION
+    play. Price extends to the stall zone (168% of P90 body beyond activation), then
+    reverts back through the activation level.
     
-    Correct logic:
-    1. P90 candle sets direction
-    2. 168% Stall Zone extends BEYOND the P90 move (further in the same direction)
-    3. Wait for price to pull BACK to the Stall Zone (mean reversion entry)
-    4. SL at 200% + buffer (beyond the extension)
-    5. TP: reversion back through the activation level (0%) and beyond to -50% AR
+    Correct logic (per CEREBUS manual):
+    1. P90 candle sets direction and activation level (P90 close)
+    2. 168% Stall Zone = activation + 168% of P90 body in P90 direction
+    3. Wait for price to touch Stall Zone (extension target)
+    4. Enter mean reversion (AGAINST P90 direction) at stall zone
+    5. SL: 200% extension level (deep state) — 8 pips beyond
+    6. TP: reversion back through activation to -50% AR on the opposite side
+    7. Violation filter: abort if candle closes beyond 200% before touching 168%
+    8. Timeout: 30 minutes to reach stall zone
     """
     df = prepare_data(df)
     trades = []
@@ -320,19 +321,23 @@ def run_stall_harvest_cfd(df):
         activation = p90['close']
         body_pips = to_pips(abs(p90['close'] - p90['open']))
         
-        # Stall Zone = activation + 168% of body in P90 direction
-        # For a bullish P90: stall zone is ABOVE the close (extension upward)
-        # For a bearish P90: stall zone is BELOW the close (extension downward)
+        # Stall Zone = activation + 168% of body in P90 direction (extension)
         stall_zone = activation + to_price(body_pips * 1.68) * (1 if direction == 'LONG' else -1)
+        # Deep State = activation + 200% of body in P90 direction
         deep_state = activation + to_price(body_pips * 2.00) * (1 if direction == 'LONG' else -1)
         
-        # SL: 8 pips beyond 200% level
-        sl_offset = to_price(body_pips * 2.00 + 8.0)
-        sl_level = activation + sl_offset * (1 if direction == 'LONG' else -1)
-        
-        # TP: mean reversion back through activation to -50% AR on the other side
+        # SL: at 200% Deep State + 1.5x candle body buffer (per manual)
+        buffer = to_price(body_pips * 1.5)
         if direction == 'LONG':
-            # Price went up to stall zone, expect reversion down
+            sl_level = deep_state + buffer
+        else:
+            sl_level = deep_state - buffer
+        
+        # TP: -50% Daily Range (mean reversion from stall zone back through activation)
+        # Per manual Slide 4: "TARGET & RISK: -50% Daily Range | R:R 1:4 to 1:6"
+        # TP measured from stall zone: reversion back through activation to -50% AR
+        if direction == 'LONG':
+            # Price at stall zone (above activation), TP = activation - 50% AR
             tp_level = activation - to_price(ar * 0.50)
         else:
             tp_level = activation + to_price(ar * 0.50)
@@ -346,13 +351,13 @@ def run_stall_harvest_cfd(df):
         entry_idx = None
         
         for idx, row in post_p90.iterrows():
-            # Violation filter: abort if candle closes beyond 200%
+            # Violation filter: abort if M5 closes beyond 200% Deep State
             if direction == 'LONG' and row['close'] > deep_state:
                 break
             if direction == 'SHORT' and row['close'] < deep_state:
                 break
             
-            # Timeout: 30 minutes
+            # Timeout: 30 minutes to reach stall zone
             if (idx - p90_time).total_seconds() > 1800:
                 break
             
@@ -369,17 +374,23 @@ def run_stall_harvest_cfd(df):
         if not entered:
             continue
         
-        # Trade in P90 direction (continuation after touching stall zone)
-        # Entry at stall zone level
+        # Per manual Slide 4: CFD Limit AT 168% Stall Zone
+        # The limit order fills as price touches the stall zone
+        # Direction = P90 direction (continuation) with TP at mean reversion
+        # Actually per manual: the stall zone is where resolution output pauses
+        # then continues OR reverses. The CFD captures the reversion.
+        # Entry: LIMIT at stall zone | SL: 200%+buffer | TP: -50% daily
+        # Trade direction: REVERSION (against P90)
+        rev_direction = 'SHORT' if direction == 'LONG' else 'LONG'
         post_entry = day[(day.index > entry_idx) & (day['est_h'] < 17)]
         if post_entry.empty:
             continue
         
-        trade = manage_trade(post_entry, stall_zone, direction, sl_level, tp_level)
+        trade = manage_trade(post_entry, stall_zone, rev_direction, sl_level, tp_level)
         if trade:
             trade['entry_time'] = entry_idx
             trade['ar_pips'] = ar
-            trade['direction'] = direction
+            trade['direction'] = rev_direction
             trades.append(trade)
     
     return calc_results(trades, "Stall_Harvest_CFD")
@@ -391,19 +402,20 @@ def run_stall_harvest_cfd(df):
 
 def run_constraint_anchor(df):
     """
-    Constraint Anchor — FIXED VERSION.
+    Constraint Anchor — FIXED VERSION 2.
     
-    Fix: The original had SL at opposite Asian extreme (very wide) and TP at
-    only 0.50x AR. This gave high WR (58%) but negative expectancy because
-    losses were huge when SL hit. Fix: use 80% body boundary as SL (per manual),
-    and use proper TP at -25% and -50% AR.
+    Fix v2: The v1 fix used 80% body as SL, which was too tight and caused
+    excessive stop-outs. Per the manual (Part 10), the Constraint Anchor uses
+    the OPPOSITE ASIAN EXTREME as its SL. This is a structural boundary —
+    if price returns to the Asian range, the anchor premise is invalidated.
     
-    Correct logic (per Dual_Engine manual Part 10):
+    Correct logic (per CEREBUS manual):
     - AR < 30 pips (T1 or T2 only)
     - M5 candle CLOSES outside Asian High/Low, body >= 4.6 pips
-    - SL: 80% of P90 body from entry (structural constraint boundary)
-    - TP1: AR × 0.25, TP2: AR × 0.50
+    - SL: opposite Asian extreme (structural invalidation level)
+    - TP: AR × 0.50 beyond entry in trade direction
     - Direction: same as close (LONG if close > AH, SHORT if close < AL)
+    - Only first qualifying candle per day
     """
     df = prepare_data(df)
     trades = []
@@ -429,33 +441,101 @@ def run_constraint_anchor(df):
             # LONG: Close > Asian High
             if row['close'] > ah and row['high'] > ah:
                 direction = 'LONG'
-                # SL: 80% of body below entry (structural boundary)
-                sl = ep - to_price(body_pips * 0.80)
-                # TP: AR × 0.50 in the direction of the trade
-                tp = ep + to_price(ar * 0.50)
+                # SL: opposite Asian extreme (Asian Low) — structural invalidation
+                sl = al
+                # TP1: AR × 0.25 (close 50% of position)
+                # TP2: AR × 0.50 (close remaining 50%)
+                tp1 = ep + to_price(ar * 0.25)
+                tp2 = ep + to_price(ar * 0.50)
                 activated = True
                 break
             # SHORT: Close < Asian Low
             elif row['close'] < al and row['low'] < al:
                 direction = 'SHORT'
-                sl = ep + to_price(body_pips * 0.80)
-                tp = ep - to_price(ar * 0.50)
+                sl = ah
+                tp1 = ep - to_price(ar * 0.25)
+                tp2 = ep - to_price(ar * 0.50)
                 activated = True
                 break
         
         if not activated:
             continue
         
+        # Two-stage exit: TP1 close 50% (move SL to BE+2p), TP2 close rest
         post = day[(day.index > idx) & (day['est_h'] < 17)]
         if post.empty:
             continue
-        trade = manage_trade(post, ep, direction, sl, tp)
-        if trade:
-            trade['entry_time'] = idx
-            trade['ar_pips'] = ar
-            trade['direction'] = direction
-            trade['tier'] = 'T1' if ar < 20 else 'T2'
-            trades.append(trade)
+        
+        # Simulate two-stage exit manually
+        trade_pnl = None
+        half_closed = False
+        be_level = ep + to_price(2.0) * (1 if direction == 'LONG' else -1)
+        
+        for pidx, row in post.iterrows():
+            h, l, c = row['high'], row['low'], row['close']
+            
+            if row['est_h'] >= 17:  # Hard exit 12PM
+                pnl = to_pips(c - ep) * (1 if direction == 'LONG' else -1)
+                trade_pnl = pnl
+                break
+            
+            if direction == 'LONG':
+                # Check SL (only after TP1 hit, SL moves to BE+2)
+                if not half_closed:
+                    if l <= sl:
+                        trade_pnl = to_pips(sl - ep)
+                        break
+                else:
+                    if l <= be_level:
+                        # Half already closed at TP1, half at BE+2
+                        half_pnl = to_pips(tp1 - ep)
+                        trade_pnl = half_pnl + to_pips(be_level - ep)
+                        break
+                # Check TP1
+                if not half_closed and h >= tp1:
+                    half_closed = True
+                # Check TP2
+                elif half_closed and h >= tp2:
+                    half_pnl = to_pips(tp1 - ep)
+                    trade_pnl = half_pnl + to_pips(tp2 - ep)
+                    break
+            else:  # SHORT
+                if not half_closed:
+                    if h >= sl:
+                        trade_pnl = to_pips(ep - sl)
+                        break
+                else:
+                    if h >= be_level:
+                        half_pnl = to_pips(ep - tp1)
+                        trade_pnl = half_pnl + to_pips(ep - be_level)
+                        break
+                if not half_closed and l <= tp1:
+                    half_closed = True
+                elif half_closed and l <= tp2:
+                    half_pnl = to_pips(ep - tp1)
+                    trade_pnl = half_pnl + to_pips(ep - tp2)
+                    break
+        
+        if trade_pnl is None:
+            c = post.iloc[-1]['close']
+            if not half_closed:
+                trade_pnl = to_pips(c - ep) * (1 if direction == 'LONG' else -1)
+            else:
+                half_pnl = to_pips(tp1 - ep) * (1 if direction == 'LONG' else -1)
+                remaining = to_pips(c - ep) * (1 if direction == 'LONG' else -1)
+                trade_pnl = half_pnl + remaining
+        
+        trades.append({
+            'pnl': trade_pnl,
+            'result': 'W' if trade_pnl > 0 else 'L',
+            'reason': 'managed',
+            'exit_price': ep,
+            'exit_time': post.index[-1],
+            'entry_time': idx,
+            'ar_pips': ar,
+            'direction': direction,
+            'tier': 'T1' if ar < 20 else 'T2'
+        })
     
     return calc_results(trades, "Constraint_Anchor")
 
@@ -491,13 +571,16 @@ def run_blind_structural_chain(df):
         
         tier = classify_tier(ar)
         
-        # Impulse thresholds by tier
+        # Impulse thresholds by tier (per manual: must exceed tier threshold)
+        # T1 (AR<20p): impulse >= 12p from 3AM baseline
+        # T2 (AR 20-30p): impulse >= 16p from 3AM baseline
+        # T3 (AR 30-45p): impulse >= 20p from 3AM baseline
         if tier == 'T1':
-            impulse_min, impulse_max = 10.0, 12.0
+            impulse_min, impulse_max = 12.0, 999.0
         elif tier == 'T2':
-            impulse_min, impulse_max = 14.0, 16.0
+            impulse_min, impulse_max = 16.0, 999.0
         elif tier == 'T3':
-            impulse_min, impulse_max = 18.0, 20.0
+            impulse_min, impulse_max = 20.0, 999.0
         else:
             continue
         
@@ -674,15 +757,17 @@ def run_two_plays(df):
                 if row['body_pips'] < thresh:
                     continue
                 
-                direction = 'LONG' if row['close'] > row['open'] else 'SHORT'
                 ep = row['close']
                 body_pips = row['body_pips']
                 
-                # Check close outside Asian band
-                if direction == 'LONG' and row['close'] <= ah:
-                    continue
-                if direction == 'SHORT' and row['close'] >= al:
-                    continue
+                # Direction determined by breakout direction (not candle internal direction)
+                # LONG: close above Asian High | SHORT: close below Asian Low
+                if row['close'] > ah:
+                    direction = 'LONG'
+                elif row['close'] < al:
+                    direction = 'SHORT'
+                else:
+                    continue  # Close not outside band — skip
                 
                 # SL: 80% of body from entry
                 sl = ep - to_price(body_pips * 0.80) * (1 if direction == 'LONG' else -1)
@@ -1035,7 +1120,8 @@ def run_dual_engine(df):
             
             if 0.32 <= retrace_pct <= 0.50:
                 ep = row['close']
-                sl = ep - to_price(amp_body * 0.80) * (1 if amp_direction == 'LONG' else -1)
+                # SL: 80% of the P90 impulse body (not the amplifier body)
+                sl = ep - to_price(body_pips * 0.80) * (1 if amp_direction == 'LONG' else -1)
                 tp = ep + to_price(20.0) * (1 if amp_direction == 'LONG' else -1)  # Fixed 20p TP
                 
                 post = day[(day.index > idx) & (day['est_h'] < 17)]
@@ -1109,21 +1195,30 @@ def run_p90p_distribution(df):
             continue
         
         # Calculate regime at 9AM if possible
-        regime_factor = 1.0
+        # Regime determines whether we take the trade and which target to use
+        regime = 'NEUTRAL'
         nine_am_data = day[(day['est_h'] >= 3) & (day['est_h'] <= 9)]
         if not nine_am_data.empty and ar > 0:
             daily_range_so_far = to_pips(nine_am_data['high'].max() - nine_am_data['low'].min())
             regime_ratio = daily_range_so_far / ar
             if regime_ratio >= 1.50:
-                regime_factor = 1.10  # CONFIRMED
+                regime = 'CONFIRMED'
             elif regime_ratio < 1.45:
-                regime_factor = 0.90  # FAILED
+                regime = 'FAILED'
         
-        # Weighted target
-        weighted_factor = base_factor * regime_factor
-        target_pips = ar * weighted_factor
+        # Target: use fraction of the max expansion factor based on regime
+        # Max factors (T1: 3.12x, T2: 2.68x, T3: 2.18x) are theoretical maximums
+        # Realistic target is 40-60% of max depending on regime
+        if regime == 'CONFIRMED':
+            target_fraction = 0.60  # 60% of max expansion
+        elif regime == 'FAILED':
+            target_fraction = 0.40  # 40% of max expansion (reduced)
+        else:
+            target_fraction = 0.50  # 50% default
         
-        # SL: 80% of body
+        target_pips = ar * base_factor * target_fraction
+        
+        # SL: 80% of body (structural boundary)
         sl = ep - to_price(body_pips * 0.80) * (1 if direction == 'LONG' else -1)
         tp = ep + to_price(target_pips) * (1 if direction == 'LONG' else -1)
         

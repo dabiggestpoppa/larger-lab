@@ -1,0 +1,86 @@
+{
+  "1b4942de": {
+    "id": "1b4942de",
+    "name": "OWL",
+    "role": "operator",
+    "capabilities": [
+      "communicate",
+      "read_files",
+      "communicate",
+      "read_files",
+      "write_files"
+    ],
+    "currentRoom": "chat-room",
+    "status": "active",
+    "createdAt": "2026-05-18T06:22:08.523Z",
+    "lastActive": "2026-05-18T06:22:08.551Z",
+    "metadata": {}
+  },
+  "dc6f6a54": {
+    "id": "dc6f6a54",
+    "name": "CC",
+    "role": "overseer",
+    "capabilities": [
+      "communicate",
+      "read_files",
+      "communicate",
+      "read_files"
+    ],
+    "currentRoom": "war-room",
+    "status": "active",
+    "createdAt": "2026-05-18T06:22:08.528Z",
+    "lastActive": "2026-05-18T06:22:08.558Z",
+    "metadata": {}
+  },
+  "44801b35": {
+    "id": "44801b35",
+    "name": "AS",
+    "role": "assistant",
+    "capabilities": [
+      "communicate",
+      "read_files",
+      "communicate",
+      "read_files",
+      "write_files"
+    ],
+    "currentRoom": "meditation-room",
+    "status": "active",
+    "createdAt": "2026-05-18T06:22:08.531Z",
+    "lastActive": "2026-05-18T06:22:08.565Z",
+    "metadata": {}
+  },
+  "f3736bba": {
+    "id": "f3736bba",
+    "name": "PM",
+    "role": "debugger",
+    "capabilities": [
+      "communicate",
+      "read_files",
+      "communicate",
+      "read_files",
+      "execute"
+    ],
+    "currentRoom": "quant-room",
+    "status": "active",
+    "createdAt": "2026-05-18T06:22:08.536Z",
+    "lastActive": "2026-05-18T06:22:08.575Z",
+    "metadata": {}
+  },
+  "e7f8057a": {
+    "id": "e7f8057a",
+    "name": "RL",
+    "role": "researcher",
+    "capabilities": [
+      "communicate",
+      "read_files",
+      "communicate",
+      "read_files",
+      "write_files"
+    ],
+    "currentRoom": "chat-room",
+    "status": "active",
+    "createdAt": "2026-05-18T06:22:08.541Z",
+    "lastActive": "2026-05-18T06:22:08.580Z",
+    "metadata": {}
+  }
+}

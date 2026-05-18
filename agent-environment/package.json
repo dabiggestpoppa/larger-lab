@@ -1,0 +1,21 @@
+{
+  "name": "agent-environment",
+  "version": "1.0.0",
+  "description": "Agent Virtual Environment — a second-level lab where agents run code, communicate, and build freely.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.16.0",
+    "uuid": "^9.0.0",
+    "yaml": "^2.3.4"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "author": "MAD / OWL",
+  "license": "MIT"
+}

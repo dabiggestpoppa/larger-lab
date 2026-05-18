@@ -1,0 +1,41 @@
+{
+  "strategy": "Stall_Harvest",
+  "pair": "EUR/USD",
+  "total_trades": 94,
+  "total_sessions": 86,
+  "wins": 36,
+  "losses": 58,
+  "win_rate": 38.3,
+  "total_pnl_pips": 39.71,
+  "avg_win_pips": 13.83,
+  "avg_loss_pips": -7.9,
+  "max_drawdown_pips": -149.06,
+  "profit_factor": 1.09,
+  "by_session": {
+    "4-7": {
+      "trades": 53,
+      "wins": 19,
+      "win_rate": 35.8,
+      "pnl_pips": -25.72
+    },
+    "7-11": {
+      "trades": 33,
+      "wins": 16,
+      "win_rate": 48.5,
+      "pnl_pips": 104.77
+    },
+    "2-4": {
+      "trades": 8,
+      "wins": 1,
+      "win_rate": 12.5,
+      "pnl_pips": -39.34
+    }
+  },
+  "by_exit_reason": {
+    "tp_reversion": 11,
+    "max_hold_time": 43,
+    "sl_deep_state": 40
+  },
+  "timeframe": "M5",
+  "data_file": "EURUSD!_M5_202301020000_202605061250.csv"
+}

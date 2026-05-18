@@ -1,0 +1,41 @@
+{
+  "strategy": "Stall_Harvest",
+  "pair": "USD/JPY",
+  "total_trades": 73,
+  "total_sessions": 65,
+  "wins": 29,
+  "losses": 44,
+  "win_rate": 39.7,
+  "total_pnl_pips": 139.4,
+  "avg_win_pips": 19.1,
+  "avg_loss_pips": -9.42,
+  "max_drawdown_pips": -96.28,
+  "profit_factor": 1.34,
+  "by_session": {
+    "7-11": {
+      "trades": 34,
+      "wins": 15,
+      "win_rate": 44.1,
+      "pnl_pips": 141.61
+    },
+    "2-4": {
+      "trades": 10,
+      "wins": 2,
+      "win_rate": 20.0,
+      "pnl_pips": -65.88
+    },
+    "4-7": {
+      "trades": 29,
+      "wins": 12,
+      "win_rate": 41.4,
+      "pnl_pips": 63.67
+    }
+  },
+  "by_exit_reason": {
+    "max_hold_time": 28,
+    "sl_deep_state": 38,
+    "tp_reversion": 7
+  },
+  "timeframe": "M5",
+  "data_file": "USDJPY!_M5_202301020000_202605061250.csv"
+}

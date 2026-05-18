@@ -1,0 +1,46 @@
+{
+  "meditation-room": {
+    "id": "meditation-room",
+    "name": "Meditation Room",
+    "description": "IACER thinking space. New agents meditate here before joining the field.",
+    "agents": [
+      "44801b35"
+    ],
+    "persistent": true,
+    "createdAt": "2026-05-17T00:00:00.000Z"
+  },
+  "quant-room": {
+    "id": "quant-room",
+    "name": "Quant Room",
+    "description": "Quant Lab — strategy work, backtesting, analysis.",
+    "agents": [
+      "f3736bba",
+      "dashboard"
+    ],
+    "persistent": true,
+    "createdAt": "2026-05-17T00:00:00.000Z"
+  },
+  "chat-room": {
+    "id": "chat-room",
+    "name": "Chat Room",
+    "description": "General team chat and coordination.",
+    "agents": [
+      "1b4942de",
+      "e7f8057a",
+      "dashboard"
+    ],
+    "persistent": true,
+    "createdAt": "2026-05-17T00:00:00.000Z"
+  },
+  "war-room": {
+    "id": "war-room",
+    "name": "War Room",
+    "description": "Mission command — active operations and debugging.",
+    "agents": [
+      "dc6f6a54",
+      "dashboard"
+    ],
+    "persistent": true,
+    "createdAt": "2026-05-17T00:00:00.000Z"
+  }
+}

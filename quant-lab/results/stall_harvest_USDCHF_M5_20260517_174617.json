@@ -1,0 +1,41 @@
+{
+  "strategy": "Stall_Harvest",
+  "pair": "USD/CHF",
+  "total_trades": 50,
+  "total_sessions": 49,
+  "wins": 30,
+  "losses": 20,
+  "win_rate": 60.0,
+  "total_pnl_pips": 258.57,
+  "avg_win_pips": 14.17,
+  "avg_loss_pips": -8.33,
+  "max_drawdown_pips": -36.01,
+  "profit_factor": 2.55,
+  "by_session": {
+    "4-7": {
+      "trades": 30,
+      "wins": 20,
+      "win_rate": 66.7,
+      "pnl_pips": 166.53
+    },
+    "7-11": {
+      "trades": 18,
+      "wins": 10,
+      "win_rate": 55.6,
+      "pnl_pips": 102.26
+    },
+    "2-4": {
+      "trades": 2,
+      "wins": 0,
+      "win_rate": 0.0,
+      "pnl_pips": -10.22
+    }
+  },
+  "by_exit_reason": {
+    "max_hold_time": 24,
+    "tp_reversion": 12,
+    "sl_deep_state": 14
+  },
+  "timeframe": "M5",
+  "data_file": "USDCHF!_M5_202301020000_202605061250.csv"
+}

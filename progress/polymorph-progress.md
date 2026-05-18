@@ -28,8 +28,15 @@
 ### V3 Phase 3 PM Tasks
 - [x] Debug topology modules (collar_field, bsp_projection, resonance_router, glyph_engine, field_pressure, attractor_stability, topology_metrics)
 - [x] Fix 5 failing tests (attractor_stability stability rules, bsp_projection SignalPacket import, glyph_engine decode iteration, field_state get_signal_count)
-- [ ] Build tools/operator/topology-debug.py CLI
-- [ ] Operator integration for topology monitoring
+- [x] Build tools/operator/topology-debug.py CLI
+- [x] Operator integration for topology monitoring
+- [x] Created memory-bank/OC2-GATEWAY-FAILURES.md — common errors & gateway fail reference for OC2 (2026-05-17)
+- [x] Posted summary to team-chat.md
+
+### V3 Phase 8 PM Tasks
+- [ ] Build tools/operator/coevolution-debug.py CLI
+- [ ] Debug coevolution modules (operator_model, constraint_model, coherence_reinforcement, bidirectional_adaptation, cognitive_load, alignment_tracking, anti_manipulation)
+- [ ] Operator integration for coevolution monitoring
 
 ### Continuous Workflow
 - After every code edit: Update this file + polymorph-memory.md

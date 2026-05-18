@@ -46,6 +46,10 @@ from coevolution_protocol import get_coevolution_protocol, CoevolutionProtocol
 from economics_engine import get_economics_engine, EconomicsEngine
 from sync_cost_optimizer import get_sync_cost_optimizer, SyncCostOptimizer
 from adaptive_compression import get_adaptive_compression, AdaptiveCompression
+from resonance_api import register_resonance_endpoints
+from reconstruction_api import register_reconstruction_endpoints
+from topology_api import register_topology_endpoints
+from sovereign_api import register_sovereign_endpoints
 
 app = FastAPI(
     title="OCE Continuity Core",
@@ -863,6 +867,18 @@ register_execution_endpoints(app)
 
 # Register Phase 8 Governance endpoints
 register_governance_endpoints(app)
+
+# Register V3 Phase 1 Resonance endpoints
+register_resonance_endpoints(app)
+
+# Register V3 Phase 2 Reconstruction endpoints
+register_reconstruction_endpoints(app)
+
+# Register V3 Phase 3 Topology endpoints
+register_topology_endpoints(app)
+
+# Register V3 Phase 4 Sovereign endpoints
+register_sovereign_endpoints(app)
 
 app.include_router(command_center_router)
 

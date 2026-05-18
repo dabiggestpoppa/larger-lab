@@ -1,0 +1,53 @@
+{
+  "validation_date": "2026-05-18 00:17:12.920370",
+  "data": {
+    "eur_bars": 249484,
+    "gbp_bars": 249422,
+    "common_bars": 249410,
+    "date_range": "2023-01-02 00:00:00+00:00 to 2026-05-06 12:50:00+00:00",
+    "years": 3.34,
+    "eur_duplicates": 0,
+    "gbp_duplicates": 0,
+    "eur_gaps": 180,
+    "gbp_gaps": 180,
+    "avg_correlation": 0.7549,
+    "used_synthetic_gbp": false
+  },
+  "performance": {
+    "total_trades": 3929,
+    "win_rate": 72.54,
+    "total_pnl": 205974.59,
+    "gross_profit": 251485.69,
+    "gross_loss": 45511.1,
+    "profit_factor": 5.526,
+    "max_drawdown": 265.0,
+    "final_equity": 215974.59,
+    "expectancy_per_trade": 52.42,
+    "avg_win": 88.24,
+    "avg_loss": -42.18,
+    "sharpe_trade_level": 0.7525,
+    "sharpe_annualized": 202.7141,
+    "annualized_return_pct": 150.9
+  },
+  "trade_characteristics": {
+    "avg_duration_bars": 9.6,
+    "avg_duration_hours": 0.8,
+    "active_days": 856,
+    "trades_per_day": 4.6,
+    "trades_per_week": 32.1
+  },
+  "exit_reasons": {
+    "stop_loss": 1348,
+    "correlation_breakdown": 512,
+    "mean_reversion": 2027,
+    "time_stop": 42
+  },
+  "temporal": {
+    "best_day": "Fri",
+    "worst_day": "Wed",
+    "best_hour_utc": 0,
+    "worst_hour_utc": 20,
+    "best_month": "Mar",
+    "worst_month": "Dec"
+  }
+}
