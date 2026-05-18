@@ -302,6 +302,7 @@ graph TB
 ```
 
 **Status:** 8/8 modules complete, 76 tests passing
+**Key:** CoevolutionProtocol at `oce/backend/coevolution_protocol.py`
 
 ## Phase 9: Post-Deployment
 

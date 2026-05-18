@@ -662,5 +662,5 @@ graph TB
 | CognitiveLoadOptimizer | `oce/backend/coevolution/cognitive_load.py` | Cognitive Load Optimization | 6 |
 | AlignmentTracker | `oce/backend/coevolution/alignment_tracking.py` | Long-Horizon Alignment Tracking | 10 |
 | AntiManipulationSafeguards | `oce/backend/coevolution/anti_manipulation.py` | Anti-Manipulation Safeguards | 10 |
-| CoevolutionProtocol | `oce/backend/coevolution/coevolution_protocol.py` | Coevolution Protocol | 14 |
+| CoevolutionProtocol | `oce/backend/coevolution_protocol.py` | Multi-Agent Coevolution Protocol | 14 |
 | **Total** | | | **76 tests** |
