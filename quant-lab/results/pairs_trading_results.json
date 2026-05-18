@@ -1,0 +1,15 @@
+{
+  "strategy": "Pairs Trading EUR/USD-GBP/USD",
+  "total_trades": 3931,
+  "win_rate": 72.5515136097685,
+  "total_pnl": 206245.0519291516,
+  "max_drawdown": 264.9981832072808,
+  "final_equity": 216245.0519291517,
+  "exit_reasons": {
+    "time_stop": 43,
+    "stop_loss": 1346,
+    "correlation_breakdown": 512,
+    "mean_reversion": 2030
+  },
+  "combined_ir": 0.203
+}

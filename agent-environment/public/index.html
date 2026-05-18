@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🦉 Virtual Agent Environment v2</title>
+<link rel="stylesheet" href="/css/env.css">
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="logo">🦉 Virtual Agent <span>Environment</span> <span style="font-size:10px;color:var(--text-dim);font-weight:400;margin-left:8px;">v2.0</span></div>
+  <div class="status">
+    <span>Rooms: <strong id="room-count">0</strong></span>
+    <span>Agents: <strong id="agent-count">0</strong></span>
+    <span>Online: <strong id="online-count">0</strong></span>
+    <span class="dot" id="ws-dot"></span>
+    <span id="ws-status">Disconnected</span>
+  </div>
+</div>
+
+<!-- Layout -->
+<div class="layout">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">Rooms</div>
+      <div id="room-list">
+        <div style="color:var(--text-dim);font-size:11px;padding:4px;">Loading...</div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Agents</div>
+      <div id="agent-list">
+        <div style="color:var(--text-dim);font-size:11px;padding:4px;">No agents yet</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <div class="tabs">
+      <div class="tab active" data-tab="world">🗺️ World Map</div>
+      <div class="tab" data-tab="chat">💬 Room Chat</div>
+      <div class="tab" data-tab="agents">🤖 Agents</div>
+    </div>
+
+    <!-- World Map Tab -->
+    <div class="tab-content active" id="tab-world">
+      <div id="world-canvas-container" style="flex:1;position:relative;overflow:hidden;">
+        <canvas id="world-canvas"></canvas>
+        <div class="map-controls">
+          <button class="btn" id="btn-demo">▶ Demo</button>
+          <button class="btn" id="btn-reset-view">⟲ Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Tab -->
+    <div class="tab-content" id="tab-chat">
+      <div class="messages" id="messages-container">
+        <div class="empty-state">
+          <div class="icon">💬</div>
+          <div>Select a room to view messages</div>
+        </div>
+      </div>
+      <div class="message-input">
+        <select id="msg-agent-select">
+          <option value="">— Select Agent —</option>
+        </select>
+        <select id="msg-type-select">
+          <option value="chat">Chat</option>
+          <option value="task">Task</option>
+          <option value="result">Result</option>
+          <option value="question">Question</option>
+          <option value="system">System</option>
+        </select>
+        <input type="text" id="msg-input" placeholder="Type a message..." />
+        <button class="btn" onclick="envClient.sendMessage()">Send</button>
+      </div>
+    </div>
+
+    <!-- Agents Tab -->
+    <div class="tab-content" id="tab-agents">
+      <div class="messages" id="agents-container" style="padding:20px;overflow-y:auto;">
+        <div class="empty-state">
+          <div class="icon">🤖</div>
+          <div>No agents registered yet</div>
+          <div style="font-size:11px;margin-top:8px;color:var(--text-dim);">Register agents below or click ▶ Demo</div>
+        </div>
+      </div>
+      <div class="message-input">
+        <input type="text" id="new-agent-name" placeholder="Agent name..." />
+        <input type="text" id="new-agent-role" placeholder="Role..." style="max-width:120px;" />
+        <button class="btn green" onclick="envClient.registerAgent()">Register</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="right-panel">
+    <!-- Selected Room -->
+    <div class="panel-section">
+      <div class="panel-title">Selected Room</div>
+      <div class="info-row"><span class="label">Name</span><span class="value" id="sel-room-name">—</span></div>
+      <div class="info-row"><span class="label">Agents</span><span class="value" id="sel-room-agents">0</span></div>
+      <div class="info-row"><span class="label">Description</span><span class="value" id="sel-room-desc" style="font-size:11px;">—</span></div>
+    </div>
+
+    <!-- Selected Agent -->
+    <div class="panel-section">
+      <div class="panel-title">Selected Agent</div>
+      <div id="agent-detail">
+        <div class="agent-detail-card">
+          <div class="avatar-row">
+            <div class="avatar-circle" id="sel-agent-avatar" style="background:#333;">🤖</div>
+            <div>
+              <div class="agent-name" id="sel-agent-name">—</div>
+              <div class="agent-role" id="sel-agent-role">—</div>
+            </div>
+          </div>
+          <div class="info-row"><span class="label">Room</span><span class="value" id="sel-agent-room">—</span></div>
+          <div class="info-row"><span class="label">Status</span><span class="value" id="sel-agent-status">—</span></div>
+          <div class="info-row"><span class="label">Online</span><span class="value" id="sel-agent-online">—</span></div>
+          <div class="info-row" style="margin-top:6px;"><span class="label">Capabilities</span></div>
+          <div id="sel-agent-caps" style="margin-top:4px;">—</div>
+          <div style="margin-top:8px;">
+            <div class="info-row"><span class="label">Activity</span><span class="value" id="sel-agent-activity-text">Idle</span></div>
+            <div class="activity-bar">
+              <div class="fill" id="sel-agent-activity-fill" style="width:0%;background:#6c5ce7;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity Log -->
+    <div class="panel-section">
+      <div class="panel-title">Recent Activity</div>
+      <div class="activity-log" id="activity-log">
+        <div style="color:var(--text-dim);font-size:11px;">No recent activity</div>
+      </div>
+    </div>
+
+    <!-- System -->
+    <div class="panel-section">
+      <div class="panel-title">System</div>
+      <div class="info-row"><span class="label">Port</span><span class="value">9000</span></div>
+      <div class="info-row"><span class="label">Version</span><span class="value">2.0.0</span></div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/env-renderer.js"></script>
+<script src="/js/env-client.js"></script>
+</body>
+</html>

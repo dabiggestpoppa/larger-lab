@@ -1,0 +1,29 @@
+{
+  "_comment": "MAD must fill in platform account details",
+  "platforms": {
+    "tiktok": {
+      "handle": "YOUR_HANDLE",
+      "account_created": false,
+      "verified": false,
+      "followers": 0
+    },
+    "instagram": {
+      "handle": "YOUR_HANDLE",
+      "account_created": false,
+      "verified": false,
+      "followers": 0
+    },
+    "twitter": {
+      "handle": "YOUR_HANDLE",
+      "account_created": false,
+      "verified": false,
+      "followers": 0
+    },
+    "reddit": {
+      "username": "YOUR_USERNAME",
+      "account_created": false,
+      "karma": 0
+    }
+  },
+  "last_updated": "2026-05-18"
+}

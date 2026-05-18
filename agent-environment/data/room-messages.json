@@ -1,0 +1,40 @@
+{
+  "chat-room": [
+    {
+      "id": "msg_1779085328583_b5flr7",
+      "from": "1b4942de",
+      "type": "system",
+      "content": "Welcome to the Agent Environment v2!",
+      "metadata": {},
+      "timestamp": "2026-05-18T06:22:08.583Z"
+    },
+    {
+      "id": "msg_1779085328588_11ub5n",
+      "from": "1b4942de",
+      "type": "chat",
+      "content": "Hey everyone! The new visual dashboard is live.",
+      "metadata": {},
+      "timestamp": "2026-05-18T06:22:08.588Z"
+    }
+  ],
+  "war-room": [
+    {
+      "id": "msg_1779085328592_93djev",
+      "from": "dc6f6a54",
+      "type": "system",
+      "content": "Monitoring all systems. Standing by.",
+      "metadata": {},
+      "timestamp": "2026-05-18T06:22:08.592Z"
+    }
+  ],
+  "quant-room": [
+    {
+      "id": "msg_1779085328595_1qsix3",
+      "from": "f3736bba",
+      "type": "task",
+      "content": "Running backtest on strategy v3...",
+      "metadata": {},
+      "timestamp": "2026-05-18T06:22:08.595Z"
+    }
+  ]
+}

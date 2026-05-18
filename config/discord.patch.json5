@@ -1,0 +1,16 @@
+{
+  channels: {
+    discord: {
+      enabled: true,
+      token: { source: "env", provider: "default", id: "DISCORD_BOT_TOKEN" },
+      dmPolicy: "pairing",
+      groupPolicy: "allowlist",
+      guilds: {
+        "1486771735729537085": {
+          requireMention: true,
+          users: ["8258195396"]
+        }
+      }
+    }
+  }
+}

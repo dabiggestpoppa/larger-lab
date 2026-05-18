@@ -1,0 +1,21 @@
+{
+  "strategy": "HMM Regime-Aware CEREBUS",
+  "total_trades": 514,
+  "win_rate": 47.66536964980545,
+  "total_pnl": -95.13532532672737,
+  "max_drawdown": 149.882232110925,
+  "final_equity": 9904.864674673268,
+  "regime_stats": {
+    "trending": {
+      "count": 512,
+      "wins": 244,
+      "pnl": -95.77014547793517
+    },
+    "mean_reverting": {
+      "count": 2,
+      "wins": 1,
+      "pnl": 0.6348201512077857
+    }
+  },
+  "combined_ir": 0.192
+}

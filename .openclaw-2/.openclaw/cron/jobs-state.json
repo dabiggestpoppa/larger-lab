@@ -45,31 +45,31 @@
       }
     },
     "dbcbd379-bc1e-4017-8ed0-fa9796deba32": {
-      "updatedAtMs": 1779017493878,
+      "updatedAtMs": 1779040415635,
       "scheduleIdentity": "{\"version\":1,\"enabled\":true,\"schedule\":{\"kind\":\"every\",\"everyMs\":120000,\"anchorMs\":1779008419655}}",
       "state": {
-        "nextRunAtMs": 1779021093878,
-        "lastRunAtMs": 1779017430564,
+        "nextRunAtMs": 1779044015635,
+        "lastRunAtMs": 1779040354977,
         "lastRunStatus": "error",
         "lastStatus": "error",
-        "lastDurationMs": 63314,
+        "lastDurationMs": 60658,
         "lastDiagnostics": {
-          "summary": "cron: job execution timed out",
+          "summary": "cron: job execution timed out (last phase: model-call-started)",
           "entries": [
             {
-              "ts": 1779017493878,
+              "ts": 1779040415634,
               "source": "cron-setup",
               "severity": "error",
-              "message": "cron: job execution timed out"
+              "message": "cron: job execution timed out (last phase: model-call-started)"
             }
           ]
         },
-        "lastDiagnosticSummary": "cron: job execution timed out",
+        "lastDiagnosticSummary": "cron: job execution timed out (last phase: model-call-started)",
         "lastErrorReason": "timeout",
         "lastDeliveryStatus": "not-requested",
-        "consecutiveErrors": 7,
+        "consecutiveErrors": 8,
         "consecutiveSkipped": 0,
-        "lastError": "cron: job execution timed out"
+        "lastError": "cron: job execution timed out (last phase: model-call-started)"
       }
     }
   }

@@ -1,0 +1,173 @@
+{
+  "Deep_Mean_Reversion": {
+    "strategy": "Deep_Mean_Reversion",
+    "pair": "EUR/USD",
+    "total_trades": 764,
+    "wins": 701,
+    "losses": 63,
+    "win_rate": 91.8,
+    "total_pnl": 8745.68,
+    "avg_win": 12.59,
+    "avg_loss": -1.25,
+    "max_dd": -5.02,
+    "profit_factor": 111.96,
+    "expectancy": 11.447,
+    "by_exit": {
+      "tp": 700,
+      "sl": 63,
+      "end_data": 1
+    }
+  },
+  "Stall_Harvest_CFD": {
+    "strategy": "Stall_Harvest_CFD",
+    "pair": "EUR/USD",
+    "total_trades": 88,
+    "wins": 34,
+    "losses": 54,
+    "win_rate": 38.6,
+    "total_pnl": 149.74,
+    "avg_win": 20.09,
+    "avg_loss": -9.88,
+    "max_dd": -117.29,
+    "profit_factor": 1.28,
+    "expectancy": 1.702,
+    "by_exit": {
+      "sl": 53,
+      "tp": 34,
+      "end_data": 1
+    }
+  },
+  "Constraint_Anchor": {
+    "strategy": "Constraint_Anchor",
+    "pair": "EUR/USD",
+    "total_trades": 607,
+    "wins": 410,
+    "losses": 197,
+    "win_rate": 67.5,
+    "total_pnl": -667.0,
+    "avg_win": 9.43,
+    "avg_loss": -23.01,
+    "max_dd": -857.9,
+    "profit_factor": 0.85,
+    "expectancy": -1.099,
+    "by_exit": {
+      "tp": 404,
+      "sl": 166,
+      "end_data": 37
+    }
+  },
+  "Blind_Structural_Chain": {
+    "strategy": "Blind_Structural_Chain",
+    "pair": "EUR/USD",
+    "total_trades": 1380,
+    "wins": 389,
+    "losses": 991,
+    "win_rate": 28.2,
+    "total_pnl": 163.2,
+    "avg_win": 14.94,
+    "avg_loss": -5.7,
+    "max_dd": -247.48,
+    "profit_factor": 1.03,
+    "expectancy": 0.118,
+    "by_exit": {
+      "tp": 381,
+      "sl": 983,
+      "end_data": 16
+    }
+  },
+  "Two_Plays": {
+    "strategy": "Two_Plays",
+    "pair": "EUR/USD",
+    "total_trades": 571,
+    "wins": 198,
+    "losses": 373,
+    "win_rate": 34.7,
+    "total_pnl": -239.3,
+    "avg_win": 9.58,
+    "avg_loss": -5.73,
+    "max_dd": -261.81,
+    "profit_factor": 0.89,
+    "expectancy": -0.419,
+    "by_exit": {
+      "sl": 364,
+      "tp": 196,
+      "end_data": 11
+    }
+  },
+  "Failure_Repair": {
+    "strategy": "Failure_Repair",
+    "pair": "EUR/USD",
+    "total_trades": 370,
+    "wins": 142,
+    "losses": 228,
+    "win_rate": 38.4,
+    "total_pnl": 214.12,
+    "avg_win": 10.45,
+    "avg_loss": -5.57,
+    "max_dd": -144.32,
+    "profit_factor": 1.17,
+    "expectancy": 0.579,
+    "by_exit": {
+      "tp": 142,
+      "sl": 226,
+      "end_data": 2
+    }
+  },
+  "Dual_Engine": {
+    "strategy": "Dual_Engine",
+    "pair": "EUR/USD",
+    "total_trades": 627,
+    "wins": 413,
+    "losses": 214,
+    "win_rate": 65.9,
+    "total_pnl": -719.32,
+    "avg_win": 9.5,
+    "avg_loss": -21.7,
+    "max_dd": -901.42,
+    "profit_factor": 0.85,
+    "expectancy": -1.147,
+    "by_exit": {
+      "tp": 407,
+      "sl": 183,
+      "end_data": 37
+    }
+  },
+  "P90P_Distribution": {
+    "strategy": "P90P_Distribution",
+    "pair": "EUR/USD",
+    "total_trades": 255,
+    "wins": 47,
+    "losses": 208,
+    "win_rate": 18.4,
+    "total_pnl": 241.37,
+    "avg_win": 28.53,
+    "avg_loss": -5.29,
+    "max_dd": -179.39,
+    "profit_factor": 1.22,
+    "expectancy": 0.947,
+    "by_exit": {
+      "sl": 206,
+      "tp": 42,
+      "end_data": 7
+    }
+  },
+  "Fractal_Resolution": {
+    "strategy": "Fractal_Resolution",
+    "pair": "EUR/USD",
+    "total_trades": 808,
+    "wins": 354,
+    "losses": 454,
+    "win_rate": 43.8,
+    "total_pnl": 196.96,
+    "avg_win": 22.37,
+    "avg_loss": -17.01,
+    "max_dd": -679.36,
+    "profit_factor": 1.03,
+    "expectancy": 0.244,
+    "by_exit": {
+      "sl": 406,
+      "tp": 252,
+      "end_data": 150
+    }
+  }
+}

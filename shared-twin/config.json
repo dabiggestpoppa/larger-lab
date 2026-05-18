@@ -1,0 +1,21 @@
+{
+    "twin_pillar": {
+        "version": "PHASE-A-1.0",
+        "oc2": {
+            "port": 18790,
+            "status": "active",
+            "role": "strategic_continuity",
+            "model": "openrouter/owl-alpha"
+        },
+        "oc3": {
+            "port": 18791,
+            "status": "deploying",
+            "role": "adaptive_execution",
+            "model": "poolside/laguna-m.1:free"
+        },
+        "shared_workspace": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\shared-twin",
+        "sync_interval_minutes": 5,
+        "heartbeat_interval_minutes": 2,
+        "drift_threshold": 0.3
+    }
+}

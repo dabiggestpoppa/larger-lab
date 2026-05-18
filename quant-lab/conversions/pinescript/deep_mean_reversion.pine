@@ -1,0 +1,111 @@
+//@version=5
+strategy("Deep Mean Reversion", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=2, initial_capital=100000, commission_type=strategy.commission.cash_per_order, commission_value=0.5)
+
+// ═══════════════════════════════════════════════════════════════
+// DEEP MEAN REVERSION STRATEGY — PineScript v5
+// Source: optimizer_v4.py → run_deep_mean_reversion()
+// Win Rate: 91.8% | P&L: +8746p | PF: 112
+//
+// When price extends to 200% Deep State (measured from P90 body),
+// enter mean reversion targeting return to activation level.
+// ═══════════════════════════════════════════════════════════════
+
+// ─── INPUTS ───────────────────────────────────────────────────
+i_deepMult     = input.float(2.00, "Deep State Multiplier (% of P90 body)", step=0.01)
+i_killMult     = input.float(2.20, "Kill Switch Multiplier (% of P90 body)", step=0.01)
+i_maxAR        = input.float(45.0, "Max Asian Range (pips)", step=1.0)
+i_minAR        = input.float(3.0, "Min Asian Range (pips)", step=0.5)
+i_pipSize      = input.float(0.0001, "Pip Size", step=0.00001)
+
+// ─── TIME ─────────────────────────────────────────────────────
+estHour    = hour(time, "America/New_York")
+currentDate = dayofmonth(time, "America/New_York")
+isAsian    = estHour >= 19 or estHour < 3
+isEntry    = estHour >= 2 and estHour < 11
+isPreNoon  = estHour < 12
+isTradeable = estHour < 17
+
+// ─── ASIAN RANGE ──────────────────────────────────────────────
+var float asianHigh = na
+var float asianLow  = na
+var float asianRange = na
+var int   asianDate  = 0
+
+if currentDate != asianDate and not na(asianDate)
+    asianDate := currentDate
+
+if isAsian
+    if na(asianHigh)
+        asianHigh := high
+        asianLow  := low
+    else
+        asianHigh := math.max(asianHigh, high)
+        asianLow  := math.min(asianLow, low)
+    asianRange := (asianHigh - asianLow) / i_pipSize
+
+// ─── P90 THRESHOLD ────────────────────────────────────────────
+p90Threshold = switch
+    estHour < 2 or estHour >= 11 => 99.0
+    estHour < 4                   => 4.1
+    estHour < 8                   => 4.6
+    estHour < 10                  => 5.9
+    estHour < 11                  => 6.2
+    => 99.0
+
+// ─── STATE VARIABLES ──────────────────────────────────────────
+var bool  p90Found    = false
+var float activation  = na
+var float p90BodyPips = na
+var bool  p90IsLong   = false
+var float deepState   = na
+var float killSwitch  = na
+var bool  deepTouched = false
+var bool  entered     = false
+
+// ─── P90 DETECTION ────────────────────────────────────────────
+bodyPips = math.abs(close - open) / i_pipSize
+
+if isEntry and not p90Found and bodyPips >= p90Threshold and asianRange >= i_minAR and asianRange <= i_maxAR
+    p90Found    := true
+    activation  := close
+    p90BodyPips := bodyPips
+    p90IsLong   := close > open
+    bodyPrice   = p90BodyPips * i_pipSize
+    deepState   := activation + bodyPrice * i_deepMult * (p90IsLong ? 1 : -1)
+    killSwitch  := activation + bodyPrice * i_killMult * (p90IsLong ? 1 : -1)
+
+if estHour == 2
+    p90Found    := false
+    deepTouched := false
+    entered     := false
+
+// ─── DEEP STATE TOUCH DETECTION ───────────────────────────────
+if p90Found and not deepTouched and isPreNoon
+    if p90IsLong and low <= deepState
+        deepTouched := true
+    else if not p90IsLong and high >= deepState
+        deepTouched := true
+
+// ─── ENTRY (mean reversion) ───────────────────────────────────
+entryDir = p90IsLong ? "Short" : "Long"
+revIsLong = not p90IsLong
+
+if deepTouched and not entered and strategy.position_size == 0 and isTradeable
+    entered := true
+    if revIsLong
+        strategy.entry("DMR Long", strategy.long, limit=deepState)
+        strategy.exit("DMR Long Exit", "DMR Long", stop=killSwitch, limit=activation)
+    else
+        strategy.entry("DMR Short", strategy.short, limit=deepState)
+        strategy.exit("DMR Short Exit", "DMR Short", stop=killSwitch, limit=activation)
+
+// Hard exit at 5PM
+if estHour >= 17 and strategy.position_size != 0
+    strategy.close_all("Hard Exit 5PM")
+
+// ─── PLOTS ────────────────────────────────────────────────────
+plot(activation, "Activation Level", color=color.new(color.blue, 30), linewidth=2)
+plot(deepState, "Deep State (200%)", color=color.new(color.purple, 30), linewidth=1)
+plot(killSwitch, "Kill Switch (220%)", color=color.new(color.red, 30), linewidth=1)
+plot(asianHigh, "Asian High", color=color.new(color.orange, 50), linewidth=1)
+plot(asianLow, "Asian Low", color=color.new(color.orange, 50), linewidth=1)

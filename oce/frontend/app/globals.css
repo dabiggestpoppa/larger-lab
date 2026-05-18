@@ -44,8 +44,8 @@ body {
   color: #fff;
 }
 
-/* Smooth transitions */
-* {
+/* Smooth transitions — avoid * selector to prevent overlay glitches */
+button, a, input, select, [class*="transition"] {
   transition-property: background-color, border-color, color, opacity;
   transition-duration: 150ms;
   transition-timing-function: ease;

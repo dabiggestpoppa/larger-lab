@@ -1,0 +1,140 @@
+//@version=5
+strategy("Composite Alpha", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=2, initial_capital=100000, commission_type=strategy.commission.cash_per_order, commission_value=0.5)
+
+// ═══════════════════════════════════════════════════════════════
+// COMPOSITE ALPHA STRATEGY — PineScript v5
+// Source: optimizer_v4.py → run_alpha_combination()
+// Win Rate: 98.6% | P&L: +3537p | PF: 703
+//
+// Combines 5 signals using IC-weighted composite score.
+// Only trades when composite ≥ 0.20 and price closes outside Asian Range.
+// ═══════════════════════════════════════════════════════════════
+
+// ─── INPUTS ───────────────────────────────────────────────────
+i_atrPeriod       = input.int(14, "ATR Period", minval=1)
+i_p90Thresh2_4    = input.float(4.1, "P90 Threshold 2-4AM EST (pips)", step=0.1)
+i_p90Thresh4_8    = input.float(4.6, "P90 Threshold 4-8AM EST (pips)", step=0.1)
+i_p90Thresh8_10   = input.float(5.9, "P90 Threshold 8-10AM EST (pips)", step=0.1)
+i_p90Thresh10_12  = input.float(6.2, "P90 Threshold 10-12PM EST (pips)", step=0.1)
+i_compositeMin    = input.float(0.20, "Min Composite Score", step=0.01)
+i_slMult          = input.float(1.5, "SL Body Multiplier", step=0.1)
+i_tpBase          = input.float(0.25, "TP Base AR Factor", step=0.01)
+i_tpComp          = input.float(0.15, "TP Composite Factor", step=0.01)
+i_maxAR           = input.float(20.0, "Max AR for Quality Filter (pips)", step=1.0)
+i_minOutside      = input.float(2.0, "Min Close Outside AR (pips)", step=0.5)
+i_pipSize         = input.float(0.0001, "Pip Size (0.0001 for EUR/USD)", step=0.00001)
+
+// ─── TIME FILTERS ─────────────────────────────────────────────
+t = time(timeframe.period, "America/New_York")
+estHour = hour(time, "America/New_York")
+isAsian     = estHour >= 19 or estHour < 3   // 7PM-3AM EST
+isEntry     = estHour >= 2 and estHour < 11   // 2AM-11AM EST
+isTradeable = estHour < 17                      // Before 5PM EST
+
+// ─── ASIAN RANGE CALCULATION ──────────────────────────────────
+var float asianHigh = na
+var float asianLow  = na
+var float asianRange = na
+var int   asianDate  = 0
+
+currentDate = dayofmonth(time, "America/New_York")
+
+if currentDate != asianDate and not na(asianDate)
+    // New day — reset Asian range from completed Asian session
+    asianDate := currentDate
+
+// Track Asian range during Asian session
+if isAsian
+    if na(asianHigh)
+        asianHigh := high
+        asianLow  := low
+    else
+        asianHigh := math.max(asianHigh, high)
+        asianLow  := math.min(asianLow, low)
+    asianRange := (asianHigh - asianLow) / i_pipSize
+
+// ─── P90 THRESHOLD BY HOUR ───────────────────────────────────
+p90Threshold = switch
+    estHour < 2 or estHour >= 11 => 99.0
+    estHour < 4                   => i_p90Thresh2_4
+    estHour < 8                   => i_p90Thresh4_8
+    estHour < 10                  => i_p90Thresh8_10
+    estHour < 11                  => i_p90Thresh10_12
+    => 99.0
+
+// ─── TIER CLASSIFICATION ──────────────────────────────────────
+tier = asianRange < 20 ? "T1" : asianRange < 30 ? "T2" : asianRange < 45 ? "T3" : "NO_GO"
+
+// ─── STATE VARIABLES ──────────────────────────────────────────
+var bool  p90Found     = false
+var float p90Close     = na
+var float p90Body      = na
+var int   p90Hour      = 0
+var int   p90Weekday   = 0
+var bool  p90IsLong    = false
+
+// ─── P90 DETECTION ────────────────────────────────────────────
+bodyPips = math.abs(close - open) / i_pipSize
+
+if isEntry and not p90Found and bodyPips >= p90Threshold
+    p90Found  := true
+    p90Close  := close
+    p90Body   := bodyPips
+    p90Hour   := estHour
+    p90Weekday := dayofweek(time, "America/New_York")
+    p90IsLong := close > open
+
+// Reset P90 at start of each entry session
+if estHour == 2
+    p90Found := false
+
+// ─── COMPOSITE SCORE CALCULATION ──────────────────────────────
+arRegime = tier == "T1" ? 1.0 : tier == "T2" ? 0.6 : tier == "T3" ? 0.3 : 0.0
+constrDeficit = math.max(0.0, 1.0 - asianRange / 45.0)
+p90Mom = p90Body > 0 ? math.min(1.0, (p90Body - p90Threshold) / p90Threshold) : 0.0
+sessStr = (p90Hour >= 3 and p90Hour <= 5) ? 1.0 : (p90Hour >= 6 and p90Hour <= 8) ? 0.8 : 0.5
+wkdayQ = (p90Weekday == 2 or p90Weekday == 3 or p90Weekday == 4) ? 1.0 : p90Weekday == 1 ? 0.7 : 0.5
+
+// IC weights
+icPM = 0.08, icAR = 0.06, icCD = 0.05, icSS = 0.04, icWQ = 0.03
+weightedSum = icPM * p90Mom + icAR * arRegime + icCD * constrDeficit + icSS * sessStr + icWQ * wkdayQ
+weightTotal = icPM + icAR + icCD + icSS + icWQ
+composite = weightTotal > 0 ? weightedSum / weightTotal : 0.0
+irMult = math.sqrt(5.0) / 2.24
+compositeAdjusted = composite * math.min(irMult, 1.5)
+
+// ─── ENTRY CONDITIONS ─────────────────────────────────────────
+closeOutsideUp   = p90Close > asianHigh and (p90Close - asianHigh) / i_pipSize >= i_minOutside
+closeOutsideDown = p90Close < asianLow  and (asianLow - p90Close) / i_pipSize >= i_minOutside
+
+canLong  = p90Found and p90IsLong  and closeOutsideUp  and asianRange <= i_maxAR and compositeAdjusted >= i_compositeMin
+canShort = p90Found and not p90IsLong and closeOutsideDown and asianRange <= i_maxAR and compositeAdjusted >= i_compositeMin
+
+// ─── SL/TP CALCULATION ────────────────────────────────────────
+slPips   = p90Body * i_slMult
+tpFactor = i_tpBase + i_tpComp * math.min(compositeAdjusted, 1.0)
+tpPips   = asianRange * tpFactor
+
+longSL  = close - slPips * i_pipSize
+longTP  = close + tpPips * i_pipSize
+shortSL = close + slPips * i_pipSize
+shortTP = close - tpPips * i_pipSize
+
+// ─── EXECUTE ORDERS ───────────────────────────────────────────
+if canLong and strategy.position_size == 0 and isTradeable
+    strategy.entry("Long", strategy.long)
+    strategy.exit("Long Exit", "Long", stop=longSL, limit=longTP)
+
+if canShort and strategy.position_size == 0 and isTradeable
+    strategy.entry("Short", strategy.short)
+    strategy.exit("Short Exit", "Short", stop=shortSL, limit=shortTP)
+
+// Hard exit at 5PM EST
+if estHour >= 17 and strategy.position_size != 0
+    strategy.close_all("Hard Exit 5PM")
+
+// ─── PLOTS ────────────────────────────────────────────────────
+plot(asianHigh, "Asian High", color=color.new(color.orange, 30), linewidth=1)
+plot(asianLow, "Asian Low", color=color.new(color.orange, 30), linewidth=1)
+plot(strategy.position_size != 0 ? longSL : na, "Long SL", color=color.red, style=plot.style_linebr)
+plot(strategy.position_size != 0 ? longTP : na, "Long TP", color=color.green, style=plot.style_linebr)

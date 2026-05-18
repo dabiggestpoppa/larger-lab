@@ -1,0 +1,208 @@
+{
+  "EURUSD_M5": {
+    "strategy": "Stall_Harvest",
+    "pair": "EUR/USD",
+    "total_trades": 94,
+    "total_sessions": 86,
+    "wins": 36,
+    "losses": 58,
+    "win_rate": 38.3,
+    "total_pnl_pips": 39.71,
+    "avg_win_pips": 13.83,
+    "avg_loss_pips": -7.9,
+    "max_drawdown_pips": -149.06,
+    "profit_factor": 1.09,
+    "by_session": {
+      "4-7": {
+        "trades": 53,
+        "wins": 19,
+        "win_rate": 35.8,
+        "pnl_pips": -25.72
+      },
+      "7-11": {
+        "trades": 33,
+        "wins": 16,
+        "win_rate": 48.5,
+        "pnl_pips": 104.77
+      },
+      "2-4": {
+        "trades": 8,
+        "wins": 1,
+        "win_rate": 12.5,
+        "pnl_pips": -39.34
+      }
+    },
+    "by_exit_reason": {
+      "tp_reversion": 11,
+      "max_hold_time": 43,
+      "sl_deep_state": 40
+    },
+    "timeframe": "M5",
+    "data_file": "EURUSD!_M5_202301020000_202605061250.csv"
+  },
+  "EURUSD_M1": {
+    "strategy": "Stall_Harvest",
+    "pair": "EUR/USD",
+    "total_trades": 94,
+    "total_sessions": 84,
+    "wins": 40,
+    "losses": 54,
+    "win_rate": 42.6,
+    "total_pnl_pips": 87.64,
+    "avg_win_pips": 13.65,
+    "avg_loss_pips": -8.49,
+    "max_drawdown_pips": -104.57,
+    "profit_factor": 1.19,
+    "by_session": {
+      "2-4": {
+        "trades": 3,
+        "wins": 1,
+        "win_rate": 33.3,
+        "pnl_pips": -4.34
+      },
+      "4-7": {
+        "trades": 59,
+        "wins": 23,
+        "win_rate": 39.0,
+        "pnl_pips": 21.88
+      },
+      "7-11": {
+        "trades": 32,
+        "wins": 16,
+        "win_rate": 50.0,
+        "pnl_pips": 70.1
+      }
+    },
+    "by_exit_reason": {
+      "sl_deep_state": 43,
+      "max_hold_time": 39,
+      "tp_reversion": 12
+    },
+    "timeframe": "M1",
+    "data_file": "EURUSD!_M1_202301020000_202605061253.csv"
+  },
+  "USDCHF_M5": {
+    "strategy": "Stall_Harvest",
+    "pair": "USD/CHF",
+    "total_trades": 50,
+    "total_sessions": 49,
+    "wins": 30,
+    "losses": 20,
+    "win_rate": 60.0,
+    "total_pnl_pips": 258.57,
+    "avg_win_pips": 14.17,
+    "avg_loss_pips": -8.33,
+    "max_drawdown_pips": -36.01,
+    "profit_factor": 2.55,
+    "by_session": {
+      "4-7": {
+        "trades": 30,
+        "wins": 20,
+        "win_rate": 66.7,
+        "pnl_pips": 166.53
+      },
+      "7-11": {
+        "trades": 18,
+        "wins": 10,
+        "win_rate": 55.6,
+        "pnl_pips": 102.26
+      },
+      "2-4": {
+        "trades": 2,
+        "wins": 0,
+        "win_rate": 0.0,
+        "pnl_pips": -10.22
+      }
+    },
+    "by_exit_reason": {
+      "max_hold_time": 24,
+      "tp_reversion": 12,
+      "sl_deep_state": 14
+    },
+    "timeframe": "M5",
+    "data_file": "USDCHF!_M5_202301020000_202605061250.csv"
+  },
+  "GBPUSD_M5": {
+    "strategy": "Stall_Harvest",
+    "pair": "GBP/USD",
+    "total_trades": 216,
+    "total_sessions": 183,
+    "wins": 98,
+    "losses": 118,
+    "win_rate": 45.4,
+    "total_pnl_pips": 275.05,
+    "avg_win_pips": 13.54,
+    "avg_loss_pips": -8.92,
+    "max_drawdown_pips": -88.47,
+    "profit_factor": 1.26,
+    "by_session": {
+      "7-11": {
+        "trades": 83,
+        "wins": 36,
+        "win_rate": 43.4,
+        "pnl_pips": 35.7
+      },
+      "2-4": {
+        "trades": 27,
+        "wins": 11,
+        "win_rate": 40.7,
+        "pnl_pips": 31.36
+      },
+      "4-7": {
+        "trades": 106,
+        "wins": 51,
+        "win_rate": 48.1,
+        "pnl_pips": 207.99
+      }
+    },
+    "by_exit_reason": {
+      "sl_deep_state": 99,
+      "max_hold_time": 87,
+      "tp_reversion": 28,
+      "hard_exit_12pm": 2
+    },
+    "timeframe": "M5",
+    "data_file": "GBPUSD!_M5_202301020000_202605061250.csv"
+  },
+  "USDJPY_M5": {
+    "strategy": "Stall_Harvest",
+    "pair": "USD/JPY",
+    "total_trades": 73,
+    "total_sessions": 65,
+    "wins": 29,
+    "losses": 44,
+    "win_rate": 39.7,
+    "total_pnl_pips": 139.4,
+    "avg_win_pips": 19.1,
+    "avg_loss_pips": -9.42,
+    "max_drawdown_pips": -96.28,
+    "profit_factor": 1.34,
+    "by_session": {
+      "7-11": {
+        "trades": 34,
+        "wins": 15,
+        "win_rate": 44.1,
+        "pnl_pips": 141.61
+      },
+      "2-4": {
+        "trades": 10,
+        "wins": 2,
+        "win_rate": 20.0,
+        "pnl_pips": -65.88
+      },
+      "4-7": {
+        "trades": 29,
+        "wins": 12,
+        "win_rate": 41.4,
+        "pnl_pips": 63.67
+      }
+    },
+    "by_exit_reason": {
+      "max_hold_time": 28,
+      "sl_deep_state": 38,
+      "tp_reversion": 7
+    },
+    "timeframe": "M5",
+    "data_file": "USDJPY!_M5_202301020000_202605061250.csv"
+  }
+}
