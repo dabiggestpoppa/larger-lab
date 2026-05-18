@@ -664,3 +664,39 @@ graph TB
 | AntiManipulationSafeguards | `oce/backend/coevolution/anti_manipulation.py` | Anti-Manipulation Safeguards | 10 |
 | CoevolutionProtocol | `oce/backend/coevolution_protocol.py` | Multi-Agent Coevolution Protocol | 14 |
 | **Total** | | | **76 tests** |
+
+---
+
+## 🔄 V3 Phase 9 — Sovereign Field Emergence ⏳ Ready
+
+```mermaid
+graph TB
+    subgraph "Field Core"
+        RE[ResonanceEngine<br/>resonance_engine.py]
+        RFN[RecursiveFieldNodes<br/>recursive_field_nodes.py]
+        AM[AttractorMapper<br/>attractor_mapper.py]
+    end
+
+    subgraph "Governance Layer"
+        DG[DriftGovernor<br/>drift_governor.py]
+        RC[ReconstructionCore<br/>reconstruction_core.py]
+        CIE[ContinuityIdentityEngine<br/>continuity_identity_engine.py]
+    end
+
+    RE --> RFN
+    RFN --> AM
+    AM --> DG
+    DG --> RC
+    RC --> CIE
+```
+
+### V3 Phase 9 Modules (Planned)
+
+| Module | File | Purpose | Tests |
+|--------|------|---------|-------|
+| ResonanceEngine | `oce/backend/field_core/resonance_engine.py` | Measures coherence across system | - |
+| RecursiveFieldNodes | `oce/backend/field_core/recursive_field_nodes.py` | Field participants with local awareness | - |
+| AttractorMapper | `oce/backend/field_core/attractor_mapper.py` | Detects stable recurring configurations | - |
+| DriftGovernor | `oce/backend/field_core/drift_governor.py` | Measures divergence, triggers reconstruction | - |
+| ReconstructionCore | `oce/backend/field_core/reconstruction_core.py` | Topology-constrained inference | - |
+| ContinuityIdentityEngine | `oce/backend/field_core/continuity_identity_engine.py` | Maintains operational continuity | - |

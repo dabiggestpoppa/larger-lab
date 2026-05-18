@@ -304,28 +304,29 @@ graph TB
 **Status:** 8/8 modules complete, 76 tests passing
 **Key:** CoevolutionProtocol at `oce/backend/coevolution_protocol.py`
 
-## Phase 9: Post-Deployment
+## Phase 9: Sovereign Field Emergence
 
 ```mermaid
 graph TB
-    subgraph "Deployment"
-        DP[Deployment Pipeline]
-        MD[Monitoring Dashboard]
+    subgraph "Field Core"
+        RE[ResonanceEngine]
+        RFN[RecursiveFieldNodes]
+        AM[AttractorMapper]
     end
 
-    subgraph "Operations"
-        AS[Alert System]
-        BR[Backup & Recovery]
+    subgraph "Governance Layer"
+        DG[DriftGovernor]
+        RC[ReconstructionCore]
+        CIE[ContinuityIdentityEngine]
     end
 
-    subgraph "Documentation"
-        DOC[Documentation]
-        PB[Performance Benchmarks]
-    end
-
-    DP --> MD
-    MD --> AS
-    AS --> BR
-    BR --> DOC
-    DOC --> PB
+    RE --> RFN
+    RFN --> AM
+    AM --> DG
+    DG --> RC
+    RC --> CIE
 ```
+
+**Status:** ⏳ Ready to Start
+**Modules:** 6 core modules in `oce/backend/field_core/`
+**Key:** resonance_engine.py → recursive_field_nodes.py → attractor_mapper.py → drift_governor.py → reconstruction_core.py → continuity_identity_engine.py
