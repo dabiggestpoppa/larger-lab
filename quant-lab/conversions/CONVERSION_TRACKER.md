@@ -108,15 +108,15 @@ After v2 fixes proved insufficient for 5 strategies, v3 cost-optimized fixes wer
 
 | Strategy | v3 Code | v3 Pine | v3 MQL5 | Key Fix |
 |----------|---------|---------|----------|----------|
-| Failure_Repair | ✅ | 🔲 | 🔲 | Wider TP (0.75x AR), stronger 2nd signal (2.0x), session filter (4-10 AM EST) |
-| Dual_Engine | ✅ | 🔲 | 🔲 | Wider TP (0.80x AR), ADX > 25, session filter, 2h time exit |
-| Two_Plays | ✅ | 🔲 | 🔲 | Cost-optimized parameters |
-| Stall_Harvest | ✅ | 🔲 | 🔲 | Cost-optimized parameters |
-| Constraint_Anchor | ✅ | 🔲 | 🔲 | Cost-optimized parameters |
+| Failure_Repair | ✅ | ✅ | 🔲 | Wider TP (0.75x AR), stronger 2nd signal (2.0x), session filter (4-10 AM EST) |
+| Dual_Engine | ✅ | ✅ | 🔲 | Wider TP (0.80x AR), ADX > 25, session filter, 2h time exit |
+| Two_Plays | ✅ | ✅ | 🔲 | Cost-optimized parameters |
+| Stall_Harvest | ✅ | ✅ | 🔲 | Cost-optimized parameters |
+| Constraint_Anchor | ✅ | ✅ | 🔲 | Cost-optimized parameters |
 
-**5 v3 code files written. 5/10 v3 PineScript conversions done. 0/10 v3 MQL5 conversions done.**
+**5 v3 code files written. 10/10 v3 PineScript conversions done. 0/10 v3 MQL5 conversions done.**
 
-## V3 PineScript Status
+## V3 PineScript Status — ALL 10 COMPLETE ✅
 | Strategy | v3 Pine | v3 MQL5 |
 |----------|---------|----------|
 | Deep_Mean_Reversion | ✅ | 🔲 |
@@ -124,11 +124,11 @@ After v2 fixes proved insufficient for 5 strategies, v3 cost-optimized fixes wer
 | Blind_Structural_Chain | ✅ | 🔲 |
 | P90P_Distribution | ✅ | 🔲 |
 | Fractal_Resolution | ✅ | 🔲 |
-| Failure_Repair | 🔲 | 🔲 |
-| Dual_Engine | 🔲 | 🔲 |
-| Two_Plays | 🔲 | 🔲 |
-| Stall_Harvest | 🔲 | 🔲 |
-| Constraint_Anchor | 🔲 | 🔲 |
+| Failure_Repair | ✅ | 🔲 |
+| Dual_Engine | ✅ | 🔲 |
+| Two_Plays | ✅ | 🔲 |
+| Stall_Harvest | ✅ | 🔲 |
+| Constraint_Anchor | ✅ | 🔲 |
 
 ---
-*Last updated: 2026-05-18 16:50 EDT by OWL heartbeat*
+*Last updated: 2026-05-18 19:06 EDT by OWL heartbeat — Researcher completed 5 remaining v3 PineScript files*

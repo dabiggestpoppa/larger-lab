@@ -101,6 +101,13 @@
 ---
 *Last updated: 2026-05-18 15:16 EDT — Heartbeat audit complete*
 
+## Heartbeat Check (2026-05-18 ~19:06 EDT)
+- Lab: 🎉 ALL 10 v3 PineScript files COMPLETE! Researcher finished 5 remaining at 5:44-5:50 PM. 0/10 v3 MQL5 done. TV push still blocked.
+- Monte Carlo DMR: ✅ Complete — 10K iterations, 0% ruin prob, production ready
+- Farm: Day 3 hashtag expansion + best posting times written. Still need: carousel, email sequence, ad copies, affiliate tracker, media kit.
+- SW Dev: Frontend 2/6 fixes done. Backend all 4 fixes still needed.
+- Capital Maxer: Timed out, no output.
+
 ## Heartbeat Check (2026-05-18 ~17:00 EDT)
 - Lab: 10/10 strategies profitable (v3 backtests). 5/10 v3 PineScript done. 5 remaining v3 PineScript + 10 MQL5 need conversion.
 - Farm: Day 3 hashtag expansion (+350) and best posting times written. Still need: carousel, email sequence, ad copies, affiliate tracker, media kit.
@@ -132,3 +139,24 @@
 - Navtoor: AI content creator (11.2K followers), posts practical AI guides. Specific post ID not accessible without X login.
 - Pattern: Managers consistently timeout at 10-19 min. Need smaller tasks or direct execution by OWL.
 - OWL wrote dual_engine_v3.py directly — exception due to timeout pattern. Normally delegates per MAD directive.
+
+## Heartbeat Check (2026-05-18 ~19:32 EDT)
+- Lab: ✅ Monte Carlo DMR COMPLETE — 10K iterations, 91.1% accuracy, 0% ruin, PF 19.3. PRODUCTION READY.
+- Lab: ALL 10 PineScript v3 files complete. Awaiting MC on remaining 9 strategies (MAD decision).
+- Farm: ✅ ALL Day 3 deliverables complete (8 files). Day 4 plan complete.
+- Farm: Awaiting platform credentials (P0 blocker) to begin publishing.
+- RAM: 89.4% (6.6/7.38GB). VS Code = 2.1GB (safe to close). Agent env = 734MB.
+- VS Code: 4 processes are editor itself, NOT agents. Closing VS Code is safe — OWL stays online.
+- Agents: labmcdmr completed MC. farmday3and4 timed out (OWL finished remaining files).
+- 3 sub-agent slots free. No active runs.
+
+## Heartbeat Check (2026-05-18 ~20:09 EDT)
+- MAD clarification: CEREBUS is his trading system, he's a trader
+- MAD closed VS Code to free RAM — OWL stays online (runs on OpenClaw gateway)
+- Phones = free resources (paired nodes) — awaiting MAD's direction
+- Lab: MC Batch 2 COMPLETE — BSC, P90P, FR, SH all pass (0% ruin)
+- Lab: Optimization Plan COMPLETE — DMR at 0.35L = $90/day, path to 1% daily
+- Lab: ABANDON Two_Plays, Constraint_Anchor, Stall_Harvest (negative edge)
+- Lab: Failure_Repair needs wider TP + tighter SL
+- 5/10 strategies have MC done. 5 remaining need MC + fixes.
+- No active sub-agents. All slots free.
