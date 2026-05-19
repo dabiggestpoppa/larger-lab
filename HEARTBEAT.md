@@ -159,4 +159,8 @@
 - Lab: ABANDON Two_Plays, Constraint_Anchor, Stall_Harvest (negative edge)
 - Lab: Failure_Repair needs wider TP + tighter SL
 - 5/10 strategies have MC done. 5 remaining need MC + fixes.
+- MQL5: 8/10 done (missing SH, CA, FR). PineScript: 10/10 v3 done.
+- V3 System: ALL 10 phases complete (1460 tests). GitHub docs done.
+- Farm Day 3: ALL complete. Day 4 plan: complete.
 - No active sub-agents. All slots free.
+- Awaiting MAD response on remaining MC + MQL5 + phone integration.
