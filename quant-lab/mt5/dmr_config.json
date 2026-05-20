@@ -1,0 +1,13 @@
+{
+  "login": 650898,
+  "password": "Teflondon1718!",
+  "server": "OxSecurities-Live",
+  "symbols": ["EURUSD.PRO"],
+  "lot_size": 0.02,
+  "max_daily_trades_per_symbol": 1,
+  "hard_exit_hour_est": 17,
+  "deep_mult": 2.00,
+  "kill_mult": 2.20,
+  "magic_number": 20260520,
+  "enabled": true
+}
