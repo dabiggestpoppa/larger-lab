@@ -44,6 +44,17 @@
 - [ ] Debug Phase 9 modules (resonance_engine, recursive_field_nodes, attractor_mapper, drift_governor, reconstruction_core, continuity_identity_engine)
 - [ ] field_core infrastructure setup
 
+### GitHub Documentation Revamp (2026-05-20)
+- [x] Created `docs/TESTING.md` — Comprehensive testing architecture guide
+- [x] Created `docs/DEBUGGING.md` — Debugging guide with error patterns, tools, diagnostics
+- [x] Created `docs/CODE_QUALITY.md` — Coding standards, Windows rules, architecture rules
+- [x] Updated `TOOLS.md` — Complete tool reference with all tools/integrations
+- [x] Created `.github/ISSUE_TEMPLATE/bug_report.md` — Bug report template
+- [x] Created `.github/ISSUE_TEMPLATE/feature_request.md` — Feature request template
+- [x] Created `.github/PULL_REQUEST_TEMPLATE.md` — PR template with checklist
+- [x] Committed and pushed to origin/master (commit: 66c4d39)
+- [x] Posted summary to team-chat.md
+
 ### Continuous Workflow
 - After every code edit: Update this file + polymorph-memory.md
 - After every 5 edits: Post summary to team-chat.md
