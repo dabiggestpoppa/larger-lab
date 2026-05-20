@@ -574,6 +574,59 @@ Agent Network:        5 agents active
 
 ---
 
+## 🧪 Phase 11 — Operational Validation
+
+### Test Matrix
+
+| Test | Duration | Target | Status |
+|------|----------|--------|--------|
+| Runtime Stability | 24h | No observer death | Ready |
+| Continuity Stability | 72h | Identity continuity | Ready |
+| Memory Stability | 7d | No poisoning | Ready |
+| Orchestration Stability | 7d | No collapse | Ready |
+| Resource Stability | 7d | Bounded entropy | Ready |
+| Recovery Stability | Cycles | Identity preserved | Ready |
+
+### Chaos Engineering
+
+| Scenario | Purpose | Status |
+|----------|---------|--------|
+| Observer Kill | Recovery testing | Ready |
+| Event Flood | Throughput resilience | Ready |
+| Memory Corruption | Integrity testing | Ready |
+| Router Failure | Rerouting | Ready |
+| WebSocket Loss | Reconnect | Ready |
+| Token Starvation | Degradation | Ready |
+| Recursive Storm | Stability | Ready |
+| Twin Desync | Sync recovery | Ready |
+
+### Running Phase 11 Tests
+
+```bash
+# Long-horizon stability test (24h)
+python -m tools.testing.long_horizon.stability_runner --hours 24
+
+# Chaos engineering tests
+python -m tools.testing.chaos.chaos_engine --scenario observer_death
+
+# All chaos scenarios
+python -m tools.testing.chaos.chaos_engine --all
+```
+
+### Monitoring Endpoints
+
+```bash
+# WebSocket metrics stream
+ws://localhost:8000/ws/stability
+
+# REST API endpoints
+GET /api/stability/metrics
+GET /api/stability/chaos
+GET /api/stability/continuity
+```
+
+---
+
 ## 📝 License
 
 See `LICENSE` file. All agent code follows the 12-rule `CLAUDE.md` contract.

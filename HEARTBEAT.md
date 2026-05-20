@@ -1,5 +1,27 @@
 # HEARTBEAT.md — OWL Operator
 
+## Heartbeat Check (2026-05-20 ~12:52 EDT)
+- 📊 **DMR Live v2:** Restarted at 12:55 PM (PID 5764) — previous instance died
+- 🖥️ **DMR Dashboard:** Restarted at 12:55 PM (PID 3648) — previous instance died
+- 💾 **DMR Database:** `quant-lab/mt5/dmr_live.db` (53KB) — last write 12:30 PM
+- 🖥️ **Servers:** OCE backend :8000 ✅ | SRRA API :8001 ✅ | OCE frontend :3000 ✅ | SRRA frontend :3001 ✅ | Agent env :9000 ❌ | DMR Dashboard :8002 ✅ (restarted)
+- 💾 **RAM:** 88.6% (0.8GB free) | CPU: 13%
+- 🌾 **No active sub-agents.** 5 slots free.
+- ⚠️ **DMR Live + Dashboard both crashed/stopped** — restarted successfully
+- ✅ **Portfolio MC Analysis COMPLETE** — PDF + JSON reports generated
+
+## Heartbeat Check (2026-05-20 ~12:55 EDT)
+- 📊 **DMR Live v2.2 (PID 9848→relaunched):** Running | 0.02 lots | EURUSD.PRO | Live account 650898
+- 🖥️ **DMR Dashboard (PID 24784):** UP on http://localhost:8002 | Auto-refreshing
+- 💾 **DMR Database:** `quant-lab/mt5/dmr_live.db` — trades, P90 events, system logs, account snapshots
+- 📋 **Daily Report Cron:** de41ff71 — Every day 5 PM EST → Telegram summary to MAD
+- 🧹 **Cron Cleanup:** Removed stale meditation jobs (Optimizer, SW Dev, CEO all timing out)
+- 🖥️ **Servers:** OCE backend :8000 ✅ | SRRA API :8001 ✅ | OCE frontend :3000 ✅ | SRRA frontend :3001 ✅ | Agent env :9000 ❌ | DMR Dashboard :8002 ✅
+- 📊 **Portfolio Backtest PDF:** `quant-lab/reports/DMR_PORTFOLIO_BACKTEST_REPORT.pdf` — 1,583 trades, 93.6% WR, $18,187 PnL, 3.14% max DD
+- 🌾 **No active sub-agents.** 5 slots free.
+- ⚠️ **P90 window closed for today.** Script active for tomorrow's window (2-11 AM EST).
+- ⚠️ **MT5 AutoTrading may be disabled** — error 10027 detected. MAD needs to enable AutoTrading in MT5 toolbar.
+
 ## Heartbeat Check (2026-05-20 ~09:45 EDT)
 - 🖥️ **Servers:** OCE backend :8000 ✅ | SRRA API :8001 ✅ | OCE frontend :3000 ✅ | SRRA frontend :3001 ✅ | Agent env :9000 ❌
 - 📊 **Forward Test (PID 4016):** Alive since 5:46 PM EST, 0 trades placed (idle, waiting for P90)
