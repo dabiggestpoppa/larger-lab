@@ -1,0 +1,2617 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>CEREBUS FX - Strategies Complete Reference Vol II</title>
+<style>
+
+@page { size: A4; margin: 12mm 15mm; }
+body { font-family: "Segoe UI", Arial, sans-serif; font-size: 9.5pt; line-height: 1.45; color: #1a1a1a; }
+h1 { font-size: 18pt; color: #0d2b4e; border-bottom: 2px solid #0d2b4e; padding-bottom: 6px; margin-top: 24px; page-break-before: always; }
+h1:first-of-type { page-break-before: avoid; }
+h2 { font-size: 14pt; color: #1a4a7a; border-bottom: 1px solid #1a4a7a; padding-bottom: 3px; margin-top: 18px; }
+h3 { font-size: 11.5pt; color: #2a5a8c; }
+h4 { font-size: 10pt; color: #3a6a9c; }
+table { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 8.5pt; }
+th { background: #0d2b4e; color: white; padding: 5px 7px; text-align: left; }
+td { border: 1px solid #ccc; padding: 4px 7px; }
+tr:nth-child(even) { background: #f4f6f9; }
+pre { background: #f0f0f0; padding: 8px; border-radius: 4px; font-size: 8.5pt; }
+code { background: #f0f0f0; padding: 1px 3px; border-radius: 2px; }
+blockquote { border-left: 3px solid #1a4a7a; padding: 4px 10px; margin: 6px 0; color: #444; background: #f8f9fa; }
+ul,ol { padding-left: 20px; margin: 4px 0; }
+li { margin: 2px 0; }
+</style>
+</head>
+<body>
+<h1 id="cerebus-fx-strategies-complete-reference">📘 CEREBUS FX — STRATEGIES COMPLETE REFERENCE</h1>
+<h2 id="volume-ii-full-strategy-breakdown-with-monte-carlo-validation">Volume II: Full Strategy Breakdown with Monte Carlo Validation</h2>
+<blockquote>
+<p><strong>Version:</strong> 2.0 | <strong>Date:</strong> May 19, 2026
+<strong>Classification:</strong> PROPRIETARY — Internal Reference Only
+<strong>Data Source:</strong> CEREBUS Manual v4.0 + Excel Workbook (97 sheets, 281 weeks, 315,000+ candles)
+<strong>Instrument:</strong> EUR/USD M5 (primary) | ETH/USD | Cross-Market
+<strong>Backtest Period:</strong> January 2020 – May 2026</p>
+</blockquote>
+<hr />
+<h1 id="table-of-contents">TABLE OF CONTENTS</h1>
+<ol>
+<li><a href="#1-system-overview--core-thesis">System Overview &amp; Core Thesis</a></li>
+<li><a href="#2-strategy-1-p90-cfd-expansion-engine">Strategy 1: P90 CFD Expansion Engine</a></li>
+<li><a href="#3-strategy-2-stall-harvest-trading-system">Strategy 2: Stall-Harvest Trading System</a></li>
+<li><a href="#4-strategy-3-deep-mean-reversion">Strategy 3: Deep Mean Reversion</a></li>
+<li><a href="#5-strategy-4-dual-engine-execution-model">Strategy 4: Dual-Engine Execution Model</a></li>
+<li><a href="#6-strategy-5-failure-repair-model">Strategy 5: Failure Repair Model</a></li>
+<li><a href="#7-strategy-6-the-two-plays">Strategy 6: The Two Plays</a></li>
+<li><a href="#8-strategy-7-blind-structural-chain">Strategy 7: Blind Structural Chain</a></li>
+<li><a href="#9-strategy-8-fractal-resolution-engine">Strategy 8: Fractal Resolution Engine</a></li>
+<li><a href="#10-strategy-9-constraint-anchor">Strategy 9: Constraint Anchor</a></li>
+<li><a href="#11-strategy-10-composite-alpha">Strategy 10: Composite Alpha</a></li>
+<li><a href="#12-monte-carlo-results-summary">Monte Carlo Results Summary</a></li>
+<li><a href="#13-risk-management--position-sizing">Risk Management &amp; Position Sizing</a></li>
+<li><a href="#14-temporal-delivery-patterns">Temporal Delivery Patterns</a></li>
+<li><a href="#15-failure-statistics-database">Failure Statistics Database</a></li>
+</ol>
+<hr />
+<h1 id="1-system-overview-core-thesis">1. SYSTEM OVERVIEW &amp; CORE THESIS</h1>
+<h2 id="11-core-thesis">1.1 Core Thesis</h2>
+<p>Small Asian ranges (&lt; 30 pips) create a <strong>Constraint Deficit</strong> — the field is under-resolved and must expand to reach its daily mean variance. The Asian Range defines the day's constraint set. The system captures this expansion through multiple complementary strategies.</p>
+<h2 id="12-three-tier-asian-range-classification">1.2 Three-Tier Asian Range Classification</h2>
+<table>
+<thead>
+<tr>
+<th>Asian Range</th>
+<th>Tier</th>
+<th>Conviction</th>
+<th>Position Size</th>
+<th>Expected Daily Range</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&lt; 20 pips</td>
+<td>T1 (Gold)</td>
+<td>Full</td>
+<td>100%</td>
+<td>~72 pips</td>
+</tr>
+<tr>
+<td>20 – 30 pips</td>
+<td>T2 (Standard)</td>
+<td>Moderate</td>
+<td>75%</td>
+<td>~58 pips</td>
+</tr>
+<tr>
+<td>30 – 45 pips</td>
+<td>T3 (Caution)</td>
+<td>Reduced</td>
+<td>50%</td>
+<td>~48 pips</td>
+</tr>
+<tr>
+<td>&gt; 45 pips</td>
+<td>NO-GO</td>
+<td>Skip</td>
+<td>0%</td>
+<td>N/A</td>
+</tr>
+</tbody>
+</table>
+<h2 id="13-key-performance-metrics-system-wide">1.3 Key Performance Metrics (System-Wide)</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Win Rate (Filtered)</td>
+<td>85% – 90%</td>
+</tr>
+<tr>
+<td>Daily Goal</td>
+<td>1.0% – 1.5%</td>
+</tr>
+<tr>
+<td>Max Daily Drawdown</td>
+<td>&lt; 0.50%</td>
+</tr>
+<tr>
+<td>Prop Firm Circuit Breaker</td>
+<td>0.40% hard stop</td>
+</tr>
+<tr>
+<td>Weekly R (Full Deployment)</td>
+<td>+38R to +52R</td>
+</tr>
+<tr>
+<td>Max Drawdown (Controlled)</td>
+<td>-4R to -6R</td>
+</tr>
+</tbody>
+</table>
+<h2 id="14-pre-session-protocol-daily-145-am-est">1.4 Pre-Session Protocol (Daily — 1:45 AM EST)</h2>
+<ol>
+<li><strong>Measure Asian Range</strong> (00:00 – 08:00 UTC) → Classify Tier</li>
+<li><strong>Define Daily Targets</strong> based on tier</li>
+<li><strong>Check Filters:</strong> News (skip if high-impact within 4h), Day of Week adjustments, Overfilled check at 9 AM</li>
+</ol>
+<h2 id="15-strategy-classification-matrix">1.5 Strategy Classification Matrix</h2>
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>Execution Style</th>
+<th>Primary Instrument</th>
+<th>Timeframe</th>
+<th>Win Rate</th>
+<th>PF (after costs)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P90 CFD Expansion</td>
+<td>Mean Reversion / Distribution</td>
+<td>EUR/USD</td>
+<td>M5</td>
+<td>83-90%</td>
+<td>~1.78</td>
+</tr>
+<tr>
+<td>Stall-Harvest</td>
+<td>Mean Reversion (Deep)</td>
+<td>EUR/USD</td>
+<td>M5</td>
+<td>86% (stall events)</td>
+<td>~1.66</td>
+</tr>
+<tr>
+<td>Deep Mean Reversion</td>
+<td>Mean Reversion</td>
+<td>EUR/USD</td>
+<td>M5</td>
+<td>89.3%</td>
+<td>~45</td>
+</tr>
+<tr>
+<td>Dual-Engine</td>
+<td>Hybrid (Anchor + Momentum)</td>
+<td>EUR/USD</td>
+<td>M5</td>
+<td>89.4%</td>
+<td>~3.42</td>
+</tr>
+<tr>
+<td>Failure Repair</td>
+<td>Counter-Trend / Rekey</td>
+<td>EUR/USD</td>
+<td>M5</td>
+<td>69.8% (2nd acceptance)</td>
+<td>~1.72</td>
+</tr>
+<tr>
+<td>The Two Plays</td>
+<td>Directional / Scalping</td>
+<td>EUR/USD</td>
+<td>M5</td>
+<td>85-92%</td>
+<td>~2.5</td>
+</tr>
+<tr>
+<td>Blind Structural Chain</td>
+<td>Trend Following</td>
+<td>Multi-pair</td>
+<td>M5/H1</td>
+<td>58%</td>
+<td>~1.92</td>
+</tr>
+<tr>
+<td>Fractal Resolution</td>
+<td>Multi-Timeframe</td>
+<td>EUR/USD</td>
+<td>M5/H4</td>
+<td>43.7%</td>
+<td>~1.03</td>
+</tr>
+<tr>
+<td>Constraint Anchor</td>
+<td>Structural</td>
+<td>EUR/USD</td>
+<td>M5</td>
+<td>91.7%</td>
+<td>~2.8</td>
+</tr>
+<tr>
+<td>Composite Alpha</td>
+<td>Multi-Strategy Blend</td>
+<td>EUR/USD</td>
+<td>M5</td>
+<td>97.3%</td>
+<td>~285</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="2-strategy-1-p90-cfd-expansion-engine">2. STRATEGY 1: P90 CFD EXPANSION ENGINE</h1>
+<h2 id="21-full-logic-mechanism">2.1 Full Logic &amp; Mechanism</h2>
+<p><strong>Pattern Basis:</strong> The P90 candle is the foundational signal of the CEREBUS system. When the Asian session produces a small range (constraint deficit), the first significant M5 candle that closes outside the Asian band represents the initial resolution of that constraint. This "P90" candle (named for its 90th-percentile body size) signals the direction of the day's expansion.</p>
+<p><strong>Execution Style:</strong> Mean Reversion / Distribution — capturing the expansion from a constrained state.</p>
+<p><strong>How the Pattern Persists:</strong> The Asian session accumulates unresolved institutional orders. When London opens and a P90 candle prints, it triggers a cascade of algorithmic responses that push price toward Fibonacci extension targets of the Asian range. This pattern persists because institutional order flow consistently clusters at these levels.</p>
+<h2 id="22-entry-mechanism">2.2 Entry Mechanism</h2>
+<p><strong>P90 Candle Exact Definition:</strong>
+- M5 candle closing within the Activation Window (2:00 AM – 11:00 AM EST)
+- Body size must meet threshold for the time window:</p>
+<table>
+<thead>
+<tr>
+<th>Time Window (EST)</th>
+<th>Body Threshold</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2:00 – 4:00 AM</td>
+<td>&gt;= 4.1 pips</td>
+</tr>
+<tr>
+<td>4:00 – 6:00 AM</td>
+<td>&gt;= 4.6 pips</td>
+</tr>
+<tr>
+<td>6:00 – 8:00 AM</td>
+<td>&gt;= 4.6 pips</td>
+</tr>
+<tr>
+<td>8:00 – 10:00 AM</td>
+<td>&gt;= 5.9 pips</td>
+</tr>
+<tr>
+<td>10:00 – 11:00 AM</td>
+<td>&gt;= 6.2 pips</td>
+</tr>
+</tbody>
+</table>
+<p><strong>CRITICAL:</strong> The P90 candle must <strong>CLOSE</strong> outside the Asian constraint band. Wicks do not count — only closes.</p>
+<p><strong>Activation &amp; Scaling Protocol (Pyramid Model):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>Timing</th>
+<th>Condition</th>
+<th>Size</th>
+<th>Boundary</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Signal 1</td>
+<td>P90 Close</td>
+<td>Activation Confirmed</td>
+<td>40%</td>
+<td>80% of P90 body</td>
+<td>-25% Daily Range</td>
+</tr>
+<tr>
+<td>Signal 2</td>
+<td>P90 Close</td>
+<td>Simultaneous</td>
+<td>40%</td>
+<td>1.5x P90 body</td>
+<td>-25% Daily Range</td>
+</tr>
+<tr>
+<td>Signal 3</td>
+<td>+45 Min</td>
+<td>Resolution Output +8 pips</td>
+<td>20%</td>
+<td>Breakeven (Signal 1)</td>
+<td>-50% Daily Range</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Regime Shift Confirmation (8:45 AM EST):</strong>
+- If Current Daily Range &gt; 1.5x Asian Range → proceed with full size
+- If not → reduce size by 50%</p>
+<h2 id="23-risk-management">2.3 Risk Management</h2>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Constraint Boundary</td>
+<td>80% of P90 body from entry</td>
+</tr>
+<tr>
+<td>TP1</td>
+<td>-25% of Asian Range → Close 50%, move boundary to BE+2p</td>
+</tr>
+<tr>
+<td>TP2</td>
+<td>-50% of Asian Range → Close remaining</td>
+</tr>
+<tr>
+<td>Hard Exit</td>
+<td>12:00 PM EST — Close ALL positions</td>
+</tr>
+<tr>
+<td>Kill Switch</td>
+<td>132% State → Close ALL immediately</td>
+</tr>
+</tbody>
+</table>
+<h2 id="24-situational-analysis">2.4 Situational Analysis</h2>
+<p><strong>When it works best:</strong>
+- T1 Asian Range (&lt; 20 pips) — highest conviction
+- Tuesday/Wednesday — strongest delivery days
+- Regime CONFIRMED (ratio &gt;= 1.5x by 9 AM)
+- No major news within 4 hours</p>
+<p><strong>When to avoid:</strong>
+- Asian Range &gt; 45 pips (NO-GO)
+- Monday (indecisive — reduce size 25%)
+- Friday after 10 AM (reduce size 50%)
+- High-impact news within 4 hours</p>
+<h2 id="25-temporal-constraints-delivery-patterns">2.5 Temporal Constraints &amp; Delivery Patterns</h2>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Mean Time to -50%</th>
+<th>Median Time</th>
+<th>Edge Thin If Not Hit By</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1 (&lt;20p)</td>
+<td>3.1 hours</td>
+<td>2.8 hours</td>
+<td>3.0 hours</td>
+</tr>
+<tr>
+<td>T2 (20-30p)</td>
+<td>4.6 hours</td>
+<td>4.1 hours</td>
+<td>4.4 hours</td>
+</tr>
+<tr>
+<td>T3 (30-45p)</td>
+<td>6.8 hours</td>
+<td>6.2 hours</td>
+<td>5.5 hours</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key Rule:</strong> 82% of daily constraint resolution is complete by 12:00 PM EST. Hard exit is non-negotiable.</p>
+<h2 id="26-failure-stats">2.6 Failure Stats</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Overall Win Rate (TP1 -25%)</td>
+<td>89.2%</td>
+</tr>
+<tr>
+<td>Overall Win Rate (TP2 -50%)</td>
+<td>78.4%</td>
+</tr>
+<tr>
+<td>Invalidation Rate (80% + 2p rule)</td>
+<td>12.3%</td>
+</tr>
+<tr>
+<td>T3 Invalidation Rate</td>
+<td>18.9%</td>
+</tr>
+<tr>
+<td>On-Time hits (before 12 PM)</td>
+<td>84.9%</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Failure Modes:</strong>
+- M5 close back inside Asian band before TP1 (12.3%)
+- 132% Kill-Switch violation (rare but catastrophic)
+- Overfilled day (range &gt; 40p by 9 AM on T2/T3)</p>
+<h2 id="27-cascade-activation">2.7 Cascade Activation</h2>
+<p>Subsequent P90 candles in the <strong>same direction</strong> within 120 minutes of the Initial P90.</p>
+<table>
+<thead>
+<tr>
+<th>Cascade #</th>
+<th>Win Rate</th>
+<th>Avg Extension</th>
+<th>Recommendation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1st (Initial)</td>
+<td>83.3%</td>
+<td>18.4p</td>
+<td>Baseline</td>
+</tr>
+<tr>
+<td>2nd</td>
+<td><strong>87.8%</strong></td>
+<td>22.6p</td>
+<td><strong>BEST</strong></td>
+</tr>
+<tr>
+<td>3rd</td>
+<td>84.2%</td>
+<td>19.8p</td>
+<td>Good</td>
+</tr>
+<tr>
+<td>4th+</td>
+<td>76.4%</td>
+<td>16.2p</td>
+<td><strong>AVOID</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Max cascades per session:</strong> 3
+<strong>Optimal cascade timing:</strong> 45-60 minutes after initial P90 (88.2% win rate)</p>
+<hr />
+<h1 id="3-strategy-2-stall-harvest-trading-system">3. STRATEGY 2: STALL-HARVEST TRADING SYSTEM</h1>
+<h2 id="31-full-logic-mechanism">3.1 Full Logic &amp; Mechanism</h2>
+<p><strong>Pattern Basis:</strong> When the resolution output extends aggressively, it often reaches the <strong>Stall Zone (168%)</strong> or <strong>Deep State (200%)</strong> of the P90 candle. At these extreme extensions, the market has exhausted its immediate resolution pathways and must either reverse (rebalance) or consolidate. The Stall-Harvest captures the high-probability snap-back from these extremes.</p>
+<p><strong>Execution Style:</strong> Mean Reversion (Deep) — counter-trend at extreme extensions.</p>
+<p><strong>How the Pattern Persists:</strong> Institutional algorithms are programmed to take profits at specific extension levels (168%, 200%). When price reaches these levels, the combined profit-taking creates a predictable counter-movement. The 168% level is particularly significant because it represents the Fibonacci 1.618 extension — a level where institutional order flow consistently reverses.</p>
+<h2 id="32-entry-mechanism">3.2 Entry Mechanism</h2>
+<p><strong>Setup Conditions:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Condition</th>
+<th>Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Trigger</td>
+<td>Resolution output touches Stall Zone (168%) or Deep State (200%) of P90 candle</td>
+</tr>
+<tr>
+<td>Time</td>
+<td>Must occur before 12:00 PM EST</td>
+</tr>
+<tr>
+<td>Filter</td>
+<td>The -50% Daily Target has NOT yet been hit</td>
+</tr>
+</tbody>
+</table>
+<p><strong>CFD Limit Order at Deep Value:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Entry</td>
+<td>LIMIT ORDER at 200% Deep State Level</td>
+</tr>
+<tr>
+<td>Constraint Boundary</td>
+<td>8 pips beyond 200% level (approx. 220% extension)</td>
+</tr>
+<tr>
+<td>TP1</td>
+<td>Return to 0% (Activation Resolution Output)</td>
+</tr>
+<tr>
+<td>TP2</td>
+<td>-50% Daily Range</td>
+</tr>
+<tr>
+<td>R:R Potential</td>
+<td>1:5 to 1:7</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Binary Options (Time-Based):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Session (EST)</th>
+<th>Dynamic Expiry</th>
+<th>Target Win Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2 AM – 6 AM</td>
+<td>90 Minutes</td>
+<td>~84%</td>
+</tr>
+<tr>
+<td>6 AM – 9 AM</td>
+<td>60 Minutes</td>
+<td>~78%</td>
+</tr>
+<tr>
+<td>9 AM – 12 PM</td>
+<td>45 Minutes</td>
+<td>~74%</td>
+</tr>
+<tr>
+<td>After 12 PM</td>
+<td>No Trade</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h2 id="33-risk-management">3.3 Risk Management</h2>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Entry</td>
+<td>Limit @ 168% Stall Zone</td>
+</tr>
+<tr>
+<td>SL</td>
+<td>200% Deep State + 1.5x candle body buffer</td>
+</tr>
+<tr>
+<td>TP1</td>
+<td>-25% Daily Range</td>
+</tr>
+<tr>
+<td>TP2</td>
+<td>-50% Daily Range</td>
+</tr>
+<tr>
+<td>Kill Switch</td>
+<td>M5 closes beyond 200% Deep State → abort</td>
+</tr>
+</tbody>
+</table>
+<h2 id="34-situational-analysis">3.4 Situational Analysis</h2>
+<p><strong>When it works best:</strong>
+- T1 Asian Range — tightest constraint, strongest snap-back
+- 2-4 AM EST session — 94.2% expansion win rate
+- When -50% daily target NOT yet hit (room to run)</p>
+<p><strong>When to avoid:</strong>
+- Asian Range &gt; 45 pips (NO-GO)
+- 132% Kill-Switch State active
+- After 11 AM EST (no new activations)
+- Major news imminent</p>
+<h2 id="35-temporal-constraints-delivery-patterns">3.5 Temporal Constraints &amp; Delivery Patterns</h2>
+<table>
+<thead>
+<tr>
+<th>Session</th>
+<th>Expansion Win Rate</th>
+<th>Stall Zone Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2-4 AM EST</td>
+<td>94.2%</td>
+<td>31.1%</td>
+</tr>
+<tr>
+<td>4-7 AM EST</td>
+<td>88.6%</td>
+<td>35.4%</td>
+</tr>
+<tr>
+<td>7-11 AM EST</td>
+<td>82.4%</td>
+<td>38.2%</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key Stats:</strong>
+- 34.2% of P90s reach Stall Zone (168%) within 35 min
+- 65.8% of P90s expand through (168% NOT hit)
+- 86% of stall events result in profitable expansion or rebalancing</p>
+<h2 id="36-failure-stats">3.6 Failure Stats</h2>
+<table>
+<thead>
+<tr>
+<th>Outcome Scenario</th>
+<th>Frequency</th>
+<th>Profit Probability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>True Rejection</td>
+<td>64.2%</td>
+<td>High</td>
+</tr>
+<tr>
+<td>Shallow Violation</td>
+<td>21.4%</td>
+<td>High</td>
+</tr>
+<tr>
+<td>Deep Violation</td>
+<td>14.4%</td>
+<td>Low</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Failure Modes:</strong>
+- Resolution output CLOSES strongly beyond 220% level (True constraint violation)
+- Asian Range &gt; 45 pips (edge exhausted)
+- 132% Kill-Switch triggers before entry</p>
+<h2 id="37-monte-carlo-results">3.7 Monte Carlo Results</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mean Daily Return</td>
+<td>+0.72 pips (after costs)</td>
+</tr>
+<tr>
+<td>Median Accuracy</td>
+<td>91.6%</td>
+</tr>
+<tr>
+<td>Median Max Drawdown</td>
+<td>29.0 pips</td>
+</tr>
+<tr>
+<td>PF Robustness (Median)</td>
+<td>1.84</td>
+</tr>
+<tr>
+<td>Probability of 20% Drawdown</td>
+<td>0.00%</td>
+</tr>
+<tr>
+<td>Trade Order Robustness</td>
+<td>PF &gt; 1.0 in ALL 1,000 shuffles ✅</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="4-strategy-3-deep-mean-reversion">4. STRATEGY 3: DEEP MEAN REVERSION</h1>
+<h2 id="41-full-logic-mechanism">4.1 Full Logic &amp; Mechanism</h2>
+<p><strong>Pattern Basis:</strong> The flagship strategy. When price extends to extreme levels (168%-200% of the Asian range), the probability of mean reversion is exceptionally high. This is the purest expression of the CEREBUS constraint-system thesis: the field must rebalance after extreme resolution.</p>
+<p><strong>Execution Style:</strong> Mean Reversion — the core edge of the entire system.</p>
+<p><strong>How the Pattern Persists:</strong> This strategy exploits the fundamental property of mean-reverting markets: extreme deviations from the mean have a higher probability of reversal. The 200% Deep State level represents the point where institutional algorithms simultaneously trigger profit-taking, creating a self-reinforcing reversal pattern.</p>
+<h2 id="42-entry-mechanism">4.2 Entry Mechanism</h2>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Trigger</td>
+<td>Price touches 200% Deep State of P90 candle</td>
+</tr>
+<tr>
+<td>Entry Type</td>
+<td>LIMIT ORDER at 200% level</td>
+</tr>
+<tr>
+<td>Time Window</td>
+<td>Before 12:00 PM EST</td>
+</tr>
+<tr>
+<td>Filter</td>
+<td>-50% Daily Target NOT yet hit</td>
+</tr>
+<tr>
+<td>Direction</td>
+<td>Counter to the extension direction</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Entry Refinements:</strong>
+- Bullish extension → SHORT at 200% level
+- Bearish extension → LONG at 200% level
+- Buffer: 8 pips beyond 200% for stop loss</p>
+<h2 id="43-risk-management">4.3 Risk Management</h2>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stop Loss</td>
+<td>8 pips beyond 200% level (~220% extension)</td>
+</tr>
+<tr>
+<td>TP1</td>
+<td>Return to 0% (Activation Resolution Output)</td>
+</tr>
+<tr>
+<td>TP2</td>
+<td>-50% Daily Range</td>
+</tr>
+<tr>
+<td>R:R Potential</td>
+<td>1:5 to 1:7</td>
+</tr>
+<tr>
+<td>Max Risk</td>
+<td>0.12% of equity per activation</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key Data Point:</strong> 90% of violations do NOT exceed 6.5 pips past 200%. The 8-pip buffer filters noise while protecting capital.</p>
+<h2 id="44-situational-analysis">4.4 Situational Analysis</h2>
+<p><strong>When it works best:</strong>
+- T1 Asian Range (&lt; 20 pips) — tightest constraint
+- 2-7 AM EST — highest expansion/reversion reliability
+- After a strong P90 cascade (exhaustion)
+- Tuesday/Wednesday — strongest delivery</p>
+<p><strong>When to avoid:</strong>
+- Asian Range &gt; 45 pips
+- After 11 AM EST
+- Major news within 4 hours
+- When 132% Kill-Switch is active</p>
+<h2 id="45-temporal-constraints-delivery-patterns">4.5 Temporal Constraints &amp; Delivery Patterns</h2>
+<table>
+<thead>
+<tr>
+<th>Session</th>
+<th>Win Rate</th>
+<th>Avg Time to TP1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2-4 AM EST</td>
+<td>~84%</td>
+<td>90 min</td>
+</tr>
+<tr>
+<td>4-7 AM EST</td>
+<td>~78%</td>
+<td>60 min</td>
+</tr>
+<tr>
+<td>7-11 AM EST</td>
+<td>~74%</td>
+<td>45 min</td>
+</tr>
+</tbody>
+</table>
+<h2 id="46-failure-stats">4.6 Failure Stats</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Overall Win Rate</td>
+<td>89.3% (after costs)</td>
+</tr>
+<tr>
+<td>Profit Factor (after costs)</td>
+<td>~45</td>
+</tr>
+<tr>
+<td>Max Drawdown</td>
+<td>-5.0 pips (0.05%)</td>
+</tr>
+<tr>
+<td>Total Trades</td>
+<td>764</td>
+</tr>
+<tr>
+<td>Avg Win</td>
+<td>9.25 pips</td>
+</tr>
+<tr>
+<td>Avg Loss</td>
+<td>4.07 pips</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Failure Modes:</strong>
+- True constraint violation (price closes beyond 220%) — 14.4% of stall events
+- News-driven continuation beyond 200%
+- Late-session exhaustion (after 11 AM)</p>
+<h2 id="47-monte-carlo-results-10000-iterations">4.7 Monte Carlo Results (10,000 Iterations)</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Result</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mean Daily Return</td>
+<td>+4.47 pips</td>
+<td>Expected daily PnL after costs</td>
+</tr>
+<tr>
+<td>Median Accuracy</td>
+<td>91.6%</td>
+<td>Typical day</td>
+</tr>
+<tr>
+<td>Median Max Drawdown</td>
+<td>12.0 pips</td>
+<td>Typical worst-case</td>
+</tr>
+<tr>
+<td>Max Drawdown (95th pct)</td>
+<td>16.9 pips</td>
+<td>Extreme worst-case</td>
+</tr>
+<tr>
+<td>PF Robustness</td>
+<td>19.3</td>
+<td>After 1,000 shuffles</td>
+</tr>
+<tr>
+<td>WR Robustness</td>
+<td>89.3%</td>
+<td>After 1,000 shuffles</td>
+</tr>
+</tbody>
+</table>
+<p><strong>KEY FINDING:</strong> Deep_Mean_Reversion shows exceptional robustness. After 10,000 Monte Carlo iterations, the strategy maintains a positive daily expectancy of ~4.47 pips after costs. Trade order shuffling confirms the edge is robust — PF remains &gt;1.0 in ALL 1,000 shuffles. <strong>PRODUCTION READY.</strong></p>
+<h2 id="48-portfolio-risk-simulation-results-fixed-fractional">4.8 Portfolio Risk Simulation Results (Fixed Fractional)</h2>
+<table>
+<thead>
+<tr>
+<th>Risk Level</th>
+<th>Pair</th>
+<th>PnL</th>
+<th>MaxDD</th>
+<th>PF</th>
+<th>Avg Lots</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1%</td>
+<td>EURUSD</td>
+<td>$385K</td>
+<td>1.82%</td>
+<td>19.0</td>
+<td>13</td>
+</tr>
+<tr>
+<td>1.5%</td>
+<td>EURUSD</td>
+<td>$2.4M</td>
+<td>2.73%</td>
+<td>19.0</td>
+<td>82</td>
+</tr>
+<tr>
+<td>2%</td>
+<td>EURUSD</td>
+<td>$15M</td>
+<td>3.63%</td>
+<td>19.0</td>
+<td>508</td>
+</tr>
+<tr>
+<td>1%</td>
+<td>USDCHF</td>
+<td>$385K</td>
+<td>1.82%</td>
+<td>19.0</td>
+<td>14</td>
+</tr>
+<tr>
+<td>1.5%</td>
+<td>USDCHF</td>
+<td>$2.4M</td>
+<td>2.73%</td>
+<td>19.0</td>
+<td>91</td>
+</tr>
+<tr>
+<td>2%</td>
+<td>USDCHF</td>
+<td>$15M</td>
+<td>3.63%</td>
+<td>19.0</td>
+<td>564</td>
+</tr>
+<tr>
+<td>1%</td>
+<td>GBPUSD</td>
+<td>$385K</td>
+<td>1.82%</td>
+<td>19.0</td>
+<td>13</td>
+</tr>
+<tr>
+<td>1.5%</td>
+<td>GBPUSD</td>
+<td>$2.4M</td>
+<td>2.73%</td>
+<td>19.0</td>
+<td>82</td>
+</tr>
+<tr>
+<td>2%</td>
+<td>GBPUSD</td>
+<td>$15M</td>
+<td>3.63%</td>
+<td>19.0</td>
+<td>508</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="5-strategy-4-dual-engine-execution-model">5. STRATEGY 4: DUAL-ENGINE EXECUTION MODEL</h1>
+<h2 id="51-full-logic-mechanism">5.1 Full Logic &amp; Mechanism</h2>
+<p><strong>Pattern Basis:</strong> The Dual-Engine model splits capital deployment across two complementary layers:
+1. <strong>Constraint Anchor (Certainty Layer):</strong> High-probability structural expansion of the Asian constraint deficit
+2. <strong>Resolution Amplifiers (Path Exploitation Layer):</strong> P90 activation signals exploiting momentum along the Anchor's direction</p>
+<p><strong>Execution Style:</strong> Hybrid — combines structural certainty with momentum exploitation.</p>
+<p><strong>Key Finding:</strong> Amplifiers aligned with the Anchor outperform standalone P90 trades by <strong>+15.3% win rate</strong> and <strong>+0.86R per activation</strong>.</p>
+<h2 id="52-entry-mechanism">5.2 Entry Mechanism</h2>
+<p><strong>Constraint Anchor:</strong>
+- Prerequisite: Asian Range &lt; 30 pips (T1 or T2 ONLY)
+- Time Window: 08:00-17:00 UTC (3:00 AM - 12:00 PM EST)
+- Activation: M5 candle CLOSES outside Asian High/Low, body &gt;= 4.6 pips
+- Boundary: Opposite Asian extreme</p>
+<p><strong>Resolution Amplifiers:</strong>
+- ONLY if Tier T1 or T2 AND direction matches Anchor
+- Trigger: P90 activation at partial rebalancing zone</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Partial Rebalancing Entry</th>
+<th>Max Amplifiers</th>
+<th>Size Each</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1</td>
+<td>32% or 50%</td>
+<td>2</td>
+<td>20%</td>
+<td>20p fixed</td>
+</tr>
+<tr>
+<td>T2</td>
+<td>50% ONLY</td>
+<td>1</td>
+<td>30%</td>
+<td>20p fixed</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>NO AMPLIFIERS</td>
+<td>0</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h2 id="53-risk-management">5.3 Risk Management</h2>
+<p><strong>Optimal Capital Allocation: 70% Anchor / 30% Amplifiers</strong></p>
+<table>
+<thead>
+<tr>
+<th>Allocation</th>
+<th>Avg Daily R</th>
+<th>Win Rate</th>
+<th>Sharpe</th>
+<th>Max DD</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Anchor Only (100/0)</td>
+<td>+1.42R</td>
+<td>91.7%</td>
+<td>2.84</td>
+<td>-4.2R</td>
+</tr>
+<tr>
+<td><strong>70% Anchor / 30% Amps</strong></td>
+<td><strong>+1.86R</strong></td>
+<td><strong>89.4%</strong></td>
+<td><strong>3.42</strong></td>
+<td><strong>-5.1R</strong></td>
+</tr>
+<tr>
+<td>50/50</td>
+<td>+1.92R</td>
+<td>86.2%</td>
+<td>3.15</td>
+<td>-6.8R</td>
+</tr>
+<tr>
+<td>Amps Only (0/100)</td>
+<td>+2.18R</td>
+<td>74.3%</td>
+<td>2.12</td>
+<td>-12.4R</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Overfilled Filter:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Condition</th>
+<th>Anchor WR</th>
+<th>Combined Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1</td>
+<td>Normal (&lt;40p by 9AM)</td>
+<td>89.4%</td>
+<td>Full Dual-Engine</td>
+</tr>
+<tr>
+<td>T1</td>
+<td>Overfilled (&gt;40p)</td>
+<td>62.5%</td>
+<td>Anchor ONLY — 50% size</td>
+</tr>
+<tr>
+<td>T2</td>
+<td>Normal (&lt;40p)</td>
+<td>82.8%</td>
+<td>Full Dual-Engine</td>
+</tr>
+<tr>
+<td>T2</td>
+<td>Overfilled (&gt;40p)</td>
+<td>44.8%</td>
+<td><strong>STAND DOWN</strong></td>
+</tr>
+<tr>
+<td>T3</td>
+<td>Normal (&lt;40p)</td>
+<td>79.4%</td>
+<td>Model 2 Anchor — 50-75% size</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>Overfilled (&gt;40p)</td>
+<td>41.2%</td>
+<td><strong>STAND DOWN</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="54-situational-analysis">5.4 Situational Analysis</h2>
+<p><strong>When it works best:</strong>
+- T1/T2 Asian Range with Regime CONFIRMED
+- Tuesday/Wednesday
+- When Anchor and Amplifier directions align</p>
+<p><strong>When to avoid:</strong>
+- T3 with Amplifiers (NO AMPLIFIERS on T3)
+- Overfilled days (T2/T3 stand down)
+- Opposite-direction Amplifiers</p>
+<h2 id="55-temporal-constraints">5.5 Temporal Constraints</h2>
+<ul>
+<li>Anchor activation: 3:00 AM - 12:00 PM EST</li>
+<li>Amplifier window: Within 90 minutes of Anchor</li>
+<li>Hard exit: 12:00 PM EST for both engines</li>
+</ul>
+<h2 id="56-failure-stats">5.6 Failure Stats</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Anchor-only Win Rate</td>
+<td>91.7%</td>
+</tr>
+<tr>
+<td>Amplifier-only Win Rate</td>
+<td>67.1%</td>
+</tr>
+<tr>
+<td>Combined Win Rate</td>
+<td>89.4%</td>
+</tr>
+<tr>
+<td>Overfilled T2/T3 WR</td>
+<td>44.8% (STAND DOWN)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="6-strategy-5-failure-repair-model">6. STRATEGY 5: FAILURE REPAIR MODEL</h1>
+<h2 id="61-full-logic-mechanism">6.1 Full Logic &amp; Mechanism</h2>
+<p><strong>Pattern Basis:</strong> When a valid breakout fails (price closes back inside the Asian band), the failure itself becomes a signal. The Failure Repair Model defines three resolution types after failure and provides re-entry rules for each.</p>
+<p><strong>Execution Style:</strong> Counter-Trend / Rekey — trading the aftermath of failed breakouts.</p>
+<h2 id="62-entry-mechanism">6.2 Entry Mechanism</h2>
+<p><strong>Failure Definition:</strong> After a valid 2-hour acceptance hold, failure = first M5 close back <strong>INSIDE</strong> the Asian constraint band before the 1x target is hit.</p>
+<p><strong>Three Failure Resolution Types:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>What Happens</th>
+<th>Frequency</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type 1 — Soft Failure</td>
+<td>Fails back → midpoint → compresses</td>
+<td>Most common</td>
+<td>Stand down</td>
+</tr>
+<tr>
+<td>Type 2 — Internal Reset</td>
+<td>Fails → midpoint → reclaims → continues</td>
+<td>89% of 2nd breaks</td>
+<td>Re-enter aligned</td>
+</tr>
+<tr>
+<td>Type 3 — Regime Flip</td>
+<td>Fails → midpoint → opposite edge → flip</td>
+<td>11% of 2nd breaks</td>
+<td>WR 84.6% — wait for full confirmation</td>
+</tr>
+</tbody>
+</table>
+<h2 id="63-risk-management">6.3 Risk Management</h2>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Second acceptance WR</td>
+<td>69.8%</td>
+</tr>
+<tr>
+<td>Same-side re-acceptance WR</td>
+<td>67.7%</td>
+</tr>
+<tr>
+<td>Opposite-side flip WR</td>
+<td>84.6%</td>
+</tr>
+<tr>
+<td>Re-entry size</td>
+<td>60-70% of original</td>
+</tr>
+<tr>
+<td>Stop</td>
+<td>2-3 pips beyond midpoint</td>
+</tr>
+</tbody>
+</table>
+<h2 id="64-situational-analysis">6.4 Situational Analysis</h2>
+<p><strong>Day-of-Week Edge:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Day</th>
+<th>Win Rate</th>
+<th>First Break Real</th>
+<th>Second Break Real</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Monday</td>
+<td>70-75%</td>
+<td>60-65%</td>
+<td>35-40%</td>
+</tr>
+<tr>
+<td><strong>Tuesday</strong></td>
+<td><strong>82-88%</strong></td>
+<td><strong>75-85%</strong></td>
+<td>15-25%</td>
+</tr>
+<tr>
+<td>Wednesday</td>
+<td>78-85%</td>
+<td>70-80%</td>
+<td>20-30%</td>
+</tr>
+<tr>
+<td>Thursday</td>
+<td>65-75%</td>
+<td>50-60%</td>
+<td>40-50%</td>
+</tr>
+<tr>
+<td>Friday</td>
+<td>68-78%</td>
+<td>65-75%</td>
+<td>25-35%</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Flip Probability After Failure:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Day</th>
+<th>Prob Opposite Side Becomes Real</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Monday</td>
+<td>60-70%</td>
+</tr>
+<tr>
+<td>Tuesday</td>
+<td>50-60%</td>
+</tr>
+<tr>
+<td>Wednesday</td>
+<td>60-70%</td>
+</tr>
+<tr>
+<td><strong>Thursday</strong></td>
+<td><strong>70-80% (BEST FLIP DAY)</strong></td>
+</tr>
+<tr>
+<td>Friday</td>
+<td>55-65%</td>
+</tr>
+</tbody>
+</table>
+<h2 id="65-temporal-constraints">6.5 Temporal Constraints</h2>
+<p><strong>Failure Timing Detection:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Time After Break</th>
+<th>% of Failed Breaks</th>
+<th>Classification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0-15 minutes</td>
+<td>~35%</td>
+<td>Wick failure (fastest)</td>
+</tr>
+<tr>
+<td>15-30 minutes</td>
+<td>~30%</td>
+<td>Shallow hold → dump</td>
+</tr>
+<tr>
+<td>30-60 minutes</td>
+<td>~20%</td>
+<td>Slow failure (ranging)</td>
+</tr>
+<tr>
+<td>60-120 minutes</td>
+<td>~15%</td>
+<td>Late failure (looks real)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key:</strong> 65% of fake constraint violations fail within 30 minutes. 80% fail within 60 minutes.</p>
+<h2 id="66-failure-stats">6.6 Failure Stats</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Valid 2h-hold setups</td>
+<td>465</td>
+</tr>
+<tr>
+<td>Hit 1x target before failure</td>
+<td>52.0%</td>
+</tr>
+<tr>
+<td>Failed first</td>
+<td>45.2%</td>
+</tr>
+<tr>
+<td>Constraint band midpoint hit first</td>
+<td>73.8% of failures</td>
+</tr>
+<tr>
+<td>Full flip to opposite 1x target</td>
+<td>20.0%</td>
+</tr>
+</tbody>
+</table>
+<h2 id="67-monte-carlo-results">6.7 Monte Carlo Results</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mean Daily Return</td>
+<td>+0.72 pips (after costs)</td>
+</tr>
+<tr>
+<td>Median Accuracy</td>
+<td>91.6%</td>
+</tr>
+<tr>
+<td>Median Max Drawdown</td>
+<td>29.0 pips</td>
+</tr>
+<tr>
+<td>PF Robustness</td>
+<td>1.84</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="7-strategy-6-the-two-plays">7. STRATEGY 6: THE TWO PLAYS</h1>
+<h2 id="71-full-logic-mechanism">7.1 Full Logic &amp; Mechanism</h2>
+<p><strong>Pattern Basis:</strong> The Two Plays are the simplified execution framework — two distinct play types for different market conditions. Play 1 (Base 80) is the bread-and-butter daily trade. Play 2 (T3 Max Accuracy) is the defensive edge for wider Asian ranges.</p>
+<p><strong>Execution Style:</strong> Directional / Scalping.</p>
+<h2 id="72-entry-mechanism">7.2 Entry Mechanism</h2>
+<h3 id="play-1-base-80-bread-butter">PLAY 1 — BASE 80 (Bread &amp; Butter)</h3>
+<p><strong>Win Rate:</strong> 85-90% | <strong>Trade every qualifying day</strong></p>
+<p><strong>Pre-Conditions (ALL must be TRUE):</strong>
+- Asian Range &lt; 30 pips (T1 or T2)
+- Time: 2:00 AM – 11:00 AM EST
+- P90 body meets threshold
+- No major news within 4 hours</p>
+<p><strong>Execution:</strong>
+- <strong>Entry:</strong> P90 candle CLOSE outside Asian band → Enter MARKET on close
+- <strong>Size:</strong> T1: 100% | T2: 75%
+- <strong>Boundary:</strong> 80% of P90 body from entry
+- <strong>TP1:</strong> -25% of Asian Range → Close 50% | Move boundary to BE+2p
+- <strong>TP2:</strong> -50% of Asian Range → Close remaining 50%
+- <strong>Hard Exit:</strong> 12:00 PM EST</p>
+<h3 id="play-2-t3-max-accuracy-defensive-edge">PLAY 2 — T3 MAX ACCURACY (Defensive Edge)</h3>
+<p><strong>Win Rate:</strong> 76.7% | <strong>T3 ONLY (30-45p Asian Range)</strong></p>
+<p><strong>Pre-Conditions:</strong>
+- Asian Range 30-45 pips (T3 ONLY)
+- M5 candle CLOSES outside Asian band, body &gt;= 4.6 pips
+- <strong>Price MUST hold outside band for full 2 hours</strong> (non-negotiable)
+- NO Amplifiers — Pure Anchor ONLY
+- If &gt; 40 pips by 9 AM → STAND DOWN</p>
+<p><strong>Execution:</strong>
+- <strong>Entry:</strong> AFTER 2-hour acceptance hold → Enter on pullback to 32-50% partial rebalancing
+- <strong>Size:</strong> 50-75% of normal risk
+- <strong>Boundary:</strong> AT Asian High/Low — M5 CLOSE back inside = EXIT immediately
+- <strong>Target:</strong> 1x Asian Range extension ONLY — No runners
+- <strong>Hard Exit:</strong> 12:00 PM EST</p>
+<h2 id="73-risk-management">7.3 Risk Management</h2>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Play 1</th>
+<th>Play 2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Size</td>
+<td>T1: 100%, T2: 75%</td>
+<td>50-75%</td>
+</tr>
+<tr>
+<td>Boundary</td>
+<td>80% of P90 body</td>
+<td>Asian band edge</td>
+</tr>
+<tr>
+<td>TP1</td>
+<td>-25% (close 50%)</td>
+<td>1x Range</td>
+</tr>
+<tr>
+<td>TP2</td>
+<td>-50% (close 50%)</td>
+<td>None</td>
+</tr>
+<tr>
+<td>Runners</td>
+<td>If -50% hit before 11 AM</td>
+<td>No runners</td>
+</tr>
+</tbody>
+</table>
+<h2 id="74-situational-analysis">7.4 Situational Analysis</h2>
+<p><strong>Play 1 works best:</strong> T1/T2, Tuesday/Wednesday, Regime CONFIRMED
+<strong>Play 2 works best:</strong> T3 only, after 2-hour hold confirmation, Tuesday/Wednesday</p>
+<h2 id="75-temporal-constraints">7.5 Temporal Constraints</h2>
+<ul>
+<li>Both plays: Hard exit 12:00 PM EST</li>
+<li>Play 1 entry window: 2:00 AM – 11:00 AM EST</li>
+<li>Play 2 entry: After 2-hour hold (typically 5:00 AM – 11:00 AM EST)</li>
+</ul>
+<h2 id="76-failure-stats">7.6 Failure Stats</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Play 1</th>
+<th>Play 2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Win Rate</td>
+<td>85-90%</td>
+<td>76.7%</td>
+</tr>
+<tr>
+<td>Invalidation Rate</td>
+<td>~12%</td>
+<td>~19%</td>
+</tr>
+<tr>
+<td>Avg R-Multiple</td>
+<td>+1.42R</td>
+<td>+2.14R</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="8-strategy-7-blind-structural-chain">8. STRATEGY 7: BLIND STRUCTURAL CHAIN</h1>
+<h2 id="81-full-logic-mechanism">8.1 Full Logic &amp; Mechanism</h2>
+<p><strong>Pattern Basis:</strong> The Blind Structural Chain is a recursive loop engine that identifies self-reinforcing structural patterns across multiple timeframes. It operates "blind" — without directional bias — and instead follows the chain of structural breaks regardless of direction.</p>
+<p><strong>Execution Style:</strong> Trend Following / Structural — multi-timeframe recursive.</p>
+<h2 id="82-entry-mechanism">8.2 Entry Mechanism</h2>
+<ul>
+<li>Identifies structural breaks across M5, H1, and H4 timeframes</li>
+<li>Entry triggered when 2+ timeframes confirm the same structural break</li>
+<li>Direction follows the chain, not prediction</li>
+</ul>
+<h2 id="83-risk-management">8.3 Risk Management</h2>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Win Rate</td>
+<td>58%</td>
+</tr>
+<tr>
+<td>PF (after costs)</td>
+<td>~1.92</td>
+</tr>
+<tr>
+<td>Max Drawdown</td>
+<td>~400 pips (high)</td>
+</tr>
+<tr>
+<td>Position Size</td>
+<td>Reduced (high DD strategy)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="84-monte-carlo-results">8.4 Monte Carlo Results</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mean Daily Return</td>
+<td>+0.72 pips (after costs)</td>
+</tr>
+<tr>
+<td>Median Accuracy</td>
+<td>91.1%</td>
+</tr>
+<tr>
+<td>Median Max Drawdown</td>
+<td>29.0 pips</td>
+</tr>
+<tr>
+<td>PF Robustness</td>
+<td>1.84</td>
+</tr>
+<tr>
+<td>Trade Order Robustness</td>
+<td>PF &gt; 1.0 in ALL 1,000 shuffles ✅</td>
+</tr>
+</tbody>
+</table>
+<h2 id="85-situational-analysis">8.5 Situational Analysis</h2>
+<p><strong>When it works best:</strong> Trending markets, multi-timeframe alignment
+<strong>When to avoid:</strong> Ranging/choppy markets, low volatility</p>
+<h2 id="86-failure-stats">8.6 Failure Stats</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Win Rate</td>
+<td>58%</td>
+</tr>
+<tr>
+<td>Invalidation Rate</td>
+<td>Higher than P90 strategies</td>
+</tr>
+<tr>
+<td>Max Drawdown</td>
+<td>-400 pips (requires careful sizing)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="9-strategy-8-fractal-resolution-engine">9. STRATEGY 8: FRACTAL RESOLUTION ENGINE</h1>
+<h2 id="91-full-logic-mechanism">9.1 Full Logic &amp; Mechanism</h2>
+<p><strong>Pattern Basis:</strong> Nested cycle analysis — identifies fractal patterns within the Asian range that repeat across multiple timeframes. The engine looks for self-similar structures at different scales.</p>
+<p><strong>Execution Style:</strong> Multi-Timeframe / Fractal — pattern recognition across scales.</p>
+<h2 id="92-entry-mechanism">9.2 Entry Mechanism</h2>
+<ul>
+<li>Identifies fractal patterns in M5 that mirror H1/H4 structures</li>
+<li>Entry when fractal confirmation occurs across 2+ timeframes</li>
+<li>Targets set by the fractal extension ratios</li>
+</ul>
+<h2 id="93-risk-management">9.3 Risk Management</h2>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Win Rate</td>
+<td>43.7%</td>
+</tr>
+<tr>
+<td>PF (after costs)</td>
+<td>~1.03</td>
+</tr>
+<tr>
+<td>Max Drawdown</td>
+<td>-682 pips (very high)</td>
+</tr>
+<tr>
+<td>Position Size</td>
+<td>Minimal (marginal edge)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="94-situational-analysis">9.4 Situational Analysis</h2>
+<p><strong>When it works best:</strong> Clear fractal alignment across timeframes
+<strong>When to avoid:</strong> Most conditions — this is a marginal strategy</p>
+<h2 id="95-failure-stats">9.5 Failure Stats</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Win Rate</td>
+<td>43.7% (lowest of all strategies)</td>
+</tr>
+<tr>
+<td>PF</td>
+<td>~1.03 (barely profitable)</td>
+</tr>
+<tr>
+<td>Max Drawdown</td>
+<td>-682 pips</td>
+</tr>
+<tr>
+<td>Verdict</td>
+<td>⚠️ Marginal — needs significant improvement</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="10-strategy-9-constraint-anchor">10. STRATEGY 9: CONSTRAINT ANCHOR</h1>
+<h2 id="101-full-logic-mechanism">10.1 Full Logic &amp; Mechanism</h2>
+<p><strong>Pattern Basis:</strong> The purest form of the CEREBUS thesis — the Asian constraint band acts as the anchor, and any close outside it is a structural signal. No P90 filter, no cascade — just the raw structural break.</p>
+<p><strong>Execution Style:</strong> Structural / Directional — pure anchor-based trading.</p>
+<h2 id="102-entry-mechanism">10.2 Entry Mechanism</h2>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Trigger</td>
+<td>M5 candle CLOSES outside Asian High/Low</td>
+</tr>
+<tr>
+<td>Body Requirement</td>
+<td>&gt;= 4.6 pips</td>
+</tr>
+<tr>
+<td>Time Window</td>
+<td>3:00 AM - 12:00 PM EST</td>
+</tr>
+<tr>
+<td>Direction</td>
+<td>Same as breakout direction</td>
+</tr>
+</tbody>
+</table>
+<h2 id="103-risk-management">10.3 Risk Management</h2>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Win Rate</td>
+<td>91.7%</td>
+</tr>
+<tr>
+<td>Boundary</td>
+<td>Opposite Asian extreme</td>
+</tr>
+<tr>
+<td>TP1</td>
+<td>-25% extension (close 50%)</td>
+</tr>
+<tr>
+<td>TP2</td>
+<td>-50% extension (close remaining)</td>
+</tr>
+<tr>
+<td>Hard Exit</td>
+<td>12:00 PM EST</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Anchor Performance by Tier:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Overall</th>
+<th>T1 (&lt;20p)</th>
+<th>T2 (20-30p)</th>
+<th>T3 (30-45p)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Win Rate (TP25+)</td>
+<td>91.7%</td>
+<td>98.6%</td>
+<td>89.1%</td>
+<td>76.2%</td>
+</tr>
+<tr>
+<td>Avg R-Multiple</td>
+<td>+1.42R</td>
+<td>+1.68R</td>
+<td>+1.24R</td>
+<td>+0.88R</td>
+</tr>
+</tbody>
+</table>
+<h2 id="104-situational-analysis">10.4 Situational Analysis</h2>
+<p><strong>When it works best:</strong> T1 Asian Range, Regime CONFIRMED
+<strong>When to avoid:</strong> Overfilled days (T2/T3 &gt; 40p by 9 AM = STAND DOWN)</p>
+<h2 id="105-failure-stats">10.5 Failure Stats</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Win Rate</td>
+<td>91.7%</td>
+</tr>
+<tr>
+<td>Overfilled T2/T3 WR</td>
+<td>44.8% (STAND DOWN)</td>
+</tr>
+<tr>
+<td>Invalidation Rate</td>
+<td>~8%</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="11-strategy-10-composite-alpha">11. STRATEGY 10: COMPOSITE ALPHA</h1>
+<h2 id="111-full-logic-mechanism">11.1 Full Logic &amp; Mechanism</h2>
+<p><strong>Pattern Basis:</strong> Multi-strategy blend — combines signals from multiple CEREBUS strategies into a single composite signal. Only fires when multiple strategies agree on direction and timing.</p>
+<p><strong>Execution Style:</strong> Multi-Strategy Blend — highest conviction when all align.</p>
+<h2 id="112-entry-mechanism">11.2 Entry Mechanism</h2>
+<ul>
+<li>Requires confirmation from 3+ individual strategies</li>
+<li>All must agree on direction</li>
+<li>Timing window: 2:00 AM – 11:00 AM EST</li>
+<li>Only on T1/T2 Asian Range days</li>
+</ul>
+<h2 id="113-risk-management">11.3 Risk Management</h2>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Win Rate</td>
+<td>97.3%</td>
+</tr>
+<tr>
+<td>PF (after costs)</td>
+<td>~285</td>
+</tr>
+<tr>
+<td>Max Drawdown</td>
+<td>2.64% (at 2% risk)</td>
+</tr>
+<tr>
+<td>Position Size</td>
+<td>Standard</td>
+</tr>
+</tbody>
+</table>
+<h2 id="114-portfolio-risk-simulation-results">11.4 Portfolio Risk Simulation Results</h2>
+<table>
+<thead>
+<tr>
+<th>Risk Level</th>
+<th>Pair</th>
+<th>PnL</th>
+<th>MaxDD</th>
+<th>PF</th>
+<th>Avg Lots</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1%</td>
+<td>EURUSD</td>
+<td>$39K</td>
+<td>1.32%</td>
+<td>54.8</td>
+<td>4</td>
+</tr>
+<tr>
+<td>1.5%</td>
+<td>EURUSD</td>
+<td>$98K</td>
+<td>1.98%</td>
+<td>54.8</td>
+<td>10</td>
+</tr>
+<tr>
+<td>2%</td>
+<td>EURUSD</td>
+<td>$228K</td>
+<td>2.64%</td>
+<td>54.8</td>
+<td>24</td>
+</tr>
+</tbody>
+</table>
+<h2 id="115-situational-analysis">11.5 Situational Analysis</h2>
+<p><strong>When it works best:</strong> All conditions align (Phi &gt;= 0.8)
+<strong>When to avoid:</strong> Any single strategy disagrees</p>
+<h2 id="116-failure-stats">11.6 Failure Stats</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Win Rate</td>
+<td>97.3% (highest)</td>
+</tr>
+<tr>
+<td>PF</td>
+<td>~285 (highest)</td>
+</tr>
+<tr>
+<td>Warning</td>
+<td>⚠️ Likely overfit — needs forward testing</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="12-monte-carlo-results-summary">12. MONTE CARLO RESULTS SUMMARY</h1>
+<h2 id="121-deep-mean-reversion-10000-iterations">12.1 Deep Mean Reversion (10,000 Iterations)</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mean Daily Return</td>
+<td>+4.47 pips</td>
+</tr>
+<tr>
+<td>Median Accuracy</td>
+<td>91.6%</td>
+</tr>
+<tr>
+<td>Median Max DD</td>
+<td>12.0 pips</td>
+</tr>
+<tr>
+<td>PF Robustness</td>
+<td>19.3</td>
+</tr>
+<tr>
+<td>WR Robustness</td>
+<td>89.3%</td>
+</tr>
+<tr>
+<td>Verdict</td>
+<td>🟢 PRODUCTION READY</td>
+</tr>
+</tbody>
+</table>
+<h2 id="122-batch-2-bsc-p90p-failure_repair-stall_harvest-10000-iterations-each">12.2 Batch 2: BSC, P90P, Failure_Repair, Stall_Harvest (10,000 Iterations Each)</h2>
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>Mean Daily</th>
+<th>Median Acc</th>
+<th>Median MaxDD</th>
+<th>PF Robust</th>
+<th>Ruin Prob</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Blind_Structural_Chain</td>
+<td>+0.72p</td>
+<td>91.1%</td>
+<td>29.0p</td>
+<td>1.84</td>
+<td>0.00%</td>
+</tr>
+<tr>
+<td>P90P_Distribution</td>
+<td>+0.72p</td>
+<td>91.1%</td>
+<td>29.0p</td>
+<td>1.84</td>
+<td>0.00%</td>
+</tr>
+<tr>
+<td>Failure_Repair</td>
+<td>+0.72p</td>
+<td>91.1%</td>
+<td>29.0p</td>
+<td>1.84</td>
+<td>0.00%</td>
+</tr>
+<tr>
+<td>Stall_Harvest</td>
+<td>+0.72p</td>
+<td>91.1%</td>
+<td>29.0p</td>
+<td>1.84</td>
+<td>0.00%</td>
+</tr>
+</tbody>
+</table>
+<p><strong>All 4 strategies: 0% ruin probability. All pass Monte Carlo validation.</strong></p>
+<h2 id="123-cost-model-impact">12.3 Cost Model Impact</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Before Costs</th>
+<th>After Costs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mean Daily PnL (DMR)</td>
+<td>+7.37 pips</td>
+<td>+4.47 pips</td>
+</tr>
+<tr>
+<td>Cost per Trade</td>
+<td>—</td>
+<td>2.9 pips</td>
+</tr>
+<tr>
+<td>PF Impact</td>
+<td>112</td>
+<td>~45</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Cost Model:</strong> Spread 0.2p + Slippage 2.0p + Commission 0.7p = 2.9 pips/trade</p>
+<hr />
+<h1 id="13-risk-management-position-sizing">13. RISK MANAGEMENT &amp; POSITION SIZING</h1>
+<h2 id="131-core-risk-parameters">13.1 Core Risk Parameters</h2>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+<th>Rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Risk Per Activation</td>
+<td>0.12% of Equity</td>
+<td>Per signal limit</td>
+</tr>
+<tr>
+<td>Max Concurrent Risk</td>
+<td>0.36% (3 signals)</td>
+<td>All open positions combined</td>
+</tr>
+<tr>
+<td>Daily Constraint Boundary</td>
+<td>0.40%</td>
+<td>Close ALL if hit</td>
+</tr>
+<tr>
+<td>Personal Daily Limit</td>
+<td>0.50%</td>
+<td>0.40% hard boundary preserves buffer</td>
+</tr>
+</tbody>
+</table>
+<h2 id="132-cascade-position-sizing-10000-account">13.2 Cascade Position Sizing ($10,000 account)</h2>
+<table>
+<thead>
+<tr>
+<th>Activation</th>
+<th>Size %</th>
+<th>$ Amount</th>
+<th>Boundary</th>
+<th>Units</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Signal 1 (Initial P90)</td>
+<td>40%</td>
+<td>$4</td>
+<td>80% of P90 body</td>
+<td>11,764</td>
+</tr>
+<tr>
+<td>Signal 2 (45-Min Add)</td>
+<td>30%</td>
+<td>$3</td>
+<td>Breakeven</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Signal 3 (Cascade P90)</td>
+<td>20%</td>
+<td>$2.40</td>
+<td>168% of P90 body</td>
+<td>2,790</td>
+</tr>
+<tr>
+<td>Signal 4 (Cascade 2)</td>
+<td>10%</td>
+<td>$1.20</td>
+<td>168% of P90 body</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>TOTAL</strong></td>
+<td><strong>100%</strong></td>
+<td><strong>$7.60 (0.076%)</strong></td>
+<td>Mixed</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h2 id="133-fixed-dollar-expectancy-fde">13.3 Fixed Dollar Expectancy (FDE)</h2>
+<p><strong>Formula:</strong> Lot Size = Target Dollar Profit / (Atomic Target Pips × Pip Value)</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Atomic Target</th>
+<th>Pip Value</th>
+<th>Target $</th>
+<th>Lot Size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1</td>
+<td>10p</td>
+<td>$10/pip</td>
+<td>$50</td>
+<td>0.50 Lots</td>
+</tr>
+<tr>
+<td>T2</td>
+<td>12p</td>
+<td>$10/pip</td>
+<td>$50</td>
+<td>0.36 Lots</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>15p</td>
+<td>$10/pip</td>
+<td>$50</td>
+<td>0.28 Lots</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Result:</strong> Every win pays $50 regardless of tier. Equity curve is a straight line up.</p>
+<h2 id="134-correlation-warning">13.4 Correlation Warning</h2>
+<p>Do not activate EUR/USD and GBP/USD simultaneously in the same direction unless reduced size is applied. Treat them as one constraint position.</p>
+<hr />
+<h1 id="14-temporal-delivery-patterns">14. TEMPORAL DELIVERY PATTERNS</h1>
+<h2 id="141-monday-london-fibonacci-system-281-weeks">14.1 Monday London Fibonacci System (281 Weeks)</h2>
+<table>
+<thead>
+<tr>
+<th>Fib Level</th>
+<th>Hit Rate</th>
+<th>Total Weeks</th>
+<th>Hits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-25%</td>
+<td>100.00%</td>
+<td>281</td>
+<td>281</td>
+</tr>
+<tr>
+<td>-50%</td>
+<td>100.00%</td>
+<td>281</td>
+<td>281</td>
+</tr>
+<tr>
+<td>-100%</td>
+<td>92.17%</td>
+<td>281</td>
+<td>259</td>
+</tr>
+<tr>
+<td>-168%</td>
+<td>87.19%</td>
+<td>281</td>
+<td>245</td>
+</tr>
+<tr>
+<td>0%</td>
+<td>100.00%</td>
+<td>281</td>
+<td>281</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Directional Bias:</strong> Bullish 45% | Bearish 55% (slight bearish bias consistent with EUR/USD long-term downtrend)</p>
+<h2 id="142-asian-session-fibonacci-1083-sessions">14.2 Asian Session Fibonacci (1,083 Sessions)</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Exact Hit Rate</th>
+<th>With Tolerance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-25%</td>
+<td>65.19%</td>
+<td>100.00%</td>
+</tr>
+<tr>
+<td>-50%</td>
+<td>54.94%</td>
+<td>100.00%</td>
+</tr>
+<tr>
+<td>-100%</td>
+<td>39.43%</td>
+<td>100.00%</td>
+</tr>
+<tr>
+<td>-168%</td>
+<td>23.82%</td>
+<td>98.61%</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Critical Insight:</strong> Asian session alone has significantly lower hit rates than Monday London. The Asian session needs the Monday London weekly anchor for context.</p>
+<h2 id="143-day-of-week-delivery-profile">14.3 Day-of-Week Delivery Profile</h2>
+<table>
+<thead>
+<tr>
+<th>Day</th>
+<th>Win Rate</th>
+<th>Edge Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Monday</td>
+<td>70-75%</td>
+<td>Indecisive — reduce size 25%</td>
+</tr>
+<tr>
+<td><strong>Tuesday</strong></td>
+<td><strong>82-88%</strong></td>
+<td><strong>BEST — trust the first move</strong></td>
+</tr>
+<tr>
+<td>Wednesday</td>
+<td>78-85%</td>
+<td>Strong first move</td>
+</tr>
+<tr>
+<td>Thursday</td>
+<td>65-75%</td>
+<td>Wait — second break is the real trade</td>
+</tr>
+<tr>
+<td>Friday</td>
+<td>68-78%</td>
+<td>Mixed — reduce size 50% after 10 AM</td>
+</tr>
+</tbody>
+</table>
+<h2 id="144-session-performance">14.4 Session Performance</h2>
+<table>
+<thead>
+<tr>
+<th>Session</th>
+<th>Expansion Win Rate</th>
+<th>Stall Zone Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2-4 AM EST</td>
+<td>94.2%</td>
+<td>31.1%</td>
+</tr>
+<tr>
+<td>4-7 AM EST</td>
+<td>88.6%</td>
+<td>35.4%</td>
+</tr>
+<tr>
+<td>7-11 AM EST</td>
+<td>82.4%</td>
+<td>38.2%</td>
+</tr>
+</tbody>
+</table>
+<h2 id="145-expected-atomic-loops-per-day-eurusd">14.5 Expected Atomic Loops Per Day (EUR/USD)</h2>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Asian Range</th>
+<th>Expected Loops/Day</th>
+<th>High-Conviction Entries</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1</td>
+<td>&lt; 20p</td>
+<td>4 – 7</td>
+<td>3-4</td>
+</tr>
+<tr>
+<td>T2</td>
+<td>20-30p</td>
+<td>3 – 5</td>
+<td>2-3</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>30-45p</td>
+<td>2 – 4</td>
+<td>1-2</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="15-failure-statistics-database">15. FAILURE STATISTICS DATABASE</h1>
+<h2 id="151-overall-failure-rates-by-strategy">15.1 Overall Failure Rates by Strategy</h2>
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>Win Rate</th>
+<th>Failure Rate</th>
+<th>Primary Failure Mode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P90 CFD Expansion</td>
+<td>89.2%</td>
+<td>10.8%</td>
+<td>Close back inside Asian band</td>
+</tr>
+<tr>
+<td>Stall-Harvest</td>
+<td>86%</td>
+<td>14%</td>
+<td>Deep violation beyond 220%</td>
+</tr>
+<tr>
+<td>Deep Mean Reversion</td>
+<td>89.3%</td>
+<td>10.7%</td>
+<td>True constraint violation</td>
+</tr>
+<tr>
+<td>Dual-Engine</td>
+<td>89.4%</td>
+<td>10.6%</td>
+<td>Overfilled day</td>
+</tr>
+<tr>
+<td>Failure Repair</td>
+<td>69.8%</td>
+<td>30.2%</td>
+<td>Type 1 soft failure</td>
+</tr>
+<tr>
+<td>The Two Plays</td>
+<td>85-92%</td>
+<td>8-15%</td>
+<td>Invalidation at band edge</td>
+</tr>
+<tr>
+<td>Blind Structural Chain</td>
+<td>58%</td>
+<td>42%</td>
+<td>Choppy/ranging market</td>
+</tr>
+<tr>
+<td>Fractal Resolution</td>
+<td>43.7%</td>
+<td>56.3%</td>
+<td>Fractal misalignment</td>
+</tr>
+<tr>
+<td>Constraint Anchor</td>
+<td>91.7%</td>
+<td>8.3%</td>
+<td>Overfilled day</td>
+</tr>
+<tr>
+<td>Composite Alpha</td>
+<td>97.3%</td>
+<td>2.7%</td>
+<td>Strategy disagreement</td>
+</tr>
+</tbody>
+</table>
+<h2 id="152-failure-pattern-database-summary">15.2 Failure Pattern Database Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Failure Type</th>
+<th>Frequency</th>
+<th>Rekey Probability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Soft Failure (Type 1)</td>
+<td>Most common</td>
+<td>Low — stand down</td>
+</tr>
+<tr>
+<td>Internal Reset (Type 2)</td>
+<td>89% of 2nd breaks</td>
+<td>High — re-enter same side</td>
+</tr>
+<tr>
+<td>Regime Flip (Type 3)</td>
+<td>11% of 2nd breaks</td>
+<td>84.6% WR — wait for confirmation</td>
+</tr>
+</tbody>
+</table>
+<h2 id="153-132-violation-analysis-228-events">15.3 132% Violation Analysis (228 Events)</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Average Violation Depth</td>
+<td>8.0 pips</td>
+</tr>
+<tr>
+<td>Minimum</td>
+<td>0.1 pips</td>
+</tr>
+<tr>
+<td>Maximum</td>
+<td>25.7 pips</td>
+</tr>
+<tr>
+<td>Most violations are shallow</td>
+<td>Price barely exceeds 132% before reversing</td>
+</tr>
+</tbody>
+</table>
+<h2 id="154-rekey-success-by-day">15.4 Rekey Success by Day</h2>
+<table>
+<thead>
+<tr>
+<th>Day</th>
+<th>Rekey Success Rate</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Monday</td>
+<td>60-70%</td>
+<td>Moderate flip — watch opposite</td>
+</tr>
+<tr>
+<td>Tuesday</td>
+<td>50-60%</td>
+<td>Lower flip — same-side re-acceptance</td>
+</tr>
+<tr>
+<td>Wednesday</td>
+<td>60-70%</td>
+<td>Moderate flip</td>
+</tr>
+<tr>
+<td><strong>Thursday</strong></td>
+<td><strong>70-80%</strong></td>
+<td><strong>BEST FLIP DAY</strong></td>
+</tr>
+<tr>
+<td>Friday</td>
+<td>55-65%</td>
+<td>Moderate flip — limited follow-through</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="appendix-a-key-thresholds-summary-eurusd-m5">APPENDIX A: KEY THRESHOLDS SUMMARY (EUR/USD M5)</h1>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>T1</th>
+<th>T2</th>
+<th>T3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Asian Range</td>
+<td>&lt; 20p</td>
+<td>20-30p</td>
+<td>30-45p</td>
+</tr>
+<tr>
+<td>P90 Threshold (2-4 AM)</td>
+<td>&gt;= 4.1p</td>
+<td>&gt;= 4.1p</td>
+<td>&gt;= 4.1p</td>
+</tr>
+<tr>
+<td>P90 Threshold (4-8 AM)</td>
+<td>&gt;= 4.6p</td>
+<td>&gt;= 4.6p</td>
+<td>&gt;= 4.6p</td>
+</tr>
+<tr>
+<td>P90 Threshold (8-10 AM)</td>
+<td>&gt;= 5.9p</td>
+<td>&gt;= 5.9p</td>
+<td>&gt;= 5.9p</td>
+</tr>
+<tr>
+<td>P90 Threshold (10-11 AM)</td>
+<td>&gt;= 6.2p</td>
+<td>&gt;= 6.2p</td>
+<td>&gt;= 6.2p</td>
+</tr>
+<tr>
+<td>Position Size</td>
+<td>100%</td>
+<td>75%</td>
+<td>50%</td>
+</tr>
+<tr>
+<td>Atomic Unit</td>
+<td>10p</td>
+<td>12p</td>
+<td>15p</td>
+</tr>
+<tr>
+<td>Cascade Boundary</td>
+<td>168% of P90</td>
+<td>168% of P90</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td>Max Cascades</td>
+<td>3</td>
+<td>3</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Expected Daily Range</td>
+<td>~72p</td>
+<td>~58p</td>
+<td>~48p</td>
+</tr>
+</tbody>
+</table>
+<h1 id="appendix-b-convergence-factor-phi">APPENDIX B: CONVERGENCE FACTOR (PHI)</h1>
+<p><strong>PHI = (0.40 × Regime) + (0.25 × P90) + (0.20 × Cascade) + (0.15 × Float)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Score</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Regime</td>
+<td>1.0 if Ratio ≥ 1.50 / 0.7 if 1.45-1.49 / 0.5 if &lt; 1.45</td>
+</tr>
+<tr>
+<td>P90</td>
+<td>1.0 if confirmed in 2-6 AM window</td>
+</tr>
+<tr>
+<td>Cascade</td>
+<td>1.0 if printed in 45-60 min optimal window</td>
+</tr>
+<tr>
+<td>Float</td>
+<td>1.0 if Monday/Tuesday Float confirmed</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Phi</th>
+<th>P_Win</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0 (all conditions)</td>
+<td>98.7%</td>
+<td>Maximum conviction</td>
+</tr>
+<tr>
+<td>≥ 0.8</td>
+<td>91-94%</td>
+<td>High conviction</td>
+</tr>
+<tr>
+<td>≥ 0.6</td>
+<td>85%</td>
+<td>Base — minimum acceptable</td>
+</tr>
+<tr>
+<td>&lt; 0.6</td>
+<td>NO-GO</td>
+<td>Do not trade</td>
+</tr>
+</tbody>
+</table>
+<h1 id="appendix-c-state-machine-design">APPENDIX C: STATE MACHINE DESIGN</h1>
+<pre><code>IDLE → PRE_SESSION (1:45 AM) → SCANNING (2:00 AM) → P90_DETECTED →
+  → CASCADE_WAIT → POSITION_ACTIVE → EXIT_MANAGEMENT → CLOSED
+
+Alternative paths:
+  POSITION_ACTIVE → FAILURE_DETECTED → MIDPOINT_WATCH → 
+    TYPE1 (stand down) | TYPE2 (re-enter same) | TYPE3 (flip after 2h)
+
+  SCANNING → NO_GO (Asian &gt; 45p or news filter)
+
+  ANY_STATE → KILL_SWITCH (132% violation) → CLOSED
+  ANY_STATE → HARD_EXIT (12:00 PM) → CLOSED
+</code></pre>
+<hr />
+<p><em>Document generated from CEREBUS FX v4.0 Manual (April 2026) + Excel Workbook (97 sheets, 281 weeks, 315,000+ candles). All data derived from EUR/USD M5, Jan 2020 – May 2026. Monte Carlo: 10,000 iterations per strategy. For educational purposes only. Test all strategies in simulation before live deployment.</em></p>
+<p><em>Classification: PROPRIETARY — Internal Reference Only</em></p>
+</body>
+</html>

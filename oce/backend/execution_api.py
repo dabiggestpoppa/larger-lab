@@ -17,7 +17,7 @@ from fastapi import FastAPI, Query, HTTPException
 from pydantic import BaseModel
 from typing import Any, Dict, List, Optional
 
-from execution_engine import (
+from .execution_engine import (
     ExecutionEngine,
     ExecutionTask,
     ExecutionStatus,
@@ -25,8 +25,8 @@ from execution_engine import (
     ExecutionPolicy,
     get_execution_engine,
 )
-from drift_detector import get_drift_detector
-from self_healing_engine import get_self_healing_engine
+from .drift_detector import get_drift_detector
+from .self_healing_engine import get_self_healing_engine
 
 
 # ─── Request/Response Models ─────────────────────────────────────────────────

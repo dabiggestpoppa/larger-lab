@@ -28,7 +28,7 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
-from event_fabric import EventFabric, Event, get_fabric
+from .event_fabric import EventFabric, Event, get_fabric
 
 logger = logging.getLogger("oce.runtime")
 

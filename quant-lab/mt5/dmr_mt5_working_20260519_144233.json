@@ -1,0 +1,32 @@
+{
+  "strategy": "Deep_Mean_Reversion",
+  "source": "MT5_Backtest_optimizer_v2_logic",
+  "symbol": "EURUSD",
+  "timeframe": "M5",
+  "period": "2022-01-01 to 2026-05-01",
+  "total_bars": 322674,
+  "trading_days": 1126,
+  "pair": "EURUSD",
+  "total_trades": 915,
+  "wins": 848,
+  "losses": 67,
+  "win_rate": 92.7,
+  "total_pnl": 10522.48,
+  "avg_win": 12.5,
+  "avg_loss": -1.21,
+  "max_dd": -2.68,
+  "profit_factor": 130.71,
+  "expectancy": 11.5,
+  "by_exit": {
+    "tp": 847,
+    "sl": 67,
+    "end_data": 1
+  },
+  "skip_stats": {
+    "no_asian_bars": 2,
+    "ar_too_big": 172,
+    "ar_too_small": 0,
+    "no_p90": 37,
+    "no_deep_state_touch": 0
+  }
+}

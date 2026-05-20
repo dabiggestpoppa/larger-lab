@@ -25,31 +25,31 @@ import traceback
 logger = logging.getLogger("oce")
 
 # Import SRRA-OPH adapter
-from srrs_adapter import get_adapter, SRRSAdapter
-from event_fabric import get_fabric, get_router, get_persistence, EventFabric, TopologicalRouter, EventPersistence
-from observer_runtime import get_runtime, ObserverRuntime, ObserverConfig, ObserverState
-from structural_memory import StructuralMemory, MemoryEntry, MemoryLayer, MemoryStats
-from dspy_pipelines import OCEPipelineManager
-from phase4_api import register_phase4_endpoints
-from metrics_collector import get_metrics_collector, MetricsCollector
-from tracing_engine import get_tracing_engine, TracingEngine
-from alerting_engine import get_alerting_engine, AlertingEngine, AlertSeverity
-from execution_engine import get_execution_engine, ExecutionEngine, ExecutionTask, ExecutionStatus, ExecutionPriority
-from execution_api import register_execution_endpoints
-from drift_detector import get_drift_detector, DriftDetector
-from self_healing_engine import get_self_healing_engine, SelfHealingEngine
-from governance_api import register_governance_endpoints
-from command_center import router as command_center_router
-from governance_engine import get_governance_engine, GovernanceEngine, ProposalStatus, ProposalType
-from consensus_engine import get_consensus_engine, ConsensusEngine
-from coevolution_protocol import get_coevolution_protocol, CoevolutionProtocol
-from economics_engine import get_economics_engine, EconomicsEngine
-from sync_cost_optimizer import get_sync_cost_optimizer, SyncCostOptimizer
-from adaptive_compression import get_adaptive_compression, AdaptiveCompression
-from resonance_api import register_resonance_endpoints
-from reconstruction_api import register_reconstruction_endpoints
-from topology_api import register_topology_endpoints
-from sovereign_api import register_sovereign_endpoints
+from .srrs_adapter import get_adapter, SRRSAdapter
+from .event_fabric import get_fabric, get_router, get_persistence, EventFabric, TopologicalRouter, EventPersistence
+from .observer_runtime import get_runtime, ObserverRuntime, ObserverConfig, ObserverState
+from .structural_memory import StructuralMemory, MemoryEntry, MemoryLayer, MemoryStats
+from .dspy_pipelines import OCEPipelineManager
+from .phase4_api import register_phase4_endpoints
+from .metrics_collector import get_metrics_collector, MetricsCollector
+from .tracing_engine import get_tracing_engine, TracingEngine
+from .alerting_engine import get_alerting_engine, AlertingEngine, AlertSeverity
+from .execution_engine import get_execution_engine, ExecutionEngine, ExecutionTask, ExecutionStatus, ExecutionPriority
+from .execution_api import register_execution_endpoints
+from .drift_detector import get_drift_detector, DriftDetector
+from .self_healing_engine import get_self_healing_engine, SelfHealingEngine
+from .governance_api import register_governance_endpoints
+from .command_center import router as command_center_router
+from .governance_engine import get_governance_engine, GovernanceEngine, ProposalStatus, ProposalType
+from .consensus_engine import get_consensus_engine, ConsensusEngine
+from .coevolution_protocol import get_coevolution_protocol, CoevolutionProtocol
+from .economics_engine import get_economics_engine, EconomicsEngine
+from .sync_cost_optimizer import get_sync_cost_optimizer, SyncCostOptimizer
+from .adaptive_compression import get_adaptive_compression, AdaptiveCompression
+from .resonance_api import register_resonance_endpoints
+from .reconstruction_api import register_reconstruction_endpoints
+from .topology_api import register_topology_endpoints
+from .sovereign_api import register_sovereign_endpoints
 
 app = FastAPI(
     title="OCE Continuity Core",
@@ -936,7 +936,7 @@ async def evolution_recommendations(time_range_hours: int = Query(24, ge=1, le=1
 async def evolution_tune():
     """Trigger auto-tuning (combines DSPy optimizer + drift data)."""
     try:
-        from dspy_execution_optimizer import get_optimizer
+        from .dspy_execution_optimizer import get_optimizer
         engine = get_execution_engine()
         drift = get_drift_detector()
         history_stats = engine.history.get_stats()

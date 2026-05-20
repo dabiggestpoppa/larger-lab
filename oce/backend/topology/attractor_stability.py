@@ -21,8 +21,8 @@ import math
 from dataclasses import dataclass, field
 from typing import Optional
 
-from resonance import FieldStateManager, ResonanceEngine
-from reconstruction import ContinuityRepairLoop
+from ..resonance import FieldStateManager, ResonanceEngine
+from ..reconstruction import ContinuityRepairLoop
 
 
 @dataclass

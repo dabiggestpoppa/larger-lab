@@ -13,9 +13,12 @@ Task: OCE-3.19
 """
 
 import logging
+import sys
+from pathlib import Path
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from srrs_opc import (
     EntropyBudgetManager,
     CoherenceYieldAnalyzer,

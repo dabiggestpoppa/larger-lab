@@ -16,12 +16,12 @@ from pydantic import BaseModel
 from typing import Optional
 import logging
 
-from resonance import SignalPacket, ResonanceEngine, CoherenceEngine
-from reconstruction import AttractorMemory
-from .collar_field import CollarFieldEngine
-from .bsp_projection import BSPProjectionEngine
-from .resonance_router import ResonanceRouter
-from .glyph_engine import GlyphEngine
+from .resonance import SignalPacket, ResonanceEngine, CoherenceEngine
+from .reconstruction import AttractorMemory
+from .topology.collar_field import CollarFieldEngine
+from .topology.bsp_projection import BSPProjectionEngine
+from .topology.resonance_router import ResonanceRouter
+from .topology.glyph_engine import GlyphEngine
 
 logger = logging.getLogger("oce.topology")
 

@@ -3,160 +3,233 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🦉 Virtual Agent Environment v2</title>
-<link rel="stylesheet" href="/css/env.css">
+<title>🦉 Agent Environment v3</title>
+<link rel="stylesheet" href="/css/env-v3.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>body { font-family: 'Inter', var(--font); }</style>
 </head>
 <body>
 
-<!-- Top Bar -->
+<!-- ═══ TOP BAR ═══ -->
 <div class="topbar">
-  <div class="logo">🦉 Virtual Agent <span>Environment</span> <span style="font-size:10px;color:var(--text-dim);font-weight:400;margin-left:8px;">v2.0</span></div>
-  <div class="status">
-    <span>Rooms: <strong id="room-count">0</strong></span>
-    <span>Agents: <strong id="agent-count">0</strong></span>
-    <span>Online: <strong id="online-count">0</strong></span>
-    <span class="dot" id="ws-dot"></span>
-    <span id="ws-status">Disconnected</span>
+  <div class="topbar-left">
+    <div class="logo">
+      <span class="logo-icon">🦉</span>
+      <span class="logo-name">Agent</span>
+      <span class="logo-env">Environment</span>
+    </div>
+    <span class="version-badge">v3.0</span>
+  </div>
+
+  <div class="topbar-center">
+    <button class="nav-btn active" data-view="chat" id="nav-chat">💬 Chat</button>
+    <button class="nav-btn" data-view="terminal" id="nav-terminal">🖥️ Terminal</button>
+    <button class="nav-btn" data-view="rooms" id="nav-rooms">🏠 Rooms</button>
+    <button class="nav-btn" data-view="dashboard" id="nav-dashboard">📊 Dashboard</button>
+  </div>
+
+  <div class="topbar-right">
+    <div class="topbar-stat">Rooms: <strong id="stat-rooms">0</strong></div>
+    <div class="topbar-stat">Agents: <strong id="stat-agents">0</strong></div>
+    <div class="topbar-stat">Online: <strong id="stat-online">0</strong></div>
+    <div class="ws-indicator" id="ws-indicator" title="WebSocket status"></div>
   </div>
 </div>
 
-<!-- Layout -->
+<!-- ═══ LAYOUT ═══ -->
 <div class="layout">
 
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="sidebar-section">
-      <div class="sidebar-title">Rooms</div>
-      <div id="room-list">
-        <div style="color:var(--text-dim);font-size:11px;padding:4px;">Loading...</div>
-      </div>
+  <!-- ── SIDEBAR ── -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-title">Agents</span>
+      <button class="sidebar-toggle" id="sidebar-collapse" title="Toggle sidebar">◀</button>
     </div>
-    <div class="sidebar-section">
-      <div class="sidebar-title">Agents</div>
-      <div id="agent-list">
-        <div style="color:var(--text-dim);font-size:11px;padding:4px;">No agents yet</div>
+    <div class="sidebar-section scrollable" id="agent-list">
+      <div style="color:var(--text-muted);font-size:12px;padding:10px;">No agents yet</div>
+    </div>
+    <div class="sidebar-section" style="border-top:1px solid var(--border);">
+      <div class="sidebar-title" style="padding:0 4px 6px;">Quick Register</div>
+      <div style="display:flex;gap:6px;">
+        <input type="text" id="quick-agent-name" placeholder="Name..." style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-size:12px;padding:6px 8px;border-radius:6px;outline:none;">
+        <button onclick="App.registerQuickAgent()" style="background:var(--accent);border:none;color:#fff;font-size:11px;padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:600;">+ Add</button>
       </div>
     </div>
   </div>
 
-  <!-- Main Content -->
-  <div class="main">
-    <div class="tabs">
-      <div class="tab active" data-tab="world">🗺️ World Map</div>
-      <div class="tab" data-tab="chat">💬 Room Chat</div>
-      <div class="tab" data-tab="agents">🤖 Agents</div>
-    </div>
+  <!-- ── MAIN CONTENT ── -->
+  <div class="main" id="main-content">
 
-    <!-- World Map Tab -->
-    <div class="tab-content active" id="tab-world">
-      <div id="world-canvas-container" style="flex:1;position:relative;overflow:hidden;">
-        <canvas id="world-canvas"></canvas>
-        <div class="map-controls">
-          <button class="btn" id="btn-demo">▶ Demo</button>
-          <button class="btn" id="btn-reset-view">⟲ Reset</button>
+    <!-- ═══ VIEW 1: SIMPLE CHAT ═══ -->
+    <div class="chat-view" id="view-chat">
+      <div class="chat-header">
+        <div class="chat-header-left">
+          <span class="chat-title">💬 Chat</span>
+          <span class="chat-subtitle" id="chat-subtitle">Select an agent to chat</span>
         </div>
-      </div>
-    </div>
-
-    <!-- Chat Tab -->
-    <div class="tab-content" id="tab-chat">
-      <div class="messages" id="messages-container">
-        <div class="empty-state">
-          <div class="icon">💬</div>
-          <div>Select a room to view messages</div>
-        </div>
-      </div>
-      <div class="message-input">
-        <select id="msg-agent-select">
+        <select class="agent-selector" id="chat-agent-select" onchange="App.selectChatAgent(this.value)">
           <option value="">— Select Agent —</option>
         </select>
-        <select id="msg-type-select">
-          <option value="chat">Chat</option>
-          <option value="task">Task</option>
-          <option value="result">Result</option>
-          <option value="question">Question</option>
-          <option value="system">System</option>
-        </select>
-        <input type="text" id="msg-input" placeholder="Type a message..." />
-        <button class="btn" onclick="envClient.sendMessage()">Send</button>
       </div>
-    </div>
 
-    <!-- Agents Tab -->
-    <div class="tab-content" id="tab-agents">
-      <div id="agents-container" style="padding:12px;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;align-content:start;">
-        <div class="empty-state" style="grid-column:1/-1;">
-          <div class="icon">🤖</div>
-          <div>No agents registered yet</div>
-          <div style="font-size:11px;margin-top:8px;color:var(--text-dim);">Register agents below or click ▶ Demo</div>
+      <div class="messages" id="chat-messages">
+        <div class="empty-state">
+          <div class="icon">💬</div>
+          <div class="title">Start a conversation</div>
+          <div class="desc">Select an agent above and type a message. Watch agents work in real-time with tool use visualization.</div>
         </div>
       </div>
-      <div class="message-input">
-        <input type="text" id="new-agent-name" placeholder="Agent name..." />
-        <input type="text" id="new-agent-role" placeholder="Role..." style="max-width:120px;" />
-        <button class="btn green" onclick="envClient.registerAgent()">Register</button>
-      </div>
-    </div>
-  </div>
 
-  <!-- Right Panel -->
-  <div class="right-panel">
-    <!-- Selected Room -->
-    <div class="panel-section">
-      <div class="panel-title">Selected Room</div>
-      <div class="info-row"><span class="label">Name</span><span class="value" id="sel-room-name">—</span></div>
-      <div class="info-row"><span class="label">Agents</span><span class="value" id="sel-room-agents">0</span></div>
-      <div class="info-row"><span class="label">Description</span><span class="value" id="sel-room-desc" style="font-size:11px;">—</span></div>
-    </div>
-
-    <!-- Selected Agent -->
-    <div class="panel-section">
-      <div class="panel-title">Selected Agent</div>
-      <div id="agent-detail">
-        <div class="agent-detail-card">
-          <div class="avatar-row">
-            <div class="avatar-circle" id="sel-agent-avatar" style="background:#333;">🤖</div>
-            <div>
-              <div class="agent-name" id="sel-agent-name">—</div>
-              <div class="agent-role" id="sel-agent-role">—</div>
-            </div>
-          </div>
-          <div class="info-row"><span class="label">Room</span><span class="value" id="sel-agent-room">—</span></div>
-          <div class="info-row"><span class="label">Status</span><span class="value" id="sel-agent-status">—</span></div>
-          <div class="info-row"><span class="label">Online</span><span class="value" id="sel-agent-online">—</span></div>
-          <div class="info-row" style="margin-top:6px;"><span class="label">Capabilities</span></div>
-          <div id="sel-agent-caps" style="margin-top:4px;">—</div>
-          <div style="margin-top:8px;">
-            <div class="info-row"><span class="label">Activity</span><span class="value" id="sel-agent-activity-text">Idle</span></div>
-            <div class="activity-bar">
-              <div class="fill" id="sel-agent-activity-fill" style="width:0%;background:#6c5ce7;"></div>
-            </div>
-          </div>
+      <div class="chat-input-area">
+        <div class="chat-input-row">
+          <textarea class="chat-input" id="chat-input" placeholder="Type a message... (Enter to send, Shift+Enter for newline)" rows="1"></textarea>
+          <button class="chat-send-btn" id="chat-send-btn" onclick="App.sendChatMessage()" disabled>➤</button>
         </div>
       </div>
     </div>
 
-    <!-- Activity Log -->
-    <div class="panel-section">
-      <div class="panel-title">Recent Activity</div>
-      <div class="activity-log" id="activity-log">
-        <div style="color:var(--text-dim);font-size:11px;">No recent activity</div>
+    <!-- ═══ VIEW 2: AGENT TERMINAL ═══ -->
+    <div class="terminal-view hidden" id="view-terminal">
+      <div class="terminal-header">
+        <div class="terminal-title">
+          <span>●</span> agent-terminal — live
+        </div>
+        <div class="terminal-controls">
+          <select class="agent-selector" id="terminal-agent-select" onchange="App.selectTerminalAgent(this.value)" style="font-family:var(--mono);font-size:11px;">
+            <option value="">— All Agents —</option>
+          </select>
+          <button class="terminal-ctrl-btn" onclick="App.clearTerminal()">Clear</button>
+          <button class="terminal-ctrl-btn" onclick="App.exportTerminal()">Export</button>
+        </div>
+      </div>
+      <div class="terminal-body" id="terminal-body">
+        <div class="term-line"><span class="term-time">[--:--:--]</span><span class="term-info">Agent Terminal initialized. Waiting for activity...</span></div>
       </div>
     </div>
 
-    <!-- System -->
-    <div class="panel-section">
-      <div class="panel-title">System</div>
-      <div class="info-row"><span class="label">Port</span><span class="value">9000</span></div>
-      <div class="info-row"><span class="label">Version</span><span class="value">2.0.0</span></div>
+    <!-- ═══ VIEW 3: ROOMS ═══ -->
+    <div class="rooms-view hidden" id="view-rooms">
+      <div class="rooms-sidebar">
+        <div class="rooms-sidebar-header">
+          <span class="sidebar-title">Rooms</span>
+          <button class="sidebar-toggle" onclick="App.showCreateRoom()">+</button>
+        </div>
+        <div class="sidebar-section scrollable" id="room-list">
+          <div style="color:var(--text-muted);font-size:12px;padding:10px;">No rooms yet</div>
+        </div>
+      </div>
+      <div class="rooms-content">
+        <div class="room-detail-header" id="room-detail-header">
+          <div>
+            <div class="chat-title" id="room-title">Select a Room</div>
+            <div class="chat-subtitle" id="room-subtitle">Choose a room from the sidebar</div>
+          </div>
+        </div>
+        <div class="room-detail-body">
+          <div class="room-chat" id="room-chat">
+            <div class="messages" id="room-messages">
+              <div class="empty-state">
+                <div class="icon">🏠</div>
+                <div class="title">Rooms</div>
+                <div class="desc">Select a room to see messages and agent activity.</div>
+              </div>
+            </div>
+            <div class="chat-input-area">
+              <div class="chat-input-row">
+                <select class="agent-selector" id="room-msg-agent" style="max-width:140px;">
+                  <option value="">— Agent —</option>
+                </select>
+                <input type="text" class="chat-input" id="room-msg-input" placeholder="Message in room..." style="font-size:13px;">
+                <button class="chat-send-btn" onclick="App.sendRoomMessage()">➤</button>
+              </div>
+            </div>
+          </div>
+          <div class="room-sidebar" id="room-sidebar">
+            <div class="sidebar-header">
+              <span class="sidebar-title">In Room</span>
+            </div>
+            <div class="sidebar-section scrollable" id="room-agent-list">
+              <div style="color:var(--text-muted);font-size:12px;padding:10px;">No agents in room</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- ═══ VIEW 4: DASHBOARD ═══ -->
+    <div class="dashboard-view hidden" id="view-dashboard">
+      <div class="dash-grid">
+        <!-- Stats Cards -->
+        <div class="dash-card">
+          <div class="dash-card-title">📊 Overview</div>
+          <div class="dash-stat">
+            <span class="dash-stat-value" id="dash-rooms">0</span>
+            <span class="dash-stat-label">Active Rooms</span>
+          </div>
+          <div class="dash-stat">
+            <span class="dash-stat-value" id="dash-agents">0</span>
+            <span class="dash-stat-label">Registered Agents</span>
+          </div>
+          <div class="dash-stat">
+            <span class="dash-stat-value" id="dash-online">0</span>
+            <span class="dash-stat-label">Online Now</span>
+          </div>
+        </div>
+
+        <div class="dash-card">
+          <div class="dash-card-title">💬 Messages</div>
+          <div class="dash-stat">
+            <span class="dash-stat-value" id="dash-messages">0</span>
+            <span class="dash-stat-label">Total Messages</span>
+          </div>
+          <div class="dash-stat">
+            <span class="dash-stat-value" id="dash-fam-messages">0</span>
+            <span class="dash-stat-label">FAM Messages</span>
+          </div>
+        </div>
+
+        <div class="dash-card">
+          <div class="dash-card-title">⚡ System</div>
+          <div class="dash-stat">
+            <span class="dash-stat-value" id="dash-uptime">0s</span>
+            <span class="dash-stat-label">Uptime</span>
+          </div>
+          <div class="dash-stat">
+            <span class="dash-stat-value" id="dash-ws-status">—</span>
+            <span class="dash-stat-label">WebSocket</span>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="dash-card">
+          <div class="dash-card-title">🚀 Quick Actions</div>
+          <div class="quick-actions">
+            <button class="quick-action-btn" onclick="App.switchView('chat')">💬 Open Chat</button>
+            <button class="quick-action-btn" onclick="App.switchView('terminal')">🖥️ Open Terminal</button>
+            <button class="quick-action-btn" onclick="App.switchView('rooms')">🏠 Open Rooms</button>
+            <button class="quick-action-btn" onclick="App.runDemo()">▶ Run Demo</button>
+          </div>
+        </div>
+
+        <!-- Activity Feed (full width) -->
+        <div class="dash-card" style="grid-column:1/-1;">
+          <div class="dash-card-title">📋 Activity Feed</div>
+          <div class="activity-feed" id="dash-activity-feed">
+            <div style="color:var(--text-muted);font-size:12px;padding:10px;">No activity yet</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
-<!-- Toast notification container -->
-<div id="toast-container" style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:6px;pointer-events:none;"></div>
+<!-- ═══ TOAST CONTAINER ═══ -->
+<div class="toast-container" id="toast-container"></div>
 
-<script src="/js/env-renderer.js"></script>
+<!-- ═══ SCRIPTS ═══ -->
 <script src="/js/env-client.js"></script>
+<script src="/js/app-v3.js"></script>
 </body>
 </html>

@@ -53,7 +53,8 @@
     "description": "Content Farm - production, marketing, research",
     "agents": [
       "5d61ace0",
-      "2bbe37f8"
+      "2bbe37f8",
+      "dashboard"
     ],
     "persistent": false,
     "createdAt": "2026-05-18T18:35:07.776Z"

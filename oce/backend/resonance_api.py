@@ -17,7 +17,7 @@ from pydantic import BaseModel
 from typing import Optional
 import logging
 
-from resonance import (
+from .resonance import (
     SignalPacket, SignalField,
     CoherenceEngine, CoherenceSnapshot,
     FieldStateManager, FieldState,

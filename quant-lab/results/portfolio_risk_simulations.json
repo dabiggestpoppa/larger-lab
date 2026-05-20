@@ -1,0 +1,471 @@
+{
+  "fixed_fractional": {
+    "Deep_Mean_Reversion": {
+      "EURUSD": {
+        "risk_0.01": {
+          "model": "Fixed Fractional",
+          "pair": "EURUSD",
+          "risk_pct": 0.01,
+          "total_trades": 600,
+          "wins": 536,
+          "losses": 64,
+          "win_rate": 0.8933333333333333,
+          "total_pnl": 385540.50500000024,
+          "final_equity": 395540.5050000002,
+          "max_drawdown_pct": 0.018180170771310563,
+          "annual_return_pct": 12.851350166666672,
+          "sharpe_ratio": 19.03284893606704,
+          "sortino_ratio": 13288.466480936939,
+          "profit_factor": 19.03409090909091,
+          "avg_lots": 12.944516666666665
+        },
+        "risk_0.015": {
+          "model": "Fixed Fractional",
+          "pair": "EURUSD",
+          "risk_pct": 0.015,
+          "total_trades": 600,
+          "wins": 536,
+          "losses": 64,
+          "win_rate": 0.8933333333333333,
+          "total_pnl": 2442233.141999999,
+          "final_equity": 2452233.141999999,
+          "max_drawdown_pct": 0.02725472879965254,
+          "annual_return_pct": 81.40777139999997,
+          "sharpe_ratio": 19.030353295664597,
+          "sortino_ratio": 26950.908812054397,
+          "profit_factor": 19.034090909090907,
+          "avg_lots": 82.1691
+        },
+        "risk_0.02": {
+          "model": "Fixed Fractional",
+          "pair": "EURUSD",
+          "risk_pct": 0.02,
+          "total_trades": 600,
+          "wins": 536,
+          "losses": 64,
+          "win_rate": 0.8933333333333333,
+          "total_pnl": 15049363.074999997,
+          "final_equity": 15059363.074999997,
+          "max_drawdown_pct": 0.0363099190178271,
+          "annual_return_pct": 501.64543583333324,
+          "sharpe_ratio": 19.0310328376544,
+          "sortino_ratio": 40437.75418830758,
+          "profit_factor": 19.034090909090907,
+          "avg_lots": 507.5928833333333
+        }
+      },
+      "USDCHF": {
+        "risk_0.01": {
+          "model": "Fixed Fractional",
+          "pair": "USDCHF",
+          "risk_pct": 0.01,
+          "total_trades": 600,
+          "wins": 536,
+          "losses": 64,
+          "win_rate": 0.8933333333333333,
+          "total_pnl": 385583.0229000001,
+          "final_equity": 395583.0229000002,
+          "max_drawdown_pct": 0.018180828980620234,
+          "annual_return_pct": 12.852767430000007,
+          "sharpe_ratio": 19.03174870758391,
+          "sortino_ratio": 14574.424343334527,
+          "profit_factor": 19.034090909090907,
+          "avg_lots": 14.38465
+        },
+        "risk_0.015": {
+          "model": "Fixed Fractional",
+          "pair": "USDCHF",
+          "risk_pct": 0.015,
+          "total_trades": 600,
+          "wins": 536,
+          "losses": 64,
+          "win_rate": 0.8933333333333333,
+          "total_pnl": 2441510.919,
+          "final_equity": 2451510.919,
+          "max_drawdown_pct": 0.02725608982973245,
+          "annual_return_pct": 81.38369730000001,
+          "sharpe_ratio": 19.029196618613,
+          "sortino_ratio": 30157.729618351863,
+          "profit_factor": 19.034090909090907,
+          "avg_lots": 91.27203333333335
+        },
+        "risk_0.02": {
+          "model": "Fixed Fractional",
+          "pair": "USDCHF",
+          "risk_pct": 0.02,
+          "total_trades": 600,
+          "wins": 536,
+          "losses": 64,
+          "win_rate": 0.8933333333333333,
+          "total_pnl": 15050164.261499997,
+          "final_equity": 15060164.261499997,
+          "max_drawdown_pct": 0.03631365313236829,
+          "annual_return_pct": 501.6721420499999,
+          "sharpe_ratio": 19.03081247320059,
+          "sortino_ratio": 46499.57720253607,
+          "profit_factor": 19.034090909090907,
+          "avg_lots": 564.0222166666667
+        }
+      },
+      "GBPUSD": {
+        "risk_0.01": {
+          "model": "Fixed Fractional",
+          "pair": "GBPUSD",
+          "risk_pct": 0.01,
+          "total_trades": 600,
+          "wins": 536,
+          "losses": 64,
+          "win_rate": 0.8933333333333333,
+          "total_pnl": 385540.50500000024,
+          "final_equity": 395540.5050000002,
+          "max_drawdown_pct": 0.018180170771310563,
+          "annual_return_pct": 12.851350166666672,
+          "sharpe_ratio": 19.03284893606704,
+          "sortino_ratio": 13288.466480936939,
+          "profit_factor": 19.03409090909091,
+          "avg_lots": 12.944516666666665
+        },
+        "risk_0.015": {
+          "model": "Fixed Fractional",
+          "pair": "GBPUSD",
+          "risk_pct": 0.015,
+          "total_trades": 600,
+          "wins": 536,
+          "losses": 64,
+          "win_rate": 0.8933333333333333,
+          "total_pnl": 2442233.141999999,
+          "final_equity": 2452233.141999999,
+          "max_drawdown_pct": 0.02725472879965254,
+          "annual_return_pct": 81.40777139999997,
+          "sharpe_ratio": 19.030353295664597,
+          "sortino_ratio": 26950.908812054397,
+          "profit_factor": 19.034090909090907,
+          "avg_lots": 82.1691
+        },
+        "risk_0.02": {
+          "model": "Fixed Fractional",
+          "pair": "GBPUSD",
+          "risk_pct": 0.02,
+          "total_trades": 600,
+          "wins": 536,
+          "losses": 64,
+          "win_rate": 0.8933333333333333,
+          "total_pnl": 15049363.074999997,
+          "final_equity": 15059363.074999997,
+          "max_drawdown_pct": 0.0363099190178271,
+          "annual_return_pct": 501.64543583333324,
+          "sharpe_ratio": 19.0310328376544,
+          "sortino_ratio": 40437.75418830758,
+          "profit_factor": 19.034090909090907,
+          "avg_lots": 507.5928833333333
+        }
+      }
+    },
+    "Composite_Alpha": {
+      "EURUSD": {
+        "risk_0.01": {
+          "model": "Fixed Fractional",
+          "pair": "EURUSD",
+          "risk_pct": 0.01,
+          "total_trades": 225,
+          "wins": 219,
+          "losses": 6,
+          "win_rate": 0.9733333333333334,
+          "total_pnl": 39185.99,
+          "final_equity": 49185.990000000005,
+          "max_drawdown_pct": 0.013195924296799473,
+          "annual_return_pct": 1.3061996666666669,
+          "sharpe_ratio": 33.61814145819595,
+          "sortino_ratio": 9690.187664168465,
+          "profit_factor": 54.75,
+          "avg_lots": 4.0941777777777775
+        },
+        "risk_0.015": {
+          "model": "Fixed Fractional",
+          "pair": "EURUSD",
+          "risk_pct": 0.015,
+          "total_trades": 225,
+          "wins": 219,
+          "losses": 6,
+          "win_rate": 0.9733333333333334,
+          "total_pnl": 98540.15000000004,
+          "final_equity": 108540.15000000004,
+          "max_drawdown_pct": 0.01977217866093215,
+          "annual_return_pct": 3.284671666666668,
+          "sharpe_ratio": 33.63912116623295,
+          "sortino_ratio": 10904.84904946742,
+          "profit_factor": 54.75000000000001,
+          "avg_lots": 10.342888888888888
+        },
+        "risk_0.02": {
+          "model": "Fixed Fractional",
+          "pair": "EURUSD",
+          "risk_pct": 0.02,
+          "total_trades": 225,
+          "wins": 219,
+          "losses": 6,
+          "win_rate": 0.9733333333333334,
+          "total_pnl": 228631.5800000001,
+          "final_equity": 238631.58000000013,
+          "max_drawdown_pct": 0.02635623547527049,
+          "annual_return_pct": 7.621052666666671,
+          "sharpe_ratio": 33.62699097773751,
+          "sortino_ratio": 21838.76918441872,
+          "profit_factor": 54.75,
+          "avg_lots": 24.14991111111111
+        }
+      },
+      "USDCHF": {
+        "risk_0.01": {
+          "model": "Fixed Fractional",
+          "pair": "USDCHF",
+          "risk_pct": 0.01,
+          "total_trades": 225,
+          "wins": 219,
+          "losses": 6,
+          "win_rate": 0.9733333333333334,
+          "total_pnl": 39182.58,
+          "final_equity": 49182.58000000001,
+          "max_drawdown_pct": 0.01319629724149132,
+          "annual_return_pct": 1.3060860000000003,
+          "sharpe_ratio": 33.620595687269436,
+          "sortino_ratio": 9278.32031163124,
+          "profit_factor": 54.75,
+          "avg_lots": 4.548666666666667
+        },
+        "risk_0.015": {
+          "model": "Fixed Fractional",
+          "pair": "USDCHF",
+          "risk_pct": 0.015,
+          "total_trades": 225,
+          "wins": 219,
+          "losses": 6,
+          "win_rate": 0.9733333333333334,
+          "total_pnl": 98529.55199999997,
+          "final_equity": 108529.55199999997,
+          "max_drawdown_pct": 0.019751415219439874,
+          "annual_return_pct": 3.2843183999999987,
+          "sharpe_ratio": 33.64252586092203,
+          "sortino_ratio": 21425.381974835163,
+          "profit_factor": 54.75,
+          "avg_lots": 11.4908
+        },
+        "risk_0.02": {
+          "model": "Fixed Fractional",
+          "pair": "USDCHF",
+          "risk_pct": 0.02,
+          "total_trades": 225,
+          "wins": 219,
+          "losses": 6,
+          "win_rate": 0.9733333333333334,
+          "total_pnl": 228641.8500000001,
+          "final_equity": 238641.85000000006,
+          "max_drawdown_pct": 0.026354939127447026,
+          "annual_return_pct": 7.621395000000002,
+          "sharpe_ratio": 33.628246816357056,
+          "sortino_ratio": 22820.759438041645,
+          "profit_factor": 54.75,
+          "avg_lots": 26.834444444444443
+        }
+      },
+      "GBPUSD": {
+        "risk_0.01": {
+          "model": "Fixed Fractional",
+          "pair": "GBPUSD",
+          "risk_pct": 0.01,
+          "total_trades": 225,
+          "wins": 219,
+          "losses": 6,
+          "win_rate": 0.9733333333333334,
+          "total_pnl": 39185.99,
+          "final_equity": 49185.990000000005,
+          "max_drawdown_pct": 0.013195924296799473,
+          "annual_return_pct": 1.3061996666666669,
+          "sharpe_ratio": 33.61814145819595,
+          "sortino_ratio": 9690.187664168465,
+          "profit_factor": 54.75,
+          "avg_lots": 4.0941777777777775
+        },
+        "risk_0.015": {
+          "model": "Fixed Fractional",
+          "pair": "GBPUSD",
+          "risk_pct": 0.015,
+          "total_trades": 225,
+          "wins": 219,
+          "losses": 6,
+          "win_rate": 0.9733333333333334,
+          "total_pnl": 98540.15000000004,
+          "final_equity": 108540.15000000004,
+          "max_drawdown_pct": 0.01977217866093215,
+          "annual_return_pct": 3.284671666666668,
+          "sharpe_ratio": 33.63912116623295,
+          "sortino_ratio": 10904.84904946742,
+          "profit_factor": 54.75000000000001,
+          "avg_lots": 10.342888888888888
+        },
+        "risk_0.02": {
+          "model": "Fixed Fractional",
+          "pair": "GBPUSD",
+          "risk_pct": 0.02,
+          "total_trades": 225,
+          "wins": 219,
+          "losses": 6,
+          "win_rate": 0.9733333333333334,
+          "total_pnl": 228631.5800000001,
+          "final_equity": 238631.58000000013,
+          "max_drawdown_pct": 0.02635623547527049,
+          "annual_return_pct": 7.621052666666671,
+          "sharpe_ratio": 33.62699097773751,
+          "sortino_ratio": 21838.76918441872,
+          "profit_factor": 54.75,
+          "avg_lots": 24.14991111111111
+        }
+      }
+    }
+  },
+  "half_kelly": {
+    "Deep_Mean_Reversion": {
+      "EURUSD": {
+        "model": "Half-Kelly",
+        "pair": "EURUSD",
+        "half_kelly_pct": 0.42296000000000006,
+        "total_trades": 600,
+        "win_rate": 0.875,
+        "total_pnl": 1.0694867149763981e+55,
+        "final_equity": 1.0694867149763981e+55,
+        "max_drawdown_pct": 0.8488616375449108,
+        "annual_return_pct": 3.564955716587994e+50,
+        "sharpe_ratio": 16.88288464250859,
+        "sortino_ratio": 11986599.201505927
+      },
+      "USDCHF": {
+        "model": "Half-Kelly",
+        "pair": "USDCHF",
+        "half_kelly_pct": 0.42296000000000006,
+        "total_trades": 600,
+        "win_rate": 0.875,
+        "total_pnl": 1.0694934639285983e+55,
+        "final_equity": 1.0694934639285983e+55,
+        "max_drawdown_pct": 0.8488616375449108,
+        "annual_return_pct": 3.5649782130953273e+50,
+        "sharpe_ratio": 16.882891945068412,
+        "sortino_ratio": 1487444.452234335
+      },
+      "GBPUSD": {
+        "model": "Half-Kelly",
+        "pair": "GBPUSD",
+        "half_kelly_pct": 0.42296000000000006,
+        "total_trades": 600,
+        "win_rate": 0.875,
+        "total_pnl": 1.0694867149763981e+55,
+        "final_equity": 1.0694867149763981e+55,
+        "max_drawdown_pct": 0.8488616375449108,
+        "annual_return_pct": 3.564955716587994e+50,
+        "sharpe_ratio": 16.88288464250859,
+        "sortino_ratio": 11986599.201505927
+      }
+    },
+    "Composite_Alpha": {
+      "EURUSD": {
+        "model": "Half-Kelly",
+        "pair": "EURUSD",
+        "half_kelly_pct": 0.4708333333333333,
+        "total_trades": 225,
+        "win_rate": 0.9733333333333334,
+        "total_pnl": 6.196801710255045e+30,
+        "final_equity": 6.196801710255045e+30,
+        "max_drawdown_pct": 0.6199317022607896,
+        "annual_return_pct": 2.065600570085015e+26,
+        "sharpe_ratio": 33.632856266582344,
+        "sortino_ratio": 12438261.976213474
+      },
+      "USDCHF": {
+        "model": "Half-Kelly",
+        "pair": "USDCHF",
+        "half_kelly_pct": 0.4708333333333333,
+        "total_trades": 225,
+        "win_rate": 0.9733333333333334,
+        "total_pnl": 6.196690538454202e+30,
+        "final_equity": 6.196690538454202e+30,
+        "max_drawdown_pct": 0.619930555555846,
+        "annual_return_pct": 2.065563512818067e+26,
+        "sharpe_ratio": 33.632857518733154,
+        "sortino_ratio": 29832993.72574744
+      },
+      "GBPUSD": {
+        "model": "Half-Kelly",
+        "pair": "GBPUSD",
+        "half_kelly_pct": 0.4708333333333333,
+        "total_trades": 225,
+        "win_rate": 0.9733333333333334,
+        "total_pnl": 6.196801710255045e+30,
+        "final_equity": 6.196801710255045e+30,
+        "max_drawdown_pct": 0.6199317022607896,
+        "annual_return_pct": 2.065600570085015e+26,
+        "sharpe_ratio": 33.632856266582344,
+        "sortino_ratio": 12438261.976213474
+      }
+    }
+  },
+  "erc": {
+    "model": "Equal Risk Contribution",
+    "weights": [
+      0.36133694670280037,
+      0.6386630532971996
+    ],
+    "total_trades": 792,
+    "win_rate": 0.9027777777777778,
+    "total_pnl": 985596.5539999987,
+    "final_equity": 995596.5539999991,
+    "max_drawdown_pct": 0.018082786344658482,
+    "annual_return_pct": 32.85321846666664,
+    "sharpe_ratio": 75.4960302396797,
+    "sortino_ratio": 21699023824.64642
+  },
+  "sensitivity": {
+    "Deep_Mean_Reversion": {
+      "base_case": {
+        "annual_return_pct": 1.1264399999999997,
+        "cost_per_trade": 2.9,
+        "win_rate": 0.893
+      },
+      "costs_plus_50pct": {
+        "annual_return_pct": 1.1252892063492062,
+        "cost_per_trade": 4.35,
+        "win_rate": 0.893
+      },
+      "wr_minus_10pp": {
+        "annual_return_pct": 1.0002989025755877,
+        "cost_per_trade": 2.9,
+        "win_rate": 0.793
+      },
+      "worst_case": {
+        "annual_return_pct": 0.9992769771947598,
+        "cost_per_trade": 4.35,
+        "win_rate": 0.793
+      }
+    },
+    "Composite_Alpha": {
+      "base_case": {
+        "annual_return_pct": 0.63,
+        "cost_per_trade": 2.9,
+        "win_rate": 0.965
+      },
+      "costs_plus_50pct": {
+        "annual_return_pct": 0.6295684523809524,
+        "cost_per_trade": 4.35,
+        "win_rate": 0.965
+      },
+      "wr_minus_10pp": {
+        "annual_return_pct": 0.5647150259067357,
+        "cost_per_trade": 2.9,
+        "win_rate": 0.865
+      },
+      "worst_case": {
+        "annual_return_pct": 0.5643281982482111,
+        "cost_per_trade": 4.35,
+        "win_rate": 0.865
+      }
+    }
+  }
+}

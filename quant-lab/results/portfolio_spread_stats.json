@@ -1,0 +1,20 @@
+{
+  "EURUSD": {
+    "pair": "EURUSD",
+    "median_spread_points": 0.0,
+    "mean_spread_points": 0.7318585560597073,
+    "median_spread_pips": 0.0
+  },
+  "USDCHF": {
+    "pair": "USDCHF",
+    "median_spread_points": 0.0,
+    "mean_spread_points": 3.7997962425195335,
+    "median_spread_pips": 0.0
+  },
+  "GBPUSD": {
+    "pair": "GBPUSD",
+    "median_spread_points": 0.0,
+    "mean_spread_points": 1.8968936180449198,
+    "median_spread_pips": 0.0
+  }
+}

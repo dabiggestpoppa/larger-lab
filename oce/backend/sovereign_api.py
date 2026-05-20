@@ -9,10 +9,10 @@ from pydantic import BaseModel
 from typing import Optional
 import logging
 
-from sovereign import (
-    OCEShellRuntime, ContinuityState,
+from .sovereign import (
+    OCEShell as OCEShellRuntime, ShellState as ContinuityState,
     ExecutiveRouter, RoutingDecision,
-    ToolEmbodimentLayer, ToolAction,
+    ToolEmbodimentLayer, ToolEmbodiment as ToolAction,
     ContinuitySnapshotSystem, ContinuitySnapshot,
     ComputeEconomicsEngine, ComputeBudget,
     AutonomousOperationLoop, LoopPhase,
