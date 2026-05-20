@@ -27,7 +27,7 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
-from structural_memory import (
+from .structural_memory import (
     MemoryEntry,
     MemoryLayer,
     StructuralMemory,

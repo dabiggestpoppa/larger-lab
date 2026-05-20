@@ -1,0 +1,31 @@
+{
+  "strategy": "Deep_Mean_Reversion",
+  "source": "MT5_Monte_Carlo_v2",
+  "iterations": 10000,
+  "initial_equity": 10000.0,
+  "lot_size": 0.01,
+  "pip_value": 0.1,
+  "ruin_count": 0,
+  "ruin_pct": 0.0,
+  "survival_rate": 100.0,
+  "final_equity": {
+    "mean": 11052.0,
+    "median": 11052.0,
+    "best": 11052.0,
+    "worst": 11052.0
+  },
+  "returns": {
+    "mean": 10.5,
+    "median": 10.5,
+    "best": 10.5,
+    "worst": 10.5
+  },
+  "max_dd": {
+    "mean": 0.0,
+    "median": 0.0,
+    "worst": 0.0,
+    "p95": 0.0,
+    "p99": 0.0
+  },
+  "prob_profitable": 100.0
+}

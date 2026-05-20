@@ -12,7 +12,7 @@ Task: OCE-2.24
 import logging
 from typing import Any, Dict, List, Optional
 
-from event_fabric import classify_event, EVENT_TYPES
+from .event_fabric import classify_event, EVENT_TYPES
 
 logger = logging.getLogger("oce.dspy.event_classifier")
 

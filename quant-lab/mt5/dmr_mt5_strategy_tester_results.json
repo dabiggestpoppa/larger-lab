@@ -1,0 +1,73 @@
+{
+  "strategy": "Deep_Mean_Reversion",
+  "total_trades": 671,
+  "wins": 636,
+  "losses": 35,
+  "win_rate": 94.8,
+  "total_pnl_pips": 7903.62,
+  "avg_win": 12.49,
+  "avg_loss": -1.1,
+  "max_drawdown_pips": 2.06,
+  "profit_factor": 205.86,
+  "expectancy": 11.78,
+  "gross_profit": 7942.2,
+  "gross_loss": 38.58,
+  "max_consec_wins": 62,
+  "max_consec_losses": 2,
+  "by_exit": {
+    "tp": 635,
+    "sl": 35,
+    "end_data": 1
+  },
+  "by_year": {
+    "2022": {
+      "trades": 21,
+      "wins": 20,
+      "wr": 95.2,
+      "pnl": 295.0
+    },
+    "2023": {
+      "trades": 203,
+      "wins": 191,
+      "wr": 94.1,
+      "pnl": 2156.98
+    },
+    "2024": {
+      "trades": 189,
+      "wins": 179,
+      "wr": 94.7,
+      "pnl": 2579.48
+    },
+    "2025": {
+      "trades": 183,
+      "wins": 174,
+      "wr": 95.1,
+      "pnl": 1957.56
+    },
+    "2026": {
+      "trades": 75,
+      "wins": 72,
+      "wr": 96.0,
+      "pnl": 914.6
+    }
+  },
+  "symbol": "EURUSD.PRO",
+  "timeframe": "M5",
+  "period": "2022-01-01 to 2026-05-19",
+  "total_bars": 271331,
+  "trading_days": 1331,
+  "skip_stats": {
+    "no_asian": 387,
+    "ar_too_big": 239,
+    "ar_too_small": 0,
+    "no_p90": 34,
+    "no_ds_touch": 0
+  },
+  "spread_pips": 3.6,
+  "spread_cost_pips": 2415.6,
+  "net_pnl_pips": 5488.02,
+  "net_win_rate": 94.8,
+  "estimated_gross_pnl_usd": 790.36,
+  "estimated_spread_cost_usd": 241.56,
+  "estimated_net_pnl_usd": 548.8
+}

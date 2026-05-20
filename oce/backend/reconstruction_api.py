@@ -16,7 +16,7 @@ from pydantic import BaseModel
 from typing import Optional
 import logging
 
-from reconstruction import (
+from .reconstruction import (
     CausalGeometryEngine, CausalEdge, ContinuityLineage,
     AttractorMemory, Attractor,
     ReconstructionEngine, ReconstructionResult,

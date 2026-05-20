@@ -1,0 +1,3679 @@
+{
+  "EURUSD.PRO": {
+    "basic": {
+      "symbol": "EURUSD.PRO",
+      "total_trades": 941,
+      "wins": 43,
+      "losses": 898,
+      "win_rate": 4.6,
+      "total_pnl": -14244.62,
+      "avg_win": 1.71,
+      "avg_loss": -15.94,
+      "max_win": 8.6,
+      "max_loss": -142.1,
+      "expectancy": -15.14,
+      "profit_factor": 0.01,
+      "max_drawdown": 14244.62,
+      "start_date": "2022-09-28",
+      "end_date": "2026-05-18",
+      "trading_days": 1328,
+      "avg_trades_per_day": 0.709,
+      "avg_trades_per_week": 5.0,
+      "avg_trades_per_month": 21.6,
+      "by_year": {
+        "2022": {
+          "trades": 67,
+          "wins": 1,
+          "win_rate": 1.5,
+          "pnl": -1816.1
+        },
+        "2023": {
+          "trades": 259,
+          "wins": 12,
+          "win_rate": 4.6,
+          "pnl": -3884.32
+        },
+        "2024": {
+          "trades": 260,
+          "wins": 13,
+          "win_rate": 5.0,
+          "pnl": -2962.2
+        },
+        "2025": {
+          "trades": 258,
+          "wins": 10,
+          "win_rate": 3.9,
+          "pnl": -4352.5
+        },
+        "2026": {
+          "trades": 97,
+          "wins": 7,
+          "win_rate": 7.2,
+          "pnl": -1229.5
+        }
+      }
+    },
+    "by_hour": {
+      "08:00": {
+        "trades": 941,
+        "wins": 43,
+        "win_rate": 4.6,
+        "total_pnl": -14244.62,
+        "avg_pnl": -15.14,
+        "avg_ar": 37.5
+      }
+    },
+    "by_dow": {
+      "Mon": {
+        "trades": 187,
+        "wins": 9,
+        "win_rate": 4.8,
+        "total_pnl": -2836.2,
+        "avg_pnl": -15.17
+      },
+      "Tue": {
+        "trades": 189,
+        "wins": 14,
+        "win_rate": 7.4,
+        "total_pnl": -2834.3,
+        "avg_pnl": -15.0
+      },
+      "Wed": {
+        "trades": 188,
+        "wins": 7,
+        "win_rate": 3.7,
+        "total_pnl": -3143.1,
+        "avg_pnl": -16.72
+      },
+      "Thu": {
+        "trades": 187,
+        "wins": 9,
+        "win_rate": 4.8,
+        "total_pnl": -2783.22,
+        "avg_pnl": -14.88
+      },
+      "Fri": {
+        "trades": 190,
+        "wins": 4,
+        "win_rate": 2.1,
+        "total_pnl": -2647.8,
+        "avg_pnl": -13.94
+      }
+    },
+    "tiers": {
+      "Tier_1_Compressed": {
+        "trades": 29,
+        "wins": 2,
+        "losses": 27,
+        "win_rate": 6.9,
+        "total_pnl": -117.7,
+        "avg_pnl": -4.06,
+        "avg_ar": 13.2,
+        "min_ar": 9.3,
+        "max_ar": 14.8,
+        "pct_of_total": 3.1,
+        "peak_hour": 8,
+        "peak_dow": "Fri",
+        "by_hour": {
+          "08:00": 29
+        },
+        "by_dow": {
+          "Fri": 9,
+          "Tue": 4,
+          "Mon": 4,
+          "Wed": 6,
+          "Thu": 6
+        }
+      },
+      "Tier_2_Normal": {
+        "trades": 214,
+        "wins": 13,
+        "losses": 201,
+        "win_rate": 6.1,
+        "total_pnl": -1623.32,
+        "avg_pnl": -7.59,
+        "avg_ar": 20.6,
+        "min_ar": 15.1,
+        "max_ar": 24.9,
+        "pct_of_total": 22.7,
+        "peak_hour": 8,
+        "peak_dow": "Thu",
+        "by_hour": {
+          "08:00": 214
+        },
+        "by_dow": {
+          "Fri": 44,
+          "Wed": 43,
+          "Thu": 45,
+          "Mon": 39,
+          "Tue": 43
+        }
+      },
+      "Tier_3_Expanded": {
+        "trades": 387,
+        "wins": 20,
+        "losses": 367,
+        "win_rate": 5.2,
+        "total_pnl": -4664.6,
+        "avg_pnl": -12.05,
+        "avg_ar": 31.7,
+        "min_ar": 25.0,
+        "max_ar": 39.7,
+        "pct_of_total": 41.1,
+        "peak_hour": 8,
+        "peak_dow": "Mon",
+        "by_hour": {
+          "08:00": 387
+        },
+        "by_dow": {
+          "Wed": 78,
+          "Mon": 85,
+          "Thu": 71,
+          "Tue": 68,
+          "Fri": 85
+        }
+      },
+      "Tier_4_Extreme": {
+        "trades": 311,
+        "wins": 8,
+        "losses": 303,
+        "win_rate": 2.6,
+        "total_pnl": -7839.0,
+        "avg_pnl": -25.21,
+        "avg_ar": 58.7,
+        "min_ar": 40.1,
+        "max_ar": 227.4,
+        "pct_of_total": 33.0,
+        "peak_hour": 8,
+        "peak_dow": "Tue",
+        "by_hour": {
+          "08:00": 311
+        },
+        "by_dow": {
+          "Wed": 61,
+          "Thu": 65,
+          "Fri": 52,
+          "Mon": 59,
+          "Tue": 74
+        }
+      }
+    },
+    "injection": {
+      "compression_to_expansion_events": [
+        {
+          "time": "2023-02-27T13:00:00+00:00",
+          "prev_ar": 22.5,
+          "curr_ar": 35.0,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -1.2,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-03-10T13:00:00+00:00",
+          "prev_ar": 21.6,
+          "curr_ar": 32.9,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -15.2,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-04-10T13:00:00+00:00",
+          "prev_ar": 9.3,
+          "curr_ar": 26.2,
+          "expansion_ratio": 2.8,
+          "tier": "Tier_3_Expanded",
+          "pnl": -14.9,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-04-13T13:00:00+00:00",
+          "prev_ar": 21.5,
+          "curr_ar": 55.0,
+          "expansion_ratio": 2.6,
+          "tier": "Tier_4_Extreme",
+          "pnl": -47.0,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-04-17T13:00:00+00:00",
+          "prev_ar": 21.9,
+          "curr_ar": 35.6,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -13.2,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-05-16T13:00:00+00:00",
+          "prev_ar": 24.6,
+          "curr_ar": 41.8,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_4_Extreme",
+          "pnl": -28.3,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-05-25T13:00:00+00:00",
+          "prev_ar": 24.7,
+          "curr_ar": 29.7,
+          "expansion_ratio": 1.2,
+          "tier": "Tier_3_Expanded",
+          "pnl": -17.2,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-05-29T13:00:00+00:00",
+          "prev_ar": 19.0,
+          "curr_ar": 30.2,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -3.8,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-06-06T13:00:00+00:00",
+          "prev_ar": 20.4,
+          "curr_ar": 43.3,
+          "expansion_ratio": 2.1,
+          "tier": "Tier_4_Extreme",
+          "pnl": 0.5,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-06-23T13:00:00+00:00",
+          "prev_ar": 24.1,
+          "curr_ar": 92.6,
+          "expansion_ratio": 3.8,
+          "tier": "Tier_4_Extreme",
+          "pnl": -18.3,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-06-27T13:00:00+00:00",
+          "prev_ar": 23.7,
+          "curr_ar": 28.5,
+          "expansion_ratio": 1.2,
+          "tier": "Tier_3_Expanded",
+          "pnl": -0.2,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-06-29T13:00:00+00:00",
+          "prev_ar": 24.7,
+          "curr_ar": 41.0,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_4_Extreme",
+          "pnl": -1.5,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-07-05T13:00:00+00:00",
+          "prev_ar": 22.8,
+          "curr_ar": 41.3,
+          "expansion_ratio": 1.8,
+          "tier": "Tier_4_Extreme",
+          "pnl": -26.2,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-07-13T13:00:00+00:00",
+          "prev_ar": 18.5,
+          "curr_ar": 44.5,
+          "expansion_ratio": 2.4,
+          "tier": "Tier_4_Extreme",
+          "pnl": -5.5,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-07-24T13:00:00+00:00",
+          "prev_ar": 23.6,
+          "curr_ar": 81.1,
+          "expansion_ratio": 3.4,
+          "tier": "Tier_4_Extreme",
+          "pnl": -16.6,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-08-03T13:00:00+00:00",
+          "prev_ar": 24.6,
+          "curr_ar": 30.9,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -18.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-08-07T13:00:00+00:00",
+          "prev_ar": 23.2,
+          "curr_ar": 31.6,
+          "expansion_ratio": 1.4,
+          "tier": "Tier_3_Expanded",
+          "pnl": -2.5,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-08-18T13:00:00+00:00",
+          "prev_ar": 24.0,
+          "curr_ar": 25.5,
+          "expansion_ratio": 1.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -8.8,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-08-29T13:00:00+00:00",
+          "prev_ar": 21.4,
+          "curr_ar": 30.7,
+          "expansion_ratio": 1.4,
+          "tier": "Tier_3_Expanded",
+          "pnl": -5.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-09-08T13:00:00+00:00",
+          "prev_ar": 23.2,
+          "curr_ar": 29.0,
+          "expansion_ratio": 1.2,
+          "tier": "Tier_3_Expanded",
+          "pnl": -2.6,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-09-12T13:00:00+00:00",
+          "prev_ar": 19.8,
+          "curr_ar": 34.6,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -11.3,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-09-20T13:00:00+00:00",
+          "prev_ar": 20.1,
+          "curr_ar": 27.0,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -0.8,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-09-28T13:00:00+00:00",
+          "prev_ar": 21.2,
+          "curr_ar": 50.4,
+          "expansion_ratio": 2.4,
+          "tier": "Tier_4_Extreme",
+          "pnl": -2.6,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-10-13T13:00:00+00:00",
+          "prev_ar": 23.8,
+          "curr_ar": 30.7,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -1.2,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-10-18T13:00:00+00:00",
+          "prev_ar": 21.9,
+          "curr_ar": 28.4,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -1.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-10-20T13:00:00+00:00",
+          "prev_ar": 20.1,
+          "curr_ar": 30.5,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -26.0,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-10-30T13:00:00+00:00",
+          "prev_ar": 18.0,
+          "curr_ar": 39.1,
+          "expansion_ratio": 2.2,
+          "tier": "Tier_3_Expanded",
+          "pnl": 0.4,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-11-07T13:00:00+00:00",
+          "prev_ar": 24.7,
+          "curr_ar": 31.1,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -2.0,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-11-14T13:00:00+00:00",
+          "prev_ar": 17.7,
+          "curr_ar": 37.6,
+          "expansion_ratio": 2.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -27.3,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-11-22T13:00:00+00:00",
+          "prev_ar": 21.5,
+          "curr_ar": 37.3,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -17.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-11-29T13:00:00+00:00",
+          "prev_ar": 22.4,
+          "curr_ar": 35.5,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -5.0,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-12-11T13:00:00+00:00",
+          "prev_ar": 18.8,
+          "curr_ar": 27.6,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -22.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-12-14T13:00:00+00:00",
+          "prev_ar": 19.7,
+          "curr_ar": 34.2,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": 1.9,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-12-19T13:00:00+00:00",
+          "prev_ar": 21.8,
+          "curr_ar": 28.4,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -15.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-12-22T13:00:00+00:00",
+          "prev_ar": 21.1,
+          "curr_ar": 27.6,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -3.5,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-12-28T13:00:00+00:00",
+          "prev_ar": 22.7,
+          "curr_ar": 35.2,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -23.2,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-01-23T13:00:00+00:00",
+          "prev_ar": 23.7,
+          "curr_ar": 48.7,
+          "expansion_ratio": 2.1,
+          "tier": "Tier_4_Extreme",
+          "pnl": -0.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-01-26T13:00:00+00:00",
+          "prev_ar": 24.8,
+          "curr_ar": 53.3,
+          "expansion_ratio": 2.1,
+          "tier": "Tier_4_Extreme",
+          "pnl": -0.1,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-02-12T13:00:00+00:00",
+          "prev_ar": 22.5,
+          "curr_ar": 38.8,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -8.7,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-02-20T13:00:00+00:00",
+          "prev_ar": 17.3,
+          "curr_ar": 44.2,
+          "expansion_ratio": 2.6,
+          "tier": "Tier_4_Extreme",
+          "pnl": -36.8,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-02-26T13:00:00+00:00",
+          "prev_ar": 18.5,
+          "curr_ar": 29.9,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -1.3,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-02-28T13:00:00+00:00",
+          "prev_ar": 24.0,
+          "curr_ar": 36.7,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -19.2,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-03-06T13:00:00+00:00",
+          "prev_ar": 14.4,
+          "curr_ar": 27.7,
+          "expansion_ratio": 1.9,
+          "tier": "Tier_3_Expanded",
+          "pnl": -2.3,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-03-08T13:00:00+00:00",
+          "prev_ar": 17.9,
+          "curr_ar": 25.0,
+          "expansion_ratio": 1.4,
+          "tier": "Tier_3_Expanded",
+          "pnl": -8.7,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-03-15T13:00:00+00:00",
+          "prev_ar": 12.7,
+          "curr_ar": 26.2,
+          "expansion_ratio": 2.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -0.7,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-03-19T13:00:00+00:00",
+          "prev_ar": 15.4,
+          "curr_ar": 41.7,
+          "expansion_ratio": 2.7,
+          "tier": "Tier_4_Extreme",
+          "pnl": -6.3,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-03-28T13:00:00+00:00",
+          "prev_ar": 17.9,
+          "curr_ar": 51.5,
+          "expansion_ratio": 2.9,
+          "tier": "Tier_4_Extreme",
+          "pnl": -1.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-04-04T13:00:00+00:00",
+          "prev_ar": 14.1,
+          "curr_ar": 26.7,
+          "expansion_ratio": 1.9,
+          "tier": "Tier_3_Expanded",
+          "pnl": -18.5,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-04-12T13:00:00+00:00",
+          "prev_ar": 23.2,
+          "curr_ar": 62.4,
+          "expansion_ratio": 2.7,
+          "tier": "Tier_4_Extreme",
+          "pnl": -3.9,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-04-16T13:00:00+00:00",
+          "prev_ar": 18.0,
+          "curr_ar": 32.9,
+          "expansion_ratio": 1.8,
+          "tier": "Tier_3_Expanded",
+          "pnl": -28.6,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-04-19T13:00:00+00:00",
+          "prev_ar": 19.9,
+          "curr_ar": 35.2,
+          "expansion_ratio": 1.8,
+          "tier": "Tier_3_Expanded",
+          "pnl": -28.9,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-04-23T13:00:00+00:00",
+          "prev_ar": 21.8,
+          "curr_ar": 56.6,
+          "expansion_ratio": 2.6,
+          "tier": "Tier_4_Extreme",
+          "pnl": -21.8,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-04-26T13:00:00+00:00",
+          "prev_ar": 23.7,
+          "curr_ar": 31.7,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -11.7,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-05-02T13:00:00+00:00",
+          "prev_ar": 24.0,
+          "curr_ar": 32.4,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -5.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-05-17T13:00:00+00:00",
+          "prev_ar": 21.0,
+          "curr_ar": 27.4,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -1.8,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-05-23T13:00:00+00:00",
+          "prev_ar": 22.4,
+          "curr_ar": 36.0,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -1.2,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-05-29T13:00:00+00:00",
+          "prev_ar": 13.1,
+          "curr_ar": 29.8,
+          "expansion_ratio": 2.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -20.5,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-06-10T13:00:00+00:00",
+          "prev_ar": 15.2,
+          "curr_ar": 27.5,
+          "expansion_ratio": 1.8,
+          "tier": "Tier_3_Expanded",
+          "pnl": -0.5,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-06-14T13:00:00+00:00",
+          "prev_ar": 15.9,
+          "curr_ar": 69.2,
+          "expansion_ratio": 4.4,
+          "tier": "Tier_4_Extreme",
+          "pnl": -8.2,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-06-20T13:00:00+00:00",
+          "prev_ar": 19.3,
+          "curr_ar": 32.3,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -16.0,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-06-26T13:00:00+00:00",
+          "prev_ar": 23.3,
+          "curr_ar": 26.4,
+          "expansion_ratio": 1.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -1.6,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-07-01T13:00:00+00:00",
+          "prev_ar": 24.0,
+          "curr_ar": 26.9,
+          "expansion_ratio": 1.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -4.2,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-07-08T13:00:00+00:00",
+          "prev_ar": 14.2,
+          "curr_ar": 28.3,
+          "expansion_ratio": 2.0,
+          "tier": "Tier_3_Expanded",
+          "pnl": -21.7,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-07-12T13:00:00+00:00",
+          "prev_ar": 20.4,
+          "curr_ar": 27.5,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -2.9,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-07-17T13:00:00+00:00",
+          "prev_ar": 20.5,
+          "curr_ar": 49.8,
+          "expansion_ratio": 2.4,
+          "tier": "Tier_4_Extreme",
+          "pnl": -1.9,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-07-23T13:00:00+00:00",
+          "prev_ar": 16.5,
+          "curr_ar": 28.9,
+          "expansion_ratio": 1.8,
+          "tier": "Tier_3_Expanded",
+          "pnl": -2.3,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-07-29T13:00:00+00:00",
+          "prev_ar": 18.8,
+          "curr_ar": 37.3,
+          "expansion_ratio": 2.0,
+          "tier": "Tier_3_Expanded",
+          "pnl": -10.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-08-01T13:00:00+00:00",
+          "prev_ar": 21.1,
+          "curr_ar": 58.0,
+          "expansion_ratio": 2.7,
+          "tier": "Tier_4_Extreme",
+          "pnl": -2.8,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-08-13T13:00:00+00:00",
+          "prev_ar": 15.1,
+          "curr_ar": 27.6,
+          "expansion_ratio": 1.8,
+          "tier": "Tier_3_Expanded",
+          "pnl": -5.5,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-08-22T13:00:00+00:00",
+          "prev_ar": 18.6,
+          "curr_ar": 37.6,
+          "expansion_ratio": 2.0,
+          "tier": "Tier_3_Expanded",
+          "pnl": -11.6,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-08-28T13:00:00+00:00",
+          "prev_ar": 17.5,
+          "curr_ar": 35.0,
+          "expansion_ratio": 2.0,
+          "tier": "Tier_3_Expanded",
+          "pnl": 0.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-09-02T13:00:00+00:00",
+          "prev_ar": 23.2,
+          "curr_ar": 33.5,
+          "expansion_ratio": 1.4,
+          "tier": "Tier_3_Expanded",
+          "pnl": -25.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-09-05T13:00:00+00:00",
+          "prev_ar": 16.0,
+          "curr_ar": 25.8,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -18.7,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-09-09T13:00:00+00:00",
+          "prev_ar": 13.5,
+          "curr_ar": 34.8,
+          "expansion_ratio": 2.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -8.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-09-13T13:00:00+00:00",
+          "prev_ar": 18.4,
+          "curr_ar": 27.8,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -18.8,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-09-19T13:00:00+00:00",
+          "prev_ar": 24.8,
+          "curr_ar": 64.0,
+          "expansion_ratio": 2.6,
+          "tier": "Tier_4_Extreme",
+          "pnl": -3.9,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-09-26T13:00:00+00:00",
+          "prev_ar": 20.4,
+          "curr_ar": 32.4,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -17.3,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-10-09T13:00:00+00:00",
+          "prev_ar": 18.6,
+          "curr_ar": 25.1,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -15.2,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-10-15T13:00:00+00:00",
+          "prev_ar": 14.4,
+          "curr_ar": 31.2,
+          "expansion_ratio": 2.2,
+          "tier": "Tier_3_Expanded",
+          "pnl": -1.6,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-10-23T13:00:00+00:00",
+          "prev_ar": 23.5,
+          "curr_ar": 27.3,
+          "expansion_ratio": 1.2,
+          "tier": "Tier_3_Expanded",
+          "pnl": -2.3,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-10-28T13:00:00+00:00",
+          "prev_ar": 23.6,
+          "curr_ar": 39.2,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -34.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-10-30T13:00:00+00:00",
+          "prev_ar": 20.9,
+          "curr_ar": 46.5,
+          "expansion_ratio": 2.2,
+          "tier": "Tier_4_Extreme",
+          "pnl": -27.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-11-06T13:00:00+00:00",
+          "prev_ar": 22.7,
+          "curr_ar": 92.0,
+          "expansion_ratio": 4.1,
+          "tier": "Tier_4_Extreme",
+          "pnl": -37.0,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-12-30T13:00:00+00:00",
+          "prev_ar": 20.8,
+          "curr_ar": 35.0,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -30.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-01-02T13:00:00+00:00",
+          "prev_ar": 24.9,
+          "curr_ar": 58.6,
+          "expansion_ratio": 2.4,
+          "tier": "Tier_4_Extreme",
+          "pnl": -10.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-01-17T13:00:00+00:00",
+          "prev_ar": 21.0,
+          "curr_ar": 28.7,
+          "expansion_ratio": 1.4,
+          "tier": "Tier_3_Expanded",
+          "pnl": -22.9,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-01-21T13:00:00+00:00",
+          "prev_ar": 22.8,
+          "curr_ar": 50.5,
+          "expansion_ratio": 2.2,
+          "tier": "Tier_4_Extreme",
+          "pnl": -6.9,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-02-19T13:00:00+00:00",
+          "prev_ar": 17.1,
+          "curr_ar": 42.5,
+          "expansion_ratio": 2.5,
+          "tier": "Tier_4_Extreme",
+          "pnl": -8.3,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-02-21T13:00:00+00:00",
+          "prev_ar": 20.5,
+          "curr_ar": 35.9,
+          "expansion_ratio": 1.8,
+          "tier": "Tier_3_Expanded",
+          "pnl": 0.6,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-02-28T13:00:00+00:00",
+          "prev_ar": 23.7,
+          "curr_ar": 25.2,
+          "expansion_ratio": 1.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -18.3,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-04-21T13:00:00+00:00",
+          "prev_ar": 20.4,
+          "curr_ar": 74.4,
+          "expansion_ratio": 3.6,
+          "tier": "Tier_4_Extreme",
+          "pnl": -48.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-05-14T13:00:00+00:00",
+          "prev_ar": 23.0,
+          "curr_ar": 85.8,
+          "expansion_ratio": 3.7,
+          "tier": "Tier_4_Extreme",
+          "pnl": -70.6,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-06-06T13:00:00+00:00",
+          "prev_ar": 20.6,
+          "curr_ar": 31.6,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -7.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-06-23T13:00:00+00:00",
+          "prev_ar": 22.2,
+          "curr_ar": 67.6,
+          "expansion_ratio": 3.0,
+          "tier": "Tier_4_Extreme",
+          "pnl": -20.0,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-07-07T13:00:00+00:00",
+          "prev_ar": 18.0,
+          "curr_ar": 51.5,
+          "expansion_ratio": 2.9,
+          "tier": "Tier_4_Extreme",
+          "pnl": -10.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-07-11T13:00:00+00:00",
+          "prev_ar": 17.6,
+          "curr_ar": 26.7,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -1.1,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-07-17T13:00:00+00:00",
+          "prev_ar": 18.1,
+          "curr_ar": 54.4,
+          "expansion_ratio": 3.0,
+          "tier": "Tier_4_Extreme",
+          "pnl": -16.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-08-07T13:00:00+00:00",
+          "prev_ar": 18.0,
+          "curr_ar": 35.9,
+          "expansion_ratio": 2.0,
+          "tier": "Tier_3_Expanded",
+          "pnl": -6.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-08-21T13:00:00+00:00",
+          "prev_ar": 23.6,
+          "curr_ar": 37.9,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -29.9,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-08-25T13:00:00+00:00",
+          "prev_ar": 19.5,
+          "curr_ar": 30.7,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -4.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        }
+      ],
+      "total_injection_events": 136,
+      "trade_clusters": [],
+      "total_clusters": 0,
+      "hour_injection_profile": {
+        "08:00": {
+          "avg_ar": 37.5,
+          "max_ar": 227.4,
+          "trades": 941,
+          "injection_score": 3530.2
+        }
+      }
+    },
+    "monte_carlo": {
+      "iterations": 10000,
+      "prob_profit": 0.0,
+      "prob_20_dd_pct": 100.0,
+      "prob_50_dd_pct": 100.0,
+      "mean_pnl": -14246.4,
+      "median_pnl": -14237.0,
+      "std_pnl": 494.66,
+      "p1_pnl": -15430.8,
+      "p5_pnl": -15068.36,
+      "p25_pnl": -14575.6,
+      "p75_pnl": -13922.2,
+      "p95_pnl": -13439.62,
+      "p99_pnl": -13114.32,
+      "mean_max_dd": 14246.57,
+      "median_max_dd": 14237.1,
+      "p95_max_dd": 15070.5,
+      "p99_max_dd": 15436.3,
+      "all_profitable": false,
+      "sharpe_approx": -28.8
+    }
+  },
+  "USDCHF.PRO": {
+    "basic": {
+      "symbol": "USDCHF.PRO",
+      "total_trades": 952,
+      "wins": 50,
+      "losses": 902,
+      "win_rate": 5.3,
+      "total_pnl": -12285.22,
+      "avg_win": 1.64,
+      "avg_loss": -13.71,
+      "max_win": 7.4,
+      "max_loss": -146.7,
+      "expectancy": -12.9,
+      "profit_factor": 0.01,
+      "max_drawdown": 12285.22,
+      "start_date": "2022-09-13",
+      "end_date": "2026-05-18",
+      "trading_days": 1343,
+      "avg_trades_per_day": 0.709,
+      "avg_trades_per_week": 5.0,
+      "avg_trades_per_month": 21.6,
+      "by_year": {
+        "2022": {
+          "trades": 78,
+          "wins": 3,
+          "win_rate": 3.8,
+          "pnl": -1963.52
+        },
+        "2023": {
+          "trades": 260,
+          "wins": 13,
+          "win_rate": 5.0,
+          "pnl": -3575.6
+        },
+        "2024": {
+          "trades": 260,
+          "wins": 14,
+          "win_rate": 5.4,
+          "pnl": -2773.5
+        },
+        "2025": {
+          "trades": 257,
+          "wins": 15,
+          "win_rate": 5.8,
+          "pnl": -3024.3
+        },
+        "2026": {
+          "trades": 97,
+          "wins": 5,
+          "win_rate": 5.2,
+          "pnl": -948.3
+        }
+      }
+    },
+    "by_hour": {
+      "08:00": {
+        "trades": 952,
+        "wins": 50,
+        "win_rate": 5.3,
+        "total_pnl": -12285.22,
+        "avg_pnl": -12.9,
+        "avg_ar": 33.6
+      }
+    },
+    "by_dow": {
+      "Mon": {
+        "trades": 190,
+        "wins": 16,
+        "win_rate": 8.4,
+        "total_pnl": -2525.7,
+        "avg_pnl": -13.29
+      },
+      "Tue": {
+        "trades": 192,
+        "wins": 7,
+        "win_rate": 3.6,
+        "total_pnl": -2040.9,
+        "avg_pnl": -10.63
+      },
+      "Wed": {
+        "trades": 190,
+        "wins": 12,
+        "win_rate": 6.3,
+        "total_pnl": -2275.2,
+        "avg_pnl": -11.97
+      },
+      "Thu": {
+        "trades": 188,
+        "wins": 7,
+        "win_rate": 3.7,
+        "total_pnl": -2914.82,
+        "avg_pnl": -15.5
+      },
+      "Fri": {
+        "trades": 192,
+        "wins": 8,
+        "win_rate": 4.2,
+        "total_pnl": -2528.6,
+        "avg_pnl": -13.17
+      }
+    },
+    "tiers": {
+      "Tier_1_Compressed": {
+        "trades": 41,
+        "wins": 2,
+        "losses": 39,
+        "win_rate": 4.9,
+        "total_pnl": -147.6,
+        "avg_pnl": -3.6,
+        "avg_ar": 12.9,
+        "min_ar": 9.9,
+        "max_ar": 14.9,
+        "pct_of_total": 4.3,
+        "peak_hour": 8,
+        "peak_dow": "Fri",
+        "by_hour": {
+          "08:00": 41
+        },
+        "by_dow": {
+          "Thu": 7,
+          "Fri": 11,
+          "Tue": 9,
+          "Wed": 8,
+          "Mon": 6
+        }
+      },
+      "Tier_2_Normal": {
+        "trades": 313,
+        "wins": 17,
+        "losses": 296,
+        "win_rate": 5.4,
+        "total_pnl": -2313.1,
+        "avg_pnl": -7.39,
+        "avg_ar": 20.3,
+        "min_ar": 15.1,
+        "max_ar": 24.9,
+        "pct_of_total": 32.9,
+        "peak_hour": 8,
+        "peak_dow": "Fri",
+        "by_hour": {
+          "08:00": 313
+        },
+        "by_dow": {
+          "Fri": 73,
+          "Wed": 65,
+          "Thu": 62,
+          "Mon": 57,
+          "Tue": 56
+        }
+      },
+      "Tier_3_Expanded": {
+        "trades": 358,
+        "wins": 16,
+        "losses": 342,
+        "win_rate": 4.5,
+        "total_pnl": -4118.62,
+        "avg_pnl": -11.5,
+        "avg_ar": 31.6,
+        "min_ar": 25.0,
+        "max_ar": 39.8,
+        "pct_of_total": 37.6,
+        "peak_hour": 8,
+        "peak_dow": "Tue",
+        "by_hour": {
+          "08:00": 358
+        },
+        "by_dow": {
+          "Tue": 81,
+          "Wed": 72,
+          "Fri": 71,
+          "Mon": 80,
+          "Thu": 54
+        }
+      },
+      "Tier_4_Extreme": {
+        "trades": 240,
+        "wins": 15,
+        "losses": 225,
+        "win_rate": 6.2,
+        "total_pnl": -5705.9,
+        "avg_pnl": -23.77,
+        "avg_ar": 57.5,
+        "min_ar": 40.0,
+        "max_ar": 179.0,
+        "pct_of_total": 25.2,
+        "peak_hour": 8,
+        "peak_dow": "Thu",
+        "by_hour": {
+          "08:00": 240
+        },
+        "by_dow": {
+          "Thu": 65,
+          "Tue": 46,
+          "Wed": 45,
+          "Fri": 37,
+          "Mon": 47
+        }
+      }
+    },
+    "injection": {
+      "compression_to_expansion_events": [
+        {
+          "time": "2022-12-12T13:00:00+00:00",
+          "prev_ar": 24.9,
+          "curr_ar": 46.5,
+          "expansion_ratio": 1.9,
+          "tier": "Tier_4_Extreme",
+          "pnl": -1.5,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-01-26T13:00:00+00:00",
+          "prev_ar": 24.0,
+          "curr_ar": 36.1,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -24.2,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-02-02T13:00:00+00:00",
+          "prev_ar": 18.4,
+          "curr_ar": 40.0,
+          "expansion_ratio": 2.2,
+          "tier": "Tier_4_Extreme",
+          "pnl": -4.0,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-02-17T13:00:00+00:00",
+          "prev_ar": 20.2,
+          "curr_ar": 42.9,
+          "expansion_ratio": 2.1,
+          "tier": "Tier_4_Extreme",
+          "pnl": 0.3,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-03-09T13:00:00+00:00",
+          "prev_ar": 23.4,
+          "curr_ar": 33.9,
+          "expansion_ratio": 1.4,
+          "tier": "Tier_3_Expanded",
+          "pnl": -5.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-04-06T13:00:00+00:00",
+          "prev_ar": 19.2,
+          "curr_ar": 38.4,
+          "expansion_ratio": 2.0,
+          "tier": "Tier_3_Expanded",
+          "pnl": -17.9,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-04-11T13:00:00+00:00",
+          "prev_ar": 16.5,
+          "curr_ar": 44.3,
+          "expansion_ratio": 2.7,
+          "tier": "Tier_4_Extreme",
+          "pnl": -7.3,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-04-13T13:00:00+00:00",
+          "prev_ar": 17.6,
+          "curr_ar": 77.9,
+          "expansion_ratio": 4.4,
+          "tier": "Tier_4_Extreme",
+          "pnl": -6.7,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-04-17T13:00:00+00:00",
+          "prev_ar": 17.7,
+          "curr_ar": 29.3,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -21.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-04-24T13:00:00+00:00",
+          "prev_ar": 23.0,
+          "curr_ar": 43.4,
+          "expansion_ratio": 1.9,
+          "tier": "Tier_4_Extreme",
+          "pnl": -13.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-05-02T13:00:00+00:00",
+          "prev_ar": 21.9,
+          "curr_ar": 45.7,
+          "expansion_ratio": 2.1,
+          "tier": "Tier_4_Extreme",
+          "pnl": -5.6,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-05-11T13:00:00+00:00",
+          "prev_ar": 23.1,
+          "curr_ar": 48.8,
+          "expansion_ratio": 2.1,
+          "tier": "Tier_4_Extreme",
+          "pnl": -38.6,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-05-16T13:00:00+00:00",
+          "prev_ar": 20.3,
+          "curr_ar": 42.4,
+          "expansion_ratio": 2.1,
+          "tier": "Tier_4_Extreme",
+          "pnl": -9.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-05-26T13:00:00+00:00",
+          "prev_ar": 23.1,
+          "curr_ar": 36.0,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -11.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-05-30T13:00:00+00:00",
+          "prev_ar": 21.8,
+          "curr_ar": 59.5,
+          "expansion_ratio": 2.7,
+          "tier": "Tier_4_Extreme",
+          "pnl": 7.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-06-05T13:00:00+00:00",
+          "prev_ar": 23.9,
+          "curr_ar": 25.1,
+          "expansion_ratio": 1.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -11.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-06-19T13:00:00+00:00",
+          "prev_ar": 24.5,
+          "curr_ar": 36.9,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -1.7,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-06-29T13:00:00+00:00",
+          "prev_ar": 22.3,
+          "curr_ar": 28.0,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -2.7,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-07-10T13:00:00+00:00",
+          "prev_ar": 16.3,
+          "curr_ar": 28.9,
+          "expansion_ratio": 1.8,
+          "tier": "Tier_3_Expanded",
+          "pnl": -5.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-07-24T13:00:00+00:00",
+          "prev_ar": 23.2,
+          "curr_ar": 35.4,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -9.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-07-26T13:00:00+00:00",
+          "prev_ar": 21.2,
+          "curr_ar": 39.7,
+          "expansion_ratio": 1.9,
+          "tier": "Tier_3_Expanded",
+          "pnl": 0.7,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-08-15T13:00:00+00:00",
+          "prev_ar": 21.7,
+          "curr_ar": 38.8,
+          "expansion_ratio": 1.8,
+          "tier": "Tier_3_Expanded",
+          "pnl": -9.3,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-08-18T13:00:00+00:00",
+          "prev_ar": 20.3,
+          "curr_ar": 30.6,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -21.9,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-08-23T13:00:00+00:00",
+          "prev_ar": 17.2,
+          "curr_ar": 36.0,
+          "expansion_ratio": 2.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -30.6,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-08-28T13:00:00+00:00",
+          "prev_ar": 17.9,
+          "curr_ar": 26.6,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -20.7,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-08-31T13:00:00+00:00",
+          "prev_ar": 19.1,
+          "curr_ar": 42.0,
+          "expansion_ratio": 2.2,
+          "tier": "Tier_4_Extreme",
+          "pnl": -38.7,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-09-05T13:00:00+00:00",
+          "prev_ar": 19.4,
+          "curr_ar": 31.7,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -2.0,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-09-08T13:00:00+00:00",
+          "prev_ar": 13.2,
+          "curr_ar": 26.3,
+          "expansion_ratio": 2.0,
+          "tier": "Tier_3_Expanded",
+          "pnl": -23.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-09-19T13:00:00+00:00",
+          "prev_ar": 19.0,
+          "curr_ar": 35.1,
+          "expansion_ratio": 1.8,
+          "tier": "Tier_3_Expanded",
+          "pnl": -20.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-09-21T13:00:00+00:00",
+          "prev_ar": 19.6,
+          "curr_ar": 92.9,
+          "expansion_ratio": 4.7,
+          "tier": "Tier_4_Extreme",
+          "pnl": -83.3,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-09-28T13:00:00+00:00",
+          "prev_ar": 22.8,
+          "curr_ar": 47.0,
+          "expansion_ratio": 2.1,
+          "tier": "Tier_4_Extreme",
+          "pnl": -0.7,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-10-16T13:00:00+00:00",
+          "prev_ar": 24.9,
+          "curr_ar": 31.4,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -19.5,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-10-18T13:00:00+00:00",
+          "prev_ar": 23.2,
+          "curr_ar": 27.3,
+          "expansion_ratio": 1.2,
+          "tier": "Tier_3_Expanded",
+          "pnl": -9.8,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-10-27T13:00:00+00:00",
+          "prev_ar": 21.3,
+          "curr_ar": 28.6,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -15.8,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-11-02T13:00:00+00:00",
+          "prev_ar": 17.0,
+          "curr_ar": 30.5,
+          "expansion_ratio": 1.8,
+          "tier": "Tier_3_Expanded",
+          "pnl": -5.6,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-11-10T13:00:00+00:00",
+          "prev_ar": 18.3,
+          "curr_ar": 43.8,
+          "expansion_ratio": 2.4,
+          "tier": "Tier_4_Extreme",
+          "pnl": -6.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-11-15T13:00:00+00:00",
+          "prev_ar": 18.4,
+          "curr_ar": 25.6,
+          "expansion_ratio": 1.4,
+          "tier": "Tier_3_Expanded",
+          "pnl": -14.8,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-11-17T13:00:00+00:00",
+          "prev_ar": 17.5,
+          "curr_ar": 27.5,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -1.7,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-11-22T13:00:00+00:00",
+          "prev_ar": 18.8,
+          "curr_ar": 31.3,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -10.2,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-11-27T13:00:00+00:00",
+          "prev_ar": 16.5,
+          "curr_ar": 27.2,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -1.6,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-11-30T13:00:00+00:00",
+          "prev_ar": 24.8,
+          "curr_ar": 40.3,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_4_Extreme",
+          "pnl": -33.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-12-04T13:00:00+00:00",
+          "prev_ar": 18.4,
+          "curr_ar": 53.3,
+          "expansion_ratio": 2.9,
+          "tier": "Tier_4_Extreme",
+          "pnl": -27.9,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-12-07T13:00:00+00:00",
+          "prev_ar": 21.7,
+          "curr_ar": 32.0,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -0.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-12-12T13:00:00+00:00",
+          "prev_ar": 20.1,
+          "curr_ar": 27.0,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -10.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-12-14T13:00:00+00:00",
+          "prev_ar": 17.5,
+          "curr_ar": 55.4,
+          "expansion_ratio": 3.2,
+          "tier": "Tier_4_Extreme",
+          "pnl": -26.9,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-12-22T13:00:00+00:00",
+          "prev_ar": 19.2,
+          "curr_ar": 38.1,
+          "expansion_ratio": 2.0,
+          "tier": "Tier_3_Expanded",
+          "pnl": -8.6,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-01-11T13:00:00+00:00",
+          "prev_ar": 22.8,
+          "curr_ar": 28.8,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -4.7,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-01-22T13:00:00+00:00",
+          "prev_ar": 16.9,
+          "curr_ar": 25.7,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -18.2,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-01-26T13:00:00+00:00",
+          "prev_ar": 21.8,
+          "curr_ar": 54.4,
+          "expansion_ratio": 2.5,
+          "tier": "Tier_4_Extreme",
+          "pnl": 3.3,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-02-05T13:00:00+00:00",
+          "prev_ar": 20.8,
+          "curr_ar": 34.6,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -26.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-02-12T13:00:00+00:00",
+          "prev_ar": 22.6,
+          "curr_ar": 32.7,
+          "expansion_ratio": 1.4,
+          "tier": "Tier_3_Expanded",
+          "pnl": -23.7,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-02-20T13:00:00+00:00",
+          "prev_ar": 15.7,
+          "curr_ar": 32.3,
+          "expansion_ratio": 2.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -8.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-02-22T13:00:00+00:00",
+          "prev_ar": 21.7,
+          "curr_ar": 42.3,
+          "expansion_ratio": 1.9,
+          "tier": "Tier_4_Extreme",
+          "pnl": -33.8,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-03-01T13:00:00+00:00",
+          "prev_ar": 24.0,
+          "curr_ar": 27.3,
+          "expansion_ratio": 1.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -11.5,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-03-19T13:00:00+00:00",
+          "prev_ar": 10.5,
+          "curr_ar": 28.6,
+          "expansion_ratio": 2.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -11.8,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-03-27T13:00:00+00:00",
+          "prev_ar": 22.0,
+          "curr_ar": 27.3,
+          "expansion_ratio": 1.2,
+          "tier": "Tier_3_Expanded",
+          "pnl": -15.5,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-04-02T13:00:00+00:00",
+          "prev_ar": 15.5,
+          "curr_ar": 30.5,
+          "expansion_ratio": 2.0,
+          "tier": "Tier_3_Expanded",
+          "pnl": -22.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-04-04T13:00:00+00:00",
+          "prev_ar": 16.3,
+          "curr_ar": 47.9,
+          "expansion_ratio": 2.9,
+          "tier": "Tier_4_Extreme",
+          "pnl": -36.9,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-04-12T13:00:00+00:00",
+          "prev_ar": 23.7,
+          "curr_ar": 27.0,
+          "expansion_ratio": 1.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -1.2,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-04-17T13:00:00+00:00",
+          "prev_ar": 24.7,
+          "curr_ar": 39.0,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -20.3,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-04-19T13:00:00+00:00",
+          "prev_ar": 21.0,
+          "curr_ar": 25.0,
+          "expansion_ratio": 1.2,
+          "tier": "Tier_3_Expanded",
+          "pnl": -16.7,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-04-23T13:00:00+00:00",
+          "prev_ar": 23.9,
+          "curr_ar": 31.3,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -18.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-05-02T13:00:00+00:00",
+          "prev_ar": 20.6,
+          "curr_ar": 72.2,
+          "expansion_ratio": 3.5,
+          "tier": "Tier_4_Extreme",
+          "pnl": -28.6,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-05-07T13:00:00+00:00",
+          "prev_ar": 21.5,
+          "curr_ar": 26.1,
+          "expansion_ratio": 1.2,
+          "tier": "Tier_3_Expanded",
+          "pnl": -4.4,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-05-17T13:00:00+00:00",
+          "prev_ar": 24.4,
+          "curr_ar": 34.1,
+          "expansion_ratio": 1.4,
+          "tier": "Tier_3_Expanded",
+          "pnl": -25.7,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-05-22T13:00:00+00:00",
+          "prev_ar": 24.2,
+          "curr_ar": 27.4,
+          "expansion_ratio": 1.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -0.4,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-05-30T13:00:00+00:00",
+          "prev_ar": 14.5,
+          "curr_ar": 71.1,
+          "expansion_ratio": 4.9,
+          "tier": "Tier_4_Extreme",
+          "pnl": -9.0,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-06-06T13:00:00+00:00",
+          "prev_ar": 23.4,
+          "curr_ar": 25.9,
+          "expansion_ratio": 1.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -10.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-06-14T13:00:00+00:00",
+          "prev_ar": 12.2,
+          "curr_ar": 35.9,
+          "expansion_ratio": 2.9,
+          "tier": "Tier_3_Expanded",
+          "pnl": -31.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-06-18T13:00:00+00:00",
+          "prev_ar": 21.2,
+          "curr_ar": 26.7,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -1.2,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-06-20T13:00:00+00:00",
+          "prev_ar": 17.9,
+          "curr_ar": 79.5,
+          "expansion_ratio": 4.4,
+          "tier": "Tier_4_Extreme",
+          "pnl": -62.0,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-06-25T13:00:00+00:00",
+          "prev_ar": 15.4,
+          "curr_ar": 25.5,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -18.0,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-07-01T13:00:00+00:00",
+          "prev_ar": 16.1,
+          "curr_ar": 26.1,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": 0.2,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-07-04T13:00:00+00:00",
+          "prev_ar": 23.9,
+          "curr_ar": 39.2,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -5.8,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-07-15T13:00:00+00:00",
+          "prev_ar": 12.2,
+          "curr_ar": 25.8,
+          "expansion_ratio": 2.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -3.0,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-07-17T13:00:00+00:00",
+          "prev_ar": 13.9,
+          "curr_ar": 69.3,
+          "expansion_ratio": 5.0,
+          "tier": "Tier_4_Extreme",
+          "pnl": -1.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-07-24T13:00:00+00:00",
+          "prev_ar": 20.3,
+          "curr_ar": 44.0,
+          "expansion_ratio": 2.2,
+          "tier": "Tier_4_Extreme",
+          "pnl": 1.0,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-07-31T13:00:00+00:00",
+          "prev_ar": 21.8,
+          "curr_ar": 28.3,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -6.2,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-08-02T13:00:00+00:00",
+          "prev_ar": 21.1,
+          "curr_ar": 26.5,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -1.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-08-12T13:00:00+00:00",
+          "prev_ar": 24.4,
+          "curr_ar": 32.7,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -18.2,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-08-14T13:00:00+00:00",
+          "prev_ar": 20.7,
+          "curr_ar": 34.4,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -7.0,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-08-16T13:00:00+00:00",
+          "prev_ar": 22.8,
+          "curr_ar": 33.3,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -3.5,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-08-28T13:00:00+00:00",
+          "prev_ar": 23.5,
+          "curr_ar": 25.2,
+          "expansion_ratio": 1.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -4.3,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-09-03T13:00:00+00:00",
+          "prev_ar": 19.9,
+          "curr_ar": 29.0,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -14.8,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-09-06T13:00:00+00:00",
+          "prev_ar": 18.2,
+          "curr_ar": 25.1,
+          "expansion_ratio": 1.4,
+          "tier": "Tier_3_Expanded",
+          "pnl": -14.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-09-11T13:00:00+00:00",
+          "prev_ar": 10.8,
+          "curr_ar": 39.0,
+          "expansion_ratio": 3.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": 1.8,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-09-18T13:00:00+00:00",
+          "prev_ar": 17.0,
+          "curr_ar": 33.7,
+          "expansion_ratio": 2.0,
+          "tier": "Tier_3_Expanded",
+          "pnl": -5.0,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-09-25T13:00:00+00:00",
+          "prev_ar": 21.4,
+          "curr_ar": 71.3,
+          "expansion_ratio": 3.3,
+          "tier": "Tier_4_Extreme",
+          "pnl": -3.0,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-10-03T13:00:00+00:00",
+          "prev_ar": 20.8,
+          "curr_ar": 43.6,
+          "expansion_ratio": 2.1,
+          "tier": "Tier_4_Extreme",
+          "pnl": -20.0,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-10-08T13:00:00+00:00",
+          "prev_ar": 19.8,
+          "curr_ar": 29.6,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -24.6,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-10-15T13:00:00+00:00",
+          "prev_ar": 21.8,
+          "curr_ar": 29.0,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -2.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-10-17T13:00:00+00:00",
+          "prev_ar": 15.1,
+          "curr_ar": 25.7,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -2.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-10-28T13:00:00+00:00",
+          "prev_ar": 21.7,
+          "curr_ar": 30.0,
+          "expansion_ratio": 1.4,
+          "tier": "Tier_3_Expanded",
+          "pnl": -0.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-11-01T13:00:00+00:00",
+          "prev_ar": 16.9,
+          "curr_ar": 54.7,
+          "expansion_ratio": 3.2,
+          "tier": "Tier_4_Extreme",
+          "pnl": -43.5,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-11-14T13:00:00+00:00",
+          "prev_ar": 19.0,
+          "curr_ar": 42.1,
+          "expansion_ratio": 2.2,
+          "tier": "Tier_4_Extreme",
+          "pnl": -42.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-11-20T13:00:00+00:00",
+          "prev_ar": 20.8,
+          "curr_ar": 29.9,
+          "expansion_ratio": 1.4,
+          "tier": "Tier_3_Expanded",
+          "pnl": -4.0,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-11-22T13:00:00+00:00",
+          "prev_ar": 22.3,
+          "curr_ar": 58.9,
+          "expansion_ratio": 2.6,
+          "tier": "Tier_4_Extreme",
+          "pnl": -35.2,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-12-02T13:00:00+00:00",
+          "prev_ar": 24.3,
+          "curr_ar": 27.7,
+          "expansion_ratio": 1.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -21.2,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-12-10T13:00:00+00:00",
+          "prev_ar": 17.8,
+          "curr_ar": 36.8,
+          "expansion_ratio": 2.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -32.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-12-12T13:00:00+00:00",
+          "prev_ar": 21.0,
+          "curr_ar": 78.1,
+          "expansion_ratio": 3.7,
+          "tier": "Tier_4_Extreme",
+          "pnl": -53.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        }
+      ],
+      "total_injection_events": 176,
+      "trade_clusters": [],
+      "total_clusters": 0,
+      "hour_injection_profile": {
+        "08:00": {
+          "avg_ar": 33.6,
+          "max_ar": 179.0,
+          "trades": 952,
+          "injection_score": 3201.4
+        }
+      }
+    },
+    "monte_carlo": {
+      "iterations": 10000,
+      "prob_profit": 0.0,
+      "prob_20_dd_pct": 100.0,
+      "prob_50_dd_pct": 100.0,
+      "mean_pnl": -12287.28,
+      "median_pnl": -12276.11,
+      "std_pnl": 460.45,
+      "p1_pnl": -13397.42,
+      "p5_pnl": -13050.74,
+      "p25_pnl": -12601.14,
+      "p75_pnl": -11973.5,
+      "p95_pnl": -11536.2,
+      "p99_pnl": -11255.62,
+      "mean_max_dd": 12287.49,
+      "median_max_dd": 12276.34,
+      "p95_max_dd": 13051.52,
+      "p99_max_dd": 13398.04,
+      "all_profitable": false,
+      "sharpe_approx": -26.69
+    }
+  },
+  "CHFJPY.PRO": {
+    "basic": {
+      "symbol": "CHFJPY.PRO",
+      "total_trades": 952,
+      "wins": 44,
+      "losses": 908,
+      "win_rate": 4.6,
+      "total_pnl": -33854.96,
+      "avg_win": 3.64,
+      "avg_loss": -37.46,
+      "max_win": 23.9,
+      "max_loss": -297.4,
+      "expectancy": -35.56,
+      "profit_factor": 0.0,
+      "max_drawdown": 33854.96,
+      "start_date": "2022-09-13",
+      "end_date": "2026-05-18",
+      "trading_days": 1343,
+      "avg_trades_per_day": 0.709,
+      "avg_trades_per_week": 5.0,
+      "avg_trades_per_month": 21.6,
+      "by_year": {
+        "2022": {
+          "trades": 78,
+          "wins": 3,
+          "win_rate": 3.8,
+          "pnl": -3164.3
+        },
+        "2023": {
+          "trades": 259,
+          "wins": 9,
+          "win_rate": 3.5,
+          "pnl": -9291.74
+        },
+        "2024": {
+          "trades": 260,
+          "wins": 11,
+          "win_rate": 4.2,
+          "pnl": -9374.72
+        },
+        "2025": {
+          "trades": 258,
+          "wins": 16,
+          "win_rate": 6.2,
+          "pnl": -8597.1
+        },
+        "2026": {
+          "trades": 97,
+          "wins": 5,
+          "win_rate": 5.2,
+          "pnl": -3427.1
+        }
+      }
+    },
+    "by_hour": {
+      "08:00": {
+        "trades": 952,
+        "wins": 44,
+        "win_rate": 4.6,
+        "total_pnl": -33854.96,
+        "avg_pnl": -35.56,
+        "avg_ar": 74.5
+      }
+    },
+    "by_dow": {
+      "Mon": {
+        "trades": 189,
+        "wins": 14,
+        "win_rate": 7.4,
+        "total_pnl": -6431.3,
+        "avg_pnl": -34.03
+      },
+      "Tue": {
+        "trades": 192,
+        "wins": 5,
+        "win_rate": 2.6,
+        "total_pnl": -6694.32,
+        "avg_pnl": -34.87
+      },
+      "Wed": {
+        "trades": 189,
+        "wins": 7,
+        "win_rate": 3.7,
+        "total_pnl": -6160.94,
+        "avg_pnl": -32.6
+      },
+      "Thu": {
+        "trades": 190,
+        "wins": 9,
+        "win_rate": 4.7,
+        "total_pnl": -7514.2,
+        "avg_pnl": -39.55
+      },
+      "Fri": {
+        "trades": 192,
+        "wins": 9,
+        "win_rate": 4.7,
+        "total_pnl": -7054.2,
+        "avg_pnl": -36.74
+      }
+    },
+    "tiers": {
+      "Tier_2_Normal": {
+        "trades": 11,
+        "wins": 2,
+        "losses": 9,
+        "win_rate": 18.2,
+        "total_pnl": -194.34,
+        "avg_pnl": -17.67,
+        "avg_ar": 22.5,
+        "min_ar": 17.4,
+        "max_ar": 24.3,
+        "pct_of_total": 1.2,
+        "peak_hour": 8,
+        "peak_dow": "Fri",
+        "by_hour": {
+          "08:00": 11
+        },
+        "by_dow": {
+          "Fri": 4,
+          "Wed": 2,
+          "Mon": 3,
+          "Thu": 2
+        }
+      },
+      "Tier_3_Expanded": {
+        "trades": 92,
+        "wins": 3,
+        "losses": 89,
+        "win_rate": 3.3,
+        "total_pnl": -1493.72,
+        "avg_pnl": -16.24,
+        "avg_ar": 34.0,
+        "min_ar": 25.1,
+        "max_ar": 39.9,
+        "pct_of_total": 9.7,
+        "peak_hour": 8,
+        "peak_dow": "Wed",
+        "by_hour": {
+          "08:00": 92
+        },
+        "by_dow": {
+          "Thu": 18,
+          "Tue": 17,
+          "Mon": 20,
+          "Wed": 22,
+          "Fri": 15
+        }
+      },
+      "Tier_4_Extreme": {
+        "trades": 849,
+        "wins": 39,
+        "losses": 810,
+        "win_rate": 4.6,
+        "total_pnl": -32166.9,
+        "avg_pnl": -37.89,
+        "avg_ar": 79.5,
+        "min_ar": 40.0,
+        "max_ar": 720.9,
+        "pct_of_total": 89.2,
+        "peak_hour": 8,
+        "peak_dow": "Tue",
+        "by_hour": {
+          "08:00": 849
+        },
+        "by_dow": {
+          "Tue": 175,
+          "Wed": 165,
+          "Thu": 170,
+          "Fri": 173,
+          "Mon": 166
+        }
+      }
+    },
+    "injection": {
+      "compression_to_expansion_events": [
+        {
+          "time": "2023-05-22T13:00:00+00:00",
+          "prev_ar": 23.6,
+          "curr_ar": 82.8,
+          "expansion_ratio": 3.5,
+          "tier": "Tier_4_Extreme",
+          "pnl": 0.8,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-11-09T13:00:00+00:00",
+          "prev_ar": 22.7,
+          "curr_ar": 38.6,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -21.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-02-19T13:00:00+00:00",
+          "prev_ar": 20.8,
+          "curr_ar": 26.4,
+          "expansion_ratio": 1.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -20.9,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-02-26T13:00:00+00:00",
+          "prev_ar": 21.3,
+          "curr_ar": 66.7,
+          "expansion_ratio": 3.1,
+          "tier": "Tier_4_Extreme",
+          "pnl": -62.4,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-05-27T13:00:00+00:00",
+          "prev_ar": 24.1,
+          "curr_ar": 39.9,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -2.1,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-06-25T13:00:00+00:00",
+          "prev_ar": 24.0,
+          "curr_ar": 41.6,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_4_Extreme",
+          "pnl": -9.3,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-06-28T13:00:00+00:00",
+          "prev_ar": 22.0,
+          "curr_ar": 51.2,
+          "expansion_ratio": 2.3,
+          "tier": "Tier_4_Extreme",
+          "pnl": -18.3,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-07-12T13:00:00+00:00",
+          "prev_ar": 17.4,
+          "curr_ar": 47.2,
+          "expansion_ratio": 2.7,
+          "tier": "Tier_4_Extreme",
+          "pnl": -30.2,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-09-16T13:00:00+00:00",
+          "prev_ar": 24.3,
+          "curr_ar": 61.2,
+          "expansion_ratio": 2.5,
+          "tier": "Tier_4_Extreme",
+          "pnl": -62.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-09-23T13:00:00+00:00",
+          "prev_ar": 24.2,
+          "curr_ar": 36.0,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -8.9,
+          "direction": "SHORT",
+          "est_hour": 8
+        }
+      ],
+      "total_injection_events": 10,
+      "trade_clusters": [],
+      "total_clusters": 0,
+      "hour_injection_profile": {
+        "08:00": {
+          "avg_ar": 74.5,
+          "max_ar": 720.9,
+          "trades": 952,
+          "injection_score": 7087.9
+        }
+      }
+    },
+    "monte_carlo": {
+      "iterations": 10000,
+      "prob_profit": 0.0,
+      "prob_20_dd_pct": 100.0,
+      "prob_50_dd_pct": 100.0,
+      "mean_pnl": -33863.63,
+      "median_pnl": -33848.19,
+      "std_pnl": 1059.47,
+      "p1_pnl": -36423.58,
+      "p5_pnl": -35616.48,
+      "p25_pnl": -34572.66,
+      "p75_pnl": -33139.48,
+      "p95_pnl": -32161.0,
+      "p99_pnl": -31413.86,
+      "mean_max_dd": 33864.0,
+      "median_max_dd": 33848.19,
+      "p95_max_dd": 35618.16,
+      "p99_max_dd": 36427.54,
+      "all_profitable": false,
+      "sharpe_approx": -31.96
+    }
+  },
+  "XAUUSD.PRO": {
+    "basic": {
+      "symbol": "XAUUSD.PRO",
+      "total_trades": 1104,
+      "wins": 110,
+      "losses": 994,
+      "win_rate": 10.0,
+      "total_pnl": -7280.99,
+      "avg_win": 1.33,
+      "avg_loss": -7.47,
+      "max_win": 12.05,
+      "max_loss": -312.98,
+      "expectancy": -6.6,
+      "profit_factor": 0.02,
+      "max_drawdown": 7280.99,
+      "start_date": "2022-01-19",
+      "end_date": "2026-05-18",
+      "trading_days": 1579,
+      "avg_trades_per_day": 0.699,
+      "avg_trades_per_week": 4.9,
+      "avg_trades_per_month": 21.3,
+      "by_year": {
+        "2022": {
+          "trades": 245,
+          "wins": 26,
+          "win_rate": 10.6,
+          "pnl": -606.45
+        },
+        "2023": {
+          "trades": 248,
+          "wins": 52,
+          "win_rate": 21.0,
+          "pnl": -501.99
+        },
+        "2024": {
+          "trades": 257,
+          "wins": 23,
+          "win_rate": 8.9,
+          "pnl": -814.85
+        },
+        "2025": {
+          "trades": 258,
+          "wins": 6,
+          "win_rate": 2.3,
+          "pnl": -2650.78
+        },
+        "2026": {
+          "trades": 96,
+          "wins": 3,
+          "win_rate": 3.1,
+          "pnl": -2706.92
+        }
+      }
+    },
+    "by_hour": {
+      "08:00": {
+        "trades": 1024,
+        "wins": 63,
+        "win_rate": 6.2,
+        "total_pnl": -7247.26,
+        "avg_pnl": -7.08,
+        "avg_ar": 20.8
+      },
+      "09:00": {
+        "trades": 33,
+        "wins": 15,
+        "win_rate": 45.5,
+        "total_pnl": -21.55,
+        "avg_pnl": -0.65,
+        "avg_ar": 6.1
+      },
+      "10:00": {
+        "trades": 47,
+        "wins": 32,
+        "win_rate": 68.1,
+        "total_pnl": -12.18,
+        "avg_pnl": -0.26,
+        "avg_ar": 5.5
+      }
+    },
+    "by_dow": {
+      "Mon": {
+        "trades": 219,
+        "wins": 22,
+        "win_rate": 10.0,
+        "total_pnl": -1701.52,
+        "avg_pnl": -7.77
+      },
+      "Tue": {
+        "trades": 225,
+        "wins": 14,
+        "win_rate": 6.2,
+        "total_pnl": -1562.26,
+        "avg_pnl": -6.94
+      },
+      "Wed": {
+        "trades": 220,
+        "wins": 23,
+        "win_rate": 10.5,
+        "total_pnl": -1429.48,
+        "avg_pnl": -6.5
+      },
+      "Thu": {
+        "trades": 223,
+        "wins": 27,
+        "win_rate": 12.1,
+        "total_pnl": -1376.63,
+        "avg_pnl": -6.17
+      },
+      "Fri": {
+        "trades": 217,
+        "wins": 24,
+        "win_rate": 11.1,
+        "total_pnl": -1211.1,
+        "avg_pnl": -5.58
+      }
+    },
+    "tiers": {
+      "Tier_1_Compressed": {
+        "trades": 640,
+        "wins": 95,
+        "losses": 545,
+        "win_rate": 14.8,
+        "total_pnl": -1295.39,
+        "avg_pnl": -2.02,
+        "avg_ar": 9.5,
+        "min_ar": 3.4,
+        "max_ar": 14.9,
+        "pct_of_total": 58.0,
+        "peak_hour": 8,
+        "peak_dow": "Fri",
+        "by_hour": {
+          "08:00": 560,
+          "09:00": 33,
+          "10:00": 47
+        },
+        "by_dow": {
+          "Wed": 121,
+          "Thu": 130,
+          "Fri": 137,
+          "Mon": 122,
+          "Tue": 130
+        }
+      },
+      "Tier_2_Normal": {
+        "trades": 248,
+        "wins": 7,
+        "losses": 241,
+        "win_rate": 2.8,
+        "total_pnl": -1344.2,
+        "avg_pnl": -5.42,
+        "avg_ar": 18.9,
+        "min_ar": 15.0,
+        "max_ar": 24.8,
+        "pct_of_total": 22.5,
+        "peak_hour": 8,
+        "peak_dow": "Wed",
+        "by_hour": {
+          "08:00": 248
+        },
+        "by_dow": {
+          "Thu": 48,
+          "Tue": 45,
+          "Mon": 50,
+          "Wed": 58,
+          "Fri": 47
+        }
+      },
+      "Tier_3_Expanded": {
+        "trades": 111,
+        "wins": 3,
+        "losses": 108,
+        "win_rate": 2.7,
+        "total_pnl": -1210.21,
+        "avg_pnl": -10.9,
+        "avg_ar": 31.8,
+        "min_ar": 25.0,
+        "max_ar": 39.7,
+        "pct_of_total": 10.1,
+        "peak_hour": 8,
+        "peak_dow": "Thu",
+        "by_hour": {
+          "08:00": 111
+        },
+        "by_dow": {
+          "Tue": 27,
+          "Wed": 18,
+          "Mon": 26,
+          "Thu": 28,
+          "Fri": 12
+        }
+      },
+      "Tier_4_Extreme": {
+        "trades": 105,
+        "wins": 5,
+        "losses": 100,
+        "win_rate": 4.8,
+        "total_pnl": -3431.19,
+        "avg_pnl": -32.68,
+        "avg_ar": 71.5,
+        "min_ar": 40.2,
+        "max_ar": 332.6,
+        "pct_of_total": 9.5,
+        "peak_hour": 8,
+        "peak_dow": "Wed",
+        "by_hour": {
+          "08:00": 105
+        },
+        "by_dow": {
+          "Thu": 17,
+          "Wed": 23,
+          "Fri": 21,
+          "Tue": 23,
+          "Mon": 21
+        }
+      }
+    },
+    "injection": {
+      "compression_to_expansion_events": [
+        {
+          "time": "2022-02-15T13:00:00+00:00",
+          "prev_ar": 7.7,
+          "curr_ar": 27.0,
+          "expansion_ratio": 3.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -2.66,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2022-02-24T13:00:00+00:00",
+          "prev_ar": 8.8,
+          "curr_ar": 40.7,
+          "expansion_ratio": 4.6,
+          "tier": "Tier_4_Extreme",
+          "pnl": -5.23,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2022-03-02T13:00:00+00:00",
+          "prev_ar": 20.7,
+          "curr_ar": 34.1,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -14.84,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2022-03-07T13:00:00+00:00",
+          "prev_ar": 13.9,
+          "curr_ar": 26.5,
+          "expansion_ratio": 1.9,
+          "tier": "Tier_3_Expanded",
+          "pnl": -1.1,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-03-20T13:00:00+00:00",
+          "prev_ar": 7.1,
+          "curr_ar": 36.8,
+          "expansion_ratio": 5.2,
+          "tier": "Tier_3_Expanded",
+          "pnl": -13.12,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-04-19T13:00:00+00:00",
+          "prev_ar": 8.7,
+          "curr_ar": 31.7,
+          "expansion_ratio": 3.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -2.79,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2023-12-04T13:00:00+00:00",
+          "prev_ar": 10.6,
+          "curr_ar": 32.7,
+          "expansion_ratio": 3.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -10.31,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-03-26T13:00:00+00:00",
+          "prev_ar": 8.2,
+          "curr_ar": 25.6,
+          "expansion_ratio": 3.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -3.68,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-04-16T13:00:00+00:00",
+          "prev_ar": 17.8,
+          "curr_ar": 26.0,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -9.52,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-06-04T13:00:00+00:00",
+          "prev_ar": 14.2,
+          "curr_ar": 25.1,
+          "expansion_ratio": 1.8,
+          "tier": "Tier_3_Expanded",
+          "pnl": -4.59,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-06-07T13:00:00+00:00",
+          "prev_ar": 12.9,
+          "curr_ar": 50.3,
+          "expansion_ratio": 3.9,
+          "tier": "Tier_4_Extreme",
+          "pnl": 1.66,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-08-05T13:00:00+00:00",
+          "prev_ar": 14.2,
+          "curr_ar": 39.4,
+          "expansion_ratio": 2.8,
+          "tier": "Tier_3_Expanded",
+          "pnl": -5.12,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-08-20T13:00:00+00:00",
+          "prev_ar": 8.4,
+          "curr_ar": 27.9,
+          "expansion_ratio": 3.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -2.51,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-09-19T13:00:00+00:00",
+          "prev_ar": 10.7,
+          "curr_ar": 35.3,
+          "expansion_ratio": 3.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -3.83,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-11-06T13:00:00+00:00",
+          "prev_ar": 13.2,
+          "curr_ar": 42.2,
+          "expansion_ratio": 3.2,
+          "tier": "Tier_4_Extreme",
+          "pnl": -20.57,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-11-12T13:00:00+00:00",
+          "prev_ar": 14.3,
+          "curr_ar": 28.5,
+          "expansion_ratio": 2.0,
+          "tier": "Tier_3_Expanded",
+          "pnl": -7.11,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-11-14T13:00:00+00:00",
+          "prev_ar": 10.7,
+          "curr_ar": 28.4,
+          "expansion_ratio": 2.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -9.28,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-11-22T13:00:00+00:00",
+          "prev_ar": 17.0,
+          "curr_ar": 25.5,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": 0.46,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-12-11T13:00:00+00:00",
+          "prev_ar": 15.6,
+          "curr_ar": 25.2,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -18.99,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2024-12-13T13:00:00+00:00",
+          "prev_ar": 10.6,
+          "curr_ar": 25.4,
+          "expansion_ratio": 2.4,
+          "tier": "Tier_3_Expanded",
+          "pnl": -3.46,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-02-10T13:00:00+00:00",
+          "prev_ar": 11.8,
+          "curr_ar": 30.2,
+          "expansion_ratio": 2.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -2.53,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-03-04T13:00:00+00:00",
+          "prev_ar": 14.7,
+          "curr_ar": 36.8,
+          "expansion_ratio": 2.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -31.65,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-03-06T13:00:00+00:00",
+          "prev_ar": 13.6,
+          "curr_ar": 31.7,
+          "expansion_ratio": 2.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -10.93,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-04-02T13:00:00+00:00",
+          "prev_ar": 24.8,
+          "curr_ar": 26.0,
+          "expansion_ratio": 1.0,
+          "tier": "Tier_3_Expanded",
+          "pnl": -3.75,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-04-16T13:00:00+00:00",
+          "prev_ar": 15.2,
+          "curr_ar": 48.6,
+          "expansion_ratio": 3.2,
+          "tier": "Tier_4_Extreme",
+          "pnl": -34.12,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-04-30T13:00:00+00:00",
+          "prev_ar": 19.7,
+          "curr_ar": 39.6,
+          "expansion_ratio": 2.0,
+          "tier": "Tier_3_Expanded",
+          "pnl": 0.41,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-05-05T13:00:00+00:00",
+          "prev_ar": 20.8,
+          "curr_ar": 55.4,
+          "expansion_ratio": 2.7,
+          "tier": "Tier_4_Extreme",
+          "pnl": 5.83,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-05-12T13:00:00+00:00",
+          "prev_ar": 24.1,
+          "curr_ar": 70.6,
+          "expansion_ratio": 2.9,
+          "tier": "Tier_4_Extreme",
+          "pnl": -5.39,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-05-15T13:00:00+00:00",
+          "prev_ar": 22.2,
+          "curr_ar": 50.9,
+          "expansion_ratio": 2.3,
+          "tier": "Tier_4_Extreme",
+          "pnl": -46.8,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-05-22T13:00:00+00:00",
+          "prev_ar": 22.3,
+          "curr_ar": 35.3,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -0.58,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-06-02T13:00:00+00:00",
+          "prev_ar": 17.5,
+          "curr_ar": 50.4,
+          "expansion_ratio": 2.9,
+          "tier": "Tier_4_Extreme",
+          "pnl": -40.63,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-06-05T13:00:00+00:00",
+          "prev_ar": 17.2,
+          "curr_ar": 30.2,
+          "expansion_ratio": 1.8,
+          "tier": "Tier_3_Expanded",
+          "pnl": -1.1,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-06-10T13:00:00+00:00",
+          "prev_ar": 19.4,
+          "curr_ar": 32.1,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -26.09,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-06-12T13:00:00+00:00",
+          "prev_ar": 17.1,
+          "curr_ar": 37.2,
+          "expansion_ratio": 2.2,
+          "tier": "Tier_3_Expanded",
+          "pnl": -24.88,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-06-19T13:00:00+00:00",
+          "prev_ar": 24.5,
+          "curr_ar": 27.8,
+          "expansion_ratio": 1.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -24.05,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-06-24T13:00:00+00:00",
+          "prev_ar": 22.0,
+          "curr_ar": 37.3,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -4.63,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-07-01T13:00:00+00:00",
+          "prev_ar": 19.8,
+          "curr_ar": 29.1,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -1.54,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-08-07T13:00:00+00:00",
+          "prev_ar": 20.6,
+          "curr_ar": 25.7,
+          "expansion_ratio": 1.2,
+          "tier": "Tier_3_Expanded",
+          "pnl": -4.57,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-08-11T13:00:00+00:00",
+          "prev_ar": 15.4,
+          "curr_ar": 27.2,
+          "expansion_ratio": 1.8,
+          "tier": "Tier_3_Expanded",
+          "pnl": -2.87,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-08-14T13:00:00+00:00",
+          "prev_ar": 21.0,
+          "curr_ar": 25.0,
+          "expansion_ratio": 1.2,
+          "tier": "Tier_3_Expanded",
+          "pnl": -14.64,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-09-02T13:00:00+00:00",
+          "prev_ar": 22.6,
+          "curr_ar": 28.2,
+          "expansion_ratio": 1.2,
+          "tier": "Tier_3_Expanded",
+          "pnl": -6.1,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-09-08T13:00:00+00:00",
+          "prev_ar": 16.3,
+          "curr_ar": 37.7,
+          "expansion_ratio": 2.3,
+          "tier": "Tier_3_Expanded",
+          "pnl": -2.04,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-09-18T13:00:00+00:00",
+          "prev_ar": 23.2,
+          "curr_ar": 39.1,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -1.0,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-09-22T13:00:00+00:00",
+          "prev_ar": 17.9,
+          "curr_ar": 36.7,
+          "expansion_ratio": 2.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -3.89,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-09-25T13:00:00+00:00",
+          "prev_ar": 16.1,
+          "curr_ar": 29.9,
+          "expansion_ratio": 1.9,
+          "tier": "Tier_3_Expanded",
+          "pnl": -3.85,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-09-29T13:00:00+00:00",
+          "prev_ar": 15.9,
+          "curr_ar": 27.4,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -16.76,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-10-06T13:00:00+00:00",
+          "prev_ar": 24.0,
+          "curr_ar": 27.5,
+          "expansion_ratio": 1.1,
+          "tier": "Tier_3_Expanded",
+          "pnl": -17.97,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-10-10T13:00:00+00:00",
+          "prev_ar": 21.1,
+          "curr_ar": 59.7,
+          "expansion_ratio": 2.8,
+          "tier": "Tier_4_Extreme",
+          "pnl": -47.73,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-11-10T13:00:00+00:00",
+          "prev_ar": 22.4,
+          "curr_ar": 36.3,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -31.41,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-11-12T13:00:00+00:00",
+          "prev_ar": 21.2,
+          "curr_ar": 34.8,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -28.11,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-11-28T13:00:00+00:00",
+          "prev_ar": 22.4,
+          "curr_ar": 33.5,
+          "expansion_ratio": 1.5,
+          "tier": "Tier_3_Expanded",
+          "pnl": -13.74,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-12-09T13:00:00+00:00",
+          "prev_ar": 17.9,
+          "curr_ar": 42.8,
+          "expansion_ratio": 2.4,
+          "tier": "Tier_4_Extreme",
+          "pnl": -32.91,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-12-12T13:00:00+00:00",
+          "prev_ar": 21.7,
+          "curr_ar": 64.8,
+          "expansion_ratio": 3.0,
+          "tier": "Tier_4_Extreme",
+          "pnl": 2.66,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-12-17T13:00:00+00:00",
+          "prev_ar": 20.8,
+          "curr_ar": 36.0,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -12.38,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2025-12-29T13:00:00+00:00",
+          "prev_ar": 17.6,
+          "curr_ar": 75.5,
+          "expansion_ratio": 4.3,
+          "tier": "Tier_4_Extreme",
+          "pnl": -15.8,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2026-01-12T13:00:00+00:00",
+          "prev_ar": 19.4,
+          "curr_ar": 33.2,
+          "expansion_ratio": 1.7,
+          "tier": "Tier_3_Expanded",
+          "pnl": -26.74,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2026-01-15T13:00:00+00:00",
+          "prev_ar": 21.6,
+          "curr_ar": 39.2,
+          "expansion_ratio": 1.8,
+          "tier": "Tier_3_Expanded",
+          "pnl": -0.34,
+          "direction": "LONG",
+          "est_hour": 8
+        },
+        {
+          "time": "2026-01-20T13:00:00+00:00",
+          "prev_ar": 17.7,
+          "curr_ar": 43.3,
+          "expansion_ratio": 2.4,
+          "tier": "Tier_4_Extreme",
+          "pnl": -32.07,
+          "direction": "SHORT",
+          "est_hour": 8
+        },
+        {
+          "time": "2026-04-23T13:00:00+00:00",
+          "prev_ar": 20.5,
+          "curr_ar": 32.6,
+          "expansion_ratio": 1.6,
+          "tier": "Tier_3_Expanded",
+          "pnl": -8.39,
+          "direction": "SHORT",
+          "est_hour": 8
+        }
+      ],
+      "total_injection_events": 59,
+      "trade_clusters": [],
+      "total_clusters": 0,
+      "hour_injection_profile": {
+        "08:00": {
+          "avg_ar": 20.8,
+          "max_ar": 332.6,
+          "trades": 1024,
+          "injection_score": 2133.3
+        },
+        "09:00": {
+          "avg_ar": 6.1,
+          "max_ar": 11.6,
+          "trades": 33,
+          "injection_score": 20.2
+        },
+        "10:00": {
+          "avg_ar": 5.5,
+          "max_ar": 8.1,
+          "trades": 47,
+          "injection_score": 25.8
+        }
+      }
+    },
+    "monte_carlo": {
+      "iterations": 10000,
+      "prob_profit": 0.0,
+      "prob_20_dd_pct": 100.0,
+      "prob_50_dd_pct": 100.0,
+      "mean_pnl": -7271.82,
+      "median_pnl": -7251.87,
+      "std_pnl": 519.77,
+      "p1_pnl": -8586.08,
+      "p5_pnl": -8158.9,
+      "p25_pnl": -7613.58,
+      "p75_pnl": -6912.47,
+      "p95_pnl": -6456.21,
+      "p99_pnl": -6158.22,
+      "mean_max_dd": 7272.28,
+      "median_max_dd": 7252.0,
+      "p95_max_dd": 8159.05,
+      "p99_max_dd": 8592.94,
+      "all_profitable": false,
+      "sharpe_approx": -13.99
+    }
+  },
+  "_cross_asset": {
+    "EURUSD.PRO_vs_USDCHF.PRO": {
+      "correlation": 0.082,
+      "common_days": 940,
+      "s1_avg_daily_pnl": -15.16,
+      "s2_avg_daily_pnl": -12.72
+    },
+    "EURUSD.PRO_vs_CHFJPY.PRO": {
+      "correlation": 0.153,
+      "common_days": 940,
+      "s1_avg_daily_pnl": -15.15,
+      "s2_avg_daily_pnl": -35.45
+    },
+    "EURUSD.PRO_vs_XAUUSD.PRO": {
+      "correlation": 0.046,
+      "common_days": 924,
+      "s1_avg_daily_pnl": -15.21,
+      "s2_avg_daily_pnl": -7.37
+    },
+    "USDCHF.PRO_vs_CHFJPY.PRO": {
+      "correlation": 0.067,
+      "common_days": 950,
+      "s1_avg_daily_pnl": -12.93,
+      "s2_avg_daily_pnl": -35.46
+    },
+    "USDCHF.PRO_vs_XAUUSD.PRO": {
+      "correlation": 0.018,
+      "common_days": 934,
+      "s1_avg_daily_pnl": -12.91,
+      "s2_avg_daily_pnl": -7.32
+    },
+    "CHFJPY.PRO_vs_XAUUSD.PRO": {
+      "correlation": 0.042,
+      "common_days": 935,
+      "s1_avg_daily_pnl": -35.74,
+      "s2_avg_daily_pnl": -7.31
+    }
+  }
+}

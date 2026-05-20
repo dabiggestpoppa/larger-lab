@@ -256,7 +256,52 @@
     "currentRoom": "farm-room",
     "status": "active",
     "createdAt": "2026-05-18T20:54:43.693Z",
-    "lastActive": "2026-05-18T20:54:43.819Z",
+    "lastActive": "2026-05-18T20:54:43.821Z",
+    "metadata": {}
+  },
+  "d9bd0bec": {
+    "id": "d9bd0bec",
+    "name": "test-agent",
+    "role": "tester",
+    "capabilities": [
+      "communicate",
+      "read_files",
+      "communicate"
+    ],
+    "currentRoom": "meditation-room",
+    "status": "meditating",
+    "createdAt": "2026-05-19T04:01:22.155Z",
+    "lastActive": "2026-05-19T04:01:22.155Z",
+    "metadata": {}
+  },
+  "52e03a18": {
+    "id": "52e03a18",
+    "name": "GDS",
+    "role": "GD",
+    "capabilities": [
+      "communicate",
+      "read_files",
+      "communicate"
+    ],
+    "currentRoom": "meditation-room",
+    "status": "meditating",
+    "createdAt": "2026-05-19T04:11:45.798Z",
+    "lastActive": "2026-05-19T04:11:45.798Z",
+    "metadata": {}
+  },
+  "c1834d7c": {
+    "id": "c1834d7c",
+    "name": "TestAgent2",
+    "role": "tester",
+    "capabilities": [
+      "communicate",
+      "read_files",
+      "communicate"
+    ],
+    "currentRoom": "meditation-room",
+    "status": "meditating",
+    "createdAt": "2026-05-19T17:57:16.850Z",
+    "lastActive": "2026-05-19T17:57:16.850Z",
     "metadata": {}
   }
 }

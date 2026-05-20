@@ -14,6 +14,16 @@ See `OPERATOR_RULES.md`. Key: Max 2 concurrent sub-agents. No unrestricted self-
 - When OWL sees work that needs doing, the FIRST thought is "who do I delegate this to?" not "let me do this myself"
 - **Only execute directly when MAD explicitly asks, or when no agent is available and the task is time-critical**
 
+### 🔄 Manager → Worker Pipeline (MANDATORY — Shaw Directive 2026-05-19)
+- OWL NEVER assigns a task to a single agent if it has >1 deliverable
+- For multi-deliverable tasks: OWL spawns Manager → Manager spawns Workers
+- One Worker = One Deliverable (one file, one page, one strategy)
+- Every worker MUST write checkpoint progress to a progress file (STARTED, STEP, FILE, DONE markers)
+- Manager NEVER executes — only plans, spawns, monitors, aggregates
+- Max 5 concurrent workers; batch if more needed
+- On failure: respawn with modified prompt, never the same prompt
+- Full templates: `sw-dev/RA_WORKFLOW_IMPLEMENTATION.md`
+
 ### 🧹 Terminal Cleanup Rule (MANDATORY)
 **After EVERY task completion, each agent MUST kill any terminals it spawned that are no longer actively needed.** This includes:
 - Test runner terminals (`python -m pytest ...`) — kill after tests complete

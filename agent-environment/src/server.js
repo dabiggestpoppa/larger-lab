@@ -237,6 +237,33 @@ app.get('/api/rooms/:id/messages', (req, res) => {
   res.json(result);
 });
 
+// ── FAM CHAT Endpoint (Global Cross-Room) ───────────────────────
+app.get('/api/fam-chat/messages', (req, res) => {
+  const limit = parseInt(req.query.limit) || 50;
+  const result = messageBus.getMessages('fam-chat', { limit });
+  res.json(result);
+});
+
+app.post('/api/fam-chat/messages', (req, res) => {
+  const { agentId, text, type = 'chat' } = req.body;
+  if (!agentId || typeof agentId !== 'string') return res.status(400).json({ success: false, error: 'agentId is required', code: 'INVALID_AGENT_ID' });
+  const textCheck = validateMessageText(text);
+  if (!textCheck.valid) return res.status(400).json({ success: false, error: textCheck.error, code: 'INVALID_TEXT' });
+  const typeCheck = validateMessageType(type);
+  if (!typeCheck.valid) return res.status(400).json({ success: false, error: typeCheck.error, code: 'INVALID_TYPE' });
+  const result = messageBus.postMessage('fam-chat', {
+    from: agentId,
+    type: typeCheck.value,
+    content: textCheck.value,
+    roomId: 'fam-chat',
+  });
+  if (!result.success) return res.status(400).json({ ...result, code: 'MESSAGE_FAILED' });
+  // Broadcast to all WS clients
+  broadcastGlobal({ event: 'fam-message', data: { ...result.message, content: escapeHtml(result.message.content), from: escapeHtml(result.message.from) }, roomId: 'fam-chat' });
+  worldEngine.recordMessage(agentId, null, 'fam-chat', 'fam');
+  res.status(201).json(result);
+});
+
 app.post('/api/rooms/:id/messages', (req, res) => {
   const { agentId, text, type = 'chat' } = req.body;
   if (!agentId || typeof agentId !== 'string') return res.status(400).json({ success: false, error: 'agentId is required', code: 'INVALID_AGENT_ID' });
@@ -342,6 +369,83 @@ app.get('/api/world', (req, res) => {
 app.get('/api/connections', (req, res) => {
   const activityTracker = require('./activity-tracker');
   res.json({ success: true, connections: activityTracker.getConnections() });
+});
+
+// ── Quant Lab Data Endpoints ────────────────────────────────────
+const fs = require('fs');
+
+app.get('/api/quant/strategies', (req, res) => {
+  try {
+    const resultsDir = path.resolve(__dirname, '..', '..', '..', 'quant-lab', 'results');
+    const strategies = [];
+    if (fs.existsSync(resultsDir)) {
+      const files = fs.readdirSync(resultsDir).filter(f => f.endsWith('.json'));
+      for (const file of files.slice(0, 20)) {
+        try {
+          const data = JSON.parse(fs.readFileSync(path.join(resultsDir, file), 'utf-8'));
+          // Handle both flat and nested formats
+          if (data.strategy || data.name) {
+            strategies.push({
+              name: data.strategy || data.name || file.replace('.json', ''),
+              file: file,
+              wr: data.win_rate || data.wr || null,
+              pnl: data.total_pnl || data.pnl || null,
+              pf: data.profit_factor || data.pf || null,
+              maxdd: data.max_drawdown || data.maxdd || null,
+              trades: data.total_trades || data.trades || null,
+            });
+          }
+          // Handle nested format (e.g. unified_results.json with strategy keys)
+          if (typeof data === 'object') {
+            for (const [key, val] of Object.entries(data)) {
+              if (val && typeof val === 'object' && (val.strategy || val.name) && !strategies.find(s => s.name === (val.strategy || val.name))) {
+                strategies.push({
+                  id: key,
+                  name: val.strategy || val.name || key,
+                  file: file,
+                  wr: val.win_rate || val.wr || null,
+                  pnl: val.total_pnl || val.pnl || null,
+                  pf: val.profit_factor || val.pf || null,
+                  maxdd: val.max_drawdown || val.maxdd || null,
+                  trades: val.total_trades || val.trades || null,
+                });
+              }
+            }
+          }
+        } catch (e) { /* skip malformed files */ }
+      }
+    }
+    res.json({ success: true, strategies });
+  } catch (err) {
+    res.json({ success: true, strategies: [], error: err.message });
+  }
+});
+
+app.get('/api/quant/backtests', (req, res) => {
+  try {
+    const resultsDir = path.resolve(__dirname, '..', '..', '..', 'quant-lab', 'results');
+    const backtests = [];
+    if (fs.existsSync(resultsDir)) {
+      const files = fs.readdirSync(resultsDir).filter(f => f.endsWith('.json'));
+      for (const file of files.slice(0, 50)) {
+        try {
+          const data = JSON.parse(fs.readFileSync(path.join(resultsDir, file), 'utf-8'));
+          backtests.push({
+            file: file,
+            strategy: data.strategy || data.name || file.replace('.json', ''),
+            wr: data.win_rate || data.wr || null,
+            pnl: data.total_pnl || data.pnl || null,
+            pf: data.profit_factor || data.pf || null,
+            maxdd: data.max_drawdown || data.maxdd || null,
+            trades: data.total_trades || data.trades || null,
+          });
+        } catch (e) { /* skip */ }
+      }
+    }
+    res.json({ success: true, backtests });
+  } catch (err) {
+    res.json({ success: true, backtests: [], error: err.message });
+  }
 });
 
 // ── Sandbox Endpoints ────────────────────────────────────────────
@@ -582,6 +686,37 @@ wss.on('connection', (ws, req) => {
             from: escapeHtml(result.message.from),
           };
           broadcast.broadcastToRoom(wsRoomSockets, client.roomId, safeMessage);
+          // Record in world engine
+          worldEngine.recordMessage(client.agentId, null, client.roomId, msg.messageType || 'chat');
+        }
+        break;
+      }
+
+      case 'fam-message': {
+        const client = wsClients.get(ws);
+        if (!client) { ws.send(JSON.stringify({ event: 'error', error: 'Not authenticated' })); return; }
+        const rawContent = msg.content;
+        if (!rawContent || typeof rawContent !== 'string' || rawContent.trim().length === 0) {
+          ws.send(JSON.stringify({ event: 'error', error: 'Message content required' })); return;
+        }
+        if (rawContent.length > MAX_MESSAGE_LENGTH) {
+          ws.send(JSON.stringify({ event: 'error', error: `Message too long (max ${MAX_MESSAGE_LENGTH})` })); return;
+        }
+        const famResult = messageBus.postMessage('fam-chat', {
+          from: client.agentId,
+          type: msg.messageType || 'chat',
+          content: rawContent.trim(),
+          roomId: 'fam-chat',
+        });
+        if (famResult.success) {
+          const safeMessage = {
+            ...famResult.message,
+            content: escapeHtml(famResult.message.content),
+            from: escapeHtml(famResult.message.from),
+          };
+          // Broadcast to ALL connected WebSocket clients (global)
+          broadcastGlobal({ event: 'fam-message', data: safeMessage, roomId: 'fam-chat' });
+          worldEngine.recordMessage(client.agentId, null, 'fam-chat', 'fam');
         }
         break;
       }

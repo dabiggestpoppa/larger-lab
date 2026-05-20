@@ -25,7 +25,8 @@
 			"**/*.exe": true,
 			"**/*.pdf": true,
 			"**/*.lnk": true
-		}
+		},
+		"powershell.cwd": "larger-lab"
 	},
 	"extensions": {
 		"recommendations": [

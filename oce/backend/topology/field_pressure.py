@@ -13,7 +13,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Optional, Callable
 
-from resonance import FieldStateManager, PressureTracker, PressureAlert
+from ..resonance import FieldStateManager, PressureTracker, PressureAlert
 from .collar_field import CollarFieldEngine
 from .bsp_projection import BSPProjectionEngine, TrajectoryProjection
 

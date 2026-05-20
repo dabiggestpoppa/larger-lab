@@ -1,0 +1,29 @@
+{
+  "famChat": {
+    "enabled": true,
+    "maxMessagesPer10s": 5,
+    "maxBroadcastsPer60s": 2,
+    "maxSubscriptions": 10,
+    "messageTtlSeconds": 30,
+    "defaultChannels": ["#general", "#alerts", "#research", "#debug"],
+    "allowBroadcast": true,
+    "allowChannels": true
+  },
+  "observerOverlap": {
+    "enabled": true,
+    "coPresenceIntervalSeconds": 60,
+    "coPresenceInsightGain": 0.05,
+    "messageExchangeInsightGain": 0.10,
+    "statusAlignmentInsightGain": 0.08,
+    "taskProximityInsightGain": 0.15,
+    "explicitShareInsightGain": 0.30,
+    "crossDomainBonus": 1.5,
+    "crossRoleBonus": 1.2,
+    "baseDecayRate": 0.02,
+    "minConfidence": 0.05,
+    "maxInsightsPerSource": 50,
+    "maxTotalInsights": 500,
+    "decayIntervalSeconds": 60,
+    "fieldCoherenceBroadcastInterval": 30
+  }
+}

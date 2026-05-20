@@ -8,18 +8,18 @@ from fastapi import FastAPI, Query, HTTPException
 from pydantic import BaseModel
 from typing import Any, Dict, List, Optional
 
-from governance_engine import (
+from .governance_engine import (
     get_governance_engine,
     GovernanceEngine,
     ProposalStatus,
     ProposalType,
 )
-from consensus_engine import (
+from .consensus_engine import (
     get_consensus_engine,
     ConsensusEngine,
     VoteValue,
 )
-from coevolution_protocol import (
+from .coevolution_protocol import (
     get_coevolution_protocol,
     CoevolutionProtocol,
     TrustLevel,

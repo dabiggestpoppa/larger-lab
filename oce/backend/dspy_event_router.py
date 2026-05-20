@@ -12,8 +12,11 @@ Task: OCE-2.25
 """
 
 import logging
+import sys
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from srrs_opc import SyncCostOptimizer, CollarTopologyEngine
 
 logger = logging.getLogger("oce.dspy.event_router")

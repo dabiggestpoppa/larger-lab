@@ -1,0 +1,608 @@
+{
+  "version": 1,
+  "updatedAt": "2026-05-20T12:55:59.791Z",
+  "entries": {
+    "memory:memory/2026-05-18.md:387:414": {
+      "key": "memory:memory/2026-05-18.md:387:414",
+      "path": "memory/2026-05-18.md",
+      "startLine": 387,
+      "endLine": 414,
+      "source": "memory",
+      "snippet": "- **resourceadapterpermanent:** Integration layer for entire workflow - Tasks: Registry cleanup, validation gate, zero-dependency content track, tool integration, repo assessment, Google accounts strategy - This is a CONTINUOUS role — RA works until all integrations complete - Home file: `tools/INTEGRATION_STATUS.md` ### 28. Current Active Agents (14:27 EDT) | Agent | Task | Status | |-------|------|--------| | labmanagerfull | Fix all 10 strategies → convert to Pine | ⏳ Running | | farmmanagerfull | Day 2 execution + Day 3 plan | ⏳ Running | | resourceadapterpermanent | Tool integration + registry cleanup | ⏳ Running | ### 29. Agent Environment Activated (14:33 EDT) - Server was already r",
+      "recallCount": 3,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 3,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-19T04:34:19.611Z",
+      "lastRecalledAt": "2026-05-19T23:54:58.824Z",
+      "queryHashes": [
+        "34a5851f36a3",
+        "2e2fb034155b",
+        "b9d802b9c422"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "zero-dependency",
+        "tools/integration-status.md",
+        "resourceadapterpermanent",
+        "integration",
+        "layer",
+        "entire",
+        "workflow",
+        "tasks"
+      ]
+    },
+    "memory:memory/2026-05-18.md:359:391": {
+      "key": "memory:memory/2026-05-18.md:359:391",
+      "path": "memory/2026-05-18.md",
+      "startLine": 359,
+      "endLine": 391,
+      "source": "memory",
+      "snippet": "- Cost model void is systemic — 10/10 profitable claim is misleading - Content Farm is planning exercise, not operation (0 content produced) - Agent Environment is shelfware (0 agents use it) - Researcher wasted on mechanical conversion instead of gap analysis - \"70+ agents\" claim is misleading — only 5-6 operational - Biggest risk: validation debt - Top recommendations: 1. Halt conversion until cost validation 2. Assign Researcher to BSC gap NOW 3. Build zero-dependency content track 4. Deprioritize Agent Environment 5. Consolidate agent registry 6. Implement validation gates 7. Define \"done\" for each system - From scratch test: Start with ONE vertical, not three",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-19T04:34:19.611Z",
+      "lastRecalledAt": "2026-05-19T04:34:47.342Z",
+      "queryHashes": [
+        "34a5851f36a3",
+        "2e2fb034155b"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "10/10",
+        "5-6",
+        "zero-dependency",
+        "cost",
+        "model",
+        "void",
+        "systemic",
+        "profitable"
+      ]
+    },
+    "memory:memory/2026-05-18.md:66:101": {
+      "key": "memory:memory/2026-05-18.md:66:101",
+      "path": "memory/2026-05-18.md",
+      "startLine": 66,
+      "endLine": 101,
+      "source": "memory",
+      "snippet": "- Works for venv (local) AND global production (workspace) - Everything designed to plug into SRRA+OCE later - Output: `tools/INTEGRATION_STATUS.md` --- ## Active Agents (as of 08:49 EDT) | Agent | Task | Status | |-------|------|--------| | optimizertaska | Cost validation (10 strategies) | ⏳ Running | | researcherbscgap | BSC gap analysis | ⏳ Running | | resourceadapter | Tool integration (Open Design, ViMax, Netviz, UI-TARS) | ⏳ Running | ## Key Decisions 1. **Conversion pipeline FROZEN** — no TV push until cost validation complete 2. **POLYGENT defined** — helper function, on-demand only, not idle 3. **Spread = points/10** — CSV spread column is broker units, divide by 10 for pips 4.",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-19T04:34:19.611Z",
+      "lastRecalledAt": "2026-05-19T04:34:47.342Z",
+      "queryHashes": [
+        "34a5851f36a3",
+        "2e2fb034155b"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "tools/integration-status.md",
+        "ui-tars",
+        "on-demand",
+        "points/10",
+        "works",
+        "venv",
+        "local",
+        "global"
+      ]
+    },
+    "memory:memory/2026-05-18.md:47:76": {
+      "key": "memory:memory/2026-05-18.md:47:76",
+      "path": "memory/2026-05-18.md",
+      "startLine": 47,
+      "endLine": 76,
+      "source": "memory",
+      "snippet": "- Example: 144 points = 14.4 pips for EUR/USD - Updated Task Brief A with correct conversion ### 7. Optimizer + Researcher Spawned (08:17 EDT) - **optimizertaska:** Task A — cost validation, all 10 strategies, real spread from CSV - **researcherbscgap:** Task B — BSC gap analysis (64pp gap) - Both outputting to `quant-lab/results/` and `quant-lab/research/` ### 8. New Tools & Repos from MAD (08:28 EDT) - **Open Design (nexu-io/open-design):** 40k stars, open-source Claude Design alt. HTML output. For Content Farm visual production. - **ViMax (HKUDS/ViMax):** Agentic video generation. Multi-agent workflow. For TikTok/Shorts/Reels. - **Netviz (ShadowArcanist/netviz):** Network architecture v",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-19T04:34:19.611Z",
+      "lastRecalledAt": "2026-05-19T04:34:19.611Z",
+      "queryHashes": [
+        "34a5851f36a3"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "network",
+        "14.4",
+        "eur/usd",
+        "quant-lab/results",
+        "quant-lab/research",
+        "nexu-io/open-design",
+        "open-source",
+        "hkuds/vimax"
+      ]
+    },
+    "memory:memory/2026-05-18.md:227:254": {
+      "key": "memory:memory/2026-05-18.md:227:254",
+      "path": "memory/2026-05-18.md",
+      "startLine": 227,
+      "endLine": 254,
+      "source": "memory",
+      "snippet": "- **Public APIs** (public-apis/public-apis) — 🔥 HIGH. 1,500+ free APIs. Cross-reference with APIS_NEEDED.md. - **Hello Agents** (datawhale/hello-agents) — 📚 Educational resource. - **Guizang PPT Skill** (op7418/guizang-ppt-skill) — 🟡 PPT generation. - **Lonkero** (bountyyfi/lonkero) — ⏳ Unknown, needs investigation. - All documented in: `research/TOOLS_AND_REPOS.md` --- ## Active Agents (as of 09:42 EDT) | Agent | Task | Status | |-------|------|--------| | optimizertaska | Cost validation (10 strategies) | ✅ COMPLETE | | researcherbscgap | BSC gap analysis | ✅ COMPLETE | | resourceadapter | Tool integration | ✅ COMPLETE (status doc written) | ## Key Decisions 1. **Conversion pipeline",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-19T04:34:19.611Z",
+      "lastRecalledAt": "2026-05-19T04:34:19.611Z",
+      "queryHashes": [
+        "34a5851f36a3"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "public-apis/public-apis",
+        "cross-reference",
+        "apis-needed.md",
+        "datawhale/hello-agents",
+        "op7418/guizang-ppt-skill",
+        "bountyyfi/lonkero",
+        "research/tools-and-repos.md",
+        "public"
+      ]
+    },
+    "memory:memory/2026-05-18.md:725:758": {
+      "key": "memory:memory/2026-05-18.md:725:758",
+      "path": "memory/2026-05-18.md",
+      "startLine": 725,
+      "endLine": 758,
+      "source": "memory",
+      "snippet": "- Full situation report with IACER structure - Intent, Abstraction, Context, Expectations, Results all addressed - Pending: phone integration, remaining MC, MQL5 --- ### 65. MAD Removes All Restrictions (23:28 EDT) - MAD removed all restrictions on OWL — full capability restored - VS Code team (CC/AS/PM) reserved ONLY for SRRA+OPH testing and building - No more memory flush write restrictions - MAD is a trader, CEREBUS is his system ### 66. Meditations Completed (23:43 EDT) - Farm Manager meditation: ✅ Complete (agent-generated) - Lab Manager meditation: ❌ Timed out — written directly by OWL - SW Dev Manager meditation: ❌ Timed out — written directly by OWL - All 3 files now exist in medi",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-19T04:34:19.611Z",
+      "lastRecalledAt": "2026-05-19T04:34:19.611Z",
+      "queryHashes": [
+        "34a5851f36a3"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "cc/as/pm",
+        "agent-generated",
+        "full",
+        "situation",
+        "report",
+        "iacer",
+        "structure",
+        "intent"
+      ]
+    },
+    "memory:memory/2026-05-18.md:409:435": {
+      "key": "memory:memory/2026-05-18.md:409:435",
+      "path": "memory/2026-05-18.md",
+      "startLine": 409,
+      "endLine": 435,
+      "source": "memory",
+      "snippet": "- MAD explicitly said: \"MAKE SURE AGENT ENVIORMENT IS WORKING TO AND ALL AGENTS USE IT THATS A KEY RN\" - This is now the #1 priority alongside Quant Lab and Content Farm - All active agents are now registered and visible in the environment - Next: Ensure sub-agents spawned by managers also register themselves ### 31. Agent Timeout & Respawn (15:05 EDT) - All 3 previous agents timed out: labmanagerfull (0 fixes), farmmanagerfull (Day 2 partial), resourceadapterpermanent (validation-gate done) - Root cause: too much work per spawn, no checkpointing - Fix: smaller task scopes, progress files after each step, sequential spawns - Respawned 3 new agents: - resourceadaptertimeout: timeout analys",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-19T23:54:58.824Z",
+      "lastRecalledAt": "2026-05-19T23:54:58.824Z",
+      "queryHashes": [
+        "b9d802b9c422"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "sub-agents",
+        "validation-gate",
+        "mad",
+        "explicitly",
+        "said",
+        "sure",
+        "enviorment",
+        "working"
+      ]
+    },
+    "memory:memory/2026-05-19.md:131:151": {
+      "key": "memory:memory/2026-05-19.md:131:151",
+      "path": "memory/2026-05-19.md",
+      "startLine": 131,
+      "endLine": 151,
+      "source": "memory",
+      "snippet": "- **MAD's UI direction:** Simple chat for regular use + rooms for complex tasks. Take best from Genspark/Claude/Manus. Agent terminal showing PowerShell/work output. Good+good=great philosophy. ## 15:46-16:00 EDT — MAD'S LATEST DIRECTIVES (Message #2918) - **MAD's #1 priority:** Forward test DMR on MT5 demo account - **MAD's #2:** Farm — \"have the farm move unto first post you check and just post update i got @\" - **MAD provided ProtonMail credentials:** wifiking999@protonmail.com / Teflondon1718! - **MAD:** \"Use iacer for last response and begin I'm gone for the day\" - **GitHub repos sent for review:** 1. https://github.com/ruvnet/RuView.git — Agent visualization 2. https://github.com/",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T01:39:59.831Z",
+      "lastRecalledAt": "2026-05-20T01:39:59.831Z",
+      "queryHashes": [
+        "be93e21b81f4"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "genspark/claude/manus",
+        "powershell/work",
+        "46-16",
+        "protonmail.com",
+        "github.com/ruvnet/ruview.git",
+        "github.com",
+        "mad's",
+        "direction"
+      ]
+    },
+    "memory:memory/2026-05-19.md:147:172": {
+      "key": "memory:memory/2026-05-19.md:147:172",
+      "path": "memory/2026-05-19.md",
+      "startLine": 147,
+      "endLine": 172,
+      "source": "memory",
+      "snippet": "- **MAD:** \"TRADING INSIGHT TO INTERGRATE STRATEGICALLY WE DONT COPY WE IMPLEMENT THE LOGIC\" - **MAD:** \"check ra he should know the best way\" (Resource Adapter should review repos) - **Key insight:** MAD is stepping away for the day. OWL should execute autonomously and report back. ## 15:56 EDT — 3 MEDITATION CRON JOBS CREATED - **CEO Meditation** (657439f0): Every 2h — Strategic review, entropy governance, system alignment - **SW Dev Meditation** (0a7e28fc): Every 3h — UI/UX review, agent environment upgrades - **Optimizer Meditation** (1573fa37): Every 4h — Strategy review, backtest analysis, optimization - All write insights to `meditation-room/*_MEDITATION_LATEST.md` - **Total cron job",
+      "recallCount": 3,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 3,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T01:39:59.831Z",
+      "lastRecalledAt": "2026-05-20T12:55:59.747Z",
+      "queryHashes": [
+        "be93e21b81f4",
+        "dd65dd2620cf",
+        "769052bb2313"
+      ],
+      "recallDays": [
+        "2026-05-19",
+        "2026-05-20"
+      ],
+      "conceptTags": [
+        "ui/ux",
+        "meditation-room",
+        "meditation-latest.md",
+        "mad",
+        "trading",
+        "insight",
+        "intergrate",
+        "strategically"
+      ]
+    },
+    "memory:memory/2026-05-19.md:120:135": {
+      "key": "memory:memory/2026-05-19.md:120:135",
+      "path": "memory/2026-05-19.md",
+      "startLine": 120,
+      "endLine": 135,
+      "source": "memory",
+      "snippet": "- **MAD:** SRRA+OPH is a feature in the full system, not the end product. - **Spawned:** farmregister (agent:main:subagent:4c35f199) — register accounts on IG, TikTok, X, Reddit - **Spawned:** swdevuiupgrade (agent:main:subagent:306855b3) — UI v3 upgrade - **Pipeline complete:** Local backtest → MC → MT5 cross-validation. All passed. Next: forward test on demo. ## 15:14 EDT — MC COMPLETE, FARM DAY 4-5 DONE, SW DEV UI v3 IN PROGRESS - **MC on MT5 DMR results:** 10K iterations, 0% ruin, 100% prob profit. Fixed lot (0.01) = +10.5% return, 0% MaxDD. PRODUCTION READY. - **Farm Day 4 COMPLETE:** @CerebusFX handles created for all 7 platforms (IG, TikTok, X, Reddit, Pinterest, YouTube, Gumroad). A",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T01:39:59.831Z",
+      "lastRecalledAt": "2026-05-20T01:39:59.831Z",
+      "queryHashes": [
+        "be93e21b81f4"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "cross-validation",
+        "4-5",
+        "0.01",
+        "10.5",
+        "mad",
+        "srra",
+        "oph",
+        "feature"
+      ]
+    },
+    "memory:memory/2026-05-19.md:60:79": {
+      "key": "memory:memory/2026-05-19.md:60:79",
+      "path": "memory/2026-05-19.md",
+      "startLine": 60,
+      "endLine": 79,
+      "source": "memory",
+      "snippet": "- **Key files:** agent-environment/public/css/chat-v3.css (new), agent-environment/public/js/chat-v3.js (new), agent-environment/public/index.html (upgraded) ## 15:46-16:00 EDT — MAD'S LATEST DIRECTIVES (Message #2918) - **MAD's #1 priority:** Forward test DMR on MT5 demo account (\"now that the mt5 is good forward test on the demo account\") - **MAD's #2:** Farm — \"have the farm move unto first post you check and just post update i got @\" - **MAD provided ProtonMail credentials:** wifiking999@protonmail.com / Teflondon1718! (for account registration) - **MAD:** \"Use iacer for last response and begin I'm gone for the day\" - **MAD:** \"have the farm move unto first post you check and just post",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T01:39:59.831Z",
+      "lastRecalledAt": "2026-05-20T01:39:59.831Z",
+      "queryHashes": [
+        "be93e21b81f4"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "46-16",
+        "protonmail.com",
+        "key",
+        "environment",
+        "public",
+        "css",
+        "chat",
+        "new"
+      ]
+    },
+    "memory:memory/2026-05-19.md:49:63": {
+      "key": "memory:memory/2026-05-19.md:49:63",
+      "path": "memory/2026-05-19.md",
+      "startLine": 49,
+      "endLine": 63,
+      "source": "memory",
+      "snippet": "- **MAD's pipeline:** local backtest → MC → MT5 cross-validation. DMR passed MT5. Next: MC on MT5 results. - **Farm:** farmday4create timed out. Need to re-spawn for Day 4-5. - **MAD directive:** PAUSE all non-lab work. Focus on MT5 production. Farm can continue in background. ## 15:14 EDT — MC COMPLETE, FARM DAY 4-5 DONE, SW DEV UI v3 IN PROGRESS - **MC on MT5 DMR results:** 10K iterations, 0% ruin, 100% prob profit. Fixed lot (0.01) = +10.5% return, 0% MaxDD. PRODUCTION READY. - **Farm Day 4 COMPLETE:** @CerebusFX handles created for all 7 platforms (IG, TikTok, X, Reddit, Pinterest, YouTube, Gumroad). All content written and organized. PUBLISHING_READY.md created. - **Farm Day 5 plan:**",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T01:39:59.831Z",
+      "lastRecalledAt": "2026-05-20T01:39:59.831Z",
+      "queryHashes": [
+        "be93e21b81f4"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "cross-validation",
+        "re-spawn",
+        "4-5",
+        "non-lab",
+        "0.01",
+        "10.5",
+        "publishing-ready.md",
+        "mad's"
+      ]
+    },
+    "memory:memory/2026-05-19.md:91:110": {
+      "key": "memory:memory/2026-05-19.md:91:110",
+      "path": "memory/2026-05-19.md",
+      "startLine": 91,
+      "endLine": 110,
+      "source": "memory",
+      "snippet": "## 17:35-17:50 EDT — MT5 FORWARD TEST DEPLOYED - **DMR forward test LIVE on MT5 demo account 1114712 (OxSecurities-Demo)** - Script: `quant-lab/mt5/dmr_mt5_forward_test.py` - Connected successfully: Balance $289.17 | EURUSD.PRO | Spread 3.6 pips - Symbol name on this broker: EURUSD.PRO (not EURUSD) - Script running in background (session vivid-orbit, pid 21344) - Currently idle — P90 window is 2-11 AM EST, currently ~5:35 PM - Will auto-scan starting 2 AM EST tonight - Lot size: 0.01 | Magic: 20260519 | Hard exit: 5 PM EST - Logs to: quant-lab/mt5/dmr_forward_test_log.csv - State: quant-lab/mt5/dmr_forward_test_state.json - **MAD credentials used:** Login 1114712, Server OxSecurities-Demo, P",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T01:58:06.835Z",
+      "lastRecalledAt": "2026-05-20T12:55:59.747Z",
+      "queryHashes": [
+        "dd65dd2620cf",
+        "769052bb2313"
+      ],
+      "recallDays": [
+        "2026-05-19",
+        "2026-05-20"
+      ],
+      "conceptTags": [
+        "35-17",
+        "oxsecurities-demo",
+        "289.17",
+        "eurusd.pro",
+        "3.6",
+        "vivid-orbit",
+        "2-11",
+        "auto-scan"
+      ]
+    },
+    "memory:memory/2026-05-19.md:76:96": {
+      "key": "memory:memory/2026-05-19.md:76:96",
+      "path": "memory/2026-05-19.md",
+      "startLine": 76,
+      "endLine": 96,
+      "source": "memory",
+      "snippet": "8. https://github.com/kaktusesquire6rmu/ai-polymarket-agent.git - **MAD:** \"TRADING INSIGHT TO INTERGRATE STRATEGICALLY WE DONT COPY WE IMPLEMENT THE LOGIC\" - **MAD:** \"check ra he should know the best way\" (Resource Adapter should review repos) - **SW Dev:** Keep upgrading venv UI — all-in-one platform similar to Genspark/Claude/Hermes workspace - **SW Dev:** Chat feature where you can see agent using power (agent terminal showing live work) - **Key insight:** MAD is stepping away for the day. OWL should execute autonomously and report back. ## Actions Taken (15:46-16:00 EDT) - Assessed all v3 UI files: env-v3.css (complete, 1050+ lines), app-v3.js (complete, 1000+ lines), index.html (up",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T01:58:06.835Z",
+      "lastRecalledAt": "2026-05-20T12:55:59.747Z",
+      "queryHashes": [
+        "dd65dd2620cf",
+        "769052bb2313"
+      ],
+      "recallDays": [
+        "2026-05-19",
+        "2026-05-20"
+      ],
+      "conceptTags": [
+        "all-in-one",
+        "genspark/claude/hermes",
+        "46-16",
+        "env-v3.css",
+        "app-v3.js",
+        "index.html",
+        "https",
+        "github.com"
+      ]
+    },
+    "memory:memory/2026-05-19.md:251:275": {
+      "key": "memory:memory/2026-05-19.md:251:275",
+      "path": "memory/2026-05-19.md",
+      "startLine": 251,
+      "endLine": 275,
+      "source": "memory",
+      "snippet": "- 7 non-negotiable rules for pipeline pattern - Manager → Workers pipeline model - Failure recovery decision tree - **Spawned RA** (raworkflowimpl) — reviewing Shaw's analysis + implementing changes to AGENTS.md - RA is updating AGENTS.md with mandatory pipeline section ## 20:30-21:00 EDT — MT5 BACKTEST FINALIZED + CRON JOBS PAUSED - **MAD directive (19:29):** \"Pause the dev team until sage is back from meditation. Just focus on mt5 backtest\" - **MAD directive (19:29):** \"Once you successfully get a actual mt5 run history backtest tell me results and make download it so i can verify after test all assets same way\" - Wrote new DMR_Backtest.mq5 EA (sequential bar processing for Strategy",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T01:58:06.835Z",
+      "lastRecalledAt": "2026-05-20T12:55:59.747Z",
+      "queryHashes": [
+        "dd65dd2620cf",
+        "769052bb2313"
+      ],
+      "recallDays": [
+        "2026-05-19",
+        "2026-05-20"
+      ],
+      "conceptTags": [
+        "non-negotiable",
+        "agents.md",
+        "30-21",
+        "dmr-backtest.mq5",
+        "non",
+        "negotiable",
+        "rules",
+        "pipeline"
+      ]
+    },
+    "memory:memory/2026-05-18.md:590:622": {
+      "key": "memory:memory/2026-05-18.md:590:622",
+      "path": "memory/2026-05-18.md",
+      "startLine": 590,
+      "endLine": 622,
+      "source": "memory",
+      "snippet": "- Both have 10-min timeouts. 3 slots still free. ### 49. MAD's Directives at 18:28 EDT - Check RAM → done (89.4%, VS Code culprit) - Check VS space → done (SW Dev room: only PROJECT_BOARD.md + PROGRESS.md, no code changes) - Spawn sub-agents → done (2 spawned) - Farm: Day 4 plans → spawned - Lab: Monte Carlo on production-ready strategies → spawned (DMR first) - Monte Carlo format: same as CEREBUS manual Part 6 (10K iterations, percentiles, shuffle) --- ### 51. Farm Day 3 + Day 4 Completion (19:32 EDT) - Farm agent (farmday3and4) timed out after creating only carousel-post.html - OWL completed remaining files directly: - `content-farm/day3/ad-copies.md` — 20 ad variations (FB/IG, Google",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T01:58:06.835Z",
+      "lastRecalledAt": "2026-05-20T01:58:06.835Z",
+      "queryHashes": [
+        "dd65dd2620cf"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "10-min",
+        "89.4",
+        "project-board.md",
+        "progress.md",
+        "sub-agents",
+        "production-ready",
+        "carousel-post.html",
+        "content-farm/day3/ad-copies.md"
+      ]
+    },
+    "memory:memory/2026-05-19.md:269:296": {
+      "key": "memory:memory/2026-05-19.md:269:296",
+      "path": "memory/2026-05-19.md",
+      "startLine": 269,
+      "endLine": 296,
+      "source": "memory",
+      "snippet": "- RA completed: sw-dev/RA_WORKFLOW_IMPLEMENTATION.md (10KB) - Shaw completed: sw-dev/SHAW_AGENT_WORKFLOW_ANALYSIS.md (16KB) ## 21:00-21:30 EDT — MULTI-ASSET BACKTEST COMPLETE - Ran DMR backtest on all 4 available forex pairs - **EURUSD.PRO**: 671 trades, 94.8% WR, +7,903p, PF 205.9 - **USDCHF.PRO**: 721 trades, 92.1% WR, +8,128p, PF 125.0 - **CHFJPY.PRO**: 191 trades, 95.3% WR, +2,154p, PF 226.4 - **XAUUSD.PRO**: 347 trades, 94.5% WR, +4,489p, PF 223.0 - **TOTAL**: 1,930 trades, 94.0% avg WR, +22,676 pips - All 4 assets 92%+ WR — consistent across forex AND gold - Sent results + HTML report to MAD - Disabled all 3 meditation cron jobs (all timing out) - Awaiting MAD's next directive ## 21:",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T12:55:59.747Z",
+      "lastRecalledAt": "2026-05-20T12:55:59.747Z",
+      "queryHashes": [
+        "769052bb2313"
+      ],
+      "recallDays": [
+        "2026-05-20"
+      ],
+      "conceptTags": [
+        "00-21",
+        "multi-asset",
+        "eurusd.pro",
+        "94.8",
+        "205.9",
+        "usdchf.pro",
+        "92.1",
+        "125.0"
+      ]
+    },
+    "memory:memory/2026-05-19.md:293:312": {
+      "key": "memory:memory/2026-05-19.md:293:312",
+      "path": "memory/2026-05-19.md",
+      "startLine": 293,
+      "endLine": 312,
+      "source": "memory",
+      "snippet": "- Result 2 (eurusd_analysis.py trade-level CSV): 92.7pct WR � SAME as Result 1 - Result 3 (sub-agent dmr_full_analysis_v2.py): 4.6pct WR � WRONG STRATEGY - Result 3 used: wrong Asian range (2-8AM vs 7PM-3AM), no Deep State, entered WITH move not AGAINST - Root cause: sub-agent wrote new code from scratch instead of using WORKING code - EURUSD Deep Analysis: 915 trades, 92.7pct WR, MC 100pct prob profit, MaxDD 2.68p, Sharpe 42.67 - Tiers: T3 (Expanded, 25-40p) = sweet spot, 93.6pct WR. T4 (>40p) = 98.2pct WR - Injection Zones: 200+ compression->expansion events, cluster in 02:00-05:00 EST - Overlay Strategy: Time 03:00-05:00 + Tier T3/T4 + Day Tue-Thu + Multi-asset confirmation",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T12:55:59.747Z",
+      "lastRecalledAt": "2026-05-20T12:55:59.747Z",
+      "queryHashes": [
+        "769052bb2313"
+      ],
+      "recallDays": [
+        "2026-05-20"
+      ],
+      "conceptTags": [
+        "eurusd-analysis.py",
+        "trade-level",
+        "92.7pct",
+        "sub-agent",
+        "dmr-full-analysis-v2.py",
+        "4.6pct",
+        "2-8am",
+        "7pm-3am"
+      ]
+    },
+    "memory:memory/2026-05-18.md:474:495": {
+      "key": "memory:memory/2026-05-18.md:474:495",
+      "path": "memory/2026-05-18.md",
+      "startLine": 474,
+      "endLine": 495,
+      "source": "memory",
+      "snippet": "### 37. Current Active Agents (15:58 EDT) | Agent | Task | Status | |-------|------|--------| | resourceadaptertimeout | Timeout analysis + Navtoor + tools | ⏳ Running | | labmanagercheckpoint | Fix 10 strategies w/ checkpointing | ⏳ Running | | farmmanagerday3 | Day 2 gaps + Day 3 plan | ⏳ Running | | envbuilderfix | Fix agent environment UI | ⏳ Running | | softwareceo | Meditate on rooms/venv | ⏳ Running (NEW) | | capitalmaxer | Meditate on biz opportunities | ⏳ Running (NEW) | | swdevmanager | SW Dev project board + spawn team | ⏳ Running (NEW) | ### 38. DeepWiki + 18 New Repos + Resource Index (16:21 EDT) - MAD's final large idea for the day: install DeepWiki, clone all shared repos, cr",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T12:55:59.791Z",
+      "lastRecalledAt": "2026-05-20T12:55:59.791Z",
+      "queryHashes": [
+        "966b560b2d5c"
+      ],
+      "recallDays": [
+        "2026-05-20"
+      ],
+      "conceptTags": [
+        "rooms/venv",
+        "current",
+        "active",
+        "agents",
+        "edt",
+        "task",
+        "status",
+        "resourceadaptertimeout"
+      ]
+    }
+  }
+}

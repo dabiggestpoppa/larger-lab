@@ -21,8 +21,8 @@ import math
 from dataclasses import dataclass, field
 from typing import Optional
 
-from resonance import SignalPacket, SignalField, ResonanceEngine, CoherenceEngine
-from reconstruction import AttractorMemory, Attractor
+from ..resonance import SignalPacket, SignalField, ResonanceEngine, CoherenceEngine
+from ..reconstruction import AttractorMemory, Attractor
 
 
 @dataclass

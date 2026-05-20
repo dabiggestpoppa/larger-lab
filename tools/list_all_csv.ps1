@@ -1,0 +1,1 @@
+Get-ChildItem 'C:\Users\wifik\Desktop\projects\larger-lab\quant-lab\mt5' -Filter '*.csv' | Select-Object FullName, @{N='SizeKB';E={[math]::Round($_.Length/1KB,1)}}, LastWriteTime | Format-Table -AutoSize
