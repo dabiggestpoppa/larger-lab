@@ -1,6 +1,6 @@
 # 🧪 LARGER-LAB TEST MANUAL
 
-> **Version:** 1.0 | **Last Updated:** May 21, 2026 | **Phase:** V3 P11.1 Active
+> **Version:** 1.1 | **Last Updated:** May 21, 2026 | **Phase:** V3 P11 Active (11.1 Running)
 
 ---
 
@@ -8,12 +8,17 @@
 
 1. [Test Philosophy](#test-philosophy)
 2. [Test Categories](#test-categories)
-3. [Phase 11.1 Long-Horizon Tests](#phase-111-long-horizon-tests)
-4. [Chaos Engine Tests](#chaos-engine-tests)
-5. [OCE/SRRA-OPH Tests](#ocesrra-oph-tests)
-6. [System Capability Tests](#system-capability-tests)
-7. [Running Tests](#running-tests)
-8. [Interpreting Results](#interpreting-results)
+3. [Phase 11.1 Runtime Stability](#phase-111-runtime-stability-24h)
+4. [Phase 11.2 Chaos Engineering](#phase-112-chaos-engineering)
+5. [Phase 11.3 Continuity Stability](#phase-113-continuity-stability-72h)
+6. [Phase 11.4 Memory Stability](#phase-114-memory-stability-7d)
+7. [Phase 11.5 Orchestration Stability](#phase-115-orchestration-stability-7d)
+8. [Phase 11.6 Resource Stability](#phase-116-resource-stability-7d)
+9. [Phase 11.7 Recovery Stability](#phase-117-recovery-stability-cycles)
+10. [OCE/SRRA-OPH Tests](#ocesrra-oph-tests)
+11. [System Capability Tests](#system-capability-tests)
+12. [Running Tests](#running-tests)
+13. [Interpreting Results](#interpreting-results)
 
 ---
 
@@ -40,9 +45,23 @@
 
 ## 📚 TEST CATEGORIES
 
-### 1. Phase 11.1 Long-Horizon Continuity Tests
+### Phase 11 — Operational Validation Overview
 
-**Purpose:** Validate system can run autonomously for 24-72 hours without degradation.
+| Sub-Phase | Duration | Target | Pass Criteria | Status |
+|-----------|----------|--------|---------------|--------|
+| **11.1 Runtime Stability** | 24h | No observer death | >99.5% uptime | 🔄 Running |
+| **11.2 Chaos Engineering** | Varies | Recovery | Auto-restart | ⏸️ Ready |
+| **11.3 Continuity Stability** | 72h | Identity continuity | ≥95% integrity | ⏸️ Pending |
+| **11.4 Memory Stability** | 7d | No poisoning | <2% contradiction | ⏸️ Pending |
+| **11.5 Orchestration Stability** | 7d | No collapse | Stable | ⏸️ Pending |
+| **11.6 Resource Stability** | 7d | Bounded entropy | Bounded | ⏸️ Pending |
+| **11.7 Recovery Stability** | Cycles | Identity preserved | <60s recovery | ⏸️ Pending |
+
+---
+
+### 1. Phase 11.1 Runtime Stability (24h)
+
+**Purpose:** Validate system can run autonomously for 24 hours without observer death.
 
 **Current Status:** ✅ **RUNNING** (PID 1628, 10 observers)
 
@@ -53,7 +72,7 @@
 | Continuity Checksum | SHA256 hashes of state | Every 5 minutes | Continuous |
 | Stability Runner | Orchestrates all tests | Daemon mode | 24 hours |
 
-### 2. Chaos Engine Tests
+### 2. Phase 11.2 Chaos Engineering
 
 **Purpose:** Inject failures to test resilience and recovery.
 
@@ -66,7 +85,64 @@
 | Recursive Storm | Delegation explosion | 60s | 30s |
 | Full Chaos | All failures combined | Varies | 120s |
 
-### 3. OCE/SRRA-OPH Tests
+### 3. Phase 11.3 Continuity Stability (72h)
+
+**Purpose:** Validate identity continuity over 72 hours.
+
+| Test | What It Does | Scale | Duration |
+|------|-------------|-------|----------|
+| Continuity Probe | Periodic state sampling | Every 5 minutes | 72 hours |
+| Drift Tracker | Monitors state drift | Continuous | 72 hours |
+| Restart Validator | Validates post-restart state | On restart | 72 hours |
+| Continuity Checksum | SHA256 integrity checks | Every 5 minutes | 72 hours |
+
+### 4. Phase 11.4 Memory Stability (7d)
+
+**Purpose:** Validate memory integrity over 7 days.
+
+| Test | What It Does | Scale | Duration |
+|------|-------------|-------|----------|
+| Memory Integrity | Checks for poisoning/drift | Every 60s | 7 days |
+| Contradiction Detector | Finds conflicting memories | Continuous | 7 days |
+| Memory Decay | Validates decay curves | Daily | 7 days |
+| Poisoning Resistance | Tests false memory rejection | Continuous | 7 days |
+
+### 5. Phase 11.5 Orchestration Stability (7d)
+
+**Purpose:** Validate orchestration doesn't collapse.
+
+| Test | What It Does | Scale | Duration |
+|------|-------------|-------|----------|
+| Orchestration Monitor | Tracks delegation chains | Continuous | 7 days |
+| Collapse Detector | Detects runaway recursion | Continuous | 7 days |
+| Stability Runner | Orchestrates all tests | Daemon mode | 7 days |
+| Entropy Monitor | Tracks system entropy | Every 60s | 7 days |
+
+### 6. Phase 11.6 Resource Stability (7d)
+
+**Purpose:** Validate bounded entropy growth.
+
+| Test | What It Does | Scale | Duration |
+|------|-------------|-------|----------|
+| Entropy Monitor | Tracks entropy growth | Every 60s | 7 days |
+| Resource Tracker | CPU, memory, disk | Every 60s | 7 days |
+| Budget Enforcer | Enforces entropy limits | Continuous | 7 days |
+| Stability Runner | Orchestrates all tests | Daemon mode | 7 days |
+
+### 7. Phase 11.7 Recovery Stability (Cycles)
+
+**Purpose:** Validate identity preservation across restarts.
+
+| Test | What It Does | Scale | Duration |
+|------|-------------|-------|----------|
+| Restart Validator | Captures pre/post state | On restart | Cycles |
+| Recovery Timer | Measures recovery time | On restart | Cycles |
+| Identity Checker | Validates identity preserved | On restart | Cycles |
+| Continuity Reconstructor | Rebuilds state | On restart | Cycles |
+
+---
+
+### 8. OCE/SRRA-OPH Tests
 
 **Purpose:** Validate all 10 V3 phases work together.
 
@@ -90,7 +166,7 @@
 
 ---
 
-## 🕐 PHASE 11.1 LONG-HORIZON TESTS
+## 🕐 PHASE 11.1 RUNTIME STABILITY (24H)
 
 ### Observer Stress Test
 
@@ -187,7 +263,185 @@ checksum = sha256(json.dumps(state, sort_keys=True).encode()).hexdigest()
 
 ---
 
-## 🌪️ CHAOS ENGINE TESTS
+## 🌪️ PHASE 11.2 CHAOS ENGINEERING
+
+### Chaos Types
+
+| Type | Description | Real-World Equivalent |
+|------|-------------|----------------------|
+| OBSERVER_KILL | Kills an observer process | Server crash |
+| EVENT_FLOOD | Floods event fabric | DDoS attack |
+| MEMORY_CORRUPT | Injects false memories | Data corruption |
+| ROUTER_FAILURE | Simulates router down | Network outage |
+| WEBSOCKET_LOSS | Disconnects websocket | Connection drop |
+| TOKEN_STARVE | Reduces token budget | Rate limiting |
+| RECURSIVE_STORM | Triggers delegation storm | Infinite loop |
+| TWIN_DESYNC | Desyncs twin claws | Data inconsistency |
+
+### Chaos Scenarios
+
+#### Observer Death Scenario
+```python
+engine.run_chaos_scenario("observer_death")
+# Kills: trading_observer, repair_observer
+# Duration: 30s each
+# Recovery: Auto-restart
+```
+
+#### Full Chaos Scenario
+```python
+engine.run_chaos_scenario("full_chaos")
+# Kills: planner_observer
+# Floods: event_fabric (15x rate)
+# Corrupts: structural_memory (20%)
+# Disconnects: hermes_mcp websocket
+```
+
+### Heavy Compute Test: Recursive Storm
+
+**This is the heavy compute equivalent for AI systems.**
+
+#### What It Simulates
+- **Exponential delegation growth** (1 → 10 → 100 → 1000...)
+- **Memory explosion** from nested contexts
+- **Stack overflow prevention**
+- **Recovery from runaway recursion**
+
+#### Why This Matters
+Current AI systems fail when they enter recursive loops:
+- "Let me think step by step" repeated infinitely
+- Context window explosion
+- Memory exhaustion
+- No recovery mechanism
+
+#### Test Parameters
+```python
+engine.recursive_storm("orchestration")
+# Duration: 60 seconds
+# Severity: 0.8
+# Expected: Recovery within 30 seconds
+```
+
+---
+
+## 🔗 PHASE 11.3 CONTINUITY STABILITY (72H)
+
+### Continuity Probe
+
+**File:** `tools/testing/long_horizon/continuity_probe.py`
+
+#### What It Does
+- Samples system state every 5 minutes
+- Records identity, trajectory, goals, memory
+- Stores snapshots for drift analysis
+- Runs for 72 hours continuously
+
+#### How It Works
+```python
+# Probe state
+@dataclass
+class ContinuityProbe:
+    probe_id: str
+    timestamp: float
+    identity: str
+    trajectory: List[str]
+    goals: List[str]
+    memory_checksum: str
+```
+
+#### Pass/Fail Criteria
+- **PASS:** ≥95% integrity over 72 hours
+- **FAIL:** <95% integrity or any discontinuity
+
+---
+
+## 🧠 PHASE 11.4 MEMORY STABILITY (7D)
+
+### Memory Integrity Checker
+
+**File:** `tools/testing/long_horizon/memory_integrity.py`
+
+#### What It Does
+- Scans memory for contradictions
+- Detects poisoned/false memories
+- Validates memory decay curves
+- Runs for 7 days continuously
+
+#### Test Scale
+| Metric | Value |
+|--------|-------|
+| **Scan frequency** | Every 60 seconds |
+| **Duration** | 7 days |
+| **Contradiction threshold** | <2% |
+| **Poisoning detection** | >90% |
+
+#### Pass/Fail Criteria
+- **PASS:** <2% contradiction rate
+- **FAIL:** ≥2% contradiction or poisoning detected
+
+---
+
+## ⚙️ PHASE 11.5 ORCHESTRATION STABILITY (7D)
+
+### Orchestration Monitor
+
+**File:** `tools/testing/long_horizon/stability_runner.py`
+
+#### What It Does
+- Tracks delegation chains
+- Detects runaway recursion
+- Monitors orchestration health
+- Runs for 7 days continuously
+
+#### Key Metrics
+| Metric | Target |
+|--------|--------|
+| **Collapse events** | 0 |
+| **Recursion depth** | Bounded |
+| **Delegation chains** | Stable |
+
+---
+
+## 📊 PHASE 11.6 RESOURCE STABILITY (7D)
+
+### Entropy Monitor
+
+**File:** `tools/testing/long_horizon/entropy_monitor.py`
+
+#### What It Does
+- Tracks system entropy growth
+- Enforces entropy budgets
+- Monitors resource usage
+- Runs for 7 days continuously
+
+#### Key Metrics
+| Metric | Target |
+|--------|--------|
+| **Entropy growth** | Bounded |
+| **CPU usage** | <80% |
+| **Memory growth** | Linear |
+
+---
+
+## 🔄 PHASE 11.7 RECOVERY STABILITY (CYCLES)
+
+### Restart Validator
+
+**File:** `tools/testing/long_horizon/restart_validator.py`
+
+#### What It Does
+- Captures pre-restart state
+- Validates post-restart state
+- Measures recovery time
+- Verifies identity preservation
+
+#### Pass/Fail Criteria
+- **PASS:** Recovery <60s, identity preserved
+- **FAIL:** Recovery >60s or identity lost
+
+---
+
+## 🔗 OCE/SRRA-OPH TESTS
 
 ### Chaos Types
 
