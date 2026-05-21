@@ -104,6 +104,17 @@ async def api_update_config(request: Request):
     safe_cfg = {k: v for k, v in cfg.items() if k != 'password'}
     return JSONResponse({"status": "ok", "config": safe_cfg})
 
+@app.post("/api/toggle")
+async def api_toggle_trading(request: Request):
+    """Toggle trading on/off. Only writes to config — live script reads config each loop."""
+    data = await request.json()
+    enabled = data.get('enabled', True)
+    cfg = load_config()
+    cfg['enabled'] = enabled
+    save_config(cfg)
+    safe_cfg = {k: v for k, v in cfg.items() if k != 'password'}
+    return JSONResponse({"status": "ok", "enabled": enabled, "config": safe_cfg})
+
 DASHBOARD_HTML = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -274,8 +285,10 @@ async function fetchStatus() {
         availableSymbols = d.available_symbols;
         
         document.getElementById('serverStatus').textContent = `Server: ${d.server_time}`;
-        document.getElementById('tradingEnabled').checked = d.config.enabled;
-        document.getElementById('tradingStatusText').textContent = d.config.enabled ? 'Trading Enabled' : 'Trading Disabled';
+        const tradingOn = d.config.enabled;
+        document.getElementById('tradingEnabled').checked = tradingOn;
+        document.getElementById('tradingStatusText').textContent = tradingOn ? 'Trading Enabled' : 'Trading Disabled';
+        document.getElementById('tradingStatusText').style.color = tradingOn ? '#00ff88' : '#ff4444';
         document.getElementById('lotSize').value = d.config.lot_size || 0.02;
         document.getElementById('hardExit').value = d.config.hard_exit_hour_est || 17;
         document.getElementById('maxTrades').value = d.config.max_daily_trades_per_symbol || 1;
@@ -366,7 +379,26 @@ async function fetchLogs() {
 async function toggleTrading() {
     const enabled = document.getElementById('tradingEnabled').checked;
     document.getElementById('tradingStatusText').textContent = enabled ? 'Trading Enabled' : 'Trading Disabled';
-    await updateConfigField('enabled', enabled);
+    // Use dedicated toggle endpoint for immediate state update
+    try {
+        const r = await fetch('/api/toggle', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({enabled: enabled})
+        });
+        const d = await r.json();
+        if (d.status === 'ok') {
+            // Show visual feedback
+            const statusText = document.getElementById('tradingStatusText');
+            statusText.textContent = enabled ? 'Trading Enabled' : 'Trading Disabled';
+            statusText.style.color = enabled ? '#00ff88' : '#ff4444';
+            // Also update the server status to show toggle time
+            const toggleTime = new Date().toLocaleTimeString();
+            document.getElementById('serverStatus').textContent = `Toggle: ${enabled ? 'ON' : 'OFF'} at ${toggleTime}`;
+        }
+    } catch(e) {
+        console.error('Toggle failed:', e);
+    }
 }
 
 async function updateConfig() {

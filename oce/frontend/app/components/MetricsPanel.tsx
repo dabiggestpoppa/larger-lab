@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Activity, Cpu, Database, Zap, TrendingUp, Clock } from "lucide-react";
 import { api, MetricsSummary } from "../lib/api";
 import { useWebSocket } from "../lib/useWebSocket";
+import { SkeletonPanel } from "./SkeletonLoader";
+import { ErrorBanner } from "./ErrorBanner";
+import { useToast } from "./Toast";
 
 function StatCard({ label, value, icon: Icon, color, sub }: {
   label: string;
@@ -42,6 +45,19 @@ export function MetricsPanel() {
   const wsData = useWebSocket<MetricsSummary>("/ws/metrics");
   const [metrics, setMetrics] = useState<MetricsSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { addToast } = useToast();
+
+  const fetchMetrics = useCallback(async () => {
+    try {
+      const m = await api.getMetrics();
+      setMetrics(m);
+      setError(null);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Backend unreachable";
+      setError(msg);
+      addToast({ type: "error", title: "Metrics Error", message: msg });
+    }
+  }, [addToast]);
 
   // Fallback polling if WebSocket not available
   useEffect(() => {
@@ -49,35 +65,32 @@ export function MetricsPanel() {
       setMetrics(wsData.data);
       return;
     }
-    const poll = async () => {
-      try {
-        const m = await api.getMetrics();
-        setMetrics(m);
-        setError(null);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Backend unreachable");
-      }
-    };
-    poll();
-    const interval = setInterval(poll, 5000);
+    fetchMetrics();
+    const interval = setInterval(fetchMetrics, 5000);
     return () => clearInterval(interval);
-  }, [wsData.data]);
+  }, [wsData.data, fetchMetrics]);
+
+  // Notify on reconnect
+  useEffect(() => {
+    if (wsData.status === "connected" && wsData.reconnectCount > 0) {
+      addToast({ type: "success", title: "Reconnected", message: "Live metrics restored" });
+    }
+  }, [wsData.status, wsData.reconnectCount, addToast]);
 
   if (error && !metrics) {
     return (
-      <div className="bg-[#111118] border border-[#27272a] rounded-lg p-6 text-center">
-        <p className="text-sm text-gray-500">Metrics unavailable</p>
-        <p className="text-xs text-gray-600 mt-1">{error}</p>
-      </div>
+      <ErrorBanner
+        title="Metrics Unavailable"
+        message={error}
+        severity="error"
+        onRetry={fetchMetrics}
+        details={wsData.lastError ?? undefined}
+      />
     );
   }
 
   if (!metrics) {
-    return (
-      <div className="bg-[#111118] border border-[#27272a] rounded-lg p-6 text-center">
-        <p className="text-sm text-gray-500 animate-pulse">Loading metrics...</p>
-      </div>
-    );
+    return <SkeletonPanel />;
   }
 
   const m = metrics;
@@ -88,10 +101,20 @@ export function MetricsPanel() {
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">System Metrics</h2>
         <div className="flex items-center gap-2">
-          <span className={`w-2 h-2 rounded-full ${wsData.status === "connected" ? "bg-green-500" : "bg-yellow-500"}`} />
+          <span className={`w-2 h-2 rounded-full ${
+            wsData.status === "connected" ? "bg-green-500 animate-pulse" :
+            wsData.status === "connecting" ? "bg-yellow-500 animate-pulse" : "bg-red-500"
+          }`} />
           <span className="text-xs text-gray-600">
-            {wsData.status === "connected" ? "Live" : "Polling"}
+            {wsData.status === "connected" ? "Live" :
+             wsData.status === "connecting" ? "Connecting..." :
+             wsData.reconnectCount > 0 ? `Reconnecting (${wsData.reconnectCount})` : "Offline"}
           </span>
+          {wsData.lastMessageAt && wsData.status === "connected" && (
+            <span className="text-xs text-gray-700">
+              {wsData.lastMessageAt.toLocaleTimeString()}
+            </span>
+          )}
         </div>
       </div>
 

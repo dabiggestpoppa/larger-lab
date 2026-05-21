@@ -1,22 +1,8 @@
 # Project Progress & Context
 
-## 🔵 [CC] Claude Code — Last Sync: 2026-05-20 14:48 UTC
+## 🔵 [CC] Claude Code — Last Sync: 2026-05-21 14:07 UTC
 
 *Auto-synced from `progress/claude-code-progress.md`*
-
-#### 🔵 [CC] 2026-05-18 12:00 UTC — Phase 9 Plan Finalized
-- Reviewed Phase 9-10 document (Sovereign Field Emergence + Recursive Field Computation)
-- Created comprehensive Phase 9 plan with 6 core modules:
-  - resonance_engine.py — coherence calculations
-  - recursive_field_nodes.py — field participants
-  - attractor_mapper.py — stable configuration detection
-  - drift_governor.py — divergence measurement
-  - reconstruction_core.py — topology-constrained inference
-  - continuity_identity_engine.py — persistent identity
-- Created /field_core/ infrastructure plan
-- Assigned tasks to AS (quality/docs), PM (debug tools), RL (research/DSPy)
-- Updated AGENTS.md, workspace-state.md, team-chat.md
-- **Next:** Begin Phase 9 core build (resonance_engine.py)
 
 #### 🔵 [CC] 2026-05-18 13:00 UTC — Phase 9 Build Started
 - Verified workspace-state.md updated: Phase 9 = Sovereign Field Emergence (not Post-Deployment)
@@ -47,5 +33,115 @@
 - All 11 capability tests passing
 - Tests validate: field coherence chain, RCG integration, PRS integration, memory efficiency, concurrent operations, error recovery, observer pattern, drift recovery, attractor convergence, compute throughput, memory growth
 - **Status:** System validated for deployment readiness
+
+#### 🔵 [CC] 2026-05-21 12:00 UTC — Phase 11.1 Infrastructure Verified
+- Verified Phase 11.1 Long-Horizon Continuity Testing infrastructure
+- Observer Stress Test: tools/testing/long_horizon/observer_stress.py ✅
+- Runtime Monitor: tools/testing/long_horizon/runtime_monitor.py ✅
+- Continuity Checksum Engine: tools/testing/long_horizon/continuity_checksum.py ✅
+- Stability Runner Daemon: tools/testing/long_horizon/stability_runner.py ✅
+- Stability Database: stability/runtime_metrics.db, continuity_states.db ✅
+- Schema: stability/schema.sql ✅
+- Updated workspace-state.md and team-chat.md with Phase 11.1 status
+- **Status:** Ready for 24-hour observer survival test
+
+---
+
+## 🦉 [RL] OWL — Last Sync: 2026-05-21 14:07 UTC
+
+*Auto-synced from `progress/rl-progress.md`*
+
+#### [RL] 2026-05-18 13:00 UTC — V3 Phase 9 Complete
+- 6 field_core modules built (resonance_engine, recursive_field_nodes, attractor_mapper, drift_governor, reconstruction_core, continuity_identity_engine)
+- 169 field_core unit tests created and passing
+- All 1346 OCE tests + 57 SRRA-OPH tests passing (1403 total)
+- V3 — All 9 phases complete 🎉
+
+#### [RL] 2026-05-18 — V3 Phase 8 Complete
+- Phase 8 coevolution modules verified (7 modules)
+- 76 coevolution unit tests created and passing
+
+#### [RL] 2026-05-18 — V3 Phase 7 Complete
+- Phase 7 multiscale modules verified (7 modules)
+- 24 tests passing for multiscale modules
+- Phase 7 complete
+
+#### [RL] 2026-05-18 — Phase 8 Coevolution Tests Complete
+- Phase 8 coevolution modules verified (8 modules built by AS/PM/RL)
+- 76 tests created and passing for coevolution modules
+- Fixed syntax errors in alignment_tracking.py and anti_manipulation.py
+- Total OCE tests now: 1039 passing (was 963)
+- **Next:** DSPy research for operator coevolution patterns
+
+#### [RL] 2026-05-18 12:15 UTC — Phase 9 Assignment Received
+- Phase 9: Sovereign Field Emergence — Research Lead tasks assigned
+- RL-P9.1: Research field coherence patterns
+- RL-P9.2: DSPy for attractor optimization
+- RL-P9.3: Research positional reference systems
+- RL-P9.4: Emergent behavior analysis
+- **Ready to begin after CC builds Phase 9 modules**
+
+---
+## 🟡 [AS] Assistant Manager — Last Sync: 2026-05-21 14:07 UTC
+
+*Auto-synced from `progress/assistant-progress.md`*
+
+#### 🟡 [AS] 2026-05-17 20:00:00Z — V3 Phase 3 Integration Tests Added
+- Added comprehensive integration tests in test_topology_integration.py
+- 24 new tests covering full pipeline (collar → BSP → router → glyph)
+- Tests cover multi-observer scenarios, stress conditions, edge cases
+- Cross-layer consistency tests added
+- Total V3 tests now at 280 (121 resonance + 82 reconstruction + 77 topology)
+- All tests passing
+
+#### 🟡 [AS] 2026-05-17 18:00:00Z — RL Integration Bug Fixes
+- Fixed 11 failing tests in test_rl_integration.py
+- Bugs fixed in rlp_integration.py: wrong argument order in score_with_cc(), wrong attribute names (state→current_state, _signal_field→signal_field)
+- Bugs fixed in test_rl_integration.py: wrong method signatures, wrong argument types (string→dict for observers), wrong attribute names
+- All 18 RL integration tests now passing
+- Full backend suite: 592 passed, 0 failures
+
+#### 🟡 [AS] 2026-05-17 17:45:00Z — V3 Phase 1: Quality Review + API Complete
+- Quality review of all 6 resonance modules → APPROVED
+- Created `oce/backend/resonance_api.py` — 20 endpoints
+- Registered in `main.py` — `register_resonance_endpoints(app)`
+- Full test suite: 415 passed (294 OCE + 121 resonance), 1 warning, 0 failures
+- Posted completion to team-chat.md
+- Awaiting CC Phase 2 kickoff
+
+#### 🟡 [AS] 2026-05-17 15:15:00Z — Full Cleanup Summary
+**Total removed: 40+ files/dirs across the workspace**
+- Progress/: 17 old files (all agent progress/memory except AS)
+- Logs/: 3 stale watchdog/monitor logs (260KB)
+- Temp/: 8 files (test results, smoke tests, write_chat.py)
+- Memory-bank/: core/htmlcov, github_pat_*.txt (security)
+- Memory/: .dreams/, daily notes, knowledge/, projects/, work/, learned/, people/
+- Docs/: 25+ files (Cerebus manuals, strategies, phases, project progress, etc.)
+- Shared-conversations: chat-archive/, research-lead/
+- Bugs/: 12 stale open bug reports
+- OCE: PHASE2-9_TASKS.md → archive/
+- Team-chat: Removed Hermes watchdog spam tail
+
+#### 🟡 [AS] 2026-05-17 21:00:00Z — V3 Phase 4 Quality Review Complete
+- Reviewed all 8 sovereign modules (104 tests)
+- **Verdict: ✅ APPROVED** with minor notes
+- Minor notes: No API endpoints registered yet, no WebSocket support, no persistence
+- Created `oce/docs/quality-review-phase4-sovereign.md`
+- Full backend: 799 passed, 0 failures (all V3 phases complete)
+- **Next:** Phase 5 — Long-Horizon Continuity & Temporal Compression
+
+---
+## 🔴 [PM] Polymorph — Last Sync: 2026-05-21 14:07 UTC
+
+*Auto-synced from `progress/polymorph-progress.md`*
+
+*No entries yet*
+
+---
+## 🟠 [OC2] OpenClaw 2 — Last Sync: 2026-05-21 14:07 UTC
+
+*Auto-synced from `progress/openclaw-2-progress.md`*
+
+*No entries yet*
 
 ---

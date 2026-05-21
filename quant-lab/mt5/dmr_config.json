@@ -2,12 +2,18 @@
   "login": 650898,
   "password": "Teflondon1718!",
   "server": "OxSecurities-Live",
-  "symbols": ["EURUSD.PRO"],
+  "symbols": ["EURUSD.PRO", "USDCHF.PRO", "CHFJPY.PRO"],
   "lot_size": 0.02,
-  "max_daily_trades_per_symbol": 1,
   "hard_exit_hour_est": 17,
   "deep_mult": 2.00,
   "kill_mult": 2.20,
   "magic_number": 20260520,
-  "enabled": true
+  "enabled": true,
+  "p90_thresholds": {
+    "EURUSD.PRO": [4.1, 4.6, 4.6, 5.9, 6.2],
+    "USDCHF.PRO": [2.0, 3.8, 3.8, 3.6, 4.6],
+    "CHFJPY.PRO": [5.2, 8.6, 8.6, 7.2, 9.2],
+    "XAUUSD.PRO": [8.4, 14.7, 15.0, 14.1, 17.4]
+  },
+  "p90_bands": ["2-4AM", "4-6AM", "6-8AM", "8-10AM", "10-11AM"]
 }
