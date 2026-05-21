@@ -102,7 +102,7 @@ def log_account(conn, acct_info, positions_count):
     c.execute('''INSERT INTO account_snapshots (timestamp, balance, equity, margin, free_margin, profit, positions_count)
         VALUES (?,?,?,?,?,?,?)''',
         (datetime.now(timezone.utc).isoformat(), acct_info.balance, acct_info.equity,
-         acct_info.margin, acct_info.free_margin, acct_info.profit, positions_count))
+         acct_info.margin, getattr(acct_info, 'free_margin', getattr(acct_info, 'margin_free', 0)), acct_info.profit, positions_count))
     conn.commit()
 
 # ── CONFIG ──────────────────────────────────────────────────────────────────
@@ -122,13 +122,24 @@ def save_config(cfg):
         json.dump(cfg, f, indent=2)
 
 # ── STRATEGY ────────────────────────────────────────────────────────────────
-def p90_threshold(est_h):
+# Pair-specific P90 thresholds: 90th percentile of 5-min body sizes (MT5, 90 days)
+# Bands: [2-4AM, 4-6AM, 6-8AM, 8-10AM, 10-11AM] EST
+_P90_THRESH = {
+    "EURUSD.PRO": [4.1, 4.6, 4.6, 5.9, 6.2],
+    "USDCHF.PRO": [2.0, 3.8, 3.8, 3.6, 4.6],
+    "CHFJPY.PRO": [5.2, 8.6, 8.6, 7.2, 9.2],
+    "XAUUSD.PRO": [8.4, 14.7, 15.0, 14.1, 17.4],
+}
+
+def p90_threshold(est_h, symbol=""):
+    """Pair-specific P90 thresholds. Each pair has its own volatility profile."""
+    t = _P90_THRESH.get(symbol, _P90_THRESH["EURUSD.PRO"])
     if est_h < 2 or est_h >= 11: return 99.0
-    if est_h < 4: return 4.1
-    if est_h < 6: return 4.6
-    if est_h < 8: return 4.6
-    if est_h < 10: return 5.9
-    if est_h < 11: return 6.2
+    if est_h < 4: return t[0]
+    if est_h < 6: return t[1]
+    if est_h < 8: return t[2]
+    if est_h < 10: return t[3]
+    if est_h < 11: return t[4]
     return 99.0
 
 def to_pips(price_diff, symbol=""):
@@ -179,11 +190,18 @@ def find_new_p90s(today_bars, symbol, known_p90_ids):
         if eh < 2 or eh >= 11:
             continue
         body = to_pips(abs(bar['close'] - bar['open']), symbol)
-        thresh = p90_threshold(eh)
+        thresh = p90_threshold(eh, symbol)
         if body >= thresh:
+            # Asian range filter: P90 must close OUTSIDE the Asian band
+            ah = max(b['high'] for b in today_bars[:today_bars.index(bar)+1])
+            al = min(b['low'] for b in today_bars[:today_bars.index(bar)+1])
+            direction = 'LONG' if bar['close'] > bar['open'] else 'SHORT'
+            if direction == 'LONG' and bar['close'] <= ah:
+                continue
+            if direction == 'SHORT' and bar['close'] >= al:
+                continue
             bar_id = bar['time'].strftime('%H:%M')
             if bar_id not in known_p90_ids:
-                direction = 'LONG' if bar['close'] > bar['open'] else 'SHORT'
                 new_p90s.append((direction, bar, body, thresh))
                 known_p90_ids.add(bar_id)
     return new_p90s, known_p90_ids

@@ -1,0 +1,20 @@
+{
+  "_comment": "P90 thresholds = 90th percentile of 5-min candle body sizes during 2-11 AM EST window. Calculated from MT5 90-day historical data.",
+  "bands": ["2-4AM", "4-6AM", "6-8AM", "8-10AM", "10-11AM"],
+  "EURUSD.PRO": {
+    "thresholds": [4.1, 4.6, 4.6, 5.9, 6.2],
+    "source": "CEREBUS manual (conservative, close to MT5 data: 2.8, 4.9, 5.0, 4.7, 5.8)"
+  },
+  "USDCHF.PRO": {
+    "thresholds": [2.0, 3.8, 3.8, 3.6, 4.6],
+    "source": "MT5 data (lower vol than EURUSD, ~0.75x)"
+  },
+  "CHFJPY.PRO": {
+    "thresholds": [5.2, 8.6, 8.6, 7.2, 9.2],
+    "source": "MT5 data (higher vol than EURUSD, ~1.7x)"
+  },
+  "XAUUSD.PRO": {
+    "thresholds": [8.4, 14.7, 15.0, 14.1, 17.4],
+    "source": "MT5 data scaled (~3x EURUSD)"
+  }
+}

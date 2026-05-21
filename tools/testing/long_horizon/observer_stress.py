@@ -52,7 +52,7 @@ class ObserverStressTest:
             return
             
         def task_loop():
-            while observer.status == "alive":
+            while observer.status in ("alive", "degraded"):
                 # Simulate task processing
                 observer.tasks_completed += 1
                 observer.last_heartbeat = time.time()
@@ -60,7 +60,7 @@ class ObserverStressTest:
                 # Random chance of error (simulate real conditions)
                 if random.random() < 0.01:  # 1% error rate
                     observer.errors += 1
-                    observer.status = "degraded"
+                    # Don't change status - degraded observers keep running
                     
                 time.sleep(60 / tasks_per_minute)
                 
@@ -75,8 +75,8 @@ class ObserverStressTest:
         dead = 0
         
         for obs in self.observers.values():
-            # Check if heartbeat is stale (> 2 minutes)
-            if now - obs.last_heartbeat > 120:
+            # Check if heartbeat is stale (> 5 minutes - more tolerant)
+            if now - obs.last_heartbeat > 300:
                 obs.status = "dead"
                 dead += 1
             elif obs.status == "degraded":

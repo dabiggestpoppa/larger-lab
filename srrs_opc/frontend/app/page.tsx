@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { srraApi, HealthResponse, ModuleInfo, PhaseInfo, EventItem } from "./lib/api";
+import { ErrorBanner } from "./components/ErrorBanner";
+import { SkeletonStatCard, SkeletonPhaseBar, SkeletonEventRow } from "./components/SkeletonLoader";
 
 function StatusBadge({ status }: { status: string }) {
   const color =
@@ -36,8 +38,9 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<string>("");
+  const [expandedPhase, setExpandedPhase] = useState<number | null>(null);
 
-  const fetchAll = async () => {
+  const fetchAll = useCallback(async () => {
     try {
       const [h, m, p, e] = await Promise.all([
         srraApi.health(),
@@ -57,33 +60,58 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchAll();
-    const interval = setInterval(fetchAll, 30000);
+    const interval = setInterval(fetchAll, 15000); // Faster polling (15s vs 30s)
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchAll]);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <div className="text-center">
-          <div className="w-10 h-10 border-2 border-accent-blue border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-gray-500 mt-4 text-sm">Connecting to SRRA-OPH…</p>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+            <p className="text-sm text-gray-500 mt-1">SRRA-OPH System Overview</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <SkeletonStatCard /><SkeletonStatCard /><SkeletonStatCard /><SkeletonStatCard />
+        </div>
+        <div className="card mb-8">
+          <h2 className="text-sm font-semibold text-gray-300 mb-4">Phase Progress</h2>
+          <div className="space-y-3">
+            <SkeletonPhaseBar /><SkeletonPhaseBar /><SkeletonPhaseBar />
+          </div>
+        </div>
+        <div className="card">
+          <h2 className="text-sm font-semibold text-gray-300 mb-4">Recent Events</h2>
+          <div className="space-y-2">
+            <SkeletonEventRow /><SkeletonEventRow /><SkeletonEventRow />
+          </div>
         </div>
       </div>
     );
   }
 
-  if (error) {
+  if (error && !health) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <div className="card text-center max-w-md">
-          <p className="text-accent-red text-lg font-semibold">Connection Error</p>
-          <p className="text-gray-400 text-sm mt-2">{error}</p>
-          <p className="text-gray-600 text-xs mt-4">Ensure API is running on localhost:8001</p>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+            <p className="text-sm text-gray-500 mt-1">SRRA-OPH System Overview</p>
+          </div>
         </div>
+        <ErrorBanner
+          title="Connection Error"
+          message={error}
+          severity="error"
+          onRetry={fetchAll}
+          details="Ensure API is running on localhost:8001. Check that the OCE backend is started."
+        />
       </div>
     );
   }
@@ -130,32 +158,55 @@ export default function DashboardPage() {
       {/* Phase Progress */}
       <div className="card mb-8">
         <h2 className="text-sm font-semibold text-gray-300 mb-4">Phase Progress</h2>
-        <div className="space-y-3">
-          {phases.map((phase) => (
-            <div key={phase.phase} className="flex items-center gap-4">
-              <span className="text-xs text-gray-500 w-6">P{phase.phase}</span>
-              <div className="flex-1 bg-bg-tertiary rounded-full h-2 overflow-hidden">
+        <div className="space-y-2">
+          {phases.map((phase) => {
+            const maxModules = Math.max(...phases.map((p) => p.modules.length));
+            const pct = maxModules > 0 ? (phase.modules.length / maxModules) * 100 : 0;
+            const isExpanded = expandedPhase === phase.phase;
+            return (
+              <div key={phase.phase}>
                 <div
-                  className={`h-full rounded-full ${
-                    phase.status === "active" ? "bg-accent-blue" : "bg-yellow-500"
-                  }`}
-                  style={{
-                    width: `${(phase.modules.length / Math.max(...phases.map((p) => p.modules.length))) * 100}%`,
-                  }}
-                />
+                  className="flex items-center gap-4 cursor-pointer hover:bg-bg-tertiary/50 rounded-md px-2 py-1.5 -mx-2 transition-colors group"
+                  onClick={() => setExpandedPhase(isExpanded ? null : phase.phase)}
+                  title={`${phase.modules.length} modules — click to ${isExpanded ? "collapse" : "expand"}`}
+                >
+                  <span className="text-xs text-gray-500 w-6">P{phase.phase}</span>
+                  <div className="flex-1 bg-bg-tertiary rounded-full h-2 overflow-hidden relative">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        phase.status === "active" ? "bg-accent-blue" : "bg-yellow-500"
+                      }`}
+                      style={{ width: `${pct}%` }}
+                    />
+                    <span className="absolute right-1 top-1/2 -translate-y-1/2 text-[9px] text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {phase.modules.length} modules
+                    </span>
+                  </div>
+                  <span className="text-xs text-gray-400 w-24 truncate">{phase.name}</span>
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded ${
+                      phase.status === "active"
+                        ? "bg-green-500/20 text-green-400"
+                        : "bg-yellow-500/20 text-yellow-400"
+                    }`}
+                  >
+                    {phase.status}
+                  </span>
+                </div>
+                {isExpanded && (
+                  <div className="ml-10 mt-1 mb-2 p-2 bg-bg-tertiary/30 rounded-md">
+                    <div className="flex flex-wrap gap-1">
+                      {phase.modules.map((modName) => (
+                        <span key={modName} className="text-[10px] bg-bg-tertiary px-1.5 py-0.5 rounded text-gray-400 font-mono">
+                          {modName}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-              <span className="text-xs text-gray-400 w-24 truncate">{phase.name}</span>
-              <span
-                className={`text-xs px-2 py-0.5 rounded ${
-                  phase.status === "active"
-                    ? "bg-green-500/20 text-green-400"
-                    : "bg-yellow-500/20 text-yellow-400"
-                }`}
-              >
-                {phase.status}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

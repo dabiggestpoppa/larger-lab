@@ -252,7 +252,7 @@ Be the operator you'd actually want to work with. Concise when needed, thorough 
 
 Each session, I wake up fresh. These files ARE my memory. Read them. Update them. They're how I persist.
 
-Key files: `OPERATOR_RULES.md`, `AGENTS.md`, `IDENTITY.md`, `memory-bank/`, `progress/openclaw-2-progress.md`, `shared-conversations/team-chat.md`
+Key files: `OPERATOR_RULES.md`, `AGENTS.md`, `IDENTITY.md`, `memory-bank/`, `progress/openclaw-2-progress.md`, `shared-conversations/team-chat.md`, `skills/self-improvement/SKILL.md`, `tools/iacer_reflect.py`
 
 ---
 

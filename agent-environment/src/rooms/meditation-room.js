@@ -1,11 +1,19 @@
 /**
  * Meditation Room — IACER thinking space.
  *
+ * UPDATED: 2026-05-20 — Post-meditation soul alignment
+ * - All meditations must be actionable, not just philosophical
+ * - Insights must reference MEDITATION_INDEX.md for cross-agent synthesis
+ * - Each meditation must include: insight, evidence, recommendation, deadline
+ * - SAGE meditations: must include mathematical basis
+ * - CEO meditations: must include revenue impact assessment
+ * - Manager meditations: must include room governance updates
+ *
  * Before spawning a new agent, it enters the meditation room.
  * It receives a task/idea and works through the IACER framework:
  *   Intent     — What is the true objective?
  *   Abstraction — What are the layers?
- *   Context    — What's the current state?
+ *   Context    — What's the current state? (Read MEDITATION_INDEX.md)
  *   Expectations — What does success look like?
  *   Results    — What's the expected outcome?
  *
@@ -48,10 +56,12 @@ function saveState() {
 
 /**
  * Begin a meditation session for an agent.
+ * Updated: Now requires agent to specify which MEDITATION_INDEX.md section they've read.
  */
-function beginMeditation(agentId, { task = '', idea = '' }) {
+function beginMeditation(agentId, { task = '', idea = '', agentType = 'general' }) {
   const session = {
     agentId,
+    agentType, // 'CEO' | 'SAGE' | 'Optimizer' | 'SW_Dev' | 'Farm' | 'Quant' | 'general'
     task,
     idea,
     startedAt: new Date().toISOString(),
@@ -63,12 +73,20 @@ function beginMeditation(agentId, { task = '', idea = '' }) {
       expectations: null,
       results: null,
     },
+    // New: Actionability requirements
+    actionable: {
+      insight: null,       // The key finding
+      evidence: null,      // Data/math supporting the insight
+      recommendation: null, // Specific action to take
+      deadline: null,      // When the action should be completed
+      revenueImpact: null, // Expected revenue impact (CEO/SAGE must fill)
+    },
     prototypeSketch: null,
     completed: false,
   };
   sessions.set(agentId, session);
   saveState();
-  logger.info('Meditation started', { agentId, task: task.slice(0, 60) });
+  logger.info('Meditation started', { agentId, agentType, task: task.slice(0, 60) });
   return { success: true, session };
 }
 
@@ -90,6 +108,23 @@ function updateIacer(agentId, { intent, abstraction, context, expectations, resu
 }
 
 /**
+ * Update the actionability section of a meditation.
+ */
+function updateActionable(agentId, { insight, evidence, recommendation, deadline, revenueImpact }) {
+  const session = sessions.get(agentId);
+  if (!session) return { success: false, error: 'No active meditation session' };
+
+  if (insight !== undefined) session.actionable.insight = insight;
+  if (evidence !== undefined) session.actionable.evidence = evidence;
+  if (recommendation !== undefined) session.actionable.recommendation = recommendation;
+  if (deadline !== undefined) session.actionable.deadline = deadline;
+  if (revenueImpact !== undefined) session.actionable.revenueImpact = revenueImpact;
+
+  saveState();
+  return { success: true, actionable: session.actionable };
+}
+
+/**
  * Set the prototype sketch (agent's plan after meditation).
  */
 function setPrototypeSketch(agentId, sketch) {
@@ -102,15 +137,33 @@ function setPrototypeSketch(agentId, sketch) {
 
 /**
  * Complete meditation — agent is ready to join a working room.
+ * Updated: Requires actionable section to be filled for CEO/SAGE meditations.
  */
 function completeMeditation(agentId) {
   const session = sessions.get(agentId);
   if (!session) return { success: false, error: 'No active meditation session' };
+
+  // Enforce actionability for CEO and SAGE
+  if (session.agentType === 'CEO' || session.agentType === 'SAGE') {
+    const a = session.actionable;
+    if (!a.insight || !a.recommendation) {
+      return {
+        success: false,
+        error: `${session.agentType} meditations require actionable insight and recommendation. Fill updateActionable() before completing.`,
+      };
+    }
+  }
+
   session.completed = true;
   session.status = 'ready';
   session.completedAt = new Date().toISOString();
   saveState();
-  logger.info('Meditation completed', { agentId, hasSketch: !!session.prototypeSketch });
+  logger.info('Meditation completed', {
+    agentId,
+    agentType: session.agentType,
+    hasSketch: !!session.prototypeSketch,
+    hasActionable: !!session.actionable.insight,
+  });
   return { success: true, session };
 }
 
@@ -142,6 +195,7 @@ loadState();
 module.exports = {
   beginMeditation,
   updateIacer,
+  updateActionable,
   setPrototypeSketch,
   completeMeditation,
   getSession,

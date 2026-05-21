@@ -794,8 +794,9 @@ graph LR
     P8[Phase 8<br/>OC<br/>8 modules]
     P9[Phase 9<br/>SFE<br/>6 modules]
     P10[Phase 10<br/>RFC<br/>5 modules]
+    P11[Phase 11<br/>OV<br/>11 components]
 
-    P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7 --> P8 --> P9 --> P10
+    P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7 --> P8 --> P9 --> P10 --> P11
 
     style P1 fill:#3498db,color:#fff
     style P2 fill:#2ecc71,color:#fff
@@ -809,7 +810,7 @@ graph LR
     style P10 fill:#8e44ad,color:#fff
 ```
 
-**Total: 67 V3 modules across 10 phases, 1403 tests passing**
+**Total: 67 V3 modules across 10 phases + 11 Phase 11 components, 1403 tests passing**
     GA --> SM
     SM --> NR
     NR --> SAR
@@ -913,3 +914,55 @@ graph TB
 | ReconstructionCore | `oce/backend/field_core/reconstruction_core.py` | Topology-constrained inference | 12 |
 | ContinuityIdentityEngine | `oce/backend/field_core/continuity_identity_engine.py` | Maintains operational continuity | 11 |
 | **Total** | | | **169 tests** |
+
+---
+
+## 🧪 V3 Phase 11 — Operational Validation
+
+```mermaid
+graph TB
+    subgraph "Long-Horizon Testing"
+        OST[ObserverStressTest<br/>observer_stress.py]
+        RTM[RuntimeMonitor<br/>runtime_monitor.py]
+        CCS[ContinuityChecksum<br/>continuity_checksum.py]
+    end
+
+    subgraph "Stability Infrastructure"
+        SR[StabilityRunner<br/>stability_runner.py]
+        MI[MemoryIntegrity<br/>memory_integrity.py]
+        CP[ContinuityProbe<br/>continuity_probe.py]
+    end
+
+    subgraph "Drift & Recovery"
+        DT[DriftTracker<br/>drift_tracker.py]
+        RV[RestartValidator<br/>restart_validator.py]
+        EM[EntropyMonitor<br/>entropy_monitor.py]
+    end
+
+    subgraph "Chaos Engine"
+        CE[ChaosEngine<br/>chaos_engine.py]
+        ME[MetricsExporter<br/>metrics_exporter.py]
+    end
+
+    OST --> RTM --> CCS
+    SR --> MI --> CP
+    DT --> RV --> EM
+    CE --> ME
+```
+
+### V3 Phase 11 Test Infrastructure
+
+| Component | File | Purpose | Tests |
+|-----------|------|---------|-------|
+| ObserverStressTest | `tools/testing/long_horizon/observer_stress.py` | 24-72hr observer survival test | 1 |
+| RuntimeMonitor | `tools/testing/long_horizon/runtime_monitor.py` | Runtime metrics collection | 1 |
+| ContinuityChecksum | `tools/testing/long_horizon/continuity_checksum.py` | Continuity state validation | 1 |
+| StabilityRunner | `tools/testing/long_horizon/stability_runner.py` | Main test orchestrator | 1 |
+| MemoryIntegrity | `tools/testing/long_horizon/memory_integrity.py` | Memory poisoning/drift detection | 1 |
+| ContinuityProbe | `tools/testing/long_horizon/continuity_probe.py` | Periodic state probing | 1 |
+| DriftTracker | `tools/testing/long_horizon/drift_tracker.py` | Drift score tracking | 1 |
+| RestartValidator | `tools/testing/long_horizon/restart_validator.py` | Post-restart validation | 1 |
+| EntropyMonitor | `tools/testing/long_horizon/entropy_monitor.py` | System entropy monitoring | 1 |
+| MetricsExporter | `tools/testing/long_horizon/metrics_exporter.py` | Metrics export to JSON | 1 |
+| ChaosEngine | `tools/testing/chaos/chaos_engine.py` | Failure injection testing | 8 |
+| **Total** | | | **16 tests** |
