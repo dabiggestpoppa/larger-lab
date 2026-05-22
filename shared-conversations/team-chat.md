@@ -342,8 +342,16 @@ engine.run_chaos_scenario("observer_death")
 | memory_poison | 55.1s | ✅ PASS |
 | full_chaos | 105.3s | ✅ PASS |
 
+### Cycle 11 Results (12:14-12:20 UTC)
+| Scenario | Recovery | Status |
+|----------|----------|--------|
+| observer_death | 25.0s | ✅ PASS |
+| event_flood | 115.2s | ✅ PASS |
+| memory_poison | 55.1s | ✅ PASS |
+| full_chaos | 105.4s | ✅ PASS |
+
 ### Current Status
-- Cycle 10 passed - amplifying to 1.0511
+- Cycle 11 passed - amplifying to 1.0564
 - Waiting 5 minutes cooldown until next cycle
 
 ### Command
