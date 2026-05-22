@@ -1,7 +1,7 @@
-# Full SRRA-OPH Topology — Phases 1-9
+# Full SRRA-OPH Topology — Phases 1-10
 
 > Source: CODEMAP.md (line 125)
-> Phase: 6-9 Resources
+> Phase: 6-9 Resources | Updated: Phase 10 Complete
 
 ```mermaid
 graph TD
@@ -36,6 +36,14 @@ graph TD
         ES[Entropy Scheduler]
     end
 
+    subgraph "Recursive Compute (Phase 10)"
+        RCG[RecursiveComputeGraph]
+        PRS[PositionalReferenceSystem]
+        RPE[ResonancePropagationEngine]
+        DCT[DynamicConstraintTopology]
+        ACE[AttractorComputeEngine]
+    end
+
     O1 --> AC1
     O2 --> AC1
     O2 --> AC2
@@ -53,4 +61,24 @@ graph TD
     TF --> MSR
     CC --> MCR
     RP --> ES
+
+    MSR --> RCG
+    MCR --> PRS
+    ES --> RPE
+    RCG --> DCT
+    PRS --> RPE
+    RPE --> ACE
+    DCT --> ACE
+    ACE --> RCG
 ```
+
+## Phase 10: Recursive Field Computation ✅ COMPLETE
+
+| Module | File | Tests | Purpose |
+|--------|------|-------|---------|
+| RecursiveComputeGraph | `oce/backend/phase10/rcg.py` | 6 | Recursive compute graph + stabilization |
+| PositionalReferenceSystem | `oce/backend/phase10/prs.py` | 5 | Positional reference system |
+| ResonancePropagationEngine | `oce/backend/phase10/rpe.py` | 4 | Resonance propagation engine |
+| DynamicConstraintTopology | `oce/backend/phase10/dct.py` | 4 | Dynamic constraint topology |
+| AttractorComputeEngine | `oce/backend/phase10/ace.py` | 4 | Attractor compute engine |
+| **Total** | | **23 tests** | |
