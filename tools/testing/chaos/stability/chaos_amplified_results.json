@@ -1,0 +1,180 @@
+{
+  "test_type": "amplified_chaos",
+  "start_time": "2026-05-22T10:11:49.626065",
+  "end_time": "2026-05-22T10:11:49.631065",
+  "total_hours": 1,
+  "cycles": [
+    {
+      "hour": 1,
+      "timestamp": "2026-05-22T10:11:49.626065",
+      "amplification_factor": 1.0,
+      "scenarios_run": [
+        "observer_death",
+        "event_flood",
+        "memory_poison",
+        "full_chaos"
+      ],
+      "events": [
+        {
+          "event_id": "EVT-0001",
+          "timestamp": "2026-05-22T10:06:44.102558",
+          "chaos_type": "observer_death",
+          "target": "system",
+          "duration_seconds": 60,
+          "injection_time": 10.015769958496094,
+          "recovery_time": 25.104478359222412,
+          "status": "PASS",
+          "error_message": null,
+          "stack_trace": null,
+          "system_state_before": {
+            "timestamp": "2026-05-22T10:06:07.736858",
+            "active_chaos": [],
+            "memory_usage": {
+              "rss_mb": 20.6640625,
+              "vms_mb": 12.35546875,
+              "percent": 0.2734597727233957
+            },
+            "observer_status": {
+              "error": "observer registry unavailable"
+            },
+            "thread_count": 1
+          },
+          "system_state_after": {
+            "timestamp": "2026-05-22T10:06:43.950238",
+            "active_chaos": [],
+            "memory_usage": {
+              "rss_mb": 3.45703125,
+              "vms_mb": 12.4375,
+              "percent": 0.047144671592388825
+            },
+            "observer_status": {
+              "error": "observer registry unavailable"
+            },
+            "thread_count": 1
+          },
+          "amplification_factor": 1.0
+        },
+        {
+          "event_id": "EVT-0002",
+          "timestamp": "2026-05-22T10:08:44.244688",
+          "chaos_type": "event_flood",
+          "target": "system",
+          "duration_seconds": 60,
+          "injection_time": 5.037847518920898,
+          "recovery_time": 115.03413438796997,
+          "status": "PASS",
+          "error_message": null,
+          "stack_trace": null,
+          "system_state_before": {
+            "timestamp": "2026-05-22T10:06:44.126270",
+            "active_chaos": [],
+            "memory_usage": {
+              "rss_mb": 5.0390625,
+              "vms_mb": 12.4375,
+              "percent": 0.06668489731818156
+            },
+            "observer_status": {
+              "error": "observer registry unavailable"
+            },
+            "thread_count": 1
+          },
+          "system_state_after": {
+            "timestamp": "2026-05-22T10:08:44.199264",
+            "active_chaos": [],
+            "memory_usage": {
+              "rss_mb": 3.0703125,
+              "vms_mb": 12.27734375,
+              "percent": 0.04192360598840717
+            },
+            "observer_status": {
+              "error": "observer registry unavailable"
+            },
+            "thread_count": 1
+          },
+          "amplification_factor": 1.0
+        },
+        {
+          "event_id": "EVT-0003",
+          "timestamp": "2026-05-22T10:09:44.396984",
+          "chaos_type": "memory_poison",
+          "target": "system",
+          "duration_seconds": 60,
+          "injection_time": 5.0123560428619385,
+          "recovery_time": 55.084163188934326,
+          "status": "PASS",
+          "error_message": null,
+          "stack_trace": null,
+          "system_state_before": {
+            "timestamp": "2026-05-22T10:08:44.251483",
+            "active_chaos": [],
+            "memory_usage": {
+              "rss_mb": 4.67578125,
+              "vms_mb": 12.27734375,
+              "percent": 0.06187738146501033
+            },
+            "observer_status": {
+              "error": "observer registry unavailable"
+            },
+            "thread_count": 1
+          },
+          "system_state_after": {
+            "timestamp": "2026-05-22T10:09:44.350160",
+            "active_chaos": [],
+            "memory_usage": {
+              "rss_mb": 3.0625,
+              "vms_mb": 12.27734375,
+              "percent": 0.04182021855070456
+            },
+            "observer_status": {
+              "error": "observer registry unavailable"
+            },
+            "thread_count": 1
+          },
+          "amplification_factor": 1.0
+        },
+        {
+          "event_id": "EVT-0004",
+          "timestamp": "2026-05-22T10:11:49.622053",
+          "chaos_type": "full_chaos",
+          "target": "system",
+          "duration_seconds": 60,
+          "injection_time": 20.08512568473816,
+          "recovery_time": 105.10931205749512,
+          "status": "PASS",
+          "error_message": null,
+          "stack_trace": null,
+          "system_state_before": {
+            "timestamp": "2026-05-22T10:09:44.404407",
+            "active_chaos": [],
+            "memory_usage": {
+              "rss_mb": 4.6640625,
+              "vms_mb": 12.27734375,
+              "percent": 0.061773994027307724
+            },
+            "observer_status": {
+              "error": "observer registry unavailable"
+            },
+            "thread_count": 1
+          },
+          "system_state_after": {
+            "timestamp": "2026-05-22T10:11:49.604056",
+            "active_chaos": [],
+            "memory_usage": {
+              "rss_mb": 3.03515625,
+              "vms_mb": 12.34765625,
+              "percent": 0.04151005623759674
+            },
+            "observer_status": {
+              "error": "observer registry unavailable"
+            },
+            "thread_count": 1
+          },
+          "amplification_factor": 1.0
+        }
+      ],
+      "passed": true,
+      "total_recovery_time": 300.3320879936218,
+      "failure_details": null
+    }
+  ]
+}

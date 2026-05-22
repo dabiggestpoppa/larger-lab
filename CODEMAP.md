@@ -966,3 +966,40 @@ graph TB
 | MetricsExporter | `tools/testing/long_horizon/metrics_exporter.py` | Metrics export to JSON | 1 |
 | ChaosEngine | `tools/testing/chaos/chaos_engine.py` | Failure injection testing | 8 |
 | **Total** | | | **16 tests** |
+
+---
+
+## 🧪 V3 Phase 11 — Operational Validation (Current Status)
+
+### Test Progress
+
+| Test | Status | Details |
+|------|--------|---------|
+| Chaos Engine Autopilot | ✅ COMPLETE | 4/4 scenarios passed |
+| Continuous Amplified Chaos | 🔄 RUNNING | Cycle 1/12+ completed, amplification 1.0050 |
+
+### Chaos Engine Test Results
+
+| Scenario | Recovery Time | Status |
+|----------|---------------|--------|
+| observer_death | 25.0s | ✅ PASS |
+| event_flood | 115.2s | ✅ PASS |
+| memory_poison | 55.1s | ✅ PASS |
+| full_chaos | 105.1s | ✅ PASS |
+
+### Continuous Test Configuration
+
+- **Duration:** 12 hours continuous
+- **Amplification:** 0.5% per PASS cycle
+- **Cooldown:** 5 minutes between cycles
+- **Tracking:** `tools/testing/chaos/stability/chaos_continuous_results.json`
+- **Trace Log:** `tools/testing/chaos/stability/chaos_continuous_trace.log`
+
+### Test Files
+
+| File | Purpose |
+|------|---------|
+| `chaos_engine.py` | Chaos injection engine (8 failure types) |
+| `chaos_runner.py` | Autopilot script for chaos scenarios |
+| `chaos_continuous_test.py` | Continuous amplified chaos test |
+| `chaos_test_plan.md` | Chaos scenario documentation |

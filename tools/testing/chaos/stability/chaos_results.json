@@ -1,0 +1,34 @@
+[
+  {
+    "scenario": "observer_death",
+    "timestamp": "2026-05-22T09:24:30.090051",
+    "events_injected": 2,
+    "recovered": 2,
+    "recovery_time_seconds": 25.06,
+    "status": "PASS"
+  },
+  {
+    "scenario": "event_flood",
+    "timestamp": "2026-05-22T09:26:40.292158",
+    "events_injected": 1,
+    "recovered": 1,
+    "recovery_time_seconds": 115.18,
+    "status": "PASS"
+  },
+  {
+    "scenario": "memory_poison",
+    "timestamp": "2026-05-22T09:27:50.403040",
+    "events_injected": 1,
+    "recovered": 1,
+    "recovery_time_seconds": 55.07,
+    "status": "PASS"
+  },
+  {
+    "scenario": "full_chaos",
+    "timestamp": "2026-05-22T09:30:05.704463",
+    "events_injected": 4,
+    "recovered": 4,
+    "recovery_time_seconds": 105.22,
+    "status": "PASS"
+  }
+]

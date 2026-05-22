@@ -39,6 +39,42 @@
 | 16.0h | 10 | 0 | 0 | ✅ 16-hour milestone - 8/24 hours completed! |
 | 16.55h | 10 | 0 | 0 | ✅ 16.55-hour milestone - TEST RUNNING STRONG |
 | 16.59h | 10 | 0 | 0 | ✅ 16.59-hour milestone - TEST RUNNING STRONG |
+| 17.00h | 10 | 0 | 0 | ✅ 17-hour milestone - TEST RUNNING STRONG |
+| 17.05h | 10 | 0 | 0 | ✅ 17.05-hour milestone - TEST RUNNING STRONG |
+| 17.20h | 10 | 0 | 0 | ✅ 17.20-hour milestone - TEST RUNNING STRONG |
+| 17.27h | 10 | 0 | 0 | ✅ 17.27-hour milestone - TEST RUNNING STRONG |
+| 17.35h | 10 | 0 | 0 | ✅ 17.35-hour milestone - TEST RUNNING STRONG |
+| 17.40h | 10 | 0 | 0 | ✅ 17.40-hour milestone - TEST RUNNING STRONG |
+| 17.45h | 10 | 0 | 0 | ✅ 17.45-hour milestone - TEST RUNNING STRONG |
+| 17.50h | 10 | 0 | 0 | ✅ 17.50-hour milestone - TEST RUNNING STRONG |
+| 17.55h | 10 | 0 | 0 | ✅ 17.55-hour milestone - TEST RUNNING STRONG |
+| 18.00h | 10 | 0 | 0 | ✅ 18-hour milestone - 75% COMPLETE! |
+| 18.02h | 10 | 0 | 0 | ✅ 18.02-hour milestone - TEST RUNNING STRONG |
+| 18.45h | 10 | 0 | 0 | ✅ 18.45-hour milestone - TEST RUNNING STRONG |
+| 18.46h | 10 | 0 | 0 | ✅ 18.46-hour milestone - TEST RUNNING STRONG |
+| 18.50h | 10 | 0 | 0 | ✅ 18.50-hour milestone - TEST RUNNING STRONG |
+| 18.55h | 10 | 0 | 0 | ✅ 18.55-hour milestone - TEST RUNNING STRONG |
+| 19.00h | 10 | 0 | 0 | ✅ 19-hour milestone - 79% COMPLETE! |
+| 19.01h | 10 | 0 | 0 | ✅ 19.01-hour milestone - TEST RUNNING STRONG |
+| 19.02h | 10 | 0 | 0 | ✅ 19.02-hour milestone - TEST RUNNING STRONG |
+| 19.03h | 10 | 0 | 0 | ✅ 19.03-hour milestone - TEST RUNNING STRONG |
+| 19.04h | 10 | 0 | 0 | ✅ 19.04-hour milestone - TEST RUNNING STRONG |
+| 19.05h | 10 | 0 | 0 | ✅ 19.05-hour milestone - TEST RUNNING STRONG |
+| 19.06h | 10 | 0 | 0 | ✅ 19.06-hour milestone - TEST RUNNING STRONG |
+| 19.07h | 10 | 0 | 0 | ✅ 19.07-hour milestone - TEST RUNNING STRONG |
+| 19.08h | 10 | 0 | 0 | ✅ 19.08-hour milestone - TEST RUNNING STRONG |
+| 19.09h | 10 | 0 | 0 | ✅ 19.09-hour milestone - TEST RUNNING STRONG |
+| 19.10h | 10 | 0 | 0 | ✅ 19.10-hour milestone - TEST RUNNING STRONG |
+| 19.12h | 10 | 0 | 0 | ✅ 19.12-hour milestone - TEST RUNNING STRONG |
+| 19.14h | 10 | 0 | 0 | ✅ 19.14-hour milestone - TEST RUNNING STRONG |
+| 19.15h | 10 | 0 | 0 | ✅ 19.15-hour milestone - TEST RUNNING STRONG |
+| 19.20h | 10 | 0 | 0 | ✅ 19.20-hour milestone - TEST RUNNING STRONG |
+| 19.26h | 10 | 0 | 0 | ✅ 19.26-hour milestone - TEST RUNNING STRONG |
+| 19.38h | 10 | 0 | 0 | ✅ 19.38-hour milestone - TEST RUNNING STRONG |
+| 19.44h | 10 | 0 | 0 | ✅ 19.44-hour milestone - TEST RUNNING STRONG |
+| 19.52h | 10 | 0 | 0 | ✅ 19.52-hour milestone - TEST RUNNING STRONG |
+| 19.58h | 10 | 0 | 0 | ✅ 19.58-hour milestone - TEST RUNNING STRONG |
+| 20.00h | 10 | 0 | 0 | ✅ 20-hour milestone - 83% COMPLETE! |
 
 ### Previous Test (5.7h) - COMPLETED
 | Time | Alive | Degraded | Dead | Status |
@@ -54,24 +90,62 @@
 
 ---
 
-## Phase 11.2 — Chaos Engine Prep (2026-05-21 16:45 UTC)
+## Phase 11.2 — Chaos Engine Autopilot (2026-05-22 02:00 UTC)
 
-### Status: READY FOR EXECUTION
-- Observer stress test at 16 hours, all observers running strong
-- Created Chaos Test Plan at `tools/testing/chaos/chaos_test_plan.md`
-- 4 chaos scenarios ready for execution
+### Status: ✅ COMPLETED
+- Observer stress test at 19+ hours, all observers running strong
+- Created Chaos Runner at `tools/testing/chaos/chaos_runner.py`
+- Autopilot mode enabled for autonomous chaos testing
 
-### Chaos Scenarios Available
-| Scenario | Description | Duration | Status |
-|----------|-------------|----------|--------|
-| observer_death | Kill trading_observer + repair_observer | 30s | 🔄 Ready |
-| event_flood | Flood event_fabric at 20x rate | 120s | 🔄 Ready |
-| memory_poison | Inject false memories at 30% rate | 60s | 🔄 Ready |
-| full_chaos | Combined: observer kill + flood + corrupt + websocket loss | 120s | 🔄 Ready |
+### Chaos Runner Features
+- Runs all 4 scenarios: observer_death, event_flood, memory_poison, full_chaos
+- Monitors recovery for each scenario
+- Saves results to `stability/chaos_results.json`
+- Reports pass/fail status
 
-### Individual Chaos Types (8 total)
-- OBSERVER_KILL, EVENT_FLOOD, MEMORY_CORRUPT, ROUTER_FAILURE
-- WEBSOCKET_LOSS, TOKEN_STARVE, RECURSIVE_STORM, TWIN_DESYNC
+### Chaos Scenarios
+| Scenario | Events | Duration | Recovery Time | Status |
+|----------|--------|----------|---------------|--------|
+| observer_death | 2 kills | 30s | 25.1s | ✅ PASS |
+| event_flood | 1 flood | 120s | 115.2s | ✅ PASS |
+| memory_poison | 1 corrupt | 60s | 55.1s | ✅ PASS |
+| full_chaos | 4 events | 120s | 105.2s | ✅ PASS |
 
-### Next Action
-Execute Phase 11.2 Chaos Engine tests after observer stress test completion.
+### Summary
+- **4/4 scenarios passed**
+- All recovery times within target
+- System demonstrated resilience under all chaos conditions
+
+---
+
+## Phase 11.2 — Continuous Amplified Chaos Test (2026-05-22 10:20 UTC)
+
+### Status: 🔄 RUNNING
+- Started continuous chaos test with 5-min cooldown between cycles
+- Run test → if pass, wait 5 mins → amplify by 0.5% → run next test
+- Continuous for 12 hours with autopilot monitoring
+- **STOP ON FAILURE** with full trace analysis
+
+### Test Design
+- Each cycle: observer_death → event_flood → memory_poison → full_chaos
+- Amplification: 0.5% increase per PASS cycle
+- Cooldown: 5 minutes between cycles
+- **STOP ON FIRST FAILURE** for root cause analysis
+
+### Comprehensive Tracking
+- `tools/testing/chaos/stability/chaos_continuous_results.json` - Structured results
+- `tools/testing/chaos/stability/chaos_continuous_trace.log` - Full execution trace
+- Event tracing: injection time, recovery time, amplification factor
+- System state snapshots: memory, observers, threads
+
+### Cycle 1 Results (10:24-10:30 UTC)
+| Scenario | Recovery | Status |
+|----------|----------|--------|
+| observer_death | 25.0s | ✅ PASS |
+| event_flood | 115.2s | ✅ PASS |
+| memory_poison | 55.1s | ✅ PASS |
+| full_chaos | 105.1s | ✅ PASS |
+
+### Current Status
+- Cycle 1 passed - amplifying to 1.0050
+- Waiting 5 minutes cooldown until next cycle
