@@ -194,6 +194,14 @@
 | memory_poison | 55.1s | ✅ PASS |
 | full_chaos | 105.1s | ✅ PASS |
 
+### Cycle 8 Results (11:41-11:47 UTC)
+| Scenario | Recovery | Status |
+|----------|----------|--------|
+| observer_death | 25.0s | ✅ PASS |
+| event_flood | 115.2s | ✅ PASS |
+| memory_poison | 55.1s | ✅ PASS |
+| full_chaos | 105.2s | ✅ PASS |
+
 ### Current Status
-- Cycle 7 passed - amplifying to 1.0355
+- Cycle 8 passed - amplifying to 1.0407
 - Waiting 5 minutes cooldown until next cycle
