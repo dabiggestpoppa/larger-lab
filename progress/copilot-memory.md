@@ -21,7 +21,7 @@ The original test failed at ~5 hours because the 1% random error rate was settin
 ---
 
 ## Current Status
-- **Test:** 24-hour observer survival test - **RUNNING** (4.0h elapsed)
+- **Test:** 24-hour observer survival test - **RUNNING** (16.35h elapsed)
 - **Observers:** 10 alive, 0 degraded, 0 dead
 - **Next:** Monitor to 24-hour completion
 
@@ -31,3 +31,16 @@ The original test failed at ~5 hours because the 1% random error rate was settin
 - 2.0h: 2-hour milestone passed
 - 3.0h: 3-hour milestone passed
 - 4.0h: 4-hour milestone passed - **EXCEEDS previous 5.7h test!**
+- 5.0h: 5-hour milestone passed - **EXCEEDS previous 5.7h failure point!**
+- 6.0h: 6-hour milestone passed
+- 7.0h: 7-hour milestone passed
+- 7.5h: 7.5-hour milestone passed
+- 8.0h: 8-hour milestone passed - **EXCEEDS previous 5.7h failure point by 2.3h!**
+- 9.0h: 9-hour milestone passed
+- 10.0h: 10-hour milestone passed
+- 11.0h: 11-hour milestone passed
+- 12.0h: 12-hour milestone passed - **HALFWAY TO GO!**
+- 13.0h: 13-hour milestone passed
+- 14.0h: 14-hour milestone passed
+- 15.0h: 15-hour milestone passed
+- 16.0h: 16-hour milestone passed - **8/24 hours completed!**

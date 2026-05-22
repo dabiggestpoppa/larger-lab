@@ -20,8 +20,11 @@
 ### Meditation Room (meditation-room/)
 - 3 meditation cron jobs disabled (timing out)
 
-## IACER Reflection Protocol (MAD Directive 2026-05-21)
-**Every 5 tool calls or task completions, PAUSE and run IACER:**
+## IACER Reflection Protocol (MAD Directive 2026-05-21, UPDATED 2026-05-22)
+**HARD INTERRUPT: Cron job fires every 8 minutes into main session as systemEvent.**
+This is NOT voluntary — it's an external interrupt that forces a pause.
+
+When interrupt fires, run IACER before continuing:
 1. **Intent:** What was I asked to do? Am I still aligned?
 2. **Abstraction:** Did I over-compress or under-deliver?
 3. **Context:** Any new info from MAD I missed?
