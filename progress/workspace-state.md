@@ -52,10 +52,10 @@
 ### Phase 11.1 Test Results
 | Test | Duration | Result | Notes |
 |------|----------|--------|-------|
-| Observer Survival Test | 5.7h | ✅ PASSED | All 10 observers survived, 0 degraded, 0 dead |
+| Observer Survival Test | 16h | ✅ RUNNING | All observers running strong, 0 degraded, 0 dead |
 | Bug Fixes Applied | - | ✅ Fixed | while loop condition + heartbeat timeout |
 | Stability Database | ✅ Built | stability/runtime_metrics.db, continuity_states.db |
-| Schema | ✅ Built | stability/schema.sql |
+| Schema | ✅ Built | stability/schema.db |
 | Memory Integrity Checker | ✅ Built | tools/testing/long_horizon/memory_integrity.py |
 | Continuity Probe | ✅ Built | tools/testing/long_horizon/continuity_probe.py |
 | Drift Tracker | ✅ Built | tools/testing/long_horizon/drift_tracker.py |
@@ -63,6 +63,15 @@
 | Entropy Monitor | ✅ Built | tools/testing/long_horizon/entropy_monitor.py |
 | Metrics Exporter | ✅ Built | tools/testing/long_horizon/metrics_exporter.py |
 | Chaos Engine | ✅ Built | tools/testing/chaos/chaos_engine.py |
+
+### Phase 11.2 — Chaos Engine Prep
+| Component | Status | Location |
+|-----------|--------|----------|
+| Chaos Test Plan | ✅ Created | tools/testing/chaos/chaos_test_plan.md |
+| Observer Death Scenario | 🔄 Ready | chaos_engine.run_chaos_scenario("observer_death") |
+| Event Flood Scenario | 🔄 Ready | chaos_engine.run_chaos_scenario("event_flood") |
+| Memory Poison Scenario | 🔄 Ready | chaos_engine.run_chaos_scenario("memory_poison") |
+| Full Chaos Scenario | 🔄 Ready | chaos_engine.run_chaos_scenario("full_chaos") |
 
 ---
 
@@ -91,6 +100,12 @@
 - Bug fix: Increased heartbeat timeout from 120s to 300s
 - **Current Status:** 1.0 hours elapsed, all 10 observers alive, 0 degraded, 0 dead
 - **Next:** Continue autopilot monitoring until 24-hour completion
+
+### 2026-05-21 16:45 UTC — [Copilot] PHASE 11.2 PREP
+- Observer stress test at 16 hours, all observers running strong
+- Created Phase 11.2 Chaos Test Plan at tools/testing/chaos/chaos_test_plan.md
+- Chaos scenarios ready: observer_death, event_flood, memory_poison, full_chaos
+- **Next:** Execute Phase 11.2 Chaos Engine tests
 
 ### 2026-05-18 16:00 UTC — [CC] Phase 10 Core Build Complete
 - 5 phase10 modules built (rcg.py, prs.py, rpe.py, dct.py, ace.py)

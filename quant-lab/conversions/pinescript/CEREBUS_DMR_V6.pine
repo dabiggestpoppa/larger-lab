@@ -1,0 +1,331 @@
+//@version=6
+strategy("CEREBUS DMR v6",
+ overlay=true,
+ initial_capital=10000,
+ default_qty_type=strategy.percent_of_equity,
+ default_qty_value=5,
+ commission_type=strategy.commission.cash_per_order,
+ commission_value=0.0,
+ slippage=0,
+ pyramiding=0,
+ calc_on_every_tick=true,
+ process_orders_on_close=false,
+ max_bars_back=5000,
+ max_labels_count=100)
+
+// ============================================================================
+// ⚙️ SYMBOL SELECTION
+// ============================================================================
+
+symbol_mode = input.string("AUTO", "Symbol Mode", options=["AUTO", "EURUSD", "USDCHF", "CHFJPY", "XAUUSD"])
+
+// ============================================================================
+// 📊 P90 THRESHOLDS PER SYMBOL — matching MT5 config
+// ============================================================================
+
+// EURUSD thresholds
+p90_eu_2_4  = input.float(4.1, "EURUSD 2-4 AM (pips)", group="EURUSD")
+p90_eu_4_6  = input.float(4.6, "EURUSD 4-6 AM (pips)", group="EURUSD")
+p90_eu_6_8  = input.float(4.6, "EURUSD 6-8 AM (pips)", group="EURUSD")
+p90_eu_8_10 = input.float(5.9, "EURUSD 8-10 AM (pips)", group="EURUSD")
+p90_eu_10_11= input.float(6.2, "EURUSD 10-11 AM (pips)", group="EURUSD")
+
+// USDCHF thresholds (from MT5 config — much lower than EURUSD)
+p90_uc_2_4  = input.float(2.0, "USDCHF 2-4 AM (pips)", group="USDCHF")
+p90_uc_4_6  = input.float(3.8, "USDCHF 4-6 AM (pips)", group="USDCHF")
+p90_uc_6_8  = input.float(3.8, "USDCHF 6-8 AM (pips)", group="USDCHF")
+p90_uc_8_10 = input.float(3.6, "USDCHF 8-10 AM (pips)", group="USDCHF")
+p90_uc_10_11= input.float(4.6, "USDCHF 10-11 AM (pips)", group="USDCHF")
+
+// CHFJPY thresholds (from MT5 config)
+p90_cj_2_4  = input.float(5.2, "CHFJPY 2-4 AM (pips)", group="CHFJPY")
+p90_cj_4_6  = input.float(8.6, "CHFJPY 4-6 AM (pips)", group="CHFJPY")
+p90_cj_6_8  = input.float(8.6, "CHFJPY 6-8 AM (pips)", group="CHFJPY")
+p90_cj_8_10 = input.float(7.2, "CHFJPY 8-10 AM (pips)", group="CHFJPY")
+p90_cj_10_11= input.float(9.2, "CHFJPY 10-11 AM (pips)", group="CHFJPY")
+
+// XAUUSD thresholds (from MT5 config — in pips where 1 pip = 0.01)
+p90_xau_2_4  = input.float(8.4,  "XAUUSD 2-4 AM (pips)", group="XAUUSD")
+p90_xau_4_6  = input.float(14.7, "XAUUSD 4-6 AM (pips)", group="XAUUSD")
+p90_xau_6_8  = input.float(15.0, "XAUUSD 6-8 AM (pips)", group="XAUUSD")
+p90_xau_8_10 = input.float(14.1, "XAUUSD 8-10 AM (pips)", group="XAUUSD")
+p90_xau_10_11= input.float(17.4, "XAUUSD 10-11 AM (pips)", group="XAUUSD")
+
+// ============================================================================
+// ⚙️ DMR SETTINGS
+// ============================================================================
+
+dmr_deep_mult  = input.float(2.00, "Deep State Multiplier", minval=1.50, maxval=3.00, step=0.01)
+dmr_kill_mult  = input.float(2.20, "Kill Switch Multiplier", minval=1.80, maxval=3.00, step=0.01)
+dmr_max_ar     = input.int(45,    "Max Asian Range (pips)", minval=20, maxval=60)
+dmr_min_ar     = input.int(3,     "Min Asian Range (pips)", minval=1, maxval=15)
+enable_dmr     = input.bool(true, "Enable DMR System")
+session_filter = input.bool(true, "Only Trade Prime Hours (2 AM - 11 AM EST)?")
+
+show_fib      = input.bool(true, "Show Fib 168%/200% Levels", group="Fib Levels")
+fib_168_mult  = input.float(1.68, "Fib 168% Multiplier", group="Fib Levels")
+fib_200_mult  = input.float(2.00, "Fib 200% Multiplier", group="Fib Levels")
+
+// ============================================================================
+// 🧮 HELPERS
+// ============================================================================
+
+get_est_hour()    => (hour(time, "UTC") - 5 + 24) % 24
+get_est_minute()  => minute(time, "UTC")
+
+is_asian_session() => get_est_hour() >= 19 or get_est_hour() < 3
+is_entry_window()  => get_est_hour() >= 2 and get_est_hour() < 11
+is_hard_exit()     => get_est_hour() >= 17
+is_pre_noon()      => get_est_hour() < 12
+
+// Auto-detect symbol
+ticker_upper = str.upper(syminfo.ticker)
+is_eurUSD = str.contains(ticker_upper, "EURUSD") or str.contains(ticker_upper, "EUR/USD")
+is_usdCHF = str.contains(ticker_upper, "USDCHF") or str.contains(ticker_upper, "USD/CHF")
+is_chfJPY = str.contains(ticker_upper, "CHFJPY") or str.contains(ticker_upper, "CHF/JPY")
+is_xauUSD = str.contains(ticker_upper, "XAUUSD") or str.contains(ticker_upper, "XAU/USD") or str.contains(ticker_upper, "GOLD")
+
+active_symbol = symbol_mode == "AUTO" ? (is_xauUSD ? "XAUUSD" : is_chfJPY ? "CHFJPY" : is_usdCHF ? "USDCHF" : "EURUSD") : symbol_mode
+
+// Pip divisor
+pip_divisor = active_symbol == "XAUUSD" ? 0.01 : 0.0001
+
+// Per-symbol P90 thresholds (matching MT5 config)
+get_p90_threshold() =>
+    h = get_est_hour()
+    if active_symbol == "USDCHF"
+        if h >= 2 and h < 4
+            p90_uc_2_4
+        else if h >= 4 and h < 6
+            p90_uc_4_6
+        else if h >= 6 and h < 8
+            p90_uc_6_8
+        else if h >= 8 and h < 10
+            p90_uc_8_10
+        else if h >= 10 and h < 11
+            p90_uc_10_11
+        else
+            99.0
+    else if active_symbol == "CHFJPY"
+        if h >= 2 and h < 4
+            p90_cj_2_4
+        else if h >= 4 and h < 6
+            p90_cj_4_6
+        else if h >= 6 and h < 8
+            p90_cj_6_8
+        else if h >= 8 and h < 10
+            p90_cj_8_10
+        else if h >= 10 and h < 11
+            p90_cj_10_11
+        else
+            99.0
+    else if active_symbol == "XAUUSD"
+        if h >= 2 and h < 4
+            p90_xau_2_4
+        else if h >= 4 and h < 6
+            p90_xau_4_6
+        else if h >= 6 and h < 8
+            p90_xau_6_8
+        else if h >= 8 and h < 10
+            p90_xau_8_10
+        else if h >= 10 and h < 11
+            p90_xau_10_11
+        else
+            999.0
+    else  // EURUSD (default)
+        if h >= 2 and h < 4
+            p90_eu_2_4
+        else if h >= 4 and h < 6
+            p90_eu_4_6
+        else if h >= 6 and h < 8
+            p90_eu_6_8
+        else if h >= 8 and h < 10
+            p90_eu_8_10
+        else if h >= 10 and h < 11
+            p90_eu_10_11
+        else
+            99.0
+
+can_trade_session = session_filter ? (get_est_hour() >= 2 and get_est_hour() < 12) : true
+
+// ============================================================================
+// 📊 ASIAN RANGE CALCULATION
+// ============================================================================
+
+var float asian_high = na
+var float asian_low  = na
+var float asian_range_pips = na
+var bool  asian_complete = false
+var bool  was_asian = false
+
+start_of_asian = get_est_hour() == 19 and get_est_minute() == 0
+end_of_asian   = get_est_hour() == 3 and get_est_minute() == 0
+
+if start_of_asian
+    asian_high := high
+    asian_low  := low
+    asian_complete := false
+    was_asian := false
+
+if is_asian_session() and not asian_complete
+    if na(asian_high)
+        asian_high := high
+        asian_low  := low
+    else
+        asian_high := math.max(asian_high, high)
+        asian_low  := math.min(asian_low, low)
+    was_asian := true
+
+if end_of_asian and was_asian
+    asian_complete := true
+    asian_range_pips := (asian_high - asian_low) / pip_divisor
+
+// ============================================================================
+// 🔶 DMR CORE LOGIC — Mean Reversion Only
+// Uses market order on next bar after Deep State touch (matches MT5 EA behavior)
+// ============================================================================
+
+var bool  dmr_p90_found    = false
+var float dmr_activation   = na
+var float dmr_p90_body     = na
+var bool  dmr_p90_is_long  = false
+var float dmr_deep_state   = na
+var float dmr_kill_switch  = na
+var float dmr_fib_168      = na
+var float dmr_fib_200      = na
+var bool  dmr_deep_touched = false
+var bool  dmr_entered      = false
+var int   dmr_trades_today = 0
+
+bodyPips = math.abs(close - open) / pip_divisor
+p90_thresh = get_p90_threshold()
+
+// Step 1: Detect P90 candle
+dmr_bull_candle = close > open and bodyPips >= p90_thresh
+dmr_bear_candle = close < open and bodyPips >= p90_thresh
+as_valid = asian_complete and asian_range_pips >= dmr_min_ar and asian_range_pips <= dmr_max_ar
+
+if enable_dmr and is_entry_window() and not dmr_p90_found and as_valid
+    if dmr_bull_candle or dmr_bear_candle
+        dmr_p90_found   := true
+        dmr_activation  := close
+        dmr_p90_body    := bodyPips
+        dmr_p90_is_long := dmr_bull_candle
+        body_price      = dmr_p90_body * pip_divisor
+        dir             = dmr_p90_is_long ? 1 : -1
+        dmr_deep_state  := dmr_activation + body_price * dmr_deep_mult * dir
+        dmr_kill_switch := dmr_activation + body_price * dmr_kill_mult * dir
+        deep_dist       = math.abs(dmr_deep_state - dmr_activation)
+        dmr_fib_168     := dmr_activation + deep_dist * fib_168_mult * dir
+        dmr_fib_200     := dmr_activation + deep_dist * fib_200_mult * dir
+
+// Daily reset at 2 AM EST
+if get_est_hour() == 2 and get_est_minute() == 0
+    dmr_p90_found    := false
+    dmr_deep_touched := false
+    dmr_entered      := false
+    dmr_trades_today := 0
+
+// Step 2: Wait for price to touch Deep State
+dmr_rev_is_long = not dmr_p90_is_long
+
+if dmr_p90_found and not dmr_deep_touched and is_pre_noon() and can_trade_session
+    if dmr_p90_is_long and low <= dmr_deep_state
+        dmr_deep_touched := true
+    else if not dmr_p90_is_long and high >= dmr_deep_state
+        dmr_deep_touched := true
+
+// Step 3: Enter at Deep State using limit order
+if enable_dmr and dmr_deep_touched and not dmr_entered and strategy.position_size == 0 and get_est_hour() < 17 and can_trade_session
+    dmr_entered      := true
+    dmr_trades_today += 1
+    
+    if dmr_rev_is_long
+        strategy.entry("DMR_L", strategy.long, limit=dmr_deep_state, comment="DMR Long")
+        strategy.exit("DMR_L_X", "DMR_L", stop=dmr_kill_switch, limit=dmr_activation, comment="DMR TP/SL")
+    else
+        strategy.entry("DMR_S", strategy.short, limit=dmr_deep_state, comment="DMR Short")
+        strategy.exit("DMR_S_X", "DMR_S", stop=dmr_kill_switch, limit=dmr_activation, comment="DMR TP/SL")
+
+// ============================================================================
+// 📊 EXIT CONDITIONS
+// ============================================================================
+
+if is_hard_exit() and strategy.position_size != 0
+    strategy.close_all(comment="Hard Exit 5PM")
+
+if dmr_entered and strategy.position_size == 0
+    dmr_entered      := false
+    dmr_deep_touched := true
+
+// ============================================================================
+// 📊 VISUALIZATION
+// ============================================================================
+
+plot(asian_complete ? asian_high : na, "Asian High", color=color.new(color.green, 0), style=plot.style_linebr, linewidth=2)
+plot(asian_complete ? asian_low : na,  "Asian Low",  color=color.new(color.red, 0),   style=plot.style_linebr, linewidth=2)
+
+plot(dmr_activation,  "Activation (TP)",     color=color.new(color.teal, 30),    linewidth=2, style=plot.style_linebr)
+plot(dmr_deep_state,  "Deep State (Entry)",  color=color.new(color.purple, 30),  linewidth=2, style=plot.style_linebr)
+plot(dmr_kill_switch, "Kill Switch (SL)",    color=color.new(color.red, 30),     linewidth=1, style=plot.style_linebr)
+
+plot(show_fib ? dmr_fib_168 : na, "Fib 168%", color=color.new(color.orange, 40), linewidth=1, style=plot.style_linebr)
+plot(show_fib ? dmr_fib_200 : na, "Fib 200%", color=color.new(color.yellow, 40), linewidth=1, style=plot.style_linebr)
+
+plotshape(dmr_p90_found and not dmr_p90_found[1], "P90 Detected", shape.diamond, location.abovebar, color=color.new(color.yellow, 0), size=size.small)
+plotshape(dmr_deep_touched and not dmr_deep_touched[1], "Deep Touched", shape.circle, location.belowbar, color=color.new(color.purple, 0), size=size.small)
+
+bgcolor(is_entry_window() ? color.new(color.green, 95) : na)
+
+// ============================================================================
+// 📊 INFO TABLE
+// ============================================================================
+
+var table info = table.new(position.bottom_right, 2, 15, bgcolor=color.black, border_width=1)
+
+if barstate.islast
+    table.cell(info, 0, 0, "CEREBUS DMR v6", text_color=color.white, bgcolor=color.gray, text_size=size.small)
+    table.cell(info, 1, 0, active_symbol, text_color=color.white, bgcolor=color.gray, text_size=size.small)
+    
+    table.cell(info, 0, 1, "EST Time", text_color=color.white, bgcolor=color.gray, text_size=size.small)
+    table.cell(info, 1, 1, str.tostring(get_est_hour(),"00") + ":" + str.tostring(get_est_minute(),"00"), text_color=color.white, bgcolor=color.blue, text_size=size.small)
+    
+    table.cell(info, 0, 2, "Asian Range", text_color=color.white, bgcolor=color.gray, text_size=size.small)
+    table.cell(info, 1, 2, str.tostring(asian_range_pips,"#.#") + " pips", text_color=color.white, bgcolor=asian_range_pips > dmr_max_ar ? color.red : color.green, text_size=size.small)
+    
+    table.cell(info, 0, 3, "P90 Threshold", text_color=color.white, bgcolor=color.gray, text_size=size.small)
+    table.cell(info, 1, 3, str.tostring(p90_thresh,"#.#") + " pips", text_color=color.white, bgcolor=color.blue, text_size=size.small)
+    
+    table.cell(info, 0, 4, "P90 Found", text_color=color.white, bgcolor=color.gray, text_size=size.small)
+    table.cell(info, 1, 4, dmr_p90_found ? "YES" : "NO", text_color=color.white, bgcolor=dmr_p90_found ? color.green : color.gray, text_size=size.small)
+    
+    table.cell(info, 0, 5, "Body Pips", text_color=color.white, bgcolor=color.gray, text_size=size.small)
+    table.cell(info, 1, 5, str.tostring(dmr_p90_body,"#.#"), text_color=color.white, bgcolor=color.blue, text_size=size.small)
+    
+    table.cell(info, 0, 6, "Deep Touched", text_color=color.white, bgcolor=color.gray, text_size=size.small)
+    table.cell(info, 1, 6, dmr_deep_touched ? "YES" : "NO", text_color=color.white, bgcolor=dmr_deep_touched ? color.purple : color.gray, text_size=size.small)
+    
+    table.cell(info, 0, 7, "DMR Entered", text_color=color.white, bgcolor=color.gray, text_size=size.small)
+    table.cell(info, 1, 7, dmr_entered ? "YES" : "NO", text_color=color.white, bgcolor=dmr_entered ? color.teal : color.gray, text_size=size.small)
+    
+    dmr_dir = dmr_entered ? (dmr_rev_is_long ? "LONG (Rev)" : "SHORT (Rev)") : "N/A"
+    table.cell(info, 0, 8, "DMR Direction", text_color=color.white, bgcolor=color.gray, text_size=size.small)
+    table.cell(info, 1, 8, dmr_dir, text_color=color.white, bgcolor=dmr_entered ? color.teal : color.gray, text_size=size.small)
+    
+    table.cell(info, 0, 9, "Position", text_color=color.white, bgcolor=color.gray, text_size=size.small)
+    table.cell(info, 1, 9, str.tostring(strategy.position_size,"#.##"), text_color=color.white, bgcolor=strategy.position_size != 0 ? color.green : color.gray, text_size=size.small)
+    
+    table.cell(info, 0, 10, "Open PnL", text_color=color.white, bgcolor=color.gray, text_size=size.small)
+    table.cell(info, 1, 10, str.tostring(strategy.openprofit,"#.##"), text_color=color.white, bgcolor=strategy.openprofit > 0 ? color.green : strategy.openprofit < 0 ? color.red : color.gray, text_size=size.small)
+    
+    table.cell(info, 0, 11, "Equity", text_color=color.white, bgcolor=color.gray, text_size=size.small)
+    table.cell(info, 1, 11, str.tostring(strategy.equity,"#.##"), text_color=color.white, bgcolor=color.blue, text_size=size.small)
+    
+    table.cell(info, 0, 12, "Fib 168%", text_color=color.white, bgcolor=color.gray, text_size=size.small)
+    table.cell(info, 1, 12, str.tostring(dmr_fib_168,"#.#####"), text_color=color.orange, bgcolor=color.gray, text_size=size.small)
+    
+    table.cell(info, 0, 13, "Fib 200%", text_color=color.white, bgcolor=color.gray, text_size=size.small)
+    table.cell(info, 1, 13, str.tostring(dmr_fib_200,"#.#####"), text_color=color.yellow, bgcolor=color.gray, text_size=size.small)
+    
+    table.cell(info, 0, 14, "Symbol", text_color=color.white, bgcolor=color.gray, text_size=size.small)
+    table.cell(info, 1, 14, active_symbol, text_color=color.white, bgcolor=color.blue, text_size=size.small)

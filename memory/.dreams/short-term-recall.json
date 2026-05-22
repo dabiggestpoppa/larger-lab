@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-21T20:16:18.839Z",
+  "updatedAt": "2026-05-22T10:39:39.679Z",
   "entries": {
     "memory:memory/2026-05-18.md:387:414": {
       "key": "memory:memory/2026-05-18.md:387:414",
@@ -74,19 +74,21 @@
       "endLine": 101,
       "source": "memory",
       "snippet": "- Works for venv (local) AND global production (workspace) - Everything designed to plug into SRRA+OCE later - Output: `tools/INTEGRATION_STATUS.md` --- ## Active Agents (as of 08:49 EDT) | Agent | Task | Status | |-------|------|--------| | optimizertaska | Cost validation (10 strategies) | ⏳ Running | | researcherbscgap | BSC gap analysis | ⏳ Running | | resourceadapter | Tool integration (Open Design, ViMax, Netviz, UI-TARS) | ⏳ Running | ## Key Decisions 1. **Conversion pipeline FROZEN** — no TV push until cost validation complete 2. **POLYGENT defined** — helper function, on-demand only, not idle 3. **Spread = points/10** — CSV spread column is broker units, divide by 10 for pips 4.",
-      "recallCount": 2,
+      "recallCount": 3,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 2,
+      "totalScore": 3,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-19T04:34:19.611Z",
-      "lastRecalledAt": "2026-05-19T04:34:47.342Z",
+      "lastRecalledAt": "2026-05-22T10:39:39.679Z",
       "queryHashes": [
         "34a5851f36a3",
-        "2e2fb034155b"
+        "2e2fb034155b",
+        "f7b300265193"
       ],
       "recallDays": [
-        "2026-05-19"
+        "2026-05-19",
+        "2026-05-22"
       ],
       "conceptTags": [
         "tools/integration-status.md",
@@ -137,18 +139,20 @@
       "endLine": 254,
       "source": "memory",
       "snippet": "- **Public APIs** (public-apis/public-apis) — 🔥 HIGH. 1,500+ free APIs. Cross-reference with APIS_NEEDED.md. - **Hello Agents** (datawhale/hello-agents) — 📚 Educational resource. - **Guizang PPT Skill** (op7418/guizang-ppt-skill) — 🟡 PPT generation. - **Lonkero** (bountyyfi/lonkero) — ⏳ Unknown, needs investigation. - All documented in: `research/TOOLS_AND_REPOS.md` --- ## Active Agents (as of 09:42 EDT) | Agent | Task | Status | |-------|------|--------| | optimizertaska | Cost validation (10 strategies) | ✅ COMPLETE | | researcherbscgap | BSC gap analysis | ✅ COMPLETE | | resourceadapter | Tool integration | ✅ COMPLETE (status doc written) | ## Key Decisions 1. **Conversion pipeline",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 2,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-19T04:34:19.611Z",
-      "lastRecalledAt": "2026-05-19T04:34:19.611Z",
+      "lastRecalledAt": "2026-05-22T10:39:39.679Z",
       "queryHashes": [
-        "34a5851f36a3"
+        "34a5851f36a3",
+        "f7b300265193"
       ],
       "recallDays": [
-        "2026-05-19"
+        "2026-05-19",
+        "2026-05-22"
       ],
       "conceptTags": [
         "public-apis/public-apis",
@@ -390,18 +394,19 @@
       "endLine": 110,
       "source": "memory",
       "snippet": "## 17:35-17:50 EDT — MT5 FORWARD TEST DEPLOYED - **DMR forward test LIVE on MT5 demo account 1114712 (OxSecurities-Demo)** - Script: `quant-lab/mt5/dmr_mt5_forward_test.py` - Connected successfully: Balance $289.17 | EURUSD.PRO | Spread 3.6 pips - Symbol name on this broker: EURUSD.PRO (not EURUSD) - Script running in background (session vivid-orbit, pid 21344) - Currently idle — P90 window is 2-11 AM EST, currently ~5:35 PM - Will auto-scan starting 2 AM EST tonight - Lot size: 0.01 | Magic: 20260519 | Hard exit: 5 PM EST - Logs to: quant-lab/mt5/dmr_forward_test_log.csv - State: quant-lab/mt5/dmr_forward_test_state.json - **MAD credentials used:** Login 1114712, Server OxSecurities-Demo, P",
-      "recallCount": 4,
+      "recallCount": 5,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 4,
+      "totalScore": 5,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-20T01:58:06.835Z",
-      "lastRecalledAt": "2026-05-21T11:05:58.692Z",
+      "lastRecalledAt": "2026-05-22T01:17:51.034Z",
       "queryHashes": [
         "dd65dd2620cf",
         "769052bb2313",
         "ac384b89f0de",
-        "8c760f679dc1"
+        "8c760f679dc1",
+        "371946845e22"
       ],
       "recallDays": [
         "2026-05-19",
@@ -686,17 +691,18 @@
       "endLine": 208,
       "source": "memory",
       "snippet": "- **OCE:** Full-stack app — FastAPI backend (port 8000) + Next.js frontend (port 3000) - Frontend has 4 pages: `/` (dashboard), `/command-center`, `/execution`, `/observability` - Uses React, Recharts, D3, Tailwind CSS, Socket.IO - Had to run `npm run build` first (no production build existed) - Then `npm run start` — ready in 898ms - **SRRA-OPH:** Python-only (no frontend). `srrs_opc/` has ~50 Python modules, no web UI - **All 3 servers confirmed running:** OCE backend (:8000) ✅ | OCE frontend (:3000) ✅ | Agent env (:9000) ✅ - **MAD said:** After looking, take all agents offline except Dev Manager to monitor frontends + backends - **MT5 forward test:** Still running (session vivid-o",
-      "recallCount": 3,
+      "recallCount": 4,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 3,
+      "totalScore": 4,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-20T17:41:09.005Z",
-      "lastRecalledAt": "2026-05-21T11:05:58.692Z",
+      "lastRecalledAt": "2026-05-22T01:17:51.034Z",
       "queryHashes": [
         "f3cb31722e84",
         "ac384b89f0de",
-        "8c760f679dc1"
+        "8c760f679dc1",
+        "371946845e22"
       ],
       "recallDays": [
         "2026-05-20",
@@ -720,17 +726,18 @@
       "endLine": 64,
       "source": "memory",
       "snippet": "- Focus: Priority ranking, risk assessment, actionable plans **SAGE Meditation (subagent: 80e9e9bd):** - Task: Mathematical analysis of income potential - Output: `meditation-room/SAGE_INCOME_MEDITATION.md` - Focus: Kelly criterion, risk of ruin, revenue models, follower-to-revenue math **Algo Readiness Check:** - Created `tools/algo_readiness_check.py` - Report: `quant-lab/reports/ALGO_READINESS_REPORT.md` - Found 2 critical issues (see below) ### Critical Issues Found: 1. **MT5 AutoTrading DISABLED** — 108 P90s detected today, 0 trades placed. MAD must enable AutoTrading in MT5 toolbar before tomorrow. 2. **DMR Live process had died** — Restarted successfully. ### System State (13:53 E",
-      "recallCount": 3,
+      "recallCount": 4,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 3,
+      "totalScore": 4,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-20T18:35:26.067Z",
-      "lastRecalledAt": "2026-05-21T11:05:58.692Z",
+      "lastRecalledAt": "2026-05-22T01:17:51.034Z",
       "queryHashes": [
         "ac384b89f0de",
         "83a92ad4c842",
-        "8c760f679dc1"
+        "8c760f679dc1",
+        "371946845e22"
       ],
       "recallDays": [
         "2026-05-20",
@@ -816,18 +823,19 @@
       "endLine": 112,
       "source": "memory",
       "snippet": "- DB dedup protection active **Meditation Room:** CEO_INCOME_MEDITATION.md (18KB) + SAGE_INCOME_MEDITATION.md (17KB) — both written by sub-agents ## 16:23-17:17 EDT — MAD DIRECTIVE: PORTFOLIO + AUTO TRADING **MAD Directives:** 1. Remove 1 trade/day filter (not how backtest worked) 2. Cancel old pending orders when new P90 prints 3. Use computer use to toggle AutoTrading on 4. Check meditation room **Actions Taken:** - Removed `max_daily_trades_per_symbol` from dmr_config.json - Removed daily trade limit skip condition from dmr_live_v2.py - Added cancel-old-pending-orders logic before placing new orders (filters by magic_number) - Used screen capture + mouse click to toggle MT5 AutoTradin",
-      "recallCount": 4,
+      "recallCount": 5,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 4,
+      "totalScore": 5,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-21T10:08:23.239Z",
-      "lastRecalledAt": "2026-05-21T11:05:58.692Z",
+      "lastRecalledAt": "2026-05-22T01:17:51.034Z",
       "queryHashes": [
         "d8142493cca0",
         "83a92ad4c842",
         "97b34c338cbe",
-        "8c760f679dc1"
+        "8c760f679dc1",
+        "371946845e22"
       ],
       "recallDays": [
         "2026-05-21"
@@ -881,17 +889,18 @@
       "endLine": 117,
       "source": "memory",
       "snippet": "- AutoTrading: ENABLED ✅ - 3 pairs: EURUSD.PRO, USDCHF.PRO, CHFJPY.PRO - No trade frequency limits - Old pending orders auto-canceled on new P90 - Next P90 window: tomorrow 2-11 AM EST ### Key Files Modified: - `quant-lab/dashboard/server.py` — toggle endpoint + state sync - `tools/workspace_monitor.py` — new 2-hour monitor script - `tools/algo_readiness_check.py` — new readiness check script - `tools/quick_syscheck.ps1` — new quick system check - `tools/restart_dmr.ps1` — new DMR restart script - `HEARTBEAT.md` — updated with latest status",
-      "recallCount": 3,
+      "recallCount": 4,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 3,
+      "totalScore": 4,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-21T10:35:58.449Z",
-      "lastRecalledAt": "2026-05-21T11:05:58.692Z",
+      "lastRecalledAt": "2026-05-22T01:17:51.034Z",
       "queryHashes": [
         "83a92ad4c842",
         "97b34c338cbe",
-        "8c760f679dc1"
+        "8c760f679dc1",
+        "371946845e22"
       ],
       "recallDays": [
         "2026-05-21"
@@ -914,17 +923,18 @@
       "endLine": 87,
       "source": "memory",
       "snippet": "**Root Cause:** Dashboard toggle endpoint wrote flat state structure (`found_p90s: []`) that overwrote the nested structure (`state.symbols.EURUSD.PRO.known_p90s`). Live script read empty `known_p90s` every loop → re-inserted same P90s. **Fixes:** 1. State file corrected to nested `symbols` structure 2. Added DB-level dedup in `log_p90()` — SELECT COUNT before INSERT 3. Dashboard toggle/config endpoints no longer write to state file (only config.json) 4. 104 duplicate rows deleted from DB **4 Real P90s Today:** 07:30 SHORT 4.4p, 08:25 SHORT 4.9p, 09:15 LONG 4.9p, 11:10 SHORT 5.3p **0 trades placed** — AutoTrading was disabled in MT5 all day. ## 14:31 EDT — PORTFOLIO MODE ACTIVATED (MAD D",
-      "recallCount": 3,
+      "recallCount": 4,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 3,
+      "totalScore": 4,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-21T10:35:58.449Z",
-      "lastRecalledAt": "2026-05-21T11:05:58.692Z",
+      "lastRecalledAt": "2026-05-22T01:17:51.034Z",
       "queryHashes": [
         "83a92ad4c842",
         "97b34c338cbe",
-        "8c760f679dc1"
+        "8c760f679dc1",
+        "371946845e22"
       ],
       "recallDays": [
         "2026-05-21"
@@ -1002,6 +1012,68 @@
         "1.2v",
         "non-ecc",
         "55-70"
+      ]
+    },
+    "memory:memory/2026-05-18.md:696:733": {
+      "key": "memory:memory/2026-05-18.md:696:733",
+      "path": "memory/2026-05-18.md",
+      "startLine": 696,
+      "endLine": 733,
+      "source": "memory",
+      "snippet": "- Farm Day 3: ALL complete (8 files) - Farm Day 4: Plan complete - Sent MAD comprehensive update (msg #2722) - Awaiting MAD response on: remaining MC, MQL5, phone integration --- ### 61. MAD's Major Directive (23:14 EDT) - GitHub missing Phase 10 → Created docs/PHASE10.md, pushed to origin/master - Local git synced ✅ - RAM: 6.2/7.4GB (83.8%) — improved after VS Code close - Lab: Portfolio strategies (30% max DD, 3-4 year data) + C2 CEREBUS manual - ALL managers must meditate before tasking - CEO+RA discuss → CEO gives OWL rundown → OWL passes to SAGE - SW Dev room: Start testing the system - Use IACER for response ### 62. Meditation Agents Spawned (23:14 EDT) - `labmanagermeditation` (age",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-22T10:39:39.679Z",
+      "lastRecalledAt": "2026-05-22T10:39:39.679Z",
+      "queryHashes": [
+        "f7b300265193"
+      ],
+      "recallDays": [
+        "2026-05-22"
+      ],
+      "conceptTags": [
+        "docs/phase10.md",
+        "origin/master",
+        "6.2/7.4gb",
+        "83.8",
+        "3-4",
+        "farm",
+        "day",
+        "all"
+      ]
+    },
+    "memory:memory/2026-05-18.md:250:283": {
+      "key": "memory:memory/2026-05-18.md:250:283",
+      "path": "memory/2026-05-18.md",
+      "startLine": 250,
+      "endLine": 283,
+      "source": "memory",
+      "snippet": "8. **IACER for all handoffs** — not just OWL responses, but Manager→agent delegations too 9. **Soft coding trick:** 1 prompt → OWL IACER framing → Manager refinement → execution agent (3x absorption) 10. **Agents read HTML better than MD** — Open Design outputs HTML artifacts natively ## Files Created/Updated This Session - `quant-lab/results/cost-validation-2026-05-18.md` — Full cost validation report - `quant-lab/results/spread-analysis.json` — Spread data for 12 pairs - `quant-lab/research/BSC_GAP_ANALYSIS.md` — BSC gap analysis - `tools/INTEGRATION_STATUS.md` — Tool integration status - `research/TOOLS_AND_REPOS.md` — All evaluated repos (updated with Batch 2) - `memory/2026-05-18.md` —",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-22T10:39:39.679Z",
+      "lastRecalledAt": "2026-05-22T10:39:39.679Z",
+      "queryHashes": [
+        "f7b300265193"
+      ],
+      "recallDays": [
+        "2026-05-22"
+      ],
+      "conceptTags": [
+        "created/updated",
+        "tools/integration-status.md",
+        "research/tools-and-repos.md",
+        "memory/2026-05-18.md",
+        "iacer",
+        "all",
+        "handoffs",
+        "not"
       ]
     }
   }
