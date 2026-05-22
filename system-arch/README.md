@@ -2,7 +2,7 @@
 
 > **Purpose:** All system-level Mermaid diagrams in one place.
 > **For:** Pipeline alignment review, architecture verification.
-> **Updated:** 2026-05-16
+> **Updated:** 2026-05-18 | Phase 10 Complete | 1460 tests passing
 
 ## Files
 
@@ -57,6 +57,7 @@ Use this to verify the actual pipeline matches the original architecture:
 - [x] **Phase 7:** Overlap cognition, prediction contracts → `srrs_opc/`
 - [x] **Phase 8:** Operator patterns, strategic preferences → `srrs_opc/`
 - [x] **Phase 9:** Entropy economics, sustainability governance → `srrs_opc/`
+- [x] **Phase 10:** Recursive field computation → `oce/backend/phase10/`
 - [x] **OCE Event Fabric:** Ingest → Route → Persist → Stream → `oce/backend/event_fabric.py`
 - [x] **OCE Observer Runtime:** Lifecycle → Health → State → `oce/backend/observer_runtime.py`
 - [x] **OC2 Gateway:** Telegram + Watchdog + Context Monitor → `.openclaw-2/`
@@ -80,3 +81,12 @@ Use this to verify the actual pipeline matches the original architecture:
 - [x] **ReconstructionEngine:** State reconstruction → `oce/backend/reconstruction/reconstruction_engine.py`
 - [x] **OverlapManifold:** Overlap computation → `oce/backend/reconstruction/overlap_manifold.py`
 - [x] **ContinuityRepair:** Repair continuity gaps → `oce/backend/reconstruction/continuity_repair.py`
+
+### V3 Phase 10 Alignment Checklist
+
+- [x] **RecursiveComputeGraph:** Recursive compute graph + stabilization → `oce/backend/phase10/rcg.py`
+- [x] **PositionalReferenceSystem:** Positional reference system → `oce/backend/phase10/prs.py`
+- [x] **ResonancePropagationEngine:** Resonance propagation → `oce/backend/phase10/rpe.py`
+- [x] **DynamicConstraintTopology:** Dynamic constraint topology → `oce/backend/phase10/dct.py`
+- [x] **AttractorComputeEngine:** Attractor compute engine → `oce/backend/phase10/ace.py`
+- [x] **Total:** 23 tests passing
