@@ -242,6 +242,14 @@
 | memory_poison | 55.1s | ✅ PASS |
 | full_chaos | 105.1s | ✅ PASS |
 
+### Cycle 14 Results (12:43-12:49 UTC)
+| Scenario | Recovery | Status |
+|----------|----------|--------|
+| observer_death | 25.0s | ✅ PASS |
+| event_flood | 115.5s | ✅ PASS |
+| memory_poison | 55.1s | ✅ PASS |
+| full_chaos | 105.1s | ✅ PASS |
+
 ### Current Status
-- Cycle 13 passed - amplifying to 1.0670
+- Cycle 14 passed - amplifying to 1.0723
 - Waiting 5 minutes cooldown until next cycle
