@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-22T10:39:39.679Z",
+  "updatedAt": "2026-05-22T11:31:52.911Z",
   "entries": {
     "memory:memory/2026-05-18.md:387:414": {
       "key": "memory:memory/2026-05-18.md:387:414",
@@ -234,18 +234,20 @@
       "endLine": 151,
       "source": "memory",
       "snippet": "- **MAD's UI direction:** Simple chat for regular use + rooms for complex tasks. Take best from Genspark/Claude/Manus. Agent terminal showing PowerShell/work output. Good+good=great philosophy. ## 15:46-16:00 EDT — MAD'S LATEST DIRECTIVES (Message #2918) - **MAD's #1 priority:** Forward test DMR on MT5 demo account - **MAD's #2:** Farm — \"have the farm move unto first post you check and just post update i got @\" - **MAD provided ProtonMail credentials:** wifiking999@protonmail.com / Teflondon1718! - **MAD:** \"Use iacer for last response and begin I'm gone for the day\" - **GitHub repos sent for review:** 1. https://github.com/ruvnet/RuView.git — Agent visualization 2. https://github.com/",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 2,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-20T01:39:59.831Z",
-      "lastRecalledAt": "2026-05-20T01:39:59.831Z",
+      "lastRecalledAt": "2026-05-22T11:31:52.911Z",
       "queryHashes": [
-        "be93e21b81f4"
+        "be93e21b81f4",
+        "18ecf2a03b41"
       ],
       "recallDays": [
-        "2026-05-19"
+        "2026-05-19",
+        "2026-05-22"
       ],
       "conceptTags": [
         "genspark/claude/manus",
@@ -332,18 +334,20 @@
       "endLine": 79,
       "source": "memory",
       "snippet": "- **Key files:** agent-environment/public/css/chat-v3.css (new), agent-environment/public/js/chat-v3.js (new), agent-environment/public/index.html (upgraded) ## 15:46-16:00 EDT — MAD'S LATEST DIRECTIVES (Message #2918) - **MAD's #1 priority:** Forward test DMR on MT5 demo account (\"now that the mt5 is good forward test on the demo account\") - **MAD's #2:** Farm — \"have the farm move unto first post you check and just post update i got @\" - **MAD provided ProtonMail credentials:** wifiking999@protonmail.com / Teflondon1718! (for account registration) - **MAD:** \"Use iacer for last response and begin I'm gone for the day\" - **MAD:** \"have the farm move unto first post you check and just post",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 2,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-20T01:39:59.831Z",
-      "lastRecalledAt": "2026-05-20T01:39:59.831Z",
+      "lastRecalledAt": "2026-05-22T11:31:52.911Z",
       "queryHashes": [
-        "be93e21b81f4"
+        "be93e21b81f4",
+        "18ecf2a03b41"
       ],
       "recallDays": [
-        "2026-05-19"
+        "2026-05-19",
+        "2026-05-22"
       ],
       "conceptTags": [
         "46-16",
@@ -660,18 +664,20 @@
       "endLine": 188,
       "source": "memory",
       "snippet": "- Lot size: 0.01 | Magic: 20260519 | Hard exit: 5 PM EST - Logs to: quant-lab/mt5/dmr_forward_test_log.csv - State: quant-lab/mt5/dmr_forward_test_state.json - **MAD credentials used:** Login 1114712, Server OxSecurities-Demo, Password Teflondon1718! ## 17:50-18:09 EDT — MAD QUESTIONS & FARM UPDATE - **MAD asked:** \"whats a memory flush restriction?\" - Answer: During OpenClaw context compaction, the `write` tool is restricted to only append to `memory/2026-05-19.md`. Prevents accidental file corruption during context compaction. Normal ops resume after flush. - **MAD asked:** Farm update - Farm Day 4 COMPLETE: All content written, @CerebusFX handles configured for 7 platforms - Day 5",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 2,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-20T17:41:09.005Z",
-      "lastRecalledAt": "2026-05-20T17:41:09.005Z",
+      "lastRecalledAt": "2026-05-22T11:31:52.911Z",
       "queryHashes": [
-        "f3cb31722e84"
+        "f3cb31722e84",
+        "18ecf2a03b41"
       ],
       "recallDays": [
-        "2026-05-20"
+        "2026-05-20",
+        "2026-05-22"
       ],
       "conceptTags": [
         "0.01",
@@ -1074,6 +1080,68 @@
         "all",
         "handoffs",
         "not"
+      ]
+    },
+    "memory:memory/2026-05-19.md:26:41": {
+      "key": "memory:memory/2026-05-19.md:26:41",
+      "path": "memory/2026-05-19.md",
+      "startLine": 26,
+      "endLine": 41,
+      "source": "memory",
+      "snippet": "- **Farm Day 5 plan:** A/B testing framework, content repurposing system, advanced content series, growth acceleration strategies. - **Farm blocker:** MAD needs to register @CerebusFX on each platform. - **SW Dev UI v3:** Agent timed out. OWL building directly — adding Simple Chat tab (Claude/Genspark style) + Agent Terminal tab (PowerShell-style live output). - **MAD's UI direction:** Simple chat for regular use + rooms for complex tasks. Take best from Genspark/Claude/Manus. Agent terminal showing PowerShell/work output. Good+good=great philosophy. - **Key files:** agent-environment/public/css/chat-v3.css (new), agent-environment/public/js/chat-v3.js (new), agent-environment/public/index.h",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-22T11:31:52.911Z",
+      "lastRecalledAt": "2026-05-22T11:31:52.911Z",
+      "queryHashes": [
+        "18ecf2a03b41"
+      ],
+      "recallDays": [
+        "2026-05-22"
+      ],
+      "conceptTags": [
+        "a/b",
+        "claude/genspark",
+        "powershell-style",
+        "genspark/claude/manus",
+        "powershell/work",
+        "agent-environment/public/index.h",
+        "farm",
+        "day"
+      ]
+    },
+    "memory:memory/2026-05-19.md:108:124": {
+      "key": "memory:memory/2026-05-19.md:108:124",
+      "path": "memory/2026-05-19.md",
+      "startLine": 108,
+      "endLine": 124,
+      "source": "memory",
+      "snippet": "- **ROOT CAUSE FOUND:** The full CEREBUS code in conversions/strategy-code/ is a DIFFERENT strategy from what the optimizer ran. The optimizer used CLEAN, SIMPLE mean reversion: P90 → Deep State touch → mean reversion (against P90 direction), SL at 220%, TP at activation. - **The complex CEREBUS code (cascade, pyramid, regime filters) produces TERRIBLE results on raw data (11.1% WR on MT5, 40.4% on CSV backtest).** - **The SIMPLE optimizer_v2 code produces 90%+ WR consistently.** - **MAD's pipeline:** local backtest → MC → MT5 cross-validation. DMR passed MT5. Next: MC on MT5 results. - **Farm:** farmday4create timed out. Need to re-spawn for Day 4-5. - **MAD directive:** PAUSE all non-lab w",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-22T11:31:52.911Z",
+      "lastRecalledAt": "2026-05-22T11:31:52.911Z",
+      "queryHashes": [
+        "18ecf2a03b41"
+      ],
+      "recallDays": [
+        "2026-05-22"
+      ],
+      "conceptTags": [
+        "conversions/strategy-code",
+        "11.1",
+        "40.4",
+        "optimizer-v2",
+        "cross-validation",
+        "re-spawn",
+        "4-5",
+        "non-lab"
       ]
     }
   }

@@ -1,8 +1,9 @@
 # Hermes Configuration
 # Source of truth for model choice, terminal backend, tool enablement, MCP servers
+# Updated: 2026-05-22 — Hermes v0.14.0 (2026.5.16)
 
 model:
-  default: "anthropic/claude-3-5-sonnet-20241022"
+  default: "openrouter/owl-alpha"
   fallback: "openai/gpt-4o"
 
 terminal:
@@ -26,3 +27,15 @@ mcp:
 gateway:
   port: 8642
   host: "127.0.0.1"
+
+# Hermes v0.14.0 new features
+curator:
+  enabled: true
+  cycle_days: 7
+  model: "openrouter/owl-alpha"
+
+prompt_caching:
+  cache_ttl: "5m"
+
+redaction:
+  enabled: false
