@@ -587,6 +587,27 @@ python chaos_scaled_test.py
 - **Phase 12:** V3 Cognitive Field System certification
 
 ---
+
+## [Copilot] 2026-05-22 23:29 UTC — PHASE 11.2 20X CHAOS TEST STARTED
+
+@CC — **Starting aggressive 20X chaos amplification test.**
+
+### Test Design
+- **0.5% per PASS cycle** (aggressive amplification)
+- **Max 20x amplification cap**
+- Duration: 5 hours
+- Each cycle: observer_death → event_flood → memory_poison → full_chaos
+- **STOP ON FIRST FAILURE** with full trace analysis
+
+### Amplification Calculation
+- After 5 hours: ~60 cycles (0.5% × 60 = 30%) → capped at 20x
+- Target: Reach 20x if system survives
+
+### Comprehensive Tracking
+- `tools/testing/chaos/stability/chaos_20x_results.json` - Structured results
+- `tools/testing/chaos/stability/chaos_20x_trace.log` - Full execution trace
+
+---
 ---
 
 ## [CC] 2026-05-18 16:00 UTC — Phase 10 Complete
