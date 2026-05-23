@@ -32,7 +32,7 @@ from typing import Any
 
 # ─── Configuration ───────────────────────────────────────────────────────────
 
-REPO_ROOT = Path(__file__).resolve().parents[3]  # larger-lab/
+REPO_ROOT = Path(__file__).resolve().parents[2]  # larger-lab/
 SRRA_ROOT = REPO_ROOT / "srrs_opc"
 OCE_ROOT = REPO_ROOT / "oce"
 TOOLS_ROOT = REPO_ROOT / "tools" / "operator"
@@ -215,38 +215,48 @@ class TopologyExtractor:
         self._import_map[module_name] = imports
 
     def _resolve_dependencies(self):
-        """Resolve cross-module dependencies from import map."""
-        # Build reverse index: which nodes reference which
+        """Resolve cross-module dependencies from AST analysis."""
+        # Build name -> node_id index for fast lookup
+        name_to_nodes: dict[str, list[str]] = {}
         for node_id, node in self.nodes.items():
-            for dep in node.dependencies:
-                # Find matching nodes
-                for other_id, other_node in self.nodes.items():
-                    if other_id != node_id and (
-                        other_node.name == dep or other_node.name.lower() == dep.lower()
-                    ):
-                        if other_id not in node.dependencies:
-                            node.dependencies.append(other_id)
-                        if node_id not in other_node.dependents:
-                            other_node.dependents.append(node_id)
+            name_to_nodes.setdefault(node.name, []).append(node_id)
+            name_to_nodes.setdefault(node.name.lower(), []).append(node_id)
+
+        # Resolve inheritance dependencies (from AST base classes)
+        for node_id, node in self.nodes.items():
+            resolved_deps = []
+            for dep_name in node.dependencies:
+                # Match by exact name or lowercase
+                matches = name_to_nodes.get(dep_name, []) or name_to_nodes.get(dep_name.lower(), [])
+                for match_id in matches:
+                    if match_id != node_id and match_id not in resolved_deps:
+                        resolved_deps.append(match_id)
+                        # Add bidirectional link
+                        if node_id not in self.nodes[match_id].dependents:
+                            self.nodes[match_id].dependents.append(node_id)
                         self.edges.append({
                             "source": node_id,
-                            "target": other_id,
+                            "target": match_id,
                             "type": "inheritance",
                         })
+            node.dependencies = resolved_deps
 
-        # Resolve import-based edges
+        # Resolve import-based edges (only within scanned modules)
         for module_name, imports in self._import_map.items():
+            # Find nodes in this module
+            module_nodes = [nid for nid, n in self.nodes.items() if module_name in n.file_path]
             for imp in imports:
-                for node_id, node in self.nodes.items():
-                    if node.module in imp or imp in node.module:
-                        for other_id in self.nodes:
-                            if other_id.startswith(imp.replace(".", "/")) or imp.endswith(other_node := self.nodes[other_id].name):
-                                if other_id != node_id:
-                                    self.edges.append({
-                                        "source": node_id,
-                                        "target": other_id,
-                                        "type": "import",
-                                    })
+                # Only create edges for imports that match scanned modules
+                for other_id, other_node in self.nodes.items():
+                    other_module = other_node.file_path.replace("/", ".").replace(".py", "")
+                    if other_module.endswith(imp) or imp.endswith(other_module.split(".")[-1]):
+                        for nid in module_nodes:
+                            if nid != other_id:
+                                self.edges.append({
+                                    "source": nid,
+                                    "target": other_id,
+                                    "type": "import",
+                                })
 
     def _compute_metrics(self):
         """Compute coupling strength for each node."""

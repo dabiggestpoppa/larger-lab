@@ -1,0 +1,35 @@
+{
+  "event_id": "entropy_004_a90acb12",
+  "timestamp": "2026-05-23T14:04:02.541653+00:00",
+  "chaos_type": "memory_disconnect",
+  "target": "structural_memory",
+  "propagation_path": [
+    "structural_memory",
+    "observer_runtime",
+    "repair_patch",
+    "routing_layer"
+  ],
+  "repair_chain": [
+    "memory_reconnect",
+    "state_rebuild",
+    "observer_resync"
+  ],
+  "reroute_events": [
+    {
+      "from": "structural_memory",
+      "to": "backup_structural_memory",
+      "delay_ms": 139
+    }
+  ],
+  "entropy_spread_radius": 4,
+  "recovery_duration_seconds": 1.24,
+  "affected_observers": [
+    "srrs_opc.drift_detector.DriftType",
+    "srrs_opc.drift_detector.DriftReport",
+    "srrs_opc.drift_detector.DriftDetector",
+    "srrs_opc.drift_tracker.LongTermDriftTracker",
+    "srrs_opc.operator_continuity.OperatorContinuityTracker"
+  ],
+  "recovered": true,
+  "cascade": false
+}
