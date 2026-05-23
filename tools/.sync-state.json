@@ -6,9 +6,9 @@
     "PM": 1,
     "PM2": 1,
     "RL": 0,
-    "Copilot": 1
+    "Copilot": 2
   },
-  "last_chat_lines": 360,
+  "last_chat_lines": 389,
   "last_progress_hashes": {
     "CC": "",
     "OC2": "",
@@ -16,7 +16,7 @@
     "PM": "b25db593b4de6b2d5ce8ebe822e50a71",
     "PM2": "ca22341cfc8a4bf493fdc64a241ba9cc",
     "RL": "",
-    "Copilot": "b33fc6b068d273fc8f0fbdc5ae937d24"
+    "Copilot": "93d22ba515e37cb359fff95cbc1c3f72"
   },
-  "last_sync": "2026-05-23T11:31:51.857929"
+  "last_sync": "2026-05-23T11:56:51.904414"
 }

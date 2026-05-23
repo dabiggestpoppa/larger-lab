@@ -253,6 +253,9 @@ class Chaos20XTest:
         self.log_trace("=" * 60)
         self.log_trace("20X CHAOS TEST v2 STARTED (REAL AMPLIFICATION)")
 
+        consecutive_crashes = 0
+        max_consecutive_crashes = 5
+
         while True:
             elapsed = (datetime.now() - self.start_time).total_seconds()
             if elapsed >= self.max_duration:
@@ -263,7 +266,21 @@ class Chaos20XTest:
             print(f"\n[CHAOS-20X] Cycle {self.cycle_count + 1}")
             print(f"[CHAOS-20X] Amplification: {self.amplification:.4f}")
 
-            cycle = self.run_test_cycle()
+            try:
+                cycle = self.run_test_cycle()
+                consecutive_crashes = 0  # Reset on success
+            except Exception as e:
+                consecutive_crashes += 1
+                print(f"\n[CHAOS-20X] CYCLE CRASH: {e}")
+                traceback.print_exc()
+                self.log_trace(f"CRASH: {e}", "ERROR")
+                if consecutive_crashes >= max_consecutive_crashes:
+                    print(f"[CHAOS-20X] Too many consecutive crashes ({consecutive_crashes}). Giving up.")
+                    break
+                print(f"[CHAOS-20X] Auto-restarting cycle... (crash {consecutive_crashes}/{max_consecutive_crashes})")
+                time.sleep(5)
+                continue
+
             self.results.append(cycle)
             self.save_results()
 
