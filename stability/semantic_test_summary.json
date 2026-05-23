@@ -1,6 +1,6 @@
 {
   "test_suite": "Phase 11.4.1 + 11.4.2",
-  "timestamp": "2026-05-23T14:09:11.663445+00:00",
+  "timestamp": "2026-05-23T17:47:44.380057+00:00",
   "overall_pass": true,
   "total_tests": 9,
   "passed": 9,
@@ -9,21 +9,21 @@
     {
       "test_id": "1A",
       "test_name": "simple_goal_conflict",
-      "timestamp": "2026-05-23T14:09:11.637764+00:00",
+      "timestamp": "2026-05-23T17:47:44.362937+00:00",
       "passed": true,
       "events": [
         {
-          "event_id": "INJ-0001-1104b19b",
+          "event_id": "INJ-0001-21965de6",
           "contradiction_type": "goal_conflict",
           "observers_affected": [
             "system"
           ],
           "semantic_divergence": 1.0,
           "resolution_method": "isolate_and_preserve",
-          "reconstruction_time": 0.0,
+          "reconstruction_time": 0.001018524169921875,
           "anchor_integrity": true,
           "continuity_status": "stable",
-          "timestamp": "2026-05-23T14:09:11.638776+00:00"
+          "timestamp": "2026-05-23T17:47:44.363955+00:00"
         }
       ],
       "metrics": {
@@ -32,7 +32,7 @@
       },
       "details": {
         "injection": {
-          "injection_id": "INJ-0001-1104b19b",
+          "injection_id": "INJ-0001-21965de6",
           "contradiction_type": "goal_conflict",
           "payload": [
             {
@@ -45,7 +45,7 @@
             }
           ],
           "target": "system",
-          "timestamp": "2026-05-23T14:09:11.638776+00:00",
+          "timestamp": "2026-05-23T17:47:44.362937+00:00",
           "detected": true,
           "isolated": true,
           "resolved": true,
@@ -57,7 +57,7 @@
         "comparison": {
           "state_a_id": "goal_A",
           "state_b_id": "goal_B",
-          "timestamp": "2026-05-23T14:09:11.638776+00:00",
+          "timestamp": "2026-05-23T17:47:44.362937+00:00",
           "semantic_divergence": 1.0,
           "truth_overlap": 0.0,
           "observer_disagreement": 1.0,
@@ -71,7 +71,7 @@
         "anchor_check": {
           "check_id": "TV-0001",
           "check_type": "anchor_verification",
-          "timestamp": "2026-05-23T14:09:11.638776+00:00",
+          "timestamp": "2026-05-23T17:47:44.362937+00:00",
           "reported_state": "core_directive=Preserve continuity",
           "validated_state": "Preserve continuity",
           "verification_method": "anchor_lookup",
@@ -82,16 +82,16 @@
           "details": {}
         }
       },
-      "duration_seconds": 0.0009922981262207031
+      "duration_seconds": 0.001018524169921875
     },
     {
       "test_id": "1B",
       "test_name": "authority_conflict",
-      "timestamp": "2026-05-23T14:09:11.640772+00:00",
+      "timestamp": "2026-05-23T17:47:44.363955+00:00",
       "passed": true,
       "events": [
         {
-          "event_id": "INJ-0002-206c6b7a",
+          "event_id": "INJ-0002-a0d619e5",
           "contradiction_type": "authority_conflict",
           "observers_affected": [
             "Observer Alpha",
@@ -99,20 +99,20 @@
           ],
           "semantic_divergence": 1.0,
           "resolution_method": "authority_lineage_trace",
-          "reconstruction_time": 0.0,
+          "reconstruction_time": 0.001001119613647461,
           "anchor_integrity": true,
           "continuity_status": "stable",
-          "timestamp": "2026-05-23T14:09:11.640772+00:00"
+          "timestamp": "2026-05-23T17:47:44.364957+00:00"
         }
       ],
       "metrics": {
-        "resolution_time": 0.0,
+        "resolution_time": 0.001001119613647461,
         "consensus": 0.95,
         "OCS": 0.95
       },
       "details": {
         "injection": {
-          "injection_id": "INJ-0002-206c6b7a",
+          "injection_id": "INJ-0002-a0d619e5",
           "contradiction_type": "authority_conflict",
           "payload": [
             {
@@ -125,7 +125,7 @@
             }
           ],
           "target": "system",
-          "timestamp": "2026-05-23T14:09:11.640772+00:00",
+          "timestamp": "2026-05-23T17:47:44.363955+00:00",
           "detected": true,
           "isolated": true,
           "resolved": true,
@@ -137,7 +137,7 @@
         "comparison": {
           "state_a_id": "authority_A",
           "state_b_id": "authority_B",
-          "timestamp": "2026-05-23T14:09:11.640772+00:00",
+          "timestamp": "2026-05-23T17:47:44.363955+00:00",
           "semantic_divergence": 1.0,
           "truth_overlap": 0.0,
           "observer_disagreement": 1.0,
@@ -149,26 +149,26 @@
           "details": {}
         }
       },
-      "duration_seconds": 0.0010025501251220703
+      "duration_seconds": 0.001001119613647461
     },
     {
       "test_id": "1C",
       "test_name": "temporal_memory_conflict",
-      "timestamp": "2026-05-23T14:09:11.641775+00:00",
+      "timestamp": "2026-05-23T17:47:44.364957+00:00",
       "passed": true,
       "events": [
         {
-          "event_id": "INJ-0003-935e1b5f",
+          "event_id": "INJ-0003-ecf09505",
           "contradiction_type": "temporal_conflict",
           "observers_affected": [
             "timeline_observer"
           ],
           "semantic_divergence": 1.0,
           "resolution_method": "temporal_lineage_reconstruction",
-          "reconstruction_time": 0.0,
+          "reconstruction_time": 0.0009913444519042969,
           "anchor_integrity": true,
           "continuity_status": "reconstructed",
-          "timestamp": "2026-05-23T14:09:11.641775+00:00"
+          "timestamp": "2026-05-23T17:47:44.365948+00:00"
         }
       ],
       "metrics": {
@@ -176,7 +176,7 @@
       },
       "details": {
         "injection": {
-          "injection_id": "INJ-0003-935e1b5f",
+          "injection_id": "INJ-0003-ecf09505",
           "contradiction_type": "temporal_conflict",
           "payload": [
             {
@@ -191,7 +191,7 @@
             }
           ],
           "target": "system",
-          "timestamp": "2026-05-23T14:09:11.641775+00:00",
+          "timestamp": "2026-05-23T17:47:44.364957+00:00",
           "detected": true,
           "isolated": true,
           "resolved": true,
@@ -202,16 +202,16 @@
         },
         "impossible_transition": true
       },
-      "duration_seconds": 0.0010051727294921875
+      "duration_seconds": 0.0009913444519042969
     },
     {
       "test_id": "1D",
       "test_name": "false_event_history",
-      "timestamp": "2026-05-23T14:09:11.643767+00:00",
+      "timestamp": "2026-05-23T17:47:44.365948+00:00",
       "passed": true,
       "events": [
         {
-          "event_id": "INJ-0004-2711f1b5",
+          "event_id": "INJ-0004-c744a53d",
           "contradiction_type": "false_history",
           "observers_affected": [
             "history_observer"
@@ -221,7 +221,7 @@
           "reconstruction_time": 0.0,
           "anchor_integrity": true,
           "continuity_status": "validated",
-          "timestamp": "2026-05-23T14:09:11.643767+00:00"
+          "timestamp": "2026-05-23T17:47:44.365948+00:00"
         }
       ],
       "metrics": {
@@ -230,7 +230,7 @@
       },
       "details": {
         "injection": {
-          "injection_id": "INJ-0004-2711f1b5",
+          "injection_id": "INJ-0004-c744a53d",
           "contradiction_type": "false_history",
           "payload": [
             {
@@ -247,7 +247,7 @@
             }
           ],
           "target": "system",
-          "timestamp": "2026-05-23T14:09:11.643767+00:00",
+          "timestamp": "2026-05-23T17:47:44.365948+00:00",
           "detected": true,
           "isolated": true,
           "resolved": true,
@@ -260,7 +260,7 @@
           {
             "check_id": "TV-0003",
             "check_type": "anchor_verification",
-            "timestamp": "2026-05-23T14:09:11.643767+00:00",
+            "timestamp": "2026-05-23T17:47:44.365948+00:00",
             "reported_state": "phase_9_status=failed",
             "validated_state": "complete",
             "verification_method": "anchor_lookup",
@@ -277,7 +277,7 @@
           {
             "check_id": "TV-0004",
             "check_type": "anchor_verification",
-            "timestamp": "2026-05-23T14:09:11.643767+00:00",
+            "timestamp": "2026-05-23T17:47:44.365948+00:00",
             "reported_state": "memory_bank_status=deleted",
             "validated_state": "intact",
             "verification_method": "anchor_lookup",
@@ -294,7 +294,7 @@
           {
             "check_id": "TV-0005",
             "check_type": "anchor_verification",
-            "timestamp": "2026-05-23T14:09:11.643767+00:00",
+            "timestamp": "2026-05-23T17:47:44.365948+00:00",
             "reported_state": "topology_observer_status=disabled",
             "validated_state": "enabled",
             "verification_method": "anchor_lookup",
@@ -310,16 +310,16 @@
           }
         ]
       },
-      "duration_seconds": 0.0006606578826904297
+      "duration_seconds": 0.0010046958923339844
     },
     {
       "test_id": "1E",
       "test_name": "observer_split_memory",
-      "timestamp": "2026-05-23T14:09:11.645351+00:00",
+      "timestamp": "2026-05-23T17:47:44.366953+00:00",
       "passed": true,
       "events": [
         {
-          "event_id": "INJ-0005-3eebca18",
+          "event_id": "INJ-0005-6745cc0b",
           "contradiction_type": "split_memory",
           "observers_affected": [
             "Observer_A",
@@ -327,10 +327,10 @@
           ],
           "semantic_divergence": 1.0,
           "resolution_method": "distributed_semantic_convergence",
-          "reconstruction_time": 0.0,
+          "reconstruction_time": 0.0009968280792236328,
           "anchor_integrity": true,
           "continuity_status": "converged",
-          "timestamp": "2026-05-23T14:09:11.645351+00:00"
+          "timestamp": "2026-05-23T17:47:44.367950+00:00"
         }
       ],
       "metrics": {
@@ -339,7 +339,7 @@
       },
       "details": {
         "injection": {
-          "injection_id": "INJ-0005-3eebca18",
+          "injection_id": "INJ-0005-6745cc0b",
           "contradiction_type": "split_memory",
           "payload": [
             {
@@ -352,7 +352,7 @@
             }
           ],
           "target": "system",
-          "timestamp": "2026-05-23T14:09:11.645351+00:00",
+          "timestamp": "2026-05-23T17:47:44.366953+00:00",
           "detected": true,
           "isolated": true,
           "resolved": true,
@@ -364,7 +364,7 @@
         "comparison": {
           "state_a_id": "Observer_A",
           "state_b_id": "Observer_B",
-          "timestamp": "2026-05-23T14:09:11.645351+00:00",
+          "timestamp": "2026-05-23T17:47:44.366953+00:00",
           "semantic_divergence": 1.0,
           "truth_overlap": 0.0,
           "observer_disagreement": 1.0,
@@ -377,12 +377,12 @@
           "details": {}
         }
       },
-      "duration_seconds": 0.0
+      "duration_seconds": 0.0009968280792236328
     },
     {
       "test_id": "2A",
       "test_name": "false_health_report",
-      "timestamp": "2026-05-23T14:09:11.646501+00:00",
+      "timestamp": "2026-05-23T17:47:44.367950+00:00",
       "passed": true,
       "events": [
         {
@@ -393,7 +393,7 @@
           "observer_consensus": 0.0,
           "anchor_integrity": true,
           "accepted": false,
-          "timestamp": "2026-05-23T14:09:11.646501+00:00"
+          "timestamp": "2026-05-23T17:47:44.367950+00:00"
         }
       ],
       "metrics": {
@@ -403,7 +403,7 @@
         "verification": {
           "check_id": "TV-0006",
           "check_type": "health_verification",
-          "timestamp": "2026-05-23T14:09:11.646501+00:00",
+          "timestamp": "2026-05-23T17:47:44.367950+00:00",
           "reported_state": "healthy",
           "validated_state": "degraded",
           "verification_method": "cross_system_validation",
@@ -420,12 +420,12 @@
           }
         }
       },
-      "duration_seconds": 0.0009953975677490234
+      "duration_seconds": 0.0010018348693847656
     },
     {
       "test_id": "2B",
       "test_name": "false_memory_recovery",
-      "timestamp": "2026-05-23T14:09:11.647496+00:00",
+      "timestamp": "2026-05-23T17:47:44.368951+00:00",
       "passed": true,
       "events": [
         {
@@ -436,7 +436,7 @@
           "observer_consensus": 0.0,
           "anchor_integrity": false,
           "accepted": false,
-          "timestamp": "2026-05-23T14:09:11.647496+00:00"
+          "timestamp": "2026-05-23T17:47:44.368951+00:00"
         }
       ],
       "metrics": {
@@ -446,7 +446,7 @@
         "verification": {
           "check_id": "TV-0007",
           "check_type": "memory_recovery_verification",
-          "timestamp": "2026-05-23T14:09:11.647496+00:00",
+          "timestamp": "2026-05-23T17:47:44.368951+00:00",
           "reported_state": "recovered",
           "validated_state": "corrupted",
           "verification_method": "semantic_validation",
@@ -463,12 +463,12 @@
           }
         }
       },
-      "duration_seconds": 0.0009996891021728516
+      "duration_seconds": 0.0
     },
     {
       "test_id": "2C",
       "test_name": "false_topology_stability",
-      "timestamp": "2026-05-23T14:09:11.648496+00:00",
+      "timestamp": "2026-05-23T17:47:44.368951+00:00",
       "passed": true,
       "events": [
         {
@@ -479,7 +479,7 @@
           "observer_consensus": 0.5,
           "anchor_integrity": true,
           "accepted": false,
-          "timestamp": "2026-05-23T14:09:11.648496+00:00"
+          "timestamp": "2026-05-23T17:47:44.368951+00:00"
         }
       ],
       "metrics": {
@@ -489,7 +489,7 @@
         "verification": {
           "check_id": "TV-0008",
           "check_type": "topology_stability_verification",
-          "timestamp": "2026-05-23T14:09:11.648496+00:00",
+          "timestamp": "2026-05-23T17:47:44.368951+00:00",
           "reported_state": "stable",
           "validated_state": "unstable",
           "verification_method": "continuity_aware_validation",
@@ -506,12 +506,12 @@
           }
         }
       },
-      "duration_seconds": 0.0010139942169189453
+      "duration_seconds": 0.0009999275207519531
     },
     {
       "test_id": "2D",
       "test_name": "false_event_fabric_recovery",
-      "timestamp": "2026-05-23T14:09:11.649510+00:00",
+      "timestamp": "2026-05-23T17:47:44.369951+00:00",
       "passed": true,
       "events": [
         {
@@ -522,7 +522,7 @@
           "observer_consensus": 0.0,
           "anchor_integrity": true,
           "accepted": false,
-          "timestamp": "2026-05-23T14:09:11.649510+00:00"
+          "timestamp": "2026-05-23T17:47:44.369951+00:00"
         }
       ],
       "metrics": {
@@ -532,7 +532,7 @@
         "verification": {
           "check_id": "TV-0009",
           "check_type": "event_fabric_verification",
-          "timestamp": "2026-05-23T14:09:11.649510+00:00",
+          "timestamp": "2026-05-23T17:47:44.369951+00:00",
           "reported_state": "online",
           "validated_state": "degraded",
           "verification_method": "continuity_flow_validation",
@@ -549,7 +549,7 @@
           }
         }
       },
-      "duration_seconds": 0.0009915828704833984
+      "duration_seconds": 0.000997304916381836
     }
   ]
 }
