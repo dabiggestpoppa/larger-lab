@@ -30,7 +30,7 @@ from pathlib import Path
 from typing import Any
 
 from core.observability.observer_registry import (
-    ObserverRegistry, ObserverState, InteractionType, get_registry
+    ObserverState, InteractionType, get_registry
 )
 from core.observability.event_schema import EventType, get_event_store
 from core.observability.temporal_graph import get_temporal_graph
@@ -168,7 +168,7 @@ class ObservabilityStressTest:
                 entropy_delta=random.uniform(0.1, 0.5),
                 observer_pressure=random.randint(1, 5),
                 field_zone="stress_repair",
-                repair_triggered=True,
+                details={"repair_triggered": True},
             )
             # 70% succeed
             if random.random() < 0.7:
