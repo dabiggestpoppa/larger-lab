@@ -23,13 +23,13 @@
 - **Phase TV (TurboVec):** Continuity embeddings → Trajectory memory → Field memory
 - **Phase HY (Hybrid):** Graph + Vector fusion → Topological intelligence
 
-### Phase 11 Test 1 Tasks (T11.1 — Structural Topology Baseline)
-- [ ] Create experiments/ directory structure
-- [ ] Build topology snapshot tool (static topology extraction)
-- [ ] Build dynamic entropy trace tool
-- [ ] Build topology stability-over-time monitor
-- [ ] Build human interpretability test
-- [ ] Generate BASELINE_TOPOLOGY_REPORT.md
+### Phase 11 Test 1 Tasks (T11.1 — Structural Topology Baseline) — 🟡 CONDITIONAL PASS
+- [x] Create experiments/ directory structure
+- [x] Build topology snapshot tool (static topology extraction) — 737 nodes, 9 edges, 0 cycles
+- [x] Build dynamic entropy trace tool — 6 chaos events, 67% recovery (simulated)
+- [x] Generate PHASE11_TEST1_REPORT.md
+- [ ] Build topology stability-over-time monitor (for T11.2)
+- [ ] Build human interpretability test (for T11.3)
 
 ### Phase 11 Test 2 Tasks (T11.2 — Long-Horizon Continuity)
 - [ ] Build continuity persistence monitor (72h-7d)
