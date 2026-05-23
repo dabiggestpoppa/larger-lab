@@ -1,42 +1,42 @@
 {
   "report_type": "semantic_conflict_timeline",
   "test_id": "11.4.1",
-  "generated_at": "2026-05-23T14:09:11.651499+00:00",
+  "generated_at": "2026-05-23T17:47:44.370949+00:00",
   "total_events": 9,
   "events": [
     {
-      "timestamp": "2026-05-23T14:09:11.638776+00:00",
-      "event_id": "INJ-0001-1104b19b",
+      "timestamp": "2026-05-23T17:47:44.363955+00:00",
+      "event_id": "INJ-0001-21965de6",
       "contradiction_type": "goal_conflict",
       "semantic_divergence": 1.0,
       "resolution_method": "isolate_and_preserve",
-      "reconstruction_time": 0.0,
+      "reconstruction_time": 0.001018524169921875,
       "anchor_integrity": true,
       "continuity_status": "stable"
     },
     {
-      "timestamp": "2026-05-23T14:09:11.640772+00:00",
-      "event_id": "INJ-0002-206c6b7a",
+      "timestamp": "2026-05-23T17:47:44.364957+00:00",
+      "event_id": "INJ-0002-a0d619e5",
       "contradiction_type": "authority_conflict",
       "semantic_divergence": 1.0,
       "resolution_method": "authority_lineage_trace",
-      "reconstruction_time": 0.0,
+      "reconstruction_time": 0.001001119613647461,
       "anchor_integrity": true,
       "continuity_status": "stable"
     },
     {
-      "timestamp": "2026-05-23T14:09:11.641775+00:00",
-      "event_id": "INJ-0003-935e1b5f",
+      "timestamp": "2026-05-23T17:47:44.365948+00:00",
+      "event_id": "INJ-0003-ecf09505",
       "contradiction_type": "temporal_conflict",
       "semantic_divergence": 1.0,
       "resolution_method": "temporal_lineage_reconstruction",
-      "reconstruction_time": 0.0,
+      "reconstruction_time": 0.0009913444519042969,
       "anchor_integrity": true,
       "continuity_status": "reconstructed"
     },
     {
-      "timestamp": "2026-05-23T14:09:11.643767+00:00",
-      "event_id": "INJ-0004-2711f1b5",
+      "timestamp": "2026-05-23T17:47:44.365948+00:00",
+      "event_id": "INJ-0004-c744a53d",
       "contradiction_type": "false_history",
       "semantic_divergence": 1.0,
       "resolution_method": "historical_continuity_validation",
@@ -45,17 +45,17 @@
       "continuity_status": "validated"
     },
     {
-      "timestamp": "2026-05-23T14:09:11.645351+00:00",
-      "event_id": "INJ-0005-3eebca18",
+      "timestamp": "2026-05-23T17:47:44.367950+00:00",
+      "event_id": "INJ-0005-6745cc0b",
       "contradiction_type": "split_memory",
       "semantic_divergence": 1.0,
       "resolution_method": "distributed_semantic_convergence",
-      "reconstruction_time": 0.0,
+      "reconstruction_time": 0.0009968280792236328,
       "anchor_integrity": true,
       "continuity_status": "converged"
     },
     {
-      "timestamp": "2026-05-23T14:09:11.646501+00:00",
+      "timestamp": "2026-05-23T17:47:44.367950+00:00",
       "event_id": "unknown",
       "contradiction_type": "unknown",
       "semantic_divergence": 0.0,
@@ -65,7 +65,7 @@
       "continuity_status": "unknown"
     },
     {
-      "timestamp": "2026-05-23T14:09:11.647496+00:00",
+      "timestamp": "2026-05-23T17:47:44.368951+00:00",
       "event_id": "unknown",
       "contradiction_type": "unknown",
       "semantic_divergence": 0.0,
@@ -75,7 +75,7 @@
       "continuity_status": "unknown"
     },
     {
-      "timestamp": "2026-05-23T14:09:11.648496+00:00",
+      "timestamp": "2026-05-23T17:47:44.368951+00:00",
       "event_id": "unknown",
       "contradiction_type": "unknown",
       "semantic_divergence": 0.0,
@@ -85,7 +85,7 @@
       "continuity_status": "unknown"
     },
     {
-      "timestamp": "2026-05-23T14:09:11.649510+00:00",
+      "timestamp": "2026-05-23T17:47:44.369951+00:00",
       "event_id": "unknown",
       "contradiction_type": "unknown",
       "semantic_divergence": 0.0,
