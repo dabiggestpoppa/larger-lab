@@ -52,7 +52,17 @@
 
 ---
 
+### 2026-05-23 17:30 UTC — Autopilot v3 + Standby Mode
+- Built `tools/owl_autopilot.py` — full monitoring daemon with rate limit recovery
+- 15-min check interval: processes, chaos test, 72h test, git status, team chat
+- Exponential backoff on errors: 60s → 120s → 300s → 600s → 1800s
+- Hourly status posts to team chat
+- Logs to `logs/owl-autopilot.log`
+- Updated team-chat.md with standby notice
+- Operator away — OWL + PM2 both on autopilot
+
 ## Notes
 - Operator stepped away at 11:00 UTC 2026-05-23
 - All agents should continue autonomously
 - OWL monitors and assists as needed
+- Autopilot v3 handles rate limit errors with exponential backoff — no operator needed

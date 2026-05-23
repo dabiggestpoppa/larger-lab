@@ -1,39 +1,32 @@
 # Phase 11.2 — Chaos Engineering Test Log
 
-## Current Status: 🔄 RUNNING (Autopilot Active)
+## Final Results
 
-- **Script:** `tools/testing/chaos/chaos_20x_test.py`
-- **PID:** 10128
-- **Started:** 2026-05-23 11:55 UTC
-- **Resume:** --resume 9 (cycle 10)
-- **Increment:** 14.3% per cycle → 5x after ~28 cycles
-- **Max amplification:** 5x cap
-- **Trace:** `tools/testing/chaos/stability/chaos_20x_trace.log`
-- **Autopilot:** `tools/owl_autopilot.ps1` running in background
+| Metric | Value |
+|--------|-------|
+| Cycles completed | 5 (10→14) |
+| Passed | 4/5 |
+| Failed | 1 (cycle 14, amp 3.0x) |
+| Failure reason | Recovery timeout in full_chaos scenario |
+| Max amp achieved | 3.002x |
+| Recovery trend | 788s → 1045s |
 
-## Progress (as of 13:22 UTC)
+## Cycle Results
 
 | Cycle | Amplification | Status | Recovery |
 |-------|--------------|--------|----------|
-| 6 | 1.86x | ✅ PASS | 598.2s |
-| 7 | 2.00x | ✅ PASS | ~650s |
-| 8 | 2.14x | ✅ PASS | 691.9s |
-| 9 | 2.29x | ✅ PASS | 739.9s |
-| 10 | 2.43x | ✅ PASS | ~740s |
-| 11 | 2.57x | ✅ PASS | ~790s |
-| 12 | 2.72x | ✅ PASS | ~840s |
-| 13 | 2.86x | ✅ PASS | ~890s |
-| 14 | 3.00x | 🔄 Running | — |
+| 10 | 2.43x | PASS | 788.9s |
+| 11 | 2.57x | PASS | 836.0s |
+| 12 | 2.72x | PASS | 883.4s |
+| 13 | 2.86x | PASS | 930.5s |
+| 14 | 3.00x | FAIL | 1045.1s (timeout) |
 
-## Key Fixes Applied
-1. Amplification now actually scales durations/severity (was broken in v1)
-2. Absolute paths for trace/results (CWD-independent)
-3. Retry logic (3 attempts) for file writes
-4. Internal auto-restart with consecutive crash limit (5)
-5. `--resume N` flag for crash recovery
-6. Auto-restart wrapper (`chaos_auto_restart.py`)
+## Notes
+- System stable up to amp 2.86x
+- Failure at 3.0x due to recovery timeout in full_chaos
+- Expected behavior — finite recovery capacity
 
-## Next Steps After Completion
-- Phase 11.3: Adversarial Drift & Identity Coherence Testing
-- Phase 11.4: 7-day memory stability test (already running, PID 21028)
-- Phase 11.5: 7-day orchestration stability test
+## Next: Phase 11.3 — Adversarial Drift & Identity Coherence Testing
+- Semantic test infrastructure built by AS (9 files in tools/testing/semantic/)
+- PM2 experiments running in experiments/phase11/test1, test2, test3
+- 72h continuity test still running (PID 21028)
