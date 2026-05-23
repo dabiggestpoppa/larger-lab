@@ -1,7 +1,8 @@
 """
-Phase 11.2 — 20X Chaos Amplification Test
+Phase 11.2 — 20X Chaos Amplification Test v2
 Target: 20x normal chaos after 5 hours
 Amplification: 0.5% per PASS cycle (aggressive)
+NOW WITH REAL AMPLIFICATION: durations, severity, and breadth all scale.
 """
 
 import time
@@ -55,7 +56,7 @@ class Chaos20XTest:
         self.max_duration = 5 * 3600  # 5 hours
         self.cycle_increment = 0.005  # 0.5% per cycle
         self.max_amplification = 20.0  # Cap at 20x
-        
+
     def get_system_state(self) -> Dict[str, Any]:
         return {
             "timestamp": datetime.now().isoformat(),
@@ -64,7 +65,7 @@ class Chaos20XTest:
             "observer_status": self._get_observer_status(),
             "thread_count": self._get_thread_count()
         }
-    
+
     def _get_memory_usage(self) -> Dict[str, Any]:
         try:
             import psutil
@@ -72,59 +73,61 @@ class Chaos20XTest:
             return {"rss_mb": process.memory_info().rss / 1024 / 1024, "percent": process.memory_percent()}
         except:
             return {"error": "psutil not available"}
-    
+
     def _get_observer_status(self) -> Dict[str, Any]:
         try:
             from oce.observer import ObserverRegistry
             return {"observers": list(ObserverRegistry.list_observers())}
         except:
             return {"error": "observer registry unavailable"}
-    
+
     def _get_thread_count(self) -> int:
         try:
             import threading
             return threading.active_count()
         except:
             return -1
-    
+
     def log_trace(self, message: str, level: str = "INFO"):
         timestamp = datetime.now().isoformat()
         with open(DETAILED_LOG_FILE, 'a') as f:
             f.write(f"[{timestamp}] [{level}] {message}\n")
-    
+
     def calculate_amplification(self) -> float:
         """Calculate amplification: 0.5% per cycle."""
         amp = 1.0 + (self.cycle_count * self.cycle_increment)
         return min(amp, self.max_amplification)
-    
+
     def run_single_scenario(self, scenario: str) -> ChaosEventTrace:
         self.event_counter += 1
         event_id = f"EVT-{self.event_counter:04d}"
-        
+
         state_before = self.get_system_state()
         start_time = time.time()
         error_msg = None
         stack_trace = None
         status = "PASS"
         result = {}
-        
+
         try:
             self.log_trace(f"Starting scenario {scenario} with amplification {self.amplification:.4f}")
-            result = self.engine.run_chaos_scenario(scenario)
+            # KEY FIX: pass amplification to the engine
+            result = self.engine.run_chaos_scenario(scenario, amplification=self.amplification)
             injection_time = time.time() - start_time
-            
+
             recovery_start = time.time()
-            timeout = 300  # 5 minutes max
+            # Recovery timeout scales with amplification (longer chaos = longer recovery allowed)
+            timeout = min(300 + (self.amplification - 1.0) * 60, 900)  # 5min base + 60s per amp, max 15min
             while self.engine.get_active_chaos() and (time.time() - recovery_start) < timeout:
                 time.sleep(0.5)
-            
+
             recovery_time = time.time() - recovery_start
-            
+
             if self.engine.get_active_chaos():
                 status = "FAIL"
                 error_msg = "Recovery timeout exceeded"
                 self.log_trace(f"Scenario {scenario} FAILED: recovery timeout", "ERROR")
-            
+
         except Exception as e:
             status = "FAIL"
             error_msg = str(e)
@@ -132,9 +135,9 @@ class Chaos20XTest:
             recovery_time = time.time() - start_time
             self.log_trace(f"Scenario {scenario} FAILED: {error_msg}", "ERROR")
             self.log_trace(stack_trace, "ERROR")
-        
+
         state_after = self.get_system_state()
-        
+
         return ChaosEventTrace(
             event_id=event_id,
             timestamp=datetime.now().isoformat(),
@@ -150,25 +153,30 @@ class Chaos20XTest:
             system_state_after=state_after,
             amplification_factor=self.amplification
         )
-    
+
     def run_test_cycle(self) -> TestCycle:
         self.cycle_count += 1
         self.amplification = self.calculate_amplification()
-        
+
+        # At amp >= 10, replace full_chaos with extreme_chaos
         scenarios = ["observer_death", "event_flood", "memory_poison", "full_chaos"]
+        if self.amplification >= 10.0:
+            scenarios = ["observer_death", "event_flood", "memory_poison", "extreme_chaos"]
+
         events = []
         total_recovery = 0
         all_passed = True
         failure_details = None
-        
+
         self.log_trace(f"=== CYCLE {self.cycle_count} START ===")
         self.log_trace(f"Amplification factor: {self.amplification:.4f}")
-        
+        self.log_trace(f"Scenarios: {scenarios}")
+
         for scenario in scenarios:
             trace = self.run_single_scenario(scenario)
             events.append(trace)
             total_recovery += trace.recovery_time
-            
+
             if trace.status == "FAIL":
                 all_passed = False
                 failure_details = {
@@ -180,7 +188,7 @@ class Chaos20XTest:
                 }
                 self.log_trace(f"Cycle {self.cycle_count} FAILED at scenario {scenario}", "ERROR")
                 break
-        
+
         return TestCycle(
             cycle=self.cycle_count,
             timestamp=datetime.now().isoformat(),
@@ -191,10 +199,10 @@ class Chaos20XTest:
             total_recovery_time=total_recovery,
             failure_details=failure_details
         )
-    
+
     def save_results(self):
         results_data = {
-            "test_type": "20x_chaos",
+            "test_type": "20x_chaos_v2",
             "start_time": self.start_time.isoformat() if self.start_time else None,
             "end_time": datetime.now().isoformat(),
             "total_cycles": len(self.results),
@@ -203,59 +211,60 @@ class Chaos20XTest:
         }
         with open(RESULTS_FILE, 'w') as f:
             json.dump(results_data, f, indent=2, default=str)
-    
+
     def run_test(self):
         self.start_time = datetime.now()
-        
-        print(f"[CHAOS-20X] Starting 20X Chaos Test")
+
+        print(f"[CHAOS-20X] Starting 20X Chaos Test v2 (REAL AMPLIFICATION)")
         print(f"[CHAOS-20X] Time: {self.start_time.isoformat()}")
         print(f"[CHAOS-20X] Duration: 5 hours")
         print(f"[CHAOS-20X] Amplification: 0.5% per cycle (max 20x)")
+        print(f"[CHAOS-20X] Durations scale: observer_kill 30s base × amp, event_flood 120s base × amp, etc.")
         print("=" * 60)
-        
+
         self.log_trace("=" * 60)
-        self.log_trace("20X CHAOS TEST STARTED")
-        
+        self.log_trace("20X CHAOS TEST v2 STARTED (REAL AMPLIFICATION)")
+
         while True:
             elapsed = (datetime.now() - self.start_time).total_seconds()
             if elapsed >= self.max_duration:
                 print(f"\n[CHAOS-20X] 5-hour duration reached")
                 self.log_trace("5-hour duration reached - TEST COMPLETE")
                 break
-            
+
             print(f"\n[CHAOS-20X] Cycle {self.cycle_count + 1}")
             print(f"[CHAOS-20X] Amplification: {self.amplification:.4f}")
-            
+
             cycle = self.run_test_cycle()
             self.results.append(cycle)
             self.save_results()
-            
-            status_icon = "✅" if cycle.passed else "❌"
-            print(f"[CHAOS-20X] Cycle {cycle.cycle} result: {status_icon} {cycle.passed}")
-            print(f"[CHAOS-20X] Total recovery time: {cycle.total_recovery_time:.1f}s")
-            
+
+            status_icon = "PASS" if cycle.passed else "FAIL"
+            total_injected = sum(len(c.events) for c in self.results)
+            print(f"[CHAOS-20X] Cycle {cycle.cycle} result: {status_icon} (recovery: {cycle.total_recovery_time:.1f}s, events so far: {total_injected})")
+
             if not cycle.passed:
                 print(f"\n[CHAOS-20X] FAILURE DETECTED!")
                 print(f"[CHAOS-20X] Analysis saved to {DETAILED_LOG_FILE}")
                 break
-            
+
             print(f"[CHAOS-20X] Waiting 5 minutes cooldown...")
             self.log_trace("Waiting 5 minutes cooldown")
             time.sleep(300)
-        
+
         self.finalize()
-    
+
     def finalize(self):
         passed_cycles = sum(1 for c in self.results if c.passed)
         total_events = sum(len(c.events) for c in self.results)
-        
+
         print("\n" + "=" * 60)
         print(f"[CHAOS-20X] Test Completed")
         print(f"[CHAOS-20X] Cycles: {passed_cycles}/{len(self.results)} passed")
         print(f"[CHAOS-20X] Total events: {total_events}")
         print(f"[CHAOS-20X] Final amplification: {self.amplification:.4f}")
         print(f"[CHAOS-20X] Results saved to {RESULTS_FILE}")
-        
+
         self.log_trace("=" * 60)
         self.log_trace("TEST FINALIZED")
 
