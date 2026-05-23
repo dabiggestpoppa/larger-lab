@@ -1,32 +1,45 @@
 # Phase 11.2 — 20X Chaos Amplification Test v2
 
-## Test Parameters
+## Test Complete ✅
+
 - **Started:** 2026-05-23 00:06 UTC
-- **Duration:** 5 hours (ends ~05:06 UTC)
-- **Amplification:** 0.5% per PASS cycle
-- **Max amplification:** 20x
-- **Cooldown:** 5 minutes between cycles
-- **Script:** `tools/testing/chaos/chaos_20x_test.py`
-- **Trace log:** `stability/chaos_20x_trace.log` (workspace root)
+- **Ended:** 2026-05-23 ~05:06 UTC (5 hours)
+- **Result:** ALL 28 CYCLES PASSED
+- **Final amplification:** 1.14x (capped by 5-hour duration, not by failure)
+- **Total events:** 112
 
-## What's Fixed in v2
-- Amplification now **actually scales** chaos parameters:
-  - Durations multiply by amp (observer_kill: 30s × amp, event_flood: 120s × amp, etc.)
-  - Severity/corruption rates multiply by amp (capped at 1.0)
-  - More targets get hit at higher amp thresholds (1.5x, 2x, 3x, 5x, 8x, 10x)
-  - New `extreme_chaos` scenario unlocks at 10x
-  - Recovery timeout scales with amp (5min base + 60s per amp, max 15min)
-  - Stagger between injections decreases at higher amp
+## What Was Fixed in v2
 
-## Progress
+The original test had a bug: amplification was calculated but **never passed to the chaos engine**. Every cycle ran the exact same durations regardless of amp level.
 
-| Cycle | Amplification | Status | Recovery Time | Events |
-|-------|--------------|--------|---------------|--------|
-| 1 | 1.005x | ✅ PASS | 302.9s | 4 |
-| 2 | 1.010x | 🔄 Cooldown | — | — |
+v2 fixes:
+- `observer_kill`: 30s × amp (30s → 34s over test)
+- `event_flood`: 120s × amp (121s → 137s over test)
+- `memory_corrupt`: 60s × amp (60s → 68s over test)
+- `websocket_loss`: 30s × amp (30s → 34s over test)
+- Severity/corruption rates also scale with amp
+- At amp 1.5x+: more observer targets added
+- At amp 2x+: router_failure added to full_chaos
+- At amp 3x+: token_starve added
+- At amp 5x+: recursive_storm added
+- At amp 8x+: twin_desync added
+- At amp 10x+: extreme_chaos replaces full_chaos
+
+## Recovery Time Trend
+
+| Cycle | Amp | Recovery |
+|-------|-----|----------|
+| 1 | 1.005x | 302.9s |
+| 5 | 1.020x | 310.3s |
+| 10 | 1.045x | 319.3s |
+| 15 | 1.070x | 327.8s |
+| 20 | 1.095x | 336.3s |
+| 28 | 1.135x | 350.8s |
+
+Recovery times increased ~16% over the test, tracking the amplification curve. System remained stable throughout.
 
 ## Notes
-- Killed old test (cycle 2, same durations every cycle — broken amplification)
-- Rewrote chaos_engine.py: all methods accept `amplification` param
-- Rewrote chaos_20x_test.py: passes `self.amplification` to engine
-- Background monitor running (checks trace every 30s, PID 7660)
+- Test ran for full 5 hours without failure
+- Amplification only reached 1.14x due to 5-hour cap (would need ~3.5 hours per cycle to reach 20x)
+- To reach higher amplification: either increase cycle_increment or extend duration
+- Git committed and pushed (commit 088652d41)

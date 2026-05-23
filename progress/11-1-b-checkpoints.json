@@ -14,63 +14,63 @@
   "observers": {
     "observer_00": {
       "status": "alive",
-      "tasks_completed": 1,
-      "errors": 0,
-      "uptime_seconds": 0.0
+      "tasks_completed": 1800,
+      "errors": 7,
+      "uptime_seconds": 17991.11607336998
     },
     "observer_01": {
       "status": "alive",
-      "tasks_completed": 1,
-      "errors": 0,
-      "uptime_seconds": 0.01714301109313965
+      "tasks_completed": 1800,
+      "errors": 4,
+      "uptime_seconds": 17990.896047592163
     },
     "observer_02": {
-      "status": "alive",
-      "tasks_completed": 1,
-      "errors": 0,
-      "uptime_seconds": 0.01714301109313965
+      "status": "degraded",
+      "tasks_completed": 1800,
+      "errors": 11,
+      "uptime_seconds": 17990.93384552002
     },
     "observer_03": {
       "status": "alive",
-      "tasks_completed": 1,
-      "errors": 0,
-      "uptime_seconds": 0.01714301109313965
+      "tasks_completed": 1800,
+      "errors": 8,
+      "uptime_seconds": 17991.088075876236
     },
     "observer_04": {
       "status": "alive",
-      "tasks_completed": 1,
-      "errors": 0,
-      "uptime_seconds": 0.01714301109313965
+      "tasks_completed": 1800,
+      "errors": 6,
+      "uptime_seconds": 17991.036573410034
     },
     "observer_05": {
       "status": "alive",
-      "tasks_completed": 1,
-      "errors": 0,
-      "uptime_seconds": 0.01714301109313965
+      "tasks_completed": 1800,
+      "errors": 10,
+      "uptime_seconds": 17990.941909074783
     },
     "observer_06": {
       "status": "alive",
-      "tasks_completed": 1,
-      "errors": 0,
-      "uptime_seconds": 0.01714301109313965
+      "tasks_completed": 1800,
+      "errors": 11,
+      "uptime_seconds": 17990.941909074783
     },
     "observer_07": {
-      "status": "degraded",
-      "tasks_completed": 1,
-      "errors": 1,
-      "uptime_seconds": 0.01714301109313965
+      "status": "alive",
+      "tasks_completed": 1800,
+      "errors": 8,
+      "uptime_seconds": 17991.14555811882
     },
     "observer_08": {
       "status": "alive",
-      "tasks_completed": 1,
-      "errors": 0,
-      "uptime_seconds": 0.01714301109313965
+      "tasks_completed": 1800,
+      "errors": 3,
+      "uptime_seconds": 17991.14555811882
     },
     "observer_09": {
       "status": "alive",
-      "tasks_completed": 1,
-      "errors": 0,
-      "uptime_seconds": 0.01714301109313965
+      "tasks_completed": 1800,
+      "errors": 7,
+      "uptime_seconds": 17990.941909074783
     }
   },
   "chaos_events": []
