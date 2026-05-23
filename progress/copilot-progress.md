@@ -452,3 +452,32 @@
 - Running in background (terminal f989c1ff)
 - Next check: ~11:20 UTC
 
+
+---
+
+## Update: 2026-05-23 11:35 UTC — WORKSPACE SYNC + AUTOPILOT v2
+
+### Test 11.1-B Restarted (PID 21028)
+- Terminal cleanup killed original PID 7660
+- Test auto-resumed from checkpoint #1 (60.4h remaining)
+- All 10 observers alive, 0 dead
+
+### Workspace Sync Infrastructure Built
+- \	ools/progress-sync.py\ — Syncs agent progress -> memory every 7 updates
+- \	ools/terminal_cleanup.py\ — PID-based protection (active PIDs in .active-pids.json)
+- \	ools/workspace_cleanup.py\ — Temp/log/progress bloat cleanup
+- All registered PIDs: 21028 (test), 18728 (sync), 3028 (observability), 21488 (chaos)
+
+### OWL Autopilot v2
+- \	ools/owl_autopilot.ps1\ — Auto-detects test PID, hourly checks
+- Checks: test health, checkpoints, agent progress, agent memory, team chat, git
+- Auto-restart capability if test process dies
+- Rate limit handling: 3 consecutive errors triggers cooldown
+- Running: terminal fea91919
+
+### Agent Status
+- AS: Active (1.3h ago)
+- PM/PM2: Active (<2h ago)
+- CC/OC2/RL: Missing progress files (memory OK)
+- Copilot: Active (updating now)
+
