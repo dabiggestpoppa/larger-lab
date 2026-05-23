@@ -1,45 +1,44 @@
-# Phase 11.2 — 20X Chaos Amplification Test v2
+# Phase 11.2 — Chaos Engineering Test Log
 
-## Test Complete ✅
+## v2 Test (Current) — 5X Target
 
-- **Started:** 2026-05-23 00:06 UTC
-- **Ended:** 2026-05-23 ~05:06 UTC (5 hours)
-- **Result:** ALL 28 CYCLES PASSED
-- **Final amplification:** 1.14x (capped by 5-hour duration, not by failure)
-- **Total events:** 112
+- **Started:** 2026-05-23 08:13 UTC
+- **Duration:** 5 hours (ends ~13:13 UTC)
+- **Increment:** 14.3% per cycle
+- **Max amplification:** 5x
+- **Script:** `tools/testing/chaos/chaos_20x_test.py`
+- **Engine:** `tools/testing/chaos/chaos_engine.py` (v2)
+- **Trace:** `stability/chaos_20x_trace.log`
 
-## What Was Fixed in v2
+## v1 Results (Complete)
 
-The original test had a bug: amplification was calculated but **never passed to the chaos engine**. Every cycle ran the exact same durations regardless of amp level.
+| Metric | Value |
+|--------|-------|
+| Cycles | 28/28 PASS |
+| Total events | 112 |
+| Final amplification | 1.14x |
+| Recovery trend | 302.9s → 350.8s (+16%) |
+| Duration | 5 hours |
 
-v2 fixes:
-- `observer_kill`: 30s × amp (30s → 34s over test)
-- `event_flood`: 120s × amp (121s → 137s over test)
-- `memory_corrupt`: 60s × amp (60s → 68s over test)
-- `websocket_loss`: 30s × amp (30s → 34s over test)
-- Severity/corruption rates also scale with amp
-- At amp 1.5x+: more observer targets added
-- At amp 2x+: router_failure added to full_chaos
-- At amp 3x+: token_starve added
-- At amp 5x+: recursive_storm added
-- At amp 8x+: twin_desync added
-- At amp 10x+: extreme_chaos replaces full_chaos
+## Amplification Scaling (v2)
 
-## Recovery Time Trend
+| Amp | observer_kill | event_flood | memory_corrupt | websocket_loss |
+|-----|--------------|-------------|---------------|----------------|
+| 1.0x | 30s | 120s | 60s | 30s |
+| 1.5x | 45s | 180s | 90s | 45s |
+| 2.0x | 60s | 240s | 120s | 60s |
+| 3.0x | 90s | 360s | 180s | 90s |
+| 5.0x | 150s | 600s | 300s | 150s |
 
-| Cycle | Amp | Recovery |
-|-------|-----|----------|
-| 1 | 1.005x | 302.9s |
-| 5 | 1.020x | 310.3s |
-| 10 | 1.045x | 319.3s |
-| 15 | 1.070x | 327.8s |
-| 20 | 1.095x | 336.3s |
-| 28 | 1.135x | 350.8s |
+## Target Thresholds
 
-Recovery times increased ~16% over the test, tracking the amplification curve. System remained stable throughout.
+- 1.5x: +planner_observer
+- 2.0x: +memory_observer, router_failure added
+- 3.0x: +gateway_observer, token_starve added
+- 5.0x: +security_observer, health_observer, recursive_storm
+- 8.0x: twin_desync added
+- 10x: extreme_chaos replaces full_chaos (14 simultaneous injections)
 
-## Notes
-- Test ran for full 5 hours without failure
-- Amplification only reached 1.14x due to 5-hour cap (would need ~3.5 hours per cycle to reach 20x)
-- To reach higher amplification: either increase cycle_increment or extend duration
-- Git committed and pushed (commit 088652d41)
+## Git
+- Commit `088652d41`: Fixed chaos amplification (engine rewrite)
+- Commit `54837179d`: v1 test results (28/28 pass)

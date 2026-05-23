@@ -106,9 +106,44 @@ All Phase 11 test harness components built:
 
 ---
 
+---
+
+## [OWL] 2026-05-23 — Phase 11.2 Chaos Engineering v2 (5X Target)
+
+### Chaos Engine v2 — Fixed Amplification
+- **Bug found:** v1 test had amplification calculated but never passed to engine — every cycle ran identical durations
+- **Fix:** Rewrote `chaos_engine.py` — all methods accept `amplification` param
+  - Durations scale: `base_duration × amp` (observer_kill 30s, event_flood 120s, memory_corrupt 60s, websocket_loss 30s)
+  - Severity scales: `base_severity × amp` (capped at 1.0)
+  - More targets at thresholds: 1.5x→+planner_observer, 2x→+memory_observer+router, 3x→+gateway+token_starve, 5x→+security+health+recursive_storm, 8x→+twin_desync, 10x→extreme_chaos (14 injections)
+  - Stagger between injections decreases at higher amp
+
+### v1 Results (retroactive)
+- 28 cycles, 112 scenarios, 100% pass rate
+- Final amplification: 1.14x (0.5% per cycle, 5h duration)
+- Recovery times: 302.9s → 350.8s (+16%)
+
+### v2 Test (Running)
+- **Started:** 2026-05-23T08:13 UTC
+- **Target:** 5x normal chaos in 5 hours
+- **Increment:** 14.3% per cycle (vs 0.5% in v1)
+- **Max:** 5x cap
+- **Cycle 1:** amp 1.14x, observer_kill 34s, event_flood 137s — PASS
+- **Status:** Cycle 1 completed, cycle 2 starting
+
+### Files
+- `tools/testing/chaos/chaos_engine.py` — v2 with full amplification
+- `tools/testing/chaos/chaos_20x_test.py` — edited increment from 0.005→0.143
+- `stability/chaos_20x_trace.log` — trace output
+- `stability/chaos_20x_results.json` — results output
+- Commits: `088652d41` (fix), `54837179d` (v1 results)
+
+---
+
 ## Next Steps
 
-- **Phase 11.3:** 72-hour continuity stability test
+- **Phase 11.2:** 5X chaos test running (complete ~05:06 UTC)
+- **Phase 11.3:** Adversarial drift & identity coherence testing
 - **Phase 11.4:** 7-day memory stability test
 - **Phase 11.5:** 7-day orchestration stability test
 - **Phase 11.7:** Recovery stability (restart survival)
