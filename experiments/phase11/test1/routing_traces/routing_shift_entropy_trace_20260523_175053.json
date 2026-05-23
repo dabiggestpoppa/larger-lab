@@ -1,0 +1,88 @@
+{
+  "label": "entropy_trace_20260523_175053",
+  "timestamp": "2026-05-23T17:50:53.397534+00:00",
+  "reroute_events": [
+    [
+      {
+        "from": "observer_alpha",
+        "to": "backup_observer_alpha",
+        "delay_ms": 410
+      },
+      {
+        "from": "observer_alpha",
+        "to": "backup_observer_alpha",
+        "delay_ms": 336
+      },
+      {
+        "from": "observer_alpha",
+        "to": "backup_observer_alpha",
+        "delay_ms": 262
+      }
+    ],
+    [
+      {
+        "from": "ws_secondary",
+        "to": "backup_ws_secondary",
+        "delay_ms": 50
+      },
+      {
+        "from": "ws_secondary",
+        "to": "backup_ws_secondary",
+        "delay_ms": 490
+      }
+    ],
+    [
+      {
+        "from": "router_primary",
+        "to": "backup_router_primary",
+        "delay_ms": 416
+      },
+      {
+        "from": "router_primary",
+        "to": "backup_router_primary",
+        "delay_ms": 322
+      }
+    ],
+    [
+      {
+        "from": "event_fabric",
+        "to": "backup_event_fabric",
+        "delay_ms": 349
+      }
+    ],
+    [
+      {
+        "from": "continuity_anchor",
+        "to": "backup_continuity_anchor",
+        "delay_ms": 171
+      },
+      {
+        "from": "continuity_anchor",
+        "to": "backup_continuity_anchor",
+        "delay_ms": 97
+      },
+      {
+        "from": "continuity_anchor",
+        "to": "backup_continuity_anchor",
+        "delay_ms": 459
+      }
+    ],
+    [
+      {
+        "from": "repair_patch",
+        "to": "backup_repair_patch",
+        "delay_ms": 216
+      },
+      {
+        "from": "repair_patch",
+        "to": "backup_repair_patch",
+        "delay_ms": 333
+      },
+      {
+        "from": "repair_patch",
+        "to": "backup_repair_patch",
+        "delay_ms": 112
+      }
+    ]
+  ]
+}
