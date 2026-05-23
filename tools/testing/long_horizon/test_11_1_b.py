@@ -372,20 +372,79 @@ class Test11_1BRunner:
         self.progress_path = Path("progress/11-1-b-checkpoints.json")
         self.progress_path.parent.mkdir(parents=True, exist_ok=True)
     
-    def start(self):
-        """Start TEST 11.1-B."""
-        self.start_time = time.time()
-        self.end_time = self.start_time + self.duration_seconds
-        self._running = True
+    def _try_resume(self):
+        """Try to resume from existing checkpoint data. Returns True if resumed."""
+        if not self.progress_path.exists():
+            return False
         
-        self.state.start_time = datetime.now().isoformat()
-        self.state.test_name = f"{self.duration_hours}h_continuity_stability"
+        try:
+            data = json.loads(self.progress_path.read_text())
+            if data.get("start_time") and data.get("total_checkpoints", 0) > 0:
+                # We have previous state — resume from it
+                old_start = datetime.fromisoformat(data["start_time"])
+                elapsed_before = (datetime.now() - old_start).total_seconds()
+                
+                # Restore state
+                self.state.test_id = data.get("test_id", "11.1-B")
+                self.state.test_name = data.get("test_name", f"{self.duration_hours}h_continuity_stability")
+                self.state.start_time = data["start_time"]
+                self.state.total_checkpoints = data.get("total_checkpoints", 0)
+                self.state.passed_checkpoints = data.get("passed_checkpoints", 0)
+                self.state.failed_checkpoints = data.get("failed_checkpoints", 0)
+                self.state.max_drift_score = data.get("max_drift_score", 0.0)
+                self.state.checkpoints = data.get("checkpoints", [])
+                self.state.chaos_events = data.get("chaos_events", [])
+                
+                # Restore hash engine baseline from last checkpoint
+                if self.state.checkpoints:
+                    last_cp = self.state.checkpoints[-1]
+                    self.hash_engine._baseline = {
+                        "identity": last_cp["identity_hash"],
+                        "trajectory": last_cp["trajectory_hash"],
+                        "goal": last_cp["goal_hash"],
+                        "memory": last_cp["memory_hash"],
+                    }
+                    self.hash_engine._history = list(self.state.checkpoints)
+                
+                # Adjust start time so remaining duration is correct
+                self.start_time = time.time()
+                remaining_seconds = self.duration_seconds - elapsed_before
+                if remaining_seconds <= 0:
+                    print("[RESUME] Previous run already completed full duration!")
+                    return False
+                self.end_time = self.start_time + remaining_seconds
+                
+                print(f"[RESUME] Found previous run: {data['total_checkpoints']} checkpoint(s), "
+                      f"{elapsed_before/3600:.1f}h elapsed")
+                print(f"[RESUME] Resuming with {remaining_seconds/3600:.1f}h remaining")
+                return True
+        except Exception as e:
+            print(f"[RESUME] Failed to resume: {e}. Starting fresh.")
+        
+        return False
+
+    def start(self):
+        """Start TEST 11.1-B. Auto-resumes from last checkpoint if available."""
+        # Try to resume first
+        resumed = self._try_resume()
+        
+        if not resumed:
+            # Fresh start
+            self.start_time = time.time()
+            self.end_time = self.start_time + self.duration_seconds
+            self.state.start_time = datetime.now().isoformat()
+            self.state.test_name = f"{self.duration_hours}h_continuity_stability"
+        
+        self._running = True
         
         print(f"\n{'='*70}")
         print(f"  TEST 11.1-B — {self.duration_hours}-Hour Continuity Stability")
         print(f"{'='*70}")
-        print(f"  Start time: {self.state.start_time}")
-        print(f"  Duration: {self.duration_hours} hours ({self.duration_seconds}s)")
+        if resumed:
+            print(f"  [RESUMED] Original start: {self.state.start_time}")
+            print(f"  [RESUMED] Checkpoints so far: {self.state.total_checkpoints}")
+            print(f"  [RESUMED] Passed: {self.state.passed_checkpoints} | Failed: {self.state.failed_checkpoints}")
+        print(f"  Duration: {self.duration_hours} hours total")
         print(f"  Observers: {OBSERVER_COUNT}")
         print(f"  Continuity checkpoint: every {CONTINUITY_CHECKPOINT_INTERVAL_HOURS}h")
         print(f"  Micro-chaos injection: every {MICRO_CHAOS_INTERVAL_HOURS}h")
@@ -455,7 +514,17 @@ class Test11_1BRunner:
     def _start_continuity_monitor(self):
         """Start the continuity checkpoint monitor thread."""
         def monitor():
-            next_checkpoint = time.time() + (CONTINUITY_CHECKPOINT_INTERVAL_HOURS * 3600)
+            # Calculate next checkpoint based on original start time
+            if self.state.start_time:
+                orig_start = datetime.fromisoformat(self.state.start_time).timestamp()
+                now = time.time()
+                elapsed = now - orig_start
+                # Next checkpoint is at the next 6h boundary from original start
+                next_boundary = ((elapsed // (CONTINUITY_CHECKPOINT_INTERVAL_HOURS * 3600)) + 1) * (CONTINUITY_CHECKPOINT_INTERVAL_HOURS * 3600)
+                next_checkpoint = orig_start + next_boundary
+            else:
+                next_checkpoint = time.time() + (CONTINUITY_CHECKPOINT_INTERVAL_HOURS * 3600)
+            
             while self._running:
                 time.sleep(60)  # Check every minute
                 if time.time() >= next_checkpoint:
@@ -469,7 +538,16 @@ class Test11_1BRunner:
     def _start_chaos_scheduler(self):
         """Start the micro-chaos injection scheduler thread."""
         def scheduler():
-            next_chaos = time.time() + (MICRO_CHAOS_INTERVAL_HOURS * 3600)
+            # Calculate next chaos based on original start time
+            if self.state.start_time:
+                orig_start = datetime.fromisoformat(self.state.start_time).timestamp()
+                now = time.time()
+                elapsed = now - orig_start
+                next_boundary = ((elapsed // (MICRO_CHAOS_INTERVAL_HOURS * 3600)) + 1) * (MICRO_CHAOS_INTERVAL_HOURS * 3600)
+                next_chaos = orig_start + next_boundary
+            else:
+                next_chaos = time.time() + (MICRO_CHAOS_INTERVAL_HOURS * 3600)
+            
             while self._running:
                 time.sleep(60)  # Check every minute
                 if time.time() >= next_chaos:
@@ -480,7 +558,7 @@ class Test11_1BRunner:
                             "elapsed_hours": self._elapsed_hours(),
                             **result
                         })
-                        print(f"\n[{self._elapsed_str()}] ⚡ Micro-chaos: killed {result['target']}, "
+                        print(f"\n[{self._elapsed_str()}] Micro-chaos: killed {result['target']}, "
                               f"recovery in {result['recovery_time']}s")
                     next_chaos = time.time() + (MICRO_CHAOS_INTERVAL_HOURS * 3600)
         
