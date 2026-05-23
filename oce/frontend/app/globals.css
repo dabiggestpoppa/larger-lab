@@ -3,87 +3,74 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #111118;
-  --bg-tertiary: #1a1a24;
-  --text-primary: #e4e4e7;
-  --text-secondary: #a1a1aa;
-  --accent: #6366f1;
-  --accent-hover: #818cf8;
-  --border: #27272a;
-  --success: #22c55e;
-  --warning: #eab308;
-  --danger: #ef4444;
+  --bg-primary: #EDEFF2;
+  --bg-content: #ffffff;
+  --bg-input: #F9F9F9;
+  --accent: #133EBF;
 }
 
-body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
+  background: #d1d5db;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3a3a4a;
+  background: #9ca3af;
 }
 
 /* Selection */
 ::selection {
-  background: rgba(99, 102, 241, 0.3);
-  color: #fff;
+  background: rgba(19, 62, 191, 0.12);
+  color: #111827;
 }
 
-/* Smooth transitions — avoid * selector to prevent overlay glitches */
-button, a, input, select, [class*="transition"] {
-  transition-property: background-color, border-color, color, opacity;
-  transition-duration: 150ms;
-  transition-timing-function: ease;
-}
-
-/* Canvas anti-aliasing */
-canvas {
-  image-rendering: auto;
-}
-
-/* Focus styles */
+/* Focus */
 :focus-visible {
-  outline: 2px solid rgba(99, 102, 241, 0.5);
+  outline: 2px solid rgba(19, 62, 191, 0.25);
   outline-offset: 2px;
+  border-radius: 4px;
 }
 
-/* Animate pulse for live indicators */
-@keyframes pulse-glow {
+/* Textarea */
+textarea {
+  outline: none;
+  resize: none;
+  border: none;
+  background: transparent;
+}
+textarea:focus {
+  box-shadow: none;
+  outline: none;
+}
+
+/* Smooth transitions */
+button, a {
+  transition: all 0.15s ease;
+}
+
+/* Animate pulse for online dot */
+@keyframes pulse-dot {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-/* Toast slide-in animation */
-@keyframes slide-in-from-right {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-.animate-in.slide-in-from-right {
-  animation: slide-in-from-right 0.3s ease-out;
 }
