@@ -54,8 +54,8 @@ class Chaos20XTest:
         self.cycle_count = 0
         self.start_time = None
         self.max_duration = 5 * 3600  # 5 hours
-        self.cycle_increment = 0.005  # 0.5% per cycle
-        self.max_amplification = 20.0  # Cap at 20x
+        self.cycle_increment = 0.143  # 14.3% per cycle → 5x after ~28 cycles in 5hrs
+        self.max_amplification = 5.0  # Cap at 5x
 
     def get_system_state(self) -> Dict[str, Any]:
         return {
@@ -218,7 +218,7 @@ class Chaos20XTest:
         print(f"[CHAOS-20X] Starting 20X Chaos Test v2 (REAL AMPLIFICATION)")
         print(f"[CHAOS-20X] Time: {self.start_time.isoformat()}")
         print(f"[CHAOS-20X] Duration: 5 hours")
-        print(f"[CHAOS-20X] Amplification: 0.5% per cycle (max 20x)")
+        print(f"[CHAOS-20X] Amplification: 14.3% per cycle (max 5x, target: 5x in 5hrs)")
         print(f"[CHAOS-20X] Durations scale: observer_kill 30s base × amp, event_flood 120s base × amp, etc.")
         print("=" * 60)
 

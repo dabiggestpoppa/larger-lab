@@ -4,73 +4,93 @@
   "start_time": "2026-05-22T23:46:12.389206",
   "end_time": "",
   "duration_hours": 0.0,
-  "total_checkpoints": 0,
-  "passed_checkpoints": 0,
+  "total_checkpoints": 1,
+  "passed_checkpoints": 1,
   "failed_checkpoints": 0,
   "max_drift_score": 0.0,
   "final_uptime_percent": 0.0,
   "overall_pass": false,
-  "checkpoints": [],
+  "checkpoints": [
+    {
+      "checkpoint_id": "chk_1779529572",
+      "timestamp": "2026-05-23T05:46:12.762325",
+      "elapsed_hours": 6.0,
+      "identity_hash": "410ceb00ecddd8f2",
+      "trajectory_hash": "cea7f16b0951c8a3",
+      "goal_hash": "b4478a016b68a135",
+      "memory_hash": "01b7aedf107593f3",
+      "state_hash": "a5bbcb051040da49",
+      "drift_score": 0.0,
+      "drift_details": {},
+      "observer_health": {
+        "alive": 5,
+        "degraded": 5,
+        "dead": 0
+      },
+      "memory_usage_mb": 14.1,
+      "status": "PASS"
+    }
+  ],
   "observers": {
     "observer_00": {
       "status": "alive",
-      "tasks_completed": 1800,
-      "errors": 7,
-      "uptime_seconds": 17991.11607336998
+      "tasks_completed": 2880,
+      "errors": 16,
+      "uptime_seconds": 28791.568100214005
     },
     "observer_01": {
       "status": "alive",
-      "tasks_completed": 1800,
-      "errors": 4,
-      "uptime_seconds": 17990.896047592163
+      "tasks_completed": 2880,
+      "errors": 8,
+      "uptime_seconds": 28791.360563516617
     },
     "observer_02": {
-      "status": "degraded",
-      "tasks_completed": 1800,
-      "errors": 11,
-      "uptime_seconds": 17990.93384552002
+      "status": "alive",
+      "tasks_completed": 2880,
+      "errors": 18,
+      "uptime_seconds": 28791.397159576416
     },
     "observer_03": {
       "status": "alive",
-      "tasks_completed": 1800,
-      "errors": 8,
-      "uptime_seconds": 17991.088075876236
+      "tasks_completed": 2880,
+      "errors": 14,
+      "uptime_seconds": 28791.550320863724
     },
     "observer_04": {
       "status": "alive",
-      "tasks_completed": 1800,
-      "errors": 6,
-      "uptime_seconds": 17991.036573410034
+      "tasks_completed": 2880,
+      "errors": 13,
+      "uptime_seconds": 28791.4918653965
     },
     "observer_05": {
       "status": "alive",
-      "tasks_completed": 1800,
-      "errors": 10,
-      "uptime_seconds": 17990.941909074783
+      "tasks_completed": 2880,
+      "errors": 16,
+      "uptime_seconds": 28791.397159576416
     },
     "observer_06": {
       "status": "alive",
-      "tasks_completed": 1800,
-      "errors": 11,
-      "uptime_seconds": 17990.941909074783
+      "tasks_completed": 2880,
+      "errors": 17,
+      "uptime_seconds": 28791.397159576416
     },
     "observer_07": {
-      "status": "alive",
-      "tasks_completed": 1800,
-      "errors": 8,
-      "uptime_seconds": 17991.14555811882
+      "status": "degraded",
+      "tasks_completed": 2880,
+      "errors": 15,
+      "uptime_seconds": 28791.609098672867
     },
     "observer_08": {
       "status": "alive",
-      "tasks_completed": 1800,
-      "errors": 3,
-      "uptime_seconds": 17991.14555811882
+      "tasks_completed": 2880,
+      "errors": 7,
+      "uptime_seconds": 28791.609098672867
     },
     "observer_09": {
       "status": "alive",
-      "tasks_completed": 1800,
-      "errors": 7,
-      "uptime_seconds": 17990.941909074783
+      "tasks_completed": 2880,
+      "errors": 11,
+      "uptime_seconds": 28791.397159576416
     }
   },
   "chaos_events": []
