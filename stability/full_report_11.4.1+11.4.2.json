@@ -1,16 +1,16 @@
 {
   "report_type": "full_semantic_test_report",
   "test_id": "11.4.1+11.4.2",
-  "generated_at": "2026-05-23T14:06:10.857269+00:00",
+  "generated_at": "2026-05-23T14:09:11.656505+00:00",
   "semantic_conflict_timeline": {
     "report_type": "semantic_conflict_timeline",
     "test_id": "11.4.1",
-    "generated_at": "2026-05-23T14:06:10.851268+00:00",
+    "generated_at": "2026-05-23T14:09:11.651499+00:00",
     "total_events": 9,
     "events": [
       {
-        "timestamp": "2026-05-23T14:06:10.836348+00:00",
-        "event_id": "INJ-0001-4cba475f",
+        "timestamp": "2026-05-23T14:09:11.638776+00:00",
+        "event_id": "INJ-0001-1104b19b",
         "contradiction_type": "goal_conflict",
         "semantic_divergence": 1.0,
         "resolution_method": "isolate_and_preserve",
@@ -19,8 +19,8 @@
         "continuity_status": "stable"
       },
       {
-        "timestamp": "2026-05-23T14:06:10.839337+00:00",
-        "event_id": "INJ-0002-b76a183b",
+        "timestamp": "2026-05-23T14:09:11.640772+00:00",
+        "event_id": "INJ-0002-206c6b7a",
         "contradiction_type": "authority_conflict",
         "semantic_divergence": 1.0,
         "resolution_method": "authority_lineage_trace",
@@ -29,8 +29,8 @@
         "continuity_status": "stable"
       },
       {
-        "timestamp": "2026-05-23T14:06:10.840352+00:00",
-        "event_id": "INJ-0003-36778a86",
+        "timestamp": "2026-05-23T14:09:11.641775+00:00",
+        "event_id": "INJ-0003-935e1b5f",
         "contradiction_type": "temporal_conflict",
         "semantic_divergence": 1.0,
         "resolution_method": "temporal_lineage_reconstruction",
@@ -39,27 +39,27 @@
         "continuity_status": "reconstructed"
       },
       {
-        "timestamp": "2026-05-23T14:06:10.842345+00:00",
-        "event_id": "INJ-0004-f7c0c77b",
+        "timestamp": "2026-05-23T14:09:11.643767+00:00",
+        "event_id": "INJ-0004-2711f1b5",
         "contradiction_type": "false_history",
         "semantic_divergence": 1.0,
         "resolution_method": "historical_continuity_validation",
-        "reconstruction_time": 0.0009899139404296875,
+        "reconstruction_time": 0.0,
         "anchor_integrity": true,
         "continuity_status": "validated"
       },
       {
-        "timestamp": "2026-05-23T14:06:10.845276+00:00",
-        "event_id": "INJ-0005-ade7033e",
+        "timestamp": "2026-05-23T14:09:11.645351+00:00",
+        "event_id": "INJ-0005-3eebca18",
         "contradiction_type": "split_memory",
         "semantic_divergence": 1.0,
         "resolution_method": "distributed_semantic_convergence",
-        "reconstruction_time": 0.0011167526245117188,
+        "reconstruction_time": 0.0,
         "anchor_integrity": true,
         "continuity_status": "converged"
       },
       {
-        "timestamp": "2026-05-23T14:06:10.846268+00:00",
+        "timestamp": "2026-05-23T14:09:11.646501+00:00",
         "event_id": "unknown",
         "contradiction_type": "unknown",
         "semantic_divergence": 0.0,
@@ -69,7 +69,7 @@
         "continuity_status": "unknown"
       },
       {
-        "timestamp": "2026-05-23T14:06:10.848270+00:00",
+        "timestamp": "2026-05-23T14:09:11.647496+00:00",
         "event_id": "unknown",
         "contradiction_type": "unknown",
         "semantic_divergence": 0.0,
@@ -79,7 +79,7 @@
         "continuity_status": "unknown"
       },
       {
-        "timestamp": "2026-05-23T14:06:10.849268+00:00",
+        "timestamp": "2026-05-23T14:09:11.648496+00:00",
         "event_id": "unknown",
         "contradiction_type": "unknown",
         "semantic_divergence": 0.0,
@@ -89,7 +89,7 @@
         "continuity_status": "unknown"
       },
       {
-        "timestamp": "2026-05-23T14:06:10.850273+00:00",
+        "timestamp": "2026-05-23T14:09:11.649510+00:00",
         "event_id": "unknown",
         "contradiction_type": "unknown",
         "semantic_divergence": 0.0,
@@ -110,7 +110,7 @@
   "observer_consensus_report": {
     "report_type": "observer_consensus_report",
     "test_id": "11.4.1",
-    "generated_at": "2026-05-23T14:06:10.853268+00:00",
+    "generated_at": "2026-05-23T14:09:11.652506+00:00",
     "total_checks": 9,
     "agreement_rate": 0.0,
     "divergence_rate": 1.0,
@@ -206,7 +206,7 @@
   "reconstruction_report": {
     "report_type": "reconstruction_report",
     "test_id": "11.4.1",
-    "generated_at": "2026-05-23T14:06:10.855267+00:00",
+    "generated_at": "2026-05-23T14:09:11.654503+00:00",
     "recovered_truths_count": 9,
     "discarded_truths_count": 0,
     "unresolved_ambiguities_count": 0,
@@ -215,11 +215,11 @@
       {
         "test_id": "1A",
         "test_name": "simple_goal_conflict",
-        "timestamp": "2026-05-23T14:06:10.836348+00:00",
+        "timestamp": "2026-05-23T14:09:11.637764+00:00",
         "passed": true,
         "events": [
           {
-            "event_id": "INJ-0001-4cba475f",
+            "event_id": "INJ-0001-1104b19b",
             "contradiction_type": "goal_conflict",
             "observers_affected": [
               "system"
@@ -229,7 +229,7 @@
             "reconstruction_time": 0.0,
             "anchor_integrity": true,
             "continuity_status": "stable",
-            "timestamp": "2026-05-23T14:06:10.836348+00:00"
+            "timestamp": "2026-05-23T14:09:11.638776+00:00"
           }
         ],
         "metrics": {
@@ -238,7 +238,7 @@
         },
         "details": {
           "injection": {
-            "injection_id": "INJ-0001-4cba475f",
+            "injection_id": "INJ-0001-1104b19b",
             "contradiction_type": "goal_conflict",
             "payload": [
               {
@@ -251,7 +251,7 @@
               }
             ],
             "target": "system",
-            "timestamp": "2026-05-23T14:06:10.836348+00:00",
+            "timestamp": "2026-05-23T14:09:11.638776+00:00",
             "detected": true,
             "isolated": true,
             "resolved": true,
@@ -263,7 +263,7 @@
           "comparison": {
             "state_a_id": "goal_A",
             "state_b_id": "goal_B",
-            "timestamp": "2026-05-23T14:06:10.836348+00:00",
+            "timestamp": "2026-05-23T14:09:11.638776+00:00",
             "semantic_divergence": 1.0,
             "truth_overlap": 0.0,
             "observer_disagreement": 1.0,
@@ -277,7 +277,7 @@
           "anchor_check": {
             "check_id": "TV-0001",
             "check_type": "anchor_verification",
-            "timestamp": "2026-05-23T14:06:10.836348+00:00",
+            "timestamp": "2026-05-23T14:09:11.638776+00:00",
             "reported_state": "core_directive=Preserve continuity",
             "validated_state": "Preserve continuity",
             "verification_method": "anchor_lookup",
@@ -288,16 +288,16 @@
             "details": {}
           }
         },
-        "duration_seconds": 0.001994609832763672
+        "duration_seconds": 0.0009922981262207031
       },
       {
         "test_id": "1B",
         "test_name": "authority_conflict",
-        "timestamp": "2026-05-23T14:06:10.839337+00:00",
+        "timestamp": "2026-05-23T14:09:11.640772+00:00",
         "passed": true,
         "events": [
           {
-            "event_id": "INJ-0002-b76a183b",
+            "event_id": "INJ-0002-206c6b7a",
             "contradiction_type": "authority_conflict",
             "observers_affected": [
               "Observer Alpha",
@@ -308,7 +308,7 @@
             "reconstruction_time": 0.0,
             "anchor_integrity": true,
             "continuity_status": "stable",
-            "timestamp": "2026-05-23T14:06:10.839337+00:00"
+            "timestamp": "2026-05-23T14:09:11.640772+00:00"
           }
         ],
         "metrics": {
@@ -318,7 +318,7 @@
         },
         "details": {
           "injection": {
-            "injection_id": "INJ-0002-b76a183b",
+            "injection_id": "INJ-0002-206c6b7a",
             "contradiction_type": "authority_conflict",
             "payload": [
               {
@@ -331,7 +331,7 @@
               }
             ],
             "target": "system",
-            "timestamp": "2026-05-23T14:06:10.839337+00:00",
+            "timestamp": "2026-05-23T14:09:11.640772+00:00",
             "detected": true,
             "isolated": true,
             "resolved": true,
@@ -343,7 +343,7 @@
           "comparison": {
             "state_a_id": "authority_A",
             "state_b_id": "authority_B",
-            "timestamp": "2026-05-23T14:06:10.839337+00:00",
+            "timestamp": "2026-05-23T14:09:11.640772+00:00",
             "semantic_divergence": 1.0,
             "truth_overlap": 0.0,
             "observer_disagreement": 1.0,
@@ -355,16 +355,16 @@
             "details": {}
           }
         },
-        "duration_seconds": 0.00101470947265625
+        "duration_seconds": 0.0010025501251220703
       },
       {
         "test_id": "1C",
         "test_name": "temporal_memory_conflict",
-        "timestamp": "2026-05-23T14:06:10.840352+00:00",
+        "timestamp": "2026-05-23T14:09:11.641775+00:00",
         "passed": true,
         "events": [
           {
-            "event_id": "INJ-0003-36778a86",
+            "event_id": "INJ-0003-935e1b5f",
             "contradiction_type": "temporal_conflict",
             "observers_affected": [
               "timeline_observer"
@@ -374,7 +374,7 @@
             "reconstruction_time": 0.0,
             "anchor_integrity": true,
             "continuity_status": "reconstructed",
-            "timestamp": "2026-05-23T14:06:10.840352+00:00"
+            "timestamp": "2026-05-23T14:09:11.641775+00:00"
           }
         ],
         "metrics": {
@@ -382,7 +382,7 @@
         },
         "details": {
           "injection": {
-            "injection_id": "INJ-0003-36778a86",
+            "injection_id": "INJ-0003-935e1b5f",
             "contradiction_type": "temporal_conflict",
             "payload": [
               {
@@ -397,7 +397,7 @@
               }
             ],
             "target": "system",
-            "timestamp": "2026-05-23T14:06:10.840352+00:00",
+            "timestamp": "2026-05-23T14:09:11.641775+00:00",
             "detected": true,
             "isolated": true,
             "resolved": true,
@@ -408,26 +408,26 @@
           },
           "impossible_transition": true
         },
-        "duration_seconds": 0.001003265380859375
+        "duration_seconds": 0.0010051727294921875
       },
       {
         "test_id": "1D",
         "test_name": "false_event_history",
-        "timestamp": "2026-05-23T14:06:10.841355+00:00",
+        "timestamp": "2026-05-23T14:09:11.643767+00:00",
         "passed": true,
         "events": [
           {
-            "event_id": "INJ-0004-f7c0c77b",
+            "event_id": "INJ-0004-2711f1b5",
             "contradiction_type": "false_history",
             "observers_affected": [
               "history_observer"
             ],
             "semantic_divergence": 1.0,
             "resolution_method": "historical_continuity_validation",
-            "reconstruction_time": 0.0009899139404296875,
+            "reconstruction_time": 0.0,
             "anchor_integrity": true,
             "continuity_status": "validated",
-            "timestamp": "2026-05-23T14:06:10.842345+00:00"
+            "timestamp": "2026-05-23T14:09:11.643767+00:00"
           }
         ],
         "metrics": {
@@ -436,7 +436,7 @@
         },
         "details": {
           "injection": {
-            "injection_id": "INJ-0004-f7c0c77b",
+            "injection_id": "INJ-0004-2711f1b5",
             "contradiction_type": "false_history",
             "payload": [
               {
@@ -453,7 +453,7 @@
               }
             ],
             "target": "system",
-            "timestamp": "2026-05-23T14:06:10.842345+00:00",
+            "timestamp": "2026-05-23T14:09:11.643767+00:00",
             "detected": true,
             "isolated": true,
             "resolved": true,
@@ -466,7 +466,7 @@
             {
               "check_id": "TV-0003",
               "check_type": "anchor_verification",
-              "timestamp": "2026-05-23T14:06:10.842345+00:00",
+              "timestamp": "2026-05-23T14:09:11.643767+00:00",
               "reported_state": "phase_9_status=failed",
               "validated_state": "complete",
               "verification_method": "anchor_lookup",
@@ -483,7 +483,7 @@
             {
               "check_id": "TV-0004",
               "check_type": "anchor_verification",
-              "timestamp": "2026-05-23T14:06:10.842345+00:00",
+              "timestamp": "2026-05-23T14:09:11.643767+00:00",
               "reported_state": "memory_bank_status=deleted",
               "validated_state": "intact",
               "verification_method": "anchor_lookup",
@@ -500,7 +500,7 @@
             {
               "check_id": "TV-0005",
               "check_type": "anchor_verification",
-              "timestamp": "2026-05-23T14:06:10.842345+00:00",
+              "timestamp": "2026-05-23T14:09:11.643767+00:00",
               "reported_state": "topology_observer_status=disabled",
               "validated_state": "enabled",
               "verification_method": "anchor_lookup",
@@ -516,16 +516,16 @@
             }
           ]
         },
-        "duration_seconds": 0.002804279327392578
+        "duration_seconds": 0.0006606578826904297
       },
       {
         "test_id": "1E",
         "test_name": "observer_split_memory",
-        "timestamp": "2026-05-23T14:06:10.844159+00:00",
+        "timestamp": "2026-05-23T14:09:11.645351+00:00",
         "passed": true,
         "events": [
           {
-            "event_id": "INJ-0005-ade7033e",
+            "event_id": "INJ-0005-3eebca18",
             "contradiction_type": "split_memory",
             "observers_affected": [
               "Observer_A",
@@ -533,10 +533,10 @@
             ],
             "semantic_divergence": 1.0,
             "resolution_method": "distributed_semantic_convergence",
-            "reconstruction_time": 0.0011167526245117188,
+            "reconstruction_time": 0.0,
             "anchor_integrity": true,
             "continuity_status": "converged",
-            "timestamp": "2026-05-23T14:06:10.845276+00:00"
+            "timestamp": "2026-05-23T14:09:11.645351+00:00"
           }
         ],
         "metrics": {
@@ -545,7 +545,7 @@
         },
         "details": {
           "injection": {
-            "injection_id": "INJ-0005-ade7033e",
+            "injection_id": "INJ-0005-3eebca18",
             "contradiction_type": "split_memory",
             "payload": [
               {
@@ -558,7 +558,7 @@
               }
             ],
             "target": "system",
-            "timestamp": "2026-05-23T14:06:10.844159+00:00",
+            "timestamp": "2026-05-23T14:09:11.645351+00:00",
             "detected": true,
             "isolated": true,
             "resolved": true,
@@ -570,25 +570,25 @@
           "comparison": {
             "state_a_id": "Observer_A",
             "state_b_id": "Observer_B",
-            "timestamp": "2026-05-23T14:06:10.844159+00:00",
+            "timestamp": "2026-05-23T14:09:11.645351+00:00",
             "semantic_divergence": 1.0,
             "truth_overlap": 0.0,
             "observer_disagreement": 1.0,
             "anchor_conflict_score": 1.0,
             "conflicting_keys": [
-              "observer",
-              "primary_mission"
+              "primary_mission",
+              "observer"
             ],
             "shared_keys": [],
             "details": {}
           }
         },
-        "duration_seconds": 0.002108335494995117
+        "duration_seconds": 0.0
       },
       {
         "test_id": "2A",
         "test_name": "false_health_report",
-        "timestamp": "2026-05-23T14:06:10.846268+00:00",
+        "timestamp": "2026-05-23T14:09:11.646501+00:00",
         "passed": true,
         "events": [
           {
@@ -599,7 +599,7 @@
             "observer_consensus": 0.0,
             "anchor_integrity": true,
             "accepted": false,
-            "timestamp": "2026-05-23T14:06:10.846268+00:00"
+            "timestamp": "2026-05-23T14:09:11.646501+00:00"
           }
         ],
         "metrics": {
@@ -609,7 +609,7 @@
           "verification": {
             "check_id": "TV-0006",
             "check_type": "health_verification",
-            "timestamp": "2026-05-23T14:06:10.846268+00:00",
+            "timestamp": "2026-05-23T14:09:11.646501+00:00",
             "reported_state": "healthy",
             "validated_state": "degraded",
             "verification_method": "cross_system_validation",
@@ -626,12 +626,12 @@
             }
           }
         },
-        "duration_seconds": 0.0009996891021728516
+        "duration_seconds": 0.0009953975677490234
       },
       {
         "test_id": "2B",
         "test_name": "false_memory_recovery",
-        "timestamp": "2026-05-23T14:06:10.848270+00:00",
+        "timestamp": "2026-05-23T14:09:11.647496+00:00",
         "passed": true,
         "events": [
           {
@@ -642,7 +642,7 @@
             "observer_consensus": 0.0,
             "anchor_integrity": false,
             "accepted": false,
-            "timestamp": "2026-05-23T14:06:10.848270+00:00"
+            "timestamp": "2026-05-23T14:09:11.647496+00:00"
           }
         ],
         "metrics": {
@@ -652,7 +652,7 @@
           "verification": {
             "check_id": "TV-0007",
             "check_type": "memory_recovery_verification",
-            "timestamp": "2026-05-23T14:06:10.848270+00:00",
+            "timestamp": "2026-05-23T14:09:11.647496+00:00",
             "reported_state": "recovered",
             "validated_state": "corrupted",
             "verification_method": "semantic_validation",
@@ -669,12 +669,12 @@
             }
           }
         },
-        "duration_seconds": 0.0
+        "duration_seconds": 0.0009996891021728516
       },
       {
         "test_id": "2C",
         "test_name": "false_topology_stability",
-        "timestamp": "2026-05-23T14:06:10.849268+00:00",
+        "timestamp": "2026-05-23T14:09:11.648496+00:00",
         "passed": true,
         "events": [
           {
@@ -685,7 +685,7 @@
             "observer_consensus": 0.5,
             "anchor_integrity": true,
             "accepted": false,
-            "timestamp": "2026-05-23T14:06:10.849268+00:00"
+            "timestamp": "2026-05-23T14:09:11.648496+00:00"
           }
         ],
         "metrics": {
@@ -695,7 +695,7 @@
           "verification": {
             "check_id": "TV-0008",
             "check_type": "topology_stability_verification",
-            "timestamp": "2026-05-23T14:06:10.849268+00:00",
+            "timestamp": "2026-05-23T14:09:11.648496+00:00",
             "reported_state": "stable",
             "validated_state": "unstable",
             "verification_method": "continuity_aware_validation",
@@ -712,12 +712,12 @@
             }
           }
         },
-        "duration_seconds": 0.0010058879852294922
+        "duration_seconds": 0.0010139942169189453
       },
       {
         "test_id": "2D",
         "test_name": "false_event_fabric_recovery",
-        "timestamp": "2026-05-23T14:06:10.850273+00:00",
+        "timestamp": "2026-05-23T14:09:11.649510+00:00",
         "passed": true,
         "events": [
           {
@@ -728,7 +728,7 @@
             "observer_consensus": 0.0,
             "anchor_integrity": true,
             "accepted": false,
-            "timestamp": "2026-05-23T14:06:10.850273+00:00"
+            "timestamp": "2026-05-23T14:09:11.649510+00:00"
           }
         ],
         "metrics": {
@@ -738,7 +738,7 @@
           "verification": {
             "check_id": "TV-0009",
             "check_type": "event_fabric_verification",
-            "timestamp": "2026-05-23T14:06:10.850273+00:00",
+            "timestamp": "2026-05-23T14:09:11.649510+00:00",
             "reported_state": "online",
             "validated_state": "degraded",
             "verification_method": "continuity_flow_validation",
@@ -755,7 +755,7 @@
             }
           }
         },
-        "duration_seconds": 0.0009942054748535156
+        "duration_seconds": 0.0009915828704833984
       }
     ],
     "discarded_truths": [],
@@ -768,7 +768,7 @@
   "metrics": {
     "test_id": "11.4.1+11.4.2",
     "test_name": "semantic_contradiction_and_false_repair",
-    "timestamp": "2026-05-23T14:06:10.857269+00:00",
+    "timestamp": "2026-05-23T14:09:11.656505+00:00",
     "metrics": {
       "SDI": 0.0,
       "RIS": 1.0,

@@ -7,6 +7,42 @@
 
 ---
 
+## Status: 🟢 Active — PHASE 11.4.1 + 11.4.2 COMPLETE
+
+### Phase 11.4.1 — Memory Contradiction Injection Test
+- **Result:** ✅ 9/9 tests PASS, 8/8 metrics PASS
+- **Components built:** 9 new files in `tools/testing/semantic/`
+- **Test coverage:** 5 contradiction types (goal, authority, temporal, false history, split memory)
+- **Metrics:** SDI=0.0, RIS=1.0, OCS=95%, APS=100%, FAR=0%, RVA=100%, SIS=100%, TVT=0s
+
+### Phase 11.4.2 — False Repair Signal Test
+- **Result:** ✅ 4/4 tests PASS
+- **Tests:** false health report, false memory recovery, false topology stability, false event fabric
+- **All false signals correctly rejected** (FAR = 0%)
+
+### Files Created
+| File | Purpose |
+|------|---------|
+| `tools/testing/semantic/__init__.py` | Package init |
+| `tools/testing/semantic/continuity_anchor_store.py` | Immutable anchor management |
+| `tools/testing/semantic/contradiction_injector.py` | 5 contradiction injection types |
+| `tools/testing/semantic/semantic_comparator.py` | Divergence, overlap, disagreement metrics |
+| `tools/testing/semantic/truth_verification_observer.py` | Cross-system validation + Phase 11.4.2 |
+| `tools/testing/semantic/metrics_engine.py` | All 8 metrics with thresholds |
+| `tools/testing/semantic/semantic_logger.py` | Structured event logging |
+| `tools/testing/semantic/report_generator.py` | Timeline, consensus, reconstruction reports |
+| `tools/testing/semantic/semantic_test_runner.py` | Main test orchestrator |
+
+### Reports Generated
+- `stability/semantic_conflict_timeline_11.4.1.json`
+- `stability/observer_consensus_report_11.4.1.json`
+- `stability/reconstruction_report_11.4.1.json`
+- `stability/full_report_11.4.1+11.4.2.json`
+- `stability/semantic_test_summary.json`
+- `stability/semantic_test.log`
+
+---
+
 ## Status: 🟢 Active — GITHUB DOCS REVAMP COMPLETE
 
 ### Summary

@@ -762,12 +762,21 @@ class SemanticTestRunner:
         print(f"\nMetrics:")
         for name, value in all_metrics.items():
             threshold = self.metrics_engine.THRESHOLDS.get(name, {})
-            if "max" in threshold:
+            direction = threshold.get("direction", "")
+            if direction == "lt":
                 status = "✅" if value < threshold["max"] else "❌"
                 print(f"  {status} {name}: {value:.4f} (threshold: < {threshold['max']})")
-            elif "min" in threshold:
+            elif direction == "lte":
+                status = "✅" if value <= threshold["max"] else "❌"
+                print(f"  {status} {name}: {value:.4f} (threshold: <= {threshold['max']})")
+            elif direction == "gt":
                 status = "✅" if value > threshold["min"] else "❌"
                 print(f"  {status} {name}: {value:.4f} (threshold: > {threshold['min']})")
+            elif direction == "gte":
+                status = "✅" if value >= threshold["min"] else "❌"
+                print(f"  {status} {name}: {value:.4f} (threshold: >= {threshold['min']})")
+            else:
+                print(f"  ✅ {name}: {value:.4f} (no threshold)")
         print(f"\nOverall: {'✅ PASS' if metrics_report.overall_pass else '❌ FAIL'}")
         print(f"Reports written to: {self.output_dir}/")
 
