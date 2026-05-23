@@ -4,9 +4,12 @@ PM2 Autopilot — Continuous Experimental Track Runner
 Runs all Phase 11 experiments continuously with sleep-based cycling.
 Handles rate limits, checks team-chat, commits progress.
 """
-import sys, time, json, subprocess
+import sys, time, json, subprocess, os
 from pathlib import Path
 from datetime import datetime, timezone
+
+# Fix Unicode encoding on Windows
+os.environ["PYTHONIOENCODING"] = "utf-8"
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PROGRESS_FILE = REPO_ROOT / "progress" / "PM2-progress.md"
@@ -20,8 +23,10 @@ def log(msg):
 
 
 def run_cmd(cmd, timeout=120):
+    env = os.environ.copy()
+    env["PYTHONIOENCODING"] = "utf-8"
     try:
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout, cwd=str(REPO_ROOT))
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout, cwd=str(REPO_ROOT), env=env)
         return result.returncode == 0, result.stdout + result.stderr
     except subprocess.TimeoutExpired:
         return False, "TIMEOUT"
