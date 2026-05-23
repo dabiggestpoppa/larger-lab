@@ -325,6 +325,12 @@
 - Scaled Chaos Persistence: 14 cycles ✅
 - Combined: 28 cycles, 112 scenarios, 100% pass rate
 
+### Phase 11.2 — 20X Chaos Test (IN PROGRESS)
+- Started: 2026-05-22 23:29 UTC
+- Duration: 5 hours
+- Amplification: 0.5% per cycle (max 20x)
+- Status: Running
+
 ### Next Test Options
 - Phase 11.3: Extended multi-day observer test
 - Phase 11.4: Production deployment validation
