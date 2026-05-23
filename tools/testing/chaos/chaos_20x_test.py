@@ -14,9 +14,12 @@ from dataclasses import dataclass, asdict
 from typing import List, Dict, Any, Optional
 from chaos_engine import ChaosEngine
 
-RESULTS_FILE = Path("stability/chaos_20x_results.json")
-DETAILED_LOG_FILE = Path("stability/chaos_20x_trace.log")
-RESULTS_FILE.parent.mkdir(parents=True, exist_ok=True)
+# Use absolute paths based on script location so CWD changes don't break logging
+_SCRIPT_DIR = Path(__file__).parent.resolve()
+_STABILITY_DIR = _SCRIPT_DIR / "stability"
+_STABILITY_DIR.mkdir(parents=True, exist_ok=True)
+RESULTS_FILE = _STABILITY_DIR / "chaos_20x_results.json"
+DETAILED_LOG_FILE = _STABILITY_DIR / "chaos_20x_trace.log"
 
 @dataclass
 class ChaosEventTrace:
@@ -91,12 +94,17 @@ class Chaos20XTest:
 
     def log_trace(self, message: str, level: str = "INFO"):
         timestamp = datetime.now().isoformat()
-        try:
-            DETAILED_LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
-            with open(DETAILED_LOG_FILE, 'a') as f:
-                f.write(f"[{timestamp}] [{level}] {message}\n")
-        except Exception as e:
-            print(f"[CHAOS-20X] WARNING: log_trace failed: {e}")
+        for attempt in range(3):
+            try:
+                DETAILED_LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+                with open(DETAILED_LOG_FILE, 'a') as f:
+                    f.write(f"[{timestamp}] [{level}] {message}\n")
+                return
+            except Exception as e:
+                if attempt < 2:
+                    time.sleep(1)
+                else:
+                    print(f"[CHAOS-20X] WARNING: log_trace failed after 3 attempts: {e}")
 
     def calculate_amplification(self) -> float:
         """Calculate amplification: 0.5% per cycle."""
@@ -214,12 +222,17 @@ class Chaos20XTest:
             "final_amplification": self.amplification,
             "cycles": [asdict(c) for c in self.results]
         }
-        try:
-            RESULTS_FILE.parent.mkdir(parents=True, exist_ok=True)
-            with open(RESULTS_FILE, 'w') as f:
-                json.dump(results_data, f, indent=2, default=str)
-        except Exception as e:
-            print(f"[CHAOS-20X] WARNING: save_results failed: {e}")
+        for attempt in range(3):
+            try:
+                RESULTS_FILE.parent.mkdir(parents=True, exist_ok=True)
+                with open(RESULTS_FILE, 'w') as f:
+                    json.dump(results_data, f, indent=2, default=str)
+                return
+            except Exception as e:
+                if attempt < 2:
+                    time.sleep(1)
+                else:
+                    print(f"[CHAOS-20X] WARNING: save_results failed after 3 attempts: {e}")
 
     def run_test(self):
         self.start_time = datetime.now()
