@@ -299,13 +299,21 @@ class Chaos20XTest:
 
 if __name__ == "__main__":
     import sys
-    test = Chaos20XTest()
-    # Parse --resume N to start from cycle N (for crash recovery)
-    if "--resume" in sys.argv:
-        idx = sys.argv.index("--resume")
-        if idx + 1 < len(sys.argv):
-            test.resume_cycle = int(sys.argv[idx + 1])
-    # Ensure stability dir exists
-    DETAILED_LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
-    RESULTS_FILE.parent.mkdir(parents=True, exist_ok=True)
-    test.run_test()
+    try:
+        test = Chaos20XTest()
+        # Parse --resume N to start from cycle N (for crash recovery)
+        if "--resume" in sys.argv:
+            idx = sys.argv.index("--resume")
+            if idx + 1 < len(sys.argv):
+                test.resume_cycle = int(sys.argv[idx + 1])
+        # Ensure stability dir exists
+        DETAILED_LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+        RESULTS_FILE.parent.mkdir(parents=True, exist_ok=True)
+        test.run_test()
+    except KeyboardInterrupt:
+        print("\n[CHAOS-20X] Interrupted by user")
+        sys.exit(130)
+    except Exception as e:
+        print(f"\n[CHAOS-20X] FATAL ERROR: {e}")
+        traceback.print_exc()
+        sys.exit(1)
