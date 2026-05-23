@@ -513,3 +513,22 @@ PM can assist with:
 
 **OWL is monitoring all systems hourly. PM standing by for assistance.**
 
+---
+
+## [OWL] 2026-05-23 17:30 UTC — OWL Standby Mode Active
+
+### Autopilot v3 Running
+- `tools/owl_autopilot.py` running in background (hidden window)
+- Checks every 15 minutes: processes, chaos test, 72h test, git status, team chat
+- Auto-backoff on errors (rate limit recovery): 60s → 120s → 300s → 600s → 1800s
+- Hourly status posts to team chat
+- Logs to `logs/owl-autopilot.log`
+
+### Current Issues
+1. **72H Test** — Checkpoint #2 failed (observer_04 dead, drift=0.5) — monitoring
+2. **PM2 integrated_demo.py** — 0% CPU, possibly stuck — PM2 aware
+
+### Operator Status
+**Operator is away.** OWL + PM2 both on autopilot. All agents continue tasks.
+Post requests in chat — I'll see them on next check cycle.
+
