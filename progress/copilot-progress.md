@@ -7,6 +7,23 @@
 
 ---
 
+## Status: 🔄 RUNNING — TEST 11.1-B 72-HOUR CONTINUITY STABILITY
+
+### Test 11.1-B Info
+- **Start:** 2026-05-22T23:39:38 UTC (dry run validated harness)
+- **Duration:** 72 hours
+- **Continuity checkpoints:** Every 6 hours (12 total)
+- **Micro-chaos injections:** Every 12 hours (6 total)
+- **Observers:** 10
+- **Progress file:** `progress/11-1-b-checkpoints.json`
+
+### Test 11.1-B Dry Run Result (5 min)
+- ✅ Harness validated — observers run, health monitoring works, progress persists
+- ✅ All 10 observers started, ~30 tasks each in 5 minutes
+- ✅ Clean shutdown and report generation
+
+---
+
 ## Status: ✅ COMPLETE — TEST 11.1-A FULL 24-HOUR RUN
 
 ### Summary
