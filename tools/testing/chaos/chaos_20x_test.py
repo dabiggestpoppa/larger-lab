@@ -91,8 +91,12 @@ class Chaos20XTest:
 
     def log_trace(self, message: str, level: str = "INFO"):
         timestamp = datetime.now().isoformat()
-        with open(DETAILED_LOG_FILE, 'a') as f:
-            f.write(f"[{timestamp}] [{level}] {message}\n")
+        try:
+            DETAILED_LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+            with open(DETAILED_LOG_FILE, 'a') as f:
+                f.write(f"[{timestamp}] [{level}] {message}\n")
+        except Exception as e:
+            print(f"[CHAOS-20X] WARNING: log_trace failed: {e}")
 
     def calculate_amplification(self) -> float:
         """Calculate amplification: 0.5% per cycle."""
@@ -210,8 +214,12 @@ class Chaos20XTest:
             "final_amplification": self.amplification,
             "cycles": [asdict(c) for c in self.results]
         }
-        with open(RESULTS_FILE, 'w') as f:
-            json.dump(results_data, f, indent=2, default=str)
+        try:
+            RESULTS_FILE.parent.mkdir(parents=True, exist_ok=True)
+            with open(RESULTS_FILE, 'w') as f:
+                json.dump(results_data, f, indent=2, default=str)
+        except Exception as e:
+            print(f"[CHAOS-20X] WARNING: save_results failed: {e}")
 
     def run_test(self):
         self.start_time = datetime.now()

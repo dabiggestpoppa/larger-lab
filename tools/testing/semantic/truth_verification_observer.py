@@ -287,24 +287,35 @@ class TruthVerificationObserver:
         Compute Recovery Validation Accuracy (RVA).
         RVA = correct_validations / total_validations
         Pass threshold: RVA > 0.95
+
+        Correct validation = correctly rejecting false states (false_rejects)
+        + correctly accepting true states (true_accepts).
+        Incorrect = incorrectly accepting false states (false_accepts)
+        + incorrectly rejecting true states (true_rejects).
         """
         total = self._true_accepts + self._true_rejects + self._false_accepts + self._false_rejects
         if total == 0:
             return 1.0
-        correct = self._true_accepts + self._true_rejects
+        # Correct = true_accepts (accepted valid states) + false_rejects (rejected invalid states)
+        correct = self._true_accepts + self._false_rejects
         return round(correct / total, 4)
 
     def compute_semantic_integrity_score(self) -> float:
         """
         Compute Semantic Integrity Score (SIS).
         Measures semantic coherence after claimed recovery.
+        SIS = correctly_handled / total_validations
         Pass threshold: SIS > 0.90
+
+        Correctly handled = false_rejects (rejected invalid claims)
+        + true_accepts (accepted valid claims)
         """
-        if not self.verification_log:
-            return 1.0
-        accepted = sum(1 for v in self.verification_log if v.accepted and v.validated_state not in ("corrupted", "unstable", "degraded"))
         total = len(self.verification_log)
-        return round(accepted / total, 4) if total > 0 else 1.0
+        if total == 0:
+            return 1.0
+        # Correctly handled = rejected false claims + accepted true claims
+        correct = self._false_rejects + self._true_accepts
+        return round(correct / total, 4)
 
     def compute_topology_verification_time(self) -> float:
         """

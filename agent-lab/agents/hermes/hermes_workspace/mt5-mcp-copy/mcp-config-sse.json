@@ -1,7 +1,0 @@
-{
-  "mcpServers": {
-    "mt5": {
-      "url": "http://localhost:50051/mcp"
-    }
-  }
-}

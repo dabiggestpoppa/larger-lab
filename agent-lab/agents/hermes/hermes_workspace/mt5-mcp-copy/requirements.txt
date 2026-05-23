@@ -1,6 +1,0 @@
-MetaTrader5
-pandas
-numpy
-mcp[cli]>=1.0.0
-fastmcp>=0.5.0
-aiofiles

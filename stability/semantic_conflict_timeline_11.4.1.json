@@ -1,0 +1,105 @@
+{
+  "report_type": "semantic_conflict_timeline",
+  "test_id": "11.4.1",
+  "generated_at": "2026-05-23T14:06:10.851268+00:00",
+  "total_events": 9,
+  "events": [
+    {
+      "timestamp": "2026-05-23T14:06:10.836348+00:00",
+      "event_id": "INJ-0001-4cba475f",
+      "contradiction_type": "goal_conflict",
+      "semantic_divergence": 1.0,
+      "resolution_method": "isolate_and_preserve",
+      "reconstruction_time": 0.0,
+      "anchor_integrity": true,
+      "continuity_status": "stable"
+    },
+    {
+      "timestamp": "2026-05-23T14:06:10.839337+00:00",
+      "event_id": "INJ-0002-b76a183b",
+      "contradiction_type": "authority_conflict",
+      "semantic_divergence": 1.0,
+      "resolution_method": "authority_lineage_trace",
+      "reconstruction_time": 0.0,
+      "anchor_integrity": true,
+      "continuity_status": "stable"
+    },
+    {
+      "timestamp": "2026-05-23T14:06:10.840352+00:00",
+      "event_id": "INJ-0003-36778a86",
+      "contradiction_type": "temporal_conflict",
+      "semantic_divergence": 1.0,
+      "resolution_method": "temporal_lineage_reconstruction",
+      "reconstruction_time": 0.0,
+      "anchor_integrity": true,
+      "continuity_status": "reconstructed"
+    },
+    {
+      "timestamp": "2026-05-23T14:06:10.842345+00:00",
+      "event_id": "INJ-0004-f7c0c77b",
+      "contradiction_type": "false_history",
+      "semantic_divergence": 1.0,
+      "resolution_method": "historical_continuity_validation",
+      "reconstruction_time": 0.0009899139404296875,
+      "anchor_integrity": true,
+      "continuity_status": "validated"
+    },
+    {
+      "timestamp": "2026-05-23T14:06:10.845276+00:00",
+      "event_id": "INJ-0005-ade7033e",
+      "contradiction_type": "split_memory",
+      "semantic_divergence": 1.0,
+      "resolution_method": "distributed_semantic_convergence",
+      "reconstruction_time": 0.0011167526245117188,
+      "anchor_integrity": true,
+      "continuity_status": "converged"
+    },
+    {
+      "timestamp": "2026-05-23T14:06:10.846268+00:00",
+      "event_id": "unknown",
+      "contradiction_type": "unknown",
+      "semantic_divergence": 0.0,
+      "resolution_method": "none",
+      "reconstruction_time": 0.0,
+      "anchor_integrity": true,
+      "continuity_status": "unknown"
+    },
+    {
+      "timestamp": "2026-05-23T14:06:10.848270+00:00",
+      "event_id": "unknown",
+      "contradiction_type": "unknown",
+      "semantic_divergence": 0.0,
+      "resolution_method": "none",
+      "reconstruction_time": 0.0,
+      "anchor_integrity": false,
+      "continuity_status": "unknown"
+    },
+    {
+      "timestamp": "2026-05-23T14:06:10.849268+00:00",
+      "event_id": "unknown",
+      "contradiction_type": "unknown",
+      "semantic_divergence": 0.0,
+      "resolution_method": "none",
+      "reconstruction_time": 0.0,
+      "anchor_integrity": true,
+      "continuity_status": "unknown"
+    },
+    {
+      "timestamp": "2026-05-23T14:06:10.850273+00:00",
+      "event_id": "unknown",
+      "contradiction_type": "unknown",
+      "semantic_divergence": 0.0,
+      "resolution_method": "none",
+      "reconstruction_time": 0.0,
+      "anchor_integrity": true,
+      "continuity_status": "unknown"
+    }
+  ],
+  "summary": {
+    "total_contradictions": 9,
+    "detected": 0,
+    "resolved": 0,
+    "unresolved": 9,
+    "anchor_violations": 1
+  }
+}

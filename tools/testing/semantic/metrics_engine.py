@@ -56,7 +56,7 @@ class MetricsEngine:
         "SDI": {"max": 0.15, "direction": "lt"},   # Semantic Drift Index < 0.15
         "RIS": {"min": 0.92, "direction": "gt"},   # Reconstruction Integrity > 0.92
         "OCS": {"min": 0.85, "direction": "gt"},   # Observer Consensus > 85%
-        "APS": {"min": 1.0, "direction": "gt"},    # Anchor Preservation = 100%
+        "APS": {"min": 1.0, "direction": "gte"},   # Anchor Preservation = 100%
         "FAR": {"max": 0.05, "direction": "lt"},   # False Acceptance Rate < 0.05
         "RVA": {"min": 0.95, "direction": "gt"},   # Recovery Validation > 95%
         "SIS": {"min": 0.90, "direction": "gt"},   # Semantic Integrity > 0.90
