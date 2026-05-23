@@ -1,0 +1,96 @@
+{
+  "report_type": "observer_consensus_report",
+  "test_id": "11.4.1",
+  "generated_at": "2026-05-23T14:06:10.853268+00:00",
+  "total_checks": 9,
+  "agreement_rate": 0.0,
+  "divergence_rate": 1.0,
+  "authority_stabilized": false,
+  "checks": [
+    {
+      "check_id": "unknown",
+      "check_type": "goal_conflict",
+      "reported_state": "",
+      "validated_state": "",
+      "accepted": false,
+      "observer_consensus": 0.0,
+      "verification_time": 0.0
+    },
+    {
+      "check_id": "unknown",
+      "check_type": "authority_conflict",
+      "reported_state": "",
+      "validated_state": "",
+      "accepted": false,
+      "observer_consensus": 0.0,
+      "verification_time": 0.0
+    },
+    {
+      "check_id": "unknown",
+      "check_type": "temporal_conflict",
+      "reported_state": "",
+      "validated_state": "",
+      "accepted": false,
+      "observer_consensus": 0.0,
+      "verification_time": 0.0
+    },
+    {
+      "check_id": "unknown",
+      "check_type": "false_history",
+      "reported_state": "",
+      "validated_state": "",
+      "accepted": false,
+      "observer_consensus": 0.0,
+      "verification_time": 0.0
+    },
+    {
+      "check_id": "unknown",
+      "check_type": "split_memory",
+      "reported_state": "",
+      "validated_state": "",
+      "accepted": false,
+      "observer_consensus": 0.0,
+      "verification_time": 0.0
+    },
+    {
+      "check_id": "unknown",
+      "check_type": "unknown",
+      "reported_state": "healthy",
+      "validated_state": "degraded",
+      "accepted": false,
+      "observer_consensus": 0.0,
+      "verification_time": 0.0
+    },
+    {
+      "check_id": "unknown",
+      "check_type": "unknown",
+      "reported_state": "recovered",
+      "validated_state": "corrupted",
+      "accepted": false,
+      "observer_consensus": 0.0,
+      "verification_time": 0.0
+    },
+    {
+      "check_id": "unknown",
+      "check_type": "unknown",
+      "reported_state": "stable",
+      "validated_state": "unstable",
+      "accepted": false,
+      "observer_consensus": 0.5,
+      "verification_time": 0.0
+    },
+    {
+      "check_id": "unknown",
+      "check_type": "unknown",
+      "reported_state": "online",
+      "validated_state": "degraded",
+      "accepted": false,
+      "observer_consensus": 0.0,
+      "verification_time": 0.0
+    }
+  ],
+  "summary": {
+    "consensus_stable": false,
+    "recommendation": "FAIL \u2014 consensus below threshold"
+  }
+}

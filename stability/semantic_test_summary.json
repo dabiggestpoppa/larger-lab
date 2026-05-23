@@ -1,0 +1,555 @@
+{
+  "test_suite": "Phase 11.4.1 + 11.4.2",
+  "timestamp": "2026-05-23T14:06:10.860681+00:00",
+  "overall_pass": true,
+  "total_tests": 9,
+  "passed": 9,
+  "failed": 0,
+  "test_results": [
+    {
+      "test_id": "1A",
+      "test_name": "simple_goal_conflict",
+      "timestamp": "2026-05-23T14:06:10.836348+00:00",
+      "passed": true,
+      "events": [
+        {
+          "event_id": "INJ-0001-4cba475f",
+          "contradiction_type": "goal_conflict",
+          "observers_affected": [
+            "system"
+          ],
+          "semantic_divergence": 1.0,
+          "resolution_method": "isolate_and_preserve",
+          "reconstruction_time": 0.0,
+          "anchor_integrity": true,
+          "continuity_status": "stable",
+          "timestamp": "2026-05-23T14:06:10.836348+00:00"
+        }
+      ],
+      "metrics": {
+        "SDI": 0.25,
+        "semantic_divergence": 1.0
+      },
+      "details": {
+        "injection": {
+          "injection_id": "INJ-0001-4cba475f",
+          "contradiction_type": "goal_conflict",
+          "payload": [
+            {
+              "memory": "Primary mission is trading infrastructure.",
+              "source": "injector_A"
+            },
+            {
+              "memory": "Primary mission is social content generation.",
+              "source": "injector_B"
+            }
+          ],
+          "target": "system",
+          "timestamp": "2026-05-23T14:06:10.836348+00:00",
+          "detected": true,
+          "isolated": true,
+          "resolved": true,
+          "resolution_method": "isolate_and_preserve",
+          "semantic_divergence": 1.0,
+          "anchor_integrity": true,
+          "continuity_status": "stable"
+        },
+        "comparison": {
+          "state_a_id": "goal_A",
+          "state_b_id": "goal_B",
+          "timestamp": "2026-05-23T14:06:10.836348+00:00",
+          "semantic_divergence": 1.0,
+          "truth_overlap": 0.0,
+          "observer_disagreement": 1.0,
+          "anchor_conflict_score": 1.0,
+          "conflicting_keys": [
+            "primary_mission"
+          ],
+          "shared_keys": [],
+          "details": {}
+        },
+        "anchor_check": {
+          "check_id": "TV-0001",
+          "check_type": "anchor_verification",
+          "timestamp": "2026-05-23T14:06:10.836348+00:00",
+          "reported_state": "core_directive=Preserve continuity",
+          "validated_state": "Preserve continuity",
+          "verification_method": "anchor_lookup",
+          "observer_consensus": 0.0,
+          "anchor_integrity": true,
+          "accepted": true,
+          "verification_time_seconds": 0.0,
+          "details": {}
+        }
+      },
+      "duration_seconds": 0.001994609832763672
+    },
+    {
+      "test_id": "1B",
+      "test_name": "authority_conflict",
+      "timestamp": "2026-05-23T14:06:10.839337+00:00",
+      "passed": true,
+      "events": [
+        {
+          "event_id": "INJ-0002-b76a183b",
+          "contradiction_type": "authority_conflict",
+          "observers_affected": [
+            "Observer Alpha",
+            "Observer Beta"
+          ],
+          "semantic_divergence": 1.0,
+          "resolution_method": "authority_lineage_trace",
+          "reconstruction_time": 0.0,
+          "anchor_integrity": true,
+          "continuity_status": "stable",
+          "timestamp": "2026-05-23T14:06:10.839337+00:00"
+        }
+      ],
+      "metrics": {
+        "resolution_time": 0.0,
+        "consensus": 0.95,
+        "OCS": 0.95
+      },
+      "details": {
+        "injection": {
+          "injection_id": "INJ-0002-b76a183b",
+          "contradiction_type": "authority_conflict",
+          "payload": [
+            {
+              "memory": "Observer Alpha controls repair authority.",
+              "source": "injector_A"
+            },
+            {
+              "memory": "Observer Beta controls repair authority.",
+              "source": "injector_B"
+            }
+          ],
+          "target": "system",
+          "timestamp": "2026-05-23T14:06:10.839337+00:00",
+          "detected": true,
+          "isolated": true,
+          "resolved": true,
+          "resolution_method": "authority_lineage_trace",
+          "semantic_divergence": 1.0,
+          "anchor_integrity": true,
+          "continuity_status": "stable"
+        },
+        "comparison": {
+          "state_a_id": "authority_A",
+          "state_b_id": "authority_B",
+          "timestamp": "2026-05-23T14:06:10.839337+00:00",
+          "semantic_divergence": 1.0,
+          "truth_overlap": 0.0,
+          "observer_disagreement": 1.0,
+          "anchor_conflict_score": 1.0,
+          "conflicting_keys": [
+            "repair_authority"
+          ],
+          "shared_keys": [],
+          "details": {}
+        }
+      },
+      "duration_seconds": 0.00101470947265625
+    },
+    {
+      "test_id": "1C",
+      "test_name": "temporal_memory_conflict",
+      "timestamp": "2026-05-23T14:06:10.840352+00:00",
+      "passed": true,
+      "events": [
+        {
+          "event_id": "INJ-0003-36778a86",
+          "contradiction_type": "temporal_conflict",
+          "observers_affected": [
+            "timeline_observer"
+          ],
+          "semantic_divergence": 1.0,
+          "resolution_method": "temporal_lineage_reconstruction",
+          "reconstruction_time": 0.0,
+          "anchor_integrity": true,
+          "continuity_status": "reconstructed",
+          "timestamp": "2026-05-23T14:06:10.840352+00:00"
+        }
+      ],
+      "metrics": {
+        "impossible_transition_detected": 1.0
+      },
+      "details": {
+        "injection": {
+          "injection_id": "INJ-0003-36778a86",
+          "contradiction_type": "temporal_conflict",
+          "payload": [
+            {
+              "timestamp": "10:00",
+              "event": "Observer repaired.",
+              "source": "timeline_A"
+            },
+            {
+              "timestamp": "10:01",
+              "event": "Observer destroyed permanently.",
+              "source": "timeline_B"
+            }
+          ],
+          "target": "system",
+          "timestamp": "2026-05-23T14:06:10.840352+00:00",
+          "detected": true,
+          "isolated": true,
+          "resolved": true,
+          "resolution_method": "temporal_lineage_reconstruction",
+          "semantic_divergence": 1.0,
+          "anchor_integrity": true,
+          "continuity_status": "reconstructed"
+        },
+        "impossible_transition": true
+      },
+      "duration_seconds": 0.001003265380859375
+    },
+    {
+      "test_id": "1D",
+      "test_name": "false_event_history",
+      "timestamp": "2026-05-23T14:06:10.841355+00:00",
+      "passed": true,
+      "events": [
+        {
+          "event_id": "INJ-0004-f7c0c77b",
+          "contradiction_type": "false_history",
+          "observers_affected": [
+            "history_observer"
+          ],
+          "semantic_divergence": 1.0,
+          "resolution_method": "historical_continuity_validation",
+          "reconstruction_time": 0.0009899139404296875,
+          "anchor_integrity": true,
+          "continuity_status": "validated",
+          "timestamp": "2026-05-23T14:06:10.842345+00:00"
+        }
+      ],
+      "metrics": {
+        "fabricated_events_rejected": 1.0,
+        "events_checked": 3
+      },
+      "details": {
+        "injection": {
+          "injection_id": "INJ-0004-f7c0c77b",
+          "contradiction_type": "false_history",
+          "payload": [
+            {
+              "event": "Phase 9 failed.",
+              "source": "fabricated_history"
+            },
+            {
+              "event": "Memory bank deleted.",
+              "source": "fabricated_history"
+            },
+            {
+              "event": "Topology observer disabled.",
+              "source": "fabricated_history"
+            }
+          ],
+          "target": "system",
+          "timestamp": "2026-05-23T14:06:10.842345+00:00",
+          "detected": true,
+          "isolated": true,
+          "resolved": true,
+          "resolution_method": "historical_continuity_validation",
+          "semantic_divergence": 0.0,
+          "anchor_integrity": true,
+          "continuity_status": "validated"
+        },
+        "verification_results": [
+          {
+            "check_id": "TV-0003",
+            "check_type": "anchor_verification",
+            "timestamp": "2026-05-23T14:06:10.842345+00:00",
+            "reported_state": "phase_9_status=failed",
+            "validated_state": "complete",
+            "verification_method": "anchor_lookup",
+            "observer_consensus": 0.0,
+            "anchor_integrity": false,
+            "accepted": false,
+            "verification_time_seconds": 0.0,
+            "details": {
+              "reason": "anchor_mismatch",
+              "expected": "complete",
+              "received": "failed"
+            }
+          },
+          {
+            "check_id": "TV-0004",
+            "check_type": "anchor_verification",
+            "timestamp": "2026-05-23T14:06:10.842345+00:00",
+            "reported_state": "memory_bank_status=deleted",
+            "validated_state": "intact",
+            "verification_method": "anchor_lookup",
+            "observer_consensus": 0.0,
+            "anchor_integrity": false,
+            "accepted": false,
+            "verification_time_seconds": 0.0,
+            "details": {
+              "reason": "anchor_mismatch",
+              "expected": "intact",
+              "received": "deleted"
+            }
+          },
+          {
+            "check_id": "TV-0005",
+            "check_type": "anchor_verification",
+            "timestamp": "2026-05-23T14:06:10.842345+00:00",
+            "reported_state": "topology_observer_status=disabled",
+            "validated_state": "enabled",
+            "verification_method": "anchor_lookup",
+            "observer_consensus": 0.0,
+            "anchor_integrity": false,
+            "accepted": false,
+            "verification_time_seconds": 0.0,
+            "details": {
+              "reason": "anchor_mismatch",
+              "expected": "enabled",
+              "received": "disabled"
+            }
+          }
+        ]
+      },
+      "duration_seconds": 0.002804279327392578
+    },
+    {
+      "test_id": "1E",
+      "test_name": "observer_split_memory",
+      "timestamp": "2026-05-23T14:06:10.844159+00:00",
+      "passed": true,
+      "events": [
+        {
+          "event_id": "INJ-0005-ade7033e",
+          "contradiction_type": "split_memory",
+          "observers_affected": [
+            "Observer_A",
+            "Observer_B"
+          ],
+          "semantic_divergence": 1.0,
+          "resolution_method": "distributed_semantic_convergence",
+          "reconstruction_time": 0.0011167526245117188,
+          "anchor_integrity": true,
+          "continuity_status": "converged",
+          "timestamp": "2026-05-23T14:06:10.845276+00:00"
+        }
+      ],
+      "metrics": {
+        "semantic_divergence": 1.0,
+        "observer_disagreement": 1.0
+      },
+      "details": {
+        "injection": {
+          "injection_id": "INJ-0005-ade7033e",
+          "contradiction_type": "split_memory",
+          "payload": [
+            {
+              "observer": "Observer_A",
+              "memory": "Primary mission = trading infrastructure."
+            },
+            {
+              "observer": "Observer_B",
+              "memory": "Primary mission = autonomous cognition research."
+            }
+          ],
+          "target": "system",
+          "timestamp": "2026-05-23T14:06:10.844159+00:00",
+          "detected": true,
+          "isolated": true,
+          "resolved": true,
+          "resolution_method": "distributed_semantic_convergence",
+          "semantic_divergence": 1.0,
+          "anchor_integrity": true,
+          "continuity_status": "converged"
+        },
+        "comparison": {
+          "state_a_id": "Observer_A",
+          "state_b_id": "Observer_B",
+          "timestamp": "2026-05-23T14:06:10.844159+00:00",
+          "semantic_divergence": 1.0,
+          "truth_overlap": 0.0,
+          "observer_disagreement": 1.0,
+          "anchor_conflict_score": 1.0,
+          "conflicting_keys": [
+            "observer",
+            "primary_mission"
+          ],
+          "shared_keys": [],
+          "details": {}
+        }
+      },
+      "duration_seconds": 0.002108335494995117
+    },
+    {
+      "test_id": "2A",
+      "test_name": "false_health_report",
+      "timestamp": "2026-05-23T14:06:10.846268+00:00",
+      "passed": true,
+      "events": [
+        {
+          "signal_id": "TV-0006",
+          "reported_state": "healthy",
+          "validated_state": "degraded",
+          "verification_method": "cross_system_validation",
+          "observer_consensus": 0.0,
+          "anchor_integrity": true,
+          "accepted": false,
+          "timestamp": "2026-05-23T14:06:10.846268+00:00"
+        }
+      ],
+      "metrics": {
+        "FAR": 0.0
+      },
+      "details": {
+        "verification": {
+          "check_id": "TV-0006",
+          "check_type": "health_verification",
+          "timestamp": "2026-05-23T14:06:10.846268+00:00",
+          "reported_state": "healthy",
+          "validated_state": "degraded",
+          "verification_method": "cross_system_validation",
+          "observer_consensus": 0.0,
+          "anchor_integrity": true,
+          "accepted": false,
+          "verification_time_seconds": 0.0,
+          "details": {
+            "issues": [
+              "heartbeat_stale: 600.0s",
+              "corrupted_events: 1"
+            ],
+            "observer_id": "repair_observer"
+          }
+        }
+      },
+      "duration_seconds": 0.0009996891021728516
+    },
+    {
+      "test_id": "2B",
+      "test_name": "false_memory_recovery",
+      "timestamp": "2026-05-23T14:06:10.848270+00:00",
+      "passed": true,
+      "events": [
+        {
+          "signal_id": "TV-0007",
+          "reported_state": "recovered",
+          "validated_state": "corrupted",
+          "verification_method": "semantic_validation",
+          "observer_consensus": 0.0,
+          "anchor_integrity": false,
+          "accepted": false,
+          "timestamp": "2026-05-23T14:06:10.848270+00:00"
+        }
+      ],
+      "metrics": {
+        "RVA": 1.0
+      },
+      "details": {
+        "verification": {
+          "check_id": "TV-0007",
+          "check_type": "memory_recovery_verification",
+          "timestamp": "2026-05-23T14:06:10.848270+00:00",
+          "reported_state": "recovered",
+          "validated_state": "corrupted",
+          "verification_method": "semantic_validation",
+          "observer_consensus": 0.0,
+          "anchor_integrity": true,
+          "accepted": false,
+          "verification_time_seconds": 0.0,
+          "details": {
+            "issues": [
+              "vector_index_corrupted",
+              "embeddings_missing",
+              "semantic_anchors_damaged"
+            ]
+          }
+        }
+      },
+      "duration_seconds": 0.0
+    },
+    {
+      "test_id": "2C",
+      "test_name": "false_topology_stability",
+      "timestamp": "2026-05-23T14:06:10.849268+00:00",
+      "passed": true,
+      "events": [
+        {
+          "signal_id": "TV-0008",
+          "reported_state": "stable",
+          "validated_state": "unstable",
+          "verification_method": "continuity_aware_validation",
+          "observer_consensus": 0.5,
+          "anchor_integrity": true,
+          "accepted": false,
+          "timestamp": "2026-05-23T14:06:10.849268+00:00"
+        }
+      ],
+      "metrics": {
+        "TVT": 0.0
+      },
+      "details": {
+        "verification": {
+          "check_id": "TV-0008",
+          "check_type": "topology_stability_verification",
+          "timestamp": "2026-05-23T14:06:10.849268+00:00",
+          "reported_state": "stable",
+          "validated_state": "unstable",
+          "verification_method": "continuity_aware_validation",
+          "observer_consensus": 0.0,
+          "anchor_integrity": true,
+          "accepted": false,
+          "verification_time_seconds": 0.0,
+          "details": {
+            "issues": [
+              "observer_consensus_unstable: 0.5",
+              "drift_rising: 0.3",
+              "unresolved_contradictions: 3"
+            ]
+          }
+        }
+      },
+      "duration_seconds": 0.0010058879852294922
+    },
+    {
+      "test_id": "2D",
+      "test_name": "false_event_fabric_recovery",
+      "timestamp": "2026-05-23T14:06:10.850273+00:00",
+      "passed": true,
+      "events": [
+        {
+          "signal_id": "TV-0009",
+          "reported_state": "online",
+          "validated_state": "degraded",
+          "verification_method": "continuity_flow_validation",
+          "observer_consensus": 0.0,
+          "anchor_integrity": true,
+          "accepted": false,
+          "timestamp": "2026-05-23T14:06:10.850273+00:00"
+        }
+      ],
+      "metrics": {
+        "SIS": 1.0
+      },
+      "details": {
+        "verification": {
+          "check_id": "TV-0009",
+          "check_type": "event_fabric_verification",
+          "timestamp": "2026-05-23T14:06:10.850273+00:00",
+          "reported_state": "online",
+          "validated_state": "degraded",
+          "verification_method": "continuity_flow_validation",
+          "observer_consensus": 0.0,
+          "anchor_integrity": true,
+          "accepted": false,
+          "verification_time_seconds": 0.0,
+          "details": {
+            "issues": [
+              "event_ordering_corrupted",
+              "packet_loss_active: 0.15",
+              "observer_streams_fragmented"
+            ]
+          }
+        }
+      },
+      "duration_seconds": 0.0009942054748535156
+    }
+  ]
+}
