@@ -1,6 +1,0 @@
-{
-  "_comment": "MAD must provide CivitAI API token",
-  "token": "YOUR_TOKEN_HERE",
-  "enabled": false,
-  "last_updated": "2026-05-18"
-}

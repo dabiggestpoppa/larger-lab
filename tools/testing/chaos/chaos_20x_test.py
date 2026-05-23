@@ -56,6 +56,7 @@ class Chaos20XTest:
         self.max_duration = 5 * 3600  # 5 hours
         self.cycle_increment = 0.143  # 14.3% per cycle → 5x after ~28 cycles in 5hrs
         self.max_amplification = 5.0  # Cap at 5x
+        self.resume_cycle = 0  # Set via --resume flag
 
     def get_system_state(self) -> Dict[str, Any]:
         return {
@@ -214,6 +215,12 @@ class Chaos20XTest:
 
     def run_test(self):
         self.start_time = datetime.now()
+        # If resuming, set cycle_count so next cycle starts at resume_cycle+1
+        if self.resume_cycle > 0:
+            self.cycle_count = self.resume_cycle
+            self.amplification = self.calculate_amplification()
+            print(f"[CHAOS-20X] Resuming from cycle {self.resume_cycle + 1} (amp={self.amplification:.4f})")
+            self.log_trace(f"RESUMED from cycle {self.resume_cycle}, starting at amp {self.amplification:.4f}")
 
         print(f"[CHAOS-20X] Starting 20X Chaos Test v2 (REAL AMPLIFICATION)")
         print(f"[CHAOS-20X] Time: {self.start_time.isoformat()}")
@@ -270,5 +277,14 @@ class Chaos20XTest:
 
 
 if __name__ == "__main__":
+    import sys
     test = Chaos20XTest()
+    # Parse --resume N to start from cycle N (for crash recovery)
+    if "--resume" in sys.argv:
+        idx = sys.argv.index("--resume")
+        if idx + 1 < len(sys.argv):
+            test.resume_cycle = int(sys.argv[idx + 1])
+    # Ensure stability dir exists
+    DETAILED_LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+    RESULTS_FILE.parent.mkdir(parents=True, exist_ok=True)
     test.run_test()
