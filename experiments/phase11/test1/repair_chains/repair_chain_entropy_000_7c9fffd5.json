@@ -1,10 +1,10 @@
 {
   "event_id": "entropy_000_7c9fffd5",
-  "timestamp": "2026-05-23T14:04:02.539645+00:00",
+  "timestamp": "2026-05-23T17:50:53.397534+00:00",
   "chaos_type": "observer_kill",
-  "target": "observer_delta",
+  "target": "observer_alpha",
   "propagation_path": [
-    "observer_delta",
+    "observer_alpha",
     "routing_layer",
     "repair_patch",
     "event_fabric"
@@ -16,20 +16,30 @@
   ],
   "reroute_events": [
     {
-      "from": "observer_delta",
-      "to": "backup_observer_delta",
-      "delay_ms": 397
+      "from": "observer_alpha",
+      "to": "backup_observer_alpha",
+      "delay_ms": 410
+    },
+    {
+      "from": "observer_alpha",
+      "to": "backup_observer_alpha",
+      "delay_ms": 336
+    },
+    {
+      "from": "observer_alpha",
+      "to": "backup_observer_alpha",
+      "delay_ms": 262
     }
   ],
   "entropy_spread_radius": 4,
-  "recovery_duration_seconds": 8.03,
+  "recovery_duration_seconds": 12.24,
   "affected_observers": [
     "srrs_opc.drift_detector.DriftType",
-    "srrs_opc.drift_detector.DriftDetector",
     "srrs_opc.drift_tracker.DriftSignal",
+    "srrs_opc.operator_continuity.OperatorContinuityTracker",
     "oce.backend.coevolution.alignment_tracking.AlignmentMeasurement",
-    "oce.backend.coevolution.alignment_tracking.AlignmentTracker"
+    "oce.backend.drift_detector.DriftReport"
   ],
-  "recovered": false,
-  "cascade": true
+  "recovered": true,
+  "cascade": false
 }

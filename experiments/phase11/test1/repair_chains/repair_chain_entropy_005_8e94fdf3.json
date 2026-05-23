@@ -1,6 +1,6 @@
 {
   "event_id": "entropy_005_8e94fdf3",
-  "timestamp": "2026-05-23T14:04:02.541653+00:00",
+  "timestamp": "2026-05-23T17:50:53.397534+00:00",
   "chaos_type": "stalled_repair",
   "target": "repair_patch",
   "propagation_path": [
@@ -18,16 +18,21 @@
     {
       "from": "repair_patch",
       "to": "backup_repair_patch",
-      "delay_ms": 292
+      "delay_ms": 216
     },
     {
       "from": "repair_patch",
       "to": "backup_repair_patch",
-      "delay_ms": 492
+      "delay_ms": 333
+    },
+    {
+      "from": "repair_patch",
+      "to": "backup_repair_patch",
+      "delay_ms": 112
     }
   ],
   "entropy_spread_radius": 4,
-  "recovery_duration_seconds": 11.96,
+  "recovery_duration_seconds": 10.41,
   "affected_observers": [
     "srrs_opc.drift_detector.DriftType",
     "srrs_opc.drift_detector.DriftReport",
