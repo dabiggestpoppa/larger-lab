@@ -1,0 +1,260 @@
+{
+  "label": "entropy_trace_20260523_140402",
+  "timestamp": "2026-05-23T14:04:02.542642+00:00",
+  "total_events": 6,
+  "events": [
+    {
+      "event_id": "entropy_000_7c9fffd5",
+      "timestamp": "2026-05-23T14:04:02.539645+00:00",
+      "chaos_type": "observer_kill",
+      "target": "observer_delta",
+      "propagation_path": [
+        "observer_delta",
+        "routing_layer",
+        "repair_patch",
+        "event_fabric"
+      ],
+      "repair_chain": [
+        "repair_patch",
+        "routing_layer",
+        "observer_spawn"
+      ],
+      "reroute_events": [
+        {
+          "from": "observer_delta",
+          "to": "backup_observer_delta",
+          "delay_ms": 397
+        }
+      ],
+      "entropy_spread_radius": 4,
+      "recovery_duration_seconds": 8.03,
+      "affected_observers": [
+        "srrs_opc.drift_detector.DriftType",
+        "srrs_opc.drift_detector.DriftDetector",
+        "srrs_opc.drift_tracker.DriftSignal",
+        "oce.backend.coevolution.alignment_tracking.AlignmentMeasurement",
+        "oce.backend.coevolution.alignment_tracking.AlignmentTracker"
+      ],
+      "recovered": false,
+      "cascade": true
+    },
+    {
+      "event_id": "entropy_001_fbfc4cc8",
+      "timestamp": "2026-05-23T14:04:02.540650+00:00",
+      "chaos_type": "websocket_interrupt",
+      "target": "ws_primary",
+      "propagation_path": [
+        "ws_primary",
+        "event_fabric",
+        "routing_layer",
+        "observer_runtime"
+      ],
+      "repair_chain": [
+        "websocket_reconnect",
+        "event_replay",
+        "observer_resync"
+      ],
+      "reroute_events": [
+        {
+          "from": "ws_primary",
+          "to": "backup_ws_primary",
+          "delay_ms": 258
+        },
+        {
+          "from": "ws_primary",
+          "to": "backup_ws_primary",
+          "delay_ms": 488
+        }
+      ],
+      "entropy_spread_radius": 4,
+      "recovery_duration_seconds": 12.28,
+      "affected_observers": [
+        "srrs_opc.drift_detector.DriftReport",
+        "oce.backend.coevolution.alignment_tracking.AlignmentMeasurement",
+        "oce.backend.coevolution.alignment_tracking.AlignmentTracker",
+        "oce.backend.drift_detector.DriftReport",
+        "oce.backend.dspy_observer_config._narrow_subscriptions"
+      ],
+      "recovered": true,
+      "cascade": false
+    },
+    {
+      "event_id": "entropy_002_44709e63",
+      "timestamp": "2026-05-23T14:04:02.540650+00:00",
+      "chaos_type": "delayed_routing",
+      "target": "router_backup",
+      "propagation_path": [
+        "router_backup",
+        "event_fabric",
+        "observer_runtime"
+      ],
+      "repair_chain": [
+        "routing_reroute",
+        "queue_drain",
+        "observer_resync"
+      ],
+      "reroute_events": [
+        {
+          "from": "router_backup",
+          "to": "backup_router_backup",
+          "delay_ms": 427
+        },
+        {
+          "from": "router_backup",
+          "to": "backup_router_backup",
+          "delay_ms": 196
+        },
+        {
+          "from": "router_backup",
+          "to": "backup_router_backup",
+          "delay_ms": 193
+        }
+      ],
+      "entropy_spread_radius": 3,
+      "recovery_duration_seconds": 8.73,
+      "affected_observers": [
+        "srrs_opc.drift_detector.DriftType",
+        "srrs_opc.drift_tracker.LongTermDriftTracker",
+        "srrs_opc.operator_continuity.OperatorContinuityTracker",
+        "srrs_opc.topology_observer.TopologySnapshot",
+        "srrs_opc.topology_observer.TopologyObserver"
+      ],
+      "recovered": false,
+      "cascade": true
+    },
+    {
+      "event_id": "entropy_003_4fd59c1d",
+      "timestamp": "2026-05-23T14:04:02.540650+00:00",
+      "chaos_type": "corrupted_event",
+      "target": "event_fabric",
+      "propagation_path": [
+        "event_fabric",
+        "observer_runtime",
+        "routing_layer"
+      ],
+      "repair_chain": [
+        "event_validation",
+        "corruption_isolation",
+        "repair_patch"
+      ],
+      "reroute_events": [
+        {
+          "from": "event_fabric",
+          "to": "backup_event_fabric",
+          "delay_ms": 270
+        },
+        {
+          "from": "event_fabric",
+          "to": "backup_event_fabric",
+          "delay_ms": 459
+        },
+        {
+          "from": "event_fabric",
+          "to": "backup_event_fabric",
+          "delay_ms": 393
+        }
+      ],
+      "entropy_spread_radius": 3,
+      "recovery_duration_seconds": 14.24,
+      "affected_observers": [
+        "srrs_opc.drift_detector.DriftType",
+        "srrs_opc.drift_detector.DriftReport",
+        "srrs_opc.drift_tracker.LongTermDriftTracker",
+        "srrs_opc.topology_observer.TopologyObserver",
+        "oce.backend.coevolution.alignment_tracking.AlignmentMeasurement"
+      ],
+      "recovered": true,
+      "cascade": false
+    },
+    {
+      "event_id": "entropy_004_a90acb12",
+      "timestamp": "2026-05-23T14:04:02.541653+00:00",
+      "chaos_type": "memory_disconnect",
+      "target": "structural_memory",
+      "propagation_path": [
+        "structural_memory",
+        "observer_runtime",
+        "repair_patch",
+        "routing_layer"
+      ],
+      "repair_chain": [
+        "memory_reconnect",
+        "state_rebuild",
+        "observer_resync"
+      ],
+      "reroute_events": [
+        {
+          "from": "structural_memory",
+          "to": "backup_structural_memory",
+          "delay_ms": 139
+        }
+      ],
+      "entropy_spread_radius": 4,
+      "recovery_duration_seconds": 1.24,
+      "affected_observers": [
+        "srrs_opc.drift_detector.DriftType",
+        "srrs_opc.drift_detector.DriftReport",
+        "srrs_opc.drift_detector.DriftDetector",
+        "srrs_opc.drift_tracker.LongTermDriftTracker",
+        "srrs_opc.operator_continuity.OperatorContinuityTracker"
+      ],
+      "recovered": true,
+      "cascade": false
+    },
+    {
+      "event_id": "entropy_005_8e94fdf3",
+      "timestamp": "2026-05-23T14:04:02.541653+00:00",
+      "chaos_type": "stalled_repair",
+      "target": "repair_patch",
+      "propagation_path": [
+        "repair_patch",
+        "routing_layer",
+        "observer_runtime",
+        "event_fabric"
+      ],
+      "repair_chain": [
+        "repair_timeout",
+        "repair_restart",
+        "routing_reroute"
+      ],
+      "reroute_events": [
+        {
+          "from": "repair_patch",
+          "to": "backup_repair_patch",
+          "delay_ms": 292
+        },
+        {
+          "from": "repair_patch",
+          "to": "backup_repair_patch",
+          "delay_ms": 492
+        }
+      ],
+      "entropy_spread_radius": 4,
+      "recovery_duration_seconds": 11.96,
+      "affected_observers": [
+        "srrs_opc.drift_detector.DriftType",
+        "srrs_opc.drift_detector.DriftReport",
+        "srrs_opc.drift_detector.DriftDetector",
+        "srrs_opc.drift_tracker.DriftSignal",
+        "srrs_opc.drift_tracker.LongTermDriftTracker"
+      ],
+      "recovered": true,
+      "cascade": false
+    }
+  ],
+  "summary": {
+    "recovered": 4,
+    "cascades": 2,
+    "recovery_rate": 0.67,
+    "avg_recovery_seconds": 9.41,
+    "avg_spread_radius": 3.7,
+    "pass_conditions": {
+      "entropy_localizes": true,
+      "repair_chains_converge": false,
+      "recovery_completes": false,
+      "no_cascade_collapse": false,
+      "continuity_restored": false
+    }
+  },
+  "pass_fail": "CONDITIONAL_PASS"
+}
