@@ -481,3 +481,26 @@
 - CC/OC2/RL: Missing progress files (memory OK)
 - Copilot: Active (updating now)
 
+
+---
+
+## Update: 2026-05-23 15:45 UTC — Autopilot Check #3
+
+### System Status
+- 72h Test (PID 21028): Running | 8 alive, 2 degraded, 0 dead
+- Progress Sync (PID 18728): Running
+- OWL Autopilot: Running (terminal fea91919)
+- Chaos Test (PID 10128): Running (resumed cycle 9)
+- Observability Stress (PID 21376): Running
+- Integrated Demo (PID 10844): Running (second instance PID 18888 also started)
+
+### Checkpoint #2 Analysis
+- FAIL due to post-resume state (trajectory + memory hashes changed)
+- Expected after terminal cleanup incident
+- Next clean checkpoint at ~17:46 UTC (6h from original start)
+
+### Agent Activity
+- Last commit: ef18db5 (11:57 UTC) — auto-restart with crash limit
+- No new team chat messages since 15:30 UTC
+- All agents progressing on respective tasks
+

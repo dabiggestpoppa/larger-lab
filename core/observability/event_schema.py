@@ -65,6 +65,7 @@ class ContinuityEvent:
     continuity_score: float = 1.0   # 0.0-1.0
     entropy_delta: float = 0.0      # change in entropy
     observer_pressure: int = 0      # observers affected
+    continuity_shift: float = 0.0   # -1.0 to 1.0 (negative = degradation)
 
     # Field context
     field_zone: str = "default"
@@ -103,7 +104,8 @@ class EventStore:
              duration_ms: float = 0.0,
              success: bool = True,
              parent_event_id: str | None = None,
-             chain_id: str | None = None) -> ContinuityEvent:
+             chain_id: str | None = None,
+             continuity_shift: float = 0.0) -> ContinuityEvent:
         """Emit a new continuity event."""
 
         # Auto-generate chain_id from parent if not provided
@@ -124,6 +126,7 @@ class EventStore:
             continuity_score=max(0.0, min(1.0, continuity_score)),
             entropy_delta=entropy_delta,
             observer_pressure=observer_pressure,
+            continuity_shift=continuity_shift,
             field_zone=field_zone,
             attractor_region=attractor_region,
             target=target,

@@ -1,23 +1,23 @@
 {
   "version": "0.1.0",
   "phase": "11.2-3B.7",
-  "timestamp": "2026-05-23T15:08:12.300301+00:00",
+  "timestamp": "2026-05-23T16:58:01.705489+00:00",
   "total_tests": 5,
-  "passed": 2,
-  "failed": 3,
+  "passed": 5,
+  "failed": 0,
   "validation": {
     "topology_reconstructable": true,
     "perturbation_origin_identifiable": true,
-    "repair_convergence_detected": false,
+    "repair_convergence_detected": true,
     "continuity_deformation_mapped": true,
     "event_ordering_preserved": true
   },
-  "overall": "CONDITIONAL_PASS",
+  "overall": "PASS",
   "results": [
     {
       "test_name": "observer_flood",
-      "timestamp": "2026-05-23T15:08:12.295958+00:00",
-      "duration_seconds": 0.0,
+      "timestamp": "2026-05-23T16:58:01.697541+00:00",
+      "duration_seconds": 0.01,
       "events_generated": 190,
       "observers_spawned": 50,
       "topology_reconstructable": true,
@@ -33,23 +33,23 @@
     },
     {
       "test_name": "repair_storm",
-      "timestamp": "2026-05-23T15:08:12.296969+00:00",
+      "timestamp": "2026-05-23T16:58:01.701462+00:00",
       "duration_seconds": 0.0,
-      "events_generated": 0,
+      "events_generated": 60,
       "observers_spawned": 0,
-      "topology_reconstructable": false,
-      "perturbation_origin_identifiable": false,
-      "repair_convergence_detected": false,
-      "continuity_deformation_mapped": false,
-      "event_ordering_preserved": false,
-      "errors": [
-        "EventStore.emit() got an unexpected keyword argument 'repair_triggered'"
-      ],
-      "metrics": {}
+      "topology_reconstructable": true,
+      "perturbation_origin_identifiable": true,
+      "repair_convergence_detected": true,
+      "continuity_deformation_mapped": true,
+      "event_ordering_preserved": true,
+      "errors": [],
+      "metrics": {
+        "repair_chains": 1
+      }
     },
     {
       "test_name": "entropy_spike",
-      "timestamp": "2026-05-23T15:08:12.297963+00:00",
+      "timestamp": "2026-05-23T16:58:01.705489+00:00",
       "duration_seconds": 0.0,
       "events_generated": 40,
       "observers_spawned": 0,
@@ -61,47 +61,53 @@
       "errors": [],
       "metrics": {
         "entropy_profile": {
-          "total_events": 210,
-          "total_entropy_injected": 14.566899534300077,
-          "total_entropy_dissipated": 0,
-          "net_entropy": 14.566899534300077,
-          "avg_entropy_per_event": 0.0694,
-          "max_single_entropy": 0.9680888936675576,
-          "min_single_entropy": 0.0
+          "total_events": 270,
+          "total_entropy_injected": 26.188426545739482,
+          "total_entropy_dissipated": 3.6292378589715155,
+          "net_entropy": 22.559188686767968,
+          "avg_entropy_per_event": 0.1104,
+          "max_single_entropy": 0.9670321515514391,
+          "min_single_entropy": -0.28681054134596884
         }
       }
     },
     {
       "test_name": "routing_instability",
-      "timestamp": "2026-05-23T15:08:12.298966+00:00",
+      "timestamp": "2026-05-23T16:58:01.705489+00:00",
       "duration_seconds": 0.0,
-      "events_generated": 0,
+      "events_generated": 50,
       "observers_spawned": 0,
-      "topology_reconstructable": false,
-      "perturbation_origin_identifiable": false,
+      "topology_reconstructable": true,
+      "perturbation_origin_identifiable": true,
       "repair_convergence_detected": false,
-      "continuity_deformation_mapped": false,
-      "event_ordering_preserved": false,
-      "errors": [
-        "EventStore.emit() got an unexpected keyword argument 'continuity_shift'"
-      ],
-      "metrics": {}
+      "continuity_deformation_mapped": true,
+      "event_ordering_preserved": true,
+      "errors": [],
+      "metrics": {
+        "route_shifts": 25
+      }
     },
     {
       "test_name": "sync_drift",
-      "timestamp": "2026-05-23T15:08:12.299279+00:00",
+      "timestamp": "2026-05-23T16:58:01.705489+00:00",
       "duration_seconds": 0.0,
-      "events_generated": 0,
+      "events_generated": 40,
       "observers_spawned": 0,
-      "topology_reconstructable": false,
-      "perturbation_origin_identifiable": false,
+      "topology_reconstructable": true,
+      "perturbation_origin_identifiable": true,
       "repair_convergence_detected": false,
-      "continuity_deformation_mapped": false,
-      "event_ordering_preserved": false,
-      "errors": [
-        "EventStore.emit() got an unexpected keyword argument 'continuity_shift'"
-      ],
-      "metrics": {}
+      "continuity_deformation_mapped": true,
+      "event_ordering_preserved": true,
+      "errors": [],
+      "metrics": {
+        "sync_health": {
+          "status": "degraded",
+          "sync_rate": 0.3434,
+          "total_relationships": 198,
+          "synced": 68,
+          "desynced": 130
+        }
+      }
     }
   ]
 }
