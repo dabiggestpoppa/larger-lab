@@ -17,13 +17,15 @@ export interface Agent {
 
 interface AgentStore {
   agents: Agent[];
+  setAgents: (agents: Agent[]) => void;
   updateAgent: (id: string, updates: Partial<Agent>) => void;
   getAliveAgents: () => Agent[];
   getAgentsByStatus: (status: AgentStatus) => Agent[];
 }
 
 export const useAgentStore = create<AgentStore>((set, get) => ({
-  agents: [
+  agents: [],
+  setAgents: (agents) => set({ agents }),
     { id: "cc", name: "Claude Code", tag: "CC", role: "Overseer / Architecture", status: "alive", currentTask: "Phase 11.3 Adversarial Drift", tasksCompleted: 1460, errors: 0, uptimeHours: 168, lastHeartbeat: "2026-05-24T12:00:00Z" },
     { id: "as", name: "Assistant Manager", tag: "AS", role: "Quality / Docs / Frontend", status: "alive", currentTask: "OCE Frontend Build", tasksCompleted: 47, errors: 0, uptimeHours: 72, lastHeartbeat: "2026-05-24T12:00:00Z" },
     { id: "pm1", name: "Polymorph", tag: "PM1", role: "Debugger / Tools", status: "alive", currentTask: "Phase 11 Test Infrastructure", tasksCompleted: 89, errors: 2, uptimeHours: 120, lastHeartbeat: "2026-05-24T12:00:00Z" },

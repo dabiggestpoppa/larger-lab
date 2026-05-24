@@ -18,6 +18,7 @@ export interface Task {
 
 interface TaskStore {
   tasks: Task[];
+  setTasks: (tasks: Task[]) => void;
   addTask: (task: Omit<Task, "id" | "createdAt" | "updatedAt">) => void;
   updateTask: (id: string, updates: Partial<Task>) => void;
   removeTask: (id: string) => void;
@@ -26,7 +27,8 @@ interface TaskStore {
 }
 
 export const useTaskStore = create<TaskStore>((set, get) => ({
-  tasks: [
+  tasks: [],
+  setTasks: (tasks) => set({ tasks }),
     {
       id: "task-001",
       title: "Phase 11.2 Chaos v2 Test",
