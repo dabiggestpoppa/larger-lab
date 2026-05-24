@@ -1,10 +1,10 @@
 {
   "event_id": "entropy_000_7c9fffd5",
-  "timestamp": "2026-05-24T01:20:23.824991+00:00",
+  "timestamp": "2026-05-24T12:35:38.085350+00:00",
   "chaos_type": "observer_kill",
-  "target": "observer_delta",
+  "target": "observer_alpha",
   "propagation_path": [
-    "observer_delta",
+    "observer_alpha",
     "routing_layer",
     "repair_patch",
     "event_fabric"
@@ -16,29 +16,19 @@
   ],
   "reroute_events": [
     {
-      "from": "observer_delta",
-      "to": "backup_observer_delta",
-      "delay_ms": 146
-    },
-    {
-      "from": "observer_delta",
-      "to": "backup_observer_delta",
-      "delay_ms": 444
-    },
-    {
-      "from": "observer_delta",
-      "to": "backup_observer_delta",
-      "delay_ms": 224
+      "from": "observer_alpha",
+      "to": "backup_observer_alpha",
+      "delay_ms": 99
     }
   ],
   "entropy_spread_radius": 4,
-  "recovery_duration_seconds": 5.46,
+  "recovery_duration_seconds": 1.23,
   "affected_observers": [
-    "srrs_opc.drift_tracker.DriftSignal",
+    "srrs_opc.drift_detector.DriftType",
     "srrs_opc.drift_tracker.LongTermDriftTracker",
-    "srrs_opc.topology_observer.TopologySnapshot",
+    "srrs_opc.operator_continuity.OperatorContinuityTracker",
     "srrs_opc.topology_observer.TopologyObserver",
-    "oce.backend.coevolution.alignment_tracking.AlignmentMeasurement"
+    "oce.backend.drift_detector.DriftLevel"
   ],
   "recovered": true,
   "cascade": false

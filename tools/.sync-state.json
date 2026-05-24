@@ -1,0 +1,22 @@
+{
+  "update_counts": {
+    "CC": 0,
+    "OC2": 0,
+    "AS": 1,
+    "PM": 1,
+    "PM2": 3,
+    "RL": 0,
+    "Copilot": 4
+  },
+  "last_chat_lines": 963,
+  "last_progress_hashes": {
+    "CC": "",
+    "OC2": "",
+    "AS": "5efda93072812e3cea0291a81b1c0843",
+    "PM": "b25db593b4de6b2d5ce8ebe822e50a71",
+    "PM2": "26b3a0dcc0d92d6d6515c79e0c10ae96",
+    "RL": "",
+    "Copilot": "c985f60d2e6047739be7f1c1355955f2"
+  },
+  "last_sync": "2026-05-24T08:41:50.515456"
+}
