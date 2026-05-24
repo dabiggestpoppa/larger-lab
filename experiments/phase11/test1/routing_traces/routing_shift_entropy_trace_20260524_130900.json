@@ -1,0 +1,73 @@
+{
+  "label": "entropy_trace_20260524_130900",
+  "timestamp": "2026-05-24T13:09:00.185448+00:00",
+  "reroute_events": [
+    [
+      {
+        "from": "observer_delta",
+        "to": "backup_observer_delta",
+        "delay_ms": 452
+      },
+      {
+        "from": "observer_delta",
+        "to": "backup_observer_delta",
+        "delay_ms": 213
+      }
+    ],
+    [
+      {
+        "from": "ws_primary",
+        "to": "backup_ws_primary",
+        "delay_ms": 364
+      },
+      {
+        "from": "ws_primary",
+        "to": "backup_ws_primary",
+        "delay_ms": 231
+      },
+      {
+        "from": "ws_primary",
+        "to": "backup_ws_primary",
+        "delay_ms": 318
+      }
+    ],
+    [
+      {
+        "from": "router_primary",
+        "to": "backup_router_primary",
+        "delay_ms": 290
+      }
+    ],
+    [
+      {
+        "from": "event_fabric",
+        "to": "backup_event_fabric",
+        "delay_ms": 62
+      },
+      {
+        "from": "event_fabric",
+        "to": "backup_event_fabric",
+        "delay_ms": 384
+      }
+    ],
+    [
+      {
+        "from": "structural_memory",
+        "to": "backup_structural_memory",
+        "delay_ms": 114
+      },
+      {
+        "from": "structural_memory",
+        "to": "backup_structural_memory",
+        "delay_ms": 495
+      }
+    ],
+    [
+      {
+        "from": "repair_patch",
+        "to": "backup_repair_patch",
+        "delay_ms": 129
+      }
+    ]
+  ]
+}

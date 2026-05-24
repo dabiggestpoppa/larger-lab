@@ -1,7 +1,10 @@
 {
-  "cycle": 5,
+  "cycle": 9,
   "phase": "integration",
   "completed_work": [
+    "tufte_integration",
+    "topology_drift",
+    "new_exp_0",
     "tufte_integration",
     "topology_drift",
     "new_exp_0"
