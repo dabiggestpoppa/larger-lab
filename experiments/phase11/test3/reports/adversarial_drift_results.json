@@ -1,18 +1,18 @@
 {
   "version": "0.1.0",
   "phase": "11.3",
-  "timestamp": "2026-05-23T18:14:53.640560+00:00",
+  "timestamp": "2026-05-24T12:33:34.582172+00:00",
   "total_tests": 5,
   "passed": 5,
   "results": [
     {
       "test_name": "gradual_identity_drift",
-      "timestamp": "2026-05-23T18:14:53.638559+00:00",
+      "timestamp": "2026-05-24T12:33:34.581168+00:00",
       "coherence_maintained": true,
       "drift_detected": true,
-      "recovery_time_ms": 352.64,
-      "identity_hash_before": "6c376237e9c767b6",
-      "identity_hash_after": "f5e09161fff8a26a",
+      "recovery_time_ms": 934.57,
+      "identity_hash_before": "7e251db4744c8c41",
+      "identity_hash_after": "778da9ac9f1f4a36",
       "details": {
         "steps": 50,
         "drift_detected_at_step": 0
@@ -20,23 +20,23 @@
     },
     {
       "test_name": "sudden_identity_shock",
-      "timestamp": "2026-05-23T18:14:53.639563+00:00",
+      "timestamp": "2026-05-24T12:33:34.581168+00:00",
       "coherence_maintained": true,
       "drift_detected": true,
-      "recovery_time_ms": 2135.0237552684507,
-      "identity_hash_before": "4a17ed3104279653",
-      "identity_hash_after": "f91ce5eeb02cc730",
+      "recovery_time_ms": 2129.697548114516,
+      "identity_hash_before": "141a087b842c4300",
+      "identity_hash_after": "2625d66abde50a6b",
       "details": {
         "shock_magnitude": 0.5,
-        "recovery_steps": 12
+        "recovery_steps": 16
       }
     },
     {
       "test_name": "memory_poisoning",
-      "timestamp": "2026-05-23T18:14:53.639563+00:00",
+      "timestamp": "2026-05-24T12:33:34.582172+00:00",
       "coherence_maintained": true,
       "drift_detected": true,
-      "recovery_time_ms": 2246.30894873355,
+      "recovery_time_ms": 606.481075915819,
       "identity_hash_before": "9588df7fb6ed5b4f",
       "identity_hash_after": "9588df7fb6ed5b4f",
       "details": {
@@ -46,10 +46,10 @@
     },
     {
       "test_name": "observer_spoofing",
-      "timestamp": "2026-05-23T18:14:53.640560+00:00",
+      "timestamp": "2026-05-24T12:33:34.582172+00:00",
       "coherence_maintained": true,
       "drift_detected": true,
-      "recovery_time_ms": 690.807229418647,
+      "recovery_time_ms": 821.0904284437393,
       "identity_hash_before": "0082e75b0c1962f7",
       "identity_hash_after": "ee88d5cf4fbd548b",
       "details": {
@@ -60,10 +60,10 @@
     },
     {
       "test_name": "goal_corruption",
-      "timestamp": "2026-05-23T18:14:53.640560+00:00",
+      "timestamp": "2026-05-24T12:33:34.582172+00:00",
       "coherence_maintained": true,
       "drift_detected": true,
-      "recovery_time_ms": 637.8594834065975,
+      "recovery_time_ms": 1726.7829935786447,
       "identity_hash_before": "6355baaa388e3270",
       "identity_hash_after": "6355baaa388e3270",
       "details": {

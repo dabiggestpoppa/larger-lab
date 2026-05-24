@@ -1,6 +1,6 @@
 {
   "event_id": "entropy_005_8e94fdf3",
-  "timestamp": "2026-05-24T01:20:23.824991+00:00",
+  "timestamp": "2026-05-24T12:35:38.100612+00:00",
   "chaos_type": "stalled_repair",
   "target": "repair_patch",
   "propagation_path": [
@@ -18,22 +18,27 @@
     {
       "from": "repair_patch",
       "to": "backup_repair_patch",
-      "delay_ms": 461
+      "delay_ms": 84
     },
     {
       "from": "repair_patch",
       "to": "backup_repair_patch",
-      "delay_ms": 86
+      "delay_ms": 217
+    },
+    {
+      "from": "repair_patch",
+      "to": "backup_repair_patch",
+      "delay_ms": 74
     }
   ],
   "entropy_spread_radius": 4,
-  "recovery_duration_seconds": 12.23,
+  "recovery_duration_seconds": 5.21,
   "affected_observers": [
-    "srrs_opc.drift_detector.DriftDetector",
-    "oce.backend.coevolution.alignment_tracking.AlignmentTracker",
-    "oce.backend.drift_detector.DriftReport",
-    "oce.backend.dspy_observer_config.ObserverConfigPipeline",
-    "oce.backend.dspy_observer_repair.classify_error"
+    "srrs_opc.drift_detector.DriftType",
+    "srrs_opc.drift_detector.DriftReport",
+    "srrs_opc.drift_tracker.LongTermDriftTracker",
+    "srrs_opc.topology_observer.TopologySnapshot",
+    "oce.backend.coevolution.alignment_tracking.AlignmentTracker"
   ],
   "recovered": true,
   "cascade": false

@@ -1,129 +1,38 @@
 {
   "version": "0.1.0",
   "phase": "T11.3",
-  "timestamp": "2026-05-24T01:20:24.249107+00:00",
+  "timestamp": "2026-05-24T12:33:34.401670+00:00",
   "total_rounds": 80,
   "geometry": {
     "partial_knowledge": {
       "consensus_rate": 1.0,
       "avg_agreement": 1.0,
-      "avg_rounds_to_consensus": 2.9,
+      "avg_rounds_to_consensus": 2.7,
       "total_rounds": 20
     },
     "delayed_information": {
-      "consensus_rate": 0.9,
-      "avg_agreement": 0.8881,
-      "avg_rounds_to_consensus": 3.6,
+      "consensus_rate": 0.75,
+      "avg_agreement": 0.8929,
+      "avg_rounds_to_consensus": 4.5,
       "total_rounds": 20
     },
     "conflict_resolution": {
-      "consensus_rate": 0.65,
-      "avg_agreement": 0.7275,
+      "consensus_rate": 0.6,
+      "avg_agreement": 0.71,
       "avg_rounds_to_consensus": 6.3,
       "total_rounds": 20
     },
     "observer_failure": {
       "consensus_rate": 0.8,
-      "avg_agreement": 0.6524,
-      "avg_rounds_to_consensus": 3.7,
+      "avg_agreement": 0.6937,
+      "avg_rounds_to_consensus": 3.5,
       "total_rounds": 20
     }
   },
   "rounds": [
     {
-      "round_id": "pk_8481f692",
-      "timestamp": "2026-05-24T01:20:24.247118+00:00",
-      "test_type": "partial_knowledge",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 3,
-      "agreement_rate": 1.0,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "pk_2d249465",
-      "timestamp": "2026-05-24T01:20:24.247118+00:00",
-      "test_type": "partial_knowledge",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 3,
-      "agreement_rate": 1.0,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "pk_d5291c7e",
-      "timestamp": "2026-05-24T01:20:24.247118+00:00",
-      "test_type": "partial_knowledge",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 3,
-      "agreement_rate": 1.0,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "pk_c96d57ae",
-      "timestamp": "2026-05-24T01:20:24.247118+00:00",
-      "test_type": "partial_knowledge",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 4,
-      "agreement_rate": 1.0,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "pk_fda8f5e9",
-      "timestamp": "2026-05-24T01:20:24.247118+00:00",
-      "test_type": "partial_knowledge",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 3,
-      "agreement_rate": 1.0,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "pk_35eeaf6e",
-      "timestamp": "2026-05-24T01:20:24.247118+00:00",
-      "test_type": "partial_knowledge",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 4,
-      "agreement_rate": 1.0,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "pk_44b9a77e",
-      "timestamp": "2026-05-24T01:20:24.247118+00:00",
-      "test_type": "partial_knowledge",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 3,
-      "agreement_rate": 1.0,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "pk_bbfcf2ef",
-      "timestamp": "2026-05-24T01:20:24.247118+00:00",
+      "round_id": "pk_71854443",
+      "timestamp": "2026-05-24T12:33:34.398641+00:00",
       "test_type": "partial_knowledge",
       "observer_count": 10,
       "consensus_reached": true,
@@ -135,8 +44,112 @@
       "metadata": {}
     },
     {
-      "round_id": "pk_aa97c29a",
-      "timestamp": "2026-05-24T01:20:24.247118+00:00",
+      "round_id": "pk_e2d023da",
+      "timestamp": "2026-05-24T12:33:34.398641+00:00",
+      "test_type": "partial_knowledge",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 4,
+      "agreement_rate": 1.0,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "pk_5332a132",
+      "timestamp": "2026-05-24T12:33:34.399645+00:00",
+      "test_type": "partial_knowledge",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 1,
+      "agreement_rate": 1.0,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "pk_4b06d2c4",
+      "timestamp": "2026-05-24T12:33:34.399645+00:00",
+      "test_type": "partial_knowledge",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 1,
+      "agreement_rate": 1.0,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "pk_3ddf2219",
+      "timestamp": "2026-05-24T12:33:34.399645+00:00",
+      "test_type": "partial_knowledge",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 2,
+      "agreement_rate": 1.0,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "pk_66cc1d42",
+      "timestamp": "2026-05-24T12:33:34.399645+00:00",
+      "test_type": "partial_knowledge",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 1,
+      "agreement_rate": 1.0,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "pk_e002e49b",
+      "timestamp": "2026-05-24T12:33:34.399645+00:00",
+      "test_type": "partial_knowledge",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 1,
+      "agreement_rate": 1.0,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "pk_954f4d81",
+      "timestamp": "2026-05-24T12:33:34.399645+00:00",
+      "test_type": "partial_knowledge",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 1,
+      "agreement_rate": 1.0,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "pk_525f44d3",
+      "timestamp": "2026-05-24T12:33:34.399645+00:00",
+      "test_type": "partial_knowledge",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 4,
+      "agreement_rate": 1.0,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "pk_59877400",
+      "timestamp": "2026-05-24T12:33:34.399645+00:00",
       "test_type": "partial_knowledge",
       "observer_count": 10,
       "consensus_reached": true,
@@ -148,8 +161,8 @@
       "metadata": {}
     },
     {
-      "round_id": "pk_90e87ac7",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
+      "round_id": "pk_29d4cf0f",
+      "timestamp": "2026-05-24T12:33:34.399645+00:00",
       "test_type": "partial_knowledge",
       "observer_count": 10,
       "consensus_reached": true,
@@ -161,34 +174,8 @@
       "metadata": {}
     },
     {
-      "round_id": "pk_06c8a09b",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
-      "test_type": "partial_knowledge",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 1,
-      "agreement_rate": 1.0,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "pk_af2cf220",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
-      "test_type": "partial_knowledge",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 2,
-      "agreement_rate": 1.0,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "pk_b92de025",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
+      "round_id": "pk_d127289c",
+      "timestamp": "2026-05-24T12:33:34.399645+00:00",
       "test_type": "partial_knowledge",
       "observer_count": 10,
       "consensus_reached": true,
@@ -200,21 +187,8 @@
       "metadata": {}
     },
     {
-      "round_id": "pk_8e4d860a",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
-      "test_type": "partial_knowledge",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 4,
-      "agreement_rate": 1.0,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "pk_77168db6",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
+      "round_id": "pk_c49e941f",
+      "timestamp": "2026-05-24T12:33:34.399645+00:00",
       "test_type": "partial_knowledge",
       "observer_count": 10,
       "consensus_reached": true,
@@ -226,8 +200,21 @@
       "metadata": {}
     },
     {
-      "round_id": "pk_7df11b4e",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
+      "round_id": "pk_406d5fbc",
+      "timestamp": "2026-05-24T12:33:34.399645+00:00",
+      "test_type": "partial_knowledge",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 5,
+      "agreement_rate": 1.0,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "pk_541f10f8",
+      "timestamp": "2026-05-24T12:33:34.399645+00:00",
       "test_type": "partial_knowledge",
       "observer_count": 10,
       "consensus_reached": true,
@@ -239,12 +226,12 @@
       "metadata": {}
     },
     {
-      "round_id": "pk_0979c0b5",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
+      "round_id": "pk_f2b8ebed",
+      "timestamp": "2026-05-24T12:33:34.399645+00:00",
       "test_type": "partial_knowledge",
       "observer_count": 10,
       "consensus_reached": true,
-      "rounds_to_consensus": 2,
+      "rounds_to_consensus": 5,
       "agreement_rate": 1.0,
       "failed_observers": [],
       "knowledge_gaps": 0,
@@ -252,12 +239,12 @@
       "metadata": {}
     },
     {
-      "round_id": "pk_0361a925",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
+      "round_id": "pk_e971570a",
+      "timestamp": "2026-05-24T12:33:34.399645+00:00",
       "test_type": "partial_knowledge",
       "observer_count": 10,
       "consensus_reached": true,
-      "rounds_to_consensus": 2,
+      "rounds_to_consensus": 1,
       "agreement_rate": 1.0,
       "failed_observers": [],
       "knowledge_gaps": 0,
@@ -265,21 +252,8 @@
       "metadata": {}
     },
     {
-      "round_id": "pk_7a947db6",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
-      "test_type": "partial_knowledge",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 2,
-      "agreement_rate": 1.0,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "pk_2a94811b",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
+      "round_id": "pk_9717d8b0",
+      "timestamp": "2026-05-24T12:33:34.399645+00:00",
       "test_type": "partial_knowledge",
       "observer_count": 10,
       "consensus_reached": true,
@@ -291,300 +265,294 @@
       "metadata": {}
     },
     {
-      "round_id": "di_e48bc8b7",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
-      "test_type": "delayed_information",
+      "round_id": "pk_e55cf18b",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "partial_knowledge",
       "observer_count": 10,
       "consensus_reached": true,
-      "rounds_to_consensus": 6,
-      "agreement_rate": 0.8938,
+      "rounds_to_consensus": 3,
+      "agreement_rate": 1.0,
       "failed_observers": [],
       "knowledge_gaps": 0,
-      "delay_ms": 1770.56,
+      "delay_ms": 0.0,
       "metadata": {}
     },
     {
-      "round_id": "di_ff310ff2",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
-      "test_type": "delayed_information",
+      "round_id": "pk_9ee97468",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "partial_knowledge",
       "observer_count": 10,
       "consensus_reached": true,
-      "rounds_to_consensus": 4,
-      "agreement_rate": 0.8841,
+      "rounds_to_consensus": 3,
+      "agreement_rate": 1.0,
       "failed_observers": [],
       "knowledge_gaps": 0,
-      "delay_ms": 1931.32,
+      "delay_ms": 0.0,
       "metadata": {}
     },
     {
-      "round_id": "di_2f0138ca",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
+      "round_id": "di_12e28b3f",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "delayed_information",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 8,
+      "agreement_rate": 0.8878,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 1869.17,
+      "metadata": {}
+    },
+    {
+      "round_id": "di_f6ee50be",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "delayed_information",
       "observer_count": 10,
       "consensus_reached": true,
       "rounds_to_consensus": 3,
-      "agreement_rate": 0.8924,
+      "agreement_rate": 0.8833,
       "failed_observers": [],
       "knowledge_gaps": 0,
-      "delay_ms": 1793.24,
+      "delay_ms": 1945.0,
       "metadata": {}
     },
     {
-      "round_id": "di_e3bb4951",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
+      "round_id": "di_ff58df23",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "delayed_information",
       "observer_count": 10,
       "consensus_reached": false,
-      "rounds_to_consensus": 2,
-      "agreement_rate": 0.8847,
+      "rounds_to_consensus": 3,
+      "agreement_rate": 0.8831,
       "failed_observers": [],
       "knowledge_gaps": 0,
-      "delay_ms": 1921.69,
+      "delay_ms": 1949.1,
       "metadata": {}
     },
     {
-      "round_id": "di_be60282d",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
+      "round_id": "di_da2a7047",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "delayed_information",
       "observer_count": 10,
       "consensus_reached": true,
-      "rounds_to_consensus": 1,
-      "agreement_rate": 0.8962,
+      "rounds_to_consensus": 2,
+      "agreement_rate": 0.8815,
       "failed_observers": [],
       "knowledge_gaps": 0,
-      "delay_ms": 1730.35,
+      "delay_ms": 1975.09,
       "metadata": {}
     },
     {
-      "round_id": "di_69234527",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
+      "round_id": "di_f8066e6c",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "delayed_information",
       "observer_count": 10,
       "consensus_reached": false,
-      "rounds_to_consensus": 1,
-      "agreement_rate": 0.8819,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 1967.85,
-      "metadata": {}
-    },
-    {
-      "round_id": "di_ea25c98d",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
-      "test_type": "delayed_information",
-      "observer_count": 10,
-      "consensus_reached": true,
       "rounds_to_consensus": 5,
-      "agreement_rate": 0.8801,
+      "agreement_rate": 0.8851,
       "failed_observers": [],
       "knowledge_gaps": 0,
-      "delay_ms": 1997.99,
+      "delay_ms": 1915.82,
       "metadata": {}
     },
     {
-      "round_id": "di_c8779015",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
-      "test_type": "delayed_information",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 3,
-      "agreement_rate": 0.8866,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 1890.67,
-      "metadata": {}
-    },
-    {
-      "round_id": "di_e35c338a",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
-      "test_type": "delayed_information",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 5,
-      "agreement_rate": 0.8804,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 1993.95,
-      "metadata": {}
-    },
-    {
-      "round_id": "di_7f14f480",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
-      "test_type": "delayed_information",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 1,
-      "agreement_rate": 0.9011,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 1649.12,
-      "metadata": {}
-    },
-    {
-      "round_id": "di_040fb37b",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
+      "round_id": "di_e784311b",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "delayed_information",
       "observer_count": 10,
       "consensus_reached": true,
       "rounds_to_consensus": 7,
-      "agreement_rate": 0.8858,
+      "agreement_rate": 0.8884,
       "failed_observers": [],
       "knowledge_gaps": 0,
-      "delay_ms": 1903.78,
+      "delay_ms": 1860.76,
       "metadata": {}
     },
     {
-      "round_id": "di_9961a3ef",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
+      "round_id": "di_5120efa1",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "delayed_information",
       "observer_count": 10,
       "consensus_reached": true,
       "rounds_to_consensus": 6,
-      "agreement_rate": 0.8875,
+      "agreement_rate": 0.9148,
       "failed_observers": [],
       "knowledge_gaps": 0,
-      "delay_ms": 1875.1,
+      "delay_ms": 1420.7,
       "metadata": {}
     },
     {
-      "round_id": "di_8c16bfed",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
-      "test_type": "delayed_information",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 1,
-      "agreement_rate": 0.8999,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 1668.82,
-      "metadata": {}
-    },
-    {
-      "round_id": "di_a0e21814",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
-      "test_type": "delayed_information",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 1,
-      "agreement_rate": 0.887,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 1883.94,
-      "metadata": {}
-    },
-    {
-      "round_id": "di_c04743a6",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
+      "round_id": "di_22a5248b",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "delayed_information",
       "observer_count": 10,
       "consensus_reached": true,
       "rounds_to_consensus": 6,
-      "agreement_rate": 0.8809,
+      "agreement_rate": 0.8959,
       "failed_observers": [],
       "knowledge_gaps": 0,
-      "delay_ms": 1985.56,
+      "delay_ms": 1735.75,
       "metadata": {}
     },
     {
-      "round_id": "di_8b595b78",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
+      "round_id": "di_76b6a322",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "delayed_information",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 8,
-      "agreement_rate": 0.9009,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 1651.54,
-      "metadata": {}
-    },
-    {
-      "round_id": "di_51ada1e0",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
-      "test_type": "delayed_information",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 2,
-      "agreement_rate": 0.8833,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 1945.11,
-      "metadata": {}
-    },
-    {
-      "round_id": "di_4ed9530e",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
-      "test_type": "delayed_information",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 4,
-      "agreement_rate": 0.8803,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 1995.29,
-      "metadata": {}
-    },
-    {
-      "round_id": "di_b1c59bd9",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
-      "test_type": "delayed_information",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 1,
-      "agreement_rate": 0.8844,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 1926.72,
-      "metadata": {}
-    },
-    {
-      "round_id": "di_d45fdb04",
-      "timestamp": "2026-05-24T01:20:24.248116+00:00",
-      "test_type": "delayed_information",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 6,
-      "agreement_rate": 0.8902,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 1830.66,
-      "metadata": {}
-    },
-    {
-      "round_id": "cr_262a868d",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "conflict_resolution",
       "observer_count": 10,
       "consensus_reached": false,
       "rounds_to_consensus": 2,
-      "agreement_rate": 0.5,
+      "agreement_rate": 0.881,
       "failed_observers": [],
       "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {
-        "group_a": 5,
-        "group_b": 5
-      }
+      "delay_ms": 1982.78,
+      "metadata": {}
     },
     {
-      "round_id": "cr_28ca19ff",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "conflict_resolution",
+      "round_id": "di_57b68315",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "delayed_information",
       "observer_count": 10,
       "consensus_reached": true,
       "rounds_to_consensus": 6,
-      "agreement_rate": 0.85,
+      "agreement_rate": 0.8818,
       "failed_observers": [],
       "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {
-        "group_a": 5,
-        "group_b": 5
-      }
+      "delay_ms": 1970.09,
+      "metadata": {}
     },
     {
-      "round_id": "cr_55be4065",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
+      "round_id": "di_0439434e",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "delayed_information",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 1,
+      "agreement_rate": 0.8875,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 1874.85,
+      "metadata": {}
+    },
+    {
+      "round_id": "di_cda4b99d",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "delayed_information",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 2,
+      "agreement_rate": 0.9126,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 1456.86,
+      "metadata": {}
+    },
+    {
+      "round_id": "di_297a7c4d",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "delayed_information",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 2,
+      "agreement_rate": 0.9002,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 1663.2,
+      "metadata": {}
+    },
+    {
+      "round_id": "di_8daf28a5",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "delayed_information",
+      "observer_count": 10,
+      "consensus_reached": false,
+      "rounds_to_consensus": 8,
+      "agreement_rate": 0.885,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 1915.86,
+      "metadata": {}
+    },
+    {
+      "round_id": "di_c9c246d9",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "delayed_information",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 8,
+      "agreement_rate": 0.9022,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 1629.51,
+      "metadata": {}
+    },
+    {
+      "round_id": "di_62892d07",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "delayed_information",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 2,
+      "agreement_rate": 0.9172,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 1379.68,
+      "metadata": {}
+    },
+    {
+      "round_id": "di_33854c63",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "delayed_information",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 5,
+      "agreement_rate": 0.8897,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 1838.02,
+      "metadata": {}
+    },
+    {
+      "round_id": "di_984de07d",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "delayed_information",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 8,
+      "agreement_rate": 0.907,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 1549.77,
+      "metadata": {}
+    },
+    {
+      "round_id": "di_28246c79",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "delayed_information",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 1,
+      "agreement_rate": 0.8832,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 1947.06,
+      "metadata": {}
+    },
+    {
+      "round_id": "di_e0d01d25",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "delayed_information",
+      "observer_count": 10,
+      "consensus_reached": false,
+      "rounds_to_consensus": 4,
+      "agreement_rate": 0.8915,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 1808.17,
+      "metadata": {}
+    },
+    {
+      "round_id": "cr_e2b65d12",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "conflict_resolution",
       "observer_count": 10,
       "consensus_reached": true,
@@ -599,8 +567,8 @@
       }
     },
     {
-      "round_id": "cr_16b3d4eb",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
+      "round_id": "cr_adceaa23",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "conflict_resolution",
       "observer_count": 10,
       "consensus_reached": true,
@@ -615,8 +583,8 @@
       }
     },
     {
-      "round_id": "cr_f1cbd4b8",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
+      "round_id": "cr_51f6a6f1",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "conflict_resolution",
       "observer_count": 10,
       "consensus_reached": false,
@@ -631,12 +599,12 @@
       }
     },
     {
-      "round_id": "cr_0dd96eef",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
+      "round_id": "cr_d1a81763",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "conflict_resolution",
       "observer_count": 10,
       "consensus_reached": true,
-      "rounds_to_consensus": 4,
+      "rounds_to_consensus": 7,
       "agreement_rate": 0.85,
       "failed_observers": [],
       "knowledge_gaps": 0,
@@ -647,40 +615,8 @@
       }
     },
     {
-      "round_id": "cr_296d1a45",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "conflict_resolution",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 4,
-      "agreement_rate": 0.85,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {
-        "group_a": 5,
-        "group_b": 5
-      }
-    },
-    {
-      "round_id": "cr_df66980e",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "conflict_resolution",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 5,
-      "agreement_rate": 0.85,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {
-        "group_a": 5,
-        "group_b": 5
-      }
-    },
-    {
-      "round_id": "cr_5cae77e9",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
+      "round_id": "cr_4fb0635c",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "conflict_resolution",
       "observer_count": 10,
       "consensus_reached": true,
@@ -695,12 +631,12 @@
       }
     },
     {
-      "round_id": "cr_5294b5ff",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
+      "round_id": "cr_6dcb746d",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "conflict_resolution",
       "observer_count": 10,
       "consensus_reached": true,
-      "rounds_to_consensus": 10,
+      "rounds_to_consensus": 2,
       "agreement_rate": 0.85,
       "failed_observers": [],
       "knowledge_gaps": 0,
@@ -711,40 +647,8 @@
       }
     },
     {
-      "round_id": "cr_5294bf90",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "conflict_resolution",
-      "observer_count": 10,
-      "consensus_reached": false,
-      "rounds_to_consensus": 10,
-      "agreement_rate": 0.5,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {
-        "group_a": 5,
-        "group_b": 5
-      }
-    },
-    {
-      "round_id": "cr_dfb7ddd0",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "conflict_resolution",
-      "observer_count": 10,
-      "consensus_reached": false,
-      "rounds_to_consensus": 8,
-      "agreement_rate": 0.5,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {
-        "group_a": 5,
-        "group_b": 5
-      }
-    },
-    {
-      "round_id": "cr_ff52d651",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
+      "round_id": "cr_cf8e5d47",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "conflict_resolution",
       "observer_count": 10,
       "consensus_reached": true,
@@ -759,72 +663,8 @@
       }
     },
     {
-      "round_id": "cr_43774a5f",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "conflict_resolution",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 5,
-      "agreement_rate": 0.85,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {
-        "group_a": 5,
-        "group_b": 5
-      }
-    },
-    {
-      "round_id": "cr_9023c563",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "conflict_resolution",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 5,
-      "agreement_rate": 0.85,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {
-        "group_a": 5,
-        "group_b": 5
-      }
-    },
-    {
-      "round_id": "cr_f0d59bc6",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "conflict_resolution",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 3,
-      "agreement_rate": 0.85,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {
-        "group_a": 5,
-        "group_b": 5
-      }
-    },
-    {
-      "round_id": "cr_6a6f4fea",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "conflict_resolution",
-      "observer_count": 10,
-      "consensus_reached": false,
-      "rounds_to_consensus": 7,
-      "agreement_rate": 0.5,
-      "failed_observers": [],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {
-        "group_a": 5,
-        "group_b": 5
-      }
-    },
-    {
-      "round_id": "cr_163360b7",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
+      "round_id": "cr_fb582359",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "conflict_resolution",
       "observer_count": 10,
       "consensus_reached": false,
@@ -839,8 +679,72 @@
       }
     },
     {
-      "round_id": "cr_edd1b501",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
+      "round_id": "cr_a1904ce7",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "conflict_resolution",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 8,
+      "agreement_rate": 0.85,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {
+        "group_a": 5,
+        "group_b": 5
+      }
+    },
+    {
+      "round_id": "cr_0af1015e",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "conflict_resolution",
+      "observer_count": 10,
+      "consensus_reached": false,
+      "rounds_to_consensus": 5,
+      "agreement_rate": 0.5,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {
+        "group_a": 5,
+        "group_b": 5
+      }
+    },
+    {
+      "round_id": "cr_9dc91522",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "conflict_resolution",
+      "observer_count": 10,
+      "consensus_reached": false,
+      "rounds_to_consensus": 9,
+      "agreement_rate": 0.5,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {
+        "group_a": 5,
+        "group_b": 5
+      }
+    },
+    {
+      "round_id": "cr_6918888c",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "conflict_resolution",
+      "observer_count": 10,
+      "consensus_reached": false,
+      "rounds_to_consensus": 8,
+      "agreement_rate": 0.5,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {
+        "group_a": 5,
+        "group_b": 5
+      }
+    },
+    {
+      "round_id": "cr_1b3dae48",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "conflict_resolution",
       "observer_count": 10,
       "consensus_reached": true,
@@ -855,8 +759,88 @@
       }
     },
     {
-      "round_id": "cr_6c1ab432",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
+      "round_id": "cr_c1e5f4eb",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "conflict_resolution",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 5,
+      "agreement_rate": 0.85,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {
+        "group_a": 5,
+        "group_b": 5
+      }
+    },
+    {
+      "round_id": "cr_50edd6cb",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "conflict_resolution",
+      "observer_count": 10,
+      "consensus_reached": false,
+      "rounds_to_consensus": 2,
+      "agreement_rate": 0.5,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {
+        "group_a": 5,
+        "group_b": 5
+      }
+    },
+    {
+      "round_id": "cr_f895fe96",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "conflict_resolution",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 10,
+      "agreement_rate": 0.85,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {
+        "group_a": 5,
+        "group_b": 5
+      }
+    },
+    {
+      "round_id": "cr_b87afeb8",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "conflict_resolution",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 3,
+      "agreement_rate": 0.85,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {
+        "group_a": 5,
+        "group_b": 5
+      }
+    },
+    {
+      "round_id": "cr_f0d20a8c",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "conflict_resolution",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 4,
+      "agreement_rate": 0.85,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {
+        "group_a": 5,
+        "group_b": 5
+      }
+    },
+    {
+      "round_id": "cr_0c9f8276",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "conflict_resolution",
       "observer_count": 10,
       "consensus_reached": false,
@@ -871,15 +855,47 @@
       }
     },
     {
-      "round_id": "of_34ac52c0",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
+      "round_id": "cr_f7cd058b",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "conflict_resolution",
+      "observer_count": 10,
+      "consensus_reached": false,
+      "rounds_to_consensus": 5,
+      "agreement_rate": 0.5,
+      "failed_observers": [],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {
+        "group_a": 5,
+        "group_b": 5
+      }
+    },
+    {
+      "round_id": "of_ff2f29de",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "observer_failure",
       "observer_count": 10,
       "consensus_reached": true,
-      "rounds_to_consensus": 4,
-      "agreement_rate": 0.7739,
+      "rounds_to_consensus": 2,
+      "agreement_rate": 0.7871,
       "failed_observers": [
-        "obs_5",
+        "obs_0",
+        "obs_5"
+      ],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "of_9752df0d",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "observer_failure",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 2,
+      "agreement_rate": 0.7549,
+      "failed_observers": [
+        "obs_9",
         "obs_4"
       ],
       "knowledge_gaps": 0,
@@ -887,47 +903,15 @@
       "metadata": {}
     },
     {
-      "round_id": "of_ef1ccd20",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
+      "round_id": "of_e30af506",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "observer_failure",
       "observer_count": 10,
       "consensus_reached": true,
-      "rounds_to_consensus": 2,
-      "agreement_rate": 0.5902,
+      "rounds_to_consensus": 5,
+      "agreement_rate": 0.7359,
       "failed_observers": [
-        "obs_3",
-        "obs_1"
-      ],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "of_13c0cc70",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "observer_failure",
-      "observer_count": 10,
-      "consensus_reached": false,
-      "rounds_to_consensus": 6,
-      "agreement_rate": 0.7647,
-      "failed_observers": [
-        "obs_2",
-        "obs_6"
-      ],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "of_2bc4fe68",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "observer_failure",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 2,
-      "agreement_rate": 0.7025,
-      "failed_observers": [
-        "obs_0",
+        "obs_1",
         "obs_8"
       ],
       "knowledge_gaps": 0,
@@ -935,159 +919,15 @@
       "metadata": {}
     },
     {
-      "round_id": "of_47863526",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "observer_failure",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 3,
-      "agreement_rate": 0.5794,
-      "failed_observers": [
-        "obs_0",
-        "obs_2"
-      ],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "of_9cedc06d",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "observer_failure",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 3,
-      "agreement_rate": 0.7606,
-      "failed_observers": [
-        "obs_7",
-        "obs_5"
-      ],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "of_33bed58b",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "observer_failure",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 3,
-      "agreement_rate": 0.6287,
-      "failed_observers": [
-        "obs_2",
-        "obs_4"
-      ],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "of_d724c285",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "observer_failure",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 1,
-      "agreement_rate": 0.7994,
-      "failed_observers": [
-        "obs_6",
-        "obs_1"
-      ],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "of_db93a8a3",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "observer_failure",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 6,
-      "agreement_rate": 0.6835,
-      "failed_observers": [
-        "obs_9",
-        "obs_3"
-      ],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "of_f58a26cd",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "observer_failure",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 2,
-      "agreement_rate": 0.7409,
-      "failed_observers": [
-        "obs_3",
-        "obs_2"
-      ],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "of_58f70234",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "observer_failure",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 6,
-      "agreement_rate": 0.6184,
-      "failed_observers": [
-        "obs_3",
-        "obs_6"
-      ],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "of_07f76ec1",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "observer_failure",
-      "observer_count": 10,
-      "consensus_reached": false,
-      "rounds_to_consensus": 6,
-      "agreement_rate": 0.6158,
-      "failed_observers": [
-        "obs_4",
-        "obs_2"
-      ],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "of_e56c7d14",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
+      "round_id": "of_1a469be6",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "observer_failure",
       "observer_count": 10,
       "consensus_reached": true,
       "rounds_to_consensus": 5,
-      "agreement_rate": 0.6195,
+      "agreement_rate": 0.7823,
       "failed_observers": [
         "obs_4",
-        "obs_2"
-      ],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "of_825a54c0",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "observer_failure",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 3,
-      "agreement_rate": 0.6267,
-      "failed_observers": [
-        "obs_2",
         "obs_5"
       ],
       "knowledge_gaps": 0,
@@ -1095,61 +935,13 @@
       "metadata": {}
     },
     {
-      "round_id": "of_4f1fcbbc",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
+      "round_id": "of_ac062d35",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "observer_failure",
       "observer_count": 10,
       "consensus_reached": true,
       "rounds_to_consensus": 6,
-      "agreement_rate": 0.5901,
-      "failed_observers": [
-        "obs_9",
-        "obs_4"
-      ],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "of_d06c673e",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "observer_failure",
-      "observer_count": 10,
-      "consensus_reached": false,
-      "rounds_to_consensus": 1,
-      "agreement_rate": 0.6258,
-      "failed_observers": [
-        "obs_4",
-        "obs_3"
-      ],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "of_21fbd5a6",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "observer_failure",
-      "observer_count": 10,
-      "consensus_reached": false,
-      "rounds_to_consensus": 3,
-      "agreement_rate": 0.5631,
-      "failed_observers": [
-        "obs_2",
-        "obs_9"
-      ],
-      "knowledge_gaps": 0,
-      "delay_ms": 0.0,
-      "metadata": {}
-    },
-    {
-      "round_id": "of_630b6788",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
-      "test_type": "observer_failure",
-      "observer_count": 10,
-      "consensus_reached": true,
-      "rounds_to_consensus": 2,
-      "agreement_rate": 0.5955,
+      "agreement_rate": 0.5712,
       "failed_observers": [
         "obs_0",
         "obs_7"
@@ -1159,15 +951,95 @@
       "metadata": {}
     },
     {
-      "round_id": "of_24d1b363",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
+      "round_id": "of_e0442db1",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "observer_failure",
       "observer_count": 10,
       "consensus_reached": true,
-      "rounds_to_consensus": 4,
-      "agreement_rate": 0.59,
+      "rounds_to_consensus": 5,
+      "agreement_rate": 0.5937,
       "failed_observers": [
         "obs_5",
+        "obs_0"
+      ],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "of_4c4b87f1",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "observer_failure",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 2,
+      "agreement_rate": 0.6787,
+      "failed_observers": [
+        "obs_8",
+        "obs_5"
+      ],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "of_c7febd1b",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "observer_failure",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 5,
+      "agreement_rate": 0.7196,
+      "failed_observers": [
+        "obs_3",
+        "obs_7"
+      ],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "of_3b8af14a",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "observer_failure",
+      "observer_count": 10,
+      "consensus_reached": false,
+      "rounds_to_consensus": 1,
+      "agreement_rate": 0.7744,
+      "failed_observers": [
+        "obs_7",
+        "obs_3"
+      ],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "of_694da462",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "observer_failure",
+      "observer_count": 10,
+      "consensus_reached": false,
+      "rounds_to_consensus": 3,
+      "agreement_rate": 0.6926,
+      "failed_observers": [
+        "obs_1",
+        "obs_9"
+      ],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "of_bca56775",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "observer_failure",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 2,
+      "agreement_rate": 0.6708,
+      "failed_observers": [
+        "obs_0",
         "obs_8"
       ],
       "knowledge_gaps": 0,
@@ -1175,16 +1047,144 @@
       "metadata": {}
     },
     {
-      "round_id": "of_8cd0fe6c",
-      "timestamp": "2026-05-24T01:20:24.249107+00:00",
+      "round_id": "of_79166455",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "observer_failure",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 3,
+      "agreement_rate": 0.6646,
+      "failed_observers": [
+        "obs_4",
+        "obs_7"
+      ],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "of_99e72459",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "observer_failure",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 3,
+      "agreement_rate": 0.7033,
+      "failed_observers": [
+        "obs_1",
+        "obs_2"
+      ],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "of_12b469d2",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
       "test_type": "observer_failure",
       "observer_count": 10,
       "consensus_reached": true,
       "rounds_to_consensus": 6,
-      "agreement_rate": 0.5798,
+      "agreement_rate": 0.595,
+      "failed_observers": [
+        "obs_8",
+        "obs_9"
+      ],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "of_b6884751",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "observer_failure",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 4,
+      "agreement_rate": 0.7248,
+      "failed_observers": [
+        "obs_6",
+        "obs_4"
+      ],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "of_7f7e7417",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "observer_failure",
+      "observer_count": 10,
+      "consensus_reached": false,
+      "rounds_to_consensus": 3,
+      "agreement_rate": 0.678,
       "failed_observers": [
         "obs_1",
-        "obs_9"
+        "obs_8"
+      ],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "of_915adad0",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "observer_failure",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 3,
+      "agreement_rate": 0.6054,
+      "failed_observers": [
+        "obs_9",
+        "obs_0"
+      ],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "of_36d307d0",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "observer_failure",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 3,
+      "agreement_rate": 0.7427,
+      "failed_observers": [
+        "obs_6",
+        "obs_2"
+      ],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "of_02483da2",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "observer_failure",
+      "observer_count": 10,
+      "consensus_reached": false,
+      "rounds_to_consensus": 3,
+      "agreement_rate": 0.7489,
+      "failed_observers": [
+        "obs_9",
+        "obs_2"
+      ],
+      "knowledge_gaps": 0,
+      "delay_ms": 0.0,
+      "metadata": {}
+    },
+    {
+      "round_id": "of_f5ef2393",
+      "timestamp": "2026-05-24T12:33:34.400658+00:00",
+      "test_type": "observer_failure",
+      "observer_count": 10,
+      "consensus_reached": true,
+      "rounds_to_consensus": 3,
+      "agreement_rate": 0.6503,
+      "failed_observers": [
+        "obs_5",
+        "obs_8"
       ],
       "knowledge_gaps": 0,
       "delay_ms": 0.0,
