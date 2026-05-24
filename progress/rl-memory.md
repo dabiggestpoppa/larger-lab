@@ -298,3 +298,50 @@
 - Observability: 5/5 stress tests passed
 - Tufte: 4/4 renderers producing real visualizations
 - PM2 experiments: All complete
+
+---
+## [BUILD_NOTES] Updated: 2026-05-24 17:11 UTC
+﻿# Build Notes â€” Key Themes, Reason, and Aim
+
+> **Purpose:** Before any agent works, they read this file to understand the core principles, avoid known errors, and stay aligned.
+> **Updated by:** CC2 (filling in for CC1 during 72h test)
+> **Last Updated:** 2026-05-24
+
+---
+
+## 1. CORE ARCHITECTURAL PRINCIPLE
+
+**Key Theme:** ONE system, not many.
+
+**Reason:** The project has a history of fragmenting into separate "systems" (SRRA, OPH, OCE, chaos engine, semantic tests, etc.) that don't communicate. The user explicitly corrected this: SRRA+OPH is the runtime substrate, OCE is the singular observational interface. Everything else is a capability layer, not a separate app.
+
+**Aim:** Every new component must answer: "Does this deepen the runtime substrate, or does it expose the substrate through OCE?" If neither, it shouldn't be built yet.
+
+---
+
+## 2. OBSERVER â‰  GENERIC LLM
+
+**Key Theme:** The primary observer is a continuity abstraction layer, not an LLM.
+
+**Reason:** Earlier phases treated observers as generic agents. The corrected architecture distinguishes: the observer is a persistent, stateful, system-aware continuity interface. LLMs (OpenRouter models) are modular cognition sources that the observer orchestrates.
+
+**Aim:** When building observer-related code, ask: "Is this maintaining continuity state, or is this just calling an LLM?" The former is core. The latter is a tool.
+
+---
+
+## 3. RUNTIME TOPOLOGY > STATIC STRUCTURE
+
+**Key Theme:** The real topology exists at runtime, not in inheritance structure.
+
+**Reason:** PM2's experiments proved that AST/import/class structures don't reveal operational reality. Runtime interaction is the actual graph.
+
+**Aim:** All topology work must capture runtime edges (who talks to whom, when, how often), not just static code structure.
+
+---
+
+## 4. CONTINUITY > FEATURES
+
+**Key Theme:** This phase is operational validation, not feature development.
+
+**Reason:** The user explicitly stated: "No major abstractions. No large archite
+... (see BUILD-NOTES.md for full content)

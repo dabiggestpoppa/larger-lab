@@ -1,4 +1,4 @@
-# Build Notes — Key Themes, Reason, and Aim
+﻿# Build Notes â€” Key Themes, Reason, and Aim
 
 > **Purpose:** Before any agent works, they read this file to understand the core principles, avoid known errors, and stay aligned.
 > **Updated by:** CC2 (filling in for CC1 during 72h test)
@@ -16,7 +16,7 @@
 
 ---
 
-## 2. OBSERVER ≠ GENERIC LLM
+## 2. OBSERVER â‰  GENERIC LLM
 
 **Key Theme:** The primary observer is a continuity abstraction layer, not an LLM.
 
@@ -103,3 +103,24 @@
 **Reason:** The user explicitly asked CC2 to "get immersed in the files and build a plan" and "not make a plan until you feel fully aligned."
 
 **Aim:** Read ALL relevant files first. Take notes. Understand the context, goal, and purpose. THEN plan.
+
+---
+
+## 11. FRONTEND BUILD STATUS (Updated 2026-05-24)
+
+### Two Frontends — Both Building
+- **SRRA-OPH (:3001):** Phase 1 complete — layout, theme, pages, Zustand stores. CC2 leading.
+- **OCE (:3000):** Active build — dashboard, agents, tasks, chaos, settings pages. AS leading.
+
+### Phase Dependencies
+1. ✅ CC2 Phase 1 (Observatory Foundation) — COMPLETE
+2. 🔄 CC2 Phase 2 (Living Topology) — In Progress
+3. ⏳ PM2 Phase 3-4 (Temporal + Field Dynamics) — Waiting for CC2 Phase 2
+4. ⏳ CC Phase 5-7 (Repair + Consensus + Prediction) — Waiting for PM2 Phase 4
+
+### Build Rules Reminder
+- Read BUILD-NOTES.md before starting any work
+- Test before updating progress files
+- Don't edit another agent's files without posting in chat first
+- Post to chat BEFORE starting a new major task
+
