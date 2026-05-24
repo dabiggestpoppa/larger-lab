@@ -1,6 +1,6 @@
 {
   "event_id": "entropy_005_8e94fdf3",
-  "timestamp": "2026-05-24T00:59:16.379580+00:00",
+  "timestamp": "2026-05-24T01:20:23.824991+00:00",
   "chaos_type": "stalled_repair",
   "target": "repair_patch",
   "propagation_path": [
@@ -18,18 +18,23 @@
     {
       "from": "repair_patch",
       "to": "backup_repair_patch",
-      "delay_ms": 121
+      "delay_ms": 461
+    },
+    {
+      "from": "repair_patch",
+      "to": "backup_repair_patch",
+      "delay_ms": 86
     }
   ],
   "entropy_spread_radius": 4,
-  "recovery_duration_seconds": 3.52,
+  "recovery_duration_seconds": 12.23,
   "affected_observers": [
-    "srrs_opc.drift_tracker.DriftSignal",
-    "srrs_opc.topology_observer.TopologySnapshot",
+    "srrs_opc.drift_detector.DriftDetector",
     "oce.backend.coevolution.alignment_tracking.AlignmentTracker",
     "oce.backend.drift_detector.DriftReport",
-    "oce.backend.dspy_observer_config.ObserverConfigSignature"
+    "oce.backend.dspy_observer_config.ObserverConfigPipeline",
+    "oce.backend.dspy_observer_repair.classify_error"
   ],
-  "recovered": false,
-  "cascade": true
+  "recovered": true,
+  "cascade": false
 }
