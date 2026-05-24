@@ -1,6 +1,6 @@
 {
-  "cycle": 15,
-  "phase": "new_experiments",
+  "cycle": 18,
+  "phase": "long_running",
   "completed_work": [
     "tufte_integration",
     "topology_drift",
@@ -12,7 +12,9 @@
     "topology_drift",
     "new_exp_0",
     "tufte_integration",
-    "topology_drift"
+    "topology_drift",
+    "new_exp_0",
+    "tufte_integration"
   ],
   "verification_results": {
     "topology": true,

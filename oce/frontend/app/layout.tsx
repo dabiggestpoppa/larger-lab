@@ -3,6 +3,7 @@ import "./globals.css";
 import TopNav from "@/components/layout/TopNav";
 import StatusBar from "@/components/layout/StatusBar";
 import RightPanel from "@/components/layout/RightPanel";
+import LiveDataProvider from "@/components/LiveDataProvider";
 
 export const metadata: Metadata = {
   title: "OCE — Operator Continuity Engine",
@@ -13,6 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="h-screen max-h-[100dvh] overflow-hidden antialiased">
+        <LiveDataProvider />
         <div className="flex flex-col h-full">
           <TopNav />
           <div className="flex flex-1 overflow-hidden">

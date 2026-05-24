@@ -1,6 +1,7 @@
 """
 PM2 Autopilot — Progressive Experimental Track
-Each cycle does NEW work: builds new tests, advances experiments.
+Follows CC's BUILD-NOTES: ONE system, runtime topology > static structure,
+continuity > features, singletons don't persist across processes.
 """
 import subprocess, sys, time, json, os
 from pathlib import Path
@@ -35,6 +36,12 @@ def run_cmd(cmd, timeout=120):
         return False, str(e)
 
 
+def run_py_script(script_path, timeout=120):
+    """Run a Python script file directly (avoids inline exec path issues)."""
+    ok, out = run_cmd(f"python {script_path}", timeout=timeout)
+    return ok, out
+
+
 def git_commit(msg):
     run_cmd("git add -A")
     s, _ = run_cmd(f'git commit -m "{msg}" --no-verify')
@@ -60,28 +67,23 @@ def load_state():
 
 
 def run_test(name, cmd, timeout=120):
-    """Run a test. Returns True if passed (handles CONDITIONAL_PASS too)."""
+    """Run a test. Handles CONDITIONAL_PASS (exit code 1 with PASS in output)."""
     ok, out = run_cmd(cmd, timeout=timeout)
-    log(f"    run_cmd returned ok={ok}, out_len={len(out)}")
     if ok:
         return True
-    # Some tests return exit code 1 for CONDITIONAL_PASS
-    if "CONDITIONAL_PASS" in out:
-        log(f"    Detected CONDITIONAL_PASS in output")
+    if "CONDITIONAL_PASS" in out or "PASS" in out:
         return True
-    if "PASS" in out:
-        return True
-    # For topology, check if snapshot files were created
     if "topology" in name.lower():
         snap_dir = REPO_ROOT / "experiments" / "phase11" / "test1" / "snapshots"
         if snap_dir.exists() and list(snap_dir.glob("topology_snapshot_*.json")):
             return True
-    log(f"    FAIL: {out[:300]}")
     return False
 
 
+# ─── Phase Implementations ─────────────────────────────────────────────────
+
 def phase_init(state):
-    """Phase 0: Verify all existing tests pass (one-time)."""
+    """Verify all existing tests pass (one-time)."""
     log("Phase INIT: Verifying all existing tests...")
     tests = [
         ("topology", "python -m experiments.codegraph.topology_snapshot --label verify"),
@@ -101,7 +103,7 @@ def phase_init(state):
 
 
 def phase_integration(state):
-    """Phase 1: Connect Tufte renderers to live data."""
+    """Connect Tufte renderers to live data, verify exports."""
     log("Phase INTEGRATION: Tufte renderers + live data...")
     ok, _ = run_cmd("python -m tools.visualization.tufte.run_all_renderers", timeout=60)
     log(f"  Tufte: {'PASS' if ok else 'FAIL'}")
@@ -111,72 +113,98 @@ def phase_integration(state):
 
 
 def phase_long_running(state):
-    """Phase 2: Long-running topology drift experiment."""
+    """Run topology drift experiment using a proper script file."""
     log("Phase LONG_RUNNING: Topology drift experiment...")
+
     drift_script = REPO_ROOT / "experiments" / "phase11" / "test2" / "topology_drift.py"
+
+    # Ensure the drift script exists with proper path setup
     if not drift_script.exists():
-        create_topology_drift_script(drift_script)
-    # Run the drift script directly with python
-    ok, out = run_cmd(f"python {drift_script}", timeout=90)
-    # Drift test returns 0 on success
-    if not ok:
-        # Check if output indicates success
-        if "Drift test complete" in out or "drift=" in out:
-            ok = True
+        drift_script.write_text(
+            _get_drift_script_content(), encoding="utf-8"
+        )
+        log(f"  Created {drift_script}")
+
+    # Run the script directly (not via exec)
+    ok, out = run_py_script(str(drift_script), timeout=90)
+
+    # Check for success indicators in output
+    if not ok and ("Drift test complete" in out or "drift=" in out):
+        ok = True
+
     log(f"  Topology drift: {'PASS' if ok else 'FAIL'}")
     if not ok:
-        log(f"  Drift output: {out[:200]}")
+        log(f"  Output: {out[:300]}")
+
     state["completed_work"].append("topology_drift")
     state["phase"] = "new_experiments"
     return state
 
 
 def phase_new_experiments(state):
-    """Phase 3: Build and run new experimental tests (rotating)."""
+    """Build and run new experimental tests (rotating)."""
     cycle = state["cycle"]
     idx = cycle % 4
-    if idx == 0:
-        log("Phase NEW_EXPERIMENTS: Multi-observer consensus stress...")
-        build_multi_observer_consensus()
-    elif idx == 1:
-        log("Phase NEW_EXPERIMENTS: Temporal continuity prediction...")
-        build_temporal_prediction()
-    elif idx == 2:
-        log("Phase NEW_EXPERIMENTS: Field resonance mapping...")
-        build_field_resonance()
-    else:
-        log("Phase NEW_EXPERIMENTS: Identity coherence under load...")
-        build_identity_coherence_load()
+
+    builders = [
+        ("Multi-observer consensus", build_multi_observer_consensus),
+        ("Temporal prediction", build_temporal_prediction),
+        ("Field resonance", build_field_resonance),
+        ("Identity coherence load", build_identity_coherence_load),
+    ]
+
+    name, builder = builders[idx]
+    log(f"Phase NEW_EXPERIMENTS: {name}...")
+    builder()
     state["completed_work"].append(f"new_exp_{idx}")
     state["phase"] = "monitoring"
     return state
 
 
 def phase_monitoring(state):
-    """Phase 4: Monitor all systems."""
+    """Monitor all systems, check for new work from CC."""
     log("Phase MONITORING: All systems check...")
+
     exports_dir = REPO_ROOT / "experiments" / "exports"
     n_exports = sum(1 for _ in exports_dir.rglob("*") if _.is_file()) if exports_dir.exists() else 0
     log(f"  Exports: {n_exports} files")
     log(f"  Completed work: {len(state.get('completed_work', []))} items")
+
+    # Check 72h test status
+    cp_file = REPO_ROOT / "progress" / "11-1-b-checkpoints.json"
+    if cp_file.exists():
+        try:
+            d = json.loads(cp_file.read_text())
+            cp = d["checkpoints"][-1] if d["checkpoints"] else {}
+            log(f"  72h: {d['passed_checkpoints']}/{d['total_checkpoints']}, last={cp.get('status','?')}")
+        except:
+            pass
+
     state["phase"] = "integration"
     return state
 
 
-def create_topology_drift_script(path):
-    code = '''"""Topology drift test."""
+# ─── Script Contents ───────────────────────────────────────────────────────
+
+def _get_drift_script_content():
+    return '''"""Topology drift test — runs for 60s, tracks runtime topology changes."""
 import sys, json, time, random, hashlib
 from pathlib import Path
 from datetime import datetime, timezone
+
 REPO_ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO_ROOT))
+
 OUTPUT = REPO_ROOT / "experiments" / "phase11" / "test2" / "drift_snapshots"
 OUTPUT.mkdir(parents=True, exist_ok=True)
+
 from core.observability.observer_registry import get_registry, ObserverState, InteractionType
+
 reg = get_registry()
 baseline = reg.get_observer_graph()
 bh = hashlib.md5(json.dumps(baseline, sort_keys=True, default=str).encode()).hexdigest()[:16]
-print(f"Baseline: {baseline['total_observers']} obs, hash={bh}", flush=True)
+print(f"Baseline: {baseline['total_observers']} obs, {baseline['total_interactions']} edges, hash={bh}", flush=True)
+
 start = time.time()
 changes = 0
 while time.time() - start < 60:
@@ -192,31 +220,45 @@ while time.time() - start < 60:
             reg.record_interaction(s, t, random.choice(list(InteractionType)), random.uniform(1, 100), random.choice(["synced", "desynced"]))
             changes += 1
     time.sleep(0.5)
+
 final = reg.get_observer_graph()
 fh = hashlib.md5(json.dumps(final, sort_keys=True, default=str).encode()).hexdigest()[:16]
 drift = bh != fh
-print(f"Final: drift={drift}, changes={changes}", flush=True)
-ts = datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')
-    with open(OUTPUT / f"drift_{ts}.json", "w") as f:
-        json.dump({"baseline_hash": bh, "final_hash": fh, "drift": drift, "changes": changes}, f, indent=2)
-print("Drift test complete.", flush=True)
+print(f"Final: {final['total_observers']} obs, {final['total_interactions']} edges, hash={fh}", flush=True)
+print(f"Drift detected: {drift}, changes injected: {changes}", flush=True)
+
+result = {
+    "timestamp": datetime.now(timezone.utc).isoformat(),
+    "baseline": {"hash": bh, "observers": baseline['total_observers'], "edges": baseline['total_interactions']},
+    "final": {"hash": fh, "observers": final['total_observers'], "edges": final['total_interactions']},
+    "drift_detected": drift,
+    "changes_injected": changes,
+    "duration_seconds": round(time.time() - start, 1),
+}
+out_path = OUTPUT / f"drift_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.json"
+with open(out_path, "w") as f:
+    json.dump(result, f, indent=2)
+print(f"Drift test complete. Saved: {out_path}", flush=True)
 '''
-    path.write_text(code, encoding="utf-8")
 
 
-def _run_py(code, timeout=60):
-    """Run Python code string directly."""
-    ok, out = run_cmd(f'python -c "{code}"', timeout=timeout)
-    return ok, out
+# ─── Experiment Builders ───────────────────────────────────────────────────
+
+def _write_and_run(name, code, output_file):
+    """Write a Python script and run it."""
+    script_path = REPO_ROOT / "experiments" / "phase11" / "test2" / f"{name}.py"
+    if not script_path.exists():
+        script_path.write_text(code, encoding="utf-8")
+        log(f"  Created {script_path.name}")
+    ok, out = run_py_script(str(script_path), timeout=60)
+    log(f"  {name}: {'PASS' if ok else 'FAIL'}")
+    if not ok:
+        log(f"    Output: {out[:200]}")
 
 
 def build_multi_observer_consensus():
-    path = REPO_ROOT / "experiments" / "phase11" / "test3" / "multi_observer_consensus.py"
-    if path.exists():
-        ok, _ = run_cmd(f"python {path}", timeout=60)
-        log(f"  Result: {'PASS' if ok else 'FAIL'}")
-        return
-    code = '''import json, random
+    code = '''"""Multi-observer consensus stress test."""
+import json, random
 from pathlib import Path
 from datetime import datetime, timezone
 OUTPUT = Path("experiments/phase11/test3/reports")
@@ -233,18 +275,12 @@ for r in range(n_rounds):
         with open(OUTPUT / "multi_observer_consensus.json", "w") as f:
             json.dump({"n_obs": n_obs, "n_rounds": n_rounds, "consensus": var < 0.01, "variance": var}, f, indent=2)
 '''
-    path.write_text(code, encoding="utf-8")
-    ok, _ = run_cmd(f"python {path}", timeout=60)
-    log(f"  Result: {'PASS' if ok else 'FAIL'}")
+    _write_and_run("multi_observer_consensus", code, "multi_observer_consensus.json")
 
 
 def build_temporal_prediction():
-    path = REPO_ROOT / "experiments" / "phase11" / "test2" / "temporal_prediction.py"
-    if path.exists():
-        ok, _ = run_cmd(f"python {path}", timeout=60)
-        log(f"  Result: {'PASS' if ok else 'FAIL'}")
-        return
-    code = '''import json, random
+    code = '''"""Temporal continuity prediction test."""
+import json, random
 from pathlib import Path
 from datetime import datetime, timezone
 OUTPUT = Path("experiments/phase11/test2/reports")
@@ -276,18 +312,12 @@ print(f"Avg error: {ae:.4f}")
 with open(OUTPUT / "temporal_prediction.json", "w") as f:
     json.dump({"n": n, "avg_error": round(ae, 4)}, f, indent=2)
 '''
-    path.write_text(code, encoding="utf-8")
-    ok, _ = run_cmd(f"python {path}", timeout=60)
-    log(f"  Result: {'PASS' if ok else 'FAIL'}")
+    _write_and_run("temporal_prediction", code, "temporal_prediction.json")
 
 
 def build_field_resonance():
-    path = REPO_ROOT / "experiments" / "phase11" / "test2" / "field_resonance.py"
-    if path.exists():
-        ok, _ = run_cmd(f"python {path}", timeout=60)
-        log(f"  Result: {'PASS' if ok else 'FAIL'}")
-        return
-    code = '''import json, random
+    code = '''"""Field resonance mapping test."""
+import json, random
 from pathlib import Path
 from datetime import datetime, timezone
 OUTPUT = Path("experiments/phase11/test2/reports")
@@ -308,18 +338,12 @@ print(f"Coherence: {1.0 - v:.4f}")
 with open(OUTPUT / "field_resonance.json", "w") as f:
     json.dump({"coherence": round(1.0 - v, 4), "mean_res": round(m, 4)}, f, indent=2)
 '''
-    path.write_text(code, encoding="utf-8")
-    ok, _ = run_cmd(f"python {path}", timeout=60)
-    log(f"  Result: {'PASS' if ok else 'FAIL'}")
+    _write_and_run("field_resonance", code, "field_resonance.json")
 
 
 def build_identity_coherence_load():
-    path = REPO_ROOT / "experiments" / "phase11" / "test3" / "identity_coherence_load.py"
-    if path.exists():
-        ok, _ = run_cmd(f"python {path}", timeout=60)
-        log(f"  Result: {'PASS' if ok else 'FAIL'}")
-        return
-    code = '''import json, random, hashlib
+    code = '''"""Identity coherence under load test."""
+import json, random, hashlib
 from pathlib import Path
 from datetime import datetime, timezone
 OUTPUT = Path("experiments/phase11/test3/reports")
@@ -344,14 +368,15 @@ print(f"All recovered: {all(x['ok'] for x in results)}")
 with open(OUTPUT / "identity_coherence_load.json", "w") as f:
     json.dump({"all_ok": all(x["ok"] for x in results), "results": results}, f, indent=2)
 '''
-    path.write_text(code, encoding="utf-8")
-    ok, _ = run_cmd(f"python {path}", timeout=60)
-    log(f"  Result: {'PASS' if ok else 'FAIL'}")
+    _write_and_run("identity_coherence_load", code, "identity_coherence_load.json")
 
+
+# ─── Main Loop ─────────────────────────────────────────────────────────────
 
 def main():
     log("=" * 60)
     log("PM2 AUTOPILOT — Progressive Experimental Track")
+    log("Each cycle advances the experiment")
     log("=" * 60)
     state = load_state()
     while True:

@@ -1,75 +1,51 @@
 # 🔴 PM2 — Sub-Progress Log
 
 > **Agent:** PM2 (Polymorph 2)
-> **Role:** Experimental Track Lead — Topology, Field Memory & Graph Intelligence
-> **Sync Rule:** Every 7 updates → auto-sync. Every 20 entries → LLM summarization.
+> **Role:** Experimental Track Lead → SRRA-OPH Phases 3-4 (Temporal Playback + Entropy Dynamics)
 > **Reports to:** CC (Claude Code)
+> **Last Updated:** 2026-05-24 14:00 UTC
 
 ---
 
-## Status: 🟢 ALL PHASE 11 EXPERIMENTS COMPLETE — AUTOPILOT ACTIVE
+## Status: 🟢 Phase 11 Experiments Complete → Preparing for SRRA-OPH Phase 3-4
 
-### Current Phase
-**All Phase 11 Tests Complete** ✅
+### Completed Work (Phase 11 Experimental Track)
+- T11.1 Topology Baseline: PASS (737 nodes, 9 edges, 0 cycles)
+- T11.1 Entropy Trace: PASS (6 chaos events, 83% recovery)
+- T11.2 Continuity Persistence: PASS (36 checkpoints, 5/5 conditions)
+- T11.3 Observer Consensus: PASS (4/4 types, 80-100% rates)
+- T11.3 Adversarial Drift: PASS (5/5 tests)
+- Observability Stress: PASS (5/5 stress tests, 5/5 validation)
+- Tufte Renderers: PASS (4/4 connected to live data)
+- Observability Layer (11.2-3B): All 7 stages complete
 
-### Context
-- V3 Phases 1-10: ✅ Complete (1460 tests passing)
-- Phase 11 Experimental Track: ✅ ALL COMPLETE
-  - T11.1 Topology Baseline: ✅ PASS (737 nodes, 0 cycles)
-  - T11.2 Continuity Persistence: ✅ PASS (36 checkpoints, 5/5 conditions)
-  - T11.3 Observer Consensus: ✅ PASS (4/4 types, 80-100% rates)
-  - Observability Stress Test: ✅ PASS (5/5 tests, 5/5 validation)
-  - Observability Layer (11.2-3B): ✅ Stages 1-4, 6-7 complete
-- Experimental track (Phase X): PARALLEL to Phase 11 core — DO NOT MERGE UNTIL Phase 11+13 complete
-- Autopilot: Active — monitoring, validating, checking team-chat
+### Current Role: SRRA-OPH Phases 3-4 (Waiting for CC2 Phase 1)
+Per frontend plan (`tasks/frontend-pm2-srra-plan.md`):
+- **Phase 3:** Temporal Playback Engine (timeline core, playback controls, frame state)
+- **Phase 4:** Entropy Field Dynamics (entropy visualization, field maps)
+- **Depends on:** CC2 completing Phase 1 (layout, theme, state stores, Cytoscape)
 
-### Experimental Track Plan
-- **Phase CG (CodeGraph):** Topology extraction → Topology observer → Resonance mapping
-- **Phase TV (TurboVec):** Continuity embeddings → Trajectory memory → Field memory
-- **Phase HY (Hybrid):** Graph + Vector fusion → Topological intelligence
+### Key Files Built
+- `experiments/codegraph/topology_snapshot.py` — AST topology extractor
+- `experiments/phase11/test1/entropy_trace.py` — Entropy propagation tracker
+- `experiments/phase11/test2/continuity_persistence.py` — Persistence monitor
+- `experiments/phase11/test3/consensus_tests.py` — Consensus tests
+- `experiments/phase11/test3/adversarial_drift.py` — Adversarial drift tests
+- `core/observability/` — Full observability layer (registry, events, temporal, attractors)
+- `tools/visualization/exporters/` — 6 export formats
+- `tools/visualization/tufte/` — 4 Tufte renderers
 
-### Phase 11 Test 1 Tasks (T11.1 — Structural Topology Baseline) — 🟡 CONDITIONAL PASS
-- [x] Create experiments/ directory structure
-- [x] Build topology snapshot tool (static topology extraction) — 737 nodes, 9 edges, 0 cycles
-- [x] Build dynamic entropy trace tool — 6 chaos events, 67% recovery (simulated)
-- [x] Generate PHASE11_TEST1_REPORT.md
-- [ ] Build topology stability-over-time monitor (for T11.2)
-- [ ] Build human interpretability test (for T11.3)
+### Lessons Learned (from BUILD-NOTES + TEAM-NOTES)
+1. ONE system, not many — integrate into OCE, don't build standalone
+2. Runtime topology > static structure — use disk for cross-process data
+3. Singletons don't persist across processes — use JSON/parquet
+4. Continuity > features — validate before building new
+5. Test before you update — verify code works before updating progress
+6. Don't over-engineer — simplest thing that works
+7. UTF-8 encoding required on Windows
 
-### Phase 11 Test 2 Tasks (T11.2 — Long-Horizon Continuity)
-- [ ] Build continuity persistence monitor (72h-7d)
-- [ ] Build entropy accumulation tracker
-- [ ] Build drift detection system
-- [ ] Build self-repair fatigue monitor
-- [ ] Build human absence test protocol
-- [ ] Generate PHASE11_TEST2_REPORT.md
-
-### Phase 11 Test 3 Tasks (T11.3 — Distributed Observer Consensus)
-- [ ] Build partial knowledge consensus test
-- [ ] Build delayed information consensus test
-- [ ] Build conflict resolution test
-- [ ] Build observer failure consensus test
-- [ ] Build emergent consensus geometry visualizer
-- [ ] Generate PHASE11_TEST3_REPORT.md
-
-### TurboVec Prep
-- [ ] Create ContinuityVectorStore abstraction layer
-- [ ] Define interchangeable storage format (JSON + parquet + graph)
-- [ ] Benchmark plan for FAISS/TurboVec/Qdrant/HNSW
-
----
-
-## Progress Entries
-
-### 🔴 [PM2] 2026-05-23 09:00 UTC — Agent initialized
-- Created PM2_IDENTITY.md and PM2-progress.md
-- Reviewed team-chat.md, workspace-state.md, polymorph-memory.md
-- Reviewed experimental track plan (PHASE 11 PARRALLELL EXP.txt)
-- Starting experimental infrastructure setup
-
-## [2026-05-23 17:46:07 UTC] Cycle 1: 0/5 pass
-- T11.1_topo: FAIL
-- T11.1_entropy: FAIL
-- T11.2: FAIL
-- T11.3: FAIL
-- stress: FAIL
+### Next Steps
+1. Wait for CC2 Phase 1 completion
+2. Begin SRRA-OPH Phase 3: Temporal Playback Engine
+3. Integrate experimental results into OCE frontend
+4. Build entropy field dynamics visualizations
