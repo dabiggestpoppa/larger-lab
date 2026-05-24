@@ -1,10 +1,10 @@
 {
   "event_id": "entropy_002_44709e63",
-  "timestamp": "2026-05-24T12:35:38.085350+00:00",
+  "timestamp": "2026-05-24T12:50:26.717952+00:00",
   "chaos_type": "delayed_routing",
-  "target": "router_primary",
+  "target": "router_backup",
   "propagation_path": [
-    "router_primary",
+    "router_backup",
     "event_fabric",
     "observer_runtime"
   ],
@@ -15,29 +15,19 @@
   ],
   "reroute_events": [
     {
-      "from": "router_primary",
-      "to": "backup_router_primary",
-      "delay_ms": 305
-    },
-    {
-      "from": "router_primary",
-      "to": "backup_router_primary",
-      "delay_ms": 424
-    },
-    {
-      "from": "router_primary",
-      "to": "backup_router_primary",
-      "delay_ms": 209
+      "from": "router_backup",
+      "to": "backup_router_backup",
+      "delay_ms": 476
     }
   ],
   "entropy_spread_radius": 3,
-  "recovery_duration_seconds": 4.78,
+  "recovery_duration_seconds": 1.19,
   "affected_observers": [
     "srrs_opc.drift_detector.DriftType",
     "srrs_opc.drift_detector.DriftReport",
+    "srrs_opc.drift_detector.DriftDetector",
     "srrs_opc.operator_continuity.OperatorContinuityTracker",
-    "oce.backend.coevolution.alignment_tracking.AlignmentMeasurement",
-    "oce.backend.drift_detector.DriftReport"
+    "srrs_opc.topology_observer.TopologySnapshot"
   ],
   "recovered": true,
   "cascade": false

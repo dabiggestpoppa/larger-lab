@@ -24,7 +24,7 @@ MEMORY_DIR = WORKSPACE_ROOT / "memory"
 TEAM_CHAT = WORKSPACE_ROOT / "shared-conversations" / "team-chat.md"
 REPO_MEMORY = Path(__file__).parent.parent.parent / "memories" / "repo" / "workspace-state.md"
 
-SYNC_INTERVAL_SECONDS = 300  # 5 minutes
+SYNC_INTERVAL_SECONDS = 120  # 2 minutes — more frequent context updates
 PROGRESS_SYNC_THRESHOLD = 7  # updates before memory sync
 CHAT_SYNC_THRESHOLD = 5  # messages before agent memory sync
 SUMMARIZE_THRESHOLD = 20  # entries before LLM summarization
@@ -38,6 +38,14 @@ AGENTS = {
     "PM2": {"progress": "PM2-progress.md", "memory": "PM2-memory.md"},
     "RL": {"progress": "rl-progress.md", "memory": "rl-memory.md"},
     "Copilot": {"progress": "copilot-progress.md", "memory": "copilot-memory.md"},
+    "CC2": {"progress": "copilot-progress.md", "memory": "copilot-memory.md"},
+}
+
+# Shared workspace notes files (synced to all agents)
+SHARED_NOTES = {
+    "build_notes": "BUILD-NOTES.md",
+    "team_notes": "TEAM-NOTES.md",
+    "phase_status": "phase-11-status.md",
 }
 
 
@@ -176,6 +184,32 @@ class ProgressSyncAgent:
                 stale.append((agent, -1))  # Missing file
         return stale
 
+    def sync_shared_notes(self):
+        """Sync shared notes files to all agent memory files."""
+        for note_name, note_file in SHARED_NOTES.items():
+            note_path = PROGRESS_DIR / note_file
+            if not note_path.exists():
+                continue
+            note_hash = self._file_hash(note_path)
+            last_hash = self.last_progress_hashes.get(f"note_{note_name}", "")
+            if note_hash == last_hash:
+                continue
+            # Notes changed — inject into all agent memory files
+            note_content = note_path.read_text(encoding="utf-8", errors="replace")
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M UTC")
+            header = f"\n---\n## [{note_name.upper()}] Updated: {timestamp}\n"
+            snippet = header + note_content[:2000]  # First 2000 chars
+            if len(note_content) > 2000:
+                snippet += f"\n... (see {note_file} for full content)\n"
+            for agent, files in AGENTS.items():
+                mem_path = PROGRESS_DIR / files["memory"]
+                if mem_path.exists():
+                    existing = mem_path.read_text(encoding="utf-8", errors="replace")
+                    if header.strip() not in existing:
+                        mem_path.write_text(existing + snippet, encoding="utf-8")
+            self.last_progress_hashes[f"note_{note_name}"] = note_hash
+            print(f"  [NOTES] {note_name} -> all agent memory synced")
+
     def run_sync_cycle(self):
         """Run one sync cycle."""
         timestamp = datetime.now().strftime("%H:%M:%S")
@@ -186,7 +220,6 @@ class ProgressSyncAgent:
         if changes:
             for agent, info in changes.items():
                 print(f"  [CHANGE] {agent}: {info['entries']} entries")
-                # Sync to memory if threshold reached
                 if self.update_counts.get(agent, 0) >= PROGRESS_SYNC_THRESHOLD:
                     self.sync_agent_to_memory(agent)
                     self.update_counts[agent] = 0
@@ -196,14 +229,17 @@ class ProgressSyncAgent:
         if new_chat_lines > 0:
             print(f"  [CHAT] {new_chat_lines} new lines")
 
-        # 3. Check stale agents
+        # 3. Sync shared notes to all agent memory
+        self.sync_shared_notes()
+
+        # 4. Check stale agents
         stale = self.check_stale_agents()
         if stale:
             for agent, age in stale:
                 age_str = f"{age}h ago" if age >= 0 else "MISSING"
                 print(f"  [STALE] {agent}: {age_str}")
 
-        # 4. Save state
+        # 5. Save state
         self._save_state()
 
         return changes, stale

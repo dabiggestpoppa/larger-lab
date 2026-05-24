@@ -1,6 +1,6 @@
 {
   "event_id": "entropy_004_a90acb12",
-  "timestamp": "2026-05-24T12:35:38.085350+00:00",
+  "timestamp": "2026-05-24T12:50:26.718940+00:00",
   "chaos_type": "memory_disconnect",
   "target": "continuity_anchor",
   "propagation_path": [
@@ -18,23 +18,18 @@
     {
       "from": "continuity_anchor",
       "to": "backup_continuity_anchor",
-      "delay_ms": 225
-    },
-    {
-      "from": "continuity_anchor",
-      "to": "backup_continuity_anchor",
-      "delay_ms": 372
+      "delay_ms": 114
     }
   ],
   "entropy_spread_radius": 4,
-  "recovery_duration_seconds": 1.34,
+  "recovery_duration_seconds": 2.32,
   "affected_observers": [
-    "srrs_opc.drift_tracker.DriftSignal",
+    "srrs_opc.drift_detector.DriftType",
+    "srrs_opc.drift_detector.DriftReport",
+    "srrs_opc.drift_detector.DriftDetector",
     "srrs_opc.operator_continuity.OperatorContinuityTracker",
-    "srrs_opc.topology_observer.TopologySnapshot",
-    "srrs_opc.topology_observer.TopologyObserver",
-    "oce.backend.coevolution.alignment_tracking.AlignmentMeasurement"
+    "srrs_opc.topology_observer.TopologySnapshot"
   ],
-  "recovered": true,
-  "cascade": false
+  "recovered": false,
+  "cascade": true
 }
