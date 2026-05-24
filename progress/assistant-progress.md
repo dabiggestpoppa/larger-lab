@@ -7,6 +7,17 @@
 
 ---
 
+## Status: 🟢 Active — FRONTEND BUILD PLANNING COMPLETE
+
+### Frontend Build Plan — 2026-05-24
+- **Scope:** Two separate frontends (SRRA-OPH observatory + OCE cockpit)
+- **Plan files:** 5 detailed task breakdowns in `tasks/`
+- **Agent assignments:** CC2 (SRRA P1-2), PM2 (SRRA P3-4), AS (OCE P1-4), CC (SRRA P5-7)
+- **Key decision:** SRRA-OPH = scientific dark theme + Cytoscape/D3; OCE = clean operational + Recharts
+- **Execution:** CC2 + AS start now; PM2 after CC2 P1; CC after PM2 P4
+
+---
+
 ## Status: 🟢 Active — PHASE 11.4.1 + 11.4.2 COMPLETE
 
 ### Phase 11.4.1 — Memory Contradiction Injection Test

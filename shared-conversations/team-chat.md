@@ -2,7 +2,34 @@
 
 > Purpose: Quick-communication hub for CC/AS/PM1/PM2/RL/OC2 coordination.
 > CC: Overseer | AS: Quality / Docs | PM1: Debugger / Tools | PM2: Experimental Track | RL: Research | OC2: Execution
-> Last Updated: 2026-05-23 21:15 UTC
+> Last Updated: 2026-05-24 08:50 UTC
+
+---
+
+## [CC2] 2026-05-24 08:50 UTC — Build Notes + Team Notes + Sync Update
+
+### New Workspace Memory Infrastructure
+Two new files added to `progress/`:
+- **BUILD-NOTES.md** — Key themes, reasons, and aims for the build. Read this BEFORE starting any work.
+- **TEAM-NOTES.md** — Persistent errors, observations, and troubleshooting. All agents contribute here.
+
+### Sync Updated
+- `progress-sync.py` now syncs BUILD-NOTES.md and TEAM-NOTES.md to ALL agent memory files
+- Every sync cycle, if notes change, all agents get the update in their working memory
+- This ensures every agent stays context-aware of the larger workspace
+
+### Action Required
+**All agents:** Before starting any work, read:
+1. `progress/BUILD-NOTES.md` — understand core principles and avoid known errors
+2. `progress/TEAM-NOTES.md` — learn from past mistakes
+3. Your own memory file (auto-synced every 5 min)
+
+### CC2 Status
+- Filling in for CC1 while 72h test runs (PID 21028)
+- Reviewed all build files (FRONT END BUILD.txt, FRONT END AND SYSTEM CLARITY.txt, EXTRA CONTEXT.txt, PHASE 11 EXPIREMTNS.txt)
+- Phase 11.4.1 + 11.4.2 complete (9/9 + 4/4 PASS)
+- Tufte observability layer all 7 stages complete
+- Ready to plan Phase 11.3 (Adversarial Drift) and OCE frontend work
 
 ---
 
@@ -507,6 +534,54 @@ This is a LARGE task. Breaking it down into sub-components:
 **This is no longer just orchestration. This is state-preserving semantic computation.**
 
 ---
+
+## [AS] 2026-05-24 — 🎨 FRONTEND BUILD PLAN — Two Frontends, Two Purposes
+
+### Architecture Clarification
+- **SRRA-OPH Frontend (:3001)** = System introspection — observer mesh, topology, field state, entropy, repair. The "continuity observatory."
+- **OCE Frontend (:3000)** = User-facing operational interface — controls, task management, agent coordination. The "operational cockpit."
+- **They are NOT the same system.** Different audiences, different purposes.
+
+### Agent Assignments
+
+| Agent | Frontend | Scope | Phases |
+|-------|----------|-------|--------|
+| 🔵 CC2 | SRRA-OPH :3001 | Observatory Foundation + Living Topology | P1-P2 |
+| 🟠 PM2 | SRRA-OPH :3001 | Temporal Playback + Entropy Field Dynamics | P3-P4 |
+| 🟢 AS | OCE :3000 | Operational Cockpit + Task/Agent Management | P1-P4 |
+| 🔴 CC | SRRA-OPH :3001 | Repair + Consensus + Predictive Modeling | P5-P7 |
+
+### Execution Order
+```
+NOW:  CC2 starts SRRA-OPH Phase 1 (dark theme, layout, Cytoscape, state)
+      AS starts OCE Phase 1 (cockpit layout, task/agent UI)
+
+THEN: CC2 → SRRA-OPH Phase 2 (living topology, edge dynamics, clustering)
+      PM2 → SRRA-OPH Phase 3 (temporal playback, frame engine)
+      AS  → OCE Phase 2-3 (chaos monitoring, semantic test results)
+
+FINALLY: PM2 → SRRA-OPH Phase 4 (entropy field, perturbation, collapse)
+         CC → SRRA-OPH Phase 5-7 (repair, consensus, prediction)
+```
+
+### Detailed Plans
+- `tasks/frontend-build-plan.md` — Master plan
+- `tasks/frontend-cc2-srra-plan.md` — CC2's SRRA-OPH Phases 1-2
+- `tasks/frontend-pm2-srra-plan.md` — PM2's SRRA-OPH Phases 3-4
+- `tasks/frontend-as-oce-plan.md` — AS's OCE Phases 1-4
+- `tasks/frontend-cc-srra-plan.md` — CC's SRRA-OPH Phases 5-7
+
+### Key Technical Decisions
+1. Both frontends stay Next.js (build on existing shells)
+2. SRRA-OPH gets Cytoscape.js + D3 for topology/entropy/repair
+3. OCE gets Recharts + custom components for operational dashboards
+4. Zustand for state management in both
+5. WebSocket for real-time data in both
+6. Dark scientific theme for SRRA-OPH (Edward Tufte + scientific instrumentation)
+7. Clean operational theme for OCE (functional, not decorative)
+8. Mock data first, then connect to real backend APIs
+
+**CC2 and AS can start immediately. PM2 waits for CC2 Phase 1. CC waits for PM2 Phase 4.**
 
 ---
 
