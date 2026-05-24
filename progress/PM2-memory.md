@@ -2,298 +2,49 @@
 
 > **Auto-synced** from `progress/PM2-progress.md` on every 7th update.
 > This is working memory — compact, current, task-focused.
-> Max ~2,000 chars. Prune old entries when full.
 
 ---
 
-## Current Context (2026-05-23 14:04 UTC)
+## Current Context (2026-05-24 16:00 UTC)
 
 ### Status
-🟢 Active — Phase 11 Experimental Track
+🟢 Active — Building SRRA-OPH backend API while CC2 works on frontend Phase 1-2
 
-### Active Phase
-**Phase 11 Test 1 — Structural Topology Baseline** 🟡 CONDITIONAL PASS
+### Completed
+- All Phase 11 experimental track tests (T11.1-T11.3, stress, Tufte)
+- Observability layer (11.2-3B, all 7 stages)
+- SRRA-OPH API server (FastAPI, 8 endpoints, demo data generation)
+- Topology drift test script
 
-### Key Results
-- 737 nodes extracted from srrs_opc/, oce/, tools/operator/
-- 9 real edges (inheritance/import), 0 cycles
-- 725 orphan nodes (expected — composition-based Python)
-- 76 fragility zones identified
-- Entropy trace: 6 simulated chaos events, 67% recovery rate
-- Report: `experiments/phase11/test1/reports/PHASE11_TEST1_REPORT.md`
+### Current Work
+- **SRRA-OPH API Server** (`srrs_opc/frontend/api_server.py`)
+  - FastAPI backend serving topology, events, temporal, entropy, repair data
+  - All endpoints tested and working
+  - Demo data generation on startup
+  - CORS enabled for localhost:3001
 
-### Next Priority
-1. T11.2 — Long-Horizon Continuity Persistence (72h-7d stability)
-2. T11.3 — Distributed Observer Consensus
+### Next Steps (Waiting for CC2 Phase 2)
+- Phase 3: Temporal Playback Engine (timeline controls, frame interpolation)
+- Phase 4: Entropy Field Dynamics (entropy visualization, field maps)
+- All integration into OCE frontend (React/TypeScript)
 
-### Rules
-- NEVER merge experimental into core until Phase 11+13 complete
-- Observation before modification — observe now, modify later
-- All experiments produce evidence: pass/fail with metrics
-- Stay out of PM1/CC/AS core track work
+### Key Rules (from BUILD-NOTES)
+1. ONE system — integrate into OCE, no standalone tools
+2. Runtime topology > static structure
+3. Singletons don't persist across processes — use disk
+4. Continuity > features — validate before building
+5. Test before updating progress
+6. Simplicity first
 
 ### Recent Activity
-- 2026-05-23: Built topology_snapshot.py, entropy_trace.py, generate_report.py
-- 2026-05-23: Ran baseline topology snapshot and entropy trace
-- 2026-05-23: Generated PHASE11_TEST1_REPORT.md
-- 2026-05-23: Committed `6d51a67d5`, `5f8225e6b`
+- 2026-05-24: Built API server, tested all endpoints
+- 2026-05-24: Fixed topology drift script path issue
+- 2026-05-24: Posted status to team chat
 
 ---
 
 ## Sync Metadata
-- **Last Sync:** 2026-05-23 14:04 UTC
+- **Last Sync:** 2026-05-24 16:00 UTC
 - **Progress File:** `progress/PM2-progress.md`
 - **Working Memory:** `progress/PM2-memory.md`
 - **Sync Threshold:** 7 updates
-
----
-## [BUILD_NOTES] Updated: 2026-05-24 08:47 UTC
-# Build Notes — Key Themes, Reason, and Aim
-
-> **Purpose:** Before any agent works, they read this file to understand the core principles, avoid known errors, and stay aligned.
-> **Updated by:** CC2 (filling in for CC1 during 72h test)
-> **Last Updated:** 2026-05-24
-
----
-
-## 1. CORE ARCHITECTURAL PRINCIPLE
-
-**Key Theme:** ONE system, not many.
-
-**Reason:** The project has a history of fragmenting into separate "systems" (SRRA, OPH, OCE, chaos engine, semantic tests, etc.) that don't communicate. The user explicitly corrected this: SRRA+OPH is the runtime substrate, OCE is the singular observational interface. Everything else is a capability layer, not a separate app.
-
-**Aim:** Every new component must answer: "Does this deepen the runtime substrate, or does it expose the substrate through OCE?" If neither, it shouldn't be built yet.
-
----
-
-## 2. OBSERVER ≠ GENERIC LLM
-
-**Key Theme:** The primary observer is a continuity abstraction layer, not an LLM.
-
-**Reason:** Earlier phases treated observers as generic agents. The corrected architecture distinguishes: the observer is a persistent, stateful, system-aware continuity interface. LLMs (OpenRouter models) are modular cognition sources that the observer orchestrates.
-
-**Aim:** When building observer-related code, ask: "Is this maintaining continuity state, or is this just calling an LLM?" The former is core. The latter is a tool.
-
----
-
-## 3. RUNTIME TOPOLOGY > STATIC STRUCTURE
-
-**Key Theme:** The real topology exists at runtime, not in inheritance structure.
-
-**Reason:** PM2's experiments proved that AST/import/class structures don't reveal operational reality. Runtime interaction is the actual graph.
-
-**Aim:** All topology work must capture runtime edges (who talks to whom, when, how often), not just static code structure.
-
----
-
-## 4. CONTINUITY > FEATURES
-
-**Key Theme:** This phase is operational validation, not feature development.
-
-**Reason:** The user explicitly stated: "No major abstractions. No large architectura
-... (see BUILD-NOTES.md for full content)
-
----
-## [TEAM_NOTES] Updated: 2026-05-24 08:47 UTC
-# Team Notes — Persistent Errors, Observations, and Troubleshooting
-
-> **Purpose:** Shared knowledge base for errors that persist or caused trouble during building. All agents contribute here.
-> **Format:** Date | Agent | Issue | Root Cause | Resolution
-
----
-
-## Chaos Test Crashes
-
-**2026-05-23 | OWL | Chaos test keeps crashing at higher amplification**
-- **Symptom:** Process exits with code 1 during full_chaos scenario at amp ~3.0x
-- **Root Cause:** Recovery timeout exceeded. At amp 3.0, event_flood duration = 360s, combined with router_failure (103s) and websocket_loss (90s) — too many concurrent long-running chaos events.
-- **Resolution:** Internal auto-restart with consecutive crash limit (5) added. Test completes 4/5 cycles.
-- **Lesson:** Recovery timeout must scale with number of concurrent injections, not just amplification.
-
-**2026-05-23 | OWL | Duplicate chaos test instances running simultaneously**
-- **Symptom:** Two chaos test processes writing to same trace log, causing interleaved entries
-- **Root Cause:** Auto-restart wrapper spawned new subprocess before old one fully cleaned up its daemon threads
-- **Resolution:** Kill all chaos-related processes before restarting. Use PID whitelist.
-- **Lesson:** Always check for existing processes before spawning new ones. Use `Get-Process | Where-Object { $_.CommandLine -like '*chaos*' }`.
-
-**2026-05-23 | OWL | Trace log FileNotFoundError**
-- **Symptom:** `log_trace` fails with FileNotFoundError for stability/chaos_20x_trace.log
-- **Root Cause:** Relative path `Path("stability/...")` depends on CWD. When CWD changes, the path breaks.
-- **Resolution:** Changed to absolute paths based on `Path(__file__).parent`. Also added `mkdir(parents=True, exist_ok=True)` before every write.
-- **Lesson:** Always use absolute paths based on script location, never relative paths for file I/O.
-
----
-
-## Singleton Data Persistence
-
-**2026-05-24 | OWL | Tufte renderers show empty data despite feeding data to singleton**
-- **Symptom:**
-... (see TEAM-NOTES.md for full content)
-
----
-## [PHASE_STATUS] Updated: 2026-05-24 08:47 UTC
-# Phase 11 — Overall Status (Tested & Verified)
-
-## Completed Tests
-
-| Test | Result | Details |
-|------|--------|---------|
-| 11.1-A 24h Observer Survival | ✅ PASS | 100% uptime, 10/10 observers |
-| 11.2 Chaos Engineering | ✅ 4/5 PASS | Max amp 3.0x, recovery 788s→1045s |
-| 11.4.1 Memory Contradiction | ✅ 9/9 PASS | 100% pass rate |
-| 11.4.2 False Repair Signal | ✅ 4/4 PASS | All false signals rejected |
-| 11.2-3B.7 Observability Stress | ✅ 5/5 PASS | All validation passed |
-| 11.3 Adversarial Drift | ✅ Complete | PM2 experiments done |
-| Tufte 11.2-3B.5 Renderers | ✅ 4/4 PASS | All rendering with real data |
-
-## Tufte Observability Layer (11.2-3B) — ALL COMPLETE
-
-| Stage | Status | Verified |
-|-------|--------|----------|
-| 11.2-3B.1 Observer Registry | ✅ | 8 observers, 10 edges |
-| 11.2-3B.2 Temporal Graph | ✅ | 15 continuity data points |
-| 11.2-3B.3 Event Schema | ✅ | 18 events captured |
-| 11.2-3B.4 Visualization Exporters | ✅ | 6 exporters built |
-| 11.2-3B.5 Tufte Renderers | ✅ | 4/4 renderers tested with real data |
-| 11.2-3B.6 Attractor Analysis | ✅ | Built |
-| 11.2-3B.7 Observability Stress | ✅ | 5/5 pass, 5/5 validation |
-
-## In Progress
-
-| Test | Status | Notes |
-|------|--------|-------|
-| 11.1-B 72h Continuity | 🔄 Running | PID 21028, ~53h remaining |
-| 11.5 Orchestration Stability | ⏳ Next | Recursive collapse prevention |
-
-## Key Metrics
-- Chaos: 4/5 cycles passed, max amp 3.0x
-- Semantic: 9/9 tests passed, 100% pass rate
-- Observability: 5/5 stress tests passed
-- Tufte: 4/4 renderers producing real visualizations
-- PM2 experiments: All complete
-
----
-## [BUILD_NOTES] Updated: 2026-05-24 10:15 UTC
-# Build Notes — Key Themes, Reason, and Aim
-
-> **Purpose:** Before any agent works, they read this file to understand the core principles, avoid known errors, and stay aligned.
-> **Updated by:** CC2 (filling in for CC1 during 72h test)
-> **Last Updated:** 2026-05-24
-
----
-
-## 1. CORE ARCHITECTURAL PRINCIPLE
-
-**Key Theme:** ONE system, not many.
-
-**Reason:** The project has a history of fragmenting into separate "systems" (SRRA, OPH, OCE, chaos engine, semantic tests, etc.) that don't communicate. The user explicitly corrected this: SRRA+OPH is the runtime substrate, OCE is the singular observational interface. Everything else is a capability layer, not a separate app.
-
-**Aim:** Every new component must answer: "Does this deepen the runtime substrate, or does it expose the substrate through OCE?" If neither, it shouldn't be built yet.
-
----
-
-## 2. OBSERVER ≠ GENERIC LLM
-
-**Key Theme:** The primary observer is a continuity abstraction layer, not an LLM.
-
-**Reason:** Earlier phases treated observers as generic agents. The corrected architecture distinguishes: the observer is a persistent, stateful, system-aware continuity interface. LLMs (OpenRouter models) are modular cognition sources that the observer orchestrates.
-
-**Aim:** When building observer-related code, ask: "Is this maintaining continuity state, or is this just calling an LLM?" The former is core. The latter is a tool.
-
----
-
-## 3. RUNTIME TOPOLOGY > STATIC STRUCTURE
-
-**Key Theme:** The real topology exists at runtime, not in inheritance structure.
-
-**Reason:** PM2's experiments proved that AST/import/class structures don't reveal operational reality. Runtime interaction is the actual graph.
-
-**Aim:** All topology work must capture runtime edges (who talks to whom, when, how often), not just static code structure.
-
----
-
-## 4. CONTINUITY > FEATURES
-
-**Key Theme:** This phase is operational validation, not feature development.
-
-**Reason:** The user explicitly stated: "No major abstractions. No large architectura
-... (see BUILD-NOTES.md for full content)
-
----
-## [TEAM_NOTES] Updated: 2026-05-24 10:15 UTC
-# Team Notes — Persistent Errors, Observations, and Troubleshooting
-
-> **Purpose:** Shared knowledge base for errors that persist or caused trouble during building. All agents contribute here.
-> **Format:** Date | Agent | Issue | Root Cause | Resolution
-
----
-
-## Chaos Test Crashes
-
-**2026-05-23 | OWL | Chaos test keeps crashing at higher amplification**
-- **Symptom:** Process exits with code 1 during full_chaos scenario at amp ~3.0x
-- **Root Cause:** Recovery timeout exceeded. At amp 3.0, event_flood duration = 360s, combined with router_failure (103s) and websocket_loss (90s) — too many concurrent long-running chaos events.
-- **Resolution:** Internal auto-restart with consecutive crash limit (5) added. Test completes 4/5 cycles.
-- **Lesson:** Recovery timeout must scale with number of concurrent injections, not just amplification.
-
-**2026-05-23 | OWL | Duplicate chaos test instances running simultaneously**
-- **Symptom:** Two chaos test processes writing to same trace log, causing interleaved entries
-- **Root Cause:** Auto-restart wrapper spawned new subprocess before old one fully cleaned up its daemon threads
-- **Resolution:** Kill all chaos-related processes before restarting. Use PID whitelist.
-- **Lesson:** Always check for existing processes before spawning new ones. Use `Get-Process | Where-Object { $_.CommandLine -like '*chaos*' }`.
-
-**2026-05-23 | OWL | Trace log FileNotFoundError**
-- **Symptom:** `log_trace` fails with FileNotFoundError for stability/chaos_20x_trace.log
-- **Root Cause:** Relative path `Path("stability/...")` depends on CWD. When CWD changes, the path breaks.
-- **Resolution:** Changed to absolute paths based on `Path(__file__).parent`. Also added `mkdir(parents=True, exist_ok=True)` before every write.
-- **Lesson:** Always use absolute paths based on script location, never relative paths for file I/O.
-
----
-
-## Singleton Data Persistence
-
-**2026-05-24 | OWL | Tufte renderers show empty data despite feeding data to singleton**
-- **Symptom:**
-... (see TEAM-NOTES.md for full content)
-
----
-## [PHASE_STATUS] Updated: 2026-05-24 10:15 UTC
-# Phase 11 — Overall Status (Tested & Verified)
-
-## Completed Tests
-
-| Test | Result | Details |
-|------|--------|---------|
-| 11.1-A 24h Observer Survival | ✅ PASS | 100% uptime, 10/10 observers |
-| 11.2 Chaos Engineering | ✅ 4/5 PASS | Max amp 3.0x, recovery 788s→1045s |
-| 11.4.1 Memory Contradiction | ✅ 9/9 PASS | 100% pass rate |
-| 11.4.2 False Repair Signal | ✅ 4/4 PASS | All false signals rejected |
-| 11.2-3B.7 Observability Stress | ✅ 5/5 PASS | All validation passed |
-| 11.3 Adversarial Drift | ✅ Complete | PM2 experiments done |
-| Tufte 11.2-3B.5 Renderers | ✅ 4/4 PASS | All rendering with real data |
-
-## Tufte Observability Layer (11.2-3B) — ALL COMPLETE
-
-| Stage | Status | Verified |
-|-------|--------|----------|
-| 11.2-3B.1 Observer Registry | ✅ | 8 observers, 10 edges |
-| 11.2-3B.2 Temporal Graph | ✅ | 15 continuity data points |
-| 11.2-3B.3 Event Schema | ✅ | 18 events captured |
-| 11.2-3B.4 Visualization Exporters | ✅ | 6 exporters built |
-| 11.2-3B.5 Tufte Renderers | ✅ | 4/4 renderers tested with real data |
-| 11.2-3B.6 Attractor Analysis | ✅ | Built |
-| 11.2-3B.7 Observability Stress | ✅ | 5/5 pass, 5/5 validation |
-
-## In Progress
-
-| Test | Status | Notes |
-|------|--------|-------|
-| 11.1-B 72h Continuity | 🔄 Running | PID 21028, ~53h remaining |
-| 11.5 Orchestration Stability | ⏳ Next | Recursive collapse prevention |
-
-## Key Metrics
-- Chaos: 4/5 cycles passed, max amp 3.0x
-- Semantic: 9/9 tests passed, 100% pass rate
-- Observability: 5/5 stress tests passed
-- Tufte: 4/4 renderers producing real visualizations
-- PM2 experiments: All complete
