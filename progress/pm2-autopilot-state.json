@@ -1,13 +1,14 @@
 {
-  "cycle": 9,
-  "phase": "integration",
+  "cycle": 10,
+  "phase": "long_running",
   "completed_work": [
     "tufte_integration",
     "topology_drift",
     "new_exp_0",
     "tufte_integration",
     "topology_drift",
-    "new_exp_0"
+    "new_exp_0",
+    "tufte_integration"
   ],
   "verification_results": {
     "topology": true,
