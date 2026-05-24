@@ -1,0 +1,78 @@
+{
+  "label": "entropy_trace_20260524_012023",
+  "timestamp": "2026-05-24T01:20:23.824991+00:00",
+  "reroute_events": [
+    [
+      {
+        "from": "observer_delta",
+        "to": "backup_observer_delta",
+        "delay_ms": 146
+      },
+      {
+        "from": "observer_delta",
+        "to": "backup_observer_delta",
+        "delay_ms": 444
+      },
+      {
+        "from": "observer_delta",
+        "to": "backup_observer_delta",
+        "delay_ms": 224
+      }
+    ],
+    [
+      {
+        "from": "ws_primary",
+        "to": "backup_ws_primary",
+        "delay_ms": 65
+      }
+    ],
+    [
+      {
+        "from": "router_primary",
+        "to": "backup_router_primary",
+        "delay_ms": 214
+      }
+    ],
+    [
+      {
+        "from": "event_fabric",
+        "to": "backup_event_fabric",
+        "delay_ms": 290
+      },
+      {
+        "from": "event_fabric",
+        "to": "backup_event_fabric",
+        "delay_ms": 124
+      }
+    ],
+    [
+      {
+        "from": "continuity_anchor",
+        "to": "backup_continuity_anchor",
+        "delay_ms": 391
+      },
+      {
+        "from": "continuity_anchor",
+        "to": "backup_continuity_anchor",
+        "delay_ms": 311
+      },
+      {
+        "from": "continuity_anchor",
+        "to": "backup_continuity_anchor",
+        "delay_ms": 176
+      }
+    ],
+    [
+      {
+        "from": "repair_patch",
+        "to": "backup_repair_patch",
+        "delay_ms": 461
+      },
+      {
+        "from": "repair_patch",
+        "to": "backup_repair_patch",
+        "delay_ms": 86
+      }
+    ]
+  ]
+}

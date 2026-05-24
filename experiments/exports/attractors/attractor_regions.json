@@ -1,20 +1,20 @@
 {
   "version": "0.1.0",
   "phase": "11.2-3B.6",
-  "timestamp": "2026-05-24T01:19:05.336142+00:00",
+  "timestamp": "2026-05-24T01:20:24.077325+00:00",
   "total_attractors": 10,
   "attractors": [
     {
       "region_id": "attractor_000",
       "label": "zone_router_0",
-      "stability_score": 0.6495,
+      "stability_score": 0.6756,
       "return_probability": 0.09,
       "repair_density": 0.0,
       "observer_coherence": 0.0,
-      "routing_consistency": 0.8248,
-      "field_resonance": 0.6423,
+      "routing_consistency": 0.8378,
+      "field_resonance": 0.654,
       "visit_count": 9,
-      "avg_duration_seconds": 1.09,
+      "avg_duration_seconds": 2.32,
       "observer_signature": {
         "router_0": "active"
       },
@@ -23,14 +23,14 @@
     {
       "region_id": "attractor_001",
       "label": "zone_router_1",
-      "stability_score": 0.6702,
+      "stability_score": 0.6379,
       "return_probability": 0.08,
       "repair_density": 0.0,
       "observer_coherence": 0.0,
-      "routing_consistency": 0.8351,
-      "field_resonance": 0.6516,
+      "routing_consistency": 0.819,
+      "field_resonance": 0.6371,
       "visit_count": 8,
-      "avg_duration_seconds": 1.58,
+      "avg_duration_seconds": 2.5,
       "observer_signature": {
         "router_1": "active"
       },
@@ -39,14 +39,14 @@
     {
       "region_id": "attractor_002",
       "label": "zone_router_2",
-      "stability_score": 0.7218,
+      "stability_score": 0.6886,
       "return_probability": 0.08,
       "repair_density": 0.0,
       "observer_coherence": 0.0,
-      "routing_consistency": 0.8609,
-      "field_resonance": 0.6748,
+      "routing_consistency": 0.8443,
+      "field_resonance": 0.6599,
       "visit_count": 8,
-      "avg_duration_seconds": 2.49,
+      "avg_duration_seconds": 2.34,
       "observer_signature": {
         "router_2": "active"
       },
@@ -55,14 +55,14 @@
     {
       "region_id": "attractor_003",
       "label": "zone_observer_0",
-      "stability_score": 0.6868,
+      "stability_score": 0.7178,
       "return_probability": 0.06,
       "repair_density": 0.0,
       "observer_coherence": 0.0,
-      "routing_consistency": 0.8434,
-      "field_resonance": 0.6591,
+      "routing_consistency": 0.8589,
+      "field_resonance": 0.673,
       "visit_count": 6,
-      "avg_duration_seconds": 0.7,
+      "avg_duration_seconds": 1.31,
       "observer_signature": {
         "observer_0": "active"
       },
@@ -71,14 +71,14 @@
     {
       "region_id": "attractor_004",
       "label": "zone_observer_1",
-      "stability_score": 0.7722,
+      "stability_score": 0.6938,
       "return_probability": 0.05,
       "repair_density": 0.0,
       "observer_coherence": 0.0,
-      "routing_consistency": 0.8861,
-      "field_resonance": 0.6975,
+      "routing_consistency": 0.8469,
+      "field_resonance": 0.6622,
       "visit_count": 5,
-      "avg_duration_seconds": 0.86,
+      "avg_duration_seconds": 1.41,
       "observer_signature": {
         "observer_1": "active"
       },
@@ -87,14 +87,14 @@
     {
       "region_id": "attractor_005",
       "label": "zone_observer_2",
-      "stability_score": 0.6969,
+      "stability_score": 0.7037,
       "return_probability": 0.05,
       "repair_density": 0.0,
       "observer_coherence": 0.0,
-      "routing_consistency": 0.8485,
-      "field_resonance": 0.6636,
+      "routing_consistency": 0.8519,
+      "field_resonance": 0.6667,
       "visit_count": 5,
-      "avg_duration_seconds": 0.22,
+      "avg_duration_seconds": 0.63,
       "observer_signature": {
         "observer_2": "active"
       },
@@ -103,14 +103,14 @@
     {
       "region_id": "attractor_006",
       "label": "zone_observer_3",
-      "stability_score": 0.7731,
+      "stability_score": 0.7125,
       "return_probability": 0.05,
       "repair_density": 0.0,
       "observer_coherence": 0.0,
-      "routing_consistency": 0.8865,
-      "field_resonance": 0.6979,
+      "routing_consistency": 0.8563,
+      "field_resonance": 0.6706,
       "visit_count": 5,
-      "avg_duration_seconds": 0.69,
+      "avg_duration_seconds": 0.72,
       "observer_signature": {
         "observer_3": "active"
       },
@@ -119,14 +119,14 @@
     {
       "region_id": "attractor_007",
       "label": "zone_observer_4",
-      "stability_score": 0.7025,
+      "stability_score": 0.7088,
       "return_probability": 0.05,
       "repair_density": 0.0,
       "observer_coherence": 0.0,
-      "routing_consistency": 0.8513,
-      "field_resonance": 0.6661,
+      "routing_consistency": 0.8544,
+      "field_resonance": 0.6689,
       "visit_count": 5,
-      "avg_duration_seconds": 0.99,
+      "avg_duration_seconds": 0.94,
       "observer_signature": {
         "observer_4": "active"
       },
@@ -135,14 +135,14 @@
     {
       "region_id": "attractor_008",
       "label": "zone_observer_5",
-      "stability_score": 0.7664,
+      "stability_score": 0.7756,
       "return_probability": 0.05,
       "repair_density": 0.0,
       "observer_coherence": 0.0,
-      "routing_consistency": 0.8832,
-      "field_resonance": 0.6949,
+      "routing_consistency": 0.8878,
+      "field_resonance": 0.699,
       "visit_count": 5,
-      "avg_duration_seconds": 0.58,
+      "avg_duration_seconds": 0.36,
       "observer_signature": {
         "observer_5": "active"
       },
@@ -151,14 +151,14 @@
     {
       "region_id": "attractor_009",
       "label": "zone_observer_6",
-      "stability_score": 0.7618,
+      "stability_score": 0.7259,
       "return_probability": 0.05,
       "repair_density": 0.0,
       "observer_coherence": 0.0,
-      "routing_consistency": 0.8809,
-      "field_resonance": 0.6928,
+      "routing_consistency": 0.863,
+      "field_resonance": 0.6767,
       "visit_count": 5,
-      "avg_duration_seconds": 0.48,
+      "avg_duration_seconds": 1.0,
       "observer_signature": {
         "observer_6": "active"
       },

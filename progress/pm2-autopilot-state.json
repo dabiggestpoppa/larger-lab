@@ -1,0 +1,13 @@
+{
+  "cycle": 1,
+  "tests_run": [
+    "cycle_1"
+  ],
+  "last_results": {
+    "topology": true,
+    "entropy_trace": true,
+    "stress": true,
+    "consensus": true,
+    "tufte": true
+  }
+}

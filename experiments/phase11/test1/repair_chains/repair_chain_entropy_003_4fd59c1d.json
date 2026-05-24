@@ -1,6 +1,6 @@
 {
   "event_id": "entropy_003_4fd59c1d",
-  "timestamp": "2026-05-24T00:59:16.379580+00:00",
+  "timestamp": "2026-05-24T01:20:23.824991+00:00",
   "chaos_type": "corrupted_event",
   "target": "event_fabric",
   "propagation_path": [
@@ -17,17 +17,22 @@
     {
       "from": "event_fabric",
       "to": "backup_event_fabric",
-      "delay_ms": 369
+      "delay_ms": 290
+    },
+    {
+      "from": "event_fabric",
+      "to": "backup_event_fabric",
+      "delay_ms": 124
     }
   ],
   "entropy_spread_radius": 3,
-  "recovery_duration_seconds": 4.06,
+  "recovery_duration_seconds": 3.1,
   "affected_observers": [
-    "srrs_opc.drift_detector.DriftDetector",
-    "srrs_opc.operator_continuity.OperatorContinuityTracker",
-    "oce.backend.coevolution.alignment_tracking.AlignmentMeasurement",
-    "oce.backend.coevolution.alignment_tracking.AlignmentTracker",
-    "oce.backend.drift_detector.DriftReport"
+    "srrs_opc.drift_detector.DriftType",
+    "srrs_opc.drift_detector.DriftReport",
+    "srrs_opc.drift_tracker.DriftSignal",
+    "srrs_opc.drift_tracker.LongTermDriftTracker",
+    "oce.backend.coevolution.alignment_tracking.AlignmentTracker"
   ],
   "recovered": true,
   "cascade": false
