@@ -1,0 +1,41 @@
+======================================================================
+REPAIR CASCADE TIMELINE
+Generated: 2026-05-23T20:50:35.188343
+Total events: 30
+======================================================================
+
+🔧 2026-05-24T00:50:35 | repair_trigger       | memory_0        →                 | Δentropy=+0.199
+✓ 2026-05-24T00:50:35 | field_perturbation   | entropy_1       →                 | Δentropy=-0.081
+🔧 2026-05-24T00:50:35 | repair_trigger       | entropy_2       →                 | Δentropy=+0.171
+✓ 2026-05-24T00:50:35 | memory_pull          | entropy_2       →                 | Δentropy=-0.059
+🔧 2026-05-24T00:50:35 | repair_trigger       | memory_1        →                 | Δentropy=-0.095
+⚡ 2026-05-24T00:50:35 | memory_pull          | repair_2        →                 | Δentropy=+0.288
+⚡ 2026-05-24T00:50:35 | memory_pull          | continuity_0    →                 | Δentropy=+0.123
+⚡ 2026-05-24T00:50:35 | field_perturbation   | continuity_0    →                 | Δentropy=+0.003
+✓ 2026-05-24T00:50:35 | field_perturbation   | memory_1        →                 | Δentropy=-0.178
+⚡ 2026-05-24T00:50:35 | field_perturbation   | entropy_0       →                 | Δentropy=+0.146
+⚡ 2026-05-24T00:50:35 | observer_sync        | continuity_2    →                 | Δentropy=+0.211
+⚡ 2026-05-24T00:50:35 | observer_sync        | continuity_0    →                 | Δentropy=+0.263
+⚡ 2026-05-24T00:50:35 | route_shift          | entropy_0       →                 | Δentropy=+0.099
+⚡ 2026-05-24T00:50:35 | route_shift          | routing_1       →                 | Δentropy=+0.042
+⚡ 2026-05-24T00:50:35 | memory_pull          | continuity_2    →                 | Δentropy=+0.138
+🔧 2026-05-24T00:50:35 | repair_trigger       | memory_0        →                 | Δentropy=+0.143
+🔧 2026-05-24T00:50:35 | repair_trigger       | repair_1        →                 | Δentropy=-0.041
+⚡ 2026-05-24T00:50:35 | route_shift          | structural_1    →                 | Δentropy=+0.213
+⚡ 2026-05-24T00:50:35 | observer_sync        | continuity_0    →                 | Δentropy=+0.147
+⚡ 2026-05-24T00:50:35 | observer_sync        | repair_1        →                 | Δentropy=+0.126
+⚡ 2026-05-24T00:50:35 | field_perturbation   | continuity_0    →                 | Δentropy=+0.159
+⚡ 2026-05-24T00:50:35 | field_perturbation   | continuity_0    →                 | Δentropy=+0.116
+⚡ 2026-05-24T00:50:35 | observer_sync        | continuity_2    →                 | Δentropy=+0.178
+✓ 2026-05-24T00:50:35 | observer_sync        | repair_1        →                 | Δentropy=-0.019
+✓ 2026-05-24T00:50:35 | memory_pull          | routing_1       →                 | Δentropy=-0.156
+⚡ 2026-05-24T00:50:35 | field_perturbation   | repair_0        →                 | Δentropy=+0.080
+⚡ 2026-05-24T00:50:35 | observer_sync        | routing_1       →                 | Δentropy=+0.289
+✓ 2026-05-24T00:50:35 | field_perturbation   | structural_1    →                 | Δentropy=-0.200
+⚡ 2026-05-24T00:50:35 | memory_pull          | routing_1       →                 | Δentropy=+0.057
+⚡ 2026-05-24T00:50:35 | field_perturbation   | memory_1        →                 | Δentropy=+0.050
+
+SUMMARY:
+  Perturbations: 22
+  Repair triggers: 5
+  Stabilizations: 8
