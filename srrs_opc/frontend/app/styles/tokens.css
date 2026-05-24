@@ -1,0 +1,113 @@
+/* SRRA-OPH Observatory Design Tokens */
+/* Tufte-inspired: high information density, minimal visual noise */
+
+:root {
+  /* Background layers */
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --bg-tertiary: #1a1a2e;
+  --bg-elevated: #22223a;
+
+  /* Border */
+  --border-subtle: #1e1e2e;
+  --border-default: #2a2a3e;
+  --border-accent: #3a3a5e;
+
+  /* Text */
+  --text-primary: #e5e7eb;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --text-dim: #4b5563;
+
+  /* Field states — Tufte palette (low saturation, high clarity) */
+  --field-stable: #059669;
+  --field-active: #22d3ee;
+  --field-sync: #10b981;
+  --field-warning: #d97706;
+  --field-danger: #dc2626;
+  --field-dormant: #4b5563;
+  --field-critical: #ffffff;
+
+  /* Observer states */
+  --observer-active: #22d3ee;
+  --observer-synced: #10b981;
+  --observer-isolated: #4b5563;
+  --observer-entropic: #dc2626;
+  --observer-repairing: #06b6d4;
+  --observer-dormant: #374151;
+  --observer-failed: #6b7280;
+
+  /* Edge types */
+  --edge-routing: #6366f1;
+  --edge-sync: #10b981;
+  --edge-repair: #06b6d4;
+  --edge-entropy: #dc2626;
+  --edge-memory: #8b5cf6;
+  --field-zone: #059669;
+
+  /* Spacing (compact, Tufte-inspired) */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 0.75rem;
+  --space-lg: 1rem;
+  --space-xl: 1.5rem;
+
+  /* Typography */
+  --font-mono: "IBM Plex Mono", "JetBrains Mono", monospace;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --text-xs: 0.6875rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.875rem;
+  --text-lg: 1rem;
+  --text-xl: 1.25rem;
+
+  /* Panel dimensions */
+  --left-rail-width: 240px;
+  --right-panel-width: 280px;
+  --bottom-timeline-height: 160px;
+  --top-bar-height: 48px;
+}
+
+/* Utility classes for observatory */
+.observatory-grid {
+  display: grid;
+  grid-template-columns: var(--left-rail-width) 1fr var(--right-panel-width);
+  grid-template-rows: var(--top-bar-height) 1fr var(--bottom-timeline-height);
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Scrollbar — minimal */
+.observatory-scroll::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.observatory-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.observatory-scroll::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 2px;
+}
+
+/* Node pulse animation */
+@keyframes node-pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+@keyframes repair-wave {
+  0% { stroke-dashoffset: 100; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes entropy-flicker {
+  0%, 100% { opacity: 0.7; }
+  25% { opacity: 0.9; }
+  50% { opacity: 0.5; }
+  75% { opacity: 0.85; }
+}
+
+.node-pulse { animation: node-pulse 2s ease-in-out infinite; }
+.repair-wave { animation: repair-wave 1.5s ease-out forwards; }
+.entropy-flicker { animation: entropy-flicker 0.5s ease-in-out infinite; }

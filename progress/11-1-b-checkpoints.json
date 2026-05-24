@@ -4,9 +4,9 @@
   "start_time": "2026-05-22T23:46:12.389206",
   "end_time": "",
   "duration_hours": 0.0,
-  "total_checkpoints": 5,
+  "total_checkpoints": 6,
   "passed_checkpoints": 1,
-  "failed_checkpoints": 4,
+  "failed_checkpoints": 5,
   "max_drift_score": 0.5,
   "final_uptime_percent": 0.0,
   "overall_pass": false,
@@ -117,68 +117,90 @@
       },
       "memory_usage_mb": 4.3,
       "status": "FAIL"
+    },
+    {
+      "checkpoint_id": "chk_1779637654",
+      "timestamp": "2026-05-24T11:47:34.090508",
+      "elapsed_hours": 24.45,
+      "identity_hash": "410ceb00ecddd8f2",
+      "trajectory_hash": "39f3fac2e855a402",
+      "goal_hash": "b4478a016b68a135",
+      "memory_hash": "0c7b3fa1706386bc",
+      "state_hash": "5908c08420b072dd",
+      "drift_score": 0.5,
+      "drift_details": {
+        "trajectory": "changed",
+        "memory": "changed"
+      },
+      "observer_health": {
+        "alive": 6,
+        "degraded": 3,
+        "dead": 1
+      },
+      "memory_usage_mb": 4.43,
+      "status": "FAIL"
     }
   ],
   "observers": {
     "observer_00": {
-      "status": "degraded",
-      "tasks_completed": 8286,
-      "errors": 38,
-      "uptime_seconds": 82850.62747597694
+      "status": "alive",
+      "tasks_completed": 9006,
+      "errors": 41,
+      "uptime_seconds": 90051.0519220829
     },
     "observer_01": {
       "status": "alive",
-      "tasks_completed": 8286,
-      "errors": 33,
-      "uptime_seconds": 82850.43055510521
+      "tasks_completed": 9006,
+      "errors": 39,
+      "uptime_seconds": 90050.81515526772
     },
     "observer_02": {
       "status": "alive",
-      "tasks_completed": 8286,
-      "errors": 30,
-      "uptime_seconds": 82850.43055510521
+      "tasks_completed": 9006,
+      "errors": 32,
+      "uptime_seconds": 90050.81515526772
     },
     "observer_03": {
-      "status": "alive",
-      "tasks_completed": 8286,
-      "errors": 40,
-      "uptime_seconds": 82850.45404911041
+      "status": "degraded",
+      "tasks_completed": 9006,
+      "errors": 45,
+      "uptime_seconds": 90050.85118985176
     },
     "observer_04": {
       "status": "alive",
-      "tasks_completed": 8286,
-      "errors": 38,
-      "uptime_seconds": 82850.62747597694
+      "tasks_completed": 9006,
+      "errors": 41,
+      "uptime_seconds": 90051.0519220829
     },
     "observer_05": {
       "status": "alive",
-      "tasks_completed": 8286,
-      "errors": 41,
-      "uptime_seconds": 82850.42700648308
+      "tasks_completed": 9006,
+      "errors": 43,
+      "uptime_seconds": 90050.81515526772
     },
     "observer_06": {
       "status": "alive",
-      "tasks_completed": 8286,
-      "errors": 51,
-      "uptime_seconds": 82850.42597675323
+      "tasks_completed": 9006,
+      "errors": 56,
+      "uptime_seconds": 90050.81515526772
     },
     "observer_07": {
       "status": "alive",
-      "tasks_completed": 8286,
-      "errors": 47,
-      "uptime_seconds": 82850.4571120739
+      "tasks_completed": 9006,
+      "errors": 52,
+      "uptime_seconds": 90050.85118985176
     },
     "observer_08": {
       "status": "alive",
-      "tasks_completed": 8286,
-      "errors": 41,
-      "uptime_seconds": 82850.62747597694
+      "tasks_completed": 9006,
+      "errors": 46,
+      "uptime_seconds": 90051.0519220829
     },
     "observer_09": {
       "status": "alive",
-      "tasks_completed": 8286,
-      "errors": 46,
-      "uptime_seconds": 82850.43055510521
+      "tasks_completed": 9006,
+      "errors": 52,
+      "uptime_seconds": 90050.81461000443
     }
   },
   "chaos_events": [
@@ -195,6 +217,14 @@
       "elapsed_hours": 12.433455221454302,
       "injected": true,
       "target": "observer_09",
+      "chaos_type": "micro_observer_kill",
+      "recovery_time": 30
+    },
+    {
+      "timestamp": "2026-05-24T11:47:34.043659",
+      "elapsed_hours": 24.449188506603242,
+      "injected": true,
+      "target": "observer_04",
       "chaos_type": "micro_observer_kill",
       "recovery_time": 30
     }

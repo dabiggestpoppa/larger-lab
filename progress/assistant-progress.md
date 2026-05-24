@@ -23,6 +23,14 @@
 - Agent plans: CC2 (SRRA P1-2), PM2 (SRRA P3-4), AS (OCE P1-4 ✅), CC (SRRA P5-7)
 - CC2 status: Planning complete, ready to start SRRA-OPH Phase 1
 
+### Phase 11.1-D + 11.1-E — COMPLETE (2026-05-24)
+- **11.1-D Restart Recovery:** ✅ PASS — 5/5 cycles, identity preserved, anchors intact
+- **11.1-E Recursive Stability:** ⚠️ PARTIAL — 3/6 scenarios pass
+  - High-branching patterns (branching^depth > 10,000) exceed call limits
+  - Observer coherence maintained in all scenarios
+  - Recommendation: Add memoization to recursive_field_nodes.py
+- **Files:** `tools/testing/phase11/test_11_1_d_restart_recovery.py`, `test_11_1_e_recursive_stability.py`
+
 ### Frontend Build Plan — 2026-05-24
 - **Scope:** Two separate frontends (SRRA-OPH observatory + OCE cockpit)
 - **Plan files:** 5 detailed task breakdowns in `tasks/`

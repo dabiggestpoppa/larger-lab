@@ -1,4691 +1,1287 @@
 {
   "version": "0.1.0",
   "phase": "11.2-3B.1",
-  "timestamp": "2026-05-24T12:33:34.167969+00:00",
+  "timestamp": "2026-05-24T15:51:01.776994+00:00",
   "observers": {
-    "stress_observer_0_15f22853": {
-      "observer_id": "stress_observer_0_15f22853",
-      "observer_type": "stress_observer_0",
-      "spawn_time": "2026-05-24T12:33:34.155078+00:00",
+    "structural_0": {
+      "observer_id": "structural_0",
+      "observer_type": "structural",
+      "spawn_time": "2026-05-24T15:51:01.774846+00:00",
       "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
+      "runtime_state": "active",
+      "entropy_score": 0.02519098719427292,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
       "metadata": {
-        "stress_test": "flood",
-        "index": 0
+        "zone": "zone_0"
       }
     },
-    "stress_observer_1_1f4d7ed7": {
-      "observer_id": "stress_observer_1_1f4d7ed7",
-      "observer_type": "stress_observer_1",
-      "spawn_time": "2026-05-24T12:33:34.155078+00:00",
+    "structural_1": {
+      "observer_id": "structural_1",
+      "observer_type": "structural",
+      "spawn_time": "2026-05-24T15:51:01.774846+00:00",
       "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
+      "runtime_state": "active",
+      "entropy_score": 0.11863264893568319,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
       "metadata": {
-        "stress_test": "flood",
-        "index": 1
+        "zone": "zone_0"
       }
     },
-    "stress_observer_2_5a0ab53f": {
-      "observer_id": "stress_observer_2_5a0ab53f",
-      "observer_type": "stress_observer_2",
-      "spawn_time": "2026-05-24T12:33:34.155078+00:00",
+    "structural_2": {
+      "observer_id": "structural_2",
+      "observer_type": "structural",
+      "spawn_time": "2026-05-24T15:51:01.774846+00:00",
       "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
+      "runtime_state": "active",
+      "entropy_score": 0.22639697533816106,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
       "metadata": {
-        "stress_test": "flood",
-        "index": 2
+        "zone": "zone_0"
       }
     },
-    "stress_observer_3_dfdadc6c": {
-      "observer_id": "stress_observer_3_dfdadc6c",
-      "observer_type": "stress_observer_3",
-      "spawn_time": "2026-05-24T12:33:34.155078+00:00",
+    "continuity_0": {
+      "observer_id": "continuity_0",
+      "observer_type": "continuity",
+      "spawn_time": "2026-05-24T15:51:01.774846+00:00",
       "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
+      "runtime_state": "active",
+      "entropy_score": 0.27856759768371453,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
       "metadata": {
-        "stress_test": "flood",
-        "index": 3
+        "zone": "zone_1"
       }
     },
-    "stress_observer_4_4aed4c39": {
-      "observer_id": "stress_observer_4_4aed4c39",
-      "observer_type": "stress_observer_4",
-      "spawn_time": "2026-05-24T12:33:34.155078+00:00",
+    "continuity_1": {
+      "observer_id": "continuity_1",
+      "observer_type": "continuity",
+      "spawn_time": "2026-05-24T15:51:01.774846+00:00",
       "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
+      "runtime_state": "active",
+      "entropy_score": 0.11237005636366805,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
       "metadata": {
-        "stress_test": "flood",
-        "index": 4
+        "zone": "zone_1"
       }
     },
-    "stress_observer_0_f8bc24ab": {
-      "observer_id": "stress_observer_0_f8bc24ab",
-      "observer_type": "stress_observer_0",
-      "spawn_time": "2026-05-24T12:33:34.155078+00:00",
+    "continuity_2": {
+      "observer_id": "continuity_2",
+      "observer_type": "continuity",
+      "spawn_time": "2026-05-24T15:51:01.774846+00:00",
       "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
+      "runtime_state": "active",
+      "entropy_score": 0.05749951239019713,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
       "metadata": {
-        "stress_test": "flood",
-        "index": 5
+        "zone": "zone_1"
       }
     },
-    "stress_observer_1_ef40515b": {
-      "observer_id": "stress_observer_1_ef40515b",
-      "observer_type": "stress_observer_1",
-      "spawn_time": "2026-05-24T12:33:34.155078+00:00",
+    "entropy_0": {
+      "observer_id": "entropy_0",
+      "observer_type": "entropy",
+      "spawn_time": "2026-05-24T15:51:01.774846+00:00",
       "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
+      "runtime_state": "degraded",
+      "entropy_score": 0.2178121152602639,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
       "metadata": {
-        "stress_test": "flood",
-        "index": 6
+        "zone": "zone_2"
       }
     },
-    "stress_observer_2_67192b09": {
-      "observer_id": "stress_observer_2_67192b09",
-      "observer_type": "stress_observer_2",
-      "spawn_time": "2026-05-24T12:33:34.155078+00:00",
+    "entropy_1": {
+      "observer_id": "entropy_1",
+      "observer_type": "entropy",
+      "spawn_time": "2026-05-24T15:51:01.774846+00:00",
       "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
+      "runtime_state": "degraded",
+      "entropy_score": 0.05375862424861076,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
       "metadata": {
-        "stress_test": "flood",
-        "index": 7
+        "zone": "zone_2"
       }
     },
-    "stress_observer_3_d1c285ba": {
-      "observer_id": "stress_observer_3_d1c285ba",
-      "observer_type": "stress_observer_3",
-      "spawn_time": "2026-05-24T12:33:34.155078+00:00",
+    "entropy_2": {
+      "observer_id": "entropy_2",
+      "observer_type": "entropy",
+      "spawn_time": "2026-05-24T15:51:01.774846+00:00",
       "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
+      "runtime_state": "degraded",
+      "entropy_score": 0.09547204277639178,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
       "metadata": {
-        "stress_test": "flood",
-        "index": 8
+        "zone": "zone_2"
       }
     },
-    "stress_observer_4_18c6efbe": {
-      "observer_id": "stress_observer_4_18c6efbe",
-      "observer_type": "stress_observer_4",
-      "spawn_time": "2026-05-24T12:33:34.155078+00:00",
+    "repair_0": {
+      "observer_id": "repair_0",
+      "observer_type": "repair",
+      "spawn_time": "2026-05-24T15:51:01.774846+00:00",
       "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
+      "runtime_state": "degraded",
+      "entropy_score": 0.13870144480110916,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
       "metadata": {
-        "stress_test": "flood",
-        "index": 9
+        "zone": "zone_3"
       }
     },
-    "stress_observer_0_3600e9bf": {
-      "observer_id": "stress_observer_0_3600e9bf",
-      "observer_type": "stress_observer_0",
-      "spawn_time": "2026-05-24T12:33:34.155078+00:00",
+    "repair_1": {
+      "observer_id": "repair_1",
+      "observer_type": "repair",
+      "spawn_time": "2026-05-24T15:51:01.774846+00:00",
       "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
+      "runtime_state": "degraded",
+      "entropy_score": 0.036179809132454575,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
       "metadata": {
-        "stress_test": "flood",
-        "index": 10
+        "zone": "zone_3"
       }
     },
-    "stress_observer_1_2e15bd47": {
-      "observer_id": "stress_observer_1_2e15bd47",
-      "observer_type": "stress_observer_1",
-      "spawn_time": "2026-05-24T12:33:34.155078+00:00",
+    "repair_2": {
+      "observer_id": "repair_2",
+      "observer_type": "repair",
+      "spawn_time": "2026-05-24T15:51:01.774846+00:00",
       "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
+      "runtime_state": "active",
+      "entropy_score": 0.18625839654021462,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
       "metadata": {
-        "stress_test": "flood",
-        "index": 11
+        "zone": "zone_3"
       }
     },
-    "stress_observer_2_9abe2e0c": {
-      "observer_id": "stress_observer_2_9abe2e0c",
-      "observer_type": "stress_observer_2",
-      "spawn_time": "2026-05-24T12:33:34.155078+00:00",
+    "routing_0": {
+      "observer_id": "routing_0",
+      "observer_type": "routing",
+      "spawn_time": "2026-05-24T15:51:01.774846+00:00",
       "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
+      "runtime_state": "active",
+      "entropy_score": 0.1433661041829317,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
       "metadata": {
-        "stress_test": "flood",
-        "index": 12
+        "zone": "zone_4"
       }
     },
-    "stress_observer_3_204bbd0d": {
-      "observer_id": "stress_observer_3_204bbd0d",
-      "observer_type": "stress_observer_3",
-      "spawn_time": "2026-05-24T12:33:34.155078+00:00",
+    "routing_1": {
+      "observer_id": "routing_1",
+      "observer_type": "routing",
+      "spawn_time": "2026-05-24T15:51:01.774846+00:00",
       "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
+      "runtime_state": "active",
+      "entropy_score": 0.27585841263646504,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
       "metadata": {
-        "stress_test": "flood",
-        "index": 13
+        "zone": "zone_4"
       }
     },
-    "stress_observer_4_8476de96": {
-      "observer_id": "stress_observer_4_8476de96",
-      "observer_type": "stress_observer_4",
-      "spawn_time": "2026-05-24T12:33:34.155078+00:00",
+    "routing_2": {
+      "observer_id": "routing_2",
+      "observer_type": "routing",
+      "spawn_time": "2026-05-24T15:51:01.774846+00:00",
       "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
+      "runtime_state": "active",
+      "entropy_score": 0.11594162311201887,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
       "metadata": {
-        "stress_test": "flood",
-        "index": 14
+        "zone": "zone_4"
       }
     },
-    "stress_observer_0_03801756": {
-      "observer_id": "stress_observer_0_03801756",
-      "observer_type": "stress_observer_0",
-      "spawn_time": "2026-05-24T12:33:34.155078+00:00",
+    "memory_0": {
+      "observer_id": "memory_0",
+      "observer_type": "memory",
+      "spawn_time": "2026-05-24T15:51:01.774846+00:00",
       "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
+      "runtime_state": "active",
+      "entropy_score": 0.01875008952194842,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
       "metadata": {
-        "stress_test": "flood",
-        "index": 15
+        "zone": "zone_5"
       }
     },
-    "stress_observer_1_0a884534": {
-      "observer_id": "stress_observer_1_0a884534",
-      "observer_type": "stress_observer_1",
-      "spawn_time": "2026-05-24T12:33:34.155078+00:00",
+    "memory_1": {
+      "observer_id": "memory_1",
+      "observer_type": "memory",
+      "spawn_time": "2026-05-24T15:51:01.774846+00:00",
       "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
+      "runtime_state": "active",
+      "entropy_score": 0.16503627139425375,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
       "metadata": {
-        "stress_test": "flood",
-        "index": 16
+        "zone": "zone_5"
       }
     },
-    "stress_observer_2_b90cea4a": {
-      "observer_id": "stress_observer_2_b90cea4a",
-      "observer_type": "stress_observer_2",
-      "spawn_time": "2026-05-24T12:33:34.155078+00:00",
+    "memory_2": {
+      "observer_id": "memory_2",
+      "observer_type": "memory",
+      "spawn_time": "2026-05-24T15:51:01.774846+00:00",
       "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
+      "runtime_state": "active",
+      "entropy_score": 0.11134509754268362,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
       "metadata": {
-        "stress_test": "flood",
-        "index": 17
-      }
-    },
-    "stress_observer_3_aebf160a": {
-      "observer_id": "stress_observer_3_aebf160a",
-      "observer_type": "stress_observer_3",
-      "spawn_time": "2026-05-24T12:33:34.155078+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 18
-      }
-    },
-    "stress_observer_4_3edfcba3": {
-      "observer_id": "stress_observer_4_3edfcba3",
-      "observer_type": "stress_observer_4",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 19
-      }
-    },
-    "stress_observer_0_f871577b": {
-      "observer_id": "stress_observer_0_f871577b",
-      "observer_type": "stress_observer_0",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 20
-      }
-    },
-    "stress_observer_1_6be3da0b": {
-      "observer_id": "stress_observer_1_6be3da0b",
-      "observer_type": "stress_observer_1",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 21
-      }
-    },
-    "stress_observer_2_6e8c81f8": {
-      "observer_id": "stress_observer_2_6e8c81f8",
-      "observer_type": "stress_observer_2",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 22
-      }
-    },
-    "stress_observer_3_8e88c3ae": {
-      "observer_id": "stress_observer_3_8e88c3ae",
-      "observer_type": "stress_observer_3",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 23
-      }
-    },
-    "stress_observer_4_06ef57b1": {
-      "observer_id": "stress_observer_4_06ef57b1",
-      "observer_type": "stress_observer_4",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 24
-      }
-    },
-    "stress_observer_0_c9389725": {
-      "observer_id": "stress_observer_0_c9389725",
-      "observer_type": "stress_observer_0",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 25
-      }
-    },
-    "stress_observer_1_18063664": {
-      "observer_id": "stress_observer_1_18063664",
-      "observer_type": "stress_observer_1",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 26
-      }
-    },
-    "stress_observer_2_e327b516": {
-      "observer_id": "stress_observer_2_e327b516",
-      "observer_type": "stress_observer_2",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 27
-      }
-    },
-    "stress_observer_3_0d356dfd": {
-      "observer_id": "stress_observer_3_0d356dfd",
-      "observer_type": "stress_observer_3",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 28
-      }
-    },
-    "stress_observer_4_5e480d95": {
-      "observer_id": "stress_observer_4_5e480d95",
-      "observer_type": "stress_observer_4",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 29
-      }
-    },
-    "stress_observer_0_223c0171": {
-      "observer_id": "stress_observer_0_223c0171",
-      "observer_type": "stress_observer_0",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 30
-      }
-    },
-    "stress_observer_1_9ff849ef": {
-      "observer_id": "stress_observer_1_9ff849ef",
-      "observer_type": "stress_observer_1",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 31
-      }
-    },
-    "stress_observer_2_89cffed5": {
-      "observer_id": "stress_observer_2_89cffed5",
-      "observer_type": "stress_observer_2",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 32
-      }
-    },
-    "stress_observer_3_27cdd797": {
-      "observer_id": "stress_observer_3_27cdd797",
-      "observer_type": "stress_observer_3",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 33
-      }
-    },
-    "stress_observer_4_a8c3a059": {
-      "observer_id": "stress_observer_4_a8c3a059",
-      "observer_type": "stress_observer_4",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 34
-      }
-    },
-    "stress_observer_0_c75a0fe0": {
-      "observer_id": "stress_observer_0_c75a0fe0",
-      "observer_type": "stress_observer_0",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 35
-      }
-    },
-    "stress_observer_1_7609e7b4": {
-      "observer_id": "stress_observer_1_7609e7b4",
-      "observer_type": "stress_observer_1",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 36
-      }
-    },
-    "stress_observer_2_1dc3136f": {
-      "observer_id": "stress_observer_2_1dc3136f",
-      "observer_type": "stress_observer_2",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 37
-      }
-    },
-    "stress_observer_3_e5fbb3e7": {
-      "observer_id": "stress_observer_3_e5fbb3e7",
-      "observer_type": "stress_observer_3",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 38
-      }
-    },
-    "stress_observer_4_9a1d18d6": {
-      "observer_id": "stress_observer_4_9a1d18d6",
-      "observer_type": "stress_observer_4",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 39
-      }
-    },
-    "stress_observer_0_e4a92c7d": {
-      "observer_id": "stress_observer_0_e4a92c7d",
-      "observer_type": "stress_observer_0",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 40
-      }
-    },
-    "stress_observer_1_213c8296": {
-      "observer_id": "stress_observer_1_213c8296",
-      "observer_type": "stress_observer_1",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 41
-      }
-    },
-    "stress_observer_2_6ce65fd1": {
-      "observer_id": "stress_observer_2_6ce65fd1",
-      "observer_type": "stress_observer_2",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 42
-      }
-    },
-    "stress_observer_3_9f8e0eb7": {
-      "observer_id": "stress_observer_3_9f8e0eb7",
-      "observer_type": "stress_observer_3",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 43
-      }
-    },
-    "stress_observer_4_4ecbc40d": {
-      "observer_id": "stress_observer_4_4ecbc40d",
-      "observer_type": "stress_observer_4",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 44
-      }
-    },
-    "stress_observer_0_adf6f62d": {
-      "observer_id": "stress_observer_0_adf6f62d",
-      "observer_type": "stress_observer_0",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 45
-      }
-    },
-    "stress_observer_1_f7606a01": {
-      "observer_id": "stress_observer_1_f7606a01",
-      "observer_type": "stress_observer_1",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 46
-      }
-    },
-    "stress_observer_2_7a5af7d1": {
-      "observer_id": "stress_observer_2_7a5af7d1",
-      "observer_type": "stress_observer_2",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 47
-      }
-    },
-    "stress_observer_3_d025b862": {
-      "observer_id": "stress_observer_3_d025b862",
-      "observer_type": "stress_observer_3",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 48
-      }
-    },
-    "stress_observer_4_999c9850": {
-      "observer_id": "stress_observer_4_999c9850",
-      "observer_type": "stress_observer_4",
-      "spawn_time": "2026-05-24T12:33:34.156079+00:00",
-      "shutdown_time": null,
-      "runtime_state": "spawning",
-      "entropy_score": 0.0,
-      "repair_state": "idle",
-      "tasks_completed": 0,
-      "errors": 0,
-      "metadata": {
-        "stress_test": "flood",
-        "index": 49
+        "zone": "zone_5"
       }
     }
   },
   "relationships": {
-    "stress_observer_0_15f22853::stress_observer_1_1f4d7ed7::message": {
-      "source_observer": "stress_observer_0_15f22853",
-      "target_observer": "stress_observer_1_1f4d7ed7",
-      "interaction_type": "message",
+    "structural_0::repair_2::memory": {
+      "source_observer": "structural_0",
+      "target_observer": "repair_2",
+      "interaction_type": "memory",
       "frequency": 1,
-      "latency_ms": 57.167838437551836,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156079+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_15f22853::stress_observer_2_5a0ab53f::message": {
-      "source_observer": "stress_observer_0_15f22853",
-      "target_observer": "stress_observer_2_5a0ab53f",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 74.29411521038817,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156079+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_15f22853::stress_observer_3_dfdadc6c::message": {
-      "source_observer": "stress_observer_0_15f22853",
-      "target_observer": "stress_observer_3_dfdadc6c",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 14.815136625689954,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156079+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_15f22853::stress_observer_4_4aed4c39::message": {
-      "source_observer": "stress_observer_0_15f22853",
-      "target_observer": "stress_observer_4_4aed4c39",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 17.429866103904217,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156079+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_1f4d7ed7::stress_observer_2_5a0ab53f::message": {
-      "source_observer": "stress_observer_1_1f4d7ed7",
-      "target_observer": "stress_observer_2_5a0ab53f",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 78.44820419855687,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156079+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_1f4d7ed7::stress_observer_3_dfdadc6c::message": {
-      "source_observer": "stress_observer_1_1f4d7ed7",
-      "target_observer": "stress_observer_3_dfdadc6c",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 3.4986221564374516,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156079+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_1f4d7ed7::stress_observer_4_4aed4c39::message": {
-      "source_observer": "stress_observer_1_1f4d7ed7",
-      "target_observer": "stress_observer_4_4aed4c39",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 66.03812252242894,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156079+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_1f4d7ed7::stress_observer_0_f8bc24ab::message": {
-      "source_observer": "stress_observer_1_1f4d7ed7",
-      "target_observer": "stress_observer_0_f8bc24ab",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 43.565362395477,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156079+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_5a0ab53f::stress_observer_3_dfdadc6c::message": {
-      "source_observer": "stress_observer_2_5a0ab53f",
-      "target_observer": "stress_observer_3_dfdadc6c",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 88.91579376296116,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156079+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_5a0ab53f::stress_observer_4_4aed4c39::message": {
-      "source_observer": "stress_observer_2_5a0ab53f",
-      "target_observer": "stress_observer_4_4aed4c39",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 10.247353342565077,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156079+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_5a0ab53f::stress_observer_0_f8bc24ab::message": {
-      "source_observer": "stress_observer_2_5a0ab53f",
-      "target_observer": "stress_observer_0_f8bc24ab",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 94.66742353369803,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156079+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_5a0ab53f::stress_observer_1_ef40515b::message": {
-      "source_observer": "stress_observer_2_5a0ab53f",
-      "target_observer": "stress_observer_1_ef40515b",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 31.937495247374887,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156079+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_dfdadc6c::stress_observer_4_4aed4c39::message": {
-      "source_observer": "stress_observer_3_dfdadc6c",
-      "target_observer": "stress_observer_4_4aed4c39",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 28.433873178758375,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156079+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_dfdadc6c::stress_observer_0_f8bc24ab::message": {
-      "source_observer": "stress_observer_3_dfdadc6c",
-      "target_observer": "stress_observer_0_f8bc24ab",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 26.6118993427919,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156079+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_dfdadc6c::stress_observer_1_ef40515b::message": {
-      "source_observer": "stress_observer_3_dfdadc6c",
-      "target_observer": "stress_observer_1_ef40515b",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 45.505001320766596,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156079+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_dfdadc6c::stress_observer_2_67192b09::message": {
-      "source_observer": "stress_observer_3_dfdadc6c",
-      "target_observer": "stress_observer_2_67192b09",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 33.28860425907224,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156079+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_4aed4c39::stress_observer_0_f8bc24ab::message": {
-      "source_observer": "stress_observer_4_4aed4c39",
-      "target_observer": "stress_observer_0_f8bc24ab",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 77.01075135351894,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156079+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_4aed4c39::stress_observer_1_ef40515b::message": {
-      "source_observer": "stress_observer_4_4aed4c39",
-      "target_observer": "stress_observer_1_ef40515b",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 49.74005988801485,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156079+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_4aed4c39::stress_observer_2_67192b09::message": {
-      "source_observer": "stress_observer_4_4aed4c39",
-      "target_observer": "stress_observer_2_67192b09",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 54.17229148973854,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156079+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_4aed4c39::stress_observer_3_d1c285ba::message": {
-      "source_observer": "stress_observer_4_4aed4c39",
-      "target_observer": "stress_observer_3_d1c285ba",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 16.588809607618643,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_f8bc24ab::stress_observer_1_ef40515b::message": {
-      "source_observer": "stress_observer_0_f8bc24ab",
-      "target_observer": "stress_observer_1_ef40515b",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 45.283430795219644,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_f8bc24ab::stress_observer_2_67192b09::message": {
-      "source_observer": "stress_observer_0_f8bc24ab",
-      "target_observer": "stress_observer_2_67192b09",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 89.34064663169862,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_f8bc24ab::stress_observer_3_d1c285ba::message": {
-      "source_observer": "stress_observer_0_f8bc24ab",
-      "target_observer": "stress_observer_3_d1c285ba",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 80.00210275593032,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_f8bc24ab::stress_observer_4_18c6efbe::message": {
-      "source_observer": "stress_observer_0_f8bc24ab",
-      "target_observer": "stress_observer_4_18c6efbe",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 73.6425522789858,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_ef40515b::stress_observer_2_67192b09::message": {
-      "source_observer": "stress_observer_1_ef40515b",
-      "target_observer": "stress_observer_2_67192b09",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 81.72201026325932,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_ef40515b::stress_observer_3_d1c285ba::message": {
-      "source_observer": "stress_observer_1_ef40515b",
-      "target_observer": "stress_observer_3_d1c285ba",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 4.659313322137844,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_ef40515b::stress_observer_4_18c6efbe::message": {
-      "source_observer": "stress_observer_1_ef40515b",
-      "target_observer": "stress_observer_4_18c6efbe",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 31.724984254275878,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_ef40515b::stress_observer_0_3600e9bf::message": {
-      "source_observer": "stress_observer_1_ef40515b",
-      "target_observer": "stress_observer_0_3600e9bf",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 33.26961031504016,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_67192b09::stress_observer_3_d1c285ba::message": {
-      "source_observer": "stress_observer_2_67192b09",
-      "target_observer": "stress_observer_3_d1c285ba",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 65.51022442888903,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_67192b09::stress_observer_4_18c6efbe::message": {
-      "source_observer": "stress_observer_2_67192b09",
-      "target_observer": "stress_observer_4_18c6efbe",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 31.743867293871336,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_67192b09::stress_observer_0_3600e9bf::message": {
-      "source_observer": "stress_observer_2_67192b09",
-      "target_observer": "stress_observer_0_3600e9bf",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 13.338508504462888,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_67192b09::stress_observer_1_2e15bd47::message": {
-      "source_observer": "stress_observer_2_67192b09",
-      "target_observer": "stress_observer_1_2e15bd47",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 87.22236035045002,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_d1c285ba::stress_observer_4_18c6efbe::message": {
-      "source_observer": "stress_observer_3_d1c285ba",
-      "target_observer": "stress_observer_4_18c6efbe",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 84.87328501729304,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_d1c285ba::stress_observer_0_3600e9bf::message": {
-      "source_observer": "stress_observer_3_d1c285ba",
-      "target_observer": "stress_observer_0_3600e9bf",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 98.23585070619994,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_d1c285ba::stress_observer_1_2e15bd47::message": {
-      "source_observer": "stress_observer_3_d1c285ba",
-      "target_observer": "stress_observer_1_2e15bd47",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 64.14855948926312,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_d1c285ba::stress_observer_2_9abe2e0c::message": {
-      "source_observer": "stress_observer_3_d1c285ba",
-      "target_observer": "stress_observer_2_9abe2e0c",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 57.434120551445,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_18c6efbe::stress_observer_0_3600e9bf::message": {
-      "source_observer": "stress_observer_4_18c6efbe",
-      "target_observer": "stress_observer_0_3600e9bf",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 93.15981929748281,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_18c6efbe::stress_observer_1_2e15bd47::message": {
-      "source_observer": "stress_observer_4_18c6efbe",
-      "target_observer": "stress_observer_1_2e15bd47",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 15.55338052205417,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_18c6efbe::stress_observer_2_9abe2e0c::message": {
-      "source_observer": "stress_observer_4_18c6efbe",
-      "target_observer": "stress_observer_2_9abe2e0c",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 1.715205879532673,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_18c6efbe::stress_observer_3_204bbd0d::message": {
-      "source_observer": "stress_observer_4_18c6efbe",
-      "target_observer": "stress_observer_3_204bbd0d",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 64.5271931043504,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_3600e9bf::stress_observer_1_2e15bd47::message": {
-      "source_observer": "stress_observer_0_3600e9bf",
-      "target_observer": "stress_observer_1_2e15bd47",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 82.03125715106631,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156621+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_3600e9bf::stress_observer_2_9abe2e0c::message": {
-      "source_observer": "stress_observer_0_3600e9bf",
-      "target_observer": "stress_observer_2_9abe2e0c",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 86.82317479096123,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_3600e9bf::stress_observer_3_204bbd0d::message": {
-      "source_observer": "stress_observer_0_3600e9bf",
-      "target_observer": "stress_observer_3_204bbd0d",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 15.536004573646274,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_3600e9bf::stress_observer_4_8476de96::message": {
-      "source_observer": "stress_observer_0_3600e9bf",
-      "target_observer": "stress_observer_4_8476de96",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 99.71877267959194,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_2e15bd47::stress_observer_2_9abe2e0c::message": {
-      "source_observer": "stress_observer_1_2e15bd47",
-      "target_observer": "stress_observer_2_9abe2e0c",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 18.184328727512735,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_2e15bd47::stress_observer_3_204bbd0d::message": {
-      "source_observer": "stress_observer_1_2e15bd47",
-      "target_observer": "stress_observer_3_204bbd0d",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 27.345946514949546,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_2e15bd47::stress_observer_4_8476de96::message": {
-      "source_observer": "stress_observer_1_2e15bd47",
-      "target_observer": "stress_observer_4_8476de96",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 87.03515172686629,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_2e15bd47::stress_observer_0_03801756::message": {
-      "source_observer": "stress_observer_1_2e15bd47",
-      "target_observer": "stress_observer_0_03801756",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 68.38270196020247,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_9abe2e0c::stress_observer_3_204bbd0d::message": {
-      "source_observer": "stress_observer_2_9abe2e0c",
-      "target_observer": "stress_observer_3_204bbd0d",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 91.2346213386269,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_9abe2e0c::stress_observer_4_8476de96::message": {
-      "source_observer": "stress_observer_2_9abe2e0c",
-      "target_observer": "stress_observer_4_8476de96",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 16.381778615657666,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_9abe2e0c::stress_observer_0_03801756::message": {
-      "source_observer": "stress_observer_2_9abe2e0c",
-      "target_observer": "stress_observer_0_03801756",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 20.923063723380906,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_9abe2e0c::stress_observer_1_0a884534::message": {
-      "source_observer": "stress_observer_2_9abe2e0c",
-      "target_observer": "stress_observer_1_0a884534",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 65.05563931511625,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_204bbd0d::stress_observer_4_8476de96::message": {
-      "source_observer": "stress_observer_3_204bbd0d",
-      "target_observer": "stress_observer_4_8476de96",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 77.21301162214048,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_204bbd0d::stress_observer_0_03801756::message": {
-      "source_observer": "stress_observer_3_204bbd0d",
-      "target_observer": "stress_observer_0_03801756",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 73.7754048267296,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_204bbd0d::stress_observer_1_0a884534::message": {
-      "source_observer": "stress_observer_3_204bbd0d",
-      "target_observer": "stress_observer_1_0a884534",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 1.4981380003991123,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_204bbd0d::stress_observer_2_b90cea4a::message": {
-      "source_observer": "stress_observer_3_204bbd0d",
-      "target_observer": "stress_observer_2_b90cea4a",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 69.8409175667886,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_8476de96::stress_observer_0_03801756::message": {
-      "source_observer": "stress_observer_4_8476de96",
-      "target_observer": "stress_observer_0_03801756",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 84.52442530242284,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_8476de96::stress_observer_1_0a884534::message": {
-      "source_observer": "stress_observer_4_8476de96",
-      "target_observer": "stress_observer_1_0a884534",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 67.92582186126788,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_8476de96::stress_observer_2_b90cea4a::message": {
-      "source_observer": "stress_observer_4_8476de96",
-      "target_observer": "stress_observer_2_b90cea4a",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 4.535982580563667,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_8476de96::stress_observer_3_aebf160a::message": {
-      "source_observer": "stress_observer_4_8476de96",
-      "target_observer": "stress_observer_3_aebf160a",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 18.942370553577284,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_03801756::stress_observer_1_0a884534::message": {
-      "source_observer": "stress_observer_0_03801756",
-      "target_observer": "stress_observer_1_0a884534",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 25.663891396707196,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_03801756::stress_observer_2_b90cea4a::message": {
-      "source_observer": "stress_observer_0_03801756",
-      "target_observer": "stress_observer_2_b90cea4a",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 24.224636274312083,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_03801756::stress_observer_3_aebf160a::message": {
-      "source_observer": "stress_observer_0_03801756",
-      "target_observer": "stress_observer_3_aebf160a",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 58.33305117313258,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_03801756::stress_observer_4_3edfcba3::message": {
-      "source_observer": "stress_observer_0_03801756",
-      "target_observer": "stress_observer_4_3edfcba3",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 81.88274740416418,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_0a884534::stress_observer_2_b90cea4a::message": {
-      "source_observer": "stress_observer_1_0a884534",
-      "target_observer": "stress_observer_2_b90cea4a",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 34.32313509604405,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_0a884534::stress_observer_3_aebf160a::message": {
-      "source_observer": "stress_observer_1_0a884534",
-      "target_observer": "stress_observer_3_aebf160a",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 16.496291947304993,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_0a884534::stress_observer_4_3edfcba3::message": {
-      "source_observer": "stress_observer_1_0a884534",
-      "target_observer": "stress_observer_4_3edfcba3",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 3.1750340316786594,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_0a884534::stress_observer_0_f871577b::message": {
-      "source_observer": "stress_observer_1_0a884534",
-      "target_observer": "stress_observer_0_f871577b",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 42.64303594883887,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_b90cea4a::stress_observer_3_aebf160a::message": {
-      "source_observer": "stress_observer_2_b90cea4a",
-      "target_observer": "stress_observer_3_aebf160a",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 97.56774302289038,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_b90cea4a::stress_observer_4_3edfcba3::message": {
-      "source_observer": "stress_observer_2_b90cea4a",
-      "target_observer": "stress_observer_4_3edfcba3",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 12.759137449919505,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_b90cea4a::stress_observer_0_f871577b::message": {
-      "source_observer": "stress_observer_2_b90cea4a",
-      "target_observer": "stress_observer_0_f871577b",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 38.5085655634981,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_b90cea4a::stress_observer_1_6be3da0b::message": {
-      "source_observer": "stress_observer_2_b90cea4a",
-      "target_observer": "stress_observer_1_6be3da0b",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 64.9968520590699,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_aebf160a::stress_observer_4_3edfcba3::message": {
-      "source_observer": "stress_observer_3_aebf160a",
-      "target_observer": "stress_observer_4_3edfcba3",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 32.47175540433561,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_aebf160a::stress_observer_0_f871577b::message": {
-      "source_observer": "stress_observer_3_aebf160a",
-      "target_observer": "stress_observer_0_f871577b",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 47.20526881268385,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_aebf160a::stress_observer_1_6be3da0b::message": {
-      "source_observer": "stress_observer_3_aebf160a",
-      "target_observer": "stress_observer_1_6be3da0b",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 11.491377112782798,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_aebf160a::stress_observer_2_6e8c81f8::message": {
-      "source_observer": "stress_observer_3_aebf160a",
-      "target_observer": "stress_observer_2_6e8c81f8",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 75.88090610037663,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_3edfcba3::stress_observer_0_f871577b::message": {
-      "source_observer": "stress_observer_4_3edfcba3",
-      "target_observer": "stress_observer_0_f871577b",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 61.75713438839197,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_3edfcba3::stress_observer_1_6be3da0b::message": {
-      "source_observer": "stress_observer_4_3edfcba3",
-      "target_observer": "stress_observer_1_6be3da0b",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 36.46865637322461,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_3edfcba3::stress_observer_2_6e8c81f8::message": {
-      "source_observer": "stress_observer_4_3edfcba3",
-      "target_observer": "stress_observer_2_6e8c81f8",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 70.72768132136575,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_3edfcba3::stress_observer_3_8e88c3ae::message": {
-      "source_observer": "stress_observer_4_3edfcba3",
-      "target_observer": "stress_observer_3_8e88c3ae",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 7.735283762047558,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_f871577b::stress_observer_1_6be3da0b::message": {
-      "source_observer": "stress_observer_0_f871577b",
-      "target_observer": "stress_observer_1_6be3da0b",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 56.86496328413574,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_f871577b::stress_observer_2_6e8c81f8::message": {
-      "source_observer": "stress_observer_0_f871577b",
-      "target_observer": "stress_observer_2_6e8c81f8",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 93.5319940660047,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_f871577b::stress_observer_3_8e88c3ae::message": {
-      "source_observer": "stress_observer_0_f871577b",
-      "target_observer": "stress_observer_3_8e88c3ae",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 23.429285192449186,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_f871577b::stress_observer_4_06ef57b1::message": {
-      "source_observer": "stress_observer_0_f871577b",
-      "target_observer": "stress_observer_4_06ef57b1",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 71.44599933617707,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_6be3da0b::stress_observer_2_6e8c81f8::message": {
-      "source_observer": "stress_observer_1_6be3da0b",
-      "target_observer": "stress_observer_2_6e8c81f8",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 31.07007944163749,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_6be3da0b::stress_observer_3_8e88c3ae::message": {
-      "source_observer": "stress_observer_1_6be3da0b",
-      "target_observer": "stress_observer_3_8e88c3ae",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 14.909893347501269,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_6be3da0b::stress_observer_4_06ef57b1::message": {
-      "source_observer": "stress_observer_1_6be3da0b",
-      "target_observer": "stress_observer_4_06ef57b1",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 8.536330888159632,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_6be3da0b::stress_observer_0_c9389725::message": {
-      "source_observer": "stress_observer_1_6be3da0b",
-      "target_observer": "stress_observer_0_c9389725",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 51.81507721283384,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_6e8c81f8::stress_observer_3_8e88c3ae::message": {
-      "source_observer": "stress_observer_2_6e8c81f8",
-      "target_observer": "stress_observer_3_8e88c3ae",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 68.07816741642787,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_6e8c81f8::stress_observer_4_06ef57b1::message": {
-      "source_observer": "stress_observer_2_6e8c81f8",
-      "target_observer": "stress_observer_4_06ef57b1",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 55.99505710847413,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_6e8c81f8::stress_observer_0_c9389725::message": {
-      "source_observer": "stress_observer_2_6e8c81f8",
-      "target_observer": "stress_observer_0_c9389725",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 11.623527000171626,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_6e8c81f8::stress_observer_1_18063664::message": {
-      "source_observer": "stress_observer_2_6e8c81f8",
-      "target_observer": "stress_observer_1_18063664",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 95.98562981184853,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_8e88c3ae::stress_observer_4_06ef57b1::message": {
-      "source_observer": "stress_observer_3_8e88c3ae",
-      "target_observer": "stress_observer_4_06ef57b1",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 45.134722051679766,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_8e88c3ae::stress_observer_0_c9389725::message": {
-      "source_observer": "stress_observer_3_8e88c3ae",
-      "target_observer": "stress_observer_0_c9389725",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 44.22050262339578,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_8e88c3ae::stress_observer_1_18063664::message": {
-      "source_observer": "stress_observer_3_8e88c3ae",
-      "target_observer": "stress_observer_1_18063664",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 2.9368315885146616,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_8e88c3ae::stress_observer_2_e327b516::message": {
-      "source_observer": "stress_observer_3_8e88c3ae",
-      "target_observer": "stress_observer_2_e327b516",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 77.01469188496218,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_06ef57b1::stress_observer_0_c9389725::message": {
-      "source_observer": "stress_observer_4_06ef57b1",
-      "target_observer": "stress_observer_0_c9389725",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 19.394265766143107,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_06ef57b1::stress_observer_1_18063664::message": {
-      "source_observer": "stress_observer_4_06ef57b1",
-      "target_observer": "stress_observer_1_18063664",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 44.02661079725444,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_06ef57b1::stress_observer_2_e327b516::message": {
-      "source_observer": "stress_observer_4_06ef57b1",
-      "target_observer": "stress_observer_2_e327b516",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 3.740162616056509,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_06ef57b1::stress_observer_3_0d356dfd::message": {
-      "source_observer": "stress_observer_4_06ef57b1",
-      "target_observer": "stress_observer_3_0d356dfd",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 63.085701053037205,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_c9389725::stress_observer_1_18063664::message": {
-      "source_observer": "stress_observer_0_c9389725",
-      "target_observer": "stress_observer_1_18063664",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 15.235125693059315,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_c9389725::stress_observer_2_e327b516::message": {
-      "source_observer": "stress_observer_0_c9389725",
-      "target_observer": "stress_observer_2_e327b516",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 25.031731011293054,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_c9389725::stress_observer_3_0d356dfd::message": {
-      "source_observer": "stress_observer_0_c9389725",
-      "target_observer": "stress_observer_3_0d356dfd",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 66.2562007360936,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_c9389725::stress_observer_4_5e480d95::message": {
-      "source_observer": "stress_observer_0_c9389725",
-      "target_observer": "stress_observer_4_5e480d95",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 72.3820220078877,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_18063664::stress_observer_2_e327b516::message": {
-      "source_observer": "stress_observer_1_18063664",
-      "target_observer": "stress_observer_2_e327b516",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 61.94985917279285,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_18063664::stress_observer_3_0d356dfd::message": {
-      "source_observer": "stress_observer_1_18063664",
-      "target_observer": "stress_observer_3_0d356dfd",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 81.39258378375295,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_18063664::stress_observer_4_5e480d95::message": {
-      "source_observer": "stress_observer_1_18063664",
-      "target_observer": "stress_observer_4_5e480d95",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 88.0901856032585,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_18063664::stress_observer_0_223c0171::message": {
-      "source_observer": "stress_observer_1_18063664",
-      "target_observer": "stress_observer_0_223c0171",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 73.94221664920845,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_e327b516::stress_observer_3_0d356dfd::message": {
-      "source_observer": "stress_observer_2_e327b516",
-      "target_observer": "stress_observer_3_0d356dfd",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 79.06539320210061,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_e327b516::stress_observer_4_5e480d95::message": {
-      "source_observer": "stress_observer_2_e327b516",
-      "target_observer": "stress_observer_4_5e480d95",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 24.359352285917595,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_e327b516::stress_observer_0_223c0171::message": {
-      "source_observer": "stress_observer_2_e327b516",
-      "target_observer": "stress_observer_0_223c0171",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 39.21330426945749,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.156953+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_e327b516::stress_observer_1_9ff849ef::message": {
-      "source_observer": "stress_observer_2_e327b516",
-      "target_observer": "stress_observer_1_9ff849ef",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 77.1427453094235,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_0d356dfd::stress_observer_4_5e480d95::message": {
-      "source_observer": "stress_observer_3_0d356dfd",
-      "target_observer": "stress_observer_4_5e480d95",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 38.14869164033162,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_0d356dfd::stress_observer_0_223c0171::message": {
-      "source_observer": "stress_observer_3_0d356dfd",
-      "target_observer": "stress_observer_0_223c0171",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 74.48759585963333,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_0d356dfd::stress_observer_1_9ff849ef::message": {
-      "source_observer": "stress_observer_3_0d356dfd",
-      "target_observer": "stress_observer_1_9ff849ef",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 76.74199752254533,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_0d356dfd::stress_observer_2_89cffed5::message": {
-      "source_observer": "stress_observer_3_0d356dfd",
-      "target_observer": "stress_observer_2_89cffed5",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 84.36580434992077,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_5e480d95::stress_observer_0_223c0171::message": {
-      "source_observer": "stress_observer_4_5e480d95",
-      "target_observer": "stress_observer_0_223c0171",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 22.040527730518203,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_5e480d95::stress_observer_1_9ff849ef::message": {
-      "source_observer": "stress_observer_4_5e480d95",
-      "target_observer": "stress_observer_1_9ff849ef",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 19.481451261518163,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_5e480d95::stress_observer_2_89cffed5::message": {
-      "source_observer": "stress_observer_4_5e480d95",
-      "target_observer": "stress_observer_2_89cffed5",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 27.14836733485384,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_5e480d95::stress_observer_3_27cdd797::message": {
-      "source_observer": "stress_observer_4_5e480d95",
-      "target_observer": "stress_observer_3_27cdd797",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 1.1976197290538482,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_223c0171::stress_observer_1_9ff849ef::message": {
-      "source_observer": "stress_observer_0_223c0171",
-      "target_observer": "stress_observer_1_9ff849ef",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 38.015312754917524,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_223c0171::stress_observer_2_89cffed5::message": {
-      "source_observer": "stress_observer_0_223c0171",
-      "target_observer": "stress_observer_2_89cffed5",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 67.28062545386477,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_223c0171::stress_observer_3_27cdd797::message": {
-      "source_observer": "stress_observer_0_223c0171",
-      "target_observer": "stress_observer_3_27cdd797",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 21.96482620307985,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_223c0171::stress_observer_4_a8c3a059::message": {
-      "source_observer": "stress_observer_0_223c0171",
-      "target_observer": "stress_observer_4_a8c3a059",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 16.131429507155467,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_9ff849ef::stress_observer_2_89cffed5::message": {
-      "source_observer": "stress_observer_1_9ff849ef",
-      "target_observer": "stress_observer_2_89cffed5",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 57.82246506787635,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_9ff849ef::stress_observer_3_27cdd797::message": {
-      "source_observer": "stress_observer_1_9ff849ef",
-      "target_observer": "stress_observer_3_27cdd797",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 8.209108144773456,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_9ff849ef::stress_observer_4_a8c3a059::message": {
-      "source_observer": "stress_observer_1_9ff849ef",
-      "target_observer": "stress_observer_4_a8c3a059",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 4.45990968848271,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_9ff849ef::stress_observer_0_c75a0fe0::message": {
-      "source_observer": "stress_observer_1_9ff849ef",
-      "target_observer": "stress_observer_0_c75a0fe0",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 38.781501466597874,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_89cffed5::stress_observer_3_27cdd797::message": {
-      "source_observer": "stress_observer_2_89cffed5",
-      "target_observer": "stress_observer_3_27cdd797",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 37.73073099963294,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_89cffed5::stress_observer_4_a8c3a059::message": {
-      "source_observer": "stress_observer_2_89cffed5",
-      "target_observer": "stress_observer_4_a8c3a059",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 51.638599388404614,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_89cffed5::stress_observer_0_c75a0fe0::message": {
-      "source_observer": "stress_observer_2_89cffed5",
-      "target_observer": "stress_observer_0_c75a0fe0",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 79.11913353563982,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_89cffed5::stress_observer_1_7609e7b4::message": {
-      "source_observer": "stress_observer_2_89cffed5",
-      "target_observer": "stress_observer_1_7609e7b4",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 23.555250469849877,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_27cdd797::stress_observer_4_a8c3a059::message": {
-      "source_observer": "stress_observer_3_27cdd797",
-      "target_observer": "stress_observer_4_a8c3a059",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 17.189897878609425,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_27cdd797::stress_observer_0_c75a0fe0::message": {
-      "source_observer": "stress_observer_3_27cdd797",
-      "target_observer": "stress_observer_0_c75a0fe0",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 55.064354740338516,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_27cdd797::stress_observer_1_7609e7b4::message": {
-      "source_observer": "stress_observer_3_27cdd797",
-      "target_observer": "stress_observer_1_7609e7b4",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 33.12814503244204,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_27cdd797::stress_observer_2_1dc3136f::message": {
-      "source_observer": "stress_observer_3_27cdd797",
-      "target_observer": "stress_observer_2_1dc3136f",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 56.97917813076828,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_a8c3a059::stress_observer_0_c75a0fe0::message": {
-      "source_observer": "stress_observer_4_a8c3a059",
-      "target_observer": "stress_observer_0_c75a0fe0",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 43.22828532739319,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_a8c3a059::stress_observer_1_7609e7b4::message": {
-      "source_observer": "stress_observer_4_a8c3a059",
-      "target_observer": "stress_observer_1_7609e7b4",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 93.8715898012304,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_a8c3a059::stress_observer_2_1dc3136f::message": {
-      "source_observer": "stress_observer_4_a8c3a059",
-      "target_observer": "stress_observer_2_1dc3136f",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 19.36024517693191,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_a8c3a059::stress_observer_3_e5fbb3e7::message": {
-      "source_observer": "stress_observer_4_a8c3a059",
-      "target_observer": "stress_observer_3_e5fbb3e7",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 19.187292454230125,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_c75a0fe0::stress_observer_1_7609e7b4::message": {
-      "source_observer": "stress_observer_0_c75a0fe0",
-      "target_observer": "stress_observer_1_7609e7b4",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 37.811679026753396,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_c75a0fe0::stress_observer_2_1dc3136f::message": {
-      "source_observer": "stress_observer_0_c75a0fe0",
-      "target_observer": "stress_observer_2_1dc3136f",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 35.156555717992894,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_c75a0fe0::stress_observer_3_e5fbb3e7::message": {
-      "source_observer": "stress_observer_0_c75a0fe0",
-      "target_observer": "stress_observer_3_e5fbb3e7",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 54.147000470785066,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_c75a0fe0::stress_observer_4_9a1d18d6::message": {
-      "source_observer": "stress_observer_0_c75a0fe0",
-      "target_observer": "stress_observer_4_9a1d18d6",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 23.673281149197066,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_7609e7b4::stress_observer_2_1dc3136f::message": {
-      "source_observer": "stress_observer_1_7609e7b4",
-      "target_observer": "stress_observer_2_1dc3136f",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 79.74889604713394,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_7609e7b4::stress_observer_3_e5fbb3e7::message": {
-      "source_observer": "stress_observer_1_7609e7b4",
-      "target_observer": "stress_observer_3_e5fbb3e7",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 20.939557322013503,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_7609e7b4::stress_observer_4_9a1d18d6::message": {
-      "source_observer": "stress_observer_1_7609e7b4",
-      "target_observer": "stress_observer_4_9a1d18d6",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 97.99391979838944,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_7609e7b4::stress_observer_0_e4a92c7d::message": {
-      "source_observer": "stress_observer_1_7609e7b4",
-      "target_observer": "stress_observer_0_e4a92c7d",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 92.09167658990752,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_1dc3136f::stress_observer_3_e5fbb3e7::message": {
-      "source_observer": "stress_observer_2_1dc3136f",
-      "target_observer": "stress_observer_3_e5fbb3e7",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 67.88105367726047,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_1dc3136f::stress_observer_4_9a1d18d6::message": {
-      "source_observer": "stress_observer_2_1dc3136f",
-      "target_observer": "stress_observer_4_9a1d18d6",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 21.327476143913096,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_1dc3136f::stress_observer_0_e4a92c7d::message": {
-      "source_observer": "stress_observer_2_1dc3136f",
-      "target_observer": "stress_observer_0_e4a92c7d",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 20.202550289255903,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_1dc3136f::stress_observer_1_213c8296::message": {
-      "source_observer": "stress_observer_2_1dc3136f",
-      "target_observer": "stress_observer_1_213c8296",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 10.765832756924327,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_e5fbb3e7::stress_observer_4_9a1d18d6::message": {
-      "source_observer": "stress_observer_3_e5fbb3e7",
-      "target_observer": "stress_observer_4_9a1d18d6",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 67.23657883797216,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_e5fbb3e7::stress_observer_0_e4a92c7d::message": {
-      "source_observer": "stress_observer_3_e5fbb3e7",
-      "target_observer": "stress_observer_0_e4a92c7d",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 21.237639437128152,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_e5fbb3e7::stress_observer_1_213c8296::message": {
-      "source_observer": "stress_observer_3_e5fbb3e7",
-      "target_observer": "stress_observer_1_213c8296",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 21.388619167493573,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_e5fbb3e7::stress_observer_2_6ce65fd1::message": {
-      "source_observer": "stress_observer_3_e5fbb3e7",
-      "target_observer": "stress_observer_2_6ce65fd1",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 3.440980013796445,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_9a1d18d6::stress_observer_0_e4a92c7d::message": {
-      "source_observer": "stress_observer_4_9a1d18d6",
-      "target_observer": "stress_observer_0_e4a92c7d",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 27.366096262057294,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_9a1d18d6::stress_observer_1_213c8296::message": {
-      "source_observer": "stress_observer_4_9a1d18d6",
-      "target_observer": "stress_observer_1_213c8296",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 76.50028348843534,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_9a1d18d6::stress_observer_2_6ce65fd1::message": {
-      "source_observer": "stress_observer_4_9a1d18d6",
-      "target_observer": "stress_observer_2_6ce65fd1",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 33.49303165384749,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_9a1d18d6::stress_observer_3_9f8e0eb7::message": {
-      "source_observer": "stress_observer_4_9a1d18d6",
-      "target_observer": "stress_observer_3_9f8e0eb7",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 62.03772714120327,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_e4a92c7d::stress_observer_1_213c8296::message": {
-      "source_observer": "stress_observer_0_e4a92c7d",
-      "target_observer": "stress_observer_1_213c8296",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 60.09865734660496,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_e4a92c7d::stress_observer_2_6ce65fd1::message": {
-      "source_observer": "stress_observer_0_e4a92c7d",
-      "target_observer": "stress_observer_2_6ce65fd1",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 35.86023208569546,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_e4a92c7d::stress_observer_3_9f8e0eb7::message": {
-      "source_observer": "stress_observer_0_e4a92c7d",
-      "target_observer": "stress_observer_3_9f8e0eb7",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 82.45013107480489,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_e4a92c7d::stress_observer_4_4ecbc40d::message": {
-      "source_observer": "stress_observer_0_e4a92c7d",
-      "target_observer": "stress_observer_4_4ecbc40d",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 4.92239189646502,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_213c8296::stress_observer_2_6ce65fd1::message": {
-      "source_observer": "stress_observer_1_213c8296",
-      "target_observer": "stress_observer_2_6ce65fd1",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 41.95837409825288,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_213c8296::stress_observer_3_9f8e0eb7::message": {
-      "source_observer": "stress_observer_1_213c8296",
-      "target_observer": "stress_observer_3_9f8e0eb7",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 86.63413079077581,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_213c8296::stress_observer_4_4ecbc40d::message": {
-      "source_observer": "stress_observer_1_213c8296",
-      "target_observer": "stress_observer_4_4ecbc40d",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 79.3123584954452,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_213c8296::stress_observer_0_adf6f62d::message": {
-      "source_observer": "stress_observer_1_213c8296",
-      "target_observer": "stress_observer_0_adf6f62d",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 53.03275234286051,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_6ce65fd1::stress_observer_3_9f8e0eb7::message": {
-      "source_observer": "stress_observer_2_6ce65fd1",
-      "target_observer": "stress_observer_3_9f8e0eb7",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 91.95344774471766,
+      "latency_ms": 134.81292446100178,
       "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_6ce65fd1::stress_observer_4_4ecbc40d::message": {
-      "source_observer": "stress_observer_2_6ce65fd1",
-      "target_observer": "stress_observer_4_4ecbc40d",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 11.668243089712522,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
       "metadata": {}
     },
-    "stress_observer_2_6ce65fd1::stress_observer_0_adf6f62d::message": {
-      "source_observer": "stress_observer_2_6ce65fd1",
-      "target_observer": "stress_observer_0_adf6f62d",
-      "interaction_type": "message",
+    "continuity_2::entropy_0::memory": {
+      "source_observer": "continuity_2",
+      "target_observer": "entropy_0",
+      "interaction_type": "memory",
       "frequency": 1,
-      "latency_ms": 17.680452909792855,
+      "latency_ms": 72.5014692185226,
       "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
       "metadata": {}
     },
-    "stress_observer_2_6ce65fd1::stress_observer_1_f7606a01::message": {
-      "source_observer": "stress_observer_2_6ce65fd1",
-      "target_observer": "stress_observer_1_f7606a01",
-      "interaction_type": "message",
+    "structural_0::memory_1::repair": {
+      "source_observer": "structural_0",
+      "target_observer": "memory_1",
+      "interaction_type": "repair",
       "frequency": 1,
-      "latency_ms": 97.97842052822541,
+      "latency_ms": 32.32406517373615,
       "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_9f8e0eb7::stress_observer_4_4ecbc40d::message": {
-      "source_observer": "stress_observer_3_9f8e0eb7",
-      "target_observer": "stress_observer_4_4ecbc40d",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 30.600521266338408,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
       "metadata": {}
     },
-    "stress_observer_3_9f8e0eb7::stress_observer_0_adf6f62d::message": {
-      "source_observer": "stress_observer_3_9f8e0eb7",
-      "target_observer": "stress_observer_0_adf6f62d",
-      "interaction_type": "message",
+    "memory_0::routing_2::memory": {
+      "source_observer": "memory_0",
+      "target_observer": "routing_2",
+      "interaction_type": "memory",
       "frequency": 1,
-      "latency_ms": 35.73363377059203,
+      "latency_ms": 129.09769628390447,
       "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_9f8e0eb7::stress_observer_1_f7606a01::message": {
-      "source_observer": "stress_observer_3_9f8e0eb7",
-      "target_observer": "stress_observer_1_f7606a01",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 5.634272033825162,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_3_9f8e0eb7::stress_observer_2_7a5af7d1::message": {
-      "source_observer": "stress_observer_3_9f8e0eb7",
-      "target_observer": "stress_observer_2_7a5af7d1",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 87.33644861516565,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
       "metadata": {}
     },
-    "stress_observer_4_4ecbc40d::stress_observer_0_adf6f62d::message": {
-      "source_observer": "stress_observer_4_4ecbc40d",
-      "target_observer": "stress_observer_0_adf6f62d",
-      "interaction_type": "message",
+    "entropy_1::structural_0::route": {
+      "source_observer": "entropy_1",
+      "target_observer": "structural_0",
+      "interaction_type": "route",
       "frequency": 1,
-      "latency_ms": 13.539812187612613,
+      "latency_ms": 195.77624172093613,
       "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
       "metadata": {}
     },
-    "stress_observer_4_4ecbc40d::stress_observer_1_f7606a01::message": {
-      "source_observer": "stress_observer_4_4ecbc40d",
-      "target_observer": "stress_observer_1_f7606a01",
-      "interaction_type": "message",
+    "memory_1::memory_2::chaos": {
+      "source_observer": "memory_1",
+      "target_observer": "memory_2",
+      "interaction_type": "chaos",
       "frequency": 1,
-      "latency_ms": 43.88029777290073,
+      "latency_ms": 13.820240080738014,
       "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
       "metadata": {}
     },
-    "stress_observer_4_4ecbc40d::stress_observer_2_7a5af7d1::message": {
-      "source_observer": "stress_observer_4_4ecbc40d",
-      "target_observer": "stress_observer_2_7a5af7d1",
-      "interaction_type": "message",
+    "repair_2::routing_1::repair": {
+      "source_observer": "repair_2",
+      "target_observer": "routing_1",
+      "interaction_type": "repair",
       "frequency": 1,
-      "latency_ms": 87.04034056150535,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_4_4ecbc40d::stress_observer_3_d025b862::message": {
-      "source_observer": "stress_observer_4_4ecbc40d",
-      "target_observer": "stress_observer_3_d025b862",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 63.30943081479796,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_adf6f62d::stress_observer_1_f7606a01::message": {
-      "source_observer": "stress_observer_0_adf6f62d",
-      "target_observer": "stress_observer_1_f7606a01",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 63.65530700036981,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_adf6f62d::stress_observer_2_7a5af7d1::message": {
-      "source_observer": "stress_observer_0_adf6f62d",
-      "target_observer": "stress_observer_2_7a5af7d1",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 81.94342196228432,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_adf6f62d::stress_observer_3_d025b862::message": {
-      "source_observer": "stress_observer_0_adf6f62d",
-      "target_observer": "stress_observer_3_d025b862",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 42.907121061189635,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_0_adf6f62d::stress_observer_4_999c9850::message": {
-      "source_observer": "stress_observer_0_adf6f62d",
-      "target_observer": "stress_observer_4_999c9850",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 30.729082053636088,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_f7606a01::stress_observer_2_7a5af7d1::message": {
-      "source_observer": "stress_observer_1_f7606a01",
-      "target_observer": "stress_observer_2_7a5af7d1",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 29.070340780805306,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_f7606a01::stress_observer_3_d025b862::message": {
-      "source_observer": "stress_observer_1_f7606a01",
-      "target_observer": "stress_observer_3_d025b862",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 50.4061012135351,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_1_f7606a01::stress_observer_4_999c9850::message": {
-      "source_observer": "stress_observer_1_f7606a01",
-      "target_observer": "stress_observer_4_999c9850",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 70.27441019692142,
+      "latency_ms": 157.24718306572387,
       "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
-      "metadata": {}
-    },
-    "stress_observer_2_7a5af7d1::stress_observer_3_d025b862::message": {
-      "source_observer": "stress_observer_2_7a5af7d1",
-      "target_observer": "stress_observer_3_d025b862",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 93.82932324657483,
-      "synchronization_state": "unknown",
-      "last_interaction": "2026-05-24T12:33:34.157970+00:00",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
       "metadata": {}
     },
-    "stress_observer_2_7a5af7d1::stress_observer_4_999c9850::message": {
-      "source_observer": "stress_observer_2_7a5af7d1",
-      "target_observer": "stress_observer_4_999c9850",
-      "interaction_type": "message",
+    "routing_2::continuity_0::memory": {
+      "source_observer": "routing_2",
+      "target_observer": "continuity_0",
+      "interaction_type": "memory",
       "frequency": 1,
-      "latency_ms": 68.6897116724663,
+      "latency_ms": 19.077963380799577,
       "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.158963+00:00",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
       "metadata": {}
     },
-    "stress_observer_3_d025b862::stress_observer_4_999c9850::message": {
-      "source_observer": "stress_observer_3_d025b862",
-      "target_observer": "stress_observer_4_999c9850",
-      "interaction_type": "message",
+    "repair_2::structural_1::memory": {
+      "source_observer": "repair_2",
+      "target_observer": "structural_1",
+      "interaction_type": "memory",
       "frequency": 1,
-      "latency_ms": 31.698371454540816,
+      "latency_ms": 167.03133811875472,
       "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.158963+00:00",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
       "metadata": {}
     },
-    "observer_0::observer_1::sync": {
-      "source_observer": "observer_0",
-      "target_observer": "observer_1",
+    "repair_1::structural_1::sync": {
+      "source_observer": "repair_1",
+      "target_observer": "structural_1",
       "interaction_type": "sync",
-      "frequency": 5,
-      "latency_ms": 1596.3993503651448,
+      "frequency": 1,
+      "latency_ms": 158.03664655300824,
       "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.161963+00:00",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
       "metadata": {}
     },
-    "observer_1::observer_2::sync": {
-      "source_observer": "observer_1",
-      "target_observer": "observer_2",
+    "memory_0::structural_0::sync": {
+      "source_observer": "memory_0",
+      "target_observer": "structural_0",
       "interaction_type": "sync",
-      "frequency": 5,
-      "latency_ms": 485.4278517102256,
+      "frequency": 2,
+      "latency_ms": 21.53837540976798,
       "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.161963+00:00",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
       "metadata": {}
     },
-    "observer_2::observer_3::sync": {
-      "source_observer": "observer_2",
-      "target_observer": "observer_3",
-      "interaction_type": "sync",
-      "frequency": 5,
-      "latency_ms": 1351.8368025132197,
+    "continuity_1::entropy_1::repair": {
+      "source_observer": "continuity_1",
+      "target_observer": "entropy_1",
+      "interaction_type": "repair",
+      "frequency": 1,
+      "latency_ms": 43.70614080899917,
       "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.161963+00:00",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
       "metadata": {}
     },
-    "observer_3::observer_4::sync": {
-      "source_observer": "observer_3",
-      "target_observer": "observer_4",
+    "routing_2::repair_2::memory": {
+      "source_observer": "routing_2",
+      "target_observer": "repair_2",
+      "interaction_type": "memory",
+      "frequency": 1,
+      "latency_ms": 52.01391306085695,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "entropy_2::routing_0::chaos": {
+      "source_observer": "entropy_2",
+      "target_observer": "routing_0",
+      "interaction_type": "chaos",
+      "frequency": 1,
+      "latency_ms": 45.87778762164384,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "entropy_2::structural_0::sync": {
+      "source_observer": "entropy_2",
+      "target_observer": "structural_0",
       "interaction_type": "sync",
-      "frequency": 5,
-      "latency_ms": 729.6971373983594,
+      "frequency": 1,
+      "latency_ms": 158.2817523509274,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "memory_0::routing_2::message": {
+      "source_observer": "memory_0",
+      "target_observer": "routing_2",
+      "interaction_type": "message",
+      "frequency": 1,
+      "latency_ms": 150.38310973678412,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "repair_0::structural_1::sync": {
+      "source_observer": "repair_0",
+      "target_observer": "structural_1",
+      "interaction_type": "sync",
+      "frequency": 1,
+      "latency_ms": 13.823959403038954,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "memory_1::memory_0::chaos": {
+      "source_observer": "memory_1",
+      "target_observer": "memory_0",
+      "interaction_type": "chaos",
+      "frequency": 1,
+      "latency_ms": 71.45427983555525,
       "synchronization_state": "desynced",
-      "last_interaction": "2026-05-24T12:33:34.161963+00:00",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
       "metadata": {}
     },
-    "observer_4::observer_5::sync": {
-      "source_observer": "observer_4",
-      "target_observer": "observer_5",
+    "routing_1::repair_0::sync": {
+      "source_observer": "routing_1",
+      "target_observer": "repair_0",
       "interaction_type": "sync",
-      "frequency": 5,
-      "latency_ms": 1038.3071504669979,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.161963+00:00",
+      "frequency": 1,
+      "latency_ms": 18.249051431196296,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
       "metadata": {}
     },
-    "observer_5::observer_6::sync": {
-      "source_observer": "observer_5",
-      "target_observer": "observer_6",
-      "interaction_type": "sync",
-      "frequency": 5,
-      "latency_ms": 1910.522223679568,
+    "repair_2::memory_1::memory": {
+      "source_observer": "repair_2",
+      "target_observer": "memory_1",
+      "interaction_type": "memory",
+      "frequency": 1,
+      "latency_ms": 75.5954632680955,
       "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.161963+00:00",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
       "metadata": {}
     },
-    "observer_6::observer_7::sync": {
-      "source_observer": "observer_6",
-      "target_observer": "observer_7",
-      "interaction_type": "sync",
-      "frequency": 5,
-      "latency_ms": 1095.8524248461833,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.161963+00:00",
+    "memory_0::repair_2::repair": {
+      "source_observer": "memory_0",
+      "target_observer": "repair_2",
+      "interaction_type": "repair",
+      "frequency": 1,
+      "latency_ms": 87.59618457790867,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
       "metadata": {}
     },
-    "observer_7::observer_0::sync": {
-      "source_observer": "observer_7",
-      "target_observer": "observer_0",
-      "interaction_type": "sync",
-      "frequency": 5,
-      "latency_ms": 1380.2449263457283,
+    "memory_0::repair_0::chaos": {
+      "source_observer": "memory_0",
+      "target_observer": "repair_0",
+      "interaction_type": "chaos",
+      "frequency": 1,
+      "latency_ms": 113.76923009602979,
       "synchronization_state": "synced",
-      "last_interaction": "2026-05-24T12:33:34.161963+00:00",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "structural_1::structural_0::memory": {
+      "source_observer": "structural_1",
+      "target_observer": "structural_0",
+      "interaction_type": "memory",
+      "frequency": 1,
+      "latency_ms": 86.92256230366934,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "memory_2::entropy_0::repair": {
+      "source_observer": "memory_2",
+      "target_observer": "entropy_0",
+      "interaction_type": "repair",
+      "frequency": 1,
+      "latency_ms": 93.35547189506802,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "entropy_0::continuity_1::repair": {
+      "source_observer": "entropy_0",
+      "target_observer": "continuity_1",
+      "interaction_type": "repair",
+      "frequency": 1,
+      "latency_ms": 197.62920813513833,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "routing_2::continuity_1::sync": {
+      "source_observer": "routing_2",
+      "target_observer": "continuity_1",
+      "interaction_type": "sync",
+      "frequency": 1,
+      "latency_ms": 137.24310360539837,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "memory_0::memory_1::sync": {
+      "source_observer": "memory_0",
+      "target_observer": "memory_1",
+      "interaction_type": "sync",
+      "frequency": 1,
+      "latency_ms": 126.4747679302713,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "structural_2::continuity_1::memory": {
+      "source_observer": "structural_2",
+      "target_observer": "continuity_1",
+      "interaction_type": "memory",
+      "frequency": 1,
+      "latency_ms": 198.13143495195513,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "memory_2::entropy_2::sync": {
+      "source_observer": "memory_2",
+      "target_observer": "entropy_2",
+      "interaction_type": "sync",
+      "frequency": 1,
+      "latency_ms": 160.672342433762,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "structural_0::structural_2::route": {
+      "source_observer": "structural_0",
+      "target_observer": "structural_2",
+      "interaction_type": "route",
+      "frequency": 1,
+      "latency_ms": 168.84835136872948,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "continuity_2::routing_1::memory": {
+      "source_observer": "continuity_2",
+      "target_observer": "routing_1",
+      "interaction_type": "memory",
+      "frequency": 1,
+      "latency_ms": 66.74758910557036,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "repair_0::repair_1::sync": {
+      "source_observer": "repair_0",
+      "target_observer": "repair_1",
+      "interaction_type": "sync",
+      "frequency": 1,
+      "latency_ms": 183.64901497127178,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "structural_2::memory_2::chaos": {
+      "source_observer": "structural_2",
+      "target_observer": "memory_2",
+      "interaction_type": "chaos",
+      "frequency": 1,
+      "latency_ms": 127.50576823438357,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "structural_2::structural_0::message": {
+      "source_observer": "structural_2",
+      "target_observer": "structural_0",
+      "interaction_type": "message",
+      "frequency": 1,
+      "latency_ms": 177.88865589857096,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "memory_0::entropy_1::message": {
+      "source_observer": "memory_0",
+      "target_observer": "entropy_1",
+      "interaction_type": "message",
+      "frequency": 1,
+      "latency_ms": 50.107130726146664,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "memory_1::continuity_1::memory": {
+      "source_observer": "memory_1",
+      "target_observer": "continuity_1",
+      "interaction_type": "memory",
+      "frequency": 1,
+      "latency_ms": 71.66297811784459,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "memory_2::continuity_0::message": {
+      "source_observer": "memory_2",
+      "target_observer": "continuity_0",
+      "interaction_type": "message",
+      "frequency": 1,
+      "latency_ms": 36.77335303942068,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "continuity_0::routing_1::repair": {
+      "source_observer": "continuity_0",
+      "target_observer": "routing_1",
+      "interaction_type": "repair",
+      "frequency": 1,
+      "latency_ms": 167.6207622100526,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "structural_2::structural_0::route": {
+      "source_observer": "structural_2",
+      "target_observer": "structural_0",
+      "interaction_type": "route",
+      "frequency": 1,
+      "latency_ms": 158.40408111613397,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "memory_0::repair_1::repair": {
+      "source_observer": "memory_0",
+      "target_observer": "repair_1",
+      "interaction_type": "repair",
+      "frequency": 1,
+      "latency_ms": 90.24321302679652,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "routing_0::repair_1::route": {
+      "source_observer": "routing_0",
+      "target_observer": "repair_1",
+      "interaction_type": "route",
+      "frequency": 1,
+      "latency_ms": 99.10162452818143,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "memory_1::repair_0::route": {
+      "source_observer": "memory_1",
+      "target_observer": "repair_0",
+      "interaction_type": "route",
+      "frequency": 1,
+      "latency_ms": 50.41069212915258,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "routing_2::routing_0::repair": {
+      "source_observer": "routing_2",
+      "target_observer": "routing_0",
+      "interaction_type": "repair",
+      "frequency": 1,
+      "latency_ms": 152.80137797532817,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "repair_1::memory_0::repair": {
+      "source_observer": "repair_1",
+      "target_observer": "memory_0",
+      "interaction_type": "repair",
+      "frequency": 1,
+      "latency_ms": 38.58470988930799,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "repair_1::continuity_0::repair": {
+      "source_observer": "repair_1",
+      "target_observer": "continuity_0",
+      "interaction_type": "repair",
+      "frequency": 1,
+      "latency_ms": 130.06405230414626,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "memory_0::continuity_1::memory": {
+      "source_observer": "memory_0",
+      "target_observer": "continuity_1",
+      "interaction_type": "memory",
+      "frequency": 1,
+      "latency_ms": 61.29266944107476,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "continuity_0::routing_1::route": {
+      "source_observer": "continuity_0",
+      "target_observer": "routing_1",
+      "interaction_type": "route",
+      "frequency": 1,
+      "latency_ms": 199.59602497571487,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "structural_2::routing_1::repair": {
+      "source_observer": "structural_2",
+      "target_observer": "routing_1",
+      "interaction_type": "repair",
+      "frequency": 1,
+      "latency_ms": 156.23884942273287,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
+      "metadata": {}
+    },
+    "continuity_0::repair_0::message": {
+      "source_observer": "continuity_0",
+      "target_observer": "repair_0",
+      "interaction_type": "message",
+      "frequency": 1,
+      "latency_ms": 164.35614372727468,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-24T15:51:01.776001+00:00",
       "metadata": {}
     }
   },
   "contexts": [],
   "graph": {
-    "timestamp": "2026-05-24T12:33:34.169962+00:00",
-    "total_observers": 50,
-    "total_interactions": 198,
+    "timestamp": "2026-05-24T15:51:01.777995+00:00",
+    "total_observers": 18,
+    "total_interactions": 49,
     "nodes": {
-      "stress_observer_0_15f22853": {
-        "type": "stress_observer_0",
-        "state": "spawning",
-        "entropy": 0.0,
+      "structural_0": {
+        "type": "structural",
+        "state": "active",
+        "entropy": 0.02519098719427292,
         "tasks": 0,
         "errors": 0
       },
-      "stress_observer_1_1f4d7ed7": {
-        "type": "stress_observer_1",
-        "state": "spawning",
-        "entropy": 0.0,
+      "structural_1": {
+        "type": "structural",
+        "state": "active",
+        "entropy": 0.11863264893568319,
         "tasks": 0,
         "errors": 0
       },
-      "stress_observer_2_5a0ab53f": {
-        "type": "stress_observer_2",
-        "state": "spawning",
-        "entropy": 0.0,
+      "structural_2": {
+        "type": "structural",
+        "state": "active",
+        "entropy": 0.22639697533816106,
         "tasks": 0,
         "errors": 0
       },
-      "stress_observer_3_dfdadc6c": {
-        "type": "stress_observer_3",
-        "state": "spawning",
-        "entropy": 0.0,
+      "continuity_0": {
+        "type": "continuity",
+        "state": "active",
+        "entropy": 0.27856759768371453,
         "tasks": 0,
         "errors": 0
       },
-      "stress_observer_4_4aed4c39": {
-        "type": "stress_observer_4",
-        "state": "spawning",
-        "entropy": 0.0,
+      "continuity_1": {
+        "type": "continuity",
+        "state": "active",
+        "entropy": 0.11237005636366805,
         "tasks": 0,
         "errors": 0
       },
-      "stress_observer_0_f8bc24ab": {
-        "type": "stress_observer_0",
-        "state": "spawning",
-        "entropy": 0.0,
+      "continuity_2": {
+        "type": "continuity",
+        "state": "active",
+        "entropy": 0.05749951239019713,
         "tasks": 0,
         "errors": 0
       },
-      "stress_observer_1_ef40515b": {
-        "type": "stress_observer_1",
-        "state": "spawning",
-        "entropy": 0.0,
+      "entropy_0": {
+        "type": "entropy",
+        "state": "degraded",
+        "entropy": 0.2178121152602639,
         "tasks": 0,
         "errors": 0
       },
-      "stress_observer_2_67192b09": {
-        "type": "stress_observer_2",
-        "state": "spawning",
-        "entropy": 0.0,
+      "entropy_1": {
+        "type": "entropy",
+        "state": "degraded",
+        "entropy": 0.05375862424861076,
         "tasks": 0,
         "errors": 0
       },
-      "stress_observer_3_d1c285ba": {
-        "type": "stress_observer_3",
-        "state": "spawning",
-        "entropy": 0.0,
+      "entropy_2": {
+        "type": "entropy",
+        "state": "degraded",
+        "entropy": 0.09547204277639178,
         "tasks": 0,
         "errors": 0
       },
-      "stress_observer_4_18c6efbe": {
-        "type": "stress_observer_4",
-        "state": "spawning",
-        "entropy": 0.0,
+      "repair_0": {
+        "type": "repair",
+        "state": "degraded",
+        "entropy": 0.13870144480110916,
         "tasks": 0,
         "errors": 0
       },
-      "stress_observer_0_3600e9bf": {
-        "type": "stress_observer_0",
-        "state": "spawning",
-        "entropy": 0.0,
+      "repair_1": {
+        "type": "repair",
+        "state": "degraded",
+        "entropy": 0.036179809132454575,
         "tasks": 0,
         "errors": 0
       },
-      "stress_observer_1_2e15bd47": {
-        "type": "stress_observer_1",
-        "state": "spawning",
-        "entropy": 0.0,
+      "repair_2": {
+        "type": "repair",
+        "state": "active",
+        "entropy": 0.18625839654021462,
         "tasks": 0,
         "errors": 0
       },
-      "stress_observer_2_9abe2e0c": {
-        "type": "stress_observer_2",
-        "state": "spawning",
-        "entropy": 0.0,
+      "routing_0": {
+        "type": "routing",
+        "state": "active",
+        "entropy": 0.1433661041829317,
         "tasks": 0,
         "errors": 0
       },
-      "stress_observer_3_204bbd0d": {
-        "type": "stress_observer_3",
-        "state": "spawning",
-        "entropy": 0.0,
+      "routing_1": {
+        "type": "routing",
+        "state": "active",
+        "entropy": 0.27585841263646504,
         "tasks": 0,
         "errors": 0
       },
-      "stress_observer_4_8476de96": {
-        "type": "stress_observer_4",
-        "state": "spawning",
-        "entropy": 0.0,
+      "routing_2": {
+        "type": "routing",
+        "state": "active",
+        "entropy": 0.11594162311201887,
         "tasks": 0,
         "errors": 0
       },
-      "stress_observer_0_03801756": {
-        "type": "stress_observer_0",
-        "state": "spawning",
-        "entropy": 0.0,
+      "memory_0": {
+        "type": "memory",
+        "state": "active",
+        "entropy": 0.01875008952194842,
         "tasks": 0,
         "errors": 0
       },
-      "stress_observer_1_0a884534": {
-        "type": "stress_observer_1",
-        "state": "spawning",
-        "entropy": 0.0,
+      "memory_1": {
+        "type": "memory",
+        "state": "active",
+        "entropy": 0.16503627139425375,
         "tasks": 0,
         "errors": 0
       },
-      "stress_observer_2_b90cea4a": {
-        "type": "stress_observer_2",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_3_aebf160a": {
-        "type": "stress_observer_3",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_4_3edfcba3": {
-        "type": "stress_observer_4",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_0_f871577b": {
-        "type": "stress_observer_0",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_1_6be3da0b": {
-        "type": "stress_observer_1",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_2_6e8c81f8": {
-        "type": "stress_observer_2",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_3_8e88c3ae": {
-        "type": "stress_observer_3",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_4_06ef57b1": {
-        "type": "stress_observer_4",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_0_c9389725": {
-        "type": "stress_observer_0",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_1_18063664": {
-        "type": "stress_observer_1",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_2_e327b516": {
-        "type": "stress_observer_2",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_3_0d356dfd": {
-        "type": "stress_observer_3",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_4_5e480d95": {
-        "type": "stress_observer_4",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_0_223c0171": {
-        "type": "stress_observer_0",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_1_9ff849ef": {
-        "type": "stress_observer_1",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_2_89cffed5": {
-        "type": "stress_observer_2",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_3_27cdd797": {
-        "type": "stress_observer_3",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_4_a8c3a059": {
-        "type": "stress_observer_4",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_0_c75a0fe0": {
-        "type": "stress_observer_0",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_1_7609e7b4": {
-        "type": "stress_observer_1",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_2_1dc3136f": {
-        "type": "stress_observer_2",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_3_e5fbb3e7": {
-        "type": "stress_observer_3",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_4_9a1d18d6": {
-        "type": "stress_observer_4",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_0_e4a92c7d": {
-        "type": "stress_observer_0",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_1_213c8296": {
-        "type": "stress_observer_1",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_2_6ce65fd1": {
-        "type": "stress_observer_2",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_3_9f8e0eb7": {
-        "type": "stress_observer_3",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_4_4ecbc40d": {
-        "type": "stress_observer_4",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_0_adf6f62d": {
-        "type": "stress_observer_0",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_1_f7606a01": {
-        "type": "stress_observer_1",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_2_7a5af7d1": {
-        "type": "stress_observer_2",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_3_d025b862": {
-        "type": "stress_observer_3",
-        "state": "spawning",
-        "entropy": 0.0,
-        "tasks": 0,
-        "errors": 0
-      },
-      "stress_observer_4_999c9850": {
-        "type": "stress_observer_4",
-        "state": "spawning",
-        "entropy": 0.0,
+      "memory_2": {
+        "type": "memory",
+        "state": "active",
+        "entropy": 0.11134509754268362,
         "tasks": 0,
         "errors": 0
       }
     },
     "edges": [
       {
-        "source": "stress_observer_0_15f22853",
-        "target": "stress_observer_1_1f4d7ed7",
-        "type": "message",
+        "source": "structural_0",
+        "target": "repair_2",
+        "type": "memory",
         "frequency": 1,
-        "latency_ms": 57.167838437551836,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_0_15f22853",
-        "target": "stress_observer_2_5a0ab53f",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 74.29411521038817,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_0_15f22853",
-        "target": "stress_observer_3_dfdadc6c",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 14.815136625689954,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_0_15f22853",
-        "target": "stress_observer_4_4aed4c39",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 17.429866103904217,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_1_1f4d7ed7",
-        "target": "stress_observer_2_5a0ab53f",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 78.44820419855687,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_1_1f4d7ed7",
-        "target": "stress_observer_3_dfdadc6c",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 3.4986221564374516,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_1_1f4d7ed7",
-        "target": "stress_observer_4_4aed4c39",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 66.03812252242894,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_1_1f4d7ed7",
-        "target": "stress_observer_0_f8bc24ab",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 43.565362395477,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_2_5a0ab53f",
-        "target": "stress_observer_3_dfdadc6c",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 88.91579376296116,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_2_5a0ab53f",
-        "target": "stress_observer_4_4aed4c39",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 10.247353342565077,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_2_5a0ab53f",
-        "target": "stress_observer_0_f8bc24ab",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 94.66742353369803,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_2_5a0ab53f",
-        "target": "stress_observer_1_ef40515b",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 31.937495247374887,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_3_dfdadc6c",
-        "target": "stress_observer_4_4aed4c39",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 28.433873178758375,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_3_dfdadc6c",
-        "target": "stress_observer_0_f8bc24ab",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 26.6118993427919,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_3_dfdadc6c",
-        "target": "stress_observer_1_ef40515b",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 45.505001320766596,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_3_dfdadc6c",
-        "target": "stress_observer_2_67192b09",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 33.28860425907224,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_4_4aed4c39",
-        "target": "stress_observer_0_f8bc24ab",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 77.01075135351894,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_4_4aed4c39",
-        "target": "stress_observer_1_ef40515b",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 49.74005988801485,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_4_4aed4c39",
-        "target": "stress_observer_2_67192b09",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 54.17229148973854,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_4_4aed4c39",
-        "target": "stress_observer_3_d1c285ba",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 16.588809607618643,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_0_f8bc24ab",
-        "target": "stress_observer_1_ef40515b",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 45.283430795219644,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_0_f8bc24ab",
-        "target": "stress_observer_2_67192b09",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 89.34064663169862,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_0_f8bc24ab",
-        "target": "stress_observer_3_d1c285ba",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 80.00210275593032,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_0_f8bc24ab",
-        "target": "stress_observer_4_18c6efbe",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 73.6425522789858,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_1_ef40515b",
-        "target": "stress_observer_2_67192b09",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 81.72201026325932,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_1_ef40515b",
-        "target": "stress_observer_3_d1c285ba",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 4.659313322137844,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_1_ef40515b",
-        "target": "stress_observer_4_18c6efbe",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 31.724984254275878,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_1_ef40515b",
-        "target": "stress_observer_0_3600e9bf",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 33.26961031504016,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_2_67192b09",
-        "target": "stress_observer_3_d1c285ba",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 65.51022442888903,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_2_67192b09",
-        "target": "stress_observer_4_18c6efbe",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 31.743867293871336,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_2_67192b09",
-        "target": "stress_observer_0_3600e9bf",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 13.338508504462888,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_2_67192b09",
-        "target": "stress_observer_1_2e15bd47",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 87.22236035045002,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_3_d1c285ba",
-        "target": "stress_observer_4_18c6efbe",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 84.87328501729304,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_3_d1c285ba",
-        "target": "stress_observer_0_3600e9bf",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 98.23585070619994,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_3_d1c285ba",
-        "target": "stress_observer_1_2e15bd47",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 64.14855948926312,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_3_d1c285ba",
-        "target": "stress_observer_2_9abe2e0c",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 57.434120551445,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_4_18c6efbe",
-        "target": "stress_observer_0_3600e9bf",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 93.15981929748281,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_4_18c6efbe",
-        "target": "stress_observer_1_2e15bd47",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 15.55338052205417,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_4_18c6efbe",
-        "target": "stress_observer_2_9abe2e0c",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 1.715205879532673,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_4_18c6efbe",
-        "target": "stress_observer_3_204bbd0d",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 64.5271931043504,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_0_3600e9bf",
-        "target": "stress_observer_1_2e15bd47",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 82.03125715106631,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_0_3600e9bf",
-        "target": "stress_observer_2_9abe2e0c",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 86.82317479096123,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_0_3600e9bf",
-        "target": "stress_observer_3_204bbd0d",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 15.536004573646274,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_0_3600e9bf",
-        "target": "stress_observer_4_8476de96",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 99.71877267959194,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_1_2e15bd47",
-        "target": "stress_observer_2_9abe2e0c",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 18.184328727512735,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_1_2e15bd47",
-        "target": "stress_observer_3_204bbd0d",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 27.345946514949546,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_1_2e15bd47",
-        "target": "stress_observer_4_8476de96",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 87.03515172686629,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_1_2e15bd47",
-        "target": "stress_observer_0_03801756",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 68.38270196020247,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_2_9abe2e0c",
-        "target": "stress_observer_3_204bbd0d",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 91.2346213386269,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_2_9abe2e0c",
-        "target": "stress_observer_4_8476de96",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 16.381778615657666,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_2_9abe2e0c",
-        "target": "stress_observer_0_03801756",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 20.923063723380906,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_2_9abe2e0c",
-        "target": "stress_observer_1_0a884534",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 65.05563931511625,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_3_204bbd0d",
-        "target": "stress_observer_4_8476de96",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 77.21301162214048,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_3_204bbd0d",
-        "target": "stress_observer_0_03801756",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 73.7754048267296,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_3_204bbd0d",
-        "target": "stress_observer_1_0a884534",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 1.4981380003991123,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_3_204bbd0d",
-        "target": "stress_observer_2_b90cea4a",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 69.8409175667886,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_4_8476de96",
-        "target": "stress_observer_0_03801756",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 84.52442530242284,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_4_8476de96",
-        "target": "stress_observer_1_0a884534",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 67.92582186126788,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_4_8476de96",
-        "target": "stress_observer_2_b90cea4a",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 4.535982580563667,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_4_8476de96",
-        "target": "stress_observer_3_aebf160a",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 18.942370553577284,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_0_03801756",
-        "target": "stress_observer_1_0a884534",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 25.663891396707196,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_0_03801756",
-        "target": "stress_observer_2_b90cea4a",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 24.224636274312083,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_0_03801756",
-        "target": "stress_observer_3_aebf160a",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 58.33305117313258,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_0_03801756",
-        "target": "stress_observer_4_3edfcba3",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 81.88274740416418,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_1_0a884534",
-        "target": "stress_observer_2_b90cea4a",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 34.32313509604405,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_1_0a884534",
-        "target": "stress_observer_3_aebf160a",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 16.496291947304993,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_1_0a884534",
-        "target": "stress_observer_4_3edfcba3",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 3.1750340316786594,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_1_0a884534",
-        "target": "stress_observer_0_f871577b",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 42.64303594883887,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_2_b90cea4a",
-        "target": "stress_observer_3_aebf160a",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 97.56774302289038,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_2_b90cea4a",
-        "target": "stress_observer_4_3edfcba3",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 12.759137449919505,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_2_b90cea4a",
-        "target": "stress_observer_0_f871577b",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 38.5085655634981,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_2_b90cea4a",
-        "target": "stress_observer_1_6be3da0b",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 64.9968520590699,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_3_aebf160a",
-        "target": "stress_observer_4_3edfcba3",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 32.47175540433561,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_3_aebf160a",
-        "target": "stress_observer_0_f871577b",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 47.20526881268385,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_3_aebf160a",
-        "target": "stress_observer_1_6be3da0b",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 11.491377112782798,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_3_aebf160a",
-        "target": "stress_observer_2_6e8c81f8",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 75.88090610037663,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_4_3edfcba3",
-        "target": "stress_observer_0_f871577b",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 61.75713438839197,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_4_3edfcba3",
-        "target": "stress_observer_1_6be3da0b",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 36.46865637322461,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_4_3edfcba3",
-        "target": "stress_observer_2_6e8c81f8",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 70.72768132136575,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_4_3edfcba3",
-        "target": "stress_observer_3_8e88c3ae",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 7.735283762047558,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_0_f871577b",
-        "target": "stress_observer_1_6be3da0b",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 56.86496328413574,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_0_f871577b",
-        "target": "stress_observer_2_6e8c81f8",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 93.5319940660047,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_0_f871577b",
-        "target": "stress_observer_3_8e88c3ae",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 23.429285192449186,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_0_f871577b",
-        "target": "stress_observer_4_06ef57b1",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 71.44599933617707,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_1_6be3da0b",
-        "target": "stress_observer_2_6e8c81f8",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 31.07007944163749,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_1_6be3da0b",
-        "target": "stress_observer_3_8e88c3ae",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 14.909893347501269,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_1_6be3da0b",
-        "target": "stress_observer_4_06ef57b1",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 8.536330888159632,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_1_6be3da0b",
-        "target": "stress_observer_0_c9389725",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 51.81507721283384,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_2_6e8c81f8",
-        "target": "stress_observer_3_8e88c3ae",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 68.07816741642787,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_2_6e8c81f8",
-        "target": "stress_observer_4_06ef57b1",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 55.99505710847413,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_2_6e8c81f8",
-        "target": "stress_observer_0_c9389725",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 11.623527000171626,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_2_6e8c81f8",
-        "target": "stress_observer_1_18063664",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 95.98562981184853,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_3_8e88c3ae",
-        "target": "stress_observer_4_06ef57b1",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 45.134722051679766,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_3_8e88c3ae",
-        "target": "stress_observer_0_c9389725",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 44.22050262339578,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_3_8e88c3ae",
-        "target": "stress_observer_1_18063664",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 2.9368315885146616,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_3_8e88c3ae",
-        "target": "stress_observer_2_e327b516",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 77.01469188496218,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_4_06ef57b1",
-        "target": "stress_observer_0_c9389725",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 19.394265766143107,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_4_06ef57b1",
-        "target": "stress_observer_1_18063664",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 44.02661079725444,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_4_06ef57b1",
-        "target": "stress_observer_2_e327b516",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 3.740162616056509,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_4_06ef57b1",
-        "target": "stress_observer_3_0d356dfd",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 63.085701053037205,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_0_c9389725",
-        "target": "stress_observer_1_18063664",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 15.235125693059315,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_0_c9389725",
-        "target": "stress_observer_2_e327b516",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 25.031731011293054,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_0_c9389725",
-        "target": "stress_observer_3_0d356dfd",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 66.2562007360936,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_0_c9389725",
-        "target": "stress_observer_4_5e480d95",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 72.3820220078877,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_1_18063664",
-        "target": "stress_observer_2_e327b516",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 61.94985917279285,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_1_18063664",
-        "target": "stress_observer_3_0d356dfd",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 81.39258378375295,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_1_18063664",
-        "target": "stress_observer_4_5e480d95",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 88.0901856032585,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_1_18063664",
-        "target": "stress_observer_0_223c0171",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 73.94221664920845,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_2_e327b516",
-        "target": "stress_observer_3_0d356dfd",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 79.06539320210061,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_2_e327b516",
-        "target": "stress_observer_4_5e480d95",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 24.359352285917595,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_2_e327b516",
-        "target": "stress_observer_0_223c0171",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 39.21330426945749,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_2_e327b516",
-        "target": "stress_observer_1_9ff849ef",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 77.1427453094235,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_3_0d356dfd",
-        "target": "stress_observer_4_5e480d95",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 38.14869164033162,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_3_0d356dfd",
-        "target": "stress_observer_0_223c0171",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 74.48759585963333,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_3_0d356dfd",
-        "target": "stress_observer_1_9ff849ef",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 76.74199752254533,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_3_0d356dfd",
-        "target": "stress_observer_2_89cffed5",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 84.36580434992077,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_4_5e480d95",
-        "target": "stress_observer_0_223c0171",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 22.040527730518203,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_4_5e480d95",
-        "target": "stress_observer_1_9ff849ef",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 19.481451261518163,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_4_5e480d95",
-        "target": "stress_observer_2_89cffed5",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 27.14836733485384,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_4_5e480d95",
-        "target": "stress_observer_3_27cdd797",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 1.1976197290538482,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_0_223c0171",
-        "target": "stress_observer_1_9ff849ef",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 38.015312754917524,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_0_223c0171",
-        "target": "stress_observer_2_89cffed5",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 67.28062545386477,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_0_223c0171",
-        "target": "stress_observer_3_27cdd797",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 21.96482620307985,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_0_223c0171",
-        "target": "stress_observer_4_a8c3a059",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 16.131429507155467,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_1_9ff849ef",
-        "target": "stress_observer_2_89cffed5",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 57.82246506787635,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_1_9ff849ef",
-        "target": "stress_observer_3_27cdd797",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 8.209108144773456,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_1_9ff849ef",
-        "target": "stress_observer_4_a8c3a059",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 4.45990968848271,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_1_9ff849ef",
-        "target": "stress_observer_0_c75a0fe0",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 38.781501466597874,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_2_89cffed5",
-        "target": "stress_observer_3_27cdd797",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 37.73073099963294,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_2_89cffed5",
-        "target": "stress_observer_4_a8c3a059",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 51.638599388404614,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_2_89cffed5",
-        "target": "stress_observer_0_c75a0fe0",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 79.11913353563982,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_2_89cffed5",
-        "target": "stress_observer_1_7609e7b4",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 23.555250469849877,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_3_27cdd797",
-        "target": "stress_observer_4_a8c3a059",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 17.189897878609425,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_3_27cdd797",
-        "target": "stress_observer_0_c75a0fe0",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 55.064354740338516,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_3_27cdd797",
-        "target": "stress_observer_1_7609e7b4",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 33.12814503244204,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_3_27cdd797",
-        "target": "stress_observer_2_1dc3136f",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 56.97917813076828,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_4_a8c3a059",
-        "target": "stress_observer_0_c75a0fe0",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 43.22828532739319,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_4_a8c3a059",
-        "target": "stress_observer_1_7609e7b4",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 93.8715898012304,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_4_a8c3a059",
-        "target": "stress_observer_2_1dc3136f",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 19.36024517693191,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_4_a8c3a059",
-        "target": "stress_observer_3_e5fbb3e7",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 19.187292454230125,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_0_c75a0fe0",
-        "target": "stress_observer_1_7609e7b4",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 37.811679026753396,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_0_c75a0fe0",
-        "target": "stress_observer_2_1dc3136f",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 35.156555717992894,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_0_c75a0fe0",
-        "target": "stress_observer_3_e5fbb3e7",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 54.147000470785066,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_0_c75a0fe0",
-        "target": "stress_observer_4_9a1d18d6",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 23.673281149197066,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_1_7609e7b4",
-        "target": "stress_observer_2_1dc3136f",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 79.74889604713394,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_1_7609e7b4",
-        "target": "stress_observer_3_e5fbb3e7",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 20.939557322013503,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_1_7609e7b4",
-        "target": "stress_observer_4_9a1d18d6",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 97.99391979838944,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_1_7609e7b4",
-        "target": "stress_observer_0_e4a92c7d",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 92.09167658990752,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_2_1dc3136f",
-        "target": "stress_observer_3_e5fbb3e7",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 67.88105367726047,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_2_1dc3136f",
-        "target": "stress_observer_4_9a1d18d6",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 21.327476143913096,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_2_1dc3136f",
-        "target": "stress_observer_0_e4a92c7d",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 20.202550289255903,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_2_1dc3136f",
-        "target": "stress_observer_1_213c8296",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 10.765832756924327,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_3_e5fbb3e7",
-        "target": "stress_observer_4_9a1d18d6",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 67.23657883797216,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_3_e5fbb3e7",
-        "target": "stress_observer_0_e4a92c7d",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 21.237639437128152,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_3_e5fbb3e7",
-        "target": "stress_observer_1_213c8296",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 21.388619167493573,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_3_e5fbb3e7",
-        "target": "stress_observer_2_6ce65fd1",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 3.440980013796445,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_4_9a1d18d6",
-        "target": "stress_observer_0_e4a92c7d",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 27.366096262057294,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_4_9a1d18d6",
-        "target": "stress_observer_1_213c8296",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 76.50028348843534,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_4_9a1d18d6",
-        "target": "stress_observer_2_6ce65fd1",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 33.49303165384749,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_4_9a1d18d6",
-        "target": "stress_observer_3_9f8e0eb7",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 62.03772714120327,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_0_e4a92c7d",
-        "target": "stress_observer_1_213c8296",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 60.09865734660496,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_0_e4a92c7d",
-        "target": "stress_observer_2_6ce65fd1",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 35.86023208569546,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_0_e4a92c7d",
-        "target": "stress_observer_3_9f8e0eb7",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 82.45013107480489,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_0_e4a92c7d",
-        "target": "stress_observer_4_4ecbc40d",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 4.92239189646502,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_1_213c8296",
-        "target": "stress_observer_2_6ce65fd1",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 41.95837409825288,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_1_213c8296",
-        "target": "stress_observer_3_9f8e0eb7",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 86.63413079077581,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_1_213c8296",
-        "target": "stress_observer_4_4ecbc40d",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 79.3123584954452,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_1_213c8296",
-        "target": "stress_observer_0_adf6f62d",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 53.03275234286051,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_2_6ce65fd1",
-        "target": "stress_observer_3_9f8e0eb7",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 91.95344774471766,
+        "latency_ms": 134.81292446100178,
         "sync": "synced"
-      },
-      {
-        "source": "stress_observer_2_6ce65fd1",
-        "target": "stress_observer_4_4ecbc40d",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 11.668243089712522,
-        "sync": "desynced"
       },
       {
-        "source": "stress_observer_2_6ce65fd1",
-        "target": "stress_observer_0_adf6f62d",
-        "type": "message",
+        "source": "continuity_2",
+        "target": "entropy_0",
+        "type": "memory",
         "frequency": 1,
-        "latency_ms": 17.680452909792855,
+        "latency_ms": 72.5014692185226,
         "sync": "synced"
       },
       {
-        "source": "stress_observer_2_6ce65fd1",
-        "target": "stress_observer_1_f7606a01",
-        "type": "message",
+        "source": "structural_0",
+        "target": "memory_1",
+        "type": "repair",
         "frequency": 1,
-        "latency_ms": 97.97842052822541,
+        "latency_ms": 32.32406517373615,
         "sync": "synced"
-      },
-      {
-        "source": "stress_observer_3_9f8e0eb7",
-        "target": "stress_observer_4_4ecbc40d",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 30.600521266338408,
-        "sync": "desynced"
       },
       {
-        "source": "stress_observer_3_9f8e0eb7",
-        "target": "stress_observer_0_adf6f62d",
-        "type": "message",
+        "source": "memory_0",
+        "target": "routing_2",
+        "type": "memory",
         "frequency": 1,
-        "latency_ms": 35.73363377059203,
+        "latency_ms": 129.09769628390447,
         "sync": "synced"
-      },
-      {
-        "source": "stress_observer_3_9f8e0eb7",
-        "target": "stress_observer_1_f7606a01",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 5.634272033825162,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_3_9f8e0eb7",
-        "target": "stress_observer_2_7a5af7d1",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 87.33644861516565,
-        "sync": "unknown"
       },
       {
-        "source": "stress_observer_4_4ecbc40d",
-        "target": "stress_observer_0_adf6f62d",
-        "type": "message",
+        "source": "entropy_1",
+        "target": "structural_0",
+        "type": "route",
         "frequency": 1,
-        "latency_ms": 13.539812187612613,
+        "latency_ms": 195.77624172093613,
         "sync": "desynced"
       },
       {
-        "source": "stress_observer_4_4ecbc40d",
-        "target": "stress_observer_1_f7606a01",
-        "type": "message",
+        "source": "memory_1",
+        "target": "memory_2",
+        "type": "chaos",
         "frequency": 1,
-        "latency_ms": 43.88029777290073,
+        "latency_ms": 13.820240080738014,
         "sync": "desynced"
       },
       {
-        "source": "stress_observer_4_4ecbc40d",
-        "target": "stress_observer_2_7a5af7d1",
-        "type": "message",
+        "source": "repair_2",
+        "target": "routing_1",
+        "type": "repair",
         "frequency": 1,
-        "latency_ms": 87.04034056150535,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_4_4ecbc40d",
-        "target": "stress_observer_3_d025b862",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 63.30943081479796,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_0_adf6f62d",
-        "target": "stress_observer_1_f7606a01",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 63.65530700036981,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_0_adf6f62d",
-        "target": "stress_observer_2_7a5af7d1",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 81.94342196228432,
-        "sync": "desynced"
-      },
-      {
-        "source": "stress_observer_0_adf6f62d",
-        "target": "stress_observer_3_d025b862",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 42.907121061189635,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_0_adf6f62d",
-        "target": "stress_observer_4_999c9850",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 30.729082053636088,
-        "sync": "unknown"
-      },
-      {
-        "source": "stress_observer_1_f7606a01",
-        "target": "stress_observer_2_7a5af7d1",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 29.070340780805306,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_1_f7606a01",
-        "target": "stress_observer_3_d025b862",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 50.4061012135351,
-        "sync": "synced"
-      },
-      {
-        "source": "stress_observer_1_f7606a01",
-        "target": "stress_observer_4_999c9850",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 70.27441019692142,
+        "latency_ms": 157.24718306572387,
         "sync": "synced"
-      },
-      {
-        "source": "stress_observer_2_7a5af7d1",
-        "target": "stress_observer_3_d025b862",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 93.82932324657483,
-        "sync": "unknown"
       },
       {
-        "source": "stress_observer_2_7a5af7d1",
-        "target": "stress_observer_4_999c9850",
-        "type": "message",
+        "source": "routing_2",
+        "target": "continuity_0",
+        "type": "memory",
         "frequency": 1,
-        "latency_ms": 68.6897116724663,
+        "latency_ms": 19.077963380799577,
         "sync": "synced"
       },
       {
-        "source": "stress_observer_3_d025b862",
-        "target": "stress_observer_4_999c9850",
-        "type": "message",
+        "source": "repair_2",
+        "target": "structural_1",
+        "type": "memory",
         "frequency": 1,
-        "latency_ms": 31.698371454540816,
+        "latency_ms": 167.03133811875472,
         "sync": "desynced"
       },
       {
-        "source": "observer_0",
-        "target": "observer_1",
+        "source": "repair_1",
+        "target": "structural_1",
         "type": "sync",
-        "frequency": 5,
-        "latency_ms": 1596.3993503651448,
+        "frequency": 1,
+        "latency_ms": 158.03664655300824,
         "sync": "synced"
       },
       {
-        "source": "observer_1",
-        "target": "observer_2",
+        "source": "memory_0",
+        "target": "structural_0",
         "type": "sync",
-        "frequency": 5,
-        "latency_ms": 485.4278517102256,
+        "frequency": 2,
+        "latency_ms": 21.53837540976798,
         "sync": "synced"
       },
       {
-        "source": "observer_2",
-        "target": "observer_3",
-        "type": "sync",
-        "frequency": 5,
-        "latency_ms": 1351.8368025132197,
+        "source": "continuity_1",
+        "target": "entropy_1",
+        "type": "repair",
+        "frequency": 1,
+        "latency_ms": 43.70614080899917,
         "sync": "desynced"
       },
       {
-        "source": "observer_3",
-        "target": "observer_4",
+        "source": "routing_2",
+        "target": "repair_2",
+        "type": "memory",
+        "frequency": 1,
+        "latency_ms": 52.01391306085695,
+        "sync": "synced"
+      },
+      {
+        "source": "entropy_2",
+        "target": "routing_0",
+        "type": "chaos",
+        "frequency": 1,
+        "latency_ms": 45.87778762164384,
+        "sync": "synced"
+      },
+      {
+        "source": "entropy_2",
+        "target": "structural_0",
         "type": "sync",
-        "frequency": 5,
-        "latency_ms": 729.6971373983594,
+        "frequency": 1,
+        "latency_ms": 158.2817523509274,
+        "sync": "synced"
+      },
+      {
+        "source": "memory_0",
+        "target": "routing_2",
+        "type": "message",
+        "frequency": 1,
+        "latency_ms": 150.38310973678412,
+        "sync": "synced"
+      },
+      {
+        "source": "repair_0",
+        "target": "structural_1",
+        "type": "sync",
+        "frequency": 1,
+        "latency_ms": 13.823959403038954,
+        "sync": "synced"
+      },
+      {
+        "source": "memory_1",
+        "target": "memory_0",
+        "type": "chaos",
+        "frequency": 1,
+        "latency_ms": 71.45427983555525,
         "sync": "desynced"
       },
       {
-        "source": "observer_4",
-        "target": "observer_5",
+        "source": "routing_1",
+        "target": "repair_0",
         "type": "sync",
-        "frequency": 5,
-        "latency_ms": 1038.3071504669979,
+        "frequency": 1,
+        "latency_ms": 18.249051431196296,
+        "sync": "desynced"
+      },
+      {
+        "source": "repair_2",
+        "target": "memory_1",
+        "type": "memory",
+        "frequency": 1,
+        "latency_ms": 75.5954632680955,
         "sync": "synced"
       },
       {
-        "source": "observer_5",
-        "target": "observer_6",
-        "type": "sync",
-        "frequency": 5,
-        "latency_ms": 1910.522223679568,
+        "source": "memory_0",
+        "target": "repair_2",
+        "type": "repair",
+        "frequency": 1,
+        "latency_ms": 87.59618457790867,
+        "sync": "desynced"
+      },
+      {
+        "source": "memory_0",
+        "target": "repair_0",
+        "type": "chaos",
+        "frequency": 1,
+        "latency_ms": 113.76923009602979,
         "sync": "synced"
       },
       {
-        "source": "observer_6",
-        "target": "observer_7",
-        "type": "sync",
-        "frequency": 5,
-        "latency_ms": 1095.8524248461833,
+        "source": "structural_1",
+        "target": "structural_0",
+        "type": "memory",
+        "frequency": 1,
+        "latency_ms": 86.92256230366934,
+        "sync": "desynced"
+      },
+      {
+        "source": "memory_2",
+        "target": "entropy_0",
+        "type": "repair",
+        "frequency": 1,
+        "latency_ms": 93.35547189506802,
+        "sync": "desynced"
+      },
+      {
+        "source": "entropy_0",
+        "target": "continuity_1",
+        "type": "repair",
+        "frequency": 1,
+        "latency_ms": 197.62920813513833,
         "sync": "synced"
       },
       {
-        "source": "observer_7",
-        "target": "observer_0",
+        "source": "routing_2",
+        "target": "continuity_1",
         "type": "sync",
-        "frequency": 5,
-        "latency_ms": 1380.2449263457283,
+        "frequency": 1,
+        "latency_ms": 137.24310360539837,
+        "sync": "synced"
+      },
+      {
+        "source": "memory_0",
+        "target": "memory_1",
+        "type": "sync",
+        "frequency": 1,
+        "latency_ms": 126.4747679302713,
+        "sync": "synced"
+      },
+      {
+        "source": "structural_2",
+        "target": "continuity_1",
+        "type": "memory",
+        "frequency": 1,
+        "latency_ms": 198.13143495195513,
+        "sync": "synced"
+      },
+      {
+        "source": "memory_2",
+        "target": "entropy_2",
+        "type": "sync",
+        "frequency": 1,
+        "latency_ms": 160.672342433762,
+        "sync": "synced"
+      },
+      {
+        "source": "structural_0",
+        "target": "structural_2",
+        "type": "route",
+        "frequency": 1,
+        "latency_ms": 168.84835136872948,
+        "sync": "desynced"
+      },
+      {
+        "source": "continuity_2",
+        "target": "routing_1",
+        "type": "memory",
+        "frequency": 1,
+        "latency_ms": 66.74758910557036,
+        "sync": "synced"
+      },
+      {
+        "source": "repair_0",
+        "target": "repair_1",
+        "type": "sync",
+        "frequency": 1,
+        "latency_ms": 183.64901497127178,
+        "sync": "synced"
+      },
+      {
+        "source": "structural_2",
+        "target": "memory_2",
+        "type": "chaos",
+        "frequency": 1,
+        "latency_ms": 127.50576823438357,
+        "sync": "desynced"
+      },
+      {
+        "source": "structural_2",
+        "target": "structural_0",
+        "type": "message",
+        "frequency": 1,
+        "latency_ms": 177.88865589857096,
+        "sync": "desynced"
+      },
+      {
+        "source": "memory_0",
+        "target": "entropy_1",
+        "type": "message",
+        "frequency": 1,
+        "latency_ms": 50.107130726146664,
+        "sync": "synced"
+      },
+      {
+        "source": "memory_1",
+        "target": "continuity_1",
+        "type": "memory",
+        "frequency": 1,
+        "latency_ms": 71.66297811784459,
+        "sync": "synced"
+      },
+      {
+        "source": "memory_2",
+        "target": "continuity_0",
+        "type": "message",
+        "frequency": 1,
+        "latency_ms": 36.77335303942068,
+        "sync": "desynced"
+      },
+      {
+        "source": "continuity_0",
+        "target": "routing_1",
+        "type": "repair",
+        "frequency": 1,
+        "latency_ms": 167.6207622100526,
+        "sync": "desynced"
+      },
+      {
+        "source": "structural_2",
+        "target": "structural_0",
+        "type": "route",
+        "frequency": 1,
+        "latency_ms": 158.40408111613397,
+        "sync": "synced"
+      },
+      {
+        "source": "memory_0",
+        "target": "repair_1",
+        "type": "repair",
+        "frequency": 1,
+        "latency_ms": 90.24321302679652,
+        "sync": "synced"
+      },
+      {
+        "source": "routing_0",
+        "target": "repair_1",
+        "type": "route",
+        "frequency": 1,
+        "latency_ms": 99.10162452818143,
+        "sync": "synced"
+      },
+      {
+        "source": "memory_1",
+        "target": "repair_0",
+        "type": "route",
+        "frequency": 1,
+        "latency_ms": 50.41069212915258,
+        "sync": "synced"
+      },
+      {
+        "source": "routing_2",
+        "target": "routing_0",
+        "type": "repair",
+        "frequency": 1,
+        "latency_ms": 152.80137797532817,
+        "sync": "desynced"
+      },
+      {
+        "source": "repair_1",
+        "target": "memory_0",
+        "type": "repair",
+        "frequency": 1,
+        "latency_ms": 38.58470988930799,
+        "sync": "synced"
+      },
+      {
+        "source": "repair_1",
+        "target": "continuity_0",
+        "type": "repair",
+        "frequency": 1,
+        "latency_ms": 130.06405230414626,
+        "sync": "desynced"
+      },
+      {
+        "source": "memory_0",
+        "target": "continuity_1",
+        "type": "memory",
+        "frequency": 1,
+        "latency_ms": 61.29266944107476,
+        "sync": "desynced"
+      },
+      {
+        "source": "continuity_0",
+        "target": "routing_1",
+        "type": "route",
+        "frequency": 1,
+        "latency_ms": 199.59602497571487,
+        "sync": "synced"
+      },
+      {
+        "source": "structural_2",
+        "target": "routing_1",
+        "type": "repair",
+        "frequency": 1,
+        "latency_ms": 156.23884942273287,
+        "sync": "desynced"
+      },
+      {
+        "source": "continuity_0",
+        "target": "repair_0",
+        "type": "message",
+        "frequency": 1,
+        "latency_ms": 164.35614372727468,
         "sync": "synced"
       }
     ]
   },
   "sync_health": {
     "status": "degraded",
-    "sync_rate": 0.3535,
-    "total_relationships": 198,
-    "synced": 70,
-    "desynced": 128
+    "sync_rate": 0.6327,
+    "total_relationships": 49,
+    "synced": 31,
+    "desynced": 18
   },
   "hotspots": []
 }

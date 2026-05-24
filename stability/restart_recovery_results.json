@@ -1,0 +1,75 @@
+{
+  "test_id": "11.1-D",
+  "test_name": "restart_recovery",
+  "timestamp": "2026-05-24T15:33:01.866858+00:00",
+  "cycles": [
+    {
+      "cycle": 1,
+      "timestamp": "2026-05-24T15:33:01.866858+00:00",
+      "recovery_time_seconds": 0.0,
+      "recovery_time_ok": true,
+      "identity_preserved": true,
+      "anchors_intact": true,
+      "observers_reestablished": true,
+      "no_data_loss": true,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "cycle": 2,
+      "timestamp": "2026-05-24T15:33:01.866858+00:00",
+      "recovery_time_seconds": 0.0,
+      "recovery_time_ok": true,
+      "identity_preserved": true,
+      "anchors_intact": true,
+      "observers_reestablished": true,
+      "no_data_loss": true,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "cycle": 3,
+      "timestamp": "2026-05-24T15:33:01.866858+00:00",
+      "recovery_time_seconds": 0.0,
+      "recovery_time_ok": true,
+      "identity_preserved": true,
+      "anchors_intact": true,
+      "observers_reestablished": true,
+      "no_data_loss": true,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "cycle": 4,
+      "timestamp": "2026-05-24T15:33:01.866858+00:00",
+      "recovery_time_seconds": 0.0,
+      "recovery_time_ok": true,
+      "identity_preserved": true,
+      "anchors_intact": true,
+      "observers_reestablished": true,
+      "no_data_loss": true,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "cycle": 5,
+      "timestamp": "2026-05-24T15:33:01.866858+00:00",
+      "recovery_time_seconds": 0.0,
+      "recovery_time_ok": true,
+      "identity_preserved": true,
+      "anchors_intact": true,
+      "observers_reestablished": true,
+      "no_data_loss": true,
+      "issues": [],
+      "passed": true
+    }
+  ],
+  "passed": 5,
+  "failed": 0,
+  "pass_rate": 100.0,
+  "avg_recovery_time_seconds": 0.0,
+  "max_recovery_time_seconds": 0.0,
+  "identity_preserved_all": true,
+  "anchors_intact_all": true,
+  "overall_pass": true
+}
