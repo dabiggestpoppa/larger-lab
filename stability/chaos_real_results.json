@@ -1,0 +1,30 @@
+{
+  "timestamp": "2026-05-24T22:47:30.401350+00:00",
+  "results": [
+    {
+      "scenario": "observer_death",
+      "amplification": 0.5,
+      "events_injected": 2,
+      "recovered": true
+    },
+    {
+      "scenario": "event_flood",
+      "amplification": 0.25,
+      "events_injected": 1,
+      "recovered": true
+    },
+    {
+      "scenario": "memory_poison",
+      "amplification": 0.5,
+      "events_injected": 1,
+      "recovered": true
+    },
+    {
+      "scenario": "full_chaos",
+      "amplification": 0.25,
+      "events_injected": 4,
+      "recovered": true
+    }
+  ],
+  "overall_pass": true
+}

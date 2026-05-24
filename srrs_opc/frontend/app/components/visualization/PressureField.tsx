@@ -53,7 +53,7 @@ export default function PressureField({ mode = "THERMAL" }: Props) {
       {gradients.map((g) => (
         <div
           key={g.zone}
-          className={`absolute rounded-full ${g.animated ? "animate-pulse" : ""}`}
+          className={`absolute rounded-full ${"animated" in g && g.animated ? "animate-pulse" : ""}`}
           style={{
             left: `${g.x}%`,
             top: `${g.y}%`,

@@ -59,6 +59,8 @@ class DriftDetector:
         """Check if an anchor is stale (not updated recently)."""
         try:
             updated = datetime.fromisoformat(anchor["updated_at"])
+            if updated.tzinfo is None:
+                updated = updated.replace(tzinfo=timezone.utc)
             age = datetime.now(timezone.utc) - updated
             if age > timedelta(days=self.staleness_days):
                 divisor = max(self.staleness_days * 3, 1)

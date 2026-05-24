@@ -19,8 +19,8 @@ export function useTemporalSync() {
 
       // Sync topology
       if (frame.topologySnapshot) {
-        setNodes(frame.topologySnapshot.nodes);
-        setEdges(frame.topologySnapshot.edges);
+        setNodes(frame.topologySnapshot.nodes as any[]);
+        setEdges(frame.topologySnapshot.edges as any[]);
       }
 
       // Sync entropy
