@@ -224,45 +224,50 @@ async def entropy_heatmap():
 
 @app.get("/api/entropy/timeseries")
 async def entropy_timeseries():
-    """Entropy over time."""
-    exports = get_exports_dir()
-    entropy_file = exports / "entropy" / "entropy_timeseries.json"
-    data = load_json(entropy_file)
+    """Entropy over time — generated from event store."""
+    from core.observability.event_schema import get_event_store
+    es = get_event_store()
 
-    if not data:
-        return {"timeseries": []}
+    timeseries = []
+    for evt in es._events:
+        timeseries.append({
+            "timestamp": evt.timestamp,
+            "entropy_before": max(0, 1.0 - abs(evt.entropy_delta)),
+            "entropy_after": max(0, min(1.0, 1.0 + evt.entropy_delta)),
+            "delta": evt.entropy_delta,
+            "source": evt.source,
+            "field_zone": evt.field_zone,
+        })
 
-    if isinstance(data, list):
-        return {"timeseries": data}
-
-    return {"timeseries": data.get("timeseries", [])}
+    return {"timeseries": timeseries}
 
 
 # ─── Repair ─────────────────────────────────────────────────────────────────
 
 @app.get("/api/repair/chains")
 async def repair_chains():
-    """Repair propagation chains."""
-    exports = get_exports_dir()
-    repair_file = exports / "repair" / "repair_chains.json"
-    data = load_json(repair_file)
+    """Repair propagation chains — generated from event store."""
+    from core.observability.event_schema import get_event_store
+    es = get_event_store()
 
-    if not data:
-        return {"chains": []}
-
+    raw_chains = es.get_repair_chains()
     chains = []
-    if isinstance(data, list):
-        for i, chain in enumerate(data):
-            chains.append({
-                "chainId": f"chain_{i:03d}",
-                "events": chain if isinstance(chain, list) else [chain],
-            })
-    elif isinstance(data, dict):
-        for chain_id, events in data.items():
-            chains.append({
-                "chainId": chain_id,
-                "events": events if isinstance(events, list) else [events],
-            })
+    for i, chain_events in enumerate(raw_chains):
+        events = []
+        for evt in chain_events:
+            if isinstance(evt, dict):
+                events.append(evt)
+            else:
+                events.append({
+                    "timestamp": getattr(evt, "timestamp", ""),
+                    "event_type": getattr(evt, "event_type", "unknown"),
+                    "source": getattr(evt, "source", ""),
+                    "entropy_delta": getattr(evt, "entropy_delta", 0),
+                })
+        chains.append({
+            "chainId": f"chain_{i:03d}",
+            "events": events,
+        })
 
     return {"chains": chains, "total_chains": len(chains)}
 
