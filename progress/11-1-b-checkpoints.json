@@ -4,9 +4,9 @@
   "start_time": "2026-05-22T23:46:12.389206",
   "end_time": "",
   "duration_hours": 0.0,
-  "total_checkpoints": 3,
+  "total_checkpoints": 5,
   "passed_checkpoints": 1,
-  "failed_checkpoints": 2,
+  "failed_checkpoints": 4,
   "max_drift_score": 0.5,
   "final_uptime_percent": 0.0,
   "overall_pass": false,
@@ -73,68 +73,112 @@
       },
       "memory_usage_mb": 4.41,
       "status": "FAIL"
+    },
+    {
+      "checkpoint_id": "chk_1779594397",
+      "timestamp": "2026-05-23T23:46:37.477077",
+      "elapsed_hours": 12.43,
+      "identity_hash": "410ceb00ecddd8f2",
+      "trajectory_hash": "762cd0831fa477fe",
+      "goal_hash": "b4478a016b68a135",
+      "memory_hash": "42cbecd36ea35a28",
+      "state_hash": "82e7d2f6650cbc97",
+      "drift_score": 0.5,
+      "drift_details": {
+        "trajectory": "changed",
+        "memory": "changed"
+      },
+      "observer_health": {
+        "alive": 7,
+        "degraded": 2,
+        "dead": 1
+      },
+      "memory_usage_mb": 4.58,
+      "status": "FAIL"
+    },
+    {
+      "checkpoint_id": "chk_1779616053",
+      "timestamp": "2026-05-24T05:47:33.899734",
+      "elapsed_hours": 18.45,
+      "identity_hash": "410ceb00ecddd8f2",
+      "trajectory_hash": "d00ec3cc9d28f670",
+      "goal_hash": "b4478a016b68a135",
+      "memory_hash": "e1889190bcf16cfc",
+      "state_hash": "874471d8bad81bb9",
+      "drift_score": 0.5,
+      "drift_details": {
+        "trajectory": "changed",
+        "memory": "changed"
+      },
+      "observer_health": {
+        "alive": 9,
+        "degraded": 1,
+        "dead": 0
+      },
+      "memory_usage_mb": 4.3,
+      "status": "FAIL"
     }
   ],
   "observers": {
     "observer_00": {
       "status": "alive",
-      "tasks_completed": 3600,
-      "errors": 18,
-      "uptime_seconds": 35991.81243109703
+      "tasks_completed": 7566,
+      "errors": 34,
+      "uptime_seconds": 75650.28310441971
     },
     "observer_01": {
       "status": "alive",
-      "tasks_completed": 3600,
-      "errors": 13,
-      "uptime_seconds": 35991.79900145531
+      "tasks_completed": 7566,
+      "errors": 33,
+      "uptime_seconds": 75650.10653042793
     },
     "observer_02": {
       "status": "alive",
-      "tasks_completed": 3600,
-      "errors": 13,
-      "uptime_seconds": 35991.79900145531
+      "tasks_completed": 7566,
+      "errors": 29,
+      "uptime_seconds": 75650.10599279404
     },
     "observer_03": {
       "status": "alive",
-      "tasks_completed": 3600,
-      "errors": 21,
-      "uptime_seconds": 35991.81295466423
+      "tasks_completed": 7566,
+      "errors": 39,
+      "uptime_seconds": 75650.10599279404
     },
     "observer_04": {
       "status": "alive",
-      "tasks_completed": 3600,
-      "errors": 17,
-      "uptime_seconds": 35991.81295466423
+      "tasks_completed": 7566,
+      "errors": 33,
+      "uptime_seconds": 75650.28310441971
     },
     "observer_05": {
       "status": "alive",
-      "tasks_completed": 3600,
-      "errors": 14,
-      "uptime_seconds": 35991.80000782013
+      "tasks_completed": 7566,
+      "errors": 37,
+      "uptime_seconds": 75650.10599279404
     },
     "observer_06": {
       "status": "alive",
-      "tasks_completed": 3600,
-      "errors": 27,
-      "uptime_seconds": 35991.79900145531
+      "tasks_completed": 7566,
+      "errors": 49,
+      "uptime_seconds": 75650.10653042793
     },
     "observer_07": {
       "status": "alive",
-      "tasks_completed": 3600,
-      "errors": 16,
-      "uptime_seconds": 35991.81295466423
+      "tasks_completed": 7566,
+      "errors": 43,
+      "uptime_seconds": 75650.10599279404
     },
     "observer_08": {
       "status": "alive",
-      "tasks_completed": 3600,
-      "errors": 20,
-      "uptime_seconds": 35991.81295466423
+      "tasks_completed": 7566,
+      "errors": 37,
+      "uptime_seconds": 75650.28310441971
     },
     "observer_09": {
       "status": "alive",
-      "tasks_completed": 3600,
-      "errors": 17,
-      "uptime_seconds": 35991.80000782013
+      "tasks_completed": 7566,
+      "errors": 43,
+      "uptime_seconds": 75650.10653042793
     }
   },
   "chaos_events": [
@@ -143,6 +187,14 @@
       "elapsed_hours": 0.43334363049930996,
       "injected": true,
       "target": "observer_04",
+      "chaos_type": "micro_observer_kill",
+      "recovery_time": 30
+    },
+    {
+      "timestamp": "2026-05-23T23:46:37.403832",
+      "elapsed_hours": 12.433455221454302,
+      "injected": true,
+      "target": "observer_09",
       "chaos_type": "micro_observer_kill",
       "recovery_time": 30
     }
