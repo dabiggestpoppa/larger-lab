@@ -95,7 +95,7 @@ class ObserverRegistry:
         self._observers: dict[str, ObserverRecord] = {}
         self._relationships: dict[str, ObserverRelationship] = {}
         self._contexts: list[RuntimeContext] = []
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
         self._flush_interval = auto_flush_interval
         self._dirty = False
         self._callbacks: list[Callable] = []
@@ -267,26 +267,32 @@ class ObserverRegistry:
 
     def export(self, path: Path | None = None) -> Path:
         """Export the full registry to JSON."""
+        import sys
+        ts = datetime.now(timezone.utc).strftime("%H:%M:%S")
+        print(f"[{ts}] REGISTRY: Starting export...", flush=True, file=sys.stderr)
         path = path or EXPORTS_DIR / "runtime_topology_registry.json"
 
         with self._lock:
+            print(f"[{ts}] REGISTRY: Lock acquired, building data...", flush=True, file=sys.stderr)
             data = {
                 "version": "0.1.0",
                 "phase": "11.2-3B.1",
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "observers": {oid: asdict(obs) for oid, obs in self._observers.items()},
                 "relationships": {k: asdict(v) for k, v in self._relationships.items()},
-                "contexts": [asdict(ctx) for ctx in self._contexts[-1000:]],  # last 1000
+                "contexts": [asdict(ctx) for ctx in self._contexts[-1000:]],
                 "graph": self.get_observer_graph(),
                 "sync_health": self.get_sync_health(),
                 "hotspots": self.get_hotspots(),
             }
+            print(f"[{ts}] REGISTRY: Data built, writing file...", flush=True, file=sys.stderr)
 
         path.parent.mkdir(parents=True, exist_ok=True)
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, default=str)
 
         self._dirty = False
+        print(f"[{ts}] REGISTRY: Export complete ({path})", flush=True, file=sys.stderr)
         return path
 
     # ─── Callbacks ───────────────────────────────────────────────────────
