@@ -1,0 +1,149 @@
+{
+  "nodes": {
+    "structural_0": {
+      "total_interactions": 7,
+      "incoming": 3,
+      "outgoing": 4,
+      "type": "unknown",
+      "state": "unknown",
+      "entropy": 0
+    },
+    "structural_1": {
+      "total_interactions": 5,
+      "incoming": 1,
+      "outgoing": 4,
+      "type": "unknown",
+      "state": "unknown",
+      "entropy": 0
+    },
+    "structural_2": {
+      "total_interactions": 6,
+      "incoming": 3,
+      "outgoing": 3,
+      "type": "unknown",
+      "state": "unknown",
+      "entropy": 0
+    },
+    "continuity_0": {
+      "total_interactions": 4,
+      "incoming": 2,
+      "outgoing": 2,
+      "type": "unknown",
+      "state": "unknown",
+      "entropy": 0
+    },
+    "continuity_1": {
+      "total_interactions": 6,
+      "incoming": 3,
+      "outgoing": 3,
+      "type": "unknown",
+      "state": "unknown",
+      "entropy": 0
+    },
+    "continuity_2": {
+      "total_interactions": 7,
+      "incoming": 6,
+      "outgoing": 1,
+      "type": "unknown",
+      "state": "unknown",
+      "entropy": 0
+    },
+    "entropy_0": {
+      "total_interactions": 8,
+      "incoming": 5,
+      "outgoing": 3,
+      "type": "unknown",
+      "state": "unknown",
+      "entropy": 0
+    },
+    "entropy_1": {
+      "total_interactions": 5,
+      "incoming": 1,
+      "outgoing": 4,
+      "type": "unknown",
+      "state": "unknown",
+      "entropy": 0
+    },
+    "entropy_2": {
+      "total_interactions": 7,
+      "incoming": 2,
+      "outgoing": 5,
+      "type": "unknown",
+      "state": "unknown",
+      "entropy": 0
+    },
+    "repair_0": {
+      "total_interactions": 8,
+      "incoming": 5,
+      "outgoing": 3,
+      "type": "unknown",
+      "state": "unknown",
+      "entropy": 0
+    },
+    "repair_1": {
+      "total_interactions": 5,
+      "incoming": 3,
+      "outgoing": 2,
+      "type": "unknown",
+      "state": "unknown",
+      "entropy": 0
+    },
+    "repair_2": {
+      "total_interactions": 5,
+      "incoming": 1,
+      "outgoing": 4,
+      "type": "unknown",
+      "state": "unknown",
+      "entropy": 0
+    },
+    "routing_0": {
+      "total_interactions": 5,
+      "incoming": 4,
+      "outgoing": 1,
+      "type": "unknown",
+      "state": "unknown",
+      "entropy": 0
+    },
+    "routing_1": {
+      "total_interactions": 3,
+      "incoming": 1,
+      "outgoing": 2,
+      "type": "unknown",
+      "state": "unknown",
+      "entropy": 0
+    },
+    "routing_2": {
+      "total_interactions": 6,
+      "incoming": 3,
+      "outgoing": 3,
+      "type": "unknown",
+      "state": "unknown",
+      "entropy": 0
+    },
+    "memory_0": {
+      "total_interactions": 4,
+      "incoming": 3,
+      "outgoing": 1,
+      "type": "unknown",
+      "state": "unknown",
+      "entropy": 0
+    },
+    "memory_1": {
+      "total_interactions": 1,
+      "incoming": 1,
+      "outgoing": 0,
+      "type": "unknown",
+      "state": "unknown",
+      "entropy": 0
+    },
+    "memory_2": {
+      "total_interactions": 2,
+      "incoming": 0,
+      "outgoing": 2,
+      "type": "unknown",
+      "state": "unknown",
+      "entropy": 0
+    }
+  },
+  "edges": 47
+}
