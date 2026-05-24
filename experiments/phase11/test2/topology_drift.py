@@ -1,8 +1,9 @@
 """Topology drift test — runs for 60s, tracks changes."""
-import json, time, random, hashlib
+import sys, json, time, random, hashlib
 from pathlib import Path
 from datetime import datetime, timezone
 REPO_ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO_ROOT))
 OUTPUT = REPO_ROOT / "experiments" / "phase11" / "test2" / "drift_snapshots"
 OUTPUT.mkdir(parents=True, exist_ok=True)
 from core.observability.observer_registry import get_registry, ObserverState, InteractionType
