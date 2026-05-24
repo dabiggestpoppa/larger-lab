@@ -91,8 +91,8 @@ export class PerturbationInjector {
     gentle: {
       name: "Gentle Stress",
       perturbations: [
-        { type: "SIGNAL_DELAY", target: "zone_0", magnitude: 0.3, duration: 5000 },
-      { type: "SYNC_BREAK", target: "zone_1", magnitude: 0.2, duration: 3000 },
+        { type: "SIGNAL_DELAY", target: "zone_0", magnitude: 0.3 },
+      { type: "SYNC_BREAK", target: "zone_1", magnitude: 0.2 },
       ],
       duration: 5000,
       cooldown: 10000,
@@ -100,9 +100,9 @@ export class PerturbationInjector {
     moderate: {
       name: "Moderate Chaos",
       perturbations: [
-        { type: "NODE_FAILURE", target: "zone_0", magnitude: 0.5, duration: 8000 },
-        { type: "ROUTING_CORRUPTION", target: "zone_2", magnitude: 0.4, duration: 6000 },
-        { type: "MEMORY_LOSS", target: "zone_1", magnitude: 0.3, duration: 5000 },
+        { type: "NODE_FAILURE", target: "zone_0", magnitude: 0.5 },
+        { type: "ROUTING_CORRUPTION", target: "zone_2", magnitude: 0.4 },
+        { type: "MEMORY_LOSS", target: "zone_1", magnitude: 0.3 },
       ],
       duration: 8000,
       cooldown: 15000,
@@ -110,9 +110,9 @@ export class PerturbationInjector {
     severe: {
       name: "Severe Cascade",
       perturbations: [
-        { type: "CASCADE_STRESS", target: "all", magnitude: 0.8, duration: 15000 },
-        { type: "FIELD_DISTORTION", target: "all", magnitude: 0.7, duration: 12000 },
-        { type: "REPAIR_BLOCK", target: "repair_0", magnitude: 0.6, duration: 10000 },
+        { type: "CASCADE_STRESS", target: "all", magnitude: 0.8 },
+        { type: "FIELD_DISTORTION", target: "all", magnitude: 0.7 },
+        { type: "REPAIR_BLOCK", target: "repair_0", magnitude: 0.6 },
       ],
       duration: 15000,
       cooldown: 30000,

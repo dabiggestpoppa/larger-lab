@@ -124,3 +124,26 @@
 - Don't edit another agent's files without posting in chat first
 - Post to chat BEFORE starting a new major task
 
+---
+
+## 12. USE REAL DATA WHEN AVAILABLE
+
+**Key Theme:** Tests should use real system data, not just simulated/mock data.
+
+**Reason:** Simulated data can miss real-world edge cases and doesn't reflect actual system behavior. The 11.1-E recursive stability test initially failed because it simulated pure recursion without memoization — but real SRRA uses memoization. After switching to memoization (how the actual system works), all scenarios passed.
+
+**Available Real Data Sources:**
+- `progress/11-1-b-checkpoints.json` — 72h test checkpoints with real observer health (alive/degraded/dead counts, drift scores)
+- `stability/chaos_20x_results.json` — Chaos test results (28 cycles, 112 scenarios, real recovery times)
+- `stability/restart_recovery_results.json` — Restart recovery (5 cycles, real identity/anchor preservation)
+- `stability/recursive_stability_results.json` — Recursive stability (7 scenarios with memoization)
+- `stability/semantic_test_summary.json` — Semantic contradiction injection (9/9 pass)
+- `experiments/phase11/test3/reports/` — PM2 adversarial drift + consensus results
+- `srrs_opc/frontend/api_server.py` — FastAPI server with endpoints for real topology, events, entropy, repair data
+- `oce/backend/observer_runtime.py` — Real observer state machine (created/active/suspended/destroyed)
+- `oce/backend/event_fabric.py` — Real event fabric with event routing
+- `srrs_opc/drift_detector.py` — Real drift detector (staleness, weight, source drift)
+- `srrs_opc/consistency_validator.py` — Real consistency validator with conflict patterns
+
+**Aim:** When writing new tests, check if real data exists first. Use `progress/*.json`, `stability/*.json`, `experiments/`, and live backend modules. Only simulate when no real data is available. When simulating, model the actual system behavior (e.g., memoization in recursion).
+

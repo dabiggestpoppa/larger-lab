@@ -50,7 +50,7 @@ export class RepairEntropyDynamics {
     balances: RepairEntropyBalance[],
     totalRepairBudget: number
   ): Record<string, number> {
-    const needsRepair = balances.filter((b) => this.needsRepair(balance));
+    const needsRepair = balances.filter((b) => this.needsRepair(b));
     if (needsRepair.length === 0) return {};
 
     const totalNeed = needsRepair.reduce((s, b) => s + b.netForce, 0);
