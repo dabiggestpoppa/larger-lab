@@ -1,7 +1,7 @@
 {
   "version": "0.1.0",
   "phase": "11.2-3B.7",
-  "timestamp": "2026-05-24T01:09:54.397437+00:00",
+  "timestamp": "2026-05-24T01:19:05.287766+00:00",
   "total_tests": 5,
   "passed": 5,
   "failed": 0,
@@ -16,8 +16,8 @@
   "results": [
     {
       "test_name": "observer_flood",
-      "timestamp": "2026-05-24T01:09:54.389960+00:00",
-      "duration_seconds": 0.0,
+      "timestamp": "2026-05-24T01:19:05.279227+00:00",
+      "duration_seconds": 0.01,
       "events_generated": 190,
       "observers_spawned": 50,
       "topology_reconstructable": true,
@@ -33,7 +33,7 @@
     },
     {
       "test_name": "repair_storm",
-      "timestamp": "2026-05-24T01:09:54.392232+00:00",
+      "timestamp": "2026-05-24T01:19:05.282229+00:00",
       "duration_seconds": 0.0,
       "events_generated": 60,
       "observers_spawned": 0,
@@ -49,7 +49,7 @@
     },
     {
       "test_name": "entropy_spike",
-      "timestamp": "2026-05-24T01:09:54.393231+00:00",
+      "timestamp": "2026-05-24T01:19:05.283230+00:00",
       "duration_seconds": 0.0,
       "events_generated": 40,
       "observers_spawned": 0,
@@ -62,18 +62,18 @@
       "metrics": {
         "entropy_profile": {
           "total_events": 270,
-          "total_entropy_injected": 25.911466414894573,
-          "total_entropy_dissipated": 4.626016126471945,
-          "net_entropy": 21.285450288422624,
-          "avg_entropy_per_event": 0.1131,
-          "max_single_entropy": 0.9906282174839314,
-          "min_single_entropy": -0.2854879913233763
+          "total_entropy_injected": 25.628360336589964,
+          "total_entropy_dissipated": 4.412929489991516,
+          "net_entropy": 21.21543084659844,
+          "avg_entropy_per_event": 0.1113,
+          "max_single_entropy": 0.9114201567186218,
+          "min_single_entropy": -0.29272827296634485
         }
       }
     },
     {
       "test_name": "routing_instability",
-      "timestamp": "2026-05-24T01:09:54.394234+00:00",
+      "timestamp": "2026-05-24T01:19:05.283230+00:00",
       "duration_seconds": 0.0,
       "events_generated": 50,
       "observers_spawned": 0,
@@ -89,7 +89,7 @@
     },
     {
       "test_name": "sync_drift",
-      "timestamp": "2026-05-24T01:09:54.394234+00:00",
+      "timestamp": "2026-05-24T01:19:05.284230+00:00",
       "duration_seconds": 0.0,
       "events_generated": 40,
       "observers_spawned": 0,
@@ -102,10 +102,10 @@
       "metrics": {
         "sync_health": {
           "status": "degraded",
-          "sync_rate": 0.3535,
+          "sync_rate": 0.3182,
           "total_relationships": 198,
-          "synced": 70,
-          "desynced": 128
+          "synced": 63,
+          "desynced": 135
         }
       }
     }
