@@ -74,7 +74,7 @@ export default function LiveDataProvider() {
           // Handle chaos test live updates
           break;
         case "notification":
-          addNotification(msg.data as { type: string; message: string });
+          addNotification(msg.data as { type: "success" | "error" | "warning" | "info"; message: string });
           break;
       }
     };

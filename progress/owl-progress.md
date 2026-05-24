@@ -61,6 +61,14 @@
 - Updated team-chat.md with standby notice
 - Operator away — OWL + PM2 both on autopilot
 
+### 2026-05-24 16:00 UTC — OCE Frontend Live Data Layer
+- Built WebSocket data layer (useWebSocket hook + LiveDataProvider component)
+- Updated Zustand stores with setAgents/setTasks/setSessions for live data
+- Added connection status and notifications to uiStore
+- Updated StatusBar with live connection indicator
+- Build: ✅ 9/9 pages compile cleanly
+- Next: Connect chaos page and agents page to live backend data
+
 ### 2026-05-23 18:00 UTC — Phase 11.2 Complete + Phase 11.4 Transition
 - Chaos 20x test completed (cycle 9, amp 2.287x, all scenarios passed)
 - Updated team chat with Phase 11.4 transition notice
