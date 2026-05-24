@@ -79,11 +79,23 @@ def render_observer_density(registry_data: dict) -> str:
     return output
 
 if __name__ == "__main__":
-    # Load from registry
+    # Load from disk export (singleton doesn't persist across processes)
     import sys
     sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
-    from core.observability.observer_registry import get_registry
-    reg = get_registry()
-    data = reg.get_observer_graph()
+    export_dir = Path(__file__).parent.parent / "exports" / "topology"
+    data = {"nodes": {}, "edges": []}
+    # Try loading from export files
+    for f in export_dir.glob("*.json"):
+        try:
+            d = json.loads(f.read_text())
+            if "nodes" in d:
+                data["nodes"].update(d.get("nodes", {}))
+                data["edges"].extend(d.get("edges", []))
+        except: pass
+    # Fallback to singleton
+    if not data["nodes"]:
+        from core.observability.observer_registry import get_registry
+        reg = get_registry()
+        data = reg.get_observer_graph()
     result = render_observer_density(data)
     print(result)

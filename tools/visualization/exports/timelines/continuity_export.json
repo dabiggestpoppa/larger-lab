@@ -1,0 +1,92 @@
+[
+  {
+    "timestamp": "2026-05-24T01:09:59.100780+00:00",
+    "continuity_score": 1.0,
+    "entropy_delta": 0.0,
+    "event_type": "observer_spawn"
+  },
+  {
+    "timestamp": "2026-05-24T01:09:59.100780+00:00",
+    "continuity_score": 1.0,
+    "entropy_delta": 0.0,
+    "event_type": "observer_spawn"
+  },
+  {
+    "timestamp": "2026-05-24T01:09:59.100780+00:00",
+    "continuity_score": 1.0,
+    "entropy_delta": 0.0,
+    "event_type": "observer_spawn"
+  },
+  {
+    "timestamp": "2026-05-24T01:09:59.100780+00:00",
+    "continuity_score": 1.0,
+    "entropy_delta": 0.0,
+    "event_type": "observer_spawn"
+  },
+  {
+    "timestamp": "2026-05-24T01:09:59.100780+00:00",
+    "continuity_score": 0.7,
+    "entropy_delta": 0.3,
+    "event_type": "repair_trigger"
+  },
+  {
+    "timestamp": "2026-05-24T01:09:59.100780+00:00",
+    "continuity_score": 0.5,
+    "entropy_delta": 0.5,
+    "event_type": "field_perturbation"
+  },
+  {
+    "timestamp": "2026-05-24T01:09:59.100780+00:00",
+    "continuity_score": 0.9,
+    "entropy_delta": -0.1,
+    "event_type": "observer_sync"
+  },
+  {
+    "timestamp": "2026-05-24T01:09:59.100780+00:00",
+    "continuity_score": 0.8,
+    "entropy_delta": 0.2,
+    "event_type": "route_shift"
+  },
+  {
+    "timestamp": "2026-05-24T01:09:59.100780+00:00",
+    "continuity_score": 0.4,
+    "entropy_delta": 0.6,
+    "event_type": "continuity_drop"
+  },
+  {
+    "timestamp": "2026-05-24T01:09:59.100780+00:00",
+    "continuity_score": 0.85,
+    "entropy_delta": -0.15,
+    "event_type": "attractor_lock"
+  },
+  {
+    "timestamp": "2026-05-24T01:09:59.100780+00:00",
+    "continuity_score": 0.95,
+    "entropy_delta": 0.0,
+    "event_type": "memory_pull"
+  },
+  {
+    "timestamp": "2026-05-24T01:09:59.100780+00:00",
+    "continuity_score": 0.75,
+    "entropy_delta": 0.1,
+    "event_type": "repair_trigger"
+  },
+  {
+    "timestamp": "2026-05-24T01:09:59.100780+00:00",
+    "continuity_score": 0.6,
+    "entropy_delta": 0.4,
+    "event_type": "chaos_inject"
+  },
+  {
+    "timestamp": "2026-05-24T01:09:59.100780+00:00",
+    "continuity_score": 0.9,
+    "entropy_delta": -0.2,
+    "event_type": "repair_complete"
+  },
+  {
+    "timestamp": "2026-05-24T01:09:59.100780+00:00",
+    "continuity_score": 0.85,
+    "entropy_delta": -0.1,
+    "event_type": "continuity_restore"
+  }
+]

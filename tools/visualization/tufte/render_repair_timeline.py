@@ -65,8 +65,22 @@ def render_repair_timeline(events: list) -> str:
 if __name__ == "__main__":
     import sys
     sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
-    from core.observability.event_schema import get_event_store
-    es = get_event_store()
-    events = es.get_all_events() if hasattr(es, 'get_all_events') else []
+    # Load from disk export
+    export_dir = Path(__file__).parent.parent / "exports" / "repair"
+    events = []
+    for f in export_dir.glob("*.json"):
+        try:
+            d = json.loads(f.read_text())
+            if isinstance(d, list):
+                for item in d:
+                    if isinstance(item, dict): events.append(item)
+                    elif isinstance(item, list): events.extend(item)  # nested list (repair chains)
+            elif "events" in d: events.extend(d["events"])
+        except: pass
+    # Fallback to singleton
+    if not events:
+        from core.observability.event_schema import get_event_store
+        es = get_event_store()
+        events = es.get_all_events() if hasattr(es, 'get_all_events') else []
     result = render_repair_timeline(events)
     print(result)

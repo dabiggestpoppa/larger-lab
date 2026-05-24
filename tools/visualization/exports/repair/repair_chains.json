@@ -1,0 +1,62 @@
+[
+  [
+    {
+      "event_id": "evt_b6e56701b72b",
+      "timestamp": "2026-05-24T01:09:59.100780+00:00",
+      "event_type": "repair_trigger",
+      "source": "repair_observer",
+      "continuity_score": 0.7,
+      "entropy_delta": 0.3,
+      "observer_pressure": 0,
+      "continuity_shift": 0.0,
+      "field_zone": "core",
+      "attractor_region": "unstable",
+      "target": "trading_observer",
+      "details": {},
+      "duration_ms": 0.0,
+      "success": true,
+      "parent_event_id": null,
+      "chain_id": "chain_536d4535"
+    }
+  ],
+  [
+    {
+      "event_id": "evt_d635012d101d",
+      "timestamp": "2026-05-24T01:09:59.100780+00:00",
+      "event_type": "repair_trigger",
+      "source": "repair_observer",
+      "continuity_score": 0.75,
+      "entropy_delta": 0.1,
+      "observer_pressure": 0,
+      "continuity_shift": 0.0,
+      "field_zone": "core",
+      "attractor_region": "unstable",
+      "target": "memory_observer",
+      "details": {},
+      "duration_ms": 0.0,
+      "success": true,
+      "parent_event_id": null,
+      "chain_id": "chain_0138b3af"
+    }
+  ],
+  [
+    {
+      "event_id": "evt_7e0b7fdcbd47",
+      "timestamp": "2026-05-24T01:09:59.100780+00:00",
+      "event_type": "repair_complete",
+      "source": "repair_observer",
+      "continuity_score": 0.9,
+      "entropy_delta": -0.2,
+      "observer_pressure": 0,
+      "continuity_shift": 0.0,
+      "field_zone": "core",
+      "attractor_region": "stable",
+      "target": "trading_observer",
+      "details": {},
+      "duration_ms": 0.0,
+      "success": true,
+      "parent_event_id": null,
+      "chain_id": "chain_494e2f03"
+    }
+  ]
+]

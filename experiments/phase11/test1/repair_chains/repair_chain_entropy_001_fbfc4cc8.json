@@ -1,10 +1,10 @@
 {
   "event_id": "entropy_001_fbfc4cc8",
-  "timestamp": "2026-05-23T17:50:53.397534+00:00",
+  "timestamp": "2026-05-24T00:59:16.379580+00:00",
   "chaos_type": "websocket_interrupt",
-  "target": "ws_secondary",
+  "target": "ws_primary",
   "propagation_path": [
-    "ws_secondary",
+    "ws_primary",
     "event_fabric",
     "routing_layer",
     "observer_runtime"
@@ -16,24 +16,29 @@
   ],
   "reroute_events": [
     {
-      "from": "ws_secondary",
-      "to": "backup_ws_secondary",
-      "delay_ms": 50
+      "from": "ws_primary",
+      "to": "backup_ws_primary",
+      "delay_ms": 55
     },
     {
-      "from": "ws_secondary",
-      "to": "backup_ws_secondary",
-      "delay_ms": 490
+      "from": "ws_primary",
+      "to": "backup_ws_primary",
+      "delay_ms": 85
+    },
+    {
+      "from": "ws_primary",
+      "to": "backup_ws_primary",
+      "delay_ms": 316
     }
   ],
   "entropy_spread_radius": 4,
-  "recovery_duration_seconds": 9.7,
+  "recovery_duration_seconds": 6.03,
   "affected_observers": [
-    "srrs_opc.drift_detector.DriftType",
+    "srrs_opc.drift_detector.DriftReport",
     "srrs_opc.drift_detector.DriftDetector",
-    "srrs_opc.drift_tracker.DriftSignal",
-    "srrs_opc.drift_tracker.LongTermDriftTracker",
-    "srrs_opc.operator_continuity.OperatorContinuityTracker"
+    "srrs_opc.operator_continuity.OperatorContinuityTracker",
+    "oce.backend.drift_detector.DriftLevel",
+    "oce.backend.drift_detector.DriftDetector"
   ],
   "recovered": true,
   "cascade": false
