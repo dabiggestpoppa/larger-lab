@@ -84,16 +84,22 @@ class ObservabilityStressTest:
         ]
 
         for name, test_fn in tests:
-            print(f"\n  🧪 Running: {name}...")
+            ts = datetime.now(timezone.utc).strftime("%H:%M:%S")
+            print(f"[{ts}] STRESS: Starting {name}...", flush=True)
             start = time.time()
             try:
                 result = test_fn()
                 result.duration_seconds = round(time.time() - start, 2)
+                print(f"[{ts}] STRESS: {name} completed in {result.duration_seconds}s", flush=True)
             except Exception as e:
+                elapsed = round(time.time() - start, 2)
+                print(f"[{ts}] STRESS: {name} FAILED after {elapsed}s: {e}", flush=True)
+                import traceback
+                traceback.print_exc()
                 result = StressResult(
                     test_name=name,
                     timestamp=datetime.now(timezone.utc).isoformat(),
-                    duration_seconds=round(time.time() - start, 2),
+                    duration_seconds=elapsed,
                     events_generated=0,
                     observers_spawned=0,
                     topology_reconstructable=False,
@@ -111,6 +117,7 @@ class ObservabilityStressTest:
 
     def _stress_observer_flood(self) -> StressResult:
         """Spawn many observers rapidly to test topology overload."""
+        print(f"  [STRESS] observer_flood: spawning 50 observers...", flush=True)
         n_observers = 50
         observer_ids = []
 
@@ -122,9 +129,10 @@ class ObservabilityStressTest:
             observer_ids.append(oid)
 
         # Generate interactions between all pairs
+        print(f"  [STRESS] observer_flood: generating interactions...", flush=True)
         events = 0
         for i, src in enumerate(observer_ids):
-            for tgt in observer_ids[i+1:i+5]:  # connect to next 4
+            for tgt in observer_ids[i+1:i+5]:
                 self.registry.record_interaction(
                     source=src, target=tgt,
                     interaction_type=InteractionType.MESSAGE,
@@ -136,6 +144,7 @@ class ObservabilityStressTest:
                     observer_pressure=2, field_zone="stress_flood"
                 )
                 events += 1
+        print(f"  [STRESS] observer_flood: done. {events} events generated.", flush=True)
 
         # Validate
         graph = self.registry.get_observer_graph()
@@ -157,6 +166,7 @@ class ObservabilityStressTest:
 
     def _stress_repair_storm(self) -> StressResult:
         """Trigger many repairs in rapid succession."""
+        print(f"  [STRESS] repair_storm: triggering 30 repairs...", flush=True)
         n_repairs = 30
         chain_id = "repair_storm_001"
 
@@ -186,9 +196,10 @@ class ObservabilityStressTest:
                     success=False,
                 )
 
-        # Validate
+        print(f"  [STRESS] repair_storm: validating...", flush=True)
         repair_chains = self.event_store.get_repair_chains()
         convergence = len(repair_chains) > 0
+        print(f"  [STRESS] repair_storm: done. chains={len(repair_chains)}", flush=True)
 
         return StressResult(
             test_name="repair_storm",
@@ -206,6 +217,7 @@ class ObservabilityStressTest:
 
     def _stress_entropy_spike(self) -> StressResult:
         """Inject high entropy events to test perturbation mapping."""
+        print(f"  [STRESS] entropy_spike: injecting 20 spikes...", flush=True)
         n_spikes = 20
 
         for i in range(n_spikes):
@@ -226,8 +238,9 @@ class ObservabilityStressTest:
                 continuity_shift=-entropy,
             )
 
-        # Validate
+        print(f"  [STRESS] entropy_spike: validating...", flush=True)
         entropy_profile = self.event_store.get_entropy_profile()
+        print(f"  [STRESS] entropy_spike: done. net_entropy={entropy_profile.get('net_entropy', 0):.4f}", flush=True)
         return StressResult(
             test_name="entropy_spike",
             timestamp=datetime.now(timezone.utc).isoformat(),
@@ -244,6 +257,7 @@ class ObservabilityStressTest:
 
     def _stress_routing_instability(self) -> StressResult:
         """Simulate routing instability to test field deformation tracking."""
+        print(f"  [STRESS] routing_instability: simulating 25 shifts...", flush=True)
         n_shifts = 25
 
         for i in range(n_shifts):
@@ -262,6 +276,7 @@ class ObservabilityStressTest:
                 continuity_shift=-random.uniform(0.1, 0.5),
             )
 
+        print(f"  [STRESS] routing_instability: done.", flush=True)
         return StressResult(
             test_name="routing_instability",
             timestamp=datetime.now(timezone.utc).isoformat(),
@@ -278,6 +293,7 @@ class ObservabilityStressTest:
 
     def _stress_sync_drift(self) -> StressResult:
         """Simulate synchronization drift to test continuity tracking."""
+        print(f"  [STRESS] sync_drift: simulating 40 events...", flush=True)
         n_events = 40
 
         for i in range(n_events):
@@ -298,7 +314,9 @@ class ObservabilityStressTest:
                 latency_ms=random.uniform(50, 2000),
             )
 
+        print(f"  [STRESS] sync_drift: validating...", flush=True)
         sync_health = self.registry.get_sync_health()
+        print(f"  [STRESS] sync_drift: done. sync_rate={sync_health.get('sync_rate', 0):.2f}", flush=True)
         return StressResult(
             test_name="sync_drift",
             timestamp=datetime.now(timezone.utc).isoformat(),

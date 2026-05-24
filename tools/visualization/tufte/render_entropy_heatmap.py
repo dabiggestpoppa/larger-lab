@@ -28,8 +28,9 @@ def render_entropy_heatmap(entropy_data: dict) -> str:
     }
     
     regions = entropy_data.get("regions", {})
-    if not regions:
-        lines.append("No entropy data available")
+    if not regions and entropy_data.get("status") == "no_data":
+        lines.append("No entropy data available (event store empty)")
+        lines.append("Run export_and_render.py to feed real data")
         return "\n".join(lines)
     
     lines.append(f"{'Region':30} | {'Level':10} | {'Score':6} | Map")
@@ -52,8 +53,18 @@ def render_entropy_heatmap(entropy_data: dict) -> str:
 if __name__ == "__main__":
     import sys
     sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
-    from core.observability.temporal_graph import get_temporal_graph
-    tg = get_temporal_graph()
-    data = tg.get_entropy_profile() if hasattr(tg, 'get_entropy_profile') else {}
+    # Load from disk export
+    export_dir = Path(__file__).parent.parent / "exports" / "entropy"
+    data = {}
+    for f in export_dir.glob("*.json"):
+        try:
+            d = json.loads(f.read_text())
+            if "regions" in d: data = d
+        except: pass
+    # Fallback to singleton
+    if not data:
+        from core.observability.temporal_graph import get_temporal_graph
+        tg = get_temporal_graph()
+        data = tg.get_entropy_profile() if hasattr(tg, 'get_entropy_profile') else {}
     result = render_entropy_heatmap(data)
     print(result)

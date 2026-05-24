@@ -1,0 +1,9 @@
+{
+  "total_events": 15,
+  "total_entropy_injected": 2.1,
+  "total_entropy_dissipated": 0.55,
+  "net_entropy": 1.55,
+  "avg_entropy_per_event": 0.1767,
+  "max_single_entropy": 0.6,
+  "min_single_entropy": -0.2
+}

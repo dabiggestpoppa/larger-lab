@@ -1,0 +1,16 @@
+======================================================================
+TEMPORAL CONTINUITY RIBBON
+Generated: 2026-05-23T21:07:34.827697
+Data points: 15
+======================================================================
+
+Continuity over time (each char = time slice):
+
+  ████▓▓██▒██▓▓██
+
+LEGEND: █=strong ▓=moderate ▒=weak ░=broken
+
+Strong:     10 (66.7%)
+Moderate:    4 (26.7%)
+Weak:        1 (6.7%)
+Broken:      0 (0.0%)

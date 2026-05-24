@@ -1,0 +1,145 @@
+{
+  "timestamp": "2026-05-24T01:09:59.101785+00:00",
+  "total_observers": 8,
+  "total_interactions": 10,
+  "nodes": {
+    "trading_observer": {
+      "type": "trading",
+      "state": "spawning",
+      "entropy": 0.0,
+      "tasks": 0,
+      "errors": 0
+    },
+    "repair_observer": {
+      "type": "repair",
+      "state": "spawning",
+      "entropy": 0.0,
+      "tasks": 0,
+      "errors": 0
+    },
+    "planner_observer": {
+      "type": "planner",
+      "state": "spawning",
+      "entropy": 0.0,
+      "tasks": 0,
+      "errors": 0
+    },
+    "memory_observer": {
+      "type": "memory",
+      "state": "spawning",
+      "entropy": 0.0,
+      "tasks": 0,
+      "errors": 0
+    },
+    "entropy_observer": {
+      "type": "entropy",
+      "state": "spawning",
+      "entropy": 0.0,
+      "tasks": 0,
+      "errors": 0
+    },
+    "gateway_observer": {
+      "type": "gateway",
+      "state": "spawning",
+      "entropy": 0.0,
+      "tasks": 0,
+      "errors": 0
+    },
+    "security_observer": {
+      "type": "security",
+      "state": "spawning",
+      "entropy": 0.0,
+      "tasks": 0,
+      "errors": 0
+    },
+    "health_observer": {
+      "type": "health",
+      "state": "spawning",
+      "entropy": 0.0,
+      "tasks": 0,
+      "errors": 0
+    }
+  },
+  "edges": [
+    {
+      "source": "trading_observer",
+      "target": "repair_observer",
+      "type": "repair",
+      "frequency": 1,
+      "latency_ms": 50,
+      "sync": "unknown"
+    },
+    {
+      "source": "repair_observer",
+      "target": "planner_observer",
+      "type": "message",
+      "frequency": 1,
+      "latency_ms": 120,
+      "sync": "unknown"
+    },
+    {
+      "source": "planner_observer",
+      "target": "memory_observer",
+      "type": "memory",
+      "frequency": 1,
+      "latency_ms": 80,
+      "sync": "unknown"
+    },
+    {
+      "source": "memory_observer",
+      "target": "entropy_observer",
+      "type": "sync",
+      "frequency": 1,
+      "latency_ms": 30,
+      "sync": "unknown"
+    },
+    {
+      "source": "entropy_observer",
+      "target": "gateway_observer",
+      "type": "route",
+      "frequency": 1,
+      "latency_ms": 150,
+      "sync": "unknown"
+    },
+    {
+      "source": "gateway_observer",
+      "target": "security_observer",
+      "type": "sync",
+      "frequency": 1,
+      "latency_ms": 70,
+      "sync": "unknown"
+    },
+    {
+      "source": "security_observer",
+      "target": "health_observer",
+      "type": "sync",
+      "frequency": 1,
+      "latency_ms": 20,
+      "sync": "unknown"
+    },
+    {
+      "source": "health_observer",
+      "target": "trading_observer",
+      "type": "sync",
+      "frequency": 1,
+      "latency_ms": 40,
+      "sync": "unknown"
+    },
+    {
+      "source": "trading_observer",
+      "target": "planner_observer",
+      "type": "message",
+      "frequency": 1,
+      "latency_ms": 110,
+      "sync": "unknown"
+    },
+    {
+      "source": "repair_observer",
+      "target": "memory_observer",
+      "type": "memory",
+      "frequency": 1,
+      "latency_ms": 90,
+      "sync": "unknown"
+    }
+  ]
+}

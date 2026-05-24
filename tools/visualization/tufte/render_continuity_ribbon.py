@@ -75,8 +75,19 @@ def render_continuity_ribbon(continuity_data: list) -> str:
 if __name__ == "__main__":
     import sys
     sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
-    from core.observability.temporal_graph import get_temporal_graph
-    tg = get_temporal_graph()
-    data = tg.get_continuity_series() if hasattr(tg, 'get_continuity_series') else []
+    # Load from disk export
+    export_dir = Path(__file__).parent.parent / "exports" / "timelines"
+    data = []
+    for f in export_dir.glob("*.json"):
+        try:
+            d = json.loads(f.read_text())
+            if isinstance(d, list): data = d
+            elif "series" in d: data = d["series"]
+        except: pass
+    # Fallback to singleton
+    if not data:
+        from core.observability.temporal_graph import get_temporal_graph
+        tg = get_temporal_graph()
+        data = tg.get_continuity_series() if hasattr(tg, 'get_continuity_series') else []
     result = render_continuity_ribbon(data)
     print(result)
