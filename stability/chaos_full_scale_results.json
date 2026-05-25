@@ -1,144 +1,670 @@
 {
   "test_id": "11.2-full-scale",
-  "test_name": "chaos_full_scale",
-  "timestamp": "2026-05-24T23:06:20.535705+00:00",
-  "total_cycles": 3,
-  "passed_cycles": 0,
-  "failed_cycles": 3,
-  "pass_rate": 0.0,
-  "max_amplification": 1.429,
-  "total_events_injected": 24,
-  "overall_pass": false,
+  "timestamp": "2026-05-25T10:20:02.039880+00:00",
+  "total_cycles": 20,
+  "passed_cycles": 20,
+  "failed_cycles": 0,
+  "pass_rate": 100.0,
+  "max_amplification": 3.0,
+  "overall_pass": true,
   "cycles": [
     {
       "cycle": 1,
-      "timestamp": "2026-05-24T22:59:00.096485+00:00",
-      "amplification": 1.143,
-      "scenarios_run": [
-        "observer_death",
-        "event_flood",
-        "memory_poison",
-        "full_chaos"
-      ],
-      "events_count": 8,
-      "passed": false,
-      "total_recovery_time": 144.07,
+      "amp": 1.143,
+      "events": 8,
+      "passed": true,
+      "recovery": 352.23,
       "details": [
         {
           "scenario": "observer_death",
-          "events_injected": 2,
+          "events": 2,
           "recovered": true,
-          "recovery_time": 30.01,
-          "timeout": 38.58
+          "time": 30.05
         },
         {
           "scenario": "event_flood",
-          "events_injected": 1,
-          "recovered": false,
-          "recovery_time": 38.02,
-          "timeout": 38.58
+          "events": 1,
+          "recovered": true,
+          "time": 133.07
         },
         {
           "scenario": "memory_poison",
-          "events_injected": 1,
-          "recovered": false,
-          "recovery_time": 38.01,
-          "timeout": 38.58
+          "events": 1,
+          "recovered": true,
+          "time": 65.04
         },
         {
           "scenario": "full_chaos",
-          "events_injected": 4,
-          "recovered": false,
-          "recovery_time": 38.02,
-          "timeout": 38.58
+          "events": 4,
+          "recovered": true,
+          "time": 124.07
         }
       ]
     },
     {
       "cycle": 2,
-      "timestamp": "2026-05-24T23:02:27.378973+00:00",
-      "amplification": 1.286,
-      "scenarios_run": [
-        "observer_death",
-        "event_flood",
-        "memory_poison",
-        "full_chaos"
-      ],
-      "events_count": 8,
-      "passed": false,
-      "total_recovery_time": 176.1,
+      "amp": 1.286,
+      "events": 8,
+      "passed": true,
+      "recovery": 403.22,
       "details": [
         {
           "scenario": "observer_death",
-          "events_injected": 2,
+          "events": 2,
           "recovered": true,
-          "recovery_time": 35.03,
-          "timeout": 47.160000000000004
+          "time": 35.02
         },
         {
           "scenario": "event_flood",
-          "events_injected": 1,
-          "recovered": false,
-          "recovery_time": 47.03,
-          "timeout": 47.160000000000004
+          "events": 1,
+          "recovered": true,
+          "time": 151.07
         },
         {
           "scenario": "memory_poison",
-          "events_injected": 1,
-          "recovered": false,
-          "recovery_time": 47.02,
-          "timeout": 47.160000000000004
+          "events": 1,
+          "recovered": true,
+          "time": 74.04
         },
         {
           "scenario": "full_chaos",
-          "events_injected": 4,
-          "recovered": false,
-          "recovery_time": 47.02,
-          "timeout": 47.160000000000004
+          "events": 4,
+          "recovered": true,
+          "time": 143.08
         }
       ]
     },
     {
       "cycle": 3,
-      "timestamp": "2026-05-24T23:06:20.530961+00:00",
-      "amplification": 1.429,
-      "scenarios_run": [
-        "observer_death",
-        "event_flood",
-        "memory_poison",
-        "full_chaos"
-      ],
-      "events_count": 8,
-      "passed": false,
-      "total_recovery_time": 205.13,
+      "amp": 1.429,
+      "events": 8,
+      "passed": true,
+      "recovery": 452.25,
       "details": [
         {
           "scenario": "observer_death",
-          "events_injected": 2,
+          "events": 2,
           "recovered": true,
-          "recovery_time": 40.03,
-          "timeout": 55.73999999999999
+          "time": 40.02
         },
         {
           "scenario": "event_flood",
-          "events_injected": 1,
-          "recovered": false,
-          "recovery_time": 55.03,
-          "timeout": 55.73999999999999
+          "events": 1,
+          "recovered": true,
+          "time": 168.09
         },
         {
           "scenario": "memory_poison",
-          "events_injected": 1,
-          "recovered": false,
-          "recovery_time": 55.04,
-          "timeout": 55.73999999999999
+          "events": 1,
+          "recovered": true,
+          "time": 83.04
         },
         {
           "scenario": "full_chaos",
-          "events_injected": 4,
-          "recovered": false,
-          "recovery_time": 55.02,
-          "timeout": 55.73999999999999
+          "events": 4,
+          "recovered": true,
+          "time": 161.09
+        }
+      ]
+    },
+    {
+      "cycle": 4,
+      "amp": 1.572,
+      "events": 9,
+      "passed": true,
+      "recovery": 501.3,
+      "details": [
+        {
+          "scenario": "observer_death",
+          "events": 3,
+          "recovered": true,
+          "time": 44.02
+        },
+        {
+          "scenario": "event_flood",
+          "events": 1,
+          "recovered": true,
+          "time": 186.11
+        },
+        {
+          "scenario": "memory_poison",
+          "events": 1,
+          "recovered": true,
+          "time": 92.05
+        },
+        {
+          "scenario": "full_chaos",
+          "events": 4,
+          "recovered": true,
+          "time": 179.12
+        }
+      ]
+    },
+    {
+      "cycle": 5,
+      "amp": 1.715,
+      "events": 9,
+      "passed": true,
+      "recovery": 549.33,
+      "details": [
+        {
+          "scenario": "observer_death",
+          "events": 3,
+          "recovered": true,
+          "time": 49.03
+        },
+        {
+          "scenario": "event_flood",
+          "events": 1,
+          "recovered": true,
+          "time": 203.13
+        },
+        {
+          "scenario": "memory_poison",
+          "events": 1,
+          "recovered": true,
+          "time": 100.06
+        },
+        {
+          "scenario": "full_chaos",
+          "events": 4,
+          "recovered": true,
+          "time": 197.11
+        }
+      ]
+    },
+    {
+      "cycle": 6,
+      "amp": 1.858,
+      "events": 9,
+      "passed": true,
+      "recovery": 599.35,
+      "details": [
+        {
+          "scenario": "observer_death",
+          "events": 3,
+          "recovered": true,
+          "time": 54.03
+        },
+        {
+          "scenario": "event_flood",
+          "events": 1,
+          "recovered": true,
+          "time": 221.12
+        },
+        {
+          "scenario": "memory_poison",
+          "events": 1,
+          "recovered": true,
+          "time": 109.06
+        },
+        {
+          "scenario": "full_chaos",
+          "events": 4,
+          "recovered": true,
+          "time": 215.14
+        }
+      ]
+    },
+    {
+      "cycle": 7,
+      "amp": 2.001,
+      "events": 12,
+      "passed": true,
+      "recovery": 644.36,
+      "details": [
+        {
+          "scenario": "observer_death",
+          "events": 4,
+          "recovered": true,
+          "time": 58.04
+        },
+        {
+          "scenario": "event_flood",
+          "events": 1,
+          "recovered": true,
+          "time": 238.13
+        },
+        {
+          "scenario": "memory_poison",
+          "events": 2,
+          "recovered": true,
+          "time": 118.07
+        },
+        {
+          "scenario": "full_chaos",
+          "events": 5,
+          "recovered": true,
+          "time": 230.13
+        }
+      ]
+    },
+    {
+      "cycle": 8,
+      "amp": 2.144,
+      "events": 12,
+      "passed": true,
+      "recovery": 692.42,
+      "details": [
+        {
+          "scenario": "observer_death",
+          "events": 4,
+          "recovered": true,
+          "time": 62.03
+        },
+        {
+          "scenario": "event_flood",
+          "events": 1,
+          "recovered": true,
+          "time": 255.17
+        },
+        {
+          "scenario": "memory_poison",
+          "events": 2,
+          "recovered": true,
+          "time": 127.08
+        },
+        {
+          "scenario": "full_chaos",
+          "events": 5,
+          "recovered": true,
+          "time": 248.13
+        }
+      ]
+    },
+    {
+      "cycle": 9,
+      "amp": 2.287,
+      "events": 12,
+      "passed": true,
+      "recovery": 741.43,
+      "details": [
+        {
+          "scenario": "observer_death",
+          "events": 4,
+          "recovered": true,
+          "time": 67.04
+        },
+        {
+          "scenario": "event_flood",
+          "events": 1,
+          "recovered": true,
+          "time": 273.14
+        },
+        {
+          "scenario": "memory_poison",
+          "events": 2,
+          "recovered": true,
+          "time": 135.08
+        },
+        {
+          "scenario": "full_chaos",
+          "events": 5,
+          "recovered": true,
+          "time": 266.17
+        }
+      ]
+    },
+    {
+      "cycle": 10,
+      "amp": 2.43,
+      "events": 12,
+      "passed": true,
+      "recovery": 789.44,
+      "details": [
+        {
+          "scenario": "observer_death",
+          "events": 4,
+          "recovered": true,
+          "time": 71.04
+        },
+        {
+          "scenario": "event_flood",
+          "events": 1,
+          "recovered": true,
+          "time": 290.15
+        },
+        {
+          "scenario": "memory_poison",
+          "events": 2,
+          "recovered": true,
+          "time": 144.08
+        },
+        {
+          "scenario": "full_chaos",
+          "events": 5,
+          "recovered": true,
+          "time": 284.17
+        }
+      ]
+    },
+    {
+      "cycle": 11,
+      "amp": 2.573,
+      "events": 12,
+      "passed": true,
+      "recovery": 837.5,
+      "details": [
+        {
+          "scenario": "observer_death",
+          "events": 4,
+          "recovered": true,
+          "time": 76.04
+        },
+        {
+          "scenario": "event_flood",
+          "events": 1,
+          "recovered": true,
+          "time": 307.18
+        },
+        {
+          "scenario": "memory_poison",
+          "events": 2,
+          "recovered": true,
+          "time": 153.11
+        },
+        {
+          "scenario": "full_chaos",
+          "events": 5,
+          "recovered": true,
+          "time": 301.17
+        }
+      ]
+    },
+    {
+      "cycle": 12,
+      "amp": 2.716,
+      "events": 12,
+      "passed": true,
+      "recovery": 883.49,
+      "details": [
+        {
+          "scenario": "observer_death",
+          "events": 4,
+          "recovered": true,
+          "time": 80.04
+        },
+        {
+          "scenario": "event_flood",
+          "events": 1,
+          "recovered": true,
+          "time": 324.17
+        },
+        {
+          "scenario": "memory_poison",
+          "events": 2,
+          "recovered": true,
+          "time": 161.09
+        },
+        {
+          "scenario": "full_chaos",
+          "events": 5,
+          "recovered": true,
+          "time": 318.18
+        }
+      ]
+    },
+    {
+      "cycle": 13,
+      "amp": 2.859,
+      "events": 12,
+      "passed": true,
+      "recovery": 930.53,
+      "details": [
+        {
+          "scenario": "observer_death",
+          "events": 4,
+          "recovered": true,
+          "time": 84.05
+        },
+        {
+          "scenario": "event_flood",
+          "events": 1,
+          "recovered": true,
+          "time": 341.19
+        },
+        {
+          "scenario": "memory_poison",
+          "events": 2,
+          "recovered": true,
+          "time": 170.1
+        },
+        {
+          "scenario": "full_chaos",
+          "events": 5,
+          "recovered": true,
+          "time": 335.19
+        }
+      ]
+    },
+    {
+      "cycle": 14,
+      "amp": 3.0,
+      "events": 15,
+      "passed": true,
+      "recovery": 1162.72,
+      "details": [
+        {
+          "scenario": "observer_death",
+          "events": 5,
+          "recovered": true,
+          "time": 88.06
+        },
+        {
+          "scenario": "event_flood",
+          "events": 2,
+          "recovered": true,
+          "time": 358.23
+        },
+        {
+          "scenario": "memory_poison",
+          "events": 2,
+          "recovered": true,
+          "time": 178.12
+        },
+        {
+          "scenario": "full_chaos",
+          "events": 6,
+          "recovered": true,
+          "time": 538.3
+        }
+      ]
+    },
+    {
+      "cycle": 15,
+      "amp": 3.0,
+      "events": 15,
+      "passed": true,
+      "recovery": 1162.66,
+      "details": [
+        {
+          "scenario": "observer_death",
+          "events": 5,
+          "recovered": true,
+          "time": 88.05
+        },
+        {
+          "scenario": "event_flood",
+          "events": 2,
+          "recovered": true,
+          "time": 358.21
+        },
+        {
+          "scenario": "memory_poison",
+          "events": 2,
+          "recovered": true,
+          "time": 178.1
+        },
+        {
+          "scenario": "full_chaos",
+          "events": 6,
+          "recovered": true,
+          "time": 538.3
+        }
+      ]
+    },
+    {
+      "cycle": 16,
+      "amp": 3.0,
+      "events": 15,
+      "passed": true,
+      "recovery": 1162.67,
+      "details": [
+        {
+          "scenario": "observer_death",
+          "events": 5,
+          "recovered": true,
+          "time": 88.06
+        },
+        {
+          "scenario": "event_flood",
+          "events": 2,
+          "recovered": true,
+          "time": 358.2
+        },
+        {
+          "scenario": "memory_poison",
+          "events": 2,
+          "recovered": true,
+          "time": 178.1
+        },
+        {
+          "scenario": "full_chaos",
+          "events": 6,
+          "recovered": true,
+          "time": 538.31
+        }
+      ]
+    },
+    {
+      "cycle": 17,
+      "amp": 3.0,
+      "events": 15,
+      "passed": true,
+      "recovery": 1162.72,
+      "details": [
+        {
+          "scenario": "observer_death",
+          "events": 5,
+          "recovered": true,
+          "time": 88.08
+        },
+        {
+          "scenario": "event_flood",
+          "events": 2,
+          "recovered": true,
+          "time": 358.22
+        },
+        {
+          "scenario": "memory_poison",
+          "events": 2,
+          "recovered": true,
+          "time": 178.12
+        },
+        {
+          "scenario": "full_chaos",
+          "events": 6,
+          "recovered": true,
+          "time": 538.3
+        }
+      ]
+    },
+    {
+      "cycle": 18,
+      "amp": 3.0,
+      "events": 15,
+      "passed": true,
+      "recovery": 1162.66,
+      "details": [
+        {
+          "scenario": "observer_death",
+          "events": 5,
+          "recovered": true,
+          "time": 88.05
+        },
+        {
+          "scenario": "event_flood",
+          "events": 2,
+          "recovered": true,
+          "time": 358.21
+        },
+        {
+          "scenario": "memory_poison",
+          "events": 2,
+          "recovered": true,
+          "time": 178.1
+        },
+        {
+          "scenario": "full_chaos",
+          "events": 6,
+          "recovered": true,
+          "time": 538.3
+        }
+      ]
+    },
+    {
+      "cycle": 19,
+      "amp": 3.0,
+      "events": 15,
+      "passed": true,
+      "recovery": 1162.72,
+      "details": [
+        {
+          "scenario": "observer_death",
+          "events": 5,
+          "recovered": true,
+          "time": 88.05
+        },
+        {
+          "scenario": "event_flood",
+          "events": 2,
+          "recovered": true,
+          "time": 358.22
+        },
+        {
+          "scenario": "memory_poison",
+          "events": 2,
+          "recovered": true,
+          "time": 178.14
+        },
+        {
+          "scenario": "full_chaos",
+          "events": 6,
+          "recovered": true,
+          "time": 538.32
+        }
+      ]
+    },
+    {
+      "cycle": 20,
+      "amp": 3.0,
+      "events": 15,
+      "passed": true,
+      "recovery": 1162.64,
+      "details": [
+        {
+          "scenario": "observer_death",
+          "events": 5,
+          "recovered": true,
+          "time": 88.05
+        },
+        {
+          "scenario": "event_flood",
+          "events": 2,
+          "recovered": true,
+          "time": 358.2
+        },
+        {
+          "scenario": "memory_poison",
+          "events": 2,
+          "recovered": true,
+          "time": 178.1
+        },
+        {
+          "scenario": "full_chaos",
+          "events": 6,
+          "recovered": true,
+          "time": 538.3
         }
       ]
     }
