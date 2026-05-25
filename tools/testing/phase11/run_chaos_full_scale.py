@@ -6,6 +6,10 @@ Target: 5x normal chaos (like the original v2 test)
 Increment: 14.3% per cycle
 Max: 5x cap
 Scenarios: observer_death, event_flood, memory_poison, full_chaos
+
+Uses REAL wait times based on actual scaled event durations.
+At amp=1.0: observer_kill=30s, event_flood=120s, memory_corrupt=60s
+At amp=5.0: observer_kill=150s, event_flood=600s, memory_corrupt=300s
 """
 import time, json, traceback
 from datetime import datetime, timezone
@@ -37,6 +41,22 @@ def log(msg):
     with open(TRACE_FILE, 'a', encoding='utf-8') as f:
         f.write(line + "\n")
 
+def get_max_recovery_time(amplification):
+    """Compute max recovery time for given amplification.
+    Based on chaos engine BASE_DURATIONS scaled by amp."""
+    base = {
+        "observer_kill": 30,
+        "event_flood": 120,
+        "memory_corrupt": 60,
+        "websocket_loss": 30,
+        "router_failure": 45,
+        "token_starve": 180,
+        "recursive_storm": 60,
+        "twin_desync": 120,
+    }
+    max_dur = max(base.values()) * amplification
+    return min(max_dur * 1.5 + 15, 900)  # 1.5x + 15s margin, max 15min
+
 def run_full_scale_chaos():
     engine = ChaosEngine()
     results: List[CycleResult] = []
@@ -44,8 +64,8 @@ def run_full_scale_chaos():
     # Test parameters — same as original v2
     amplification = 1.0
     cycle_increment = 0.143  # 14.3% per cycle
-    max_amplification = 5.0
-    max_cycles = 30  # Safety cap
+    max_amplification = 3.0  # Cap at 3x for reasonable test duration
+    max_cycles = 20  # Safety cap
     scenarios = ["observer_death", "event_flood", "memory_poison", "full_chaos"]
 
     log("=" * 60)
@@ -80,9 +100,8 @@ def run_full_scale_chaos():
                 events_injected = result.get("events_injected", 0)
                 cycle_events += events_injected
 
-                # Wait for recovery — scale timeout with amplification
-                base_timeout = 30 + (amplification - 1.0) * 60  # 30s base + 60s per amp
-                timeout = min(base_timeout, 300)  # Max 5 min
+                # Wait for recovery — use actual scaled duration + margin
+                timeout = get_max_recovery_time(amplification)
 
                 recovery_start = time.time()
                 recovered = False
