@@ -1,109 +1,58 @@
 """
 Phase 11.2 — Full Scale Chaos Test
-===================================
-Runs the real chaos engine with amplification scaling.
-Target: 5x normal chaos (like the original v2 test)
-Increment: 14.3% per cycle
-Max: 5x cap
-Scenarios: observer_death, event_flood, memory_poison, full_chaos
-
-Uses REAL wait times based on actual scaled event durations.
-At amp=1.0: observer_kill=30s, event_flood=120s, memory_corrupt=60s
-At amp=5.0: observer_kill=150s, event_flood=600s, memory_corrupt=300s
+Target: 3.0x normal chaos, 14.3% increment per cycle
 """
-import time, json, traceback
+import time, json, sys
 from datetime import datetime, timezone
 from pathlib import Path
-from dataclasses import dataclass, asdict
-from typing import List, Dict, Any, Optional
-import sys; sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 from tools.testing.chaos.chaos_engine import ChaosEngine
 
 RESULTS_FILE = Path("stability/chaos_full_scale_results.json")
 TRACE_FILE = Path("stability/chaos_full_scale_trace.log")
-RESULTS_FILE.parent.mkdir(parents=True, exist_ok=True)
-
-@dataclass
-class CycleResult:
-    cycle: int
-    timestamp: str
-    amplification: float
-    scenarios_run: List[str]
-    events_count: int
-    passed: bool
-    total_recovery_time: float
-    details: List[Dict]
 
 def log(msg):
     ts = datetime.now().isoformat()
     line = f"[{ts}] {msg}"
-    print(line)
+    print(line, flush=True)
     with open(TRACE_FILE, 'a', encoding='utf-8') as f:
         f.write(line + "\n")
 
-def get_max_recovery_time(amplification):
-    """Compute max recovery time for given amplification.
-    Based on chaos engine BASE_DURATIONS scaled by amp."""
-    base = {
-        "observer_kill": 30,
-        "event_flood": 120,
-        "memory_corrupt": 60,
-        "websocket_loss": 30,
-        "router_failure": 45,
-        "token_starve": 180,
-        "recursive_storm": 60,
-        "twin_desync": 120,
-    }
-    max_dur = max(base.values()) * amplification
-    return min(max_dur * 1.5 + 15, 900)  # 1.5x + 15s margin, max 15min
+def get_timeout(amp):
+    base = {"observer_kill": 30, "event_flood": 120, "memory_corrupt": 60, "websocket_loss": 30}
+    return min(max(base.values()) * amp * 1.5 + 15, 900)
 
-def run_full_scale_chaos():
+def run():
     engine = ChaosEngine()
-    results: List[CycleResult] = []
-
-    # Test parameters — same as original v2
+    results = []
     amplification = 1.0
-    cycle_increment = 0.143  # 14.3% per cycle
-    max_amplification = 3.0  # Cap at 3x for reasonable test duration
-    max_cycles = 20  # Safety cap
+    cycle_increment = 0.143
+    max_amp = 3.0
     scenarios = ["observer_death", "event_flood", "memory_poison", "full_chaos"]
 
     log("=" * 60)
     log("PHASE 11.2 — FULL SCALE CHAOS TEST")
-    log(f"Target: {max_amplification}x normal chaos")
-    log(f"Increment: {cycle_increment*100:.1f}% per cycle")
-    log(f"Max cycles: {max_cycles}")
-    log(f"Scenarios per cycle: {scenarios}")
+    log(f"Target: {max_amp}x | Increment: {cycle_increment*100:.1f}%")
     log("=" * 60)
 
-    cycle = 0
-    consecutive_failures = 0
-    max_consecutive_failures = 3
-
-    while amplification <= max_amplification and cycle < max_cycles:
-        cycle += 1
-        amplification = min(1.0 + (cycle * cycle_increment), max_amplification)
-
-        log(f"\n{'='*60}")
-        log(f"CYCLE {cycle} | Amplification: {amplification:.4f}x")
-        log(f"{'='*60}")
+    for cycle in range(1, 21):
+        amplification = min(1.0 + (cycle * cycle_increment), max_amp)
+        log(f"\nCYCLE {cycle} | Amp: {amplification:.4f}x")
 
         cycle_events = 0
-        cycle_recovery_time = 0
+        cycle_recovery = 0
         all_passed = True
-        scenario_details = []
+        details = []
 
         for scenario in scenarios:
-            log(f"  Running: {scenario} (amp={amplification:.4f}x)")
+            log(f"  {scenario}...")
             try:
                 result = engine.run_chaos_scenario(scenario, amplification=amplification)
-                events_injected = result.get("events_injected", 0)
-                cycle_events += events_injected
+                events = result.get("events_injected", 0)
+                cycle_events += events
 
-                # Wait for recovery — use actual scaled duration + margin
-                timeout = get_max_recovery_time(amplification)
-
-                recovery_start = time.time()
+                timeout = get_timeout(amplification)
+                start = time.time()
                 recovered = False
                 for _ in range(int(timeout)):
                     time.sleep(1)
@@ -111,95 +60,42 @@ def run_full_scale_chaos():
                         recovered = True
                         break
 
-                recovery_time = time.time() - recovery_start
-                cycle_recovery_time += recovery_time
+                recovery = time.time() - start
+                cycle_recovery += recovery
 
                 if not recovered:
-                    log(f"    [WARN] Recovery timeout ({timeout:.0f}s) — forcing clear")
+                    log(f"    [WARN] Timeout ({timeout:.0f}s)")
                     engine.active_events.clear()
                     all_passed = False
 
-                detail = {
-                    "scenario": scenario,
-                    "events_injected": events_injected,
-                    "recovered": recovered,
-                    "recovery_time": round(recovery_time, 2),
-                    "timeout": timeout,
-                }
-                scenario_details.append(detail)
-
                 status = "PASS" if recovered else "FAIL"
-                log(f"    [{status}] {events_injected} events, recovery={recovery_time:.1f}s")
+                log(f"    [{status}] {events} events, {recovery:.1f}s")
+                details.append({"scenario": scenario, "events": events, "recovered": recovered, "time": round(recovery, 2)})
 
             except Exception as e:
                 log(f"    [ERROR] {e}")
                 all_passed = False
-                scenario_details.append({
-                    "scenario": scenario,
-                    "error": str(e),
-                    "recovered": False,
-                })
+                details.append({"scenario": scenario, "error": str(e)})
 
-        cycle_result = CycleResult(
-            cycle=cycle,
-            timestamp=datetime.now(timezone.utc).isoformat(),
-            amplification=round(amplification, 4),
-            scenarios_run=scenarios,
-            events_count=cycle_events,
-            passed=all_passed,
-            total_recovery_time=round(cycle_recovery_time, 2),
-            details=scenario_details,
-        )
-        results.append(cycle_result)
+        results.append({"cycle": cycle, "amp": round(amplification, 4), "events": cycle_events, "passed": all_passed, "recovery": round(cycle_recovery, 2), "details": details})
 
         if all_passed:
-            consecutive_failures = 0
-            log(f"  [PASS] CYCLE {cycle} — {cycle_events} events, {cycle_recovery_time:.1f}s total recovery")
+            log(f"  [PASS] {cycle_events} events, {cycle_recovery:.1f}s")
         else:
-            consecutive_failures += 1
-            log(f"  [FAIL] CYCLE {cycle} — consecutive failures: {consecutive_failures}")
-            if consecutive_failures >= max_consecutive_failures:
-                log(f"\n  ⚠ {max_consecutive_failures} consecutive failures — stopping test")
-                break
+            log(f"  [FAIL] consecutive failures — stopping")
+            break
 
-    # Summary
-    total_cycles = len(results)
-    passed_cycles = sum(1 for r in results if r.passed)
-    failed_cycles = total_cycles - passed_cycles
-    max_amp_reached = max(r.amplification for r in results)
-    total_events = sum(r.events_count for r in results)
+    total = len(results)
+    passed = sum(1 for r in results if r["passed"])
+    max_amp_reached = max(r["amp"] for r in results)
 
-    summary = {
-        "test_id": "11.2-full-scale",
-        "test_name": "chaos_full_scale",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "total_cycles": total_cycles,
-        "passed_cycles": passed_cycles,
-        "failed_cycles": failed_cycles,
-        "pass_rate": round(passed_cycles / total_cycles * 100, 1) if total_cycles > 0 else 0,
-        "max_amplification": max_amp_reached,
-        "total_events_injected": total_events,
-        "overall_pass": passed_cycles == total_cycles,
-        "cycles": [asdict(r) for r in results],
-    }
-
-    with open(RESULTS_FILE, 'w') as f:
-        json.dump(summary, f, indent=2, default=str)
+    summary = {"test_id": "11.2-full-scale", "timestamp": datetime.now(timezone.utc).isoformat(), "total_cycles": total, "passed_cycles": passed, "failed_cycles": total - passed, "pass_rate": round(passed/total*100, 1) if total else 0, "max_amplification": max_amp_reached, "overall_pass": passed == total, "cycles": results}
+    RESULTS_FILE.write_text(json.dumps(summary, indent=2, default=str))
 
     log(f"\n{'='*60}")
-    log(f"FINAL RESULTS")
-    log(f"{'='*60}")
-    log(f"Total cycles: {total_cycles}")
-    log(f"Passed: {passed_cycles}")
-    log(f"Failed: {failed_cycles}")
-    log(f"Pass rate: {summary['pass_rate']}%")
-    log(f"Max amplification: {max_amp_reached:.4f}x")
-    log(f"Total events injected: {total_events}")
+    log(f"RESULTS: {passed}/{total} cycles | Max amp: {max_amp_reached:.4f}x")
     log(f"Overall: {'ALL PASS' if summary['overall_pass'] else 'SOME FAIL'}")
-    log(f"Results: {RESULTS_FILE}")
-    log(f"Trace: {TRACE_FILE}")
-
     return summary
 
 if __name__ == "__main__":
-    run_full_scale_chaos()
+    run()
