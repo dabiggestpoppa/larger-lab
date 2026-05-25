@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useTaskStore } from "@/stores/taskStore";
 import { useAgentStore } from "@/stores/agentStore";
 import { useSessionStore } from "@/stores/sessionStore";
@@ -16,6 +16,7 @@ export default function LiveDataProvider() {
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectCount = useRef(0);
   const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isMounted = useRef(true);
 
   const setAgents = useAgentStore((s) => s.setAgents);
   const setTasks = useTaskStore((s) => s.setTasks);
@@ -23,86 +24,77 @@ export default function LiveDataProvider() {
   const setConnectionStatus = useUIStore((s) => s.setConnectionStatus);
   const addNotification = useUIStore((s) => s.addNotification);
 
-  useEffect(() => {
-    const connect = () => {
-      const ws = new WebSocket("ws://localhost:8000/ws");
-
-      ws.onopen = () => {
-        reconnectCount.current = 0;
-        setConnectionStatus("connected");
-        addNotification({ type: "success", message: "Connected to OCE backend" });
-      };
-
-      ws.onmessage = (event) => {
-        try {
-          const msg: WSMessage = JSON.parse(event.data);
-          handleMessage(msg);
-        } catch {
-          // ignore non-JSON
-        }
-      };
-
-      ws.onclose = () => {
-        setConnectionStatus("disconnected");
-        if (reconnectCount.current < 10) {
-          reconnectTimer.current = setTimeout(() => {
-            reconnectCount.current++;
-            connect();
-          }, 3000 * Math.min(reconnectCount.current + 1, 5));
-        }
-      };
-
-      ws.onerror = () => {
-        setConnectionStatus("error");
-      };
-
-      wsRef.current = ws;
-    };
-
-    const handleMessage = (msg: WSMessage) => {
+  const handleMessage = useCallback(
+    (msg: WSMessage) => {
+      if (!isMounted.current) return;
       switch (msg.type) {
         case "agents":
-          setAgents(msg.data as ReturnType<typeof useAgentStore.getState>["agents"]);
+          setAgents(msg.data as any);
           break;
         case "tasks":
-          setTasks(msg.data as ReturnType<typeof useTaskStore.getState>["tasks"]);
+          setTasks(msg.data as any);
           break;
         case "sessions":
-          setSessions(msg.data as ReturnType<typeof useSessionStore.getState>["sessions"]);
-          break;
-        case "chaos_update":
-          // Handle chaos test live updates
+          setSessions(msg.data as any);
           break;
         case "notification":
-          addNotification(msg.data as { type: "success" | "error" | "warning" | "info"; message: string });
+          addNotification(msg.data as any);
           break;
+      }
+    },
+    [setAgents, setTasks, setSessions, setConnectionStatus, addNotification]
+  );
+
+  useEffect(() => {
+    isMounted.current = true;
+
+    const connect = () => {
+      if (!isMounted.current) return;
+      try {
+        const ws = new WebSocket("ws://localhost:8000/ws");
+
+        ws.onopen = () => {
+          reconnectCount.current = 0;
+          setConnectionStatus("connected");
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            const msg: WSMessage = JSON.parse(event.data);
+            handleMessage(msg);
+          } catch {
+            // ignore non-JSON
+          }
+        };
+
+        ws.onclose = () => {
+          setConnectionStatus("disconnected");
+          if (isMounted.current && reconnectCount.current < 10) {
+            reconnectTimer.current = setTimeout(() => {
+              reconnectCount.current++;
+              connect();
+            }, 3000 * Math.min(reconnectCount.current + 1, 5));
+          }
+        };
+
+        ws.onerror = () => {
+          setConnectionStatus("error");
+        };
+
+        wsRef.current = ws;
+      } catch {
+        setConnectionStatus("error");
       }
     };
 
     connect();
 
-    // Poll for data every 10s as fallback
-    const pollInterval = setInterval(async () => {
-      if (wsRef.current?.readyState !== WebSocket.OPEN) {
-        try {
-          const [agentsRes, tasksRes] = await Promise.all([
-            fetch("http://localhost:8000/api/agents"),
-            fetch("http://localhost:8000/api/tasks"),
-          ]);
-          if (agentsRes.ok) setAgents(await agentsRes.json());
-          if (tasksRes.ok) setTasks(await tasksRes.json());
-        } catch {
-          // backend not available
-        }
-      }
-    }, 10000);
-
     return () => {
-      clearInterval(pollInterval);
+      isMounted.current = false;
       if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
       wsRef.current?.close();
     };
-  }, [setAgents, setTasks, setSessions, setConnectionStatus, addNotification]);
+  }, [handleMessage, setConnectionStatus]);
 
   return null;
 }
