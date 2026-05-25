@@ -1,0 +1,146 @@
+{
+  "test_id": "11.2-full-scale",
+  "test_name": "chaos_full_scale",
+  "timestamp": "2026-05-24T23:06:20.535705+00:00",
+  "total_cycles": 3,
+  "passed_cycles": 0,
+  "failed_cycles": 3,
+  "pass_rate": 0.0,
+  "max_amplification": 1.429,
+  "total_events_injected": 24,
+  "overall_pass": false,
+  "cycles": [
+    {
+      "cycle": 1,
+      "timestamp": "2026-05-24T22:59:00.096485+00:00",
+      "amplification": 1.143,
+      "scenarios_run": [
+        "observer_death",
+        "event_flood",
+        "memory_poison",
+        "full_chaos"
+      ],
+      "events_count": 8,
+      "passed": false,
+      "total_recovery_time": 144.07,
+      "details": [
+        {
+          "scenario": "observer_death",
+          "events_injected": 2,
+          "recovered": true,
+          "recovery_time": 30.01,
+          "timeout": 38.58
+        },
+        {
+          "scenario": "event_flood",
+          "events_injected": 1,
+          "recovered": false,
+          "recovery_time": 38.02,
+          "timeout": 38.58
+        },
+        {
+          "scenario": "memory_poison",
+          "events_injected": 1,
+          "recovered": false,
+          "recovery_time": 38.01,
+          "timeout": 38.58
+        },
+        {
+          "scenario": "full_chaos",
+          "events_injected": 4,
+          "recovered": false,
+          "recovery_time": 38.02,
+          "timeout": 38.58
+        }
+      ]
+    },
+    {
+      "cycle": 2,
+      "timestamp": "2026-05-24T23:02:27.378973+00:00",
+      "amplification": 1.286,
+      "scenarios_run": [
+        "observer_death",
+        "event_flood",
+        "memory_poison",
+        "full_chaos"
+      ],
+      "events_count": 8,
+      "passed": false,
+      "total_recovery_time": 176.1,
+      "details": [
+        {
+          "scenario": "observer_death",
+          "events_injected": 2,
+          "recovered": true,
+          "recovery_time": 35.03,
+          "timeout": 47.160000000000004
+        },
+        {
+          "scenario": "event_flood",
+          "events_injected": 1,
+          "recovered": false,
+          "recovery_time": 47.03,
+          "timeout": 47.160000000000004
+        },
+        {
+          "scenario": "memory_poison",
+          "events_injected": 1,
+          "recovered": false,
+          "recovery_time": 47.02,
+          "timeout": 47.160000000000004
+        },
+        {
+          "scenario": "full_chaos",
+          "events_injected": 4,
+          "recovered": false,
+          "recovery_time": 47.02,
+          "timeout": 47.160000000000004
+        }
+      ]
+    },
+    {
+      "cycle": 3,
+      "timestamp": "2026-05-24T23:06:20.530961+00:00",
+      "amplification": 1.429,
+      "scenarios_run": [
+        "observer_death",
+        "event_flood",
+        "memory_poison",
+        "full_chaos"
+      ],
+      "events_count": 8,
+      "passed": false,
+      "total_recovery_time": 205.13,
+      "details": [
+        {
+          "scenario": "observer_death",
+          "events_injected": 2,
+          "recovered": true,
+          "recovery_time": 40.03,
+          "timeout": 55.73999999999999
+        },
+        {
+          "scenario": "event_flood",
+          "events_injected": 1,
+          "recovered": false,
+          "recovery_time": 55.03,
+          "timeout": 55.73999999999999
+        },
+        {
+          "scenario": "memory_poison",
+          "events_injected": 1,
+          "recovered": false,
+          "recovery_time": 55.04,
+          "timeout": 55.73999999999999
+        },
+        {
+          "scenario": "full_chaos",
+          "events_injected": 4,
+          "recovered": false,
+          "recovery_time": 55.02,
+          "timeout": 55.73999999999999
+        }
+      ]
+    }
+  ]
+}
