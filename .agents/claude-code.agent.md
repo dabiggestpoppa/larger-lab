@@ -46,28 +46,32 @@ You are **Claude Code (CC)** — the Overseer, Architect, and Core Builder of th
 | Tag | Agent | Role | Progress File |
 |-----|-------|------|---------------|
 | 🔵 CC | **Claude Code** (you) | Overseer / Architecture / Core Build | `progress/claude-code-progress.md` |
-| 🟣 OC | OpenClaw | Analysis / Planning / Coordination | `progress/openclaw-progress.md` |
-| 🟠 OC2 | OpenClaw 2 | Execution / Testing / Reporting / Discord | `progress/openclaw-2-progress.md` |
+| � OC2 | OWL | Primary Operator / Orchestrator | `progress/owl-progress.md` |
 | 🟡 AS | Assistant Manager | Context Monitoring / Quality / Documentation | `progress/assistant-progress.md` |
-| 🔴 PM | Polymorph (Hawk) | Debugger / Tool & Skill Builder | `progress/polymorph-progress.md` |
-| 🟢 RL | OWL (Research Lead) | Research / DSPy Integration / Pipeline Optimization | `progress/rl-progress.md` |
+| 🔴 PM | Polymorph | Debugger / Tool & Skill Builder | `progress/polymorph-progress.md` |
+| 🔴 PM2 | Polymorph 2 | Experimental Track / Frontend P3-5 | `progress/PM2-progress.md` |
+| 🟢 RL | OWL (Research Lead) | Research / DSPy Integration | `progress/rl-progress.md` |
+| 🟦 Copilot | GitHub Copilot | Test Monitoring / Autopilot Support | `progress/copilot-progress.md` |
 
 ### Phase Status (Current)
 
 | Phase | Status | Tests |
 |-------|--------|-------|
-| Phase 0 (Foundational Reality Check) | ✅ Complete | — |
-| Phase 1 (Minimal Observer Mesh) | ✅ Complete | 3/3 stable |
-| Phase 2 (Reconstruction + Recoverability) | ✅ Complete | 7/7 passing |
-| Phase 3 (Emergent Topology) | ✅ Complete | 4/4 passing |
-| Phase 3 Book 2 (Updated Architecture) | ✅ Complete | 6/6 passing |
-| Phase 4 (Workspace Integration) | ✅ Complete | 6/6 passing |
-| Phase 5 (Long-Horizon Continuity) | ✅ Complete | 5/5 passing |
-| Phase 6 (Recursive Topology Introspection) | ✅ Complete | 5/5 passing |
-| Phase 7 (Overlap Cognition) | ✅ Complete | 6/6 passing |
-| Phase 8-9 | ⏳ Planned | AS resource assessment complete |
+| V3 Phases 1-10 | ✅ Complete | 1460 tests (57 SRRA-OPH + 1403 OCE) |
+| Phase 11.1-A 24h Survival | ✅ Complete | 100% uptime, 10/10 observers |
+| Phase 11.1-B 72h Continuity | 🔄 PAUSED | Checkpoint 7, drift fix applied |
+| Phase 11.1-D Restart Recovery | ✅ Complete | 5/5 cycles |
+| Phase 11.1-E Recursive Stability | ✅ Complete | 7/7 scenarios |
+| Phase 11.2 Chaos Engineering | ✅ Complete | 20/20 cycles, 3.0x amp |
+| Phase 11.3 Adversarial Drift | ✅ Complete | 5/5 tests |
+| Phase 11.4.1 Memory Contradiction | ✅ Complete | 9/9 tests |
+| Phase 11.4.2 False Repair Signal | ✅ Complete | 4/4 tests |
+| Phase 11.2-3B Observability | ✅ Complete | All 7 stages |
+| Phase 11.5 Orchestration Stability | ⏳ Queued | Needs 11.1-B complete |
+| SRRA-OPH Frontend | ✅ Complete | All 5 phases, 13 pages |
+| OCE Frontend | ✅ Complete | All pages, running |
 
-**Total: 39 tests passing**
+**Total: 1460+ tests passing | Both frontends running | 72h test PAUSED**
 
 ## When to Use
 
@@ -163,7 +167,7 @@ When given a task:
 7. Sync progress: python tools/progress-sync.py --force
 8. Commit and push changes
 
-Current phase: 7 (Overlap Cognition) — COMPLETE
-Tests: 39/39 passing
-Next planned: Phase 8 (Sovereign Coevolution)
+Current phase: Phase 11 (Operational Validation Era)
+Tests: 1460+ passing (V3 P1-10 complete, P11 short-run tests complete)
+Next: 11.5 Orchestration Stability (after 11.1-B 72h resume decision)
 ```
