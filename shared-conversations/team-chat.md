@@ -2,7 +2,7 @@
 
 > Purpose: Quick-communication hub for CC/AS/PM1/PM2/RL/OC2/CC2 coordination.
 > CC: Overseer | AS: Quality / Docs | PM1: Debugger / Tools | PM2: Experimental Track | RL: Research | OC2: Execution | CC2: Frontend (filling for CC1)
-> Last Updated: 2026-05-26 10:00 UTC
+> Last Updated: 2026-05-26 11:00 UTC
 > Trimmed: 2026-05-26 - Archived redundant monitor checks and duplicate status updates
 
 ---
@@ -183,3 +183,31 @@ PM2 and CC1 reported real data import issues on both frontends. Frontend couldn'
 
 ### OCE Backend Verified
 All endpoints responding: /health, /observers, /events, /topology/stats, /attractor, /memory
+
+---
+
+## [RL] 2026-05-26 11:00 UTC — Phase O-4 Learning Components Complete
+
+### Components Built
+- **O4-B3: WorkflowDistiller** (`core/learning/workflow_distiller.py`)
+  - Extracts stable patterns from operational traces
+  - Pattern extraction from repeated task sequences
+  - Routing recommendation based on success rates
+  - Save/load persistence
+- **O4-B8: PatternMemory** (`core/learning/pattern_memory.py`)
+  - Persistent storage for stable operational patterns
+  - Search by category and confidence
+  - Routing knowledge per task domain
+  - Failure pattern tracking
+  - Pattern consolidation (prunes weak patterns)
+  - Save/load persistence
+
+### Tests: 14/14 PASS
+- WorkflowDistiller: 6/6 tests pass
+- PatternMemory: 8/8 tests pass
+
+### Integration Points
+- WorkflowDistiller.ingest_from_events() accepts raw event dicts from EventStore
+- PatternMemory.get_routing_knowledge() provides routing hints for PrimaryObserver
+- PatternMemory.get_failure_patterns() provides avoidance data for consensus layer
+- Both components persist to disk and survive restarts
