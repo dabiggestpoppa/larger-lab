@@ -5,28 +5,55 @@
 
 ---
 
-## Current State (2026-05-18 22:00 UTC)
+## Current State (2026-05-26 15:00 UTC)
 
 ### Active Phase
-**V3 — All 10 Phases Complete** ✅🎉 | **GitHub Documentation Revamp** 🔄
+**Observer Core + OCE Unified** — Phases O-1 → O-7 | Planning Complete, Ready for Task Assignment
+
+### Previous Phase Complete
+**V3 Phases 1-10** ✅ | **Phase 11 Short-Run Tests** ✅ (38/38 pass) | **72h Test (11.1-B)** 🔄 PAUSED (operator: "past the 72 hour test")
 
 ### Agent Status
 | Agent | Status | Current Task |
 |-------|--------|-------------|
-| CC | Active | GitHub docs revamp (README, ARCHITECTURE, PRINCIPLES, CODEMAP) |
-| AS | Assigned | API docs + quality review of documentation |
-| PM | Assigned | Debug tools + code quality docs |
-| RL | Active | Research/DSPy |
-| OC2 | Autonomous | DO NOT TOUCH |
-| AS | Ready | Phase 10 quality review |
-| PM | Ready | Phase 10 debug tools |
-| RL | Ready | Phase 10 research/DSPy |
-| OC2 | Autonomous | DO NOT TOUCH |
+| CC | Active | Observer Core + OCE Unified planning |
+| AS | Standby | Ready for O-1 quality review |
+| PM | Standby | Ready for O-1 debug tools |
+| PM2 | Standby | Ready for O-5 frontend integration |
+| RL | Standby | Ready for O-4 research |
+| OC2 | Active | Monitoring |
 
-### V3 Test Status
+### Test Status
 ```
-1403 OCE + 57 SRRA-OPH = 1460 total tests passing
+Phase 11 Short-Run: 38/38 PASS (all real data)
+Phase 11.1-B 72h: PAUSED (checkpoint 7, drift fix applied)
+V3 P1-10: 1460 tests passing
 ```
+
+### Key Architecture Decisions
+- **Observer ≠ LLM** — Primary Observer is continuity abstraction layer
+- **ONE unified OCE frontend** — SRRA-OPH integrated as Layer 2 panels
+- **Agents are temporary** — Spawned models are ephemeral cognition workers
+- **Build order:** Stability → Visibility → Replay → Boundaries → Persistence → Adaptation → Automation
+
+### Planning Files
+| File | Purpose |
+|------|---------|
+| `plans/observer-core/MASTER-PLAN-OBSERVER-CORE.md` | Complete master plan |
+| `plans/observer-core/PHASE-BREAKDOWN.md` | Component-by-component task breakdown |
+| `plans/observer-core/OBSERVER-CORE-WORKSPACE-STATE.md` | Workspace state tracking |
+| `plans/observer-core/OCE-UNIFIED-FRONTEND-PLAN.md` | Frontend integration plan |
+
+### Phase Breakdown
+| Phase | Name | Status |
+|-------|------|--------|
+| O-1 | Primary Observer Core | ⏳ Planned |
+| O-2 | Observer Consensus + Task Routing | ⏳ Planned |
+| O-3 | Spawn Engine + Context Inheritance | ⏳ Planned |
+| O-4 | Operational Trace + Field Learning | ⏳ Planned |
+| O-5 | OCE Unified Operational Observatory | ⏳ Planned |
+| O-6 | Local Execution Substrate | ⏳ Planned |
+| O-7 | Persistent Field Mode | ⏳ Planned |
 
 ### V3 — 10 Phases Complete
 

@@ -90,4 +90,57 @@ Result: OCE (:3000) and SRRA-OPH (:3001) both 200 OK.
 
 ---
 
+## [CC] 2026-05-26 15:00 UTC — NEW PHASE: OBSERVER CORE + OCE UNIFIED
+
+### 🚀 Major Development Phase Starting
+
+After thorough review of all planning documents, we are beginning the **Observer Core + OCE Unified** phase. This is NOT a rebuild — it's an extension of the validated Phase 11 substrate.
+
+### Key Architectural Insights (from source files)
+- **Observer ≠ Generic LLM** — The Primary Observer is a continuity abstraction layer, not a chatbot
+- **ONE unified OCE frontend** — SRRA-OPH observatory panels integrated INTO OCE as Layer 2 (hidden by default), not a separate app
+- **Agents are temporary** — Spawned models are ephemeral cognition workers, not the system
+- **The field is the intelligence** — Not any single model or agent
+
+### Source Files Analyzed
+1. `OBSERVER CORE BUILD AFTER FRONT END.txt` — Phases O-0 → O-7
+2. `oce front end upgrade plan.txt` — Primary Observer UX, two-layer UI
+3. `FRONT END AND SYSTEM CLARITY FOR BUILD.txt` — Unified architecture
+4. `EXTRA CONTEXT AND PLANS FOR FRONT END AND OBSERVERS.txt` — Observer ≠ LLM
+
+### Planning Files Created
+- `plans/observer-core/MASTER-PLAN-OBSERVER-CORE.md` — Complete master plan
+- `plans/observer-core/PHASE-BREAKDOWN.md` — Component-by-component task breakdown
+- `plans/observer-core/OBSERVER-CORE-WORKSPACE-STATE.md` — Workspace state tracking
+- `plans/observer-core/OCE-UNIFIED-FRONTEND-PLAN.md` — Frontend integration plan
+
+### Phase Breakdown
+| Phase | Name | Status |
+|-------|------|--------|
+| O-1 | Primary Observer Core | ⏳ Planned |
+| O-2 | Observer Consensus + Task Routing | ⏳ Planned |
+| O-3 | Spawn Engine + Context Inheritance | ⏳ Planned |
+| O-4 | Operational Trace + Field Learning | ⏳ Planned |
+| O-5 | OCE Unified Operational Observatory | ⏳ Planned |
+| O-6 | Local Execution Substrate | ⏳ Planned |
+| O-7 | Persistent Field Mode | ⏳ Planned |
+
+### Build Order (Mandatory)
+Stability → Visibility → Replay → Boundaries → Persistence → Adaptation → Automation
+
+### 72h Test Decision
+Per operator: **"Past the 72 hour test"** — 11.1-B remains paused. Moving forward with Observer Core phases.
+
+### Next Steps
+Planning complete. Ready for task assignment when operator gives go-ahead.
+All planning files are in `plans/observer-core/` for agent reference.
+
+---
+
 > Archived: 11 OWL monitor checks (2026-05-24 23:03 to 2026-05-26 22:21) - all identical system health.
+
+## [OWL] 2026-05-26 22:51 UTC — Monitor Check #4
+
+### Git Activity
+- 2 new commit(s)
+- Latest: efb6e0f2c3e35415a931f3119fd7a6eb4ba88971 Cleanup: Update memory-bank files (doctor prescription + ia
