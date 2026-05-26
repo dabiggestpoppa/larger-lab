@@ -7,21 +7,89 @@
 
 ---
 
-## Status: 🟢 Active — Autopilot Mode
+## Status: 🟢 Active — Post-Restart Monitoring
 
-### Current Mode
-**Autopilot — Monitoring team chat every 15 minutes for agent requests.**
+### Current State (2026-05-26 13:00 UTC — Reconstructed from Git History)
+**All agent memory files were stale. Reconstructed accurate state from git log.**
 
-### What I Do
-- Monitor team-chat.md for requests from CC, AS, PM1, PM2, RL
-- Respond to help requests posted in chat
-- Run chaos tests and validation loops
-- Coordinate between agents when needed
-- Keep workspace clean and organized
+### What's Actually Running
+- **OCE Frontend (:3000):** ✅ Running (Next.js dev server, PID 6080)
+- **SRRA-OPH Frontend (:3001):** ✅ Running (Next.js dev server, PID 10652)
+- **Progress Sync (PID 1824):** ✅ Running (`tools/progress-sync.py --daemon --interval 120`)
+- **OWL Monitor (PID 9300):** ✅ Running (`tools/owl_monitor.py`)
+- **Phase 11 Test Runner (PID 17392):** ✅ Running (`tools/testing/phase11/run_all_real`)
+
+### Latest Commits (from git)
+1. **5d6c795** (2026-05-25) — Fix: LiveDataProvider infinite loop (useCallback, isMounted guard)
+2. **198bdf7** (2026-05-25) — Cleanup: Removed 700+ accidentally downloaded skills, restored from git
+3. **1e59589** (2026-05-25) — System restart: All services restored, 72h test still paused
+4. **039c688** (2026-05-24) — 72h test PAUSED — checkpoint 7 saved
+5. **7a3af86** (2026-05-24) — All frontend phases complete
+6. **d1f650d** (2026-05-24) — SRRA-OPH Phase 3-5: Timeline engine, repair/continuity stores
+7. **c7ae63b** (2026-05-24) — PM2: Phase 5 Repair + Self-Stabilization visualization
+8. **ef8c3a4** (2026-05-24) — PM2: Phase 3-4 Temporal Playback + Entropy Field Dynamics
+9. **0a21a9c** (2026-05-24) — SRRA-OPH Phase 2: Living topology
+10. **4ae83b9** (2026-05-24) — SRRA-OPH Phase 1: Observatory foundation
+
+### Phase 11 Test Status (Accurate)
+| Test | Result |
+|------|--------|
+| 11.1-A 24h Survival | ✅ PASS (100% uptime, 10/10 observers) |
+| 11.1-B 72h Continuity | 🔄 PAUSED (checkpoint 7, drift fix applied, DO NOT RESTART) |
+| 11.1-D Restart Recovery | ✅ PASS (5/5 cycles) |
+| 11.1-E Recursive Stability | ✅ PASS (7/7 scenarios, memoization fix) |
+| 11.2 Chaos Engineering | ✅ 20/20 PASS (3.0x amplification) |
+| 11.3 Adversarial Drift | ✅ 5/5 PASS |
+| 11.4.1 Memory Contradiction | ✅ 9/9 PASS |
+| 11.4.2 False Repair Signal | ✅ 4/4 PASS |
+| 11.2-3B Observability | ✅ All 7 stages complete |
+| Tufte Renderers | ✅ 4/4 PASS (real data) |
+| 11.5 Orchestration Stability | ⏳ Queued (needs 11.1-B complete first) |
+
+### Frontend Status (Accurate)
+- **SRRA-OPH (:3001):** All 5 phases built, 13 pages, running ✅
+- **OCE (:3000):** All pages built, running ✅
+- **API Server:** `srrs_opc/frontend/api_server.py` (FastAPI, port 8001) ✅
+
+### Key Fixes Applied (from git history)
+1. **11.1-B Drift Fix:** Only identity+goal changes count as drift; trajectory/memory tracked as "evolved"
+2. **11.1-E Memoization Fix:** O(depth×branching) instead of O(branching^depth)
+3. **Chaos timeout formula:** Changed to `max_duration * 1.5 + 15`
+4. **LiveDataProvider infinite loop:** useCallback, isMounted guard, removed polling fallback
+5. **Skills cleanup:** Removed 700+ accidentally downloaded skills, restored from git
+
+### 72h Test (11.1-B) — PAUSED
+- Progress: `progress/11-1-b-checkpoints-paused.json`
+- Checkpoint 7 saved | 1 PASS | 6 FAIL (pre-fix) | drift=0.5
+- **DO NOT RESTART** until operator says "run"
+- Resume: `python tools/testing/long_horizon/test_11_1_b.py --hours 72 --resume`
+
+### Agent Roster (Accurate)
+| Tag | Agent | Role | Status |
+|-----|-------|------|--------|
+| 🔵 CC | Claude Code | Overseer / Architecture | Standby |
+| 🟠 OC2 | OWL | Primary Operator / Orchestrator | Active |
+| 🟡 AS | Assistant Manager | Context Monitoring / Quality | Standby |
+| 🔴 PM | Polymorph | Debugger / Tool Builder | Standby |
+| 🔴 PM2 | Polymorph 2 | Experimental Track / Frontend P3-4 | Standby |
+| 🟢 RL | OWL (Research Lead) | Research / DSPy | Standby |
+
+### Next Steps (When Operator Returns)
+1. Decide on 72h test (11.1-B) — resume or restart with drift fix
+2. Run 11.5 Orchestration Stability (7-day test) after 11.1-B
+3. Phase 6-7 frontend: WebSocket integration, real SRRA data feed
+4. Phase 12 planning
 
 ---
 
 ## Session Log
+
+### 2026-05-26 13:00 UTC — Memory Reconstruction from Git
+- All agent progress/memory files were significantly behind git history
+- Reconstructed accurate state from `git log --oneline -60`
+- Updated OWL progress, AS progress, PM2 progress, Polymorph progress
+- Key finding: ~20 commits of work not reflected in any agent memory files
+- Both frontends confirmed running, all infrastructure healthy
 
 ### 2026-05-23 — Workspace Cleanup + Autopilot Setup
 - Cleaned up OC2 junk: deleted agent-environment/, hermes-latest/, projects/, quant-lab/, content-farm/, Crawler/, tradingview-mcp-cdp/, tv-mcp/, usb-cloud/
