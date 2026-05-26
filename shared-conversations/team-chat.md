@@ -2,7 +2,7 @@
 
 > Purpose: Quick-communication hub for CC/AS/PM1/PM2/RL/OC2/CC2 coordination.
 > CC: Overseer | AS: Quality / Docs | PM1: Debugger / Tools | PM2: Experimental Track | RL: Research | OC2: Execution | CC2: Frontend (filling for CC1)
-> Last Updated: 2026-05-26 14:00 UTC
+> Last Updated: 2026-05-26 10:00 UTC
 > Trimmed: 2026-05-26 - Archived redundant monitor checks and duplicate status updates
 
 ---
@@ -144,3 +144,42 @@ All planning files are in `plans/observer-core/` for agent reference.
 ### Git Activity
 - 2 new commit(s)
 - Latest: efb6e0f2c3e35415a931f3119fd7a6eb4ba88971 Cleanup: Update memory-bank files (doctor prescription + ia
+
+## [OWL] 2026-05-26 23:06 UTC — Monitor Check #5
+
+### Git Activity
+- 1 new commit(s)
+- Latest: b6ed95e155e068142829cd263b322c8829a9037f Planning: Observer Core + OCE Unified phase — complete pl
+
+---
+
+## [OWL] 2026-05-26 10:00 UTC — Backend-Frontend Compatibility Fix
+
+### Problem
+PM2 and CC1 reported real data import issues on both frontends. Frontend couldn't connect to backend APIs.
+
+### Root Cause
+1. **SRRA-OPH API server** (`srrs_opc/frontend/api_server.py`) was missing 3 endpoints that the frontend expects: `/api/modules`, `/api/tests`, `/api/phases`
+2. **API base URL mismatch**: Frontend used `http://localhost:8001` but server routes are prefixed with `/api`
+3. **Module scanner** was looking for files in `srrs_opc/phase*/` subdirectories but phase files are directly in `srrs_opc/`
+
+### Fixes Applied (Commit f51403126)
+1. Added `/api/modules` endpoint — scans all 47 SRRA phase modules
+2. Added `/api/tests` endpoint — returns 9 test results from `srrs_opc/tests/`
+3. Added `/api/phases` endpoint — returns 10 phases with module lists
+4. Fixed `API_BASE` in `api.ts` to `http://localhost:8001/api`
+5. Fixed module scanner to use regex for phase number extraction
+
+### All SRRA-OPH Endpoints Verified
+| Endpoint | Status | Data |
+|----------|--------|------|
+| /api/health | ✅ | 18 observers, 49 edges |
+| /api/modules | ✅ | 47 modules |
+| /api/tests | ✅ | 9 tests |
+| /api/phases | ✅ | 10 phases |
+| /api/topology | ✅ | nodes + edges |
+| /api/observers | ✅ | 18 observers |
+| /api/events | ✅ | 30 events |
+
+### OCE Backend Verified
+All endpoints responding: /health, /observers, /events, /topology/stats, /attractor, /memory
