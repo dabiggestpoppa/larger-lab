@@ -25,6 +25,297 @@ The current SRRA/OPH runtime (Phase 11 tested, 38/38 tests passing) is the **sub
 
 ---
 
+## SYSTEM ARCHITECTURE OVERVIEW
+
+```mermaid
+flowchart TD
+    USER(["👤 User"]) -->|"natural language"| PO["🧠 Primary Observer"]
+    
+    PO -->|"continuity anchor"| OF["🌐 Observer Field"]
+    PO -->|"orchestration relay"| CO["🤝 Consensus Layer"]
+    PO -->|"field translator"| OCE["📊 OCE Interface"]
+    
+    CO -->|"task analysis"| TC["📋 Task Classifier"]
+    CO -->|"routing consensus"| RC["🛤️ Routing Consensus"]
+    CO -->|"spawn planning"| SP["📐 Spawn Planner"]
+    CO -->|"model selection"| MS["🎯 Model Selector"]
+    
+    SP -->|"spawn blueprint"| SE["🚀 Spawn Engine"]
+    SE -->|"context injection"| OI["💉 Context Injector"]
+    SE -->|"OpenRouter"| OR["🔌 OpenRouter Gateway"]
+    SE -->|"lifecycle"| AL["♻️ Agent Lifecycle"]
+    
+    AL -->|"execution"| EX["⚡ Execution Substrate"]
+    EX -->|"bounded by"| EB["🔒 Execution Boundaries"]
+    EX -->|"traces"| TF["📤 Trace Feedback"]
+    
+    TF -->|"operational memory"| FM["💾 Field Memory"]
+    TF -->|"routing learning"| RL["📈 Routing Learning"]
+    TF -->|"failure analysis"| FA["🔍 Failure Analyzer"]
+    TF -->|"observer evolution"| OE["🧬 Observer Evolution"]
+    
+    FM -->|"adaptation"| AE["🔄 Adaptation Engine"]
+    AE -->|"improves"| CO
+    
+    OCE -->|"Layer 1"| L1["💬 Chat + Workspace"]
+    OCE -->|"Layer 2"| L2["🔭 Observatory Panels"]
+    OCE -->|"Layer 3"| L3["🎛️ Orchestration Panels"]
+    
+    L2 -->|"topology"| TOP["🕸️ Topology View"]
+    L2 -->|"entropy"| ENT["🌡️ Entropy View"]
+    L2 -->|"repair"| REP["🔧 Repair View"]
+    L2 -->|"timeline"| TL["⏱️ Timeline View"]
+    
+    L3 -->|"observer status"| OS["📊 Observer Status"]
+    L3 -->|"spawn monitor"| SM["👁️ Spawn Monitor"]
+    L3 -->|"consensus view"| CV["🤝 Consensus View"]
+    L3 -->|"learning view"| LV["📈 Learning View"]
+    
+    style USER fill:#1f1f1f,stroke:#999,color:#fff
+    style PO fill:#1d3557,stroke:#6fa8dc,color:#fff
+    style OF fill:#1f3b2d,stroke:#93c47d,color:#fff
+    style CO fill:#2f233d,stroke:#b4a7d6,color:#fff
+    style SE fill:#3b3120,stroke:#d6b656,color:#fff
+    style EX fill:#991b1b,stroke:#ef4444,color:#fff
+    style OCE fill:#1f1f1f,stroke:#999,color:#fff
+    style L1 fill:#1d3557,stroke:#6fa8dc,color:#fff
+    style L2 fill:#1f3b2d,stroke:#93c47d,color:#fff
+    style L3 fill:#2f233d,stroke:#b4a7d6,color:#fff
+```
+
+---
+
+## UNIFIED OCE LAYER ARCHITECTURE
+
+```mermaid
+flowchart TD
+    subgraph OCE["OCE — Singular Operational Interface"]
+        direction TB
+        
+        subgraph LAYER1["Layer 1 — Simple User Layer (DOMINATES)"]
+            CHAT["💬 Chat Panel<br/>Primary Observer Interface"]
+            WS["📋 Task Workspace"]
+            EF["📡 Execution Feed"]
+            AR["📦 Artifacts/Results"]
+            LP["📊 Live Progress"]
+            RS["🔄 Replay Summaries"]
+        end
+        
+        subgraph LAYER2["Layer 2 — Observational Layer (HIDDEN BY DEFAULT)"]
+            TOP["🕸️ Topology Observatory"]
+            ENT["🌡️ Entropy Field View"]
+            REP["🔧 Repair Cascade Viewer"]
+            AB["🏔️ Attractor Basin View"]
+            TL["⏱️ Temporal Playback"]
+            ES["🧪 Experiment Sessions"]
+        end
+        
+        subgraph LAYER3["Layer 3 — Orchestration Layer (HIDDEN BY DEFAULT)"]
+            OS["📊 Observer Status"]
+            CV["🤝 Consensus View"]
+            SM["👁️ Spawn Monitor"]
+            AL["♻️ Agent Lifecycle"]
+            CI["💉 Context Injection"]
+            EB["🔒 Execution Boundaries"]
+            MF["🕸️ Multi-Agent Flow"]
+            OR["🔄 Operational Replay"]
+            RL["📈 Routing Learning"]
+            FA["🔍 Failure Analysis"]
+            OE["🧬 Observer Evolution"]
+            AM["🔄 Adaptation Monitor"]
+        end
+    end
+    
+    LAYER1 -->|"expand/collapse"| LAYER2
+    LAYER2 -->|"expand/collapse"| LAYER3
+    
+    style OCE fill:#0a0a0f,stroke:#6366f1,color:#fff
+    style LAYER1 fill:#1d3557,stroke:#6fa8dc,color:#fff
+    style LAYER2 fill:#1f3b2d,stroke:#93c47d,color:#fff
+    style LAYER3 fill:#2f233d,stroke:#b4a7d6,color:#fff
+```
+
+---
+
+## BUILD ORDER & DEPENDENCIES
+
+```mermaid
+flowchart LR
+    O1["O-1<br/>Primary Observer"] --> O2["O-2<br/>Observer Consensus"]
+    O2 --> O3["O-3<br/>Spawn Engine"]
+    O3 --> O4["O-4<br/>Field Learning"]
+    O1 --> O5["O-5<br/>OCE Unified"]
+    O2 --> O5
+    O3 --> O5
+    O4 --> O5
+    O5 --> O6["O-6<br/>Local Embodiment"]
+    O6 --> O7["O-7<br/>Persistent Field"]
+    O4 --> O7
+    
+    style O1 fill:#1d3557,stroke:#6fa8dc,color:#fff
+    style O2 fill:#1f3b2d,stroke:#93c47d,color:#fff
+    style O3 fill:#3b3120,stroke:#d6b656,color:#fff
+    style O4 fill:#2f233d,stroke:#b4a7d6,color:#fff
+    style O5 fill:#6366f1,stroke:#818cf8,color:#fff
+    style O6 fill:#991b1b,stroke:#ef4444,color:#fff
+    style O7 fill:#1e3a5f,stroke:#3b82f6,color:#fff
+```
+
+---
+
+## DATA FLOW — USER TASK TO EXECUTION
+
+```mermaid
+sequenceDiagram
+    participant U as 👤 User
+    participant PO as 🧠 Primary Observer
+    participant CO as 🤝 Consensus Layer
+    participant SE as 🚀 Spawn Engine
+    participant OR as 🔌 OpenRouter
+    participant EX as ⚡ Execution
+    participant TF as 📤 Trace Feedback
+    participant FM as 💾 Field Memory
+    
+    U->>PO: "Build a coding agent"
+    PO->>PO: Analyze intent, gather runtime state
+    PO->>CO: Task intent + context
+    
+    CO->>CO: Classify: CODING, complexity: MEDIUM
+    CO->>CO: Select model: Qwen-Coder
+    CO->>CO: Determine capabilities: [repo_access, terminal]
+    CO->>SE: Spawn blueprint
+    
+    SE->>SE: Create SpawnBlueprint
+    SE->>SE: Compress context (topology, runtime, history)
+    SE->>OR: Spawn agent with context injection
+    
+    OR->>EX: Agent executes with field continuity
+    EX->>TF: Return execution traces
+    
+    TF->>FM: Store operational traces
+    TF->>CO: Update routing heuristics
+    TF->>PO: Update observer memory
+    
+    PO->>U: Response with results + orchestration summary
+```
+
+---
+
+## OBSERVER CONSENSUS FLOW
+
+```mermaid
+flowchart TD
+    TI["📋 Task Intent"] --> PO["🧠 Primary Observer"]
+    
+    PO -->|"broadcast"| OBS["🌐 Observer Field"]
+    
+    subgraph OBSERVERS["Observer Specializations"]
+        EO["🌡️ Entropy Observer"]
+        RO["🛤️ Routing Observer"]
+        RPO["🔧 Repair Observer"]
+        TO["🕸️ Topology Observer"]
+        SO["🚀 Spawn Observer"]
+    end
+    
+    OBS --> EO
+    OBS --> RO
+    OBS --> RPO
+    OBS --> TO
+    OBS --> SO
+    
+    EO -->|"entropy assessment"| CONSENSUS["🤝 Consensus Engine"]
+    RO -->|"routing proposal"| CONSENSUS
+    RPO -->|"repair readiness"| CONSENSUS
+    TO -->|"topology impact"| CONSENSUS
+    SO -->|"spawn recommendation"| CONSENSUS
+    
+    CONSENSUS -->|"confidence > 0.8"| BLUEPRINT["📐 Orchestration Blueprint"]
+    CONSENSUS -->|"confidence < 0.8"| REVIEW["🔍 Human Review Queue"]
+    
+    BLUEPRINT -->|"approved"| EXEC["⚡ Execute"]
+    
+    style TI fill:#1f1f1f,stroke:#999,color:#fff
+    style PO fill:#1d3557,stroke:#6fa8dc,color:#fff
+    style OBS fill:#1f3b2d,stroke:#93c47d,color:#fff
+    style CONSENSUS fill:#3b3120,stroke:#d6b656,color:#fff
+    style BLUEPRINT fill:#2f233d,stroke:#b4a7d6,color:#fff
+    style REVIEW fill:#991b1b,stroke:#ef4444,color:#fff
+```
+
+---
+
+## CONTEXT INHERITANCE MODEL
+
+```mermaid
+flowchart LR
+    subgraph FIELD["SRRA Field State"]
+        TOPO["🕸️ Topology State"]
+        RUNTIME["⚡ Runtime State"]
+        CONTINUITY["🔄 Continuity Memory"]
+        ENTROPY["🌡️ Entropy State"]
+        REPAIR["🔧 Repair State"]
+    end
+    
+    subgraph DISTILLER["Context Distiller"]
+        CD["📦 Compressor"]
+        TOPO --> CD
+        RUNTIME --> CD
+        CONTINUITY --> CD
+        ENTROPY --> CD
+        REPAIR --> CD
+    end
+    
+    CD -->|"compressed context packet"| AGENT["🤖 Spawned Agent"]
+    
+    AGENT -->|"inherits"| AWARENESS["🧠 Agent Awareness"]
+    AWARENESS -->|"topology aware"| EXEC["⚡ Execution"]
+    AWARENESS -->|"continuity aware"| EXEC
+    AWARENESS -->|"entropy aware"| EXEC
+    AWARENESS -->|"bounded"| EXEC
+    
+    style FIELD fill:#1f3b2d,stroke:#93c47d,color:#fff
+    style DISTILLER fill:#3b3120,stroke:#d6b656,color:#fff
+    style AGENT fill:#1d3557,stroke:#6fa8dc,color:#fff
+    style AWARENESS fill:#2f233d,stroke:#b4a7d6,color:#fff
+    style EXEC fill:#991b1b,stroke:#ef4444,color:#fff
+```
+
+---
+
+## ERROR HANDLING FLOW
+
+```mermaid
+flowchart TD
+    DETECT["🔍 Error Detected"] --> CLASSIFY{"Classify Error"}
+    
+    CLASSIFY -->|"Observer Failure"| OF["🔄 Observer Recovery"]
+    CLASSIFY -->|"Spawn Failure"| SF["🔄 Spawn Recovery"]
+    CLASSIFY -->|"Entropy Spike"| ES["🛡️ Entropy Response"]
+    CLASSIFY -->|"Topology Drift"| TD["🔧 Topology Repair"]
+    CLASSIFY -->|"Memory Fragmentation"| MF["💾 Memory Rebuild"]
+    CLASSIFY -->|"Repair Loop"| RL["🛑 Loop Breaker"]
+    CLASSIFY -->|"UI Desync"| UD["🔄 UI Resync"]
+    
+    OF -->|"restart + restore"| RECOVER["✅ Recovery"]
+    SF -->|"retry + fallback"| RECOVER
+    ES -->"|pause + stabilize"| RECOVER
+    TD -->"|reconstruct + resync"| RECOVER
+    MF --> "|restore + compress"| RECOVER
+    RL --> "|freeze + rollback"| RECOVER
+    UD --> "|rebuild + resync"| RECOVER
+    
+    RECOVER -->|"log incident"| LOG["📝 Incident Log"]
+    LOG -->|"update heuristics"| LEARN["📈 Learning"]
+    
+    style DETECT fill:#991b1b,stroke:#ef4444,color:#fff
+    style CLASSIFY fill:#3b3120,stroke:#d6b656,color:#fff
+    style RECOVER fill:#1f3b2d,stroke:#93c47d,color:#fff
+    style LOG fill:#1d3557,stroke:#6fa8dc,color:#fff
+    style LEARN fill:#2f233d,stroke:#b4a7d6,color:#fff
+```
+
+---
+
 ## ARCHITECTURAL DIRECTIVE (from source files)
 
 ### The Correct Architecture:
