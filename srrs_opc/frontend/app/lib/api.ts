@@ -4,7 +4,7 @@
  * Typed client for the SRRA-OPH API wrapper.
  */
 
-const API_BASE = process.env.NEXT_PUBLIC_SRRA_API || "http://localhost:8001";
+const API_BASE = process.env.NEXT_PUBLIC_SRRA_API || "http://localhost:8001/api";
 
 async function fetchJSON<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
