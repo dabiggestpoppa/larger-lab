@@ -57,6 +57,8 @@
 3. **Chaos timeout formula:** Changed to `max_duration * 1.5 + 15`
 4. **LiveDataProvider infinite loop:** useCallback, isMounted guard, removed polling fallback
 5. **Skills cleanup:** Removed 700+ accidentally downloaded skills, restored from git
+6. **ObservatoryCanvas infinite loop (2026-05-26):** Changed layout nodes from useState to useRef, throttled re-renders to every 3 frames
+7. **Frontend dev server fix (2026-05-26):** Killed stale node processes, deleted .next/ caches, restarted both servers
 
 ### 72h Test (11.1-B) — PAUSED
 - Progress: `progress/11-1-b-checkpoints-paused.json`
