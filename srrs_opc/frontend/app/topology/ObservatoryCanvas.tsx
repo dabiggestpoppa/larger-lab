@@ -17,86 +17,97 @@ interface LayoutNode extends ObserverNode {
 export default function ObservatoryCanvas() {
   const svgRef = useRef<SVGSVGElement>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
-  const [nodes, setNodes] = useState<LayoutNode[]>([]);
+  const [renderNodes, setRenderNodes] = useState<LayoutNode[]>([]);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const animationRef = useRef<number | null>(null);
+  const layoutNodesRef = useRef<LayoutNode[]>([]);
 
   const { nodes: storeNodes, edges, selectObserver, viewMode, setClusters } = useTopologyStore();
 
-  // Sync store nodes to local layout nodes
+  // Sync store nodes to layout ref (no re-render trigger)
   useEffect(() => {
-    setNodes((prev) => {
-      return storeNodes.map((sn) => {
-        const existing = prev.find((n) => n.id === sn.id);
+    const currentIds = layoutNodesRef.current.map(n => n.id).sort().join(',');
+    const newIds = storeNodes.map(n => n.id).sort().join(',');
+    
+    if (currentIds !== newIds || layoutNodesRef.current.length === 0) {
+      layoutNodesRef.current = storeNodes.map((sn) => {
+        const existing = layoutNodesRef.current.find((n) => n.id === sn.id);
         if (existing) {
           return { ...existing, ...sn };
         }
-        return { ...sn, vx: 0, vy: 0 };
+        return { ...sn, vx: 0, vy: 0, x: dimensions.width / 2 + (Math.random() - 0.5) * 200, y: dimensions.height / 2 + (Math.random() - 0.5) * 200 };
       });
-    });
-  }, [storeNodes]);
+      setRenderNodes([...layoutNodesRef.current]);
+    }
+  }, [storeNodes, dimensions.width, dimensions.height]);
 
-  // Compute clusters when nodes/edges change
+  // Compute clusters when nodes change
   useEffect(() => {
-    const clusters = computeClusters(nodes, edges);
-    setClusters(clusters);
-  }, [nodes, edges, setClusters]);
+    if (layoutNodesRef.current.length > 0) {
+      const clusters = computeClusters(layoutNodesRef.current, edges);
+      setClusters(clusters);
+    }
+  }, [renderNodes, edges, setClusters]);
 
-  // Force-directed layout
+  // Force-directed layout using refs (no setState in animation loop)
   useEffect(() => {
-    if (nodes.length === 0) return;
+    if (layoutNodesRef.current.length === 0) return;
 
+    let frameCount = 0;
     const tick = () => {
-      setNodes((prev) => {
-        const updated = prev.map((node) => ({ ...node }));
+      const nodes = layoutNodesRef.current;
+      if (nodes.length === 0) return;
 
-        // Repulsion
-        for (let i = 0; i < updated.length; i++) {
-          for (let j = i + 1; j < updated.length; j++) {
-            const dx = updated[j].x - updated[i].x;
-            const dy = updated[j].y - updated[i].y;
-            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-            const force = 500 / (dist * dist);
-            const fx = (dx / dist) * force;
-            const fy = (dy / dist) * force;
-            updated[i].vx -= fx;
-            updated[i].vy -= fy;
-            updated[j].vx += fx;
-            updated[j].vy += fy;
-          }
-        }
-
-        // Attraction along edges
-        edges.forEach((edge) => {
-          const source = updated.find((n) => n.id === edge.source);
-          const target = updated.find((n) => n.id === edge.target);
-          if (!source || !target) return;
-          const dx = target.x - source.x;
-          const dy = target.y - source.y;
+      // Repulsion
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const dx = (nodes[j].x || 0) - (nodes[i].x || 0);
+          const dy = (nodes[j].y || 0) - (nodes[i].y || 0);
           const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-          const force = (dist - 120) * 0.008 * edge.strength;
+          const force = 500 / (dist * dist);
           const fx = (dx / dist) * force;
           const fy = (dy / dist) * force;
-          source.vx += fx;
-          source.vy += fy;
-          target.vx -= fx;
-          target.vy -= fy;
-        });
+          nodes[i].vx = (nodes[i].vx || 0) - fx;
+          nodes[i].vy = (nodes[i].vy || 0) - fy;
+          nodes[j].vx = (nodes[j].vx || 0) + fx;
+          nodes[j].vy = (nodes[j].vy || 0) + fy;
+        }
+      }
 
-        // Center gravity + damping + bounds
-        updated.forEach((node) => {
-          node.vx += (dimensions.width / 2 - node.x) * 0.001;
-          node.vy += (dimensions.height / 2 - node.y) * 0.001;
-          node.vx *= 0.85;
-          node.vy *= 0.85;
-          node.x += node.vx;
-          node.y += node.vy;
-          node.x = Math.max(60, Math.min(dimensions.width - 60, node.x));
-          node.y = Math.max(60, Math.min(dimensions.height - 60, node.y));
-        });
-
-        return updated;
+      // Attraction along edges
+      edges.forEach((edge) => {
+        const source = nodes.find((n) => n.id === edge.source);
+        const target = nodes.find((n) => n.id === edge.target);
+        if (!source || !target) return;
+        const dx = (target.x || 0) - (source.x || 0);
+        const dy = (target.y || 0) - (source.y || 0);
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        const force = (dist - 120) * 0.008 * edge.strength;
+        const fx = (dx / dist) * force;
+        const fy = (dy / dist) * force;
+        source.vx = (source.vx || 0) + fx;
+        source.vy = (source.vy || 0) + fy;
+        target.vx = (target.vx || 0) - fx;
+        target.vy = (target.vy || 0) - fy;
       });
+
+      // Center gravity + damping + bounds
+      nodes.forEach((node) => {
+        node.vx = (node.vx || 0) + (dimensions.width / 2 - (node.x || 0)) * 0.001;
+        node.vy = (node.vy || 0) + (dimensions.height / 2 - (node.y || 0)) * 0.001;
+        node.vx = (node.vx || 0) * 0.85;
+        node.vy = (node.vy || 0) * 0.85;
+        node.x = (node.x || 0) + (node.vx || 0);
+        node.y = (node.y || 0) + (node.vy || 0);
+        node.x = Math.max(60, Math.min(dimensions.width - 60, node.x || 0));
+        node.y = Math.max(60, Math.min(dimensions.height - 60, node.y || 0));
+      });
+
+      // Only trigger re-render every 3 frames (throttle)
+      frameCount++;
+      if (frameCount % 3 === 0) {
+        setRenderNodes([...nodes]);
+      }
 
       animationRef.current = requestAnimationFrame(tick);
     };
@@ -105,7 +116,7 @@ export default function ObservatoryCanvas() {
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [nodes.length, edges, dimensions]);
+  }, [edges, dimensions]);
 
   // Resize handler
   useEffect(() => {
@@ -141,7 +152,6 @@ export default function ObservatoryCanvas() {
       className="bg-[var(--bg-primary)]"
       viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
     >
-      {/* Grid */}
       <defs>
         <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
           <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e1e2e" strokeWidth="0.5" />
@@ -156,20 +166,12 @@ export default function ObservatoryCanvas() {
       </defs>
       <rect width="100%" height="100%" fill="url(#grid)" />
 
-      {/* Cluster overlays */}
       <ClusterOverlay />
-
-      {/* Entropy heatmap */}
       {viewMode === "entropy" && <EntropyHeatmap />}
-
-      {/* Edge flow */}
       <EdgeFlow />
-
-      {/* Repair waves */}
       {viewMode === "repair" && <RepairWave />}
 
-      {/* Nodes */}
-      {nodes.map((node) => {
+      {renderNodes.map((node) => {
         const style = getObserverStyle(node.status);
         return (
           <g
