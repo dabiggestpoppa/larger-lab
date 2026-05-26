@@ -185,7 +185,11 @@ class ProgressSyncAgent:
         return stale
 
     def sync_shared_notes(self):
-        """Sync shared notes files to all agent memory files."""
+        """Sync shared notes references to all agent memory files.
+        
+        Instead of duplicating full content, inject a compact reference.
+        Replaces any existing injection from the same note to prevent bloat.
+        """
         for note_name, note_file in SHARED_NOTES.items():
             note_path = PROGRESS_DIR / note_file
             if not note_path.exists():
@@ -194,21 +198,34 @@ class ProgressSyncAgent:
             last_hash = self.last_progress_hashes.get(f"note_{note_name}", "")
             if note_hash == last_hash:
                 continue
-            # Notes changed — inject into all agent memory files
-            note_content = note_path.read_text(encoding="utf-8", errors="replace")
+            # Notes changed — update reference in all agent memory files
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M UTC")
-            header = f"\n---\n## [{note_name.upper()}] Updated: {timestamp}\n"
-            snippet = header + note_content[:2000]  # First 2000 chars
-            if len(note_content) > 2000:
-                snippet += f"\n... (see {note_file} for full content)\n"
+            marker = f"## [{note_name.upper()}] Updated:"
+            ref_line = f"- {note_name}: `progress/{note_file}` (updated {timestamp})\n"
             for agent, files in AGENTS.items():
                 mem_path = PROGRESS_DIR / files["memory"]
-                if mem_path.exists():
-                    existing = mem_path.read_text(encoding="utf-8", errors="replace")
-                    if header.strip() not in existing:
-                        mem_path.write_text(existing + snippet, encoding="utf-8")
+                if not mem_path.exists():
+                    continue
+                existing = mem_path.read_text(encoding="utf-8", errors="replace")
+                # Remove all previous injections of this note
+                lines = existing.splitlines(keepends=True)
+                new_lines = []
+                skip = False
+                for line in lines:
+                    if line.strip().startswith(marker):
+                        skip = True
+                        continue
+                    if skip and line.strip().startswith("- "):
+                        skip = False
+                        continue
+                    if not skip:
+                        new_lines.append(line)
+                existing = "".join(new_lines)
+                # Add compact reference at end
+                existing = existing.rstrip() + "\n" + ref_line
+                mem_path.write_text(existing, encoding="utf-8")
             self.last_progress_hashes[f"note_{note_name}"] = note_hash
-            print(f"  [NOTES] {note_name} -> all agent memory synced")
+            print(f"  [NOTES] {note_name} -> all agent memory updated (compact ref)")
 
     def run_sync_cycle(self):
         """Run one sync cycle."""
