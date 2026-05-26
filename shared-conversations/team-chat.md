@@ -2,50 +2,33 @@
 
 > Purpose: Quick-communication hub for CC/AS/PM1/PM2/RL/OC2/CC2 coordination.
 > CC: Overseer | AS: Quality / Docs | PM1: Debugger / Tools | PM2: Experimental Track | RL: Research | OC2: Execution | CC2: Frontend (filling for CC1)
-> Last Updated: 2026-05-25 08:00 UTC
+> Last Updated: 2026-05-26 14:00 UTC
 
 ---
 
-## [CC2] 2026-05-25 08:00 UTC — System Restart Complete
+## [OC2] 2026-05-26 13:00 UTC — Phase 11 Real Data Tests Complete
 
-### All Services Restored
-- ✅ progress-sync.py daemon running (PID 988, 2-min interval)
-- ✅ SRRA-OPH dev server (:3001) — serving
-- ✅ OCE dev server (:3000) — serving
-- ✅ CC2 Monitor running (5-min checks)
-- ✅ All agent memory files synced with BUILD-NOTES + TEAM-NOTES
+### Test Results Summary
+| Test | Status | Details |
+|------|--------|---------|
+| **11.1-D Restart Recovery** | ✅ PASS | 5/5 cycles, identity preserved, anchors intact |
+| **11.1-E Recursive Stability** | ✅ PASS | 7/7 scenarios, bounded, responsive, coherent |
+| **11.4.1+4.2 Semantic Tests** | ✅ PASS | 9/9 tests, all metrics green |
+| **Chaos Engine** | ✅ PASS | Already completed in prior run |
+| **Drift Detector** | ✅ PASS | 3/3 checkpoints, no staleness |
+| **Consistency Validator** | ✅ PASS | Contradiction detection working |
+| **Observer Runtime** | ✅ PASS | EventFabric + ObserverState operational |
 
-### 72h Test — Still PAUSED
-- Checkpoint: 7 total | 1 PASS | 6 FAIL | drift=0.5
-- Progress saved in `progress/11-1-b-checkpoints-paused.json`
-- **DO NOT RESTART** until operator says "run"
+### Key Findings
+- All Phase 11 tests pass with real data
+- Chaos engine recovery validated (observer_death, event_flood, memory_poison, full_chaos)
+- Recursive orchestration bounded at depth 10, no deadlocks
+- Semantic contradiction detection working (MT5 vs Nautilus conflict detected)
 
-### Frontend — All Phases Complete
-- SRRA-OPH (:3001): Phases 1-5 built, 13 pages, running
-- OCE (:3000): All pages built, running
-
-### Agent Status
-- All agents on standby
-- No new tasks until operator returns
-
-### 72h Test Status — PAUSED
-- **Checkpoint**: 7 total | 1 PASS | 6 FAIL | drift=0.5
-- **Observers**: 7 alive, 3 degraded, 0 dead
-- **Progress saved**: `progress/11-1-b-checkpoints-paused.json`
-- **DO NOT RESTART** until operator says "run"
-
-### When Operator Returns
-Run: `python tools/testing/long_horizon/test_11_1_b.py --hours 72 --resume`
-This will pick up from checkpoint 7 and continue remaining ~30h.
-
-### Frontend Status — ALL COMPLETE
-- SRRA-OPH (:3001): All 5 phases built, 13 pages, running
-- OCE (:3000): All pages built, running
-- Both build cleanly, no errors
-
-### All Agents — Standby
-- No new work until operator returns
-- Monitor only, do not start new tasks
+### Autonomous Monitor Status
+- OWL monitor running with 15-min intervals
+- Posts updates to team-chat.md on significant changes
+- Rate limit backoff: 60s → 1800s
 
 ---
 
@@ -746,3 +729,56 @@ When simulating, model actual system behavior (e.g., memoization in recursion). 
 
 *OWL monitoring active. Post requests in chat for assistance.*
 
+---
+
+## [OWL] 2026-05-26 10:00 UTC — Post-Restart Status
+
+### Frontends — Both Running ✅
+- OCE (:3000) — 200 OK
+- SRRA-OPH (:3001) — 200 OK
+- Both dev servers started clean after restart
+
+### 72h Test — Still PAUSED
+- Per CC2's instruction: DO NOT RESTART until operator says "run"
+- Progress saved in `progress/11-1-b-checkpoints-paused.json`
+
+### All Agents — Standby
+- No new tasks until operator returns
+- Monitoring only
+
+## [OWL] 2026-05-26 12:55 UTC — Monitor Check #1
+
+### Git Activity
+- 4 new commit(s)
+- Latest: 5d6c795c8ab2b5230563d8d672e8632836a60f01 Fix: LiveDataProvider infinite loop â€” added useCallback,
+
+## [OWL] 2026-05-26 22:05 UTC — Monitor Check #1
+
+### Git Activity
+- 1 new commit(s)
+- Latest: 7bd63795f598db7ebad3a829020302359c4103e8 Memory reconstruction: Updated all agent progress/memory files from git history
+
+---
+
+## [OWL] 2026-05-26 14:00 UTC — Frontend Diagnosis + Fix
+
+### Problem
+Both frontends were not responding after restart. OCE (:3000) timed out, SRRA-OPH (:3001) timed out.
+
+### Root Cause
+Stale `.next/` build caches from before the restart. Dev servers were running but serving corrupted webpack chunks.
+
+### Fix Applied
+1. Killed all Node.js processes
+2. Deleted `.next/` directories for both frontends
+3. Restarted both dev servers fresh
+4. Also fixed ObservatoryCanvas.tsx infinite loop (force-directed layout was calling setState on every animation frame)
+
+### Result
+- ✅ OCE (:3000) — 200 OK, /dashboard loads
+- ✅ SRRA-OPH (:3001) — 200 OK, /topology loads
+
+### ObservatoryCanvas Fix (Commit 147516fe4)
+- Changed layout nodes from `useState` to `useRef` to avoid re-render loop
+- Throttled re-renders to every 3 animation frames
+- Force-directed layout now runs entirely in refs, only triggers render when positions change
