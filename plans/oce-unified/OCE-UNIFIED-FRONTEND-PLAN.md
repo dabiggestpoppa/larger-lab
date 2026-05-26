@@ -19,6 +19,227 @@
 
 ---
 
+## CURRENT vs TARGET ARCHITECTURE
+
+```mermaid
+flowchart TD
+    subgraph CURRENT["❌ CURRENT: Two Separate Apps"]
+        OCE_APP["OCE :3000<br/>Light theme<br/>Dashboard + Chat + Tasks"]
+        SRRA_APP["SRRA-OPH :3001<br/>Dark theme<br/>Topology + Entropy + Repair"]
+        OCE_APP -.->|"separate"| SRRA_APP
+    end
+    
+    subgraph TARGET["✅ TARGET: One Unified OCE"]
+        direction TB
+        ENTRY["Single Entry Point<br/>OCE :3000"]
+        
+        L1["Layer 1 — Chat + Workspace<br/>DOMINATES VISUALLY"]
+        L2["Layer 2 — Observatory<br/>Topology, Entropy, Repair, Timeline<br/>HIDDEN BY DEFAULT"]
+        L3["Layer 3 — Orchestration<br/>Observer, Consensus, Spawn, Learning<br/>HIDDEN BY DEFAULT"]
+        
+        ENTRY --> L1
+        L1 -->|"expand"| L2
+        L2 -->|"expand"| L3
+    end
+    
+    CURRENT -->|"merge into"| TARGET
+    
+    style CURRENT fill:#991b1b,stroke:#ef4444,color:#fff
+    style TARGET fill:#1f3b2d,stroke:#93c47d,color:#fff
+    style OCE_APP fill:#3b3120,stroke:#d6b656,color:#fff
+    style SRRA_APP fill:#3b3120,stroke:#d6b656,color:#fff
+    style ENTRY fill:#6366f1,stroke:#818cf8,color:#fff
+    style L1 fill:#1d3557,stroke:#6fa8dc,color:#fff
+    style L2 fill:#1f3b2d,stroke:#93c47d,color:#fff
+    style L3 fill:#2f233d,stroke:#b4a7d6,color:#fff
+```
+
+---
+
+## LAYER SWITCHING UX FLOW
+
+```mermaid
+flowchart TD
+    USER["👤 User"] -->|"opens OCE"| DEFAULT["Default View<br/>Layer 1: Chat + Workspace"]
+    
+    DEFAULT -->|"needs topology view"| EXPAND2["Expand Layer 2<br/>Observatory Panels Slide Out"]
+    DEFAULT -->|"needs orchestration view"| EXPAND3["Expand Layer 3<br/>Orchestration Panels Slide Out"]
+    
+    EXPAND2 -->|"collapse"| DEFAULT
+    EXPAND3 -->|"collapse"| DEFAULT
+    
+    EXPAND2 -->|"needs orchestration too"| EXPAND23["Both Layers 2+3<br/>Side by side or tabbed"]
+    EXPAND3 -->|"needs observatory too"| EXPAND23
+    
+    EXPAND23 -->|"collapse all"| DEFAULT
+    
+    DEFAULT -->|"keyboard shortcut"| HOTKEY["Hotkey: L1/L2/L3 toggle"]
+    HOTKEY --> DEFAULT
+    
+    style USER fill:#1f1f1f,stroke:#999,color:#fff
+    style DEFAULT fill:#1d3557,stroke:#6fa8dc,color:#fff
+    style EXPAND2 fill:#1f3b2d,stroke:#93c47d,color:#fff
+    style EXPAND3 fill:#2f233d,stroke:#b4a7d6,color:#fff
+    style EXPAND23 fill:#3b3120,stroke:#d6b656,color:#fff
+    style HOTKEY fill:#6366f1,stroke:#818cf8,color:#fff
+```
+
+---
+
+## COMPONENT MIGRATION MAP
+
+```mermaid
+flowchart LR
+    subgraph FROM["SRRA-OPH :3001 (to be merged)"]
+        T1["topology/page.tsx"]
+        E1["entropy/page.tsx"]
+        R1["repair/page.tsx"]
+        A1["attractors/page.tsx"]
+        P1["playback/page.tsx"]
+        X1["experiments/page.tsx"]
+        V1["events/page.tsx"]
+        M1["modules/page.tsx"]
+        S1["tests/page.tsx"]
+        TS["topologyStore.ts"]
+        TLS["timelineStore.ts"]
+        ES["entropyStore.ts"]
+        RS["repairStore.ts"]
+        CS["continuityStore.ts"]
+    end
+    
+    subgraph TO["OCE :3000 (unified target)"]
+        T2["app/topology/page.tsx"]
+        E2["app/entropy/page.tsx"]
+        R2["app/repair/page.tsx"]
+        A2["app/attractors/page.tsx"]
+        P2["app/playback/page.tsx"]
+        X2["app/experiments/page.tsx"]
+        V2["app/events/page.tsx"]
+        M2["app/modules/page.tsx"]
+        S2["app/tests/page.tsx"]
+        NS["stores/observerStore.ts"]
+        NCS["stores/consensusStore.ts"]
+        NSS["stores/spawnStore.ts"]
+        NLS["stores/learningStore.ts"]
+        NPS["stores/persistenceStore.ts"]
+    end
+    
+    T1 --> T2
+    E1 --> E2
+    R1 --> R2
+    A1 --> A2
+    P1 --> P2
+    X1 --> X2
+    V1 --> V2
+    M1 --> M2
+    S1 --> S2
+    TS -->|"merge"| TO
+    TLS -->|"merge"| TO
+    ES -->|"merge"| TO
+    RS -->|"merge"| TO
+    CS -->|"merge"| TO
+    
+    style FROM fill:#991b1b,stroke:#ef4444,color:#fff
+    style TO fill:#1f3b2d,stroke:#93c47d,color:#fff
+```
+
+---
+
+## UNIFIED STATE MANAGEMENT
+
+```mermaid
+flowchart TD
+    subgraph STORES["Zustand Stores (Unified)"]
+        direction TB
+        OS["observerStore.ts<br/>Primary Observer state"]
+        CS["consensusStore.ts<br/>Consensus state"]
+        SS["spawnStore.ts<br/>Spawn state"]
+        LS["learningStore.ts<br/>Learning state"]
+        PS["persistenceStore.ts<br/>Persistence state"]
+        TS["topologyStore.ts<br/>Topology state (moved from SRRA-OPH)"]
+        TLS["timelineStore.ts<br/>Timeline state (moved from SRRA-OPH)"]
+        ES["entropyStore.ts<br/>Entropy state (moved from SRRA-OPH)"]
+        RS["repairStore.ts<br/>Repair state (moved from SRRA-OPH)"]
+        COS["continuityStore.ts<br/>Continuity state (moved from SRRA-OPH)"]
+        US["uiStore.ts<br/>UI state (exists in OCE)"]
+    end
+    
+    subgraph WS["WebSocket (Unified)"]
+        WSS["Single WebSocket Connection"]
+    end
+    
+    WSS -->|"events"| OS
+    WSS -->|"events"| CS
+    WSS -->|"events"| SS
+    WSS -->|"events"| LS
+    WSS -->|"events"| PS
+    WSS -->|"events"| TS
+    WSS -->|"events"| TLS
+    WSS -->|"events"| ES
+    WSS -->|"events"| RS
+    WSS -->|"events"| COS
+    WSS -->|"events"| US
+    
+    style STORES fill:#1d3557,stroke:#6fa8dc,color:#fff
+    style WS fill:#3b3120,stroke:#d6b656,color:#fff
+    style WSS fill:#6366f1,stroke:#818cf8,color:#fff
+```
+
+---
+
+## INTEGRATION SEQUENCE
+
+```mermaid
+sequenceDiagram
+    participant DEV as 👨‍💻 Developer
+    participant OCE as OCE :3000
+    participant SRRA as SRRA-OPH :3001
+    participant GIT as Git
+
+    DEV->>GIT: Create feature branch observer-core-o5
+    
+    DEV->>OCE: Step 1: Merge state stores<br/>(move 5 stores from SRRA-OPH)
+    SRRA-->>OCE: topologyStore, timelineStore, entropyStore, repairStore, continuityStore
+    DEV->>OCE: Verify stores work in OCE context
+    
+    DEV->>OCE: Step 2: Move visualization components<br/>(move 9 page components)
+    SRRA-->>OCE: topology/, entropy/, repair/, attractors/, playback/, experiments/, events/, modules/, tests/
+    DEV->>OCE: Update imports, verify rendering
+    
+    DEV->>OCE: Step 3: Create Layer System<br/>(LayerSwitcher, layout update)
+    DEV->>OCE: Implement expand/collapse with Framer Motion
+    
+    DEV->>OCE: Step 4: Update navigation<br/>(in-app panel switching)
+    DEV->>OCE: TopNav shows layer indicator
+    
+    DEV->>OCE: Step 5: Unify WebSocket<br/>(merge LiveDataProvider)
+    DEV->>OCE: Single connection, event bus distribution
+    
+    DEV->>OCE: Step 6: Theme unification<br/>(dark theme across all layers)
+    DEV->>OCE: Switch OCE from light to dark observatory theme
+    
+    DEV->>OCE: Step 7: Build new observer components
+    DEV->>OCE: ObserverConsole, ObserverStatus, ContinuityPanel, etc.
+    
+    DEV->>OCE: Step 8: Build consensus components
+    DEV->>OCE: ConsensusPanel, RoutingMap, SpawnBlueprintView, etc.
+    
+    DEV->>OCE: Step 9: Build spawn components
+    DEV->>OCE: SpawnMonitor, AgentLifecyclePanel, etc.
+    
+    DEV->>OCE: Step 10: Build learning components
+    DEV->>OCE: OperationalReplay, WorkflowEvolution, etc.
+    
+    DEV->>OCE: Step 11: Build persistence components
+    DEV->>OCE: PersistentFieldView, RuntimeHeartbeatPanel, etc.
+    
+    DEV->>OCE: Step 12: Performance validation
+    DEV->>OCE: 60fps idle, 30fps under load, no memory leaks
+    
+    DEV->>GIT: Merge to master
+    DEV->>SRRA: Decommission separate SRRA-OPH app
+```
+
 ## UNIFIED ARCHITECTURE
 
 ```

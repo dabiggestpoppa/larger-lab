@@ -5,6 +5,126 @@
 
 ---
 
+## COMPONENT DEPENDENCY MAP — ALL PHASES
+
+```mermaid
+flowchart TD
+    subgraph O1["O-1: Primary Observer Core"]
+        PO["PrimaryObserver"]
+        OS["ObserverState"]
+        RA["RuntimeAwareness"]
+        CM["ContinuityMemory"]
+        TIA["TaskIntentAnalyzer"]
+        CD["ContextDistiller"]
+        EA["EventAwareness"]
+        OBS["ObserverSession"]
+        OL["ObserverLifecycle"]
+    end
+    
+    subgraph O2["O-2: Observer Consensus"]
+        OC["ObserverConsensus"]
+        TC["TaskClassifier"]
+        RC["RoutingConsensus"]
+        CS["ComplexityScorer"]
+        SP["SpawnPlanner"]
+        MS["ModelSelector"]
+        CM2["CapabilityMatcher"]
+        CSM["ConsensusMemory"]
+        OBS2["ObserverSpecialization"]
+        CR["ConsensusReplay"]
+    end
+    
+    subgraph O3["O-3: Spawn Engine"]
+        AS["AgentSpawner"]
+        SB["SpawnBlueprint"]
+        CI["ContextInjector"]
+        OR["OpenRouterGateway"]
+        AL["AgentLifecycle"]
+        EB["ExecutionBoundary"]
+        MAC["MultiAgentCoordinator"]
+        TF["TraceFeedback"]
+        SR["SpawnReplay"]
+        REG["SpawnRegistry"]
+    end
+    
+    subgraph O4["O-4: Field Learning"]
+        TC2["TraceCollector"]
+        OR2["OperationalReplay"]
+        WD["WorkflowDistiller"]
+        RL["RoutingLearning"]
+        FA["FailureAnalyzer"]
+        TL["TopologyLearning"]
+        OE["ObserverEvolution"]
+        PM["PatternMemory"]
+        WM["WorkflowMemory"]
+        OS2["OperationalScoring"]
+        AE["AdaptationEngine"]
+    end
+    
+    subgraph O5["O5: OCE Unified"]
+        OCE_LAYER["Layer System"]
+        CHAT["ChatPanel"]
+        EF["ExecutionFeed"]
+        RS["ReplaySummary"]
+        AV["ArtifactViewer"]
+        OCP["ObserverConsole"]
+        OBS3["ObserverStatus"]
+        CP["ContinuityPanel"]
+        RS2["RuntimeSummary"]
+        OHP["ObserverHealthPanel"]
+    end
+    
+    subgraph O6["O6: Local Embodiment"]
+        LR["LocalRuntime"]
+        FA2["FilesystemAwareness"]
+        TO["TerminalOrchestrator"]
+        PO2["ProcessObserver"]
+        AB["ApplicationBridge"]
+        EM["EnvironmentModel"]
+        RI["RuntimeInspector"]
+        PL["PermissionLayer"]
+        ES2["ExecutionSandbox"]
+        MSG["MachineStateGraph"]
+        RC2["RecoveryController"]
+    end
+    
+    subgraph O7["O7: Persistent Field"]
+        PR["PersistentRuntime"]
+        OP["ObserverPersistence"]
+        PA["PassiveAwareness"]
+        EM2["EnvironmentalMonitor"]
+        CP2["ContinuityPreserver"]
+        DSM["DormantStateManager"]
+        AR["AutonomousRepair"]
+        RH["RuntimeHeartbeat"]
+        PS["PersistentScheduler"]
+        RP["RecoveryPersistence"]
+        LHM["LongHorizonMemory"]
+        ODD["OperationalDriftDetector"]
+    end
+    
+    O1 --> O2
+    O2 --> O3
+    O3 --> O4
+    O1 --> O5
+    O2 --> O5
+    O3 --> O5
+    O4 --> O5
+    O5 --> O6
+    O6 --> O7
+    O4 --> O7
+    
+    style O1 fill:#1d3557,stroke:#6fa8dc,color:#fff
+    style O2 fill:#1f3b2d,stroke:#93c47d,color:#fff
+    style O3 fill:#3b3120,stroke:#d6b656,color:#fff
+    style O4 fill:#2f233d,stroke:#b4a7d6,color:#fff
+    style O5 fill:#6366f1,stroke:#818cf8,color:#fff
+    style O6 fill:#991b1b,stroke:#ef4444,color:#fff
+    style O7 fill:#1e3a5f,stroke:#3b82f6,color:#fff
+```
+
+---
+
 ## PHASE O-1: PRIMARY OBSERVER CORE
 
 ### Backend Components (Python)
