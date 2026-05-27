@@ -4,7 +4,7 @@
  * Typed client for the SRRA-OPH API wrapper.
  */
 
-const API_BASE = process.env.NEXT_PUBLIC_SRRA_API || "http://localhost:8001/api";
+const API_BASE = process.env.NEXT_PUBLIC_SRRA_API || "";
 
 async function fetchJSON<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
@@ -45,13 +45,19 @@ export interface TopologyNode {
   label: string;
   type: string;
   status: string;
+  entropy: number;
+  syncScore: number;
+  repairState: string;
+  x: number;
+  y: number;
+  clusterId?: string;
 }
 
 export interface TopologyEdge {
   source: string;
   target: string;
-  weight: number;
-  label: string;
+  strength: number;
+  type: string;
 }
 
 export interface TopologyResponse {
@@ -99,13 +105,13 @@ export interface PhaseInfo {
 // ─── API Functions ───────────────────────────────────────────────────────────
 
 export const srraApi = {
-  health: () => fetchJSON<HealthResponse>("/health"),
-  modules: () => fetchJSON<ModuleInfo[]>("/modules"),
-  moduleDetail: (name: string) => fetchJSON<Record<string, unknown>>(`/modules/${name}`),
-  topology: () => fetchJSON<TopologyResponse>("/topology"),
-  tests: () => fetchJSON<TestSummary>("/tests"),
-  events: (limit = 50) => fetchJSON<EventItem[]>(`/events?limit=${limit}`),
-  phases: () => fetchJSON<PhaseInfo[]>("/phases"),
-  phaseDetail: (id: number) => fetchJSON<Record<string, unknown>>(`/phases/${id}`),
-  root: () => fetchJSON<Record<string, unknown>>("/"),
+  health: () => fetchJSON<HealthResponse>("/api/health"),
+  modules: () => fetchJSON<ModuleInfo[]>("/api/modules"),
+  moduleDetail: (name: string) => fetchJSON<Record<string, unknown>>(`/api/modules/${name}`),
+  topology: () => fetchJSON<TopologyResponse>("/api/topology"),
+  tests: () => fetchJSON<TestSummary>("/api/tests"),
+  events: (limit = 50) => fetchJSON<EventItem[]>(`/api/events?limit=${limit}`),
+  phases: () => fetchJSON<PhaseInfo[]>("/api/phases"),
+  phaseDetail: (id: number) => fetchJSON<Record<string, unknown>>(`/api/phases/${id}`),
+  root: () => fetchJSON<Record<string, unknown>>("/api/"),
 };
