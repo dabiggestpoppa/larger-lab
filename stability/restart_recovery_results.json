@@ -1,11 +1,20 @@
 {
   "test_id": "11.1-D",
   "test_name": "restart_recovery",
-  "timestamp": "2026-05-24T22:36:41.508762+00:00",
-  "cycles": [
+  "timestamp": "2026-05-26T13:16:27.405582+00:00",
+  "cycles": 5,
+  "passed": 5,
+  "failed": 0,
+  "pass_rate": 100.0,
+  "avg_recovery_time_seconds": 0.0,
+  "max_recovery_time_seconds": 0.0,
+  "identity_preserved_all": true,
+  "anchors_intact_all": true,
+  "overall_pass": true,
+  "cycle_results": [
     {
       "cycle": 1,
-      "timestamp": "2026-05-24T22:36:41.507761+00:00",
+      "timestamp": "2026-05-26T13:16:27.403580+00:00",
       "recovery_time_seconds": 0.0,
       "recovery_time_ok": true,
       "identity_preserved": true,
@@ -17,7 +26,7 @@
     },
     {
       "cycle": 2,
-      "timestamp": "2026-05-24T22:36:41.507761+00:00",
+      "timestamp": "2026-05-26T13:16:27.404578+00:00",
       "recovery_time_seconds": 0.0,
       "recovery_time_ok": true,
       "identity_preserved": true,
@@ -29,7 +38,7 @@
     },
     {
       "cycle": 3,
-      "timestamp": "2026-05-24T22:36:41.507761+00:00",
+      "timestamp": "2026-05-26T13:16:27.404578+00:00",
       "recovery_time_seconds": 0.0,
       "recovery_time_ok": true,
       "identity_preserved": true,
@@ -41,7 +50,7 @@
     },
     {
       "cycle": 4,
-      "timestamp": "2026-05-24T22:36:41.507761+00:00",
+      "timestamp": "2026-05-26T13:16:27.404578+00:00",
       "recovery_time_seconds": 0.0,
       "recovery_time_ok": true,
       "identity_preserved": true,
@@ -53,7 +62,7 @@
     },
     {
       "cycle": 5,
-      "timestamp": "2026-05-24T22:36:41.507761+00:00",
+      "timestamp": "2026-05-26T13:16:27.405582+00:00",
       "recovery_time_seconds": 0.0,
       "recovery_time_ok": true,
       "identity_preserved": true,
@@ -63,13 +72,5 @@
       "issues": [],
       "passed": true
     }
-  ],
-  "passed": 5,
-  "failed": 0,
-  "pass_rate": 100.0,
-  "avg_recovery_time_seconds": 0.0,
-  "max_recovery_time_seconds": 0.0,
-  "identity_preserved_all": true,
-  "anchors_intact_all": true,
-  "overall_pass": true
+  ]
 }

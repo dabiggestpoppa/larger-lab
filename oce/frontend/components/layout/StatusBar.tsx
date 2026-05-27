@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useTaskStore } from "@/stores/taskStore";
 import { useAgentStore } from "@/stores/agentStore";
 import { useUIStore } from "@/stores/uiStore";
@@ -19,11 +20,13 @@ const statusLabels: Record<string, string> = {
 };
 
 export default function StatusBar() {
-  const activeTasks = useTaskStore((s) => s.getActiveTasks());
+  const tasks = useTaskStore((s) => s.tasks);
   const agents = useAgentStore((s) => s.agents);
-  const aliveCount = agents.filter((a) => a.status === "alive").length;
-  const degradedCount = agents.filter((a) => a.status === "degraded").length;
   const connectionStatus = useUIStore((s) => s.connectionStatus);
+
+  const activeTasks = useMemo(() => tasks.filter((t) => t.status === "active"), [tasks]);
+  const aliveCount = useMemo(() => agents.filter((a) => a.status === "alive").length, [agents]);
+  const degradedCount = useMemo(() => agents.filter((a) => a.status === "degraded").length, [agents]);
 
   return (
     <div className="h-7 bg-bg-tertiary border-t border-border-light flex items-center px-4 gap-4 text-xs text-text-muted shrink-0">

@@ -5,8 +5,11 @@ import { useTaskStore } from "@/stores/taskStore";
 import { useAgentStore } from "@/stores/agentStore";
 
 export default function RightPanel() {
-  const { rightPanelOpen, rightPanelContent, toggleRightPanel } = useUIStore();
-  const { selectedTaskId, selectedAgentId } = useUIStore();
+  const rightPanelOpen = useUIStore((s) => s.rightPanelOpen);
+  const rightPanelContent = useUIStore((s) => s.rightPanelContent);
+  const toggleRightPanel = useUIStore((s) => s.toggleRightPanel);
+  const selectedTaskId = useUIStore((s) => s.selectedTaskId);
+  const selectedAgentId = useUIStore((s) => s.selectedAgentId);
   const task = useTaskStore((s) => s.tasks.find((t) => t.id === selectedTaskId));
   const agent = useAgentStore((s) => s.agents.find((a) => a.id === selectedAgentId));
 

@@ -18,9 +18,9 @@ from core.consensus.observer_consensus import ObserverConsensus, ConsensusResult
 from core.consensus.spawn_planner import SpawnPlanner
 from core.spawn.spawn_blueprint import SpawnBlueprint, SpawnPlan
 from core.spawn.context_injector import ContextInjector
-from core.spawn.agent_lifecycle import AgentLifecycle, AgentState
+from core.spawn.agent_lifecycle import AgentLifecycle, AgentState, AgentInstance
 from core.spawn.execution_boundary import ExecutionBoundary
-from core.spawn.spawn_registry import SpawnRegistry, SpawnRecord
+from core.spawn.spawn_registry import SpawnRegistry, RegisteredAgent
 
 logger = logging.getLogger("spawn.agent_spawner")
 
@@ -59,6 +59,15 @@ class AgentSpawner:
         self.lifecycle = AgentLifecycle()
         self.boundary = ExecutionBoundary()
         self.registry = SpawnRegistry()
+        self._trace_feedback = TraceFeedback()
+
+
+    def _get_trace_feedback(self):
+        """Lazy import to avoid circular deps."""
+        if not hasattr(self, '_trace_fb'):
+            from core.spawn.trace_feedback import TraceFeedback
+            self._trace_fb = TraceFeedback()
+        return self._trace_fb
 
     async def spawn(
         self,

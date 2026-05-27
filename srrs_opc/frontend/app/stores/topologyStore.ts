@@ -4,7 +4,7 @@ export interface ObserverNode {
   id: string;
   label: string;
   type: string;
-  status: "active" | "synced" | "isolated" | "entropic" | "repairing" | "dormant" | "failed";
+  status: "active" | "synced" | "isolated" | "entropic" | "repairing" | "dormant" | "failed" | "degraded";
   entropy: number;
   syncScore: number;
   repairState: string;

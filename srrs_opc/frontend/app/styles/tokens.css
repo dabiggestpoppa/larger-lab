@@ -36,6 +36,7 @@
   --observer-repairing: #06b6d4;
   --observer-dormant: #374151;
   --observer-failed: #6b7280;
+  --observer-degraded: #f59e0b;
 
   /* Edge types */
   --edge-routing: #6366f1;

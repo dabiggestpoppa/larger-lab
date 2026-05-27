@@ -21,10 +21,10 @@ export default function ClusterOverlay() {
 
         if (clusterNodes.length < 2) return null;
 
-        const minX = Math.min(...clusterNodes.map((n) => n!.x)) - 30;
-        const maxX = Math.max(...clusterNodes.map((n) => n!.x)) + 30;
-        const minY = Math.min(...clusterNodes.map((n) => n!.y)) - 30;
-        const maxY = Math.max(...clusterNodes.map((n) => n!.y)) + 30;
+        const minX = Math.min(...clusterNodes.map((n) => n!.x ?? 0)) - 30;
+        const maxX = Math.max(...clusterNodes.map((n) => n!.x ?? 0)) + 30;
+        const minY = Math.min(...clusterNodes.map((n) => n!.y ?? 0)) - 30;
+        const maxY = Math.max(...clusterNodes.map((n) => n!.y ?? 0)) + 30;
 
         return (
           <g key={cluster.id}>

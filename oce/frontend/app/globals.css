@@ -6,7 +6,11 @@
   --bg-primary: #f8f9fa;
   --bg-secondary: #ffffff;
   --bg-tertiary: #f1f3f5;
-  --accent-primary: #2563eb;
+  --bg-input: #F9F9F9;
+  --bg-chat-user: #133EBF;
+  --bg-chat-assistant: #F2F2F2;
+  --accent-primary: #133EBF;
+  --accent-secondary: #4F46E5;
   --accent-success: #16a34a;
   --accent-warning: #d97706;
   --accent-danger: #dc2626;

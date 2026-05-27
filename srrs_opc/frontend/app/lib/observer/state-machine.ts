@@ -7,7 +7,8 @@ export type ObserverStatus =
   | "entropic"
   | "repairing"
   | "dormant"
-  | "failed";
+  | "failed"
+  | "degraded";
 
 export interface ObserverStateConfig {
   color: string;
@@ -25,6 +26,7 @@ export const OBSERVER_STATUSES: Record<ObserverStatus, ObserverStateConfig> = {
   repairing:{ color: "#06b6d4", glow: "#06b6d4", pulse: true,  dim: false, label: "Repairing" },
   dormant:  { color: "#374151", glow: "none",     pulse: false, dim: true,  label: "Dormant" },
   failed:   { color: "#6b7280", glow: "none",     pulse: false, dim: true,  label: "Failed" },
+  degraded: { color: "#f59e0b", glow: "#f59e0b", pulse: true,  dim: false, label: "Degraded" },
 };
 
 export function getObserverStyle(status: ObserverStatus): ObserverStateConfig {
