@@ -59,15 +59,6 @@ class AgentSpawner:
         self.lifecycle = AgentLifecycle()
         self.boundary = ExecutionBoundary()
         self.registry = SpawnRegistry()
-        self._trace_feedback = TraceFeedback()
-
-
-    def _get_trace_feedback(self):
-        """Lazy import to avoid circular deps."""
-        if not hasattr(self, '_trace_fb'):
-            from core.spawn.trace_feedback import TraceFeedback
-            self._trace_fb = TraceFeedback()
-        return self._trace_fb
 
     async def spawn(
         self,
@@ -125,17 +116,25 @@ class AgentSpawner:
                     timestamp=start_time.isoformat(),
                 )
 
-            # Step 5: Register and start lifecycle
-            record = SpawnRecord(
-                spawn_id=spawn_id,
+            # Step 5: Register agent in lifecycle and registry
+            agent_instance = AgentInstance(
+                agent_id=spawn_id,
+                plan_id=blueprint.plan_id,
                 task_type=consensus_result.task_type,
-                complexity=consensus_result.complexity,
                 model=blueprint.target_model,
-                status="active",
-                started_at=start_time.isoformat(),
             )
-            self.registry.register(record)
-            self.lifecycle.start(spawn_id)
+            self.lifecycle.register(agent_instance)
+
+            registered_agent = RegisteredAgent(
+                agent_id=spawn_id,
+                plan_id=blueprint.plan_id,
+                task_type=consensus_result.task_type,
+                model=blueprint.target_model,
+            )
+            self.registry.register(registered_agent)
+
+            # Transition: pending -> running
+            self.lifecycle.transition(spawn_id, AgentState.RUNNING)
 
             # Step 6: Generate response (for chat, this is the observer response)
             output = self._generate_response(
@@ -145,9 +144,9 @@ class AgentSpawner:
                 context=context,
             )
 
-            # Complete
-            self.lifecycle.complete(spawn_id)
-            self.registry.update_status(spawn_id, "completed")
+            # Complete: running -> complete
+            self.lifecycle.transition(spawn_id, AgentState.COMPLETE)
+            self.registry.update_state(spawn_id, "complete")
 
             duration = (datetime.now(timezone.utc) - start_time).total_seconds() * 1000
 
@@ -170,8 +169,11 @@ class AgentSpawner:
 
         except Exception as e:
             logger.error(f"[{spawn_id}] Spawn failed: {e}")
-            self.lifecycle.fail(spawn_id)
-            self.registry.update_status(spawn_id, "failed")
+            try:
+                self.lifecycle.transition(spawn_id, AgentState.FAILED)
+                self.registry.update_state(spawn_id, "failed")
+            except Exception:
+                pass
             return SpawnResult(
                 spawn_id=spawn_id,
                 status="failed",
@@ -365,8 +367,23 @@ class AgentSpawner:
 
     def get_active_spawns(self) -> list[dict[str, Any]]:
         """Get all active spawns."""
-        return self.registry.get_active()
+        agents = self.registry.get_active()
+        return [
+            {
+                "agent_id": a.agent_id,
+                "task_type": a.task_type,
+                "model": a.model,
+                "state": a.state,
+                "created_at": a.created_at,
+            }
+            for a in agents
+        ]
 
     def get_spawn_history(self, limit: int = 50) -> list[dict[str, Any]]:
-        """Get spawn history."""
-        return self.registry.get_history(limit)
+        """Get spawn history from lifecycle."""
+        # Collect all agents from lifecycle (active + terminal states)
+        all_agents = []
+        for state in [AgentState.PENDING, AgentState.RUNNING, AgentState.COMPLETE, AgentState.FAILED, AgentState.TIMEOUT, AgentState.CANCELLED]:
+            all_agents.extend(self.lifecycle.get_by_state(state))
+        all_agents.sort(key=lambda a: a.created_at, reverse=True)
+        return [a.to_dict() for a in all_agents[:limit]]
