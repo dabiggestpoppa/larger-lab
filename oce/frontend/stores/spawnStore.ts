@@ -26,6 +26,7 @@ export interface SpawnTrace {
   tokensUsed: number;
   turnsUsed: number;
   durationSeconds: number;
+  keyFindings: string[];
   timestamp: string;
 }
 

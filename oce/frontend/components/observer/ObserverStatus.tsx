@@ -1,8 +1,4 @@
-"""
-O-1-F6: ObserverStatus
-=======================
-Observer alive state + health display.
-"""
+/* Fixed docstring */
 
 "use client";
 

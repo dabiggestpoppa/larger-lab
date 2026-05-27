@@ -1,8 +1,7 @@
-"""
-O-1-F4: ArtifactViewer
-=======================
-Artifacts/results panel.
-"""
+/**
+ * O-1-F4: ArtifactViewer
+ * Artifacts/results panel.
+ */
 
 "use client";
 

@@ -1,12 +1,4 @@
-"""
-O-4-F3: RoutingLearningMap
-===========================
-Routing improvement visualization over time.
-*/
-
-"use client";
-
-import { useLearningStore } from "@/stores/learningStore";
+﻿import { useLearningStore } from "@/stores/learningStore";
 
 export default function RoutingLearningMap() {
   const improvements = useLearningStore((s) => s.routingImprovements);

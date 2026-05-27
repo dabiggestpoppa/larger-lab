@@ -1,12 +1,4 @@
-"""
-O-4-F4: FailureAnalysisPanel
-=============================
-Failure analysis display.
-*/
-
-"use client";
-
-import { useLearningStore } from "@/stores/learningStore";
+﻿import { useLearningStore } from "@/stores/learningStore";
 
 export default function FailureAnalysisPanel() {
   const failures = useLearningStore((s) => s.failures);

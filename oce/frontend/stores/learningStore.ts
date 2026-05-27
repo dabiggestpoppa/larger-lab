@@ -1,14 +1,4 @@
-"""
-O-4-F9: learningStore
-======================
-Zustand store for learning state.
-
-Manages: operational replay, workflow evolution, routing learning,
-failure analysis, topology learning, observer evolution,
-pattern memory, adaptation monitoring.
-*/
-
-import { create } from "zustand";
+﻿import { create } from "zustand";
 
 export interface TraceEntry {
   id: string;

@@ -1,12 +1,4 @@
-"""
-O-4-F5: TopologyEvolutionView
-==============================
-Topology learning visualization.
-*/
-
-"use client";
-
-import { useLearningStore } from "@/stores/learningStore";
+﻿import { useLearningStore } from "@/stores/learningStore";
 
 export default function TopologyEvolutionView() {
   const clusters = useLearningStore((s) => s.topologyClusters);

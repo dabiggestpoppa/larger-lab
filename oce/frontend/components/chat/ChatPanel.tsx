@@ -1,162 +1,142 @@
-"""
-O-1-F1: ChatPanel
-==================
-Enhanced Primary Observer chat interface.
-
-Replaces basic chat with observer-aware chat that shows
-task analysis, routing, and execution context.
-*/
-
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useObserverStore } from "@/stores/observerStore";
+import { useUIStore } from "@/stores/uiStore";
+import { useConsensusStore } from "@/stores/consensusStore";
 
 interface ChatMessage {
   id: string;
-  role: "user" | "observer" | "system";
+  role: "user" | "assistant";
   content: string;
   timestamp: string;
-  metadata?: {
-    domain?: string;
-    complexity?: string;
-    nextAction?: string;
+  observer?: {
+    task_type: string;
+    complexity: string;
+    confidence: number;
+    routing_path: string[];
+    agreement?: number;
+    model?: string;
+    spawn_required?: boolean;
   };
 }
 
 export default function ChatPanel() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const observer = useObserverStore((s) => s.observer);
-  const setObserverState = useObserverStore((s) => s.setObserverState);
+  const setConnectionStatus = useUIStore((s) => s.setConnectionStatus);
+  const setCurrentConsensus = useConsensusStore((s) => s.setCurrentConsensus);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!input.trim() || isProcessing) return;
 
     const userMsg: ChatMessage = {
-      id: `msg_${Date.now()}`,
+      id: `msg-${Date.now()}`,
       role: "user",
       content: input,
       timestamp: new Date().toISOString(),
     };
-
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsProcessing(true);
 
-    // Simulate observer processing (will be replaced with real API call)
     try {
-      const response = await fetch("/api/observer/chat", {
+      const res = await fetch("http://localhost:8000/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: input }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        const observerMsg: ChatMessage = {
-          id: `msg_${Date.now()}_resp`,
-          role: "observer",
-          content: data.message || "Task received and analyzed.",
+      if (res.ok) {
+        const data = await res.json();
+        const assistantMsg: ChatMessage = {
+          id: `msg-${Date.now()}-resp`,
+          role: "assistant",
+          content: data.response || data.message || "No response",
           timestamp: new Date().toISOString(),
-          metadata: {
-            domain: data.task_domain,
-            complexity: data.complexity,
-            nextAction: data.next_action,
-          },
+          observer: data.observer,
         };
-        setMessages((prev) => [...prev, observerMsg]);
-        setObserverState({ requestCount: observer.requestCount + 1 });
+        setMessages((prev) => [...prev, assistantMsg]);
+        if (data.observer) {
+          setCurrentConsensus({
+            task_type: data.observer.task_type || "unknown",
+            complexity: data.observer.complexity || "low",
+            confidence: data.observer.confidence || 0,
+            routing_path: data.observer.routing_path || [],
+            required_capabilities: data.observer.required_capabilities || [],
+            recommended_model: data.observer.model || "default",
+            spawn_required: data.observer.spawn_required || false,
+            timestamp: new Date().toISOString(),
+            voter_count: data.observer.voter_count || 1,
+            agreement_score: data.observer.agreement || 1.0,
+          });
+        }
+        setConnectionStatus("connected");
       } else {
-        // Fallback: show that observer received the message
-        const observerMsg: ChatMessage = {
-          id: `msg_${Date.now()}_resp`,
-          role: "observer",
-          content: `Received: "${input}" — Observer API not yet connected.`,
-          timestamp: new Date().toISOString(),
-        };
-        setMessages((prev) => [...prev, observerMsg]);
+        setConnectionStatus("error");
       }
     } catch {
-      const observerMsg: ChatMessage = {
-        id: `msg_${Date.now()}_resp`,
-        role: "observer",
-        content: `Received: "${input}" — Observer API not yet connected.`,
+      setConnectionStatus("error");
+      const errMsg: ChatMessage = {
+        id: `msg-${Date.now()}-err`,
+        role: "assistant",
+        content: "Error: Could not connect to OCE backend.",
         timestamp: new Date().toISOString(),
       };
-      setMessages((prev) => [...prev, observerMsg]);
+      setMessages((prev) => [...prev, errMsg]);
     } finally {
       setIsProcessing(false);
     }
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-950 border border-gray-800 rounded-xl overflow-hidden">
-      {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-800 bg-gray-900/50">
-        <h2 className="text-sm font-semibold text-gray-200">
-          Primary Observer Chat
-        </h2>
-        <p className="text-xs text-gray-500">
-          Continuity-aware orchestration interface
-        </p>
+    <div className="flex flex-col h-full">
+      <div className="flex items-center px-4 py-2 border-b border-border-light bg-bg-secondary">
+        <h2 className="text-xs font-mono font-bold text-text-primary">PRIMARY OBSERVER CHAT</h2>
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {messages.length === 0 && (
-          <div className="text-center text-gray-600 text-sm py-8">
-            <p>Start a conversation with the Primary Observer.</p>
-            <p className="text-xs mt-1">
-              Try: &quot;Build a REST API&quot;, &quot;Analyze the topology&quot;,
-              &quot;Debug the spawn engine&quot;
-            </p>
-          </div>
-        )}
         {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex ${
-              msg.role === "user" ? "justify-end" : "justify-start"
-            }`}
-          >
-            <div
-              className={`max-w-[80%] rounded-lg px-3 py-2 ${
-                msg.role === "user"
-                  ? "bg-blue-900/50 text-blue-100"
-                  : msg.role === "system"
-                  ? "bg-gray-800 text-gray-400 text-xs"
-                  : "bg-gray-800 text-gray-200"
-              }`}
-            >
-              <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-              {msg.metadata && (
-                <div className="flex gap-2 mt-2 text-xs">
-                  {msg.metadata.domain && (
-                    <span className="bg-purple-900/50 text-purple-300 px-1.5 py-0.5 rounded">
-                      {msg.metadata.domain}
+          <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+            <div className={`max-w-[80%] rounded-lg p-3 ${
+              msg.role === "user" ? "bg-accent-primary/10" : "bg-bg-tertiary"
+            }`}>
+              <p className="text-sm text-text-primary whitespace-pre-wrap">{msg.content}</p>
+
+              {msg.observer && (
+                <div className="mt-2 pt-2 border-t border-border-light space-y-1">
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="px-1.5 py-0.5 rounded bg-accent-primary/10 text-accent-primary font-mono">
+                      {msg.observer.task_type}
                     </span>
-                  )}
-                  {msg.metadata.complexity && (
-                    <span className="bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded">
-                      {msg.metadata.complexity}
-                    </span>
-                  )}
-                  {msg.metadata.nextAction && (
-                    <span className="bg-green-900/50 text-green-300 px-1.5 py-0.5 rounded">
-                      → {msg.metadata.nextAction}
-                    </span>
+                    <span className="text-text-muted">{msg.observer.complexity}</span>
+                    <span className="text-accent-success">{(msg.observer.confidence * 100).toFixed(0)}%</span>
+                  </div>
+                  {msg.observer.routing_path && msg.observer.routing_path.length > 0 && (
+                    <div className="flex items-center gap-1 text-xs text-text-muted flex-wrap">
+                      <span>Route:</span>
+                      {msg.observer.routing_path.map((step, idx) => (
+                        <span key={idx} className="flex items-center gap-1">
+                          <span className="px-1.5 py-0.5 bg-white rounded border border-border-light text-text-primary font-mono text-[10px]">
+                            {step}
+                          </span>
+                          {idx < (msg.observer?.routing_path?.length ?? 0) - 1 && (
+                            <span className="text-text-muted">→</span>
+                          )}
+                        </span>
+                      ))}
+                    </div>
                   )}
                 </div>
               )}
-              <div className="text-xs text-gray-600 mt-1">
+
+              <div className="text-[10px] text-text-muted mt-1">
                 {new Date(msg.timestamp).toLocaleTimeString()}
               </div>
             </div>
@@ -164,11 +144,10 @@ export default function ChatPanel() {
         ))}
         {isProcessing && (
           <div className="flex justify-start">
-            <div className="bg-gray-800 rounded-lg px-3 py-2">
-              <div className="flex gap-1">
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" />
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-100" />
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-200" />
+            <div className="bg-bg-tertiary rounded-lg p-3">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-accent-primary animate-pulse" />
+                <span className="text-xs text-text-muted">Observer analyzing...</span>
               </div>
             </div>
           </div>
@@ -177,25 +156,25 @@ export default function ChatPanel() {
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="p-3 border-t border-gray-800">
-        <div className="flex gap-2">
+      <div className="p-3 border-t border-border-light">
+        <div className="flex items-center gap-2">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type a task or question..."
-            className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-blue-600"
-            disabled={isProcessing}
+            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            placeholder="Send message to Primary Observer..."
+            className="flex-1 px-3 py-2 rounded-lg bg-bg-tertiary border border-border-light text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary"
           />
           <button
-            type="submit"
+            onClick={handleSubmit}
             disabled={isProcessing || !input.trim()}
-            className="px-4 py-2 bg-blue-700 hover:bg-blue-600 disabled:bg-gray-700 disabled:text-gray-500 text-white text-sm font-medium rounded-lg transition-colors"
+            className="px-4 py-2 rounded-lg bg-accent-primary text-white text-sm font-medium disabled:opacity-50"
           >
             Send
           </button>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
