@@ -1,70 +1,9 @@
 {
-  "timestamp": "2026-05-24T22:38:58.432020+00:00",
+  "timestamp": "2026-05-26T13:17:09.687342+00:00",
   "test_groups": {
     "11.1-D": {
       "passed": 5,
-      "total": [
-        {
-          "cycle": 1,
-          "timestamp": "2026-05-24T22:36:41.507761+00:00",
-          "recovery_time_seconds": 0.0,
-          "recovery_time_ok": true,
-          "identity_preserved": true,
-          "anchors_intact": true,
-          "observers_reestablished": true,
-          "no_data_loss": true,
-          "issues": [],
-          "passed": true
-        },
-        {
-          "cycle": 2,
-          "timestamp": "2026-05-24T22:36:41.507761+00:00",
-          "recovery_time_seconds": 0.0,
-          "recovery_time_ok": true,
-          "identity_preserved": true,
-          "anchors_intact": true,
-          "observers_reestablished": true,
-          "no_data_loss": true,
-          "issues": [],
-          "passed": true
-        },
-        {
-          "cycle": 3,
-          "timestamp": "2026-05-24T22:36:41.507761+00:00",
-          "recovery_time_seconds": 0.0,
-          "recovery_time_ok": true,
-          "identity_preserved": true,
-          "anchors_intact": true,
-          "observers_reestablished": true,
-          "no_data_loss": true,
-          "issues": [],
-          "passed": true
-        },
-        {
-          "cycle": 4,
-          "timestamp": "2026-05-24T22:36:41.507761+00:00",
-          "recovery_time_seconds": 0.0,
-          "recovery_time_ok": true,
-          "identity_preserved": true,
-          "anchors_intact": true,
-          "observers_reestablished": true,
-          "no_data_loss": true,
-          "issues": [],
-          "passed": true
-        },
-        {
-          "cycle": 5,
-          "timestamp": "2026-05-24T22:36:41.507761+00:00",
-          "recovery_time_seconds": 0.0,
-          "recovery_time_ok": true,
-          "identity_preserved": true,
-          "anchors_intact": true,
-          "observers_reestablished": true,
-          "no_data_loss": true,
-          "issues": [],
-          "passed": true
-        }
-      ],
+      "total": 5,
       "overall": true
     },
     "11.1-E": {
@@ -78,9 +17,9 @@
       "overall": true
     },
     "chaos_engine": {
-      "passed": 0,
-      "total": 4,
-      "overall": false
+      "passed": 20,
+      "total": 20,
+      "overall": true
     },
     "drift_detector": {
       "passed": 3,
@@ -88,9 +27,9 @@
       "overall": true
     },
     "consistency_validator": {
-      "passed": false,
+      "passed": true,
       "total": 1,
-      "overall": false
+      "overall": true
     },
     "observer_runtime": {
       "passed": 1,
@@ -98,7 +37,7 @@
       "overall": true
     }
   },
-  "total_passed": 17,
-  "total_tests": 18,
-  "overall_pass": false
+  "total_passed": 38,
+  "total_tests": 38,
+  "overall_pass": true
 }

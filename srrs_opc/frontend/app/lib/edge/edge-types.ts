@@ -1,6 +1,6 @@
 /* Edge type definitions for SRRA-OPH topology */
 
-export type EdgeType = "routing" | "sync" | "repair" | "entropy" | "memory" | "field";
+export type EdgeType = "routing" | "sync" | "repair" | "entropy" | "memory" | "field" | "message" | "chaos" | "route";
 
 export interface EdgeStyle {
   color: string;
@@ -17,10 +17,13 @@ export const EDGE_STYLES: Record<EdgeType, EdgeStyle> = {
   entropy:  { color: "#dc2626", width: 1,   opacity: 0.4, animated: false, dashArray: "4 2" },
   memory:   { color: "#8b5cf6", width: 1,   opacity: 0.3, animated: false },
   field:    { color: "#059669", width: 0.5, opacity: 0.2, animated: false },
+  message:  { color: "#f59e0b", width: 1.5, opacity: 0.5, animated: true },
+  chaos:    { color: "#dc2626", width: 1,   opacity: 0.4, animated: true, dashArray: "2 2" },
+  route:    { color: "#6366f1", width: 1.5, opacity: 0.5, animated: false },
 };
 
 export function getEdgeStyle(type: EdgeType, strength: number): EdgeStyle {
-  const base = EDGE_STYLES[type];
+  const base = EDGE_STYLES[type] || EDGE_STYLES.field;
   return {
     ...base,
     width: base.width * strength,

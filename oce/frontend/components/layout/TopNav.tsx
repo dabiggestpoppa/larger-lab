@@ -27,8 +27,8 @@ export default function TopNav() {
             href={item.href}
             className={`text-xs px-3 py-1.5 rounded-md no-underline transition-colors ${
               isActive
-                ? "bg-accent-primary/10 text-accent-primary font-medium"
-                : "text-text-secondary hover:bg-bg-tertiary hover:text-text-primary"
+                ? "bg-[#133EBF]/10 text-accent-primary font-medium"
+                : "text-text-secondary hover:bg-gray-100 hover:text-text-primary"
             }`}
           >
             {item.label}

@@ -28,6 +28,19 @@ export default function LiveDataProvider() {
     (msg: WSMessage) => {
       if (!isMounted.current) return;
       switch (msg.type) {
+        case "observer_stats":
+          // Backend sends stats without observers array - just update connection status
+          setConnectionStatus("connected");
+          break;
+        case "event":
+          // Convert event to notification format
+          if (msg.data && typeof msg.data === "object") {
+            addNotification({
+              type: "info",
+              message: (msg.data as any).event_type || "System event",
+            });
+          }
+          break;
         case "agents":
           setAgents(msg.data as any);
           break;
@@ -42,7 +55,7 @@ export default function LiveDataProvider() {
           break;
       }
     },
-    [setAgents, setTasks, setSessions, setConnectionStatus, addNotification]
+    [setAgents, setTasks, setSessions, addNotification]
   );
 
   useEffect(() => {
@@ -51,7 +64,7 @@ export default function LiveDataProvider() {
     const connect = () => {
       if (!isMounted.current) return;
       try {
-        const ws = new WebSocket("ws://localhost:8000/ws");
+        const ws = new WebSocket("ws://localhost:8000/ws/observers");
 
         ws.onopen = () => {
           reconnectCount.current = 0;

@@ -163,6 +163,7 @@ async def continuity_chat(request: ContinuityChatRequest):
     """
     Continuity chat endpoint.
     Preserves goals, trajectories, observer state, operational context.
+    Uses O-1/O-2/O-3 observer pipeline for intelligent responses.
     """
     try:
         adapter = await get_adapter()
@@ -170,7 +171,10 @@ async def continuity_chat(request: ContinuityChatRequest):
         return {
             "response": result.get("response", "No response"),
             "session_id": request.session_id or "new_session",
-            "continuity_preserved": True
+            "continuity_preserved": True,
+            "observer": result.get("observer", {}),
+            "system": result.get("system", {}),
+            "confidence": result.get("confidence", 0),
         }
     except Exception as e:
         logger.error(f"Chat error: {e}")
@@ -1339,6 +1343,95 @@ async def economics_compress(request: dict):
         target_ratio = request.get("target_ratio", 0.6)
         return engine.compress_layer(layer, data, target_ratio)
     except Exception as e:
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+# ─── O-2: Observer Consensus Endpoints ───────────────────────────────────────
+
+
+@app.get("/consensus/status")
+async def get_consensus_status():
+    """Get observer consensus statistics."""
+    try:
+        adapter = await get_adapter()
+        return adapter._observer_consensus.get_stats()
+    except Exception as e:
+        logger.error(f"Consensus status error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/consensus/history")
+async def get_consensus_history(limit: int = Query(50, ge=1, le=500)):
+    """Get recent consensus decisions."""
+    try:
+        adapter = await get_adapter()
+        return adapter._observer_consensus.get_consensus_history(limit)
+    except Exception as e:
+        logger.error(f"Consensus history error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/consensus/specializations")
+async def get_observer_specializations():
+    """Get observer specialization data."""
+    try:
+        adapter = await get_adapter()
+        return adapter._observer_specialization.get_specializations()
+    except Exception as e:
+        logger.error(f"Specializations error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+# ─── O-3: Spawn Engine Endpoints ─────────────────────────────────────────────
+
+
+@app.get("/spawn/status")
+async def get_spawn_status():
+    """Get spawn engine status."""
+    try:
+        adapter = await get_adapter()
+        return {
+            "registry": adapter._spawn_registry.get_stats(),
+            "active": adapter._agent_spawner.get_active_spawns(),
+        }
+    except Exception as e:
+        logger.error(f"Spawn status error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/spawn/history")
+async def get_spawn_history(limit: int = Query(50, ge=1, le=500)):
+    """Get spawn history."""
+    try:
+        adapter = await get_adapter()
+        return adapter._spawn_registry.get_history(limit)
+    except Exception as e:
+        logger.error(f"Spawn history error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/spawn/traces")
+async def get_spawn_traces(
+    task_type: Optional[str] = None,
+    limit: int = Query(50, ge=1, le=500),
+):
+    """Get execution traces."""
+    try:
+        adapter = await get_adapter()
+        return adapter._trace_feedback.get_traces(task_type, limit)
+    except Exception as e:
+        logger.error(f"Traces error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/observer/health")
+async def get_observer_health():
+    """Get Primary Observer health status."""
+    try:
+        adapter = await get_adapter()
+        return adapter._primary_observer.health
+    except Exception as e:
+        logger.error(f"Observer health error: {e}")
         raise HTTPException(status_code=503, detail=str(e))
 
 

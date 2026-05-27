@@ -1,19 +1,11 @@
 "use client";
 
-import { useState } from "react";
-
-interface ObserverDetails {
-  id: string;
-  type: string;
-  status: string;
-  entropy: number;
-  syncScore: number;
-  repairState: string;
-  connections: number;
-}
+import { useEffect } from "react";
+import { useTopologyStore } from "@/stores/topologyStore";
 
 export default function RightPanel() {
-  const [selectedObserver, setSelectedObserver] = useState<ObserverDetails | null>(null);
+  const { nodes, selectedObserverId, selectObserver } = useTopologyStore();
+  const selectedObserver = nodes.find((n) => n.id === selectedObserverId) || null;
 
   return (
     <aside
@@ -25,6 +17,22 @@ export default function RightPanel() {
         <h2 className="text-xs font-mono font-bold text-[var(--text-primary)] uppercase tracking-wider">
           Inspector
         </h2>
+      </div>
+
+      {/* Observer Selector */}
+      <div className="px-4 py-2 border-b border-[var(--border-subtle)]">
+        <select
+          value={selectedObserverId || ""}
+          onChange={(e) => selectObserver(e.target.value || null)}
+          className="w-full text-[10px] font-mono bg-[var(--bg-tertiary)] text-[var(--text-secondary)] border border-[var(--border-subtle)] rounded px-2 py-1"
+        >
+          <option value="">Select Observer...</option>
+          {nodes.map((node) => (
+            <option key={node.id} value={node.id}>
+              {node.id} ({node.type})
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Observer Details */}
@@ -44,6 +52,7 @@ export default function RightPanel() {
               selectedObserver.status === "active" ? "text-[var(--observer-active)]" :
               selectedObserver.status === "synced" ? "text-[var(--observer-synced)]" :
               selectedObserver.status === "repairing" ? "text-[var(--observer-repairing)]" :
+              selectedObserver.status === "degraded" ? "text-[var(--observer-degraded)]" :
               "text-[var(--observer-dormant)]"
             }`}>
               {selectedObserver.status}
@@ -75,7 +84,9 @@ export default function RightPanel() {
           </div>
           <div>
             <span className="text-[10px] font-mono text-[var(--text-muted)] uppercase">Connections</span>
-            <p className="text-xs font-mono text-[var(--text-primary)]">{selectedObserver.connections}</p>
+            <p className="text-xs font-mono text-[var(--text-primary)]">
+              {selectedObserver.clusterId ?? "—"}
+            </p>
           </div>
         </div>
       ) : (

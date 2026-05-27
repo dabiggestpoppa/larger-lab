@@ -203,6 +203,8 @@ async def topology():
     edges_raw = data.get("graph", {}).get("edges", [])
 
     nodes = []
+    import random
+    random.seed(42)  # Deterministic positions
     for nid, ninfo in nodes_raw.items():
         if isinstance(ninfo, dict):
             nodes.append({
@@ -213,6 +215,8 @@ async def topology():
                 "entropy": ninfo.get("entropy_score", 0),
                 "syncScore": 0.5,
                 "repairState": ninfo.get("repair_state", "idle"),
+                "x": random.uniform(100, 700),
+                "y": random.uniform(100, 500),
             })
 
     edges = []
@@ -221,7 +225,7 @@ async def topology():
             "source": e.get("source", ""),
             "target": e.get("target", ""),
             "type": e.get("type", "unknown"),
-            "weight": e.get("frequency", 1),
+            "strength": e.get("frequency", 1),
         })
 
     # Also check for relationships format
@@ -232,7 +236,7 @@ async def topology():
                 "source": rel_info.get("source_observer", ""),
                 "target": rel_info.get("target_observer", ""),
                 "type": rel_info.get("interaction_type", "unknown"),
-                "weight": rel_info.get("frequency", 1),
+                "strength": rel_info.get("frequency", 1),
             })
 
     return {

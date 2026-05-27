@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./styles/tokens.css";
 import ObservatoryLayout from "./components/layout/ObservatoryLayout";
+import LiveDataProvider from "./components/LiveDataProvider";
 
 export const metadata: Metadata = {
   title: "SRRA-OPH Observatory — Continuity Substrate Monitor",
@@ -13,6 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="bg-[var(--bg-primary)] text-[var(--text-primary)] antialiased">
         <ObservatoryLayout>{children}</ObservatoryLayout>
+        <LiveDataProvider />
       </body>
     </html>
   );

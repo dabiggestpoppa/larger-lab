@@ -228,7 +228,7 @@ class RestartRecoveryTest:
             "identity_preserved_all": all(r["identity_preserved"] for r in self.results),
             "anchors_intact_all": all(r["anchors_intact"] for r in self.results),
             "overall_pass": passed == total,
-            "cycles": self.results,
+            "cycle_results": self.results,
         }
 
         # Write results

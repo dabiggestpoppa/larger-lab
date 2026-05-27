@@ -34,6 +34,28 @@ from srrs_opc import (
     TopologyObserver,
 )
 
+# O-1 Observer Core
+from core.observer import (
+    PrimaryObserver, ObserverState, RuntimeAwareness,
+    TaskIntentAnalyzer, ContextDistiller, ContinuityMemory,
+    ObserverSession, ObserverLifecycle, EventAwareness,
+)
+# O-2 Consensus
+from core.consensus import (
+    ObserverConsensus, TaskClassifier, RoutingConsensus,
+    ComplexityScorer, SpawnPlanner, ModelSelector,
+    CapabilityMatcher, ConsensusMemory, ObserverSpecialization,
+    ConsensusReplay,
+)
+# O-3 Spawn Engine
+from core.spawn import (
+    AgentSpawner, SpawnBlueprint,
+    ContextInjector, AgentLifecycle, ExecutionBoundary,
+    MultiAgentCoordinator, TraceFeedback, SpawnReplay,
+    SpawnRegistry, SpawnRecord,
+)
+from core.spawn.agent_spawner import SpawnResult
+
 
 class SRRSAdapter:
     """
@@ -61,6 +83,32 @@ class SRRSAdapter:
         self._contract_manager: Optional[PredictionContractManager] = None
         self._topology_observer: Optional[TopologyObserver] = None
         self._event_counter = 0
+
+        # O-1: Primary Observer Core
+        self._primary_observer: Optional[PrimaryObserver] = None
+        self._observer_state: Optional[ObserverState] = None
+        self._runtime_awareness: Optional[RuntimeAwareness] = None
+        self._continuity_memory: Optional[ContinuityMemory] = None
+        self._observer_session: Optional[ObserverSession] = None
+        self._observer_lifecycle: Optional[ObserverLifecycle] = None
+
+        # O-2: Observer Consensus
+        self._observer_consensus: Optional[ObserverConsensus] = None
+        self._task_classifier: Optional[TaskClassifier] = None
+        self._routing_consensus: Optional[RoutingConsensus] = None
+        self._complexity_scorer: Optional[ComplexityScorer] = None
+        self._spawn_planner: Optional[SpawnPlanner] = None
+        self._model_selector: Optional[ModelSelector] = None
+        self._capability_matcher: Optional[CapabilityMatcher] = None
+        self._consensus_memory: Optional[ConsensusMemory] = None
+        self._observer_specialization: Optional[ObserverSpecialization] = None
+        self._consensus_replay: Optional[ConsensusReplay] = None
+
+        # O-3: Spawn Engine
+        self._agent_spawner: Optional[AgentSpawner] = None
+        self._spawn_registry: Optional[SpawnRegistry] = None
+        self._trace_feedback: Optional[TraceFeedback] = None
+        self._multi_agent_coordinator: Optional[MultiAgentCoordinator] = None
 
     async def initialize(self):
         """Initialize SRRA-OPH substrate components."""
@@ -96,6 +144,35 @@ class SRRSAdapter:
         self._sync_optimizer = SyncCostOptimizer()
         self._resource_cognition = ResourceConstrainedCognition()
         self._governance = SustainabilityGovernance()
+
+        # O-1: Initialize Primary Observer Core
+        self._observer_state = ObserverState()
+        self._primary_observer = PrimaryObserver()
+        self._runtime_awareness = RuntimeAwareness()
+        self._continuity_memory = ContinuityMemory()
+        self._observer_session = ObserverSession()
+        self._observer_lifecycle = ObserverLifecycle()
+        logger.info("O-1: Primary Observer Core initialized")
+
+        # O-2: Initialize Observer Consensus
+        self._observer_consensus = ObserverConsensus()
+        self._task_classifier = TaskClassifier()
+        self._routing_consensus = RoutingConsensus()
+        self._complexity_scorer = ComplexityScorer()
+        self._spawn_planner = SpawnPlanner()
+        self._model_selector = ModelSelector()
+        self._capability_matcher = CapabilityMatcher()
+        self._consensus_memory = ConsensusMemory()
+        self._observer_specialization = ObserverSpecialization()
+        self._consensus_replay = ConsensusReplay(self._consensus_memory)
+        logger.info("O-2: Observer Consensus initialized")
+
+        # O-3: Initialize Spawn Engine
+        self._agent_spawner = AgentSpawner()
+        self._spawn_registry = SpawnRegistry()
+        self._trace_feedback = TraceFeedback()
+        self._multi_agent_coordinator = MultiAgentCoordinator()
+        logger.info("O-3: Spawn Engine initialized")
 
         self._initialized = True
 
@@ -187,19 +264,93 @@ class SRRSAdapter:
         }
 
     async def process_continuity_message(self, message: str, context: Optional[Dict] = None) -> Dict[str, Any]:
-        """Process a message through SRRA-OPH substrate."""
+        """
+        Process a message through the full Observer pipeline.
+
+        Pipeline:
+        1. O-1: PrimaryObserver receives input, analyzes intent
+        2. O-2: ObserverConsensus reaches consensus on routing
+        3. O-3: AgentSpawner generates response via spawn pipeline
+        4. Response enriched with system state
+        """
         if not self._initialized:
             await self.initialize()
 
         await self.emit_event("chat.message.received", {"message": message})
 
-        planner = self._patches.get("planner")
-        if planner:
-            result = planner.process(message, context or {})
-        else:
-            result = {"response": "Planner not available"}
+        try:
+            # ── Step 1: O-1 Primary Observer receives input ──
+            orch_response = self._primary_observer.receive_input(
+                user_input=message,
+                session_context=context or {},
+            )
 
-        await self.emit_event("chat.message.responded", {"response": result.get("response", "")})
+            # ── Step 2: O-2 Observer Consensus ──
+            consensus_result = self._observer_consensus.reach_consensus(
+                user_input=message,
+                observer_signals=None,
+                session_context=context or {},
+            )
+
+            # ── Step 3: O-3 Spawn pipeline for response generation ──
+            spawn_result = await self._agent_spawner.spawn(
+                user_input=message,
+                session_context={
+                    "last_domain": orch_response.task_domain,
+                    "last_complexity": orch_response.complexity,
+                    **(context or {}),
+                },
+            )
+
+            # ── Step 4: Gather system state for enrichment ──
+            observer_health = self._primary_observer.health
+            consensus_stats = self._observer_consensus.get_stats()
+            spawn_snapshot = self._spawn_registry.get_field_snapshot()
+
+            # ── Step 5: Build enriched response ──
+            response_text = spawn_result.output if spawn_result.status == "completed" else orch_response.message
+
+            result = {
+                "response": response_text,
+                "confidence": consensus_result.confidence,
+                "observer": {
+                    "task_domain": consensus_result.task_type,
+                    "complexity": consensus_result.complexity,
+                    "routing_path": consensus_result.routing_path,
+                    "model": consensus_result.recommended_model,
+                    "agreement": consensus_result.agreement_score,
+                    "spawn_status": spawn_result.status,
+                },
+                "system": {
+                    "health": observer_health.get("status", "unknown"),
+                    "continuity_score": observer_health.get("continuity_score", 0),
+                    "active_agents": spawn_snapshot.get("active_agents", 0),
+                    "total_spawns": spawn_snapshot.get("total_agents", 0),
+                },
+            }
+
+            # Record in continuity memory
+            self._continuity_memory.record({
+                "type": "chat_interaction",
+                "domain": consensus_result.task_type,
+                "complexity": consensus_result.complexity,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            })
+
+        except Exception as e:
+            logger.error(f"Observer pipeline error: {e}", exc_info=True)
+            # Fallback to simple response
+            result = {
+                "response": f"Observer pipeline error: {str(e)}. The system is still initializing.",
+                "confidence": 0.0,
+                "observer": {"task_domain": "error", "complexity": "unknown"},
+                "system": {"health": "degraded"},
+            }
+
+        await self.emit_event("chat.message.responded", {
+            "response": result.get("response", "")[:200],
+            "domain": result.get("observer", {}).get("task_domain", ""),
+        })
 
         return result
 
