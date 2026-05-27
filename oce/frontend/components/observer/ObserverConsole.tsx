@@ -1,10 +1,4 @@
-"""
-O-1-F5: ObserverConsole
-========================
-Primary Observer interface panel.
-
-Main panel showing observer status, continuity, runtime, and health.
-"""
+/* Fixed docstring */
 
 "use client";
 

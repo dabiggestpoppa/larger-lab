@@ -19,7 +19,15 @@ interface BoundaryUsage {
 
 export default function ExecutionBoundaryView() {
   // Placeholder — would be connected to real data via props or store
-  const boundary: BoundaryConfig | null = null;
+  const boundary: BoundaryConfig | null = {
+    allowed_tools: ["read", "write", "execute"],
+    max_file_writes: 100,
+    max_terminal_commands: 50,
+    max_network_requests: 200,
+    allow_network: true,
+    allow_file_system: true,
+    sandbox_enabled: true,
+  };
   const usage: BoundaryUsage = { file_writes: 0, terminal_commands: 0, network_requests: 0 };
 
   if (!boundary) {

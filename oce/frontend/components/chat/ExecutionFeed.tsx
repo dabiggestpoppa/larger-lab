@@ -1,8 +1,4 @@
-"""
-O-1-F2: ExecutionFeed
-======================
-Live execution visibility in chat.
-"""
+/* Fixed docstring */
 
 "use client";
 

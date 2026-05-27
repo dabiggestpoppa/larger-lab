@@ -1,12 +1,4 @@
-"""
-O-4-F7: PatternMemoryView
-==========================
-Stable orchestration patterns display.
-*/
-
-"use client";
-
-import { useLearningStore } from "@/stores/learningStore";
+﻿import { useLearningStore } from "@/stores/learningStore";
 
 export default function PatternMemoryView() {
   const patterns = useLearningStore((s) => s.workflowPatterns);

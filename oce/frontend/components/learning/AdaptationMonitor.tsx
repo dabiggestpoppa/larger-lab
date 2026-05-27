@@ -1,12 +1,4 @@
-"""
-O-4-F8: AdaptationMonitor
-==========================
-Adaptation tracking display.
-*/
-
-"use client";
-
-import { useLearningStore } from "@/stores/learningStore";
+﻿import { useLearningStore } from "@/stores/learningStore";
 
 export default function AdaptationMonitor() {
   const events = useLearningStore((s) => s.adaptationEvents);

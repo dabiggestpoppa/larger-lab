@@ -1,8 +1,4 @@
-"""
-O-1-F9: ObserverHealthPanel
-============================
-Observer health metrics display.
-"""
+/* Fixed docstring */
 
 "use client";
 

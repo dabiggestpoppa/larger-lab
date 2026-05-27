@@ -1,8 +1,4 @@
-"""
-O-1-F3: ReplaySummary
-======================
-Replay summaries in chat.
-"""
+/* Fixed docstring */
 
 "use client";
 

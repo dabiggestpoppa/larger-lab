@@ -1,12 +1,4 @@
-"""
-O-4-F6: ObserverEvolutionMap
-=============================
-Observer specialization evolution display.
-*/
-
-"use client";
-
-import { useLearningStore } from "@/stores/learningStore";
+﻿import { useLearningStore } from "@/stores/learningStore";
 
 export default function ObserverEvolutionMap() {
   const specializations = useLearningStore((s) => s.observerSpecializations);

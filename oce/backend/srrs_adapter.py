@@ -330,12 +330,15 @@ class SRRSAdapter:
             }
 
             # Record in continuity memory
-            self._continuity_memory.record({
-                "type": "chat_interaction",
-                "domain": consensus_result.task_type,
-                "complexity": consensus_result.complexity,
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-            })
+            from core.observer.continuity_memory import WorkflowRecord
+            import uuid as _uuid
+            self._continuity_memory.record_workflow(WorkflowRecord(
+                workflow_id=f"chat_{_uuid.uuid4().hex[:8]}",
+                task_domain=consensus_result.task_type,
+                complexity=consensus_result.complexity,
+                timestamp=datetime.now(timezone.utc).isoformat(),
+                success=spawn_result.status == "completed",
+            ))
 
         except Exception as e:
             logger.error(f"Observer pipeline error: {e}", exc_info=True)

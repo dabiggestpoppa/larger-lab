@@ -1,8 +1,4 @@
-"""
-O-1-F8: RuntimeSummary
-=======================
-Current runtime awareness display.
-"""
+/* Fixed docstring */
 
 "use client";
 

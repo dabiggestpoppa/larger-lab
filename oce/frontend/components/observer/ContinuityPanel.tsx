@@ -1,8 +1,4 @@
-"""
-O-1-F7: ContinuityPanel
-========================
-Continuity state display.
-"""
+/* Fixed docstring */
 
 "use client";
 

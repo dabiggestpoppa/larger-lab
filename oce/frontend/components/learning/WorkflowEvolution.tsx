@@ -1,12 +1,4 @@
-"""
-O-4-F2: WorkflowEvolution
-==========================
-Workflow pattern evolution display.
-*/
-
-"use client";
-
-import { useLearningStore } from "@/stores/learningStore";
+﻿import { useLearningStore } from "@/stores/learningStore";
 
 export default function WorkflowEvolution() {
   const patterns = useLearningStore((s) => s.workflowPatterns);

@@ -1,15 +1,6 @@
-"""
-O-1-F10: observerStore
-=======================
-Zustand store for observer state.
+﻿import { create } from "zustand";
 
-Manages: observer health, continuity score, runtime state,
-entropy state, repair state, active agents.
-"""
-
-import { create } from "zustand";
-
-export type ObserverHealthStatus = "healthy" | "degrated" | "recovering" | "failed";
+export type ObserverHealthStatus = "healthy" | "degraded" | "recovering" | "failed";
 
 export interface ObserverStateData {
   observerId: string;

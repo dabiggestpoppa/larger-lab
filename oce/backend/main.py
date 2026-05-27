@@ -1391,7 +1391,7 @@ async def get_spawn_status():
     try:
         adapter = await get_adapter()
         return {
-            "registry": adapter._spawn_registry.get_stats(),
+            "registry": adapter._spawn_registry.get_field_snapshot(),
             "active": adapter._agent_spawner.get_active_spawns(),
         }
     except Exception as e:

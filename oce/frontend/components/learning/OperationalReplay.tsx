@@ -1,12 +1,4 @@
-"""
-O-4-F1: OperationalReplay
-==========================
-Orchestration history replay panel.
-*/
-
-"use client";
-
-import { useLearningStore } from "@/stores/learningStore";
+﻿import { useLearningStore } from "@/stores/learningStore";
 
 export default function OperationalReplay() {
   const traces = useLearningStore((s) => s.traces);
