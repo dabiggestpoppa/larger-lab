@@ -39,29 +39,29 @@ Observer Core + OCE Unified — O-1 through O-4 complete. O-5 in progress (CC le
 ### Migration Patterns (SRRA-OPH → OCE)
 
 #### Store Interface Mapping
-| SRRA-OPH Store | OCE Store | Migration Action |
-|----------------|-----------|-----------------|
-| topologyStore.ts | topologyStore.ts | Merge — OCE version is base, add SRRA observers/edges |
-| entropyStore.ts | (new) | Create in OCE, migrate entropy visualization state |
-| repairStore.ts | (new) | Create in OCE, migrate repair cascade state |
-| continuityStore.ts | (new) | Create in OCE, migrate continuity monitoring state |
-| timelineStore.ts | timelineStore.ts | Merge — both have timeline, unify interfaces |
+| SRRA-OPH Store | OCE Store | Migration Action | Status |
+|----------------|-----------|-----------------|--------|
+| topologyStore.ts | topologyStore.ts | Migrated with ObserverNode/Edge/ClusterState | ✅ Done |
+| entropyStore.ts | entropyStore.ts | Created with EntropyEngine class | ✅ Done |
+| repairStore.ts | repairStore.ts | Migrated with RepairEvent interface | ✅ Done |
+| continuityStore.ts | continuityStore.ts | Migrated with Checkpoint interface | ✅ Done |
+| timelineStore.ts | timelineStore.ts | Migrated with RuntimeFrame types | ✅ Done |
 
 #### Component Migration List
-- ObservatoryCanvas → OCE topology page
-- EntropyField → OCE entropy page
-- RepairCascade → OCE repair page
-- AttractorMap → OCE attractors page
-- ClusterOverlay → OCE topology overlay
-- RepairWaveAnimation → OCE repair visualization
+- ObservatoryCanvas → OCE topology page ✅
+- EntropyField → OCE entropy page ✅
+- RepairCascade → OCE repair page ✅
+- AttractorMap → OCE attractors page (pending)
+- ClusterOverlay → OCE topology overlay (pending)
+- RepairWaveAnimation → OCE repair visualization (pending)
 
 ### Testing Requirements for Unified Frontend
-1. **Store integration tests** — Verify merged stores work together
-2. **Component render tests** — Each migrated component renders in OCE layout
-3. **WebSocket unification test** — Single LiveDataProvider serves all panels
-4. **Performance tests** — 60fps idle, 30fps under load
-5. **Theme consistency** — All panels use dark observatory theme
-6. **Navigation tests** — In-app panel switching works
+1. **Store integration tests** — Verify merged stores work together ✅
+2. **Component render tests** — Each migrated component renders in OCE layout ✅
+3. **WebSocket unification test** — Single LiveDataProvider serves all panels ✅
+4. **Performance tests** — 60fps idle, 30fps under load (pending)
+5. **Theme consistency** — All panels use dark observatory theme ✅
+6. **Navigation tests** — In-app panel switching works (pending)
 
 ### O-7 Persistent Field — Expected Structure
 - **Backend (12 components):** PersistentRuntime, ObserverPersistence, PassiveAwareness, EnvironmentalMonitor, ContinuityPreserver, DormantStateManager, AutonomousRepair, RuntimeHeartbeat, PersistentScheduler, RecoveryPersistence, LongHorizonMemory, OperationalDriftDetector
