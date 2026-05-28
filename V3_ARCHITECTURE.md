@@ -157,6 +157,44 @@ V3 is a **cognitive field system** that replaces traditional event→handler arc
 
 ---
 
+## 2.11 Observer Core (O-1 through O-7)
+
+**Purpose:** Practical observer implementation building on V3 cognitive field
+
+**Location:** `core/learning/` — 11 backend modules + frontend components
+
+The Observer Core phases implement practical observer functionality that leverages the V3 cognitive field:
+
+| Phase | Name | Backend | Frontend | Tests | Status |
+|-------|------|---------|----------|-------|--------|
+| O-1 | Primary Observer Core | ✅ 9/9 | ✅ 10/10 | ✅ 42/42 | COMPLETE |
+| O-2 | Observer Consensus | ✅ 10/10 | ✅ 7/7 | ⏳ needs alignment | COMPLETE |
+| O-3 | Spawn Engine | ✅ 10/10 | ✅ 8/8 | ⏳ needs alignment | COMPLETE |
+| O-4 | Field Learning | ✅ 11/11 | ✅ 9/9 | ✅ 14/14 | COMPLETE |
+| O-5 | OCE Unified Frontend | ⏳ Planned | ⏳ Planned | — | NEXT (CC) |
+| O-6 | Local Substrate | ⏳ Planned | ⏳ Planned | — | Planned (PM) |
+| O-7 | Persistent Field | ⏳ Planned | ⏳ Planned | — | Planned (AS) |
+
+### O-4 Field Learning Components
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| TraceCollector | `core/learning/trace_collector.py` | Captures operational traces |
+| OperationalReplay | `core/learning/operational_replay.py` | Records/replays orchestration history |
+| WorkflowDistiller | `core/learning/workflow_distiller.py` | Extracts stable patterns from traces |
+| RoutingLearning | `core/learning/routing_learning.py` | Improves future routing decisions |
+| FailureAnalyzer | `core/learning/failure_analyzer.py` | Analyzes orchestration failures |
+| TopologyLearning | `core/learning/topology_learning.py` | Studies topology effects on outcomes |
+| ObserverEvolution | `core/learning/observer_evolution.py` | Observer specialization through history |
+| PatternMemory | `core/learning/pattern_memory.py` | Stores stable knowledge patterns |
+| WorkflowMemory | `core/learning/workflow_memory.py` | Long-horizon workflow continuity |
+| OperationalScoring | `core/learning/operational_scoring.py` | Quantifies orchestration quality |
+| AdaptationEngine | `core/learning/adaptation_engine.py` | Applies controlled adaptations |
+
+**Key Innovation:** Observers learn from operational history to improve future performance
+
+---
+
 ## 3. Key Distinctions from Current AI Paradigm
 
 | Aspect | Current AI | V3 Cognitive Field |
