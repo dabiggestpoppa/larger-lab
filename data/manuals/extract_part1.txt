@@ -1,0 +1,184 @@
+﻿=== PART 1: CEREBUS FX v2.0 CORE MANUAL ===
+
+--- PAGE 5 ---
+CORE OPERATING PRINCIPLES
+CONSTRAINT LOGIC ΓÇö SIX OPERATING PRINCIPLES
+ΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûáΓûá
+1. THE FIELD IS NOT A BATTLEGROUND
+   The field resolves conflicting intents through minimal changes (resolution outputs).
+   There are no "buyers" or "sellers" ΓÇö only constraint states being resolved.
+2. NO INHERENT DIRECTION
+   Direction of Constraint Resolution = the orientation of the current resolution process.
+   It is not assumed to persist. Each session begins fresh with a new constraint set.
+3. INDICATORS DO NOT CREATE INFORMATION
+   Strong Subadditivity (SSA): the current state already embeds all past information.
+   Adding more indicators does not increase edge ΓÇö it increases noise.
+4. BREAKOUTS ARE CONSTRAINT VIOLATIONS
+   Resolution occurs when existing constraints cannot contain the state.
+   The 132% level is the Kill-Switch State: the constraint set has been violated.
+5. FIBONACCI LEVELS ARE STATES, NOT TARGETS
+   168% = Stall Zone State (resolution output pausing at a constraint cluster)
+   200% = Deep State (extended resolution, often exhaustion)
+   132% = Kill-Switch State (invalidation of current constraint set)
+6. TRADING IS STATE RECOGNITION, NOT CANDLE PREDICTION
+   The Markov Property: the current state contains all necessary information.
+   Past data is fully embedded in the present state. Align with the field's resolution.
+CONSTRAINT-SYSTEM VOCABULARY GLOSSARY
+Full footnote reference ΓÇö these definitions apply throughou
+
+--- PAGE 6 ---
+Replaces 'breakout.' A sudden change when the field's constraints are exceeded. Not random ΓÇö required when the field can no longer
+balance constraints with small adjustments.
+[6] Partial Rebalancing
+Replaces 'pullback.' Temporary adjustment after a strong movement. Indicates short-term resolution of an imbalance, not a reversal
+signal.
+[7] Resolution Output Stall
+Replaces 'stall.' A period when the field temporarily stops advancing because it is processing a local constraint cluster. The
+Stall-Harvest Trading System focuses on this phase.
+[8] Constraint Boundary
+Replaces 'stop' or 'stop-loss.' A state at which the current constraint set is invalidated. Not arbitrary ΓÇö represents the limit beyond which
+the resolution process must be reevaluated.
+[9] Activation Signal
+Replaces 'entry.' A defined condition showing that a new constraint-resolution process has started. The P90 candle is one such
+activation signal.
+[10] Fib Extension States
+168%, 200%, 132% are not entries or stops. They are states describing how far the resolution output has extended. 168% = stall state;
+200% = deep state; 132% = kill-switch state.
+[11] Constraint Deficit and Expansion
+Small Asian ranges act as a 'coiled spring.' When the field is under-resolved, it must expand to reach its daily mean variance.
+[12] Strong Subadditivity (SSA)
+Adding more indicators does not create new information. The current state already embeds all past information.
+[13] Markov Property
+The current state contains all necessary i
+
+--- PAGE 7 ---
+PART 1 CEREBUS FX v2.0 ΓÇö The Complete Operational Manual Asian
+Range P90  Deep Mean Rebalancing  Daily Distribution Matrix
+1. EXECUTIVE SUMMARY: THE EDGE
+The CEREBUS System exploits the statistical correlation between the Asian Session Range and the Daily Distribution.
+Constraint Logic: Small Asian ranges create a Constraint Deficit [11]. The field is under-resolved and must expand to reach its daily
+mean variance. The Asian Range defines the day's constraint set. Resolution Outputs [2] then satisfy that deficit.
+Core Thesis: Small Asian ranges (<30 pips) act as a constraint deficit [11]. The field must expand to resolve it.
+CFD Expansion Engine: Captures the initial resolution output expansion with tight constraint boundaries [8] and pyramided
+activation signals [9].
+Binary/Mean Reversion Engine: Capitalizes on available resolution pathway harvesting [4] at deep states (168%-200%) [10]
+where the resolution output stalls [7] before reversing or continuing.
+Target Metric
+Value
+Win Rate (Filtered)
+85% ΓÇô 90%
+Daily Goal
+1.0% ΓÇô 1.5%
+Max Daily Drawdown
+< 0.50%
+Prop Firm Circuit Breaker
+Hard constraint boundary [8] at 0.40% loss
+2. PRE-SESSION CHECKLIST (Daily @ 1:45 AM EST)
+Step 1: Measure Asian Range
+Timeframe: 00:00 ΓÇô 08:00 UTC (7:00 PM ΓÇô 3:00 AM EST). Calculate the constraint deficit [11] ΓÇö the distance between Asian High
+and Asian Low.
+Asian Range Size
+Field Status
+Action
+Position Sizing
+< 20 pips
+TIER 1 (Gold)
+Full Conviction
+100% Size
+20 ΓÇô 30 pips
+TIER 2 (Standard)
+Moderate
+
+--- PAGE 8 ---
+News: High-impact news (NFP, CPI, FOMC) within 4 hours? ΓåÆ SKIP.
+Day of Week: Monday (reduce size 25%). Friday (reduce size 50% after 10 AM).
+3. STRATEGY A: CFD EXPANSION ENGINE (The Primary Engine)
+This engine captures the initial Constraint Deficit expansion [11]. The P90 candle is the Activation Signal [9] that marks the start of a new
+resolution process. Stop-losses are Constraint Boundaries [8] ΓÇö structurally defined invalidation points.
+A. Activation Signal Identification (P90 Candle)
+Wait for an M5 candle to close within the Activation Window (2:00 AM ΓÇô 11:00 AM EST) meeting the threshold below. This is the
+P90 Activation Signal [9].
+Time Window (EST)
+Bullish/Bearish Threshold
+2:00 ΓÇô 4:00 AM
+>= 4.1 pips
+4:00 ΓÇô 6:00 AM
+>= 4.6 pips
+6:00 ΓÇô 8:00 AM
+>= 4.6 pips
+8:00 ΓÇô 10:00 AM
+>= 5.9 pips
+10:00 ΓÇô 11:00 AM
+>= 6.2 pips
+B. Activation & Scaling Protocol
+Do not activate all at once. Use a pyramid model to manage constraint boundary exposure.
+Activation
+Timing
+Condition
+Size
+Constraint Boundary
+Target
+Signal 1
+P90 Close
+Activation Confirmed
+40%
+80% of P90 Body
+-25% Daily Range
+Signal 2
+P90 Close
+Simultaneous
+40%
+1.5x P90 Body
+-25% Daily Range
+Signal 3
++45 Mins
+Resolution Output +8 pips
+20%
+Breakeven (Signal 1)
+-50% Daily Range
+Regime Shift Confirmation (8:45 AM EST): If Current Daily Range > 1.5x Asian Range, proceed with full size. If not, reduce size
+by 50%.
+C. Exit Management
+TP1 (-25% of Asian Range):  Close 50% of total position. Move constraint boundaries to Breakeven.
+TP2 (
+
+--- PAGE 9 ---
+When the resolution output extends aggressively, it often reaches the Stall Zone (168%) [10] or Deep State (200%) [10] to harvest
+available resolution pathways before rebalancing.
+CFD Context: Usually a constraint boundary-out signal [8].
+Binary/Mean Reversion Context: A high-probability activation signal [9] for a rebalancing snap-back.
+B. The Setup
+Trigger: Resolution output touches Stall Zone (168%) or Deep State (200%) [10] of the P90 candle.
+Condition: Must occur before 12:00 PM EST.
+Filter: The -50% Daily Target has NOT yet been hit.
+C. Execution ΓÇö Option 1: Binary Options (Time-Based)
+Session (EST)
+Dynamic Expiry
+Target Win Rate
+2 AM ΓÇô 6 AM
+90 Minutes
+~84% (early session)
+6 AM ΓÇô 9 AM
+60 Minutes
+~78%
+9 AM ΓÇô 12 PM
+45 Minutes
+~74%
+After 12 PM
+No Trade
+ΓÇö
+Direction: Same as the direction of constraint resolution [3] if Regime Shift confirmed. Counter-direction if resolution momentum is
+exhausted.
+C. Execution ΓÇö Option 2: CFD Limit Order at Deep State (Deep Value)
+LIMIT ORDER at 200% Deep State Level [10]
+Constraint Boundary: 8 pips beyond 200% level (approx. 220% extension)
+  ΓåÆ Data shows 90% of violations do NOT exceed 6.5 pips past 200%.
+  ΓåÆ Filters noise while protecting capital.
+Take Profit:
+  TP1: Return to 0% (Activation Resolution Output [9])
+  TP2: -50% Daily Range
+R:R Potential: 1:5 to 1:7
+D. When to AVOID the Rebalancing Play
+  Resolution output CLOSES strongly beyond 220% level (True constraint violation)
+  Major news is imminent
+  Asian Range was >45 pips (const
