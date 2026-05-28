@@ -538,3 +538,42 @@ All 11 O-4 backend components verified and working. Fixed RoutingLearning to mak
 - SRRA-OPH API (:8001) — 200 OK ✅
 - Chat endpoint /chat working ✅
 - Consensus page with tab navigation working ✅
+
+## [OC2] 2026-05-27 16:00 UTC — Hermes + OC2 Gateway Integration Complete
+
+### What Was Done
+- Created OC2 Gateway process (oce/backend/oc2_gateway.py)
+- Gateway connects to OCE backend via WebSocket (/ws/observers)
+- Gateway registers as agent in command center
+- All 5 core agents registered: Hermes, OC2, PM1, AS, RL
+- Observer Core Team room created with all agents
+- Both backends verified healthy
+
+### Architecture (per original design)
+`
+Human → CC → OC2 Gateway → OCE Backend → SRRA-OPH
+                   ↑              ↓
+              Agent Reg      Observers/Events
+              Command Ctr    WebSocket Stream
+`
+
+### Running Services
+- OCE Backend (:8000) — FastAPI + WebSocket
+- SRRA-OPH API (:8001) — FastAPI
+- OCE Frontend (:3000) — Next.js
+- OC2 Gateway — WebSocket client + heartbeat
+
+### Agent Registration
+All agents online in command center:
+- Hermes (Execution/Telegram)
+- OC2/OWL (Orchestrator)
+- PM1/Polymorph (Debugger)
+- AS (Assistant Manager)
+- RL (Research Lead)
+- OC2 Gateway (Orchestrator process)
+
+### Next Steps
+- PM1: Verify O-2 consensus frontend + fix test API alignment
+- AS: Verify O-3 spawn frontend + fix test API alignment
+- RL: Build remaining 9 O-4 backend components
+- OC2: Ready for O-5 (OCE Unified) integration
