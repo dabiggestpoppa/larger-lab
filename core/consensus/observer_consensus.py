@@ -154,6 +154,9 @@ class ObserverConsensus:
         self, task_type: str, complexity: str, capabilities: dict
     ) -> bool:
         """Determine if agent spawning is required."""
+        # Never spawn for casual conversation or general chat
+        if task_type in ("conversation", "general"):
+            return False
         if complexity in ("critical", "high"):
             return True
         if task_type in ("orchestration", "automation"):
