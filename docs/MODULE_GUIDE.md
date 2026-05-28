@@ -1,8 +1,8 @@
 # 📚 Module Guide — V3 Cognitive Field System
 
-> **Last Updated:** 2026-05-18
-> **Total Modules:** 67 across 10 phases
-> **Total Tests:** 1460 passing
+> **Last Updated:** 2026-05-27
+> **Total Modules:** 67 V3 + 11 Observer Core = 78 modules
+> **Total Tests:** 1460 V3 + 56 Observer Core = 1516 tests
 
 ---
 
@@ -18,6 +18,7 @@
 8. [Phase 8: Operator Coevolution](#phase-8-operator-coevolution)
 9. [Phase 9: Sovereign Field Emergence](#phase-9-sovereign-field-emergence)
 10. [Phase 10: Recursive Field Computation](#phase-10-recursive-field-computation)
+11. [Observer Core Phases (O-1 through O-7)](#observer-core-phases-o-1-through-o-7)
 
 ---
 
@@ -304,6 +305,87 @@ OperatorModel.record_observation()
 - Models strategic behavior, NOT emotional vulnerabilities
 - Anti-manipulation: no emotional dependency vectors, no parasocial hooks
 - Optimizes for long-term coherence, NOT short-term satisfaction
+
+---
+
+## Observer Core Phases (O-1 through O-7)
+
+**Purpose:** Practical observer implementation building on V3 cognitive field. These phases implement the observer lifecycle: core foundation, consensus building, spawning, learning, unified frontend, local substrate, and persistent field.
+
+**Directory:** `core/learning/` + `core/spawn/` + `core/observer/`
+
+### O-1: Primary Observer Core
+
+**Purpose:** Core observer infrastructure with bounded patches
+
+**Directory:** `core/observer/`
+
+| Module | Key Classes | Purpose |
+|--------|-------------|---------|
+| observer.py | PrimaryObserver | Core observer with 4 bounded patches |
+| patches.py | PlannerPatch, ExecutionPatch, MemoryPatch, RepairPatch | Bounded operational patches |
+| state.py | ObserverState | Observer state management |
+| health.py | HealthMonitor | Observer health tracking |
+| registry.py | ObserverRegistry | Observer registration |
+| lifecycle.py | ObserverLifecycle | Lifecycle state machine |
+| consensus.py | ConsensusEngine | Observer consensus |
+| routing.py | RoutingEngine | Task routing |
+| context.py | ContextManager | Context compression |
+
+### O-2: Observer Consensus
+
+**Purpose:** Multi-observer consensus and routing decisions
+
+**Directory:** `core/consensus/`
+
+| Module | Key Classes | Purpose |
+|--------|-------------|---------|
+| consensus_engine.py | ConsensusEngine | Multi-observer consensus |
+| routing_matrix.py | RoutingMatrix | Routing decisions |
+| spawn_blueprint.py | SpawnBlueprint | Agent spawning plans |
+| specialization_map.py | SpecializationMap | Observer specialization |
+| capability_inspector.py | CapabilityInspector | Capability analysis |
+
+### O-3: Spawn Engine
+
+**Purpose:** Agent spawning and lifecycle management
+
+**Directory:** `core/spawn/`
+
+| Module | Key Classes | Purpose |
+|--------|-------------|---------|
+| agent_spawner.py | AgentSpawner | Creates new agents |
+| spawn_blueprint.py | SpawnBlueprint | Blueprint generation |
+| context_injector.py | ContextInjector | Context injection |
+| openrouter_gateway.py | OpenRouterGateway | LLM routing |
+| agent_lifecycle.py | AgentLifecycle | Lifecycle management |
+| execution_boundary.py | ExecutionBoundary | Tool scope limits |
+| multi_agent_coordinator.py | MultiAgentCoordinator | Coordination |
+| trace_feedback.py | TraceFeedback | Execution feedback |
+| spawn_replay.py | SpawnReplay | Replay system |
+| spawn_registry.py | SpawnRegistry | Agent registry |
+
+### O-4: Field Learning
+
+**Purpose:** Learning from operational history to improve future performance
+
+**Directory:** `core/learning/`
+
+| Module | Key Classes | Purpose |
+|--------|-------------|---------|
+| trace_collector.py | TraceCollector, ExecutionTrace | Captures operational traces |
+| operational_replay.py | OperationalReplay, ReplayEvent | Records/replays history |
+| workflow_distiller.py | WorkflowDistiller, WorkflowPattern | Extracts stable patterns |
+| routing_learning.py | RoutingLearning, RoutingPattern | Improves routing decisions |
+| failure_analyzer.py | FailureAnalyzer, FailurePattern | Analyzes failures |
+| topology_learning.py | TopologyLearning, TopologySnapshot | Studies topology effects |
+| observer_evolution.py | ObserverEvolution, EvolutionRecord | Observer specialization |
+| pattern_memory.py | PatternMemory, StoredPattern | Stores knowledge patterns |
+| workflow_memory.py | WorkflowMemory, WorkflowEntry | Long-horizon memory |
+| operational_scoring.py | OperationalScoring, ScoreEntry | Quantifies quality |
+| adaptation_engine.py | AdaptationEngine, AdaptationAction | Applies adaptations |
+
+**Total: 11 modules, 14 tests passing**
 
 ---
 
