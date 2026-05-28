@@ -1,0 +1,35 @@
+{
+  "current_session_id": "chat_20260528_163208",
+  "sessions": {
+    "chat_20260528_163208": {
+      "session_id": "chat_20260528_163208",
+      "start_time": "2026-05-28T16:32:08.961504+00:00",
+      "last_active": "2026-05-28T16:32:08.963510+00:00",
+      "message_count": 2,
+      "user_message_count": 1,
+      "assistant_message_count": 1,
+      "messages": [
+        {
+          "message_id": "msg_20260528163208961504",
+          "role": "user",
+          "content": "Hello observer!",
+          "timestamp": "2026-05-28T16:32:08.961504+00:00",
+          "session_id": "chat_20260528_163208",
+          "task_domain": null,
+          "complexity": null,
+          "observer_metadata": {}
+        },
+        {
+          "message_id": "msg_20260528163208963510",
+          "role": "assistant",
+          "content": "Hello! I am the Primary Observer.",
+          "timestamp": "2026-05-28T16:32:08.963510+00:00",
+          "session_id": "chat_20260528_163208",
+          "task_domain": null,
+          "complexity": null,
+          "observer_metadata": {}
+        }
+      ]
+    }
+  }
+}

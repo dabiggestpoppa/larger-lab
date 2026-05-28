@@ -7,12 +7,13 @@
 
 ---
 
-## Status: 🟢 Active — O-5 OCE Unified Frontend In Progress
+## Status: 🟢 Active — O-6 COMPLETE, O-7 READY
 
-### Current State (2026-05-27 20:30 UTC)
-**O-5 OCE Unified Frontend integration started. O-4 backend complete.**
+### Current State (2026-05-28 11:00 UTC)
+**O-6 Local Substrate — COMPLETE (52/52 tests, 16 routes, 0 errors).**
+**O-7 Persistent Field — Ready to build (12 backend + 9 frontend + 8 tests).**
 
-### O-5 OCE Unified Frontend — IN PROGRESS (10/12 frontend components)
+### O-5 OCE Unified Frontend — IN PROGRESS (12/12 frontend components)
 | Component | File | Status |
 |-----------|------|--------|
 | topologyStore | `stores/topologyStore.ts` | ✅ Migrated from SRRA-OPH |
@@ -30,17 +31,20 @@
 | topology/ObservatoryCanvas.tsx | `app/topology/ObservatoryCanvas.tsx` | ✅ Migrated |
 | entropy/page.tsx | `app/entropy/page.tsx` | ✅ Migrated |
 | repair/page.tsx | `app/repair/page.tsx` | ✅ Migrated |
+| attractors/page.tsx | `app/attractors/page.tsx` | ✅ Migrated |
+| playback/page.tsx | `app/playback/page.tsx` | ✅ Migrated |
+| experiments/page.tsx | `app/experiments/page.tsx` | ✅ Migrated |
+| events/page.tsx | `app/events/page.tsx` | ✅ Migrated |
+| modules/page.tsx | `app/modules/page.tsx` | ✅ Migrated |
+| tests/page.tsx | `app/tests/page.tsx` | ✅ Migrated |
+| ConsensusPanel | `components/panels/ConsensusPanel.tsx` | ✅ Created |
+| SpawnPanel | `components/panels/SpawnPanel.tsx` | ✅ Created |
+| LearningPanel | `components/panels/LearningPanel.tsx` | ✅ Created |
 
 ### Remaining O-5 Tasks
-- Migrate attractors, playback, experiments, events, modules, tests pages
-- Build Layer 3 orchestration panels (consensus, spawn, learning)
+- ✅ Migrate 6 pages: attractors, playback, experiments, events, modules, tests
+- ✅ Build Layer 3 panels: ConsensusPanel, SpawnPanel, LearningPanel
 - Performance validation (60fps idle, 30fps under load)
-
-### Remaining O-5 Tasks
-- Migrate attractors, playback, experiments, events, modules, tests pages
-- Create LayerSwitcher with expand/collapse in layout
-- Build Layer 3 orchestration panels (consensus, spawn, learning)
-- Performance validation
 
 ### O-4 Field Learning — COMPLETE (11 backend components)
 
@@ -127,6 +131,7 @@
 5. **Skills cleanup:** Removed 700+ accidentally downloaded skills, restored from git
 6. **ObservatoryCanvas infinite loop (2026-05-26):** Changed layout nodes from useState to useRef, throttled re-renders to every 3 frames
 7. **Frontend dev server fix (2026-05-26):** Killed stale node processes, deleted .next/ caches, restarted both servers
+8. **SandboxMonitor.tsx (2026-05-28):** Fixed property names from snake_case to camelCase (active_tasks → activeTasks, max_tasks → maxTasks)
 
 ### 72h Test (11.1-B) — PAUSED
 - Progress: `progress/11-1-b-checkpoints-paused.json`

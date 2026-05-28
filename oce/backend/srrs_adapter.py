@@ -39,6 +39,7 @@ from core.observer import (
     PrimaryObserver, ObserverState, RuntimeAwareness,
     TaskIntentAnalyzer, ContextDistiller, ContinuityMemory,
     ObserverSession, ObserverLifecycle, EventAwareness,
+    ChatLog, get_chat_log,
 )
 # O-2 Consensus
 from core.consensus import (
@@ -173,7 +174,9 @@ class SRRSAdapter:
         self._trace_feedback = TraceFeedback()
         self._multi_agent_coordinator = MultiAgentCoordinator()
         logger.info("O-3: Spawn Engine initialized")
-
+        # O-1-B5: Chat Log
+        self._chat_log = get_chat_log()
+        logger.info("O-1-B5: Chat Log initialized")
         self._initialized = True
 
     async def get_observer_status(self) -> List[Dict[str, Any]]:
@@ -470,10 +473,34 @@ class SRRSAdapter:
 
         await self.emit_event("chat.message.received", {"message": message})
 
+        # Get or create session, then log the user message
+        session_id = self._chat_log.get_current_session()
+        self._chat_log.add_message(
+            role="user",
+            content=message,
+            session_id=session_id,
+            observer_metadata={"source": "web_chat"},
+        )
+        # Use the session_id from the message (in case a new session was created)
+        session_id = self._chat_log.get_current_session()
+
         try:
             # ── Fast Path: Simple questions ──
             if self._is_simple_question(message):
-                return await self._fast_path_response(message)
+                result = await self._fast_path_response(message)
+                # Log the observer response
+                self._chat_log.add_message(
+                    role="assistant",
+                    content=result.get("response", ""),
+                    session_id=session_id,
+                    task_domain=result.get("observer", {}).get("task_domain", "general"),
+                    observer_metadata={
+                        "routing_path": result.get("observer", {}).get("routing_path", []),
+                        "confidence": result.get("confidence", 0),
+                    },
+                )
+                result["session_id"] = session_id
+                return result
 
             # ── Full Pipeline: Complex tasks ──
             # Step 1: O-1 Primary Observer receives input
@@ -537,6 +564,23 @@ class SRRSAdapter:
                 success=spawn_result.status == "completed",
             ))
 
+            # Log the observer response to chat log
+            self._chat_log.add_message(
+                role="assistant",
+                content=response_text,
+                session_id=session_id,
+                task_domain=consensus_result.task_type,
+                complexity=consensus_result.complexity,
+                observer_metadata={
+                    "routing_path": consensus_result.routing_path,
+                    "model": consensus_result.recommended_model,
+                    "confidence": consensus_result.confidence,
+                    "spawn_status": spawn_result.status,
+                    "agreement": consensus_result.agreement_score,
+                },
+            )
+            result["session_id"] = session_id
+
         except Exception as e:
             logger.error(f"Observer pipeline error: {e}", exc_info=True)
             # Fallback to simple response
@@ -545,7 +589,16 @@ class SRRSAdapter:
                 "confidence": 0.0,
                 "observer": {"task_domain": "error", "complexity": "unknown"},
                 "system": {"health": "degraded"},
+                "session_id": session_id,
             }
+            # Log the error response
+            self._chat_log.add_message(
+                role="assistant",
+                content=result["response"],
+                session_id=session_id,
+                task_domain="error",
+                observer_metadata={"error": str(e)},
+            )
 
         await self.emit_event("chat.message.responded", {
             "response": result.get("response", "")[:200],

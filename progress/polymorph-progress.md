@@ -33,6 +33,18 @@
 - [x] Created memory-bank/OC2-GATEWAY-FAILURES.md — common errors & gateway fail reference for OC2 (2026-05-17)
 - [x] Posted summary to team-chat.md
 
+### O-6 Local Substrate Planning — IN PROGRESS (2026-05-28)
+- [x] Created O-6 implementation plan (plans/observer-core/O-6-IMPLEMENTATION-PLAN.md)
+- [x] Created substrate/ backend directory with 11 components
+- [x] Created substrateStore.ts for frontend state management
+- [x] Created 8 frontend components (MachineStateView, ProcessGraph, RuntimeInspector, FilesystemTopology, SandboxMonitor, EnvironmentModelView, TerminalExecutionPanel, RecoveryTimeline)
+- [x] Created substrate page (app/substrate/page.tsx)
+- [x] Added Substrate nav link to TopNav
+- [x] Registered substrate_api.py endpoints in main.py
+- [x] Created test_substrate.py with 8 test scenarios
+- [ ] Backend integration testing
+- [ ] Frontend component testing
+
 ### V3 Phase 8-10 PM Tasks — ALL COMPLETE
 - [x] All V3 phases 1-10 debugged and tested
 - [x] 1460 tests passing (57 SRRA-OPH + 1403 OCE)

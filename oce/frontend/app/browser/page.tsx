@@ -11,7 +11,7 @@ export default function BrowserPage() {
     if (!url) return;
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/chat", {
+      const res = await fetch("/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: `open ${url}` }),
@@ -27,7 +27,7 @@ export default function BrowserPage() {
   const checkStatus = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/browser/status");
+      const res = await fetch("/browser/status");
       const data = await res.json();
       setResult(JSON.stringify(data, null, 2));
     } catch (e) {

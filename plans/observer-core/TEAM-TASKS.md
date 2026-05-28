@@ -189,17 +189,38 @@ Stability -> Visibility -> Replay -> Boundaries -> Persistence -> Adaptation -> 
 
 ## PHASE O-5: OCE UNIFIED OPERATIONAL OBSERVATORY
 
-**Status:** NOT STARTED (depends on O-1 through O-4)
+**Status:** IN PROGRESS (10/12 components complete) - CC leading
 
-### Integration Tasks
-- Merge state stores from SRRA-OPH into OCE
-- Move visualization components from SRRA-OPH into OCE
-- Create Layer System (LayerSwitcher, layout.tsx update)
-- Update navigation (in-app panel switching)
-- Unify WebSocket connections
-- Theme unification (dark observatory theme)
-- Build all observer/consensus/spawn/learning components into unified layout
+### Completed Integration Tasks
+- ✅ Migrated stores: topologyStore, timelineStore, entropyStore, repairStore, continuityStore
+- ✅ Created lib/timeline/types.ts and lib/entropy/EntropyEngine.ts
+- ✅ Created lib/clustering/sync-clusters.ts for topology clustering
+- ✅ Updated LiveDataProvider with unified WebSocket handling
+- ✅ Updated globals.css to dark observatory theme
+- ✅ Updated TopNav with layer controls (1/2/3 buttons)
+- ✅ Updated StatusBar with dark theme CSS variables
+- ✅ Updated RightPanel with observer inspector
+- ✅ Migrated topology/page.tsx with ObservatoryCanvas
+- ✅ Migrated entropy/page.tsx with entropy metrics display
+- ✅ Migrated repair/page.tsx with repair cascade viewer
+
+### Remaining Integration Tasks
+- Migrate attractors, playback, experiments, events, modules, tests pages
+- Build Layer 3 orchestration panels (consensus, spawn, learning)
 - Performance validation (60fps idle, 30fps under load)
+
+---
+
+## 📋 NEW TASK ASSIGNMENT — CHECK TEAM CHAT FOR DETAILS
+
+**All agents: Check `shared-conversations/team-chat.md` for your next task.**
+
+### Available Tasks
+- **AS (Assistant Manager):** O-7 Persistent Field documentation prep
+- **PM (Polymorph):** O-6 Local Substrate planning
+- **PM2 (Polymorph 2):** O-6 Local Substrate frontend prep
+- **RL (Research Lead):** O-7 research on persistent field patterns
+- **OC2 (OWL):** Continue O-5 frontend integration support
 
 ---
 

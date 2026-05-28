@@ -1,11 +1,45 @@
 "use client";
 
 import { useTopologyStore } from "@/stores/topologyStore";
+import { useUIStore } from "@/stores/uiStore";
+import ConsensusPanel from "../panels/ConsensusPanel";
+import SpawnPanel from "../panels/SpawnPanel";
+import LearningPanel from "../panels/LearningPanel";
 
 export default function RightPanel() {
   const { nodes, selectedObserverId, selectObserver } = useTopologyStore();
   const selectedObserver = nodes.find((n) => n.id === selectedObserverId) || null;
+  const activeLayer = useUIStore((s) => s.activeLayer);
 
+  // Layer 3: Show orchestration panels
+  if (activeLayer === "layer3") {
+    return (
+      <aside
+        className="flex flex-col border-l border-[var(--border-subtle)] bg-[var(--bg-secondary)] overflow-y-auto"
+        style={{ width: "var(--right-panel-width, 280px)" }}
+      >
+        <div className="flex border-b border-[var(--border-subtle)]">
+          {(["consensus", "spawn", "learning"] as const).map((tab) => (
+            <button
+              key={tab}
+              className={`flex-1 px-2 py-2 text-[10px] font-mono uppercase tracking-wider transition-colors ${
+                tab === "consensus"
+                  ? "bg-[var(--bg-tertiary)] text-[var(--accent-primary)] border-b-2 border-[var(--accent-primary)]"
+                  : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+        <div className="flex-1 overflow-y-auto">
+          <ConsensusPanel />
+        </div>
+      </aside>
+    );
+  }
+
+  // Layer 1/2: Show observer inspector
   return (
     <aside
       className="flex flex-col border-l border-[var(--border-subtle)] bg-[var(--bg-secondary)] overflow-y-auto"
