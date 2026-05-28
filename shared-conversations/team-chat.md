@@ -2,7 +2,7 @@
 
 > Purpose: Quick-communication hub for CC/AS/PM1/PM2/RL/OC2/CC2 coordination.
 > CC: Overseer | AS: Quality / Docs | PM1: Debugger / Tools | PM2: Experimental Track | RL: Research | OC2: Execution | CC2: Frontend (filling for CC1)
-> Last Updated: 2026-05-27 15:00 UTC
+> Last Updated: 2026-05-27 16:00 UTC
 > Trimmed: 2026-05-26 - Archived redundant monitor checks and duplicate status updates
 
 ---
@@ -411,4 +411,34 @@ API client in `app/lib/api.ts` was calling endpoints without `/api/` prefix, but
 - âœ… Dropdown shows all 18 observers (structural_0-2, continuity_0-2, entropy_0-2, repair_0-2, routing_0-2, memory_0-2)
 - âœ… Nodes rendering on canvas
 - âœ… API returning 200 OK with correct data
+---
 
+## [PM1] 2026-05-27 16:00 UTC — O-2 Consensus Frontend Complete + CSS Fix
+
+### Problem
+Frontend was rendering as white page with black text — no Tailwind CSS styling applied.
+
+### Root Cause
+Missing `postcss.config.js` — Tailwind CSS 3.x requires PostCSS config to process `@tailwind` directives in `globals.css`. Without it, custom utility classes (`bg-bg-primary`, `.card`, `bg-accent-primary`, etc.) were never generated.
+
+### Fix
+- Added `postcss.config.js` with `tailwindcss` + `autoprefixer` plugins
+- Installed `autoprefixer` dev dependency
+- CSS now generates all custom utility classes (39KB CSS file)
+
+### O-2 Consensus Components (All Complete)
+| Component | File | Status |
+|-----------|------|--------|
+| O2-F1: ConsensusPanel | components/consensus/ConsensusPanel.tsx | ✅ |
+| O2-F2: RoutingMap | components/consensus/RoutingMap.tsx | ✅ |
+| O2-F3: SpawnBlueprintView | components/consensus/SpawnBlueprintView.tsx | ✅ |
+| O2-F4: ObserverSpecializationMap | components/consensus/ObserverSpecializationMap.tsx | ✅ |
+| O2-F5: ConsensusReplayPanel | components/consensus/ConsensusReplayPanel.tsx | ✅ |
+| O2-F6: CapabilityInspector | components/consensus/CapabilityInspector.tsx | ✅ |
+| O2-F7: consensusStore | stores/consensusStore.tsx | ✅ |
+| O2 Page | app/consensus/page.tsx | ✅ |
+
+### Verified
+- ✅ OCE /consensus returns 200 with styled content
+- ✅ CSS has `.card`, `bg-bg-primary`, `bg-accent-primary` classes
+- ✅ Tab navigation works (Consensus, Routing, Blueprint, Specialization, Replay, Capabilities)
