@@ -811,11 +811,49 @@ graph LR
 ```
 
 **Total: 67 V3 modules across 10 phases + 11 Phase 11 components, 1403 tests passing**
-    GA --> SM
-    SM --> NR
-    NR --> SAR
-    SAR --> ECS
+
+---
+
+## 🔄 Observer Core Phases (O-1 through O-7)
+
+```mermaid
+graph LR
+    O1[O-1<br/>Primary Observer<br/>9/9 backend]
+    O2[O-2<br/>Observer Consensus<br/>10/10 backend]
+    O3[O-3<br/>Spawn Engine<br/>10/10 backend]
+    O4[O-4<br/>Field Learning<br/>11/11 backend]
+    O5[O-5<br/>OCE Unified<br/>Planned]
+    O6[O-6<br/>Local Substrate<br/>Planned]
+    O7[O-7<br/>Persistent Field<br/>Planned]
+
+    O1 --> O2 --> O3 --> O4 --> O5 --> O6 --> O7
+
+    style O1 fill:#3498db,color:#fff
+    style O2 fill:#2ecc71,color:#fff
+    style O3 fill:#9b59b6,color:#fff
+    style O4 fill:#e74c3c,color:#fff
+    style O5 fill:#f39c12,color:#fff
+    style O6 fill:#1abc9c,color:#fff
+    style O7 fill:#34495e,color:#fff
 ```
+
+### Observer Core O-4 Field Learning Modules
+
+| Module | File | Purpose |
+|--------|------|---------|
+| TraceCollector | `core/learning/trace_collector.py` | Captures operational traces |
+| OperationalReplay | `core/learning/operational_replay.py` | Records/replays orchestration history |
+| WorkflowDistiller | `core/learning/workflow_distiller.py` | Extracts stable patterns from traces |
+| RoutingLearning | `core/learning/routing_learning.py` | Improves future routing decisions |
+| FailureAnalyzer | `core/learning/failure_analyzer.py` | Analyzes orchestration failures |
+| TopologyLearning | `core/learning/topology_learning.py` | Studies topology effects on outcomes |
+| ObserverEvolution | `core/learning/observer_evolution.py` | Observer specialization through history |
+| PatternMemory | `core/learning/pattern_memory.py` | Stores stable knowledge patterns |
+| WorkflowMemory | `core/learning/workflow_memory.py` | Long-horizon workflow continuity |
+| OperationalScoring | `core/learning/operational_scoring.py` | Quantifies orchestration quality |
+| AdaptationEngine | `core/learning/adaptation_engine.py` | Applies controlled adaptations |
+
+---
 
 ### V3 Phase 7 Modules
 

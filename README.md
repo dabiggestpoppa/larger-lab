@@ -203,6 +203,20 @@ OCE V3 is the **cognitive field** — a 10-phase computational architecture that
 | 10 | Recursive Field Computation | 5 | 23 | Recursive compute graphs, positional references, resonance propagation |
 | **Total** | | **67** | **1403** | |
 
+### Observer Core Phases (O-1 through O-7)
+
+| Phase | Name | Backend | Frontend | Tests | Status |
+|-------|------|---------|----------|-------|--------|
+| O-1 | Primary Observer Core | ✅ 9/9 | ✅ 10/10 | ✅ 42/42 | COMPLETE |
+| O-2 | Observer Consensus | ✅ 10/10 | ✅ 7/7 | ⏳ needs alignment | COMPLETE |
+| O-3 | Spawn Engine | ✅ 10/10 | ✅ 8/8 | ⏳ needs alignment | COMPLETE |
+| O-4 | Field Learning | ✅ 11/11 | ✅ 9/9 | ✅ 14/14 | COMPLETE |
+| O-5 | OCE Unified Frontend | ⏳ Planned | ⏳ Planned | — | NEXT (CC) |
+| O-6 | Local Substrate | ⏳ Planned | ⏳ Planned | — | Planned (PM) |
+| O-7 | Persistent Field | ⏳ Planned | ⏳ Planned | — | Planned (AS) |
+
+**Total Tests: 56 passing** (42 O-1 + 14 O-4)
+
 ---
 
 ## 🤖 Agent Network

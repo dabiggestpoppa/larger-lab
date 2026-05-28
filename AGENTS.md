@@ -53,6 +53,17 @@ After EVERY code edit: Update own progress file + memory file. After every 5 cod
 | SRRA-OPH Frontend | 13 pages | ✅ Complete (all 5 phases) |
 | OCE Frontend | All pages | ✅ Complete |
 
+### Observer Core Phases
+| Phase | Backend | Frontend | Tests | Status |
+|-------|---------|----------|-------|--------|
+| O-1 | 9/9 | 10/10 | 42/42 | ✅ Complete |
+| O-2 | 10/10 | 7/7 | needs alignment | ✅ Complete |
+| O-3 | 10/10 | 8/8 | needs alignment | ✅ Complete |
+| O-4 | 11/11 | 9/9 | 14/14 | ✅ Complete |
+| O-5 | 0/12 | 0/12 | — | ⏳ Next (CC) |
+| O-6 | 0/11 | 0/8 | — | ⏳ Planned (PM) |
+| O-7 | 0/12 | 0/9 | — | ⏳ Planned (AS) |
+
 ## Key Files
 | File | Purpose |
 |------|---------|
