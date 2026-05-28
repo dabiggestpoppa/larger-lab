@@ -37,7 +37,7 @@ class RoutingPattern:
 class RoutingLearning:
     """Analyzes operational traces to learn optimal routing decisions."""
     
-    def __init__(self, trace_collector: "TraceCollector", storage_path: Optional[str] = None):
+    def __init__(self, trace_collector: Optional["TraceCollector"] = None, storage_path: Optional[str] = None):
         self.trace_collector = trace_collector
         self._patterns: Dict[str, RoutingPattern] = {}
         self._storage_path = Path(storage_path) if storage_path else None
@@ -46,9 +46,6 @@ class RoutingLearning:
     def _init_if_needed(self) -> None:
         """Initialize if not already initialized."""
         if not self._initialized:
-            # Ensure trace collector is available
-            if not hasattr(self, 'trace_collector'):
-                raise ValueError("TraceCollector not provided")
             self._initialized = True
     
     def analyze_traces(self) -> Dict[str, Any]:

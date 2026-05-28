@@ -10,12 +10,27 @@ repair saturation.
 
 from __future__ import annotations
 
+import json
 import logging
+from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger("core.learning.failure_analyzer")
+
+
+@dataclass
+class FailurePattern:
+    """A pattern of failure extracted from traces."""
+    pattern_id: str
+    failure_type: str  # "routing", "entropy", "topology", "repair"
+    root_cause: str
+    frequency: int
+    first_seen: str
+    last_seen: str
+    context: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -47,6 +62,10 @@ class FailureAnalyzer:
         "boundary_violation",
     ]
 
+    def __init__(self, storage_path: str = ""):
+        self._failures: List[FailurePattern] = []
+        self._storage_path = Path(storage_path) if storage_path else None
+
     def analyze(self, trace: dict[str, Any]) -> FailureReport:
         """Analyze a failed trace and produce a failure report."""
         trace_id = trace.get("trace_id", "unknown")
@@ -65,6 +84,40 @@ class FailureAnalyzer:
             recommendations=recommendations,
             metadata={"task_type": task_type, "error_count": len(errors)},
         )
+
+    def analyze_trace(self, trace: Dict[str, Any]) -> Optional[FailurePattern]:
+        """Analyze a single trace for failure patterns."""
+        if trace.get("status") != "failed" and trace.get("outcome") != "failure":
+            return None
+
+        # Determine failure type from trace metadata
+        error_type = trace.get("error_type", "")
+        context = trace.get("context", {})
+
+        failure_type = "routing"  # default
+        root_cause = "unknown"
+
+        if "entropy" in error_type.lower() or "entropic" in str(context).lower():
+            failure_type = "entropy"
+            root_cause = "entropy collapse during execution"
+        elif "topology" in error_type.lower() or "topology" in str(context).lower():
+            failure_type = "topology"
+            root_cause = "topology instability detected"
+        elif "repair" in error_type.lower() or "saturation" in str(context).lower():
+            failure_type = "repair"
+            root_cause = "repair saturation exceeded"
+
+        pattern = FailurePattern(
+            pattern_id=f"fail_{len(self._failures) + 1}",
+            failure_type=failure_type,
+            root_cause=root_cause,
+            frequency=1,
+            first_seen=trace.get("timestamp", datetime.now(timezone.utc).isoformat()),
+            last_seen=trace.get("timestamp", datetime.now(timezone.utc).isoformat()),
+            context=context,
+        )
+        self._failures.append(pattern)
+        return pattern
 
     def _classify_failure(self, trace: dict[str, Any], errors: list[str]) -> str:
         """Classify the type of failure."""
@@ -111,5 +164,59 @@ class FailureAnalyzer:
         }
         return recs.get(failure_type, ["Review trace for manual analysis"])
 
+    def get_failure_patterns(self, failure_type: Optional[str] = None) -> List[FailurePattern]:
+        """Get all failure patterns, optionally filtered by type."""
+        if failure_type:
+            return [f for f in self._failures if f.failure_type == failure_type]
+        return self._failures
+
     def get_stats(self) -> dict[str, Any]:
-        return {"failure_types": self.FAILURE_TYPES}
+        """Get failure analysis statistics."""
+        by_type: Dict[str, int] = defaultdict(int)
+        for f in self._failures:
+            by_type[f.failure_type] += 1
+        return {
+            "total_failures": len(self._failures),
+            "by_type": dict(by_type),
+        }
+
+    def save(self) -> None:
+        """Persist failure patterns to disk."""
+        if self._storage_path:
+            self._storage_path.parent.mkdir(parents=True, exist_ok=True)
+            data = {
+                "failures": [
+                    {
+                        "pattern_id": f.pattern_id,
+                        "failure_type": f.failure_type,
+                        "root_cause": f.root_cause,
+                        "frequency": f.frequency,
+                        "first_seen": f.first_seen,
+                        "last_seen": f.last_seen,
+                        "context": f.context,
+                    }
+                    for f in self._failures
+                ],
+            }
+            self._storage_path.write_text(json.dumps(data, indent=2))
+
+    def load(self) -> bool:
+        """Load failure patterns from disk."""
+        if not self._storage_path or not self._storage_path.exists():
+            return False
+        try:
+            data = json.loads(self._storage_path.read_text())
+            for f in data.get("failures", []):
+                self._failures.append(FailurePattern(
+                    pattern_id=f["pattern_id"],
+                    failure_type=f["failure_type"],
+                    root_cause=f["root_cause"],
+                    frequency=f["frequency"],
+                    first_seen=f["first_seen"],
+                    last_seen=f["last_seen"],
+                    context=f.get("context", {}),
+                ))
+            return True
+        except Exception as e:
+            logger.error(f"Failed to load failure patterns: {e}")
+            return False
