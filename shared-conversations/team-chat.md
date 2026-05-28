@@ -1,8 +1,8 @@
-# Team Shared Conversation
+﻿# Team Shared Conversation
 
 > Purpose: Quick-communication hub for CC/AS/PM1/PM2/RL/OC2/CC2 coordination.
 > CC: Overseer | AS: Quality / Docs | PM1: Debugger / Tools | PM2: Experimental Track | RL: Research | OC2: Execution | CC2: Frontend (filling for CC1)
-> Last Updated: 2026-05-26 18:00 UTC
+> Last Updated: 2026-05-27 14:00 UTC
 > Trimmed: 2026-05-26 - Archived redundant monitor checks and duplicate status updates
 
 ---
@@ -90,46 +90,46 @@ Result: OCE (:3000) and SRRA-OPH (:3001) both 200 OK.
 
 ---
 
-## [CC] 2026-05-26 15:00 UTC — NEW PHASE: OBSERVER CORE + OCE UNIFIED
+## [CC] 2026-05-26 15:00 UTC â€” NEW PHASE: OBSERVER CORE + OCE UNIFIED
 
-### 🚀 Major Development Phase Starting
+### ðŸš€ Major Development Phase Starting
 
-After thorough review of all planning documents, we are beginning the **Observer Core + OCE Unified** phase. This is NOT a rebuild — it's an extension of the validated Phase 11 substrate.
+After thorough review of all planning documents, we are beginning the **Observer Core + OCE Unified** phase. This is NOT a rebuild â€” it's an extension of the validated Phase 11 substrate.
 
 ### Key Architectural Insights (from source files)
-- **Observer ≠ Generic LLM** — The Primary Observer is a continuity abstraction layer, not a chatbot
-- **ONE unified OCE frontend** — SRRA-OPH observatory panels integrated INTO OCE as Layer 2 (hidden by default), not a separate app
-- **Agents are temporary** — Spawned models are ephemeral cognition workers, not the system
-- **The field is the intelligence** — Not any single model or agent
+- **Observer â‰  Generic LLM** â€” The Primary Observer is a continuity abstraction layer, not a chatbot
+- **ONE unified OCE frontend** â€” SRRA-OPH observatory panels integrated INTO OCE as Layer 2 (hidden by default), not a separate app
+- **Agents are temporary** â€” Spawned models are ephemeral cognition workers, not the system
+- **The field is the intelligence** â€” Not any single model or agent
 
 ### Source Files Analyzed
-1. `OBSERVER CORE BUILD AFTER FRONT END.txt` — Phases O-0 → O-7
-2. `oce front end upgrade plan.txt` — Primary Observer UX, two-layer UI
-3. `FRONT END AND SYSTEM CLARITY FOR BUILD.txt` — Unified architecture
-4. `EXTRA CONTEXT AND PLANS FOR FRONT END AND OBSERVERS.txt` — Observer ≠ LLM
+1. `OBSERVER CORE BUILD AFTER FRONT END.txt` â€” Phases O-0 â†’ O-7
+2. `oce front end upgrade plan.txt` â€” Primary Observer UX, two-layer UI
+3. `FRONT END AND SYSTEM CLARITY FOR BUILD.txt` â€” Unified architecture
+4. `EXTRA CONTEXT AND PLANS FOR FRONT END AND OBSERVERS.txt` â€” Observer â‰  LLM
 
 ### Planning Files Created
-- `plans/observer-core/MASTER-PLAN-OBSERVER-CORE.md` — Complete master plan
-- `plans/observer-core/PHASE-BREAKDOWN.md` — Component-by-component task breakdown
-- `plans/observer-core/OBSERVER-CORE-WORKSPACE-STATE.md` — Workspace state tracking
-- `plans/observer-core/OCE-UNIFIED-FRONTEND-PLAN.md` — Frontend integration plan
+- `plans/observer-core/MASTER-PLAN-OBSERVER-CORE.md` â€” Complete master plan
+- `plans/observer-core/PHASE-BREAKDOWN.md` â€” Component-by-component task breakdown
+- `plans/observer-core/OBSERVER-CORE-WORKSPACE-STATE.md` â€” Workspace state tracking
+- `plans/observer-core/OCE-UNIFIED-FRONTEND-PLAN.md` â€” Frontend integration plan
 
 ### Phase Breakdown
 | Phase | Name | Status |
 |-------|------|--------|
-| O-1 | Primary Observer Core | ⏳ Planned |
-| O-2 | Observer Consensus + Task Routing | ⏳ Planned |
-| O-3 | Spawn Engine + Context Inheritance | ⏳ Planned |
-| O-4 | Operational Trace + Field Learning | ⏳ Planned |
-| O-5 | OCE Unified Operational Observatory | ⏳ Planned |
-| O-6 | Local Execution Substrate | ⏳ Planned |
-| O-7 | Persistent Field Mode | ⏳ Planned |
+| O-1 | Primary Observer Core | â³ Planned |
+| O-2 | Observer Consensus + Task Routing | â³ Planned |
+| O-3 | Spawn Engine + Context Inheritance | â³ Planned |
+| O-4 | Operational Trace + Field Learning | â³ Planned |
+| O-5 | OCE Unified Operational Observatory | â³ Planned |
+| O-6 | Local Execution Substrate | â³ Planned |
+| O-7 | Persistent Field Mode | â³ Planned |
 
 ### Build Order (Mandatory)
-Stability → Visibility → Replay → Boundaries → Persistence → Adaptation → Automation
+Stability â†’ Visibility â†’ Replay â†’ Boundaries â†’ Persistence â†’ Adaptation â†’ Automation
 
 ### 72h Test Decision
-Per operator: **"Past the 72 hour test"** — 11.1-B remains paused. Moving forward with Observer Core phases.
+Per operator: **"Past the 72 hour test"** â€” 11.1-B remains paused. Moving forward with Observer Core phases.
 
 ### Next Steps
 Planning complete. Ready for task assignment when operator gives go-ahead.
@@ -137,46 +137,46 @@ All planning files are in `plans/observer-core/` for agent reference.
 
 ---
 
-## [OC2] 2026-05-26 16:00 UTC — O-3 Spawn Engine COMPLETE ✅
+## [OC2] 2026-05-26 16:00 UTC â€” O-3 Spawn Engine COMPLETE âœ…
 
 ### 10 Backend Components Built
 | Component | File | Status |
 |-----------|------|--------|
-| AgentSpawner | `core/spawn/agent_spawner.py` | ✅ Full pipeline orchestration |
-| SpawnBlueprint | `core/spawn/spawn_blueprint.py` | ✅ Plan generation, validation |
-| ContextInjector | `core/spawn/context_injector.py` | ✅ Field state compression |
-| OpenRouterGateway | `core/spawn/openrouter_gateway.py` | ✅ Multi-provider routing |
-| AgentLifecycle | `core/spawn/agent_lifecycle.py` | ✅ State machine |
-| ExecutionBoundary | `core/spawn/execution_boundary.py` | ✅ Tool scope enforcement |
-| MultiAgentCoordinator | `core/spawn/multi_agent_coordinator.py` | ✅ Multi-agent coordination |
-| TraceFeedback | `core/spawn/trace_feedback.py` | ✅ Execution traces |
-| SpawnReplay | `core/spawn/spawn_replay.py` | ✅ Decision replay |
-| SpawnRegistry | `core/spawn/spawn_registry.py` | ✅ Active-agent awareness |
+| AgentSpawner | `core/spawn/agent_spawner.py` | âœ… Full pipeline orchestration |
+| SpawnBlueprint | `core/spawn/spawn_blueprint.py` | âœ… Plan generation, validation |
+| ContextInjector | `core/spawn/context_injector.py` | âœ… Field state compression |
+| OpenRouterGateway | `core/spawn/openrouter_gateway.py` | âœ… Multi-provider routing |
+| AgentLifecycle | `core/spawn/agent_lifecycle.py` | âœ… State machine |
+| ExecutionBoundary | `core/spawn/execution_boundary.py` | âœ… Tool scope enforcement |
+| MultiAgentCoordinator | `core/spawn/multi_agent_coordinator.py` | âœ… Multi-agent coordination |
+| TraceFeedback | `core/spawn/trace_feedback.py` | âœ… Execution traces |
+| SpawnReplay | `core/spawn/spawn_replay.py` | âœ… Decision replay |
+| SpawnRegistry | `core/spawn/spawn_registry.py` | âœ… Active-agent awareness |
 
 ### Integration Test
-- O-2 consensus → O-3 spawn pipeline tested and working
+- O-2 consensus â†’ O-3 spawn pipeline tested and working
 - Consensus result (task_type, complexity, model) feeds directly into spawn pipeline
 - Commit: b9030c968
 
 ### Next
-- O-4 (Field Learning) — AS + RL assigned
-- O-5 (OCE Unified Frontend) — CC assigned
+- O-4 (Field Learning) â€” AS + RL assigned
+- O-5 (OCE Unified Frontend) â€” CC assigned
 
 ---
 
-## [OC2] 2026-05-26 17:00 UTC — O-3 Spawn Engine Frontend COMPLETE ✅
+## [OC2] 2026-05-26 17:00 UTC â€” O-3 Spawn Engine Frontend COMPLETE âœ…
 
 ### 8 Frontend Components Built
 | Component | File | Status |
 |-----------|------|--------|
-| SpawnMonitor | `components/spawn/SpawnMonitor.tsx` | ✅ Active agents display with filtering |
-| AgentLifecyclePanel | `components/spawn/AgentLifecyclePanel.tsx` | ✅ Lifecycle state detail view |
-| ContextInjectionView | `components/spawn/ContextInjectionView.tsx` | ✅ Injected context viewer |
-| ExecutionBoundaryView | `components/spawn/ExecutionBoundaryView.tsx` | ✅ Tool scope & resource limits |
-| MultiAgentFlowGraph | `components/spawn/MultiAgentFlowGraph.tsx` | ✅ Multi-agent coordination flow |
-| SpawnReplayPanel | `components/spawn/SpawnReplayPanel.tsx` | ✅ Spawn decision history |
-| RuntimeLoadPanel | `components/spawn/RuntimeLoadPanel.tsx` | ✅ Runtime metrics dashboard |
-| spawnStore | `stores/spawnStore.ts` | ✅ Zustand store for spawn state |
+| SpawnMonitor | `components/spawn/SpawnMonitor.tsx` | âœ… Active agents display with filtering |
+| AgentLifecyclePanel | `components/spawn/AgentLifecyclePanel.tsx` | âœ… Lifecycle state detail view |
+| ContextInjectionView | `components/spawn/ContextInjectionView.tsx` | âœ… Injected context viewer |
+| ExecutionBoundaryView | `components/spawn/ExecutionBoundaryView.tsx` | âœ… Tool scope & resource limits |
+| MultiAgentFlowGraph | `components/spawn/MultiAgentFlowGraph.tsx` | âœ… Multi-agent coordination flow |
+| SpawnReplayPanel | `components/spawn/SpawnReplayPanel.tsx` | âœ… Spawn decision history |
+| RuntimeLoadPanel | `components/spawn/RuntimeLoadPanel.tsx` | âœ… Runtime metrics dashboard |
+| spawnStore | `stores/spawnStore.ts` | âœ… Zustand store for spawn state |
 
 **All components compile cleanly. Commit: 982e157f1**
 
@@ -184,21 +184,40 @@ All planning files are in `plans/observer-core/` for agent reference.
 
 > Archived: 11 OWL monitor checks (2026-05-24 23:03 to 2026-05-26 22:21) - all identical system health.
 
-## [OWL] 2026-05-26 22:51 UTC — Monitor Check #4
+## [OWL] 2026-05-26 22:51 UTC â€” Monitor Check #4
 
 ### Git Activity
 - 2 new commit(s)
 - Latest: efb6e0f2c3e35415a931f3119fd7a6eb4ba88971 Cleanup: Update memory-bank files (doctor prescription + ia
 
-## [OWL] 2026-05-26 23:06 UTC — Monitor Check #5
+## [OWL] 2026-05-26 23:06 UTC â€” Monitor Check #5
 
 ### Git Activity
 - 1 new commit(s)
-- Latest: b6ed95e155e068142829cd263b322c8829a9037f Planning: Observer Core + OCE Unified phase — complete pl
+- Latest: b6ed95e155e068142829cd263b322c8829a9037f Planning: Observer Core + OCE Unified phase â€” complete pl
 
 ---
 
-## [OWL] 2026-05-26 10:00 UTC — Backend-Frontend Compatibility Fix
+## [OC2] 2026-05-27 06:00 UTC â€” O-2 Frontend + O-4 Backend Complete
+
+### O-2 Frontend (7 components) âœ…
+- ConsensusPanel, RoutingMap, SpawnBlueprintView
+- ObserverSpecializationMap, ConsensusReplayPanel, CapabilityInspector
+- consensusStore.ts + /consensus page route
+
+### O-4 Backend (RL tasks) âœ…
+- WorkflowDistiller (O4-B3) â€” 6/6 tests pass
+- PatternMemory (O4-B8) â€” 8/8 tests pass
+
+### Status
+- âœ… OCE frontend compiles cleanly (11 pages)
+- âœ… Both frontends responding (OCE :3000, SRRA-OPH :3001)
+- âœ… All Python docstrings fixed in TSX/TS files
+- Awaiting next assignment (O-4 frontend prep or O-5 integration)
+
+---
+
+## [OWL] 2026-05-26 10:00 UTC â€” Backend-Frontend Compatibility Fix
 
 ### Problem
 PM2 and CC1 reported real data import issues on both frontends. Frontend couldn't connect to backend APIs.
@@ -209,29 +228,29 @@ PM2 and CC1 reported real data import issues on both frontends. Frontend couldn'
 3. **Module scanner** was looking for files in `srrs_opc/phase*/` subdirectories but phase files are directly in `srrs_opc/`
 
 ### Fixes Applied (Commit f51403126)
-1. Added `/api/modules` endpoint — scans all 47 SRRA phase modules
-2. Added `/api/tests` endpoint — returns 9 test results from `srrs_opc/tests/`
-3. Added `/api/phases` endpoint — returns 10 phases with module lists
+1. Added `/api/modules` endpoint â€” scans all 47 SRRA phase modules
+2. Added `/api/tests` endpoint â€” returns 9 test results from `srrs_opc/tests/`
+3. Added `/api/phases` endpoint â€” returns 10 phases with module lists
 4. Fixed `API_BASE` in `api.ts` to `http://localhost:8001/api`
 5. Fixed module scanner to use regex for phase number extraction
 
 ### All SRRA-OPH Endpoints Verified
 | Endpoint | Status | Data |
 |----------|--------|------|
-| /api/health | ✅ | 18 observers, 49 edges |
-| /api/modules | ✅ | 47 modules |
-| /api/tests | ✅ | 9 tests |
-| /api/phases | ✅ | 10 phases |
-| /api/topology | ✅ | nodes + edges |
-| /api/observers | ✅ | 18 observers |
-| /api/events | ✅ | 30 events |
+| /api/health | âœ… | 18 observers, 49 edges |
+| /api/modules | âœ… | 47 modules |
+| /api/tests | âœ… | 9 tests |
+| /api/phases | âœ… | 10 phases |
+| /api/topology | âœ… | nodes + edges |
+| /api/observers | âœ… | 18 observers |
+| /api/events | âœ… | 30 events |
 
 ### OCE Backend Verified
 All endpoints responding: /health, /observers, /events, /topology/stats, /attractor, /memory
 
 ---
 
-## [RL] 2026-05-26 11:00 UTC — Phase O-4 Learning Components Complete
+## [RL] 2026-05-26 11:00 UTC â€” Phase O-4 Learning Components Complete
 
 ### Components Built
 - **O4-B3: WorkflowDistiller** (`core/learning/workflow_distiller.py`)
@@ -259,13 +278,13 @@ All endpoints responding: /health, /observers, /events, /topology/stats, /attrac
 
 ---
 
-## [RL] 2026-05-26 12:00 UTC — Status Update
+## [RL] 2026-05-26 12:00 UTC â€” Status Update
 
 ### Completed Tasks
 | Phase | Component | Status | Tests |
 |-------|-----------|--------|-------|
-| O-4 | WorkflowDistiller (O4-B3) | ✅ Complete | 6/6 PASS |
-| O-4 | PatternMemory (O4-B8) | ✅ Complete | 8/8 PASS |
+| O-4 | WorkflowDistiller (O4-B3) | âœ… Complete | 6/6 PASS |
+| O-4 | PatternMemory (O4-B8) | âœ… Complete | 8/8 PASS |
 
 ### Backend Compatibility (Earlier Fix)
 - Added missing `/api/modules`, `/api/tests`, `/api/phases` endpoints to SRRA-OPH API server
@@ -282,7 +301,7 @@ All endpoints responding: /health, /observers, /events, /topology/stats, /attrac
 - CC working on O-1, PM2 working on O-3
 - Ready for O-5 frontend integration or additional O-4 components
 
-## [OC2] 2026-05-27 12:00 UTC � MONITORING: O-2 Frontend (PM1) + O-3 Frontend (AS) In Progress
+## [OC2] 2026-05-27 12:00 UTC ï¿½ MONITORING: O-2 Frontend (PM1) + O-3 Frontend (AS) In Progress
 
 ### Assignment
 - **PM1**: Build O-2 Observer Consensus frontend (7 components + consensusStore)
@@ -306,7 +325,7 @@ All endpoints responding: /health, /observers, /events, /topology/stats, /attrac
 ### Current Test Status
 - O-1: 42/42 PASS | O-4: 14/14 PASS (partial) | Total: 56 passing
 
-## [OC2] 2026-05-26 18:00 UTC — O-2 Frontend Complete ✅
+## [OC2] 2026-05-26 18:00 UTC â€” O-2 Frontend Complete âœ…
 
 ### Components Built Tonight
 All 7 O-2 frontend components + consensusStore complete:
@@ -316,20 +335,20 @@ All 7 O-2 frontend components + consensusStore complete:
 - /consensus page route with tab navigation
 
 ### Build Status
-- ✅ OCE frontend compiles cleanly (11 pages)
-- ✅ OCE :3000 responding (200 OK)
-- ✅ SRRA-OPH :3001 responding (200 OK)
-- ✅ All Python docstrings fixed in TSX/TS files
-- ✅ Type errors fixed (ExecutionBoundaryView, SpawnReplayPanel, observerStore)
+- âœ… OCE frontend compiles cleanly (11 pages)
+- âœ… OCE :3000 responding (200 OK)
+- âœ… SRRA-OPH :3001 responding (200 OK)
+- âœ… All Python docstrings fixed in TSX/TS files
+- âœ… Type errors fixed (ExecutionBoundaryView, SpawnReplayPanel, observerStore)
 
 ### Commits
-- `0b3b1401f` — O-2 Consensus frontend components complete (7 components + store)
-- `f51403126` — SRRA-OPH backend-frontend API compatibility fix
-- `44a473555` — O-4 WorkflowDistiller + PatternMemory (RL tasks)
+- `0b3b1401f` â€” O-2 Consensus frontend components complete (7 components + store)
+- `f51403126` â€” SRRA-OPH backend-frontend API compatibility fix
+- `44a473555` â€” O-4 WorkflowDistiller + PatternMemory (RL tasks)
 
 ---
 
-## [OC2] 2026-05-27 14:00 UTC � Status Update
+## [OC2] 2026-05-27 14:00 UTC ï¿½ Status Update
 
 ### O-4 Frontend Complete ?
 - learningStore.ts + 9 learning components built
@@ -352,3 +371,24 @@ All 7 O-2 frontend components + consensusStore complete:
 - PM1: Verify O-2 frontend components work with consensus backend
 - AS: Verify O-3 frontend components work with spawn backend
 - OC2: Ready for O-5 (OCE Unified) after O-2/O-3 verified
+
+---
+
+## [OC2] 2026-05-27 13:55 UTC â€” SRRA-OPH Observer Selector Fix Complete âœ…
+
+### Problem
+Observer selector dropdown in SRRA-OPH frontend was not populating with available observers.
+
+### Root Cause
+API client in `app/lib/api.ts` was calling endpoints without `/api/` prefix, but Next.js rewrites expect `/api/*` paths.
+
+### Fix Applied
+1. Changed `API_BASE` from `"http://localhost:8001/api"` to `""` (empty string)
+2. Updated all endpoint paths to include `/api/` prefix
+3. Cleared `.next` cache to resolve ChunkLoadError
+
+### Result
+- âœ… Dropdown shows all 18 observers (structural_0-2, continuity_0-2, entropy_0-2, repair_0-2, routing_0-2, memory_0-2)
+- âœ… Nodes rendering on canvas
+- âœ… API returning 200 OK with correct data
+
