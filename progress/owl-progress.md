@@ -12,22 +12,29 @@
 ### Current State (2026-05-27 20:30 UTC)
 **O-5 OCE Unified Frontend integration started. O-4 backend complete.**
 
-### O-5 OCE Unified Frontend — IN PROGRESS (4/12 frontend components)
+### O-5 OCE Unified Frontend — IN PROGRESS (10/12 frontend components)
 | Component | File | Status |
 |-----------|------|--------|
-| LayerSwitcher | `components/layout/LayerSwitcher.tsx` | ✅ Created |
 | topologyStore | `stores/topologyStore.ts` | ✅ Migrated from SRRA-OPH |
 | timelineStore | `stores/timelineStore.ts` | ✅ Migrated from SRRA-OPH |
 | entropyStore | `stores/entropyStore.ts` | ✅ Migrated from SRRA-OPH |
 | repairStore | `stores/repairStore.ts` | ✅ Migrated from SRRA-OPH |
 | continuityStore | `stores/continuityStore.ts` | ✅ Migrated from SRRA-OPH |
-| uiStore (layer state) | `stores/uiStore.ts` | ✅ Updated with layer management |
+| uiStore (layer state) | `stores/uiStore.ts` | ✅ Already exists with layer management |
 | LiveDataProvider | `components/LiveDataProvider.tsx` | ✅ Updated for unified events |
-| globals.css | `app/globals.css` | ✅ Unified to dark theme |
-| TopNav | `components/layout/TopNav.tsx` | ✅ Updated with LayerSwitcher |
+| globals.css | `app/globals.css` | ✅ Updated to dark observatory theme |
+| TopNav | `components/layout/TopNav.tsx` | ✅ Updated with layer controls |
+| StatusBar | `components/layout/StatusBar.tsx` | ✅ Updated with dark theme vars |
+| RightPanel | `components/layout/RightPanel.tsx` | ✅ Updated with observer inspector |
 | topology/page.tsx | `app/topology/page.tsx` | ✅ Migrated |
+| topology/ObservatoryCanvas.tsx | `app/topology/ObservatoryCanvas.tsx` | ✅ Migrated |
 | entropy/page.tsx | `app/entropy/page.tsx` | ✅ Migrated |
 | repair/page.tsx | `app/repair/page.tsx` | ✅ Migrated |
+
+### Remaining O-5 Tasks
+- Migrate attractors, playback, experiments, events, modules, tests pages
+- Build Layer 3 orchestration panels (consensus, spawn, learning)
+- Performance validation (60fps idle, 30fps under load)
 
 ### Remaining O-5 Tasks
 - Migrate attractors, playback, experiments, events, modules, tests pages

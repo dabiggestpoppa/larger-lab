@@ -23,22 +23,23 @@
 
 ---
 
-## [OWL] 2026-05-27 20:30 UTC - O-5 OCE Unified Frontend Integration Started
+## [OWL] 2026-05-27 21:30 UTC - O-5 OCE Unified Frontend Integration Progress
 
-### Completed
-- ✅ LayerSwitcher component with Layer 1/2/3 toggle controls
-- ✅ Migrated SRRA-OPH stores: topologyStore, timelineStore, entropyStore, repairStore, continuityStore
-- ✅ Migrated topology page with ObservatoryCanvas, ViewModeSelector, FilterPanel
-- ✅ Migrated entropy page with entropy metrics display
-- ✅ Migrated repair page with repair cascade viewer
-- ✅ Updated uiStore with layer state management (activeLayer, layerVisibility)
-- ✅ Updated LiveDataProvider to handle topology/entropy/repair events
-- ✅ Unified theme to dark observatory style
+### Completed (10/12 components)
+- ✅ Migrated stores: topologyStore, timelineStore, entropyStore, repairStore, continuityStore
+- ✅ Created lib/timeline/types.ts and lib/entropy/EntropyEngine.ts
+- ✅ Created lib/clustering/sync-clusters.ts for topology clustering
+- ✅ Updated LiveDataProvider with unified WebSocket handling (topology/entropy/repair/checkpoint events)
+- ✅ Updated globals.css to dark observatory theme (#0a0a0f)
+- ✅ Updated TopNav with layer controls (1/2/3 buttons)
+- ✅ Updated StatusBar with dark theme CSS variables
+- ✅ Updated RightPanel with observer inspector
+- ✅ Migrated topology/page.tsx with ObservatoryCanvas
+- ✅ Migrated entropy/page.tsx with entropy metrics display
+- ✅ Migrated repair/page.tsx with repair cascade viewer
 
 ### Remaining O-5 Tasks
 - Migrate attractors, playback, experiments, events, modules, tests pages
-- Create LayerSwitcher in layout with expand/collapse functionality
-- Unify WebSocket connections (merge LiveDataProvider)
 - Build Layer 3 orchestration panels (consensus, spawn, learning)
 - Performance validation (60fps idle, 30fps under load)
 

@@ -20,7 +20,7 @@
 | O-6 | 0/11 | 0/8 | 0 | PM | ⏳ Planned |
 | O-7 | 0/12 | 0/9 | 0 | AS | ⏳ Planned |
 
-### O-5 OCE Unified Frontend — Readiness Assessment
+### O-5 OCE Unified Frontend — Readiness Assessment (UPDATED 2026-05-27)
 
 #### What Exists (OCE Frontend :3000)
 - **Pages:** /dashboard, /tasks, /agents, /chaos, /settings, /browser
@@ -29,19 +29,21 @@
 - **Theme:** Clean operational (light, CSS variables in globals.css)
 - **Layout:** TopNav + MainContent + RightPanel + Statusbar
 
-#### What Needs Migration from SRRA-OPH (:3001)
-- **Pages to migrate:** /topology, /entropy, /repair, /attractors, /events, /experiments, /playback, /modules, /tests
-- **Stores to migrate:** topologyStore, entropyStore, repairStore, continuityStore, timelineStore
-- **Components to migrate:** ObservatoryCanvas, EntropyField, RepairCascade, AttractorMap, etc.
-- **Theme change:** Light operational → Dark observatory (CSS variable override)
+#### What Has Been Migrated (10/12 components)
+- ✅ topologyStore, timelineStore, entropyStore, repairStore, continuityStore
+- ✅ LiveDataProvider with unified WebSocket events
+- ✅ globals.css updated to dark observatory theme
+- ✅ TopNav with layer controls (1/2/3 buttons)
+- ✅ StatusBar with dark theme CSS variables
+- ✅ RightPanel with observer inspector
+- ✅ topology/page.tsx with ObservatoryCanvas
+- ✅ entropy/page.tsx with entropy metrics
+- ✅ repair/page.tsx with repair cascade viewer
 
-#### O-5 Integration Gaps
-1. **Layer System** — No LayerSwitcher component exists yet
-2. **Store merging** — SRRA-OPH stores need to merge into OCE store architecture
-3. **WebSocket unification** — Separate LiveDataProvider instances need merging
-4. **Navigation** — In-app panel switching not implemented
-5. **Theme unification** — Dark observatory theme not applied to OCE
-6. **Performance** — No 60fps/30fps validation yet
+#### Remaining O-5 Tasks
+- Migrate attractors, playback, experiments, events, modules, tests pages
+- Build Layer 3 orchestration panels (consensus, spawn, learning)
+- Performance validation (60fps idle, 30fps under load)
 
 ### O-7 Persistent Field — Documentation Prep
 - **Backend directory:** `core/persistent-field/` — DOES NOT EXIST YET
