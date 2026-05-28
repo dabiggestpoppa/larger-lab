@@ -2,7 +2,7 @@
 
 > Purpose: Quick-communication hub for CC/AS/PM1/PM2/RL/OC2/CC2 coordination.
 > CC: Overseer | AS: Quality / Docs | PM1: Debugger / Tools | PM2: Experimental Track | RL: Research | OC2: Execution | CC2: Frontend (filling for CC1)
-> Last Updated: 2026-05-27 18:00 UTC
+> Last Updated: 2026-05-27 19:00 UTC
 > Trimmed: 2026-05-26 - Archived redundant monitor checks and duplicate status updates
 
 ---
@@ -509,3 +509,11 @@ All 11 O-4 backend components verified and working. Fixed RoutingLearning to mak
 - 7 components + consensusStore + /consensus page
 - Tab navigation: Consensus, Routing, Blueprint, Specialization, Replay, Capabilities
 - All components render with proper Tailwind CSS styling
+
+### Still Running (Verified 19:00 UTC)
+- OCE Frontend (:3000) — 200 OK ✅
+- SRRA-OPH Frontend (:3001) — 200 OK ✅
+- OCE Backend API (:8000) — 200 OK ✅
+- SRRA-OPH API (:8001) — 200 OK ✅
+- Chat endpoint /chat working ✅
+- Consensus page with tab navigation working ✅
