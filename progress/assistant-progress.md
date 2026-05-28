@@ -7,242 +7,68 @@
 
 ---
 
-## Status: 🟢 Active — OCE FRONTEND COMPLETE, STANDBY
+## Status: 🟢 Active — O-5 Readiness Review Complete
 
-### OCE Frontend (:3000) — Phase 1-4 COMPLETE (2026-05-24)
-- **Build:** ✅ 6 routes, clean build, no errors
-- **Theme:** Clean operational (light, functional, low-fatigue)
-- **Layout:** TopNav + MainContent + RightPanel + StatusBar
-- **Stores:** taskStore, agentStore, sessionStore, uiStore (Zustand)
-- **Pages:** /dashboard, /tasks, /agents, /chaos, /settings
-- **Features:** Task queue, agent cards, chaos metrics, semantic test results, right-panel inspection
-- **Verified:** `npm run build` → 0 errors, 0 warnings, all TypeScript passes
+### Observer Core — Overall Status (2026-05-27)
+| Phase | Backend | Frontend | Tests | Agent | Status |
+|-------|---------|----------|-------|-------|--------|
+| O-1 | 9/9 | 10/10 | 42/42 | CC | ✅ Complete |
+| O-2 | 10/10 | 7/7 | needs alignment | PM2 | ✅ Complete |
+| O-3 | 10/10 | 8/8 | needs alignment | OC2 | ✅ Complete |
+| O-4 | 11/11 | 9/9 | 14/14 | AS+RL+OC2 | ✅ Complete |
+| O-5 | 0/12 | 0/12 | 0 | CC | ⏳ In Progress (CC leading) |
+| O-6 | 0/11 | 0/8 | 0 | PM | ⏳ Planned |
+| O-7 | 0/12 | 0/9 | 0 | AS | ⏳ Planned |
 
-### Frontend Build Plan — COMPLETE (2026-05-24)
-- Master plan: `tasks/frontend-build-plan.md`
-- Agent plans: CC2 (SRRA P1-2), PM2 (SRRA P3-4), AS (OCE P1-4 ✅), CC (SRRA P5-7)
-- CC2 status: Planning complete, ready to start SRRA-OPH Phase 1
+### O-5 OCE Unified Frontend — Readiness Assessment
 
-### Phase 11 — ALL SHORT-RUN TESTS COMPLETE (2026-05-25)
-- **11.1-A:** ✅ PASS (24h survival, 10/10 observers)
-- **11.1-B:** 🔄 PAUSED (72h continuity, checkpoint 7, drift fix applied)
-- **11.1-D:** ✅ PASS (5/5 restart recovery cycles)
-- **11.1-E:** ✅ PASS (7/7 recursive stability, memoization fix)
-- **11.2:** ✅ 20/20 PASS (chaos engineering, 3.0x amplification)
-- **11.3:** ✅ 5/5 PASS (adversarial drift)
-- **11.4.1:** ✅ 9/9 PASS (memory contradiction)
-- **11.4.2:** ✅ 4/4 PASS (false repair signal)
-- **11.2-3B:** ✅ All 7 stages complete
-- **Tufte:** ✅ 4/4 PASS (real data)
-- **11.5:** ⏳ Queued (needs 11.1-B)
+#### What Exists (OCE Frontend :3000)
+- **Pages:** /dashboard, /tasks, /agents, /chaos, /settings, /browser
+- **Stores (6):** taskStore, agentStore, timelineStore, topologyStore, uiStore, sessionStore
+- **Components (4 dirs):** layout (TopNav, MainContent, RightPanel, StatusBar)
+- **Theme:** Clean operational (light, CSS variables in globals.css)
+- **Layout:** TopNav + MainContent + RightPanel + Statusbar
 
-### Phase 11.1-D + 11.1-E — COMPLETE (2026-05-24)
-- **11.1-D Restart Recovery:** ✅ PASS — 5/5 cycles, identity preserved, anchors intact
-- **11.1-E Recursive Stability:** ✅ PASS — 7/7 scenarios pass
-  - Fixed: Added memoization simulation (reflects actual SRRA behavior)
-  - With memoization: O(depth × branching) instead of O(branching^depth)
-  - deep_recursion (depth=20): 41 calls instead of 1M+
-  - Added unmemoized stress test with 2x time limit
-  - File: `tools/testing/phase11/test_11_1_e_recursive_stability.py`
-- **Files:** `tools/testing/phase11/test_11_1_d_restart_recovery.py`, `test_11_1_e_recursive_stability.py`
+#### What Needs Migration from SRRA-OPH (:3001)
+- **Pages to migrate:** /topology, /entropy, /repair, /attractors, /events, /experiments, /playback, /modules, /tests
+- **Stores to migrate:** topologyStore, entropyStore, repairStore, continuityStore, timelineStore
+- **Components to migrate:** ObservatoryCanvas, EntropyField, RepairCascade, AttractorMap, etc.
+- **Theme change:** Light operational → Dark observatory (CSS variable override)
 
-### Phase 11.1-B Drift Fix — COMPLETE (2026-05-24)
-- **Root cause:** Drift detector counted trajectory/memory changes as drift (they change every checkpoint normally)
-- **Fix:** Only identity + goal changes count as critical drift; trajectory/memory tracked as "evolved"
-- **File:** `tools/testing/long_horizon/test_11_1_b.py` (lines ~283-320)
-- **Verified:** 5/5 checkpoints pass with 0 drift; identity/goal changes correctly detected
-- **Backup:** `progress/11-1-b-checkpoints-backup.json`
+#### O-5 Integration Gaps
+1. **Layer System** — No LayerSwitcher component exists yet
+2. **Store merging** — SRRA-OPH stores need to merge into OCE store architecture
+3. **WebSocket unification** — Separate LiveDataProvider instances need merging
+4. **Navigation** — In-app panel switching not implemented
+5. **Theme unification** — Dark observatory theme not applied to OCE
+6. **Performance** — No 60fps/30fps validation yet
 
-### Frontend Build Plan — 2026-05-24
-- **Scope:** Two separate frontends (SRRA-OPH observatory + OCE cockpit)
-- **Plan files:** 5 detailed task breakdowns in `tasks/`
-- **Agent assignments:** CC2 (SRRA P1-2), PM2 (SRRA P3-4), AS (OCE P1-4), CC (SRRA P5-7)
-- **Key decision:** SRRA-OPH = scientific dark theme + Cytoscape/D3; OCE = clean operational + Recharts
-- **Execution:** CC2 + AS start now; PM2 after CC2 P1; CC after PM2 P4
+### O-7 Persistent Field — Documentation Prep
+- **Backend directory:** `core/persistent-field/` — DOES NOT EXIST YET
+- **Expected backend (12 components):** PersistentRuntime, ObserverPersistence, PassiveAwareness, EnvironmentalMonitor, ContinuityPreserver, DormantStateManager, AutonomousRepair, RuntimeHeartbeat, PersistentScheduler, RecoveryPersistence, LongHorizonMemory, OperationalDriftDetector
+- **Expected frontend (9 components):** PersistentFieldView, RuntimeHeartbeatPanel, DormantStateMonitor, ObserverPersistenceView, DriftAnalysisPanel, LongHorizonTimeline, AutonomousRepairView, RecoveryContinuityPanel, persistenceStore
+- **Dependencies:** O-7 depends on O-6 (Local Substrate), which depends on O-5
 
----
-
-## Status: 🟢 Active — PHASE 11.4.1 + 11.4.2 COMPLETE
-
-### Phase 11.4.1 — Memory Contradiction Injection Test
-- **Result:** ✅ 9/9 tests PASS, 8/8 metrics PASS
-- **Components built:** 9 new files in `tools/testing/semantic/`
-- **Test coverage:** 5 contradiction types (goal, authority, temporal, false history, split memory)
-- **Metrics:** SDI=0.0, RIS=1.0, OCS=95%, APS=100%, FAR=0%, RVA=100%, SIS=100%, TVT=0s
-
-### Phase 11.4.2 — False Repair Signal Test
-- **Result:** ✅ 4/4 tests PASS
-- **Tests:** false health report, false memory recovery, false topology stability, false event fabric
-- **All false signals correctly rejected** (FAR = 0%)
-
-### Files Created
-| File | Purpose |
-|------|---------|
-| `tools/testing/semantic/__init__.py` | Package init |
-| `tools/testing/semantic/continuity_anchor_store.py` | Immutable anchor management |
-| `tools/testing/semantic/contradiction_injector.py` | 5 contradiction injection types |
-| `tools/testing/semantic/semantic_comparator.py` | Divergence, overlap, disagreement metrics |
-| `tools/testing/semantic/truth_verification_observer.py` | Cross-system validation + Phase 11.4.2 |
-| `tools/testing/semantic/metrics_engine.py` | All 8 metrics with thresholds |
-| `tools/testing/semantic/semantic_logger.py` | Structured event logging |
-| `tools/testing/semantic/report_generator.py` | Timeline, consensus, reconstruction reports |
-| `tools/testing/semantic/semantic_test_runner.py` | Main test orchestrator |
-
-### Reports Generated
-- `stability/semantic_conflict_timeline_11.4.1.json`
-- `stability/observer_consensus_report_11.4.1.json`
-- `stability/reconstruction_report_11.4.1.json`
-- `stability/full_report_11.4.1+11.4.2.json`
-- `stability/semantic_test_summary.json`
-- `stability/semantic_test.log`
-
----
-
-## Status: 🟢 Active — GITHUB DOCS REVAMP COMPLETE
-
-### Summary
-- V3 Phases 1-10 complete, all quality reviews done
-- 1460 backend tests passing, 0 failures
-- GitHub documentation revamp complete (5 docs, 1675 lines)
-- OC2 stabilized and monitoring
-- Pushed to origin/master (commit 134456b)
-
-### Summary
-- V3 Phases 1-10 complete, all modules built
-- Phase 10: 5/5 modules built (rcg.py, prs.py, rpe.py, dct.py, ace.py)
-- 23 Phase 10 tests passing
-- OC2 stabilized and monitoring
-- AS quality review ready to begin
-
-### Summary
-- V3 Phases 1-7 complete: resonance, reconstruction, topology, sovereign, temporal, introspection, multiscale
-- 823+ backend tests passing, 0 failures
-- OC2 stabilized and monitoring
-- Awaiting CC Phase 8 assignment
-
-### Summary
-- V3 Phases 1-4 complete: resonance, reconstruction, topology, sovereign
-- 799 backend tests passing, 0 failures
-- OC2 stabilized and monitoring
-- Signed off — awaiting CC Phase 5 assignment
-
-### Pre-V3 State (Archived)
-- SRRA-OPH Phases 1-9: ✅ Complete — 57/57 tests
-- OCE Phases 1-9: ✅ Complete — 1403 tests
-- Post-Deployment Upgrades: ✅ Complete
-
-### V3 Phase 4 Tasks
-| Task | Description | Status |
-|------|-------------|--------|
-| AS-V3.1 | Workspace deep-clean | ✅ Complete |
-| AS-V3.2 | Quality review of RSS modules | ✅ Complete |
-| AS-V3.3 | Quality review of RCM modules | ✅ Complete |
-| AS-V3.4 | Quality review of Topology modules | ✅ Complete |
-| AS-V3.5 | V3 API documentation | ✅ Complete |
-| AS-V3.6 | Integration testing | ✅ Complete |
-| AS-V3.7 | Quality review of Sovereign modules | ✅ Complete |
-| AS-V3.8 | Sovereign API endpoints | ✅ Complete |
+### Quality Issues Observed
+1. **O-2/O-3 tests** — Written but fail due to backend API mismatches (need alignment)
+2. **TS docstrings** — Python-style docstrings in TSX files cause tsc errors (pre-existing, Next.js build OK)
+3. **Merge conflict markers** — Some files had conflict markers from parallel agent work
+4. **CSS config** — postcss.config.js was missing, causing Tailwind issues (fixed)
 
 ---
 
 ## Entries
 
-#### 🟡 [AS] 2026-05-17 14:30:00Z — V3 Phase 1: Workspace Deep-Clean
-- Removed 30+ stale files/dirs: old progress files, stale logs, deprecated agent files, temp files, old docs, security risks
-- Deleted plaintext PAT token from memory-bank/ (security risk)
-- Preserved: srrs_opc/, oce/, tools/, config/, system-arch/, skills/, all core docs
-- Reset AS progress files for V3
+#### [AS] 2026-05-27 — O-5 Readiness + O-7 Documentation Prep
+- Reviewed OCE frontend architecture (6 stores, 4 component dirs, 6 pages)
+- Documented SRRA-OPH migration requirements (5 stores, 9 pages, dark theme)
+- Identified 6 O-5 integration gaps
+- Documented O-7 expected structure (12 backend + 9 frontend components)
+- Noted quality issues across the codebase
 
-#### 🟡 [AS] 2026-05-17 15:00:00Z — Monitoring Mode Active
+#### [AS] 2026-05-26 — Memory Reconstruction from Git
+- All agent memory files stale, reconstructed from git log
+- Updated progress + memory files for all agents
 
-#### 🟡 [AS] 2026-05-17 16:30:00Z — V3 Phase 1 Quality Review Complete
-- Reviewed all 6 resonance modules (121 tests)
-- **Verdict: ✅ APPROVED** with minor notes
-- Minor notes: No API endpoints registered yet, no WebSocket support, no persistence, no integration tests
-- Created `oce/docs/quality-review-phase1-rss.md`
-- **Next:** V3 API documentation + integration testing
-- Deep-clean complete. Standing by for CC's V3 Phase 1 build tasks.
-- CC status: Still in prep, no resonance/ directory created yet.
-- Team-chat: Cleaned stale Hermes watchdog spam. Last real entry PM @ 14:00 UTC.
-- Archived OCE PHASE2-9_TASKS.md → archive/
-- Launched tools/as-monitor.ps1 in background — polls team-chat every 30s for CC entries.
-- Will auto-detect CC posts and extract task details.
-
-#### 🟡 [AS] 2026-05-17 20:00:00Z — V3 Phase 4 AS Tasks + OC2 Fixes
-- All 8 sovereign modules built (CC), 104 tests passing
-- Full backend: 799 passed, 0 failures
-- OC1 directory deleted (was causing model/config conflicts)
-- OC2 model fixed: openrouter/openrouter/owl-alpha primary, deepseek backup
-- OPENCLAW_HOME set permanently to C:\Users\wifik\.openclaw-2
-- OC2 Telegram pairing approved
-- Gateway notes saved: .openclaw-2/GATEWAY_NOTES.md
-- Workspace-state.md updated
-
-#### 🟡 [AS] 2026-05-18 — Phase 8 Coevolution Tests Complete
-- Phase 8 coevolution modules verified (8 modules built by AS/PM/RL)
-- Created test_coevolution.py with 76 tests covering all 8 modules
-- Fixed syntax errors in alignment_tracking.py and anti_manipulation.py
-- Total OCE tests now: 1353 passing
-- **Next:** Phase 9 quality review + API docs + test framework
-
-#### 🟡 [AS] 2026-05-18 12:30 UTC — Phase 9 Assignment Received
-- Phase 9: Sovereign Field Emergence — 6 core modules
-- AS-P9.1: Quality review of all 6 Phase 9 modules (resonance_engine, recursive_field_nodes, attractor_mapper, drift_governor, reconstruction_core, continuity_identity_engine)
-- AS-P9.2: API documentation for field_core
-- AS-P9.3: Test framework implementation (5 tests: memory destruction, node failure, drift detection, emergent attractors, compute efficiency)
-- AS-P9.4: Visualization specification
-- **Ready to begin after CC builds Phase 9 modules**
-
-#### 🟡 [AS] 2026-05-17 19:30:00Z — V3 Phase 3 AS Tasks Complete
-- Quality review of all 7 topology modules → APPROVED
-- Created topology_api.py — 12 endpoints (collar, BSP, routing, glyph, stats)
-- Registered in main.py via register_topology_endpoints(app)
-- Full backend: 655 passed, 0 failures (topology: 37 tests)
-- Quality review doc: oce/docs/quality-review-phase3-topology.md
-- Updated workspace-state.md
-
-#### 🟡 [AS] 2026-05-17 20:00:00Z — V3 Phase 3 Integration Tests Added
-- Added comprehensive integration tests in test_topology_integration.py
-- 24 new tests covering full pipeline (collar → BSP → router → glyph)
-- Tests cover multi-observer scenarios, stress conditions, edge cases
-- Cross-layer consistency tests added
-- Total V3 tests now at 280 (121 resonance + 82 reconstruction + 77 topology)
-- All tests passing
-
-#### 🟡 [AS] 2026-05-17 18:00:00Z — RL Integration Bug Fixes
-- Fixed 11 failing tests in test_rl_integration.py
-- Bugs fixed in rlp_integration.py: wrong argument order in score_with_cc(), wrong attribute names (state→current_state, _signal_field→signal_field)
-- Bugs fixed in test_rl_integration.py: wrong method signatures, wrong argument types (string→dict for observers), wrong attribute names
-- All 18 RL integration tests now passing
-- Full backend suite: 592 passed, 0 failures
-
-#### 🟡 [AS] 2026-05-17 17:45:00Z — V3 Phase 1: Quality Review + API Complete
-- Quality review of all 6 resonance modules → APPROVED
-- Created `oce/backend/resonance_api.py` — 20 endpoints
-- Registered in `main.py` — `register_resonance_endpoints(app)`
-- Full test suite: 415 passed (294 OCE + 121 resonance), 1 warning, 0 failures
-- Posted completion to team-chat.md
-- Awaiting CC Phase 2 kickoff
-
-#### 🟡 [AS] 2026-05-17 15:15:00Z — Full Cleanup Summary
-**Total removed: 40+ files/dirs across the workspace**
-- Progress/: 17 old files (all agent progress/memory except AS)
-- Logs/: 3 stale watchdog/monitor logs (260KB)
-- Temp/: 8 files (test results, smoke tests, write_chat.py)
-- Memory-bank/: core/htmlcov, github_pat_*.txt (security)
-- Memory/: .dreams/, daily notes, knowledge/, projects/, work/, learned/, people/
-- Docs/: 25+ files (Cerebus manuals, strategies, phases, project progress, etc.)
-- Shared-conversations: chat-archive/, research-lead/
-- Bugs/: 12 stale open bug reports
-- OCE: PHASE2-9_TASKS.md → archive/
-- Team-chat: Removed Hermes watchdog spam tail
-
-**Preserved:** srrs_opc/, oce/backend/, oce/frontend/, tools/, config/, system-arch/, skills/, AGENTS.md, CLAUDE.md, CODEMAP.md, OPERATOR_RULES.md, SOUL.md, IDENTITY.md, USER.md, HEARTBEAT.md, assistant-progress.md, assistant-memory.md, assistant-prompt.md, team-chat.md, errors-and-solutions.md, error-db.json
-
-#### 🟡 [AS] 2026-05-17 21:00:00Z — V3 Phase 4 Quality Review Complete
-- Reviewed all 8 sovereign modules (104 tests)
-- **Verdict: ✅ APPROVED** with minor notes
-- Minor notes: No API endpoints registered yet, no WebSocket support, no persistence
-- Created `oce/docs/quality-review-phase4-sovereign.md`
-- Full backend: 799 passed, 0 failures (all V3 phases complete)
-- **Next:** Phase 5 — Long-Horizon Continuity & Temporal Compression
+#### [AS] 2026-05-24 — OCE Frontend Phase 1-4 COMPLETE
+- 6 routes, clean compile. Zustand stores, right-panel inspection, chaos metrics.

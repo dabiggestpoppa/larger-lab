@@ -17,7 +17,7 @@
 | O-2 | 10/10 | 7/7 | needs alignment | PM2 | ✅ Complete |
 | O-3 | 10/10 | 8/8 | needs alignment | OC2 | ✅ Complete |
 | O-4 | 11/11 | 9/9 | 14/14 | AS+RL+OC2 | ✅ Complete |
-| O-5 | 0/12 | 0/12 | 0 | CC | ⏳ Not started |
+| O-5 | 0/12 | 4/12 | 0 | CC | 🔄 In Progress |
 | O-6 | 0/11 | 0/8 | 0 | PM | ⏳ Not started |
 | O-7 | 0/12 | 0/9 | 0 | AS | ⏳ Not started |
 
@@ -46,7 +46,11 @@
 
 ### Frontend Status
 - **SRRA-OPH Observatory (:3001):** ✅ All 5 phases, 13 pages complete
-- **OCE Cockpit (:3000):** ✅ All pages complete
+- **OCE Cockpit (:3000):** 🔄 O-5 integration in progress
+  - LayerSwitcher component created
+  - Topology, Entropy, Repair stores migrated
+  - Topology page migrated with ObservatoryCanvas
+  - Theme unified to dark observatory style
 - **API Server (port 8001):** ✅ FastAPI with demo data
 
 ### V3 Test Status
@@ -192,9 +196,18 @@
 - Committed and pushed to origin/master
 - **Next:** Delegate PM (debug tools + code quality docs) and AS (API docs + quality review)
 
----
+### 2026-05-27 20:30 UTC — [OWL] O-5 OCE Unified Frontend Started
+- Created LayerSwitcher component with Layer 1/2/3 toggle controls
+- Migrated SRRA-OPH stores: topologyStore, timelineStore, entropyStore, repairStore, continuityStore
+- Migrated topology page with ObservatoryCanvas, ViewModeSelector, FilterPanel
+- Migrated entropy page with entropy metrics display
+- Migrated repair page with repair cascade viewer
+- Updated uiStore with layer state management (activeLayer, layerVisibility)
+- Updated LiveDataProvider to handle topology/entropy/repair events
+- Unified theme to dark observatory style (#0a0a0f background, accent colors)
+- **Status:** O-5 frontend integration in progress
 
-### 2026-05-18 13:00 UTC — [RL] Phase 9 Sovereign Field Emergence Complete
+---
 - 6 field_core modules built (resonance_engine, recursive_field_nodes, attractor_mapper, drift_governor, reconstruction_core, continuity_identity_engine)
 - 169 field_core unit tests created and passing
 - Full suite: 1353 tests, 87 warnings

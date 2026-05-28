@@ -208,21 +208,25 @@ class AgentSpawner:
         if len(input_preview) > 150:
             input_preview = input_preview[:150] + "..."
 
-        # Generate task-specific helpful content
-        task_responses = {
-            "system_analysis": self._build_system_analysis,
-            "coding": self._build_coding_response,
-            "research": self._build_research_response,
-            "architecture": self._build_architecture_response,
-            "repair": self._build_repair_response,
-            "debugging": self._build_debugging_response,
-            "orchestration": self._build_orchestration_response,
-            "visualization": self._build_visualization_response,
-            "automation": self._build_automation_response,
-        }
+        # Handle casual conversation differently — no task templates
+        if task_type == "conversation":
+            lines.extend(self._build_conversational_response(user_input, context))
+        else:
+            # Generate task-specific helpful content
+            task_responses = {
+                "system_analysis": self._build_system_analysis,
+                "coding": self._build_coding_response,
+                "research": self._build_research_response,
+                "architecture": self._build_architecture_response,
+                "repair": self._build_repair_response,
+                "debugging": self._build_debugging_response,
+                "orchestration": self._build_orchestration_response,
+                "visualization": self._build_visualization_response,
+                "automation": self._build_automation_response,
+            }
 
-        builder = task_responses.get(task_type, self._build_general_response)
-        lines.extend(builder(user_input, context))
+            builder = task_responses.get(task_type, self._build_general_response)
+            lines.extend(builder(user_input, context))
 
         # Add observer metadata footer
         lines.extend([
@@ -232,6 +236,48 @@ class AgentSpawner:
         ])
 
         return "\n".join(lines)
+
+    def _build_conversational_response(self, user_input: str, context: dict) -> list[str]:
+        """
+        Generate a natural conversational response for casual messages.
+        No task templates — just a genuine, friendly reply.
+        """
+        text = user_input.strip().lower()
+
+        # Greetings
+        if any(w in text for w in ["hello", "hi", "hey", "howdy", "greetings"]):
+            return [
+                f"Hello! I'm the Primary Observer — the continuity interface for SRRA/OCE.",
+                f"",
+                f"I'm here to help with anything from casual conversation to complex orchestration tasks. What's on your mind?",
+            ]
+
+        # How are you
+        if any(w in text for w in ["how are you", "how's it going", "what's up", "how do you do"]):
+            return [
+                f"I'm doing well, thanks for asking! All observer systems are running smoothly.",
+                f"",
+                f"The field is stable, entropy is low, and I'm ready to help with whatever you need. What can I do for you?",
+            ]
+
+        # Thanks
+        if any(w in text for w in ["thanks", "thank you", "thx", "ty", "appreciate"]):
+            return [
+                f"You're welcome! Let me know if there's anything else I can help with.",
+            ]
+
+        # Goodbye
+        if any(w in text for w in ["bye", "goodbye", "see you", "later", "take care"]):
+            return [
+                f"Goodbye! I'll be here whenever you need me. The observer field remains active.",
+            ]
+
+        # General casual — respond naturally
+        return [
+            f"I hear you. '{user_input.strip()[:100]}'",
+            f"",
+            f"I'm designed to handle both casual conversation and complex tasks. Is there something specific you'd like to work on, or just chatting?",
+        ]
 
     def _build_system_analysis(self, user_input: str, context: dict) -> list[str]:
         return [

@@ -33,6 +33,7 @@
 | Arch Commit | `tools/arch-commit.py` | Post-change architecture alignment |
 | Hermes Watchdog | `tools/hermes-watchdog.py` | OWL health monitor |
 | Doctor | `tools/doctor.py` | System diagnostic + prescriptions |
+| Self-Heal | `tools/self_heal.py` | OWL's own doctor — scans files, memory, behavior patterns |
 
 ## Ports
 

@@ -1,15 +1,15 @@
 {
   "version": "0.1.0",
   "phase": "11.2-3B.1",
-  "timestamp": "2026-05-27T02:53:00.526144+00:00",
+  "timestamp": "2026-05-28T02:30:21.202967+00:00",
   "observers": {
     "structural_0": {
       "observer_id": "structural_0",
       "observer_type": "structural",
-      "spawn_time": "2026-05-27T02:53:00.525549+00:00",
+      "spawn_time": "2026-05-28T02:30:21.201197+00:00",
       "shutdown_time": null,
-      "runtime_state": "degraded",
-      "entropy_score": 0.2956720924553938,
+      "runtime_state": "active",
+      "entropy_score": 0.03433938046926716,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
@@ -20,10 +20,10 @@
     "structural_1": {
       "observer_id": "structural_1",
       "observer_type": "structural",
-      "spawn_time": "2026-05-27T02:53:00.525549+00:00",
+      "spawn_time": "2026-05-28T02:30:21.201197+00:00",
       "shutdown_time": null,
       "runtime_state": "active",
-      "entropy_score": 0.20396334640023142,
+      "entropy_score": 0.047814539239788144,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
@@ -34,10 +34,10 @@
     "structural_2": {
       "observer_id": "structural_2",
       "observer_type": "structural",
-      "spawn_time": "2026-05-27T02:53:00.525549+00:00",
+      "spawn_time": "2026-05-28T02:30:21.201197+00:00",
       "shutdown_time": null,
       "runtime_state": "active",
-      "entropy_score": 0.02587523716729855,
+      "entropy_score": 0.08153301520488365,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
@@ -48,10 +48,10 @@
     "continuity_0": {
       "observer_id": "continuity_0",
       "observer_type": "continuity",
-      "spawn_time": "2026-05-27T02:53:00.525549+00:00",
+      "spawn_time": "2026-05-28T02:30:21.201197+00:00",
       "shutdown_time": null,
-      "runtime_state": "degraded",
-      "entropy_score": 0.08099471300282111,
+      "runtime_state": "active",
+      "entropy_score": 0.29490637169058453,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
@@ -62,10 +62,10 @@
     "continuity_1": {
       "observer_id": "continuity_1",
       "observer_type": "continuity",
-      "spawn_time": "2026-05-27T02:53:00.525549+00:00",
+      "spawn_time": "2026-05-28T02:30:21.201197+00:00",
       "shutdown_time": null,
       "runtime_state": "active",
-      "entropy_score": 0.038609793115175706,
+      "entropy_score": 0.11879899639745636,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
@@ -76,10 +76,10 @@
     "continuity_2": {
       "observer_id": "continuity_2",
       "observer_type": "continuity",
-      "spawn_time": "2026-05-27T02:53:00.525549+00:00",
+      "spawn_time": "2026-05-28T02:30:21.201197+00:00",
       "shutdown_time": null,
       "runtime_state": "active",
-      "entropy_score": 0.2812657803926741,
+      "entropy_score": 0.24905865101387167,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
@@ -90,10 +90,10 @@
     "entropy_0": {
       "observer_id": "entropy_0",
       "observer_type": "entropy",
-      "spawn_time": "2026-05-27T02:53:00.526144+00:00",
+      "spawn_time": "2026-05-28T02:30:21.201197+00:00",
       "shutdown_time": null,
-      "runtime_state": "active",
-      "entropy_score": 0.1414027750770689,
+      "runtime_state": "degraded",
+      "entropy_score": 0.299084518619079,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
@@ -104,10 +104,10 @@
     "entropy_1": {
       "observer_id": "entropy_1",
       "observer_type": "entropy",
-      "spawn_time": "2026-05-27T02:53:00.526144+00:00",
+      "spawn_time": "2026-05-28T02:30:21.201197+00:00",
       "shutdown_time": null,
       "runtime_state": "degraded",
-      "entropy_score": 0.24394194986103754,
+      "entropy_score": 0.21390080466899578,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
@@ -118,10 +118,10 @@
     "entropy_2": {
       "observer_id": "entropy_2",
       "observer_type": "entropy",
-      "spawn_time": "2026-05-27T02:53:00.526144+00:00",
+      "spawn_time": "2026-05-28T02:30:21.201197+00:00",
       "shutdown_time": null,
       "runtime_state": "active",
-      "entropy_score": 0.2963794166009948,
+      "entropy_score": 0.09182387566436086,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
@@ -132,10 +132,10 @@
     "repair_0": {
       "observer_id": "repair_0",
       "observer_type": "repair",
-      "spawn_time": "2026-05-27T02:53:00.526144+00:00",
+      "spawn_time": "2026-05-28T02:30:21.201197+00:00",
       "shutdown_time": null,
       "runtime_state": "degraded",
-      "entropy_score": 0.1544427462707706,
+      "entropy_score": 0.28069002712718627,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
@@ -146,10 +146,10 @@
     "repair_1": {
       "observer_id": "repair_1",
       "observer_type": "repair",
-      "spawn_time": "2026-05-27T02:53:00.526144+00:00",
+      "spawn_time": "2026-05-28T02:30:21.201197+00:00",
       "shutdown_time": null,
       "runtime_state": "active",
-      "entropy_score": 0.14364377225129835,
+      "entropy_score": 0.06146680696503882,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
@@ -160,10 +160,10 @@
     "repair_2": {
       "observer_id": "repair_2",
       "observer_type": "repair",
-      "spawn_time": "2026-05-27T02:53:00.526144+00:00",
+      "spawn_time": "2026-05-28T02:30:21.201197+00:00",
       "shutdown_time": null,
-      "runtime_state": "active",
-      "entropy_score": 0.19041742369749984,
+      "runtime_state": "degraded",
+      "entropy_score": 0.25304665283952227,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
@@ -174,10 +174,10 @@
     "routing_0": {
       "observer_id": "routing_0",
       "observer_type": "routing",
-      "spawn_time": "2026-05-27T02:53:00.526144+00:00",
+      "spawn_time": "2026-05-28T02:30:21.201197+00:00",
       "shutdown_time": null,
-      "runtime_state": "active",
-      "entropy_score": 0.27515710138047467,
+      "runtime_state": "degraded",
+      "entropy_score": 0.23568757813409053,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
@@ -188,10 +188,10 @@
     "routing_1": {
       "observer_id": "routing_1",
       "observer_type": "routing",
-      "spawn_time": "2026-05-27T02:53:00.526144+00:00",
+      "spawn_time": "2026-05-28T02:30:21.201197+00:00",
       "shutdown_time": null,
       "runtime_state": "active",
-      "entropy_score": 0.07790383658341667,
+      "entropy_score": 0.20357272771229787,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
@@ -202,10 +202,10 @@
     "routing_2": {
       "observer_id": "routing_2",
       "observer_type": "routing",
-      "spawn_time": "2026-05-27T02:53:00.526144+00:00",
+      "spawn_time": "2026-05-28T02:30:21.201197+00:00",
       "shutdown_time": null,
-      "runtime_state": "degraded",
-      "entropy_score": 0.04474567387620334,
+      "runtime_state": "active",
+      "entropy_score": 0.075061799269972,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
@@ -216,10 +216,10 @@
     "memory_0": {
       "observer_id": "memory_0",
       "observer_type": "memory",
-      "spawn_time": "2026-05-27T02:53:00.526144+00:00",
+      "spawn_time": "2026-05-28T02:30:21.201197+00:00",
       "shutdown_time": null,
-      "runtime_state": "degraded",
-      "entropy_score": 0.11294931872777828,
+      "runtime_state": "active",
+      "entropy_score": 0.2110120202647125,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
@@ -230,10 +230,10 @@
     "memory_1": {
       "observer_id": "memory_1",
       "observer_type": "memory",
-      "spawn_time": "2026-05-27T02:53:00.526144+00:00",
+      "spawn_time": "2026-05-28T02:30:21.201197+00:00",
       "shutdown_time": null,
-      "runtime_state": "active",
-      "entropy_score": 0.1079271997791961,
+      "runtime_state": "degraded",
+      "entropy_score": 0.2718000087206266,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
@@ -244,10 +244,10 @@
     "memory_2": {
       "observer_id": "memory_2",
       "observer_type": "memory",
-      "spawn_time": "2026-05-27T02:53:00.526144+00:00",
+      "spawn_time": "2026-05-28T02:30:21.201197+00:00",
       "shutdown_time": null,
-      "runtime_state": "active",
-      "entropy_score": 0.011358742807331712,
+      "runtime_state": "degraded",
+      "entropy_score": 0.027507917487526033,
       "repair_state": "idle",
       "tasks_completed": 0,
       "errors": 0,
@@ -257,1049 +257,1031 @@
     }
   },
   "relationships": {
-    "structural_0::entropy_1::repair": {
-      "source_observer": "structural_0",
+    "memory_2::entropy_1::message": {
+      "source_observer": "memory_2",
       "target_observer": "entropy_1",
+      "interaction_type": "message",
+      "frequency": 1,
+      "latency_ms": 77.5024829021785,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
+      "metadata": {}
+    },
+    "repair_0::structural_0::chaos": {
+      "source_observer": "repair_0",
+      "target_observer": "structural_0",
+      "interaction_type": "chaos",
+      "frequency": 1,
+      "latency_ms": 132.82392696166897,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
+      "metadata": {}
+    },
+    "memory_2::continuity_2::route": {
+      "source_observer": "memory_2",
+      "target_observer": "continuity_2",
+      "interaction_type": "route",
+      "frequency": 1,
+      "latency_ms": 146.6049025470544,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
+      "metadata": {}
+    },
+    "routing_1::memory_1::message": {
+      "source_observer": "routing_1",
+      "target_observer": "memory_1",
+      "interaction_type": "message",
+      "frequency": 1,
+      "latency_ms": 147.6110571519262,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
+      "metadata": {}
+    },
+    "memory_1::memory_0::repair": {
+      "source_observer": "memory_1",
+      "target_observer": "memory_0",
       "interaction_type": "repair",
       "frequency": 1,
-      "latency_ms": 81.63634826850601,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
+      "latency_ms": 173.39014555991307,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
       "metadata": {}
     },
-    "continuity_0::repair_1::sync": {
+    "continuity_0::continuity_1::chaos": {
       "source_observer": "continuity_0",
-      "target_observer": "repair_1",
-      "interaction_type": "sync",
+      "target_observer": "continuity_1",
+      "interaction_type": "chaos",
       "frequency": 1,
-      "latency_ms": 41.31551461233201,
+      "latency_ms": 92.36767425086705,
       "synchronization_state": "desynced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
       "metadata": {}
     },
-    "memory_2::continuity_0::sync": {
+    "memory_2::continuity_0::chaos": {
       "source_observer": "memory_2",
       "target_observer": "continuity_0",
-      "interaction_type": "sync",
+      "interaction_type": "chaos",
       "frequency": 1,
-      "latency_ms": 131.1733565572827,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
+      "latency_ms": 114.86183962274092,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
       "metadata": {}
     },
-    "memory_0::repair_2::route": {
+    "continuity_1::continuity_2::route": {
+      "source_observer": "continuity_1",
+      "target_observer": "continuity_2",
+      "interaction_type": "route",
+      "frequency": 1,
+      "latency_ms": 7.824078043077461,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
+      "metadata": {}
+    },
+    "structural_0::entropy_2::sync": {
+      "source_observer": "structural_0",
+      "target_observer": "entropy_2",
+      "interaction_type": "sync",
+      "frequency": 1,
+      "latency_ms": 34.67867595890434,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
+      "metadata": {}
+    },
+    "memory_0::structural_2::memory": {
       "source_observer": "memory_0",
+      "target_observer": "structural_2",
+      "interaction_type": "memory",
+      "frequency": 1,
+      "latency_ms": 101.47329605712574,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
+      "metadata": {}
+    },
+    "repair_0::continuity_0::memory": {
+      "source_observer": "repair_0",
+      "target_observer": "continuity_0",
+      "interaction_type": "memory",
+      "frequency": 1,
+      "latency_ms": 172.89610681184487,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
+      "metadata": {}
+    },
+    "repair_2::structural_2::sync": {
+      "source_observer": "repair_2",
+      "target_observer": "structural_2",
+      "interaction_type": "sync",
+      "frequency": 1,
+      "latency_ms": 113.99420475411537,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
+      "metadata": {}
+    },
+    "routing_0::structural_1::repair": {
+      "source_observer": "routing_0",
+      "target_observer": "structural_1",
+      "interaction_type": "repair",
+      "frequency": 1,
+      "latency_ms": 4.806940844806104,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
+      "metadata": {}
+    },
+    "routing_1::routing_0::chaos": {
+      "source_observer": "routing_1",
+      "target_observer": "routing_0",
+      "interaction_type": "chaos",
+      "frequency": 1,
+      "latency_ms": 197.3415654151951,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
+      "metadata": {}
+    },
+    "structural_0::memory_0::repair": {
+      "source_observer": "structural_0",
+      "target_observer": "memory_0",
+      "interaction_type": "repair",
+      "frequency": 1,
+      "latency_ms": 111.14914962031041,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
+      "metadata": {}
+    },
+    "entropy_0::structural_2::repair": {
+      "source_observer": "entropy_0",
+      "target_observer": "structural_2",
+      "interaction_type": "repair",
+      "frequency": 1,
+      "latency_ms": 173.39346939042912,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
+      "metadata": {}
+    },
+    "entropy_0::continuity_0::repair": {
+      "source_observer": "entropy_0",
+      "target_observer": "continuity_0",
+      "interaction_type": "repair",
+      "frequency": 1,
+      "latency_ms": 141.3639814053943,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
+      "metadata": {}
+    },
+    "structural_1::continuity_0::message": {
+      "source_observer": "structural_1",
+      "target_observer": "continuity_0",
+      "interaction_type": "message",
+      "frequency": 1,
+      "latency_ms": 62.86355191522445,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
+      "metadata": {}
+    },
+    "entropy_1::memory_1::route": {
+      "source_observer": "entropy_1",
+      "target_observer": "memory_1",
+      "interaction_type": "route",
+      "frequency": 2,
+      "latency_ms": 129.00572065527362,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
+      "metadata": {}
+    },
+    "routing_2::structural_0::route": {
+      "source_observer": "routing_2",
+      "target_observer": "structural_0",
+      "interaction_type": "route",
+      "frequency": 1,
+      "latency_ms": 144.49655642442272,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
+      "metadata": {}
+    },
+    "repair_1::routing_2::route": {
+      "source_observer": "repair_1",
+      "target_observer": "routing_2",
+      "interaction_type": "route",
+      "frequency": 1,
+      "latency_ms": 118.67069350276157,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
+      "metadata": {}
+    },
+    "routing_2::memory_0::message": {
+      "source_observer": "routing_2",
+      "target_observer": "memory_0",
+      "interaction_type": "message",
+      "frequency": 1,
+      "latency_ms": 57.85855257693779,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
+      "metadata": {}
+    },
+    "continuity_0::repair_2::route": {
+      "source_observer": "continuity_0",
       "target_observer": "repair_2",
       "interaction_type": "route",
       "frequency": 1,
-      "latency_ms": 185.78481259683454,
+      "latency_ms": 132.4868383666962,
       "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
       "metadata": {}
     },
-    "structural_0::entropy_0::memory": {
-      "source_observer": "structural_0",
-      "target_observer": "entropy_0",
-      "interaction_type": "memory",
+    "repair_2::routing_2::message": {
+      "source_observer": "repair_2",
+      "target_observer": "routing_2",
+      "interaction_type": "message",
       "frequency": 1,
-      "latency_ms": 111.16551828975756,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
+      "latency_ms": 80.32290346946007,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
       "metadata": {}
     },
-    "repair_1::routing_1::memory": {
-      "source_observer": "repair_1",
-      "target_observer": "routing_1",
-      "interaction_type": "memory",
-      "frequency": 1,
-      "latency_ms": 2.7423122702698284,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "structural_2::entropy_0::memory": {
-      "source_observer": "structural_2",
-      "target_observer": "entropy_0",
-      "interaction_type": "memory",
-      "frequency": 1,
-      "latency_ms": 136.1906058681692,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "repair_0::continuity_2::chaos": {
+    "repair_0::routing_1::sync": {
       "source_observer": "repair_0",
-      "target_observer": "continuity_2",
-      "interaction_type": "chaos",
-      "frequency": 1,
-      "latency_ms": 166.2492775315308,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "memory_2::entropy_0::memory": {
-      "source_observer": "memory_2",
-      "target_observer": "entropy_0",
-      "interaction_type": "memory",
-      "frequency": 1,
-      "latency_ms": 67.05115910413896,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "repair_2::continuity_1::message": {
-      "source_observer": "repair_2",
-      "target_observer": "continuity_1",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 57.32185842952257,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "continuity_2::structural_1::repair": {
-      "source_observer": "continuity_2",
-      "target_observer": "structural_1",
-      "interaction_type": "repair",
-      "frequency": 1,
-      "latency_ms": 60.63235001962821,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "repair_1::entropy_2::sync": {
-      "source_observer": "repair_1",
-      "target_observer": "entropy_2",
-      "interaction_type": "sync",
-      "frequency": 1,
-      "latency_ms": 61.35272394486129,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "repair_1::routing_1::sync": {
-      "source_observer": "repair_1",
       "target_observer": "routing_1",
       "interaction_type": "sync",
       "frequency": 1,
-      "latency_ms": 108.31051649999769,
+      "latency_ms": 29.248119654143537,
       "synchronization_state": "desynced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
       "metadata": {}
     },
-    "routing_2::entropy_2::message": {
+    "routing_2::entropy_1::chaos": {
       "source_observer": "routing_2",
-      "target_observer": "entropy_2",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 98.15869435589784,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "entropy_0::memory_0::sync": {
-      "source_observer": "entropy_0",
-      "target_observer": "memory_0",
-      "interaction_type": "sync",
-      "frequency": 1,
-      "latency_ms": 33.264519737393165,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "continuity_1::continuity_0::memory": {
-      "source_observer": "continuity_1",
-      "target_observer": "continuity_0",
-      "interaction_type": "memory",
-      "frequency": 1,
-      "latency_ms": 141.81236513833832,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "continuity_0::structural_0::chaos": {
-      "source_observer": "continuity_0",
-      "target_observer": "structural_0",
+      "target_observer": "entropy_1",
       "interaction_type": "chaos",
       "frequency": 1,
-      "latency_ms": 34.07924922172655,
+      "latency_ms": 114.62265396897212,
       "synchronization_state": "desynced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
       "metadata": {}
     },
-    "memory_0::repair_1::memory": {
-      "source_observer": "memory_0",
-      "target_observer": "repair_1",
-      "interaction_type": "memory",
-      "frequency": 1,
-      "latency_ms": 35.524921082414956,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "routing_2::structural_1::route": {
+    "routing_2::entropy_0::chaos": {
       "source_observer": "routing_2",
-      "target_observer": "structural_1",
-      "interaction_type": "route",
-      "frequency": 1,
-      "latency_ms": 177.07400467805263,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "structural_1::repair_0::memory": {
-      "source_observer": "structural_1",
-      "target_observer": "repair_0",
-      "interaction_type": "memory",
-      "frequency": 1,
-      "latency_ms": 68.99494801343624,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "memory_1::structural_1::memory": {
-      "source_observer": "memory_1",
-      "target_observer": "structural_1",
-      "interaction_type": "memory",
-      "frequency": 1,
-      "latency_ms": 33.68695966274474,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "entropy_0::entropy_2::message": {
-      "source_observer": "entropy_0",
-      "target_observer": "entropy_2",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 120.11102535505633,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "memory_1::structural_0::memory": {
-      "source_observer": "memory_1",
-      "target_observer": "structural_0",
-      "interaction_type": "memory",
-      "frequency": 1,
-      "latency_ms": 89.25072809665343,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "entropy_0::memory_2::repair": {
-      "source_observer": "entropy_0",
-      "target_observer": "memory_2",
-      "interaction_type": "repair",
-      "frequency": 1,
-      "latency_ms": 152.7918411881892,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "continuity_0::structural_1::route": {
-      "source_observer": "continuity_0",
-      "target_observer": "structural_1",
-      "interaction_type": "route",
-      "frequency": 1,
-      "latency_ms": 171.66145744077036,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "continuity_0::entropy_0::route": {
-      "source_observer": "continuity_0",
       "target_observer": "entropy_0",
-      "interaction_type": "route",
-      "frequency": 1,
-      "latency_ms": 53.960711704576234,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "repair_1::repair_0::route": {
-      "source_observer": "repair_1",
-      "target_observer": "repair_0",
-      "interaction_type": "route",
-      "frequency": 1,
-      "latency_ms": 85.98448872654714,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "memory_2::routing_0::route": {
-      "source_observer": "memory_2",
-      "target_observer": "routing_0",
-      "interaction_type": "route",
-      "frequency": 1,
-      "latency_ms": 122.14781703175765,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "continuity_2::routing_0::sync": {
-      "source_observer": "continuity_2",
-      "target_observer": "routing_0",
-      "interaction_type": "sync",
-      "frequency": 1,
-      "latency_ms": 195.835662364093,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "entropy_2::repair_1::message": {
-      "source_observer": "entropy_2",
-      "target_observer": "repair_1",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 27.577093779503645,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "structural_1::memory_0::memory": {
-      "source_observer": "structural_1",
-      "target_observer": "memory_0",
-      "interaction_type": "memory",
-      "frequency": 1,
-      "latency_ms": 9.693609710284857,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "memory_1::structural_0::chaos": {
-      "source_observer": "memory_1",
-      "target_observer": "structural_0",
       "interaction_type": "chaos",
       "frequency": 1,
-      "latency_ms": 15.102263367090265,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "routing_0::memory_1::memory": {
-      "source_observer": "routing_0",
-      "target_observer": "memory_1",
-      "interaction_type": "memory",
-      "frequency": 1,
-      "latency_ms": 3.985956455139433,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "entropy_0::repair_1::sync": {
-      "source_observer": "entropy_0",
-      "target_observer": "repair_1",
-      "interaction_type": "sync",
-      "frequency": 1,
-      "latency_ms": 159.50609871960668,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "memory_0::structural_1::memory": {
-      "source_observer": "memory_0",
-      "target_observer": "structural_1",
-      "interaction_type": "memory",
-      "frequency": 1,
-      "latency_ms": 3.4987626440283233,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "continuity_0::entropy_2::route": {
-      "source_observer": "continuity_0",
-      "target_observer": "entropy_2",
-      "interaction_type": "route",
-      "frequency": 1,
-      "latency_ms": 125.2720955828549,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "structural_1::routing_1::memory": {
-      "source_observer": "structural_1",
-      "target_observer": "routing_1",
-      "interaction_type": "memory",
-      "frequency": 1,
-      "latency_ms": 18.013923357740268,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "entropy_2::routing_1::sync": {
-      "source_observer": "entropy_2",
-      "target_observer": "routing_1",
-      "interaction_type": "sync",
-      "frequency": 1,
-      "latency_ms": 48.448549201573144,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "routing_0::memory_0::sync": {
-      "source_observer": "routing_0",
-      "target_observer": "memory_0",
-      "interaction_type": "sync",
-      "frequency": 1,
-      "latency_ms": 176.7724681611663,
+      "latency_ms": 16.884880739227,
       "synchronization_state": "desynced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
       "metadata": {}
     },
-    "memory_2::repair_1::memory": {
-      "source_observer": "memory_2",
-      "target_observer": "repair_1",
-      "interaction_type": "memory",
-      "frequency": 1,
-      "latency_ms": 110.29827763023516,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "continuity_2::entropy_0::sync": {
-      "source_observer": "continuity_2",
-      "target_observer": "entropy_0",
-      "interaction_type": "sync",
-      "frequency": 1,
-      "latency_ms": 50.81769625092134,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "continuity_1::entropy_0::message": {
-      "source_observer": "continuity_1",
-      "target_observer": "entropy_0",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 99.5488563098229,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "routing_1::structural_2::message": {
-      "source_observer": "routing_1",
-      "target_observer": "structural_2",
-      "interaction_type": "message",
-      "frequency": 1,
-      "latency_ms": 14.660947205800365,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "repair_2::routing_2::route": {
-      "source_observer": "repair_2",
-      "target_observer": "routing_2",
-      "interaction_type": "route",
-      "frequency": 1,
-      "latency_ms": 97.75200762551411,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "continuity_0::memory_0::chaos": {
-      "source_observer": "continuity_0",
-      "target_observer": "memory_0",
-      "interaction_type": "chaos",
-      "frequency": 1,
-      "latency_ms": 36.00963961396327,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "structural_2::structural_0::repair": {
+    "structural_2::structural_1::sync": {
       "source_observer": "structural_2",
+      "target_observer": "structural_1",
+      "interaction_type": "sync",
+      "frequency": 1,
+      "latency_ms": 123.54506531910454,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.201197+00:00",
+      "metadata": {}
+    },
+    "continuity_0::structural_0::repair": {
+      "source_observer": "continuity_0",
       "target_observer": "structural_0",
       "interaction_type": "repair",
       "frequency": 1,
-      "latency_ms": 10.805012148166044,
-      "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
+      "latency_ms": 174.02435906533458,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-28T02:30:21.202094+00:00",
       "metadata": {}
     },
-    "continuity_0::memory_1::message": {
-      "source_observer": "continuity_0",
-      "target_observer": "memory_1",
+    "entropy_2::structural_1::route": {
+      "source_observer": "entropy_2",
+      "target_observer": "structural_1",
+      "interaction_type": "route",
+      "frequency": 1,
+      "latency_ms": 92.36143761351951,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-28T02:30:21.202094+00:00",
+      "metadata": {}
+    },
+    "memory_0::structural_0::message": {
+      "source_observer": "memory_0",
+      "target_observer": "structural_0",
       "interaction_type": "message",
       "frequency": 1,
-      "latency_ms": 152.43145995137974,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "entropy_2::routing_2::sync": {
-      "source_observer": "entropy_2",
-      "target_observer": "routing_2",
-      "interaction_type": "sync",
-      "frequency": 1,
-      "latency_ms": 3.3058713100559753,
-      "synchronization_state": "desynced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
-      "metadata": {}
-    },
-    "entropy_0::repair_0::sync": {
-      "source_observer": "entropy_0",
-      "target_observer": "repair_0",
-      "interaction_type": "sync",
-      "frequency": 1,
-      "latency_ms": 141.5786799344219,
+      "latency_ms": 170.77996462723942,
       "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
+      "last_interaction": "2026-05-28T02:30:21.202094+00:00",
       "metadata": {}
     },
-    "entropy_0::memory_0::memory": {
-      "source_observer": "entropy_0",
+    "structural_2::entropy_2::message": {
+      "source_observer": "structural_2",
+      "target_observer": "entropy_2",
+      "interaction_type": "message",
+      "frequency": 1,
+      "latency_ms": 198.4521673436248,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.202094+00:00",
+      "metadata": {}
+    },
+    "continuity_2::entropy_1::message": {
+      "source_observer": "continuity_2",
+      "target_observer": "entropy_1",
+      "interaction_type": "message",
+      "frequency": 1,
+      "latency_ms": 12.89118201002424,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.202094+00:00",
+      "metadata": {}
+    },
+    "continuity_0::repair_1::chaos": {
+      "source_observer": "continuity_0",
+      "target_observer": "repair_1",
+      "interaction_type": "chaos",
+      "frequency": 1,
+      "latency_ms": 112.96627812536354,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-28T02:30:21.202094+00:00",
+      "metadata": {}
+    },
+    "memory_0::continuity_0::route": {
+      "source_observer": "memory_0",
+      "target_observer": "continuity_0",
+      "interaction_type": "route",
+      "frequency": 1,
+      "latency_ms": 14.466607170597575,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-28T02:30:21.202094+00:00",
+      "metadata": {}
+    },
+    "routing_1::memory_0::message": {
+      "source_observer": "routing_1",
       "target_observer": "memory_0",
+      "interaction_type": "message",
+      "frequency": 1,
+      "latency_ms": 170.30985982074085,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-28T02:30:21.202094+00:00",
+      "metadata": {}
+    },
+    "continuity_2::continuity_0::repair": {
+      "source_observer": "continuity_2",
+      "target_observer": "continuity_0",
+      "interaction_type": "repair",
+      "frequency": 1,
+      "latency_ms": 72.13175665821535,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.202094+00:00",
+      "metadata": {}
+    },
+    "structural_1::structural_2::sync": {
+      "source_observer": "structural_1",
+      "target_observer": "structural_2",
+      "interaction_type": "sync",
+      "frequency": 1,
+      "latency_ms": 165.88981101051903,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.202094+00:00",
+      "metadata": {}
+    },
+    "routing_0::memory_1::repair": {
+      "source_observer": "routing_0",
+      "target_observer": "memory_1",
+      "interaction_type": "repair",
+      "frequency": 1,
+      "latency_ms": 181.28746621042492,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.202094+00:00",
+      "metadata": {}
+    },
+    "entropy_0::routing_1::sync": {
+      "source_observer": "entropy_0",
+      "target_observer": "routing_1",
+      "interaction_type": "sync",
+      "frequency": 1,
+      "latency_ms": 143.59090088120467,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.202094+00:00",
+      "metadata": {}
+    },
+    "structural_0::routing_2::message": {
+      "source_observer": "structural_0",
+      "target_observer": "routing_2",
+      "interaction_type": "message",
+      "frequency": 1,
+      "latency_ms": 86.1477110292708,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-28T02:30:21.202094+00:00",
+      "metadata": {}
+    },
+    "continuity_2::structural_1::route": {
+      "source_observer": "continuity_2",
+      "target_observer": "structural_1",
+      "interaction_type": "route",
+      "frequency": 1,
+      "latency_ms": 28.89078610465165,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-28T02:30:21.202094+00:00",
+      "metadata": {}
+    },
+    "repair_1::structural_2::chaos": {
+      "source_observer": "repair_1",
+      "target_observer": "structural_2",
+      "interaction_type": "chaos",
+      "frequency": 1,
+      "latency_ms": 169.59519041966314,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-28T02:30:21.202094+00:00",
+      "metadata": {}
+    },
+    "repair_2::entropy_0::memory": {
+      "source_observer": "repair_2",
+      "target_observer": "entropy_0",
       "interaction_type": "memory",
       "frequency": 1,
-      "latency_ms": 119.98358210262,
+      "latency_ms": 153.87920203930818,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-28T02:30:21.202094+00:00",
+      "metadata": {}
+    },
+    "entropy_1::structural_1::repair": {
+      "source_observer": "entropy_1",
+      "target_observer": "structural_1",
+      "interaction_type": "repair",
+      "frequency": 1,
+      "latency_ms": 62.27708001011241,
       "synchronization_state": "synced",
-      "last_interaction": "2026-05-27T02:53:00.526144+00:00",
+      "last_interaction": "2026-05-28T02:30:21.202094+00:00",
+      "metadata": {}
+    },
+    "routing_0::repair_1::memory": {
+      "source_observer": "routing_0",
+      "target_observer": "repair_1",
+      "interaction_type": "memory",
+      "frequency": 1,
+      "latency_ms": 69.15511550005556,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.202094+00:00",
+      "metadata": {}
+    },
+    "continuity_2::routing_0::message": {
+      "source_observer": "continuity_2",
+      "target_observer": "routing_0",
+      "interaction_type": "message",
+      "frequency": 1,
+      "latency_ms": 123.94028764647895,
+      "synchronization_state": "desynced",
+      "last_interaction": "2026-05-28T02:30:21.202094+00:00",
+      "metadata": {}
+    },
+    "entropy_1::routing_0::repair": {
+      "source_observer": "entropy_1",
+      "target_observer": "routing_0",
+      "interaction_type": "repair",
+      "frequency": 1,
+      "latency_ms": 113.11009664732009,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.202094+00:00",
+      "metadata": {}
+    },
+    "memory_2::continuity_2::message": {
+      "source_observer": "memory_2",
+      "target_observer": "continuity_2",
+      "interaction_type": "message",
+      "frequency": 1,
+      "latency_ms": 120.26057384478767,
+      "synchronization_state": "synced",
+      "last_interaction": "2026-05-28T02:30:21.202094+00:00",
       "metadata": {}
     }
   },
   "contexts": [],
   "graph": {
-    "timestamp": "2026-05-27T02:53:00.526144+00:00",
+    "timestamp": "2026-05-28T02:30:21.202967+00:00",
     "total_observers": 18,
-    "total_interactions": 50,
+    "total_interactions": 49,
     "nodes": {
       "structural_0": {
         "type": "structural",
-        "state": "degraded",
-        "entropy": 0.2956720924553938,
+        "state": "active",
+        "entropy": 0.03433938046926716,
         "tasks": 0,
         "errors": 0
       },
       "structural_1": {
         "type": "structural",
         "state": "active",
-        "entropy": 0.20396334640023142,
+        "entropy": 0.047814539239788144,
         "tasks": 0,
         "errors": 0
       },
       "structural_2": {
         "type": "structural",
         "state": "active",
-        "entropy": 0.02587523716729855,
+        "entropy": 0.08153301520488365,
         "tasks": 0,
         "errors": 0
       },
       "continuity_0": {
         "type": "continuity",
-        "state": "degraded",
-        "entropy": 0.08099471300282111,
+        "state": "active",
+        "entropy": 0.29490637169058453,
         "tasks": 0,
         "errors": 0
       },
       "continuity_1": {
         "type": "continuity",
         "state": "active",
-        "entropy": 0.038609793115175706,
+        "entropy": 0.11879899639745636,
         "tasks": 0,
         "errors": 0
       },
       "continuity_2": {
         "type": "continuity",
         "state": "active",
-        "entropy": 0.2812657803926741,
+        "entropy": 0.24905865101387167,
         "tasks": 0,
         "errors": 0
       },
       "entropy_0": {
         "type": "entropy",
-        "state": "active",
-        "entropy": 0.1414027750770689,
+        "state": "degraded",
+        "entropy": 0.299084518619079,
         "tasks": 0,
         "errors": 0
       },
       "entropy_1": {
         "type": "entropy",
         "state": "degraded",
-        "entropy": 0.24394194986103754,
+        "entropy": 0.21390080466899578,
         "tasks": 0,
         "errors": 0
       },
       "entropy_2": {
         "type": "entropy",
         "state": "active",
-        "entropy": 0.2963794166009948,
+        "entropy": 0.09182387566436086,
         "tasks": 0,
         "errors": 0
       },
       "repair_0": {
         "type": "repair",
         "state": "degraded",
-        "entropy": 0.1544427462707706,
+        "entropy": 0.28069002712718627,
         "tasks": 0,
         "errors": 0
       },
       "repair_1": {
         "type": "repair",
         "state": "active",
-        "entropy": 0.14364377225129835,
+        "entropy": 0.06146680696503882,
         "tasks": 0,
         "errors": 0
       },
       "repair_2": {
         "type": "repair",
-        "state": "active",
-        "entropy": 0.19041742369749984,
+        "state": "degraded",
+        "entropy": 0.25304665283952227,
         "tasks": 0,
         "errors": 0
       },
       "routing_0": {
         "type": "routing",
-        "state": "active",
-        "entropy": 0.27515710138047467,
+        "state": "degraded",
+        "entropy": 0.23568757813409053,
         "tasks": 0,
         "errors": 0
       },
       "routing_1": {
         "type": "routing",
         "state": "active",
-        "entropy": 0.07790383658341667,
+        "entropy": 0.20357272771229787,
         "tasks": 0,
         "errors": 0
       },
       "routing_2": {
         "type": "routing",
-        "state": "degraded",
-        "entropy": 0.04474567387620334,
+        "state": "active",
+        "entropy": 0.075061799269972,
         "tasks": 0,
         "errors": 0
       },
       "memory_0": {
         "type": "memory",
-        "state": "degraded",
-        "entropy": 0.11294931872777828,
+        "state": "active",
+        "entropy": 0.2110120202647125,
         "tasks": 0,
         "errors": 0
       },
       "memory_1": {
         "type": "memory",
-        "state": "active",
-        "entropy": 0.1079271997791961,
+        "state": "degraded",
+        "entropy": 0.2718000087206266,
         "tasks": 0,
         "errors": 0
       },
       "memory_2": {
         "type": "memory",
-        "state": "active",
-        "entropy": 0.011358742807331712,
+        "state": "degraded",
+        "entropy": 0.027507917487526033,
         "tasks": 0,
         "errors": 0
       }
     },
     "edges": [
       {
-        "source": "structural_0",
-        "target": "entropy_1",
-        "type": "repair",
-        "frequency": 1,
-        "latency_ms": 81.63634826850601,
-        "sync": "desynced"
-      },
-      {
-        "source": "continuity_0",
-        "target": "repair_1",
-        "type": "sync",
-        "frequency": 1,
-        "latency_ms": 41.31551461233201,
-        "sync": "desynced"
-      },
-      {
         "source": "memory_2",
-        "target": "continuity_0",
-        "type": "sync",
+        "target": "entropy_1",
+        "type": "message",
         "frequency": 1,
-        "latency_ms": 131.1733565572827,
-        "sync": "synced"
-      },
-      {
-        "source": "memory_0",
-        "target": "repair_2",
-        "type": "route",
-        "frequency": 1,
-        "latency_ms": 185.78481259683454,
-        "sync": "synced"
-      },
-      {
-        "source": "structural_0",
-        "target": "entropy_0",
-        "type": "memory",
-        "frequency": 1,
-        "latency_ms": 111.16551828975756,
-        "sync": "synced"
-      },
-      {
-        "source": "repair_1",
-        "target": "routing_1",
-        "type": "memory",
-        "frequency": 1,
-        "latency_ms": 2.7423122702698284,
-        "sync": "synced"
-      },
-      {
-        "source": "structural_2",
-        "target": "entropy_0",
-        "type": "memory",
-        "frequency": 1,
-        "latency_ms": 136.1906058681692,
+        "latency_ms": 77.5024829021785,
         "sync": "synced"
       },
       {
         "source": "repair_0",
-        "target": "continuity_2",
+        "target": "structural_0",
         "type": "chaos",
         "frequency": 1,
-        "latency_ms": 166.2492775315308,
-        "sync": "synced"
+        "latency_ms": 132.82392696166897,
+        "sync": "desynced"
       },
       {
         "source": "memory_2",
-        "target": "entropy_0",
-        "type": "memory",
+        "target": "continuity_2",
+        "type": "route",
         "frequency": 1,
-        "latency_ms": 67.05115910413896,
+        "latency_ms": 146.6049025470544,
         "sync": "desynced"
       },
       {
-        "source": "repair_2",
-        "target": "continuity_1",
+        "source": "routing_1",
+        "target": "memory_1",
         "type": "message",
         "frequency": 1,
-        "latency_ms": 57.32185842952257,
+        "latency_ms": 147.6110571519262,
         "sync": "synced"
       },
       {
-        "source": "continuity_2",
-        "target": "structural_1",
+        "source": "memory_1",
+        "target": "memory_0",
         "type": "repair",
         "frequency": 1,
-        "latency_ms": 60.63235001962821,
+        "latency_ms": 173.39014555991307,
         "sync": "synced"
       },
       {
-        "source": "repair_1",
-        "target": "entropy_2",
-        "type": "sync",
+        "source": "continuity_0",
+        "target": "continuity_1",
+        "type": "chaos",
         "frequency": 1,
-        "latency_ms": 61.35272394486129,
-        "sync": "synced"
-      },
-      {
-        "source": "repair_1",
-        "target": "routing_1",
-        "type": "sync",
-        "frequency": 1,
-        "latency_ms": 108.31051649999769,
+        "latency_ms": 92.36767425086705,
         "sync": "desynced"
       },
       {
-        "source": "routing_2",
-        "target": "entropy_2",
-        "type": "message",
+        "source": "memory_2",
+        "target": "continuity_0",
+        "type": "chaos",
         "frequency": 1,
-        "latency_ms": 98.15869435589784,
-        "sync": "synced"
-      },
-      {
-        "source": "entropy_0",
-        "target": "memory_0",
-        "type": "sync",
-        "frequency": 1,
-        "latency_ms": 33.264519737393165,
-        "sync": "synced"
+        "latency_ms": 114.86183962274092,
+        "sync": "desynced"
       },
       {
         "source": "continuity_1",
+        "target": "continuity_2",
+        "type": "route",
+        "frequency": 1,
+        "latency_ms": 7.824078043077461,
+        "sync": "desynced"
+      },
+      {
+        "source": "structural_0",
+        "target": "entropy_2",
+        "type": "sync",
+        "frequency": 1,
+        "latency_ms": 34.67867595890434,
+        "sync": "desynced"
+      },
+      {
+        "source": "memory_0",
+        "target": "structural_2",
+        "type": "memory",
+        "frequency": 1,
+        "latency_ms": 101.47329605712574,
+        "sync": "synced"
+      },
+      {
+        "source": "repair_0",
         "target": "continuity_0",
         "type": "memory",
         "frequency": 1,
-        "latency_ms": 141.81236513833832,
+        "latency_ms": 172.89610681184487,
         "sync": "synced"
       },
       {
-        "source": "continuity_0",
-        "target": "structural_0",
-        "type": "chaos",
+        "source": "repair_2",
+        "target": "structural_2",
+        "type": "sync",
         "frequency": 1,
-        "latency_ms": 34.07924922172655,
-        "sync": "desynced"
+        "latency_ms": 113.99420475411537,
+        "sync": "synced"
       },
       {
-        "source": "memory_0",
-        "target": "repair_1",
-        "type": "memory",
-        "frequency": 1,
-        "latency_ms": 35.524921082414956,
-        "sync": "desynced"
-      },
-      {
-        "source": "routing_2",
+        "source": "routing_0",
         "target": "structural_1",
-        "type": "route",
-        "frequency": 1,
-        "latency_ms": 177.07400467805263,
-        "sync": "synced"
-      },
-      {
-        "source": "structural_1",
-        "target": "repair_0",
-        "type": "memory",
-        "frequency": 1,
-        "latency_ms": 68.99494801343624,
-        "sync": "desynced"
-      },
-      {
-        "source": "memory_1",
-        "target": "structural_1",
-        "type": "memory",
-        "frequency": 1,
-        "latency_ms": 33.68695966274474,
-        "sync": "desynced"
-      },
-      {
-        "source": "entropy_0",
-        "target": "entropy_2",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 120.11102535505633,
-        "sync": "desynced"
-      },
-      {
-        "source": "memory_1",
-        "target": "structural_0",
-        "type": "memory",
-        "frequency": 1,
-        "latency_ms": 89.25072809665343,
-        "sync": "synced"
-      },
-      {
-        "source": "entropy_0",
-        "target": "memory_2",
         "type": "repair",
         "frequency": 1,
-        "latency_ms": 152.7918411881892,
-        "sync": "synced"
-      },
-      {
-        "source": "continuity_0",
-        "target": "structural_1",
-        "type": "route",
-        "frequency": 1,
-        "latency_ms": 171.66145744077036,
-        "sync": "synced"
-      },
-      {
-        "source": "continuity_0",
-        "target": "entropy_0",
-        "type": "route",
-        "frequency": 1,
-        "latency_ms": 53.960711704576234,
-        "sync": "desynced"
-      },
-      {
-        "source": "repair_1",
-        "target": "repair_0",
-        "type": "route",
-        "frequency": 1,
-        "latency_ms": 85.98448872654714,
-        "sync": "synced"
-      },
-      {
-        "source": "memory_2",
-        "target": "routing_0",
-        "type": "route",
-        "frequency": 1,
-        "latency_ms": 122.14781703175765,
-        "sync": "synced"
-      },
-      {
-        "source": "continuity_2",
-        "target": "routing_0",
-        "type": "sync",
-        "frequency": 1,
-        "latency_ms": 195.835662364093,
-        "sync": "synced"
-      },
-      {
-        "source": "entropy_2",
-        "target": "repair_1",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 27.577093779503645,
-        "sync": "desynced"
-      },
-      {
-        "source": "structural_1",
-        "target": "memory_0",
-        "type": "memory",
-        "frequency": 1,
-        "latency_ms": 9.693609710284857,
-        "sync": "synced"
-      },
-      {
-        "source": "memory_1",
-        "target": "structural_0",
-        "type": "chaos",
-        "frequency": 1,
-        "latency_ms": 15.102263367090265,
-        "sync": "synced"
-      },
-      {
-        "source": "routing_0",
-        "target": "memory_1",
-        "type": "memory",
-        "frequency": 1,
-        "latency_ms": 3.985956455139433,
-        "sync": "synced"
-      },
-      {
-        "source": "entropy_0",
-        "target": "repair_1",
-        "type": "sync",
-        "frequency": 1,
-        "latency_ms": 159.50609871960668,
-        "sync": "synced"
-      },
-      {
-        "source": "memory_0",
-        "target": "structural_1",
-        "type": "memory",
-        "frequency": 1,
-        "latency_ms": 3.4987626440283233,
-        "sync": "synced"
-      },
-      {
-        "source": "continuity_0",
-        "target": "entropy_2",
-        "type": "route",
-        "frequency": 1,
-        "latency_ms": 125.2720955828549,
-        "sync": "synced"
-      },
-      {
-        "source": "structural_1",
-        "target": "routing_1",
-        "type": "memory",
-        "frequency": 1,
-        "latency_ms": 18.013923357740268,
-        "sync": "synced"
-      },
-      {
-        "source": "entropy_2",
-        "target": "routing_1",
-        "type": "sync",
-        "frequency": 1,
-        "latency_ms": 48.448549201573144,
-        "sync": "synced"
-      },
-      {
-        "source": "routing_0",
-        "target": "memory_0",
-        "type": "sync",
-        "frequency": 1,
-        "latency_ms": 176.7724681611663,
-        "sync": "desynced"
-      },
-      {
-        "source": "memory_2",
-        "target": "repair_1",
-        "type": "memory",
-        "frequency": 1,
-        "latency_ms": 110.29827763023516,
-        "sync": "desynced"
-      },
-      {
-        "source": "continuity_2",
-        "target": "entropy_0",
-        "type": "sync",
-        "frequency": 1,
-        "latency_ms": 50.81769625092134,
-        "sync": "synced"
-      },
-      {
-        "source": "continuity_1",
-        "target": "entropy_0",
-        "type": "message",
-        "frequency": 1,
-        "latency_ms": 99.5488563098229,
+        "latency_ms": 4.806940844806104,
         "sync": "synced"
       },
       {
         "source": "routing_1",
+        "target": "routing_0",
+        "type": "chaos",
+        "frequency": 1,
+        "latency_ms": 197.3415654151951,
+        "sync": "synced"
+      },
+      {
+        "source": "structural_0",
+        "target": "memory_0",
+        "type": "repair",
+        "frequency": 1,
+        "latency_ms": 111.14914962031041,
+        "sync": "desynced"
+      },
+      {
+        "source": "entropy_0",
         "target": "structural_2",
+        "type": "repair",
+        "frequency": 1,
+        "latency_ms": 173.39346939042912,
+        "sync": "synced"
+      },
+      {
+        "source": "entropy_0",
+        "target": "continuity_0",
+        "type": "repair",
+        "frequency": 1,
+        "latency_ms": 141.3639814053943,
+        "sync": "synced"
+      },
+      {
+        "source": "structural_1",
+        "target": "continuity_0",
         "type": "message",
         "frequency": 1,
-        "latency_ms": 14.660947205800365,
+        "latency_ms": 62.86355191522445,
+        "sync": "synced"
+      },
+      {
+        "source": "entropy_1",
+        "target": "memory_1",
+        "type": "route",
+        "frequency": 2,
+        "latency_ms": 129.00572065527362,
+        "sync": "synced"
+      },
+      {
+        "source": "routing_2",
+        "target": "structural_0",
+        "type": "route",
+        "frequency": 1,
+        "latency_ms": 144.49655642442272,
+        "sync": "synced"
+      },
+      {
+        "source": "repair_1",
+        "target": "routing_2",
+        "type": "route",
+        "frequency": 1,
+        "latency_ms": 118.67069350276157,
+        "sync": "synced"
+      },
+      {
+        "source": "routing_2",
+        "target": "memory_0",
+        "type": "message",
+        "frequency": 1,
+        "latency_ms": 57.85855257693779,
+        "sync": "desynced"
+      },
+      {
+        "source": "continuity_0",
+        "target": "repair_2",
+        "type": "route",
+        "frequency": 1,
+        "latency_ms": 132.4868383666962,
         "sync": "synced"
       },
       {
         "source": "repair_2",
         "target": "routing_2",
-        "type": "route",
+        "type": "message",
         "frequency": 1,
-        "latency_ms": 97.75200762551411,
-        "sync": "synced"
+        "latency_ms": 80.32290346946007,
+        "sync": "desynced"
       },
       {
-        "source": "continuity_0",
-        "target": "memory_0",
+        "source": "repair_0",
+        "target": "routing_1",
+        "type": "sync",
+        "frequency": 1,
+        "latency_ms": 29.248119654143537,
+        "sync": "desynced"
+      },
+      {
+        "source": "routing_2",
+        "target": "entropy_1",
         "type": "chaos",
         "frequency": 1,
-        "latency_ms": 36.00963961396327,
-        "sync": "synced"
+        "latency_ms": 114.62265396897212,
+        "sync": "desynced"
+      },
+      {
+        "source": "routing_2",
+        "target": "entropy_0",
+        "type": "chaos",
+        "frequency": 1,
+        "latency_ms": 16.884880739227,
+        "sync": "desynced"
       },
       {
         "source": "structural_2",
-        "target": "structural_0",
-        "type": "repair",
+        "target": "structural_1",
+        "type": "sync",
         "frequency": 1,
-        "latency_ms": 10.805012148166044,
+        "latency_ms": 123.54506531910454,
         "sync": "synced"
       },
       {
         "source": "continuity_0",
-        "target": "memory_1",
-        "type": "message",
+        "target": "structural_0",
+        "type": "repair",
         "frequency": 1,
-        "latency_ms": 152.43145995137974,
+        "latency_ms": 174.02435906533458,
         "sync": "desynced"
       },
       {
         "source": "entropy_2",
-        "target": "routing_2",
-        "type": "sync",
+        "target": "structural_1",
+        "type": "route",
         "frequency": 1,
-        "latency_ms": 3.3058713100559753,
+        "latency_ms": 92.36143761351951,
         "sync": "desynced"
       },
       {
-        "source": "entropy_0",
-        "target": "repair_0",
+        "source": "memory_0",
+        "target": "structural_0",
+        "type": "message",
+        "frequency": 1,
+        "latency_ms": 170.77996462723942,
+        "sync": "synced"
+      },
+      {
+        "source": "structural_2",
+        "target": "entropy_2",
+        "type": "message",
+        "frequency": 1,
+        "latency_ms": 198.4521673436248,
+        "sync": "synced"
+      },
+      {
+        "source": "continuity_2",
+        "target": "entropy_1",
+        "type": "message",
+        "frequency": 1,
+        "latency_ms": 12.89118201002424,
+        "sync": "synced"
+      },
+      {
+        "source": "continuity_0",
+        "target": "repair_1",
+        "type": "chaos",
+        "frequency": 1,
+        "latency_ms": 112.96627812536354,
+        "sync": "desynced"
+      },
+      {
+        "source": "memory_0",
+        "target": "continuity_0",
+        "type": "route",
+        "frequency": 1,
+        "latency_ms": 14.466607170597575,
+        "sync": "desynced"
+      },
+      {
+        "source": "routing_1",
+        "target": "memory_0",
+        "type": "message",
+        "frequency": 1,
+        "latency_ms": 170.30985982074085,
+        "sync": "desynced"
+      },
+      {
+        "source": "continuity_2",
+        "target": "continuity_0",
+        "type": "repair",
+        "frequency": 1,
+        "latency_ms": 72.13175665821535,
+        "sync": "synced"
+      },
+      {
+        "source": "structural_1",
+        "target": "structural_2",
         "type": "sync",
         "frequency": 1,
-        "latency_ms": 141.5786799344219,
+        "latency_ms": 165.88981101051903,
+        "sync": "synced"
+      },
+      {
+        "source": "routing_0",
+        "target": "memory_1",
+        "type": "repair",
+        "frequency": 1,
+        "latency_ms": 181.28746621042492,
         "sync": "synced"
       },
       {
         "source": "entropy_0",
-        "target": "memory_0",
+        "target": "routing_1",
+        "type": "sync",
+        "frequency": 1,
+        "latency_ms": 143.59090088120467,
+        "sync": "synced"
+      },
+      {
+        "source": "structural_0",
+        "target": "routing_2",
+        "type": "message",
+        "frequency": 1,
+        "latency_ms": 86.1477110292708,
+        "sync": "desynced"
+      },
+      {
+        "source": "continuity_2",
+        "target": "structural_1",
+        "type": "route",
+        "frequency": 1,
+        "latency_ms": 28.89078610465165,
+        "sync": "desynced"
+      },
+      {
+        "source": "repair_1",
+        "target": "structural_2",
+        "type": "chaos",
+        "frequency": 1,
+        "latency_ms": 169.59519041966314,
+        "sync": "desynced"
+      },
+      {
+        "source": "repair_2",
+        "target": "entropy_0",
         "type": "memory",
         "frequency": 1,
-        "latency_ms": 119.98358210262,
+        "latency_ms": 153.87920203930818,
+        "sync": "desynced"
+      },
+      {
+        "source": "entropy_1",
+        "target": "structural_1",
+        "type": "repair",
+        "frequency": 1,
+        "latency_ms": 62.27708001011241,
+        "sync": "synced"
+      },
+      {
+        "source": "routing_0",
+        "target": "repair_1",
+        "type": "memory",
+        "frequency": 1,
+        "latency_ms": 69.15511550005556,
+        "sync": "synced"
+      },
+      {
+        "source": "continuity_2",
+        "target": "routing_0",
+        "type": "message",
+        "frequency": 1,
+        "latency_ms": 123.94028764647895,
+        "sync": "desynced"
+      },
+      {
+        "source": "entropy_1",
+        "target": "routing_0",
+        "type": "repair",
+        "frequency": 1,
+        "latency_ms": 113.11009664732009,
+        "sync": "synced"
+      },
+      {
+        "source": "memory_2",
+        "target": "continuity_2",
+        "type": "message",
+        "frequency": 1,
+        "latency_ms": 120.26057384478767,
         "sync": "synced"
       }
     ]
   },
   "sync_health": {
     "status": "degraded",
-    "sync_rate": 0.7,
-    "total_relationships": 50,
-    "synced": 35,
-    "desynced": 15
+    "sync_rate": 0.551,
+    "total_relationships": 49,
+    "synced": 27,
+    "desynced": 22
   },
   "hotspots": []
 }

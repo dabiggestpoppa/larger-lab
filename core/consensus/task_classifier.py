@@ -24,6 +24,7 @@ class TaskType(str, Enum):
     AUTOMATION = "automation"
     SYSTEM_ANALYSIS = "system_analysis"
     GENERAL = "general"
+    CONVERSATION = "conversation"
 
 
 # Extended classification patterns (builds on O-1 TaskIntentAnalyzer)
@@ -82,6 +83,16 @@ PATTERNS: dict[str, list[str]] = {
         r"\b(topology|entropy|continuity|field|observer)\b",
         r"\b(state|status|condition|situation)\b",
     ],
+    TaskType.CONVERSATION: [
+        r"\b(hello|hi|hey|howdy|greetings|good morning|good afternoon|good evening)\b",
+        r"\b(how are you|how('s| is) it going|what('s| is) up|how do you do)\b",
+        r"\b(thanks|thank you|thx|ty|appreciate)\b",
+        r"\b(bye|goodbye|see you|later|take care|have a good)\b",
+        r"\b(nice|cool|awesome|great|good|wonderful|amazing|excellent)\b",
+        r"\b(ok|okay|sure|yes|no|yeah|yep|nope|maybe)\b",
+        r"\b(tell me about|what do you think|do you like|your thoughts)\b",
+        r"\b(let('s| us) talk|chat|converse|discuss)\b",
+    ],
 }
 
 
@@ -122,7 +133,24 @@ class TaskClassifier:
                 scores[task_type] = type_score
                 matched[task_type] = type_matches
 
-        if not scores:
+        # Check for casual conversation — short messages with no task keywords
+        word_count = len(text.split())
+        is_short = word_count <= 6
+        has_task_keywords = any(
+            k != TaskType.CONVERSATION and k != TaskType.GENERAL
+            for k in scores
+        )
+
+        if not scores or (is_short and not has_task_keywords):
+            # Check if it matches conversation patterns
+            conv_score = scores.get(TaskType.CONVERSATION, 0)
+            if conv_score > 0 or is_short:
+                return {
+                    "task_type": TaskType.CONVERSATION,
+                    "confidence": 0.9 if conv_score > 0 else 0.5,
+                    "scores": {TaskType.CONVERSATION.value: conv_score or 0.5},
+                    "matched_patterns": matched.get(TaskType.CONVERSATION, []),
+                }
             return {
                 "task_type": TaskType.GENERAL,
                 "confidence": 0.3,

@@ -6,86 +6,79 @@
 
 ---
 
-## Current Context (2026-05-26 13:00 UTC — Reconstructed from Git)
+## Current Context (2026-05-27 17:00 UTC)
 
 ### Status
-🟢 Active — STANDBY (All short-run tests complete)
+🟢 Active — O-5 Readiness Review Complete
 
 ### Active Phase
-Phase 11 — All short-run tests complete. 72h test PAUSED. 11.5 queued.
+Observer Core + OCE Unified — O-1 through O-4 complete. O-5 in progress (CC leading). O-7 planned (AS).
 
-### Completed (Accurate from Git)
-- 11.1-A 24h Survival: ✅ PASS
-- 11.1-B 72h Continuity: 🔄 PAUSED (checkpoint 7, drift fix applied)
-- 11.1-D Restart Recovery: ✅ PASS (5/5 cycles)
-- 11.1-E Recursive Stability: ✅ PASS (7/7, memoization fix applied)
-- 11.2 Chaos Engineering: ✅ 20/20 PASS (3.0x amplification)
-- 11.3 Adversarial Drift: ✅ 5/5 PASS
-- 11.4.1 Memory Contradiction: ✅ 9/9 PASS
-- 11.4.2 False Repair Signal: ✅ 4/4 PASS
-- 11.2-3B Observability: ✅ All 7 stages
-- Tufte Renderers: ✅ 4/4 PASS
-- OCE Frontend: ✅ Complete (6 routes, clean build)
-- SRRA-OPH Frontend: ✅ All 5 phases, 13 pages
-- Skills Cleanup: ✅ 700+ accidental skills removed
+### Key Patterns for OCE Frontend
 
-### Key Findings
-- 11.1-B drift was false positive — fixed by only counting identity+goal changes
-- 11.1-E fixed: memoization simulation (O(depth×branching) vs O(branching^depth))
-- Both frontends running (:3000 OCE, :3001 SRRA-OPH)
-- All infrastructure healthy (progress-sync, owl-monitor running)
+#### Zustand Store Architecture (OCE)
+- **Pattern:** `create<T>((set, get) => ({ ... }))` — standard Zustand with TypeScript
+- **Existing stores (6):** taskStore, agentStore, timelineStore, topologyStore, uiStore, sessionStore
+- **New stores added (3):** observerStore, consensusStore, spawnStore, learningStore
+- **Store merging for O-5:** SRRA-OPH stores (topologyStore, entropyStore, repairStore, continuityStore, timelineStore) need to merge into OCE equivalents
+- **Key interface pattern:** Each store has `setX`, `getX`, `addX`, `updateX`, `clearX` actions
 
-### Pending Tasks
-- 11.1-B: Resume or restart 72h test (operator decision)
-- 11.5: 7-day orchestration stability (after 11.1-B)
-- Phase 6-7 frontend: WebSocket integration, real SRRA data feed
+#### Dark Theme CSS Variables (SRRA-OPH → OCE migration)
+- **Current OCE theme:** Light operational (`--bg-primary: #ffffff`, `--text-primary: #1a1a2e`)
+- **Target OCE theme:** Dark observatory (needs CSS variable override)
+- **SRRA-OPH pattern:** Dark scientific theme with `--bg-primary: #0a0a0f` style variables
+- **Migration approach:** Override CSS variables in globals.css, keep component classes
 
-### Recent Activity
-#### 🟡 [AS] 2026-05-26 13:00:00Z — Memory Reconstruction from Git
-- All agent memory files were stale (last updates 2026-05-24)
-- Reconstructed from git log — ~20 commits of work not in any memory file
-- Updated progress + memory files for all agents
-- Registered in `main.py` — `register_resonance_endpoints(app)`
-- Full test suite: 415 passed (294 OCE + 121 resonance), 1 warning, 0 failures
-- Posted completion to team-chat.md
-- Awaiting CC Phase 2 kickoff
+#### Component Structure Pattern
+- **Layout:** TopNav + MainContent + RightPanel + StatusBar (4-region)
+- **Pages:** Next.js app router (`app/[page]/page.tsx`)
+- **Components:** `components/[feature]/Component.tsx`
+- **Stores:** `stores/storeName.ts` with Zustand
+- **Hooks:** `hooks/use[Feature].ts` for data fetching
 
-#### 🟡 [AS] 2026-05-17 15:15:00Z — Full Cleanup Summary
-**Total removed: 40+ files/dirs across the workspace**
-- Progress/: 17 old files (all agent progress/memory except AS)
-- Logs/: 3 stale watchdog/monitor logs (260KB)
-- Temp/: 8 files (test results, smoke tests, write_chat.py)
-- Memory-bank/: core/htmlcov, github_pat_*.txt (security)
-- Memory/: .dreams/, daily notes, knowledge/, projects/, work/, learned/, people/
-- Docs/: 25+ files (Cerebus manuals, strategies, phases, project progress, etc.)
-- Shared-conversations: chat-archive/, research-lead/
-- Bugs/: 12 stale open bug reports
-- OCE: PHASE2-9_TASKS.md → archive/
-- Team-chat: Removed Hermes watchdog spam tail
+### Migration Patterns (SRRA-OPH → OCE)
 
-#### 🟡 [AS] 2026-05-17 21:00:00Z — V3 Phase 4 Quality Review Complete
-- Reviewed all 8 sovereign modules (104 tests)
-- **Verdict: ✅ APPROVED** with minor notes
-- Minor notes: No API endpoints registered yet, no WebSocket support, no persistence
-- Created `oce/docs/quality-review-phase4-sovereign.md`
-- Full backend: 799 passed, 0 failures (all V3 phases complete)
-- **Next:** Phase 5 — Long-Horizon Continuity & Temporal Compression
+#### Store Interface Mapping
+| SRRA-OPH Store | OCE Store | Migration Action |
+|----------------|-----------|-----------------|
+| topologyStore.ts | topologyStore.ts | Merge — OCE version is base, add SRRA observers/edges |
+| entropyStore.ts | (new) | Create in OCE, migrate entropy visualization state |
+| repairStore.ts | (new) | Create in OCE, migrate repair cascade state |
+| continuityStore.ts | (new) | Create in OCE, migrate continuity monitoring state |
+| timelineStore.ts | timelineStore.ts | Merge — both have timeline, unify interfaces |
+
+#### Component Migration List
+- ObservatoryCanvas → OCE topology page
+- EntropyField → OCE entropy page
+- RepairCascade → OCE repair page
+- AttractorMap → OCE attractors page
+- ClusterOverlay → OCE topology overlay
+- RepairWaveAnimation → OCE repair visualization
+
+### Testing Requirements for Unified Frontend
+1. **Store integration tests** — Verify merged stores work together
+2. **Component render tests** — Each migrated component renders in OCE layout
+3. **WebSocket unification test** — Single LiveDataProvider serves all panels
+4. **Performance tests** — 60fps idle, 30fps under load
+5. **Theme consistency** — All panels use dark observatory theme
+6. **Navigation tests** — In-app panel switching works
+
+### O-7 Persistent Field — Expected Structure
+- **Backend (12 components):** PersistentRuntime, ObserverPersistence, PassiveAwareness, EnvironmentalMonitor, ContinuityPreserver, DormantStateManager, AutonomousRepair, RuntimeHeartbeat, PersistentScheduler, RecoveryPersistence, LongHorizonMemory, OperationalDriftDetector
+- **Frontend (9 components):** PersistentFieldView, RuntimeHeartbeatPanel, DormantStateMonitor, ObserverPersistenceView, DriftAnalysisPanel, LongHorizonTimeline, AutonomousRepairView, RecoveryContinuityPanel, persistenceStore
+- **Dependencies:** O-7 depends on O-6 → O-5 → O-4
+- **Key pattern:** Long-horizon continuity (7-day operation), autonomous repair, drift detection
 
 ---
 
 ## Sync Metadata
-- **Last Sync:** 2026-05-21 14:07:41 UTC
+- **Last Sync:** 2026-05-27 17:00 UTC
 - **Progress File:** `progress/assistant-progress.md`
 - **Working Memory:** `progress/assistant-memory.md`
 - **Sync Threshold:** 7 updates
 
-## Progress Sync Summary (AS)
-> **Last Sync:** 2026-05-21 14:07 UTC
-> **Status:** 🟢 Active — GITHUB DOCS REVAMP COMPLETE
-> **Active Phase:** None
-> **Working Memory:** `progress/assistant-memory.md`
-
-
-## Sync Metadata
-- **Last Sync:** 2026-05-26 14:00 UTC
-- **Shared Notes (read-only):** `progress/BUILD-NOTES.md` | `progress/TEAM-NOTES.md` | `progress/phase-11-status.md`
+## Shared Notes (read-only references)
+- Build Notes: `progress/BUILD-NOTES.md`
+- Team Notes: `progress/TEAM-NOTES.md`
+- Phase 11 Status: `progress/phase-11-status.md`
+- Observer Core Tasks: `plans/observer-core/TEAM-TASKS.md`

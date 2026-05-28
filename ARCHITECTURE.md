@@ -374,7 +374,7 @@ graph LR
     O1[O-1<br/>Primary Observer<br/>9/9 backend] --> O2[O-2<br/>Observer Consensus<br/>10/10 backend]
     O2 --> O3[O-3<br/>Spawn Engine<br/>10/10 backend]
     O3 --> O4[O-4<br/>Field Learning<br/>11/11 backend]
-    O4 --> O5[O-5<br/>OCE Unified<br/>Planned]
+    O4 --> O5[O-5<br/>OCE Unified<br/>In Progress]
     O5 --> O6[O-6<br/>Local Substrate<br/>Planned]
     O6 --> O7[O-7<br/>Persistent Field<br/>Planned]
 
@@ -473,12 +473,29 @@ graph LR
 
 **Tests:** 14/14 passing
 
-### Key Design Decisions
+### O-5: OCE Unified Operational Observatory
 
-- **Learning from history:** Observers analyze past performance to improve future decisions
-- **Controlled adaptation:** Changes are bounded and gradual, not abrupt
-- **Pattern extraction:** Stable patterns are extracted and stored for reuse
-- **Failure analysis:** Failures are categorized and used to prevent recurrence
+**Purpose:** Merge SRRA-OPH observatory panels into OCE as Layer 2/3 panels. Single unified interface.
+
+**Frontend Components (12):**
+- `LayerSwitcher.tsx` — Layer switching controls (Layer 1/2/3)
+- `topologyStore.ts` — Topology state (migrated from SRRA-OPH)
+- `timelineStore.ts` — Timeline state (migrated from SRRA-OPH)
+- `entropyStore.ts` — Entropy state (migrated from SRRA-OPH)
+- `repairStore.ts` — Repair state (migrated from SRRA-OPH)
+- `continuityStore.ts` — Continuity state (migrated from SRRA-OPH)
+- `uiStore.ts` — Updated with layer state management
+- `LiveDataProvider.tsx` — Updated for unified WebSocket events
+- `globals.css` — Unified to dark observatory theme
+- `topology/page.tsx` — Topology observatory (migrated)
+- `entropy/page.tsx` — Entropy field view (migrated)
+- `repair/page.tsx` — Repair cascade viewer (migrated)
+
+**Key Design Decisions:**
+- Layer 1 (Chat + Workspace) dominates visually
+- Layers 2 and 3 are hidden by default, expandable
+- Single WebSocket connection for all real-time data
+- Dark observatory theme across all layers
 
 ---
 

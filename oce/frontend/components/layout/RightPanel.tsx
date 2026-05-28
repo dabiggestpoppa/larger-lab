@@ -1,102 +1,72 @@
 "use client";
 
-import { useUIStore } from "@/stores/uiStore";
-import { useTaskStore } from "@/stores/taskStore";
-import { useAgentStore } from "@/stores/agentStore";
+import { useTopologyStore } from "@/stores/topologyStore";
 
 export default function RightPanel() {
-  const rightPanelOpen = useUIStore((s) => s.rightPanelOpen);
-  const rightPanelContent = useUIStore((s) => s.rightPanelContent);
-  const toggleRightPanel = useUIStore((s) => s.toggleRightPanel);
-  const selectedTaskId = useUIStore((s) => s.selectedTaskId);
-  const selectedAgentId = useUIStore((s) => s.selectedAgentId);
-  const task = useTaskStore((s) => s.tasks.find((t) => t.id === selectedTaskId));
-  const agent = useAgentStore((s) => s.agents.find((a) => a.id === selectedAgentId));
-
-  if (!rightPanelOpen) return null;
+  const { nodes, selectedObserverId, selectObserver } = useTopologyStore();
+  const selectedObserver = nodes.find((n) => n.id === selectedObserverId) || null;
 
   return (
-    <div className="w-72 bg-bg-secondary border-l border-border-light flex flex-col shrink-0 overflow-y-auto">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border-light">
-        <span className="text-xs font-semibold text-text-primary uppercase tracking-wider">
-          {rightPanelContent === "task" ? "Task Details" : rightPanelContent === "agent" ? "Agent Details" : "Details"}
-        </span>
-        <button
-          onClick={toggleRightPanel}
-          className="text-text-muted hover:text-text-primary text-xs px-2 py-1 rounded hover:bg-bg-tertiary"
+    <aside
+      className="flex flex-col border-l border-[var(--border-subtle)] bg-[var(--bg-secondary)] overflow-y-auto"
+      style={{ width: "var(--right-panel-width, 240px)" }}
+    >
+      {/* Header */}
+      <div className="px-4 py-3 border-b border-[var(--border-subtle)]">
+        <h2 className="text-xs font-mono font-bold text-[var(--text-primary)] uppercase tracking-wider">
+          Inspector
+        </h2>
+      </div>
+
+      {/* Observer Selector */}
+      <div className="px-4 py-2 border-b border-[var(--border-subtle)]">
+        <select
+          value={selectedObserverId || ""}
+          onChange={(e) => selectObserver(e.target.value || null)}
+          className="w-full text-[10px] font-mono bg-[var(--bg-tertiary)] text-[var(--text-secondary)] border border-[var(--border-subtle)] rounded px-2 py-1"
         >
-          ✕
-        </button>
+          <option value="">Select Observer...</option>
+          {nodes.map((node) => (
+            <option key={node.id} value={node.id}>
+              {node.id} ({node.type})
+            </option>
+          ))}
+        </select>
       </div>
-      <div className="p-4">
-        {rightPanelContent === "task" && task && (
-          <div className="space-y-3">
-            <div>
-              <span className="badge badge-neutral">Task</span>
-            </div>
-            <h3 className="text-sm font-semibold text-text-primary">{task.title}</h3>
-            <p className="text-xs text-text-secondary">{task.description}</p>
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between">
-                <span className="text-text-muted">Status</span>
-                <span className={`badge badge-${task.status === "active" ? "info" : task.status === "completed" ? "success" : task.status === "failed" ? "danger" : "neutral"}`}>
-                  {task.status}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-text-muted">Agent</span>
-                <span className="text-text-primary">{task.agent}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-text-muted">Progress</span>
-                <span className="text-text-primary">{task.progress}%</span>
-              </div>
-              <div className="w-full bg-bg-tertiary rounded-full h-1.5 mt-1">
-                <div
-                  className="bg-accent-primary h-1.5 rounded-full transition-all"
-                  style={{ width: `${task.progress}%` }}
-                />
-              </div>
-            </div>
+
+      {/* Observer Details */}
+      {selectedObserver ? (
+        <div className="p-4 space-y-3">
+          <div>
+            <span className="text-[10px] font-mono text-[var(--text-muted)] uppercase">ID</span>
+            <p className="text-xs font-mono text-[var(--text-primary)]">{selectedObserver.id}</p>
           </div>
-        )}
-        {rightPanelContent === "agent" && agent && (
-          <div className="space-y-3">
-            <div>
-              <span className="badge badge-neutral">{agent.tag}</span>
-            </div>
-            <h3 className="text-sm font-semibold text-text-primary">{agent.name}</h3>
-            <p className="text-xs text-text-secondary">{agent.role}</p>
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between">
-                <span className="text-text-muted">Status</span>
-                <span className={`badge badge-${agent.status === "alive" ? "success" : agent.status === "degraded" ? "warning" : "neutral"}`}>
-                  {agent.status}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-text-muted">Current Task</span>
-                <span className="text-text-primary truncate ml-2">{agent.currentTask}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-text-muted">Tasks Done</span>
-                <span className="text-text-primary">{agent.tasksCompleted}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-text-muted">Uptime</span>
-                <span className="text-text-primary">{agent.uptimeHours}h</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-text-muted">Errors</span>
-                <span className={agent.errors > 0 ? "text-accent-danger" : "text-text-primary"}>{agent.errors}</span>
-              </div>
-            </div>
+          <div>
+            <span className="text-[10px] font-mono text-[var(--text-muted)] uppercase">Type</span>
+            <p className="text-xs font-mono text-[var(--text-primary)]">{selectedObserver.type}</p>
           </div>
-        )}
-        {!rightPanelContent && (
-          <p className="text-xs text-text-muted">Select a task or agent to view details.</p>
-        )}
-      </div>
-    </div>
+          <div>
+            <span className="text-[10px] font-mono text-[var(--text-muted)] uppercase">Status</span>
+            <p className={`text-xs font-mono ${
+              selectedObserver.status === "active" ? "text-[var(--observer-active)]" :
+              selectedObserver.status === "synced" ? "text-[var(--observer-synced)]" :
+              selectedObserver.status === "repairing" ? "text-[var(--observer-repairing)]" :
+              selectedObserver.status === "degraded" ? "text-[var(--observer-degraded)]" :
+              "text-[var(--observer-dormant)]"
+            }`}>
+              {selectedObserver.status}
+            </p>
+          </div>
+          <div>
+            <span className="text-[10px] font-mono text-[var(--text-muted)] uppercase">Entropy</span>
+            <p className="text-xs font-mono text-[var(--text-primary)]">{(selectedObserver.entropy * 100).toFixed(1)}%</p>
+          </div>
+        </div>
+      ) : (
+        <div className="p-4">
+          <p className="text-[10px] font-mono text-[var(--text-dim)]">No observer selected</p>
+        </div>
+      )}
+    </aside>
   );
 }

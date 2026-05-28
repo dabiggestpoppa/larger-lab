@@ -7,10 +7,35 @@
 
 ---
 
-## Status: 🟢 Active — O-4 Field Learning Complete
+## Status: 🟢 Active — O-5 OCE Unified Frontend In Progress
 
-### Current State (2026-05-27 17:00 UTC)
-**O-4 Field Learning backend complete. All 11 components verified and working.**
+### Current State (2026-05-27 20:30 UTC)
+**O-5 OCE Unified Frontend integration started. O-4 backend complete.**
+
+### O-5 OCE Unified Frontend — IN PROGRESS (4/12 frontend components)
+| Component | File | Status |
+|-----------|------|--------|
+| LayerSwitcher | `components/layout/LayerSwitcher.tsx` | ✅ Created |
+| topologyStore | `stores/topologyStore.ts` | ✅ Migrated from SRRA-OPH |
+| timelineStore | `stores/timelineStore.ts` | ✅ Migrated from SRRA-OPH |
+| entropyStore | `stores/entropyStore.ts` | ✅ Migrated from SRRA-OPH |
+| repairStore | `stores/repairStore.ts` | ✅ Migrated from SRRA-OPH |
+| continuityStore | `stores/continuityStore.ts` | ✅ Migrated from SRRA-OPH |
+| uiStore (layer state) | `stores/uiStore.ts` | ✅ Updated with layer management |
+| LiveDataProvider | `components/LiveDataProvider.tsx` | ✅ Updated for unified events |
+| globals.css | `app/globals.css` | ✅ Unified to dark theme |
+| TopNav | `components/layout/TopNav.tsx` | ✅ Updated with LayerSwitcher |
+| topology/page.tsx | `app/topology/page.tsx` | ✅ Migrated |
+| entropy/page.tsx | `app/entropy/page.tsx` | ✅ Migrated |
+| repair/page.tsx | `app/repair/page.tsx` | ✅ Migrated |
+
+### Remaining O-5 Tasks
+- Migrate attractors, playback, experiments, events, modules, tests pages
+- Create LayerSwitcher with expand/collapse in layout
+- Build Layer 3 orchestration panels (consensus, spawn, learning)
+- Performance validation
+
+### O-4 Field Learning — COMPLETE (11 backend components)
 
 ### O-4 Field Learning — COMPLETE (11 backend components)
 | Component | File | Status |

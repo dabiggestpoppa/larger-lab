@@ -3,102 +3,97 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #f8f9fa;
-  --bg-secondary: #ffffff;
-  --bg-tertiary: #f1f3f5;
-  --bg-input: #F9F9F9;
-  --bg-chat-user: #133EBF;
-  --bg-chat-assistant: #F2F2F2;
-  --accent-primary: #133EBF;
-  --accent-secondary: #4F46E5;
-  --accent-success: #16a34a;
-  --accent-warning: #d97706;
-  --accent-danger: #dc2626;
-  --text-primary: #1a1a2e;
-  --text-secondary: #6b7280;
-  --text-muted: #9ca3af;
-  --border-light: #e5e7eb;
-  --border-medium: #d1d5db;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #111118;
+  --bg-tertiary: #1a1a24;
+  --border-default: #27272a;
+  --border-subtle: #27272a;
+  --accent-primary: #6366f1;
+  --accent-success: #4ade80;
+  --accent-warning: #facc15;
+  --accent-danger: #f87171;
+  --text-primary: #e5e7eb;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --text-dim: #4b5563;
+  --field-stable: #4ade80;
+  --field-warning: #facc15;
+  --field-danger: #f87171;
+  --observer-active: #4ade80;
+  --observer-synced: #60a5fa;
+  --observer-repairing: #facc15;
+  --observer-degraded: #f87171;
+  --observer-dormant: #6b7280;
 }
 
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
-  color: var(--text-primary);
   background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Scrollbar */
-::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+/* Typing dots */
+@keyframes blink {
+  0%, 80%, 100% { opacity: 0; }
+  40% { opacity: 1; }
 }
-::-webkit-scrollbar-track {
-  background: transparent;
+.dot-1 { animation: blink 1.4s infinite 0s; }
+.dot-2 { animation: blink 1.4s infinite 0.2s; }
+.dot-3 { animation: blink 1.4s infinite 0.4s; }
+
+/* Fade in */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-::-webkit-scrollbar-thumb {
-  background: var(--border-medium);
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
 }
 
-/* Selection */
-::selection {
-  background: rgba(37, 99, 235, 0.12);
-  color: var(--text-primary);
-}
-
-/* Focus */
-:focus-visible {
-  outline: 2px solid rgba(37, 99, 235, 0.25);
-  outline-offset: 2px;
-}
-
-/* Utility */
-.card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-light);
-  border-radius: 8px;
-  box-shadow: var(--shadow-sm);
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 8px;
-  border-radius: 9999px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
-
-.badge-success { background: #dcfce7; color: #166534; }
-.badge-warning { background: #fef3c7; color: #92400e; }
-.badge-danger { background: #fee2e2; color: #991b1b; }
-.badge-info { background: #dbeafe; color: #1e40af; }
-.badge-neutral { background: var(--bg-tertiary); color: var(--text-secondary); }
-
-/* Smooth transitions */
-button, a {
-  transition: all 0.15s ease;
-}
-
-/* Animate pulse for online dot */
-@keyframes pulse-dot {
+/* Pulse */
+@keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50% { opacity: 0.4; }
+}
+.animate-pulse-slow {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+textarea {
+  font-family: inherit;
+}
+
+/* Code blocks in messages */
+.msg-content pre {
+  background: #1e1e2e;
+  color: #cdd6f4;
+  border-radius: var(--radius-xs);
+  padding: 12px 14px;
+  overflow-x: auto;
+  font-size: 13px;
+  margin: 8px 0;
+}
+.msg-content code {
+  background: var(--bg-tertiary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+.msg-content pre code {
+  background: none;
+  padding: 0;
 }

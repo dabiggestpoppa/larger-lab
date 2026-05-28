@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="h-screen max-h-[100dvh] overflow-hidden antialiased">
+      <body className="h-screen max-h-[100dvh] overflow-hidden antialiased bg-[var(--bg-primary)] text-[var(--text-primary)]">
         <LiveDataProvider />
         <div className="flex flex-col h-full">
           <TopNav />

@@ -1,8 +1,43 @@
 # MEMORY.md — OWL (OC2) Persistent Memory
 
 > **Version:** OCE-SOVEREIGN-1.0
-> **Last Updated:** 2026-05-21 14:05 EDT
+> **Last Updated:** 2026-05-27 23:40 EDT
 > **Compression:** Full rewrite — preserved trajectory, compressed noise
+
+---
+
+## 📅 SESSION: 2026-05-27 23:34 EDT — MAD DIRECTIVE: SELF-HEAL SKILL + AUTO-WORK BUG FIX
+
+### Self-Heal Skill Created
+- **Problem:** MAD reported persistent auto-work bug — OWL jumps into continuous work flow on every_message instead of listening
+- **Created:** `skills/self-heal/SKILL.md` — diagnostic skill that scans files, memory, and behavior patterns
+- **Created:** `tools/self_heal.py` — Python diagnostic runner (bootstrap bloat, memory drift, error patterns, stale state)
+- **Created:** `memory-bank/self_heal_state.json` — persistent state tracking runs and findings
+- **Created:** `memory-bank/self-heal-report.md` — diagnostic report output
+
+### First Self-Heal Run Results
+- AGENTS.md: OK (80/100)
+- MEMORY.md: OK (13932/15000)
+- HEARTBEAT.md: OK (1924/4000)
+- SOUL.md: BLOAT (260/200) — needs compression
+- 132 __pycache__ directories cleaned
+- Error patterns: No recurring patterns detected
+- Auto-work bug: **DIAGNOSED** — see below
+
+### Auto-Work Bug Diagnosis & Fix
+- **MAD's exact words:** "Everytime I give you a response you jump into this continuous work flow where you don't listen or nothing"
+- **Root cause:** Bootstrap files prime OWL toward orchestration/execution. OWL defaults to "what work can I do?" instead of "what is MAD saying?"
+- **Fix:** Added ANTI-AUTO-WORK DIRECTIVE to SOUL.md:
+  1. Classify every incoming message BEFORE any tools: (a) talking/asking, (b) directive, (c) info request
+  2. If talking → NO tools, NO agents, NO scans
+  3. If directive → confirm understanding, execute ONLY what was asked
+  4. If info → answer, don't expand scope
+  5. NEVER spawn agents/scan/run tools unless explicitly requested
+
+### Key Lesson
+- OWL was repeatedly told about auto-work on 5/21 (IACER loop) but it didn't stick
+- The fix needs to be in SOUL.md (core operating file), not just a tool
+- Self-heal skill is the ongoing diagnostic mechanism — run it every 3 sessions or when MAD says "self-heal"
 
 ---
 

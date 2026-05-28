@@ -6,10 +6,10 @@ import { useAgentStore } from "@/stores/agentStore";
 import { useUIStore } from "@/stores/uiStore";
 
 const statusColors: Record<string, string> = {
-  connected: "text-accent-success",
-  connecting: "text-accent-warning",
-  disconnected: "text-text-muted",
-  error: "text-accent-danger",
+  connected: "text-[var(--accent-success)]",
+  connecting: "text-[var(--accent-warning)]",
+  disconnected: "text-[var(--text-muted)]",
+  error: "text-[var(--accent-danger)]",
 };
 
 const statusLabels: Record<string, string> = {
@@ -29,20 +29,20 @@ export default function StatusBar() {
   const degradedCount = useMemo(() => agents.filter((a) => a.status === "degraded").length, [agents]);
 
   return (
-    <div className="h-7 bg-bg-tertiary border-t border-border-light flex items-center px-4 gap-4 text-xs text-text-muted shrink-0">
+    <div className="h-7 bg-[var(--bg-tertiary)] border-t border-[var(--border-default)] flex items-center px-4 gap-4 text-xs text-[var(--text-muted)] shrink-0">
       <span className={statusColors[connectionStatus]}>
         {statusLabels[connectionStatus]}
       </span>
       <span>
-        <span className="text-accent-success">●</span> {aliveCount} agents alive
+        <span className="text-[var(--accent-success)]">●</span> {aliveCount} agents alive
       </span>
       {degradedCount > 0 && (
         <span>
-          <span className="text-accent-warning">●</span> {degradedCount} degraded
+          <span className="text-[var(--accent-warning)]">●</span> {degradedCount} degraded
         </span>
       )}
       <span>
-        <span className="text-accent-primary">▶</span> {activeTasks.length} active tasks
+        <span className="text-[var(--accent-primary)]">▶</span> {activeTasks.length} active tasks
       </span>
       <div className="flex-1" />
       <span>OCE v2.0 — Operator Continuity Engine</span>
