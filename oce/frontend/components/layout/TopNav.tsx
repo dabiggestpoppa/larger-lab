@@ -9,6 +9,15 @@ const navItems = [
   { href: "/topology", label: "Topology", icon: "▦" },
   { href: "/entropy", label: "Entropy", icon: "◎" },
   { href: "/repair", label: "Repair", icon: "◈" },
+  { href: "/attractors", label: "Attractors", icon: "◉" },
+  { href: "/playback", label: "Playback", icon: "▶" },
+  { href: "/experiments", label: "Experiments", icon: "⚗" },
+  { href: "/events", label: "Events", icon: "⚡" },
+  { href: "/modules", label: "Modules", icon: "▣" },
+  { href: "/tests", label: "Tests", icon: "✓" },
+  { href: "/browser", label: "Browser", icon: "🌐" },
+  { href: "/substrate", label: "Substrate", icon: "🖥️" },
+  { href: "/chat", label: "Chat", icon: "💬" },
 ];
 
 export default function TopNav() {

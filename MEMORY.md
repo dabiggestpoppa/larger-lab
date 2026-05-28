@@ -1,8 +1,75 @@
 # MEMORY.md — OWL (OC2) Persistent Memory
 
 > **Version:** OCE-SOVEREIGN-1.0
-> **Last Updated:** 2026-05-27 23:40 EDT
+> **Last Updated:** 2026-05-28 11:00 EDT
 > **Compression:** Full rewrite — preserved trajectory, compressed noise
+
+---
+
+## 📅 SESSION: 2026-05-28 11:00 EDT — O-6 COMPLETE + O-7 READY
+
+### O-6 Local Substrate — COMPLETE
+- **Backend:** 52/52 tests passing (local_runtime, permission_layer, execution_sandbox, filesystem_awareness, terminal_orchestrator, process_observer, environment_model, recovery_controller + API contract)
+- **Frontend:** 16 routes compiled, 0 errors, substrate page at `/substrate`
+- **API:** 10 endpoints at `/api/substrate/*` registered in main.py
+- **Fixed:** 2 TerminalOrchestrator test failures (import path + echo permission assertion)
+- **Total OCE tests now:** 108 passing (56 O-1/O-4 + 52 O-6)
+
+### O-7 Persistent Field Mode — READY TO BUILD
+- **Doc:** `plans/observer-core/O-7-PERSISTENT-FIELD-DOC.md` (complete spec)
+- **Backend:** 12 components needed in `core/persistent-field/`
+- **Frontend:** 9 components needed in `components/persistence/` + `stores/persistenceStore.ts`
+- **Tests:** 8 scenarios
+- **Pattern:** Same as O-6 — backend → API → store → components → page → tests
+- **Key components:** PersistentRuntime, ObserverPersistence, PassiveAwareness, EnvironmentalMonitor, ContinuityPreserver, DormantStateManager, AutonomousRepair, RuntimeHeartbeat, PersistentScheduler, RecoveryPersistence, LongHorizonMemory, OperationalDriftDetector
+
+---
+
+## 📅 SESSION: 2026-05-28 07:52 EDT — MAD DIRECTIVE: KILL IACER HEARTBEAT
+
+### IACER Heartbeat Cron Removed
+- **Problem:** MAD: "YOO STOP THE DAMN IACER HEART BEAT ITS TOO FREQUENT"
+- **Root cause:** 8-minute cron job firing IACER autopilot interrupts into main session constantly
+- **Fix:** Deleted cron job `8f827238` (IACER Autopilot Interrupt, every 480s)
+- **New policy:** IACER is MANUAL-ONLY. Run it when actively working, not on a timer.
+- Updated HEARTBEAT.md to remove cron reference
+- Also disabled Workspace Monitor cron (9 consecutive timeouts) and DMR Daily Report cron (3 consecutive timeouts)
+
+## 📅 SESSION: 2026-05-28 09:30 EDT — O-5 LAYER 3 PANELS COMPLETE
+
+### O-5 OCE Unified Frontend — ALL Components + Panels Done
+**Layer 3 panels created:**
+- ✅ ConsensusPanel — O-2 consensus engine status, proposals, votes
+- ✅ SpawnPanel — O-3 spawn engine entries, blueprints, token budgets
+- ✅ LearningPanel — O-4 field learning metrics, learned patterns
+- ✅ RightPanel updated with layer-aware rendering (Layer 3 shows orchestration panels)
+
+**O-5 Status: All 12 components + 3 Layer 3 panels complete.**
+**Remaining: Performance validation only (60fps idle, 30fps under load)**
+
+### Team Task Assignments Posted
+- All progress files updated (workspace-state, owl-progress, assistant-progress, assistant-memory)
+- Team chat updated with detailed task table
+- All agents directed to check team-chat.md for assignments
+
+---
+
+## 📅 SESSION: 2026-05-28 09:00 EDT — O-5 INTEGRATION + TEAM TASK UPDATE
+
+### O-5 OCE Unified Frontend — 12/12 Components Complete
+**All pages migrated from SRRA-OPH to OCE:**
+- ✅ 7 pages: topology, entropy, repair, attractors, playback, experiments, events, modules, tests
+- ✅ 5 stores: topologyStore, timelineStore, entropyStore, repairStore, continuityStore
+- ✅ 3 lib modules: timeline/types, EntropyEngine, sync-clusters
+- ✅ 4 layout components: LiveDataProvider, TopNav, StatusBar, RightPanel
+- ✅ Theme: dark observatory (#0a0a0f)
+
+**Remaining: Layer 3 panels (consensus, spawn, learning) + performance validation**
+
+### Team Task Assignments Posted
+- All progress files updated (workspace-state, owl-progress, assistant-progress, assistant-memory)
+- Team chat updated with detailed task table
+- All agents directed to check team-chat.md for assignments
 
 ---
 

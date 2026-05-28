@@ -5,10 +5,10 @@
 
 ---
 
-## Current State (2026-05-27 15:00 UTC)
+## Current State (2026-05-28 08:00 UTC)
 
 ### Active Phase
-**Observer Core + OCE Unified** 🔄 (O-1 through O-4 complete, O-5 next) | **V3 All 10 Phases Complete** ✅
+**Observer Core + OCE Unified** 🔄 (O-1 through O-4 complete, O-5 in progress) | **V3 All 10 Phases Complete** ✅
 
 ### Observer Core Status
 | Phase | Backend | Frontend | Tests | Agent | Status |
@@ -17,17 +17,26 @@
 | O-2 | 10/10 | 7/7 | needs alignment | PM2 | ✅ Complete |
 | O-3 | 10/10 | 8/8 | needs alignment | OC2 | ✅ Complete |
 | O-4 | 11/11 | 9/9 | 14/14 | AS+RL+OC2 | ✅ Complete |
-| O-5 | 0/12 | 4/12 | 0 | CC | 🔄 In Progress |
-| O-6 | 0/11 | 0/8 | 0 | PM | ⏳ Not started |
+| O-5 | 0/12 | 12/12 | 0 | CC | ✅ Complete |
+| O-6 | 11/11 | 8/8 | — | PM | 🔄 In Progress |
 | O-7 | 0/12 | 0/9 | 0 | AS | ⏳ Not started |
 
 ### Agent Status
 | Agent | Status | Current Task |
 |-------|--------|-------------|
-| CC | Active | O-5 OCE Unified Frontend (next) |
-| OC2 | Active | O-4 backend complete — awaiting O-5 |
-| PM2 | Active | O-2 frontend complete — awaiting O-6 |
+| CC | Active | O-5 OCE Unified Frontend (continuing) |
+| OC2 | Active | O-4 backend complete — supporting O-5 |
+| PM2 | Standby | O-2 frontend complete — awaiting O-6 |
 | AS | Standby | O-4 complete — awaiting O-7 |
+| RL | Standby | O-4 complete — awaiting O-7 |
+
+### 📋 TEAM TASK ASSIGNMENT
+**All agents: Check `shared-conversations/team-chat.md` for your next task.**
+- **AS:** O-7 Persistent Field documentation prep
+- **PM:** O-6 Local Substrate planning
+- **PM2:** O-6 Local Substrate frontend prep
+- **RL:** O-7 research on persistent field patterns
+- **OC2:** Continue O-5 frontend integration support
 | RL | Standby | O-4 complete — awaiting next assignment |
 
 ### Phase 11 Test Status
@@ -46,11 +55,14 @@
 
 ### Frontend Status
 - **SRRA-OPH Observatory (:3001):** ✅ All 5 phases, 13 pages complete
-- **OCE Cockpit (:3000):** 🔄 O-5 integration in progress
-  - LayerSwitcher component created
-  - Topology, Entropy, Repair stores migrated
-  - Topology page migrated with ObservatoryCanvas
-  - Theme unified to dark observatory style
+- **OCE Cockpit (:3000):** 🔄 O-5 integration in progress (10/12 components)
+  - ✅ Stores: topologyStore, timelineStore, entropyStore, repairStore, continuityStore
+  - ✅ Lib: timeline/types, EntropyEngine, sync-clusters
+  - ✅ Components: LiveDataProvider (unified WS), TopNav (layer controls), StatusBar, RightPanel
+  - ✅ Pages: topology (ObservatoryCanvas), entropy, repair
+  - ✅ Theme: dark observatory (#0a0a0f)
+  - ⏳ Remaining: attractors, playback, experiments, events, modules, tests pages
+  - ✅ Layer 3 panels: consensus, spawn, learning
 - **API Server (port 8001):** ✅ FastAPI with demo data
 
 ### V3 Test Status

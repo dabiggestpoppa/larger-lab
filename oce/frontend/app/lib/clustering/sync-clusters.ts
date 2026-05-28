@@ -1,6 +1,6 @@
 /* Synchronization-based clustering for OCE topology */
 
-import { ObserverNode } from "../../stores/topologyStore";
+import { ObserverNode } from "../../../stores/topologyStore";
 
 export interface Cluster {
   id: string;

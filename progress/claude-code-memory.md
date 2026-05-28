@@ -6,16 +6,27 @@
 
 ---
 
-## Current Context (2026-05-26 13:00 UTC — Reconstructed from Git)
+## Current Context (2026-05-28 12:00 UTC — Post O-6 Test Fix)
 
 ### Status
-🟢 V3 PHASES 1-10 COMPLETE + Phase 11 Short-Run Tests Complete
+🟢 V3 PHASES 1-10 COMPLETE + Phase 11 Short-Run Tests Complete + O-1..O-5 Complete + O-6 Tests Passing
 
 ### Active Phase
-**Phase 11 — Operational Validation Era**
-- All short-run tests complete (11.1-A, 11.1-D, 11.1-E, 11.2, 11.3, 11.4.1, 11.4.2, 11.2-3B)
-- 11.1-B 72h Continuity: PAUSED at checkpoint 7 (drift fix applied)
-- 11.5 Orchestration Stability: Queued (needs 11.1-B)
+**Observer Core + OCE Unified — O-6 Local Substrate**
+- O-1: ✅ Complete (42/42 tests)
+- O-2: ✅ Complete (13 tests need alignment — pre-existing)
+- O-3: ✅ Complete (25 tests need alignment — pre-existing)
+- O-4: ✅ Complete (14/14 tests)
+- O-5: ✅ Complete (all 12 components + Layer 3 panels)
+- O-6: 🔄 Foundation complete, **52/52 tests passing** (fixed in this session)
+- O-7: ⏳ Planned (AS docs done, awaiting PM/PM2)
+
+### O-6 Fixes Applied (2026-05-28)
+1. **Syntax error:** `with.assertRaises` → `with pytest.raises` (line 284)
+2. **Async test pattern:** `self.assertRaises` → `pytest.raises` in all async test methods
+3. **Permission layer:** Added echo/ls/cat/pwd command rules
+4. **Pattern matching:** Fixed `_matches_pattern` to handle space-separated commands (`echo hello` matches `echo:*`)
+5. **Terminal orchestrator:** Changed `command.split()[0]` → `command` for permission check
 
 ### Pending Tasks
 - 11.1-B: Resume or restart 72h test (operator decision required)

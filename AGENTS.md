@@ -1,6 +1,6 @@
 # AGENTS.md — V3 Cognitive Field Team Manifest
 
-> **Last Updated:** May 26, 2026 | **Phase:** V3 P10 COMPLETE + Phase 11 Short-Run Tests Complete
+> **Last Updated:** May 28, 2026 | **Phase:** O-6 Complete — O-7 Persistent Field Next
 
 ## ⚠️ OPERATOR RULES
 See `OPERATOR_RULES.md`. Key: Max 2 concurrent sub-agents. No unrestricted self-modification. All execution logged.
@@ -30,13 +30,23 @@ ALWAYS use PowerShell. Never use `cmd.exe` / `subprocess.run(..., shell=True)`.
 ## Team Roster
 | Tag | Agent | Role | Status |
 |-----|-------|------|--------|
-| 🔵 CC | Claude Code | Overseer / Architecture | Standby |
+| 🔵 CC | Claude Code | Overseer / Architecture | Active |
 | 🟠 OC2 | OWL | Primary Operator / Orchestrator | Active |
 | 🟡 AS | Assistant Manager | Context Monitoring / Quality | Standby |
-| 🔴 PM | Polymorph | Debugger / Tool Builder | Standby |
+| 🔴 PM | Polymorph | Debugger / Tool Builder | Active |
 | 🔴 PM2 | Polymorph 2 | Experimental Track / Frontend P3-5 | Standby |
 | 🟢 RL | OWL (Research Lead) | Research / DSPy | Standby |
 | 🟦 Copilot | GitHub Copilot | Test Monitoring / Autopilot | Standby |
+
+## 📋 Current Team Tasks (2026-05-28)
+**All agents: Check `shared-conversations/team-chat.md` for detailed assignments.**
+- **CC:** O-6 tests fixed (52/52 passing) — O-7 planning next
+- **OC2:** O-5 complete — supporting O-6 integration
+- **AS:** O-7 Persistent Field documentation complete — ready for build
+- **PM:** O-6 Local Substrate complete — O-7 backend build next
+- **PM2:** O-6 frontend complete — O-7 frontend build next
+- **RL:** O-7 research
+- **Copilot:** 11.1-B monitoring
 
 ## Memory Relay System
 After EVERY code edit: Update own progress file + memory file. After every 5 code edits: Post summary to `shared-conversations/team-chat.md`.
@@ -60,9 +70,9 @@ After EVERY code edit: Update own progress file + memory file. After every 5 cod
 | O-2 | 10/10 | 7/7 | needs alignment | ✅ Complete |
 | O-3 | 10/10 | 8/8 | needs alignment | ✅ Complete |
 | O-4 | 11/11 | 9/9 | 14/14 | ✅ Complete |
-| O-5 | 0/12 | 0/12 | — | ⏳ Next (CC) |
-| O-6 | 0/11 | 0/8 | — | ⏳ Planned (PM) |
-| O-7 | 0/12 | 0/9 | — | ⏳ Planned (AS) |
+| O-5 | 12/12 | 12/12 | — | ✅ Complete |
+| O-6 | 11/11 | 8/8 | 52/52 | ✅ Complete |
+| O-7 | 0/12 | 0/9 | — | 🔄 Ready to Build (PM/PM2) |
 
 ## Key Files
 | File | Purpose |

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTopologyStore, ObserverNode } from "../../stores/topologyStore";
-import { computeClusters } from "../../lib/clustering/sync-clusters";
+import { computeClusters } from "../lib/clustering/sync-clusters";
 
 interface LayoutNode extends ObserverNode {
   vx: number;

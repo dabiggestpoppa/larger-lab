@@ -10,6 +10,7 @@ Components:
 - TaskIntentAnalyzer: Classifies task domain and complexity
 - ContextDistiller: Compresses field state for responses
 - ContinuityMemory: Operational continuity memory
+- ChatLog: Persistent conversation log for field analysis
 - ObserverSession: Session continuity management
 - ObserverLifecycle: Heartbeat, healthcheck, recovery
 - EventAwareness: Runtime event observation
@@ -21,6 +22,7 @@ from .runtime_awareness import RuntimeAwareness
 from .task_intent_analyzer import TaskIntentAnalyzer
 from .context_distiller import ContextDistiller
 from .continuity_memory import ContinuityMemory
+from .chat_log import ChatLog, get_chat_log
 from .observer_session import ObserverSession
 from .observer_lifecycle import ObserverLifecycle
 from .event_awareness import EventAwareness, EventType
@@ -30,9 +32,10 @@ __all__ = [
     "ObserverState",
     "RuntimeAwareness",
     "TaskIntentAnalyzer",
-
     "ContextDistiller",
     "ContinuityMemory",
+    "ChatLog",
+    "get_chat_log",
     "ObserverSession",
     "ObserverLifecycle",
     "EventAwareness",

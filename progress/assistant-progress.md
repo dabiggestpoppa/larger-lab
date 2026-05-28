@@ -16,7 +16,7 @@
 | O-2 | 10/10 | 7/7 | needs alignment | PM2 | ✅ Complete |
 | O-3 | 10/10 | 8/8 | needs alignment | OC2 | ✅ Complete |
 | O-4 | 11/11 | 9/9 | 14/14 | AS+RL+OC2 | ✅ Complete |
-| O-5 | 0/12 | 0/12 | 0 | CC | ⏳ In Progress (CC leading) |
+| O-5 | 0/12 | 12/12 | 0 | CC | 🔄 In Progress (CC leading) |
 | O-6 | 0/11 | 0/8 | 0 | PM | ⏳ Planned |
 | O-7 | 0/12 | 0/9 | 0 | AS | ⏳ Planned |
 

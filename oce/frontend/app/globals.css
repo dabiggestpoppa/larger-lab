@@ -97,3 +97,11 @@ textarea {
   background: none;
   padding: 0;
 }
+
+/* Card component */
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  padding: 16px;
+}

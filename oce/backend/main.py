@@ -172,7 +172,7 @@ async def continuity_chat(request: ContinuityChatRequest):
         result = await adapter.process_continuity_message(request.message, request.context)
         return {
             "response": result.get("response", "No response"),
-            "session_id": request.session_id or "new_session",
+            "session_id": result.get("session_id", request.session_id or "new_session"),
             "continuity_preserved": True,
             "observer": result.get("observer", {}),
             "system": result.get("system", {}),
@@ -181,6 +181,84 @@ async def continuity_chat(request: ContinuityChatRequest):
     except Exception as e:
         logger.error(f"Chat error: {e}")
         raise HTTPException(status_code=503, detail=f"Continuity service unavailable: {str(e)}")
+
+
+# ─── Chat Log Endpoints ──────────────────────────────────────────────────────
+
+@app.get("/chat/sessions")
+async def get_chat_sessions():
+    """List all chat sessions with recent messages."""
+    try:
+        from core.observer.chat_log import get_chat_log
+        chat_log = get_chat_log()
+        data = chat_log.to_dict()
+        sessions = []
+        for sid, s in data.get("sessions", {}).items():
+            sessions.append({
+                "session_id": s["session_id"],
+                "start_time": s["start_time"],
+                "last_active": s["last_active"],
+                "message_count": s["message_count"],
+                "user_message_count": s.get("user_message_count", 0),
+                "assistant_message_count": s.get("assistant_message_count", 0),
+                "recent_messages": s.get("messages", [])[-5:],
+            })
+        # Sort by last_active descending
+        sessions.sort(key=lambda x: x.get("last_active", ""), reverse=True)
+        return {
+            "sessions": sessions,
+            "active_session": data.get("current_session_id"),
+        }
+    except Exception as e:
+        logger.error(f"Chat sessions error: {e}")
+        raise HTTPException(status_code=503, detail=f"Chat log unavailable: {str(e)}")
+
+
+@app.get("/chat/history/{session_id}")
+async def get_chat_history(session_id: str):
+    """Get full conversation history for a session."""
+    try:
+        from core.observer.chat_log import get_chat_log
+        chat_log = get_chat_log()
+        messages = chat_log.get_session_messages(session_id)
+        summary = chat_log.get_session_summary(session_id)
+        return {
+            "session": summary,
+            "messages": messages,
+        }
+    except Exception as e:
+        logger.error(f"Chat history error: {e}")
+        raise HTTPException(status_code=503, detail=f"Chat log unavailable: {str(e)}")
+
+
+@app.get("/chat/recent")
+async def get_recent_messages(limit: int = Query(50, ge=1, le=200)):
+    """Get recent messages across all sessions."""
+    try:
+        from core.observer.chat_log import get_chat_log
+        chat_log = get_chat_log()
+        messages = chat_log.get_recent_messages(limit=limit)
+        return {"messages": messages}
+    except Exception as e:
+        logger.error(f"Chat recent error: {e}")
+        raise HTTPException(status_code=503, detail=f"Chat log unavailable: {str(e)}")
+
+
+@app.get("/chat/search")
+async def search_chat_history(q: str = Query(..., min_length=1, max_length=200)):
+    """Search chat history by content."""
+    try:
+        from core.observer.chat_log import get_chat_log
+        chat_log = get_chat_log()
+        results = chat_log.search_messages(query=q)
+        return {
+            "query": q,
+            "results": results,
+            "count": len(results),
+        }
+    except Exception as e:
+        logger.error(f"Chat search error: {e}")
+        raise HTTPException(status_code=503, detail=f"Chat log unavailable: {str(e)}")
 
 
 @app.get("/observers", response_model=List[ObserverStatus])
@@ -885,6 +963,10 @@ register_topology_endpoints(app)
 
 # Register V3 Phase 4 Sovereign endpoints
 register_sovereign_endpoints(app)
+
+# Register O-6 Substrate endpoints
+from .substrate_api import register_substrate_endpoints
+register_substrate_endpoints(app)
 
 app.include_router(command_center_router)
 

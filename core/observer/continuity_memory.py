@@ -68,7 +68,6 @@ class ContinuityMemory:
         self._record = self._load()
 
     @classmethod
-    @classmethod
     def reset_instance(cls) -> None:
         """Reset the singleton instance (for testing)."""
         # Delete persistence file

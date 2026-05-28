@@ -1,6 +1,6 @@
 "use client";
 
-import { useTopologyStore } from "../../stores/topologyStore";
+import { useTopologyStore } from "@/stores/topologyStore";
 
 export default function RepairPage() {
   const { nodes, edges } = useTopologyStore();
