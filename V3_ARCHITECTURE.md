@@ -1,5 +1,7 @@
 # V3 Cognitive Field System — Architecture Documentation
 
+> **Last Updated:** 2026-05-27 | **V3 Phases:** 10 Complete | **Observer Core:** O-1 through O-4 Complete
+
 ## Executive Summary
 
 V3 is a **cognitive field system** that replaces traditional event→handler architectures with signal field→resonance→observer entrainment→execution emergence. This is NOT an agent framework — it's a new computational paradigm.
@@ -318,6 +320,9 @@ GET /api/stability/continuity
 |------|---------|
 | `oce/backend/field_core/` | Phase 9 core modules |
 | `oce/backend/phase10/` | Phase 10 compute modules |
+| `core/learning/` | Observer Core O-4 Field Learning modules |
+| `core/spawn/` | Observer Core O-3 Spawn Engine modules |
+| `core/observer/` | Observer Core O-1 Primary Observer modules |
 | `tools/testing/long_horizon/` | Phase 11 test infrastructure |
 | `tools/testing/chaos/` | Chaos engineering tools |
 | `stability/` | Stability database and reports |
