@@ -7,6 +7,22 @@
 
 ---
 
+## 📊 Observer Core — Overall Status (2026-05-27 17:00 UTC)
+
+| Phase | Name | Backend | Frontend | Tests | Status |
+|-------|------|---------|----------|-------|--------|
+| O-1 | Primary Observer Core | ✅ 9/9 | ✅ 10/10 | ✅ 42/42 | COMPLETE |
+| O-2 | Observer Consensus | ✅ 10/10 | ✅ 7/7 | ⏳ needs alignment | COMPLETE |
+| O-3 | Spawn Engine | ✅ 10/10 | ✅ 8/8 | ⏳ needs alignment | COMPLETE |
+| O-4 | Field Learning | ✅ 11/11 | ✅ 9/9 | ✅ 14/14 | COMPLETE |
+| O-5 | OCE Unified Frontend | ⏳ Planned | ⏳ Planned | — | NEXT (CC) |
+| O-6 | Local Substrate | ⏳ Planned | ⏳ Planned | — | Planned (PM) |
+| O-7 | Persistent Field | ⏳ Planned | ⏳ Planned | — | Planned (AS) |
+
+**Total Tests: 56 passing** (42 O-1 + 14 O-4)
+
+---
+
 ## [OC2] 2026-05-26 13:00 UTC - Phase 11 Real Data Tests Complete
 
 ### Test Results Summary
