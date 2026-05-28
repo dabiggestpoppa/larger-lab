@@ -2,45 +2,64 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useUIStore } from "@/stores/uiStore";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/tasks", label: "Tasks" },
-  { href: "/agents", label: "Agents" },
-  { href: "/consensus", label: "Consensus" },
-  { href: "/chaos", label: "Chaos" },
-  { href: "/settings", label: "Settings" },
+  { href: "/agents", label: "Agents", icon: "◉" },
+  { href: "/topology", label: "Topology", icon: "▦" },
+  { href: "/entropy", label: "Entropy", icon: "◎" },
+  { href: "/repair", label: "Repair", icon: "◈" },
 ];
 
 export default function TopNav() {
   const pathname = usePathname();
+  const { activeLayer, setActiveLayer } = useUIStore();
 
   return (
-    <nav className="h-12 bg-bg-secondary border-b border-border-light flex items-center px-4 gap-1 shrink-0">
-      <Link href="/dashboard" className="text-sm font-semibold text-accent-primary mr-4 no-underline">
-        OCE
-      </Link>
-      {navItems.map((item) => {
-        const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`text-xs px-3 py-1.5 rounded-md no-underline transition-colors ${
-              isActive
-                ? "bg-[#133EBF]/10 text-accent-primary font-medium"
-                : "text-text-secondary hover:bg-gray-100 hover:text-text-primary"
-            }`}
-          >
-            {item.label}
-          </Link>
-        );
-      })}
-      <div className="flex-1" />
-      <div className="flex items-center gap-2">
-        <span className="badge badge-success">● Live</span>
-        <span className="text-xs text-text-muted">:3000</span>
+    <header className="h-12 bg-[var(--bg-secondary)] border-b border-[var(--border-default)] flex items-center justify-between px-4 shrink-0">
+      <div className="flex items-center gap-6">
+        <span className="text-xs font-mono font-bold text-[var(--text-primary)]">
+          OCE
+        </span>
+        <nav className="flex items-center gap-4">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-2 text-xs font-mono transition-colors ${
+                  isActive
+                    ? "text-[var(--accent-primary)]"
+                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                }`}
+              >
+                <span className="text-[10px]">{item.icon}</span>
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
       </div>
-    </nav>
+
+      <div className="flex items-center gap-3">
+        <span className="text-[10px] font-mono text-[var(--text-muted)]">Layer:</span>
+        <div className="flex items-center gap-1">
+          {(["layer1", "layer2", "layer3"] as const).map((layer) => (
+            <button
+              key={layer}
+              onClick={() => setActiveLayer(layer)}
+              className={`px-2 py-0.5 text-[10px] font-mono rounded border ${
+                activeLayer === layer
+                  ? "bg-[var(--accent-primary)] text-white border-[var(--accent-primary)]"
+                  : "bg-[var(--bg-tertiary)] text-[var(--text-secondary)] border-[var(--border-default)]"
+              }`}
+            >
+              {layer === "layer1" ? "1" : layer === "layer2" ? "2" : "3"}
+            </button>
+          ))}
+        </div>
+      </div>
+    </header>
   );
 }

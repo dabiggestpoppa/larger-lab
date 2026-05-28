@@ -9,11 +9,12 @@ Provides endpoints for:
 - Event stream access
 - Attractor panel data
 - Memory view
+- Browser control proxy (OC2 sidecar)
 """
 
 from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone
@@ -21,6 +22,7 @@ import asyncio
 import json
 import logging
 import traceback
+import httpx
 
 logger = logging.getLogger("oce")
 
@@ -1433,6 +1435,58 @@ async def get_observer_health():
     except Exception as e:
         logger.error(f"Observer health error: {e}")
         raise HTTPException(status_code=503, detail=str(e))
+
+
+# ─── Browser Control Proxy (OC2 Sidecar) ─────────────────────────────────────
+
+OC2_BROWSER_URL = "http://127.0.0.1:18792"
+OC2_BROWSER_TOKEN = "oc2-68cdb0729953cce1aecaf09a9dffddac574c9a674f46aa77"
+
+
+@app.get("/browser")
+async def browser_proxy_get(path: str = ""):
+    """Proxy GET requests to OC2 browser control sidecar."""
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            url = f"{OC2_BROWSER_URL}/{path}" if path else OC2_BROWSER_URL
+            resp = await client.get(
+                url,
+                headers={"Authorization": OC2_BROWSER_TOKEN},
+            )
+            return JSONResponse(content=resp.json(), status_code=resp.status_code)
+    except Exception as e:
+        logger.error(f"Browser proxy GET error: {e}")
+        raise HTTPException(status_code=503, detail=f"Browser control unavailable: {str(e)}")
+
+
+@app.post("/browser")
+async def browser_proxy_post(request: dict):
+    """Proxy POST requests to OC2 browser control sidecar."""
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(
+                OC2_BROWSER_URL,
+                json=request,
+                headers={"Authorization": OC2_BROWSER_TOKEN},
+            )
+            return JSONResponse(content=resp.json(), status_code=resp.status_code)
+    except Exception as e:
+        logger.error(f"Browser proxy POST error: {e}")
+        raise HTTPException(status_code=503, detail=f"Browser control unavailable: {str(e)}")
+
+
+@app.get("/browser/status")
+async def browser_status():
+    """Check OC2 browser control sidecar status."""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(
+                f"{OC2_BROWSER_URL}/status",
+                headers={"Authorization": OC2_BROWSER_TOKEN},
+            )
+            return {"status": "available", "response": resp.json()}
+    except Exception as e:
+        return {"status": "unavailable", "error": str(e)}
 
 
 if __name__ == "__main__":

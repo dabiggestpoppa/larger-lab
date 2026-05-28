@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
-import { useTaskStore } from "@/stores/taskStore";
-import { useAgentStore } from "@/stores/agentStore";
-import { useSessionStore } from "@/stores/sessionStore";
+import { useTopologyStore } from "@/stores/topologyStore";
+import { useEntropyStore } from "@/stores/entropyStore";
+import { useRepairStore } from "@/stores/repairStore";
+import { useContinuityStore } from "@/stores/continuityStore";
 import { useUIStore } from "@/stores/uiStore";
 
 type WSMessage = {
@@ -17,54 +18,77 @@ export default function LiveDataProvider() {
   const reconnectCount = useRef(0);
   const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isMounted = useRef(true);
+  const pollTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const setAgents = useAgentStore((s) => s.setAgents);
-  const setTasks = useTaskStore((s) => s.setTasks);
-  const setSessions = useSessionStore((s) => s.setSessions);
+  const setNodes = useTopologyStore((s) => s.setNodes);
+  const setEdges = useTopologyStore((s) => s.setEdges);
+  const updateEntropy = useEntropyStore((s) => s.updateFromFrame);
+  const addRepair = useRepairStore((s) => s.addRepair);
+  const addCheckpoint = useContinuityStore((s) => s.addCheckpoint);
   const setConnectionStatus = useUIStore((s) => s.setConnectionStatus);
-  const addNotification = useUIStore((s) => s.addNotification);
+
+  const fetchTopology = useCallback(async () => {
+    if (!isMounted.current) return;
+    try {
+      const res = await fetch("/api/topology");
+      const data = await res.json();
+      if (data.nodes && data.edges) {
+        setNodes(data.nodes);
+        setEdges(data.edges);
+      }
+    } catch (err) {
+      // API not available, will retry
+    }
+  }, [setNodes, setEdges]);
 
   const handleMessage = useCallback(
     (msg: WSMessage) => {
       if (!isMounted.current) return;
       switch (msg.type) {
-        case "observer_stats":
-          // Backend sends stats without observers array - just update connection status
-          setConnectionStatus("connected");
+        case "topology_update":
+          setNodes((msg.data as any).nodes);
+          setEdges((msg.data as any).edges);
           break;
-        case "event":
-          // Convert event to notification format
-          if (msg.data && typeof msg.data === "object") {
-            addNotification({
-              type: "info",
-              message: (msg.data as any).event_type || "System event",
-            });
-          }
+        case "entropy_update":
+          updateEntropy((msg.data as any).observerStates);
           break;
-        case "agents":
-          setAgents(msg.data as any);
+        case "repair_event":
+          addRepair({
+            id: (msg.data as any).id || `repair-${Date.now()}`,
+            source: (msg.data as any).source,
+            target: (msg.data as any).target,
+            type: "trigger",
+            timestamp: Date.now(),
+            strength: (msg.data as any).strength || 0.5,
+          });
           break;
-        case "tasks":
-          setTasks(msg.data as any);
-          break;
-        case "sessions":
-          setSessions(msg.data as any);
-          break;
-        case "notification":
-          addNotification(msg.data as any);
+        case "checkpoint":
+          addCheckpoint({
+            id: (msg.data as any).id || `cp-${Date.now()}`,
+            timestamp: (msg.data as any).timestamp || new Date().toISOString(),
+            status: (msg.data as any).status || "PASS",
+            drift_score: (msg.data as any).drift_score || 0,
+            observer_health: (msg.data as any).observer_health || { alive: 0, degraded: 0, dead: 0 },
+            elapsed_hours: (msg.data as any).elapsed_hours || 0,
+          });
           break;
       }
     },
-    [setAgents, setTasks, setSessions, addNotification]
+    [setNodes, setEdges, updateEntropy, addRepair, addCheckpoint]
   );
 
   useEffect(() => {
     isMounted.current = true;
+    setConnectionStatus("connecting");
 
+    // Initial fetch
+    fetchTopology();
+
+    // Try WebSocket first
     const connect = () => {
       if (!isMounted.current) return;
       try {
-        const ws = new WebSocket("ws://localhost:8000/ws/observers");
+        const ws = new WebSocket("ws://localhost:8001/ws");
 
         ws.onopen = () => {
           reconnectCount.current = 0;
@@ -81,7 +105,6 @@ export default function LiveDataProvider() {
         };
 
         ws.onclose = () => {
-          setConnectionStatus("disconnected");
           if (isMounted.current && reconnectCount.current < 10) {
             reconnectTimer.current = setTimeout(() => {
               reconnectCount.current++;
@@ -92,11 +115,17 @@ export default function LiveDataProvider() {
 
         ws.onerror = () => {
           setConnectionStatus("error");
+          if (pollTimer.current === null) {
+            pollTimer.current = setInterval(fetchTopology, 5000);
+          }
         };
 
         wsRef.current = ws;
       } catch {
         setConnectionStatus("error");
+        if (pollTimer.current === null) {
+          pollTimer.current = setInterval(fetchTopology, 5000);
+        }
       }
     };
 
@@ -104,10 +133,11 @@ export default function LiveDataProvider() {
 
     return () => {
       isMounted.current = false;
+      if (wsRef.current) wsRef.current.close();
       if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
-      wsRef.current?.close();
+      if (pollTimer.current) clearInterval(pollTimer.current);
     };
-  }, [handleMessage, setConnectionStatus]);
+  }, [fetchTopology, handleMessage, setConnectionStatus]);
 
   return null;
 }
