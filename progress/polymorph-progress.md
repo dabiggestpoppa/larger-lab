@@ -7,7 +7,20 @@
 
 ---
 
-## Status: 🟢 V3 PHASES 1-10 COMPLETE — STANDBY
+## Status: 🟢 CHAT LOG SYSTEM COMPLETE — STANDBY
+
+### Chat Log System (2026-05-28)
+- [x] Added `/chat/sessions`, `/chat/history/{id}`, `/chat/recent`, `/chat/search` API endpoints to `oce/backend/main.py`
+- [x] Wired `ChatLog` into `srrs_adapter.process_continuity_message` — logs user + observer messages with metadata
+- [x] Created frontend `chatStore.ts` (Zustand) — session management, message history, search
+- [x] Created `/chat` page — session list sidebar, message bubbles, input area, typing indicator
+- [x] Added Chat nav link to TopNav
+- [x] Backend imports verified, frontend TypeScript compiles cleanly
+- [x] Functional test passed: session creation, message add/history/search
+- [x] Committed: `89c3c498c`
+
+### Previous Status
+**V3 Phases 1-10 — ALL COMPLETE** (1460 tests passing)
 
 ### Current Phase
 **V3 Phases 1-10 — ALL COMPLETE** (1460 tests passing)
