@@ -44,6 +44,32 @@ V3 is a **cognitive field system** that replaces traditional event→handler arc
 
 ## 2. Architecture Layers
 
+### V3 Phase Flow
+
+```mermaid
+graph LR
+    P1[Phase 1<br/>RSS<br/>7 modules] --> P2[Phase 2<br/>RCM<br/>6 modules]
+    P2 --> P3[Phase 3<br/>RT&BSP<br/>7 modules]
+    P3 --> P4[Phase 4<br/>SIE<br/>8 modules]
+    P4 --> P5[Phase 5<br/>LHCTC<br/>8 modules]
+    P5 --> P6[Phase 6<br/>RTI<br/>4 modules]
+    P6 --> P7[Phase 7<br/>MSCF<br/>7 modules]
+    P7 --> P8[Phase 8<br/>OC<br/>8 modules]
+    P8 --> P9[Phase 9<br/>SFE<br/>6 modules]
+    P9 --> P10[Phase 10<br/>RFC<br/>5 modules]
+
+    style P1 fill:#3498db,color:#fff
+    style P2 fill:#2ecc71,color:#fff
+    style P3 fill:#9b59b6,color:#fff
+    style P4 fill:#e74c3c,color:#fff
+    style P5 fill:#f39c12,color:#fff
+    style P6 fill:#1abc9c,color:#fff
+    style P7 fill:#34495e,color:#fff
+    style P8 fill:#e67e22,color:#fff
+    style P9 fill:#2c3e50,color:#fff
+    style P10 fill:#8e44ad,color:#fff
+```
+
 ### 2.1 Resonant Signal Substrate (Phase 1)
 **Purpose:** Foundation layer for signal propagation
 
@@ -156,6 +182,26 @@ V3 is a **cognitive field system** that replaces traditional event→handler arc
 - `AttractorComputeEngine` — Computation via attractors
 
 **Key Innovation:** Computation IS field dynamics
+
+### Observer Core Phase Flow
+
+```mermaid
+graph LR
+    O1[O-1<br/>Primary Observer<br/>9/9 backend] --> O2[O-2<br/>Observer Consensus<br/>10/10 backend]
+    O2 --> O3[O-3<br/>Spawn Engine<br/>10/10 backend]
+    O3 --> O4[O-4<br/>Field Learning<br/>11/11 backend]
+    O4 --> O5[O-5<br/>OCE Unified<br/>Planned]
+    O5 --> O6[O-6<br/>Local Substrate<br/>Planned]
+    O6 --> O7[O-7<br/>Persistent Field<br/>Planned]
+
+    style O1 fill:#3498db,color:#fff
+    style O2 fill:#2ecc71,color:#fff
+    style O3 fill:#9b59b6,color:#fff
+    style O4 fill:#e74c3c,color:#fff
+    style O5 fill:#f39c12,color:#fff
+    style O6 fill:#1abc9c,color:#fff
+    style O7 fill:#34495e,color:#fff
+```
 
 ---
 
