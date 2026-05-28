@@ -2,7 +2,8 @@
 
 > **Purpose:** Step-by-step guide to the entire Larger-Lab system. What each part does, how they connect, and why.
 > **Audience:** Any agent or developer who needs to understand, modify, or extend the system.
-> **Last Updated:** 2026-05-18
+> **Last Updated:** 2026-05-27
+> **Status:** V3 All 10 Phases Complete | Observer Core O-1 through O-4 Complete
 
 ---
 
@@ -12,6 +13,7 @@
 2. [The Five Architecture Levels](#2-the-five-architecture-levels)
 3. [SRRA-OPH — The Substrate](#3-srra-oph--the-substrate)
 4. [OCE V3 — The Cognitive Field](#4-oce-v3--the-cognitive-field)
+4.5. [Observer Core — O-1 through O-7](#45-observer-core--o-1-through-o-7)
 5. [Agent Network — Who Does What](#5-agent-network--who-does-what)
 6. [Memory Architecture — How State Persists](#6-memory-architecture--how-state-persists)
 7. [Data Pipeline — From Market Data to Decisions](#7-data-pipeline--from-market-data-to-decisions)
@@ -356,6 +358,127 @@ OCE V3 (Operator Continuity Engine, Version 3) is the **computational core** —
 - `ace.py` — AttractorComputeEngine + AttractorSolution (4 tests)
 
 **Key concept:** The field doesn't just compute once — it **iterates toward convergence**, with each iteration refining the result.
+
+---
+
+## 4.5 Observer Core (O-1 through O-7)
+
+### What It Is
+
+Observer Core is the **practical observer implementation** that builds on the V3 cognitive field. It implements the observer lifecycle: core foundation, consensus building, spawning, learning, unified frontend, local substrate, and persistent field.
+
+### Observer Core Phases
+
+```mermaid
+graph LR
+    O1[O-1<br/>Primary Observer<br/>9/9 backend] --> O2[O-2<br/>Observer Consensus<br/>10/10 backend]
+    O2 --> O3[O-3<br/>Spawn Engine<br/>10/10 backend]
+    O3 --> O4[O-4<br/>Field Learning<br/>11/11 backend]
+    O4 --> O5[O-5<br/>OCE Unified<br/>Planned]
+    O5 --> O6[O-6<br/>Local Substrate<br/>Planned]
+    O6 --> O7[O-7<br/>Persistent Field<br/>Planned]
+
+    style O1 fill:#3498db,color:#fff
+    style O2 fill:#2ecc71,color:#fff
+    style O3 fill:#9b59b6,color:#fff
+    style O4 fill:#e74c3c,color:#fff
+    style O5 fill:#f39c12,color:#fff
+    style O6 fill:#1abc9c,color:#fff
+    style O7 fill:#34495e,color:#fff
+```
+
+### Phase-by-Phase Guide
+
+#### O-1: Primary Observer Core
+
+**Purpose:** Core observer infrastructure with bounded patches
+
+**Backend Modules (9):**
+- `observer.py` — PrimaryObserver class
+- `patches.py` — PlannerPatch, ExecutionPatch, MemoryPatch, RepairPatch
+- `state.py` — ObserverState management
+- `health.py` — HealthMonitor
+- `registry.py` — ObserverRegistry
+- `lifecycle.py` — ObserverLifecycle state machine
+- `consensus.py` — ConsensusEngine
+- `routing.py` — RoutingEngine
+- `context.py` — ContextManager
+
+**Frontend Components (10):**
+- ObserverDashboard, ObserverStatePanel, ObserverHealthView, ObserverRegistryView, ObserverLifecycleControls, ObserverConsensusPanel, ObserverRoutingMap, SpawnBlueprintView, ObserverSpecializationMap, ConsensusReplayPanel
+
+**Tests:** 42/42 passing
+
+#### O-2: Observer Consensus
+
+**Purpose:** Multi-observer consensus and routing decisions
+
+**Backend Modules (10):**
+- `consensus_engine.py` — ConsensusEngine
+- `routing_matrix.py` — RoutingMatrix
+- `spawn_blueprint.py` — SpawnBlueprint
+- `specialization_map.py` — SpecializationMap
+- `capability_inspector.py` — CapabilityInspector
+- `consensus_store.py` — ConsensusStore
+- `routing_store.py` — RoutingStore
+- `blueprint_store.py` — BlueprintStore
+- `specialization_store.py` — SpecializationStore
+- `replay_store.py` — ReplayStore
+
+**Frontend Components (7):**
+- ConsensusPanel, RoutingMap, SpawnBlueprintView, ObserverSpecializationMap, ConsensusReplayPanel, CapabilityInspector, consensusStore
+
+**Tests:** needs alignment
+
+#### O-3: Spawn Engine
+
+**Purpose:** Agent spawning and lifecycle management
+
+**Backend Modules (10):**
+- `agent_spawner.py` — AgentSpawner
+- `spawn_blueprint.py` — SpawnBlueprint
+- `context_injector.py` — ContextInjector
+- `openrouter_gateway.py` — OpenRouterGateway
+- `agent_lifecycle.py` — AgentLifecycle
+- `execution_boundary.py` — ExecutionBoundary
+- `multi_agent_coordinator.py` — MultiAgentCoordinator
+- `trace_feedback.py` — TraceFeedback
+- `spawn_replay.py` — SpawnReplay
+- `spawn_registry.py` — SpawnRegistry
+
+**Frontend Components (8):**
+- SpawnPanel, ContextInjectorPanel, LifecyclePanel, BoundaryPanel, CoordinatorPanel, FeedbackPanel, ReplayPanel, RegistryPanel
+
+**Tests:** needs alignment
+
+#### O-4: Field Learning
+
+**Purpose:** Learning from operational history to improve future performance
+
+**Backend Modules (11):**
+- `trace_collector.py` — TraceCollector, ExecutionTrace
+- `operational_replay.py` — OperationalReplay, ReplayEvent
+- `workflow_distiller.py` — WorkflowDistiller, WorkflowPattern, TraceEntry
+- `routing_learning.py` — RoutingLearning, RoutingPattern
+- `failure_analyzer.py` — FailureAnalyzer, FailurePattern
+- `topology_learning.py` — TopologyLearning, TopologySnapshot
+- `observer_evolution.py` — ObserverEvolution, EvolutionRecord
+- `pattern_memory.py` — PatternMemory, StoredPattern
+- `workflow_memory.py` — WorkflowMemory, WorkflowEntry
+- `operational_scoring.py` — OperationalScoring, ScoreEntry
+- `adaptation_engine.py` — AdaptationEngine, AdaptationAction
+
+**Frontend Components (9):**
+- LearningDashboard, TraceViewer, PatternExplorer, ScoringPanel, AdaptationControls, EvolutionTracker, MemoryBrowser, ReplayConsole, StatsPanel
+
+**Tests:** 14/14 passing
+
+### Key Design Decisions
+
+- **Learning from history:** Observers analyze past performance to improve future decisions
+- **Controlled adaptation:** Changes are bounded and gradual, not abrupt
+- **Pattern extraction:** Stable patterns are extracted and stored for reuse
+- **Failure analysis:** Failures are categorized and used to prevent recurrence
 
 ---
 
