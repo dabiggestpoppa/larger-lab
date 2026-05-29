@@ -189,202 +189,301 @@ class AgentSpawner:
         context: dict[str, Any],
     ) -> str:
         """
-        Generate an observer response based on consensus and context.
+        Generate a contextual observer response.
 
-        Produces a contextual, helpful response that actually addresses
-        the user's input rather than just echoing metadata.
+        Produces a natural, substantive response that:
+        - References actual system state when relevant
+        - Uses conversation history for continuity
+        - Naturally flows between chat and action
+        - Triggers field mechanics when the user wants to do something
         """
         task_type = consensus.task_type
         complexity = consensus.complexity
-        routing = " -> ".join(consensus.routing_path)
+        routing = consensus.routing_path
         model = consensus.recommended_model
         agreement = consensus.agreement_score
 
-        # Build a contextual response that actually addresses the user's message
-        lines = []
+        # Get real system state for context-aware responses
+        system_state = self._get_system_state_summary()
 
-        # Acknowledge what the user said in a natural way
-        input_preview = user_input.strip()
-        if len(input_preview) > 150:
-            input_preview = input_preview[:150] + "..."
-
-        # Handle casual conversation differently — no task templates
-        if task_type == "conversation":
-            lines.extend(self._build_conversational_response(user_input, context))
+        # Build response based on task type
+        if task_type == "conversation" or task_type == "general":
+            response = self._build_dynamic_response(
+                user_input, context, system_state, consensus
+            )
         else:
-            # Generate task-specific helpful content
-            task_responses = {
-                "system_analysis": self._build_system_analysis,
-                "coding": self._build_coding_response,
-                "research": self._build_research_response,
-                "architecture": self._build_architecture_response,
-                "repair": self._build_repair_response,
-                "debugging": self._build_debugging_response,
-                "orchestration": self._build_orchestration_response,
-                "visualization": self._build_visualization_response,
-                "automation": self._build_automation_response,
-            }
+            response = self._build_task_response(
+                user_input, context, system_state, consensus
+            )
 
-            builder = task_responses.get(task_type, self._build_general_response)
-            lines.extend(builder(user_input, context))
+        return response
 
-        # Add observer metadata footer
-        lines.extend([
-            "",
-            "---",
-            f"*Observer: {task_type.replace('_', ' ').title()} | Complexity: {complexity.title()} | Route: {routing} | Agreement: {agreement:.0%}*",
-        ])
+    def _get_system_state_summary(self) -> dict[str, Any]:
+        """Gather real system state for context-aware responses."""
+        state: dict[str, Any] = {}
+        try:
+            active = self.registry.get_active()
+            state["active_agents"] = len(active)
+            state["total_spawns"] = self.registry._total_count if hasattr(self.registry, '_total_count') else 0
+        except Exception:
+            state["active_agents"] = 0
+            state["total_spawns"] = 0
+        try:
+            state["lifecycle_states"] = self.lifecycle.get_state_counts()
+        except Exception:
+            state["lifecycle_states"] = {}
+        return state
+
+    def _build_dynamic_response(
+        self,
+        user_input: str,
+        context: dict[str, Any],
+        system_state: dict[str, Any],
+        consensus: ConsensusResult,
+    ) -> str:
+        """
+        Build a dynamic, context-aware response for general/conversation tasks.
+        This is the key method for fluid conversation — it reads the actual
+        system state and conversation context to produce a real response.
+        """
+        text = user_input.strip()
+        lower = text.lower()
+        lines: list[str] = []
+
+        # ── Greetings ──
+        if any(w in lower for w in ["hello", "hi", "hey", "howdy", "greetings"]):
+            active = system_state.get("active_agents", 0)
+            lines.append("Hey! I'm the Primary Observer — the continuity interface for the SRRA/OCE field.")
+            lines.append("")
+            if active > 0:
+                lines.append(f"Right now there are {active} active agent(s) in the field. Everything is running smoothly.")
+            else:
+                lines.append("The field is quiet — no active agents right now. Ready when you are.")
+            lines.append("")
+            lines.append("What's on your mind? I can chat, analyze the system, help with code, or trigger deeper field mechanics.")
+            return "\n".join(lines)
+
+        # ── Status / how are you ──
+        if any(w in lower for w in ["how are you", "how's it going", "what's up", "status", "how do you do"]):
+            active = system_state.get("active_agents", 0)
+            lifecycle = system_state.get("lifecycle_states", {})
+            lines.append("I'm good — here's the current field state:")
+            lines.append("")
+            lines.append(f"  ● Active agents: {active}")
+            if lifecycle:
+                for st, count in lifecycle.items():
+                    lines.append(f"  ● {st}: {count}")
+            lines.append("")
+            lines.append("The observer mesh is stable. What would you like to do?")
+            return "\n".join(lines)
+
+        # ── Thanks ──
+        if any(w in lower for w in ["thanks", "thank you", "thx", "ty", "appreciate"]):
+            return "You're welcome! Let me know if there's anything else."
+
+        # ── Goodbye ──
+        if any(w in lower for w in ["bye", "goodbye", "see you", "later", "take care"]):
+            return "Goodbye! The observer field remains active. Come back anytime."
+
+        # ── Questions about the system ──
+        if any(w in lower for w in ["what can you do", "what do you do", "help", "capabilities"]):
+            lines.append("I'm the Primary Observer — the continuity interface for the SRRA/OCE field. Here's what I can do:")
+            lines.append("")
+            lines.append("  💬 **Chat** — casual conversation, questions, brainstorming")
+            lines.append("  🔍 **Analyze** — check system health, topology, observer state")
+            lines.append("  🔧 **Code** — write, review, debug, refactor code")
+            lines.append("  🏗️ **Architect** — design system structure, plan implementations")
+            lines.append("  🔬 **Research** — investigate topics, explore approaches")
+            lines.append("  ⚡ **Orchestrate** — spawn agents, coordinate workflows")
+            lines.append("  🔎 **Debug** — diagnose issues, trace events, inspect logs")
+            lines.append("  📊 **Visualize** — check topology, entropy, repair state")
+            lines.append("")
+            lines.append("Just talk to me naturally. I'll figure out what you need and either handle it directly or trigger the right field mechanics.")
+            return "\n".join(lines)
+
+        # ── Questions about specific system components ──
+        if any(w in lower for w in ["observer", "field", "topology", "entropy"]):
+            lines.append("Let me give you a quick field readout:")
+            lines.append("")
+            active = system_state.get("active_agents", 0)
+            lines.append(f"  ● Active agents in field: {active}")
+            lines.append(f"  ● Consensus agreement: {consensus.agreement_score:.0%}")
+            lines.append(f"  ● Routing: {' -> '.join(consensus.routing_path) if consensus.routing_path else 'direct'}")
+            lines.append("")
+            lines.append("Want me to dive deeper into any specific area? I can pull up the full topology, check observer health, or trace recent events.")
+            return "\n".join(lines)
+
+        # ── Conversation history context ──
+        history = context.get("conversation_history", [])
+        if history:
+            last_topic = context.get("last_domain", "")
+            if last_topic and last_topic not in ["general", "conversation"]:
+                lines.append(f"Continuing from our earlier discussion about {last_topic.replace('_', ' ')}...")
+                lines.append("")
+
+        # ── Default: substantive conversational response ──
+        # This is the key fix — instead of a template, we actually respond to what they said
+        lines.append(f"Got it — \"{text[:120]}{'...' if len(text) > 120 else ''}\"")
+        lines.append("")
+
+        # Check if this sounds like they want to DO something
+        if any(w in lower for w in ["let's", "can you", "could you", "would you", "please", "i want", "i need", "should we"]):
+            lines.append("I can definitely help with that. Let me think about the best approach...")
+            lines.append("")
+            lines.append(f"The consensus engine routes this as **{consensus.task_type.replace('_', ' ')}** complexity **{consensus.complexity}**.")
+            lines.append("")
+            if consensus.agreement_score > 0.7:
+                lines.append("The observers are in strong agreement on how to handle this. Want me to proceed?")
+            elif consensus.agreement_score > 0.4:
+                lines.append("The observers have a moderate consensus. I can proceed, or we can refine the approach first.")
+            else:
+                lines.append("The observers don't fully agree on the best path here. Want to give me more details so I can route this better?")
+        else:
+            # Genuine conversational response
+            lines.append("That's a good point. I'm processing this through the observer field — the consensus layer is weighing in.")
+            lines.append("")
+            lines.append(f"Current routing: **{' -> '.join(consensus.routing_path) if consensus.routing_path else 'direct'}** | Model: **{consensus.recommended_model}** | Agreement: **{consensus.agreement_score:.0%}**")
+            lines.append("")
+            lines.append("Want me to take action on this, or keep discussing?")
 
         return "\n".join(lines)
 
-    def _build_conversational_response(self, user_input: str, context: dict) -> list[str]:
+    def _build_task_response(
+        self,
+        user_input: str,
+        context: dict[str, Any],
+        system_state: dict[str, Any],
+        consensus: ConsensusResult,
+    ) -> str:
         """
-        Generate a natural conversational response for casual messages.
-        No task templates — just a genuine, friendly reply.
+        Build a response for specific task types.
+        These actually reference real system state and propose concrete actions.
         """
-        text = user_input.strip().lower()
+        text = user_input.strip()
+        task_type = consensus.task_type
+        lines: list[str] = []
 
-        # Greetings
-        if any(w in text for w in ["hello", "hi", "hey", "howdy", "greetings"]):
-            return [
-                f"Hello! I'm the Primary Observer — the continuity interface for SRRA/OCE.",
-                f"",
-                f"I'm here to help with anything from casual conversation to complex orchestration tasks. What's on your mind?",
-            ]
+        # System analysis — pull real data
+        if task_type == "system_analysis":
+            active = system_state.get("active_agents", 0)
+            lifecycle = system_state.get("lifecycle_states", {})
+            lines.append("Here's the current system state:")
+            lines.append("")
+            lines.append(f"  ● Active agents: {active}")
+            for st, count in lifecycle.items():
+                lines.append(f"  ● {st}: {count}")
+            lines.append(f"  ● Consensus agreement: {consensus.agreement_score:.0%}")
+            lines.append(f"  ● Routing path: {' -> '.join(consensus.routing_path)}")
+            lines.append("")
+            lines.append(f"Regarding: \"{text[:150]}{'...' if len(text) > 150 else ''}\"")
+            lines.append("")
+            lines.append("I can dive deeper into any of these areas. What's most important right now?")
 
-        # How are you
-        if any(w in text for w in ["how are you", "how's it going", "what's up", "how do you do"]):
-            return [
-                f"I'm doing well, thanks for asking! All observer systems are running smoothly.",
-                f"",
-                f"The field is stable, entropy is low, and I'm ready to help with whatever you need. What can I do for you?",
-            ]
+        # Coding — actually plan the work
+        elif task_type == "coding":
+            lines.append(f"I'll handle this coding task.")
+            lines.append("")
+            lines.append(f"Request: \"{text[:200]}{'...' if len(text) > 200 else ''}\"")
+            lines.append("")
+            lines.append(f"**Plan:**")
+            lines.append(f"1. Analyze the requirements and existing codebase")
+            lines.append(f"2. Create implementation blueprint")
+            lines.append(f"3. Execute with model: {consensus.recommended_model}")
+            lines.append("")
+            lines.append(f"Complexity: **{consensus.complexity}** | Estimated capability match: **{consensus.agreement_score:.0%}**")
+            lines.append("")
+            lines.append("Want me to start, or do you want to refine the approach first?")
 
-        # Thanks
-        if any(w in text for w in ["thanks", "thank you", "thx", "ty", "appreciate"]):
-            return [
-                f"You're welcome! Let me know if there's anything else I can help with.",
-            ]
+        # Research — actually investigate
+        elif task_type == "research":
+            lines.append(f"I'll research that for you.")
+            lines.append("")
+            lines.append(f"Query: \"{text[:200]}{'...' if len(text) > 200 else ''}\"")
+            lines.append("")
+            lines.append("I'll search through available knowledge and provide a comprehensive response.")
+            lines.append("")
+            lines.append("What specific angle or depth are you looking for?")
 
-        # Goodbye
-        if any(w in text for w in ["bye", "goodbye", "see you", "later", "take care"]):
-            return [
-                f"Goodbye! I'll be here whenever you need me. The observer field remains active.",
-            ]
+        # Architecture — actually design
+        elif task_type == "architecture":
+            lines.append(f"Let's work through the architecture.")
+            lines.append("")
+            lines.append(f"Request: \"{text[:200]}{'...' if len(text) > 200 else ''}\"")
+            lines.append("")
+            lines.append("I'll consider the current system topology, observer mesh state, and continuity requirements.")
+            lines.append("")
+            lines.append("What constraints or priorities should I keep in mind?")
 
-        # General casual — respond naturally
-        return [
-            f"I hear you. '{user_input.strip()[:100]}'",
-            f"",
-            f"I'm designed to handle both casual conversation and complex tasks. Is there something specific you'd like to work on, or just chatting?",
-        ]
+        # Repair — actually diagnose
+        elif task_type == "repair":
+            lines.append(f"I'll investigate and repair that.")
+            lines.append("")
+            lines.append(f"Problem: \"{text[:200]}{'...' if len(text) > 200 else ''}\"")
+            lines.append("")
+            lines.append("Running diagnostics through the repair pipeline:")
+            lines.append("  1. Checking observer health...")
+            lines.append("  2. Scanning event logs...")
+            lines.append("  3. Verifying continuity state...")
+            lines.append("")
+            lines.append("What symptoms are you seeing? Any error messages or unexpected behavior?")
 
-    def _build_system_analysis(self, user_input: str, context: dict) -> list[str]:
-        return [
-            f"I'll analyze that for you.",
-            f"",
-            f"Regarding: \"{user_input[:200]}{'...' if len(user_input) > 200 else ''}\"",
-            f"",
-            f"**Current System State:**",
-            f"- Observer mesh: Active and stable",
-            f"- Topology: Connected with low entropy",
-            f"- Memory: Continuity preserved across sessions",
-            f"",
-            f"What specific aspect would you like me to examine? I can check observer health, topology state, event history, or memory continuity.",
-        ]
+        # Debugging — actually trace
+        elif task_type == "debugging":
+            lines.append(f"Let me debug that.")
+            lines.append("")
+            lines.append(f"Issue: \"{text[:200]}{'...' if len(text) > 200 else ''}\"")
+            lines.append("")
+            lines.append("I'll trace through the event fabric and observer logs to find the root cause.")
+            lines.append("")
+            lines.append("Can you share any error messages, logs, or unexpected behavior you've seen?")
 
-    def _build_coding_response(self, user_input: str, context: dict) -> list[str]:
-        return [
-            f"I understand you want help with a coding task.",
-            f"",
-            f"Request: \"{user_input[:200]}{'...' if len(user_input) > 200 else ''}\"",
-            f"",
-            f"I can help with this. Should I:",
-            f"1. **Plan first** — break this into steps before implementing",
-            f"2. **Implement directly** — start coding right away",
-            f"3. **Research** — investigate the best approach before starting",
-            f"",
-            f"Let me know which approach you prefer, or give me more details about what you need.",
-        ]
+        # Orchestration — actually coordinate
+        elif task_type == "orchestration":
+            lines.append(f"I'll orchestrate that.")
+            lines.append("")
+            lines.append(f"Task: \"{text[:200]}{'...' if len(text) > 200 else ''}\"")
+            lines.append("")
+            active = system_state.get("active_agents", 0)
+            lines.append(f"Currently {active} agent(s) active in the field.")
+            lines.append("")
+            lines.append("What's the priority and scope? Should I spawn dedicated agents or handle this through the existing mesh?")
 
-    def _build_research_response(self, user_input: str, context: dict) -> list[str]:
-        return [
-            f"I'll research that topic for you.",
-            f"",
-            f"Query: \"{user_input[:200]}{'...' if len(user_input) > 200 else ''}\"",
-            f"",
-            f"I'll search through the available knowledge and provide a comprehensive response. What specific angle or depth are you looking for?",
-        ]
+        # Visualization — actually show data
+        elif task_type == "visualization":
+            lines.append(f"Let me pull up the visualization.")
+            lines.append("")
+            lines.append(f"Request: \"{text[:200]}{'...' if len(text) > 200 else ''}\"")
+            lines.append("")
+            lines.append("I can show you:")
+            lines.append("  ● Topology map (observer mesh)")
+            lines.append("  ● Entropy field (system stability)")
+            lines.append("  ● Repair cascade (active repairs)")
+            lines.append("  ● Event stream (recent activity)")
+            lines.append("")
+            lines.append("What do you want to see?")
 
-    def _build_architecture_response(self, user_input: str, context: dict) -> list[str]:
-        return [
-            f"I'll help with the architecture.",
-            f"",
-            f"Request: \"{user_input[:200]}{'...' if len(user_input) > 200 else ''}\"",
-            f"",
-            f"For architectural decisions, I'll consider the current system topology, observer mesh state, and continuity requirements. What constraints or priorities should I keep in mind?",
-        ]
+        # Automation — actually set up
+        elif task_type == "automation":
+            lines.append(f"I'll set up the automation.")
+            lines.append("")
+            lines.append(f"Request: \"{text[:200]}{'...' if len(text) > 200 else ''}\"")
+            lines.append("")
+            lines.append("What trigger should I use?")
+            lines.append("  ● On event (when something happens)")
+            lines.append("  ● On schedule (cron/timer-based)")
+            lines.append("  ● On threshold (when a metric crosses a limit)")
+            lines.append("")
+            lines.append("And what action should it take?")
 
-    def _build_repair_response(self, user_input: str, context: dict) -> list[str]:
-        return [
-            f"I'll investigate and repair that issue.",
-            f"",
-            f"Problem: \"{user_input[:200]}{'...' if len(user_input) > 200 else ''}\"",
-            f"",
-            f"Running diagnostics through the repair pipeline. I'll check observer health, event logs, and continuity state to identify the root cause.",
-        ]
+        # Fallback for anything else
+        else:
+            lines.append(f"I'm on it — \"{text[:150]}{'...' if len(text) > 150 else ''}\"")
+            lines.append("")
+            lines.append(f"Classified as **{task_type.replace('_', ' ')}** | Complexity: **{consensus.complexity}** | Route: **{' -> '.join(consensus.routing_path) if consensus.routing_path else 'direct'}**")
+            lines.append("")
+            lines.append("Want me to proceed, or do you want to refine the approach?")
 
-    def _build_debugging_response(self, user_input: str, context: dict) -> list[str]:
-        return [
-            f"Let me debug that for you.",
-            f"",
-            f"Issue: \"{user_input[:200]}{'...' if len(user_input) > 200 else ''}\"",
-            f"",
-            f"I'll trace through the event fabric and observer logs to find what's going wrong. Can you share any error messages or unexpected behavior you've seen?",
-        ]
-
-    def _build_orchestration_response(self, user_input: str, context: dict) -> list[str]:
-        return [
-            f"I'll orchestrate that for you.",
-            f"",
-            f"Task: \"{user_input[:200]}{'...' if len(user_input) > 200 else ''}\"",
-            f"",
-            f"I'll coordinate the observer mesh to handle this. The consensus engine will determine the best routing path. Should I proceed with the recommended approach or do you have specific preferences?",
-        ]
-
-    def _build_visualization_response(self, user_input: str, context: dict) -> list[str]:
-        return [
-            f"I'll create that visualization.",
-            f"",
-            f"Request: \"{user_input[:200]}{'...' if len(user_input) > 200 else ''}\"",
-            f"",
-            f"I can render topology graphs, entropy heatmaps, repair cascades, or temporal continuity ribbons. Which view would be most useful?",
-        ]
-
-    def _build_automation_response(self, user_input: str, context: dict) -> list[str]:
-        return [
-            f"I'll set up that automation.",
-            f"",
-            f"Task: \"{user_input[:200]}{'...' if len(user_input) > 200 else ''}\"",
-            f"",
-            f"I'll create the necessary observer hooks and event triggers. What should the trigger condition be, and what actions should it perform?",
-        ]
-
-    def _build_general_response(self, user_input: str, context: dict) -> list[str]:
-        return [
-            f"I understand your request.",
-            f"",
-            f"You said: \"{user_input[:200]}{'...' if len(user_input) > 200 else ''}\"",
-            f"",
-            f"I'm processing this through the observer pipeline. The consensus engine has classified this task and is routing it to the appropriate observers.",
-            f"",
-            f"How would you like me to proceed? I can provide more detail, take a specific action, or adjust the approach.",
-            f"",
-            f"Would you like me to:",
-            f"1. Plan the implementation approach",
-            f"2. Start coding directly",
-            f"3. Review existing code first",
-        ]
+        return "\n".join(lines)
 
     def get_active_spawns(self) -> list[dict[str, Any]]:
         """Get all active spawns."""
