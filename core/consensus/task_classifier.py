@@ -118,8 +118,39 @@ class TaskClassifier:
             }
         """
         text = user_input.lower().strip()
+        word_count = len(text.split())
         scores: dict[str, float] = {}
         matched: dict[str, list[str]] = {}
+
+        # ── Pre-check: Strong conversational patterns (high priority) ──
+        # These must be checked BEFORE general pattern matching because
+        # question words like "what"/"how" also match RESEARCH patterns.
+        STRONG_CONVERSATION = [
+            r"^(hello|hi|hey|howdy|greetings|yo|sup|hiya)[\s!.]*$",
+            r"^how('?s| is) it going[\s?!]*$",
+            r"^how are you[\s?!]*$",
+            r"^how do you do[\s?!]*$",
+            r"^what'?s up[\s?!]*$",
+            r"^good (morning|afternoon|evening|night|day)[\s!.]*$",
+            r"^(thanks|thank you|thx|ty|cheers)[\s!.]*$",
+            r"^(bye|goodbye|see you|later|take care|peace)[\s!.]*$",
+            r"^(nice|cool|awesome|great|good|wonderful|amazing)[\s!.]*$",
+            r"^(ok|okay|sure|yes|no|yeah|yep|nope|maybe)[\s!.]*$",
+            r"^what can you do[\s?!]*$",
+            r"^what do you (do|know)[\s?!]*$",
+            r"^tell me about yourself[\s?!]*$",
+            r"^who are you[\s?!]*$",
+            r"^how('?s| is) everything[\s?!]*$",
+            r"^how('?s| is) the (field|system|topology)[\s?!]*$",
+        ]
+        for pat in STRONG_CONVERSATION:
+            if re.match(pat, text, re.IGNORECASE):
+                return {
+                    "task_type": TaskType.CONVERSATION,
+                    "confidence": 0.95,
+                    "scores": {TaskType.CONVERSATION.value: 1.0},
+                    "matched_patterns": [pat],
+                }
 
         for task_type, patterns in PATTERNS.items():
             type_score = 0.0
@@ -134,7 +165,6 @@ class TaskClassifier:
                 matched[task_type] = type_matches
 
         # Check for casual conversation — short messages with no task keywords
-        word_count = len(text.split())
         is_short = word_count <= 6
         has_task_keywords = any(
             k != TaskType.CONVERSATION and k != TaskType.GENERAL
