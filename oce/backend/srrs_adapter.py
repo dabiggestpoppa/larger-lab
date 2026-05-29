@@ -485,24 +485,10 @@ class SRRSAdapter:
         session_id = self._chat_log.get_current_session()
 
         try:
-            # ── Fast Path: Simple questions ──
-            if self._is_simple_question(message):
-                result = await self._fast_path_response(message)
-                # Log the observer response
-                self._chat_log.add_message(
-                    role="assistant",
-                    content=result.get("response", ""),
-                    session_id=session_id,
-                    task_domain=result.get("observer", {}).get("task_domain", "general"),
-                    observer_metadata={
-                        "routing_path": result.get("observer", {}).get("routing_path", []),
-                        "confidence": result.get("confidence", 0),
-                    },
-                )
-                result["session_id"] = session_id
-                return result
-
-            # ── Full Pipeline: Complex tasks ──
+            # ── Full Pipeline: All messages go through the observer field ──
+            # The fast path was bypassing the pipeline for conversational messages,
+            # causing static responses. The new dynamic response generation handles
+            # all message types contextually.
             # Step 1: O-1 Primary Observer receives input
             orch_response = self._primary_observer.receive_input(
                 user_input=message,
