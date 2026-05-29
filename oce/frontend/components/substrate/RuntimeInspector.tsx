@@ -40,8 +40,8 @@ export default function RuntimeInspector() {
   }, []);
 
   const cpu = metrics?.system_load?.cpu ?? 0;
-  const memory = metrics?.system_load?.memory ?? 0;
-  const disk = metrics?.system_load?.disk ?? 0;
+  const memoryPercent = typeof metrics?.system_load?.memory === 'object' ? ((metrics?.system_load?.memory as any)?.percent ?? 0) : (metrics?.system_load?.memory ?? 0);
+  const diskPercent = typeof metrics?.system_load?.disk === 'object' ? ((metrics?.system_load?.disk as any)?.percent ?? 0) : (metrics?.system_load?.disk ?? 0);
   const bottlenecks = metrics?.bottlenecks ?? [];
 
   return (
@@ -53,8 +53,8 @@ export default function RuntimeInspector() {
           <div className="text-xs text-gray-500 mb-1">System Load</div>
           <div className="grid grid-cols-3 gap-2 text-xs">
             <span>CPU: <span className="text-cyan-400">{cpu.toFixed(1)}%</span></span>
-            <span>MEM: <span className="text-purple-400">{memory.toFixed(1)}%</span></span>
-            <span>DISK: <span className="text-green-400">{disk.toFixed(1)}%</span></span>
+            <span>MEM: <span className="text-purple-400">{memoryPercent.toFixed(1)}%</span></span>
+            <span>DISK: <span className="text-green-400">{diskPercent.toFixed(1)}%</span></span>
           </div>
         </div>
         

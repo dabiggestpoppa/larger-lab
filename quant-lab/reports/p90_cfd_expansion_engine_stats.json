@@ -1,0 +1,12 @@
+{
+  "strategy": "p90_cfd_expansion_engine",
+  "total_trades": 652,
+  "wins": 285,
+  "losses": 367,
+  "win_rate_pct": 43.7,
+  "profit_factor": 0.53,
+  "total_pips": -1697.7,
+  "avg_pips_per_trade": -2.6,
+  "gross_profit_pips": 1947.2,
+  "gross_loss_pips": 3645.0
+}

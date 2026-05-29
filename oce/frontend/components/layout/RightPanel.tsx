@@ -1,15 +1,19 @@
 "use client";
 
+import { useState } from "react";
 import { useTopologyStore } from "@/stores/topologyStore";
 import { useUIStore } from "@/stores/uiStore";
 import ConsensusPanel from "../panels/ConsensusPanel";
 import SpawnPanel from "../panels/SpawnPanel";
 import LearningPanel from "../panels/LearningPanel";
 
+type Layer3Tab = "consensus" | "spawn" | "learning";
+
 export default function RightPanel() {
   const { nodes, selectedObserverId, selectObserver } = useTopologyStore();
   const selectedObserver = nodes.find((n) => n.id === selectedObserverId) || null;
   const activeLayer = useUIStore((s) => s.activeLayer);
+  const [activeTab, setActiveTab] = useState<Layer3Tab>("consensus");
 
   // Layer 3: Show orchestration panels
   if (activeLayer === "layer3") {
@@ -22,8 +26,9 @@ export default function RightPanel() {
           {(["consensus", "spawn", "learning"] as const).map((tab) => (
             <button
               key={tab}
+              onClick={() => setActiveTab(tab)}
               className={`flex-1 px-2 py-2 text-[10px] font-mono uppercase tracking-wider transition-colors ${
-                tab === "consensus"
+                activeTab === tab
                   ? "bg-[var(--bg-tertiary)] text-[var(--accent-primary)] border-b-2 border-[var(--accent-primary)]"
                   : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
               }`}
@@ -33,7 +38,9 @@ export default function RightPanel() {
           ))}
         </div>
         <div className="flex-1 overflow-y-auto">
-          <ConsensusPanel />
+          {activeTab === "consensus" && <ConsensusPanel />}
+          {activeTab === "spawn" && <SpawnPanel />}
+          {activeTab === "learning" && <LearningPanel />}
         </div>
       </aside>
     );

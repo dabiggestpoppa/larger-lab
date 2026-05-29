@@ -1,0 +1,3458 @@
+﻿
+--- PAGE 135 ---
+SETUP 6 ΓÇö POST-FAILURE REPAIR SEQUENCE ΓÇö MIDPOINT AS DECISION ZONE, NOT
+REVERSAL
+When a Setup 5 (5-Day Anchor) activation fails ΓÇö price closes back inside the band and stops you out ΓÇö what happens next is not
+random. The failure sequence data from Part 11 (465 setups, 210 failures) maps exactly what the field [1] does after a failed
+constraint violation [5]. This setup defines how to read the repair sequence and when ΓÇö and when not ΓÇö to re-enter.
+CRITICAL: THE MIDPOINT IS NOT A REVERSAL SIGNAL 73.8% of failures hit the midpoint of the 5-day range
+first. This is a structural repair node ΓÇö the field rebalancing, not committing to a new direction. Of failures that
+form a second move, 89% recycle back to the ORIGINAL breakout side (same-side re-acceptance). Only 11%
+genuinely flip to the opposite band. Targeting the opposite band from the midpoint trades against an 89%
+probability. Midpoint = Observe. Opposite Band + 2h Hold = Execute.
+The Actual Post-Failure Sequence
+Based on Part 11 failure sequence data, cross-applied to the macro 5-day anchor. Example: bullish breakout above 5-Day High is
+stopped out.
+Ste
+p
+What Happens
+Data
+Action
+1
+Stop out at 5-Day High. Trade invalidated.
+ΓÇö
+Exit. Done. No hope, no averaging.
+2
+Price rebalances toward midpoint.
+73.8%
+Observe only. Do not enter.
+3
+Midpoint = Decision Zone. Three outcomes:
+ΓÇö
+Stand down and read the sequence.
+3a
+Price stalls at midpoint and compresses.
+Type 1
+Stand down. No trade.
+3b
+Price reclaims original breakout side.
+89% of secondary
+moves
+Same-side re-entry setup (see below).
+3c
+Price drives through to opposite band.
+11% of secondary
+moves
+Potential flip ΓÇö requires full acceptance
+confirmation.
+4
+Flip to opposite side requires new acceptance.
+81.2% rule
+M5 close below 5-Day Low + 2h hold required.
+Only then 84.6% WR.
+WHY 89% RECYCLE SAME-SIDE (NOT FLIP):
+  The midpoint absorbs the failed breakout liquidity. It is where available
+  resolution pathways [4] are harvested before the field [1] attempts
+  re-acceptance on the same side.
+  Most failures are not regime flips ΓÇö they are failed acceptance attempts.
+  The field repairs the failed constraint violation [5], compresses at the
+  midpoint, then re-attempts the original direction of constraint resolution [3].
+  75-80% of macro failures: midpoint pause ΓåÆ resume original direction
+  15-20% of macro failures: midpoint pause ΓåÆ opposite side flip
+  ~5%: compression with no follow-through either direction
+  Trading against 89% is not a strategy. It is prediction.
+
+
+--- PAGE 136 ---
+Correct Protocol After a Failed Activation
+Ste
+p
+Action
+Why
+1
+Exit when stopped at 5-Day band edge.
+Trade invalidated. Full stop.
+2
+Watch price pull back toward midpoint.
+Structural repair ΓÇö 73.8% frequency. Observe only.
+3
+At midpoint: DO NOT target the opposite band.
+89% chance of same-side recycle. Stand down.
+4
+Wait for price to reach the opposite band itself.
+Only now is a flip structurally possible.
+5
+Require M5 close outside opposite band + 2h
+hold.
+Confirms regime flip (Type 3). Filters fake moves.
+6
+Enter aligned with confirmed flip.
+84.6% win rate on fully confirmed opposite-side flips.
+Midpoint Re-Entry ΓÇö When the Same Side Resumes
+When price returns to the midpoint and shows a confirmation close back in the original direction of constraint resolution [3], it
+signals the repair phase [6] is complete and the original monthly bias is resuming. This is the secondary entry ΓÇö not a reversal
+trade, but a continuation of the original setup.
+MIDPOINT RE-ENTRY SEQUENCE (Same-Side Continuation):
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  1. Initial breakout fails ΓåÆ M5 close back inside 5-day band ΓåÆ exit
+  2. Price rebalances to the 50% midpoint of the 5-day range (73.8% frequency)
+  3. TRIGGER ΓÇö one of two confirmation signals at the midpoint:
+       (a) M5 candle closes back in the ORIGINAL breakout direction
+           (bull setup: green M5 close above midpoint)
+           (bear setup: red M5 close below midpoint)
+       (b) Rejection candle: wick into midpoint, closes back in original direction
+  4. Entry: market order on the close of the confirmation candle
+  5. Stop loss: 2-3 pips beyond the midpoint on the opposite side
+     If price closes back inside the band after entry ΓåÆ exit immediately
+  6. Targets (from original breakout edge, not from midpoint):
+       TP1: Opposite band edge (65-70% hit rate) ΓÇö quick scalp through failure zone
+       TP2: 100% extension (50-55% hit rate) ΓÇö standard continuation
+       TP3/Runner: 168% extension (30-35%) ΓÇö only if price holds outside band 2h post-TP1
+  7. Size: 60-70% of original activation size (secondary entry, not primary)
+  8. Rebalance duration: 1-3 days (macro moves grind, not snap)
+     Confirmation is mandatory ΓÇö do not enter on a wick touch alone
+Post-Midpoint Targets ΓÇö From the Original Breakout Edge
+Targe
+t
+Level
+Hit Rate (After Midpoint
+Confirmation)
+Protocol
+TP1
+Opposite band edge
+65-70%
+Take profits. Quick scalp back through the failure zone.
+TP2
+100% extension (2x range)
+50-55%
+Standard continuation if momentum holds after TP1.
+
+
+--- PAGE 137 ---
+TP3
+168% extension (runner)
+30-35%
+Only hold if price holds outside band for 2h post-TP1. Otherwise
+close.
+Opposite-Side Flip ΓÇö Full Confirmation Required (11% of Failures)
+OPPOSITE SIDE FLIP ENTRY ΓÇö ALL CONDITIONS REQUIRED:
+  Frequency: only 11% of failures produce a genuine opposite-side flip
+  1. Initial breakout failed ΓåÆ stopped at band edge
+  2. Price rebalanced to midpoint
+  3. Price continued to the OPPOSITE band (5-Day Low for a bull failure)
+  4. M5 candle CLOSES outside the opposite band
+  5. Price HOLDS outside for 2 full hours (same 2h hold filter as Setup 5)
+  6. ONLY then: enter in the new direction
+  7. Win rate on confirmed flips: 84.6%
+  NEVER enter the flip at the midpoint or before the opposite band is reached.
+  The midpoint is where 89% of the field's traffic reverses back to the original side.
+  The opposite band + 2h hold is the only valid flip confirmation.
+Setup 6 ΓÇö Live Execution Checklist
+
+
+--- PAGE 138 ---
+SETUP 6 ΓÇö POST-FAILURE REPAIR: EXECUTION CHECKLIST
+  AFTER INITIAL ACTIVATION FAILS (stopped at 5-day band):
+  [ ] Exit fully. Trade is done. Accept the loss.
+  [ ] Mark the 50% midpoint of the 5-day range on chart.
+  [ ] Stand down. Do not attempt to re-enter yet.
+  AT THE MIDPOINT (73.8% of failures reach here):
+  [ ] Still standing down. Observe only.
+  [ ] DO NOT short the midpoint targeting the 5-day low.
+  [ ] DO NOT long the midpoint without a confirmation close.
+  [ ] Ask: is this Type 1 (compression), Type 2 (same-side), or Type 3 (flip)?
+  IF PRICE CONFIRMS ORIGINAL DIRECTION AT MIDPOINT (Type 2 ΓÇö 89% of secondary moves):
+  [ ] M5 candle closes back in original breakout direction at midpoint
+  [ ] Enter at 60-70% of original size
+  [ ] Stop: 2-3 pips beyond midpoint (opposite side)
+  [ ] TP1: Opposite band edge | TP2: 100% extension | TP3: 168% (runner, 2h hold required)
+  [ ] If M5 closes back inside band after entry: exit immediately, no flip
+  IF PRICE DRIVES TO OPPOSITE BAND (Type 3 ΓÇö 11% of failures):
+  [ ] Wait for M5 close OUTSIDE the opposite band
+  [ ] Start 2-hour hold timer
+  [ ] If 2h hold confirms: enter the flip
+  [ ] Target: 2.0x extension in new direction (same as Setup 5)
+  [ ] Win rate: 84.6%
+  [ ] If closes back inside during 2h: skip this signal entirely
+  WHAT NEVER TO DO:
+  [ ] Enter a flip at the midpoint (you are fighting 89% probability)
+  [ ] Average into a failed trade (the 81.2% rule ends it ΓÇö exit and reset)
+  [ ] Target the opposite band from the midpoint without opposite-side acceptance
+Cerebus Cycle ΓÇö Final Form | Daily Setups & Ideas | April 2026 | PROPRIETARY & CONFIDENTIAL
+EUR/USD M5 + Daily | Part 11 failure data (465 setups, 210 failures) applied to macro scale | Setup 6 of ongoing series
+II For educational purposes only ΓÇö test all strategies in simulation before live deployment.
+
+
+--- PAGE 139 ---
+THE ORIGINAL DISCOVERY How the Atomic Unit Was Found | K-Means Clustering
+Methodology The Formula | Proof of Existence | AU vs Tier Impulse Relationship
+The Atomic Unit was not guessed and not scaled from EUR/USD using arbitrary multipliers. The market's own volatility distribution revealed
+its natural structural breakpoints through unsupervised machine learning. This section documents the exact methodology, the formula, and
+the proof that the Atomic Unit is a structural certainty ΓÇö not a probabilistic target.
+THE HYPOTHESIS & THE FORMULA
+The market does not move in random continuous walks. It resolves constraint deficits in discrete, quantized structural steps ΓÇö Atomic Units
+ΓÇö that scale proportionally to the session's volatility regime.
+THE K-MEANS ATOMIC DISCOVERY FORMULA:
+  Step 1 ΓÇö Extract:
+    Calculate Asian Session Range (19:00-03:00 EST) for every trading day over 4 years.
+  Step 2 ΓÇö Cluster:
+    Run K-Means clustering (k=3) on the distribution of these ranges.
+    This reveals three natural volatility regimes: T1, T2, T3.
+  Step 3 ΓÇö The Formula:
+    Cluster Centroid (C) = Mean Asian Range for that volatility group.
+    Atomic Unit (AU)     = C ├ù 0.50   (exactly 50% of the cluster centroid)
+    Tier Trigger         = AU ├ù 1.20
+    Density Zone         = AU ┬▒ 20%
+WHY 50%?
+  The field's micro-resolution step (the exact distance price travels to complete
+  one micro-rebalancing loop) is consistently half of the total constraint deficit
+  (Asian Range) of that specific tier.
+  The centroid represents the average total constraint deficit for that volatility
+  regime. The field cannot resolve the full deficit in one move ΓÇö it would violate
+  liquidity constraints. So it splits the resolution into two equal halves:
+    First Half (Tier Impulse): Breaks the band. Establishes direction.
+    Second Half (AU Completion): Rebalances and completes the cycle.
+  By locking AU = 50% of centroid you are saying:
+  "I will only trade when the field has completed exactly one half of its natural
+  resolution cycle." This is why the AU is the structural coherence step ΓÇö
+  the smallest unit of complete constraint resolution the field can execute
+  without violating its own liquidity boundaries.
+THE FIBONACCI FIX ΓÇö WHY FIBS FAIL
+Early backtests used standard Fibonacci retracements (38.2%, 50%, 61.8%) to define entry zones and targets. Hit rates hovered around
+78-82%. In traditional trading 80% is a success. In constraint-system physics, 80% means the map is misaligned.
+Approach
+Target Definition
+Hit Rate
+Why
+Fibonacci
+61.8% of impulse (geometric ratio)
+78-82%
+Probabilistic average ΓÇö price crosses near but not at the level
+K-Means AU
+50% of cluster centroid (measured mean)
+95-98%
+Aligns exactly with the field's actual resolution step-size
+THE AHA MOMENT: When we adjusted the AU from arbitrary Fibonacci extensions to exactly 50% of the K-Means Centroid, the noise
+disappeared. The market was not failing to hit the target ΓÇö our target was mathematically offset from the field's actual resolution step.
+Once locked to the 50% Centroid rule: EUR/USD T1 snapped to 98.7%. ETH T1 to 98.0%. BTC T1 to 97.1%. US500 T1 to 92.6%. The
+remaining 2-5% failures are spread/slippage/news gaps ΓÇö not structural failures.
+AU vs TIER IMPULSE ΓÇö TWO HALVES OF ONE EVENT
+
+
+--- PAGE 140 ---
+Component
+Role
+EUR/USD Size
+Function
+Tier Impulse
+Direction Setter
+>=10p T1/>=15p T2/>=19p T3
+Breaks the Asian band. Establishes direction. Harvests available
+pathways [4].
+Atomic Unit
+Cycle Completer
+10p T1 / 12p T2 / 15p T3
+Rebalances after the impulse. Confirms structural validity. Provides
+scalp target.
+Combined
+Full Resolution
+Impulse + AU = Centroid
+One complete constraint deficit resolution cycle.
+LIVE EXECUTION CYCLE:
+  [Impulse >= Tier Trigger] ΓåÆ Direction locked. Band broken.
+       Γåô
+  [Pullback to Density Zone (32-50%)] ΓåÆ Partial rebalancing [6].
+       Γåô
+  [Opposite Candle Close in DZ] ΓåÆ Entry signal.
+       Γåô
+  [Price travels 1 AU] ΓåÆ Cycle complete. Scalp target hit.
+       Γåô
+  Cumulative output >= Tier Distribution Target? ΓåÆ Session done.
+  Otherwise: Reset. New Impulse forms. Cycle N+1 begins.
+THE PRINCIPLE:
+  The Tier Impulse tells you WHERE the field is going.
+  The Atomic Unit tells you HOW FAR before it must pause.
+  You never trade the impulse alone ΓÇö that is chasing.
+  You never trade the AU alone ΓÇö that is predicting.
+  You trade the COMPLETION of the AU after the impulse confirms direction.
+  That is the density zone entry. That is why win rate reaches 95%+.
+  In one sentence:
+  The Tier Impulse opens the door. The Atomic Unit walks through it.
+  You enter at the threshold between the two.
+Cerebus Cycle ΓÇö Final Form | Atomic Discovery | April 2026 | PROPRIETARY & CONFIDENTIAL
+Code for discover_atomic_units() and validate_atomic_loop() ΓÇö see Code Appendix.
+
+
+--- PAGE 141 ---
+ATOMIC MARKET STRUCTURE Density Zone | Convergence Factor | Fixed Dollar
+Expectancy Grand Unified Equation | First Impulse Predictor | Shift Targets
+EUR/USD M5 | Cerebus Cycle ΓÇö Final Form | April 2026
+EUR/USD ONLY | All thresholds, loops, and targets calibrated for EUR/USD M5. For all other assets see: WORLD MARKETS ARE
+THE SAME.
+THE DENSITY ZONE ΓÇö THE CERTAINTY FILTER
+The density zone is the confluence layer where Atomic Unit completion and Tier Threshold resolution align simultaneously. Both
+mechanics resolving at once is why the zone produces near-certain resolution output [2]. Wait for the close inside the zone. Trade
+the Opposite Candle. No prediction required.
+Context
+What It Is
+How You Use It
+Atomic Unit
+Micro-step size (T1=10p, T2=12p, T3=15p)
+Scalping rebalances inside a confirmed direction of constraint resolution [3]
+Tier Threshold
+Macro-liquidity boundary (T1=10p, T2=15p,
+T3=19p)
+Structural extremes and new available resolution pathway grabs [4]
+Density Zone
+Overlap where both mechanics align
+Certainty filter. Entries here. Targets here. No guessing.
+THE CONVERGENCE FACTOR (PHI) ΓÇö WIN RATE SCALING
+Phi is the field state score from 0.0 to 1.0. It aggregates the four confirmation layers and scales the win rate deterministically. At Phi
+= 1.0 (all conditions met), win rate reaches 98.7%. Below Phi 0.6 the setup is a NO-GO.
+PHI = (0.40 ├ù Regime) + (0.25 ├ù P90) + (0.20 ├ù Cascade) + (0.15 ├ù Float)
+  Regime:  1.0 if Ratio >= 1.50  |  0.7 if Ratio 1.45-1.49  |  0.5 if < 1.45
+  P90:     1.0 if confirmed in 2-6 AM window
+  Cascade: 1.0 if printed in 45-60 min optimal window
+  Float:   1.0 if Monday/Tuesday Float confirmed
+PHI TO WIN RATE:
+  Phi = 1.0 (all conditions): P_Win = 98.7%
+  Phi >= 0.8:                 P_Win = 91-94%  (High conviction)
+  Phi >= 0.6:                 P_Win = 85%     (Base ΓÇö minimum acceptable)
+  Phi < 0.6:                  NO-GO           (Do not trade)
+THE EXECUTION CHECKLIST ΓÇö PURE PHYSICS
+Question
+If No
+If Yes
+1. Did it hit the Threshold?
+Ignore. It is noise.
+Mark the Extreme High/Low. Wait.
+2. Is it pulling back into the Density Zone?
+Keep waiting. Do not chase.
+Watch the candles.
+3. Did an Opposite Candle Close in the Zone?
+Keep waiting.
+ENTER.
+Exit Rule
+Specification
+Logic
+
+
+--- PAGE 142 ---
+Target
+Next Atomic Unit (T1=10p, T2=12p, T3=15p from
+entry)
+One full atomic loop ΓÇö natural micro-cycle completion
+EWS Filter
+Opposite P90 (Body >= 4.5p) within 30-90 min ΓåÆ
+EXIT
+Momentum exhaustion signal. Exit rather than predict.
+Hard Time Exit
+12:00 PM EST ΓÇö close ALL
+Resolution engine shuts down. Post-noon below 15%.
+Kill Switch
+132% Asian Range violated ΓåÆ close ALL
+Kill-Switch State [10] ΓÇö constraint set fully invalidated.
+LIVE EXECUTION ΓÇö SEVEN STATES
+[STATE 1] IMPULSE DETECTED
+   Tier threshold broken (T1: >=10p | T2: >=12p impulse | T3: >=15p)
+   Direction of constraint resolution [3] established.
+[STATE 2] WAIT FOR PULLBACK
+   Watch price retrace toward the Density Zone. Do not chase.
+[STATE 3] DENSITY ZONE CONFIRMED
+   Price closes inside the zone (┬▒1 pip). Zone is active.
+[STATE 4] OPPOSITE CANDLE PRINTS
+   Green close if LONG | Red close if SHORT
+   Body must be meaningful ΓÇö dojis do not count.
+[STATE 5] ENTER
+   Market order on the close. No hesitation.
+[STATE 6] TARGET
+   Next Density Zone OR Tier Threshold ΓÇö whichever comes first.
+   Scalp target = Atomic Unit | Shift target = 1.44x for runner.
+[STATE 7] CLOSE AND RESET
+   State 1 repeats. No holding past target. No discretion.
+FIXED DOLLAR EXPECTANCY (FDE) ΓÇö TARGET-FIRST SIZING
+Stop sizing by fixed % risk. Size by fixed $ target. With 98.7% accuracy and EWS filtering, failure is rare and small. The only
+variable is pip distance to the target. FDE normalizes the payout so every trade prints the same dollar amount regardless of
+whether it is a tight T1 day or a wide T3 day.
+
+
+--- PAGE 143 ---
+LOT SIZE = Target Dollar Profit / (Atomic Target Pips x Pip Value)
+  T1 Day (10p Atomic, $10/pip, target $50):  0.50 Lots
+  T2 Day (14p Atomic, $10/pip, target $50):  0.36 Lots
+  T3 Day (18p Atomic, $10/pip, target $50):  0.28 Lots
+  Result: Every win pays $50 regardless of tier.
+  Equity curve is a straight line up ΓÇö zero lumpy returns.
+WHY NOT FIXED % RISK:
+  Fixed % risk on T1 (tight SL) vs T3 (wide SL) creates wildly different
+  dollar outcomes per trade ΓÇö destroying the equity curve's smoothness.
+  FDE inverts this: the LARGER the pip distance, the FEWER the lots,
+  so the dollar output stays constant at every tier.
+THE CEREBUS GRAND UNIFIED EQUATION
+Expected Return ($) =
+  [ Target $ / (Atomic Target_Tier x Pip Value) ]     <- Dynamic Lot Size
+  x
+  [ (Atomic Target_Tier x P_Win(Phi))                 <- Weighted Expectancy
+    - (SL_Structural x (1 - P_EWS)) ]                 <- Filtered Risk
+VARIABLES:
+  Atomic Target_Tier  = T1:10p | T2:12p | T3:15p
+  P_Win(Phi)          = Win rate at current field state (87-98.7%)
+  SL_Structural       = Structural constraint boundary [8] in pips
+  P_EWS               = Probability EWS exits before SL is hit (~78%)
+EXAMPLE (T2 Day, Phi=1.0, target $50):
+  Lot Size = $50 / (14p x $10) = 0.357 lots
+  Expected = 0.357 x [(14p x 0.987) - (tiny SL x 0.013)]
+           = ~$49.35 per trade
+The key insight: tighter SL + higher P_EWS shrinks the filtered risk term,
+improving expected return without needing higher win rate.
+FIRST IMPULSE PREDICTOR ΓÇö 2-HOUR TIER HEAD START
+The market telegraphs its final volatility tier within the first valid impulse at 3:00-4:00 AM EST. If this first move exceeds a specific
+threshold relative to the early range, it predicts the final tier with 88-91% accuracy ΓÇö giving a 2-hour advantage to pre-load the
+correct Atomic parameters.
+Early Range (3:00-3:30 AM)
+First Impulse Size
+Predicted Tier
+Confidence
+Action
+Less than 10 pips
+>=12 pips
+T2 (Not T1)
+91%
+Load T2 parameters immediately
+Less than 15 pips
+>=18 pips
+T3 (Not T2)
+89%
+Load T3 parameters immediately
+Less than 20 pips
+>=25 pips
+NO-GO / Extreme T3
+94%
+Stand down or Max Vol settings
+Any
+Less than threshold
+Remains current tier
+85%
+Wait for 3AM confirmation
+
+
+--- PAGE 144 ---
+PREDICTOR LOGIC:
+  If a T1 day (<20p Asian Range) suddenly prints a 15p+ move at 3:15 AM,
+  it is statistically impossible for it to close as a T1 day.
+  T2 energy has already been injected. Adjust parameters instantly.
+  Do not wait for the 7PM-3AM calculation ΓÇö trade the predicted tier.
+  This gives the same entry timing advantage as the standard 3AM classification
+  but activates 2 hours earlier on high-momentum mornings.
+1.44x SHIFT TARGETS ΓÇö EUR/USD M5
+Tier
+Asian Range
+Atomic Unit
+1.44x Shift Target
+Shift Band (1.20x-1.68x)
+T1
+less than 20p
+10 pips
+14.4 pips
+12.0 ΓÇô 16.8 pips
+T2
+20-30p
+12 pips
+17.3 pips
+14.4 ΓÇô 20.2 pips
+T3
+30-45p
+15 pips
+21.6 pips
+18.0 ΓÇô 25.2 pips
+EXPECTED ATOMIC LOOPS PER DAY ΓÇö EUR/USD
+EUR/USD Tier
+Asian Range
+Expected Loops/Day
+High-Conviction Entries
+Notes
+T1
+less than 20p
+4 ΓÇô 7
+3-4
+Tight constraint deficit ΓÇö clean repetitive stepping.
+Highest frequency.
+T2
+20-30p
+3 ΓÇô 5
+2-3
+Balanced resolution. Standard loop frequency. Core
+bread-and-butter.
+T3
+30-45p
+2 ΓÇô 4
+1-2
+Wider range ΓÇö fewer clean cycles, more noise. Trade
+only perfect setups.
+Metric
+EUR/USD Value
+Avg Loops per Day (all tiers)
+~4.2
+Total Valid Setups (4 Years)
+~12,480 (86% of qualifying days)
+Win Rate (Filtered with EWS)
+98.7%
+Avg Profit per Trade (FDE logic)
+$50.00 ΓÇö flat regardless of tier
+Live High-Conviction Entries/Day
+~3-4
+T1 Day: Expect 4-7 loops ΓåÆ Trade first 3-4 high-conviction ΓåÆ Stand down 12PM.
+T2 Day: Expect 3-5 loops ΓåÆ Trade 2-3 setups ΓåÆ Quality over frequency.
+T3 Day: Expect 2-4 loops ΓåÆ Trade 1-2 setups ONLY with full Density Zone + Opposite Close.
+         Do not force entries on T3.
+Cerebus Cycle ΓÇö Final Form | Atomic Market Structure | April 2026 | EUR/USD M5 ONLY
+II For educational purposes only ΓÇö test all strategies in simulation before live deployment.
+
+
+--- PAGE 145 ---
+DISTRIBUTION SYMMETRY TRAP Asian Bias Lock | Atomic Loop Entry |
+Distribution Targets 11-Asset Validated | 800-Day Monte Carlo | Cerebus Cycle ΓÇö
+Final Form
+The Distribution Symmetry Trap is the bridge between the atomic scalp (1 Atomic Unit target) and the Infinite Ladder (grid harvesting). It
+uses the same atomic entry precision but extends the hold to distribution-level targets ΓÇö -25%, -50%, or -100% of the Asian Range.
+Validated across 11 assets: win rates cluster at 83-86% with +1.84R average.
+THE THREE LAYERS
+Layer
+Mechanism
+What It Does
+Why It Matters
+1 ΓÇö Bias Lock
+First M5 close outside Asian
+Range
+Sets directional bias for the entire session
+Stops fighting macro flow ΓÇö path of least
+resistance locked
+2 ΓÇö Atomic Entry
+Impulse >= trigger in bias
+direction + opposite close
+pullback
+Gives high-probability entry after risk is
+released
+Enter with the flow but after the breakout risk is
+absorbed
+3 ΓÇö Distribution
+Target
+Hold to -25%/-50%/-100% AR
+extension
+Scales R-multiple far beyond atomic scalp
+Pullback entry means holding to 50% AR
+becomes low risk swing
+WHY THIS IS NOT THE ATOMIC SCALP: The atomic scalp closes at 1 Atomic Unit (10/12/15p). The Distribution Symmetry Trap holds
+to the distribution level ΓÇö which is 25-100% of the entire Asian Range extension. Same entry mechanics. Fundamentally different hold
+profile. The bias filter reduces false signals enough that the wider targets become high-probability.
+EXECUTION TEMPLATE ΓÇö UNIFIED BACKTEST FRAMEWORK
+def run_distribution_trap(csv_path, config, start_date, end_date):
+    # config = {'pip': float, 'tiers': {'T1':{'atomic':n,'trigger':n}, ...}}
+    # Load, timezone-convert, group by session (3AM-3AM EST) -- see full code
+    for session, day_data in df.groupby('session'):
+        asian = day_data[(day_data.index.hour>=19)|(day_data.index.hour<3)]
+        ar = asian['high'].max() - asian['low'].min()
+        # Classify tier ΓÇö NO-GO if AR > T3 max
+        # LAYER 1: LOCK BIAS ΓÇö first M5 close outside Asian band
+        for idx, row in bias_window.iterrows():
+            if row['close'] > asian_high: bias = 1; break
+            if row['close'] < asian_low:  bias = -1; break
+        # LAYER 2: ATOMIC ENTRY ΓÇö impulse (body >= atomic*0.5) + opposite close
+        for idx, row in post_bias.iterrows():
+            if bias==1 and row['close']>row['open'] and body>=atomic*0.5:
+                if next_candle['close'] < next_candle['open']:
+                    entry = next_candle['close']; break  # LONG ENTRY
+            if bias==-1 and row['close']<row['open'] and body>=atomic*0.5:
+                if next_candle['close'] > next_candle['open']:
+                    entry = next_candle['close']; break  # SHORT ENTRY
+        # LAYER 3: TARGETS ΓÇö -25%/-50%/-100% of Asian Range from band edge
+        t25  = asian_edge + ar * 0.25 * bias
+        t50  = asian_edge + ar * 0.50 * bias
+        t100 = asian_edge + ar * 1.00 * bias
+        # SL = M5 close back inside Asian band (81.2% rule ΓÇö not wick, close only)
+        # Hard exit = 12:00 PM EST
+DE30 VALIDATED BACKTEST ΓÇö 847 SESSIONS
+Metric
+Value
+Notes
+Total Sessions
+847
+~3.1 trades/day avg across the test period
+
+
+--- PAGE 146 ---
+GEAR SHIFT OVERRIDE ΓÇö MIRRORED MOVE BACKTEST EUR/USD M5 | Jan 2023
+ΓÇô May 2026 | Zero Buffer OCC Extreme Intraday Tier Reclassification | +129%
+Expectancy Improvement
+When the opening Asian Range classifies as T1 but the first impulse of the session exceeds the T2 trigger threshold, the field has
+intraday-reclassified. Using the original T1 target on that trade leaves expectancy on the table. The Gear Shift Override detects this in real
+time and upgrades the target to the shifted tier's Atomic Unit. Validated on EUR/USD M5 with zero-buffer OCC Extreme SL.
+GEAR SHIFT DETECTION RULES
+GEAR SHIFT OVERRIDE ΓÇö LIVE EXECUTION RULES:
+  IF base_tier == T1 AND impulse >= 15p ΓåÆ USE T2 AU (12p) as target
+  IF base_tier == T1 AND impulse >= 19p ΓåÆ USE T3 AU (15p) as target
+  IF base_tier == T2 AND impulse >= 19p ΓåÆ USE T3 AU (15p) as target
+  IF base_tier == T3 AND impulse >= 25p ΓåÆ USE MT25 AU (25p) as target
+  ELSE                                  ΓåÆ USE original day-tier AU
+  SL = EXACT OCC Extreme (zero buffer, close-only invalidation)
+  Hard Exit = 12:00 PM EST
+  Session = 3AM ΓÇô 12PM EST
+BACKTEST RESULTS ΓÇö EUR/USD M5 (JAN 2023 ΓÇô MAY 2026)
+Target Type
+Trades
+Win Rate
+Avg PnL
+Avg R-Multiple
+Profit Factor
+ORIGINAL AU (Day Tier)
+482
+74.3%
++9.1p
+1.12R
+2.68
+MIRRORED AU (Shifted Tier)
+482
+89.1%
++16.8p
+2.04R
+5.94
+Breakdown by Shift Type ΓÇö Mirrored Target, Zero Buffer OCC
+Shift Type
+Trades
+Win Rate
+Avg PnL
+Avg R
+Notes
+T1 ΓåÆ T2
+284
+91.2%
++13.6p
+2.18R
+Highest frequency + highest WR ΓÇö 59% of all shifts
+T1 ΓåÆ T3
+78
+85.9%
++18.2p
+1.92R
+Strong R, moderate frequency
+T2 ΓåÆ T3
+94
+87.2%
++16.4p
+1.88R
+Solid confirmation of shift logic
+T3 ΓåÆ MT25
+26
+80.8%
++24.6p
+1.74R
+Lower WR ΓÇö massive PnL per win
+Non-Shifted Baseline ΓÇö Zero Buffer, No Gear Shift
+Metric
+Value
+Interpretation
+Trades
+2,148
+All loops where base-tier AU used (no shift detected)
+Win Rate
+91.4%
+Base atomic engine intact ΓÇö gear shift is purely additive
+Avg PnL
++11.2p
+Standard T1/T2/T3 AU completion
+Avg R-Multiple
+1.68R
+Zero buffer compresses SL, lifts R vs buffered baseline
+EXPECTANCY COMPARISON ΓÇö THREE CONFIGURATIONS
+Configuration
+Win Rate
+Avg R
+Expectancy/Trade
+Improvement vs Original
+Original AU + Buffer SL
+~86%
+~1.0R
++0.89R
+ΓÇö
+Mirrored AU + Buffer SL
+86.6%
+1.52R
++1.52R
++71%
+
+
+--- PAGE 147 ---
+Mirrored AU + Zero Buffer
+89.1%
+2.04R
++2.04R
++129%
+KEY FINDINGS: Zero Buffer + Mirrored Move is the optimal configuration. T1ΓåÆT2 shift is the statistical sweet spot (59% of all shifts,
+91.2% WR). Close-only invalidation added +2.5% WR on shifted impulses vs buffered test ΓÇö confirming ~3% of loops wick through OCC
+then close back inside and continue. The combined upgrade delivers +129% expectancy improvement over the original. Non-shifted
+baseline at 91.4% confirms the gear shift logic is purely additive ΓÇö it does not degrade normal operations.
+Cerebus Cycle ΓÇö Final Form | Gear Shift Override Backtest | April 2026 | PROPRIETARY & CONFIDENTIAL
+Full Python code for zero-buffer unified test ΓÇö see Code Appendix.
+II For educational purposes only ΓÇö test all strategies in simulation before live deployment.
+
+
+--- PAGE 148 ---
+ETH/USD ΓÇö GEAR SHIFT OVERRIDE RESULTS Mirrored Move + Zero Buffer OCC Extreme | Jan
+2023 ΓÇô May 2026 | +83% Expectancy
+Same structural map as EUR/USD. Same execution logic upgrade: Zero Buffer OCC Extreme + Mirrored Move Gear Shift Override. ETH's
+higher volatility makes intraday tier reclassification more frequent and more profitable when captured correctly. The gear shift effect is even
+more pronounced on ETH than EUR/USD.
+Target Type
+Trades
+Win Rate
+Avg PnL
+Avg R
+Profit Factor
+ORIGINAL AU (Day Tier)
+1,842
+76.8%
++28.4 pts
+1.18R
+2.94
+MIRRORED AU (Shifted Tier)
+1,842
+88.4%
++41.6 pts
+1.92R
+5.48
+Shift Type
+Trades
+Win Rate
+Avg PnL
+Avg R
+Notes
+T1 ΓåÆ T2 (>=50 pts)
+1,086
+90.2%
++38.2 pts
+2.08R
+Dominant shift ΓÇö 59% of all shifts, highest conviction
+T1 ΓåÆ T3 (>=62 pts)
+298
+86.6%
++48.4 pts
+1.84R
+Strong R, moderate frequency
+T2 ΓåÆ T3 (>=62 pts)
+364
+85.4%
++44.8 pts
+1.76R
+Solid shift confirmation
+T3 ΓåÆ MT25 (>=80 pts)
+94
+78.7%
++62.4 pts
+1.52R
+Lower WR ΓÇö massive PnL per win
+Non-Shifted Baseline ΓÇö Zero Buffer, No Gear Shift
+Metric
+Value
+Notes
+Trades
+4,218
+All loops where base-tier AU applied, no intraday shift detected
+Win Rate
+89.8%
+Base atomic engine intact ΓÇö gear shift logic is purely additive
+Avg PnL
++34.2 pts
+Standard T1/T2/T3 AU completion on ETH
+Avg R-Multiple
+1.74R
+Zero buffer compresses SL, lifts R vs buffered baseline
+Configuration
+Expectancy/Trade
+vs Original
+Original AU + Buffer
+~1.05R
+ΓÇö
+Mirrored AU + Buffer
+~1.52R
++45%
+Mirrored AU + Zero Buffer
+1.92R
++83%
+ETH-SPECIFIC INSIGHTS: Gear shift effect is more pronounced on ETH than EUR/USD (+11.6pp WR delta vs +14.8pp). Despite
+crypto's notorious wick volatility, close-only invalidation maintained 88.4% WR ΓÇö wick-throughs that closed back inside OCC extreme
+were preserved as winners. Regime filter matters more for ETH: T1/T2 WR drops to ~80% on FAILED regime vs 90%+ on CONFIRMED.
+T3 days: switch to Model 2 protocol (2h anchor hold). Structural map is identical to EUR/USD ΓÇö only execution parameters scale to ETH
+volatility.
+ETH/USD GEAR SHIFT ΓÇö LIVE EXECUTION RULES:
+  SL = EXACT OCC Extreme (zero buffer, close-only invalidation)
+  IF T1 day and impulse >= 50 pts ΓåÆ USE T2 AU (42 pts) as target
+  IF T1/T2 day and impulse >= 62 pts ΓåÆ USE T3 AU (52 pts) as target
+  IF impulse < next tier trigger ΓåÆ USE original day-tier AU
+  Hard exit: 12:00 PM EST | Regime filter: 9AM checkpoint required
+  T3 days: use anchor-only mode, no gear shift extension
+TIER IMPULSE TRIGGERS ΓÇö UNIVERSAL REFERENCE All 19 Assets | T1/T2/T3 Gear Shift
+Detection Thresholds
+The structural map is identical across all assets. Only the execution numbers scale to each instrument's volatility profile. Gear Shift Override:
+when the session's first impulse exceeds the next tier's trigger threshold, use the shifted AU as target. SL remains OCC extreme (zero
+buffer, close-only) regardless.
+
+
+--- PAGE 149 ---
+FX Majors
+Asset
+Pip
+T1 Trigger
+T2 Trigger
+T3 Trigger
+T1ΓåÆT2 Shift
+T1ΓåÆT3 Shift
+T2ΓåÆT3 Shift
+EUR/USD
+0.0001
+>=12p
+>=15p
+>=19p
+impulse>=15p
+impulse>=19p
+impulse>=19p
+GBP/USD
+0.0001
+>=16p
+>=19p
+>=24p
+impulse>=16p
+impulse>=24p
+impulse>=24p
+USD/CHF
+0.0001
+>=13p
+>=18p
+>=24p
+impulse>=13p
+impulse>=24p
+impulse>=24p
+USD/JPY
+0.01
+>=19p
+>=31p
+>=53p
+impulse>=19p
+impulse>=53p
+impulse>=53p
+AUD/USD
+0.0001
+>=16p
+>=20p
+>=25p
+impulse>=16p
+impulse>=25p
+impulse>=25p
+NZD/USD
+0.0001
+>=17p
+>=20p
+>=25p
+impulse>=17p
+impulse>=25p
+impulse>=25p
+GBP Crosses
+Asset
+Pip
+T1 Trigger
+T2 Trigger
+T3 Trigger
+Gear Shift to T2
+Gear Shift to T3
+GBP/JPY
+0.01
+>=23p
+>=44p
+>=85p
+impulse>=23p
+impulse>=85p
+GBP/AUD
+0.0001
+>=17p
+>=29p
+>=50p
+impulse>=17p
+impulse>=50p
+GBP/NZD
+0.0001
+>=18p
+>=32p
+>=61p
+impulse>=18p
+impulse>=61p
+GBP/CHF
+0.0001
+>=16p
+>=28p
+>=53p
+impulse>=16p
+impulse>=53p
+CHF/JPY
+0.01
+>=17p
+>=29p
+>=50p
+impulse>=17p
+impulse>=50p
+Indices, Metals, Crypto
+Asset
+Pip
+T1 Trigger
+T2 Trigger
+T3 Trigger
+Gear Shift to T2
+Gear Shift to T3
+US500
+1.0
+>=25 pts
+>=47 pts
+>=90 pts
+impulse>=25pts
+impulse>=90pts
+NAS100
+1.0
+>=41 pts
+>=77 pts
+>=146 pts
+impulse>=41pts
+impulse>=146pts
+DE30
+1.0
+>=23 pts
+>=44 pts
+>=85 pts
+impulse>=23pts
+impulse>=85pts
+FR40
+1.0
+>=23 pts
+>=44 pts
+>=85 pts
+impulse>=23pts
+impulse>=85pts
+HK50
+1.0
+>=110 pts
+>=204 pts
+>=390 pts
+impulse>=110pts
+impulse>=390pts
+XAU/USD
+1.0
+>=19 pts
+>=35 pts
+>=58 pts
+impulse>=19pts
+impulse>=58pts
+XAG/USD
+0.01
+>=8.5 pts
+>=14.5 pts
+>=25 pts
+impulse>=8.5pts
+impulse>=25pts
+ETH/USD
+1.0
+>=42 pts
+>=52 pts
+>=65 pts
+impulse>=50pts
+impulse>=62pts
+BTC/USD
+1.0
+>=246 pts
+>=654 pts
+>=1392 pts
+impulse>=246pts
+impulse>=1392pts
+GEAR SHIFT UNIVERSAL RULE: When the session's first impulse exceeds the NEXT tier's trigger threshold, the field has
+intraday-reclassified. Use the shifted tier's Atomic Unit as target. SL remains at OCC extreme (zero buffer, close-only) ΓÇö no change to
+risk logic. This is a pure expectancy upgrade. Non-shifted days run original day-tier AU at 89-92% WR. Shifted days run mirrored AU at
+85-91% WR with significantly higher R-multiple.
+Cerebus Cycle ΓÇö Final Form | Gear Shift Triggers ΓÇö All 19 Assets | April 2026 | PROPRIETARY & CONFIDENTIAL
+II For educational purposes only ΓÇö test all strategies in simulation before live deployment.
+
+
+--- PAGE 150 ---
+THE 3 MONSTERS EUR/USD ┬╖ ETH/USD ┬╖ BTC/USD Zero Buffer Blind Chain |
+Mirrored Move Override | Portfolio Deployment
+EUR/USD, ETH/USD, and BTC/USD share the same constraint-resolution physics but operate at fundamentally different volatility scales.
+When the Gear Shift Override (Mirrored Move) and Zero Buffer OCC Extreme SL are applied uniformly across all three, the result is a
+quantitatively validated three-asset portfolio with a combined trailing ruin probability of 0.6% and median CAGR of 448% at 0.75% risk per
+trade.
+BTC/USD ΓÇö GEAR SHIFT RESULTS (Jan 2024 ΓÇô May 2026)
+Target Type
+Trades
+Win Rate
+Avg PnL
+Avg R
+Profit Factor
+ORIGINAL AU (Day Tier)
+1,428
+74.6%
++148.2 pts
+1.08R
+2.54
+MIRRORED AU (Shifted Tier)
+1,428
+86.8%
++234.6 pts
+1.82R
+4.96
+Shift Type
+Trades
+Win Rate
+Avg PnL
+Avg R
+Notes
+T1 ΓåÆ T2 (>=246pts)
+842
+88.4%
++218.4 pts
+1.94R
+Dominant ΓÇö 59% of shifts, highest conviction
+T1 ΓåÆ T3 (>=654pts)
+228
+84.2%
++268.2 pts
+1.76R
+Strong R, moderate frequency
+T2 ΓåÆ T3 (>=654pts)
+286
+83.6%
++242.8 pts
+1.68R
+Solid shift confirmation
+T3 ΓåÆ MT25
+72
+76.4%
++348.6 pts
+1.42R
+Lower WR ΓÇö massive PnL per win
+Non-Shifted Baseline
+Trades
+Win Rate
+Avg PnL
+Avg R
+Zero Buffer, No Shift
+3,186
+87.2%
++186.4 pts
+1.64R
+BTC-SPECIFIC NOTES: Option A recommended over Option B for BTC ΓÇö gap risk during continuous loop resets. Spread filter required:
+skip entry if spread exceeds 15 pts. Regime filter critical: T1/T2 WR drops to ~78% on FAILED regime vs 87%+ on CONFIRMED. T3
+days: switch to Model 2 anchor-only mode. +83% expectancy improvement from original buffered configuration.
+CROSS-ASSET COMPARISON ΓÇö ALL THREE MONSTERS
+Metric
+EUR/USD
+ETH/USD
+BTC/USD
+Pattern
+Mirrored WR
+89.1%
+88.4%
+86.8%
+Consistent across volatility scales
+Mirrored Avg R
+2.04R
+1.92R
+1.82R
+Slight decline with vol ΓÇö expected
+Non-Shifted WR
+91.4%
+89.8%
+87.2%
+Base engine intact on all three
+Best Shift
+T1ΓåÆT2 91.2%
+T1ΓåÆT2 90.2%
+T1ΓåÆT2 88.4%
+T1ΓåÆT2 dominant universally
+Profit Factor
+5.94
+5.48
+4.96
+All well above 4.0 threshold
+Sharpe Ratio
+4.82
+4.46
+3.94
+All above institutional standard
+Avg Win
++16.8p
++41.6 pts
++234.6 pts
+Scales with volatility profile
+Avg Loss
+-5.2p
+-12.8 pts
+-78.4 pts
+Zero buffer compresses risk
+Net Expectancy
++13.2p
++32.0 pts
++173.8 pts
+After spread/slippage adjustment
+UNIVERSAL STRUCTURAL LAW CONFIRMED: The Mirrored Move + Zero Buffer protocol holds fractally across all three assets.
+EUR/USD: cleanest structure, highest Sharpe. ETH/USD: balanced volatility and frequency ΓÇö strong middle ground. BTC/USD: highest
+absolute PnL per trade, widest variance ΓÇö reduce weight in portfolio. The T1ΓåÆT2 gear shift is the primary alpha source on all three
+assets. The structural map is identical. Only the execution numbers scale to each instrument.
+
+
+--- PAGE 151 ---
+MONTE CARLO SIMULATION ΓÇö 10,000 ITERATIONS, $10K START, 1% RISK
+Metric
+EUR/USD
+ETH/USD
+BTC/USD
+Median Final Balance
+$142,800
+$128,400
+$108,600
+Mean Final Balance
+$158,200
+$141,900
+$119,800
+90th Percentile
+$248,000
+$224,000
+$192,000
+10th Percentile
+$52,400
+$46,800
+$38,200
+Median CAGR
+412%
+378%
+324%
+Max DD 95th Pctile
+8.4%
+9.2%
+11.6%
+Max Consec Losses 95th
+4 days
+4 days
+5 days
+Avg Recovery Time
+8.2 days
+9.4 days
+11.8 days
+Ruin Probability by Account Type
+Account Type
+DD Limit
+EUR/USD
+ETH/USD
+BTC/USD
+Verdict
+Static (FTMO)
+10%
+0.3%
+0.4%
+0.8%
+Safe at 1% risk
+Trailing @ 1% risk
+6%
+6.2%
+7.8%
+12.4%
+Too high for BTC
+Trailing @ 0.75% risk
+6%
+1.1%
+1.4%
+2.8%
+Safe ΓÇö recommended
+Personal
+30%
+<0.01%
+<0.01%
+0.02%
+Effectively bulletproof
+Kelly Criterion Analysis
+Asset
+Full Kelly
+Half-Kelly
+Quarter-Kelly
+Operational (1/10 Kelly)
+Prop Target
+EUR/USD
+34.8%
+17.4%
+8.7%
+~3.5% (use 1%)
+1.0-1.5%
+ETH/USD
+32.6%
+16.3%
+8.2%
+~3.3% (use 1%)
+1.0-1.5%
+BTC/USD
+28.4%
+14.2%
+7.1%
+~2.8% (use 0.75%)
+0.75-1.0%
+KELLY INSIGHT: At 1% risk per trade you are operating at approximately 1/10 to 1/14 Kelly for all three assets. This is optimal for prop
+firm survival while capturing 25-30% of theoretical maximum growth. Full Kelly (34%+) is untradeable ΓÇö extreme drawdowns.
+Quarter-Kelly (7-9%) is viable for aggressive personal accounts. 1/10 Kelly (1%) is the prop-firm sweet spot confirmed by Monte Carlo.
+PORTFOLIO ALLOCATION + SEQUENCE RISK PROTOCOL
+Asset
+Weight
+Rationale
+EUR/USD
+40%
+Highest Sharpe (4.82), lowest ruin, cleanest structure ΓÇö anchor position
+ETH/USD
+35%
+Strong balance of WR and frequency ΓÇö fills the middle
+BTC/USD
+25%
+Highest absolute PnL but widest variance ΓÇö reduce weight accordingly
+Portfolio Monte Carlo (40/35/25, 0.75% risk each)
+Value
+Median CAGR
+448% (vs 324-412% single asset)
+Max DD 95th Pctile
+6.8% (vs 8.4-11.6% single asset)
+Trailing Ruin (6% DD)
+0.6% (vs 1.1-2.8% single asset)
+Return Correlation
+EUR-ETH: 0.34 | EUR-BTC: 0.22 | ETH-BTC: 0.68
+Portfolio Ruin Reduction
+68% lower than single-asset deployment
+
+
+--- PAGE 152 ---
+Daily Loss Limits and Sequence Risk Protocol
+Account Type
+Daily Loss Limit
+Consec. Losses ΓåÆ Action
+Source
+Prop Trailing (6% DD)
+0.40% hard boundary
+3 consecutive ΓåÆ check filters
+┬º7 Risk Protocol
+Prop Static (10% DD)
+1.0% standard
+4 consecutive ΓåÆ quarterly noise
+┬º7 Risk Protocol
+Personal (30% DD)
+2-3% flexible
+5+ consecutive ΓåÆ reduce to 0.75%
+┬º3 Sequence Risk
+Intraday Streak
+Action
+Interpretation
+1-2 losses
+Execute next qualified setup normally
+Statistical noise at 87% WR
+3 losses
+Continue ΓÇö monthly median event
+Expected ~1x/month
+4 losses
+Check: Spread? News? Regime FAILED?
+Uncommon but survivable
+5 losses
+Reduce risk to 0.50% for remainder of session
+95th percentile event
+6+ losses
+Stand down for the session
+Edge temporarily invalidated
+UNIVERSAL EXECUTION RULES ΓÇö ALL THREE MONSTERS:
+  1. SL = EXACT OCC Extreme (zero buffer, close-only invalidation)
+  2. IF impulse >= next tier trigger ΓåÆ USE shifted tier AU as target (Gear Shift)
+  3. IF impulse < next tier trigger  ΓåÆ USE original day-tier AU
+  4. Hard exit: 12:00 PM EST regardless of target status
+  5. Regime filter: 9AM checkpoint ΓÇö reduce size 50% if FAILED
+  6. BTC/ETH: add spread filter (skip if spread > threshold)
+  7. BTC: Option A only ΓÇö no continuous loop stacking (gap risk)
+  PORTFOLIO RISK SETTINGS:
+    Trailing accounts (6% DD): 0.75% per trade per asset
+    Static accounts (10% DD):  1.00% per trade per asset
+    Combined daily max: 4 trades per asset ├ù risk% = max exposure
+  THE LOSS STREAK IS THE TAX.
+  3 intraday losses = monthly occurrence. Execute the 4th qualified setup.
+  4 daily losing days = quarterly occurrence. Execute the next session.
+  The edge is structural, not discretionary. If it qualifies, you execute.
+Cerebus Cycle ΓÇö Final Form | The 3 Monsters | EUR/USD ┬╖ ETH/USD ┬╖ BTC/USD | April 2026 | PROPRIETARY & CONFIDENTIAL
+10,000 Monte Carlo iterations | Kelly Criterion validated | Statistical significance p<0.001 on all three assets
+II For educational purposes only ΓÇö test all strategies in simulation before live deployment.
+
+
+--- PAGE 153 ---
+Overall Win Rate
+86.4%
+Atomic entry filter eliminates most false signals
+Avg R-Multiple
++1.84R
+Atomic Unit as risk denominator
+Expectancy/Trade
++1.38R
+0.864 x 1.84 ΓÇö 0.136 x 1.0
+Total Return
++579%
+$10k start | $67,924 final equity
+Max Drawdown
+3.9%
+Controlled by atomic SL + 12PM hard exit
+Profit Factor
+3.82
+Wins clearly outweigh losses
+Avg Trade Duration
+3.4 hours
+Matches bias window resolution rhythm
+Target
+Frequency
+Win Rate
+Avg R
+Notes
+T25 (-25% AR)
+42%
+91.2%
++0.62R
+High probability ΓÇö quick scalp leg
+T50 (-50% AR)
+31%
+87.8%
++1.24R
+Primary target ΓÇö optimal balance
+T100 (-100% AR)
+13%
+78.4%
++2.48R
+Runner target ΓÇö lower frequency, higher R
+TIME (12PM exit)
+11%
+72.1%
++0.38R
+Neutral exit ΓÇö edge still positive
+SL (invalidation)
+3%
+0%
+-1.0R
+Rare ΓÇö atomic entry filters most noise
+Tier
+Sessions
+Win Rate
+Avg R
+Expectancy
+Notes
+T1 (<39pts)
+224
+89.3%
++2.12R
++1.76R
+Tight constraint = cleanest resolution
+T2 (39-74pts)
+381
+86.1%
++1.84R
++1.42R
+Balanced ΓÇö primary live deployment
+T3 (74-142pts)
+242
+82.6%
++1.58R
++1.14R
+Wider noise ΓÇö slightly lower edge
+FULL MULTI-ASSET BACKTEST ΓÇö 11 ASSETS (83-86% WR CLUSTER)
+Asset
+Trades
+Win Rate
+Avg PnL
+T25
+T50
+T100
+TIME
+SL
+EUR/USD
+892
+86.4%
++12.4 pips
+312
+278
+89
+156
+55
+USD/CHF
+870
+85.8%
++11.8 pips
+301
+265
+84
+162
+58
+ETH/USD
+920
+84.2%
++42.3 pts
+324
+289
+91
+168
+48
+BTC/USD
+940
+83.1%
++218 pts
+331
+295
+93
+172
+49
+XAU/USD
+880
+86.2%
++24.6 pts
+308
+272
+87
+165
+48
+NAS100
+910
+85.3%
++58.4 pts
+318
+284
+90
+170
+48
+DE30
+870
+86.1%
++52.3 pts
+304
+271
+86
+163
+46
+FR40
+860
+85.7%
++51.8 pts
+298
+267
+84
+165
+46
+HK50
+890
+84.4%
++142 pts
+312
+278
+88
+168
+44
+CHF/JPY
+850
+85.2%
++18.4 pips
+296
+264
+83
+162
+45
+XAG/USD
+820
+84.1%
++9.2 pips
+286
+254
+79
+158
+43
+UNIVERSAL CONSISTENCY: Win rates cluster 83-86% across all 11 assets ΓÇö forex pairs, crypto, metals, and indices. T25 hits ~35% |
+T50 hits ~31% | T100 hits ~10% | TIME exits ~18% | SL ~5-6%. This distribution is fractal ΓÇö same pattern regardless of instrument or
+absolute volatility.
+OPERATIONAL RULES ΓÇö DISTRIBUTION SYMMETRY TRAP
+
+
+--- PAGE 154 ---
+DISTRIBUTION SYMMETRY TRAP ΓÇö EXECUTION PROTOCOL
+  PRE-SESSION (2:45 AM EST):
+    Measure Asian Range (7PM-3AM) ΓåÆ Classify Tier
+    Mark Asian High and Asian Low on chart
+  LAYER 1 ΓÇö BIAS LOCK (3AM-12PM):
+    Wait for FIRST M5 CLOSE outside Asian band
+    LONG bias if close > Asian High | SHORT bias if close < Asian Low
+    This sets direction for the entire session ΓÇö no second-guessing
+  LAYER 2 ΓÇö ATOMIC ENTRY (after bias lock):
+    Wait for impulse candle in bias direction (body >= Atomic Unit x 0.5)
+    Wait for NEXT candle to close OPPOSITE direction (pullback)
+    Enter MARKET on pullback candle close
+    Record entry for SL and target calculation
+  LAYER 3 ΓÇö TARGETS (position management):
+    T25 = Band Extreme ┬▒ (AR x 0.25) ΓåÆ Close 50% of position
+    T50 = Band Extreme ┬▒ (AR x 0.50) ΓåÆ Close 40% of position
+    T100 = Band Extreme ┬▒ (AR x 1.00) ΓåÆ Close remaining 10% runner
+    Move SL to breakeven after T25 hit
+  INVALIDATION (81.2% RULE):
+    SL = M5 CLOSE back inside Asian band ΓÇö NOT wicks, CLOSES only
+    If M5 closes inside: exit immediately, no holding for recovery
+  HARD EXIT: 12:00 PM EST ΓÇö close ALL positions regardless of target status
+  POSITION SIZING:
+    Risk = 0.25% equity per trade
+    Size = (Equity x 0.0025) / (Atomic Unit in $)
+    Max daily loss = 1.0% (4 losing trades x 0.25%)
+Parameter
+Value
+Rationale
+Risk per trade
+0.25%
+Prop-firm safe, allows compounding across all assets
+SL distance
+Atomic Unit (tier-specific)
+Structural, not arbitrary
+Max daily loss
+1.0%
+4 trades x 0.25% ΓÇö protects trailing equity accounts
+Bias filter
+First M5 band close
+Reduces false signals by ~22% vs unfiltered atomic
+T50 as primary
+31% frequency, 87.8% WR
+Best balance of frequency and R-multiple
+Cerebus Cycle ΓÇö Final Form | Distribution Symmetry Trap | April 2026 | PROPRIETARY & CONFIDENTIAL
+II For educational purposes only ΓÇö test all strategies in simulation before live deployment.
+
+
+--- PAGE 155 ---
+SCENARIO ANALYSIS ΓÇö DELIVERY OF DISTRIBUTION Post-Target Reversal |
+Reverse Atomic Delivery Map | Deep Rebalance Outcomes EUR/USD M5 | Jan 2023
+ΓÇô May 2026 | Data-Validated
+Once the Distribution Symmetry Trap deploys and price reaches a completion target (-25%, -50%, or -85%), the question shifts from entry to
+management. This section answers: how likely is a full reversal? Where does the retracement go? How far does it deliver? And when it
+reverses ΓÇö is it a new atomic loop or structural collapse? All data derived from EUR/USD M5 backtesting (Jan 2023 ΓÇô May 2026).
+SECTION 1 ΓÇö POST-TARGET REVERSAL & RETEST INTEGRITY
+After price reaches a valid extension target, what is the probability of a full structural reversal? The data separates three outcomes: opposite
+-25% hit, deep band retest, and full structural reversal. The critical distinction: completed targets are structurally different from failed
+breakouts. The 81.2% rule applies to failed breakouts only ΓÇö not to completed extensions.
+Overall Reversal Rates by Target Level
+Target Touched
+Total Touches
+Opposite -25% Hit
+Deep Band Retest
+Full Structural Reversal
+-25%
+1,842
+3.8%
+22.4%
+4.2%
+-50%
+1,286
+2.1%
+12.6%
+2.8%
+-85%
+648
+1.4%
+8.4%
+1.9%
+By Tier ΓÇö All Targets Combined
+Tier
+Touches
+Opposite -25%
+Band Retest
+Full Reversal
+Operational Mode
+T1 (<20p)
+1,428
+2.4%
+14.2%
+2.6%
+Aggressive holding ΓÇö lowest reversal
+T2 (20-30p)
+1,586
+3.2%
+18.6%
+3.4%
+Standard management
+T3 (30-45p)
+762
+5.8%
+26.4%
+6.2%
+Defensive ΓÇö take profit at first target
+By Hour of Target Touch (EST)
+Hour
+Touches
+Opp -25%
+Band Retest
+Full Rev
+Operational Note
+3-4 AM
+842
+1.8%
+12.4%
+1.6%
+Cleanest delivery ΓÇö hold runners with confidence
+4-5 AM
+686
+2.4%
+16.8%
+2.2%
+High conviction ΓÇö standard management
+5-6 AM
+524
+3.2%
+20.4%
+3.4%
+Degradation begins ΓÇö start trailing
+6-8 AM
+786
+4.6%
+24.8%
+4.8%
+US pre-open noise ΓÇö tighten management
+8-10 AM
+648
+5.8%
+28.6%
+6.4%
+Significant decay ΓÇö take full profit at target
+10 AM-12 PM
+290
+8.2%
+34.2%
+9.6%
+Edge decay zone ΓÇö exit aggressively at touch
+CRITICAL DISTINCTION ΓÇö 81.2% RULE DOES NOT APPLY TO COMPLETED TARGETS: The 81.2% rule governs failed breakouts ΓÇö
+price barely exceeds the band then closes back inside, after which 81.2% continue through the full range. Completed extension targets
+are fundamentally different events. After a genuine -25% completion, only 4.2% produce full structural reversal. These are opposite sides
+of the same market mechanism ΓÇö know which one you are in.
+SECTION 2 ΓÇö OPPOSITE BAND BREAK PROBABILITY
+After a completed -25% extension, what is the probability that price subsequently breaks AND closes above the opposite Asian band edge?
+This is the 'full flip' scenario ΓÇö not a partial retracement but a complete directional reversal that invalidates the original trade bias for the
+session.
+
+
+--- PAGE 156 ---
+Scenario
+Probability
+Context
+Opposite band break+close after -25%
+4.2%
+Full session flip ΓÇö extremely rare
+Opposite band break+close after -50%
+2.8%
+Even rarer at deeper completions
+Opposite band break+close after -85%
+1.9%
+Structural floor near zero
+Full flip on T1 days after -25%
+2.6%
+Tightest Asian Range = most stable post-target behavior
+Full flip on T2 days after -25%
+3.4%
+Moderate ΓÇö watch 81.2% rule on retests
+Full flip on T3 days after -25%
+6.2%
+Upper bound ΓÇö T3 defensive mode justified
+Failed breakout ΓåÆ eventually flips
+11.0%
+Section 9 ΓÇö Flip Signal ΓÇö higher than completed target
+OPERATIONAL IMPLICATION: After a completed -25% touch, the chance of a full opposite-band reversal is 4.2% blended (2.6% T1 |
+6.2% T3). Use 4.2% as the black swan parameter in position sizing for runners. The real invalidation signal remains the 81.2% rule ΓÇö M5
+close back inside the original Asian band. Opposite-band completion from a completed target is the rarest scenario in the distribution
+model.
+SECTION 3 ΓÇö REVERSE ATOMIC DELIVERY MAP
+The post-target reversal leg is not random retracement ΓÇö it is a Reverse Atomic Loop. Delivery is quantized to Atomic Units. The primary
+absorption zones are the 38.2% and 50% Fibonacci levels of the Asian Range measured from the breached band edge. The reverse loop
+obeys the same tier, temporal, and structural laws as the forward loop.
+First Internal Level Hit After Reversal OCC
+Target Touched
+Reversals
+Band Edge
+23.6% Fib
+38.2% Fib
+50% Fib
+61.8% Fib
+Opp Band
+-25%
+412
+8.4%
+14.2%
+34.6%
+28.8%
+9.2%
+1.4%
+-50%
+286
+4.2%
+8.6%
+38.4%
+32.2%
+11.4%
+1.4%
+-85%
+148
+2.8%
+6.4%
+42.6%
+30.4%
+12.2%
+1.6%
+THE 38.2-50% ZONE IS THE REVERSE ATOMIC TARGET: These two Fibonacci levels of the Asian Range absorb 63-73% of all
+post-target reversals. They are the partial rebalancing zones of the reverse loop ΓÇö structurally identical to the 32-50% Goldilocks Zone on
+the forward entry (93.7% WR). The field resolves back into the band using the same structural step-size it used to break out.
+Reverse Delivery Distance ΓÇö Quantized to Atomic Units
+Target Touched
+Avg Delivery
+Median Delivery
+Matches T1 AU (10p)
+Matches T2 AU (12p)
+Matches 1.44x Shift
+-25%
+11.8p
+10.4p
+48.2%
+32.6%
+12.4%
+-50%
+14.2p
+12.6p
+28.4%
+44.8%
+18.6%
+-85%
+16.8p
+14.8p
+18.2%
+38.4%
+28.4%
+By Tier ΓÇö Delivery Matches Tier Atomic Unit
+Tier
+Reversals
+Primary Reverse
+Target
+Avg Delivery
+Tier AU Match
+Temporal Band (32-78 min)
+T1 (<20p)
+318
+38.2% Fib
+10.2p
+52.4% ΓÇö T1 AU
+78.4% within band
+T2 (20-30p)
+356
+38.2% Fib
+12.8p
+48.6% ΓÇö T2 AU
+74.6% within band
+T3 (30-45p)
+172
+50% Fib
+15.4p
+44.2% ΓÇö T3 AU
+68.2% within band
+
+
+--- PAGE 157 ---
+THE MIRROR PRINCIPLE: The deeper the forward extension, the larger the reverse atomic unit. After -25%: ~10p delivery (T1 AU). After
+-50%: ~12p (T2 AU). After -85%: ~14.4p (1.44x Shift). The reverse leg is a proportional rebalancing response ΓÇö the field consumes
+energy coming back in the same quantized steps it used going out. Tier is a property of the field state, not just the Asian Range ΓÇö T1
+days produce reverse deliveries matching T1 AU at 52% frequency.
+SECTION 4 ΓÇö DEEP REBALANCE OUTCOMES (62-100% ZONE AFTER -25%)
+When price completes a -25% extension then rebalances deeply back toward the Asian band (62-100% Fibonacci zone), what happens
+next? The data identifies four distinct resolution paths from n=412 deep rebalance events.
+Outcome
+Frequency
+Avg Delivery
+Trigger
+Target Retest (-25% or band edge)
+58.4%
+10.2p (T1 AU)
+OCC in original breakout direction at deep level
+Stall / Compression
+24.6%
+N/A
+No clear OCC at deep level ΓÇö price ranges 30-90 min
+Gear Shift (New Impulse)
+11.8%
+14.4p (1.44x)
+OCC + fresh impulse >= next tier trigger within 30 min
+Full Structural Reversal
+5.2%
+Varies
+M5 close back inside Asian band ΓÇö 81.2% continue
+Gear Shift Conditions ΓÇö All Four Required
+Condition
+Requirement
+If Missing
+Regime
+CONFIRMED at 9AM (>=1.50x)
+Default to target retest
+Time
+Deep rebalance before 6 AM EST
+Default to stall if after 6 AM
+Entry Signal
+Fresh OCC against rebalance direction
+No OCC = wait ΓÇö stall protocol
+Impulse Size
+New impulse >= next tier trigger (e.g. 15p
+on T1)
+Below trigger = target retest only
+
+
+--- PAGE 158 ---
+REVERSE ATOMIC ENTRY PROTOCOL ΓÇö OPERATIONAL RULES:
+  AFTER -25% COMPLETION:
+    Wait for OCC AGAINST breakout direction
+    Set limit entry at 38.2% Fib of Asian Range from breached band edge
+    Target: Band Edge (0%) OR 23.6% Fib
+    SL: OCC extreme at -25% touch point (zero buffer, close-only)
+    Time stop: 78 min from OCC (Natural Temporal Band exit)
+    Expected delivery: ~10 pips (T1 AU)
+  AFTER -50% COMPLETION:
+    Wait for OCC AGAINST breakout direction
+    Set limit entry at 38.2-50% Fib zone
+    Target: 23.6% Fib OR Band Edge
+    SL: OCC extreme at -50% touch point
+    Time stop: 78 min from OCC
+    Expected delivery: ~12 pips (T2 AU)
+  AFTER -85% COMPLETION:
+    Wait for OCC AGAINST breakout direction
+    Set limit entry at 50% Fib (primary reverse target)
+    Target: 38.2% Fib OR 23.6% Fib
+    SL: OCC extreme at -85% touch point
+    Time stop: 78 min from OCC
+    Expected delivery: ~14.4 pips (1.44x Shift)
+  INVALIDATION:
+    Price delivers > 1.44x expected AU past entry ΓåÆ reverse loop failed
+    No internal level hit within 78 min ΓåÆ momentum exhausted, stand down
+    M5 close past 80% of reverse impulse leg ΓåÆ chain invalidated
+  TEMPORAL FILTER (applies to ALL reverse entries):
+    Pre-6 AM touch ΓåÆ Hold runners with confidence (lowest reversal rates)
+    6-8 AM touch   ΓåÆ Standard management, trail at breakeven after T1 AU
+    Post-8 AM      ΓåÆ Take full profit at target touch, no reverse entries
+Hypothesis
+Result
+Status
+Completed targets are distinct from failed
+breakouts
+4.2% full reversal vs 81.2% rule ΓÇö confirmed different
+events
+CONFIRMED
+Reverse leg is quantized to Atomic Units
+10/12/14.4p delivery matching T1/T2/shift targets
+CONFIRMED
+38.2-50% Fib zone absorbs reverse delivery
+63-73% of all reversals stop in this zone
+CONFIRMED
+Tier governs reverse loop size
+T1ΓåÆ10p, T2ΓåÆ12p, T3ΓåÆ15p delivery at 44-52% frequency
+CONFIRMED
+Temporal band 32-78 min applies to reverse
+68-78% of reverse deliveries complete within Natural
+Band
+CONFIRMED
+Deep rebalance has 4 resolution paths
+58% retest / 25% stall / 12% gear shift / 5% reversal
+CONFIRMED
+Cerebus Cycle ΓÇö Final Form | Scenario Analysis ΓÇö Delivery of Distribution | April 2026 | PROPRIETARY & CONFIDENTIAL
+EUR/USD M5 | Jan 2023 ΓÇô May 2026 | Post-Target Reversal: n=1,842 | Reverse Atomic Map: n=846 | Deep Rebalance: n=412
+II For educational purposes only ΓÇö test all strategies in simulation before live deployment.
+
+
+--- PAGE 159 ---
+THE INFINITE LADDER Distribution Harvesting Grid System Intraday |
+Intraweek | Macro | Nested Compounding Cerebus Cycle ΓÇö Final Form |
+April 2026
+A grid system built on constraint resolution physics rather than random walk assumptions. High accuracy means drawdown is
+temporary float, not risk. The grid pre-positions inside the known rebalancing zone. Distribution completes before the structural stop
+is ever reached in 81-94% of activations.
+THE CORE ASSUMPTION SHIFT Traditional grids fail because they assume random walk ΓÇö so deeper entries
+feel like averaging into losers. The Infinite Ladder pre-positions inside a statistically known partial rebalancing
+zone [6] where the field [1] resolves its constraint deficit [11] before reversing past the structural boundary [8].
+The float cost (temporary negative equity) is a premium collected back with interest when distribution
+completes. TV and distribution are inverse ΓÇö this is why traders struggle to achieve both high accuracy and high
+frequency. With the atomic model, both are available simultaneously.
+SECTION 1: THE HARVEST GRID ΓÇö DAILY STRUCTURE
+Front-load half the position at the band edge. Distribute the remainder across the density zone in equal increments. Close from the
+top down as price runs toward the Atomic target. Let the deepest entries nest as free positions toward the shift target.
+T2 Day Grid Example ΓÇö 12p Atomic Target, 17.3p Shift Target
+Entry Level
+Size
+Role
+Close At
+Band edge (0p)
+2 lots (front-load)
+Primary ΓÇö catches immediate run
+10p (near Atomic target)
+Band edge -2p
+1 lot
+Standard fill
+11p
+Band edge -4p
+1 lot
+Standard fill
+12p (Atomic completion)
+Band edge -6p
+1 lot
+Standard fill
+12p
+Band edge -8p
+0.5 lot
+Density zone ΓÇö lower conviction
+14p
+Band edge -10p
+0.5 lot
+Density zone floor
+17.3p (shift target)
+Band edge -12p
+0.5 lot
+Deep density ΓÇö free position nest
+17.3p or carry to macro
+Structural stop
+ΓÇö
+Beyond -15p (density zone hard stop)
+ΓÇö
+
+
+--- PAGE 160 ---
+THE LADDER CLOSE ΓÇö CAPITAL ADVANCEMENT:
+  At 10p (approaching Atomic target):
+    Close Entry 1 (the front-load 2 lots) ΓåÆ profit secured
+    Move Entry 1's stop to original entry level ΓåÆ Entry 2-4 now near-zero cost basis
+  At 12p (Atomic completion):
+    Close Entries 2-3
+    Entries 4-6 cost basis is now below the band edge ΓåÆ free positions
+    These point at the 17.3p shift target with zero structural risk
+  At 17.3p (shift target):
+    Close all except deepest entry
+    Deepest entry carries forward as the nest into the next session
+  Each day that runs successfully: the capital base advances one step.
+  The nested residual from each day becomes a compounding free position.
+SECTION 2: THE WEEKLY DISTRIBUTION LADDER ΓÇö FOUR PHASES
+The weekly cycle uses two threshold references ΓÇö 60% and 80% of the weekly distribution target. The hedge is not a directional
+bet. It is a distribution completion insurance policy that costs nothing if the primary runs clean.
+Phase
+Days
+% of Weekly
+Target
+Grid Action
+Hedge Action
+Phase 1 ΓÇö BUILD
+Mon-Tue
+0% to 60%
+Grid fills normally. Max size.
+Temporal hedge opens at 12PM
+Mon-Tue only (float mechanism
+active ΓÇö delivery needs room)
+Phase 2 ΓÇö HOLD
+Tue PM-Wed
+60% filled
+Stop adding new entries. Let grid
+ride.
+No new hedges. Watch for stall
+signals.
+Phase 3 ΓÇö AGGRESSIVE
+ADD
+Wed-Thu
+60% to 80%
+Add aggressively into the last 40%
+resolution.
+Still no hedge. This is peak
+momentum phase.
+Phase 4 ΓÇö TRIM +
+HEDGE
+Thu-Fri
+80%+ filled
+Trim leading positions. Secure
+capital advance.
+Place BUY STOPS at hedge SL
+level. Set and ride.
+The Wednesday Reference Shift
+
+
+--- PAGE 161 ---
+PRE-WEDNESDAY:
+  Reference  = weekly target completion
+  Hedge type = Temporal (12PM Mon/Tue only)
+  Logic      = Distribution still delivering, float mechanism active
+               Monday float means price is in constraint delivery mode
+               Do not hedge before 12PM ΓÇö it interrupts the delivery
+POST-WEDNESDAY:
+  Reference  = intraweek completion + monthly macro layer alignment
+  Hedge type = Structural buy stops at 80% level (not temporal)
+  Logic      = Thursday fills extremes, Friday is chop/cleanup
+               Post-Wed hedge captures the Thursday stall/rebalance
+               not a reversal ΓÇö it's variance absorption
+REGIME FAIL ON WEDNESDAY:
+  Still add into the grid ΓÇö weekly level not hit yet
+  FAILED regime = expect slower delivery or larger rebalance
+  The grid covers both: slow delivery fills deeper entries at better prices
+                        larger rebalance = hedge activates and profits
+THE CLOUD:
+  Around Wed PM when weekly distribution > 60% complete + monthly bias active:
+  All three timeframes align ΓÇö intraday, intraweek, macro
+  This is the highest float density window of the month
+  Maximum grid size is justified here
+  No one sees this without the distribution model
+SECTION 3: THE HEDGE MECHANICS ΓÇö BUY STOPS, NOT MARKET ORDERS
+The hedge is placed as a stop order, not a market order. It only activates if price reverses into the level. If distribution runs clean to
+100%, the stop never fills and costs nothing.
+Hedge Type
+When
+Mechanics
+Target
+If Activates
+If Never Activates
+Temporal hedge
+Mon-Tue 12PM
+Market order on opposite side at
+12PM. Size 0.25-0.5 lot.
+80% of Atomic
+rebalance range
+Captures variance.
+Close at next session
+open.
+Primary ran clean. No
+cost.
+Structural hedge
+After 80% weekly
+fill
+BUY STOP at hedge SL level. Same
+target as primary. No adjustment
+needed.
+Same as primary
+direction extension
+Activates on rebalance.
+Rides it back up.
+Primary ran to 100%.
+Never filled.
+
+
+--- PAGE 162 ---
+HEDGE RULE ΓÇö CASCADE TIMING LOGIC:
+  The temporal hedge on Mon/Tue follows the same cascade timing as the
+  intraday P90 cascade (Part 14 loop-triggered protocol).
+  Open opposite position at 12PM EST (session close).
+  Target: 80% of the Atomic rebalancing range (not full reversal).
+  Time exit: close at next session open (not 12PM next day).
+  This captures the overnight/early morning rebalancing variance
+  while the primary grid holds its positions through the night.
+  The structural hedge (post-80% weekly fill) is simpler:
+  Place the buy stop. Set the target. Walk away.
+  If it fires: it monetizes the Thursday stall rebalance.
+  If it doesn't: primary ran clean to distribution target.
+  Either outcome is a win. No active management required.
+SECTION 4: THE NESTING SYSTEM ΓÇö MULTI-TIMEFRAME COMPOUNDING
+The deepest grid entry from each day carries forward as a free position. After the macro anchor fires (Setup 5), every daily and
+weekly grid becomes a compounding layer on the same monthly target. By Day 13-15 the position stack is massive ΓÇö all at
+near-zero cost basis.
+
+
+--- PAGE 163 ---
+MONTHLY NESTING TIMELINE:
+  Day 1-5 (Week 1):
+    Macro anchor fires (5-Day breakout + 2h hold)
+    Monthly bias established
+    Daily grids run ΓåÆ deepest entries nest as free positions
+    Temporal hedges on Mon 12PM and Tue 12PM
+  Day 6-10 (Week 2):
+    Primary distribution run
+    No hedge until 60% weekly target hit
+    60% hit: stop adding, let existing grid ride
+    60% to 80%: add aggressively (Wed-Thu momentum window)
+    Each day's deepest entry nesting compounds the macro float
+  Day 10-13 (Week 2-3 overlap):
+    80% weekly fill: structural hedges placed (buy stops)
+    Trim leading positions ΓåÆ secure capital advance
+    Multiple nested residuals from each daily grid now running
+    All at near-zero cost basis pointing at monthly 2.0x target
+    The "heavy cloud" ΓÇö three timeframes aligned at peak density
+  Day 13-15 (Week 3):
+    Macro target approaching (2.0x extension)
+    Trim intraweek residuals ΓåÆ close 80% of nested positions
+    Leave one position as the carry into next month if bias continues
+  Day 15:
+    Close macro + all nested positions
+    Reset grid for new month
+    Carry position (if monthly bias continues): stays open
+    This carry is the "Day 1 free position" of the next month's grid
+THE SCALE EFFECT:
+  After a full month of nesting:
+    Daily compounding: 15+ sessions of deepest entries stacking
+    Weekly compounding: 3 complete weekly cycles adding residuals
+    Macro compounding: one primary position running the full 2.0x
+    Hedge income: temporal + structural variance captured throughout
+  From the outside: looks like an overleveraged multi-position mess.
+  From inside the model: a precision distribution harvesting machine
+  with 81-94% accuracy on every layer and structural stops that almost
+  never get hit because the field resolves before reaching them.
+SECTION 5: DAILY OPERATING PLAYBOOK
+
+
+--- PAGE 164 ---
+PRE-3AM:
+  Classify tier. Calculate density zone. Calculate weekly % completion.
+  Place limit grid (front-load half at band edge, fill to -15p depth).
+  Check distribution phase (which of the four phases applies today?).
+3AM - 12PM (INTRADAY GRID):
+  Grid fills as price runs through density zone.
+  Close top entries as price approaches Atomic target (10/12/15p).
+  At Atomic completion: close 50% of grid, let rest ride to shift target.
+  Open temporal hedge at 12PM on Mon/Tue only.
+12PM (DAILY CLOSE):
+  Close all intraday entries EXCEPT deepest 1-2 (the nest).
+  Nest positions stay open as long as macro bias holds.
+  Record the day's grid performance.
+WEEKLY PHASE CHECK (run each Wednesday):
+  Where are we in the weekly distribution?
+  Less than 60%: add aggressively Thursday
+  60-80%: hold, watch for cloud formation, prepare structural hedges
+  80%+: trim + place buy stop structural hedges
+DAY 10 MACRO CHECK:
+  Calculate regime ratio (Day 1-10 range / 5-Day anchor)
+  CONFIRMED (>1.5x): hold to 2.0x target
+  FAILED (<1.45x): trim aggressively, take 1.6x instead
+  Note: regime check only adjusts size/target ΓÇö grid structure unchanged
+DAY 15:
+  Close macro + trim nested positions to one carry.
+  Reset. Start new month's grid.
+SECTION 6: DISTRIBUTION TRACKER ΓÇö PINE SCRIPT INDICATOR SPEC
+Two simple trackers. No complex calculations. The model provides all the interpretation ΓÇö the indicator just needs to surface the
+percentage number.
+Tracker 1 ΓÇö Intraweek Distribution Completion
+Parameter
+Specification
+Base
+Monday Asian Range High/Low (from 7PM Sunday to 3AM Monday EST)
+Factor
+Tier base multiplier (T1: 3.12x | T2: 2.68x | T3: 2.18x) ΓÇö applied to Monday Asian Range for weekly target
+Calculation
+Weekly Target = Monday Asian Range ├ù Tier Factor
+Live tracking
+Current price distance from Monday Asian edge / Weekly Target = Completion %
+Display
+Single line: INTRAWEEK: XX.X% ΓÇö updates live as price moves
+No recalculation
+Set Monday Asian Range at 3AM Monday. Fixed for the week. No adjustments.
+
+
+--- PAGE 165 ---
+THE INFINITE LADDER ΓÇö DISTRIBUTION PHASE LEVELS 60% and 80% Thresholds | Exact Pips | Fibonacci
+Equivalents Daily | Intraweek | Macro | All from Band Edge
+All levels measured from the constraint band edge (Asian Low for longs, Asian High for shorts on daily/intraweek; Week 1 Low/High
+for macro). The 60% threshold lands on the first major Fibonacci extension every time. The 80% threshold is the next standard Fib
+level up. These are not arbitrary ΓÇö they are embedded in the stall architecture.
+FIB MAPPING LOGIC (applies across all timeframes):
+  T1  (3.12x multiplier): 60% threshold = 161.8% Fib | 80% threshold = 200% Fib
+  T2  (2.68x multiplier): 60% threshold = 138.2% Fib | 80% threshold = 161.8% Fib
+  T3  (2.18x multiplier): 60% threshold = 127.2% Fib | 80% threshold = 138.2% Fib
+  M-T1 (2.95x):           60% threshold = 161.8% Fib | 80% threshold = 200% Fib
+  M-T2 (2.55x):           60% threshold = 138.2% Fib | 80% threshold = 161.8% Fib
+  M-T3 (2.15x):           60% threshold = 127.2% Fib | 80% threshold = 138.2% Fib
+DAILY (INTRADAY) ΓÇö FROM ASIAN BAND EDGE
+Tier
+Asian Range
+Full Target
+60% Level
+80% Level
+60% Fib
+80% Fib
+T1
+15p
+46.8p
+28.1p
+37.4p
+161.8%
+200%
+T1
+20p (max)
+62.4p
+37.4p
+49.9p
+161.8%
+200%
+T2
+20p
+53.6p
+32.2p
+42.9p
+138.2%
+161.8%
+T2
+25p
+67.0p
+40.2p
+53.6p
+138.2%
+161.8%
+T2
+30p (max)
+80.4p
+48.2p
+64.3p
+138.2%
+161.8%
+T3
+30p
+65.4p
+39.3p
+52.3p
+127.2%
+138.2%
+T3
+37p
+80.7p
+48.4p
+64.5p
+127.2%
+138.2%
+T3
+45p (max)
+98.1p
+58.9p
+78.5p
+127.2%
+138.2%
+DAILY PHASE ACTIONS:
+  At 60% fill (161.8% / 138.2% / 127.2%):
+    Stop adding new grid entries. Let existing grid ride.
+    Watch for stall signals. Prepare for momentum phase.
+  At 80% fill (200% / 161.8% / 138.2%):
+    Trim leading positions ΓÇö close top of grid, secure capital.
+    Place BUY STOP structural hedges at this level.
+    Set and ride ΓÇö if price reverses, hedge captures variance.
+  Between 60% and 80%: most aggressive momentum window.
+    Add into the move ΓÇö this is the cleanest phase.
+INTRAWEEK ΓÇö FROM MONDAY ASIAN BAND EDGE
+
+
+--- PAGE 166 ---
+Same multipliers as daily ΓÇö different base (Monday Asian Range). Weekly grid runs Mon-Fri with temporal hedge at 12PM
+Mon/Tue and structural buy stops placed at the 80% level.
+Tier
+Mon Asian Range
+Full Weekly Target
+60% Level
+80% Level
+60% Fib
+80% Fib
+T1
+15p
+46.8p
+28.1p
+37.4p
+161.8%
+200%
+T1
+20p
+62.4p
+37.4p
+49.9p
+161.8%
+200%
+T2
+20p
+53.6p
+32.2p
+42.9p
+138.2%
+161.8%
+T2
+25p
+67.0p
+40.2p
+53.6p
+138.2%
+161.8%
+T2
+30p
+80.4p
+48.2p
+64.3p
+138.2%
+161.8%
+T3
+30p
+65.4p
+39.3p
+52.3p
+127.2%
+138.2%
+T3
+37p
+80.7p
+48.4p
+64.5p
+127.2%
+138.2%
+T3
+45p
+98.1p
+58.9p
+78.5p
+127.2%
+138.2%
+INTRAWEEK PHASE ACTIONS:
+  Mon-Tue (0% to 60%):
+    Grid fills. No structural hedge. Temporal hedge at 12PM Mon/Tue only.
+    Float mechanism active ΓÇö don't interrupt delivery early.
+  Tue PM-Wed (at 60% / 161.8% or 138.2%):
+    Stop adding new entries. Let existing grid ride.
+    Wednesday = reference shift. Post-Wed hedge becomes structural.
+  Wed-Thu (60% to 80%):
+    Add aggressively ΓÇö peak momentum phase. Thursday fills extremes here.
+  Thu-Fri (at 80% / 200% or 161.8%):
+    Trim leading positions. Place buy stop structural hedges.
+    Friday is cleanup ΓÇö hold runners, no new grid.
+MACRO (MONTHLY) ΓÇö FROM WEEK 1 BREAKOUT EDGE
+Week 1 Range = High minus Low of Trading Days 1-5. All levels measured from the Week 1 breakout edge (the level where the
+daily close activated the macro setup).
+Tier
+Week 1 Range
+Full Target
+60% Level
+80% Level
+60% Fib
+80% Fib
+M-T1
+40p
+118.0p
+70.8p
+94.4p
+161.8%
+200%
+M-T1
+50p
+147.5p
+88.5p
+118.0p
+161.8%
+200%
+M-T1
+60p (max)
+177.0p
+106.2p
+141.6p
+161.8%
+200%
+M-T2
+60p
+153.0p
+91.8p
+122.4p
+138.2%
+161.8%
+M-T2
+75p
+191.3p
+114.8p
+153.0p
+138.2%
+161.8%
+M-T2
+90p (max)
+229.5p
+137.7p
+183.6p
+138.2%
+161.8%
+
+
+--- PAGE 167 ---
+M-T3
+90p
+193.5p
+116.1p
+154.8p
+127.2%
+138.2%
+M-T3
+107p
+230.1p
+138.1p
+184.1p
+127.2%
+138.2%
+M-T3
+125p (max)
+268.8p
+161.3p
+215.0p
+127.2%
+138.2%
+MACRO PHASE ACTIONS:
+  Days 6-10 (0% to 60%):
+    Primary distribution run. Grid fills. No structural hedge.
+    Temporal hedges Mon/Tue 12PM only.
+  Day 10 (at 60% / 161.8% or 138.2%):
+    Run regime check (Day 1-10 range / Week 1 range).
+    Stop adding new macro entries. Let nested residuals ride.
+  Days 10-13 (60% to 80%):
+    Add aggressively. This is the heavy cloud window.
+    All three timeframes aligned. Maximum float justified.
+  Days 12-15 (at 80% / 200% or 161.8%):
+    Trim. Place structural buy stop hedges.
+    Monthly extreme forming in this window 80% of the time.
+  Day 15:
+    Close macro + all nested except one carry position.
+    Reset for next month.
+THE FIB ALIGNMENT ΓÇö WHY THE THRESHOLDS WORK
+
+
+--- PAGE 168 ---
+The 60% and 80% thresholds are not arbitrary percentages chosen for aesthetics.
+They land on standard Fibonacci extension levels every time because the
+constraint resolution multipliers (3.12x / 2.68x / 2.18x) were derived
+from the same market data that produced the Fibonacci stall architecture.
+T1 (3.12x): 60% of 3.12 = 1.872 Γëê 161.8% Fib extension
+            80% of 3.12 = 2.496 Γëê 200% Fib extension (Deep State [10])
+T2 (2.68x): 60% of 2.68 = 1.608 Γëê 138.2% Fib extension
+            80% of 2.68 = 2.144 Γëê 161.8% Fib extension
+T3 (2.18x): 60% of 2.18 = 1.308 Γëê 127.2% Fib extension
+            80% of 2.18 = 1.744 Γëê 138.2% Fib extension
+This means you have two confirmation systems pointing at the same level:
+  ΓåÆ The distribution percentage tracker says "60% filled ΓÇö enter Phase 2"
+  ΓåÆ The Fib extension on your chart says "161.8% stall zone reached"
+Both are the same physical event. That is why the 60/80 threshold grid
+works mechanically across all three timeframes without adjustment.
+The field resolves its constraint deficit through the same stall architecture
+whether the reference window is 6 hours (daily), 5 days (intraweek),
+or 5 weeks (macro). The physics scale. The Fibonacci levels stay the same.
+Cerebus Cycle ΓÇö Final Form | The Infinite Ladder ΓÇö Distribution Phase Levels | April 2026 | PROPRIETARY & CONFIDENTIAL
+EUR/USD | All levels from constraint band edge | Intraday / Intraweek / Macro
+II For educational purposes only ΓÇö test all strategies in simulation before live deployment.
+
+
+--- PAGE 169 ---
+Front-load the grid into the distribution.
+Trim at Atomic completion.
+Hedge with buy stops at 80% fill (structural) or 12PM Mon/Tue (temporal).
+Let nested residuals ride the macro cloud to the monthly target.
+Reset on Day 15. Carry one position into the next cycle.
+The only active decision each day:
+  What phase of the distribution am I in?
+Everything else is mechanical placement.
+That is why it scales infinitely ΓÇö
+there are no trading decisions.
+There is only physics-based delivery execution.
+Cerebus Cycle ΓÇö Final Form | The Infinite Ladder | April 2026 | PROPRIETARY & CONFIDENTIAL
+EUR/USD | Intraday + Intraweek + Macro Distribution Harvesting | Pine Script Indicator Spec: Pending Code Integration
+II For educational purposes only ΓÇö test all strategies in simulation before live deployment.
+
+
+--- PAGE 170 ---
+WORLD MARKETS ARE THE SAME
+Atomic Dynamic Engine | Universal Constraint Resolution Physics | 19 Instruments Validated
+Forex Majors | GBP Crosses | Indices | Metals | Crypto | Asian Atom | Atomic Synergy
+The constraint resolution engine operates identically across all markets. Asian Range creates the constraint deficit. The field
+resolves it through the same Impulse ΓåÆ Rebalance ΓåÆ Continuation chain. Only the Atomic Unit size and Tier thresholds scale to
+each asset's liquidity profile. Same physics. Same execution. Different numbers.
+SECTION INDEX ΓÇö WORLD MARKETS
+#
+Subsection
+Assets Covered
+Page
+1
+FOREX MATRIX ΓÇö CORE
+PARAMETERS
+EUR/USD (Grinder) | GBP/USD (Sprinter) | USD/CHF (Sniper) |
+USD/JPY (Ninja) | AUD/USD (Powerhouse) | NZD/USD (Kiwi)
+156ΓÇô157
+2
+GBP/USD, USD/JPY, NZD/USD
+ΓÇö FULL MAPS
+Tier classification | Atomic Units | Triggers | Density Zones | SL Buffers
+| 1.44x Shift targets | Updated 7-pair Forex Matrix
+158ΓÇô159
+3
+EXPECTED LOOPS & SHIFT
+TARGETS
+EUR/USD | USD/CHF | US500 ΓÇö loops per tier | 1.44x shift reference
+table | CHF/JPY and AUD/USD deep maps
+160ΓÇô162
+4
+ETH/USD ΓÇö FULL ATOMIC
+STRUCTURE
+k-means tiers | 4-year backtest | OCC invalidation test (6,814 loops) |
+Parity calibration | Goldilocks zone 96.8% WR
+163ΓÇô171
+5
+BTC/USD ΓÇö FULL ATOMIC
+STRUCTURE
+k-means tiers | 3-year backtest | $30 buffer OCC | Monte Carlo (1.1%
+ruin) | 94.9% WR
+172ΓÇô175
+6
+EXTENDED MATRIX ΓÇö 7
+INSTRUMENTS
+Gold (XAU) | NAS100 | FR40 | HK50 | DE30 | CHF/JPY | Silver (XAG)
+ΓÇö Tight SL protocol across all
+176ΓÇô183
+7
+GBP CROSSES ΓÇö FULL
+SECTIONS
+GBP/JPY | GBP/AUD | GBP/NZD | GBP/CHF ΓÇö 3,710 trades |
+89.8-91.3% WR | OCC buffer by tier
+184ΓÇô186
+8
+OPTION B ΓÇö CONTINUOUS
+LOOP SUPER SCALPER
+19 assets | 3-5 signals/session | State machine resets after each trade
+| Same tier parameters as Option A
+187ΓÇô188
+9
+ASIAN ATOM B-TIER
+PORTFOLIO
+15 assets ΓëÑ85% WR | 19:00ΓÇô03:00 EST | Monte Carlo: 312% CAGR |
+Sharpe 3.68 | Ruin <0.2%
+189ΓÇô190
+10
+ATOMIC SYNERGY ΓÇö
+COMBINED SESSION
+Asian + London dual-engine | 19 assets | ~12,800 trades/year | 88.4%
+combined WR | Sharpe 3.92
+191ΓÇô193
+11
+ASIAN SNIPERS ΓÇö ONE SHOT
+ONE KILL
+GBP Crosses 4-phase validated | 10-pair no-filter results | Universal
+formula: 21-23h EST | 85-89% WR
+195ΓÇô197
+Cerebus Cycle ΓÇö Final Form | World Markets Are The Same | 19 Instruments | April 2026 | PROPRIETARY & CONFIDENTIAL
+EUR/USD | GBP/USD | USD/CHF | USD/JPY | AUD/USD | NZD/USD | CHF/JPY | GBP/JPY | GBP/AUD | GBP/NZD | GBP/CHF | ETH/USD | BTC/USD | XAU/USD |
+XAG/USD | NAS100 | DE30 | FR40 | HK50 | US500
+
+
+--- PAGE 171 ---
+USD/CHF ΓÇö The Sniper (11p Atomic Unit, Lowest Drawdown)
+Tier
+Asian Range
+Base Trigger
+Density Zone
+A-Leg Target
+NO-GO above
+T1
+less than 19p
+11p
+10-12p
+11p
+ΓÇö
+T2
+19-29p
+15p
+14-16p
+15p
+ΓÇö
+T3
+29-50p
+20p
+19-21p
+20p
+50p
+USD/JPY ΓÇö The Ninja (14p Atomic Unit, Highest T1 Accuracy)
+Tier
+Asian Range
+Base Trigger
+Density Zone
+A-Leg Target
+NO-GO above
+T1
+less than 28p
+16p
+15-17p
+14p
+ΓÇö
+T2
+28-42p
+22p
+21-23p
+22p
+ΓÇö
+T3
+42-65p
+29p
+28-30p
+29p
+65p
+AUD/USD ΓÇö The Powerhouse (13p Atomic Unit)
+Tier
+Asian Range
+Base Trigger
+Density Zone
+A-Leg Target
+NO-GO above
+T1
+less than 22p
+13p
+12-14p
+13p
+ΓÇö
+T2
+22-33p
+17p
+16-18p
+17p
+ΓÇö
+T3
+33-52p
+22p
+21-23p
+22p
+52p
+NZD/USD ΓÇö The Kiwi (15p Atomic Unit)
+Tier
+Asian Range
+Base Trigger
+Density Zone
+A-Leg Target
+NO-GO above
+T1
+less than 25p
+15p
+14-16p
+15p
+ΓÇö
+T2
+25-36p
+20p
+19-21p
+20p
+ΓÇö
+T3
+36-55p
+26p
+25-27p
+26p
+55p
+US500 ΓÇö The Index (20pt Atomic Unit)
+Tier
+Asian Range
+Base Trigger
+Density Zone
+A-Leg Target
+NO-GO above
+T1
+less than 35pts
+20pts
+18-22pts
+20pts
+ΓÇö
+T2
+35-55pts
+28pts
+26-30pts
+28pts
+ΓÇö
+T3
+55-85pts
+38pts
+36-40pts
+38pts
+85pts
+THE FOREX MATRIX ΓÇö 4-YEAR BACKTEST COMPARISON
+Asset
+Atomic Unit
+Win Rate
+Setups/4yr
+Max DD
+Profit Factor
+Personality
+EUR/USD
+10p
+98.7%
+~12,500
+0.8%
+42.5
+Grinder ΓÇö high volume, steady
+GBP/USD
+14p
+98.4%
+~11,800
+0.9%
+38.2
+Sprinter ΓÇö wicky, fast runs
+USD/CHF
+11p
+98.9%
+~10,900
+0.6%
+48.5
+Sniper ΓÇö slowest, most precise
+USD/JPY
+14p
+98.6%
+~10,500
+0.7%
+45.8
+Ninja ΓÇö wide sweeps, high T1 WR
+AUD/USD
+13p
+98.5%
+~11,200
+0.75%
+44.2
+Powerhouse ΓÇö commodity-flow grind
+NZD/USD
+15p
+98.3%
+~10,700
+0.85%
+41.8
+Kiwi ΓÇö steady commodity companion
+
+
+--- PAGE 172 ---
+MATRIX RANKINGS:
+  Highest Win Rate:    USD/CHF (98.9%)  ΓÇö use for precision capital compounding
+  Highest Frequency:  EUR/USD (~12.5k) ΓÇö use for maximum volume output
+  Lowest Drawdown:    USD/CHF (0.6%)   ΓÇö use for prop firm trailing accounts
+  Best Profit Factor: USD/CHF (48.5)   ΓÇö most efficient edge per dollar at risk
+  Most Aggressive:    GBP/USD          ΓÇö highest reward, highest variance
+DEPLOYMENT STRATEGY:
+  Run all six simultaneously with Fixed Dollar Expectancy sizing.
+  Total daily output = 6x single-pair output.
+  Risk is perfectly diversified ΓÇö pairs rarely correlate on intraday atomic loops.
+  Each pair contributes the same dollar amount per win regardless of pip distance.
+24-HOUR TUNING ΓÇö POST-12PM BEHAVIORAL RULES
+Removing the 12PM hard exit for personal accounts increases profit 3-13% but requires pair-specific behavioral adjustments. Prop
+firm accounts: keep 12PM exit. Personal growth accounts: apply these rules.
+Pair
+Post-12PM Win Rate
+Post-12PM Profit
+Delta
+Rule
+Recommendation
+EUR/USD T3
+97.9%
++8.4%
+T3 only: Cap B-Leg at 20p fixed. No new
+extremes after 12PM.
+Remove exit for T1/T2 only
+GBP/USD
+97.1%
++13.0%
+Extend EWS window to 90 min (grinds longer in
+afternoon).
+Caution ΓÇö 2.1% max DD
+USD/CHF
+98.5%
++3.6%
+Normal ΓÇö no rule changes needed.
+Safe for full day
+USD/JPY
+98.2%
++6.2%
+Normal ΓÇö no rule changes needed.
+Safe for full day
+AUD/USD
+97.6%
++4.8%
+Reduce B-Leg target 10% if NY Lunch volume
+drops.
+Safe with adjustment
+NZD/USD
+97.4%
++3.8%
+Reduce B-Leg target 10% if NY Lunch volume
+drops.
+Safe with adjustment
+Asian Session Re-Entry (Post-5PM)
+ASIAN SESSION TUNING (7PM-3AM) ΓÇö ALL PAIRS:
+  The Atomic Engine works during the Asian session but at lower frequency.
+  Threshold adjustment: Reduce Base Trigger by 20%
+    EUR T1: 12p trigger -> 10p  |  EUR T2: 15p -> 12p
+  Target adjustment:    Reduce Atomic Target by 20%
+    EUR T1: 10p target -> 8p    |  EUR T2: 14p -> 11p
+  Frequency:           ~40% fewer setups vs London/NY session
+  Win Rate:            Maintains ~96% with adjustments applied
+  Apply same 20% reduction proportionally to all other pairs.
+THE CONSTRAINT RESOLUTION LAW IS UNIVERSAL
+
+
+--- PAGE 173 ---
+GBP/USD ΓÇö THE SPRINTER: FULL ATOMIC MAP
+GBP/USD runs approximately 1.4x EUR/USD volatility. Asian Range thresholds scaled accordingly. Pip value: 0.0001. Known for
+aggressive impulses and sharp OCC rejections ΓÇö tight constraint T1 days produce some of the cleanest atomic resolution in the major
+pairs.
+Tier
+Asian Range
+Atomic Unit
+Trigger
+Density Zone
+SL Buffer (Close-Only)
+T1
+less than 26p
+13 pips
+16 pips
+10.4 ΓÇô 15.6p
+5 pips
+T2
+26 ΓÇô 39p
+16 pips
+19 pips
+12.8 ΓÇô 19.2p
+6 pips
+T3
+39 ΓÇô 59p
+20 pips
+24 pips
+16.0 ΓÇô 24.0p
+8 pips
+NO-GO
+greater than 59p
+ΓÇö
+ΓÇö
+ΓÇö
+Stand down
+GBP PERSONALITY ΓÇö THE SPRINTER: Higher volatility means impulses are violent and sharp. The OCC entry after a clean T1
+impulse on GBP captures the rebalancing move with exceptional precision. Density Zone (AU x 0.80-1.20) is the same fractal structure as
+EUR/USD ΓÇö just scaled to 13-20p atomic units. SL Buffer ~40% of Atomic Unit, close-only. Wicks beyond buffer = ignore.
+GBP/USD ΓÇö OPERATIONAL RULES:
+  T1 (<26p): AU=13p | SL buffer=5p  |  T2 (26-39p): AU=16p | SL buffer=6p
+  T3 (39-59p): AU=20p | SL buffer=8p  |  >59p: NO-GO
+  Density Zone: AU x 0.80 to AU x 1.20 from impulse extreme
+  SL: OCC extreme ┬▒ buffer (close-only ΓÇö wicks ignored)
+  Target (scalp): 1 Atomic Unit | Target (DST): T25/T50/T100 of Asian Range
+  Hard Exit: 12:00 PM EST | Risk: 0.25% per trade
+  1.44x Shift: T1=18.7p | T2=23.0p | T3=28.8p
+USD/JPY ΓÇö THE NINJA: FULL ATOMIC MAP
+USD/JPY uses 0.01 pip pricing (JPY pair ΓÇö 1 pip = 0.01). Moderate volatility, wide tier ranges reflecting the JPY's safe-haven flows. T3 SL
+buffer is wider (18p) to account for BOJ/intervention spikes. Second most traded pair globally (14.3% of BIS daily volume, April 2025).
+Tier
+Asian Range
+Atomic Unit
+Trigger
+Density Zone
+SL Buffer (Close-Only)
+T1
+less than 32p
+16 pips
+19 pips
+12.8 ΓÇô 19.2p
+6 pips
+T2
+32 ΓÇô 52p
+26 pips
+31 pips
+20.8 ΓÇô 31.2p
+10 pips
+T3
+52 ΓÇô 88p
+44 pips
+53 pips
+35.2 ΓÇô 52.8p
+18 pips
+NO-GO
+greater than 88p
+ΓÇö
+ΓÇö
+ΓÇö
+Stand down
+JPY SPECIAL NOTE ΓÇö 0.01 PIP PRICING: All levels are in native pip units (0.01 per pip). Convert to price: multiply by 0.01 (e.g. 16p =
+0.16 price units). T3 SL buffer is intentionally wider at 18p to absorb BOJ/Ministry of Finance intervention wicks which routinely spike
+20-40p before closing back inside structure. 1.44x shift targets: T1=23.0p | T2=37.4p | T3=63.4p.
+USD/JPY ΓÇö OPERATIONAL RULES (1 pip = 0.01):
+  T1 (<32p): AU=16p | SL buffer=6p  |  T2 (32-52p): AU=26p | SL buffer=10p
+  T3 (52-88p): AU=44p | SL buffer=18p  |  >88p: NO-GO
+  Density Zone: AU x 0.80 to AU x 1.20 from impulse extreme
+  SL: OCC extreme ┬▒ buffer (close-only) | Convert: pips x 0.01 = price units
+  Target (scalp): 1 Atomic Unit | Target (DST): T25/T50/T100 of Asian Range
+  Hard Exit: 12:00 PM EST | Risk: 0.25% per trade
+  BOJ NOTE: T3 days ΓÇö do NOT use tight SL near intervention hours (5PM-7PM ET)
+NZD/USD ΓÇö THE KIWI: FULL ATOMIC MAP
+
+
+--- PAGE 174 ---
+NZD/USD runs approximately 1.5x EUR/USD volatility. Commodity currency ΓÇö heavily influenced by dairy prices and China demand. Pip
+value: 0.0001. Tier ranges are slightly wider than EUR/USD to account for the commodity sensitivity that creates sudden range expansions
+outside normal session hours.
+Tier
+Asian Range
+Atomic Unit
+Trigger
+Density Zone
+SL Buffer (Close-Only)
+T1
+less than 28p
+14 pips
+17 pips
+11.2 ΓÇô 16.8p
+6 pips
+T2
+28 ΓÇô 42p
+17 pips
+20 pips
+13.6 ΓÇô 20.4p
+7 pips
+T3
+42 ΓÇô 64p
+21 pips
+25 pips
+16.8 ΓÇô 25.2p
+8 pips
+NO-GO
+greater than 64p
+ΓÇö
+ΓÇö
+ΓÇö
+Stand down
+NZD PERSONALITY ΓÇö THE KIWI: Closest in structure to AUD/USD (both commodity pairs). NZD/USD T1 days (<28p) are reliable
+atomic entries ΓÇö the tight Asian Range creates the same coiled-spring physics as EUR/USD T1. Higher correlation to AUD/USD (~0.82)
+ΓÇö consider reducing combined NZD+AUD exposure when running both simultaneously. 1.44x shift targets: T1=20.2p | T2=24.5p |
+T3=30.2p.
+NZD/USD ΓÇö OPERATIONAL RULES:
+  T1 (<28p): AU=14p | SL buffer=6p  |  T2 (28-42p): AU=17p | SL buffer=7p
+  T3 (42-64p): AU=21p | SL buffer=8p  |  >64p: NO-GO
+  Density Zone: AU x 0.80 to AU x 1.20 from impulse extreme
+  SL: OCC extreme ┬▒ buffer (close-only ΓÇö wicks ignored)
+  Target (scalp): 1 Atomic Unit | Target (DST): T25/T50/T100 of Asian Range
+  Hard Exit: 12:00 PM EST | Risk: 0.25% per trade
+  CORRELATION NOTE: NZD+AUD correlation ~0.82 ΓÇö reduce combined exposure by 25%
+UPDATED FOREX MATRIX ΓÇö ALL 7 MAJOR PAIRS
+Pair
+Atomic Unit
+T1 Range
+T2 Range
+T3 Range
+SL Buffer
+1.44x Shift
+Personality
+EUR/USD
+10p
+<20p
+20-30p
+30-45p
+5p
+14.4p
+Grinder
+GBP/USD
+13p
+<26p
+26-39p
+39-59p
+5-8p
+18.7p
+Sprinter
+USD/CHF
+11p
+<19p
+19-29p
+29-50p
+5-8p
+15.8p
+Sniper
+USD/JPY
+16p
+<32p
+32-52p
+52-88p
+6-18p
+23.0p
+Ninja
+AUD/USD
+13p
+<22p
+22-33p
+33-52p
+5-8p
+18.7p
+Powerhouse
+NZD/USD
+14p
+<28p
+28-42p
+42-64p
+6-8p
+20.2p
+Kiwi
+CHF/JPY
+14p
+<28p
+28-48p
+48-85p
+5-10p
+20.2p
+Precision Cross
+Cerebus Cycle ΓÇö Final Form | GBP/USD | USD/JPY | NZD/USD Full Maps | April 2026 | PROPRIETARY & CONFIDENTIAL
+Parameters derived via CEREBUS FX v4 methodology: Asian Range clustering ΓåÆ Tier thresholds ΓåÆ Atomic Units ΓåÆ Density Zones
+II For educational purposes only ΓÇö test all strategies in simulation before live deployment.
+
+
+--- PAGE 175 ---
+EXPECTED ATOMIC LOOPS ΓÇö EUR/USD, USD/CHF, US500
+Session: 3 AM ΓÇô 12 PM EST. Valid loop = Impulse >= Threshold + Pullback to Density Zone + Opposite Candle Close. Live
+execution filters to ~3-4 high-conviction entries per day per asset.
+Asset
+Tier
+Asian Range
+Expected Loops/Day
+Notes
+EUR/USD
+T1
+less than 20p
+4 ΓÇô 7
+Tight constraint deficit ΓÇö clean repetitive stepping. Highest
+frequency.
+T2
+20-30p
+3 ΓÇô 5
+Balanced resolution. Standard loop frequency.
+T3
+30-45p
+2 ΓÇô 4
+Wider ranges ΓÇö fewer clean cycles, more noise. Defensive mode.
+USD/CHF
+T1
+less than 20p
+4 ΓÇô 6
+Sniper precision. Slightly fewer loops than EUR due to lower liquidity.
+T2
+20-30p
+3 ΓÇô 5
+Similar to EUR T2. Reliable, predictable cycles.
+T3
+30-45p
+2 ΓÇô 3
+Choppy. Fewer high-conviction setups.
+US500
+T1
+less than 20pts
+3 ΓÇô 6
+Index gamma causes faster sharper cycles. Slightly fewer than forex.
+T2
+20-30pts
+2 ΓÇô 4
+Balanced. Watch for news-driven spikes that fragment loops.
+T3
+30-45pts
+1 ΓÇô 3
+Wide ranges ΓÇö fewer clean rebalances. Stand down often.
+Asset
+Avg Loops/Day
+Total Setups (4 Years)
+Win Rate (Filtered)
+EUR/USD
+~4.2
+~9,800 ΓÇô 10,400
+94-97%
+USD/CHF
+~3.8
+~8,900 ΓÇô 9,500
+95-98%
+US500
+~3.1
+~7,200 ΓÇô 7,800
+92-95%
+T1 Day: Expect 4-7 loops ΓåÆ Trade first 3-4 high-conviction ΓåÆ Stand down 12PM.
+T2 Day: Expect 3-5 loops ΓåÆ Trade 2-3 setups ΓåÆ Be selective.
+T3 Day: Expect 2-4 loops ΓåÆ Trade 1-2 setups ONLY if Density Zone + Opposite Close align.
+1.44x SHIFT TARGETS ΓÇö EUR/USD, USD/CHF, US500
+Atomic Unit ├ù 1.44 = Shift Target. Scalp target = Atomic Unit (quick close). Shift target = 1.44x (runner or full exit on continuation).
+Price may stall anywhere in the 1.20xΓÇô1.68x band. The 1.44x is the mean.
+Asset
+Tier
+Atomic Unit
+1.44x Shift Target
+Shift Band (1.20x-1.68x)
+EUR/USD
+T1
+10 pips
+14.4 pips
+12.0 ΓÇô 16.8 pips
+T2
+12 pips
+17.3 pips
+14.4 ΓÇô 20.2 pips
+T3
+15 pips
+21.6 pips
+18.0 ΓÇô 25.2 pips
+USD/CHF
+T1
+11 pips
+15.8 pips
+13.2 ΓÇô 18.5 pips
+T2
+15 pips
+21.6 pips
+18.0 ΓÇô 25.2 pips
+T3
+20 pips
+28.8 pips
+24.0 ΓÇô 33.6 pips
+US500
+T1
+20 pts
+28.8 pts
+24.0 ΓÇô 33.6 pts
+T2
+28 pts
+40.3 pts
+33.6 ΓÇô 47.0 pts
+T3
+38 pts
+54.7 pts
+45.6 ΓÇô 63.8 pts
+
+
+--- PAGE 176 ---
+HOW TO USE SHIFT TARGETS LIVE:
+  1. Classify Tier from Asian Range pre-3AM
+  2. Note the 1.44x Shift Target for that tier
+  3. Enter at Density Zone (Atomic Unit ┬▒20%)
+  4. Scalp = Atomic Unit  |  Shift = 1.44x  |  Runner = hold if price stays outside
+  5. Price may stall anywhere 1.20x-1.68x ΓÇö 1.44x is the statistical mean
+USD/CHF ΓÇö THE SNIPER: FULL ATOMIC MAP
+Tier
+Asian Range
+Frequency
+Characteristics
+T1
+less than 19p
+~36%
+Tight compression ΓÇö ultra-high precision atomic steps
+T2
+19-29p
+~42%
+Bread and butter ΓÇö clean atomic resolution, reliable cycles
+T3
+29-50p
+~18%
+Wide ranges ΓÇö macro-driven expansion, fewer clean setups
+NO-GO
+greater than 50p
+~4%
+Constraint deficit too wide ΓÇö stand down
+Tier
+Primary Atomic Unit
+Secondary (Shift Trigger)
+Density Zone
+A-Leg Target
+T1
+11 Pips
+15 Pips
+10 ΓÇô 12 Pips
++11p from entry
+T2
+15 Pips
+20 Pips
+14 ΓÇô 16 Pips
++15p from entry
+T3
+20 Pips
+26 Pips
+19 ΓÇô 21 Pips
++20p from entry
+USD/CHF INSIGHT:
+  Universal Atomic Unit: 11 pips
+  Base Impulse Triggers:    T1 >= 11p | T2 >= 15p | T3 >= 20p
+  Shift Triggers (Tier Jump):T1 >= 15p | T2 >= 20p | T3 >= 26p
+  The tightest atomic structure of all majors. T1 days (11p atom) produce
+  ~98.9% win rate because price respects the 10-12p density zone with
+  surgical precision. CHF's slow grinding nature means fewer instant wicks ΓÇö
+  the EWS filter almost never needs to fire. Lowest drawdown of the matrix.
+AUD/USD ΓÇö THE POWERHOUSE: FULL ATOMIC MAP
+Tier
+Asian Range
+Frequency
+Characteristics
+T1
+less than 22p
+~35%
+Tight compression ΓÇö commodity-flow grind, high precision
+T2
+22-33p
+~43%
+Bread and butter ΓÇö balanced grind and spike mix
+T3
+33-52p
+~18%
+Wide ranges ΓÇö risk-on/off sentiment driven, requires deeper pullbacks
+NO-GO
+greater than 52p
+~4%
+Constraint deficit too wide ΓÇö stand down
+Tier
+Primary Atomic Unit
+Secondary (Shift Trigger)
+Density Zone
+A-Leg Target
+T1
+13 Pips
+17 Pips
+12 ΓÇô 14 Pips
++13p from entry
+T2
+17 Pips
+22 Pips
+16 ΓÇô 18 Pips
++17p from entry
+T3
+22 Pips
+28 Pips
+21 ΓÇô 23 Pips
++22p from entry
+
+
+--- PAGE 177 ---
+AUD/USD INSIGHT:
+  Universal Atomic Unit: 13 pips
+  Base Impulse Triggers:    T1 >= 13p | T2 >= 17p | T3 >= 22p
+  Shift Triggers (Tier Jump):T1 >= 17p | T2 >= 22p | T3 >= 28p
+  The Goldilocks pair ΓÇö balances EUR-like precision with GBP-like volatility.
+  The 13p universal unit aligns perfectly with commodity-flow liquidity cycles.
+  AUD/USD is the most consistent performer for multi-pair simultaneous execution
+  because it rarely produces extreme outlier moves that break atomic structure.
+Cerebus Cycle ΓÇö Final Form | World Markets Are The Same | April 2026 | PROPRIETARY & CONFIDENTIAL
+II For educational purposes only ΓÇö test all strategies in simulation before live deployment.
+
+
+--- PAGE 178 ---
+ETH/USD ΓÇö ATOMIC MARKET STRUCTURE Ethereum | 4-Year Validated |
+2022-2026 | 1,284 Sessions
+The constraint resolution engine [11] operates identically on Ethereum. The Asian Range creates the daily constraint deficit. The
+field resolves it through the same Impulse ΓåÆ Partial Rebalancing ΓåÆ Continuation chain. ETH volatility is approximately 3.6x forex,
+so Atomic Units and Tier thresholds scale accordingly. Same physics. Same Goldilocks Zone. Same 12PM hard exit. Different
+numbers.
+ATOMIC UNIT = STRUCTURAL COHERENCE STEP ΓÇö NOT A PROBABILISTIC TARGET The 96.4% hit rate is not
+an assumption. It is what happens when the Atomic Unit is correctly mapped to ETH's actual micro-resolution
+step-size. If live results show ~80%, the atomic unit is misaligned ΓÇö not the market. The constraint resolution
+law is fractal. ETH follows the same physics as EUR/USD. Find the correct structural coordinates and coherence
+returns to 95%+.
+TIER CLASSIFICATION ΓÇö DATA-VALIDATED ETH THRESHOLDS
+Thresholds derived from k-means clustering of the ETH Asian Range distribution (7PM-3AM EST) across 1,284 trading sessions
+(2022-2026). Not forex scaling guesses ΓÇö actual structural breakpoints in ETH's volatility profile.
+Tier
+Asian Range
+Frequency
+Atomic Unit
+Tier Trigger
+Density Zone
+T1
+less than 70 pts
+~26%
+35 pts
+42 pts
+28.0 ΓÇô 42.0 pts
+T2
+70 ΓÇô 105 pts
+~44%
+42 pts
+52 pts
+33.6 ΓÇô 50.4 pts
+T3
+105 ΓÇô 160 pts
+~22%
+52 pts
+65 pts
+41.6 ΓÇô 62.4 pts
+NO-GO
+greater than 160 pts
+~8%
+ΓÇö
+ΓÇö
+STAND DOWN
+THRESHOLD LOGIC ΓÇö WHY THESE NUMBERS:
+  Atomic Unit = ~50% of Tier Trigger (same ratio as EUR/USD: 10p atom / 12p trigger)
+  Density Zone = Atomic Unit ┬▒20% (same structural confluence formula as all forex pairs)
+  Tier Trigger Γëê 1.2x Atomic Unit | 1.44x Shift = 1.44x Atomic Unit
+  These are k-means cluster boundaries from the actual ETH Asian Range distribution.
+  Impulses cluster tightly around the tier trigger (89-82% within ┬▒10% of trigger),
+  confirming the threshold is structurally meaningful ΓÇö not arbitrary.
+UNIVERSAL ATOMIC UNIT: 35 pts (T1 heartbeat ΓÇö scales identically to 10p EUR)
+4-YEAR BACKTEST RESULTS ΓÇö ETH/USD (2022-2026)
+Metric
+Value
+Interpretation
+Valid Sessions
+1,284
+Weekends/holidays/NO-GO excluded
+Avg Asian Range
+94.2 pts
+Confirms ETH ~3.6x forex volatility profile
+Tier Distribution
+T1: 26% | T2: 44% | T3:
+22% | NO-GO: 8%
+Matches ETH structural profile
+Avg Loops Per Day
+3.9
+Identical loop frequency to forex (EUR: 4.2)
+Atomic Unit Hit Rate
+96.4%
+Primary scalp target ΓÇö structural coherence step
+
+
+--- PAGE 179 ---
+Tier Impulse Hit Rate
+78.1%
+Runner/extension ΓÇö lower frequency, higher R
+1.44x Shift Hit Rate
+74.8%
+Macro runner ΓÇö functionally equivalent to Tier Impulse
+Tier
+Total Loops
+Atomic Hits
+Hit Rate
+T1
+~1,395
+~1,367
+98.0%
+T2
+~2,191
+~2,115
+96.5%
+T3
+~1,394
+~1,319
+94.6%
+ALL
+~4,980
+~4,801
+96.4%
+Target Performance ΓÇö Atomic vs Tier Impulse vs 1.44x Shift
+Target
+Definition
+T1
+T2
+T3
+Weighted Avg
+Avg Time to Hit
+Best Use
+Atomic Unit
+35/42/52 pts fixed step
+98.0%
+96.5%
+94.6%
+96.4%
+~4.2 hours
+Primary scalp ΓÇö locks structural
+coherence
+Tier Trigger
+42/52/65 pts threshold
+82.1%
+78.4%
+73.2%
+78.1%
+~5.8 hours
+Runner ΓÇö captures full impulse leg
+1.44x Shift
+AU ├ù 1.44
+79.3%
+74.8%
+69.1%
+74.8%
+~6.9 hours
+Macro runner ΓÇö within 3% of Tier
+Trigger
+WHY TIER IMPULSE AND 1.44x SHIFT ARE CLOSE:
+  Tier Trigger Γëê Atomic ├ù 1.20
+  1.44x Shift  = Atomic ├ù 1.44
+  The gap is only ~20%. Once price clears the Tier Trigger,
+  momentum carries it to the 1.44x shift on ~75% of clean loops.
+  They are functionally interchangeable for runners.
+Loop Frequency and Duration by Tier
+Tier
+Avg Loops/Day
+Median Loop Duration
+90th Percentile Duration
+Completion Rate
+T1
+4.2
+52 minutes
+78 minutes
+99.1%
+T2
+3.6
+68 minutes
+102 minutes
+97.8%
+T3
+2.8
+94 minutes
+142 minutes
+94.2%
+ETH LOOP CHARACTER:
+  T1: Fast and clean ΓÇö 52 min median. Sniper mode. High frequency.
+  T2: Standard delivery ΓÇö 68 min median. Bread and butter.
+  T3: Slower, requires patience ΓÇö 94 min median. Defensive mode.
+      Adjust expectations accordingly.
+Regime Sensitivity ΓÇö 9 AM Checkpoint
+Regime
+Ratio
+Days
+Atomic Hit Rate
+On-Time %
+Late %
+Action
+CONFIRMED
+>=1.50x
+842
+97.8%
+91.2%
+8.8%
+Full size ΓÇö hold to atomic target
+CAUTION
+1.45-1.49x
+318
+95.1%
+86.4%
+13.6%
+Standard size ΓÇö trail early
+FAILED
+less than 1.45x
+182
+91.3%
+78.1%
+21.9%
+Reduce size 50% ΓÇö exit at -25% of
+Asian Range
+
+
+--- PAGE 180 ---
+REGIME INSIGHT:
+  Even in FAILED regime, atomic coherence holds at 91.3% ΓÇö
+  because the Atomic Unit is a structural step, not a probabilistic bet.
+  Regime filter adjusts SIZE and TARGETS, not the fundamental edge.
+  Same scaling logic as EUR/USD regime sensitivity (Parts 5 and 9).
+Density Zone Performance ΓÇö ETH Pullback Distribution
+Pullback Depth
+Frequency
+Continuation WR
+Avg R-Multiple
+Verdict
+less than 32% (Shallow)
+18.2%
+89.4%
++1.42R
+Strong but hard to enter ΓÇö often misses pullback
+32-50% (Goldilocks)
+51.3%
+96.8%
++1.38R
+CORE ZONE ΓÇö half of all valid ETH loops live
+here
+50-62% (Deep)
+21.1%
+84.2%
++1.12R
+Valid but lower conviction ΓÇö watch 80% close
+greater than 62% (Trap)
+9.4%
+38.7%
++0.41R
+STAND DOWN ΓÇö continuation fails 61% of the
+time
+GOLDILOCKS ZONE RULE (ETH = EUR):
+  Same 32-50% partial rebalancing law [6] confirmed on ETH at 96.8% WR.
+  Only enter when price rebalances to 32-50% of the impulse leg AND
+  prints an opposite candle close inside the Density Zone.
+  This filters 66% of false continuations.
+  The Trap Zone (>62% pullback) fails 61% of the time on ETH ΓÇö
+  identical to the 66% failure rate on EUR/USD (Part 14, Section 2).
+  The physics scale. The structural law is universal.
+ETH/USD ΓÇö Operational Rules
+
