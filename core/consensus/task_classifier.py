@@ -74,7 +74,7 @@ PATTERNS: dict[str, list[str]] = {
     TaskType.AUTOMATION: [
         r"\b(automate|script|cron|schedule|batch|trigger)\b",
         r"\b(deploy|release|publish|push|merge|ship)\b",
-        r"\b(ci|cd|pipeline|build|lint|format)\b",
+        r"\b(ci|cd|pipeline|lint|format)\b",
         r"\b(github|action|workflow|hook)\b",
     ],
     TaskType.SYSTEM_ANALYSIS: [
@@ -130,6 +130,8 @@ class TaskClassifier:
             r"^how('?s| is) it going[\s?!]*$",
             r"^how are you[\s?!]*$",
             r"^how do you do[\s?!]*$",
+            r"^how('?s| is) everything[\s?!]*$",
+            r"^how are you doing[\s?!]*$",
             r"^what'?s up[\s?!]*$",
             r"^good (morning|afternoon|evening|night|day)[\s!.]*$",
             r"^(thanks|thank you|thx|ty|cheers)[\s!.]*$",
@@ -138,10 +140,14 @@ class TaskClassifier:
             r"^(ok|okay|sure|yes|no|yeah|yep|nope|maybe)[\s!.]*$",
             r"^what can you do[\s?!]*$",
             r"^what do you (do|know)[\s?!]*$",
-            r"^tell me about yourself[\s?!]*$",
-            r"^who are you[\s?!]*$",
-            r"^how('?s| is) everything[\s?!]*$",
+            r"^tell me about (yourself|you)[\s?!]*$",
+            r"^who (are you|built you|made you|created you)[\s?!]*$",
+            r"^what (type|kind) of (system|architecture|engine) are you[\s?!]*$",
+            r"^what are you[\s?!]*$",
             r"^how('?s| is) the (field|system|topology)[\s?!]*$",
+            r"^how does the (field|system|observer) work[\s?!]*$",
+            r"^what is (srra|oce|oph)[\s?!]*$",
+            r"^tell me about the (field|system|topology|architecture)[\s?!]*$",
         ]
         for pat in STRONG_CONVERSATION:
             if re.match(pat, text, re.IGNORECASE):
