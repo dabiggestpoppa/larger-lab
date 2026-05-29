@@ -4,9 +4,10 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   async rewrites() {
     return [
+      // Proxy all /api/* to FastAPI backend
       {
-        source: "/command-center/:path*",
-        destination: "http://localhost:8000/command-center/:path*",
+        source: "/api/:path*",
+        destination: "http://localhost:8000/api/:path*",
       },
     ];
   },

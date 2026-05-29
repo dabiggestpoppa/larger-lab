@@ -69,7 +69,7 @@ class PersistentScheduler:
     ]
 
     def __init__(self):
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
         self._tasks: dict[str, ScheduledTask] = {}
         self._init_default_tasks()
 

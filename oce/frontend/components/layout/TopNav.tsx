@@ -17,6 +17,7 @@ const navItems = [
   { href: "/tests", label: "Tests", icon: "✓" },
   { href: "/browser", label: "Browser", icon: "🌐" },
   { href: "/substrate", label: "Substrate", icon: "🖥️" },
+  { href: "/persistence", label: "Persistence", icon: "◷" },
   { href: "/chat", label: "Chat", icon: "💬" },
 ];
 

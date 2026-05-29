@@ -968,6 +968,10 @@ register_sovereign_endpoints(app)
 from .substrate_api import register_substrate_endpoints
 register_substrate_endpoints(app)
 
+# Register O-7 Persistent Field endpoints
+from .persistent_field_api import register_persistent_field_endpoints
+register_persistent_field_endpoints(app)
+
 app.include_router(command_center_router)
 
 # ─── Phase 7: Evolution API ──────────────────────────────────────────────────
@@ -1569,6 +1573,233 @@ async def browser_status():
             return {"status": "available", "response": resp.json()}
     except Exception as e:
         return {"status": "unavailable", "error": str(e)}
+
+
+# ─── Frontend API Aliases (/api/* → existing endpoints) ──────────────────────
+# The Next.js frontend proxies /api/* → /api/* on the backend.
+# These aliases map frontend-expected paths to existing OCE endpoints.
+
+@app.get("/api/topology")
+async def api_topology():
+    """Frontend alias: /api/topology → topology graph with observer nodes."""
+    import math
+    try:
+        adapter = await get_adapter()
+        obs_status = await adapter.get_observer_status()
+        nodes = []
+        count = max(len(obs_status), 1)
+        for i, obs in enumerate(obs_status):
+            angle = (2 * math.pi * i) / count
+            radius = 150
+            nodes.append({
+                "id": obs.get("observer_id", f"obs-{i}"),
+                "label": obs.get("observer_id", f"obs-{i}"),
+                "type": "observer",
+                "status": obs.get("state", "active"),
+                "entropy": obs.get("entropy", 0.0),
+                "syncScore": 1.0 - obs.get("entropy", 0.0),
+                "repairState": "idle",
+                "x": 400 + radius * math.cos(angle),
+                "y": 300 + radius * math.sin(angle),
+            })
+        edges = []
+        for i in range(len(nodes) - 1):
+            edges.append({
+                "source": nodes[i]["id"],
+                "target": nodes[i + 1]["id"],
+                "strength": 0.5,
+                "type": "routing",
+            })
+        # If no observers from adapter, provide seed data for UI testing
+        if not nodes:
+            seed_observers = [
+                {"id": "CC", "label": "CC (Claude Code)", "type": "orchestrator", "status": "active", "entropy": 0.05},
+                {"id": "OC2", "label": "OC2 (OWL)", "type": "operator", "status": "active", "entropy": 0.08},
+                {"id": "AS", "label": "AS (Assistant)", "type": "quality", "status": "active", "entropy": 0.03},
+                {"id": "PM", "label": "PM (Polymorph)", "type": "debugger", "status": "active", "entropy": 0.12},
+                {"id": "PM2", "label": "PM2 (Polymorph 2)", "type": "experimental", "status": "synced", "entropy": 0.07},
+                {"id": "RL", "label": "RL (Researcher)", "type": "research", "status": "active", "entropy": 0.15},
+            ]
+            count = len(seed_observers)
+            for i, obs in enumerate(seed_observers):
+                angle = (2 * math.pi * i) / count
+                radius = 150
+                nodes.append({
+                    "id": obs["id"],
+                    "label": obs["label"],
+                    "type": obs["type"],
+                    "status": obs["status"],
+                    "entropy": obs["entropy"],
+                    "syncScore": 1.0 - obs["entropy"],
+                    "repairState": "idle",
+                    "x": 400 + radius * math.cos(angle),
+                    "y": 300 + radius * math.sin(angle),
+                })
+            # Create a ring of edges
+            for i in range(len(nodes)):
+                edges.append({
+                    "source": nodes[i]["id"],
+                    "target": nodes[(i + 1) % len(nodes)]["id"],
+                    "strength": 0.5 + (0.3 * (1 - nodes[i]["entropy"])),
+                    "type": "routing",
+                })
+            # Add cross-edges
+            if len(nodes) >= 4:
+                edges.append({"source": nodes[0]["id"], "target": nodes[3]["id"], "strength": 0.3, "type": "sync"})
+                edges.append({"source": nodes[1]["id"], "target": nodes[4]["id"], "strength": 0.3, "type": "sync"})
+        try:
+            router = get_router()
+            stats = router.get_topology_stats()
+        except Exception:
+            stats = {"observers": len(nodes), "edges": len(edges), "avg_coupling": 0.5, "density": round(len(edges) / max(len(nodes) * (len(nodes) - 1) / 2, 1), 2)}
+        return {"nodes": nodes, "edges": edges, "stats": stats}
+    except Exception as e:
+        logger.error(f"API topology error: {e}")
+        return {"nodes": [], "edges": [], "stats": {}}
+
+
+@app.get("/api/health")
+async def api_health():
+    """Frontend alias: /api/health."""
+    return {"status": "healthy", "service": "oce-continuity-core"}
+
+
+@app.get("/api/chat/sessions")
+async def api_chat_sessions():
+    """Frontend alias: /api/chat/sessions."""
+    try:
+        adapter = await get_adapter()
+        sessions = await adapter.get_chat_sessions()
+        return {"sessions": sessions}
+    except Exception:
+        return {"sessions": []}
+
+
+@app.post("/api/chat")
+async def api_chat(request: dict):
+    """Frontend alias: /api/chat → /chat."""
+    try:
+        adapter = await get_adapter()
+        message = request.get("message", "")
+        result = await adapter.process_continuity_message(message, request.get("context"))
+        return {
+            "response": result.get("response", "No response"),
+            "session_id": request.get("session_id", "new_session"),
+            "continuity_preserved": True,
+            "observer": result.get("observer", {}),
+            "system": result.get("system", {}),
+            "confidence": result.get("confidence", 0),
+        }
+    except Exception as e:
+        logger.error(f"API chat error: {e}")
+        raise HTTPException(status_code=503, detail=f"Chat unavailable: {str(e)}")
+
+
+@app.post("/api/chat/sessions")
+async def api_create_chat_session(request: dict):
+    """Frontend alias: create new chat session."""
+    return {"session_id": f"session-{datetime.now(timezone.utc).timestamp()}", "created": True}
+
+
+@app.get("/api/entropy/timeseries")
+async def api_entropy_timeseries():
+    """Frontend alias: /api/entropy/timeseries."""
+    try:
+        fabric = get_fabric()
+        events = fabric.get_history(event_type="entropy", limit=100)
+        timeseries = []
+        for e in events:
+            payload = e.payload if hasattr(e, 'payload') else {}
+            timeseries.append({
+                "timestamp": e.timestamp if hasattr(e, 'timestamp') else "",
+                "entropy_before": payload.get("entropy_before", 0),
+                "entropy_after": payload.get("entropy_after", 0),
+                "delta": payload.get("delta", 0),
+            })
+        return {"timeseries": timeseries}
+    except Exception:
+        return {"timeseries": []}
+
+
+@app.get("/api/repair/state")
+async def api_repair_state():
+    """Frontend alias: /api/repair/state."""
+    try:
+        healing = get_self_healing_engine()
+        stats = healing.get_stats()
+        return {
+            "active": stats.get("active_repairs", []),
+            "completed": stats.get("completed_repairs", []),
+            "failed": stats.get("failed_repairs", []),
+            "saturation": stats.get("saturation", 0.0),
+        }
+    except Exception:
+        return {"active": [], "completed": [], "failed": [], "saturation": 0.0}
+
+
+@app.get("/api/temporal/timeline")
+async def api_temporal_timeline():
+    """Frontend alias: /api/temporal/timeline."""
+    try:
+        fabric = get_fabric()
+        events = fabric.get_history(limit=200)
+        frames = []
+        for i, e in enumerate(events):
+            frames.append({
+                "frameId": f"frame_{i}",
+                "timestamp": e.timestamp if hasattr(e, 'timestamp') else i * 1000,
+                "topologySnapshot": {"nodes": [], "edges": []},
+                "entropySnapshot": {"local": 0, "cluster": 0, "global": 0},
+                "repairSnapshot": {"active": [], "completed": []},
+                "events": [{"type": e.event_type if hasattr(e, 'event_type') else "unknown"}],
+                "observerStates": {},
+            })
+        return {"frames": frames}
+    except Exception:
+        return {"frames": []}
+
+
+@app.get("/api/sessions")
+async def api_sessions():
+    """Frontend alias: /api/sessions."""
+    try:
+        adapter = await get_adapter()
+        sessions = await adapter.get_chat_sessions()
+        return {"sessions": sessions}
+    except Exception:
+        return {"sessions": []}
+
+
+@app.get("/api/observers")
+async def api_observers():
+    """Frontend alias: /api/observers → /observers."""
+    try:
+        adapter = await get_adapter()
+        obs_status = await adapter.get_observer_status()
+        return {"observers": obs_status}
+    except Exception:
+        return {"observers": []}
+
+
+@app.get("/api/events")
+async def api_events(limit: int = Query(50, ge=1, le=1000)):
+    """Frontend alias: /api/events → /events."""
+    try:
+        fabric = get_fabric()
+        events = fabric.get_history(limit=limit)
+        return {"events": [
+            {
+                "event_id": e.event_id if hasattr(e, 'event_id') else str(i),
+                "event_type": e.event_type if hasattr(e, 'event_type') else "unknown",
+                "timestamp": e.timestamp if hasattr(e, 'timestamp') else "",
+                "source": e.source if hasattr(e, 'source') else "system",
+                "priority": e.priority if hasattr(e, 'priority') else 0,
+                "payload": e.payload if hasattr(e, 'payload') else {},
+            }
+            for i, e in enumerate(events)
+        ]}
+    except Exception:
+        return {"events": []}
 
 
 if __name__ == "__main__":
