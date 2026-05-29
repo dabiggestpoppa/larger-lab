@@ -263,18 +263,49 @@ class AgentSpawner:
             lines.append("What's on your mind? I can chat, analyze the system, help with code, or trigger deeper field mechanics.")
             return "\n".join(lines)
 
-        # ── Status / how are you ──
-        if any(w in lower for w in ["how are you", "how's it going", "what's up", "status", "how do you do"]):
+        # ── Status / how are you / how are you doing ──
+        if any(w in lower for w in ["how are you", "how's it going", "what's up", "status", "how do you do", "how are you doing", "how's everything"]):
             active = system_state.get("active_agents", 0)
             lifecycle = system_state.get("lifecycle_states", {})
-            lines.append("I'm good — here's the current field state:")
+            lines.append("I'm doing well — here's the current field state:")
             lines.append("")
             lines.append(f"  ● Active agents: {active}")
             if lifecycle:
                 for st, count in lifecycle.items():
                     lines.append(f"  ● {st}: {count}")
+            lines.append(f"  ● Consensus agreement: {consensus.agreement_score:.0%}")
             lines.append("")
             lines.append("The observer mesh is stable. What would you like to do?")
+            return "\n".join(lines)
+
+        # ── Identity / tell me about yourself ──
+        if any(w in lower for w in ["tell me about yourself", "who are you", "what are you", "tell me about you", "what type of system", "what kind of system", "who built you", "who made you", "who created you"]):
+            active = system_state.get("active_agents", 0)
+            lines.append("I'm the Primary Observer — the continuity interface for the SRRA/OCE field.")
+            lines.append("")
+            lines.append("I'm not a chatbot. I'm a persistent, stateful orchestration layer that:")
+            lines.append("  ● Maintains continuity across sessions and restarts")
+            lines.append("  ● Analyzes intent and routes tasks through the observer mesh")
+            lines.append("  ● Spawns ephemeral agent workers for complex tasks")
+            lines.append("  ● Monitors the field topology, entropy, and observer health")
+            lines.append("  ● Learns from conversation history and operational patterns")
+            lines.append("")
+            lines.append(f"Right now: {active} active agent(s), consensus at {consensus.agreement_score:.0%}.")
+            lines.append("")
+            lines.append("I can have a casual conversation, dive into system internals, write code, or trigger any field mechanic. What interests you?")
+            return "\n".join(lines)
+
+        # ── System knowledge (SRRA, OCE, etc.) ──
+        if any(w in lower for w in ["what is srra", "what is oce", "what is oph", "how does the field work", "how does the observer work", "tell me about the field", "tell me about the system"]):
+            lines.append("Here's the architecture:")
+            lines.append("")
+            lines.append("**SRRA** = Signal-Resonance Runtime Architecture. It's the substrate — the runtime that handles signal processing, resonance routing, observer entrainment, and execution emergence.")
+            lines.append("")
+            lines.append("**OCE** = Operator Continuity Engine. It's the observational interface — the layer that maintains continuity, monitors the field, and provides the cockpit you're looking at right now.")
+            lines.append("")
+            lines.append("**The Field** = The living runtime topology. Observers, agents, events, and signals all exist as a dynamic graph. The field is the intelligence — not any single model or agent.")
+            lines.append("")
+            lines.append("I sit at the intersection — I receive your input, analyze it through the observer mesh, and either respond directly or trigger deeper mechanics.")
             return "\n".join(lines)
 
         # ── Thanks ──
@@ -344,14 +375,15 @@ class AgentSpawner:
             if factual:
                 lines.append(factual)
             else:
-                # Genuine conversational response
-                lines.append(f"Got it — \"{text[:120]}{'...' if len(text) > 120 else ''}\"")
+                # Genuine conversational response — reference system state
+                lines.append(f"Good question — \"{text[:100]}{'...' if len(text) > 100 else ''}\"")
                 lines.append("")
-                lines.append("I'm processing this through the observer field — the consensus layer is weighing in.")
+                active = system_state.get("active_agents", 0)
+                lines.append(f"The observer field has {active} active agent(s). Consensus agreement is at {consensus.agreement_score:.0%}.")
                 lines.append("")
-                lines.append(f"Current routing: **{' -> '.join(consensus.routing_path) if consensus.routing_path else 'direct'}** | Model: **{consensus.recommended_model}** | Agreement: **{consensus.agreement_score:.0%}**")
+                lines.append(f"Routing: **{' -> '.join(consensus.routing_path) if consensus.routing_path else 'direct'}** | Model: **{consensus.recommended_model}**")
                 lines.append("")
-                lines.append("Want me to take action on this, or keep discussing?")
+                lines.append("Want me to dig deeper, or is something specific you'd like to do?")
 
         return "\n".join(lines)
 
