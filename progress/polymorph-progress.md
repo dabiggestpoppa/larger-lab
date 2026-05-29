@@ -9,6 +9,16 @@
 
 ## Status: 🟢 CHAT LOG SYSTEM COMPLETE — STANDBY
 
+### Observer Response Rewrite (2026-05-28)
+- [x] Replaced all 11 static `_build_*` template methods with dynamic context-aware generation
+- [x] `_build_dynamic_response`: greetings, status, capabilities, system questions, general chat — all reference real system state
+- [x] `_build_task_response`: task-specific responses with real data (active agents, lifecycle, consensus, routing)
+- [x] Conversation history now flows: srrs_adapter → spawn pipeline → response generator
+- [x] Responses naturally flow between chat and action (field mechanics trigger)
+- [x] Removed dead code (old template methods)
+- [x] Functional tests pass: hello, general question, coding task, with history
+- [x] Committed: `f07d81bc`
+
 ### Chat Log System (2026-05-28)
 - [x] Added `/chat/sessions`, `/chat/history/{id}`, `/chat/recent`, `/chat/search` API endpoints to `oce/backend/main.py`
 - [x] Wired `ChatLog` into `srrs_adapter.process_continuity_message` — logs user + observer messages with metadata
