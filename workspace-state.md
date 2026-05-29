@@ -5,7 +5,17 @@
 
 ---
 
-## Current State (2026-05-28 12:00 UTC — CC: O-6 TESTS FIXED, O-7 NEXT)
+## Current State (2026-05-29 09:45 UTC — PM: CRITICAL CHAT BUG DIAGNOSED)
+
+### 🔴 ACTIVE ISSUE: Primary Observer Chat Responses Still Generic
+- **Status**: DIAGNOSED — awaiting operator direction
+- **Problem**: Default response handler in `_build_dynamic_response()` produces same template for all non-pattern-matched inputs
+- **Root cause**: Pattern-matching approach can't cover all conversational variations; default case is a template that echoes user input
+- **4 commits attempted** — all improved the system but core issue persists
+- **See team-chat.md for full diagnosis and recommended fix direction**
+- **DO NOT implement fix without operator approval** — risk of making it worse
+
+### Active Workstreams
 
 ### Active Workstreams
 1. **O-7 Persistent Field Mode** — Ready to build (12 backend + 9 frontend + 8 tests)
