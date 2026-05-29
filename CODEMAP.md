@@ -1,7 +1,7 @@
 # 🗺️ CODEMAP — Unified System Architecture
 
 > **Purpose:** Complete workspace orientation with all Mermaid diagrams in one place.
-> **Updated:** 2026-05-18 | V3 All 10 Phases Complete | 1460 tests passing
+> **Updated:** 2026-05-29 | V3 All 10 Phases Complete | Observer Core O-1 through O-7 COMPLETE | 1603+ tests passing
 > **For:** Quick reference, architecture alignment, pipeline verification.
 
 ---
@@ -822,9 +822,9 @@ graph LR
     O2[O-2<br/>Observer Consensus<br/>10/10 backend]
     O3[O-3<br/>Spawn Engine<br/>10/10 backend]
     O4[O-4<br/>Field Learning<br/>11/11 backend]
-    O5[O-5<br/>OCE Unified<br/>Planned]
-    O6[O-6<br/>Local Substrate<br/>Planned]
-    O7[O-7<br/>Persistent Field<br/>Planned]
+    O5[O-5<br/>OCE Unified<br/>✅ 12/12 backend, 12/12 frontend]
+    O6[O-6<br/>Local Substrate<br/>✅ 11/11 backend, 8/8 frontend]
+    O7[O-7<br/>Persistent Field<br/>✅ 12/12 backend, 8/8 frontend]
 
     O1 --> O2 --> O3 --> O4 --> O5 --> O6 --> O7
 
@@ -832,9 +832,9 @@ graph LR
     style O2 fill:#2ecc71,color:#fff
     style O3 fill:#9b59b6,color:#fff
     style O4 fill:#e74c3c,color:#fff
-    style O5 fill:#f39c12,color:#fff
-    style O6 fill:#1abc9c,color:#fff
-    style O7 fill:#34495e,color:#fff
+    style O5 fill:#2ecc71,color:#fff
+    style O6 fill:#2ecc71,color:#fff
+    style O7 fill:#2ecc71,color:#fff
 ```
 
 ### Observer Core O-4 Field Learning Modules
@@ -852,6 +852,32 @@ graph LR
 | WorkflowMemory | `core/learning/workflow_memory.py` | Long-horizon workflow continuity |
 | OperationalScoring | `core/learning/operational_scoring.py` | Quantifies orchestration quality |
 | AdaptationEngine | `core/learning/adaptation_engine.py` | Applies controlled adaptations |
+
+---
+
+### Observer Core O-7 Persistent Field Modules
+
+| Module | File | Purpose |
+|--------|------|---------|
+| PersistentRuntime | `core/persistent_field/persistent_runtime.py` | Long-running runtime that survives restarts |
+| ObserverPersistence | `core/persistent_field/observer_persistence.py` | Save/restore observer state across sessions |
+| PassiveAwareness | `core/persistent_field/passive_awareness.py` | Low-power monitoring during idle periods |
+| EnvironmentalMonitor | `core/persistent_field/environmental_monitor.py` | Track system resources, network, disk |
+| ContinuityPreserver | `core/persistent_field/continuity_preserver.py` | Maintain operational continuity across restarts |
+| DormantStateManager | `core/persistent_field/dormant_state_manager.py` | Manage idle/dormant/active transitions |
+| AutonomousRepair | `core/persistent_field/autonomous_repair.py` | Self-healing without operator intervention |
+| RuntimeHeartbeat | `core/persistent_field/runtime_heartbeat.py` | Periodic health signals |
+| PersistentScheduler | `core/persistent_field/persistent_scheduler.py` | Schedule long-running tasks (RLock-based) |
+| RecoveryPersistence | `core/persistent_field/recovery_persistence.py` | Preserve continuity during failure |
+| LongHorizonMemory | `core/persistent_field/long_horizon_memory.py` | Multi-week operational memory |
+| OperationalDriftDetector | `core/persistent_field/operational_drift_detect.py` | Detect slow degradation patterns |
+
+**O-7 Frontend Components (8):**
+`components/persistence/` — PersistentFieldView, RuntimeHeartbeatPanel, DormantStateMonitor, ObserverPersistenceView, DriftAnalysisPanel, LongHorizonTimeline, AutonomousRepairView, RecoveryContinuityPanel
+
+**O-7 API Endpoints (13):** `persistent_field_api.py` — /api/persistent/* routes
+
+**Tests:** 35/35 passing
 
 ---
 
