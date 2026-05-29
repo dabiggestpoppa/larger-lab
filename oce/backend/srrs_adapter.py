@@ -517,11 +517,15 @@ class SRRSAdapter:
             )
 
             # Step 3: O-3 Spawn pipeline for response generation
+            # Include conversation history for context-aware responses
+            recent_history = self._chat_log.get_session_messages(session_id)
             spawn_result = await self._agent_spawner.spawn(
                 user_input=message,
                 session_context={
                     "last_domain": orch_response.task_domain,
                     "last_complexity": orch_response.complexity,
+                    "conversation_history": recent_history[-10:],  # last 10 messages for context
+                    "session_id": session_id,
                     **(context or {}),
                 },
             )
