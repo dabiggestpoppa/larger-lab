@@ -9,6 +9,7 @@ Orchestrates the full spawn lifecycle: consensus -> blueprint -> context injecti
 from __future__ import annotations
 
 import logging
+import re
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -251,7 +252,7 @@ class AgentSpawner:
         lines: list[str] = []
 
         # ── Greetings ──
-        if any(w in lower for w in ["hello", "hi", "hey", "howdy", "greetings"]):
+        if any(re.search(r"\b" + re.escape(w) + r"\b", lower) for w in ["hello", "hi", "hey", "howdy", "greetings"]):
             active = system_state.get("active_agents", 0)
             lines.append("Hey! I'm the Primary Observer — the continuity interface for the SRRA/OCE field.")
             lines.append("")
@@ -264,7 +265,7 @@ class AgentSpawner:
             return "\n".join(lines)
 
         # ── Status / how are you / how are you doing ──
-        if any(w in lower for w in ["how are you", "how's it going", "what's up", "status", "how do you do", "how are you doing", "how's everything"]):
+        if any(re.search(r"\b" + re.escape(w) + r"\b", lower) for w in ["how are you", "how's it going", "what's up", "status", "how do you do", "how are you doing", "how's everything"]):
             active = system_state.get("active_agents", 0)
             lifecycle = system_state.get("lifecycle_states", {})
             lines.append("I'm doing well — here's the current field state:")
@@ -279,7 +280,7 @@ class AgentSpawner:
             return "\n".join(lines)
 
         # ── Identity / tell me about yourself ──
-        if any(w in lower for w in ["tell me about yourself", "who are you", "what are you", "tell me about you", "what type of system", "what kind of system", "who built you", "who made you", "who created you"]):
+        if any(re.search(r"\b" + re.escape(w) + r"\b", lower) for w in ["tell me about yourself", "who are you", "what are you", "tell me about you", "what type of system", "what kind of system", "who built you", "who made you", "who created you"]):
             active = system_state.get("active_agents", 0)
             lines.append("I'm the Primary Observer — the continuity interface for the SRRA/OCE field.")
             lines.append("")
@@ -296,7 +297,7 @@ class AgentSpawner:
             return "\n".join(lines)
 
         # ── System knowledge (SRRA, OCE, etc.) ──
-        if any(w in lower for w in ["what is srra", "what is oce", "what is oph", "how does the field work", "how does the observer work", "tell me about the field", "tell me about the system"]):
+        if any(re.search(r"\b" + re.escape(w) + r"\b", lower) for w in ["what is srra", "what is oce", "what is oph", "how does the field work", "how does the observer work", "tell me about the field", "tell me about the system"]):
             lines.append("Here's the architecture:")
             lines.append("")
             lines.append("**SRRA** = Signal-Resonance Runtime Architecture. It's the substrate — the runtime that handles signal processing, resonance routing, observer entrainment, and execution emergence.")
@@ -309,15 +310,15 @@ class AgentSpawner:
             return "\n".join(lines)
 
         # ── Thanks ──
-        if any(w in lower for w in ["thanks", "thank you", "thx", "ty", "appreciate"]):
+        if any(re.search(r"\b" + re.escape(w) + r"\b", lower) for w in ["thanks", "thank you", "thx", "ty", "appreciate"]):
             return "You're welcome! Let me know if there's anything else."
 
         # ── Goodbye ──
-        if any(w in lower for w in ["bye", "goodbye", "see you", "later", "take care"]):
+        if any(re.search(r"\b" + re.escape(w) + r"\b", lower) for w in ["bye", "goodbye", "see you", "later", "take care"]):
             return "Goodbye! The observer field remains active. Come back anytime."
 
         # ── Questions about the system ──
-        if any(w in lower for w in ["what can you do", "what do you do", "help", "capabilities"]):
+        if any(re.search(r"\b" + re.escape(w) + r"\b", lower) for w in ["what can you do", "what do you do", "help", "capabilities"]):
             lines.append("I'm the Primary Observer — the continuity interface for the SRRA/OCE field. Here's what I can do:")
             lines.append("")
             lines.append("  💬 **Chat** — casual conversation, questions, brainstorming")
@@ -333,7 +334,7 @@ class AgentSpawner:
             return "\n".join(lines)
 
         # ── Questions about specific system components ──
-        if any(w in lower for w in ["observer", "field", "topology", "entropy"]):
+        if any(re.search(r"\b" + re.escape(w) + r"\b", lower) for w in ["observer", "field", "topology", "entropy"]):
             lines.append("Let me give you a quick field readout:")
             lines.append("")
             active = system_state.get("active_agents", 0)
@@ -352,38 +353,55 @@ class AgentSpawner:
                 lines.append(f"Continuing from our earlier discussion about {last_topic.replace('_', ' ')}...")
                 lines.append("")
 
-        # ── Default: substantive conversational response ──
-        # This is the key fix — instead of a template, we actually respond to what they said
-        lines.append(f"Got it — \"{text[:120]}{'...' if len(text) > 120 else ''}\"")
-        lines.append("")
-
+                # ── Default: analyze message content and respond dynamically ──
         # Check if this sounds like they want to DO something
-        if any(w in lower for w in ["let's", "can you", "could you", "would you", "please", "i want", "i need", "should we"]):
-            lines.append("I can definitely help with that. Let me think about the best approach...")
+        action_words = ["let's", "can you", "could you", "would you", "please",
+                        "i want", "i need", "should we", "show me", "tell me",
+                        "give me", "i'd like", "help me"]
+        if any(w in lower for w in action_words):
+            lines.append("I can definitely help with that.")
             lines.append("")
-            lines.append(f"The consensus engine routes this as **{consensus.task_type.replace('_', ' ')}** complexity **{consensus.complexity}**.")
+            truncated = text[:150] + ('...' if len(text) > 150 else '')
+            lines.append("Here's what I'm thinking: **" + truncated + "**")
+            lines.append("")
+            tt = consensus.task_type.replace('_', ' ')
+            lines.append("The consensus engine routes this as **" + tt + "** at **" + consensus.complexity + "** complexity.")
             lines.append("")
             if consensus.agreement_score > 0.7:
-                lines.append("The observers are in strong agreement on how to handle this. Want me to proceed?")
+                lines.append("The observers are in strong agreement. Want me to proceed, or do you want to adjust the approach?")
             elif consensus.agreement_score > 0.4:
-                lines.append("The observers have a moderate consensus. I can proceed, or we can refine the approach first.")
+                lines.append("Moderate consensus among observers. I can proceed, or we can refine first.")
             else:
-                lines.append("The observers don't fully agree on the best path here. Want to give me more details so I can route this better?")
-        else:
-            # Check if this is a factual question we can answer directly
-            factual = self._try_factual_answer(lower)
-            if factual:
-                lines.append(factual)
-            else:
-                # Genuine conversational response — reference system state
-                lines.append(f"Good question — \"{text[:100]}{'...' if len(text) > 100 else ''}\"")
+                lines.append("The observers don't fully agree on the best path. Can you give me more details?")
+            return "\n".join(lines)
+
+        # Check if this is a factual question we can answer directly
+        factual = self._try_factual_answer(lower)
+        if factual:
+            lines.append(factual)
+            lines.append("")
+            lines.append("Anything else you'd like to know?")
+            return "\n".join(lines)
+
+        # Truly open-ended: ask a clarifying question specific to what was said
+        truncated = text[:120] + ('...' if len(text) > 120 else '')
+        lines.append('Interesting — "' + truncated + '"')
+        lines.append("")
+
+        # Use conversation history for continuity
+        history = context.get("conversation_history", [])
+        if history and len(history) > 1:
+            last_topic = context.get("last_domain", "")
+            if last_topic and last_topic not in ["general", "conversation"]:
+                lines.append("We were just discussing " + last_topic.replace('_', ' ') + ". Want to continue that thread, or is this something new?")
                 lines.append("")
-                active = system_state.get("active_agents", 0)
-                lines.append(f"The observer field has {active} active agent(s). Consensus agreement is at {consensus.agreement_score:.0%}.")
-                lines.append("")
-                lines.append(f"Routing: **{' -> '.join(consensus.routing_path) if consensus.routing_path else 'direct'}** | Model: **{consensus.recommended_model}**")
-                lines.append("")
-                lines.append("Want me to dig deeper, or is something specific you'd like to do?")
+
+        # Reference the consensus analysis
+        tt = consensus.task_type.replace('_', ' ')
+        pct = str(int(consensus.agreement_score * 100))
+        lines.append("My analysis: this reads as **" + tt + "** complexity. Observer mesh agreement: **" + pct + "%**.")
+        lines.append("")
+        lines.append("What would you like to do with this? I can dive deeper, take action, or keep chatting.")
 
         return "\n".join(lines)
 

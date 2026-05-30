@@ -113,11 +113,12 @@ meditation-room/
 | `QUANT_LAB_MANAGER_MEDITATION.md` | 2026-05-18 | Quant Lab management â€” validation pipeline, honest reporting | 2.8KB |
 
 **Quant Lab Key Insights (Consolidated):**
-1. Reporting artifacts are the #1 enemy. Every number must be verified independently.
-2. Costs matter more than strategy. 7/10 "profitable" strategies became losers with real costs.
-3. Monte Carlo is the truth teller. Backtests show what happened. MC shows what *could* happen.
-4. Only DMR and Composite Alpha survive cost validation. Abandon the rest.
-5. Validation gate: PF > 1.5, MaxDD < 5%, WR > 50%, 100+ trades.
+1. BIPOLAR MOTOR: Only 2 engines exist. ALL 20+ named setups are parameter variants. Build 2 engines, not 20 strategies.
+2. EXECUTION ISOLATION: P90 entry + Symmetry Trap SL = edge destruction. Never mix.
+3. CONVERGENCE: Dual-engine alignment produces 94-5% WR. This is the #1 backtest verification target.
+4. P90 is NOT an indicator — it is a statistically derived kinetic validation constant. Do not optimize it.
+5. Research shifted from alpha hunting to ontology verification. Falsification conditions defined.
+6. Model B (Atomic) is the foundation — build first, highest base WR (~89%). Add P90 layer after.
 
 ---
 
@@ -180,3 +181,4 @@ meditation-room/
 
 *This index is the single source of truth for all meditation insights. Agents should reference this file when waking up to understand the collective wisdom of the system.*
 *Next update: After next meditation cycle.*
+

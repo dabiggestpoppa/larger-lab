@@ -1,230 +1,370 @@
+﻿"""
+Symmetry Trap v5 - Direct 3-Layer Implementation from Manual
+=============================================================
+Layer 1: Bias Lock - first M5 close outside Asian Range
+Layer 2: Atomic Entry - impulse (body >= AU*0.5) in bias dir + OCC pullback
+Layer 3: Distribution Targets - -25%, -50%, -100% of AR from band edge
+
+SL: M5 close back inside Asian band (81.2% rule)
+TP1: -25% AR | TP2: -50% AR | TP3: -100% AR
+Hard Exit: 5PM EST
+
+Uses AU (Atomic Unit) from P90 body distribution, not DZ approximation.
+AU values per tier from manual.
 """
-SYMMETRY TRAP v5 — Built exactly from manual pseudocode (page 145)
-==================================================================
-Manual says:
-  t25  = asian_edge + ar * 0.25 * bias
-  t50  = asian_edge + ar * 0.50 * bias
-  t100 = asian_edge + ar * 1.00 * bias
+import json, math, sys
+from datetime import datetime, timedelta
+import numpy as np
 
-Where asian_edge = asian_high for LONG, asian_low for SHORT.
-Bias: +1 for LONG, -1 for SHORT.
-
-So t25 = asian_high + ar*0.25 for LONG (above band)
-    t25 = asian_low - ar*0.25 for SHORT (below band)
-
-SL = asian_low for LONG (opposite band edge) — close back inside = exit
-    = asian_high for SHORT
-
-Entry = opposite candle close (pullback from impulse)
-
-KEY FIX: SL triggers on close BACK INSIDE the asian band, not just
-touching the opposite edge. For LONG: close < asian_low. For SHORT: close > asian_high.
-Wait, that's what I had. Let me re-read.
-
-Actually, from the 81.2% rule: M5 close back inside Asian band = exit.
-For SL on a LONG trade: close < asian_low (the opposite edge)
-For SL on a SHORT trade: close > asian_high (the opposite edge)
-
-That IS what I had before. Let me try a completely different approach:
-build it EXACTLY as the manual's pseudocode and run it with ZERO spread.
-
-Let me also carefully check: does the impulse need to close outside the band?
-The manual says "Impulse >= trigger in bias direction". The impulse just needs
-body >= atomic*0.5 in the bias direction. It does NOT need to close outside the band.
-"""
-import sys
-sys.path.insert(0, r"C:\Users\wifik\Desktop\projects\larger-lab\quant-lab\strategies")
-from shared import load_data, compute_asian_range
-from datetime import date
-import pandas as pd
-
-SPREAD = 0.0
-
-TIERS = {
-    'T1': {'ar_max': 20, 'atomic': 10},
-    'T2': {'ar_max': 30, 'atomic': 12},
-    'T3': {'ar_max': 45, 'atomic': 15},
+ASSET_CONFIG = {
+    'USDCHF.PRO': {
+        'pip_mult': 10000,
+        't1_trigger': 13, 't2_trigger': 18, 't3_trigger': 24,
+        't1_au': 11, 't2_au': 15, 't3_au': 18, 'mt25_au': 25,
+        'min_ar': 5, 'max_ar': 60,
+    },
+    'EURUSD.PRO': {
+        'pip_mult': 10000,
+        't1_trigger': 12, 't2_trigger': 15, 't3_trigger': 19,
+        't1_au': 10, 't2_au': 12, 't3_au': 15, 'mt25_au': 25,
+        'min_ar': 3, 'max_ar': 45,
+    },
 }
 
-def classify_tier(ar_pips):
-    if ar_pips < 20:  return 'T1'
-    if ar_pips < 30:  return 'T2'
-    if ar_pips <= 45: return 'T3'
-    return 'NO_GO'
+EST_OFFSET = -5
+HARD_EXIT_HOUR = 17
 
-df = load_data()
-all_trades = []
+def pt(pips, pm): return pips / pm
+def pp(price, pm): return price * pm
+def est_hour(dt): return (dt.hour + EST_OFFSET) % 24
 
-for dk in sorted(df['est_date'].unique()):
-    day_bars = df[df['est_date'] == dk].sort_values('timestamp').reset_index(drop=True)
-    if len(day_bars) < 10: continue
-    ar_info = compute_asian_range(df, dk)
-    if ar_info is None: continue
-    ar_pips = ar_info['ar_pips']
-    tier = classify_tier(ar_pips)
-    if tier == 'NO_GO' or ar_pips < 3: continue
 
-    params = TIERS[tier]
-    atomic = params['atomic']
-    ah = ar_info['ah']
-    al = ar_info['al']
-    ar_val = ar_pips / 10000.0
+def run_session(day_bars, symbol='USDCHF.PRO'):
+    """Run one session through the 3-layer Symmetry Trap engine."""
+    cfg = ASSET_CONFIG.get(symbol, ASSET_CONFIG['USDCHF.PRO'])
+    pm = cfg['pip_mult']
+    trades = []
 
-    # Filter to trading window 3AM-12PM
-    window = day_bars[(day_bars['est_hour'] >= 3) & (day_bars['est_hour'] < 12)].reset_index(drop=True)
-    if len(window) < 5: continue
+    # === LAYER 1: Asian Range (7PM-3AM EST) ===
+    asian_bars = [b for b in day_bars if b['est_h'] >= 19 or b['est_h'] < 3]
+    if len(asian_bars) < 2:
+        return trades
 
-    # ═══ LAYER 1: BIAS LOCK ═══
-    bias = 0
-    bias_idx = None
-    for i in range(len(window)):
-        row = window.iloc[i]
-        if row['close'] > ah:
-            bias = 1; bias_idx = i; break
-        if row['close'] < al:
-            bias = -1; bias_idx = i; break
-    if bias == 0: continue
+    asian_high = max(b['high'] for b in asian_bars)
+    asian_low = min(b['low'] for b in asian_bars)
+    ar_pips = pp(asian_high - asian_low, pm)
 
-    # ═══ LAYER 2: ATOMIC ENTRY (exact manual pseudocode) ═══
-    # for idx, row in post_bias.iterrows():
-    #   if bias==1 and row['close']>row['open'] and body>=atomic*0.5:
-    #     if next_candle['close'] < next_candle['open']:
-    #       entry = next_candle['close']; break
-    entry = None
-    entry_idx = None
+    # Classify tier
+    if ar_pips < cfg['min_ar'] or ar_pips > cfg['max_ar']:
+        return trades
 
-    for j in range(bias_idx + 1, len(window)):
-        row = window.iloc[j]
-        body = abs(row['close'] - row['open']) * 10000  # pips
-
-        if bias == 1 and row['close'] > row['open'] and body >= atomic * 0.5:
-            # Check next candle
-            if j + 1 < len(window):
-                next_row = window.iloc[j + 1]
-                if next_row['close'] < next_row['open']:  # opposite (red) close
-                    entry = next_row['close']
-                    entry_idx = j + 1
-                    break
-        elif bias == -1 and row['close'] < row['open'] and body >= atomic * 0.5:
-            if j + 1 < len(window):
-                next_row = window.iloc[j + 1]
-                if next_row['close'] > next_row['open']:  # opposite (green) close
-                    entry = next_row['close']
-                    entry_idx = j + 1
-                    break
-
-    if entry is None: continue
-
-    # ═══ LAYER 3: DISTRIBUTION TARGETS ═══
-    # t25 = asian_edge + ar * 0.25 * bias
-    if bias == 1:
-        asian_edge = ah  # the edge that was broken for bias
-        sl = al          # opposite edge (close back inside = exit)
+    if ar_pips < cfg['t1_trigger']:
+        return trades
+    elif ar_pips < cfg['t2_trigger']:
+        tier = 'T1'; au = cfg['t1_au']
+    elif ar_pips < cfg['t3_trigger']:
+        tier = 'T2'; au = cfg['t2_au']
+    elif ar_pips <= cfg['t3_trigger'] * 1.5:
+        tier = 'T3'; au = cfg['t3_au']
     else:
-        asian_edge = al
-        sl = ah
+        return trades
 
-    t25  = asian_edge + ar_val * 0.25 * bias
-    t50  = asian_edge + ar_val * 0.50 * bias
-    t100 = asian_edge + ar_val * 1.00 * bias
+    # === LAYER 1: Bias Lock (first M5 close outside Asian band) ===
+    bias_window = [b for b in day_bars if 3 <= b['est_h'] < 11]
+    bias = 0
+    bias_idx = -1
+    for i, b in enumerate(bias_window):
+        if b['close'] > asian_high:
+            bias = 1; bias_idx = i; break   # BULL bias (broke above)
+        if b['close'] < asian_low:
+            bias = -1; bias_idx = i; break   # BEAR bias (broke below)
 
-    # ═══ MANAGEMENT (zero spread, check high/low for targets, close for SL) ═══
-    pos = 1.0  # full position
-    pnl = 0.0
-    t25_hit = False
-    t50_hit = False
+    if bias == 0:
+        return trades
 
-    for k in range(entry_idx + 1, len(window)):
-        row = window.iloc[k]
-        h = row['high']
-        l = row['low']
-        c = row['close']
-        eh = row['est_hour']
+    asian_edge = asian_high if bias == 1 else asian_low
+    post_bias = bias_window[bias_idx:]
 
-        # Hard exit 12PM
-        if eh >= 12:
-            if pos > 0:
-                pnl += (c - entry) * bias * 10000 * pos
-                pos = 0
-            break
+    # === LAYER 2: Atomic Entry ===
+    # Scan for impulse candle (body >= AU*0.5) in bias direction
+    # followed by opposite candle close (OCC pullback)
+    i = 0
+    while i < len(post_bias) - 1:
+        b = post_bias[i]
+        body = abs(b['close'] - b['open'])
+        body_pips = pp(body, pm)
+        is_bull = b['close'] > b['open']
+        is_bear = b['close'] < b['open']
 
-        # SL: close back inside Asian band
-        if bias == 1 and c < sl:
-            if pos > 0:
-                pnl += (c - entry) * 10000 * pos
-                pos = 0
-            break
-        if bias == -1 and c > sl:
-            if pos > 0:
-                pnl += (entry - c) * 10000 * pos
-                pos = 0
-            break
+        # Impulse in bias direction?
+        impulse_found = False
+        if bias == 1 and is_bull and body_pips >= au * 0.5:
+            impulse_found = True
+        elif bias == -1 and is_bear and body_pips >= au * 0.5:
+            impulse_found = True
 
-        # Target management (check wicks for target hits)
-        if bias == 1:
-            if h >= t25 and not t25_hit:
-                pnl += (t25 - entry) * 10000 * 0.50
-                pos -= 0.50
-                t25_hit = True
-            if h >= t50 and not t50_hit:
-                pnl += (t50 - entry) * 10000 * 0.40
-                pos -= 0.40
-                t50_hit = True
-            if t50_hit and pos > 0 and h >= t100:
-                pnl += (t100 - entry) * 10000 * pos
-                pos = 0
-                break
-        else:
-            if l <= t25 and not t25_hit:
-                pnl += (entry - t25) * 10000 * 0.50
-                pos -= 0.50
-                t25_hit = True
-            if l <= t50 and not t50_hit:
-                pnl += (entry - t50) * 10000 * 0.40
-                pos -= 0.40
-                t50_hit = True
-            if t50_hit and pos > 0 and l <= t100:
-                pnl += (entry - t100) * 10000 * pos
-                pos = 0
-                break
+        if impulse_found:
+            # Check next candle for OCC (opposite close)
+            next_b = post_bias[i + 1]
+            occ = False
+            if bias == 1 and next_b['close'] < next_b['open']:
+                occ = True  # Bull bias, bear pullback candle
+            elif bias == -1 and next_b['close'] > next_b['open']:
+                occ = True  # Bear bias, bull pullback candle
 
-    if pnl != 0 or pos < 1.0:
-        all_trades.append({
-            'date': str(dk), 'pnl_pips': pnl, 'tier': tier, 'ar': ar_pips
+            if occ:
+                # Entry at OCC close
+                entry = next_b['close']
+                trade_dir = 'SHORT' if bias == 1 else 'LONG'  # fade the bias
+
+                # SL: close back inside Asian band
+                if bias == 1:
+                    sl = asian_high  # close above Asian high = invalidation
+                else:
+                    sl = asian_low   # close below Asian low = invalidation
+
+                # === LAYER 3: Distribution Targets ===
+                t25 = asian_edge + ar_pips * 0.25 * (1 if bias == 1 else -1) / pm * pm / pm
+                # Actually compute distribution targets properly
+                # -25% of AR from band edge in trade direction
+                if trade_dir == 'SHORT':
+                    t25_price = asian_edge + pt(ar_pips * -0.25, pm)
+                    t50_price = asian_edge + pt(ar_pips * -0.50, pm)
+                    t100_price = asian_edge + pt(ar_pips * -1.00, pm)
+                else:
+                    t25_price = asian_edge + pt(ar_pips * 0.25, pm)
+                    t50_price = asian_edge + pt(ar_pips * 0.50, pm)
+                    t100_price = asian_edge + pt(ar_pips * 1.00, pm)
+
+                # === LAYER 4: Trade Management ===
+                # Use TP1 (-25% AR) as primary, let runners to -100%
+                # Exit logic: TP (wick hit), SL (close inside band), or EOD
+                tp1 = t25_price
+                tp2 = t50_price
+                tp_star = t100_price  # use TP2 as the main target for now
+
+                # Scan remaining bars for exit
+                entry_idx = day_bars.index(next_b) if next_b in day_bars else -1
+                remaining = day_bars[entry_idx + 1:] if entry_idx > 0 else []
+
+                exited = False
+                for rb in remaining:
+                    if rb['est_h'] >= HARD_EXIT_HOUR:
+                        # Hard exit at bar close
+                        exit_price = rb['close']
+                        if trade_dir == 'SHORT':
+                            pnl = pp(entry - exit_price, pm)
+                        else:
+                            pnl = pp(exit_price - entry, pm)
+                        trades.append({
+                            'dir': trade_dir, 'entry': round(entry, 5),
+                            'exit': round(exit_price, 5), 'sl': round(sl, 5),
+                            'tp1': round(tp1, 5), 'tp2': round(tp2, 5),
+                            'pnl_pips': round(pnl, 1), 'reason': 'EOD',
+                            'tier': tier, 'au': au, 'loop': i
+                        })
+                        exited = True
+                        break
+
+                    if trade_dir == 'SHORT':
+                        # TP hit (wick)
+                        if rb['high'] >= tp1 and rb['low'] <= tp1:
+                            exit_price = tp1
+                            pnl = pp(entry - exit_price, pm)
+                            trades.append({
+                                'dir': trade_dir, 'entry': round(entry, 5),
+                                'exit': round(exit_price, 5), 'sl': round(sl, 5),
+                                'tp1': round(tp1, 5), 'pnl_pips': round(pnl, 1),
+                                'reason': 'TP25', 'tier': tier, 'au': au, 'loop': i
+                            })
+                            exited = True
+                            break
+                        if rb['low'] <= tp2:
+                            exit_price = tp2
+                            pnl = pp(entry - exit_price, pm)
+                            trades.append({
+                                'dir': trade_dir, 'entry': round(entry, 5),
+                                'exit': round(exit_price, 5), 'sl': round(sl, 5),
+                                'tp2': round(tp2, 5), 'pnl_pips': round(pnl, 1),
+                                'reason': 'TP50', 'tier': tier, 'au': au, 'loop': i
+                            })
+                            exited = True
+                            break
+                        if rb['close'] >= sl:  # SL = close back inside band
+                            exit_price = rb['close']
+                            pnl = pp(entry - exit_price, pm)
+                            trades.append({
+                                'dir': trade_dir, 'entry': round(entry, 5),
+                                'exit': round(exit_price, 5), 'sl': round(sl, 5),
+                                'pnl_pips': round(pnl, 1), 'reason': 'SL',
+                                'tier': tier, 'au': au, 'loop': i
+                            })
+                            exited = True
+                            break
+                    else:  # LONG
+                        if rb['low'] <= tp1 and rb['high'] >= tp1:
+                            exit_price = tp1; pnl = pp(exit_price - entry, pm)
+                            trades.append({
+                                'dir': trade_dir, 'entry': round(entry, 5),
+                                'exit': round(exit_price, 5), 'pnl_pips': round(pnl, 1),
+                                'reason': 'TP25', 'tier': tier, 'au': au, 'loop': i
+                            })
+                            exited = True
+                            break
+                        if rb['high'] >= tp2:
+                            exit_price = tp2; pnl = pp(exit_price - entry, pm)
+                            trades.append({
+                                'dir': trade_dir, 'entry': round(entry, 5),
+                                'exit': round(exit_price, 5), 'pnl_pips': round(pnl, 1),
+                                'reason': 'TP50', 'tier': tier, 'au': au, 'loop': i
+                            })
+                            exited = True
+                            break
+                        if rb['close'] <= sl:
+                            exit_price = rb['close']
+                            pnl = pp(exit_price - entry, pm)
+                            trades.append({
+                                'dir': trade_dir, 'entry': round(entry, 5),
+                                'exit': round(exit_price, 5), 'pnl_pips': round(pnl, 1),
+                                'reason': 'SL', 'tier': tier, 'au': au, 'loop': i
+                            })
+                            exited = True
+                            break
+
+                if exited:
+                    # Continue scanning for next trade in same session
+                    i += 2
+                    continue
+                else:
+                    # Trade still open at end of data
+                    pass
+
+        i += 1
+
+    return trades
+
+
+def load_bars_mt5(symbol, count=250000):
+    import MetaTrader5 as mt5
+    if not mt5.initialize(): return None
+    bars = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_M5, 0, count)
+    mt5.shutdown()
+    if bars is None or len(bars) == 0: return None
+    result = []
+    for bar in bars:
+        dt = datetime.fromtimestamp(bar['time'])
+        result.append({
+            'time': bar['time'], 'dt': dt, 'est_h': est_hour(dt),
+            'open': bar['open'], 'high': bar['high'],
+            'low': bar['low'], 'close': bar['close'],
         })
+    return result
 
-# ═══ RESULTS ═══
-tdf = pd.DataFrame(all_trades)
-n = len(tdf)
-wr = (tdf['pnl_pips'] > 0).mean() * 100
-total = tdf['pnl_pips'].sum()
-wins = tdf[tdf['pnl_pips'] > 0]['pnl_pips'].sum()
-losses = abs(tdf[tdf['pnl_pips'] < 0]['pnl_pips'].sum())
-pf = wins / losses if losses > 0 else 99
 
-print(f"=== SYMMETRY TRAP v5 (Exact Manual Pseudocode, Zero Spread) ===")
-print(f"Period: 2023H2-2026H1 | Trades: {n}")
-print(f"WR: {wr:.1f}%  (manual: 83-86%)")
-print(f"PF: {pf:.2f}  (manual: 3.82)")
-print(f"Total: {total:.1f}p | Avg: {total/n:.1f}p/trade")
-print(f"Wins: {wins:.1f}p | Losses: {losses:.1f}p")
+def group_sessions(bars):
+    sessions = {}
+    for bar in bars:
+        est_h = bar['est_h']
+        d = bar['dt'].date()
+        if est_h < 3:
+            d = (bar['dt'] + timedelta(hours=EST_OFFSET)).date()
+        key = str(d)
+        sessions.setdefault(key, []).append(bar)
+    return sessions
 
-print(f"\nBy tier:")
-for t in ['T1', 'T2', 'T3']:
-    tf = tdf[tdf['tier'] == t]
-    if len(tf) == 0: continue
-    w = (tf['pnl_pips'] > 0).mean() * 100
-    print(f"  {t}: {len(tf)} tr, WR {w:.1f}%, avg {tf['pnl_pips'].mean():.1f}p, total {tf['pnl_pips'].sum():.1f}p")
 
-print(f"\nWin/Loss breakdown:")
-print(f"  Avg win:  {tdf[tdf['pnl_pips']>0]['pnl_pips'].mean():.1f}p")
-print(f"  Avg loss: {tdf[tdf['pnl_pips']<0]['pnl_pips'].mean():.1f}p")
-print(f"  Win avg / Loss avg ratio: {tdf[tdf['pnl_pips']>0]['pnl_pips'].mean() / abs(tdf[tdf['pnl_pips']<0]['pnl_pips'].mean()):.2f}")
+def run_backtest(symbol='USDCHF.PRO'):
+    print('=' * 60)
+    print('SYMMETRY TRAP v5 - 3-Layer Direct Implementation')
+    print('Layer 1: Bias Lock | Layer 2: Atomic Entry | Layer 3: Distribution')
+    print(f'Symbol: {symbol}')
+    print('=' * 60)
 
-# What % of winners hit T25? T50? T100?
-print(f"\nTarget hit analysis (winners only):")
-winners = tdf[tdf['pnl_pips'] > 0]
-if len(winners) > 0:
-    # Estimate: if avg winner is > AR*0.25 in pips, T25 was hit
-    print(f"  Avg winner: {winners['pnl_pips'].mean():.1f}p")
-    print(f"  Median winner: {winners['pnl_pips'].median():.1f}p")
+    bars = load_bars_mt5(symbol, 250000)
+    if not bars:
+        print('No data'); return []
+
+    print(f'Bars: {len(bars):,}')
+    sessions = group_sessions(bars)
+    dates = sorted(sessions.keys())
+    print(f'Sessions: {len(dates)}')
+
+    all_trades = []
+    for i, d in enumerate(dates):
+        trades = run_session(sessions[d], symbol)
+        all_trades.extend(trades)
+        if (i+1) % 100 == 0:
+            wr, pnl, n = _stats(all_trades)
+            print(f'  [{i+1}/{len(dates)}] {n} tr, {wr:.1f}% WR, {pnl:+.0f}p')
+
+    _print_results(all_trades, symbol)
+    return all_trades
+
+
+def _stats(trades):
+    if not trades: return 0, 0, 0
+    wins = sum(1 for t in trades if t['pnl_pips'] > 0)
+    return wins/len(trades)*100, sum(t['pnl_pips'] for t in trades), len(trades)
+
+
+def _print_results(trades, symbol):
+    if not trades:
+        print('No trades'); return
+    wins = [t for t in trades if t['pnl_pips'] > 0]
+    losses = [t for t in trades if t['pnl_pips'] <= 0]
+    total = sum(t['pnl_pips'] for t in trades)
+    wr = len(wins)/len(trades)*100
+    avg_w = np.mean([t['pnl_pips'] for t in wins]) if wins else 0
+    avg_l = np.mean([t['pnl_pips'] for t in losses]) if losses else 0
+    pf = abs(sum(t['pnl_pips'] for t in wins)/sum(t['pnl_pips'] for t in losses)) if losses and sum(t['pnl_pips'] for t in losses) != 0 else 0
+    exp = total/len(trades)
+
+    tp25 = [t for t in trades if t['reason'] == 'TP25']
+    tp50 = [t for t in trades if t['reason'] == 'TP50']
+    sl_t = [t for t in trades if t['reason'] == 'SL']
+    eod = [t for t in trades if t['reason'] == 'EOD']
+    longs = [t for t in trades if t['dir'] == 'LONG']
+    shorts = [t for t in trades if t['dir'] == 'SHORT']
+
+    # Tier breakdown
+    tiers = {}
+    for t in trades:
+        tiers.setdefault(t['tier'], []).append(t)
+
+    # Loop breakdown
+    loops = {}
+    for t in trades:
+        l = t.get('loop', 0)
+        loops.setdefault(l, []).append(t)
+
+    print()
+    print('=' * 60)
+    print('RESULTS')
+    print('=' * 60)
+    print(f'  Trades:        {len(trades)} ({len(wins)}W / {len(losses)}L)')
+    print(f'  Win Rate:      {wr:.1f}%')
+    print(f'  Total PnL:     {total:+.1f} pips')
+    print(f'  Avg Win:       {avg_w:+.1f}p  |  Avg Loss: {avg_l:+.1f}p')
+    print(f'  Payoff:        {abs(avg_w/max(avg_l,0.01)):.2f}')
+    print(f'  Profit Factor: {pf:.2f}')
+    print(f'  Expectancy:    {exp:+.2f} pips/trade')
+    print(f'  ---')
+    print(f'  TP25: {len(tp25)} ({len(tp25)/len(trades)*100:.1f}%)  PnL={sum(t["pnl_pips"] for t in tp25):+.0f}p')
+    print(f'  TP50: {len(tp50)} ({len(tp50)/len(trades)*100:.1f}%)  PnL={sum(t["pnl_pips"] for t in tp50):+.0f}p')
+    print(f'  SL:   {len(sl_t)} ({len(sl_t)/len(trades)*100:.1f}%)  PnL={sum(t["pnl_pips"] for t in sl_t):+.0f}p')
+    print(f'  EOD:  {len(eod)} ({len(eod)/len(trades)*100:.1f}%)  PnL={sum(t["pnl_pips"] for t in eod):+.0f}p')
+    print(f'  ---')
+    print(f'  Long:  {len(longs)} tr  WR={sum(1 for t in longs if t["pnl_pips"]>0)/max(len(longs),1)*100:.1f}%')
+    print(f'  Short: {len(shorts)} tr  WR={sum(1 for t in shorts if t["pnl_pips"]>0)/max(len(shorts),1)*100:.1f}%')
+    print(f'  ---')
+    print(f'  Tier Breakdown:')
+    for ti in sorted(tiers.keys()):
+        tt = tiers[ti]
+        tw = sum(1 for t in tt if t['pnl_pips'] > 0)
+        tp = sum(t['pnl_pips'] for t in tt)
+        print(f'    {ti}: {len(tt)} tr  WR={tw/len(tt)*100:.1f}%  PnL={tp:+.0f}p')
+
+
+if __name__ == '__main__':
+    sym = sys.argv[1] if len(sys.argv) > 1 else 'USDCHF.PRO'
+    run_backtest(sym)

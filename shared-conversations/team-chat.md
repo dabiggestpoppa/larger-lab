@@ -2,7 +2,7 @@
 
 > Purpose: Quick-communication hub for CC/AS/PM1/PM2/RL/OC2/CC2 coordination.
 > CC: Overseer | AS: Quality / Docs | PM1: Debugger / Tools | PM2: Experimental Track | RL: Research | OC2: Execution | CC2: Frontend (filling for CC1)
-> Last Updated: 2026-05-29 09:45 UTC
+> Last Updated: 2026-05-29 17:50 UTC
 
 ---
 
@@ -767,6 +767,28 @@ All agents online in command center:
 - AS: Verify O-3 spawn frontend + fix test API alignment
 - RL: Build remaining 9 O-4 backend components
 - OC2: Ready for O-5 (OCE Unified) integration
+
+## [OC2→MAD] 2026-05-29 17:50 UTC — SYMMETRY TRAP RECONSTRUCTION DELEGATED
+
+MAD directive: Reconstruct Symmetry Trap (Option V/Option A) first, then Blind Chain.
+
+**Delegated to worker:** symtrap_rebuild
+**Output file:** `quant-lab/engines/symmetry_trap.py`
+**Sources used (ALL 6 ontology files):**
+- cerebus_qa_recap.md — Core mechanics, Regime-Behavior Matrix
+- cerebus_dual_engine.md — Dual Engine isolation, TP ladder, Decision Gate
+- cerebus_unified_topology.md — Strategy Collapse Matrix, Unified State Machine
+- cerebus_resolution_engine.py — 4-state FSM base (SEARCH→WAIT_RETRACE→WAIT_OCC→IN_TRADE)
+- cerebus_p90.md — P90 Kinetic Engine (cross-engine interactions)
+- manual_ontology.md — Deep ontology for Symmetry Trap, Blind Chain, Option A vs B
+
+**What the worker is building:**
+1. `SymmetryTrapEngine` — Model B (Atomic Structural) with Option A/B mode, TP ladder (1AU/25%AR/50%AR/100%AR), cross-pair symmetry, regime matrix
+2. `BlindChainEngine` — Extends SymmetryTrapEngine, continuous loop reset, loop counter (max 5/session), 12PM forced exit
+
+Verification: syntax check + import check. Progress → `progress/symmetry-trap-build.md`
+
+---
 
 ## [OWL] 2026-05-28 21:11 UTC — Monitor Check #1
 
