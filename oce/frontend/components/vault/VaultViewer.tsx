@@ -6,9 +6,9 @@ interface VaultNote {
   id: string;
   title: string;
   path: string;
-  content: string;
+  content?: string;
   tags: string[];
-  links: string[];
+  links?: string[];
   modified: string;
   category: string;
 }
@@ -57,7 +57,7 @@ export default function VaultViewer({ onNoteSelect }: VaultViewerProps) {
     const matchesFilter =
       !filter ||
       note.title.toLowerCase().includes(filter.toLowerCase()) ||
-      note.content.toLowerCase().includes(filter.toLowerCase()) ||
+      (note.content || "").toLowerCase().includes(filter.toLowerCase()) ||
       note.tags.some((t) => t.toLowerCase().includes(filter.toLowerCase()));
     const matchesCategory =
       category === "all" || note.category === category;
@@ -177,10 +177,10 @@ export default function VaultViewer({ onNoteSelect }: VaultViewerProps) {
                     )}
                   </div>
                 )}
-                {note.links.length > 0 && (
+                {(note.links || []).length > 0 && (
                   <div className="mt-1">
                     <span className="text-[9px] font-mono text-[var(--text-muted)]">
-                      → {note.links.length} link{note.links.length !== 1 ? "s" : ""}
+                      → {(note.links || []).length} link{(note.links || []).length !== 1 ? "s" : ""}
                     </span>
                   </div>
                 )}
@@ -205,8 +205,8 @@ export default function VaultViewer({ onNoteSelect }: VaultViewerProps) {
             </button>
           </div>
           <pre className="text-[10px] font-mono text-[var(--text-secondary)] whitespace-pre-wrap leading-relaxed">
-            {selectedNote.content.slice(500)}
-            {selectedNote.content.length > 500 ? "\n..." : ""}
+            {(selectedNote.content || "").slice(500)}
+            {(selectedNote.content || "").length > 500 ? "\n..." : ""}
           </pre>
         </div>
       )}
