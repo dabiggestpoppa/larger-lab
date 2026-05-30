@@ -253,7 +253,7 @@ class AgentSpawner:
         This is the core fix for the "same response" bug — the synthesizer
         generates from interpreted intent, not from template matching.
         """
-        from core.semantic.interpret import interpret
+        from core.semantic.interpreter import interpret
         from core.response.synthesizer import synthesize
 
         # Step 1: Interpret the message into semantic state
