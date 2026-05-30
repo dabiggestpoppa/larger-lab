@@ -10,7 +10,7 @@ SL = 168% of NEW P90 body (not 80%).
 Engine Persistence: Engine stays alive across scans within a day to track
 p90_count and last_p90_exit_time for CASCADE detection.
 
-Symbol: GBPUSD.PRO (separate from Symmetry Trap on EURUSD.PRO)
+Symbol: USDCHF.PRO (separate from Symmetry Trap on EURUSD.PRO)
 """
 
 from __future__ import annotations
