@@ -1,5 +1,5 @@
-"""
-Vault API Endpoints — Phase 00
+﻿"""
+Vault API Endpoints â€” Phase 00
 FastAPI endpoints for O2C Obsidian Vault.
 """
 
@@ -164,6 +164,25 @@ def register_vault_endpoints(app: FastAPI):
         except Exception as e:
             return {"total_notes": 0, "categories": {}, "top_tags": {}}
 
+
+    @app.post("/api/vault/sync")
+    async def vault_sync():
+        """Sync O2C-VAULT files to Obsidian vault."""
+        try:
+            from core.obsidian.live_sync import sync_to_obsidian
+            written, skipped = sync_to_obsidian()
+            return {"status": "ok", "written": written, "skipped": skipped}
+        except Exception as e:
+            return {"status": "error", "detail": str(e)}
+
+    @app.get("/api/vault/sync/status")
+    async def vault_sync_status():
+        """Get sync status."""
+        try:
+            from core.obsidian.live_sync import get_live_sync
+            return get_live_sync().get_status()
+        except Exception as e:
+            return {"status": "error", "detail": str(e)}
     @app.post("/api/vault/validate")
     async def validate_note(request: ValidateRequest):
         try:
@@ -171,3 +190,4 @@ def register_vault_endpoints(app: FastAPI):
             return validator.validate(request.content)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
+

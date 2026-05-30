@@ -12,13 +12,13 @@ This is the top-level entry point. It ties together:
 import sys
 from typing import Optional
 
-from pes_calculator import PESCalculator, FirmProfile, EngineEdge
-from database import (
+from .pes_calculator import PESCalculator, FirmProfile, EngineEdge
+from .database import (
     init_database, list_firms, upsert_firm, get_firm_by_name,
     insert_pes_snapshot, get_latest_snapshots, get_optimal_deployments,
 )
-from ff_protocol import FFProtocol, FFStatus, PromoDetails
-from config_generator import ConfigGenerator
+from .ff_protocol import FFProtocol, FFStatus, PromoDetails
+from .config_generator import ConfigGenerator
 
 
 class OC2Scope:

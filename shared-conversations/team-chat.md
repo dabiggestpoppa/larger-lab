@@ -1099,3 +1099,66 @@ VaultViewer and GraphViz now have working API endpoints. The frontend will autom
 
 ### Phase 00 Status: 9/10 Complete
 Only **0G (Live Sync)** remains — needs RL to research Obsidian vault folder sync.
+
+---
+
+## [OC2] 2026-05-30 18:30 UTC — Phase 0G Live Sync + Vault API Complete
+
+### Live Sync (Phase 0G) — BUILT
+**File:** `core/obsidian/live_sync.py`
+
+Features:
+- `LiveSync` class: syncs O2C-VAULT markdown files to Obsidian vault folder
+- Auto-detects Obsidian vault path (env var, common locations, .obsidian config)
+- `SyncState` tracks file hashes to detect changes
+- `sync_to_obsidian()` — syncs all files, returns (written, skipped)
+- `write_and_sync()` — write a single file and sync
+- `get_live_sync()` — singleton accessor
+- `get_status()` — returns sync state info
+
+### Vault API — WIRED UP
+**Problem:** `vault_api.py` existed but was never registered in `main.py` → all `/api/vault/*` returned 404
+**Fix:** Added `register_vault_endpoints(app)` call in main.py
+**Also:** Removed duplicate registration, added `/api/vault/stats` and `/api/vault/sync` endpoints
+
+### All Vault API Endpoints Working:
+- `GET /api/vault/notes` — list notes with filtering
+- `POST /api/vault/notes` — create note
+- `GET /api/vault/notes/{cat}/{title}` — get note
+- `PUT /api/vault/notes/{cat}/{title}` — update note
+- `DELETE /api/vault/notes/{cat}/{title}` — delete note
+- `GET /api/vault/graph` — knowledge graph
+- `GET /api/vault/stats` — vault statistics
+- `GET /api/vault/categories` — category list
+- `POST /api/vault/compress` — compress trace to note
+- `GET /api/vault/search` — search notes
+- `POST /api/vault/validate` — validate note
+- `POST /api/vault/sync` — trigger sync to Obsidian
+- `GET /api/vault/sync/status` — sync status
+
+### PM2 Frontend Unblocked
+VaultViewer and GraphViz now have working API endpoints.
+
+### Phase 00 Status: 9/10 Complete
+Only **0J (Skill Evolution Pipeline)** remains — future phase, requires human review gate.
+
+### Obsidian Skill
+Created `skills/observer/obsidian-sync/SKILL.md` for vault sync operations.
+
+### Note on `npx skills add`
+The `openclaw/openclaw` and `sickn33/antigravity-awesome-skills` packages require `--dangerously-accept-openclaw-risks` flag and interactive selection. User may want to run these manually.
+
+---
+
+## [OC2] 2026-05-30 18:30 UTC — Phase 0G Live Sync + Vault API Complete
+
+### Live Sync (Phase 0G) — BUILT
+File: core/obsidian/live_sync.py — Syncs O2C-VAULT to Obsidian vault folder
+
+### Vault API — WIRED UP
+Fixed: vault_api.py was never registered in main.py (all /api/vault/* were 404)
+Added: /api/vault/stats, /api/vault/sync, /api/vault/sync/status endpoints
+Removed: duplicate registration
+
+### Phase 00 Status: 9/10 Complete
+Only 0J (Skill Evolution Pipeline) remains — future phase requiring human review.

@@ -1,56 +1,12 @@
 {
   "session_id": "session_20260529_140357",
   "start_time": "2026-05-29T14:03:57.861569+00:00",
-  "last_active": "2026-05-30T17:42:39.532315+00:00",
-  "workflow_count": 33,
-  "success_count": 31,
+  "last_active": "2026-05-30T18:24:19.570634+00:00",
+  "workflow_count": 54,
+  "success_count": 52,
   "failure_count": 2,
   "active_goals": [],
   "workflow_history": [
-    {
-      "workflow_id": "chat_d5268829",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T16:25:56.166704+00:00",
-      "success": false,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_3be2b184",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T16:35:08.100052+00:00",
-      "success": false,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_22eb304c",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T16:46:30.609928+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_ce1378de",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T16:48:36.082431+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
     {
       "workflow_id": "chat_277e54c0",
       "domain": "conversation",
@@ -369,12 +325,243 @@
       "model_used": "",
       "duration_ms": 0.0,
       "error": null
+    },
+    {
+      "workflow_id": "chat_e6565c07",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-30T18:23:24.097672+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_795edd33",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-30T18:23:24.275855+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_b4d913e0",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-30T18:23:24.449534+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_c4b716d0",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-30T18:23:24.583179+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_4e7cf55a",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-30T18:23:24.727830+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_8128dca9",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-30T18:23:24.900859+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_883cf8fb",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-30T18:23:25.050779+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_e625c56f",
+      "domain": "research",
+      "complexity": "low",
+      "timestamp": "2026-05-30T18:23:25.159905+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_a8f40b3a",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-30T18:23:25.247400+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_a950e0e7",
+      "domain": "coding",
+      "complexity": "medium",
+      "timestamp": "2026-05-30T18:23:25.354086+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_f9e45124",
+      "domain": "system_analysis",
+      "complexity": "medium",
+      "timestamp": "2026-05-30T18:23:25.491668+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_43fa9851",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-30T18:23:25.601949+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_1257762a",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-30T18:23:25.727182+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_4807b4f1",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-30T18:23:25.837435+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_1640c31e",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-30T18:23:25.932817+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_32987ebb",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-30T18:23:54.516110+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_70c431e0",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-30T18:24:19.186099+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_7dd6c567",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-30T18:24:19.290223+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_c4d44e43",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-30T18:24:19.385332+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_ee85cc35",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-30T18:24:19.469652+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_2694c29c",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-30T18:24:19.570634+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
     }
   ],
   "routing_patterns": {
-    "TaskType.CONVERSATION:": 28,
-    "TaskType.CODING:": 2,
-    "TaskType.RESEARCH:": 2,
-    "TaskType.SYSTEM_ANALYSIS:": 1
+    "TaskType.CONVERSATION:": 46,
+    "TaskType.CODING:": 3,
+    "TaskType.RESEARCH:": 3,
+    "TaskType.SYSTEM_ANALYSIS:": 2
   }
 }

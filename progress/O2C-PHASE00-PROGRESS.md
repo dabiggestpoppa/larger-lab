@@ -2,7 +2,7 @@
 
 > **Created:** 2026-05-30
 > **Lead:** CC2 (Planning) → CC1 (Execution)
-> **Status:** � Build In Progress — 8/10 components complete or fixed
+**Status:** ✅ Build Complete — 9/10 components done (0J future)
 
 ---
 
@@ -16,11 +16,14 @@
 | Execution Journal | `core/execution/journal.py` | CC1 | ✅ Fixed | IndentationError fixed by OC2 |
 | Skill System | `skills/` directory | AS | ✅ Complete | First skill: observer/chat_response/ |
 | Skill Loader | `core/skills/loader.py` | PM | ✅ Complete | Built by OC2 |
-| Live Sync | Obsidian vault writes | RL | ⏳ Not Started | Needs research |
+| Live Sync | `core/obsidian/live_sync.py` | OC2 | ✅ Complete | Syncs O2C-VAULT → Obsidian vault folder |
 | Doctrine Taxonomy | `core/obsidian/taxonomy.py` | AS | ✅ Fixed | Type hint fixed by OC2 |
 | Note Standard | `core/obsidian/note_standard.py` | AS | ✅ Fixed | Missing Path import fixed by OC2 |
 | Frontend Vault Viewer | `vault-viewer.tsx` | PM2 | ✅ Complete | `components/vault/VaultViewer.tsx` — note list, filter, category, preview |
 | Frontend Graph Viz | `graph-viz.tsx` | PM2 | ✅ Complete | `components/vault/GraphViz.tsx` — canvas force-directed graph, zoom, node select |
+| Vault API | `vault_api.py` | PM2 | ✅ Complete | 11 endpoints: CRUD, graph, compress, search, categories, validate |
+| Vault Store | `vaultStore.ts` | PM2 | ✅ Complete | Zustand store with fetchNotes/fetchGraph actions |
+| Vault Page | `app/vault/page.tsx` | PM2 | ✅ Complete | Tabbed notes/graph view with TopNav link |
 | Test Suite | All test files | Copilot | ✅ Complete | 76 tests passing (41 obsidian + 35 O-7) |
 
 ---

@@ -86,6 +86,10 @@ class PropFirmOntology:
     allowed_instruments: list = field(default_factory=list)
     news_trading_restricted: bool = False
 
+    # Raw pricing (for fragmentation cost estimation)
+    raw_cost_per_size: dict = field(default_factory=dict)   # {size: cost}
+    raw_account_sizes: list = field(default_factory=list)
+
     # Health
     is_active: bool = True
     notes: list = field(default_factory=list)
@@ -253,6 +257,8 @@ class OntologyMapper:
             payout_cycle_days=payout_days,
             min_trading_days=min_days,
             ff_access=ff,
+            raw_cost_per_size={int(k) if isinstance(k, str) and k.isdigit() else k: float(v) for k, v in costs.items()} if isinstance(costs, dict) and costs else {primary_size: primary_cost},
+            raw_account_sizes=sizes if isinstance(sizes, list) else [primary_size],
             allowed_instruments=raw.get("instruments", []),
             news_trading_restricted=raw.get("news_restricted", False),
             scale_enabled=sc.get("enabled", False),
