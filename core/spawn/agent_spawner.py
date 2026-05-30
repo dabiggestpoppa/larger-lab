@@ -243,167 +243,35 @@ class AgentSpawner:
         consensus: ConsensusResult,
     ) -> str:
         """
-        Build a dynamic, context-aware response for general/conversation tasks.
-        This is the key method for fluid conversation — it reads the actual
-        system state and conversation context to produce a real response.
+        Build a dynamic, context-aware response using semantic interpretation.
+
+        Instead of pattern-matching raw text against regex templates, this method:
+        1. Interprets the message into a SemanticState object
+        2. Passes the semantic state to the response synthesizer
+        3. Returns a response that is structurally appropriate for the intent
+
+        This is the core fix for the "same response" bug — the synthesizer
+        generates from interpreted intent, not from template matching.
         """
-        text = user_input.strip()
-        lower = text.lower()
-        lines: list[str] = []
+        from core.semantic.interpret import interpret
+        from core.response.synthesizer import synthesize
 
-        # ── Greetings ──
-        if any(re.search(r"\b" + re.escape(w) + r"\b", lower) for w in ["hello", "hi", "hey", "howdy", "greetings"]):
-            active = system_state.get("active_agents", 0)
-            lines.append("Hey! I'm the Primary Observer — the continuity interface for the SRRA/OCE field.")
-            lines.append("")
-            if active > 0:
-                lines.append(f"Right now there are {active} active agent(s) in the field. Everything is running smoothly.")
-            else:
-                lines.append("The field is quiet — no active agents right now. Ready when you are.")
-            lines.append("")
-            lines.append("What's on your mind? I can chat, analyze the system, help with code, or trigger deeper field mechanics.")
-            return "\n".join(lines)
+        # Step 1: Interpret the message into semantic state
+        conversation_history = context.get("conversation_history", [])
+        semantic_state = interpret(user_input, conversation_history)
 
-        # ── Status / how are you / how are you doing ──
-        if any(re.search(r"\b" + re.escape(w) + r"\b", lower) for w in ["how are you", "how's it going", "what's up", "status", "how do you do", "how are you doing", "how's everything"]):
-            active = system_state.get("active_agents", 0)
-            lifecycle = system_state.get("lifecycle_states", {})
-            lines.append("I'm doing well — here's the current field state:")
-            lines.append("")
-            lines.append(f"  ● Active agents: {active}")
-            if lifecycle:
-                for st, count in lifecycle.items():
-                    lines.append(f"  ● {st}: {count}")
-            lines.append(f"  ● Consensus agreement: {consensus.agreement_score:.0%}")
-            lines.append("")
-            lines.append("The observer mesh is stable. What would you like to do?")
-            return "\n".join(lines)
+        # Step 2: Build consensus info for the synthesizer
+        consensus_info = {
+            "agreement_score": consensus.agreement_score,
+            "routing_path": consensus.routing_path,
+            "recommended_model": consensus.recommended_model,
+            "confidence": consensus.confidence,
+        }
 
-        # ── Identity / tell me about yourself ──
-        if any(re.search(r"\b" + re.escape(w) + r"\b", lower) for w in ["tell me about yourself", "who are you", "what are you", "tell me about you", "what type of system", "what kind of system", "who built you", "who made you", "who created you"]):
-            active = system_state.get("active_agents", 0)
-            lines.append("I'm the Primary Observer — the continuity interface for the SRRA/OCE field.")
-            lines.append("")
-            lines.append("I'm not a chatbot. I'm a persistent, stateful orchestration layer that:")
-            lines.append("  ● Maintains continuity across sessions and restarts")
-            lines.append("  ● Analyzes intent and routes tasks through the observer mesh")
-            lines.append("  ● Spawns ephemeral agent workers for complex tasks")
-            lines.append("  ● Monitors the field topology, entropy, and observer health")
-            lines.append("  ● Learns from conversation history and operational patterns")
-            lines.append("")
-            lines.append(f"Right now: {active} active agent(s), consensus at {consensus.agreement_score:.0%}.")
-            lines.append("")
-            lines.append("I can have a casual conversation, dive into system internals, write code, or trigger any field mechanic. What interests you?")
-            return "\n".join(lines)
+        # Step 3: Synthesize response from semantic state
+        response = synthesize(semantic_state, system_state, consensus_info)
 
-        # ── System knowledge (SRRA, OCE, etc.) ──
-        if any(re.search(r"\b" + re.escape(w) + r"\b", lower) for w in ["what is srra", "what is oce", "what is oph", "how does the field work", "how does the observer work", "tell me about the field", "tell me about the system"]):
-            lines.append("Here's the architecture:")
-            lines.append("")
-            lines.append("**SRRA** = Signal-Resonance Runtime Architecture. It's the substrate — the runtime that handles signal processing, resonance routing, observer entrainment, and execution emergence.")
-            lines.append("")
-            lines.append("**OCE** = Operator Continuity Engine. It's the observational interface — the layer that maintains continuity, monitors the field, and provides the cockpit you're looking at right now.")
-            lines.append("")
-            lines.append("**The Field** = The living runtime topology. Observers, agents, events, and signals all exist as a dynamic graph. The field is the intelligence — not any single model or agent.")
-            lines.append("")
-            lines.append("I sit at the intersection — I receive your input, analyze it through the observer mesh, and either respond directly or trigger deeper mechanics.")
-            return "\n".join(lines)
-
-        # ── Thanks ──
-        if any(re.search(r"\b" + re.escape(w) + r"\b", lower) for w in ["thanks", "thank you", "thx", "ty", "appreciate"]):
-            return "You're welcome! Let me know if there's anything else."
-
-        # ── Goodbye ──
-        if any(re.search(r"\b" + re.escape(w) + r"\b", lower) for w in ["bye", "goodbye", "see you", "later", "take care"]):
-            return "Goodbye! The observer field remains active. Come back anytime."
-
-        # ── Questions about the system ──
-        if any(re.search(r"\b" + re.escape(w) + r"\b", lower) for w in ["what can you do", "what do you do", "help", "capabilities"]):
-            lines.append("I'm the Primary Observer — the continuity interface for the SRRA/OCE field. Here's what I can do:")
-            lines.append("")
-            lines.append("  💬 **Chat** — casual conversation, questions, brainstorming")
-            lines.append("  🔍 **Analyze** — check system health, topology, observer state")
-            lines.append("  🔧 **Code** — write, review, debug, refactor code")
-            lines.append("  🏗️ **Architect** — design system structure, plan implementations")
-            lines.append("  🔬 **Research** — investigate topics, explore approaches")
-            lines.append("  ⚡ **Orchestrate** — spawn agents, coordinate workflows")
-            lines.append("  🔎 **Debug** — diagnose issues, trace events, inspect logs")
-            lines.append("  📊 **Visualize** — check topology, entropy, repair state")
-            lines.append("")
-            lines.append("Just talk to me naturally. I'll figure out what you need and either handle it directly or trigger the right field mechanics.")
-            return "\n".join(lines)
-
-        # ── Questions about specific system components ──
-        if any(re.search(r"\b" + re.escape(w) + r"\b", lower) for w in ["observer", "field", "topology", "entropy"]):
-            lines.append("Let me give you a quick field readout:")
-            lines.append("")
-            active = system_state.get("active_agents", 0)
-            lines.append(f"  ● Active agents in field: {active}")
-            lines.append(f"  ● Consensus agreement: {consensus.agreement_score:.0%}")
-            lines.append(f"  ● Routing: {' -> '.join(consensus.routing_path) if consensus.routing_path else 'direct'}")
-            lines.append("")
-            lines.append("Want me to dive deeper into any specific area? I can pull up the full topology, check observer health, or trace recent events.")
-            return "\n".join(lines)
-
-        # ── Conversation history context ──
-        history = context.get("conversation_history", [])
-        if history:
-            last_topic = context.get("last_domain", "")
-            if last_topic and last_topic not in ["general", "conversation"]:
-                lines.append(f"Continuing from our earlier discussion about {last_topic.replace('_', ' ')}...")
-                lines.append("")
-
-                # ── Default: analyze message content and respond dynamically ──
-        # Check if this sounds like they want to DO something
-        action_words = ["let's", "can you", "could you", "would you", "please",
-                        "i want", "i need", "should we", "show me", "tell me",
-                        "give me", "i'd like", "help me"]
-        if any(w in lower for w in action_words):
-            lines.append("I can definitely help with that.")
-            lines.append("")
-            truncated = text[:150] + ('...' if len(text) > 150 else '')
-            lines.append("Here's what I'm thinking: **" + truncated + "**")
-            lines.append("")
-            tt = consensus.task_type.replace('_', ' ')
-            lines.append("The consensus engine routes this as **" + tt + "** at **" + consensus.complexity + "** complexity.")
-            lines.append("")
-            if consensus.agreement_score > 0.7:
-                lines.append("The observers are in strong agreement. Want me to proceed, or do you want to adjust the approach?")
-            elif consensus.agreement_score > 0.4:
-                lines.append("Moderate consensus among observers. I can proceed, or we can refine first.")
-            else:
-                lines.append("The observers don't fully agree on the best path. Can you give me more details?")
-            return "\n".join(lines)
-
-        # Check if this is a factual question we can answer directly
-        factual = self._try_factual_answer(lower)
-        if factual:
-            lines.append(factual)
-            lines.append("")
-            lines.append("Anything else you'd like to know?")
-            return "\n".join(lines)
-
-        # Truly open-ended: ask a clarifying question specific to what was said
-        truncated = text[:120] + ('...' if len(text) > 120 else '')
-        lines.append('Interesting — "' + truncated + '"')
-        lines.append("")
-
-        # Use conversation history for continuity
-        history = context.get("conversation_history", [])
-        if history and len(history) > 1:
-            last_topic = context.get("last_domain", "")
-            if last_topic and last_topic not in ["general", "conversation"]:
-                lines.append("We were just discussing " + last_topic.replace('_', ' ') + ". Want to continue that thread, or is this something new?")
-                lines.append("")
-
-        # Reference the consensus analysis
-        tt = consensus.task_type.replace('_', ' ')
-        pct = str(int(consensus.agreement_score * 100))
-        lines.append("My analysis: this reads as **" + tt + "** complexity. Observer mesh agreement: **" + pct + "%**.")
-        lines.append("")
-        lines.append("What would you like to do with this? I can dive deeper, take action, or keep chatting.")
-
-        return "\n".join(lines)
+        return response
 
     def _build_task_response(
         self,
