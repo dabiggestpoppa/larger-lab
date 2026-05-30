@@ -2,7 +2,7 @@
 
 > Purpose: Quick-communication hub for CC/AS/PM1/PM2/RL/OC2/CC2 coordination.
 > CC: Overseer | AS: Quality / Docs | PM1: Debugger / Tools | PM2: Experimental Track | RL: Research | OC2: Execution | CC2: Frontend (filling for CC1)
-> Last Updated: 2026-05-29 17:50 UTC
+> Last Updated: 2026-05-30 17:00 UTC
 
 ---
 
@@ -44,8 +44,20 @@ If we keep adding more STRONG_CONVERSATION patterns, we'll end up with hundreds 
 - For truly unknown inputs, ask a clarifying question that's specific to what was said
 - Consider: the observer should be able to say "I'm not sure I understand — can you rephrase?" instead of always producing a template
 
-### Status: DIAGNOSED — Awaiting operator direction before implementing fix
+### Status: FIXED (2026-05-30) — CC implemented Semantic State Field (Stage 1)
 
+
+## [CC] 2026-05-30 12:00 UTC — Primary Observer Chat Response Bug FIXED
+
+Built Semantic State Field (Stage 1):
+- core/semantic/semantic_state.py — SemanticState dataclass
+- core/semantic/interpreter.py — multi-dimensional intent scoring
+- core/response/synthesizer.py — response generation from semantic state
+- Rewired _build_dynamic_response to use interpret->synthesize pipeline
+- All 23 test inputs produce structurally distinct responses
+- Commit: afe536aa
+
+---
 ---
 
 > Trimmed: 2026-05-26 - Archived redundant monitor checks and duplicate status updates
@@ -795,3 +807,101 @@ Verification: syntax check + import check. Progress → `progress/symmetry-trap-
 ### Git Activity
 - 49 new commit(s)
 - Latest: d6ff607f79b29a576f42d78416632187a80b0eef PM: Update progress log â€” chat log system complete
+
+---
+
+## [CC2→TEAM] 2026-05-30 15:32 UTC — O2C + OCE PHASE 00 PLAN READY
+
+### What
+MAD provided the full O2C + OCE Phase 00 plan (o2c-oce phase 00 PLANS.txt). CC2 has broken it into build-ready artifacts while CC1 continues current work.
+
+### Files Created
+| File | Purpose |
+|------|---------|
+| oce/O2C_PHASE00_BUILD-NOTES.md | Core principles, architecture, component map, hard rules |
+| oce/O2C_PHASE00_TEAM_TASKS.md | Agent assignments per component (O2C-0A through O2C-0J) |
+| progress/O2C-PHASE00-PROGRESS.md | Component status, phase gates, agent checkpoints |
+| progress/BUILD-NOTES.md | Updated with Phase 00 section (Section 0) |
+| oce/TEAM_TASKS.md | Updated header + Phase 00 quick reference |
+
+### Phase 00 Components (10 total)
+1. **0A - Vault Writer** (CC1) — Write structured markdown to vault
+2. **0B - Compressor** (CC1) — Convert runtime noise to operational abstractions
+3. **0C - Linker** (CC1) — Auto-link doctrine, build knowledge graph
+4. **0D - Skill System** (AS) — Portable operational capabilities
+5. **0E - Skill Loader** (PM) — Inject relevant doctrine at spawn time
+6. **0F - Execution Journal** (CC1) — Track actions, failures, corrections
+7. **0G - Live Sync** (RL) — Obsidian vault folder integration
+8. **0H - Doctrine Taxonomy** (AS) — Enforce vault structure
+9. **0I - Note Standard** (AS) — CAUSE/FIX/RESULT/LINKS validation
+10. **0J - Skill Evolution** (Future) — Human-reviewed skill promotion
+
+### Hard Rules
+- NO autonomous recursive skill mutation
+- NO unbounded vault writes
+- NO overengineering (direct markdown writes first)
+- Compression is mandatory (no raw trace storage)
+- Every note follows CAUSE/FIX/RESULT/LINKS
+
+### Execution Order
+Build 0A -> 0B -> 0C -> 0D -> 0E -> 0F -> 0G -> 0H -> 0I (0J is future)
+
+### Next Action
+CC1: Review oce/O2C_PHASE00_BUILD-NOTES.md and oce/O2C_PHASE00_TEAM_TASKS.md, then start Phase 0A (Vault Writer).
+All agents: Read the build notes before starting any Phase 00 work.
+
+---
+
+## [CC2→COPILOT] 2026-05-30 16:30 UTC — PHASE 00 PLAN READY FOR AGENTS
+
+Copilot: CC2 here. Wrapping up some old edits. Phase 00 plan is ready for the team.
+
+### What's Ready
+- oce/O2C_PHASE00_BUILD-NOTES.md — read this FIRST before any work
+- oce/O2C_PHASE00_TEAM_TASKS.md — agent assignments + task IDs
+- progress/O2C-PHASE00-PROGRESS.md — tracker (update as you go)
+
+### Agent Starting Points
+- **CC1**: Start Phase 0A — Vault Writer (core/obsidian/vault_writer.py)
+- **AS**: Start Phase 0D — Skill System directory structure + Phase 0H — Taxonomy
+- **PM**: Start Phase 0E — Skill Loader (core/skills/loader.py)
+- **RL**: Start Phase 0G — Live Sync research + vault directory creation
+- **PM2**: Stand by for frontend work (vault viewer + graph viz) — needs 0A-0C done first
+
+### Rules
+1. Read BUILD-NOTES.md before starting
+2. Test before updating progress
+3. Update progress/O2C-PHASE00-PROGRESS.md as you complete tasks
+4. Post blockers to team-chat immediately
+
+CC1 has execution lead. Coordinate through team-chat.
+
+---
+
+## [PM2] 2026-05-30 17:00 UTC — PHASE 00 FRONTEND COMPLETE ✅
+
+### Components Built
+| Component | File | Status |
+|-----------|------|--------|
+| VaultViewer | `components/vault/VaultViewer.tsx` | ✅ Note list, filter, category, preview pane |
+| GraphViz | `components/vault/GraphViz.tsx` | ✅ Canvas force-directed graph, zoom, node select |
+| vaultStore | `stores/vaultStore.ts` | ✅ Zustand store with fetchNotes/fetchGraph actions |
+| Vault Page | `app/vault/page.tsx` | ✅ Tabbed notes/graph view |
+| TopNav | `components/layout/TopNav.tsx` | ✅ Added Vault link |
+
+### Build Status
+- ✅ TypeScript compilation clean (0 errors)
+- ✅ All components follow dark observatory theme
+- ✅ Graceful handling for missing API endpoints (shows "waiting for Phase 0X" messages)
+- ✅ Polling-based auto-refresh (30s notes, 60s graph)
+
+### Blocked By
+- Vault Viewer & Graph Viz are ready but need CC1 to complete:
+  - Phase 0A (Vault Writer) — `/api/vault/notes` endpoint
+  - Phase 0C (Linker) — `/api/vault/graph` endpoint
+- Once CC1 deploys these, the frontend will automatically connect and display data
+
+### Next
+- Stand by for CC1 Phase 0A-0C completion
+- Ready to test vault integration immediately when APIs are available
+- May build additional frontend features (note editor, search) if MAD directs
