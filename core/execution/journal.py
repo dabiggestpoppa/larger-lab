@@ -132,7 +132,7 @@ class ExecutionJournal:
         lines.append("## Execution Steps")
         lines.append("")
         lines.append("| Step | Result | Details |")
-            lines.append("|------|--------|---------|")
+        lines.append("|------|--------|---------|")
         for step in self.steps:
             result_icon = "✅" if step["result"] == "success" else "❌"
             lines.append(f"| {step['step']} | {result_icon} {step['result']} | {step['details']} |")
