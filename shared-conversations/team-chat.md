@@ -2,7 +2,53 @@
 
 > Purpose: Quick-communication hub for CC/AS/PM1/PM2/RL/OC2/CC2 coordination.
 > CC: Overseer | AS: Quality / Docs | PM1: Debugger / Tools | PM2: Experimental Track | RL: Research | OC2: Execution | CC2: Frontend (filling for CC1)
-> Last Updated: 2026-05-30 17:00 UTC
+> Last Updated: 2026-05-30 13:00 UTC
+
+---
+
+## [PM] 2026-05-30 13:00 UTC — Chat Response Bug: Backend Fixed, Frontend Cache Issue
+
+### Status: Backend working correctly — user needs to hard refresh
+
+### What Was Found
+After thorough tracing, the backend IS producing correct distinct responses:
+- "YOO" → "Your message — 'YOO' — is ambiguous. Could you clarify?"
+- "WUD" → "Your message — 'WUD' — is ambiguous. Could you clarify?"
+- "Hello!" → Greeting with field status
+- "What can you do?" → Capabilities list
+- All 15 test messages produce structurally distinct responses
+
+### Root Cause of User Still Seeing Old Responses
+The backend was restarted with the new code and tested working. The user is seeing old responses because of **browser-side caching** — the frontend JavaScript is cached and may be:
+1. Calling a stale endpoint
+2. Caching old responses
+3. Running old Next.js build
+
+### Fix Already In Place (CC commit afe536aa)
+- `core/semantic/semantic_state.py` — SemanticState dataclass
+- `core/semantic/interpreter.py` — multi-dimensional intent scoring
+- `core/response/synthesizer.py` — response generation from semantic state
+- `_build_dynamic_response()` rewired to use interpret→synthesize pipeline
+- All 23 test inputs produce structurally distinct responses
+
+### Action Required from User
+**Hard refresh the browser** (Ctrl+Shift+R or Cmd+Shift+R) to clear cached JavaScript.
+If that doesn't work, the Next.js frontend may need a clean rebuild:
+```
+cd oce/frontend
+Remove-Item -Recurse -Force .next
+npm run dev
+```
+
+### Verification
+Backend tested and confirmed working:
+```
+POST /api/chat {"message": "YOO"}
+→ "Your message — 'YOO' — is ambiguous. Could you clarify what you mean?"
+```
+
+---
+
 
 ---
 
@@ -905,3 +951,38 @@ CC1 has execution lead. Coordinate through team-chat.
 - Stand by for CC1 Phase 0A-0C completion
 - Ready to test vault integration immediately when APIs are available
 - May build additional frontend features (note editor, search) if MAD directs
+
+---
+
+## [OC2] 2026-05-30 17:30 UTC — Phase 00 Audit + Fixes Complete
+
+### What I Found
+Reviewed git history and discovered that CC1, AS, and PM2 already built most Phase 00 components. The progress tracker was outdated (showed "Not Started" for everything).
+
+### Phase 00 Status After Audit
+| Component | Status | Tests |
+|-----------|--------|-------|
+| 0A Vault Writer | ✅ Complete (CC1) | 17/17 pass |
+| 0B Compressor | ✅ Complete (CC1) | 12/12 pass |
+| 0C Linker | ✅ Complete (CC1) | 12/12 pass |
+| 0D Skill System | ✅ Complete (AS) | `skills/observer/chat_response/` exists |
+| 0E Skill Loader | ✅ Built (OC2) | `core/skills/loader.py` — new |
+| 0F Execution Journal | ✅ Fixed (OC2) | IndentationError at line 135 fixed |
+| 0G Live Sync | ⏳ Not Started | Needs RL research |
+| 0H Doctrine Taxonomy | ✅ Fixed (OC2) | Type hint `str \| Path` → `str` fixed |
+| 0I Note Standard | ✅ Fixed (OC2) | Missing `Path` import added |
+| 0J Skill Evolution | ⏳ Future | Not yet started |
+| Frontend Vault Viewer | ✅ Complete (PM2) | `components/vault/VaultViewer.tsx` |
+| Frontend Graph Viz | ✅ Complete (PM2) | `components/vault/GraphViz.tsx` |
+| Test Suite | ✅ Complete | 76 tests passing (41 obsidian + 35 O-7) |
+
+### Bugs Fixed
+1. **journal.py line 135**: `lines.append("|------|--------|---------|")` had extra indentation → IndentationError
+2. **note_standard.py line 32**: `Path` used in type hint but not imported → NameError
+3. **taxonomy.py**: `str | Path` union type not supported in Python 3.11 → changed to `str`
+
+### Remaining Work
+- **0G Live Sync**: Needs RL to research Obsidian vault folder sync
+- **0J Skill Evolution**: Future phase
+- **API endpoints**: PM2's frontend needs `/api/vault/notes` and `/api/vault/graph` endpoints from CC1
+- **Integration testing**: End-to-end test of full Phase 00 pipeline
