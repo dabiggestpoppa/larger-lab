@@ -216,7 +216,7 @@ class SRRSAdapter:
 
         # Ingest into Event Fabric
         try:
-            from event_fabric import get_fabric
+            from oce.backend.event_fabric import get_fabric
             fabric = get_fabric()
             event = await fabric.ingest(
                 event_type=event_type,
