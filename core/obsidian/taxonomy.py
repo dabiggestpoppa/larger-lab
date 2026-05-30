@@ -43,7 +43,7 @@ REQUIRED_DIRS = list(set(REQUIRED_DIRS))
 class Taxonomy:
     """Enforce vault structure and prevent entropy landfill."""
 
-    def __init__(self, vault_path: Optional[str | Path] = None):
+    def __init__(self, vault_path: Optional[str] = None):
         self.vault_path = Path(vault_path) if vault_path else DEFAULT_VAULT_PATH
 
     def validate(self) -> list[dict]:
