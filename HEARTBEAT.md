@@ -3,14 +3,14 @@
 > **Policy:** Latest status + active delegations only. Archive history to logs/heartbeat-history/>.
 Max 4000 chars.
 
-## Current Status (2026-05-29 23:45 EDT)
+## Current Status (2026-05-30 00:23 EDT)
 - **Workspace:** owl-environment (isolated, OFF LIMITS: larger-lab belongs to CC)
-- **MAD last interaction:** msg #4989 (DMR scrapped, deploy ST + P90 CASCADE)
+- **MAD last interaction:** msg #5030 (P90 CASCADE on USDCHF.PRO verified)
 
 ## This Session — COMPLETE
 ### DMR — SCRAPPED (MAD directive)
 - CSV sim produced 19% WR vs MT5 EA's 92% — root cause never found
-- DMR cron jobs disabled. DMR executors killed. Moving on.
+- DMR cron jobs disabled. DMR executors killed.
 
 ### Symmetry Trap — DEPLOYMENT READY
 - Engine: `quant-lab/engines/symmetry_trap.py` — Engine B, 4-state FSM
@@ -23,11 +23,15 @@ Max 4000 chars.
 ### P90 CASCADE — DEPLOYMENT READY
 - Engine: `quant-lab/engines/p90_engine.py` — Engine A, CASCADE ONLY
 - Executor: `quant-lab/mt5/p90_cascade_executor.py`
-- Symbol: GBPUSD.PRO | Magic: 20260532 | Lot: 0.01
-- 4Y BT: 439 trades, 85.4% WR (CASCADE-only pool)
+- Symbol: **USDCHF.PRO** (MAD correction: was GBPUSD, changed to USDCHF "sniper")
+- Magic: 20260532 | Lot: 0.01
+- 3Y BT (MAD's data, Jan 2023–May 2026): 1,035 trades, 79.0% WR, PF 2.81, MaxDD 42.9p
+- CASCADE variant: 484 trades, 83.1% WR, +1,292.3p
+- DMR Convergence overlay: 85.8% WR on convergence trades
 - INITIAL variant FILTERED in executor
 - Engine persists across scans for CASCADE detection
 - Cron: 2AM EST daily start (5min after ST)
+- Data: `quant-lab/data/USDCHFPRO_M5_MAD.csv` (MAD's file, 253K bars)
 
 ### Active Cron Jobs
 | Job | Time (EST) | ID |
@@ -50,6 +54,7 @@ Max 4000 chars.
 - Touch larger-lab workspace (CC's domain)
 - Re-enable DMR without MAD explicit directive
 - Modify engine filters without backing up original
-- Deploy INITIAL variant (61% WR)
+- Deploy INITIAL variant (63.6% WR, filtered out)
+- Deploy on GBPUSD (MAD said "sloppy" — use USDCHF only)
 
-*Updated: 2026-05-29 23:45 EDT — Build phase complete. ST + P90 CASCADE deploying tomorrow.*
+*Updated: 2026-05-30 00:23 EDT — MAD corrected P90 symbol to USDCHF. Backtest verified on his full dataset. Build phase complete. Awaiting go-live confirmation.*
