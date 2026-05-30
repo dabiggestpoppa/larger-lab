@@ -191,7 +191,7 @@ class EventFabric:
         # Persist to SQLite
         try:
             persistence = get_persistence()
-            await persistence.store_event(event)
+            persistence.store_event(event)
         except Exception as e:
             logger.warning(f"Persistence failed (non-critical): {e}")
 
