@@ -52,13 +52,12 @@ ACTIVATION_END = time(12, 0)        # 12:00 PM EST — hard termination
 # Hard structural law (manual_ontology.md Computable Mechanics Q11)
 KILL_SWITCH_PCT = 0.80              # 80% of impulse leg — CLOSE ONLY
 
-# Tier Configuration: discrete volatility quantization classes
-# AU = 50% of K-Means cluster centroid (manual_ontology.md Computable Q1)
+# Default tier config — EUR/USD reference (Quick Reference Card Page 2)
+# For other ASSET_CONFIGS registry in configs/asset_configs.py.
 DEFAULT_TIER_CONFIG: Dict[str, Dict[str, float]] = {
     "T1": {"ar_max": 20.0, "au": 10.0, "trigger": 12.0},
     "T2": {"ar_max": 30.0, "au": 12.0, "trigger": 15.0},
     "T3": {"ar_max": 45.0, "au": 15.0, "trigger": 19.0},
-    # AR > 45p → NO-GO: structural coherence collapses
 }
 
 
@@ -183,10 +182,17 @@ class SymmetryTrapEngine:
         pip_size: float = 0.0001,
         tier_config: Optional[Dict[str, Dict[str, float]]] = None,
         symbol: str = "EURUSD",
+        config: Optional[Dict] = None,
     ):
-        self.pip_size = pip_size
-        self.tier_config = tier_config or DEFAULT_TIER_CONFIG.copy()
-        self.symbol = symbol
+        # Config injection: if full config dict provided, extract tier_config from it
+        if config is not None:
+            self.pip_size = config.get("pip_value", pip_size)
+            self.tier_config = config.get("tiers", tier_config or DEFAULT_TIER_CONFIG.copy())
+            self.symbol = config.get("name", symbol)
+        else:
+            self.pip_size = pip_size
+            self.tier_config = tier_config or DEFAULT_TIER_CONFIG.copy()
+            self.symbol = symbol
         self.logger = logging.getLogger(f"cerebus.symmetry_trap.{symbol}")
 
         # ── State Machine ──────────────────────────────────────────────
