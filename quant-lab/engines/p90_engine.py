@@ -230,11 +230,19 @@ class P90Engine:
         tier_config: Optional[Dict] = None,
         symbol: str = "EURUSD",
         target_mode: str = "both",  # "tp1_only" (-25% AR), "tp2_only" (-50% AR), "both"
+        config: Optional[Dict] = None,
     ):
-        self.pip_size = pip_size
-        self.p90_config = p90_config or DEFAULT_P90_THRESHOLDS.copy()
-        self.tier_config = tier_config or DEFAULT_TIER_CONFIG.copy()
-        self.symbol = symbol
+        # Config injection: if full config dict provided, extract parameters from it
+        if config is not None:
+            self.pip_size = config.get("pip_value", pip_size)
+            self.p90_config = p90_config or DEFAULT_P90_THRESHOLDS.copy()
+            self.tier_config = config.get("tiers", tier_config or DEFAULT_TIER_CONFIG.copy())
+            self.symbol = config.get("name", symbol)
+        else:
+            self.pip_size = pip_size
+            self.p90_config = p90_config or DEFAULT_P90_THRESHOLDS.copy()
+            self.tier_config = tier_config or DEFAULT_TIER_CONFIG.copy()
+            self.symbol = symbol
         self.target_mode = target_mode
         self.logger = logging.getLogger(f"cerebus.p90.{symbol}")
 

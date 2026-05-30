@@ -1,6 +1,6 @@
 # TOOLS.md — Larger-Lab Tool Reference
 
-> **Last Updated:** 2026-05-21
+> **Last Updated:** 2026-05-30
 > **Purpose:** Quick reference for all tools, paths, and configurations
 > **Policy:** Keep <10K chars. Full details in docs/ subdirectories.
 
@@ -14,6 +14,10 @@
 | `oce/` | Operator Continuity Engine (V3 cognitive field) |
 | `oce/backend/` | FastAPI backend (main.py, event_fabric.py, observer_runtime.py) |
 | `srrs_opc/` | SRRA-OPH core (33 modules, 56 tests) |
+| `quant-lab/` | CEREBUS FX system (engines, strategies, mt5, backtests, data) |
+| `quant-lab/sniper/` | **Prop Firm Sniper Engine v1.0** (7 modules, PES calculator, scope CLI) |
+| `quant-lab/ontology/` | CEREBUS ontology suite (7 files) |
+| `quant-lab/knowledge/` | Domain docs (sniper plan, payout systems) |
 | `tools/` | Python/JS automation tools |
 | `skills/` | Agent skills (57 active) |
 | `docs/` | Documentation (TESTING, DEBUGGING, API_REFERENCE, MODULE_GUIDE) |
@@ -70,5 +74,5 @@
 - **Max concurrent sub-agents:** 5
 
 ---
-*Compressed: 2026-05-21 — Old TOOLS.md was 13.8KB, now <4KB*
+*Updated: 2026-05-30 — Added sniper engine paths, ontology, knowledge dirs*
 *Full tool list archived to: docs/TOOLS_FULL.md*

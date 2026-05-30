@@ -1,9 +1,39 @@
 # OCE Team Tasks
 
 > **Generated:** 2026-05-16
-> **Updated:** 2026-05-17
-> **Lead:** OWL (RL) — Phase 9 Lead
-> **Status:** Phase 9 — Entropy Economics ✅ Complete | Post-Deployment Upgrades Pending
+> **Updated:** 2026-05-30
+> **Lead:** CC2 (Phase 00 Planning) -> CC1 (Phase 00 Execution)
+> **Status:** Phase 00 - Cognitive Filesystem Foundation [Ready for Build]
+
+---
+
+## PHASE 00 - O2C COGNITIVE FILESYSTEM FOUNDATION (NEW)
+
+> **Full Plan:** oce/O2C_PHASE00_BUILD-NOTES.md
+> **Team Tasks:** oce/O2C_PHASE00_TEAM_TASKS.md
+> **Progress:** progress/O2C-PHASE00-PROGRESS.md
+
+### Quick Reference
+| Phase | Component | Agent | Status |
+|-------|-----------|-------|--------|
+| 0A | Vault Writer | CC1 | Pending |
+| 0B | Compressor | CC1 | Pending |
+| 0C | Linker | CC1 | Pending |
+| 0D | Skill System | AS | Pending |
+| 0E | Skill Loader | PM | Pending |
+| 0F | Execution Journal | CC1 | Pending |
+| 0G | Live Sync | RL | Pending |
+| 0H | Doctrine Taxonomy | AS | Pending |
+| 0I | Note Standard | AS | Pending |
+
+### Hard Rules
+1. NO autonomous recursive skill mutation
+2. NO unbounded vault writes
+3. NO overengineering - direct markdown writes first
+4. Compression is mandatory
+5. CAUSE/FIX/RESULT/LINKS on every note
+
+---
 
 ---
 

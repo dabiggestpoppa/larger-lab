@@ -61,6 +61,8 @@ from symmetry_trap import (
 # --- TIMESTAMP PARSING -----------------------------------------------------
 
 _TIMESTAMP_FORMATS = [
+    "%Y.%m.%d %H:%M:%S",
+    "%Y.%m.%d %H:%M",
     "%Y-%m-%d %H:%M:%S",
     "%Y-%m-%dT%H:%M:%S",
     "%Y-%m-%dT%H:%M:%SZ",
@@ -94,19 +96,37 @@ def load_bars_csv(csv_path: str) -> List[Bar]:
         raise FileNotFoundError(f"CSV file not found: {csv_path}")
 
     with open(path, newline="", encoding="utf-8-sig") as f:
-        reader = csv.DictReader(f)
+        # Read header and detect delimiter
+        first_line = f.readline()
+        f.seek(0)
+        # Determine delimiter (tab or comma)
+        delimiter = "\t" if "\t" in first_line else ","
+        reader = csv.DictReader(f, delimiter=delimiter)
         for row_num, row in enumerate(reader, start=2):
-            ts_raw = (row.get("timestamp") or row.get("Timestamp")
-                      or row.get("time") or row.get("Time")
-                      or row.get("date") or row.get("Date")
-                      or row.get("datetime") or row.get("Datetime"))
-            if ts_raw is None:
-                raise ValueError(f"Row {row_num}: no timestamp column. Columns: {list(row.keys())}")
+            # Clean column names (strip angle brackets, whitespace)
+            clean_row = {k.strip().strip("<").strip(">"): v for k, v in row.items()}
 
-            o = row.get("open") or row.get("Open") or row.get("OPEN")
-            h = row.get("high") or row.get("High") or row.get("HIGH")
-            l = row.get("low") or row.get("Low") or row.get("LOW")
-            c = row.get("close") or row.get("Close") or row.get("CLOSE")
+            # Try single timestamp column first
+            ts_raw = (clean_row.get("timestamp") or clean_row.get("Timestamp")
+                      or clean_row.get("TIMESTAMP") or clean_row.get("datetime")
+                      or clean_row.get("Datetime") or clean_row.get("DATETIME"))
+
+            # If no single timestamp, combine DATE + TIME
+            if ts_raw is None:
+                date_val = (clean_row.get("date") or clean_row.get("Date") or clean_row.get("DATE")
+                           or clean_row.get("<DATE>"))
+                time_val = (clean_row.get("time") or clean_row.get("Time") or clean_row.get("TIME")
+                           or clean_row.get("<TIME>"))
+                if date_val and time_val:
+                    ts_raw = f"{date_val.strip()} {time_val.strip()}"
+
+            if ts_raw is None or not ts_raw.strip():
+                raise ValueError(f"Row {row_num}: no timestamp. Columns: {list(row.keys())}")
+
+            o = clean_row.get("OPEN")
+            h = clean_row.get("HIGH")
+            l = clean_row.get("LOW")
+            c = clean_row.get("CLOSE")
 
             if any(v is None for v in (o, h, l, c)):
                 raise ValueError(f"Row {row_num}: missing OHLC. Columns: {list(row.keys())}")
@@ -362,7 +382,7 @@ def compute_stats(
 
     # --- Per-variant breakdown ---
     per_variant = {}
-    for variant in [P90Variant.INITIAL, P90Variant.CASCADE]:
+    for variant in [P90Variant.INITIAL, P90Variant.CASCADE, P90Variant.EWS]:
         v_completed = [s for s in completed if s.variant == variant]
         v_pnls = []
         for sig in v_completed:
@@ -579,6 +599,7 @@ def run_backtest(
     symbol: str,
     pip_size: float = 0.0001,
     convergence_mode: bool = True,
+    config: Optional[Dict] = None,
 ) -> Dict:
     logging.basicConfig(
         level=logging.WARNING,
@@ -596,8 +617,8 @@ def run_backtest(
     sessions = group_by_session(bars)
     print(f"[P90 BT] Found {len(sessions)} sessions")
 
-    p90_engine = P90Engine(pip_size=pip_size, symbol=symbol)
-    st_engine = SymmetryTrapEngine(pip_size=pip_size, symbol=symbol)
+    p90_engine = P90Engine(pip_size=pip_size, symbol=symbol, config=config)
+    st_engine = SymmetryTrapEngine(pip_size=pip_size, symbol=symbol, config=config)
     total_bars_processed = 0
 
     # Track convergence: map each ENTRY signal index -> bool
@@ -682,6 +703,8 @@ def main():
     parser.add_argument("--symbol", default="EURUSD", help="Symbol (default: EURUSD)")
     parser.add_argument("--pip-size", type=float, default=0.0001,
                         help="Pip size (default: 0.0001 for EURUSD)")
+    parser.add_argument("--asset", type=str, default=None,
+                        help="Asset key from config registry (e.g., USDCHF). Auto-loads pip_size, tiers, etc.")
     conv_group = parser.add_mutually_exclusive_group()
     conv_group.add_argument("--convergence-mode", dest="convergence_mode", action="store_true",
                             default=True,
@@ -690,11 +713,26 @@ def main():
                             help="Disable DMR convergence (pure P90 baseline)")
     args = parser.parse_args()
 
+    # Load config from registry if --asset specified
+    config = None
+    if args.asset:
+        try:
+            sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "configs"))
+            from asset_configs import get_config
+            config = get_config(args.asset.upper())
+            pip_size = config["pip_value"]
+            symbol = config["name"]
+            print(f"[CONFIG] Loaded {args.asset.upper()}: pip={pip_size}, symbol={symbol}")
+        except (KeyError, ImportError) as e:
+            print(f"[CONFIG] WARNING: Could not load config for '{args.asset}': {e}")
+            print(f"[CONFIG] Falling back to CLI args: symbol={args.symbol}, pip_size={args.pip_size}")
+
     run_backtest(
         csv_path=args.csv,
-        symbol=args.symbol,
-        pip_size=args.pip_size,
+        symbol=symbol,
+        pip_size=pip_size,
         convergence_mode=args.convergence_mode,
+        config=config,
     )
 
 

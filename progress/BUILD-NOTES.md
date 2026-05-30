@@ -147,3 +147,38 @@
 
 **Aim:** When writing new tests, check if real data exists first. Use `progress/*.json`, `stability/*.json`, `experiments/`, and live backend modules. Only simulate when no real data is available. When simulating, model the actual system behavior (e.g., memoization in recursion).
 
+
+---
+
+## 0. O2C + OCE PHASE 00 — COGNITIVE FILESYSTEM FOUNDATION
+
+**Key Theme:** Filesystem cognition > model intelligence.
+
+**Reason:** Models reset. Models forget. Models hallucinate. The filesystem is the only persistent substrate. Every agent execution must leave behind structured operational intelligence — not raw logs, but distilled operational knowledge in markdown.
+
+**Aim:** Every Phase 00 component answers: \"Does this make the filesystem smarter?\" If not, it shouldn't be built.
+
+**Full Plan:** \oce/O2C_PHASE00_BUILD-NOTES.md\
+**Team Tasks:** \oce/O2C_PHASE00_TEAM_TASKS.md\
+**Progress:** \progress/O2C-PHASE00-PROGRESS.md\
+
+### Phase 00 Component Map
+| Phase | Component | Agent |
+|-------|-----------|-------|
+| 0A | Vault Writer | CC1 |
+| 0B | Compressor | CC1 |
+| 0C | Linker | CC1 |
+| 0D | Skill System | AS |
+| 0E | Skill Loader | PM |
+| 0F | Execution Journal | CC1 |
+| 0G | Live Sync | RL |
+| 0H | Doctrine Taxonomy | AS |
+| 0I | Note Standard | AS |
+| 0J | Skill Evolution (future) | — |
+
+### Hard Rules
+1. NO autonomous recursive skill mutation — human review required
+2. NO unbounded vault writes — taxonomy enforcement required
+3. NO overengineering Obsidian sync — direct markdown writes first
+4. NO raw trace storage — compression is mandatory
+5. Every note follows CAUSE/FIX/RESULT/LINKS

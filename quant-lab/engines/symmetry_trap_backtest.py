@@ -366,10 +366,17 @@ class SymmetryTrapBacktest:
         tier_config: Optional[Dict] = None,
         symbol: str = "EURUSD",
         est_offset: int = -5,
+        config: Optional[Dict] = None,
     ):
-        self.pip_size = pip_size
-        self.tier_config = tier_config or DEFAULT_TIER_CONFIG.copy()
-        self.symbol = symbol
+        if config is not None:
+            self.pip_size = config.get("pip_value", pip_size)
+            self.tier_config = config.get("tiers", tier_config or DEFAULT_TIER_CONFIG.copy())
+            self.symbol = config.get("name", symbol)
+        else:
+            self.pip_size = pip_size
+            self.tier_config = tier_config or DEFAULT_TIER_CONFIG.copy()
+            self.symbol = symbol
+        self.config = config
         self.est_offset = est_offset
         self.logger = logging.getLogger(f"cerebus.symt_backtest.{symbol}")
 
@@ -397,7 +404,7 @@ class SymmetryTrapBacktest:
                 days[dk] = []
             days[dk].append(bar)
 
-        engine = SymmetryTrapEngine(pip_size=self.pip_size, tier_config=self.tier_config, symbol=self.symbol)
+        engine = SymmetryTrapEngine(pip_size=self.pip_size, tier_config=self.tier_config, symbol=self.symbol, config=self.config)
         all_trades: List[TradeRecord] = []
 
         for dk in sorted(days.keys()):

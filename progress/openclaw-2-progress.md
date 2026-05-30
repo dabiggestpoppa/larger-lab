@@ -1,15 +1,23 @@
-# OWL Progress Log
+# OC2 Progress — OWL (OpenClaw-2)
 
-## 2026-05-28 19:03 EDT — AUTO-WORK BUG FIX
+> **Last Updated:** 2026-05-30 12:49 EDT
 
-**Issue:** MAD directed "Run self heal and doc and see why you keep running in circles and not listening"
+## Today's Work (2026-05-30)
 
-**Finding:** SOUL.md had anti-auto-work rule at line 240/275. 239 lines of "always-on / execute" priming dominated. MEMORY.md (21K) re-trained old patterns.
+### Prop Firm Sniper Engine v1.0 — COMPLETE
+- Built all 7 modules from ontology spec
+- All compile OK, end-to-end scope workflow verified
+- $100K deployment test: My Funded Futures #1 (PES 0.0430)
+- Code map delivered to MAD (183 Python files, 103 in quant-lab)
 
-**Actions:**
-- Rewrote SOUL.md: 275 → ~100 lines, FIRST GATE moved to position #1
-- Compressed MEMORY.md: 21,188 → ~4,400 chars
-- Documented root cause + fix in self-heal-report.md
-- All done on explicit MAD directive (no auto-work)
+### Self-Heal Fleet — COMPLETE
+- Replaced monolithic cron with 4-job fleet (Sage design)
+- STRUCT/PULSE/ECHO/DRIFT all active
 
-**Result:** Bootstrap files now lead with "classify before acting" instead of "maintain/execute/do"
+### Workspace Updates
+- MEMORY.md updated with sniper build + test results
+- TOOLS.md updated with sniper paths
+- HEARTBEAT.md synced to latest state
+
+## Standing By
+- MAD's detailed plan for next phase (expected shortly)
