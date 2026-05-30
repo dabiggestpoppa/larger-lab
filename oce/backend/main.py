@@ -972,6 +972,12 @@ register_substrate_endpoints(app)
 from .persistent_field_api import register_persistent_field_endpoints
 register_persistent_field_endpoints(app)
 
+# Register O2C Phase 00 Vault endpoints
+from .vault_api import register_vault_endpoints
+register_vault_endpoints(app)
+
+
+
 app.include_router(command_center_router)
 
 # ─── Phase 7: Evolution API ──────────────────────────────────────────────────

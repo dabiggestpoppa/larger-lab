@@ -7,11 +7,11 @@
 
 ---
 
-## Status: 🟢 Active — O-6 COMPLETE, O-7 READY
+## Status: 🟢 Active — PHASE 00 IN PROGRESS
 
-### Current State (2026-05-28 11:00 UTC)
-**O-6 Local Substrate — COMPLETE (52/52 tests, 16 routes, 0 errors).**
-**O-7 Persistent Field — Ready to build (12 backend + 9 frontend + 8 tests).**
+### Current State (2026-05-30 17:30 UTC)
+**Observer Core O-1 through O-7 — ALL COMPLETE (143 tests passing).**
+**Phase 00 (O2C + OCE Cognitive Filesystem) — 8/10 components complete.**
 
 ### O-5 OCE Unified Frontend — IN PROGRESS (12/12 frontend components)
 | Component | File | Status |
@@ -198,6 +198,19 @@
 ### 2026-05-23 17:30 UTC — Autopilot v3 + Standby Mode
 - Built `tools/owl_autopilot.py` — full monitoring daemon with rate limit recovery
 - 15-min check interval: processes, chaos test, 72h test, git status, team chat
+
+### 2026-05-30 17:30 UTC — Phase 00 Audit + Fixes
+- Reviewed git history: O-1 through O-7 all complete (OC2 commit 3b12b0844)
+- Discovered Phase 00 components already built by CC1/AS/PM2 (progress tracker was outdated)
+- Fixed 3 bugs in existing Phase 00 code:
+  1. `core/execution/journal.py` line 135: IndentationError (extra indent on table separator)
+  2. `core/obsidian/note_standard.py` line 32: NameError — `Path` used in type hint but not imported
+  3. `core/obsidian/taxonomy.py`: `str | Path` union type not supported in Python 3.11 → changed to `str`
+- Built `core/skills/loader.py` (Phase 0E Skill Loader)
+- Updated progress tracker and team-chat with accurate status
+- Cleaned up accidentally created duplicate directories (persistent_field/, components/)
+- **Phase 00 status**: 8/10 components complete, 76 tests passing (41 obsidian + 35 O-7)
+- **Remaining**: 0G (Live Sync, needs RL), 0J (Skill Evolution, future)
 - Exponential backoff on errors: 60s → 120s → 300s → 600s → 1800s
 - Hourly status posts to team chat
 - Logs to `logs/owl-autopilot.log`

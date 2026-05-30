@@ -1,0 +1,16 @@
+DMR BACKTEST SUMMARY — 2026-05-28 10:25:51.870726
+Account: 1114712 @ OxSecurities-Demo
+==================================================
+
+EURUSD:
+  trades: 869
+  wins: 778
+  losses: 91
+  wr: 89.5
+  pnl_pips: 9313.1
+  pf: 86.1
+  avg_win: 12.1
+  avg_loss: 1.2
+  max_consec_wins: 44
+  max_consec_losses: 3
+  max_drawdown_pips: 4.8
