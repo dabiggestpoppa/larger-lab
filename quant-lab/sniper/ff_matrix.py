@@ -112,12 +112,11 @@ class FFScalingMatrix:
             # Consistency bypass: does this fragmentation help?
             bypass = False
             bypass_factor = 1.0
+            typical_daily_pnl_pct = 0.02  # ~2% of account per good day
+            daily_pct_per_account = typical_daily_pnl_pct
+            daily_pct_per_account_adjusted = typical_daily_pnl_pct / qty
             if ontology.has_consistency_rule and ontology.max_single_day_profit_pct > 0:
-                # If CEREBUS generates $X/day, what % is that of one small account?
-                typical_daily_pnl_pct = 0.02  # ~2% of account per good day
-                daily_pct_per_account = typical_daily_pnl_pct  # scales with account size
                 # More accounts = each account's share of total profit is smaller
-                daily_pct_per_account_adjusted = typical_daily_pnl_pct / qty
                 if daily_pct_per_account_adjusted < ontology.max_single_day_profit_pct:
                     bypass = True
                     bypass_factor = 1.0 + (1.0 / qty)
@@ -174,7 +173,27 @@ class FFScalingMatrix:
         return results
 
     def _estimate_cost(self, ontology: PropFirmOntology, account_size: int) -> float:
-        """Estimate eval fee for a given account size based on known pricing."""
+        """Estimate eval fee for a given account size."""
+        if not ontology.raw_cost_per_size:
+            ratio = account_size / max(ontology.account_size, 1)
+            return ontology.eval_fee * ratio
+        # Try int key first, then string key
+        cost = ontology.raw_cost_per_size.get(account_size)
+        if cost is None:
+            cost = ontology.raw_cost_per_size.get(str(account_size))
+        if cost is not None:
+            return cost
+        # Linear interpolation from nearest
+        int_keys = []
+        for k in ontology.raw_cost_per_size:
+            try:
+                int_keys.append((int(k), ontology.raw_cost_per_size[k]))
+            except (ValueError, TypeError):
+                pass
+        if int_keys:
+            nearest = min(int_keys, key=lambda x: abs(x[0] - account_size))
+            ratio = account_size / max(nearest[0], 1)
+            return nearest[1] * ratio
         ratio = account_size / max(ontology.account_size, 1)
         return ontology.eval_fee * ratio
 

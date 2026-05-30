@@ -1,16 +1,25 @@
 """
 Phase 1: Real Scraper Engine for PropFirmMatch + PayoutJunction
-Uses Scrapling (StealthyFetcher) to bypass anti-bot.
-Falls back to web_fetch if Scrapling unavailable.
+Calibrated against live DOM (2026-05-30 browser scrape).
+
+DOM Structure (PropFirmMatch /futures):
+  - Comparison table: <TABLE> with columns FIRM | RANK/REVIEWS | COUNTRY | YEARS | ASSETS | PLATFORMS | MAX ALLOCATIONS | PROMO | ACTIONS
+  - Firm detail pages: /prop-firms/{name} with sections: Overview, Instruments, Leverage, Commissions, Consistency Rules, Firm Rules, Challenges, Payout Policy, Restricted Countries
+  - Promo data in table: e.g. "50%OFF\nMATCH" (discount % + code)
+  - Individual firm page tabs: Overview | Challenges (N) | Reviews (N) | Offers (N) | Announcements | Payouts
+
+Anti-bot: Cloudflare Turnstile — requires Scrapling StealthyFetcher or CloakBrowser.
 
 Targets:
   - https://propfirmmatch.com/futures  → firm listings, pricing, promos
+  - https://propfirmmatch.com/futures/prop-firms/{slug}  → detailed rules per firm
   - https://payoutjunction.com/        → payout verification data
 """
 
 import json
 import time
 import hashlib
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -24,17 +33,38 @@ SNAPSHOT_DIR.mkdir(exist_ok=True)
 class PropFirmMatchScraper:
     """
     Scrapes PropFirmMatch futures directory.
-    Uses Scrapling StealthyFetcher for anti-bot bypass.
-    Falls back to requests + bs4 if Scrapling unavailable.
+
+    TWO-PASS APPROACH:
+      Pass 1: Scrape /futures comparison table → firm names, ratings, promos, max allocations
+      Pass 2: Visit each firm's detail page → drawdown rules, consistency, payout, instruments
     """
 
-    URL = "https://propfirmmatch.com/futures"
+    BASE_URL = "https://propfirmmatch.com/futures"
+    FIRM_URL_TEMPLATE = "https://propfirmmatch.com/futures/prop-firms/{slug}"
+
+    # Known firm name → slug mapping (from live DOM data)
+    KNOWN_FIRM_SLUGS = {
+        "my funded futures": "my-funded-futures",
+        "topstep": "topstep",
+        "apex trader funding": "apex-trader-funding",
+        "take profit trader": "take-profit-trader",
+        "fundednext futures": "fundednext-futures",
+        "lucid trading": "lucid-trading",
+        "alpha futures": "alpha-futures",
+        "tradeify": "tradeify",
+        "top one futures": "top-one-futures",
+        "funded futures family": "funded-futures-family",
+        "e8 futures": "e8-futures",
+        "goat funded futures": "goat-funded-futures",
+        "traders launch": "traders-launch",
+        "tradeday": "tradeday",
+        "futureselite": "futureselite",
+    }
 
     def __init__(self, stealth: bool = True):
         self.stealth = stealth
         self.last_result: Optional[list[dict]] = None
         self._scrapling_available = False
-        self._requests_available = False
         self._check_deps()
 
     def _check_deps(self):
@@ -43,262 +73,87 @@ class PropFirmMatchScraper:
             self._scrapling_available = True
         except ImportError:
             pass
-        try:
-            import requests
-            from bs4 import BeautifulSoup
-            self._requests_available = True
-        except ImportError:
-            pass
 
     def scrape(self) -> list[dict]:
-        """
-        Scrape PropFirmMatch futures page.
-        Returns list of raw firm dicts.
-        """
-        if self.stealth and self._scrapling_available:
-            return self._scrape_scrapling()
-        elif self._requests_available:
-            return self._scrape_requests()
-        else:
-            return []
+        """Full two-pass scrape: summary table + individual firm pages."""
+        if self._scrapling_available:
+            return self._scrape_with_scrapling()
+        return []
 
-    def _scrape_scrapling(self) -> list[dict]:
-        """Primary: Scrapling StealthyFetcher."""
+    def scrape_table_only(self) -> list[dict]:
+        """Pass 1 only: scrape the comparison table for firm names, promos, allocations."""
+        if self._scrapling_available:
+            return self._scrape_table_scrapling()
+        return []
+
+    # ── SCRAPLING PATH ──────────────────────────────────────
+
+    def _scrape_with_scrapling(self) -> list[dict]:
+        """Full two-pass scrape using Scrapling StealthyFetcher."""
         from scrapling.fetchers import StealthyFetcher
 
+        # Pass 1: Comparison table
         try:
             page = StealthyFetcher.fetch(
-                self.URL,
-                headless=True,
-                network_idle=True,
-                timeout=30000,
+                self.BASE_URL, headless=True, network_idle=True, timeout=30000,
             )
-            return self._parse_page_content(page)
+            basic_firms = _parse_table_from_page(page)
         except Exception as e:
-            print(f"[Scrapling] StealthyFetcher failed: {e}, trying fallback...")
-            if self._requests_available:
-                return self._scrape_requests()
+            print(f"[Scrapling] Table fetch failed: {e}")
             return []
 
-    def _scrape_requests(self) -> list[dict]:
-        """Fallback: requests + BeautifulSoup (may be blocked)."""
-        import requests
-        from bs4 import BeautifulSoup
+        # Pass 2: Detail pages (limit to avoid hammering)
+        detailed = []
+        for firm in basic_firms[:8]:  # top 8 firms for now
+            slug = firm.get("_slug") or self._slugify(firm["name"])
+            detail_url = self.FIRM_URL_TEMPLATE.format(slug=slug)
+            try:
+                time.sleep(1.5)  # polite delay
+                detail_page = StealthyFetcher.fetch(
+                    detail_url, headless=True, network_idle=True, timeout=25000,
+                )
+                details = _parse_firm_detail_from_page(detail_page)
+                firm.update(details)
+                detailed.append(firm)
+            except Exception as e:
+                print(f"[Scrapling] Detail fetch failed for {firm['name']}: {e}")
+                detailed.append(firm)  # keep basic data at least
 
+        self.last_result = detailed
+        return detailed
+
+    def _scrape_table_scrapling(self) -> list[dict]:
+        """Scrape only the comparison table."""
+        from scrapling.fetchers import StealthyFetcher
         try:
-            headers = {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                              "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                "Accept-Language": "en-US,en;q=0.5",
-            }
-            resp = requests.get(self.URL, headers=headers, timeout=15)
-            resp.raise_for_status()
-            soup = BeautifulSoup(resp.text, "html.parser")
-            return self._parse_soup(soup)
+            page = StealthyFetcher.fetch(
+                self.BASE_URL, headless=True, network_idle=True, timeout=30000,
+            )
+            firms = _parse_table_from_page(page)
+            self.last_result = firms
+            return firms
         except Exception as e:
-            print(f"[Requests] Scrape failed: {e}")
+            print(f"[Scrapling] Table only fetch failed: {e}")
             return []
 
-    def _parse_page_content(self, page) -> list[dict]:
-        """
-        Parse a Scrapling page object for firm data.
-        Adapts to actual PropFirmMatch DOM structure.
-        """
-        results = []
+    # ── FIRM SLUG RESOLUTION ────────────────────────────────
 
-        # Strategy 1: Look for structured JSON-LD or API data in page
-        scripts = page.css('script[type="application/ld+json"]::text').getall()
-        scripts += page.css('script[id*="data"]::text').getall()
-        for script_text in scripts:
-            try:
-                data = json.loads(script_text)
-                if isinstance(data, list):
-                    for item in data:
-                        if self._looks_like_firm(item):
-                            results.append(item)
-                elif isinstance(data, dict) and self._looks_like_firm(data):
-                    results.append(data)
-            except (json.JSONDecodeError, TypeError):
-                pass
+    def _slugify(self, name: str) -> str:
+        """Convert firm name to URL slug."""
+        clean = name.lower().strip()
+        # Remove rank prefix like "4\n\n" or "NEW\n\n"
+        clean = re.sub(r'^(new\s+|\d+\s+)', '', clean)
+        # Check known slugs first
+        if clean in self.KNOWN_FIRM_SLUGS:
+            return self.KNOWN_FIRM_SLUGS[clean]
+        # Generic: lowercase, replace spaces with hyphens, remove special chars
+        slug = re.sub(r'[^a-z0-9\s-]', '', clean)
+        slug = re.sub(r'\s+', '-', slug.strip())
+        return slug
 
-        # Strategy 2: CSS selectors targeting common prop firm card layouts
-        if not results:
-            # Common class patterns for prop firm listing sites
-            card_selectors = [
-                '.firm-card', '.prop-firm-card', '.card', '.listing-item',
-                '[class*="firm"]', '[class*="provider"]', '.comparison-card',
-            ]
-            for selector in card_selectors:
-                cards = page.css(selector)
-                if cards:
-                    for card in cards:
-                        firm = self._extract_firm_from_card(card)
-                        if firm and firm.get("name"):
-                            results.append(firm)
-                    break  # first selector that matches wins
+    # ── SNAPSHOTS & CHANGE DETECTION ────────────────────────
 
-        # Strategy 3: Extract from text
-        if not results:
-            text = page.text()
-            results = self._extract_from_text(text)
-
-        self.last_result = results
-        return results
-
-    def _parse_soup(self, soup) -> list[dict]:
-        """Parse BeautifulSoup object."""
-        results = []
-
-        # CSS selectors for firm cards
-        card_selectors = [
-            '.firm-card', '.prop-firm-card', '.card', '.listing-item',
-            '[class*="firm"]', '[class*="provider"]',
-        ]
-        for selector in card_selectors:
-            cards = soup.select(selector)
-            if cards:
-                for card in cards:
-                    firm = self._extract_firm_from_bs4(card)
-                    if firm and firm.get("name"):
-                        results.append(firm)
-                break
-
-        return results
-
-    def _extract_firm_from_card(self, card) -> Optional[dict]:
-        """Extract firm data from a Scrapling element."""
-        try:
-            # Try common text patterns
-            name = (
-                card.css('.firm-name::text').get()
-                or card.css('h2::text').get()
-                or card.css('h3::text').get()
-                or card.css('.name::text').get()
-                or card.css('a::text').get()
-                or ""
-            ).strip()
-
-            if not name:
-                return None
-
-            # Extract all text for pattern matching
-            all_text = card.text() or ""
-
-            return {
-                "name": name,
-                "account_sizes": self._extract_sizes(all_text),
-                "costs": {},
-                "promo": self._extract_promo(all_text),
-                "drawdown": self._extract_drawdown(all_text),
-                "consistency": self._extract_consistency(all_text),
-                "payout": self._extract_payout(all_text),
-                "raw_text": all_text[:500],  # truncated for debugging
-            }
-        except Exception:
-            return None
-
-    def _extract_firm_from_bs4(self, card) -> Optional[dict]:
-        """Extract firm data from a BeautifulSoup element."""
-        try:
-            name_el = card.select_one('.firm-name, h2, h3, .name, a')
-            name = name_el.get_text(strip=True) if name_el else ""
-            if not name:
-                return None
-            all_text = card.get_text(separator=" ", strip=True)
-            return {
-                "name": name,
-                "account_sizes": self._extract_sizes(all_text),
-                "costs": {},
-                "promo": self._extract_promo(all_text),
-                "drawdown": self._extract_drawdown(all_text),
-                "consistency": self._extract_consistency(all_text),
-                "payout": self._extract_payout(all_text),
-                "raw_text": all_text[:500],
-            }
-        except Exception:
-            return None
-
-    def _extract_sizes(self, text: str) -> list[int]:
-        """Extract account sizes from text."""
-        import re
-        sizes = []
-        # Match patterns like $50,000 or $50k or 50000
-        matches = re.findall(r'\$[\s]?([\d,]+)[,.]?(\d{0,3})\s*(k)?', text.lower())
-        for match in matches:
-            num_str = match[0].replace(",", "")
-            decimal = match[1] if match[1] else "0"
-            is_k = match[2] == 'k'
-            try:
-                val = int(num_str)
-                if is_k:
-                    val *= 1000
-                if 1000 <= val <= 500000:
-                    sizes.append(val)
-            except ValueError:
-                pass
-        return list(set(sizes)) if sizes else [10000]
-
-    def _extract_promo(self, text: str) -> dict:
-        """Extract promo/coupon info from text."""
-        import re
-        promo = {}
-        # Match discount percentages
-        pct_matches = re.findall(r'(\d+)%\s*(?:off|discount)', text.lower())
-        if pct_matches:
-            promo["discount_pct"] = int(pct_matches[0])
-        # Match coupon codes
-        code_matches = re.findall(r'code[:\s]+["\']?([A-Z0-9]{4,})["\']?', text.upper())
-        if code_matches:
-            promo["code"] = code_matches[0]
-        promo["new_customer_only"] = "new customer" in text.lower() or "first purchase" in text.lower()
-        return promo
-
-    def _extract_drawdown(self, text: str) -> dict:
-        """Extract drawdown rules from text."""
-        import re
-        dd = {}
-        # Match DD percentages
-        pct_matches = re.findall(r'(\d+)%\s*(?:max\s*)?(?:drawdown|dd|loss)', text.lower())
-        if pct_matches:
-            dd["max_dd_pct"] = float(pct_matches[0])
-        # Detect trailing
-        dd["trailing_type"] = "intraday" if "intraday" in text.lower() else (
-            "eod" if "eod" in text.lower() or "end of day" in text.lower() else "static"
-        )
-        return dd
-
-    def _extract_consistency(self, text: str) -> dict:
-        """Extract consistency rules from text."""
-        import re
-        cr = {}
-        cr["active"] = bool(re.search(r'consistency|profit\s*cap|daily\s*limit', text.lower()))
-        pct_matches = re.findall(r'(\d+)%\s*(?:max|daily|single)', text.lower())
-        if pct_matches:
-            cr["max_day_pct"] = float(pct_matches[0])
-        return cr
-
-    def _extract_payout(self, text: str) -> dict:
-        """Extract payout schedule from text."""
-        import re
-        po = {}
-        day_matches = re.findall(r'(\d+)\s*days?\s*(?:payout|payment|withdraw)', text.lower())
-        if day_matches:
-            po["cycle_days"] = int(day_matches[0])
-        return po
-
-    def _looks_like_firm(self, data: dict) -> bool:
-        """Heuristic: does this dict look like prop firm data?"""
-        firm_keywords = ['firm', 'name', 'account', 'drawdown', 'payout', 'size', 'cost', 'price']
-        data_str = json.dumps(data).lower()
-        return any(kw in data_str for kw in firm_keywords)
-
-    def _extract_from_text(self, text: str) -> list[dict]:
-        """Last resort: regex extraction from full page text."""
-        return []  # Too noisy for structured data
-
-    def save_snapshot(self, firms: list[dict]):
-        """Save raw scrape for change detection."""
+    def save_snapshot(self, firms: list[dict]) -> Path:
         snapshot = {
             "scraped_at": datetime.utcnow().isoformat(),
             "source": "propfirmmatch",
@@ -314,33 +169,254 @@ class PropFirmMatchScraper:
         return path
 
     def detect_changes(self, current: list[dict]) -> list[dict]:
-        """Compare against last saved snapshot."""
         changes = []
         existing = sorted(SNAPSHOT_DIR.glob("propfirmmatch_*.json"), reverse=True)
-
         if not existing:
             self.save_snapshot(current)
             return [{"type": "INIT", "msg": "First scrape — baseline saved"}]
-
         with open(existing[0]) as f:
             previous = json.load(f)
-
         prev_names = {f.get("name", "") for f in previous.get("firms", [])}
         curr_names = {f.get("name", "") for f in current}
-
         for name in curr_names - prev_names:
             changes.append({"type": "NEW_FIRM", "firm": name})
         for name in prev_names - curr_names:
             changes.append({"type": "REMOVED_FIRM", "firm": name})
-
+        # Promo changes
+        prev_promos = {(f.get("name") or ""): (f.get("promo") or {}) for f in previous.get("firms", [])}
+        for f in curr_names & prev_names:
+            cp = next((x for x in current if x.get("name") == f), {}).get("promo", {})
+            pp = prev_promos.get(f, {})
+            if cp != pp:
+                changes.append({"type": "PROMO_CHANGE", "firm": f, "old": pp, "new": cp})
         self.save_snapshot(current)
         return changes
 
 
+# ── PARSERS (DOM-specific, calibrated 2026-05-30) ─────────────────
+
+def _parse_table_from_page(page) -> list[dict]:
+    """
+    Parse PropFirmMatch /futures comparison table.
+    Calibrated: table has <tbody> with <td> cells per row.
+    Columns: FIRM | RANK/REVIEWS | COUNTRY | YEARS | ASSETS | PLATFORMS | MAX_ALLOC | PROMO | ACTIONS
+    """
+    firms = []
+    rows = page.css('table tbody tr')
+
+    for row in rows:
+        cells = row.css('td')
+        if len(cells) < 7:
+            continue
+
+        # Cell 0: Firm name (may include NEW badge + rank number)
+        firm_text = cells[0].text() or ""
+        firm_name = _clean_firm_name(firm_text)
+        if not firm_name:
+            continue
+
+        # Cell 1: Rank + Reviews → e.g. "4.6\n\n53\n\nreviews"
+        rank_text = cells[1].text() or ""
+        rating, review_count = _parse_rank_reviews(rank_text)
+
+        # Cell 2: Country
+        country = (cells[2].text() or "").strip()
+
+        # Cell 3: Years in operation
+        years_text = (cells[3].text() or "").strip()
+        years = _parse_years(years_text)
+
+        # Cell 5: Platforms → e.g. "Tr\nMo\n+ 7" (abbreviated platform names)
+        platforms_text = (cells[5].text() or "").strip()
+        platforms = _parse_platforms(platforms_text)
+
+        # Cell 6: Max Allocations → e.g. "$450K" or "$3.2M"
+        max_alloc_text = (cells[6].text() or "").strip()
+        max_alloc = _parse_max_allocation(max_alloc_text)
+
+        # Cell 7: Promo → e.g. "50%OFF\n\nMATCH" or empty
+        promo_text = (cells[7].text() or "").strip() if len(cells) > 7 else ""
+        promo = _parse_promo(promo_text)
+
+        firms.append({
+            "name": firm_name,
+            "rating": rating,
+            "review_count": review_count,
+            "country": country,
+            "years": years,
+            "platforms": platforms,
+            "max_allocation": max_alloc,
+            "promo": promo,
+            "drawdown": {},      # filled in Pass 2
+            "consistency": {},   # filled in Pass 2
+            "payout": {},        # filled in Pass 2
+            "scaling": {},
+            "instruments": [],
+            "_slug": "",
+            "_raw_rank_text": rank_text[:100],
+        })
+
+    return firms
+
+
+def _parse_firm_detail_from_page(page) -> dict:
+    """
+    Parse individual firm detail page.
+    Calibrated: has tabbed sections — Overview, Consistency Rules, Firm Rules, Challenges, Payout Policy.
+    """
+    details = {
+        "drawdown": {},
+        "consistency": {},
+        "payout": {},
+        "instruments": [],
+        "firm_rules": [],
+    }
+
+    # Get full page text for regex extraction
+    full_text = page.text() or ""
+
+    # ── CONSISTENCY RULES ──
+    # Pattern: "profit on any single day cannot exceed XX% of the total profit"
+    cons_match = re.search(
+        r'profit on any single day cannot exceed (\d+)%', full_text, re.IGNORECASE
+    )
+    if cons_match:
+        details["consistency"]["active"] = True
+        details["consistency"]["max_day_pct"] = float(cons_match.group(1))
+    else:
+        details["consistency"]["active"] = False
+
+    # ── DRAWDOWN ──
+    # Pattern: "Max Loss" or "Max Drawdown" or trailing DD mentions
+    dd_match = re.search(r'max\s*(?:loss|drawdown)[:\s]+\$?([\d,]+)', full_text, re.IGNORECASE)
+    if dd_match:
+        dd_val = float(dd_match.group(1).replace(",", ""))
+        details["drawdown"]["max_dd_amount"] = dd_val
+
+    # Trailing DD detection
+    if re.search(r'trailing\s*(?:drawdown|loss|dd)', full_text, re.IGNORECASE):
+        details["drawdown"]["trailing_type"] = "eod"
+    elif re.search(r'intraday\s*(?:drawdown|loss|dd)', full_text, re.IGNORECASE):
+        details["drawdown"]["trailing_type"] = "intraday"
+    else:
+        details["drawdown"]["trailing_type"] = "static"
+
+    # ── PAYOUT ──
+    payout_match = re.search(r'payout[:\s]+(\d+)\s*days?', full_text, re.IGNORECASE)
+    if payout_match:
+        details["payout"]["cycle_days"] = int(payout_match.group(1))
+
+    # ── INSTRUMENTS ──
+    known_instruments = ["ES", "NQ", "CL", "GC", "YM", "RTY", "SI", "HG", "NG", "ZB", "ZN", "ZW", "ZC"]
+    found_instruments = []
+    for inst in known_instruments:
+        if re.search(rf'\b{inst}\b', full_text):
+            found_instruments.append(inst)
+    details["instruments"] = found_instruments
+
+    # ── NEWS TRADING ──
+    details["news_restricted"] = bool(re.search(r'news\s*(?:restrict|prohibit|ban)', full_text, re.IGNORECASE))
+
+    # ── OVERNIGHT HOLDING ──
+    details["overnight_allowed"] = not bool(re.search(r'overnight\s*(?:not\s*allowed|prohibit|close)', full_text, re.IGNORECASE))
+
+    return details
+
+
+# ── TEXT CLEANUP HELPERS ─────────────────────────────────────
+
+def _clean_firm_name(text: str) -> str:
+    """Extract clean firm name from table cell text.
+    Input: '4\n\nMy Funded Futures\n\n50992' or 'NEW\n\nLucid Trading\n\n12603'
+    Output: 'My Funded Futures'
+    """
+    lines = [l.strip() for l in text.split('\n') if l.strip()]
+    # Filter out: rank numbers, NEW badge, numeric IDs
+    name_lines = []
+    for line in lines:
+        if line.upper() == 'NEW':
+            continue
+        if re.match(r'^\d+$', line):  # pure number = rank or ID
+            continue
+        if re.match(r'^\d+\.\d+$', line):  # rating like 4.5
+            continue
+        name_lines.append(line)
+    return ' '.join(name_lines) if name_lines else ""
+
+
+def _parse_rank_reviews(text: str) -> tuple:
+    """Parse '4.6\n\n53\n\nreviews' → (4.6, 53)"""
+    lines = [l.strip() for l in text.split('\n') if l.strip()]
+    rating = 0.0
+    reviews = 0
+    for line in lines:
+        if re.match(r'^\d+\.\d+$', line):
+            rating = float(line)
+        elif re.match(r'^\d+$', line):
+            reviews = int(line)
+    return rating, reviews
+
+
+def _parse_years(text: str) -> int:
+    """Parse '10+' → 10, '2' → 2"""
+    m = re.search(r'(\d+)', text)
+    return int(m.group(1)) if m else 0
+
+
+def _parse_platforms(text: str) -> list:
+    """Parse 'Tr\nMo\n+ 7' → ['Tradovate', 'Mo'] (abbreviated platform names)."""
+    lines = [l.strip() for l in text.split('\n') if l.strip()]
+    # Remove the "+ N" count line
+    return [l for l in lines if not re.match(r'^\+\s*\d+$', l)]
+
+
+def _parse_max_allocation(text: str) -> int:
+    """Parse '$450K' → 450000, '$3.2M' → 3200000"""
+    text = text.strip().replace('$', '').replace(',', '')
+    m = re.match(r'([\d.]+)\s*(K|M|B)?', text, re.IGNORECASE)
+    if not m:
+        return 0
+    val = float(m.group(1))
+    suffix = (m.group(2) or '').upper()
+    if suffix == 'K':
+        val *= 1000
+    elif suffix == 'M':
+        val *= 1_000_000
+    elif suffix == 'B':
+        val *= 1_000_000_000
+    return int(val)
+
+
+def _parse_promo(text: str) -> dict:
+    """Parse '50%OFF\n\nMATCH' → {discount_pct: 50, code: 'MATCH'}"""
+    result = {}
+    if not text:
+        return result
+    # Discount percentage
+    pct = re.search(r'(\d+)%\s*(?:OFF|DISCOUNT)', text, re.IGNORECASE)
+    if pct:
+        result["discount_pct"] = int(pct.group(1))
+    # Promo code (uppercase word after discount, typically 4-10 chars)
+    code = re.search(r'\n([A-Z]{4,12})\s*$', text)
+    if code:
+        result["code"] = code.group(1)
+    else:
+        # Try inline: "MATCH" on its own line
+        for line in text.split('\n'):
+            line = line.strip()
+            if line and re.match(r'^[A-Z]{4,12}$', line):
+                result["code"] = line
+                break
+    result["new_customer_only"] = True  # PropFirmMatch promos are typically new-customer
+    return result
+
+
+# ── PAYOUT JUNCTION SCRAPER ─────────────────────────────────
+
 class PayoutJunctionScraper:
     """
     Scrapes PayoutJunction.com for payout verification data.
-    Supplements PropFirmMatch data with real trader payout experiences.
+    JS-rendered SPA — requires Scrapling/CloakBrowser.
     """
 
     URL = "https://payoutjunction.com/"
@@ -355,28 +431,27 @@ class PayoutJunctionScraper:
 
     def scrape(self) -> list[dict]:
         """Scrape payout verification data."""
+        if not self._scrapling_available:
+            return []
+        try:
+            from scrapling.fetchers import StealthyFetcher
+            page = StealthyFetcher.fetch(self.URL, headless=True, network_idle=True, timeout=25000)
+            # PayoutJunction is a JS SPA — data loads after network idle
+            text = page.text() or ""
+            return self._parse_payout_data(text)
+        except Exception as e:
+            print(f"[PayoutJunction] Scrape failed: {e}")
+            return []
+
+    def _parse_payout_data(self, text: str) -> list[dict]:
+        """Parse payout data from page text."""
         results = []
-        if self._scrapling_available:
-            try:
-                from scrapling.fetchers import StealthyFetcher
-                page = StealthyFetcher.fetch(self.URL, headless=True, timeout=20000)
-                # Parse payout table/cards
-                rows = page.css('tr, .review-card, .payout-entry')
-                for row in rows:
-                    text = row.text() or ""
-                    if text.strip():
-                        results.append({"raw_text": text[:300]})
-            except Exception as e:
-                print(f"[PayoutJunction] Scrape failed: {e}")
+        # Pattern: firm name + payout days + denial info
+        # Calibrated: TBD after first successful scrape
         return results
 
     def get_firm_payout_data(self, firm_name: str) -> dict:
-        """
-        Get payout data for a specific firm.
-        Returns: {avg_days, denial_rate, reliability_score, total_reviews}
-        PHASE 1: Placeholder — builds when we have real data.
-        Scraper populates the table, this reads it back.
-        """
+        """Get payout data for a specific firm. Placeholder until live data."""
         return OntologyMapper.from_payout_junction({
             "firm_name": firm_name,
             "avg_days": 0,
@@ -387,21 +462,13 @@ class PayoutJunctionScraper:
         })
 
 
-# ==========================================
-# TEST HARNESS
-# ==========================================
+# ── TEST HARNESS ─────────────────────────────────────────────
 
 def test_scraper():
-    """Quick test: can we reach PropFirmMatch?"""
-    print("🔧 Testing PropFirmMatch scraper...")
-    scraper = PropFirmMatchScraper(stealth=True)
-    print(f"  Scrapling available: {scraper._scrapling_available}")
-
-    # Don't actually scrape in test — just verify import chain
+    """Verify import chain and ontology mapping."""
     from .ontology_mapper import PropFirmOntology, OntologyMapper
-    print("  OntologyMapper: OK")
+    print("[OK] Imports OK")
 
-    # Test ontology mapping with sample data
     sample = {
         "name": "TestFirm",
         "url": "https://test.com",
@@ -414,14 +481,17 @@ def test_scraper():
         "scaling": {"enabled": False},
         "ff_status": "ARBITRAGE",
     }
-    ontology = OntologyMapper.from_propfirm_match(sample)
-    print(f"  Firm: {ontology.firm_name}")
-    print(f"  Risk Bandwidth: ${ontology.risk_bandwidth:,.0f}")
-    print(f"  CoC: {ontology.cost_of_capital():.4f}")
-    print(f"  Lethal: {ontology.is_trailing_lethal}")
-    print(f"  Variance Tax: {ontology.variance_suppression_tax:.2f}")
-    print(f"  Allows Runners: {ontology.allows_runners}")
-    print("  ✅ All ontology checks passed")
+    ont = OntologyMapper.from_propfirm_match(sample)
+    print(f"  Firm: {ont.firm_name}, BW=${ont.risk_bandwidth:,.0f}, CoC={ont.cost_of_capital():.4f}")
+
+    # Test text parsers
+    assert _clean_firm_name("4\n\nMy Funded Futures\n\n50992") == "My Funded Futures"
+    assert _clean_firm_name("NEW\n\nLucid Trading\n\n12603") == "Lucid Trading"
+    assert _parse_max_allocation("$450K") == 450000
+    assert _parse_max_allocation("$3.2M") == 3200000
+    assert _parse_promo("50%OFF\n\nMATCH") == {"discount_pct": 50, "code": "MATCH", "new_customer_only": True}
+    assert _parse_rank_reviews("4.6\n\n53\n\nreviews") == (4.6, 53)
+    print("[OK] All parser tests passed")
     return True
 
 

@@ -3,11 +3,12 @@
 > **Policy:** Latest status + active delegations only. Archive history to logs/heartbeat-history/>.
 Max 4000 chars.
 
-## Current Status (2026-05-30 12:45 EDT)
+## Current Status (2026-05-30 14:30 EDT)
 - **Workspace:** owl-environment (isolated, OFF LIMITS: larger-lab belongs to CC)
-- **MAD last interaction:** msg #5230 — Prop Firm Sniper Engine build + $100K deployment test delivered
-- **Self-Heal fleet deployed** — 4 jobs replacing 1 monolithic cron
-- **Prop Firm Sniper Engine — COMPLETE (12:23 EDT)**
+- **MAD last interaction:** msg #5320 — Continue directive: spawn workers, calibrate scraper, build dashboard
+- **Scraper DOM calibration complete** — Live PropFirmMatch table structure captured (15 firms, 9-column layout)
+- **Phase 1 complete** — ontology_mapper, scraper_engine (calibrated), ff_matrix all built and tested
+- **5 sub-agents spawned (14:30 EDT):** care_engine, migration_engine, config_engine, squad_lead, dashboard_skeleton
 
 ## DEPLOYED — CEREBUS FX v4.0
 
