@@ -84,3 +84,17 @@ I am the **Execution** agent. I do NOT orchestrate — CC and OWL do that.
 - Fail loud — surface uncertainty, don't hide it
 - Memory compresses — linear growth is failure
 - No global state — every node self-stabilizes
+
+---
+
+## Obsidian Vault
+
+- **Vault path:** `C:\Users\wifik\Downloads\o2c`
+- **Vault name:** o2c
+- **Vault ID:** c19da291888cf7e1
+- **Write method:** `VaultWriter(vault_path='C:/Users/wifik/Downloads/o2c')` — writes directly to disk, Obsidian auto-detects
+- **notesmd-cli:** Not installed (GitHub rate-limited). VaultWriter is the primary write tool.
+- **Test files written:**
+  - `Hermes_Agent_Test.md` (root)
+  - `execution/Hermes_Agent_Activation_Note.md`
+  - `execution/Hermes_Obsidian_Test_-_Vault_Working.md`
