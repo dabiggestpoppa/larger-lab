@@ -183,6 +183,114 @@ def register_vault_endpoints(app: FastAPI):
             return get_live_sync().get_status()
         except Exception as e:
             return {"status": "error", "detail": str(e)}
+
+    # --- Phase 01: Error Intelligence ---
+
+    @app.get("/api/vault/errors")
+    async def get_error_intelligence(category: str = "", limit: int = 50):
+        try:
+            from core.obsidian.error_intelligence import ErrorIntelligence
+            ei = ErrorIntelligence(vault_path=DEFAULT_VAULT_PATH)
+            patterns = ei.get_error_patterns()
+            similar = ei.find_similar_errors(category, limit=limit) if category else []
+            prevention = ei.get_prevention_rules()[:10]
+            return {"patterns": patterns, "errors": similar, "prevention_rules": prevention}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+    @app.post("/api/vault/errors/index")
+    async def index_error(request: dict):
+        try:
+            from core.obsidian.error_intelligence import ErrorIntelligence
+            ei = ErrorIntelligence(vault_path=DEFAULT_VAULT_PATH)
+            result = ei.index_error(
+                traceback=request.get("traceback", ""),
+                category=request.get("category", ""),
+                context=request.get("context", ""),
+                fix_applied=request.get("fix_applied", ""),
+                result=request.get("result", ""),
+            )
+            return {"status": "indexed", "error": result}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+    # --- Phase 01: Pattern Crystallization ---
+
+    @app.get("/api/vault/patterns")
+    async def get_patterns(min_occurrences: int = 2):
+        try:
+            from core.obsidian.pattern_crystallizer import PatternCrystallizer
+            pc = PatternCrystallizer(vault_path=DEFAULT_VAULT_PATH)
+            patterns = pc.extract_patterns(min_occurrences=min_occurrences)
+            primitives = pc.get_cognitive_primitives()
+            co_occurrence = pc.analyze_co_occurrence()
+            return {"patterns": patterns, "cognitive_primitives": primitives, "co_occurrence": co_occurrence}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+    @app.post("/api/vault/crystallize")
+    async def crystallize_pattern(request: dict):
+        try:
+            from core.obsidian.pattern_crystallizer import PatternCrystallizer
+            pc = PatternCrystallizer(vault_path=DEFAULT_VAULT_PATH)
+            result = pc.crystallize_pattern(
+                name=request.get("name", ""),
+                conditions=request.get("conditions", []),
+                result=request.get("result", ""),
+                links=request.get("links", []),
+            )
+            return {"status": "crystallized", "pattern": result}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+    # --- Phase 01: Memory Distillation ---
+
+    @app.post("/api/vault/distill")
+    async def distill_session(request: dict):
+        try:
+            from core.obsidian.memory_distiller import MemoryDistiller
+            md = MemoryDistiller(vault_path=DEFAULT_VAULT_PATH)
+            result = md.distill_session(
+                agent_name=request.get("agent_name", "unknown"),
+                task=request.get("task", ""),
+                journal_entries=request.get("journal_entries", []),
+            )
+            return {"status": "distilled", "result": result}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+    @app.post("/api/vault/distill/vault")
+    async def distill_vault(request: dict):
+        try:
+            from core.obsidian.memory_distiller import MemoryDistiller
+            md = MemoryDistiller(vault_path=DEFAULT_VAULT_PATH)
+            days = request.get("days", 7)
+            result = md.distill_from_vault(days=days)
+            return {"status": "distilled", "result": result}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+    # --- Phase 01: Context Injection ---
+
+    @app.get("/api/vault/context")
+    async def get_context(task: str = "", max_skills: int = 3, max_patterns: int = 5):
+        try:
+            from core.obsidian.context_injector import ContextInjector
+            ci = ContextInjector(vault_path=DEFAULT_VAULT_PATH)
+            context = ci.prepare_context(task=task, max_skills=max_skills, max_patterns=max_patterns)
+            return {"context": context, "task": task}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+    @app.get("/api/vault/summary")
+    async def get_vault_summary():
+        try:
+            from core.obsidian.context_injector import ContextInjector
+            ci = ContextInjector(vault_path=DEFAULT_VAULT_PATH)
+            return {"summary": ci.get_vault_summary()}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
     @app.post("/api/vault/validate")
     async def validate_note(request: ValidateRequest):
         try:

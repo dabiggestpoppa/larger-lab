@@ -76,21 +76,21 @@
   - 12 PM = full state reset (deficits terminate, no roll-forward)
   - Dual-Engine Convergence: 94-95% WR when both engines align
 
-### DMR Live Executor — RUNNING (background)
-- EURUSD.PRO: Magic 20260528 | 0.01 lots | PID 18036
-- USDCHF.PRO: Magic 20260529 | 0.01 lots | PID 7728
-- Account: 650898 LIVE | Balance: $85.26
-- Entry window: 2AM-11AM EST | Hard exit: 5PM
+### DMR — LIVE EXECUTOR (DEPRECATED/REDUNDANT)
+- **DMR was merged into the P90 Kinetic Engine** — it's the same system, P90 is the kinetic validation layer
+- Executors still running but we trade via P90 CASCADE now, not standalone DMR
+- EURUSD.PRO: Magic 20260528 | 0.01 lots
+- USDCHF.PRO: Magic 20260529 | 0.01 lots
+- Account: 650898 LIVE | $85.26
+- **Do NOT waste time on DMR backtests — it's the old standalone version, not the integrated P90 engine**
 
----
-
-## 📊 DMR BACKTEST RESULTS
-
-| Period | Trades | WR | Pips |
-|--------|--------|-----|------|
-| Full 2024-2025 | 435 | 92.2% | +938.1 |
-| 2024 | 226 | 93.8% | +485.3 |
-| 2025 | 209 | 90.4% | +452.7 |
+### CEREBUS BACKTEST RESULTS (from engines, CSV-based — verified)
+| Strategy | Pair | Trades | WR | PnL |
+|----------|------|--------|-----|-----|
+| P90 (INIT+CASCADE+EWS) | EURUSD | 1,038 | 78.7% | +4,814p |
+| CASCADE only (dominant) | EURUSD | 439 | 85.4% | +1,444p |
+| Symmetry Trap | EURUSD | 574 | 91.1% | +3,121p |
+| Multi-asset DMR (old) | 4 pairs | 1,930 | 94.0% | +22,676p |
 
 ---
 
@@ -114,10 +114,14 @@
 
 ## 🔢 CRITICAL NUMBERS
 
-- **>78.9% WR live** = break-even for DMR
-- MC Results: 10K iterations, 0% ruin at 0.01 lots
-- Multi-asset: 1,930 trades, 94.0% avg WR, +22,676 pips across 4 pairs
-- Dual-Engine Convergence: 94-95% WR (both engines aligned)
+- **P90 CASCADE is the primary edge** (85.4% WR standalone)
+- **Symmetry Trap** 91.1% WR — structural/atomic engine
+- **Dual-Engine Convergence**: 94-95% WR when both align
+- **STALL_HARVEST REMOVED** — covered by DMR, variant cleaned from enum
+- **DMR standalone backtest is deprecated** — the live DMR executors exist but are not the focus
+- **Current live trades**: ST Executor (EURUSD.PRO) + P90 CASCADE (USDCHF.PRO)
+- **Hermes role**: NautilusTrader backtesting + strategy execution (NOT MT5 engines)
+- **Nautilus backtester must match CSV engine results** — cross-validation requirement
 
 ---
 
@@ -334,3 +338,18 @@ _Updated: 2026-05-30 11:09 EDT — Prop Firm Sniper Engine ontology stored. Read
 - Stale executor PIDs killed (ST: 6640, P90: 8456, 18208)
 
 _Updated: 2026-05-30 12:49 EDT — Sniper v1.0 build complete, $100K test delivered, code map delivered. Standing by for MAD's detailed plan._
+
+
+---
+
+## ?? CRITICAL MEMORY ORGANIZATION RULES (MAD 2026-05-30)
+
+1. **DMR standalone is DEPRECATED** � DO NOT waste time on DMR backtests or executor scripts. DMR is integrated into the P90 Kinetic Engine. The old DMR executor scripts still exist in the workspace but we trade P90 now.
+2. **Hermes does NOT touch quant-lab engines or lab code** � Hermes is NautilusTrader backtesting + strategy execution only. MT5 is banned for Hermes.
+3. **Nautilus backtester must produce results matching CSV engines** � cross-validation requirement. If Nautilus results diverge from CSV engine results, something is wrong with the Nautilus setup, not the strategy code.
+4. **CEREBUS has TWO engines ONLY**: P90 Kinetic Engine (A) + Symmetry Trap Structural Engine (B). ALL named setups are parameter variants of A or B.
+5. **Strategy code = strategy backtest** � engines in quant-lab/engines/ contain the TRUTH. Backtest runners just feed data through engines. When debugging, start from engines.
+6. **Do NOT re-read deprecated DMR content** � if I see DMR in old memory/archive, skip it. Focus on P90 + Symmetry Trap.
+7. **Workspace organization**: quant-lab/engines = truth source, quant-lab/strategies = Nautilus wrappers, quant-lab/backtest = runners, quant-lab/reports = results
+
+_Last updated: 2026-05-30 22:20 EDT � MAD memory org update_

@@ -52,6 +52,7 @@ from .resonance_api import register_resonance_endpoints
 from .reconstruction_api import register_reconstruction_endpoints
 from .topology_api import register_topology_endpoints
 from .sovereign_api import register_sovereign_endpoints
+from .vault_api import register_vault_endpoints
 
 app = FastAPI(
     title="OCE Continuity Core",
@@ -66,6 +67,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+
 )
 
 

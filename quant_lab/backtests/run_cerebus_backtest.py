@@ -112,8 +112,12 @@ def load_bars(csv_path: Path, instrument, bar_type) -> list:
     if 'timestamp' in df.columns:
         df = df.set_index('timestamp')
     df.index = pd.to_datetime(df.index, utc=True)
-    # Nautilus v1.221 expects nanosecond timestamps
-    df.index = df.index.view('int64')
+    # Keep only the columns Nautilus wrangler expects
+    keep_cols = [c for c in ['open', 'high', 'low', 'close', 'volume'] if c in df.columns]
+    df = df[keep_cols]
+    # Convert all to float64 for Cython buffer compatibility
+    for c in keep_cols:
+        df[c] = pd.to_numeric(df[c], errors='coerce').astype('float64')
     wrangler = BarDataWrangler(bar_type=bar_type, instrument=instrument)
     bars = wrangler.process(df)
     print(f"  Loaded {len(bars)} bars from {csv_path.name}")
@@ -149,7 +153,7 @@ def run_backtest(strategy_name: str, symbol: str, csv_path: Path,
     # Configure engine
     config = BacktestEngineConfig(
         trader_id=TraderId(f"CEREBUS-{strategy_name.upper()}-001"),
-        logging=LoggingConfig(log_level="ERROR"),
+        logging=LoggingConfig(log_level="INFO"),
     )
 
     engine = BacktestEngine(config=config)
@@ -161,7 +165,6 @@ def run_backtest(strategy_name: str, symbol: str, csv_path: Path,
         starting_balances=[Money(10000, USD)],
         fill_model=FillModel(
             prob_fill_on_limit=0.95,
-            prob_fill_on_stop=0.95,
             prob_slippage=0.05,
         ),
     )
