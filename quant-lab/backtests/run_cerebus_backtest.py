@@ -125,7 +125,7 @@ def load_bars(csv_path: Path, instrument, bar_type) -> list:
 
 
 def run_backtest(strategy_name: str, symbol: str, csv_path: Path,
-                 lot_size: Decimal = Decimal("0.01"), bars_limit: int = 0):
+                 lot_size: Decimal = Decimal("1000"), bars_limit: int = 0):
     """Run a backtest for the given strategy + symbol."""
 
     print("=" * 70)
@@ -224,23 +224,38 @@ def run_backtest(strategy_name: str, symbol: str, csv_path: Path,
     # Results
     result = engine.get_result()
 
-    # Extract PnL stats
+    # Extract Nautilus engine stats (may be 0 for non-USD pairs)
     pnl_stats = result.stats_pnls.get('USD', {})
-    total_pnl = pnl_stats.get('total', 0.0)
-    win_rate = pnl_stats.get('win_rate', 0.0) if pnl_stats else 0.0
+    engine_pnl = pnl_stats.get('total', 0.0)
+    engine_wr = pnl_stats.get('win_rate', 0.0) if pnl_stats else 0.0
     max_dd = pnl_stats.get('max_drawdown', 0.0) if pnl_stats else 0.0
     returns_pct = result.stats_returns.get('equity', 0.0)
+
+    # Extract strategy-level stats (GROUND TRUTH — works for all pairs)
+    try:
+        strat_trades = strategy.total_trades
+        strat_wins = strategy.wins
+        strat_losses = strategy.losses
+        strat_pnl = strategy.total_pnl if hasattr(strategy, 'total_pnl') else strategy.total_pnl_pips
+        strat_wr = (strat_wins / strat_trades * 100.0) if strat_trades > 0 else 0.0
+    except Exception:
+        strat_trades = 0
+        strat_wins = 0
+        strat_losses = 0
+        strat_pnl = 0.0
+        strat_wr = 0.0
 
     print(f"\n{'=' * 70}")
     print(f"  BACKTEST RESULTS — {strategy_name.upper()} / {symbol}")
     print(f"{'=' * 70}")
-    print(f"  Orders:     {result.total_orders}")
-    print(f"  Positions:  {result.total_positions}")
-    print(f"  PnL (USD):  {total_pnl:.2f}")
-    print(f"  Win Rate:   {win_rate:.1f}%")
-    print(f"  Max DD:     {max_dd:.2%}")
-    print(f"  Returns:    {returns_pct:.2%}")
-    print(f"  Stats:      {pnl_stats}")
+    print(f"  Engine Orders:    {result.total_orders}")
+    print(f"  Engine Positions: {result.total_positions}")
+    print(f"  Engine PnL (USD): {engine_pnl:.2f}")
+    print(f"  ---")
+    print(f"  Strategy Trades:  {strat_trades}")
+    print(f"  Strategy W/L:     {strat_wins}/{strat_losses}")
+    print(f"  Strategy WR:      {strat_wr:.1f}%")
+    print(f"  Strategy PnL:     {strat_pnl:.1f} pips")
     print(f"{'=' * 70}")
 
     # Save report
@@ -253,12 +268,16 @@ def run_backtest(strategy_name: str, symbol: str, csv_path: Path,
         "symbol": symbol,
         "bars": len(bars),
         "timestamp": timestamp,
-        "total_orders": result.total_orders,
-        "total_positions": result.total_positions,
-        "pnl_usd": total_pnl,
-        "win_rate": win_rate,
+        "engine_orders": result.total_orders,
+        "engine_positions": result.total_positions,
+        "engine_pnl_usd": engine_pnl,
+        "engine_win_rate": engine_wr,
+        "strategy_trades": strat_trades,
+        "strategy_wins": strat_wins,
+        "strategy_losses": strat_losses,
+        "strategy_win_rate": strat_wr,
+        "strategy_pnl_pips": strat_pnl,
         "max_drawdown": max_dd,
-        "returns": returns_pct,
         "elapsed_s": result.elapsed_time,
     }
 
@@ -275,7 +294,7 @@ def main():
     parser.add_argument('--strategy', choices=['symmetry_trap', 'p90'], required=True)
     parser.add_argument('--symbol', default='EURUSD.PRO')
     parser.add_argument('--csv', help='Path to CSV data file')
-    parser.add_argument('--lot-size', type=float, default=0.01)
+    parser.add_argument('--lot-size', type=float, default=1000.0)
     parser.add_argument('--bars', type=int, default=0, help='Limit bars (0=all)')
     args = parser.parse_args()
 
