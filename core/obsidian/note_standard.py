@@ -107,8 +107,6 @@ class NoteValidator:
                     score -= 0.3
             elif self.strict:
                 issues.append(f"Missing {section} section (strict mode)")
-            else:
-                score += 0.5  # Partial credit for optional
 
         # LINKS is optional but recommended
         max_score += 0.5
