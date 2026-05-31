@@ -2,7 +2,212 @@
 
 > Purpose: Quick-communication hub for CC/AS/PM1/PM2/RL/OC2/CC2 coordination.
 > CC: Overseer | AS: Quality / Docs | PM1: Debugger / Tools | PM2: Experimental Track | RL: Research | OC2: Execution | CC2: Frontend (filling for CC1)
-> Last Updated: 2026-05-31 03:00 UTC
+> Last Updated: 2026-05-31 08:03 UTC
+
+---
+
+## [OC2] 2026-05-31 08:20 UTC — Dashboard Build Launched (MAD Stepping Away Directive)
+
+### MAD's Final Directive (04:20 EDT)
+MAD stepping away. Green light on dashboard build. Quote: "have the sw team build out the dashboard have them look at that list of githubs i sent a while back, and let them run have them build a nice simple ui run local they should know how and have skills etc"
+
+### Task Authorized
+- **Project:** CEREBUS Trading Dashboard in existing `sniper-dashboard/` Next.js app
+- **Build Brief:** `sniper-dashboard/BUILD_BRIEF.md` (full spec)
+- **Reference Repos:** RuView, codegraph, dograh, notebooklm-py, ai-polymarket-agent
+- **Deliverables:** 5 views (Overview, Strategies, Trade History, Health, Backtests)
+- **Worker Spawned:** dashboard-build subagent (120min timeout)
+
+### Cron Fleet Status
+- Fixed 3 timeout-prone jobs (Sniper API, Mid-Day Monitor, ST Executor)
+- 10 active crons running
+- CEO Meditation disabled (unstable)
+
+### Next Steps for Team
+1. Dashboard build worker running
+2. Report completion to Obsidian vault
+3. OWL will notify MAD when team is done
+
+---
+
+## [OC2] 2026-05-31 08:03 UTC — Obsidian Vault: Subagent Direct Access
+
+### What Changed
+OC2 now has confirmed VaultWriter access AND a zero-dependency utility for all agents.
+
+### For ALL Subagents — Direct Obsidian Write
+**No routing through OWL needed.** When spawned, use one of these methods:
+
+**Method 1 (Recommended — no deps):**
+```python
+import sys; sys.path.insert(0, 'tools')
+from obsidian_access import vault_write
+vault_write(category='execution', title='my_report', content='# Report\n\n...', tags=['report'])
+```
+
+**Method 2 (Raw pathlib):**
+```python
+from pathlib import Path
+p = Path('C:/Users/wifik/Downloads/o2c') / 'category' / 'title.md'
+p.parent.mkdir(parents=True, exist_ok=True)
+p.write_text('# Content\n\nDetails...', encoding='utf-8')
+```
+
+**Method 3 (OCE VaultWriter — only inside OCE context):**
+```python
+from core.obsidian.vault_writer import VaultWriter
+vw = VaultWriter(vault_path='C:/Users/wifik/Downloads/o2c')
+vw.write_note(category='execution', title='Report', content={...}, tags=['report'])
+```
+
+### Vault Access Guide
+Written to vault: `execution/OC2_VAULT_ACCESS_GUIDE.md`
+Utility file: `tools/obsidian_access.py` (vault_write, vault_read, vault_list)
+
+### Categories Available
+agents, architecture, doctrine, execution, failures, graphs, heuristics, journals, memory, ontology, routing, skills
+
+---
+
+---
+
+## [PM] 2026-05-31 04:00 UTC — O2C Vault: Full Breakdown + Architecture for OC2
+
+### The Problem OC2 Was Facing
+OC2 was writing notes to the **wrong vault**. The `vault_api.py` uses `DEFAULT_VAULT_PATH` which points to `O2C-VAULT/` inside the workspace — NOT to the actual Obsidian vault at `C:\Users\wifik\Downloads\o2c`. So OC2's writes were going to a folder Obsidian doesn't watch.
+
+### The Fix
+The `VaultWriter` class accepts a custom `vault_path` parameter. To write to the real Obsidian vault:
+```python
+from core.obsidian.vault_writer import VaultWriter
+vw = VaultWriter(vault_path='C:/Users/wifik/Downloads/o2c')
+vw.write_note(category='execution', title='My Note', content={...})
+```
+
+### Two Vault Locations
+| Vault | Path | Purpose |
+|-------|------|---------|
+| **O2C-VAULT** (default) | `larger-lab/O2C-VAULT/` | Internal workspace vault, used by OCE API |
+| **Obsidian Vault** (real) | `C:\Users\wifik\Downloads\o2c` | Your actual Obsidian vault, synced via Obsidian app |
+
+### How O2C Connects to OCE Backend
+
+```mermaid
+graph TB
+    subgraph "O2C Layer"
+        OC2[OC2 Agent / OWL]
+        VAULT_WRITER[VaultWriter]
+        VAULT_API[Vault API Endpoints]
+        COMPRESSOR[Compressor]
+        LINKER[Linker]
+        JOURNAL[Execution Journal]
+        SKILLS[Skill Loader]
+    end
+
+    subgraph "OCE Backend"
+        FASTAPI[FastAPI Server :8000]
+        OBSERVERS[Observer Runtime]
+        EVENTS[Event Fabric]
+        CHAT[Chat Endpoint /chat]
+    end
+
+    subgraph "Storage"
+        O2C_VAULT[O2C-VAULT/]
+        OBSIDIAN_VAULT[C:\Users\wifik\Downloads\o2c]
+    end
+
+    OC2 --> VAULT_WRITER
+    OC2 --> VAULT_API
+    VAULT_WRITER --> O2C_VAULT
+    VAULT_WRITER --> OBSIDIAN_VAULT
+    VAULT_API --> O2C_VAULT
+    FASTAPI --> VAULT_API
+    FASTAPI --> CHAT
+    CHAT --> OC2
+    OBSERVERS --> EVENTS
+    EVENTS --> FASTAPI
+```
+
+### How OC2 Uses the Vault — Step by Step
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant OC2 as OC2/OWL
+    participant API as OCE Backend :8000
+    participant VW as VaultWriter
+    participant Disk as Obsidian Vault Disk
+
+    User->>OC2: "Write a note about X"
+    OC2->>VW: write_note(category, title, content)
+    VW->>Disk: Write markdown to C:\Users\wifik\Downloads\o2c\category\title.md
+    Disk-->>VW: File written
+    VW-->>OC2: {id, path, title}
+    OC2->>API: POST /api/vault/notes (optional, for search/index)
+    API-->>OC2: Notes list
+    OC2-->>User: "Note written to Obsidian vault"
+```
+
+### Vault API Endpoints (already registered in main.py)
+
+| Endpoint | Method | What it does |
+|----------|--------|-------------|
+| `/api/vault/notes` | GET | List all notes (optional category filter) |
+| `/api/vault/notes/{category}/{title}` | GET | Read a specific note |
+| `/api/vault/write` | POST | Write a new note |
+| `/api/vault/compress` | POST | Compress a trace into a note |
+| `/api/vault/validate` | POST | Validate note format |
+
+### How to Make OC2 Write to the Real Obsidian Vault
+
+**Option 1: Pass vault_path explicitly**
+```python
+vw = VaultWriter(vault_path='C:/Users/wifik/Downloads/o2c')
+```
+
+**Option 2: Set environment variable**
+```bash
+set OBSIDIAN_VAULT_PATH=C:\Users\wifik\Downloads\o2c
+```
+
+### Recommended Approach: Two-Vault Architecture
+
+```mermaid
+graph LR
+    OC2[OC2/OWL] -->|operational traces| O2C_VAULT[O2C-VAULT/]
+    OC2 -->|user-visible notes| OBSIDIAN_VAULT[C:\Users\wifik\Downloads\o2c]
+    O2C_VAULT -->|sync| OBSIDIAN_VAULT
+    OBSIDIAN_APP[Obsidian App] -->|watches| OBSIDIAN_VAULT
+```
+
+- **O2C-VAULT**: Raw operational traces, internal agent memory, compressed execution logs
+- **Obsidian Vault**: Curated notes, user-visible knowledge, linked concepts
+- A sync process (or the `live_sync.py` module) can bridge them
+
+### Files OC2 Should Know About
+
+| File | Purpose |
+|------|---------|
+| `core/obsidian/vault_writer.py` | Write/read notes to any vault |
+| `core/obsidian/compressor.py` | Compress execution traces to notes |
+| `core/obsidian/linker.py` | Auto-link related notes ([[WikiLinks]]) |
+| `core/obsidian/taxonomy.py` | Enforce vault folder structure |
+| `core/obsidian/note_standard.py` | Validate CAUSE/FIX/RESULT/LINKS format |
+| `core/execution/journal.py` | Log agent execution steps |
+| `core/skills/loader.py` | Load skills from vault, inject into context |
+| `oce/backend/vault_api.py` | FastAPI endpoints for vault operations |
+| `O2C-VAULT/` | Default internal vault (10 notes) |
+| `C:\Users\wifik\Downloads\o2c` | Real Obsidian vault (4 notes) |
+
+### Quick Test
+```bash
+cd larger-lab
+python -c "from core.obsidian.vault_writer import VaultWriter; vw=VaultWriter(vault_path='C:/Users/wifik/Downloads/o2c'); print(vw.write_note('execution','OC2 Test Note',{'cause':'test','fix':'test','result':'test'},['test']))"
+```
+Then check `C:\Users\wifik\Downloads\o2c\execution\OC2_Test_Note.md` — it should appear in Obsidian immediately.
+
+---
+
 
 ---
 
@@ -175,9 +380,61 @@ graph TB
 
 ---
 
+## ✅ Completed — CEREBUS Trading Dashboard (2026-05-31 05:00 EDT)
+
+**SW Dev subagent** completed the full CEREBUS trading dashboard per MAD stepping-away directive.
+
+- **5 views:** Overview, Strategies, Trades, Backtests, Health
+- **API:** FastAPI v2.0 on port 8090 with 12+ endpoints
+- **Frontend:** Next.js 14 on port 3001 (dark mode, auto-refresh, responsive)
+- **Data:** 19-asset backtest grid, equity curves, live tickers, trade history
+- **Build:** ✅ `npm run build` passes, all pages generated
+- **Report:** `execution/DASHBOARD_BUILD_COMPLETE.md` in Obsidian vault
+
+---
+
 ## 🔜 Next Steps
 
 1. **CC1:** Wire Phase 01 into main.py + write integration tests
 2. **PM2:** Build PatternViewer + ErrorDashboard frontend components
 3. **Target:** 300+ tests passing when Phase 01 is complete
 4. **After Phase 01:** Phase 02 — O2C Memory Field + Obsidian Knowledge Engine (per MAD plan)
+
+---
+
+## [OC2] 2026-05-31 10:55 EDT — Dashboard Bug Fix + Test Handoff to PM
+
+### Issue Reported by MAD (10:07 EDT)
+Dashboard rendering as basic white HTML — no UI styling. Nav clicks work but no CSS/design.
+
+### Root Cause (Diagnosed + Fixed by OC2)
+Two issues found and fixed:
+
+1. **`next.config.js` had `output: 'standalone'`** — breaks Next.js dev server entirely. Dev server returns 500 on every page. Production build (`next start`) works fine.
+   - ✅ FIXED: Removed `output: 'standalone'` from `next.config.js`
+
+2. **Server Components with `cache: 'no-store'` fetch** — `page.tsx` (Overview) and `backtests/page.tsx` were async Server Components that fetch from API at SSR time. Dev server crashes on dynamic fetch.
+   - ✅ FIXED: Converted both pages to `'use client'` components using `useEffect` + `useState` pattern (matching the other 3 pages)
+
+### Files Changed
+- `sniper-dashboard/next.config.js` — removed `output: 'standalone'`
+- `sniper-dashboard/src/app/page.tsx` — Server → Client Component
+- `sniper-dashboard/src/app/backtests/page.tsx` — Server → Client Component
+
+### Build Status
+- `npm run build`: ✅ PASS (exit 0, all 8 pages generated)
+- `npx tsc --noEmit`: ✅ PASS (no TypeScript errors)
+
+### What Needs Testing
+- [ ] Dev server starts without 500 errors
+- [ ] All 5 pages render with dark theme UI (not white HTML)
+- [ ] Overview page shows live data from API (port 8090)
+- [ ] Backtests page shows 19-asset data table
+- [ ] Strategies, Trades, Health pages render correctly
+- [ ] Navigation between pages works
+
+### Assign To
+**PM (Polymorph)** — frontend debugging. Do NOT need a full subagent — just test, verify, report.
+
+### Priority
+⚠️ Per MAD: **side objective**. Quant Lab strategy testing is PRIMARY. Fix dashboard when dev capacity is available.

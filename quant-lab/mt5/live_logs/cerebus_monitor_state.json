@@ -1,8 +1,5 @@
 {
   "trades_seen": [],
-  "last_check": "2026-05-30 17:00:22",
-  "alerts": [
-    "\u26a0\ufe0f Symmetry Trap executor NOT RUNNING (symmetry_trap_executor.py)",
-    "\u26a0\ufe0f P90 CASCADE executor NOT RUNNING (p90_cascade_executor.py)"
-  ]
+  "last_check": "2026-05-31 10:00:23",
+  "alerts": []
 }

@@ -1,86 +1,178 @@
 /**
- * API Layer — Sniper Dashboard
- *
- * Connects to Sniper FastAPI server at localhost:8090.
- * Replace API_BASE with env var for production deployment.
+ * CEREBUS Dashboard API Client
+ * Connects to FastAPI server at localhost:8090
  */
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8090';
 
 async function fetchApi(path: string): Promise<any> {
-  const res = await fetch(`${API_BASE}${path}`, { cache: 'no-store' });
-  if (!res.ok) throw new Error(`API ${res.status}: ${path}`);
-  return res.json();
+  try {
+    const res = await fetch(`${API_BASE}${path}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`API ${res.status}: ${path}`);
+    return res.json();
+  } catch (error) {
+    console.error(`API fetch error: ${path}`, error);
+    return null;
+  }
 }
 
 // ── TYPES ──────────────────────────────────────────────────
 
-export interface FirmMix {
-  firm: string;
-  accounts: number;
-  size: number;
-  promo_applied: string;
-  true_cost: number;
-  ff_eligible: boolean;
-  strategy: string;
-  alert_level: string;
-  pes_score: number;
-}
-
-export interface DeploymentMatrix {
+export interface OverviewData {
   generated_at: string;
-  crossover_threshold_usd: number;
-  firm_mix: FirmMix[];
-  risk_parameters: {
-    risk_per_trade: number;
-    max_correlated_exposure: number;
-    consistency_buffer: number;
+  summary: {
+    total_firms_tracked: number;
+    active_deployments: number;
+    total_capital_deployed: number;
+    avg_pes_score: number;
+    crossover_proximity_pct: number;
+    account_balance: number;
+    equity: number;
+    daily_pnl: number;
+    weekly_pnl: number;
+    monthly_pnl: number;
+    drawdown_pct: number;
+    active_trades: number;
+    rolling_wr_20: number;
+    rolling_wr_50: number;
   };
-  notes: string[];
+  strategy_live: {
+    symmetry_trap: { wr: number; trades: number; status: string };
+    p90_cascade: { wr: number; trades: number; status: string };
+  };
+  alerts: { level: string; message: string }[];
+  alerts_count: number;
+  tickers: Record<string, { bid: number; ask: number; spread: number; change_pct: number }>;
 }
 
-export interface Deployment {
-  deployment_id: string;
-  firm_name: string;
-  account_size: number;
-  quantity: number;
-  total_cost: number;
-  pes_score: number;
-  status: string;
-  deployed_at: string;
+export interface StrategyData {
+  generated_at: string;
+  symmetry_trap: StrategyRecord[];
+  p90_cascade: StrategyRecord[];
+  all: StrategyRecord[];
+}
+
+export interface StrategyRecord {
   strategy: string;
+  symbol: string;
+  trades: number;
+  wins: number;
+  losses: number;
+  win_rate: number;
+  pnl_pips: number;
+  report_file: string;
+  timestamp: string;
 }
 
-export interface PESPoint {
-  date: string;
-  pes: number;
-  firm: string;
+export interface TradeData {
+  trades: TradeRecord[];
+  count: number;
+  stats: {
+    total_pnl: number;
+    win_rate: number;
+    wins: number;
+    losses: number;
+    avg_win: number;
+    avg_loss: number;
+  };
+}
+
+export interface TradeRecord {
+  id: string;
+  symbol: string;
+  strategy: string;
+  entry_time: string;
+  exit_time: string;
+  pnl: number;
+  pips: number;
+  duration: string;
+  type: string;
+}
+
+export interface AssetResult {
+  symbol: string;
+  trades: number;
+  win_rate: number | null;
+  pf: number;
+  sharpe: number | null;
+  max_dd: number;
+  max_dd_pct: number;
+  ruin_prob: number;
+  median_pnl: number;
+  has_report: boolean;
+  report_file: string;
+}
+
+export interface BacktestData {
+  generated_at: string;
+  assets: AssetResult[];
+  count: number;
+}
+
+export interface EquityCurve {
+  symbol: string;
+  curve: { trade: number; p5: number; p25: number; p50: number; p75: number; p95: number }[];
+  stats: {
+    median_pnl: number;
+    mean_pnl: number;
+    max_dd: number;
+    ruin_prob: number;
+    pf: number;
+  };
+}
+
+export interface HealthData {
+  generated_at: string;
+  executors: { name: string; file: string; symbol: string; status: string; last_check: string }[];
+  mt5_connection: string;
+  last_log: { file: string; age_seconds: number; fresh: boolean } | null;
+  overall: string;
 }
 
 // ── API FUNCTIONS ──────────────────────────────────────────
 
-export async function getDeploymentMatrix(): Promise<DeploymentMatrix> {
+export async function getOverview(): Promise<OverviewData | null> {
+  return fetchApi('/api/overview');
+}
+
+export async function getStrategies(): Promise<StrategyData | null> {
+  return fetchApi('/api/strategies');
+}
+
+export async function getEquityCurve(strategy: string, symbol: string): Promise<EquityCurve | null> {
+  return fetchApi(`/api/strategies/${strategy}/equity?symbol=${symbol}`);
+}
+
+export async function getTrades(strategy?: string, symbol?: string, limit?: number): Promise<TradeData | null> {
+  let path = `/api/trades?limit=${limit || 50}`;
+  if (strategy) path += `&strategy=${encodeURIComponent(strategy)}`;
+  if (symbol) path += `&symbol=${encodeURIComponent(symbol)}`;
+  return fetchApi(path);
+}
+
+export async function getBacktests(): Promise<BacktestData | null> {
+  return fetchApi('/api/backtests');
+}
+
+export async function getBacktestReport(symbol: string): Promise<{ symbol: string; content: string } | null> {
+  return fetchApi(`/api/backtests/report/${symbol}`);
+}
+
+export async function getHealth(): Promise<HealthData | null> {
+  return fetchApi('/api/health/live');
+}
+
+// Legacy sniper endpoints
+export async function getDeploymentMatrix() {
   return fetchApi('/api/matrix');
 }
 
-export async function getActiveDeployments(): Promise<Deployment[]> {
+export async function getActiveDeployments() {
   const data = await fetchApi('/api/deployments/active-full');
-  return data.deployments || [];
+  return data?.deployments || [];
 }
 
-export async function getPESHistory(_days: number = 30): Promise<PESPoint[]> {
+export async function getLatestPES() {
   const data = await fetchApi('/api/pes/latest');
-  return (data.snapshots || []).map((s: any) => ({
-    date: s.snapshot_date || '',
-    pes: s.pes_score || 0,
-    firm: s.firm_name || 'Unknown',
-  }));
-}
-
-export async function getHealthReport() {
-  return fetchApi('/api/health');
-}
-
-export async function getOverview() {
-  return fetchApi('/api/overview');
+  return data?.snapshots || [];
 }

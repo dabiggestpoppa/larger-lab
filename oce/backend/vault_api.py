@@ -1,15 +1,36 @@
 ﻿"""
-Vault API Endpoints â€” Phase 00
+Vault API Endpoints — Phase 00
 FastAPI endpoints for O2C Obsidian Vault.
+
+Supports two vaults:
+- DEFAULT (O2C-VAULT/): Internal workspace vault for raw operational traces
+- OBSIDIAN (C:\\Users\\wifik\\Downloads\\o2c): Real Obsidian vault for user-visible notes
+
+Use query param ?vault=obsidian to target the real Obsidian vault.
 """
 
-from fastapi import FastAPI, HTTPException
+import os
+from pathlib import Path
+from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
 
 from core.obsidian.vault_writer import VaultWriter, DEFAULT_VAULT_PATH
 from core.obsidian.linker import Linker
 from core.obsidian.compressor import compress_trace
 from core.obsidian.note_standard import NoteValidator
+
+
+# Real Obsidian vault path
+OBSIDIAN_VAULT_PATH = Path("C:/Users/wifik/Downloads/o2c")
+_env_path = os.environ.get("OBSIDIAN_VAULT_PATH")
+if _env_path:
+    OBSIDIAN_VAULT_PATH = Path(_env_path)
+
+
+def _resolve_vault(vault_param: str = "") -> Path:
+    if vault_param.lower() == "obsidian":
+        return OBSIDIAN_VAULT_PATH
+    return DEFAULT_VAULT_PATH
 
 
 class WriteNoteRequest(BaseModel):
@@ -34,21 +55,26 @@ def register_vault_endpoints(app: FastAPI):
     """Register all vault endpoints on the given FastAPI app."""
 
     @app.get("/api/vault/notes")
-    async def list_vault_notes(category: str = "", subcategory: str = ""):
+    async def list_vault_notes(
+        category: str = "", subcategory: str = "",
+        vault: str = Query(default="", description="'obsidian' for real vault"),
+    ):
         try:
-            writer = VaultWriter(vault_path=DEFAULT_VAULT_PATH)
-            notes = writer.list_notes(
-                category=category or None,
-                subcategory=subcategory or None,
-            )
-            return {"notes": notes, "count": len(notes)}
+            vpath = _resolve_vault(vault)
+            writer = VaultWriter(vault_path=vpath)
+            notes = writer.list_notes(category=category or None, subcategory=subcategory or None)
+            return {"notes": notes, "count": len(notes), "vault": str(vpath)}
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
     @app.get("/api/vault/notes/{category}/{title}")
-    async def get_vault_note(category: str, title: str, subcategory: str = ""):
+    async def get_vault_note(
+        category: str, title: str, subcategory: str = "",
+        vault: str = Query(default="", description="'obsidian' for real vault"),
+    ):
         try:
-            writer = VaultWriter(vault_path=DEFAULT_VAULT_PATH)
+            vpath = _resolve_vault(vault)
+            writer = VaultWriter(vault_path=vpath)
             note = writer.get_note(category, title, subcategory or None)
             if not note:
                 raise HTTPException(status_code=404, detail=f"Note not found: {category}/{title}")
@@ -58,44 +84,39 @@ def register_vault_endpoints(app: FastAPI):
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
-    @app.post("/api/vault/notes")
-    async def write_vault_note(request: WriteNoteRequest):
+    @app.post("/api/vault/write")
+    async def write_vault_note(
+        request: WriteNoteRequest,
+        vault: str = Query(default="", description="'obsidian' for real vault"),
+    ):
         try:
-            writer = VaultWriter(vault_path=DEFAULT_VAULT_PATH)
+            vpath = _resolve_vault(vault)
+            writer = VaultWriter(vault_path=vpath)
             result = writer.write_note(
                 category=request.category, title=request.title,
                 content=request.content, tags=request.tags,
                 subcategory=request.subcategory,
             )
-            return {"status": "ok", "note": result}
+            return {"status": "ok", "note": result, "vault": str(vpath)}
         except ValueError as e:
             raise HTTPException(status_code=400, detail=str(e))
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
-    @app.put("/api/vault/notes/{category}/{title}")
-    async def update_vault_note(category: str, title: str, request: WriteNoteRequest, subcategory: str = ""):
+    @app.post("/api/vault/compress")
+    async def compress_vault_note(request: CompressRequest):
         try:
-            writer = VaultWriter(vault_path=DEFAULT_VAULT_PATH)
-            result = writer.update_note(
-                category=category, title=title,
-                content=request.content, tags=request.tags,
-                subcategory=subcategory or None,
-            )
-            return {"status": "ok", "note": result}
+            result = compress_trace(request.trace, request.context, request.category)
+            return {"status": "ok", "result": result}
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
-    @app.delete("/api/vault/notes/{category}/{title}")
-    async def delete_vault_note(category: str, title: str, subcategory: str = ""):
+    @app.post("/api/vault/validate")
+    async def validate_vault_note(request: ValidateRequest):
         try:
-            writer = VaultWriter(vault_path=DEFAULT_VAULT_PATH)
-            success = writer.delete_note(category, title, subcategory or None)
-            if not success:
-                raise HTTPException(status_code=404, detail=f"Note not found: {category}/{title}")
-            return {"status": "deleted"}
-        except HTTPException:
-            raise
+            validator = NoteValidator()
+            result = validator.validate(request.content)
+            return {"status": "ok", "result": result}
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
@@ -115,14 +136,6 @@ def register_vault_endpoints(app: FastAPI):
                         edges.append({"source": source, "target": target})
                         seen_edges.add(edge_key)
             return {"nodes": nodes, "edges": edges}
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
-
-    @app.post("/api/vault/compress")
-    async def compress_trace_to_note(request: CompressRequest):
-        try:
-            compressed = compress_trace(traceback=request.trace, context=request.context)
-            return {"compressed": compressed}
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
@@ -291,11 +304,5 @@ def register_vault_endpoints(app: FastAPI):
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
-    @app.post("/api/vault/validate")
-    async def validate_note(request: ValidateRequest):
-        try:
-            validator = NoteValidator()
-            return validator.validate(request.content)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+
 

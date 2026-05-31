@@ -974,8 +974,7 @@ register_substrate_endpoints(app)
 from .persistent_field_api import register_persistent_field_endpoints
 register_persistent_field_endpoints(app)
 
-# Register O2C Phase 00 Vault endpoints
-from .vault_api import register_vault_endpoints
+# Register O2C Phase 00 + Phase 01 Vault/Cognitive Mesh endpoints
 register_vault_endpoints(app)
 
 
