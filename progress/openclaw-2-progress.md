@@ -1,51 +1,40 @@
-# OC2 Progress -- OWL (OpenClaw-2)
+# OC2 Progress — 2026-05-30
 
-> **Last Updated:** 2026-05-30 14:15 EDT
+## Phase 5 — COMPLETE
+- 13 Python modules in quant-lab/sniper/ (all compile OK)
+- Dashboard: sniper-dashboard/ (Next.js 14, 6 components, build OK)
+- API server: sniper-dashboard/api_server.py (FastAPI, port 8090, 8 endpoints)
+- 32 firms in DB (15 Futures + 15 Forex/CFD + 2 legacy)
+- PES snapshots stored for all firms
+- Dashboard api.ts connected to real API
 
-## Phase 1 -- PROP SNIPER ENGINE: Shallow Well Build
+## True Cost Update — COMPLETE (evening)
+- Scraped /challenge pages for real pricing (activation + challenge fee)
+- Corrected PES rankings: Lucid Trading 100K #1 (PES 13.52), not Apex
+- DB updated: true_cost_per_size, activation_fees, billing_types columns
+- scope.py: _dict_to_firm_profile uses true_cost_per_size first
+- MAD confirmation: promo prices are marketing, not real cost
 
-### COMPLETED (Direct Build by OWL)
+## Dashboard True Cost Update — COMPLETE
+- /api/true-costs endpoint added
+- /api/matrix now returns true_cost breakdown (activation + challenge fee + billing)
+- All 32 firms showing verified true costs in dashboard
+- Old promo prices purged from API responses
+- Server restarted and verified live
 
-**New Modules Created:**
-1. `quant-lab/sniper/ontology_mapper.py` -- Ontology Translation Layer
-   - PropFirmOntology dataclass (30+ fields: cost, DD, trailing type, consistency, FF, etc.)
-   - OntologyMapper.from_propfirm_match() -- maps raw scrape → clean ontology
-   - TrailingType, DDType enums with proper classification
-   - Cost of Capital (CoC) calculation with latency decay and consistency penalty
+## Server Restarts (21:15 EDT)
+- OCE backend (:8000): ✅ HEALTHY
+- SRRA-OPH API (:8001): ✅ RUNNING — 9 phases, 45 modules
+- Sniper API (:8090): ✅ RUNNING — 32 firms, 0 deployments
+- All 3 backends confirmed healthy
 
-2. `quant-lab/sniper/scraper_engine.py` -- Real Scraper
-   - PropFirmMatchScraper: Scrapling StealthyFetcher primary, requests+bs4 fallback
-   - PayoutJunctionScraper: payout verification data
-   - Regex-based data extraction (sizes, promos, DD rules, consistency, payout)
-   - Change detection via content hashing + snapshot comparison
+## MAD Directive: Full Lab Takeover Prep (msg #5435)
+- MAD: "you're about to be able to use the full srra-oph system and take over larger labs entirely"
+- Prepping for operational control of full lab
+- Official prompt coming later
+- Restored all servers, noted full scope
 
-3. `quant-lab/sniper/ff_matrix.py` -- F&F Matrix + Deployment Router
-   - FFScalingMatrix: Exponential CoC decay via F&F fragmentation
-   - find_optimal_fragmentation() -- optimal account size × quantity
-   - CapitalDeploymentRouter: Ranks all firms → DeploymentDirective per firm
-   - Full JSON output: prop_firm_matrix.json
-
-**Skills Created:**
-4. `skills/tools/scrapling/SKILL.md` -- Scrapling stealth scraping tool reference
-
-**Infrastructure Fixes:**
-- Fixed all relative imports in sniper package (was blocking `python -m` usage)
-- Created `quant_lab` junction → `quant-lab` directory for Python package imports
-- Cleared all __pycache__ files
-
-**Test Results:**
-- All 4 test firms ranked: MFF #1 (PES 2.205), Topstep #2 (1.537), TickFunded #3 (0.625), Apex #4 (0.624)
-- Lethal trailing DD detection: TickFundedTrader correctly flagged
-- Consistency bypass: Working for FF-enabled firms
-- JSON matrix output: configs/prop_firm_matrix.json
-
-### KNOWN ISSUES (to fix in Phase 2)
-- Cost model: linear scaling produces unrealistic per-account fees at small sizes (needs floor pricing)
-- Scraper: regex-based extraction needs calibration against actual PropFirmMatch DOM
-- PayoutJunction: placeholder only — needs real scraping
-
-### Metadata
-- CEREBUS edge for PES calc: WR 85.7%, 2.0 trades/day, Sharpe 8.5, monthly R 15, PF 8.0
-- Target bandwidth: $50,000
-- PropFirmMatch URL: https://propfirmmatch.com/futures
-- PayoutJunction URL: https://payoutjunction.com/
+## Phase 6 — Awaiting MAD signal
+- Desktop app meditation ready (823 lines)
+- Handoff package: P1-5 source + API spec + DB schema
+- Next: MAD signals PM/CC dev team to build Tauri desktop wrapper

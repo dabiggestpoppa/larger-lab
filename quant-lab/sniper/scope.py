@@ -7,6 +7,7 @@ This is the top-level entry point. It ties together:
   pes_calculator.py  - math engine
   ff_protocol.py     - F&F arbitrage
   config_generator.py - YAML output
+  care_engine.py     - CARE deployment config generator + live monitor
 """
 
 import sys
@@ -18,6 +19,7 @@ from .database import (
     insert_pes_snapshot, get_latest_snapshots, get_optimal_deployments,
 )
 from .ff_protocol import FFProtocol, FFStatus, PromoDetails
+from .care_engine import run_scope as run_care_scope, promo_verify, live_firm_monitor
 from .config_generator import ConfigGenerator
 
 
@@ -241,17 +243,34 @@ class OC2Scope:
         return f"Seeded {len(added)} firms:\n" + "\n".join(f"  - {a}" for a in added)
 
     def _dict_to_firm_profile(self, d: dict) -> FirmProfile:
-        """Convert database dict to FirmProfile."""
+        """Convert database dict to FirmProfile. Uses true_cost_per_size when available."""
+        # Prefer true_cost_per_size (activation + challenge fee) over promo cost_per_size
+        true_cost_per = d.get("true_cost_per_size", {})
         cost_per = d.get("cost_per_size", {})
-        if isinstance(cost_per, dict):
-            account_size = d.get("account_sizes", [1000])[0] if d.get("account_sizes") else 1000
-            cost = cost_per.get(str(account_size), 0)
-            if not cost:
-                # Try int keys
-                cost = cost_per.get(account_size, 0)
-        else:
-            cost = 0
-            account_size = 1000
+        
+        if isinstance(true_cost_per, str):
+            import json
+            try: true_cost_per = json.loads(true_cost_per)
+            except: true_cost_per = {}
+        if isinstance(cost_per, str):
+            import json
+            try: cost_per = json.loads(cost_per)
+            except: cost_per = {}
+        
+        account_sizes = d.get("account_sizes", [1000])
+        if isinstance(account_sizes, str):
+            import json
+            try: account_sizes = json.loads(account_sizes)
+            except: account_sizes = [1000]
+        
+        account_size = account_sizes[0] if account_sizes else 1000
+        
+        # Use true cost if available, fall back to cost_per_size
+        cost = 0
+        if true_cost_per:
+            cost = true_cost_per.get(str(account_size), 0) or true_cost_per.get(account_size, 0)
+        if not cost and cost_per:
+            cost = cost_per.get(str(account_size), 0) or cost_per.get(account_size, 0)
 
         promo = d.get("promo_active", {}) or {}
         consistency = d.get("consistency_rule", {}) or {}
@@ -313,8 +332,41 @@ def main():
             optimal = " [OPTIMAL]" if s.get("is_optimal") else ""
             print(f"  - {s['firm_name']} ${s['account_size']:,} | PES: {s['pes_score']:.4f} | {s['snapshot_date']}{optimal}")
 
+    elif sys.argv[1] == "care":
+        full_mode = "--full" in sys.argv
+        result = run_care_scope(full=full_mode)
+        from .care_engine import format_care_output
+        print(format_care_output(result))
+
+    elif sys.argv[1] == "verify-promo":
+        if len(sys.argv) < 4:
+            print("Usage: python scope.py verify-promo <code> <firm_name>")
+        else:
+            r = promo_verify(sys.argv[2], sys.argv[3])
+            print(f"Promo '{sys.argv[2]}' for {sys.argv[3]}:")
+            print(f"  Valid: {r.valid}")
+            print(f"  Discount: {r.discount_pct:.0%}")
+            print(f"  FF Eligible: {r.ff_eligible}")
+            print(f"  Reason: {r.reason}")
+
+    elif sys.argv[1] == "monitor":
+        if len(sys.argv) < 3:
+            print("Usage: python scope.py monitor <firm_name>")
+        else:
+            m = live_firm_monitor(sys.argv[2])
+            print(f"Monitor — {m['firm_name']} [{m['alert_level']}]")
+            print(f"  Status: {m['status']}")
+            if m.get('active_promo'):
+                p = m['active_promo']
+                print(f"  Promo: {p.get('code')} (-{p.get('discount_pct', 0)}%)")
+            if m.get('rule_changes'):
+                print(f"  Changes:")
+                for c in m['rule_changes']:
+                    print(f"    • {c}")
+            print(f"  Snapshots: last={m.get('last_snapshot', 'N/A')} | prev={m.get('prev_snapshot', 'N/A')}")
+
     else:
-        print("Usage: python scope.py [seed|scope|firms|deployments|snapshots]")
+        print("Usage: python scope.py [seed|scope|firms|deployments|snapshots|care|verify-promo|monitor]")
 
 
 if __name__ == "__main__":

@@ -37,6 +37,15 @@ Run from project root: C:\Users\wifik\Desktop\projects\larger-lab\
 - scraper_engine.py: PropFirmMatchScraper (2-pass: table + detail pages), PayoutJunctionScraper
 - ff_matrix.py: FFScalingMatrix (exponential CoC decay), CapitalDeploymentRouter (ranked directives)
 
+## PROP FIRM MATCH — DUAL TAB STRUCTURE
+- **Futures tab:** https://propfirmmatch.com/futures → futures prop firms (+ Crypto tab)
+- **Forex tab:** https://propfirmmatch.com (click Forex nav button) → CFD-like firms (indices, metals, energy, stocks)
+- MAD confirms: "Forex" on PropFirmMatch = what he calls "CFDs" (contract-based trading)
+- Scraper supports: `scrape(category="futures")` and `scrape(category="forex")` and `scrape_both_tabs()`
+- 28 known firm slugs in KNOWN_FIRM_SLUGS (15 futures + 13 forex)
+- Both tabs use same table DOM structure — one parser handles both
+- Each firm tagged with `_category` field: "futures" | "forex"
+
 ## ARCHITECTURE RULES
 1. Physics (trading) NEVER touches venue (prop firm rules)
 2. OC2/Sniper = config generator ONLY, not a trading system

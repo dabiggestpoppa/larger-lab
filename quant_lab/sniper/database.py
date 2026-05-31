@@ -31,6 +31,9 @@ def init_database() -> None:
             website         TEXT,
             account_sizes   TEXT NOT NULL DEFAULT '[]',
             cost_per_size   TEXT NOT NULL DEFAULT '{}',
+            true_cost_per_size TEXT DEFAULT '{}',
+            activation_fees TEXT DEFAULT '{}',
+            billing_types   TEXT DEFAULT '{}',
             promo_active    TEXT,
             max_daily_loss_pct      REAL NOT NULL DEFAULT 0.05,
             max_trailing_dd_pct     REAL NOT NULL DEFAULT 0.06,
@@ -299,6 +302,90 @@ def get_optimal_deployments() -> list[dict]:
     """).fetchall()
     conn.close()
     return [dict(r) for r in rows]
+
+
+# ─── Config Loop Helpers ──────────────────────────────────
+
+def get_active_deployments_with_firms() -> list[dict]:
+    """JOIN deployments + firms for full view. Used by config_loop health checks."""
+    conn = get_connection()
+    rows = conn.execute("""
+        SELECT d.*, f.name as firm_name, f.website, f.ff_status,
+               f.promo_active, f.patch_signals, f.status as firm_status,
+               f.account_sizes, f.cost_per_size, f.payout_method
+        FROM capital_deployments d
+        JOIN prop_firms f ON d.firm_id = f.firm_id
+        WHERE d.status = 'ACTIVE'
+        ORDER BY d.pes_score DESC
+    """).fetchall()
+    conn.close()
+    results = []
+    for r in rows:
+        d = dict(r)
+        # Decode JSON fields
+        for field in ["promo_active", "patch_signals", "account_sizes", "cost_per_size"]:
+            if field in d and d[field]:
+                try:
+                    d[field] = json.loads(d[field])
+                except (json.JSONDecodeError, TypeError):
+                    pass
+        results.append(d)
+    return results
+
+
+def get_pes_trend(firm_id: str, days: int = 30) -> list[dict]:
+    """Get PES over time for drift detection. Returns list of {snapshot_date, pes_score, firm_name, account_size}."""
+    conn = get_connection()
+    rows = conn.execute("""
+        SELECT s.*, f.name as firm_name
+        FROM pes_snapshots s
+        JOIN prop_firms f ON s.firm_id = f.firm_id
+        WHERE s.firm_id = ?
+          AND s.snapshot_date >= date('now', ? || ' days')
+        ORDER BY s.snapshot_date ASC
+    """, (firm_id, f"-{days}")).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def insert_patch_signal(firm_id: str, signal: dict) -> str:
+    """Log a patch signal to a firm's patch_signals JSON array. Returns signal id."""
+    conn = get_connection()
+    signal_id = str(uuid.uuid4())
+    now = datetime.utcnow().isoformat()
+
+    # Get existing signals
+    row = conn.execute(
+        "SELECT patch_signals FROM prop_firms WHERE firm_id = ?", (firm_id,)
+    ).fetchone()
+
+    if row is None:
+        conn.close()
+        return ""
+
+    existing = []
+    if row["patch_signals"]:
+        try:
+            existing = json.loads(row["patch_signals"])
+        except (json.JSONDecodeError, TypeError):
+            existing = []
+
+    # Append new signal with metadata
+    new_signal = {
+        "signal_id": signal_id,
+        **signal,
+        "detected_at": signal.get("detected_at", now),
+        "logged_at": now,
+    }
+    existing.append(new_signal)
+
+    conn.execute(
+        "UPDATE prop_firms SET patch_signals = ?, last_updated = ? WHERE firm_id = ?",
+        (json.dumps(existing), now, firm_id),
+    )
+    conn.commit()
+    conn.close()
+    return signal_id
 
 
 # ─── Helpers ────────────────────────────────────────────────

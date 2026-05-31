@@ -1,0 +1,452 @@
+{
+  "scraped_at": "2026-05-30T23:20:56.719176Z",
+  "source": "propfirmmatch",
+  "futures_count": 15,
+  "forex_count": 15,
+  "total_firms": 30,
+  "futures_firms": [
+    {
+      "name": "Lucid Trading",
+      "rank": 4.6,
+      "reviews": 53,
+      "country": "US",
+      "years": 1,
+      "platforms": [
+        "Tr",
+        "Mo"
+      ],
+      "max_allocation": 750000,
+      "promo_pct": 50,
+      "promo_code": "MATCH",
+      "is_new": true
+    },
+    {
+      "name": "Alpha Futures",
+      "rank": 4.6,
+      "reviews": 51,
+      "country": "GB",
+      "years": 1,
+      "platforms": [
+        "De"
+      ],
+      "max_allocation": 750000,
+      "promo_pct": 25,
+      "promo_code": "MATCH25"
+    },
+    {
+      "name": "Tradeify",
+      "rank": 4.7,
+      "reviews": 160,
+      "country": "US",
+      "years": 1,
+      "platforms": [
+        "Tr"
+      ],
+      "max_allocation": 750000,
+      "promo_pct": 40,
+      "promo_code": "MATCH"
+    },
+    {
+      "name": "My Funded Futures",
+      "rank": 4.5,
+      "reviews": 235,
+      "country": "US",
+      "years": 2,
+      "platforms": [],
+      "max_allocation": 450000,
+      "promo_pct": 50,
+      "promo_code": "MATCH"
+    },
+    {
+      "name": "Top One Futures",
+      "rank": 4.7,
+      "reviews": 75,
+      "country": "US",
+      "years": 1,
+      "platforms": [],
+      "max_allocation": 3200000,
+      "promo_pct": 60,
+      "promo_code": "MATCH"
+    },
+    {
+      "name": "Funded Futures Family",
+      "rank": 4.5,
+      "reviews": 18,
+      "country": "US",
+      "years": 1,
+      "platforms": [],
+      "max_allocation": 750000,
+      "promo_pct": 75,
+      "promo_code": "MATCH",
+      "is_new": true
+    },
+    {
+      "name": "Apex Trader Funding",
+      "rank": 3.8,
+      "reviews": 105,
+      "country": "US",
+      "years": 5,
+      "platforms": [
+        "Mo"
+      ],
+      "max_allocation": 3000000,
+      "promo_pct": 90,
+      "promo_code": "MATCH"
+    },
+    {
+      "name": "Topstep",
+      "rank": 4.5,
+      "reviews": 124,
+      "country": "US",
+      "years": 10,
+      "platforms": [],
+      "max_allocation": 750000,
+      "promo_pct": 0,
+      "promo_code": ""
+    },
+    {
+      "name": "E8 Futures",
+      "rank": 4.7,
+      "reviews": 19,
+      "country": "US",
+      "years": 1,
+      "platforms": [],
+      "max_allocation": 750000,
+      "promo_pct": 20,
+      "promo_code": "MATCH"
+    },
+    {
+      "name": "FundedNext Futures",
+      "rank": 4.3,
+      "reviews": 62,
+      "country": "AE",
+      "years": 1,
+      "platforms": [],
+      "max_allocation": 750000,
+      "promo_pct": 47,
+      "promo_code": "MATCH"
+    },
+    {
+      "name": "Goat Funded Futures",
+      "rank": 4.4,
+      "reviews": 18,
+      "country": "HK",
+      "years": 1,
+      "platforms": [
+        "De"
+      ],
+      "max_allocation": 750000,
+      "promo_pct": 50,
+      "promo_code": "MATCHSPECIAL",
+      "is_new": true
+    },
+    {
+      "name": "Traders Launch",
+      "rank": 4.6,
+      "reviews": 19,
+      "country": "US",
+      "years": 2,
+      "platforms": [
+        "IB"
+      ],
+      "max_allocation": 1500000,
+      "promo_pct": 15,
+      "promo_code": "MATCH"
+    },
+    {
+      "name": "Take Profit Trader",
+      "rank": 3.0,
+      "reviews": 17,
+      "country": "US",
+      "years": 5,
+      "platforms": [
+        "Mo"
+      ],
+      "max_allocation": 750000,
+      "promo_pct": 30,
+      "promo_code": "MATCH"
+    },
+    {
+      "name": "TradeDay",
+      "rank": 4.8,
+      "reviews": 11,
+      "country": "US",
+      "years": 6,
+      "platforms": [
+        "Tr"
+      ],
+      "max_allocation": 450000,
+      "promo_pct": 30,
+      "promo_code": "MATCH"
+    },
+    {
+      "name": "FuturesElite",
+      "rank": 4.5,
+      "reviews": 12,
+      "country": "IT",
+      "years": 1,
+      "platforms": [
+        "De"
+      ],
+      "max_allocation": 1500000,
+      "promo_pct": 40,
+      "promo_code": "MATCH"
+    }
+  ],
+  "forex_firms": [
+    {
+      "name": "FundingPips",
+      "rank": 4.3,
+      "reviews": 1082,
+      "country": "AE",
+      "years": 3,
+      "assets": [
+        "Crypto",
+        "Energy",
+        "FX",
+        "Indices",
+        "Metals"
+      ],
+      "max_allocation": 300000,
+      "promo_pct": 20,
+      "promo_code": "MATCH"
+    },
+    {
+      "name": "The5ers",
+      "rank": 4.7,
+      "reviews": 1199,
+      "country": "GB",
+      "years": 10,
+      "assets": [
+        "Crypto",
+        "Energy",
+        "FX",
+        "Indices",
+        "Metals",
+        "Other Commodities"
+      ],
+      "max_allocation": 647500,
+      "promo_pct": 10,
+      "promo_code": "MATCH"
+    },
+    {
+      "name": "Goat Funded Trader",
+      "rank": 4.3,
+      "reviews": 910,
+      "country": "HK",
+      "years": 2,
+      "assets": [
+        "Crypto",
+        "Energy",
+        "FX",
+        "Indices",
+        "Metals",
+        "Other Commodities",
+        "Stocks"
+      ],
+      "max_allocation": 400000,
+      "promo_pct": 40,
+      "promo_code": "GFT40"
+    },
+    {
+      "name": "BrightFunded",
+      "rank": 4.4,
+      "reviews": 108,
+      "country": "AE",
+      "years": 2,
+      "assets": [
+        "Crypto",
+        "FX",
+        "Indices",
+        "Metals",
+        "Other Commodities"
+      ],
+      "max_allocation": 400000,
+      "promo_pct": 15,
+      "promo_code": "MATCH"
+    },
+    {
+      "name": "FundedNext",
+      "rank": 4.3,
+      "reviews": 774,
+      "country": "AE",
+      "years": 4,
+      "assets": [
+        "Crypto",
+        "FX",
+        "Indices",
+        "Other Commodities"
+      ],
+      "max_allocation": 300000,
+      "promo_pct": 0,
+      "promo_code": ""
+    },
+    {
+      "name": "E8 Markets",
+      "rank": 4.8,
+      "reviews": 465,
+      "country": "US",
+      "years": 4,
+      "assets": [
+        "Crypto",
+        "Energy",
+        "FX",
+        "Indices",
+        "Metals"
+      ],
+      "max_allocation": 1250000,
+      "promo_pct": 20,
+      "promo_code": "MATCH"
+    },
+    {
+      "name": "FTMO_EquityTrust",
+      "rank": 0,
+      "reviews": 0,
+      "country": "HK",
+      "years": 1,
+      "assets": [
+        "Crypto",
+        "FX",
+        "Indices",
+        "Metals",
+        "Other Commodities"
+      ],
+      "max_allocation": 500000,
+      "promo_pct": 50,
+      "promo_code": "MATCH50"
+    },
+    {
+      "name": "Alpha Capital",
+      "rank": 4.4,
+      "reviews": 906,
+      "country": "GB",
+      "years": 4,
+      "assets": [
+        "Energy",
+        "FX",
+        "Indices",
+        "Metals"
+      ],
+      "max_allocation": 400000,
+      "promo_pct": 30,
+      "promo_code": "MATCH30"
+    },
+    {
+      "name": "Crypto Fund Trader",
+      "rank": 4.1,
+      "reviews": 105,
+      "country": "CH",
+      "years": 3,
+      "assets": [
+        "Crypto",
+        "FX",
+        "Indices",
+        "Other Commodities",
+        "Stocks"
+      ],
+      "max_allocation": 330000,
+      "promo_pct": 10,
+      "promo_code": "MATCH"
+    },
+    {
+      "name": "Blue Guardian",
+      "rank": 4.4,
+      "reviews": 204,
+      "country": "AE",
+      "years": 4,
+      "assets": [
+        "Crypto",
+        "FX",
+        "Indices",
+        "Other Commodities"
+      ],
+      "max_allocation": 400000,
+      "promo_pct": 50,
+      "promo_code": "BGUARD"
+    },
+    {
+      "name": "Blueberry Funded",
+      "rank": 3.9,
+      "reviews": 461,
+      "country": "VU",
+      "years": 1,
+      "assets": [
+        "Crypto",
+        "FX",
+        "Indices",
+        "Metals",
+        "Other Commodities"
+      ],
+      "max_allocation": 400000,
+      "promo_pct": 40,
+      "promo_code": "MATCH"
+    },
+    {
+      "name": "Maven",
+      "rank": 4.2,
+      "reviews": 728,
+      "country": "LC",
+      "years": 3,
+      "assets": [
+        "Crypto",
+        "Energy",
+        "FX",
+        "Indices",
+        "Metals",
+        "Other Commodities",
+        "Stocks"
+      ],
+      "max_allocation": 200000,
+      "promo_pct": 10,
+      "promo_code": "MATCH"
+    },
+    {
+      "name": "BesquaredTrading",
+      "rank": 4.9,
+      "reviews": 0,
+      "country": "LC",
+      "years": 0,
+      "assets": [
+        "Crypto",
+        "Energy",
+        "FX",
+        "Indices",
+        "Metals"
+      ],
+      "max_allocation": 2300000,
+      "promo_pct": 50,
+      "promo_code": "MATCHFIRST"
+    },
+    {
+      "name": "Trade The Pool",
+      "rank": 0,
+      "reviews": 0,
+      "country": "IL",
+      "years": 3,
+      "assets": [
+        "Stocks"
+      ],
+      "max_allocation": 450000,
+      "promo_pct": 10,
+      "promo_code": "MATCH"
+    },
+    {
+      "name": "For Traders",
+      "rank": 4.5,
+      "reviews": 248,
+      "country": "AE",
+      "years": 2,
+      "assets": [
+        "Energy",
+        "FX",
+        "Indices",
+        "Metals",
+        "Other Commodities"
+      ],
+      "max_allocation": 200000,
+      "promo_pct": 50,
+      "promo_code": "MATCH"
+    }
+  ],
+  "notes": "Fresh browser scrape 2026-05-30. Forex tab = CFD-like instruments (indices, metals, energy, stocks). Futures tab = futures prop firms. No separate CFD category on site."
+}

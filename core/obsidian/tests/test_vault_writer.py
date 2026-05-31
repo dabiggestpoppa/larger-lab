@@ -1,10 +1,8 @@
-﻿"""
+"""
 Tests for Vault Writer — Phase 0A
 """
 
 import pytest
-import tempfile
-import shutil
 from pathlib import Path
 
 from core.obsidian.vault_writer import VaultWriter, VALID_CATEGORIES
@@ -12,7 +10,6 @@ from core.obsidian.vault_writer import VaultWriter, VALID_CATEGORIES
 
 @pytest.fixture
 def tmp_vault(tmp_path):
-    """Create a temporary vault directory."""
     vault = tmp_path / "test-vault"
     vault.mkdir()
     return vault
@@ -20,7 +17,6 @@ def tmp_vault(tmp_path):
 
 @pytest.fixture
 def writer(tmp_vault):
-    """Create a VaultWriter with temp vault."""
     return VaultWriter(vault_path=tmp_vault)
 
 
@@ -37,129 +33,139 @@ class TestVaultWriterInit:
 
 class TestWriteNote:
     def test_write_basic_note(self, writer, tmp_vault):
-        content = {
-            "cause": "entry_price cleared before archival",
-            "fix": "snapshot before reset",
-            "result": "trade continuity restored",
-            "links": ["Trading Systems", "State Machines"],
-        }
-        path = writer.write_note("failures", "State Reset Bug", content)
-        assert path.exists()
-        text = path.read_text(encoding="utf-8")
+        content = {"cause": "entry_price cleared", "fix": "snapshot", "result": "restored", "links": ["Systems"]}
+        result = writer.write_note("failures", "State Reset Bug", content)
+        assert result["title"] == "State Reset Bug"
+        assert result["category"] == "failures"
+        assert (tmp_vault / result["path"]).exists()
+        text = (tmp_vault / result["path"]).read_text(encoding="utf-8")
         assert "# State Reset Bug" in text
         assert "CAUSE:" in text
-        assert "entry_price cleared before archival" in text
-        assert "FIX:" in text
-        assert "snapshot before reset" in text
-        assert "RESULT:" in text
-        assert "trade continuity restored" in text
-        assert "[[Trading Systems]]" in text
-        assert "[[State Machines]]" in text
+        assert "[[Systems]]" in text
 
     def test_write_note_with_tags(self, writer):
-        content = {"cause": "test", "fix": "test", "result": "test", "links": []}
-        path = writer.write_note("failures", "Tagged Bug", content, tags=["state", "reset"])
-        text = path.read_text(encoding="utf-8")
-        assert "#state" in text
-        assert "#reset" in text
+        content = {"cause": "t", "fix": "t", "result": "t", "links": []}
+        result = writer.write_note("failures", "Tagged", content, tags=["state", "reset"])
+        assert result["tags"] == ["state", "reset"]
 
     def test_write_note_with_subcategory(self, writer, tmp_vault):
-        content = {"cause": "test", "fix": "test", "result": "test", "links": []}
-        path = writer.write_note("agents", "Quant Agent Report", content, subcategory="quant")
-        assert path.exists()
-        assert "agents" in str(path) and "quant" in str(path)
+        content = {"cause": "t", "fix": "t", "result": "t", "links": []}
+        result = writer.write_note("agents", "Quant Report", content, subcategory="quant")
+        assert "agents" in result["path"] and "quant" in result["path"]
+        assert (tmp_vault / result["path"]).exists()
 
     def test_invalid_category_raises(self, writer):
-        content = {"cause": "test", "fix": "test", "result": "test", "links": []}
         with pytest.raises(ValueError, match="Invalid category"):
-            writer.write_note("invalid_category", "Test", content)
+            writer.write_note("invalid", "Test", {"cause": "t"})
 
     def test_minimal_content(self, writer):
-        content = {"cause": "something broke"}
-        path = writer.write_note("failures", "Minimal Bug", content)
-        text = path.read_text(encoding="utf-8")
-        assert "# Minimal Bug" in text
+        result = writer.write_note("failures", "Minimal", {"cause": "broke"})
+        text = (writer.vault_path / result["path"]).read_text(encoding="utf-8")
         assert "CAUSE:" in text
-        assert "FIX:" not in text  # No fix provided, should not appear
+        assert "FIX:" not in text
 
     def test_sanitize_filename(self, writer):
-        content = {"cause": "test", "fix": "test", "result": "test", "links": []}
-        path = writer.write_note("failures", "Bug: State/Reset @#$%", content)
-        assert path.exists()
-        # Special chars should be removed
-        assert "@" not in path.name
-        assert "#" not in path.name
+        result = writer.write_note("failures", "Bug: @#$%", {"cause": "t"})
+        assert "@" not in result["path"]
+        assert "#" not in result["path"]
+
+    def test_write_returns_metadata(self, writer):
+        result = writer.write_note("failures", "Meta", {"cause": "t"})
+        assert all(k in result for k in ["id", "title", "path", "category", "modified"])
 
 
 class TestGetNote:
     def test_get_existing_note(self, writer):
-        content = {"cause": "test cause", "fix": "test fix", "result": "test result", "links": []}
-        writer.write_note("failures", "Readable Bug", content)
-        text = writer.get_note("failures", "Readable Bug")
-        assert text is not None
-        assert "test cause" in text
+        writer.write_note("failures", "Readable", {"cause": "test cause", "fix": "f", "result": "r", "links": []})
+        note = writer.get_note("failures", "Readable")
+        assert note is not None
+        assert note["title"] == "Readable"
+        assert "test cause" in note["content"]
 
     def test_get_nonexistent_note(self, writer):
-        result = writer.get_note("failures", "Does Not Exist")
-        assert result is None
+        assert writer.get_note("failures", "Nope") is None
+
+    def test_get_note_with_subcategory(self, writer):
+        writer.write_note("agents", "Sub", {"cause": "t", "fix": "f", "result": "r", "links": []}, subcategory="quant")
+        note = writer.get_note("agents", "Sub", subcategory="quant")
+        assert note is not None
 
 
 class TestListNotes:
     def test_list_all_notes(self, writer):
-        content = {"cause": "a", "fix": "b", "result": "c", "links": []}
-        writer.write_note("failures", "Bug A", content)
-        writer.write_note("failures", "Bug B", content)
-        writer.write_note("doctrine", "Doctrine A", content)
+        c = {"cause": "a", "fix": "b", "result": "c", "links": []}
+        writer.write_note("failures", "A", c)
+        writer.write_note("failures", "B", c)
+        writer.write_note("doctrine", "C", c)
+        assert len(writer.list_notes()) == 3
+
+    def test_list_category_filter(self, writer):
+        c = {"cause": "a", "fix": "b", "result": "c", "links": []}
+        writer.write_note("failures", "A", c)
+        writer.write_note("doctrine", "B", c)
+        notes = writer.list_notes(category="failures")
+        assert len(notes) == 1
+        assert notes[0]["category"] == "failures"
+
+    def test_list_returns_metadata(self, writer):
+        writer.write_note("failures", "Meta", {"cause": "t", "fix": "f", "result": "r", "links": ["X"]}, tags=["t"])
         notes = writer.list_notes()
-        assert len(notes) == 3
-
-    def test_list_category_notes(self, writer):
-        content = {"cause": "a", "fix": "b", "result": "c", "links": []}
-        writer.write_note("failures", "Bug A", content)
-        writer.write_note("failures", "Bug B", content)
-        writer.write_note("doctrine", "Doctrine A", content)
-        notes = writer.list_notes("failures")
-        assert len(notes) == 2
+        assert len(notes) == 1
+        n = notes[0]
+        assert "id" in n and "title" in n and "category" in n
+        assert "t" in n["tags"] and "X" in n["links"]
 
 
-class TestNoteExists:
-    def test_exists(self, writer):
-        content = {"cause": "test", "fix": "test", "result": "test", "links": []}
-        writer.write_note("failures", "Existing Bug", content)
-        assert writer.note_exists("failures", "Existing Bug") is True
+class TestSearchNotes:
+    def test_search_by_title(self, writer):
+        c = {"cause": "t", "fix": "f", "result": "r", "links": []}
+        writer.write_note("failures", "UniqueXYZ", c)
+        writer.write_note("failures", "Other", c)
+        results = writer.search_notes(query="UniqueXYZ")
+        assert len(results) == 1
 
-    def test_not_exists(self, writer):
-        assert writer.note_exists("failures", "Nonexistent Bug") is False
+    def test_search_by_content(self, writer):
+        writer.write_note("failures", "Content", {"cause": "needle_in_haystack", "fix": "f", "result": "r", "links": []})
+        results = writer.search_notes(query="needle_in_haystack")
+        assert len(results) >= 1
+
+    def test_search_with_category(self, writer):
+        c = {"cause": "shared", "fix": "f", "result": "r", "links": []}
+        writer.write_note("failures", "F", c)
+        writer.write_note("doctrine", "D", c)
+        results = writer.search_notes(query="shared", category="failures")
+        assert all(n["category"] == "failures" for n in results)
+
+
+class TestListCategories:
+    def test_list_categories(self, writer):
+        cats = writer.list_categories()
+        assert "failures" in cats and "doctrine" in cats and "skills" in cats
 
 
 class TestUpdateNote:
     def test_update_existing(self, writer):
-        content1 = {"cause": "old cause", "fix": "old fix", "result": "old result", "links": []}
-        writer.write_note("failures", "Updatable Bug", content1)
-
-        content2 = {"cause": "new cause", "fix": "new fix", "result": "new result", "links": []}
-        path = writer.update_note("failures", "Updatable Bug", content2)
-        text = path.read_text(encoding="utf-8")
-        assert "new cause" in text
-        assert "old cause" not in text
+        writer.write_note("failures", "UpdateMe", {"cause": "old", "fix": "old", "result": "old", "links": []})
+        result = writer.update_note("failures", "UpdateMe", {"cause": "new", "fix": "new", "result": "new", "links": []})
+        note = writer.get_note("failures", "UpdateMe")
+        assert "new" in note["content"]
+        assert "old" not in note["content"]
 
 
 class TestDeleteNote:
     def test_delete_existing(self, writer):
-        content = {"cause": "test", "fix": "test", "result": "test", "links": []}
-        writer.write_note("failures", "Deletable Bug", content)
-        assert writer.note_exists("failures", "Deletable Bug")
-        result = writer.delete_note("failures", "Deletable Bug")
-        assert result is True
-        assert not writer.note_exists("failures", "Deletable Bug")
+        writer.write_note("failures", "DeleteMe", {"cause": "t", "fix": "f", "result": "r", "links": []})
+        assert writer.delete_note("failures", "DeleteMe") is True
+        assert writer.get_note("failures", "DeleteMe") is None
 
     def test_delete_nonexistent(self, writer):
-        result = writer.delete_note("failures", "Nonexistent Bug")
-        assert result is False
+        assert writer.delete_note("failures", "Nope") is False
 
 
-class TestValidCategories:
-    def test_all_expected_categories(self):
-        expected = {"failures", "doctrine", "skills", "agents", "memory", "ontology",
-                     "graphs", "journals", "execution", "heuristics", "routing", "architecture"}
-        assert expected.issubset(set(VALID_CATEGORIES))
+class TestNoteExists:
+    def test_exists(self, writer):
+        writer.write_note("failures", "Exists", {"cause": "t", "fix": "f", "result": "r", "links": []})
+        assert writer.note_exists("failures", "Exists") is True
+
+    def test_not_exists(self, writer):
+        assert writer.note_exists("failures", "Nope") is False

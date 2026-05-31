@@ -1,6 +1,6 @@
 # MEMORY.md — OWL (OC2) Persistent Memory
 
-> **Last Updated:** 2026-05-30 14:00 EDT
+> **Last Updated:** 2026-05-30 21:00 EDT
 > **Policy:** Trajectory only. Archive old sessions to `logs/memory-archive/`.
 
 ---

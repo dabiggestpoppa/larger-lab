@@ -2,17 +2,24 @@
 Phase 1: Real Scraper Engine for PropFirmMatch + PayoutJunction
 Calibrated against live DOM (2026-05-30 browser scrape).
 
-DOM Structure (PropFirmMatch /futures):
+DOM Structure (PropFirmMatch):
+  - TWO TABS: Forex (CFD-like: indices, metals, energy, stocks, crypto) | Futures
   - Comparison table: <TABLE> with columns FIRM | RANK/REVIEWS | COUNTRY | YEARS | ASSETS | PLATFORMS | MAX ALLOCATIONS | PROMO | ACTIONS
-  - Firm detail pages: /prop-firms/{name} with sections: Overview, Instruments, Leverage, Commissions, Consistency Rules, Firm Rules, Challenges, Payout Policy, Restricted Countries
+  - Nav: Forex | Futures | Crypto buttons (top nav bar, NOT tabs within page)
+  - Forex tab URL: loads table under same page (nav button click, no URL change)
+  - Futures tab URL: https://propfirmmatch.com/futures
+  - Firm detail pages: /{category}/prop-firms/{slug}
   - Promo data in table: e.g. "50%OFF\nMATCH" (discount % + code)
   - Individual firm page tabs: Overview | Challenges (N) | Reviews (N) | Offers (N) | Announcements | Payouts
+  - Assets column (Forex): comma-separated list like "Crypto,Energy,FX,Indices,Metals"
+  - Assets column (Futures): typically empty or shows platform codes
 
 Anti-bot: Cloudflare Turnstile — requires Scrapling StealthyFetcher or CloakBrowser.
 
 Targets:
-  - https://propfirmmatch.com/futures  → firm listings, pricing, promos
-  - https://propfirmmatch.com/futures/prop-firms/{slug}  → detailed rules per firm
+  - https://propfirmmatch.com/futures  → futures firm listings, pricing, promos
+  - https://propfirmmatch.com          → forex/CFD firm listings (after clicking Forex nav button)
+  - https://propfirmmatch.com/futures/prop-firms/{slug}  → futures firm detail pages
   - https://payoutjunction.com/        → payout verification data
 """
 
@@ -39,11 +46,18 @@ class PropFirmMatchScraper:
       Pass 2: Visit each firm's detail page → drawdown rules, consistency, payout, instruments
     """
 
-    BASE_URL = "https://propfirmmatch.com/futures"
+    FUTURES_URL = "https://propfirmmatch.com/futures"
+    FOREX_URL = "https://propfirmmatch.com"  # Forex tab loads on main page
     FIRM_URL_TEMPLATE = "https://propfirmmatch.com/futures/prop-firms/{slug}"
+    FOREX_FIRM_URL_TEMPLATE = "https://propfirmmatch.com/prop-firms/{slug}"
+
+    # Tab categories
+    CATEGORY_FOREX = "forex"
+    CATEGORY_FUTURES = "futures"
 
     # Known firm name → slug mapping (from live DOM data)
     KNOWN_FIRM_SLUGS = {
+        # Futures
         "my funded futures": "my-funded-futures",
         "topstep": "topstep",
         "apex trader funding": "apex-trader-funding",
@@ -59,6 +73,20 @@ class PropFirmMatchScraper:
         "traders launch": "traders-launch",
         "tradeday": "tradeday",
         "futureselite": "futureselite",
+        # Forex/CFD
+        "fundingpips": "fundingpips",
+        "the5ers": "the-5-ers",
+        "goat funded trader": "goat-funded-trader",
+        "brightfunded": "brightfunded",
+        "e8 markets": "e8-markets",
+        "alpha capital": "alpha-capital-group",
+        "crypto fund trader": "crypto-fund-trader",
+        "blue guardian": "blue-guardian",
+        "blueberry funded": "blueberry-funded",
+        "maven": "maven",
+        "besquared trading": "besquared-trading",
+        "trade the pool": "trade-the-pool",
+        "for traders": "for-traders",
     }
 
     def __init__(self, stealth: bool = True):
@@ -150,6 +178,76 @@ class PropFirmMatchScraper:
         slug = re.sub(r'[^a-z0-9\s-]', '', clean)
         slug = re.sub(r'\s+', '-', slug.strip())
         return slug
+
+    # ── DUAL-TAB SCRAPING (FUTURES + FOREX/CFD) ──────────────
+
+    def scrape_both_tabs(self) -> dict:
+        """
+        Scrape both Futures and Forex tabs.
+        Returns {"futures": [...], "forex": [...], "combined": [...]}.
+        """
+        return {
+            "futures": self.scrape(category="futures"),
+            "forex": self.scrape(category="forex"),
+            "combined": self.scrape(category="futures") + self.scrape(category="forex"),
+        }
+
+    def scrape(self, category: str = "futures") -> list[dict]:
+        """
+        Scrape a specific category tab.
+        category: "futures" | "forex"
+        """
+        if category == "forex":
+            url = self.FOREX_URL
+        else:
+            url = self.FUTURES_URL
+
+        if self._scrapling_available:
+            return self._scrape_table_scrapling_url(url, category)
+        return []
+
+    def _scrape_table_scrapling_url(self, url: str, category: str) -> list[dict]:
+        """Scrape comparison table from a specific URL with category tagging."""
+        from scrapling import StealthyFetcher
+        try:
+            page = StealthyFetcher.get(url, stealthy=True)
+            firms = _parse_table_from_page(page)
+            for f in firms:
+                f["_category"] = category
+                f["_scraped_at"] = datetime.utcnow().isoformat()
+            return firms
+        except Exception as e:
+            print(f"[Scrapling] {category} table fetch failed: {e}")
+            return []
+
+    def _scrape_with_scrapling(self) -> list[dict]:
+        """Legacy: scrape only futures (default behavior)."""
+        from scrapling import StealthyFetcher
+        try:
+            page = StealthyFetcher.get(self.FUTURES_URL, stealthy=True)
+            basic_firms = _parse_table_from_page(page)
+        except Exception as e:
+            print(f"[Scrapling] Table fetch failed: {e}")
+            return []
+        detailed = []
+        for firm in basic_firms[:8]:
+            slug = self.KNOWN_FIRM_SLUGS.get(firm["name"].lower(), self._slugify(firm["name"]))
+            detail_url = self.FIRM_URL_TEMPLATE.format(slug=slug)
+            try:
+                time.sleep(1.5)
+                detail_page = StealthyFetcher.get(detail_url, stealthy=True)
+                details = _parse_firm_detail_from_page(detail_page)
+                firm.update(details)
+                detailed.append(firm)
+            except Exception as e:
+                print(f"[Scrapling] Detail fetch failed for {firm['name']}: {e}")
+                detailed.append(firm)
+        self.last_result = detailed
+        return detailed
+
+    def _scrape_table_scrapling(self) -> list[dict]:
+        """Legacy: scrape only futures table."""
+        return self._scrape_table_scrapling_url(self.FUTURES_URL, "futures")
 
     # ── SNAPSHOTS & CHANGE DETECTION ────────────────────────
 

@@ -1,0 +1,471 @@
+deployment_config:
+  generated_at: '2026-05-30T23:20:56.997812'
+  version: 1.0.0
+  crossover_threshold_usd: 2016
+  edge_metrics:
+    win_rate: 0.857
+    max_drawdown_pct: 0.05
+    avg_trades_per_day: 2.5
+    sharpe_ratio: 8.5
+    profit_factor: 8.0
+    instrument: EURUSD.PRO
+  firm_mix:
+  - firm: Apex Trader Funding
+    account_size: 5000
+    pes_score: 0.4411
+    effective_leverage: 10.92
+    capital_velocity: 4.411
+    omega: 24052.7914
+    alpha: 5.8554
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: FundedNext Futures
+    account_size: 25000
+    pes_score: 0.0676
+    effective_leverage: 10.92
+    capital_velocity: 22.0551
+    omega: 51571.3989
+    alpha: 3.7166
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: E8 Futures
+    account_size: 25000
+    pes_score: 0.0458
+    effective_leverage: 10.92
+    capital_velocity: 22.0551
+    omega: 28909.7361
+    alpha: 2.1248
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: Funded Futures Family
+    account_size: 50000
+    pes_score: 0.0455
+    effective_leverage: 10.92
+    capital_velocity: 44.1103
+    omega: 171806.8211
+    alpha: 6.2426
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: My Funded Futures
+    account_size: 25000
+    pes_score: 0.0455
+    effective_leverage: 10.92
+    capital_velocity: 22.0551
+    omega: 28634.4053
+    alpha: 2.1058
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: Top One Futures
+    account_size: 50000
+    pes_score: 0.0394
+    effective_leverage: 10.92
+    capital_velocity: 44.1103
+    omega: 130722.5813
+    alpha: 4.7878
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: Goat Funded Futures
+    account_size: 50000
+    pes_score: 0.032
+    effective_leverage: 10.92
+    capital_velocity: 44.1103
+    omega: 92511.3652
+    alpha: 3.4193
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: Lucid Trading
+    account_size: 50000
+    pes_score: 0.032
+    effective_leverage: 10.92
+    capital_velocity: 44.1103
+    omega: 92511.3652
+    alpha: 3.4193
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: Tradeify
+    account_size: 50000
+    pes_score: 0.03
+    effective_leverage: 10.92
+    capital_velocity: 44.1103
+    omega: 83517.2047
+    alpha: 3.0921
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: Blueberry Funded
+    account_size: 50000
+    pes_score: 0.0292
+    effective_leverage: 10.92
+    capital_velocity: 44.1103
+    omega: 80176.5165
+    alpha: 2.9706
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: For Traders
+    account_size: 50000
+    pes_score: 0.0292
+    effective_leverage: 10.92
+    capital_velocity: 44.1103
+    omega: 80176.5165
+    alpha: 2.9706
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: FuturesElite
+    account_size: 50000
+    pes_score: 0.0292
+    effective_leverage: 10.92
+    capital_velocity: 44.1103
+    omega: 80176.5165
+    alpha: 2.9706
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: E8 Markets
+    account_size: 50000
+    pes_score: 0.0279
+    effective_leverage: 10.92
+    capital_velocity: 44.1103
+    omega: 75165.4842
+    alpha: 2.7887
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: TradeDay
+    account_size: 50000
+    pes_score: 0.0278
+    effective_leverage: 10.92
+    capital_velocity: 44.1103
+    omega: 74698.6179
+    alpha: 2.7703
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: Blue Guardian
+    account_size: 50000
+    pes_score: 0.0262
+    effective_leverage: 10.92
+    capital_velocity: 44.1103
+    omega: 68722.7285
+    alpha: 2.5533
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: Take Profit Trader
+    account_size: 50000
+    pes_score: 0.0262
+    effective_leverage: 10.92
+    capital_velocity: 44.1103
+    omega: 68722.7285
+    alpha: 2.5533
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: BrightFunded
+    account_size: 25000
+    pes_score: 0.0259
+    effective_leverage: 10.92
+    capital_velocity: 22.0551
+    omega: 14148.765
+    alpha: 1.0538
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: Alpha Futures
+    account_size: 50000
+    pes_score: 0.0257
+    effective_leverage: 10.92
+    capital_velocity: 44.1103
+    omega: 66813.7638
+    alpha: 2.4828
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: Goat Funded Trader
+    account_size: 50000
+    pes_score: 0.0257
+    effective_leverage: 10.92
+    capital_velocity: 44.1103
+    omega: 66813.7638
+    alpha: 2.4828
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: FundingPips
+    account_size: 25000
+    pes_score: 0.0235
+    effective_leverage: 10.92
+    capital_velocity: 22.0551
+    omega: 12611.6298
+    alpha: 0.9406
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: Topstep
+    account_size: 25000
+    pes_score: 0.0226
+    effective_leverage: 10.92
+    capital_velocity: 22.0551
+    omega: 12026.4502
+    alpha: 0.8977
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: Traders Launch
+    account_size: 50000
+    pes_score: 0.0209
+    effective_leverage: 10.92
+    capital_velocity: 44.1103
+    omega: 50531.418
+    alpha: 1.8849
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: Maven
+    account_size: 50000
+    pes_score: 0.0189
+    effective_leverage: 10.92
+    capital_velocity: 44.1103
+    omega: 44542.5092
+    alpha: 1.6634
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: Alpha Capital
+    account_size: 50000
+    pes_score: 0.0184
+    effective_leverage: 10.92
+    capital_velocity: 44.1103
+    omega: 42951.7053
+    alpha: 1.6048
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: FundedNext
+    account_size: 50000
+    pes_score: 0.0174
+    effective_leverage: 10.92
+    capital_velocity: 44.1103
+    omega: 40088.2583
+    alpha: 1.4986
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: Trade The Pool
+    account_size: 50000
+    pes_score: 0.015
+    effective_leverage: 10.92
+    capital_velocity: 44.1103
+    omega: 33406.8819
+    alpha: 1.2507
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: TickFundedTrader
+    account_size: 25000
+    pes_score: 0.0145
+    effective_leverage: 18.2
+    capital_velocity: 22.0551
+    omega: 25308.1865
+    alpha: 1.4994
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - Promo 'TICK25' applied (-25.0%)
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: ARBITRAGE'
+    - OVER crossover threshold
+  - firm: Crypto Fund Trader
+    account_size: 50000
+    pes_score: 0.0124
+    effective_leverage: 10.92
+    capital_velocity: 44.1103
+    omega: 26725.5055
+    alpha: 1.002
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: The5ers
+    account_size: 40000
+    pes_score: 0.0117
+    effective_leverage: 10.92
+    capital_velocity: 35.2882
+    omega: 15549.3674
+    alpha: 0.7292
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  - firm: FTMO_EquityTrust
+    account_size: 50000
+    pes_score: 0.0049
+    effective_leverage: 10.92
+    capital_velocity: 44.1103
+    omega: 9621.182
+    alpha: 0.3621
+    survival_probability: 0.7284
+    crossover_threshold_usd: 2016
+    notes:
+    - "Promo NCO only \u2014 F&F access not confirmed"
+    - "High consistency drag (21.9%) \u2014 caps compounding"
+    - Scaling friction elevated (0.0066)
+    - 'FF: UNTESTED'
+    - OVER crossover threshold
+  risk_parameters:
+    risk_per_trade: 0.0916
+    consistency_buffer: 0.781
+    max_correlated_exposure: 3
+    firm_diversification_min: 3
+    diminishing_return_threshold: 2016
+    max_drawdown_pct: 0.05
+    instrument: EURUSD.PRO
+  metadata:
+    generated_by: oc2-scope
+    notes: ''

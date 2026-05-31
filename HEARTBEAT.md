@@ -3,66 +3,52 @@
 > **Policy:** Latest status + active delegations only. Archive history to logs/heartbeat-history/>.
 Max 4000 chars.
 
-## Current Status (2026-05-30 14:30 EDT)
-- **Workspace:** owl-environment (isolated, OFF LIMITS: larger-lab belongs to CC)
-- **MAD last interaction:** msg #5320 — Continue directive: spawn workers, calibrate scraper, build dashboard
-- **Scraper DOM calibration complete** — Live PropFirmMatch table structure captured (15 firms, 9-column layout)
-- **Phase 1 complete** — ontology_mapper, scraper_engine (calibrated), ff_matrix all built and tested
-- **5 sub-agents spawned (14:30 EDT):** care_engine, migration_engine, config_engine, squad_lead, dashboard_skeleton
+## Current Status (2026-05-30 23:45 EDT)
+- **MAD last interaction:** msg #5364 — confirmed Forex tab = CFD, dual-tab scrape done
+- **PHASES 1-5 COMPLETE** | Phase 6 desktop app pending MAD signal for PM/CC handoff
+
+## Phase 5 FULL BUILD — COMPLETE
+- API server: `sniper-dashboard/api_server.py` (FastAPI, port 8090, 8 endpoints, live data)
+- **32 firms in DB** (15 Futures + 15 Forex/CFD + 2 legacy), PES snapshots stored for all
+- Dashboard `api.ts` connected to real API (no more mock data), build passes
+- Top 5: Apex Trader Funding $5K (0.44), FundedNext Futures $25K (0.068), E8 Futures $25K (0.046), Funded Futures Family $50K (0.046), My Funded Futures $25K (0.046)
+- Dashboard build: `npm run build` passes clean (4/4 static pages)
+- Dual-tab scraper: `scrape(category="futures")` + `scrape(category="forex")` + `scrape_both_tabs()`
+
+## Scraper Engine — UPDATED
+- `scraper_engine.py` now supports both Futures and Forex (CFD) tabs
+- 28 firm slugs in `KNOWN_FIRM_SLUGS`
+- Fresh snapshot: `sniper/snapshots/propfirmmatch_20260530_232056.json`
+- Real pricing scraped from /challenge pages (activation + challenge fee)
+- PES calculator now uses TRUE cost via `_dict_to_firm_profile` (reads true_cost_per_size first)
+- DB updated: true_cost_per_size, activation_fees, billing_types columns added
+- Results: Lucid Trading 100K (PES 13.52) → #1, not Apex
+- Files: true_pes.py, real_pricing.py, update_true_costs.py
+
+## Phase 6 — Desktop App Handoff Package
+- Meditation file: `meditation-room/desktop-app-meditation.md` (823 lines, Tauri)
+- All P1-5 source code ready for PM/CC dev team
+- Awaiting MAD signal to pass off
 
 ## DEPLOYED — CEREBUS FX v4.0
-
-### Symmetry Trap (Engine B) — LIVE
-- Executor: `quant-lab/mt5/symmetry_trap_executor.py`
-- Symbol: EURUSD.PRO | Magic: 20260531 | Lot: 0.03
-- 4Y BT: 892 trades, 85.7% WR, PF 8.18, IACER 96/100
-- Cron start: 2:00 AM EST daily
-
-### P90 CASCADE (Engine A) — LIVE
-- Executor: `quant-lab/mt5/p90_cascade_executor.py`
-- Symbol: USDCHF.PRO | Magic: 20260532 | Lot: 0.01
-- 3.5Y BT: 1,035 total trades, CASCADE 83.1% WR
-- INITIAL variant FILTERED in executor
-- Cron start: 9:00 AM EST daily
+- **Symmetry Trap (B):** EURUSD.PRO | Magic 20260531 | Lot 0.03 | 2:00 AM EST
+- **P90 CASCADE (A):** USDCHF.PRO | Magic 20260532 | Lot 0.01 | 9:00 AM EST
 
 ## DEPLOYED — Prop Firm Sniper Engine v1.0
+- **13 Python modules** in `quant-lab/sniper/` (all compile OK, ~350KB)
+- Dashboard: `sniper-dashboard/` (Next.js 14, 6 components, build OK)
 
-### 7 Modules (ALL compile OK, end-to-end verified)
-| Module | File | Purpose |
-|--------|------|---------|
-| PES Calculator | `quant-lab/sniper/pes_calculator.py` | Ω, α, Vc, EL, crossover, survival |
-| Database | `quant-lab/sniper/database.py` | SQLite — 3 tables: prop_firms, deployments, pes_snapshots |
-| F&F Protocol | `quant-lab/sniper/ff_protocol.py` | Promo verification, patch signals, cost basis |
-| Config Generator | `quant-lab/sniper/config_generator.py` | YAML/JSON config output |
-| Scope | `quant-lab/sniper/scope.py` | SCAN→VERIFY→CALCULATE→RANK→OUTPUT |
-| Firm Scanner | `quant-lab/sniper/firm_scanner.py` | PropFirmMatch scrape + change detection |
-| Init | `quant-lab/sniper/__init__.py` | Package init, public API |
-
-### $100K Deployment Test Results
-- **BEST: My Funded Futures $100K** — PES 0.0430, Omega 139,755, EL 19.5x, Cost $225, 7-day payout cycle
-- Runner-up: Topstep $100K [F&F] — PES 0.0318, Cost $220, 10-day cycle
-- Crossover threshold: ~$4,629 (far below $100K — prop advantage confirmed)
-
-### Active Cron Jobs
-| Job | Time (EST) | ID | Status |
-|-----|------------|-----|--------|
-| ST Executor Start | 2:00 AM | 367d723e | ✅ Running |
-| P90 CASCADE Executor | 9:00 AM | 2669a448 | ✅ Running |
-| Overnight Report | 5:00 AM | 89279994 | ✅ Delivered |
-| Mid-Day Monitor | 8/10/12PM | ebc75d0c | ⚠️ 1 error (timeout, not yetAlerting) |
-| End-of-Day Report | 5:00 PM | cb63255b | Not yet |
-| STRUCT (Hygiene) | 6:00 AM daily | 921d31d0 | ✅ Fleet |
-| PULSE (Fleet Health) | 6:15 AM daily | 10a579a2 | ✅ Fleet |
-| ECHO (Trail Maintenance) | 6:30 AM daily | 2b40b8da | ✅ Fleet |
-| DRIFT (Architecture) | 6:45 AM Sun/Wed/Sat | 2cb0fe0e | ✅ Fleet |
-
-### Disabled Cron Jobs
-- Self-Heal Daily Review (old monolithic) — disabled, replaced by fleet
-- DMR Forward Test Monitor / Mid-Day Check / Daily Report — disabled
-- Workspace Monitor — disabled (16-strike timeout history)
+## Active Cron Jobs
+| Job | Time (EST) | Status |
+|-----|------------|--------|
+| ST Executor | 2:00 AM | OK |
+| P90 CASCADE | 9:00 AM | OK |
+| Overnight Report | 5:00 AM | OK |
+| Mid-Day Monitor | 8/10/12PM | 1 error (watching) |
+| STRUCT/PULSE/ECHO | 6-6:30 AM | Fleet OK |
+| DRIFT | Sun/Wed/Sat 6:45AM | OK |
 
 ## Notes
-- Weekend: both executors expected down (markets closed)
-- Mid-Day Monitor errored once (consecutiveErrors=1, threshold=2) — watching
-
-*Updated: 2026-05-30 12:45 EDT — Sniper engine complete, HEARTBEAT synced to latest state*
+- Scrapling not installed — live PropFirmMatch uses snapshot data
+- Dashboard shows real firm data + PES scores
+- Next: MAD signals Phase 6 handoff to PM/CC dev team
