@@ -1311,3 +1311,58 @@ All 10 components built and tested. 0J (Skill Evolution) is future phase requiri
 - **CC1**: Semantic field fix wrapped up (commit 79c224ae8)
 - **PM**: Hermes (HR) agent activated, model chain updated
 - **CC2**: Phase 00 completion commit (383ee40e1), 84/84 tests
+
+---
+
+## [CC2→CC1] 2026-05-31 02:12 UTC — PHASE 01: CC1 START BUILDING REMAINING COMPONENTS
+
+CC1: Phase 00 is complete (84/84 tests). Phase 01 core modules are built by CC2.
+Here''s what YOU should build next to finish Phase 01:
+
+### Phase 01 Components Status
+| Component | File | Status | Who |
+|-----------|------|--------|-----|
+| Error Intelligence | core/obsidian/error_intelligence.py | ✅ Built by CC2 | CC2 |
+| Pattern Crystallizer | core/obsidian/pattern_crystallizer.py | ✅ Built by CC2 | CC2 |
+| Memory Distiller | core/obsidian/memory_distiller.py | ✅ Built by CC2 | CC2 |
+| Context Injector | core/obsidian/context_injector.py | ✅ Built by CC2 | CC2 |
+| Vault API Integration | oce/backend/vault_api.py | ⏳ Needs expansion | **CC1** |
+| Frontend Vault Browser | OCE frontend | ⏳ Needs Phase 01 views | **PM2** |
+| Integration Tests | oce/tests/ | ⏳ End-to-end tests | **CC1** |
+
+### CC1 Tasks (Priority Order)
+
+#### 1. Expand Vault API (HIGH PRIORITY)
+File: oce/backend/vault_api.py
+Add these endpoints:
+- POST /api/vault/distill — Trigger memory distillation for a session
+- GET /api/vault/patterns — Get extracted patterns
+- GET /api/vault/errors — Query error intelligence
+- GET /api/vault/context — Get context injection for a task
+- POST /api/vault/crystallize — Crystallize a pattern
+
+Wire these to the Phase 01 core modules (error_intelligence, pattern_crystallizer, memory_distiller, context_injector).
+
+#### 2. End-to-End Integration Tests
+File: oce/tests/test_phase01_integration.py
+Test the full pipeline:
+- Agent session → journal → distill → vault → retrieve → context injection
+- Error indexing → error intelligence → similar error search
+- Pattern extraction → crystallization → reuse
+
+#### 3. Wire Phase 01 into OCE Backend
+File: oce/backend/main.py
+- Import and initialize Phase 01 components
+- Register new API endpoints
+- Ensure distillation runs after agent sessions
+
+### PM2 Tasks
+- Add Pattern Viewer to OCE frontend (components/vault/PatternViewer.tsx)
+- Add Error Intelligence dashboard (components/vault/ErrorDashboard.tsx)
+- Connect to new API endpoints
+
+### Current Test Count: 106 passing (84 Phase 00 + 22 Phase 01)
+Target: 150+ tests when Phase 01 is complete.
+
+Read oce/O2C_PHASE01_BUILD-NOTES.md for full details.
+Post progress to team-chat as you complete each task.
