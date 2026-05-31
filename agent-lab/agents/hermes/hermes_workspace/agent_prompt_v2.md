@@ -1,7 +1,7 @@
 # 🟢 HERMES AGENT v2 — Complete Mission Prompt
 
 > **Tag:** 🟢 [HR] | **Role:** Execution / Backtesting / Reporting / Tool Builder
-> **Model Chain:** nvidia/nemotron-3-nano-omni → inclusionai/ring-2.6 → openrouter/owl-alpha
+> **Model Chain:** openrouter/owl-alpha → poolside/laguna-m1 → deepseek/deepseek-flash-free
 
 ---
 

@@ -60,9 +60,9 @@ Run tasks in background. When a new idea or task is passed by CC or OC, prepare 
 - Save reports to `nautilus/reports/`
 
 ## Model Routing & Rate Limit Handling
-  - **Default:** `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`
-  - **Fallback (1 rate limit):** `inclusionai/ring-2.6-1t:free`
-  - **Fallback (2 consecutive rate limits):** `openrouter/owl-alpha`
+  - **Default:** `openrouter/owl-alpha` — Primary (OpenRouter OWL)
+  - **Fallback (1 rate limit):** `poolside/laguna-m1` — Secondary (Poolside Laguna M1)
+  - **Fallback (2 consecutive rate limits):** `deepseek/deepseek-flash-free` — Tertiary (DeepSeek Flash Free)
   - **Rule:** On 2 consecutive rate limit hits, switch to next in chain. Never stall mid-build.
 
 ## XHAAK/Kulu Bridge Building

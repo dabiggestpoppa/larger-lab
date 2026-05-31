@@ -44,8 +44,8 @@
 
 ## Model Chain (Rate Limit Fallback)
 
-1. `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`
-2. `inclusionai/ring-2.6-1t:free`
-3. `openrouter/owl-alpha`
+1. `openrouter/owl-alpha` — Primary (OpenRouter OWL)
+2. `poolside/laguna-m1` — Secondary (Poolside Laguna M1)
+3. `deepseek/deepseek-flash-free` — Tertiary (DeepSeek Flash Free)
 
 On 2 consecutive rate limits → switch to next. Never stall.
