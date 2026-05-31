@@ -344,12 +344,44 @@ _Updated: 2026-05-30 12:49 EDT â€” Sniper v1.0 build complete, $100K test delive
 
 ## ?? CRITICAL MEMORY ORGANIZATION RULES (MAD 2026-05-30)
 
-1. **DMR standalone is DEPRECATED** — DO NOT waste time on DMR backtests or executor scripts. DMR is integrated into the P90 Kinetic Engine. The old DMR executor scripts still exist in the workspace but we trade P90 now.
-2. **Hermes does NOT touch quant-lab engines or lab code** — Hermes is NautilusTrader backtesting + strategy execution only. MT5 is banned for Hermes.
-3. **Nautilus backtester must produce results matching CSV engines** — cross-validation requirement. If Nautilus results diverge from CSV engine results, something is wrong with the Nautilus setup, not the strategy code.
+1. **DMR standalone is DEPRECATED** ï¿½ DO NOT waste time on DMR backtests or executor scripts. DMR is integrated into the P90 Kinetic Engine. The old DMR executor scripts still exist in the workspace but we trade P90 now.
+2. **Hermes does NOT touch quant-lab engines or lab code** ï¿½ Hermes is NautilusTrader backtesting + strategy execution only. MT5 is banned for Hermes.
+3. **Nautilus backtester must produce results matching CSV engines** ï¿½ cross-validation requirement. If Nautilus results diverge from CSV engine results, something is wrong with the Nautilus setup, not the strategy code.
 4. **CEREBUS has TWO engines ONLY**: P90 Kinetic Engine (A) + Symmetry Trap Structural Engine (B). ALL named setups are parameter variants of A or B.
-5. **Strategy code = strategy backtest** — engines in quant-lab/engines/ contain the TRUTH. Backtest runners just feed data through engines. When debugging, start from engines.
-6. **Do NOT re-read deprecated DMR content** — if I see DMR in old memory/archive, skip it. Focus on P90 + Symmetry Trap.
+5. **Strategy code = strategy backtest** ï¿½ engines in quant-lab/engines/ contain the TRUTH. Backtest runners just feed data through engines. When debugging, start from engines.
+6. **Do NOT re-read deprecated DMR content** ï¿½ if I see DMR in old memory/archive, skip it. Focus on P90 + Symmetry Trap.
 7. **Workspace organization**: quant-lab/engines = truth source, quant-lab/strategies = Nautilus wrappers, quant-lab/backtest = runners, quant-lab/reports = results
 
-_Last updated: 2026-05-30 22:20 EDT — MAD memory org update_
+### Multi-Asset ST Backtest ï¿½ SPAWNED (23:40 EDT)
+- MAD directive: Backtest Symmetry Trap on all 17 assets using config injection
+- Worker: st_multi_asset_backtest (subagent, 60min timeout)
+- Assets: 17 total (6 majors, 5 crosses, 2 metals, 2 crypto, 5 indices)
+- Data: MT5 fetch for assets without CSV (only EURUSD + USDCHF have data)
+- Output: quant-lab/reports/st_multi_asset_results.json + st_multi_asset_report.md
+- Status: RUNNING
+
+### CEREBUS Dashboard Design ï¿½ SPAWNED (23:40 EDT)
+- MAD directive: Design (not build) a real-time trading dashboard
+- Worker: cerebus_dashboard_design (subagent, 30min timeout)
+- Output: docs/CEREBUS_DASHBOARD_DESIGN.md
+- Priority: LOW (dashboard is side-step, strategy testing is priority)
+- Scope: Real-time P&L, active trades, WR/Sharpe/PF, drawdown, backtest comparison, account info
+- Status: RUNNING
+
+_Last updated: 2026-05-30 23:40 EDT - multi-asset backtest + dashboard design spawned_
+
+### Multi-Asset ST Backtest RESULTS (23:53 EDT)
+- 19/20 assets backtested (NAS100 skipped — not in MT5)
+- **TOTAL: 14,563 trades | 82.8% avg WR | +294,067 pips**
+- Top: ETHUSD 96.9% | HK50 94.0% | NZDUSD 93.3% | BTCUSD 92.6% | US500 91.7%
+- All 18 (non-XAG) assets: 82-97% WR — consistent across all asset classes
+- XAGUSD: FLAGGED — 2 trades, 50% WR (config issue for silver)
+- Aggregate Tier: T1 85.2% | T2 89.9% | T3 91.7%
+- Output: quant-lab/reports/st_multi_asset_results.json + st_multi_asset_report.md
+
+### Dashboard Design — TIMED OUT
+- Worker cerebus_dashboard_design timed out (10min, still exploring codebase)
+- No output produced. Needs re-spawn with tighter scope.
+- Priority: LOW (MAD confirmed dashboard is side-step)
+
+- Trade count analysis (MAD 00:01 EDT): Count variance is by design. Trigger thresholds differ by asset (US500 T1=23pts vs EURUSD=12pips). Higher threshold = fewer qualifying sessions. 12PM cutoff + 4h loop timeout are per ontology. No bug found.
