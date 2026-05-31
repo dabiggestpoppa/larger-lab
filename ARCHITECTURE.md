@@ -2,8 +2,8 @@
 
 > **Purpose:** Step-by-step guide to the entire Larger-Lab system. What each part does, how they connect, and why.
 > **Audience:** Any agent or developer who needs to understand, modify, or extend the system.
-> **Last Updated:** 2026-05-27
-> **Status:** V3 All 10 Phases Complete | Observer Core O-1 through O-7 COMPLETE
+> **Last Updated:** 2026-05-31
+> **Status:** V3 All 10 Phases Complete | Observer Core O-1 through O-7 COMPLETE | Phase 00 Cognitive Filesystem COMPLETE
 
 ---
 
@@ -776,4 +776,117 @@ python -m pytest oce/backend/ --cov=oce.backend --cov-report=html
 
 ---
 
-*This document is maintained by CC. Last updated: 2026-05-18.*
+---
+
+## 11. Phase 00: O2C + OCE Cognitive Filesystem
+
+> **Status:** ✅ COMPLETE (10/10 components) | **Tests:** 84/84 passing | **Completed:** 2026-05-31
+
+### Purpose
+
+Phase 00 transforms O2C from conversation orchestration into **persistent operational intelligence**. The filesystem is the only persistent substrate — models reset, models forget, models hallucinate. Every agent execution must leave behind distilled operational knowledge in markdown.
+
+**Core shift:**
+```
+OLD: User asks → System responds → Dies
+NEW: Agents execute → Trace → Distill → Store → Retrieve → Improve
+```
+
+### Components
+
+#### Vault Writer (`core/obsidian/vault_writer.py`)
+- Writes structured markdown to `O2C-VAULT/` directory
+- Categories: agents, memory, ontology, graphs, journals, doctrine, failures, execution, skills, heuristics, routing, architecture
+- Returns structured dict with `{id, title, path, category, tags, modified}`
+- 17/17 tests passing
+
+#### Compressor (`core/obsidian/compressor.py`)
+- Converts runtime noise → operational abstractions
+- Extracts CAUSE/FIX/RESULT/LINKS from raw traces
+- Filters noise (tracebacks, file lines, empty lines)
+- Deduplicates signals
+- 12/12 tests passing
+
+#### Linker (`core/obsidian/linker.py`)
+- Auto-detects `[[WikiLink]]` references between notes
+- Builds knowledge graph (nodes + edges)
+- Generates Mermaid diagram from graph
+- Tag-based related note discovery
+- 12/12 tests passing
+
+#### Execution Journal (`core/execution/journal.py`)
+- Tracks agent actions, failures, corrections, retries
+- Compresses raw traces → operational markdown summaries
+- Saves to vault via Vault Writer
+- 8/8 tests passing
+
+#### Skill System (`skills/` directory)
+- Portable operational capabilities as markdown
+- Structure: `skills/<category>/<skill_name>/SKILL.md`
+- Optional: heuristics.md, failures.md, patterns.md, examples.md
+- First skill: `skills/observer/chat_response/` (fixes static response bug)
+
+#### Skill Loader (`core/skills/loader.py`)
+- Scans skills directory, loads all valid skills
+- `get_skill(category, name)` — lookup by category + name
+- `classify_task(task)` — keyword-based task classification
+- `load_for_task(task)` — auto-classify + inject relevant skills
+- 8/8 tests passing
+
+#### Doctrine Taxonomy (`core/obsidian/taxonomy.py`)
+- Enforces vault structure — prevents entropy landfill
+- Validates all notes are in correct categories
+- Auto-fixes structural issues
+
+#### Note Standard (`core/obsidian/note_standard.py`)
+- Validates notes against CAUSE/FIX/RESULT/LINKS format
+- Scores notes 0.0–1.0 on compliance
+- 19/19 tests passing
+
+#### Live Sync (`core/obsidian/live_sync.py`)
+- Syncs O2C-VAULT markdown files to Obsidian vault folder
+- Auto-detects Obsidian vault path
+- Tracks file hashes to detect changes
+- `POST /api/vault/sync` triggers sync
+
+#### Vault API (`oce/backend/vault_api.py`)
+- REST endpoints for all vault operations
+- `GET/POST /api/vault/notes` — list/create notes
+- `GET/PUT/DELETE /api/vault/notes/{cat}/{title}` — CRUD
+- `GET /api/vault/graph` — knowledge graph
+- `GET /api/vault/stats` — vault statistics
+- `POST /api/vault/compress` — compress trace → note
+- `GET /api/vault/search` — search notes
+- `POST /api/vault/validate` — validate note
+- `POST /api/vault/sync` — trigger Obsidian sync
+
+### Frontend (PM2)
+- `VaultViewer.tsx` — note list, filter, category, preview pane
+- `GraphViz.tsx` — canvas force-directed graph, zoom, node select
+- `vaultStore.ts` — Zustand store with fetchNotes/fetchGraph actions
+- `/vault` page — tabbed notes/graph view
+
+### Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Phase 00: Cognitive Filesystem             │
+├─────────────────────────────────────────────────────────────┤
+│                                                               │
+│  Agents → Trace → Compressor → Vault Writer → O2C-VAULT     │
+│                                      ↓                        │
+│                              Linker → Knowledge Graph         │
+│                                      ↓                        │
+│                              Live Sync → Obsidian             │
+│                                                               │
+│  Skills → Skill Loader → classify_task → Context Injection   │
+│                                                               │
+│  Vault API ←→ Frontend (VaultViewer + GraphViz)              │
+│                                                               │
+│  Taxonomy (enforce) + Note Standard (validate)                │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+*This document is maintained by CC. Last updated: 2026-05-31.*
