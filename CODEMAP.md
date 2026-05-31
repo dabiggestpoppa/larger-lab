@@ -1,7 +1,7 @@
 # 🗺️ CODEMAP — Unified System Architecture
 
 > **Purpose:** Complete workspace orientation with all Mermaid diagrams in one place.
-> **Updated:** 2026-05-29 | V3 All 10 Phases Complete | Observer Core O-1 through O-7 COMPLETE | 1603+ tests passing
+> **Updated:** 2026-05-31 | V3 All 10 Phases Complete | Observer Core O-1 through O-7 COMPLETE | Phase 00 Cognitive Filesystem COMPLETE | 119+ tests passing
 > **For:** Quick reference, architecture alignment, pipeline verification.
 
 ---
@@ -328,7 +328,95 @@ graph TB
 
 ---
 
-## 🤖 Agent Workflow
+## � Phase 00: O2C + OCE Cognitive Filesystem
+
+> **Status:** ✅ COMPLETE (10/10 components) | **Tests:** 84/84 passing | **Commit:** 383ee40e1
+
+```mermaid
+graph TB
+    subgraph "Cognitive Filesystem Layer"
+        VW[Vault Writer<br/>core/obsidian/vault_writer.py]
+        COMP[Compressor<br/>core/obsidian/compressor.py]
+        LNK[Linker<br/>core/obsidian/laxyer.py]
+        TAX[Taxonomy<br/>core/obsidian/taxonomy.py]
+        NS[Note Standard<br/>core/obsidian/note_standard.py]
+    end
+
+    subgraph "Execution + Skills"
+        JOURNAL[Execution Journal<br/>core/execution/journal.py]
+        SKILL_SYS[Skill System<br/>skills/ directory]
+        SKILL_LD[Skill Loader<br/>core/skills/loader.py]
+        LIVE_SYNC[Live Sync<br/>core/obsidian/live_sync.py]
+    end
+
+    subgraph "Vault API"
+        VAPI[Vault API<br/>oce/backend/vault_api.py]
+        VNOTES[/api/vault/notes]
+        VGRAPH[/api/vault/graph]
+        VSTATS[/api/vault/stats]
+        VSYNC[/api/vault/sync]
+        VSEARCH[/api/vault/search]
+        VVALID[/api/vault/validate]
+    end
+
+    subgraph "Frontend"
+        VV[VaultViewer.tsx]
+        GV[GraphViz.tsx]
+        VS[vaultStore.ts]
+    end
+
+    subgraph "Storage"
+        VAULT[O2C-VAULT/<br/>Markdown Files]
+        OBSIDIAN[Obsidian Vault<br/>Live Sync]
+    end
+
+    VW --> VAULT
+    COMP --> VAULT
+    LNK --> VAULT
+    TAX --> VAULT
+    NS --> VAULT
+    JOURNAL --> VAULT
+    SKILL_SYS --> SKILL_LD
+    SKILL_LD --> VAULT
+    LIVE_SYNC --> OBSIDIAN
+
+    VAPI --> VW
+    VAPI --> LNK
+    VAPI --> COMP
+    VAPI --> NS
+    VAPI --> LIVE_SYNC
+
+    VNOTES --> VAPI
+    VGRAPH --> VAPI
+    VSTATS --> VAPI
+    VSYNC --> VAPI
+    VSEARCH --> VAPI
+    VVALID --> VAPI
+
+    VV --> VS
+    GV --> VS
+    VS --> VNOTES
+    VS --> VGRAPH
+```
+
+### Phase 00 Component Map
+
+| # | Component | File | Status | Tests |
+|---|-----------|------|--------|-------|
+| 0A | Vault Writer | `core/obsidian/vault_writer.py` | ✅ | 17/17 |
+| 0B | Compressor | `core/obsidian/compressor.py` | ✅ | 12/12 |
+| 0C | Linker | `core/obsidian/linker.py` | ✅ | 12/12 |
+| 0D | Skill System | `skills/` directory | ✅ | — |
+| 0E | Skill Loader | `core/skills/loader.py` | ✅ | 8/8 |
+| 0F | Execution Journal | `core/execution/journal.py` | ✅ | 8/8 |
+| 0G | Live Sync | `core/obsidian/live_sync.py` | ✅ | — |
+| 0H | Doctrine Taxonomy | `core/obsidian/taxonomy.py` | ✅ | — |
+| 0I | Note Standard | `core/obsidian/note_standard.py` | ✅ | 19/19 |
+| 0J | Skill Evolution | Future phase | ⏳ | — |
+
+---
+
+## �🤖 Agent Workflow
 
 ```mermaid
 sequenceDiagram

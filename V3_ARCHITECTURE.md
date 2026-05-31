@@ -1,6 +1,6 @@
 # V3 Cognitive Field System — Architecture Documentation
 
-> **Last Updated:** 2026-05-27 | **V3 Phases:** 10 Complete | **Observer Core:** O-1 through O-4 Complete
+> **Last Updated:** 2026-05-31 | **V3 Phases:** 10 Complete | **Observer Core:** O-1 through O-7 COMPLETE | **Phase 00:** Cognitive Filesystem Foundation COMPLETE
 
 ## Executive Summary
 
@@ -190,9 +190,9 @@ graph LR
     O1[O-1<br/>Primary Observer<br/>9/9 backend] --> O2[O-2<br/>Observer Consensus<br/>10/10 backend]
     O2 --> O3[O-3<br/>Spawn Engine<br/>10/10 backend]
     O3 --> O4[O-4<br/>Field Learning<br/>11/11 backend]
-    O4 --> O5[O-5<br/>OCE Unified<br/>Planned]
-    O5 --> O6[O-6<br/>Local Substrate<br/>Planned]
-    O6 --> O7[O-7<br/>Persistent Field<br/>Planned]
+    O4 --> O5[O-5<br/>OCE Unified<br/>✅ 12/12]
+    O5 --> O6[O-6<br/>Local Substrate<br/>✅ 11/11]
+    O6 --> O7[O-7<br/>Persistent Field<br/>✅ 12/12]
 
     style O1 fill:#3498db,color:#fff
     style O2 fill:#2ecc71,color:#fff
@@ -384,3 +384,96 @@ GET /api/stability/continuity
 - **Quality Lead:** AS (Assistant Manager)
 
 See `AGENTS.md` for team coordination protocol.
+
+---
+
+## 9. Phase 00: O2C + OCE Cognitive Filesystem
+
+> **Status:** ✅ COMPLETE | **Completed:** 2026-05-31 | **Tests:** 84/84 passing
+
+Phase 00 is the **cognitive filesystem foundation** — the layer that makes every agent execution leave behind distilled operational knowledge. It sits alongside V3 and Observer Core as the third pillar of the architecture.
+
+### 9.1 Core Principle
+**Filesystem cognition > model intelligence.** Models reset. Models forget. Models hallucinate. The filesystem is the only persistent substrate.
+
+### 9.2 Component Map
+
+```mermaid
+graph TB
+    subgraph "Write Path"\        AGENTS[Agent Execution] --> TRACE[Raw Trace]
+        TRACE --> COMP[Compressor
+noise → signal]
+        COMP --> VW[Vault Writer
+O2C-VAULT/]
+    end
+
+    subgraph "Read Path"\        VW --> LNK[Linker
+WikiLink Graph]
+        LNK --> SKILL[Skill Loader
+classify + inject]
+        SKILL --> AGENTS
+    end
+
+    subgraph "Validation"\        TAX[Taxonomy
+structure enforce]
+        NS[Note Standard
+CAUSE/FIX/RESULT/LINKS]
+        VW --> TAX
+        VW --> NS
+    end
+
+    subgraph "Sync"\        VW --> LS[Live Sync
+O2C-VAULT → Obsidian]
+    end
+
+    subgraph "API"\        VAPI[Vault API
+/api/vault/*]
+        VV[VaultViewer.tsx]
+        GV[GraphViz.tsx]
+        VAPI --> VW
+        VAPI --> LNK
+        VV --> VAPI
+        GV --> VAPI
+    end
+```
+
+### 9.3 Components
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| Vault Writer | `core/obsidian/vault_writer.py` | Write structured markdown to vault |
+| Compressor | `core/obsidian/compressor.py` | Convert runtime noise → operational abstractions |
+| Linker | `core/obsidian/linker.py` | Auto-link doctrine, build knowledge graph |
+| Execution Journal | `core/execution/journal.py` | Track actions, failures, corrections |
+| Skill System | `skills/` directory | Portable operational capabilities |
+| Skill Loader | `core/skills/loader.py` | Inject relevant doctrine at spawn time |
+| Live Sync | `core/obsidian/live_sync.py` | Obsidian vault folder sync |
+| Doctrine Taxonomy | `core/obsidian/taxonomy.py` | Enforce vault structure |
+| Note Standard | `core/obsidian/note_standard.py` | CAUSE/FIX/RESULT/LINKS validation |
+| Vault API | `oce/backend/vault_api.py` | REST endpoints for vault operations |
+
+### 9.4 Key Files
+
+| Path | Purpose |
+|------|---------|
+| `core/obsidian/` | Vault writer, compressor, linker, taxonomy, note standard, live sync |
+| `core/execution/journal.py` | Execution journal |
+| `core/skills/loader.py` | Skill loader |
+| `skills/` | Skill directories (observer/chat_response/) |
+| `oce/backend/vault_api.py` | Vault API endpoints |
+| `oce/frontend/components/vault/` | VaultViewer.tsx, GraphViz.tsx |
+| `oce/frontend/stores/vaultStore.ts` | Zustand store |
+| `oce/frontend/app/vault/page.tsx` | Vault page |
+| `oce/O2C_PHASE00_BUILD-NOTES.md` | Build notes |
+| `oce/O2C_PHASE00_TEAM_TASKS.md` | Team task assignments |
+| `progress/O2C-PHASE00-PROGRESS.md` | Progress tracker |
+| `O2C-VAULT/` | The actual vault (markdown files) |
+
+### 9.5 Architecture Integration
+
+Phase 00 connects to the rest of the system:
+- **V3/OCE**: Vault API served from OCE backend (port 8000)
+- **Observer Core**: Execution journal feeds into observer traces
+- **Agent Network**: Skill loader injects doctrine at agent spawn time
+- **Frontend**: Vault page at `/vault` route in OCE frontend
+- **Obsidian**: Live sync pushes vault files to Obsidian for visualization
