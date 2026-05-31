@@ -1,111 +1,12 @@
 {
   "session_id": "session_20260529_140357",
   "start_time": "2026-05-29T14:03:57.861569+00:00",
-  "last_active": "2026-05-30T18:24:19.570634+00:00",
-  "workflow_count": 54,
-  "success_count": 52,
+  "last_active": "2026-05-31T03:26:36.501063+00:00",
+  "workflow_count": 63,
+  "success_count": 61,
   "failure_count": 2,
   "active_goals": [],
   "workflow_history": [
-    {
-      "workflow_id": "chat_277e54c0",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T16:48:36.208938+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_7f70d90a",
-      "domain": "coding",
-      "complexity": "medium",
-      "timestamp": "2026-05-30T16:48:36.240868+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_298bad14",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T16:48:36.272985+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_86a4b687",
-      "domain": "research",
-      "complexity": "low",
-      "timestamp": "2026-05-30T16:48:36.320719+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_1456fcfa",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T16:48:36.352648+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_e547e2db",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T16:48:36.384622+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_0ed4d0f4",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T16:48:36.434810+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_4656cbc2",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T16:52:32.494578+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_f54e29c1",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T16:52:39.196226+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
     {
       "workflow_id": "chat_f6d28418",
       "domain": "conversation",
@@ -556,12 +457,113 @@
       "model_used": "",
       "duration_ms": 0.0,
       "error": null
+    },
+    {
+      "workflow_id": "chat_d5d65755",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-31T03:24:36.279460+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_1d315fc8",
+      "domain": "general",
+      "complexity": "low",
+      "timestamp": "2026-05-31T03:24:50.524257+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_7680c06a",
+      "domain": "research",
+      "complexity": "low",
+      "timestamp": "2026-05-31T03:25:09.664480+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_f3c4ff02",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-31T03:25:35.192677+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_4609e138",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-31T03:25:48.604936+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_d37891ab",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-31T03:25:59.015885+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_6f7363da",
+      "domain": "automation",
+      "complexity": "medium",
+      "timestamp": "2026-05-31T03:26:09.592757+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_a019b046",
+      "domain": "coding",
+      "complexity": "medium",
+      "timestamp": "2026-05-31T03:26:29.865919+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_b9042c80",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-31T03:26:36.501063+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
     }
   ],
   "routing_patterns": {
-    "TaskType.CONVERSATION:": 46,
-    "TaskType.CODING:": 3,
-    "TaskType.RESEARCH:": 3,
-    "TaskType.SYSTEM_ANALYSIS:": 2
+    "TaskType.CONVERSATION:": 51,
+    "TaskType.CODING:": 4,
+    "TaskType.RESEARCH:": 4,
+    "TaskType.SYSTEM_ANALYSIS:": 2,
+    "TaskType.GENERAL:": 1,
+    "TaskType.AUTOMATION:": 1
   }
 }

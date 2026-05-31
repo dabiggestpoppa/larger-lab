@@ -3,30 +3,32 @@
 > **Policy:** Latest status + active delegations only. Archive history to logs/heartbeat-history/>.
 Max 4000 chars.
 
-## Current Status (2026-05-30 22:58 EDT)
-- **MAD last interaction:** msg #5524 — directive: fix DMR deprecation in memory, update workspace org, run Nautilus cross-validation backtests
-- **Nautilus backtest fix applied** — lot_size Decimal("0.01") → Decimal("1000") in run_cerebus_backtest.py
-- **4 sub-agents running** full Nautilus backtests (fixed runner, 30min timeout each)
+## Current Status (2026-05-31 00:35 EDT)
+- **MAD last interaction:** msg #5586 — green light on full report run, parallel workers per phase, Sage meditation on orchestration
+- **Phase 1 SPAWNED** — 4 backtest workers + 1 Sage meditation (all running)
+- **Multi-asset ST backtest COMPLETED** — 19/20 assets, 14,563 trades, 82.8% avg WR
+- **Dashboard design:** Timed out x2, LOW priority per MAD
+- **Trade count analysis:** Completed — variance is by design (trigger thresholds scale with asset class)
 
 ## Active Delegations
 | Task | Agent | Status | Started |
 |------|-------|--------|---------|
-| ST/EURUSD Nautilus backtest | naut_st_eurusd_v2 | RUNNING | ~22:55 |
-| ST/USDCHF Nautilus backtest | naut_st_usdchf_v2 | RUNNING | ~22:55 |
-| P90/EURUSD Nautilus backtest | naut_p90_eurusd_v2 | RUNNING | ~22:55 |
-| P90/USDCHF Nautilus backtest | naut_p90_usdchf_v2 | RUNNING | ~22:55 |
+| Phase 1: Majors A (EURUSD,GBPUSD,USDCHF) | st_batch1_majors_a | RUNNING | 00:34 EDT |
+| Phase 1: Majors B+Crosses A (USDJPY,AUDUSD,NZDUSD,CHFJPY,GBPJPY) | st_batch2_majors_b_crosses_a | RUNNING | 00:34 EDT |
+| Phase 1: Crosses B+Metals+Crypto (GBPAUD,GBPNZD,GBPCHF,XAUUSD,XAGUSD,BTCUSD,ETHUSD) | st_batch3_crosses_b_metals_crypto | RUNNING | 00:34 EDT |
+| Phase 1: Indices (US500,DE30,FR40,HK50) | st_batch4_indices | RUNNING | 00:34 EDT |
+| Sage: Orchestration meditation | sage_orchestration_meditation | RUNNING | 00:35 EDT |
 
-## Nautilus Cross-Validation — IN PROGRESS
-- **Root cause fixed**: lot_size was Decimal("0.01") = 1 micro-unit in Nautilus v1.226 → orders filled at zero size
-- **Fix**: Default lot_size now Decimal("1000") = 0.01 standard lots
-- **Strategy-level stats**: Extracted directly from strategy object (works for all pairs)
-- **Smoke test confirmed**: ST/EURUSD 5K bars: 48 trades, 77.1% WR, +175.3p ✅
-- **Benchmarks to beat**: ST ~85-91% WR, P90 ~78.7% WR
+## Phase Plan
+- **Phase 1 (NOW):** Individual per-asset deep reports + Monte Carlo (4 parallel workers)
+- **Phase 2 (NEXT):** Grouped reports — Majors/Crosses/Metals/Crypto/Indices (multi-worker)
+- **Phase 3 (NEXT):** Multi-asset combined + MC
+- **Phase 4 (FINAL):** Master INDEX.md linking all reports
+- **PHASES 2-4 blocked on Phase 1 completion**
 
-## Memory & Workspace Updates (this session)
-- MEMORY.md: Added Critical Memory Org Rules (DMR deprecated, Hermes role, 2-engine only)
-- TOOLS.md: Added quant-lab structure (engines=strategies=backtests=reports)
-- memory/2026-05-30-nautilus-fix.md: Full fix documentation
+## Nautilus Cross-Validation — COMPLETED
+- lot_size fix applied (Decimal("0.01") → Decimal("1000"))
+- All 4 Nautilus backtest workers completed
 
 ## DEPLOYED — CEREBUS FX v4.0
 - **Symmetry Trap (B):** EURUSD.PRO | Magic 20260531 | Lot 0.03 | 2:00 AM EST
@@ -51,4 +53,4 @@ Max 4000 chars.
 - Do NOT waste time on DMR standalone (deprecated, integrated into P90)
 - Hermes does NOT touch quant-lab engines (Nautilus backtesting only)
 - Nautilus backtester must match CSV engine results (~5% tolerance)
-- Awaiting sub-agent cross-validation results before next steps
+- Phase 2-4 gated on Phase 1 completion

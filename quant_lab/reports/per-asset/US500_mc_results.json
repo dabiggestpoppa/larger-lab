@@ -1,0 +1,39 @@
+{
+  "n_simulations": 10000,
+  "n_trades_per_sim": 372,
+  "start_balance": 10000.0,
+  "risk_per_trade_pct": 1.0,
+  "ruin_probability_pct": 0.0,
+  "pct_profitable_sims": 100.0,
+  "mean_total_pnl": 3414.24,
+  "median_total_pnl": 3416.1,
+  "stdev_total_pnl": 231.2,
+  "ci_90_low": 3030.7,
+  "ci_90_high": 3789.5,
+  "mean_final_balance": 13414.24,
+  "median_final_balance": 13416.1,
+  "pnl_distribution": {
+    "min": 2456.5,
+    "p5": 3030.7,
+    "p10": 3111.6,
+    "p25": 3261.5,
+    "p50": 3416.1,
+    "p75": 3571.2,
+    "p90": 3704.9,
+    "p95": 3789.5,
+    "max": 4489.6
+  },
+  "max_drawdown_distribution": {
+    "mean": 0.75,
+    "median": 0.95,
+    "p5": 0.15,
+    "p95": 1.18,
+    "max": 3.02
+  },
+  "profit_factor_distribution": {
+    "median": 14.77,
+    "p25": 10.83,
+    "p75": 22.23
+  },
+  "sampled_equity_curves": 1000
+}
