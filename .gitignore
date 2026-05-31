@@ -83,3 +83,4 @@ dist/
 build/
 
 argo-ref/
+.worktrees/
