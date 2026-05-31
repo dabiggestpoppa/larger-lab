@@ -1,96 +1,39 @@
 {
-  "version": "2.0-unified",
-  "last_updated": "2026-05-31T02:25:00-04:00",
-  "architecture": {
-    "model": "unified_field",
-    "substrate": "OCE",
-    "cognition_layer": "O2C",
-    "capability_fields": ["SRRA-OPH", "Quant Lab", "CARE", "Telemetry"],
-    "memory_spine": "Obsidian",
-    "status": "STABILIZED"
+  "version": "2.1-unified",
+  "last_updated": "2026-05-31T02:58:00-04:00",
+  "obsidian_vault": {
+    "path": "C:\\Users\\wifik\\Downloads\\o2c",
+    "name": "o2c",
+    "vault_id": "c19da291888cf7e1",
+    "write_method": "VaultWriter(vault_path)",
+    "bible_copied": true,
+    "notes_written": 7,
+    "hermes_also_writes": true,
+    "cli_notesmd": "not_installed_github_rate_limited",
+    "source": "hermes MEMORY.md"
   },
-  "field_domains": {
-    "OCE": {"role": "unified_operational_substrate", "access": "native"},
-    "O2C": {"role": "orchestration_cognition_layer", "access": "native", "owner": "OC2"},
-    "SRRA_OPH": {"role": "capability_field", "access": "direct_call"},
-    "Obsidian": {"role": "memory_continuity_spine", "access": "primary_persistence"},
-    "Quant_Lab": {"role": "deterministic_execution", "access": "direct_orchestration"},
-    "CARE": {"role": "capital_routing", "access": "direct_orchestration"},
-    "Telemetry": {"role": "adaptive_stabilization", "access": "read_write"}
+  "workspace_vault_also_exists": {
+    "path": "O2C-VAULT/",
+    "purpose": "Backend vault writer test location via core/obsidian/vault_writer.py",
+    "status": "Working — DEFAULT_VAULT_PATH in vault_writer.py",
+    "test_notes": ["Test_Note.md", "API_Test_Note.md", "PM2_Test_Note.md"]
   },
-  "priority_hierarchy": [
-    "execution_reliability",
-    "memory_continuity",
-    "recursive_refinement",
-    "artifact_synthesis",
-    "telemetry_adaptation",
-    "capital_efficiency",
-    "ux_conversation"
-  ],
-  "obsidian_behaviors": {
-    "research_persistence": true,
-    "agent_memory_chains": true,
-    "knowledge_graphing": true,
-    "failure_indexing": true,
-    "artifact_centric_workflow": true
+  "core_obsidian_modules": {
+    "vault_writer": "core/obsidian/vault_writer.py — CC1 built, writes to DEFAULT_VAULT_PATH",
+    "compressor": "core/obsidian/compressor.py — CC1 built",
+    "linker": "core/obsidian/linker.py — CC1 built",
+    "error_intelligence": "core/obsidian/error_intelligence.py — CC2 built",
+    "pattern_crystallizer": "core/obsidian/pattern_crystallizer.py — CC2 built",
+    "memory_distiller": "core/obsidian/memory_distiller.py — CC2 built",
+    "context_injector": "core/obsidian/context_injector.py — CC2 built",
+    "test_results": "119 tests passing (Phase 00) + 22 (Phase 01) = 141 total"
   },
-  "build_directive": {
-    "new_systems_authorized": false,
-    "evolution_mode": ["refinement", "telemetry", "memory", "observation", "optimization", "adaptation"],
-    "reject": ["expansion", "cosmetic_architecture", "redundant_frameworks", "infrastructure_bloat", "saas_feature_creep"]
+  "hermes_workspace": {
+    "path": "agent-lab/agents/hermes/hermes_workspace/",
+    "files": ["MEMORY.md", "SOUL.md", "agent_prompt.md", "SKILLS_INDEX.md"],
+    "gateway": "Discord + API on port 8642",
+    "model_chain": ["openrouter/owl-alpha", "poolside/laguna-m1", "deepseek/deepseek-flash-free"],
+    "role": "Execution / Nautilus backtesting — NEVER touch MT5 directly"
   },
-  "active_campaigns": {
-    "symmetry_trap_backtest": {
-      "status": "COMPLETE",
-      "phases_done": [1, 2, 3, 4, 5],
-      "assets_tested": 19,
-      "total_trades": 17700,
-      "pooled_trades": 12488,
-      "blended_wr": 0.812,
-      "combined_pf": 26.58,
-      "mc_ruin": 0.0062,
-      "reports_location": "quant-lab/reports/",
-      "bible_location": "quant-lab/QUANTLAB_BIBLE.md",
-      "top_performers": [
-        {"asset": "ETHUSD", "wr": 0.969, "pf": 50.34},
-        {"asset": "HK50", "wr": 0.940, "pf": 40.30},
-        {"asset": "NZDUSD", "wr": 0.933, "pf": 19.02},
-        {"asset": "BTCUSD", "wr": 0.926, "pf": 26.52},
-        {"asset": "US500", "wr": 0.917, "pf": 13.95}
-      ],
-      "flags": [
-        {"issue": "XAGUSD config", "severity": "high", "detail": "Only 2 trades, needs recalibration"},
-        {"issue": "BTC concentration", "severity": "medium", "detail": "55% of multi-asset PnL from single asset"},
-        {"issue": "Crypto correlation", "severity": "medium", "detail": "BTC+ETH = 58.5% of pool"}
-      ]
-    }
-  },
-  "team_roster": {
-    "CC": {"role": "overseer_architecture", "status": "active"},
-    "OC2": {"role": "o2c_orchestrator", "status": "active"},
-    "AS": {"role": "quality_docs", "status": "standby"},
-    "PM": {"role": "debugger_tools", "status": "active"},
-    "PM2": {"role": "experimental_track", "status": "standby"},
-    "RL": {"role": "research_dspy", "status": "standby"},
-    "HR": {"role": "hermes_nautilus_execution", "status": "24_7_active"},
-    "Copilot": {"role": "test_monitoring", "status": "standby"}
-  },
-  "live_deployment": {
-    "ST_executor": {"symbol": "EURUSD.PRO", "magic": 20260531, "lots": 0.03, "status": "live"},
-    "P90_executor": {"symbol": "USDCHF.PRO", "magic": 20260532, "lots": 0.01, "status": "live"},
-    "account": "650898 LIVE"
-  },
-  "next_priorities": [
-    "P90 multi-asset backtest (Phase 6)",
-    "Dual-engine convergence (P90 + ST)",
-    "Nautilus cross-validation",
-    "Obsidian knowledge graph setup",
-    "DD duration + time-in-DD metrics",
-    "XAGUSD config recalibration"
-  ],
-  "metadata": {
-    "created_by": "OC2",
-    "trigger": "MAD O2C Post-Port Integration Directive 2026-05-31",
-    "session": "telegram_8258195396"
-  }
+  "discovery_notes": "Hermes gateway auto-starts on Windows login; PM/CC built full Phase 00 vault system but core/obsidian modules only exist via VaultWriter API despite team-chat claims of 117 tests; actual .py files confirmed at core/obsidian/; test files written by Hermes confirmed in real Obsidian vault"
 }
