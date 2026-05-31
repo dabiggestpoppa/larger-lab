@@ -1,6 +1,7 @@
 # AGENTS.md — V3 Cognitive Field Team Manifest
 
-> **Last Updated:** May 28, 2026 | **Phase:** O-7 Persistent Field Complete
+> **Last Updated:** May 31, 2026 | **Phase:** Post-Port Integration Complete
+> **Architecture:** Unified Field (OCE + O2C + SRRA-OPH + Obsidian + CARE + Quant Lab)
 
 ## ⚠️ OPERATOR RULES
 See `OPERATOR_RULES.md`. Key: Max 2 concurrent sub-agents. No unrestricted self-modification. All execution logged.

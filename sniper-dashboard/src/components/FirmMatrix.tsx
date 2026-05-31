@@ -39,7 +39,7 @@ export default async function FirmMatrix({ firms }: { firms: FirmMix[] }) {
             {data.length === 0 ? (
               <tr><td colSpan={7} className="text-center py-8 text-dark-muted">No deployment data yet. Run scope-care to generate.</td></tr>
             ) : (
-              data.map((firm, i) => (
+              data.map((firm: FirmMix, i: number) => (
                 <tr key={i} className="border-b border-dark-border/50 hover:bg-dark-border/30 transition-colors">
                   <td className="px-4 py-3 font-medium">{firm.firm}</td>
                   <td className="px-4 py-3 text-right">{firm.accounts}</td>

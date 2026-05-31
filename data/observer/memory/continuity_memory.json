@@ -1,39 +1,49 @@
 {
-  "version": "2.1-unified",
-  "last_updated": "2026-05-31T02:58:00-04:00",
+  "version": "2.2-unified",
+  "last_updated": "2026-05-31T04:03:00-04:00",
   "obsidian_vault": {
     "path": "C:\\Users\\wifik\\Downloads\\o2c",
     "name": "o2c",
     "vault_id": "c19da291888cf7e1",
-    "write_method": "VaultWriter(vault_path)",
-    "bible_copied": true,
-    "notes_written": 7,
-    "hermes_also_writes": true,
-    "cli_notesmd": "not_installed_github_rate_limited",
-    "source": "hermes MEMORY.md"
+    "write_method": "Direct file write OR VaultWriter(vault_path)",
+    "categories": ["agents", "architecture", "doctrine", "execution", "failures", "graphs", "heuristics", "journals", "memory", "ontology", "routing", "skills"],
+    "access_guide_written": true,
+    "access_guide_path": "execution/OC2_VAULT_ACCESS_GUIDE.md",
+    "subagent_utility": "tools/obsidian_access.py — vault_write(), vault_read(), vault_list()",
+    "utility_no_deps": true,
+    "bible_in_vault": true,
+    "hermes_also_writes": true
   },
-  "workspace_vault_also_exists": {
+  "workspace_vault": {
     "path": "O2C-VAULT/",
-    "purpose": "Backend vault writer test location via core/obsidian/vault_writer.py",
-    "status": "Working — DEFAULT_VAULT_PATH in vault_writer.py",
-    "test_notes": ["Test_Note.md", "API_Test_Note.md", "PM2_Test_Note.md"]
+    "purpose": "Internal workspace vault for raw operational traces"
+  },
+  "subagent_vault_access": {
+    "method": "Direct file write via tools/obsidian_access.py or raw pathlib",
+    "no_routing_through_owl": true,
+    "spawn_template_included": true
   },
   "core_obsidian_modules": {
-    "vault_writer": "core/obsidian/vault_writer.py — CC1 built, writes to DEFAULT_VAULT_PATH",
-    "compressor": "core/obsidian/compressor.py — CC1 built",
-    "linker": "core/obsidian/linker.py — CC1 built",
-    "error_intelligence": "core/obsidian/error_intelligence.py — CC2 built",
-    "pattern_crystallizer": "core/obsidian/pattern_crystallizer.py — CC2 built",
-    "memory_distiller": "core/obsidian/memory_distiller.py — CC2 built",
-    "context_injector": "core/obsidian/context_injector.py — CC2 built",
-    "test_results": "119 tests passing (Phase 00) + 22 (Phase 01) = 141 total"
+    "vault_writer": "core/obsidian/vault_writer.py — OCE package import",
+    "compressor": "core/obsidian/compressor.py",
+    "linker": "core/obsidian/linker.py",
+    "error_intelligence": "core/obsidian/error_intelligence.py",
+    "pattern_crystallizer": "core/obsidian/pattern_crystallizer.py",
+    "memory_distiller": "core/obsidian/memory_distiller.py",
+    "context_injector": "core/obsidian/context_injector.py"
   },
   "hermes_workspace": {
     "path": "agent-lab/agents/hermes/hermes_workspace/",
-    "files": ["MEMORY.md", "SOUL.md", "agent_prompt.md", "SKILLS_INDEX.md"],
     "gateway": "Discord + API on port 8642",
-    "model_chain": ["openrouter/owl-alpha", "poolside/laguna-m1", "deepseek/deepseek-flash-free"],
     "role": "Execution / Nautilus backtesting — NEVER touch MT5 directly"
   },
-  "discovery_notes": "Hermes gateway auto-starts on Windows login; PM/CC built full Phase 00 vault system but core/obsidian modules only exist via VaultWriter API despite team-chat claims of 117 tests; actual .py files confirmed at core/obsidian/; test files written by Hermes confirmed in real Obsidian vault"
+  "agent_registry": {
+    "owl": "OC2 — Primary Orchestrator (me)",
+    "cc": "Claude Code — Overseer / Architecture",
+    "pm": "Polymorph — Debugger / Tool Builder",
+    "pm2": "Polymorph 2 — Experimental Track / Frontend",
+    "hr": "Hermes — Execution / NautilusTrader",
+    "rl": "Research Lead — DSPy research",
+    "as": "Assistant Manager — Context Monitoring"
+  }
 }

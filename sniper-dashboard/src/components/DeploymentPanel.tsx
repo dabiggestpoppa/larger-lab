@@ -28,7 +28,7 @@ export default async function DeploymentPanel({ deployments }: { deployments?: D
         </div>
       ) : (
         <div className="divide-y divide-dark-border">
-          {data.map((dep, i) => (
+          {data.map((dep: Deployment, i: number) => (
             <div key={i} className="px-4 py-3 flex items-center justify-between hover:bg-dark-border/20 transition-colors">
               <div className="flex items-center gap-4">
                 <p className="text-sm font-medium">{dep.firm_name}</p>

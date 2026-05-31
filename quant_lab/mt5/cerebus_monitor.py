@@ -61,7 +61,9 @@ def check_process_alive(script_name):
     """Check if a Python executor script is running."""
     try:
         result = subprocess.run(
-            ['tasklist', '/FI', 'IMAGENAME eq python.exe', '/FO', 'CSV', '/NH'],
+            ['powershell', '-NoProfile', '-Command',
+             'Get-CimInstance Win32_Process -Filter "Name=\'python.exe\'" | '
+             'Select-Object -ExpandProperty CommandLine'],
             capture_output=True, text=True, timeout=5
         )
         return script_name.lower() in result.stdout.lower()

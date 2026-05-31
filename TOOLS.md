@@ -15,9 +15,11 @@
 | `oce/backend/` | FastAPI backend (main.py, event_fabric.py, observer_runtime.py) |
 | `srrs_opc/` | SRRA-OPH core (33 modules, 56 tests) |
 | `quant-lab/` | CEREBUS FX system (engines, strategies, mt5, backtests, data) |
+| `quant-lab/QUANTLAB_BIBLE.md` | **📖 LIVING BIBLE** — single navigation hub connecting ontology → engines → configs → reports → optimization |
 | `quant-lab/sniper/` | **Prop Firm Sniper Engine v1.0** (7 modules, PES calculator, scope CLI) |
 | `quant-lab/ontology/` | CEREBUS ontology suite (7 files) |
 | `quant-lab/knowledge/` | Domain docs (sniper plan, payout systems) |
+| `quant-lab/reports/INDEX.md` | Master report index (19 assets, groups, multi-asset) |
 | `tools/` | Python/JS automation tools |
 | `skills/` | Agent skills (57 active) |
 | `docs/` | Documentation (TESTING, DEBUGGING, API_REFERENCE, MODULE_GUIDE) |
@@ -89,6 +91,15 @@
 | 🟡 AS | Assistant Manager | Context Monitoring / Quality | `progress/assistant-progress.md` |
 | 🔴 PM | Polymorph (Hawk) | Debugger / Tool Builder | `progress/polymorph-progress.md` |
 | 🟢 RL | OWL (Research Lead) | Research / DSPy | `progress/researcher-progress.md` |
+
+## Key Quant Lab Files
+| File | Purpose |
+|------|---------|
+| `quant-lab/QUANTLAB_BIBLE.md` | Living reference — update after every test/optimization |
+| `quant-lab/reports/INDEX.md` | Master report index |
+| `quant-lab/engines/symmetry_trap.py` | ST engine (TRUTH SOURCE) |
+| `quant-lab/engines/p90_engine.py` | P90 engine (TRUTH SOURCE) |
+| `quant-lab/configs/asset_configs.py` | Per-asset calibration |
 
 ## Key Config Files
 | File | Purpose |
