@@ -1,0 +1,13 @@
+{
+  "strategy": "symmetry_trap",
+  "symbol": "USDCHF.PRO",
+  "bars": 253031,
+  "timestamp": "20260530_224610",
+  "total_orders": 2301,
+  "total_positions": 218,
+  "pnl_usd": 0.0,
+  "win_rate": 0.0,
+  "max_drawdown": 0.0,
+  "returns": 0.0,
+  "elapsed_s": 106844100.0
+}

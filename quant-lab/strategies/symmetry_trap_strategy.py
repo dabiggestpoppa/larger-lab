@@ -110,7 +110,7 @@ class SymmetryTrapConfig(StrategyConfig, frozen=True):
 
     instrument_id: str = "EURUSD.PRO"
     bar_type: str = "EURUSD.PRO-5-MINUTE-LAST-EXTERNAL"
-    lot_size: Decimal = Decimal("0.01")
+    lot_size: Decimal = Decimal("1000")
     magic_number: int = 20260530
     max_loops: int = MAX_LOOPS
     est_offset: int = EST_OFFSET
