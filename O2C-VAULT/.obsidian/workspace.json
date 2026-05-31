@@ -1,0 +1,23 @@
+
+{
+  "main": {
+    "id": "o2c-vault",
+    "type": "split",
+    "children": [
+      {
+        "id": "graph-view",
+        "type": "graph",
+        "state": {
+          "search": "",
+          "tags": true,
+          "attachments": false,
+          "existingFilesOnly": true,
+          "orphans": true
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "active": "graph-view",
+  "openTabs": []
+}
