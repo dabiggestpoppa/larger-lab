@@ -14,5 +14,9 @@ RESULT:
 Note created successfully
 
 LINKS:
+[[Hermes Agent Test Note]]
+[[Test Pattern]]
+[[Test Note]]
+[[API Test Note]]
 [[Vault Writer]]
 [[Phase 00]]
