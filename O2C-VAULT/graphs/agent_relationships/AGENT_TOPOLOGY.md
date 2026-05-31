@@ -61,3 +61,19 @@ RELATIONSHIPS: [[Team Roster]] [[OC2 Identity]] [[System Architecture]]
 
 STATUS: active
 SOURCE: AGENTS.md, IDENTITY.md
+
+LINKS:
+[[OC2 (OWL) — Unified Field Operator]]
+[[Team Roster — Agent Network]]
+[[System Architecture — Complete Guide]]
+[[Operator Rules — Bounded Sovereign Operational Continuity]]
+[[Hermes Agent Test Note]]
+[[KeyError — data_validation — 20260531_0245]]
+[[Task Flow — How Work Moves Through the System]]
+[[Session Distillation — TestAgent]]
+[[Build Patterns — Successful Operational Patterns]]
+[[O2C Pipeline — Cognitive Filesystem & Obsidian Mesh]]
+[[Observer Core — O-1 through O-7]]
+[[SRRA-OPH — Observer Patch Substrate]]
+[[API Reference — OCE Backend Endpoints]]
+[[Module Guide — 78 Modules Reference]]

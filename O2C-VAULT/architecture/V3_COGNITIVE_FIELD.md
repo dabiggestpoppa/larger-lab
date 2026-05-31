@@ -66,3 +66,9 @@ RELATIONSHIPS: [[System Architecture]] [[PRINCIPLES]] [[API Reference]]
 
 STATUS: active
 SOURCE: V3_ARCHITECTURE.md
+
+LINKS:
+[[OC2 (OWL) — Unified Field Operator]]
+[[System Architecture — Complete Guide]]
+[[Task Flow — How Work Moves Through the System]]
+[[O2C Pipeline — Cognitive Filesystem & Obsidian Mesh]]

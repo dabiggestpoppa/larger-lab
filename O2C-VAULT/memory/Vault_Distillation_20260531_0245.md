@@ -14,4 +14,8 @@ RESULT:
 0 executions, 1 failures analyzed
 
 LINKS:
+[[Session Distillation — TestAgent]]
+[[Session TestAgent 20260531_0245]]
+[[KeyError — data_validation — 20260531_0245]]
+[[Obsidian Vault Connection Info]]
 [[Vault Distillation]]

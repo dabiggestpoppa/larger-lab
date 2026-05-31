@@ -12,3 +12,8 @@ Created this reference note with vault path and sync details
 
 RESULT:
 Vault info stored in O2C-VAULT/architecture/
+
+LINKS:
+[[Hermes Agent Test Note]]
+[[Vault Distillation 20260531_0245]]
+[[O2C Pipeline — Cognitive Filesystem & Obsidian Mesh]]

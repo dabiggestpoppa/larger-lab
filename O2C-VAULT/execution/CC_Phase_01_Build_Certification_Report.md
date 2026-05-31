@@ -14,6 +14,7 @@ RESULT:
 Phase 01 fully integrated: 19 vault API routes, 0 duplicates, 149/149 tests passing
 
 LINKS:
+[[Build Patterns — Successful Operational Patterns]]
 [[Phase 01 Cognitive Mesh]]
 [[OCE Backend]]
 [[Obsidian Vault]]

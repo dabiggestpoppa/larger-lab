@@ -38,6 +38,27 @@ def unregister_pid(pid):
     active.discard(int(pid))
     PID_FILE.write_text(json.dumps({"pids": list(active), "updated": datetime.now().isoformat()}))
 
+def get_powershell_processes():
+    """Get stale powershell/pwsh processes (excluding current session)."""
+    if not HAS_PSUTIL:
+        return []
+    processes = []
+    current_pid = os.getpid()
+    for proc in psutil.process_iter(["pid", "name", "cmdline", "create_time"]):
+        try:
+            info = proc.info
+            if info["pid"] == current_pid:
+                continue
+            if info["name"] and info["name"].lower() in ("powershell.exe", "pwsh.exe"):
+                cmdline = " ".join(info["cmdline"]) if info["cmdline"] else ""
+                create_time = datetime.fromtimestamp(info["create_time"])
+                age_minutes = (datetime.now() - create_time).total_seconds() / 60
+                processes.append({"pid": info["pid"], "cmdline": cmdline[:200],
+                                  "age_minutes": round(age_minutes, 1)})
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            continue
+    return processes
+
 def get_python_processes():
     if not HAS_PSUTIL:
         return []
@@ -120,6 +141,25 @@ def main():
     print("  TERMINAL CLEANUP")
     print(f"  Active PIDs: {get_active_pids()}")
     print(f"  Force: {args.force}")
+    
+    # Clean PowerShell processes first
+    ps_procs = get_powershell_processes()
+    if ps_procs:
+        print(f"\n[CLEANUP] {len(ps_procs)} PowerShell process(es):")
+        ps_killed = 0
+        for p in ps_procs:
+            stale = p["age_minutes"] > args.threshold
+            status = "STALE" if stale else "RECENT"
+            print(f"  PID {p['pid']:<8} {p['age_minutes']:<10.1f} {status:<8} {p['cmdline'][:60]}")
+            if stale and args.force:
+                try:
+                    psutil.Process(p["pid"]).terminate()
+                    ps_killed += 1
+                    print(f"    -> KILLED")
+                except Exception as e:
+                    print(f"    -> FAILED: {e}")
+        print(f"[CLEANUP] PowerShell killed: {ps_killed}")
+    
     cleanup_stale(force=args.force, threshold=args.threshold)
 
 if __name__ == "__main__":

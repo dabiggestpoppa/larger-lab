@@ -101,3 +101,18 @@ RELATIONSHIPS: [[System Architecture]] [[V3 Cognitive Field]] [[O2C Pipeline]]
 
 STATUS: active
 SOURCE: docs/MODULE_GUIDE.md
+
+LINKS:
+[[OC2 (OWL) — Unified Field Operator]]
+[[Team Roster — Agent Network]]
+[[System Architecture — Complete Guide]]
+[[Operator Rules — Bounded Sovereign Operational Continuity]]
+[[KeyError — data_validation — 20260531_0245]]
+[[Agent Topology — Relationship Map]]
+[[Task Flow — How Work Moves Through the System]]
+[[Session Distillation — TestAgent]]
+[[Build Patterns — Successful Operational Patterns]]
+[[O2C Pipeline — Cognitive Filesystem & Obsidian Mesh]]
+[[Observer Core — O-1 through O-7]]
+[[SRRA-OPH — Observer Patch Substrate]]
+[[API Reference — OCE Backend Endpoints]]

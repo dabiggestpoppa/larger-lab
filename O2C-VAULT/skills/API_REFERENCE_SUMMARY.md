@@ -84,3 +84,19 @@ RELATIONSHIPS: [[O2C Pipeline]] [[System Architecture]] [[Module Guide]]
 
 STATUS: active
 SOURCE: docs/API_REFERENCE.md
+
+LINKS:
+[[OC2 (OWL) — Unified Field Operator]]
+[[Team Roster — Agent Network]]
+[[System Architecture — Complete Guide]]
+[[API Test Note]]
+[[Operator Rules — Bounded Sovereign Operational Continuity]]
+[[KeyError — data_validation — 20260531_0245]]
+[[Agent Topology — Relationship Map]]
+[[Task Flow — How Work Moves Through the System]]
+[[Session Distillation — TestAgent]]
+[[Build Patterns — Successful Operational Patterns]]
+[[O2C Pipeline — Cognitive Filesystem & Obsidian Mesh]]
+[[Observer Core — O-1 through O-7]]
+[[SRRA-OPH — Observer Patch Substrate]]
+[[Module Guide — 78 Modules Reference]]

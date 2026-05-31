@@ -118,8 +118,15 @@ function Restart-Gateway {
     
     Start-Sleep -Seconds 3
     
-    # Start gateway hidden
-    Start-Process -FilePath "openclaw" -ArgumentList "gateway run --port $GatewayPort" -WindowStyle Hidden
+    # Start gateway hidden — use node directly to avoid .ps1 wrapper opening in VS Code
+    $nodePath = (Get-Command node -ErrorAction SilentlyContinue).Source
+    $openclawMjs = "$env:APPDATA\npm\node_modules\openclaw\openclaw.mjs"
+    if (-not $nodePath -or -not (Test-Path $openclawMjs)) {
+        Write-Log "WARNING: Cannot find node or openclaw.mjs, falling back to openclaw command"
+        Start-Process -FilePath "openclaw" -ArgumentList "gateway run --port $GatewayPort" -WindowStyle Hidden
+    } else {
+        Start-Process -FilePath $nodePath -ArgumentList @($openclawMjs, "gateway run --port $GatewayPort") -WindowStyle Hidden
+    }
     Write-Log "Gateway restart initiated. Waiting 15s..."
     
     Start-Sleep -Seconds 15

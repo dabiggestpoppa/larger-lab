@@ -25,6 +25,15 @@ After EVERY task, kill terminals no longer needed. Before wrapping up: "Did I sp
 
 **At session start, run:** `python tools/terminal_cleanup.py --force`
 
+**Before spawning ANY process, check for duplicates:**
+```powershell
+# Kill stale terminals (>30min)
+Get-Process powershell -EA 0 | Where-Object { (New-TimeSpan -Start $_.StartTime).TotalMinutes -gt 30 } | Stop-Process -Force
+# Check port before starting service
+Get-NetTCPConnection -LocalPort <PORT> -EA 0
+```
+**Max 3 PowerShell + 2 Python** processes at any time. **NEVER use `Start-Process -FilePath "openclaw"`** — use `node` + `openclaw.mjs` directly (the .ps1 wrapper opens in VS Code notes).
+
 ### ⚡ Windows Execution Rule (MANDATORY)
 ALWAYS use PowerShell. Never use `cmd.exe` / `subprocess.run(..., shell=True)`.
 
