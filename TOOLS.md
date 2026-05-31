@@ -26,6 +26,36 @@
 | `logs/` | System logs (hermes-watchdog, oc2-monitor) |
 | `memory-bank/` | Error DB, errors-and-solutions, gateway failures |
 
+## Quant Lab — STRATEGY & BACKTEST (Primary Work Area)
+
+| Path | Purpose |
+|------|---------|
+| `quant-lab/engines/` | **TRUTH SOURCE** — p90_engine.py, symmetry_trap.py, dmr_standalone_backtest.py. These contain the strategy logic. |
+| `quant-lab/strategies/` | NautilusTrader Strategy class wrappers (dmr_strategy.py, p90_strategy.py, symmetry_trap_strategy.py) |
+| `quant-lab/backtests/` | Backtest runners (naut_dmr_backtest.py, run_naut_backtest.py, run_cerebus_backtest.py) |
+| `quant-lab/reports/` | Backtest results (JSON, CSV, MD reports) |
+| `quant-lab/data/` | MT5 data fetchers + CSV data files (EURUSD, USDCHF M5) |
+| `quant-lab/ontology/` | CEREBUS ontology suite (cerebus_dual_engine.md, cerebus_p90.md, manual_ontology.md) |
+| `quant-lab/knowledge/` | Domain docs (sniper plan, payout systems) |
+| `quant-lab/sniper/` | Prop Firm Sniper Engine v1.0 |
+| `quant-lab/mt5/` | MT5 executors, EAs, monitors (LIVE — do NOT touch without approval) |
+
+### Active Strategies (Two Engines)
+- **P90 Kinetic Engine A**: INITIAL + CASCADE + EWS variants. CASCADE is dominant (85.4% WR)
+- **Symmetry Trap Engine B**: 4-state FSM, single AU target, 91.1% WR
+- **Dual-Engine Convergence**: 94-95% WR when both align
+
+### Deprecated (DO NOT USE)
+- `quant-lab/engines/dmr_standalone_backtest.py` — old standalone DMR, replaced by P90 engine
+- `quant-lab/mt5/dmr_executor*.py` — old DMR live executors, we trade P90 CASCADE now
+- STALL_HARVEST variant — removed from P90 enum per MAD directive
+
+### Nautilus Backtest Architecture
+- CSV engines (`quant-lab/engines/`) — GOLD STANDARD for strategy logic
+- Nautilus Strategy classes (`quant-lab/strategies/`) — must replicate CSV results
+- Nautilus backtest runners (`quant-lab/backtests/`) — feed data through Nautilus strategies
+- **Cross-validation requirement**: Nautilus results must match CSV engine results within ~5% or something is wrong with the Nautilus setup
+
 ## Key Tools (Full list: docs/TOOLS_FULL.md)
 
 | Tool | Path | Purpose |

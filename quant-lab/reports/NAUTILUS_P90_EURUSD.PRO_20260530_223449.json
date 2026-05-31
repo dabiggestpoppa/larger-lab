@@ -1,0 +1,13 @@
+{
+  "strategy": "p90",
+  "symbol": "EURUSD.PRO",
+  "bars": 224000,
+  "timestamp": "20260530_223449",
+  "total_orders": 907,
+  "total_positions": 0,
+  "pnl_usd": 0.0,
+  "win_rate": 0.0,
+  "max_drawdown": 0.0,
+  "returns": 0.0,
+  "elapsed_s": 94607700.0
+}

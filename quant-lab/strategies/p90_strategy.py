@@ -363,8 +363,9 @@ class P90Strategy(Strategy):
         """
         if (self.last_p90_exit_time is not None and
                 self.p90_count > 0):
-            delta = bar.ts_event - self.last_p90_exit_time
-            delta_min = delta.total_seconds() / 60.0
+            # Both in nanoseconds since epoch
+            delta_ns = bar.ts_event - self.last_p90_exit_time
+            delta_min = delta_ns / 60_000_000_000.0
             if delta_min <= self.cascade_window_min:
                 self.log.info(
                     f"Cascade P90 detected: #{self.p90_count + 1}, "
@@ -548,8 +549,8 @@ class P90Strategy(Strategy):
         if not self.portfolio.is_flat(self.instrument_id):
             self.close_all_positions(self.instrument_id)
 
-        # Save exit time for cascade tracking
-        self.last_p90_exit_time = self._bar_to_datetime(bar)
+        # Save exit time for cascade tracking (in nanoseconds, same as bar.ts_event)
+        self.last_p90_exit_time = bar.ts_event
 
         # Reset to SEARCH state (matches engine _reset_state)
         self._strategy_state = "SEARCH"
@@ -586,10 +587,9 @@ class P90Strategy(Strategy):
         utc_hour = (bar_ts // 3600_000_000_000) % 24
         return (utc_hour + self.est_offset) % 24
 
-    def _bar_to_datetime(self, bar: Bar):
-        """Convert bar timestamp (ns) back to datetime for cascade timing."""
-        from datetime import datetime, timezone
-        return datetime.fromtimestamp(bar.ts_event / 1e9, tz=timezone.utc)
+    def _bar_to_ns(self, bar: Bar) -> int:
+        """Return bar timestamp as nanoseconds since epoch (int)."""
+        return int(bar.ts_event)
 
     def _is_new_day(self, bar: Bar, current_date) -> bool:
         """Detect new trading day (~20h gap = new session)."""
