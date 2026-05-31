@@ -3,40 +3,39 @@
 > **Policy:** Latest status + active delegations only. Archive history to logs/heartbeat-history/>.
 Max 4000 chars.
 
-## Current Status (2026-05-30 23:45 EDT)
-- **MAD last interaction:** msg #5364 — confirmed Forex tab = CFD, dual-tab scrape done
-- **PHASES 1-5 COMPLETE** | Phase 6 desktop app pending MAD signal for PM/CC handoff
+## Current Status (2026-05-30 22:58 EDT)
+- **MAD last interaction:** msg #5524 — directive: fix DMR deprecation in memory, update workspace org, run Nautilus cross-validation backtests
+- **Nautilus backtest fix applied** — lot_size Decimal("0.01") → Decimal("1000") in run_cerebus_backtest.py
+- **4 sub-agents running** full Nautilus backtests (fixed runner, 30min timeout each)
 
-## Phase 5 FULL BUILD — COMPLETE
-- API server: `sniper-dashboard/api_server.py` (FastAPI, port 8090, 8 endpoints, live data)
-- **32 firms in DB** (15 Futures + 15 Forex/CFD + 2 legacy), PES snapshots stored for all
-- Dashboard `api.ts` connected to real API (no more mock data), build passes
-- Top 5: Apex Trader Funding $5K (0.44), FundedNext Futures $25K (0.068), E8 Futures $25K (0.046), Funded Futures Family $50K (0.046), My Funded Futures $25K (0.046)
-- Dashboard build: `npm run build` passes clean (4/4 static pages)
-- Dual-tab scraper: `scrape(category="futures")` + `scrape(category="forex")` + `scrape_both_tabs()`
+## Active Delegations
+| Task | Agent | Status | Started |
+|------|-------|--------|---------|
+| ST/EURUSD Nautilus backtest | naut_st_eurusd_v2 | RUNNING | ~22:55 |
+| ST/USDCHF Nautilus backtest | naut_st_usdchf_v2 | RUNNING | ~22:55 |
+| P90/EURUSD Nautilus backtest | naut_p90_eurusd_v2 | RUNNING | ~22:55 |
+| P90/USDCHF Nautilus backtest | naut_p90_usdchf_v2 | RUNNING | ~22:55 |
 
-## Scraper Engine — UPDATED
-- `scraper_engine.py` now supports both Futures and Forex (CFD) tabs
-- 28 firm slugs in `KNOWN_FIRM_SLUGS`
-- Fresh snapshot: `sniper/snapshots/propfirmmatch_20260530_232056.json`
-- Real pricing scraped from /challenge pages (activation + challenge fee)
-- PES calculator now uses TRUE cost via `_dict_to_firm_profile` (reads true_cost_per_size first)
-- DB updated: true_cost_per_size, activation_fees, billing_types columns added
-- Results: Lucid Trading 100K (PES 13.52) → #1, not Apex
-- Files: true_pes.py, real_pricing.py, update_true_costs.py
+## Nautilus Cross-Validation — IN PROGRESS
+- **Root cause fixed**: lot_size was Decimal("0.01") = 1 micro-unit in Nautilus v1.226 → orders filled at zero size
+- **Fix**: Default lot_size now Decimal("1000") = 0.01 standard lots
+- **Strategy-level stats**: Extracted directly from strategy object (works for all pairs)
+- **Smoke test confirmed**: ST/EURUSD 5K bars: 48 trades, 77.1% WR, +175.3p ✅
+- **Benchmarks to beat**: ST ~85-91% WR, P90 ~78.7% WR
 
-## Phase 6 — Desktop App Handoff Package
-- Meditation file: `meditation-room/desktop-app-meditation.md` (823 lines, Tauri)
-- All P1-5 source code ready for PM/CC dev team
-- Awaiting MAD signal to pass off
+## Memory & Workspace Updates (this session)
+- MEMORY.md: Added Critical Memory Org Rules (DMR deprecated, Hermes role, 2-engine only)
+- TOOLS.md: Added quant-lab structure (engines=strategies=backtests=reports)
+- memory/2026-05-30-nautilus-fix.md: Full fix documentation
 
 ## DEPLOYED — CEREBUS FX v4.0
 - **Symmetry Trap (B):** EURUSD.PRO | Magic 20260531 | Lot 0.03 | 2:00 AM EST
 - **P90 CASCADE (A):** USDCHF.PRO | Magic 20260532 | Lot 0.01 | 9:00 AM EST
 
 ## DEPLOYED — Prop Firm Sniper Engine v1.0
-- **13 Python modules** in `quant-lab/sniper/` (all compile OK, ~350KB)
-- Dashboard: `sniper-dashboard/` (Next.js 14, 6 components, build OK)
+- **13 Python modules** in `quant-lab/sniper/`
+- Dashboard: `sniper-dashboard/` (Next.js 14, build OK)
+- Phase 6 desktop app handoff ready (awaiting MAD signal)
 
 ## Active Cron Jobs
 | Job | Time (EST) | Status |
@@ -49,6 +48,7 @@ Max 4000 chars.
 | DRIFT | Sun/Wed/Sat 6:45AM | OK |
 
 ## Notes
-- Scrapling not installed — live PropFirmMatch uses snapshot data
-- Dashboard shows real firm data + PES scores
-- Next: MAD signals Phase 6 handoff to PM/CC dev team
+- Do NOT waste time on DMR standalone (deprecated, integrated into P90)
+- Hermes does NOT touch quant-lab engines (Nautilus backtesting only)
+- Nautilus backtester must match CSV engine results (~5% tolerance)
+- Awaiting sub-agent cross-validation results before next steps

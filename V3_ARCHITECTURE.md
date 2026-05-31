@@ -1,6 +1,6 @@
 # V3 Cognitive Field System — Architecture Documentation
 
-> **Last Updated:** 2026-05-31 | **V3 Phases:** 10 Complete | **Observer Core:** O-1 through O-7 COMPLETE | **Phase 00:** Cognitive Filesystem Foundation COMPLETE
+> **Last Updated:** 2026-05-31 | **V3 Phases:** 10 Complete | **Observer Core:** O-1 through O-7 COMPLETE | **O2C Phase 00 + Phase 01:** COMPLETE
 
 ## Executive Summary
 
@@ -271,6 +271,125 @@ The Observer Core phases implement practical observer functionality that leverag
 ### 3.4 Drift vs Error
 - **Error** is deviation from expected output
 - **Drift** is divergence from expected field state
+
+
+---
+
+## 3.5 O2C — Cognitive Filesystem & Obsidian Mesh
+
+The O2C (OpenClaw Orchestration) system extends V3 with a **cognitive filesystem** — a persistent operational intelligence layer built on markdown-native storage and graph-based knowledge linking.
+
+### Core Architecture
+
+```mermaid
+flowchart TD
+    subgraph "Agent Runtime"
+        AGENT[Agent Execution]
+        JOURNAL[Execution Journal]
+    end
+
+    subgraph "Phase 00: Cognitive Filesystem"
+        VW[Vault Writer]
+        CMP[Compressor]
+        LNK[Knowledge Graph Linker]
+        TAX[Doctrine Taxonomy]
+        NS[Note Standard]
+        SL[Skill Loader]
+    end
+
+    subgraph "Phase 01: Obsidian Cognitive Mesh"
+        EI[Error Intelligence]
+        PC[Pattern Crystallizer]
+        MD[Memory Distiller]
+        CI[Context Injector]
+    end
+
+    subgraph "Storage"
+        VAULT[(O2C-VAULT)]
+    end
+
+    AGENT --> JOURNAL
+    JOURNAL --> VW
+    VW --> VAULT
+    VAULT --> CMP
+    CMP --> LNK
+    LNK --> VAULT
+    VAULT --> EI
+    EI --> VAULT
+    VAULT --> PC
+    PC --> VAULT
+    JOURNAL --> MD
+    MD --> VAULT
+    VAULT --> CI
+    SL --> CI
+    CI --> AGENT
+
+    style AGENT fill:#1d3557,color:#fff
+    style JOURNAL fill:#4dabf7,color:#fff
+    style VW fill:#4dabf7,color:#fff
+    style CMP fill:#4dabf7,color:#fff
+    style LNK fill:#4dabf7,color:#fff
+    style TAX fill:#4dabf7,color:#fff
+    style NS fill:#4dabf7,color:#fff
+    style SL fill:#4dabf7,color:#fff
+    style EI fill:#51cf66,color:#fff
+    style PC fill:#51cf66,color:#fff
+    style MD fill:#51cf66,color:#fff
+    style CI fill:#51cf66,color:#fff
+    style VAULT fill:#264653,color:#fff,stroke:#2a9d8f
+```
+
+### Knowledge Compounding Loop
+
+The key innovation: **intelligence compounds over time**.
+
+```
+Session 1: Agent executes → Journal captures → Distiller compresses → Vault stores
+Session 2: Context injector loads Session 1 knowledge → Agent starts smarter
+Session 3: Patterns from Sessions 1+2 crystallize → Cognitive primitives emerge
+Session N: Agent starts with N-1 sessions of accumulated operational intelligence
+```
+
+### Phase 00 vs Phase 01
+
+| Aspect | Phase 00 | Phase 01 |
+|--------|----------|----------|
+| **Focus** | Filesystem foundation | Cognitive mesh |
+| **Key capability** | Write structured markdown | Extract intelligence from markdown |
+| **Memory type** | Raw storage | Distilled operational memory |
+| **Agent benefit** | Can store knowledge | Can retrieve and reuse knowledge |
+| **Test count** | 84 | 38 |
+
+### Vault API Integration
+
+All O2C endpoints are registered on the OCE FastAPI backend (port 8000):
+
+```mermaid
+graph LR
+    OCE[OCE Backend<br/>Port 8000] --> VAULT_API[Vault API<br/>21 Endpoints]
+    VAULT_API --> P00[Phase 00<br/>11 endpoints]
+    VAULT_API --> P01[Phase 01<br/>10 endpoints]
+    P00 --> OV[(O2C-VAULT)]
+    P01 --> OV
+```
+
+### File Reference
+
+| File | Purpose |
+|------|---------|
+| `core/obsidian/vault_writer.py` | Write structured markdown to vault |
+| `core/obsidian/compressor.py` | Compress execution traces |
+| `core/obsidian/linker.py` | Auto-link knowledge graph |
+| `core/obsidian/taxonomy.py` | Enforce vault structure |
+| `core/obsidian/note_standard.py` | Validate note format |
+| `core/obsidian/error_intelligence.py` | Error categorization and indexing |
+| `core/obsidian/pattern_crystallizer.py` | Pattern extraction |
+| `core/obsidian/memory_distiller.py` | Session distillation |
+| `core/obsidian/context_injector.py` | Context injection at spawn |
+| `core/skills/loader.py` | Skill loading |
+| `oce/backend/vault_api.py` | FastAPI endpoints |
+| `oce/O2C_PHASE00_BUILD-NOTES.md` | Phase 00 documentation |
+| `oce/O2C_PHASE01_BUILD-NOTES.md` | Phase 01 documentation |
 
 ---
 

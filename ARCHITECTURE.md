@@ -3,7 +3,7 @@
 > **Purpose:** Step-by-step guide to the entire Larger-Lab system. What each part does, how they connect, and why.
 > **Audience:** Any agent or developer who needs to understand, modify, or extend the system.
 > **Last Updated:** 2026-05-31
-> **Status:** V3 All 10 Phases Complete | Observer Core O-1 through O-7 COMPLETE | Phase 00 Cognitive Filesystem COMPLETE
+> **Status:** V3 All 10 Phases Complete | Observer Core O-1 through O-7 COMPLETE | O2C Phase 00 + Phase 01 COMPLETE
 
 ---
 
@@ -14,6 +14,7 @@
 3. [SRRA-OPH — The Substrate](#3-srra-oph--the-substrate)
 4. [OCE V3 — The Cognitive Field](#4-oce-v3--the-cognitive-field)
 4.5. [Observer Core — O-1 through O-7](#45-observer-core--o-1-through-o-7)
+4.6. [O2C — Cognitive Filesystem & Obsidian Mesh](#46-o2c--cognitive-filesystem--obsidian-mesh)
 5. [Agent Network — Who Does What](#5-agent-network--who-does-what)
 6. [Memory Architecture — How State Persists](#6-memory-architecture--how-state-persists)
 7. [Data Pipeline — From Market Data to Decisions](#7-data-pipeline--from-market-data-to-decisions)
@@ -61,7 +62,7 @@ Larger-Lab is a **sovereign cognitive field system** — a multi-agent architect
 ```
 
 **Key metrics:**
-- 1460 tests passing (1403 OCE + 57 SRRA-OPH)
+- 1582+ tests passing (1403 OCE + 57 SRRA-OPH + 122 O2C)
 - 67 V3 modules across 10 phases
 - 5 active agents
 - 11 system capability integration tests
@@ -496,6 +497,207 @@ graph LR
 - Layers 2 and 3 are hidden by default, expandable
 - Single WebSocket connection for all real-time data
 - Dark observatory theme across all layers
+
+
+---
+
+## 4.6 O2C — Cognitive Filesystem & Obsidian Mesh
+
+**Purpose:** The cognitive filesystem layer that makes O2C (OpenClaw Orchestration) a persistent operational intelligence system — not a chatbot, but an evolving research organism.
+
+**Core shift:** `User asks → System responds → Dies` becomes `Agents execute → Trace → Distill → Store → Retrieve → Improve`
+
+### O2C Phase Flow
+
+```mermaid
+graph LR
+    subgraph "Phase 00: Cognitive Filesystem"
+        VW[Vault Writer] --> CMP[Compressor]
+        CMP --> LNK[Linker]
+        LNK --> TAX[Taxonomy]
+        TAX --> NS[Note Standard]
+        SKL[Skill System] --> SL[Skill Loader]
+        EJ[Execution Journal] --> LS[Live Sync]
+    end
+
+    subgraph "Phase 01: Obsidian Cognitive Mesh"
+        EI[Error Intelligence] --> PC[Pattern Crystallizer]
+        PC --> MD[Memory Distiller]
+        MD --> CI[Context Injector]
+        SL --> CI
+    end
+
+    subgraph "Vault"
+        OV[(O2C-VAULT)]
+    end
+
+    VW --> OV
+    EJ --> OV
+    EI --> OV
+    MD --> OV
+    LNK --> OV
+    CI --> OV
+
+    style VW fill:#4dabf7,color:#fff
+    style CMP fill:#4dabf7,color:#fff
+    style LNK fill:#4dabf7,color:#fff
+    style TAX fill:#4dabf7,color:#fff
+    style NS fill:#4dabf7,color:#fff
+    style SKL fill:#4dabf7,color:#fff
+    style SL fill:#4dabf7,color:#fff
+    style EJ fill:#4dabf7,color:#fff
+    style LS fill:#4dabf7,color:#fff
+    style EI fill:#51cf66,color:#fff
+    style PC fill:#51cf66,color:#fff
+    style MD fill:#51cf66,color:#fff
+    style CI fill:#51cf66,color:#fff
+    style OV fill:#264653,color:#fff,stroke:#2a9d8f
+```
+
+### O2C Architecture Diagram
+
+```mermaid
+flowchart TD
+    AGENT[Agent Execution] --> JOURNAL[Execution Journal]
+    JOURNAL --> DISTILL[Memory Distiller]
+    DISTILL --> VAULT[(O2C-VAULT)]
+    VAULT --> LINKER[Knowledge Graph Linker]
+    LINKER --> VAULT
+    VAULT --> ERRORS[Error Intelligence]
+    ERRORS --> VAULT
+    VAULT --> PATTERNS[Pattern Crystallizer]
+    PATTERNS --> VAULT
+    VAULT --> CONTEXT[Context Injector]
+    CONTEXT --> SPAWN[Future Agent Spawns]
+    SPAWN --> AGENT
+
+    style AGENT fill:#1d3557,color:#fff
+    style JOURNAL fill:#4dabf7,color:#fff
+    style DISTILL fill:#51cf66,color:#fff
+    style VAULT fill:#264653,color:#fff,stroke:#2a9d8f
+    style LINKER fill:#4dabf7,color:#fff
+    style ERRORS fill:#51cf66,color:#fff
+    style PATTERNS fill:#51cf66,color:#fff
+    style CONTEXT fill:#51cf66,color:#fff
+    style SPAWN fill:#9d0208,color:#fff
+```
+
+### Phase 00 Components — Cognitive Filesystem Foundation
+
+| Component | File | Purpose | Tests |
+|-----------|------|---------|-------|
+| Vault Writer | `core/obsidian/vault_writer.py` | Write structured markdown to vault | 24 |
+| Compressor | `core/obsidian/compressor.py` | Compress traces → operational knowledge | 12 |
+| Linker | `core/obsidian/linker.py` | Auto-link knowledge graph | 12 |
+| Taxonomy | `core/obsidian/taxonomy.py` | Enforce vault structure | 8 |
+| Note Standard | `core/obsidian/note_standard.py` | Validate CAUSE/FIX/RESULT/LINKS | 11 |
+| Skill System | `skills/` directory | Portable operational capabilities | — |
+| Skill Loader | `core/skills/loader.py` | Load/inject skills at runtime | 8 |
+| Execution Journal | `core/execution/journal.py` | Track agent execution steps | 7 |
+| Live Sync | Built into vault_writer | Direct markdown writes to vault | — |
+
+**Phase 00 Total: 84 tests**
+
+### Phase 01 Components — Obsidian Cognitive Mesh
+
+| Component | File | Purpose | Tests |
+|-----------|------|---------|-------|
+| Error Intelligence | `core/obsidian/error_intelligence.py` | Auto-classify, index, query errors | 13 |
+| Pattern Crystallizer | `core/obsidian/pattern_crystallizer.py` | Extract recurring operational patterns | 5 |
+| Memory Distiller | `core/obsidian/memory_distiller.py` | Compress sessions into operational memory | 4 |
+| Context Injector | `core/obsidian/context_injector.py` | Load relevant vault knowledge at spawn | 7 |
+| Integration Tests | `oce/tests/test_phase01_integration.py` | End-to-end pipeline verification | 9 |
+
+**Phase 01 Total: 38 tests (29 unit + 9 integration)**
+
+### Vault API Endpoints
+
+All O2C endpoints are registered on the OCE FastAPI backend (port 8000):
+
+| Endpoint | Method | Phase | Purpose |
+|----------|--------|-------|---------|
+| `/api/vault/notes` | GET | 00 | List notes with filtering |
+| `/api/vault/notes` | POST | 00 | Create a note |
+| `/api/vault/notes/{cat}/{title}` | GET/PUT/DELETE | 00 | Note CRUD |
+| `/api/vault/graph` | GET | 00 | Knowledge graph (nodes + edges) |
+| `/api/vault/compress` | POST | 00 | Compress trace → markdown |
+| `/api/vault/search` | GET | 00 | Search notes |
+| `/api/vault/categories` | GET | 00 | List categories |
+| `/api/vault/stats` | GET | 00 | Vault statistics |
+| `/api/vault/sync` | POST | 00 | Sync to Obsidian vault |
+| `/api/vault/validate` | POST | 00 | Validate note format |
+| `/api/vault/errors` | GET | 01 | Error intelligence data |
+| `/api/vault/errors/index` | POST | 01 | Index an error |
+| `/api/vault/patterns` | GET | 01 | Extracted patterns |
+| `/api/vault/crystallize` | POST | 01 | Crystallize a pattern |
+| `/api/vault/distill` | POST | 01 | Distill session → memory |
+| `/api/vault/distill/vault` | POST | 01 | Distill vault activity |
+| `/api/vault/context` | GET | 01 | Context injection for task |
+| `/api/vault/summary` | GET | 01 | Vault summary |
+
+**Total: 21 vault API endpoints (11 Phase 00 + 10 Phase 01)**
+
+### Vault Structure (O2C-VAULT)
+
+```
+O2C-VAULT/
+├── agents/           # Agent execution reports
+│   ├── quant/
+│   ├── research/
+│   ├── coding/
+│   └── observer/
+├── memory/           # Distilled operational memory
+│   ├── successful_patterns/
+│   ├── error_corrections/
+│   ├── spawn_history/
+│   └── consensus_failures/
+├── ontology/         # Domain models and state machines
+├── graphs/           # Knowledge graph visualizations
+├── journals/         # Daily runtime logs
+├── doctrine/         # Core operational principles
+├── failures/         # Indexed error knowledge
+├── execution/        # Execution traces
+├── skills/           # Portable operational capabilities
+├── heuristics/       # Rules of thumb
+├── routing/          # Task routing patterns
+└── architecture/     # System architecture notes
+```
+
+### Note Standard (CAUSE/FIX/RESULT/LINKS)
+
+Every note in the vault follows this mandatory format:
+
+```markdown
+# [Title]
+
+CAUSE:
+[What caused this]
+
+FIX:
+[What fixed it]
+
+RESULT:
+[Outcome after fix]
+
+LINKS:
+[[Related Concept 1]]
+[[Related Concept 2]]
+```
+
+This ensures every note is machine-parseable, graph-linkable, and contributes to the knowledge graph.
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `core/obsidian/` | All O2C backend modules (11 files) |
+| `core/execution/` | Execution journal |
+| `core/skills/` | Skill loader |
+| `skills/` | Skill definitions (2 skills) |
+| `oce/backend/vault_api.py` | FastAPI endpoints (21 routes) |
+| `oce/O2C_PHASE00_BUILD-NOTES.md` | Phase 00 build notes |
+| `oce/O2C_PHASE01_BUILD-NOTES.md` | Phase 01 build notes |
+| `O2C-VAULT/` | The Obsidian vault directory |
 
 ---
 
