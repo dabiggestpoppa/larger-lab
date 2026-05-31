@@ -1,569 +1,96 @@
 {
-  "session_id": "session_20260529_140357",
-  "start_time": "2026-05-29T14:03:57.861569+00:00",
-  "last_active": "2026-05-31T03:26:36.501063+00:00",
-  "workflow_count": 63,
-  "success_count": 61,
-  "failure_count": 2,
-  "active_goals": [],
-  "workflow_history": [
-    {
-      "workflow_id": "chat_f6d28418",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T17:00:51.783479+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_ac96db28",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T17:00:51.946263+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_364219ef",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T17:00:51.988218+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_3256763e",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T17:00:52.021939+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_a7016142",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T17:00:52.064642+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_48ab62c0",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T17:00:52.104360+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_2a3dd1a5",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T17:00:52.147005+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_7b4b3c3c",
-      "domain": "research",
-      "complexity": "low",
-      "timestamp": "2026-05-30T17:00:52.197676+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_1c21771f",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T17:00:52.241948+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_fdf4abdb",
-      "domain": "coding",
-      "complexity": "medium",
-      "timestamp": "2026-05-30T17:00:52.285392+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_7396d5a1",
-      "domain": "system_analysis",
-      "complexity": "medium",
-      "timestamp": "2026-05-30T17:00:52.338852+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_1bde53ce",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T17:00:52.384172+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_720f7aa7",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T17:00:52.433880+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_5d05a441",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T17:00:52.485705+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_a45c4790",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T17:00:52.548684+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_a9fa29b5",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T17:02:51.393557+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_b2ff23db",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T17:12:10.356554+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_21fad3d6",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T17:39:18.984530+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_f51c3903",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T17:39:57.679158+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_c06a9baa",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T17:42:39.532315+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_e6565c07",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T18:23:24.097672+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_795edd33",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T18:23:24.275855+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_b4d913e0",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T18:23:24.449534+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_c4b716d0",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T18:23:24.583179+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_4e7cf55a",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T18:23:24.727830+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_8128dca9",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T18:23:24.900859+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_883cf8fb",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T18:23:25.050779+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_e625c56f",
-      "domain": "research",
-      "complexity": "low",
-      "timestamp": "2026-05-30T18:23:25.159905+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_a8f40b3a",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T18:23:25.247400+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_a950e0e7",
-      "domain": "coding",
-      "complexity": "medium",
-      "timestamp": "2026-05-30T18:23:25.354086+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_f9e45124",
-      "domain": "system_analysis",
-      "complexity": "medium",
-      "timestamp": "2026-05-30T18:23:25.491668+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_43fa9851",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T18:23:25.601949+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_1257762a",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T18:23:25.727182+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_4807b4f1",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T18:23:25.837435+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_1640c31e",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T18:23:25.932817+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_32987ebb",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T18:23:54.516110+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_70c431e0",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T18:24:19.186099+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_7dd6c567",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T18:24:19.290223+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_c4d44e43",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T18:24:19.385332+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_ee85cc35",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T18:24:19.469652+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_2694c29c",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-30T18:24:19.570634+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_d5d65755",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-31T03:24:36.279460+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_1d315fc8",
-      "domain": "general",
-      "complexity": "low",
-      "timestamp": "2026-05-31T03:24:50.524257+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_7680c06a",
-      "domain": "research",
-      "complexity": "low",
-      "timestamp": "2026-05-31T03:25:09.664480+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_f3c4ff02",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-31T03:25:35.192677+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_4609e138",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-31T03:25:48.604936+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_d37891ab",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-31T03:25:59.015885+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_6f7363da",
-      "domain": "automation",
-      "complexity": "medium",
-      "timestamp": "2026-05-31T03:26:09.592757+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_a019b046",
-      "domain": "coding",
-      "complexity": "medium",
-      "timestamp": "2026-05-31T03:26:29.865919+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_b9042c80",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-31T03:26:36.501063+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    }
+  "version": "2.0-unified",
+  "last_updated": "2026-05-31T02:25:00-04:00",
+  "architecture": {
+    "model": "unified_field",
+    "substrate": "OCE",
+    "cognition_layer": "O2C",
+    "capability_fields": ["SRRA-OPH", "Quant Lab", "CARE", "Telemetry"],
+    "memory_spine": "Obsidian",
+    "status": "STABILIZED"
+  },
+  "field_domains": {
+    "OCE": {"role": "unified_operational_substrate", "access": "native"},
+    "O2C": {"role": "orchestration_cognition_layer", "access": "native", "owner": "OC2"},
+    "SRRA_OPH": {"role": "capability_field", "access": "direct_call"},
+    "Obsidian": {"role": "memory_continuity_spine", "access": "primary_persistence"},
+    "Quant_Lab": {"role": "deterministic_execution", "access": "direct_orchestration"},
+    "CARE": {"role": "capital_routing", "access": "direct_orchestration"},
+    "Telemetry": {"role": "adaptive_stabilization", "access": "read_write"}
+  },
+  "priority_hierarchy": [
+    "execution_reliability",
+    "memory_continuity",
+    "recursive_refinement",
+    "artifact_synthesis",
+    "telemetry_adaptation",
+    "capital_efficiency",
+    "ux_conversation"
   ],
-  "routing_patterns": {
-    "TaskType.CONVERSATION:": 51,
-    "TaskType.CODING:": 4,
-    "TaskType.RESEARCH:": 4,
-    "TaskType.SYSTEM_ANALYSIS:": 2,
-    "TaskType.GENERAL:": 1,
-    "TaskType.AUTOMATION:": 1
+  "obsidian_behaviors": {
+    "research_persistence": true,
+    "agent_memory_chains": true,
+    "knowledge_graphing": true,
+    "failure_indexing": true,
+    "artifact_centric_workflow": true
+  },
+  "build_directive": {
+    "new_systems_authorized": false,
+    "evolution_mode": ["refinement", "telemetry", "memory", "observation", "optimization", "adaptation"],
+    "reject": ["expansion", "cosmetic_architecture", "redundant_frameworks", "infrastructure_bloat", "saas_feature_creep"]
+  },
+  "active_campaigns": {
+    "symmetry_trap_backtest": {
+      "status": "COMPLETE",
+      "phases_done": [1, 2, 3, 4, 5],
+      "assets_tested": 19,
+      "total_trades": 17700,
+      "pooled_trades": 12488,
+      "blended_wr": 0.812,
+      "combined_pf": 26.58,
+      "mc_ruin": 0.0062,
+      "reports_location": "quant-lab/reports/",
+      "bible_location": "quant-lab/QUANTLAB_BIBLE.md",
+      "top_performers": [
+        {"asset": "ETHUSD", "wr": 0.969, "pf": 50.34},
+        {"asset": "HK50", "wr": 0.940, "pf": 40.30},
+        {"asset": "NZDUSD", "wr": 0.933, "pf": 19.02},
+        {"asset": "BTCUSD", "wr": 0.926, "pf": 26.52},
+        {"asset": "US500", "wr": 0.917, "pf": 13.95}
+      ],
+      "flags": [
+        {"issue": "XAGUSD config", "severity": "high", "detail": "Only 2 trades, needs recalibration"},
+        {"issue": "BTC concentration", "severity": "medium", "detail": "55% of multi-asset PnL from single asset"},
+        {"issue": "Crypto correlation", "severity": "medium", "detail": "BTC+ETH = 58.5% of pool"}
+      ]
+    }
+  },
+  "team_roster": {
+    "CC": {"role": "overseer_architecture", "status": "active"},
+    "OC2": {"role": "o2c_orchestrator", "status": "active"},
+    "AS": {"role": "quality_docs", "status": "standby"},
+    "PM": {"role": "debugger_tools", "status": "active"},
+    "PM2": {"role": "experimental_track", "status": "standby"},
+    "RL": {"role": "research_dspy", "status": "standby"},
+    "HR": {"role": "hermes_nautilus_execution", "status": "24_7_active"},
+    "Copilot": {"role": "test_monitoring", "status": "standby"}
+  },
+  "live_deployment": {
+    "ST_executor": {"symbol": "EURUSD.PRO", "magic": 20260531, "lots": 0.03, "status": "live"},
+    "P90_executor": {"symbol": "USDCHF.PRO", "magic": 20260532, "lots": 0.01, "status": "live"},
+    "account": "650898 LIVE"
+  },
+  "next_priorities": [
+    "P90 multi-asset backtest (Phase 6)",
+    "Dual-engine convergence (P90 + ST)",
+    "Nautilus cross-validation",
+    "Obsidian knowledge graph setup",
+    "DD duration + time-in-DD metrics",
+    "XAGUSD config recalibration"
+  ],
+  "metadata": {
+    "created_by": "OC2",
+    "trigger": "MAD O2C Post-Port Integration Directive 2026-05-31",
+    "session": "telegram_8258195396"
   }
 }
