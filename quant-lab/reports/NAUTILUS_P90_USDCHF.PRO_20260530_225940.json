@@ -1,0 +1,17 @@
+{
+  "strategy": "p90",
+  "symbol": "USDCHF.PRO",
+  "bars": 253031,
+  "timestamp": "20260530_225940",
+  "engine_orders": 813,
+  "engine_positions": 0,
+  "engine_pnl_usd": 0.0,
+  "engine_win_rate": 0.0,
+  "strategy_trades": 763,
+  "strategy_wins": 443,
+  "strategy_losses": 320,
+  "strategy_win_rate": 58.0602883355177,
+  "strategy_pnl_pips": 239.53399999999786,
+  "max_drawdown": 0.0,
+  "elapsed_s": 106844100.0
+}

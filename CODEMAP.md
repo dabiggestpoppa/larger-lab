@@ -1,7 +1,7 @@
 # 🗺️ CODEMAP — Unified System Architecture
 
 > **Purpose:** Complete workspace orientation with all Mermaid diagrams in one place.
-> **Updated:** 2026-05-31 | V3 All 10 Phases Complete | Observer Core O-1 through O-7 COMPLETE | Phase 00 Cognitive Filesystem COMPLETE | 119+ tests passing
+> **Updated:** 2026-05-31 | V3 All 10 Phases Complete | Observer Core O-1 through O-7 COMPLETE | O2C Phase 00 + Phase 01 COMPLETE | 1582+ tests passing
 > **For:** Quick reference, architecture alignment, pipeline verification.
 
 ---
@@ -72,6 +72,10 @@ graph TB
     OR --> API
     API --> UI
     API --> EF
+    API --> O2C_API
+    O2C_API --> O2C_COMP
+    O2C_COMP --> O2C_VAULT
+    O2C_VAULT --> O2C_COMP
 
     CSV --> NT
     NT --> REPORTS
@@ -82,6 +86,108 @@ graph TB
     API --> OPENROUTER
     WIN --> CLOUD
 ```
+
+---
+
+## 🔮 O2C — Cognitive Filesystem & Obsidian Mesh
+
+### O2C Phase Flow Diagram
+
+```mermaid
+graph LR
+    subgraph "Phase 00: Filesystem Foundation"
+        VW[Vault Writer] --> CMP[Compressor]
+        CMP --> LNK[Linker]
+        LNK --> TAX[Taxonomy]
+        TAX --> NS[Note Standard]
+        SKL[Skill System] --> SL[Skill Loader]
+        EJ[Execution Journal] --> LS[Live Sync]
+    end
+
+    subgraph "Phase 01: Cognitive Mesh"
+        EI[Error Intelligence] --> PC[Pattern Crystallizer]
+        PC --> MD[Memory Distiller]
+        MD --> CI[Context Injector]
+        SL --> CI
+    end
+
+    subgraph "Storage"
+        OV[(O2C-VAULT)]
+        API[Vault API<br/>21 Endpoints]
+    end
+
+    VW --> OV
+    EJ --> OV
+    EI --> OV
+    MD --> OV
+    LNK --> OV
+    CI --> OV
+    OV --> API
+
+    style VW fill:#4dabf7,color:#fff
+    style CMP fill:#4dabf7,color:#fff
+    style LNK fill:#4dabf7,color:#fff
+    style TAX fill:#4dabf7,color:#fff
+    style NS fill:#4dabf7,color:#fff
+    style SKL fill:#4dabf7,color:#fff
+    style SL fill:#4dabf7,color:#fff
+    style EJ fill:#4dabf7,color:#fff
+    style LS fill:#4dabf7,color:#fff
+    style EI fill:#51cf66,color:#fff
+    style PC fill:#51cf66,color:#fff
+    style MD fill:#51cf66,color:#fff
+    style CI fill:#51cf66,color:#fff
+    style OV fill:#264653,color:#fff,stroke:#2a9d8f
+    style API fill:#845ef7,color:#fff
+```
+
+### O2C Knowledge Loop
+
+```mermaid
+flowchart TD
+    A[Agent Spawned] --> B[Executes Task]
+    B --> C[Journal Captures Steps]
+    C --> D[Memory Distiller]
+    D --> E[O2C-VAULT]
+    E --> F[Error Intelligence]
+    E --> G[Pattern Crystallizer]
+    E --> H[Knowledge Graph Linker]
+    F --> E
+    G --> E
+    H --> E
+    E --> I[Context Injector]
+    I --> J[Future Agent Spawns]
+    J --> A
+
+    style A fill:#1d3557,color:#fff
+    style B fill:#4dabf7,color:#fff
+    style C fill:#4dabf7,color:#fff
+    style D fill:#51cf66,color:#fff
+    style E fill:#264653,color:#fff,stroke:#2a9d8f
+    style F fill:#51cf66,color:#fff
+    style G fill:#51cf66,color:#fff
+    style H fill:#4dabf7,color:#fff
+    style I fill:#51cf66,color:#fff
+    style J fill:#9d0208,color:#fff
+```
+
+### O2C Component Table
+
+| Phase | Component | File | Tests |
+|-------|-----------|------|-------|
+| 00 | Vault Writer | `core/obsidian/vault_writer.py` | 24 |
+| 00 | Compressor | `core/obsidian/compressor.py` | 12 |
+| 00 | Linker | `core/obsidian/linker.py` | 12 |
+| 00 | Taxonomy | `core/obsidian/taxonomy.py` | 8 |
+| 00 | Note Standard | `core/obsidian/note_standard.py` | 11 |
+| 00 | Skill Loader | `core/skills/loader.py` | 8 |
+| 00 | Execution Journal | `core/execution/journal.py` | 7 |
+| 01 | Error Intelligence | `core/obsidian/error_intelligence.py` | 13 |
+| 01 | Pattern Crystallizer | `core/obsidian/pattern_crystallizer.py` | 5 |
+| 01 | Memory Distiller | `core/obsidian/memory_distiller.py` | 4 |
+| 01 | Context Injector | `core/obsidian/context_injector.py` | 7 |
+| — | Integration Tests | `oce/tests/test_phase01_integration.py` | 9 |
+| **Total** | | | **122** |
 
 ---
 
