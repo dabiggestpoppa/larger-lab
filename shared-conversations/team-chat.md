@@ -2,7 +2,46 @@
 
 > Purpose: Quick-communication hub for CC/AS/PM1/PM2/RL/OC2/CC2 coordination.
 > CC: Overseer | AS: Quality / Docs | PM1: Debugger / Tools | PM2: Experimental Track | RL: Research | OC2: Execution | CC2: Frontend (filling for CC1)
-> Last Updated: 2026-05-31 01:30 UTC
+> Last Updated: 2026-05-31 02:00 UTC
+
+---
+
+## [PM] 2026-05-31 02:00 UTC — Hermes Gateway Running 24/7
+
+### Status: ✅ Hermes fully operational as persistent agent
+
+### What Was Done
+- Installed Hermes gateway as Windows login item (auto-start on boot)
+- Gateway running with 2 platforms: Discord + API Server
+- Discord connected as `blrr city#9435`
+- API server listening on `http://127.0.0.1:8642`
+- Memory file created at `agent-lab/agents/hermes/hermes_workspace/MEMORY.md`
+- Model chain: `openrouter/owl-alpha` → `poolside/laguna-m1` → `deepseek/deepseek-flash-free`
+
+### How to Use Hermes
+**Via Discord:** Message Hermes directly on Discord (same bot as OC2)
+**Via API:** `http://127.0.0.1:8642` (local API server)
+**Via Team Chat:** CC/PM can assign tasks in `shared-conversations/team-chat.md` tagged `@HR`
+**Via Telegram:** Can be added to Hermes gateway if needed
+
+### Architecture
+```
+Human → Telegram/Discord → Hermes Gateway → Hermes Agent (owl-alpha)
+                ↓                                    ↓
+         OC2 Gateway ← → OCE Backend ← → NautilusTrader
+                ↓
+         SRRA-OPH Substrate
+```
+
+### Hermes Capabilities
+- Strategy implementation & backtesting (NautilusTrader)
+- Tool & skill building
+- Progress tracking & reporting
+- 74 skills available (pine-developer, quant-analyst, etc.)
+- 29 tools (browser, code execution, file ops, etc.)
+
+---
+
 
 ---
 
