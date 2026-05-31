@@ -1,4 +1,4 @@
-"""
+﻿"""
 Tests for Linker — Phase 0C
 """
 
@@ -62,15 +62,16 @@ class TestAutoLink:
     def test_dry_run_doesnt_write(self, tmp_linker):
         tmp_linker.auto_link(dry_run=True)
         # Notes should be unchanged
-        content = tmp_linker.writer.get_note("failures", "State Reset Bug")
+        note = tmp_linker.writer.get_note("failures", "State Reset Bug")
+        content = note["content"] if isinstance(note, dict) else note
         assert "[[Price KeyError Bug]]" not in content
 
     def test_auto_link_writes(self, tmp_linker):
         additions = tmp_linker.auto_link(dry_run=False)
         if "State Reset Bug" in additions:
-            content = tmp_linker.writer.get_note("failures", "State Reset Bug")
+            note = tmp_linker.writer.get_note("failures", "State Reset Bug")
             # Should now have links to related notes
-            assert "LINKS:" in content
+            assert note is not None and "LINKS:" in note["content"]
 
 
 class TestGetRelated:

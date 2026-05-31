@@ -1,4 +1,4 @@
-"""
+﻿"""
 Execution Journal — Phase 0F
 Track agent actions, failures, corrections, retries, successful heuristics.
 

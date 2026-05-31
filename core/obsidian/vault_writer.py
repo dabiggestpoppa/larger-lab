@@ -88,7 +88,7 @@ class VaultWriter:
         notes = []
         for p in sorted(dp.rglob("*.md")):
             c = p.read_text(encoding="utf-8")
-            rp = str(p.relative_to(self.vault_path))
+            rp = str(p.relative_to(self.vault_path)).replace("\\", "/")
             notes.append({"id": rp, "title": p.stem.replace("_", " "), "path": rp,
                           "category": rp.split("/")[0], "tags": re.findall(r"#(\w+)", c),
                           "links": re.findall(r"\[\[(.+?)\]\]", c),
@@ -98,7 +98,7 @@ class VaultWriter:
     def search_notes(self, query="", category="", limit=50):
         results = []
         for n in self.list_notes(category=category or None):
-            fp = self.vault_path / n["path"]
+            fp = Path(self.vault_path) / n["path"]
             c = fp.read_text(encoding="utf-8") if fp.exists() else ""
             if query.lower() in n["title"].lower() or query.lower() in c.lower():
                 n["content"] = c[:500]
@@ -109,6 +109,11 @@ class VaultWriter:
 
     def list_categories(self):
         return sorted(VALID_CATEGORIES)
+
+    def note_exists(self, category, title, subcategory=None):
+        fn = self._sanitize_filename(title) + ".md"
+        fp = self.vault_path / category / (subcategory or "") / fn
+        return fp.exists()
 
     def update_note(self, category, title, content, tags=None, subcategory=None):
         return self.write_note(category, title, content, tags, subcategory)

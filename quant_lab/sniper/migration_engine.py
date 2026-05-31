@@ -1,5 +1,5 @@
 """
-Fertile Soil Migration Engine — Phase 3
+Fertile Soil Migration Engine - Phase 3
 Monitors prop firm degradation and detects when to migrate capital to live accounts.
 
 Migration triggers:
@@ -26,9 +26,9 @@ from quant_lab.sniper.database import (
 )
 
 
-# ═══════════════════════════════════════════════════════════
+# ===========================================================
 # 1. CROSSOVER DETECTOR
-# ═══════════════════════════════════════════════════════════
+# ===========================================================
 
 def crossover_detector(
     current_pes: float,
@@ -41,9 +41,9 @@ def crossover_detector(
     The crossover point formula:
         When (edge_prop × leverage_prop) < (edge_live × leverage_live)
 
-    Calibrated range: ~$8K–$12K for CEREBUS edge (WR 85.7%, Sharpe 8.5).
-    Higher WR → props stay optimal longer.
-    Degrading edge → crossover comes sooner.
+    Calibrated range: ~$8K-$12K for CEREBUS edge (WR 85.7%, Sharpe 8.5).
+    Higher WR -> props stay optimal longer.
+    Degrading edge -> crossover comes sooner.
 
     Args:
         current_pes: Current PES score of the active prop deployment.
@@ -63,26 +63,26 @@ def crossover_detector(
 
     # Derive edge quality from the PES ratio degradation
     # If current_pes is much lower than what our edge should produce,
-    # the effective edge has degraded → crossover comes sooner
+    # the effective edge has degraded -> crossover comes sooner
     edge_ratio = current_pes / max(live_pes, 0.001)
 
     if edge_ratio >= 0.85:
         status = "OPTIMAL"
-        # Within optimal band — props are still better
+        # Within optimal band - props are still better
         crossover_aum = int(base_crossover_high * (1.0 + (edge_ratio - 0.85) * 2))
         recommendation = (
             f"Prop deployment optimal. Crossover at ${crossover_aum:,}. "
-            f"Current AUM ${total_aum:,.0f} — {'within' if total_aum < crossover_aum else 'approaching'} safe zone."
+            f"Current AUM ${total_aum:,.0f} - {'within' if total_aum < crossover_aum else 'approaching'} safe zone."
         )
     elif edge_ratio >= 0.50:
         status = "DEGRADED"
-        # Edge degrading — crossover is sooner
+        # Edge degrading - crossover is sooner
         degradation_factor = 1.0 - edge_ratio
         crossover_aum = int(base_crossover_low * (1.0 - degradation_factor))
         recommendation = (
             f"Prop edge degraded ({edge_ratio:.0%} of live PES). "
             f"Crossover threshold lowered to ${crossover_aum:,}. "
-            f"{'Total AUM already past crossover — begin live migration.' if total_aum > crossover_aum else 'Monitor closely.'}"
+            f"{'Total AUM already past crossover - begin live migration.' if total_aum > crossover_aum else 'Monitor closely.'}"
         )
     else:
         status = "CROSSOVER"
@@ -102,32 +102,32 @@ def crossover_detector(
     }
 
 
-# ═══════════════════════════════════════════════════════════
+# ===========================================================
 # 2. TOXIC WELL SCANNER
-# ═══════════════════════════════════════════════════════════
+# ===========================================================
 
 def toxic_well_scanner(active_deployments: list) -> list:
     """
     Scans active deployments for degradation signals.
 
     Toxicity signal weights (total = 100):
-        patch_signal:      40  — firm patched/exploited the strategy
-        promo_loss:        20  — promo expired or revoked
-        rule_change:       20  — tighter trailing DD, stricter consistency, news restrictions
-        pes_drop:          15  — PES dropped >20% from initial
-        payout_delay:       5  — payout from PayoutJunction showing delays
+        patch_signal:      40  - firm patched/exploited the strategy
+        promo_loss:        20  - promo expired or revoked
+        rule_change:       20  - tighter trailing DD, stricter consistency, news restrictions
+        pes_drop:          15  - PES dropped >20% from initial
+        payout_delay:       5  - payout from PayoutJunction showing delays
 
     Action thresholds (toxicity_score):
-        0–25:   MONITOR
-        26–50:  SCALE_DOWN
-        51–100: EXIT
+        0-25:   MONITOR
+        26-50:  SCALE_DOWN
+        51-100: EXIT
 
     Args:
         active_deployments: list of dicts with keys:
             firm_name (str)
             pes_initial (float)
             pes_current (float)
-            status (str) — "ACTIVE" | "PAUSED" | etc.
+            status (str) - "ACTIVE" | "PAUSED" | etc.
             Optional: promo_active (bool), rule_changed (bool),
                       patch_signal (bool), payout_delayed (bool)
 
@@ -177,13 +177,13 @@ def toxic_well_scanner(active_deployments: list) -> list:
                 score += PES_WEIGHT
                 signals.append(
                     f"PES_DROP: Score fell {pes_drop_pct:.0%} "
-                    f"({pes_initial:.4f} → {pes_current:.4f})"
+                    f"({pes_initial:.4f} -> {pes_current:.4f})"
                 )
             elif pes_drop_pct > 0.10:
                 score += PES_WEIGHT // 2
                 signals.append(
                     f"PES_DECLINING: Score fell {pes_drop_pct:.0%} "
-                    f"({pes_initial:.4f} → {pes_current:.4f})"
+                    f"({pes_initial:.4f} -> {pes_current:.4f})"
                 )
 
         # ── Payout delay (weight: 5) ──
@@ -207,14 +207,14 @@ def toxic_well_scanner(active_deployments: list) -> list:
             "action": action,
         })
 
-    # Sort by toxicity descending — worst first
+    # Sort by toxicity descending - worst first
     results.sort(key=lambda r: r["toxicity_score"], reverse=True)
     return results
 
 
-# ═══════════════════════════════════════════════════════════
+# ===========================================================
 # 3. MONTE CARLO AUM PATH SIMULATOR
-# ═══════════════════════════════════════════════════════════
+# ===========================================================
 
 def monte_carlo_aum_path(
     initial_aum: float,
@@ -230,7 +230,7 @@ def monte_carlo_aum_path(
         - Payout cycles (biweekly extraction, 14-day + 3-day buffer)
         - Consistency drag (max day caps reduce compounding)
         - Promo availability (refresh rate, F&F network depth)
-        - Patch probability (increases over time — firms learn)
+        - Patch probability (increases over time - firms learn)
 
     Args:
         initial_aum: Starting AUM in USD.
@@ -284,7 +284,7 @@ def monte_carlo_aum_path(
 
             # Payout extraction: extract every payout cycle
             if month % max(1, int(payout_cycle_months * 2)) == 0:
-                # Payouts extracted — AUM stays flat, capital moves to treasury
+                # Payouts extracted - AUM stays flat, capital moves to treasury
                 pass
             else:
                 aum += monthly_return
@@ -325,9 +325,9 @@ def monte_carlo_aum_path(
     }
 
 
-# ═══════════════════════════════════════════════════════════
+# ===========================================================
 # 4. MIGRATION ALERT (MASTER FUNCTION)
-# ═══════════════════════════════════════════════════════════
+# ===========================================================
 
 def migration_alert(current_state: dict) -> dict:
     """
@@ -343,8 +343,8 @@ def migration_alert(current_state: dict) -> dict:
             current_pes (float)
             live_pes (float)
             total_aum (float)
-            active_deployments (list) — for toxic_well_scanner
-            pes_30_days_ago (float) — PES 30 days prior
+            active_deployments (list) - for toxic_well_scanner
+            pes_30_days_ago (float) - PES 30 days prior
             Optional: wr (float), edge_monthly_r (float)
 
     Returns:
@@ -402,7 +402,7 @@ def migration_alert(current_state: dict) -> dict:
             urgency = "ACT_NOW"
             actions.append(
                 f"PES_CRASH: PES dropped {pes_change_pct:.0%} in 30 days "
-                f"({pes_30_days_ago:.4f} → {current_pes:.4f}). Immediate review required."
+                f"({pes_30_days_ago:.4f} -> {current_pes:.4f}). Immediate review required."
             )
 
     # ── Estimate impact ──
@@ -442,9 +442,9 @@ def migration_alert(current_state: dict) -> dict:
     }
 
 
-# ═══════════════════════════════════════════════════════════
+# ===========================================================
 # 5. WEEKLY REBALANCE CHECK
-# ═══════════════════════════════════════════════════════════
+# ===========================================================
 
 def weekly_rebalance_check() -> dict:
     """
