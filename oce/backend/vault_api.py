@@ -121,7 +121,7 @@ def register_vault_endpoints(app: FastAPI):
     @app.post("/api/vault/compress")
     async def compress_trace_to_note(request: CompressRequest):
         try:
-            compressed = compress_trace(trace=request.trace, context=request.context)
+            compressed = compress_trace(traceback=request.trace, context=request.context)
             return {"compressed": compressed}
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))

@@ -81,7 +81,7 @@ class P90Config(StrategyConfig, frozen=True):
     """Configuration for P90 Kinetic Strategy."""
     instrument_id: str = "EURUSD.PRO"
     bar_type: str = "EURUSD.PRO-5-MINUTE-LAST-EXTERNAL"
-    lot_size: Decimal = Decimal("0.01")
+    lot_size: Decimal = Decimal("1000")
     magic_number: int = 20260530
     initial_sl_mult: float = 0.80     # SL = 80% of INITIAL P90 body
     cascade_sl_mult: float = 1.68     # SL = 168% of CASCADE P90 body

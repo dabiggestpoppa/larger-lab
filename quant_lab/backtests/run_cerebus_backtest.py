@@ -138,6 +138,19 @@ def run_backtest(strategy_name: str, symbol: str, csv_path: Path,
     instrument, venue_name = get_instrument_and_venue(symbol)
     bar_type = make_bar_type(symbol, instrument)
 
+    # Auto-adjust lot size to instrument constraints (Nautilus v1.226+ FX instruments)
+    min_qty = instrument.min_quantity if instrument.min_quantity else instrument.size_increment
+    if lot_size < min_qty:
+        old_lot = lot_size
+        lot_size = min_qty
+        print(f"  [AUTO] Lot size adjusted: {old_lot} -> {lot_size} (instrument min_quantity={instrument.min_quantity})")
+    # Ensure lot_size is a multiple of size_increment
+    if lot_size % instrument.size_increment != 0:
+        lot_size = (lot_size // instrument.size_increment) * instrument.size_increment
+        if lot_size < min_qty:
+            lot_size = min_qty
+        print(f"  [AUTO] Lot size aligned to increment: {lot_size}")
+
     # Load data
     bars = load_bars(csv_path, instrument, bar_type)
     if not bars:
@@ -153,7 +166,7 @@ def run_backtest(strategy_name: str, symbol: str, csv_path: Path,
     # Configure engine
     config = BacktestEngineConfig(
         trader_id=TraderId(f"CEREBUS-{strategy_name.upper()}-001"),
-        logging=LoggingConfig(log_level="INFO"),
+        logging=LoggingConfig(log_level="ERROR"),
     )
 
     engine = BacktestEngine(config=config)
@@ -195,6 +208,18 @@ def run_backtest(strategy_name: str, symbol: str, csv_path: Path,
     # Run
     print(f"\n  Running backtest...")
     engine.run()
+
+    # Print strategy's internal stats
+    try:
+        internal = strategy.get_statistics()
+        print(f"\n  Strategy Internal Stats: {internal}")
+    except Exception:
+        pass
+    # Try to access strategy internal counters via log
+    try:
+        print(f"  Strategy total_trades={strategy.total_trades} wins={strategy.wins} losses={strategy.losses} pnl={strategy.total_pnl:.1f}")
+    except Exception:
+        pass
 
     # Results
     result = engine.get_result()
