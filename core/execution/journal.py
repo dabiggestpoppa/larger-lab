@@ -164,10 +164,13 @@ class ExecutionJournal:
             },
         )
         # Also write the full markdown
-        full_path = path.with_name(path.stem + "_full.md")
+        if isinstance(path, dict):
+            fp = self.writer.vault_path / path["path"]
+            full_path = fp.with_name(fp.stem + "_full.md")
+        else:
+            full_path = path.with_name(path.stem + "_full.md")
         full_path.write_text(markdown, encoding="utf-8")
         return path
-
     def to_json(self) -> str:
         """Serialize journal to JSON."""
         return json.dumps({

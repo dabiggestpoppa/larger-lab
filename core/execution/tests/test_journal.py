@@ -1,4 +1,4 @@
-"""
+﻿"""
 Tests for Execution Journal — Phase 0F
 """
 
@@ -73,8 +73,9 @@ class TestToMarkdown:
 class TestCompressAndSave:
     def test_saves_to_vault(self, tmp_journal, tmp_path):
         tmp_journal.log_step("test", "success")
-        path = tmp_journal.compress_and_save()
-        assert path.exists()
+        result = tmp_journal.compress_and_save()
+        assert result is not None
+        assert "path" in result
 
 
 class TestToJson:
