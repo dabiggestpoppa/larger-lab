@@ -37,6 +37,7 @@ ALWAYS use PowerShell. Never use `cmd.exe` / `subprocess.run(..., shell=True)`.
 | 🔴 PM2 | Polymorph 2 | Experimental Track / Frontend P3-5 | Standby |
 | 🟢 RL | OWL (Research Lead) | Research / DSPy | Standby |
 | 🟦 Copilot | GitHub Copilot | Test Monitoring / Autopilot | Standby |
+| 🟢 HR | Hermes | Execution / Backtesting / Reporting | **Active** |
 
 ## 📋 Current Team Tasks (2026-05-28)
 **All agents: Check `shared-conversations/team-chat.md` for detailed assignments.**

@@ -2,7 +2,48 @@
 
 > Purpose: Quick-communication hub for CC/AS/PM1/PM2/RL/OC2/CC2 coordination.
 > CC: Overseer | AS: Quality / Docs | PM1: Debugger / Tools | PM2: Experimental Track | RL: Research | OC2: Execution | CC2: Frontend (filling for CC1)
-> Last Updated: 2026-05-30 13:00 UTC
+> Last Updated: 2026-05-31 01:30 UTC
+
+---
+
+## [PM] 2026-05-31 01:30 UTC — Hermes (HR) Agent Activated and Registered
+
+### What Was Done
+- Registered Hermes in OCE Command Center as agent `hermes`
+- Capabilities: execution, backtesting, reporting, tool_building, telegram, nautilus_trader, strategy_implementation
+- Created `progress/hermes-progress.md` progress file
+- Verified registration: `POST /command-center/agents/register` → 200 OK
+
+### Hermes Role (from agent_prompt_v2.md)
+- **Tag:** 🟢 [HR]
+- **Primary:** Strategy implementation & backtesting (NautilusTrader)
+- **Secondary:** Tool & skill building, progress tracking, XHAAK/Kulu Bridge
+- **Model Chain:** nvidia/nemotron-3-nano-omni → inclusionai/ring-2.6 → openrouter/owl-alpha
+- **Key Constraint:** NEVER use MT5 directly — NautilusTrader only
+
+### How Hermes Fits Into the Architecture
+```
+Human → CC (Overseer) → Hermes (Execution)
+                ↓              ↓
+         OCE Backend ← NautilusTrader
+                ↓
+         SRRA-OPH Substrate
+```
+- CC assigns tasks to Hermes via team-chat or command center
+- Hermes executes backtests, builds tools, implements strategies
+- Results saved to `progress/hermes-progress.md` + `nautilus/reports/`
+- Hermes can write to `shared-conversations/team-chat.md` for coordination
+
+### Pending Hermes Tasks (from phase plans)
+- Review O-4 backtest requirements (reconstruction anchors, recovery after context deletion)
+- Check NautilusTrader backtest environment status
+- Review CEREBUS strategy implementation status
+- Run pending backtests per phase plan
+
+### Status: 🟢 ACTIVE — Ready for task assignment
+
+---
+
 
 ---
 

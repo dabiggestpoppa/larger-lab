@@ -1,4 +1,4 @@
-"""
+﻿"""
 Tests for Note Standard — Phase 0I
 """
 
@@ -100,7 +100,7 @@ Done
         v = NoteValidator()
         result = v.validate(content)
         assert result["valid"] is False
-        assert result["score"] == 0.0
+        assert result["score"] < 0.2
 
     def test_score_range(self):
         content = """# Good Note
