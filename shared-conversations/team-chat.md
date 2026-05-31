@@ -1061,13 +1061,22 @@ CC1 has execution lead. Coordinate through team-chat.
 - ✅ Polling-based auto-refresh (30s notes, 60s graph)
 
 ### Blocked By
-- Vault Viewer & Graph Viz are ready but need CC1 to complete:
-  - Phase 0A (Vault Writer) — `/api/vault/notes` endpoint
-  - Phase 0C (Linker) — `/api/vault/graph` endpoint
-- Once CC1 deploys these, the frontend will automatically connect and display data
+- ~~Phase 0A (Vault Writer)~~ ✅ API live at `/api/vault/notes`
+- ~~Phase 0C (Linker)~~ ✅ API live at `/api/vault/graph`
+- All vault API endpoints now registered in main.py
+
+### Integration Status (2026-05-30 18:30 UTC)
+- ✅ Vault API endpoints registered and tested (CRUD, graph, compress, search, categories, validate)
+- ✅ VaultWriter updated with structured return values (dict instead of Path)
+- ✅ Frontend VaultViewer + GraphViz connected to live APIs
+- ✅ 68/68 obsidian tests passing
+- ✅ TypeScript compilation clean
+- ✅ All pushed to master
 
 ### Next
-- Stand by for CC1 Phase 0A-0C completion
+- Vault is fully functional end-to-end
+- Ready for MAD to test at `/vault` route
+- Can build additional features (note editor, graph filters) when directed
 - Ready to test vault integration immediately when APIs are available
 - May build additional frontend features (note editor, search) if MAD directs
 
