@@ -1,0 +1,15 @@
+{
+  "strategy": "symmetry_trap",
+  "symbol": "EURUSD",
+  "bars": 273909,
+  "timestamp": "20260601_031932",
+  "engine_orders": 2679,
+  "engine_positions": 1,
+  "strategy_trades": 2186,
+  "strategy_wins": 1795,
+  "strategy_losses": 374,
+  "strategy_win_rate": 82.11344922232388,
+  "strategy_pnl_pips": 8584.69999999979,
+  "asset_cfg_pip": 0.0001,
+  "asset_cfg_k": 0.46
+}

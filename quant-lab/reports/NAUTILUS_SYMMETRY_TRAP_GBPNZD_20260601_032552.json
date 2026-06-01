@@ -1,0 +1,15 @@
+{
+  "strategy": "symmetry_trap",
+  "symbol": "GBPNZD",
+  "bars": 277117,
+  "timestamp": "20260601_032552",
+  "engine_orders": 2053,
+  "engine_positions": 1,
+  "strategy_trades": 1410,
+  "strategy_wins": 1199,
+  "strategy_losses": 208,
+  "strategy_win_rate": 85.0354609929078,
+  "strategy_pnl_pips": 13936.100000000128,
+  "asset_cfg_pip": 0.0001,
+  "asset_cfg_k": 0.48
+}

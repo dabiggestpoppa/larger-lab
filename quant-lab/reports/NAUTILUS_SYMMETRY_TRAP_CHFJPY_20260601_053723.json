@@ -1,0 +1,17 @@
+{
+  "strategy": "symmetry_trap",
+  "symbol": "CHFJPY",
+  "bars": 275093,
+  "timestamp": "20260601_053723",
+  "engine_orders": 1968,
+  "engine_positions": 0,
+  "engine_pnl_usd": 0.0,
+  "engine_win_rate": 0.0,
+  "strategy_trades": 1919,
+  "strategy_wins": 1570,
+  "strategy_losses": 346,
+  "strategy_win_rate": 81.81344450234496,
+  "strategy_pnl_pips": 13888.89999999983,
+  "max_drawdown": 0.0,
+  "elapsed_s": 138219900.0
+}

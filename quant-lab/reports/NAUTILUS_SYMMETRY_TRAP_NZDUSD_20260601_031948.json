@@ -1,0 +1,15 @@
+{
+  "strategy": "symmetry_trap",
+  "symbol": "NZDUSD",
+  "bars": 276961,
+  "timestamp": "20260601_031948",
+  "engine_orders": 1586,
+  "engine_positions": 1,
+  "strategy_trades": 833,
+  "strategy_wins": 763,
+  "strategy_losses": 68,
+  "strategy_win_rate": 91.59663865546219,
+  "strategy_pnl_pips": 4363.899999999998,
+  "asset_cfg_pip": 0.0001,
+  "asset_cfg_k": 0.46
+}

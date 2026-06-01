@@ -1,0 +1,32 @@
+{
+  "batch": 2,
+  "assets": ["NZDUSD", "GBPJPY", "GBPCHF", "GBPAUD", "GBPNZD"],
+  "results": {
+    "NZDUSD": {
+      "symmetry_trap": {"trades": 833, "wr": 91.6, "pnl": 4363.9},
+      "p90": {"trades": 457, "wr": 54.0, "pnl": 215.0}
+    },
+    "GBPJPY": {
+      "symmetry_trap": {"trades": 0, "wr": 0.0, "pnl": 0.0},
+      "p90": {"trades": 0, "wr": 0.0, "pnl": 0.0}
+    },
+    "GBPCHF": {
+      "symmetry_trap": {"trades": 1161, "wr": 89.9, "pnl": 7981.2},
+      "p90": {"trades": 980, "wr": 59.7, "pnl": 673.6}
+    },
+    "GBPAUD": {
+      "symmetry_trap": {"trades": 1428, "wr": 85.2, "pnl": 12529.2},
+      "p90": {"trades": 380, "wr": 47.9, "pnl": 81.0}
+    },
+    "GBPNZD": {
+      "symmetry_trap": {"trades": 1410, "wr": 85.0, "pnl": 13936.1},
+      "p90": {"trades": 255, "wr": 48.6, "pnl": 133.9}
+    }
+  },
+  "errors": [
+    "GBPJPY: 0 trades for both strategies (no signals generated)",
+    "GBPCHF: Exchange rate errors (CHD/USD) during backtest - results still generated",
+    "GBPAUD: Exchange rate errors (AUD/USD) during backtest - results still generated",
+    "GBPNZD: Exchange rate errors (NZD/USD) during backtest - results still generated"
+  ]
+}

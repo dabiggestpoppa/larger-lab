@@ -123,10 +123,10 @@ def load_bars_csv(csv_path: str) -> List[Bar]:
             if ts_raw is None or not ts_raw.strip():
                 raise ValueError(f"Row {row_num}: no timestamp. Columns: {list(row.keys())}")
 
-            o = clean_row.get("OPEN")
-            h = clean_row.get("HIGH")
-            l = clean_row.get("LOW")
-            c = clean_row.get("CLOSE")
+            o = clean_row.get("OPEN") or clean_row.get("open")
+            h = clean_row.get("HIGH") or clean_row.get("high")
+            l = clean_row.get("LOW") or clean_row.get("low")
+            c = clean_row.get("CLOSE") or clean_row.get("close")
 
             if any(v is None for v in (o, h, l, c)):
                 raise ValueError(f"Row {row_num}: missing OHLC. Columns: {list(row.keys())}")

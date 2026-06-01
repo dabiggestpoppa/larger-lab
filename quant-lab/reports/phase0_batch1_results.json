@@ -1,0 +1,73 @@
+{
+  "batch": 1,
+  "assets": [
+    "EURUSD",
+    "GBPUSD",
+    "USDCHF",
+    "USDJPY",
+    "AUDUSD"
+  ],
+  "results": {
+    "EURUSD": {
+      "symmetry_trap": {
+        "trades": 2186,
+        "wr": 82.1,
+        "pnl": 8584.7
+      },
+      "p90": {
+        "trades": 1048,
+        "wr": 60.4,
+        "pnl": 792.8
+      }
+    },
+    "GBPUSD": {
+      "symmetry_trap": {
+        "trades": 2234,
+        "wr": 83.5,
+        "pnl": 11750.6
+      },
+      "p90": {
+        "trades": 1297,
+        "wr": 53.1,
+        "pnl": 396.9
+      }
+    },
+    "USDCHF": {
+      "symmetry_trap": {
+        "trades": 2050,
+        "wr": 81.6,
+        "pnl": 7756.4
+      },
+      "p90": {
+        "trades": 841,
+        "wr": 57.4,
+        "pnl": 258.6
+      }
+    },
+    "USDJPY": {
+      "symmetry_trap": {
+        "trades": 0,
+        "wr": 0.0,
+        "pnl": 0.0
+      },
+      "p90": {
+        "trades": 0,
+        "wr": 0.0,
+        "pnl": 0.0
+      }
+    },
+    "AUDUSD": {
+      "symmetry_trap": {
+        "trades": 1249,
+        "wr": 87.8,
+        "pnl": 5328.6
+      },
+      "p90": {
+        "trades": 527,
+        "wr": 49.1,
+        "pnl": -35.8
+      }
+    }
+  },
+  "errors": []
+}

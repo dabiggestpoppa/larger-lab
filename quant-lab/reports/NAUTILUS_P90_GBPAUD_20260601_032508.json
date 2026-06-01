@@ -1,0 +1,15 @@
+{
+  "strategy": "p90",
+  "symbol": "GBPAUD",
+  "bars": 277100,
+  "timestamp": "20260601_032508",
+  "engine_orders": 75810,
+  "engine_positions": 1,
+  "strategy_trades": 380,
+  "strategy_wins": 182,
+  "strategy_losses": 198,
+  "strategy_win_rate": 47.89473684210526,
+  "strategy_pnl_pips": 81.02399999996068,
+  "asset_cfg_pip": 0.0001,
+  "asset_cfg_k": 0.48
+}

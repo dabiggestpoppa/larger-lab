@@ -1,0 +1,15 @@
+{
+  "strategy": "symmetry_trap",
+  "symbol": "US500",
+  "bars": 260958,
+  "timestamp": "20260601_033520",
+  "engine_orders": 1,
+  "engine_positions": 1,
+  "strategy_trades": 1,
+  "strategy_wins": 1,
+  "strategy_losses": 0,
+  "strategy_win_rate": 100.0,
+  "strategy_pnl_pips": 19.00000000205182,
+  "asset_cfg_pip": 1.0,
+  "asset_cfg_k": 0.48
+}

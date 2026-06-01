@@ -26,7 +26,7 @@ GUIDE_LINES = [
     "| Vault | Path | Purpose |",
     "|-------|------|---------|",
     "| **Real Obsidian** | `C:\\Users\\wifik\\Downloads\\o2c` | Obsidian app watches this |",
-    "| **Default (workspace)** | `O2C-VAULT/` | Internal workspace vault |",
+    "| **Default (workspace)** | `memory/obsidian-vault/` | Internal workspace vault |",
     "",
     "## How to Write (Python)",
     "",

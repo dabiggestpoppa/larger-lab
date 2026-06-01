@@ -3,7 +3,7 @@ Vault API Endpoints — Phase 00
 FastAPI endpoints for O2C Obsidian Vault.
 
 Supports two vaults:
-- DEFAULT (O2C-VAULT/): Internal workspace vault for raw operational traces
+- DEFAULT (memory/obsidian-vault/): Internal workspace vault for raw operational traces
 - OBSIDIAN (C:\\Users\\wifik\\Downloads\\o2c): Real Obsidian vault for user-visible notes
 
 Use query param ?vault=obsidian to target the real Obsidian vault.

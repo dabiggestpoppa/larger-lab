@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-06-01T04:50:00-04:00",
+  "deliverable": "Nautilus Config Fix + Re-Backtest",
+  "files_changed": [
+    "strategies/symmetry_trap_strategy.py - dynamic import from asset_configs",
+    "strategies/p90_strategy.py - per-asset P90 thresholds from config",
+    "backtests/run_cerebus_backtest.py - equity instrument handling"
+  ],
+  "root_cause": "Nautilus strategies had hardcoded partial configs (6 assets). Missing assets fell back to EUR/USD defaults causing 0 trades (JPY, indices) and WR collapse (P90 83%%->56%%)",
+  "groups_1_2_results": {
+    "EURUSD": "ST 2186tr/82.1%% | P90 1048tr/60.4%%",
+    "GBPUSD": "ST 2234tr/83.5%% | P90 1029tr/61.1%%",
+    "USDCHF": "ST 2050tr/81.6%% | P90 726tr/59.9%%",
+    "USDJPY": "ST 1473tr/84.6%% | P90 326tr/65.0%% (FIXED: was 0)",
+    "AUDUSD": "ST 1249tr/87.8%% | P90 458tr/50.2%%",
+    "NZDUSD": "ST 833tr/91.6%% | P90 236tr/60.2%%",
+    "GBPJPY": "ST 1948tr/81.8%% | P90 278tr/67.6%% (FIXED: was 0)",
+    "GBPCHF": "ST 1161tr/89.9%% | P90 343tr/67.9%%",
+    "GBPAUD": "ST 1428tr/85.2%% | P90 195tr/64.6%%",
+    "GBPNZD": "ST 1410tr/85.0%% | P90 130tr/69.2%%"
+  },
+  "status": "Groups 1+2 complete. Groups 3+4 spawned. Awaiting completion."
+}

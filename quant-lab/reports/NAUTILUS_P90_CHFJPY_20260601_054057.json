@@ -1,0 +1,17 @@
+{
+  "strategy": "p90",
+  "symbol": "CHFJPY",
+  "bars": 275093,
+  "timestamp": "20260601_054057",
+  "engine_orders": 407,
+  "engine_positions": 0,
+  "engine_pnl_usd": 0.0,
+  "engine_win_rate": 0.0,
+  "strategy_trades": 395,
+  "strategy_wins": 232,
+  "strategy_losses": 163,
+  "strategy_win_rate": 58.734177215189874,
+  "strategy_pnl_pips": 477.8779999999671,
+  "max_drawdown": 0.0,
+  "elapsed_s": 138219900.0
+}

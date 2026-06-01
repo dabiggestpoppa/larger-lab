@@ -1,0 +1,17 @@
+{
+  "strategy": "symmetry_trap",
+  "symbol": "FR40",
+  "bars": 253878,
+  "timestamp": "20260601_053928",
+  "engine_orders": 1753,
+  "engine_positions": 0,
+  "engine_pnl_usd": 0.0,
+  "engine_win_rate": 0.0,
+  "strategy_trades": 1705,
+  "strategy_wins": 1420,
+  "strategy_losses": 274,
+  "strategy_win_rate": 83.28445747800586,
+  "strategy_pnl_pips": 12589.720000000001,
+  "max_drawdown": 0.0,
+  "elapsed_s": 138930600.0
+}

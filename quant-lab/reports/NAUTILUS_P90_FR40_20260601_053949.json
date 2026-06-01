@@ -1,0 +1,17 @@
+{
+  "strategy": "p90",
+  "symbol": "FR40",
+  "bars": 253878,
+  "timestamp": "20260601_053949",
+  "engine_orders": 1247,
+  "engine_positions": 0,
+  "engine_pnl_usd": 0.0,
+  "engine_win_rate": 0.0,
+  "strategy_trades": 1222,
+  "strategy_wins": 788,
+  "strategy_losses": 434,
+  "strategy_win_rate": 64.48445171849427,
+  "strategy_pnl_pips": -800.2888000000075,
+  "max_drawdown": 0.0,
+  "elapsed_s": 138930600.0
+}

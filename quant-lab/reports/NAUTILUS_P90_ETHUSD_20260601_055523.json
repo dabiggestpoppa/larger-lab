@@ -1,0 +1,17 @@
+{
+  "strategy": "p90",
+  "symbol": "ETHUSD",
+  "bars": 458015,
+  "timestamp": "20260601_055523",
+  "engine_orders": 100,
+  "engine_positions": 0,
+  "engine_pnl_usd": 0.0,
+  "engine_win_rate": 0.0,
+  "strategy_trades": 92,
+  "strategy_wins": 77,
+  "strategy_losses": 15,
+  "strategy_win_rate": 83.69565217391305,
+  "strategy_pnl_pips": 368.0540999999987,
+  "max_drawdown": 0.0,
+  "elapsed_s": 139117500.0
+}

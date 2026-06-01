@@ -1,0 +1,17 @@
+{
+  "strategy": "symmetry_trap",
+  "symbol": "GBPJPY",
+  "bars": 276931,
+  "timestamp": "20260601_043619",
+  "engine_orders": 1998,
+  "engine_positions": 0,
+  "engine_pnl_usd": 0.0,
+  "engine_win_rate": 0.0,
+  "strategy_trades": 1948,
+  "strategy_wins": 1594,
+  "strategy_losses": 347,
+  "strategy_win_rate": 81.82751540041068,
+  "strategy_pnl_pips": 17037.59999999997,
+  "max_drawdown": 0.0,
+  "elapsed_s": 138930600.0
+}

@@ -1,0 +1,15 @@
+{
+  "strategy": "p90",
+  "symbol": "BTCUSD",
+  "bars": 458887,
+  "timestamp": "20260601_032358",
+  "engine_orders": 106437,
+  "engine_positions": 1,
+  "strategy_trades": 2,
+  "strategy_wins": 2,
+  "strategy_losses": 0,
+  "strategy_win_rate": 100.0,
+  "strategy_pnl_pips": 17.0,
+  "asset_cfg_pip": 1.0,
+  "asset_cfg_k": 0.52
+}

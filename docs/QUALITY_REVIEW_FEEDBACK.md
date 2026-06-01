@@ -24,7 +24,7 @@ CC's documentation is comprehensive, well-structured, and accurate. The document
 ### Suggestions
 1. **Test count** — README says "1460 tests" but the actual count may have changed. Consider making this auto-generated or noting "as of 2026-05-18".
 2. **Phase 5-6 descriptions** — The README briefly mentions Phases 5-6 but doesn't detail them. Consider adding a one-line description for each phase in the V3 table.
-3. **Security section** — The security section mentions "No plaintext secrets in repo" but the `memory-bank/github_pat_*.txt` file was recently deleted. This is now accurate, but worth confirming no other secrets exist.
+3. **Security section** — The security section mentions "No plaintext secrets in repo" but the `memory/memory/memory-bank/github_pat_*.txt` file was recently deleted. This is now accurate, but worth confirming no other secrets exist.
 
 ### Issues Found
 - None blocking. Document is accurate and complete.

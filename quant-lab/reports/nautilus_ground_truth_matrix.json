@@ -1,0 +1,331 @@
+{
+  "metadata": {
+    "phase": "Phase 0 - Ground Truth Calibration",
+    "timestamp": "2026-06-01 03:49:06 EST",
+    "engine": "Nautilus (locked)",
+    "strategies": [
+      "symmetry_trap",
+      "p90"
+    ],
+    "total_assets": 18,
+    "missing_data": [
+      "NAS100"
+    ],
+    "note": "Indices may have unreliable results - equity instrument type workaround applied"
+  },
+  "matrix": {
+    "EURUSD": {
+      "symmetry_trap": {
+        "trades": 2186,
+        "wr": 82.1,
+        "pnl": 8584.7,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 1048,
+        "wr": 60.4,
+        "pnl": 792.8,
+        "wins": 0,
+        "losses": 0
+      }
+    },
+    "GBPUSD": {
+      "symmetry_trap": {
+        "trades": 2234,
+        "wr": 83.5,
+        "pnl": 11750.6,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 1297,
+        "wr": 53.1,
+        "pnl": 396.9,
+        "wins": 0,
+        "losses": 0
+      }
+    },
+    "USDCHF": {
+      "symmetry_trap": {
+        "trades": 2050,
+        "wr": 81.6,
+        "pnl": 7756.4,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 841,
+        "wr": 57.4,
+        "pnl": 258.6,
+        "wins": 0,
+        "losses": 0
+      }
+    },
+    "USDJPY": {
+      "symmetry_trap": {
+        "trades": 0,
+        "wr": 0.0,
+        "pnl": 0.0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "wr": 0.0,
+        "pnl": 0.0,
+        "wins": 0,
+        "losses": 0
+      }
+    },
+    "AUDUSD": {
+      "symmetry_trap": {
+        "trades": 1249,
+        "wr": 87.8,
+        "pnl": 5328.6,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 527,
+        "wr": 49.1,
+        "pnl": -35.8,
+        "wins": 0,
+        "losses": 0
+      }
+    },
+    "NZDUSD": {
+      "symmetry_trap": {
+        "trades": 833,
+        "wr": 91.6,
+        "pnl": 4363.9,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 457,
+        "wr": 54.0,
+        "pnl": 215.0,
+        "wins": 0,
+        "losses": 0
+      }
+    },
+    "GBPJPY": {
+      "symmetry_trap": {
+        "trades": 0,
+        "wr": 0.0,
+        "pnl": 0.0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "wr": 0.0,
+        "pnl": 0.0,
+        "wins": 0,
+        "losses": 0
+      }
+    },
+    "GBPCHF": {
+      "symmetry_trap": {
+        "trades": 1161,
+        "wr": 89.9,
+        "pnl": 7981.2,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 980,
+        "wr": 59.7,
+        "pnl": 673.6,
+        "wins": 0,
+        "losses": 0
+      }
+    },
+    "GBPAUD": {
+      "symmetry_trap": {
+        "trades": 1428,
+        "wr": 85.2,
+        "pnl": 12529.2,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 380,
+        "wr": 47.9,
+        "pnl": 81.0,
+        "wins": 0,
+        "losses": 0
+      }
+    },
+    "GBPNZD": {
+      "symmetry_trap": {
+        "trades": 1410,
+        "wr": 85.0,
+        "pnl": 13936.1,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 255,
+        "wr": 48.6,
+        "pnl": 133.9,
+        "wins": 0,
+        "losses": 0
+      }
+    },
+    "CHFJPY": {
+      "symmetry_trap": {
+        "trades": 0,
+        "wr": 0.0,
+        "pnl": 0.0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "wr": 0.0,
+        "pnl": 0.0,
+        "wins": 0,
+        "losses": 0
+      }
+    },
+    "XAUUSD": {
+      "symmetry_trap": {
+        "trades": 1718,
+        "wr": 81.8,
+        "pnl": 21118.2,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 202,
+        "wr": 54.5,
+        "pnl": 309.2,
+        "wins": 0,
+        "losses": 0
+      }
+    },
+    "XAGUSD": {
+      "symmetry_trap": {
+        "trades": 2,
+        "wr": 100.0,
+        "pnl": 50.0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "wr": 0.0,
+        "pnl": 0.0,
+        "wins": 0,
+        "losses": 0
+      }
+    },
+    "BTCUSD": {
+      "symmetry_trap": {
+        "trades": 2014,
+        "wr": 86.9,
+        "pnl": 219718.6,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 2,
+        "wr": 100.0,
+        "pnl": 17.0,
+        "wins": 0,
+        "losses": 0
+      }
+    },
+    "ETHUSD": {
+      "symmetry_trap": {
+        "trades": 777,
+        "wr": 94.7,
+        "pnl": 11901.9,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 99,
+        "wr": 83.8,
+        "pnl": 391.0,
+        "wins": 0,
+        "losses": 0
+      }
+    },
+    "US500": {
+      "symmetry_trap": {
+        "trades": 1,
+        "wr": 100.0,
+        "pnl": 19.0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "wr": 0.0,
+        "pnl": 0.0,
+        "wins": 0,
+        "losses": 0
+      }
+    },
+    "DE30": {
+      "symmetry_trap": {
+        "trades": 0,
+        "wr": 0.0,
+        "pnl": 0.0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "wr": 0.0,
+        "pnl": 0.0,
+        "wins": 0,
+        "losses": 0
+      }
+    },
+    "FR40": {
+      "symmetry_trap": {
+        "trades": 56,
+        "wr": 96.4,
+        "pnl": -329031.0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "wr": 0.0,
+        "pnl": 0.0,
+        "wins": 0,
+        "losses": 0
+      }
+    },
+    "HK50": {
+      "symmetry_trap": {
+        "trades": 0,
+        "wr": 0.0,
+        "pnl": 0.0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "wr": 0.0,
+        "pnl": 0.0,
+        "wins": 0,
+        "losses": 0
+      }
+    }
+  },
+  "errors": [
+    "Batch 2: GBPJPY: 0 trades for both strategies (no signals generated)",
+    "Batch 2: GBPCHF: Exchange rate errors (CHD/USD) during backtest - results still generated",
+    "Batch 2: GBPAUD: Exchange rate errors (AUD/USD) during backtest - results still generated",
+    "Batch 2: GBPNZD: Exchange rate errors (NZD/USD) during backtest - results still generated",
+    "Batch 4: CRITICAL: FR40 ST shows -329,031 pips loss \u00e2\u20ac\u201d pip calculation likely broken when using Equity instrument type. Needs investigation.",
+    "Batch 4: US500, DE30, HK50: near-zero trades on both strategies \u00e2\u20ac\u201d equity instrument type may not feed bars correctly to the strategy engine",
+    "Batch 4: FIX APPLIED: Added TestInstrumentProvider.equity() fallback for non-6-char symbols in get_instrument_and_venue()"
+  ]
+}

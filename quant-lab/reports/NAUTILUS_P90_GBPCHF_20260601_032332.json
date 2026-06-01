@@ -1,0 +1,15 @@
+{
+  "strategy": "p90",
+  "symbol": "GBPCHF",
+  "bars": 276994,
+  "timestamp": "20260601_032332",
+  "engine_orders": 79457,
+  "engine_positions": 1,
+  "strategy_trades": 980,
+  "strategy_wins": 585,
+  "strategy_losses": 395,
+  "strategy_win_rate": 59.693877551020414,
+  "strategy_pnl_pips": 673.6309999999804,
+  "asset_cfg_pip": 0.0001,
+  "asset_cfg_k": 0.48
+}

@@ -1,0 +1,532 @@
+{
+  "timestamp": "2026-05-31T20:06:57.257712",
+  "total_assets": 21,
+  "errors": [],
+  "results": {
+    "EURUSD": {
+      "data_bars": 273909,
+      "data_file": "EURUSD_M5.csv",
+      "config": {
+        "pip_value": 0.0001,
+        "k_factor": 0.46
+      },
+      "st": {
+        "error": "SymmetryTrapEngine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "p90": {
+        "error": "cannot import name 'run_p90_backtest' from 'p90_backtest' (C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\engines\\p90_backtest.py) | P90Engine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "timing": {
+        "load": 0.9,
+        "st": 0.0,
+        "p90": 0.0
+      }
+    },
+    "GBPUSD": {
+      "data_bars": 277022,
+      "data_file": "GBPUSD_M5.csv",
+      "config": {
+        "pip_value": 0.0001,
+        "k_factor": 0.46
+      },
+      "st": {
+        "error": "SymmetryTrapEngine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "p90": {
+        "error": "cannot import name 'run_p90_backtest' from 'p90_backtest' (C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\engines\\p90_backtest.py) | P90Engine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "timing": {
+        "load": 1.0,
+        "st": 0.0,
+        "p90": 0.0
+      }
+    },
+    "USDCHF": {
+      "data_bars": 277072,
+      "data_file": "USDCHF_M5.csv",
+      "config": {
+        "pip_value": 0.0001,
+        "k_factor": 0.46
+      },
+      "st": {
+        "error": "SymmetryTrapEngine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "p90": {
+        "error": "cannot import name 'run_p90_backtest' from 'p90_backtest' (C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\engines\\p90_backtest.py) | P90Engine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "timing": {
+        "load": 0.9,
+        "st": 0.0,
+        "p90": 0.0
+      }
+    },
+    "USDJPY": {
+      "data_bars": 277092,
+      "data_file": "USDJPY_M5.csv",
+      "config": {
+        "pip_value": 0.01,
+        "k_factor": 0.46
+      },
+      "st": {
+        "error": "SymmetryTrapEngine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "p90": {
+        "error": "cannot import name 'run_p90_backtest' from 'p90_backtest' (C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\engines\\p90_backtest.py) | P90Engine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "timing": {
+        "load": 1.1,
+        "st": 0.0,
+        "p90": 0.0
+      }
+    },
+    "AUDUSD": {
+      "data_bars": 273896,
+      "data_file": "AUDUSD_M5.csv",
+      "config": {
+        "pip_value": 0.0001,
+        "k_factor": 0.46
+      },
+      "st": {
+        "error": "SymmetryTrapEngine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "p90": {
+        "error": "cannot import name 'run_p90_backtest' from 'p90_backtest' (C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\engines\\p90_backtest.py) | P90Engine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "timing": {
+        "load": 1.1,
+        "st": 0.0,
+        "p90": 0.0
+      }
+    },
+    "NZDUSD": {
+      "data_bars": 276961,
+      "data_file": "NZDUSD_M5.csv",
+      "config": {
+        "pip_value": 0.0001,
+        "k_factor": 0.46
+      },
+      "st": {
+        "error": "SymmetryTrapEngine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "p90": {
+        "error": "cannot import name 'run_p90_backtest' from 'p90_backtest' (C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\engines\\p90_backtest.py) | P90Engine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "timing": {
+        "load": 1.1,
+        "st": 0.0,
+        "p90": 0.0
+      }
+    },
+    "EURGBP": {
+      "data_bars": 273909,
+      "data_file": "EURUSD_M5.csv",
+      "config": {
+        "pip_value": 0.0001,
+        "k_factor": 0.48
+      },
+      "st": {
+        "error": "SymmetryTrapEngine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "p90": {
+        "error": "cannot import name 'run_p90_backtest' from 'p90_backtest' (C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\engines\\p90_backtest.py) | P90Engine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "timing": {
+        "load": 1.0,
+        "st": 0.0,
+        "p90": 0.0
+      }
+    },
+    "EURJPY": {
+      "data_bars": 277092,
+      "data_file": "USDJPY_M5.csv",
+      "config": {
+        "pip_value": 0.01,
+        "k_factor": 0.48
+      },
+      "st": {
+        "error": "SymmetryTrapEngine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "p90": {
+        "error": "cannot import name 'run_p90_backtest' from 'p90_backtest' (C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\engines\\p90_backtest.py) | P90Engine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "timing": {
+        "load": 1.1,
+        "st": 0.0,
+        "p90": 0.0
+      }
+    },
+    "GBPJPY": {
+      "data_bars": 276931,
+      "data_file": "GBPJPY_M5.csv",
+      "config": {
+        "pip_value": 0.01,
+        "k_factor": 0.48
+      },
+      "st": {
+        "error": "SymmetryTrapEngine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "p90": {
+        "error": "cannot import name 'run_p90_backtest' from 'p90_backtest' (C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\engines\\p90_backtest.py) | P90Engine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "timing": {
+        "load": 1.0,
+        "st": 0.0,
+        "p90": 0.0
+      }
+    },
+    "GBPCHF": {
+      "data_bars": 276994,
+      "data_file": "GBPCHF_M5.csv",
+      "config": {
+        "pip_value": 0.0001,
+        "k_factor": 0.48
+      },
+      "st": {
+        "error": "SymmetryTrapEngine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "p90": {
+        "error": "cannot import name 'run_p90_backtest' from 'p90_backtest' (C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\engines\\p90_backtest.py) | P90Engine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "timing": {
+        "load": 1.1,
+        "st": 0.0,
+        "p90": 0.0
+      }
+    },
+    "GBPAUD": {
+      "data_bars": 277100,
+      "data_file": "GBPAUD_M5.csv",
+      "config": {
+        "pip_value": 0.0001,
+        "k_factor": 0.48
+      },
+      "st": {
+        "error": "SymmetryTrapEngine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "p90": {
+        "error": "cannot import name 'run_p90_backtest' from 'p90_backtest' (C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\engines\\p90_backtest.py) | P90Engine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "timing": {
+        "load": 1.1,
+        "st": 0.0,
+        "p90": 0.0
+      }
+    },
+    "GBPNZD": {
+      "data_bars": 277117,
+      "data_file": "GBPNZD_M5.csv",
+      "config": {
+        "pip_value": 0.0001,
+        "k_factor": 0.48
+      },
+      "st": {
+        "error": "SymmetryTrapEngine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "p90": {
+        "error": "cannot import name 'run_p90_backtest' from 'p90_backtest' (C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\engines\\p90_backtest.py) | P90Engine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "timing": {
+        "load": 1.1,
+        "st": 0.0,
+        "p90": 0.0
+      }
+    },
+    "CHFJPY": {
+      "data_bars": 275093,
+      "data_file": "CHFJPY_M5.csv",
+      "config": {
+        "pip_value": 0.01,
+        "k_factor": 0.48
+      },
+      "st": {
+        "error": "SymmetryTrapEngine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "p90": {
+        "error": "cannot import name 'run_p90_backtest' from 'p90_backtest' (C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\engines\\p90_backtest.py) | P90Engine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "timing": {
+        "load": 1.1,
+        "st": 0.0,
+        "p90": 0.0
+      }
+    },
+    "US500": {
+      "data_bars": 260958,
+      "data_file": "US500_M5.csv",
+      "config": {
+        "pip_value": 1.0,
+        "k_factor": 0.48
+      },
+      "st": {
+        "error": "SymmetryTrapEngine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "p90": {
+        "error": "cannot import name 'run_p90_backtest' from 'p90_backtest' (C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\engines\\p90_backtest.py) | P90Engine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "timing": {
+        "load": 1.0,
+        "st": 0.0,
+        "p90": 0.0
+      }
+    },
+    "HK50": {
+      "data_bars": 242271,
+      "data_file": "HK50_M5.csv",
+      "config": {
+        "pip_value": 1.0,
+        "k_factor": 0.48
+      },
+      "st": {
+        "error": "SymmetryTrapEngine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "p90": {
+        "error": "cannot import name 'run_p90_backtest' from 'p90_backtest' (C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\engines\\p90_backtest.py) | P90Engine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "timing": {
+        "load": 0.9,
+        "st": 0.0,
+        "p90": 0.0
+      }
+    },
+    "XAUUSD": {
+      "data_bars": 300000,
+      "data_file": "XAUUSD_M5.csv",
+      "config": {
+        "pip_value": 0.01,
+        "k_factor": 0.5
+      },
+      "st": {
+        "error": "SymmetryTrapEngine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "p90": {
+        "error": "cannot import name 'run_p90_backtest' from 'p90_backtest' (C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\engines\\p90_backtest.py) | P90Engine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "timing": {
+        "load": 1.1,
+        "st": 0.0,
+        "p90": 0.0
+      }
+    },
+    "XAGUSD": {
+      "data_bars": 300000,
+      "data_file": "XAGUSD_M5.csv",
+      "config": {
+        "pip_value": 0.001,
+        "k_factor": 0.5
+      },
+      "st": {
+        "error": "SymmetryTrapEngine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "p90": {
+        "error": "cannot import name 'run_p90_backtest' from 'p90_backtest' (C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\engines\\p90_backtest.py) | P90Engine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "timing": {
+        "load": 1.1,
+        "st": 0.0,
+        "p90": 0.0
+      }
+    },
+    "BTCUSD": {
+      "data_bars": 300000,
+      "data_file": "BTCUSD_M5.csv",
+      "config": {
+        "pip_value": 1.0,
+        "k_factor": 0.52
+      },
+      "st": {
+        "error": "SymmetryTrapEngine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "p90": {
+        "error": "cannot import name 'run_p90_backtest' from 'p90_backtest' (C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\engines\\p90_backtest.py) | P90Engine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "timing": {
+        "load": 1.1,
+        "st": 0.0,
+        "p90": 0.0
+      }
+    },
+    "ETHUSD": {
+      "data_bars": 300000,
+      "data_file": "ETHUSD_M5.csv",
+      "config": {
+        "pip_value": 1.0,
+        "k_factor": 0.52
+      },
+      "st": {
+        "error": "SymmetryTrapEngine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "p90": {
+        "error": "cannot import name 'run_p90_backtest' from 'p90_backtest' (C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\engines\\p90_backtest.py) | P90Engine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "timing": {
+        "load": 1.1,
+        "st": 0.0,
+        "p90": 0.0
+      }
+    },
+    "FR40": {
+      "data_bars": 253878,
+      "data_file": "FR40_M5.csv",
+      "config": {
+        "pip_value": 1.0,
+        "k_factor": 0.48
+      },
+      "st": {
+        "error": "SymmetryTrapEngine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "p90": {
+        "error": "cannot import name 'run_p90_backtest' from 'p90_backtest' (C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\engines\\p90_backtest.py) | P90Engine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "timing": {
+        "load": 0.9,
+        "st": 0.0,
+        "p90": 0.0
+      }
+    },
+    "DE30": {
+      "data_bars": 257602,
+      "data_file": "DE30_M5.csv",
+      "config": {
+        "pip_value": 1.0,
+        "k_factor": 0.48
+      },
+      "st": {
+        "error": "SymmetryTrapEngine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "p90": {
+        "error": "cannot import name 'run_p90_backtest' from 'p90_backtest' (C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\engines\\p90_backtest.py) | P90Engine.__init__() got an unexpected keyword argument 'pip_value'",
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0
+      },
+      "timing": {
+        "load": 1.0,
+        "st": 0.0,
+        "p90": 0.0
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "strategy": "symmetry_trap",
+  "symbol": "HK50",
+  "bars": 242271,
+  "timestamp": "20260601_054017",
+  "engine_orders": 445,
+  "engine_positions": 0,
+  "engine_pnl_usd": 0.0,
+  "engine_win_rate": 0.0,
+  "strategy_trades": 425,
+  "strategy_wins": 395,
+  "strategy_losses": 30,
+  "strategy_win_rate": 92.94117647058823,
+  "strategy_pnl_pips": 17006.150000000012,
+  "max_drawdown": 0.0,
+  "elapsed_s": 138930600.0
+}

@@ -1,0 +1,15 @@
+{
+  "strategy": "symmetry_trap",
+  "symbol": "XAGUSD",
+  "bars": 304981,
+  "timestamp": "20260601_032145",
+  "engine_orders": 2,
+  "engine_positions": 1,
+  "strategy_trades": 2,
+  "strategy_wins": 2,
+  "strategy_losses": 0,
+  "strategy_win_rate": 100.0,
+  "strategy_pnl_pips": 50.00000000002558,
+  "asset_cfg_pip": 0.01,
+  "asset_cfg_k": 0.5
+}

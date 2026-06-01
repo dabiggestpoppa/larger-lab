@@ -1,0 +1,17 @@
+{
+  "strategy": "p90",
+  "symbol": "USDJPY",
+  "bars": 277092,
+  "timestamp": "20260601_043900",
+  "engine_orders": 351,
+  "engine_positions": 0,
+  "engine_pnl_usd": 0.0,
+  "engine_win_rate": 0.0,
+  "strategy_trades": 326,
+  "strategy_wins": 212,
+  "strategy_losses": 114,
+  "strategy_win_rate": 65.03067484662577,
+  "strategy_pnl_pips": 787.6720000000176,
+  "max_drawdown": 0.0,
+  "elapsed_s": 138930600.0
+}

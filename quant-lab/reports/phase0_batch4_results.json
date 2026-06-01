@@ -1,0 +1,27 @@
+{
+  "batch": 4,
+  "assets": ["US500", "DE30", "FR40", "HK50"],
+  "results": {
+    "US500": {
+      "symmetry_trap": {"trades": 1, "wr": 100.0, "pnl": 19.0},
+      "p90": {"trades": 0, "wr": 0.0, "pnl": 0.0}
+    },
+    "DE30": {
+      "symmetry_trap": {"trades": 0, "wr": 0.0, "pnl": 0.0},
+      "p90": {"trades": 0, "wr": 0.0, "pnl": 0.0}
+    },
+    "FR40": {
+      "symmetry_trap": {"trades": 56, "wr": 96.4, "pnl": -329031.0},
+      "p90": {"trades": 0, "wr": 0.0, "pnl": 0.0}
+    },
+    "HK50": {
+      "symmetry_trap": {"trades": 0, "wr": 0.0, "pnl": 0.0},
+      "p90": {"trades": 0, "wr": 0.0, "pnl": 0.0}
+    }
+  },
+  "errors": [
+    "CRITICAL: FR40 ST shows -329,031 pips loss — pip calculation likely broken when using Equity instrument type. Needs investigation.",
+    "US500, DE30, HK50: near-zero trades on both strategies — equity instrument type may not feed bars correctly to the strategy engine",
+    "FIX APPLIED: Added TestInstrumentProvider.equity() fallback for non-6-char symbols in get_instrument_and_venue()"
+  ]
+}

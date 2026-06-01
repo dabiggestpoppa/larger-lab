@@ -9,9 +9,9 @@ Sync the O2C-VAULT (filesystem cognition layer) with Obsidian.
 
 ## Vault Paths
 
-- **Source**: `O2C-VAULT/` (in project root)
-- **Obsidian target**: Auto-detected from `OBSIDIAN_VAULT_PATH` env var, or `~/Documents/Obsidian Vault/`, or `~/O2C-VAULT/`
-- If no Obsidian vault exists, writes stay in `O2C-VAULT/` (Obsidian will pick them up when vault is opened)
+- **Source**: `memory/obsidian-vault/` (in project root)
+- **Obsidian target**: Auto-detected from `OBSIDIAN_VAULT_PATH` env var, or `~/Documents/Obsidian Vault/`, or `~/memory/obsidian-vault/`
+- If no Obsidian vault exists, writes stay in `memory/obsidian-vault/` (Obsidian will pick them up when vault is opened)
 
 ## Write a Note
 

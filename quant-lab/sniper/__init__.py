@@ -4,9 +4,10 @@ Layer: OC2 Intelligence (above the venue)
 Does NOT trade. Outputs deployment config only.
 
 Phase 1 Build: Ontology Mapper + Scraper Engine + F&F Matrix + Deployment Router
+Phase 2 Build: Structural Decay Monitor + Self-Healing Telemetry + Risk Litigator
 """
 
-__version__ = "1.1.0-phase1"
+__version__ = "1.2.0-phase2"
 
 # Core math
 from .pes_calculator import PESCalculator, FirmProfile, EngineEdge, PESResult

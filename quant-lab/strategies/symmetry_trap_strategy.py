@@ -44,38 +44,48 @@ from nautilus_trader.trading.strategy import Strategy, StrategyConfig
 
 
 # ─── MACHINE READABLE ───────────────────────────────────────────────────
-# Default tier configuration — EUR/USD reference (Quick Reference Card Page 2)
-# For per-symbol overrides see configs/asset_configs.py
+# ALL configs imported from configs/asset_configs.py (single source of truth)
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent / 'configs'))
+from asset_configs import ASSET_CONFIGS, get_config
 
+# Default tier config (EUR/USD fallback)
 DEFAULT_TIER_CONFIG = {
     "T1": {"ar_max": 20.0, "au": 10.0, "trigger": 12.0},
     "T2": {"ar_max": 30.0, "au": 12.0, "trigger": 15.0},
     "T3": {"ar_max": 45.0, "au": 15.0, "trigger": 19.0},
 }
 
-# Per-symbol pip divisors (price * pip_divisor = pips)
-PIP_DIVISORS = {
-    "EURUSD.PRO": 10000.0,
-    "EURUSD": 10000.0,
-    "USDCHF.PRO": 10000.0,
-    "USDCHF": 10000.0,
-}
+# Per-symbol pip divisors — derived from asset_configs pip_value
+# pip_divisor = 1 / pip_value (e.g. 0.0001 -> 10000, 0.01 -> 100, 1.0 -> 1.0)
+PIP_DIVISORS = {}
+SYMBOL_TIER_CONFIGS = {}
 
-# Per-symbol tier configs — override EUR/USD defaults
-SYMBOL_TIER_CONFIGS = {
-    "EURUSD.PRO": DEFAULT_TIER_CONFIG,
-    "EURUSD": DEFAULT_TIER_CONFIG,
-    "USDCHF.PRO": {
-        "T1": {"ar_max": 19.0, "au": 11.0, "trigger": 11.0},
-        "T2": {"ar_max": 29.0, "au": 15.0, "trigger": 15.0},
-        "T3": {"ar_max": 50.0, "au": 20.0, "trigger": 20.0},
-    },
-    "USDCHF": {
-        "T1": {"ar_max": 19.0, "au": 11.0, "trigger": 11.0},
-        "T2": {"ar_max": 29.0, "au": 15.0, "trigger": 15.0},
-        "T3": {"ar_max": 50.0, "au": 20.0, "trigger": 20.0},
-    },
-}
+for _key, _cfg in ASSET_CONFIGS.items():
+    _pip_val = _cfg["pip_value"]
+    _divisor = 1.0 / _pip_val
+    PIP_DIVISORS[_key] = _divisor
+    # Also add .PRO variant for FX majors
+    if _cfg.get("pip_value") == 0.0001 and len(_key) == 6:
+        PIP_DIVISORS[_key + ".PRO"] = _divisor
+    # Build tier config from asset config
+    _tiers = _cfg.get("tiers", {})
+    if _tiers:
+        SYMBOL_TIER_CONFIGS[_key] = _tiers
+        if _cfg.get("pip_value") == 0.0001 and len(_key) == 6:
+            SYMBOL_TIER_CONFIGS[_key + ".PRO"] = _tiers
+
+# Ensure XAU/USD variants exist
+for _alias in ["XAU/USD", "XAUUSD"]:
+    if _alias not in PIP_DIVISORS:
+        PIP_DIVISORS[_alias] = PIP_DIVISORS.get("XAUUSD", 10.0)
+for _alias in ["BTC/USD", "BTCUSD"]:
+    if _alias not in PIP_DIVISORS:
+        PIP_DIVISORS[_alias] = PIP_DIVISORS.get("BTCUSD", 1.0)
+for _alias in ["ETH/USD", "ETHUSD"]:
+    if _alias not in PIP_DIVISORS:
+        PIP_DIVISORS[_alias] = PIP_DIVISORS.get("ETHUSD", 1.0)
 
 # Structural constants
 KILL_SWITCH_PCT = 0.80         # 80% of impulse leg — close-only invalidation
@@ -149,11 +159,13 @@ class SymmetryTrapStrategy(Strategy):
 
         # ── Per-symbol config ──────────────────────────────────────────
         sym_str = str(self.instrument_id.symbol)
-        self.pip_divisor = PIP_DIVISORS.get(sym_str, 10000.0)
+        # Map instrument symbol to config key (e.g. "BTC/USD" -> "BTCUSD")
+        sym_key = sym_str.replace("/", "").replace(".", "")
+        self.pip_divisor = PIP_DIVISORS.get(sym_str, PIP_DIVISORS.get(sym_key, 10000.0))
         if config.tier_config_override is not None:
             self.tier_config = config.tier_config_override
         else:
-            self.tier_config = SYMBOL_TIER_CONFIGS.get(sym_str, DEFAULT_TIER_CONFIG)
+            self.tier_config = SYMBOL_TIER_CONFIGS.get(sym_str, SYMBOL_TIER_CONFIGS.get(sym_key, DEFAULT_TIER_CONFIG))
 
         # ── Per-session state (resets each day) ────────────────────────
         self._reset_all_state()
@@ -278,8 +290,10 @@ class SymmetryTrapStrategy(Strategy):
             self._close_all_positions("5PM_hard_exit")
             return
 
-        # ── Detect new day ────────────────────────────────────────────
-        bar_date = self._ts_to_date(bar.ts_event)
+        # ── Detect new day (EST date for proper session tracking) ────────
+        # Use EST date to align with Asian session (19:00-03:00 EST)
+        # UTC midnight (7PM EST) would incorrectly split sessions
+        bar_date = self._ts_to_date(bar.ts_event, est_offset=-5)  # EST date
         if self.current_date is None:
             self.current_date = bar_date
         elif bar_date != self.current_date:
@@ -623,10 +637,18 @@ class SymmetryTrapStrategy(Strategy):
     # ── Day boundary detection ────────────────────────────────────────
 
     @staticmethod
-    def _ts_to_date(ts_ns: int):
-        """Convert UTC nanosecond timestamp to a date object."""
-        from datetime import datetime, timezone
-        return datetime.fromtimestamp(ts_ns / 1e9, tz=timezone.utc).date()
+    def _ts_to_date(ts_ns: int, est_offset: int = 0):
+        """Convert UTC nanosecond timestamp to a date object.
+        
+        Args:
+            ts_ns: UTC timestamp in nanoseconds
+            est_offset: Hours to offset (use -5 for EST, 0 for UTC)
+        """
+        from datetime import datetime, timezone, timedelta
+        dt = datetime.fromtimestamp(ts_ns / 1e9, tz=timezone.utc)
+        if est_offset != 0:
+            dt = dt + timedelta(hours=est_offset)
+        return dt.date()
 
     # ── / Lifecycle ────────────────────────────────────────────────────
 

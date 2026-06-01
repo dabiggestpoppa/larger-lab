@@ -1,0 +1,15 @@
+{
+  "strategy": "symmetry_trap",
+  "symbol": "ETHUSD",
+  "bars": 458015,
+  "timestamp": "20260531_220842",
+  "engine_orders": 2162,
+  "engine_positions": 1,
+  "strategy_trades": 777,
+  "strategy_wins": 736,
+  "strategy_losses": 41,
+  "strategy_win_rate": 94.72329472329473,
+  "strategy_pnl_pips": 11901.89999999998,
+  "asset_cfg_pip": 1.0,
+  "asset_cfg_k": 0.52
+}

@@ -1,0 +1,123 @@
+{
+  "_comment": "CEREBUS FX v4.0 — Deployment Configuration + Risk Gate",
+  "_reference": "CEREBUS ontology + quant-lab/configs/asset_configs.py",
+  "_author": "MAD Directive 2026-05-31",
+
+  "version": "4.0.0",
+  "engine_models": {
+    "A": "P90_Kinetic",
+    "B": "Symmetry_Trap_Atomic"
+  },
+
+  "risk_gate": {
+    "max_daily_loss_usd": 500,
+    "max_daily_loss_pct": 2.0,
+    "max_concurrent_trades": 4,
+    "max_correlated_trades": 2,
+    "max_single_trade_risk_pct": 1.0,
+    "max_total_exposure_pct": 3.0,
+    "correlation_pairs": [
+      ["EURUSD", "GBPUSD"],
+      ["EURUSD", "USDCHF"],
+      ["BTCUSD", "ETHUSD"],
+      ["US500", "NAS100"]
+    ],
+    "correlation_max_direction": "same",
+    "cooldown_after_loss_minutes": 30,
+    "max_losses_before_stop": 3,
+    "daily_reset_hour_est": 12
+  },
+
+  "position_sizing": {
+    "method": "fixed_lot_with_cap",
+    "default_lot": 0.01,
+    "max_lot": 1.0,
+    "scale_in_enabled": false,
+    "scale_in_max_levels": 1,
+    "scale_in_trigger": "none"
+  },
+
+  "session_config": {
+    "asian_start_est": 19,
+    "asian_end_est": 3,
+    "trading_window_start_est": 3,
+    "daily_reset_hour_est": 12,
+    "loop_timeout_hours": 9
+  },
+
+  "asset_deployments": {
+    "EURUSD": {
+      "enabled": true,
+      "strategies": ["P90_CASCADE", "ST_BASE"],
+      "lot_size": 0.05,
+      "max_spread_pips": 2.0,
+      "notes": "Primary asset. Both engines active."
+    },
+    "GBPUSD": {
+      "enabled": true,
+      "strategies": ["P90_CASCADE"],
+      "lot_size": 0.03,
+      "max_spread_pips": 2.5,
+      "notes": "High volatility. P90 Cascade only."
+    },
+    "USDCHF": {
+      "enabled": false,
+      "strategies": [],
+      "lot_size": 0.01,
+      "max_spread_pips": 2.5,
+      "notes": "Pending validation."
+    },
+    "XAUUSD": {
+      "enabled": false,
+      "strategies": ["ST_BASE"],
+      "lot_size": 0.01,
+      "max_spread_pips": 50.0,
+      "notes": "Gold — requires separate margin allocation."
+    },
+    "BTCUSD": {
+      "enabled": false,
+      "strategies": ["P90_INITIAL"],
+      "lot_size": 0.01,
+      "max_spread_pips": 500.0,
+      "notes": "Crypto track (Track B)."
+    }
+  },
+
+  "trade_copier": {
+    "enabled": false,
+    "mode": "signal_bridge",
+    "source": "NT8_backtest_or_live",
+    "target": "MT5_executor",
+    "signal_format": {
+      "action": "BUY|SELL|CLOSE",
+      "symbol": "string",
+      "lot_size": "number",
+      "sl_price": "number",
+      "tp_price": "number",
+      "magic_number": "integer",
+      "comment": "CEREBUS_[engine]_[variant]"
+    },
+    "allowed_actions": ["OPEN", "CLOSE", "MODIFY_SL"],
+    "blocked_actions": ["SCALE_IN", "HEDGE"]
+  },
+
+  "monitoring": {
+    "oce_vault_enabled": true,
+    "oce_persistent_field": "oc2_status",
+    "overseer_check_interval_minutes": 15,
+    "alert_on_freeze": true,
+    "freeze_timeout_minutes": 5,
+    "escalation_target": "telegram:8258195396"
+  },
+
+  "deployment_checklist": {
+    "compile_validation": "PENDING",
+    "backtest_st_eurusd": "PENDING",
+    "backtest_p90_eurusd": "PENDING",
+    "backtest_dual_convergence": "PENDING",
+    "multi_asset_validation": "PENDING",
+    "risk_gate_test": "PENDING",
+    "live_dry_run": "PENDING",
+    "mad_sign_off": "PENDING"
+  }
+}

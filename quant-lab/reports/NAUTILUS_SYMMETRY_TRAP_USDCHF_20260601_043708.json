@@ -1,0 +1,17 @@
+{
+  "strategy": "symmetry_trap",
+  "symbol": "USDCHF",
+  "bars": 277072,
+  "timestamp": "20260601_043708",
+  "engine_orders": 2121,
+  "engine_positions": 0,
+  "engine_pnl_usd": 0.0,
+  "engine_win_rate": 0.0,
+  "strategy_trades": 2050,
+  "strategy_wins": 1672,
+  "strategy_losses": 368,
+  "strategy_win_rate": 81.5609756097561,
+  "strategy_pnl_pips": 7756.400000000006,
+  "max_drawdown": 0.0,
+  "elapsed_s": 138930600.0
+}

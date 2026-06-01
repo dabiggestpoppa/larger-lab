@@ -490,7 +490,7 @@ larger-lab/
   ├── 📁 shared-conversations/  ← Team coordination
   │   └── team-chat.md          ← Agent chat hub
   │
-  ├── 📁 memory-bank/           ← Error DB + solutions + patterns
+  ├── 📁 memory/memory-bank/   ← Error DB + solutions + patterns
   │   ├── error-db.json
   │   └── errors-and-solutions.md
   │

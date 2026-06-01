@@ -1,0 +1,27 @@
+{
+  "batch": 3,
+  "assets": ["CHFJPY", "XAUUSD", "XAGUSD", "BTCUSD", "ETHUSD"],
+  "results": {
+    "CHFJPY": {
+      "symmetry_trap": {"trades": 0, "wr": 0.0, "pnl": 0.0},
+      "p90": {"trades": 0, "wr": 0.0, "pnl": 0.0}
+    },
+    "XAUUSD": {
+      "symmetry_trap": {"trades": 1718, "wr": 81.8, "pnl": 21118.2},
+      "p90": {"trades": 202, "wr": 54.5, "pnl": 309.2}
+    },
+    "XAGUSD": {
+      "symmetry_trap": {"trades": 2, "wr": 100.0, "pnl": 50.0},
+      "p90": {"trades": 0, "wr": 0.0, "pnl": 0.0}
+    },
+    "BTCUSD": {
+      "symmetry_trap": {"trades": 2014, "wr": 86.9, "pnl": 219718.6},
+      "p90": {"trades": 2, "wr": 100.0, "pnl": 17.0}
+    },
+    "ETHUSD": {
+      "symmetry_trap": {"trades": 777, "wr": 94.7, "pnl": 11901.9},
+      "p90": {"trades": 99, "wr": 83.8, "pnl": 391.0}
+    }
+  },
+  "errors": []
+}

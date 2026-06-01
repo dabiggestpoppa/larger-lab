@@ -1,0 +1,672 @@
+{
+  "timestamp": "2026-05-31T21:18:37.659903",
+  "total_assets": 19,
+  "errors": [],
+  "results": {
+    "EURUSD": {
+      "config": {
+        "pip_value": 0.0001,
+        "k_factor": 0.46
+      },
+      "st": {
+        "trades": 1163,
+        "wins": 989,
+        "losses": 171,
+        "win_rate": 85.0,
+        "pnl_pips": 5048.1,
+        "profit_factor": 8.57,
+        "sharpe": 0,
+        "max_drawdown_pct": 0.04,
+        "data_bars": 273909,
+        "data_days": 1341,
+        "avg_win_pips": 5.8,
+        "avg_loss_pips": -3.9,
+        "expectancy_pips": 4.3
+      },
+      "p90": {
+        "trades": 1471,
+        "wins": 1175,
+        "losses": 296,
+        "win_rate": 79.9,
+        "pnl_pips": 0,
+        "profit_factor": 3.26,
+        "sharpe": 0,
+        "max_drawdown_pct": 0
+      },
+      "timing": {
+        "st": 4,
+        "p90": 6
+      }
+    },
+    "GBPUSD": {
+      "config": {
+        "pip_value": 0.0001,
+        "k_factor": 0.46
+      },
+      "st": {
+        "trades": 1259,
+        "wins": 1079,
+        "losses": 176,
+        "win_rate": 85.7,
+        "pnl_pips": 7444.3,
+        "profit_factor": 9.23,
+        "sharpe": 0,
+        "max_drawdown_pct": 0.05,
+        "data_bars": 277022,
+        "data_days": 1343,
+        "avg_win_pips": 7.7,
+        "avg_loss_pips": -5.1,
+        "expectancy_pips": 5.9
+      },
+      "p90": {
+        "trades": 2237,
+        "wins": 1922,
+        "losses": 315,
+        "win_rate": 85.9,
+        "pnl_pips": 0,
+        "profit_factor": 4.67,
+        "sharpe": 0,
+        "max_drawdown_pct": 0
+      },
+      "timing": {
+        "st": 4,
+        "p90": 6
+      }
+    },
+    "USDCHF": {
+      "config": {
+        "pip_value": 0.0001,
+        "k_factor": 0.46
+      },
+      "st": {
+        "trades": 1153,
+        "wins": 979,
+        "losses": 169,
+        "win_rate": 84.9,
+        "pnl_pips": 5035.5,
+        "profit_factor": 8.87,
+        "sharpe": 0,
+        "max_drawdown_pct": 0.06,
+        "data_bars": 277072,
+        "data_days": 1343,
+        "avg_win_pips": 5.8,
+        "avg_loss_pips": -3.8,
+        "expectancy_pips": 4.4
+      },
+      "p90": {
+        "trades": 1192,
+        "wins": 957,
+        "losses": 235,
+        "win_rate": 80.3,
+        "pnl_pips": 0,
+        "profit_factor": 3.02,
+        "sharpe": 0,
+        "max_drawdown_pct": 0
+      },
+      "timing": {
+        "st": 4,
+        "p90": 6
+      }
+    },
+    "USDJPY": {
+      "config": {
+        "pip_value": 0.01,
+        "k_factor": 0.46
+      },
+      "st": {
+        "trades": 729,
+        "wins": 640,
+        "losses": 86,
+        "win_rate": 87.8,
+        "pnl_pips": 7086.7,
+        "profit_factor": 16.73,
+        "sharpe": 0,
+        "max_drawdown_pct": 0.04,
+        "data_bars": 277092,
+        "data_days": 1343,
+        "avg_win_pips": 11.8,
+        "avg_loss_pips": -5.2,
+        "expectancy_pips": 9.7
+      },
+      "p90": {
+        "trades": 1062,
+        "wins": 904,
+        "losses": 158,
+        "win_rate": 85.1,
+        "pnl_pips": 0,
+        "profit_factor": 5.06,
+        "sharpe": 0,
+        "max_drawdown_pct": 0
+      },
+      "timing": {
+        "st": 4,
+        "p90": 6
+      }
+    },
+    "AUDUSD": {
+      "config": {
+        "pip_value": 0.0001,
+        "k_factor": 0.46
+      },
+      "st": {
+        "trades": 828,
+        "wins": 739,
+        "losses": 83,
+        "win_rate": 89.3,
+        "pnl_pips": 3989.7,
+        "profit_factor": 18.47,
+        "sharpe": 0,
+        "max_drawdown_pct": 0.02,
+        "data_bars": 273896,
+        "data_days": 1341,
+        "avg_win_pips": 5.7,
+        "avg_loss_pips": -2.8,
+        "expectancy_pips": 4.8
+      },
+      "p90": {
+        "trades": 618,
+        "wins": 447,
+        "losses": 171,
+        "win_rate": 72.3,
+        "pnl_pips": 0,
+        "profit_factor": 2.62,
+        "sharpe": 0,
+        "max_drawdown_pct": 0
+      },
+      "timing": {
+        "st": 4,
+        "p90": 6
+      }
+    },
+    "NZDUSD": {
+      "config": {
+        "pip_value": 0.0001,
+        "k_factor": 0.46
+      },
+      "st": {
+        "trades": 727,
+        "wins": 678,
+        "losses": 49,
+        "win_rate": 93.3,
+        "pnl_pips": 4213.6,
+        "profit_factor": 19.02,
+        "sharpe": 0,
+        "max_drawdown_pct": 0.05,
+        "data_bars": 276961,
+        "data_days": 1343,
+        "avg_win_pips": 6.6,
+        "avg_loss_pips": -4.8,
+        "expectancy_pips": 5.8
+      },
+      "p90": {
+        "trades": 534,
+        "wins": 374,
+        "losses": 160,
+        "win_rate": 70.0,
+        "pnl_pips": 0,
+        "profit_factor": 2.29,
+        "sharpe": 0,
+        "max_drawdown_pct": 0
+      },
+      "timing": {
+        "st": 4,
+        "p90": 6
+      }
+    },
+    "GBPJPY": {
+      "config": {
+        "pip_value": 0.01,
+        "k_factor": 0.48
+      },
+      "st": {
+        "trades": 830,
+        "wins": 716,
+        "losses": 113,
+        "win_rate": 86.3,
+        "pnl_pips": 8655.6,
+        "profit_factor": 12.61,
+        "sharpe": 0,
+        "max_drawdown_pct": 0.06,
+        "data_bars": 276931,
+        "data_days": 1343,
+        "avg_win_pips": 13.1,
+        "avg_loss_pips": -6.6,
+        "expectancy_pips": 10.4
+      },
+      "p90": {
+        "trades": 1717,
+        "wins": 1571,
+        "losses": 146,
+        "win_rate": 91.5,
+        "pnl_pips": 0,
+        "profit_factor": 8.23,
+        "sharpe": 0,
+        "max_drawdown_pct": 0
+      },
+      "timing": {
+        "st": 4,
+        "p90": 6
+      }
+    },
+    "GBPCHF": {
+      "config": {
+        "pip_value": 0.0001,
+        "k_factor": 0.48
+      },
+      "st": {
+        "trades": 803,
+        "wins": 732,
+        "losses": 70,
+        "win_rate": 91.2,
+        "pnl_pips": 6409.4,
+        "profit_factor": 24.51,
+        "sharpe": 0,
+        "max_drawdown_pct": 0.02,
+        "data_bars": 276994,
+        "data_days": 1343,
+        "avg_win_pips": 9.1,
+        "avg_loss_pips": -3.9,
+        "expectancy_pips": 8.0
+      },
+      "p90": {
+        "trades": 1746,
+        "wins": 1486,
+        "losses": 260,
+        "win_rate": 85.1,
+        "pnl_pips": 0,
+        "profit_factor": 4.01,
+        "sharpe": 0,
+        "max_drawdown_pct": 0
+      },
+      "timing": {
+        "st": 4,
+        "p90": 6
+      }
+    },
+    "GBPAUD": {
+      "config": {
+        "pip_value": 0.0001,
+        "k_factor": 0.48
+      },
+      "st": {
+        "trades": 715,
+        "wins": 632,
+        "losses": 82,
+        "win_rate": 88.4,
+        "pnl_pips": 7911.5,
+        "profit_factor": 14.97,
+        "sharpe": 0,
+        "max_drawdown_pct": 0.06,
+        "data_bars": 277100,
+        "data_days": 1343,
+        "avg_win_pips": 13.4,
+        "avg_loss_pips": -6.9,
+        "expectancy_pips": 11.1
+      },
+      "p90": {
+        "trades": 1299,
+        "wins": 1137,
+        "losses": 162,
+        "win_rate": 87.5,
+        "pnl_pips": 0,
+        "profit_factor": 5.89,
+        "sharpe": 0,
+        "max_drawdown_pct": 0
+      },
+      "timing": {
+        "st": 4,
+        "p90": 6
+      }
+    },
+    "GBPNZD": {
+      "config": {
+        "pip_value": 0.0001,
+        "k_factor": 0.48
+      },
+      "st": {
+        "trades": 664,
+        "wins": 587,
+        "losses": 75,
+        "win_rate": 88.4,
+        "pnl_pips": 8598.3,
+        "profit_factor": 20.87,
+        "sharpe": 0,
+        "max_drawdown_pct": 0.05,
+        "data_bars": 277117,
+        "data_days": 1343,
+        "avg_win_pips": 15.4,
+        "avg_loss_pips": -5.8,
+        "expectancy_pips": 12.9
+      },
+      "p90": {
+        "trades": 1275,
+        "wins": 1129,
+        "losses": 146,
+        "win_rate": 88.5,
+        "pnl_pips": 0,
+        "profit_factor": 6.04,
+        "sharpe": 0,
+        "max_drawdown_pct": 0
+      },
+      "timing": {
+        "st": 4,
+        "p90": 6
+      }
+    },
+    "CHFJPY": {
+      "config": {
+        "pip_value": 0.01,
+        "k_factor": 0.48
+      },
+      "st": {
+        "trades": 751,
+        "wins": 648,
+        "losses": 102,
+        "win_rate": 86.3,
+        "pnl_pips": 7167.0,
+        "profit_factor": 13.01,
+        "sharpe": 0,
+        "max_drawdown_pct": 0.09,
+        "data_bars": 275093,
+        "data_days": 1336,
+        "avg_win_pips": 12.0,
+        "avg_loss_pips": -5.9,
+        "expectancy_pips": 9.5
+      },
+      "p90": {
+        "trades": 1662,
+        "wins": 1504,
+        "losses": 158,
+        "win_rate": 90.5,
+        "pnl_pips": 0,
+        "profit_factor": 7.57,
+        "sharpe": 0,
+        "max_drawdown_pct": 0
+      },
+      "timing": {
+        "st": 4,
+        "p90": 6
+      }
+    },
+    "US500": {
+      "config": {
+        "pip_value": 1.0,
+        "k_factor": 0.48
+      },
+      "st": {
+        "trades": 372,
+        "wins": 341,
+        "losses": 29,
+        "win_rate": 91.7,
+        "pnl_pips": 3414.8,
+        "profit_factor": 13.95,
+        "sharpe": 0,
+        "max_drawdown_pct": 0.12,
+        "data_bars": 260958,
+        "data_days": 1335,
+        "avg_win_pips": 10.8,
+        "avg_loss_pips": -9.1,
+        "expectancy_pips": 9.2
+      },
+      "p90": {
+        "trades": 548,
+        "wins": 436,
+        "losses": 112,
+        "win_rate": 79.6,
+        "pnl_pips": 0,
+        "profit_factor": 3.35,
+        "sharpe": 0,
+        "max_drawdown_pct": 0
+      },
+      "timing": {
+        "st": 4,
+        "p90": 6
+      }
+    },
+    "HK50": {
+      "config": {
+        "pip_value": 1.0,
+        "k_factor": 0.48
+      },
+      "st": {
+        "trades": 385,
+        "wins": 362,
+        "losses": 22,
+        "win_rate": 94.0,
+        "pnl_pips": 21838.8,
+        "profit_factor": 40.3,
+        "sharpe": 0,
+        "max_drawdown_pct": 0.15,
+        "data_bars": 242271,
+        "data_days": 1288,
+        "avg_win_pips": 61.9,
+        "avg_loss_pips": -25.3,
+        "expectancy_pips": 56.7
+      },
+      "p90": {
+        "trades": 4,
+        "wins": 3,
+        "losses": 1,
+        "win_rate": 75.0,
+        "pnl_pips": 0,
+        "profit_factor": 3.88,
+        "sharpe": 0,
+        "max_drawdown_pct": 0
+      },
+      "timing": {
+        "st": 3,
+        "p90": 5
+      }
+    },
+    "XAUUSD": {
+      "config": {
+        "pip_value": 0.1,
+        "k_factor": 0.5
+      },
+      "st": {
+        "trades": 604,
+        "wins": 510,
+        "losses": 92,
+        "win_rate": 84.4,
+        "pnl_pips": 7187.7,
+        "profit_factor": 7.42,
+        "sharpe": 0,
+        "max_drawdown_pct": 0.12,
+        "data_bars": 306934,
+        "data_days": 1362,
+        "avg_win_pips": 16.3,
+        "avg_loss_pips": -12.2,
+        "expectancy_pips": 11.9
+      },
+      "p90": {
+        "trades": 673,
+        "wins": 620,
+        "losses": 53,
+        "win_rate": 92.1,
+        "pnl_pips": 0,
+        "profit_factor": 9.19,
+        "sharpe": 0,
+        "max_drawdown_pct": 0
+      },
+      "timing": {
+        "st": 4,
+        "p90": 7
+      }
+    },
+    "XAGUSD": {
+      "config": {
+        "pip_value": 0.01,
+        "k_factor": 0.5
+      },
+      "st": {
+        "trades": 2,
+        "wins": 1,
+        "losses": 1,
+        "win_rate": 50.0,
+        "pnl_pips": 2.5,
+        "profit_factor": 26.0,
+        "sharpe": 0,
+        "max_drawdown_pct": 0.0,
+        "data_bars": 304981,
+        "data_days": 1366,
+        "avg_win_pips": 2.6,
+        "avg_loss_pips": -0.1,
+        "expectancy_pips": 1.2
+      },
+      "p90": {
+        "trades": 973,
+        "wins": 729,
+        "losses": 244,
+        "win_rate": 74.9,
+        "pnl_pips": 0,
+        "profit_factor": 2.78,
+        "sharpe": 0,
+        "max_drawdown_pct": 0
+      },
+      "timing": {
+        "st": 4,
+        "p90": 7
+      }
+    },
+    "BTCUSD": {
+      "config": {
+        "pip_value": 1.0,
+        "k_factor": 0.52
+      },
+      "st": {
+        "trades": 801,
+        "wins": 742,
+        "losses": 59,
+        "win_rate": 92.6,
+        "pnl_pips": 152304.3,
+        "profit_factor": 26.52,
+        "sharpe": 0,
+        "max_drawdown_pct": 0.78,
+        "data_bars": 458887,
+        "data_days": 1611,
+        "avg_win_pips": 213.3,
+        "avg_loss_pips": -101.2,
+        "expectancy_pips": 190.1
+      },
+      "p90": {
+        "trades": 0,
+        "wins": 0,
+        "losses": 0,
+        "win_rate": 0.0,
+        "pnl_pips": 0,
+        "profit_factor": 0.0,
+        "sharpe": 0,
+        "max_drawdown_pct": 0
+      },
+      "timing": {
+        "st": 7,
+        "p90": 11
+      }
+    },
+    "ETHUSD": {
+      "config": {
+        "pip_value": 1.0,
+        "k_factor": 0.52
+      },
+      "st": {
+        "trades": 547,
+        "wins": 530,
+        "losses": 17,
+        "win_rate": 96.9,
+        "pnl_pips": 9562.5,
+        "profit_factor": 50.34,
+        "sharpe": 0,
+        "max_drawdown_pct": 0.03,
+        "data_bars": 458015,
+        "data_days": 1611,
+        "avg_win_pips": 18.4,
+        "avg_loss_pips": -11.4,
+        "expectancy_pips": 17.5
+      },
+      "p90": {
+        "trades": 223,
+        "wins": 160,
+        "losses": 63,
+        "win_rate": 71.7,
+        "pnl_pips": 0,
+        "profit_factor": 3.09,
+        "sharpe": 0,
+        "max_drawdown_pct": 0
+      },
+      "timing": {
+        "st": 7,
+        "p90": 10
+      }
+    },
+    "FR40": {
+      "config": {
+        "pip_value": 1.0,
+        "k_factor": 0.48
+      },
+      "st": {
+        "trades": 1085,
+        "wins": 944,
+        "losses": 132,
+        "win_rate": 87.0,
+        "pnl_pips": 9730.3,
+        "profit_factor": 12.21,
+        "sharpe": 0,
+        "max_drawdown_pct": 0.11,
+        "data_bars": 253878,
+        "data_days": 1300,
+        "avg_win_pips": 11.2,
+        "avg_loss_pips": -6.6,
+        "expectancy_pips": 9.0
+      },
+      "p90": {
+        "trades": 3141,
+        "wins": 2826,
+        "losses": 315,
+        "win_rate": 90.0,
+        "pnl_pips": 0,
+        "profit_factor": 5.13,
+        "sharpe": 0,
+        "max_drawdown_pct": 0
+      },
+      "timing": {
+        "st": 4,
+        "p90": 6
+      }
+    },
+    "DE30": {
+      "config": {
+        "pip_value": 1.0,
+        "k_factor": 0.48
+      },
+      "st": {
+        "trades": 1145,
+        "wins": 948,
+        "losses": 183,
+        "win_rate": 82.8,
+        "pnl_pips": 18466.8,
+        "profit_factor": 9.91,
+        "sharpe": 0,
+        "max_drawdown_pct": 0.13,
+        "data_bars": 257602,
+        "data_days": 1320,
+        "avg_win_pips": 21.7,
+        "avg_loss_pips": -11.3,
+        "expectancy_pips": 16.1
+      },
+      "p90": {
+        "trades": 3073,
+        "wins": 2905,
+        "losses": 168,
+        "win_rate": 94.5,
+        "pnl_pips": 0,
+        "profit_factor": 11.17,
+        "sharpe": 0,
+        "max_drawdown_pct": 0
+      },
+      "timing": {
+        "st": 4,
+        "p90": 6
+      }
+    }
+  }
+}

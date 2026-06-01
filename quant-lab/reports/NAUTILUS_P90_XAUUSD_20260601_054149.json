@@ -1,0 +1,17 @@
+{
+  "strategy": "p90",
+  "symbol": "XAUUSD",
+  "bars": 306934,
+  "timestamp": "20260601_054149",
+  "engine_orders": 186,
+  "engine_positions": 0,
+  "engine_pnl_usd": 0.0,
+  "engine_win_rate": 0.0,
+  "strategy_trades": 185,
+  "strategy_wins": 115,
+  "strategy_losses": 70,
+  "strategy_win_rate": 62.16216216216216,
+  "strategy_pnl_pips": 257.8449999999839,
+  "max_drawdown": 0.0,
+  "elapsed_s": 138219900.0
+}

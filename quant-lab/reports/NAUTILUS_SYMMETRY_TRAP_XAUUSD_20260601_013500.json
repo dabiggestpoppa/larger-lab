@@ -1,0 +1,15 @@
+{
+  "strategy": "symmetry_trap",
+  "symbol": "XAUUSD",
+  "bars": 306934,
+  "timestamp": "20260601_013500",
+  "engine_orders": 2091,
+  "engine_positions": 1,
+  "strategy_trades": 1718,
+  "strategy_wins": 1406,
+  "strategy_losses": 308,
+  "strategy_win_rate": 81.83934807916181,
+  "strategy_pnl_pips": 21118.20000000008,
+  "asset_cfg_pip": 0.1,
+  "asset_cfg_k": 0.5
+}

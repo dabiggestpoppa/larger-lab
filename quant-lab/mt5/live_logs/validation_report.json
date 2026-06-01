@@ -1,0 +1,3676 @@
+{
+  "timestamp": "2026-06-01T09:43:43.314712-04:00",
+  "setups_found": {
+    "EURUSD.PRO": [
+      {
+        "engine": "P90",
+        "symbol": "EURUSD.PRO",
+        "direction": "BUY",
+        "entry": 1.16646,
+        "sl": 1.16598,
+        "tp": 1.16741,
+        "variant": "INITIAL",
+        "body_pips": 6.0,
+        "threshold": 4.6,
+        "ar_pips": 19.0,
+        "bar_time": "05:55",
+        "bar_idx": 1918
+      }
+    ],
+    "GBPUSD.PRO": [
+      {
+        "engine": "P90",
+        "symbol": "GBPUSD.PRO",
+        "direction": "BUY",
+        "entry": 1.34669,
+        "sl": 1.34628,
+        "tp": 1.34738,
+        "variant": "INITIAL",
+        "body_pips": 5.1,
+        "threshold": 4.6,
+        "ar_pips": 13.8,
+        "bar_time": "05:30",
+        "bar_idx": 1913
+      }
+    ],
+    "GBPAUD.PRO": [
+      {
+        "engine": "P90",
+        "symbol": "GBPAUD.PRO",
+        "direction": "BUY",
+        "entry": 1.876,
+        "sl": 1.87556,
+        "tp": 1.87808,
+        "variant": "INITIAL",
+        "body_pips": 5.5,
+        "threshold": 4.6,
+        "ar_pips": 41.6,
+        "bar_time": "05:50",
+        "bar_idx": 1917
+      }
+    ],
+    "GBPCHF.PRO": [],
+    "NZDUSD.PRO": []
+  },
+  "signals_sent": [
+    {
+      "ts": "2026-05-29T04:07:09.943398",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:07:39.957123",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:08:09.963048",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:08:39.979940",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:09:10.002500",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:09:40.016040",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:10:10.023694",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:10:40.042397",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:11:10.052376",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:11:40.075512",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:12:10.082802",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:12:40.106676",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:13:10.119772",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:13:40.130082",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:14:10.148186",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:14:40.164528",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:15:10.183453",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:15:40.199328",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:16:10.217768",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:16:40.233280",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:17:40.255128",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:18:10.282749",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:18:40.295972",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:19:10.311312",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:19:40.327263",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:20:40.356611",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:21:10.375616",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:21:40.377073",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:22:40.413409",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:24:10.460591",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:38:40.868120",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:39:10.873366",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:44:11.014022",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:46:11.082666",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:46:41.099109",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:47:11.108346",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:47:41.117881",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:48:11.134252",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:48:41.160238",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:49:11.173957",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:49:41.177317",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:50:11.195515",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:50:41.219151",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:51:11.232088",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:51:41.243465",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:52:11.263954",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:52:41.273438",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:53:11.286136",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:53:41.300766",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:54:11.309375",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:54:41.332396",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:55:11.348103",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T04:59:41.469480",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:00:11.485995",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:00:41.487081",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:01:11.512144",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:01:41.527759",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:02:11.541600",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:02:41.555417",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:03:11.568753",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:03:41.584118",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:04:11.598337",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:04:41.602186",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:05:11.619509",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:05:41.648031",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:06:11.663257",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:06:41.668450",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:07:11.681104",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:07:41.695860",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:08:11.725733",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:08:41.728568",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:09:11.754255",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:09:41.770047",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:10:11.783133",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:10:41.797265",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:11:11.810145",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:11:41.823377",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:12:11.839213",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:12:41.852975",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:13:11.867473",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:13:41.881265",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:14:11.894174",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:15:11.920577",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:15:41.934921",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:16:11.948689",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:16:41.963491",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:20:12.053455",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:20:42.067497",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:21:12.081067",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:21:42.094628",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:22:12.107761",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:22:42.120423",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:23:12.134240",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:23:42.149737",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:24:12.164622",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:24:42.178188",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:25:12.191277",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:25:42.210167",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:26:12.222917",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:26:42.238584",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:27:12.255678",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:27:42.268835",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:28:12.282825",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:28:42.296334",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:29:12.311885",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:32:12.394695",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:32:42.409970",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:33:12.427178",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:33:42.439933",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:34:12.452593",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:34:42.466225",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:35:12.482003",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:35:42.499153",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:36:12.512798",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:36:42.529358",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:37:12.543102",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:37:42.556488",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:38:12.569504",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:38:42.583371",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:39:12.596882",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:39:42.611130",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:40:12.626085",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:40:42.664932",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:41:12.681596",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:41:42.694542",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:42:12.711727",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:42:42.726286",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:43:12.742371",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:43:42.759682",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:44:12.774538",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T05:44:42.788037",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:28:56.078543",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:29:26.092901",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:29:56.097949",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:30:26.116938",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:30:56.134193",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:31:26.141046",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:31:56.158616",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:32:26.188323",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:32:56.200900",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:33:26.216652",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:33:56.229049",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:34:26.251446",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:34:56.261106",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:35:26.281372",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:35:56.285165",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:36:26.310741",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:36:56.316030",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:37:26.338074",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:37:56.358680",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:38:26.372109",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:38:56.385341",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:39:26.400265",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:39:56.411461",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:40:26.433742",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:40:56.456977",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:41:26.465698",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:41:56.476539",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:42:26.493829",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:42:56.517834",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:43:26.537796",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:43:56.544162",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:44:26.566913",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:44:54.994163",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:44:56.584514",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:45:25.004702",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:45:26.600447",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:45:55.027066",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:45:56.611140",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:46:25.035776",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:46:26.622048",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:46:55.056135",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:46:56.646659",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:46:59.171736",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:47:25.077472",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:47:26.659685",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:47:29.179020",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:47:55.096213",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:47:56.679833",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:47:59.203821",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:48:25.105118",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:48:26.694238",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:48:29.214876",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:48:55.124402",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:48:56.703598",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:48:59.236460",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:49:25.136444",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:49:26.723989",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:49:29.245751",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:49:55.156109",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:49:56.743323",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:49:59.262703",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:50:25.167075",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:50:26.750482",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:50:29.282262",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:50:55.188255",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:50:56.765900",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:50:59.307832",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:51:25.205065",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:51:26.780786",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:51:29.323403",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:51:55.225935",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:51:56.797622",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:51:59.333171",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:52:25.246186",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:52:26.827968",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:52:29.349990",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:52:55.250452",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:52:56.840378",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:52:59.360749",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:53:25.285272",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:53:29.374493",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:53:59.394092",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:54:29.408200",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:54:59.429113",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:55:29.438031",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:55:59.467599",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:56:29.470617",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:56:59.496861",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:57:29.511673",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:57:59.529020",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:58:29.543072",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:58:59.560392",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:59:29.574093",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T06:59:59.597160",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:00:29.614945",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:00:59.631076",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:01:29.652275",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:01:59.654558",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:02:29.681291",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:02:59.698582",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:03:29.711351",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:03:59.737850",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:04:29.755764",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:04:59.803047",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:05:29.813443",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:05:59.835638",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:06:29.851510",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:06:59.859996",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:07:29.886327",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:07:59.898525",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:08:29.916042",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:08:59.932713",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:09:29.946019",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:09:59.966895",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:10:29.974865",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:10:59.993188",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:11:30.010640",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:12:00.027103",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:12:30.049600",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:13:00.068257",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:13:30.074925",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:14:00.106592",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:14:30.121322",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:15:00.134843",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:15:30.151582",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:16:00.162652",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:16:30.190206",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:17:00.206946",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:17:30.216491",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:18:00.238302",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:18:30.246761",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:19:00.264512",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:19:30.287814",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:20:00.301585",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:20:30.319825",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:21:00.326617",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:21:30.345598",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:22:00.363812",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:22:30.388653",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:23:00.404056",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:23:30.422124",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:24:00.437779",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:24:30.452661",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:25:00.459251",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:25:30.485452",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:26:00.504508",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:26:30.517820",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:27:00.537306",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:27:30.552124",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:28:00.570021",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:28:30.580073",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:29:00.603365",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:29:30.622278",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:30:00.629782",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:30:30.652401",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:31:00.663672",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:31:30.677362",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:32:00.701354",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:32:30.725977",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:33:00.740532",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:33:30.756717",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:34:00.776794",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:34:30.794081",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:35:00.802285",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:35:30.811645",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:36:00.834909",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:36:30.850877",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:37:00.875123",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:37:30.883452",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:38:00.904055",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:38:30.925519",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:39:00.963342",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T07:39:30.980452",
+      "type": "ORDER_FAILED",
+      "retcode": 10027,
+      "comment": "AutoTrading disabled by client"
+    },
+    {
+      "ts": "2026-05-29T08:05:23.808929",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626195
+    },
+    {
+      "ts": "2026-05-29T08:05:23.809921",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:05:53.862067",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626200
+    },
+    {
+      "ts": "2026-05-29T08:05:53.863060",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:06:23.912378",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626205
+    },
+    {
+      "ts": "2026-05-29T08:06:23.913382",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:06:53.970844",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626207
+    },
+    {
+      "ts": "2026-05-29T08:06:53.971838",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:07:24.019298",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626215
+    },
+    {
+      "ts": "2026-05-29T08:07:24.020297",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:07:54.067609",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626223
+    },
+    {
+      "ts": "2026-05-29T08:07:54.068608",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:08:24.117550",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626233
+    },
+    {
+      "ts": "2026-05-29T08:08:24.118553",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:08:54.174837",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626235
+    },
+    {
+      "ts": "2026-05-29T08:08:54.175837",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:09:24.223227",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626275
+    },
+    {
+      "ts": "2026-05-29T08:09:24.224226",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:09:54.275717",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626295
+    },
+    {
+      "ts": "2026-05-29T08:09:54.276719",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:10:24.325116",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626312
+    },
+    {
+      "ts": "2026-05-29T08:10:24.326122",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:10:54.371589",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626340
+    },
+    {
+      "ts": "2026-05-29T08:10:54.372585",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:11:24.420699",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626344
+    },
+    {
+      "ts": "2026-05-29T08:11:24.421699",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:11:54.470463",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626360
+    },
+    {
+      "ts": "2026-05-29T08:11:54.471458",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:12:24.524138",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626378
+    },
+    {
+      "ts": "2026-05-29T08:12:24.525138",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:12:31.049996",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626381
+    },
+    {
+      "ts": "2026-05-29T08:12:31.050975",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:12:54.575141",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626388
+    },
+    {
+      "ts": "2026-05-29T08:12:54.576150",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:13:01.092171",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626396
+    },
+    {
+      "ts": "2026-05-29T08:13:01.092171",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:13:24.623343",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626404
+    },
+    {
+      "ts": "2026-05-29T08:13:24.624344",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:13:31.152494",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626410
+    },
+    {
+      "ts": "2026-05-29T08:13:31.153499",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:13:54.673444",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626419
+    },
+    {
+      "ts": "2026-05-29T08:13:54.674445",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:14:01.199303",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626422
+    },
+    {
+      "ts": "2026-05-29T08:14:01.200292",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:14:24.722626",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626429
+    },
+    {
+      "ts": "2026-05-29T08:14:24.723625",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:14:31.252386",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626431
+    },
+    {
+      "ts": "2026-05-29T08:14:31.253388",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:14:54.772251",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626437
+    },
+    {
+      "ts": "2026-05-29T08:14:54.773253",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:15:01.303488",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626450
+    },
+    {
+      "ts": "2026-05-29T08:15:01.304484",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:15:24.821622",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626471
+    },
+    {
+      "ts": "2026-05-29T08:15:24.822613",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:15:31.352399",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626474
+    },
+    {
+      "ts": "2026-05-29T08:15:31.353389",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:15:54.871724",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626480
+    },
+    {
+      "ts": "2026-05-29T08:15:54.872727",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:16:01.403836",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626482
+    },
+    {
+      "ts": "2026-05-29T08:16:01.404845",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:16:31.455267",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626490
+    },
+    {
+      "ts": "2026-05-29T08:16:31.456265",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:17:01.503693",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626496
+    },
+    {
+      "ts": "2026-05-29T08:17:01.504693",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:17:31.555919",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626503
+    },
+    {
+      "ts": "2026-05-29T08:17:31.556913",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:18:01.604319",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626506
+    },
+    {
+      "ts": "2026-05-29T08:18:01.605316",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:18:31.655992",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626515
+    },
+    {
+      "ts": "2026-05-29T08:18:31.656990",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:19:01.710001",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626519
+    },
+    {
+      "ts": "2026-05-29T08:19:01.711010",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:19:31.761529",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626521
+    },
+    {
+      "ts": "2026-05-29T08:19:31.762524",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:20:01.814830",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626525
+    },
+    {
+      "ts": "2026-05-29T08:20:01.815831",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:20:31.103663",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:20:31.863415",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626557
+    },
+    {
+      "ts": "2026-05-29T08:20:31.864413",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:21:01.154658",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:21:01.909764",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626597
+    },
+    {
+      "ts": "2026-05-29T08:21:01.909764",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:21:31.201873",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:21:31.963671",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626606
+    },
+    {
+      "ts": "2026-05-29T08:21:31.964670",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:22:01.249130",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:22:02.014721",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626635
+    },
+    {
+      "ts": "2026-05-29T08:22:02.015715",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:22:31.297438",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:22:32.069091",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626643
+    },
+    {
+      "ts": "2026-05-29T08:22:32.071097",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:23:01.352187",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:23:02.120407",
+      "type": "ORDER_FILLED",
+      "direction": "LONG",
+      "price": 1.16272,
+      "sl": 1.16263,
+      "tp": 1.16364,
+      "ticket": 10626651
+    },
+    {
+      "ts": "2026-05-29T08:23:02.121402",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:23:31.403313",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:24:01.455051",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:24:31.505126",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:25:01.554615",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:25:31.604883",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:26:01.643739",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:26:31.702152",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:27:01.755921",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:27:31.800183",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:28:01.851363",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:28:31.888917",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:29:01.951309",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:29:32.002111",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:30:02.050982",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:30:32.112512",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:31:02.159320",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:31:32.206679",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:32:02.250217",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:32:32.304983",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:33:02.354687",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:33:32.392949",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:34:02.440971",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:34:32.490486",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:35:02.546730",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:35:32.595475",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:36:02.645737",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:36:32.679462",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:37:02.726208",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:37:32.775748",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:38:02.826951",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:38:32.875804",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:39:02.926049",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:39:32.960621",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:40:03.023923",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:40:33.077434",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:41:03.123887",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:41:33.167557",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:42:03.226859",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:42:33.278928",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:43:03.314900",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:43:33.377996",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:44:03.422244",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:44:33.470269",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T08:52:17.252327",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "ts": "2026-05-29T09:09:06.407557",
+      "type": "SIGNAL_EXECUTED",
+      "direction": "BUY",
+      "p90_dir": "BEAR",
+      "entry_price": 1.1627200000000002,
+      "sl": 1.1626280000000002,
+      "tp": 1.16364,
+      "body_pips": 4.6,
+      "ds_level": 1.1627200000000002
+    },
+    {
+      "engine": "P90",
+      "symbol": "EURUSD.PRO",
+      "direction": "SELL",
+      "entry": 1.16348,
+      "sl": 1.16409,
+      "tp": 1.16253,
+      "variant": "INITIAL",
+      "body_pips": 7.6,
+      "threshold": 6.2,
+      "ar_pips": 19.0,
+      "time": "2026-06-01 09:12:00"
+    },
+    {
+      "engine": "P90",
+      "symbol": "GBPAUD.PRO",
+      "direction": "BUY",
+      "entry": 1.87897,
+      "sl": 1.87796,
+      "tp": 1.88105,
+      "variant": "INITIAL",
+      "body_pips": 12.6,
+      "threshold": 6.2,
+      "ar_pips": 41.6,
+      "time": "2026-06-01 09:12:00"
+    },
+    {
+      "engine": "P90",
+      "symbol": "NZDUSD.PRO",
+      "direction": "SELL",
+      "entry": 0.59429,
+      "sl": 0.59487,
+      "tp": 0.59308,
+      "variant": "INITIAL",
+      "body_pips": 7.3,
+      "threshold": 6.2,
+      "ar_pips": 24.2,
+      "time": "2026-06-01 09:12:00"
+    },
+    {
+      "engine": "SymmetryTrap",
+      "symbol": "EURUSD.PRO",
+      "direction": "SELL",
+      "entry": 1.16291,
+      "sl": 1.16431,
+      "tp": 1.16191,
+      "au": 10.0,
+      "tier": "T1",
+      "ar_pips": 19.0,
+      "impulse_pips": 13.3,
+      "time": "2026-06-01 09:13:00"
+    },
+    {
+      "engine": "P90",
+      "symbol": "EURUSD.PRO",
+      "direction": "SELL",
+      "entry": 1.16291,
+      "sl": 1.16397,
+      "tp": 1.16196,
+      "variant": "INITIAL",
+      "body_pips": 13.3,
+      "threshold": 6.2,
+      "ar_pips": 19.0,
+      "time": "2026-06-01 09:13:00"
+    },
+    {
+      "engine": "SymmetryTrap",
+      "symbol": "GBPUSD.PRO",
+      "direction": "SELL",
+      "entry": 1.34394,
+      "sl": 1.34562,
+      "tp": 1.34274,
+      "au": 12.0,
+      "tier": "T1",
+      "ar_pips": 13.8,
+      "impulse_pips": 16.5,
+      "time": "2026-06-01 09:13:00"
+    },
+    {
+      "engine": "P90",
+      "symbol": "GBPUSD.PRO",
+      "direction": "SELL",
+      "entry": 1.34394,
+      "sl": 1.34526,
+      "tp": 1.34325,
+      "variant": "INITIAL",
+      "body_pips": 16.5,
+      "threshold": 6.2,
+      "ar_pips": 13.8,
+      "time": "2026-06-01 09:13:00"
+    },
+    {
+      "engine": "SymmetryTrap",
+      "symbol": "GBPAUD.PRO",
+      "direction": "BUY",
+      "entry": 1.8806,
+      "sl": 1.87744,
+      "tp": 1.8821,
+      "au": 15.0,
+      "tier": "T3",
+      "ar_pips": 41.6,
+      "impulse_pips": 28.9,
+      "time": "2026-06-01 09:13:00"
+    },
+    {
+      "engine": "P90",
+      "symbol": "GBPAUD.PRO",
+      "direction": "BUY",
+      "entry": 1.8806,
+      "sl": 1.87829,
+      "tp": 1.88268,
+      "variant": "INITIAL",
+      "body_pips": 28.9,
+      "threshold": 6.2,
+      "ar_pips": 41.6,
+      "time": "2026-06-01 09:13:00"
+    },
+    {
+      "engine": "SymmetryTrap",
+      "symbol": "NZDUSD.PRO",
+      "direction": "SELL",
+      "entry": 0.59338,
+      "sl": 0.59509,
+      "tp": 0.59218,
+      "au": 12.0,
+      "tier": "T2",
+      "ar_pips": 24.2,
+      "impulse_pips": 16.4,
+      "time": "2026-06-01 09:13:00"
+    },
+    {
+      "engine": "P90",
+      "symbol": "NZDUSD.PRO",
+      "direction": "SELL",
+      "entry": 0.59338,
+      "sl": 0.59469,
+      "tp": 0.59217,
+      "variant": "INITIAL",
+      "body_pips": 16.4,
+      "threshold": 6.2,
+      "ar_pips": 24.2,
+      "time": "2026-06-01 09:13:00"
+    },
+    {
+      "engine": "SymmetryTrap",
+      "symbol": "EURUSD.PRO",
+      "direction": "SELL",
+      "entry": 1.16297,
+      "sl": 1.16431,
+      "tp": 1.16197,
+      "au": 10.0,
+      "tier": "T1",
+      "ar_pips": 19.0,
+      "impulse_pips": 12.7,
+      "time": "2026-06-01 09:14:00"
+    },
+    {
+      "engine": "P90",
+      "symbol": "EURUSD.PRO",
+      "direction": "SELL",
+      "entry": 1.16297,
+      "sl": 1.16399,
+      "tp": 1.16202,
+      "variant": "INITIAL",
+      "body_pips": 12.7,
+      "threshold": 6.2,
+      "ar_pips": 19.0,
+      "time": "2026-06-01 09:14:00"
+    },
+    {
+      "engine": "SymmetryTrap",
+      "symbol": "GBPUSD.PRO",
+      "direction": "SELL",
+      "entry": 1.34387,
+      "sl": 1.34562,
+      "tp": 1.34267,
+      "au": 12.0,
+      "tier": "T1",
+      "ar_pips": 13.8,
+      "impulse_pips": 17.2,
+      "time": "2026-06-01 09:14:00"
+    },
+    {
+      "engine": "P90",
+      "symbol": "GBPUSD.PRO",
+      "direction": "SELL",
+      "entry": 1.34387,
+      "sl": 1.34525,
+      "tp": 1.34318,
+      "variant": "INITIAL",
+      "body_pips": 17.2,
+      "threshold": 6.2,
+      "ar_pips": 13.8,
+      "time": "2026-06-01 09:14:00"
+    },
+    {
+      "engine": "SymmetryTrap",
+      "symbol": "GBPAUD.PRO",
+      "direction": "BUY",
+      "entry": 1.87997,
+      "sl": 1.87744,
+      "tp": 1.88147,
+      "au": 15.0,
+      "tier": "T3",
+      "ar_pips": 41.6,
+      "impulse_pips": 22.6,
+      "time": "2026-06-01 09:14:00"
+    },
+    {
+      "engine": "P90",
+      "symbol": "GBPAUD.PRO",
+      "direction": "BUY",
+      "entry": 1.87997,
+      "sl": 1.87816,
+      "tp": 1.88205,
+      "variant": "INITIAL",
+      "body_pips": 22.6,
+      "threshold": 6.2,
+      "ar_pips": 41.6,
+      "time": "2026-06-01 09:14:00"
+    },
+    {
+      "engine": "P90",
+      "symbol": "NZDUSD.PRO",
+      "direction": "SELL",
+      "entry": 0.59359,
+      "sl": 0.59473,
+      "tp": 0.59238,
+      "variant": "INITIAL",
+      "body_pips": 14.3,
+      "threshold": 6.2,
+      "ar_pips": 24.2,
+      "time": "2026-06-01 09:14:00"
+    },
+    {
+      "engine": "SymmetryTrap",
+      "symbol": "GBPUSD.PRO",
+      "direction": "SELL",
+      "entry": 1.34414,
+      "sl": 1.34562,
+      "tp": 1.34314,
+      "au": 10.0,
+      "tier": "T1",
+      "ar_pips": 13.8,
+      "impulse_pips": 14.5,
+      "time": "2026-06-01 09:15:00"
+    },
+    {
+      "engine": "P90",
+      "symbol": "GBPUSD.PRO",
+      "direction": "SELL",
+      "entry": 1.34414,
+      "sl": 1.3453,
+      "tp": 1.34345,
+      "variant": "INITIAL",
+      "body_pips": 14.5,
+      "threshold": 6.2,
+      "ar_pips": 13.8,
+      "time": "2026-06-01 09:15:00"
+    },
+    {
+      "engine": "SymmetryTrap",
+      "symbol": "GBPAUD.PRO",
+      "direction": "BUY",
+      "entry": 1.87994,
+      "sl": 1.87744,
+      "tp": 1.88144,
+      "au": 15.0,
+      "tier": "T3",
+      "ar_pips": 41.6,
+      "impulse_pips": 22.3,
+      "time": "2026-06-01 09:15:00"
+    },
+    {
+      "engine": "P90",
+      "symbol": "GBPAUD.PRO",
+      "direction": "BUY",
+      "entry": 1.87994,
+      "sl": 1.87816,
+      "tp": 1.88202,
+      "variant": "INITIAL",
+      "body_pips": 22.3,
+      "threshold": 6.2,
+      "ar_pips": 41.6,
+      "time": "2026-06-01 09:15:00"
+    },
+    {
+      "engine": "P90",
+      "symbol": "GBPAUD.PRO",
+      "direction": "BUY",
+      "entry": 1.88055,
+      "sl": 1.87987,
+      "tp": 1.88263,
+      "variant": "INITIAL",
+      "body_pips": 8.5,
+      "threshold": 6.2,
+      "ar_pips": 41.6,
+      "time": "2026-06-01 09:22:00"
+    },
+    {
+      "engine": "P90",
+      "symbol": "GBPUSD.PRO",
+      "direction": "SELL",
+      "entry": 1.34348,
+      "sl": 1.34418,
+      "tp": 1.34279,
+      "variant": "INITIAL",
+      "body_pips": 8.7,
+      "threshold": 6.2,
+      "ar_pips": 13.8,
+      "time": "2026-06-01 09:23:00"
+    },
+    {
+      "engine": "P90",
+      "symbol": "NZDUSD.PRO",
+      "direction": "SELL",
+      "entry": 0.59319,
+      "sl": 0.59375,
+      "tp": 0.59198,
+      "variant": "INITIAL",
+      "body_pips": 7.0,
+      "threshold": 6.2,
+      "ar_pips": 24.2,
+      "time": "2026-06-01 09:23:00"
+    },
+    {
+      "engine": "P90",
+      "symbol": "GBPUSD.PRO",
+      "direction": "SELL",
+      "entry": 1.34353,
+      "sl": 1.34419,
+      "tp": 1.34284,
+      "variant": "INITIAL",
+      "body_pips": 8.2,
+      "threshold": 6.2,
+      "ar_pips": 13.8,
+      "time": "2026-06-01 09:24:00"
+    },
+    {
+      "engine": "P90",
+      "symbol": "GBPUSD.PRO",
+      "direction": "SELL",
+      "entry": 1.34341,
+      "sl": 1.34416,
+      "tp": 1.34272,
+      "variant": "INITIAL",
+      "body_pips": 9.4,
+      "threshold": 6.2,
+      "ar_pips": 13.8,
+      "time": "2026-06-01 09:25:00"
+    }
+  ],
+  "total_setups": 3,
+  "total_sent": 470,
+  "missed": 0
+}

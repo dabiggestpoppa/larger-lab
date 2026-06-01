@@ -99,7 +99,7 @@ These are non-negotiable:
 ## 9. VAULT STRUCTURE (TARGET)
 
 ```
-/O2C-VAULT/
+/memory/obsidian-vault/
 ├── agents/
 │   ├── quant/
 │   ├── research/

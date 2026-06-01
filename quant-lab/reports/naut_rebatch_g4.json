@@ -1,0 +1,26 @@
+{
+  "group": 4,
+  "assets": ["US500", "DE30", "FR40", "HK50", "NAS100"],
+  "results": {
+    "US500": {
+      "symmetry_trap": {"trades": 393, "wr": 90.3, "pnl": 2718.8},
+      "p90": {"trades": 144, "wr": 78.5, "pnl": 260.8}
+    },
+    "DE30": {
+      "symmetry_trap": {"trades": 2459, "wr": 76.5, "pnl": 28306.5},
+      "p90": {"trades": 610, "wr": 65.6, "pnl": 463.5}
+    },
+    "FR40": {
+      "symmetry_trap": {"trades": 1705, "wr": 83.3, "pnl": 12589.7},
+      "p90": {"trades": 1222, "wr": 64.5, "pnl": -800.3}
+    },
+    "HK50": {
+      "symmetry_trap": {"trades": 425, "wr": 92.9, "pnl": 17006.2},
+      "p90": {"trades": 0, "wr": 0.0, "pnl": 0.0}
+    },
+    "NAS100": {
+      "symmetry_trap": {"error": "No data file found (NAS100_M5.csv missing)"},
+      "p90": {"error": "No data file found (NAS100_M5.csv missing)"}
+    }
+  }
+}
