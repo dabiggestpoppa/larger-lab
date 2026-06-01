@@ -1,0 +1,15 @@
+{
+  "strategy": "symmetry_trap",
+  "symbol": "AUDUSD",
+  "bars": 273896,
+  "timestamp": "20260601_032633",
+  "engine_orders": 1894,
+  "engine_positions": 1,
+  "strategy_trades": 1249,
+  "strategy_wins": 1096,
+  "strategy_losses": 145,
+  "strategy_win_rate": 87.7502001601281,
+  "strategy_pnl_pips": 5328.600000000003,
+  "asset_cfg_pip": 0.0001,
+  "asset_cfg_k": 0.46
+}

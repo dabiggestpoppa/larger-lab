@@ -421,6 +421,11 @@ class SymmetryTrapBacktest:
 
             for bar in day_bars:
                 bar_est_h = self._get_est_hour(bar.timestamp)
+                
+                # Skip Asian hours (19:00-03:00 EST) - no impulse detection during Asian
+                if bar_est_h >= 19 or bar_est_h < 3:
+                    continue
+                
                 if bar_est_h >= 12 and engine.state == EngineState.SEARCH:
                     break
 

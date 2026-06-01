@@ -173,9 +173,9 @@ python tools/analyze_errors.py
 | Hermes Watchdog | `logs/hermes-watchdog.log` | OC2 gateway health, workspace monitoring |
 | OC2 Monitor | `logs/oc2-monitor.log` | OC2 process monitoring, heartbeat |
 | Phase 10 Monitor | `tools/phase10-monitor.log` | Phase 10 execution tracking |
-| Error DB | `memory-bank/error-db.json` | Structured error database |
-| Errors & Solutions | `memory-bank/errors-and-solutions.md` | Human-readable error knowledge base |
-| OC2 Gateway Failures | `memory-bank/OC2-GATEWAY-FAILURES.md` | Gateway-specific failure patterns |
+| Error DB | `memory/memory-bank/error-db.json` | Structured error database |
+| Errors & Solutions | `memory/memory-bank/errors-and-solutions.md` | Human-readable error knowledge base |
+| OC2 Gateway Failures | `memory/memory-bank/OC2-GATEWAY-FAILURES.md` | Gateway-specific failure patterns |
 
 ### Reading Logs
 
@@ -262,7 +262,7 @@ Resolve-DnsName github.com
 
 ## 6. Error Database
 
-The error database (`memory-bank/error-db.json`) is a structured log of all significant errors.
+The error database (`memory/memory-bank/error-db.json`) is a structured log of all significant errors.
 
 ### Schema
 
@@ -298,10 +298,10 @@ The error database (`memory-bank/error-db.json`) is a structured log of all sign
 
 ```powershell
 # Search by error ID
-python -c "import json; db=json.load(open('memory-bank/error-db.json')); [print(e) for e in db['entries'] if e['id']=='ERR-V3-0001']"
+python -c "import json; db=json.load(open('memory/memory-bank/error-db.json')); [print(e) for e in db['entries'] if e['id']=='ERR-V3-0001']"
 
 # Search by tag
-python -c "import json; db=json.load(open('memory-bank/error-db.json')); [print(e['id'], e['symptom']) for e in db['entries'] if 'windows' in e['tags']]"
+python -c "import json; db=json.load(open('memory/memory-bank/error-db.json')); [print(e['id'], e['symptom']) for e in db['entries'] if 'windows' in e['tags']]"
 ```
 
 ### When to Log an Error

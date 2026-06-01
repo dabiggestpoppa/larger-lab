@@ -51,16 +51,56 @@ EST = pytz.timezone('US/Eastern')
 
 
 def get_instrument_and_venue(symbol: str):
-    """Create Nautilus instrument and venue from broker symbol."""
-    symbol_map = {
-        'EURUSD.PRO': ('EUR/USD', 'OANDA'),
-        'USDCHF.PRO': ('USD/CHF', 'OANDA'),
-        'GBPUSD.PRO': ('GBP/USD', 'OANDA'),
-        'USDJPY.PRO': ('USD/JPY', 'OANDA'),
+    """Create Nautilus instrument and venue from broker symbol.
+    
+    FX pairs: TestInstrumentProvider.default_fx_ccy()
+    Indices/Crypto/Metals: TestInstrumentProvider.equity() or custom instrument
+    """
+    # FX majors and crosses
+    fx_map = {
+        'EURUSD.PRO': 'EUR/USD', 'EURUSD': 'EUR/USD',
+        'USDCHF.PRO': 'USD/CHF', 'USDCHF': 'USD/CHF',
+        'GBPUSD.PRO': 'GBP/USD', 'GBPUSD': 'GBP/USD',
+        'USDJPY.PRO': 'USD/JPY', 'USDJPY': 'USD/JPY',
+        'AUDUSD.PRO': 'AUD/USD', 'AUDUSD': 'AUD/USD',
+        'NZDUSD.PRO': 'NZD/USD', 'NZDUSD': 'NZD/USD',
+        'GBPJPY.PRO': 'GBP/JPY', 'GBPJPY': 'GBP/JPY',
+        'GBPCHF.PRO': 'GBP/CHF', 'GBPCHF': 'GBP/CHF',
+        'GBPAUD.PRO': 'GBP/AUD', 'GBPAUD': 'GBP/AUD',
+        'GBPNZD.PRO': 'GBP/NZD', 'GBPNZD': 'GBP/NZD',
+        'CHFJPY.PRO': 'CHF/JPY', 'CHFJPY': 'CHF/JPY',
     }
-    pair, venue_name = symbol_map.get(symbol, (symbol[:3] + '/' + symbol[3:6], 'OANDA'))
-    instrument = TestInstrumentProvider.default_fx_ccy(pair, venue=Venue(venue_name))
-    return instrument, venue_name
+    
+    # Indices - use equity instrument type
+    INDEX_SYMBOLS = {'US500', 'DE30', 'FR40', 'HK50', 'NAS100', 'USTEC100'}
+    # Crypto
+    CRYPTO_SYMBOLS = {'BTCUSD', 'ETHUSD', 'BTC/USD', 'ETH/USD'}
+    # Metals
+    METAL_SYMBOLS = {'XAUUSD', 'XAGUSD', 'XAU/USD', 'XAG/USD'}
+    
+    venue_str = 'OANDA'
+    nautilus_venue = Venue(venue_str)
+    
+    if symbol in fx_map:
+        pair = fx_map[symbol]
+        instrument = TestInstrumentProvider.default_fx_ccy(pair, venue=nautilus_venue)
+    elif symbol in INDEX_SYMBOLS or symbol in CRYPTO_SYMBOLS or symbol in METAL_SYMBOLS:
+        # Use equity instrument for non-FX assets
+        try:
+            instrument = TestInstrumentProvider.equity(
+                symbol=symbol,
+                venue=venue_str,
+            )
+        except Exception:
+            # Fallback: try default_fx_ccy with synthetic pair
+            pair = symbol[:3] + '/' + symbol[3:6] if len(symbol) == 6 else symbol
+            instrument = TestInstrumentProvider.default_fx_ccy(pair, venue=nautilus_venue)
+    else:
+        # Default: try as FX
+        pair = symbol[:3] + '/' + symbol[3:6] if len(symbol) == 6 else symbol
+        instrument = TestInstrumentProvider.default_fx_ccy(pair, venue=nautilus_venue)
+    
+    return instrument, venue_str
 
 
 def make_bar_type(symbol: str, instrument) -> BarType:

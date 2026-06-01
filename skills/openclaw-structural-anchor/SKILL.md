@@ -88,10 +88,10 @@ AGENTS.md + SOUL.md + MEMORY.md → Planning Loop → Topology Overlay
 
 ## Integration with O2C-VAULT (Phase 00)
 The vault is the persistent substrate for topology memory:
-- `O2C-VAULT/ontology/` — topology patterns, dependency graphs
-- `O2C-VAULT/failures/` — failure propagation patterns
-- `O2C-VAULT/memory/` — dependency lessons, rollback lessons
-- `O2C-VAULT/doctrine/` — governance rules, validation standards
+- `memory/obsidian-vault/ontology/` — topology patterns, dependency graphs
+- `memory/obsidian-vault/failures/` — failure propagation patterns
+- `memory/obsidian-vault/memory/` — dependency lessons, rollback lessons
+- `memory/obsidian-vault/doctrine/` — governance rules, validation standards
 
 ## Usage in Agent Harness
 

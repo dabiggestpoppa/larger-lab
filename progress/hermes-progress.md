@@ -7,7 +7,19 @@
 
 ---
 
-## Status: 🟢 ACTIVE — Registered and Ready
+## Status: 🟢 ACTIVE — Phase 3 Complete
+
+### Phase 3 — Documentation Reorganization (2026-06-01)
+- [x] Archived `plans/` -> `archive/plans-original/`, moved all contents -> `docs/plans/`
+- [x] Removed empty `plans/` directory (21 files + 2 subdirs relocated)
+- [x] Archived `system-arch/` -> `archive/system-arch-original/`, moved all contents -> `docs/system-arch/`
+- [x] Removed empty `system-arch/` directory (5 .md + 1 .jsonl relocated)
+- [x] Moved to `docs/meta/`: AGENTS.md, CLAUDE.md, PRINCIPLES.md, SOUL.md, IDENTITY.md, USER.md, SUB_AGENT_RULES.md, MASTER_PROMPT.md
+- [x] Moved to `docs/architecture/`: ARCHITECTURE.md, V3_ARCHITECTURE.md, CODEMAP.md, proposed-self-heal-fleet.md
+- [x] Moved to `docs/reference/`: TOOLS.md, CONTRIBUTING.md, HEARTBEAT.md, workspace-state.md
+- [x] Verified: Only README.md and MEMORY.md remain at root
+
+---
 
 ### Registration (2026-05-31)
 - [x] Registered in OCE Command Center as agent `hermes`

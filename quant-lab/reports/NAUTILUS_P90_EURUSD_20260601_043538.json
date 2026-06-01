@@ -1,0 +1,17 @@
+{
+  "strategy": "p90",
+  "symbol": "EURUSD",
+  "bars": 273909,
+  "timestamp": "20260601_043538",
+  "engine_orders": 1092,
+  "engine_positions": 0,
+  "engine_pnl_usd": 0.0,
+  "engine_win_rate": 0.0,
+  "strategy_trades": 1048,
+  "strategy_wins": 633,
+  "strategy_losses": 415,
+  "strategy_win_rate": 60.40076335877863,
+  "strategy_pnl_pips": 792.7539999999296,
+  "max_drawdown": 0.0,
+  "elapsed_s": 138930600.0
+}

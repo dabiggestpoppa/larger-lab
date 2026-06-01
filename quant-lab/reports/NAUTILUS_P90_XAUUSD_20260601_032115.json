@@ -1,0 +1,15 @@
+{
+  "strategy": "p90",
+  "symbol": "XAUUSD",
+  "bars": 306934,
+  "timestamp": "20260601_032115",
+  "engine_orders": 78977,
+  "engine_positions": 1,
+  "strategy_trades": 202,
+  "strategy_wins": 110,
+  "strategy_losses": 92,
+  "strategy_win_rate": 54.45544554455446,
+  "strategy_pnl_pips": 309.20299999998633,
+  "asset_cfg_pip": 0.1,
+  "asset_cfg_k": 0.5
+}

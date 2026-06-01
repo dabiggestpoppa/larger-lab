@@ -3,6 +3,10 @@
                    "defaults":  {
                                     "workspace":  "C:\\Users\\wifik\\Desktop\\projects\\larger-lab",
                                     "model":  "openrouter/owl-alpha",
+                                    "subagent":  {
+                                                     "maxConcurrent":  2,
+                                                     "model":  "deepseek/deepseek-v4-flash:free"
+                                                 },
                                     "models":  {
                                                    "poolside/laguna-m.1:free":  {
                                                                                     "alias":  "laguna"

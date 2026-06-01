@@ -1,0 +1,17 @@
+{
+  "strategy": "p90",
+  "symbol": "NZDUSD",
+  "bars": 276961,
+  "timestamp": "20260601_043559",
+  "engine_orders": 263,
+  "engine_positions": 0,
+  "engine_pnl_usd": 0.0,
+  "engine_win_rate": 0.0,
+  "strategy_trades": 236,
+  "strategy_wins": 142,
+  "strategy_losses": 94,
+  "strategy_win_rate": 60.16949152542372,
+  "strategy_pnl_pips": 142.67599999999703,
+  "max_drawdown": 0.0,
+  "elapsed_s": 138930600.0
+}

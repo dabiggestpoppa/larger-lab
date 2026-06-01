@@ -1,0 +1,15 @@
+{
+  "strategy": "p90",
+  "symbol": "GBPNZD",
+  "bars": 277117,
+  "timestamp": "20260601_032643",
+  "engine_orders": 77912,
+  "engine_positions": 1,
+  "strategy_trades": 255,
+  "strategy_wins": 124,
+  "strategy_losses": 131,
+  "strategy_win_rate": 48.627450980392155,
+  "strategy_pnl_pips": 133.85899999997395,
+  "asset_cfg_pip": 0.0001,
+  "asset_cfg_k": 0.48
+}

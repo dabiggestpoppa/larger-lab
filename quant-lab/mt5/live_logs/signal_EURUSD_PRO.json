@@ -1,0 +1,13 @@
+{
+  "engine": "P90",
+  "symbol": "EURUSD.PRO",
+  "direction": "SELL",
+  "entry": 1.16218,
+  "sl": 1.16269,
+  "tp": 1.16123,
+  "variant": "INITIAL",
+  "body_pips": 6.4,
+  "threshold": 6.2,
+  "ar_pips": 19.0,
+  "time": "2026-06-01 09:44:00"
+}

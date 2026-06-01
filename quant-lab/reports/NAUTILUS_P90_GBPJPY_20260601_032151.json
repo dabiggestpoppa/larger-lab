@@ -1,0 +1,15 @@
+{
+  "strategy": "p90",
+  "symbol": "GBPJPY",
+  "bars": 276931,
+  "timestamp": "20260601_032151",
+  "engine_orders": 0,
+  "engine_positions": 0,
+  "strategy_trades": 0,
+  "strategy_wins": 0,
+  "strategy_losses": 0,
+  "strategy_win_rate": 0.0,
+  "strategy_pnl_pips": 0.0,
+  "asset_cfg_pip": 0.01,
+  "asset_cfg_k": 0.48
+}

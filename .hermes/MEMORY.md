@@ -4,20 +4,35 @@
 > Auto-extracted and updated by Hermes as work happens.
 > **Also auto-synced from `progress/hermes-progress.md` every 3 updates.**
 
-## � Workspace Heartbeat (2026-05-16) — CRITICAL
-- **File:** `tools/workspace-heartbeat.py` — runs in background, checks OC2 every 60s
-- **Auto-restart:** If OC2 down → heartbeat restarts it automatically
-- **Telegram alert:** If no messages in 10 min → sends alert to FBO_MAD
-- **Log:** `logs/workspace-heartbeat.log`
-- **Status:** `.workspace-heartbeat.status.json`
-- **PID file:** `.workspace-heartbeat.pid` — prevents duplicate instances
-- **DO NOT KILL** this process — it's the safety net for OC2 while MAD is away
+## 🔄 Gateway Watchdog (2026-05-31) — CRITICAL
+- **File:** `tools/gateway_watchdog.py` — checks OC2 + Hermes every 30s, auto-restarts if down
+- **Monitors:** OC2 (port 18790) + Hermes (port 8642)
+- **Circuit breaker:** Max 5 restarts/hour per service
+- **Log:** `C:\Users\wifik\AppData\Local\Temp\openclaw\watchdog.log`
+- **PID file:** `tools/.watchdog-state.json`
+- **Startup:** Registered in Windows Startup folder (`Gateway_Watchdog.cmd`)
+- **DO NOT KILL** this process — it's the safety net for both gateways
 - **Commands:**
-  - `python tools/workspace-heartbeat.py --daemon` — start in background
-  - `python tools/workspace-heartbeat.py --stop` — stop background process
-  - `python tools/workspace-heartbeat.py --status` — check if running
-- **If heartbeat fails:** Restart with `python tools/workspace-heartbeat.py --daemon`
-- **Fix (2026-05-17):** Added `CREATE_NO_WINDOW` flag to all `subprocess.run()` calls AND `run_daemon()` subprocess.Popen to prevent PowerShell window flashing
+  - `python tools/gateway_watchdog.py` — start foreground loop
+  - `python tools/gateway_watchdog.py --check` — single check + exit
+  - `python tools/gateway_watchdog.py --install` — register as Scheduled Task (needs admin)
+- **If watchdog fails:** Restart with `python tools/gateway_watchdog.py`
+
+## 🌐 Service Ports (All Must Stay Up 24/7)
+| Service | Port | Command |
+|---------|------|---------|
+| OC2 Gateway | 18790 | `node openclaw.mjs gateway run --port 18790` |
+| Hermes Gateway | 8642 | `hermes.exe gateway run` |
+| OCE Backend | 8000 | `uvicorn oce.backend.main:app --port 8000` |
+| SRRA-OPH API | 8001 | `uvicorn srrs_opc.frontend.api_server:app --port 8001` |
+| OCE Frontend | 3000 | `npm run dev` (oce/frontend) |
+| Sniper Dashboard | 3001 | `npm run dev` (sniper-dashboard) |
+
+## ⚠️ Lessons Learned (2026-05-31)
+- Hermes was forgotten by all agents for days — always check `hermes gateway status`
+- `Start-Process -FilePath "openclaw"` opens .ps1 in VS Code notes — use `node` + `openclaw.mjs` directly
+- 29+ stale PowerShell terminals accumulated — run `python tools/terminal_cleanup.py --force` at session start
+- Startup scripts were broken (wrong paths) — fixed and verified
 
 ## �🟢 Hermes v2 Upgrade (2026-05-16)
 - **New agent prompt:** `agent-lab/agents/hermes/hermes_workspace/agent_prompt_v2.md`

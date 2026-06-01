@@ -1,0 +1,17 @@
+{
+  "strategy": "p90",
+  "symbol": "XAGUSD",
+  "bars": 304981,
+  "timestamp": "20260601_054236",
+  "engine_orders": 1580,
+  "engine_positions": 0,
+  "engine_pnl_usd": 0.0,
+  "engine_win_rate": 0.0,
+  "strategy_trades": 1575,
+  "strategy_wins": 559,
+  "strategy_losses": 1016,
+  "strategy_win_rate": 35.492063492063494,
+  "strategy_pnl_pips": 365.5399999999936,
+  "max_drawdown": 0.0,
+  "elapsed_s": 138930600.0
+}

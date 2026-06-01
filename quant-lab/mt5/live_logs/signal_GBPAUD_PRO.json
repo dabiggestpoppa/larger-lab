@@ -1,0 +1,13 @@
+{
+  "engine": "P90",
+  "symbol": "GBPAUD.PRO",
+  "direction": "BUY",
+  "entry": 1.87952,
+  "sl": 1.87874,
+  "tp": 1.8816,
+  "variant": "INITIAL",
+  "body_pips": 9.7,
+  "threshold": 6.2,
+  "ar_pips": 41.6,
+  "time": "2026-06-01 10:05:00"
+}

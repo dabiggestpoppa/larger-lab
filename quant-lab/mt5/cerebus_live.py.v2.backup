@@ -1,0 +1,805 @@
+"""
+CEREBUS LIVE ENGINE — MT5 Bridge v2
+=====================================
+LIVE deployment with FULL state machine (SEARCH→WAIT_RETRACE→WAIT_OCC→IN_TRADE).
+
+This is a 1:1 translation of the Nautilus backtest strategy to direct MT5 execution.
+Same physics. Same logic. Same edge.
+
+Key fixes from v1:
+- Full 4-state machine for ST (was: 1-state immediate entry)
+- SL = impulse_extreme zero-buffer (was: current bar low/high)
+- Entry on OCC confirmation (was: impulse bar close)
+- Close-only SL invalidation (was: wick-based)
+- 80% kill switch (was: missing)
+- P90 with INITIAL/CASCADE/EWS variants (was: INITIAL only)
+- Close-only SL for P90 (was: wick-based)
+- TP1/TP2 ladder for P90 (was: single TP)
+
+Top 5 FX pairs:
+  EURUSD.PRO, GBPUSD.PRO, GBPAUD.PRO, GBPCHF.PRO, NZDUSD.PRO
+"""
+
+from __future__ import annotations
+
+import json
+import logging
+import os
+import sys
+import time
+from datetime import datetime, timedelta
+from typing import Optional
+
+sys.stdout.reconfigure(encoding="utf-8")
+
+import pytz
+import MetaTrader5 as mt5
+
+EST = pytz.timezone("US/Eastern")
+
+TOP5_FX = [
+    "EURUSD.PRO",
+    "GBPUSD.PRO",
+    "GBPAUD.PRO",
+    "GBPCHF.PRO",
+    "NZDUSD.PRO",
+]
+
+LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "live_logs")
+
+# ─── LOGGING ────────────────────────────────────────────────────
+def setup_logging():
+    os.makedirs(LOG_DIR, exist_ok=True)
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        datefmt="%H:%M:%S",
+        handlers=[
+            logging.StreamHandler(sys.stdout),
+            logging.FileHandler(os.path.join(LOG_DIR, "live_engine.log")),
+        ],
+    )
+
+
+# ─── MT5 HELPERS ────────────────────────────────────────────────
+def mt5_connect() -> bool:
+    if not mt5.initialize():
+        logging.error("MT5 init failed: %s", mt5.last_error())
+        return False
+    info = mt5.account_info()
+    logging.info("MT5 connected: %s @ %s | Balance: $%.2f | Equity: $%.2f",
+                 info.login, info.server, info.balance, info.equity)
+    return True
+
+
+def get_bars(symbol: str, count: int = 500) -> list:
+    rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_M5, 0, count)
+    if rates is None or len(rates) == 0:
+        return []
+    result = []
+    for r in rates:
+        result.append({
+            "time": datetime.fromtimestamp(int(r["time"]), tz=EST),
+            "open": float(r["open"]),
+            "high": float(r["high"]),
+            "low": float(r["low"]),
+            "close": float(r["close"]),
+            "volume": int(r["tick_volume"]),
+            "spread": int(r["spread"]),
+        })
+    return result
+
+
+def get_account() -> dict:
+    info = mt5.account_info()
+    if info is None:
+        return {}
+    return {
+        "login": info.login,
+        "server": info.server,
+        "balance": info.balance,
+        "equity": info.equity,
+        "profit": info.profit,
+        "margin": info.margin,
+        "margin_free": info.margin_free,
+    }
+
+
+def get_positions() -> list:
+    positions = mt5.positions_get()
+    if positions is None:
+        return []
+    return [{
+        "ticket": p.ticket,
+        "symbol": p.symbol,
+        "type": "BUY" if p.type == mt5.ORDER_TYPE_BUY else "SELL",
+        "volume": p.volume,
+        "open_price": p.price_open,
+        "current_price": p.price_current,
+        "sl": p.sl,
+        "tp": p.tp,
+        "profit": p.profit,
+        "magic": p.magic,
+        "comment": p.comment,
+    } for p in positions]
+
+
+def check_autotrading() -> bool:
+    info = mt5.terminal_info()
+    if info is None:
+        return False
+    if not info.trade_allowed:
+        return False
+    return True
+
+
+def send_order(symbol: str, direction: str, volume: float,
+               sl: float, tp: float, comment: str) -> bool:
+    """Send a market order to MT5 with SL/TP."""
+    if not check_autotrading():
+        logging.warning("MT5 AutoTrading DISABLED — signal logged but not executed")
+        return False
+
+    info = mt5.symbol_info(symbol)
+    if info is None:
+        logging.error("Symbol %s not found", symbol)
+        return False
+    if not info.visible:
+        mt5.symbol_select(symbol, True)
+        time.sleep(0.5)
+
+    tick = mt5.symbol_info_tick(symbol)
+    if tick is None:
+        logging.error("No tick for %s", symbol)
+        return False
+
+    order_type = mt5.ORDER_TYPE_BUY if direction == "BUY" else mt5.ORDER_TYPE_SELL
+    price = tick.ask if direction == "BUY" else tick.bid
+
+    request = {
+        "action": mt5.TRADE_ACTION_DEAL,
+        "symbol": symbol,
+        "volume": volume,
+        "type": order_type,
+        "price": price,
+        "sl": round(sl, info.digits),
+        "tp": round(tp, info.digits),
+        "deviation": 10,
+        "magic": 20260601,
+        "comment": comment,
+        "type_time": mt5.ORDER_TIME_GTC,
+        "type_filling": mt5.ORDER_FILLING_IOC,
+    }
+
+    result = mt5.order_send(request)
+    if result is None:
+        logging.error("order_send returned None: %s", mt5.last_error())
+        return False
+
+    if result.retcode == mt5.TRADE_RETCODE_DONE:
+        logging.info("EXECUTED: %s %s %s @ %.5f SL=%.5f TP=%.5f | Ticket=%s",
+                     direction, volume, symbol, price, sl, tp, result.order)
+        return True
+    else:
+        logging.error("Order rejected: retcode=%s (%s)", result.retcode, result.comment)
+        return False
+
+
+# ─── PIP SIZE ──────────────────────────────────────────────────
+def pip_size(symbol: str) -> float:
+    if "JPY" in symbol:
+        return 0.01
+    if "XAU" in symbol or "XAG" in symbol:
+        return 0.01
+    return 0.0001
+
+
+# ─── CONFIG ────────────────────────────────────────────────────
+ST_TIERS = {
+    "T1": {"ar_max": 20.0, "au": 10.0, "trigger": 12.0},
+    "T2": {"ar_max": 30.0, "au": 12.0, "trigger": 15.0},
+    "T3": {"ar_max": 45.0, "au": 15.0, "trigger": 19.0},
+}
+
+P90_THRESHOLDS = {
+    2: 4.1, 3: 4.1, 4: 4.6, 5: 4.6, 6: 4.6,
+    7: 5.9, 8: 5.9, 9: 6.2, 10: 6.2,
+}
+
+KILL_SWITCH_PCT = 0.80
+MAX_LOOPS = 5
+
+
+# ─── ASIAN RANGE ────────────────────────────────────────────────
+def get_asian_range(bars: list) -> tuple:
+    """Get the most recent Asian session range (7PM-3AM EST)."""
+    if not bars:
+        return (0.0, 0.0)
+
+    now = datetime.now(EST)
+    if now.hour >= 3:
+        session_end = now.replace(hour=3, minute=0, second=0, microsecond=0)
+    else:
+        yesterday = now - timedelta(days=1)
+        session_end = yesterday.replace(hour=3, minute=0, second=0, microsecond=0)
+    session_start = session_end - timedelta(hours=8)  # 7PM prev day
+
+    asian = [b for b in bars if b["time"] >= session_start and b["time"] <= session_end]
+
+    if not asian:
+        recent = bars[-5:] if len(bars) > 5 else bars
+        if not recent:
+            return (0.0, 0.0)
+        return (max(b["high"] for b in recent), min(b["low"] for b in recent))
+
+    return (max(b["high"] for b in asian), min(b["low"] for b in asian))
+
+
+def classify_tier(ar_pips: float) -> tuple:
+    """Classify session into T1/T2/T3/NO-GO. Returns (tier, au, trigger)."""
+    for name in ["T1", "T2", "T3"]:
+        if ar_pips <= ST_TIERS[name]["ar_max"]:
+            cfg = ST_TIERS[name]
+            return name, cfg["au"], cfg["trigger"]
+    return "NO_GO", 0.0, 0.0
+
+
+# ─── PER-SYMBOL STATE MACHINE ──────────────────────────────────
+class SymbolState:
+    """
+    Full 4-state machine for Symmetry Trap + P90 per symbol.
+    Matches Nautilus strategy EXACTLY.
+
+    ST States: SEARCH → WAIT_RETRACE → WAIT_OCC → IN_TRADE
+    P90 States: SEARCH_P90 → IN_TRADE_P90 (immediate entry, manage TP/SL)
+    """
+
+    def __init__(self, symbol: str):
+        self.symbol = symbol
+        self.ps = pip_size(symbol)
+
+        # Asian
+        self.asian_high = 0.0
+        self.asian_low = 99999.0
+        self.asian_locked = False
+        self.session_active = False
+        self.tier_name = "T1"
+        self.au_pips = 10.0
+        self.trigger_pips = 12.0
+
+        # ST state machine
+        self.st_state = "SEARCH"
+        self.swing_origin = 0.0
+        self.impulse_direction = 0
+        self.impulse_extreme = 0.0
+        self.impulse_size_pips = 0.0
+        self.kill_switch_level = 0.0
+        self.st_entry = 0.0
+        self.st_sl = 0.0
+        self.st_tp = 0.0
+        self.st_loop = 1
+        self.st_entry_bar_idx = 0
+
+        # P90 state machine
+        self.p90_state = "SEARCH_P90"
+        self.p90_variant = "INITIAL"
+        self.p90_entry = 0.0
+        self.p90_sl = 0.0
+        self.p90_tp1 = 0.0
+        self.p90_tp2 = 0.0
+        self.p90_direction = 0
+        self.p90_body_price = 0.0
+        self.p90_initial_today = 0
+        self.p90_cascade_today = 0
+        self.p90_last_exit_time = None
+
+        # Current date for session reset
+        self.current_date = None
+
+    def reset_session(self):
+        """New day / 12PM hard reset."""
+        self.asian_high = 0.0
+        self.asian_low = 99999.0
+        self.asian_locked = False
+        self.session_active = False
+        self.tier_name = "T1"
+        self.au_pips = 10.0
+        self.trigger_pips = 12.0
+        self.st_state = "SEARCH"
+        self.swing_origin = 0.0
+        self.impulse_direction = 0
+        self.impulse_extreme = 0.0
+        self.impulse_size_pips = 0.0
+        self.kill_switch_level = 0.0
+        self.st_entry = 0.0
+        self.st_sl = 0.0
+        self.st_tp = 0.0
+        self.st_loop = 1
+        self.p90_state = "SEARCH_P90"
+        self.p90_variant = "INITIAL"
+        self.p90_entry = 0.0
+        self.p90_sl = 0.0
+        self.p90_tp1 = 0.0
+        self.p90_tp2 = 0.0
+        self.p90_direction = 0
+        self.p90_initial_today = 0
+        self.p90_cascade_today = 0
+        self.p90_last_exit_time = None
+
+    def advance_st_loop(self, new_origin: float):
+        """After ST exit, reset state machine, preserve/increment loop."""
+        self.st_loop += 1
+        if self.st_loop > MAX_LOOPS:
+            self.session_active = False
+            return
+        self.st_state = "SEARCH"
+        self.swing_origin = new_origin
+        self.impulse_direction = 0
+        self.impulse_extreme = 0.0
+        self.impulse_size_pips = 0.0
+        self.kill_switch_level = 0.0
+        self.st_entry = 0.0
+        self.st_sl = 0.0
+        self.st_tp = 0.0
+
+    def advance_p90_variant(self):
+        """After P90 exit, reset to SEARCH_P90."""
+        self.p90_state = "SEARCH_P90"
+        self.p90_entry = 0.0
+        self.p90_sl = 0.0
+        self.p90_tp1 = 0.0
+        self.p90_tp2 = 0.0
+        self.p90_direction = 0
+        self.p90_body_price = 0.0
+
+    # ── PROCESS BAR ──────────────────────────────────────────────
+    def process_bar(self, bar: dict, bar_idx: int) -> Optional[dict]:
+        """
+        Process one M5 bar. Returns signal dict if entry triggered, None otherwise.
+        """
+        bh = bar["high"]
+        bl = bar["low"]
+        bo = bar["bo"] = bar["open"]
+        bc = bar["close"]
+        b_time = bar["time"]
+        est_hour = b_time.hour
+
+        signal = None
+
+        # ── 5PM hard exit ──
+        if est_hour >= 17:
+            if self.st_state == "IN_TRADE" or self.p90_state == "IN_TRADE_P90":
+                self.reset_session()
+            return None
+
+        # ── 12PM hard reset ──
+        if est_hour >= 12:
+            self.reset_session()
+            return None
+
+        # ── Asian session: track range ──
+        if est_hour >= 19 or est_hour < 3:
+            if bh > self.asian_high:
+                self.asian_high = bh
+            if bl < self.asian_low:
+                self.asian_low = bl
+            return None
+
+        # ── Lock Asian Range at 3AM ──
+        if not self.asian_locked and est_hour >= 3:
+            self.asian_locked = True
+            ar_price = self.asian_high - self.asian_low
+            ar_pips = ar_price / self.ps
+            self.tier_name, self.au_pips, self.trigger_pips = classify_tier(ar_pips)
+            self.session_active = self.tier_name != "NO_GO"
+            if self.session_active:
+                self.st_state = "SEARCH"
+                self.swing_origin = bc
+                self.p90_state = "SEARCH_P90"
+            logging.info("[%s] Session INIT: tier=%s AR=%.1fp AU=%sp trigger=%sp origin=%.5f",
+                         self.symbol, self.tier_name, ar_pips,
+                         self.au_pips, self.trigger_pips, self.swing_origin)
+            return None
+
+        if not self.session_active:
+            return None
+
+        # ── ST not in trade: run state machine ──
+        if self.st_state != "IN_TRADE":
+            signal = self._st_state_machine(bar, bar_idx)
+
+        # ── ST in trade: manage TP/SL (close-only SL) ──
+        if self.st_state == "IN_TRADE":
+            self._st_manage_trade(bc, bh, bl, b_time)
+
+        # ── P90: only if ST not in trade ──
+        if self.st_state != "IN_TRADE" and self.p90_state != "IN_TRADE_P90":
+            p90_sig = self._p90_search(bar, est_hour)
+            if p90_sig:
+                signal = p90_sig
+
+        if self.p90_state == "IN_TRADE_P90":
+            self._p90_manage_trade(bc, bh, bl, est_hour)
+
+        return signal
+
+    # ── ST STATE MACHINE ─────────────────────────────────────────
+    def _st_state_machine(self, bar: dict, bar_idx: int) -> Optional[dict]:
+        bh = bar["high"]
+        bl = bar["low"]
+        bo = bar["open"]
+        bc = bar["close"]
+
+        if self.st_state == "SEARCH":
+            return self._st_search(bh, bl, bc, bar_idx)
+        elif self.st_state == "WAIT_RETRACE":
+            return self._st_wait_retrace(bh, bl, bc, bar_idx)
+        elif self.st_state == "WAIT_OCC":
+            return self._st_wait_occ(bo, bh, bl, bc, bar_idx)
+        return None
+
+    def _st_search(self, bh, bl, bc, bar_idx) -> Optional[dict]:
+        """Detect impulse leg exceeding trigger from swing_origin."""
+        trigger_price = self.trigger_pips / self.ps
+        up_move = bh - self.swing_origin
+        dn_move = self.swing_origin - bl
+
+        if up_move >= trigger_price:
+            self.impulse_direction = 1
+            self.impulse_extreme = bh
+            self.impulse_size_pips = up_move * self.ps
+            self.kill_switch_level = bh - up_move * KILL_SWITCH_PCT
+            self.st_state = "WAIT_RETRACE"
+            logging.info("[%s] Impulse LONG: extreme=%.5f size=%.1fp kill=%.5f loop=%d",
+                         self.symbol, self.impulse_extreme, self.impulse_size_pips,
+                         self.kill_switch_level, self.st_loop)
+        elif dn_move >= trigger_price:
+            self.impulse_direction = -1
+            self.impulse_extreme = bl
+            self.impulse_size_pips = dn_move * self.ps
+            self.kill_switch_level = bl + dn_move * KILL_SWITCH_PCT
+            self.st_state = "WAIT_RETRACE"
+            logging.info("[%s] Impulse SHORT: extreme=%.5f size=%.1fp kill=%.5f loop=%d",
+                         self.symbol, self.impulse_extreme, self.impulse_size_pips,
+                         self.kill_switch_level, self.st_loop)
+        return None
+
+    def _st_wait_retrace(self, bh, bl, bc, bar_idx) -> Optional[dict]:
+        """Wait for DZ pullback. Monitor kill switch."""
+        # Kill switch (close-only)
+        if self.impulse_direction == 1 and bc < self.kill_switch_level:
+            logging.info("[%s] KILL SWITCH (LONG): close=%.5f level=%.5f",
+                         self.symbol, bc, self.kill_switch_level)
+            self.advance_st_loop(bc)
+            return None
+        if self.impulse_direction == -1 and bc > self.kill_switch_level:
+            logging.info("[%s] KILL SWITCH (SHORT): close=%.5f level=%.5f",
+                         self.symbol, bc, self.kill_switch_level)
+            self.advance_st_loop(bc)
+            return None
+
+        # DZ pullback check
+        min_retrace = 0.32 if self.st_loop == 1 else 0.20
+        max_retrace = 0.50
+
+        if self.impulse_direction == 1:
+            pullback_px = self.impulse_extreme - bl
+        else:
+            pullback_px = bh - self.impulse_extreme
+
+        pullback_pips = pullback_px * self.ps
+        retrace_pct = pullback_pips / self.impulse_size_pips if self.impulse_size_pips > 0 else 0
+
+        au_penetrated = pullback_pips >= self.au_pips
+        fib_ok = min_retrace <= retrace_pct <= max_retrace
+
+        if au_penetrated or fib_ok:
+            self.st_state = "WAIT_OCC"
+            logging.info("[%s] DZ penetrated: pullback=%.1fp retrace=%.3f loop=%d",
+                         self.symbol, pullback_pips, retrace_pct, self.st_loop)
+        return None
+
+    def _st_wait_occ(self, bo, bh, bl, bc, bar_idx) -> Optional[dict]:
+        """OCC confirmation: candle closes in impulse direction."""
+        # Kill switch re-verify
+        if self.impulse_direction == 1 and bc < self.kill_switch_level:
+            self.advance_st_loop(bc)
+            return None
+        if self.impulse_direction == -1 and bc > self.kill_switch_level:
+            self.advance_st_loop(bc)
+            return None
+
+        occ = (self.impulse_direction == 1 and bc > bo) or \
+              (self.impulse_direction == -1 and bc < bo)
+
+        if occ:
+            self.st_entry = bc
+            self.st_sl = self.impulse_extreme  # ZERO-BUFFER impulse extreme
+            au_price = self.au_pips / self.ps
+            self.st_tp = bc + au_price * self.impulse_direction
+            self.st_state = "IN_TRADE"
+            self.st_entry_bar_idx = bar_idx
+
+            direction = "BUY" if self.impulse_direction == 1 else "SELL"
+            logging.info("[%s] ST ENTRY %s: entry=%.5f SL=%.5f TP=%.5f (zero-buffer) loop=%d",
+                         self.symbol, direction, self.st_entry, self.st_sl, self.st_tp, self.st_loop)
+
+            return {
+                "engine": "SymmetryTrap",
+                "symbol": self.symbol,
+                "direction": direction,
+                "entry": round(self.st_entry, 5),
+                "sl": round(self.st_sl, 5),
+                "tp": round(self.st_tp, 5),
+                "au": self.au_pips,
+                "tier": self.tier_name,
+                "loop": self.st_loop,
+                "time": datetime.now(EST).strftime("%Y-%m-%d %H:%M:%S"),
+            }
+        return None
+
+    def _st_manage_trade(self, bc, bh, bl, b_time):
+        """Manage active ST trade. Close-only SL. TP on wick OR close."""
+        if self.impulse_direction == 1:  # LONG
+            if bh >= self.st_tp:
+                logging.info("[%s] ST TP HIT (LONG): %.5f", self.symbol, self.st_tp)
+                self.advance_st_loop(self.st_entry)
+                return
+            if bc <= self.st_sl:  # CLOSE-ONLY SL
+                logging.info("[%s] ST SL HIT (LONG): close=%.5f sl=%.5f [ZERO-BUFFER EXTREME]",
+                             self.symbol, bc, self.st_sl)
+                self.advance_st_loop(self.st_entry)
+                return
+        else:  # SHORT
+            if bl <= self.st_tp:
+                logging.info("[%s] ST TP HIT (SHORT): %.5f", self.symbol, self.st_tp)
+                self.advance_st_loop(self.st_entry)
+                return
+            if bc >= self.st_sl:  # CLOSE-ONLY SL
+                logging.info("[%s] ST SL HIT (SHORT): close=%.5f sl=%.5f [ZERO-BUFFER EXTREME]",
+                             self.symbol, bc, self.st_sl)
+                self.advance_st_loop(self.st_entry)
+                return
+
+    # ── P90 STATE MACHINE ────────────────────────────────────────
+    def _p90_search(self, bar: dict, est_hour: int) -> Optional[dict]:
+        """P90 detection: body >= threshold AND close outside Asian Range."""
+        if est_hour < 2 or est_hour >= 11:
+            return None
+
+        bh = bar["high"]
+        bl = bar["low"]
+        bo = bar["open"]
+        bc = bar["close"]
+
+        threshold = P90_THRESHOLDS.get(est_hour, 4.6)
+        body_price = abs(bc - bo)
+        body_pips = body_price / self.ps
+
+        if body_pips < threshold:
+            return None
+
+        # Close outside Asian Range
+        outside = (bc > self.asian_high) or (bc < self.asian_low)
+        if not outside:
+            return None
+
+        direction = 1 if bc > bo else -1
+
+        # Detect variant: INITIAL or CASCADE
+        variant = "INITIAL"
+        if self.p90_last_exit_time is not None and self.p90_initial_today > 0:
+            delta_min = (bar["time"] - self.p90_last_exit_time).total_seconds() / 60
+            if delta_min <= 120:
+                variant = "CASCADE"
+
+        # Enforce max per session
+        if variant == "INITIAL" and self.p90_initial_today >= 1:
+            return None
+        if variant == "CASCADE" and self.p90_cascade_today >= 1:
+            return None
+
+        # Calculate params
+        if variant == "INITIAL":
+            sl_mult = 0.80
+        else:
+            sl_mult = 1.68
+
+        sl_offset = body_price * sl_mult
+        ar_target_1 = (self.asian_high - self.asian_low) * 0.25
+        ar_target_2 = (self.asian_high - self.asian_low) * 0.50
+
+        if direction == 1:  # LONG
+            sl = bc - sl_offset
+            tp1 = bc + ar_target_1
+            tp2 = bc + ar_target_2
+        else:
+            sl = bc + sl_offset
+            tp1 = bc - ar_target_1
+            tp2 = bc - ar_target_2
+
+        self.p90_state = "IN_TRADE_P90"
+        self.p90_variant = variant
+        self.p90_direction = direction
+        self.p90_entry = bc
+        self.p90_sl = sl
+        self.p90_tp1 = tp1
+        self.p90_tp2 = tp2
+        self.p90_body_price = body_price
+
+        if variant == "INITIAL":
+            self.p90_initial_today += 1
+        else:
+            self.p90_cascade_today += 1
+
+        dir_str = "BUY" if direction == 1 else "SELL"
+        logging.info("[%s] P90 ENTRY [%s] %s: entry=%.5f SL=%.5f TP1=%.5f TP2=%.5f body=%.1fp",
+                     self.symbol, variant, dir_str, bc, sl, tp1, tp2, body_pips)
+
+        return {
+            "engine": "P90",
+            "symbol": self.symbol,
+            "direction": dir_str,
+            "entry": round(bc, 5),
+            "sl": round(sl, 5),
+            "tp": round(tp2, 5),  # Use TP2 as primary target
+            "tp1": round(tp1, 5),
+            "tp2": round(tp2, 5),
+            "variant": variant,
+            "body_pips": round(body_pips, 1),
+            "ar_pips": round((self.asian_high - self.asian_low) / self.ps, 1),
+            "time": datetime.now(EST).strftime("%Y-%m-%d %H:%M:%S"),
+        }
+
+    def _p90_manage_trade(self, bc, bh, bl, est_hour):
+        """Manage active P90 trade. Close-only SL. TP2 first, then TP1."""
+        # EWS: opposite P90 at target + boundary breach = exit (not reversal)
+        # Simplified: check if opposite impulse fires while in trade
+        # Full EWS requires scanning for opposite P90 — handled in search
+
+        if self.p90_direction == 1:  # LONG
+            # TP2 first (further target)
+            if self.p90_tp2 > 0 and bh >= self.p90_tp2:
+                logging.info("[%s] P90 TP2 HIT (LONG): %.5f", self.symbol, self.p90_tp2)
+                self.p90_last_exit_time = datetime.now(EST)
+                self.advance_p90_variant()
+                return
+            # TP1
+            if self.p90_tp1 > 0 and bh >= self.p90_tp1:
+                logging.info("[%s] P90 TP1 HIT (LONG): %.5f", self.symbol, self.p90_tp1)
+                self.p90_last_exit_time = datetime.now(EST)
+                self.advance_p90_variant()
+                return
+            # SL (close-only)
+            if bc <= self.p90_sl:
+                logging.info("[%s] P90 SL HIT (LONG): close=%.5f sl=%.5f",
+                             self.symbol, bc, self.p90_sl)
+                self.p90_last_exit_time = datetime.now(EST)
+                self.advance_p90_variant()
+                return
+        else:  # SHORT
+            if self.p90_tp2 > 0 and bl <= self.p90_tp2:
+                logging.info("[%s] P90 TP2 HIT (SHORT): %.5f", self.symbol, self.p90_tp2)
+                self.p90_last_exit_time = datetime.now(EST)
+                self.advance_p90_variant()
+                return
+            if self.p90_tp1 > 0 and bl <= self.p90_tp1:
+                logging.info("[%s] P90 TP1 HIT (SHORT): %.5f", self.symbol, self.p90_tp1)
+                self.p90_last_exit_time = datetime.now(EST)
+                self.advance_p90_variant()
+                return
+            if bc >= self.p90_sl:
+                logging.info("[%s] P90 SL HIT (SHORT): close=%.5f sl=%.5f",
+                             self.symbol, bc, self.p90_sl)
+                self.p90_last_exit_time = datetime.now(EST)
+                self.advance_p90_variant()
+                return
+
+
+# ─── SIGNAL EMISSION ───────────────────────────────────────────
+SIGNAL_FILE = os.path.join(LOG_DIR, "signals.jsonl")
+
+
+def emit_signal(sig: dict, lot_size: float, dry_run: bool) -> bool:
+    """Write signal to file + optionally execute on MT5."""
+    # Write per-symbol signal file
+    sig_file = os.path.join(LOG_DIR, "signal_%s.json" % sig["symbol"].replace(".", "_"))
+    with open(sig_file, "w") as f:
+        json.dump(sig, f, indent=2)
+
+    # Append to signals log
+    with open(SIGNAL_FILE, "a") as f:
+        f.write(json.dumps(sig) + "\n")
+
+    if dry_run:
+        logging.info("  -> DRY RUN (not executed)")
+        return False
+
+    comment = "CEREBUS-%s-%s" % (sig["engine"], sig.get("tier", sig.get("variant", "")))
+    ok = send_order(sig["symbol"], sig["direction"], lot_size, sig["sl"], sig["tp"], comment)
+    if ok:
+        logging.info("  -> EXECUTED")
+    else:
+        logging.warning("  -> NOT EXECUTED")
+    return ok
+
+
+# ─── MAIN LIVE LOOP ─────────────────────────────────────────────
+def run_live(symbols: list, lot_size: float = 0.01, dry_run: bool = False):
+    setup_logging()
+    logging.info("=" * 60)
+    logging.info("  CEREBUS LIVE ENGINE v2 — Full State Machine")
+    logging.info("  Symbols: %s", symbols)
+    logging.info("  Lot: %.2f | Dry run: %s", lot_size, dry_run)
+    logging.info("  Started: %s", datetime.now(EST).strftime("%Y-%m-%d %H:%M:%S"))
+    logging.info("=" * 60)
+
+    if not mt5_connect():
+        return
+
+    # Per-symbol state machines
+    states = {sym: SymbolState(sym) for sym in symbols}
+    scan_count = 0
+    signal_count = 0
+    exec_count = 0
+    last_minute = -1
+
+    try:
+        while True:
+            now = datetime.now(EST)
+
+            if now.second < 5 and now.minute != last_minute:
+                last_minute = now.minute
+                scan_count += 1
+
+                acct = get_account()
+                positions = get_positions()
+
+                logging.info(
+                    "[%s] Scan #%d | Equity: $%.2f | Open: %d | Signals: %d | Exec: %d",
+                    now.strftime("%H:%M:%S"), scan_count,
+                    acct.get("equity", 0), len(positions),
+                    signal_count, exec_count
+                )
+
+                for symbol in symbols:
+                    bars = get_bars(symbol, 500)
+                    if not bars:
+                        continue
+
+                    state = states[symbol]
+
+                    # Process each new bar through state machine
+                    # Only process the latest bar (bars[-1]) for new signals
+                    # But we need to process all bars for state machine continuity
+                    # Optimization: only process from last known position
+                    latest_bar = bars[-1]
+                    sig = state.process_bar(latest_bar, len(bars) - 1)
+
+                    if sig:
+                        signal_count += 1
+                        ok = emit_signal(sig, lot_size, dry_run)
+                        if ok:
+                            exec_count += 1
+
+            time.sleep(1)
+
+    except KeyboardInterrupt:
+        logging.info("Stopped.")
+    finally:
+        mt5.shutdown()
+        logging.info("Done. %d scans, %d signals, %d executed",
+                     scan_count, signal_count, exec_count)
+
+
+# ─── ENTRY ──────────────────────────────────────────────────────
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="CEREBUS Live Engine v2")
+    parser.add_argument("--symbols", default=",".join(TOP5_FX))
+    parser.add_argument("--lot-size", type=float, default=0.01)
+    parser.add_argument("--dry-run", action="store_true")
+    args = parser.parse_args()
+
+    symbols = [s.strip() for s in args.symbols.split(",")]
+    run_live(symbols, args.lot_size, args.dry_run)

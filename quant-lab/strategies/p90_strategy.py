@@ -44,34 +44,47 @@ from nautilus_trader.model.orders import MarketOrder, StopMarketOrder
 from nautilus_trader.trading.strategy import Strategy, StrategyConfig
 
 
-# ─── P90 THRESHOLDS BY EST HOUR (EUR/USD reference, cerebus_p90.md) ──
+# ─── ALL configs imported from configs/asset_configs.py (single source of truth) ──
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent / 'configs'))
+from asset_configs import ASSET_CONFIGS, get_config
+
+# Default P90 thresholds by EST hour (EUR/USD reference)
 P90_THRESHOLDS = {
-    2: 4.1,   # 2AM-3AM
-    3: 4.1,   # 3AM-4AM
-    4: 4.6,   # 4AM-5AM
-    5: 4.6,   # 5AM-6AM
-    6: 4.6,   # 6AM-7AM
-    7: 5.9,   # 7AM-8AM
-    8: 5.9,   # 8AM-9AM
-    9: 6.2,   # 9AM-10AM
-    10: 6.2,  # 10AM-11AM
+    2: 4.1, 3: 4.1, 4: 4.6, 5: 4.6, 6: 4.6,
+    7: 5.9, 8: 5.9, 9: 6.2, 10: 6.2,
 }
 
-# Per-symbol thresholds
-SYMBOL_P90 = {
-    'EURUSD.PRO': P90_THRESHOLDS,
-    'EURUSD': P90_THRESHOLDS,
-    'USDCHF.PRO': P90_THRESHOLDS,
-    'USDCHF': P90_THRESHOLDS,
-}
+# Per-symbol P90 thresholds — derived from asset_configs p90_threshold
+# Scale by hour relative to base threshold (EUR/USD ratio)
+SYMBOL_P90 = {}
+PIP_DIVISORS = {}
 
-# Per-symbol pip divisors (price * pip_divisor = pips)
-PIP_DIVISORS = {
-    'EURUSD.PRO': 10000.0,
-    'EURUSD': 10000.0,
-    'USDCHF.PRO': 10000.0,
-    'USDCHF': 10000.0,
-}
+for _key, _cfg in ASSET_CONFIGS.items():
+    _pip_val = _cfg["pip_value"]
+    _divisor = 1.0 / _pip_val
+    PIP_DIVISORS[_key] = _divisor
+    # Add .PRO variant for FX majors
+    if _cfg.get("pip_value") == 0.0001 and len(_key) == 6:
+        PIP_DIVISORS[_key + ".PRO"] = _divisor
+    # Build per-symbol P90 thresholds from p90_threshold
+    _base = _cfg.get("p90_threshold", 4.6)
+    _ratio = _base / 4.6  # scale relative to EUR/USD base
+    SYMBOL_P90[_key] = {h: round(t * _ratio, 1) for h, t in P90_THRESHOLDS.items()}
+    if _cfg.get("pip_value") == 0.0001 and len(_key) == 6:
+        SYMBOL_P90[_key + ".PRO"] = SYMBOL_P90[_key]
+
+# Ensure XAU/USD variants exist
+for _alias in ["XAU/USD", "XAUUSD"]:
+    if _alias not in PIP_DIVISORS:
+        PIP_DIVISORS[_alias] = PIP_DIVISORS.get("XAUUSD", 10.0)
+for _alias in ["BTC/USD", "BTCUSD"]:
+    if _alias not in PIP_DIVISORS:
+        PIP_DIVISORS[_alias] = PIP_DIVISORS.get("BTCUSD", 1.0)
+for _alias in ["ETH/USD", "ETHUSD"]:
+    if _alias not in PIP_DIVISORS:
+        PIP_DIVISORS[_alias] = PIP_DIVISORS.get("ETHUSD", 1.0)
 
 # Cascade P90 max time window (120 minutes)
 CASCADE_WINDOW_MINUTES = 120
@@ -122,12 +135,13 @@ class P90Strategy(Strategy):
         self.max_initial_per_day = config.max_initial_per_day
         self.max_cascade_per_day = config.max_cascade_per_day
 
-        # Get pip divisor for this symbol
+        # Get pip divisor and thresholds for this symbol
         sym_str = str(self.instrument_id.symbol)
-        self.pip_divisor = PIP_DIVISORS.get(sym_str, 10000.0)
+        sym_key = sym_str.replace("/", "").replace(".", "")
+        self.pip_divisor = PIP_DIVISORS.get(sym_str, PIP_DIVISORS.get(sym_key, 10000.0))
 
-        # Get P90 thresholds
-        self.p90_thresholds = SYMBOL_P90.get(sym_str, P90_THRESHOLDS)
+        # Get P90 thresholds (try with and without / separator)
+        self.p90_thresholds = SYMBOL_P90.get(sym_str, SYMBOL_P90.get(sym_key, P90_THRESHOLDS))
 
         # Daily session state
         self.reset_daily_state()

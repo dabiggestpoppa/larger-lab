@@ -1,0 +1,520 @@
+{
+  "timestamp": "2026-05-31T21:02:37.214121",
+  "total_assets": 19,
+  "errors": [],
+  "results": {
+    "AUDUSD": {
+      "data_bars": 273896,
+      "data_file": "AUDUSD_M5.csv",
+      "config": {
+        "pip_size": 0.0001,
+        "k_factor": 0.46
+      },
+      "st": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "timing": {
+        "load": 1,
+        "st": 5,
+        "p90": 5
+      }
+    },
+    "BTCUSD": {
+      "data_bars": 300000,
+      "data_file": "BTCUSD_M5.csv",
+      "config": {
+        "pip_size": 1.0,
+        "k_factor": 0.52
+      },
+      "st": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "timing": {
+        "load": 1,
+        "st": 5,
+        "p90": 5
+      }
+    },
+    "CHFJPY": {
+      "data_bars": 275093,
+      "data_file": "CHFJPY_M5.csv",
+      "config": {
+        "pip_size": 0.01,
+        "k_factor": 0.48
+      },
+      "st": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "timing": {
+        "load": 1,
+        "st": 5,
+        "p90": 5
+      }
+    },
+    "DE30": {
+      "data_bars": 257602,
+      "data_file": "DE30_M5.csv",
+      "config": {
+        "pip_size": 1.0,
+        "k_factor": 0.48
+      },
+      "st": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "timing": {
+        "load": 1,
+        "st": 4,
+        "p90": 4
+      }
+    },
+    "ETHUSD": {
+      "data_bars": 300000,
+      "data_file": "ETHUSD_M5.csv",
+      "config": {
+        "pip_size": 1.0,
+        "k_factor": 0.52
+      },
+      "st": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "timing": {
+        "load": 1,
+        "st": 5,
+        "p90": 5
+      }
+    },
+    "EURUSD": {
+      "data_bars": 273909,
+      "data_file": "EURUSD_M5.csv",
+      "config": {
+        "pip_size": 0.0001,
+        "k_factor": 0.46
+      },
+      "st": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "timing": {
+        "load": 1,
+        "st": 5,
+        "p90": 5
+      }
+    },
+    "FR40": {
+      "data_bars": 253878,
+      "data_file": "FR40_M5.csv",
+      "config": {
+        "pip_size": 1.0,
+        "k_factor": 0.48
+      },
+      "st": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "timing": {
+        "load": 1,
+        "st": 5,
+        "p90": 5
+      }
+    },
+    "GBPAUD": {
+      "data_bars": 277100,
+      "data_file": "GBPAUD_M5.csv",
+      "config": {
+        "pip_size": 0.0001,
+        "k_factor": 0.48
+      },
+      "st": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "timing": {
+        "load": 1,
+        "st": 5,
+        "p90": 5
+      }
+    },
+    "GBPCHF": {
+      "data_bars": 276994,
+      "data_file": "GBPCHF_M5.csv",
+      "config": {
+        "pip_size": 0.0001,
+        "k_factor": 0.48
+      },
+      "st": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "timing": {
+        "load": 1,
+        "st": 5,
+        "p90": 5
+      }
+    },
+    "GBPJPY": {
+      "data_bars": 276931,
+      "data_file": "GBPJPY_M5.csv",
+      "config": {
+        "pip_size": 0.01,
+        "k_factor": 0.48
+      },
+      "st": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "timing": {
+        "load": 1,
+        "st": 5,
+        "p90": 5
+      }
+    },
+    "GBPNZD": {
+      "data_bars": 277117,
+      "data_file": "GBPNZD_M5.csv",
+      "config": {
+        "pip_size": 0.0001,
+        "k_factor": 0.48
+      },
+      "st": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "timing": {
+        "load": 1,
+        "st": 5,
+        "p90": 5
+      }
+    },
+    "GBPUSD": {
+      "data_bars": 277022,
+      "data_file": "GBPUSD_M5.csv",
+      "config": {
+        "pip_size": 0.0001,
+        "k_factor": 0.46
+      },
+      "st": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "timing": {
+        "load": 1,
+        "st": 5,
+        "p90": 5
+      }
+    },
+    "HK50": {
+      "data_bars": 242271,
+      "data_file": "HK50_M5.csv",
+      "config": {
+        "pip_size": 1.0,
+        "k_factor": 0.48
+      },
+      "st": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "timing": {
+        "load": 1,
+        "st": 4,
+        "p90": 4
+      }
+    },
+    "NZDUSD": {
+      "data_bars": 276961,
+      "data_file": "NZDUSD_M5.csv",
+      "config": {
+        "pip_size": 0.0001,
+        "k_factor": 0.46
+      },
+      "st": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "timing": {
+        "load": 1,
+        "st": 5,
+        "p90": 5
+      }
+    },
+    "US500": {
+      "data_bars": 260958,
+      "data_file": "US500_M5.csv",
+      "config": {
+        "pip_size": 1.0,
+        "k_factor": 0.48
+      },
+      "st": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "timing": {
+        "load": 1,
+        "st": 4,
+        "p90": 5
+      }
+    },
+    "USDCHF": {
+      "data_bars": 277072,
+      "data_file": "USDCHF_M5.csv",
+      "config": {
+        "pip_size": 0.0001,
+        "k_factor": 0.46
+      },
+      "st": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "timing": {
+        "load": 1,
+        "st": 5,
+        "p90": 5
+      }
+    },
+    "USDJPY": {
+      "data_bars": 277092,
+      "data_file": "USDJPY_M5.csv",
+      "config": {
+        "pip_size": 0.01,
+        "k_factor": 0.46
+      },
+      "st": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "timing": {
+        "load": 1,
+        "st": 5,
+        "p90": 5
+      }
+    },
+    "XAGUSD": {
+      "data_bars": 300000,
+      "data_file": "XAGUSD_M5.csv",
+      "config": {
+        "pip_size": 0.001,
+        "k_factor": 0.5
+      },
+      "st": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "timing": {
+        "load": 1,
+        "st": 5,
+        "p90": 5
+      }
+    },
+    "XAUUSD": {
+      "data_bars": 300000,
+      "data_file": "XAUUSD_M5.csv",
+      "config": {
+        "pip_size": 0.01,
+        "k_factor": 0.5
+      },
+      "st": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "p90": {
+        "trades": 0,
+        "win_rate": 0,
+        "pnl_pips": 0,
+        "wins": 0,
+        "losses": 0
+      },
+      "timing": {
+        "load": 1,
+        "st": 5,
+        "p90": 5
+      }
+    }
+  }
+}

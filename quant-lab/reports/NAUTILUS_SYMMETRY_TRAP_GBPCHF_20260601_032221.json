@@ -1,0 +1,15 @@
+{
+  "strategy": "symmetry_trap",
+  "symbol": "GBPCHF",
+  "bars": 276994,
+  "timestamp": "20260601_032221",
+  "engine_orders": 1877,
+  "engine_positions": 1,
+  "strategy_trades": 1161,
+  "strategy_wins": 1044,
+  "strategy_losses": 113,
+  "strategy_win_rate": 89.92248062015504,
+  "strategy_pnl_pips": 7981.200000000032,
+  "asset_cfg_pip": 0.0001,
+  "asset_cfg_k": 0.48
+}

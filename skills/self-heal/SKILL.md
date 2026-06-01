@@ -14,7 +14,7 @@
 3. When you catch yourself spawning agents/tools without being asked
 
 **Routine:**
-- Every 3rd session start (set a counter in memory-bank/self_heal_state.json)
+- Every 3rd session start (set a counter in memory/memory-bank/self_heal_state.json)
 - After any session where >20 tool calls were made without MAD direction
 
 ---
@@ -30,9 +30,9 @@
 - Check if you read their message and responded to IT, or if you used your first response to launch into work
 
 **Prescription:**
-- Write an honest diagnosis to `memory-bank/self-heal-report.md`
+- Write an honest diagnosis to `memory/memory-bank/self-heal-report.md`
 - Look at what triggered the auto-work: was it a bootstrap file? A cron? A reflex?
-- Add a specific line to `memory-bank/self-heal-report.md` about what the trigger was and how to avoid it next time
+- Add a specific line to `memory/memory-bank/self-heal-report.md` about what the trigger was and how to avoid it next time
 
 ### 2. MEMORY DRIFT
 **Symptom:** MEMORY.md entries don't match current reality.
@@ -64,9 +64,9 @@
 **Symptom:** Same errors appearing repeatedly in logs.
 
 **How to detect it:**
-- Read `memory-bank/error-db.json` — any pattern_ids appearing >3 times?
-- Read `memory-bank/errors-and-solutions.md` — any entries with >2 attempts?
-- Check `memory-bank/OC2-GATEWAY-FAILURES.md` for recurring issues
+- Read `memory/memory-bank/error-db.json` — any pattern_ids appearing >3 times?
+- Read `memory/memory-bank/errors-and-solutions.md` — any entries with >2 attempts?
+- Check `memory/memory-bank/OC2-GATEWAY-FAILURES.md` for recurring issues
 
 **Prescription:**
 - Flag recurring patterns
@@ -88,7 +88,7 @@
 
 ## OUTPUT FORMAT
 
-Every self-heal run produces: `memory-bank/self-heal-report.md`
+Every self-heal run produces: `memory/memory-bank/self-heal-report.md`
 
 ```markdown
 # SELF-HEAL REPORT
@@ -122,13 +122,13 @@ Every self-heal run produces: `memory-bank/self-heal-report.md`
 2. **Be specific.** "I spawned 3 agents without being asked" not "I was a bit active."
 3. **Be actionable.** Every diagnosis needs a prescription.
 4. **Keep it short.** Report should be <500 lines. Compress aggressively.
-5. **Update the state file.** Increment the counter in `memory-bank/self_heal_state.json`.
+5. **Update the state file.** Increment the counter in `memory/memory-bank/self_heal_state.json`.
 
 ---
 
 ## STATE FILE
 
-`memory-bank/self_heal_state.json`:
+`memory/memory-bank/self_heal_state.json`:
 ```json
 {
   "version": 1,

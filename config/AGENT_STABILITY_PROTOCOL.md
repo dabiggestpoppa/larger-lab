@@ -41,7 +41,7 @@
 ## ERROR CONTAINMENT
 
 ### If an error occurs:
-1. Log it immediately to `memory-bank/error-log.jsonl`
+1. Log it immediately to `memory/memory-bank/error-log.jsonl`
 2. Assess: is this isolated or systemic?
 3. If systemic → STOP all agent work, alert MAD
 4. If isolated → fix, document, continue

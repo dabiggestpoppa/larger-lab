@@ -1,0 +1,26 @@
+{
+  "group": 2,
+  "assets": ["NZDUSD", "GBPJPY", "GBPCHF", "GBPAUD", "GBPNZD"],
+  "results": {
+    "NZDUSD": {
+      "symmetry_trap": {"trades": 833, "wr": 91.6, "pnl": 4363.9},
+      "p90": {"trades": 236, "wr": 60.2, "pnl": 142.7}
+    },
+    "GBPJPY": {
+      "symmetry_trap": {"trades": 1948, "wr": 81.8, "pnl": 17037.6},
+      "p90": {"trades": 278, "wr": 67.6, "pnl": 724.8}
+    },
+    "GBPCHF": {
+      "symmetry_trap": {"trades": 1161, "wr": 89.9, "pnl": 7981.2},
+      "p90": {"trades": 343, "wr": 67.9, "pnl": 246.7}
+    },
+    "GBPAUD": {
+      "symmetry_trap": {"trades": 1428, "wr": 85.2, "pnl": 12529.2},
+      "p90": {"trades": 195, "wr": 64.6, "pnl": 300.5}
+    },
+    "GBPNZD": {
+      "symmetry_trap": {"trades": 1410, "wr": 85.0, "pnl": 13936.1},
+      "p90": {"trades": 130, "wr": 69.2, "pnl": 307.3}
+    }
+  }
+}

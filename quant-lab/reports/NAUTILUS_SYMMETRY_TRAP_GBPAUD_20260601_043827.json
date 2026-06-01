@@ -1,0 +1,17 @@
+{
+  "strategy": "symmetry_trap",
+  "symbol": "GBPAUD",
+  "bars": 277100,
+  "timestamp": "20260601_043827",
+  "engine_orders": 1485,
+  "engine_positions": 0,
+  "engine_pnl_usd": 0.0,
+  "engine_win_rate": 0.0,
+  "strategy_trades": 1428,
+  "strategy_wins": 1216,
+  "strategy_losses": 209,
+  "strategy_win_rate": 85.15406162464986,
+  "strategy_pnl_pips": 12529.200000000092,
+  "max_drawdown": 0.0,
+  "elapsed_s": 138930600.0
+}

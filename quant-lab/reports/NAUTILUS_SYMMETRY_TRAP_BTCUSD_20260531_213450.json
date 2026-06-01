@@ -1,0 +1,17 @@
+{
+  "strategy": "symmetry_trap",
+  "symbol": "BTCUSD",
+  "bars": 458887,
+  "timestamp": "20260531_213450",
+  "engine_orders": 3,
+  "engine_positions": 0,
+  "engine_pnl_usd": 0.0,
+  "engine_win_rate": 0.0,
+  "strategy_trades": 3,
+  "strategy_wins": 2,
+  "strategy_losses": 1,
+  "strategy_win_rate": 66.66666666666666,
+  "strategy_pnl_pips": -363979.99999986496,
+  "max_drawdown": 0.0,
+  "elapsed_s": 139117500.0
+}

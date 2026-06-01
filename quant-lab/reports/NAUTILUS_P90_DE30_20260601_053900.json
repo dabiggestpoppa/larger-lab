@@ -1,0 +1,17 @@
+{
+  "strategy": "p90",
+  "symbol": "DE30",
+  "bars": 257602,
+  "timestamp": "20260601_053900",
+  "engine_orders": 614,
+  "engine_positions": 0,
+  "engine_pnl_usd": 0.0,
+  "engine_win_rate": 0.0,
+  "strategy_trades": 610,
+  "strategy_wins": 400,
+  "strategy_losses": 210,
+  "strategy_win_rate": 65.57377049180327,
+  "strategy_pnl_pips": 463.49639999995634,
+  "max_drawdown": 0.0,
+  "elapsed_s": 138930600.0
+}

@@ -1,0 +1,67 @@
+{
+  "group": 3,
+  "assets": ["CHFJPY", "XAUUSD", "XAGUSD", "BTCUSD", "ETHUSD"],
+  "timestamp": "2026-06-01T05:55:23-05:00",
+  "results": {
+    "CHFJPY": {
+      "symmetry_trap": {
+        "trades": 1919,
+        "wr": 81.8,
+        "pnl": 13888.9
+      },
+      "p90": {
+        "trades": 395,
+        "wr": 58.7,
+        "pnl": 477.9
+      }
+    },
+    "XAUUSD": {
+      "symmetry_trap": {
+        "trades": 1718,
+        "wr": 81.8,
+        "pnl": 21118.2
+      },
+      "p90": {
+        "trades": 185,
+        "wr": 62.2,
+        "pnl": 257.8
+      }
+    },
+    "XAGUSD": {
+      "symmetry_trap": {
+        "trades": 716,
+        "wr": 88.0,
+        "pnl": 8709.0
+      },
+      "p90": {
+        "trades": 1575,
+        "wr": 35.5,
+        "pnl": 365.5
+      }
+    },
+    "BTCUSD": {
+      "symmetry_trap": {
+        "trades": 2014,
+        "wr": 86.9,
+        "pnl": 219718.6
+      },
+      "p90": {
+        "trades": 3,
+        "wr": 100.0,
+        "pnl": 34.2
+      }
+    },
+    "ETHUSD": {
+      "symmetry_trap": {
+        "trades": 777,
+        "wr": 94.7,
+        "pnl": 11901.9
+      },
+      "p90": {
+        "trades": 92,
+        "wr": 83.7,
+        "pnl": 368.1
+      }
+    }
+  }
+}

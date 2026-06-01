@@ -1,0 +1,17 @@
+{
+  "strategy": "p90",
+  "symbol": "AUDUSD",
+  "bars": 273896,
+  "timestamp": "20260601_043951",
+  "engine_orders": 505,
+  "engine_positions": 0,
+  "engine_pnl_usd": 0.0,
+  "engine_win_rate": 0.0,
+  "strategy_trades": 458,
+  "strategy_wins": 230,
+  "strategy_losses": 228,
+  "strategy_win_rate": 50.21834061135371,
+  "strategy_pnl_pips": -141.19899999999853,
+  "max_drawdown": 0.0,
+  "elapsed_s": 138930600.0
+}

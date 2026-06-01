@@ -31,7 +31,7 @@ NEW: Agents execute → Trace → Distill → Store → Retrieve → Improve
 ### Tasks
 #### Phase 0A — Vault Writer
 - [ ] **O2C-0A-1** Create `core/obsidian/vault_writer.py` — write_note(), list_notes(), get_note()
-- [ ] **O2C-0A-2` Create vault directory structure (`/O2C-VAULT/`)
+- [ ] **O2C-0A-2` Create vault directory structure (`/memory/obsidian-vault/`)
 - [ ] **O2C-0A-3` Write tests for vault_writer (create, read, update, delete notes)
 
 #### Phase 0B — Compressor
@@ -127,7 +127,7 @@ NEW: Agents execute → Trace → Distill → Store → Retrieve → Improve
 #### Research
 - [ ] **O2C-RL-1** Research optimal compression ratios for execution traces
 - [ ] **O2C-RL-2** Research knowledge graph auto-linking algorithms
-- [ ] **O2C-RL-3** Document findings in `O2C-VAULT/research/`
+- [ ] **O2C-RL-3** Document findings in `memory/obsidian-vault/research/`
 
 ---
 
@@ -192,6 +192,6 @@ Before advancing to Phase 1, ALL must be true:
 | `core/execution/__init__.py` | CC1 | Execution package |
 | `core/execution/journal.py` | CC1 | Track agent execution |
 | `skills/observer/chat_response/SKILL.md` | AS | First skill (static response fix) |
-| `O2C-VAULT/` | RL | Vault directory structure |
+| `memory/obsidian-vault/` | RL | Vault directory structure |
 | `oce/frontend/vault-viewer.tsx` | PM2 | Vault viewer component |
 | `oce/frontend/graph-viz.tsx` | PM2 | Knowledge graph visualization |

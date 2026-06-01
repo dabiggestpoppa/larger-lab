@@ -1,49 +1,48 @@
 {
-  "version": "2.2-unified",
-  "last_updated": "2026-05-31T04:03:00-04:00",
-  "obsidian_vault": {
-    "path": "C:\\Users\\wifik\\Downloads\\o2c",
-    "name": "o2c",
-    "vault_id": "c19da291888cf7e1",
-    "write_method": "Direct file write OR VaultWriter(vault_path)",
-    "categories": ["agents", "architecture", "doctrine", "execution", "failures", "graphs", "heuristics", "journals", "memory", "ontology", "routing", "skills"],
-    "access_guide_written": true,
-    "access_guide_path": "execution/OC2_VAULT_ACCESS_GUIDE.md",
-    "subagent_utility": "tools/obsidian_access.py — vault_write(), vault_read(), vault_list()",
-    "utility_no_deps": true,
-    "bible_in_vault": true,
-    "hermes_also_writes": true
-  },
-  "workspace_vault": {
-    "path": "O2C-VAULT/",
-    "purpose": "Internal workspace vault for raw operational traces"
-  },
-  "subagent_vault_access": {
-    "method": "Direct file write via tools/obsidian_access.py or raw pathlib",
-    "no_routing_through_owl": true,
-    "spawn_template_included": true
-  },
-  "core_obsidian_modules": {
-    "vault_writer": "core/obsidian/vault_writer.py — OCE package import",
-    "compressor": "core/obsidian/compressor.py",
-    "linker": "core/obsidian/linker.py",
-    "error_intelligence": "core/obsidian/error_intelligence.py",
-    "pattern_crystallizer": "core/obsidian/pattern_crystallizer.py",
-    "memory_distiller": "core/obsidian/memory_distiller.py",
-    "context_injector": "core/obsidian/context_injector.py"
-  },
-  "hermes_workspace": {
-    "path": "agent-lab/agents/hermes/hermes_workspace/",
-    "gateway": "Discord + API on port 8642",
-    "role": "Execution / Nautilus backtesting — NEVER touch MT5 directly"
-  },
-  "agent_registry": {
-    "owl": "OC2 — Primary Orchestrator (me)",
-    "cc": "Claude Code — Overseer / Architecture",
-    "pm": "Polymorph — Debugger / Tool Builder",
-    "pm2": "Polymorph 2 — Experimental Track / Frontend",
-    "hr": "Hermes — Execution / NautilusTrader",
-    "rl": "Research Lead — DSPy research",
-    "as": "Assistant Manager — Context Monitoring"
+  "session_id": "session_20260531_214842",
+  "start_time": "2026-05-31T21:48:42.184575+00:00",
+  "last_active": "2026-06-01T15:15:14.755148+00:00",
+  "workflow_count": 3,
+  "success_count": 3,
+  "failure_count": 0,
+  "active_goals": [],
+  "workflow_history": [
+    {
+      "workflow_id": "chat_e3eaf31d",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-05-31T21:48:49.232254+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_4e225e38",
+      "domain": "research",
+      "complexity": "low",
+      "timestamp": "2026-05-31T21:48:58.415088+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_0519f978",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-06-01T15:15:14.755148+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    }
+  ],
+  "routing_patterns": {
+    "TaskType.CONVERSATION:": 2,
+    "TaskType.RESEARCH:": 1
   }
 }
