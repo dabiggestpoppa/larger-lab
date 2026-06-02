@@ -55,13 +55,13 @@ class FrictionFilter:
         # Reset daily counters on new day
         self._reset_daily_if_new_day(t)
 
+        # Daily loss limit gate (checked first — most critical)
+        if self._daily_pnl_pct <= -self.daily_loss_limit_pct:
+            return False, f"DAILY_LIMIT: {self._daily_pnl_pct:.1f}% <= -{self.daily_loss_limit_pct}%"
+
         # Consecutive loss gate
         if self._consecutive_losses >= self.max_consecutive_losses:
             return False, f"LOSS_GATE: {self._consecutive_losses} consecutive losses (max {self.max_consecutive_losses})"
-
-        # Daily loss limit gate
-        if self._daily_pnl_pct <= -self.daily_loss_limit_pct:
-            return False, f"DAILY_LIMIT: {self._daily_pnl_pct:.1f}% <= -{self.daily_loss_limit_pct}%"
 
         return True, "ALL_FILTERS_PASSED"
 
