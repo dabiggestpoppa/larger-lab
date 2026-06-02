@@ -1,0 +1,241 @@
+{
+  "timestamp": "2026-06-02T17:33:33.831275",
+  "total": 18,
+  "ok": 18,
+  "results": [
+    {
+      "symbol": "AUDUSD",
+      "status": "OK",
+      "rows": 270352,
+      "columns": 43,
+      "regime_distribution": {
+        "NO-GO": 190659,
+        "FAILED": 62346,
+        "CAUTION": 12287,
+        "CONFIRMED": 5060
+      },
+      "avg_quality": 0.33
+    },
+    {
+      "symbol": "BTCUSD",
+      "status": "OK",
+      "rows": 458071,
+      "columns": 43,
+      "regime_distribution": {
+        "NO-GO": 345737,
+        "FAILED": 83429,
+        "CAUTION": 18424,
+        "CONFIRMED": 10481
+      },
+      "avg_quality": 0.334
+    },
+    {
+      "symbol": "CHFJPY",
+      "status": "OK",
+      "rows": 271379,
+      "columns": 43,
+      "regime_distribution": {
+        "NO-GO": 190288,
+        "FAILED": 60694,
+        "CAUTION": 13525,
+        "CONFIRMED": 6872
+      },
+      "avg_quality": 0.335
+    },
+    {
+      "symbol": "DE30",
+      "status": "OK",
+      "rows": 242421,
+      "columns": 43,
+      "regime_distribution": {
+        "NO-GO": 152575,
+        "FAILED": 54877,
+        "CAUTION": 18453,
+        "CONFIRMED": 16516
+      },
+      "avg_quality": 0.306
+    },
+    {
+      "symbol": "ETHUSD",
+      "status": "OK",
+      "rows": 457200,
+      "columns": 43,
+      "regime_distribution": {
+        "NO-GO": 349608,
+        "FAILED": 80396,
+        "CAUTION": 17286,
+        "CONFIRMED": 9910
+      },
+      "avg_quality": 0.331
+    },
+    {
+      "symbol": "EURUSD",
+      "status": "OK",
+      "rows": 270351,
+      "columns": 43,
+      "regime_distribution": {
+        "NO-GO": 174582,
+        "FAILED": 64903,
+        "CAUTION": 18536,
+        "CONFIRMED": 12330
+      },
+      "avg_quality": 0.312
+    },
+    {
+      "symbol": "FR40",
+      "status": "OK",
+      "rows": 240584,
+      "columns": 43,
+      "regime_distribution": {
+        "NO-GO": 156316,
+        "FAILED": 50827,
+        "CAUTION": 16802,
+        "CONFIRMED": 16639
+      },
+      "avg_quality": 0.308
+    },
+    {
+      "symbol": "GBPAUD",
+      "status": "OK",
+      "rows": 273401,
+      "columns": 43,
+      "regime_distribution": {
+        "NO-GO": 190129,
+        "FAILED": 63493,
+        "CAUTION": 13752,
+        "CONFIRMED": 6027
+      },
+      "avg_quality": 0.33
+    },
+    {
+      "symbol": "GBPCHF",
+      "status": "OK",
+      "rows": 273254,
+      "columns": 43,
+      "regime_distribution": {
+        "NO-GO": 184363,
+        "FAILED": 59522,
+        "CAUTION": 16934,
+        "CONFIRMED": 12435
+      },
+      "avg_quality": 0.336
+    },
+    {
+      "symbol": "GBPJPY",
+      "status": "OK",
+      "rows": 273204,
+      "columns": 43,
+      "regime_distribution": {
+        "NO-GO": 184980,
+        "FAILED": 65100,
+        "CAUTION": 15376,
+        "CONFIRMED": 7748
+      },
+      "avg_quality": 0.329
+    },
+    {
+      "symbol": "GBPNZD",
+      "status": "OK",
+      "rows": 273336,
+      "columns": 43,
+      "regime_distribution": {
+        "NO-GO": 197968,
+        "FAILED": 58913,
+        "CAUTION": 11287,
+        "CONFIRMED": 5168
+      },
+      "avg_quality": 0.34
+    },
+    {
+      "symbol": "GBPUSD",
+      "status": "OK",
+      "rows": 273361,
+      "columns": 43,
+      "regime_distribution": {
+        "NO-GO": 175299,
+        "FAILED": 65512,
+        "CAUTION": 19379,
+        "CONFIRMED": 13171
+      },
+      "avg_quality": 0.312
+    },
+    {
+      "symbol": "NZDUSD",
+      "status": "OK",
+      "rows": 273302,
+      "columns": 43,
+      "regime_distribution": {
+        "NO-GO": 199300,
+        "FAILED": 58214,
+        "CAUTION": 10939,
+        "CONFIRMED": 4849
+      },
+      "avg_quality": 0.334
+    },
+    {
+      "symbol": "US500",
+      "status": "OK",
+      "rows": 245426,
+      "columns": 43,
+      "regime_distribution": {
+        "NO-GO": 151534,
+        "FAILED": 56979,
+        "CAUTION": 18790,
+        "CONFIRMED": 18123
+      },
+      "avg_quality": 0.32
+    },
+    {
+      "symbol": "USDCHF",
+      "status": "OK",
+      "rows": 273435,
+      "columns": 43,
+      "regime_distribution": {
+        "NO-GO": 184135,
+        "FAILED": 61044,
+        "CAUTION": 17001,
+        "CONFIRMED": 11255
+      },
+      "avg_quality": 0.328
+    },
+    {
+      "symbol": "USDJPY",
+      "status": "OK",
+      "rows": 273408,
+      "columns": 43,
+      "regime_distribution": {
+        "NO-GO": 195545,
+        "FAILED": 59883,
+        "CAUTION": 12036,
+        "CONFIRMED": 5944
+      },
+      "avg_quality": 0.332
+    },
+    {
+      "symbol": "XAGUSD",
+      "status": "OK",
+      "rows": 286999,
+      "columns": 43,
+      "regime_distribution": {
+        "NO-GO": 195018,
+        "FAILED": 63022,
+        "CAUTION": 17399,
+        "CONFIRMED": 11560
+      },
+      "avg_quality": 0.336
+    },
+    {
+      "symbol": "XAUUSD",
+      "status": "OK",
+      "rows": 288817,
+      "columns": 43,
+      "regime_distribution": {
+        "NO-GO": 194985,
+        "FAILED": 66010,
+        "CAUTION": 17209,
+        "CONFIRMED": 10613
+      },
+      "avg_quality": 0.33
+    }
+  ]
+}

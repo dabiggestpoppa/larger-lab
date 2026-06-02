@@ -16,7 +16,7 @@ from phase4_integration.close_only_guard import (
     check_812_rule, check_12pm_hard_exit, check_tp_hit
 )
 from phase4_integration.nautilus_bridge import CerebusMLBridge
-from phase4_integration.parity_validator import validate_parity, BacktestMetrics, LiveMetrics, compute_metrics_from_trades
+from phase4_integration.parity_validator import validate_parity, check_parity, BENCHMARKS, TOLERANCES
 
 
 class TestFrictionFilters:
@@ -145,43 +145,45 @@ class TestParityValidator:
     """Tests for backtest-to-live parity validation."""
 
     def test_passes_within_tolerance(self):
-        bt = BacktestMetrics(win_rate=88.4, avg_r=1.18, profit_factor=4.18, max_dd_pct=0.8, total_trades=3842)
-        live = LiveMetrics(win_rate=87.0, avg_r=1.15, profit_factor=4.0, max_dd_pct=0.9, total_trades=3700)
+        bt = {"win_rate": 88.4, "avg_r": 1.18}
+        live = {"win_rate": 87.0, "avg_r": 1.15}
         result = validate_parity(bt, live)
-        assert result.status == "PASS"
+        assert result["status"] == "PARITY_CONFIRMED"
 
     def test_detects_wr_drift(self):
-        bt = BacktestMetrics(win_rate=88.4, avg_r=1.18, profit_factor=4.18, max_dd_pct=0.8, total_trades=3842)
-        live = LiveMetrics(win_rate=70.0, avg_r=1.15, profit_factor=4.0, max_dd_pct=0.9, total_trades=3700)
+        bt = {"win_rate": 88.4, "avg_r": 1.18}
+        live = {"win_rate": 70.0, "avg_r": 1.15}
         result = validate_parity(bt, live)
-        assert result.status in ("DRIFT_DETECTED", "FAIL")
+        assert result["status"] == "DRIFT_DETECTED"
+        assert any("Win Rate" in i for i in result["issues"])
 
     def test_detects_r_drift(self):
-        bt = BacktestMetrics(win_rate=88.4, avg_r=1.18, profit_factor=4.18, max_dd_pct=0.8, total_trades=3842)
-        live = LiveMetrics(win_rate=87.0, avg_r=0.50, profit_factor=4.0, max_dd_pct=0.9, total_trades=3700)
+        bt = {"win_rate": 88.4, "avg_r": 1.18}
+        live = {"win_rate": 87.0, "avg_r": 0.50}
         result = validate_parity(bt, live)
-        assert result.status in ("DRIFT_DETECTED", "FAIL")
+        assert result["status"] == "DRIFT_DETECTED"
+        assert any("R-Multiple" in i for i in i in result["issues"])
 
-    def test_pf_floor(self):
-        bt = BacktestMetrics(win_rate=88.4, avg_r=1.18, profit_factor=4.18, max_dd_pct=0.8, total_trades=3842)
-        live = LiveMetrics(win_rate=87.0, avg_r=1.15, profit_factor=1.5, max_dd_pct=0.9, total_trades=3700)
-        result = validate_parity(bt, live)
-        assert any("Profit Factor" in i for i in result.issues)
+    def test_check_parity_pass(self):
+        results = {"win_rate": 88.0, "avg_r": 1.20, "profit_factor": 4.5, "max_dd": 0.7, "total_trades": 3800}
+        result = check_parity("EURUSD", results)
+        assert result["status"] == "PASS"
 
-    def test_compute_metrics_from_trades(self):
-        trades = [
-            {"outcome": "WIN", "r_multiple": 1.5, "pnl": 150},
-            {"outcome": "WIN", "r_multiple": 1.0, "pnl": 100},
-            {"outcome": "LOSS", "r_multiple": -1.0, "pnl": -100},
-            {"outcome": "WIN", "r_multiple": 2.0, "pnl": 200},
-        ]
-        metrics = compute_metrics_from_trades(trades)
-        assert metrics.win_rate == 75.0
-        assert metrics.total_trades == 4
+    def test_check_parity_fail_wr(self):
+        results = {"win_rate": 70.0, "avg_r": 1.20, "profit_factor": 4.5, "max_dd": 0.7, "total_trades": 3800}
+        result = check_parity("EURUSD", results)
+        assert result["status"] == "FAIL"
 
-    def test_compute_metrics_empty(self):
-        metrics = compute_metrics_from_trades([])
-        assert metrics.total_trades == 0
+    def test_check_parity_no_benchmark(self):
+        result = check_parity("UNKNOWN", {"win_rate": 50})
+        assert result["status"] == "ERROR"
+
+    def test_benchmarks_19_assets(self):
+        assert len(BENCHMARKS) >= 19
+
+    def test_tolerances_defined(self):
+        assert "wr" in TOLERANCES
+        assert "r" in TOLERANCES
 
     def test_sl_close_only_wick_ignored(self):
         guard = CloseOnlyGuard()

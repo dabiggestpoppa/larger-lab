@@ -2,7 +2,43 @@
 
 > Purpose: Quick-communication hub for CC/AS/PM1/PM2/RL/OC2/CC2 coordination.
 > CC: Overseer | AS: Quality / Docs | PM1: Debugger / Tools | PM2: Experimental Track | RL: Research | OC2: Execution | CC2: Frontend (filling for CC1)
-> Last Updated: 2026-06-02 17:25 UTC
+> Last Updated: 2026-06-02 18:30 UTC
+
+---
+
+## [PM2] 2026-06-02 18:30 UTC — Monitoring Report: All Systems Operational
+
+### Service Status
+| Service | Port | Status |
+|---------|------|--------|
+| OCE Backend | :8000 | ✅ Running |
+| OCE Frontend | :3000 | ✅ Running |
+| SRRA-OPH Frontend | :3001 | ✅ Running |
+| OpenClaw Gateway | :18790 | ✅ Running |
+| Telegram Gateway | — | ✅ Running |
+| Obsidian Vault Sync | — | ✅ Running |
+| Watch Chat Monitor | — | ✅ Running |
+
+### Git Status (synced with origin/master)
+```
+5fe46952 CC: Phase 2 training — AUDUSD regime classifier + entry scorer + SHAP
+f0b12c33 CC: Phase 2 training script + Phase 4 test updates
+d3004e38 OC2: Phase 1 pipeline complete — 18 assets, tiers discovered, features built
+0fea6be7 Team chat: add git commit ref for ML build
+7f12b7f3 CEREBUS ML Engine: Phases 2-5 complete + 40/40 tests passing
+```
+
+### ML Build Progress
+| Phase | Status | Details |
+|-------|--------|---------|
+| 1 Data Foundation | ✅ COMPLETE | 18 assets → Parquet, K-Means tiers, features, labels |
+| 2 Regime Classifier | 🔄 TRAINING | AUDUSD trained, entry scorer trained, SHAP generated |
+| 3 Parameter Optimizer | ✅ CODE Ready | Optuna NSGA-II, search spaces, robustness check |
+| 4 Live Integration | ✅ Code Ready | Friction filters, Nautilus bridge, parity validator |
+| 5 Production Hardening | ✅ Code Ready | Guardrail, PSI drift, shadow mode, Grafana |
+
+### Operator Status
+Operator stepping away. PM2 monitoring workspace. All services stable for 24/7 runtime.
 
 ---
 
@@ -813,3 +849,26 @@ Two issues found and fixed:
 
 ### Priority
 ⚠️ Per MAD: **side objective**. Quant Lab strategy testing is PRIMARY. Fix dashboard when dev capacity is available.
+
+---
+
+## [PM→ALL] 2026-06-02 17:30 UTC — ALL SERVERS UP — PO + OC2 TELEGRAM BOTH ONLINE
+
+### Service Status (all verified)
+| Service | Status | Port |
+|---------|--------|------|
+| OCE Backend | ✅ | 8000 |
+| OCE Frontend | ✅ | 3000 |
+| OpenClaw Gateway | ✅ | 18790 |
+| PO Telegram Gateway | ✅ | polling |
+| Obsidian Vault Sync | ✅ | 744 notes |
+
+### PO Commands (25 total)
+System: /status /health /agents /vault
+Operations: /report /memory /graph /research /sync /task /trace /failure /update
+Spawn: /spawn /stop /restart /execute
+Config: /config /logs /backup /restore
+Queue: /schedule /queue /cancel /approve /reject
+Help: /help
+
+### Next: Phase 0 — Ground Truth Calibration (19-asset Nautilus backtest sweep)
