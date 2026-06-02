@@ -3,7 +3,7 @@ Phase 3.1: Search Space Definition
 ====================================
 Per-regime parameter search spaces for Bayesian optimization.
 """
-from __future__ import typing
+from __future__ import annotations
 
 
 # Per-regime search spaces (can be tuned per asset class)

@@ -328,3 +328,6 @@
 {"engine": "P90", "symbol": "GBPJPY.PRO", "direction": "SELL", "entry": 215.473, "sl": 215.34868, "tp": 215.55450000000002, "event": "SL_HIT", "variant": "CASCADE", "time": "2026-06-02 12:56:00"}
 {"engine": "P90", "symbol": "GBPJPY.PRO", "direction": "SELL", "entry": 215.473, "sl": 215.34868, "tp": 215.55450000000002, "event": "SL_HIT", "variant": "CASCADE", "time": "2026-06-02 12:56:00"}
 {"engine": "P90", "symbol": "CHFJPY.PRO", "direction": "SELL", "entry": 203.124, "sl": 203.24159999999998, "tp": 203.02075, "event": "TP_HIT", "variant": "CASCADE", "time": "2026-06-02 13:50:00"}
+{"engine": "SymmetryTrap", "symbol": "CHFJPY.PRO", "direction": "SELL", "entry": 202.916, "sl": 203.059, "tp": 202.766, "event": "ENTRY", "loop": 1, "time": "2026-06-02 17:03:00"}
+{"engine": "SymmetryTrap", "symbol": "CHFJPY.PRO", "direction": "SELL", "entry": 202.916, "sl": 203.059, "tp": 202.766, "event": "TP_HIT", "loop": 1, "time": "2026-06-02 17:04:00"}
+{"engine": "SymmetryTrap", "symbol": "CHFJPY.PRO", "direction": "BUY", "entry": 202.931, "sl": 202.871, "tp": 203.08100000000002, "event": "ENTRY", "loop": 2, "time": "2026-06-02 17:07:00"}
