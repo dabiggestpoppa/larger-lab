@@ -9,6 +9,7 @@ import LearningPanel from "../panels/LearningPanel";
 import RegimePanel from "../panels/RegimePanel";
 import EntryQualityPanel from "../panels/EntryQualityPanel";
 import ParameterOverlay from "../panels/ParameterOverlay";
+import ShapPanel from "../panels/ShapPanel";
 
 type Layer3Tab = "consensus" | "spawn" | "learning" | "ml";
 
@@ -119,12 +120,12 @@ export default function RightPanel() {
 /* ─── ML Tab Content ──────────────────────────────────────────────────────── */
 
 function MlTabContent() {
-  const [mlSubTab, setMlSubTab] = useState<"regime" | "quality" | "params">("regime");
+  const [mlSubTab, setMlSubTab] = useState<"regime" | "quality" | "params" | "shap">("regime");
 
   return (
     <div className="flex flex-col h-full">
       <div className="flex border-b border-[var(--border-subtle)]">
-        {(["regime", "quality", "params"] as const).map((tab) => (
+        {(["regime", "quality", "params", "shap"] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setMlSubTab(tab)}
@@ -142,6 +143,7 @@ function MlTabContent() {
         {mlSubTab === "regime" && <RegimePanel />}
         {mlSubTab === "quality" && <EntryQualityPanel />}
         {mlSubTab === "params" && <ParameterOverlay />}
+        {mlSubTab === "shap" && <ShapPanel />}
       </div>
     </div>
   );
