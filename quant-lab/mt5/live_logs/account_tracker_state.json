@@ -1,20 +1,36 @@
 {
-  "timestamp": "2026-06-02T17:04:44.450877",
+  "timestamp": "2026-06-02T18:05:35.596986",
   "account": {
     "login": 650898,
     "server": "OxSecurities-Live",
-    "balance": 74.0,
-    "equity": 74.0,
-    "profit": 0.0,
-    "margin": 0.0,
-    "margin_free": 74.0,
-    "margin_level": 0.0,
+    "balance": 71.89,
+    "equity": 71.57,
+    "profit": -0.32,
+    "margin": 2.54,
+    "margin_free": 69.03,
+    "margin_level": 2817.7165354330705,
     "leverage": 500,
     "currency": "USD",
     "name": "Jaelon Scott - Live #0",
     "company": "Ox Securities Pty Ltd"
   },
-  "positions": [],
+  "positions": [
+    {
+      "ticket": 91878347,
+      "symbol": "CHFJPY.PRO",
+      "type": "BUY",
+      "volume": 0.01,
+      "open_price": 203.2,
+      "current_price": 203.149,
+      "sl": 202.98,
+      "tp": 203.332,
+      "profit": -0.32,
+      "swap": 0.0,
+      "magic": 20260601,
+      "comment": "CEREBUS-ST-L1",
+      "time": "2026-06-02T21:02:58"
+    }
+  ],
   "today_history": [
     {
       "ticket": 109609785,
