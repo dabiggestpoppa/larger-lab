@@ -1,0 +1,23 @@
+{
+  "feature_names": [
+    "pullback_pct",
+    "occ_body_to_au_ratio",
+    "time_since_impulse_min",
+    "volume_spike_ratio",
+    "regime_confidence",
+    "distance_to_dz_center",
+    "prior_loop_outcome",
+    "spread_at_entry"
+  ],
+  "params": {
+    "n_estimators": "150",
+    "max_depth": "3",
+    "learning_rate": "0.05",
+    "subsample": "0.8",
+    "reg_alpha": "0.1",
+    "reg_lambda": "1.0",
+    "objective": "reg:squarederror",
+    "tree_method": "hist",
+    "random_state": "42"
+  }
+}
