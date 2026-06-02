@@ -67,6 +67,7 @@ class FrictionFilter:
 
     def record_trade(self, pnl_pct: float):
         """Record trade outcome for loss tracking."""
+        self._last_trade_date = datetime.utcnow().date()
         if pnl_pct < 0:
             self._consecutive_losses += 1
             self._daily_pnl_pct += pnl_pct
