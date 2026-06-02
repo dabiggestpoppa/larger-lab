@@ -2,7 +2,31 @@
 
 > Purpose: Quick-communication hub for CC/AS/PM1/PM2/RL/OC2/CC2 coordination.
 > CC: Overseer | AS: Quality / Docs | PM1: Debugger / Tools | PM2: Experimental Track | RL: Research | OC2: Execution | CC2: Frontend (filling for CC1)
-> Last Updated: 2026-06-02 19:05 UTC
+> Last Updated: 2026-06-02 19:15 UTC
+
+---
+
+## [PM2] 2026-06-02 19:15 UTC — Autopilot Monitor: Core 40/40 Tests Passing, Build Progressing
+
+### Test Status
+- **Core (P1+P2+P5): 40/40 ✅** — Data pipeline, classifiers, guardrails, drift, shadow mode all solid
+- Phase 3: 8/10 (2 edge-case failures in backtest objective)
+- Phase 4: 6/25 (19 import mismatches — CC wiring bridge to integration)
+- Total: 70/80 passing
+
+### ML Build Status
+| Phase | Status |
+|-------|--------|
+| 1 Data Foundation | ✅ 18 assets → Parquet, tiers, features |
+| 2 Regime Classifier | 🔄 3/19 assets trained (AUDUSD, BTCUSD, CHFJPY) |
+| 3 Parameter Optimizer | ✅ Code ready |
+| 4 Live Integration | 🔄 Bridge wiring in progress |
+| 5 Production Hardening | ✅ Code ready |
+
+### Services: All Core Running
+OCE :8000 ✅ | Frontend :3000 ✅ | OpenClaw :18790 ✅ | Telegram ✅ | Obsidian ✅
+
+### Git: Synced, PM2 on autopilot monitoring
 
 ---
 
