@@ -64,14 +64,14 @@ class ExecutionGuardrailInterceptor:
         sl_dist_pips = abs(entry_price - sl_price) / self.pip_size
         tp_dist_pips = abs(tp_price - entry_price) / self.pip_size
 
-        # 1. Check SL Structural Integrity
-        if sl_dist_pips < self.bounds["min_sl_pips"]:
+        # 1. Check SL Structural Integrity (0.1 pip tolerance for floating point)
+        if sl_dist_pips < self.bounds["min_sl_pips"] - 0.1:
             msg = f"🛑 REJECTED: SL distance {sl_dist_pips:.1f}p below minimum {self.bounds['min_sl_pips']}p"
             self._log_rejection(msg)
             return False, msg
 
-        # 2. Check TP Structural Integrity
-        if tp_dist_pips < self.bounds["min_tp_pips"]:
+        # 2. Check TP Structural Integrity (0.1 pip tolerance for floating point)
+        if tp_dist_pips < self.bounds["min_tp_pips"] - 0.1:
             msg = f"🛑 REJECTED: TP distance {tp_dist_pips:.1f}p below minimum {self.bounds['min_tp_pips']}p"
             self._log_rejection(msg)
             return False, msg

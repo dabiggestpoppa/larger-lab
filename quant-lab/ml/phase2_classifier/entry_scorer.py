@@ -60,8 +60,9 @@ class CerebusEntryScorer:
         y_train: np.ndarray,
         X_val: np.ndarray = None,
         y_val: np.ndarray = None,
-    ):
-        """Train on normalized R-multiple targets."""
+    ) -> float:
+        """Train on normalized R-multiple targets. Returns mean CV R²."""
+        from sklearn.model_selection import TimeSeriesSplit
         X_train_scaled = self.scaler.fit_transform(X_train)
         eval_set = None
         if X_val is not None and y_val is not None:
@@ -69,7 +70,18 @@ class CerebusEntryScorer:
             eval_set = [(X_val_scaled, y_val)]
         self.model.fit(X_train_scaled, y_train, eval_set=eval_set, verbose=False)
         self.is_trained = True
-        print("✅ Entry Quality Scorer trained")
+
+        # TimeSeriesSplit CV for R²
+        tscv = TimeSeriesSplit(n_splits=5)
+        scores = []
+        for train_idx, val_idx in tscv.split(X_train):
+            fold_model = xgb.XGBRegressor(**self.params)
+            fold_model.fit(X_train_scaled[train_idx], y_train[train_idx], verbose=False)
+            scores.append(fold_model.score(X_train_scaled[val_idx], y_train[val_idx]))
+
+        mean_r2 = float(np.mean(scores))
+        print(f"✅ Entry Quality Scorer trained (CV R²={mean_r2:.3f})")
+        return mean_r2
 
     def score_entry(self, features: dict) -> dict:
         """Score a single entry. Returns quality score + action."""
@@ -87,6 +99,7 @@ class CerebusEntryScorer:
             action = "ENTER_FULL"
 
         return {
+            "score": round(quality, 3),
             "quality_score": round(quality, 3),
             "action": action,
             "size_multiplier": quality if quality >= 0.5 else 0.0,
@@ -98,23 +111,29 @@ class CerebusEntryScorer:
         X_scaled = self.scaler.transform(X)
         return np.clip(self.model.predict(X_scaled), 0.0, 1.0)
 
-    def save(self, path: str | Path):
+    MODEL_DIR = Path(__file__).resolve().parent.parent / "models"
+
+    def save(self, path: str | Path = None):
+        if path is None:
+            path = self.MODEL_DIR / "entry_scorer_xgb.pkl"
         path = Path(path)
-        path.mkdir(parents=True, exist_ok=True)
-        joblib.dump(self.model, path / "entry_scorer_xgb.pkl")
-        joblib.dump(self.scaler, path / "entry_scaler.pkl")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        joblib.dump(self.model, path)
+        joblib.dump(self.scaler, path.with_suffix(".scaler.pkl"))
         meta = {"feature_names": self.feature_names, "params": {k: str(v) for k, v in self.params.items()}}
-        with open(path / "model_manifest.json", "w") as f:
+        with open(path.with_suffix(".json"), "w") as f:
             json.dump(meta, f, indent=2)
 
     @classmethod
-    def load(cls, path: str | Path) -> "CerebusEntryScorer":
+    def load(cls, path: str | Path = None) -> "CerebusEntryScorer":
+        if path is None:
+            path = cls.MODEL_DIR / "entry_scorer_xgb.pkl"
         path = Path(path)
-        with open(path / "model_manifest.json") as f:
+        with open(path.with_suffix(".json")) as f:
             meta = json.load(f)
         inst = cls(params=meta.get("params"))
-        inst.model = joblib.load(path / "entry_scorer_xgb.pkl")
-        inst.scaler = joblib.load(path / "entry_scaler.pkl")
+        inst.model = joblib.load(path)
+        inst.scaler = joblib.load(path.with_suffix(".scaler.pkl"))
         inst.feature_names = meta["feature_names"]
         inst.is_trained = True
         return inst

@@ -133,9 +133,8 @@ class CerebusRegimeClassifier:
 
     def get_feature_importance(self, X_sample: np.ndarray) -> pd.DataFrame:
         """SHAP-based feature importance for audit trail."""
-        X_scaled = self.scaler.transform(X_sample)
         explainer = shap.TreeExplainer(self.model)
-        shap_values = explainer.shap_values(X_scaled)
+        shap_values = explainer.shap_values(X_sample)
 
         # For multi-class, shap_values is a list of arrays (one per class)
         if isinstance(shap_values, list):
