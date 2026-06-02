@@ -111,12 +111,16 @@ class CerebusBayesianOptimizer:
             print(f"  Solution {i+1}: {bp['params']}")
             print(f"    Sharpe*WR={bp['values'][0]:.4f}, PF={bp['values'][1]:.2f}, -DD={bp['values'][2]:.2f}")
 
-        return {
+        result = {
             "asset": self.asset_name,
             "regime": self.regime,
             "pareto_front": best_params,
             "n_trials": self.n_trials,
+            "study": self.study,
         }
+        if best_params:
+            result["best_params"] = best_params[0]["params"]
+        return result
 
     def save_study(self, path: str | Path):
         """Save Optuna study."""
