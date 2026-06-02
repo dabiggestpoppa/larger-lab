@@ -133,19 +133,26 @@ class CerebusRegimeClassifier:
 
     def get_feature_importance(self, X_sample: np.ndarray) -> pd.DataFrame:
         """SHAP-based feature importance for audit trail."""
+        X_scaled = self.scaler.transform(X_sample)
         explainer = shap.TreeExplainer(self.model)
-        shap_values = explainer.shap_values(X_sample)
+        shap_values = explainer.shap_values(X_scaled)
 
-        # For multi-class, average absolute SHAP across classes
+        # For multi-class, shap_values is a list of arrays (one per class)
         if isinstance(shap_values, list):
-            mean_abs_shap = np.mean([np.abs(sv).mean(axis=0) for sv in shap_values], axis=0)
+            mean_abs_shap = np.zeros(len(self.feature_names))
+            for sv in shap_values:
+                if sv.ndim == 2:
+                    mean_abs_shap += np.abs(sv).mean(axis=0)
+            mean_abs_shap /= len(shap_values)
+        elif shap_values.ndim == 2:
+            mean_abs_shap = np.abs(shap_values).mean(axis=0)
         else:
             mean_abs_shap = np.abs(shap_values).mean(axis=0)
 
         importance = pd.DataFrame({
             'feature': self.feature_names,
-            'mean_abs_shap': mean_abs_shap,
-        }).sort_values('mean_abs_shap', ascending=False)
+            'mean_abs_shap': mean_abs_shap.tolist() if hasattr(mean_abs_shap, 'tolist') else list(mean_abs_shap),
+        }).sort_values('mean_abs_shap', ascending=False).reset_index(drop=True)
         importance['rank'] = range(1, len(importance) + 1)
 
         return importance
