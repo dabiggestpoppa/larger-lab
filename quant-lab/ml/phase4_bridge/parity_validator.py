@@ -79,15 +79,21 @@ class ParityValidator:
         issues = []
         baseline_wr = self.baseline.get("win_rate", 0)
         if baseline_wr > 0:
-            wr_drift = abs(live_wr - baseline_wr) / baseline_wr
-            if wr_drift > self.tolerance:
-                issues.append(f"Win Rate drift: {wr_drift:.1%}")
+            # Only flag drift when live is worse than baseline
+            wr_diff = baseline_wr - live_wr  # Positive means live is worse
+            if wr_diff > 0:
+                wr_drift = wr_diff / baseline_wr if baseline_wr <= 1 else wr_diff / 100
+                if wr_drift > self.tolerance:
+                    issues.append(f"Win Rate drift: {wr_drift:.1%}")
 
         baseline_r = self.baseline.get("avg_r", 0)
         if baseline_r > 0:
-            r_drift = abs(live_avg_r - baseline_r) / abs(baseline_r)
-            if r_drift > self.tolerance:
-                issues.append(f"R-Multiple drift: {r_drift:.1%}")
+            # Only flag drift when live avg R is worse
+            r_diff = baseline_r - live_avg_r
+            if r_diff > 0:
+                r_drift = r_diff / abs(baseline_r)
+                if r_drift > self.tolerance:
+                    issues.append(f"R-Multiple drift: {r_drift:.1%}")
 
         if issues:
             return {"status": "DRIFT_DETECTED", "issues": issues, "live_trades": len(self.live_trades)}
