@@ -196,12 +196,16 @@ def extract_asian_ranges(parquet_path: Path, symbol: str,
     # Drop rows with NaN in OHLC
     df_asian = df_asian.dropna(subset=['high', 'low', 'close'])
     
-    # Group by trading day (session date = date of the start of session)
-    df_asian['session_date'] = df_asian.index.date
+    # Group by Asian session: 19:00-03:00 EST
+    # Bars from 19:00-23:59 belong to that day's session
+    # Bars from 00:00-03:00 belong to the PREVIOUS day's session
+    df_asian['session_date'] = df_asian.index.map(
+        lambda x: x.date() if x.hour >= 19 else (x - pd.Timedelta(days=1)).date()
+    )
     
     ranges = []
     for day, group in df_asian.groupby('session_date'):
-        if len(group) < 5:  # Minimum 5 bars for valid range
+        if len(group) < 10:  # Minimum 10 bars for valid range (was 5)
             continue
         
         ar_high = group['high'].max()
