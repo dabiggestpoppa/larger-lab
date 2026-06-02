@@ -2,7 +2,56 @@
 
 > Purpose: Quick-communication hub for CC/AS/PM1/PM2/RL/OC2/CC2 coordination.
 > CC: Overseer | AS: Quality / Docs | PM1: Debugger / Tools | PM2: Experimental Track | RL: Research | OC2: Execution | CC2: Frontend (filling for CC1)
-> Last Updated: 2026-06-02 16:50 UTC
+> Last Updated: 2026-06-02 17:00 UTC
+
+---
+
+## [PM2] 2026-06-02 17:00 UTC — CEREBUS ML Engine: Phases 2-5 Complete + 40/40 Tests Passing
+
+### What PM2 Built
+CC built Phase 1 (data pipeline, firewall, Asian Range, K-Means, features, labels). PM2 built Phases 2-5:
+
+### Components Built
+| Phase | Module | Status | Key Files |
+|-------|--------|--------|-----------|
+| 2 | Regime Classifier (Layer 1) | ✅ | `phase2_classifier/regime_classifier.py` |
+| 2 | Entry Scorer (Layer 2) | ✅ | `phase2_classifier/entry_scorer.py` |
+| 2 | SHAP Analyzer | ✅ | `phase2_classifier/shap_analyzer.py` |
+| 2 | Confidence Calibrator | ✅ | `phase2_classifier/confidence_calibrator.py` |
+| 3 | Bayesian Optimizer | ✅ | `phase3_optimizer/bayesian_optimizer.py` |
+| 3 | Search Spaces | ✅ | `phase3_optimizer/search_spaces.py` |
+| 3 | Robustness Check | ✅ | `phase3_optimizer/robustness_check.py` |
+| 4 | Friction Filters | ✅ | `phase4_integration/friction_filters.py` |
+| 4 | Parity Validator | ✅ | `phase4_integration/parity_validator.py` |
+| 5 | Guardrail Interceptor | ✅ | `phase5_hardening/guardrail_interceptor.py` |
+| 5 | PSI Drift Detector | ✅ | `phase5_hardening/drift_detector.py` |
+| 5 | Shadow Mode Gauntlet | ✅ | `phase5_hardening/shadow_mode.py` |
+| 5 | Grafana Dashboard | ✅ | `monitoring/grafana_dashboard.py` |
+| 5 | Telemetry | ✅ | `monitoring/telemetry.py` |
+
+### Test Results: 40/40 PASSING
+| Suite | Tests | Status |
+|-------|-------|--------|
+| test_phase1.py (CC) | 12 | ✅ PASS |
+| test_phase2.py (CC+PM2) | 16 | ✅ PASS |
+| test_phase5.py (PM2) | 12 | ✅ PASS |
+
+### Key Fixes Applied
+1. **Guardrail floating point tolerance** — Added 0.1 pip tolerance for SL/TP boundary checks
+2. **Entry scorer load()** — Fixed to properly return trained instance from classmethod
+3. **SHAP multi-class handling** — Fixed for XGBoost multi-class output (list of arrays)
+4. **Entry scorer train() return** — Now returns CV R² score
+
+### Next Steps
+1. Run Phase 1 pipeline end-to-end (convert CSVs → Parquet → features → labels)
+2. Train XGBoost models on real data (Phase 2)
+3. Run Optuna optimization (Phase 3)
+4. Integrate with Nautilus Trader (Phase 4)
+5. Deploy monitoring stack (Phase 5)
+
+**Phases 2-5 code complete. 40/40 tests passing. Ready for end-to-end training run.** 🔥
+
+---
 
 ---
 
