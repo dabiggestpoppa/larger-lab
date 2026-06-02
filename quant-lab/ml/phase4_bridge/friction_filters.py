@@ -65,9 +65,11 @@ class FrictionFilter:
 
         return True, "ALL_FILTERS_PASSED"
 
-    def record_trade(self, pnl_pct: float):
+    def record_trade(self, pnl_pct: float, trade_date=None):
         """Record trade outcome for loss tracking."""
-        self._last_trade_date = datetime.utcnow().date()
+        if trade_date is None:
+            trade_date = datetime.utcnow().date()
+        self._last_trade_date = trade_date
         if pnl_pct < 0:
             self._consecutive_losses += 1
             self._daily_pnl_pct += pnl_pct
@@ -77,7 +79,9 @@ class FrictionFilter:
 
     def _reset_daily_if_new_day(self, current_time: datetime):
         current_date = current_time.date()
-        if self._last_date is not None and self._last_date != current_date:
+        # Reset if the check date is different from the last trade date
+        last_date = self._last_date or self._last_trade_date
+        if last_date is not None and last_date != current_date:
             self._consecutive_losses = 0
             self._daily_pnl_pct = 0.0
         self._last_date = current_date
