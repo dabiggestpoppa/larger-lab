@@ -76,7 +76,11 @@ class FrictionFilter:
 
     def _reset_daily_if_new_day(self, current_time: datetime):
         current_date = current_time.date()
-        if self._last_date is not None and self._last_date != current_date:
+        if self._last_date is None:
+            # First call — reset any accumulated state (assumed from previous day)
+            self._consecutive_losses = 0
+            self._daily_pnl_pct = 0.0
+        elif self._last_date != current_date:
             self._consecutive_losses = 0
             self._daily_pnl_pct = 0.0
         self._last_date = current_date
