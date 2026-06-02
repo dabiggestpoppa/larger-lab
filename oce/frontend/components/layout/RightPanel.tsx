@@ -6,8 +6,11 @@ import { useUIStore } from "@/stores/uiStore";
 import ConsensusPanel from "../panels/ConsensusPanel";
 import SpawnPanel from "../panels/SpawnPanel";
 import LearningPanel from "../panels/LearningPanel";
+import RegimePanel from "../panels/RegimePanel";
+import EntryQualityPanel from "../panels/EntryQualityPanel";
+import ParameterOverlay from "../panels/ParameterOverlay";
 
-type Layer3Tab = "consensus" | "spawn" | "learning";
+type Layer3Tab = "consensus" | "spawn" | "learning" | "ml";
 
 export default function RightPanel() {
   const { nodes, selectedObserverId, selectObserver } = useTopologyStore();
@@ -23,7 +26,7 @@ export default function RightPanel() {
         style={{ width: "var(--right-panel-width, 280px)" }}
       >
         <div className="flex border-b border-[var(--border-subtle)]">
-          {(["consensus", "spawn", "learning"] as const).map((tab) => (
+          {(["consensus", "spawn", "learning", "ml"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -41,6 +44,7 @@ export default function RightPanel() {
           {activeTab === "consensus" && <ConsensusPanel />}
           {activeTab === "spawn" && <SpawnPanel />}
           {activeTab === "learning" && <LearningPanel />}
+          {activeTab === "ml" && <MlTabContent />}
         </div>
       </aside>
     );
@@ -109,5 +113,36 @@ export default function RightPanel() {
         </div>
       )}
     </aside>
+  );
+}
+
+/* ─── ML Tab Content ──────────────────────────────────────────────────────── */
+
+function MlTabContent() {
+  const [mlSubTab, setMlSubTab] = useState<"regime" | "quality" | "params">("regime");
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex border-b border-[var(--border-subtle)]">
+        {(["regime", "quality", "params"] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setMlSubTab(tab)}
+            className={`flex-1 px-2 py-1.5 text-[9px] font-mono uppercase tracking-wider transition-colors ${
+              mlSubTab === tab
+                ? "bg-[var(--bg-tertiary)] text-[var(--accent-primary)] border-b border-[var(--accent-primary)]"
+                : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+      <div className="flex-1 overflow-y-auto">
+        {mlSubTab === "regime" && <RegimePanel />}
+        {mlSubTab === "quality" && <EntryQualityPanel />}
+        {mlSubTab === "params" && <ParameterOverlay />}
+      </div>
+    </div>
   );
 }
