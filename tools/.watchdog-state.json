@@ -1,10 +1,20 @@
 {
   "restarts": {
-    "OC2": 5
+    "Telegram-Gateway": 5,
+    "OC2": 5,
+    "Hermes": 5,
+    "OCE-Backend": 5,
+    "OCE-Frontend": 5,
+    "Sniper-Dashboard": 5,
+    "SRRA-OPH": 5
   },
   "last_restart": {
-    "OC2": 1780365016.3137317,
-    "Hermes": 1780358413.8564832,
-    "OCE-Backend": 1780290374.2494447
+    "OC2": 1780392033.9952905,
+    "Hermes": 1780392046.1418974,
+    "OCE-Backend": 1780392058.2941797,
+    "Telegram-Gateway": 1780391903.7917488,
+    "OCE-Frontend": 1780392062.8837447,
+    "Sniper-Dashboard": 1780392066.9768238,
+    "SRRA-OPH": 1780392071.0437043
   }
 }

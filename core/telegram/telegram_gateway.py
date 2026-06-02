@@ -4,10 +4,25 @@ This is a lightweight polling-based gateway intended as a runnable stub
 for development and integration with the ObserverConversationRuntime.
 """
 import os
+import sys
 import time
 import threading
+import logging
 import requests
 from typing import Callable, Optional, Dict, Any
+
+# Ensure logs directory exists
+_log_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "logs")
+os.makedirs(_log_dir, exist_ok=True)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(name)s] %(levelname)s: %(message)s",
+    handlers=[
+        logging.FileHandler(os.path.join(_log_dir, "telegram_gateway.log"), encoding="utf-8"),
+        logging.StreamHandler(sys.stdout),
+    ]
+)
+logger = logging.getLogger("telegram.gateway")
 
 
 class TelegramGateway:
@@ -35,26 +50,38 @@ class TelegramGateway:
 
     def send_message(self, chat_id: int, text: str) -> Dict[str, Any]:
         try:
-            r = requests.post(f"{self.api_url}/sendMessage", json={"chat_id": chat_id, "text": text})
+            logger.info(f"Sending message to chat {chat_id} ({len(text)} chars)")
+            r = requests.post(f"{self.api_url}/sendMessage", json={"chat_id": chat_id, "text": text}, timeout=15)
             r.raise_for_status()
-            return r.json()
+            result = r.json()
+            if result.get("ok"):
+                logger.info(f"Message sent successfully to chat {chat_id}")
+            else:
+                logger.error(f"Telegram API error: {result}")
+            return result
         except Exception as e:
+            logger.error(f"Failed to send message: {e}")
             return {"ok": False, "error": str(e)}
 
     def _poll_loop(self, handler: Callable[[Dict[str, Any]], None]):
         self._running = True
+        logger.info("Polling loop started")
         while self._running:
-            updates = self._get_updates(timeout=10)
-            for u in updates:
-                try:
-                    self._offset = u["update_id"] + 1
-                except Exception:
-                    pass
-                try:
-                    handler(u)
-                except Exception:
-                    pass
+            try:
+                updates = self._get_updates(timeout=10)
+                for u in updates:
+                    try:
+                        self._offset = u["update_id"] + 1
+                    except Exception:
+                        pass
+                    try:
+                        handler(u)
+                    except Exception as e:
+                        logger.error(f"Handler error: {e}", exc_info=True)
+            except Exception as e:
+                logger.error(f"Poll loop error: {e}", exc_info=True)
             time.sleep(self.poll_interval)
+        logger.info("Polling loop stopped")
 
     def start(self, handler: Callable[[Dict[str, Any]], None], background: bool = True):
         if background:

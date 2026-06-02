@@ -49,6 +49,33 @@ class Handler(SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(body)
             return
+
+        # Proxy SSE stream from po_sse server
+        if self.path == '/stream':
+            try:
+                req = urllib.request.Request('http://127.0.0.1:8780/stream')
+                with urllib.request.urlopen(req, timeout=30) as r:
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'text/event-stream')
+                    self.send_header('Cache-Control', 'no-cache')
+                    self.send_header('Connection', 'keep-alive')
+                    self.end_headers()
+                    # Stream chunks
+                    while True:
+                        chunk = r.read(4096)
+                        if not chunk:
+                            break
+                        self.wfile.write(chunk)
+                        self.wfile.flush()
+            except Exception as e:
+                self.send_response(502)
+                self.send_header('Content-Type', 'text/plain')
+                msg = f'SSE proxy error: {e}'.encode('utf-8')
+                self.send_header('Content-Length', str(len(msg)))
+                self.end_headers()
+                self.wfile.write(msg)
+            return
+
         return super().do_GET()
 
 if __name__ == '__main__':

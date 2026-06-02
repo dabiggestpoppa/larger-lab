@@ -189,27 +189,34 @@ def place_order(is_short, sl_price, tp_price, entry_price):
         dir_str = "SHORT" if is_short else "LONG"
         log(f"ORDER: {label} CASCADE {dir_str} @ {oprice:.5f} SL={sl_r:.5f} TP={tp_r:.5f}")
 
-        req = {
-            "action": act, "symbol": SYMBOL, "volume": PARAMS["LotSize"],
-            "type": otype, "price": oprice, "sl": sl_r, "tp": tp_r,
-            "magic": PARAMS["MagicNumber"], "comment": f"P90_CASCADE_{dir_str}",
-        }
-        if act == mt5.TRADE_ACTION_PENDING:
-            req["type_filling"] = mt5.ORDER_FILLING_RETURN
-        else:
-            req["deviation"] = 10
-            req["type_filling"] = mt5.ORDER_FILLING_IOC
+        # ── Try filling modes in order: IOC → RETURN → FOK ────────────
+        filling_modes = [mt5.ORDER_FILLING_IOC, mt5.ORDER_FILLING_RETURN, mt5.ORDER_FILLING_FOK]
+        result = None
+        for fill_mode in filling_modes:
+            req = {
+                "action": act, "symbol": SYMBOL, "volume": PARAMS["LotSize"],
+                "type": otype, "price": oprice, "sl": sl_r, "tp": tp_r,
+                "magic": PARAMS["MagicNumber"], "comment": f"P90_CASCADE_{dir_str}",
+                "type_filling": fill_mode,
+            }
+            if act == mt5.TRADE_ACTION_DEAL:
+                req["deviation"] = 10
 
-        result = mt5.order_send(req)
-        if result is None:
-            log("ERROR: order_send returned None")
-            return None
-        if result.retcode in (mt5.TRADE_RETCODE_DONE, mt5.TRADE_RETCODE_PLACED):
-            log(f"ORDER PLACED: CASCADE {dir_str} @ {oprice:.5f} ticket={result.order}")
-            return result
-        else:
-            log(f"ORDER FAILED: retcode={result.retcode} comment={result.comment}")
-            return None
+            result = mt5.order_send(req)
+            if result is None:
+                log(f"ERROR: order_send returned None (filling={fill_mode})")
+                continue
+            if result.retcode in (mt5.TRADE_RETCODE_DONE, mt5.TRADE_RETCODE_PLACED):
+                log(f"ORDER PLACED: CASCADE {dir_str} @ {oprice:.5f} ticket={result.order} (filling={fill_mode})")
+                return result
+            log(f"ORDER FAILED: retcode={result.retcode} comment={result.comment} (filling={fill_mode})")
+            # If it's a filling mode error, try next; otherwise stop
+            if result.retcode == mt5.TRADE_RETCODE_INVALID_FILL:
+                continue
+            break
+
+        log(f"ORDER FAILED: all filling modes exhausted for {dir_str} @ {oprice:.5f}")
+        return None
     except Exception as e:
         log(f"place_order ERROR: {traceback.format_exc()}")
         return None
@@ -221,13 +228,22 @@ def close_position(pos, reason="MANUAL"):
     tick = mt5.symbol_info_tick(SYMBOL)
     price = tick.ask if is_short else tick.bid
     digits = PARAMS["Digits"]
-    request = {
-        "action": mt5.TRADE_ACTION_DEAL, "symbol": SYMBOL, "volume": pos.volume,
-        "type": order_type, "price": round(price, digits), "position": pos.ticket,
-        "deviation": 10, "magic": PARAMS["MagicNumber"],
-        "comment": f"P90_CASCADE_{reason}", "type_filling": mt5.ORDER_FILLING_IOC,
-    }
-    result = mt5.order_send(request)
+    # ── Try filling modes: IOC → RETURN → FOK ──────────────────────────
+    filling_modes = [mt5.ORDER_FILLING_IOC, mt5.ORDER_FILLING_RETURN, mt5.ORDER_FILLING_FOK]
+    result = None
+    for fill_mode in filling_modes:
+        request = {
+            "action": mt5.TRADE_ACTION_DEAL, "symbol": SYMBOL, "volume": pos.volume,
+            "type": order_type, "price": round(price, digits), "position": pos.ticket,
+            "deviation": 10, "magic": PARAMS["MagicNumber"],
+            "comment": f"P90_CASCADE_{reason}", "type_filling": fill_mode,
+        }
+        result = mt5.order_send(request)
+        if result and result.retcode in (mt5.TRADE_RETCODE_DONE, mt5.TRADE_RETCODE_PLACED):
+            break
+        log(f"CLOSE FAILED (filling={fill_mode}): {result.retcode if result else 'None'}")
+        if result and result.retcode != mt5.TRADE_RETCODE_INVALID_FILL:
+            break
     if result and result.retcode in (mt5.TRADE_RETCODE_DONE, mt5.TRADE_RETCODE_PLACED):
         pnl_pips = round(price_to_pips((pos.price_open - price) if is_short else (price - pos.price_open)) - PARAMS["SpreadPips"], 1)
         log(f"CLOSED: {reason} PnL={pnl_pips:+.1f}p ticket={pos.ticket}")
@@ -394,17 +410,19 @@ def run_loop(interval_seconds=30):
     log("P90 CASCADE ONLY — INITIAL variant skipped | Engine persistent across scans")
     log("=" * 60)
 
-    if not mt5.initialize():
-        log("FATAL: Cannot initialize MT5")
-        sys.exit(1)
+    # ─── MT5 Self-Healing Init ───────────────────────────────────────────
+    mt5_ok = mt5.initialize()
+    if not mt5_ok:
+        log("MT5 init failed — will retry in loop (self-heal)")
 
-    acct = mt5.account_info()
+    acct = mt5.account_info() if mt5_ok else None
     if acct:
         log(f"Account: {acct.login} | Balance: ${acct.balance:.2f} | Server: {acct.server}")
 
-    info = get_symbol_info()
-    if info:
-        log(f"Spread: {PARAMS['SpreadPips']:.1f} pips")
+    if mt5_ok:
+        info = get_symbol_info()
+        if info:
+            log(f"Spread: {PARAMS['SpreadPips']:.1f} pips")
 
     log(f"Scanning every {interval_seconds}s | Max {PARAMS['MaxDailyTrades']} trade(s)/day")
     log("=" * 60)
@@ -413,10 +431,29 @@ def run_loop(interval_seconds=30):
         cycle = 0
         daily_trade_count = 0
         last_trade_date = None
+        last_mt5_check = time.time()
         log("LOOP STARTED")
 
         while True:
             cycle += 1
+
+            # ── MT5 Health Check (every 120s) ───────────────────────────────
+            if time.time() - last_mt5_check > 120:
+                try:
+                    ai = mt5.account_info()
+                    if ai is None:
+                        log("⚠ MT5 connection lost — reconnecting...")
+                        mt5.shutdown()
+                        time.sleep(2)
+                        if mt5.initialize():
+                            log("✅ MT5 reconnected")
+                        else:
+                            log("❌ MT5 reconnect failed — will retry next cycle")
+                    last_mt5_check = time.time()
+                except Exception as recon_err:
+                    log(f"MT5 health check error: {recon_err} — will retry")
+                    last_mt5_check = time.time()
+
             current_est_date = (datetime.utcnow() + timedelta(hours=PARAMS["ESTOffset"])).date()
             if current_est_date != last_trade_date:
                 reset_engine()

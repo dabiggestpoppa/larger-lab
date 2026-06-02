@@ -68,6 +68,27 @@ SERVICES = {
         "log": r"C:\Users\wifik\AppData\Local\Temp\openclaw\watchdog-sniper.log",
         "cwd": r"C:\Users\wifik\Desktop\projects\larger-lab\sniper-dashboard",
     },
+    "SRRA-OPH": {
+        "port": 8001,
+        "cmd": [
+            "uvicorn", "srrs_opc.frontend.api_server:app",
+            "--host", "0.0.0.0", "--port", "8001"
+        ],
+        "log": r"C:\Users\wifik\AppData\Local\Temp\openclaw\watchdog-srra-oph.log",
+        "cwd": r"C:\Users\wifik\Desktop\projects\larger-lab",
+        "env": {"PYTHONIOENCODING": "utf-8"},
+    },
+    "Telegram-Gateway": {
+        "port": 0,  # No port — process-based check only
+        "cmd": [
+            r"C:\Users\wifik\Desktop\projects\larger-lab\.venv\Scripts\python.exe",
+            r"C:\Users\wifik\Desktop\projects\larger-lab\scripts\start_telegram_gateway.py"
+        ],
+        "log": r"C:\Users\wifik\AppData\Local\Temp\openclaw\watchdog-telegram.log",
+        "cwd": r"C:\Users\wifik\Desktop\projects\larger-lab",
+        "env": {"PYTHONIOENCODING": "utf-8", "TELEGRAM_TOKEN": "8951584547:AAEzC-suY_uS9bOvD9kAfhpnwHVw8hvbs9I"},
+        "process_check": "start_telegram_gateway",
+    },
 }
 
 CHECK_INTERVAL = 30       # seconds between health checks
@@ -255,15 +276,32 @@ def is_oc2_responsive():
 def check_and_restart(name, config, state):
     """Check a service and restart if needed. Returns True if healthy."""
     port = config["port"]
-    
-    if is_port_listening(port):
+
+    # Process-based check (for services without a port, e.g. Telegram gateway)
+    if config.get("process_check"):
+        proc_name = config["process_check"]
+        try:
+            result = subprocess.run(
+                ["powershell", "-Command",
+                 f"Get-Process python -EA 0 | Where-Object {{ (Get-CimInstance Win32_Process -Filter 'ProcessId = $($_.Id)').CommandLine -match '{proc_name}' }} | Select-Object Id"],
+                capture_output=True, text=True, timeout=10
+            )
+            if result.stdout.strip():
+                return True
+        except Exception:
+            pass
+        log(f"Process '{proc_name}' NOT FOUND — {name} is DOWN", name)
+    elif port > 0 and is_port_listening(port):
         # For OC2, also check responsiveness (not just port)
         if config.get("stuck_check") and not is_oc2_responsive():
             log(f"{name} port {port} is listening but NOT RESPONSIVE — restarting", name)
         else:
             return True
-    
-    log(f"Port {port} NOT LISTENING — {name} is DOWN", name)
+    elif port == 0:
+        return True  # No port, no process_check — skip
+
+    if port > 0:
+        log(f"Port {port} NOT LISTENING — {name} is DOWN", name)
     
     # Circuit breaker: don't restart too frequently
     now = time.time()

@@ -1,11 +1,11 @@
 {
-  "engine": "SymmetryTrap",
+  "engine": "P90",
   "symbol": "CHFJPY.PRO",
-  "direction": "BUY",
-  "entry": 202.933,
-  "sl": 203.016,
-  "tp": 203.083,
-  "event": "SL_HIT",
-  "loop": 1,
-  "time": "2026-06-01 20:11:00"
+  "direction": "SELL",
+  "entry": 203.46,
+  "sl": 203.33064000000002,
+  "tp": 203.56225,
+  "event": "EWS_EXIT",
+  "variant": "EWS",
+  "time": "2026-06-02 08:31:00"
 }
