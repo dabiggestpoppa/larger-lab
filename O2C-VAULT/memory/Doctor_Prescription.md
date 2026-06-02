@@ -1,0 +1,143 @@
+# Doctor Prescription
+
+> Category: memory | Imported: 2026-06-02 01:13 UTC
+
+Tags: #memory
+
+# OWL DOCTOR PRESCRIPTION
+
+**Generated:** 2026-05-26 14:00 UTC (Updated)
+**Status:** RESOLVED - All critical issues fixed or outdated
+
+---
+
+## Resolved Issues
+
+### 1. Embedded run aborted (surface error) (x2) - RESOLVED
+- **Original Fix:** Add fallback models to config
+- **Status:** OC2 config stabilized (openrouter/owl-alpha primary, deepseek backup)
+
+### 2. Agent session stalled (x1) - RESOLVED
+- **Original Fix:** Clear stuck sessions
+- **Status:** All agents responding normally
+
+### 3. Tool execution failed (x10) - RESOLVED
+- **Root Cause:** Windows cp1252 encoding + stale terminals
+- **Fix Applied:** PYTHONIOENCODING=utf-8 + terminal cleanup at session start
+
+---
+
+## Current System Health (2026-05-26)
+
+| Component | Status |
+|-----------|--------|
+| OCE Backend | 1403 tests passing |
+| SRRA-OPH Backend | 57 tests passing |
+| OCE Frontend (:3000) | Running |
+| SRRA-OPH Frontend (:3001) | Running |
+| API Server (:8001) | Running |
+| Progress Sync | Running (dedup fix applied) |
+| Agent Memory Files | Trimmed (480+ lines removed each) |
+| Team Chat | Trimmed (759 -> 93 lines) |
+
+---
+
+## Pending Operator Decisions
+
+1. **11.1-B 72h Test** - PAUSED at checkpoint 7. Drift fix applied. Awaiting run command to resume.
+2. **11.5 Orchestration Stability** - Queued (7-day test, needs 11.1-B complete first)
+
+LINKS:
+[[System Architecture]]
+[[V3 Cognitive Field]]
+[[Agents]]
+[[Operator Rules]]
+[[2026 05 17]]
+[[2026 05 18]]
+[[2026 05 20]]
+[[2026 05 21]]
+[[2026 05 30]]
+[[2026 05 30 Evening]]
+[[2026 05 30 Nautilus Fix]]
+[[2026 05 31]]
+[[2026 06 01]]
+[[Active Strategies Performance]]
+[[Agent Topology]]
+[[Api Execution Architecture 20260531]]
+[[Api Reference Summary]]
+[[Api Test Note]]
+[[Backtest Campaign Status 20260531]]
+[[Backtest Campaign V3 Results]]
+[[Backtest Phase Status]]
+[[Build Patterns]]
+[[Build Progress 20260531]]
+[[Cc Phase 01 Build Certification Report]]
+[[Cerebus Nt8 Deployment Campaign 20260531]]
+[[Daily Runtime 20260531]]
+[[Dashboard Build Complete]]
+[[Errors And Solutions]]
+[[Executor Crash 20260531]]
+[[Failure Index Oc2]]
+[[Foundational Principles]]
+[[Hermes Agent Activation Note]]
+[[Hermes Agent Test]]
+[[Hermes Agent Test Note]]
+[[Hermes Obsidian Test   Vault Working]]
+[[Journal 20260602T004840Z Command Graph]]
+[[Journal 20260602T004840Z Command Help]]
+[[Journal 20260602T004840Z Command Status]]
+[[Journal 20260602T004840Z Command Sync]]
+[[Journal 20260602T004840Z Graph Summary]]
+[[Journal 20260602T004840Z Sync]]
+[[Journal 20260602T004841Z Conversation]]
+[[Journal 20260602T004841Z Report]]
+[[Journal 20260602T004841Z Report Oc2 20260602004841]]
+[[Journal 20260602T005953Z Command Report]]
+[[Journal 20260602T005953Z Command Spawn]]
+[[Journal 20260602T005953Z Command Status]]
+[[Journal 20260602T005953Z Command Task]]
+[[Journal 20260602T005953Z Orchestrated Spawn]]
+[[Journal 20260602T005953Z Spawn Research]]
+[[Journal 20260602T005953Z Task Create]]
+[[Journal 20260602T005953Z Task Update]]
+[[Keyerror Data Validation 20260531 0245]]
+[[Live Deployment Status]]
+[[Master Plan Assessment 20260531]]
+[[Module Guide Summary]]
+[[O2C Pipeline]]
+[[Observer Core O1 O7]]
+[[Obsidian Vault Connection Info]]
+[[Oc2 Gateway Failures]]
+[[Oc2 Identity]]
+[[Oc2 Vault Access Guide]]
+[[Ontology Core Summary]]
+[[Operational State 20260531]]
+[[Option A Confirmed 20260531]]
+[[Pm2 Test Note]]
+[[Progress]]
+[[Python Vs Nautilus Tradecount Investigation 20260601]]
+[[Quantlab Bible]]
+[[Sage Audit 20260531 Environment Utilization]]
+[[Sage Audit 20260531 Environment Utilization V2]]
+[[Sage Audit Environment Utilization]]
+[[Self Heal Report]]
+[[Session 20260531 2200]]
+[[Session Testagent 20260531 0245]]
+[[Session Testagent 20260531 0245 Full]]
+[[Srra Oph]]
+[[Task Flow]]
+[[Team Phase01 Status]]
+[[Team Roster]]
+[[Test Note]]
+[[Test Pattern]]
+[[Track A Build Complete 20260531]]
+[[Track A Build Status]]
+[[Track A Ninjascript Build 20260531]]
+[[Tradovate Api Discovery 20260531]]
+[[Vault Distillation 20260531 0245]]
+[[Welcome]]
+[[Cal]]
+[[Server]]
+[[System]]
+[[Memory]]
+[[Team Chat]]

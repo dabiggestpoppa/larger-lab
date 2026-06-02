@@ -307,6 +307,8 @@ class SymbolState:
         self.p90_initial_today = 0
         self.p90_cascade_today = 0
         self.p90_last_exit_time = None
+        self.cascade_bias = None  # P90 cascade direction for ST loop 2+ bypass
+        self.loop_start_time = None  # 4h loop timeout
 
         # Current date for session reset
         self.current_date = None
@@ -361,6 +363,8 @@ class SymbolState:
         self.p90_initial_today = 0
         self.p90_cascade_today = 0
         self.p90_last_exit_time = None
+        self.cascade_bias = None  # P90 cascade direction for ST loop 2+ bypass
+        self.loop_start_time = None  # 4h loop timeout
 
     def advance_st_loop(self, new_origin: float):
         """After ST exit, reset state machine, preserve/increment loop."""
@@ -379,6 +383,7 @@ class SymbolState:
         self.st_tp = 0.0
 
     def advance_p90_variant(self):
+        self.cascade_bias = self.p90_direction  # Feed to ST cascade bypass
         """After P90 exit, reset to SEARCH_P90."""
         self.p90_state = "SEARCH_P90"
         self.p90_entry = 0.0
@@ -529,7 +534,15 @@ class SymbolState:
         au_penetrated = pullback_pips >= self.au_pips
         fib_ok = min_retrace <= retrace_pct <= max_retrace
 
-        if au_penetrated or fib_ok:
+        # Cascade P90 Bypass (loop 2+)
+        cascade_bypass = False
+        if (self.st_loop >= 2 and retrace_pct < min_retrace
+                and self.cascade_bias is not None
+                and self.cascade_bias == self.impulse_direction):
+            cascade_bypass = True
+
+
+        if au_penetrated or fib_ok or cascade_bypass:
             self.st_state = "WAIT_OCC"
             logging.info("[%s] DZ penetrated: pullback=%.1fp retrace=%.3f loop=%d",
                          self.symbol, pullback_pips, retrace_pct, self.st_loop)

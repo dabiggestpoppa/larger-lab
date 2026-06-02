@@ -1,0 +1,11 @@
+{
+  "engine": "SymmetryTrap",
+  "symbol": "GBPJPY.PRO",
+  "direction": "BUY",
+  "entry": 214.768,
+  "sl": 214.812,
+  "tp": 214.918,
+  "event": "SL_HIT",
+  "loop": 2,
+  "time": "2026-06-01 17:52:00"
+}

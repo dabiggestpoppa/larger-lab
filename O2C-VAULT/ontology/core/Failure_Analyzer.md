@@ -1,0 +1,396 @@
+# Failure Analyzer
+
+> Category: ontology | Imported: 2026-06-02 01:13 UTC
+
+Tags: #ontology #python #core
+
+```python
+"""
+O-4-B5: FailureAnalyzer
+========================
+Studies why orchestration failed.
+
+Analyzes traces to identify root causes of failures including
+routing issues, entropy collapse, topology instability, and
+repair saturation.
+"""
+
+from __future__ import annotations
+
+import json
+import logging
+from collections import defaultdict
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+logger = logging.getLogger("core.learning.failure_analyzer")
+
+
+@dataclass
+class FailurePattern:
+    """A pattern of failure extracted from traces."""
+    pattern_id: str
+    failure_type: str  # "routing", "entropy", "topology", "repair"
+    root_cause: str
+    frequency: int
+    first_seen: str
+    last_seen: str
+    context: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
+class FailureReport:
+    """Analysis report for a failed orchestration."""
+    trace_id: str
+    timestamp: str
+    failure_type: str
+    root_cause: str
+    recommendations: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
+
+
+class FailureAnalyzer:
+    """
+    Analyzes orchestration failures to identify root causes.
+    
+    Examines failed traces for patterns: routing errors,
+    entropy spikes, topology instability, resource exhaustion.
+    """
+
+    FAILURE_TYPES = [
+        "routing_error",
+        "entropy_collapse",
+        "topology_instability",
+        "resource_exhaustion",
+        "timeout",
+        "model_error",
+        "boundary_violation",
+    ]
+
+    def __init__(self, storage_path: str = ""):
+        self._failures: List[FailurePattern] = []
+        self._storage_path = Path(storage_path) if storage_path else None
+
+    def analyze(self, trace: dict[str, Any]) -> FailureReport:
+        """Analyze a failed trace and produce a failure report."""
+        trace_id = trace.get("trace_id", "unknown")
+        errors = trace.get("errors", [])
+        task_type = trace.get("task_type", "unknown")
+
+        failure_type = self._classify_failure(trace, errors)
+        root_cause = self._identify_root_cause(trace, errors, failure_type)
+        recommendations = self._generate_recommendations(failure_type, root_cause)
+
+        return FailureReport(
+            trace_id=trace_id,
+            timestamp=datetime.now(timezone.utc).isoformat(),
+            failure_type=failure_type,
+            root_cause=root_cause,
+            recommendations=recommendations,
+            metadata={"task_type": task_type, "error_count": len(errors)},
+        )
+
+    def analyze_trace(self, trace: Dict[str, Any]) -> Optional[FailurePattern]:
+        """Analyze a single trace for failure patterns."""
+        if trace.get("status") != "failed" and trace.get("outcome") != "failure":
+            return None
+
+        # Determine failure type from trace metadata
+        error_type = trace.get("error_type", "")
+        context = trace.get("context", {})
+
+        failure_type = "routing"  # default
+        root_cause = "unknown"
+
+        if "entropy" in error_type.lower() or "entropic" in str(context).lower():
+            failure_type = "entropy"
+            root_cause = "entropy collapse during execution"
+        elif "topology" in error_type.lower() or "topology" in str(context).lower():
+            failure_type = "topology"
+            root_cause = "topology instability detected"
+        elif "repair" in error_type.lower() or "saturation" in str(context).lower():
+            failure_type = "repair"
+            root_cause = "repair saturation exceeded"
+
+        pattern = FailurePattern(
+            pattern_id=f"fail_{len(self._failures) + 1}",
+            failure_type=failure_type,
+            root_cause=root_cause,
+            frequency=1,
+            first_seen=trace.get("timestamp", datetime.now(timezone.utc).isoformat()),
+            last_seen=trace.get("timestamp", datetime.now(timezone.utc).isoformat()),
+            context=context,
+        )
+        self._failures.append(pattern)
+        return pattern
+
+    def _classify_failure(self, trace: dict[str, Any], errors: list[str]) -> str:
+        """Classify the type of failure."""
+        error_text = " ".join(errors).lower()
+        if "timeout" in error_text or trace.get("status") == "timeout":
+            return "timeout"
+        if "routing" in error_text or "route" in error_text:
+            return "routing_error"
+        if "entropy" in error_text:
+            return "entropy_collapse"
+        if "topology" in error_text:
+            return "topology_instability"
+        if "resource" in error_text or "exhaust" in error_text:
+            return "resource_exhaustion"
+        if "boundary" in error_text or "permission" in error_text:
+            return "boundary_violation"
+        if "model" in error_text or "api" in error_text:
+            return "model_error"
+        return "unknown"
+
+    def _identify_root_cause(self, trace: dict[str, Any], errors: list[str], failure_type: str) -> str:
+        """Identify the root cause of the failure."""
+        causes = {
+            "timeout": "Operation exceeded time limit",
+            "routing_error": "Task routed to inappropriate observer/model",
+            "entropy_collapse": "System entropy exceeded stable threshold",
+            "topology_instability": "Topology changes during execution",
+            "resource_exhaustion": "Token or turn budget exhausted",
+            "boundary_violation": "Agent attempted out-of-scope operation",
+            "model_error": "Model API returned error or invalid response",
+        }
+        return causes.get(failure_type, "Unknown root cause")
+
+    def _generate_recommendations(self, failure_type: str, root_cause: str) -> list[str]:
+        """Generate recommendations based on failure analysis."""
+        recs = {
+            "timeout": ["Increase timeout for complex tasks", "Break task into smaller subtasks"],
+            "routing_error": ["Review routing consensus weights", "Add task-specific routing rules"],
+            "entropy_collapse": ["Reduce concurrent operations", "Enable entropy dampening"],
+            "topology_instability": ["Stale topology snapshot — refresh before routing"],
+            "resource_exhaustion": ["Reduce context size", "Optimize token usage"],
+            "boundary_violation": ["Tighten execution boundaries", "Review tool scope"],
+            "model_error": ["Enable model failover", "Add retry logic"],
+        }
+        return recs.get(failure_type, ["Review trace for manual analysis"])
+
+    def get_failure_patterns(self, failure_type: Optional[str] = None) -> List[FailurePattern]:
+        """Get all failure patterns, optionally filtered by type."""
+        if failure_type:
+            return [f for f in self._failures if f.failure_type == failure_type]
+        return self._failures
+
+    def get_stats(self) -> dict[str, Any]:
+        """Get failure analysis statistics."""
+        by_type: Dict[str, int] = defaultdict(int)
+        for f in self._failures:
+            by_type[f.failure_type] += 1
+        return {
+            "total_failures": len(self._failures),
+            "by_type": dict(by_type),
+        }
+
+    def save(self) -> None:
+        """Persist failure patterns to disk."""
+        if self._storage_path:
+            self._storage_path.parent.mkdir(parents=True, exist_ok=True)
+            data = {
+                "failures": [
+                    {
+                        "pattern_id": f.pattern_id,
+                        "failure_type": f.failure_type,
+                        "root_cause": f.root_cause,
+                        "frequency": f.frequency,
+                        "first_seen": f.first_seen,
+                        "last_seen": f.last_seen,
+                        "context": f.context,
+                    }
+                    for f in self._failures
+                ],
+            }
+            self._storage_path.write_text(json.dumps(data, indent=2))
+
+    def load(self) -> bool:
+        """Load failure patterns from disk."""
+        if not self._storage_path or not self._storage_path.exists():
+            return False
+        try:
+            data = json.loads(self._storage_path.read_text())
+            for f in data.get("failures", []):
+                self._failures.append(FailurePattern(
+                    pattern_id=f["pattern_id"],
+                    failure_type=f["failure_type"],
+                    root_cause=f["root_cause"],
+                    frequency=f["frequency"],
+                    first_seen=f["first_seen"],
+                    last_seen=f["last_seen"],
+                    context=f.get("context", {}),
+                ))
+            return True
+        except Exception as e:
+            logger.error(f"Failed to load failure patterns: {e}")
+            return False
+
+```
+
+LINKS:
+[[Failure Index Oc2]]
+[[Ontology Core Summary]]
+[[Citation Workflow]]
+[[Failures]]
+[[Patterns]]
+[[Server]]
+[[System]]
+[[Usage]]
+[[Asset Configs]]
+[[Convergence Indicator]]
+[[Dmr Standalone Backtest]]
+[[P90 Backtest]]
+[[P90 Count Ews]]
+[[P90 Dmr Backtest]]
+[[P90 Dmr Combo Backtest]]
+[[P90 Dmr Overlay Backtest]]
+[[P90 Engine]]
+[[P90 Engine Dmr]]
+[[P90 Gap Check]]
+[[P90 Trace Trades]]
+[[P90 Usdchf Backtest]]
+[[Run Majors Backtest]]
+[[Run St Multi Asset]]
+[[Run Top5 Backtest Mc]]
+[[St Batch2 Runner]]
+[[St Batch Runner]]
+[[Symmetry Trap]]
+[[Symmetry Trap Backtest]]
+[[Symmetry Trap Monte Carlo]]
+[[Atomic Sym Trap]]
+[[Blind Chain Debug]]
+[[Blind Chain Diag]]
+[[Blind Chain Engine]]
+[[Blind Chain Exact]]
+[[Blind Chain V2 Debug]]
+[[Blind Chain V2 Sl Calibrated]]
+[[Blind Chain V3]]
+[[Cerebus Resolution Engine]]
+[[Constraint Anchor Engine]]
+[[Debug Days]]
+[[Debug One Day]]
+[[Debug St]]
+[[Debug Trace]]
+[[Diag Option B]]
+[[Diag V5]]
+[[Dmr Strategy]]
+[[Dual Engine]]
+[[Naut Asset Config]]
+[[P90 Cfd Expansion Engine]]
+[[P90 Cfd Expansion Engine V2]]
+[[P90 Cfd Expansion Engine V3]]
+[[P90 Cfd Expansion Engine V4]]
+[[P90 Cfd Expansion Engine V5]]
+[[P90 Strategy]]
+[[Shared]]
+[[Stall Harvest Cfd Engine]]
+[[Symmetry Trap Engine]]
+[[Symmetry Trap Exact]]
+[[Symmetry Trap Option B]]
+[[Symmetry Trap Strategy]]
+[[Symmetry Trap V4]]
+[[Symmetry Trap V5]]
+[[Symmetry Trap V6 Exact]]
+[[Symmetry Trap V7B Sl Calibrated]]
+[[Symmetry Trap V7 Sl Calibrated]]
+[[Two Plays Engine]]
+[[Adaptation Engine]]
+[[Agent Lifecycle]]
+[[Agent Spawner]]
+[[Attractor Analysis]]
+[[Autonomous Repair]]
+[[Capability Matcher]]
+[[Complexity Scorer]]
+[[Consensus Memory]]
+[[Consensus Replay]]
+[[Context Injector]]
+[[Continuity Preserver]]
+[[Data Fetcher]]
+[[Dormant State Manager]]
+[[Environmental Monitor]]
+[[Event Schema]]
+[[Execution Boundary]]
+[[Indicators]]
+[[Journal]]
+[[Loader]]
+[[Long Horizon Memory]]
+[[Metrics]]
+[[Model Selector]]
+[[Multi Agent Coordinator]]
+[[Observability Stress]]
+[[Observer Consensus]]
+[[Observer Evolution]]
+[[Observer Persistence]]
+[[Observer Registry]]
+[[Observer Specialization]]
+[[Openrouter Gateway]]
+[[Operational Drift Detect]]
+[[Operational Replay]]
+[[Operational Scoring]]
+[[Passive Awareness]]
+[[Pattern Memory]]
+[[Persistent Runtime]]
+[[Persistent Scheduler]]
+[[Recovery Persistence]]
+[[Routing Consensus]]
+[[Routing Learning]]
+[[Runtime Heartbeat]]
+[[Spawn Blueprint]]
+[[Spawn Planner]]
+[[Spawn Registry]]
+[[Spawn Replay]]
+[[Structural Anchor]]
+[[Synthesizer]]
+[[Task Classifier]]
+[[Temporal Graph]]
+[[Test Journal]]
+[[Test Loader]]
+[[Topology Learning]]
+[[Trace Collector]]
+[[Trace Feedback]]
+[[Workflow Distiller]]
+[[Workflow Memory]]
+[[Autonomous Orchestrator]]
+[[Chat Log]]
+[[Command Router]]
+[[Context Distiller]]
+[[Continuity Memory]]
+[[Event Awareness]]
+[[Graph Traversal]]
+[[Observer Conversation Runtime]]
+[[Observer Lifecycle]]
+[[Observer Session]]
+[[Observer State]]
+[[Pattern Distillation]]
+[[Primary Observer]]
+[[Report Return]]
+[[Runtime Awareness]]
+[[Semantic Retrieval]]
+[[Task Executor]]
+[[Task Intent Analyzer]]
+[[Vault]]
+[[Compressor]]
+[[Error Intelligence]]
+[[Knowledge Importer]]
+[[Linker]]
+[[Live Sync]]
+[[Memory Distiller]]
+[[Note Standard]]
+[[Pattern Crystallizer]]
+[[Taxonomy]]
+[[Test Compressor]]
+[[Test Context Injector]]
+[[Test Error Intelligence]]
+[[Test Linker]]
+[[Test Memory Distiller]]
+[[Test Note Standard]]
+[[Test Pattern Crystallizer]]
+[[Test Taxonomy]]
+[[Test Vault Writer]]
+[[Vault Writer]]
+[[Interpreter]]
+[[Semantic State]]
+[[Telegram Gateway]]

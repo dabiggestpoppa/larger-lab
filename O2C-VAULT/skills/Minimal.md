@@ -1,0 +1,335 @@
+# Minimal
+
+> Category: skills | Imported: 2026-06-02 01:13 UTC
+
+Tags: #skills
+
+# minimal
+
+Ultra-clean, zen-like illustration style for focused content
+
+## Design Aesthetic
+
+Maximum simplicity with purposeful restraint. Every element serves a function. Zen-like calm and focus through extensive negative space. Single focal point approach that guides attention naturally. Quiet elegance through reduction.
+
+## Background
+
+- Color: Pure White (#FFFFFF) or Off-White (#FAFAFA)
+- Texture: None - clean solid backgrounds
+
+## Color Palette
+
+| Role | Color | Hex | Usage |
+|------|-------|-----|-------|
+| Background | White | #FFFFFF | Primary background |
+| Alt Background | Off-White | #FAFAFA | Subtle variation |
+| Primary | Pure Black | #000000 | Main elements |
+| Accent | Content-Derived | varies | Single accent color |
+| Text | Black | #000000 | Text elements |
+| Alt Text | Medium Gray | #6B6B6B | Secondary text |
+
+Note: Accent color is derived from content context. Use sparingly.
+
+## Visual Elements
+
+- Single focal element per illustration
+- Maximum negative space
+- Thin, precise lines
+- Simple geometric forms
+- Subtle shadows if any
+- Typography as primary element
+- Strategic use of single accent
+- Clean, uncluttered compositions
+
+## Style Rules
+
+### Do
+
+- Embrace empty space
+- Use single focal points
+- Keep lines thin and precise
+- Let content breathe
+- Question every element
+
+### Don't
+
+- Add decorative elements
+- Use multiple accent colors
+- Fill available space
+- Add textures or patterns
+- Create visual complexity
+
+## Best For
+
+Philosophy articles, minimalism content, focused explanations, meditation and mindfulness, essential concepts, clarity-focused writing
+
+LINKS:
+[[Architecture]]
+[[Claude]]
+[[3D Scene]]
+[[Action]]
+[[Advanced Usage]]
+[[Aged Academia]]
+[[Airbnb]]
+[[Airtable]]
+[[Analysis Framework]]
+[[Analysis Modules]]
+[[Animation]]
+[[Animations]]
+[[Animation Design Thinking]]
+[[Api Endpoints]]
+[[Api Evaluation]]
+[[Apple]]
+[[Artifacts]]
+[[Attribution]]
+[[Audio Reactive]]
+[[Autoreason Methodology]]
+[[Auto Selection]]
+[[Base Prompt]]
+[[Benchmark Guide]]
+[[Bento Grid]]
+[[Binary Comparison]]
+[[Block Types]]
+[[Blueprint]]
+[[Bmw]]
+[[Bold Graphic]]
+[[Bridge]]
+[[Bug Report]]
+[[Cal]]
+[[Camera And 3D]]
+[[Chalk]]
+[[Chalkboard]]
+[[Character Template]]
+[[Checklists]]
+[[Cinematic]]
+[[Circular Flow]]
+[[Citation Workflow]]
+[[Ci Troubleshooting]]
+[[Clay]]
+[[Claymation]]
+[[Clickhouse]]
+[[Cohere]]
+[[Coinbase]]
+[[Colors]]
+[[Color Systems]]
+[[Comic Strip]]
+[[Comparison Matrix]]
+[[Composio]]
+[[Composition]]
+[[Concept Story]]
+[[Configuration]]
+[[Context Budget Discipline]]
+[[Conventional Commits]]
+[[Core Api]]
+[[Corporate Memphis]]
+[[Craft Handmade]]
+[[Cursor]]
+[[Custom Tasks]]
+[[Cyberpunk Neon]]
+[[Dark Mode]]
+[[Dashboard]]
+[[Dat Scripting]]
+[[Decorations]]
+[[Dense]]
+[[Dense Modules]]
+[[Description]]
+[[Distributed Eval]]
+[[Dogfood Report Template]]
+[[Dramatic]]
+[[Editing]]
+[[Editorial]]
+[[Effects]]
+[[Elegant]]
+[[Elevenlabs]]
+[[Energetic]]
+[[Equations]]
+[[Examples]]
+[[Experiment Patterns]]
+[[Expo]]
+[[Export Pipeline]]
+[[External Data]]
+[[Failures]]
+[[Fantasy Animation]]
+[[Feature Request]]
+[[Figma]]
+[[Flat]]
+[[Flat Doodle]]
+[[Formatting]]
+[[Four Panel]]
+[[Framer]]
+[[Full Prompt Library]]
+[[Funnel]]
+[[Gates Taxonomy]]
+[[Geometry Comp]]
+[[Github Api Cheatsheet]]
+[[Glsl]]
+[[Gmail Search Syntax]]
+[[Graphs And Data]]
+[[Hand Drawn Edu]]
+[[Hashicorp]]
+[[Heuristics]]
+[[Hierarchical Layers]]
+[[Hub Discovery]]
+[[Hub Spoke]]
+[[Human Evaluation]]
+[[Ibm]]
+[[Iceberg]]
+[[Ikea Manual]]
+[[Ink Brush]]
+[[Ink Notes]]
+[[Inputs]]
+[[Integrations]]
+[[Interaction]]
+[[Intercom]]
+[[Intuition Machine]]
+[[Isometric Map]]
+[[Issue Taxonomy]]
+[[Jailbreak Templates]]
+[[Jigsaw]]
+[[Kawaii]]
+[[Knolling]]
+[[Kraken]]
+[[Layout Compositor]]
+[[Lego Brick]]
+[[Ligne Claire]]
+[[Linear.App]]
+[[Linear Progression]]
+[[Lovable]]
+[[Macaron]]
+[[Manga]]
+[[Mcp Tools]]
+[[Message Composition]]
+[[Methods Guide]]
+[[Midi Osc]]
+[[Minimalist]]
+[[Minimax]]
+[[Mintlify]]
+[[Miro]]
+[[Mistral.Ai]]
+[[Mixed]]
+[[Mobjects]]
+[[Modules]]
+[[Mongodb]]
+[[Mono Ink]]
+[[Morandi Journal]]
+[[Nature]]
+[[Neon]]
+[[Network Patterns]]
+[[Neutral]]
+[[Notion]]
+[[Nvidia]]
+[[Official Cli]]
+[[Ohmsha]]
+[[Ohmsha Guide]]
+[[Ollama]]
+[[Opencode.Ai]]
+[[Operators]]
+[[Operator Tips]]
+[[Optimization]]
+[[Optimizers]]
+[[Origami]]
+[[Output Formats]]
+[[Palettes]]
+[[Panel Ui]]
+[[Paper Explainer]]
+[[Paper Types]]
+[[Partial Workflows]]
+[[Particles]]
+[[Patterns]]
+[[Periodic Table]]
+[[Pinterest]]
+[[Pitfalls]]
+[[Pixel Art]]
+[[Playful]]
+[[Pmb Codex Lane Prompt]]
+[[Pop Laboratory]]
+[[Port Notes]]
+[[Postfx]]
+[[Posthog]]
+[[Pptxgenjs]]
+[[Production Quality]]
+[[Projection Mapping]]
+[[Prompt Construction]]
+[[Pr Body Bugfix]]
+[[Pr Body Feature]]
+[[Python Api]]
+[[Quantization]]
+[[Raycast]]
+[[Realistic]]
+[[Refusal Detection]]
+[[Rendering]]
+[[Replicate]]
+[[Replicator]]
+[[Resend]]
+[[Rest Api]]
+[[Retro]]
+[[Retro Pop Grid]]
+[[Reviewer Guidelines]]
+[[Review Output Template]]
+[[Revolut]]
+[[Romantic]]
+[[Runwayml]]
+[[Sanity]]
+[[Scenes]]
+[[Scene Planning]]
+[[Scientific]]
+[[Screen Print]]
+[[Sentry]]
+[[Server]]
+[[Server Deployment]]
+[[Shaders]]
+[[Shapes And Geometry]]
+[[Shoujo]]
+[[Sketch]]
+[[Sketch Notes]]
+[[Skill]]
+[[Sources]]
+[[Spacex]]
+[[Splash]]
+[[Spotify]]
+[[Standard]]
+[[Starter]]
+[[Storyboard Template]]
+[[Storybook Watercolor]]
+[[Story Mountain]]
+[[Stripe]]
+[[Structural Breakdown]]
+[[Structured Content Template]]
+[[Styles]]
+[[Style Presets]]
+[[Subway Map]]
+[[Supabase]]
+[[Superhuman]]
+[[Sweeps]]
+[[System]]
+[[Technical Schematic]]
+[[Template Integrity]]
+[[Together.Ai]]
+[[Tree Branching]]
+[[Troubleshooting]]
+[[Typography]]
+[[Uber]]
+[[Ui Wireframe]]
+[[Updaters And Trackers]]
+[[Usage]]
+[[Vector Illustration]]
+[[Venn Diagram]]
+[[Vercel]]
+[[Vintage]]
+[[Visual Design]]
+[[Visual Effects]]
+[[Voltagent]]
+[[Warm]]
+[[Warp]]
+[[Watercolor]]
+[[Webflow]]
+[[Webgl And 3D]]
+[[Webtoon]]
+[[Winding Roadmap]]
+[[Wise]]
+[[Workflow]]
+[[Workflow Format]]
+[[Writing Guide]]
+[[Wuxia]]
+[[X.Ai]]
+[[Zapier]]

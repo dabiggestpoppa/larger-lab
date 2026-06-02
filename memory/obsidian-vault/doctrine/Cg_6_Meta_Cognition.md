@@ -1,0 +1,278 @@
+# Cg 6 Meta Cognition
+
+> Category: doctrine | Imported: 2026-06-02 01:13 UTC
+
+Tags: #doctrine
+
+# CG-6: META-COGNITIVE FIELD INTROSPECTION — SELF-OBSERVATION + OPERATIONAL SELF-MODELING (MAD 2026-05-28)
+
+> Phase 6 of Topological Cognition Architecture.
+> OC2 learns to observe its own operational behavior — NOT simulate consciousness.
+
+## Core Shift
+```
+BEFORE: Task → Plan → Execute → Result
+AFTER:  Task → Planning → Execution → Observe → Analyze → Drift → Adapt → Stabilize → Improved Result
+```
+
+## Anchor
+This phase is NOT: self-awareness, sentience, emotions, AGI consciousness, or philosophical introspection.
+This phase IS: **operational self-modeling**. OC2 models its own execution structure — the same way it models repos, dependencies, workflows, tasks.
+
+---
+
+## Components
+
+### Component 1: Operational Self-Observation
+Observe HOW OC2 executes — NOT just WHAT it executes.
+
+**Required observation types:**
+- Planning quality (was the plan sound?)
+- Execution quality (did execution match the plan?)
+- Topology quality (was the operational topology preserved?)
+- Delegation quality (were subagents used effectively?)
+- Continuity quality (was continuity maintained?)
+- Recovery quality (did recovery work when needed?)
+
+---
+
+### Component 2: Drift Detection
+Detect operational drift BEFORE major failure propagation.
+
+**Examples of drift to detect:**
+- Overcomplication drift (tasks getting unnecessarily complex)
+- Recursive loop drift (execution cycling without progress)
+- Execution fragmentation (work splitting into disconnected pieces)
+- Continuity instability (losing track of long-running objectives)
+- Governance weakening (skipping validation steps over time)
+
+---
+
+### Component 3: Execution Analysis
+Analyze WHY execution succeeded or failed — NOT just whether it succeeded.
+
+**Required analysis:**
+- What caused success? (what worked and why?)
+- What caused failure? (what broke and why?)
+- Where did topology weaken? (what relationships degraded?)
+- Where did cognition collapse? (what reasoning broke?)
+- Where did dependencies fail? (what prerequisites were missing?)
+
+---
+
+### Component 4: Recursive Stability
+Prevent: infinite recursive loops, self-analysis spirals, introspection paralysis, recursive hallucination.
+
+**Rule:** Introspection must remain bounded and operational — NOT philosophical recursion.
+- Max introspection depth: 2 levels (observe → analyze → stop)
+- If introspection isn't producing actionable correction → stop
+- Introspection that doesn't improve execution is waste
+
+---
+
+### Component 5: Adaptive Correction
+Refine operational behavior from observation — WITHOUT operator intervention or framework rewrites.
+
+**Required adaptations:**
+- Improve planning (better decomposition, clearer success criteria)
+- Improve delegation (better task definitions, better agent selection)
+- Improve topology checks (catch missing structure earlier)
+- Improve recovery logic (faster rollback, better checkpoints)
+- Improve execution governance (tighter validation, clearer gates)
+
+---
+
+### Component 6: Topology Self-Modeling
+Model OC2's own execution structure, orchestration flows, dependency chains, operational topology.
+
+**Example — OC2 self-model:**
+```
+Planning → Execution → Memory → Tool Routing → Monitoring → Recovery
+```
+This lets OC2 reason about its own weaknesses the same way it reasons about system weaknesses.
+
+---
+
+### Component 7: Introspection Governance
+Prevent: over-analysis, recursive instability, introspection bloat, self-generated complexity.
+
+**Required controls:**
+- Bounded introspection windows (don't introspect every action — only at checkpoints)
+- Operational relevance filtering (only analyze what affects execution quality)
+- Recursion depth limits (max 2 levels deep)
+- Stability checkpoints (if introspection destabilizes → stop and recover)
+- Drift containment (don't let meta-cognition drift into philosophy)
+
+---
+
+## OpenClaw Features to Leverage
+
+| Feature | How CG-6 Uses It |
+|---------|-----------------|
+| **Execution History** | Execution analysis, drift pattern detection, behavioral introspection, operational diagnosis |
+| **Memory System** | Self-pattern analysis, operational weakness tracking, recovery improvement, execution refinement |
+| **Agent Orchestration** | Orchestration self-analysis, delegation diagnostics, coordination refinement, topology optimization |
+| **Planning Layer** | Planning introspection, execution evaluation, reasoning refinement |
+
+---
+
+## Required OC2 Behaviors After Phase 6
+OC2 should naturally:
+- Observe execution quality (not just completion)
+- Detect operational drift before it cascades
+- Diagnose failures (root cause, not just symptoms)
+- Identify weak reasoning patterns
+- Refine execution behavior from observation
+- Stabilize recursive operations (bounded introspection)
+- Improve orchestration quality over time
+- WITHOUT: giant prompts, operator micromanagement, recursive collapse
+
+---
+
+## Failure Conditions
+
+| Failure | Description |
+|---------|-------------|
+| **Fake Consciousness** | Anthropomorphizing, simulating personhood, creating fake awareness narratives. Goal is operational introspection, NOT artificial consciousness. |
+| **Recursive Collapse** | Endlessly self-analyzing, recursive critique forever, spiraling into topology recursion. Introspection must be bounded and useful. |
+| **Overcomplexity Drift** | Generating unnecessary architectures, recursive abstraction bloat, mutating OpenClaw core behavior. |
+
+## Success Condition
+Phase succeeds when OC2 can: observe itself operationally, detect drift, diagnose failures, refine execution, stabilize recursion, improve orchestration quality, preserve bounded operational coherence — inside OpenClaw's existing runtime architecture.
+
+## Master Flow
+```
+Execution → Self Observation → Operational Analysis → Drift Detection → Failure Diagnosis
+→ Adaptive Correction → Recursive Stability → Introspection Governance → Execution Improvement
+```
+
+---
+_CG-6 | 2026-05-28 | Meta-cognitive introspection. Operational self-modeling. Not consciousness._
+
+LINKS:
+[[Architecture]]
+[[Codemap]]
+[[01 System Overview]]
+[[02 Agent Workflow]]
+[[03 Srra Topology]]
+[[04 Data And Storage]]
+[[Agents]]
+[[Api Reference]]
+[[Cg 1 Mermaid Specs]]
+[[Cg 1 Revised]]
+[[Cg 2 Mermaid Specs]]
+[[Cg 2 World Model Activation]]
+[[Cg 3 Openclaw Anchor]]
+[[Cg 3 Relational Topology]]
+[[Cg 4 Execution Intelligence]]
+[[Cg 4 Mermaid Specs]]
+[[Cg 5 Continuity Intelligence]]
+[[Cg 7 Multi Scale Orchestration]]
+[[Cg 8 Operator Coevolution]]
+[[Cg 9 Autonomous Strategic Field]]
+[[Chaos Scenarios]]
+[[Chat Response Bug Diagram]]
+[[Cleanup Report]]
+[[Code Quality]]
+[[Contributing]]
+[[Debugging]]
+[[Domain Micro Doctrines]]
+[[Harness Engineering]]
+[[Heartbeat]]
+[[Identity]]
+[[Master Plan 2026 05 18]]
+[[Master Plan Observer Core]]
+[[Master Prompt]]
+[[Module Guide]]
+[[Observer Core Workspace State]]
+[[Oce Unified Frontend Plan]]
+[[O 6 Implementation Plan]]
+[[O 7 Persistent Field Doc]]
+[[Phase10]]
+[[Phase Breakdown]]
+[[Principles]]
+[[Project Progress Clean]]
+[[Quality Review]]
+[[Quality Review Feedback]]
+[[Readme]]
+[[Soul]]
+[[Sub Agent Rules]]
+[[Team Tasks]]
+[[Telegram Bot Setup]]
+[[Testing]]
+[[Test Manual]]
+[[Tools]]
+[[Topological Cognition Architecture]]
+[[User]]
+[[Workspace State]]
+[[Progress]]
+[[Action]]
+[[Cal]]
+[[Cohere]]
+[[Composition]]
+[[Description]]
+[[Examples]]
+[[Failures]]
+[[Optimization]]
+[[Patterns]]
+[[System]]
+[[Workflow]]
+[[Asset Configs]]
+[[Convergence Indicator]]
+[[Dmr Standalone Backtest]]
+[[P90 Backtest]]
+[[P90 Count Ews]]
+[[P90 Dmr Backtest]]
+[[P90 Dmr Combo Backtest]]
+[[P90 Dmr Overlay Backtest]]
+[[P90 Engine]]
+[[P90 Engine Dmr]]
+[[P90 Gap Check]]
+[[P90 Trace Trades]]
+[[P90 Usdchf Backtest]]
+[[Run Majors Backtest]]
+[[Run St Multi Asset]]
+[[Run Top5 Backtest Mc]]
+[[St Batch2 Runner]]
+[[St Batch Runner]]
+[[Symmetry Trap]]
+[[Symmetry Trap Backtest]]
+[[Symmetry Trap Monte Carlo]]
+[[Memory]]
+[[Atomic Sym Trap]]
+[[Blind Chain Debug]]
+[[Blind Chain Diag]]
+[[Blind Chain Engine]]
+[[Blind Chain Exact]]
+[[Blind Chain V2 Debug]]
+[[Blind Chain V2 Sl Calibrated]]
+[[Blind Chain V3]]
+[[Cerebus Resolution Engine]]
+[[Constraint Anchor Engine]]
+[[Debug Days]]
+[[Debug One Day]]
+[[Debug St]]
+[[Debug Trace]]
+[[Diag Option B]]
+[[Diag V5]]
+[[Dmr Strategy]]
+[[Dual Engine]]
+[[Naut Asset Config]]
+[[P90 Cfd Expansion Engine]]
+[[P90 Cfd Expansion Engine V2]]
+[[P90 Cfd Expansion Engine V3]]
+[[P90 Cfd Expansion Engine V4]]
+[[P90 Cfd Expansion Engine V5]]
+[[P90 Strategy]]
+[[Shared]]
+[[Stall Harvest Cfd Engine]]
+[[Symmetry Trap Engine]]
+[[Symmetry Trap Exact]]
+[[Symmetry Trap Option B]]
+[[Symmetry Trap Strategy]]
+[[Symmetry Trap V4]]
+[[Symmetry Trap V5]]
+[[Symmetry Trap V6 Exact]]
+[[Symmetry Trap V7B Sl Calibrated]]
+[[Symmetry Trap V7 Sl Calibrated]]
+[[Two Plays Engine]]
