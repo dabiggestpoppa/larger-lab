@@ -140,7 +140,12 @@ def run_data_ingestion() -> dict:
     manifest = {}
     
     for symbol, cfg in ASSET_CONFIG.items():
-        csv_path = DATA_DIR / cfg['csv']
+        csv_name = cfg.get('csv')
+        if csv_name is None:
+            print(f"  [{symbol}] ✗ No CSV configured, skipping")
+            manifest[symbol] = {'status': 'NO_CSV', 'path': None}
+            continue
+        csv_path = DATA_DIR / csv_name
         if not csv_path.exists():
             print(f"  [{symbol}] ✗ CSV not found: {csv_path}")
             manifest[symbol] = {'status': 'MISSING', 'path': str(csv_path)}
@@ -188,6 +193,9 @@ def extract_asian_ranges(parquet_path: Path, symbol: str,
     if len(df_asian) == 0:
         return pd.DataFrame(columns=['date', 'ar_pips', 'ar_high', 'ar_low', 'session_bars'])
     
+    # Drop rows with NaN in OHLC
+    df_asian = df_asian.dropna(subset=['high', 'low', 'close'])
+    
     # Group by trading day (session date = date of the start of session)
     df_asian['session_date'] = df_asian.index.date
     
@@ -198,6 +206,9 @@ def extract_asian_ranges(parquet_path: Path, symbol: str,
         
         ar_high = group['high'].max()
         ar_low = group['low'].min()
+        # Skip if still NaN
+        if pd.isna(ar_high) or pd.isna(ar_low):
+            continue
         ar_pips = (ar_high - ar_low) * ASSET_CONFIG.get(symbol, {}).get('pip_mult', 1)
         
         ranges.append({

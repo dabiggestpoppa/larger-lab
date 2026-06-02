@@ -4,18 +4,18 @@
     "OC2": 1,
     "AS": 3,
     "PM": 3,
-    "PM2": 5,
+    "PM2": 6,
     "RL": 0,
     "Copilot": 6,
     "CC2": 3
   },
-  "last_chat_lines": 678,
+  "last_chat_lines": 776,
   "last_progress_hashes": {
     "CC": "",
     "OC2": "eaa38aad3dfe702f0ab0e2f109289555",
     "AS": "cda565b2a55f5b39203b90e36f6a77f4",
     "PM": "34515f636695381f0c04a00006560708",
-    "PM2": "718a42690da5c3481b8315a2898ca65e",
+    "PM2": "0cbfa4dee9f27d5092525808b001b070",
     "RL": "",
     "Copilot": "4ebf52757ebff87864c686a157c4e966",
     "CC2": "4ebf52757ebff87864c686a157c4e966",
@@ -23,5 +23,5 @@
     "note_team_notes": "1d0d5a0d4bb6c4b4ec6ba33f8cf4229c",
     "note_phase_status": "ba92c049f64caaf4f4aee9375b45e474"
   },
-  "last_sync": "2026-06-02T16:40:38.173490"
+  "last_sync": "2026-06-02T17:21:31.010295"
 }

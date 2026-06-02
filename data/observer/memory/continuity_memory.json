@@ -1,9 +1,9 @@
 {
   "session_id": "session_20260531_214842",
   "start_time": "2026-05-31T21:48:42.184575+00:00",
-  "last_active": "2026-06-02T20:27:25.814347+00:00",
-  "workflow_count": 5,
-  "success_count": 5,
+  "last_active": "2026-06-02T20:58:27.523466+00:00",
+  "workflow_count": 6,
+  "success_count": 6,
   "failure_count": 0,
   "active_goals": [],
   "workflow_history": [
@@ -61,10 +61,21 @@
       "model_used": "",
       "duration_ms": 0.0,
       "error": null
+    },
+    {
+      "workflow_id": "chat_d048f858",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-06-02T20:58:27.523466+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
     }
   ],
   "routing_patterns": {
-    "TaskType.CONVERSATION:": 4,
+    "TaskType.CONVERSATION:": 5,
     "TaskType.RESEARCH:": 1
   }
 }
