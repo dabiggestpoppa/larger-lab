@@ -2,82 +2,86 @@
 Phase 4.2: Close-Only Guard
 =============================
 Enforces the CEREBUS close-only invalidation rule.
-Only M5 candle CLOSE beyond SL triggers exit. Wicks are ignored.
-Also enforces the 81.2% rule kill switch and 12PM hard exit.
 """
 from __future__ import annotations
 
-import logging
+from dataclasses import dataclass
 from datetime import datetime, time as dt_time
-from typing import Optional
 
-logger = logging.getLogger(__name__)
+HARD_EXIT_TIME = dt_time(12, 0)
 
-HARD_EXIT_TIME = dt_time(12, 0)  # 12:00 PM EST
+
+@dataclass
+class PositionState:
+    direction: int
+    entry_price: float
+    sl_price: float
+    tp_price: float
+    au_target: float
+    tier: str
+    entry_time: str
+
+
+def check_close_only_invalidation(direction: int, current_close: float, sl_price: float) -> tuple[bool, str]:
+    if direction == 1 and current_close < sl_price:
+        return True, "INVALIDATION: M5 Close below SL"
+    if direction == -1 and current_close > sl_price:
+        return True, "INVALIDATION: M5 Close above SL"
+    return False, "HOLD: Close within structural bounds"
+
+
+def check_12pm_hard_exit(hour: int, minute: int) -> tuple[bool, str]:
+    if hour >= 12:
+        return True, "HARD_EXIT_12PM"
+    return False, "SAFE"
+
+
+def manage_open_position(
+    state: PositionState,
+    bar: dict,
+    hour: int,
+    minute: int,
+    asian_high: float,
+    asian_low: float,
+) -> tuple[str, str]:
+    """Full position management. Returns (action, reason)."""
+    if hour >= 12:
+        return "HARD_EXIT_12PM", "12:00 PM EST hard exit"
+
+    if state.direction == 1 and bar["high"] >= state.tp_price:
+        return "TP_HIT", "Take profit hit"
+    if state.direction == -1 and bar["low"] <= state.tp_price:
+        return "TP_HIT", "Take profit hit"
+
+    if state.direction == 1 and bar["close"] <= state.sl_price:
+        return "SL_HIT", "M5 close below SL"
+    if state.direction == -1 and bar["close"] >= state.sl_price:
+        return "SL_HIT", "M5 close above SL"
+
+    if state.direction == 1 and bar["close"] < asian_low:
+        return "KILL_812", "81.2% rule"
+    if state.direction == -1 and bar["close"] > asian_high:
+        return "KILL_812", "81.2% rule"
+
+    return "HOLD", "Position held"
 
 
 class CloseOnlyGuard:
-    """
-    Position exit manager. Runs every bar close.
-    Enforces close-only SL, 81.2% rule, and 12PM hard exit.
-    """
+    """Stateful position guard."""
 
     def __init__(self):
-        self.position: Optional[dict] = None
+        self.position = None
 
-    def open_position(
-        self,
-        direction: int,
-        entry_price: float,
-        sl_price: float,
-        tp_price: float,
-        origin_price: float,
-    ):
-        """
-        Open a tracked position.
-
-        Parameters
-        ----------
-        direction : 1 for LONG, -1 for SHORT
-        entry_price : float
-        sl_price : OCC extreme (zero buffer)
-        tp_price : 1 AU target (or gear-shifted AU)
-        origin_price : Asian band extreme (for 81.2% rule)
-        """
+    def open_position(self, direction, entry_price, sl_price, tp_price, origin_price):
         self.position = {
             "direction": direction,
             "entry_price": entry_price,
             "sl_price": sl_price,
             "tp_price": tp_price,
             "origin_price": origin_price,
-            "open_time": datetime.utcnow(),
         }
-        logger.info(
-            f"GUARD: Opened {'LONG' if direction == 1 else 'SHORT'} @ {entry_price} | "
-            f"SL={sl_price} | TP={tp_price} | Origin={origin_price}"
-        )
 
-    def check_exit(
-        self,
-        bar_close: float,
-        bar_high: float,
-        bar_low: float,
-        current_time_est: datetime,
-    ) -> tuple[bool, str]:
-        """
-        Check if position should be exited.
-
-        Parameters
-        ----------
-        bar_close : float — M5 candle close price
-        bar_high : float — M5 candle high
-        bar_low : float — M5 candle low
-        current_time_est : datetime — current time in EST
-
-        Returns
-        -------
-        (should_exit: bool, reason: str)
-        """
+    def check_exit(self, bar_close, bar_high, bar_low, current_time_est):
         if self.position is None:
             return False, "NO_POSITION"
 
@@ -86,41 +90,22 @@ class CloseOnlyGuard:
         tp_price = self.position["tp_price"]
         origin_price = self.position["origin_price"]
 
-        # 1. 12PM Hard Exit (absolute priority)
-        if current_time_est.time() >= HARD_EXIT_TIME:
-            self.position = None
+        if current_time_est.hour >= 12:
             return True, "HARD_EXIT_12PM"
 
-        # 2. Take Profit — wick OR close triggers
         if direction == 1 and bar_high >= tp_price:
-            self.position = None
             return True, "TP_HIT"
         if direction == -1 and bar_low <= tp_price:
-            self.position = None
             return True, "TP_HIT"
 
-        # 3. Stop Loss — CLOSE ONLY (wicks ignored)
         if direction == 1 and bar_close <= sl_price:
-            self.position = None
             return True, "SL_CLOSE_ONLY"
         if direction == -1 and bar_close >= sl_price:
-            self.position = None
             return True, "SL_CLOSE_ONLY"
 
-        # 4. 81.2% Rule — close back inside Asian band
         if direction == 1 and bar_close < origin_price:
-            self.position = None
             return True, "81PCT_RULE_KILL"
         if direction == -1 and bar_close > origin_price:
-            self.position = None
             return True, "81PCT_RULE_KILL"
 
         return False, "HOLD"
-
-    def close_position(self):
-        """Force close position."""
-        self.position = None
-
-    @property
-    def has_position(self) -> bool:
-        return self.position is not None
