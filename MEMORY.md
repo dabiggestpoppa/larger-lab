@@ -1,6 +1,6 @@
 # MEMORY.md — OWL (OC2) Persistent Memory
 
-> **Last Updated:** 2026-06-01 11:14 EDT — v2.1 Deployed + Init Bug Fixed — 3rd Auto-Work Violation + Structural Fix Applied
+> **Last Updated:** 2026-06-02 06:15 EDT — Guardian Deployed + Executor Self-Heal + Filling Mode Fix
 > **Policy:** Trajectory only. Archive old sessions to `logs/memory-archive/`.
 
 ---

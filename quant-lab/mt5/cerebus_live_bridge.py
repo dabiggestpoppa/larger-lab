@@ -25,6 +25,25 @@ sys.stdout.reconfigure(encoding="utf-8")
 import pytz
 import MetaTrader5 as mt5
 
+
+def get_pip_size(symbol: str) -> float:
+    """Return pip size for a symbol. JPY pairs use 0.01, everything else 0.0001."""
+    info = mt5.symbol_info(symbol)
+    if info is None:
+        return 0.0001
+    # JPY pairs have point=0.001 and digits=3
+    if info.point >= 0.001:
+        return 0.01
+    return 0.0001
+
+
+def to_pips(price_diff: float, symbol: str) -> float:
+    """Convert a price difference to pips."""
+    pip = get_pip_size(symbol)
+    if pip == 0:
+        return 0.0
+    return round(price_diff / pip, 1)
+
 # ─── Import backtest engines (THE TRUTH) ──────────────────────────
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 from engines.symmetry_trap import SymmetryTrapEngine, Bar, TradeDirection, classify_tier
@@ -177,38 +196,43 @@ def send_order(symbol: str, direction: str, volume: float,
     price = tick.ask if direction == "BUY" else tick.bid
     # Universal SL/TP safety clamp
     point = info.point
-    # Use broker's trade_stops_level if available, otherwise 10 points minimum
+    # Use broker's trade_stops_level if available
     min_stop_pts = getattr(info, 'trade_stops_level', 0)
-    buffer_pts = max(min_stop_pts + 5, 10)  # at least 10 points buffer
+    # For JPY pairs (point=0.001), 10 points = only 1 pip — broker needs more
+    # Use at least 50 points (~5 pips on JPY, ~0.5 pips on 5-dec pairs)
+    buffer_pts = max(min_stop_pts + 5, 50)
     safety_buffer = buffer_pts * point
 
+    # Only clamp SL/TP if they're on the WRONG side of entry (zero-buffer edge case)
+    # or if they're too close to entry (broker minimum distance).
+    # A correct SELL SL is ABOVE entry; a correct BUY SL is BELOW entry.
     if direction == "BUY":
+        # SL must be below entry
         if sl >= price:
-            # Zero-Buffer impulse extreme can be above BUY entry (ontology-correct
-            # but broker-invalid). Clamp to entry - safety_buffer.
-            log.warning("SL %.5f >= BUY entry %.5f (zero-buffer extreme above entry) — clamping to entry - buffer", sl, price)
+            log.warning("SL %.5f >= BUY entry %.5f (wrong side) — clamping to entry - buffer", sl, price)
             sl = price - safety_buffer
-        # Also enforce minimum broker distance
+        # Enforce minimum distance
         min_sl = price - safety_buffer
         if sl > min_sl:
+            log.warning("SL %.5f too close to BUY entry %.5f — clamping to %.5f", sl, price, min_sl)
             sl = min_sl
-        min_tp = price + safety_buffer
+        # TP must be above entry
         if tp <= price:
-            tp = min_tp
+            tp = price + safety_buffer
             log.warning("TP clamped above BUY entry")
     else:  # SELL
+        # SL must be above entry
         if sl <= price:
-            # Zero-Buffer impulse extreme can be below SELL entry (ontology-correct
-            # but broker-invalid). Clamp to entry + safety_buffer.
-            log.warning("SL %.5f <= SELL entry %.5f (zero-buffer extreme below entry) — clamping to entry + buffer", sl, price)
+            log.warning("SL %.5f <= SELL entry %.5f (wrong side) — clamping to entry + buffer", sl, price)
             sl = price + safety_buffer
-        # Also enforce minimum broker distance
+        # Enforce minimum distance
         max_sl = price + safety_buffer
         if sl < max_sl:
+            log.warning("SL %.5f too close to SELL entry %.5f — clamping to %.5f", sl, price, max_sl)
             sl = max_sl
-        max_tp = price - safety_buffer
+        # TP must be below entry
         if tp >= price:
-            tp = max_tp
+            tp = price - safety_buffer
             log.warning("TP clamped below SELL entry")
 
     # Broker minimum stop level
@@ -232,7 +256,15 @@ def send_order(symbol: str, direction: str, volume: float,
 
     sl = round(sl, info.digits)
     tp = round(tp, info.digits)
-    log.info("Order: %s %.5f SL=%.5f TP=%.5f" % (direction, price, sl, tp))
+
+    # Calculate distances in pips
+    sym = symbol
+    sl_pips = to_pips(abs(sl - price), sym)
+    tp_pips = to_pips(abs(tp - price), sym)
+    rr = round(tp_pips / sl_pips, 2) if sl_pips > 0 else 0.0
+
+    log.info("Order: %s %.5f | SL=%.5f (%.1fp) | TP=%.5f (%.1fp) | RR=%.2f"
+             % (direction, price, sl, sl_pips, tp, tp_pips, rr))
 
     request = {
         "action": mt5.TRADE_ACTION_DEAL,
@@ -246,35 +278,37 @@ def send_order(symbol: str, direction: str, volume: float,
         "magic": 20260601,
         "comment": comment,
         "type_time": mt5.ORDER_TIME_GTC,
-        "type_filling": mt5.ORDER_FILLING_FOK,
+        "type_filling": mt5.ORDER_FILLING_IOC,
     }
     result = mt5.order_send(request)
     if result is None:
         log.error("order_send returned None: %s", mt5.last_error())
         return False
     if result.retcode == mt5.TRADE_RETCODE_DONE:
-        log.info("EXECUTED: %s %s %s @ %.5f SL=%.5f TP=%.5f | Ticket=%s",
-                 direction, volume, symbol, price, sl, tp, result.order)
+        log.info("EXECUTED: %s %.2f %s @ %.5f | SL=%.5f (%.1fp) | TP=%.5f (%.1fp) | RR=%.2f | Ticket=%s",
+                 direction, volume, symbol, price, sl, sl_pips, tp, tp_pips, rr, result.order)
         return True
     else:
         log.error("Order rejected: retcode=%s (%s)", result.retcode, result.comment)
         log.error("  Request: %s %.2f %s @ %.5f SL=%.5f TP=%.5f",
                   direction, volume, symbol, price, request["sl"], request["tp"])
         log.error("  Tick: bid=%.5f ask=%.5f", tick.bid, tick.ask)
-        # Try fallback filling mode (10030 = unsupported filling mode)
+        # Try all filling modes: IOC -> FOK -> RETURN
         if result.retcode in (10014, 10016, 10017, 10030):
-            request2 = dict(request)
-            if request2.get("type_filling") == mt5.ORDER_FILLING_FOK:
-                request2["type_filling"] = mt5.ORDER_FILLING_RETURN
-            else:
-                request2["type_filling"] = mt5.ORDER_FILLING_FOK
-            log.info("  Retrying with filling mode: %d" % request2["type_filling"])
-            result2 = mt5.order_send(request2)
-            if result2 and result2.retcode == mt5.TRADE_RETCODE_DONE:
-                log.info("  FALLBACK EXECUTED: Ticket=%s" % result2.order)
-                return True
-            elif result2:
-                log.error("  Fallback also rejected: retcode=%s (%s)" % (result2.retcode, result2.comment))
+            primary_fill = request.get("type_filling", mt5.ORDER_FILLING_IOC)
+            # Build ordered fallback list (skip primary)
+            all_fills = [mt5.ORDER_FILLING_IOC, mt5.ORDER_FILLING_FOK, mt5.ORDER_FILLING_RETURN]
+            fallbacks = [f for f in all_fills if f != primary_fill]
+            for fill_mode in fallbacks:
+                request2 = dict(request)
+                request2["type_filling"] = fill_mode
+                log.info("  Retrying with filling mode: %d" % fill_mode)
+                result2 = mt5.order_send(request2)
+                if result2 and result2.retcode == mt5.TRADE_RETCODE_DONE:
+                    log.info("  FALLBACK EXECUTED (mode=%d): Ticket=%s" % (fill_mode, result2.order))
+                    return True
+                elif result2:
+                    log.error("  Fallback rejected (mode=%d): retcode=%s (%s)" % (fill_mode, result2.retcode, result2.comment))
         return False
 
 
@@ -305,7 +339,18 @@ def close_position(ticket: int) -> bool:
     }
     result = mt5.order_send(request)
     if result and result.retcode == mt5.TRADE_RETCODE_DONE:
-        log.info("CLOSED position %s", ticket)
+        # Get the position details for PnL calc
+        pos_list = mt5.positions_get(ticket=ticket)
+        sym = p.symbol if pos_list else ""
+        pnl_pips = 0.0
+        if pos_list:
+            pos = pos_list[0]
+            entry = pos.price_open
+            if pos.type == mt5.ORDER_TYPE_BUY:
+                pnl_pips = to_pips(price - entry, sym)
+            else:
+                pnl_pips = to_pips(entry - price, sym)
+        log.info("CLOSED position %s | PnL: %+.1fp", ticket, pnl_pips)
         return True
     # Fallback filling mode
     if result and result.retcode in (10014, 10016, 10017, 10030):
@@ -313,7 +358,17 @@ def close_position(ticket: int) -> bool:
         request2["type_filling"] = mt5.ORDER_FILLING_FOK
         result2 = mt5.order_send(request2)
         if result2 and result2.retcode == mt5.TRADE_RETCODE_DONE:
-            log.info("CLOSED position %s (fallback filling)", ticket)
+            pos_list = mt5.positions_get(ticket=ticket)
+            sym = p.symbol if pos_list else ""
+            pnl_pips = 0.0
+            if pos_list:
+                pos = pos_list[0]
+                entry = pos.price_open
+                if pos.type == mt5.ORDER_TYPE_BUY:
+                    pnl_pips = to_pips(price - entry, sym)
+                else:
+                    pnl_pips = to_pips(entry - price, sym)
+            log.info("CLOSED position %s (fallback filling) | PnL: %+.1fp", ticket, pnl_pips)
             return True
     log.error("Close failed for ticket %s: retcode=%s", ticket, result.retcode if result else "None")
     return False
@@ -476,6 +531,16 @@ def run_live(symbols: list, lot_size: float = 0.01):
     # Keyed by (symbol, engine_name) so ST and P90 don't collide on same symbol
     active_trades = {}
 
+    # ── Daily trade tracking ──
+    daily_stats = {
+        "date": now.strftime("%Y-%m-%d"),
+        "entries": 0,
+        "wins": 0,
+        "losses": 0,
+        "pips": 0.0,
+        "rr_total": 0.0,
+    }
+
     # ── Recover orphaned positions from MT5 on restart ──
     existing_positions = get_positions()
     for p in existing_positions:
@@ -486,9 +551,11 @@ def run_live(symbols: list, lot_size: float = 0.01):
             active_trades[key] = {
                 "ticket": p["ticket"],
                 "direction": p["type"],
+                "entry": p["price_open"],
                 "sl": p["sl"],
                 "tp": p["tp"],
                 "engine": eng,
+                "sl_moved": p["sl"] != 0 and eng == "P90",  # If SL already moved on recovery
             }
             log.info("Recovered position: %s %s ticket=%s engine=%s",
                      p["symbol"], p["type"], p["ticket"], eng)
@@ -534,6 +601,12 @@ def run_live(symbols: list, lot_size: float = 0.01):
                     equity, len(positions), signal_count, exec_count
                 )
 
+                # ── P90 Trailing Stop: move SL to breakeven at +2 pips ──
+                try:
+                    check_trailing_stop(active_trades, trail_pips=2.0)
+                except Exception as e:
+                    log.warning("Trailing stop check error: %s", e)
+
                 for sym in symbols:
                     try:
                         bars = get_bars(sym, 500)
@@ -568,6 +641,11 @@ def run_live(symbols: list, lot_size: float = 0.01):
                                 if (sym, "ST") in active_trades:
                                     log.info("[%s] ST ENTRY skipped — ST already in position", sym)
                                 else:
+                                    sl_p = to_pips(abs(st_sig.sl_price - st_sig.entry_price), sym)
+                                    tp_p = to_pips(abs(st_sig.tp_price - st_sig.entry_price), sym)
+                                    rr = round(tp_p / sl_p, 2) if sl_p > 0 else 0.0
+                                    log.info("ST ENTRY: %s %s @ %.5f | SL=%.1fp TP=%.1fp RR=%.2f",
+                                             direction, sym, st_sig.entry_price, sl_p, tp_p, rr)
                                     ok = send_order(sym, direction, lot_size,
                                                     st_sig.sl_price, st_sig.tp_price,
                                                     "CEREBUS-ST-L%d" % st_sig.loop_count)
@@ -579,16 +657,40 @@ def run_live(symbols: list, lot_size: float = 0.01):
                                                 active_trades[(sym, "ST")] = {
                                                     "ticket": p["ticket"],
                                                     "direction": direction,
+                                                    "entry": st_sig.entry_price,
                                                     "sl": st_sig.sl_price,
                                                     "tp": st_sig.tp_price,
                                                     "engine": "ST",
+                                                    "sl_moved": False,
                                                 }
                                                 break
                             elif st_sig.event in ("TP_HIT", "SL_HIT", "KILL_SWITCH"):
                                 # Close position if still open
                                 key = (sym, "ST")
                                 if key in active_trades:
-                                    close_position(active_trades[key]["ticket"])
+                                    trade = active_trades[key]
+                                    entry = trade["entry"]
+                                    direction = trade["direction"]
+                                    # Calculate PnL in pips before closing
+                                    tick = mt5.symbol_info_tick(sym)
+                                    if tick:
+                                        close_price = tick.bid if direction == "BUY" else tick.ask
+                                        if direction == "BUY":
+                                            pnl_pips = to_pips(close_price - entry, sym)
+                                        else:
+                                            pnl_pips = to_pips(entry - close_price, sym)
+                                    else:
+                                        pnl_pips = 0.0
+                                    won = st_sig.event == "TP_HIT"
+                                    daily_stats["pips"] += pnl_pips
+                                    if won:
+                                        daily_stats["wins"] += 1
+                                    else:
+                                        daily_stats["losses"] += 1
+                                    log.info("ST CLOSE [%s]: %s %s | PnL: %+.1fp | Daily: W%d L%d %+.1fp",
+                                             st_sig.event, direction, sym, pnl_pips,
+                                             daily_stats["wins"], daily_stats["losses"], daily_stats["pips"])
+                                    close_position(trade["ticket"])
                                     del active_trades[key]
 
                         # ── Process through P90 engine ──
@@ -617,6 +719,12 @@ def run_live(symbols: list, lot_size: float = 0.01):
                                     if (sym, "P90") in active_trades:
                                         log.info("[%s] P90 ENTRY skipped — P90 already in position", sym)
                                     else:
+                                        sl_p = to_pips(abs(p90_sig.sl_price - p90_sig.entry_price), sym)
+                                        tp_p = to_pips(abs(p90_sig.tp_price - p90_sig.entry_price), sym)
+                                        rr = round(tp_p / sl_p, 2) if sl_p > 0 else 0.0
+                                        variant = str(p90_sig.variant).replace("P90Variant.", "")
+                                        log.info("P90 ENTRY [%s]: %s %s @ %.5f | SL=%.1fp TP=%.1fp RR=%.2f",
+                                                 variant, direction, sym, p90_sig.entry_price, sl_p, tp_p, rr)
                                         ok = send_order(sym, direction, lot_size,
                                                         p90_sig.sl_price, p90_sig.tp_price,
                                                         "CEREBUS-P90")
@@ -628,15 +736,38 @@ def run_live(symbols: list, lot_size: float = 0.01):
                                                     active_trades[(sym, "P90")] = {
                                                         "ticket": p["ticket"],
                                                         "direction": direction,
+                                                        "entry": p90_sig.entry_price,
                                                         "sl": p90_sig.sl_price,
                                                         "tp": p90_sig.tp_price,
                                                         "engine": "P90",
+                                                        "sl_moved": False,
                                                     }
                                                     break
                                 elif p90_sig.event in ("TP_HIT", "SL_HIT", "KILL_SWITCH"):
                                     key = (sym, "P90")
                                     if key in active_trades:
-                                        close_position(active_trades[key]["ticket"])
+                                        trade = active_trades[key]
+                                        entry = trade["entry"]
+                                        direction = trade["direction"]
+                                        tick = mt5.symbol_info_tick(sym)
+                                        if tick:
+                                            close_price = tick.bid if direction == "BUY" else tick.ask
+                                            if direction == "BUY":
+                                                pnl_pips = to_pips(close_price - entry, sym)
+                                            else:
+                                                pnl_pips = to_pips(entry - close_price, sym)
+                                        else:
+                                            pnl_pips = 0.0
+                                        won = p90_sig.event == "TP_HIT"
+                                        daily_stats["pips"] += pnl_pips
+                                        if won:
+                                            daily_stats["wins"] += 1
+                                        else:
+                                            daily_stats["losses"] += 1
+                                        log.info("P90 CLOSE [%s]: %s %s | PnL: %+.1fp | Daily: W%d L%d %+.1fp",
+                                                 p90_sig.event, direction, sym, pnl_pips,
+                                                 daily_stats["wins"], daily_stats["losses"], daily_stats["pips"])
+                                        close_position(trade["ticket"])
                                         del active_trades[key]
 
                     except Exception as sym_err:

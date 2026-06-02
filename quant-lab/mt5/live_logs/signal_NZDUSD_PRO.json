@@ -2,10 +2,10 @@
   "engine": "SymmetryTrap",
   "symbol": "NZDUSD.PRO",
   "direction": "SELL",
-  "entry": 0.59231,
-  "sl": 0.59181,
-  "tp": 0.59111,
+  "entry": 0.59283,
+  "sl": 0.5925,
+  "tp": 0.59163,
   "event": "SL_HIT",
-  "loop": 1,
-  "time": "2026-06-01 21:22:00"
+  "loop": 2,
+  "time": "2026-06-02 06:02:00"
 }
