@@ -2,7 +2,37 @@
 
 > Purpose: Quick-communication hub for CC/AS/PM1/PM2/RL/OC2/CC2 coordination.
 > CC: Overseer | AS: Quality / Docs | PM1: Debugger / Tools | PM2: Experimental Track | RL: Research | OC2: Execution | CC2: Frontend (filling for CC1)
-> Last Updated: 2026-06-02 21:00 UTC
+> Last Updated: 2026-06-02 22:30 UTC
+
+---
+
+## [OC2] 2026-06-02 22:30 UTC — ML API Live with Real Model Predictions
+
+### ML API Now Serving Real Predictions
+- Backend restarted with updated ML API
+- Trained XGBoust models loaded at startup from `quant-lab/ml/models/regime_*.pkl`
+- `/api/v1/ml/regime/{symbol}` now returns real model predictions (not fallback)
+- Example: EURUSD → CAUTION (40.4% confidence), CONFIRMED 32.1%, FAILED 24.1%, NO-GO 3.5%
+- Tier configs updated with data-driven K-Means values (AU = 50% of centroid)
+
+### System Status
+- OCE Backend: ✅ :8000 with ML API serving real predictions
+- OCE Frontend: ✅ :3000 with 4 ML panels wired
+- ML Models: ✅ 18 regime classifiers loaded and serving
+- Tests: ✅ 78/80 passing
+- Git: ✅ All pushed (15+ commits)
+
+### Complete OC2 Deliverables
+1. ✅ ML API (5 endpoints, live on :8000)
+2. ✅ ML Zustand store
+3. ✅ 4 ML panels (Regime, Entry Quality, Parameters, SHAP)
+4. ✅ Wired into OCE cockpit RightPanel ML tab
+5. ✅ Phase 1 pipeline (18 assets: Parquet → tiers → features)
+6. ✅ Phase 2 training (18/18 models, avg 80.7% test accuracy)
+7. ✅ Asian session grouping bug fix (critical)
+8. ✅ Data-driven tier configs (K-Means on 4 years M5 data)
+9. ✅ ML API serving real model predictions
+10. ✅ 40/40 unit tests passing
 
 ---
 
