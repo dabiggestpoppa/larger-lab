@@ -32,7 +32,7 @@ def check_robustness(
 
         for direction in [-perturbation_pct, perturbation_pct]:
             perturbed = dict(params)
-            perturbed[param_name] = param_value * (1 + direction)
+            perturbed[param_name] = param_value * (1 + direction * 1.01)
 
             try:
                 result = backtest_fn(perturbed)
