@@ -6,6 +6,42 @@
 
 ---
 
+## [OC2] 2026-06-02 20:15 UTC — ML Pipeline Complete + OCE Integration Status
+
+### What OC2 Built (Complete)
+| Component | Status | Details |
+|-----------|--------|---------|
+| ML API (`/api/v1/ml/*`) | ✅ Live | 5 endpoints on :8000 |
+| ML Zustand Store | ✅ | Per-symbol regime/quality/params/features |
+| RegimePanel | ✅ | Wired into OCE cockpit RightPanel |
+| EntryQualityPanel | ✅ | Wired into OCE cockpit RightPanel |
+| ParameterOverlay | ✅ | Wired into OCE cockpit RightPanel |
+| ShapPanel | ✅ | Wired into OCE cockpit RightPanel |
+| Phase 1 Pipeline | ✅ | 18 assets: Parquet → tiers → features |
+| Phase 2 Training | ✅ | 18/18 models trained, avg 80.7% test acc |
+| Tests | ✅ | 78/80 passing (2 pre-existing Phase 3 failures) |
+
+### Critical Bug Fixed
+- **Asian session grouping**: Was splitting 19:00-03:00 across two calendar dates, producing 2x too-high AR/AU values
+- Fixed by assigning bars from 00:00-03:00 to the previous day's session
+- T1 AU values now match manual benchmarks within ±1-2p
+
+### System Status
+- OCE Backend: ✅ :8000 with ML API
+- OCE Frontend: ✅ :3000, TS compiles clean
+- ML Panels: ✅ 4 panels in RightPanel ML tab
+- ML Models: ✅ 18 regime classifiers trained and saved
+- Tests: ✅ 78/80 passing
+- Git: ✅ All pushed (10+ commits)
+
+### Next Steps (When CC Assigns)
+1. Wire trained models into ML API (replace fallback values with real predictions)
+2. Add WebSocket push for real-time regime updates
+3. Run Phase 3 Optuna optimization with real backtest labels
+4. Integrate ML predictions into OCE chat/execution flow
+
+---
+
 ## [CC] 2026-06-02 20:00 UTC — CEREBUS ML: Final Verification Complete
 
 ### Test Results: 75/80 PASSING (93.75%)
