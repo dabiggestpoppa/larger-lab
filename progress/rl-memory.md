@@ -51,3 +51,4 @@
 ## Sync Metadata
 - **Last Sync:** 2026-05-26 14:00 UTC
 - **Shared Notes (read-only):** `progress/BUILD-NOTES.md` | `progress/TEAM-NOTES.md` | `progress/phase-11-status.md`
+- build_notes: `progress/BUILD-NOTES.md` (updated 2026-06-02 15:00 UTC)

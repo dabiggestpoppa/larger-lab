@@ -6,7 +6,8 @@
     "OCE-Backend": 5,
     "OCE-Frontend": 5,
     "Sniper-Dashboard": 5,
-    "SRRA-OPH": 5
+    "SRRA-OPH": 5,
+    "Obsidian-Sync": 5
   },
   "last_restart": {
     "OC2": 1780392033.9952905,
@@ -15,6 +16,7 @@
     "Telegram-Gateway": 1780391903.7917488,
     "OCE-Frontend": 1780392062.8837447,
     "Sniper-Dashboard": 1780392066.9768238,
-    "SRRA-OPH": 1780392071.0437043
+    "SRRA-OPH": 1780392071.0437043,
+    "Obsidian-Sync": 1780413962.7588823
   }
 }

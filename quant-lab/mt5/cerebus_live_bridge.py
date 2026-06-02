@@ -694,6 +694,9 @@ def run_live(symbols: list, lot_size: float = 0.01):
                             if p90_sig:
                                 signal_count += 1
                                 direction = "BUY" if p90_sig.direction == TradeDirection.LONG else "SELL"
+                                log.info("P90 RAW: sig.dir=%s (%s) → bridge_dir=%s | entry=%.5f sl=%.5f tp=%.5f",
+                                         p90_sig.direction, type(p90_sig.direction).__name__,
+                                         direction, p90_sig.entry_price, p90_sig.sl_price, p90_sig.tp_price)
                                 sig_dict = {
                                     "engine": "P90",
                                     "symbol": sym,

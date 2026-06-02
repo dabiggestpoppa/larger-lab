@@ -2,10 +2,10 @@
   "engine": "P90",
   "symbol": "CHFJPY.PRO",
   "direction": "SELL",
-  "entry": 203.268,
-  "sl": 203.2056,
-  "tp": 203.37025,
-  "event": "ENTRY",
-  "variant": "INITIAL",
-  "time": "2026-06-02 10:37:00"
+  "entry": 203.124,
+  "sl": 203.24159999999998,
+  "tp": 203.02075,
+  "event": "TP_HIT",
+  "variant": "CASCADE",
+  "time": "2026-06-02 13:50:00"
 }
