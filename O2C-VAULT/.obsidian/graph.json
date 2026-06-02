@@ -1,0 +1,59 @@
+{
+  "filters": {
+    "search": "",
+    "tags": true,
+    "attachments": false,
+    "existingFilesOnly": true,
+    "orphans": true
+  },
+  "groups": [
+    {
+      "query": "path:doctrine",
+      "color": {"rgb": 77, 171, 247, "a": 1}
+    },
+    {
+      "query": "path:agents",
+      "color": {"rgb": 81, 207, 102, "a": 1}
+    },
+    {
+      "query": "path:architecture",
+      "color": {"rgb": 132, 94, 247, "a": 1}
+    },
+    {
+      "query": "path:ontology",
+      "color": {"rgb": 255, 211, 59, "a": 1}
+    },
+    {
+      "query": "path:failures",
+      "color": {"rgb": 249, 65, 68, "a": 1}
+    },
+    {
+      "query": "path:execution",
+      "color": {"rgb": 32, 201, 151, "a": 1}
+    },
+    {
+      "query": "path:memory",
+      "color": {"rgb": 240, 101, 149, "a": 1}
+    },
+    {
+      "query": "path:skills",
+      "rgb": [255, 169, 77]
+    },
+    {
+      "query": "path:graphs",
+      "color": {"rgb": 148, 216, 45, "a": 1}
+    }
+  ],
+  "display": {
+    "arrows": true,
+    "textFadeThreshold": 0.1,
+    "nodeSizeMultiplier": 1.5,
+    "linkThicknessMultiplier": 1.2
+  },
+  "force": {
+    "centerStrength": 0.5,
+    "repelStrength": 120,
+    "linkStrength": 0.8,
+    "linkDistance": 80
+  }
+}

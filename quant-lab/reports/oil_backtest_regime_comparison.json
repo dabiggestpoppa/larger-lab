@@ -1,0 +1,68 @@
+{
+  "LCOUSD": {
+    "static": {
+      "label": "STATIC_DEFAULT",
+      "n_trades": 197,
+      "tiers": {
+        "T3": 127,
+        "T2": 53,
+        "T1": 17
+      },
+      "regimes": {
+        "PRE_WAR": 83,
+        "WAR_ONSET": 36,
+        "WAR_SPIKE": 29,
+        "NORMALIZATION": 49
+      }
+    },
+    "regime_adaptive": {
+      "label": "REGIME_ADAPTIVE",
+      "n_trades": 240,
+      "tiers": {
+        "T2": 123,
+        "T1": 79,
+        "T3": 38
+      },
+      "regimes": {
+        "PRE_WAR": 87,
+        "WAR_ONSET": 59,
+        "WAR_SPIKE": 31,
+        "NORMALIZATION": 63
+      }
+    }
+  },
+  "OILUSD": {
+    "static": {
+      "label": "STATIC_DEFAULT",
+      "n_trades": 2373,
+      "tiers": {
+        "T1": 1305,
+        "T2": 705,
+        "T3": 363
+      },
+      "regimes": {
+        "PRE_WAR": 645,
+        "WAR_ONSET": 323,
+        "WAR_SPIKE": 183,
+        "NORMALIZATION": 574,
+        "CURRENT": 648
+      }
+    },
+    "regime_adaptive": {
+      "label": "REGIME_ADAPTIVE",
+      "n_trades": 2651,
+      "tiers": {
+        "T2": 1282,
+        "T1": 1067,
+        "T3": 302
+      },
+      "regimes": {
+        "PRE_WAR": 608,
+        "WAR_ONSET": 395,
+        "WAR_SPIKE": 230,
+        "NORMALIZATION": 566,
+        "CURRENT": 852
+      }
+    }
+  }
+}

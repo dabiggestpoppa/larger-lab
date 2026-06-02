@@ -1,4 +1,4 @@
-# 📊 All Mermaid Graphs — Canonical Reference
+OK# 📊 All Mermaid Graphs — Canonical Reference
 
 > **Purpose:** Single file containing every Mermaid diagram in the workspace.
 > **Last Updated:** 2026-06-01

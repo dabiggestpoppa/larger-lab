@@ -40,4 +40,48 @@ __all__ = [
     "ObserverLifecycle",
     "EventAwareness",
     "EventType",
+    "ObserverConversationRuntime",
+    "CommandRouter",
+    "Vault",
+    "Journal",
+    "ReportReturnSystem",
+    "SemanticRetrieval",
+    "KnowledgeGraph",
+    "PatternDistillation",
+    "FailureIntelligence",
+    "AutonomousOrchestrator",
 ]
+
+# Phase 1 + 2 + 3 components (lazy imports to avoid circular deps)
+def __getattr__(name):
+    if name == "ObserverConversationRuntime":
+        from .observer_conversation_runtime import ObserverConversationRuntime
+        return ObserverConversationRuntime
+    if name == "CommandRouter":
+        from .command_router import CommandRouter
+        return CommandRouter
+    if name == "Vault":
+        from .vault import Vault
+        return Vault
+    if name == "Journal":
+        from .journal import Journal
+        return Journal
+    if name == "ReportReturnSystem":
+        from .report_return import ReportReturnSystem
+        return ReportReturnSystem
+    if name == "SemanticRetrieval":
+        from .semantic_retrieval import SemanticRetrieval
+        return SemanticRetrieval
+    if name == "KnowledgeGraph":
+        from .graph_traversal import KnowledgeGraph
+        return KnowledgeGraph
+    if name == "PatternDistillation":
+        from .pattern_distillation import PatternDistillation
+        return PatternDistillation
+    if name == "FailureIntelligence":
+        from .pattern_distillation import FailureIntelligence
+        return FailureIntelligence
+    if name == "AutonomousOrchestrator":
+        from .autonomous_orchestrator import AutonomousOrchestrator
+        return AutonomousOrchestrator
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

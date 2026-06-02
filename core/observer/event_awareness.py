@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Callable
+from .observer_persistence import persist_event
 
 
 class EventType(str, Enum):
@@ -89,6 +90,11 @@ class EventAwareness:
 
         # Notify subscribers
         self._notify(event)
+        # Persist event to observer DB (best-effort)
+        try:
+            persist_event(event)
+        except Exception:
+            pass
         return event
 
     def subscribe(self, event_type: str, callback: Callable) -> None:

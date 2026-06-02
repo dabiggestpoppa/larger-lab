@@ -1,0 +1,36 @@
+{
+  "tasks": {
+    "task_4160e39e": {
+      "task_id": "task_4160e39e",
+      "name": "build phase3",
+      "status": "pending",
+      "created_at": "2026-06-02T00:59:53.588001Z",
+      "updated_at": "2026-06-02T00:59:53.588001Z",
+      "agent_id": "",
+      "output": "",
+      "error": "",
+      "metadata": {
+        "source": "telegram"
+      }
+    },
+    "task_6e028583": {
+      "task_id": "task_6e028583",
+      "name": "spawn_research",
+      "status": "active",
+      "created_at": "2026-06-02T00:59:53.694759Z",
+      "updated_at": "2026-06-02T00:59:53.697161Z",
+      "agent_id": "spawn_36f75fcc",
+      "output": "",
+      "error": "",
+      "metadata": {
+        "spawn_id": "spawn_36f75fcc",
+        "task_type": "research"
+      }
+    }
+  },
+  "queue": [
+    "task_4160e39e",
+    "task_6e028583"
+  ],
+  "saved_at": "2026-06-02T00:59:53.697161Z"
+}

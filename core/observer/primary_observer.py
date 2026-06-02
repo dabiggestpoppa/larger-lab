@@ -172,6 +172,138 @@ class PrimaryObserver:
         runtime[key] = value
         self.state.set("runtime_state", runtime)
 
+    def execute(self, response: OrchestrationResponse, user_input: str) -> dict[str, Any]:
+        """
+        Execute the next action determined by receive_input().
+        
+        If next_action is spawn_agent, runs the AgentSpawner pipeline
+        AND executes real tasks via TaskExecutor when task is recognized.
+        Returns a dict with execution results.
+        """
+        from core.observer.task_executor import TaskExecutor
+        executor = TaskExecutor()
+
+        # Check for known task patterns and execute directly
+        task_results = self._try_execute_known_task(user_input, executor)
+        if task_results is not None:
+            self.event_awareness.emit(
+                EventType.TASK_COMPLETED,
+                source=self.observer_id,
+                data={
+                    "request_id": response.request_id,
+                    "task_results": [r.to_dict() for r in task_results],
+                },
+            )
+            return {
+                "action": "direct_execution",
+                "status": "completed",
+                "task_results": [r.to_dict() for r in task_results],
+            }
+
+        # Otherwise run the spawn pipeline for general tasks
+        if response.next_action == "spawn_agent":
+            import asyncio
+            from core.spawn.agent_spawner import AgentSpawner
+            
+            spawner = AgentSpawner()
+            try:
+                result = asyncio.get_event_loop().run_until_complete(
+                    spawner.spawn(
+                        user_input=user_input,
+                        session_context=response.context_summary,
+                    )
+                )
+                self.event_awareness.emit(
+                    EventType.AGENT_SPAWNED,
+                    source=self.observer_id,
+                    data={
+                        "spawn_id": result.spawn_id,
+                        "status": result.status,
+                        "task_type": result.consensus.get("task_type"),
+                        "model": result.blueprint.get("target_model") if result.blueprint else None,
+                    },
+                )
+                self.state.add_active_agent(result.spawn_id)
+                return {
+                    "action": "spawn_agent",
+                    "spawn_id": result.spawn_id,
+                    "status": result.status,
+                    "output": result.output,
+                    "consensus": result.consensus,
+                    "duration_ms": result.duration_ms,
+                }
+            except RuntimeError:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                try:
+                    result = loop.run_until_complete(
+                        spawner.spawn(
+                            user_input=user_input,
+                            session_context=response.context_summary,
+                        )
+                    )
+                    self.event_awareness.emit(
+                        EventType.AGENT_SPAWNED,
+                        source=self.observer_id,
+                        data={
+                            "spawn_id": result.spawn_id,
+                            "status": result.status,
+                            "task_type": result.consensus.get("task_type"),
+                        },
+                    )
+                    self.state.add_active_agent(result.spawn_id)
+                    return {
+                        "action": "spawn_agent",
+                        "spawn_id": result.spawn_id,
+                        "status": result.status,
+                        "output": result.output,
+                        "consensus": result.consensus,
+                        "duration_ms": result.duration_ms,
+                    }
+                finally:
+                    loop.close()
+            except Exception as e:
+                self.event_awareness.emit(
+                    EventType.SPAWN_FAILED,
+                    source=self.observer_id,
+                    data={"error": str(e)},
+                )
+                return {"action": "spawn_agent", "status": "failed", "error": str(e)}
+        
+        return {"action": response.next_action, "status": "no_execution_needed"}
+
+    def _try_execute_known_task(self, user_input: str, executor) -> list | None:
+        """Detect known task patterns and execute them directly."""
+        text = user_input.lower()
+
+        # Phase 1 cleanup
+        if any(kw in text for kw in ["phase 1", "phase1", "cleanup", "workspace cleanup"]):
+            if any(kw in text for kw in [".openclaw", "quant_lab", "shared", "archive", "cleanup"]):
+                return executor.execute_phase1_cleanup()
+
+        # Move to archive
+        if "move" in text and "archive" in text:
+            import re
+            match = re.search(r"move\s+(\S+)\s+to\s+archive", text)
+            if match:
+                return [executor.move_to_archive(match.group(1))]
+
+        # Remove symlink
+        if "remove" in text and "symlink" in text:
+            import re
+            match = re.search(r"remove\s+symlink\s+(\S+)", text)
+            if match:
+                return [executor.remove_symlink(match.group(1))]
+
+        # Merge directories
+        if "merge" in text:
+            import re
+            match = re.search(r"merge\s+(\S+)\s+into\s+(\S+)", text)
+            if match:
+                return [executor.merge_directories(match.group(1), match.group(2))]
+
+        return None
+
     def _determine_next_action(self, request: OrchestrationRequest) -> str:
         if request.requires_spawn:
             return "spawn_agent"

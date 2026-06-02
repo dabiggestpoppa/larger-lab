@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 from typing import Optional
 
 
-DEFAULT_VAULT_PATH = Path(__file__).resolve().parent.parent.parent / "O2C-VAULT"
+DEFAULT_VAULT_PATH = Path(__file__).resolve().parent.parent.parent / "memory/obsidian-vault"
 
 VAULT_DIRECTORIES = [
     "agents/quant", "agents/research", "agents/coding", "agents/observer",

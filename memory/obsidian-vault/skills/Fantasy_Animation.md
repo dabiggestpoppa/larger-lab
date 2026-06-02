@@ -1,0 +1,335 @@
+# Fantasy Animation
+
+> Category: skills | Imported: 2026-06-02 01:13 UTC
+
+Tags: #skills
+
+# fantasy-animation
+
+Whimsical hand-drawn animation style inspired by Ghibli/Disney
+
+## Design Aesthetic
+
+Charming hand-drawn animation aesthetic reminiscent of classic Disney, Studio Ghibli, or European storybook illustration. Soft, painterly textures with warm, inviting colors. Friendly characters, magical elements, and storybook feel. Enchanting, nostalgic, and emotionally engaging.
+
+## Background
+
+- Color: Soft Sky Blue (#E8F4FC) or Warm Cream (#FFF8E7)
+- Texture: Subtle watercolor wash, soft brush strokes
+
+## Color Palette
+
+| Role | Color | Hex | Usage |
+|------|-------|-----|-------|
+| Background | Soft Sky Blue | #E8F4FC | Primary background |
+| Alt Background | Warm Cream | #FFF8E7 | Secondary areas |
+| Primary Text | Deep Forest | #2D5A3D | Headlines |
+| Body Text | Warm Brown | #5D4E37 | Content |
+| Accent 1 | Golden Yellow | #F4D03F | Magic, highlights |
+| Accent 2 | Rose Pink | #E8A0BF | Warmth, charm |
+| Accent 3 | Sage Green | #87A96B | Nature elements |
+| Accent 4 | Sky Blue | #7EC8E3 | Air, water, dreams |
+| Accent 5 | Coral | #F08080 | Emphasis, life |
+
+## Visual Elements
+
+- Central illustrated character (friendly, expressive)
+- Small companion creatures (animals, magical beings)
+- Storybook-style environment backgrounds
+- Magical floating objects (books, orbs, sparkles)
+- Decorative elements: stars, flowers, leaves
+- Soft shadows and gentle highlights
+- Layered depth with foreground/background
+
+## Style Rules
+
+### Do
+
+- Create warm, inviting compositions
+- Use soft edges and painterly textures
+- Include charming character illustrations
+- Add magical decorative touches
+- Maintain storybook narrative feel
+
+### Don't
+
+- Use harsh geometric shapes
+- Create dark or intimidating imagery
+- Add photorealistic elements
+- Use cold color palettes
+- Make it look digital/computerized
+
+## Best For
+
+Educational content, children's articles, storytelling, creative topics, fantasy/gaming, inspirational pieces, family-friendly content
+
+LINKS:
+[[Architecture]]
+[[Claude]]
+[[3D Scene]]
+[[Action]]
+[[Advanced Usage]]
+[[Aged Academia]]
+[[Airbnb]]
+[[Airtable]]
+[[Analysis Framework]]
+[[Analysis Modules]]
+[[Animation]]
+[[Animations]]
+[[Animation Design Thinking]]
+[[Api Endpoints]]
+[[Api Evaluation]]
+[[Apple]]
+[[Artifacts]]
+[[Attribution]]
+[[Audio Reactive]]
+[[Autoreason Methodology]]
+[[Auto Selection]]
+[[Base Prompt]]
+[[Benchmark Guide]]
+[[Bento Grid]]
+[[Binary Comparison]]
+[[Block Types]]
+[[Blueprint]]
+[[Bmw]]
+[[Bold Graphic]]
+[[Bridge]]
+[[Bug Report]]
+[[Cal]]
+[[Camera And 3D]]
+[[Chalk]]
+[[Chalkboard]]
+[[Character Template]]
+[[Checklists]]
+[[Cinematic]]
+[[Circular Flow]]
+[[Citation Workflow]]
+[[Ci Troubleshooting]]
+[[Clay]]
+[[Claymation]]
+[[Clickhouse]]
+[[Cohere]]
+[[Coinbase]]
+[[Colors]]
+[[Color Systems]]
+[[Comic Strip]]
+[[Comparison Matrix]]
+[[Composio]]
+[[Composition]]
+[[Concept Story]]
+[[Configuration]]
+[[Context Budget Discipline]]
+[[Conventional Commits]]
+[[Core Api]]
+[[Corporate Memphis]]
+[[Craft Handmade]]
+[[Cursor]]
+[[Custom Tasks]]
+[[Cyberpunk Neon]]
+[[Dark Mode]]
+[[Dashboard]]
+[[Dat Scripting]]
+[[Decorations]]
+[[Dense]]
+[[Dense Modules]]
+[[Description]]
+[[Distributed Eval]]
+[[Dogfood Report Template]]
+[[Dramatic]]
+[[Editing]]
+[[Editorial]]
+[[Effects]]
+[[Elegant]]
+[[Elevenlabs]]
+[[Energetic]]
+[[Equations]]
+[[Examples]]
+[[Experiment Patterns]]
+[[Expo]]
+[[Export Pipeline]]
+[[External Data]]
+[[Failures]]
+[[Feature Request]]
+[[Figma]]
+[[Flat]]
+[[Flat Doodle]]
+[[Formatting]]
+[[Four Panel]]
+[[Framer]]
+[[Full Prompt Library]]
+[[Funnel]]
+[[Gates Taxonomy]]
+[[Geometry Comp]]
+[[Github Api Cheatsheet]]
+[[Glsl]]
+[[Gmail Search Syntax]]
+[[Graphs And Data]]
+[[Hand Drawn Edu]]
+[[Hashicorp]]
+[[Heuristics]]
+[[Hierarchical Layers]]
+[[Hub Discovery]]
+[[Hub Spoke]]
+[[Human Evaluation]]
+[[Ibm]]
+[[Iceberg]]
+[[Ikea Manual]]
+[[Ink Brush]]
+[[Ink Notes]]
+[[Inputs]]
+[[Integrations]]
+[[Interaction]]
+[[Intercom]]
+[[Intuition Machine]]
+[[Isometric Map]]
+[[Issue Taxonomy]]
+[[Jailbreak Templates]]
+[[Jigsaw]]
+[[Kawaii]]
+[[Knolling]]
+[[Kraken]]
+[[Layout Compositor]]
+[[Lego Brick]]
+[[Ligne Claire]]
+[[Linear.App]]
+[[Linear Progression]]
+[[Lovable]]
+[[Macaron]]
+[[Manga]]
+[[Mcp Tools]]
+[[Message Composition]]
+[[Methods Guide]]
+[[Midi Osc]]
+[[Minimal]]
+[[Minimalist]]
+[[Minimax]]
+[[Mintlify]]
+[[Miro]]
+[[Mistral.Ai]]
+[[Mixed]]
+[[Mobjects]]
+[[Modules]]
+[[Mongodb]]
+[[Mono Ink]]
+[[Morandi Journal]]
+[[Nature]]
+[[Neon]]
+[[Network Patterns]]
+[[Neutral]]
+[[Notion]]
+[[Nvidia]]
+[[Official Cli]]
+[[Ohmsha]]
+[[Ohmsha Guide]]
+[[Ollama]]
+[[Opencode.Ai]]
+[[Operators]]
+[[Operator Tips]]
+[[Optimization]]
+[[Optimizers]]
+[[Origami]]
+[[Output Formats]]
+[[Palettes]]
+[[Panel Ui]]
+[[Paper Explainer]]
+[[Paper Types]]
+[[Partial Workflows]]
+[[Particles]]
+[[Patterns]]
+[[Periodic Table]]
+[[Pinterest]]
+[[Pitfalls]]
+[[Pixel Art]]
+[[Playful]]
+[[Pmb Codex Lane Prompt]]
+[[Pop Laboratory]]
+[[Port Notes]]
+[[Postfx]]
+[[Posthog]]
+[[Pptxgenjs]]
+[[Production Quality]]
+[[Projection Mapping]]
+[[Prompt Construction]]
+[[Pr Body Bugfix]]
+[[Pr Body Feature]]
+[[Python Api]]
+[[Quantization]]
+[[Raycast]]
+[[Realistic]]
+[[Refusal Detection]]
+[[Rendering]]
+[[Replicate]]
+[[Replicator]]
+[[Resend]]
+[[Rest Api]]
+[[Retro]]
+[[Retro Pop Grid]]
+[[Reviewer Guidelines]]
+[[Review Output Template]]
+[[Revolut]]
+[[Romantic]]
+[[Runwayml]]
+[[Sanity]]
+[[Scenes]]
+[[Scene Planning]]
+[[Scientific]]
+[[Screen Print]]
+[[Sentry]]
+[[Server]]
+[[Server Deployment]]
+[[Shaders]]
+[[Shapes And Geometry]]
+[[Shoujo]]
+[[Sketch]]
+[[Sketch Notes]]
+[[Skill]]
+[[Sources]]
+[[Spacex]]
+[[Splash]]
+[[Spotify]]
+[[Standard]]
+[[Starter]]
+[[Storyboard Template]]
+[[Storybook Watercolor]]
+[[Story Mountain]]
+[[Stripe]]
+[[Structural Breakdown]]
+[[Structured Content Template]]
+[[Styles]]
+[[Style Presets]]
+[[Subway Map]]
+[[Supabase]]
+[[Superhuman]]
+[[Sweeps]]
+[[System]]
+[[Technical Schematic]]
+[[Template Integrity]]
+[[Together.Ai]]
+[[Tree Branching]]
+[[Troubleshooting]]
+[[Typography]]
+[[Uber]]
+[[Ui Wireframe]]
+[[Updaters And Trackers]]
+[[Usage]]
+[[Vector Illustration]]
+[[Venn Diagram]]
+[[Vercel]]
+[[Vintage]]
+[[Visual Design]]
+[[Visual Effects]]
+[[Voltagent]]
+[[Warm]]
+[[Warp]]
+[[Watercolor]]
+[[Webflow]]
+[[Webgl And 3D]]
+[[Webtoon]]
+[[Winding Roadmap]]
+[[Wise]]
+[[Workflow]]
+[[Workflow Format]]
+[[Writing Guide]]
+[[Wuxia]]
+[[X.Ai]]
+[[Zapier]]

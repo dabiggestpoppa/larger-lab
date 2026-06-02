@@ -1,13 +1,11 @@
 {
-  "engine": "P90",
+  "engine": "SymmetryTrap",
   "symbol": "GBPUSD.PRO",
   "direction": "SELL",
-  "entry": 1.3415,
-  "sl": 1.34213,
-  "tp": 1.34081,
-  "variant": "INITIAL",
-  "body_pips": 7.9,
-  "threshold": 6.2,
-  "ar_pips": 13.8,
-  "time": "2026-06-01 09:53:00"
+  "entry": 1.34593,
+  "sl": 1.34535,
+  "tp": 1.3449300000000002,
+  "event": "SL_HIT",
+  "loop": 1,
+  "time": "2026-06-01 16:08:00"
 }

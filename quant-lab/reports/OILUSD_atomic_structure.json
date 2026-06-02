@@ -1,0 +1,103 @@
+{
+  "symbol": "OILUSD",
+  "pip_size": 0.01,
+  "regimes": {
+    "PRE_WAR": {
+      "n_days": 198,
+      "ar_mean": 29.2,
+      "ar_std": 36.0,
+      "ar_p50": 20.0,
+      "ar_p90": 49.9,
+      "ar_p95": 62.6,
+      "ar_min": 8.0,
+      "ar_max": 416.0,
+      "tier_dist": {
+        "T1": 94,
+        "T2": 56,
+        "T3": 26,
+        "NO_GO": 22
+      },
+      "day_range_mean": 238.8,
+      "day_range_p90": 363.6
+    },
+    "WAR_ONSET": {
+      "n_days": 122,
+      "ar_mean": 30.9,
+      "ar_std": 24.8,
+      "ar_p50": 23.0,
+      "ar_p90": 56.9,
+      "ar_p95": 68.9,
+      "ar_min": 9.0,
+      "ar_max": 185.0,
+      "tier_dist": {
+        "T1": 48,
+        "T2": 31,
+        "NO_GO": 23,
+        "T3": 20
+      },
+      "day_range_mean": 228.9,
+      "day_range_p90": 340.1
+    },
+    "WAR_SPIKE": {
+      "n_days": 65,
+      "ar_mean": 22.0,
+      "ar_std": 11.9,
+      "ar_p50": 18.0,
+      "ar_p90": 37.0,
+      "ar_p95": 45.0,
+      "ar_min": 9.0,
+      "ar_max": 68.0,
+      "tier_dist": {
+        "T1": 38,
+        "T2": 17,
+        "T3": 6,
+        "NO_GO": 4
+      },
+      "day_range_mean": 172.8,
+      "day_range_p90": 246.2
+    },
+    "NORMALIZATION": {
+      "n_days": 194,
+      "ar_mean": 27.0,
+      "ar_std": 21.4,
+      "ar_p50": 20.0,
+      "ar_p90": 48.0,
+      "ar_p95": 63.7,
+      "ar_min": 7.0,
+      "ar_max": 151.0,
+      "tier_dist": {
+        "T1": 95,
+        "T2": 44,
+        "T3": 32,
+        "NO_GO": 23
+      },
+      "day_range_mean": 193.4,
+      "day_range_p90": 282.7
+    },
+    "CURRENT": {
+      "n_days": 300,
+      "ar_mean": 64.9,
+      "ar_std": 118.6,
+      "ar_p50": 27.0,
+      "ar_p90": 127.1,
+      "ar_p95": 216.2,
+      "ar_min": 6.0,
+      "ar_max": 1323.0,
+      "tier_dist": {
+        "NO_GO": 116,
+        "T1": 107,
+        "T2": 52,
+        "T3": 25
+      },
+      "day_range_mean": 295.2,
+      "day_range_p90": 634.1
+    }
+  },
+  "current_regime_ar_mean": 64.9,
+  "current_regime_tier_dist": {
+    "NO_GO": 116,
+    "T1": 107,
+    "T2": 52,
+    "T3": 25
+  }
+}

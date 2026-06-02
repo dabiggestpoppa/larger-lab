@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PO Tracker</title>
+  <style>
+    *{box-sizing:border-box}
+    body{font-family:Inter,Segoe UI,Arial;margin:0;padding:0;background:#0b1220;color:#e6eef8}
+    header{padding:10px 20px;background:#071029;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    h1{margin:0;font-size:18px;white-space:nowrap}
+    #container{display:flex;gap:12px;padding:12px;flex-wrap:wrap}
+    .panel{background:#071029;padding:12px;border-radius:6px;flex:1;min-width:280px;min-height:200px;overflow:auto}
+    pre{white-space:pre-wrap;word-break:break-word;margin:0}
+    .small{font-size:12px;color:#9fb0c8}
+    button,.btn{background:#0b6fff;border:none;color:white;padding:6px 10px;border-radius:4px;cursor:pointer;font-size:12px}
+    button:hover,.btn:hover{background:#0a5edf}
+    input,select{background:#0f1a2e;color:#e6eef8;border:1px solid #1a2a44;border-radius:4px;padding:5px 8px;font-size:12px}
+    input:focus,select:focus{outline:1px solid #0b6fff}
+    .filter-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .badge{display:inline-block;background:#1a2a44;padding:2px 8px;border-radius:10px;font-size:11px;margin:1px}
+    .badge.active{background:#0b6fff}
+    .badge:hover{cursor:pointer;background:#0b6fff80}
+    .event-card{border-left:3px solid #0b6fff;padding:4px 8px;margin:4px 0;border-radius:2px;background:#0f1a2e}
+    .event-card.critical{border-left-color:#ff4444}
+    .event-card.warn{border-left-color:#ffaa00}
+    .event-card.ok{border-left-color:#22cc66}
+    .ts{color:#5a7a9a;font-size:11px}
+    .etype{color:#0b6fff;font-weight:600}
+    .esrc{color:#9b59b6}
+    .link{color:#0b6fff;text-decoration:underline;cursor:pointer}
+    #status-bar{padding:4px 20px;background:#060d1a;font-size:11px;color:#5a7a9a;display:flex;gap:16px}
+    .tab{padding:6px 12px;cursor:pointer;border-bottom:2px solid transparent}
+    .tab.active{border-bottom-color:#0b6fff;color:#0b6fff}
+    .tabs{display:flex;gap:0;margin-bottom:8px}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>PO Tracker</h1>
+    <div class="filter-bar">
+      <input id="search" type="text" placeholder="Search events..." style="width:180px" />
+      <select id="typeFilter">
+        <option value="">All types</option>
+        <option value="task_received">task_received</option>
+        <option value="task_started">task_started</option>
+        <option value="task_completed">task_completed</option>
+        <option value="task_failed">task_failed</option>
+        <option value="observer_spawned">observer_spawned</option>
+        <option value="observer_degraded">observer_degraded</option>
+        <option value="agent_spawned">agent_spawned</option>
+        <option value="agent_terminated">agent_terminated</option>
+        <option value="spawn_failed">spawn_failed</option>
+        <option value="repair_triggered">repair_triggered</option>
+        <option value="entropy_spike">entropy_spike</option>
+        <option value="continuity_lost">continuity_lost</option>
+      </select>
+      <select id="sourceFilter">
+        <option value="">All sources</option>
+        <option value="primary_observer">primary_observer</option>
+        <option value="spawn_engine">spawn_engine</option>
+        <option value="consensus">consensus</option>
+        <option value="event_awareness">event_awareness</option>
+      </select>
+      <select id="limitSelect">
+        <option value="25">25</option>
+        <option value="50" selected>50</option>
+        <option value="100">100</option>
+        <option value="200">200</option>
+      </select>
+      <button id="refresh">Refresh</button>
+      <label style="font-size:11px;display:flex;align-items:center;gap:4px"><input type="checkbox" id="autoRefresh" checked /> Auto</label>
+    </div>
+  </header>
+
+  <div id="status-bar">
+    <span id="statusEvents">Events: 0</span>
+    <span id="statusChat">Chat: 0</span>
+    <span id="statusState">State: 0</span>
+    <span id="statusSSE">SSE: —</span>
+    <span id="statusLast">Last: —</span>
+  </div>
+
+  <div id="container">
+    <div class="panel" style="flex:2">
+      <div class="tabs">
+        <div class="tab active" data-tab="events">Events</div>
+        <div class="tab" data-tab="chat">Chat</div>
+        <div class="tab" data-tab="state">State</div>
+      </div>
+      <div id="events" class="small"><pre>Loading...</pre></div>
+      <div id="chat" class="small" style="display:none"><pre>Loading...</pre></div>
+      <div id="state" class="small" style="display:none"><pre>Loading...</pre></div>
+    </div>
+    <div class="panel" style="flex:1;max-width:320px">
+      <h3>Event Type Counts</h3>
+      <div id="counts" class="small"><pre>—</pre></div>
+      <h3 style="margin-top:16px">Quick Links</h3>
+      <div id="links" class="small">
+        <a class="link" href="/api/events?limit=100" target="_blank">/api/events</a><br/>
+        <a class="link" href="/api/chat?limit=100" target="_blank">/api/chat</a><br/>
+        <a class="link" href="/api/state?limit=100" target="_blank">/api/state</a><br/>
+        <a class="link" href="http://127.0.0.1:8765/events?limit=100" target="_blank">PO API (8765)</a><br/>
+        <a class="link" href="http://127.0.0.1:8780/stream" target="_blank">SSE Stream</a>
+      </div>
+    </div>
+  </div>
+
+<script>
+const API = '/api'
+const q = s => document.querySelector(s)
+const qa = s => document.querySelectorAll(s)
+
+// State
+let allEvents = [], allChat = [], allState = []
+let activeTab = 'events'
+
+// Tabs
+qa('.tab').forEach(t => t.addEventListener('click', () => {
+  qa('.tab').forEach(x => x.classList.remove('active'))
+  t.classList.add('active')
+  activeTab = t.dataset.tab
+  q('#events').style.display = activeTab==='events' ? '' : 'none'
+  q('#chat').style.display = activeTab==='chat' ? '' : 'none'
+  q('#state').style.display = activeTab==='state' ? '' : 'none'
+}))
+
+async function fetchJSON(path){
+  try{
+    const res = await fetch(API+path)
+    return await res.json()
+  }catch(e){return {error:e.message}}
+}
+
+function classify(type){
+  const critical = ['task_failed','observer_degraded','spawn_failed','continuity_lost','agent_terminated']
+  const warn = ['repair_triggered','entropy_spike','observer_shutdown']
+  if(critical.includes(type)) return 'critical'
+  if(warn.includes(type)) return 'warn'
+  return 'ok'
+}
+
+function filterRows(rows, type){
+  const search = q('#search').value.toLowerCase()
+  const typeF = q('#typeFilter').value
+  const srcF = q('#sourceFilter').value
+  return rows.filter(r => {
+    if(type==='events'){
+      if(typeF && r.event_type !== typeF) return false
+      if(srcF && r.source !== srcF) return false
+    }
+    if(search){
+      const text = type==='events' ? `${r.event_type} ${r.source} ${JSON.stringify(r.data)}`
+        : type==='chat' ? `${r.source} ${r.message}`
+        : `${r.key} ${JSON.stringify(r.new)}`
+      if(!text.toLowerCase().includes(search)) return false
+    }
+    return true
+  })
+}
+
+function renderEvents(rows){
+  const el = q('#events pre')
+  if(!rows.length){ el.textContent='(none)'; return }
+  el.innerHTML = rows.map(r => {
+    const cls = classify(r.event_type)
+    const dataStr = JSON.stringify(r.data)
+    const shortData = dataStr.length>120 ? dataStr.slice(0,120)+'...' : dataStr
+    return `<div class="event-card ${cls}"><span class="ts">${r.timestamp}</span> <span class="etype">${r.event_type}</span> <span class="esrc">@${r.source}</span> ${shortData}</div>`
+  }).join('')
+}
+
+function renderChat(rows){
+  const el = q('#chat pre')
+  if(!rows.length){ el.textContent='(none)'; return }
+  el.innerHTML = rows.map(r =>
+    `<div class="event-card ok"><span class="ts">${r.timestamp}</span> <span class="esrc">${r.source}</span>: ${r.message}</div>`
+  ).join('')
+}
+
+function renderState(rows){
+  const el = q('#state pre')
+  if(!rows.length){ el.textContent='(none)'; return }
+  el.innerHTML = rows.map(r => {
+    const nv = JSON.stringify(r.new)
+    const short = nv.length>100 ? nv.slice(0,100)+'...' : nv
+    return `<div class="event-card ok"><span class="ts">${r.timestamp}</span> <span class="etype">${r.key}</span>: ${short}</div>`
+  }).join('')
+}
+
+function renderCounts(events){
+  const counts = {}
+  events.forEach(e => { counts[e.event_type] = (counts[e.event_type]||0)+1 })
+  const el = q('#counts pre')
+  if(!Object.keys(counts).length){ el.textContent='—'; return }
+  el.innerHTML = Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([k,v]) =>
+    `<span class="badge ${classify(k)}">${k}: ${v}</span>`
+  ).join(' ')
+}
+
+async function refresh(){
+  q('#refresh').disabled = true
+  const limit = q('#limitSelect').value
+  const ev = await fetchJSON('/events?limit='+limit)
+  const ch = await fetchJSON('/chat?limit='+limit)
+  const st = await fetchJSON('/state?limit='+limit)
+
+  if(!ev.error) allEvents = ev
+  if(!ch.error) allChat = ch
+  if(!st.error) allState = st
+
+  renderEvents(filterRows(allEvents,'events'))
+  renderChat(filterRows(allChat,'chat'))
+  renderState(filterRows(allState,'state'))
+  renderCounts(allEvents)
+
+  q('#statusEvents').textContent = 'Events: '+allEvents.length
+  q('#statusChat').textContent = 'Chat: '+allChat.length
+  q('#statusState').textContent = 'State: '+allState.length
+  q('#statusLast').textContent = 'Last: '+new Date().toLocaleTimeString()
+  q('#refresh').disabled = false
+}
+
+// Filters trigger re-render
+q('#search').addEventListener('input', () => {
+  renderEvents(filterRows(allEvents,'events'))
+  renderChat(filterRows(allChat,'chat'))
+  renderState(filterRows(allState,'state'))
+})
+q('#typeFilter').addEventListener('change', () => renderEvents(filterRows(allEvents,'events')))
+q('#sourceFilter').addEventListener('change', () => renderEvents(filterRows(allEvents,'events')))
+
+q('#refresh').addEventListener('click', refresh)
+
+// Auto-refresh
+let autoInterval = null
+function setAuto(){
+  if(autoInterval) clearInterval(autoInterval)
+  if(q('#autoRefresh').checked) autoInterval = setInterval(refresh, 5000)
+}
+q('#autoRefresh').addEventListener('change', setAuto)
+setAuto()
+refresh()
+
+// SSE for live updates
+if (!!window.EventSource) {
+  const src = new EventSource('/stream')
+  src.addEventListener('po_event', e => {
+    try{
+      const obj = JSON.parse(e.data)
+      allEvents.unshift(obj)
+      renderEvents(filterRows(allEvents,'events'))
+      renderCounts(allEvents)
+      q('#statusEvents').textContent = 'Events: '+allEvents.length
+      q('#statusSSE').textContent = 'SSE: live'
+      // browser notification
+      if (Notification && Notification.permission === 'granted'){
+        const cls = classify(obj.type)
+        if(cls==='critical'||cls==='warn'){
+          new Notification('PO Alert: '+obj.type, {body: obj.source+': '+JSON.stringify(obj.data).slice(0,100)})
+        }
+      }
+    }catch(err){ console.error('SSE parse error', err) }
+  })
+  src.onopen = () => { q('#statusSSE').textContent = 'SSE: connected' }
+  src.onerror = () => { q('#statusSSE').textContent = 'SSE: error' }
+  if (Notification && Notification.permission !== 'granted') Notification.requestPermission()
+} else {
+  q('#statusSSE').textContent = 'SSE: unsupported'
+}
+</script>
+</body>
+</html>
