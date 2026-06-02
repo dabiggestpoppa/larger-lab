@@ -53,6 +53,7 @@ from .reconstruction_api import register_reconstruction_endpoints
 from .topology_api import register_topology_endpoints
 from .sovereign_api import register_sovereign_endpoints
 from .vault_api import register_vault_endpoints
+from .ml_api import register_ml_endpoints
 
 app = FastAPI(
     title="OCE Continuity Core",
@@ -976,6 +977,9 @@ register_persistent_field_endpoints(app)
 
 # Register O2C Phase 00 + Phase 01 Vault/Cognitive Mesh endpoints
 register_vault_endpoints(app)
+
+# Register CEREBUS ML API endpoints
+register_ml_endpoints(app)
 
 
 

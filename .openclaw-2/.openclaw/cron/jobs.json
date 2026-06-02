@@ -60,7 +60,7 @@
       "agentId": "main",
       "sessionKey": "agent:main:telegram:direct:8258195396",
       "name": "Drain Watchdog — Kill stuck sub-agents before restart",
-      "enabled": true,
+      "enabled": false,
       "createdAtMs": 1779008419655,
       "schedule": {
         "kind": "every",
@@ -72,6 +72,29 @@
       "payload": {
         "kind": "agentTurn",
         "message": "You are the Drain Watchdog. Run these steps:\n\n1. Read the last 200 lines of today's gateway log at C:\\Users\\wifik\\AppData\\Local\\Temp\\openclaw\\openclaw-$(Get-Date -Format 'yyyy-MM-dd').log\n2. Count how many 'still draining' messages appear\n3. Check for 'drain timeout reached' or 'failed to reacquire gateway lock'\n\nIf drain stalls >= 3 OR drain timeout detected OR lock conflict detected:\n   - Use subagents(action='list') to get all active sub-agents\n   - Use subagents(action='kill') on each active sub-agent\n   - Wait 5 seconds\n   - Use gateway(action='restart') to restart the gateway\n   - Log the intervention to logs/drain-watchdog.log\n\nIf no issues found — reply NO_REPLY.\n\nKeep it fast. This runs every 2 minutes.",
+        "timeoutSeconds": 60
+      },
+      "delivery": {
+        "mode": "none"
+      },
+      "state": {}
+    },
+    {
+      "id": "c41b6d5f-99bc-4b59-95c8-ce4fe4370c33",
+      "agentId": "main",
+      "name": "Guardian Watchdog",
+      "enabled": true,
+      "createdAtMs": 1780430646945,
+      "schedule": {
+        "kind": "every",
+        "everyMs": 300000,
+        "anchorMs": 1780430646945
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Check if cerebus_guardian.py is running (PID via Get-Process python | Where-Object {$_.CommandLine -match 'guardian'}). If NOT running, start it: cd C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\mt5; Start-Process python.exe -ArgumentList 'cerebus_guardian.py' -WindowStyle Hidden. Check if cerebus_live_bridge.py is running. If NOT running, kill any guardian first (to avoid double-restart), wait 5s, then start guardian which will also start the bridge. Report status to MAD via Telegram (8258195396) only if something was restarted.",
         "timeoutSeconds": 60
       },
       "delivery": {

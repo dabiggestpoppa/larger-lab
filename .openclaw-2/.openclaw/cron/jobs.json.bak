@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "jobs": [
+    {
+      "id": "5fddd1f3-46e6-454d-8040-0cbba6f6319b",
+      "agentId": "main",
+      "sessionKey": "agent:main:telegram:direct:8258195396",
+      "name": "Content Farm - Daily Sourcing",
+      "enabled": true,
+      "createdAtMs": 1778942642133,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 6 * * *",
+        "tz": "America/New_York"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run the content sourcing pipeline: Use MediaCrawler and Spider_XHS to scrape trending content from ÃƒÂ¦Ã…Â Ã¢â‚¬â€œÃƒÂ©Ã…Â¸Ã‚Â³, ÃƒÂ¥Ã‚Â°Ã‚ÂÃƒÂ§Ã‚ÂºÃ‚Â¢ÃƒÂ¤Ã‚Â¹Ã‚Â¦, ÃƒÂ¥Ã‚Â¿Ã‚Â«ÃƒÂ¦Ã¢â‚¬Â°Ã¢â‚¬Â¹, ÃƒÂ¥Ã‚Â¾Ã‚Â®ÃƒÂ¥Ã‚ÂÃ…Â¡. Identify top 10 trending topics and save to content-farm/sourcing/YYYY-MM-DD.json. Then post a summary to the team chat.",
+        "timeoutSeconds": 300
+      },
+      "delivery": {
+        "mode": "announce",
+        "to": "telegram:8258195396",
+        "channel": "telegram",
+        "accountId": "default"
+      },
+      "state": {}
+    },
+    {
+      "agentId": "main",
+      "wakeMode": "now",
+      "id": "87b9fd68-3c68-427f-abfc-3125015f46a0",
+      "enabled": true,
+      "createdAtMs": 1778951487894,
+      "payload": {
+        "message": "Run daily memory sync: 1) python tools/progress-sync.py --force 2) python tools/summarize_progress.py --all 3) python tools/workspace_cleanup.py --scan 4) Post summary to team-chat.md",
+        "timeoutSeconds": 300,
+        "kind": "agentTurn"
+      },
+      "schedule": {
+        "expr": "0 7 * * *",
+        "tz": "America/New_York",
+        "kind": "cron"
+      },
+      "sessionTarget": "isolated",
+      "name": "Daily Memory Sync & Summarization",
+      "sessionKey": "agent:main:telegram:direct:8258195396",
+      "delivery": {
+        "to": "telegram:8258195396",
+        "channel": "telegram",
+        "accountId": "default",
+        "mode": "announce"
+      },
+      "state": {}
+    },
+    {
+      "id": "dbcbd379-bc1e-4017-8ed0-fa9796deba32",
+      "agentId": "main",
+      "sessionKey": "agent:main:telegram:direct:8258195396",
+      "name": "Drain Watchdog — Kill stuck sub-agents before restart",
+      "enabled": false,
+      "createdAtMs": 1779008419655,
+      "schedule": {
+        "kind": "every",
+        "everyMs": 120000,
+        "anchorMs": 1779008419655
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "You are the Drain Watchdog. Run these steps:\n\n1. Read the last 200 lines of today's gateway log at C:\\Users\\wifik\\AppData\\Local\\Temp\\openclaw\\openclaw-$(Get-Date -Format 'yyyy-MM-dd').log\n2. Count how many 'still draining' messages appear\n3. Check for 'drain timeout reached' or 'failed to reacquire gateway lock'\n\nIf drain stalls >= 3 OR drain timeout detected OR lock conflict detected:\n   - Use subagents(action='list') to get all active sub-agents\n   - Use subagents(action='kill') on each active sub-agent\n   - Wait 5 seconds\n   - Use gateway(action='restart') to restart the gateway\n   - Log the intervention to logs/drain-watchdog.log\n\nIf no issues found — reply NO_REPLY.\n\nKeep it fast. This runs every 2 minutes.",
+        "timeoutSeconds": 60
+      },
+      "delivery": {
+        "mode": "none"
+      },
+      "state": {}
+    }
+  ]
+}

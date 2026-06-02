@@ -2,62 +2,90 @@
   "version": 1,
   "jobs": {
     "5fddd1f3-46e6-454d-8040-0cbba6f6319b": {
-      "updatedAtMs": 1779012304177,
+      "updatedAtMs": 1780426959588,
       "scheduleIdentity": "{\"version\":1,\"enabled\":true,\"schedule\":{\"kind\":\"cron\",\"expr\":\"0 6 * * *\",\"tz\":\"America/New_York\"}}",
       "state": {
-        "nextRunAtMs": 1780426808422,
-        "lastRunAtMs": 1779012000028,
+        "nextRunAtMs": 1780480800000,
+        "lastRunAtMs": 1780426835293,
         "lastRunStatus": "error",
         "lastStatus": "error",
-        "lastDurationMs": 304149,
+        "lastDurationMs": 124295,
         "lastDiagnostics": {
-          "summary": "cron: job execution timed out",
+          "summary": "Provider returned error",
           "entries": [
             {
-              "ts": 1779012304176,
-              "source": "cron-setup",
+              "ts": 1780426959581,
+              "source": "agent-run",
               "severity": "error",
-              "message": "cron: job execution timed out"
+              "message": "Provider returned error"
             }
           ]
         },
-        "lastDiagnosticSummary": "cron: job execution timed out",
-        "lastErrorReason": "timeout",
+        "lastDiagnosticSummary": "Provider returned error",
         "lastDeliveryStatus": "unknown",
-        "consecutiveErrors": 1,
+        "consecutiveErrors": 2,
         "consecutiveSkipped": 0,
-        "runningAtMs": 1780426835230
+        "lastError": "FailoverError: Provider returned error",
+        "lastFailureNotificationDeliveryStatus": "unknown"
       }
     },
     "87b9fd68-3c68-427f-abfc-3125015f46a0": {
-      "updatedAtMs": 1779015782929,
+      "updatedAtMs": 1780426976707,
       "scheduleIdentity": "{\"version\":1,\"enabled\":true,\"schedule\":{\"kind\":\"cron\",\"expr\":\"0 7 * * *\",\"tz\":\"America/New_York\"}}",
       "state": {
-        "nextRunAtMs": 1780426813422,
-        "lastRunAtMs": 1779015600048,
+        "nextRunAtMs": 1780484400000,
+        "lastRunAtMs": 1780426835327,
         "lastRunStatus": "ok",
         "lastStatus": "ok",
-        "lastDurationMs": 182881,
+        "lastDurationMs": 141380,
         "lastDelivered": true,
         "lastDeliveryStatus": "delivered",
         "consecutiveErrors": 0,
         "consecutiveSkipped": 0,
-        "runningAtMs": 1780426835230
+        "lastFailureNotificationDeliveryStatus": "not-requested"
       }
     },
     "dbcbd379-bc1e-4017-8ed0-fa9796deba32": {
-      "updatedAtMs": 1780426833151,
-      "scheduleIdentity": "{\"version\":1,\"enabled\":true,\"schedule\":{\"kind\":\"every\",\"everyMs\":120000,\"anchorMs\":1779008419655}}",
+      "updatedAtMs": 1780427010181,
+      "scheduleIdentity": "{\"version\":1,\"enabled\":false,\"schedule\":{\"kind\":\"every\",\"everyMs\":120000,\"anchorMs\":1779008419655}}",
       "state": {
-        "nextRunAtMs": 1780426939655,
-        "lastRunAtMs": 1780426803444,
+        "lastRunAtMs": 1780426978787,
         "lastRunStatus": "ok",
         "lastStatus": "ok",
-        "lastDurationMs": 29707,
+        "lastDurationMs": 31394,
         "lastDeliveryStatus": "not-requested",
         "consecutiveErrors": 0,
         "consecutiveSkipped": 0,
         "lastFailureNotificationDeliveryStatus": "not-requested"
+      }
+    },
+    "c41b6d5f-99bc-4b59-95c8-ce4fe4370c33": {
+      "updatedAtMs": 1780431220265,
+      "scheduleIdentity": "{\"version\":1,\"enabled\":true,\"schedule\":{\"kind\":\"every\",\"everyMs\":300000,\"anchorMs\":1780430646945}}",
+      "state": {
+        "nextRunAtMs": 1780431520265,
+        "lastRunAtMs": 1780431159025,
+        "lastRunStatus": "error",
+        "lastStatus": "error",
+        "lastDurationMs": 61240,
+        "lastDiagnostics": {
+          "summary": "cron: job execution timed out (last phase: tool-execution-started)",
+          "entries": [
+            {
+              "ts": 1780431220265,
+              "source": "cron-setup",
+              "severity": "error",
+              "message": "cron: job execution timed out (last phase: tool-execution-started)"
+            }
+          ]
+        },
+        "lastDiagnosticSummary": "cron: job execution timed out (last phase: tool-execution-started)",
+        "lastErrorReason": "timeout",
+        "lastDeliveryStatus": "not-requested",
+        "lastFailureNotificationDeliveryStatus": "not-requested",
+        "consecutiveErrors": 3,
+        "consecutiveSkipped": 0,
+        "lastError": "cron: job execution timed out (last phase: tool-execution-started)"
       }
     }
   }
