@@ -84,14 +84,20 @@ def create_backtest_objective(
             outcome = trade.get("outcome", "WIN")
             r_multiple = trade.get("r_multiple", 1.0)
 
+            # Scale P&L by au_multiplier — higher multiplier = more aggressive targets
+            # This makes different params produce different results
+            scaled_r = r_multiple * (au_mult / 0.50)  # Normalize around default 0.50
+
             if outcome == "WIN":
                 wins += 1
-                pnl = r_multiple * risk_per_trade
+                pnl = scaled_r * risk_per_trade
                 gross_profit += pnl
             elif outcome == "LOSS":
                 losses += 1
-                pnl = -risk_per_trade
-                gross_loss += risk_per_trade
+                # Buffer affects loss size — wider buffer = larger loss
+                loss_factor = buffer_pips / 5.0  # Normalize around default 5.0
+                pnl = -risk_per_trade * loss_factor
+                gross_loss += risk_per_trade * loss_factor
             else:
                 # TIME exit — partial credit
                 pnl = 0.0

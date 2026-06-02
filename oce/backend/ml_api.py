@@ -11,8 +11,33 @@ from pydantic import BaseModel
 from typing import Dict, List, Optional
 from datetime import datetime, timezone
 import logging
+import joblib
+from pathlib import Path
 
 logger = logging.getLogger("oce.ml")
+
+# ── Load trained models at startup ─────────────────────────
+_MODELS_DIR = Path(__file__).parent.parent.parent / "quant-lab" / "ml" / "models"
+_regime_models: Dict[str, object] = {}
+
+def _load_models():
+    """Load all trained regime classifier models."""
+    global _regime_models
+    if not _MODELS_DIR.exists():
+        logger.warning(f"Models directory not found: {_MODELS_DIR}")
+        return
+    for pkl_file in _MODELS_DIR.glob("regime_*.pkl"):
+        symbol = pkl_file.stem.replace("regime_", "")
+        try:
+            artifact = joblib.load(pkl_file)
+            _regime_models[symbol] = artifact
+            logger.info(f"Loaded regime model for {symbol}")
+        except Exception as e:
+            logger.error(f"Failed to load model for {symbol}: {e}")
+    logger.info(f"Loaded {len(_regime_models)} regime models")
+
+# Load on import
+_load_models()
 
 router = APIRouter(prefix="/api/v1/ml", tags=["ml"])
 
