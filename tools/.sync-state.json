@@ -1,27 +1,27 @@
 {
   "update_counts": {
     "CC": 0,
-    "OC2": 0,
-    "AS": 2,
-    "PM": 2,
+    "OC2": 1,
+    "AS": 3,
+    "PM": 3,
     "PM2": 5,
     "RL": 0,
     "Copilot": 6,
     "CC2": 3
   },
-  "last_chat_lines": 152,
+  "last_chat_lines": 1223,
   "last_progress_hashes": {
     "CC": "",
-    "OC2": "",
-    "AS": "2141f98e7aec0e8d126e678039eb4c6b",
-    "PM": "b71a3457fd091382fb8d68e25390027b",
+    "OC2": "eaa38aad3dfe702f0ab0e2f109289555",
+    "AS": "cda565b2a55f5b39203b90e36f6a77f4",
+    "PM": "34515f636695381f0c04a00006560708",
     "PM2": "718a42690da5c3481b8315a2898ca65e",
     "RL": "",
     "Copilot": "4ebf52757ebff87864c686a157c4e966",
     "CC2": "4ebf52757ebff87864c686a157c4e966",
-    "note_build_notes": "6e6a4d65eb139ca5cdd5539f379e9952",
+    "note_build_notes": "95b007ee61856ed640e5430768e0bbd4",
     "note_team_notes": "1d0d5a0d4bb6c4b4ec6ba33f8cf4229c",
     "note_phase_status": "ba92c049f64caaf4f4aee9375b45e474"
   },
-  "last_sync": "2026-05-26T19:16:01.959861"
+  "last_sync": "2026-06-02T15:00:54.692721"
 }

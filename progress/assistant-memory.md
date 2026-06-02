@@ -82,3 +82,4 @@ Observer Core + OCE Unified — O-1 through O-4 complete. O-5 in progress (CC le
 - Team Notes: `progress/TEAM-NOTES.md`
 - Phase 11 Status: `progress/phase-11-status.md`
 - Observer Core Tasks: `plans/observer-core/TEAM-TASKS.md`
+- build_notes: `progress/BUILD-NOTES.md` (updated 2026-06-02 15:00 UTC)

@@ -1,11 +1,11 @@
 {
-  "engine": "P90",
+  "engine": "SymmetryTrap",
   "symbol": "GBPAUD.PRO",
   "direction": "SELL",
-  "entry": 1.87637,
-  "sl": 1.8769140000000002,
-  "tp": 1.87542,
-  "event": "ENTRY",
-  "variant": "INITIAL",
-  "time": "2026-06-02 10:43:00"
+  "entry": 1.8759000000000001,
+  "sl": 1.87528,
+  "tp": 1.8744,
+  "event": "SL_HIT",
+  "loop": 1,
+  "time": "2026-06-02 11:09:00"
 }

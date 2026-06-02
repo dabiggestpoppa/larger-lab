@@ -1,5 +1,6 @@
 {
   "ws_hashes": {
+    "2026 05 21.md": "d41d8cd98f00b204e9800998ecf8427e",
     "2026-05-31.md": "de0f3549919e95e395649fb567085707",
     "CEREBUS_Live_Engine_-_Full_Build_Log_(May_29_-_Jun_1_2026).md": "d41d8cd98f00b204e9800998ecf8427e",
     "Hermes Agent Test Note.md": "d41d8cd98f00b204e9800998ecf8427e",
@@ -29,6 +30,8 @@
     "journal_20260602T043000Z_phase4_complete.md": "65c5ee3df96c61f51b9fbc0512724faa",
     "journal_20260602T133456Z_command_status.md": "e926f48e6e9f8cf61cfe6636c8709e5f",
     "journal_20260602T140131Z_command_report.md": "6e28f779906c1ed9cc71db42be16f5fd",
+    "journal_20260602T144750Z_command_update.md": "a93b7aa09d16a4f3811b497053fd9429",
+    "journal_20260602T150337Z_command_status.md": "e6e25daee295ca42faf61ae21ad2e7c1",
     "Module Guide.md": "d41d8cd98f00b204e9800998ecf8427e",
     "Primary Observer.md": "d41d8cd98f00b204e9800998ecf8427e",
     "PRINCIPLES.md": "d41d8cd98f00b204e9800998ecf8427e",
@@ -741,6 +744,7 @@
     "ontology\\observer_core\\SRRA_OPH.md": "03514bdaa06ebe6d434c1cc421ceb15e"
   },
   "real_hashes": {
+    "2026 05 21.md": "d41d8cd98f00b204e9800998ecf8427e",
     "2026-05-31.md": "de0f3549919e95e395649fb567085707",
     "CEREBUS_Live_Engine_-_Full_Build_Log_(May_29_-_Jun_1_2026).md": "d41d8cd98f00b204e9800998ecf8427e",
     "Hermes Agent Test Note.md": "d41d8cd98f00b204e9800998ecf8427e",
@@ -770,6 +774,8 @@
     "journal_20260602T043000Z_phase4_complete.md": "65c5ee3df96c61f51b9fbc0512724faa",
     "journal_20260602T133456Z_command_status.md": "e926f48e6e9f8cf61cfe6636c8709e5f",
     "journal_20260602T140131Z_command_report.md": "6e28f779906c1ed9cc71db42be16f5fd",
+    "journal_20260602T144750Z_command_update.md": "a93b7aa09d16a4f3811b497053fd9429",
+    "journal_20260602T150337Z_command_status.md": "e6e25daee295ca42faf61ae21ad2e7c1",
     "Module Guide.md": "d41d8cd98f00b204e9800998ecf8427e",
     "Primary Observer.md": "d41d8cd98f00b204e9800998ecf8427e",
     "PRINCIPLES.md": "d41d8cd98f00b204e9800998ecf8427e",
@@ -1481,6 +1487,6 @@
     "ontology\\observer_core\\OBSERVER_CORE_O1_O7.md": "dd93ed799d87e5a9584fb88c5e7298e3",
     "ontology\\observer_core\\SRRA_OPH.md": "03514bdaa06ebe6d434c1cc421ceb15e"
   },
-  "last_sync": "2026-06-02T10:12:50.464247",
-  "changes_since_sync": 1
+  "last_sync": "2026-06-02T11:10:35.088776",
+  "changes_since_sync": 0
 }

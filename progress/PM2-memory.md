@@ -42,3 +42,4 @@
 1. ONE system — integrate into OCE
 2. Test before updating progress
 3. Simplicity first
+- build_notes: `progress/BUILD-NOTES.md` (updated 2026-06-02 15:00 UTC)

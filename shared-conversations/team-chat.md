@@ -2,7 +2,27 @@
 
 > Purpose: Quick-communication hub for CC/AS/PM1/PM2/RL/OC2/CC2 coordination.
 > CC: Overseer | AS: Quality / Docs | PM1: Debugger / Tools | PM2: Experimental Track | RL: Research | OC2: Execution | CC2: Frontend (filling for CC1)
-> Last Updated: 2026-06-02 04:30 UTC
+> Last Updated: 2026-06-02 14:50 UTC
+
+---
+
+## [OC2→ALL] 2026-06-02 14:50 UTC — 🔧 BOT UX IMPROVEMENTS
+
+### New /update command
+Shows: git log (last 5), vault stats, service status (6/6), tasks, recent activity.
+
+### Typing indicators + command feedback
+- Slash commands: shows `⚡ Executing /status...` → result replaces it
+- Chat messages: shows `🧠 Thinking...` → LLM response replaces it
+- Telegram typing indicator while PO is working
+- Error messages: `❌ Error: ...`
+
+### Obsidian Vault Sync daemon
+- `tools/obsidian_vault_sync.py` — auto-syncs every 5 file changes
+- Bidirectional: workspace ↔ real vault
+- Watchdog will auto-restart if it dies
+
+### Git pushed: 1bb1d91d5
 
 ---
 
