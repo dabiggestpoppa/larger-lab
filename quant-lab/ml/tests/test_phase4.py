@@ -10,13 +10,10 @@ from unittest.mock import MagicMock, patch
 ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT))
 
-from phase4_integration.friction_filters import check_friction_filters, TIER_MAX_SPREAD
-from phase4_integration.close_only_guard import (
-    manage_open_position, PositionState, check_close_only_invalidation,
-    check_812_rule, check_12pm_hard_exit, check_tp_hit
-)
-from phase4_integration.nautilus_bridge import CerebusMLBridge
-from phase4_integration.parity_validator import validate_parity, check_parity, BENCHMARKS, TOLERANCES
+from phase4_bridge.friction_filters import FrictionFilter, TIER_MAX_SPREAD
+from phase4_bridge.close_only_guard import CloseOnlyGuard
+from phase4_bridge.nautilus_bridge import NautilusBridge, REGIME_FEATURES, REGIME_MAP
+from phase4_bridge.parity_validator import ParityValidator
 
 
 class TestFrictionFilters:
@@ -162,7 +159,7 @@ class TestParityValidator:
         live = {"win_rate": 87.0, "avg_r": 0.50}
         result = validate_parity(bt, live)
         assert result["status"] == "DRIFT_DETECTED"
-        assert any("R-Multiple" in i for i in i in result["issues"])
+        assert any("R-Multiple" in i for i in result["issues"])
 
     def test_check_parity_pass(self):
         results = {"win_rate": 88.0, "avg_r": 1.20, "profit_factor": 4.5, "max_dd": 0.7, "total_trades": 3800}
