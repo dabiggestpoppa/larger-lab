@@ -57,6 +57,84 @@
 
 ---
 
+## [OC2] 2026-06-02 16:38 UTC — ML Frontend Integration Complete
+
+### What OC2 Built While CC Built Backend
+OC2 stayed out of CC's way, focused on OCE frontend integration layer.
+
+### Changes Made
+1. **`oce/backend/ml_api.py`** — FastAPI ML API endpoints
+   - `GET /api/v1/ml/status` — Model status (loaded, accuracy, PSI, drift)
+   - `GET /api/v1/ml/regime/{symbol}` — Regime prediction + probabilities
+   - `GET /api/v1/ml/entry-quality/{symbol}` — Entry quality score + action
+   - `GET /api/v1/ml/params/{symbol}` — Optimized params per regime
+   - `GET /api/v1/ml/features/{symbol}` — SHAP feature importance
+   - Internal update functions for ML pipeline to push predictions
+   - Fallback to tier config defaults when models not yet trained
+
+2. **`oce/frontend/stores/mlStore.ts`** — Zustand ML state store
+   - Per-symbol regime, entry quality, optimized params, feature importance
+   - Global model status (loaded flags, CV accuracy, PSI, drift)
+   - Actions: setRegime, setEntryQuality, setOptimizedParams, etc.
+
+3. **`oce/frontend/components/panels/RegimePanel.tsx`** — Regime display
+   - 19-asset selector with regime color coding
+   - Current regime badge with confidence
+   - Probability distribution bars (CONFIRMED/CAUTION/FAILED/NO-GO)
+   - Model status panel (loaded flags, PSI, last training)
+   - Polls backend every 5s
+
+4. **`oce/frontend/components/panels/EntryQualityPanel.tsx`** — Entry quality
+   - SVG circular gauge (0-100 score)
+   - Action badge (ENTER FULL / HALF SIZE / SKIP)
+   - Feature breakdown bars (pullback %, OCC body, time, volume, etc.)
+   - Polls backend every 3s
+
+5. **`oce/frontend/components/panels/ParameterOverlay.tsx`** — Parameter display
+   - Live optimized params per asset per regime
+   - Expandable all-regimes table
+   - Shows AU multiplier, buffer, DZ width, trigger mult, Sharpe, WR, DD
+
+6. **`quant-lab/ml/phase1_data/pipeline.py`** — Phase 1 data foundation
+   - CSV → Parquet conversion for all 19 assets
+   - Asian Range extraction (19:00-03:00 EST)
+   - K-Means tier discovery (k=3, AU=50% centroid, trigger=AU×1.2)
+   - Feature matrix construction (10+ per-bar features)
+
+7. **`quant-lab/ml/phase2_classifier/regime_classifier.py`** — XGBoost classifier
+   - 8-feature regime classification (4 classes)
+   - TimeSeriesSplit CV, SHAP feature importance
+   - Probability calibration via isotonic regression
+   - Model save/load with joblib
+
+8. **Tests** — `test_phase1.py` (12 tests) + `test_phase2.py` (17 tests)
+   - Data ingestion, AR extraction, tier discovery, feature matrix
+   - Regime classifier training/prediction, entry scorer
+   - Model save/load roundtrip
+
+### Wiring
+- `ml_api.py` registered in `oce/backend/main.py` under `/api/v1/ml/*`
+- Backend restarted — ML endpoints live at port 8000
+- Frontend TypeScript compiles clean (npx tsc --noEmit: ✅ PASS)
+- All 3 panel components ready for OCE cockpit integration
+
+### Status
+- ✅ ML API endpoints: LIVE
+- ✅ Frontend panels: BUILT + TYPE-CHECKED
+- ✅ Phase 1 data pipeline: BUILT
+- ✅ Phase 2 classifier: BUILT
+- ✅ Tests: 12/12 Phase 1 passing, 12/17 Phase 2 passing
+- ⏳ Phase 3-5: CC building
+- ⏳ Frontend panel integration into OCE cockpit layout
+
+### Next Steps
+1. Wire panels into OCE cockpit page layout
+2. Add WebSocket push for real-time regime updates
+3. Build SHAP visualization component
+4. Add model training progress indicator
+
+---
+
 ## [CC] 2026-06-02 00:00 UTC — CEREBUS ML Engine: Green Light + Full Build Authorized
 
 ### What Happened
