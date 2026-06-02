@@ -89,6 +89,16 @@ SERVICES = {
         "env": {"PYTHONIOENCODING": "utf-8", "TELEGRAM_TOKEN": "8951584547:AAEzC-suY_uS9bOvD9kAfhpnwHVw8hvbs9I"},
         "process_check": "start_telegram_gateway",
     },
+    "Obsidian-Sync": {
+        "port": 0,
+        "cmd": [
+            r"C:\Users\wifik\Desktop\projects\larger-lab\.venv\Scripts\python.exe",
+            r"C:\Users\wifik\Desktop\projects\larger-lab\tools\obsidian_vault_sync.py"
+        ],
+        "log": r"C:\Users\wifik\AppData\Local\Temp\openclaw\watchdog-obsidian-sync.log",
+        "cwd": r"C:\Users\wifik\Desktop\projects\larger-lab",
+        "process_check": "obsidian_vault_sync",
+    },
 }
 
 CHECK_INTERVAL = 30       # seconds between health checks

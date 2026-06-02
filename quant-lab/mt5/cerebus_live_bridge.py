@@ -194,59 +194,48 @@ def send_order(symbol: str, direction: str, volume: float,
         return False
     order_type = mt5.ORDER_TYPE_BUY if direction == "BUY" else mt5.ORDER_TYPE_SELL
     price = tick.ask if direction == "BUY" else tick.bid
-    # Universal SL/TP safety clamp
     point = info.point
-    # Use broker's trade_stops_level if available
-    min_stop_pts = getattr(info, 'trade_stops_level', 0)
-    # For JPY pairs (point=0.001), 10 points = only 1 pip — broker needs more
-    # Use at least 50 points (~5 pips on JPY, ~0.5 pips on 5-dec pairs)
-    buffer_pts = max(min_stop_pts + 5, 50)
-    safety_buffer = buffer_pts * point
 
-    # Only clamp SL/TP if they're on the WRONG side of entry (zero-buffer edge case)
-    # or if they're too close to entry (broker minimum distance).
-    # A correct SELL SL is ABOVE entry; a correct BUY SL is BELOW entry.
+    # Broker minimum stop level — the ONLY distance enforcement
+    min_stop_pts = getattr(info, 'trade_stops_level', 0)
+    min_dist = (min_stop_pts + 1) * point if min_stop_pts > 0 else 0.0
+
+    # Only clamp SL/TP if they're on the WRONG side of entry.
+    # The engine (P90/ST) calculates correct SL/TP — we trust it.
+    # We only enforce: (a) SL on correct side, (b) TP on correct side,
+    # (c) broker minimum stop level.
     if direction == "BUY":
         # SL must be below entry
         if sl >= price:
-            log.warning("SL %.5f >= BUY entry %.5f (wrong side) — clamping to entry - buffer", sl, price)
-            sl = price - safety_buffer
-        # Enforce minimum distance
-        min_sl = price - safety_buffer
-        if sl > min_sl:
-            log.warning("SL %.5f too close to BUY entry %.5f — clamping to %.5f", sl, price, min_sl)
-            sl = min_sl
+            old_sl = sl
+            sl = price - max(min_dist, 10 * point)
+            log.warning("SL %.5f >= BUY entry %.5f (wrong side) — clamping to %.5f", old_sl, price, sl)
         # TP must be above entry
         if tp <= price:
-            tp = price + safety_buffer
-            log.warning("TP clamped above BUY entry")
-    else:  # SELL
-        # SL must be above entry
-        if sl <= price:
-            log.warning("SL %.5f <= SELL entry %.5f (wrong side) — clamping to entry + buffer", sl, price)
-            sl = price + safety_buffer
-        # Enforce minimum distance
-        max_sl = price + safety_buffer
-        if sl < max_sl:
-            log.warning("SL %.5f too close to SELL entry %.5f — clamping to %.5f", sl, price, max_sl)
-            sl = max_sl
-        # TP must be below entry
-        if tp >= price:
-            tp = price - safety_buffer
-            log.warning("TP clamped below SELL entry")
-
-    # Broker minimum stop level
-    min_stop_pts = info.trade_stops_level
-    if min_stop_pts > 0:
-        min_dist = (min_stop_pts + 1) * point
-        if direction == "BUY":
+            old_tp = tp
+            tp = price + max(min_dist, 10 * point)
+            log.warning("TP %.5f <= BUY entry %.5f (wrong side) — clamping to %.5f", old_tp, price, tp)
+        # Enforce broker minimum distance
+        if min_dist > 0:
             hard_max_sl = price - min_dist
             if sl > hard_max_sl:
                 sl = hard_max_sl
             hard_min_tp = price + min_dist
             if tp < hard_min_tp:
                 tp = hard_min_tp
-        else:
+    else:  # SELL
+        # SL must be above entry
+        if sl <= price:
+            old_sl = sl
+            sl = price + max(min_dist, 10 * point)
+            log.warning("SL %.5f <= SELL entry %.5f (wrong side) — clamping to %.5f", old_sl, price, sl)
+        # TP must be below entry
+        if tp >= price:
+            old_tp = tp
+            tp = price - max(min_dist, 10 * point)
+            log.warning("TP %.5f >= SELL entry %.5f (wrong side) — clamping to %.5f", old_tp, price, tp)
+        # Enforce broker minimum distance
+        if min_dist > 0:
             hard_min_sl = price + min_dist
             if sl < hard_min_sl:
                 sl = hard_min_sl
@@ -595,10 +584,12 @@ def run_live(symbols: list, lot_size: float = 0.01):
                 acct = mt5.account_info()
                 equity = acct.equity if acct else 0
 
+                avg_rr = round(daily_stats["rr_total"] / daily_stats["entries"], 2) if daily_stats["entries"] > 0 else 0.0
                 log.info(
-                    "[%s] Scan #%d | Equity: $%.2f | Pos: %d | Sig: %d | Exec: %d",
+                    "[%s] Scan #%d | Equity: $%.2f | Pos: %d | Sig: %d | Exec: %d | Daily: W%d L%d %+.1fp AvgRR=%.2f",
                     now.strftime("%H:%M:%S"), scan_count,
-                    equity, len(positions), signal_count, exec_count
+                    equity, len(positions), signal_count, exec_count,
+                    daily_stats["wins"], daily_stats["losses"], daily_stats["pips"], avg_rr
                 )
 
                 # ── P90 Trailing Stop: move SL to breakeven at +2 pips ──
@@ -651,6 +642,8 @@ def run_live(symbols: list, lot_size: float = 0.01):
                                                     "CEREBUS-ST-L%d" % st_sig.loop_count)
                                     if ok:
                                         exec_count += 1
+                                        daily_stats["entries"] += 1
+                                        daily_stats["rr_total"] += rr
                                         pos = get_positions()
                                         for p in pos:
                                             if p["symbol"] == sym and p["magic"] == 20260601 and (sym, "ST") not in active_trades:
@@ -730,6 +723,8 @@ def run_live(symbols: list, lot_size: float = 0.01):
                                                         "CEREBUS-P90")
                                         if ok:
                                             exec_count += 1
+                                            daily_stats["entries"] += 1
+                                            daily_stats["rr_total"] += rr
                                             pos = get_positions()
                                             for p in pos:
                                                 if p["symbol"] == sym and p["magic"] == 20260601 and (sym, "P90") not in active_trades:
@@ -743,7 +738,7 @@ def run_live(symbols: list, lot_size: float = 0.01):
                                                         "sl_moved": False,
                                                     }
                                                     break
-                                elif p90_sig.event in ("TP_HIT", "SL_HIT", "KILL_SWITCH"):
+                                elif p90_sig.event in ("TP_HIT", "SL_HIT", "KILL_SWITCH", "EWS_EXIT"):
                                     key = (sym, "P90")
                                     if key in active_trades:
                                         trade = active_trades[key]
@@ -796,8 +791,10 @@ def run_live(symbols: list, lot_size: float = 0.01):
             mt5.shutdown()
         except Exception:
             pass
-        log.info("Shutdown. %d scans | %d signals | %d executed",
-                 scan_count, signal_count, exec_count)
+        avg_rr = round(daily_stats["rr_total"] / daily_stats["entries"], 2) if daily_stats["entries"] > 0 else 0.0
+        log.info("Shutdown. %d scans | %d signals | %d executed | Daily: W%d L%d %+.1fp AvgRR=%.2f",
+                 scan_count, signal_count, exec_count,
+                 daily_stats["wins"], daily_stats["losses"], daily_stats["pips"], avg_rr)
 
 
 if __name__ == "__main__":

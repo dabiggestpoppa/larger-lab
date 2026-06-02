@@ -94,23 +94,69 @@ def main():
 
                 log(f"MSG from {chat_id}: {text[:80]}")
 
+                # Send typing indicator
+                try:
+                    requests.post(f"{base_url}/sendChatAction",
+                                  json={"chat_id": chat_id, "action": "typing"}, timeout=5)
+                except Exception:
+                    pass
+
                 # Process
                 try:
                     if text.strip().startswith("/"):
+                        # Show command being executed
+                        cmd_name = text.strip().split()[0]
+                        exec_msg = requests.post(
+                            f"{base_url}/sendMessage",
+                            json={"chat_id": chat_id, "text": f"⚡ Executing {cmd_name}..."},
+                            timeout=10,
+                        )
+                        exec_id = exec_msg.json().get("result", {}).get("message_id", 0)
+
                         resp = router.handle(text.strip())
+
+                        # Delete execution message and send result
+                        if exec_id:
+                            try:
+                                requests.post(f"{base_url}/deleteMessage",
+                                              json={"chat_id": chat_id, "message_id": exec_id}, timeout=5)
+                            except Exception:
+                                pass
+
+                        log(f"RESP ({len(resp)} chars): {resp[:80]}")
+                        sr = requests.post(
+                            f"{base_url}/sendMessage",
+                            json={"chat_id": chat_id, "text": resp},
+                            timeout=15,
+                        )
                     else:
+                        # Chat message — show thinking indicator
+                        thinking_msg = requests.post(
+                            f"{base_url}/sendMessage",
+                            json={"chat_id": chat_id, "text": "🧠 Thinking..."},
+                            timeout=10,
+                        )
+                        thinking_id = thinking_msg.json().get("result", {}).get("message_id", 0)
+
                         sov_ctx = sovereign.get_sovereign_context()
                         resp = chat_agent.chat(text, sovereign_context=sov_ctx)
                         sovereign.process_message(text, resp)
 
-                    log(f"RESP ({len(resp)} chars): {resp[:80]}")
+                        # Delete thinking message and send response
+                        if thinking_id:
+                            try:
+                                requests.post(f"{base_url}/deleteMessage",
+                                              json={"chat_id": chat_id, "message_id": thinking_id}, timeout=5)
+                            except Exception:
+                                pass
 
-                    # Send
-                    sr = requests.post(
-                        f"{base_url}/sendMessage",
-                        json={"chat_id": chat_id, "text": resp},
-                        timeout=15,
-                    )
+                        log(f"RESP ({len(resp)} chars): {resp[:80]}")
+                        sr = requests.post(
+                            f"{base_url}/sendMessage",
+                            json={"chat_id": chat_id, "text": resp},
+                            timeout=15,
+                        )
+
                     if sr.json().get("ok"):
                         log("SENT OK")
                     else:
@@ -121,7 +167,7 @@ def main():
                     try:
                         requests.post(
                             f"{base_url}/sendMessage",
-                            json={"chat_id": chat_id, "text": f"Error: {str(e)[:200]}"},
+                            json={"chat_id": chat_id, "text": f"❌ Error: {str(e)[:200]}"},
                             timeout=10,
                         )
                     except Exception:

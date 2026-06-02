@@ -195,6 +195,10 @@ class SymmetryTrapEngine:
             self.symbol = symbol
         self.logger = logging.getLogger(f"cerebus.symmetry_trap.{symbol}")
 
+        # ── SL Min Buffer (per Architect Directive 2026-06-02) ──
+        cfg = config or {}
+        self.min_sl_buffer = cfg.get("min_sl_buffer", self._default_min_sl_buffer(symbol))
+
         # ── State Machine ──────────────────────────────────────────────
         self.state: EngineState = EngineState.SEARCH
         self.swing_origin: Optional[float] = None
@@ -226,6 +230,20 @@ class SymmetryTrapEngine:
 
         # ── Logging ────────────────────────────────────────────────────
         self.signal_log: List[TradeSignal] = []
+
+    # ── Default SL Buffers by Asset Class ───────────────────────────
+
+    @staticmethod
+    def _default_min_sl_buffer(symbol: str) -> float:
+        """Minimum SL buffer floor in pips."""
+        sym = symbol.upper()
+        if any(x in sym for x in ['GBPJPY', 'GBPAUD', 'GBPNZD']):
+            return 12.0
+        if 'JPY' in sym:
+            return 6.0
+        if any(x in sym for x in ['XAU', 'XAG']):
+            return 150.0
+        return 8.0
 
     # ── Session Initialization ────────────────────────────────────────
 
@@ -475,7 +493,19 @@ class SymmetryTrapEngine:
 
             if occ_confirmed:
                 self.entry_price = bar.close
-                self.sl_price = self.impulse_extreme  # ZERO BUFFER
+                # SL = OCC candle extreme + minimum buffer floor
+                # For SHORT: SL at OCC high + min buffer (loss direction = above entry)
+                # For LONG: SL at OCC low - min buffer (loss direction = below entry)
+                if self.impulse_direction == TradeDirection.SHORT:
+                    self.sl_price = bar.high
+                    min_sl = self.entry_price + (self.min_sl_buffer * self.pip_size)
+                    if self.sl_price < min_sl:
+                        self.sl_price = min_sl
+                else:
+                    self.sl_price = bar.low
+                    min_sl = self.entry_price - (self.min_sl_buffer * self.pip_size)
+                    if self.sl_price > min_sl:
+                        self.sl_price = min_sl
                 self.tp_price = (
                     bar.close + self.active_au * self.impulse_direction.value
                 )

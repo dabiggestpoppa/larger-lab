@@ -1,6 +1,41 @@
 # MEMORY.md — OWL (OC2) Persistent Memory
 
-> **Last Updated:** 2026-06-02 06:15 EDT — Guardian Deployed + Executor Self-Heal + Filling Mode Fix
+> **Last Updated:** 2026-06-02 10:43 EDT — P90 SL Fix + ST SL Fix + Duplicate Executor Kill
+
+---
+
+## 🔴 CRITICAL FIXES DEPLOYED (2026-06-02 10:43 EDT)
+
+### P90 SL Fix — Body-Based → Extreme + Buffer Floor
+- **Bug**: `SL = entry - (body * 0.80)` gave 3-5 pip SLs on small candles → instant stop-outs
+- **Fix**: SL = P90 signal candle extreme (high for SHORT, low for LONG) + spread buffer + min floor
+- **Min floors**: GBP crosses 12p, JPY pairs 6p, majors 8p
+- **80% body rule**: Now a KILL SWITCH (intra-candle invalidation), NOT the hard stop
+- **Hard stop**: At P90 extreme, close-only evaluation
+- **File**: `quant-lab/engines/p90_engine.py`
+
+### ST SL Fix — Impulse Extreme → OCC Extreme
+- **Bug**: `sl_price = self.impulse_extreme` placed SL BELOW entry for SHORT (in profit direction!)
+- **Result**: ALL ST orders rejected by broker as "Invalid stops" — ST appeared to never fire
+- **Fix**: SL = OCC candle extreme (high for SHORT, low for LONG) + min buffer floor
+- **File**: `quant-lab/engines/symmetry_trap.py`
+
+### Duplicate Executor Kill
+- **Bug**: Guardian respawned old executors (p90_cascade ×2, symmetry_trap ×2) alongside bridge
+- **Result**: Multiple processes trading simultaneously with old buggy code
+- **Fix**: Killed all 4 duplicate PIDs. Only bridge + guardian should run.
+- **Policy**: Do NOT restart executors. Bridge is sole executor.
+
+### Bridge send_order Fix — Aggressive Clamping Removed
+- **Bug**: `buffer_pts = max(min_stop_pts + 5, 50)` overrode engine-calculated SL/TP
+- **Fix**: Only clamp SL/TP if on WRONG side of entry. Trust engine values.
+- **File**: `quant-lab/mt5/cerebus_live_bridge.py`
+
+### EWS_EXIT Missing from Bridge
+- **Bug**: Bridge handled TP_HIT, SL_HIT, KILL_SWITCH but NOT EWS_EXIT
+- **Fix**: Added EWS_EXIT to close handling in bridge
+
+---
 > **Policy:** Trajectory only. Archive old sessions to `logs/memory-archive/`.
 
 ---
