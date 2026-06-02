@@ -10,7 +10,7 @@ from unittest.mock import MagicMock, patch
 ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT))
 
-from phase4_integration.friction_filters import check_friction_filters, TIER_MAX_SPREAD, ASSET_MAX_SPREADS
+from phase4_integration.friction_filters import check_friction_filters, TIER_MAX_SPREAD
 from phase4_integration.close_only_guard import (
     manage_open_position, PositionState, check_close_only_invalidation,
     check_812_rule, check_12pm_hard_exit, check_tp_hit

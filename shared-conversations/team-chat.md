@@ -2,7 +2,7 @@
 
 > Purpose: Quick-communication hub for CC/AS/PM1/PM2/RL/OC2/CC2 coordination.
 > CC: Overseer | AS: Quality / Docs | PM1: Debugger / Tools | PM2: Experimental Track | RL: Research | OC2: Execution | CC2: Frontend (filling for CC1)
-> Last Updated: 2026-06-02 17:00 UTC
+> Last Updated: 2026-06-02 17:25 UTC
 
 ---
 
@@ -54,6 +54,45 @@ CC built Phase 1 (data pipeline, firewall, Asian Range, K-Means, features, label
 ### Git
 - Commit: `7f12b7f3` — pushed to origin/master
 - Files: 10 changed, 82 insertions, 42 deletions
+
+---
+
+## [OC2] 2026-06-02 17:25 UTC — Phase 1 Pipeline Complete + Phase 2 Training Started
+
+### Phase 1 Pipeline Results (End-to-End)
+| Asset | Rows | T1 AU | T2 AU | T3 AU | Features |
+|-------|------|-------|-------|-------|----------|
+| EURUSD | 463K | 15.0p | 38.0p | 88.8p | 270K x 16 |
+| GBPUSD | 463K | 22.9p | 65.2p | 214.3p | 273K x 16 |
+| USDCHF | 463K | 15.0p | 35.1p | 79.6p | 273K x 16 |
+| USDJPY | 463K | 30.4p | 73.9p | 169.7p | 273K x 16 |
+| AUDUSD | 463K | 14.7p | 31.5p | 63.4p | 270K x 16 |
+| NZDUSD | 463K | 14.9p | 31.5p | 64.7p | 273K x 16 |
+| GBPJPY | 463K | 37.9p | 87.1p | 199.6p | 273K x 16 |
+| GBPAUD | 463K | 36.9p | 88.1p | 301.2p | 273K x 16 |
+| GBPNZD | 463K | 44.0p | 100.3p | 386.0p | 273K x 16 |
+| GBPCHF | 463K | 20.2p | 53.7p | 193.3p | 273K x 16 |
+| CHFJPY | 460K | 33.7p | 71.4p | 159.1p | 271K x 16 |
+| US500 | 463K | 13.3p | 41.4p | 127.2p | 245K x 16 |
+| DE30 | 463K | 54.5p | 162.1p | 416.0p | 242K x 16 |
+| FR40 | 463K | 20.1p | 53.9p | 124.6p | 240K x 16 |
+| XAUUSD | 460K | 102.4p | 378.5p | 1273.2p | 288K x 16 |
+| XAGUSD | 463K | 292.6p | 2066.7p | 5814.0p | 286K x 16 |
+| BTCUSD | 463K | 438.9p | 1295.0p | 2917.8p | 458K x 16 |
+| ETHUSD | 463K | 300.2p | 869.0p | 1817.8p | 457K x 16 |
+
+**18/18 assets processed** (USTEC100 has no CSV)
+
+### Phase 2 Training (In Progress)
+- Training XGBoost regime classifiers on all 18 assets
+- AUDUSD: 82.2% CV accuracy (heuristic labels — will improve with real backtest labels)
+- BTCUSD: Training now
+- Estimated completion: ~30 min for all 18 assets
+
+### Notes
+- Tier discovery AU values are data-driven (K-Means on 4 years of M5 Asian Ranges)
+- These replace the manual tier configs with learned boundaries
+- Feature matrices include: body, range, body_ratio, hour_est, day_of_week, rolling_vol_20, vol_ratio, gap, session markers
 
 ---
 
