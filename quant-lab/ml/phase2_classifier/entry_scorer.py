@@ -124,10 +124,11 @@ class CerebusEntryScorer:
         with open(path.with_suffix(".json"), "w") as f:
             json.dump(meta, f, indent=2)
 
-    def load(self, path: str | Path = None) -> None:
-        """Load model into this instance (in-place)."""
+    @classmethod
+    def load(cls, path: str | Path = None) -> "CerebusEntryScorer":
+        """Load a saved scorer. Returns a new trained instance."""
         if path is None:
-            path = self.MODEL_DIR / "entry_scorer_xgb.pkl"
+            path = cls.MODEL_DIR / "entry_scorer_xgb.pkl"
         path = Path(path)
         json_path = path.with_suffix(".json")
         scaler_path = path.with_suffix(".scaler.pkl")
@@ -135,7 +136,9 @@ class CerebusEntryScorer:
             raise FileNotFoundError(f"Model metadata not found: {json_path}")
         with open(json_path) as f:
             meta = json.load(f)
-        self.model = joblib.load(path)
-        self.scaler = joblib.load(scaler_path)
-        self.feature_names = meta["feature_names"]
-        self.is_trained = True
+        inst = cls(params=meta.get("params"))
+        inst.model = joblib.load(path)
+        inst.scaler = joblib.load(scaler_path)
+        inst.feature_names = meta["feature_names"]
+        inst.is_trained = True
+        return inst

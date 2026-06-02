@@ -7,7 +7,15 @@
 
 ---
 
-## Status: 🟢 ALL WORK COMPLETE — STANDBY
+## Status: 🟢 CEREBUS ML ENGINE — PHASES 2-5 COMPLETE
+
+### CEREBUS ML Build (2026-06-02)
+All 5 phases built. 40/40 tests passing.
+- Phase 1 (CC): Data pipeline, firewall, Asian Range, K-Means, features, labels
+- Phase 2 (PM2): XGBoost regime classifier, entry scorer, SHAP, calibration
+- Phase 3 (PM2): Optuna Bayesian optimizer, search spaces, robustness check
+- Phase 4 (PM2): Friction filters, parity validator
+- Phase 5 (PM2): Guardrail interceptor, PSI drift, shadow mode, Grafana dashboards
 
 ### Completed Work (Phase 11 Experimental Track) — ALL COMPLETE
 - T11.1 Topology Baseline: PASS (737 nodes, 9 edges, 0 cycles)
