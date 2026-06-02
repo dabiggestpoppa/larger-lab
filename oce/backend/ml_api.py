@@ -104,27 +104,28 @@ _entry_quality: Dict[str, dict] = {}
 _optimized_params: Dict[str, list] = {}
 _feature_importance: Dict[str, list] = {}
 
-# ── Tier configs (from Phase 1 K-Means or manual fallback) ─
-
+# ── Tier configs (from Phase 1 K-Means, data-driven) ──────
+# These are the AU values discovered by K-Means clustering on 4 years of M5 Asian Range data
+# AU = 50% of cluster centroid, Trigger = AU x 1.2
 TIER_CONFIGS = {
-    "EURUSD": {"T1": {"au": 10, "trig": 12}, "T2": {"au": 12, "trig": 15}, "T3": {"au": 15, "trig": 19}},
-    "GBPUSD": {"T1": {"au": 13, "trig": 16}, "T2": {"au": 16, "trig": 19}, "T3": {"au": 20, "trig": 24}},
-    "USDCHF": {"T1": {"au": 11, "trig": 13}, "T2": {"au": 15, "trig": 18}, "T3": {"au": 20, "trig": 24}},
-    "USDJPY": {"T1": {"au": 16, "trig": 19}, "T2": {"au": 26, "trig": 31}, "T3": {"au": 44, "trig": 53}},
-    "AUDUSD": {"T1": {"au": 10, "trig": 12}, "T2": {"au": 12, "trig": 15}, "T3": {"au": 15, "trig": 19}},
-    "NZDUSD": {"T1": {"au": 10, "trig": 12}, "T2": {"au": 12, "trig": 15}, "T3": {"au": 15, "trig": 19}},
-    "GBPJPY": {"T1": {"au": 19, "trig": 23}, "T2": {"au": 37, "trig": 44}, "T3": {"au": 71, "trig": 85}},
-    "GBPAUD": {"T1": {"au": 14, "trig": 17}, "T2": {"au": 24, "trig": 29}, "T3": {"au": 42, "trig": 50}},
-    "GBPNZD": {"T1": {"au": 15, "trig": 18}, "T2": {"au": 27, "trig": 32}, "T3": {"au": 51, "trig": 61}},
-    "GBPCHF": {"T1": {"au": 13, "trig": 16}, "T2": {"au": 23, "trig": 28}, "T3": {"au": 44, "trig": 53}},
-    "CHFJPY": {"T1": {"au": 14, "trig": 17}, "T2": {"au": 24, "trig": 29}, "T3": {"au": 42, "trig": 50}},
-    "US500":  {"T1": {"au": 21, "trig": 25}, "T2": {"au": 39, "trig": 47}, "T3": {"au": 75, "trig": 90}},
-    "DE30":   {"T1": {"au": 19, "trig": 23}, "T2": {"au": 37, "trig": 44}, "T3": {"au": 71, "trig": 85}},
-    "FR40":   {"T1": {"au": 19, "trig": 23}, "T2": {"au": 37, "trig": 44}, "T3": {"au": 71, "trig": 85}},
-    "XAUUSD": {"T1": {"au": 16, "trig": 19}, "T2": {"au": 29, "trig": 35}, "T3": {"au": 48, "trig": 58}},
-    "XAGUSD": {"T1": {"au": 7,  "trig": 8.5},"T2": {"au": 12, "trig": 14.5},"T3": {"au": 21, "trig": 25}},
-    "BTCUSD": {"T1": {"au": 205,"trig": 246},"T2": {"au": 545,"trig": 654},"T3": {"au": 1160,"trig": 1392}},
-    "ETHUSD": {"T1": {"au": 35, "trig": 42}, "T2": {"au": 42, "trig": 52}, "T3": {"au": 52, "trig": 65}},
+    "EURUSD": {"T1": {"au": 9.0,  "trig": 10.8}, "T2": {"au": 21.9, "trig": 26.3}, "T3": {"au": 75.2, "trig": 90.2}},
+    "GBPUSD": {"T1": {"au": 12.7, "trig": 15.2}, "T2": {"au": 34.6, "trig": 41.5}, "T3": {"au": 163.6,"trig": 196.3}},
+    "USDCHF": {"T1": {"au": 9.8,  "trig": 11.8}, "T2": {"au": 22.8, "trig": 27.4}, "T3": {"au": 59.3, "trig": 71.2}},
+    "USDJPY": {"T1": {"au": 19.5, "trig": 23.4}, "T2": {"au": 48.3, "trig": 58.0}, "T3": {"au": 165.0,"trig": 198.0}},
+    "AUDUSD": {"T1": {"au": 8.6,  "trig": 10.3}, "T2": {"au": 17.8, "trig": 21.4}, "T3": {"au": 35.8, "trig": 43.0}},
+    "NZDUSD": {"T1": {"au": 9.4,  "trig": 11.3}, "T2": {"au": 20.3, "trig": 24.4}, "T3": {"au": 41.7, "trig": 50.0}},
+    "GBPJPY": {"T1": {"au": 26.9, "trig": 32.3}, "T2": {"au": 65.1, "trig": 78.1}, "T3": {"au": 224.2,"trig": 269.0}},
+    "GBPAUD": {"T1": {"au": 25.5, "trig": 30.6}, "T2": {"au": 59.7, "trig": 71.6}, "T3": {"au": 216.5,"trig": 259.8}},
+    "GBPNZD": {"T1": {"au": 32.1, "trig": 38.5}, "T2": {"au": 73.5, "trig": 88.2}, "T3": {"au": 270.7,"trig": 324.8}},
+    "GBPCHF": {"T1": {"au": 13.9, "trig": 16.7}, "T2": {"au": 37.6, "trig": 45.1}, "T3": {"au": 192.5,"trig": 231.0}},
+    "CHFJPY": {"T1": {"au": 23.2, "trig": 27.8}, "T2": {"au": 50.8, "trig": 61.0}, "T3": {"au": 162.3,"trig": 194.8}},
+    "US500":  {"T1": {"au": 7.0,  "trig": 8.4},  "T2": {"au": 22.8, "trig": 27.4}, "T3": {"au": 59.4, "trig": 71.3}},
+    "DE30":   {"T1": {"au": 29.3, "trig": 35.2}, "T2": {"au": 87.2, "trig": 104.6},"T3": {"au": 220.4,"trig": 264.5}},
+    "FR40":   {"T1": {"au": 12.5, "trig": 15.0}, "T2": {"au": 37.3, "trig": 44.8}, "T3": {"au": 100.2,"trig": 120.2}},
+    "XAUUSD": {"T1": {"au": 62.9, "trig": 75.5}, "T2": {"au": 273.0,"trig": 327.6},"T3": {"au": 1013.7,"trig": 1216.4}},
+    "XAGUSD": {"T1": {"au": 186.9,"trig": 224.3},"T2": {"au": 1589.7,"trig": 1907.6},"T3": {"au": 5329.9,"trig": 6395.9}},
+    "BTCUSD": {"T1": {"au": 335.6,"trig": 402.7},"T2": {"au": 990.6,"trig": 1188.7},"T3": {"au": 2240.2,"trig": 2688.2}},
+    "ETHUSD": {"T1": {"au": 226.0,"trig": 271.2},"T2": {"au": 700.8,"trig": 841.0}," "T3": {"au": 1569.0,"trig": 1882.8}},
 }
 
 
