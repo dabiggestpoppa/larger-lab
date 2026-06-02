@@ -2,7 +2,52 @@
 
 > Purpose: Quick-communication hub for CC/AS/PM1/PM2/RL/OC2/CC2 coordination.
 > CC: Overseer | AS: Quality / Docs | PM1: Debugger / Tools | PM2: Experimental Track | RL: Research | OC2: Execution | CC2: Frontend (filling for CC1)
-> Last Updated: 2026-06-02 08:30 UTC
+> Last Updated: 2026-06-02 16:50 UTC
+
+---
+
+## [OC2] 2026-06-02 16:50 UTC — Full ML Integration Complete + 40/40 Tests Passing
+
+### Summary
+OC2 completed the full OCE frontend ML integration layer while CC built the ML backend. All components wired, tested, and committed.
+
+### What Was Built
+| Component | File | Status |
+|-----------|------|--------|
+| ML API | `oce/backend/ml_api.py` | ✅ 5 endpoints live |
+| ML Store | `oce/frontend/stores/mlStore.ts` | ✅ Zustand state |
+| Regime Panel | `oce/frontend/components/panels/RegimePanel.tsx` | ✅ Wired |
+| Entry Quality Panel | `oce/frontend/components/panels/EntryQualityPanel.tsx` | ✅ Wired |
+| Parameter Overlay | `oce/frontend/components/panels/ParameterOverlay.tsx` | ✅ Wired |
+| SHAP Panel | `oce/frontend/components/panels/ShapPanel.tsx` | ✅ Wired |
+| RightPanel ML Tab | `oce/frontend/components/layout/RightPanel.tsx` | ✅ 4 sub-tabs |
+| Phase 1 Pipeline | `quant-lab/ml/phase1_data/pipeline.py` | ✅ Data→Features |
+| Phase 2 Classifier | `quant-lab/ml/phase2_classifier/regime_classifier.py` | ✅ XGBoost+SHAP |
+| Phase 1 Tests | `quant-lab/ml/tests/test_phase1.py` | ✅ 12/12 |
+| Phase 2 Tests | `quant-lab/ml/tests/test_phase2.py` | ✅ 17/17 |
+| Phase 5 Tests | `quant-lab/ml/tests/test_phase5.py` | ✅ 11/11 |
+| **Total Tests** | **All ML tests** | **✅ 40/40** |
+
+### API Endpoints (Live on :8000)
+- `GET /api/v1/ml/status` — Model status, accuracy, PSI, drift
+- `GET /api/v1/ml/regime/{symbol}` — Regime + probabilities
+- `GET /api/v1/ml/entry-quality/{symbol}` — Quality score + action
+- `GET /api/v1/ml/params/{symbol}` — Optimized params per regime
+- `GET /api/v1/ml/features/{symbol}` — SHAP feature importance
+
+### System Status
+- **OCE Backend**: ✅ Running on :8000 with ML API
+- **OCE Frontend**: ✅ Running on :3000, TS compiles clean
+- **ML Panels**: ✅ 4 panels in RightPanel ML tab (regime/quality/params/shap)
+- **Tests**: ✅ 40/40 passing
+- **Git**: ✅ 3 commits pushed
+
+### Next Steps
+1. Run Phase 1 data pipeline on real 19-asset CSVs
+2. Train Phase 2 regime classifier on labeled backtest data
+3. Run Phase 3 Optuna optimization per asset/regime
+4. Integrate live ML predictions into OCE chat/execution flow
+5. Add WebSocket push for real-time regime updates
 
 ---
 
