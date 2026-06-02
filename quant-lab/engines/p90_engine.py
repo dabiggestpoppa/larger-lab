@@ -246,6 +246,14 @@ class P90Engine:
         self.target_mode = target_mode
         self.logger = logging.getLogger(f"cerebus.p90.{symbol}")
 
+        # ── SL Min Buffer & Spread Buffer (per Architect Directive 2026-06-02) ──
+        # min_sl_buffer: minimum SL distance in pips (asset-specific floor)
+        # spread_buffer: spread buffer in price units (added to P90 extreme)
+        cfg = config or {}
+        self.min_sl_buffer = cfg.get("min_sl_buffer", self._default_min_sl_buffer(symbol))
+        self.spread_buffer = cfg.get("spread_buffer", self._default_spread_buffer(symbol))
+        self.kill_switch_body_pct = 0.80  # 80% body = intra-candle kill switch
+
         # ── State Machine ──────────────────────────────────────────────
         self.state = EngineState.SEARCH
         self.active_variant = P90Variant.INITIAL
@@ -258,6 +266,9 @@ class P90Engine:
         self.tp2_price: Optional[float] = None   # -50% AR
         self.p90_body_pips: float = 0.0
         self.p90_body_price: float = 0.0
+        # ── 80% Kill Switch levels (P90 signal candle extremes) ──
+        self.p90_kill_high: Optional[float] = None  # High of P90 signal candle
+        self.p90_kill_low: Optional[float] = None   # Low of P90 signal candle
 
         # ── Session State ──────────────────────────────────────────────
         self.asian_high: float = 0.0
@@ -310,8 +321,35 @@ class P90Engine:
 
         self.logger.info(
             f"Session initialized: tier={self.tier_name}, "
-            f"AR={self.asian_range_pips:.1f}p"
+            f"AR={self.asian_range_pips:.1f}p, "
+            f"min_sl={self.min_sl_buffer:.1f}p, spread_buf={self.spread_buffer:.5f}"
         )
+
+    # ── Default SL Buffers by Asset Class ───────────────────────────
+
+    @staticmethod
+    def _default_min_sl_buffer(symbol: str) -> float:
+        """Minimum SL buffer floor in pips (Architect Directive 2026-06-02)."""
+        sym = symbol.upper()
+        if any(x in sym for x in ['GBPJPY', 'GBPAUD', 'GBPNZD']):
+            return 12.0   # GBP crosses need 12+ pip floor
+        if 'JPY' in sym:
+            return 6.0    # JPY pairs need 6+ pip floor
+        if any(x in sym for x in ['XAU', 'XAG']):
+            return 150.0  # Gold/Silver in points
+        return 8.0        # Default for majors
+
+    @staticmethod
+    def _default_spread_buffer(symbol: str) -> float:
+        """Spread buffer in price units (added to P90 extreme for SL placement)."""
+        sym = symbol.upper()
+        if any(x in sym for x in ['GBPJPY', 'GBPAUD', 'GBPNZD']):
+            return 0.0003  # ~3 pips on GBP crosses
+        if 'JPY' in sym:
+            return 0.00015  # ~1.5 pips on JPY
+        if any(x in sym for x in ['XAU', 'XAG']):
+            return 0.15
+        return 0.00015  # ~1.5 pips default
 
     # ── P90 Validation ───────────────────────────────────────────────
 
@@ -425,6 +463,27 @@ class P90Engine:
                 tp1 = entry - self.ar_price * 0.25
                 tp2 = entry - self.ar_price * 0.50
 
+        # ── STRUCTURAL SL FIX: Enforce P90 Extreme + Min Buffer Floor ──
+        # The 80%/168% body SL is the THEORETICAL invalidation point.
+        # In live execution, the SL must be at the P90 signal candle extreme
+        # plus a spread buffer, with a per-asset minimum floor.
+        # Reference: Architect Directive 2026-06-02 (P90 SL fix)
+        raw_sl = sl
+        if direction == TradeDirection.LONG:
+            # SL = Low of P90 candle minus spread buffer
+            extreme_sl = bar.low - self.spread_buffer
+            # Use max of body-based and extreme-based (more conservative)
+            sl = min(sl, extreme_sl)  # lower SL = more conservative for LONG
+            if sl > entry - (self.min_sl_buffer * self.pip_size):
+                sl = entry - (self.min_sl_buffer * self.pip_size)
+        else:
+            # SL = High of P90 candle plus spread buffer
+            extreme_sl = bar.high + self.spread_buffer
+            # Use min of body-based and extreme-based (more conservative)
+            sl = max(sl, extreme_sl)  # higher SL = more conservative for SHORT
+            if sl < entry + (self.min_sl_buffer * self.pip_size):
+                sl = entry + (self.min_sl_buffer * self.pip_size)
+
         return entry, sl, tp1, tp2
 
     # ── Main Processing Loop ─────────────────────────────────────────
@@ -496,6 +555,12 @@ class P90Engine:
                 self.tp1_price = tp1
                 self.tp2_price = tp2
                 self.p90_count += 1
+                # ── 80% Kill Switch: save P90 signal candle extremes ──
+                # Kill switch triggers if next M5 close inside 80% of P90 body
+                self.p90_kill_high = bar.high
+                self.p90_kill_low = bar.low
+                self.p90_kill_entry = entry
+                self.p90_kill_body = bar.body_abs
 
                 dir_str = "LONG" if direction == TradeDirection.LONG else "SHORT"
                 tp1_str = f"{tp1:.5f}" if tp1 is not None else "N/A"
@@ -523,6 +588,54 @@ class P90Engine:
 
         # ── STATE: IN_TRADE ────────────────────────────────────────────
         elif self.state == EngineState.IN_TRADE:
+            # ── 80% Kill Switch (intra-candle invalidation) ──
+            # If the very next M5 candle closes inside 80% of the P90 body,
+            # the momentum has failed. Kill immediately.
+            if self.p90_kill_body > 0:
+                kill_80_pct = self.p90_kill_body * self.kill_switch_body_pct
+                if self.direction == TradeDirection.LONG:
+                    kill_level = self.p90_kill_entry - kill_80_pct
+                    if bar.close <= kill_level:
+                        _entry = self.entry_price; _sl = self.sl_price
+                        _tp1 = self.tp1_price; _tp2 = self.tp2_price
+                        _var = self.active_variant; _dir = self.direction
+                        self._reset_state()
+                        sig = P90Signal(
+                            event="KILL_SWITCH",
+                            variant=_var,
+                            direction=_dir,
+                            entry_price=_entry,
+                            sl_price=_sl,
+                            tp_price=_tp1,
+                            p90_body_pips=self.p90_body_pips,
+                            timestamp=bar.timestamp,
+                            reason="80% Kill Switch: close inside P90 body"
+                        )
+                        self.signal_log.append(sig)
+                        self.logger.info("KILL SWITCH (80%%): close=%.5f <= kill_level=%.5f", bar.close, kill_level)
+                        return sig
+                else:  # SHORT
+                    kill_level = self.p90_kill_entry + kill_80_pct
+                    if bar.close >= kill_level:
+                        _entry = self.entry_price; _sl = self.sl_price
+                        _tp1 = self.tp1_price; _tp2 = self.tp2_price
+                        _var = self.active_variant; _dir = self.direction
+                        self._reset_state()
+                        sig = P90Signal(
+                            event="KILL_SWITCH",
+                            variant=_var,
+                            direction=_dir,
+                            entry_price=_entry,
+                            sl_price=_sl,
+                            tp_price=_tp1,
+                            p90_body_pips=self.p90_body_pips,
+                            timestamp=bar.timestamp,
+                            reason="80% Kill Switch: close inside P90 body"
+                        )
+                        self.signal_log.append(sig)
+                        self.logger.info("KILL SWITCH (80%%): close=%.5f >= kill_level=%.5f", bar.close, kill_level)
+                        return sig
+
             if self.direction == TradeDirection.LONG:
                 # TP2 check first (it's further out)
                 if self.tp2_price and bar.high >= self.tp2_price:
@@ -668,6 +781,10 @@ class P90Engine:
         self.tp2_price = None
         self.p90_body_pips = 0.0
         self.p90_body_price = 0.0
+        self.p90_kill_high = None
+        self.p90_kill_low = None
+        self.p90_kill_entry = None
+        self.p90_kill_body = 0.0
 
     def hard_exit(self) -> None:
         """12:00 PM EST forced termination."""

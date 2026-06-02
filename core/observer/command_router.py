@@ -119,23 +119,88 @@ class CommandRouter:
         if cmd == "failure":
             return self._cmd_failure(args)
 
+        if cmd == "update":
+            return self._cmd_update(args)
+
         if cmd == "help":
             return (
                 "Primary Observer commands:\n"
-                "  /status       — check all service ports\n"
-                "  /spawn <t>   — spawn agent (stub)\n"
+                "  /status       — check all service ports and runtime state\n"
+                "  /update       — system update: git, vault, services, recent activity\n"
+                "  /spawn <t>   — spawn agent (e.g. /spawn research analyze vault)\n"
                 "  /report       — recent operational summary\n"
                 "  /memory <kw> — search vault notes\n"
                 "  /graph        — knowledge graph summary\n"
                 "  /research <t>— research stub\n"
                 "  /sync         — sync vault state\n"
-                "  /task <name> — create task\n"
+                "  /task <name> — create or list tasks\n"
                 "  /trace <id>  — trace execution\n"
                 "  /failure <d> — log structured failure\n"
                 "  /help         — this message"
             )
 
         return f"Unknown command: {cmd}. Try /help"
+
+    def _cmd_update(self, args: List[str]) -> str:
+        """Show system update: git status, vault stats, services, recent activity."""
+        import subprocess
+        lines = ["📊 System Update", ""]
+
+        # Git status
+        try:
+            result = subprocess.run(
+                ["git", "log", "--oneline", "-5"],
+                capture_output=True, text=True, timeout=10,
+                cwd=os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            )
+            lines.append("📝 Recent commits:")
+            for line in result.stdout.strip().split("\n")[:5]:
+                lines.append(f"  {line}")
+        except Exception:
+            lines.append("📝 Git: unavailable")
+        lines.append("")
+
+        # Vault stats
+        try:
+            md_count = 0
+            for _, _, files in os.walk(self.vault.path):
+                md_count += len([f for f in files if f.lower().endswith('.md')])
+            lines.append(f"📚 Vault: {md_count} notes")
+        except Exception:
+            lines.append("📚 Vault: unavailable")
+
+        # Service ports
+        ports = [("OC2", 18790), ("Hermes", 8642), ("OCE Backend", 8000),
+                 ("SRRA-OPH", 8001), ("OCE Frontend", 3000), ("Sniper", 3001)]
+        up_count = 0
+        for name, port in ports:
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.settimeout(0.5)
+                s.connect(("127.0.0.1", port))
+                s.close()
+                up_count += 1
+            except Exception:
+                pass
+        lines.append(f"🔌 Services: {up_count}/{len(ports)} UP")
+        lines.append("")
+
+        # Tasks
+        lines.append(f"📋 {self.orchestrator.tasks.summary()}")
+
+        # Recent events
+        recent = self.journal.recent_events(5)
+        if recent:
+            lines.append("")
+            lines.append("🕐 Recent activity:")
+            for e in recent:
+                ts = e.get("timestamp", "")[:19]
+                lines.append(f"  [{ts}] {e.get('type','')} {e.get('command','')}")
+
+        lines.append("")
+        lines.append("✅ All systems operational" if up_count == len(ports) else "⚠️ Some services down")
+
+        return "\n".join(lines)
 
     def _cmd_graph(self, args: List[str]) -> str:
         md_count = 0
