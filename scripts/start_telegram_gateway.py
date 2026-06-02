@@ -104,67 +104,27 @@ def main():
                 # Process
                 try:
                     if text.strip().startswith("/"):
-                        # Send command execution message (stays in chat)
-                        cmd_name = text.strip().split()[0]
-                        requests.post(
-                            f"{base_url}/sendMessage",
-                            json={"chat_id": chat_id, "text": f"⚡ {text.strip()}"},
-                            timeout=10,
-                        )
-
+                        # Slash command
                         resp = router.handle(text.strip())
-
-                        log(f"RESP ({len(resp)} chars): {resp[:80]}")
-                        sr = requests.post(
-                            f"{base_url}/sendMessage",
-                            json={"chat_id": chat_id, "text": resp},
-                            timeout=15,
-                        )
-                    else:
-                        # Chat message — send thinking then response
+                        log(f"CMD RESP ({len(resp)} chars): {resp[:80]}")
                         requests.post(
                             f"{base_url}/sendMessage",
-                            json={"chat_id": chat_id, "text": "🧠 ..."},
-                            timeout=10,
-                        )
-
-                        sov_ctx = sovereign.get_sovereign_context()
-                        resp = chat_agent.chat(text, sovereign_context=sov_ctx)
-                        sovereign.process_message(text, resp)
-
-                        log(f"RESP ({len(resp)} chars): {resp[:80]}")
-                        sr = requests.post(
-                            f"{base_url}/sendMessage",
                             json={"chat_id": chat_id, "text": resp},
                             timeout=15,
                         )
-
-                        sov_ctx = sovereign.get_sovereign_context()
-                        resp = chat_agent.chat(text, sovereign_context=sov_ctx)
-                        sovereign.process_message(text, resp)
-
-                        # Delete thinking message and send response
-                        if thinking_id:
-                            try:
-                                requests.post(f"{base_url}/deleteMessage",
-                                              json={"chat_id": chat_id, "message_id": thinking_id}, timeout=5)
-                            except Exception:
-                                pass
-
-                        log(f"RESP ({len(resp)} chars): {resp[:80]}")
-                        sr = requests.post(
-                            f"{base_url}/sendMessage",
-                            json={"chat_id": chat_id, "text": resp},
-                            timeout=15,
-                        )
-
-                    if sr.json().get("ok"):
-                        log("SENT OK")
                     else:
-                        log(f"SEND FAIL: {sr.json()}")
-
+                        # Chat message — get response from chat agent
+                        sov_ctx = sovereign.get_sovereign_context()
+                        resp = chat_agent.chat(text, sovereign_context=sov_ctx)
+                        sovereign.process_message(text, resp)
+                        log(f"CHAT RESP ({len(resp)} chars): {resp[:80]}")
+                        requests.post(
+                            f"{base_url}/sendMessage",
+                            json={"chat_id": chat_id, "text": resp},
+                            timeout=15,
+                        )
                 except Exception as e:
-                    log(f"HANDLER ERROR: {e}")
+                    log(f"ERROR processing message: {e}")
                     try:
                         requests.post(
                             f"{base_url}/sendMessage",
@@ -174,10 +134,8 @@ def main():
                     except Exception:
                         pass
 
-        except requests.exceptions.Timeout:
-            pass  # Normal for long polling
         except Exception as e:
-            log(f"POLL ERROR: {e}")
+            log(f"Poll error: {e}")
             time.sleep(5)
 
 

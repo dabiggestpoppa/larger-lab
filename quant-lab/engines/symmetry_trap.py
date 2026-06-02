@@ -198,6 +198,8 @@ class SymmetryTrapEngine:
         # ── SL Min Buffer (per Architect Directive 2026-06-02) ──
         cfg = config or {}
         self.min_sl_buffer = cfg.get("min_sl_buffer", self._default_min_sl_buffer(symbol))
+        # ── Spread Buffer: pair-specific spread estimate for SL placement ──
+        self.spread_buffer = cfg.get("spread_buffer", self._default_spread_buffer(symbol))
 
         # ── State Machine ──────────────────────────────────────────────
         self.state: EngineState = EngineState.SEARCH
@@ -244,6 +246,20 @@ class SymmetryTrapEngine:
         if any(x in sym for x in ['XAU', 'XAG']):
             return 150.0
         return 8.0
+
+    @staticmethod
+    def _default_spread_buffer(symbol: str) -> float:
+        """Spread buffer in pips — added to SL to prevent spread-wick stop-outs.
+        MAD directive 2026-06-02: OCC extreme + spread buffer so tight SLs
+        don't get hit by normal spread widening on entry."""
+        sym = symbol.upper()
+        if any(x in sym for x in ['GBPJPY', 'GBPAUD', 'GBPNZD']):
+            return 3.0   # GBP crosses typically 2-4p spread
+        if 'JPY' in sym:
+            return 2.0   # JPY pairs typically 1.5-3p spread
+        if any(x in sym for x in ['XAU', 'XAG']):
+            return 15.0  # metals have wide spread
+        return 1.5       # majors typically 0.8-2p spread
 
     # ── Session Initialization ────────────────────────────────────────
 
@@ -493,16 +509,19 @@ class SymmetryTrapEngine:
 
             if occ_confirmed:
                 self.entry_price = bar.close
-                # SL = OCC candle extreme + minimum buffer floor
-                # For SHORT: SL at OCC high + min buffer (loss direction = above entry)
-                # For LONG: SL at OCC low - min buffer (loss direction = below entry)
+                # SL = OCC candle extreme + spread buffer + minimum buffer floor
+                # MAD directive 2026-06-02: add spread buffer to prevent
+                # spread-wick stop-outs on tight OCC candles
+                # For SHORT: SL at OCC high + spread buffer (loss direction = above entry)
+                # For LONG: SL at OCC low - spread buffer (loss direction = below entry)
+                spread_buf = self.spread_buffer * self.pip_size
                 if self.impulse_direction == TradeDirection.SHORT:
-                    self.sl_price = bar.high
+                    self.sl_price = bar.high + spread_buf
                     min_sl = self.entry_price + (self.min_sl_buffer * self.pip_size)
                     if self.sl_price < min_sl:
                         self.sl_price = min_sl
                 else:
-                    self.sl_price = bar.low
+                    self.sl_price = bar.low - spread_buf
                     min_sl = self.entry_price - (self.min_sl_buffer * self.pip_size)
                     if self.sl_price > min_sl:
                         self.sl_price = min_sl

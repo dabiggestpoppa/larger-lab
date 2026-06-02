@@ -1,6 +1,24 @@
 # MEMORY.md — OWL (OC2) Persistent Memory
 
-> **Last Updated:** 2026-06-02 10:43 EDT — P90 SL Fix + ST SL Fix + Duplicate Executor Kill
+> **Last Updated:** 2026-06-02 15:30 EDT — ST Spread Buffer Fix + ST Executor Validation Fix
+
+---
+
+## 🔴 CRITICAL FIXES DEPLOYED (2026-06-02 15:30 EDT)
+
+### ST Spread Buffer Fix — OCC Extreme + Spread Buffer
+- **Bug**: ST SL = OCC candle extreme (high for SHORT, low for LONG) with no spread buffer. On tight OCC candles where high-close spread is 1-2 pips, the SL gets placed so close to entry that normal spread widening triggers instant stop-outs. GBPAUD trade at 11:08 got SL at 1.87528 (6.2p below entry!) — bridge clamped to 1.87600 (1p above entry) → instant stop-out.
+- **Root cause**: The OCC candle's high can be very close to its close (entry). Without a spread buffer, the SL sits right at or even below entry.
+- **Fix**: `SL = OCC extreme + spread_buffer` then enforce `min_sl_buffer` floor
+- **Spread buffers**: GBP crosses 3p, JPY pairs 2p, majors 1.5p, metals 15p
+- **Also fixed**: ST executor validation was rejecting valid signals (`sl_r <= entry_r` with no tolerance). Added 1-point tolerance.
+- **Also fixed**: Bridge process (PID 14496) was running OLD engine code from June 1 — never restarted after today's fixes. Needs restart.
+- **Files**: `quant-lab/engines/symmetry_trap.py`, `quant-lab/mt5/symmetry_trap_executor.py`
+
+### ST Executor Loop Bug
+- **Bug**: ST executor stuck in infinite loop generating EURUSD SHORT at 1.16399 with SL=1.16362 (below entry). Every cycle rejected as `invalid_tp_sl`. 180+ cycles wasted.
+- **Root cause**: Same missing spread buffer + executor validation too strict.
+- **Fix**: Spread buffer ensures SL always above entry. Executor validation now has 1-point tolerance.
 
 ---
 

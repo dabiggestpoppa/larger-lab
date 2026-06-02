@@ -184,15 +184,16 @@ def place_order(
         tp_r = round(tp_price, digits)
         entry_r = round(entry_price, digits)
 
-        # Validate TP/SL against entry price
+        # Validate TP/SL against entry price (with 1-point tolerance for rounding)
+        point = info.point
         if is_short:
-            if tp_r >= entry_r or sl_r <= entry_r:
+            if tp_r >= entry_r or sl_r <= entry_r + point:
                 log(
                     f"INVALID TP/SL: SHORT TP={tp_r} entry={entry_r} SL={sl_r}"
                 )
                 return "INVALID_TP_SL"
         else:
-            if sl_r >= entry_r or tp_r <= entry_r:
+            if sl_r >= entry_r - point or tp_r <= entry_r:
                 log(
                     f"INVALID TP/SL: LONG SL={sl_r} entry={entry_r} TP={tp_r}"
                 )
