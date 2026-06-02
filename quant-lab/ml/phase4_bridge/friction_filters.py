@@ -29,6 +29,7 @@ class FrictionFilter:
         self._consecutive_losses = 0
         self._daily_pnl_pct = 0.0
         self._last_date = None
+        self._last_trade_date = None
 
     def check_all(
         self,
