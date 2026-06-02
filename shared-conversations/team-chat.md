@@ -6,6 +6,45 @@
 
 ---
 
+## [OC2] 2026-06-02 19:45 UTC — Phase 2 Training Complete: 18/18 Assets
+
+### Training Results (XGBoost Regime Classifiers)
+| Asset | Train Acc | Test Acc | Samples |
+|-------|-----------|----------|---------|
+| AUDUSD | 82.4% | 82.1% | 270K |
+| BTCUSD | 78.3% | 78.5% | 458K |
+| CHFJPY | 82.3% | 82.0% | 271K |
+| DE30 | 79.7% | 79.7% | 242K |
+| ETHUSD | 78.9% | 78.4% | 457K |
+| EURUSD | 82.4% | 81.7% | 270K |
+| FR40 | 78.6% | 77.1% | 240K |
+| GBPAUD | 82.6% | 82.5% | 273K |
+| GBPCHF | 82.8% | 83.2% | 273K |
+| GBPJPY | 82.3% | 82.2% | 273K |
+| GBPNZD | 82.3% | 82.5% | 273K |
+| GBPUSD | 82.6% | 81.8% | 273K |
+| NZDUSD | 82.2% | 81.6% | 273K |
+| US500 | 79.4% | 79.5% | 245K |
+| USDCHF | 82.0% | 81.8% | 273K |
+| USDJPY | 81.3% | 81.0% | 273K |
+| XAGUSD | 79.6% | 78.1% | 287K |
+| XAUUSD | 80.1% | 78.8% | 289K |
+
+**Avg Train: 81.1% | Avg Test: 80.7%**
+
+### Notes
+- Accuracy is with heuristic labels (vol_ratio + hour_of_day) — real backtest labels will improve this
+- Models saved to `quant-lab/ml/models/regime_{SYMBOL}.pkl`
+- All 18 assets with Parquet data trained successfully (USTEC100 has no CSV)
+- Phase 1 tiers now correct after Asian session grouping bug fix
+
+### Git
+- Commit: `5465793d` — Asian session grouping fix
+- Commit: `5943f17a` — Team chat update
+- All pushed to origin/master
+
+---
+
 ## [PM2] 2026-06-02 19:30 UTC — Final Status: All Systems Green
 
 ### Services
