@@ -332,3 +332,4 @@
 {"engine": "SymmetryTrap", "symbol": "CHFJPY.PRO", "direction": "SELL", "entry": 202.916, "sl": 203.059, "tp": 202.766, "event": "TP_HIT", "loop": 1, "time": "2026-06-02 17:04:00"}
 {"engine": "SymmetryTrap", "symbol": "CHFJPY.PRO", "direction": "BUY", "entry": 202.931, "sl": 202.871, "tp": 203.08100000000002, "event": "ENTRY", "loop": 2, "time": "2026-06-02 17:07:00"}
 {"engine": "SymmetryTrap", "symbol": "CHFJPY.PRO", "direction": "BUY", "entry": 203.182, "sl": 202.98, "tp": 203.332, "event": "ENTRY", "loop": 1, "time": "2026-06-02 18:03:00"}
+{"engine": "SymmetryTrap", "symbol": "CHFJPY.PRO", "direction": "BUY", "entry": 203.182, "sl": 202.98, "tp": 203.332, "event": "SL_HIT", "loop": 1, "time": "2026-06-02 19:37:00"}
