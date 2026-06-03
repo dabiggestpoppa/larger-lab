@@ -1,0 +1,1036 @@
+{
+  "tiers": {
+    "EURUSD": {
+      "symbol": "EURUSD",
+      "status": "OK",
+      "sessions": 1075,
+      "centroids": [
+        18.05,
+        43.84,
+        150.5
+      ],
+      "cutoffs": [
+        30.95,
+        97.17
+      ],
+      "tiers": {
+        "T1": {
+          "centroid": 18.05,
+          "max_ar": 30.95,
+          "au": 9.03,
+          "trigger": 10.83,
+          "dz_low": 7.22,
+          "dz_high": 10.83
+        },
+        "T2": {
+          "centroid": 43.84,
+          "max_ar": 97.17,
+          "au": 21.92,
+          "trigger": 26.31,
+          "dz_low": 17.54,
+          "dz_high": 26.31
+        },
+        "T3": {
+          "centroid": 150.5,
+          "max_ar": 9999,
+          "au": 75.25,
+          "trigger": 90.3,
+          "dz_low": 60.2,
+          "dz_high": 90.3
+        }
+      },
+      "tier_counts": {
+        "T1": 235,
+        "T2": 15,
+        "T3": 825
+      }
+    },
+    "GBPUSD": {
+      "symbol": "GBPUSD",
+      "status": "OK",
+      "sessions": 1086,
+      "centroids": [
+        25.36,
+        69.29,
+        327.23
+      ],
+      "cutoffs": [
+        47.33,
+        198.26
+      ],
+      "tiers": {
+        "T1": {
+          "centroid": 25.36,
+          "max_ar": 47.33,
+          "au": 12.68,
+          "trigger": 15.22,
+          "dz_low": 10.15,
+          "dz_high": 15.22
+        },
+        "T2": {
+          "centroid": 69.29,
+          "max_ar": 198.26,
+          "au": 34.64,
+          "trigger": 41.57,
+          "dz_low": 27.71,
+          "dz_high": 41.57
+        },
+        "T3": {
+          "centroid": 327.23,
+          "max_ar": 9999,
+          "au": 163.62,
+          "trigger": 196.34,
+          "dz_low": 130.89,
+          "dz_high": 196.34
+        }
+      },
+      "tier_counts": {
+        "T1": 162,
+        "T2": 10,
+        "T3": 914
+      }
+    },
+    "USDCHF": {
+      "symbol": "USDCHF",
+      "status": "OK",
+      "sessions": 1086,
+      "centroids": [
+        19.51,
+        45.51,
+        118.53
+      ],
+      "cutoffs": [
+        32.51,
+        82.02
+      ],
+      "tiers": {
+        "T1": {
+          "centroid": 19.51,
+          "max_ar": 32.51,
+          "au": 9.75,
+          "trigger": 11.7,
+          "dz_low": 7.8,
+          "dz_high": 11.7
+        },
+        "T2": {
+          "centroid": 45.51,
+          "max_ar": 82.02,
+          "au": 22.76,
+          "trigger": 27.31,
+          "dz_low": 18.2,
+          "dz_high": 27.31
+        },
+        "T3": {
+          "centroid": 118.53,
+          "max_ar": 9999,
+          "au": 59.26,
+          "trigger": 71.12,
+          "dz_low": 47.41,
+          "dz_high": 71.12
+        }
+      },
+      "tier_counts": {
+        "T1": 779,
+        "T2": 31,
+        "T3": 276
+      }
+    },
+    "USDJPY": {
+      "symbol": "USDJPY",
+      "status": "OK",
+      "sessions": 1086,
+      "centroids": [
+        39.06,
+        96.67,
+        330.08
+      ],
+      "cutoffs": [
+        67.86,
+        213.37
+      ],
+      "tiers": {
+        "T1": {
+          "centroid": 39.06,
+          "max_ar": 67.86,
+          "au": 19.53,
+          "trigger": 23.43,
+          "dz_low": 15.62,
+          "dz_high": 23.43
+        },
+        "T2": {
+          "centroid": 96.67,
+          "max_ar": 213.37,
+          "au": 48.33,
+          "trigger": 58.0,
+          "dz_low": 38.67,
+          "dz_high": 58.0
+        },
+        "T3": {
+          "centroid": 330.08,
+          "max_ar": 9999,
+          "au": 165.04,
+          "trigger": 198.05,
+          "dz_low": 132.03,
+          "dz_high": 198.05
+        }
+      },
+      "tier_counts": {
+        "T1": 705,
+        "T2": 365,
+        "T3": 16
+      }
+    },
+    "AUDUSD": {
+      "symbol": "AUDUSD",
+      "status": "OK",
+      "sessions": 1075,
+      "centroids": [
+        17.14,
+        35.61,
+        71.61
+      ],
+      "cutoffs": [
+        26.38,
+        53.61
+      ],
+      "tiers": {
+        "T1": {
+          "centroid": 17.14,
+          "max_ar": 26.38,
+          "au": 8.57,
+          "trigger": 10.29,
+          "dz_low": 6.86,
+          "dz_high": 10.29
+        },
+        "T2": {
+          "centroid": 35.61,
+          "max_ar": 53.61,
+          "au": 17.81,
+          "trigger": 21.37,
+          "dz_low": 14.24,
+          "dz_high": 21.37
+        },
+        "T3": {
+          "centroid": 71.61,
+          "max_ar": 9999,
+          "au": 35.81,
+          "trigger": 42.97,
+          "dz_low": 28.65,
+          "dz_high": 42.97
+        }
+      },
+      "tier_counts": {
+        "T1": 500,
+        "T2": 105,
+        "T3": 470
+      }
+    },
+    "NZDUSD": {
+      "symbol": "NZDUSD",
+      "status": "OK",
+      "sessions": 1086,
+      "centroids": [
+        18.71,
+        40.65,
+        83.32
+      ],
+      "cutoffs": [
+        29.68,
+        61.98
+      ],
+      "tiers": {
+        "T1": {
+          "centroid": 18.71,
+          "max_ar": 29.68,
+          "au": 9.36,
+          "trigger": 11.23,
+          "dz_low": 7.48,
+          "dz_high": 11.23
+        },
+        "T2": {
+          "centroid": 40.65,
+          "max_ar": 61.98,
+          "au": 20.32,
+          "trigger": 24.39,
+          "dz_low": 16.26,
+          "dz_high": 24.39
+        },
+        "T3": {
+          "centroid": 83.32,
+          "max_ar": 9999,
+          "au": 41.66,
+          "trigger": 49.99,
+          "dz_low": 33.33,
+          "dz_high": 49.99
+        }
+      },
+      "tier_counts": {
+        "T1": 577,
+        "T2": 86,
+        "T3": 423
+      }
+    },
+    "GBPJPY": {
+      "symbol": "GBPJPY",
+      "status": "OK",
+      "sessions": 1086,
+      "centroids": [
+        53.75,
+        130.17,
+        448.31
+      ],
+      "cutoffs": [
+        91.96,
+        289.24
+      ],
+      "tiers": {
+        "T1": {
+          "centroid": 53.75,
+          "max_ar": 91.96,
+          "au": 26.88,
+          "trigger": 32.25,
+          "dz_low": 21.5,
+          "dz_high": 32.25
+        },
+        "T2": {
+          "centroid": 130.17,
+          "max_ar": 289.24,
+          "au": 65.09,
+          "trigger": 78.1,
+          "dz_low": 52.07,
+          "dz_high": 78.1
+        },
+        "T3": {
+          "centroid": 448.31,
+          "max_ar": 9999,
+          "au": 224.16,
+          "trigger": 268.99,
+          "dz_low": 179.32,
+          "dz_high": 268.99
+        }
+      },
+      "tier_counts": {
+        "T1": 257,
+        "T2": 811,
+        "T3": 18
+      }
+    },
+    "GBPAUD": {
+      "symbol": "GBPAUD",
+      "status": "OK",
+      "sessions": 1086,
+      "centroids": [
+        51.01,
+        119.34,
+        432.93
+      ],
+      "cutoffs": [
+        85.18,
+        276.14
+      ],
+      "tiers": {
+        "T1": {
+          "centroid": 51.01,
+          "max_ar": 85.18,
+          "au": 25.51,
+          "trigger": 30.61,
+          "dz_low": 20.41,
+          "dz_high": 30.61
+        },
+        "T2": {
+          "centroid": 119.34,
+          "max_ar": 276.14,
+          "au": 59.67,
+          "trigger": 71.6,
+          "dz_low": 47.74,
+          "dz_high": 71.6
+        },
+        "T3": {
+          "centroid": 432.93,
+          "max_ar": 9999,
+          "au": 216.47,
+          "trigger": 259.76,
+          "dz_low": 173.17,
+          "dz_high": 259.76
+        }
+      },
+      "tier_counts": {
+        "T1": 782,
+        "T2": 295,
+        "T3": 9
+      }
+    },
+    "GBPNZD": {
+      "symbol": "GBPNZD",
+      "status": "OK",
+      "sessions": 1087,
+      "centroids": [
+        64.2,
+        147.08,
+        541.49
+      ],
+      "cutoffs": [
+        105.64,
+        344.28
+      ],
+      "tiers": {
+        "T1": {
+          "centroid": 64.2,
+          "max_ar": 105.64,
+          "au": 32.1,
+          "trigger": 38.52,
+          "dz_low": 25.68,
+          "dz_high": 38.52
+        },
+        "T2": {
+          "centroid": 147.08,
+          "max_ar": 344.28,
+          "au": 73.54,
+          "trigger": 88.25,
+          "dz_low": 58.83,
+          "dz_high": 88.25
+        },
+        "T3": {
+          "centroid": 541.49,
+          "max_ar": 9999,
+          "au": 270.74,
+          "trigger": 324.89,
+          "dz_low": 216.59,
+          "dz_high": 324.89
+        }
+      },
+      "tier_counts": {
+        "T1": 312,
+        "T2": 768,
+        "T3": 7
+      }
+    },
+    "GBPCHF": {
+      "symbol": "GBPCHF",
+      "status": "OK",
+      "sessions": 1086,
+      "centroids": [
+        27.72,
+        75.19,
+        384.95
+      ],
+      "cutoffs": [
+        51.45,
+        230.07
+      ],
+      "tiers": {
+        "T1": {
+          "centroid": 27.72,
+          "max_ar": 51.45,
+          "au": 13.86,
+          "trigger": 16.63,
+          "dz_low": 11.09,
+          "dz_high": 16.63
+        },
+        "T2": {
+          "centroid": 75.19,
+          "max_ar": 230.07,
+          "au": 37.59,
+          "trigger": 45.11,
+          "dz_low": 30.07,
+          "dz_high": 45.11
+        },
+        "T3": {
+          "centroid": 384.95,
+          "max_ar": 9999,
+          "au": 192.48,
+          "trigger": 230.97,
+          "dz_low": 153.98,
+          "dz_high": 230.97
+        }
+      },
+      "tier_counts": {
+        "T1": 151,
+        "T2": 929,
+        "T3": 6
+      }
+    },
+    "CHFJPY": {
+      "symbol": "CHFJPY",
+      "status": "OK",
+      "sessions": 1078,
+      "centroids": [
+        46.4,
+        101.57,
+        324.64
+      ],
+      "cutoffs": [
+        73.99,
+        213.11
+      ],
+      "tiers": {
+        "T1": {
+          "centroid": 46.4,
+          "max_ar": 73.99,
+          "au": 23.2,
+          "trigger": 27.84,
+          "dz_low": 18.56,
+          "dz_high": 27.84
+        },
+        "T2": {
+          "centroid": 101.57,
+          "max_ar": 213.11,
+          "au": 50.79,
+          "trigger": 60.94,
+          "dz_low": 40.63,
+          "dz_high": 60.94
+        },
+        "T3": {
+          "centroid": 324.64,
+          "max_ar": 9999,
+          "au": 162.32,
+          "trigger": 194.79,
+          "dz_low": 129.86,
+          "dz_high": 194.79
+        }
+      },
+      "tier_counts": {
+        "T1": 683,
+        "T2": 16,
+        "T3": 379
+      }
+    },
+    "US500": {
+      "symbol": "US500",
+      "status": "OK",
+      "sessions": 1073,
+      "centroids": [
+        14.06,
+        45.6,
+        118.71
+      ],
+      "cutoffs": [
+        29.83,
+        82.16
+      ],
+      "tiers": {
+        "T1": {
+          "centroid": 14.06,
+          "max_ar": 29.83,
+          "au": 7.03,
+          "trigger": 8.43,
+          "dz_low": 5.62,
+          "dz_high": 8.43
+        },
+        "T2": {
+          "centroid": 45.6,
+          "max_ar": 82.16,
+          "au": 22.8,
+          "trigger": 27.36,
+          "dz_low": 18.24,
+          "dz_high": 27.36
+        },
+        "T3": {
+          "centroid": 118.71,
+          "max_ar": 9999,
+          "au": 59.36,
+          "trigger": 71.23,
+          "dz_low": 47.48,
+          "dz_high": 71.23
+        }
+      },
+      "tier_counts": {
+        "T1": 190,
+        "T2": 28,
+        "T3": 855
+      }
+    },
+    "DE30": {
+      "symbol": "DE30",
+      "status": "OK",
+      "sessions": 1052,
+      "centroids": [
+        58.61,
+        174.47,
+        440.88
+      ],
+      "cutoffs": [
+        116.54,
+        307.67
+      ],
+      "tiers": {
+        "T1": {
+          "centroid": 58.61,
+          "max_ar": 116.54,
+          "au": 29.31,
+          "trigger": 35.17,
+          "dz_low": 23.45,
+          "dz_high": 35.17
+        },
+        "T2": {
+          "centroid": 174.47,
+          "max_ar": 307.67,
+          "au": 87.23,
+          "trigger": 104.68,
+          "dz_low": 69.79,
+          "dz_high": 104.68
+        },
+        "T3": {
+          "centroid": 440.88,
+          "max_ar": 9999,
+          "au": 220.44,
+          "trigger": 264.53,
+          "dz_low": 176.35,
+          "dz_high": 264.53
+        }
+      },
+      "tier_counts": {
+        "T1": 851,
+        "T2": 37,
+        "T3": 164
+      }
+    },
+    "FR40": {
+      "symbol": "FR40",
+      "status": "OK",
+      "sessions": 1027,
+      "centroids": [
+        24.93,
+        74.53,
+        200.38
+      ],
+      "cutoffs": [
+        49.73,
+        137.45
+      ],
+      "tiers": {
+        "T1": {
+          "centroid": 24.93,
+          "max_ar": 49.73,
+          "au": 12.46,
+          "trigger": 14.96,
+          "dz_low": 9.97,
+          "dz_high": 14.96
+        },
+        "T2": {
+          "centroid": 74.53,
+          "max_ar": 137.45,
+          "au": 37.26,
+          "trigger": 44.72,
+          "dz_low": 29.81,
+          "dz_high": 44.72
+        },
+        "T3": {
+          "centroid": 200.38,
+          "max_ar": 9999,
+          "au": 100.19,
+          "trigger": 120.23,
+          "dz_low": 80.15,
+          "dz_high": 120.23
+        }
+      },
+      "tier_counts": {
+        "T1": 872,
+        "T2": 136,
+        "T3": 19
+      }
+    },
+    "XAUUSD": {
+      "symbol": "XAUUSD",
+      "status": "OK",
+      "sessions": 1260,
+      "centroids": [
+        125.72,
+        546.02,
+        2027.34
+      ],
+      "cutoffs": [
+        335.87,
+        1286.68
+      ],
+      "tiers": {
+        "T1": {
+          "centroid": 125.72,
+          "max_ar": 335.87,
+          "au": 62.86,
+          "trigger": 75.43,
+          "dz_low": 50.29,
+          "dz_high": 75.43
+        },
+        "T2": {
+          "centroid": 546.02,
+          "max_ar": 1286.68,
+          "au": 273.01,
+          "trigger": 327.61,
+          "dz_low": 218.41,
+          "dz_high": 327.61
+        },
+        "T3": {
+          "centroid": 2027.34,
+          "max_ar": 9999,
+          "au": 1013.67,
+          "trigger": 1216.41,
+          "dz_low": 810.94,
+          "dz_high": 1216.41
+        }
+      },
+      "tier_counts": {
+        "T1": 1027,
+        "T2": 16,
+        "T3": 217
+      }
+    },
+    "XAGUSD": {
+      "symbol": "XAGUSD",
+      "status": "OK",
+      "sessions": 1255,
+      "centroids": [
+        373.78,
+        3179.47,
+        10659.78
+      ],
+      "cutoffs": [
+        1776.63,
+        6919.62
+      ],
+      "tiers": {
+        "T1": {
+          "centroid": 373.78,
+          "max_ar": 1776.63,
+          "au": 186.89,
+          "trigger": 224.27,
+          "dz_low": 149.51,
+          "dz_high": 224.27
+        },
+        "T2": {
+          "centroid": 3179.47,
+          "max_ar": 6919.62,
+          "au": 1589.74,
+          "trigger": 1907.68,
+          "dz_low": 1271.79,
+          "dz_high": 1907.68
+        },
+        "T3": {
+          "centroid": 10659.78,
+          "max_ar": 9999,
+          "au": 5329.89,
+          "trigger": 6395.87,
+          "dz_low": 4263.91,
+          "dz_high": 6395.87
+        }
+      },
+      "tier_counts": {
+        "T1": 1144,
+        "T2": 9,
+        "T3": 102
+      }
+    },
+    "BTCUSD": {
+      "symbol": "BTCUSD",
+      "status": "OK",
+      "sessions": 1604,
+      "centroids": [
+        671.14,
+        1981.22,
+        4480.3
+      ],
+      "cutoffs": [
+        1326.18,
+        3230.76
+      ],
+      "tiers": {
+        "T1": {
+          "centroid": 671.14,
+          "max_ar": 1326.18,
+          "au": 335.57,
+          "trigger": 402.69,
+          "dz_low": 268.46,
+          "dz_high": 402.69
+        },
+        "T2": {
+          "centroid": 1981.22,
+          "max_ar": 3230.76,
+          "au": 990.61,
+          "trigger": 1188.73,
+          "dz_low": 792.49,
+          "dz_high": 1188.73
+        },
+        "T3": {
+          "centroid": 4480.3,
+          "max_ar": 9999,
+          "au": 2240.15,
+          "trigger": 2688.18,
+          "dz_low": 1792.12,
+          "dz_high": 2688.18
+        }
+      },
+      "tier_counts": {
+        "T1": 1017,
+        "T2": 79,
+        "T3": 508
+      }
+    },
+    "ETHUSD": {
+      "symbol": "ETHUSD",
+      "status": "OK",
+      "sessions": 1601,
+      "centroids": [
+        452.07,
+        1401.61,
+        3138.09
+      ],
+      "cutoffs": [
+        926.84,
+        2269.85
+      ],
+      "tiers": {
+        "T1": {
+          "centroid": 452.07,
+          "max_ar": 926.84,
+          "au": 226.04,
+          "trigger": 271.24,
+          "dz_low": 180.83,
+          "dz_high": 271.24
+        },
+        "T2": {
+          "centroid": 1401.61,
+          "max_ar": 2269.85,
+          "au": 700.81,
+          "trigger": 840.97,
+          "dz_low": 560.65,
+          "dz_high": 840.97
+        },
+        "T3": {
+          "centroid": 3138.09,
+          "max_ar": 9999,
+          "au": 1569.04,
+          "trigger": 1882.85,
+          "dz_low": 1255.24,
+          "dz_high": 1882.85
+        }
+      },
+      "tier_counts": {
+        "T1": 1073,
+        "T2": 470,
+        "T3": 58
+      }
+    }
+  },
+  "manifest": {
+    "EURUSD": {
+      "symbol": "EURUSD",
+      "status": "OK",
+      "rows": 463103,
+      "date_start": "2022-01-03 00:00:00+00:00",
+      "date_end": "2026-05-29 23:50:00+00:00",
+      "max_gap": "3 days 00:00:00",
+      "gap_count": 442,
+      "nan_bars": 189194,
+      "data_hash": "1d0d70e5223d",
+      "parquet_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\parquet\\EURUSD_M5.parquet"
+    },
+    "GBPUSD": {
+      "symbol": "GBPUSD",
+      "status": "OK",
+      "rows": 463103,
+      "date_start": "2022-01-03 00:00:00+00:00",
+      "date_end": "2026-05-29 23:50:00+00:00",
+      "max_gap": "3 days 00:00:00",
+      "gap_count": 518,
+      "nan_bars": 186081,
+      "data_hash": "9df211823581",
+      "parquet_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\parquet\\GBPUSD_M5.parquet"
+    },
+    "USDCHF": {
+      "symbol": "USDCHF",
+      "status": "OK",
+      "rows": 463103,
+      "date_start": "2022-01-03 00:00:00+00:00",
+      "date_end": "2026-05-29 23:50:00+00:00",
+      "max_gap": "3 days 00:00:00",
+      "gap_count": 504,
+      "nan_bars": 186031,
+      "data_hash": "766854ed6b8b",
+      "parquet_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\parquet\\USDCHF_M5.parquet"
+    },
+    "USDJPY": {
+      "symbol": "USDJPY",
+      "status": "OK",
+      "rows": 463103,
+      "date_start": "2022-01-03 00:00:00+00:00",
+      "date_end": "2026-05-29 23:50:00+00:00",
+      "max_gap": "3 days 00:00:00",
+      "gap_count": 461,
+      "nan_bars": 186011,
+      "data_hash": "618ffecfcba3",
+      "parquet_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\parquet\\USDJPY_M5.parquet"
+    },
+    "AUDUSD": {
+      "symbol": "AUDUSD",
+      "status": "OK",
+      "rows": 463103,
+      "date_start": "2022-01-03 00:00:00+00:00",
+      "date_end": "2026-05-29 23:50:00+00:00",
+      "max_gap": "3 days 00:00:00",
+      "gap_count": 455,
+      "nan_bars": 189207,
+      "data_hash": "685fa9431890",
+      "parquet_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\parquet\\AUDUSD_M5.parquet"
+    },
+    "NZDUSD": {
+      "symbol": "NZDUSD",
+      "status": "OK",
+      "rows": 463103,
+      "date_start": "2022-01-03 00:00:00+00:00",
+      "date_end": "2026-05-29 23:50:00+00:00",
+      "max_gap": "3 days 00:00:00",
+      "gap_count": 558,
+      "nan_bars": 186142,
+      "data_hash": "2b861f0ee546",
+      "parquet_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\parquet\\NZDUSD_M5.parquet"
+    },
+    "GBPJPY": {
+      "symbol": "GBPJPY",
+      "status": "OK",
+      "rows": 463103,
+      "date_start": "2022-01-03 00:00:00+00:00",
+      "date_end": "2026-05-29 23:50:00+00:00",
+      "max_gap": "3 days 00:00:00",
+      "gap_count": 475,
+      "nan_bars": 186172,
+      "data_hash": "b0f42756d5b7",
+      "parquet_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\parquet\\GBPJPY_M5.parquet"
+    },
+    "GBPAUD": {
+      "symbol": "GBPAUD",
+      "status": "OK",
+      "rows": 463103,
+      "date_start": "2022-01-03 00:00:00+00:00",
+      "date_end": "2026-05-29 23:50:00+00:00",
+      "max_gap": "3 days 00:00:00",
+      "gap_count": 457,
+      "nan_bars": 186003,
+      "data_hash": "4e5f02cf08cd",
+      "parquet_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\parquet\\GBPAUD_M5.parquet"
+    },
+    "GBPNZD": {
+      "symbol": "GBPNZD",
+      "status": "OK",
+      "rows": 463103,
+      "date_start": "2022-01-03 00:00:00+00:00",
+      "date_end": "2026-05-29 23:50:00+00:00",
+      "max_gap": "3 days 00:00:00",
+      "gap_count": 481,
+      "nan_bars": 185986,
+      "data_hash": "045be671ddc0",
+      "parquet_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\parquet\\GBPNZD_M5.parquet"
+    },
+    "GBPCHF": {
+      "symbol": "GBPCHF",
+      "status": "OK",
+      "rows": 463103,
+      "date_start": "2022-01-03 00:00:00+00:00",
+      "date_end": "2026-05-29 23:50:00+00:00",
+      "max_gap": "3 days 00:00:00",
+      "gap_count": 510,
+      "nan_bars": 186109,
+      "data_hash": "bf28dab90632",
+      "parquet_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\parquet\\GBPCHF_M5.parquet"
+    },
+    "CHFJPY": {
+      "symbol": "CHFJPY",
+      "status": "OK",
+      "rows": 460734,
+      "date_start": "2022-01-03 00:00:00+00:00",
+      "date_end": "2026-05-21 18:25:00+00:00",
+      "max_gap": "3 days 00:00:00",
+      "gap_count": 461,
+      "nan_bars": 185641,
+      "data_hash": "32505ba79ce7",
+      "parquet_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\parquet\\CHFJPY_M5.parquet"
+    },
+    "US500": {
+      "symbol": "US500",
+      "status": "OK",
+      "rows": 463103,
+      "date_start": "2022-01-03 00:00:00+00:00",
+      "date_end": "2026-05-29 23:50:00+00:00",
+      "max_gap": "4 days 00:00:00",
+      "gap_count": 1203,
+      "nan_bars": 202145,
+      "data_hash": "ca3a20198533",
+      "parquet_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\parquet\\US500_M5.parquet"
+    },
+    "DE30": {
+      "symbol": "DE30",
+      "status": "OK",
+      "rows": 463103,
+      "date_start": "2022-01-03 00:00:00+00:00",
+      "date_end": "2026-05-29 23:50:00+00:00",
+      "max_gap": "5 days 03:20:00",
+      "gap_count": 1272,
+      "nan_bars": 205501,
+      "data_hash": "458c751c6f2f",
+      "parquet_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\parquet\\DE30_M5.parquet"
+    },
+    "FR40": {
+      "symbol": "FR40",
+      "status": "OK",
+      "rows": 463103,
+      "date_start": "2022-01-03 00:00:00+00:00",
+      "date_end": "2026-05-29 23:50:00+00:00",
+      "max_gap": "5 days 00:00:00",
+      "gap_count": 3331,
+      "nan_bars": 209225,
+      "data_hash": "1700d4d40464",
+      "parquet_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\parquet\\FR40_M5.parquet"
+    },
+    "XAUUSD": {
+      "symbol": "XAUUSD",
+      "status": "OK",
+      "rows": 460734,
+      "date_start": "2022-01-03 00:00:00+00:00",
+      "date_end": "2026-05-21 18:25:00+00:00",
+      "max_gap": "3 days 01:10:00",
+      "gap_count": 1244,
+      "nan_bars": 153800,
+      "data_hash": "f9a788b565c2",
+      "parquet_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\parquet\\XAUUSD_M5.parquet"
+    },
+    "XAGUSD": {
+      "symbol": "XAGUSD",
+      "status": "OK",
+      "rows": 463103,
+      "date_start": "2022-01-03 00:00:00+00:00",
+      "date_end": "2026-05-29 23:50:00+00:00",
+      "max_gap": "3 days 01:10:00",
+      "gap_count": 1258,
+      "nan_bars": 158122,
+      "data_hash": "ab304a851d27",
+      "parquet_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\parquet\\XAGUSD_M5.parquet"
+    },
+    "BTCUSD": {
+      "symbol": "BTCUSD",
+      "status": "OK",
+      "rows": 463726,
+      "date_start": "2022-01-02 00:00:00+00:00",
+      "date_end": "2026-05-31 03:45:00+00:00",
+      "max_gap": "1 days 00:05:00",
+      "gap_count": 117,
+      "nan_bars": 4839,
+      "data_hash": "d888d5229fed",
+      "parquet_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\parquet\\BTCUSD_M5.parquet"
+    },
+    "ETHUSD": {
+      "symbol": "ETHUSD",
+      "status": "OK",
+      "rows": 463726,
+      "date_start": "2022-01-02 00:00:00+00:00",
+      "date_end": "2026-05-31 03:45:00+00:00",
+      "max_gap": "1 days 00:05:00",
+      "gap_count": 119,
+      "nan_bars": 5711,
+      "data_hash": "8df8b636707a",
+      "parquet_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\parquet\\ETHUSD_M5.parquet"
+    },
+    "USTEC100": {
+      "status": "NO_CSV",
+      "path": null
+    }
+  }
+}

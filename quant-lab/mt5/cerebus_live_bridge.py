@@ -145,6 +145,9 @@ def pip_size(symbol: str) -> float:
             pass
         return 0.01
     # Non-JPY: could be 0.0001 or 0.00001
+    # Crypto (BTCUSD, ETHUSD): point=0.01, 1 pip = 0.01
+    if "BTC" in symbol or "ETH" in symbol or "XBT" in symbol:
+        return 0.01
     return 0.0001
 
 
@@ -185,12 +188,13 @@ def send_order(symbol: str, direction: str, volume: float,
         log.warning("MT5 AutoTrading DISABLED")
         return False
     info = mt5.symbol_info(symbol)
+    if info is None or not info.visible:
+        mt5.symbol_select(symbol, True)
+        time.sleep(1)
+        info = mt5.symbol_info(symbol)
     if info is None:
         log.error("Symbol %s not found", symbol)
         return False
-    if not info.visible:
-        mt5.symbol_select(symbol, True)
-        time.sleep(0.5)
     tick = mt5.symbol_info_tick(symbol)
     if tick is None:
         log.error("No tick for %s", symbol)
