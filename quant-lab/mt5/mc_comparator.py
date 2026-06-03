@@ -48,6 +48,11 @@ MC_THRESHOLDS = {
     "HK50":     {"max_daily_losses": 5, "min_wr": 0.75, "max_dd_pct": 0.025},
 }
 
+# Fix Windows emoji output
+import os
+if os.name == 'nt':
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+
 # Aggregate thresholds (all assets combined today)
 AGGREGATE_THRESHOLDS = {
     "max_daily_losses": 8,       # 95th percentile worst day across all pairs
