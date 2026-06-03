@@ -6,7 +6,7 @@ sys.path.insert(0, 'quant-lab/configs')
 sys.path.insert(0, 'quant-lab/strategies')
 sys.path.insert(0, 'quant-lab/backtests')
 
-from backtests.run_cerebus_backtest_fixed import run_backtest
+from run_cerebus_backtest_fixed import run_backtest
 
 result = run_backtest('symmetry_trap', 'EURUSD', bars_limit=10000)
 if result:
