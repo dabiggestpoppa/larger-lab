@@ -257,27 +257,30 @@ def send_order(symbol: str, direction: str, volume: float,
         "type": order_type,
         "price": price,
         "tp": tp,
-    }
-    if not no_sl:
-        request["sl"] = sl
         "deviation": 10,
         "magic": 20260601,
         "comment": comment,
         "type_time": mt5.ORDER_TIME_GTC,
         "type_filling": mt5.ORDER_FILLING_IOC,
     }
+    if not no_sl:
+        request["sl"] = sl
     result = mt5.order_send(request)
     if result is None:
         log.error("order_send returned None: %s", mt5.last_error())
         return False
     if result.retcode == mt5.TRADE_RETCODE_DONE:
-        log.info("EXECUTED: %s %.2f %s @ %.5f | SL=%.5f (%.1fp) | TP=%.5f (%.1fp) | RR=%.2f | Ticket=%s",
-                 direction, volume, symbol, price, sl, sl_pips, tp, tp_pips, rr, result.order)
+        if no_sl:
+            log.info("EXECUTED (NO SL): %s %.2f %s @ %.5f | TP=%.5f (%.1fp) | Ticket=%s",
+                     direction, volume, symbol, price, tp, tp_pips, result.order)
+        else:
+            log.info("EXECUTED: %s %.2f %s @ %.5f | SL=%.5f (%.1fp) | TP=%.5f (%.1fp) | RR=%.2f | Ticket=%s",
+                     direction, volume, symbol, price, sl, sl_pips, tp, tp_pips, rr, result.order)
         return True
     else:
         log.error("Order rejected: retcode=%s (%s)", result.retcode, result.comment)
-        log.error("  Request: %s %.2f %s @ %.5f SL=%.5f TP=%.5f",
-                  direction, volume, symbol, price, request["sl"], request["tp"])
+        log.error("  Request: %s %.2f %s @ %.5f SL=%s TP=%.5f",
+                  direction, volume, symbol, price, request.get("sl", "NONE"), request["tp"])
         log.error("  Tick: bid=%.5f ask=%.5f", tick.bid, tick.ask)
         # Try all filling modes: IOC -> FOK -> RETURN
         if result.retcode in (10014, 10016, 10017, 10030):
