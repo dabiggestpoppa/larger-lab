@@ -345,3 +345,4 @@
 {"engine": "SymmetryTrap", "symbol": "EURUSD.PRO", "direction": "SELL", "entry": 1.16184, "sl": 1.16264, "tp": 1.16084, "event": "ENTRY", "loop": 1, "time": "2026-06-03 03:19:00"}
 {"engine": "SymmetryTrap", "symbol": "GBPJPY.PRO", "direction": "SELL", "entry": 215.053, "sl": 215.173, "tp": 214.903, "event": "TP_HIT", "loop": 1, "time": "2026-06-03 03:35:00"}
 {"engine": "SymmetryTrap", "symbol": "GBPJPY.PRO", "direction": "SELL", "entry": null, "sl": null, "tp": null, "event": "KILL_SWITCH", "loop": 2, "time": "2026-06-03 03:37:00"}
+{"engine": "P90", "symbol": "CHFJPY.PRO", "direction": "SELL", "entry": 202.266, "sl": 202.326, "tp": 202.16375, "event": "ENTRY", "variant": "INITIAL", "time": "2026-06-03 04:04:00"}
