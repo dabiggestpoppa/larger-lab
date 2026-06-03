@@ -79,6 +79,9 @@ for dk in sorted(days.keys()):
         signal = engine.process_bar(bar)
         
         if signal and signal.event == "ENTRY":
+            sl_dist = abs(signal.entry_price-signal.sl_price)/engine.pip_size
+            tp_dist = abs(signal.tp_price-signal.entry_price)/engine.pip_size
             print(f"  ENTRY {'LONG' if signal.direction == TradeDirection.LONG else 'SHORT'} @ {signal.entry_price:.5f}")
-            print(f"    SL={signal.sl_price:.5f} | TP={signal.tp_price:.5f} | dist_SL={abs(signal.entry_price-signal.sl_price)/engine.pip_size:.1f}p | dist_TP={abs(signal.tp_price-signal.entry_price)/engine.pip_size:.1f}p")
-            print(f"    swing_origin={engine.swing_origin:.5f} | impulse_extreme={engine.impulse_extreme:.5f} | impulse_size={engine.impulse_size_pips:.1f}p")
+            print(f"    SL={signal.sl_price:.5f} ({sl_dist:.1f}p) | TP={signal.tp_price:.5f} ({tp_dist:.1f}p) | R:R=1:{tp_dist/max(sl_dist,0.1):.1f}")
+            print(f"    swing_origin={engine.swing_origin:.5f} | impulse_extreme={engine.impulse_extreme:.5f} | impulse={engine.impulse_size_pips:.1f}p | OCC={bar.high if signal.direction == TradeDirection.SHORT else bar.low:.5f}")
+            print(f"    min_sl_buffer={engine.min_sl_buffer:.1f}p | spread_buffer={engine.spread_buffer:.1f}p")
