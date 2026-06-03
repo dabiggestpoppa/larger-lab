@@ -1,14 +1,14 @@
 {
-  "timestamp": "2026-06-03T04:04:56.815482",
+  "timestamp": "2026-06-03T05:04:46.506146",
   "account": {
     "login": 650898,
     "server": "OxSecurities-Live",
-    "balance": 71.7,
-    "equity": 71.94,
-    "profit": 0.24,
-    "margin": 4.85,
-    "margin_free": 67.09,
-    "margin_level": 1483.298969072165,
+    "balance": 71.2,
+    "equity": 69.41,
+    "profit": -1.79,
+    "margin": 5.22,
+    "margin_free": 64.19,
+    "margin_level": 1329.6934865900382,
     "leverage": 500,
     "currency": "USD",
     "name": "Jaelon Scott - Live #0",
@@ -16,40 +16,40 @@
   },
   "positions": [
     {
-      "ticket": 91913220,
-      "symbol": "EURUSD.PRO",
+      "ticket": 91921030,
+      "symbol": "GBPJPY.PRO",
       "type": "SELL",
       "volume": 0.01,
-      "open_price": 1.16184,
-      "current_price": 1.16155,
-      "sl": 1.1626400000000001,
-      "tp": 1.16084,
-      "profit": 0.29,
+      "open_price": 214.761,
+      "current_price": 214.9,
+      "sl": 214.971,
+      "tp": 214.611,
+      "profit": -0.87,
       "swap": 0.0,
       "magic": 20260601,
-      "comment": "CEREBUS-ST-L1",
-      "time": "2026-06-03T06:18:57",
-      "sl_pips": 8.0,
-      "tp_pips": 10.0,
-      "rr": 1.25
+      "comment": "CEREBUS-ST-L3",
+      "time": "2026-06-03T07:34:57",
+      "sl_pips": 21.0,
+      "tp_pips": 15.0,
+      "rr": 0.71
     },
     {
-      "ticket": 91915961,
+      "ticket": 91921956,
       "symbol": "CHFJPY.PRO",
       "type": "SELL",
       "volume": 0.01,
-      "open_price": 202.266,
-      "current_price": 202.274,
-      "sl": 202.326,
-      "tp": 202.164,
-      "profit": -0.05,
+      "open_price": 202.322,
+      "current_price": 202.469,
+      "sl": 202.483,
+      "tp": 202.22,
+      "profit": -0.92,
       "swap": 0.0,
       "magic": 20260601,
       "comment": "CEREBUS-P90",
-      "time": "2026-06-03T07:03:57",
-      "sl_pips": 6.0,
+      "time": "2026-06-03T07:46:57",
+      "sl_pips": 16.1,
       "tp_pips": 10.2,
-      "rr": 1.7
+      "rr": 0.63
     }
   ],
   "today_history": [
@@ -78,13 +78,26 @@
       "magic": 20260601,
       "comment": "[sl 0.59244]",
       "time": "2026-06-03T02:30:45"
+    },
+    {
+      "ticket": 109693837,
+      "symbol": "USDCHF.PRO",
+      "type": "SELL",
+      "volume": 0.01,
+      "price": 0.78858,
+      "profit": 1.22,
+      "swap": 0.0,
+      "commission": 0.0,
+      "magic": 20260601,
+      "comment": "[tp 0.78857]",
+      "time": "2026-06-03T04:28:39"
     }
   ],
   "today_stats": {
-    "trades": 2,
-    "pnl": 0.21,
-    "wins": 1,
+    "trades": 3,
+    "pnl": 1.43,
+    "wins": 2,
     "losses": 1,
-    "win_rate": 50.0
+    "win_rate": 66.7
   }
 }
