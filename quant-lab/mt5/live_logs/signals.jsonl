@@ -358,3 +358,4 @@
 {"engine": "SymmetryTrap", "symbol": "EURUSD.PRO", "direction": "SELL", "entry": 1.16184, "sl": 1.16264, "tp": 1.16084, "event": "TP_HIT", "loop": 1, "time": "2026-06-03 04:41:00"}
 {"engine": "P90", "symbol": "CHFJPY.PRO", "direction": "SELL", "entry": 202.347, "sl": 202.26468, "tp": 202.44925, "event": "ENTRY", "variant": "CASCADE", "time": "2026-06-03 04:43:00"}
 {"engine": "P90", "symbol": "CHFJPY.PRO", "direction": "SELL", "entry": 202.347, "sl": 202.26468, "tp": 202.44925, "event": "EWS_EXIT", "variant": "EWS", "time": "2026-06-03 04:46:00"}
+{"engine": "P90", "symbol": "CHFJPY.PRO", "direction": "SELL", "entry": 202.322, "sl": 202.48328, "tp": 202.21975, "event": "ENTRY", "variant": "CASCADE", "time": "2026-06-03 04:47:00"}
