@@ -2,10 +2,10 @@
   "engine": "P90",
   "symbol": "USDCHF.PRO",
   "direction": "SELL",
-  "entry": 0.78895,
-  "sl": 0.7897500000000001,
-  "tp": 0.7884575,
-  "event": "KILL_SWITCH",
+  "entry": 0.78947,
+  "sl": 0.78867,
+  "tp": 0.7899625,
+  "event": "TP_HIT",
   "variant": "INITIAL",
-  "time": "2026-06-03 05:30:00"
+  "time": "2026-06-03 08:36:00"
 }

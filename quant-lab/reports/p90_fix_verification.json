@@ -1,0 +1,141 @@
+{
+  "summary": {
+    "EURUSD": {
+      "trades": 298,
+      "wins": 146,
+      "losses": 134,
+      "opens": 4,
+      "wr": 52.1,
+      "avg_rr": 4.32,
+      "min_rr": 1.01,
+      "max_rr": 17.24,
+      "sub_rr1_count": 0,
+      "gross_pips": -4213.2
+    },
+    "USDCHF": {
+      "trades": 256,
+      "wins": 131,
+      "losses": 104,
+      "opens": 6,
+      "wr": 55.7,
+      "avg_rr": 4.58,
+      "min_rr": 1.01,
+      "max_rr": 16.61,
+      "sub_rr1_count": 0,
+      "gross_pips": -4073.3
+    },
+    "NZDUSD": {
+      "trades": 73,
+      "wins": 35,
+      "losses": 30,
+      "opens": 2,
+      "wr": 53.8,
+      "avg_rr": 4.26,
+      "min_rr": 1.01,
+      "max_rr": 9.67,
+      "sub_rr1_count": 0,
+      "gross_pips": -553.8
+    },
+    "GBPJPY": {
+      "trades": 4,
+      "wins": 3,
+      "losses": 1,
+      "opens": 0,
+      "wr": 75.0,
+      "avg_rr": 4.28,
+      "min_rr": 2.14,
+      "max_rr": 8.04,
+      "sub_rr1_count": 0,
+      "gross_pips": -176.8
+    },
+    "CHFJPY": {
+      "trades": 17,
+      "wins": 11,
+      "losses": 5,
+      "opens": 0,
+      "wr": 68.8,
+      "avg_rr": 3.26,
+      "min_rr": 1.0,
+      "max_rr": 8.09,
+      "sub_rr1_count": 0,
+      "gross_pips": -465.6
+    },
+    "GBPAUD": {
+      "trades": 23,
+      "wins": 6,
+      "losses": 15,
+      "opens": 1,
+      "wr": 28.6,
+      "avg_rr": 3.56,
+      "min_rr": 1.57,
+      "max_rr": 6.6,
+      "sub_rr1_count": 0,
+      "gross_pips": -556.7
+    },
+    "GBPUSD": {
+      "trades": 231,
+      "wins": 115,
+      "losses": 113,
+      "opens": 2,
+      "wr": 50.4,
+      "avg_rr": 4.89,
+      "min_rr": 1.02,
+      "max_rr": 16.07,
+      "sub_rr1_count": 0,
+      "gross_pips": -5575.1
+    },
+    "GBPNZD": {
+      "trades": 1,
+      "wins": 1,
+      "losses": 0,
+      "opens": 0,
+      "wr": 100.0,
+      "avg_rr": 3.13,
+      "min_rr": 3.13,
+      "max_rr": 3.13,
+      "sub_rr1_count": 0,
+      "gross_pips": 54.2
+    },
+    "GBPCHF": {
+      "trades": 119,
+      "wins": 65,
+      "losses": 44,
+      "opens": 4,
+      "wr": 59.6,
+      "avg_rr": 3.71,
+      "min_rr": 1.04,
+      "max_rr": 11.58,
+      "sub_rr1_count": 0,
+      "gross_pips": -2771.6
+    },
+    "USDJPY": {
+      "trades": 30,
+      "wins": 16,
+      "losses": 12,
+      "opens": 0,
+      "wr": 57.1,
+      "avg_rr": 5.76,
+      "min_rr": 1.16,
+      "max_rr": 14.26,
+      "sub_rr1_count": 0,
+      "gross_pips": -931.6
+    }
+  },
+  "fix_verification": {
+    "min_rr_gate": 1.0,
+    "min_p90_body": {
+      "EURUSD": 4.0,
+      "USDCHF": 4.0,
+      "NZDUSD": 5.0,
+      "GBPJPY": 12.0,
+      "CHFJPY": 12.0,
+      "GBPAUD": 10.0,
+      "GBPUSD": 5.0,
+      "GBPNZD": 10.0,
+      "GBPCHF": 8.0,
+      "USDJPY": 8.0
+    },
+    "total_sub_rr1": 0,
+    "pass": true
+  }
+}
