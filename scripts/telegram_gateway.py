@@ -285,11 +285,8 @@ def main():
                             except Exception as e:
                                 import traceback as _tb
                                 log("LLM ERR: " + str(e) + "\n" + _tb.format_exc())
-                                tb = traceback.format_exc()
-                                log(f"LLM ERR: {e}")
                                 try:
-                                    send(base_url, chat_id,
-                                         f"❌ *Error:* `{str(e)[:200]}`")
+                                    send(base_url, chat_id, "❌ *Error:* `" + str(e)[:200] + "`")
                                 except: pass
 
                         TASK_QUEUE.submit(do_llm)
