@@ -28,6 +28,10 @@ from core.observer.autonomous_orchestrator import AutonomousOrchestrator
 from core.observer.command_router import CommandRouter
 from core.observer.chat_agent import ChatAgent
 from core.observer.sovereign_field import SovereignField
+from core.observer.presence_engine import (
+    WATCHERS, TIMELINE, CONTINUITY, PRIORITY,
+    start_presence_engine, stop_presence_engine
+)
 
 # ─── Logging ─────────────────────────────────────────────────────────────
 
