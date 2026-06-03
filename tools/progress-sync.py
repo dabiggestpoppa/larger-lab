@@ -22,7 +22,7 @@ WORKSPACE_ROOT = Path(__file__).parent.parent
 PROGRESS_DIR = WORKSPACE_ROOT / "progress"
 MEMORY_DIR = WORKSPACE_ROOT / "memory"
 TEAM_CHAT = WORKSPACE_ROOT / "shared-conversations" / "team-chat.md"
-REPO_MEMORY = Path(__file__).parent.parent.parent / "memories" / "repo" / "workspace-state.md"
+REPO_MEMORY = WORKSPACE_ROOT / "progress" / "workspace-state.md"
 
 SYNC_INTERVAL_SECONDS = 120  # 2 minutes — more frequent context updates
 PROGRESS_SYNC_THRESHOLD = 7  # updates before memory sync
