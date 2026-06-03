@@ -1,6 +1,6 @@
 # MEMORY.md — OWL (OC2) Persistent Memory
 
-> **Last Updated:** 2026-06-03 14:04 EDT — AUTO-WORK BUG STRUCTURAL FIX (AGENTS.md + SOUL.md)
+> **Last Updated:** 2026-06-03 17:33 EDT — ST-ONLY DEPLOYMENT (Top 7 assets, P90 disabled, sym bug fixed)
 
 ---
 
