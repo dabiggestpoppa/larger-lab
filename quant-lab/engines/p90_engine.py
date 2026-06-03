@@ -65,6 +65,38 @@ DEFAULT_P90_THRESHOLDS = {
     11: 999.0,  # outside entry window
 }
 
+# ─── ASSET-SPECIFIC MINIMUM P90 BODY (MAD Directive 2026-06-03) ─────────
+# The default thresholds above are hour-based and calibrated for EURUSD.
+# This dictionary enforces a HARD FLOOR per asset class — if the P90 candle
+# body is below this minimum, the signal is SKIP regardless of hour threshold.
+# Rationale: JPY crosses and GBP crosses move 2-3x more in pips than EURUSD.
+# A 5-pip P90 on EURUSD is significant; on GBPJPY it's noise.
+MIN_P90_BODY = {
+    # Majors (low vol)
+    'EURUSD': 4.0, 'USDCHF': 4.0, 'AUDUSD': 5.0, 'NZDUSD': 5.0,
+    # JPY pairs (high vol / wide spreads)
+    'GBPJPY': 12.0, 'CHFJPY': 12.0, 'EURJPY': 10.0, 'USDJPY': 8.0,
+    'NZDJPY': 10.0, 'AUDJPY': 10.0,
+    # GBP crosses (volatile)
+    'GBPAUD': 10.0, 'GBPNZD': 10.0, 'GBPCHF': 8.0,
+    # Commodity pairs
+    'AUDNZD': 5.0, 'AUDCAD': 5.0, 'NZDCAD': 5.0,
+}
+
+# ─── ASSET-SPECIFIC CASCADE COOLDOWN ──────────────────────────────────────
+# Volatile pairs need longer cascade windows to avoid death spirals.
+# Standard cascade = 120 min. JPY/GBP crosses = 240 min.
+CASCADE_COOLDOWN = {
+    'DEFAULT': 120,
+    'GBPJPY': 240, 'CHFJPY': 240, 'EURJPY': 240, 'USDJPY': 180,
+    'GBPAUD': 240, 'GBPNZD': 240, 'GBPCHF': 180,
+}
+
+# ─── MINIMUM RR GATE ──────────────────────────────────────────────────────
+# Hard floor: TP1 must be at least 1.0x the SL distance from entry.
+# If the math doesn't work (small AR + large P90 body = RR < 1.0), SKIP.
+MIN_RR = 1.0
+
 # Tier configuration (same as Symmetry Trap — shared crankshaft)
 DEFAULT_TIER_CONFIG = {
     "T1": {"ar_max": 20.0, "au": 10.0, "trigger": 12.0},
@@ -281,6 +313,9 @@ class P90Engine:
         # ── Cascade State ──────────────────────────────────────────────
         self.p90_count: int = 0                  # P90s fired this session, same dir
         self.last_p90_exit_time: Optional[datetime] = None
+        self.initial_p90_time: Optional[datetime] = None  # Time of 1st P90 (for cascade window)
+        self.initial_p90_direction: Optional[TradeDirection] = None  # Direction of 1st P90
+        self.initial_p90_body: float = 0.0        # Body of 1st P90 (for min move filter)
 
         # ── Timing ─────────────────────────────────────────────────────
         self.last_bar_time: Optional[datetime] = None
@@ -305,6 +340,11 @@ class P90Engine:
             self.asian_range_pips, self.tier_config
         )
         self.session_active = self.tier_name != "NO_GO"
+
+        # Reset cascade tracking for new session
+        self.initial_p90_time = None
+        self.initial_p90_direction = None
+        self.initial_p90_body = 0.0
 
         # Reset state machine
         self.state = EngineState.SEARCH
@@ -339,6 +379,22 @@ class P90Engine:
             return 150.0  # Gold/Silver in points
         return 8.0        # Default for majors
 
+    # ── Asset-Specific Minimum P90 Body ─────────────────────────────────
+
+    @staticmethod
+    def _min_p90_body(symbol: str) -> float:
+        """Return minimum P90 body in pips for this asset (MAD Directive 2026-06-03)."""
+        sym = symbol.upper().replace('.PRO', '').replace('.', '')
+        return MIN_P90_BODY.get(sym, 5.0)  # Default 5 pips if unknown
+
+    # ── Asset-Specific Cascade Cooldown ────────────────────────────────
+
+    @staticmethod
+    def _cascade_cooldown(symbol: str) -> int:
+        """Return cascade cooldown in minutes for this asset."""
+        sym = symbol.upper().replace('.PRO', '').replace('.', '')
+        return CASCADE_COOLDOWN.get(sym, CASCADE_COOLDOWN['DEFAULT'])
+
     @staticmethod
     def _default_spread_buffer(symbol: str) -> float:
         """Spread buffer in price units (added to P90 extreme for SL placement)."""
@@ -355,15 +411,28 @@ class P90Engine:
 
     def _is_p90(self, bar: Bar, est_hour: int) -> bool:
         """
-        Check if M5 candle body >= P90 threshold for current hour.
+        Check if M5 candle body >= P90 threshold for current hour
+        AND meets the asset-specific minimum body floor.
+
+        TWO GATES (both must pass):
+          1. Hour-based threshold (EURUSD-calibrated, time-of-day aware)
+          2. Asset-specific minimum body (prevents noise on volatile pairs)
 
         Reference: cerebus_p90.md Section II (Elastic vs Plastic Deformation)
-          - body >= P90 = plastic deformation = pathway accepted
-          - body < P90 = elastic deformation = ignore (81.2% reversion)
         """
         body_pips = bar.body_abs / self.pip_size
         threshold = get_p90_threshold(est_hour, self.p90_config)
-        return body_pips >= threshold
+        # Gate 1: Hour-based threshold
+        if body_pips < threshold:
+            return False
+        # Gate 2: Asset-specific minimum body (MAD Directive 2026-06-03)
+        min_body = self._min_p90_body(self.symbol)
+        if body_pips < min_body:
+            self.logger.debug(
+                f"P90 body {body_pips:.1f}p below asset min {min_body}p for {self.symbol} — skipping"
+            )
+            return False
+        return True
 
     def _is_boundary_breach(self, bar: Bar) -> bool:
         """
@@ -378,27 +447,69 @@ class P90Engine:
 
     def _detect_variant(self, bar: Bar, est_hour: int) -> P90Variant:
         """
-        Detect which P90 variant applies.
+        Detect which P90 variant applies — per CEREBUS FX v4 Manual.
 
-        Reference: cerebus_unified_topology.md Section II Model A Table,
-                   cerebus_dual_engine.md Section III Table
+        CASCADE requires ALL of:
+          1. Time: 30-90 min from initial P90 activation (optimal 45-60)
+             HARD CUTOFF: Skip after 90 min from initial activation
+          2. Direction: Same direction as initial P90
+          3. Body: New P90 body >= asset-specific minimum (min move filter)
+             e.g., <15p impulses on GBPJPY fail 65% of the time
+          4. Prior exit: last_p90_exit_time must exist (a trade was closed)
 
-        Logic:
-          - CASCADE: Same-dir P90 within 120 min of last exit
-          - INITIAL: First P90 of session (default)
+        INITIAL: First P90 of session, or cascade conditions not met.
+
+        Reference: cerebus_dual_engine.md, CEREBUS FX v4 Manual Part 2
         """
-        # Cascade: same direction P90 within 120 min of last exit
-        if (self.last_p90_exit_time is not None and
-                self.p90_count > 0 and
-                bar.timestamp - self.last_p90_exit_time <= timedelta(minutes=CASCADE_WINDOW_MINUTES)):
-            self.logger.info(
-                f"Cascade P90 detected: #{self.p90_count + 1}, "
-                f"delta={bar.timestamp - self.last_p90_exit_time}"
-            )
-            return P90Variant.CASCADE
+        # If no prior exit, can't be cascade
+        if self.last_p90_exit_time is None or self.p90_count == 0:
+            return P90Variant.INITIAL
 
-        # Default: Initial
-        return P90Variant.INITIAL
+        # If no initial P90 time recorded, this is the first — not a cascade
+        if self.initial_p90_time is None:
+            return P90Variant.INITIAL
+
+        # ── FILTER 1: Time window (30-90 min from initial activation) ──
+        # HARD CUTOFF: 90 minutes from initial P90. Not from last exit.
+        # Manual: "Skip cascades after 90 min from initial activation"
+        elapsed_from_initial = (bar.timestamp - self.initial_p90_time).total_seconds() / 60.0
+        if elapsed_from_initial > 90.0:
+            self.logger.debug(
+                f"Cascade SKIP: {elapsed_from_initial:.0f}min from initial > 90min hard cutoff"
+            )
+            return P90Variant.INITIAL
+        if elapsed_from_initial < 30.0:
+            self.logger.debug(
+                f"Cascade SKIP: {elapsed_from_initial:.0f}min from initial < 30min minimum"
+            )
+            return P90Variant.INITIAL
+
+        # ── FILTER 2: Same direction as initial P90 ──
+        new_direction = TradeDirection.LONG if bar.body > 0 else TradeDirection.SHORT
+        if self.initial_p90_direction is not None and new_direction != self.initial_p90_direction:
+            self.logger.debug(
+                f"Cascade SKIP: new P90 direction {new_direction.name} != "
+                f"initial {self.initial_p90_direction.name}"
+            )
+            return P90Variant.INITIAL
+
+        # ── FILTER 3: Minimum body size (min move filter) ──
+        # Manual: "Impulse filter: <15p fails 65% of time" for GBPJPY
+        body_pips = bar.body_abs / self.pip_size
+        min_body = self._min_p90_body(self.symbol)
+        if body_pips < min_body:
+            self.logger.debug(
+                f"Cascade SKIP: body {body_pips:.1f}p < min {min_body}p"
+            )
+            return P90Variant.INITIAL
+
+        # All cascade conditions met
+        self.logger.info(
+            f"Cascade P90 detected: #{self.p90_count + 1}, "
+            f"elapsed_from_initial={elapsed_from_initial:.0f}min, "
+            f"direction={new_direction.name}, body={body_pips:.1f}p"
+        )
+        return P90Variant.CASCADE
 
     # ── Trade Parameter Calculation ──────────────────────────────────
 
@@ -420,48 +531,42 @@ class P90Engine:
         entry = bar.close
 
         if variant == P90Variant.INITIAL:
-            # Base 80: SL = 80% of P90 body from close
-            # TP1 = -25% AR, TP2 = -50% AR
             sl_offset = body_price * 0.80
-            ar_target_1 = self.ar_price * 0.25
-            ar_target_2 = self.ar_price * 0.50
-
-            if direction == TradeDirection.LONG:
-                sl = entry - sl_offset
-                tp1 = entry + ar_target_1
-                tp2 = entry + ar_target_2
-            else:
-                sl = entry + sl_offset
-                tp1 = entry - ar_target_1
-                tp2 = entry - ar_target_2
-
         elif variant == P90Variant.CASCADE:
-            # Cascade: SL = 168% of NEW P90 body
-            # Target = -25% AR and -50% AR (same as initial)
             sl_offset = body_price * 1.68
-            ar_target_1 = self.ar_price * 0.25
-            ar_target_2 = self.ar_price * 0.50
-
-            if direction == TradeDirection.LONG:
-                sl = entry - sl_offset
-                tp1 = entry + ar_target_1
-                tp2 = entry + ar_target_2
-            else:
-                sl = entry + sl_offset
-                tp1 = entry - ar_target_1
-                tp2 = entry - ar_target_2
-
         else:
-            # Fallback = Initial params
             sl_offset = body_price * 0.80
-            if direction == TradeDirection.LONG:
-                sl = entry - sl_offset
-                tp1 = entry + self.ar_price * 0.25
-                tp2 = entry + self.ar_price * 0.50
-            else:
-                sl = entry + sl_offset
-                tp1 = entry - self.ar_price * 0.25
-                tp2 = entry - self.ar_price * 0.50
+
+        # ── TARGET: Asian Range extension from the BAND EDGE ──────────
+        # Per Architect clarification (2026-06-03):
+        #   LONG:  TP = Asian High + (Asian Range × extension%)
+        #   SHORT: TP = Asian Low - (Asian Range × extension%)
+        # NOT measured from entry. Measured from the breached band edge.
+        ar_ext_1 = self.ar_price * 0.25  # TP1 = 25% AR extension
+        ar_ext_2 = self.ar_price * 0.50  # TP2 = 50% AR extension
+
+        if direction == TradeDirection.LONG:
+            sl = entry - sl_offset
+            tp1 = self.asian_high + ar_ext_1
+            tp2 = self.asian_high + ar_ext_2
+        else:
+            sl = entry + sl_offset
+            tp1 = self.asian_low - ar_ext_1
+            tp2 = self.asian_low - ar_ext_2
+
+        # ── RR GATE: Skip if TP1 doesn't cover the risk ──────────────
+        # If TP1 distance from entry < SL distance from entry, the math
+        # is broken (negative expectancy). Return params anyway — the
+        # caller (process_bar) will check RR and skip.
+        sl_dist = abs(sl - entry)
+        tp1_dist = abs(tp1 - entry)
+        rr1 = tp1_dist / sl_dist if sl_dist > 0 else 0.0
+        if rr1 < MIN_RR:
+            self.logger.info(
+                f"RR GATE: TP1/SL = {rr1:.2f} < {MIN_RR} "
+                f"(TP1={tp1_dist:.1f}p, SL={sl_dist:.1f}p) — "
+                f"AR too small for this P90 body. Will skip."
+            )
 
         # ── STRUCTURAL SL FIX: Enforce P90 Extreme + Min Buffer Floor ──
         # The 80%/168% body SL is the THEORETICAL invalidation point.
@@ -546,6 +651,31 @@ class P90Engine:
                 # Calculate trade params
                 entry, sl, tp1, tp2 = self._calc_trade_params(bar, variant, direction)
 
+                # ── RR GATE: Hard skip if TP1/SL < 1.0 ──────────────────
+                # Manual: Average RR should be ~2.0+. If TP1 doesn't even
+                # cover the risk, the math is broken. Skip.
+                sl_dist = abs(sl - entry)
+                tp1_dist = abs(tp1 - entry)
+                rr1 = tp1_dist / sl_dist if sl_dist > 0 else 0.0
+                if rr1 < MIN_RR:
+                    self.logger.info(
+                        f"RR GATE SKIP: TP1/SL = {rr1:.2f} < {MIN_RR} "
+                        f"(TP1_dist={tp1_dist:.1f}p, SL_dist={sl_dist:.1f}p) — "
+                        f"AR too small for this P90 body on {self.symbol}. Skipping."
+                    )
+                    # Don't reset state — stay in SEARCH, let it find next P90
+                    return None
+
+                # ── Track initial P90 for cascade window ──────────────
+                if self.p90_count == 0:
+                    self.initial_p90_time = bar.timestamp
+                    self.initial_p90_direction = direction
+                    self.initial_p90_body = bar.body_abs
+                    self.logger.info(
+                        f"Initial P90 recorded: {direction.name} @ {entry:.5f}, "
+                        f"body={bar.body_abs/self.pip_size:.1f}p"
+                    )
+
                 # Set state
                 self.state = EngineState.IN_TRADE
                 self.direction = direction
@@ -556,7 +686,6 @@ class P90Engine:
                 self.tp2_price = tp2
                 self.p90_count += 1
                 # ── 80% Kill Switch: save P90 signal candle extremes ──
-                # Kill switch triggers if next M5 close inside 80% of P90 body
                 self.p90_kill_high = bar.high
                 self.p90_kill_low = bar.low
                 self.p90_kill_entry = entry
@@ -567,7 +696,8 @@ class P90Engine:
                 tp2_str = f"{tp2:.5f}" if tp2 is not None else "N/A"
                 self.logger.info(
                     f"ENTRY [{variant.value}]: {dir_str} @ {entry:.5f}, "
-                    f"SL={sl:.5f}, TP1={tp1_str}, TP2={tp2_str}"
+                    f"SL={sl:.5f}, TP1={tp1_str}, TP2={tp2_str}, "
+                    f"RR1={rr1:.2f}"
                 )
 
                 sig = P90Signal(
@@ -581,7 +711,7 @@ class P90Engine:
                     p90_body_pips=self.p90_body_pips,
                     timestamp=bar.timestamp,
                     reason=f"P90 {variant.value}: body >= threshold, "
-                           f"boundary breach, entry on close"
+                           f"boundary breach, RR1={rr1:.2f}"
                 )
                 self.signal_log.append(sig)
                 return sig
@@ -771,7 +901,8 @@ class P90Engine:
     # ── State Reset ────────────────────────────────────────────────────
 
     def _reset_state(self) -> None:
-        """Reset to SEARCH, record cascade timing."""
+        """Reset to SEARCH, record cascade timing.
+        Preserves initial_p90_time and initial_p90_direction for cascade window tracking."""
         self.last_p90_exit_time = self.last_bar_time
         self.state = EngineState.SEARCH
         self.direction = TradeDirection.FLAT
@@ -785,6 +916,9 @@ class P90Engine:
         self.p90_kill_low = None
         self.p90_kill_entry = None
         self.p90_kill_body = 0.0
+        # NOTE: Do NOT reset initial_p90_time / initial_p90_direction here.
+        # They persist for the entire session to track cascade window.
+        # They are reset in initialize_session().
 
     def hard_exit(self) -> None:
         """12:00 PM EST forced termination."""

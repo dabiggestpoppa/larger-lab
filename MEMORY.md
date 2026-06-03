@@ -1,6 +1,6 @@
 # MEMORY.md — OWL (OC2) Persistent Memory
 
-> **Last Updated:** 2026-06-02 15:30 EDT — ST Spread Buffer Fix + ST Executor Validation Fix
+> **Last Updated:** 2026-06-03 09:00 EDT — P90 RR Fix + Asset Thresholds + Cascade Logic Fix + Backtest Verification
 
 ---
 

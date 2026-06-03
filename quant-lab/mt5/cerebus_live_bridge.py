@@ -255,6 +255,18 @@ def send_order(symbol: str, direction: str, volume: float,
     log.info("Order: %s %.5f | SL=%.5f (%.1fp) | TP=%.5f (%.1fp) | RR=%.2f"
              % (direction, price, sl, sl_pips, tp, tp_pips, rr))
 
+    # ── BRIDGE RR GATE (MAD Directive 2026-06-03) ──────────────────────
+    # Safety net: If RR < 1.0, reject even if engine sent it.
+    # This prevents negative-expectancy trades from reaching the broker.
+    MIN_RR = 1.0
+    if rr < MIN_RR:
+        log.warning(
+            "BRIDGE RR GATE: REJECTED %s %s | RR=%.2f < %.1f | "
+            "TP=%.1fp SL=%.1fp — math broken, skipping."
+            % (direction, symbol, rr, MIN_RR, tp_pips, sl_pips)
+        )
+        return False
+
     request = {
         "action": mt5.TRADE_ACTION_DEAL,
         "symbol": symbol,

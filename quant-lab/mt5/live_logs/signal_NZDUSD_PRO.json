@@ -2,10 +2,10 @@
   "engine": "P90",
   "symbol": "NZDUSD.PRO",
   "direction": "SELL",
-  "entry": 0.59015,
-  "sl": 0.5890916000000002,
-  "tp": 0.5906425,
-  "event": "KILL_SWITCH",
-  "variant": "CASCADE",
-  "time": "2026-06-03 06:17:00"
+  "entry": 0.58856,
+  "sl": 0.58936,
+  "tp": 0.5880675,
+  "event": "ENTRY",
+  "variant": "INITIAL",
+  "time": "2026-06-03 08:39:00"
 }
