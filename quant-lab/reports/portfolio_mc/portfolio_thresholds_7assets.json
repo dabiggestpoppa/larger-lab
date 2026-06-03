@@ -1,0 +1,77 @@
+{
+  "portfolio": "7-asset live: GBPJPY+CHFJPY+GBPAUD+GBPNZD+EURUSD+USDCHF+NZDUSD",
+  "pooled_trades": 5420,
+  "pooled_wr": 0.736,
+  "pooled_pnl_pips": 36772.3,
+  "mc_sims": 10000,
+  "max_dd_pips_median": 107.3,
+  "max_dd_pips_95th": 145.8,
+  "max_dd_pips_99th": 171.2,
+  "max_dd_pips_worst": 223.8,
+  "max_daily_losses": 3,
+  "max_daily_losses_hard": 7,
+  "min_daily_wr": 0.25,
+  "min_daily_wr_hard": 0.20,
+  "max_loss_streak": 2,
+  "max_loss_streak_hard": 6,
+  "per_asset": {
+    "GBPJPY": {
+      "engine": "P90",
+      "max_daily_losses": 9,
+      "min_daily_wr": 0.60,
+      "max_loss_streak": 3,
+      "backtest_wr": 0.863,
+      "backtest_trades": 830
+    },
+    "CHFJPY": {
+      "engine": "P90",
+      "max_daily_losses": 8,
+      "min_daily_wr": 0.60,
+      "max_loss_streak": 3,
+      "backtest_wr": 0.863,
+      "backtest_trades": 751
+    },
+    "GBPAUD": {
+      "engine": "P90",
+      "max_daily_losses": 6,
+      "min_daily_wr": 0.62,
+      "max_loss_streak": 2,
+      "backtest_wr": 0.884,
+      "backtest_trades": 715
+    },
+    "GBPNZD": {
+      "engine": "P90",
+      "max_daily_losses": 6,
+      "min_daily_wr": 0.62,
+      "max_loss_streak": 2,
+      "backtest_wr": 0.884,
+      "backtest_trades": 664
+    },
+    "NZDUSD": {
+      "engine": "ST",
+      "max_daily_losses": 3,
+      "min_daily_wr": 0.65,
+      "max_loss_streak": 2,
+      "backtest_wr": 0.933,
+      "backtest_trades": 727
+    },
+    "EURUSD": {
+      "engine": "ST",
+      "max_daily_losses": 4,
+      "min_daily_wr": 0.00,
+      "max_loss_streak": 13,
+      "backtest_wr": 0.440,
+      "backtest_trades": 886,
+      "note": "WR discrepancy under Arch investigation (per-asset 44% vs multi-asset 85%)"
+    },
+    "USDCHF": {
+      "engine": "ST",
+      "max_daily_losses": 4,
+      "min_daily_wr": 0.00,
+      "max_loss_streak": 11,
+      "backtest_wr": 0.399,
+      "backtest_trades": 847,
+      "note": "WR discrepancy under Arch investigation (per-asset 40% vs multi-asset 85%)"
+    }
+  }
+}
