@@ -339,6 +339,10 @@ class P90Engine:
         self.tier_name, au_pips, trigger_pips = classify_tier(
             self.asian_range_pips, self.tier_config
         )
+        self.au_pips = au_pips
+        self.au_price = au_pips * self.pip_size
+        # gear_shift_au = tier AU x 1.5 (impulse extension beyond TP1)
+        self.gear_shift_au = self.au_price * 1.5
         self.session_active = self.tier_name != "NO_GO"
 
         # Reset cascade tracking for new session
@@ -537,26 +541,21 @@ class P90Engine:
         else:
             sl_offset = body_price * 0.80
 
-        # ── TARGET: Entry Price ± Atomic Unit (MAD/Architect Directive 2026-06-03) ─
-        # OLD (BROKEN): TP = Asian High/Low ± AR extension
-        #   This placed TP BEHIND entry on breakout trades.
-        #   Example: Entry 1.1015, Asian High 1.1000, TP = 1.1005 = -10p loss logged as "TP hit"
-        # NEW (CORRECT): TP = Entry ± AU (same structural targets as Symmetry Trap)
-        #   TP1 = Entry + 1 AU, TP2 = Entry + Gear Shift AU
-        #   Measured FROM entry price in direction of trade. Every TP hit = actual profit.
-        au_pips = self.au_price / self.pip_size  # AU in price units → convert to pips for reference
-        # Use tier AU as the atomic unit target
-        au_target_1 = self.au_price  # 1 AU
-        au_target_2 = self.au_price * 2.0  # 2 AU (gear shift)
+        # ── TARGET: Entry Price ± Atomic Unit ─────────────────────────────────────────
+        # TP measured FROM entry price in direction of trade.
+        # Same structural target as Symmetry Trap.
+        #   TP1 = Entry + 1 AU
+        #   TP2 = Entry + gear_shift_au (tier AU x 1.5)
+        # Every TP hit = actual profit. No exceptions.
 
         if direction == TradeDirection.LONG:
             sl = entry - sl_offset
-            tp1 = entry + au_target_1  # 1 AU above entry
-            tp2 = entry + au_target_2  # 2 AU above entry
+            tp1 = entry + self.au_price         # 1 AU above entry
+            tp2 = entry + self.gear_shift_au    # gear shift above entry
         else:
             sl = entry + sl_offset
-            tp1 = entry - au_target_1  # 1 AU below entry
-            tp2 = entry - au_target_2  # 2 AU below entry
+            tp1 = entry - self.au_price         # 1 AU below entry
+            tp2 = entry - self.gear_shift_au    # gear shift below entry
 
         # ── RR GATE: Skip if TP1 doesn't cover the risk ──────────────
         sl_dist = abs(sl - entry)
