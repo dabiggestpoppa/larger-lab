@@ -1,14 +1,14 @@
 {
-  "timestamp": "2026-06-02T20:04:47.230441",
+  "timestamp": "2026-06-02T21:05:17.695553",
   "account": {
     "login": 650898,
     "server": "OxSecurities-Live",
-    "balance": 70.44,
-    "equity": 70.15,
-    "profit": -0.29,
-    "margin": 2.69,
-    "margin_free": 67.46,
-    "margin_level": 2607.8066914498145,
+    "balance": 70.37,
+    "equity": 70.91,
+    "profit": 0.54,
+    "margin": 4.6899999999999995,
+    "margin_free": 66.22,
+    "margin_level": 1511.9402985074628,
     "leverage": 500,
     "currency": "USD",
     "name": "Jaelon Scott - Live #0",
@@ -21,14 +21,29 @@
       "type": "BUY",
       "volume": 0.01,
       "open_price": 1.87552,
-      "current_price": 1.87512,
+      "current_price": 1.87581,
       "sl": 1.87418,
       "tp": 1.8768799999999999,
-      "profit": -0.29,
+      "profit": 0.21,
       "swap": 0.0,
       "magic": 20260601,
       "comment": "CEREBUS-ST-L1",
       "time": "2026-06-02T22:40:58"
+    },
+    {
+      "ticket": 91882817,
+      "symbol": "USDCHF.PRO",
+      "type": "BUY",
+      "volume": 0.01,
+      "open_price": 0.78762,
+      "current_price": 0.78788,
+      "sl": 0.78677,
+      "tp": 0.78857,
+      "profit": 0.33,
+      "swap": 0.0,
+      "magic": 20260601,
+      "comment": "CEREBUS-ST-L1",
+      "time": "2026-06-02T23:42:58"
     }
   ],
   "today_history": [
@@ -538,13 +553,26 @@
       "magic": 20260601,
       "comment": "[sl 1.87625]",
       "time": "2026-06-02T15:25:28"
+    },
+    {
+      "ticket": 109654456,
+      "symbol": "CHFJPY.PRO",
+      "type": "SELL",
+      "volume": 0.01,
+      "price": 202.869,
+      "profit": -1.97,
+      "swap": 0.0,
+      "commission": 0.0,
+      "magic": 20260601,
+      "comment": "[sl 202.871]",
+      "time": "2026-06-02T20:20:00"
     }
   ],
   "today_stats": {
-    "trades": 39,
-    "pnl": -3.06,
+    "trades": 40,
+    "pnl": -5.03,
     "wins": 8,
-    "losses": 31,
-    "win_rate": 20.5
+    "losses": 32,
+    "win_rate": 20.0
   }
 }
