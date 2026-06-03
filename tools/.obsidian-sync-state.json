@@ -797,6 +797,11 @@
     "journal_20260603T032430Z_command_restart.md": "8fcd083000535051dfacfc940d0f2c25",
     "journal_20260603T032430Z_restart_all.md": "60d3cd6eb958e1f73e0f48ec06fa0fcf",
     "journal_20260603T132919Z_command_help.md": "8e0cdd1b5ed14d203e42327b36062882",
+    "journal_20260603T161902Z_command_drift.md": "7c5e8990abbd77f1bf05be5599eac2ed",
+    "journal_20260603T161902Z_command_observers.md": "41d9ee674958a4ce4e676921f50b037e",
+    "journal_20260603T161902Z_command_presence.md": "705900a698d6e8b2a35d80c7b54c8df9",
+    "journal_20260603T161902Z_command_timeline.md": "bf9b9c834683f336e314bb9d2c93234d",
+    "journal_20260603T161902Z_command_watchers.md": "15cead26e200eba0f82757b988d92b88",
     "Module Guide.md": "d41d8cd98f00b204e9800998ecf8427e",
     "Primary Observer.md": "d41d8cd98f00b204e9800998ecf8427e",
     "PRINCIPLES.md": "d41d8cd98f00b204e9800998ecf8427e",
@@ -1510,6 +1515,6 @@
     "skills\\XAi.md": "0864011d6809fd1ba9abd903053831f5",
     "skills\\Zapier.md": "5c1bb34ef437685ec31f84344285a040"
   },
-  "last_sync": "2026-06-03T12:19:41.017797",
+  "last_sync": "2026-06-03T12:20:59.280709",
   "changes_since_sync": 0
 }
