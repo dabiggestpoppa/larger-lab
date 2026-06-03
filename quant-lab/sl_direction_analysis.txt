@@ -1,0 +1,62 @@
+# Verify old SL placement direction
+# OLD CODE: sl_price = self.impulse_extreme
+# 
+# For LONG:
+#   impulse_extreme = bar.high of impulse candle (the candle that broke out)
+#   The impulse candle closes ABOVE the trigger level
+#   Then we wait for OCC: a candle that closes back in impulse direction (bullish)
+#   Entry = OCC close
+#   
+#   The impulse candle high is the EXTREME of the breakout move
+#   The OCC candle close (entry) is typically LOWER than the impulse high
+#   (because there's a pullback between impulse and OCC)
+#   
+#   So: impulse_extreme (high) > OCC close (entry)
+#   OLD SL = impulse_extreme = ABOVE entry
+#   For LONG, SL should be BELOW entry
+#   → OLD SL WAS ON THE WRONG SIDE FOR LONG ✓
+#
+# For SHORT:
+#   impulse_extreme = bar.low of impulse candle (the candle that broke down)
+#   The impulse candle closes BELOW the trigger level
+#   Then we wait for OCC: a candle that closes back in impulse direction (bearish)
+#   Entry = OCC close
+#
+#   The impulse candle low is the EXTREME of the breakdown move
+#   The OCC close (entry) is typically HIGHER than the impulse low
+#   (because there's a pullback between impulse and OCC)
+#
+#   So: impulse_extreme (low) < OCC close (entry)
+#   OLD SL = impulse_extreme = BELOW entry
+#   For SHORT, SL should be ABOVE entry
+#   → OLD SL WAS ON THE WRONG SIDE FOR SHORT ✓
+#
+# CONCLUSION: The old SL was on the WRONG SIDE for BOTH directions
+# This means the SL would NEVER be hit (price has to go through entry first)
+# The trade would only exit via TP, KILL_SWITCH, or EWS_EXIT
+# This massively inflated the WR
+
+print("OLD SL ANALYSIS:")
+print()
+print("For LONG trades:")
+print("  impulse_extreme = impulse candle HIGH")
+print("  entry = OCC candle CLOSE (typically LOWER than impulse high)")
+print("  OLD SL = impulse_extreme = ABOVE entry")
+print("  → SL is on the PROFIT side, not the LOSS side")
+print("  → SL can NEVER be hit (price must cross entry first)")
+print()
+print("For SHORT trades:")
+print("  impulse_extreme = impulse candle LOW")
+print("  entry = OCC candle CLOSE (typically HIGHER than impulse low)")
+print("  OLD SL = impulse_extreme = BELOW entry")
+print("  → SL is on the PROFIT side, not the LOSS side")
+print("  → SL can NEVER be hit")
+print()
+print("RESULT: Old SL was effectively a second TP, not a stop loss")
+print("Trades only exited via: TP_HIT, KILL_SWITCH, or EWS_EXIT")
+print("This is why the old 82-85% WR was fake")
+print()
+print("NEW SL (OCC extreme + buffer):")
+print("  For LONG: SL = OCC low - spread_buf (BELOW entry) ✓ correct side")
+print("  For SHORT: SL = OCC high + spread_buf (ABOVE entry) ✓ correct side")
+print("  But SL is only 8-9p from entry on M5 → gets clipped by noise")
