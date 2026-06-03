@@ -6,8 +6,6 @@
 
 ---
 
----
-
 ## [PM2] 2026-06-03 12:00 UTC — Sync Infrastructure Audit + Monitoring Active
 
 ### Sync Scripts Status (All Audited)
@@ -89,8 +87,6 @@ Monitoring CC's build progress. Will test when everything is done. Not building 
 - All ML models: ✅ 18 regime classifiers trained
 - All ML tests: ✅ 80/80 passing
 - Git: ✅ All committed and pushed
-
----
 
 ---
 
@@ -180,8 +176,6 @@ Monitoring CC's build progress. Will test when everything is done. Not building 
 - Pushed to origin/master ✅
 
 ### ✅ CEREBUS ML ENGINE — FULLY OPERATIONAL
-
----
 
 ---
 
@@ -275,8 +269,6 @@ Monitoring CC's build progress. Will test when everything is done. Not building 
 
 ---
 
----
-
 ## [PM2] 2026-06-02 19:15 UTC — Autopilot Monitor: Core 40/40 Tests Passing, Build Progressing
 
 ### Test Status
@@ -298,8 +290,6 @@ Monitoring CC's build progress. Will test when everything is done. Not building 
 OCE :8000 ✅ | Frontend :3000 ✅ | OpenClaw :18790 ✅ | Telegram ✅ | Obsidian ✅
 
 ### Git: Synced, PM2 on autopilot monitoring
-
----
 
 ---
 
@@ -505,8 +495,6 @@ CC built Phase 1 (data pipeline, firewall, Asian Range, K-Means, features, label
 
 ---
 
----
-
 ## [PM2] 2026-06-03 12:00 UTC — Sync Infrastructure Audit + Monitoring Active
 
 ### Sync Scripts Status (All Audited)
@@ -566,8 +554,6 @@ Monitoring CC's build progress. Will test when everything is done. Not building 
 - Tier discovery AU values are data-driven (K-Means on 4 years of M5 Asian Ranges)
 - These replace the manual tier configs with learned boundaries
 - Feature matrices include: body, range, body_ratio, hour_est, day_of_week, rolling_vol_20, vol_ratio, gap, session markers
-
----
 
 ---
 
@@ -689,8 +675,6 @@ OC2 completed the full OCE frontend ML integration layer while CC built the ML b
 - Phase 5: Guardrail blocks bad orders, drift detection tested, shadow mode passed, rollback tested
 
 **CC is on autopilot. Building until done. Will post progress after each phase.** 🔥
-
----
 
 ---
 
@@ -902,8 +886,6 @@ Phase 01 backend is fully wired. All 19 vault API endpoints are live and tested.
 
 ---
 
----
-
 ## [PM2] 2026-06-03 12:00 UTC — Sync Infrastructure Audit + Monitoring Active
 
 ### Sync Scripts Status (All Audited)
@@ -948,8 +930,6 @@ MAD stepping away. Green light on dashboard build. Quote: "have the sw team buil
 1. Dashboard build worker running
 2. Report completion to Obsidian vault
 3. OWL will notify MAD when team is done
-
----
 
 ---
 
@@ -1347,8 +1327,6 @@ graph TB
 2. **PM2:** Build PatternViewer + ErrorDashboard frontend components
 3. **Target:** 300+ tests passing when Phase 01 frontend is complete
 4. **After Phase 01:** Phase 02 — Graph Field Emergence (per MAD plan)
-
----
 
 ---
 
