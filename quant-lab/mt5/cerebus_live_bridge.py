@@ -10,10 +10,11 @@ Architecture:
   TradeSignal → MT5 order_send()
 
 SL LOGIC: Matches Nautilus strategy (line 503): sl = impulse_extreme (zero buffer)
-  - For LONG:  SL = impulse bar high (below entry)
-  - For SHORT: SL = impulse bar low (may be below entry — intentional)
+  - For LONG:  SL = impulse bar HIGH (ABOVE entry — this is a PROFIT LOCK, not a loss stop)
+  - For SHORT: SL = impulse bar LOW (BELOW entry — this is a PROFIT LOCK, not a loss stop)
   - No spread buffer, no OCC extreme — exact impulse extreme only
-  - Bridge does NOT clamp or override engine SL/TP values
+  - Bridge does NOT send hard SL to broker — monitors M5 closes and sends market close
+  - ALIEN EDGE: The "SL" is a structural boundary exit, engineered to NEVER take a loss
 
 FIX APPLIED (2026-06-03): Changed from OCC extreme + spread buffer → impulse_extreme.
 This aligns MT5 live results with Nautilus Phase 0 ground truth (85% WR).
