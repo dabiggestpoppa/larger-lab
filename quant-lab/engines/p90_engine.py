@@ -782,7 +782,7 @@ class P90Engine:
                         tp_price=_tp2,
                         p90_body_pips=self.p90_body_pips,
                         timestamp=bar.timestamp,
-                        reason="TP2 (-50% AR) hit"
+                        reason="TP2 (gear shift AU) hit"
                     )
                     self.signal_log.append(sig)
                     self.logger.info("TP2 HIT (gear shift AU): exit={}".format(self.tp2_price if self.tp2_price is not None else "N/A"))
@@ -804,7 +804,7 @@ class P90Engine:
                         tp2_price=_tp2,
                         p90_body_pips=self.p90_body_pips,
                         timestamp=bar.timestamp,
-                        reason="TP1 (-25% AR) hit"
+                        reason="TP1 (1 AU) hit"
                     )
                     self.signal_log.append(sig)
                     self.logger.info("TP1 HIT (1 AU): exit={}".format(self.tp1_price if self.tp1_price is not None else "N/A"))
@@ -847,7 +847,7 @@ class P90Engine:
                         tp_price=_tp2,
                         p90_body_pips=self.p90_body_pips,
                         timestamp=bar.timestamp,
-                        reason="TP2 (-50% AR) hit"
+                        reason="TP2 (gear shift AU) hit"
                     )
                     self.signal_log.append(sig)
                     self.logger.info("TP2 HIT (gear shift AU): exit={}".format(self.tp2_price if self.tp2_price is not None else "N/A"))
@@ -869,7 +869,7 @@ class P90Engine:
                         tp2_price=_tp2,
                         p90_body_pips=self.p90_body_pips,
                         timestamp=bar.timestamp,
-                        reason="TP1 (-25% AR) hit"
+                        reason="TP1 (1 AU) hit"
                     )
                     self.signal_log.append(sig)
                     self.logger.info("TP1 HIT (1 AU): exit={}".format(self.tp1_price if self.tp1_price is not None else "N/A"))
