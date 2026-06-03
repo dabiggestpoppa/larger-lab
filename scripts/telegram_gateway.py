@@ -277,7 +277,7 @@ def main():
                                 if history:
                                     ctx += "\n\n## Recent Conversation\n"
                                     for h in history[-6:]:
-                                        ctx += f"- **{h['role']}:** {h['text'][:100]}\n"
+                                        ctx += "- **" + h["role"] + ":** " + h["content"][:100] + "\n"
 
                                 resp = agent.chat(msg_text, sovereign_context=ctx)
 

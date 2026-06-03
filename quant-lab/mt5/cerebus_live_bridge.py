@@ -540,7 +540,7 @@ def run_live(symbols: list, lot_size: float = 0.01):
             active_trades[key] = {
                 "ticket": p["ticket"],
                 "direction": p["type"],
-                "entry": p["price_open"],
+                "entry": p["open_price"],
                 "sl": p["sl"],
                 "tp": p["tp"],
                 "engine": eng,
