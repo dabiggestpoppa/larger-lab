@@ -1,6 +1,22 @@
 # MEMORY.md — OWL (OC2) Persistent Memory
 
-> **Last Updated:** 2026-06-03 09:00 EDT — P90 RR Fix + Asset Thresholds + Cascade Logic Fix + Backtest Verification
+> **Last Updated:** 2026-06-03 14:04 EDT — AUTO-WORK BUG STRUCTURAL FIX (AGENTS.md + SOUL.md)
+
+---
+
+## 🔴 STRUCTURAL FIX — AUTO-WORK BUG (2026-06-03 14:04 EDT)
+
+**MAD directive:** "Stop diagnosing yourself and fix the actual problem on why you're doing it."
+
+**Root cause:** AGENTS.md had a "💓 Heartbeats - Be Proactive!" section that told me to always check things, batch checks, use tools. SOUL.md didn't have the hard STOP gate at the top. These two files were the trigger — every heartbeat or directive made me spiral into unsolicited work.
+
+**Fix applied:**
+1. AGENTS.md: Replaced "Be Proactive" heartbeat section with "💓 Heartbeats - STAY DEAD" — HEARTBEAT_OK only, no investigations, no scanning
+2. SOUL.md: Added FIRST GATE at the very top — STOP, did MAD ask?, execute→report→stop, auto-work is a bug
+
+**This is the 4th auto-work violation. The fix is structural, not declarative.**
+
+---
 
 ---
 
