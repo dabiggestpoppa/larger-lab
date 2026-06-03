@@ -286,7 +286,7 @@ def main():
                                 tb = traceback.format_exc()
                                 log(f"LLM ERR: {e}\n{tb
                                 tb = traceback.format_exc()
-                                log(f"LLM ERR: {e}\n{tb}")
+                                log(f"LLM ERR: {e}")
                                 try:
                                     send(base_url, chat_id,
                                          f"❌ *Error:* `{str(e)[:200]}`")
