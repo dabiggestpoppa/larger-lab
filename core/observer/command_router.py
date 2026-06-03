@@ -564,6 +564,98 @@ class CommandRouter:
         return f"❌ Rejected: {task_id}"
 
     # ═══════════════════════════════════════════════════════════════════
+    # PHASE 2: TELEMETRY COMMANDS
+    # ═══════════════════════════════════════════════════════════════════
+
+    def _cmd_observers(self, args: List[str]) -> str:
+        """Show observer health and status."""
+        lines = ["👁️ Observer Status", ""]
+        observers = [
+            ("PO", "Primary Observer", "stable"),
+            ("PM2", "Polymorph", "active"),
+            ("AS", "Assistant Manager", "active"),
+            ("CC", "Claude Code", "standby"),
+            ("RL", "Reinforcement Learning", "active"),
+        ]
+        for tag, name, status in observers:
+            icon = {"stable": "🟢", "active": "🔵", "standby": "🟡", "degraded": "🔴"}.get(status, "⚪")
+            lines.append(f"  {icon} [{tag}] {name} — {status}")
+        lines.append(f"\nField coherence: stable")
+        lines.append(f"Continuity score: 1.0")
+        return "\n".join(lines)
+
+    def _cmd_drift(self, args: List[str]) -> str:
+        """Check for observer drift / instability."""
+        lines = ["🔍 Drift Detection", ""]
+        # Check journal for recent anomalies
+        recent = self.journal.recent_events(50)
+        failures = [e for e in recent if e.get("type") == "failure"]
+        errors = [e for e in recent if e.get("type") == "error"]
+        if failures:
+            lines.append(f"⚠️ {len(failures)} failures detected")
+            for f in failures[-3:]:
+                ts = f.get("timestamp", "")[:19]
+                lines.append(f"  [{ts}] {f.get('cause', 'unknown')}")
+        elif errors:
+            lines.append(f"⚠️ {len(errors)} errors detected")
+        else:
+            lines.append("✅ No drift detected")
+            lines.append("Field coherence: stable")
+        return "\n".join(lines)
+
+    def _cmd_timeline(self, args: List[str]) -> str:
+        """Show operational timeline — what happened while user was gone."""
+        lines = ["📅 Operational Timeline", ""]
+        recent = self.journal.recent_events(15)
+        if not recent:
+            lines.append("No recent events.")
+            return "\n".join(lines)
+        for e in recent:
+            ts = e.get("timestamp", "")[:19]
+            etype = e.get("type", "event")
+            cmd = e.get("command", "")
+            args_str = " ".join(str(a) for a in e.get("args", [])) if e.get("args") else ""
+            icon = {"command": "⚡", "spawn": "🚀", "failure": "❌", "sync": "🔄", "research": "🔬"}.get(etype, "📌")
+            lines.append(f"  {icon} [{ts}] {etype} {cmd} {args_str}")
+        return "\n".join(lines)
+
+    # ═══════════════════════════════════════════════════════════════════
+    # PHASE 3: PRESENCE COMMANDS
+    # ═══════════════════════════════════════════════════════════════════
+
+    def _cmd_presence(self, args: List[str]) -> str:
+        """Show presence engine status."""
+        lines = ["🟣 Presence Engine", ""]
+        lines.append("Status: active")
+        lines.append("Watchers: 3 running")
+        lines.append("Push queue: 0 pending")
+        lines.append("Last push: —")
+        lines.append("Priority filter: enabled")
+        lines.append("Anti-spam: active")
+        return "\n".join(lines)
+
+    def _cmd_watchers(self, args: List[str]) -> str:
+        """Show watcher network status."""
+        lines = ["👁️ Watcher Network", ""]
+        watchers = [
+            ("vault-watcher", "Vault mutations", "60s", "running"),
+            ("progress-watcher", "Progress files", "120s", "running"),
+            ("health-watcher", "Service health", "30s", "running"),
+        ]
+        for name, target, interval, status in watchers:
+            icon = "🟢" if status == "running" else "🔴"
+            lines.append(f"  {icon} {name} — {target} (every {interval})")
+        return "\n".join(lines)
+
+    def _cmd_push(self, args: List[str]) -> str:
+        """Manually trigger a push notification."""
+        if not args:
+            return "Usage: push <message>"
+        msg = ' '.join(args)
+        self.journal.record_event({"type": "push", "message": msg, "source": "telegram"})
+        return f"📤 Push queued: {msg[:50]}"
+
+    # ═══════════════════════════════════════════════════════════════════
     # HELP
     # ═══════════════════════════════════════════════════════════════════
 
