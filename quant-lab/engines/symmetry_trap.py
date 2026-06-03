@@ -509,19 +509,20 @@ class SymmetryTrapEngine:
 
             if occ_confirmed:
                 self.entry_price = bar.close
-                # SL = OCC candle extreme + spread buffer + minimum buffer floor
-                # MAD directive 2026-06-02: add spread buffer to prevent
-                # spread-wick stop-outs on tight OCC candles
-                # For SHORT: SL at OCC high + spread buffer (loss direction = above entry)
-                # For LONG: SL at OCC low - spread buffer (loss direction = below entry)
-                spread_buf = self.spread_buffer * self.pip_size
+                # SL = impulse_extreme (Zero Buffer) — per ontology cerebus_qa_recap.md line 90
+                # "Entry = close of OCC candle. SL = impulse_extreme (Zero Buffer)."
+                # impulse_extreme = swing_origin (the start of the impulse leg)
+                # For SHORT: swing_origin is above entry (loss direction) ✓
+                # For LONG: swing_origin is below entry (loss direction) ✓
                 if self.impulse_direction == TradeDirection.SHORT:
-                    self.sl_price = bar.high + spread_buf
+                    self.sl_price = self.swing_origin
+                    # Enforce minimum SL buffer: SL must be at least min_sl_buffer pips above entry
                     min_sl = self.entry_price + (self.min_sl_buffer * self.pip_size)
                     if self.sl_price < min_sl:
                         self.sl_price = min_sl
                 else:
-                    self.sl_price = bar.low - spread_buf
+                    self.sl_price = self.swing_origin
+                    # Enforce minimum SL buffer: SL must be at least min_sl_buffer pips below entry
                     min_sl = self.entry_price - (self.min_sl_buffer * self.pip_size)
                     if self.sl_price > min_sl:
                         self.sl_price = min_sl
