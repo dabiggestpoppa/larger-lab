@@ -1,14 +1,14 @@
 {
-  "timestamp": "2026-06-02T19:04:44.825601",
+  "timestamp": "2026-06-02T20:04:47.230441",
   "account": {
     "login": 650898,
     "server": "OxSecurities-Live",
-    "balance": 71.89,
-    "equity": 71.29,
-    "profit": -0.6,
-    "margin": 2.54,
-    "margin_free": 68.75,
-    "margin_level": 2806.692913385827,
+    "balance": 70.44,
+    "equity": 70.15,
+    "profit": -0.29,
+    "margin": 2.69,
+    "margin_free": 67.46,
+    "margin_level": 2607.8066914498145,
     "leverage": 500,
     "currency": "USD",
     "name": "Jaelon Scott - Live #0",
@@ -16,19 +16,19 @@
   },
   "positions": [
     {
-      "ticket": 91878347,
-      "symbol": "CHFJPY.PRO",
+      "ticket": 91880997,
+      "symbol": "GBPAUD.PRO",
       "type": "BUY",
       "volume": 0.01,
-      "open_price": 203.2,
-      "current_price": 203.104,
-      "sl": 202.98,
-      "tp": 203.332,
-      "profit": -0.6,
+      "open_price": 1.87552,
+      "current_price": 1.87512,
+      "sl": 1.87418,
+      "tp": 1.8768799999999999,
+      "profit": -0.29,
       "swap": 0.0,
       "magic": 20260601,
       "comment": "CEREBUS-ST-L1",
-      "time": "2026-06-02T21:02:58"
+      "time": "2026-06-02T22:40:58"
     }
   ],
   "today_history": [
