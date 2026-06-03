@@ -571,22 +571,6 @@ def run_live(symbols: list, lot_size: float = 0.01):
 
             now = datetime.now(EST)
 
-            # ── 12 PM EST HARD EXIT ──────────────────────────────────
-            # Close all positions and stop trading at 12:00 PM EST
-            if now.hour >= 12:
-                if active_trades:
-                    log.info("12 PM EST HARD EXIT: Closing %d positions", len(active_trades))
-                    for key, trade in list(active_trades.items()):
-                        close_position(trade["ticket"])
-                        del active_trades[key]
-                # Reset all engines
-                for sym in st_engines:
-                    st_engines[sym].hard_exit()
-                log.info("12 PM EST HARD EXIT complete — all engines reset")
-                # Stay alive but don't trade until next session
-                time.sleep(60)
-                continue
-
             try:
                 scan_this_minute = (now.second < 5 and now.minute != last_minute)
             except Exception:
