@@ -277,7 +277,9 @@ def main():
                                 send(base_url, chat_id, resp)
                                 log(f"LLM RESP ({len(resp)} chars)")
                             except Exception as e:
-                                log(f"LLM ERR: {e}")
+                                import traceback
+                                tb = traceback.format_exc()
+                                log(f"LLM ERR: {e}\n{tb}")
                                 try:
                                     send(base_url, chat_id,
                                          f"❌ *Error:* `{str(e)[:200]}`")
