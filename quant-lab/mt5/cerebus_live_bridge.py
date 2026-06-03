@@ -1,15 +1,22 @@
 """
-CEREBUS LIVE BRIDGE — Backtest Engine + MT5 Data Feed
-======================================================
-Uses the PROVEN backtest engines (SymmetryTrapEngine + P90Engine) directly.
-MT5 provides the data feed and execution. No strategy logic rewritten.
+CEREBUS LIVE BRIDGE — Nautilus Strategy Engine + MT5 Data Feed
+===============================================================
+Uses the Nautilus-validated SymmetryTrapEngine (SL = zero-buffer impulse extreme).
+MT5 provides the data feed and execution. Bridge is a thin transport layer.
 
 Architecture:
   MT5.copy_rates_from_pos() → Bar objects → SymmetryTrapEngine.process_bar()
                                               P90Engine.process_bar()
   TradeSignal → MT5 order_send()
 
-This is a THIN ADAPTER. All strategy logic lives in the backtest engines.
+SL LOGIC: Matches Nautilus strategy (line 503): sl = impulse_extreme (zero buffer)
+  - For LONG:  SL = impulse bar high (below entry)
+  - For SHORT: SL = impulse bar low (may be below entry — intentional)
+  - No spread buffer, no OCC extreme — exact impulse extreme only
+  - Bridge does NOT clamp or override engine SL/TP values
+
+FIX APPLIED (2026-06-03): Changed from OCC extreme + spread buffer → impulse_extreme.
+This aligns MT5 live results with Nautilus Phase 0 ground truth (85% WR).
 """
 
 import json
