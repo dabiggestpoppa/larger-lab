@@ -168,7 +168,7 @@ def main():
     base_url = f"https://api.telegram.org/bot{token}"
     offset = 0
 
-    log("Initializing Phase 1: Telegram Runtime Foundation...")
+    log("Initializing Telegram Presence System — All 3 Phases...")
     vault = Vault()
     journal = Journal(vault)
     orch = AutonomousOrchestrator(vault=vault, journal=journal)
@@ -176,6 +176,8 @@ def main():
     agent = ChatAgent()
     sov = SovereignField()
 
+    # Start Phase 3: Presence Engine
+    start_presence_engine()
     log(f"Vault: {vault.path}")
     try:
         r = requests.get(f"{base_url}/getMe", timeout=10)
