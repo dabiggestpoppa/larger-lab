@@ -249,14 +249,17 @@ def send_order(symbol: str, direction: str, volume: float,
             )
             return False
 
+    # Build request — omit SL entirely for no_sl trades
     request = {
         "action": mt5.TRADE_ACTION_DEAL,
         "symbol": symbol,
         "volume": volume,
         "type": order_type,
         "price": price,
-        "sl": sl,
         "tp": tp,
+    }
+    if not no_sl:
+        request["sl": sl]
         "deviation": 10,
         "magic": 20260601,
         "comment": comment,
