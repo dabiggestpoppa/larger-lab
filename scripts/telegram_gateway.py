@@ -227,7 +227,14 @@ def main():
                         # Chat message — async via task queue
                         SESSIONS.add(cid, "user", text)
 
-                        def do_llm(chat_id=cid, user_text=text):
+                        # Check for continuity queries
+                        lower = user_text.lower().strip()
+                        continuity_triggers = ["what happened", "what's up", "whats up",
+                                               "what going on", "status update", "summary",
+                                               "what did i miss", "catch me up", "yo", "yoo", "yoioo"]
+                        is_continuity = any(t in lower for t in continuity_triggers)
+
+                        def do_llm(chat_id=cid, user_text=text, continuity=is_continuity):
                             try:
                                 send(base_url, chat_id,
                                      f"🧠 *Processing:* `{user_text[:60]}`")
@@ -238,7 +245,22 @@ def main():
                                      f"🔍 *Workspace Scan:*\n{scan_result}")
                                 typing(base_url, chat_id)
 
+                                # Build rich context
                                 ctx = sov.get_sovereign_context()
+
+                                # Add timeline for continuity queries
+                                if continuity:
+                                    timeline_summary = TIMELINE.get_summary(10)
+                                    ctx += f"\n\n## Operational Timeline\n{timeline_summary}"
+
+                                    # Add task summary
+                                    try:
+                                        task_summary = orch.tasks.summary()
+                                        ctx += f"\n\n## Tasks\n{task_summary}"
+                                    except:
+                                        pass
+
+                                # Add session history
                                 history = SESSIONS.get_context(chat_id)
                                 if history:
                                     ctx += "\n\n## Recent Conversation\n"
@@ -246,6 +268,11 @@ def main():
                                         ctx += f"- **{h['role']}:** {h['text'][:100]}\n"
 
                                 resp = agent.chat(user_text, sovereign_context=ctx)
+
+                                # Record in timeline and continuity cache
+                                TIMELINE.record("chat", {"user": user_text[:50], "response_len": len(resp)})
+                                CONTINUITY.add("last_chat", user_text[:100])
+
                                 SESSIONS.add(chat_id, "assistant", resp)
                                 send(base_url, chat_id, resp)
                                 log(f"LLM RESP ({len(resp)} chars)")
