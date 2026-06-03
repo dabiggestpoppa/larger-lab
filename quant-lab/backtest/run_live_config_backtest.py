@@ -126,24 +126,25 @@ def simulate_trade(signal, all_bars, entry_bar, config, engine_type):
     for j in range(entry_idx + 1, len(all_bars)):
         b = all_bars[j]
         
-        if direction == TradeDirection.BUY:
+        # P90 engine uses LONG/ST direction enum
+        if direction in (TradeDirection.LONG, "LONG"):
             if b.low <= sl:
-                pnl = sl - entry_price
+                pnl = sl - entry_price  # negative for LONG SL
                 return {"result": "LOSS", "pnl_pips": pnl, "exit": "SL", "entry_time": entry_bar.time.isoformat()}
             if b.high >= tp:
-                pnl = tp - entry_price
+                pnl = tp - entry_price  # positive for LONG TP
                 return {"result": "WIN", "pnl_pips": pnl, "exit": "TP", "entry_time": entry_bar.time.isoformat()}
-        else:  # SELL
+        else:  # SHORT
             if b.high >= sl:
-                pnl = entry_price - sl
-                return {"result": "LOSS", "pnl_pips": -pnl, "exit": "SL", "entry_time": entry_bar.time.isoformat()}
+                pnl = entry_price - sl  # negative for SHORT SL
+                return {"result": "LOSS", "pnl_pips": pnl, "exit": "SL", "entry_time": entry_bar.time.isoformat()}
             if b.low <= tp:
-                pnl = entry_price - tp
+                pnl = entry_price - tp  # positive for SHORT TP
                 return {"result": "WIN", "pnl_pips": pnl, "exit": "TP", "entry_time": entry_bar.time.isoformat()}
     
     # Bar ran out — close at last bar close
     last_close = all_bars[-1].close
-    if direction == TradeDirection.BUY:
+    if direction in (TradeDirection.LONG, "LONG"):
         pnl = last_close - entry_price
     else:
         pnl = entry_price - last_close
