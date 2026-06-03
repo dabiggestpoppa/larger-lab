@@ -1,11 +1,11 @@
 {
-  "engine": "SymmetryTrap",
+  "engine": "P90",
   "symbol": "EURUSD.PRO",
   "direction": "SELL",
-  "entry": 1.16035,
-  "sl": 1.16115,
-  "tp": 1.15935,
-  "event": "SL_HIT",
-  "loop": 3,
-  "time": "2026-06-03 10:59:00"
+  "entry": 1.1605699999999999,
+  "sl": 1.1616956000000003,
+  "tp": 1.1602599999999998,
+  "event": "ENTRY",
+  "variant": "CASCADE",
+  "time": "2026-06-03 11:05:00"
 }
