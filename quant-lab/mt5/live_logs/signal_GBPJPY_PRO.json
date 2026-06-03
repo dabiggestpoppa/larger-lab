@@ -1,11 +1,11 @@
 {
-  "engine": "P90",
+  "engine": "SymmetryTrap",
   "symbol": "GBPJPY.PRO",
   "direction": "SELL",
-  "entry": 214.553,
-  "sl": 214.80630000000002,
-  "tp": 214.451,
-  "event": "KILL_SWITCH",
-  "variant": "INITIAL",
-  "time": "2026-06-03 04:33:00"
+  "entry": 214.761,
+  "sl": 214.971,
+  "tp": 214.611,
+  "event": "ENTRY",
+  "loop": 3,
+  "time": "2026-06-03 04:35:00"
 }
