@@ -1,0 +1,292 @@
+{
+  "EURUSD": {
+    "initial": {
+      "count": 433,
+      "closed": 398,
+      "wins": 213,
+      "losses": 185,
+      "wr": 53.517587939698494,
+      "avg_pnl": -14.951616628175886,
+      "total_pnl": -6474.050000000158
+    },
+    "cascade": {
+      "count": 50,
+      "closed": 50,
+      "wins": 32,
+      "losses": 18,
+      "wr": 64.0,
+      "avg_pnl": -27.676380000000467,
+      "total_pnl": -1383.8190000000234
+    },
+    "combined": {
+      "count": 483,
+      "closed": 448,
+      "wins": 245,
+      "losses": 203,
+      "wr": 54.6875,
+      "avg_pnl": -16.268879917184652,
+      "total_pnl": -7857.869000000186
+    }
+  },
+  "USDCHF": {
+    "initial": {
+      "count": 393,
+      "closed": 358,
+      "wins": 192,
+      "losses": 166,
+      "wr": 53.63128491620112,
+      "avg_pnl": -13.27016539440209,
+      "total_pnl": -5215.175000000021
+    },
+    "cascade": {
+      "count": 54,
+      "closed": 47,
+      "wins": 31,
+      "losses": 16,
+      "wr": 65.95744680851064,
+      "avg_pnl": -16.479074074074,
+      "total_pnl": -889.869999999996
+    },
+    "combined": {
+      "count": 447,
+      "closed": 405,
+      "wins": 223,
+      "losses": 182,
+      "wr": 55.06172839506173,
+      "avg_pnl": -13.657818791946342,
+      "total_pnl": -6105.045000000015
+    }
+  },
+  "NZDUSD": {
+    "initial": {
+      "count": 119,
+      "closed": 105,
+      "wins": 54,
+      "losses": 51,
+      "wr": 51.42857142857142,
+      "avg_pnl": -7.905672268907521,
+      "total_pnl": -940.774999999995
+    },
+    "cascade": {
+      "count": 7,
+      "closed": 7,
+      "wins": 4,
+      "losses": 3,
+      "wr": 57.14285714285714,
+      "avg_pnl": -21.702428571428452,
+      "total_pnl": -151.91699999999918
+    },
+    "combined": {
+      "count": 126,
+      "closed": 112,
+      "wins": 58,
+      "losses": 54,
+      "wr": 51.78571428571429,
+      "avg_pnl": -8.672158730158683,
+      "total_pnl": -1092.691999999994
+    }
+  },
+  "GBPJPY": {
+    "initial": {
+      "count": 31,
+      "closed": 26,
+      "wins": 16,
+      "losses": 10,
+      "wr": 61.53846153846154,
+      "avg_pnl": -36.224193548387376,
+      "total_pnl": -1122.9500000000087
+    },
+    "cascade": {
+      "count": 3,
+      "closed": 3,
+      "wins": 2,
+      "losses": 1,
+      "wr": 66.66666666666666,
+      "avg_pnl": -50.671333333335156,
+      "total_pnl": -152.01400000000547
+    },
+    "combined": {
+      "count": 34,
+      "closed": 29,
+      "wins": 18,
+      "losses": 11,
+      "wr": 62.06896551724138,
+      "avg_pnl": -37.498941176471,
+      "total_pnl": -1274.964000000014
+    }
+  },
+  "CHFJPY": {
+    "initial": {
+      "count": 41,
+      "closed": 37,
+      "wins": 22,
+      "losses": 15,
+      "wr": 59.45945945945946,
+      "avg_pnl": -34.8408536585359,
+      "total_pnl": -1428.474999999972
+    },
+    "cascade": {
+      "count": 9,
+      "closed": 9,
+      "wins": 9,
+      "losses": 0,
+      "wr": 100.0,
+      "avg_pnl": -101.53888888888882,
+      "total_pnl": -913.8499999999993
+    },
+    "combined": {
+      "count": 50,
+      "closed": 46,
+      "wins": 31,
+      "losses": 15,
+      "wr": 67.3913043478261,
+      "avg_pnl": -46.84649999999942,
+      "total_pnl": -2342.324999999971
+    }
+  },
+  "GBPAUD": {
+    "initial": {
+      "count": 36,
+      "closed": 34,
+      "wins": 16,
+      "losses": 18,
+      "wr": 47.05882352941176,
+      "avg_pnl": -26.29236111111088,
+      "total_pnl": -946.5249999999916
+    },
+    "cascade": {
+      "count": 2,
+      "closed": 2,
+      "wins": 0,
+      "losses": 2,
+      "wr": 0.0,
+      "avg_pnl": -21.914000000001764,
+      "total_pnl": -43.82800000000353
+    },
+    "combined": {
+      "count": 38,
+      "closed": 36,
+      "wins": 16,
+      "losses": 20,
+      "wr": 44.44444444444444,
+      "avg_pnl": -26.061921052631448,
+      "total_pnl": -990.3529999999951
+    }
+  },
+  "GBPUSD": {
+    "initial": {
+      "count": 510,
+      "closed": 492,
+      "wins": 253,
+      "losses": 239,
+      "wr": 51.42276422764228,
+      "avg_pnl": -20.678088235294528,
+      "total_pnl": -10545.82500000021
+    },
+    "cascade": {
+      "count": 63,
+      "closed": 61,
+      "wins": 34,
+      "losses": 27,
+      "wr": 55.73770491803278,
+      "avg_pnl": -15.898857142857056,
+      "total_pnl": -1001.6279999999945
+    },
+    "combined": {
+      "count": 573,
+      "closed": 553,
+      "wins": 287,
+      "losses": 266,
+      "wr": 51.89873417721519,
+      "avg_pnl": -20.15262303664956,
+      "total_pnl": -11547.453000000198
+    }
+  },
+  "GBPNZD": {
+    "initial": {
+      "count": 19,
+      "closed": 19,
+      "wins": 13,
+      "losses": 6,
+      "wr": 68.42105263157895,
+      "avg_pnl": -33.59473684210424,
+      "total_pnl": -638.2999999999805
+    },
+    "cascade": {
+      "count": 0,
+      "closed": 0,
+      "wins": 0,
+      "losses": 0,
+      "wr": 0,
+      "avg_pnl": 0,
+      "total_pnl": 0
+    },
+    "combined": {
+      "count": 19,
+      "closed": 19,
+      "wins": 13,
+      "losses": 6,
+      "wr": 68.42105263157895,
+      "avg_pnl": -33.59473684210424,
+      "total_pnl": -638.2999999999805
+    }
+  },
+  "GBPCHF": {
+    "initial": {
+      "count": 203,
+      "closed": 187,
+      "wins": 109,
+      "losses": 78,
+      "wr": 58.288770053475936,
+      "avg_pnl": -18.898645320197407,
+      "total_pnl": -3836.425000000074
+    },
+    "cascade": {
+      "count": 25,
+      "closed": 24,
+      "wins": 18,
+      "losses": 6,
+      "wr": 75.0,
+      "avg_pnl": -26.87455999999981,
+      "total_pnl": -671.8639999999953
+    },
+    "combined": {
+      "count": 228,
+      "closed": 211,
+      "wins": 127,
+      "losses": 84,
+      "wr": 60.18957345971564,
+      "avg_pnl": -19.773197368421364,
+      "total_pnl": -4508.289000000071
+    }
+  },
+  "USDJPY": {
+    "initial": {
+      "count": 62,
+      "closed": 54,
+      "wins": 31,
+      "losses": 23,
+      "wr": 57.407407407407405,
+      "avg_pnl": -18.104758064515547,
+      "total_pnl": -1122.494999999964
+    },
+    "cascade": {
+      "count": 4,
+      "closed": 4,
+      "wins": 2,
+      "losses": 2,
+      "wr": 50.0,
+      "avg_pnl": -6.218000000000501,
+      "total_pnl": -24.872000000002004
+    },
+    "combined": {
+      "count": 66,
+      "closed": 58,
+      "wins": 33,
+      "losses": 25,
+      "wr": 56.896551724137936,
+      "avg_pnl": -17.384348484847973,
+      "total_pnl": -1147.366999999966
+    }
+  }
+}
