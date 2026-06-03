@@ -289,7 +289,7 @@ WATCHERS.add("health-watcher", 30, check_health, on_health_change)
 def start_presence_engine():
     """Start all watchers and presence systems."""
     WATCHERS.start_all()
-    log("[Presence] Engine started — watchers active")
+    print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] [Presence] Engine started — watchers active", flush=True)
 
 
 def stop_presence_engine():
