@@ -200,26 +200,10 @@ def send_order(symbol: str, direction: str, volume: float,
     min_stop_pts = getattr(info, 'trade_stops_level', 0)
     min_dist = (min_stop_pts + 1) * point if min_stop_pts > 0 else 0.0
 
-    # Trust the engine's SL/TP — it uses zero-buffer impulse extreme per Nautilus strategy.
-    # Only enforce broker minimum stop level (hard requirement).
-    # Do NOT clamp based on "wrong side" — the engine's SL may be intentionally
-    # placed at impulse extreme which can be on the profit side for SHORT.
-    if min_dist > 0:
-        # Enforce broker minimum stop level for both SL and TP
-        if direction == "BUY":
-            hard_max_sl = price - min_dist
-            if sl > hard_max_sl:
-                sl = hard_max_sl
-            hard_min_tp = price + min_dist
-            if tp < hard_min_tp:
-                tp = hard_min_tp
-        else:  # SELL
-            hard_min_sl = price + min_dist
-            if sl < hard_min_sl:
-                sl = hard_min_sl
-            hard_max_tp = price - min_dist
-            if tp > hard_max_tp:
-                tp = hard_max_tp
+    # Trust the engine's SL/TP completely — it uses zero-buffer impulse extreme
+    # per Nautilus strategy (line 503: sl_price = self.impulse_extreme).
+    # The engine's SL may be on the "profit side" for SHORT — that's intentional.
+    # We do NOT clamp or override. The broker will reject if truly invalid.
 
     sl = round(sl, info.digits)
     tp = round(tp, info.digits)
