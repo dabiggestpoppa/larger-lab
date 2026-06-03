@@ -5,7 +5,7 @@
   "entry": 0.58856,
   "sl": 0.58936,
   "tp": 0.5880675,
-  "event": "ENTRY",
+  "event": "TP_HIT",
   "variant": "INITIAL",
-  "time": "2026-06-03 08:39:00"
+  "time": "2026-06-03 09:27:00"
 }
