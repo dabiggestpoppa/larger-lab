@@ -382,3 +382,6 @@
 {"engine": "P90", "symbol": "GBPAUD.PRO", "direction": "SELL", "entry": 1.8767, "sl": 1.8779000000000001, "tp": 1.87575, "event": "TP_HIT", "variant": "CASCADE", "time": "2026-06-03 06:08:00"}
 {"engine": "P90", "symbol": "NZDUSD.PRO", "direction": "SELL", "entry": 0.59015, "sl": 0.5890916000000002, "tp": 0.5906425, "event": "ENTRY", "variant": "CASCADE", "time": "2026-06-03 06:08:00"}
 {"engine": "SymmetryTrap", "symbol": "EURUSD.PRO", "direction": "BUY", "entry": 1.16187, "sl": 1.16107, "tp": 1.1628699999999998, "event": "ENTRY", "loop": 2, "time": "2026-06-03 06:08:00"}
+{"engine": "P90", "symbol": "GBPJPY.PRO", "direction": "SELL", "entry": 214.971, "sl": 214.83324000000002, "tp": 215.073, "event": "ENTRY", "variant": "CASCADE", "time": "2026-06-03 06:09:00"}
+{"engine": "P90", "symbol": "CHFJPY.PRO", "direction": "SELL", "entry": 202.45, "sl": 202.52056, "tp": 202.34775, "event": "EWS_EXIT", "variant": "EWS", "time": "2026-06-03 06:09:00"}
+{"engine": "P90", "symbol": "GBPAUD.PRO", "direction": "SELL", "entry": 1.8756, "sl": 1.8775488, "tp": 1.87465, "event": "ENTRY", "variant": "CASCADE", "time": "2026-06-03 06:09:00"}

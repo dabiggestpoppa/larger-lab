@@ -2,10 +2,10 @@
   "engine": "P90",
   "symbol": "GBPAUD.PRO",
   "direction": "SELL",
-  "entry": 1.8767,
-  "sl": 1.8779000000000001,
-  "tp": 1.87575,
-  "event": "TP_HIT",
+  "entry": 1.8756,
+  "sl": 1.8775488,
+  "tp": 1.87465,
+  "event": "ENTRY",
   "variant": "CASCADE",
-  "time": "2026-06-03 06:08:00"
+  "time": "2026-06-03 06:09:00"
 }
