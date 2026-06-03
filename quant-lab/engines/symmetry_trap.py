@@ -162,7 +162,8 @@ class SymmetryTrapEngine:
 
     Trade Management:
       Entry:  Close of OCC candle
-      SL:     Zero-Buffer Impulse Extreme (CLOSE-ONLY invalidation)
+      SL:     Zero-Buffer Impulse Extreme = exact impulse bar high/low (CLOSE-ONLY)
+             NOTE: Uses self.impulse_extreme (set in SEARCH), NOT OCC extreme + buffer
       TP:     Exactly 1 AU from entry (SINGLE TARGET — no ladder)
 
     Invalidation:
@@ -509,22 +510,14 @@ class SymmetryTrapEngine:
 
             if occ_confirmed:
                 self.entry_price = bar.close
-                # SL = OCC candle extreme (loss direction) + spread buffer, with min floor
+                # SL = Zero-Buffer Impulse Extreme (exact high/low of impulse bar)
+                # Per Nautilus strategy line 503: self.sl_price = self.impulse_extreme
                 # Per ontology cerebus_qa_recap.md: "SL = impulse_extreme (Zero Buffer)"
-                # The OCC extreme IS the impulse structural anchor (manual_ontology.md line 411)
-                # For SHORT: SL at OCC high + spread buffer (loss direction = above entry)
-                # For LONG: SL at OCC low - spread buffer (loss direction = below entry)
-                spread_buf = self.spread_buffer * self.pip_size
-                if self.impulse_direction == TradeDirection.SHORT:
-                    self.sl_price = bar.high + spread_buf
-                    min_sl = self.entry_price + (self.min_sl_buffer * self.pip_size)
-                    if self.sl_price < min_sl:
-                        self.sl_price = min_sl
-                else:
-                    self.sl_price = bar.low - spread_buf
-                    min_sl = self.entry_price - (self.min_sl_buffer * self.pip_size)
-                    if self.sl_price > min_sl:
-                        self.sl_price = min_sl
+                # The impulse_extreme is set in SEARCH state:
+                #   LONG  -> bar.high of impulse bar
+                #   SHORT -> bar.low of impulse bar
+                # No spread buffer, no OCC extreme — exact impulse extreme only.
+                self.sl_price = self.impulse_extreme
                 self.tp_price = (
                     bar.close + self.active_au * self.impulse_direction.value
                 )
