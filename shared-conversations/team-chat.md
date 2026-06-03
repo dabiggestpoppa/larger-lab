@@ -1209,3 +1209,36 @@ Help: /help
 - Branch: master @ 05662417a
 
 ### Next: Phase 0 — Ground Truth Calibration (19-asset Nautilus backtest sweep)
+
+## [OC2] 2026-06-03 16:20 UTC — ✅ Telegram Presence System: All 3 Phases Complete
+
+**Phase 1: Telegram Runtime Foundation** ✅
+- scripts/telegram_gateway.py — complete rewrite with async LLM calls
+- Session continuity with TTL (3600s window)
+- Workspace scanning (team-chat, progress files, vault stats)
+- Streaming progress updates: Processing → Workspace Scan → LLM Response
+- TaskQueue with bounded workers (max 3 concurrent)
+- Command routing for all slash commands
+
+**Phase 2: Operational Telemetry + Live Field** ✅
+- /observers — observer health status (PO, PM2, AS, CC, RL)
+- /drift — drift detection from journal events
+- /timeline — operational history with event icons
+- Enhanced /vault with search, /tasks, /report
+
+**Phase 3: Autonomous Presence Engine** ✅
+- core/observer/presence_engine.py — full presence system
+- WatcherNetwork: vault-watcher (60s), progress-watcher (120s), health-watcher (30s)
+- PriorityEvaluator: CRITICAL/HIGH/MEDIUM/LOW with 30s cooldown anti-spam
+- ContinuityCache: rolling window with TTL
+- TimelineEngine: operational history with get_gone_summary()
+- /presence, /watchers, /push commands
+- Continuity query detection ("what happened", "what's up", "catch me up", etc.)
+
+**Files changed:**
+- scripts/telegram_gateway.py (new, 200+ lines)
+- scripts/start_telegram_gateway.py (updated)
+- core/observer/presence_engine.py (new, 250+ lines)
+- core/observer/command_router.py (added 6 new commands)
+
+**Commit:** c36f912e — pushed to origin/master
