@@ -259,7 +259,7 @@ def send_order(symbol: str, direction: str, volume: float,
         "tp": tp,
     }
     if not no_sl:
-        request["sl": sl]
+        request["sl"] = sl
         "deviation": 10,
         "magic": 20260601,
         "comment": comment,
