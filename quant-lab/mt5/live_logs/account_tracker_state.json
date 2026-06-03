@@ -1,14 +1,14 @@
 {
-  "timestamp": "2026-06-03T11:04:55.616131",
+  "timestamp": "2026-06-03T11:08:19.692295",
   "account": {
     "login": 650898,
     "server": "OxSecurities-Live",
-    "balance": 63.31,
-    "equity": 64.54,
-    "profit": 1.23,
-    "margin": 6.97,
-    "margin_free": 57.57,
-    "margin_level": 925.9684361549499,
+    "balance": 63.24,
+    "equity": 65.07,
+    "profit": 1.83,
+    "margin": 9.29,
+    "margin_free": 55.78,
+    "margin_level": 700.4305705059204,
     "leverage": 500,
     "currency": "USD",
     "name": "Jaelon Scott - Live #0",
@@ -21,10 +21,10 @@
       "type": "SELL",
       "volume": 0.03,
       "open_price": 1.16099,
-      "current_price": 1.16058,
+      "current_price": 1.16043,
       "sl": 1.16109,
       "tp": 1.15929,
-      "profit": 1.23,
+      "profit": 1.6800000000000002,
       "swap": 0.0,
       "magic": 20260531,
       "comment": "SYMT_SHORT",
@@ -32,6 +32,24 @@
       "sl_pips": 1.0,
       "tp_pips": 17.0,
       "rr": 17.0
+    },
+    {
+      "ticket": 91941915,
+      "symbol": "EURUSD.PRO",
+      "type": "SELL",
+      "volume": 0.01,
+      "open_price": 1.16058,
+      "current_price": 1.16043,
+      "sl": 1.1617,
+      "tp": 1.16026,
+      "profit": 0.15,
+      "swap": 0.0,
+      "magic": 20260601,
+      "comment": "CEREBUS-P90",
+      "time": "2026-06-03T14:04:59",
+      "sl_pips": 11.2,
+      "tp_pips": 3.2,
+      "rr": 0.29
     }
   ],
   "today_history": [
@@ -320,13 +338,26 @@
       "magic": 20260601,
       "comment": "[tp 0.78846]",
       "time": "2026-06-03T10:52:02"
+    },
+    {
+      "ticket": 109749577,
+      "symbol": "GBPAUD.PRO",
+      "type": "BUY",
+      "volume": 0.01,
+      "price": 1.87756,
+      "profit": -1.42,
+      "swap": 0.0,
+      "commission": 0.0,
+      "magic": 20260601,
+      "comment": "[sl 1.87755]",
+      "time": "2026-06-03T11:08:07"
     }
   ],
   "today_stats": {
-    "trades": 22,
-    "pnl": 0.72,
+    "trades": 23,
+    "pnl": -0.7,
     "wins": 10,
-    "losses": 12,
-    "win_rate": 45.5
+    "losses": 13,
+    "win_rate": 43.5
   }
 }
