@@ -17,12 +17,14 @@ REPORTS_DIR = Path(__file__).parent / ".." / "reports"
 # HARD thresholds = deployment error. SOFT = warning.
 
 PORTFOLIO_THRESHOLDS = {
-    "max_daily_losses": 3,        # P95 from portfolio MC
-    "max_daily_losses_hard": 5,   # worst case from portfolio MC
-    "min_daily_wr": 0.62,         # P5 daily WR from portfolio MC
-    "min_daily_wr_hard": 0.49,    # absolute floor
-    "max_loss_streak": 5,         # P95 from portfolio MC
-    "max_loss_streak_hard": 8,    # worst case from portfolio MC
+    # 7-asset pooled MC (GBPJPY+CHFJPY+GBPAUD+GBPNZD+EURUSD+USDCHF+NZDUSD)
+    # 5420 trades, 73.6% WR, +36772p | MaxDD P95=146p P99=171p Worst=224p
+    "max_daily_losses": 3,        # P95 from 7-asset portfolio MC
+    "max_daily_losses_hard": 7,   # worst case from 7-asset portfolio MC
+    "min_daily_wr": 0.25,         # P5 daily WR from 7-asset portfolio MC
+    "min_daily_wr_hard": 0.20,    # absolute floor
+    "max_loss_streak": 2,         # P95 from 7-asset portfolio MC
+    "max_loss_streak_hard": 6,    # worst case from 7-asset portfolio MC
 }
 
 # Per-asset thresholds (from portfolio MC detail)
@@ -32,8 +34,8 @@ MC_THRESHOLDS = {
     "GBPAUD":  {"max_daily_losses": 6, "min_wr": 0.62, "max_loss_streak": 2},
     "GBPNZD":  {"max_daily_losses": 6, "min_wr": 0.62, "max_loss_streak": 2},
     "NZDUSD":  {"max_daily_losses": 3, "min_wr": 0.65, "max_loss_streak": 2},
-    "EURUSD":  {"max_daily_losses": 3, "min_wr": 0.60, "max_loss_streak": 2},  # no bt data yet
-    "USDCHF":  {"max_daily_losses": 3, "min_wr": 0.60, "max_loss_streak": 2},  # no bt data yet
+    "EURUSD":  {"max_daily_losses": 4, "min_wr": 0.00, "max_loss_streak": 13},  # per-asset MC: 886tr/44%WR/+155p
+    "USDCHF":  {"max_daily_losses": 4, "min_wr": 0.00, "max_loss_streak": 11},  # per-asset MC: 847tr/40%WR/+71p
 }
 
 # Fix Windows emoji output
