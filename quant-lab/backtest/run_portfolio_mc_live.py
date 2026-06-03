@@ -13,7 +13,8 @@ PORTFOLIO_MC_DIR = REPORTS_DIR / "portfolio_mc"
 PORTFOLIO_MC_DIR.mkdir(parents=True, exist_ok=True)
 
 # EXACT live portfolio from run_live_config_backtest.py
-LIVE_ASSETS = ["GBPJPY", "CHFJPY", "GBPAUD", "GBPNZD", "EURUSD", "USDCHF", "NZDUSD"]
+# EURUSD and USDCHF excluded pending WR investigation
+LIVE_ASSETS = ["GBPJPY", "CHFJPY", "GBPAUD", "GBPNZD", "NZDUSD"]
 N_SIMULATIONS = 10000
 
 print("=" * 60)
