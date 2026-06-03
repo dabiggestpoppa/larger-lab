@@ -228,16 +228,16 @@ def main():
                         SESSIONS.add(cid, "user", text)
 
                         # Check for continuity queries
-                        lower = user_text.lower().strip()
+                        lower = text.lower().strip()
                         continuity_triggers = ["what happened", "what's up", "whats up",
                                                "what going on", "status update", "summary",
                                                "what did i miss", "catch me up", "yo", "yoo", "yoioo"]
                         is_continuity = any(t in lower for t in continuity_triggers)
 
-                        def do_llm(chat_id=cid, user_text=text, continuity=is_continuity):
+                        def do_llm(chat_id=cid, msg_text=text, continuity=is_continuity):
                             try:
                                 send(base_url, chat_id,
-                                     f"🧠 *Processing:* `{user_text[:60]}`")
+                                     f"🧠 *Processing:* `{msg_text[:60]}`")
                                 typing(base_url, chat_id)
 
                                 scan_result = scan_workspace()
@@ -267,11 +267,11 @@ def main():
                                     for h in history[-6:]:
                                         ctx += f"- **{h['role']}:** {h['text'][:100]}\n"
 
-                                resp = agent.chat(user_text, sovereign_context=ctx)
+                                resp = agent.chat(msg_text, sovereign_context=ctx)
 
                                 # Record in timeline and continuity cache
-                                TIMELINE.record("chat", {"user": user_text[:50], "response_len": len(resp)})
-                                CONTINUITY.add("last_chat", user_text[:100])
+                                TIMELINE.record("chat", {"user": msg_text[:50], "response_len": len(resp)})
+                                CONTINUITY.add("last_chat", msg_text[:100])
 
                                 SESSIONS.add(chat_id, "assistant", resp)
                                 send(base_url, chat_id, resp)
