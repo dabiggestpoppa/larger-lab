@@ -37,7 +37,12 @@ from core.observer.presence_engine import (
 
 def log(msg):
     ts = datetime.datetime.now().strftime("%H:%M:%S")
-    print(f"[{ts}] {msg}", flush=True)
+    line = f"[{ts}] {msg}"
+    print(line, flush=True)
+    try:
+        with open("logs/telegram-gateway.log", "a", encoding="utf-8") as f:
+            f.write(line + "\n")
+    except: pass
 
 # ─── Telegram Helpers ────────────────────────────────────────────────────
 
@@ -278,6 +283,8 @@ def main():
                                 log(f"LLM RESP ({len(resp)} chars)")
                             except Exception as e:
                                 import traceback
+                                tb = traceback.format_exc()
+                                log(f"LLM ERR: {e}\n{tb
                                 tb = traceback.format_exc()
                                 log(f"LLM ERR: {e}\n{tb}")
                                 try:
