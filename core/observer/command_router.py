@@ -694,6 +694,15 @@ class CommandRouter:
             "  /cancel <id> Cancel task\n"
             "  /approve <id> Approve task\n"
             "  /reject <id> Reject task\n\n"
+
+            "━━ Telemetry (Phase 2) ━━━━━━━━━━━━━\n"
+            "  /observers   Observer health status\n"
+            "  /drift       Drift detection\n"
+            "  /timeline    Operational timeline\n\n"
+            "━━ Presence (Phase 3) ━━━━━━━━━━━━━━\n"
+            "  /presence    Presence engine status\n"
+            "  /watchers    Watcher network status\n"
+            "  /push <msg>  Trigger push notification\n\n"
             "━━ Other ━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
             "  /help        This message"
         )
