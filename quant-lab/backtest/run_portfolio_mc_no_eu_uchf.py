@@ -1,8 +1,4 @@
-"""
-PORTFOLIO MC — EXACT LIVE CONFIG (1:1 PARITY)
-==============================================
-Reads per-asset MC trade P&Ls, pools them, runs portfolio-level MC.
-"""
+"""Portfolio MC — 5 assets only (excluding EURUSD + USDCHF pending WR fix)."""
 import json
 import random
 from pathlib import Path
@@ -12,15 +8,14 @@ REPORTS_DIR = Path(__file__).parent.parent / "reports"
 PORTFOLIO_MC_DIR = REPORTS_DIR / "portfolio_mc"
 PORTFOLIO_MC_DIR.mkdir(parents=True, exist_ok=True)
 
-# EXACT live portfolio from run_live_config_backtest.py
-LIVE_ASSETS = ["GBPJPY", "CHFJPY", "GBPAUD", "GBPNZD", "EURUSD", "USDCHF", "NZDUSD"]
+LIVE_ASSETS = ["GBPJPY", "CHFJPY", "GBPAUD", "GBPNZD", "NZDUSD"]
 N_SIMULATIONS = 10000
+random.seed(42)
 
 print("=" * 60)
-print("PORTFOLIO MC — EXACT LIVE CONFIG (1:1 PARITY)")
+print("PORTFOLIO MC — 5 ASSETS (EURUSD+USDCHF EXCLUDED)")
 print("=" * 60)
 
-# Load per-asset trade P&Ls
 all_trades = {}
 for sym in LIVE_ASSETS:
     mc_path = REPORTS_DIR / "per-asset" / f"{sym}_mc_results.json"
@@ -39,7 +34,6 @@ for sym in LIVE_ASSETS:
 
 print(f"\nLoaded {len(all_trades)}/{len(LIVE_ASSETS)} assets")
 
-# Pool all trades
 pooled = []
 for sym, trades in all_trades.items():
     pooled.extend(trades)
@@ -53,7 +47,7 @@ gross_profit = sum(wins)
 gross_loss = abs(sum(losses)) if losses else 0.01
 pf = gross_profit / gross_loss
 
-print(f"\nPooled: {n_trades} trades | WR {total_wr:.1f}% | P&L {total_pnl:.1f}p | PF {pf:.1f}")
+print(f"\nPooled: {n_trades} trades | WR {total_wr:.1f}% | P&L {total_pnl:.1f}p | PF {pf:.2f}")
 print(f"Running {N_SIMULATIONS} simulations...")
 
 terminal_pnls = []
@@ -64,32 +58,22 @@ for i in range(N_SIMULATIONS):
     shuffled = random.sample(pooled, n_trades)
     terminal_pnls.append(sum(shuffled))
 
-    cumulative = 0
-    peak = 0
-    max_dd = 0
+    cumulative = 0; peak = 0; max_dd = 0
     for p in shuffled:
         cumulative += p
-        if cumulative > peak:
-            peak = cumulative
+        if cumulative > peak: peak = cumulative
         dd = peak - cumulative
-        if dd > max_dd:
-            max_dd = dd
+        if dd > max_dd: max_dd = dd
     max_dds.append(max_dd)
 
-    max_streak = 0
-    current = 0
+    max_streak = current = 0
     for p in shuffled:
-        if p <= 0:
-            current += 1
-            if current > max_streak:
-                max_streak = current
-        else:
-            current = 0
+        if p <= 0: current += 1
+        else: current = 0
+        if current > max_streak: max_streak = current
     max_streaks.append(max_streak)
 
-terminal_pnls.sort()
-max_dds.sort()
-max_streaks.sort()
+terminal_pnls.sort(); max_dds.sort(); max_streaks.sort()
 n = len(terminal_pnls)
 
 mc = {
@@ -110,7 +94,7 @@ mc = {
 }
 
 print(f"\n{'='*60}")
-print(f"PORTFOLIO MC RESULTS ({N_SIMULATIONS} sims)")
+print(f"PORTFOLIO MC RESULTS ({N_SIMULATIONS} sims, 5 assets)")
 print(f"{'='*60}")
 print(f"  Terminal PnL median:  {mc['terminal_pnl_median']}p")
 print(f"  Terminal PnL mean:    {mc['terminal_pnl_mean']}p")
@@ -124,22 +108,21 @@ print(f"  Loss streak median:   {mc['max_loss_streak_median']}")
 print(f"  Loss streak 95th:     {mc['max_loss_streak_95th']}")
 print(f"  Loss streak worst:    {mc['max_loss_streak_worst']}")
 
-# Per-asset breakdown
 per_asset = {}
 for sym in all_trades:
     trades = all_trades[sym]
     aw = sum(1 for t in trades if t > 0)
-    al = len(trades) - aw
     per_asset[sym] = {
         "trades": len(trades),
         "wins": aw,
-        "losses": al,
+        "losses": len(trades) - aw,
         "win_rate": round(aw / len(trades) * 100, 1),
         "total_pnl": round(sum(trades), 1),
     }
 
 result = {
     "portfolio": list(all_trades.keys()),
+    "excluded": ["EURUSD", "USDCHF"],
     "timestamp": datetime.now().isoformat(),
     "n_simulations": N_SIMULATIONS,
     "pooled_stats": {
@@ -154,7 +137,7 @@ result = {
     "monte_carlo": mc,
 }
 
-out_path = PORTFOLIO_MC_DIR / "portfolio_mc_results.json"
+out_path = PORTFOLIO_MC_DIR / "portfolio_mc_5assets.json"
 with open(out_path, "w") as f:
     json.dump(result, f, indent=2, default=str)
 
