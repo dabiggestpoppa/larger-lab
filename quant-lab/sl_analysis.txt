@@ -1,0 +1,55 @@
+# Trace ST SL placement for a specific example
+# EURUSD: SHORT trade
+# OCC candle: high=1.08500, low=1.08400, close=1.08420 (entry for SHORT)
+# spread_buffer for EURUSD = 1.5 pips = 0.00015
+# min_sl_buffer for EURUSD = 8 pips = 0.00080
+# AU = 10 pips = 0.00100
+
+# SHORT trade:
+# entry = 1.08420 (OCC close)
+# sl = OCC high + spread_buf = 1.08500 + 0.00015 = 1.08515
+# min_sl = entry + min_sl_buffer = 1.08420 + 0.00080 = 1.08500
+# sl (1.08515) > min_sl (1.08500) → sl = 1.08515 ✓ (above entry, correct for SHORT)
+# tp = entry - AU = 1.08420 - 0.00100 = 1.08320 ✓ (below entry, correct for SHORT)
+
+# Distance check:
+# SL distance = 1.08515 - 1.08420 = 0.00095 = 9.5 pips
+# TP distance = 1.08420 - 1.08320 = 0.00100 = 10.0 pips
+# SL is 9.5p, TP is 10p → TP is only 0.5p further than SL!
+
+# LONG trade:
+# entry = 1.08500 (OCC close)
+# sl = OCC low - spread_buf = 1.08400 - 0.00015 = 1.08385
+# min_sl = entry - min_sl_buffer = 1.08500 - 0.00080 = 1.08420
+# sl (1.08385) < min_sl (1.08420) → sl = min_sl = 1.08420 ✓ (below entry, correct for LONG)
+# tp = entry + AU = 1.08500 + 0.00100 = 1.08600 ✓ (above entry, correct for LONG)
+
+# Distance check:
+# SL distance = 1.08500 - 1.08420 = 0.00080 = 8.0 pips
+# TP distance = 1.08600 - 1.08500 = 0.00100 = 10.0 pips
+# SL is 8p, TP is 10p → TP is only 2p further than SL
+
+print("=== ST SL PLACEMENT ANALYSIS ===")
+print()
+print("The SL IS on the correct side of entry. The logic is correct.")
+print()
+print("BUT: The SL is too close to entry relative to TP.")
+print()
+print("For a typical EURUSD trade:")
+print("  LONG:  SL at 8p, TP at 10p → TP only 2p further than SL")
+print("  SHORT: SL at 9.5p, TP at 10p → TP only 0.5p further than SL")
+print()
+print("On M5 bars, price routinely wicks 8-10p in both directions.")
+print("So the SL gets hit by normal noise almost as often as TP.")
+print()
+print("This is NOT a bug in SL placement direction.")
+print("This is a STRUCTURAL issue: the OCC candle is too small,")
+print("so the OCC extreme is too close to the OCC close (entry).")
+print()
+print("The previous backtest had 82-85% WR because:")
+print("  The OCC candle body was used for SL (not the extreme)")
+print("  AND the old code had a bug where SL was placed behind entry for SHORT")
+print("  This meant many losing trades were never stopped out → counted as wins")
+print()
+print("The new 35-44% WR is the HONEST result with correct SL placement.")
+print("The ST edge exists but the R:R is too tight on M5 (SL 8-9p vs TP 10p)")

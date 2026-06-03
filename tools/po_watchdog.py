@@ -93,7 +93,7 @@ def tail_loop(interval: int = 5):
                 last_observer = cur_observer
 
             cur_chat = load_json(CHAT_LOG) or []
-                if len(cur_chat) > len(last_chat):
+            if len(cur_chat) > len(last_chat):
                 new_msgs = cur_chat[len(last_chat):]
                 for m in new_msgs:
                     ts = m.get('timestamp') or now()
