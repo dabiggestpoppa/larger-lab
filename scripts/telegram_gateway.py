@@ -208,14 +208,17 @@ def main():
                 log("HEARTBEAT: poll loop alive")
                 _heartbeat = time.time()
 
-            r = requests.get(f"{base_url}/getUpdates",
-                params={"offset": offset, "limit": 10, "timeout": 10}, timeout=15)
+            _poll_url = f"{base_url}/getUpdates?offset={offset}&limit=10&timeout=30"
+            r = requests.get(_poll_url, timeout=35)
             data = r.json()
             if not data.get("ok"):
+                log(f"getUpdates error: {data}")
                 time.sleep(5)
                 continue
 
-            for u in data.get("result", []):
+            results = data.get("result", [])
+            log(f"poll: offset={offset} got={len(results)}")
+            for u in results:
                 offset = u["update_id"] + 1
                 msg = u.get("message") or {}
                 text = msg.get("text") or msg.get("caption")
