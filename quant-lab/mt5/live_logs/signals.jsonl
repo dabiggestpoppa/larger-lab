@@ -374,3 +374,4 @@
 {"engine": "P90", "symbol": "CHFJPY.PRO", "direction": "SELL", "entry": 202.526, "sl": 202.44031999999999, "tp": 202.62825, "event": "ENTRY", "variant": "CASCADE", "time": "2026-06-03 05:42:00"}
 {"engine": "P90", "symbol": "CHFJPY.PRO", "direction": "SELL", "entry": 202.526, "sl": 202.44031999999999, "tp": 202.62825, "event": "EWS_EXIT", "variant": "EWS", "time": "2026-06-03 05:49:00"}
 {"engine": "P90", "symbol": "CHFJPY.PRO", "direction": "SELL", "entry": 202.45, "sl": 202.52056, "tp": 202.34775, "event": "ENTRY", "variant": "CASCADE", "time": "2026-06-03 05:52:00"}
+{"engine": "P90", "symbol": "GBPAUD.PRO", "direction": "SELL", "entry": 1.8765800000000001, "sl": 1.8777800000000002, "tp": 1.8756300000000001, "event": "KILL_SWITCH", "variant": "INITIAL", "time": "2026-06-03 05:58:00"}
