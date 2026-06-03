@@ -1,5 +1,7 @@
 import MetaTrader5 as mt5
 from datetime import datetime
+import sys
+sys.stdout.reconfigure(encoding="utf-8")
 
 def get_pip_size(symbol):
     s = symbol.upper()
@@ -33,8 +35,7 @@ if positions:
         pip = get_pip_size(p.symbol)
         sl_p, tp_p, rr = calc_rr(p.price_open, p.sl, p.tp, pip, dir_name)
         rr_str = f"RR {rr:.2f}" if rr > 0 else "RR --"
-        emoji = "🟢" if p.profit >= 0 else "🔴"
-        print(f"{emoji} {dir_name} {p.volume:.2f} {p.symbol} @ {p.price_open:.5f} | P&L: ${p.profit:+.2f} | {rr_str}")
+        print(f"{dir_name} {p.volume:.2f} {p.symbol} @ {p.price_open:.5f} | P&L: ${p.profit:+.2f} | {rr_str}")
         print(f"   SL: {p.sl:.5f} ({sl_p}p) | TP: {p.tp:.5f} ({tp_p}p)")
 else:
     print("No open positions")
