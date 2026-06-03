@@ -785,7 +785,7 @@ class P90Engine:
                         reason="TP2 (-50% AR) hit"
                     )
                     self.signal_log.append(sig)
-                    self.logger.info("TP2 HIT (-50% AR): exit={}".format(self.tp2_price if self.tp2_price is not None else "N/A"))
+                    self.logger.info("TP2 HIT (gear shift AU): exit={}".format(self.tp2_price if self.tp2_price is not None else "N/A"))
                     return sig
 
                 # TP1 check
@@ -807,7 +807,7 @@ class P90Engine:
                         reason="TP1 (-25% AR) hit"
                     )
                     self.signal_log.append(sig)
-                    self.logger.info("TP1 HIT (-25% AR): exit={}".format(self.tp1_price if self.tp1_price is not None else "N/A"))
+                    self.logger.info("TP1 HIT (1 AU): exit={}".format(self.tp1_price if self.tp1_price is not None else "N/A"))
                     return sig
 
                 # SL check (CLOSE ONLY)
@@ -850,7 +850,7 @@ class P90Engine:
                         reason="TP2 (-50% AR) hit"
                     )
                     self.signal_log.append(sig)
-                    self.logger.info("TP2 HIT (-50% AR): exit={}".format(self.tp2_price if self.tp2_price is not None else "N/A"))
+                    self.logger.info("TP2 HIT (gear shift AU): exit={}".format(self.tp2_price if self.tp2_price is not None else "N/A"))
                     return sig
 
                 # TP1 check
@@ -872,7 +872,7 @@ class P90Engine:
                         reason="TP1 (-25% AR) hit"
                     )
                     self.signal_log.append(sig)
-                    self.logger.info("TP1 HIT (-25% AR): exit={}".format(self.tp1_price if self.tp1_price is not None else "N/A"))
+                    self.logger.info("TP1 HIT (1 AU): exit={}".format(self.tp1_price if self.tp1_price is not None else "N/A"))
                     return sig
 
                 # SL check (CLOSE ONLY)
