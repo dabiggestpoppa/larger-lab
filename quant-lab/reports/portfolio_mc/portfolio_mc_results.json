@@ -1,0 +1,119 @@
+{
+  "portfolio": [
+    "GBPJPY",
+    "CHFJPY",
+    "GBPAUD",
+    "GBPNZD",
+    "NZDUSD"
+  ],
+  "timestamp": "2026-06-02T22:11:06.436767",
+  "n_simulations": 10000,
+  "pooled_stats": {
+    "total_trades": 3687,
+    "wins": 3261,
+    "losses": 421,
+    "win_rate": 88.4,
+    "total_pnl_pips": 36546.0,
+    "profit_factor": 15.19
+  },
+  "per_asset": {
+    "GBPJPY": {
+      "trades": 830,
+      "wins": 716,
+      "losses": 114,
+      "win_rate": 86.3,
+      "total_pnl": 8655.6
+    },
+    "CHFJPY": {
+      "trades": 751,
+      "wins": 648,
+      "losses": 103,
+      "win_rate": 86.3,
+      "total_pnl": 7167.0
+    },
+    "GBPAUD": {
+      "trades": 715,
+      "wins": 632,
+      "losses": 83,
+      "win_rate": 88.4,
+      "total_pnl": 7911.5
+    },
+    "GBPNZD": {
+      "trades": 664,
+      "wins": 587,
+      "losses": 77,
+      "win_rate": 88.4,
+      "total_pnl": 8598.3
+    },
+    "NZDUSD": {
+      "trades": 727,
+      "wins": 678,
+      "losses": 49,
+      "win_rate": 93.3,
+      "total_pnl": 4213.6
+    }
+  },
+  "monte_carlo": {
+    "terminal_pnl_median": 36546.0,
+    "terminal_pnl_mean": 36546.0,
+    "terminal_pnl_5th": 36546.0,
+    "terminal_pnl_25th": 36546.0,
+    "terminal_pnl_75th": 36546.0,
+    "terminal_pnl_95th": 36546.0,
+    "max_dd_median": 87.5,
+    "max_dd_95th": 108.4,
+    "max_dd_99th": 129.9,
+    "max_dd_worst": 175.1,
+    "max_loss_streak_median": 3,
+    "max_loss_streak_95th": 5,
+    "max_loss_streak_99th": 5,
+    "max_loss_streak_worst": 8
+  },
+  "thresholds": {
+    "max_daily_losses": 3,
+    "max_daily_losses_hard": 5,
+    "min_daily_wr": 0.62,
+    "min_daily_wr_hard": 0.49,
+    "max_loss_streak": 5,
+    "max_loss_streak_hard": 8,
+    "max_dd_pips_95th": 108.4,
+    "max_dd_pips_worst": 175.1,
+    "per_asset": {
+      "GBPJPY": {
+        "max_daily_losses": 9,
+        "min_daily_wr": 0.6,
+        "max_loss_streak": 3,
+        "backtest_wr": 0.863,
+        "backtest_trades": 830
+      },
+      "CHFJPY": {
+        "max_daily_losses": 8,
+        "min_daily_wr": 0.6,
+        "max_loss_streak": 3,
+        "backtest_wr": 0.863,
+        "backtest_trades": 751
+      },
+      "GBPAUD": {
+        "max_daily_losses": 6,
+        "min_daily_wr": 0.62,
+        "max_loss_streak": 2,
+        "backtest_wr": 0.884,
+        "backtest_trades": 715
+      },
+      "GBPNZD": {
+        "max_daily_losses": 6,
+        "min_daily_wr": 0.62,
+        "max_loss_streak": 2,
+        "backtest_wr": 0.884,
+        "backtest_trades": 664
+      },
+      "NZDUSD": {
+        "max_daily_losses": 3,
+        "min_daily_wr": 0.65,
+        "max_loss_streak": 2,
+        "backtest_wr": 0.9329999999999999,
+        "backtest_trades": 727
+      }
+    }
+  }
+}

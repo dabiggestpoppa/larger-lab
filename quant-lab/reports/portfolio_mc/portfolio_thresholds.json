@@ -1,0 +1,47 @@
+{
+  "max_daily_losses": 3,
+  "max_daily_losses_hard": 5,
+  "min_daily_wr": 0.62,
+  "min_daily_wr_hard": 0.49,
+  "max_loss_streak": 5,
+  "max_loss_streak_hard": 8,
+  "max_dd_pips_95th": 108.4,
+  "max_dd_pips_worst": 175.1,
+  "per_asset": {
+    "GBPJPY": {
+      "max_daily_losses": 9,
+      "min_daily_wr": 0.6,
+      "max_loss_streak": 3,
+      "backtest_wr": 0.863,
+      "backtest_trades": 830
+    },
+    "CHFJPY": {
+      "max_daily_losses": 8,
+      "min_daily_wr": 0.6,
+      "max_loss_streak": 3,
+      "backtest_wr": 0.863,
+      "backtest_trades": 751
+    },
+    "GBPAUD": {
+      "max_daily_losses": 6,
+      "min_daily_wr": 0.62,
+      "max_loss_streak": 2,
+      "backtest_wr": 0.884,
+      "backtest_trades": 715
+    },
+    "GBPNZD": {
+      "max_daily_losses": 6,
+      "min_daily_wr": 0.62,
+      "max_loss_streak": 2,
+      "backtest_wr": 0.884,
+      "backtest_trades": 664
+    },
+    "NZDUSD": {
+      "max_daily_losses": 3,
+      "min_daily_wr": 0.65,
+      "max_loss_streak": 2,
+      "backtest_wr": 0.9329999999999999,
+      "backtest_trades": 727
+    }
+  }
+}
