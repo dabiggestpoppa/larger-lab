@@ -596,3 +596,19 @@ if __name__ == "__main__":
     print(cr.handle('/status'))
     print('---')
     print(cr.handle('/help'))
+
+# PATCH: Override _cmd_restart to actually restart the gateway
+import time as _time
+import threading as _threading
+
+def _patched_restart(self, args):
+    target = ' '.join(args) if args else 'gateway'
+    self.journal.record_event({"type": "restart", "target": target})
+    def _do_restart():
+        _time.sleep(2)
+        os.kill(os.getpid(), 9)
+    t = _threading.Thread(target=_do_restart, daemon=True)
+    t.start()
+    return "?? Restarting PO gateway in 2 seconds..."
+
+CommandRouter._cmd_restart = _patched_restart
