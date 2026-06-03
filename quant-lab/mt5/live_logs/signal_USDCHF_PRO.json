@@ -5,7 +5,7 @@
   "entry": 0.78895,
   "sl": 0.7897500000000001,
   "tp": 0.7884575,
-  "event": "ENTRY",
+  "event": "KILL_SWITCH",
   "variant": "INITIAL",
-  "time": "2026-06-03 05:10:00"
+  "time": "2026-06-03 05:30:00"
 }
