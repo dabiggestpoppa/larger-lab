@@ -1,13 +1,41 @@
 # 🔴 PM2 — Sub-Progress Log
 
 > **Agent:** PM2 (Polymorph 2)
-> **Role:** Experimental Track Lead → SRRA-OPH Phases 3-4 (Temporal Playback + Entropy Dynamics)
-> **Reports to:** CC (Claude Code)
-> **Last Updated:** 2026-05-24 14:00 UTC
+> **Role:** Monitor / Test — Watching CC's build progress, verifying plan alignment
+> **Reports to:** CC (Claude Code) + OWL (OC2)
+> **Last Updated:** 2026-06-03 12:00 UTC
 
 ---
 
-## Status: 🟢 CEREBUS ML ENGINE — PHASES 2-5 COMPLETE
+## Status: 🟡 MONITORING — Watching CC Build Progress
+
+### Current Assignment (2026-06-03)
+- **Monitor CC** — watch his build progress, ensure he's following the plan
+- **Do NOT build** unless something is wrong
+- **Test** when everything is done
+- **Report** to team-chat.md when CC updates
+
+### Sync Infrastructure Status
+| Script | Status | Notes |
+|--------|--------|-------|
+| `tools/progress-sync.py` | ✅ Present | 2-min interval, hash-based change detection |
+| `tools/obsidian_vault_sync.py` | ✅ Present | Bidirectional vault sync, 60s interval |
+| `tools/gateway_watchdog.py` | ✅ Present | Monitors OC2, Hermes, OCE-BE, OCE-FE, SRRA, Telegram |
+| `tools/po_watchdog.py` | ✅ Present | Monitors observer state + chat log |
+| `tools/pm2_autopilot.py` | ⚠️ Stopped | Was spamming git with empty commits — killed |
+| `scripts/start_telegram_gateway.py` | ⚠️ Exists | Crashes on start (exit code 1) — needs investigation |
+| Git sync | ⚠️ Dirty | 20+ "PM2 autopilot" spam commits on master |
+| Vault sync | ✅ Running | Obsidian vault sync daemon active |
+
+### Issues Found
+1. **PM2 autopilot spam** — 20+ meaningless commits pushed to master. Needs cleanup or autopilot rewrite.
+2. **Telegram gateway crash** — `start_telegram_gateway.py` exits with code 1. Likely missing deps or config.
+3. **Progress sync daemon not running** — `progress-sync.py` daemon not active, needs restart.
+4. **workspace-state.md stale** — Last updated 2026-05-28, doesn't reflect O-5/O-6 completion or ML work.
+
+---
+
+## Previous Work: CEREBUS ML ENGINE — PHASES 2-5 COMPLETE
 
 ### CEREBUS ML Build (2026-06-02)
 All 5 phases built. 40/40 tests passing.
@@ -55,7 +83,18 @@ All 5 phases built. 40/40 tests passing.
 7. UTF-8 encoding required on Windows
 
 ### Next Steps
-1. Wait for CC2 Phase 1 completion
-2. Begin SRRA-OPH Phase 3: Temporal Playback Engine
-3. Integrate experimental results into OCE frontend
-4. Build entropy field dynamics visualizations
+1. ✅ Monitor CC's build progress
+2. ✅ Verify sync scripts are up to date
+3. ⏳ Test when CC finishes building
+4. ⏳ Report to team-chat.md
+
+---
+
+## Completed Work (Historical)
+
+### CEREBUS ML Build (2026-06-02) — COMPLETE
+- All 5 phases built. 40/40 tests passing.
+- Phase 2: XGBoost regime classifier, entry scorer, SHAP, calibration
+- Phase 3: Optuna Bayesian optimizer, search spaces, robustness check
+- Phase 4: Friction filters, parity validator
+- Phase 5: Guardrail interceptor, PSI drift, shadow mode, Grafana dashboards
