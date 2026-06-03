@@ -210,6 +210,7 @@ class SymmetryTrapEngine:
         self.impulse_size_pips: float = 0.0
         self.kill_switch_level: float = 0.0
         self.active_au: float = 0.0    # AU in price units
+        self._just_entered: bool = False  # Skip SL/TP check on entry bar
 
         # ── Trade State ────────────────────────────────────────────────
         self.entry_price: Optional[float] = None
@@ -522,6 +523,7 @@ class SymmetryTrapEngine:
                     bar.close + self.active_au * self.impulse_direction.value
                 )
                 self.state = EngineState.IN_TRADE
+                self._just_entered = True  # Skip SL/TP check on entry bar (Nautilus fills on NEXT bar)
 
                 sig = TradeSignal(
                     event="ENTRY",
@@ -547,6 +549,10 @@ class SymmetryTrapEngine:
         # Monitor TP (wick or close) and SL (CLOSE-ONLY)
         # Reference: cerebus_dual_engine.md (Zero-Buffer SL, close-only)
         elif self.state == EngineState.IN_TRADE:
+            # Skip SL/TP check on entry bar — Nautilus fills on NEXT bar
+            if self._just_entered:
+                self._just_entered = False
+                return None
             if self.impulse_direction == TradeDirection.LONG:
                 # TP check: wick OR close
                 if bar.high >= self.tp_price:
