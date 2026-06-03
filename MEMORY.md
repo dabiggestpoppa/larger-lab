@@ -20,14 +20,21 @@
 
 ---
 
-## 🔴 CRITICAL FIXES DEPLOYED (2026-06-02 15:30 EDT)
+## 🔴 CRITICAL FIXES DEPLOYED (2026-06-03 14:20 EDT)
 
-### ST Spread Buffer Fix — OCC Extreme + Spread Buffer
-- **Bug**: ST SL = OCC candle extreme (high for SHORT, low for LONG) with no spread buffer. On tight OCC candles where high-close spread is 1-2 pips, the SL gets placed so close to entry that normal spread widening triggers instant stop-outs. GBPAUD trade at 11:08 got SL at 1.87528 (6.2p below entry!) — bridge clamped to 1.87600 (1p above entry) → instant stop-out.
-- **Root cause**: The OCC candle's high can be very close to its close (entry). Without a spread buffer, the SL sits right at or even below entry.
-- **Fix**: `SL = OCC extreme + spread_buffer` then enforce `min_sl_buffer` floor
-- **Spread buffers**: GBP crosses 3p, JPY pairs 2p, majors 1.5p, metals 15p
-- **Also fixed**: ST executor validation was rejecting valid signals (`sl_r <= entry_r` with no tolerance). Added 1-point tolerance.
+### ST SL Fix — OCC Extreme + Buffer → Zero-Buffer Impulse Extreme
+- **Bug**: MT5 engine used `SL = OCC extreme + spread_buffer` then clamped to min_sl_buffer floor. This placed SL 8-15 pips from entry → instant stop-outs on M5 noise → 38-44% WR live.
+- **Root cause**: The MT5 engine (`engines/symmetry_trap.py`) had DIFFERENT SL logic than the Nautilus strategy (`strategies/symmetry_trap_strategy.py`) that produced 85% WR in Phase 0 ground truth. Two different code paths = two different results.
+- **Fix**: Changed MT5 engine SL to `self.sl_price = self.impulse_extreme` (zero-buffer, exact impulse bar high/low) — matching Nautilus strategy line 503 exactly.
+- **Also fixed**: Bridge `send_order` was clamping SL based on "wrong side of entry" logic. Removed all clamping — bridge now trusts engine SL/TP completely.
+- **Verification**: Simulated impulse → retrace → OCC → ENTRY: SL = impulse_extreme confirmed. Both LONG and SHORT.
+- **Files**: `quant-lab/engines/symmetry_trap.py` (line ~519), `quant-lab/mt5/cerebus_live_bridge.py` (send_order)
+- **Status**: Code fixed, NOT yet deployed to live. Needs demo testing first per ARC directive.
+
+### ⚠️ PREVIOUS FIX REVERSED (2026-06-02 15:30 EDT)
+- The "ST Spread Buffer Fix" (OCC extreme + spread_buffer) has been REVERSED.
+- That fix was the cause of the 38-44% WR discrepancy vs the 85% Nautilus backtest.
+- Old entry preserved for audit trail only.
 - **Also fixed**: Bridge process (PID 14496) was running OLD engine code from June 1 — never restarted after today's fixes. Needs restart.
 - **Files**: `quant-lab/engines/symmetry_trap.py`, `quant-lab/mt5/symmetry_trap_executor.py`
 
