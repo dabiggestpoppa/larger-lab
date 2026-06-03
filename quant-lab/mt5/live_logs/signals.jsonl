@@ -377,3 +377,4 @@
 {"engine": "P90", "symbol": "GBPAUD.PRO", "direction": "SELL", "entry": 1.8765800000000001, "sl": 1.8777800000000002, "tp": 1.8756300000000001, "event": "KILL_SWITCH", "variant": "INITIAL", "time": "2026-06-03 05:58:00"}
 {"engine": "P90", "symbol": "GBPAUD.PRO", "direction": "SELL", "entry": 1.8767, "sl": 1.8779000000000001, "tp": 1.87575, "event": "ENTRY", "variant": "CASCADE", "time": "2026-06-03 06:02:00"}
 {"engine": "P90", "symbol": "EURUSD.PRO", "direction": "SELL", "entry": 1.16131, "sl": 1.1605100000000002, "tp": 1.16162, "event": "TP_HIT", "variant": "INITIAL", "time": "2026-06-03 06:05:00"}
+{"engine": "P90", "symbol": "EURUSD.PRO", "direction": "SELL", "entry": 1.16211, "sl": 1.16131, "tp": 1.16242, "event": "ENTRY", "variant": "CASCADE", "time": "2026-06-03 06:06:00"}
