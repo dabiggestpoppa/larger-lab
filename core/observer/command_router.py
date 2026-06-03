@@ -111,6 +111,22 @@ class CommandRouter:
         if cmd == "reject":
             return self._cmd_reject(args)
 
+        # ── Phase 2: Telemetry Commands ──────────────────────────────
+        if cmd == "observers":
+            return self._cmd_observers(args)
+        if cmd == "drift":
+            return self._cmd_drift(args)
+        if cmd == "timeline":
+            return self._cmd_timeline(args)
+
+        # ── Phase 3: Presence Commands ───────────────────────────────
+        if cmd == "presence":
+            return self._cmd_presence(args)
+        if cmd == "watchers":
+            return self._cmd_watchers(args)
+        if cmd == "push":
+            return self._cmd_push(args)
+
         # ── Help ─────────────────────────────────────────────────────
         if cmd == "help":
             return self._cmd_help(args)

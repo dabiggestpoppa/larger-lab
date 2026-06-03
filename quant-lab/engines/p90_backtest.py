@@ -715,6 +715,8 @@ def main():
 
     # Load config from registry if --asset specified
     config = None
+    symbol = args.symbol
+    pip_size = args.pip_size
     if args.asset:
         try:
             sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "configs"))
