@@ -300,8 +300,8 @@ def run_p90_asset(
             pnl_pips = (sig.entry_price - exit_price) / pip_size
 
         # Intended RR = TP1 distance / SL distance
-        if sig.tp1_price is not None and sl_dist_price > 0:
-            tp1_dist = abs(sig.tp1_price - sig.entry_price)
+        if sig.tp_price is not None and sl_dist_price > 0:
+            tp1_dist = abs(sig.tp_price - sig.entry_price)
             intended_rr = tp1_dist / sl_dist_price
         else:
             intended_rr = 0.0
@@ -316,7 +316,7 @@ def run_p90_asset(
             "direction": sig.direction.name,
             "entry": sig.entry_price,
             "sl": sig.sl_price,
-            "tp1": sig.tp1_price,
+            "tp1": sig.tp_price,
             "exit_price": exit_price,
             "pnl_pips": round(pnl_pips, 2),
             "intended_rr": round(intended_rr, 3),
@@ -429,9 +429,9 @@ def main():
     skipped = []
 
     for symbol in TARGET_ASSETS:
-        print(f"\n{'─' * 50}")
+        print(f"\n{'-' * 50}")
         print(f">>> {symbol}")
-        print(f"{'─' * 50}")
+        print(f"{'-' * 50}")
 
         # ── Try to get M5 data ────────────────────────────────────────
         bars = None
@@ -548,11 +548,11 @@ def main():
     md_lines.append(f"\n**Total Trades:** {total_trades} | **Total Net PnL:** {total_pnl:+.1f} pips | **Sub-1.0 RR trades:** {total_sub1}\n")
 
     # Key verification result
-    md_lines.append("## 🎯 Key Verification: Did Fixes Eliminate Sub-1.0 RR Trades?\n")
+    md_lines.append("## Key Verification: Did Fixes Eliminate Sub-1.0 RR Trades?\n")
     if total_sub1 == 0:
-        md_lines.append("**✅ PASS: Zero sub-1.0 RR trades across all assets.** The RR gate and asset thresholds are working correctly.\n")
+        md_lines.append("**PASS: Zero sub-1.0 RR trades across all assets.** The RR gate and asset thresholds are working correctly.\n")
     else:
-        md_lines.append(f"**⚠️ FAIL: {total_sub1} sub-1.0 RR trades still present.** Investigation needed.\n")
+        md_lines.append(f"**FAIL: {total_sub1} sub-1.0 RR trades still present.** Investigation needed.\n")
         for sym in TARGET_ASSETS:
             if sym not in all_results:
                 continue
@@ -614,7 +614,7 @@ def main():
     print("VERIFICATION SUMMARY")
     print(f"{'=' * 70}")
     print(f"{'Asset':<10} {'Trades':>6} {'WR%':>6} {'AvgRR':>7} {'MinRR':>7} {'MaxRR':>7} {'Sub1':>5} {'NetP&L':>9}")
-    print(f"{'─'*10} {'─'*6} {'─'*6} {'─'*7} {'─'*7} {'─'*7} {'─'*5} {'─'*9}")
+    print(f"{'-'*10} {'-'*6} {'-'*6} {'-'*7} {'-'*7} {'-'*7} {'-'*5} {'-'*9}")
     for sym in TARGET_ASSETS:
         if sym not in all_results:
             print(f"{sym:<10} {'SKIP':>6}")
@@ -625,9 +625,9 @@ def main():
               f"{r['net_pnl_after_commission_pips']:>+9.1f}")
     print(f"\nSub-1.0 RR trades across ALL assets: {total_sub1}")
     if total_sub1 == 0:
-        print("✅ ALL SUB-1.0 RR TRADES ELIMINATED — FIXES VERIFIED")
+        print("[PASS] ALL SUB-1.0 RR TRADES ELIMINATED -- FIXES VERIFIED")
     else:
-        print(f"⚠️  {total_sub1} sub-1.0 RR trades remain — needs investigation")
+        print(f"[FAIL] {total_sub1} sub-1.0 RR trades remain -- needs investigation")
     print(f"{'=' * 70}")
 
 

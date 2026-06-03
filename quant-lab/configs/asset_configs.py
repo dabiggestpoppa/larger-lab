@@ -1,3 +1,296 @@
+    # ─────────────────────────────────────────────────────
+    # FOREX CROSSES (NEW — fetched 2026-06-03)
+    # K-Means calibrated with percentile capping (T1<p75, T3<p95)
+    # ─────────────────────────────────────────────────────
+    "EURGBP": {
+        "name": "EUR/GBP",
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "tiers": {
+            "T1": {"ar_max": 20.98, "au": 7, "trigger": 8},
+            "T2": {"ar_max": 40.33, "au": 14, "trigger": 17},
+            "T3": {"ar_max": 40.33, "au": 19, "trigger": 23},
+        },
+        "gear_shifts": {
+            "T1": [(8, "T2"), (17, "T3")],
+            "T2": [(17, "T3")],
+        },
+        "p90_threshold": 3.36,
+        "fixed_tp": 14.0,
+    },
+    "EURJPY": {
+        "name": "EUR/JPY",
+        "pip_value": 0.01,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "tiers": {
+            "T1": {"ar_max": 91.57, "au": 29, "trigger": 35},
+            "T2": {"ar_max": 160.35, "au": 63, "trigger": 75},
+            "T3": {"ar_max": 160.35, "au": 63, "trigger": 76},
+        },
+        "gear_shifts": {
+            "T1": [(35, "T2"), (75, "T3")],
+            "T2": [(75, "T3")],
+        },
+        "p90_threshold": 13.92,
+        "fixed_tp": 58.0,
+    },
+    "EURAUD": {
+        "name": "EUR/AUD",
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "tiers": {
+            "T1": {"ar_max": 77.51, "au": 27, "trigger": 32},
+            "T2": {"ar_max": 135.4, "au": 51, "trigger": 61},
+            "T3": {"ar_max": 135.4, "au": 58, "trigger": 69},
+        },
+        "gear_shifts": {
+            "T1": [(32, "T2"), (61, "T3")],
+            "T2": [(61, "T3")],
+        },
+        "p90_threshold": 12.96,
+        "fixed_tp": 54.0,
+    },
+    "EURNZD": {
+        "name": "EUR/NZD",
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "tiers": {
+            "T1": {"ar_max": 77.48, "au": 28, "trigger": 34},
+            "T2": {"ar_max": 143.25, "au": 49, "trigger": 59},
+            "T3": {"ar_max": 143.25, "au": 61, "trigger": 73},
+        },
+        "gear_shifts": {
+            "T1": [(34, "T2"), (59, "T3")],
+            "T2": [(59, "T3")],
+        },
+        "p90_threshold": 13.44,
+        "fixed_tp": 56.0,
+    },
+    "EURCHF": {
+        "name": "EUR/CHF",
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "tiers": {
+            "T1": {"ar_max": 28.55, "au": 9, "trigger": 11},
+            "T2": {"ar_max": 53.15, "au": 19, "trigger": 23},
+            "T3": {"ar_max": 53.15, "au": 22, "trigger": 27},
+        },
+        "gear_shifts": {
+            "T1": [(11, "T2"), (23, "T3")],
+            "T2": [(23, "T3")],
+        },
+        "p90_threshold": 4.32,
+        "fixed_tp": 18.0,
+    },
+    "EURCAD": {
+        "name": "EUR/CAD",
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "tiers": {
+            "T1": {"ar_max": 38.86, "au": 13, "trigger": 16},
+            "T2": {"ar_max": 75.87, "au": 25, "trigger": 31},
+            "T3": {"ar_max": 75.87, "au": 32, "trigger": 38},
+        },
+        "gear_shifts": {
+            "T1": [(16, "T2"), (31, "T3")],
+            "T2": [(31, "T3")],
+        },
+        "p90_threshold": 6.24,
+        "fixed_tp": 26.0,
+    },
+    "USDCAD": {
+        "name": "USD/CAD",
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "tiers": {
+            "T1": {"ar_max": 31.17, "au": 11, "trigger": 13},
+            "T2": {"ar_max": 56.88, "au": 20, "trigger": 24},
+            "T3": {"ar_max": 56.88, "au": 27, "trigger": 32},
+        },
+        "gear_shifts": {
+            "T1": [(13, "T2"), (24, "T3")],
+            "T2": [(24, "T3")],
+        },
+        "p90_threshold": 5.28,
+        "fixed_tp": 22.0,
+    },
+    "AUDJPY": {
+        "name": "AUD/JPY",
+        "pip_value": 0.01,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "tiers": {
+            "T1": {"ar_max": 65.94, "au": 21, "trigger": 26},
+            "T2": {"ar_max": 119.73, "au": 45, "trigger": 53},
+            "T3": {"ar_max": 119.73, "au": 49, "trigger": 59},
+        },
+        "gear_shifts": {
+            "T1": [(26, "T2"), (53, "T3")],
+            "T2": [(53, "T3")],
+        },
+        "p90_threshold": 10.08,
+        "fixed_tp": 42.0,
+    },
+    "AUDNZD": {
+        "name": "AUD/NZD",
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "tiers": {
+            "T1": {"ar_max": 36.17, "au": 12, "trigger": 14},
+            "T2": {"ar_max": 65.5, "au": 24, "trigger": 29},
+            "T3": {"ar_max": 65.5, "au": 27, "trigger": 33},
+        },
+        "gear_shifts": {
+            "T1": [(14, "T2"), (29, "T3")],
+            "T2": [(29, "T3")],
+        },
+        "p90_threshold": 5.76,
+        "fixed_tp": 24.0,
+    },
+    "AUDCHF": {
+        "name": "AUD/CHF",
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "tiers": {
+            "T1": {"ar_max": 28.05, "au": 10, "trigger": 12},
+            "T2": {"ar_max": 55.24, "au": 18, "trigger": 22},
+            "T3": {"ar_max": 55.24, "au": 23, "trigger": 28},
+        },
+        "gear_shifts": {
+            "T1": [(12, "T2"), (22, "T3")],
+            "T2": [(22, "T3")],
+        },
+        "p90_threshold": 4.8,
+        "fixed_tp": 20.0,
+    },
+    "AUDCAD": {
+        "name": "AUD/CAD",
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "tiers": {
+            "T1": {"ar_max": 36.92, "au": 13, "trigger": 16},
+            "T2": {"ar_max": 67.8, "au": 24, "trigger": 29},
+            "T3": {"ar_max": 67.8, "au": 28, "trigger": 33},
+        },
+        "gear_shifts": {
+            "T1": [(16, "T2"), (29, "T3")],
+            "T2": [(29, "T3")],
+        },
+        "p90_threshold": 6.24,
+        "fixed_tp": 26.0,
+    },
+    "NZDJPY": {
+        "name": "NZD/JPY",
+        "pip_value": 0.01,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "tiers": {
+            "T1": {"ar_max": 62.7, "au": 20, "trigger": 24},
+            "T2": {"ar_max": 100.51, "au": 44, "trigger": 53},
+            "T3": {"ar_max": 100.51, "au": 43, "trigger": 51},
+        },
+        "gear_shifts": {
+            "T1": [(24, "T2"), (53, "T3")],
+            "T2": [(53, "T3")],
+        },
+        "p90_threshold": 9.6,
+        "fixed_tp": 40.0,
+    },
+    "NZDCHF": {
+        "name": "NZD/CHF",
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "tiers": {
+            "T1": {"ar_max": 27.68, "au": 9, "trigger": 11},
+            "T2": {"ar_max": 49.57, "au": 18, "trigger": 22},
+            "T3": {"ar_max": 49.57, "au": 21, "trigger": 25},
+        },
+        "gear_shifts": {
+            "T1": [(11, "T2"), (22, "T3")],
+            "T2": [(22, "T3")],
+        },
+        "p90_threshold": 4.32,
+        "fixed_tp": 18.0,
+    },
+    "NZDCAD": {
+        "name": "NZD/CAD",
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "tiers": {
+            "T1": {"ar_max": 33.79, "au": 12, "trigger": 15},
+            "T2": {"ar_max": 63.21, "au": 22, "trigger": 26},
+            "T3": {"ar_max": 63.21, "au": 27, "trigger": 32},
+        },
+        "gear_shifts": {
+            "T1": [(15, "T2"), (26, "T3")],
+            "T2": [(26, "T3")],
+        },
+        "p90_threshold": 5.76,
+        "fixed_tp": 24.0,
+    },
+    "CADJPY": {
+        "name": "CAD/JPY",
+        "pip_value": 0.01,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "tiers": {
+            "T1": {"ar_max": 61.54, "au": 19, "trigger": 23},
+            "T2": {"ar_max": 107.57, "au": 43, "trigger": 51},
+            "T3": {"ar_max": 107.57, "au": 42, "trigger": 50},
+        },
+        "gear_shifts": {
+            "T1": [(23, "T2"), (51, "T3")],
+            "T2": [(51, "T3")],
+        },
+        "p90_threshold": 9.12,
+        "fixed_tp": 38.0,
+    },
+    "CADCHF": {
+        "name": "CAD/CHF",
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "tiers": {
+            "T1": {"ar_max": 21.73, "au": 7, "trigger": 9},
+            "T2": {"ar_max": 41.15, "au": 14, "trigger": 17},
+            "T3": {"ar_max": 41.15, "au": 17, "trigger": 21},
+        },
+        "gear_shifts": {
+            "T1": [(9, "T2"), (17, "T3")],
+            "T2": [(17, "T3")],
+        },
+        "p90_threshold": 3.36,
+        "fixed_tp": 14.0,
+    },
+    "GBPCAD": {
+        "name": "GBP/CAD",
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "tiers": {
+            "T1": {"ar_max": 59.7, "au": 20, "trigger": 24},
+            "T2": {"ar_max": 104.24, "au": 45, "trigger": 55},
+            "T3": {"ar_max": 104.24, "au": 42, "trigger": 50},
+        },
+        "gear_shifts": {
+            "T1": [(24, "T2"), (55, "T3")],
+            "T2": [(55, "T3")],
+        },
+        "p90_threshold": 9.6,
+        "fixed_tp": 40.0,
+    },
 """
 CEREBUS FX v4.0 — Master Asset Configuration Registry
 ======================================================

@@ -1,0 +1,855 @@
+{
+  "calibrated": {
+    "EURGBP": {
+      "symbol": "EURGBP",
+      "pip_size": 0.0001,
+      "n_days": 956,
+      "ar_stats": {
+        "mean": 7.1,
+        "std": 4.5,
+        "min": 1.7,
+        "max": 63.5,
+        "p50": 5.9,
+        "p75": 8.3,
+        "p90": 11.5,
+        "p95": 14.4
+      },
+      "tier_dist_reference": {
+        "T1": 934,
+        "T2": 19,
+        "NO_GO": 2,
+        "T3": 1
+      },
+      "recommended_config": {
+        "k_factor": 0.48,
+        "T1": {
+          "ar_max": 10.0,
+          "au": 4.8,
+          "trigger": 5.8
+        },
+        "T2": {
+          "ar_max": 15.0,
+          "au": 7.2,
+          "trigger": 8.6
+        },
+        "T3": {
+          "ar_max": 23.0,
+          "au": 11.0,
+          "trigger": 13.2
+        }
+      },
+      "tier_dist_recommended": {
+        "T1": 810,
+        "T2": 106,
+        "T3": 27,
+        "NO_GO": 13
+      },
+      "impulse_stats": {
+        "mean": 1.3,
+        "p50": 1.1,
+        "p90": 2.2
+      }
+    },
+    "EURJPY": {
+      "symbol": "EURJPY",
+      "pip_size": 0.01,
+      "n_days": 956,
+      "ar_stats": {
+        "mean": 38.0,
+        "std": 29.9,
+        "min": 7.8,
+        "max": 511.0,
+        "p50": 31.6,
+        "p75": 44.1,
+        "p90": 62.4,
+        "p95": 78.0
+      },
+      "tier_dist_reference": {
+        "T3": 293,
+        "T2": 277,
+        "NO_GO": 226,
+        "T1": 160
+      },
+      "recommended_config": {
+        "k_factor": 0.48,
+        "T1": {
+          "ar_max": 28.4,
+          "au": 13.6,
+          "trigger": 16.3
+        },
+        "T2": {
+          "ar_max": 39.7,
+          "au": 19.1,
+          "trigger": 22.9
+        },
+        "T3": {
+          "ar_max": 59.3,
+          "au": 28.5,
+          "trigger": 34.2
+        }
+      },
+      "tier_dist_recommended": {
+        "T1": 399,
+        "T2": 245,
+        "T3": 204,
+        "NO_GO": 108
+      },
+      "impulse_stats": {
+        "mean": 6.1,
+        "p50": 4.8,
+        "p90": 10.4
+      }
+    },
+    "EURAUD": {
+      "symbol": "EURAUD",
+      "pip_size": 0.0001,
+      "n_days": 967,
+      "ar_stats": {
+        "mean": 43.4,
+        "std": 24.6,
+        "min": 9.9,
+        "max": 253.8,
+        "p50": 36.7,
+        "p75": 51.6,
+        "p90": 70.8,
+        "p95": 91.0
+      },
+      "tier_dist_reference": {
+        "T3": 342,
+        "NO_GO": 331,
+        "T2": 228,
+        "T1": 66
+      },
+      "recommended_config": {
+        "k_factor": 0.48,
+        "T1": {
+          "ar_max": 33.0,
+          "au": 15.8,
+          "trigger": 19.0
+        },
+        "T2": {
+          "ar_max": 46.4,
+          "au": 22.3,
+          "trigger": 26.8
+        },
+        "T3": {
+          "ar_max": 67.2,
+          "au": 32.3,
+          "trigger": 38.8
+        }
+      },
+      "tier_dist_recommended": {
+        "T1": 378,
+        "T2": 284,
+        "T3": 191,
+        "NO_GO": 114
+      },
+      "impulse_stats": {
+        "mean": 5.8,
+        "p50": 5.1,
+        "p90": 9.2
+      }
+    },
+    "EURNZD": {
+      "symbol": "EURNZD",
+      "pip_size": 0.0001,
+      "n_days": 956,
+      "ar_stats": {
+        "mean": 46.4,
+        "std": 28.5,
+        "min": 12.3,
+        "max": 258.4,
+        "p50": 39.2,
+        "p75": 53.9,
+        "p90": 74.9,
+        "p95": 94.1
+      },
+      "tier_dist_reference": {
+        "NO_GO": 358,
+        "T3": 347,
+        "T2": 208,
+        "T1": 43
+      },
+      "recommended_config": {
+        "k_factor": 0.48,
+        "T1": {
+          "ar_max": 35.2,
+          "au": 16.9,
+          "trigger": 20.3
+        },
+        "T2": {
+          "ar_max": 48.5,
+          "au": 23.3,
+          "trigger": 28.0
+        },
+        "T3": {
+          "ar_max": 71.1,
+          "au": 34.1,
+          "trigger": 40.9
+        }
+      },
+      "tier_dist_recommended": {
+        "T1": 381,
+        "T2": 272,
+        "T3": 194,
+        "NO_GO": 109
+      },
+      "impulse_stats": {
+        "mean": 6.2,
+        "p50": 5.4,
+        "p90": 10.0
+      }
+    },
+    "EURCHF": {
+      "symbol": "EURCHF",
+      "pip_size": 0.0001,
+      "n_days": 967,
+      "ar_stats": {
+        "mean": 9.2,
+        "std": 7.2,
+        "min": 2.5,
+        "max": 138.8,
+        "p50": 7.6,
+        "p75": 10.6,
+        "p90": 14.6,
+        "p95": 18.3
+      },
+      "tier_dist_reference": {
+        "T1": 927,
+        "T2": 28,
+        "T3": 10,
+        "NO_GO": 2
+      },
+      "recommended_config": {
+        "k_factor": 0.48,
+        "T1": {
+          "ar_max": 10.0,
+          "au": 4.8,
+          "trigger": 5.8
+        },
+        "T2": {
+          "ar_max": 15.0,
+          "au": 7.2,
+          "trigger": 8.6
+        },
+        "T3": {
+          "ar_max": 23.0,
+          "au": 11.0,
+          "trigger": 13.2
+        }
+      },
+      "tier_dist_recommended": {
+        "T1": 683,
+        "T2": 193,
+        "T3": 61,
+        "NO_GO": 30
+      },
+      "impulse_stats": {
+        "mean": 1.6,
+        "p50": 1.3,
+        "p90": 2.7
+      }
+    },
+    "EURCAD": {
+      "symbol": "EURCAD",
+      "pip_size": 0.0001,
+      "n_days": 967,
+      "ar_stats": {
+        "mean": 16.4,
+        "std": 10.2,
+        "min": 5.1,
+        "max": 162.1,
+        "p50": 14.2,
+        "p75": 18.8,
+        "p90": 26.5,
+        "p95": 33.8
+      },
+      "tier_dist_reference": {
+        "T1": 763,
+        "T2": 134,
+        "T3": 55,
+        "NO_GO": 15
+      },
+      "recommended_config": {
+        "k_factor": 0.48,
+        "T1": {
+          "ar_max": 12.8,
+          "au": 6.1,
+          "trigger": 7.3
+        },
+        "T2": {
+          "ar_max": 17.8,
+          "au": 8.5,
+          "trigger": 10.2
+        },
+        "T3": {
+          "ar_max": 25.8,
+          "au": 12.4,
+          "trigger": 14.9
+        }
+      },
+      "tier_dist_recommended": {
+        "T1": 396,
+        "T2": 293,
+        "T3": 173,
+        "NO_GO": 105
+      },
+      "impulse_stats": {
+        "mean": 2.8,
+        "p50": 2.4,
+        "p90": 4.6
+      }
+    },
+    "USDCAD": {
+      "symbol": "USDCAD",
+      "pip_size": 0.0001,
+      "n_days": 967,
+      "ar_stats": {
+        "mean": 17.0,
+        "std": 9.4,
+        "min": 4.0,
+        "max": 89.1,
+        "p50": 14.8,
+        "p75": 20.2,
+        "p90": 26.3,
+        "p95": 34.2
+      },
+      "tier_dist_reference": {
+        "T1": 713,
+        "T2": 185,
+        "T3": 50,
+        "NO_GO": 19
+      },
+      "recommended_config": {
+        "k_factor": 0.48,
+        "T1": {
+          "ar_max": 13.3,
+          "au": 6.4,
+          "trigger": 7.7
+        },
+        "T2": {
+          "ar_max": 18.3,
+          "au": 8.8,
+          "trigger": 10.6
+        },
+        "T3": {
+          "ar_max": 26.3,
+          "au": 12.6,
+          "trigger": 15.1
+        }
+      },
+      "tier_dist_recommended": {
+        "T1": 383,
+        "T2": 283,
+        "T3": 204,
+        "NO_GO": 97
+      },
+      "impulse_stats": {
+        "mean": 2.4,
+        "p50": 2.0,
+        "p90": 4.1
+      }
+    },
+    "AUDJPY": {
+      "symbol": "AUDJPY",
+      "pip_size": 0.01,
+      "n_days": 967,
+      "ar_stats": {
+        "mean": 35.7,
+        "std": 23.2,
+        "min": 6.5,
+        "max": 370.2,
+        "p50": 30.3,
+        "p75": 41.4,
+        "p90": 58.6,
+        "p95": 74.0
+      },
+      "tier_dist_reference": {
+        "T3": 292,
+        "T2": 292,
+        "NO_GO": 203,
+        "T1": 180
+      },
+      "recommended_config": {
+        "k_factor": 0.48,
+        "T1": {
+          "ar_max": 27.3,
+          "au": 13.1,
+          "trigger": 15.7
+        },
+        "T2": {
+          "ar_max": 37.3,
+          "au": 17.9,
+          "trigger": 21.5
+        },
+        "T3": {
+          "ar_max": 55.7,
+          "au": 26.7,
+          "trigger": 32.0
+        }
+      },
+      "tier_dist_recommended": {
+        "T1": 402,
+        "T2": 245,
+        "T3": 204,
+        "NO_GO": 116
+      },
+      "impulse_stats": {
+        "mean": 5.1,
+        "p50": 4.2,
+        "p90": 8.1
+      }
+    },
+    "AUDNZD": {
+      "symbol": "AUDNZD",
+      "pip_size": 0.0001,
+      "n_days": 967,
+      "ar_stats": {
+        "mean": 21.0,
+        "std": 14.4,
+        "min": 5.9,
+        "max": 129.4,
+        "p50": 16.9,
+        "p75": 23.8,
+        "p90": 34.0,
+        "p95": 46.1
+      },
+      "tier_dist_reference": {
+        "T1": 610,
+        "T2": 213,
+        "T3": 94,
+        "NO_GO": 50
+      },
+      "recommended_config": {
+        "k_factor": 0.48,
+        "T1": {
+          "ar_max": 15.2,
+          "au": 7.3,
+          "trigger": 8.8
+        },
+        "T2": {
+          "ar_max": 21.4,
+          "au": 10.3,
+          "trigger": 12.4
+        },
+        "T3": {
+          "ar_max": 32.3,
+          "au": 15.5,
+          "trigger": 18.6
+        }
+      },
+      "tier_dist_recommended": {
+        "T1": 389,
+        "T2": 275,
+        "T3": 194,
+        "NO_GO": 109
+      },
+      "impulse_stats": {
+        "mean": 2.9,
+        "p50": 2.6,
+        "p90": 4.7
+      }
+    },
+    "AUDCHF": {
+      "symbol": "AUDCHF",
+      "pip_size": 0.0001,
+      "n_days": 967,
+      "ar_stats": {
+        "mean": 16.4,
+        "std": 9.8,
+        "min": 4.2,
+        "max": 102.7,
+        "p50": 14.0,
+        "p75": 19.6,
+        "p90": 27.2,
+        "p95": 33.6
+      },
+      "tier_dist_reference": {
+        "T1": 736,
+        "T2": 160,
+        "T3": 52,
+        "NO_GO": 19
+      },
+      "recommended_config": {
+        "k_factor": 0.48,
+        "T1": {
+          "ar_max": 12.6,
+          "au": 6.0,
+          "trigger": 7.2
+        },
+        "T2": {
+          "ar_max": 17.6,
+          "au": 8.4,
+          "trigger": 10.1
+        },
+        "T3": {
+          "ar_max": 25.9,
+          "au": 12.4,
+          "trigger": 14.9
+        }
+      },
+      "tier_dist_recommended": {
+        "T1": 402,
+        "T2": 245,
+        "T3": 204,
+        "NO_GO": 116
+      },
+      "impulse_stats": {
+        "mean": 2.2,
+        "p50": 1.9,
+        "p90": 3.6
+      }
+    },
+    "AUDCAD": {
+      "symbol": "AUDCAD",
+      "pip_size": 0.0001,
+      "n_days": 961,
+      "ar_stats": {
+        "mean": 21.8,
+        "std": 11.7,
+        "min": 4.8,
+        "max": 103.5,
+        "p50": 19.0,
+        "p75": 25.8,
+        "p90": 34.7,
+        "p95": 43.4
+      },
+      "tier_dist_reference": {
+        "T1": 523,
+        "T2": 272,
+        "T3": 122,
+        "NO_GO": 44
+      },
+      "recommended_config": {
+        "k_factor": 0.48,
+        "T1": {
+          "ar_max": 17.1,
+          "au": 8.2,
+          "trigger": 9.8
+        },
+        "T2": {
+          "ar_max": 23.2,
+          "au": 11.1,
+          "trigger": 13.3
+        },
+        "T3": {
+          "ar_max": 33.0,
+          "au": 15.8,
+          "trigger": 19.0
+        }
+      },
+      "tier_dist_recommended": {
+        "T1": 385,
+        "T2": 254,
+        "T3": 205,
+        "NO_GO": 117
+      },
+      "impulse_stats": {
+        "mean": 3.0,
+        "p50": 2.6,
+        "p90": 4.7
+      }
+    },
+    "NZDJPY": {
+      "symbol": "NZDJPY",
+      "pip_size": 0.01,
+      "n_days": 967,
+      "ar_stats": {
+        "mean": 31.3,
+        "std": 21.2,
+        "min": 9.0,
+        "max": 326.7,
+        "p50": 26.2,
+        "p75": 36.3,
+        "p90": 50.8,
+        "p95": 67.7
+      },
+      "tier_dist_reference": {
+        "T2": 346,
+        "T1": 259,
+        "T3": 220,
+        "NO_GO": 142
+      },
+      "recommended_config": {
+        "k_factor": 0.48,
+        "T1": {
+          "ar_max": 23.6,
+          "au": 11.3,
+          "trigger": 13.6
+        },
+        "T2": {
+          "ar_max": 32.7,
+          "au": 15.7,
+          "trigger": 18.8
+        },
+        "T3": {
+          "ar_max": 48.3,
+          "au": 23.2,
+          "trigger": 27.8
+        }
+      },
+      "tier_dist_recommended": {
+        "T1": 394,
+        "T2": 265,
+        "T3": 196,
+        "NO_GO": 112
+      },
+      "impulse_stats": {
+        "mean": 4.4,
+        "p50": 3.7,
+        "p90": 7.0
+      }
+    },
+    "NZDCHF": {
+      "symbol": "NZDCHF",
+      "pip_size": 0.0001,
+      "n_days": 967,
+      "ar_stats": {
+        "mean": 14.4,
+        "std": 9.6,
+        "min": 3.5,
+        "max": 100.8,
+        "p50": 12.0,
+        "p75": 16.7,
+        "p90": 23.3,
+        "p95": 29.8
+      },
+      "tier_dist_reference": {
+        "T1": 820,
+        "T2": 99,
+        "T3": 32,
+        "NO_GO": 16
+      },
+      "recommended_config": {
+        "k_factor": 0.48,
+        "T1": {
+          "ar_max": 10.8,
+          "au": 5.2,
+          "trigger": 6.2
+        },
+        "T2": {
+          "ar_max": 15.8,
+          "au": 7.6,
+          "trigger": 9.1
+        },
+        "T3": {
+          "ar_max": 23.8,
+          "au": 11.4,
+          "trigger": 13.7
+        }
+      },
+      "tier_dist_recommended": {
+        "T1": 397,
+        "T2": 296,
+        "T3": 182,
+        "NO_GO": 92
+      },
+      "impulse_stats": {
+        "mean": 1.9,
+        "p50": 1.7,
+        "p90": 3.1
+      }
+    },
+    "NZDCAD": {
+      "symbol": "NZDCAD",
+      "pip_size": 0.0001,
+      "n_days": 967,
+      "ar_stats": {
+        "mean": 20.1,
+        "std": 12.2,
+        "min": 5.4,
+        "max": 127.2,
+        "p50": 17.2,
+        "p75": 23.5,
+        "p90": 31.6,
+        "p95": 41.4
+      },
+      "tier_dist_reference": {
+        "T1": 617,
+        "T2": 239,
+        "T3": 73,
+        "NO_GO": 38
+      },
+      "recommended_config": {
+        "k_factor": 0.48,
+        "T1": {
+          "ar_max": 15.5,
+          "au": 7.4,
+          "trigger": 8.9
+        },
+        "T2": {
+          "ar_max": 21.2,
+          "au": 10.2,
+          "trigger": 12.2
+        },
+        "T3": {
+          "ar_max": 30.0,
+          "au": 14.4,
+          "trigger": 17.3
+        }
+      },
+      "tier_dist_recommended": {
+        "T1": 395,
+        "T2": 261,
+        "T3": 200,
+        "NO_GO": 111
+      },
+      "impulse_stats": {
+        "mean": 2.7,
+        "p50": 2.4,
+        "p90": 4.5
+      }
+    },
+    "CADJPY": {
+      "symbol": "CADJPY",
+      "pip_size": 0.01,
+      "n_days": 956,
+      "ar_stats": {
+        "mean": 27.6,
+        "std": 21.2,
+        "min": 5.3,
+        "max": 363.4,
+        "p50": 22.9,
+        "p75": 32.1,
+        "p90": 45.3,
+        "p95": 56.3
+      },
+      "tier_dist_reference": {
+        "T1": 367,
+        "T2": 302,
+        "T3": 190,
+        "NO_GO": 97
+      },
+      "recommended_config": {
+        "k_factor": 0.48,
+        "T1": {
+          "ar_max": 20.7,
+          "au": 9.9,
+          "trigger": 11.9
+        },
+        "T2": {
+          "ar_max": 28.9,
+          "au": 13.9,
+          "trigger": 16.7
+        },
+        "T3": {
+          "ar_max": 43.0,
+          "au": 20.6,
+          "trigger": 24.7
+        }
+      },
+      "tier_dist_recommended": {
+        "T1": 395,
+        "T2": 254,
+        "T3": 197,
+        "NO_GO": 110
+      },
+      "impulse_stats": {
+        "mean": 4.3,
+        "p50": 3.5,
+        "p90": 7.2
+      }
+    },
+    "CADCHF": {
+      "symbol": "CADCHF",
+      "pip_size": 0.0001,
+      "n_days": 967,
+      "ar_stats": {
+        "mean": 8.5,
+        "std": 5.7,
+        "min": 2.6,
+        "max": 91.0,
+        "p50": 7.0,
+        "p75": 9.8,
+        "p90": 13.8,
+        "p95": 17.5
+      },
+      "tier_dist_reference": {
+        "T1": 935,
+        "T2": 21,
+        "T3": 9,
+        "NO_GO": 2
+      },
+      "recommended_config": {
+        "k_factor": 0.48,
+        "T1": {
+          "ar_max": 10.0,
+          "au": 4.8,
+          "trigger": 5.8
+        },
+        "T2": {
+          "ar_max": 15.0,
+          "au": 7.2,
+          "trigger": 8.6
+        },
+        "T3": {
+          "ar_max": 23.0,
+          "au": 11.0,
+          "trigger": 13.2
+        }
+      },
+      "tier_dist_recommended": {
+        "T1": 740,
+        "T2": 153,
+        "T3": 54,
+        "NO_GO": 20
+      },
+      "impulse_stats": {
+        "mean": 1.4,
+        "p50": 1.1,
+        "p90": 2.3
+      }
+    },
+    "GBPCAD": {
+      "symbol": "GBPCAD",
+      "pip_size": 0.0001,
+      "n_days": 967,
+      "ar_stats": {
+        "mean": 18.8,
+        "std": 15.9,
+        "min": 5.4,
+        "max": 399.4,
+        "p50": 15.6,
+        "p75": 21.6,
+        "p90": 29.7,
+        "p95": 37.5
+      },
+      "tier_dist_reference": {
+        "T1": 672,
+        "T2": 200,
+        "T3": 71,
+        "NO_GO": 24
+      },
+      "recommended_config": {
+        "k_factor": 0.48,
+        "T1": {
+          "ar_max": 14.0,
+          "au": 6.7,
+          "trigger": 8.0
+        },
+        "T2": {
+          "ar_max": 19.4,
+          "au": 9.3,
+          "trigger": 11.2
+        },
+        "T3": {
+          "ar_max": 28.3,
+          "au": 13.6,
+          "trigger": 16.3
+        }
+      },
+      "tier_dist_recommended": {
+        "T1": 383,
+        "T2": 268,
+        "T3": 208,
+        "NO_GO": 108
+      },
+      "impulse_stats": {
+        "mean": 3.4,
+        "p50": 2.8,
+        "p90": 5.5
+      }
+    }
+  },
+  "missing": []
+}

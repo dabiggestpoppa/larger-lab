@@ -1,0 +1,50 @@
+{
+  "symbol": "EURAUD",
+  "pip_size": 0.0001,
+  "n_days": 967,
+  "ar_stats": {
+    "mean": 43.4,
+    "std": 24.6,
+    "min": 9.9,
+    "max": 253.8,
+    "p50": 36.7,
+    "p75": 51.6,
+    "p90": 70.8,
+    "p95": 91.0
+  },
+  "tier_dist_reference": {
+    "T3": 342,
+    "NO_GO": 331,
+    "T2": 228,
+    "T1": 66
+  },
+  "recommended_config": {
+    "k_factor": 0.48,
+    "T1": {
+      "ar_max": 33.0,
+      "au": 15.8,
+      "trigger": 19.0
+    },
+    "T2": {
+      "ar_max": 46.4,
+      "au": 22.3,
+      "trigger": 26.8
+    },
+    "T3": {
+      "ar_max": 67.2,
+      "au": 32.3,
+      "trigger": 38.8
+    }
+  },
+  "tier_dist_recommended": {
+    "T1": 378,
+    "T2": 284,
+    "T3": 191,
+    "NO_GO": 114
+  },
+  "impulse_stats": {
+    "mean": 5.8,
+    "p50": 5.1,
+    "p90": 9.2
+  }
+}

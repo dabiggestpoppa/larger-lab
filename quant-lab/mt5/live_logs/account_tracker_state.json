@@ -1,39 +1,20 @@
 {
-  "timestamp": "2026-06-03T17:05:30.464843",
+  "timestamp": "2026-06-03T19:05:06.210311",
   "account": {
     "login": 650898,
     "server": "OxSecurities-Live",
-    "balance": 65.79,
-    "equity": 65.55,
-    "profit": -0.24,
-    "margin": 2.32,
-    "margin_free": 63.23,
-    "margin_level": 2825.4310344827586,
+    "balance": 65.39,
+    "equity": 65.39,
+    "profit": 0.0,
+    "margin": 0.0,
+    "margin_free": 65.39,
+    "margin_level": 0.0,
     "leverage": 500,
     "currency": "USD",
     "name": "Jaelon Scott - Live #0",
     "company": "Ox Securities Pty Ltd"
   },
-  "positions": [
-    {
-      "ticket": 91943356,
-      "symbol": "EURUSD.PRO",
-      "type": "SELL",
-      "volume": 0.01,
-      "open_price": 1.15986,
-      "current_price": 1.16012,
-      "sl": 1.16039,
-      "tp": 1.15886,
-      "profit": -0.26,
-      "swap": 0.02,
-      "magic": 20260601,
-      "comment": "CEREBUS-ST-L4",
-      "time": "2026-06-03T15:09:59",
-      "sl_pips": 5.3,
-      "tp_pips": 10.0,
-      "rr": 1.89
-    }
-  ],
+  "positions": [],
   "today_history": [
     {
       "ticket": 109664762,
@@ -814,13 +795,26 @@
       "magic": 20260601,
       "comment": "[sl 202.009]",
       "time": "2026-06-03T15:57:14"
+    },
+    {
+      "ticket": 109775253,
+      "symbol": "GBPAUD.PRO",
+      "type": "BUY",
+      "volume": 0.01,
+      "price": 1.88231,
+      "profit": -0.83,
+      "swap": 0.0,
+      "commission": 0.0,
+      "magic": 20260601,
+      "comment": "[sl 1.88231]",
+      "time": "2026-06-03T18:50:15"
     }
   ],
   "today_stats": {
-    "trades": 60,
-    "pnl": 1.36,
+    "trades": 61,
+    "pnl": 0.53,
     "wins": 25,
-    "losses": 35,
-    "win_rate": 41.7
+    "losses": 36,
+    "win_rate": 41.0
   }
 }

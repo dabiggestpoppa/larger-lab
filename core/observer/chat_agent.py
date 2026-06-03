@@ -1,12 +1,15 @@
-"""Chat agent for Primary Observer — with robust response parsing."""
+"""Chat agent for Primary Observer — with tool calling support."""
 import os, json, requests, datetime, time
 from typing import Dict, Any, List, Optional
 
 MODEL_CHAIN = [
-    "moonshotai/kimi-k2.6:free",
     "openrouter/owl-alpha",
+    "moonshotai/kimi-k2.6:free",
     "poolside/laguna-m.1:free",
 ]
+
+from core.observer.tools import TOOL_DEFINITIONS, TOOL_FUNCTIONS
+
 
 class ChatAgent:
     def __init__(self, api_key: str = None):
@@ -26,18 +29,34 @@ class ChatAgent:
         sov = "\n" + sovereign_context if sovereign_context else ""
         return (
             "You are the Primary Observer (PO) — the operational intelligence layer for Larger-Lab.\n"
-            "You speak naturally and directly, like a senior engineer who knows the entire system.\n"
+            "You have access to tools that let you read files, list directories, run commands, and check git.\n"
+            "Use these tools to actually investigate the codebase and provide real answers.\n"
             f"- Current time: {ts}\n"
             f"{sov}\n\n"
+            "## Available Tools\n"
+            "When you need information, respond with a tool call in this format:\n"
+            "```tool\n"
+            "{\"tool\": \"tool_name\", \"args\": {\"arg1\": \"value1\"}}\n"
+            "```\n"
+            "Available tools:\n"
+            "- list_directory(path, max_depth, max_items) — explore file tree\n"
+            "- read_file(path, start_line, max_lines) — read file contents\n"
+            "- run_command(command, timeout, cwd) — execute shell commands\n"
+            "- git_status() — check modified/added/deleted files\n"
+            "- git_log(count) — recent commits\n"
+            "- search_files(pattern, path) — find files by name glob\n"
+            "- search_content(query, path, file_pattern) — search text in files\n\n"
+            "## Rules\n"
+            "1. ALWAYS use tools to get real data before answering questions about the codebase\n"
+            "2. Call tools one at a time, wait for results, then decide next step\n"
+            "3. After gathering info, provide a natural conversational response\n"
+            "4. Don't say 'let me check' without actually calling a tool\n"
+            "5. Be concise — don't dump entire file contents unless asked\n\n"
             "## Style\n"
             "Concise. Technical when needed, casual when appropriate. No filler.\n"
-            "Use emoji sparingly: ✅ ❌ ⚠️ 🔄 📊 🔍 only when they add clarity.\n"
-            "Reference specific files, commits, vault notes by name when relevant.\n"
-            "If the user says something short like 'yoo' or 'what happened', respond naturally — "
-            "don't dump system state unless asked. Be a conversation partner, not a status report.\n"
+            "Reference specific files, commits by name when relevant.\n"
             f"{ctx}\n\n"
-            "When asked for status or 'what happened', give a brief operational summary: "
-            "what's running, what completed, any issues. Keep it tight."
+            "When asked for status, use git_status() and git_log() to get real data first."
         )
 
     def _get_vault_context(self, message: str) -> str:
@@ -59,10 +78,7 @@ class ChatAgent:
         try:
             r = requests.post(
                 self.base_url,
-                headers={
-                    "Authorization": "Bearer " + self.api_key,
-                    "Content-Type": "application/json",
-                },
+                headers={"Authorization": "Bearer " + self.api_key, "Content-Type": "application/json"},
                 json={"model": model, "messages": messages, "max_tokens": 4096, "temperature": 0.7},
                 timeout=120,
             )
@@ -71,7 +87,6 @@ class ChatAgent:
             if r.status_code >= 400:
                 return None, model, "http_" + str(r.status_code) + ": " + r.text[:200]
             data = r.json()
-            # Try multiple response formats
             if "choices" in data and len(data["choices"]) > 0:
                 c = data["choices"][0]
                 if isinstance(c, dict):
@@ -89,25 +104,80 @@ class ChatAgent:
         except Exception as e:
             return None, model, str(e)[:200]
 
-    def chat(self, message: str, sovereign_context: str = "") -> str:
+    def _parse_tool_call(self, content: str) -> Optional[Dict]:
+        """Parse a tool call from LLM response. Looks for ```tool ... ``` blocks."""
+        if "```tool" in content:
+            try:
+                start = content.index("```tool") + len("```tool")
+                end = content.index("```", start)
+                tool_json = content[start:end].strip()
+                return json.loads(tool_json)
+            except (ValueError, json.JSONDecodeError):
+                return None
+        return None
+
+    def _execute_tool(self, tool_call: Dict) -> str:
+        """Execute a tool call and return the result."""
+        tool_name = tool_call.get("tool", "")
+        args = tool_call.get("args", {})
+        if tool_name not in TOOL_FUNCTIONS:
+            return f"Unknown tool: {tool_name}. Available: {', '.join(TOOL_FUNCTIONS.keys())}"
+        try:
+            result = TOOL_FUNCTIONS[tool_name](**args)
+            return str(result)
+        except Exception as e:
+            return f"Error executing {tool_name}: {e}"
+
+    def chat(self, message: str, sovereign_context: str = "", max_tool_rounds: int = 5) -> str:
+        """Chat with tool-calling support. LLM can request tool executions."""
         if not self.api_key:
             return "LLM not configured. Set OPENROUTER_API_KEY."
+
         vault_context = self._get_vault_context(message)
         system_prompt = self._build_system_prompt(vault_context=vault_context, sovereign_context=sovereign_context)
+
         messages = [{"role": "system", "content": system_prompt}]
         for h in self._history[-self._max_history:]:
             messages.append(h)
         messages.append({"role": "user", "content": message})
+
+        for round_num in range(max_tool_rounds):
+            for attempt in range(len(MODEL_CHAIN)):
+                model = MODEL_CHAIN[(self._model_index + attempt) % len(MODEL_CHAIN)]
+                resp, used_model, err = self._call_llm(messages, model)
+                if resp:
+                    self._model_index = MODEL_CHAIN.index(used_model)
+                    break
+                continue
+
+            if not resp:
+                return "All LLM providers failed."
+
+            tool_call = self._parse_tool_call(resp)
+            if tool_call:
+                tool_result = self._execute_tool(tool_call)
+                messages.append({"role": "assistant", "content": resp})
+                messages.append({
+                    "role": "user",
+                    "content": f"Tool result for {tool_call.get('tool', 'unknown')}:\n{tool_result}\n\nUse this to respond to the user."
+                })
+                continue
+            else:
+                self._history.append({"role": "user", "content": message})
+                self._history.append({"role": "assistant", "content": resp})
+                return resp
+
+        # Max rounds — ask for final response
+        messages.append({"role": "user", "content": "Max tool calls reached. Provide your final response."})
         for attempt in range(len(MODEL_CHAIN)):
             model = MODEL_CHAIN[(self._model_index + attempt) % len(MODEL_CHAIN)]
             resp, used_model, err = self._call_llm(messages, model)
             if resp:
-                self._model_index = MODEL_CHAIN.index(used_model)
                 self._history.append({"role": "user", "content": message})
                 self._history.append({"role": "assistant", "content": resp})
                 return resp
             continue
-        return "All LLM providers failed."
+        return "All LLM providers failed after tool calls."
 
     def clear_history(self):
         self._history.clear()

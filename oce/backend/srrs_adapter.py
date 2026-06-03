@@ -485,44 +485,56 @@ class SRRSAdapter:
         session_id = self._chat_log.get_current_session()
 
         try:
-            # ── Full Pipeline: All messages go through the observer field ──
-            # The fast path was bypassing the pipeline for conversational messages,
-            # causing static responses. The new dynamic response generation handles
-            # all message types contextually.
-            # Step 1: O-1 Primary Observer receives input
+            # ── Step 1: O-1 Primary Observer receives input ──
             orch_response = self._primary_observer.receive_input(
                 user_input=message,
                 session_context=context or {},
             )
 
-            # Step 2: O-2 Observer Consensus
+            # ── Step 2: O-2 Observer Consensus ──
             consensus_result = self._observer_consensus.reach_consensus(
                 user_input=message,
                 observer_signals=None,
                 session_context=context or {},
             )
 
-            # Step 3: O-3 Spawn pipeline for response generation
-            # Include conversation history for context-aware responses
+            # ── Step 3: Generate response via LLM (ChatAgent/OpenRouter) ──
+            # ALL messages go through the LLM for natural, contextual responses.
+            # The LLM receives system state, conversation history, and observer context.
+            from core.observer.chat_agent import ChatAgent
+            agent = ChatAgent()
+
+            # Build conversation history for the LLM
             recent_history = self._chat_log.get_session_messages(session_id)
-            spawn_result = await self._agent_spawner.spawn(
-                user_input=message,
-                session_context={
-                    "last_domain": orch_response.task_domain,
-                    "last_complexity": orch_response.complexity,
-                    "conversation_history": recent_history[-10:],  # last 10 messages for context
-                    "session_id": session_id,
-                    **(context or {}),
-                },
-            )
+            history_msgs = []
+            for m in recent_history[-10:]:
+                role = "assistant" if m.get("role") == "assistant" else "user"
+                history_msgs.append({"role": role, "content": m.get("content", "")})
+            agent._history = history_msgs
 
-            # Step 4: Gather system state for enrichment
-            observer_health = self._primary_observer.health
-            consensus_stats = self._observer_consensus.get_stats()
+            # Build sovereign context with real system state
             spawn_snapshot = self._spawn_registry.get_field_snapshot()
+            observer_health = self._primary_observer.health
+            sov_lines = [
+                "## System State",
+                "- Active agents: " + str(spawn_snapshot.get("active_agents", 0)),
+                "- Total spawns: " + str(spawn_snapshot.get("total_agents", 0)),
+                "- Observer health: " + str(observer_health.get("status", "unknown")),
+                "- Continuity score: " + str(observer_health.get("continuity_score", 0)),
+                "- Consensus agreement: " + str(round(consensus_result.agreement_score * 100)) + "%",
+                "- Routing path: " + " -> ".join(consensus_result.routing_path),
+                "- Task type: " + consensus_result.task_type,
+                "- Complexity: " + consensus_result.complexity,
+            ]
+            sovereign_context = "\n".join(sov_lines)
 
-            # Step 5: Build enriched response
-            response_text = spawn_result.output if spawn_result.status == "completed" else orch_response.message
+            response_text = agent.chat(message, sovereign_context=sovereign_context)
+            spawn_status = "completed"
+
+            # ── Step 4: Gather system state for enrichment ──
+            consensus_stats = self._observer_consensus.get_stats()
+
+            # ── Step 5: Build enriched response ──
 
             result = {
                 "response": response_text,
@@ -533,7 +545,7 @@ class SRRSAdapter:
                     "routing_path": consensus_result.routing_path,
                     "model": consensus_result.recommended_model,
                     "agreement": consensus_result.agreement_score,
-                    "spawn_status": spawn_result.status,
+                    "spawn_status": spawn_status,
                 },
                 "system": {
                     "health": observer_health.get("status", "unknown"),
@@ -551,7 +563,7 @@ class SRRSAdapter:
                 task_domain=consensus_result.task_type,
                 complexity=consensus_result.complexity,
                 timestamp=datetime.now(timezone.utc).isoformat(),
-                success=spawn_result.status == "completed",
+                success=spawn_status == "completed",
             ))
 
             # Log the observer response to chat log
@@ -565,7 +577,7 @@ class SRRSAdapter:
                     "routing_path": consensus_result.routing_path,
                     "model": consensus_result.recommended_model,
                     "confidence": consensus_result.confidence,
-                    "spawn_status": spawn_result.status,
+                    "spawn_status": spawn_status,
                     "agreement": consensus_result.agreement_score,
                 },
             )

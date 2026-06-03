@@ -1,0 +1,50 @@
+{
+  "symbol": "AUDNZD",
+  "pip_size": 0.0001,
+  "n_days": 967,
+  "ar_stats": {
+    "mean": 21.0,
+    "std": 14.4,
+    "min": 5.9,
+    "max": 129.4,
+    "p50": 16.9,
+    "p75": 23.8,
+    "p90": 34.0,
+    "p95": 46.1
+  },
+  "tier_dist_reference": {
+    "T1": 610,
+    "T2": 213,
+    "T3": 94,
+    "NO_GO": 50
+  },
+  "recommended_config": {
+    "k_factor": 0.48,
+    "T1": {
+      "ar_max": 15.2,
+      "au": 7.3,
+      "trigger": 8.8
+    },
+    "T2": {
+      "ar_max": 21.4,
+      "au": 10.3,
+      "trigger": 12.4
+    },
+    "T3": {
+      "ar_max": 32.3,
+      "au": 15.5,
+      "trigger": 18.6
+    }
+  },
+  "tier_dist_recommended": {
+    "T1": 389,
+    "T2": 275,
+    "T3": 194,
+    "NO_GO": 109
+  },
+  "impulse_stats": {
+    "mean": 2.9,
+    "p50": 2.6,
+    "p90": 4.7
+  }
+}

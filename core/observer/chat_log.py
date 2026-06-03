@@ -19,8 +19,7 @@ from pathlib import Path
 from typing import Any, Optional
 from collections import deque
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-CHAT_LOG_DIR = REPO_ROOT / "data" / "observer" / "chat"
+CHAT_LOG_DIR = Path("C:/Users/wifik/Desktop/projects/larger-lab/data/observer/chat")
 CHAT_LOG_FILE = CHAT_LOG_DIR / "chat_log.json"
 MAX_HISTORY = 1000  # Maximum messages per session
 
@@ -249,6 +248,12 @@ class ChatLog:
                     self._sessions[sid] = session
             except Exception:
                 pass
+
+    def reload(self) -> None:
+        """Force reload from disk. Clears current state and re-reads the file."""
+        self._sessions.clear()
+        self._current_session_id = ""
+        self._load()
 
 
 # Global accessor

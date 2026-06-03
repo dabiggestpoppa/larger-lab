@@ -62,11 +62,13 @@ HAS_P90 = False
 
 EST = pytz.timezone("US/Eastern")
 
-# TOP 7 ST ASSETS (by Nautilus Phase 0 ground truth WR)
-# NZDUSD 91.6% | GBPCHF 89.9% | AUDUSD 87.8% | BTCUSD 86.9%
-# GBPAUD 85.2% | GBPNZD 85.0% | GBPUSD 83.5%
-TOP7_ST = ["NZDUSD.PRO", "GBPCHF.PRO", "AUDUSD.PRO", "BTCUSD",
-           "GBPAUD.PRO", "GBPNZD.PRO", "GBPUSD.PRO"]
+# TOP 8 ST ASSETS (by Nautilus Phase 0 ground truth WR)
+# NZDUSD 91.6% | GBPCHF 89.9% | AUDUSD 87.8% | GBPAUD 85.2%
+# GBPNZD 85.0% | GBPUSD 83.5% | EURUSD 82.1% | USDCHF 81.6%
+# EURUSD + USDCHF = natural hedge pair
+TOP8_ST = ["NZDUSD.PRO", "GBPCHF.PRO", "AUDUSD.PRO",
+           "GBPAUD.PRO", "GBPNZD.PRO", "GBPUSD.PRO",
+           "EURUSD.PRO", "USDCHF.PRO"]
 
 LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "live_logs")
 os.makedirs(LOG_DIR, exist_ok=True)
@@ -145,9 +147,6 @@ def pip_size(symbol: str) -> float:
             pass
         return 0.01
     # Non-JPY: could be 0.0001 or 0.00001
-    # Crypto (BTCUSD, ETHUSD): point=0.01, 1 pip = 0.01
-    if "BTC" in symbol or "ETH" in symbol or "XBT" in symbol:
-        return 0.01
     return 0.0001
 
 
@@ -800,7 +799,7 @@ def run_live(symbols: list, lot_size: float = 0.01):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="CEREBUS Live Bridge v3.0")
-    parser.add_argument("--symbols", default=",".join(TOP7_ST))
+    parser.add_argument("--symbols", default=",".join(TOP8_ST))
     parser.add_argument("--lot-size", type=float, default=0.01)
     args = parser.parse_args()
     symbols = [s.strip() for s in args.symbols.split(",")]
