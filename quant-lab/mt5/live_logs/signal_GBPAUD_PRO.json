@@ -5,7 +5,7 @@
   "entry": 1.8756,
   "sl": 1.8775488,
   "tp": 1.87465,
-  "event": "ENTRY",
-  "variant": "CASCADE",
-  "time": "2026-06-03 06:09:00"
+  "event": "EWS_EXIT",
+  "variant": "EWS",
+  "time": "2026-06-03 06:44:00"
 }
