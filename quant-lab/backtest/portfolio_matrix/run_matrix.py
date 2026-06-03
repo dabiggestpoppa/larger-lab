@@ -170,7 +170,9 @@ for size in range(6, n + 1):
             best_next = mc
     if best_next:
         all_results[f"{size}_asset_greedy"] = best_next
-        print(f"  {size}-asset: PF={best_next['profit_factor']} WR={best_next['win_rate']}% MaxDD95={best_next['max_dd_95th']}p | +{[a for a in best_next[\"assets\"] if a not in current_assets][0]}")
+        new_assets = [a for a in best_next['assets'] if a not in current_assets]
+        added = new_assets[0] if new_assets else '?'
+        print(f"  {size}-asset: PF={best_next['profit_factor']} WR={best_next['win_rate']}% MaxDD95={best_next['max_dd_95th']}p | +{added}")
         best_prev = best_next
 
 # ─── All assets ───
