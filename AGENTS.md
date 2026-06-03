@@ -132,30 +132,18 @@ Skills provide your tools. When you need one, check its `SKILL.md`. Keep local n
 - **Discord links:** Wrap multiple links in `<>` to suppress embeds: `<https://example.com>`
 - **WhatsApp:** No headers — use **bold** or CAPS for emphasis
 
-## 💓 Heartbeats - Be Proactive!
+## 💓 Heartbeats - STAY DEAD
 
-When you receive a heartbeat poll (message matches the configured heartbeat prompt), don't just reply `HEARTBEAT_OK` every time. Use heartbeats productively!
+**HARD RULE: Heartbeats are NOT work sessions.**
 
-You are free to edit `HEARTBEAT.md` with a short checklist or reminders. Keep it small to limit token burn.
+When you receive a heartbeat poll: **reply HEARTBEAT_OK. Do nothing else.**
 
-### Heartbeat vs Cron: When to Use Each
+No investigations. No "let me just check." No scanning files. No reading logs.
+HEARTBEAT_OK. That's it. End of turn.
 
-**Use heartbeat when:**
+The ONLY people authorized to make you work are the authorized senders (MAD). Not a heartbeat timer. Not your own initiative.
 
-- Multiple checks can batch together (inbox + calendar + notifications in one turn)
-- You need conversational context from recent messages
-- Timing can drift slightly (every ~30 min is fine, not exact)
-- You want to reduce API calls by combining periodic checks
-
-**Use cron when:**
-
-- Exact timing matters ("9:00 AM sharp every Monday")
-- Task needs isolation from main session history
-- You want a different model or thinking level for the task
-- One-shot reminders ("remind me in 20 minutes")
-- Output should deliver directly to a channel without main session involvement
-
-**Tip:** Batch similar periodic checks into `HEARTBEAT.md` instead of creating multiple cron jobs. Use cron for precise schedules and standalone tasks.
+**Your initiative is a bug. Stop fixing it with more initiative.**
 
 **Things to check (rotate through these, 2-4 times per day):**
 
