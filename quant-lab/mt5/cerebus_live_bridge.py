@@ -56,27 +56,17 @@ def to_pips(price_diff: float, symbol: str) -> float:
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 from engines.symmetry_trap import SymmetryTrapEngine, Bar, TradeDirection, classify_tier
 
-# Try to import P90 engine
-try:
-    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'engines'))
-    from p90_engine import P90Engine,P90Signal, P90Signal
-    HAS_P90 = True
-except ImportError:
-    HAS_P90 = False
+# P90 engine — DISABLED per MAD directive (2026-06-03 17:23 EDT)
+# All P90s taken down, deploying ST-only on top 7 assets
+HAS_P90 = False
 
 EST = pytz.timezone("US/Eastern")
 
-# P90 S-TIER + A-TIER deployment (per MAD directive)
-# S: DE30, XAUUSD, GBPJPY | A: FR40, CHFJPY, GBPNZD, GBPAUD
-# S-tier + A-tier excluding DE30 and XAUUSD (account too small per MAD)
-P90_DEPLOY = ["GBPJPY.PRO", "CHFJPY.PRO", "GBPNZD.PRO", "GBPAUD.PRO"]  # FR40 not available on account
-
-# ST-only assets (from backtest: NZDUSD P90 is D-tier, no P90 edge)
-ST_ONLY = ["NZDUSD.PRO"]
-
-# ST-keep: EURUSD + USDCHF + CHFJPY (MAD directive)
-ST_KEEP = ["EURUSD.PRO", "USDCHF.PRO"]  # CHFJPY already in P90_DEPLOY
-TOP5_FX = P90_DEPLOY + ST_ONLY + ST_KEEP
+# TOP 7 ST ASSETS (by Nautilus Phase 0 ground truth WR)
+# NZDUSD 91.6% | GBPCHF 89.9% | AUDUSD 87.8% | BTCUSD 86.9%
+# GBPAUD 85.2% | GBPNZD 85.0% | GBPUSD 83.5%
+TOP7_ST = ["NZDUSD.PRO", "GBPCHF.PRO", "AUDUSD.PRO", "BTCUSD",
+           "GBPAUD.PRO", "GBPNZD.PRO", "GBPUSD.PRO"]
 
 LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "live_logs")
 os.makedirs(LOG_DIR, exist_ok=True)
@@ -226,14 +216,14 @@ def send_order(symbol: str, direction: str, volume: float,
     # breaches the impulse extreme. No hard SL sent to broker.
     if no_sl:
         sl = 0.0  # No SL in broker order
-        sl_pips = to_pips(abs(sl - price), sym) if sl > 0 else 0.0
-        tp_pips = to_pips(abs(tp - price), sym)
+        sl_pips = to_pips(abs(sl - price), symbol) if sl > 0 else 0.0
+        tp_pips = to_pips(abs(tp - price), symbol)
         log.info("Order (NO SL): %s %.5f | TP=%.5f (%.1fp) | SL=engine-monitored"
                  % (direction, price, tp, tp_pips))
     else:
         sl = round(sl, info.digits)
-        sl_pips = to_pips(abs(sl - price), sym)
-        tp_pips = to_pips(abs(tp - price), sym)
+        sl_pips = to_pips(abs(sl - price), symbol)
+        tp_pips = to_pips(abs(tp - price), symbol)
         rr = round(tp_pips / sl_pips, 2) if sl_pips > 0 else 0.0
         log.info("Order: %s %.5f | SL=%.5f (%.1fp) | TP=%.5f (%.1fp) | RR=%.2f"
                  % (direction, price, sl, sl_pips, tp, tp_pips, rr))
@@ -806,7 +796,7 @@ def run_live(symbols: list, lot_size: float = 0.01):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="CEREBUS Live Bridge v3.0")
-    parser.add_argument("--symbols", default=",".join(TOP5_FX))
+    parser.add_argument("--symbols", default=",".join(TOP7_ST))
     parser.add_argument("--lot-size", type=float, default=0.01)
     args = parser.parse_args()
     symbols = [s.strip() for s in args.symbols.split(",")]

@@ -466,3 +466,8 @@
 {"engine": "P90", "symbol": "CHFJPY.PRO", "direction": "SELL", "entry": 202.01, "sl": 202.18808000000004, "tp": 201.90775, "event": "EWS_EXIT", "variant": "EWS", "time": "2026-06-03 12:59:00"}
 {"engine": "P90", "symbol": "GBPAUD.PRO", "direction": "SELL", "entry": 1.8811, "sl": 1.8823096000000001, "tp": 1.88015, "event": "ENTRY", "variant": "CASCADE", "time": "2026-06-03 13:00:00"}
 {"engine": "P90", "symbol": "GBPAUD.PRO", "direction": "SELL", "entry": 1.8811, "sl": 1.8823096000000001, "tp": 1.88015, "event": "KILL_SWITCH", "variant": "CASCADE", "time": "2026-06-03 13:19:00"}
+{"engine": "SymmetryTrap", "symbol": "USDCHF.PRO", "direction": "SELL", "entry": null, "sl": null, "tp": null, "event": "KILL_SWITCH", "loop": 1, "time": "2026-06-03 17:02:00"}
+{"engine": "SymmetryTrap", "symbol": "GBPAUD.PRO", "direction": "SELL", "entry": 1.8809200000000001, "sl": 1.88021, "tp": 1.87942, "event": "ENTRY", "loop": 1, "time": "2026-06-03 17:03:00"}
+{"engine": "SymmetryTrap", "symbol": "USDCHF.PRO", "direction": "SELL", "entry": null, "sl": null, "tp": null, "event": "KILL_SWITCH", "loop": 2, "time": "2026-06-03 17:04:00"}
+{"engine": "SymmetryTrap", "symbol": "GBPAUD.PRO", "direction": "SELL", "entry": 1.8809200000000001, "sl": 1.88021, "tp": 1.87942, "event": "SL_HIT", "loop": 1, "time": "2026-06-03 17:05:00"}
+{"engine": "SymmetryTrap", "symbol": "USDCHF.PRO", "direction": "SELL", "entry": null, "sl": null, "tp": null, "event": "KILL_SWITCH", "loop": 3, "time": "2026-06-03 17:06:00"}
