@@ -475,6 +475,197 @@ def _event_to_dict(event) -> Dict[str, Any]:
     return _event_to_response(event)
 
 
+# ─── Agent Action API ─────────────────────────────────────────────────────────
+# These endpoints let PO (and other agents) execute actions through OCE.
+
+class AgentActionRequest(BaseModel):
+    """Request model for agent-executed actions."""
+    action: str  # "run_command", "read_file", "write_file", "edit_file", "run_python", "git_op"
+    params: Dict[str, Any] = {}
+    agent_id: str = "po"
+    session_id: Optional[str] = None
+
+
+class AgentActionResponse(BaseModel):
+    """Response from an agent action."""
+    ok: bool
+    result: Any = None
+    error: Optional[str] = None
+    execution_time_ms: float = 0
+
+
+@app.post("/agent/execute", response_model=AgentActionResponse)
+async def agent_execute_action(request: AgentActionRequest):
+    """
+    Execute an action on behalf of an agent.
+    This is the main integration point for PO and other external agents
+    to interact with the workspace through the OCE backend.
+
+    Actions:
+    - run_command: Execute a shell command (params: command, timeout?, cwd?)
+    - read_file: Read a file (params: path, start_line?, max_lines?)
+    - write_file: Write a file (params: path, content)
+    - edit_file: Edit a file (params: path, old_text, new_text)
+    - run_python: Execute Python code (params: code, timeout?)
+    - git_op: Git operation (params: operation, args?)
+    """
+    import time as _time
+    from pathlib import Path as _Path
+
+    start = _time.time()
+    repo_root = _Path(__file__).resolve().parents[2]
+
+    try:
+        if request.action == "run_command":
+            cmd = request.params.get("command", "")
+            timeout = request.params.get("timeout", 30)
+            cwd = request.params.get("cwd", str(repo_root))
+            import subprocess
+            result = subprocess.run(
+                cmd, shell=True, capture_output=True, text=True,
+                timeout=timeout, cwd=cwd, encoding="utf-8", errors="replace",
+            )
+            output = result.stdout
+            if result.stderr:
+                output += "\n[STDERR]\n" + result.stderr
+            return AgentActionResponse(ok=True, result=output[:5000], execution_time_ms=(_time.time()-start)*1000)
+
+        elif request.action == "read_file":
+            path = request.params.get("path", "")
+            fp = repo_root / path
+            if not fp.exists():
+                return AgentActionResponse(ok=False, error=f"File not found: {path}")
+            content = fp.read_text(encoding="utf-8", errors="replace")
+            lines = content.splitlines()
+            start_line = request.params.get("start_line", 1)
+            max_lines = request.params.get("max_lines", 200)
+            if start_line > 1 or max_lines < len(lines):
+                end = min(start_line - 1 + max_lines, len(lines))
+                content = f"[Lines {start_line}-{end} of {len(lines)}]\n" + "\n".join(lines[start_line-1:end])
+            return AgentActionResponse(ok=True, result=content[:5000], execution_time_ms=(_time.time()-start)*1000)
+
+        elif request.action == "write_file":
+            path = request.params.get("path", "")
+            content = request.params.get("content", "")
+            fp = repo_root / path
+            fp.parent.mkdir(parents=True, exist_ok=True)
+            fp.write_text(content, encoding="utf-8")
+            return AgentActionResponse(ok=True, result=f"Wrote {len(content.splitlines())} lines to {path}", execution_time_ms=(_time.time()-start)*1000)
+
+        elif request.action == "edit_file":
+            path = request.params.get("path", "")
+            old_text = request.params.get("old_text", "")
+            new_text = request.params.get("new_text", "")
+            fp = repo_root / path
+            if not fp.exists():
+                return AgentActionResponse(ok=False, error=f"File not found: {path}")
+            content = fp.read_text(encoding="utf-8")
+            if old_text not in content:
+                return AgentActionResponse(ok=False, error=f"Text not found in {path}")
+            new_content = content.replace(old_text, new_text, 1)
+            fp.write_text(new_content, encoding="utf-8")
+            return AgentActionResponse(ok=True, result=f"Edited {path}", execution_time_ms=(_time.time()-start)*1000)
+
+        elif request.action == "run_python":
+            code = request.params.get("code", "")
+            timeout = request.params.get("timeout", 60)
+            import tempfile, os
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False, encoding='utf-8') as f:
+                f.write(code)
+                tmp_path = f.name
+            python_exe = str(repo_root / ".venv" / "Scripts" / "python.exe")
+            import subprocess
+            result = subprocess.run(
+                [python_exe, tmp_path], capture_output=True, text=True,
+                timeout=timeout, cwd=str(repo_root), encoding="utf-8", errors="replace",
+            )
+            os.unlink(tmp_path)
+            output = result.stdout
+            if result.stderr:
+                output += "\n[STDERR]\n" + result.stderr
+            return AgentActionResponse(ok=True, result=output[:5000], execution_time_ms=(_time.time()-start)*1000)
+
+        elif request.action == "git_op":
+            operation = request.params.get("operation", "")
+            args = request.params.get("args", "")
+            allowed_ops = ["status", "log", "diff", "add", "commit", "push", "pull", "branch", "checkout", "stash"]
+            if operation not in allowed_ops:
+                return AgentActionResponse(ok=False, error=f"Unknown git operation: {operation}. Allowed: {', '.join(allowed_ops)}")
+            cmd = f"git {operation} {args}"
+            import subprocess
+            result = subprocess.run(
+                cmd, shell=True, capture_output=True, text=True,
+                timeout=30, cwd=str(repo_root), encoding="utf-8", errors="replace",
+            )
+            output = result.stdout
+            if result.stderr:
+                output += "\n[STDERR]\n" + result.stderr
+            return AgentActionResponse(ok=True, result=output[:5000], execution_time_ms=(_time.time()-start)*1000)
+
+        else:
+            return AgentActionResponse(ok=False, error=f"Unknown action: {request.action}")
+
+    except subprocess.TimeoutExpired:
+        return AgentActionResponse(ok=False, error="Action timed out", execution_time_ms=(_time.time()-start)*1000)
+    except Exception as e:
+        return AgentActionResponse(ok=False, error=str(e), execution_time_ms=(_time.time()-start)*1000)
+
+
+@app.get("/agent/workspace/info")
+async def agent_workspace_info():
+    """Get workspace info for agents — recent files, git status, service ports."""
+    import os
+    import socket
+    from pathlib import Path as _Path
+
+    repo_root = _Path(__file__).resolve().parents[2]
+    info = {}
+
+    # Git info
+    try:
+        import subprocess
+        branch = subprocess.run(
+            ["git", "branch", "--show-current"], capture_output=True, text=True,
+            cwd=str(repo_root), timeout=5
+        ).stdout.strip()
+        last_commit = subprocess.run(
+            ["git", "log", "-1", "--oneline"], capture_output=True, text=True,
+            cwd=str(repo_root), timeout=5
+        ).stdout.strip()
+        info["git"] = {"branch": branch, "last_commit": last_commit}
+    except Exception:
+        info["git"] = {"error": "git not available"}
+
+    # Service ports
+    ports = {
+        "oce_backend": 8000, "oce_frontend": 3000,
+        "openclaw": 18790, "po_api": 8765,
+    }
+    port_states = {}
+    for name, port in ports.items():
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(0.5)
+        try:
+            s.connect(("127.0.0.1", port))
+            port_states[name] = "up"
+        except Exception:
+            port_states[name] = "down"
+        finally:
+            s.close()
+    info["services"] = port_states
+
+    # Recent progress files
+    try:
+        progress_dir = repo_root / "progress"
+        if progress_dir.exists():
+            files = sorted(progress_dir.iterdir(), key=lambda f: f.stat().st_mtime, reverse=True)[:5]
+            info["recent_progress"] = [f.name for f in files]
+    except Exception:
+        pass
+
+    return info
+
+
 @app.on_event("startup")
 async def startup_event():
     """Initialize Event Fabric on startup."""

@@ -26,7 +26,7 @@ from core.observer.vault import Vault
 from core.observer.journal import Journal
 from core.observer.autonomous_orchestrator import AutonomousOrchestrator
 from core.observer.command_router import CommandRouter
-from core.observer.chat_agent import ChatAgent
+from core.observer.po_agent import POAgent
 from core.observer.sovereign_field import SovereignField
 from core.observer.presence_engine import (
     WATCHERS, TIMELINE, CONTINUITY, PRIORITY,
@@ -185,12 +185,12 @@ def main():
     except Exception as _e:
         log(f"Stale clear error: {_e}")
 
-    log("Initializing Telegram Presence System — All 3 Phases...")
+    log("Initializing Telegram Presence System — All 3 Phases + Agent...")
     vault = Vault()
     journal = Journal(vault)
     orch = AutonomousOrchestrator(vault=vault, journal=journal)
     router = CommandRouter(vault=vault, journal=journal, orchestrator=orch)
-    agent = ChatAgent()
+    agent = POAgent()
     sov = SovereignField()
 
     # Start Phase 3: Presence Engine
@@ -206,7 +206,7 @@ def main():
 
     # Send startup notification
     send(base_url, int(os.environ.get("TELEGRAM_CHAT_ID", "0")),
-         "🟢 *PO Phase 1 Online*\n\nTelegram Runtime Foundation active.\nSession continuity • Workspace scan • Async LLM • Command routing",
+         "🟢 *PO Agent Online*\n\nFull agent capability active:\n• File read/write/edit\n• Shell commands\n• OCE API calls\n• GitHub operations\n• Python execution\n• Vault search\n• Tool-calling loop\n\nSlash commands still work. Chat messages now use full agent.",
          parse_mode="Markdown")
 
     log("Poll loop started. PO is live on Telegram.")
@@ -250,72 +250,47 @@ def main():
                         SESSIONS.add(cid, "assistant", resp)
                         send(base_url, cid, resp)
                     else:
-                        # Chat message — async via task queue
+                        # Chat message — full agent with tool-calling
                         SESSIONS.add(cid, "user", text)
 
-                        # Check for continuity queries
-                        lower = text.lower().strip()
-                        continuity_triggers = ["what happened", "what's up", "whats up",
-                                               "what going on", "status update", "summary",
-                                               "what did i miss", "catch me up", "yo", "yoo", "yoioo"]
-                        is_continuity = any(t in lower for t in continuity_triggers)
-
-                        def do_llm(chat_id=cid, msg_text=text, continuity=is_continuity):
+                        def do_agent(chat_id=cid, msg_text=text):
                             try:
                                 send(base_url, chat_id,
-                                     f"🧠 *Processing:* `{msg_text[:60]}`")
+                                     f"🧠 *Agent processing:* `{msg_text[:60]}...`\n\n🔧 Tools available: file read/write/edit, shell, git, OCE API, GitHub, Python, vault search")
                                 typing(base_url, chat_id)
 
-                                scan_result = scan_workspace()
-                                send(base_url, chat_id,
-                                     f"🔍 *Workspace Scan:*\n{scan_result}")
-                                typing(base_url, chat_id)
-
-                                # Build rich context
+                                # Build operational context
                                 ctx = sov.get_sovereign_context()
 
-                                # Add timeline for continuity queries
-                                if continuity:
-                                    timeline_summary = TIMELINE.get_summary(10)
-                                    ctx += f"\n\n## Operational Timeline\n{timeline_summary}"
+                                # Add timeline summary
+                                try:
+                                    timeline_summary = TIMELINE.get_summary(5)
+                                    ctx += f"\n\n## Recent Timeline\n{timeline_summary}"
+                                except: pass
 
-                                    # Add task summary
-                                    try:
-                                        task_summary = orch.tasks.summary()
-                                        ctx += f"\n\n## Tasks\n{task_summary}"
-                                    except:
-                                        pass
+                                # Add task summary
+                                try:
+                                    task_summary = orch.tasks.summary()
+                                    ctx += f"\n\n## Tasks\n{task_summary}"
+                                except: pass
 
-                                # Add session history — pass as conversation context
+                                # Add session history
                                 history = SESSIONS.get_context(chat_id)
                                 if history:
                                     ctx += "\n\n## Recent Conversation\n"
-                                    for h in history[-6:]:
-                                        ctx += f"- **{h['role']}:** {h['content'][:100]}\n"
+                                    for h in history[-4:]:
+                                        ctx += f"- **{h['role']}:** {h['content'][:80]}\n"
 
-                                # Build full message list for multi-turn
-                                messages = [{"role": "system", "content": agent._build_system_prompt(sovereign_context=ctx)}]
-                                for h in history:
-                                    messages.append({"role": h["role"], "content": h["content"]})
-                                messages.append({"role": "user", "content": msg_text})
-
-                                # Call LLM directly with full history
-                                resp, used_model, err = agent._call_llm(messages, agent.current_model)
-                                if not resp:
-                                    # Try next model in chain
-                                    for attempt in range(1, len(agent.MODEL_CHAIN)):
-                                        model = agent.MODEL_CHAIN[(agent._model_index + attempt) % len(agent.MODEL_CHAIN)]
-                                        resp, used_model, err = agent._call_llm(messages, model)
-                                        if resp:
-                                            break
+                                # Run full agent with tool-calling loop
+                                resp = agent.chat(msg_text, sovereign_context=ctx, max_tool_rounds=8)
 
                                 # Record in timeline and continuity cache
-                                TIMELINE.record("chat", {"user": msg_text[:50], "response_len": len(resp)})
+                                TIMELINE.record("agent_chat", {"user": msg_text[:50], "response_len": len(resp)})
                                 CONTINUITY.add("last_chat", msg_text[:100])
 
                                 SESSIONS.add(chat_id, "assistant", resp)
                                 send(base_url, chat_id, resp)
-                                log(f"LLM RESP ({len(resp)} chars)")
+                                log(f"AGENT RESP ({len(resp)} chars)")
                             except Exception as e:
                                 import traceback as _tb
                                 log("LLM ERR: " + str(e) + "\n" + _tb.format_exc())
