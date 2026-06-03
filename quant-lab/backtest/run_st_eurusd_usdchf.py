@@ -10,8 +10,7 @@ from datetime import datetime
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "engines"))
 
-from symmetry_trap_backtest import SymmetryTrapBacktest, load_m5_csv, compute_stats
-from symmetry_trap import TradeRecord
+from symmetry_trap_backtest import SymmetryTrapBacktest, load_m5_csv, compute_stats, TradeRecord
 
 DATA_DIR = Path(__file__).parent.parent / "data"
 REPORTS_DIR = Path(__file__).parent.parent / "reports" / "per-asset"
