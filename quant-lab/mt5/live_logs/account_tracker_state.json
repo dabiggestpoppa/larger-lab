@@ -1,14 +1,14 @@
 {
-  "timestamp": "2026-06-02T21:05:17.695553",
+  "timestamp": "2026-06-02T21:10:25.047747",
   "account": {
     "login": 650898,
     "server": "OxSecurities-Live",
     "balance": 70.37,
-    "equity": 70.91,
-    "profit": 0.54,
+    "equity": 70.74,
+    "profit": 0.37,
     "margin": 4.6899999999999995,
-    "margin_free": 66.22,
-    "margin_level": 1511.9402985074628,
+    "margin_free": 66.05,
+    "margin_level": 1508.315565031983,
     "leverage": 500,
     "currency": "USD",
     "name": "Jaelon Scott - Live #0",
@@ -21,14 +21,17 @@
       "type": "BUY",
       "volume": 0.01,
       "open_price": 1.87552,
-      "current_price": 1.87581,
+      "current_price": 1.87576,
       "sl": 1.87418,
       "tp": 1.8768799999999999,
-      "profit": 0.21,
+      "profit": 0.17,
       "swap": 0.0,
       "magic": 20260601,
       "comment": "CEREBUS-ST-L1",
-      "time": "2026-06-02T22:40:58"
+      "time": "2026-06-02T22:40:58",
+      "sl_pips": 13.4,
+      "tp_pips": 13.6,
+      "rr": 1.01
     },
     {
       "ticket": 91882817,
@@ -36,14 +39,17 @@
       "type": "BUY",
       "volume": 0.01,
       "open_price": 0.78762,
-      "current_price": 0.78788,
+      "current_price": 0.78778,
       "sl": 0.78677,
       "tp": 0.78857,
-      "profit": 0.33,
+      "profit": 0.2,
       "swap": 0.0,
       "magic": 20260601,
       "comment": "CEREBUS-ST-L1",
-      "time": "2026-06-02T23:42:58"
+      "time": "2026-06-02T23:42:58",
+      "sl_pips": 8.5,
+      "tp_pips": 9.5,
+      "rr": 1.12
     }
   ],
   "today_history": [

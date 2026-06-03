@@ -62,6 +62,39 @@ def get_account_info() -> dict:
     }
 
 
+def get_pip_size(symbol: str) -> float:
+    """Return pip size for a symbol (e.g. 0.0001 for EURUSD, 0.01 for JPY pairs)."""
+    s = symbol.upper()
+    if "JPY" in s:
+        return 0.01
+    if "XAU" in s or "GOLD" in s:
+        return 0.1
+    if "XAG" in s or "SILVER" in s:
+        return 0.001
+    if any(x in s for x in ["BTC", "ETH", "US500", "NAS100", "DE30", "FR40", "HK50", "US30", "SPX", "NSX"]):
+        return 1.0
+    return 0.0001
+
+
+def calc_rr(open_price: float, sl: float, tp: float, pip_size: float, direction: str) -> dict:
+    """Calculate SL pips, TP pips, and RR ratio for a position."""
+    if pip_size <= 0:
+        return {"sl_pips": 0.0, "tp_pips": 0.0, "rr": 0.0}
+
+    if direction == "BUY":
+        sl_dist = (open_price - sl) / pip_size if sl > 0 else 0.0
+        tp_dist = (tp - open_price) / pip_size if tp > 0 else 0.0
+    else:  # SELL
+        sl_dist = (sl - open_price) / pip_size if sl > 0 else 0.0
+        tp_dist = (open_price - tp) / pip_size if tp > 0 else 0.0
+
+    sl_pips = max(sl_dist, 0.0)
+    tp_pips = max(tp_dist, 0.0)
+    rr = round(tp_pips / sl_pips, 2) if sl_pips > 0 else 0.0
+
+    return {"sl_pips": round(sl_pips, 1), "tp_pips": round(tp_pips, 1), "rr": rr}
+
+
 def get_open_positions() -> list:
     """Pull all open positions from MT5."""
     positions = mt5.positions_get()
@@ -70,10 +103,13 @@ def get_open_positions() -> list:
 
     result = []
     for p in positions:
+        direction = "BUY" if p.type == mt5.ORDER_TYPE_BUY else "SELL"
+        pip_size = get_pip_size(p.symbol)
+        rr_data = calc_rr(p.price_open, p.sl, p.tp, pip_size, direction)
         result.append({
             "ticket": p.ticket,
             "symbol": p.symbol,
-            "type": "BUY" if p.type == mt5.ORDER_TYPE_BUY else "SELL",
+            "type": direction,
             "volume": p.volume,
             "open_price": p.price_open,
             "current_price": p.price_current,
@@ -84,6 +120,9 @@ def get_open_positions() -> list:
             "magic": p.magic,
             "comment": p.comment,
             "time": datetime.fromtimestamp(p.time).isoformat(),
+            "sl_pips": rr_data["sl_pips"],
+            "tp_pips": rr_data["tp_pips"],
+            "rr": rr_data["rr"],
         })
     return result
 
@@ -155,12 +194,15 @@ def format_report(account: dict, positions: list, history: list, stats: dict) ->
     if positions:
         for p in positions:
             emoji = "🟢" if p["profit"] >= 0 else "🔴"
+            rr_str = f"RR {p['rr']:.2f}" if p.get("rr", 0) > 0 else "RR --"
             lines.append(
                 f"  {emoji} {p['type']} {p['volume']} {p['symbol']} @ {p['open_price']:.5f}"
-                f" | P&L: ${p['profit']:+.2f} | Magic: {p['magic']}"
+                f" | P&L: ${p['profit']:+.2f} | {rr_str}"
             )
+            sl_pips = p.get("sl_pips", 0)
+            tp_pips = p.get("tp_pips", 0)
             if p["sl"] > 0 or p["tp"] > 0:
-                lines.append(f"     SL: {p['sl']:.5f} | TP: {p['tp']:.5f}")
+                lines.append(f"     SL: {p['sl']:.5f} ({sl_pips}p) | TP: {p['tp']:.5f} ({tp_pips}p)")
     else:
         lines.append("  No open positions")
     lines.append("")
