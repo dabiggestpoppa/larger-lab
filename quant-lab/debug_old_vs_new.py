@@ -30,7 +30,7 @@ with open('quant-lab/data/EURUSD_M5.csv', newline='', encoding='utf-8-sig') as f
             except Exception:
                 pass
 
-bars.sort(key=lambda b: b.timestamp)
+bars.sort(key=lambda b: b['timestamp'])
 
 ASIAN_START_H, ASIAN_END_H, TRADING_START_H, TRADING_END_H = 19, 3, 3, 12
 
