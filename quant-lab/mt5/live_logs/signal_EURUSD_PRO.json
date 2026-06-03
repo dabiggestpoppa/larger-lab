@@ -5,7 +5,7 @@
   "entry": 1.1607,
   "sl": 1.158936,
   "tp": 1.16101,
-  "event": "ENTRY",
+  "event": "TP_HIT",
   "variant": "CASCADE",
-  "time": "2026-06-03 10:55:00"
+  "time": "2026-06-03 10:58:00"
 }

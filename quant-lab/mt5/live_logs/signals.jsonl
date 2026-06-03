@@ -444,3 +444,6 @@
 {"engine": "P90", "symbol": "EURUSD.PRO", "direction": "SELL", "entry": 1.16026, "sl": 1.1592352000000001, "tp": 1.16057, "event": "TP_HIT", "variant": "CASCADE", "time": "2026-06-03 10:54:00"}
 {"engine": "P90", "symbol": "USDCHF.PRO", "direction": "SELL", "entry": 0.79049, "sl": 0.7915819999999999, "tp": 0.7899975, "event": "ENTRY", "variant": "CASCADE", "time": "2026-06-03 10:54:00"}
 {"engine": "P90", "symbol": "EURUSD.PRO", "direction": "SELL", "entry": 1.1607, "sl": 1.158936, "tp": 1.16101, "event": "ENTRY", "variant": "CASCADE", "time": "2026-06-03 10:55:00"}
+{"engine": "P90", "symbol": "CHFJPY.PRO", "direction": "SELL", "entry": 202.323, "sl": 202.12812, "tp": 202.42525, "event": "TP_HIT", "variant": "CASCADE", "time": "2026-06-03 10:58:00"}
+{"engine": "P90", "symbol": "EURUSD.PRO", "direction": "SELL", "entry": 1.1607, "sl": 1.158936, "tp": 1.16101, "event": "TP_HIT", "variant": "CASCADE", "time": "2026-06-03 10:58:00"}
+{"engine": "P90", "symbol": "USDCHF.PRO", "direction": "SELL", "entry": 0.79049, "sl": 0.7915819999999999, "tp": 0.7899975, "event": "TP_HIT", "variant": "CASCADE", "time": "2026-06-03 10:58:00"}
