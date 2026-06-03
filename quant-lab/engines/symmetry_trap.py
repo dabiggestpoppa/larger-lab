@@ -509,20 +509,19 @@ class SymmetryTrapEngine:
 
             if occ_confirmed:
                 self.entry_price = bar.close
-                # SL = impulse_extreme (Zero Buffer) — per ontology cerebus_qa_recap.md line 90
-                # "Entry = close of OCC candle. SL = impulse_extreme (Zero Buffer)."
-                # impulse_extreme = swing_origin (the start of the impulse leg)
-                # For SHORT: swing_origin is above entry (loss direction) ✓
-                # For LONG: swing_origin is below entry (loss direction) ✓
+                # SL = OCC candle extreme (loss direction) + spread buffer, with min floor
+                # Per ontology cerebus_qa_recap.md: "SL = impulse_extreme (Zero Buffer)"
+                # The OCC extreme IS the impulse structural anchor (manual_ontology.md line 411)
+                # For SHORT: SL at OCC high + spread buffer (loss direction = above entry)
+                # For LONG: SL at OCC low - spread buffer (loss direction = below entry)
+                spread_buf = self.spread_buffer * self.pip_size
                 if self.impulse_direction == TradeDirection.SHORT:
-                    self.sl_price = self.swing_origin
-                    # Enforce minimum SL buffer: SL must be at least min_sl_buffer pips above entry
+                    self.sl_price = bar.high + spread_buf
                     min_sl = self.entry_price + (self.min_sl_buffer * self.pip_size)
                     if self.sl_price < min_sl:
                         self.sl_price = min_sl
                 else:
-                    self.sl_price = self.swing_origin
-                    # Enforce minimum SL buffer: SL must be at least min_sl_buffer pips below entry
+                    self.sl_price = bar.low - spread_buf
                     min_sl = self.entry_price - (self.min_sl_buffer * self.pip_size)
                     if self.sl_price > min_sl:
                         self.sl_price = min_sl

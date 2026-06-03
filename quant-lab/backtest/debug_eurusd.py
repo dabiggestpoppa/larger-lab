@@ -15,7 +15,7 @@ config = ASSET_CONFIGS[asset_key]
 
 # Custom backtest that logs SL details
 from symmetry_trap import SymmetryTrapEngine, Bar, TradeDirection
-from cerebus_qa_recap import *  # just for reference
+# reference only
 
 bt2 = SymmetryTrapBacktest(
     pip_size=config["pip_value"],
