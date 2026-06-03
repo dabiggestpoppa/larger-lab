@@ -1,0 +1,75 @@
+{
+  "generated": "2026-06-02T23:17:53.946148",
+  "portfolio": [
+    "GBPJPY",
+    "CHFJPY",
+    "GBPAUD",
+    "GBPNZD",
+    "NZDUSD"
+  ],
+  "excluded": [
+    "EURUSD",
+    "USDCHF"
+  ],
+  "n_simulations": 10000,
+  "pooled_backtest": {
+    "total_trades": 3687,
+    "win_rate": 88.4,
+    "profit_factor": 15.19,
+    "total_pnl_pips": 36546.0
+  },
+  "monitoring_thresholds": {
+    "max_drawdown_warning_pips": 109.1,
+    "max_drawdown_critical_pips": 132.8,
+    "max_drawdown_hard_stop_pips": 205.4,
+    "max_loss_streak_warning": 5,
+    "max_loss_streak_critical": 9
+  },
+  "mc_distribution": {
+    "terminal_pnl_median": 36546.0,
+    "terminal_pnl_mean": 36546.0,
+    "terminal_pnl_5th": 36546.0,
+    "terminal_pnl_95th": 36546.0,
+    "max_dd_median": 87.5,
+    "max_dd_95th": 109.1,
+    "max_dd_99th": 132.8,
+    "max_dd_worst": 205.4
+  },
+  "per_asset": {
+    "GBPJPY": {
+      "trades": 830,
+      "wins": 716,
+      "losses": 114,
+      "win_rate": 86.3,
+      "total_pnl": 8655.6
+    },
+    "CHFJPY": {
+      "trades": 751,
+      "wins": 648,
+      "losses": 103,
+      "win_rate": 86.3,
+      "total_pnl": 7167.0
+    },
+    "GBPAUD": {
+      "trades": 715,
+      "wins": 632,
+      "losses": 83,
+      "win_rate": 88.4,
+      "total_pnl": 7911.5
+    },
+    "GBPNZD": {
+      "trades": 664,
+      "wins": 587,
+      "losses": 77,
+      "win_rate": 88.4,
+      "total_pnl": 8598.3
+    },
+    "NZDUSD": {
+      "trades": 727,
+      "wins": 678,
+      "losses": 49,
+      "win_rate": 93.3,
+      "total_pnl": 4213.6
+    }
+  }
+}
