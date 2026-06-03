@@ -1470,3 +1470,22 @@ Help: /help
 - core/observer/command_router.py (added 6 new commands)
 
 **Commit:** c36f912e — pushed to origin/master
+
+## [OC2] 2026-06-04 00:43 UTC — ✅ Telegram Gateway Fixed & Live
+
+**Bug fixed:** 
+ame 'user_text' is not defined — variable reference error in do_llm() function inside scripts/telegram_gateway.py. Changed user_text to msg_text parameter name consistently.
+
+**Status:**
+- @P01999BOT connected and polling ✅
+- All 3 phases active ✅
+- Test message sent and delivered ✅
+- Gateway responding to messages ✅
+
+**Try on Telegram:**
+- /status — full system status
+- /observers — observer health
+- /drift — drift detection
+- /timeline — operational history
+- /presence — presence engine status
+- Any chat message → async LLM response with workspace scan
