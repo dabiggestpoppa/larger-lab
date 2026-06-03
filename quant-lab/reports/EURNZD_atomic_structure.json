@@ -1,0 +1,50 @@
+{
+  "symbol": "EURNZD",
+  "pip_size": 0.0001,
+  "n_days": 956,
+  "ar_stats": {
+    "mean": 46.4,
+    "std": 28.5,
+    "min": 12.3,
+    "max": 258.4,
+    "p50": 39.2,
+    "p75": 53.9,
+    "p90": 74.9,
+    "p95": 94.1
+  },
+  "tier_dist_reference": {
+    "NO_GO": 358,
+    "T3": 347,
+    "T2": 208,
+    "T1": 43
+  },
+  "recommended_config": {
+    "k_factor": 0.48,
+    "T1": {
+      "ar_max": 35.2,
+      "au": 16.9,
+      "trigger": 20.3
+    },
+    "T2": {
+      "ar_max": 48.5,
+      "au": 23.3,
+      "trigger": 28.0
+    },
+    "T3": {
+      "ar_max": 71.1,
+      "au": 34.1,
+      "trigger": 40.9
+    }
+  },
+  "tier_dist_recommended": {
+    "T1": 381,
+    "T2": 272,
+    "T3": 194,
+    "NO_GO": 109
+  },
+  "impulse_stats": {
+    "mean": 6.2,
+    "p50": 5.4,
+    "p90": 10.0
+  }
+}

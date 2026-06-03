@@ -1,0 +1,50 @@
+{
+  "symbol": "AUDCAD",
+  "pip_size": 0.0001,
+  "n_days": 961,
+  "ar_stats": {
+    "mean": 21.8,
+    "std": 11.7,
+    "min": 4.8,
+    "max": 103.5,
+    "p50": 19.0,
+    "p75": 25.8,
+    "p90": 34.7,
+    "p95": 43.4
+  },
+  "tier_dist_reference": {
+    "T1": 523,
+    "T2": 272,
+    "T3": 122,
+    "NO_GO": 44
+  },
+  "recommended_config": {
+    "k_factor": 0.48,
+    "T1": {
+      "ar_max": 17.1,
+      "au": 8.2,
+      "trigger": 9.8
+    },
+    "T2": {
+      "ar_max": 23.2,
+      "au": 11.1,
+      "trigger": 13.3
+    },
+    "T3": {
+      "ar_max": 33.0,
+      "au": 15.8,
+      "trigger": 19.0
+    }
+  },
+  "tier_dist_recommended": {
+    "T1": 385,
+    "T2": 254,
+    "T3": 205,
+    "NO_GO": 117
+  },
+  "impulse_stats": {
+    "mean": 3.0,
+    "p50": 2.6,
+    "p90": 4.7
+  }
+}

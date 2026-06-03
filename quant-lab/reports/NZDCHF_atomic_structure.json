@@ -1,0 +1,50 @@
+{
+  "symbol": "NZDCHF",
+  "pip_size": 0.0001,
+  "n_days": 967,
+  "ar_stats": {
+    "mean": 14.4,
+    "std": 9.6,
+    "min": 3.5,
+    "max": 100.8,
+    "p50": 12.0,
+    "p75": 16.7,
+    "p90": 23.3,
+    "p95": 29.8
+  },
+  "tier_dist_reference": {
+    "T1": 820,
+    "T2": 99,
+    "T3": 32,
+    "NO_GO": 16
+  },
+  "recommended_config": {
+    "k_factor": 0.48,
+    "T1": {
+      "ar_max": 10.8,
+      "au": 5.2,
+      "trigger": 6.2
+    },
+    "T2": {
+      "ar_max": 15.8,
+      "au": 7.6,
+      "trigger": 9.1
+    },
+    "T3": {
+      "ar_max": 23.8,
+      "au": 11.4,
+      "trigger": 13.7
+    }
+  },
+  "tier_dist_recommended": {
+    "T1": 397,
+    "T2": 296,
+    "T3": 182,
+    "NO_GO": 92
+  },
+  "impulse_stats": {
+    "mean": 1.9,
+    "p50": 1.7,
+    "p90": 3.1
+  }
+}

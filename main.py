@@ -186,28 +186,55 @@ async def continuity_chat(request: ContinuityChatRequest):
         raise HTTPException(status_code=503, detail=f"Continuity service unavailable: {str(e)}")
 
 
+# ─── Debug Endpoint ──────────────────────────────────────────────────────────
+
+@app.get("/debug/filecheck")
+async def debug_filecheck():
+    """Debug endpoint to check file access."""
+    import os as _os
+    from pathlib import Path as _Path
+    result = {}
+    result["cwd"] = str(_Path.cwd())
+    result["__file__"] = __file__
+    p = _Path("C:/Users/wifik/Desktop/projects/larger-lab/data/observer/chat/chat_log.json")
+    result["path"] = str(p)
+    result["exists"] = p.exists()
+    result["readable"] = _os.access(str(p), _os.R_OK)
+    if p.exists():
+        result["size"] = p.stat().st_size
+        import json as _json
+        data = _json.loads(p.read_text(encoding="utf-8"))
+        result["session_count"] = len(data.get("sessions", {}))
+    return result
+
 # ─── Chat Log Endpoints ──────────────────────────────────────────────────────
 
 @app.get("/chat/sessions")
 async def get_chat_sessions():
     """List all chat sessions with recent messages."""
+    import json as _json
+    from pathlib import Path as _Path
     try:
-        from core.observer.chat_log import get_chat_log
-        chat_log = get_chat_log()
-        chat_log.reload()  # Force fresh read from disk
-        data = chat_log.to_dict()
+        import sys as _sys
+        chat_log_file = _Path("C:/Users/wifik/Desktop/projects/larger-lab/data/observer/chat/chat_log.json")
+        _exists = chat_log_file.exists()
+        print(f"[DEBUG] chat_log_file={chat_log_file} exists={exists}", file=_sys.stderr, flush=True)
+        if not _exists:
+            print(f"[DEBUG] CWD={_Path.cwd()}", file=_sys.stderr, flush=True)
+            print(f"[DEBUG] __file__={__file__}", file=_sys.stderr, flush=True)
+            return {"sessions": [], "active_session": None}
+        data = _json.loads(chat_log_file.read_text(encoding="utf-8"))
         sessions = []
         for sid, s in data.get("sessions", {}).items():
             sessions.append({
                 "session_id": s["session_id"],
                 "start_time": s["start_time"],
                 "last_active": s["last_active"],
-                "message_count": s["message_count"],
+                "message_count": s.get("message_count", 0),
                 "user_message_count": s.get("user_message_count", 0),
                 "assistant_message_count": s.get("assistant_message_count", 0),
                 "recent_messages": s.get("messages", [])[-5:],
             })
-        # Sort by last_active descending
         sessions.sort(key=lambda x: x.get("last_active", ""), reverse=True)
         return {
             "sessions": sessions,

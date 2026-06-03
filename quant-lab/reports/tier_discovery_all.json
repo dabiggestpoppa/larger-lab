@@ -1,0 +1,308 @@
+{
+  "EURGBP": {
+    "T1": {
+      "range_max": 20.98,
+      "au": 7,
+      "trig": 8
+    },
+    "T2": {
+      "range_min": 20.98,
+      "range_max": 40.33,
+      "au": 14,
+      "trig": 17
+    },
+    "T3": {
+      "range_min": 40.33,
+      "au": 19,
+      "trig": 23
+    }
+  },
+  "EURJPY": {
+    "T1": {
+      "range_max": 91.57,
+      "au": 29,
+      "trig": 35
+    },
+    "T2": {
+      "range_min": 91.57,
+      "range_max": 160.35,
+      "au": 63,
+      "trig": 75
+    },
+    "T3": {
+      "range_min": 160.35,
+      "au": 63,
+      "trig": 76
+    }
+  },
+  "EURAUD": {
+    "T1": {
+      "range_max": 77.51,
+      "au": 27,
+      "trig": 32
+    },
+    "T2": {
+      "range_min": 77.51,
+      "range_max": 135.4,
+      "au": 51,
+      "trig": 61
+    },
+    "T3": {
+      "range_min": 135.4,
+      "au": 58,
+      "trig": 69
+    }
+  },
+  "EURNZD": {
+    "T1": {
+      "range_max": 77.48,
+      "au": 28,
+      "trig": 34
+    },
+    "T2": {
+      "range_min": 77.48,
+      "range_max": 143.25,
+      "au": 49,
+      "trig": 59
+    },
+    "T3": {
+      "range_min": 143.25,
+      "au": 61,
+      "trig": 73
+    }
+  },
+  "EURCHF": {
+    "T1": {
+      "range_max": 28.55,
+      "au": 9,
+      "trig": 11
+    },
+    "T2": {
+      "range_min": 28.55,
+      "range_max": 53.15,
+      "au": 19,
+      "trig": 23
+    },
+    "T3": {
+      "range_min": 53.15,
+      "au": 22,
+      "trig": 27
+    }
+  },
+  "EURCAD": {
+    "T1": {
+      "range_max": 38.86,
+      "au": 13,
+      "trig": 16
+    },
+    "T2": {
+      "range_min": 38.86,
+      "range_max": 75.87,
+      "au": 25,
+      "trig": 31
+    },
+    "T3": {
+      "range_min": 75.87,
+      "au": 32,
+      "trig": 38
+    }
+  },
+  "USDCAD": {
+    "T1": {
+      "range_max": 31.17,
+      "au": 11,
+      "trig": 13
+    },
+    "T2": {
+      "range_min": 31.17,
+      "range_max": 56.88,
+      "au": 20,
+      "trig": 24
+    },
+    "T3": {
+      "range_min": 56.88,
+      "au": 27,
+      "trig": 32
+    }
+  },
+  "AUDJPY": {
+    "T1": {
+      "range_max": 65.94,
+      "au": 21,
+      "trig": 26
+    },
+    "T2": {
+      "range_min": 65.94,
+      "range_max": 119.73,
+      "au": 45,
+      "trig": 53
+    },
+    "T3": {
+      "range_min": 119.73,
+      "au": 49,
+      "trig": 59
+    }
+  },
+  "AUDNZD": {
+    "T1": {
+      "range_max": 36.17,
+      "au": 12,
+      "trig": 14
+    },
+    "T2": {
+      "range_min": 36.17,
+      "range_max": 65.5,
+      "au": 24,
+      "trig": 29
+    },
+    "T3": {
+      "range_min": 65.5,
+      "au": 27,
+      "trig": 33
+    }
+  },
+  "AUDCHF": {
+    "T1": {
+      "range_max": 28.05,
+      "au": 10,
+      "trig": 12
+    },
+    "T2": {
+      "range_min": 28.05,
+      "range_max": 55.24,
+      "au": 18,
+      "trig": 22
+    },
+    "T3": {
+      "range_min": 55.24,
+      "au": 23,
+      "trig": 28
+    }
+  },
+  "AUDCAD": {
+    "T1": {
+      "range_max": 36.92,
+      "au": 13,
+      "trig": 16
+    },
+    "T2": {
+      "range_min": 36.92,
+      "range_max": 67.8,
+      "au": 24,
+      "trig": 29
+    },
+    "T3": {
+      "range_min": 67.8,
+      "au": 28,
+      "trig": 33
+    }
+  },
+  "NZDJPY": {
+    "T1": {
+      "range_max": 62.7,
+      "au": 20,
+      "trig": 24
+    },
+    "T2": {
+      "range_min": 62.7,
+      "range_max": 100.51,
+      "au": 44,
+      "trig": 53
+    },
+    "T3": {
+      "range_min": 100.51,
+      "au": 43,
+      "trig": 51
+    }
+  },
+  "NZDCHF": {
+    "T1": {
+      "range_max": 27.68,
+      "au": 9,
+      "trig": 11
+    },
+    "T2": {
+      "range_min": 27.68,
+      "range_max": 49.57,
+      "au": 18,
+      "trig": 22
+    },
+    "T3": {
+      "range_min": 49.57,
+      "au": 21,
+      "trig": 25
+    }
+  },
+  "NZDCAD": {
+    "T1": {
+      "range_max": 33.79,
+      "au": 12,
+      "trig": 15
+    },
+    "T2": {
+      "range_min": 33.79,
+      "range_max": 63.21,
+      "au": 22,
+      "trig": 26
+    },
+    "T3": {
+      "range_min": 63.21,
+      "au": 27,
+      "trig": 32
+    }
+  },
+  "CADJPY": {
+    "T1": {
+      "range_max": 61.54,
+      "au": 19,
+      "trig": 23
+    },
+    "T2": {
+      "range_min": 61.54,
+      "range_max": 107.57,
+      "au": 43,
+      "trig": 51
+    },
+    "T3": {
+      "range_min": 107.57,
+      "au": 42,
+      "trig": 50
+    }
+  },
+  "CADCHF": {
+    "T1": {
+      "range_max": 21.73,
+      "au": 7,
+      "trig": 9
+    },
+    "T2": {
+      "range_min": 21.73,
+      "range_max": 41.15,
+      "au": 14,
+      "trig": 17
+    },
+    "T3": {
+      "range_min": 41.15,
+      "au": 17,
+      "trig": 21
+    }
+  },
+  "GBPCAD": {
+    "T1": {
+      "range_max": 59.7,
+      "au": 20,
+      "trig": 24
+    },
+    "T2": {
+      "range_min": 59.7,
+      "range_max": 104.24,
+      "au": 45,
+      "trig": 55
+    },
+    "T3": {
+      "range_min": 104.24,
+      "au": 42,
+      "trig": 50
+    }
+  }
+}

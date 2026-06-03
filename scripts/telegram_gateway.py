@@ -174,6 +174,17 @@ def main():
     base_url = f"https://api.telegram.org/bot{token}"
     offset = 0
 
+    # Clear any stale updates from previous runs so we start fresh
+    try:
+        _clear = requests.get(f"{base_url}/getUpdates", params={"offset": -1, "timeout": 0}, timeout=5)
+        _cleared = _clear.json().get("result", [])
+        log(f"Stale check: {len(_cleared)} pending updates")
+        if _cleared:
+            offset = max(u["update_id"] for u in _cleared) + 1
+            log(f"Cleared stale updates, starting at offset {offset}")
+    except Exception as _e:
+        log(f"Stale clear error: {_e}")
+
     log("Initializing Telegram Presence System — All 3 Phases...")
     vault = Vault()
     journal = Journal(vault)
@@ -275,14 +286,28 @@ def main():
                                     except:
                                         pass
 
-                                # Add session history
+                                # Add session history — pass as conversation context
                                 history = SESSIONS.get_context(chat_id)
                                 if history:
                                     ctx += "\n\n## Recent Conversation\n"
                                     for h in history[-6:]:
-                                        ctx += "- **" + h["role"] + ":** " + h["content"][:100] + "\n"
+                                        ctx += f"- **{h['role']}:** {h['content'][:100]}\n"
 
-                                resp = agent.chat(msg_text, sovereign_context=ctx)
+                                # Build full message list for multi-turn
+                                messages = [{"role": "system", "content": agent._build_system_prompt(sovereign_context=ctx)}]
+                                for h in history:
+                                    messages.append({"role": h["role"], "content": h["content"]})
+                                messages.append({"role": "user", "content": msg_text})
+
+                                # Call LLM directly with full history
+                                resp, used_model, err = agent._call_llm(messages, agent.current_model)
+                                if not resp:
+                                    # Try next model in chain
+                                    for attempt in range(1, len(agent.MODEL_CHAIN)):
+                                        model = agent.MODEL_CHAIN[(agent._model_index + attempt) % len(agent.MODEL_CHAIN)]
+                                        resp, used_model, err = agent._call_llm(messages, model)
+                                        if resp:
+                                            break
 
                                 # Record in timeline and continuity cache
                                 TIMELINE.record("chat", {"user": msg_text[:50], "response_len": len(resp)})

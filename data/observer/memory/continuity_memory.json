@@ -1,9 +1,9 @@
 {
   "session_id": "session_20260531_214842",
   "start_time": "2026-05-31T21:48:42.184575+00:00",
-  "last_active": "2026-06-03T21:42:50.901172+00:00",
-  "workflow_count": 12,
-  "success_count": 12,
+  "last_active": "2026-06-03T23:35:19.083405+00:00",
+  "workflow_count": 35,
+  "success_count": 35,
   "failure_count": 0,
   "active_goals": [],
   "workflow_history": [
@@ -138,11 +138,267 @@
       "model_used": "",
       "duration_ms": 0.0,
       "error": null
+    },
+    {
+      "workflow_id": "chat_64783e21",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-06-03T21:53:42.630105+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_a4d51e68",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-06-03T21:54:04.896264+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_b7a74ad3",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-06-03T21:56:57.618509+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_a3bb5b42",
+      "domain": "visualization",
+      "complexity": "low",
+      "timestamp": "2026-06-03T21:57:52.674778+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_1c059dd1",
+      "domain": "visualization",
+      "complexity": "low",
+      "timestamp": "2026-06-03T21:58:04.091497+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_13994510",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-06-03T21:58:43.998422+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_117e724d",
+      "domain": "general",
+      "complexity": "low",
+      "timestamp": "2026-06-03T21:58:59.733384+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_03ef52eb",
+      "domain": "general",
+      "complexity": "low",
+      "timestamp": "2026-06-03T21:59:39.435334+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_a1597d09",
+      "domain": "system_analysis",
+      "complexity": "low",
+      "timestamp": "2026-06-03T22:00:17.831533+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_e1e6fd3b",
+      "domain": "visualization",
+      "complexity": "low",
+      "timestamp": "2026-06-03T22:00:34.031003+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_8bc98942",
+      "domain": "system_analysis",
+      "complexity": "low",
+      "timestamp": "2026-06-03T22:08:09.344055+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_2a97332e",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-06-03T22:10:17.957491+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_d812b47d",
+      "domain": "visualization",
+      "complexity": "low",
+      "timestamp": "2026-06-03T22:11:26.483827+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_380f68d0",
+      "domain": "visualization",
+      "complexity": "low",
+      "timestamp": "2026-06-03T22:12:54.147922+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_82749cfc",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-06-03T22:14:54.925966+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_94844644",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-06-03T22:38:12.806908+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_7d5a907c",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-06-03T23:04:26.487317+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_9e16fa83",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-06-03T23:30:26.175081+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_2e239cbc",
+      "domain": "research",
+      "complexity": "low",
+      "timestamp": "2026-06-03T23:31:01.681737+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_0817a894",
+      "domain": "research",
+      "complexity": "low",
+      "timestamp": "2026-06-03T23:31:58.198754+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_c83ba5c9",
+      "domain": "system_analysis",
+      "complexity": "low",
+      "timestamp": "2026-06-03T23:32:52.477019+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_fb6e1abb",
+      "domain": "coding",
+      "complexity": "medium",
+      "timestamp": "2026-06-03T23:34:05.146754+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_4014e924",
+      "domain": "research",
+      "complexity": "low",
+      "timestamp": "2026-06-03T23:35:19.083405+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
     }
   ],
   "routing_patterns": {
-    "TaskType.CONVERSATION:": 8,
-    "TaskType.RESEARCH:": 3,
-    "TaskType.CODING:": 1
+    "TaskType.CONVERSATION:": 17,
+    "TaskType.RESEARCH:": 6,
+    "TaskType.CODING:": 2,
+    "TaskType.VISUALIZATION:": 5,
+    "TaskType.GENERAL:": 2,
+    "TaskType.SYSTEM_ANALYSIS:": 3
   }
 }
