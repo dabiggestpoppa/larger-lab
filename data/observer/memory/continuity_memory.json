@@ -1,9 +1,9 @@
 {
   "session_id": "session_20260531_214842",
   "start_time": "2026-05-31T21:48:42.184575+00:00",
-  "last_active": "2026-06-03T21:37:01.430232+00:00",
-  "workflow_count": 7,
-  "success_count": 7,
+  "last_active": "2026-06-03T21:42:50.901172+00:00",
+  "workflow_count": 12,
+  "success_count": 12,
   "failure_count": 0,
   "active_goals": [],
   "workflow_history": [
@@ -83,10 +83,66 @@
       "model_used": "",
       "duration_ms": 0.0,
       "error": null
+    },
+    {
+      "workflow_id": "chat_19a909a7",
+      "domain": "coding",
+      "complexity": "medium",
+      "timestamp": "2026-06-03T21:39:57.571672+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_f64e7610",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-06-03T21:41:48.922235+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_4567a932",
+      "domain": "research",
+      "complexity": "low",
+      "timestamp": "2026-06-03T21:41:53.780371+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_c7235d3b",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-06-03T21:42:05.356990+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_bed29980",
+      "domain": "research",
+      "complexity": "low",
+      "timestamp": "2026-06-03T21:42:50.901172+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
     }
   ],
   "routing_patterns": {
-    "TaskType.CONVERSATION:": 6,
-    "TaskType.RESEARCH:": 1
+    "TaskType.CONVERSATION:": 8,
+    "TaskType.RESEARCH:": 3,
+    "TaskType.CODING:": 1
   }
 }
