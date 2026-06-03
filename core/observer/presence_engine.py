@@ -232,7 +232,7 @@ def on_progress_change(name, old, new):
 def on_health_change(name, old, new):
     TIMELINE.record("health_change", {"old": str(old)[:50], "new": str(new)[:50]})
     if new != "healthy" and PRIORITY.should_push("service_down", key=name):
-        log(f"[PUSH] Service down: {name}")
+        print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] [PUSH] Service down: {name}", flush=True)
 
 
 # ─── Check Functions ───────────────────────────────────────────────────
