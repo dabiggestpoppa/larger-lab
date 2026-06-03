@@ -4,42 +4,32 @@
 
 ---
 
-## Current Context (2026-05-24 17:00 UTC)
+## Current Context (2026-06-03 12:00 UTC)
 
 ### Status
-🟢 Active — Building SRRA-OPH Phase 3-4 (Temporal Playback + Entropy Dynamics)
+🟡 MONITORING — Watching CC build progress, verifying plan alignment
 
-### Completed
-- All Phase 11 experimental track tests
-- Observability layer (11.2-3B, all 7 stages)
-- SRRA-OPH API server (FastAPI, 8 endpoints)
-- Phase 3-4 frontend: 24 files built and committed
+### Assignment
+- Monitor CC's build progress
+- Ensure he's building according to the plan
+- Do NOT build unless something is wrong
+- Test when everything is done
+- Report to team-chat.md
 
-### Phase 3 (Temporal Playback) Files
-- lib/timeline/types.ts, TimelineEngine.ts, FrameInterpolator.ts
-- stores/timelineStore.ts
-- components/timeline/PlaybackControls.tsx, TemporalScrubber.tsx, EventMarkers.tsx
-- lib/events/EventSequencer.ts
-- lib/storage/FrameCompressor.ts
-- hooks/useTemporalSync.ts
-- components/experiments/ExperimentLoader.tsx
-
-### Phase 4 (Entropy Field) Files
-- lib/entropy/EntropyEngine.ts
-- lib/perturbation/PerturbationInjector.ts
-- lib/collapse/CollapseDetector.ts
-- lib/repair/RepairEntropyDynamics.ts
-- lib/stability/StabilityIndex.ts, DriftTracker.ts
-- stores/entropyStore.ts
-- components/visualization/EntropyField.tsx, PressureField.tsx, CollapseIndicator.tsx, RepairEntropyInteraction.tsx, Shockwave.tsx, StabilityGradient.tsx
-
-### Next Steps
-- Integrate components into CC2's topology page
-- Add playback page to SRRA-OPH frontend
-- Connect live data from observability layer
+### Sync Infrastructure (Verified 2026-06-03)
+- `tools/progress-sync.py` — ✅ Code correct, daemon not running
+- `tools/obsidian_vault_sync.py` — ✅ Code correct, daemon running
+- `tools/gateway_watchdog.py` — ✅ Code correct, not running
+- `tools/po_watchdog.py` — ✅ Code correct, not running
+- `tools/pm2_autopilot.py` — ⚠️ Was spamming git, killed
+- `scripts/start_telegram_gateway.py` — ⚠️ Crashes on start
+- Git — ⚠️ 20+ spam commits from autopilot on master
+- Vault — ✅ Sync daemon active
 
 ### Key Rules
-1. ONE system — integrate into OCE
-2. Test before updating progress
-3. Simplicity first
+1. Monitor, don't build (unless something wrong)
+2. Test when CC is done
+3. Report to team-chat.md
+4. ONE system — integrate into OCE
+5. Simplicity first
 - build_notes: `progress/BUILD-NOTES.md` (updated 2026-06-02 15:00 UTC)
