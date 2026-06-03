@@ -416,3 +416,4 @@
 {"engine": "P90", "symbol": "EURUSD.PRO", "direction": "SELL", "entry": 1.16039, "sl": 1.1595332, "tp": 1.1607, "event": "KILL_SWITCH", "variant": "CASCADE", "time": "2026-06-03 08:53:00"}
 {"engine": "P90", "symbol": "CHFJPY.PRO", "direction": "SELL", "entry": 202.342, "sl": 202.47639999999998, "tp": 202.23975000000002, "event": "EWS_EXIT", "variant": "EWS", "time": "2026-06-03 09:24:00"}
 {"engine": "P90", "symbol": "CHFJPY.PRO", "direction": "SELL", "entry": 202.347, "sl": 202.24115999999998, "tp": 202.44925, "event": "ENTRY", "variant": "CASCADE", "time": "2026-06-03 09:25:00"}
+{"engine": "P90", "symbol": "NZDUSD.PRO", "direction": "SELL", "entry": 0.58856, "sl": 0.58936, "tp": 0.5880675, "event": "TP_HIT", "variant": "INITIAL", "time": "2026-06-03 09:27:00"}
