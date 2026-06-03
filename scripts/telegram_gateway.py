@@ -199,11 +199,17 @@ def main():
          parse_mode="Markdown")
 
     log("Poll loop started. PO is live on Telegram.")
+    _heartbeat = time.time()
 
     while True:
         try:
+            # Heartbeat every 60s
+            if time.time() - _heartbeat > 60:
+                log("HEARTBEAT: poll loop alive")
+                _heartbeat = time.time()
+
             r = requests.get(f"{base_url}/getUpdates",
-                params={"offset": offset, "limit": 10, "timeout": 15}, timeout=20)
+                params={"offset": offset, "limit": 10, "timeout": 10}, timeout=15)
             data = r.json()
             if not data.get("ok"):
                 time.sleep(5)
