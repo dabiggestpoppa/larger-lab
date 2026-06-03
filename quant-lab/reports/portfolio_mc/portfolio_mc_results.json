@@ -6,7 +6,7 @@
     "GBPNZD",
     "NZDUSD"
   ],
-  "timestamp": "2026-06-02T22:11:06.436767",
+  "timestamp": "2026-06-02T22:27:53.782766",
   "n_simulations": 10000,
   "pooled_stats": {
     "total_trades": 3687,
@@ -61,59 +61,12 @@
     "terminal_pnl_75th": 36546.0,
     "terminal_pnl_95th": 36546.0,
     "max_dd_median": 87.5,
-    "max_dd_95th": 108.4,
-    "max_dd_99th": 129.9,
-    "max_dd_worst": 175.1,
+    "max_dd_95th": 107.6,
+    "max_dd_99th": 130.5,
+    "max_dd_worst": 177.1,
     "max_loss_streak_median": 3,
     "max_loss_streak_95th": 5,
     "max_loss_streak_99th": 5,
     "max_loss_streak_worst": 8
-  },
-  "thresholds": {
-    "max_daily_losses": 3,
-    "max_daily_losses_hard": 5,
-    "min_daily_wr": 0.62,
-    "min_daily_wr_hard": 0.49,
-    "max_loss_streak": 5,
-    "max_loss_streak_hard": 8,
-    "max_dd_pips_95th": 108.4,
-    "max_dd_pips_worst": 175.1,
-    "per_asset": {
-      "GBPJPY": {
-        "max_daily_losses": 9,
-        "min_daily_wr": 0.6,
-        "max_loss_streak": 3,
-        "backtest_wr": 0.863,
-        "backtest_trades": 830
-      },
-      "CHFJPY": {
-        "max_daily_losses": 8,
-        "min_daily_wr": 0.6,
-        "max_loss_streak": 3,
-        "backtest_wr": 0.863,
-        "backtest_trades": 751
-      },
-      "GBPAUD": {
-        "max_daily_losses": 6,
-        "min_daily_wr": 0.62,
-        "max_loss_streak": 2,
-        "backtest_wr": 0.884,
-        "backtest_trades": 715
-      },
-      "GBPNZD": {
-        "max_daily_losses": 6,
-        "min_daily_wr": 0.62,
-        "max_loss_streak": 2,
-        "backtest_wr": 0.884,
-        "backtest_trades": 664
-      },
-      "NZDUSD": {
-        "max_daily_losses": 3,
-        "min_daily_wr": 0.65,
-        "max_loss_streak": 2,
-        "backtest_wr": 0.9329999999999999,
-        "backtest_trades": 727
-      }
-    }
   }
 }
