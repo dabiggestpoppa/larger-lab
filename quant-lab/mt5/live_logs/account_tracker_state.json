@@ -1,39 +1,20 @@
 {
-  "timestamp": "2026-06-03T02:04:45.463084",
+  "timestamp": "2026-06-03T03:04:48.340481",
   "account": {
     "login": 650898,
     "server": "OxSecurities-Live",
-    "balance": 71.66,
-    "equity": 72.27,
-    "profit": 0.61,
-    "margin": 1.18,
-    "margin_free": 71.09,
-    "margin_level": 6124.576271186441,
+    "balance": 71.84,
+    "equity": 71.84,
+    "profit": 0.0,
+    "margin": 0.0,
+    "margin_free": 71.84,
+    "margin_level": 0.0,
     "leverage": 500,
     "currency": "USD",
     "name": "Jaelon Scott - Live #0",
     "company": "Ox Securities Pty Ltd"
   },
-  "positions": [
-    {
-      "ticket": 91895111,
-      "symbol": "NZDUSD.PRO",
-      "type": "SELL",
-      "volume": 0.01,
-      "open_price": 0.59145,
-      "current_price": 0.59084,
-      "sl": 0.59224,
-      "tp": 0.59044,
-      "profit": 0.61,
-      "swap": 0.0,
-      "magic": 20260601,
-      "comment": "CEREBUS-ST-L2",
-      "time": "2026-06-03T04:11:57",
-      "sl_pips": 7.9,
-      "tp_pips": 10.1,
-      "rr": 1.28
-    }
-  ],
+  "positions": [],
   "today_history": [
     {
       "ticket": 109664762,
@@ -47,13 +28,26 @@
       "magic": 20260601,
       "comment": "[tp 1.87688]",
       "time": "2026-06-03T00:30:06"
+    },
+    {
+      "ticket": 109675835,
+      "symbol": "NZDUSD.PRO",
+      "type": "SELL",
+      "volume": 0.01,
+      "price": 0.59243,
+      "profit": -0.82,
+      "swap": 0.0,
+      "commission": 0.0,
+      "magic": 20260601,
+      "comment": "[sl 0.59244]",
+      "time": "2026-06-03T02:30:45"
     }
   ],
   "today_stats": {
-    "trades": 1,
-    "pnl": 1.03,
+    "trades": 2,
+    "pnl": 0.21,
     "wins": 1,
-    "losses": 0,
-    "win_rate": 100.0
+    "losses": 1,
+    "win_rate": 50.0
   }
 }
