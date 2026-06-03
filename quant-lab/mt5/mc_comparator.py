@@ -11,41 +11,29 @@ from datetime import datetime
 
 REPORTS_DIR = Path(__file__).parent / ".." / "reports"
 
-# ── MC THRESHOLDS (extracted from monte carlo backtests) ──────────────────
-# These are the "quant bible" numbers. If live trading exceeds these, 
-# something is wrong with the deployment.
+# ── PORTFOLIO MC THRESHOLDS ──────────────────────────────────────────────
+# From portfolio_mc/portfolio_thresholds.json — pooled 3,687 trades across
+# 5 live assets. Captures correlated loss days (not isolated per-asset).
+# HARD thresholds = deployment error. SOFT = warning.
 
+PORTFOLIO_THRESHOLDS = {
+    "max_daily_losses": 3,        # P95 from portfolio MC
+    "max_daily_losses_hard": 5,   # worst case from portfolio MC
+    "min_daily_wr": 0.62,         # P5 daily WR from portfolio MC
+    "min_daily_wr_hard": 0.49,    # absolute floor
+    "max_loss_streak": 5,         # P95 from portfolio MC
+    "max_loss_streak_hard": 8,    # worst case from portfolio MC
+}
+
+# Per-asset thresholds (from portfolio MC detail)
 MC_THRESHOLDS = {
-    # Format: asset -> {metric: {p50: x, p95: x, max: x}}
-    # Per-asset daily loss count thresholds
-    # Derived from MC: mean daily losses + 95th percentile
-    
-    "EURUSD":   {"max_daily_losses": 3, "min_wr": 0.80, "max_dd_pct": 0.015},
-    "GBPUSD":   {"max_daily_losses": 4, "min_wr": 0.78, "max_dd_pct": 0.018},
-    "USDCHF":   {"max_daily_losses": 3, "min_wr": 0.80, "max_dd_pct": 0.015},
-    "USDJPY":   {"max_daily_losses": 4, "min_wr": 0.77, "max_dd_pct": 0.018},
-    "AUDUSD":   {"max_daily_losses": 3, "min_wr": 0.79, "max_dd_pct": 0.016},
-    "NZDUSD":   {"max_daily_losses": 4, "min_wr": 0.77, "max_dd_pct": 0.018},
-    
-    # GBP crosses — wider tolerances per MC
-    "GBPJPY":   {"max_daily_losses": 5, "min_wr": 0.75, "max_dd_pct": 0.025},
-    "GBPAUD":   {"max_daily_losses": 5, "min_wr": 0.75, "max_dd_pct": 0.025},
-    "GBPNZD":   {"max_daily_losses": 5, "min_wr": 0.75, "max_dd_pct": 0.025},
-    "GBPCHF":   {"max_daily_losses": 5, "min_wr": 0.75, "max_dd_pct": 0.025},
-    
-    # CHFJPY
-    "CHFJPY":   {"max_daily_losses": 5, "min_wr": 0.75, "max_dd_pct": 0.025},
-    
-    # Metals/Crypto/Indices — from MC
-    "XAUUSD":   {"max_daily_losses": 4, "min_wr": 0.75, "max_dd_pct": 0.030},
-    "XAGUSD":   {"max_daily_losses": 5, "min_wr": 0.70, "max_dd_pct": 0.035},
-    "BTCUSD":   {"max_daily_losses": 3, "min_wr": 0.80, "max_dd_pct": 0.025},
-    "ETHUSD":   {"max_daily_losses": 4, "min_wr": 0.72, "max_dd_pct": 0.030},
-    "US500":    {"max_daily_losses": 4, "min_wr": 0.78, "max_dd_pct": 0.020},
-    "NAS100":   {"max_daily_losses": 4, "min_wr": 0.78, "max_dd_pct": 0.020},
-    "DE30":     {"max_daily_losses": 4, "min_wr": 0.78, "max_dd_pct": 0.020},
-    "FR40":     {"max_daily_losses": 4, "min_wr": 0.78, "max_dd_pct": 0.020},
-    "HK50":     {"max_daily_losses": 5, "min_wr": 0.75, "max_dd_pct": 0.025},
+    "GBPJPY":  {"max_daily_losses": 9, "min_wr": 0.60, "max_loss_streak": 3},
+    "CHFJPY":  {"max_daily_losses": 8, "min_wr": 0.60, "max_loss_streak": 3},
+    "GBPAUD":  {"max_daily_losses": 6, "min_wr": 0.62, "max_loss_streak": 2},
+    "GBPNZD":  {"max_daily_losses": 6, "min_wr": 0.62, "max_loss_streak": 2},
+    "NZDUSD":  {"max_daily_losses": 3, "min_wr": 0.65, "max_loss_streak": 2},
+    "EURUSD":  {"max_daily_losses": 3, "min_wr": 0.60, "max_loss_streak": 2},  # no bt data yet
+    "USDCHF":  {"max_daily_losses": 3, "min_wr": 0.60, "max_loss_streak": 2},  # no bt data yet
 }
 
 # Fix Windows emoji output
@@ -53,13 +41,7 @@ import os
 if os.name == 'nt':
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
-# Aggregate thresholds (all assets combined today)
-AGGREGATE_THRESHOLDS = {
-    "max_daily_losses": 8,       # 95th percentile worst day across all pairs
-    "min_daily_wr": 0.65,       # Don't go below 65% on any given day
-    "max_daily_dd_pct": 0.03,   # 3% max daily drawdown
-    "max_loss_streak": 5,        # More than 5 consecutive losses = bug
-}
+AGGREGATE_THRESHOLDS = PORTFOLIO_THRESHOLDS
 
 
 def load_mc_asset_data(asset: str) -> dict:
