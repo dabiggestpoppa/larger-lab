@@ -1,10 +1,28 @@
-"""Telegram gateway for Primary Observer — async LLM calls, OC2-style output.
+"""Start script for Telegram Presence System — All 3 Phases.
 
-Key fix: LLM calls run in background thread so gateway never blocks.
-Sends progress updates while waiting for response.
+Phase 1: Telegram Runtime Foundation
+- Async LLM calls (never blocks gateway)
+- Session continuity with TTL
+- Workspace scanning
+- Streaming progress updates
+- Command routing
+
+Phase 2: Operational Telemetry + Live Field
+- /observers — observer health status
+- /drift — drift detection
+- /timeline — operational history
+- /vault — vault metrics + search
+- /tasks — live task tracking
+
+Phase 3: Autonomous Presence Engine
+- Watcher Network (vault, progress, health)
+- Priority Evaluator (anti-spam filtering)
+- Autonomous Push (proactive communication)
+- Continuity Cache (persistent context)
+- Timeline Engine (operational history)
 """
-import os, sys, time, json, requests, datetime, threading
-from collections import defaultdict
+import os, sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 _env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
 if os.path.exists(_env_path):
@@ -14,12 +32,8 @@ if os.path.exists(_env_path):
             if _line and not _line.startswith("#") and "=" in _line:
                 _parts = _line.split("=", 1)
                 os.environ.setdefault(_parts[0].strip(), _parts[1].strip())
-from core.observer.vault import Vault
-from core.observer.journal import Journal
-from core.observer.autonomous_orchestrator import AutonomousOrchestrator
-from core.observer.command_router import CommandRouter
-from core.observer.chat_agent import ChatAgent
-from core.observer.sovereign_field import SovereignField
+
+from scripts.telegram_gateway import main
 
 def log(msg):
     ts = datetime.datetime.now().strftime("%H:%M:%S")
