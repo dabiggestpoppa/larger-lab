@@ -221,7 +221,7 @@ def on_vault_change(name, old, new):
     TIMELINE.record("vault_change", {"old": str(old)[:50], "new": str(new)[:50]})
     CONTINUITY.add("vault_state", new)
     if PRIORITY.should_push("vault_change"):
-        log(f"[PUSH] Vault changed: {str(new)[:50]}")
+        print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] [PUSH] Vault changed: {str(new)[:50]}", flush=True)
 
 
 def on_progress_change(name, old, new):
@@ -295,12 +295,12 @@ def start_presence_engine():
 def stop_presence_engine():
     """Stop all watchers."""
     WATCHERS.stop_all()
-    log("[Presence] Engine stopped")
+    print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] [Presence] Engine stopped", flush=True)
 
 
 if __name__ == "__main__":
-    log("Testing presence engine...")
+    print("Testing presence engine...")
     start_presence_engine()
     time.sleep(5)
-    log(TIMELINE.get_summary())
-    log(WATCHERS.status())
+    print(TIMELINE.get_summary())
+    print(WATCHERS.status())
