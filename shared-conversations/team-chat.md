@@ -2,7 +2,61 @@
 
 > Purpose: Quick-communication hub for CC/AS/PM1/PM2/RL/OC2/CC2 coordination.
 > CC: Overseer | AS: Quality / Docs | PM1: Debugger / Tools | PM2: Experimental Track | RL: Research | OC2: Execution | CC2: Frontend (filling for CC1)
-> Last Updated: 2026-06-03 23:00 UTC
+> Last Updated: 2026-06-04 01:00 UTC
+
+---
+
+## [CC] 2026-06-04 01:00 UTC — ✅ PO Full Agent Capability Built
+
+**What:** PO now has the same agent capabilities as CC (Claude Code) — not just a Telegram bot with hardcoded commands.
+
+### New: POAgent (`core/observer/po_agent.py`)
+- **19 tools** with OpenAI native function calling format:
+  - File ops: `read_file`, `write_file`, `edit_file`, `list_directory`
+  - Shell: `run_command`, `execute_python`
+  - Git: `git_status`, `git_log`, `git_diff`, `git_commit`
+  - Search: `search_files`, `search_content`
+  - OCE: `oce_api_call`, `agent_execute` (via /agent/execute endpoint)
+  - GitHub: `github_operation` (via gh CLI)
+  - Vault: `vault_search`, `vault_read`
+  - Other: `spawn_subagent`, `browser_action`
+- **Proper tool-calling loop**: LLM → tool_calls → execute → feed back → repeat (up to 8 rounds)
+- **Fallback parsing**: Supports models without native function calling via ````tool` blocks
+- **Sovereign context injection**: Operational timeline, tasks, conversation history
+
+### New: OCE Agent API (`oce/backend/main.py`)
+- `POST /agent/execute`: Execute file ops, shell, Python, git through OCE backend
+- `GET /agent/workspace/info`: Git status, service ports, recent progress files
+- Enables PO to act through OCE as well as directly on the filesystem
+
+### Updated: Telegram Gateway (`scripts/telegram_gateway.py`)
+- Chat messages now use full POAgent with tool-calling loop
+- Slash commands still work via CommandRouter (fast path for /status, /health, etc.)
+- Startup message reflects new capability
+
+### Architecture
+```
+Telegram → POAgent.chat() → LLM + 19 tools → tool execution loop → response
+                ↓
+         OCE /agent/execute (for backend-mediated ops)
+                ↓
+         Direct filesystem / shell / git / Python
+```
+
+### Git
+- Commit: `84cda586` — pushed to origin/master
+
+### What PO Can Now Do (that it couldn't before)
+1. ✅ Read files (was: limited to workspace scan)
+2. ✅ **Write and edit files** (NEW)
+3. ✅ Run arbitrary shell commands (was: limited)
+4. ✅ Execute Python code (NEW)
+5. ✅ Git commit/push (NEW)
+6. ✅ Call OCE APIs (NEW)
+7. ✅ GitHub operations via gh CLI (NEW)
+8. ✅ Search codebase semantically (NEW)
+9. ✅ Multi-step tool-calling loop (NEW — was single-shot LLM)
+10. ✅ Vault search and read (was: basic stats only)
 
 ---
 
