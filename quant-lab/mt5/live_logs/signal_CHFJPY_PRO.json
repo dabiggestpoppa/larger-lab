@@ -2,10 +2,10 @@
   "engine": "P90",
   "symbol": "CHFJPY.PRO",
   "direction": "SELL",
-  "entry": 202.506,
-  "sl": 202.19856000000001,
-  "tp": 202.60825,
-  "event": "EWS_EXIT",
-  "variant": "EWS",
-  "time": "2026-06-03 10:19:00"
+  "entry": 202.454,
+  "sl": 202.30952,
+  "tp": 202.55625,
+  "event": "ENTRY",
+  "variant": "CASCADE",
+  "time": "2026-06-03 10:30:00"
 }
