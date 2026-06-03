@@ -2,10 +2,10 @@
   "engine": "P90",
   "symbol": "GBPJPY.PRO",
   "direction": "SELL",
-  "entry": 214.972,
-  "sl": 214.852,
-  "tp": 215.074,
-  "event": "KILL_SWITCH",
+  "entry": 214.971,
+  "sl": 214.83324000000002,
+  "tp": 215.073,
+  "event": "ENTRY",
   "variant": "CASCADE",
-  "time": "2026-06-03 05:34:00"
+  "time": "2026-06-03 06:09:00"
 }
