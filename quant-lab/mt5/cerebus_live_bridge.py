@@ -185,7 +185,12 @@ def check_autotrading() -> bool:
 
 
 def send_order(symbol: str, direction: str, volume: float,
-               sl: float, tp: float, comment: str) -> bool:
+               sl: float, tp: float, comment: str, no_sl: bool = False) -> bool:
+    """
+    Send order to MT5.
+    If no_sl=True, SL is not included in the order request.
+    Used for ST trades where SL is monitored by the engine (close-only).
+    """
     if not check_autotrading():
         log.warning("MT5 AutoTrading DISABLED")
         return False
@@ -213,29 +218,36 @@ def send_order(symbol: str, direction: str, volume: float,
     # The engine's SL may be on the "profit side" for SHORT — that's intentional.
     # We do NOT clamp or override. The broker will reject if truly invalid.
 
-    sl = round(sl, info.digits)
     tp = round(tp, info.digits)
 
-    # Calculate distances in pips
-    sym = symbol
-    sl_pips = to_pips(abs(sl - price), sym)
-    tp_pips = to_pips(abs(tp - price), sym)
-    rr = round(tp_pips / sl_pips, 2) if sl_pips > 0 else 0.0
+    # ── ALIEN EDGE: No hard SL for ST trades ──────────────────────
+    # Per ARC directive: ST uses monitored close, not broker SL.
+    # The engine monitors M5 closes and returns SL_HIT when price
+    # breaches the impulse extreme. No hard SL sent to broker.
+    if no_sl:
+        sl = 0.0  # No SL in broker order
+        sl_pips = to_pips(abs(sl - price), sym) if sl > 0 else 0.0
+        tp_pips = to_pips(abs(tp - price), sym)
+        log.info("Order (NO SL): %s %.5f | TP=%.5f (%.1fp) | SL=engine-monitored"
+                 % (direction, price, tp, tp_pips))
+    else:
+        sl = round(sl, info.digits)
+        sl_pips = to_pips(abs(sl - price), sym)
+        tp_pips = to_pips(abs(tp - price), sym)
+        rr = round(tp_pips / sl_pips, 2) if sl_pips > 0 else 0.0
+        log.info("Order: %s %.5f | SL=%.5f (%.1fp) | TP=%.5f (%.1fp) | RR=%.2f"
+                 % (direction, price, sl, sl_pips, tp, tp_pips, rr))
 
-    log.info("Order: %s %.5f | SL=%.5f (%.1fp) | TP=%.5f (%.1fp) | RR=%.2f"
-             % (direction, price, sl, sl_pips, tp, tp_pips, rr))
-
-    # ── BRIDGE RR GATE (MAD Directive 2026-06-03) ──────────────────────
-    # Safety net: If RR < 1.0, reject even if engine sent it.
-    # This prevents negative-expectancy trades from reaching the broker.
-    MIN_RR = 1.0
-    if rr < MIN_RR:
-        log.warning(
-            "BRIDGE RR GATE: REJECTED %s %s | RR=%.2f < %.1f | "
-            "TP=%.1fp SL=%.1fp — math broken, skipping."
-            % (direction, symbol, rr, MIN_RR, tp_pips, sl_pips)
-        )
-        return False
+        # ── BRIDGE RR GATE (MAD Directive 2026-06-03) ──────────────────
+        # Safety net: If RR < 1.0, reject even if engine sent it.
+        MIN_RR = 1.0
+        if rr < MIN_RR:
+            log.warning(
+                "BRIDGE RR GATE: REJECTED %s %s | RR=%.2f < %.1f | "
+                "TP=%.1fp SL=%.1fp — math broken, skipping."
+                % (direction, symbol, rr, MIN_RR, tp_pips, sl_pips)
+            )
+            return False
 
     request = {
         "action": mt5.TRADE_ACTION_DEAL,
