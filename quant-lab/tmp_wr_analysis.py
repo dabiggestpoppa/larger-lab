@@ -114,7 +114,7 @@ def run_backtest(symbol, bars):
             entry = sig.entry_price
             sl = sig.sl_price
             tp1 = sig.tp_price
-            direction = 'LONG' if sig.direction == TradeDirection.Long else 'SHORT'
+            direction = 'LONG' if sig.direction == TradeDirection.LONG else 'SHORT'
             variant = sig.variant.value
             
             outcome = None
