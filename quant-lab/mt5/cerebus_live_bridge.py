@@ -200,42 +200,20 @@ def send_order(symbol: str, direction: str, volume: float,
     min_stop_pts = getattr(info, 'trade_stops_level', 0)
     min_dist = (min_stop_pts + 1) * point if min_stop_pts > 0 else 0.0
 
-    # Only clamp SL/TP if they're on the WRONG side of entry.
-    # The engine (P90/ST) calculates correct SL/TP — we trust it.
-    # We only enforce: (a) SL on correct side, (b) TP on correct side,
-    # (c) broker minimum stop level.
-    if direction == "BUY":
-        # SL must be below entry
-        if sl >= price:
-            old_sl = sl
-            sl = price - max(min_dist, 10 * point)
-            log.warning("SL %.5f >= BUY entry %.5f (wrong side) — clamping to %.5f", old_sl, price, sl)
-        # TP must be above entry
-        if tp <= price:
-            old_tp = tp
-            tp = price + max(min_dist, 10 * point)
-            log.warning("TP %.5f <= BUY entry %.5f (wrong side) — clamping to %.5f", old_tp, price, tp)
-        # Enforce broker minimum distance
-        if min_dist > 0:
+    # Trust the engine's SL/TP — it uses zero-buffer impulse extreme per Nautilus strategy.
+    # Only enforce broker minimum stop level (hard requirement).
+    # Do NOT clamp based on "wrong side" — the engine's SL may be intentionally
+    # placed at impulse extreme which can be on the profit side for SHORT.
+    if min_dist > 0:
+        # Enforce broker minimum stop level for both SL and TP
+        if direction == "BUY":
             hard_max_sl = price - min_dist
             if sl > hard_max_sl:
                 sl = hard_max_sl
             hard_min_tp = price + min_dist
             if tp < hard_min_tp:
                 tp = hard_min_tp
-    else:  # SELL
-        # SL must be above entry
-        if sl <= price:
-            old_sl = sl
-            sl = price + max(min_dist, 10 * point)
-            log.warning("SL %.5f <= SELL entry %.5f (wrong side) — clamping to %.5f", old_sl, price, sl)
-        # TP must be below entry
-        if tp >= price:
-            old_tp = tp
-            tp = price - max(min_dist, 10 * point)
-            log.warning("TP %.5f >= SELL entry %.5f (wrong side) — clamping to %.5f", old_tp, price, tp)
-        # Enforce broker minimum distance
-        if min_dist > 0:
+        else:  # SELL
             hard_min_sl = price + min_dist
             if sl < hard_min_sl:
                 sl = hard_min_sl
