@@ -38,6 +38,7 @@
     "journal_20260603T030708Z_command_agents.md": "c569a15550dd28168178d52f7ce77efe",
     "journal_20260603T032430Z_command_restart.md": "8fcd083000535051dfacfc940d0f2c25",
     "journal_20260603T032430Z_restart_all.md": "60d3cd6eb958e1f73e0f48ec06fa0fcf",
+    "journal_20260603T132919Z_command_help.md": "8e0cdd1b5ed14d203e42327b36062882",
     "Module Guide.md": "d41d8cd98f00b204e9800998ecf8427e",
     "Primary Observer.md": "d41d8cd98f00b204e9800998ecf8427e",
     "PRINCIPLES.md": "d41d8cd98f00b204e9800998ecf8427e",
@@ -1503,6 +1504,6 @@
     "skills\\XAi.md": "0864011d6809fd1ba9abd903053831f5",
     "skills\\Zapier.md": "5c1bb34ef437685ec31f84344285a040"
   },
-  "last_sync": "2026-06-03T00:37:49.744981",
-  "changes_since_sync": 4
+  "last_sync": "2026-06-03T09:33:51.813222",
+  "changes_since_sync": 0
 }
