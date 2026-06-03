@@ -20,13 +20,13 @@ with open('quant-lab/data/EURUSD_M5.csv', newline='', encoding='utf-8-sig') as f
                 ts = dv.strip() + ' ' + tv.strip()
         if ts:
             try:
-                bars.append({
+                bars.append(type('Bar', (), {
                     'timestamp': datetime.strptime(ts.strip(), '%Y-%m-%d %H:%M:%S'),
                     'open': float(clean.get('OPEN') or clean.get('open')),
                     'high': float(clean.get('HIGH') or clean.get('high')),
                     'low': float(clean.get('LOW') or clean.get('low')),
                     'close': float(clean.get('CLOSE') or clean.get('close'))
-                })
+                })())
             except Exception:
                 pass
 
