@@ -537,27 +537,28 @@ class P90Engine:
         else:
             sl_offset = body_price * 0.80
 
-        # ── TARGET: Asian Range extension from the BAND EDGE ──────────
-        # Per Architect clarification (2026-06-03):
-        #   LONG:  TP = Asian High + (Asian Range × extension%)
-        #   SHORT: TP = Asian Low - (Asian Range × extension%)
-        # NOT measured from entry. Measured from the breached band edge.
-        ar_ext_1 = self.ar_price * 0.25  # TP1 = 25% AR extension
-        ar_ext_2 = self.ar_price * 0.50  # TP2 = 50% AR extension
+        # ── TARGET: Entry Price ± Atomic Unit (MAD/Architect Directive 2026-06-03) ─
+        # OLD (BROKEN): TP = Asian High/Low ± AR extension
+        #   This placed TP BEHIND entry on breakout trades.
+        #   Example: Entry 1.1015, Asian High 1.1000, TP = 1.1005 = -10p loss logged as "TP hit"
+        # NEW (CORRECT): TP = Entry ± AU (same structural targets as Symmetry Trap)
+        #   TP1 = Entry + 1 AU, TP2 = Entry + Gear Shift AU
+        #   Measured FROM entry price in direction of trade. Every TP hit = actual profit.
+        au_pips = self.au_price / self.pip_size  # AU in price units → convert to pips for reference
+        # Use tier AU as the atomic unit target
+        au_target_1 = self.au_price  # 1 AU
+        au_target_2 = self.au_price * 2.0  # 2 AU (gear shift)
 
         if direction == TradeDirection.LONG:
             sl = entry - sl_offset
-            tp1 = self.asian_high + ar_ext_1
-            tp2 = self.asian_high + ar_ext_2
+            tp1 = entry + au_target_1  # 1 AU above entry
+            tp2 = entry + au_target_2  # 2 AU above entry
         else:
             sl = entry + sl_offset
-            tp1 = self.asian_low - ar_ext_1
-            tp2 = self.asian_low - ar_ext_2
+            tp1 = entry - au_target_1  # 1 AU below entry
+            tp2 = entry - au_target_2  # 2 AU below entry
 
         # ── RR GATE: Skip if TP1 doesn't cover the risk ──────────────
-        # If TP1 distance from entry < SL distance from entry, the math
-        # is broken (negative expectancy). Return params anyway — the
-        # caller (process_bar) will check RR and skip.
         sl_dist = abs(sl - entry)
         tp1_dist = abs(tp1 - entry)
         rr1 = tp1_dist / sl_dist if sl_dist > 0 else 0.0
@@ -565,7 +566,7 @@ class P90Engine:
             self.logger.info(
                 f"RR GATE: TP1/SL = {rr1:.2f} < {MIN_RR} "
                 f"(TP1={tp1_dist:.1f}p, SL={sl_dist:.1f}p) — "
-                f"AR too small for this P90 body. Will skip."
+                f"AU too small for this P90 body. Will skip."
             )
 
         # ── STRUCTURAL SL FIX: Enforce P90 Extreme + Min Buffer Floor ──
