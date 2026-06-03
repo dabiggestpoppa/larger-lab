@@ -2,10 +2,10 @@
   "engine": "P90",
   "symbol": "EURUSD.PRO",
   "direction": "SELL",
-  "entry": 1.16039,
-  "sl": 1.1595332,
-  "tp": 1.1607,
-  "event": "KILL_SWITCH",
+  "entry": 1.1608,
+  "sl": 1.15954,
+  "tp": 1.16111,
+  "event": "ENTRY",
   "variant": "CASCADE",
-  "time": "2026-06-03 08:53:00"
+  "time": "2026-06-03 10:14:00"
 }
