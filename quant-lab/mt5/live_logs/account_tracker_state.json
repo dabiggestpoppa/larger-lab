@@ -1,14 +1,14 @@
 {
-  "timestamp": "2026-06-03T15:04:56.996248",
+  "timestamp": "2026-06-03T16:05:00.193163",
   "account": {
     "login": 650898,
     "server": "OxSecurities-Live",
-    "balance": 66.62,
-    "equity": 66.16,
-    "profit": -0.46,
-    "margin": 5.0,
-    "margin_free": 61.16,
-    "margin_level": 1323.1999999999998,
+    "balance": 65.79,
+    "equity": 65.88,
+    "profit": 0.09,
+    "margin": 2.32,
+    "margin_free": 63.56,
+    "margin_level": 2839.655172413793,
     "leverage": 500,
     "currency": "USD",
     "name": "Jaelon Scott - Live #0",
@@ -21,10 +21,10 @@
       "type": "SELL",
       "volume": 0.01,
       "open_price": 1.15986,
-      "current_price": 1.15995,
+      "current_price": 1.15977,
       "sl": 1.16039,
       "tp": 1.15886,
-      "profit": -0.09,
+      "profit": 0.09,
       "swap": 0.0,
       "magic": 20260601,
       "comment": "CEREBUS-ST-L4",
@@ -32,24 +32,6 @@
       "sl_pips": 5.3,
       "tp_pips": 10.0,
       "rr": 1.89
-    },
-    {
-      "ticket": 91944777,
-      "symbol": "GBPAUD.PRO",
-      "type": "SELL",
-      "volume": 0.01,
-      "open_price": 1.88115,
-      "current_price": 1.88167,
-      "sl": 1.88231,
-      "tp": 1.88015,
-      "profit": -0.37,
-      "swap": 0.0,
-      "magic": 20260601,
-      "comment": "CEREBUS-P90",
-      "time": "2026-06-03T15:59:59",
-      "sl_pips": 11.6,
-      "tp_pips": 10.0,
-      "rr": 0.86
     }
   ],
   "today_history": [
@@ -780,13 +762,65 @@
       "magic": 20260601,
       "comment": "[sl 1.88172]",
       "time": "2026-06-03T14:35:01"
+    },
+    {
+      "ticket": 109768277,
+      "symbol": "CHFJPY.PRO",
+      "type": "BUY",
+      "volume": 0.01,
+      "price": 202.18,
+      "profit": 0.66,
+      "swap": 0.0,
+      "commission": 0.0,
+      "magic": 20260601,
+      "comment": "[tp 202.183]",
+      "time": "2026-06-03T15:07:01"
+    },
+    {
+      "ticket": 109769238,
+      "symbol": "CHFJPY.PRO",
+      "type": "BUY",
+      "volume": 0.01,
+      "price": 202.048,
+      "profit": 0.64,
+      "swap": 0.0,
+      "commission": 0.0,
+      "magic": 20260601,
+      "comment": "[tp 202.048]",
+      "time": "2026-06-03T15:32:31"
+    },
+    {
+      "ticket": 109770257,
+      "symbol": "EURUSD.PRO",
+      "type": "BUY",
+      "volume": 0.03,
+      "price": 1.16004,
+      "profit": 2.91,
+      "swap": 0.0,
+      "commission": 0.0,
+      "magic": 20260531,
+      "comment": "[sl 1.16004]",
+      "time": "2026-06-03T15:57:11"
+    },
+    {
+      "ticket": 109770454,
+      "symbol": "CHFJPY.PRO",
+      "type": "BUY",
+      "volume": 0.01,
+      "price": 202.009,
+      "profit": 0.01,
+      "swap": 0.0,
+      "commission": 0.0,
+      "magic": 20260601,
+      "comment": "[sl 202.009]",
+      "time": "2026-06-03T15:57:14"
     }
   ],
   "today_stats": {
-    "trades": 56,
-    "pnl": -2.86,
-    "wins": 21,
+    "trades": 60,
+    "pnl": 1.36,
+    "wins": 25,
     "losses": 35,
-    "win_rate": 37.5
+    "win_rate": 41.7
   }
 }
