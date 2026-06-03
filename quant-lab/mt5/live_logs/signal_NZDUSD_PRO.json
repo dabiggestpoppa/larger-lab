@@ -1,11 +1,11 @@
 {
-  "engine": "SymmetryTrap",
+  "engine": "P90",
   "symbol": "NZDUSD.PRO",
   "direction": "SELL",
-  "entry": 0.59144,
-  "sl": 0.59224,
-  "tp": 0.59044,
-  "event": "TP_HIT",
-  "loop": 2,
-  "time": "2026-06-03 02:12:00"
+  "entry": 0.58967,
+  "sl": 0.59047,
+  "tp": 0.5891775,
+  "event": "ENTRY",
+  "variant": "INITIAL",
+  "time": "2026-06-03 04:25:00"
 }
