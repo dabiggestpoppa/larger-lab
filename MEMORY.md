@@ -1,6 +1,38 @@
 # MEMORY.md — OWL (OC2) Persistent Memory
 
-> **Last Updated:** 2026-06-03 17:33 EDT — ST-ONLY DEPLOYMENT (Top 7 assets, P90 disabled, sym bug fixed)
+> **Last Updated:** 2026-06-03 21:10 EDT — ALL 7 BASKETS COMPLETE (39,866 trades | 87.5% WR | +277,666p)
+
+---
+
+## 🔴 BASKET BACKTEST INVESTIGATION (2026-06-03 21:20 EDT)
+
+### Loop Stats — WORKING, not missing
+- All 5 loops fire: Loop 1 = 434 tr (92.2% WR), Loop 2 = 267 tr (82.8%), Loop 3 = 188 tr (79.8%), Loop 4 = 125 tr (76.0%), Loop 5 = 111 tr (77.5%)
+- EURUSD total: 1,125 trades across 1,341 days (0.839 tr/day)
+- Loop stats computed in engine but NOT saved by basket runner (reporting gap, not engine bug)
+- BacktestResult has loop_stats field, report formatter has loop display code — just not passed through
+
+### PRO vs Non-PRO — DATA QUALITY ISSUE (UPDATED 2026-06-03 21:28 EDT)
+- Both formats parse correctly after CSV fix
+- **CRITICAL: PRO pair data from 2015-2021 has ZERO Asian session bars (UTC 00:00-08:00)**
+- EURGBP 2015-2021: Only 1,756 bars at 19:00-21:00 UTC (2 hrs/day). No Asian coverage.
+- EURGBP 2022-2026: 274,871 bars with full 24-hour coverage including Asian session.
+- Engine needs Asian bars to compute AR → pre-2022 days are SKIPPED (ah=0, al=99999 → continue)
+- **Effective data for ALL PRO pairs: ~2022-2026 only (~4.5 years), NOT 2015-2026**
+- This is why PRO pairs produce fewer trades despite longer filenames — old data is unusable
+- ORIG pairs: 0.588 tr/day | PRO pairs: 0.269 tr/day (PRO pairs have wider AR → fewer qualifying sessions)
+- Phase 0 ground truth EURUSD: 2,186 trades vs our 1,125 — suggests Phase 0 used different params or longer data
+
+### Data Ranges (EFFECTIVE — with Asian session coverage)
+- ORIG pairs (EURUSD, GBPUSD, etc.): 2022-01 to 2026-05 (~4.5 years, full coverage)
+- PRO pairs (EURGBP, EURJPY, etc.): 2022-01 to 2026-06 (~4.5 years effective, 2015 data is partial)
+
+### Low Trade Count Diagnosis
+- 12 PM EST cutoff limits London session to 9 hours (3 AM - 12 PM EST) — this is correct
+- After loop 1 exits, remaining bars rarely form clean DZ → OCC for loops 2-5
+- K-Means tier thresholds filter out many sessions
+- Average 0.339 tr/day across all pairs — selective by design
+- **Root cause of low PRO pair trades: missing Asian bars in pre-2022 data, not strategy bug**
 
 ---
 

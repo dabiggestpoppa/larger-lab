@@ -138,7 +138,8 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     set((s) => ({ messages: [...s.messages, userMsg] }));
 
     try {
-      const res = await fetch("/api/chat", {
+      // Use streaming endpoint for real-time progress updates
+      const res = await fetch("/api/chat/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -146,26 +147,108 @@ export const useChatStore = create<ChatStore>((set, get) => ({
           session_id: sessionId || get().activeSessionId,
         }),
       });
-      const data = await res.json();
 
-      const observerMsg: ChatMessage = {
-        message_id: `observer_${Date.now()}`,
-        role: "observer",
-        content: data.response || "No response",
-        timestamp: new Date().toISOString(),
-        session_id: data.session_id || sessionId || "",
-        task_domain: data.observer?.task_domain,
-        complexity: data.observer?.complexity,
-        observer_metadata: {
-          routing_path: data.observer?.routing_path,
-          model: data.observer?.model,
-          confidence: data.confidence,
-          agreement: data.observer?.agreement,
-          spawn_status: data.observer?.spawn_status,
-          system: data.system,
-        },
-      };
-      set((s) => ({ messages: [...s.messages, observerMsg] }));
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      // Read SSE stream
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let finalData: any = null;
+      const progressMessages: ChatMessage[] = [];
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n\n");
+          buffer = lines.pop() || "";
+
+          for (const line of lines) {
+            if (!line.startsWith("data: ")) continue;
+            const jsonStr = line.slice(6).trim();
+            if (!jsonStr) continue;
+
+            try {
+              const evt = JSON.parse(jsonStr);
+              const eventType = evt.type || evt.event;
+              const data = evt.data || {};
+
+              if (eventType === "round") {
+                const msg: ChatMessage = {
+                  message_id: `progress_${Date.now()}_round`,
+                  role: "system",
+                  content: `🔄 Round ${data.round}/${data.max} — Thinking...`,
+                  timestamp: new Date().toISOString(),
+                  session_id: sessionId || get().activeSessionId || "",
+                };
+                progressMessages.push(msg);
+                set((s) => ({ messages: [...s.messages, msg] }));
+              } else if (eventType === "tool_call") {
+                const msg: ChatMessage = {
+                  message_id: `progress_${Date.now()}_tool`,
+                  role: "system",
+                  content: `🔧 Tool: ${data.tool} — Executing...`,
+                  timestamp: new Date().toISOString(),
+                  session_id: sessionId || get().activeSessionId || "",
+                };
+                progressMessages.push(msg);
+                set((s) => ({ messages: [...s.messages, msg] }));
+              } else if (eventType === "tool_result") {
+                const preview = (data.result || "").substring(0, 120);
+                const msg: ChatMessage = {
+                  message_id: `progress_${Date.now()}_result`,
+                  role: "system",
+                  content: `📋 ${data.tool}: ${preview}${data.result?.length > 120 ? "..." : ""}`,
+                  timestamp: new Date().toISOString(),
+                  session_id: sessionId || get().activeSessionId || "",
+                };
+                progressMessages.push(msg);
+                set((s) => ({ messages: [...s.messages, msg] }));
+              } else if (eventType === "final") {
+                finalData = data;
+              } else if (eventType === "error") {
+                const msg: ChatMessage = {
+                  message_id: `error_${Date.now()}`,
+                  role: "system",
+                  content: `❌ Error: ${data.message || "Unknown error"}`,
+                  timestamp: new Date().toISOString(),
+                  session_id: sessionId || get().activeSessionId || "",
+                };
+                set((s) => ({ messages: [...s.messages, msg] }));
+              }
+            } catch (parseErr) {
+              // Skip malformed SSE events
+            }
+          }
+        }
+      }
+
+      // Send final response
+      if (finalData) {
+        const observerMsg: ChatMessage = {
+          message_id: `observer_${Date.now()}`,
+          role: "observer",
+          content: finalData.response || "No response",
+          timestamp: new Date().toISOString(),
+          session_id: finalData.session_id || sessionId || "",
+          task_domain: finalData.observer?.task_domain,
+          complexity: finalData.observer?.complexity,
+          observer_metadata: {
+            routing_path: finalData.observer?.routing_path,
+            model: finalData.observer?.model,
+            confidence: finalData.confidence,
+            agreement: finalData.observer?.agreement,
+            spawn_status: finalData.observer?.spawn_status,
+            system: finalData.system,
+          },
+        };
+        set((s) => ({ messages: [...s.messages, observerMsg] }));
+      }
 
       // Reload sessions to update the list
       await get().loadSessions();

@@ -461,12 +461,17 @@ class SRRSAdapter:
             },
         }
 
-    async def process_continuity_message(self, message: str, context: Optional[Dict] = None) -> Dict[str, Any]:
+    async def process_continuity_message(self, message: str, context: Optional[Dict] = None,
+                                          agent_progress_callback=None) -> Dict[str, Any]:
         """
         Process a message through the Observer pipeline.
 
         For simple factual questions → fast path (direct response).
         For complex tasks → full O-1 → O-2 → O-3 pipeline.
+
+        Args:
+            agent_progress_callback: Optional callable(event_type, data) for streaming
+                progress events during agent tool-calling.
         """
         if not self._initialized:
             await self.initialize()
@@ -528,7 +533,8 @@ class SRRSAdapter:
             ]
             sovereign_context = "\n".join(sov_lines)
 
-            response_text = agent.chat(message, sovereign_context=sovereign_context)
+            response_text = agent.chat(message, sovereign_context=sovereign_context,
+                                        progress_callback=agent_progress_callback)
             spawn_status = "completed"
 
             # ── Step 4: Gather system state for enrichment ──

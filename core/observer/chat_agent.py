@@ -128,10 +128,27 @@ class ChatAgent:
         except Exception as e:
             return f"Error executing {tool_name}: {e}"
 
-    def chat(self, message: str, sovereign_context: str = "", max_tool_rounds: int = 5) -> str:
-        """Chat with tool-calling support. LLM can request tool executions."""
+    def chat(self, message: str, sovereign_context: str = "", max_tool_rounds: int = 5,
+             progress_callback=None) -> str:
+        """Chat with tool-calling support. LLM can request tool executions.
+
+        Args:
+            progress_callback: Optional callable(event_type, data) that receives
+                progress events during tool execution:
+                - ("round", {"round": N, "max": M})
+                - ("tool_call", {"tool": name, "args": {...}})
+                - ("tool_result", {"tool": name, "result": str})
+                - ("final", {"response": str})
+        """
         if not self.api_key:
             return "LLM not configured. Set OPENROUTER_API_KEY."
+
+        def _notify(event_type, data=None):
+            if progress_callback:
+                try:
+                    progress_callback(event_type, data or {})
+                except Exception:
+                    pass
 
         vault_context = self._get_vault_context(message)
         system_prompt = self._build_system_prompt(vault_context=vault_context, sovereign_context=sovereign_context)
@@ -142,6 +159,8 @@ class ChatAgent:
         messages.append({"role": "user", "content": message})
 
         for round_num in range(max_tool_rounds):
+            _notify("round", {"round": round_num + 1, "max": max_tool_rounds})
+
             for attempt in range(len(MODEL_CHAIN)):
                 model = MODEL_CHAIN[(self._model_index + attempt) % len(MODEL_CHAIN)]
                 resp, used_model, err = self._call_llm(messages, model)
@@ -151,11 +170,18 @@ class ChatAgent:
                 continue
 
             if not resp:
+                _notify("error", {"message": "All LLM providers failed"})
                 return "All LLM providers failed."
 
             tool_call = self._parse_tool_call(resp)
             if tool_call:
+                tool_name = tool_call.get("tool", "unknown")
+                tool_args = tool_call.get("args", {})
+                _notify("tool_call", {"tool": tool_name, "args": tool_args})
+
                 tool_result = self._execute_tool(tool_call)
+                _notify("tool_result", {"tool": tool_name, "result": tool_result[:300]})
+
                 messages.append({"role": "assistant", "content": resp})
                 messages.append({
                     "role": "user",
@@ -165,6 +191,7 @@ class ChatAgent:
             else:
                 self._history.append({"role": "user", "content": message})
                 self._history.append({"role": "assistant", "content": resp})
+                _notify("final", {"response": resp})
                 return resp
 
         # Max rounds — ask for final response
@@ -175,6 +202,7 @@ class ChatAgent:
             if resp:
                 self._history.append({"role": "user", "content": message})
                 self._history.append({"role": "assistant", "content": resp})
+                _notify("final", {"response": resp})
                 return resp
             continue
         return "All LLM providers failed after tool calls."
