@@ -11,6 +11,7 @@ Persistent operational observer interface with:
 """
 import os, sys, time, json, requests, datetime, threading
 from collections import defaultdict, deque
+from typing import Dict, Callable
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 _env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
@@ -163,6 +164,48 @@ class TaskQueue:
 
 TASK_QUEUE = TaskQueue(max_workers=3)
 
+# ─── Per-Chat Queue ──────────────────────────────────────────────────────
+# Ensures messages from the same chat are processed sequentially.
+# If a user sends 3 messages while agent is working on #1, they queue up.
+
+class ChatQueue:
+    """Per-chat sequential message queue. Each chat gets its own worker thread."""
+
+    def __init__(self):
+        self._queues: Dict[int, deque] = defaultdict(deque)
+        self._locks: Dict[int, threading.Lock] = defaultdict(threading.Lock)
+        self._active: Dict[int, bool] = defaultdict(bool)
+
+    def submit(self, chat_id: int, fn: Callable, *args, **kwargs):
+        """Submit a task for a specific chat. Tasks run sequentially per chat."""
+        with self._locks[chat_id]:
+            self._queues[chat_id].append((fn, args, kwargs))
+            if self._active[chat_id]:
+                # Agent is already working — message will be picked up when current task finishes
+                log(f"Chat {chat_id}: queued message (queue depth: {len(self._queues[chat_id])})")
+                return
+            self._active[chat_id] = True
+
+        # Start processing thread for this chat
+        t = threading.Thread(target=self._process_chat, args=(chat_id,), daemon=True)
+        t.start()
+
+    def _process_chat(self, chat_id: int):
+        """Process all queued messages for a chat sequentially."""
+        while True:
+            with self._locks[chat_id]:
+                if not self._queues[chat_id]:
+                    self._active[chat_id] = False
+                    return
+                fn, args, kwargs = self._queues[chat_id].popleft()
+
+            try:
+                fn(*args, **kwargs)
+            except Exception as e:
+                log(f"Chat {chat_id} task error: {e}")
+
+CHAT_QUEUE = ChatQueue()
+
 # ─── Main Gateway ────────────────────────────────────────────────────────
 
 def main():
@@ -250,14 +293,24 @@ def main():
                         SESSIONS.add(cid, "assistant", resp)
                         send(base_url, cid, resp)
                     else:
-                        # Chat message — full agent with tool-calling
+                        # Chat message — full agent with tool-calling (background)
                         SESSIONS.add(cid, "user", text)
 
                         def do_agent(chat_id=cid, msg_text=text):
                             try:
+                                # Send initial acknowledgment
                                 send(base_url, chat_id,
-                                     f"🧠 *Agent processing:* `{msg_text[:60]}...`\n\n🔧 Tools available: file read/write/edit, shell, git, OCE API, GitHub, Python, vault search")
+                                     f"🧠 *Agent received:* `{msg_text[:80]}`\n\n"
+                                     f"🔧 19 tools available. Working in background...")
                                 typing(base_url, chat_id)
+
+                                # Progress callback — sends updates to Telegram during tool execution
+                                def on_progress(update_text):
+                                    try:
+                                        send(base_url, chat_id, update_text)
+                                        typing(base_url, chat_id)
+                                    except Exception as e:
+                                        log(f"Progress send error: {e}")
 
                                 # Build operational context
                                 ctx = sov.get_sovereign_context()
@@ -281,8 +334,13 @@ def main():
                                     for h in history[-4:]:
                                         ctx += f"- **{h['role']}:** {h['content'][:80]}\n"
 
-                                # Run full agent with tool-calling loop
-                                resp = agent.chat(msg_text, sovereign_context=ctx, max_tool_rounds=8)
+                                # Run full agent with tool-calling loop + progress callback
+                                resp = agent.chat(
+                                    msg_text,
+                                    sovereign_context=ctx,
+                                    max_tool_rounds=8,
+                                    progress_callback=on_progress,
+                                )
 
                                 # Record in timeline and continuity cache
                                 TIMELINE.record("agent_chat", {"user": msg_text[:50], "response_len": len(resp)})
@@ -293,12 +351,12 @@ def main():
                                 log(f"AGENT RESP ({len(resp)} chars)")
                             except Exception as e:
                                 import traceback as _tb
-                                log("LLM ERR: " + str(e) + "\n" + _tb.format_exc())
+                                log("AGENT ERR: " + str(e) + "\n" + _tb.format_exc())
                                 try:
                                     send(base_url, chat_id, "❌ *Error:* `" + str(e)[:200] + "`")
                                 except: pass
 
-                        TASK_QUEUE.submit(do_llm)
+                        CHAT_QUEUE.submit(cid, do_agent)
 
                 except Exception as e:
                     log(f"ERR: {e}")
