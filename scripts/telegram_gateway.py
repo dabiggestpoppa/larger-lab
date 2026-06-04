@@ -27,7 +27,7 @@ from core.observer.vault import Vault
 from core.observer.journal import Journal
 from core.observer.autonomous_orchestrator import AutonomousOrchestrator
 from core.observer.command_router import CommandRouter
-from core.observer.po_agent import POAgent
+from core.observer.chat_agent import ChatAgent
 from core.observer.sovereign_field import SovereignField
 from core.observer.presence_engine import (
     WATCHERS, TIMELINE, CONTINUITY, PRIORITY,
@@ -233,7 +233,7 @@ def main():
     journal = Journal(vault)
     orch = AutonomousOrchestrator(vault=vault, journal=journal)
     router = CommandRouter(vault=vault, journal=journal, orchestrator=orch)
-    agent = POAgent()
+    agent = ChatAgent()
     sov = SovereignField()
 
     # Start Phase 3: Presence Engine
@@ -293,70 +293,43 @@ def main():
                         SESSIONS.add(cid, "assistant", resp)
                         send(base_url, cid, resp)
                     else:
-                        # Chat message — full agent with tool-calling (background)
+                        # Chat message — async LLM response
                         SESSIONS.add(cid, "user", text)
 
-                        def do_agent(chat_id=cid, msg_text=text):
+                        def do_llm(chat_id=cid, msg_text=text):
                             try:
-                                # Send initial acknowledgment
-                                send(base_url, chat_id,
-                                     f"🧠 *Agent received:* `{msg_text[:80]}`\n\n"
-                                     f"🔧 19 tools available. Working in background...")
+                                log(f"DO_LLM START: {msg_text[:60]}")
+                                send(base_url, chat_id, f"🧠 *Processing:* `{msg_text[:60]}`")
                                 typing(base_url, chat_id)
 
-                                # Progress callback — sends updates to Telegram during tool execution
-                                def on_progress(update_text):
-                                    try:
-                                        send(base_url, chat_id, update_text)
-                                        typing(base_url, chat_id)
-                                    except Exception as e:
-                                        log(f"Progress send error: {e}")
+                                scan_result = scan_workspace()
+                                send(base_url, chat_id, f"🔍 *Workspace Scan:*\n{scan_result}")
+                                typing(base_url, chat_id)
 
-                                # Build operational context
                                 ctx = sov.get_sovereign_context()
-
-                                # Add timeline summary
-                                try:
-                                    timeline_summary = TIMELINE.get_summary(5)
-                                    ctx += f"\n\n## Recent Timeline\n{timeline_summary}"
-                                except: pass
-
-                                # Add task summary
-                                try:
-                                    task_summary = orch.tasks.summary()
-                                    ctx += f"\n\n## Tasks\n{task_summary}"
-                                except: pass
-
-                                # Add session history
                                 history = SESSIONS.get_context(chat_id)
                                 if history:
                                     ctx += "\n\n## Recent Conversation\n"
-                                    for h in history[-4:]:
-                                        ctx += f"- **{h['role']}:** {h['content'][:80]}\n"
+                                    for h in history[-6:]:
+                                        ctx += f"- **{h['role']}:** {h['content'][:100]}\n"
 
-                                # Run full agent with tool-calling loop + progress callback
-                                resp = agent.chat(
-                                    msg_text,
-                                    sovereign_context=ctx,
-                                    max_tool_rounds=8,
-                                    progress_callback=on_progress,
-                                )
+                                resp = agent.chat(msg_text, sovereign_context=ctx)
 
-                                # Record in timeline and continuity cache
-                                TIMELINE.record("agent_chat", {"user": msg_text[:50], "response_len": len(resp)})
+                                TIMELINE.record("chat", {"user": msg_text[:50], "response_len": len(resp)})
                                 CONTINUITY.add("last_chat", msg_text[:100])
 
                                 SESSIONS.add(chat_id, "assistant", resp)
                                 send(base_url, chat_id, resp)
-                                log(f"AGENT RESP ({len(resp)} chars)")
+                                log(f"LLM RESP ({len(resp)} chars)")
                             except Exception as e:
                                 import traceback as _tb
-                                log("AGENT ERR: " + str(e) + "\n" + _tb.format_exc())
+                                log("LLM ERR: " + str(e) + "\n" + _tb.format_exc())
                                 try:
-                                    send(base_url, chat_id, "❌ *Error:* `" + str(e)[:200] + "`")
+                                    send(base_url, chat_id, f"❌ *Error:* `{str(e)[:200]}`")
                                 except: pass
 
-                        CHAT_QUEUE.submit(cid, do_agent)
+                        _ok = TASK_QUEUE.submit(do_llm)
+                        log(f"TaskQueue submit: {_ok}, active={TASK_QUEUE._active}")
 
                 except Exception as e:
                     log(f"ERR: {e}")
