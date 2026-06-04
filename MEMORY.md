@@ -1,6 +1,7 @@
 # MEMORY.md — OWL (OC2) Persistent Memory
 
-> **Last Updated:** 2026-06-03 21:10 EDT — ALL 7 BASKETS COMPLETE (39,866 trades | 87.5% WR | +277,666p)
+> **Last Updated:** 2026-06-04 01:30 EDT — FINAL CALIBRATION COMPLETE (5,084 tr | 82.9% WR | PF 11.83)
+> **THE BIBLE locked:** AR gate decoupled from tier, impulse-based classification, 4PM cutoff, 10p trigger
 
 ---
 
