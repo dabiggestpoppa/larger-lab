@@ -827,7 +827,7 @@ class POAgent:
             messages.append(h)
         messages.append({"role": "user", "content": message})
 
-        _notify(f"🔄 *Round 1/{max_tool_rounds}* — Calling LLM...")
+        _notify("round", {"round": 1, "max": max_tool_rounds})
 
         for round_num in range(max_tool_rounds):
             # Try each model in the chain
@@ -843,7 +843,7 @@ class POAgent:
 
             if not resp and not tool_calls:
                 error_msg = f"⚠️ All LLM providers failed. Last error: {err}"
-                _notify(error_msg)
+                _notify("error", {"message": error_msg})
                 return error_msg
 
             if tool_calls:
@@ -874,12 +874,12 @@ class POAgent:
                     except Exception:
                         args = {}
 
-                    _notify(f"🔧 *Tool:* `{tool_name}` — Executing...")
+                    _notify("tool_call", {"tool": tool_name, "args": args})
                     result = self._execute_tool(tc)
 
                     # Send truncated result as progress update
                     result_preview = result[:300] + ("..." if len(result) > 300 else "")
-                    _notify(f"📋 *{tool_name} result:*\n```\n{result_preview}\n```")
+                    _notify("tool_result", {"tool": tool_name, "result": result_preview})
 
                     messages.append({
                         "role": "tool",
@@ -889,17 +889,17 @@ class POAgent:
 
                 next_round = round_num + 2
                 if next_round <= max_tool_rounds:
-                    _notify(f"🔄 *Round {next_round}/{max_tool_rounds}* — Processing tool results...")
+                    _notify("round", {"round": next_round, "max": max_tool_rounds})
                 continue
             else:
                 # Final response — no more tool calls
                 self._history.append({"role": "user", "content": message})
                 self._history.append({"role": "assistant", "content": resp})
-                _notify("✅ *Agent complete* — Sending final response...")
+                _notify("complete", {})
                 return resp
 
         # Max rounds — ask for final response
-        _notify("⚠️ Max tool rounds reached. Generating final response...")
+        _notify("max_rounds", {})
         messages.append({"role": "user", "content": "Max tool calls reached. Provide your final response now."})
         for attempt in range(len(MODEL_CHAIN)):
             model = MODEL_CHAIN[(self._model_index + attempt) % len(MODEL_CHAIN)]

@@ -209,6 +209,24 @@ export const useChatStore = create<ChatStore>((set, get) => ({
                 };
                 progressMessages.push(msg);
                 set((s) => ({ messages: [...s.messages, msg] }));
+              } else if (eventType === "complete") {
+                const msg: ChatMessage = {
+                  message_id: `progress_${Date.now()}_complete`,
+                  role: "system",
+                  content: "✅ Agent complete — Sending final response...",
+                  timestamp: new Date().toISOString(),
+                  session_id: sessionId || get().activeSessionId || "",
+                };
+                set((s) => ({ messages: [...s.messages, msg] }));
+              } else if (eventType === "max_rounds") {
+                const msg: ChatMessage = {
+                  message_id: `progress_${Date.now()}_max`,
+                  role: "system",
+                  content: "⚠️ Max tool rounds reached. Generating final response...",
+                  timestamp: new Date().toISOString(),
+                  session_id: sessionId || get().activeSessionId || "",
+                };
+                set((s) => ({ messages: [...s.messages, msg] }));
               } else if (eventType === "final") {
                 finalData = data;
               } else if (eventType === "error") {
