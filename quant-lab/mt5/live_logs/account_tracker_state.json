@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-03T21:05:16.409369",
+  "timestamp": "2026-06-03T22:04:46.471638",
   "account": {
     "login": 650898,
     "server": "OxSecurities-Live",
@@ -808,13 +808,26 @@
       "magic": 20260601,
       "comment": "[sl 1.88231]",
       "time": "2026-06-03T18:50:15"
+    },
+    {
+      "ticket": 109778562,
+      "symbol": "EURUSD.PRO",
+      "type": "BUY",
+      "volume": 0.01,
+      "price": 1.16028,
+      "profit": -0.42,
+      "swap": 0.02,
+      "commission": 0.0,
+      "magic": 20260601,
+      "comment": "[sl 1.16028]",
+      "time": "2026-06-03T21:56:44"
     }
   ],
   "today_stats": {
-    "trades": 61,
-    "pnl": 0.53,
+    "trades": 62,
+    "pnl": 0.13,
     "wins": 25,
-    "losses": 36,
-    "win_rate": 41.0
+    "losses": 37,
+    "win_rate": 40.3
   }
 }

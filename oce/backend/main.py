@@ -14,9 +14,9 @@ Provides endpoints for:
 
 from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.responses import JSONResponse, HTMLResponse, StreamingResponse
 from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, AsyncGenerator
 from datetime import datetime, timezone
 import asyncio
 import json
@@ -184,6 +184,94 @@ async def continuity_chat(request: ContinuityChatRequest):
     except Exception as e:
         logger.error(f"Chat error: {e}")
         raise HTTPException(status_code=503, detail=f"Continuity service unavailable: {str(e)}")
+
+
+@app.post("/chat/stream")
+async def continuity_chat_stream(request: ContinuityChatRequest):
+    """
+    Streaming chat endpoint — Server-Sent Events (SSE).
+
+    Sends multiple events during agent tool-calling:
+    - round: LLM thinking round started
+    - tool_call: Agent decided to use a tool
+    - tool_result: Tool execution completed
+    - final: Agent's final response
+    - error: Something went wrong
+
+    The OCE frontend and Telegram can show real-time progress
+    instead of waiting for one blocking response.
+    """
+    async def event_generator() -> AsyncGenerator[str, None]:
+        try:
+            adapter = await get_adapter()
+
+            # Collect progress events from the agent
+            progress_events = []
+            loop = asyncio.get_event_loop()
+
+            def on_progress(event_type: str, data: dict):
+                """Callback that collects progress events from the sync agent loop."""
+                progress_events.append({"type": event_type, "data": data})
+
+            # Run the blocking agent call in a thread pool
+            def run_agent():
+                return adapter.process_continuity_message(
+                    request.message,
+                    request.context,
+                    agent_progress_callback=on_progress,
+                )
+
+            # Execute in background thread so we can stream events
+            import concurrent.futures
+            executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+            future = executor.submit(run_agent)
+
+            # Stream progress events as they arrive
+            last_sent = 0
+            while not future.done():
+                while last_sent < len(progress_events):
+                    evt = progress_events[last_sent]
+                    yield f"data: {json.dumps(evt, default=str)}\n\n"
+                    last_sent += 1
+                await asyncio.sleep(0.1)
+
+            # Drain remaining events
+            while last_sent < len(progress_events):
+                evt = progress_events[last_sent]
+                yield f"data: {json.dumps(evt, default=str)}\n\n"
+                last_sent += 1
+
+            # Get final result
+            result = future.result(timeout=300)
+
+            # Send final response if not already sent via progress
+            final_response = {
+                "type": "final",
+                "data": {
+                    "response": result.get("response", ""),
+                    "session_id": result.get("session_id", request.session_id or ""),
+                    "observer": result.get("observer", {}),
+                    "system": result.get("system", {}),
+                    "confidence": result.get("confidence", 0),
+                }
+            }
+            yield f"data: {json.dumps(final_response, default=str)}\n\n"
+            executor.shutdown(wait=False)
+
+        except Exception as e:
+            logger.error(f"Stream error: {e}")
+            error_event = {"type": "error", "data": {"message": str(e)[:500]}}
+            yield f"data: {json.dumps(error_event)}\n\n"
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 # ─── Chat Log Endpoints ──────────────────────────────────────────────────────

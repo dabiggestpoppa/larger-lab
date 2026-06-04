@@ -84,21 +84,12 @@ def discover_tiers(csv_path, pip_size=0.0001, name=""):
     c = sorted(km.cluster_centers_.flatten())
 
     # 3. Calculate Cutoffs and Parameters
-    # Arch fix: Percentile capping (Winsorization) to handle fat-tail distortion
-    ar_p75 = np.percentile(ranges, 75)
-    ar_p90 = np.percentile(ranges, 90)
-    ar_p95 = np.percentile(ranges, 95)
-
-    cutoff1_raw = (c[0] + c[1]) / 2
-    cutoff2_raw = (c[1] + c[2]) / 2
-
-    # Cap cutoffs at percentiles to avoid outlier-driven extremes
-    cutoff1 = min(cutoff1_raw, ar_p75)
-    cutoff2 = min(cutoff2_raw, ar_p95)
-
-    # T3 AU: use p90 as the representative AR for high-vol days
-    # (c[2] is distorted by fat tail; p90 is realistic)
-    t3_au_base = ar_p90
+    # Arch fix v2: Percentile boundaries (33rd/66th) to ensure balanced tier distribution
+    # K-Means midpoints are skewed by dead clusters — percentiles guarantee T1/T2/T3
+    # each capture ~33% of trading days regardless of distribution shape.
+    # AU and Trigger still use K-Means centroids (true core volatility of each cluster).
+    cutoff1 = np.percentile(ranges, 33.3)
+    cutoff2 = np.percentile(ranges, 66.6)
 
     results = {
         "T1": {
@@ -114,8 +105,8 @@ def discover_tiers(csv_path, pip_size=0.0001, name=""):
         },
         "T3": {
             "range_min": round(cutoff2, 2),
-            "au": int(round(t3_au_base * 0.5)),
-            "trig": int(round(t3_au_base * 0.5 * 1.2)),
+            "au": int(round(c[2] * 0.5)),
+            "trig": int(round(c[2] * 0.5 * 1.2)),
         },
     }
 

@@ -293,43 +293,104 @@ def main():
                         SESSIONS.add(cid, "assistant", resp)
                         send(base_url, cid, resp)
                     else:
-                        # Chat message — async LLM response
+                        # Chat message — full agent with streaming progress
                         SESSIONS.add(cid, "user", text)
 
-                        def do_llm(chat_id=cid, msg_text=text):
+                        def do_agent(chat_id=cid, msg_text=text):
                             try:
-                                log(f"DO_LLM START: {msg_text[:60]}")
-                                send(base_url, chat_id, f"🧠 *Processing:* `{msg_text[:60]}`")
+                                log(f"DO_AGENT START: {msg_text[:60]}")
+
+                                # Send initial acknowledgment immediately
+                                send(base_url, chat_id,
+                                     f"🧠 *Agent received:* `{msg_text[:80]}`\n\n"
+                                     f"🔧 19 tools available. Working...")
                                 typing(base_url, chat_id)
 
-                                scan_result = scan_workspace()
-                                send(base_url, chat_id, f"🔍 *Workspace Scan:*\n{scan_result}")
-                                typing(base_url, chat_id)
+                                # Progress callback — sends real-time updates to Telegram
+                                def on_progress(event_type, data):
+                                    try:
+                                        if event_type == "round":
+                                            send(base_url, chat_id,
+                                                 f"🔄 *Round {data.get('round', '?')}/{data.get('max', '?')}* — Thinking...")
+                                        elif event_type == "tool_call":
+                                            tool_name = data.get("tool", "unknown")
+                                            send(base_url, chat_id,
+                                                 f"🔧 *Tool:* `{tool_name}` — Executing...")
+                                        elif event_type == "tool_result":
+                                            tool_name = data.get("tool", "unknown")
+                                            result_preview = (data.get("result", "") or "")[:200]
+                                            send(base_url, chat_id,
+                                                 f"📋 *{tool_name}:*\n```\n{result_preview}\n```")
+                                        elif event_type == "error":
+                                            send(base_url, chat_id,
+                                                 f"❌ *Error:* `{data.get('message', 'unknown')[:200]}`")
+                                        typing(base_url, chat_id)
+                                    except Exception as e:
+                                        log(f"Progress send error: {e}")
 
-                                ctx = sov.get_sovereign_context()
+                                # Build operational context
+                                ctx_parts = []
+
+                                # Add workspace scan
+                                try:
+                                    scan = scan_workspace()
+                                    if scan:
+                                        ctx_parts.append(f"## Workspace\n{scan}")
+                                except: pass
+
+                                # Add sovereign context
+                                try:
+                                    ctx_parts.append(sov.get_sovereign_context())
+                                except: pass
+
+                                # Add timeline
+                                try:
+                                    timeline_summary = TIMELINE.get_summary(5)
+                                    if timeline_summary:
+                                        ctx_parts.append(f"## Recent Timeline\n{timeline_summary}")
+                                except: pass
+
+                                # Add tasks
+                                try:
+                                    task_summary = orch.tasks.summary()
+                                    if task_summary:
+                                        ctx_parts.append(f"## Tasks\n{task_summary}")
+                                except: pass
+
+                                # Add session history
                                 history = SESSIONS.get_context(chat_id)
                                 if history:
-                                    ctx += "\n\n## Recent Conversation\n"
-                                    for h in history[-6:]:
-                                        ctx += f"- **{h['role']}:** {h['content'][:100]}\n"
+                                    ctx_parts.append("## Recent Conversation")
+                                    for h in history[-4:]:
+                                        ctx_parts.append(f"- **{h['role']}:** {h['content'][:80]}")
 
-                                resp = agent.chat(msg_text, sovereign_context=ctx)
+                                full_ctx = "\n\n".join(ctx_parts)
 
-                                TIMELINE.record("chat", {"user": msg_text[:50], "response_len": len(resp)})
+                                # Run agent with progress callback — this sends multiple messages
+                                resp = agent.chat(
+                                    msg_text,
+                                    sovereign_context=full_ctx,
+                                    max_tool_rounds=8,
+                                    progress_callback=on_progress,
+                                )
+
+                                # Record in timeline and continuity cache
+                                TIMELINE.record("agent_chat", {"user": msg_text[:50], "response_len": len(resp)})
                                 CONTINUITY.add("last_chat", msg_text[:100])
 
                                 SESSIONS.add(chat_id, "assistant", resp)
                                 send(base_url, chat_id, resp)
-                                log(f"LLM RESP ({len(resp)} chars)")
+                                log(f"AGENT RESP ({len(resp)} chars)")
                             except Exception as e:
                                 import traceback as _tb
-                                log("LLM ERR: " + str(e) + "\n" + _tb.format_exc())
+                                log("AGENT ERR: " + str(e) + "\n" + _tb.format_exc())
                                 try:
                                     send(base_url, chat_id, f"❌ *Error:* `{str(e)[:200]}`")
                                 except: pass
 
-                        _ok = TASK_QUEUE.submit(do_llm)
-                        log(f"TaskQueue submit: {_ok}, active={TASK_QUEUE._active}")
+                        # Submit to per-chat queue (sequential per chat, concurrent across chats)
+                        CHAT_QUEUE.submit(cid, do_agent)
+                        log(f"Chat {cid}: agent task submitted")
 
                 except Exception as e:
                     log(f"ERR: {e}")
