@@ -190,78 +190,54 @@ async def continuity_chat(request: ContinuityChatRequest):
 async def continuity_chat_stream(request: ContinuityChatRequest):
     """
     Streaming chat endpoint — Server-Sent Events (SSE).
-
-    Sends multiple events during agent tool-calling:
-    - round: LLM thinking round started
-    - tool_call: Agent decided to use a tool
-    - tool_result: Tool execution completed
-    - final: Agent's final response
-    - error: Something went wrong
-
-    The OCE frontend and Telegram can show real-time progress
-    instead of waiting for one blocking response.
+    Bypasses the heavy O-1/O-2/O-3 pipeline for direct ChatAgent responses.
     """
     async def event_generator() -> AsyncGenerator[str, None]:
         try:
-            adapter = await get_adapter()
-
-            # Collect progress events from the agent
-            progress_events = []
-            loop = asyncio.get_event_loop()
+            import queue
+            progress_queue = queue.Queue()
 
             def on_progress(event_type: str, data: dict):
-                """Callback that collects progress events from the sync agent loop."""
-                progress_events.append({"type": event_type, "data": data})
+                progress_queue.put({"type": event_type, "data": data})
 
-            # Run the blocking agent call in a thread pool
             def run_agent():
-                return adapter.process_continuity_message(
+                from core.observer.chat_agent import ChatAgent
+                agent = ChatAgent()
+                return agent.chat(
                     request.message,
-                    request.context,
-                    agent_progress_callback=on_progress,
+                    sovereign_context="",
+                    progress_callback=on_progress,
                 )
 
-            # Execute in background thread so we can stream events
+            loop = asyncio.get_event_loop()
             import concurrent.futures
             executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
-            future = executor.submit(run_agent)
+            future = loop.run_in_executor(executor, run_agent)
 
-            # Stream progress events as they arrive
-            last_sent = 0
             while not future.done():
-                while last_sent < len(progress_events):
-                    evt = progress_events[last_sent]
+                while not progress_queue.empty():
+                    try:
+                        evt = progress_queue.get_nowait()
+                        yield f"data: {json.dumps(evt, default=str)}\n\n"
+                    except queue.Empty:
+                        break
+                yield ": keepalive\n\n"
+                await asyncio.sleep(0.5)
+
+            while not progress_queue.empty():
+                try:
+                    evt = progress_queue.get_nowait()
                     yield f"data: {json.dumps(evt, default=str)}\n\n"
-                    last_sent += 1
-                await asyncio.sleep(0.1)
+                except queue.Empty:
+                    break
 
-            # Drain remaining events
-            while last_sent < len(progress_events):
-                evt = progress_events[last_sent]
-                yield f"data: {json.dumps(evt, default=str)}\n\n"
-                last_sent += 1
-
-            # Get final result
-            result = future.result(timeout=300)
-
-            # Send final response if not already sent via progress
-            final_response = {
-                "type": "final",
-                "data": {
-                    "response": result.get("response", ""),
-                    "session_id": result.get("session_id", request.session_id or ""),
-                    "observer": result.get("observer", {}),
-                    "system": result.get("system", {}),
-                    "confidence": result.get("confidence", 0),
-                }
-            }
-            yield f"data: {json.dumps(final_response, default=str)}\n\n"
+            response_text = await asyncio.wait_for(future, timeout=300)
+            yield f"data: {json.dumps({'type': 'final', 'data': {'response': response_text, 'session_id': request.session_id or '', 'observer': {}, 'system': {}, 'confidence': 1.0}}, default=str)}\n\n"
             executor.shutdown(wait=False)
 
         except Exception as e:
             logger.error(f"Stream error: {e}")
-            error_event = {"type": "error", "data": {"message": str(e)[:500]}}
-            yield f"data: {json.dumps(error_event)}\n\n"
+            yield f"data: {json.dumps({'type': 'error', 'data': {'message': str(e)[:500]}})}\n\n"
 
     return StreamingResponse(
         event_generator(),
@@ -1984,6 +1960,110 @@ async def api_chat(request: dict):
     except Exception as e:
         logger.error(f"API chat error: {e}")
         raise HTTPException(status_code=503, detail=f"Chat unavailable: {str(e)}")
+
+
+@app.post("/api/chat/stream")
+async def api_chat_stream(request: dict):
+    """Frontend streaming alias: /api/chat/stream with SSE."""
+    try:
+        adapter = await get_adapter()
+        message = request.get("message", "")
+        context = request.get("context")
+
+        # Collect progress events thread-safely
+        import queue
+        progress_queue = queue.Queue()
+
+        def on_progress(event_type: str, data: dict):
+            progress_queue.put({"type": event_type, "data": data})
+
+        async def event_generator():
+            # Run the async adapter method directly (it's async, not blocking)
+            # Use asyncio.to_thread for the sync parts inside
+            import concurrent.futures
+            executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+
+            def run_sync_agent():
+                """Run the sync ChatAgent.chat() with progress callback."""
+                from core.observer.chat_agent import ChatAgent
+                from core.observer.continuity_memory import WorkflowRecord
+                import uuid as _uuid
+
+                # Build context
+                spawn_snapshot = adapter._spawn_registry.get_field_snapshot()
+                observer_health = adapter._primary_observer.health
+
+                sov_lines = [
+                    "## System State",
+                    f"- Active agents: {spawn_snapshot.get('active_agents', 0)}",
+                    f"- Observer health: {observer_health.get('status', 'unknown')}",
+                ]
+                sovereign_context = "\n".join(sov_lines)
+
+                agent = ChatAgent()
+                response_text = agent.chat(
+                    message,
+                    sovereign_context=sovereign_context,
+                    progress_callback=on_progress,
+                )
+                return response_text
+
+            # Send keepalive while agent works
+            import asyncio
+            loop = asyncio.get_event_loop()
+
+            # Run agent in thread pool
+            future = loop.run_in_executor(executor, run_sync_agent)
+
+            # Stream progress events and keepalive
+            while not future.done():
+                # Drain progress queue
+                while not progress_queue.empty():
+                    try:
+                        evt = progress_queue.get_nowait()
+                        yield f"data: {json.dumps(evt, default=str)}\n\n"
+                    except queue.Empty:
+                        break
+                # Send keepalive comment to prevent timeout
+                yield ": keepalive\n\n"
+                await asyncio.sleep(0.5)
+
+            # Drain remaining progress events
+            while not progress_queue.empty():
+                try:
+                    evt = progress_queue.get_nowait()
+                    yield f"data: {json.dumps(evt, default=str)}\n\n"
+                except queue.Empty:
+                    break
+
+            # Get final result
+            response_text = await asyncio.wait_for(future, timeout=300)
+
+            final_response = {
+                "type": "final",
+                "data": {
+                    "response": response_text,
+                    "session_id": request.get("session_id", ""),
+                    "observer": {"task_domain": "chat", "complexity": "simple"},
+                    "system": {},
+                    "confidence": 1.0,
+                }
+            }
+            yield f"data: {json.dumps(final_response, default=str)}\n\n"
+            executor.shutdown(wait=False)
+
+        return StreamingResponse(
+            event_generator(),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",
+            },
+        )
+    except Exception as e:
+        logger.error(f"API stream error: {e}")
+        raise HTTPException(status_code=503, detail=f"Stream unavailable: {str(e)}")
 
 
 @app.post("/api/chat/sessions")
