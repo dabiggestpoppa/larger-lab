@@ -791,24 +791,43 @@ class POAgent:
         except Exception as e:
             return f"Error executing {tool_name}: {e}"
 
-    def chat(self, message: str, sovereign_context: str = "", max_tool_rounds: int = 8) -> str:
+    def chat(self, message: str, sovereign_context: str = "", max_tool_rounds: int = 8,
+             progress_callback=None) -> str:
         """
         Full agent chat with tool-calling loop.
+
+        Args:
+            message: User message
+            sovereign_context: Operational context to inject
+            max_tool_rounds: Maximum tool-calling iterations
+            progress_callback: Optional callable(text) for sending progress updates
+                              during tool execution. Used by Telegram gateway.
 
         Flow:
         1. Send message + system prompt + tool definitions to LLM
         2. If LLM returns tool_calls, execute them and send results back
-        3. Repeat until LLM returns a final response or max rounds reached
-        4. Return final response
+        3. After each tool execution, call progress_callback with update
+        4. Repeat until LLM returns a final response or max rounds reached
+        5. Return final response
         """
         if not self.api_key:
             return "LLM not configured. Set OPENROUTER_API_KEY."
+
+        def _notify(text):
+            """Send progress update if callback is available."""
+            if progress_callback:
+                try:
+                    progress_callback(text)
+                except Exception:
+                    pass
 
         system_prompt = self._build_system_prompt(sovereign_context)
         messages = [{"role": "system", "content": system_prompt}]
         for h in self._history[-self._max_history:]:
             messages.append(h)
         messages.append({"role": "user", "content": message})
+
+        _notify(f"🔄 *Round 1/{max_tool_rounds}* — Calling LLM...")
 
         for round_num in range(max_tool_rounds):
             # Try each model in the chain
@@ -823,7 +842,9 @@ class POAgent:
                     break
 
             if not resp and not tool_calls:
-                return f"⚠️ All LLM providers failed. Last error: {err}"
+                error_msg = f"⚠️ All LLM providers failed. Last error: {err}"
+                _notify(error_msg)
+                return error_msg
 
             if tool_calls:
                 # Add assistant message with tool calls
@@ -843,22 +864,42 @@ class POAgent:
                     ]
                 })
 
-                # Execute each tool call
+                # Execute each tool call and report progress
                 for tc in tool_calls:
+                    func = tc.get("function", {})
+                    tool_name = func.get("name", "unknown")
+                    args_str = func.get("arguments", "{}")
+                    try:
+                        args = json.loads(args_str) if isinstance(args_str, str) else args_str
+                    except Exception:
+                        args = {}
+
+                    _notify(f"🔧 *Tool:* `{tool_name}` — Executing...")
                     result = self._execute_tool(tc)
+
+                    # Send truncated result as progress update
+                    result_preview = result[:300] + ("..." if len(result) > 300 else "")
+                    _notify(f"📋 *{tool_name} result:*\n```\n{result_preview}\n```")
+
                     messages.append({
                         "role": "tool",
                         "tool_call_id": tc.get("id", "unknown"),
                         "content": result[:2000],  # Cap tool result size
                     })
+
+                next_round = round_num + 2
+                if next_round <= max_tool_rounds:
+                    _notify(f"🔄 *Round {next_round}/{max_tool_rounds}* — Processing tool results...")
                 continue
             else:
                 # Final response — no more tool calls
                 self._history.append({"role": "user", "content": message})
                 self._history.append({"role": "assistant", "content": resp})
+                _notify("✅ *Agent complete* — Sending final response...")
                 return resp
 
         # Max rounds — ask for final response
+        _notify("⚠️ Max tool rounds reached. Generating final response...")
         messages.append({"role": "user", "content": "Max tool calls reached. Provide your final response now."})
         for attempt in range(len(MODEL_CHAIN)):
             model = MODEL_CHAIN[(self._model_index + attempt) % len(MODEL_CHAIN)]
