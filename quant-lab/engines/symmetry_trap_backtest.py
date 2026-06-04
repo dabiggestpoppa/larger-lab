@@ -164,6 +164,7 @@ def load_m5_csv(filepath: str, pip_size: float = 0.0001) -> Tuple[List[Bar], str
         date_col = col_idx.get("date")
         time_col = col_idx.get("time")
         dt_is_split = ts_col is None and date_col is not None and time_col is not None
+        dt_is_single_time = ts_col is None and date_col is None and time_col is not None
 
         # Locate OHLC columns
         o_idx = col_idx.get("open")
@@ -187,6 +188,15 @@ def load_m5_csv(filepath: str, pip_size: float = 0.0001) -> Tuple[List[Bar], str
                     dt = datetime.strptime(cells[ts_col].strip(), "%Y-%m-%d %H:%M:%S")
                 elif dt_is_split:
                     dt_str = cells[date_col].strip() + " " + cells[time_col].strip()  # type: ignore[index]
+                    for fmt in ts_formats:
+                        try:
+                            dt = datetime.strptime(dt_str, fmt)
+                            break
+                        except ValueError:
+                            continue
+                elif dt_is_single_time:
+                    # Single ``time`` column (e.g. "2015-10-11T20:00:00" or "2015-10-11 20:00:00")
+                    dt_str = cells[time_col].strip()
                     for fmt in ts_formats:
                         try:
                             dt = datetime.strptime(dt_str, fmt)
