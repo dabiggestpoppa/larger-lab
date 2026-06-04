@@ -537,3 +537,44 @@ _Last updated: 2026-05-30 23:40 EDT - multi-asset backtest + dashboard design sp
 - Cleanup: Disabled 8 failing crons, killed stale processes, 0 active subagents
 - Subagent policy: No research spawns. Code writing only, tight scope, 5min timeout.
 _Last updated: 2026-05-31 19:05 EDT_
+
+---
+
+## 📜 THE BIBLE — GOLD STANDARD BASELINE (2026-06-04 01:30 EDT)
+
+### Core Philosophy: The Agnostic Skeleton
+- Skeleton is immutable: Impulse → Pullback to DZ → OCC Confirmation
+- Parameters are adaptive: triggers, cutoffs, regime filters are lenses, not logic
+
+### Scientific Loop (SOP for all changes)
+1. Hypothesize → 2. Test (A/B isolation) → 3. Falsify → 4. Record → 5. Optimize/Deploy
+
+### Established Truths (Locked)
+- **Edge is real and scalable:** 82.9%+ WR, PF > 11.0 across 5,000+ trades
+- **AR gate was false suppressor:** ar_max conflated session filtering with tier classification. Now decoupled.
+- **Tier classification by impulse size ONLY:** T1<20p, T2=20-30p, T3>30p. Independent of AR.
+- **Loop extras are dead code:** 4h timeout, 80% kill switch, dynamic DZ — all removed (0% delta in A/B test)
+- **K-Means never existed in code** — was in ontology docs but never implemented
+
+### Final Calibration Config (LOCKED)
+- AR gate: ar_max=60 (session filter only, not tier classifier)
+- T1 trigger: 10 pips
+- Session cutoff: 4:00 PM EST
+- DZ: flat 20-50% for all loops
+- Tier logic: strictly by impulse leg size, decoupled from AR
+
+### Final Calibration Results — EURUSD M5
+- **5,084 trades | 82.9% WR | +26,746p | PF 11.83 | MaxDD 38.5p**
+- Avg Win: 6.9p | Avg Loss: -2.9p | Expectancy: 5.3p
+- Max Consec Wins: 44 | Max Consec Losses: 4
+- Loop 1: 681tr 83.3% | Loop 2: 661tr 81.7% | Loop 3: 633tr 82.0% | Loop 4: 579tr 82.0% | Loop 5: 2530tr 83.5%
+- T1: 4,968 tr (83.0% WR) | T2: 111 tr (80.2% WR) | T3: 5 tr (80.0% WR)
+- Target zone: 3,500-4,500 trades — actual 5,084 (slightly above, acceptable)
+
+### Files Modified
+- `quant-lab/engines/symmetry_trap.py`: Removed dead code, decoupled tier from AR, impulse-based classification
+- `quant-lab/engines/symmetry_trap_backtest.py`: Session cutoff 12PM → 4PM EST
+- `quant-lab/tests/ab_test_engine/`: Preserved original engine copy (A/B test)
+- `quant-lab/tests/test_c_d/`: Preserved engine copy (C/D test)
+
+_Last updated: 2026-06-04 01:30 EDT — THE BIBLE locked, final calibration complete_
