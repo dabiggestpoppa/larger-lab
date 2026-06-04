@@ -388,6 +388,7 @@ class SymmetryTrapBacktest:
             self.symbol = symbol
         self.config = config
         self.est_offset = est_offset
+        self.session_cutoff = 12  # Default 12PM EST; set to 16 for 4PM EST
         self.logger = logging.getLogger(f"cerebus.symt_backtest.{symbol}")
 
     def _get_est_hour(self, dt: datetime) -> int:
@@ -436,8 +437,8 @@ class SymmetryTrapBacktest:
                 if bar_est_h >= 19 or bar_est_h < 3:
                     continue
                 
-                if bar_est_h >= 16 and engine.state == EngineState.SEARCH:
-                    break  # 4PM EST cutoff — NY afternoon session capture
+                if bar_est_h >= self.session_cutoff and engine.state == EngineState.SEARCH:
+                    break
 
                 signal = engine.process_bar(bar)
 

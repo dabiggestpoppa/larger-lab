@@ -436,8 +436,8 @@ class SymmetryTrapBacktest:
                 if bar_est_h >= 19 or bar_est_h < 3:
                     continue
                 
-                if bar_est_h >= 16 and engine.state == EngineState.SEARCH:
-                    break  # 4PM EST cutoff — NY afternoon session capture
+                if bar_est_h >= 12 and engine.state == EngineState.SEARCH:
+                    break
 
                 signal = engine.process_bar(bar)
 

@@ -55,13 +55,9 @@ KILL_SWITCH_PCT = 0.80              # 80% of impulse leg — CLOSE ONLY
 # Default tier config — EUR/USD reference (Quick Reference Card Page 2)
 # For other ASSET_CONFIGS registry in configs/asset_configs.py.
 DEFAULT_TIER_CONFIG: Dict[str, Dict[str, float]] = {
-    # ar_max: session gate only (filter dead zones). Set high to disable.
-    # au: AU pips for position sizing per tier.
-    # trigger: minimum impulse pips to detect (used when tier=PENDING).
-    # Tier is classified by impulse size: T1<20p, T2=20-30p, T3>30p
-    "T1": {"ar_max": 60.0, "au": 8.0, "trigger": 10.0},
-    "T2": {"ar_max": 60.0, "au": 10.0, "trigger": 10.0},
-    "T3": {"ar_max": 60.0, "au": 12.0, "trigger": 10.0},
+    "T1": {"ar_max": 20.0, "au": 10.0, "trigger": 12.0},
+    "T2": {"ar_max": 30.0, "au": 12.0, "trigger": 15.0},
+    "T3": {"ar_max": 45.0, "au": 15.0, "trigger": 19.0},
 }
 
 
@@ -131,42 +127,26 @@ class TradeSignal:
 
 # ─── TIER CLASSIFICATION ──────────────────────────────────────────────────
 
-def classify_tier_by_ar(
+def classify_tier(
     asian_range_pips: float,
     tier_config: Dict[str, Dict[str, float]] = DEFAULT_TIER_CONFIG
 ) -> Tuple[str, float, float]:
     """
-    Session filter: classify based on Asian Range.
-    AR > ar_max → NO-GO (skip session entirely).
-    This is a GATE, not a tier classifier.
+    Classify session volatility into discrete Tier.
+
+    Tier is DISCRETE — field snaps into one of three quantized energy states.
+    AR > T3 max → NO-GO (structural coherence collapses).
+
+    Reference: manual_ontology.md Section 1 Q4, Computable Mechanics Q3
+
+    Returns:
+        (tier_name, au_pips, trigger_pips)
     """
     for tier_name in ("T1", "T2", "T3"):
         if tier_name in tier_config and asian_range_pips <= tier_config[tier_name]["ar_max"]:
-            return tier_name, 0.0, 0.0  # au/trigger set later by impulse
+            cfg = tier_config[tier_name]
+            return tier_name, cfg["au"], cfg["trigger"]
     return "NO_GO", 0.0, 0.0
-
-
-def classify_tier_by_impulse(
-    impulse_size_pips: float,
-    tier_config: Dict[str, Dict[str, float]] = DEFAULT_TIER_CONFIG
-) -> Tuple[str, float, float]:
-    """
-    Tier classification based on impulse leg size (DECOUPLED from AR).
-    T1: impulse < 20 pips
-    T2: impulse 20-30 pips
-    T3: impulse > 30 pips
-
-    This is called at impulse detection time, NOT at session init.
-    """
-    if impulse_size_pips < 20.0:
-        cfg = tier_config.get("T1", {"au": 8.0, "trigger": 10.0})
-        return "T1", cfg["au"], cfg["trigger"]
-    elif impulse_size_pips <= 30.0:
-        cfg = tier_config.get("T2", {"au": 10.0, "trigger": 12.0})
-        return "T2", cfg["au"], cfg["trigger"]
-    else:
-        cfg = tier_config.get("T3", {"au": 12.0, "trigger": 15.0})
-        return "T3", cfg["au"], cfg["trigger"]
 
 
 # ─── CORE ENGINE ──────────────────────────────────────────────────────────
@@ -310,17 +290,12 @@ class SymmetryTrapEngine:
         self.asian_low = asian_low
         self.asian_range_pips = (asian_high - asian_low) / self.pip_size
 
-        # AR gate: session filter only (not tier classifier)
-        gate_tier, _, _ = classify_tier_by_ar(
+        self.tier_name, self.au_pips, self.trigger_pips = classify_tier(
             self.asian_range_pips, self.tier_config
         )
-        self.session_active = gate_tier != "NO_GO"
 
-        # Tier is NOT set here — deferred to impulse detection
-        self.tier_name = "PENDING"
-        self.au_pips = 0.0
-        self.trigger_pips = 0.0
-        self.active_au = 0.0
+        self.active_au = self.au_pips * self.pip_size
+        self.session_active = self.tier_name != "NO_GO"
 
         # Reset state machine
         self.state = EngineState.SEARCH
@@ -372,34 +347,28 @@ class SymmetryTrapEngine:
         if self.swing_origin is None:
             self.swing_origin = bar.close
 
-        # 4h timeout: REMOVED (dead code — never triggered in testing)
+        # ── Option B: Loop timeout — if 4 hours pass without entry, stop looping
+        if self.loop_start_time is not None and self.loop_count > 1:
+            if (bar.timestamp - self.loop_start_time).total_seconds() > 4 * 3600:
+                self.tel_timeout_4hr += 1
+                self.loop_start_time = None
+                self.session_active = False
+                self.logger.debug(f"Loop {self.loop_count} expired (4h timeout)")
+                return None
+
+        active_trig = self.trigger_pips * self.pip_size
 
         up_move = bar.high - self.swing_origin
         dn_move = self.swing_origin - bar.low
 
         # ── STATE: SEARCH ──────────────────────────────────────────────
-        # Wait for impulse breach >= minimum trigger.
-        # If tier is PENDING (session just started), use T1 trigger as default.
-        # Once impulse is detected, classify tier by impulse size and lock parameters.
+        # Wait for impulse breach >= Tier Trigger (AU x 1.20)
         # Reference: cerebus_qa_recap.md Q4, manual_ontology.md Computable Q1
         if self.state == EngineState.SEARCH:
-            # Use current tier trigger, or T1 default if tier not yet classified
-            if self.tier_name == "PENDING":
-                _cfg = self.tier_config.get("T1", {"trigger": 10.0})
-                active_trig = _cfg["trigger"] * self.pip_size
-            else:
-                active_trig = self.trigger_pips * self.pip_size
-
             if up_move >= active_trig:
                 self.impulse_direction = TradeDirection.LONG
                 self.impulse_extreme = bar.high
                 self.impulse_size_pips = up_move / self.pip_size
-                # Classify tier based on impulse size (DECOUPLED from AR)
-                if self.tier_name == "PENDING":
-                    self.tier_name, self.au_pips, self.trigger_pips = classify_tier_by_impulse(
-                        self.impulse_size_pips, self.tier_config
-                    )
-                    self.active_au = self.au_pips * self.pip_size
                 self.kill_switch_level = (
                     self.impulse_extreme - up_move * KILL_SWITCH_PCT
                 )
@@ -407,7 +376,6 @@ class SymmetryTrapEngine:
                 self.logger.debug(
                     f"Impulse LONG: extreme={self.impulse_extreme:.5f}, "
                     f"size={self.impulse_size_pips:.1f}p, "
-                    f"tier={self.tier_name}, "
                     f"kill={self.kill_switch_level:.5f}"
                 )
 
@@ -415,12 +383,6 @@ class SymmetryTrapEngine:
                 self.impulse_direction = TradeDirection.SHORT
                 self.impulse_extreme = bar.low
                 self.impulse_size_pips = dn_move / self.pip_size
-                # Classify tier based on impulse size (DECOUPLED from AR)
-                if self.tier_name == "PENDING":
-                    self.tier_name, self.au_pips, self.trigger_pips = classify_tier_by_impulse(
-                        self.impulse_size_pips, self.tier_config
-                    )
-                    self.active_au = self.au_pips * self.pip_size
                 self.kill_switch_level = (
                     self.impulse_extreme + dn_move * KILL_SWITCH_PCT
                 )
@@ -428,20 +390,61 @@ class SymmetryTrapEngine:
                 self.logger.debug(
                     f"Impulse SHORT: extreme={self.impulse_extreme:.5f}, "
                     f"size={self.impulse_size_pips:.1f}p, "
-                    f"tier={self.tier_name}, "
                     f"kill={self.kill_switch_level:.5f}"
                 )
 
         # ── STATE: WAIT_RETRACE ────────────────────────────────────────
-        # Wait for pullback >= 1 AU OR 20%-50% Fib retracement
-        # 80% Kill Switch: REMOVED (dead code — never triggered in testing)
-        # DZ: Flat 20-50% for all loops (dynamic 32% floor removed — zero impact)
-        # Reference: cerebus_qa_recap.md Q8 (DZ pullback), Q9 (DZ)
+        # Wait for pullback >= 1 AU OR 38.2%-50% Fib retracement
+        # Monitor 80% Kill Switch (close-only invalidation)
+        # Reference: cerebus_qa_recap.md Q5 (Kill), Q8 (DZ pullback), Q9 (DZ)
         elif self.state == EngineState.WAIT_RETRACE:
-            # Kill Switch: REMOVED
-            # Dynamic DZ: REMOVED — using flat 20-50% for all loops
-            min_retrace_pct = 0.20
-            max_retrace_pct = 0.50
+            # Kill Switch check (CLOSE-ONLY)
+            if self.impulse_direction == TradeDirection.LONG:
+                if bar.close < self.kill_switch_level:
+                    self.tel_kill_switch_80pct += 1
+                    _loop = self.loop_count
+                    self._reset_state_keep_loop(bar.close)
+                    self.loop_count = min(_loop + 1, self.max_loops)
+                    self.loop_start_time = bar.timestamp
+                    self._check_max_loops()
+                    sig = TradeSignal(
+                        event="KILL_SWITCH",
+                        direction=None, entry_price=None,
+                        sl_price=None, tp_price=None,
+                        au_used=self.au_pips, timestamp=bar.timestamp,
+                        reason="Q5: M5 close past 80% of impulse leg = pathway void",
+                        loop_count=_loop,
+                    )
+                    self.signal_log.append(sig)
+                    return sig
+            else:  # SHORT
+                if bar.close > self.kill_switch_level:
+                    self.tel_kill_switch_80pct += 1
+                    _loop = self.loop_count
+                    self._reset_state_keep_loop(bar.close)
+                    self.loop_count = min(_loop + 1, self.max_loops)
+                    self.loop_start_time = bar.timestamp
+                    self._check_max_loops()
+                    sig = TradeSignal(
+                        event="KILL_SWITCH",
+                        direction=None, entry_price=None,
+                        sl_price=None, tp_price=None,
+                        au_used=self.au_pips, timestamp=bar.timestamp,
+                        reason="Q5: M5 close past 80% of impulse leg = pathway void",
+                        loop_count=_loop,
+                    )
+                    self.signal_log.append(sig)
+                    return sig
+
+            # ── Dynamic DZ Thresholds (Option B: Continuous Loop) ────────
+            # Loop 1: strict Goldilocks zone (32%-50%)
+            # Loop 2+: relaxed floor (20%-50% — shallow momentum pullbacks)
+            if self.loop_count == 1:
+                min_retrace_pct = 0.32
+                max_retrace_pct = 0.50
+            else:
+                min_retrace_pct = 0.20
+                max_retrace_pct = 0.50
 
 
 
@@ -486,10 +489,44 @@ class SymmetryTrapEngine:
 
         # ── STATE: WAIT_OCC ────────────────────────────────────────────
         # Wait for Opposite Candle Close confirming impulse direction
-        # Kill Switch: REMOVED (dead code)
         # Reference: cerebus_qa_recap.md Q8, manual_ontology.md Computable Q3
         elif self.state == EngineState.WAIT_OCC:
-            # Kill Switch: REMOVED
+            # Re-verify Kill Switch
+            if self.impulse_direction == TradeDirection.LONG:
+                if bar.close < self.kill_switch_level:
+                    _loop = self.loop_count
+                    self._reset_state_keep_loop(bar.close)
+                    self.loop_count = min(_loop + 1, self.max_loops)
+                    self.loop_start_time = bar.timestamp
+                    self._check_max_loops()
+                    sig = TradeSignal(
+                        event="KILL_SWITCH",
+                        direction=None, entry_price=None,
+                        sl_price=None, tp_price=None,
+                        au_used=self.au_pips, timestamp=bar.timestamp,
+                        reason="Q5: Kill switch breached in WAIT_OCC",
+                        loop_count=_loop,
+                    )
+                    self.signal_log.append(sig)
+                    return sig
+            else:
+                if bar.close > self.kill_switch_level:
+                    _loop = self.loop_count
+                    self._reset_state_keep_loop(bar.close)
+                    self.loop_count = min(_loop + 1, self.max_loops)
+                    self.loop_start_time = bar.timestamp
+                    self._check_max_loops()
+                    sig = TradeSignal(
+                        event="KILL_SWITCH",
+                        direction=None, entry_price=None,
+                        sl_price=None, tp_price=None,
+                        au_used=self.au_pips, timestamp=bar.timestamp,
+                        reason="Q5: Kill switch breached in WAIT_OCC",
+                        loop_count=_loop,
+                    )
+                    self.signal_log.append(sig)
+                    return sig
+
             # OCC check: candle closing in impulse direction
             occ_confirmed = (
                 (self.impulse_direction == TradeDirection.LONG and bar.is_bullish) or

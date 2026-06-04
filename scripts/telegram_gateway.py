@@ -366,13 +366,15 @@ def main():
 
                                 full_ctx = "\n\n".join(ctx_parts)
 
-                                # Run agent with progress callback — this sends multiple messages
-                                resp = agent.chat(
-                                    msg_text,
-                                    sovereign_context=full_ctx,
-                                    max_tool_rounds=8,
-                                    progress_callback=on_progress,
-                                )
+                                # Run agent with limited tool rounds and timeout
+                                import concurrent.futures
+                                with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+                                    future = executor.submit(agent.chat, msg_text, full_ctx, 3, on_progress)
+                                    try:
+                                        resp = future.result(timeout=120)
+                                    except concurrent.futures.TimeoutError:
+                                        resp = "⏱️ Response timed out after 120s. Try a simpler question."
+                                        log("AGENT TIMEOUT")
 
                                 # Record in timeline and continuity cache
                                 TIMELINE.record("agent_chat", {"user": msg_text[:50], "response_len": len(resp)})
