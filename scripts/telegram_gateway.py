@@ -27,7 +27,7 @@ from core.observer.vault import Vault
 from core.observer.journal import Journal
 from core.observer.autonomous_orchestrator import AutonomousOrchestrator
 from core.observer.command_router import CommandRouter
-from core.observer.chat_agent import ChatAgent
+from core.observer.po_agent import POAgent
 from core.observer.sovereign_field import SovereignField
 from core.observer.presence_engine import (
     WATCHERS, TIMELINE, CONTINUITY, PRIORITY,
@@ -233,7 +233,7 @@ def main():
     journal = Journal(vault)
     orch = AutonomousOrchestrator(vault=vault, journal=journal)
     router = CommandRouter(vault=vault, journal=journal, orchestrator=orch)
-    agent = ChatAgent()
+    agent = POAgent()
     sov = SovereignField()
 
     # Start Phase 3: Presence Engine
@@ -369,7 +369,7 @@ def main():
                                 # Run agent with limited tool rounds and timeout
                                 import concurrent.futures
                                 with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-                                    future = executor.submit(agent.chat, msg_text, full_ctx, 3, on_progress)
+                                    future = executor.submit(agent.chat, msg_text, full_ctx, progress_callback=on_progress)
                                     try:
                                         resp = future.result(timeout=120)
                                     except concurrent.futures.TimeoutError:

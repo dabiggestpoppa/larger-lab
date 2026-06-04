@@ -1,7 +1,8 @@
 # MEMORY.md — OWL (OC2) Persistent Memory
 
-> **Last Updated:** 2026-06-04 01:30 EDT — FINAL CALIBRATION COMPLETE (5,084 tr | 82.9% WR | PF 11.83)
+> **Last Updated:** 2026-06-04 08:00 EDT — MAX ACCURACY SWEEP COMPLETE (29,438 tr | 90.8% avg WR | PF 20+)
 > **THE BIBLE locked:** AR gate decoupled from tier, impulse-based classification, 4PM cutoff, 10p trigger
+> **ACCURACY-FREQUENCY CURVE MAPPED:** Floor (max-trades) and ceiling (max-accuracy) both complete for all 28 pairs
 
 ---
 
@@ -577,4 +578,32 @@ _Last updated: 2026-05-31 19:05 EDT_
 - `quant-lab/tests/ab_test_engine/`: Preserved original engine copy (A/B test)
 - `quant-lab/tests/test_c_d/`: Preserved engine copy (C/D test)
 
-_Last updated: 2026-06-04 01:30 EDT — THE BIBLE locked, final calibration complete_
+### Max Accuracy Sweep — COMPLETE (2026-06-04 08:00 EDT)
+- **Ceiling established:** All 28 pairs swept upward from native triggers to find max WR
+- **Ceiling grand total:** 29,438 trades | 90.8% avg WR | PF 20+ avg | 0.59 avg tr/d
+- **Floor grand total:** ~158,375 trades | 81.1% avg WR | PF 11.5 avg | 3.0 avg tr/d
+- **Accuracy-frequency curve fully mapped** — any intermediate point derivable via interpolation
+- **Top ceiling performers:** NZDUSD 95.5% WR, AUDUSD 94.2%, GBPAUD 93.4%, GBPNZD 93.3%, USDCHF 93.2%
+- **No valid ceiling config (native <0.5 tr/d):** EURJPY, EURAUD, EURNZD, AUDJPY, NZDJPY, CADJPY
+- **Key insight:** The "knee" of the curve — where WR gains become marginal (<0.3% per pip) — is the natural portfolio optimization target
+- **Full curve data:** `reports/trigger_sweep_max_accuracy.json` — every trigger tested with full metrics
+- **Combinatorics ready:** With both floor and ceiling stored, any risk/reward profile is constructible
+
+### Deployment Configs — PENDING MAD APPROVAL
+- Floor configs (max trades, ~81% WR): `reports/trigger_sweep_*.json`
+- Ceiling configs (max accuracy, ~90%+ WR): `reports/trigger_sweep_max_accuracy.json`
+- **Next step:** MAD selects operating point per pair, OWL codes deployment configs
+
+### Deployment — LIVE (2026-06-04 09:40 EDT)
+- **7 pairs live:** EURUSD, USDJPY, CHFJPY (floor) | NZDUSD, AUDUSD, USDCHF (ceiling) | GBPJPY (knee)
+- **Lot size:** 0.01 all pairs
+- **Engine:** Nautilus symmetry trap v4.0 (zero-buffer impulse extreme SL)
+- **Bridge:** cerebus_live_bridge.py v3.0 — execution only, no signal computation
+- **Config:** `mt5/deploy_config.py` — per-pair sweep-optimized T1 triggers
+- **Account:** $65.12 balance, 0 open positions at deployment
+- **Cron coverage:** 5 jobs (5-min health, hourly report, daily recon, MC comparator, drift check)
+- **Kill threshold:** rolling 30-day WR < 70% → pause + fall back to floor
+- **Drawdown:** 15-20% alert, 25% hard stop
+- **First 200 trades:** no intervention
+
+_Last updated: 2026-06-04 09:40 EDT — CEREBUS LIVE, 7 pairs deployed, full cron coverage_

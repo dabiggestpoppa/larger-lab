@@ -54,7 +54,7 @@ def to_pips(price_diff: float, symbol: str) -> float:
 
 # ─── Import backtest engines (THE TRUTH) ──────────────────────────
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
-from engines.symmetry_trap import SymmetryTrapEngine, Bar, TradeDirection, classify_tier
+from engines.symmetry_trap import SymmetryTrapEngine, Bar, TradeDirection
 
 # P90 engine — DISABLED per MAD directive (2026-06-03 17:23 EDT)
 # All P90s taken down, deploying ST-only on top 7 assets
@@ -62,13 +62,15 @@ HAS_P90 = False
 
 EST = pytz.timezone("US/Eastern")
 
-# TOP 8 ST ASSETS (by Nautilus Phase 0 ground truth WR)
-# NZDUSD 91.6% | GBPCHF 89.9% | AUDUSD 87.8% | GBPAUD 85.2%
-# GBPNZD 85.0% | GBPUSD 83.5% | EURUSD 82.1% | USDCHF 81.6%
-# EURUSD + USDCHF = natural hedge pair
-TOP8_ST = ["NZDUSD.PRO", "GBPCHF.PRO", "AUDUSD.PRO",
-           "GBPAUD.PRO", "GBPNZD.PRO", "GBPUSD.PRO",
-           "EURUSD.PRO", "USDCHF.PRO"]
+# ═══════════════════════════════════════════════════════════════
+# DEPLOYMENT SYMBOLS — MAD Directive 2026-06-04
+# Floor (3): EURUSD, USDJPY, CHFJPY
+# Ceiling (3): NZDUSD, AUDUSD, USDCHF
+# Hedge/Knee (1): GBPJPY
+# ═══════════════════════════════════════════════════════════════
+TOP8_ST = ["EURUSD.PRO", "USDJPY.PRO", "CHFJPY.PRO",
+           "NZDUSD.PRO", "AUDUSD.PRO", "USDCHF.PRO",
+           "GBPJPY.PRO"]
 
 LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "live_logs")
 os.makedirs(LOG_DIR, exist_ok=True)
@@ -165,6 +167,7 @@ def get_positions() -> list:
         "tp": p.tp,
         "profit": p.profit,
         "magic": p.magic,
+        "comment": p.comment or "",
     } for p in positions]
 
 
@@ -478,12 +481,16 @@ def run_live(symbols: list, lot_size: float = 0.01):
     if not mt5_connect():
         return
 
-    # Initialize backtest engines per symbol
+    # Initialize backtest engines per symbol with deployment configs
+    # Engine does ALL computing. Bridge just reads bars, feeds engine, places orders.
+    from deploy_config import DEPLOYMENT_CONFIGS
     st_engines = {}
     p90_engines = {}
     for sym in symbols:
         ps = pip_size(sym)
-        st_engines[sym] = SymmetryTrapEngine(pip_size=ps, symbol=sym)
+        # Get deployment config for this symbol (fallback to defaults if not found)
+        cfg = DEPLOYMENT_CONFIGS.get(sym, {})
+        st_engines[sym] = SymmetryTrapEngine(pip_size=ps, symbol=sym, config=cfg)
         if HAS_P90:
             p90_engines[sym] = P90Engine(pip_size=ps, symbol=sym)
 
@@ -528,7 +535,7 @@ def run_live(symbols: list, lot_size: float = 0.01):
     for p in existing_positions:
         if p["magic"] == 20260601:
             # Determine engine from comment
-            eng = "ST" if "ST" in (p.get("comment") or "") else "P90"
+            eng = "ST" if "ST" in p.get("comment", "") else "P90"
             key = (p["symbol"], eng)
             active_trades[key] = {
                 "ticket": p["ticket"],
@@ -621,10 +628,19 @@ def run_live(symbols: list, lot_size: float = 0.01):
                             emit_signal(sig_dict)
 
                             if st_sig.event == "ENTRY":
-                                # Only skip if THIS engine already has position on this symbol
-                                if (sym, "ST") in active_trades:
-                                    log.info("[%s] ST ENTRY skipped — ST already in position", sym)
-                                else:
+                                # 1:1 backtest parity — close old position before entering new one
+                                # The engine resets to SEARCH after SL/TP hit, so if a new ENTRY fires
+                                # while an MT5 position is still open, close it first.
+                                _existing_pos = get_positions()
+                                _old_on_sym = [p for p in (_existing_pos or []) if p["symbol"] == sym and p["magic"] == 20260601]
+                                for _op in _old_on_sym:
+                                    log.info("[%s] Closing pre-existing position before new entry: #%s %s @ %.5f",
+                                             sym, _op["ticket"], _op["type"], _op["open_price"])
+                                    close_position(_op["ticket"])
+                                # Also clean stale active_trades
+                                stale_keys = [k for k in active_trades if k[0] == sym]
+                                for sk in stale_keys:
+                                    del active_trades[sk]
                                     sl_p = to_pips(abs(st_sig.sl_price - st_sig.entry_price), sym)
                                     tp_p = to_pips(abs(st_sig.tp_price - st_sig.entry_price), sym)
                                     rr = round(tp_p / sl_p, 2) if sl_p > 0 else 0.0
