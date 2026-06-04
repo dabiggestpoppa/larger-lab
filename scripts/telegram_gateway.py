@@ -321,6 +321,12 @@ def main():
                                             result_preview = (data.get("result", "") or "")[:200]
                                             send(base_url, chat_id,
                                                  f"📋 *{tool_name}:*\n```\n{result_preview}\n```")
+                                        elif event_type == "complete":
+                                            send(base_url, chat_id,
+                                                 "✅ *Agent complete* — Sending final response...")
+                                        elif event_type == "max_rounds":
+                                            send(base_url, chat_id,
+                                                 "⚠️ Max tool rounds reached. Generating final response...")
                                         elif event_type == "error":
                                             send(base_url, chat_id,
                                                  f"❌ *Error:* `{data.get('message', 'unknown')[:200]}`")
