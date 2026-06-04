@@ -813,11 +813,11 @@ class POAgent:
         if not self.api_key:
             return "LLM not configured. Set OPENROUTER_API_KEY."
 
-        def _notify(text):
+        def _notify(event_type, data=None):
             """Send progress update if callback is available."""
             if progress_callback:
                 try:
-                    progress_callback(text)
+                    progress_callback(event_type, data or {})
                 except Exception:
                     pass
 

@@ -227,66 +227,69 @@ class ChatAgent:
         for round_num in range(max_tool_rounds):
             _notify("round", {"round": round_num + 1, "max": max_tool_rounds})
 
-            # Try each model in the chain
-            resp, tool_calls, used_model, err = None, None, None, None
+            resp = None
+            tool_calls = None
+            used_model = None
+            err = None
+
             for attempt in range(len(MODEL_CHAIN)):
-                model = MODEL_CHAIN[(self._model_index + attempt) % len(MODEL_CHAIN)]
+                idx = (self._model_index + attempt) % len(MODEL_CHAIN)
+                model = MODEL_CHAIN[idx]
                 resp, tool_calls, used_model, err = self._call_llm(messages, model, tools=TOOL_DEFINITIONS)
-                if resp or tool_calls:
+                if tool_calls:
                     self._model_index = MODEL_CHAIN.index(used_model)
                     break
+                elif resp and not err:
+                    self._model_index = MODEL_CHAIN.index(used_model)
+                    break
+                elif err and "http_400" in str(err):
+                    resp2, _, used_model2, err2 = self._call_llm(messages, model, tools=None)
+                    if resp2:
+                        resp = resp2
+                        used_model = used_model2
+                        err = err2
+                        self._model_index = MODEL_CHAIN.index(used_model)
+                        break
+                elif err:
+                    continue
 
             if not resp and not tool_calls:
                 _notify("error", {"message": "All LLM providers failed"})
                 return "All LLM providers failed."
 
-            # Handle native OpenAI tool_calls
             if tool_calls:
                 for tc in tool_calls:
                     tool_name = tc.get("tool", "unknown")
                     tool_args = tc.get("args", {})
                     _notify("tool_call", {"tool": tool_name, "args": tool_args})
-
                     tool_result = self._execute_tool(tc)
                     _notify("tool_result", {"tool": tool_name, "result": tool_result[:300]})
-
                     messages.append({"role": "assistant", "content": resp or "", "tool_calls": [
                         {"id": f"tc_{round_num}", "type": "function", "function": {"name": tool_name, "arguments": json.dumps(tool_args)}}
                     ]})
-                    messages.append({
-                        "role": "tool",
-                        "tool_call_id": f"tc_{round_num}",
-                        "content": tool_result[:2000],
-                    })
+                    messages.append({"role": "tool", "tool_call_id": f"tc_{round_num}", "content": tool_result[:2000]})
                 continue
 
-            # Handle parsed tool calls from content (```tool blocks, XML, etc.)
-            parsed_tool_call = self._parse_tool_call(resp) if resp else None
-            if parsed_tool_call:
-                tool_name = parsed_tool_call.get("tool", "unknown")
-                tool_args = parsed_tool_call.get("args", {})
+            parsed_tc = self._parse_tool_call(resp) if resp else None
+            if parsed_tc:
+                tool_name = parsed_tc.get("tool", "unknown")
+                tool_args = parsed_tc.get("args", {})
                 _notify("tool_call", {"tool": tool_name, "args": tool_args})
-
-                tool_result = self._execute_tool(parsed_tool_call)
+                tool_result = self._execute_tool(parsed_tc)
                 _notify("tool_result", {"tool": tool_name, "result": tool_result[:300]})
-
                 messages.append({"role": "assistant", "content": resp})
-                messages.append({
-                    "role": "user",
-                    "content": f"Tool result for {tool_name}:\n{tool_result}\n\nUse this to respond to the user."
-                })
+                messages.append({"role": "user", "content": f"Tool result for {tool_name}:\n{tool_result}\n\nUse this to respond to the user."})
                 continue
 
-            # No tool calls — this is the final response
             self._history.append({"role": "user", "content": message})
             self._history.append({"role": "assistant", "content": resp})
             _notify("final", {"response": resp})
             return resp
 
-        # Max rounds — ask for final response
         messages.append({"role": "user", "content": "Max tool calls reached. Provide your final response."})
         for attempt in range(len(MODEL_CHAIN)):
-            model = MODEL_CHAIN[(self._model_index + attempt) % len(MODEL_CHAIN)]
+            idx = (self._model_index + attempt) % len(MODEL_CHAIN)
+            model = MODEL_CHAIN[idx]
             resp, _, used_model, err = self._call_llm(messages, model)
             if resp:
                 self._history.append({"role": "user", "content": message})

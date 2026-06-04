@@ -201,11 +201,12 @@ async def continuity_chat_stream(request: ContinuityChatRequest):
                 progress_queue.put({"type": event_type, "data": data})
 
             def run_agent():
-                from core.observer.chat_agent import ChatAgent
-                agent = ChatAgent()
+                from core.observer.po_agent import POAgent
+                agent = POAgent()
                 return agent.chat(
                     request.message,
                     sovereign_context="",
+                    max_tool_rounds=8,
                     progress_callback=on_progress,
                 )
 
@@ -1971,72 +1972,53 @@ async def api_chat_stream(request: dict):
         context = request.get("context")
 
         # Collect progress events thread-safely
-        import queue
-        progress_queue = queue.Queue()
+        progress_queue = asyncio.Queue()
+        loop = asyncio.get_event_loop()
 
         def on_progress(event_type: str, data: dict):
-            progress_queue.put({"type": event_type, "data": data})
+            """Thread-safe: called from thread pool, puts into async queue."""
+            try:
+                evt = {"type": event_type, "data": data}
+                loop.call_soon_threadsafe(progress_queue.put_nowait, evt)
+            except Exception:
+                pass
 
         async def event_generator():
-            # Run the async adapter method directly (it's async, not blocking)
-            # Use asyncio.to_thread for the sync parts inside
             import concurrent.futures
             executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
 
             def run_sync_agent():
-                """Run the sync ChatAgent.chat() with progress callback."""
-                from core.observer.chat_agent import ChatAgent
-                from core.observer.continuity_memory import WorkflowRecord
-                import uuid as _uuid
-
-                # Build context
-                spawn_snapshot = adapter._spawn_registry.get_field_snapshot()
-                observer_health = adapter._primary_observer.health
-
-                sov_lines = [
-                    "## System State",
-                    f"- Active agents: {spawn_snapshot.get('active_agents', 0)}",
-                    f"- Observer health: {observer_health.get('status', 'unknown')}",
-                ]
-                sovereign_context = "\n".join(sov_lines)
-
-                agent = ChatAgent()
-                response_text = agent.chat(
+                from core.observer.po_agent import POAgent
+                agent = POAgent()
+                return agent.chat(
                     message,
-                    sovereign_context=sovereign_context,
+                    sovereign_context="",
+                    max_tool_rounds=8,
                     progress_callback=on_progress,
                 )
-                return response_text
 
-            # Send keepalive while agent works
-            import asyncio
-            loop = asyncio.get_event_loop()
-
-            # Run agent in thread pool
             future = loop.run_in_executor(executor, run_sync_agent)
 
             # Stream progress events and keepalive
             while not future.done():
-                # Drain progress queue
                 while not progress_queue.empty():
                     try:
                         evt = progress_queue.get_nowait()
                         yield f"data: {json.dumps(evt, default=str)}\n\n"
-                    except queue.Empty:
+                    except asyncio.QueueEmpty:
                         break
-                # Send keepalive comment to prevent timeout
                 yield ": keepalive\n\n"
-                await asyncio.sleep(0.5)
+                await asyncio.sleep(0.3)
 
-            # Drain remaining progress events
+            # Drain remaining events
+            await asyncio.sleep(0.2)
             while not progress_queue.empty():
                 try:
                     evt = progress_queue.get_nowait()
                     yield f"data: {json.dumps(evt, default=str)}\n\n"
-                except queue.Empty:
+                except asyncio.QueueEmpty:
                     break
 
-            # Get final result
             response_text = await asyncio.wait_for(future, timeout=300)
 
             final_response = {

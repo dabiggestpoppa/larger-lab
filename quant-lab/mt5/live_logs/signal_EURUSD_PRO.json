@@ -2,10 +2,10 @@
   "engine": "SymmetryTrap",
   "symbol": "EURUSD.PRO",
   "direction": "SELL",
-  "entry": 1.1598600000000001,
-  "sl": 1.16066,
-  "tp": 1.1588600000000002,
-  "event": "ENTRY",
-  "loop": 4,
-  "time": "2026-06-03 12:10:00"
+  "entry": 1.16271,
+  "sl": 1.16254,
+  "tp": 1.16191,
+  "event": "SL_HIT",
+  "loop": 1,
+  "time": "2026-06-04 11:12:00"
 }

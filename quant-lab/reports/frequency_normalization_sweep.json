@@ -1,0 +1,2541 @@
+{
+  "generated": "2026-06-04T03:01:02.634887",
+  "objective": "Normalize to 2.5-3.0 tr/day",
+  "guardrail": {
+    "min_pf": 10.0,
+    "min_wr": 80.0
+  },
+  "multipliers_tested": [
+    1.0,
+    0.75,
+    0.65,
+    0.55,
+    0.45
+  ],
+  "results": [
+    {
+      "asset_key": "EURGBP",
+      "base_t1_trigger": 8,
+      "sweep_results": [
+        {
+          "label": "1.00x (T1=8.0p)",
+          "total_trades": 3858,
+          "wins": 3260,
+          "losses": 571,
+          "win_rate": 84.5,
+          "pnl_pips": 15485.2,
+          "profit_factor": 15.599,
+          "sharpe": 12.2787,
+          "max_drawdown_pips": 23.7,
+          "expectancy_pips": 4.01,
+          "avg_win_pips": 5.08,
+          "avg_loss_pips": -1.86,
+          "data_bars": 276627,
+          "data_days": 3101,
+          "trades_per_day": 1.2441,
+          "tier_stats": {
+            "T1": {
+              "trades": 3807,
+              "wr": 84.3,
+              "pnl": 14566.4
+            },
+            "T2": {
+              "trades": 29,
+              "wr": 96.6,
+              "pnl": 407.4
+            },
+            "T3": {
+              "trades": 22,
+              "wr": 95.5,
+              "pnl": 511.4
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 993,
+              "wr": 84.0,
+              "pnl": 4300.3
+            },
+            "2": {
+              "trades": 808,
+              "wr": 84.2,
+              "pnl": 3017.6
+            },
+            "3": {
+              "trades": 632,
+              "wr": 84.5,
+              "pnl": 2259.1
+            },
+            "4": {
+              "trades": 486,
+              "wr": 85.6,
+              "pnl": 1843.4
+            },
+            "5": {
+              "trades": 939,
+              "wr": 84.8,
+              "pnl": 4064.8
+            }
+          },
+          "config_used": {
+            "pip_value": 0.0001,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 7,
+                "trigger": 8.0
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 14,
+                "trigger": 17.0
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 19,
+                "trigger": 23.0
+              }
+            }
+          }
+        },
+        {
+          "label": "0.75x (T1=6.0p)",
+          "total_trades": 5483,
+          "wins": 4465,
+          "losses": 945,
+          "win_rate": 81.43,
+          "pnl_pips": 19979.0,
+          "profit_factor": 12.8506,
+          "sharpe": 12.0637,
+          "max_drawdown_pips": 19.9,
+          "expectancy_pips": 3.64,
+          "avg_win_pips": 4.85,
+          "avg_loss_pips": -1.78,
+          "data_bars": 276627,
+          "data_days": 3101,
+          "trades_per_day": 1.7681,
+          "tier_stats": {
+            "T1": {
+              "trades": 5456,
+              "wr": 81.3,
+              "pnl": 19397.3
+            },
+            "T2": {
+              "trades": 18,
+              "wr": 100.0,
+              "pnl": 307.8
+            },
+            "T3": {
+              "trades": 9,
+              "wr": 100.0,
+              "pnl": 273.9
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 1040,
+              "wr": 80.4,
+              "pnl": 4209.2
+            },
+            "2": {
+              "trades": 928,
+              "wr": 81.4,
+              "pnl": 3279.3
+            },
+            "3": {
+              "trades": 801,
+              "wr": 81.1,
+              "pnl": 2859.0
+            },
+            "4": {
+              "trades": 690,
+              "wr": 80.1,
+              "pnl": 2403.3
+            },
+            "5": {
+              "trades": 2024,
+              "wr": 82.6,
+              "pnl": 7228.2
+            }
+          },
+          "config_used": {
+            "pip_value": 0.0001,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 7,
+                "trigger": 6.0
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 14,
+                "trigger": 12.75
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 19,
+                "trigger": 17.25
+              }
+            }
+          }
+        },
+        {
+          "label": "0.65x (T1=5.2p)",
+          "total_trades": 6176,
+          "wins": 4930,
+          "losses": 1162,
+          "win_rate": 79.83,
+          "pnl_pips": 21329.1,
+          "profit_factor": 11.0184,
+          "sharpe": 11.6525,
+          "max_drawdown_pips": 27.5,
+          "expectancy_pips": 3.45,
+          "avg_win_pips": 4.76,
+          "avg_loss_pips": -1.83,
+          "data_bars": 276627,
+          "data_days": 3101,
+          "trades_per_day": 1.9916,
+          "tier_stats": {
+            "T1": {
+              "trades": 6156,
+              "wr": 79.8,
+              "pnl": 20838.3
+            },
+            "T2": {
+              "trades": 10,
+              "wr": 100.0,
+              "pnl": 236.0
+            },
+            "T3": {
+              "trades": 10,
+              "wr": 90.0,
+              "pnl": 254.8
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 1048,
+              "wr": 78.5,
+              "pnl": 4090.1
+            },
+            "2": {
+              "trades": 938,
+              "wr": 79.5,
+              "pnl": 3136.8
+            },
+            "3": {
+              "trades": 827,
+              "wr": 78.4,
+              "pnl": 2802.4
+            },
+            "4": {
+              "trades": 738,
+              "wr": 79.8,
+              "pnl": 2562.9
+            },
+            "5": {
+              "trades": 2625,
+              "wr": 80.9,
+              "pnl": 8736.9
+            }
+          },
+          "config_used": {
+            "pip_value": 0.0001,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 7,
+                "trigger": 5.2
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 14,
+                "trigger": 11.05
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 19,
+                "trigger": 14.95
+              }
+            }
+          }
+        }
+      ],
+      "optimal_result": {
+        "label": "1.00x (T1=8.0p)",
+        "total_trades": 3858,
+        "wins": 3260,
+        "losses": 571,
+        "win_rate": 84.5,
+        "pnl_pips": 15485.2,
+        "profit_factor": 15.599,
+        "sharpe": 12.2787,
+        "max_drawdown_pips": 23.7,
+        "expectancy_pips": 4.01,
+        "avg_win_pips": 5.08,
+        "avg_loss_pips": -1.86,
+        "data_bars": 276627,
+        "data_days": 3101,
+        "trades_per_day": 1.2441,
+        "tier_stats": {
+          "T1": {
+            "trades": 3807,
+            "wr": 84.3,
+            "pnl": 14566.4
+          },
+          "T2": {
+            "trades": 29,
+            "wr": 96.6,
+            "pnl": 407.4
+          },
+          "T3": {
+            "trades": 22,
+            "wr": 95.5,
+            "pnl": 511.4
+          }
+        },
+        "loop_stats": {
+          "1": {
+            "trades": 993,
+            "wr": 84.0,
+            "pnl": 4300.3
+          },
+          "2": {
+            "trades": 808,
+            "wr": 84.2,
+            "pnl": 3017.6
+          },
+          "3": {
+            "trades": 632,
+            "wr": 84.5,
+            "pnl": 2259.1
+          },
+          "4": {
+            "trades": 486,
+            "wr": 85.6,
+            "pnl": 1843.4
+          },
+          "5": {
+            "trades": 939,
+            "wr": 84.8,
+            "pnl": 4064.8
+          }
+        },
+        "config_used": {
+          "pip_value": 0.0001,
+          "tiers": {
+            "T1": {
+              "ar_max": 60.0,
+              "au": 7,
+              "trigger": 8.0
+            },
+            "T2": {
+              "ar_max": 60.0,
+              "au": 14,
+              "trigger": 17.0
+            },
+            "T3": {
+              "ar_max": 60.0,
+              "au": 19,
+              "trigger": 23.0
+            }
+          }
+        }
+      },
+      "guardrail_breached": true
+    },
+    {
+      "asset_key": "EURCHF",
+      "base_t1_trigger": 11,
+      "sweep_results": [
+        {
+          "label": "1.00x (T1=11.0p)",
+          "total_trades": 3317,
+          "wins": 2823,
+          "losses": 472,
+          "win_rate": 85.11,
+          "pnl_pips": 18689.6,
+          "profit_factor": 16.2955,
+          "sharpe": 11.3304,
+          "max_drawdown_pips": 21.8,
+          "expectancy_pips": 5.63,
+          "avg_win_pips": 7.05,
+          "avg_loss_pips": -2.59,
+          "data_bars": 279575,
+          "data_days": 3103,
+          "trades_per_day": 1.069,
+          "tier_stats": {
+            "T1": {
+              "trades": 3214,
+              "wr": 84.8,
+              "pnl": 16628.4
+            },
+            "T2": {
+              "trades": 65,
+              "wr": 92.3,
+              "pnl": 1055.2
+            },
+            "T3": {
+              "trades": 38,
+              "wr": 94.7,
+              "pnl": 1006.0
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 955,
+              "wr": 86.0,
+              "pnl": 5980.1
+            },
+            "2": {
+              "trades": 766,
+              "wr": 83.6,
+              "pnl": 3883.9
+            },
+            "3": {
+              "trades": 567,
+              "wr": 86.4,
+              "pnl": 3182.5
+            },
+            "4": {
+              "trades": 394,
+              "wr": 82.7,
+              "pnl": 2000.6
+            },
+            "5": {
+              "trades": 635,
+              "wr": 86.0,
+              "pnl": 3642.5
+            }
+          },
+          "config_used": {
+            "pip_value": 0.0001,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 9,
+                "trigger": 11.0
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 19,
+                "trigger": 23.0
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 22,
+                "trigger": 27.0
+              }
+            }
+          }
+        },
+        {
+          "label": "0.75x (T1=8.25p)",
+          "total_trades": 4617,
+          "wins": 3768,
+          "losses": 801,
+          "win_rate": 81.61,
+          "pnl_pips": 21938.4,
+          "profit_factor": 12.3441,
+          "sharpe": 10.8377,
+          "max_drawdown_pips": 35.4,
+          "expectancy_pips": 4.75,
+          "avg_win_pips": 6.34,
+          "avg_loss_pips": -2.41,
+          "data_bars": 279575,
+          "data_days": 3103,
+          "trades_per_day": 1.4879,
+          "tier_stats": {
+            "T1": {
+              "trades": 4550,
+              "wr": 81.4,
+              "pnl": 20387.4
+            },
+            "T2": {
+              "trades": 39,
+              "wr": 94.9,
+              "pnl": 693.8
+            },
+            "T3": {
+              "trades": 28,
+              "wr": 96.4,
+              "pnl": 857.2
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 990,
+              "wr": 81.2,
+              "pnl": 5319.2
+            },
+            "2": {
+              "trades": 857,
+              "wr": 80.9,
+              "pnl": 4007.7
+            },
+            "3": {
+              "trades": 714,
+              "wr": 81.1,
+              "pnl": 3263.3
+            },
+            "4": {
+              "trades": 595,
+              "wr": 82.4,
+              "pnl": 2680.1
+            },
+            "5": {
+              "trades": 1461,
+              "wr": 82.3,
+              "pnl": 6668.1
+            }
+          },
+          "config_used": {
+            "pip_value": 0.0001,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 9,
+                "trigger": 8.25
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 19,
+                "trigger": 17.25
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 22,
+                "trigger": 20.25
+              }
+            }
+          }
+        },
+        {
+          "label": "0.65x (T1=7.15p)",
+          "total_trades": 5347,
+          "wins": 4295,
+          "losses": 1003,
+          "win_rate": 80.33,
+          "pnl_pips": 24042.0,
+          "profit_factor": 11.2029,
+          "sharpe": 10.6277,
+          "max_drawdown_pips": 32.9,
+          "expectancy_pips": 4.5,
+          "avg_win_pips": 6.15,
+          "avg_loss_pips": -2.35,
+          "data_bars": 279575,
+          "data_days": 3103,
+          "trades_per_day": 1.7232,
+          "tier_stats": {
+            "T1": {
+              "trades": 5288,
+              "wr": 80.2,
+              "pnl": 22638.3
+            },
+            "T2": {
+              "trades": 32,
+              "wr": 93.8,
+              "pnl": 585.1
+            },
+            "T3": {
+              "trades": 27,
+              "wr": 96.3,
+              "pnl": 818.6
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 998,
+              "wr": 80.6,
+              "pnl": 5295.0
+            },
+            "2": {
+              "trades": 892,
+              "wr": 78.7,
+              "pnl": 3819.8
+            },
+            "3": {
+              "trades": 770,
+              "wr": 79.7,
+              "pnl": 3074.2
+            },
+            "4": {
+              "trades": 675,
+              "wr": 80.1,
+              "pnl": 2851.8
+            },
+            "5": {
+              "trades": 2012,
+              "wr": 81.2,
+              "pnl": 9001.2
+            }
+          },
+          "config_used": {
+            "pip_value": 0.0001,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 9,
+                "trigger": 7.15
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 19,
+                "trigger": 14.95
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 22,
+                "trigger": 17.55
+              }
+            }
+          }
+        },
+        {
+          "label": "0.55x (T1=6.05p)",
+          "total_trades": 6081,
+          "wins": 4740,
+          "losses": 1267,
+          "win_rate": 77.95,
+          "pnl_pips": 25797.0,
+          "profit_factor": 9.8817,
+          "sharpe": 10.1912,
+          "max_drawdown_pips": 44.9,
+          "expectancy_pips": 4.24,
+          "avg_win_pips": 6.06,
+          "avg_loss_pips": -2.29,
+          "data_bars": 279575,
+          "data_days": 3103,
+          "trades_per_day": 1.9597,
+          "tier_stats": {
+            "T1": {
+              "trades": 6021,
+              "wr": 77.8,
+              "pnl": 24398.0
+            },
+            "T2": {
+              "trades": 33,
+              "wr": 90.9,
+              "pnl": 560.1
+            },
+            "T3": {
+              "trades": 27,
+              "wr": 100.0,
+              "pnl": 838.9
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 1005,
+              "wr": 77.4,
+              "pnl": 5097.2
+            },
+            "2": {
+              "trades": 908,
+              "wr": 76.5,
+              "pnl": 3545.6
+            },
+            "3": {
+              "trades": 795,
+              "wr": 76.9,
+              "pnl": 3062.5
+            },
+            "4": {
+              "trades": 710,
+              "wr": 78.3,
+              "pnl": 3055.7
+            },
+            "5": {
+              "trades": 2663,
+              "wr": 78.9,
+              "pnl": 11036.0
+            }
+          },
+          "config_used": {
+            "pip_value": 0.0001,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 9,
+                "trigger": 6.05
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 19,
+                "trigger": 12.65
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 22,
+                "trigger": 14.85
+              }
+            }
+          }
+        }
+      ],
+      "optimal_result": {
+        "label": "1.00x (T1=11.0p)",
+        "total_trades": 3317,
+        "wins": 2823,
+        "losses": 472,
+        "win_rate": 85.11,
+        "pnl_pips": 18689.6,
+        "profit_factor": 16.2955,
+        "sharpe": 11.3304,
+        "max_drawdown_pips": 21.8,
+        "expectancy_pips": 5.63,
+        "avg_win_pips": 7.05,
+        "avg_loss_pips": -2.59,
+        "data_bars": 279575,
+        "data_days": 3103,
+        "trades_per_day": 1.069,
+        "tier_stats": {
+          "T1": {
+            "trades": 3214,
+            "wr": 84.8,
+            "pnl": 16628.4
+          },
+          "T2": {
+            "trades": 65,
+            "wr": 92.3,
+            "pnl": 1055.2
+          },
+          "T3": {
+            "trades": 38,
+            "wr": 94.7,
+            "pnl": 1006.0
+          }
+        },
+        "loop_stats": {
+          "1": {
+            "trades": 955,
+            "wr": 86.0,
+            "pnl": 5980.1
+          },
+          "2": {
+            "trades": 766,
+            "wr": 83.6,
+            "pnl": 3883.9
+          },
+          "3": {
+            "trades": 567,
+            "wr": 86.4,
+            "pnl": 3182.5
+          },
+          "4": {
+            "trades": 394,
+            "wr": 82.7,
+            "pnl": 2000.6
+          },
+          "5": {
+            "trades": 635,
+            "wr": 86.0,
+            "pnl": 3642.5
+          }
+        },
+        "config_used": {
+          "pip_value": 0.0001,
+          "tiers": {
+            "T1": {
+              "ar_max": 60.0,
+              "au": 9,
+              "trigger": 11.0
+            },
+            "T2": {
+              "ar_max": 60.0,
+              "au": 19,
+              "trigger": 23.0
+            },
+            "T3": {
+              "ar_max": 60.0,
+              "au": 22,
+              "trigger": 27.0
+            }
+          }
+        }
+      },
+      "guardrail_breached": true
+    },
+    {
+      "asset_key": "EURCAD",
+      "base_t1_trigger": 16,
+      "sweep_results": [
+        {
+          "label": "1.00x (T1=16.0p)",
+          "total_trades": 2514,
+          "wins": 2112,
+          "losses": 387,
+          "win_rate": 84.01,
+          "pnl_pips": 19298.7,
+          "profit_factor": 14.4401,
+          "sharpe": 12.5967,
+          "max_drawdown_pips": 34.5,
+          "expectancy_pips": 7.68,
+          "avg_win_pips": 9.82,
+          "avg_loss_pips": -3.71,
+          "data_bars": 279618,
+          "data_days": 3103,
+          "trades_per_day": 0.8102,
+          "tier_stats": {
+            "T1": {
+              "trades": 2211,
+              "wr": 83.8,
+              "pnl": 15659.1
+            },
+            "T2": {
+              "trades": 249,
+              "wr": 85.9,
+              "pnl": 2866.3
+            },
+            "T3": {
+              "trades": 54,
+              "wr": 85.2,
+              "pnl": 773.3
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 675,
+              "wr": 81.9,
+              "pnl": 5378.7
+            },
+            "2": {
+              "trades": 514,
+              "wr": 86.4,
+              "pnl": 4122.4
+            },
+            "3": {
+              "trades": 405,
+              "wr": 84.4,
+              "pnl": 3148.1
+            },
+            "4": {
+              "trades": 302,
+              "wr": 80.1,
+              "pnl": 2169.0
+            },
+            "5": {
+              "trades": 618,
+              "wr": 85.9,
+              "pnl": 4480.5
+            }
+          },
+          "config_used": {
+            "pip_value": 0.0001,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 13,
+                "trigger": 16.0
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 25,
+                "trigger": 31.0
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 32,
+                "trigger": 38.0
+              }
+            }
+          }
+        },
+        {
+          "label": "0.75x (T1=12.0p)",
+          "total_trades": 3780,
+          "wins": 3098,
+          "losses": 665,
+          "win_rate": 81.96,
+          "pnl_pips": 26405.8,
+          "profit_factor": 12.2088,
+          "sharpe": 12.3409,
+          "max_drawdown_pips": 55.2,
+          "expectancy_pips": 6.99,
+          "avg_win_pips": 9.28,
+          "avg_loss_pips": -3.54,
+          "data_bars": 279618,
+          "data_days": 3103,
+          "trades_per_day": 1.2182,
+          "tier_stats": {
+            "T1": {
+              "trades": 3689,
+              "wr": 81.8,
+              "pnl": 25094.7
+            },
+            "T2": {
+              "trades": 66,
+              "wr": 89.4,
+              "pnl": 855.9
+            },
+            "T3": {
+              "trades": 25,
+              "wr": 92.0,
+              "pnl": 455.2
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 714,
+              "wr": 79.8,
+              "pnl": 5035.1
+            },
+            "2": {
+              "trades": 591,
+              "wr": 81.9,
+              "pnl": 4193.3
+            },
+            "3": {
+              "trades": 514,
+              "wr": 82.3,
+              "pnl": 3990.2
+            },
+            "4": {
+              "trades": 459,
+              "wr": 83.7,
+              "pnl": 3512.3
+            },
+            "5": {
+              "trades": 1502,
+              "wr": 82.4,
+              "pnl": 9674.9
+            }
+          },
+          "config_used": {
+            "pip_value": 0.0001,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 13,
+                "trigger": 12.0
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 25,
+                "trigger": 23.25
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 32,
+                "trigger": 28.5
+              }
+            }
+          }
+        },
+        {
+          "label": "0.65x (T1=10.4p)",
+          "total_trades": 4438,
+          "wins": 3552,
+          "losses": 866,
+          "win_rate": 80.04,
+          "pnl_pips": 29031.6,
+          "profit_factor": 10.4609,
+          "sharpe": 11.7652,
+          "max_drawdown_pips": 55.2,
+          "expectancy_pips": 6.54,
+          "avg_win_pips": 9.04,
+          "avg_loss_pips": -3.54,
+          "data_bars": 279618,
+          "data_days": 3103,
+          "trades_per_day": 1.4302,
+          "tier_stats": {
+            "T1": {
+              "trades": 4369,
+              "wr": 79.9,
+              "pnl": 27906.6
+            },
+            "T2": {
+              "trades": 48,
+              "wr": 89.6,
+              "pnl": 705.8
+            },
+            "T3": {
+              "trades": 21,
+              "wr": 90.5,
+              "pnl": 419.2
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 730,
+              "wr": 77.4,
+              "pnl": 4662.8
+            },
+            "2": {
+              "trades": 622,
+              "wr": 82.0,
+              "pnl": 4158.2
+            },
+            "3": {
+              "trades": 556,
+              "wr": 77.3,
+              "pnl": 3900.9
+            },
+            "4": {
+              "trades": 498,
+              "wr": 81.3,
+              "pnl": 3636.3
+            },
+            "5": {
+              "trades": 2032,
+              "wr": 80.8,
+              "pnl": 12673.4
+            }
+          },
+          "config_used": {
+            "pip_value": 0.0001,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 13,
+                "trigger": 10.4
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 25,
+                "trigger": 20.15
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 32,
+                "trigger": 24.7
+              }
+            }
+          }
+        },
+        {
+          "label": "0.55x (T1=8.8p)",
+          "total_trades": 4948,
+          "wins": 3886,
+          "losses": 1036,
+          "win_rate": 78.54,
+          "pnl_pips": 31001.4,
+          "profit_factor": 9.7328,
+          "sharpe": 11.7899,
+          "max_drawdown_pips": 52.4,
+          "expectancy_pips": 6.27,
+          "avg_win_pips": 8.89,
+          "avg_loss_pips": -3.43,
+          "data_bars": 279618,
+          "data_days": 3103,
+          "trades_per_day": 1.5946,
+          "tier_stats": {
+            "T1": {
+              "trades": 4897,
+              "wr": 78.4,
+              "pnl": 30152.8
+            },
+            "T2": {
+              "trades": 33,
+              "wr": 90.9,
+              "pnl": 535.2
+            },
+            "T3": {
+              "trades": 18,
+              "wr": 88.9,
+              "pnl": 313.4
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 745,
+              "wr": 77.2,
+              "pnl": 4722.2
+            },
+            "2": {
+              "trades": 641,
+              "wr": 79.9,
+              "pnl": 3961.1
+            },
+            "3": {
+              "trades": 571,
+              "wr": 76.2,
+              "pnl": 3735.9
+            },
+            "4": {
+              "trades": 524,
+              "wr": 76.3,
+              "pnl": 3539.0
+            },
+            "5": {
+              "trades": 2467,
+              "wr": 79.6,
+              "pnl": 15043.2
+            }
+          },
+          "config_used": {
+            "pip_value": 0.0001,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 13,
+                "trigger": 8.8
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 25,
+                "trigger": 17.05
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 32,
+                "trigger": 20.9
+              }
+            }
+          }
+        }
+      ],
+      "optimal_result": {
+        "label": "1.00x (T1=16.0p)",
+        "total_trades": 2514,
+        "wins": 2112,
+        "losses": 387,
+        "win_rate": 84.01,
+        "pnl_pips": 19298.7,
+        "profit_factor": 14.4401,
+        "sharpe": 12.5967,
+        "max_drawdown_pips": 34.5,
+        "expectancy_pips": 7.68,
+        "avg_win_pips": 9.82,
+        "avg_loss_pips": -3.71,
+        "data_bars": 279618,
+        "data_days": 3103,
+        "trades_per_day": 0.8102,
+        "tier_stats": {
+          "T1": {
+            "trades": 2211,
+            "wr": 83.8,
+            "pnl": 15659.1
+          },
+          "T2": {
+            "trades": 249,
+            "wr": 85.9,
+            "pnl": 2866.3
+          },
+          "T3": {
+            "trades": 54,
+            "wr": 85.2,
+            "pnl": 773.3
+          }
+        },
+        "loop_stats": {
+          "1": {
+            "trades": 675,
+            "wr": 81.9,
+            "pnl": 5378.7
+          },
+          "2": {
+            "trades": 514,
+            "wr": 86.4,
+            "pnl": 4122.4
+          },
+          "3": {
+            "trades": 405,
+            "wr": 84.4,
+            "pnl": 3148.1
+          },
+          "4": {
+            "trades": 302,
+            "wr": 80.1,
+            "pnl": 2169.0
+          },
+          "5": {
+            "trades": 618,
+            "wr": 85.9,
+            "pnl": 4480.5
+          }
+        },
+        "config_used": {
+          "pip_value": 0.0001,
+          "tiers": {
+            "T1": {
+              "ar_max": 60.0,
+              "au": 13,
+              "trigger": 16.0
+            },
+            "T2": {
+              "ar_max": 60.0,
+              "au": 25,
+              "trigger": 31.0
+            },
+            "T3": {
+              "ar_max": 60.0,
+              "au": 32,
+              "trigger": 38.0
+            }
+          }
+        }
+      },
+      "guardrail_breached": true
+    },
+    {
+      "asset_key": "EURNZD",
+      "base_t1_trigger": 34,
+      "sweep_results": [
+        {
+          "label": "1.00x (T1=34.0p)",
+          "total_trades": 332,
+          "wins": 296,
+          "losses": 35,
+          "win_rate": 89.16,
+          "pnl_pips": 6477.8,
+          "profit_factor": 41.6642,
+          "sharpe": 12.1518,
+          "max_drawdown_pips": 14.1,
+          "expectancy_pips": 19.51,
+          "avg_win_pips": 22.42,
+          "avg_loss_pips": -4.55,
+          "data_bars": 276542,
+          "data_days": 3101,
+          "trades_per_day": 0.1071,
+          "tier_stats": {
+            "T3": {
+              "trades": 332,
+              "wr": 89.2,
+              "pnl": 6477.8
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 273,
+              "wr": 87.5,
+              "pnl": 5090.5
+            },
+            "2": {
+              "trades": 49,
+              "wr": 98.0,
+              "pnl": 1165.7
+            },
+            "3": {
+              "trades": 7,
+              "wr": 85.7,
+              "pnl": 184.2
+            },
+            "4": {
+              "trades": 2,
+              "wr": 100.0,
+              "pnl": 18.7
+            },
+            "5": {
+              "trades": 1,
+              "wr": 100.0,
+              "pnl": 18.7
+            }
+          },
+          "config_used": {
+            "pip_value": 0.0001,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 28,
+                "trigger": 34.0
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 49,
+                "trigger": 59.0
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 61,
+                "trigger": 73.0
+              }
+            }
+          }
+        },
+        {
+          "label": "0.75x (T1=25.5p)",
+          "total_trades": 529,
+          "wins": 461,
+          "losses": 65,
+          "win_rate": 87.15,
+          "pnl_pips": 8991.8,
+          "profit_factor": 26.0747,
+          "sharpe": 11.711,
+          "max_drawdown_pips": 34.1,
+          "expectancy_pips": 17.0,
+          "avg_win_pips": 20.28,
+          "avg_loss_pips": -5.52,
+          "data_bars": 276542,
+          "data_days": 3101,
+          "trades_per_day": 0.1706,
+          "tier_stats": {
+            "T2": {
+              "trades": 373,
+              "wr": 85.8,
+              "pnl": 4968.3
+            },
+            "T3": {
+              "trades": 156,
+              "wr": 90.4,
+              "pnl": 4023.5
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 328,
+              "wr": 85.1,
+              "pnl": 5411.1
+            },
+            "2": {
+              "trades": 124,
+              "wr": 92.7,
+              "pnl": 2508.9
+            },
+            "3": {
+              "trades": 52,
+              "wr": 84.6,
+              "pnl": 731.0
+            },
+            "4": {
+              "trades": 17,
+              "wr": 94.1,
+              "pnl": 214.1
+            },
+            "5": {
+              "trades": 8,
+              "wr": 87.5,
+              "pnl": 126.7
+            }
+          },
+          "config_used": {
+            "pip_value": 0.0001,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 28,
+                "trigger": 25.5
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 49,
+                "trigger": 44.25
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 61,
+                "trigger": 54.75
+              }
+            }
+          }
+        },
+        {
+          "label": "0.65x (T1=22.1p)",
+          "total_trades": 602,
+          "wins": 505,
+          "losses": 94,
+          "win_rate": 83.89,
+          "pnl_pips": 9398.2,
+          "profit_factor": 18.8537,
+          "sharpe": 11.1343,
+          "max_drawdown_pips": 37.6,
+          "expectancy_pips": 15.61,
+          "avg_win_pips": 19.65,
+          "avg_loss_pips": -5.6,
+          "data_bars": 276542,
+          "data_days": 3101,
+          "trades_per_day": 0.1941,
+          "tier_stats": {
+            "T2": {
+              "trades": 507,
+              "wr": 82.6,
+              "pnl": 6457.5
+            },
+            "T3": {
+              "trades": 95,
+              "wr": 90.5,
+              "pnl": 2940.7
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 340,
+              "wr": 80.0,
+              "pnl": 5258.9
+            },
+            "2": {
+              "trades": 152,
+              "wr": 91.4,
+              "pnl": 2618.9
+            },
+            "3": {
+              "trades": 68,
+              "wr": 85.3,
+              "pnl": 954.7
+            },
+            "4": {
+              "trades": 26,
+              "wr": 88.5,
+              "pnl": 285.8
+            },
+            "5": {
+              "trades": 16,
+              "wr": 81.2,
+              "pnl": 279.9
+            }
+          },
+          "config_used": {
+            "pip_value": 0.0001,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 28,
+                "trigger": 22.1
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 49,
+                "trigger": 38.35
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 61,
+                "trigger": 47.45
+              }
+            }
+          }
+        },
+        {
+          "label": "0.55x (T1=18.7p)",
+          "total_trades": 919,
+          "wins": 759,
+          "losses": 157,
+          "win_rate": 82.59,
+          "pnl_pips": 12073.5,
+          "profit_factor": 14.8521,
+          "sharpe": 10.8877,
+          "max_drawdown_pips": 35.5,
+          "expectancy_pips": 13.14,
+          "avg_win_pips": 17.06,
+          "avg_loss_pips": -5.55,
+          "data_bars": 276542,
+          "data_days": 3101,
+          "trades_per_day": 0.2964,
+          "tier_stats": {
+            "T1": {
+              "trades": 414,
+              "wr": 82.6,
+              "pnl": 4548.8
+            },
+            "T2": {
+              "trades": 443,
+              "wr": 81.5,
+              "pnl": 5373.5
+            },
+            "T3": {
+              "trades": 62,
+              "wr": 90.3,
+              "pnl": 2151.2
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 351,
+              "wr": 79.2,
+              "pnl": 5135.0
+            },
+            "2": {
+              "trades": 210,
+              "wr": 87.1,
+              "pnl": 3070.5
+            },
+            "3": {
+              "trades": 133,
+              "wr": 82.7,
+              "pnl": 1210.0
+            },
+            "4": {
+              "trades": 94,
+              "wr": 81.9,
+              "pnl": 1062.8
+            },
+            "5": {
+              "trades": 131,
+              "wr": 84.7,
+              "pnl": 1595.2
+            }
+          },
+          "config_used": {
+            "pip_value": 0.0001,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 28,
+                "trigger": 18.7
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 49,
+                "trigger": 32.45
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 61,
+                "trigger": 40.15
+              }
+            }
+          }
+        },
+        {
+          "label": "0.45x (T1=15.3p)",
+          "total_trades": 1431,
+          "wins": 1095,
+          "losses": 323,
+          "win_rate": 76.52,
+          "pnl_pips": 15316.4,
+          "profit_factor": 10.5937,
+          "sharpe": 10.3259,
+          "max_drawdown_pips": 48.0,
+          "expectancy_pips": 10.7,
+          "avg_win_pips": 15.45,
+          "avg_loss_pips": -4.94,
+          "data_bars": 276542,
+          "data_days": 3101,
+          "trades_per_day": 0.4615,
+          "tier_stats": {
+            "T1": {
+              "trades": 1218,
+              "wr": 75.6,
+              "pnl": 11321.0
+            },
+            "T2": {
+              "trades": 160,
+              "wr": 78.1,
+              "pnl": 1947.7
+            },
+            "T3": {
+              "trades": 53,
+              "wr": 92.5,
+              "pnl": 2047.7
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 366,
+              "wr": 76.2,
+              "pnl": 4865.0
+            },
+            "2": {
+              "trades": 263,
+              "wr": 78.7,
+              "pnl": 2704.6
+            },
+            "3": {
+              "trades": 216,
+              "wr": 75.0,
+              "pnl": 1993.7
+            },
+            "4": {
+              "trades": 176,
+              "wr": 75.0,
+              "pnl": 1752.7
+            },
+            "5": {
+              "trades": 410,
+              "wr": 76.8,
+              "pnl": 4000.4
+            }
+          },
+          "config_used": {
+            "pip_value": 0.0001,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 28,
+                "trigger": 15.3
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 49,
+                "trigger": 26.55
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 61,
+                "trigger": 32.85
+              }
+            }
+          }
+        }
+      ],
+      "optimal_result": {
+        "label": "1.00x (T1=34.0p)",
+        "total_trades": 332,
+        "wins": 296,
+        "losses": 35,
+        "win_rate": 89.16,
+        "pnl_pips": 6477.8,
+        "profit_factor": 41.6642,
+        "sharpe": 12.1518,
+        "max_drawdown_pips": 14.1,
+        "expectancy_pips": 19.51,
+        "avg_win_pips": 22.42,
+        "avg_loss_pips": -4.55,
+        "data_bars": 276542,
+        "data_days": 3101,
+        "trades_per_day": 0.1071,
+        "tier_stats": {
+          "T3": {
+            "trades": 332,
+            "wr": 89.2,
+            "pnl": 6477.8
+          }
+        },
+        "loop_stats": {
+          "1": {
+            "trades": 273,
+            "wr": 87.5,
+            "pnl": 5090.5
+          },
+          "2": {
+            "trades": 49,
+            "wr": 98.0,
+            "pnl": 1165.7
+          },
+          "3": {
+            "trades": 7,
+            "wr": 85.7,
+            "pnl": 184.2
+          },
+          "4": {
+            "trades": 2,
+            "wr": 100.0,
+            "pnl": 18.7
+          },
+          "5": {
+            "trades": 1,
+            "wr": 100.0,
+            "pnl": 18.7
+          }
+        },
+        "config_used": {
+          "pip_value": 0.0001,
+          "tiers": {
+            "T1": {
+              "ar_max": 60.0,
+              "au": 28,
+              "trigger": 34.0
+            },
+            "T2": {
+              "ar_max": 60.0,
+              "au": 49,
+              "trigger": 59.0
+            },
+            "T3": {
+              "ar_max": 60.0,
+              "au": 61,
+              "trigger": 73.0
+            }
+          }
+        }
+      },
+      "guardrail_breached": true
+    },
+    {
+      "asset_key": "EURAUD",
+      "base_t1_trigger": 32,
+      "sweep_results": [
+        {
+          "label": "1.00x (T1=32.0p)",
+          "total_trades": 328,
+          "wins": 292,
+          "losses": 36,
+          "win_rate": 89.02,
+          "pnl_pips": 4229.9,
+          "profit_factor": 22.9735,
+          "sharpe": 11.6367,
+          "max_drawdown_pips": 31.4,
+          "expectancy_pips": 12.9,
+          "avg_win_pips": 15.15,
+          "avg_loss_pips": -5.35,
+          "data_bars": 279664,
+          "data_days": 3103,
+          "trades_per_day": 0.1057,
+          "tier_stats": {
+            "T3": {
+              "trades": 328,
+              "wr": 89.0,
+              "pnl": 4229.9
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 287,
+              "wr": 88.2,
+              "pnl": 3489.0
+            },
+            "2": {
+              "trades": 39,
+              "wr": 94.9,
+              "pnl": 693.8
+            },
+            "3": {
+              "trades": 1,
+              "wr": 100.0,
+              "pnl": 38.7
+            },
+            "4": {
+              "trades": 1,
+              "wr": 100.0,
+              "pnl": 8.4
+            }
+          },
+          "config_used": {
+            "pip_value": 0.0001,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 27,
+                "trigger": 32.0
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 51,
+                "trigger": 61.0
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 58,
+                "trigger": 69.0
+              }
+            }
+          }
+        },
+        {
+          "label": "0.75x (T1=24.0p)",
+          "total_trades": 515,
+          "wins": 443,
+          "losses": 71,
+          "win_rate": 86.02,
+          "pnl_pips": 5620.4,
+          "profit_factor": 18.4601,
+          "sharpe": 11.1317,
+          "max_drawdown_pips": 31.6,
+          "expectancy_pips": 10.91,
+          "avg_win_pips": 13.41,
+          "avg_loss_pips": -4.53,
+          "data_bars": 279664,
+          "data_days": 3103,
+          "trades_per_day": 0.166,
+          "tier_stats": {
+            "T2": {
+              "trades": 420,
+              "wr": 85.5,
+              "pnl": 3831.1
+            },
+            "T3": {
+              "trades": 95,
+              "wr": 88.4,
+              "pnl": 1789.3
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 365,
+              "wr": 84.1,
+              "pnl": 3755.8
+            },
+            "2": {
+              "trades": 110,
+              "wr": 90.9,
+              "pnl": 1266.9
+            },
+            "3": {
+              "trades": 28,
+              "wr": 92.9,
+              "pnl": 454.5
+            },
+            "4": {
+              "trades": 8,
+              "wr": 75.0,
+              "pnl": 81.4
+            },
+            "5": {
+              "trades": 4,
+              "wr": 100.0,
+              "pnl": 61.8
+            }
+          },
+          "config_used": {
+            "pip_value": 0.0001,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 27,
+                "trigger": 24.0
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 51,
+                "trigger": 45.75
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 58,
+                "trigger": 51.75
+              }
+            }
+          }
+        },
+        {
+          "label": "0.65x (T1=20.8p)",
+          "total_trades": 627,
+          "wins": 524,
+          "losses": 101,
+          "win_rate": 83.57,
+          "pnl_pips": 7404.1,
+          "profit_factor": 15.8171,
+          "sharpe": 10.8056,
+          "max_drawdown_pips": 45.7,
+          "expectancy_pips": 11.81,
+          "avg_win_pips": 15.08,
+          "avg_loss_pips": -4.95,
+          "data_bars": 279664,
+          "data_days": 3103,
+          "trades_per_day": 0.2021,
+          "tier_stats": {
+            "T2": {
+              "trades": 571,
+              "wr": 83.0,
+              "pnl": 6093.5
+            },
+            "T3": {
+              "trades": 56,
+              "wr": 89.3,
+              "pnl": 1310.6
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 392,
+              "wr": 81.1,
+              "pnl": 4042.8
+            },
+            "2": {
+              "trades": 153,
+              "wr": 88.2,
+              "pnl": 2221.4
+            },
+            "3": {
+              "trades": 58,
+              "wr": 84.5,
+              "pnl": 721.3
+            },
+            "4": {
+              "trades": 19,
+              "wr": 89.5,
+              "pnl": 355.5
+            },
+            "5": {
+              "trades": 5,
+              "wr": 100.0,
+              "pnl": 63.1
+            }
+          },
+          "config_used": {
+            "pip_value": 0.0001,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 27,
+                "trigger": 20.8
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 51,
+                "trigger": 39.65
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 58,
+                "trigger": 44.85
+              }
+            }
+          }
+        },
+        {
+          "label": "0.55x (T1=17.6p)",
+          "total_trades": 1174,
+          "wins": 961,
+          "losses": 204,
+          "win_rate": 81.86,
+          "pnl_pips": 12286.4,
+          "profit_factor": 13.8613,
+          "sharpe": 11.2949,
+          "max_drawdown_pips": 32.2,
+          "expectancy_pips": 10.47,
+          "avg_win_pips": 13.78,
+          "avg_loss_pips": -4.68,
+          "data_bars": 279664,
+          "data_days": 3103,
+          "trades_per_day": 0.3783,
+          "tier_stats": {
+            "T1": {
+              "trades": 825,
+              "wr": 81.6,
+              "pnl": 7637.8
+            },
+            "T2": {
+              "trades": 306,
+              "wr": 81.7,
+              "pnl": 3525.2
+            },
+            "T3": {
+              "trades": 43,
+              "wr": 88.4,
+              "pnl": 1123.4
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 413,
+              "wr": 78.0,
+              "pnl": 3911.9
+            },
+            "2": {
+              "trades": 264,
+              "wr": 85.6,
+              "pnl": 3371.9
+            },
+            "3": {
+              "trades": 180,
+              "wr": 82.2,
+              "pnl": 2037.5
+            },
+            "4": {
+              "trades": 126,
+              "wr": 86.5,
+              "pnl": 1251.4
+            },
+            "5": {
+              "trades": 191,
+              "wr": 81.7,
+              "pnl": 1713.7
+            }
+          },
+          "config_used": {
+            "pip_value": 0.0001,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 27,
+                "trigger": 17.6
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 51,
+                "trigger": 33.55
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 58,
+                "trigger": 37.95
+              }
+            }
+          }
+        },
+        {
+          "label": "0.45x (T1=14.4p)",
+          "total_trades": 1673,
+          "wins": 1300,
+          "losses": 361,
+          "win_rate": 77.7,
+          "pnl_pips": 14326.5,
+          "profit_factor": 10.02,
+          "sharpe": 10.2806,
+          "max_drawdown_pips": 43.2,
+          "expectancy_pips": 8.56,
+          "avg_win_pips": 12.24,
+          "avg_loss_pips": -4.4,
+          "data_bars": 279664,
+          "data_days": 3103,
+          "trades_per_day": 0.5392,
+          "tier_stats": {
+            "T1": {
+              "trades": 1530,
+              "wr": 77.3,
+              "pnl": 12115.8
+            },
+            "T2": {
+              "trades": 117,
+              "wr": 78.6,
+              "pnl": 1299.4
+            },
+            "T3": {
+              "trades": 26,
+              "wr": 100.0,
+              "pnl": 911.3
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 431,
+              "wr": 76.6,
+              "pnl": 4245.0
+            },
+            "2": {
+              "trades": 330,
+              "wr": 78.5,
+              "pnl": 2954.0
+            },
+            "3": {
+              "trades": 258,
+              "wr": 76.4,
+              "pnl": 2031.9
+            },
+            "4": {
+              "trades": 209,
+              "wr": 75.6,
+              "pnl": 1561.8
+            },
+            "5": {
+              "trades": 445,
+              "wr": 80.0,
+              "pnl": 3533.8
+            }
+          },
+          "config_used": {
+            "pip_value": 0.0001,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 27,
+                "trigger": 14.4
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 51,
+                "trigger": 27.45
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 58,
+                "trigger": 31.05
+              }
+            }
+          }
+        }
+      ],
+      "optimal_result": {
+        "label": "1.00x (T1=32.0p)",
+        "total_trades": 328,
+        "wins": 292,
+        "losses": 36,
+        "win_rate": 89.02,
+        "pnl_pips": 4229.9,
+        "profit_factor": 22.9735,
+        "sharpe": 11.6367,
+        "max_drawdown_pips": 31.4,
+        "expectancy_pips": 12.9,
+        "avg_win_pips": 15.15,
+        "avg_loss_pips": -5.35,
+        "data_bars": 279664,
+        "data_days": 3103,
+        "trades_per_day": 0.1057,
+        "tier_stats": {
+          "T3": {
+            "trades": 328,
+            "wr": 89.0,
+            "pnl": 4229.9
+          }
+        },
+        "loop_stats": {
+          "1": {
+            "trades": 287,
+            "wr": 88.2,
+            "pnl": 3489.0
+          },
+          "2": {
+            "trades": 39,
+            "wr": 94.9,
+            "pnl": 693.8
+          },
+          "3": {
+            "trades": 1,
+            "wr": 100.0,
+            "pnl": 38.7
+          },
+          "4": {
+            "trades": 1,
+            "wr": 100.0,
+            "pnl": 8.4
+          }
+        },
+        "config_used": {
+          "pip_value": 0.0001,
+          "tiers": {
+            "T1": {
+              "ar_max": 60.0,
+              "au": 27,
+              "trigger": 32.0
+            },
+            "T2": {
+              "ar_max": 60.0,
+              "au": 51,
+              "trigger": 61.0
+            },
+            "T3": {
+              "ar_max": 60.0,
+              "au": 58,
+              "trigger": 69.0
+            }
+          }
+        }
+      },
+      "guardrail_breached": true
+    },
+    {
+      "asset_key": "EURJPY",
+      "base_t1_trigger": 35,
+      "sweep_results": [
+        {
+          "label": "1.00x (T1=35.0p)",
+          "total_trades": 250,
+          "wins": 225,
+          "losses": 25,
+          "win_rate": 90.0,
+          "pnl_pips": 3734.6,
+          "profit_factor": 34.6754,
+          "sharpe": 12.6002,
+          "max_drawdown_pips": 16.6,
+          "expectancy_pips": 14.94,
+          "avg_win_pips": 17.09,
+          "avg_loss_pips": -4.44,
+          "data_bars": 276531,
+          "data_days": 3101,
+          "trades_per_day": 0.0806,
+          "tier_stats": {
+            "T3": {
+              "trades": 250,
+              "wr": 90.0,
+              "pnl": 3734.6
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 213,
+              "wr": 88.3,
+              "pnl": 2831.7
+            },
+            "2": {
+              "trades": 30,
+              "wr": 100.0,
+              "pnl": 752.2
+            },
+            "3": {
+              "trades": 5,
+              "wr": 100.0,
+              "pnl": 104.7
+            },
+            "4": {
+              "trades": 2,
+              "wr": 100.0,
+              "pnl": 46.0
+            }
+          },
+          "config_used": {
+            "pip_value": 0.01,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 29,
+                "trigger": 35.0
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 63,
+                "trigger": 75.0
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 63,
+                "trigger": 76.0
+              }
+            }
+          }
+        },
+        {
+          "label": "0.75x (T1=26.25p)",
+          "total_trades": 366,
+          "wins": 324,
+          "losses": 40,
+          "win_rate": 88.52,
+          "pnl_pips": 5018.3,
+          "profit_factor": 26.2557,
+          "sharpe": 11.1907,
+          "max_drawdown_pips": 38.4,
+          "expectancy_pips": 13.71,
+          "avg_win_pips": 16.1,
+          "avg_loss_pips": -4.97,
+          "data_bars": 276531,
+          "data_days": 3101,
+          "trades_per_day": 0.118,
+          "tier_stats": {
+            "T2": {
+              "trades": 212,
+              "wr": 86.8,
+              "pnl": 2148.2
+            },
+            "T3": {
+              "trades": 154,
+              "wr": 90.9,
+              "pnl": 2870.1
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 273,
+              "wr": 86.1,
+              "pnl": 3086.7
+            },
+            "2": {
+              "trades": 76,
+              "wr": 96.1,
+              "pnl": 1546.0
+            },
+            "3": {
+              "trades": 11,
+              "wr": 100.0,
+              "pnl": 304.9
+            },
+            "4": {
+              "trades": 5,
+              "wr": 80.0,
+              "pnl": 65.4
+            },
+            "5": {
+              "trades": 1,
+              "wr": 100.0,
+              "pnl": 15.3
+            }
+          },
+          "config_used": {
+            "pip_value": 0.01,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 29,
+                "trigger": 26.25
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 63,
+                "trigger": 56.25
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 63,
+                "trigger": 57.0
+              }
+            }
+          }
+        },
+        {
+          "label": "0.65x (T1=22.75p)",
+          "total_trades": 428,
+          "wins": 368,
+          "losses": 59,
+          "win_rate": 85.98,
+          "pnl_pips": 5817.7,
+          "profit_factor": 26.0224,
+          "sharpe": 10.634,
+          "max_drawdown_pips": 21.0,
+          "expectancy_pips": 13.59,
+          "avg_win_pips": 16.44,
+          "avg_loss_pips": -3.94,
+          "data_bars": 276531,
+          "data_days": 3101,
+          "trades_per_day": 0.138,
+          "tier_stats": {
+            "T2": {
+              "trades": 341,
+              "wr": 84.2,
+              "pnl": 3958.3
+            },
+            "T3": {
+              "trades": 87,
+              "wr": 93.1,
+              "pnl": 1859.4
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 300,
+              "wr": 83.7,
+              "pnl": 3523.5
+            },
+            "2": {
+              "trades": 95,
+              "wr": 92.6,
+              "pnl": 1656.5
+            },
+            "3": {
+              "trades": 24,
+              "wr": 91.7,
+              "pnl": 575.7
+            },
+            "4": {
+              "trades": 7,
+              "wr": 85.7,
+              "pnl": 55.4
+            },
+            "5": {
+              "trades": 2,
+              "wr": 50.0,
+              "pnl": 6.6
+            }
+          },
+          "config_used": {
+            "pip_value": 0.01,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 29,
+                "trigger": 22.75
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 63,
+                "trigger": 48.75
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 63,
+                "trigger": 49.4
+              }
+            }
+          }
+        },
+        {
+          "label": "0.55x (T1=19.25p)",
+          "total_trades": 625,
+          "wins": 519,
+          "losses": 104,
+          "win_rate": 83.04,
+          "pnl_pips": 7666.8,
+          "profit_factor": 18.1786,
+          "sharpe": 10.5259,
+          "max_drawdown_pips": 23.1,
+          "expectancy_pips": 12.27,
+          "avg_win_pips": 15.63,
+          "avg_loss_pips": -4.29,
+          "data_bars": 276531,
+          "data_days": 3101,
+          "trades_per_day": 0.2015,
+          "tier_stats": {
+            "T1": {
+              "trades": 225,
+              "wr": 81.3,
+              "pnl": 2196.5
+            },
+            "T2": {
+              "trades": 348,
+              "wr": 82.5,
+              "pnl": 4205.0
+            },
+            "T3": {
+              "trades": 52,
+              "wr": 94.2,
+              "pnl": 1265.3
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 325,
+              "wr": 82.8,
+              "pnl": 3651.7
+            },
+            "2": {
+              "trades": 158,
+              "wr": 88.0,
+              "pnl": 2410.4
+            },
+            "3": {
+              "trades": 72,
+              "wr": 81.9,
+              "pnl": 961.9
+            },
+            "4": {
+              "trades": 36,
+              "wr": 75.0,
+              "pnl": 338.2
+            },
+            "5": {
+              "trades": 34,
+              "wr": 73.5,
+              "pnl": 304.6
+            }
+          },
+          "config_used": {
+            "pip_value": 0.01,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 29,
+                "trigger": 19.25
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 63,
+                "trigger": 41.25
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 63,
+                "trigger": 41.8
+              }
+            }
+          }
+        },
+        {
+          "label": "0.45x (T1=15.75p)",
+          "total_trades": 1133,
+          "wins": 919,
+          "losses": 210,
+          "win_rate": 81.11,
+          "pnl_pips": 11549.7,
+          "profit_factor": 13.7171,
+          "sharpe": 10.492,
+          "max_drawdown_pips": 32.5,
+          "expectancy_pips": 10.19,
+          "avg_win_pips": 13.56,
+          "avg_loss_pips": -4.32,
+          "data_bars": 276531,
+          "data_days": 3101,
+          "trades_per_day": 0.3654,
+          "tier_stats": {
+            "T1": {
+              "trades": 963,
+              "wr": 80.3,
+              "pnl": 8615.8
+            },
+            "T2": {
+              "trades": 138,
+              "wr": 83.3,
+              "pnl": 1956.2
+            },
+            "T3": {
+              "trades": 32,
+              "wr": 96.9,
+              "pnl": 977.7
+            }
+          },
+          "loop_stats": {
+            "1": {
+              "trades": 353,
+              "wr": 78.2,
+              "pnl": 3731.1
+            },
+            "2": {
+              "trades": 240,
+              "wr": 82.1,
+              "pnl": 2642.2
+            },
+            "3": {
+              "trades": 169,
+              "wr": 80.5,
+              "pnl": 1759.9
+            },
+            "4": {
+              "trades": 125,
+              "wr": 85.6,
+              "pnl": 1293.3
+            },
+            "5": {
+              "trades": 246,
+              "wr": 82.5,
+              "pnl": 2123.2
+            }
+          },
+          "config_used": {
+            "pip_value": 0.01,
+            "tiers": {
+              "T1": {
+                "ar_max": 60.0,
+                "au": 29,
+                "trigger": 15.75
+              },
+              "T2": {
+                "ar_max": 60.0,
+                "au": 63,
+                "trigger": 33.75
+              },
+              "T3": {
+                "ar_max": 60.0,
+                "au": 63,
+                "trigger": 34.2
+              }
+            }
+          }
+        }
+      ],
+      "optimal_result": {
+        "label": "1.00x (T1=35.0p)",
+        "total_trades": 250,
+        "wins": 225,
+        "losses": 25,
+        "win_rate": 90.0,
+        "pnl_pips": 3734.6,
+        "profit_factor": 34.6754,
+        "sharpe": 12.6002,
+        "max_drawdown_pips": 16.6,
+        "expectancy_pips": 14.94,
+        "avg_win_pips": 17.09,
+        "avg_loss_pips": -4.44,
+        "data_bars": 276531,
+        "data_days": 3101,
+        "trades_per_day": 0.0806,
+        "tier_stats": {
+          "T3": {
+            "trades": 250,
+            "wr": 90.0,
+            "pnl": 3734.6
+          }
+        },
+        "loop_stats": {
+          "1": {
+            "trades": 213,
+            "wr": 88.3,
+            "pnl": 2831.7
+          },
+          "2": {
+            "trades": 30,
+            "wr": 100.0,
+            "pnl": 752.2
+          },
+          "3": {
+            "trades": 5,
+            "wr": 100.0,
+            "pnl": 104.7
+          },
+          "4": {
+            "trades": 2,
+            "wr": 100.0,
+            "pnl": 46.0
+          }
+        },
+        "config_used": {
+          "pip_value": 0.01,
+          "tiers": {
+            "T1": {
+              "ar_max": 60.0,
+              "au": 29,
+              "trigger": 35.0
+            },
+            "T2": {
+              "ar_max": 60.0,
+              "au": 63,
+              "trigger": 75.0
+            },
+            "T3": {
+              "ar_max": 60.0,
+              "au": 63,
+              "trigger": 76.0
+            }
+          }
+        }
+      },
+      "guardrail_breached": false
+    }
+  ]
+}
