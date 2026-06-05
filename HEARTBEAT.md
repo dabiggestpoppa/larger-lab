@@ -362,3 +362,396 @@
 
 🧠 Memory file: MEMORY.md (modified 2026-06-05 02:55)
 🔒 Pre-commit hook: active
+
+## 2026-06-05 07:02 UTC
+**Field Check #21** — 2026-06-05 07:02 UTC
+🔄 2 uncommitted files changed:
+  M quant-lab/mt5/live_logs/signal_USDCHF_PRO.json
+   M quant-lab/mt5/live_logs/signals.jsonl
+
+📋 Recent commits:
+  70d4274c7 OC2: Group combinatorics complete + all 3 fixes verified + system green
+  f20bfe1b4 PM2 autopilot: sync workspace changes
+  8da65fb0c CC: Fix event types â€” use structured (event_type, data) format for progress callbacks
+
+🧠 Memory file: MEMORY.md (modified 2026-06-05 02:55)
+⚠️ Pre-commit hook: MISSING!
+
+**Actions needed:** Pre-commit hook missing!
+
+## 2026-06-05 07:07 UTC
+**Field Check #22** — 2026-06-05 07:07 UTC
+🔄 7 uncommitted files changed:
+  M .po_heartbeat_state.json
+   M HEARTBEAT.md
+   M quant-lab/mt5/live_logs/account_tracker_state.json
+   M quant-lab/mt5/live_logs/signal_USDCHF_PRO.json
+   M quant-lab/mt5/live_logs/signals.jsonl
+   M scripts/po_heartbeat.py
+   M shared-conversations/team-chat.md
+
+📋 Recent commits:
+  70d4274c7 OC2: Group combinatorics complete + all 3 fixes verified + system green
+  f20bfe1b4 PM2 autopilot: sync workspace changes
+  8da65fb0c CC: Fix event types â€” use structured (event_type, data) format for progress callbacks
+
+🧠 Memory file: MEMORY.md (modified 2026-06-05 02:55)
+⚠️ Pre-commit hook: MISSING!
+
+**Actions needed:** Pre-commit hook missing!
+
+## 2026-06-05 07:08 UTC
+**Field Check #23** — 2026-06-05 07:08 UTC
+⚠️ 7 files unchanged
+
+📋 Recent commits:
+  70d4274c7 OC2: Group combinatorics complete + all 3 fixes verified + system green
+  f20bfe1b4 PM2 autopilot: sync workspace changes
+  8da65fb0c CC: Fix event types â€” use structured (event_type, data) format for progress callbacks
+
+🧠 Memory: modified 2026-06-05 02:55
+
+🔌 Services:
+  ✅ OCE Backend :8000
+  ✅ OCE Frontend :3000
+  ✅ SRRA-OPH :3001
+
+## 2026-06-05 07:11 UTC
+**Field Check #24** — 2026-06-05 07:11 UTC
+⚠️ 7 files unchanged
+
+📋 Recent commits:
+  70d4274c7 OC2: Group combinatorics complete + all 3 fixes verified + system green
+  f20bfe1b4 PM2 autopilot: sync workspace changes
+  8da65fb0c CC: Fix event types â€” use structured (event_type, data) format for progress callbacks
+
+🧠 Memory: modified 2026-06-05 02:55
+
+🔌 Services:
+  ✅ OCE Backend :8000
+  ✅ OCE Frontend :3000
+  ✅ SRRA-OPH :3001
+
+## 2026-06-05 07:12 UTC
+**Field Check #25** — 2026-06-05 07:12 UTC
+⚠️ 7 uncommitted files (unchanged since last check)
+
+📋 Recent commits:
+  70d4274c7 OC2: Group combinatorics complete + all 3 fixes verified + system green
+  f20bfe1b4 PM2 autopilot: sync workspace changes
+  8da65fb0c CC: Fix event types â€” use structured (event_type, data) format for progress callbacks
+
+🧠 Memory file: MEMORY.md (modified 2026-06-05 02:55)
+⚠️ Pre-commit hook: MISSING!
+
+**Actions needed:** Pre-commit hook missing!
+
+## 2026-06-05 07:16 UTC
+**Field Check #26** — 2026-06-05 07:16 UTC
+🔄 9 files changed:
+  M .po_heartbeat_state.json
+   M HEARTBEAT.md
+   M quant-lab/mt5/live_logs/account_tracker_state.json
+   M quant-lab/mt5/live_logs/signal_EURUSD_PRO.json
+   M quant-lab/mt5/live_logs/signal_GBPJPY_PRO.json
+   M quant-lab/mt5/live_logs/signal_USDCHF_PRO.json
+   M quant-lab/mt5/live_logs/signals.jsonl
+   M scripts/po_heartbeat.py
+   M shared-conversations/team-chat.md
+
+📋 Recent commits:
+  70d4274c7 OC2: Group combinatorics complete + all 3 fixes verified + system green
+  f20bfe1b4 PM2 autopilot: sync workspace changes
+  8da65fb0c CC: Fix event types â€” use structured (event_type, data) format for progress callbacks
+
+🧠 Memory: modified 2026-06-05 02:55
+
+🔌 Services:
+  ✅ OCE Backend :8000
+  ✅ OCE Frontend :3000
+  ✅ SRRA-OPH :3001
+
+## 2026-06-05 07:17 UTC
+**Field Check #27** — 2026-06-05 07:17 UTC
+⚠️ 9 uncommitted files (unchanged since last check)
+
+📋 Recent commits:
+  70d4274c7 OC2: Group combinatorics complete + all 3 fixes verified + system green
+  f20bfe1b4 PM2 autopilot: sync workspace changes
+  8da65fb0c CC: Fix event types â€” use structured (event_type, data) format for progress callbacks
+
+🧠 Memory file: MEMORY.md (modified 2026-06-05 02:55)
+⚠️ Pre-commit hook: MISSING!
+
+**Actions needed:** Pre-commit hook missing!
+
+## 2026-06-05 07:22 UTC
+**Field Check #29** — 2026-06-05 07:22 UTC
+🔄 9 uncommitted files changed:
+  M .po_heartbeat_state.json
+   M HEARTBEAT.md
+   M quant-lab/mt5/live_logs/account_tracker_state.json
+   M quant-lab/mt5/live_logs/signal_CHFJPY_PRO.json
+   M quant-lab/mt5/live_logs/signal_EURUSD_PRO.json
+   M quant-lab/mt5/live_logs/signal_GBPJPY_PRO.json
+   M quant-lab/mt5/live_logs/signal_USDCHF_PRO.json
+   M quant-lab/mt5/live_logs/signals.jsonl
+   M shared-conversations/team-chat.md
+
+📋 Recent commits:
+  4304de086 CC: Full PO autonomous system â€” heartbeat, Telegram streaming, OCE chat
+  70d4274c7 OC2: Group combinatorics complete + all 3 fixes verified + system green
+  f20bfe1b4 PM2 autopilot: sync workspace changes
+
+🧠 Memory file: MEMORY.md (modified 2026-06-05 02:55)
+⚠️ Pre-commit hook: MISSING!
+
+**Actions needed:** Pre-commit hook missing!
+
+## 2026-06-05 07:22 UTC
+**Field Check #28** — 2026-06-05 07:22 UTC
+🔄 8 files changed:
+  M .po_heartbeat_state.json
+   M HEARTBEAT.md
+   M quant-lab/mt5/live_logs/account_tracker_state.json
+   M quant-lab/mt5/live_logs/signal_CHFJPY_PRO.json
+   M quant-lab/mt5/live_logs/signal_EURUSD_PRO.json
+   M quant-lab/mt5/live_logs/signal_GBPJPY_PRO.json
+   M quant-lab/mt5/live_logs/signal_USDCHF_PRO.json
+   M quant-lab/mt5/live_logs/signals.jsonl
+
+📋 Recent commits:
+  4304de086 CC: Full PO autonomous system â€” heartbeat, Telegram streaming, OCE chat
+  70d4274c7 OC2: Group combinatorics complete + all 3 fixes verified + system green
+  f20bfe1b4 PM2 autopilot: sync workspace changes
+
+🧠 Memory: modified 2026-06-05 02:55
+
+🔌 Services:
+  ✅ OCE Backend :8000
+  ✅ OCE Frontend :3000
+  ✅ SRRA-OPH :3001
+
+## 2026-06-05 07:27 UTC
+**Field Check #30** — 2026-06-05 07:27 UTC
+🔄 10 uncommitted files changed:
+  M .po_heartbeat_state.json
+   M HEARTBEAT.md
+   M memory/2026-06-05.md
+   M quant-lab/mt5/live_logs/account_tracker_state.json
+   M quant-lab/mt5/live_logs/signal_CHFJPY_PRO.json
+   M quant-lab/mt5/live_logs/signal_EURUSD_PRO.json
+   M quant-lab/mt5/live_logs/signal_GBPJPY_PRO.json
+   M quant-lab/mt5/live_logs/signal_USDCHF_PRO.json
+   M quant-lab/mt5/live_logs/signals.jsonl
+   M shared-conversations/team-chat.md
+
+📋 Recent commits:
+  4304de086 CC: Full PO autonomous system â€” heartbeat, Telegram streaming, OCE chat
+  70d4274c7 OC2: Group combinatorics complete + all 3 fixes verified + system green
+  f20bfe1b4 PM2 autopilot: sync workspace changes
+
+🧠 Memory file: MEMORY.md (modified 2026-06-05 02:55)
+⚠️ Pre-commit hook: MISSING!
+
+**Actions needed:** Pre-commit hook missing!
+
+## 2026-06-05 07:27 UTC
+**Field Check #31** — 2026-06-05 07:27 UTC
+⚠️ 10 files unchanged
+
+📋 Recent commits:
+  4304de086 CC: Full PO autonomous system â€” heartbeat, Telegram streaming, OCE chat
+  70d4274c7 OC2: Group combinatorics complete + all 3 fixes verified + system green
+  f20bfe1b4 PM2 autopilot: sync workspace changes
+
+🧠 Memory: modified 2026-06-05 02:55
+
+🔌 Services:
+  ✅ OCE Backend :8000
+  ✅ OCE Frontend :3000
+  ✅ SRRA-OPH :3001
+
+## 2026-06-05 07:32 UTC
+**Field Check #32** — 2026-06-05 07:32 UTC
+🔄 11 uncommitted files changed:
+  M .po_heartbeat_state.json
+   M HEARTBEAT.md
+   M memory/2026-06-05.md
+   M quant-lab/mt5/live_logs/account_tracker_state.json
+   M quant-lab/mt5/live_logs/signal_CHFJPY_PRO.json
+   M quant-lab/mt5/live_logs/signal_EURUSD_PRO.json
+   M quant-lab/mt5/live_logs/signal_GBPJPY_PRO.json
+   M quant-lab/mt5/live_logs/signal_USDCHF_PRO.json
+   M quant-lab/mt5/live_logs/signals.jsonl
+   M shared-conversations/team-chat.md
+  ... and 1 more
+
+📋 Recent commits:
+  4304de086 CC: Full PO autonomous system â€” heartbeat, Telegram streaming, OCE chat
+  70d4274c7 OC2: Group combinatorics complete + all 3 fixes verified + system green
+  f20bfe1b4 PM2 autopilot: sync workspace changes
+
+🧠 Memory file: MEMORY.md (modified 2026-06-05 02:55)
+⚠️ Pre-commit hook: MISSING!
+
+**Actions needed:** Pre-commit hook missing!
+
+## 2026-06-05 07:32 UTC
+**Field Check #33** — 2026-06-05 07:32 UTC
+🔄 12 files changed:
+  M .po_heartbeat_state.json
+   M HEARTBEAT.md
+   M memory/2026-06-05.md
+   M quant-lab/mt5/live_logs/account_tracker_state.json
+   M quant-lab/mt5/live_logs/signal_CHFJPY_PRO.json
+   M quant-lab/mt5/live_logs/signal_EURUSD_PRO.json
+   M quant-lab/mt5/live_logs/signal_GBPJPY_PRO.json
+   M quant-lab/mt5/live_logs/signal_USDCHF_PRO.json
+   M quant-lab/mt5/live_logs/signals.jsonl
+   M shared-conversations/team-chat.md
+
+📋 Recent commits:
+  4304de086 CC: Full PO autonomous system â€” heartbeat, Telegram streaming, OCE chat
+  70d4274c7 OC2: Group combinatorics complete + all 3 fixes verified + system green
+  f20bfe1b4 PM2 autopilot: sync workspace changes
+
+🧠 Memory: modified 2026-06-05 02:55
+
+🔌 Services:
+  ✅ OCE Backend :8000
+  ✅ OCE Frontend :3000
+  ✅ SRRA-OPH :3001
+
+## 2026-06-05 07:37 UTC
+**Field Check #34** — 2026-06-05 07:37 UTC
+🔄 18 uncommitted files changed:
+  M .po_heartbeat_state.json
+   M HEARTBEAT.md
+   M memory/2026-06-05.md
+   M quant-lab/mt5/live_logs/account_tracker_state.json
+   M quant-lab/mt5/live_logs/signal_CHFJPY_PRO.json
+   M quant-lab/mt5/live_logs/signal_EURUSD_PRO.json
+   M quant-lab/mt5/live_logs/signal_GBPJPY_PRO.json
+   M quant-lab/mt5/live_logs/signal_NZDUSD_PRO.json
+   M quant-lab/mt5/live_logs/signal_USDCHF_PRO.json
+   M quant-lab/mt5/live_logs/signals.jsonl
+  ... and 8 more
+
+📋 Recent commits:
+  4304de086 CC: Full PO autonomous system â€” heartbeat, Telegram streaming, OCE chat
+  70d4274c7 OC2: Group combinatorics complete + all 3 fixes verified + system green
+  f20bfe1b4 PM2 autopilot: sync workspace changes
+
+🧠 Memory file: MEMORY.md (modified 2026-06-05 02:55)
+⚠️ Pre-commit hook: MISSING!
+
+**Actions needed:** Pre-commit hook missing!
+
+## 2026-06-05 07:37 UTC
+**Field Check #35** — 2026-06-05 07:37 UTC
+⚠️ 18 files unchanged
+
+📋 Recent commits:
+  4304de086 CC: Full PO autonomous system â€” heartbeat, Telegram streaming, OCE chat
+  70d4274c7 OC2: Group combinatorics complete + all 3 fixes verified + system green
+  f20bfe1b4 PM2 autopilot: sync workspace changes
+
+🧠 Memory: modified 2026-06-05 02:55
+
+🔌 Services:
+  ✅ OCE Backend :8000
+  ✅ OCE Frontend :3000
+  ✅ SRRA-OPH :3001
+
+## 2026-06-05 07:42 UTC
+**Field Check #36** — 2026-06-05 07:42 UTC
+🔄 22 uncommitted files changed:
+  M .po_heartbeat_state.json
+   M HEARTBEAT.md
+   M memory/2026-06-05.md
+   M quant-lab/mt5/deploy_config.py
+   M quant-lab/mt5/live_logs/account_tracker_state.json
+   M quant-lab/mt5/live_logs/signal_CHFJPY_PRO.json
+   M quant-lab/mt5/live_logs/signal_EURUSD_PRO.json
+   M quant-lab/mt5/live_logs/signal_GBPJPY_PRO.json
+   M quant-lab/mt5/live_logs/signal_NZDUSD_PRO.json
+   M quant-lab/mt5/live_logs/signal_USDCHF_PRO.json
+  ... and 12 more
+
+📋 Recent commits:
+  4304de086 CC: Full PO autonomous system â€” heartbeat, Telegram streaming, OCE chat
+  70d4274c7 OC2: Group combinatorics complete + all 3 fixes verified + system green
+  f20bfe1b4 PM2 autopilot: sync workspace changes
+
+🧠 Memory file: MEMORY.md (modified 2026-06-05 02:55)
+⚠️ Pre-commit hook: MISSING!
+
+**Actions needed:** Pre-commit hook missing!
+
+## 2026-06-05 07:42 UTC
+**Field Check #37** — 2026-06-05 07:42 UTC
+🔄 23 files changed:
+  M .po_heartbeat_state.json
+   M HEARTBEAT.md
+   M memory/2026-06-05.md
+   M quant-lab/mt5/cerebus_live_bridge.py
+   M quant-lab/mt5/deploy_config.py
+   M quant-lab/mt5/live_logs/account_tracker_state.json
+   M quant-lab/mt5/live_logs/signal_CHFJPY_PRO.json
+   M quant-lab/mt5/live_logs/signal_EURUSD_PRO.json
+   M quant-lab/mt5/live_logs/signal_GBPJPY_PRO.json
+   M quant-lab/mt5/live_logs/signal_NZDUSD_PRO.json
+
+📋 Recent commits:
+  4304de086 CC: Full PO autonomous system â€” heartbeat, Telegram streaming, OCE chat
+  70d4274c7 OC2: Group combinatorics complete + all 3 fixes verified + system green
+  f20bfe1b4 PM2 autopilot: sync workspace changes
+
+🧠 Memory: modified 2026-06-05 02:55
+
+🔌 Services:
+  ✅ OCE Backend :8000
+  ✅ OCE Frontend :3000
+  ✅ SRRA-OPH :3001
+
+## 2026-06-05 07:47 UTC
+**Field Check #38** — 2026-06-05 07:47 UTC
+🔄 24 uncommitted files changed:
+  M .po_heartbeat_state.json
+   M HEARTBEAT.md
+   M memory/2026-06-05.md
+   M quant-lab/mt5/cerebus_live_bridge.py
+   M quant-lab/mt5/deploy_config.py
+   M quant-lab/mt5/live_logs/account_tracker_state.json
+   M quant-lab/mt5/live_logs/signal_AUDUSD_PRO.json
+   M quant-lab/mt5/live_logs/signal_CHFJPY_PRO.json
+   M quant-lab/mt5/live_logs/signal_EURUSD_PRO.json
+   M quant-lab/mt5/live_logs/signal_GBPJPY_PRO.json
+  ... and 14 more
+
+📋 Recent commits:
+  4304de086 CC: Full PO autonomous system â€” heartbeat, Telegram streaming, OCE chat
+  70d4274c7 OC2: Group combinatorics complete + all 3 fixes verified + system green
+  f20bfe1b4 PM2 autopilot: sync workspace changes
+
+🧠 Memory file: MEMORY.md (modified 2026-06-05 02:55)
+⚠️ Pre-commit hook: MISSING!
+
+**Actions needed:** Pre-commit hook missing!
+
+## 2026-06-05 07:47 UTC
+**Field Check #39** — 2026-06-05 07:47 UTC
+⚠️ 24 files unchanged
+
+📋 Recent commits:
+  4304de086 CC: Full PO autonomous system â€” heartbeat, Telegram streaming, OCE chat
+  70d4274c7 OC2: Group combinatorics complete + all 3 fixes verified + system green
+  f20bfe1b4 PM2 autopilot: sync workspace changes
+
+🧠 Memory: modified 2026-06-05 02:55
+
+🔌 Services:
+  ✅ OCE Backend :8000
+  ✅ OCE Frontend :3000
+  ✅ SRRA-OPH :3001

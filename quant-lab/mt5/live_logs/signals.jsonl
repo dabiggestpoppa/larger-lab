@@ -483,3 +483,15 @@
 {"engine": "SymmetryTrap", "symbol": "CHFJPY.PRO", "direction": "BUY", "entry": 202.752, "sl": 202.779, "tp": 202.892, "event": "SL_HIT", "loop": 1, "time": "2026-06-05 02:20:00"}
 {"engine": "SymmetryTrap", "symbol": "CHFJPY.PRO", "direction": "BUY", "entry": 202.918, "sl": 202.91, "tp": 203.058, "event": "ENTRY", "loop": 2, "time": "2026-06-05 02:44:00"}
 {"engine": "SymmetryTrap", "symbol": "CHFJPY.PRO", "direction": "BUY", "entry": 202.918, "sl": 202.91, "tp": 203.058, "event": "SL_HIT", "loop": 2, "time": "2026-06-05 02:46:00"}
+{"engine": "SymmetryTrap", "symbol": "USDCHF.PRO", "direction": "SELL", "entry": 0.78821, "sl": 0.78805, "tp": 0.78711, "event": "ENTRY", "loop": 1, "time": "2026-06-05 03:01:00"}
+{"engine": "SymmetryTrap", "symbol": "USDCHF.PRO", "direction": "SELL", "entry": 0.78821, "sl": 0.78805, "tp": 0.78711, "event": "SL_HIT", "loop": 1, "time": "2026-06-05 03:03:00"}
+{"engine": "SymmetryTrap", "symbol": "EURUSD.PRO", "direction": "BUY", "entry": 1.16262, "sl": 1.16265, "tp": 1.1636199999999999, "event": "ENTRY", "loop": 1, "time": "2026-06-05 03:14:00"}
+{"engine": "SymmetryTrap", "symbol": "GBPJPY.PRO", "direction": "BUY", "entry": 214.931, "sl": 214.948, "tp": 215.121, "event": "ENTRY", "loop": 1, "time": "2026-06-05 03:14:00"}
+{"engine": "SymmetryTrap", "symbol": "GBPJPY.PRO", "direction": "BUY", "entry": 214.931, "sl": 214.948, "tp": 215.121, "event": "SL_HIT", "loop": 1, "time": "2026-06-05 03:16:00"}
+{"engine": "SymmetryTrap", "symbol": "EURUSD.PRO", "direction": "BUY", "entry": 1.16262, "sl": 1.16265, "tp": 1.1636199999999999, "event": "SL_HIT", "loop": 1, "time": "2026-06-05 03:20:00"}
+{"engine": "SymmetryTrap", "symbol": "CHFJPY.PRO", "direction": "BUY", "entry": 203.027, "sl": 203.039, "tp": 203.16699999999997, "event": "ENTRY", "loop": 3, "time": "2026-06-05 03:22:00"}
+{"engine": "SymmetryTrap", "symbol": "CHFJPY.PRO", "direction": "BUY", "entry": 203.027, "sl": 203.039, "tp": 203.16699999999997, "event": "SL_HIT", "loop": 3, "time": "2026-06-05 03:32:00"}
+{"engine": "SymmetryTrap", "symbol": "NZDUSD.PRO", "direction": "BUY", "entry": 0.58732, "sl": 0.5873, "tp": 0.5887199999999999, "event": "ENTRY", "loop": 1, "time": "2026-06-05 03:36:00"}
+{"engine": "SymmetryTrap", "symbol": "NZDUSD.PRO", "direction": "BUY", "entry": 0.58732, "sl": 0.5873, "tp": 0.5887199999999999, "event": "SL_HIT", "loop": 1, "time": "2026-06-05 03:41:00"}
+{"engine": "SymmetryTrap", "symbol": "AUDUSD.PRO", "direction": "BUY", "entry": 0.71335, "sl": 0.71356, "tp": 0.71445, "event": "ENTRY", "loop": 1, "time": "2026-06-05 03:46:00"}
+{"engine": "SymmetryTrap", "symbol": "AUDUSD.PRO", "direction": "BUY", "entry": 0.71335, "sl": 0.71356, "tp": 0.71445, "event": "SL_HIT", "loop": 1, "time": "2026-06-05 03:48:00"}
