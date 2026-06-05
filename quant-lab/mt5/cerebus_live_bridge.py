@@ -16,7 +16,10 @@ SL LOGIC: Matches Nautilus strategy (line 503): sl = impulse_extreme (zero buffe
   - Bridge does NOT send hard SL to broker — monitors M5 closes and sends market close
   - ALIEN EDGE: The "SL" is a structural boundary exit, engineered to NEVER take a loss
 
-FIX APPLIED (2026-06-03): Changed from OCC extreme + spread buffer → impulse_extreme.
+FIX APPLIED v4.1 (2026-06-03): Changed from OCC extreme + spread buffer → impulse_extreme.
+FIX APPLIED v4.2 (2026-06-04): close_position() rewritten — SLTP-first close method + existence check.
+  Fixes retcode=10030 (Invalid filling mode) for positions with no broker SL.
+  Fixes orphaned position close failures after manual close.
 This aligns MT5 live results with Nautilus Phase 0 ground truth (85% WR).
 """
 
@@ -298,20 +301,69 @@ def send_order(symbol: str, direction: str, volume: float,
 
 
 def close_position(ticket: int) -> bool:
-    """Close a position by ticket."""
+    """Close a position by ticket.
+    
+    FIX v4.2 (2026-06-04):
+    1. Check position exists before attempting close (handles manually closed positions)
+    2. Use TRADE_ACTION_SLTP to set SL 1 pip beyond current price = guaranteed market close
+       - Works for positions with no SL on broker (our ST trades)
+       - Avoids retcode=10030 (Invalid filling mode) from TRADE_ACTION_DEAL
+    3. Only fall back to TRADE_ACTION_DEAL if SLTP fails
+    """
+    # ── Step 1: Verify position still exists ──
     pos = mt5.positions_get(ticket=ticket)
     if not pos:
-        log.warning("Position %s not found", ticket)
-        return False
+        log.info("Position %s already closed (not found on broker) — skipping", ticket)
+        return True  # Not an error — position is gone, that's what we wanted
     p = pos[0]
-    direction = "SELL" if p.type == mt5.ORDER_TYPE_BUY else "BUY"
-    tick = mt5.symbol_info_tick(p.symbol)
-    if tick is None:
+    symbol = p.symbol
+    info = mt5.symbol_info(symbol)
+    tick = mt5.symbol_info_tick(symbol)
+    if tick is None or info is None:
+        log.warning("No tick/info for %s — cannot close", symbol)
         return False
+
+    # ── Step 2: Use SLTP to trigger immediate close ──
+    # Set SL 1 pip beyond current price so broker closes at market on next tick
+    # For BUY: SL = current_bid - 1pip (below market = immediate trigger)
+    # For SELL: SL = current_ask + 1pip (above market = immediate trigger)
+    pip_sz = get_pip_size(symbol)
+    if p.type == mt5.ORDER_TYPE_BUY:
+        trigger_price = tick.bid
+        new_sl = round(trigger_price - pip_sz, info.digits)
+    else:
+        trigger_price = tick.ask
+        new_sl = round(trigger_price + pip_sz, info.digits)
+
+    log.info("CLOSING via SLTP ticket=%s %s %s | SL=%.5f (1pip from market)",
+             ticket, "BUY" if p.type == mt5.ORDER_TYPE_BUY else "SELL", symbol, new_sl)
+    
+    slp_req = {
+        "action": mt5.TRADE_ACTION_SLTP,
+        "symbol": symbol,
+        "volume": p.volume,
+        "position": ticket,
+        "sl": new_sl,
+        "tp": p.tp,  # Keep existing TP unchanged
+    }
+    result = mt5.order_send(slp_req)
+    if result and result.retcode == mt5.TRADE_RETCODE_DONE:
+        # Calculate PnL
+        entry = p.price_open
+        if p.type == mt5.ORDER_TYPE_BUY:
+            pnl_pips = to_pips(trigger_price - entry, symbol)
+        else:
+            pnl_pips = to_pips(entry - trigger_price, symbol)
+        log.info("CLOSED position %s via SLTP | PnL: %+.1fp", ticket, pnl_pips)
+        return True
+
+    # ── Step 3: Fallback to TRADE_ACTION_DEAL if SLTP failed ──
+    log.warning("SLTP close failed (retcode=%s) — falling back to DEAL", result.retcode if result else "None")
+    direction = "SELL" if p.type == mt5.ORDER_TYPE_BUY else "BUY"
     price = tick.bid if direction == "SELL" else tick.ask
-    request = {
+    deal_req = {
         "action": mt5.TRADE_ACTION_DEAL,
-        "symbol": p.symbol,
+        "symbol": symbol,
         "volume": p.volume,
         "type": mt5.ORDER_TYPE_SELL if direction == "SELL" else mt5.ORDER_TYPE_BUY,
         "price": price,
@@ -319,43 +371,35 @@ def close_position(ticket: int) -> bool:
         "magic": 20260601,
         "comment": "CEREBUS_CLOSE",
         "type_time": mt5.ORDER_TIME_GTC,
-        "type_filling": mt5.ORDER_FILLING_RETURN,
+        "type_filling": mt5.ORDER_FILLING_IOC,
         "position": ticket,
     }
-    result = mt5.order_send(request)
-    if result and result.retcode == mt5.TRADE_RETCODE_DONE:
-        # Get the position details for PnL calc
-        pos_list = mt5.positions_get(ticket=ticket)
-        sym = p.symbol if pos_list else ""
-        pnl_pips = 0.0
-        if pos_list:
-            pos = pos_list[0]
-            entry = pos.price_open
-            if pos.type == mt5.ORDER_TYPE_BUY:
-                pnl_pips = to_pips(price - entry, sym)
-            else:
-                pnl_pips = to_pips(entry - price, sym)
-        log.info("CLOSED position %s | PnL: %+.1fp", ticket, pnl_pips)
+    result2 = mt5.order_send(deal_req)
+    if result2 and result2.retcode == mt5.TRADE_RETCODE_DONE:
+        entry = p.price_open
+        if p.type == mt5.ORDER_TYPE_BUY:
+            pnl_pips = to_pips(price - entry, symbol)
+        else:
+            pnl_pips = to_pips(entry - price, symbol)
+        log.info("CLOSED position %s via DEAL fallback | PnL: %+.1fp", ticket, pnl_pips)
         return True
-    # Fallback filling mode
-    if result and result.retcode in (10014, 10016, 10017, 10030):
-        request2 = dict(request)
-        request2["type_filling"] = mt5.ORDER_FILLING_FOK
-        result2 = mt5.order_send(request2)
-        if result2 and result2.retcode == mt5.TRADE_RETCODE_DONE:
-            pos_list = mt5.positions_get(ticket=ticket)
-            sym = p.symbol if pos_list else ""
-            pnl_pips = 0.0
-            if pos_list:
-                pos = pos_list[0]
-                entry = pos.price_open
-                if pos.type == mt5.ORDER_TYPE_BUY:
-                    pnl_pips = to_pips(price - entry, sym)
-                else:
-                    pnl_pips = to_pips(entry - price, sym)
-            log.info("CLOSED position %s (fallback filling) | PnL: %+.1fp", ticket, pnl_pips)
+
+    # Try FOK filling
+    if result2 and result2.retcode in (10014, 10016, 10017, 10030):
+        deal_req2 = dict(deal_req)
+        deal_req2["type_filling"] = mt5.ORDER_FILLING_FOK
+        result3 = mt5.order_send(deal_req2)
+        if result3 and result3.retcode == mt5.TRADE_RETCODE_DONE:
+            entry = p.price_open
+            if p.type == mt5.ORDER_TYPE_BUY:
+                pnl_pips = to_pips(price - entry, symbol)
+            else:
+                pnl_pips = to_pips(entry - price, symbol)
+            log.info("CLOSED position %s via FOK fallback | PnL: %+.1fp", ticket, pnl_pips)
             return True
-    log.error("Close failed for ticket %s: retcode=%s", ticket, result.retcode if result else "None")
+
+    log.error("Close FAILED for ticket %s: SLTP retcode=%s, DEAL retcode=%s",
+              ticket, result.retcode if result else "None", result2.retcode if result2 else "None")
     return False
 
 

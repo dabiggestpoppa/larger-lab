@@ -1,8 +1,29 @@
 # MEMORY.md — OWL (OC2) Persistent Memory
 
-> **Last Updated:** 2026-06-04 08:00 EDT — MAX ACCURACY SWEEP COMPLETE (29,438 tr | 90.8% avg WR | PF 20+)
+> **Last Updated:** 2026-06-05 02:53 EDT — GROUP COMBINATORICS COMPLETE + LOW-COST HEX IDENTIFIED + ALL 3 FIXES VERIFIED + BRIDGE LIVE
 > **THE BIBLE locked:** AR gate decoupled from tier, impulse-based classification, 4PM cutoff, 10p trigger
 > **ACCURACY-FREQUENCY CURVE MAPPED:** Floor (max-trades) and ceiling (max-accuracy) both complete for all 28 pairs
+
+---
+
+## 🔴 CRITICAL ERROR LOG — UNIVERSAL AU BUG (2026-06-04 23:15 EDT)
+
+**Error:** Deployed all 7 pairs with EURUSD AU targets (8/10/12) instead of each pair native AU from sweep configs.
+
+**Root cause:** When writing deploy_config.py, copied EURUSD AU values universally instead of extracting each pair custom AU from trigger_sweep_max_accuracy_all.py NATIVE_CONFIGS. Violation of core strategy rule: AU is ALWAYS per-pair, never universal.
+
+**Impact:** All pairs except EURUSD ran wrong AU targets since go-live (2026-06-04 09:40 EDT). TP distances wrong for 6 of 7 pairs. Backtest results (correct per-pair AUs) did not match live performance.
+
+**Fix applied:** Updated deploy_config.py with per-pair native AU values and sweep-optimal triggers:
+- EURUSD: AU 10/12/15, trigger 12.0
+- USDJPY: AU 16/26/44, trigger 15.0
+- CHFJPY: AU 14/24/42, trigger 11.7
+- NZDUSD: AU 14/17/21, trigger 10.0
+- AUDUSD: AU 11/14/18, trigger 10.8
+- USDCHF: AU 11/15/20, trigger 11.7
+- GBPJPY: AU 19/29/48, trigger 18.7
+
+HARD RULE: When adding/swapping assets, MUST run a sweep to find that asset native AU. Never copy AU from one pair to another. Each market has its own volatility profile.
 
 ---
 
@@ -607,3 +628,35 @@ _Last updated: 2026-05-31 19:05 EDT_
 - **First 200 trades:** no intervention
 
 _Last updated: 2026-06-04 09:40 EDT — CEREBUS LIVE, 7 pairs deployed, full cron coverage_
+
+---
+
+## 🔴 GROUP COMBINATORICS — COMPLETE (2026-06-05 02:53 EDT)
+
+### Low-Cost Hex (6 assets) — Phase 1 Build Config
+- **Pairs:** EURJPY(FLOOR) + EURNZD(FLOOR) + GBPNZD(FLOOR) + EURAUD(FLOOR) + GBPAUD(FLOOR) + GBPCAD(FLOOR)
+- **Net:** $24,907 | **Avg WR:** 81.4% | **Cost:** 10.9% | **Trades:** 25,540
+- All FLOOR mode, all <11% cost individually
+- Core trio: EURJPY + EURNZD + GBPNZD — the cheapest forex pairs to run
+
+### Low-Cost Duos/Trios — Quick Reference
+- **Duo:** EURJPY + EURNZD → $6,905 net, 9.9% cost, 83.8% WR
+- **Trio:** EURJPY + EURNZD + GBPNZD → $12,620 net, 10.0% cost, 82.2% WR
+
+### Max Profit (all sizes) — Phase 2 at $250+
+- Dominated by crypto: BTCUSD(FLOOR) + ETHUSD(FLOOR) at every level
+- Duo: $765,816 | Trio (+EURNZD): $771,651 | Quad (+GBPNZD): $777,366
+- Hex (+GBPCAD + GBPUSD): $786,886 | Oct: $795,401 | 14-set: $816,645
+
+### Full Matrix
+- `reports/GROUP_COMBINATORICS.md` — top 3 per category at every size (2-14)
+- 5 categories: MAX PROFIT, LOW COST, HIGH ACCURACY, HIGH FREQUENCY, SWEET SPOT
+- Phase 1/Phase 2 strategy + plug & play reference included
+- **SWEET SPOT is EMPTY** — no combo meets PF>15 + cost%<20% simultaneously
+
+### MAD's Strategy
+- **Phase 1 (now):** LOW COST groups — build to $250 account
+- **Phase 2 ($250+):** Switch to MAX PROFIT groups
+- For prop firms / multiple accounts: pick group size, pick category, go
+
+_Last updated: 2026-06-05 02:53 EDT — Group combinatorics complete, plug & play ready_

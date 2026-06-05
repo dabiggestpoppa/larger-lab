@@ -1,93 +1,22 @@
 {
-  "timestamp": "2026-06-02 21:33:34",
-  "total_trades": 40,
-  "total_wins": 8,
-  "total_losses": 31,
-  "total_wr": 0.2,
-  "total_pnl": -5.03,
-  "max_loss_streak": 10,
+  "timestamp": "2026-06-05 02:53:29",
+  "total_trades": 1,
+  "total_wins": 1,
+  "total_losses": 0,
+  "total_wr": 1.0,
+  "total_pnl": 0.51,
+  "max_loss_streak": 0,
   "by_symbol": {
-    "USDCHF": {
-      "trades": 4,
-      "wins": 1,
-      "losses": 3,
-      "wr": 0.25,
-      "pnl": 1.0,
-      "max_loss_streak": 3,
-      "issues": []
-    },
-    "GBPJPY": {
-      "trades": 9,
-      "wins": 0,
-      "losses": 9,
-      "wr": 0.0,
-      "pnl": -2.18,
-      "max_loss_streak": 9,
-      "issues": [
-        "\u26a0\ufe0f LOSSES: 9 > MC threshold 5",
-        "\u26a0\ufe0f LOSS STREAK: 9 consecutive losses"
-      ]
-    },
     "CHFJPY": {
-      "trades": 9,
-      "wins": 3,
-      "losses": 6,
-      "wr": 0.3333333333333333,
-      "pnl": -1.96,
-      "max_loss_streak": 3,
-      "issues": [
-        "\u26a0\ufe0f LOSSES: 6 > MC threshold 5"
-      ]
-    },
-    "GBPNZD": {
-      "trades": 2,
-      "wins": 0,
-      "losses": 2,
-      "wr": 0.0,
-      "pnl": -0.57,
-      "max_loss_streak": 2,
-      "issues": []
-    },
-    "GBPAUD": {
-      "trades": 7,
+      "trades": 1,
       "wins": 1,
-      "losses": 5,
-      "wr": 0.14285714285714285,
-      "pnl": -0.9,
-      "max_loss_streak": 3,
+      "losses": 0,
+      "wr": 1.0,
+      "pnl": 0.51,
+      "max_loss_streak": 0,
       "issues": []
-    },
-    "NZDUSD": {
-      "trades": 2,
-      "wins": 1,
-      "losses": 1,
-      "wr": 0.5,
-      "pnl": 0.23,
-      "max_loss_streak": 1,
-      "issues": []
-    },
-    "EURUSD": {
-      "trades": 7,
-      "wins": 2,
-      "losses": 5,
-      "wr": 0.2857142857142857,
-      "pnl": -0.65,
-      "max_loss_streak": 5,
-      "issues": [
-        "\u26a0\ufe0f LOSSES: 5 > MC threshold 3",
-        "\u26a0\ufe0f LOSS STREAK: 5 consecutive losses"
-      ]
     }
   },
-  "issues": [
-    "GBPJPY: \u26a0\ufe0f LOSSES: 9 > MC threshold 5",
-    "GBPJPY: \u26a0\ufe0f LOSS STREAK: 9 consecutive losses",
-    "CHFJPY: \u26a0\ufe0f LOSSES: 6 > MC threshold 5",
-    "EURUSD: \u26a0\ufe0f LOSSES: 5 > MC threshold 3",
-    "EURUSD: \u26a0\ufe0f LOSS STREAK: 5 consecutive losses",
-    "\ud83d\udd34 AGG LOSSES: 31 > MC threshold 8",
-    "\ud83d\udd34 AGG WR: 20% < MC threshold 65%",
-    "\ud83d\udd34 LOSS STREAK: 10 straight losses"
-  ],
-  "is_healthy": false
+  "issues": [],
+  "is_healthy": true
 }
