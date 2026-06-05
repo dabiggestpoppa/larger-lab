@@ -1,14 +1,10 @@
 """
 PO Heartbeat Worker — keeps PO alive and aware in the field.
-Runs on a loop, checks the workspace, posts updates to team chat.
+Runs on a loop, checks the workspace, posts updates to Telegram + team chat.
 
-Usage: python scripts/po_heartbeat.py [--interval 300] [--once]
+Usage: python scripts/po_heartbeat.py [--interval 300] [--once] [--no-telegram]
 """
-import subprocess
-import sys
-import time
-import json
-import hashlib
+import subprocess, sys, time, json, hashlib, os, socket
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -17,7 +13,6 @@ TEAM_CHAT = REPO_ROOT / "shared-conversations" / "team-chat.md"
 MEMORY_FILE = REPO_ROOT / "MEMORY.md"
 STATE_FILE = REPO_ROOT / ".po_heartbeat_state.json"
 HEARTBEAT_LOG = REPO_ROOT / "heartbeat.md"
-
 DEFAULT_INTERVAL = 300  # 5 minutes
 
 
@@ -25,20 +20,51 @@ def utcnow_str():
     return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
 
-def run_cmd(cmd, cwd=None):
-    r = subprocess.run(cmd, capture_output=True, text=True, cwd=str(cwd or REPO_ROOT))
-    return r.stdout.strip(), r.stderr.strip(), r.returncode
+def run_cmd(cmd):
+    r = subprocess.run(cmd, capture_output=True, text=True, cwd=str(REPO_ROOT))
+    return r.stdout.strip()
+
+
+def load_env():
+    env_path = REPO_ROOT / ".env"
+    if env_path.exists():
+        for line in env_path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                os.environ.setdefault(k.strip(), v.strip())
+
+
+def send_telegram(text):
+    import requests
+    token = os.environ.get("TELEGRAM_TOKEN", "")
+    chat_id = os.environ.get("TELEGRAM_CHAT_ID", "")
+    if not token:
+        return False
+    try:
+        if not chat_id or chat_id == "0":
+            r = requests.get(f"https://api.telegram.org/bot{token}/getUpdates?limit=1&timeout=5", timeout=10)
+            data = r.json()
+            if data.get("ok") and data.get("result"):
+                chat_id = str(data["result"][0]["message"]["chat"]["id"])
+                os.environ["TELEGRAM_CHAT_ID"] = chat_id
+            else:
+                return False
+        for chunk in [text[i:i+4000] for i in range(0, len(text), 4000)]:
+            requests.post(f"https://api.telegram.org/bot{token}/sendMessage",
+                json={"chat_id": chat_id, "text": chunk, "parse_mode": "Markdown"}, timeout=15)
+        return True
+    except Exception as e:
+        print(f"[heartbeat] Telegram error: {e}")
+        return False
 
 
 def git_status():
-    out, _, _ = run_cmd(["git", "status", "--porcelain"])
-    lines = [l for l in out.splitlines() if l.strip()]
-    return lines
+    return [l for l in run_cmd(["git", "status", "--porcelain"]).splitlines() if l.strip()]
 
 
 def git_log_last(n=3):
-    out, _, _ = run_cmd(["git", "log", f"-{n}", "--oneline"])
-    return out.splitlines()
+    return run_cmd(["git", "log", f"-{n}", "--oneline"]).splitlines()
 
 
 def load_state():
@@ -54,154 +80,107 @@ def save_state(state):
     STATE_FILE.write_text(json.dumps(state, indent=2))
 
 
-def post_to_team_chat(message):
-    """Append a PO message to the team shared chat."""
-    timestamp = utcnow_str()
-    entry = f"\n---\n\n### [PO] {timestamp}\n{message}\n"
-
-    if TEAM_CHAT.exists():
-        content = TEAM_CHAT.read_text(encoding="utf-8", errors="replace")
-        TEAM_CHAT.write_text(content + entry, encoding="utf-8")
-    else:
-        TEAM_CHAT.write_text(f"# Team Chat\n{entry}", encoding="utf-8")
-
-    print(f"[heartbeat] Posted to team chat: {message[:80]}")
-
-
-def append_heartbeat_log(message):
-    """Keep a local heartbeat log."""
-    timestamp = utcnow_str()
-    entry = f"\n## {timestamp}\n{message}\n"
-    if HEARTBEAT_LOG.exists():
-        content = HEARTBEAT_LOG.read_text(encoding="utf-8", errors="replace")
-        HEARTBEAT_LOG.write_text(content + entry, encoding="utf-8")
-    else:
-        HEARTBEAT_LOG.write_text(f"# PO Heartbeat Log\n{entry}", encoding="utf-8")
-
-
-def compute_status_hash(status_lines):
-    """Hash of current git status to detect changes."""
-    return hashlib.md5("".join(status_lines).encode()).hexdigest()
-
-
 def check_field():
-    """Main field check — returns a status report string."""
     state = load_state()
     state["checks_done"] = state.get("checks_done", 0) + 1
-    check_num = state["checks_done"]
+    report = [f"**Field Check #{state['checks_done']}** — {utcnow_str()}"]
+    actions = []
 
-    report_parts = [f"**Field Check #{check_num}** — {utcnow_str()}"]
-    actions_taken = []
-
-    # 1. Git status
+    # Git status
     status = git_status()
-    status_hash = compute_status_hash(status)
-    prev_hash = state.get("last_status_hash")
-
+    h = hashlib.md5("".join(status).encode()).hexdigest()
+    prev = state.get("last_status_hash")
     if not status:
-        report_parts.append("✅ Workspace clean — no uncommitted changes")
-    elif status_hash == prev_hash:
-        report_parts.append(f"⚠️ {len(status)} uncommitted files (unchanged since last check)")
+        report.append("✅ Workspace clean")
+    elif h == prev:
+        report.append(f"⚠️ {len(status)} files unchanged")
     else:
-        report_parts.append(f"🔄 {len(status)} uncommitted files changed:")
-        for line in status[:10]:
-            report_parts.append(f"  {line}")
-        if len(status) > 10:
-            report_parts.append(f"  ... and {len(status) - 10} more")
+        report.append(f"🔄 {len(status)} files changed:")
+        for l in status[:10]:
+            report.append(f"  {l}")
+    state["last_status_hash"] = h
 
-    state["last_status_hash"] = status_hash
+    # Recent commits
+    commits = git_log_last(3)
+    if commits:
+        report.append("\n📋 Recent commits:")
+        for c in commits:
+            report.append(f"  {c}")
 
-    # 2. Recent commits
-    recent = git_log_last(3)
-    if recent:
-        report_parts.append("\n📋 Recent commits:")
-        for line in recent:
-            report_parts.append(f"  {line}")
-
-    # 3. Memory file check
+    # Memory
     if MEMORY_FILE.exists():
-        mem_mtime = MEMORY_FILE.stat().st_mtime
-        report_parts.append(f"\n🧠 Memory file: {MEMORY_FILE.name} (modified {datetime.fromtimestamp(mem_mtime).strftime('%Y-%m-%d %H:%M')})")
-    else:
-        report_parts.append("\n⚠️ No MEMORY.md found")
+        mtime = datetime.fromtimestamp(MEMORY_FILE.stat().st_mtime)
+        report.append(f"\n🧠 Memory: modified {mtime.strftime('%Y-%m-%d %H:%M')}")
 
-    # 4. Vault check
-    vault_dir = REPO_ROOT / "vault"
-    if vault_dir.exists():
-        vault_notes = list(vault_dir.rglob("*.md"))
-        report_parts.append(f"📚 Vault: {len(vault_notes)} notes")
+    # Services
+    report.append("\n🔌 Services:")
+    for name, port in [("OCE Backend", 8000), ("OCE Frontend", 3000), ("SRRA-OPH", 3001)]:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(1)
+        try:
+            s.connect(("127.0.0.1", port))
+            report.append(f"  ✅ {name} :{port}")
+        except Exception:
+            report.append(f"  ❌ {name} :{port} DOWN")
+        finally:
+            s.close()
 
-    # 5. Check for junk files to clean
-    junk_patterns = ["*.tmp", "*.bak", "*~", "*.orig"]
-    junk_found = []
-    for pattern in junk_patterns:
-        junk_found.extend(REPO_ROOT.glob(pattern))
-    if junk_found:
-        report_parts.append(f"\n🗑️ {len(junk_found)} junk files found — consider cleaning")
-        actions_taken.append(f"Found {len(junk_found)} junk files")
-
-    # 6. Pre-commit hook health
-    hook_file = REPO_ROOT / ".git" / "hooks" / "pre-commit"
-    if hook_file.exists():
-        report_parts.append("🔒 Pre-commit hook: active")
-    else:
-        report_parts.append("⚠️ Pre-commit hook: MISSING!")
-        actions_taken.append("Pre-commit hook missing!")
-
-    # Save state
     state["last_check"] = utcnow_str()
     save_state(state)
 
-    # Build final report
-    full_report = "\n".join(report_parts)
-
-    if actions_taken:
-        full_report += "\n\n**Actions needed:** " + "; ".join(actions_taken)
-
-    return full_report, len(status) == 0
+    full = "\n".join(report)
+    if actions:
+        full += "\n\n**Actions:** " + "; ".join(actions)
+    return full, len(status) == 0
 
 
-def run_once():
-    """Run a single heartbeat check."""
-    print(f"[heartbeat] Field check starting at {utcnow_str()}")
+def run_once(telegram=True):
+    print(f"[heartbeat] Check at {utcnow_str()}")
+    load_env()
+    report, clean = check_field()
+    # Team chat
+    ts = utcnow_str()
+    entry = f"\n---\n\n### [PO] {ts}\n{report}\n"
+    if TEAM_CHAT.exists():
+        TEAM_CHAT.write_text(TEAM_CHAT.read_text(encoding="utf-8", errors="replace") + entry, encoding="utf-8")
+    # Telegram short summary
+    if telegram:
+        short = f"🔄 *PO Heartbeat* — {ts}\n\n{report[:800]}"
+        send_telegram(short)
+    # Local log
+    if HEARTBEAT_LOG.exists():
+        HEARTBEAT_LOG.write_text(HEARTBEAT_LOG.read_text(encoding="utf-8") + f"\n## {ts}\n{report}\n", encoding="utf-8")
+    else:
+        HEARTBEAT_LOG.write_text(f"# PO Heartbeat Log\n\n## {ts}\n{report}\n", encoding="utf-8")
+    print(f"[heartbeat] Done. Clean: {clean}")
+    return clean
 
-    report, is_clean = check_field()
 
-    # Post to team chat
-    post_to_team_chat(report)
-
-    # Log locally
-    append_heartbeat_log(report)
-
-    print(f"[heartbeat] Check complete. Workspace clean: {is_clean}")
-    return is_clean
-
-
-def run_loop(interval=DEFAULT_INTERVAL):
-    """Run heartbeat on a loop."""
-    print(f"[heartbeat] Starting loop — interval {interval}s")
-    post_to_team_chat("🟢 Heartbeat started — PO is in the field")
-
+def run_loop(interval=DEFAULT_INTERVAL, telegram=True):
+    print(f"[heartbeat] Starting — interval {interval}s")
+    load_env()
+    if telegram:
+        send_telegram(f"🟢 *PO Heartbeat started*\n\nI'm in the field. Checking every {interval//60} minutes.\n\nI'll report changes, check services, and keep the field running.")
     try:
         while True:
-            run_once()
+            run_once(telegram=telegram)
             print(f"[heartbeat] Sleeping {interval}s...")
             time.sleep(interval)
     except KeyboardInterrupt:
-        post_to_team_chat("🔴 Heartbeat stopped")
+        if telegram:
+            send_telegram("🔴 PO Heartbeat stopped")
         print("[heartbeat] Stopped.")
 
 
 if __name__ == "__main__":
     args = sys.argv[1:]
     interval = DEFAULT_INTERVAL
-
+    telegram = "--no-telegram" not in args
     if "--interval" in args:
         idx = args.index("--interval")
         if idx + 1 < len(args):
             interval = int(args[idx + 1])
-
     if "--once" in args:
-        run_once()
+        run_once(telegram=telegram)
     else:
-        run_loop(interval)
+        run_loop(interval=interval, telegram=telegram)
