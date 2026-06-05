@@ -66,14 +66,12 @@ HAS_P90 = False
 EST = pytz.timezone("US/Eastern")
 
 # ═══════════════════════════════════════════════════════════════
-# DEPLOYMENT SYMBOLS — MAD Directive 2026-06-04
-# Floor (3): EURUSD, USDJPY, CHFJPY
-# Ceiling (3): NZDUSD, AUDUSD, USDCHF
-# Hedge/Knee (1): GBPJPY
+# DEPLOYMENT SYMBOLS — MAD Directive 2026-06-05 (LOW COST HEX)
+# All FLOOR: EURJPY, EURNZD, GBPNZD, EURAUD, GBPAUD, GBPCAD
+# Phase 1: Low cost, build to $250 account
 # ═══════════════════════════════════════════════════════════════
-TOP8_ST = ["EURUSD.PRO", "USDJPY.PRO", "CHFJPY.PRO",
-           "NZDUSD.PRO", "AUDUSD.PRO", "USDCHF.PRO",
-           "GBPJPY.PRO"]
+TOP8_ST = ["EURJPY.PRO", "EURNZD.PRO", "GBPNZD.PRO",
+           "EURAUD.PRO", "GBPAUD.PRO", "GBPCAD.PRO"]
 
 LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "live_logs")
 os.makedirs(LOG_DIR, exist_ok=True)
@@ -183,7 +181,7 @@ def check_autotrading() -> bool:
 
 
 def send_order(symbol: str, direction: str, volume: float,
-               sl: float, tp: float, comment: str, no_sl: bool = False) -> bool:
+               sl: float, tp: float, comment: str, no_sl: bool = False) -> int:
     """
     Send order to MT5.
     If no_sl=True, SL is not included in the order request.
@@ -275,7 +273,7 @@ def send_order(symbol: str, direction: str, volume: float,
         else:
             log.info("EXECUTED: %s %.2f %s @ %.5f | SL=%.5f (%.1fp) | TP=%.5f (%.1fp) | RR=%.2f | Ticket=%s",
                      direction, volume, symbol, price, sl, sl_pips, tp, tp_pips, rr, result.order)
-        return True
+        return result.order
     else:
         log.error("Order rejected: retcode=%s (%s)", result.retcode, result.comment)
         log.error("  Request: %s %.2f %s @ %.5f SL=%s TP=%.5f",
@@ -294,10 +292,10 @@ def send_order(symbol: str, direction: str, volume: float,
                 result2 = mt5.order_send(request2)
                 if result2 and result2.retcode == mt5.TRADE_RETCODE_DONE:
                     log.info("  FALLBACK EXECUTED (mode=%d): Ticket=%s" % (fill_mode, result2.order))
-                    return True
+                    return result2.order
                 elif result2:
                     log.error("  Fallback rejected (mode=%d): retcode=%s (%s)" % (fill_mode, result2.retcode, result2.comment))
-        return False
+        return 0
 
 
 def close_position(ticket: int) -> bool:
@@ -692,27 +690,25 @@ def run_live(symbols: list, lot_size: float = 0.01):
                                              direction, sym, st_sig.entry_price, sl_p, tp_p, rr)
                                     # ALIEN EDGE: No hard SL sent to broker for ST
                                     # Engine monitors M5 closes and returns SL_HIT
-                                    ok = send_order(sym, direction, lot_size,
+                                    ticket = send_order(sym, direction, lot_size,
                                                     st_sig.sl_price, st_sig.tp_price,
                                                     "CEREBUS-ST-L%d" % st_sig.loop_count,
                                                     no_sl=True)
-                                    if ok:
+                                    if ticket:
                                         exec_count += 1
                                         daily_stats["entries"] += 1
                                         daily_stats["rr_total"] += rr
-                                        pos = get_positions()
-                                        for p in pos:
-                                            if p["symbol"] == sym and p["magic"] == 20260601 and (sym, "ST") not in active_trades:
-                                                active_trades[(sym, "ST")] = {
-                                                    "ticket": p["ticket"],
-                                                    "direction": direction,
-                                                    "entry": st_sig.entry_price,
-                                                    "sl": st_sig.sl_price,
-                                                    "tp": st_sig.tp_price,
-                                                    "engine": "ST",
-                                                    "sl_moved": False,
-                                                }
-                                                break
+                                        # Register directly from order result ticket
+                                        # FIX: avoids get_positions() race condition
+                                        active_trades[(sym, "ST")] = {
+                                            "ticket": ticket,
+                                            "direction": direction,
+                                            "entry": st_sig.entry_price,
+                                            "sl": st_sig.sl_price,
+                                            "tp": st_sig.tp_price,
+                                            "engine": "ST",
+                                            "sl_moved": False,
+                                        }
                             elif st_sig.event in ("TP_HIT", "SL_HIT", "KILL_SWITCH"):
                                 # Close position if still open
                                 key = (sym, "ST")
@@ -777,26 +773,22 @@ def run_live(symbols: list, lot_size: float = 0.01):
                                         variant = str(p90_sig.variant).replace("P90Variant.", "")
                                         log.info("P90 ENTRY [%s]: %s %s @ %.5f | SL=%.1fp TP=%.1fp RR=%.2f",
                                                  variant, direction, sym, p90_sig.entry_price, sl_p, tp_p, rr)
-                                        ok = send_order(sym, direction, lot_size,
+                                        ticket = send_order(sym, direction, lot_size,
                                                         p90_sig.sl_price, p90_sig.tp_price,
                                                         "CEREBUS-P90")
-                                        if ok:
+                                        if ticket:
                                             exec_count += 1
                                             daily_stats["entries"] += 1
                                             daily_stats["rr_total"] += rr
-                                            pos = get_positions()
-                                            for p in pos:
-                                                if p["symbol"] == sym and p["magic"] == 20260601 and (sym, "P90") not in active_trades:
-                                                    active_trades[(sym, "P90")] = {
-                                                        "ticket": p["ticket"],
-                                                        "direction": direction,
-                                                        "entry": p90_sig.entry_price,
-                                                        "sl": p90_sig.sl_price,
-                                                        "tp": p90_sig.tp_price,
-                                                        "engine": "P90",
-                                                        "sl_moved": False,
-                                                    }
-                                                    break
+                                            active_trades[(sym, "P90")] = {
+                                                "ticket": ticket,
+                                                "direction": direction,
+                                                "entry": p90_sig.entry_price,
+                                                "sl": p90_sig.sl_price,
+                                                "tp": p90_sig.tp_price,
+                                                "engine": "P90",
+                                                "sl_moved": False,
+                                            }
                                 elif p90_sig.event in ("TP_HIT", "SL_HIT", "KILL_SWITCH", "EWS_EXIT"):
                                     key = (sym, "P90")
                                     if key in active_trades:

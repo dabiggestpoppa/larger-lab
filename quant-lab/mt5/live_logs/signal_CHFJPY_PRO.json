@@ -2,10 +2,10 @@
   "engine": "SymmetryTrap",
   "symbol": "CHFJPY.PRO",
   "direction": "BUY",
-  "entry": 202.918,
-  "sl": 202.91,
-  "tp": 203.058,
+  "entry": 203.027,
+  "sl": 203.039,
+  "tp": 203.16699999999997,
   "event": "SL_HIT",
-  "loop": 2,
-  "time": "2026-06-05 02:46:00"
+  "loop": 3,
+  "time": "2026-06-05 03:32:00"
 }

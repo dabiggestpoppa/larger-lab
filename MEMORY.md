@@ -1,6 +1,6 @@
 # MEMORY.md — OWL (OC2) Persistent Memory
 
-> **Last Updated:** 2026-06-05 02:53 EDT — GROUP COMBINATORICS COMPLETE + LOW-COST HEX IDENTIFIED + ALL 3 FIXES VERIFIED + BRIDGE LIVE
+> **Last Updated:** 2026-06-05 03:27 EDT — LOW COST HEX DEPLOYED + ACTIVE TRADES RACE CONDITION FIXED + BRIDGE v4.3
 > **THE BIBLE locked:** AR gate decoupled from tier, impulse-based classification, 4PM cutoff, 10p trigger
 > **ACCURACY-FREQUENCY CURVE MAPPED:** Floor (max-trades) and ceiling (max-accuracy) both complete for all 28 pairs
 
@@ -660,3 +660,23 @@ _Last updated: 2026-06-04 09:40 EDT — CEREBUS LIVE, 7 pairs deployed, full cro
 - For prop firms / multiple accounts: pick group size, pick category, go
 
 _Last updated: 2026-06-05 02:53 EDT — Group combinatorics complete, plug & play ready_
+
+---
+
+## 🔴 LOW COST HEX — DEPLOYED (2026-06-05 03:27 EDT)
+
+### Config Swap: Sign 7 → Low Cost Hex
+- **OLD (Sign 7):** EURUSD/USDJPY/CHFJPY (floor) + NZDUSD/AUDUSD/USDCHF (ceiling) + GBPJPY (knee)
+- **NEW (Low Cost Hex):** EURJPY + EURNZD + GBPNZD + EURAUD + GBPAUD + GBPCAD (all FLOOR)
+- **Net:** $24,907 | **Avg WR:** 81.4% | **Cost:** 10.9% | **Trades:** 25,540
+- Files changed: `mt5/deploy_config.py`, `mt5/cerebus_live_bridge.py` (TOP8_ST default)
+- **RESTART BRIDGE** to pick up new config
+
+### Active Trades Race Condition — FIXED (v4.3)
+- **Bug:** After send_order() succeeds, bridge called get_positions() to find new position and register in active_trades. MT5 server delay meant position wasn't found → active_trades never populated → SL_HIT/TP_HIT silently skipped
+- **Symptom:** EURUSD SELL at 1.16109 hit engine SL at 17:00, bridge never closed it, position ran for 9 hours
+- **Fix:** send_order() now returns ticket (int) instead of bool. Caller uses ticket directly — no get_positions() scan needed
+- **Files:** `mt5/cerebus_live_bridge.py` — send_order() return type + both ST and P90 entry branches
+- **HARD RULE:** Never use get_positions() to find a position you just entered. Use the order result ticket directly.
+
+_Last updated: 2026-06-05 03:27 EDT — Low Cost Hex deployed, active trades fix v4.3_
