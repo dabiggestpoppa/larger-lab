@@ -1,0 +1,128 @@
+{
+  "GBPUSD": {
+    "floor": {
+      "t1_trigger": 16.0,
+      "net_wr": 84.02268178785857,
+      "net_pf": 14.472739242324595,
+      "net_tr_per_day": 2.232,
+      "total_trades": 2998
+    },
+    "ceiling": {
+      "t1_trigger": 82.56,
+      "net_wr": 87.98076923076923,
+      "net_pf": 26.240248226950346,
+      "net_tr_per_day": 0.155,
+      "total_trades": 208
+    },
+    "costs": {
+      "spread_pips": 0.0,
+      "commission_pips": 0.07,
+      "pip_size": 0.0001
+    }
+  },
+  "GBPJPY": {
+    "floor": {
+      "t1_trigger": 23.0,
+      "net_wr": 84.27745664739884,
+      "net_pf": 13.056156428152761,
+      "net_tr_per_day": 1.288,
+      "total_trades": 1730
+    },
+    "ceiling": {
+      "t1_trigger": 118.67,
+      "net_wr": 91.19496855345912,
+      "net_pf": 23.508170795993678,
+      "net_tr_per_day": 0.118,
+      "total_trades": 159
+    },
+    "costs": {
+      "spread_pips": 0.1,
+      "commission_pips": 0.07,
+      "pip_size": 0.001
+    }
+  },
+  "GBPAUD": {
+    "floor": {
+      "t1_trigger": 25.0,
+      "net_wr": 82.38304093567251,
+      "net_pf": 14.036001730852421,
+      "net_tr_per_day": 1.019,
+      "total_trades": 1368
+    },
+    "ceiling": {
+      "t1_trigger": 128.99,
+      "net_wr": 97.05882352941177,
+      "net_pf": 518.0526315789474,
+      "net_tr_per_day": 0.025,
+      "total_trades": 34
+    },
+    "costs": {
+      "spread_pips": 1.1,
+      "commission_pips": 0.07,
+      "pip_size": 0.0001
+    }
+  },
+  "GBPCAD": {
+    "floor": {
+      "t1_trigger": 24,
+      "net_wr": 84.33931484502448,
+      "net_pf": 16.60725971370138,
+      "net_tr_per_day": 0.395,
+      "total_trades": 1226
+    },
+    "ceiling": {
+      "t1_trigger": 123.83,
+      "net_wr": 100.0,
+      "net_pf": 2370700.0000000005,
+      "net_tr_per_day": 0.016,
+      "total_trades": 49
+    },
+    "costs": {
+      "spread_pips": 0.6,
+      "commission_pips": 0.07,
+      "pip_size": 0.0001
+    }
+  },
+  "GBPNZD": {
+    "floor": {
+      "t1_trigger": 29.0,
+      "net_wr": 83.58509566968782,
+      "net_pf": 18.840449706972848,
+      "net_tr_per_day": 0.739,
+      "total_trades": 993
+    },
+    "ceiling": {
+      "t1_trigger": 149.63,
+      "net_wr": 94.44444444444444,
+      "net_pf": 110.3785714285714,
+      "net_tr_per_day": 0.027,
+      "total_trades": 36
+    },
+    "costs": {
+      "spread_pips": 0.9,
+      "commission_pips": 0.07,
+      "pip_size": 0.0001
+    }
+  },
+  "GBPCHF": {
+    "floor": {
+      "t1_trigger": 21.0,
+      "net_wr": 86.29283489096574,
+      "net_pf": 20.172024816694865,
+      "net_tr_per_day": 0.956,
+      "total_trades": 1284
+    },
+    "ceiling": {
+      "t1_trigger": 108.36,
+      "net_wr": 87.09677419354838,
+      "net_pf": 23.015094339622642,
+      "net_tr_per_day": 0.023,
+      "total_trades": 31
+    },
+    "costs": {
+      "spread_pips": 0.7,
+      "commission_pips": 0.07,
+      "pip_size": 0.0001
+    }
+  }
+}

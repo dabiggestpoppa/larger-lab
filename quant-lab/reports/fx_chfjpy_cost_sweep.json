@@ -1,0 +1,110 @@
+{
+  "CHFJPY": {
+    "floor": {
+      "t1_trigger": 17.0,
+      "net_wr": 82.60437375745528,
+      "net_pf": 13.294470469769147,
+      "net_tr_per_day": 2.26,
+      "total_trades": 3018,
+      "net_pnl_pips": 28081.79999999974,
+      "net_sharpe": 11.991902367474697,
+      "net_max_dd_pips": 46.9
+    },
+    "ceiling": {
+      "t1_trigger": 85.0,
+      "net_wr": 91.73913043478261,
+      "net_pf": 40.80468178493049,
+      "net_tr_per_day": 0.17,
+      "total_trades": 230,
+      "net_pnl_pips": 5441.299999999998,
+      "net_sharpe": 15.089668736562157,
+      "net_max_dd_pips": 36.6
+    },
+    "costs": {
+      "spread_pips": 0.1,
+      "commission_pips": 0.07,
+      "pip_size": 0.001
+    }
+  },
+  "CADJPY": {
+    "floor": {
+      "t1_trigger": 23,
+      "net_wr": 86.44240570846075,
+      "net_pf": 20.502164502164522,
+      "net_tr_per_day": 0.32,
+      "total_trades": 981,
+      "net_pnl_pips": 10361.500000000015,
+      "net_sharpe": 11.186375989084697,
+      "net_max_dd_pips": 40.6
+    },
+    "ceiling": {
+      "t1_trigger": 115.0,
+      "net_wr": 86.11111111111111,
+      "net_pf": 14.260804769001492,
+      "net_tr_per_day": 0.01,
+      "total_trades": 36,
+      "net_pnl_pips": 889.8000000000002,
+      "net_sharpe": 13.800248893744223,
+      "net_max_dd_pips": 35.1
+    },
+    "costs": {
+      "spread_pips": 0.1,
+      "commission_pips": 0.07,
+      "pip_size": 0.001
+    }
+  },
+  "AUDJPY": {
+    "floor": {
+      "t1_trigger": 26,
+      "net_wr": 89.15145005370569,
+      "net_pf": 24.84017802953673,
+      "net_tr_per_day": 0.3,
+      "total_trades": 931,
+      "net_pnl_pips": 11784.200000000015,
+      "net_sharpe": 11.83115732980792,
+      "net_max_dd_pips": 40.2
+    },
+    "ceiling": {
+      "t1_trigger": 130.0,
+      "net_wr": 94.44444444444444,
+      "net_pf": 78.23863636363636,
+      "net_tr_per_day": 0.01,
+      "total_trades": 18,
+      "net_pnl_pips": 679.6999999999999,
+      "net_sharpe": 18.320440697075522,
+      "net_max_dd_pips": 8.8
+    },
+    "costs": {
+      "spread_pips": 0.1,
+      "commission_pips": 0.07,
+      "pip_size": 0.001
+    }
+  },
+  "NZDJPY": {
+    "floor": {
+      "t1_trigger": 24,
+      "net_wr": 88.65168539325843,
+      "net_pf": 28.782905086523293,
+      "net_tr_per_day": 0.29,
+      "total_trades": 890,
+      "net_pnl_pips": 10596.39999999999,
+      "net_sharpe": 11.891107388799576,
+      "net_max_dd_pips": 39.9
+    },
+    "ceiling": {
+      "t1_trigger": 120.0,
+      "net_wr": 94.44444444444444,
+      "net_pf": 24.670411985018728,
+      "net_tr_per_day": 0.01,
+      "total_trades": 18,
+      "net_pnl_pips": 632.0,
+      "net_sharpe": 20.502725673659285,
+      "net_max_dd_pips": 26.7
+    },
+    "costs": {
+      "spread_pips": 0.1,
+      "commission_pips": 0.07,
+      "pip_size": 0.001
+    }
+  }
+}
