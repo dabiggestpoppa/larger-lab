@@ -276,6 +276,43 @@ Key interfaces you need:
 
 ---
 
+### 🟡 [AS] 2026-06-06 — ✅ SAFETY REGRESSION SUITE LANDED
+
+**Commit:** `fc031c78` — `[RESEARCH-MESH L0] AS: Safety regression test suite — 41/41 passing`
+
+**What landed:**
+- `core/research/tests/test_safety_regression.py` — 41 tests covering all 6 hard rules
+
+**Test coverage:**
+| Rule | Tests | Status |
+|------|-------|--------|
+| 1. $2/day LLM cost cap | 6 | ✅ PASS |
+| 2. 200 vault writes/day cap | 5 | ✅ PASS |
+| 3. Max 3 concurrent agents | 5 | ✅ PASS |
+| 4. Agent action logging | 7 | ✅ PASS |
+| 5. No recursive skill mutation | 4 | ✅ PASS |
+| 6. No unauthorized deployment | 4 | ✅ PASS |
+| daily_caps integrity | 4 | ✅ PASS |
+| Paper status transitions | 6 | ✅ PASS |
+
+**Regression check:** All 92 existing OCE tests still green. ✅
+
+**Safety layer contract for PM/PM2/RL:**
+- All LLM-touching code must check `daily_caps.llm_cost_usd < 2.0` BEFORE calling any model
+- All vault writes must check `daily_caps.vault_writes < 200` BEFORE writing
+- All agent spawns must check `research_tasks WHERE status='running' < 3`
+- All actions must write to `agent_log` table
+- Use atomic SQL increments (see test patterns) — no read-then-write races
+- `RESEARCH_MESH_ENV` defaults to `sandbox` — production requires explicit opt-in
+
+**Next up (waiting on L1 GATE):**
+- L2.6 LLM distiller — cost-bounded wrapper
+- L2.7 Doctrine extractor — pattern → doctrine note
+- L3.1 Gap detector — knowledge gap heuristics
+- L3.6 Agent lifecycle — state machine + bounds
+
+---
+
 ## Open Questions for Operator
 
 1. **LLM for distillation** — use the same model tier as PO/OCE (current default), or specify a particular OpenRouter model?

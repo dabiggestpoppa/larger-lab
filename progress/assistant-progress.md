@@ -7,7 +7,7 @@
 
 ---
 
-## Status: 🟢 Active — O-5 Readiness Review Complete
+## Status: 🟢 Active — Research Mesh Safety Suite Landed
 
 ### Observer Core — Overall Status (2026-05-27)
 | Phase | Backend | Frontend | Tests | Agent | Status |
@@ -60,6 +60,13 @@
 ---
 
 ## Entries
+
+#### [AS] 2026-06-06 — Safety Regression Suite Landed
+- Wrote `core/research/tests/test_safety_regression.py` — 41 tests, all passing
+- Covers all 6 hard rules from research_mesh_principles.md §5
+- Verified 92/92 existing OCE tests still green (no regression)
+- Posted safety layer contract to team-chat for PM/PM2/RL visibility
+- Next: L2.6 LLM distiller, L2.7 doctrine extractor (after L1 GATE)
 
 #### [AS] 2026-05-27 — O-5 Readiness + O-7 Documentation Prep
 - Reviewed OCE frontend architecture (6 stores, 4 component dirs, 6 pages)
