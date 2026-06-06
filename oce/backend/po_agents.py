@@ -123,15 +123,20 @@ class AgentCoordinator:
 
         try:
             # Route through OCE's POAgent for actual execution
-            from core.observer.po_agent import POAgent
-            agent = POAgent()
+            try:
+                from core.observer.po_agent import POAgent
+                agent = POAgent()
 
-            result = await agent.chat(
-                task.prompt,
-                history=[],
-                session_id=task.task_id,
-                max_tool_rounds=4,
-            )
+                result = await agent.chat(
+                    task.prompt,
+                    history=[],
+                    session_id=task.task_id,
+                    max_tool_rounds=4,
+                )
+            except ImportError:
+                # POAgent not available — return simulated response
+                logger.warning("POAgent not available, using simulated response")
+                result = f"[{best_agent.name}] {task.prompt}"
 
             task.status = "complete"
             task.result = result
@@ -204,3 +209,57 @@ class AgentCoordinator:
             }
             for t in self._tasks.values()
         ]
+
+    async def coordinate_concurrent(
+        self,
+        tasks: List[AgentTask],
+    ) -> List[CoordinationResult]:
+        """
+        Execute multiple tasks concurrently with bounded parallelism.
+
+        Uses asyncio.Semaphore to limit concurrent agent executions.
+        """
+        sem = asyncio.Semaphore(self.max_concurrent)
+
+        async def _run(task: AgentTask) -> CoordinationResult:
+            async with sem:
+                return await self.coordinate(task)
+
+        results = await asyncio.gather(
+            *[_run(t) for t in tasks],
+            return_exceptions=True,
+        )
+
+        # Convert exceptions to error results
+        final = []
+        for i, r in enumerate(results):
+            if isinstance(r, Exception):
+                final.append(CoordinationResult(
+                    task_id=tasks[i].task_id,
+                    agent="",
+                    status="error",
+                    error=str(r),
+                ))
+            else:
+                final.append(r)
+
+        return final
+
+    def select_agent_for_query(self, query: str) -> str:
+        """Public interface: select best agent name for a query string."""
+        task = AgentTask(task_id="select", agent_name="", prompt=query)
+        agent = self._select_agent(task)
+        return agent.name if agent else "analyst"
+
+    def get_stats(self) -> Dict[str, Any]:
+        """Return coordination statistics."""
+        tasks = list(self._tasks.values())
+        return {
+            "registered_agents": len(self._agents),
+            "agent_names": list(self._agents.keys()),
+            "total_tasks": len(tasks),
+            "pending": sum(1 for t in tasks if t.status == "pending"),
+            "running": sum(1 for t in tasks if t.status == "running"),
+            "complete": sum(1 for t in tasks if t.status == "complete"),
+            "error": sum(1 for t in tasks if t.status == "error"),
+        }

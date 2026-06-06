@@ -187,9 +187,18 @@ class FallbackChain:
         async with httpx.AsyncClient(timeout=timeout) as client:
             async with client.stream("POST", endpoint, json=body, headers=headers) as resp:
                 resp.raise_for_status()
-                async for chunk in response.aiter_text():
+                async for chunk in resp.aiter_text():
                     if chunk.strip():
                         yield chunk
+
+    def status(self) -> Dict[str, Any]:
+        """Return fallback chain status."""
+        return {
+            "providers": [p["provider"] for p in self.chain],
+            "provider_count": len(self.chain),
+            "recent_errors": self._errors[-10:],
+            "error_count": len(self._errors),
+        }
 
     def get_errors(self) -> List[Dict[str, Any]]:
         """Return all accumulated errors."""
@@ -199,13 +208,13 @@ class FallbackChain:
         """Clear the error log."""
         self._errors.clear()
 
-    def status(self) -> Dict[str, Any]:
-        """Get fallback chain status."""
-        return {
-            "providers": [
-                {"provider": p["provider"], "model": p.get("model", "unknown")}
-                for p in self.chain
-            ],
-            "recent_errors": len(self._errors),
-            "total_errors": len(self._errors),
-        }
+    def add_provider(self, config: Dict[str, Any], position: int = -1):
+        """Add a provider to the fallback chain."""
+        if position == -1:
+            self.chain.append(config)
+        else:
+            self.chain.insert(position, config)
+
+    def remove_provider(self, provider_name: str):
+        """Remove a provider from the chain by name."""
+        self.chain = [p for p in self.chain if p["provider"] != provider_name]
