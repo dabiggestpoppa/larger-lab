@@ -278,7 +278,8 @@ class ThoughtStreamer:
                 if context:
                     prompt = f"Context:\n{context}\n\nUser: {last_msg}"
 
-                return await agent.chat(
+                return await asyncio.to_thread(
+                    agent.chat,
                     prompt,
                     history=history,
                     session_id="",

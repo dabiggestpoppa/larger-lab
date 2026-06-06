@@ -1,34 +1,12 @@
 {
   "session_id": "session_20260531_214842",
   "start_time": "2026-05-31T21:48:42.184575+00:00",
-  "last_active": "2026-06-05T19:56:35.594817+00:00",
-  "workflow_count": 48,
-  "success_count": 48,
+  "last_active": "2026-06-06T07:09:16.283129+00:00",
+  "workflow_count": 52,
+  "success_count": 52,
   "failure_count": 0,
   "active_goals": [],
   "workflow_history": [
-    {
-      "workflow_id": "chat_e3eaf31d",
-      "domain": "conversation",
-      "complexity": "low",
-      "timestamp": "2026-05-31T21:48:49.232254+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
-    {
-      "workflow_id": "chat_4e225e38",
-      "domain": "research",
-      "complexity": "low",
-      "timestamp": "2026-05-31T21:48:58.415088+00:00",
-      "success": true,
-      "routing_path": "",
-      "model_used": "",
-      "duration_ms": 0.0,
-      "error": null
-    },
     {
       "workflow_id": "chat_0519f978",
       "domain": "conversation",
@@ -534,11 +512,55 @@
       "model_used": "",
       "duration_ms": 0.0,
       "error": null
+    },
+    {
+      "workflow_id": "chat_90295b24",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-06-06T06:45:52.814475+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_ce3c9822",
+      "domain": "research",
+      "complexity": "low",
+      "timestamp": "2026-06-06T06:52:46.472996+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_70e36cb3",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-06-06T07:00:49.073963+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_6990fb80",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-06-06T07:09:16.279121+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
     }
   ],
   "routing_patterns": {
-    "TaskType.CONVERSATION:": 22,
-    "TaskType.RESEARCH:": 10,
+    "TaskType.CONVERSATION:": 25,
+    "TaskType.RESEARCH:": 11,
     "TaskType.CODING:": 3,
     "TaskType.VISUALIZATION:": 5,
     "TaskType.GENERAL:": 4,
