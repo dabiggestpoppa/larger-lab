@@ -55,6 +55,7 @@ from .topology_api import register_topology_endpoints
 from .sovereign_api import register_sovereign_endpoints
 from .vault_api import register_vault_endpoints
 from .ml_api import register_ml_endpoints
+from .po_idle import POIdleRuntime, get_idle_runtime, set_idle_runtime
 
 app = FastAPI(
     title="OCE Continuity Core",
@@ -773,7 +774,7 @@ async def agent_workspace_info():
 
 @app.on_event("startup")
 async def startup_event():
-    """Initialize Event Fabric on startup."""
+    """Initialize Event Fabric and PO Idle Runtime on startup."""
     try:
         fabric = get_fabric()
         await fabric.ingest(
@@ -781,15 +782,21 @@ async def startup_event():
             source="oce-continuity-core",
             payload={"version": "1.0.0", "message": "OCE Continuity Core started"},
         )
-        logger.info("OCE Continuity Core started successfully")
+        # Start PO Idle Runtime (P3.4 — autonomous background tick)
+        idle = get_idle_runtime()
+        await idle.start()
+        logger.info("OCE Continuity Core started successfully (PO Idle Runtime active)")
     except Exception as e:
         logger.error(f"Startup error: {e}")
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    """Emit shutdown event."""
+    """Stop PO Idle Runtime and emit shutdown event."""
     try:
+        # Stop PO Idle Runtime cleanly
+        idle = get_idle_runtime()
+        await idle.stop()
         fabric = get_fabric()
         await fabric.ingest(
             event_type="system.shutdown",
@@ -799,6 +806,45 @@ async def shutdown_event():
         logger.info("OCE Continuity Core shutting down")
     except Exception as e:
         logger.error(f"Shutdown error: {e}")
+
+
+# ─── PO Idle Runtime Endpoints (P3.4) ────────────────────────────────────────
+
+@app.get("/api/po/idle/status")
+async def po_idle_status():
+    """Get PO Idle Runtime status — tick count, uptime, session state, last tick."""
+    idle = get_idle_runtime()
+    last_report = idle.last_tick_report
+    return {
+        "running": idle.is_running,
+        "tick_count": idle.tick_count,
+        "uptime_seconds": round(idle.uptime_seconds, 1),
+        "session_state": idle._get_session_state().value if idle.is_running else "stopped",
+        "cadence_seconds": idle._compute_cadence() if idle.is_running else 0,
+        "last_tick": {
+            "ts": last_report.ts,
+            "cadence": last_report.cadence,
+            "session_state": last_report.session_state.value,
+            "vault_sync": {
+                "entries_indexed": last_report.vault_sync.entries_indexed,
+                "entries_pruned": last_report.vault_sync.entries_pruned,
+                "duration_ms": last_report.vault_sync.duration_ms,
+            } if last_report and last_report.vault_sync else None,
+            "memory_distill": {
+                "work_compressed": last_report.memory_distill.work_compressed,
+                "learned_created": last_report.memory_distill.learned_created,
+                "compression_ratio": last_report.memory_distill.compression_ratio,
+            } if last_report and last_report.memory_distill else None,
+        } if last_report else None,
+    }
+
+
+@app.post("/api/po/idle/notify")
+async def po_idle_notify():
+    """Notify PO Idle Runtime that a request was handled (resets active timer)."""
+    idle = get_idle_runtime()
+    idle.notify_request()
+    return {"status": "ok", "message": "Active timer reset"}
 
 
 # ─── WebSocket for Real-time Updates ──────────────────────────────────────────
