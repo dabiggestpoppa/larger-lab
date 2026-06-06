@@ -21,6 +21,9 @@ from typing import Any, Dict, Optional
 from ..distillation.distiller import Distiller
 from ..distillation.vault_writer import VaultWriter
 from ..ingestion.models import Paper
+from ..ingestion.openalex_client import OpenAlexClient
+from ..ingestion.arxiv_client import ArxivClient
+from ..ingestion.s2_client import S2Client
 from .queue import ResearchTask
 
 logger = logging.getLogger(__name__)
@@ -48,6 +51,33 @@ class ResearchAgent:
         self.distiller = Distiller()
         self.vault_writer = VaultWriter()
         self._running = False
+        self._openalex: Optional[OpenAlexClient] = None
+        self._arxiv: Optional[ArxivClient] = None
+        self._s2: Optional[S2Client] = None
+
+    async def _get_openalex(self) -> OpenAlexClient:
+        if self._openalex is None:
+            self._openalex = OpenAlexClient()
+        return self._openalex
+
+    async def _get_arxiv(self) -> ArxivClient:
+        if self._arxiv is None:
+            self._arxiv = ArxivClient()
+        return self._arxiv
+
+    async def _get_s2(self) -> S2Client:
+        if self._s2 is None:
+            self._s2 = S2Client()
+        return self._s2
+
+    async def close(self):
+        """Close all source clients."""
+        if self._openalex:
+            await self._openalex._client.aclose()
+        if self._arxiv:
+            await self._arxiv.close()
+        if self._s2:
+            await self._s2._client.aclose()
 
     async def execute(self, task: ResearchTask) -> Dict[str, Any]:
         """
@@ -124,13 +154,57 @@ class ResearchAgent:
 
     async def _query_sources(self, task: ResearchTask) -> list[Paper]:
         """
-        Query available sources for relevant papers.
+        Query all three sources for relevant papers.
         
-        This is a placeholder — actual implementation uses PM/PM2 clients.
+        Uses PM's OpenAlex + S2 clients and PM2's arXiv client.
+        Deduplicates results via cache layer.
         """
-        # Placeholder: return empty list until clients are built
-        # PM will implement openalex_client, arxiv_client, s2_client
-        return []
+        from ..ingestion.cache import get_cache
+
+        all_papers: list[Paper] = []
+        cache = get_cache()
+        seen_ids: set[str] = set()
+
+        # Use task domains or fall back to query
+        domains = task.domains if task.domains else [task.query]
+
+        # Query OpenAlex (PM's client)
+        try:
+            oa_client = await self._get_openalex()
+            for domain in domains[:3]:  # Cap at 3 domains per task
+                papers, _ = await oa_client.search_by_domain(domain, per_page=20)
+                for p in papers:
+                    if p.id not in seen_ids and not cache.exists(p):
+                        all_papers.append(p)
+                        seen_ids.add(p.id)
+        except Exception as e:
+            logger.warning(f"OpenAlex query failed: {e}")
+
+        # Query arXiv (PM2's client)
+        try:
+            arxiv_client = await self._get_arxiv()
+            for domain in domains[:2]:
+                query = domain.replace("_", " ")
+                papers = await arxiv_client.search(query, max_results=10)
+                for p in papers:
+                    if p.id not in seen_ids and not cache.exists(p):
+                        all_papers.append(p)
+                        seen_ids.add(p.id)
+        except Exception as e:
+            logger.warning(f"arXiv query failed: {e}")
+
+        # Query Semantic Scholar (PM's client)
+        try:
+            s2_client = await self._get_s2()
+            papers = await s2_client.search_by_query(task.query, limit=10)
+            for p in papers:
+                if p.id not in seen_ids and not cache.exists(p):
+                    all_papers.append(p)
+                    seen_ids.add(p.id)
+        except Exception as e:
+            logger.warning(f"S2 query failed: {e}")
+
+        return all_papers
 
     def _combine_findings(self, findings: list[Dict], task: ResearchTask) -> str:
         """Combine multiple paper findings into a single note."""

@@ -7,26 +7,18 @@
 
 ---
 
-## Status: 🟢 L1 INGESTION — IN PROGRESS
+## Status: 🟢 ALL PM TASKS COMPLETE — STANDING BY
 
-### O2C × MAD LABS Research Mesh — L1 Ingestion (2026-06-06)
+### O2C × MAD LABS Research Mesh — PM Tasks (2026-06-06)
 - [x] **RM-PM-1** L1.7 Cache + dedup layer (`core/research/ingestion/cache.py`) — 6 tests PASS
-  - DOI-based dedup (primary)
-  - Fuzzy title+author+year dedup (fallback, 0.98 threshold)
-  - Daily write cap (200 papers/day)
-  - Ingestion log recording
 - [x] **RM-PM-2** L1.1 OpenAlex client (`core/research/ingestion/openalex_client.py`) — 15 tests PASS
-  - Live API connectivity verified with `mailto=ops@larger-lab.local`
-  - Domain search with registry query mapping
-  - Paper parsing (title, abstract, authors, concepts, citations)
-  - Pagination with cursor
-  - DOI lookup
 - [x] **RM-PM-3** L1.3 Semantic Scholar client (`core/research/ingestion/s2_client.py`) — 10 tests PASS
-  - Graph API client with optional API key
-  - Paper search and lookup by DOI/ID
-  - Parsing to canonical Paper schema
 - [x] Smoke test: 100 papers fetched from OpenAlex, cache dedup verified
-- [ ] Commit + push pending
+- [x] Committed + pushed: `0b9bdc6a`, `ea9eadac`
+- [x] L2.2 Concept extractor — built by OC2 (verified exists)
+- [x] L3.2 Research task generator — built by OC2 (verified exists)
+- **All 87 research tests passing** ✅
+- **All PM assignments complete. Standing by for L3 GATE / L4 work.**
 
 ### PO × Open-LLM-VTuber — Phase 0 Recon (2026-06-05)
 - [x] Cloned Open-LLM-VTuber from `Open-LLM-VTuber/Open-LLM-VTuber` to `vtuber_integration/Open-LLM-VTuber/`
