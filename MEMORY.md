@@ -694,6 +694,59 @@ _Last updated: 2026-06-05 03:27 EDT — Low Cost Hex deployed, active trades fix
 
 ### Demo Setup Plan (MAD 2026-06-05 16:04 EDT)
 
+**Goal:** Run Profit Quad on demo alongside live — separate processes, separate logs.
+
+**Config-only changes (no new code):**
+1. `mt5/demo_deploy_config.py` — Profit Quad config (BTCUSD + ETHUSD + EURNZD + GBPNZD)
+2. `mt5/demo_account.json` — demo account login/server/password
+3. `mt5/demo_bridge.py` — standalone bridge, DEMO_MODE=True, separate logs
+4. Guardian: add `demo_bridge` as separate monitored process
+5. Logs: `demo_logs/` folder — completely separate from `live_logs/`
+
+**Key rule:** Demo and live = separate Python processes, no shared state, no mixed signals.
+
+---
+
+## 🟢 WEEKEND DEMO DEPLOY (2026-06-06 00:19 EDT)
+
+**Demo bridge deployed and running live on OxSecurities demo account.**
+
+| Config | Value |
+|--------|-------|
+| Platform | OxSecurities-Demo |
+| Account | 1114712 |
+| Strategy | Profit Quad — BTCUSD + ETHUSD + EURNZD + GBPNZD |
+| Lot Size | 0.01 |
+| Mode | All FLOOR |
+| Balance | $288.84 |
+| PID | 15568 |
+| Magic | 20261000 |
+
+**Weekend Protocol:**
+- Live bridge + guardian SHUT DOWN for weekend (market closed)
+- Demo bridge running standalone — scanning Profit Quad
+- Daily report cron: `scripts/demo_daily_report.py` via Task Scheduler
+  - Schedule: SAT+SUN at 23:00 EST
+  - Task name: `OC2-Demo-Weekend-Report`
+  - Outputs to `demo_logs/demo_daily_report.txt`
+
+**Key rule:** No live scanning when market closed. Demo only this weekend.
+
+_Last updated: 2026-06-06 00:20 EDT — Weekend demo deployed, live shut down_
+
+---
+
+## 🔴 ST EXECUTOR DECOMMISSIONED (2026-06-05 23:30 EDT)
+
+- Removed `symmetry_trap_executor.py` from guardian `PROCESSES` dict — bridge is now SOLE executor
+- Process was already dead; zombie configs could have respawned it with wrong pair/magic
+- Rogue trades from old executor: CHFJPY.BUY (+$0.51), EURUSD.SELL (+$1.02), EURUSD.BUY (-$1.08)
+- All old signal files archived to `quant-lab/mt5/archive/`
+- Debug artifacts removed: engine_diff.txt, hook_test_msg.txt, hook_test_output.txt
+- Guardian commit: `ac3aed8` + cleanup commit: `8a45899d`
+
+### Demo Setup Plan (MAD 2026-06-05 16:04 EDT)
+
 **Goal:** Run Profit Quad on demo alongside live — separate processes, separate logs, no shared state.
 
 **What to do (config only, no new code):**
