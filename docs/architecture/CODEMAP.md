@@ -1,1263 +1,415 @@
-# 🗺️ CODEMAP — Unified System Architecture
+# 🗺️ CODEMAP — Complete Workspace Reference
 
-> **Purpose:** Complete workspace orientation with all Mermaid diagrams in one place.
-> **Updated:** 2026-05-31 | V3 All 10 Phases Complete | Observer Core O-1 through O-7 COMPLETE | O2C Phase 00 + Phase 01 COMPLETE | 1582+ tests passing
-> **For:** Quick reference, architecture alignment, pipeline verification.
-
----
-
-## 🏛️ Unified System Overview
-
-```mermaid
-graph TB
-    subgraph "Level 1: Human Interface"
-        H[Human / Board]
-        CC[Claude Code<br/>🔵 Overseer]
-        OC[OpenClaw<br/>🟣 Analysis]
-        HR[Hermes<br/>🟢 Execution]
-        OC2[OpenClaw 2<br/>🟠 Telegram]
-    end
-
-    subgraph "Level 2: SRRA-OPH Substrate"
-        C1[Collar Protocol]
-        PP[PlannerPatch]
-        EP[ExecutionPatch]
-        MP[MemoryPatch]
-        RP[RepairPatch]
-        AC[Active Collars]
-        TF[Trajectory Fields]
-    end
-
-    subgraph "Level 3: OCE Engine"
-        API[FastAPI Backend<br/>Port 8000]
-        EF[Event Fabric]
-        OR[Observer Runtime]
-        UI[Next.js Frontend]
-    end
-
-    subgraph "Level 4: Data Pipeline"
-        CSV[Downloads/*.csv]
-        NT[Nautilus Trader]
-        REPORTS[Reports]
-    end
-
-    subgraph "Level 5: Infrastructure"
-        WIN[Windows Desktop]
-        CLOUD[Hetzner/Oracle Cloud]
-        TG[Telegram API]
-        OPENROUTER[OpenRouter LLMs]
-    end
-
-    H --> CC
-    CC --> OC
-    OC --> HR
-    HR --> OC2
-    OC2 --> TG
-
-    CC --> C1
-    OC --> C1
-    HR --> C1
-    C1 --> PP
-    C1 --> EP
-    C1 --> MP
-    C1 --> RP
-    PP --> AC
-    EP --> AC
-    MP --> AC
-    RP --> AC
-    AC --> TF
-
-    TF --> EF
-    EF --> OR
-    OR --> API
-    API --> UI
-    API --> EF
-    API --> O2C_API
-    O2C_API --> O2C_COMP
-    O2C_COMP --> O2C_VAULT
-    O2C_VAULT --> O2C_COMP
-
-    CSV --> NT
-    NT --> REPORTS
-    REPORTS --> TF
-
-    WIN --> OC2
-    WIN --> API
-    API --> OPENROUTER
-    WIN --> CLOUD
-```
+> **Last Updated:** 2026-06-06
+> **Version:** 2.1 (PO × VTuber Integration Added)
 
 ---
 
-## 🔮 O2C — Cognitive Filesystem & Obsidian Mesh
+## Quick Reference
 
-### O2C Phase Flow Diagram
-
-```mermaid
-graph LR
-    subgraph "Phase 00: Filesystem Foundation"
-        VW[Vault Writer] --> CMP[Compressor]
-        CMP --> LNK[Linker]
-        LNK --> TAX[Taxonomy]
-        TAX --> NS[Note Standard]
-        SKL[Skill System] --> SL[Skill Loader]
-        EJ[Execution Journal] --> LS[Live Sync]
-    end
-
-    subgraph "Phase 01: Cognitive Mesh"
-        EI[Error Intelligence] --> PC[Pattern Crystallizer]
-        PC --> MD[Memory Distiller]
-        MD --> CI[Context Injector]
-        SL --> CI
-    end
-
-    subgraph "Storage"
-        OV[(O2C-VAULT)]
-        API[Vault API<br/>21 Endpoints]
-    end
-
-    VW --> OV
-    EJ --> OV
-    EI --> OV
-    MD --> OV
-    LNK --> OV
-    CI --> OV
-    OV --> API
-
-    style VW fill:#4dabf7,color:#fff
-    style CMP fill:#4dabf7,color:#fff
-    style LNK fill:#4dabf7,color:#fff
-    style TAX fill:#4dabf7,color:#fff
-    style NS fill:#4dabf7,color:#fff
-    style SKL fill:#4dabf7,color:#fff
-    style SL fill:#4dabf7,color:#fff
-    style EJ fill:#4dabf7,color:#fff
-    style LS fill:#4dabf7,color:#fff
-    style EI fill:#51cf66,color:#fff
-    style PC fill:#51cf66,color:#fff
-    style MD fill:#51cf66,color:#fff
-    style CI fill:#51cf66,color:#fff
-    style OV fill:#264653,color:#fff,stroke:#2a9d8f
-    style API fill:#845ef7,color:#fff
-```
-
-### O2C Knowledge Loop
-
-```mermaid
-flowchart TD
-    A[Agent Spawned] --> B[Executes Task]
-    B --> C[Journal Captures Steps]
-    C --> D[Memory Distiller]
-    D --> E[O2C-VAULT]
-    E --> F[Error Intelligence]
-    E --> G[Pattern Crystallizer]
-    E --> H[Knowledge Graph Linker]
-    F --> E
-    G --> E
-    H --> E
-    E --> I[Context Injector]
-    I --> J[Future Agent Spawns]
-    J --> A
-
-    style A fill:#1d3557,color:#fff
-    style B fill:#4dabf7,color:#fff
-    style C fill:#4dabf7,color:#fff
-    style D fill:#51cf66,color:#fff
-    style E fill:#264653,color:#fff,stroke:#2a9d8f
-    style F fill:#51cf66,color:#fff
-    style G fill:#51cf66,color:#fff
-    style H fill:#4dabf7,color:#fff
-    style I fill:#51cf66,color:#fff
-    style J fill:#9d0208,color:#fff
-```
-
-### O2C Component Table
-
-| Phase | Component | File | Tests |
-|-------|-----------|------|-------|
-| 00 | Vault Writer | `core/obsidian/vault_writer.py` | 24 |
-| 00 | Compressor | `core/obsidian/compressor.py` | 12 |
-| 00 | Linker | `core/obsidian/linker.py` | 12 |
-| 00 | Taxonomy | `core/obsidian/taxonomy.py` | 8 |
-| 00 | Note Standard | `core/obsidian/note_standard.py` | 11 |
-| 00 | Skill Loader | `core/skills/loader.py` | 8 |
-| 00 | Execution Journal | `core/execution/journal.py` | 7 |
-| 01 | Error Intelligence | `core/obsidian/error_intelligence.py` | 13 |
-| 01 | Pattern Crystallizer | `core/obsidian/pattern_crystallizer.py` | 5 |
-| 01 | Memory Distiller | `core/obsidian/memory_distiller.py` | 4 |
-| 01 | Context Injector | `core/obsidian/context_injector.py` | 7 |
-| — | Integration Tests | `oce/tests/test_phase01_integration.py` | 9 |
-| **Total** | | | **122** |
+| System | Port | Status | Description |
+|--------|------|--------|-------------|
+| OC2 Gateway | 18790 | ✅ | OpenClaw agent gateway (Telegram) |
+| Hermes Gateway | 8642 | ✅ | Hermes agent gateway (Discord) |
+| OCE Backend | 8000 | ✅ | FastAPI + WebSocket server |
+| SRRA-OPH API | 8001 | ✅ | Observer substrate API |
+| OCE Frontend | 3000 | ✅ | Next.js React dashboard |
+| Sniper Dashboard | 3001 | ✅ | Trading dashboard |
+| Gateway Watchdog | — | ✅ | Python auto-restart monitor |
 
 ---
 
-## 📊 Architecture Levels
+## Directory Structure
 
-### Level 1: Human Interface + Agent Network
-
-```mermaid
-graph TB
-    subgraph "Human Interface"
-        H[Human / Board] --> CC[Claude Code<br/>🔵 Overseer / Architecture]
-        H --> OC[OpenClaw<br/>🟣 Analysis / Planning]
-        H --> HR[Hermes<br/>🟢 Execution / Telegram]
-    end
-
-    subgraph "Agent Coordination"
-        CC --> |Task Brief| OC
-        OC --> |Execution Plan| HR
-        HR --> |Progress| PP[progress/ files]
-        CC --> |Progress| PP
-        OC --> |Progress| PP
-    end
-
-    subgraph "Memory & Sync Layer"
-        PP --> SYNC[progress-sync.py]
-        SYNC --> WM[Working Memory<br/>progress/*-memory.md]
-        SYNC --> PM[Persistent Memory<br/>.openclaw/MEMORY.md]
-        SYNC --> RM[Repo Memory<br/>workspace-state.md]
-        SYNC --> CM[CODEMAP.md]
-    end
-
-    subgraph "OC2 Gateway"
-        OC2[OpenClaw 2<br/>Port 18790] --> TG[Telegram @OC2BLRBOT]
-        OC2 --> WD[Watchdog<br/>Auto-restart]
-        OC2 --> CM2[Context Monitor<br/>75%/90%/95% alerts]
-    end
-
-    CC --> OC2
-    OC --> OC2
-    HR --> OC2
 ```
+larger-lab/
+├── docs/                          # All documentation
+│   ├── architecture/              # System architecture docs
+│   │   ├── SYSTEM_ARCHITECTURE.md
+│   │   ├── V3_COGNITIVE_FIELD.md
+│   │   └── ALL_MERMAID_GRAPHS.md  # All Mermaid diagrams (40+)
+│   ├── plans/                     # Project plans & roadmaps
+│   │   ├── observer-core/
+│   │   └── oce-unified/
+│   ├── reference/                 # API refs, debugging, testing
+│   │   ├── CODEMAP.md            # This file
+│   │   ├── API_REFERENCE_SUMMARY.md
+│   │   ├── MODULE_GUIDE_SUMMARY.md
+│   │   └── DEBUGGING.md
+│   └── meta/                      # Behavioral contracts
+│       ├── AGENTS.md
+│       ├── CLAUDE.md
+│       ├── PRINCIPLES.md
+│       ├── SOUL.md
+│       ├── IDENTITY.md
+│       ├── USER.md
+│       └── SUB_AGENT_RULES.md
+├── memory/                        # All memory/knowledge
+│   ├── memories/                  # Session-based memory
+│   ├── memory-bank/               # Self-heal state
+│   ├── obsidian-vault/            # Full Obsidian vault (64 .md files)
+│   │   ├── agents/
+│   │   ├── architecture/
+│   │   ├── doctrine/
+│   │   ├── execution/
+│   │   ├── failures/
+│   │   ├── graphs/
+│   │   ├── heuristics/
+│   │   ├── journals/
+│   │   ├── memory/
+│   │   ├── ontology/
+│   │   ├── routing/
+│   │   └── skills/
+│   ├── .dreams/
+│   └── archive/
+├── core/                          # Core system modules
+│   ├── observer/                  # Observer runtime
+│   │   ├── chat_log.py
+│   │   └── continuity_memory.py
+│   ├── persistent_field/          # O-7 Persistent Field
+│   │   ├── recovery_persistence.py
+│   │   ├── runtime_health.py
+│   │   └── dormant_state.py
+│   ├── execution/                 # Execution engine
+│   │   └── journal.py
+│   ├── skills/                    # Skill system
+│   │   └── loader.py
+│   ├── consensus/                 # O-2 Consensus
+│   ├── spawn/                     # O-3 Spawn Engine
+│   ├── learning/                  # O-4 Field Learning
+│   ├── observability/             # Observability layer
+│   ├── response/                  # Response builder
+│   ├── semantic/                  # Semantic memory
+│   ├── topology/                  # Topology engine
+│   └── utils/                     # Utility functions
+│       ├── data_fetcher.py
+│       ├── indicators.py
+│       └── metrics.py
+├── oce/                           # Operator Continuity Engine
+│   ├── backend/                   # FastAPI server
+│   │   ├── main.py               # App entry (30+ imports)
+│   │   ├── vault_api.py          # Vault API endpoints (19 routes)
+│   │   ├── persistent_field_api.py
+│   │   └── substrate/            # Substrate layer
+│   ├── po_api.py                  # PO API endpoints
+│   ├── po_workspace.py            # Workspace scanner
+│   ├── po_vault.py                # Vault retriever
+│   ├── po_stream.py               # Streaming thought layer
+│   ├── po_agents.py               # Agent coordination
+│   ├── po_router.py               # Multi-model router
+│   ├── po_fallback.py             # Fallback chain
+│   ├── po_interrupt.py            # Interrupt handler
+│   ├── po_idle.py                 # Idle runtime
+│   ├── po_session.py              # Session store
+│   ├── po_state.py                # State persistence
+│   └── po_events.py               # Event schema
 
-### Level 2: SRRA-OPH Substrate (Phases 1-9)
 
-```mermaid
-graph TD
-    subgraph "Phase 1: Observer Mesh"
-        O1[Observer A]
-        O2[Observer B]
-        O3[Observer C]
-        C1[CollarState]
-        PP[PlannerPatch]
-        EP[ExecutionPatch]
-        MP[MemoryPatch]
-        RP[RepairPatch]
-    end
+│   └── frontend/                  # Next.js app
+│       ├── components/           # React components
+│       ├── stores/               # Zustand stores
+│       └── pages/                # App pages
+├── srrs_opc/                      # SRRA-OPH Substrate
+│   ├── frontend/                  # Observatory frontend
+│   │   ├── api_server.py         # FastAPI (port 8001)
+│   │   └── components/           # Cytoscape graphs
+│   └── constraint_propagator.py
+├── quant-lab/                     # Quantitative trading
+│   ├── engines/                   # Strategy engines
+│   │   ├── symmetry_trap.py      # Symmetry Trap (Engine B)
+│   │   ├── p90_engine_dmr.py     # P90 Kinetic Engine
+│   │   └── dmr_standalone_backtest.py
+│   ├── strategies/                # Strategy implementations
+│   │   └── dmr_strategy.py
+│   ├── backtests/                 # Backtest results
+│   │   ├── naut_dmr_backtest.py
+│   │   └── run_naut_backtest.py
+│   ├── reports/                   # Generated reports
+│   ├── data/                      # Market data
+│   └── mt5/                       # MetaTrader 5 integration
+│       ├── dmr_executor.py
+│       ├── dmr_monitor.py
+│       └── symmetry_trap_executor.py
+├── vtuber_integration/              # PO × VTuber Integration
+│   ├── po_provider/                 # PO Provider Adapter (Phase 1)
+│   │   └── po_provider.py           # StatelessLLMInterface impl
+│   ├── tests/                       # Integration tests
+│   │   ├── test_smoke.py           # P1.6 smoke (12 tests)
+│   │   ├── test_phase2.py          # P2.1-P2.12 (34 tests)
+│   │   └── test_phase3.py          # P3.1-P3.5 (15 tests)
+│   └── Open-LLM-VTuber/            # Cloned upstream (Phase 0)
 
-    subgraph "Phase 2: Reconstruction"
-        TF[Trajectory Fields]
-        CC[Continuity Collars]
-        RP2[Repair-First Continuity]
-    end
-
-    subgraph "Phase 3: Emergent Topology"
-        DC[Dynamic Coupling]
-        TR[Topological Router]
-        DCON[Distributed Consensus]
-        ACF[Active Collar Fields]
-    end
-
-    subgraph "Phase 4: Workspace Integration"
-        CF1[Claude]
-        CF2[VSCode]
-        CF3[Memory DB]
-        CF4[OpenClaw]
-        WT[Workspace Tools]
-    end
-
-    subgraph "Phase 5: Long-Horizon Continuity"
-        TC[Trajectory Compression]
-        ID[Identity Reconstruction]
-    end
-
-    subgraph "Phase 6-9: Advanced"
-        RT[Topology Observer]
-        OC6[Overlap Cognition]
-        SC[Sovereign Coevolution]
-        EB[Entropy Budget]
-    end
-
-    O1 --> C1
-    O2 --> C1
-    O3 --> C1
-    PP --> C1
-    EP --> C1
-    MP --> C1
-    RP --> C1
-    C1 --> PP
-    C1 --> EP
-    C1 --> MP
-    C1 --> RP
-
-    C1 --> TF
-    TF --> CC
-    TF --> RP2
-
-    O1 --> DC
-    O2 --> DC
-    O3 --> DC
-    DC --> TR
-    TR --> DCON
-    DCON --> ACF
-    ACF --> DC
-
-    CF1 --> WT
-    CF2 --> WT
-    CF3 --> WT
-    CF4 --> WT
-
-    TF --> TC
-    TC --> ID
-    CC --> ID
-    RP2 --> ID
-
-    RT --> OC6
-    OC6 --> SC
-    SC --> EB
-```
-
-### Level 3: OCE — Operator Continuity Engine
-
-```mermaid
-graph TB
-    subgraph "User Layer"
-        U[User] --> UI[OCE Shell UI<br/>Next.js Frontend]
-    end
-
-    subgraph "Continuity Core"
-        UI --> API[FastAPI Backend<br/>Port 8000]
-        API --> CHAT[/chat endpoint]
-        API --> OBS[/observers endpoints]
-        API --> EVT[/events endpoints]
-        API --> ATTR[/attractor endpoint]
-        API --> MEM[/memory endpoint]
-        API --> WS[WebSocket /ws/events]
-    end
-
-    subgraph "Event Fabric"
-        EF[Event Fabric Engine] --> ING[Ingest]
-        EF --> ROUTE[Route]
-        EF --> PERSIST[Persist]
-        EF --> STREAM[Stream]
-        ING --> VALIDATE[Validate + Classify]
-        ROUTE --> TOPO[Topology-Aware Routing]
-        PERSIST --> TRAJ[Trajectory Memory]
-        STREAM --> WS
-    end
-
-    subgraph "Observer Runtime"
-        OR[Observer Runtime] --> LIFECYCLE[Create/Activate/Suspend/Destroy]
-        OR --> HEALTH[Entropy/Drift/Budget]
-        OR --> STATE[State Persistence]
-    end
-
-    subgraph "SRRA-OPH Substrate"
-        SRR[srrs_opc/] --> PATCHES[Observer Patches]
-        SRR --> COLLAR[CollarLayer]
-        SRR --> TOPO2[CollarTopologyEngine]
-        SRR --> DRIFT[DriftDetector]
-        SRR --> ENTROPY[EntropyBudgetManager]
-    end
-
-    API --> EF
-    EF --> OR
-    OR --> SRR
-    SRR --> EF
-```
-
-### Level 4: Data + Trading Pipeline
-
-```mermaid
-flowchart LR
-    subgraph "Input"
-        CSV[Downloads/*.csv<br/>29 files M1/M5 2022-2026]
-    end
-
-    subgraph "Processing"
-        PREP[nautilus/step1_prep_data.py<br/>CSV → Parquet]
-        VALID[Data Validation<br/>Schema Check]
-    end
-
-    subgraph "Execution"
-        NT[Nautilus Trader<br/>Backtest Engine]
-        SWEEP[Parameter Sweep<br/>Grid/Random Search]
-    end
-
-    subgraph "Output"
-        REPORTS[nautilus/reports/<br/>Performance Metrics]
-        PROGRESS[progress/<br/>Agent sub-progress files]
-        MEMORY[Working Memory<br/>Auto-synced]
-    end
-
-    CSV --> PREP --> VALID --> NT --> SWEEP --> REPORTS
-    REPORTS --> PROGRESS --> MEMORY
-```
-
-### Level 5: Infrastructure + External Services
-
-```mermaid
-graph TB
-    subgraph "Local Host"
-        WIN[Windows Desktop<br/>BLRRR]
-        OC2[OC2 Gateway<br/>Port 18790]
-        OCE[OCE Backend<br/>Port 8000]
-    end
-
-    subgraph "Cloud Infrastructure"
-        HETZ[Hetzner Cloud<br/>CPX31 Primary]
-        ORACLE[Oracle Cloud<br/>ARM 24GB]
-    end
-
-    subgraph "External APIs"
-        OANDA[Oanda API<br/>Verification Data]
-        TG[Telegram API<br/>@OC2BLRBOT]
-        GH[GitHub API<br/>Source Control]
-        OPENROUTER[OpenRouter<br/>LLM Models]
-    end
-
-    subgraph "Monitoring"
-        WATCHDOG[OC2 Watchdog<br/>60s health checks]
-        CTXMON[Context Monitor<br/>75/90/95% alerts]
-        DOCTOR[OC2 Doctor<br/>6-layer diagnostic]
-    end
-
-    WIN --> OC2
-    WIN --> OCE
-    OC2 --> TG
-    OCE --> OPENROUTER
-    WIN --> HETZ
-    WIN --> ORACLE
-    WATCHDOG --> OC2
-    CTXMON --> OC2
+├── tradovate/                     # NinjaTrader 8 + Tradovate
+│   ├── CEREBUS_ST_NT8.cs         # Symmetry Trap NinjaScript
+│   ├── CEREBUS_P90_NT8.cs        # P90 NinjaScript
+│   ├── CEREBUS_BacktestHarness.cs
+│   ├── CEREBUS_DeployConfig.json
+│   └── CEREBUS_TradeCopier.cs
+├── crypto/                        # Crypto execution
+├── sniper-dashboard/              # Trading dashboard (Next.js)
+│   ├── src/app/                   # App pages
+│   │   ├── page.tsx              # Overview
+│   │   ├── strategies/page.tsx
+│   │   ├── trades/page.tsx
+│   │   ├── backtests/page.tsx
+│   │   └── health/page.tsx
+│   └── api/                       # FastAPI backend (port 8090)
+├── experiments/                   # R&D experiments
+│   ├── codegraph/                 # Code topology analysis
+│   ├── hybrid/                    # Hybrid experiments
+│   ├── phase11/                   # Phase 11 test results
+│   │   ├── test1/entropy_trace.py
+│   │   ├── test2/continuity_persistence.py
+│   │   └── test3/consensus_tests.py
+│   ├── research/                  # Research notes
+│   │   ├── RA_GAP_ANALYSIS.md
+│   │   └── RESOURCE_INDEX.md
+│   ├── agent-lab/                 # Agent experiments
+│   │   ├── agents/hermes/         # Hermes agent config
+│   │   ├── coordinator/
+│   │   └── shared/
+│   └── turbovec/                  # TurboVec experiments
+├── tests/                         # All tests
+│   ├── test_observer/             # Observer tests
+│   ├── stability/                 # Stability test results
+│   │   ├── chaos_results/
+│   │   └── reports/
+│   └── test_*.py                  # Unit tests
+├── tools/                         # Utility scripts
+│   ├── gateway_watchdog.py        # OC2+Hermes auto-restart
+│   ├── terminal_cleanup.py        # Stale process cleaner
+│   ├── progress-sync.py           # Agent progress sync
+│   ├── obsidian_access.py         # Vault read/write
+│   └── analyze_errors.py          # Error analysis
+├── config/                        # Configuration
+│   ├── REPOS.md                   # Repository registry
+│   └── WORKSPACE_TOOLS_AND_SKILLS.md
+├── skills/                        # Agent skills
+│   ├── vectorbt-expert/
+│   ├── pine-developer/
+│   ├── pine-debugger/
+│   ├── fastapi-python/
+│   └── ...
+├── shared-conversations/          # Team communication
+│   ├── team-chat.md               # Main team chat
+│   ├── team-chat-archive-*.md     # Archived chats
+│   └── prompts/                   # Agent prompts
+├── progress/                      # Agent progress tracking
+│   ├── BUILD-NOTES.md
+│   ├── TEAM-NOTES.md
+│   ├── phase-11-status.md
+│   ├── assistant-progress.md
+│   ├── assistant-memory.md
+│   └── *-progress.md              # Per-agent progress
+├── logs/                          # System logs
+├── data/                          # Data files
+│   └── observer/                  # Observer data
+│       ├── ontology/              # Ontology definitions
+│       └── notes/                 # Obsidian notes
+├── archive/                       # Archived files
+│   ├── .openclaw-old/             # Old OpenClaw config
+│   ├── shared-old/                # Old shared dir
+│   ├── plans-original/            # Original plans dir
+│   ├── system-arch-original/      # Original system-arch dir
+│   ├── memories-*/                # Original memory dirs
+│   ├── research-*/                # Original research dir
+│   ├── agent-lab-*/               # Original agent-lab dir
+│   ├── tasks-*/                   # Original tasks dir
+│   └── stability-*/               # Original stability dir
+├── .github/                       # GitHub config
+│   ├── skills/                    # GitHub skills
+│   └── workflows/                 # CI/CD workflows
+├── .hermes/                       # Hermes agent config
+│   ├── MEMORY.md
+│   ├── SOUL.md
+│   ├── cron/jobs.json
+│   └── skills/
+├── .openclaw-2/                   # OpenClaw config
+│   ├── openclaw.json
+│   ├── gateway.cmd
+│   └── skills/
+├── .venv/                         # Python virtual environment
+├── .agents/                       # Agent definitions
+├── .claude/                       # Claude config
+├── .cursor/                       # Cursor config
+├── .pytest_cache/                 # Pytest cache
+├── .roo/                          # Roo config
+├── .worktrees/                    # Git worktrees
+├── pyproject.toml                 # Python project config
+├── requirements.txt               # Python dependencies
+├── uv.lock                        # UV lock file
+├── .gitignore                     # Git ignore rules
+├── .env                           # Environment variables
+├── .agent-tags.json               # Agent tags
+├── .chat-sync-counters.json       # Chat sync state
+├── .phase-state.json              # Phase state
+├── .progress-sync-counters.json   # Progress sync state
+├── .python-version                # Python version
+├── .clinerules                    # Claude rules
+├── .memory-sync-daemon.pid        # Memory sync PID
+├── .memory-sync-daemon.status.json
+├── README.md                      # Project readme
+└── MEMORY.md                      # Long-term memory
 ```
 
 ---
 
-## � Phase 00: O2C + OCE Cognitive Filesystem
+## Key Files by Category
 
-> **Status:** ✅ COMPLETE (10/10 components) | **Tests:** 84/84 passing | **Commit:** 383ee40e1
+### Architecture & Design
+| File | Description |
+|------|-------------|
+| `docs/architecture/SYSTEM_ARCHITECTURE.md` | 5-level system architecture |
+| `docs/architecture/V3_COGNITIVE_FIELD.md` | V3 cognitive field theory |
+| `docs/architecture/ALL_MERMAID_GRAPHS.md` | All 40+ Mermaid diagrams |
+| `docs/reference/CODEMAP.md` | This file |
+| `docs/reference/MODULE_GUIDE_SUMMARY.md` | 78 module reference |
+| `docs/reference/API_REFERENCE_SUMMARY.md` | All API endpoints |
 
-```mermaid
-graph TB
-    subgraph "Cognitive Filesystem Layer"
-        VW[Vault Writer<br/>core/obsidian/vault_writer.py]
-        COMP[Compressor<br/>core/obsidian/compressor.py]
-        LNK[Linker<br/>core/obsidian/laxyer.py]
-        TAX[Taxonomy<br/>core/obsidian/taxonomy.py]
-        NS[Note Standard<br/>core/obsidian/note_standard.py]
-    end
+### Agent Configuration
+| File | Description |
+|------|-------------|
+| `docs/meta/AGENTS.md` | Team roster & rules |
+| `docs/meta/CLAUDE.md` | Claude behavioral contract |
+| `docs/meta/PRINCIPLES.md` | Foundational principles |
+| `docs/meta/SOUL.md` | Agent personality |
+| `docs/meta/IDENTITY.md` | Agent identity |
+| `docs/meta/USER.md` | User profile |
+| `docs/meta/SUB_AGENT_RULES.md` | Subagent rules |
+| `.hermes/MEMORY.md` | Hermes memory |
+| `.hermes/SOUL.md` | Hermes personality |
+| `.openclaw-2/openclaw.json` | OC2 config |
 
-    subgraph "Execution + Skills"
-        JOURNAL[Execution Journal<br/>core/execution/journal.py]
-        SKILL_SYS[Skill System<br/>skills/ directory]
-        SKILL_LD[Skill Loader<br/>core/skills/loader.py]
-        LIVE_SYNC[Live Sync<br/>core/obsidian/live_sync.py]
-    end
+### Progress & Status
+| File | Description |
+|------|-------------|
+| `progress/BUILD-NOTES.md` | Build history |
+| `progress/TEAM-NOTES.md` | Team notes |
+| `progress/phase-11-status.md` | Phase 11 status |
+| `progress/assistant-progress.md` | Assistant progress |
+| `progress/hermes-progress.md` | Hermes progress |
+| `progress/owl-progress.md` | OWL progress |
 
-    subgraph "Vault API"
-        VAPI[Vault API<br/>oce/backend/vault_api.py]
-        VNOTES[/api/vault/notes]
-        VGRAPH[/api/vault/graph]
-        VSTATS[/api/vault/stats]
-        VSYNC[/api/vault/sync]
-        VSEARCH[/api/vault/search]
-        VVALID[/api/vault/validate]
-    end
+### Core Systems
+| File | Description |
+|------|-------------|
+| `core/observer/continuity_memory.py` | Observer continuity |
+| `core/persistent_field/*.py` | O-7 Persistent Field (12 modules) |
+| `core/execution/journal.py` | Execution journal |
+| `core/skills/loader.py` | Skill loader |
+| `core/consensus/*.py` | O-2 Consensus engine |
+| `core/spawn/*.py` | O-3 Spawn engine |
+| `core/learning/*.py` | O-4 Field Learning |
 
-    subgraph "Frontend"
-        VV[VaultViewer.tsx]
-        GV[GraphViz.tsx]
-        VS[vaultStore.ts]
-    end
+### Trading Systems
+| File | Description |
+|------|-------------|
+| `quant-lab/engines/symmetry_trap.py` | Symmetry Trap engine |
+| `quant-lab/engines/p90_engine_dmr.py` | P90 Kinetic engine |
+| `quant-lab/strategies/dmr_strategy.py` | DMR strategy |
+| `tradovate/CEREBUS_ST_NT8.cs` | NT8 Symmetry Trap |
+| `tradovate/CEREBUS_P90_NT8.cs` | NT8 P90 Engine |
+| `sniper-dashboard/` | Trading dashboard |
 
-    subgraph "Storage"
-        VAULT[memory/obsidian-vault/<br/>Markdown Files]
-        OBSIDIAN[Obsidian Vault<br/>Live Sync]
-    end
+### Sniper / CARE
+| File | Description |
+|------|-------------|
+| `quant-lab/sniper/care_engine.py` | CARE engine |
+| `quant-lab/sniper/firm_scanner.py` | Prop firm scanner |
+| `quant-lab/sniper/pes_calculator.py` | PES calculator |
+| `quant-lab/sniper/ff_protocol.py` | F&F protocol |
+| `quant-lab/sniper/ff_matrix.py` | F&F matrix |
+| `quant-lab/sniper/structural_decay_monitor.py` | Decay monitor |
+| `quant-lab/sniper/self_healing_telemetry.py` | Self-healing telemetry |
+| `quant-lab/sniper/risk_litigator.py` | Risk litigator |
 
-    VW --> VAULT
-    COMP --> VAULT
-    LNK --> VAULT
-    TAX --> VAULT
-    NS --> VAULT
-    JOURNAL --> VAULT
-    SKILL_SYS --> SKILL_LD
-    SKILL_LD --> VAULT
-    LIVE_SYNC --> OBSIDIAN
+### Tools & Utilities
+| File | Description |
+|------|-------------|
+| `tools/gateway_watchdog.py` | OC2+Hermes auto-restart |
+| `tools/terminal_cleanup.py` | Stale process cleaner |
+| `tools/progress-sync.py` | Agent progress sync |
+| `tools/obsidian_access.py` | Vault read/write |
+| `tools/analyze_errors.py` | Error analysis |
 
-    VAPI --> VW
-    VAPI --> LNK
-    VAPI --> COMP
-    VAPI --> NS
-    VAPI --> LIVE_SYNC
-
-    VNOTES --> VAPI
-    VGRAPH --> VAPI
-    VSTATS --> VAPI
-    VSYNC --> VAPI
-    VSEARCH --> VAPI
-    VVALID --> VAPI
-
-    VV --> VS
-    GV --> VS
-    VS --> VNOTES
-    VS --> VGRAPH
-```
-
-### Phase 00 Component Map
-
-| # | Component | File | Status | Tests |
-|---|-----------|------|--------|-------|
-| 0A | Vault Writer | `core/obsidian/vault_writer.py` | ✅ | 17/17 |
-| 0B | Compressor | `core/obsidian/compressor.py` | ✅ | 12/12 |
-| 0C | Linker | `core/obsidian/linker.py` | ✅ | 12/12 |
-| 0D | Skill System | `skills/` directory | ✅ | — |
-| 0E | Skill Loader | `core/skills/loader.py` | ✅ | 8/8 |
-| 0F | Execution Journal | `core/execution/journal.py` | ✅ | 8/8 |
-| 0G | Live Sync | `core/obsidian/live_sync.py` | ✅ | — |
-| 0H | Doctrine Taxonomy | `core/obsidian/taxonomy.py` | ✅ | — |
-| 0I | Note Standard | `core/obsidian/note_standard.py` | ✅ | 19/19 |
-| 0J | Skill Evolution | Future phase | ⏳ | — |
-
----
-
-## �🤖 Agent Workflow
-
-```mermaid
-sequenceDiagram
-    participant H as Human
-    participant CC as Claude Code (🔵)
-    participant OC as OpenClaw (🟣)
-    participant HR as Hermes (🟢)
-    participant OC2 as OpenClaw 2 (🟠)
-    participant OCE as OCE Backend
-    participant SRRA as SRRA-OPH
-
-    H->>CC: Set Direction / Review
-    CC->>OC: Task Brief
-    OC->>HR: Execution Plan
-    HR->>SRRA: Run Analysis
-    SRRA->>OCE: Emit Events
-    OCE->>OC2: Stream Updates
-    OC2->>H: Telegram Notification
-    HR->>CC: Progress Update
-    CC->>H: Status Report
-```
-
-```mermaid
-stateDiagram-v2
-    [*] --> TaskReceived
-    TaskReceived --> Planning: OpenClaw
-    Planning --> Implementation: Hermes / OC2
-    Implementation --> Verification: Tests + Backtest
-    Verification --> Review: CC Review
-    Review --> Approved: Quality Gate
-    Review --> Rejected: Fix Required
-    Rejected --> Implementation
-    Approved --> Memory: Sync + Persist
-    Memory --> [*]
-
-    state Planning {
-        [*] --> ParseBrief
-        ParseBrief --> CreatePlan
-        CreatePlan --> EstimateEffort
-        EstimateEffort --> AssignTasks
-    end
-
-    state Implementation {
-        [*] --> ExecuteCode
-        ExecuteCode --> RunTests
-        RunTests --> CollectResults
-        CollectResults --> UpdateProgress
-    }
-
-    state Verification {
-        [*] --> ValidateOutput
-        ValidateOutput --> CrossCheck
-        CrossCheck --> GenerateReport
-    }
-
-    state Memory {
-        [*] --> SyncProgress
-        SyncProgress --> Summarize
-        Summarize --> Archive
-    }
-```
+### Frontend
+| File | Description |
+|------|-------------|
+| `oce/frontend/` | OCE Next.js app (:3000) |
+| `srrs_opc/frontend/` | SRRA-OPH Observatory (:3001) |
+| `sniper-dashboard/` | Trading dashboard (:3001) |
 
 ---
 
-## 💾 Storage Architecture
+## Mermaid Diagram Index
 
-```mermaid
-graph TB
-    subgraph "Hot Storage (Local SSD)"
-        WS[larger-lab workspace]
-        NAUT[nautilus/]
-        DATA[data/]
-        PROG[progress/]
-    end
+All Mermaid diagrams are in `docs/architecture/ALL_MERMAID_GRAPHS.md`. Key diagrams:
 
-    subgraph "Warm Storage (USB)"
-        USBD[USB Drive D:<br/>57.3GB]
-        USBE[USB Drive E:<br/>57.3GB]
-    end
-
-    subgraph "Cold Storage (Cloud)"
-        GH[GitHub<br/>master branch]
-        CLOUD[Cloud Storage<br/>Google Drive/MEGA/pCloud]
-        HETZ[Hetzner Cloud<br/>CPX31]
-    end
-
-    subgraph "Memory System"
-        WM[Working Memory<br/>progress/*-memory.md]
-        PM[Persistent Memory<br/>.openclaw/MEMORY.md]
-        RM[Repo Memory<br/>workspace-state.md]
-        ERR[Error Log<br/>errors-and-solutions.md]
-    end
-
-    WS --> USBD
-    WS --> USBE
-    WS --> GH
-    WS --> CLOUD
-    PROG --> WM
-    WM --> PM
-    PM --> RM
-```
-
----
-
-## 🔧 Key Pipelines
-
-### OCE Event Pipeline
-```
-SRRA-OPH → Event Fabric → Observer Runtime → WebSocket → Frontend
-                ↓                ↓
-           Persist to      State Updates
-           Trajectory      → Telegram
-```
-
-### Agent Coordination Pipeline
-```
-Human → CC → OC → HR/OC2 → Results → Progress Files → Sync → Memory
-```
-
-### Memory Sync Pipeline
-```
-progress files → progress-sync.py → working memory + persistent memory + repo memory
-team-chat.md → chat_sync.py → working memory + repo memory
-errors → errors-and-solutions.md → repo memory (every 7 entries)
-```
+| # | Diagram | Section |
+|---|---------|---------|
+| 1 | Master System Architecture (5-Level) | System Architecture |
+| 2 | Agent Communication Flow | System Architecture |
+| 3 | Full Agent Roster & Relationships | Agent Topology |
+| 4 | Task Lifecycle Flow | Agent Topology |
+| 5 | Observer Core O-1→O-7 Pipeline | Observer Core |
+| 6 | O-1 State Machine | Observer Core |
+| 7 | O-2 Consensus Engine | Observer Core |
+| 8 | O-3 Spawn Engine Lifecycle | Observer Core |
+| 9 | OCE Component Architecture | OCE Frontend |
+| 10 | OCE Data Flow | OCE Frontend |
+| 11 | Cognitive Filesystem Foundation | O2C Pipeline |
+| 12 | Obsidian Cognitive Mesh | O2C Pipeline |
+| 13 | Capital Allocation Flow | CARE Engine |
+| 14 | F&F Fragmentation Matrix | CARE Engine |
+| 15 | Dynamic Risk Gate | Risk Litigator |
+| 16 | PROP vs KELLY Toggle | Risk Litigator |
+| 17 | Asset Integrity Evaluation | Decay Monitor |
+| 18 | Decay State Machine | Decay Monitor |
+| 19 | Execution Feedback Loop | Telemetry |
+| 20 | Venue Switch Logic | Telemetry |
+| 21 | NinjaScript Strategy Pipeline | Tradovate |
+| 22 | Symmetry Trap State Machine | Tradovate |
+| 23 | Gear Shift Detection | Tradovate |
+| 24 | Crypto Atomic Engine Pipeline | Crypto |
+| 25 | Spawn Engine + Context Inheritance | Spawn Engine |
+| 26 | Agent Lifecycle | Spawn Engine |
+| 27 | Observer Consensus + Task Routing | Consensus |
+| 28 | Routing Map | Consensus |
+| 29 | Learning Loop | Field Learning |
+| 30 | O-7 Persistent Field Mode | Persistent Field |
+| 31 | Workspace Directory Structure | Workspace |
+| 32 | Service Ports & Health | Services |
+| 33 | Complete File Inventory | Inventory |
+| 34 | PO-VTuber Integration Architecture | PO × VTuber |
+| 35 | PO Cognitive Pipeline | PO × VTuber |
+| 36 | PO Provider Injection Flow | PO × VTuber |
 
 ---
 
-## 📁 Quick Reference
+## Test Status
 
-| Directory | Purpose |
-|-----------|---------|
-| `srrs_opc/` | SRRA-OPH core (33 Python files, 57 tests) |
-| `nautilus/` | NautilusTrader backtesting |
-| `oce/` | Operator Continuity Engine |
-| `oce/backend/resonance/` | V3 Phase 1 — Resonant Signal Substrate (139 tests) |
-| `oce/backend/reconstruction/` | V3 Phase 2 — Reconstructive Continuity Manifold (52 tests) |
-| `oce/backend/topology/` | V3 Phase 3 — Resonant Topology & BSP Emergence |
-| `oce/backend/sovereign/` | V3 Phase 4 — Sovereign Instrumentation & Embodiment |
-| `oce/backend/temporal/` | V3 Phase 5 — Long-Horizon Continuity & Temporal Compression |
-| `oce/backend/introspection/` | V3 Phase 6 — Recursive Topology Introspection |
-| `oce/backend/multiscale/` | V3 Phase 7 — Multi-Scale Cognitive Fields (70 tests) |
-| `oce/backend/coevolution/` | V3 Phase 8 — Operator Coevolution (76 tests) |
-| `oce/backend/field_core/` | V3 Phase 9 — Sovereign Field Emergence (169 tests) |
-| `oce/backend/phase10/` | V3 Phase 10 — Recursive Field Computation (23 tests) |
-| `oce/backend/recursive_compute/` | Recursive compute graph utilities |
-| `oce/backend/production/` | Production deployment tools |
-| `oce/backend/cognition/` | Cognitive processing engines |
-| `oce/backend/tests/` | System-level tests (11 capability tests) |
-| `progress/` | Agent sub-progress files |
-| `system-arch/` | Architecture documentation + Mermaid diagrams |
-| `all-mermaids/` | Diagram archive by phase |
-| `tools/` | Automation & utilities |
-| `memory/memory-bank/` | Error DB, solutions, patterns |
-| `quant-lab/` | Quantitative research + strategy conversions |
-| `research/` | Research notes + resource index |
-| `skills/` | Workspace-level skills (30+) |
-| `.agents/skills/` | Agent-specific skills (40+) |
-| `.github/skills/` | GitHub skills |
+| Suite | Tests | Status |
+|-------|-------|--------|
+| V3 Phases 1-10 | 1460 | ✅ PASS |
+| PO × VTuber P1-P3 | 61 | ✅ PASS |
+| SRRA-OPH | 57 | ✅ PASS |
+| OCE | 1403 | ✅ PASS |
+| Observer Core O-1→O-7 | All phases | ✅ Complete |
+| Phase 11 Short-Run | 38/38 | ✅ PASS |
+| Phase 11.1-B 72h | PAUSED | ⏳ Awaiting operator |
 
 ---
 
-## 🔄 V3 Phase 1 — Resonant Signal Substrate (RSS)
+## Recent Commits
 
-```mermaid
-graph TB
-    subgraph "Signal Layer"
-        SP[SignalPacket<br/>signal_packet.py]
-        SF[SignalField<br/>signal_packet.py]
-    end
-
-    subgraph "Coherence Layer"
-        CM[CoherenceMetrics<br/>coherence_metrics.py]
-        CE[CoherenceEngine<br/>coherence_metrics.py]
-    end
-
-    subgraph "Field Layer"
-        FSM[FieldStateManager<br/>field_state.py]
-        BM[BoundaryMapper<br/>boundary_mapper.py]
-    end
-
-    subgraph "Resonance Layer"
-        RE[ResonanceEngine<br/>resonance_engine.py]
-        RO[ResonanceOptimizer<br/>resonance_engine.py]
-    end
-
-    subgraph "Pressure Layer"
-        PT[PressureTracker<br/>pressure_tracker.py]
-    end
-
-    SP --> SF
-    SF --> CM
-    CM --> CE
-    CE --> FSM
-    FSM --> BM
-    BM --> RE
-    RE --> RO
-    RO --> PT
-```
-
-### V3 Phase 1 Modules
-
-| Module | File | Tests | Purpose |
-|--------|------|-------|---------|
-| SignalPacket | `oce/backend/resonance/signal_packet.py` | 34 | Signal ontology + resonance scoring |
-| CoherenceMetrics | `oce/backend/resonance/coherence_metrics.py` | 21 | 6 coherence metrics tracking |
-| FieldStateManager | `oce/backend/resonance/field_state.py` | 16 | Field state management |
-| BoundaryMapper | `oce/backend/resonance/boundary_mapper.py` | 20 | Boundary detection + pressure mapping |
-| ResonanceEngine | `oce/backend/resonance/resonance_engine.py` | 20 | Resonance alignment + scoring |
-| PressureTracker | `oce/backend/resonance/pressure_tracker.py` | 10 | Entropy pressure monitoring |
-| RL Integration | `oce/backend/resonance/rlp_integration.py` | 18 | RL ↔ CC bridge |
+| Commit | Description |
+|--------|-------------|
+| `a9e86573` | PO × VTuber Phase 3 gate complete - 61/61 tests passing |
+| `b562f1f1` | Exclude .venv and large dirs in WorkspaceScanner for fast tests |
+| `ca432549b` | Workspace reorganization: consolidate dirs, sync vault, update configs |
+| `a4809d51d` | Previous state |
 
 ---
 
-## ⚠️ ERR-0007: Windows Subprocess Execution Rules
-
-```mermaid
-flowchart LR
-    A[subprocess.run] --> B[CREATE_NO_WINDOW]
-    C[subprocess.Popen] --> D[DETACHED_PROCESS<br/>CREATE_NO_WINDOW<br/>CREATE_NEW_PROCESS_GROUP]
-    E[Daemon Scripts] --> F[PID File Tracking]
-    G[Session Start] --> H[terminal_cleanup.py --force]
-```
-
-**Prevention Rules:**
-- ALL `subprocess.run()` on Windows MUST use `creationflags=subprocess.CREATE_NO_WINDOW`
-- ALL `subprocess.Popen()` for background processes MUST use `DETACHED_PROCESS | CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP`
-- Always implement PID file tracking for daemon scripts
-- Run `tools/terminal_cleanup.py --force` at session start
-
----
-
-## 🔄 V3 Phase 7 — Multi-Scale Cognitive Fields (MSCF)
-
-```mermaid
-graph TB
-    subgraph "Local Scale"
-        LF[LocalObserverField<br/>local_fields.py]
-        LFR[LocalFieldRegistry]
-    end
-
-    subgraph "Regional Scale"
-        RC[RegionalCluster<br/>regional_clusters.py]
-        CR[ClusterRegistry]
-    end
-
-    subgraph "Global Scale"
-        GA[GlobalAttractor<br/>global_attractor.py]
-        GAL[GlobalAttractorLayer]
-    end
-
-    subgraph "Sync Layer"
-        SM[SyncManager<br/>hierarchical_sync.py]
-        SF[SyncFrequency]
-        SR[SyncRecord]
-    end
-
-    subgraph "Repair Layer"
-        NR[NestedRepairSystem<br/>nested_repair.py]
-        RR[RepairRequest]
-        RE[RepairEscalation]
-    end
-
-    subgraph "Routing Layer"
-        SAR[ScaleAdaptiveRouter<br/>scale_routing.py]
-        SL[ScaleLevel]
-        RM[RoutedMessage]
-    end
-
-    subgraph "Containment Layer"
-        ECS[EntropyContainmentSystem<br/>entropy_containment.py]
-        CB[ContainmentBoundary]
-    end
-
-    LF --> LFR
-    RC --> CR
-    GA --> GAL
-    SM --> SF
-    SM --> SR
-    NR --> RR
-    NR --> RE
-    SAR --> SL
-    SAR --> RM
-    ECS --> CB
-
-    LF --> SM
-    RC --> SM
-
----
-
-## 🔄 V3 Phase 8 — Operator Coevolution
-
-```mermaid
-graph TB
-    subgraph "Operator Modeling"
-        OM[OperatorModel<br/>operator_model.py]
-        CM[ConstraintModel<br/>constraint_model.py]
-    end
-
-    subgraph "Adaptation"
-        BA[BidirectionalAdaptation<br/>bidirectional_adaptation.py]
-        CR[CoherenceReinforcement<br/>coherence_reinforcement.py]
-    end
-
-    subgraph "Monitoring"
-        CL[CognitiveLoad<br/>cognitive_load.py]
-        AT[AlignmentTracking<br/>alignment_tracking.py]
-    end
-
-    subgraph "Protection"
-        AM[AntiManipulation<br/>anti_manipulation.py]
-    end
-
-    OM --> BA
-    CM --> BA
-    BA --> CR
-    CR --> AT
-    AT --> CL
-    AM --> OM
-```
-
-### V3 Phase 8 Modules
-
-| Module | File | Tests | Purpose |
-|--------|------|-------|---------|
-| OperatorModel | `oce/backend/coevolution/operator_model.py` | — | Models human operator preferences |
-| ConstraintModel | `oce/backend/coevolution/constraint_model.py` | — | Models system constraints |
-| CoherenceReinforcement | `oce/backend/coevolution/coherence_reinforcement.py` | — | Reinforces coherent behavior |
-| BidirectionalAdaptation | `oce/backend/coevolution/bidirectional_adaptation.py` | — | System ↔ Human adaptation |
-| CognitiveLoad | `oce/backend/coevolution/cognitive_load.py` | — | Monitors operator cognitive load |
-| AlignmentTracking | `oce/backend/coevolution/alignment_tracking.py` | — | Tracks system-operator alignment |
-| AntiManipulation | `oce/backend/coevolution/anti_manipulation.py` | — | Prevents operator manipulation |
-
----
-
-## 🔄 V3 Phase 9 — Sovereign Field Emergence
-
-```mermaid
-graph TB
-    subgraph "Resonance"
-        RE[ResonanceEngine<br/>resonance_engine.py]
-    end
-
-    subgraph "Field Nodes"
-        RFN[RecursiveFieldNodes<br/>recursive_field_nodes.py]
-    end
-
-    subgraph "Attractors"
-        AM[AttractorMapper<br/>attractor_mapper.py]
-    end
-
-    subgraph "Governance"
-        DG[DriftGovernor<br/>drift_governor.py]
-    end
-
-    subgraph "Reconstruction"
-        RC[ReconstructionCore<br/>reconstruction_core.py]
-    end
-
-    subgraph "Identity"
-        CIE[ContinuityIdentityEngine<br/>continuity_identity_engine.py]
-    end
-
-    RE --> RFN
-    RFN --> AM
-    AM --> DG
-    DG --> RC
-    RC --> CIE
-    CIE --> RE
-```
-
-### V3 Phase 9 Modules
-
-| Module | File | Tests | Purpose |
-|--------|------|-------|---------|
-| ResonanceEngine | `oce/backend/field_core/resonance_engine.py` | — | Field-level resonance |
-| RecursiveFieldNodes | `oce/backend/field_core/recursive_field_nodes.py` | — | Recursive field computation |
-| AttractorMapper | `oce/backend/field_core/attractor_mapper.py` | — | Attractor mapping + convergence |
-| DriftGovernor | `oce/backend/field_core/drift_governor.py` | — | Drift governance + correction |
-| ReconstructionCore | `oce/backend/field_core/reconstruction_core.py` | — | Core reconstruction engine |
-| ContinuityIdentityEngine | `oce/backend/field_core/continuity_identity_engine.py` | — | Continuity identity management |
-
----
-
-## 🔄 V3 Phase 10 — Recursive Field Computation
-
-```mermaid
-graph TB
-    subgraph "Compute Graph"
-        RCG[RecursiveComputeGraph<br/>rcg.py]
-        CN[ComputeNode]
-        SR[StabilizationResult]
-    end
-
-    subgraph "Reference System"
-        PRS[PositionalReferenceSystem<br/>prs.py]
-        POS[Position]
-        RF[ReferenceFrame]
-    end
-
-    subgraph "Propagation"
-        RPE[ResonancePropagationEngine<br/>rpe.py]
-        PR[PropagationResult]
-    end
-
-    subgraph "Constraint Topology"
-        DCT[DynamicConstraintTopology<br/>dct.py]
-        CE[ConstraintEdge]
-        TC[TopologyChange]
-    end
-
-    subgraph "Attractor Engine"
-        ACE[AttractorComputeEngine<br/>ace.py]
-        AS[AttractorSolution]
-    end
-
-    RCG --> CN
-    CN --> SR
-    PRS --> POS
-    POS --> RF
-    RPE --> PR
-    DCT --> CE
-    CE --> TC
-    ACE --> AS
-
-    RCG --> PRS
-    PRS --> RPE
-    RPE --> DCT
-    DCT --> ACE
-    ACE --> RCG
-```
-
-### V3 Phase 10 Modules
-
-| Module | File | Tests | Purpose |
-|--------|------|-------|---------|
-| RecursiveComputeGraph | `oce/backend/phase10/rcg.py` | 6 | Recursive compute graph + stabilization |
-| PositionalReferenceSystem | `oce/backend/phase10/prs.py` | 5 | Positional reference system |
-| ResonancePropagationEngine | `oce/backend/phase10/rpe.py` | 4 | Resonance propagation engine |
-| DynamicConstraintTopology | `oce/backend/phase10/dct.py` | 4 | Dynamic constraint topology |
-| AttractorComputeEngine | `oce/backend/phase10/ace.py` | 4 | Attractor compute engine |
-
-### V3 Phase 10 Test Results: 23/23 passed
-- TestRecursiveComputeGraph: 6 tests ✅
-- TestPositionalReferenceSystem: 5 tests ✅
-- TestResonancePropagationEngine: 4 tests ✅
-- TestDynamicConstraintTopology: 4 tests ✅
-- TestAttractorComputeEngine: 4 tests ✅
-
----
-
-## 🔄 V3 — All 10 Phases Complete
-
-```mermaid
-graph LR
-    P1[Phase 1<br/>RSS<br/>7 modules]
-    P2[Phase 2<br/>RCM<br/>6 modules]
-    P3[Phase 3<br/>RT&BSP<br/>7 modules]
-    P4[Phase 4<br/>SIE<br/>8 modules]
-    P5[Phase 5<br/>LHCTC<br/>8 modules]
-    P6[Phase 6<br/>RTI<br/>4 modules]
-    P7[Phase 7<br/>MSCF<br/>7 modules]
-    P8[Phase 8<br/>OC<br/>8 modules]
-    P9[Phase 9<br/>SFE<br/>6 modules]
-    P10[Phase 10<br/>RFC<br/>5 modules]
-    P11[Phase 11<br/>OV<br/>11 components]
-
-    P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7 --> P8 --> P9 --> P10 --> P11
-
-    style P1 fill:#3498db,color:#fff
-    style P2 fill:#2ecc71,color:#fff
-    style P3 fill:#9b59b6,color:#fff
-    style P4 fill:#e74c3c,color:#fff
-    style P5 fill:#f39c12,color:#fff
-    style P6 fill:#1abc9c,color:#fff
-    style P7 fill:#34495e,color:#fff
-    style P8 fill:#e67e22,color:#fff
-    style P9 fill:#2c3e50,color:#fff
-    style P10 fill:#8e44ad,color:#fff
-```
-
-**Total: 67 V3 modules across 10 phases + 11 Phase 11 components, 1403 tests passing**
-
----
-
-## 🔄 Observer Core Phases (O-1 through O-7)
-
-```mermaid
-graph LR
-    O1[O-1<br/>Primary Observer<br/>9/9 backend]
-    O2[O-2<br/>Observer Consensus<br/>10/10 backend]
-    O3[O-3<br/>Spawn Engine<br/>10/10 backend]
-    O4[O-4<br/>Field Learning<br/>11/11 backend]
-    O5[O-5<br/>OCE Unified<br/>✅ 12/12 backend, 12/12 frontend]
-    O6[O-6<br/>Local Substrate<br/>✅ 11/11 backend, 8/8 frontend]
-    O7[O-7<br/>Persistent Field<br/>✅ 12/12 backend, 8/8 frontend]
-
-    O1 --> O2 --> O3 --> O4 --> O5 --> O6 --> O7
-
-    style O1 fill:#3498db,color:#fff
-    style O2 fill:#2ecc71,color:#fff
-    style O3 fill:#9b59b6,color:#fff
-    style O4 fill:#e74c3c,color:#fff
-    style O5 fill:#2ecc71,color:#fff
-    style O6 fill:#2ecc71,color:#fff
-    style O7 fill:#2ecc71,color:#fff
-```
-
-### Observer Core O-4 Field Learning Modules
-
-| Module | File | Purpose |
-|--------|------|---------|
-| TraceCollector | `core/learning/trace_collector.py` | Captures operational traces |
-| OperationalReplay | `core/learning/operational_replay.py` | Records/replays orchestration history |
-| WorkflowDistiller | `core/learning/workflow_distiller.py` | Extracts stable patterns from traces |
-| RoutingLearning | `core/learning/routing_learning.py` | Improves future routing decisions |
-| FailureAnalyzer | `core/learning/failure_analyzer.py` | Analyzes orchestration failures |
-| TopologyLearning | `core/learning/topology_learning.py` | Studies topology effects on outcomes |
-| ObserverEvolution | `core/learning/observer_evolution.py` | Observer specialization through history |
-| PatternMemory | `core/learning/pattern_memory.py` | Stores stable knowledge patterns |
-| WorkflowMemory | `core/learning/workflow_memory.py` | Long-horizon workflow continuity |
-| OperationalScoring | `core/learning/operational_scoring.py` | Quantifies orchestration quality |
-| AdaptationEngine | `core/learning/adaptation_engine.py` | Applies controlled adaptations |
-
----
-
-### Observer Core O-7 Persistent Field Modules
-
-| Module | File | Purpose |
-|--------|------|---------|
-| PersistentRuntime | `core/persistent_field/persistent_runtime.py` | Long-running runtime that survives restarts |
-| ObserverPersistence | `core/persistent_field/observer_persistence.py` | Save/restore observer state across sessions |
-| PassiveAwareness | `core/persistent_field/passive_awareness.py` | Low-power monitoring during idle periods |
-| EnvironmentalMonitor | `core/persistent_field/environmental_monitor.py` | Track system resources, network, disk |
-| ContinuityPreserver | `core/persistent_field/continuity_preserver.py` | Maintain operational continuity across restarts |
-| DormantStateManager | `core/persistent_field/dormant_state_manager.py` | Manage idle/dormant/active transitions |
-| AutonomousRepair | `core/persistent_field/autonomous_repair.py` | Self-healing without operator intervention |
-| RuntimeHeartbeat | `core/persistent_field/runtime_heartbeat.py` | Periodic health signals |
-| PersistentScheduler | `core/persistent_field/persistent_scheduler.py` | Schedule long-running tasks (RLock-based) |
-| RecoveryPersistence | `core/persistent_field/recovery_persistence.py` | Preserve continuity during failure |
-| LongHorizonMemory | `core/persistent_field/long_horizon_memory.py` | Multi-week operational memory |
-| OperationalDriftDetector | `core/persistent_field/operational_drift_detect.py` | Detect slow degradation patterns |
-
-**O-7 Frontend Components (8):**
-`components/persistence/` — PersistentFieldView, RuntimeHeartbeatPanel, DormantStateMonitor, ObserverPersistenceView, DriftAnalysisPanel, LongHorizonTimeline, AutonomousRepairView, RecoveryContinuityPanel
-
-**O-7 API Endpoints (13):** `persistent_field_api.py` — /api/persistent/* routes
-
-**Tests:** 35/35 passing
-
----
-
-### V3 Phase 7 Modules
-
-| Module | File | Tests | Purpose |
-|--------|------|-------|---------|
-| LocalObserverField | `oce/backend/multiscale/local_fields.py` | 6 | Independent local cognition with bounded sync |
-| RegionalCluster | `oce/backend/multiscale/regional_clusters.py` | 4 | Self-organizing clusters by interaction density |
-| GlobalAttractor | `oce/backend/multiscale/global_attractor.py` | 4 | Low-frequency strategic stabilization |
-| SyncManager | `oce/backend/multiscale/hierarchical_sync.py` | 2 | Scale-appropriate sync frequency |
-| NestedRepairSystem | `oce/backend/multiscale/nested_repair.py` | 2 | Multi-scale repair escalation |
-| ScaleAdaptiveRouter | `oce/backend/multiscale/scale_routing.py` | 3 | Scale-adaptive information routing |
-| EntropyContainmentSystem | `oce/backend/multiscale/entropy_containment.py` | 3 | Localize instability, prevent cascade |
-
----
-
-## 🔄 V3 Phase 8 — Operator Coevolution ✅ COMPLETE
-
-```mermaid
-graph TB
-    subgraph "Operator Modeling"
-        OM[OperatorModel<br/>operator_model.py]
-        CM[ConstraintModel<br/>constraint_model.py]
-    end
-
-    subgraph "Alignment Layer"
-        CR[CoherenceReinforcement<br/>coherence_reinforcement.py]
-        BA[BidirectionalAdaptation<br/>bidirectional_adaptation.py]
-    end
-
-    subgraph "Optimization Layer"
-        CLO[CognitiveLoadOptimizer<br/>cognitive_load.py]
-        AT[AlignmentTracker<br/>alignment_tracking.py]
-    end
-
-    subgraph "Safety Layer"
-        AMS[AntiManipulationSafeguards<br/>anti_manipulation.py]
-        CP[CoevolutionProtocol<br/>coevolution_protocol.py]
-    end
-
-    OM --> CM
-    CM --> CR
-    CR --> BA
-    BA --> CLO
-    CLO --> AT
-    AT --> AMS
-    AMS --> CP
-```
-
-### V3 Phase 8 Modules (Complete)
-
-| Module | File | Purpose | Tests |
-|--------|------|---------|-------|
-| OperatorModel | `oce/backend/coevolution/operator_model.py` | Operator Pattern Extraction | 9 |
-| ConstraintModel | `oce/backend/coevolution/constraint_model.py` | Strategic Constraint Modeling | 8 |
-| CoherenceReinforcement | `oce/backend/coevolution/coherence_reinforcement.py` | Coherence Reinforcement | 7 |
-| BidirectionalAdaptation | `oce/backend/coevolution/bidirectional_adaptation.py` | Bidirectional Adaptation | 6 |
-| CognitiveLoadOptimizer | `oce/backend/coevolution/cognitive_load.py` | Cognitive Load Optimization | 6 |
-| AlignmentTracker | `oce/backend/coevolution/alignment_tracking.py` | Long-Horizon Alignment Tracking | 10 |
-| AntiManipulationSafeguards | `oce/backend/coevolution/anti_manipulation.py` | Anti-Manipulation Safeguards | 10 |
-| CoevolutionProtocol | `oce/backend/coevolution_protocol.py` | Multi-Agent Coevolution Protocol | 14 |
-| **Total** | | | **76 tests** |
-
----
-
-## ✅ V3 Phase 9 — Sovereign Field Emergence Complete
-
-```mermaid
-graph TB
-    subgraph "Field Core"
-        RE[ResonanceEngine<br/>resonance_engine.py]
-        RFN[RecursiveFieldNodes<br/>recursive_field_nodes.py]
-        AM[AttractorMapper<br/>attractor_mapper.py]
-    end
-
-    subgraph "Governance Layer"
-        DG[DriftGovernor<br/>drift_governor.py]
-        RC[ReconstructionCore<br/>reconstruction_core.py]
-        CIE[ContinuityIdentityEngine<br/>continuity_identity_engine.py]
-    end
-
-    RE --> RFN
-    RFN --> AM
-    AM --> DG
-    DG --> RC
-    RC --> CIE
-```
-
-### V3 Phase 9 Modules (Complete)
-
-| Module | File | Purpose | Tests |
-|--------|------|---------|-------|
-| ResonanceEngine | `oce/backend/field_core/resonance_engine.py` | Measures coherence across system | 24 |
-| RecursiveFieldNodes | `oce/backend/field_core/recursive_field_nodes.py` | Field participants with local awareness | 18 |
-| AttractorMapper | `oce/backend/field_core/attractor_mapper.py` | Detects stable recurring configurations | 14 |
-| DriftGovernor | `oce/backend/field_core/drift_governor.py` | Measures divergence, triggers reconstruction | 15 |
-| ReconstructionCore | `oce/backend/field_core/reconstruction_core.py` | Topology-constrained inference | 12 |
-| ContinuityIdentityEngine | `oce/backend/field_core/continuity_identity_engine.py` | Maintains operational continuity | 11 |
-| **Total** | | | **169 tests** |
-
----
-
-## 🧪 V3 Phase 11 — Operational Validation
-
-```mermaid
-graph TB
-    subgraph "Long-Horizon Testing"
-        OST[ObserverStressTest<br/>observer_stress.py]
-        RTM[RuntimeMonitor<br/>runtime_monitor.py]
-        CCS[ContinuityChecksum<br/>continuity_checksum.py]
-    end
-
-    subgraph "Stability Infrastructure"
-        SR[StabilityRunner<br/>stability_runner.py]
-        MI[MemoryIntegrity<br/>memory_integrity.py]
-        CP[ContinuityProbe<br/>continuity_probe.py]
-    end
-
-    subgraph "Drift & Recovery"
-        DT[DriftTracker<br/>drift_tracker.py]
-        RV[RestartValidator<br/>restart_validator.py]
-        EM[EntropyMonitor<br/>entropy_monitor.py]
-    end
-
-    subgraph "Chaos Engine"
-        CE[ChaosEngine<br/>chaos_engine.py]
-        ME[MetricsExporter<br/>metrics_exporter.py]
-    end
-
-    OST --> RTM --> CCS
-    SR --> MI --> CP
-    DT --> RV --> EM
-    CE --> ME
-```
-
-### V3 Phase 11 Test Infrastructure
-
-| Component | File | Purpose | Tests |
-|-----------|------|---------|-------|
-| ObserverStressTest | `tools/testing/long_horizon/observer_stress.py` | 24-72hr observer survival test | 1 |
-| RuntimeMonitor | `tools/testing/long_horizon/runtime_monitor.py` | Runtime metrics collection | 1 |
-| ContinuityChecksum | `tools/testing/long_horizon/continuity_checksum.py` | Continuity state validation | 1 |
-| StabilityRunner | `tools/testing/long_horizon/stability_runner.py` | Main test orchestrator | 1 |
-| MemoryIntegrity | `tools/testing/long_horizon/memory_integrity.py` | Memory poisoning/drift detection | 1 |
-| ContinuityProbe | `tools/testing/long_horizon/continuity_probe.py` | Periodic state probing | 1 |
-| DriftTracker | `tools/testing/long_horizon/drift_tracker.py` | Drift score tracking | 1 |
-| RestartValidator | `tools/testing/long_horizon/restart_validator.py` | Post-restart validation | 1 |
-| EntropyMonitor | `tools/testing/long_horizon/entropy_monitor.py` | System entropy monitoring | 1 |
-| MetricsExporter | `tools/testing/long_horizon/metrics_exporter.py` | Metrics export to JSON | 1 |
-| ChaosEngine | `tools/testing/chaos/chaos_engine.py` | Failure injection testing | 8 |
-| **Total** | | | **16 tests** |
-
----
-
-## 🧪 V3 Phase 11 — Operational Validation (Current Status)
-
-### Test Progress
-
-| Test | Status | Details |
-|------|--------|---------|
-| Chaos Engine Autopilot | ✅ COMPLETE | 4/4 scenarios passed |
-| Continuous Amplified Chaos | 🔄 RUNNING | Cycle 1/12+ completed, amplification 1.0050 |
-
-### Chaos Engine Test Results
-
-| Scenario | Recovery Time | Status |
-|----------|---------------|--------|
-| observer_death | 25.0s | ✅ PASS |
-| event_flood | 115.2s | ✅ PASS |
-| memory_poison | 55.1s | ✅ PASS |
-| full_chaos | 105.1s | ✅ PASS |
-
-### Continuous Test Configuration
-
-- **Duration:** 12 hours continuous
-- **Amplification:** 0.5% per PASS cycle
-- **Cooldown:** 5 minutes between cycles
-- **Tracking:** `tools/testing/chaos/stability/chaos_continuous_results.json`
-- **Trace Log:** `tools/testing/chaos/stability/chaos_continuous_trace.log`
-
-### Test Files
-
-| File | Purpose |
-|------|---------|
-| `chaos_engine.py` | Chaos injection engine (8 failure types) |
-| `chaos_runner.py` | Autopilot script for chaos scenarios |
-| `chaos_continuous_test.py` | Continuous amplified chaos test |
-| `chaos_test_plan.md` | Chaos scenario documentation |
+> **Note:** This CODEMAP is maintained by OWL. For the latest version, check `docs/reference/CODEMAP.md`.
+> For all Mermaid diagrams, see `docs/architecture/ALL_MERMAID_GRAPHS.md`.
