@@ -280,7 +280,9 @@ def create_hermes_agent(chat_id: int):
     """Create a configured Hermes AIAgent for this chat session."""
     from run_agent import AIAgent
 
-    model = os.environ.get("HERMES_MODEL", "openrouter/owl-alpha")
+    # Default to a real OpenRouter model. "openrouter/owl-alpha" is not on
+    # OpenRouter — fall back to "openrouter/auto" which routes to best model.
+    model = os.environ.get("HERMES_MODEL", "openrouter/auto")
     openrouter_key = os.environ.get("OPENROUTER_API_KEY", "")
 
     agent = AIAgent(
@@ -292,17 +294,15 @@ def create_hermes_agent(chat_id: int):
         user_id=str(chat_id),
         chat_id=str(chat_id),
         chat_type="private",
-        max_iterations=50,
+        max_iterations=10,        # Reduced from 50 to avoid hangs
         tool_delay=0.5,
         quiet_mode=True,
         save_trajectories=False,
-        enabled_toolsets=["hermes-cli"],
+        enabled_toolsets=[],       # No tools by default — pure chat, no hangs
         ephemeral_system_prompt=(
             "You are Hermes, a helpful AI assistant. "
-            "You have full access to tools including file operations, shell commands, "
-            "web search, code execution, and more. "
-            "Respond concisely and helpfully. "
-            "The user is interacting via Telegram."
+            "The user is interacting via Telegram, so keep replies short and conversational. "
+            "Avoid Markdown characters like * and _ in your reply — use plain text."
         ),
     )
     return agent
@@ -328,13 +328,44 @@ def run_agent_task(base_url, chat_id, text):
 
         # Run conversation with timeout
         import concurrent.futures
+        response = None
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
             future = executor.submit(agent.run_conversation, messages)
             try:
-                response = future.result(timeout=180)
+                response = future.result(timeout=120)
             except concurrent.futures.TimeoutError:
-                response = "⏱️ Response timed out after 180s. Try a simpler question."
-                log(f"AGENT TIMEOUT: chat={chat_id}")
+                log(f"AGENT TIMEOUT: chat={chat_id} (120s)")
+                response = "⏱️ Response timed out after 120s. Try a simpler question."
+            except Exception as e:
+                import traceback as _tb
+                log(f"AGENT EXCEPTION: chat={chat_id}: {e}\n{_tb.format_exc()[:500]}")
+                response = f"❌ Agent error: {str(e)[:300]}"
+
+        # Normalize response — AIAgent.run_conversation returns a DICT like:
+        #   {"final_response": "...", "last_reasoning": "...", "messages": [...]}
+        # We just want the final text. Also handle None, list, etc.
+        if response is None:
+            log(f"AGENT RETURNED NONE: chat={chat_id}")
+            response = "(no response from agent — try again)"
+        elif isinstance(response, dict):
+            response = response.get("final_response") or response.get("response") or response.get("text") or str(response)
+        elif isinstance(response, list):
+            # Could be list of message dicts — extract last assistant content
+            for msg in reversed(response):
+                if isinstance(msg, dict):
+                    content = msg.get("content", "")
+                    if isinstance(content, list):
+                        for part in content:
+                            if isinstance(part, dict) and part.get("type") == "text":
+                                response = part.get("text", "")
+                                break
+                    elif isinstance(content, str) and content:
+                        response = content
+                        break
+            if not isinstance(response, str):
+                response = str(response)
+        if not isinstance(response, str):
+            response = str(response)
 
         log(f"AGENT DONE: chat={chat_id}, response_len={len(response)}")
 
@@ -346,10 +377,11 @@ def run_agent_task(base_url, chat_id, text):
 
     except Exception as e:
         import traceback as _tb
-        log(f"AGENT ERROR: {e}\n{_tb.format_exc()}")
+        log(f"AGENT TASK ERROR: chat={chat_id}: {e}\n{_tb.format_exc()[:500]}")
         try:
-            send(base_url, chat_id, f"❌ *Error:* `{str(e)[:200]}`")
-        except: pass
+            send(base_url, chat_id, f"❌ Error: `{str(e)[:200]}`")
+        except Exception as se:
+            log(f"Send-on-error also failed: {se}")
 
 # ─── Main Gateway Loop ──────────────────────────────────────────────────────
 
@@ -401,6 +433,21 @@ def main():
                 params={"offset": offset, "limit": 10, "timeout": 30},
                 timeout=35
             )
+
+            # Check for HTTP error before parsing JSON
+            if r.status_code == 409:
+                log("409 Conflict — another getUpdates request is in flight. Exiting to let the other instance handle messages.")
+                # Sleep briefly so we don't immediately restart in a loop
+                time.sleep(5)
+                # Release PID lock and exit cleanly
+                _release_pid_lock()
+                log("Exiting due to 409 conflict. Restart manually if needed.")
+                return
+            if r.status_code != 200:
+                log(f"getUpdates HTTP {r.status_code}: {r.text[:200]}")
+                time.sleep(5)
+                continue
+
             data = r.json()
 
             if not data.get("ok"):
