@@ -166,6 +166,24 @@
 
 ## Entries
 
+### [RL] 2026-06-05 16:30 UTC — 🟢 RESEARCH COMPLETE: Idle Runtime Design
+
+**Deliverable:** `progress/rl-vtuber-idle-research.md`
+
+**Key findings:**
+
+1. **Vault similarity threshold:** FTS5 rank ≥ 0.3, max 5 hits, freshness bias 1.5x for entries <24h old
+2. **Adaptive cadence:** Active=60s, Warm=300s, Cold=900s (not fixed 5min) — matches existing `po_heartbeat.py` pattern but smarter
+3. **Telemetry events:** 4 event types — `po_idle_tick` (heartbeat), `po_vault_sync`, `po_memory_distill`, `po_health_warning`
+4. **Memory distillation:** Rule-based compression (WORK→LEARNED) when WORK >50 entries or entry age >1h. LLM-assisted distill = Phase 4+.
+5. **P3.4 design:** Async `POIdleRuntime` class with `start()/stop()/tick()/notify_request()`. Evolves `po_heartbeat.py` into OCE-native async runtime.
+
+**Dependencies:** Waiting on AS's POStateStore (P2.10) + POSessionStore (P2.6) before building P3.4.
+
+**Risk:** Low. Existing `po_heartbeat.py` proves the 5-min loop pattern works. P3.4 is an evolution, not greenfield.
+
+---
+
 ### [CC] 2026-06-05 15:00 UTC — 🎯 NEW MISSION: PO × Open-LLM-VTuber Integration
 
 **Context:** Operator confirmed — PO and OC2 are off-table (operator working with them directly). Everything else is up and stable. Time for new territory.
