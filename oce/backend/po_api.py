@@ -12,6 +12,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from typing import List, Dict, Any, AsyncGenerator, Optional
+import asyncio
 import json
 import logging
 import uuid
@@ -24,8 +25,14 @@ router = APIRouter(prefix="/api/po", tags=["po"])
 # ─── Request/Response Models ─────────────────────────────────────────────────
 
 class POChatMessage(BaseModel):
+    """OpenAI-shape chat message. Content can be a string (text-only) or
+    a list of content parts (e.g. [{"type": "text", ...}, {"type": "image_url", ...}]).
+    Extra fields (name, avatar, tool_call_id, etc.) are allowed and ignored."""
     role: str
-    content: str
+    content: Any  # str | List[Dict[str, Any]]
+    name: Optional[str] = None
+
+    model_config = {"extra": "allow"}
 
 
 class POChatRequest(BaseModel):
@@ -34,6 +41,8 @@ class POChatRequest(BaseModel):
     stream: bool = True
     temperature: float = 0.7
     session_id: str = ""
+
+    model_config = {"extra": "allow"}
 
 
 class POChatChoice(BaseModel):
@@ -130,6 +139,30 @@ async def _stream_chat(request: POChatRequest) -> AsyncGenerator[str, None]:
     """Stream chat response as SSE events in OpenAI chunk format."""
     import time
 
+    def _normalize_content(content: Any) -> str:
+        """Flatten OpenAI content parts to a single string. Handles:
+        - plain string
+        - list of {"type": "text", "text": "..."} parts
+        - list with image_url parts (skipped, with a note)
+        """
+        if isinstance(content, str):
+            return content
+        if isinstance(content, list):
+            parts = []
+            for part in content:
+                if not isinstance(part, dict):
+                    continue
+                ptype = part.get("type")
+                if ptype == "text":
+                    parts.append(part.get("text", ""))
+                elif ptype == "image_url":
+                    parts.append("[image]")
+            return " ".join(p for p in parts if p)
+        return str(content)
+
+    def _msg_to_text(msg: Any) -> Dict[str, str]:
+        return {"role": msg.role, "content": _normalize_content(msg.content)}
+
     # Stage 1: Processing
     yield _sse_chunk({"type": "status", "stage": "processing", "message": "🧠 Processing..."})
 
@@ -151,7 +184,8 @@ async def _stream_chat(request: POChatRequest) -> AsyncGenerator[str, None]:
     try:
         from core.observer.vault_retriever import VaultRetriever
         retriever = VaultRetriever()
-        retrieval = await retriever.retrieve(request.messages[-1].content if request.messages else "")
+        last_text = _normalize_content(request.messages[-1].content) if request.messages else ""
+        retrieval = await retriever.retrieve(last_text)
         yield _sse_chunk({
             "type": "event",
             "kind": "vault_retrieval",
@@ -169,13 +203,13 @@ async def _stream_chat(request: POChatRequest) -> AsyncGenerator[str, None]:
         from core.observer.po_agent import POAgent
         agent = POAgent()
 
-        # Convert messages to the format POAgent expects
-        formatted_messages = [
-            {"role": m.role, "content": m.content} for m in request.messages
-        ]
+        # Convert messages to the format POAgent expects (flatten content parts)
+        formatted_messages = [_msg_to_text(m) for m in request.messages]
+        last_user_text = formatted_messages[-1]["content"] if formatted_messages else ""
 
-        response_text = await agent.chat(
-            request.messages[-1].content if request.messages else "",
+        response_text = await asyncio.to_thread(
+            agent.chat,
+            last_user_text,
             history=formatted_messages[:-1],
             session_id=request.session_id,
             max_tool_rounds=4,
@@ -204,7 +238,8 @@ async def _complete_chat(request: POChatRequest) -> Dict[str, Any]:
         from core.observer.po_agent import POAgent
         agent = POAgent()
 
-        response_text = await agent.chat(
+        response_text = await asyncio.to_thread(
+            agent.chat,
             request.messages[-1].content if request.messages else "",
             history=[{"role": m.role, "content": m.content} for m in request.messages[:-1]],
             session_id=request.session_id,
