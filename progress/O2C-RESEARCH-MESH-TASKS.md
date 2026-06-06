@@ -160,9 +160,9 @@ L4 API + UI
   - Threshold: 0.6 (configurable)
 - [ ] **RM-PM2-5** Write L3.5 research router (`core/research/agents/router.py`) — 5 tests
   - Routes research tasks to: local LLM (Ollama) / OpenRouter / skip if budget exhausted
-- [ ] **RM-PM2-6** Write L4.7 vault sync engine (`oce/backend/research_api.py` section) — 4 tests
+- [x] **RM-PM2-6** Write L4.7 vault sync engine (`oce/backend/vault_sync.py`) — 2 new API endpoints ✅
   - Reads O2C-VAULT/research/, syncs to graph
-- [ ] **RM-PM2-7** Build OCE frontend pages (after L4 API):
+- [x] **RM-PM2-7** Build OCE frontend pages ✅:
   - `oce/frontend/app/research/page.tsx` — Research Hub
   - `oce/frontend/app/research/graph/page.tsx` — Knowledge Graph
   - `oce/frontend/app/research/doctrine/page.tsx` — Doctrine Library

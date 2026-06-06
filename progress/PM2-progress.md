@@ -56,6 +56,22 @@
 
 **Commit:** `05aad19a` — `[RESEARCH-MESH L1] PM2: Add arXiv client (L1.2) + rate limiter (L1.8) — 15/15 tests passing`
 
+### L4 Components Shipped (2026-06-06)
+| Component | File | Status |
+|-----------|------|--------|
+| L4.7 Vault sync engine | `oce/backend/vault_sync.py` | ✅ |
+| L4 UI Research Hub | `oce/frontend/app/research/page.tsx` | ✅ |
+| L4 UI Knowledge Graph | `oce/frontend/app/research/graph/page.tsx` | ✅ |
+| L4 UI Doctrine Library | `oce/frontend/app/research/doctrine/page.tsx` | ✅ |
+| L4 UI Research Agents | `oce/frontend/app/research/agents/page.tsx` | ✅ |
+| researchStore | `oce/frontend/stores/researchStore.ts` | ✅ |
+| TopNav update | `oce/frontend/components/layout/TopNav.tsx` | ✅ |
+
+**Commit:** `fd8a2fb3` — `[RESEARCH-MESH L4] PM2: Vault sync engine (L4.7) + 4 OCE frontend pages + researchStore`
+
+### PM2 — ALL ASSIGNMENTS COMPLETE ✅
+- L1.2 ✅ | L1.8 ✅ | L2.3 ✅ (OC2 built) | L3.4 ✅ (OC2 built) | L3.5 ✅ (OC2 built) | L4.7 ✅ | L4 UI ✅
+
 ### Previous: PO × VTuber P2.4 + P2.5 + P3.2 COMPLETE
 
 ### Current Assignment (2026-06-06)
