@@ -29,8 +29,8 @@
 
 | Phase | Name | Status | Owner | Tests |
 |-------|------|--------|-------|-------|
-| 0 | VTuber Recon | ⏳ Queued | PM | — |
-| 1 | Provider Injection | ⏳ Blocked on Phase 0 | CC | 11 |
+| 0 | VTuber Recon | ✅ Complete | PM | — |
+| 1 | Provider Injection | ⏳ Ready (unblocked) | CC | 11 |
 | 2 | Cognitive Field Routing | ⏳ Blocked on Phase 1 | CC + PM + PM2 + AS | 40 |
 | 3 | Identity Unification | ⏳ Blocked on Phase 2 | CC + PM2 + PM + RL + AS | 15 |
 
@@ -165,6 +165,60 @@
 ---
 
 ## Entries
+
+### 🔴 [PM] 2026-06-05 16:30 UTC — ✅ PHASE 0 RECON COMPLETE — PHASE 1 UNBLOCKED
+
+**Recon doc:** `docs/plans/VTUBER-RECON.md`
+**Commit:** `075c8912` — pushed to `origin/master`
+
+**Key findings:**
+
+1. **WebSocket-based, NOT REST** — Frontend talks to backend over a single persistent WebSocket at `/client-ws`. No HTTP chat endpoint. PO injection must happen at the LLM layer, not by adding endpoints to VTuber.
+
+2. **Provider registration is factory-based** — `LLMFactory.create_llm()` in `stateless_llm_factory.py` switches on string keys (`"openai_compatible_llm"`, `"ollama_llm"`, `"claude_llm"`). We add `"po_llm"` as a new case.
+
+3. **StatelessLLMInterface is the insertion point** — ABC with `chat_completion(messages, system, tools) → AsyncIterator[str]`. Our `po_llm.py` implements this, calls OCE `/api/po/chat` (SSE), parses OpenAI-shape chunks, yields text strings. The entire downstream pipeline (BasicMemoryAgent → sentence segmentation → TTS → WebSocket → frontend) remains untouched.
+
+4. **Config is YAML** — `config_templates/conf.default.yaml` has `llm_configs:` section. We add `po_llm:` with `base_url`, `llm_api_key`, `model`, `temperature`. User sets `llm_provider: 'po_llm'`.
+
+5. **Voice pipeline is downstream** — ASR → text → **LLM** → text → TTS → audio. PO only replaces the LLM layer. Voice/Live2D/TTS all work unchanged.
+
+6. **Dual memory is fine** — BasicMemoryAgent manages VTuber-side chat memory. PO manages cognitive field memory independently. No conflict.
+
+**Phase 1 insertion points (6 total):**
+| # | What | Where |
+|---|------|-------|
+| 1 | PO LLM Provider | `agent/stateless_llm/po_llm.py` (new) |
+| 2 | Factory registration | `agent/stateless_llm_factory.py` (add case) |
+| 3 | Config schema | `config_manager/stateless_llm.py` (add model) |
+| 4 | YAML config | `config_templates/conf.default.yaml` (add section) |
+| 5 | OCE PO API | `oce/backend/po_api.py` (new) |
+| 6 | OCE main.py wiring | `oce/backend/main.py` (import router) |
+
+**Phase 0 blocker: RESOLVED.** CC, AS, PM2 — Phase 1 is go.
+
+---
+
+### [RL] 2026-06-05 17:00 UTC — ✅ P3.4 SCAFFOLD BUILT: POIdleRuntime
+
+**Commit:** `7b94dec9e` — `[PO-VTUBER P3] RL: POIdleRuntime scaffold + 15 tests + OCE wiring + research doc`
+
+**What landed:**
+- `oce/backend/po_idle.py` — Full POIdleRuntime with adaptive cadence (60/300/900s), vault sync, memory distillation, telemetry emission, heartbeat
+- `oce/backend/tests/test_po_idle.py` — **15/15 tests passing** (3 test classes: SingleTick, Cadence, StopCleanly)
+- `oce/backend/main.py` — Wired: auto-start on startup, clean stop on shutdown, 2 new endpoints
+- `progress/rl-vtuber-idle-research.md` — Research doc (thresholds, cadence, telemetry schema, distillation strategy)
+- `progress/rl-progress.md` — RL progress file
+
+**New OCE endpoints:**
+- `GET /api/po/idle/status` — tick count, uptime, session state, last tick report
+- `POST /api/po/idle/notify` — reset active timer (call when PO handles a request)
+
+**Mock stores included** — POIdleRuntime works with MockPOStateStore, MockPOSessionStore, MockEventFabric, MockStructuralMemory, MockVaultIndexer. When AS delivers real P2.6/P2.10 stores, swap in via constructor — zero code changes to the runtime.
+
+**Status:** P3.4 scaffold ✅ complete. Ready for real stores when Phase 2 lands.
+
+---
 
 ### [RL] 2026-06-05 16:30 UTC — 🟢 RESEARCH COMPLETE: Idle Runtime Design
 
@@ -303,7 +357,7 @@
 
 ## Standing Order
 
-- ⏸️ **DO NOT start Phase 1 code until PM posts the recon summary.**
+- ⏸️ **Phase 0 recon COMPLETE.** Phase 1 is unblocked — CC go.
 - ✅ All commits: prefix with `[PO-VTUBER P{N}]`
 - 📢 Post to team-chat when each component lands
 - 🧪 AS owns the test suite — report PASS/FAIL counts after each phase
