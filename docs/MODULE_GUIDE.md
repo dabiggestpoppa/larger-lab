@@ -458,6 +458,52 @@ RecursiveComputeGraph.add_node()
 
 ---
 
+## PO × VTuber Integration Modules
+
+**Purpose:** Replace VTuber's generic LLM chat loop with PO cognitive field runtime. VTuber becomes an embodiment shell for PO/OCE.
+
+**Directory:** `vtuber_integration/` + `oce/backend/po_*.py`
+
+| Module | Key Classes | Purpose |
+|--------|-------------|---------|
+| po_provider.py | POProvider | StatelessLLMInterface implementation for VTuber |
+| po_api.py | POAPIRouter | FastAPI endpoints for PO chat/stream/status |
+| po_workspace.py | WorkspaceScanner | Scans repo for context (Python files, patterns, TODOs) |
+| po_vault.py | VaultRetriever | Retrieves memory context from obsidian-vault |
+| po_stream.py | ThoughtStreamer | 5-stage cognitive pipeline (processing → scan → retrieve → route → respond) |
+| po_agents.py | AgentCoordinator | Coordinates concurrent agent tasks |
+| po_router.py | ModelRouter | Multi-model routing with context awareness |
+| po_fallback.py | FallbackChain | OpenRouter → Ollama fallback chain |
+| po_interrupt.py | InterruptHandler | Cancel scopes for in-flight generation |
+| po_idle.py | POIdleRuntime | Autonomous idle tick (60/300/900s cadence) |
+| po_session.py | POSessionStore | Session persistence across restarts |
+| po_state.py | POStateStore | Operational state persistence |
+| po_events.py | POEventSchema | Event schema for cognitive pipeline |
+| session_bridge.py | IdentitySessionBridge | VTuber ↔ Telegram identity bridge |
+
+**Data Flow:**
+```
+VTuber WebSocket → POProvider.chat_completion()
+  → OCE /api/po/chat
+    → WorkspaceScanner.scan() → context
+    → VaultRetriever.retrieve() → memory
+    → ModelRouter.route_with_context()
+      → FallbackChain.execute()
+        → Response stream → VTuber
+```
+
+**Integration Points:**
+- → OCE Backend: All PO modules integrate with OCE FastAPI
+- → VTuber: POProvider implements StatelessLLMInterface
+- → Observer Core: Uses same patterns as O-1 through O-7
+
+**Key Design Decisions:**
+- Zero frontend changes — PO emulates OpenAI streaming format
+- Workspace scan excludes .venv, __pycache__, .git for performance
+- Identity bridge enables cross-interface continuity
+
+---
+
 ## Cross-Phase Integration Map
 
 ```
@@ -482,3 +528,49 @@ Phase 9 (Field Core) ←→ Phase 10 (Recursive Compute)
 ---
 
 *Last updated: 2026-05-18 | 67 modules | 1460 tests*
+
+---
+
+## PO × VTuber Integration Modules
+
+**Purpose:** Replace VTuber's generic LLM chat loop with PO cognitive field runtime. VTuber becomes an embodiment shell for PO/OCE.
+
+**Directory:** tuber_integration/ + oce/backend/po_*.py
+
+| Module | Key Classes | Purpose |
+|--------|-------------|---------|
+| po_provider.py | POProvider | StatelessLLMInterface implementation for VTuber |
+| po_api.py | POAPIRouter | FastAPI endpoints for PO chat/stream/status |
+| po_workspace.py | WorkspaceScanner | Scans repo for context (Python files, patterns, TODOs) |
+| po_vault.py | VaultRetriever | Retrieves memory context from obsidian-vault |
+| po_stream.py | ThoughtStreamer | 5-stage cognitive pipeline (processing → scan → retrieve → route → respond) |
+| po_agents.py | AgentCoordinator | Coordinates concurrent agent tasks |
+| po_router.py | ModelRouter | Multi-model routing with context awareness |
+| po_fallback.py | FallbackChain | OpenRouter → Ollama fallback chain |
+| po_interrupt.py | InterruptHandler | Cancel scopes for in-flight generation |
+| po_idle.py | POIdleRuntime | Autonomous idle tick (60/300/900s cadence) |
+| po_session.py | POSessionStore | Session persistence across restarts |
+| po_state.py | POStateStore | Operational state persistence |
+| po_events.py | POEventSchema | Event schema for cognitive pipeline |
+| session_bridge.py | IdentitySessionBridge | VTuber ↔ Telegram identity bridge |
+
+**Data Flow:**
+`
+VTuber WebSocket → POProvider.chat_completion()
+  → OCE /api/po/chat
+    → WorkspaceScanner.scan() → context
+    → VaultRetriever.retrieve() → memory
+    → ModelRouter.route_with_context()
+      → FallbackChain.execute()
+        → Response stream → VTuber
+`
+
+**Integration Points:**
+- → OCE Backend: All PO modules integrate with OCE FastAPI
+- → VTuber: POProvider implements StatelessLLMInterface
+- → Observer Core: Uses same patterns as O-1 through O-7
+
+**Key Design Decisions:**
+- Zero frontend changes — PO emulates OpenAI streaming format
+- Workspace scan excludes .venv, __pycache__, .git for performance
+- Identity bridge enables cross-interface continuity

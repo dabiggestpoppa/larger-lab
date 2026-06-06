@@ -241,6 +241,50 @@ Response:
 
 ---
 
+## PO × VTuber API
+
+### PO Chat Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/po/chat` | PO chat with workspace context |
+| GET | `/api/po/status` | PO status and health |
+| GET | `/api/po/stream` | SSE streaming endpoint |
+| GET | `/api/po/context` | Workspace + vault context summary |
+| POST | `/api/po/commands` | Command dispatch |
+
+**POST /api/po/chat**
+```json
+{
+  "messages": [{"role": "user", "content": "string"}],
+  "session_id": "optional-session-id",
+  "stream": false
+}
+```
+Response:
+```json
+{
+  "response": "string",
+  "session_id": "string",
+  "stages": ["processing", "scan", "retrieve", "route", "respond"]
+}
+```
+
+### PO Idle Runtime
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/po/idle/status` | Tick count, uptime, session state |
+| POST | `/api/po/idle/notify` | Reset active timer |
+
+### PO Fallback Chain
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/po/fallback/status` | Provider status and errors |
+
+---
+
 ## SRRA-OPH API
 
 ### Core Classes
