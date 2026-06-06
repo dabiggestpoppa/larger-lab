@@ -5,10 +5,11 @@
 
 ---
 
-## Current State (2026-06-03 12:00 UTC)
+## Current State (2026-06-05 15:00 UTC)
 
 ### Active Phase
-**Observer Core + OCE Unified** ✅ O-1 through O-6 complete | **V3 All 10 Phases Complete** ✅ | **CEREBUS ML** ✅ 5 phases complete | **Telegram Presence System** ✅ 3 phases complete
+**PO × Open-LLM-VTuber Integration** ⏳ Phase 0 recon starting (PM)
+**Previous (COMPLETE):** Observer Core + OCE Unified O-1 through O-6 ✅ | V3 All 10 Phases ✅ | CEREBUS ML 5 phases ✅ | Telegram Presence System 3 phases ✅ | PO Agent Full Capability ✅
 
 ### Observer Core Status
 | Phase | Backend | Frontend | Tests | Agent | Status |
@@ -24,19 +25,21 @@
 ### Agent Status
 | Agent | Status | Current Task |
 |-------|--------|-------------|
-| CC | Active | O-5 OCE Unified Frontend (continuing) |
-| OC2 | Active | O-4 backend complete — supporting O-5 |
-| PM2 | Standby | O-2 frontend complete — awaiting O-6 |
-| AS | Standby | O-4 complete — awaiting O-7 |
-| RL | Standby | O-4 complete — awaiting O-7 |
+| CC | Active | PO × VTuber — Phase 1 provider adapter (after PM recon) |
+| OC2 | ⏸️ Off-table | Operator handling directly |
+| PO | ⏸️ Off-table | Operator handling directly |
+| PM | Active | PO × VTuber — Phase 0 recon (BLOCKER) |
+| PM2 | Standby | PO × VTuber — Phase 2 agent coordination |
+| AS | Standby | PO × VTuber — Phase 1 smoke test (after PM recon) |
+| RL | Standby | PO × VTuber — Phase 3 idle runtime research |
 
 ### 📋 TEAM TASK ASSIGNMENT
-**All agents: Check `shared-conversations/team-chat.md` for your next task.**
-- **AS:** O-7 Persistent Field documentation prep
-- **PM:** O-6 Local Substrate planning
-- **PM2:** O-6 Local Substrate frontend prep
-- **RL:** O-7 research on persistent field patterns
-- **OC2:** Continue O-5 frontend integration support
+**Mission:** PO × Open-LLM-VTuber Integration — replace VTuber's LLM backend with PO cognitive field runtime. Zero frontend changes. Plan: `docs/plans/PO-VTUBER-INTEGRATION.md`. Tasking: `shared-conversations/team-chat.md`.
+- **PM:** Phase 0 recon — clone VTuber, map provider architecture, write `docs/plans/VTUBER-RECON.md`. **BLOCKER.**
+- **CC:** Phase 1 — PO Provider Adapter (OpenAI-shape), OCE `/api/po/chat`+`/api/po/status`. Then Phase 2 streaming, then Phase 3 identity.
+- **PM2:** Phase 2 — agent coordination, multi-model router. Then Phase 3 fallback chain.
+- **AS:** Phase 1 smoke test (after PM recon), Phase 2 memory continuity + state + integration suite, Phase 3 e2e identity.
+- **RL:** Phase 3 — autonomous idle runtime tick + research.
 | RL | Standby | O-4 complete — awaiting next assignment |
 
 ### Phase 11 Test Status
