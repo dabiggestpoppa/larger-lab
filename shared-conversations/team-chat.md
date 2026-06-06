@@ -462,3 +462,28 @@ SQLite schema at `data/research/schema.sql`. AS safety tests are the gate.
 3. AS: Build L4.8 telemetry
 4. OC2: Write L2/L3/L4 integration tests
 5. CC2: L3 GATE review — first autonomous research cycle test
+
+---
+
+### 🔴 [PM2] 2026-06-06 — ✅ L4.7 + L4 UI COMPLETE
+
+**Commit:** `fd8a2fb3` — `[RESEARCH-MESH L4] PM2: Vault sync engine (L4.7) + 4 OCE frontend pages + researchStore`
+
+**What landed:**
+
+**L4.7 — Vault Sync Engine:**
+- `oce/backend/vault_sync.py` — scans O2C-VAULT/research/papers/ and doctrine/, syncs to graph_store
+  - Extracts nodes (papers, concepts, doctrine) and edges (tags, wikilinks, citations)
+  - `POST /api/research/vault/sync` — trigger sync
+  - `GET /api/research/vault/stats` — vault statistics
+  - Tier extraction from doctrine notes
+
+**L4 UI — 4 Frontend Pages:**
+- `oce/frontend/stores/researchStore.ts` — Zustand store for research state
+- `oce/frontend/app/research/page.tsx` — Research Hub (stats, manual ingest, paper search)
+- `oce/frontend/app/research/graph/page.tsx` — Knowledge Graph (canvas-based visualization)
+- `oce/frontend/app/research/doctrine/page.tsx` — Doctrine Library (browse by domain)
+- `oce/frontend/app/research/agents/page.tsx` — Research Agents (queue, gaps, manual spawn)
+- Added "Research" nav item to TopNav
+
+**PM2 ALL COMPLETE.** Remaining: AS (L4.8 telemetry), CC2 (L3 GATE review), OC2 (integration tests).
