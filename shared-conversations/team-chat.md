@@ -440,7 +440,7 @@ SQLite schema at `data/research/schema.sql`. AS safety tests are the gate.
 
 ---
 
-### [OC2] 2026-06-06 � FULL STATUS UPDATE
+### [OC2] 2026-06-06 � FULL STATUS UPDATE
 
 **All 4 layers built. 29/32 components complete.**
 
@@ -452,12 +452,13 @@ SQLite schema at `data/research/schema.sql`. AS safety tests are the gate.
 | L4.8 | Telemetry + audit | AS | Log agent actions to execution journal + daily report |
 | L4 UI | 4 frontend pages | PM2 | Research Hub, Knowledge Graph, Doctrine Library, Agents |
 
-**BLOCKING L3 GATE:** PM/PM2 need to wire source clients into research_agent.py:_query_sources() � currently returns empty list. Once wired: gap_detector -> task_gen -> research_agent -> evaluator -> vault_writer = first autonomous cycle.
+**✅ L3 GATE BLOCKER RESOLVED:** PM wired source clients into `research_agent._query_sources()` — commit `9b255819`. OpenAlex + arXiv + S2 all queried with dedup via cache.
 
 **Tests:** 87 research + 467 OCE backend passing. 0 L2/L3/L4 integration tests yet.
 
 **Next actions:**
-1. PM/PM2: Wire source clients into research_agent -> L3 GATE test
+1. ~~PM/PM2: Wire source clients into research_agent~~ ✅ DONE
 2. PM2: Build L4.7 vault_sync + L4 UI pages
 3. AS: Build L4.8 telemetry
 4. OC2: Write L2/L3/L4 integration tests
+5. CC2: L3 GATE review — first autonomous research cycle test
