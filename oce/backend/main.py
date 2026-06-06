@@ -1325,6 +1325,10 @@ register_vault_endpoints(app)
 # Register CEREBUS ML API endpoints
 register_ml_endpoints(app)
 
+# Register O2C × MAD LABS Research Mesh endpoints
+from .research_api import register_research_endpoints
+register_research_endpoints(app)
+
 # Register PO API endpoints (PO × VTuber integration)
 app.include_router(po_router)
 

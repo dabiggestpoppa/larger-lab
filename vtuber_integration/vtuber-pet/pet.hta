@@ -1,0 +1,140 @@
+<html>
+<head>
+<title>VTuber Pet</title>
+<HTA:APPLICATION 
+  id="VTuberPet"
+  applicationName="VTuberPet"
+  border="none"
+  caption="no"
+  contextMenu="no"
+  maximizeButton="no"
+  minimizeButton="no"
+  navigable="yes"
+  scroll="no"
+  showInTaskbar="no"
+  singleInstance="yes"
+  sysMenu="no"
+  windowState="normal"
+/>
+<style>
+  * { margin: 0; padding: 0; }
+  body {
+    background: transparent;
+    overflow: hidden;
+    cursor: default;
+  }
+  iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border: none;
+    background: transparent;
+  }
+  #dragbar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 20px;
+    background: rgba(0,0,0,0.01);
+    cursor: move;
+    z-index: 100;
+  }
+  #controls {
+    position: absolute;
+    top: 2px; right: 2px;
+    z-index: 200;
+  }
+  #controls button {
+    background: rgba(0,0,0,0.3);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 12px;
+    width: 22px; height: 22px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: 2px;
+  }
+  #controls button:hover {
+    background: rgba(0,0,0,0.6);
+  }
+  #status {
+    position: absolute;
+    bottom: 5px; left: 5px;
+    color: rgba(255,255,255,0.5);
+    font: 10px sans-serif;
+    z-index: 200;
+  }
+</style>
+<script>
+var isVisible = true;
+var isDragging = false;
+var dragOffsetX, dragOffsetY;
+
+function init() {
+  // Set window size and position
+  var w = 320, h = 480;
+  var x = (screen.width - w) / 2;
+  var y = (screen.height - h) / 2 - 100;
+  
+  window.resizeTo(w, h);
+  window.moveTo(x, y);
+  
+  // Load VTuber
+  document.getElementById('vtuberFrame').src = 'http://localhost:12393/';
+  
+  // Make always on top
+  setInterval(function() {
+    try { window.top.window.moveTo(window.screenLeft, window.screenTop); } catch(e){}
+  }, 1000);
+}
+
+function toggleVisible() {
+  isVisible = !isVisible;
+  document.getElementById('vtuberFrame').style.display = isVisible ? 'block' : 'none';
+  document.getElementById('status').innerText = isVisible ? 'VISIBLE' : 'HIDDEN';
+}
+
+function closePet() {
+  window.close();
+}
+
+function startDrag(e) {
+  isDragging = true;
+  dragOffsetX = e.clientX;
+  dragOffsetY = e.clientY;
+}
+
+function doDrag(e) {
+  if (isDragging) {
+    var dx = e.clientX - dragOffsetX;
+    var dy = e.clientY - dragOffsetY;
+    window.moveBy(dx, dy);
+    dragOffsetX = e.clientX;
+    dragOffsetY = e.clientY;
+  }
+}
+
+function endDrag() {
+  isDragging = false;
+}
+
+// Keyboard shortcuts
+document.onkeydown = function(e) {
+  if (e.altKey && e.key === 'v') { toggleVisible(); }
+  if (e.altKey && e.key === 'q') { closePet(); }
+};
+</script>
+</head>
+<body onload="init()">
+  <div id="dragbar" 
+       onmousedown="startDrag(event)" 
+       onmousemove="doDrag(event)" 
+       onmouseup="endDrag()">
+  </div>
+  <div id="controls">
+    <button onclick="toggleVisible()" title="Toggle Visibility (Alt+V)">◑</button>
+    <button onclick="closePet()" title="Close (Alt+Q)">✕</button>
+  </div>
+  <iframe id="vtuberFrame" allowtransparency="true"></iframe>
+  <div id="status">LOADING...</div>
+</body>
+</html>
