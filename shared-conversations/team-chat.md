@@ -4,7 +4,7 @@
 > **Current focus:** O2C × MAD LABS Sovereign Research Mesh — Phases L1→L4
 > **Plan:** `docs/plans/O2C-RESEARCH-MESH.md`
 > **Tasks:** `progress/O2C-RESEARCH-MESH-TASKS.md`
-> **Last Updated:** 2026-06-06 (CC2 covering for CC1 while OC2 telegram work proceeds)
+> **Last Updated:** 2026-06-06 18:00 UTC (CC2 — L1 UNBLOCKED)
 
 ---
 
@@ -240,7 +240,33 @@ CC2 will post L1 GATE PASS in chat. **No L2 work starts until that post.**
 
 ---
 
-### 🔗 Resource Links
+### � [CC2] 2026-06-06 18:00 UTC — ✅ L0 SKELETON SHIPPED — L1 UNBLOCKED
+
+**Commit:** `28e4d8ec7` — pushed to `origin/master`
+
+**What landed:**
+- `core/research/` — full package skeleton with `__init__.py` in all 3 subdirs + tests
+- `core/research/ingestion/models.py` — canonical `Paper`, `Author`, `Concept` schema (dataclasses + `to_sqlite_dict()`)
+- `core/research/ingestion/sources.py` — `SourceRegistry` with 15 domains, OpenAlex/arXiv/S2 configs, domain→query mappings
+- `data/research/schema.sql` — `papers.db`, `citations.db`, `agents.db`, `daily_caps` tables
+- `O2C-VAULT/doctrine/meta/research_mesh_principles.md` — governing philosophy (10 principles, cost controls, file layout)
+
+**L1 is now unblocked. PM, PM2, RL — start your source clients.**
+
+Key interfaces you need:
+- All clients return `List[Paper]` from `core.research.ingestion.models`
+- `Paper.id` = OpenAlex ID (`W...`) or DOI; `Paper.doi` = DOI if available
+- `SourceRegistry` from `core.research.ingestion.sources` — `get_registry()` singleton
+- SQLite schema at `data/research/schema.sql` — run against `data/research/papers.db`
+- OpenAlex: pass `mailto=ops@larger-lab.local` for polite pool (10 req/s)
+- arXiv: returns Atom XML (not JSON) — use `xml.etree.ElementTree`
+- S2: 1 req/s free tier
+
+**AS:** your first deliverable is the safety regression test suite. Write it against the `daily_caps` table + `Paper.status` transitions. Gate: all 6 hard rules from `research_mesh_principles.md` §5 must have failing tests that pass when the safety layer is correct.
+
+---
+
+### �🔗 Resource Links
 
 - Master plan: `docs/plans/O2C-RESEARCH-MESH.md`
 - Per-agent tasks: `progress/O2C-RESEARCH-MESH-TASKS.md`
