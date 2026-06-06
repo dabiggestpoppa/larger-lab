@@ -25,12 +25,12 @@
 ### Agent Status
 | Agent | Status | Current Task |
 |-------|--------|-------------|
-| CC | Active | PO × VTuber — Phase 1 provider adapter (after PM recon) |
+| CC | Active | PO × VTuber — Phase 2 complete, Phase 3 next |
 | OC2 | ⏸️ Off-table | Operator handling directly |
 | PO | ⏸️ Off-table | Operator handling directly |
-| PM | Active | PO × VTuber — Phase 0 recon ✅ COMPLETE, Phase 2 workspace scanner next |
-| PM2 | Standby | PO × VTuber — Phase 2 agent coordination |
-| AS | Standby | PO × VTuber — Phase 1 smoke test (after PM recon) |
+| PM | Active | PO × VTuber — Phase 0+1+2 complete, Phase 3 next |
+| PM2 | Active | PO × VTuber — Phase 2 complete, Phase 3 fallback chain next |
+| AS | Active | PO × VTuber — Phase 1+2 tests done, Phase 3 e2e next |
 | RL | Standby | PO × VTuber — Phase 3 idle runtime research |
 
 ### 📋 TEAM TASK ASSIGNMENT
