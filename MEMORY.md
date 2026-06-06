@@ -680,3 +680,34 @@ _Last updated: 2026-06-05 02:53 EDT — Group combinatorics complete, plug & pla
 - **HARD RULE:** Never use get_positions() to find a position you just entered. Use the order result ticket directly.
 
 _Last updated: 2026-06-05 03:27 EDT — Low Cost Hex deployed, active trades fix v4.3_
+
+---
+
+## 🔴 ST EXECUTOR DECOMMISSIONED (2026-06-05 23:30 EDT)
+
+- Removed `symmetry_trap_executor.py` from guardian `PROCESSES` dict — bridge is now SOLE executor
+- Process was already dead; zombie configs could have respawned it with wrong pair/magic
+- Rogue trades from old executor: CHFJPY.BUY (+$0.51), EURUSD.SELL (+$1.02), EURUSD.BUY (-$1.08)
+- All old signal files archived to `quant-lab/mt5/archive/`
+- Debug artifacts removed: engine_diff.txt, hook_test_msg.txt, hook_test_output.txt
+- Guardian commit: `ac3aed8` + cleanup commit: `8a45899d`
+
+### Demo Setup Plan (MAD 2026-06-05 16:04 EDT)
+
+**Goal:** Run Profit Quad on demo alongside live — separate processes, separate logs, no shared state.
+
+**What to do (config only, no new code):**
+1. Create `mt5/demo_deploy_config.py` — copy of `deploy_config.py` with demo symbol suffixes (`.demo`)
+2. Create `mt5/demo_account.json` — demo account login/server/password
+3. Copy `cerebus_live_bridge.py` → `demo_bridge.py` — set `DEMO_MODE = True`, load demo config
+4. Log separation: live uses `live_logs/`, demo uses `demo_logs/` (already exists)
+5. Guardian: add `demo_bridge` as separate monitored process with its own args
+6. Profit Quad demo config: BTCUSD + ETHUSD + 2 FX pairs (EURNZD, GBPNZD for continuity)
+
+**Key rules:**
+- Demo and live run as SEPARATE Python processes — no overlap
+- Separate signal files, separate trackers, separate logs
+- Guardian monitors both independently
+- No changes to engine code — config only
+
+_Last updated: 2026-06-05 23:30 EDT — Executor decommissioned + demo plan documented_
