@@ -518,8 +518,8 @@ async def record_rate_limit(request: dict):
             model=request.get("model", "unknown"),
             status_code=request.get("status_code", 200),
             error_type=request.get("error_type", ""),
-            cost_usd=request.get("cost_usd", 0.0),
-            tokens_used=request.get("tokens_used", 0),
+            cost=request.get("cost_usd", 0.0),
+            tokens=request.get("tokens_used", 0),
         )
         return {"ok": True}
     except Exception as e:

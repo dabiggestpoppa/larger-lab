@@ -11,7 +11,7 @@ These endpoints are consumed by the POProvider adapter in vtuber_integration/po_
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from typing import List, Dict, Any, AsyncGenerator, Optional, Optional
+from typing import List, Dict, Any, AsyncGenerator, Optional
 import json
 import logging
 import uuid
@@ -64,36 +64,6 @@ class POStatusResponse(BaseModel):
     streaming_supported: bool = True
     active_sessions: int = 0
     uptime_seconds: float = 0.0
-
-
-class POContextRequest(BaseModel):
-    session_id: str = ""
-    include_workspace: bool = True
-    include_vault: bool = True
-    include_memory: bool = True
-    max_tokens: int = 2000
-
-
-class POContextResponse(BaseModel):
-    session_id: str
-    workspace: Dict[str, Any] = {}
-    vault: Dict[str, Any] = {}
-    memory: Dict[str, Any] = {}
-    combined_context: str = ""
-    sources: List[str] = []
-
-
-class POCommandRequest(BaseModel):
-    command: str  # "interrupt", "cancel", "reset", "status"
-    session_id: str = ""
-    params: Dict[str, Any] = {}
-
-
-class POCommandResponse(BaseModel):
-    ok: bool
-    command: str
-    result: Any = None
-    error: Optional[str] = None
 
 
 class POContextRequest(BaseModel):

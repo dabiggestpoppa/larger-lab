@@ -38,19 +38,35 @@ from oce.backend.rate_limit_tracker import record_api_call, get_rate_limit_track
 # --- PID File Lock ---
 _PID_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".telegram_gateway.pid")
 
+def _is_process_alive(pid):
+    """Cross-platform process existence check."""
+    if pid == os.getpid():
+        return True
+    if sys.platform == "win32":
+        import ctypes
+        kernel32 = ctypes.windll.kernel32
+        PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+        handle = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+        if handle:
+            kernel32.CloseHandle(handle)
+            return True
+        return False
+    else:
+        try:
+            os.kill(pid, 0)
+            return True
+        except (OSError, ProcessLookupError):
+            return False
+
 def _acquire_pid_lock():
     pid = os.getpid()
     if os.path.exists(_PID_FILE):
         try:
             with open(_PID_FILE, "r") as f:
                 old_pid = int(f.read().strip())
-            if old_pid != pid:
-                try:
-                    os.kill(old_pid, 0)
-                    log("[FATAL] Another instance already running (PID %d). Exiting." % old_pid)
-                    sys.exit(1)
-                except (OSError, ProcessLookupError):
-                    pass
+            if old_pid != pid and _is_process_alive(old_pid):
+                log("[FATAL] Another instance already running (PID %d). Exiting." % old_pid)
+                sys.exit(1)
         except (ValueError, FileNotFoundError):
             pass
     with open(_PID_FILE, "w") as f:
@@ -243,6 +259,9 @@ def main():
         log("ERROR: TELEGRAM_TOKEN not set")
         return
 
+    # Acquire PID lock FIRST — before any network connections
+    _acquire_pid_lock()
+
     base_url = f"https://api.telegram.org/bot{token}"
     offset = 0
 
@@ -281,7 +300,6 @@ def main():
          "🟢 *PO Agent Online*\n\nFull agent capability active:\n• File read/write/edit\n• Shell commands\n• OCE API calls\n• GitHub operations\n• Python execution\n• Vault search\n• Tool-calling loop\n\nSlash commands still work. Chat messages now use full agent.",
          parse_mode="Markdown")
 
-    _acquire_pid_lock()
     log("Poll loop started. PO is live on Telegram.")
     _heartbeat = time.time()
 
