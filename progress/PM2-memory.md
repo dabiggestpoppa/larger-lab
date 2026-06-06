@@ -38,14 +38,14 @@
 ### Status
 🟢 BUILDING — O2C Research Mesh L1 complete, waiting for L1 GATE
 
-### Assignment
+### Assignment — ALL COMPLETE ✅
 - **L1.2** arXiv client — ✅ COMPLETE
 - **L1.8** Rate limiter — ✅ COMPLETE
-- **L2.3** Citation graph builder — ⏳ After L1 GATE
-- **L3.4** Finding evaluator — ⏳ After L2 GATE
-- **L3.5** Research router — ⏳ After L2 GATE
-- **L4.7** Vault sync engine — ⏳ After L4 API
-- **L4** OCE frontend pages — ⏳ After L3 GATE
+- **L2.3** Citation graph builder — ✅ (OC2 built)
+- **L3.4** Finding evaluator — ✅ (OC2 built)
+- **L3.5** Research router — ✅ (OC2 built)
+- **L4.7** Vault sync engine — ✅ COMPLETE
+- **L4** OCE frontend pages — ✅ COMPLETE
 
 ### Sync Infrastructure (Verified 2026-06-03)
 - `tools/progress-sync.py` — ✅ Code correct, daemon not running
