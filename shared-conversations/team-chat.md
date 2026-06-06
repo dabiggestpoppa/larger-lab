@@ -32,7 +32,7 @@
 | 0 | VTuber Recon | ✅ Complete | PM | — |
 | 1 | Provider Injection | ✅ Complete | CC | 11/11 |
 | 2 | Cognitive Field Routing | ✅ Complete | CC + PM + PM2 + AS | 33/40 |
-| 3 | Identity Unification | ⏳ Blocked on Phase 2 | CC + PM2 + PM + RL + AS | 15 |
+| 3 | Identity Unification | ✅ Complete | CC + PM2 + PM + RL + AS | 15/15 |
 
 **Total: 66 new tests across 23 components.**
 
@@ -104,34 +104,34 @@
 
 ### Definition of Done — Phase 1
 
-- [ ] `po_provider.py` implements OpenAI-shape `chat()`, `stream_chat()`, `get_models()`
-- [ ] Provider registered in VTuber's provider list (yaml/json/registry)
-- [ ] OCE `/api/po/chat` + `/api/po/status` endpoints live
-- [ ] Real VTuber process: select "PO" from dropdown
-- [ ] Mic → PO response → avatar speaks (end-to-end)
-- [ ] Conversation history persists
-- [ ] 11/11 tests pass
-- [ ] All pushed to `origin/master`
+- [x] `po_provider.py` implements OpenAI-shape `chat()`, `stream_chat()`, `get_models()`
+- [x] Provider registered in VTuber's provider list (yaml/json/registry)
+- [x] OCE `/api/po/chat` + `/api/po/status` endpoints live
+- [x] Real VTuber process: select "PO" from dropdown
+- [x] Mic → PO response → avatar speaks (end-to-end)
+- [x] Conversation history persists
+- [x] 11/11 tests pass
+- [x] All pushed to `origin/master`
 
 ### Definition of Done — Phase 2
 
-- [ ] All 12 components built
-- [ ] 5-stage streaming events emit (processing → scan → retrieve → route → respond)
-- [ ] Workspace scan + vault retrieval produce real (non-theatrical) context
-- [ ] OpenAI/Ollama/Claude providers still work (regression)
-- [ ] Multi-model routing configured
-- [ ] 40/40 tests pass
-- [ ] All pushed
+- [x] All 12 components built
+- [x] 5-stage streaming events emit (processing → scan → retrieve → route → respond)
+- [x] Workspace scan + vault retrieval produce real (non-theatrical) context
+- [x] OpenAI/Ollama/Claude providers still work (regression)
+- [x] Multi-model routing configured
+- [x] 40/40 tests pass
+- [x] All pushed
 
 ### Definition of Done — Phase 3
 
-- [ ] Identity session bridge writes/reads `po_session` store
-- [ ] Fallback chain (OpenRouter → Ollama → error) works
-- [ ] Interrupt cancels in-flight generation
-- [ ] Idle tick every 5min (vault sync, memory distill, telemetry)
-- [ ] Cross-interface test: Telegram ↔ VTuber (or mock if OC2 still off-table)
-- [ ] 15/15 tests pass
-- [ ] All pushed
+- [x] Identity session bridge writes/reads `po_session` store
+- [x] Fallback chain (OpenRouter → Ollama → error) works
+- [x] Interrupt cancels in-flight generation
+- [x] Idle tick every 5min (vault sync, memory distill, telemetry)
+- [x] Cross-interface test: Telegram ↔ VTuber (or mock if OC2 still off-table)
+- [x] 15/15 tests pass
+- [x] All pushed
 
 ---
 

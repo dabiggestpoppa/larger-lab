@@ -8,11 +8,24 @@ Phase 1 of PO × Open-LLM-VTuber Integration.
 """
 
 from typing import AsyncIterator, List, Dict, Any
-from loguru import logger
+import logging
 
-from ...open_llm_vtuber.agent.stateless_llm.stateless_llm_interface import (
-    StatelessLLMInterface,
-)
+# Use standard logging instead of loguru for test compatibility
+logger = logging.getLogger("po_provider")
+
+# Import VTuber's StatelessLLMInterface
+# VTuber is cloned at vtuber_integration/Open-LLM-VTuber/src/open_llm_vtuber/
+try:
+    from open_llm_vtuber.agent.stateless_llm.stateless_llm_interface import (
+        StatelessLLMInterface,
+    )
+except ImportError:
+    # Fallback: define minimal interface for testing
+    import abc
+    class StatelessLLMInterface(metaclass=abc.ABCMeta):
+        @abc.abstractmethod
+        async def chat_completion(self, messages, system=None, tools=None):
+            ...
 
 # Fallback if direct import fails (dev/testing)
 try:
