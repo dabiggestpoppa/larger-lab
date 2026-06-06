@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SUMMARIZE PROGRESS — PO Daily Summary Generator
+SUMMARIZE PROGRESS – PO Daily Summary Generator
 ================================================
 Replaces the missing summarize_progress.py that cron was calling.
 Reads: team-chat.md, git log, demo bridge logs, agent states
@@ -187,7 +187,7 @@ def generate_summary(days: int = 7) -> str:
     """Generate full daily summary report."""
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     lines = []
-    lines.append(f"# PO Daily Summary — {now}")
+    lines.append(f"# PO Daily Summary – {now}")
     lines.append("")
 
     # Git
@@ -252,7 +252,7 @@ def generate_summary(days: int = 7) -> str:
         else:
             lines.append(f"- **{entry['date']}**: {'; '.join(entry['lines'][:5])}")
             if entry.get("has_action_items"):
-                lines.append(f"  - 📋 Has action items — see team-chat.md")
+                lines.append(f"  - 📋 Has action items – see team-chat.md")
     lines.append("")
 
     lines.append("---")

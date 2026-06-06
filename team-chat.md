@@ -74,3 +74,65 @@
 - TP_HIT: 8 (actual wins)
 - SL_HIT: 37 (profit-lock exits, NOT losses)
 - KILL_SWITCH: 0
+
+---
+
+# Daily Summary — 2026-06-06 (Sat) — PO Investigation
+
+## 🔍 OC2 Bridge Zero Signals — ROOT CAUSE FOUND
+
+**Problem:** OC2 Demo Bridge connected since ~10:13 EST, scanning 4 symbols (BTCUSD.DEMO, ETHUSD.DEMO, EURNZD.DEMO, GBPNZD.DEMO) every 60 seconds. **Zero signals, zero trades, zero PnL.** Equity flat at $80.07, 0 open positions.
+
+## 🔍 Root Cause: `initialize_session()` Never Called
+
+Traced the full signal chain in `quant-lab/mt5/demo_bridge.py` (418 lines) and `quant-lab/engines/symmetry_trap.py` (725 lines):
+
+```
+DemoBridge.run()
+  └─ while self.running:
+       ├─ self.check_daily_reset()
+       ├─ self.check_positions()
+       ├─ bars_data = self.scan_bars()       ← pulls M5 bars ✅
+       ├─ self.process_signals(bars_data)     ← calls engine.process_bar() ✅
+       └─ ...
+```
+
+**The gap:** `DemoBridge.initialize()` (line ~140) creates `SymmetryTrapEngine` instances for all 8 symbols. But it **never calls `engine.initialize_session(asian_high, asian_low)`**.
+
+### What `initialize_session()` does (symmetry_trap.py line ~299):
+- Sets `self.session_active = True` (gate check via `classify_tier_by_ar()`)
+- Sets `self.asian_high` / `self.asian_low` / `self.asian_range_pips`
+- Resets state machine to `EngineState.SEARCH`
+- Resets all trade variables (swing_origin, impulse_direction, kill_switch, etc.)
+- Logs: `"Session initialized: tier=? AU=Xp AR=Yp loop=1"`
+
+### What happens WITHOUT it:
+- `session_active = False` (default from `__init__`)
+- `tier_name = "PENDING"` forever
+- `au_pips = 0.0`, `trigger_pips = 0.0`
+- Engine receives bars but **silently discards them** — `process_bar()` exits early when session isn't active
+- Result: **zero signals forever**
+
+### Evidence in demo_bridge.log:
+```
+00:19:06 - Demo Bridge initialized with 4 symbols
+00:19:11 - Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+00:20:11 - Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+...repeats every 60s, no session init log, no impulse, no tier classification
+```
+
+## 🛠️ Fix
+
+**Add this in `DemoBridge.run()`, after `self.initialize()`, before the scan loop:**
+
+```python
+# Initialize session for each engine BEFORE scanning — CRITICAL
+for symbol, engine in self.engines.items():
+    engine.initialize_session(asian_high=asian_high, asian_low=asian_low)
+```
+
+Without this fix: **$0 PnL forever.**
+With this fix: bridge goes from brain-dead zombie to live trading system.
+
+**Full investigation:** `quant-lab/scripts/po_oc2_investigation.md`
+
