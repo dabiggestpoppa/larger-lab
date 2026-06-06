@@ -1,9 +1,3 @@
-# System Architecture
-
-> Category: architecture | Imported: 2026-06-02 01:13 UTC
-
-Tags: #architecture
-
 # System Architecture — Complete Guide
 
 TYPE: architecture
@@ -16,10 +10,11 @@ FUNCTION: Master reference for system topology, component relationships, and dat
 Larger-Lab is a **sovereign cognitive field system** — a multi-agent architecture where autonomous agents collaborate under human strategic direction (MAD).
 
 **Key metrics:**
-- 1582+ tests passing (1403 OCE + 57 SRRA-OPH + 122 O2C)
-- 67 V3 modules across 10 phases + 11 Observer Core modules = 78 total
+- 1643+ tests passing (1403 OCE + 57 SRRA-OPH + 122 O2C + 61 PO-VTuber)
+- 67 V3 modules across 10 phases + 11 Observer Core + 14 PO-VTuber = 92 total
 - 5 active agents (CC, OC2, AS, PM, RL)
 - 19 vault API routes (Phase 00 + Phase 01)
+- PO × VTuber: 61/61 tests, Phases 0-3 complete
 
 ## The Five Architecture Levels
 
@@ -48,7 +43,13 @@ Larger-Lab is a **sovereign cognitive field system** — a multi-agent architect
 - 19 vault API routes
 - Persistent operational memory via Obsidian vault
 
-### Level 5: Infrastructure
+### Level 5: PO × VTuber — Embodiment Layer
+- Open-LLM-VTuber frontend (WebSocket, Live2D, TTS — unchanged)
+- PO Provider adapter implements StatelessLLMInterface
+- OCE /api/po/chat provides cognitive field responses
+- 61/61 tests passing across Phases 0-3
+
+### Level 6: Infrastructure
 - Windows Desktop → Cloud → External APIs
 - FastAPI backend on port 8000
 - Next.js frontend on port 3000
@@ -66,6 +67,8 @@ OBSERVER CORE (O-1 through O-7)
 SRRA-OPH (Repair / Entropy / Drift / BSP)
     ↓
 OCE V3 (10 Phase Cognitive Field)
+    ↓
+PO × VTUBER (Embodiment Layer — StatelessLLMInterface → OCE)
     ↓
 O2C LAYER (Distill / Journal / Skills)
     ↓
@@ -87,118 +90,47 @@ KNOWLEDGE GRAPH (Externalized Cognition)
 | memory/obsidian-vault/ | Internal workspace vault |
 | C:\Users\wifik\Downloads\o2c | Real Obsidian vault |
 
+## PO × VTuber Integration Layer
+
+**Purpose:** VTuber (Open-LLM-VTuber) becomes an embodiment shell for PO/OCE. Zero frontend changes — PO emulates OpenAI streaming format.
+
+**Architecture:**
+```
+VTuber Frontend (WebSocket, unchanged)
+    ↓
+PO Provider (StatelessLLMInterface)
+    ↓
+OCE /api/po/chat (SSE, OpenAI-shaped)
+    ↓
+Cognitive Pipeline: scan → retrieve → route → respond
+    ↓
+Vault + Agents + Memory + Workspace
+```
+
+**Key Files:**
+| Path | Purpose |
+|------|---------|
+| vtuber_integration/po_provider/po_provider.py | PO Provider adapter (StatelessLLMInterface) |
+| oce/backend/po_api.py | PO API endpoints (/api/po/chat, /stream, /status) |
+| oce/backend/po_workspace.py | Workspace scanner (excludes .venv, __pycache__) |
+| oce/backend/po_vault.py | Vault retriever for memory context |
+| oce/backend/po_stream.py | 5-stage cognitive streaming pipeline |
+| oce/backend/po_agents.py | Agent coordination bridge |
+| oce/backend/po_router.py | Multi-model router |
+| oce/backend/po_fallback.py | Fallback chain (OpenRouter → Ollama) |
+| oce/backend/po_interrupt.py | Interrupt/cancel handler |
+| oce/backend/po_idle.py | Autonomous idle runtime tick |
+| core/identity/session_bridge.py | VTuber ↔ Telegram identity bridge |
+| vtuber_integration/tests/ | 61 tests (P1-P3) |
+
+**Test Status:** 61/61 passing (P1.6: 12, P2: 34, P3: 15)
+
 RELATIONSHIPS: [[V3 Architecture]] [[PRINCIPLES]] [[Observer Core O-1 through O-7]] [[O2C Pipeline]]
 
 STATUS: active
 SOURCE: ARCHITECTURE.md
 
 LINKS:
-[[Vault]]
-[[Metrics]]
-[[Loader]]
-[[Journal]]
-[[Memory]]
-[[System]]
-[[Skill]]
-[[Server]]
-[[Patterns]]
-[[Modules]]
-[[Api Endpoints]]
-[[Welcome]]
-[[Vault Distillation 20260531 0245]]
-[[Tradovate Api Discovery 20260531]]
-[[Track A Ninjascript Build 20260531]]
-[[Track A Build Status]]
-[[Track A Build Complete 20260531]]
-[[Test Pattern]]
-[[Test Note]]
-[[Team Roster]]
-[[Team Phase01 Status]]
-[[Task Flow]]
-[[Srra Oph]]
-[[Session Testagent 20260531 0245 Full]]
-[[Session Testagent 20260531 0245]]
-[[Session 20260531 2200]]
-[[Self Heal Report]]
-[[Sage Audit Environment Utilization]]
-[[Sage Audit 20260531 Environment Utilization V2]]
-[[Sage Audit 20260531 Environment Utilization]]
-[[Quantlab Bible]]
-[[Python Vs Nautilus Tradecount Investigation 20260601]]
-[[Progress]]
-[[Pm2 Test Note]]
-[[Option A Confirmed 20260531]]
-[[Operational State 20260531]]
-[[Ontology Core Summary]]
-[[Oc2 Vault Access Guide]]
-[[Oc2 Identity]]
-[[Oc2 Gateway Failures]]
-[[Obsidian Vault Connection Info]]
-[[Observer Core O1 O7]]
-[[Module Guide Summary]]
-[[Master Plan Assessment 20260531]]
-[[Live Deployment Status]]
-[[Keyerror Data Validation 20260531 0245]]
-[[Journal 20260602T005953Z Task Update]]
-[[Journal 20260602T005953Z Task Create]]
-[[Journal 20260602T005953Z Spawn Research]]
-[[Journal 20260602T005953Z Orchestrated Spawn]]
-[[Journal 20260602T005953Z Command Task]]
-[[Journal 20260602T005953Z Command Status]]
-[[Journal 20260602T005953Z Command Spawn]]
-[[Journal 20260602T005953Z Command Report]]
-[[Journal 20260602T004841Z Report Oc2 20260602004841]]
-[[Journal 20260602T004841Z Report]]
-[[Journal 20260602T004841Z Conversation]]
-[[Journal 20260602T004840Z Sync]]
-[[Journal 20260602T004840Z Graph Summary]]
-[[Journal 20260602T004840Z Command Sync]]
-[[Journal 20260602T004840Z Command Status]]
-[[Journal 20260602T004840Z Command Help]]
-[[Journal 20260602T004840Z Command Graph]]
-[[Hermes Obsidian Test   Vault Working]]
-[[Hermes Agent Test Note]]
-[[Hermes Agent Test]]
-[[Hermes Agent Activation Note]]
-[[Foundational Principles]]
-[[Failure Index Oc2]]
-[[Executor Crash 20260531]]
-[[Errors And Solutions]]
-[[Doctor Prescription]]
-[[Dashboard Build Complete]]
-[[Daily Runtime 20260531]]
-[[Cerebus Nt8 Deployment Campaign 20260531]]
-[[Cc Phase 01 Build Certification Report]]
-[[Build Progress 20260531]]
-[[Build Patterns]]
-[[Backtest Phase Status]]
-[[Backtest Campaign V3 Results]]
-[[Backtest Campaign Status 20260531]]
-[[Api Test Note]]
-[[Api Reference Summary]]
-[[Api Execution Architecture 20260531]]
-[[Agent Topology]]
-[[Active Strategies Performance]]
-[[2026 06 01]]
-[[2026 05 31]]
-[[2026 05 30 Nautilus Fix]]
-[[2026 05 30 Evening]]
-[[2026 05 30]]
-[[2026 05 21]]
-[[2026 05 20]]
-[[2026 05 18]]
-[[2026 05 17]]
-[[User]]
-[[Topological Cognition Architecture]]
-[[Principles]]
-[[Operator Rules]]
-[[Module Guide]]
-[[Claude]]
-[[Api Reference]]
-[[Agents]]
-[[01 System Overview]]
-[[V3 Cognitive Field]]
-[[Architecture]]
 [[OC2 (OWL) — Unified Field Operator]]
 [[Team Roster — Agent Network]]
 [[V3 Cognitive Field System]]
@@ -212,4 +144,6 @@ LINKS:
 [[Observer Core — O-1 through O-7]]
 [[SRRA-OPH — Observer Patch Substrate]]
 [[API Reference — OCE Backend Endpoints]]
-[[Module Guide — 78 Modules Reference]]
+[[Module Guide — 92 Modules Reference]]
+[[PO × VTuber Integration — Implementation Plan]]
+[[PO × VTuber API Reference]]
