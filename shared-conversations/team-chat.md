@@ -311,6 +311,47 @@ Bridge syntax verified. Player 2 demo account ready to launch alongside live.
 
 ### [CC] 2026-06-05 15:00 UTC — 📋 AGENT TASKING
 
+#### 🔴 [PM2] 2026-06-06 00:30 UTC — ✅ P2.4 + P2.5 + P3.2 ENHANCED — 37/37 TESTS
+
+**Commit:** `ad07f24d` — `[PO-VTUBER P2+P3] PM2: Enhance agent coordination, model router, fallback chain + 37 tests`
+
+**What landed:**
+
+**po_agents.py (P2.4) — Agent Coordination Bridge:**
+- `coordinate_concurrent()` — bounded parallelism with asyncio.Semaphore
+- `select_agent_for_query()` — public query→agent selection
+- `get_stats()` — coordination statistics (tasks, agents, statuses)
+- Graceful POAgent import fallback (simulated response when unavailable)
+
+**po_router.py (P2.5) — Multi-Model Router:**
+- `route_with_context()` — context-aware routing (token count, streaming requirement, preferred model)
+- `get_routing_stats()` — routing statistics
+- Context-length filtering (skip models with insufficient context window)
+- Streaming capability filtering
+
+**po_fallback.py (P3.2) — Fallback Chain:**
+- Fixed `_stream_provider` bug (`response` → `resp`)
+- `add_provider()` / `remove_provider()` — dynamic chain management
+- Removed duplicate `status()` method
+- `status()` returns proper structure with `provider_count`, `error_count`
+
+**po_stream.py — Streaming Pipeline:**
+- Added missing `_generate_response()` method (POAgent → fallback chain → echo)
+- `ThoughtStreamer` now accepts `fallback_chain` parameter
+- `_run_routing()` now uses `AgentCoordinator` for agent selection
+- Full pipeline: scan → retrieve → route (with agent) → generate (with fallback)
+
+**Tests:** 37/37 passing across 3 new test files
+- `test_po_agents_pm2.py` — 12 tests (core, concurrent, helpers)
+- `test_po_router_pm2.py` — 15 tests (core, context-aware, fallback chain, health)
+- `test_po_fallback_pm2.py` — 10 tests (core, provider mgmt, errors, status)
+
+**Regression:** All 9 existing Phase 2 tests still pass.
+
+**Status:** P2.4 ✅ | P2.5 ✅ | P3.2 ✅ — PM2 deliverables complete.
+
+---
+
 #### 🟡 [AS] Assistant Manager
 **You are:** Quality / Tests / Session / Docs
 **Primary:**
@@ -382,3 +423,18 @@ Bridge syntax verified. Player 2 demo account ready to launch alongside live.
 4. **Live VTuber test** — operator willing to install VTuber for AS smoke, or do we mock audio?
 
 ---
+### 🟡 [AS] 2026-06-06 10:00 UTC — ✅ PHASE 3 GATE COMPLETE: 61/61 TESTS PASSING
+
+**Test Results:**
+| Test Suite | Tests | Status |
+|----------|-------|--------|
+| P1.6 Smoke | 12 | ✅ PASS |
+| P2.1-P2.12 Integration | 34 | ✅ PASS |
+| P3.1-P3.5 Identity | 15 | ✅ PASS |
+| **TOTAL** | **61** | ✅ **ALL PASS** |
+
+**Fix Applied:** Added `EXCLUDE_DIRS` to `po_workspace.py` to skip `.venv`, `__pycache__`, `.git`, `node_modules`, `archive`, `.openclaw`, `memory-bank` — reduced scan time from 7+ min to ~2 min.
+
+**Commit:** `b562f1f1` — pushed to `origin/master`
+
+**Phase 3 Status:** ✅ COMPLETE — ready for Phase 4.
