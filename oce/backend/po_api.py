@@ -11,9 +11,10 @@ These endpoints are consumed by the POProvider adapter in vtuber_integration/po_
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from typing import List, Dict, Any, AsyncGenerator
+from typing import List, Dict, Any, AsyncGenerator, Optional, Optional
 import json
 import logging
+import uuid
 
 logger = logging.getLogger("oce.po_api")
 
@@ -63,6 +64,66 @@ class POStatusResponse(BaseModel):
     streaming_supported: bool = True
     active_sessions: int = 0
     uptime_seconds: float = 0.0
+
+
+class POContextRequest(BaseModel):
+    session_id: str = ""
+    include_workspace: bool = True
+    include_vault: bool = True
+    include_memory: bool = True
+    max_tokens: int = 2000
+
+
+class POContextResponse(BaseModel):
+    session_id: str
+    workspace: Dict[str, Any] = {}
+    vault: Dict[str, Any] = {}
+    memory: Dict[str, Any] = {}
+    combined_context: str = ""
+    sources: List[str] = []
+
+
+class POCommandRequest(BaseModel):
+    command: str  # "interrupt", "cancel", "reset", "status"
+    session_id: str = ""
+    params: Dict[str, Any] = {}
+
+
+class POCommandResponse(BaseModel):
+    ok: bool
+    command: str
+    result: Any = None
+    error: Optional[str] = None
+
+
+class POContextRequest(BaseModel):
+    session_id: str = ""
+    include_workspace: bool = True
+    include_vault: bool = True
+    include_memory: bool = True
+    max_tokens: int = 2000
+
+
+class POContextResponse(BaseModel):
+    session_id: str
+    workspace: Dict[str, Any] = {}
+    vault: Dict[str, Any] = {}
+    memory: Dict[str, Any] = {}
+    combined_context: str = ""
+    sources: List[str] = []
+
+
+class POCommandRequest(BaseModel):
+    command: str  # "interrupt", "cancel", "reset", "status"
+    session_id: str = ""
+    params: Dict[str, Any] = {}
+
+
+class POCommandResponse(BaseModel):
+    ok: bool
+    command: str
+    result: Any = None
+    error: Optional[str] = None
 
 
 # ─── Chat Endpoint (Streaming) ───────────────────────────────────────────────
@@ -200,6 +261,81 @@ async def po_status() -> POStatusResponse:
         model="po",
         streaming_supported=True,
     )
+
+
+# ─── Cognitive Stream (P2.3+P2.7) ─────────────────────────────────────────
+
+@router.get("/stream")
+async def po_stream(session_id: str = "", max_tokens: int = 2048):
+    """5-stage cognitive streaming endpoint."""
+    from oce.backend.po_stream import ThoughtStreamer
+    streamer = ThoughtStreamer()
+    req = {"messages": [{"role": "user", "content": "begin"}], "model": "po", "session_id": session_id, "max_tokens": max_tokens}
+    return StreamingResponse(streamer.stream(req, session_id=session_id), media_type="text/event-stream", headers={"Cache-Control": "no-cache", "Connection": "keep-alive", "X-Accel-Buffering": "no"})
+
+
+# ─── Context Endpoint (P2.8) ─────────────────────────────────────────────
+
+@router.post("/context")
+async def po_context(request: POContextRequest):
+    """Get current context from workspace, vault, and memory."""
+    try:
+        result = {"session_id": request.session_id}
+        if request.include_workspace:
+            try:
+                from oce.backend.po_workspace import WorkspaceScanner
+                result["workspace"] = WorkspaceScanner().scan().summary()
+            except Exception as e:
+                result["workspace"] = {"error": str(e)}
+        if request.include_vault:
+            try:
+                from oce.backend.po_vault import VaultRetriever
+                r = VaultRetriever().retrieve(request.session_id or "general")
+                result["vault"] = r.summary()
+                result["vault"]["context_string"] = r.as_context_string(max_tokens=request.max_tokens)
+            except Exception as e:
+                result["vault"] = {"error": str(e)}
+        if request.include_memory:
+            try:
+                from oce.backend.po_session import SessionManager
+                s = SessionManager().get(request.session_id)
+                result["memory"] = {"state": s.get_state().__dict__, "context": s.get_context()} if s else {"state": "no_session"}
+            except Exception as e:
+                result["memory"] = {"error": str(e)}
+        result["combined_context"] = "no context"
+        result["sources"] = [k for k in ["workspace","vault","memory"] if k in result and "error" not in result.get(k,{})]
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+# ─── Commands Endpoint (P2.9) ─────────────────────────────────────────────
+
+@router.post("/commands")
+async def po_commands(request: POCommandRequest):
+    """Execute PO commands: interrupt, cancel, reset, status."""
+    try:
+        if request.command == "interrupt":
+            from oce.backend.po_interrupt import InterruptHandler
+            InterruptHandler().cancel_session(request.session_id, reason="api")
+            return POCommandResponse(ok=True, command=request.command, result={"action": "interrupted"})
+        elif request.command == "cancel":
+            from oce.backend.po_interrupt import InterruptHandler
+            InterruptHandler().cancel_session(request.session_id, reason="api")
+            return POCommandResponse(ok=True, command=request.command, result={"action": "cancelled"})
+        elif request.command == "reset":
+            import shutil
+            from oce.backend.po_state import POStateStore
+            s = POStateStore()
+            if s._session_dir.exists(): shutil.rmtree(s._session_dir); s._session_dir.mkdir(exist_ok=True)
+            return POCommandResponse(ok=True, command=request.command, result={"action": "reset_complete"})
+        elif request.command == "status":
+            from oce.backend.po_state import POStateStore
+            from oce.backend.po_router import ModelRouter
+            return POCommandResponse(ok=True, command=request.command, result={"state": POStateStore().load_state().__dict__, "models": ModelRouter().health_check()})
+        raise HTTPException(status_code=400, detail=f"Unknown: {request.command}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────

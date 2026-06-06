@@ -1,0 +1,26 @@
+==================================================
+OC2 DEMO DAILY REPORT — 2026-06-06 00:19
+==================================================
+
+Bridge Status: RUNNING
+Symbols: BTCUSD.DEMO, ETHUSD.DEMO, EURNZD.DEMO, GBPNZD.DEMO
+Daily Stats: {'trades': 0, 'wins': 0, 'losses': 0, 'pnl': 0.0}
+
+Open Positions: 0
+
+Closed Today: 0
+
+--- Today's Trade Events (0 entries) ---
+
+--- Recent Bridge Log ---
+  2026-06-06 00:19:06,255 [INFO] [DEMO] Demo account connected. Balance: 288.84
+  2026-06-06 00:19:06,260 [INFO] [DEMO] Demo Bridge initialized with 4 symbols: ['BTCUSD.DEMO', 'ETHUSD.DEMO', 'EURNZD.DEMO', 'GBPNZD.DEMO']
+  2026-06-06 00:19:06,260 [INFO] [DEMO] ============================================================
+  2026-06-06 00:19:06,260 [INFO] [DEMO] CEREBUS DEMO BRIDGE â€” RUNNING
+  2026-06-06 00:19:06,260 [INFO] [DEMO] Symbols: BTCUSD.DEMO, ETHUSD.DEMO, EURNZD.DEMO, GBPNZD.DEMO
+  2026-06-06 00:19:06,261 [INFO] [DEMO] Lot size: 0.01
+  2026-06-06 00:19:06,261 [INFO] [DEMO] ============================================================
+  2026-06-06 00:19:11,291 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+
+==================================================
+End of report.
