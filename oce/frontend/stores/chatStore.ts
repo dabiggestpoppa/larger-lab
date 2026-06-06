@@ -56,16 +56,25 @@ interface ChatStore {
   searchMessages: (query: string) => Promise<ChatMessage[]>;
 }
 
-export const useChatStore = create<ChatStore>((set, get) => ({
-  messages: [],
-  sessions: [],
-  activeSessionId: null,
-  isLoading: false,
-  isSending: false,
-  error: null,
+export const useChatStore = create<ChatStore>((set, get) => {
+  // Counter for unique message IDs (Date.now() only has ms precision)
+  let messageCounter = 0;
 
-  setMessages: (messages) => set({ messages }),
-  addMessage: (message) => set((s) => ({ messages: [...s.messages, message] })),
+  const getNextId = (prefix: string) => {
+    messageCounter += 1;
+    return `${prefix}_${Date.now()}_${messageCounter}`;
+  };
+
+  return {
+    messages: [],
+    sessions: [],
+    activeSessionId: null,
+    isLoading: false,
+    isSending: false,
+    error: null,
+
+    setMessages: (messages) => set({ messages }),
+    addMessage: (message) => set((s) => ({ messages: [...s.messages, message] })),
   setSessions: (sessions) => set({ sessions }),
   setActiveSession: (sessionId) => set({ activeSessionId: sessionId }),
   setLoading: (loading) => set({ isLoading: loading }),
@@ -108,7 +117,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       // API returns { session, messages }
       const raw = data.messages || data.entries || [];
       const msgs: ChatMessage[] = raw.map((m: Record<string, unknown>) => ({
-        message_id: (m.message_id as string) || `msg_${Date.now()}`,
+        message_id: (m.message_id as string) || getNextId("msg"),
         role: (m.role as "user" | "observer" | "system") || (m.role as string) === "assistant" ? "observer" : (m.role as "user" | "observer" | "system"),
         content: (m.content as string) || "",
         timestamp: (m.timestamp as string) || new Date().toISOString(),
@@ -129,7 +138,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   sendMessage: async (message: string, sessionId?: string) => {
     set({ isSending: true, error: null });
     const userMsg: ChatMessage = {
-      message_id: `local_${Date.now()}`,
+      message_id: getNextId("local"),
       role: "user",
       content: message,
       timestamp: new Date().toISOString(),
@@ -180,7 +189,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 
               if (eventType === "round") {
                 const msg: ChatMessage = {
-                  message_id: `progress_${Date.now()}_round`,
+                  message_id: getNextId("progress_round"),
                   role: "system",
                   content: `🔄 Round ${data.round}/${data.max} — Thinking...`,
                   timestamp: new Date().toISOString(),
@@ -190,7 +199,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
                 set((s) => ({ messages: [...s.messages, msg] }));
               } else if (eventType === "tool_call") {
                 const msg: ChatMessage = {
-                  message_id: `progress_${Date.now()}_tool`,
+                  message_id: getNextId("progress_tool"),
                   role: "system",
                   content: `🔧 Tool: ${data.tool} — Executing...`,
                   timestamp: new Date().toISOString(),
@@ -201,7 +210,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
               } else if (eventType === "tool_result") {
                 const preview = (data.result || "").substring(0, 120);
                 const msg: ChatMessage = {
-                  message_id: `progress_${Date.now()}_result`,
+                  message_id: getNextId("progress_result"),
                   role: "system",
                   content: `📋 ${data.tool}: ${preview}${data.result?.length > 120 ? "..." : ""}`,
                   timestamp: new Date().toISOString(),
@@ -211,7 +220,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
                 set((s) => ({ messages: [...s.messages, msg] }));
               } else if (eventType === "complete") {
                 const msg: ChatMessage = {
-                  message_id: `progress_${Date.now()}_complete`,
+                  message_id: getNextId("progress_complete"),
                   role: "system",
                   content: "✅ Agent complete — Sending final response...",
                   timestamp: new Date().toISOString(),
@@ -220,7 +229,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
                 set((s) => ({ messages: [...s.messages, msg] }));
               } else if (eventType === "max_rounds") {
                 const msg: ChatMessage = {
-                  message_id: `progress_${Date.now()}_max`,
+                  message_id: getNextId("progress_max"),
                   role: "system",
                   content: "⚠️ Max tool rounds reached. Generating final response...",
                   timestamp: new Date().toISOString(),
@@ -231,7 +240,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
                 finalData = data;
               } else if (eventType === "error") {
                 const msg: ChatMessage = {
-                  message_id: `error_${Date.now()}`,
+                  message_id: getNextId("error"),
                   role: "system",
                   content: `❌ Error: ${data.message || "Unknown error"}`,
                   timestamp: new Date().toISOString(),
@@ -249,7 +258,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       // Send final response
       if (finalData) {
         const observerMsg: ChatMessage = {
-          message_id: `observer_${Date.now()}`,
+          message_id: getNextId("observer"),
           role: "observer",
           content: finalData.response || "No response",
           timestamp: new Date().toISOString(),
@@ -322,4 +331,4 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       return [];
     }
   },
-}));
+}});

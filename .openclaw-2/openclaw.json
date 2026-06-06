@@ -1,111 +1,109 @@
-﻿{
-    "agents":  {
-                   "defaults":  {
-                                    "workspace":  "C:\\Users\\wifik\\Desktop\\projects\\larger-lab",
-                                    "model":  "openrouter/owl-alpha",
-                                    "subagent":  {
-                                                     "maxConcurrent":  2,
-                                                     "model":  "deepseek/deepseek-v4-flash:free"
-                                                 },
-                                    "models":  {
-                                                   "poolside/laguna-m.1:free":  {
-                                                                                    "alias":  "laguna"
-                                                                                },
-                                                   "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free":  {
-                                                                                                              "alias":  "nemotron"
-                                                                                                          },
-                                                   "deepseek/deepseek-v4-flash:free":  {
-                                                                                           "alias":  "deepseek"
-                                                                                       },
-                                                   "openrouter/owl-alpha":  {
-                                                                                "alias":  "owl"
-                                                                            }
-                                               }
-                                }
-               },
-    "gateway":  {
-                    "mode":  "local",
-                    "auth":  {
-                                 "mode":  "token",
-                                 "token":  "oc2-68cdb0729953cce1aecaf09a9dffddac574c9a674f46aa77"
-                             },
-                    "port":  18790,
-                    "bind":  "loopback",
-                    "tailscale":  {
-                                      "mode":  "off",
-                                      "resetOnExit":  false
-                                  }
+{
+    "agents": {
+        "defaults": {
+            "workspace": "C:\\\\Users\\\\wifik\\\\Desktop\\\\projects\\\\larger-lab",
+            "model": "inclusionai/ring-2.6-1t",
+            "subagent": {
+                "maxConcurrent": 2,
+                "model": "minimax/minimax-m3"
+            },
+            "models": {
+                "inclusionai/ring-2.6-1t": {
+                    "alias": "ring"
                 },
-    "session":  {
-                    "dmScope":  "per-channel-peer"
+                "minimax/minimax-m3": {
+                    "alias": "minimax"
                 },
-    "tools":  {
-                  "profile":  "coding"
-              },
-    "skills":  {
-                   "install":  {
-                                   "nodeManager":  "npm"
-                               },
-                   "load":  {
-                                "extraDirs":  [
-                                                  "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\.openclaw-2\\skills",
-                                                  "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\.agents\\skills",
-                                                  "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\skills"
-                                              ]
-                            }
-               },
-    "channels":  {
-                     "telegram":  {
-                                      "enabled":  true,
-                                      "botToken":  "8945439460:AAHZT2Xx0jHaApejRJYi-xORG5FkKNAQ5yM",
-                                      "dmPolicy":  "pairing",
-                                      "commands":  {
-                                          "native":  false
-                                      },
-                                      "groups":  {
-                                                     "*":  {
-                                                               "requireMention":  true
-                                                           }
-                                                 }
-                                  }
-                 },
-    "commands":  {
-                     "ownerAllowFrom":  [
-                                            "telegram:8258195396"
-                                        ]
-                 },
-    "models":  {
-                   "providers":  {
-                                     "poolside":  {
-                                                      "baseUrl":  "https://api.poolside.ai/v1",
-                                                      "apiKey":  "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",
-                                                      "models":  [
-                                                                     {
-                                                                         "id":  "laguna-m.1:free",
-                                                                         "name":  "laguna-m.1:free"
-                                                                     }
-                                                                 ]
-                                                  },
-                                     "nvidia":  {
-                                                    "baseUrl":  "https://integrate.api.nvidia.com/v1",
-                                                    "apiKey":  "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",
-                                                    "models":  [
-                                                                   {
-                                                                       "id":  "nemotron-3-nano-omni-30b-a3b-reasoning:free",
-                                                                       "name":  "nemotron-3-nano-omni-30b-a3b-reasoning:free"
-                                                                   }
-                                                               ]
-                                                },
-                                     "deepseek":  {
-                                                      "baseUrl":  "https://api.deepseek.com/v1",
-                                                      "apiKey":  "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",
-                                                      "models":  [
-                                                                     {
-                                                                         "id":  "deepseek-v4-flash:free",
-                                                                         "name":  "deepseek-v4-flash:free"
-                                                                     }
-                                                                 ]
-                                                  }
-                                 }
-               }
+                "nvidia/nemotron-3-ultra-550b-a55b": {
+                    "alias": "nemotron"
+                },
+                "openrouter/owl-alpha": {
+                    "alias": "owl"
+                }
+            }
+        }
+    },
+    "gateway": {
+        "mode": "local",
+        "auth": {
+            "mode": "token",
+            "token": "oc2-68cdb0729953cce1aecaf09a9dffddac574c9a674f46aa77"
+        },
+        "port": 18790,
+        "bind": "loopback",
+        "tailscale": {
+            "mode": "off",
+            "resetOnExit": false
+        }
+    },
+    "session": {
+        "dmScope": "per-channel-peer"
+    },
+    "tools": {
+        "profile": "coding"
+    },
+    "skills": {
+        "install": {
+            "nodeManager": "npm"
+        },
+        "load": {
+            "extraDirs": [
+                "C:\\\\Users\\\\wifik\\\\Desktop\\\\projects\\\\larger-lab\\\\.openclaw-2\\\\skills",
+                "C:\\\\Users\\\\wifik\\\\Desktop\\\\projects\\\\larger-lab\\\\.agents\\\\skills",
+                "C:\\\\Users\\\\wifik\\\\Desktop\\\\projects\\\\larger-lab\\\\skills"
+            ]
+        }
+    },
+    "channels": {
+        "telegram": {
+            "enabled": true,
+            "botToken": "8945439460:AAHZT2Xx0jHaApejRJYi-xORG5FkKNAQ5yM",
+            "dmPolicy": "pairing",
+            "commands": {
+                "native": false
+            },
+            "groups": {
+                "*": {
+                    "requireMention": true
+                }
+            }
+        }
+    },
+    "commands": {
+        "ownerAllowFrom": [
+            "telegram:8258195396"
+        ]
+    },
+    "models": {
+        "providers": {
+            "openrouter": {
+                "baseUrl": "https://openrouter.ai/api/v1",
+                "apiKey": "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",
+                "models": [
+                    {
+                        "id": "inclusionai/ring-2.6-1t",
+                        "name": "inclusionai/ring-2.6-1t"
+                    },
+                    {
+                        "id": "openrouter/owl-alpha",
+                        "name": "openrouter/owl-alpha"
+                    }
+                ]
+            },
+            "nvidia": {
+                "baseUrl": "https://integrate.api.nvidia.com/v1",
+                "apiKey": "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",
+                "models": [
+                    {
+                        "id": "nvidia/nemotron-3-ultra-550b-a55b",
+                        "name": "nvidia/nemotron-3-ultra-550b-a55b"
+                    }
+                ]
+            }
+        }
+    },
+    "meta": {
+        "lastTouchedVersion": "2026.5.7",
+        "lastTouchedAt": "2026-05-17T07:50:18.709Z"
+    }
 }

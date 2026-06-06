@@ -576,20 +576,19 @@ def run_live(symbols: list, lot_size: float = 0.01):
     existing_positions = get_positions()
     for p in existing_positions:
         if p["magic"] == 20260601:
-            # Determine engine from comment
-            eng = "ST" if "ST" in p.get("comment", "") else "P90"
-            key = (p["symbol"], eng)
+            # ST-only: Always recover as ST engine
+            key = (p["symbol"], "ST")
             active_trades[key] = {
                 "ticket": p["ticket"],
                 "direction": p["type"],
                 "entry": p["open_price"],
                 "sl": p["sl"],
                 "tp": p["tp"],
-                "engine": eng,
-                "sl_moved": p["sl"] != 0 and eng == "P90",  # If SL already moved on recovery
+                "engine": "ST",
+                "sl_moved": False,
             }
             log.info("Recovered position: %s %s ticket=%s engine=%s",
-                     p["symbol"], p["type"], p["ticket"], eng)
+                     p["symbol"], p["type"], p["ticket"], "ST")
 
     mt5_connected = True
     last_reconnect = time.time()
@@ -634,11 +633,7 @@ def run_live(symbols: list, lot_size: float = 0.01):
                     daily_stats["wins"], daily_stats["losses"], daily_stats["pips"], avg_rr
                 )
 
-                # ── P90 Trailing Stop: move SL to breakeven at +2 pips ──
-                try:
-                    check_trailing_stop(active_trades, trail_pips=2.0)
-                except Exception as e:
-                    log.warning("Trailing stop check error: %s", e)
+
 
                 for sym in symbols:
                     try:

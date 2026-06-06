@@ -1,13 +1,13 @@
 {
-  "timestamp": "2026-06-05T03:05:09.797123",
+  "timestamp": "2026-06-05T08:04:46.696194",
   "account": {
     "login": 650898,
     "server": "OxSecurities-Live",
-    "balance": 64.0,
-    "equity": 64.0,
+    "balance": 64.95,
+    "equity": 64.95,
     "profit": 0.0,
     "margin": 0.0,
-    "margin_free": 64.0,
+    "margin_free": 64.95,
     "margin_level": 0.0,
     "leverage": 500,
     "currency": "USD",
@@ -28,13 +28,39 @@
       "magic": 20260601,
       "comment": "[tp 202.587]",
       "time": "2026-06-05T00:26:31"
+    },
+    {
+      "ticket": 109890054,
+      "symbol": "EURUSD.PRO",
+      "type": "BUY",
+      "volume": 0.01,
+      "price": 1.16217,
+      "profit": -1.08,
+      "swap": 0.01,
+      "commission": 0.0,
+      "magic": 0,
+      "comment": "",
+      "time": "2026-06-05T05:44:06"
+    },
+    {
+      "ticket": 109898440,
+      "symbol": "EURUSD.PRO",
+      "type": "SELL",
+      "volume": 0.01,
+      "price": 1.16365,
+      "profit": 1.02,
+      "swap": 0.0,
+      "commission": 0.0,
+      "magic": 20260601,
+      "comment": "[tp 1.16362]",
+      "time": "2026-06-05T06:38:20"
     }
   ],
   "today_stats": {
-    "trades": 1,
-    "pnl": 0.51,
-    "wins": 1,
-    "losses": 0,
-    "win_rate": 100.0
+    "trades": 3,
+    "pnl": 0.46,
+    "wins": 2,
+    "losses": 1,
+    "win_rate": 66.7
   }
 }

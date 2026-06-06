@@ -3,15 +3,20 @@ O2-B5: SpawnPlanner
 ====================
 Generate task orchestration blueprint.
 
-Creates structured spawn plans for agent execution.
+Creates structured spawn plans for agent execution with full
+context injection from vault, shared memory, and session state.
 """
 
 from __future__ import annotations
 
 import uuid
+import json
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
+from pathlib import Path
+
+from core.consensus.shared_memory_bridge import SharedMemoryBridge
 
 
 @dataclass
@@ -28,6 +33,20 @@ class SpawnBlueprint:
     max_retries: int = 3
     timeout_seconds: int = 300
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "blueprint_id": self.blueprint_id,
+            "task_type": self.task_type,
+            "complexity": self.complexity,
+            "timestamp": self.timestamp,
+            "steps": self.steps,
+            "context_injection": self.context_injection,
+            "execution_boundaries": self.execution_boundaries,
+            "fallback_strategy": self.fallback_strategy,
+            "max_retries": self.max_retries,
+            "timeout_seconds": self.timeout_seconds,
+        }
+
 
 class SpawnPlanner:
     """
@@ -35,7 +54,16 @@ class SpawnPlanner:
 
     Creates structured plans for agent spawning with context injection,
     execution boundaries, and fallback strategies.
+
+    Context sources (in priority order):
+    1. Vault knowledge (via API query)
+    2. Shared memory bridge (recent cross-agent observations)
+    3. Session context (active goals, domain, complexity)
     """
+
+    def __init__(self, vault_url: str = "http://127.0.0.1:8000"):
+        self.vault_url = vault_url.rstrip("/")
+        self.bridge = SharedMemoryBridge()
 
     def create_blueprint(
         self,
@@ -58,7 +86,7 @@ class SpawnPlanner:
             context: Session context
 
         Returns:
-            SpawnBlueprint with execution plan
+            SpawnBlueprint with execution plan and full context injection
         """
         blueprint_id = f"bp_{uuid.uuid4().hex[:8]}"
         timestamp = datetime.now(timezone.utc).isoformat()
@@ -66,8 +94,14 @@ class SpawnPlanner:
         # Build execution steps
         steps = self._build_steps(task_type, complexity, routing_path, capabilities)
 
-        # Build context injection
-        context_injection = self._build_context(task_type, context)
+        # Build context injection from ALL three sources
+        context_injection = self._build_context(
+            task_type=task_type,
+            complexity=complexity,
+            user_input=user_input,
+            routing_path=routing_path,
+            session_context=context,
+        )
 
         # Build execution boundaries
         boundaries = self._build_boundaries(task_type, complexity)
@@ -84,115 +118,111 @@ class SpawnPlanner:
             context_injection=context_injection,
             execution_boundaries=boundaries,
             fallback_strategy=fallback,
-            max_retries=3 if complexity in ("critical", "high") else 1,
-            timeout_seconds=self._get_timeout(complexity),
         )
+
+    # ── Context Injection (THE FIX) ────────────────────────────────────
+
+    def _build_context(
+        self,
+        task_type: str,
+        complexity: str,
+        user_input: str,
+        routing_path: list[str],
+        session_context: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """
+        Build full context injection from all sources.
+
+        Sources:
+        1. Vault API — relevant patterns, skills, past errors
+        2. Shared memory — recent cross-agent observations
+        3. Session context — active goals, domain state
+        """
+        ctx: dict[str, Any] = {
+            "task_type": task_type,
+            "complexity": complexity,
+            "user_input": user_input,
+            "routing_path": routing_path,
+            "injected_at": datetime.now(timezone.utc).isoformat(),
+        }
+
+        # ── Source 1: Vault context ──
+        vault_ctx = self._pull_vault_context(task_type)
+        if vault_ctx:
+            ctx["vault"] = vault_ctx
+
+        # ── Source 2: Shared memory ──
+        shared_ctx = self._pull_shared_memory(task_type)
+        if shared_ctx:
+            ctx["shared_memory"] = shared_ctx
+
+        # ── Source 3: Session context ──
+        if session_context:
+            ctx["session"] = {
+                k: v for k, v in session_context.items()
+                if k in ("last_domain", "last_complexity", "active_goals", "recent_tasks")
+            }
+
+        return ctx
+
+    def _pull_vault_context(self, task: str) -> dict[str, Any] | None:
+        """Pull relevant context from vault via API."""
+        try:
+            import httpx
+            params = {"task": task, "max_skills": 3, "max_patterns": 5}
+            resp = httpx.get(
+                f"{self.vault_url}/api/vault/context",
+                params=params,
+                timeout=5.0,
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                return data.get("context", {})
+        except Exception:
+            pass  # Vault unavailable — skip gracefully
+        return None
+
+    def _pull_shared_memory(self, task: str) -> dict[str, Any] | None:
+        """Pull recent observations from shared memory bridge."""
+        try:
+            recent = self.bridge.read_latest(limit=20)
+            consensus = self.bridge.get_all_consensus()
+            return {
+                "recent_observations": recent,
+                "consensus_state": consensus,
+            }
+        except Exception:
+            pass
+        return None
+
+    # ── Steps ───────────────────────────────────────────────────────────
 
     def _build_steps(
         self,
         task_type: str,
         complexity: str,
         routing_path: list[str],
-        capabilities: dict[str, Any] | None,
+        capabilities: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
-        """Build execution steps."""
-        steps: list[dict[str, Any]] = []
+        """Build the ordered execution steps."""
+        steps = [
+            {"step": 1, "action": "validate_input", "params": {"task_type": task_type}},
+            {"step": 2, "action": "acquire_context", "params": {"from": ["vault", "shared_memory", "session"]}},
+        ]
 
-        for i, observer_id in enumerate(routing_path):
-            step: dict[str, Any] = {
-                "step_id": i + 1,
-                "observer": observer_id,
-                "action": self._get_observer_action(observer_id, task_type),
-                "timeout": self._get_step_timeout(complexity),
-                "retry_on_failure": complexity in ("critical", "high"),
-            }
+        if complexity in ("critical", "high"):
+            steps.append(
+                {"step": 3, "action": "safety_check", "params": {"level": complexity}}
+            )
 
-            if capabilities and "observer_assignments" in capabilities:
-                obs_caps = capabilities["observer_assignments"].get(observer_id, [])
-                step["capabilities"] = obs_caps
-
-            steps.append(step)
+        steps.extend([
+            {"step": len(steps) + 1, "action": "execute_task", "params": {"routing": routing_path}},
+            {"step": len(steps) + 2, "action": "record_outcome", "params": {"store": ["consensus_memory", "shared_memory"]}},
+        ])
 
         return steps
 
-    def _get_observer_action(self, observer_id: str, task_type: str) -> str:
-        """Get the action for an observer."""
-        actions: dict[str, dict[str, str]] = {
-            "planner": {
-                "coding": "plan_implementation",
-                "research": "plan_research",
-                "architecture": "design_architecture",
-                "repair": "plan_repair",
-                "debugging": "plan_debugging",
-                "orchestration": "plan_orchestration",
-                "visualization": "plan_visualization",
-                "automation": "plan_automation",
-                "system_analysis": "plan_analysis",
-                "general": "plan_response",
-            },
-            "execution": {
-                "coding": "implement_code",
-                "research": "execute_research",
-                "architecture": "implement_design",
-                "repair": "execute_repair",
-                "debugging": "execute_debugging",
-                "orchestration": "execute_orchestration",
-                "visualization": "implement_ui",
-                "automation": "execute_automation",
-                "system_analysis": "execute_analysis",
-                "general": "execute_task",
-            },
-            "memory": {
-                "coding": "retrieve_context",
-                "research": "retrieve_knowledge",
-                "architecture": "retrieve_patterns",
-                "repair": "retrieve_history",
-                "debugging": "retrieve_logs",
-                "orchestration": "retrieve_state",
-                "visualization": "retrieve_data",
-                "automation": "retrieve_config",
-                "system_analysis": "retrieve_metrics",
-                "general": "retrieve_context",
-            },
-            "repair": {
-                "coding": "fix_errors",
-                "research": "validate_findings",
-                "architecture": "validate_design",
-                "repair": "heal_system",
-                "debugging": "diagnose_issue",
-                "orchestration": "stabilize",
-                "visualization": "fix_rendering",
-                "automation": "fix_pipeline",
-                "system_analysis": "analyze_health",
-                "general": "check_consistency",
-            },
-        }
-        return actions.get(observer_id, {}).get(task_type, "process")
-
-    def _get_step_timeout(self, complexity: str) -> int:
-        """Get timeout for a step based on complexity."""
-        timeouts = {"critical": 600, "high": 300, "medium": 120, "low": 60}
-        return timeouts.get(complexity, 120)
-
-    def _get_timeout(self, complexity: str) -> int:
-        """Get total timeout based on complexity."""
-        timeouts = {"critical": 1800, "high": 900, "medium": 300, "low": 120}
-        return timeouts.get(complexity, 300)
-
-    def _build_context(
-        self, task_type: str, session_context: dict[str, Any] | None
-    ) -> dict[str, Any]:
-        """Build context injection for spawned agents."""
-        ctx: dict[str, Any] = {
-            "task_type": task_type,
-            "injected_at": datetime.now(timezone.utc).isoformat(),
-        }
-        if session_context:
-            ctx["session"] = {
-                k: v for k, v in session_context.items()
-                if k in ("last_domain", "last_complexity", "active_goals")
-            }
-        return ctx
+    # ── Boundaries ──────────────────────────────────────────────────────
 
     def _build_boundaries(self, task_type: str, complexity: str) -> list[str]:
         """Build execution boundaries."""

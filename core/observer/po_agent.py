@@ -27,19 +27,22 @@ import os
 import json
 import time
 import datetime
+import threading
 import requests
 import subprocess
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Callable
+
+from oce.backend.rate_limit_tracker import record_api_call
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 # ─── Model Configuration ────────────────────────────────────────────────────
 
 MODEL_CHAIN = [
-    "openrouter/owl-alpha",
-    "moonshotai/kimi-k2.6:free",
-    "poolside/laguna-m.1:free",
+    "inclusionai/ring-2.6-1t",
+    "minimax/minimax-m3",
+    "nvidia/nemotron-3-ultra-550b-a55b",
 ]
 
 # ─── Tool Definitions (OpenAI function calling format) ─────────────────────
@@ -670,9 +673,24 @@ class POAgent:
         self._history: List[Dict[str, str]] = []
         self._max_history = 20
         self._model_index = 0
+        self._lock = threading.Lock()
+
+    def _load_configured_model(self) -> Optional[str]:
+        """Load model from config file if it exists."""
+        try:
+            model_config_path = REPO_ROOT / "data" / "po_model.json"
+            if model_config_path.exists():
+                data = json.loads(model_config_path.read_text(encoding="utf-8"))
+                return data.get("model")
+        except Exception:
+            pass
+        return None
 
     @property
     def current_model(self) -> str:
+        configured = self._load_configured_model()
+        if configured:
+            return configured
         return MODEL_CHAIN[self._model_index % len(MODEL_CHAIN)]
 
     def _build_system_prompt(self, sovereign_context: str = "") -> str:
@@ -705,11 +723,30 @@ class POAgent:
             + (f"\n## Operational Context\n{sovereign_context}\n" if sovereign_context else "")
         )
 
-    def _call_llm(self, messages: List[Dict], tools: list = None, tool_choice: str = "auto"):
+    def _sanitize_message(self, msg: Dict) -> Dict:
+        """Ensure message content is always a string — prevents OpenRouter 400 errors
+        from corrupted history entries where content becomes a list/dict."""
+        if not isinstance(msg, dict):
+            return {"role": "user", "content": str(msg)}
+        content = msg.get("content", "")
+        if not isinstance(content, str):
+            content = json.dumps(content, default=str)[:2000]
+        return {
+            "role": msg.get("role", "user"),
+            "content": content,
+        }
+
+    def _call_llm(self, messages: List[Dict], model: str = None, tools: list = None, tool_choice: str = "auto"):
         """Call LLM with optional tool definitions. Returns (response, tool_calls, model, error)."""
+        if model is None:
+            model = self.current_model
+
+        # Sanitize all messages to prevent content-type errors
+        safe_messages = [self._sanitize_message(m) for m in messages]
+
         payload = {
-            "model": self.current_model,
-            "messages": messages,
+            "model": model,
+            "messages": safe_messages,
             "max_tokens": 4096,
             "temperature": 0.7,
         }
@@ -728,9 +765,11 @@ class POAgent:
                 timeout=120,
             )
             if r.status_code == 429:
-                return None, None, self.current_model, "rate_limited"
+                record_api_call(model=model, status_code=429, error_type="rate_limited")
+                return None, None, model, "rate_limited"
             if r.status_code >= 400:
-                return None, None, self.current_model, f"http_{r.status_code}: {r.text[:200]}"
+                record_api_call(model=model, status_code=r.status_code, error_type=f"http_{r.status_code}")
+                return None, None, model, f"http_{r.status_code}: {r.text[:200]}"
             data = r.json()
 
             # Extract response
@@ -745,11 +784,14 @@ class POAgent:
             if not tool_calls and content:
                 tool_calls = self._parse_fallback_tool_calls(content)
 
-            return content, tool_calls, self.current_model, None
+            record_api_call(model=model, status_code=200, tokens_used=len(content or ""))
+            return content, tool_calls, model, None
         except requests.exceptions.Timeout:
-            return None, None, self.current_model, "timeout"
+            record_api_call(model=model, status_code=0, error_type="timeout")
+            return None, None, model, "timeout"
         except Exception as e:
-            return None, None, self.current_model, str(e)[:200]
+            record_api_call(model=model, status_code=0, error_type=str(e)[:200])
+            return None, None, model, str(e)[:200]
 
     def _parse_fallback_tool_calls(self, content: str) -> Optional[List[Dict]]:
         """Parse ```tool blocks as fallback for models without native function calling."""
@@ -791,7 +833,7 @@ class POAgent:
         except Exception as e:
             return f"Error executing {tool_name}: {e}"
 
-    def chat(self, message: str, sovereign_context: str = "", max_tool_rounds: int = 8,
+    def chat(self, message: str, sovereign_context: str = "", max_tool_rounds: int = 15,
              progress_callback=None) -> str:
         """
         Full agent chat with tool-calling loop.
@@ -823,22 +865,33 @@ class POAgent:
 
         system_prompt = self._build_system_prompt(sovereign_context)
         messages = [{"role": "system", "content": system_prompt}]
-        for h in self._history[-self._max_history:]:
-            messages.append(h)
+        with self._lock:
+            for h in self._history[-self._max_history:]:
+                messages.append(h)
         messages.append({"role": "user", "content": message})
 
         _notify("round", {"round": 1, "max": max_tool_rounds})
 
         for round_num in range(max_tool_rounds):
-            # Try each model in the chain
+            # Try configured model first, then current model, then chain fallback
             resp, tool_calls, used_model, err = None, None, None, None
-            for attempt in range(len(MODEL_CHAIN)):
-                model = MODEL_CHAIN[(self._model_index + attempt) % len(MODEL_CHAIN)]
+            configured = self._load_configured_model()
+            models_to_try = []
+            if configured:
+                models_to_try.append(configured)
+            if self.current_model not in models_to_try:
+                models_to_try.append(self.current_model)
+            for m in MODEL_CHAIN:
+                if m not in models_to_try:
+                    models_to_try.append(m)
+
+            for attempt, model in enumerate(models_to_try):
                 resp, tool_calls, used_model, err = self._call_llm(
-                    messages, tools=TOOL_DEFINITIONS, tool_choice="auto"
+                    messages, model=model, tools=TOOL_DEFINITIONS, tool_choice="auto"
                 )
                 if resp or tool_calls:
-                    self._model_index = MODEL_CHAIN.index(used_model)
+                    if used_model in MODEL_CHAIN:
+                        self._model_index = MODEL_CHAIN.index(used_model)
                     break
 
             if not resp and not tool_calls:
@@ -893,23 +946,34 @@ class POAgent:
                 continue
             else:
                 # Final response — no more tool calls
-                self._history.append({"role": "user", "content": message})
-                self._history.append({"role": "assistant", "content": resp})
+                # Thread-safe history write
+                with self._lock:
+                    self._history.append({"role": "user", "content": message})
+                    self._history.append({"role": "assistant", "content": resp})
                 _notify("complete", {})
                 return resp
 
         # Max rounds — ask for final response
         _notify("max_rounds", {})
         messages.append({"role": "user", "content": "Max tool calls reached. Provide your final response now."})
-        for attempt in range(len(MODEL_CHAIN)):
-            model = MODEL_CHAIN[(self._model_index + attempt) % len(MODEL_CHAIN)]
-            resp, _, used_model, err = self._call_llm(messages)
+        configured = self._load_configured_model()
+        models_to_try = []
+        if configured:
+            models_to_try.append(configured)
+        models_to_try.append(self.current_model)
+        for m in MODEL_CHAIN:
+            if m not in models_to_try:
+                models_to_try.append(m)
+        for model in models_to_try:
+            resp, _, used_model, err = self._call_llm(messages, model=model)
             if resp:
-                self._history.append({"role": "user", "content": message})
-                self._history.append({"role": "assistant", "content": resp})
+                with self._lock:
+                    self._history.append({"role": "user", "content": message})
+                    self._history.append({"role": "assistant", "content": resp})
                 return resp
 
         return "⚠️ All LLM providers failed after tool calls."
 
     def clear_history(self):
-        self._history.clear()
+        with self._lock:
+            self._history.clear()

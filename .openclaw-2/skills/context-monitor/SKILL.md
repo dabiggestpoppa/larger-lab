@@ -9,9 +9,9 @@
 |-------|-----------|-------------|--------------|
 | openrouter/owl-alpha | 1,000,000 | 750,000 | 900,000 |
 | openrouter/anthropic/claude-sonnet-4 | 200,000 | 150,000 | 180,000 |
-| deepseek/deepseek-v4-flash:free | 128,000 | 96,000 | 115,200 |
-| nvidia/nemotron-3-nano-omni | 128,000 | 96,000 | 115,200 |
-| poolside/laguna-m.1:free | 32,000 | 24,000 | 28,800 |
+| inclusionai/ring-2.6-1t | 131,072 | 98,304 | 117,964 |
+| nvidia/nemotron-3-ultra-550b-a55b | 131,072 | 98,304 | 117,964 |
+| minimax/minimax-m3 | 128,000 | 96,000 | 115,200 |
 
 ## Behavior
 

@@ -61,12 +61,12 @@ $config = @{
     agents = @{
         defaults = @{
             workspace = $WorkspacePath
-            model = "poolside/laguna-m.1:free"
+            model = "inclusionai/ring-2.6-1t"
         }
     }
     gateway = @{
         mode = "local"
-        port = 18789
+        port = 18790
         bind = "loopback"
     }
 } | ConvertTo-Json -Depth 5

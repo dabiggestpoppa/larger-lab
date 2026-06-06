@@ -1,11 +1,11 @@
 {
   "engine": "SymmetryTrap",
   "symbol": "USDCHF.PRO",
-  "direction": "SELL",
-  "entry": 0.78821,
-  "sl": 0.78805,
-  "tp": 0.78711,
+  "direction": "BUY",
+  "entry": 0.79555,
+  "sl": 0.79549,
+  "tp": 0.79665,
   "event": "SL_HIT",
-  "loop": 1,
-  "time": "2026-06-05 03:03:00"
+  "loop": 5,
+  "time": "2026-06-05 11:53:00"
 }

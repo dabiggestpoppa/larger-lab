@@ -26,11 +26,26 @@
         "spawn_id": "spawn_36f75fcc",
         "task_type": "research"
       }
+    },
+    "task_eaa28557": {
+      "task_id": "task_eaa28557",
+      "name": "spawn_worker",
+      "status": "active",
+      "created_at": "2026-06-05T23:05:14.940129Z",
+      "updated_at": "2026-06-05T23:05:14.942874Z",
+      "agent_id": "spawn_0478ba19",
+      "output": "",
+      "error": "",
+      "metadata": {
+        "spawn_id": "spawn_0478ba19",
+        "task_type": "worker"
+      }
     }
   },
   "queue": [
     "task_4160e39e",
-    "task_6e028583"
+    "task_6e028583",
+    "task_eaa28557"
   ],
-  "saved_at": "2026-06-02T00:59:53.697161Z"
+  "saved_at": "2026-06-05T23:05:14.942874Z"
 }

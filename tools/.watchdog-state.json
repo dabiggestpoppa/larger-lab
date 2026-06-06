@@ -1,22 +1,13 @@
 {
   "restarts": {
-    "Hermes": 3,
-    "Sniper-Dashboard": 3,
-    "Telegram-Gateway": 2,
-    "Obsidian-Sync": 2,
-    "OC2": 2,
-    "OCE-Backend": 2,
-    "OCE-Frontend": 2,
-    "SRRA-OPH": 1
+    "Hermes": 0,
+    "Sniper-Dashboard": 0,
+    "Telegram-Gateway": 0,
+    "Obsidian-Sync": 0,
+    "OC2": 0,
+    "OCE-Backend": 0,
+    "OCE-Frontend": 0,
+    "SRRA-OPH": 0
   },
-  "last_restart": {
-    "Hermes": 1780435124.4415903,
-    "Sniper-Dashboard": 1780435162.1801698,
-    "Telegram-Gateway": 1780434913.6072252,
-    "Obsidian-Sync": 1780435005.1537237,
-    "OC2": 1780435108.2716432,
-    "OCE-Backend": 1780435144.691859,
-    "OCE-Frontend": 1780435153.8892422,
-    "SRRA-OPH": 1780434908.6326294
-  }
+  "last_restart": {}
 }
