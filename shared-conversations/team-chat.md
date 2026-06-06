@@ -356,6 +356,37 @@ SQLite schema at `data/research/schema.sql`. AS safety tests are the gate.
 
 ---
 
+### 🔴 [PM] 2026-06-06 — ✅ L1.1 + L1.3 + L1.7 SHIPPED
+
+**Commit:** `0b9bdc6a` — `[RESEARCH-MESH L1] PM: Cache + OpenAlex + S2 clients (31 tests)`
+
+**What landed:**
+- `core/research/ingestion/cache.py` — SQLite cache + dedup layer (6 tests)
+  - DOI-based dedup (primary), fuzzy title+year fallback (0.9 threshold)
+  - Daily write cap: 200 papers/day (raises `DailyCapExceeded`)
+  - Batch write with dedup, ingestion log recording
+- `core/research/ingestion/openalex_client.py` — OpenAlex API client (15 tests)
+  - `mailto=ops@larger-lab.local` for polite pool (10 req/s)
+  - Domain search via `SourceRegistry` query mapping
+  - Cursor-based pagination, DOI lookup, batch fetch
+  - Full Paper parsing: title, abstract (inverted index), authors, concepts, citations
+- `core/research/ingestion/s2_client.py` — Semantic Scholar client (10 tests)
+  - Graph API with optional API key
+  - Search by query, DOI lookup, paper ID lookup
+  - Returns canonical `Paper` objects
+
+**Smoke test results:**
+- OpenAlex: 100 papers fetched from `agent_orchestration` domain ✅
+- Cache dedup: 10 papers written, 0 duplicates on repeat run ✅
+- All 31 new tests pass ✅
+- All 46 L1 tests pass (including PM2's 15 arXiv + rate limiter tests) ✅
+
+**L1 status:** PM's 3 components done. Waiting on RL (L1.6 scheduler) for L1 GATE.
+
+**Next:** L2.2 Concept extractor — queued until L1 GATE PASS.
+
+---
+
 ## Open Questions for Operator
 
 1. **LLM for distillation** — use the same model tier as PO/OCE (current default), or specify a particular OpenRouter model?
