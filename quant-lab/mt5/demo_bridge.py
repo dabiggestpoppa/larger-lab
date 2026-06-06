@@ -217,17 +217,13 @@ class DemoBridge:
             engine = self.engines[symbol]
 
             for bar in bars:
-                engine.process_bar(bar)
+                signal = engine.process_bar(bar)
+                if signal is not None:
+                    self.execute_signal(signal, engine)
 
-            signal = engine.get_signal()
-            if signal is None:
-                continue
-
-            self.execute_signal(signal)
-
-    def execute_signal(self, signal: TradeSignal):
+    def execute_signal(self, signal: TradeSignal, engine):
         """Execute a trade signal on demo account."""
-        symbol = signal.symbol
+        symbol = engine.symbol
         direction = signal.direction
 
         # Check position limits
@@ -242,9 +238,8 @@ class DemoBridge:
             order_type = mt5.ORDER_TYPE_SELL
             entry_price = mt5.symbol_info_tick(symbol).bid
 
-        pip_size = get_pip_size(symbol)
-        sl_price = signal.sl
-        tp_price = signal.tp
+        sl_price = signal.sl_price
+        tp_price = signal.tp_price
 
         # Validate SL/TP
         if sl_price is None or tp_price is None:
@@ -262,7 +257,7 @@ class DemoBridge:
             "tp": tp_price,
             "deviation": 20,
             "magic": 20261000,  # Demo magic number
-            "comment": f"DEMO_{signal.engine.name}",
+            "comment": f"DEMO_SYMTRAP",
             "type_time": mt5.ORDER_TIME_GTC,
             "type_filling": mt5.ORDER_FILLING_IOC,
         }
