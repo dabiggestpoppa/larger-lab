@@ -527,7 +527,11 @@ class DesktopPetApp:
         self.api = None
 
     def create_window(self):
-        """Create the pywebview window."""
+        """Create the pywebview window.
+        Loads VTuber URL DIRECTLY so WebView2 renders the actual VTuber UI.
+        Standard window (not frameless, not transparent) so the user can
+        drag the titlebar, resize from the edges, and use it normally.
+        """
         x = self.pet_state.get("x", -1)
         y = self.pet_state.get("y", -1)
         w = self.pet_state.get("width", WINDOW_WIDTH)
@@ -545,26 +549,22 @@ class DesktopPetApp:
             except Exception:
                 x, y = 100, 100
 
-        # Load HTML directly so the window is ready immediately
-        html = PET_HTML.replace("__VTUBER_URL__", VTUBER_URL)
-
         self.window = webview.create_window(
             title="VTuber Pet",
-            html=html,
+            url=VTUBER_URL,
             width=w,
             height=h,
             x=x,
             y=y,
             resizable=True,
-            frameless=True,
-            easy_drag=False,
+            frameless=False,          # Standard titlebar so user can drag
+            easy_drag=True,           # Allow drag from anywhere
             minimized=False,
             on_top=on_top,
-            transparent=False,
-            hidden=True,
+            transparent=False,        # No transparency hack — clean WebView2
             text_select=False,
             confirm_close=True,
-            background_color="#000000",
+            background_color="#1a1a2e",  # Dark fallback that matches VTuber
         )
 
         # Set up API bridge
@@ -572,12 +572,10 @@ class DesktopPetApp:
 
         return self.window
 
-    def _apply_transparency(self):
-        """Apply transparency after pywebview window is fully created.
-        Called from a background thread that polls until the HWND is ready."""
+    def _show_window(self):
+        """Apply on-top after the window is fully created."""
         if not WIN32_AVAILABLE or not self.window:
             return
-        # Wait for the native window to exist, with bounded retries
         hwnd = None
         for attempt in range(50):  # up to 5 seconds
             hwnd = self.api._get_hwnd() if self.api else None
@@ -586,24 +584,20 @@ class DesktopPetApp:
             time.sleep(0.1)
 
         if not hwnd:
-            log.warning("Could not apply transparency — window handle not found after 5s")
+            log.warning("Window handle not found after 5s")
             return
 
         try:
-            alpha = int(self.pet_state.get("transparency", TRANSPARENCY) * 255)
-            set_window_transparency(hwnd, alpha)
             set_always_on_top(hwnd, self.pet_state.get("always_on_top", ALWAYS_ON_TOP))
             ctypes.windll.user32.ShowWindow(hwnd, 5)  # SW_SHOW
-            ctypes.windll.user32.SetForegroundWindow(hwnd)
-            log.info(f"Applied transparency (alpha={alpha}) to window handle {hwnd}")
+            log.info(f"Window {hwnd} shown")
         except Exception as e:
-            log.warning(f"Transparency application failed: {e}")
+            log.warning(f"Show window failed: {e}")
 
     def _on_loaded(self):
         """Called from pywebview's loaded event (page fully loaded).
-        Starts the transparency thread (HWND now exists)."""
-        # Apply transparency on a background thread (HWND now exists)
-        threading.Thread(target=self._apply_transparency, daemon=True).start()
+        Applies on-top via Win32."""
+        threading.Thread(target=self._show_window, daemon=True).start()
 
     def run(self):
         """Run the desktop pet application."""
