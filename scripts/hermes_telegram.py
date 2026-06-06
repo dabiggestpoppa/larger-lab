@@ -27,6 +27,48 @@ sys.path.insert(0, r"C:\Users\wifik\AppData\Local\hermes\hermes-agent")
 # Add workspace venv for mcp and other packages
 sys.path.insert(0, r"C:\Users\wifik\Desktop\projects\larger-lab\.venv\Lib\site-packages")
 
+# ─── PID File Lock ───────────────────────────────────────────────────────────
+_PID_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".hermes_telegram.pid")
+
+def _is_process_alive(pid):
+    if pid == os.getpid():
+        return True
+    if sys.platform == "win32":
+        import ctypes
+        kernel32 = ctypes.windll.kernel32
+        handle = kernel32.OpenProcess(0x1000, False, pid)
+        if handle:
+            kernel32.CloseHandle(handle)
+            return True
+        return False
+    else:
+        try:
+            os.kill(pid, 0)
+            return True
+        except (OSError, ProcessLookupError):
+            return False
+
+def _acquire_pid_lock():
+    pid = os.getpid()
+    if os.path.exists(_PID_FILE):
+        try:
+            with open(_PID_FILE, "r") as f:
+                old_pid = int(f.read().strip())
+            if old_pid != pid and _is_process_alive(old_pid):
+                log("[FATAL] Another Hermes instance already running (PID %d). Exiting." % old_pid)
+                sys.exit(1)
+        except (ValueError, FileNotFoundError):
+            pass
+    with open(_PID_FILE, "w") as f:
+        f.write(str(pid))
+
+def _release_pid_lock():
+    if os.path.exists(_PID_FILE):
+        try:
+            os.remove(_PID_FILE)
+        except OSError:
+            pass
+
 # ─── Logging ────────────────────────────────────────────────────────────────
 
 def log(msg):
@@ -41,26 +83,68 @@ def log(msg):
 
 # ─── Telegram Helpers ───────────────────────────────────────────────────────
 
+def _escape_markdown(text: str) -> str:
+    """Escape Telegram MarkdownV2 special chars: _ * [ ] ( ) ~ ` > # + - = | { } . !
+    For legacy Markdown, only *, _, `, [ need escaping."""
+    special = r"_*`["
+    out = []
+    for ch in text:
+        if ch in special:
+            out.append("\\" + ch)
+        else:
+            out.append(ch)
+    return "".join(out)
+
+
 def send(base_url, chat_id, text, parse_mode="Markdown"):
-    if not text: return
+    if not text:
+        return
+
+    def _post(text_chunk: str, mode: str | None):
+        payload = {"chat_id": chat_id, "text": text_chunk}
+        if mode:
+            payload["parse_mode"] = mode
+        r = requests.post(
+            f"{base_url}/sendMessage",
+            json=payload,
+            timeout=15,
+        )
+        return r
+
+    def _send_chunk(text_chunk: str):
+        # First try with the requested parse mode
+        if parse_mode:
+            r = _post(text_chunk, parse_mode)
+            if r.status_code == 200:
+                return True
+            # If markdown parse failed, log and fall back to plain text
+            err = ""
+            try:
+                err = r.json().get("description", "")
+            except Exception:
+                err = r.text[:200]
+            log(f"Send markdown failed ({r.status_code}): {err} — falling back to plain text")
+        # Plain text fallback (no parse_mode)
+        r = _post(text_chunk, None)
+        if r.status_code != 200:
+            err = ""
+            try:
+                err = r.json().get("description", "")
+            except Exception:
+                err = r.text[:200]
+            log(f"Send FAILED ({r.status_code}): {err}")
+            return False
+        return True
+
     # Split long messages (Telegram 4096 char limit)
     while len(text) > 4000:
         idx = text.rfind("\n", 0, 4000)
-        if idx == -1: idx = 4000
-        try:
-            requests.post(f"{base_url}/sendMessage",
-                json={"chat_id": chat_id, "text": text[:idx], "parse_mode": parse_mode},
-                timeout=15)
-        except Exception as e:
-            log(f"Send error (chunk): {e}")
+        if idx == -1:
+            idx = 4000
+        _send_chunk(text[:idx])
         text = text[idx:]
     if text:
-        try:
-            requests.post(f"{base_url}/sendMessage",
-                json={"chat_id": chat_id, "text": text, "parse_mode": parse_mode},
-                timeout=15)
-        except Exception as e:
-            log(f"Send error: {e}")
+        _send_chunk(text)
 
 def typing(base_url, chat_id):
     try:
@@ -275,6 +359,9 @@ def main():
         log("ERROR: HERMES_TELEGRAM_TOKEN not set in environment")
         log("Set it in .env: HERMES_TELEGRAM_TOKEN=<bot_token>")
         return
+
+    # Acquire PID lock FIRST — before any network connections
+    _acquire_pid_lock()
 
     base_url = f"https://api.telegram.org/bot{token}"
     chat_id = os.environ.get("HERMES_TELEGRAM_CHAT_ID", "")
