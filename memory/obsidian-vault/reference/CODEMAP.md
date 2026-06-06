@@ -1,7 +1,7 @@
 # 🗺️ CODEMAP — Complete Workspace Reference
 
-> **Last Updated:** 2026-06-01
-> **Version:** 2.0 (Post-Reorganization)
+> **Last Updated:** 2026-06-06
+> **Version:** 2.1 (PO × VTuber Integration Added)
 
 ---
 
@@ -91,6 +91,20 @@ larger-lab/
 │   │   ├── vault_api.py          # Vault API endpoints (19 routes)
 │   │   ├── persistent_field_api.py
 │   │   └── substrate/            # Substrate layer
+│   ├── po_api.py                  # PO API endpoints
+│   ├── po_workspace.py            # Workspace scanner
+│   ├── po_vault.py                # Vault retriever
+│   ├── po_stream.py               # Streaming thought layer
+│   ├── po_agents.py               # Agent coordination
+│   ├── po_router.py               # Multi-model router
+│   ├── po_fallback.py             # Fallback chain
+│   ├── po_interrupt.py            # Interrupt handler
+│   ├── po_idle.py                 # Idle runtime
+│   ├── po_session.py              # Session store
+│   ├── po_state.py                # State persistence
+│   └── po_events.py               # Event schema
+
+
 │   └── frontend/                  # Next.js app
 │       ├── components/           # React components
 │       ├── stores/               # Zustand stores
@@ -116,6 +130,15 @@ larger-lab/
 │       ├── dmr_executor.py
 │       ├── dmr_monitor.py
 │       └── symmetry_trap_executor.py
+├── vtuber_integration/              # PO × VTuber Integration
+│   ├── po_provider/                 # PO Provider Adapter (Phase 1)
+│   │   └── po_provider.py           # StatelessLLMInterface impl
+│   ├── tests/                       # Integration tests
+│   │   ├── test_smoke.py           # P1.6 smoke (12 tests)
+│   │   ├── test_phase2.py          # P2.1-P2.12 (34 tests)
+│   │   └── test_phase3.py          # P3.1-P3.5 (15 tests)
+│   └── Open-LLM-VTuber/            # Cloned upstream (Phase 0)
+
 ├── tradovate/                     # NinjaTrader 8 + Tradovate
 │   ├── CEREBUS_ST_NT8.cs         # Symmetry Trap NinjaScript
 │   ├── CEREBUS_P90_NT8.cs        # P90 NinjaScript
@@ -357,6 +380,9 @@ All Mermaid diagrams are in `docs/architecture/ALL_MERMAID_GRAPHS.md`. Key diagr
 | 31 | Workspace Directory Structure | Workspace |
 | 32 | Service Ports & Health | Services |
 | 33 | Complete File Inventory | Inventory |
+| 34 | PO-VTuber Integration Architecture | PO × VTuber |
+| 35 | PO Cognitive Pipeline | PO × VTuber |
+| 36 | PO Provider Injection Flow | PO × VTuber |
 
 ---
 
@@ -365,6 +391,7 @@ All Mermaid diagrams are in `docs/architecture/ALL_MERMAID_GRAPHS.md`. Key diagr
 | Suite | Tests | Status |
 |-------|-------|--------|
 | V3 Phases 1-10 | 1460 | ✅ PASS |
+| PO × VTuber P1-P3 | 61 | ✅ PASS |
 | SRRA-OPH | 57 | ✅ PASS |
 | OCE | 1403 | ✅ PASS |
 | Observer Core O-1→O-7 | All phases | ✅ Complete |
@@ -377,6 +404,8 @@ All Mermaid diagrams are in `docs/architecture/ALL_MERMAID_GRAPHS.md`. Key diagr
 
 | Commit | Description |
 |--------|-------------|
+| `a9e86573` | PO × VTuber Phase 3 gate complete - 61/61 tests passing |
+| `b562f1f1` | Exclude .venv and large dirs in WorkspaceScanner for fast tests |
 | `ca432549b` | Workspace reorganization: consolidate dirs, sync vault, update configs |
 | `a4809d51d` | Previous state |
 
