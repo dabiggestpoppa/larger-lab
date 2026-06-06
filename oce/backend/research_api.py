@@ -38,6 +38,13 @@ except ImportError:
     TaskQueue = None
     ResearchTask = None
 
+# L4.7 — Vault sync engine
+try:
+    from .vault_sync import VaultSync as _VaultSync
+    _vault_sync = _VaultSync()
+except ImportError:
+    _vault_sync = None
+
 router = APIRouter()
 
 
@@ -395,6 +402,38 @@ async def update_config(config: Dict[str, Any]) -> Dict[str, Any]:
     """
     # Placeholder: actual implementation updates config
     return {"status": "updated", "config": config}
+
+
+# ─── L4.7 — Vault Sync Endpoints ─────────────────────────────────────────────
+
+@router.post("/api/research/vault/sync")
+async def sync_vault() -> Dict[str, Any]:
+    """
+    Trigger vault → graph sync.
+    
+    Scans O2C-VAULT/research/papers/ and O2C-VAULT/doctrine/,
+    upserts nodes and edges into the knowledge graph.
+    """
+    if not _vault_sync:
+        return {"error": "Vault sync not available", "status": "unavailable"}
+
+    try:
+        result = await _vault_sync.sync_vault_to_graph()
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/api/research/vault/stats")
+async def vault_stats() -> Dict[str, Any]:
+    """Get vault statistics (paper notes, doctrine notes, domains)."""
+    if not _vault_sync:
+        return {"error": "Vault sync not available", "status": "unavailable"}
+
+    try:
+        return _vault_sync.get_vault_stats()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 def register_research_endpoints(app) -> None:

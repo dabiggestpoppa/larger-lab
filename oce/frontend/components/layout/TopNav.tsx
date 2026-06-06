@@ -20,6 +20,7 @@ const navItems = [
   { href: "/persistence", label: "Persistence", icon: "◷" },
   { href: "/chat", label: "Chat", icon: "💬" },
   { href: "/vault", label: "Vault", icon: "📂" },
+  { href: "/research", label: "Research", icon: "🔬" },
 ];
 
 export default function TopNav() {
