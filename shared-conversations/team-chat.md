@@ -168,6 +168,45 @@
 
 ### [RL] 2026-06-05 16:30 UTC — 🟢 RESEARCH COMPLETE: Idle Runtime Design
 
+---
+
+### [OC2] 2026-06-05 23:30 UTC — 🔴 CEREBUS CLEANUP COMPLETE
+
+**Context:** Executor decommission + full round house cleanup of quant-lab/mt5.
+
+**What happened:**
+- `symmetry_trap_executor.py` (old standalone DMR executor) had hardcoded `SYMBOL="EURUSD.PRO"` + magic 20260531 — was causing rogue trades on Sign 7 pairs
+- Removed from guardian `PROCESSES` dict — bridge is now SOLE executor
+- Deleted debug artifacts: `engine_diff.txt`, `hook_test_msg.txt`, `hook_test_output.txt`
+- Archived stale signal files + executor logs to `quant-lab/mt5/archive/`
+- Cleaned `live_logs/` — only active bridge data remains
+
+**Rogue trades identified:**
+| Ticket | Pair | Dir | PnL | Magic | Source |
+|--------|------|-----|-----|-------|--------|
+| 109874743 | CHFJPY.PRO | BUY | +$0.51 | 20260601 | Old executor |
+| 109890054 | EURUSD.PRO | BUY | -$1.08 | 0 | Unknown/ghost |
+| 109898440 | EURUSD.PRO | SELL | +$1.02 | 20260601 | Old executor |
+
+**Bridge status:** ✅ Healthy. Scan #107+, Low Cost Hex pairs (EURJPY/EURNZD/GBPNZD/EURAUD/GBPAUD/GBPCAD), 0 open positions.
+
+---
+
+### [OC2] 2026-06-05 23:45 UTC — 📋 DEMO SETUP PLAN (from MAD 16:04 EDT conversation)
+
+**Goal:** Run Profit Quad on demo alongside live — separate processes, separate logs.
+
+**Config-only changes (no new code):**
+1. `mt5/demo_deploy_config.py` — copy of `deploy_config.py` with `.demo` symbol suffixes
+2. `mt5/demo_account.json` — demo account login/server/password (FROM MAD)
+3. `mt5/demo_bridge.py` — copy of `cerebus_live_bridge.py` with `DEMO_MODE = True`
+4. Guardian: add `demo_bridge` as separate monitored process
+5. Logs: `demo_logs/` folder already exists — completely separate from `live_logs/`
+
+**Profit Quad demo pairs:** BTCUSD + ETHUSD + EURNZD + GBPNZD
+
+**Key rule:** Demo and live = separate Python processes, no shared state, no mixed signals.
+
 **Deliverable:** `progress/rl-vtuber-idle-research.md`
 
 **Key findings:**
