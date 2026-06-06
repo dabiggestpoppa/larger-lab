@@ -1,11 +1,11 @@
 {
   "engine": "SymmetryTrap",
   "symbol": "AUDUSD.PRO",
-  "direction": "BUY",
-  "entry": 0.71335,
-  "sl": 0.71356,
-  "tp": 0.71445,
+  "direction": "SELL",
+  "entry": 0.70518,
+  "sl": 0.70515,
+  "tp": 0.70408,
   "event": "SL_HIT",
-  "loop": 1,
-  "time": "2026-06-05 03:48:00"
+  "loop": 5,
+  "time": "2026-06-05 12:23:00"
 }

@@ -59,18 +59,18 @@ class OpenRouterGateway:
             "priority": 1,
         },
         {
-            "name": "deepseek-chat",
-            "model": "deepseek/deepseek-chat",
-            "max_context": 65536,
-            "cost_per_1k_tokens": 0.001,
-            "priority": 2,
+            "name": "ring",
+            "model": "inclusionai/ring-2.6-1t",
+            "max_context": 131072,
+            "cost_per_1k_tokens": 0.0,
+            "priority": 1,
         },
         {
-            "name": "deepseek-reasoner",
-            "model": "deepseek/deepseek-reasoner",
-            "max_context": 65536,
-            "cost_per_1k_tokens": 0.002,
-            "priority": 3,
+            "name": "minimax",
+            "model": "minimax/minimax-m3",
+            "max_context": 131072,
+            "cost_per_1k_tokens": 0.0,
+            "priority": 2,
         },
         {
             "name": "qwen-plus",
@@ -118,16 +118,16 @@ class OpenRouterGateway:
 
         # Task-based selection
         task_preferences: dict[str, list[str]] = {
-            "coding": ["qwen-coder", "deepseek-chat"],
-            "research": ["deepseek-chat", "qwen-plus"],
-            "architecture": ["deepseek-reasoner", "deepseek-chat"],
-            "repair": ["qwen-coder", "deepseek-chat"],
-            "debugging": ["qwen-coder", "deepseek-chat"],
-            "orchestration": ["deepseek-chat", "qwen-plus"],
-            "visualization": ["qwen-coder", "deepseek-chat"],
-            "automation": ["qwen-coder", "deepseek-chat"],
-            "system_analysis": ["deepseek-reasoner", "deepseek-chat"],
-            "general": ["deepseek-chat", "qwen-plus"],
+            "coding": ["qwen-coder", "ring"],
+            "research": ["ring", "qwen-plus"],
+            "architecture": ["ring", "minimax"],
+            "repair": ["qwen-coder", "ring"],
+            "debugging": ["qwen-coder", "ring"],
+            "orchestration": ["ring", "qwen-plus"],
+            "visualization": ["qwen-coder", "ring"],
+            "automation": ["qwen-coder", "ring"],
+            "system_analysis": ["ring", "minimax"],
+            "general": ["ring", "qwen-plus"],
         }
 
         preferences = task_preferences.get(task_type, ["deepseek-chat"])

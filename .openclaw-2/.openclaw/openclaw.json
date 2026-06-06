@@ -1,17 +1,17 @@
 {
   "agents": {
     "defaults": {
-      "workspace": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab",
-      "model": "openrouter/owl-alpha",
+      "workspace": "C:\\\\Users\\\\wifik\\\\Desktop\\\\projects\\\\larger-lab",
+      "model": "inclusionai/ring-2.6-1t",
       "models": {
-        "poolside/laguna-m.1:free": {
-          "alias": "laguna"
+        "inclusionai/ring-2.6-1t": {
+          "alias": "ring"
         },
-        "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": {
+        "minimax/minimax-m3": {
+          "alias": "minimax"
+        },
+        "nvidia/nemotron-3-ultra-550b-a55b": {
           "alias": "nemotron"
-        },
-        "deepseek/deepseek-v4-flash:free": {
-          "alias": "deepseek"
         },
         "openrouter/owl-alpha": {
           "alias": "owl"
@@ -48,9 +48,9 @@
     },
     "load": {
       "extraDirs": [
-        "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\.openclaw-2\\skills",
-        "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\.agents\\skills",
-        "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\skills"
+        "C:\\\\Users\\\\wifik\\\\Desktop\\\\projects\\\\larger-lab\\\\.openclaw-2\\\\skills",
+        "C:\\\\Users\\\\wifik\\\\Desktop\\\\projects\\\\larger-lab\\\\.agents\\\\skills",
+        "C:\\\\Users\\\\wifik\\\\Desktop\\\\projects\\\\larger-lab\\\\skills"
       ]
     }
   },
@@ -76,6 +76,20 @@
   },
   "models": {
     "providers": {
+      "openrouter": {
+        "baseUrl": "https://openrouter.ai/api/v1",
+        "apiKey": "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",
+        "models": [
+          {
+            "id": "inclusionai/ring-2.6-1t",
+            "name": "inclusionai/ring-2.6-1t"
+          },
+          {
+            "id": "openrouter/owl-alpha",
+            "name": "openrouter/owl-alpha"
+          }
+        ]
+      },
       "poolside": {
         "baseUrl": "https://api.poolside.ai/v1",
         "apiKey": "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",
@@ -93,6 +107,10 @@
           {
             "id": "nemotron-3-nano-omni-30b-a3b-reasoning:free",
             "name": "nemotron-3-nano-omni-30b-a3b-reasoning:free"
+          },
+          {
+            "id": "nemotron-3-ultra-550b-a55b:free",
+            "name": "nemotron-3-ultra-550b-a55b:free"
           }
         ]
       },

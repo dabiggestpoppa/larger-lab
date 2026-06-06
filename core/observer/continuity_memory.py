@@ -154,6 +154,30 @@ class ContinuityMemory:
             )
             return sorted_patterns[:n]
 
+    def to_summary_string(self) -> str:
+        """Produce an LLM-readable summary of continuity memory."""
+        r = self._record
+        lines = [
+            f"Operational Memory Summary:",
+            f"  Session: {r.session_id}",
+            f"  Started: {r.start_time}",
+            f"  Last active: {r.last_active}",
+            f"  Total workflows: {r.workflow_count}",
+            f"  Success rate: {self.get_success_rate():.1%} ({r.success_count} ok, {r.failure_count} failed)",
+        ]
+        if r.active_goals:
+            lines.append(f"  Active goals: {', '.join(r.active_goals)}")
+        top = self.get_top_routing_patterns(5)
+        if top:
+            lines.append(f"  Routing patterns: {', '.join(f'{k} ({v}x)' for k, v in top)}")
+        recent = r.workflow_history[-5:]
+        if recent:
+            lines.append(f"  Recent workflows:")
+            for w in recent:
+                status = '✅' if w.get('success') else '❌'
+                lines.append(f"    {status} [{w.get('timestamp','')}] {w.get('domain','')} via {w.get('routing_path','')} ({w.get('model_used','')})")
+        return "\n".join(lines)
+
     def to_dict(self) -> dict[str, Any]:
         with self._lock:
             return {

@@ -47,7 +47,7 @@ PROCESSES = {
     "bridge": {
         "exe": PYTHONW_EXE,
         "script": os.path.join(SCRIPT_DIR, "cerebus_live_bridge.py"),
-        "args": ["--symbols", "GBPJPY.PRO,CHFJPY.PRO,GBPNZD.PRO,GBPAUD.PRO,NZDUSD.PRO,EURUSD.PRO,USDCHF.PRO", "--lot-size", "0.01"],
+        "args": ["--symbols", "EURJPY.PRO,EURNZD.PRO,GBPNZD.PRO,EURAUD.PRO,GBPAUD.PRO,GBPCAD.PRO", "--lot-size", "0.01"],
         "critical": True,  # Alert if this dies
     },
     "st_executor": {
@@ -156,7 +156,7 @@ def check_mt5_connection() -> bool:
 
 def main(run_once: bool = False):
     log.info("=" * 60)
-    log.info("CEREBUS GUARDIAN v2 — Starting")
+    log.info("CEREBUS GUARDIAN v2 - Starting")
     log.info(f"Monitoring: {', '.join(PROCESSES.keys())}")
     log.info(f"Check interval: {CHECK_INTERVAL}s | Grace period: {GRACE_PERIOD}s")
     log.info(f"Max restarts/hour per process: {MAX_RESTARTS_PER_HOUR}")
@@ -171,9 +171,9 @@ def main(run_once: bool = False):
         script_basename = os.path.basename(cfg["script"])
         pid = get_process_pid(script_basename)
         if pid:
-            log.info(f"{name} already running — OK (PID {pid})")
+            log.info(f"{name} already running - OK (PID {pid})")
         else:
-            log.info(f"{name} not running — starting...")
+            log.info(f"{name} not running - starting...")
             start_process(name, cfg)
             last_restart[name] = time.time()
 
@@ -208,19 +208,19 @@ def main(run_once: bool = False):
 
                 pid = get_process_pid(script_basename)
                 if pid:
-                    log.debug(f"  {name} — alive (PID {pid})")
+                    log.debug(f"  {name} - alive (PID {pid})")
                     continue
 
                 # Process is dead
                 is_critical = cfg.get("critical", False)
-                level = "🚨 CRITICAL" if is_critical else "⚠ WARNING"
-                log.warning(f"{level} {name} is DEAD (was PID {pid}) — restarting...")
+                level = "CRITICAL" if is_critical else "WARNING"
+                log.warning(f"{level} {name} is DEAD (was PID {pid}) - restarting...")
 
                 # Check restart rate limit
                 if restart_count.get(name, 0) >= MAX_RESTARTS_PER_HOUR:
-                    log.error(f"  {name} exceeded {MAX_RESTARTS_PER_HOUR}/hour restarts — SKIPPING. Manual intervention needed.")
+                    log.error(f"  {name} exceeded {MAX_RESTARTS_PER_HOUR}/hour restarts - SKIPPING. Manual intervention needed.")
                     if is_critical:
-                        log.error(f"  CRITICAL PROCESS {name} IS DOWN — SEND ALERT TO MAD")
+                        log.error(f"  CRITICAL PROCESS {name} IS DOWN - SEND ALERT TO MAD")
                     continue
 
                 # Kill any zombie processes first
@@ -230,16 +230,16 @@ def main(run_once: bool = False):
                 if start_process(name, cfg):
                     last_restart[name] = now
                     restart_count[name] = restart_count.get(name, 0) + 1
-                    log.info(f"✅ {name} restarted (attempt {restart_count[name]}/{MAX_RESTARTS_PER_HOUR} this hour)")
+                    log.info(f"{name} restarted (attempt {restart_count[name]}/{MAX_RESTARTS_PER_HOUR} this hour)")
                 else:
-                    log.error(f"❌ Failed to restart {name}")
+                    log.error(f"Failed to restart {name}")
 
             # Periodic MT5 health check (every 5 cycles)
             if int(now) % (CHECK_INTERVAL * 5) < CHECK_INTERVAL:
                 if check_mt5_connection():
-                    log.debug("  MT5 connection — OK")
+                    log.debug("  MT5 connection - OK")
                 else:
-                    log.warning("  MT5 connection — FAIL (terminal may need manual restart)")
+                    log.warning("  MT5 connection - FAIL (terminal may need manual restart)")
 
         except KeyboardInterrupt:
             log.info("Guardian stopped by user")

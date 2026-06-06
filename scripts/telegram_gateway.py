@@ -33,8 +33,37 @@ from core.observer.presence_engine import (
     WATCHERS, TIMELINE, CONTINUITY, PRIORITY,
     start_presence_engine, stop_presence_engine
 )
+from oce.backend.rate_limit_tracker import record_api_call, get_rate_limit_tracker
 
-# ─── Logging ─────────────────────────────────────────────────────────────
+# --- PID File Lock ---
+_PID_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".telegram_gateway.pid")
+
+def _acquire_pid_lock():
+    pid = os.getpid()
+    if os.path.exists(_PID_FILE):
+        try:
+            with open(_PID_FILE, "r") as f:
+                old_pid = int(f.read().strip())
+            if old_pid != pid:
+                try:
+                    os.kill(old_pid, 0)
+                    log("[FATAL] Another instance already running (PID %d). Exiting." % old_pid)
+                    sys.exit(1)
+                except (OSError, ProcessLookupError):
+                    pass
+        except (ValueError, FileNotFoundError):
+            pass
+    with open(_PID_FILE, "w") as f:
+        f.write(str(pid))
+
+def _release_pid_lock():
+    if os.path.exists(_PID_FILE):
+        try:
+            os.remove(_PID_FILE)
+        except OSError:
+            pass
+
+# ---- Logging ----
 
 def log(msg):
     ts = datetime.datetime.now().strftime("%H:%M:%S")
@@ -252,6 +281,7 @@ def main():
          "🟢 *PO Agent Online*\n\nFull agent capability active:\n• File read/write/edit\n• Shell commands\n• OCE API calls\n• GitHub operations\n• Python execution\n• Vault search\n• Tool-calling loop\n\nSlash commands still work. Chat messages now use full agent.",
          parse_mode="Markdown")
 
+    _acquire_pid_lock()
     log("Poll loop started. PO is live on Telegram.")
     _heartbeat = time.time()
 
@@ -377,9 +407,9 @@ def main():
                                 with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
                                     future = executor.submit(agent.chat, msg_text, full_ctx, progress_callback=on_progress)
                                     try:
-                                        resp = future.result(timeout=120)
+                                        resp = future.result(timeout=180)
                                     except concurrent.futures.TimeoutError:
-                                        resp = "⏱️ Response timed out after 120s. Try a simpler question."
+                                        resp = "⏱️ Response timed out after 180s. Try a simpler question."
                                         log("AGENT TIMEOUT")
 
                                 # Record in timeline and continuity cache

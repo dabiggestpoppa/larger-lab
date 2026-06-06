@@ -1,9 +1,38 @@
-﻿# ðŸŸ¦ Copilot â€” Sub-Progress Log
+﻿# 🦦 Copilot — Sub-Progress Log
 
 > **Agent:** Copilot (GitHub Copilot)
 > **Role:** Test Monitoring / Autopilot Support
 > **Reports to:** CC (Claude Code)
-> **Sync Rule:** Every 7 updates â†’ auto-sync. Every 20 entries â†’ LLM summarization.
+> **Sync Rule:** Every 7 updates → auto-sync. Every 20 entries → LLM summarization.
+
+---
+
+## PowerShell/Windows Execution Gotchas
+
+### Encoding Issues
+- **Problem:** Windows PowerShell defaults to `cp1252` encoding, breaking emoji and Unicode
+- **Fix:** Always set `$env:PYTHONIOENCODING="utf-8"` before running Python scripts
+- **Symptom:** 🔄✅⚠️ characters appear as `?` or cause silent failures
+
+### Process Invocation
+- **Problem:** `Start-Process "openclaw"` opens .ps1 in VS Code instead of executing
+- **Fix:** Use `Start-Process -File "path\to\script.ps1"` or `Start-Process -WindowStyle Hidden -FilePath "python" -ArgumentList "script.py"`
+- **For background processes:** Always use `-WindowStyle Hidden` to avoid terminal timeout
+
+### Terminal Management
+- **Problem:** Stale terminals accumulate (76+ hours old), causing port conflicts
+- **Fix:** Kill old terminals before starting: `Get-Process powershell | Where-Object {$_.StartTime -lt (Get-Date).AddHours(-1)} | Stop-Process`
+- **Best practice:** Use `gateway_watchdog.py` for 24/7 monitoring instead of async terminals
+
+### Working Directory
+- **Problem:** Scripts with relative paths fail when terminal CWD differs
+- **Fix:** Use full paths: `python "C:\Users\wifik\Desktop\projects\larger-lab\scripts\script.py"`
+- **Or:** `Set-Location "C:\Users\wifik\Desktop\projects\larger-lab"` before running
+
+### PID Locking (for Python scripts)
+- Always implement PID file locks to prevent duplicate instances
+- Check `_PID_FILE` before starting critical services (telegram_gateway, etc.)
+- Use `taskkill /F /PID <pid>` to kill stale processes
 
 ---
 

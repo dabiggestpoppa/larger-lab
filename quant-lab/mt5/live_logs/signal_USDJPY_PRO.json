@@ -1,0 +1,11 @@
+{
+  "engine": "SymmetryTrap",
+  "symbol": "USDJPY.PRO",
+  "direction": "BUY",
+  "entry": 160.197,
+  "sl": 160.237,
+  "tp": 160.357,
+  "event": "SL_HIT",
+  "loop": 4,
+  "time": "2026-06-05 10:35:00"
+}

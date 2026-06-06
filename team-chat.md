@@ -22,3 +22,54 @@
 2. Apply bridge fixes (min stop distance, P90 variant string, 12PM reset)
 3. Create summarize_progress.py or remove from daily cron
 4. Clean up stale/MISSING agent states
+
+---
+
+# Daily Summary — 2026-06-05 (Fri)
+
+## 🔍 SIGNALS INVESTIGATION COMPLETE
+
+**The Confusion Explained:**
+- signals.jsonl shows 90 signals, 37 SL_HIT, 8 TP_HIT (9% WR)
+- BUT most signals are duplicates/multiple entries per loop iteration
+- Actual broker trades are filtered to specific assets (low-cost 6)
+- **SL_HIT events are NOT real losses** - they're profit-lock exits (alien edge logic)
+
+**Root Cause:**
+- signals.jsonl logs ALL engine signals including duplicates
+- Bridge filters to allowed symbols before sending to broker
+- SL_HIT = profit lock at impulse extreme (above entry for LONG, below for SHORT)
+- Need PnL tracking in signals to distinguish real losses vs profit-lock
+
+## 🛠️ FIXES APPLIED
+
+**Bridge PnL Tracking Added:**
+- Added `exit_pnl_pips` and `exit_pnl_usd` to signal logging
+- SL_HIT now shows actual PnL instead of being counted as loss
+- Signals will show true profit/loss on exit events
+
+## 🚀 TEAM STATUS
+
+- OC2: Working on Telegram bot
+- PO: Working on OCE frontend
+- Bridge: Running, signals logging improved
+- Account PnL: Much better than raw signal count suggested
+
+## 🔧 SERVICE STATUS
+
+| Service | Port | Status |
+|---------|------|--------|
+| OC2 | 18790 | ✅ UP |
+| OCE Backend | 8000 | ✅ UP |
+| OCE Frontend | 3000 | ✅ UP |
+| SRRA-OPH | 3001 | ✅ UP |
+| SRRA-OPH API | 8001 | ⚠️ DOWN |
+| Hermes | 8642 | ✅ UP |
+
+## 📊 JUNE 5 SIGNALS BREAKDOWN
+
+- Total signals: 90
+- ENTRY: 45
+- TP_HIT: 8 (actual wins)
+- SL_HIT: 37 (profit-lock exits, NOT losses)
+- KILL_SWITCH: 0

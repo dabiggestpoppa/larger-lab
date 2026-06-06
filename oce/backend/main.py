@@ -28,6 +28,7 @@ logger = logging.getLogger("oce")
 
 # Import SRRA-OPH adapter
 from .srrs_adapter import get_adapter, SRRSAdapter
+from .rate_limit_tracker import get_rate_limit_tracker, record_api_call
 from .event_fabric import get_fabric, get_router, get_persistence, EventFabric, TopologicalRouter, EventPersistence
 from .observer_runtime import get_runtime, ObserverRuntime, ObserverConfig, ObserverState
 from .structural_memory import StructuralMemory, MemoryEntry, MemoryLayer, MemoryStats
@@ -483,6 +484,45 @@ async def get_attractor_state():
     except Exception as e:
         logger.error(f"Attractor error: {e}")
         raise HTTPException(status_code=503, detail=f"Attractor service unavailable: {str(e)}")
+
+
+@app.get("/rate-limit/status")
+async def get_rate_limit_status():
+    """Get current rate-limit status for all API models."""
+    try:
+        tracker = get_rate_limit_tracker()
+        return tracker.get_status()
+    except Exception as e:
+        logger.error(f"Rate limit status error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.get("/rate-limit/errors")
+async def get_rate_limit_errors(limit: int = Query(20, ge=1, le=100)):
+    """Get recent rate-limit errors."""
+    try:
+        tracker = get_rate_limit_tracker()
+        return {"errors": tracker.get_recent_errors(limit)}
+    except Exception as e:
+        logger.error(f"Rate limit errors error: {e}")
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.post("/rate-limit/record")
+async def record_rate_limit(request: dict):
+    """Record an API call for rate-limit tracking."""
+    try:
+        record_api_call(
+            model=request.get("model", "unknown"),
+            status_code=request.get("status_code", 200),
+            error_type=request.get("error_type", ""),
+            cost_usd=request.get("cost_usd", 0.0),
+            tokens_used=request.get("tokens_used", 0),
+        )
+        return {"ok": True}
+    except Exception as e:
+        logger.error(f"Rate limit record error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/memory")

@@ -53,16 +53,16 @@ class SpawnBlueprint:
 
     # Default model mapping by task type
     DEFAULT_MODELS: dict[str, str] = {
-        "coding": "qwen/qwen-2.5-coder-32b-instruct",
-        "research": "deepseek/deepseek-chat",
-        "architecture": "deepseek/deepseek-reasoner",
-        "repair": "qwen/qwen-2.5-coder-32b-instruct",
-        "debugging": "qwen/qwen-2.5-coder-32b-instruct",
-        "orchestration": "deepseek/deepseek-chat",
-        "visualization": "qwen/qwen-2.5-coder-32b-instruct",
-        "automation": "qwen/qwen-2.5-coder-32b-instruct",
-        "system_analysis": "deepseek/deepseek-reasoner",
-        "general": "deepseek/deepseek-chat",
+        "coding": "inclusionai/ring-2.6-1t",
+        "research": "inclusionai/ring-2.6-1t",
+        "architecture": "inclusionai/ring-2.6-1t",
+        "repair": "inclusionai/ring-2.6-1t",
+        "debugging": "inclusionai/ring-2.6-1t",
+        "orchestration": "inclusionai/ring-2.6-1t",
+        "visualization": "inclusionai/ring-2.6-1t",
+        "automation": "inclusionai/ring-2.6-1t",
+        "system_analysis": "inclusionai/ring-2.6-1t",
+        "general": "inclusionai/ring-2.6-1t",
     }
 
     # Default tool sets by task type

@@ -164,6 +164,8 @@ def save_state(state):
 
 def kill_existing_on_port(port):
     """Kill any process listening on the given port."""
+    if port <= 0:
+        return  # Don't kill anything for services without a port
     try:
         result = subprocess.run(
             ["netstat", "-ano"],

@@ -3,9 +3,9 @@ import os, json, requests, datetime, time
 from typing import Dict, Any, List, Optional
 
 MODEL_CHAIN = [
-    "openrouter/owl-alpha",
-    "moonshotai/kimi-k2.6:free",
-    "poolside/laguna-m.1:free",
+    "inclusionai/ring-2.6-1t",
+    "minimax/minimax-m3",
+    "nvidia/nemotron-3-ultra-550b-a55b",
 ]
 
 from core.observer.tools import TOOL_DEFINITIONS, TOOL_FUNCTIONS

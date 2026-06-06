@@ -5,6 +5,7 @@ All Phase 1-4 commands:
 /research  /sync  /task  /trace  /failure  /update  /help
 /spawn  /stop  /restart  /config  /logs  /backup  /restore
 /execute  /schedule  /queue  /cancel  /approve  /reject
+/hermes  — Proxy to Hermes agent
 """
 import os
 import socket
@@ -12,6 +13,8 @@ import datetime
 import asyncio
 import subprocess
 import json
+import threading
+import concurrent.futures
 from typing import Dict, Any, List
 from core.observer.vault import Vault
 from core.observer.journal import Journal
@@ -110,6 +113,18 @@ class CommandRouter:
             return self._cmd_approve(args)
         if cmd == "reject":
             return self._cmd_reject(args)
+
+        # ── Model Selection Command ───────────────────────────────────
+        if cmd == "model":
+            return self._cmd_model(args)
+
+        # ── Rate-Limit Command ───────────────────────────────────
+        if cmd == "ratelimit" or cmd == "rl":
+            return self._cmd_ratelimit(args)
+
+        # ── Hermes Proxy Command ───────────────────────────────────
+        if cmd == "hermes":
+            return self._cmd_hermes(args)
 
         # ── Phase 2: Telemetry Commands ──────────────────────────────
         if cmd == "observers":
@@ -456,6 +471,41 @@ class CommandRouter:
     # CONFIG / ADMIN COMMANDS
     # ═══════════════════════════════════════════════════════════════════
 
+    def _cmd_model(self, args: List[str]) -> str:
+        """Set the LLM model for PO Bot. Usage: /model <model_id>"""
+        VALID_MODELS = [
+            "inclusionai/ring-2.6-1t",
+            "minimax/minimax-m3",
+            "nvidia/nemotron-3-ultra-550b-a55b",
+            "openrouter/owl-alpha",
+        ]
+        # Show current model (use REPO_ROOT for consistency with _load_configured_model)
+        current = None
+        model_config_path = REPO_ROOT / "data" / "po_model.json"
+        if model_config_path.exists():
+            try:
+                current = json.loads(model_config_path.read_text()).get("model")
+            except Exception:
+                pass
+        if not args:
+            lines = ["🤖 Available Models", ""]
+            if current:
+                lines.append(f"Current: {current}")
+            lines.append("")
+            for m in VALID_MODELS:
+                icon = "✅" if m == current else "  •"
+                lines.append(f"{icon} {m}")
+            lines.append("\nUsage: /model <model_id>")
+            return "\n".join(lines)
+        model = args[0]
+        if model not in VALID_MODELS:
+            return f"❌ Unknown model: {model}\n\nUse /model to see available options."
+        # Write to model config file (use REPO_ROOT for consistency)
+        model_config_path.parent.mkdir(parents=True, exist_ok=True)
+        model_config_path.write_text(json.dumps({"model": model, "updated": datetime.datetime.utcnow().isoformat()}, indent=2))
+        self.journal.record_event({"type": "model_change", "model": model})
+        return f"✅ Model set to: {model}\nChanges take effect immediately."
+
     def _cmd_config(self, args: List[str]) -> str:
         """View or set configuration."""
         if not args:
@@ -656,76 +706,149 @@ class CommandRouter:
         return f"📤 Push queued: {msg[:50]}"
 
     # ═══════════════════════════════════════════════════════════════════
+    # HERMES PROXY COMMAND
+    # ═══════════════════════════════════════════════════════════════════
+
+    def _cmd_hermes(self, args: List[str]) -> str:
+        """Proxy a message to Hermes agent for full tool-calling response.
+
+        Usage:
+          /hermes <message>  — Send message to Hermes, get full agent response
+          /hermes model      — Show current Hermes model
+          /hermes models     — List available models
+          /hermes status     — Check Hermes gateway status
+        """
+        if not args:
+            return (
+                "🤖 *Hermes Agent Proxy*\n\n"
+                "Usage:\n"
+                "  /hermes <message>  — Chat with Hermes (full agent)\n"
+                "  /hermes model      — Show current model\n"
+                "  /hermes models     — List available models\n"
+                "  /hermes status     — Check gateway status\n\n"
+                "Examples:\n"
+                "  /hermes What is the status of all services?\n"
+                "  /hermes /status\n"
+                "  /hermes Read the file src/main.py and summarize it"
+            )
+
+        subcmd = args[0].lower()
+
+        if subcmd == "model":
+            model = os.environ.get("HERMES_MODEL", "openrouter/owl-alpha")
+            return f"🧠 Hermes current model: `{model}`\n\nTo change: set HERMES_MODEL env var."
+
+        if subcmd == "models":
+            return (
+                "📋 Available models:\n\n"
+                "  • openrouter/owl-alpha (default)\n"
+                "  • inclusionai/ring-2.6-1t\n"
+                "  • openai/gpt-4.1\n"
+                "  • anthropic/claude-sonnet-4\n"
+                "  • google/gemini-2.0-flash\n"
+                "  • nvidia/nemotron-3-ultra-550b-a55b\n\n"
+                "Set HERMES_MODEL env var to switch."
+            )
+
+        if subcmd == "status":
+            try:
+                import urllib.request
+                req = urllib.request.Request("http://127.0.0.1:8642/api/v1/status")
+                with urllib.request.urlopen(req, timeout=5) as resp:
+                    data = json.loads(resp.read().decode())
+                lines = [
+                    "🟢 Hermes Gateway Status",
+                    "",
+                    f"  Running: {data.get('gateway_running', False)}",
+                    f"  PID: {data.get('gateway_pid')}",
+                    f"  State: {data.get('gateway_state', 'unknown')}",
+                    f"  Active sessions: {data.get('active_sessions', 0)}",
+                    f"  Version: {data.get('version', 'unknown')}",
+                ]
+                return "\n".join(lines)
+            except Exception as e:
+                return f"⚠️ Could not reach Hermes gateway: {e}"
+
+        # Otherwise, proxy the full message to Hermes
+        query = ' '.join(args)
+        try:
+            from run_agent import AIAgent
+
+            model = os.environ.get("HERMES_MODEL", "openrouter/owl-alpha")
+            openrouter_key = os.environ.get("OPENROUTER_API_KEY", "")
+
+            agent = AIAgent(
+                model=model,
+                provider="openrouter",
+                api_key=openrouter_key,
+                base_url="https://openrouter.ai/api/v1",
+                platform="telegram",
+                max_iterations=30,
+                tool_delay=0.5,
+                quiet_mode=True,
+                save_trajectories=False,
+                enabled_toolsets=["hermes-cli"],
+                ephemeral_system_prompt=(
+                    "You are Hermes, a helpful AI assistant with full tool access. "
+                    "Respond concisely. The user is on Telegram via PO Bot proxy."
+                ),
+            )
+
+            # Run with timeout
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+                future = executor.submit(agent.run_conversation, query)
+                try:
+                    response = future.result(timeout=120)
+                except concurrent.futures.TimeoutError:
+                    response = "⏱️ Hermes timed out after 120s. Try a simpler query."
+
+            return response
+
+        except Exception as e:
+            return f"❌ Hermes error: `{str(e)[:200]}`"
+
+    # ═══════════════════════════════════════════════════════════════════
     # HELP
     # ═══════════════════════════════════════════════════════════════════
 
-    def _cmd_help(self, args: List[str]) -> str:
-        """Show all available commands."""
-        return (
-            "🤖 Primary Observer — Command Reference\n\n"
-            "━━ System ━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            "  /status      Full system status (ports, vault, tasks)\n"
-            "  /health      Quick health check\n"
-            "  /agents      List active agents\n"
-            "  /vault       Vault stats (or /vault <search>)\n\n"
-            "━━ Operations ━━━━━━━━━━━━━━━━━━━━━\n"
-            "  /report      Operational report\n"
-            "  /memory <kw> Search vault notes\n"
-            "  /graph       Knowledge graph summary\n"
-            "  /research <t> Research topic\n"
-            "  /sync        Sync vault index\n"
-            "  /task        List tasks (or /task <name>)\n"
-            "  /trace <id>  Trace execution\n"
-            "  /failure <d> Log structured failure\n"
-            "  /update      System update summary\n\n"
-            "━━ Spawn / Execution ━━━━━━━━━━━━━━\n"
-            "  /spawn <t>   Spawn agent\n"
-            "  /stop <t>    Stop agent/task\n"
-            "  /restart <t> Restart service\n"
-            "  /execute <c> Execute command\n\n"
-            "━━ Config / Admin ━━━━━━━━━━━━━━━━━\n"
-            "  /config      View/set config\n"
-            "  /logs        View recent logs\n"
-            "  /backup      Create backup\n"
-            "  /restore     Restore from backup\n\n"
-            "━━ Queue / Scheduling ━━━━━━━━━━━━━\n"
-            "  /schedule <t> Schedule task\n"
-            "  /queue       View task queue\n"
-            "  /cancel <id> Cancel task\n"
-            "  /approve <id> Approve task\n"
-            "  /reject <id> Reject task\n\n"
+    def _cmd_ratelimit(self, args: List[str]) -> str:
+        """Check current rate-limit status."""
+        try:
+            from oce.backend.rate_limit_tracker import get_rate_limit_tracker
+            tracker = get_rate_limit_tracker()
+            s = tracker.get_status()
+            du = s.get("daily_usage_today", 0)
+            ds = s.get("daily_spend_today_usd", 0.0)
+            er = s.get("error_rate", {})
+            models = s.get("models", {})
+            alerts = s.get("alerts", [])
+            worst = "OK"
+            for a in alerts:
+                if a.get("level") == "critical":
+                    worst = "CRITICAL"
+                    break
+                elif a.get("level") == "warning":
+                    worst = "WARNING"
+            lines = [
+                "Rate Limit Status", "",
+                "Requests today: %d" % du,
+                "Spend today: $%.4f" % ds,
+                "Errors (5min): %d" % er.get("count_5min", 0),
+                "Status: %s" % worst,
+            ]
+            if models:
+                lines.append("\nPer-model:")
+                for m, info in models.items():
+                    lines.append("  %s: %d req/hr (%s%%) [%s]" % (
+                        m, info.get("hourly_requests", 0),
+                        info.get("usage_pct", 0),
+                        info.get("status", "?")))
+            if alerts:
+                lines.append("\nAlerts:")
+                for a in alerts:
+                    lines.append("  [%s] %s" % (a["level"].upper(), a["message"]))
+            return "\n".join(lines)
+        except Exception as e:
+            return "Could not get rate-limit status: %s" % e
 
-            "━━ Telemetry (Phase 2) ━━━━━━━━━━━━━\n"
-            "  /observers   Observer health status\n"
-            "  /drift       Drift detection\n"
-            "  /timeline    Operational timeline\n\n"
-            "━━ Presence (Phase 3) ━━━━━━━━━━━━━━\n"
-            "  /presence    Presence engine status\n"
-            "  /watchers    Watcher network status\n"
-            "  /push <msg>  Trigger push notification\n\n"
-            "━━ Other ━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            "  /help        This message"
-        )
-
-
-if __name__ == "__main__":
-    cr = CommandRouter()
-    print(cr.handle('/status'))
-    print('---')
-    print(cr.handle('/help'))
-
-# PATCH: Override _cmd_restart to actually restart the gateway
-import time as _time
-import threading as _threading
-
-def _patched_restart(self, args):
-    target = ' '.join(args) if args else 'gateway'
-    self.journal.record_event({"type": "restart", "target": target})
-    def _do_restart():
-        _time.sleep(2)
-        os.kill(os.getpid(), 9)
-    t = _threading.Thread(target=_do_restart, daemon=True)
-    t.start()
-    return "?? Restarting PO gateway in 2 seconds..."
-
-CommandRouter._cmd_restart = _patched_restart
