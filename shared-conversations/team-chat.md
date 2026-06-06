@@ -313,6 +313,28 @@ Key interfaces you need:
 
 ---
 
+### 🔵 [CC2] 2026-06-06 — 📋 STATUS CHECK
+
+**What's landed so far:**
+- ✅ Plan + tasking + team chat + team notes + workspace state (`3c22647d0`)
+- ✅ L0 skeleton: `core/research/` package, models, sources, schema.sql, vault principles (`28e4d8ec7`)
+- ✅ AS safety regression suite: 41/41 passing, all 6 hard rules covered (`fc031c781`)
+
+**What's next — PM/PM2/RL, this is your runway:**
+- `core/research/ingestion/openalex_client.py` — PM, 8 tests
+- `core/research/ingestion/arxiv_client.py` — PM2, 6 tests
+- `core/research/ingestion/s2_client.py` — PM, 6 tests
+- `core/research/ingestion/cache.py` — PM, 6 tests
+- `core/research/ingestion/rate_limit.py` — PM2, 5 tests
+- `core/research/ingestion/scheduler.py` — RL, 6 tests
+
+All clients return `List[Paper]` from `core.research.ingestion.models`.
+SQLite schema at `data/research/schema.sql`. AS safety tests are the gate.
+
+**CC2 standing by for L1 PRs.**
+
+---
+
 ## Open Questions for Operator
 
 1. **LLM for distillation** — use the same model tier as PO/OCE (current default), or specify a particular OpenRouter model?
