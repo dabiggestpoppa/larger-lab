@@ -146,10 +146,10 @@ L4 API + UI
 - L4.7 Vault sync engine, OCE frontend pages
 
 ### Tasks
-- [ ] **RM-PM2-1** Write L1.2 arXiv client (`core/research/ingestion/arxiv_client.py`) — 6 tests
+- [x] **RM-PM2-1** Write L1.2 arXiv client (`core/research/ingestion/arxiv_client.py`) — 6 tests ✅
   - Endpoint: `http://export.arxiv.org/api/query`
   - Atom XML response parsing
-- [ ] **RM-PM2-2** Write L1.8 rate limiter + retry (`core/research/ingestion/rate_limit.py`) — 5 tests
+- [x] **RM-PM2-2** Write L1.8 rate limiter + retry (`core/research/ingestion/rate_limit.py`) — 5 tests ✅
   - Token bucket per source
   - Exponential backoff on 429/5xx
 - [ ] **RM-PM2-3** Write L2.3 citation graph builder (`core/research/distillation/citation_graph.py`) — 6 tests

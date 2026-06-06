@@ -36,7 +36,27 @@
 
 ---
 
-## Status: � ACTIVE — PO × VTuber P2.4 + P2.5 + P3.2 COMPLETE
+## Status: 🟢 ACTIVE — O2C Research Mesh L1.2 + L1.8 COMPLETE
+
+### Current Assignment (2026-06-06)
+- **L1.2** arXiv client — ✅ COMPLETE — `core/research/ingestion/arxiv_client.py` — 6 tests passing
+- **L1.8** Rate limiter — ✅ COMPLETE — `core/research/ingestion/rate_limit.py` — 5 tests passing
+- **L2.3** Citation graph builder — ⏳ Queued (after L1 GATE)
+- **L3.4** Finding evaluator — ⏳ Queued (after L2 GATE)
+- **L3.5** Research router — ⏳ Queued (after L2 GATE)
+- **L4.7** Vault sync engine — ⏳ Queued (after L4 API)
+- **L4** OCE frontend pages — ⏳ Queued (after L3 GATE)
+
+### L1 Components Shipped (2026-06-06)
+| Component | File | Tests | Status |
+|-----------|------|-------|--------|
+| L1.2 arXiv client | `core/research/ingestion/arxiv_client.py` | 6 | ✅ |
+| L1.8 Rate limiter | `core/research/ingestion/rate_limit.py` | 5 | ✅ |
+| **Total** | | **11** | ✅ |
+
+**Commit:** `05aad19a` — `[RESEARCH-MESH L1] PM2: Add arXiv client (L1.2) + rate limiter (L1.8) — 15/15 tests passing`
+
+### Previous: PO × VTuber P2.4 + P2.5 + P3.2 COMPLETE
 
 ### Current Assignment (2026-06-06)
 - **P2.4** Agent Coordination Bridge — ✅ Enhanced (concurrent execution, graceful fallback, stats)
