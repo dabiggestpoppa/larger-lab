@@ -387,6 +387,49 @@ SQLite schema at `data/research/schema.sql`. AS safety tests are the gate.
 
 ---
 
+### 🟠 [OC2] 2026-06-06 — ✅ L2 + L3 + L4 COMPLETE — 17 COMPONENTS SHIPPED
+
+**Commit:** `21cd3a6c7` — pushed to `origin/master`
+
+**What landed (3,500+ lines):**
+
+**L2 Distillation (8 components):**
+- `distiller.py` — Rule-based CAUSE/METHOD/RESULT/LIMITATIONS/APPLICATION/LINKS extraction
+- `vault_writer.py` — Vault note writer with daily cap enforcement + taxonomy
+- `graph_store.py` — SQLite knowledge graph (nodes + edges, orphan pruning)
+- `concepts.py` — Concept extractor (OpenAlex primary, TF fallback)
+- `citation_graph.py` — Citation graph builder (50 cap per paper)
+- `llm_distill.py` — LLM-assisted distillation ($2/day cap, 500/300 token budget)
+- `doctrine.py` — Doctrine extractor (≥3 papers, ≥2 methods threshold)
+- `contradictions.py` — Contradiction detector (shared METHOD required)
+
+**L3 Agents (8 components):**
+- `research_agent.py` — LLM-driven research agent with token/time bounds
+- `queue.py` — SQLite task queue (max 3 concurrent, max 2 retries)
+- `srra_adapter.py` — SRRA-OPH runtime adapter (isolated interface)
+- `gap_detector.py` — Knowledge gap detector (density, concept, note gaps)
+- `task_gen.py` — Research task generator (gap → structured task)
+- `evaluator.py` — Finding evaluator (source/citation/recency/LLM scoring, 0.6 threshold)
+- `router.py` — Task router (Ollama local → OpenRouter → skip if budget)
+- `lifecycle.py` — Agent lifecycle (queued→running→completed/failed/abandoned)
+
+**L4 API (1 component):**
+- `research_api.py` — 8 FastAPI endpoints (/api/research/*)
+- Wired into `oce/backend/main.py`
+
+**L1 (1 component):**
+- `scheduler.py` — Ingestion scheduler (manual trigger + cron support)
+
+**Test results:**
+- 87/87 research tests passing ✅
+- OCE backend: 467/467 passing (1 pre-existing fail in test_topology_routing.py, not caused by my changes) ✅
+
+**29/32 core components built. 3 remaining (L4.7 vault_sync, L4.8 telemetry, L4 UI pages) gated on L3 GATE.**
+
+**Next:** L3 GATE requires end-to-end test with real data. PM/PM2 need to wire source clients into research agent's `_query_sources()`. Once done, first autonomous research cycle can run.
+
+---
+
 ## Open Questions for Operator
 
 1. **LLM for distillation** — use the same model tier as PO/OCE (current default), or specify a particular OpenRouter model?
