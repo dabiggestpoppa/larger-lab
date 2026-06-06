@@ -5,11 +5,11 @@
 
 ---
 
-## Current State (2026-06-05 15:00 UTC)
+## Current State (2026-06-06)
 
 ### Active Phase
-**PO × Open-LLM-VTuber Integration** ✅ Phase 0–3 Complete — 61/61 tests passing
-**Previous (COMPLETE):** Observer Core + OCE Unified O-1 through O-6 ✅ | V3 All 10 Phases ✅ | CEREBUS ML 5 phases ✅ | Telegram Presence System 3 phases ✅ | PO Agent Full Capability ✅
+**O2C × MAD LABS Sovereign Research Mesh** 🟡 Planning complete — awaiting L1 kickoff
+**Previous (COMPLETE):** PO × Open-LLM-VTuber Integration ✅ (61/61) | O2C Phase 00 + Phase 01 ✅ (113/113) | Observer Core + OCE Unified O-1 through O-6 ✅ | V3 All 10 Phases ✅ | CEREBUS ML 5 phases ✅ | Telegram Presence System 3 phases ✅ | PO Agent Full Capability ✅
 
 ### Observer Core Status
 | Phase | Backend | Frontend | Tests | Agent | Status |
@@ -25,22 +25,23 @@
 ### Agent Status
 | Agent | Status | Current Task |
 |-------|--------|-------------|
-| CC | Active | PO × VTuber — Phase 3 complete, cleanup + docs |
-| OC2 | ⏸️ Off-table | Operator handling directly |
-| PO | ⏸️ Off-table | Operator handling directly |
-| PM | Active | PO × VTuber — all phases complete |
-| PM2 | Active | PO × VTuber — all phases complete |
-| AS | Active | PO × VTuber — all test suites passing |
-| RL | Active | PO × VTuber — idle runtime validated |
+| CC (CC2) | Active | O2C Research Mesh — ship package skeleton + L1 GATE review |
+| OC2 | ⏸️ Off-table | Operator handling directly (telegram back-up) |
+| PO | ⏸️ Off-table | Operator handling directly (telegram back-up) |
+| PM | Active | O2C Research Mesh L1 — OpenAlex + S2 + cache |
+| PM2 | Active | O2C Research Mesh L1 — arXiv + rate limiter |
+| AS | Active | O2C Research Mesh — safety regression tests first |
+| RL | Active | O2C Research Mesh L1 — scheduler |
 
 ### 📋 TEAM TASK ASSIGNMENT
-**Mission:** PO × Open-LLM-VTuber Integration — replace VTuber's LLM backend with PO cognitive field runtime. Zero frontend changes. Plan: `docs/plans/PO-VTUBER-INTEGRATION.md`. Tasking: `shared-conversations/team-chat.md`.
-- **PM:** Phase 0 recon — clone VTuber, map provider architecture, write `docs/plans/VTUBER-RECON.md`. **BLOCKER.**
-- **CC:** Phase 1 — PO Provider Adapter (OpenAI-shape), OCE `/api/po/chat`+`/api/po/status`. Then Phase 2 streaming, then Phase 3 identity.
-- **PM2:** Phase 2 — agent coordination, multi-model router. Then Phase 3 fallback chain.
-- **AS:** Phase 1 smoke test (after PM recon), Phase 2 memory continuity + state + integration suite, Phase 3 e2e identity.
-- **RL:** Phase 3 — autonomous idle runtime tick + research.
-| RL | Standby | O-4 complete — awaiting next assignment |
+**Mission:** O2C × MAD LABS Sovereign Research Mesh — extend OCE/SRRA-OPH with autonomous research loop (OpenAlex/arXiv ingestion → distillation → recursive research agents → OCE API+UI). Plan: `docs/plans/O2C-RESEARCH-MESH.md`. Tasking: `progress/O2C-RESEARCH-MESH-TASKS.md`.
+- **CC:** L1 package skeleton + L1.4 source registry + L1.5 paper schema + L2 distiller/vault_writer/graph + L3 research agent/queue/SRRA adapter + L4 OCE research_api. Ship skeleton first; L1 GATE review.
+- **PM:** L1.1 OpenAlex client + L1.3 S2 client + L1.7 cache/dedup (then L2.2 concepts + L3.2 task gen after gates).
+- **PM2:** L1.2 arXiv client + L1.8 rate limiter (then L2.3 citations + L3.4 evaluator + L3.5 router + L4 OCE frontend pages).
+- **AS:** **WRITE SAFETY REGRESSION TESTS FIRST** (cost cap, write cap, audit log, hard rules). Then L2.6 LLM distiller, L2.7 doctrine, L3.1 gap detector, L3.6 lifecycle, L4.8 telemetry. Gate every PR.
+- **RL:** L1.6 scheduler + L2.8 contradiction detector + research doc. **Do NOT build research agent — that's CC's L3.3.**
+
+**L1 GATE:** 500 papers ingested from 3 sources, dedup verified, all ~46 L1 tests pass. No L2 work until CC2 posts GATE PASS.
 
 ### Phase 11 Test Status
 | Test | Result |
