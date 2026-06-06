@@ -1,0 +1,36 @@
+# PO Provider Configuration for Open-LLM-VTuber
+# Add this section to your conf.default.yaml or pass as settings
+
+# Provider selection in agent config:
+#   conversation_agent_choice: 'basic_memory_agent'
+#   agent_settings:
+#     basic_memory_agent:
+#       llm_provider: 'po_llm'
+#   llm_configs:
+#     po_llm:
+#       provider_class: 'po_provider.POProvider'
+#       model: 'po'
+#       base_url: 'http://localhost:8000'
+#       llm_api_key: ''  # OCE internal token if needed
+#       temperature: 0.7
+
+provider:
+  name: po_llm
+  display_name: "PO (Cognitive Field)"
+  description: "Routes through OCE cognitive field with workspace awareness, vault memory, and agent orchestration"
+  class: "po_provider.POProvider"
+  requires_ollama: false
+  requires_openrouter: false
+  is_local: false
+  supports_streaming: true
+  supports_tools: true
+  supports_functions: true
+
+# Model options (for VTuber's model selector UI)
+models:
+  - id: po
+    name: "PO Cognitive Field"
+    description: "Full cognitive pipeline with workspace scan, vault retrieval, and agent coordination"
+    provider: po_llm
+    temperature: 0.7
+    context_length: 16384

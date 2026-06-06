@@ -55,6 +55,7 @@ from .topology_api import register_topology_endpoints
 from .sovereign_api import register_sovereign_endpoints
 from .vault_api import register_vault_endpoints
 from .ml_api import register_ml_endpoints
+from .po_api import router as po_router
 from .po_idle import POIdleRuntime, get_idle_runtime, set_idle_runtime
 
 app = FastAPI(
@@ -1323,6 +1324,9 @@ register_vault_endpoints(app)
 
 # Register CEREBUS ML API endpoints
 register_ml_endpoints(app)
+
+# Register PO API endpoints (PO × VTuber integration)
+app.include_router(po_router)
 
 
 
