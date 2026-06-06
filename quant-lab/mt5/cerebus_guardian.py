@@ -6,15 +6,16 @@ Lightweight — just checks PIDs via PowerShell.
 
 Processes monitored:
   1. cerebus_live_bridge.py (PRIMARY — executes all trades)
-  2. symmetry_trap_executor.py (ST standalone executor)
 
 Policy:
-  - Bridge is SOLE executor. ST executor is backup/satellite.
+  - Bridge is SOLE executor.
   - If bridge dies → restart immediately
-  - If ST executor dies → restart (it should be decommissioned but kept for safety)
   - Grace period after restart to avoid flapping
   - Self-protect: cron job restarts guardian if it dies
   - Max restart attempts per hour to prevent infinite loops
+
+Decommissioned:
+  - symmetry_trap_executor.py — removed 2026-06-05 (hardcoded SYMBOL, magic 20260531)
 
 Usage:
   python cerebus_guardian.py [--once]
@@ -50,12 +51,7 @@ PROCESSES = {
         "args": ["--symbols", "EURJPY.PRO,EURNZD.PRO,GBPNZD.PRO,EURAUD.PRO,GBPAUD.PRO,GBPCAD.PRO", "--lot-size", "0.01"],
         "critical": True,  # Alert if this dies
     },
-    "st_executor": {
-        "exe": PYTHON_EXE,
-        "script": os.path.join(SCRIPT_DIR, "symmetry_trap_executor.py"),
-        "args": ["--loop", "--interval", "30"],
-        "critical": False,
-    },
+    # st_executor DECOMMISSIONED 2026-06-05
 }
 
 # ─── Logging ──────────────────────────────────────────────────────────────────
