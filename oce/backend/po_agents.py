@@ -127,7 +127,8 @@ class AgentCoordinator:
                 from core.observer.po_agent import POAgent
                 agent = POAgent()
 
-                result = await agent.chat(
+                result = await asyncio.to_thread(
+                    agent.chat,
                     task.prompt,
                     history=[],
                     session_id=task.task_id,

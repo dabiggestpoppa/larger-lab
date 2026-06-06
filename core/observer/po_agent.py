@@ -784,7 +784,7 @@ class POAgent:
             if not tool_calls and content:
                 tool_calls = self._parse_fallback_tool_calls(content)
 
-            record_api_call(model=model, status_code=200, tokens_used=len(content or ""))
+            record_api_call(model=model, status_code=200, tokens=len(content or ""))
             return content, tool_calls, model, None
         except requests.exceptions.Timeout:
             record_api_call(model=model, status_code=0, error_type="timeout")
@@ -834,7 +834,8 @@ class POAgent:
             return f"Error executing {tool_name}: {e}"
 
     def chat(self, message: str, sovereign_context: str = "", max_tool_rounds: int = 15,
-             progress_callback=None) -> str:
+             progress_callback=None, history: Optional[List[Dict[str, str]]] = None,
+             session_id: str = "") -> str:
         """
         Full agent chat with tool-calling loop.
 
@@ -844,6 +845,8 @@ class POAgent:
             max_tool_rounds: Maximum tool-calling iterations
             progress_callback: Optional callable(text) for sending progress updates
                               during tool execution. Used by Telegram gateway.
+            history: Optional list of previous messages to include in context.
+            session_id: Optional session identifier for logging/tracking.
 
         Flow:
         1. Send message + system prompt + tool definitions to LLM

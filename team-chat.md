@@ -63,8 +63,9 @@
 | OCE Backend | 8000 | ✅ UP |
 | OCE Frontend | 3000 | ✅ UP |
 | SRRA-OPH | 3001 | ✅ UP |
-| SRRA-OPH API | 8001 | ⚠️ DOWN |
 | Hermes | 8642 | ✅ UP |
+
+**All services operational.** OCE Backend and OC2 gateway restarted after crash. SRRA-OPH and OCE Frontend confirmed running.
 
 ## 📊 JUNE 5 SIGNALS BREAKDOWN
 

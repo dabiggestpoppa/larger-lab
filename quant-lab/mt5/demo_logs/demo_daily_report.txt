@@ -1,5 +1,5 @@
 ==================================================
-OC2 DEMO DAILY REPORT — 2026-06-06 00:19
+OC2 DEMO DAILY REPORT — 2026-06-06 10:20
 ==================================================
 
 Bridge Status: RUNNING
@@ -13,14 +13,16 @@ Closed Today: 0
 --- Today's Trade Events (0 entries) ---
 
 --- Recent Bridge Log ---
-  2026-06-06 00:19:06,255 [INFO] [DEMO] Demo account connected. Balance: 288.84
-  2026-06-06 00:19:06,260 [INFO] [DEMO] Demo Bridge initialized with 4 symbols: ['BTCUSD.DEMO', 'ETHUSD.DEMO', 'EURNZD.DEMO', 'GBPNZD.DEMO']
-  2026-06-06 00:19:06,260 [INFO] [DEMO] ============================================================
-  2026-06-06 00:19:06,260 [INFO] [DEMO] CEREBUS DEMO BRIDGE â€” RUNNING
-  2026-06-06 00:19:06,260 [INFO] [DEMO] Symbols: BTCUSD.DEMO, ETHUSD.DEMO, EURNZD.DEMO, GBPNZD.DEMO
-  2026-06-06 00:19:06,261 [INFO] [DEMO] Lot size: 0.01
-  2026-06-06 00:19:06,261 [INFO] [DEMO] ============================================================
-  2026-06-06 00:19:11,291 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+  2026-06-06 10:16:14,196 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+  2026-06-06 10:16:34,486 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+  2026-06-06 10:17:14,202 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+  2026-06-06 10:17:34,494 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+  2026-06-06 10:18:14,209 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+  2026-06-06 10:18:34,502 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+  2026-06-06 10:19:14,216 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+  2026-06-06 10:19:34,510 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+  2026-06-06 10:20:14,223 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+  2026-06-06 10:20:34,517 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
 
 ==================================================
 End of report.
