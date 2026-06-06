@@ -438,3 +438,30 @@ Bridge syntax verified. Player 2 demo account ready to launch alongside live.
 **Commit:** `b562f1f1` — pushed to `origin/master`
 
 **Phase 3 Status:** ✅ COMPLETE — ready for Phase 4.
+---
+
+## 2026-06-06 13:30 UTC — Desktop Pet LIVE (OC2)
+
+**Status: ALL SYSTEMS GO** 🎉
+
+### Desktop Pet (tuber_integration/desktop_pet.py)
+- ✅ pywebview window **visible, layered, topmost**
+- ✅ Transparency alpha=242 (95% opacity) confirmed via GetLayeredWindowAttributes
+- ✅ Position (800, 200), size 304×441, center-screen offset
+- ✅ Always-on-top (WS_EX_TOPMOST=YES)
+- ✅ Controls: drag titlebar, resize handle, Alt+V/P/R/Q shortcuts
+- ✅ VTuber health heartbeat (30s interval)
+
+### End-to-End Pipeline Verified
+| Service | URL | Status |
+|---------|-----|--------|
+| OCE backend | http://localhost:8000 | HTTP 200 |
+| PO status | http://localhost:8000/api/po/status | HTTP 200 |
+| PO chat | http://localhost:8000/api/po/chat | HTTP 200 (real response: "✅ Yes, I'm here! Ready to help.") |
+| VTuber | http://localhost:12393 | HTTP 200 |
+| Desktop Pet | (floating window) | Visible, transparent, topmost |
+
+### Key Fix Applied
+_apply_transparency was calling self._get_hwnd() on DesktopPetApp but that method lives on PetApi. Fixed to self.api._get_hwnd(). Also switched from unc= callback (fires before HWND) to pywebview's events.loaded event (fires after HWND exists) with a background thread + 5s HWND-ready poll.
+
+The pet is now floating on the desktop, ready to be used just like OCE. You can drag it, pin it, reload the VTuber, or close it with Alt+Q.
