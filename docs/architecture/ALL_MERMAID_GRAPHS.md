@@ -811,6 +811,86 @@ graph LR
 
 ---
 
+## PO × VTuber Integration
+
+### PO-VTuber Integration Architecture
+
+```mermaid
+flowchart LR
+    subgraph "VTuber Frontend (Unchanged)"
+        VT[VTube Studio\nWebSocket] --> VTUBER[Open-LLM-VTuber\nFrontend]
+        VTUBER --> LLM[LLM Provider]
+    end
+
+    subgraph "PO Cognitive Layer"
+        LLM --> PO_PO[po_provider.py\n(StatelessLLMInterface)]
+        PO_PO --> PO_API[/api/po/chat\nSSE Endpoint]
+        PO_API --> SCAN[po_workspace.py\nWorkspace Scan]
+        PO_API --> VAULT[po_vault.py\nVault Retrieval]
+        PO_API --> ROUTER[po_router.py\nModel Routing]
+        PO_API --> FALLBACK[po_fallback.py\nFallback Chain]
+        PO_API --> IDLE[po_idle.py\nIdle Runtime]
+    end
+
+    subgraph "Identity Bridge"
+        BRIDGE[session_bridge.py\nVTuber ↔ Telegram]
+        PO_API --> BRIDGE
+    end
+
+    subgraph "OCE Backend"
+        SCAN --> OCE[OCE :8000]
+        VAULT --> OCE
+        ROUTER --> OCE
+        FALLBACK --> OCE
+        IDLE --> OCE
+    end
+```
+
+### PO Cognitive Pipeline
+
+```mermaid
+sequenceDiagram
+    participant VT as VTuber
+    participant PO as PO Provider
+    participant OCE as OCE Backend
+    participant SCAN as Workspace Scanner
+    participant VAULT as Vault Retriever
+    participant ROUTER as Model Router
+    participant FALLBACK as Fallback Chain
+
+    VT->>PO: chat_completion(messages)
+    PO->>OCE: POST /api/po/chat
+    OCE->>SCAN: scan() → context
+    OCE->>VAULT: retrieve(query) → memory
+    OCE->>ROUTER: route_with_context()
+    ROUTER->>FALLBACK: execute()
+    FALLBACK-->>OCE: response stream
+    OCE-->>PO: SSE chunks
+    PO-->>VT: yield text
+```
+
+### PO Provider Injection Flow
+
+```mermaid
+flowchart TD
+    A[VTuber Config] --> B{llm_provider}
+    B -->|po_llm| C[po_provider.py]
+    B -->|openai| D[openai_llm.py]
+    B -->|ollama| E[ollama_llm.py]
+    B -->|claude| F[claude_llm.py]
+
+    C --> G[StatelessLLMInterface]
+    G --> H[chat_completion]
+    H --> I[OCE /api/po/chat]
+    I --> J[Workspace Scan]
+    I --> K[Vault Retrieval]
+    I --> L[Model Routing]
+    I --> M[Fallback Chain]
+    M --> N[OpenRouter/Ollama]
+```
+
+---
+
 ## Complete File Inventory
 
 ```mermaid
