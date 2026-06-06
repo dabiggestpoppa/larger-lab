@@ -2,8 +2,8 @@
 
 > **Purpose:** Step-by-step guide to the entire Larger-Lab system. What each part does, how they connect, and why.
 > **Audience:** Any agent or developer who needs to understand, modify, or extend the system.
-> **Last Updated:** 2026-05-31
-> **Status:** V3 All 10 Phases Complete | Observer Core O-1 through O-7 COMPLETE | O2C Phase 00 + Phase 01 COMPLETE
+> **Last Updated:** 2026-06-06
+> **Status:** V3 All 10 Phases Complete | Observer Core O-1 through O-7 COMPLETE | O2C Phase 00 + Phase 01 COMPLETE | PO × VTuber P1-P3 COMPLETE
 
 ---
 
@@ -18,6 +18,7 @@
 5. [Agent Network — Who Does What](#5-agent-network--who-does-what)
 6. [Memory Architecture — How State Persists](#6-memory-architecture--how-state-persists)
 7. [Data Pipeline — From Market Data to Decisions](#7-data-pipeline--from-market-data-to-decisions)
+8. [PO × VTuber Integration — Cognitive Embodiment](#8-po--vtuber-integration--cognitive-embodiment)
 8. [Infrastructure — Where It Runs](#8-infrastructure--where-it-runs)
 9. [Testing Architecture — How We Verify](#9-testing-architecture--how-we-verify)
 10. [Step-by-Step: How a Task Flows Through the System](#10-step-by-step-how-a-task-flows-through-the-system)
@@ -1091,4 +1092,49 @@ NEW: Agents execute → Trace → Distill → Store → Retrieve → Improve
 
 ---
 
-*This document is maintained by CC. Last updated: 2026-05-31.*
+## PO × VTuber Integration — Cognitive Embodiment Layer
+
+**Purpose:** Replace VTuber's generic LLM chat loop with PO cognitive field runtime. VTuber becomes an embodiment shell for PO/OCE.
+
+**Architecture:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Level 1: Human Interface                     │
+│  User → VTuber Frontend (Live2D, Voice, UI) — UNCHANGED      │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────┐
+│              Level 2: PO Provider Layer                         │
+│  POProvider (StatelessLLMInterface) → OCE Backend :8000      │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────┐
+│              Level 3: OCE Cognitive Field                     │
+│  /api/po/chat → WorkspaceScanner → VaultRetriever → Router   │
+│  → FallbackChain → Response Stream → VTuber                    │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────┐
+│              Level 4: Identity Bridge                           │
+│  session_bridge.py → VTuber ↔ Telegram continuity            │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────┐
+│              Level 5: Autonomous Runtime                        │
+│  POIdleRuntime → Vault Sync + Memory Distill + Telemetry     │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Key Components:**
+- `vtuber_integration/po_provider/po_provider.py` — StatelessLLMInterface implementation
+- `oce/backend/po_api.py` — FastAPI endpoints for PO chat/stream/status
+- `oce/backend/po_workspace.py` — Workspace scanner (excludes .venv, __pycache__, .git)
+- `oce/backend/po_vault.py` — Vault retrieval for memory context
+- `oce/backend/po_stream.py` — 5-stage cognitive pipeline
+- `core/identity/session_bridge.py` — Cross-interface identity continuity
+
+**Test Status:** 61/61 tests passing (P1.6: 12, P2.1-P2.12: 34, P3.1-P3.5: 15)
+
+---
+
+*This document is maintained by CC. Last updated: 2026-06-06.*
