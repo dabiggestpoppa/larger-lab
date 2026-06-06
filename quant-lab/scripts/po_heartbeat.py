@@ -25,7 +25,7 @@ from pathlib import Path
 
 # ─── Config ──────────────────────────────────────────────────────────────────
 
-WORKSPACE_ROOT = Path(__file__).parent.parent  # larger-lab/
+WORKSPACE_ROOT = Path(__file__).parent.parent.parent  # larger-lab/
 VAULT_DIR = WORKSPACE_ROOT / "vault"
 TEAM_CHAT = WORKSPACE_ROOT / "team-chat.md"
 OCE_API_URL = os.environ.get("OCE_API_URL", "http://localhost:8000")
