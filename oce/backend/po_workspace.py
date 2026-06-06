@@ -68,6 +68,9 @@ class WorkspaceScanner:
         "po_reference": re.compile(r"\bpo\b|\bPO\b|\bcognitive\b|\bfield\b", re.IGNORECASE),
     }
 
+    # Directories to exclude from scanning
+    EXCLUDE_DIRS = {".venv", "__pycache__", ".git", "node_modules", "archive", ".openclaw", "memory-bank"}
+
     def __init__(self, repo_root: str | None = None, fresh_window: int | None = None):
         self.repo_root = Path(repo_root) if repo_root else Path(__file__).resolve().parents[2]
         self.fresh_window = fresh_window or self.DEFAULT_FRESH_WINDOW
@@ -100,10 +103,14 @@ class WorkspaceScanner:
         return result
 
     def _glob_files(self, pattern: str) -> List[str]:
-        """Glob files relative to repo root."""
+        """Glob files relative to repo root, excluding EXCLUDE_DIRS."""
         try:
             matches = list(self.repo_root.glob(pattern))
-            return [str(p.relative_to(self.repo_root)) for p in matches if p.is_file()]
+            return [
+                str(p.relative_to(self.repo_root))
+                for p in matches
+                if p.is_file() and not any(part in self.EXCLUDE_DIRS for part in p.parts)
+            ]
         except Exception:
             return []
 
@@ -123,11 +130,12 @@ class WorkspaceScanner:
                     except (OSError, ValueError):
                         pass
         except Exception:
-            # Fallback: check mtime on all python files
+            # Fallback: check mtime on all python files (excluding EXCLUDE_DIRS)
             for f in self.repo_root.glob(self.PYTHON_GLOB):
                 try:
-                    if f.stat().st_mtime > cutoff:
-                        fresh.append(str(f.relative_to(self.repo_root)))
+                    if not any(part in self.EXCLUDE_DIRS for part in f.parts):
+                        if f.stat().st_mtime > cutoff:
+                            fresh.append(str(f.relative_to(self.repo_root)))
                 except OSError:
                     pass
         return fresh
