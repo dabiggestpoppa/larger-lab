@@ -109,11 +109,13 @@ class ThoughtStreamer:
         vault_retriever=None,
         agent_coordinator=None,
         model_router=None,
+        fallback_chain=None,
     ):
         self.workspace_scanner = workspace_scanner
         self.vault_retriever = vault_retriever
         self.agent_coordinator = agent_coordinator
         self.model_router = model_router
+        self.fallback_chain = fallback_chain
 
     async def stream(
         self,
@@ -231,10 +233,74 @@ class ThoughtStreamer:
         try:
             from oce.backend.po_router import ModelRouter
             router = self.model_router or ModelRouter()
-            return router.route(query)
+
+            # Also try agent coordination for complex queries
+            route_result = router.route(query)
+            result = {
+                "model": route_result.model_id,
+                "provider": route_result.provider,
+                "confidence": route_result.confidence,
+                "fallback_chain": route_result.fallback_chain,
+            }
+
+            # If agent coordinator is available, select best agent
+            if self.agent_coordinator:
+                try:
+                    from oce.backend.po_agents import AgentCoordinator
+                    coord = self.agent_coordinator
+                    if isinstance(coord, AgentCoordinator):
+                        result["agent"] = coord.select_agent_for_query(query)
+                except Exception:
+                    pass
+
+            return result
         except Exception as e:
             logger.warning(f"Model routing failed: {e}")
             return {"model": "po", "provider": "oce", "fallback": False}
+
+    async def _generate_response(
+        self,
+        messages: List[Dict[str, Any]],
+        context: str = "",
+        model: str = "po",
+    ) -> str:
+        """Generate a response using the PO agent or fallback chain."""
+        # Try POAgent first
+        if model == "po":
+            try:
+                from core.observer.po_agent import POAgent
+                agent = POAgent()
+                last_msg = messages[-1]["content"] if messages else ""
+                history = messages[:-1] if len(messages) > 1 else []
+
+                # Build augmented prompt with context
+                prompt = last_msg
+                if context:
+                    prompt = f"Context:\n{context}\n\nUser: {last_msg}"
+
+                return await agent.chat(
+                    prompt,
+                    history=history,
+                    session_id="",
+                    max_tool_rounds=4,
+                )
+            except ImportError:
+                logger.warning("POAgent not available, trying fallback chain")
+            except Exception as e:
+                logger.warning(f"POAgent failed: {e}, trying fallback chain")
+
+        # Try fallback chain
+        try:
+            from oce.backend.po_fallback import FallbackChain
+            chain = self.fallback_chain or FallbackChain()
+            result = await chain.execute(messages)
+            return result.get("response", "")
+        except Exception as e:
+            logger.warning(f"Fallback chain failed: {e}")
+
+        # Last resort: echo response
+        last_content = messages[-1]["content"] if messages else ""
+        return f"I received your message: '{last_content[:100]}'. Let me process that further."
 
 
 def _format_event(event: POEvent) -> str:

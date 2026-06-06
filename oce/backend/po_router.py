@@ -203,3 +203,85 @@ class ModelRouter:
             }
             for model_id, model in self._models.items()
         }
+
+    def route_with_context(
+        self,
+        query: str,
+        estimated_tokens: int = 0,
+        preferred_model: str | None = None,
+        require_streaming: bool = False,
+    ) -> RouteDecision:
+        """
+        Context-aware routing that considers token count and capabilities.
+
+        Args:
+            query: The user's query
+            estimated_tokens: Estimated token count for the request
+            preferred_model: Override to use a specific model
+            require_streaming: If True, only route to streaming-capable models
+
+        Returns:
+            RouteDecision with the best model for the request
+        """
+        # Filter models by requirements
+        candidates = []
+        for mid, model in self._models.items():
+            if model.status != "available":
+                continue
+            if require_streaming and not model.supports_streaming:
+                continue
+            if estimated_tokens > 0 and estimated_tokens > model.context_window:
+                continue
+            candidates.append(model)
+
+        if not candidates:
+            # Relax constraints — just find any available model
+            candidates = [m for m in self._models.values() if m.status == "available"]
+
+        if not candidates:
+            return RouteDecision(
+                model_id="",
+                provider="",
+                confidence=0.0,
+                reason="no_available_models",
+            )
+
+        # If preferred model is in candidates, use it
+        if preferred_model:
+            for m in candidates:
+                if m.id == preferred_model:
+                    return RouteDecision(
+                        model_id=m.id,
+                        provider=m.provider,
+                        reason=f"preferred:{preferred_model}",
+                        fallback_chain=self._build_fallback_chain(m.id),
+                    )
+
+        # Default: PO first, then by capability match
+        for m in candidates:
+            if m.id == "po":
+                return RouteDecision(
+                    model_id="po",
+                    provider="oce",
+                    reason="po_primary",
+                    confidence=1.0,
+                    fallback_chain=self._build_fallback_chain("po"),
+                )
+
+        # First available candidate
+        m = candidates[0]
+        return RouteDecision(
+            model_id=m.id,
+            provider=m.provider,
+            reason="first_available",
+            fallback_chain=self._build_fallback_chain(m.id),
+        )
+
+    def get_routing_stats(self) -> Dict[str, Any]:
+        """Return routing statistics."""
+        return {
+            "total_models": len(self._models),
+            "available_models": len([m for m in self._models.values() if m.status == "available"]),
+            "routing_rules": len(self._routing_rules),
+            "model_ids": list(self._models.keys()),
+        }
