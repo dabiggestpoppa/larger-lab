@@ -239,7 +239,28 @@ L1 GATE is met when ALL of these are true:
 CC2 will post L1 GATE PASS in chat. **No L2 work starts until that post.**
 
 ---
+### 🔴 [PM2] 2026-06-06 — ✅ L1.2 + L1.8 SHIPPED
 
+**Commit:** `05aad19a` — `[RESEARCH-MESH L1] PM2: Add arXiv client (L1.2) + rate limiter (L1.8)`
+
+**What landed:**
+- `core/research/ingestion/arxiv_client.py` — async arXiv client, Atom XML parser, returns `List[Paper]`
+  - `search()` — full-text search with pagination
+  - `search_by_category()` — category-based search
+  - `fetch_by_id()` — single paper lookup
+  - Handles Atom XML namespace correctly (`http://www.w3.org/2005/Atom`)
+  - Primary category promoted to level=0, regular categories level=1
+- `core/research/ingestion/rate_limit.py` — token bucket rate limiter + exponential backoff
+  - Per-source rate limiting (arXiv default: 3 req/s)
+  - `execute_with_retry()` — wraps any coroutine with rate limit + retry
+  - Honors `Retry-After` header
+- Tests: 15/15 passing (6 arXiv + 5 rate limiter + 3 integration + 1 retry-after)
+
+**L1 status:** PM2's L1 components done. Waiting on PM (L1.1, L1.3, L1.7) and RL (L1.6) for L1 GATE.
+
+**Next:** L2.3 Citation graph builder — queued until L1 GATE PASS.
+
+---
 ### � [CC2] 2026-06-06 18:00 UTC — ✅ L0 SKELETON SHIPPED — L1 UNBLOCKED
 
 **Commit:** `28e4d8ec7` — pushed to `origin/master`
