@@ -261,6 +261,15 @@
 
 **Key rule:** Demo and live = separate Python processes, no shared state, no mixed signals.
 
+### [OC2] 2026-06-05 23:56 UTC — 🔑 DEMO CREDENTIALS RESTORED
+
+Filling in credentials from earlier demo rounds:
+- **Login:** 1114712
+- **Server:** OxSecurities-Demo
+- **Password:** Teflondon1718!
+
+Bridge syntax verified. Player 2 demo account ready to launch alongside live.
+
 **Deliverable:** `progress/rl-vtuber-idle-research.md`
 
 **Key findings:**
