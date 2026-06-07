@@ -336,4 +336,35 @@
 - **Fix:** Cleared sessions, restarted OC2, deployed `scripts/oc2_session_cleanup.py` watchdog
 - **Watchdog:** Runs every 5 min, cleans session files >200KB, trajectory >300KB, all .bak files
 - **Health check:** `{"ok":true,"status":"live"}` ✅
-- **Note:** Long-term fix should be in OpenClaw config — session compaction or rotation
+- **Note:** Long-term fix applied — see below
+
+### 2026-06-07 18:xx UTC — [Copilot] OC2 Long-Term Session Fix Applied
+
+**Root Cause:** OpenClaw had no session maintenance, compaction, or context pruning configured.
+Session files grew unbounded (3.8MB+ in hours) → context overflow → crash.
+
+**Permanent Fix Applied to `.openclaw/openclaw.json`:**
+
+1. **Session Maintenance** (auto-enforced):
+   - `pruneAfter: "7d"` — prune files older than 7 days (default: 30d)
+   - `maxEntries: 100` — cap session store entries (default: 500)
+   - `maxDiskBytes: "100mb"` — hard disk budget (default: 500mb)
+   - `highWaterBytes: "80mb"` — cleanup target threshold
+
+2. **Compaction** (prevents transcript bloat):
+   - `mode: "safeguard"` — chunked summarization for long histories
+   - `maxActiveTranscriptBytes: "5mb"` — trigger compaction before files get huge
+   - `truncateAfterCompaction: true` — rotate to smaller successor JSONL
+   - `keepRecentTokens: 50000` — keep recent tail verbatim
+
+3. **Context Pruning** (reduces per-turn context):
+   - `mode: "cache-ttl"` — prune old tool results from in-memory context
+   - `ttl: "1h"` — tool results older than 1 hour get pruned
+   - `keepLastAssistants: 3` — always keep last 3 assistant responses
+
+4. **Manual cleanup run:** `openclaw sessions cleanup --enforce --all-agents`
+   - Reduced session from 3.8MB → 8.4KB
+
+**Result:** OC2 session files will now be automatically maintained. Compaction kicks in
+at 5MB transcript size. Old tool results are pruned from context after 1 hour.
+Session store is capped at 100 entries / 100MB disk.
