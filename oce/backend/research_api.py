@@ -438,8 +438,11 @@ async def vault_stats() -> Dict[str, Any]:
 
 # ─── L4.8 — Telemetry Endpoints ─────────────────────────────────────────────
 
-from .telemetry import Telemetry as _Telemetry
-_telemetry = _Telemetry()
+try:
+    from .telemetry import Telemetry as _Telemetry
+    _telemetry = _Telemetry()
+except ImportError:
+    _telemetry = None
 
 
 @router.get("/api/research/telemetry/daily")
@@ -450,6 +453,8 @@ async def get_daily_report(day: Optional[str] = None) -> Dict[str, Any]:
     Shows papers ingested, distilled, agents run, $ spent, safety status.
     Query param: day=YYYY-MM-DD (defaults to today)
     """
+    if not _telemetry:
+        return {"error": "Telemetry not available (L4.8 not yet built)"}
     return await _telemetry.daily_report(day=day)
 
 
@@ -466,6 +471,8 @@ async def get_audit_trail(
     
     Returns agent_log entries filtered by agent, task, action, or time.
     """
+    if not _telemetry:
+        return {"error": "Telemetry not available (L4.8 not yet built)"}
     entries = await _telemetry.audit_trail(
         agent_id=agent_id,
         task_id=task_id,
