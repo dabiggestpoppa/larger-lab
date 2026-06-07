@@ -6,6 +6,25 @@
 
 ---
 
+## Bug #6: Session Recovery Sends Stale Responses (DOCUMENTED — NO CODE CHANGE)
+
+**Symptom:** After OC2 restarts, the first message gets a stale response like "No further note from me." instead of actually processing the new message. Sometimes sends TWO responses — one stale, one correct.
+
+**Root Cause:** OpenClaw's session recovery mechanism. When the gateway restarts, it resumes the previous Telegram session and re-sends the last assistant response before processing the new message. Log evidence:
+```
+22:39:46 [resumed interrupted main session: agent:main:telegram:direct:8258195396]
+22:44:10 [telegram sendMessage ok] message=9449   ← stale response
+22:44:17 [telegram sendMessage ok] message=9451   ← actual response
+```
+
+**Fix:** No code change. Operator confirmed: "I don't wanna touch code OC2 Telegram way too fragile, we will just work with what we got."
+
+**Workaround:** After any OC2 restart, send a `/new` or `/reset` command to start a fresh session, or just ignore the first stale response.
+
+**Why PO doesn't have this:** PO's custom Python gateway (`scripts/telegram_gateway.py`) doesn't have session recovery — each message is processed fresh.
+
+---
+
 ## Bug #1: OpenClaw Gateway Restart Loop (CRITICAL)
 
 **Symptom:** OC2 gateway restarts every ~2-5 minutes. Each restart takes 30-90s to come back. During restart, Telegram messages are queued but not processed.
