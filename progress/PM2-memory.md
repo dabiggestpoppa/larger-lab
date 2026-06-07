@@ -4,6 +4,72 @@
 
 ---
 
+## 🚨 CRITICAL: OpenClaw Gateway Knowledge (2026-06-06 — 7hr outage fix)
+
+### The Two-File Config Trap
+**MOST IMPORTANT LESSON** — would have saved 7 hours on 2026-06-06:
+
+OpenClaw 2026.5.7 has **TWO config files**. The CLI edits the wrong one.
+
+| File | What It Is | What Edits It |
+|------|-----------|---------------|
+| `C:\Users\wifik\.openclaw-2\openclaw.json` | Primary/CLI config (~2.5KB) | `openclaw config set/patch/get` |
+| `C:\Users\wifik\.openclaw-2\.openclaw\openclaw.json` | **Gateway runtime — THE REAL ONE** | **Direct file edit ONLY** |
+
+**Rule:** When fixing OpenClaw, edit BOTH files. Always. Atomically (gateway stopped).
+
+### Model Name = Provider Prefix
+OpenClaw splits model IDs on `/` and uses the first segment as provider name.
+- ✅ `openrouter/owl-alpha` works (provider `openrouter` is registered)
+- ❌ `inclusionai/ring-2.6-1t` fails (provider `inclusionai` is NOT registered)
+
+**Always use models with provider prefix matching a registered provider.**
+
+### Fix OC2 in 5 Minutes (Speed-Run)
+```powershell
+# Stop
+Stop-ScheduledTask -TaskName "OpenClaw-2-Gateway"
+$proc = Get-NetTCPConnection -State Listen -LocalPort 18790 -EA SilentlyContinue
+if ($proc) { Stop-Process -Id $proc.OwningProcess -Force }
+Start-Sleep -Seconds 3
+
+# Edit BOTH configs (gateway stopped):
+#   "model": "inclusionai/ring-2.6-1t" → "model": "openrouter/owl-alpha"
+#   "subagent": { "model": "minimax/minimax-m3" } → "openrouter/owl-alpha"
+
+# Start
+Start-ScheduledTask -TaskName "OpenClaw-2-Gateway"
+Start-Sleep -Seconds 30
+Invoke-RestMethod http://127.0.0.1:18790/health  # should be {"ok":true,"status":"live"}
+```
+
+### Tools Created
+- `tools/OPENCLAW-RUNBOOK.md` — complete triage + fix guide
+- `tools/openclaw_watchdog.py` — auto-restart on health fail, alerts via Telegram
+
+### Key Files (OC2-specific)
+- Config 1 (primary): `C:\Users\wifik\.openclaw-2\openclaw.json`
+- Config 2 (gateway): `C:\Users\wifik\.openclaw-2\.openclaw\openclaw.json`
+- Task: `OpenClaw-2-Gateway` (cmd: `C:\Users\wifik\Desktop\projects\larger-lab\.openclaw-2\gateway.cmd`)
+- Log: `C:\Users\wifik\AppData\Local\Temp\openclaw\openclaw-2026-06-06.log`
+- Bot: @OC2BLRBOT (Telegram)
+- Token: `oc2-68cdb0729953cce1aecaf09a9dffddac574c9a674f46aa77` (don't rotate)
+
+### What NEVER To Do
+- ❌ `openclaw config set` to fix model issues (edits wrong file)
+- ❌ Add `inclusionai` as provider (OpenClaw strips on validation)
+- ❌ Edit configs while gateway is running (overwritten on startup)
+- ❌ Use model name without registered provider prefix
+
+### What ALWAYS To Do
+- ✅ Stop gateway before editing config
+- ✅ Edit BOTH config files
+- ✅ Verify with `/health` endpoint after restart
+- ✅ Check log for `FailoverError: Unknown model` if responding fails
+- ✅ Run `openclaw_watchdog.py` for 24/7 monitoring
+
+---
+
 ## PowerShell/Windows Execution Gotchas
 
 ### Encoding Issues
