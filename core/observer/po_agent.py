@@ -41,8 +41,8 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 MODEL_CHAIN = [
     "inclusionai/ring-2.6-1t",
+    "openrouter/owl-alpha",
     "minimax/minimax-m2.5",
-    "nvidia/nemotron-3-ultra-550b-a55b:free",
 ]
 
 MODEL_RETRY_COUNT = 2  # attempts per model before falling back
