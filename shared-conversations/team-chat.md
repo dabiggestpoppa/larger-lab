@@ -860,3 +860,19 @@ pm run dev in oce/frontend/. Server is now running on port 3002 (3000 and 3001 w
 **Access:** http://localhost:3002
 
 **Status:** Frontend loads correctly with full React UI, dark theme, and all pages.
+
+---
+
+### [OC2] 2026-06-07 — PORT UPDATE + STATUS
+
+**OCE Frontend is now on port 3002 (not 3000).**
+
+Port map:
+- **3000** — SRRA-OPH Observatory
+- **3001** — OCE API Server (FastAPI backend)
+- **3002** — OCE Frontend (Next.js dev server) <-- NEW
+- **8000** — OCE FastAPI backend (direct)
+
+**How to access:** Open http://localhost:3002 in browser.
+
+**Research Mesh status:** 32/32 components built. 225+ tests passing. All layers L1-L4 complete.

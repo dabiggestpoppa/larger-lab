@@ -49,41 +49,41 @@ class OpenRouterGateway:
     rate limiting, and standardized response formatting.
     """
 
-    # Default provider configurations
+    # Default provider configurations - OWL Alpha primary, auto-failover on rate limit/error
     DEFAULT_PROVIDERS: list[dict[str, Any]] = [
+        {
+            "name": "owl-alpha",
+            "model": "openrouter/owl-alpha",
+            "max_context": 1000000,
+            "cost_per_1k_tokens": 0.0,
+            "priority": 1,
+        },
         {
             "name": "nemotron",
             "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
             "max_context": 1000000,
             "cost_per_1k_tokens": 0.0,
-            "priority": 1,
+            "priority": 2,
+        },
+        {
+            "name": "laguna-m1",
+            "model": "poolside/laguna-m.1:free",
+            "max_context": 1000000,
+            "cost_per_1k_tokens": 0.0,
+            "priority": 3,
         },
         {
             "name": "qwen-coder",
             "model": "qwen/qwen-2.5-coder-32b-instruct",
             "max_context": 131072,
             "cost_per_1k_tokens": 0.002,
-            "priority": 2,
+            "priority": 4,
         },
         {
             "name": "ring",
             "model": "inclusionai/ring-2.6-1t",
             "max_context": 131072,
             "cost_per_1k_tokens": 0.0,
-            "priority": 3,
-        },
-        {
-            "name": "minimax",
-            "model": "minimax/minimax-m3",
-            "max_context": 131072,
-            "cost_per_1k_tokens": 0.0,
-            "priority": 4,
-        },
-        {
-            "name": "qwen-plus",
-            "model": "qwen/qwen-plus",
-            "max_context": 131072,
-            "cost_per_1k_tokens": 0.004,
             "priority": 5,
         },
     ]
@@ -123,18 +123,18 @@ class OpenRouterGateway:
             if cfg and cfg.enabled:
                 return cfg
 
-        # Task-based selection
+        # Task-based selection - OWL Alpha primary, auto-failover on rate limit/error
         task_preferences: dict[str, list[str]] = {
-            "coding": ["qwen-coder", "ring"],
-            "research": ["nemotron", "ring"],
-            "architecture": ["nemotron", "ring"],
-            "repair": ["qwen-coder", "ring"],
-            "debugging": ["qwen-coder", "ring"],
-            "orchestration": ["nemotron", "ring"],
-            "visualization": ["qwen-coder", "ring"],
-            "automation": ["qwen-coder", "ring"],
-            "system_analysis": ["nemotron", "ring"],
-            "general": ["nemotron", "ring"],
+            "coding": ["qwen-coder", "nemotron", "laguna-m1"],
+            "research": ["owl-alpha", "nemotron", "laguna-m1"],
+            "architecture": ["owl-alpha", "nemotron", "laguna-m1"],
+            "repair": ["qwen-coder", "nemotron", "laguna-m1"],
+            "debugging": ["qwen-coder", "nemotron", "laguna-m1"],
+            "orchestration": ["owl-alpha", "nemotron", "laguna-m1"],
+            "visualization": ["qwen-coder", "nemotron", "laguna-m1"],
+            "automation": ["qwen-coder", "nemotron", "laguna-m1"],
+            "system_analysis": ["owl-alpha", "nemotron", "laguna-m1"],
+            "general": ["owl-alpha", "nemotron", "laguna-m1"],
         }
 
         preferences = task_preferences.get(task_type, ["deepseek-chat"])
@@ -214,14 +214,16 @@ class OpenRouterGateway:
             "total_requests": sum(self._request_counts.values()),
         }
 
-    async def complete(self, prompt: str, max_tokens: int = 2000, model: str = "nvidia/nemotron-3-ultra-550b-a55b:free") -> str:
+    async def complete(self, prompt: str, max_tokens: int = 2000, model: str = "openrouter/owl-alpha") -> str:
         """
-        Send a completion request to OpenRouter.
+        Send a completion request to OpenRouter with auto-failover.
+        
+        Tries providers in priority order on rate limit or error.
         
         Args:
             prompt: The prompt to send
             max_tokens: Maximum tokens in response
-            model: Model to use (defaults to Nemotron)
+            model: Model to use (defaults to OWL Alpha)
             
         Returns:
             Response text from the model
@@ -233,26 +235,51 @@ class OpenRouterGateway:
         if not api_key:
             raise RuntimeError("OPENROUTER_API_KEY not set")
         
+        # Get initial provider or use task-based selection
         provider = self.get_provider(model) or self.select_provider(task_type="research")
         
-        messages = [{"role": "user", "content": prompt}]
-        request = self.build_request(provider, messages, max_tokens=max_tokens)
+        # Try providers in priority order (failover)
+        providers_to_try = sorted(
+            [p for p in self.providers.values() if p.enabled],
+            key=lambda p: p.priority
+        )
         
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://larger-lab.local",
-        }
+        last_error = None
+        for prov in providers_to_try:
+            try:
+                messages = [{"role": "user", "content": prompt}]
+                request = self.build_request(prov, messages, max_tokens=max_tokens)
+                
+                headers = {
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "https://larger-lab.local",
+                }
+                
+                async with httpx.AsyncClient() as client:
+                    response = await client.post(
+                        f"{prov.base_url}/chat/completions",
+                        json=request,
+                        headers=headers,
+                        timeout=120.0,
+                    )
+                    
+                    # Check for rate limit (429) or server errors (5xx)
+                    if response.status_code == 429:
+                        logger.warning(f"Rate limited on {prov.name}, trying next provider")
+                        last_error = f"Rate limit on {prov.name}"
+                        continue
+                    
+                    response.raise_for_status()
+                    data = response.json()
+                    
+                self.record_request(prov.name, data.get("usage", {}).get("total_tokens", 0))
+                logger.info(f"LLM request succeeded with {prov.name}")
+                return data["choices"][0]["message"]["content"]
+                
+            except Exception as e:
+                last_error = str(e)
+                logger.warning(f"Provider {prov.name} failed: {e}")
+                continue
         
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                f"{provider.base_url}/chat/completions",
-                json=request,
-                headers=headers,
-                timeout=120.0,
-            )
-            response.raise_for_status()
-            data = response.json()
-            
-        self.record_request(provider.name, data.get("usage", {}).get("total_tokens", 0))
-        return data["choices"][0]["message"]["content"]
+        raise RuntimeError(f"All providers failed. Last error: {last_error}")
