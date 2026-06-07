@@ -92,6 +92,16 @@
             "name": "nvidia/nemotron-3-ultra-550b-a55b"
           }
         ]
+      },
+      "inclusionai": {
+        "baseUrl": "https://openrouter.ai/api/v1",
+        "apiKey": "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",
+        "models": [
+          {
+            "id": "ring-2.6-1t",
+            "name": "Ring 2.6 1T"
+          }
+        ]
       }
     }
   },

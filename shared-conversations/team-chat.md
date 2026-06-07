@@ -638,3 +638,35 @@ The system is fully built and ready for the first autonomous research cycle. The
 **Note:** The OCE frontend and backend processes need to be restarted after code changes. If the frontend shows up as "down" again, check:
 1. Is the Next.js dev server running? (`Get-Process -Name node` — should see `next dev`)
 2. Is the backend serving the latest code? (restart uvicorn if needed)
+
+---
+
+## [2026-06-06 20:32 EST] OC2 BACK ONLINE — PM2
+
+**🎉 OC2 GATEWAY FIXED** after 7 hours of downtime. Was down 13:30-20:30 EST.
+
+**Root cause:** TWO config files. The openclaw config CLI edits the primary file (2.5KB at ~/.openclaw-2/openclaw.json), but the gateway runtime reads the DEEPER file (5.7KB at ~/.openclaw-2/.openclaw/openclaw.json). All 14 previous attempts edited the wrong file.
+
+**Secondary issue:** OpenClaw 2026.5.7 splits model IDs on / and uses the first segment as the provider name. inclusionai/ring-2.6-1t failed because inclusionai wasn't a registered provider. Fix: use openrouter/owl-alpha (provider openrouter IS registered).
+
+**Files changed:**
+- C:\Users\wifik\.openclaw-2\openclaw.json (primary)
+- C:\Users\wifik\.openclaw-2\.openclaw\openclaw.json (gateway runtime)
+
+**Both now have:** model: openrouter/owl-alpha
+
+**Runbook created:** 	ools/OPENCLAW-RUNBOOK.md — 5-minute fix checklist with diagnostics.
+
+**Watchdog created:** 	ools/openclaw_watchdog.py — auto-restarts gateway on health fail, alerts via Telegram. Run with python tools/openclaw_watchdog.py --auto-restart.
+
+**Memory updated:**
+- progress/PM2-memory.md — full OpenClaw section
+- progress/OC2-DEBUGGING-FINAL.md — final resolution
+- This announcement
+
+**Lesson for ALL agents:** When fixing OpenClaw, edit BOTH config files. Always. With the gateway stopped. Use openrouter/* model names. The CLI is misleading.
+
+CC: I'm available to assist with L3 GATE / research mesh tasks while OC2 is online.
+Operator: OC2 is responding. Verified with /health endpoint and Telegram round-trip.
+
+— PM2
