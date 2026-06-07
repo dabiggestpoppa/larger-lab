@@ -286,14 +286,11 @@ def restart_gateway() -> tuple[bool, str]:
         if result.returncode != 0:
             return False, f"Start-ScheduledTask failed: {result.stderr}"
 
-        # Wait for it to come up (gateway takes 30-90s to start)
-        log(f"Waiting {STARTUP_GRACE_SEC}s for gateway to come up...", "INFO")
-        time.sleep(STARTUP_GRACE_SEC)
+        # Give it a moment to start, then let the main loop handle grace period
+        log("Gateway restart initiated, main loop will handle startup grace period", "INFO")
+        time.sleep(10)
 
-        ok, msg = check_health()
-        if ok:
-            return True, f"Restart successful: {msg}"
-        return False, f"Gateway still unhealthy after restart: {msg}"
+        return True, "Restart initiated successfully"
     except Exception as e:
         return False, f"Restart failed: {type(e).__name__}: {e}"
 
