@@ -671,7 +671,7 @@ class POAgent:
         self.api_key = api_key or os.environ.get("OPENROUTER_API_KEY", "")
         self.base_url = "https://openrouter.ai/api/v1/chat/completions"
         self._history: List[Dict[str, str]] = []
-        self._max_history = 20
+        self._max_history = 50
         self._model_index = 0
         self._lock = threading.Lock()
 
@@ -833,7 +833,7 @@ class POAgent:
         except Exception as e:
             return f"Error executing {tool_name}: {e}"
 
-    def chat(self, message: str, sovereign_context: str = "", max_tool_rounds: int = 15,
+    def chat(self, message: str, sovereign_context: str = "", max_tool_rounds: int = 36,
              progress_callback=None, history: Optional[List[Dict[str, str]]] = None,
              session_id: str = "") -> str:
         """
@@ -940,7 +940,7 @@ class POAgent:
                     messages.append({
                         "role": "tool",
                         "tool_call_id": tc.get("id", "unknown"),
-                        "content": result[:2000],  # Cap tool result size
+                        "content": result[:8000],  # Cap tool result size (extended for long runs)
                     })
 
                 next_round = round_num + 2
