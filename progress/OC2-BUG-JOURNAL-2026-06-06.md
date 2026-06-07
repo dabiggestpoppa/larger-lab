@@ -120,3 +120,22 @@
 | **Verdict** | **Production ready** | **Needs work** |
 
 **Recommendation:** Consider migrating OC2 to use PO's gateway pattern (custom Python Telegram poller) instead of OpenClaw's built-in Telegram channel. This would eliminate bugs #1 and #2 entirely.
+
+---
+
+## Bug #7: Watchdog Clipping OC2 Mid-Response (FIXED — REMOVED)
+
+**Symptom:** OC2 starts working on a large response/task, takes time to think, watchdog health check fails during thinking, watchdog restarts OC2 mid-response. Result: OC2 never finishes anything.
+
+**Root Cause:** The watchdog (`tools/openclaw_watchdog.py`) was designed with a 60s check interval and auto-restart on any failure. But OC2's LLM can take 30-90s+ to process complex requests. The health check times out during thinking → watchdog thinks OC2 is down → restarts it → kills the in-progress response.
+
+**Operator feedback:** "U BUILT A USELESS ASS GUARD DOG, JUST MAKE A SIMPLE STATE TRACKER WITH A LOG SO WE CAN SEE IF AND WHEN AND WHY OC2 STOP RESPONDING FOR GOING DOWN, NO FUCKING SCRIPT AUTO RESTARTING ON NONE OF THE SHIT COOKING PROGRESS AINT NUN BE WRONG AND ITS RESTARTING THE DAMN AGENT EVERY 2/4 RESPONSES"
+
+**Fix:** 
+- DELETED `tools/openclaw_watchdog.py` entirely
+- Created `tools/oc2_state_tracker.py` — simple monitor, NO auto-restart
+- Checks every 120s, only logs state changes (UP/DOWN/DEGRADED)
+- Logs last 5 gateway lines when OC2 goes down for context
+- Tracks downtime count and timestamps
+
+**Lesson learned:** Never auto-restart an agent that's mid-task. Just log and alert.
