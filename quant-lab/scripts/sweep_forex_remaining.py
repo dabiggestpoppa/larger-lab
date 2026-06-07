@@ -1,11 +1,9 @@
 """
-CEREBUS Forex Re-Sweep — ALL 28 pairs, corrected pip values.
-Same methodology as metals/indices sweep: multipliers 0.3x–3.0x from baseline.
-Uses SymmetryTrapBacktest for reliable simulation.
+CEREBUS Forex Re-SWEEP — RESUME from pair 14 (AUDNZD)
+Continues the full 28-pair sweep that was killed mid-run.
 """
-import sys, json, os, io, time, pickle
+import sys, json, os, time
 from pathlib import Path
-from collections import defaultdict
 
 sys.stdout.reconfigure(encoding='utf-8', line_buffering=True)
 
@@ -22,18 +20,15 @@ sys.path.insert(0, str(ENGINES_DIR))
 from asset_configs import ASSET_CONFIGS
 from symmetry_trap_backtest import SymmetryTrapBacktest, load_m5_csv
 
-# All 28 forex pairs
-FOREX_PAIRS = [
-    "EURUSD", "GBPUSD", "USDJPY", "USDCHF", "AUDUSD", "NZDUSD", "USDCAD",
-    "EURGBP", "EURJPY", "GBPJPY", "EURCHF", "AUDJPY", "NZDJPY", "AUDNZD",
-    "AUDCAD", "AUDCHF", "CADJPY", "CHFJPY", "CADCHF", "EURNZD", "EURAUD",
-    "EURCAD", "GBPAUD", "GBPCAD", "GBPCHF", "GBPNZD", "NZDCAD", "NZDCHF",
+# Remaining pairs (14 through 28)
+REMAINING_PAIRS = [
+    "AUDNZD", "AUDCAD", "AUDCHF", "CADJPY", "CHFJPY", "CADCHF",
+    "EURNZD", "EURAUD", "EURCAD", "GBPAUD", "GBPCAD", "GBPCHF",
+    "GBPNZD", "NZDCAD", "NZDCHF",
 ]
 
-# Multiplier range (same as metals/indices sweep)
 MULTIPLIERS = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.2, 1.4, 1.7, 2.0, 2.5, 3.0]
 
-# Corrected pip values
 PIP_VALUES = {
     "BTCUSD": 1.0, "ETHUSD": 1.0,
     "XAUUSD": 0.10, "XAGUSD": 0.10,
@@ -41,15 +36,10 @@ PIP_VALUES = {
 }
 DEFAULT_PIP = 0.10
 
-
 def get_pip_val(pair):
     return PIP_VALUES.get(pair, 0.07 if "JPY" in pair else DEFAULT_PIP)
 
-
 def build_scaled_config(pair, mult):
-    """Scale tier config by multiplier from baseline.
-    Returns a FULL config dict with scaled tiers, so the engine
-    picks up the scaled values via config.get('tiers')."""
     base = ASSET_CONFIGS[pair].copy()
     tiers = {}
     for tn in ["T1", "T2", "T3"]:
@@ -62,9 +52,7 @@ def build_scaled_config(pair, mult):
     base["tiers"] = tiers
     return base
 
-
 def run_sweep_pair(pair):
-    """Run full trigger sweep for a single forex pair."""
     csv_path = DATA_DIR / f"{pair}_M5.csv"
     if not csv_path.exists():
         candidates = sorted(DATA_DIR.glob(f"{pair}*.csv"))
@@ -88,15 +76,14 @@ def run_sweep_pair(pair):
 
     results = []
     for i, mult in enumerate(MULTIPLIERS):
-        tier_config = build_scaled_config(pair, mult)
+        scaled_config = build_scaled_config(pair, mult)
         t1_trigger = round(base_t1 * mult, 1)
 
         t0 = time.time()
-        scaled_config = build_scaled_config(pair, mult)
         bt = SymmetryTrapBacktest(
             pip_size=pip_value,
             symbol=pair,
-            config=scaled_config,  # pass scaled tiers through config
+            config=scaled_config,
         )
         result = bt.run(bars)
         elapsed = time.time() - t0
@@ -132,54 +119,26 @@ def run_sweep_pair(pair):
 
     return results
 
-
 def main():
     print("=" * 70)
-    print("CEREBUS FOREX RE-SWEEP — ALL 28 PAIRS")
-    print(f"Multipliers: {MULTIPLIERS}")
+    print("CEREBUS FOREX RE-SWEEP — RESUME (pairs 14-28)")
+    print(f"Remaining: {REMAINING_PAIRS}")
     print(f"Started: {time.strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 70)
 
     all_results = {}
-    for idx, pair in enumerate(FOREX_PAIRS):
-        print(f"\n[{idx+1:2d}/{len(FOREX_PAIRS)}] {pair}")
+    for idx, pair in enumerate(REMAINING_PAIRS):
+        print(f"\n[{idx+1:2d}/{len(REMAINING_PAIRS)}] {pair}")
         results = run_sweep_pair(pair)
         if results:
             all_results[pair] = results
 
-    # Save
-    output_path = REPORTS_DIR / "trigger_sweep_forex_full.json"
+    # Save partial results
+    output_path = REPORTS_DIR / "trigger_sweep_forex_remaining.json"
     with open(output_path, "w") as f:
         json.dump(all_results, f, indent=2, default=str)
-    print(f"\n\nResults saved to: {output_path}")
-
-    # Summary
-    print("\n" + "=" * 70)
-    print("SWEEP SUMMARY")
-    print("=" * 70)
-    for pair, entries in all_results.items():
-        if not entries:
-            continue
-        best_trades = max(entries, key=lambda e: e["trades"])
-        best_wr = max(entries, key=lambda e: e["wr"])
-        best_pf = max(entries, key=lambda e: e["pf"] if e["pf"] < 999 else 0)
-        best_pnl = max(entries, key=lambda e: e["pnl"])
-        print(f"\n{pair}:")
-        print(f"  Max Trades: mult={best_trades['multiplier']:.1f} t1={best_trades['t1_trigger']:.1f} | "
-              f"trades={best_trades['trades']} | WR={best_trades['wr']:.1f}% | "
-              f"PF={best_trades['pf']:.2f} | tr/d={best_trades['tr_per_day']:.3f}")
-        print(f"  Max WR:     mult={best_wr['multiplier']:.1f} t1={best_wr['t1_trigger']:.1f} | "
-              f"trades={best_wr['trades']} | WR={best_wr['wr']:.1f}% | "
-              f"PF={best_wr['pf']:.2f} | tr/d={best_wr['tr_per_day']:.3f}")
-        print(f"  Max PF:     mult={best_pf['multiplier']:.1f} t1={best_pf['t1_trigger']:.1f} | "
-              f"trades={best_pf['trades']} | WR={best_pf['wr']:.1f}% | "
-              f"PF={best_pf['pf']:.2f} | tr/d={best_pf['tr_per_day']:.3f}")
-        print(f"  Max PnL:    mult={best_pnl['multiplier']:.1f} t1={best_pnl['t1_trigger']:.1f} | "
-              f"trades={best_pnl['trades']} | WR={best_pnl['wr']:.1f}% | "
-              f"PF={best_pnl['pf']:.2f} | tr/d={best_pnl['tr_per_day']:.3f}")
-
-    print(f"\nFinished: {time.strftime('%Y-%m-%d %H:%M:%S')}")
-
+    print(f"\n\nRemaining results saved to: {output_path}")
+    print(f"Finished: {time.strftime('%Y-%m-%d %H:%M:%S')}")
 
 if __name__ == "__main__":
     main()

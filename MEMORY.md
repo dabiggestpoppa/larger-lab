@@ -169,6 +169,7 @@ _Last updated: 2026-06-06 21:10 EDT — Self-heal complete, all processes runnin
 Old flat config was extremely tight (trigger=30). Optimal is trigger=9 (mult=0.3).
 
 ### Full Universe Rankings (36 pairs: 28 FX + 2 crypto + 2 metals + 4 indices)
+**NOTE (2026-06-07):** FX universe expanded from 22 → 28 pairs. The 28 FX count is correct. Never was 15.
 
 **Top 10 by Net Profit (best config per pair):**
 1. BTCUSD (FLOOR) $721,151 | WR 75.2% | PF 8.1 | Tr/d 2.61

@@ -380,7 +380,8 @@ class SymmetryTrapBacktest:
     ):
         if config is not None:
             self.pip_size = config.get("pip_value", pip_size)
-            self.tier_config = config.get("tiers", tier_config or DEFAULT_TIER_CONFIG.copy())
+            # tier_config parameter takes priority over config["tiers"] when explicitly provided
+            self.tier_config = tier_config if tier_config is not None else config.get("tiers", DEFAULT_TIER_CONFIG.copy())
             self.symbol = config.get("name", symbol)
         else:
             self.pip_size = pip_size
