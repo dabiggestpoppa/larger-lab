@@ -436,6 +436,63 @@ async def vault_stats() -> Dict[str, Any]:
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# ─── L4.8 — Telemetry Endpoints ─────────────────────────────────────────────
+
+from .telemetry import Telemetry as _Telemetry
+_telemetry = _Telemetry()
+
+
+@router.get("/api/research/telemetry/daily")
+async def get_daily_report(day: Optional[str] = None) -> Dict[str, Any]:
+    """
+    Get daily telemetry report.
+    
+    Shows papers ingested, distilled, agents run, $ spent, safety status.
+    Query param: day=YYYY-MM-DD (defaults to today)
+    """
+    return await _telemetry.daily_report(day=day)
+
+
+@router.get("/api/research/telemetry/audit")
+async def get_audit_trail(
+    agent_id: Optional[str] = None,
+    task_id: Optional[str] = None,
+    action: Optional[str] = None,
+    since: Optional[str] = None,
+    limit: int = Query(100, ge=1, le=500),
+) -> Dict[str, Any]:
+    """
+    Export audit trail with optional filters.
+    
+    Returns agent_log entries filtered by agent, task, action, or time.
+    """
+    entries = await _telemetry.audit_trail(
+        agent_id=agent_id,
+        task_id=task_id,
+        action=action,
+        since=since,
+        limit=limit,
+    )
+    return {"entries": entries, "count": len(entries)}
+
+
+@router.get("/api/research/telemetry/safety")
+async def get_safety_status() -> Dict[str, Any]:
+    """
+    Get current safety budget status.
+    
+    Shows remaining LLM budget, vault write budget, and agent slots.
+    """
+    llm = await _telemetry.check_llm_budget()
+    vault = await _telemetry.check_vault_write_budget()
+    agents = await _telemetry.check_agent_slots()
+    return {
+        "llm_budget": llm,
+        "vault_budget": vault,
+        "agent_slots": agents,
+    }
+
+
 def register_research_endpoints(app) -> None:
     """Register research endpoints on the OCE FastAPI app."""
     app.include_router(router)
