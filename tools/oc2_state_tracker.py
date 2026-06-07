@@ -82,9 +82,9 @@ def main():
 
             now = datetime.now().isoformat(timespec="seconds")
 
-            if healthy and port_listening:
+            if healthy:
                 status = f"UP (PID {pid}, {health_msg})"
-            elif port_listening and not healthy:
+            elif port_listening:
                 status = f"DEGRADED (PID {pid}, health: {health_msg})"
             else:
                 status = f"DOWN ({health_msg})"
