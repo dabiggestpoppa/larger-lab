@@ -56,6 +56,8 @@ from .sovereign_api import register_sovereign_endpoints
 from .vault_api import register_vault_endpoints
 from .ml_api import register_ml_endpoints
 from .po_api import router as po_router
+from .po_tools_api import router as po_tools_router
+from .po_mcp_client import MCPToolRegistry, BUILTIN_MCP_SERVERS
 from .po_idle import POIdleRuntime, get_idle_runtime, set_idle_runtime
 
 app = FastAPI(
@@ -82,6 +84,25 @@ async def global_exception_handler(request, exc):
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={"detail": "Internal server error", "type": type(exc).__name__},
     )
+
+
+# ─── MCP Tool Registry ──────────────────────────────────────────────────────
+
+mcp_registry = MCPToolRegistry()
+
+
+@app.on_event("startup")
+async def startup_mcp():
+    """Connect to all MCP servers on startup."""
+    mcp_registry.discover_servers()
+    await mcp_registry.connect_all()
+    logger.info(f"MCP registry: {len(mcp_registry._tools)} tools from {len(mcp_registry._servers)} servers")
+
+
+@app.on_event("shutdown")
+async def shutdown_mcp():
+    """Disconnect from all MCP servers on shutdown."""
+    await mcp_registry.disconnect_all()
 
 
 # ─── Models ───────────────────────────────────────────────────────────────────
@@ -1332,6 +1353,21 @@ register_research_endpoints(app)
 # Register PO API endpoints (PO × VTuber integration)
 app.include_router(po_router)
 
+# Register PO Tools API (all Copilot-equivalent capabilities)
+app.include_router(po_tools_router)
+
+# MCP proxy endpoint — forward tool calls to MCP servers
+@app.get("/api/po/mcp/tools")
+async def list_mcp_tools():
+    """List all tools from connected MCP servers."""
+    return {"tools": mcp_registry.list_all_tools(), "servers": list(mcp_registry._servers.keys())}
+
+
+@app.post("/api/po/mcp/call")
+async def call_mcp_tool(server: str, tool_name: str, arguments: Dict[str, Any] = {}):
+    """Call a tool on a specific MCP server."""
+    result = await mcp_registry.call_tool(server, tool_name, arguments)
+    return {"server": server, "tool": tool_name, "result": result}
 
 
 app.include_router(command_center_router)
