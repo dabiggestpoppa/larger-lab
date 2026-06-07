@@ -847,3 +847,16 @@ note = await distiller.distill(paper)
 ```
 
 **Requires:** `OPENROUTER_API_KEY` environment variable
+
+---
+
+### [OC2] 2026-06-07 — OCE FRONTEND FIXED — WAS NOT RUNNING
+
+**Problem:** OCE frontend was showing static black/white HTML because the Next.js dev server was not running.
+
+**Fix:** Started 
+pm run dev in oce/frontend/. Server is now running on port 3002 (3000 and 3001 were occupied).
+
+**Access:** http://localhost:3002
+
+**Status:** Frontend loads correctly with full React UI, dark theme, and all pages.
