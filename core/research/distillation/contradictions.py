@@ -43,20 +43,34 @@ class ContradictionDetector:
     def __init__(self, min_shared_method_words: int = MIN_SHARED_METHOD_WORDS):
         self.min_shared_method_words = min_shared_method_words
 
-    def detect(self, papers: List[Dict[str, str]]) -> List[Dict[str, Any]]:
+    def detect(self, papers: List[Any]) -> List[Dict[str, Any]]:
         """
         Detect contradictions among a set of papers.
         
         Args:
-            papers: List of dicts with 'id', 'method', 'result', 'title' keys
+            papers: List of Paper objects or dicts with 'id', 'method', 'result', 'title' keys
             
         Returns:
             List of contradiction dicts with paper_a, paper_b, method, description
         """
         contradictions = []
         
+        # Normalize Paper objects to dicts
+        normalized = []
+        for p in papers:
+            if isinstance(p, dict):
+                normalized.append(p)
+            else:
+                # Paper object — extract fields
+                normalized.append({
+                    "id": p.id,
+                    "title": p.title,
+                    "method": p.abstract or "",  # Use abstract as method proxy
+                    "result": p.abstract or "",  # Use abstract as result proxy
+                })
+        
         # Group papers by similar method
-        method_groups = self._group_by_method(papers)
+        method_groups = self._group_by_method(normalized)
         
         for method_key, group in method_groups.items():
             if len(group) < 2:

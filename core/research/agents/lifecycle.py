@@ -80,6 +80,7 @@ class AgentLifecycle:
         self.max_duration = max_duration
         self.max_retries = max_retries
         self._agents: Dict[str, AgentInstance] = {}
+        self._task_retries: Dict[str, int] = {}
 
     def spawn(self, task_id: str) -> Optional[AgentInstance]:
         """
@@ -134,7 +135,12 @@ class AgentLifecycle:
         if not agent:
             return False
         
-        agent.retry_count += 1
+        # Track retries at task level (survives re-spawns with same base task)
+        task_id = agent.task_id
+        # Normalize task_id: strip _retry suffix for retry tracking
+        base_task = task_id.rsplit("_retry", 1)[0] if "_retry" in task_id else task_id
+        self._task_retries[base_task] = self._task_retries.get(base_task, 0) + 1
+        agent.retry_count = self._task_retries[base_task]
         agent.error_message = error
         
         if agent.retry_count > self.max_retries:

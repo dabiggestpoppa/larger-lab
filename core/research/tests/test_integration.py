@@ -439,7 +439,7 @@ class TestL2L3Smoke:
         task = ResearchTask(query="Test")
         tid = queue.enqueue(task)
 
-        # Fail twice, then abandon
+        # Fail 3 times — 3rd exceeds max_retries → auto-abandoned by mark_failed
         for i in range(3):
             queue.dequeue()
             queue.mark_failed(tid, error=f"error {i}")

@@ -36,7 +36,7 @@ class CitationGraphBuilder:
     def __init__(self, graph_store: Optional[GraphStore] = None):
         self.graph = graph_store or GraphStore()
 
-    def build_from_paper(self, paper: Paper) -> int:
+    def build_from_paper(self, paper: Paper) -> list:
         """
         Build citation edges from a single paper.
         
@@ -44,13 +44,13 @@ class CitationGraphBuilder:
             paper: Paper object with referenced_works list
             
         Returns:
-            Number of edges added
+            List of edge dicts [{'src': ..., 'dst': ..., 'kind': 'cites'}, ...]
         """
         if not paper.referenced_works:
-            return 0
+            return []
 
         src_id = self._normalize_id(paper.id, paper.doi)
-        edges_added = 0
+        edges = []
 
         # Cap citations per paper
         refs = paper.referenced_works[:MAX_CITATIONS_PER_PAPER]
@@ -59,15 +59,14 @@ class CitationGraphBuilder:
             dst_id = self._normalize_ref_id(ref_id)
             
             # Only add edge if destination exists in our graph (orphan pruning)
-            # For now, we add the edge — orphan pruning happens at query time
-            # or during periodic cleanup
-            if self.graph.add_edge(src_id, dst_id, kind="cites"):
-                edges_added += 1
+            if self.graph.has_node(dst_id):
+                if self.graph.add_edge(src_id, dst_id, kind="cites"):
+                    edges.append({"src": src_id, "dst": dst_id, "kind": "cites"})
 
-        if edges_added > 0:
-            logger.debug(f"Added {edges_added} citation edges for {src_id}")
+        if edges:
+            logger.debug(f"Added {len(edges)} citation edges for {src_id}")
 
-        return edges_added
+        return edges
 
     def build_from_papers(self, papers: List[Paper]) -> int:
         """
