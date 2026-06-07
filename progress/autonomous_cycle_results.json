@@ -1,0 +1,47 @@
+{
+  "start_time": "2026-06-07T18:26:38.092447+00:00",
+  "steps": [
+    {
+      "step": "ingestion",
+      "status": "ok",
+      "total_papers": 154,
+      "openalex": 133,
+      "arxiv": 20
+    },
+    {
+      "step": "distillation",
+      "status": "ok",
+      "distilled": 20,
+      "graph_nodes": 283
+    },
+    {
+      "step": "gap_detection",
+      "status": "ok",
+      "gaps_found": 0,
+      "gaps": []
+    },
+    {
+      "step": "research_agent",
+      "status": "ok",
+      "task_id": "task_24cf547d26a6",
+      "query": "research in pinns volatility",
+      "findings": 1
+    },
+    {
+      "step": "vault_sync",
+      "status": "ok",
+      "nodes_added": 444,
+      "edges_added": 20527,
+      "papers_synced": 83,
+      "doctrine_synced": 135,
+      "errors": []
+    },
+    {
+      "step": "telemetry",
+      "status": "ok"
+    }
+  ],
+  "errors": [],
+  "end_time": "2026-06-07T18:26:54.978602+00:00",
+  "duration_seconds": 16.886155
+}

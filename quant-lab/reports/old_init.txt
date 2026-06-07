@@ -1,0 +1,55 @@
+def initialize_session(
+        self,
+        asian_high: float,
+        asian_low: float,
+    ) -> None:
+        """
+        Initialize session at 03:00 EST from Asian Range.
+
+        Classify Tier â Lock AU â Lock Trigger.
+        Called ONCE per session.
+
+        Reference: cerebus_qa_recap.md Q1 (Tier session invariance)
+        """
+        self.asian_high = asian_high
+        self.asian_low = asian_low
+        self.asian_range_pips = (asian_high - asian_low) / self.pip_size
+
+        self.tier_name, self.au_pips, self.trigger_pips = classify_tier(
+            self.asian_range_pips, self.tier_config
+        )
+
+        self.active_au = self.au_pips * self.pip_size
+        self.session_active = self.tier_name != "NO_GO"
+
+        # Reset state machine
+        self.state = EngineState.SEARCH
+        self.swing_origin = None
+        self.impulse_direction = TradeDirection.FLAT
+        self.impulse_extreme = 0.0
+        self.impulse_size_pips = 0.0
+        self.kill_switch_level = 0.0
+        self.entry_price = None
+        self.sl_price = None
+        self.tp_price = None
+
+        # ââ Option B: Reset loop tracking for new session âââââââââââââ
+        self.loop_count = 1
+        self.loop_start_time = None
+        self.cascade_bias = None
+
+        # ââ Reset telemetry counters ââ
+        self.tel_kill_switch_80pct = 0
+        self.tel_timeout_4hr = 0
+        self.tel_loop1_reject_shallow = 0
+        self.tel_loop1_reject_deep = 0
+        self.tel_max_loops_exhausted = 0
+        self.tel_valid_occ_ignored = 0
+
+        self.logger.info(
+            f"Session initialized: tier={self.tier_name}, "
+            f"AU={self.au_pips}p, trigger={self.trigger_pips}p, "
+            f"AR={self.asian_range_pips:.1f}p, loop=1 (max={self.max_loops})"
+        )
+
+    # ââ Main Processing Loop âââââââââââââââââââââââââââââââââââââââââ

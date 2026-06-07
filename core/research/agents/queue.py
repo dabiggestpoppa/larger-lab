@@ -21,7 +21,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-AGENTS_DB = Path(__file__).resolve().parents[4] / "data" / "research" / "agents.db"
+AGENTS_DB = Path(__file__).resolve().parents[3] / "data" / "research" / "agents.db"
 
 
 @dataclass
