@@ -349,6 +349,19 @@ CREATE TABLE IF NOT EXISTS ingestion_log (
     duration_seconds REAL,
     created_at TEXT
 );
+
+CREATE TABLE IF NOT EXISTS daily_caps (
+    date TEXT PRIMARY KEY,
+    vault_writes INTEGER DEFAULT 0,
+    llm_tokens_input INTEGER DEFAULT 0,
+    llm_tokens_output INTEGER DEFAULT 0,
+    llm_cost_usd REAL DEFAULT 0.0,
+    papers_ingested INTEGER DEFAULT 0,
+    papers_distilled INTEGER DEFAULT 0,
+    agents_spawned INTEGER DEFAULT 0,
+    created_at TEXT,
+    updated_at TEXT
+);
 """
 
 

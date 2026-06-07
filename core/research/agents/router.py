@@ -51,22 +51,27 @@ class ResearchRouter:
         self._daily_spent = 0.0
         self._call_count = 0
 
-    def route(self, task: Any) -> str:
+    def route(self, task: Any = None, query: str = "", budget_remaining: float = 2.0) -> str:
         """
         Route a research task to appropriate backend.
         
         Args:
-            task: ResearchTask object
+            task: ResearchTask object (optional)
+            query: Query string (used if task not provided)
+            budget_remaining: Remaining budget in USD
             
         Returns:
             'ollama', 'openrouter', or 'skip'
         """
         # Check budget first
-        if self._daily_spent >= self.daily_budget_usd:
+        if budget_remaining <= 0 or self._daily_spent >= self.daily_budget_usd:
             logger.warning(f"Router: daily budget exhausted (${self._daily_spent:.2f}/{self.daily_budget_usd:.2f})")
             return "skip"
 
-        query = getattr(task, 'query', str(task))
+        if task is not None:
+            query = getattr(task, 'query', str(task))
+        if not query:
+            query = "unknown"
         complexity = self._assess_complexity(query)
 
         if complexity == "simple":

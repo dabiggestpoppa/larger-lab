@@ -42,9 +42,61 @@ class DoctrineExtractor:
         self,
         min_papers: int = MIN_PAPERS_FOR_DOCTRINE,
         min_method_diversity: int = MIN_METHOD_DIVERSITY,
+        vault_root: Optional[Path] = None,
     ):
         self.min_papers = min_papers
         self.min_method_diversity = min_method_diversity
+        if vault_root:
+            global VAULT_PAPERS_DIR, VAULT_DOCTRINE_DIR
+            VAULT_PAPERS_DIR = vault_root / "research" / "papers"
+            VAULT_DOCTRINE_DIR = vault_root / "doctrine"
+
+    def extract(self, papers: List[Any], domain: str = "general") -> List[str]:
+        """
+        Extract doctrine from a list of Paper objects.
+        
+        Args:
+            papers: List of Paper objects
+            domain: Domain tag for the doctrine note
+            
+        Returns:
+            List of created doctrine note paths (empty if below threshold)
+        """
+        if len(papers) < self.min_papers:
+            return []
+
+        # Build simple concept frequency map
+        concept_counts: Dict[str, int] = defaultdict(int)
+        for paper in papers:
+            for concept in paper.concepts:
+                concept_counts[concept.name] += 1
+
+        # Find recurring concepts (appearing in ≥ min_papers)
+        recurring = {
+            name: count for name, count in concept_counts.items()
+            if count >= self.min_papers
+        }
+
+        if not recurring:
+            return []
+
+        # Create doctrine note for top recurring concept
+        created = []
+        top_concept = max(recurring, key=recurring.get)
+        note = self._format_doctrine_note(top_concept, papers, domain)
+        
+        VAULT_DOCTRINE_DIR.mkdir(parents=True, exist_ok=True)
+        domain_dir = VAULT_DOCTRINE_DIR / domain
+        domain_dir.mkdir(parents=True, exist_ok=True)
+        
+        path = domain_dir / f"{top_concept.lower().replace(' ', '_')}.md"
+        try:
+            path.write_text(note, encoding="utf-8")
+            created.append(str(path))
+        except Exception as e:
+            logger.error(f"Failed to write doctrine note: {e}")
+
+        return created
 
     def extract_from_vault(self) -> List[str]:
         """
@@ -151,6 +203,38 @@ class DoctrineExtractor:
         stop_words = {"the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for", "of", "with", "by", "from", "as", "is", "are", "was", "were", "this", "that", "we", "our", "it", "its"}
         words = [w for w in text.split() if w not in stop_words and len(w) > 3]
         return " ".join(words[:5])  # First 5 meaningful words as pattern key
+
+    def _format_doctrine_note(self, concept: str, papers: List[Any], domain: str) -> str:
+        """Format a doctrine note from a recurring concept."""
+        evidence = []
+        for p in papers[:10]:
+            title = getattr(p, 'title', str(p))
+            abstract = getattr(p, 'abstract', '') or ''
+            evidence.append(f"- {title}: {abstract[:100]}")
+
+        return f"""# Doctrine: {concept}
+
+> **Domain:** {domain} | **Papers:** {len(papers)} | **Extracted:** {datetime.now(timezone.utc).strftime('%Y-%m-%d')}
+> **Tier:** 2 (auto-extracted, AS review pending)
+
+## Pattern
+
+The concept "{concept}"" appears across {len(papers)} papers in the {domain} domain.
+
+## Evidence
+
+{chr(10).join(evidence)}
+
+## Synthesis
+
+[AS to review and synthesize]
+
+## Application
+
+[How OCE/PO can use this doctrine]
+
+#doctrine #tier/2 #domain/{domain} #auto_extracted
+"""
 
     def _create_doctrine_note(
         self,

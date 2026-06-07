@@ -89,8 +89,38 @@ logging.basicConfig(
 log = logging.getLogger("cerebus.live_bridge")
 
 
+# ─── ACCOUNT CONFIG ─────────────────────────────────────────────────
+ACCOUNT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "live_account.json")
+
+def _load_account():
+    try:
+        with open(ACCOUNT_PATH, "r") as f:
+            return json.load(f)
+    except Exception as e:
+        log.error("Failed to load live_account.json: %s", e)
+        return None
+
 # ─── MT5 HELPERS ──────────────────────────────────────────────────
 def mt5_connect() -> bool:
+    account = _load_account()
+    if account:
+        login = account.get("login")
+        server = account.get("server")
+        password = account.get("password")
+        if login and server and password:
+            if not mt5.initialize():
+                log.error("MT5 init failed: %s", mt5.last_error())
+                return False
+            authorized = mt5.login(login=login, password=password, server=server)
+            if not authorized:
+                log.error("MT5 login failed: %s", mt5.last_error())
+                mt5.shutdown()
+                return False
+            info = mt5.account_info()
+            log.info("MT5 connected: %s @ %s | Balance: $%.2f | Equity: $%.2f",
+                     info.login, info.server, info.balance, info.equity)
+            return True
+    # Fallback: try default initialize
     if not mt5.initialize():
         log.error("MT5 init failed: %s", mt5.last_error())
         return False

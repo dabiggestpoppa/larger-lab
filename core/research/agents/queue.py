@@ -31,8 +31,8 @@ class ResearchTask:
     gap_id: str = ""
     query: str = ""
     domains: List[str] = field(default_factory=list)
-    status: str = "pending"  # pending | running | completed | failed | abandoned
-    priority: int = 3  # 1-5
+    status: str = "pending"
+    priority: int = 3
     assigned_to: str = ""
     result_json: str = ""
     confidence: float = 0.0
@@ -52,11 +52,7 @@ class ResearchTask:
 
 
 class TaskQueue:
-    """
-    SQLite-backed task queue with bounded concurrency.
-    
-    Max 3 concurrent tasks, max 2 retries before abandoned.
-    """
+    """SQLite-backed task queue with bounded concurrency."""
 
     MAX_CONCURRENT = 3
     MAX_RETRIES = 2
@@ -66,7 +62,6 @@ class TaskQueue:
         self._ensure_schema()
 
     def _ensure_schema(self) -> None:
-        """Create task tables if they don't exist."""
         conn = sqlite3.connect(self.db_path)
         try:
             conn.executescript(_TASK_SCHEMA)
@@ -78,21 +73,14 @@ class TaskQueue:
         return sqlite3.connect(self.db_path)
 
     def enqueue(self, task: ResearchTask) -> str:
-        """
-        Add a task to the queue.
-        
-        Returns task ID.
-        """
         conn = self._get_connection()
         try:
             conn.execute(
                 """INSERT INTO research_tasks 
                    (id, gap_id, query, domains, status, priority, created_at)
                    VALUES (?, ?, ?, ?, ?, ?, ?)""",
-                (
-                    task.id, task.gap_id, task.query,
-                    json.dumps(task.domains), task.status, task.priority, task.created_at
-                ),
+                (task.id, task.gap_id, task.query,
+                 json.dumps(task.domains), task.status, task.priority, task.created_at),
             )
             conn.commit()
             return task.id
@@ -100,46 +88,36 @@ class TaskQueue:
             conn.close()
 
     def dequeue(self) -> Optional[ResearchTask]:
-        """
-        Get next pending task if under concurrency limit.
-        
-        Returns None if max concurrent reached or no tasks available.
-        """
         conn = self._get_connection()
         try:
-            # Check concurrent limit
             running = conn.execute(
                 "SELECT COUNT(*) FROM research_tasks WHERE status = 'running'"
             ).fetchone()[0]
-            
             if running >= self.MAX_CONCURRENT:
                 return None
-            
-            # Get highest priority pending task
             row = conn.execute(
                 """SELECT * FROM research_tasks 
                    WHERE status = 'pending' 
-                   ORDER BY priority DESC, created_at ASC 
-                   LIMIT 1"""
+                   ORDER BY priority DESC, created_at ASC LIMIT 1"""
             ).fetchone()
-            
             if not row:
                 return None
-            
-            # Mark as running
+            task_id = row[0]
+            now = datetime.now(timezone.utc).isoformat()
             conn.execute(
                 "UPDATE research_tasks SET status = 'running', started_at = ? WHERE id = ?",
-                (datetime.now(timezone.utc).isoformat(), row[0]),
+                (now, task_id),
             )
             conn.commit()
-            
-            return self._row_to_task(row)
+            updated = conn.execute(
+                "SELECT * FROM research_tasks WHERE id = ?", (task_id,)
+            ).fetchone()
+            return self._row_to_task(updated)
         finally:
             conn.close()
 
     def mark_complete(self, task_id: str, result: Optional[Dict[str, Any]] = None,
                       confidence: float = 0.0, tokens: int = 0, cost: float = 0.0) -> bool:
-        """Mark task as completed with result."""
         conn = self._get_connection()
         try:
             conn.execute(
@@ -147,11 +125,9 @@ class TaskQueue:
                    SET status = 'completed', completed_at = ?, result_json = ?, 
                        confidence = ?, tokens_used = ?, cost_usd = ?
                    WHERE id = ?""",
-                (
-                    datetime.now(timezone.utc).isoformat(),
-                    json.dumps(result) if result else None,
-                    confidence, tokens, cost, task_id
-                ),
+                (datetime.now(timezone.utc).isoformat(),
+                 json.dumps(result) if result else None,
+                 confidence, tokens, cost, task_id),
             )
             conn.commit()
             return True
@@ -159,21 +135,16 @@ class TaskQueue:
             conn.close()
 
     def mark_failed(self, task_id: str, error: str) -> bool:
-        """Mark task as failed, increment retry count."""
         conn = self._get_connection()
         try:
-            # Get current retry count
             row = conn.execute(
                 "SELECT retry_count FROM research_tasks WHERE id = ?", (task_id,)
             ).fetchone()
-            
             if not row:
                 return False
-            
             retry_count = row[0] + 1
-            
+            # If max retries exceeded, abandon; otherwise mark as failed
             if retry_count > self.MAX_RETRIES:
-                # Abandon task
                 conn.execute(
                     """UPDATE research_tasks 
                        SET status = 'abandoned', error_message = ?, retry_count = ?
@@ -181,61 +152,119 @@ class TaskQueue:
                     (error, retry_count, task_id),
                 )
             else:
-                # Re-queue for retry
                 conn.execute(
                     """UPDATE research_tasks 
-                       SET status = 'pending', error_message = ?, retry_count = ?
+                       SET status = 'failed', error_message = ?, retry_count = ?
                        WHERE id = ?""",
                     (error, retry_count, task_id),
                 )
-            
+            conn.commit()
+            return True
+        finally:
+            conn.close()
+
+    def mark_abandoned(self, task_id: str, error: str = "") -> bool:
+        """Mark a task as abandoned (exceeded max retries)."""
+        conn = self._get_connection()
+        try:
+            conn.execute(
+                """UPDATE research_tasks 
+                   SET status = 'abandoned', error_message = ?
+                   WHERE id = ?""",
+                (error, task_id),
+            )
+            conn.commit()
+            return True
+        finally:
+            conn.close()
+
+    def retry(self, task_id: str) -> bool:
+        """Retry a failed task: transition from 'failed' back to 'pending'."""
+        conn = self._get_connection()
+        try:
+            row = conn.execute(
+                "SELECT status, retry_count FROM research_tasks WHERE id = ?", (task_id,)
+            ).fetchone()
+            if not row:
+                return False
+            status, retry_count = row
+            if status != 'failed':
+                return False
+            if retry_count > self.MAX_RETRIES:
+                # Transition to abandoned instead
+                conn.execute(
+                    "UPDATE research_tasks SET status = 'abandoned' WHERE id = ?",
+                    (task_id,),
+                )
+            else:
+                conn.execute(
+                    "UPDATE research_tasks SET status = 'pending' WHERE id = ?",
+                    (task_id,),
+                )
+            conn.commit()
+            return True
+        finally:
+            conn.close()
+
+    def get_task(self, task_id: str) -> Optional[ResearchTask]:
+        """Get a task by ID."""
+        conn = self._get_connection()
+        try:
+            row = conn.execute(
+                "SELECT * FROM research_tasks WHERE id = ?", (task_id,)
+            ).fetchone()
+            if not row:
+                return None
+            return self._row_to_task(row)
+        finally:
+            conn.close()
+
+    def mark_running(self, task_id: str) -> bool:
+        """Mark a task as running."""
+        conn = self._get_connection()
+        try:
+            conn.execute(
+                "UPDATE research_tasks SET status = 'running', started_at = ? WHERE id = ?",
+                (datetime.now(timezone.utc).isoformat(), task_id),
+            )
             conn.commit()
             return True
         finally:
             conn.close()
 
     def get_running_count(self) -> int:
-        """Get count of currently running tasks."""
         conn = self._get_connection()
         try:
-            cursor = conn.execute(
+            return conn.execute(
                 "SELECT COUNT(*) FROM research_tasks WHERE status = 'running'"
-            )
-            return cursor.fetchone()[0]
+            ).fetchone()[0]
         finally:
             conn.close()
 
     def get_pending_count(self) -> int:
-        """Get count of pending tasks."""
         conn = self._get_connection()
         try:
-            cursor = conn.execute(
+            return conn.execute(
                 "SELECT COUNT(*) FROM research_tasks WHERE status = 'pending'"
-            )
-            return cursor.fetchone()[0]
+            ).fetchone()[0]
         finally:
             conn.close()
 
     def list_tasks(self, status: Optional[str] = None, limit: int = 50) -> List[ResearchTask]:
-        """List tasks, optionally filtered by status."""
         conn = self._get_connection()
         try:
             query = "SELECT * FROM research_tasks"
             params = []
-            
             if status:
                 query += " WHERE status = ?"
                 params.append(status)
-            
             query += f" ORDER BY priority DESC, created_at DESC LIMIT {limit}"
-            
             cursor = conn.execute(query, params)
             return [self._row_to_task(row) for row in cursor.fetchall()]
         finally:
             conn.close()
 
     def _row_to_task(self, row) -> ResearchTask:
-        """Convert database row to ResearchTask."""
         return ResearchTask(
             id=row[0], gap_id=row[1], query=row[2],
             domains=json.loads(row[3]) if row[3] else [],

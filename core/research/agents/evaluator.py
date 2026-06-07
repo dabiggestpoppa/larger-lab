@@ -43,16 +43,26 @@ class FindingEvaluator:
     def __init__(self, threshold: float = DEFAULT_CONFIDENCE_THRESHOLD):
         self.threshold = threshold
 
-    def evaluate(self, finding: Dict[str, Any]) -> float:
+    def evaluate(self, finding: Any, context: Optional[Dict[str, Any]] = None) -> float:
         """
         Evaluate a research finding and return confidence score.
         
         Args:
             finding: Finding dict with source, citation_count, year, etc.
+                     OR a Paper object (context must be provided)
+            context: Optional dict with additional context (summary, etc.)
             
         Returns:
             Confidence score between 0 and 1
         """
+        # Handle Paper object passed as finding
+        if not isinstance(finding, dict):
+            finding = {
+                "paper_id": getattr(finding, 'id', 'unknown'),
+                "source": getattr(finding, 'source', 'test'),
+                "citation_count": getattr(finding, 'citation_count', 0),
+                "year": getattr(finding, 'year', 2024),
+            }
         scores = []
         
         # Source quality score (0-0.3)

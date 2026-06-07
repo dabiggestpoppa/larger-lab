@@ -157,6 +157,17 @@ class GraphStore:
         
         return count
 
+    def has_node(self, node_id: str) -> bool:
+        """Check if a node exists in the graph."""
+        conn = self._get_connection()
+        try:
+            row = conn.execute(
+                "SELECT 1 FROM graph_nodes WHERE id = ?", (node_id,)
+            ).fetchone()
+            return row is not None
+        finally:
+            conn.close()
+
     def query_nodes(self, kind: Optional[str] = None, 
                     domain: Optional[str] = None,
                     limit: int = 100) -> List[Dict[str, Any]]:
