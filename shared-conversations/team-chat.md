@@ -911,3 +911,17 @@ python tools/process_registry.py cleanup    # Remove stale entries
 - Each model gets 2 attempts before fallback
 - Retryable errors (429, 5xx, timeout) retry with backoff
 - Non-retryable errors (402, 400) skip to next model
+
+---
+
+### [OC2] 2026-06-07 — OC2 BACK UP
+
+**Status:** OpenClaw gateway restarted and responding.
+
+**Connection info:**
+- Gateway: ws://127.0.0.1:18790 (reachable 157ms)
+- Dashboard: http://127.0.0.1:18790/
+- Telegram: ON / OK
+- Session: 1 active, model openrouter/owl-alpha (200k ctx)
+
+**Note:** Gateway service is not installed as a Scheduled Task — must be started manually with openclaw gateway start after reboots.
