@@ -17,8 +17,10 @@
 | 🔴 PM | Polymorph | Sources / Cache / Concepts | 🟢 Active |
 | 🔴 PM2 | Polymorph 2 | Graph / Multi-Agent / Frontend | 🟢 Active |
 | 🟢 RL | Research Lead | Scheduling / Contradictions | 🟢 Active |
-| 🟠 OC2 | OWL (OpenClaw) | — | ⏸️ Off-table (operator handling) |
-| 🦦 PO | Telegram Bot | — | ⏸️ Off-table (operator handling) |
+| 🟠 OC2 | OWL (OpenClaw) | — | 🟢 Stable (session maintenance configured) |
+| 🦦 PO | Telegram Bot | — | 🟢 Stable |
+
+> **2026-06-07 OC2 Session Fix:** Configured `session.maintenance` (enforce, 7d prune, 100MB cap), `compaction` (safeguard, 5MB trigger, truncate after), `contextPruning` (cache-ttl, 1h). Previously crashed 3x/day from session bloat. Now auto-maintained.
 
 ---
 
