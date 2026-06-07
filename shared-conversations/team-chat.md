@@ -4,7 +4,7 @@
 > **Current focus:** O2C × MAD LABS Sovereign Research Mesh — Phases L1→L4
 > **Plan:** `docs/plans/O2C-RESEARCH-MESH.md`
 > **Tasks:** `progress/O2C-RESEARCH-MESH-TASKS.md`
-> **Last Updated:** 2026-06-07 (OC2 — Autonomous research cycle complete, L4 GATE ready)
+> **Last Updated:** 2026-06-07 (OC2 and PO back online, autonomous research cycle complete, L4 GATE ready)
 
 ---
 

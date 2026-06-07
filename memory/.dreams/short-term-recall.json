@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-07T15:01:26.675Z",
+  "updatedAt": "2026-06-07T22:02:50.132Z",
   "entries": {
     "memory:memory/2026-05-18.md:387:414": {
       "key": "memory:memory/2026-05-18.md:387:414",
@@ -1297,6 +1297,37 @@
         "toggle/config",
         "config.json",
         "4.4p"
+      ]
+    },
+    "memory:memory/2026-06-07.md:34:71": {
+      "key": "memory:memory/2026-06-07.md:34:71",
+      "path": "memory/2026-06-07.md",
+      "startLine": 34,
+      "endLine": 71,
+      "source": "memory",
+      "snippet": "3. Next loop iteration now requires 15p impulse instead of 12p 4. Subsequent loops have HIGHER threshold → fewer trades ### The Fix - Tier reclassification now ONLY updates `self.au_pips` (for DZ calculation) - `self.trigger_pips` stays at T1's value for ALL loop iterations - EURUSD validation: 5,850 trades vs 5,593 baseline = **+4.6%** ✅ ### Key Transcript Findings - June 3rd session ran 7 baskets: 39,866 trades | 87.5% WR ✅ - Percentile fix from Arch made things WORSE (-57% trades on EURGBP) - The 3 \"extras\" (4h timeout, 80% kill switch, dynamic DZ) were already removed/commented out in my engine — they're dead code - The June 4th sweep used **ar_max=999** (no AR gate), not ar_max=60 -",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-07T22:02:50.132Z",
+      "lastRecalledAt": "2026-06-07T22:02:50.132Z",
+      "queryHashes": [
+        "4ec439e7a2d3"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "self.au-pips",
+        "self.trigger-pips",
+        "4.6",
+        "87.5",
+        "removed/commented",
+        "ar-max",
+        "loop",
+        "iteration"
       ]
     }
   }

@@ -870,6 +870,12 @@ class POAgent:
 
         system_prompt = self._build_system_prompt(sovereign_context)
         messages = [{"role": "system", "content": system_prompt}]
+        # Inject explicit history first (from session memory / caller)
+        if history:
+            for h in history[-self._max_history:]:
+                if isinstance(h, dict) and "role" in h and "content" in h:
+                    messages.append(self._sanitize_message(h))
+        # Then append agent's own in-memory history (may overlap, but ensures continuity)
         with self._lock:
             for h in self._history[-self._max_history:]:
                 messages.append(h)

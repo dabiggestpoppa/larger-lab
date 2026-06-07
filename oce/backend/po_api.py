@@ -201,19 +201,42 @@ async def _stream_chat(request: POChatRequest) -> AsyncGenerator[str, None]:
     # Stage 5: Generate response via OCE's existing chat pipeline
     try:
         from core.observer.po_agent import POAgent
-        agent = POAgent()
+        from oce.backend.po_session import SessionManager
+
+        # Use session manager for memory continuity
+        session_mgr = SessionManager()
+        session = session_mgr.get_or_create(request.session_id if request.session_id else None)
+        stable_session_id = session.session_id
 
         # Convert messages to the format POAgent expects (flatten content parts)
         formatted_messages = [_msg_to_text(m) for m in request.messages]
         last_user_text = formatted_messages[-1]["content"] if formatted_messages else ""
 
+        # If session has prior context, prepend it as history so the LLM remembers
+        session_history = []
+        if session.messages:
+            ctx = session.get_context(max_messages=50)
+            for line in ctx.split("\n"):
+                if line.startswith("user: "):
+                    session_history.append({"role": "user", "content": line[6:]})
+                elif line.startswith("assistant: "):
+                    session_history.append({"role": "assistant", "content": line[12:]})
+
+        # Merge: session history first, then current conversation history
+        merged_history = session_history + formatted_messages[:-1]
+
+        agent = POAgent()
         response_text = await asyncio.to_thread(
             agent.chat,
             last_user_text,
-            history=formatted_messages[:-1],
-            session_id=request.session_id,
+            history=merged_history if merged_history else None,
+            session_id=stable_session_id,
             max_tool_rounds=4,
         )
+
+        # Persist this turn to session memory (auto-saves to disk)
+        session_mgr.add_message(stable_session_id, "user", last_user_text)
+        session_mgr.add_message(stable_session_id, "assistant", response_text)
 
         # Stream the response word by word for the LLM feel
         words = response_text.split()
@@ -236,15 +259,42 @@ async def _complete_chat(request: POChatRequest) -> Dict[str, Any]:
     """Non-streaming chat completion."""
     try:
         from core.observer.po_agent import POAgent
+        from oce.backend.po_session import SessionManager
+
+        # Use session manager for memory continuity
+        session_mgr = SessionManager()
+        session = session_mgr.get_or_create(request.session_id if request.session_id else None)
+        stable_session_id = session.session_id
+
+        # Build session history
+        session_history = []
+        if session.messages:
+            ctx = session.get_context(max_messages=20)
+            for line in ctx.split("\n"):
+                if line.startswith("user: "):
+                    session_history.append({"role": "user", "content": line[6:]})
+                elif line.startswith("assistant: "):
+                    session_history.append({"role": "assistant", "content": line[12:]})
+
+        current_history = [{"role": m.role, "content": m.content if isinstance(m.content, str) else str(m.content)} for m in request.messages[:-1]]
+        merged_history = session_history + current_history
+
         agent = POAgent()
+        last_content = request.messages[-1].content if request.messages else ""
+        if not isinstance(last_content, str):
+            last_content = str(last_content)
 
         response_text = await asyncio.to_thread(
             agent.chat,
-            request.messages[-1].content if request.messages else "",
-            history=[{"role": m.role, "content": m.content} for m in request.messages[:-1]],
-            session_id=request.session_id,
+            last_content,
+            history=merged_history if merged_history else None,
+            session_id=stable_session_id,
             max_tool_rounds=4,
         )
+
+        # Persist to session
+        session.add_message("user", last_content)
+        session.add_message("assistant", response_text)
 
         return {
             "id": "chatcmpl-po",
