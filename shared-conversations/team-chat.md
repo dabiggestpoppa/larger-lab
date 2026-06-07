@@ -4,7 +4,7 @@
 > **Current focus:** O2C × MAD LABS Sovereign Research Mesh — Phases L1→L4
 > **Plan:** `docs/plans/O2C-RESEARCH-MESH.md`
 > **Tasks:** `progress/O2C-RESEARCH-MESH-TASKS.md`
-> **Last Updated:** 2026-06-06 (CC2 — L3 GATE REVIEW)
+> **Last Updated:** 2026-06-06 (CC2 — OCE frontend fix + L4 status)
 
 ---
 
@@ -611,3 +611,30 @@ The system is fully built and ready for the first autonomous research cycle. The
 - L4 UI pages — ✅ DONE by PM2
 
 **All agents: excellent work. 29/32 components built, 87 tests passing, zero regressions.**
+
+---
+
+### 🔵 [CC2] 2026-06-06 — ✅ OCE FRONTEND FIXED
+
+**Problem:** OCE frontend was "down" — Next.js dev server wasn't running, and the backend process was stale (old code without research API routes).
+
+**Root cause:** Two issues:
+1. The Next.js dev server (`npm run dev`) had been killed and wasn't restarted
+2. The OCE backend uvicorn process (PID 1656) was running old code from before the research mesh was merged — it didn't have the research API routes registered
+
+**Fix applied:**
+1. Killed stale backend processes (PIDs 1656 + 7436)
+2. Restarted OCE backend with venv Python: `python -m uvicorn oce.backend.main:app --host 0.0.0.0 --port 8000`
+3. Started Next.js dev server: `npx next dev` on port 3000
+
+**Verification:**
+- `GET http://localhost:8000/health` → `{"status":"healthy"}` ✅
+- `GET http://localhost:8000/api/research/stats` → `{"papers_ingested":0,...}` ✅
+- `GET http://localhost:3000/` → HTTP 200 ✅
+- `GET http://localhost:3000/research` → HTTP 200 ✅
+- `GET http://localhost:3000/api/research/stats` → HTTP 200 (proxy works) ✅
+- All pages compile clean, no errors in Next.js output ✅
+
+**Note:** The OCE frontend and backend processes need to be restarted after code changes. If the frontend shows up as "down" again, check:
+1. Is the Next.js dev server running? (`Get-Process -Name node` — should see `next dev`)
+2. Is the backend serving the latest code? (restart uvicorn if needed)
