@@ -614,7 +614,63 @@ The system is fully built and ready for the first autonomous research cycle. The
 
 ---
 
-### 🔵 [CC2] 2026-06-06 — ✅ OCE FRONTEND FIXED
+### � [OC2] 2026-06-07 — ✅ L2/L3/L4 INTEGRATION TESTS COMPLETE
+
+**Commit:** `092280cf0` — `[RESEARCH-MESH] OC2: L2/L3/L4 integration tests — 85 new tests, 225 total research tests passing`
+
+**What landed:**
+
+**L2 Integration Tests (24 tests):**
+- `core/research/tests/test_l2_integration.py`
+- Distiller: CAUSE/METHOD/RESULT extraction, empty abstract handling
+- VaultWriter: file creation, taxonomy enforcement, daily cap
+- GraphStore: add_node/edge, query by kind, counts
+- ConceptExtractor: OpenAlex concepts + keyword fallback
+- CitationGraphBuilder: edge creation, orphan pruning
+- ContradictionDetector: shared METHOD detection, different-method rejection
+- DoctrineExtractor: ≥3 paper threshold, below-threshold rejection
+- End-to-end: Paper → Distill → Write → Graph
+
+**L3 Integration Tests (26 tests):**
+- `core/research/tests/test_l3_integration.py`
+- GapDetector: gap detection, structure validation, empty paper handling
+- TaskGenerator: gap → ResearchTask, domain inclusion
+- TaskQueue: enqueue/dequeue, mark complete/failed, max concurrent (3), list by status
+- FindingEvaluator: confidence scoring, citation-based ranking, threshold rejection
+- ResearchRouter: local-first routing, budget-exhausted skip
+- AgentLifecycle: spawn, max concurrent, complete/fail transitions, retry counting, heartbeat
+- ResearchAgent: execute with mock sources, paper-based success, confidence scoring
+- End-to-end: Gap → Task → Agent → Evaluator → Result
+
+**L4 API Integration Tests (35 tests):**
+- `oce/backend/tests/test_research_api.py`
+- All 18 endpoints tested (stats, ingest, papers, graph, agents, doctrine, gaps, config, vault sync, telemetry)
+- Response structure validation, parameter filtering, error handling
+- All GET endpoints return valid JSON
+
+**Fixed:**
+- `oce/backend/research_api.py`: Made L4.8 telemetry import conditional (AS hasn't built it yet) — was blocking all API tests
+- `oce/backend/tests/test_research_api.py`: Fixed 3 tests (limit bounds 422, spawn DB availability)
+
+**Final test count:**
+```
+core/research/           225 tests passing ✅
+  ├─ L1 unit tests        15 (PM2 arXiv + rate limiter)
+  ├─ L1 unit tests        31 (PM OpenAlex + S2 + cache)
+  ├─ Safety regression    41 (AS)
+  ├─ L2 integration       24 (OC2)
+  ├─ L3 integration       26 (OC2)
+  ├─ Cross-layer          88 (OC2 test_integration.py)
+oce/backend/tests/        35 API tests passing ✅
+```
+
+**Remaining work:**
+- **AS**: L4.8 telemetry — wire execution journal logging into the existing `/api/research/telemetry/*` endpoints
+- **Operator**: First autonomous research cycle with live data (L4 GATE)
+
+---
+
+### �🔵 [CC2] 2026-06-06 — ✅ OCE FRONTEND FIXED
 
 **Problem:** OCE frontend was "down" — Next.js dev server wasn't running, and the backend process was stale (old code without research API routes).
 
@@ -914,7 +970,7 @@ python tools/process_registry.py cleanup    # Remove stale entries
 
 ---
 
-### [OC2] 2026-06-07 � OC2 BACK UP
+### [OC2] 2026-06-07 � OC2 BACK UP
 
 **Status:** OpenClaw gateway restarted and responding.
 
@@ -924,7 +980,7 @@ python tools/process_registry.py cleanup    # Remove stale entries
 - Telegram: ON / OK
 - Session: 1 active, model openrouter/owl-alpha (200k ctx)
 
-**Note:** Gateway service is not installed as a Scheduled Task � must be started manually with openclaw gateway start after reboots.
+**Note:** Gateway service is not installed as a Scheduled Task � must be started manually with openclaw gateway start after reboots.
 
 
 ---

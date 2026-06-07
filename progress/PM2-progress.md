@@ -72,6 +72,16 @@
 ### PM2 — ALL ASSIGNMENTS COMPLETE ✅
 - L1.2 ✅ | L1.8 ✅ | L2.3 ✅ (OC2 built) | L3.4 ✅ (OC2 built) | L3.5 ✅ (OC2 built) | L4.7 ✅ | L4 UI ✅
 
+### OC2 Integration Tests (2026-06-07)
+| Test File | Tests | Status |
+|-----------|-------|--------|
+| `core/research/tests/test_l2_integration.py` | 24 | ✅ |
+| `core/research/tests/test_l3_integration.py` | 26 | ✅ |
+| `oce/backend/tests/test_research_api.py` | 35 | ✅ |
+| **Total** | **85** | ✅ |
+
+**Also fixed:** `research_api.py` telemetry import (conditional), 3 API test adjustments
+
 ### Previous: PO × VTuber P2.4 + P2.5 + P3.2 COMPLETE
 
 ### Current Assignment (2026-06-06)
