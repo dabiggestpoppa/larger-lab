@@ -25,9 +25,9 @@ logger = logging.getLogger(__name__)
 MIN_PAPERS_FOR_DOCTRINE = 3
 MIN_METHOD_DIVERSITY = 2  # Pattern must appear across ≥2 different methods
 
-# Vault paths — parents[3] = larger-lab/
-_vp = Path(__file__).resolve().parents[3] / "O2C-VAULT" / "research" / "papers"; VAULT_PAPERS_DIR = _vp if _vp.exists() else Path(__file__).resolve().parents[4] / "larger-lab" / "O2C-VAULT" / "research" / "papers"
-_vd = Path(__file__).resolve().parents[3] / "O2C-VAULT" / "doctrine"; VAULT_DOCTRINE_DIR = _vd if _vd.exists() else Path(__file__).resolve().parents[4] / "larger-lab" / "O2C-VAULT" / "doctrine"
+VAULT_ROOT = Path(r"C:\Users\wifik\Downloads\o2c")
+VAULT_PAPERS_DIR = VAULT_ROOT / "research" / "papers"
+VAULT_DOCTRINE_DIR = VAULT_ROOT / "doctrine"
 
 
 class DoctrineExtractor:

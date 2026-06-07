@@ -29,7 +29,9 @@ CONTRADICTION_INDICATORS = [
     "worse", "lower", "decreased", "reduced", "failed",
 ]
 
-_vc = Path(__file__).resolve().parents[3] / "O2C-VAULT" / "research" / "contradictions"; VAULT_CONTRADICTIONS_DIR = _vc if _vc.exists() else Path(__file__).resolve().parents[4] / "larger-lab" / "O2C-VAULT" / "research" / "contradictions"
+VAULT_ROOT = Path(r"C:\Users\wifik\Downloads\o2c")
+VAULT_CONTRADICTIONS_DIR = VAULT_ROOT / "research" / "contradictions"
+VAULT_PAPERS_DIR = VAULT_ROOT / "research" / "papers"
 
 
 class ContradictionDetector:
@@ -92,7 +94,7 @@ class ContradictionDetector:
         
         Reads all paper notes from O2C-VAULT/research/papers/ and checks for contradictions.
         """
-        papers_dir = Path(__file__).resolve().parents[4] / "O2C-VAULT" / "research" / "papers"
+        papers_dir = VAULT_PAPERS_DIR
         
         if not papers_dir.exists():
             logger.warning(f"Vault papers dir not found: {papers_dir}")

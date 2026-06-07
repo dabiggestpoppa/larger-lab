@@ -1,5 +1,5 @@
 ==================================================
-OC2 DEMO DAILY REPORT — 2026-06-06 10:20
+OC2 DEMO DAILY REPORT — 2026-06-06 23:00
 ==================================================
 
 Bridge Status: RUNNING
@@ -13,16 +13,16 @@ Closed Today: 0
 --- Today's Trade Events (0 entries) ---
 
 --- Recent Bridge Log ---
-  2026-06-06 10:16:14,196 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
-  2026-06-06 10:16:34,486 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
-  2026-06-06 10:17:14,202 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
-  2026-06-06 10:17:34,494 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
-  2026-06-06 10:18:14,209 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
-  2026-06-06 10:18:34,502 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
-  2026-06-06 10:19:14,216 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
-  2026-06-06 10:19:34,510 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
-  2026-06-06 10:20:14,223 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
-  2026-06-06 10:20:34,517 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+  2026-06-06 22:50:41,868 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+  2026-06-06 22:51:42,080 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+  2026-06-06 22:52:42,441 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+  2026-06-06 22:53:43,137 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+  2026-06-06 22:54:43,221 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+  2026-06-06 22:55:55,638 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+  2026-06-06 22:56:55,873 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+  2026-06-06 22:57:56,147 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+  2026-06-06 22:58:56,203 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
+  2026-06-06 22:59:56,331 [INFO] [DEMO] [DEMO] Scan | Open positions: 0 | Daily: W0 L0 PnL: $0.00
 
 ==================================================
 End of report.

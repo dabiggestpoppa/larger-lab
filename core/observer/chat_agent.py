@@ -16,7 +16,7 @@ class ChatAgent:
         self.api_key = api_key or os.environ.get("OPENROUTER_API_KEY", "")
         self.base_url = "https://openrouter.ai/api/v1/chat/completions"
         self._history: List[Dict[str, str]] = []
-        self._max_history = 20
+        self._max_history = 36
         self._model_index = 0
 
     @property

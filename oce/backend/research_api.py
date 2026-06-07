@@ -334,10 +334,10 @@ async def list_doctrine(
     """
     List auto-extracted doctrine notes.
     
-    Doctrine notes are in O2C-VAULT/doctrine/{domain}/.
+    Doctrine notes are in the Obsidian vault at o2c/doctrine/{domain}/.
     """
     doctrine_notes = []
-    doctrine_root = Path(__file__).resolve().parents[2] / "O2C-VAULT" / "doctrine"
+    doctrine_root = Path(r"C:\Users\wifik\Downloads\o2c\doctrine")
     
     if doctrine_root.exists():
         try:
@@ -411,7 +411,7 @@ async def sync_vault() -> Dict[str, Any]:
     """
     Trigger vault → graph sync.
     
-    Scans O2C-VAULT/research/papers/ and O2C-VAULT/doctrine/,
+    Scans Obsidian vault (o2c/research/papers/ and o2c/doctrine/),
     upserts nodes and edges into the knowledge graph.
     """
     if not _vault_sync:

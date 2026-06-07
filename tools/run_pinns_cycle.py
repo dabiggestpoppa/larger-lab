@@ -92,8 +92,8 @@ async def main():
         if p.abstract:
             print(f"   Abstract: {p.abstract[:200]}...")
     
-    # Check vault
-    vault_dir = Path("O2C-VAULT/research/papers")
+    # Check vault (actual Obsidian vault)
+    vault_dir = Path(r"C:\Users\wifik\Downloads\o2c\research\papers")
     vault_files = list(vault_dir.rglob("*.md")) if vault_dir.exists() else []
     print(f"\n--- Vault: {len(vault_files)} paper notes written ---")
     for vf in vault_files:

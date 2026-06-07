@@ -21,7 +21,7 @@ from typing import Any, Dict, List, Optional
 
 from ..ingestion.models import Paper
 
-GRAPH_DB = Path(__file__).resolve().parents[4] / "data" / "research" / "citations.db"
+GRAPH_DB = Path(__file__).resolve().parents[3] / "data" / "research" / "citations.db"
 
 
 class GraphStore:

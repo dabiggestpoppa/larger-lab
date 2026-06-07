@@ -1,7 +1,7 @@
 """
 L4.7 — Vault Sync Engine.
 
-Bidirectional sync between O2C-VAULT/research/ and the SQLite knowledge graph.
+Bidirectional sync between Obsidian vault (C:\\Users\\wifik\\Downloads\\o2c) and the SQLite knowledge graph.
 - Vault → Graph: Scans vault paper notes, adds nodes/edges to graph_store
 - Graph → Vault: (future) Updates vault notes when graph topology changes
 
@@ -20,8 +20,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
-# Vault paths
-VAULT_ROOT = Path(__file__).resolve().parents[2] / "O2C-VAULT"
+# Vault paths — actual Obsidian vault at Downloads/o2c
+VAULT_ROOT = Path(r"C:\Users\wifik\Downloads\o2c")
 RESEARCH_PAPERS_DIR = VAULT_ROOT / "research" / "papers"
 DOCTRINE_DIR = VAULT_ROOT / "doctrine"
 
@@ -99,7 +99,7 @@ class VaultSync:
         return result
 
     async def _sync_paper_notes(self, gs) -> Dict[str, int]:
-        """Sync paper notes from O2C-VAULT/research/papers/."""
+        """Sync paper notes from Obsidian vault (o2c/research/papers/)."""
         nodes = 0
         edges = 0
         count = 0
@@ -180,7 +180,7 @@ class VaultSync:
         return {"nodes": nodes, "edges": edges, "count": count}
 
     async def _sync_doctrine_notes(self, gs) -> Dict[str, int]:
-        """Sync doctrine notes from O2C-VAULT/doctrine/."""
+        """Sync doctrine notes from Obsidian vault (o2c/doctrine/)."""
         nodes = 0
         edges = 0
         count = 0

@@ -23,6 +23,7 @@ from datetime import datetime
 # Configuration
 WORKSPACE_ROOT = Path(__file__).parent.parent
 WS_VAULT = WORKSPACE_ROOT / "memory" / "obsidian-vault"
+WS_RESEARCH = WORKSPACE_ROOT / "O2C-VAULT" / "research"
 REAL_VAULT = Path(r"C:\Users\wifik\Downloads\o2c")
 STATE_FILE = WORKSPACE_ROOT / "tools" / ".obsidian-sync-state.json"
 
