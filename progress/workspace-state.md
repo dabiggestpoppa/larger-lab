@@ -312,3 +312,10 @@
 - **Telegram:** Token configured in workspace `.env` but needs `TELEGRAM_BOT_TOKEN` in `~/.hermes/.env` for activation
 - **Mermaid files:** Located in `docs/architecture/ALL_MERMAID_GRAPHS.md` and `docs/plans/CG-*-MERMAID-SPECS.md`
 - **CODEAMP:** No files found in workspace
+
+### 2026-06-07 14:00 UTC — [Copilot] OC2 Gateway Restarted
+
+- **OC2 Gateway:** Restarted on port 18790 (PID 10888)
+- **Health check:** `{"ok":true,"status":"live"}`
+- **Telegram:** Responding again
+- **Commit:** `5639830b0` pushed to origin/master
