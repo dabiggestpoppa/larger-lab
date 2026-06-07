@@ -37,6 +37,21 @@ from oce.backend.rate_limit_tracker import record_api_call
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
+# ─── Dynamic Tool Registry ──────────────────────────────────────────────────
+# Import the unified capability functions and tool registry
+# This gives PO access to ALL tools: file, git, exec, search, github,
+# system, memory, vault, web, vscode, notebook, pdf, tasks
+try:
+    from oce.backend.po_capabilities import CAPABILITY_FUNCTIONS, execute_tool
+    from oce.backend.po_tool_registry import ToolRegistry as _ToolRegistry
+    _dyn_registry = _ToolRegistry()
+    DYNAMIC_TOOLS_ENABLED = True
+except ImportError:
+    CAPABILITY_FUNCTIONS = {}
+    execute_tool = None
+    _dyn_registry = None
+    DYNAMIC_TOOLS_ENABLED = False
+
 # ─── Model Configuration ────────────────────────────────────────────────────
 
 MODEL_CHAIN = [
@@ -659,6 +674,48 @@ TOOL_FUNCTIONS: Dict[str, Callable] = {
 }
 
 
+def _get_all_tool_definitions() -> List[Dict[str, Any]]:
+    """
+    Build the complete tool definitions list, combining:
+    1. Original hardcoded tools (for backward compatibility)
+    2. Dynamic tools from the tool registry (new capabilities)
+
+    This ensures PO has access to ALL tools that Copilot has.
+    """
+    # Start with original tools
+    all_tools = list(TOOL_DEFINITIONS)
+
+    # Add dynamic tools from registry
+    if DYNAMIC_TOOLS_ENABLED and _dyn_registry:
+        dynamic_schemas = _dyn_registry.to_openai_tools()
+        # Avoid duplicates — only add tools not already in TOOL_DEFINITIONS
+        existing_names = {t["function"]["name"] for t in TOOL_DEFINITIONS}
+        for tool in dynamic_schemas:
+            if tool["function"]["name"] not in existing_names:
+                all_tools.append(tool)
+
+    return all_tools
+
+
+def _execute_any_tool(tool_name: str, arguments: Dict[str, Any]) -> str:
+    """
+    Execute a tool by name, checking both the original TOOL_FUNCTIONS
+    and the dynamic CAPABILITY_FUNCTIONS.
+    """
+    # Check original functions first
+    if tool_name in TOOL_FUNCTIONS:
+        try:
+            return str(TOOL_FUNCTIONS[tool_name](**arguments))
+        except Exception as e:
+            return f"Error executing {tool_name}: {e}"
+
+    # Check dynamic capabilities
+    if DYNAMIC_TOOLS_ENABLED and execute_tool:
+        return execute_tool(tool_name, arguments)
+
+    return f"Unknown tool: {tool_name}"
+
+
 # ─── PO Agent ───────────────────────────────────────────────────────────────
 
 class POAgent:
@@ -697,19 +754,36 @@ class POAgent:
 
     def _build_system_prompt(self, sovereign_context: str = "") -> str:
         ts = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+
+        # Build dynamic tool list
+        all_tools = _get_all_tool_definitions()
+        tool_names = sorted(t["function"]["name"] for t in all_tools)
+        tool_list = ", ".join(tool_names[:30])
+        if len(tool_names) > 30:
+            tool_list += f" ... and {len(tool_names) - 30} more"
+
         return (
             "You are PO (Primary Observer) — a full autonomous agent for Larger-Lab.\n"
-            "You have the same capabilities as Claude Code: you can read/write/edit files, "
-            "run shell commands, call OCE APIs, perform GitHub operations, search code, "
-            "execute Python, and manage the entire workspace.\n\n"
+            "You have the SAME capabilities as Claude Code / GitHub Copilot: you can "
+            "read/write/edit files, run shell commands, execute Python, perform GitHub "
+            "operations, search code semantically, manage the workspace, and more.\n\n"
             f"Current time: {ts}\n"
             f"Workspace: C:\\Users\\wifik\\Desktop\\projects\\larger-lab\n"
-            f"Branch: master (default: main)\n\n"
-            "## Available Tools\n"
-            "list_directory, read_file, write_file, edit_file, run_command, "
-            "git_status, git_log, git_diff, git_commit, search_files, search_content, "
-            "oce_api_call, github_operation, vault_search, vault_read, execute_python, "
-            "spawn_subagent, browser_action\n\n"
+            f"Branch: master (default: main)\n"
+            f"Available tools: {len(all_tools)}\n\n"
+            "## Tool Categories\n"
+            "- File: list_directory, read_file, write_file, edit_file, multi_edit_file, create_directory, delete_file\n"
+            "- Git: git_status, git_log, git_diff, git_commit, git_push, git_pull, git_branch, git_stash, git_blame\n"
+            "- Exec: run_command, execute_python, run_python_file, install_python_package\n"
+            "- Search: search_files, search_content, grep_search, web_search, web_fetch\n"
+            "- GitHub: github_pr_list, github_pr_create, github_pr_view, github_pr_merge, github_issue_list, github_issue_create, github_ci_status, github_search\n"
+            "- System: system_env, system_processes, system_kill_process, system_disk_usage, system_info\n"
+            "- Memory: memory_read, memory_write, memory_list, memory_search\n"
+            "- Vault: vault_search, vault_read\n"
+            "- VS Code: vscode_run_command, vscode_get_errors\n"
+            "- Notebook: notebook_list, notebook_read\n"
+            "- PDF: pdf_extract_text, pdf_merge, pdf_split, pdf_compress\n"
+            "- Tasks: task_list, task_update\n\n"
             "## Rules\n"
             "1. Use tools to accomplish tasks — don't just describe what to do\n"
             "2. Read files before editing them\n"
@@ -817,7 +891,7 @@ class POAgent:
             return None
 
     def _execute_tool(self, tool_call: Dict) -> str:
-        """Execute a tool call and return the result."""
+        """Execute a tool call and return the result. Checks both static and dynamic tools."""
         try:
             func = tool_call.get("function", {})
             tool_name = func.get("name", "")
@@ -826,14 +900,7 @@ class POAgent:
         except (json.JSONDecodeError, AttributeError) as e:
             return f"Error parsing tool call: {e}"
 
-        if tool_name not in TOOL_FUNCTIONS:
-            return f"Unknown tool: {tool_name}. Available: {', '.join(TOOL_FUNCTIONS.keys())}"
-
-        try:
-            result = TOOL_FUNCTIONS[tool_name](**args)
-            return str(result)
-        except Exception as e:
-            return f"Error executing {tool_name}: {e}"
+        return _execute_any_tool(tool_name, args)
 
     def chat(self, message: str, sovereign_context: str = "", max_tool_rounds: int = 36,
              progress_callback=None, history: Optional[List[Dict[str, str]]] = None,
@@ -897,10 +964,13 @@ class POAgent:
                 if m not in models_to_try:
                     models_to_try.append(m)
 
+            # Use dynamic tool definitions (includes all capabilities)
+            all_tool_defs = _get_all_tool_definitions()
+
             for model in models_to_try:
                 for retry in range(MODEL_RETRY_COUNT):
                     resp, tool_calls, used_model, err = self._call_llm(
-                        messages, model=model, tools=TOOL_DEFINITIONS, tool_choice="auto"
+                        messages, model=model, tools=all_tool_defs, tool_choice="auto"
                     )
                     if resp or tool_calls:
                         if used_model in MODEL_CHAIN:

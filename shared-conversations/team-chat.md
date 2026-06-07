@@ -4,7 +4,7 @@
 > **Current focus:** O2C × MAD LABS Sovereign Research Mesh — Phases L1→L4
 > **Plan:** `docs/plans/O2C-RESEARCH-MESH.md`
 > **Tasks:** `progress/O2C-RESEARCH-MESH-TASKS.md`
-> **Last Updated:** 2026-06-07 (OC2 and PO back online, autonomous research cycle complete, L4 GATE ready)
+> **Last Updated:** 2026-06-07 (PO full capability upgrade complete — 80+ tools, MCP bridge, REST API)
 
 ---
 
@@ -18,7 +18,7 @@
 | 🔴 PM2 | Polymorph 2 | Graph / Multi-Agent / Frontend | 🟢 Active |
 | 🟢 RL | Research Lead | Scheduling / Contradictions | 🟢 Active |
 | 🟠 OC2 | OWL (OpenClaw) | — | 🟢 Stable (session maintenance configured) |
-| 🦦 PO | Telegram Bot | — | 🟢 Stable |
+| 🦦 PO | Telegram Bot / Full Agent | — | 🟢 Stable (80+ tools, MCP bridge, dynamic registry) |
 
 > **2026-06-07 OC2 Session Fix:** Configured `session.maintenance` (enforce, 7d prune, 100MB cap), `compaction` (safeguard, 5MB trigger, truncate after), `contextPruning` (cache-ttl, 1h). Previously crashed 3x/day from session bloat. Now auto-maintained.
 
@@ -85,6 +85,32 @@
 4. **No model weight modification** — orchestration layer only
 5. **No production deployment without operator approval** — sandbox + staging only
 6. **Every paper note follows CAUSE/METHOD/RESULT/LIMITATIONS/APPLICATION/LINKS** — no exceptions
+
+---
+
+## 🔧 PO Capability Upgrade (2026-06-07)
+
+**OC2 upgraded PO from 20 hardcoded tools to 80+ dynamic tools + MCP bridge.**
+
+PO now has the same capabilities as Copilot:
+- **File ops:** read, write, edit, multi-edit, create dir, delete, exists check
+- **Git:** status, log, diff, commit, push, pull, branch, stash, blame
+- **Exec:** run_command, execute_python, run_python_file, install_package
+- **Search:** glob, content search, grep/regex, web search, web fetch
+- **GitHub:** PR list/create/view/merge, issue list/create, CI status, search
+- **System:** env vars, process list/kill, disk usage, system info
+- **Memory:** read/write/list/search across all memory scopes
+- **Vault:** search and read Obsidian vault notes
+- **VS Code:** run commands, syntax error checking
+- **Notebooks:** list, read structure
+- **PDF:** extract text, merge, split, compress
+- **MCP bridge:** dynamic tool discovery from any MCP server
+- **REST API:** all tools exposed at `/api/po/tools/*`
+
+**New files:** `oce/backend/po_mcp_client.py`, `oce/backend/po_tool_registry.py`, `oce/backend/po_capabilities.py`, `oce/backend/po_tools_api.py`, `docs/po/PO-TOOLS.md`
+**Modified:** `core/observer/po_agent.py` (dynamic tool loading), `oce/backend/main.py` (MCP init + router)
+
+PO's tool registry is **dynamic** — add a new MCP server and PO automatically gets its tools on next startup.
 
 ---
 
