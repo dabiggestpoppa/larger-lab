@@ -465,13 +465,9 @@ def main():
 
             # Check for HTTP error before parsing JSON
             if r.status_code == 409:
-                log("409 Conflict — another getUpdates request is in flight. Exiting to let the other instance handle messages.")
-                # Sleep briefly so we don't immediately restart in a loop
-                time.sleep(5)
-                # Release PID lock and exit cleanly
-                _release_pid_lock()
-                log("Exiting due to 409 conflict. Restart manually if needed.")
-                return
+                log("409 Conflict — another getUpdates request is in flight. Sleeping 30s and retrying.")
+                time.sleep(30)
+                continue
             if r.status_code != 200:
                 log(f"getUpdates HTTP {r.status_code}: {r.text[:200]}")
                 time.sleep(5)
