@@ -850,7 +850,7 @@ note = await distiller.distill(paper)
 
 ---
 
-### [OC2] 2026-06-07 — OCE FRONTEND FIXED — WAS NOT RUNNING
+### [OC2] 2026-06-07 ï¿½ OCE FRONTEND FIXED ï¿½ WAS NOT RUNNING
 
 **Problem:** OCE frontend was showing static black/white HTML because the Next.js dev server was not running.
 
@@ -863,16 +863,51 @@ pm run dev in oce/frontend/. Server is now running on port 3002 (3000 and 3001 w
 
 ---
 
-### [OC2] 2026-06-07 — PORT UPDATE + STATUS
+### [OC2] 2026-06-07 ï¿½ PORT UPDATE + STATUS
 
 **OCE Frontend is now on port 3002 (not 3000).**
 
 Port map:
-- **3000** — SRRA-OPH Observatory
-- **3001** — OCE API Server (FastAPI backend)
-- **3002** — OCE Frontend (Next.js dev server) <-- NEW
-- **8000** — OCE FastAPI backend (direct)
+- **3000** ï¿½ SRRA-OPH Observatory
+- **3001** ï¿½ OCE API Server (FastAPI backend)
+- **3002** ï¿½ OCE Frontend (Next.js dev server) <-- NEW
+- **8000** ï¿½ OCE FastAPI backend (direct)
 
 **How to access:** Open http://localhost:3002 in browser.
 
 **Research Mesh status:** 32/32 components built. 225+ tests passing. All layers L1-L4 complete.
+
+---
+
+### ðŸ”´ [PM] 2026-06-07 â€” HERMES CLEANUP + PROCESS REGISTRY
+
+**What was done:**
+- Removed ALL hermes_telegram.py files, logs, tools, skills, and vault notes
+- Killed all 6 duplicate hermes processes (3 venv + 3 uv)
+- Added `tools/process_registry.py` â€” centralized process tracking to prevent future duplicates
+- PO bot (@P01999BOT) is running clean â€” 1 instance only
+- OC2 gateway running via scheduled task
+
+**Root cause of duplicate processes:**
+- No shared state between agents â€” each started processes independently
+- Stale PID files from killed processes
+- Windows Scheduled Task (OpenClaw-2-Gateway) auto-restarted uv Python instances
+- Multiple Python interpreters (venv, uv, system) running same scripts
+
+**Process registry usage:**
+```
+python tools/process_registry.py status     # Check all services
+python tools/process_registry.py start --service po_telegram
+python tools/process_registry.py kill-dupes --service po_telegram
+python tools/process_registry.py cleanup    # Remove stale entries
+```
+
+**OpenRouter account:** $6.20 balance remaining. Hermes agent was burning credits with 6 duplicate instances all making API calls.
+
+**Model chain updated for PO bot:**
+1. Ring 2.6 (primary)
+2. Owl Alpha (free backup)
+3. MiniMax M2.5 (tertiary)
+- Each model gets 2 attempts before fallback
+- Retryable errors (429, 5xx, timeout) retry with backoff
+- Non-retryable errors (402, 400) skip to next model

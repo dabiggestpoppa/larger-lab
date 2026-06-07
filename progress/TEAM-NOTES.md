@@ -332,3 +332,51 @@
 - **RL progress file**: Needs updating (still shows old PO×VTuber assignment)
 - **First autonomous research cycle**: Needs to be run end-to-end with live data
 - **Open questions**: LLM model for distillation, domain list confirmation, daily budget, vault sync direction, operator trigger preference
+
+---
+
+## Section 5 — Process Management (2026-06-07)
+
+> **CRITICAL**: All agents MUST check the process registry before starting any service.
+
+### Process Registry
+- **Tool**: `python tools/process_registry.py`
+- **Registry file**: `data/process_registry.json`
+- **Commands**: `status`, `start --service <name>`, `stop --service <name>`, `kill-dupes --service <name>`, `cleanup`
+
+### Duplicate Process Prevention
+**BEFORE starting any service:**
+1. Run `python tools/process_registry.py status`
+2. If service is already running, DO NOT start another instance
+3. If PID file exists but process is dead, run `python tools/process_registry.py cleanup`
+4. Use `python tools/process_registry.py start --service <name>` instead of direct `python` calls
+
+### Known Duplicate Sources
+- **Windows Scheduled Tasks**: OpenClaw-2-Gateway auto-restarts uv Python instances
+- **Multiple Python interpreters**: venv, uv, system Python can all run same scripts
+- **Stale PID files**: When processes die without cleanup, next agent thinks it's safe to start
+- **No shared state**: Each agent was starting processes independently
+
+### Service Definitions
+| Service | Script | Port | Python |
+|---------|--------|------|--------|
+| po_telegram | scripts/telegram_gateway.py | None | .venv |
+| srrs_api | srrs_opc/frontend/api_server.py | 8001 | .venv |
+| oce_backend | uvicorn oce.backend.main:app | 8000 | system |
+| oce_frontend | Next.js dev | 3000 | node |
+| srrs_frontend | Next.js dev | 3001 | node |
+| oc2_gateway | OpenClaw gateway | 18790 | node |
+
+### Hermes Bot — REMOVED
+- All hermes_telegram.py files removed
+- All hermes logs, tools, skills, vault notes removed
+- Was causing 6 duplicate instances burning OpenRouter credits
+- PO bot (@P01999BOT) and OC2 gateway are the only Telegram bots
+
+### OpenRouter Model Chain (PO Bot)
+1. **Ring 2.6** (primary) — `inclusionai/ring-2.6-1t`
+2. **Owl Alpha** (free backup) — `openrouter/owl-alpha`
+3. **MiniMax M2.5** (tertiary) — `minimax/minimax-m2.5`
+- Each model gets 2 attempts before fallback
+- Retryable errors (429, 5xx, timeout) retry with backoff
+- Non-retryable errors (402, 400) skip to next model immediately
