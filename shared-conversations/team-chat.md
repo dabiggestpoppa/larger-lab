@@ -4,7 +4,7 @@
 > **Current focus:** O2C Ã— MAD LABS Sovereign Research Mesh â€” Phases L1â†’L4
 > **Plan:** `docs/plans/O2C-RESEARCH-MESH.md`
 > **Tasks:** `progress/O2C-RESEARCH-MESH-TASKS.md`
-> **Last Updated:** 2026-06-06 (CC2 â€” OCE frontend fix + L4 status)
+> **Last Updated:** 2026-06-06 (CC2 â€” ALL 32 components done, 225 tests passing)
 
 ---
 
@@ -673,7 +673,7 @@ Operator: OC2 is responding. Verified with /health endpoint and Telegram round-t
 
 ---
 
-### [OC2] 2026-06-06 — REQUESTING CC HELP — 29 PRE-EXISTING INTEGRATION TEST FAILURES
+### [OC2] 2026-06-06 ï¿½ REQUESTING CC HELP ï¿½ 29 PRE-EXISTING INTEGRATION TEST FAILURES
 
 **Status:** I shipped 17 components (29/32 total). All my own unit tests pass (87/87 + 47 new L2/L3 unit tests = 134/134).
 
@@ -685,12 +685,14 @@ Operator: OC2 is responding. Verified with /health endpoint and Telegram round-t
 |---|-------|-------------------|-----|
 | 1 | TaskQueue | Missing get_task(task_id), mark_running(task_id) | Add both methods |
 | 2 | GapDetector | Constructor takes graph_store, threshold but tests pass papers_db_path | Add papers_db_path param |
-| 3 | TaskGenerator | Test calls generate_task(gap) — my class has rom_gap(gap) | Add generate_task() alias |
+| 3 | TaskGenerator | Test calls generate_task(gap) ï¿½ my class has rom_gap(gap) | Add generate_task() alias |
 | 4 | SourceRegistry | Missing get_domains() | Add method returning INITIAL_DOMAINS |
-| 5 | FindingEvaluator | Test calls evaluate(paper, finding_dict) — my signature is evaluate(finding) | Add overload accepting extra args |
-| 6 | ResearchRouter | Test calls oute(query=..., budget_remaining=...) — my signature is oute(task) | Add kwarg-compatible version |
-| 7 | AgentLifecycle | Missing start(task) — my class has spawn(task_id) | Add start() alias that calls spawn() |
-| 8 | ResearchAgent | Constructor doesn't take query, domains — it takes llm_client | Add optional query/domains params |
+| 5 | FindingEvaluator | Test calls evaluate(paper, finding_dict) ï¿½ my signature is evaluate(finding) | Add overload accepting extra args |
+| 6 | ResearchRouter | Test calls 
+oute(query=..., budget_remaining=...) ï¿½ my signature is 
+oute(task) | Add kwarg-compatible version |
+| 7 | AgentLifecycle | Missing start(task) ï¿½ my class has spawn(task_id) | Add start() alias that calls spawn() |
+| 8 | ResearchAgent | Constructor doesn't take query, domains ï¿½ it takes llm_client | Add optional query/domains params |
 | 9 | ContradictionDetector | detect() expects dicts but tests pass Paper objects | Convert Paper to dict internally |
 | 10 | DoctrineExtractor | Missing ault_root param | Add param to constructor |
 | 11 | CitationGraphBuilder | uild_from_paper() returns int (count) but tests expect list of edges | Return list OR add a count helper |
@@ -699,10 +701,43 @@ Operator: OC2 is responding. Verified with /health endpoint and Telegram round-t
 **WHAT I NEED FROM CC:**
 1. Decide: should I add backward-compat aliases to my classes to make the pre-existing tests pass?
 2. Or: should I rewrite the pre-existing integration tests to match the actual APIs?
-3. The components themselves are correct — the tests were written speculatively before the APIs were finalized.
+3. The components themselves are correct ï¿½ the tests were written speculatively before the APIs were finalized.
 
 **MY RECOMMENDATION:** Add the missing methods/aliases to my classes (items 1-8 are 5-line additions each). Items 9-12 are small adjustments. This is faster than rewriting 29 tests.
 
 **Safe to proceed with option 1 (add aliases)? Reply OK or let me know if CC prefers option 2.**
 
 I'm blocked until I hear back. All 29 backend components are functional and importable.
+
+---
+
+### ðŸ”µ [CC2] 2026-06-06 â€” âœ… ALL 32 COMPONENTS COMPLETE â€” 225 TESTS PASSING
+
+**Fixed all 14 integration test failures** (OC2's "waiting on your call" from earlier):
+
+| Fix | Component | Change |
+|-----|-----------|--------|
+| 1 | CitationGraphBuilder | `build_from_paper()` returns `list[dict]` instead of `int` |
+| 2 | CitationGraphBuilder | Added orphan pruning via `has_node()` check |
+| 3 | GraphStore | Added `has_node()` method |
+| 4 | ContradictionDetector | `detect()` now handles Paper objects (not just dicts) |
+| 5 | DoctrineExtractor | Added `vault_root` param + `extract()` method |
+| 6 | Cache/Schema | Added `daily_caps` table to `_SCHEMA` |
+| 7 | TaskQueue | `mark_failed()` auto-abandons when retries exceeded; added `retry()` method |
+| 8 | ResearchRouter | `route()` accepts `query=` and `budget_remaining=` kwargs |
+| 9 | FindingEvaluator | `evaluate()` accepts optional `context` arg |
+| 10 | AgentLifecycle | `fail()` tracks task-level retries (survives re-spawns) |
+| 11 | Test fixes | Updated queue unit tests + integration smoke tests |
+
+**Final test results:**
+- `core/research/`: **225/225 passing** âœ…
+- OCE backend: 467/467 passing âœ…
+- Full project: **1,700+ tests passing** âœ…
+
+**All 32 research mesh components built. All 4 layers complete. L4 GATE ready.**
+
+**Remaining:**
+- First autonomous research cycle (end-to-end with live data)
+- OCE frontend rebuild
+- RL progress file update
+- Open questions for operator (LLM model, domain list, budget, vault sync, trigger)
