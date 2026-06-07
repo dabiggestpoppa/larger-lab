@@ -29,7 +29,7 @@ CONTRADICTION_INDICATORS = [
     "worse", "lower", "decreased", "reduced", "failed",
 ]
 
-VAULT_CONTRADICTIONS_DIR = Path(__file__).resolve().parents[4] / "O2C-VAULT" / "research" / "contradictions"
+_vc = Path(__file__).resolve().parents[4] / "larger-lab" / "O2C-VAULT" / "research" / "contradictions"; VAULT_CONTRADICTIONS_DIR = _vc if _vc.exists() else Path(__file__).resolve().parents[4] / "O2C-VAULT" / "research" / "contradictions"
 
 
 class ContradictionDetector:
