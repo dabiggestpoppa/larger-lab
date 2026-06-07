@@ -55,13 +55,9 @@ KILL_SWITCH_PCT = 0.80              # 80% of impulse leg — CLOSE ONLY
 # Default tier config — EUR/USD reference (Quick Reference Card Page 2)
 # For other ASSET_CONFIGS registry in configs/asset_configs.py.
 DEFAULT_TIER_CONFIG: Dict[str, Dict[str, float]] = {
-    # ar_max: session gate only (filter dead zones). Set high to disable.
-    # au: AU pips for position sizing per tier.
-    # trigger: minimum impulse pips to detect (used when tier=PENDING).
-    # Tier is classified by impulse size: T1<20p, T2=20-30p, T3>30p
-    "T1": {"ar_max": 60.0, "au": 8.0, "trigger": 10.0},
-    "T2": {"ar_max": 60.0, "au": 10.0, "trigger": 10.0},
-    "T3": {"ar_max": 60.0, "au": 12.0, "trigger": 10.0},
+    "T1": {"ar_max": 20.0, "au": 10.0, "trigger": 12.0},
+    "T2": {"ar_max": 30.0, "au": 12.0, "trigger": 15.0},
+    "T3": {"ar_max": 45.0, "au": 15.0, "trigger": 19.0},
 }
 
 
@@ -231,14 +227,6 @@ class SymmetryTrapEngine:
         self.asian_high: float = 0.0
         self.asian_low: float = 0.0
         self.asian_range_pips: float = 0.0
-
-        # ── Telemetry Counters (A/B Test) ───────────────────────────────
-        self.tel_kill_switch_80pct = 0
-        self.tel_timeout_4hr = 0
-        self.tel_loop1_reject_shallow = 0
-        self.tel_loop1_reject_deep = 0
-        self.tel_max_loops_exhausted = 0
-        self.tel_valid_occ_ignored = 0
         self.tier_name: str = "T1"
         self.au_pips: float = 10.0
         self.trigger_pips: float = 12.0
@@ -317,14 +305,6 @@ class SymmetryTrapEngine:
         self.loop_start_time = None
         self.cascade_bias = None
 
-        # ── Reset telemetry counters ──
-        self.tel_kill_switch_80pct = 0
-        self.tel_timeout_4hr = 0
-        self.tel_loop1_reject_shallow = 0
-        self.tel_loop1_reject_deep = 0
-        self.tel_max_loops_exhausted = 0
-        self.tel_valid_occ_ignored = 0
-
         self.logger.info(
             f"Session initialized: tier={self.tier_name}, "
             f"AU={self.au_pips}p, trigger={self.trigger_pips}p, "
@@ -351,7 +331,15 @@ class SymmetryTrapEngine:
         if self.swing_origin is None:
             self.swing_origin = bar.close
 
-        # 4h timeout: REMOVED (dead code — never triggered in testing)
+        # ── Option B: Loop timeout — if 4 hours pass without entry, stop looping
+        if self.loop_start_time is not None and self.loop_count > 1:
+            if (bar.timestamp - self.loop_start_time).total_seconds() > 4 * 3600:
+                self.loop_start_time = None
+                self.session_active = False
+                self.logger.debug(f"Loop {self.loop_count} expired (4h timeout)")
+                return None
+
+        active_trig = self.trigger_pips * self.pip_size
 
         up_move = bar.high - self.swing_origin
         dn_move = self.swing_origin - bar.low
@@ -360,8 +348,6 @@ class SymmetryTrapEngine:
         # Wait for impulse breach >= Tier Trigger (AU x 1.20)
         # Reference: cerebus_qa_recap.md Q4, manual_ontology.md Computable Q1
         if self.state == EngineState.SEARCH:
-            active_trig = self.trigger_pips * self.pip_size
-
             if up_move >= active_trig:
                 self.impulse_direction = TradeDirection.LONG
                 self.impulse_extreme = bar.high
@@ -398,12 +384,12 @@ class SymmetryTrapEngine:
             # Kill Switch check (CLOSE-ONLY)
             if self.impulse_direction == TradeDirection.LONG:
                 if bar.close < self.kill_switch_level:
-                    self.tel_kill_switch_80pct += 1
                     _loop = self.loop_count
                     self._reset_state_keep_loop(bar.close)
                     self.loop_count = min(_loop + 1, self.max_loops)
                     self.loop_start_time = bar.timestamp
-                    self._check_max_loops()
+                    if self.loop_count >= self.max_loops:
+                        self.session_active = False
                     sig = TradeSignal(
                         event="KILL_SWITCH",
                         direction=None, entry_price=None,
@@ -416,12 +402,12 @@ class SymmetryTrapEngine:
                     return sig
             else:  # SHORT
                 if bar.close > self.kill_switch_level:
-                    self.tel_kill_switch_80pct += 1
                     _loop = self.loop_count
                     self._reset_state_keep_loop(bar.close)
                     self.loop_count = min(_loop + 1, self.max_loops)
                     self.loop_start_time = bar.timestamp
-                    self._check_max_loops()
+                    if self.loop_count >= self.max_loops:
+                        self.session_active = False
                     sig = TradeSignal(
                         event="KILL_SWITCH",
                         direction=None, entry_price=None,
@@ -433,7 +419,7 @@ class SymmetryTrapEngine:
                     self.signal_log.append(sig)
                     return sig
 
-            # Dynamic DZ Thresholds (Option B: Continuous Loop)
+            # ── Dynamic DZ Thresholds (Option B: Continuous Loop) ────────
             # Loop 1: strict Goldilocks zone (32%-50%)
             # Loop 2+: relaxed floor (20%-50% — shallow momentum pullbacks)
             if self.loop_count == 1:
@@ -442,8 +428,6 @@ class SymmetryTrapEngine:
             else:
                 min_retrace_pct = 0.20
                 max_retrace_pct = 0.50
-
-
 
             # Pullback measurement
             if self.impulse_direction == TradeDirection.LONG:
@@ -460,13 +444,6 @@ class SymmetryTrapEngine:
             au_penetrated = pullback_pips >= self.au_pips
             # Dynamic fib zone: min_retrace_pct to max_retrace_pct
             fib_penetrated = min_retrace_pct <= retrace_pct <= max_retrace_pct
-
-            # TELEMETRY: Loop 1 DZ strictness — count AU-hit-but-fib-missed
-            if self.loop_count == 1 and au_penetrated and not fib_penetrated:
-                if retrace_pct < 0.32:
-                    self.tel_loop1_reject_shallow += 1
-                elif retrace_pct > 0.50:
-                    self.tel_loop1_reject_deep += 1
 
             # ── Cascade P90 Bypass (Loop 2+ only) ────────────────────
             cascade_bypass = False
@@ -495,7 +472,8 @@ class SymmetryTrapEngine:
                     self._reset_state_keep_loop(bar.close)
                     self.loop_count = min(_loop + 1, self.max_loops)
                     self.loop_start_time = bar.timestamp
-                    self._check_max_loops()
+                    if self.loop_count >= self.max_loops:
+                        self.session_active = False
                     sig = TradeSignal(
                         event="KILL_SWITCH",
                         direction=None, entry_price=None,
@@ -512,7 +490,8 @@ class SymmetryTrapEngine:
                     self._reset_state_keep_loop(bar.close)
                     self.loop_count = min(_loop + 1, self.max_loops)
                     self.loop_start_time = bar.timestamp
-                    self._check_max_loops()
+                    if self.loop_count >= self.max_loops:
+                        self.session_active = False
                     sig = TradeSignal(
                         event="KILL_SWITCH",
                         direction=None, entry_price=None,
@@ -683,12 +662,6 @@ class SymmetryTrapEngine:
         return None
 
     # ── State Reset ────────────────────────────────────────────────────
-
-    def _check_max_loops(self) -> None:
-        """Check if max loops reached, increment telemetry, deactivate session."""
-        if self.loop_count >= self.max_loops:
-            self.tel_max_loops_exhausted += 1
-            self.session_active = False
 
     def _reset_state(self, new_origin: float) -> None:
         """
