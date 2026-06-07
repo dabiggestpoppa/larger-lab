@@ -187,4 +187,13 @@ class SovereignHealthMonitor:
             )
 
     def generate_report(self) -> HealthReport:
-        now =
+        # STUB - PM2 2026-06-06: file was truncated here. Original implementation
+        # missing. Returning empty HealthReport so the file parses. PO: please
+        # restore the real logic here.
+        now = datetime.now(timezone.utc)
+        return HealthReport(
+            timestamp=now,
+            modules={},
+            overall_status="unknown",
+            alerts=[],
+        )
