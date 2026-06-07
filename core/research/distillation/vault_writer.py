@@ -22,11 +22,11 @@ from ..ingestion.models import Paper
 from ..ingestion.cache import Cache, DailyCapExceeded
 
 # Navigate from core/research/distillation/ → larger-lab/O2C-VAULT/research
-# parents[4] = projects/, parents[5] = Desktop/, parents[6] = wifik/, parents[7] = Users/, parents[8] = C:/
-# O2C-VAULT is at: parents[4] / "larger-lab" / "O2C-VAULT" / "research"
-_vault_candidate = Path(__file__).resolve().parents[4] / "larger-lab" / "O2C-VAULT" / "research"
+# parents[0]=distillation, [1]=research, [2]=core, [3]=larger-lab, [4]=projects
+_vault_candidate = Path(__file__).resolve().parents[3] / "O2C-VAULT" / "research"
 if not _vault_candidate.exists():
-    # Fallback: try without larger-lab (in case of different checkout)
+    _vault_candidate = Path(__file__).resolve().parents[4] / "larger-lab" / "O2C-VAULT" / "research"
+if not _vault_candidate.exists():
     _vault_candidate = Path(__file__).resolve().parents[4] / "O2C-VAULT" / "research"
 VAULT_ROOT = _vault_candidate
 
