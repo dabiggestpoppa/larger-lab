@@ -8,7 +8,7 @@
 ## Current State (2026-06-06)
 
 ### Active Phase
-**O2C × MAD LABS Sovereign Research Mesh** 🟡 Planning complete — awaiting L1 kickoff
+**O2C × MAD LABS Sovereign Research Mesh** ✅ L3 GATE PASSED — 29/32 components, 87 tests | L4.8 telemetry (AS) + integration tests (OC2) remaining
 **Previous (COMPLETE):** PO × Open-LLM-VTuber Integration ✅ (61/61) | O2C Phase 00 + Phase 01 ✅ (113/113) | Observer Core + OCE Unified O-1 through O-6 ✅ | V3 All 10 Phases ✅ | CEREBUS ML 5 phases ✅ | Telegram Presence System 3 phases ✅ | PO Agent Full Capability ✅
 
 ### Observer Core Status
@@ -25,13 +25,13 @@
 ### Agent Status
 | Agent | Status | Current Task |
 |-------|--------|-------------|
-| CC (CC2) | Active | O2C Research Mesh — ship package skeleton + L1 GATE review |
+| CC (CC2) | Active | O2C Research Mesh — L3 GATE review done, L4 GATE next |
 | OC2 | ⏸️ Off-table | Operator handling directly (telegram back-up) |
 | PO | ⏸️ Off-table | Operator handling directly (telegram back-up) |
-| PM | Active | O2C Research Mesh L1 — OpenAlex + S2 + cache |
-| PM2 | Active | O2C Research Mesh L1 — arXiv + rate limiter |
-| AS | Active | O2C Research Mesh — safety regression tests first |
-| RL | Active | O2C Research Mesh L1 — scheduler |
+| PM | ✅ COMPLETE | All L1 + L2 + L3 components shipped |
+| PM2 | ✅ COMPLETE | All L1 + L2 + L3 + L4.7 + L4 UI shipped |
+| AS | Active | L4.8 telemetry + audit — wire execution journal |
+| RL | ✅ COMPLETE | L1.6 scheduler + L2.8 contradictions shipped |
 
 ### 📋 TEAM TASK ASSIGNMENT
 **Mission:** O2C × MAD LABS Sovereign Research Mesh — extend OCE/SRRA-OPH with autonomous research loop (OpenAlex/arXiv ingestion → distillation → recursive research agents → OCE API+UI). Plan: `docs/plans/O2C-RESEARCH-MESH.md`. Tasking: `progress/O2C-RESEARCH-MESH-TASKS.md`.
