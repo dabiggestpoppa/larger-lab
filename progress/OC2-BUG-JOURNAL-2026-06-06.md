@@ -123,6 +123,23 @@
 
 ---
 
+## Bug #8: Session Accumulation Causes Context Overflow Crash Loop (ROOT CAUSE — FIXED)
+
+**Symptom:** OC2 crashes every few minutes in a restart loop. Each crash produces a "context overflow" error. Was stable for a week, then started crashing constantly after 2026-06-06 "fixes."
+
+**Root Cause:** Repeated gateway restarts (watchdog, manual, SIGUSR1) caused session files to accumulate and grow massive (68KB-78KB each, 15+ files). On each restart, OpenClaw tried to resume these sessions, but the context size exceeded the model's window, causing immediate crash → restart → crash loop.
+
+**Why it was stable before:** When OC2 ran continuously for a week without restarts, sessions completed naturally and were cleaned up. The constant restarting from our watchdog and manual interventions prevented this natural cleanup.
+
+**Fix:**
+1. Cleared all 15+ stale session files (some 68KB+ each)
+2. Updated `gateway.cmd` to auto-clear session files before every startup
+3. No more external watchdog — OC2 manages itself
+
+**Lesson:** Never auto-restart an agent. Session state accumulates and causes context overflow. Let OC2 run continuously and only restart when truly dead (process gone, port not listening).
+
+---
+
 ## Bug #7: Watchdog Clipping OC2 Mid-Response (FIXED — REMOVED)
 
 **Symptom:** OC2 starts working on a large response/task, takes time to think, watchdog health check fails during thinking, watchdog restarts OC2 mid-response. Result: OC2 never finishes anything.
