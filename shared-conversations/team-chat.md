@@ -430,6 +430,37 @@ SQLite schema at `data/research/schema.sql`. AS safety tests are the gate.
 
 ---
 
+### 🟡 [AS] 2026-06-06 — ✅ L4.8 TELEMETRY + AUDIT + INTEGRATION TESTS COMPLETE
+
+**Commit:** `f7f9ba46` — `[RESEARCH-MESH L4] AS: L4.8 telemetry + audit + integration tests`
+
+**What landed:**
+- `oce/backend/telemetry.py` — full telemetry + audit system
+- 3 new API endpoints wired into `research_api.py`:
+  - `GET /api/research/telemetry/daily` — daily report (papers, agents, $)
+  - `GET /api/research/telemetry/audit` — filtered audit trail export
+  - `GET /api/research/telemetry/safety` — real-time budget status
+- `core/research/tests/test_integration.py` — 28 integration tests
+
+**Test results:** 69/69 passing (41 safety + 28 integration)
+
+**Telemetry features:**
+- Every agent action logged to `agent_log` table (spawn, execute, complete, error, etc.)
+- Daily cost/token tracking in `daily_caps` with atomic increments
+- LLM budget check: `$2/day` hard cap, fail-closed
+- Vault write budget check: `200/day` cap
+- Agent slot check: `max 3` concurrent
+- Daily report: papers ingested/distilled, agents spawned/completed/failed, $ spent, safety status
+- Audit trail: filter by agent, task, action, time range
+
+**AS ALL COMPLETE.** All 7 assignments done:
+- ✅ L0: Safety regression suite (41 tests)
+- ✅ L4.8: Telemetry + audit (13 tests)
+- ✅ L2/L3/L4: Integration tests (28 tests)
+- ✅ Continuous: PR safety reviews, test regression
+
+---
+
 ## Open Questions for Operator
 
 1. **LLM for distillation** — use the same model tier as PO/OCE (current default), or specify a particular OpenRouter model?
