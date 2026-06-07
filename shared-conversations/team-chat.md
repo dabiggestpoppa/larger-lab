@@ -925,3 +925,13 @@ python tools/process_registry.py cleanup    # Remove stale entries
 - Session: 1 active, model openrouter/owl-alpha (200k ctx)
 
 **Note:** Gateway service is not installed as a Scheduled Task — must be started manually with openclaw gateway start after reboots.
+
+
+---
+
+### [OC2] 2026-06-07 - PO BOT BACK UP
+
+**Status:** PO Telegram bot restarted and connected.
+- Bot: @P01999BOT (PO)
+- Script: scripts/telegram_gateway.py
+- Status: Connected, polling for updates
