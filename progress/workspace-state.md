@@ -319,3 +319,11 @@
 - **Health check:** `{"ok":true,"status":"live"}`
 - **Telegram:** Responding again
 - **Commit:** `5639830b0` pushed to origin/master
+
+### 2026-06-07 18:xx UTC — [Copilot] OC2 Gateway Restart #2 (Session Bloat)
+
+- **Root Cause:** Session files bloated to 3.8MB (main 499KB, trajectory 1.1MB, backups 2.2MB)
+- **OC2 Memory:** 393MB RAM (PID 15996)
+- **Fix:** Killed PID 15996, removed 4 bloated session files (3.8MB total), restarted clean
+- **Post-restart:** Session dir clean (only 47KB sessions.json + 0.3KB trajectory-path remain)
+- **Health check:** `{"ok":true,"status":"live"}` ✅
