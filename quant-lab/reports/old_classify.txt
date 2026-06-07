@@ -1,0 +1,23 @@
+def classify_tier(
+    asian_range_pips: float,
+    tier_config: Dict[str, Dict[str, float]] = DEFAULT_TIER_CONFIG
+) -> Tuple[str, float, float]:
+    """
+    Classify session volatility into discrete Tier.
+
+    Tier is DISCRETE â field snaps into one of three quantized energy states.
+    AR > T3 max â NO-GO (structural coherence collapses).
+
+    Reference: manual_ontology.md Section 1 Q4, Computable Mechanics Q3
+
+    Returns:
+        (tier_name, au_pips, trigger_pips)
+    """
+    for tier_name in ("T1", "T2", "T3"):
+        if tier_name in tier_config and asian_range_pips <= tier_config[tier_name]["ar_max"]:
+            cfg = tier_config[tier_name]
+            return tier_name, cfg["au"], cfg["trigger"]
+    return "NO_GO", 0.0, 0.0
+
+
+# âââ CORE ENGINE ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ

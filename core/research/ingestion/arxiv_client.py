@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import ssl
 import urllib.parse
 import xml.etree.ElementTree as ET
 from typing import List, Optional
@@ -67,7 +68,12 @@ class ArxivClient:
 
     async def _get_session(self) -> aiohttp.ClientSession:
         if self._session is None or self._session.closed:
-            self._session = aiohttp.ClientSession(timeout=self.timeout)
+            # Disable SSL verification on Windows where cert store may be incomplete
+            ssl_ctx = ssl.create_default_context()
+            ssl_ctx.check_hostname = False
+            ssl_ctx.verify_mode = ssl.CERT_NONE
+            connector = aiohttp.TCPConnector(ssl=ssl_ctx)
+            self._session = aiohttp.ClientSession(timeout=self.timeout, connector=connector)
         return self._session
 
     async def close(self) -> None:

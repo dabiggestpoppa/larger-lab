@@ -1,0 +1,357 @@
+def process_bar(self, bar: Bar) -> Optional[TradeSignal]:
+        """
+        Process each M5 bar through the state machine.
+
+        Args:
+            bar: M5 candle with OHLC data
+
+        Returns:
+            TradeSignal on state transitions (ENTRY, TP_HIT, SL_HIT, KILL_SWITCH)
+            None if no event
+        """
+        if not self.session_active:
+            return None
+
+        # Set swing origin from first bar if not set
+        if self.swing_origin is None:
+            self.swing_origin = bar.close
+
+        # ââ Option B: Loop timeout â if 4 hours pass without entry, stop looping
+        if self.loop_start_time is not None and self.loop_count > 1:
+            if (bar.timestamp - self.loop_start_time).total_seconds() > 4 * 3600:
+                self.tel_timeout_4hr += 1
+                self.loop_start_time = None
+                self.session_active = False
+                self.logger.debug(f"Loop {self.loop_count} expired (4h timeout)")
+                return None
+
+        active_trig = self.trigger_pips * self.pip_size
+
+        up_move = bar.high - self.swing_origin
+        dn_move = self.swing_origin - bar.low
+
+        # ââ STATE: SEARCH ââââââââââââââââââââââââââââââââââââââââââââââ
+        # Wait for impulse breach >= Tier Trigger (AU x 1.20)
+        # Reference: cerebus_qa_recap.md Q4, manual_ontology.md Computable Q1
+        if self.state == EngineState.SEARCH:
+            if up_move >= active_trig:
+                self.impulse_direction = TradeDirection.LONG
+                self.impulse_extreme = bar.high
+                self.impulse_size_pips = up_move / self.pip_size
+                self.kill_switch_level = (
+                    self.impulse_extreme - up_move * KILL_SWITCH_PCT
+                )
+                self.state = EngineState.WAIT_RETRACE
+                self.logger.debug(
+                    f"Impulse LONG: extreme={self.impulse_extreme:.5f}, "
+                    f"size={self.impulse_size_pips:.1f}p, "
+                    f"kill={self.kill_switch_level:.5f}"
+                )
+
+            elif dn_move >= active_trig:
+                self.impulse_direction = TradeDirection.SHORT
+                self.impulse_extreme = bar.low
+                self.impulse_size_pips = dn_move / self.pip_size
+                self.kill_switch_level = (
+                    self.impulse_extreme + dn_move * KILL_SWITCH_PCT
+                )
+                self.state = EngineState.WAIT_RETRACE
+                self.logger.debug(
+                    f"Impulse SHORT: extreme={self.impulse_extreme:.5f}, "
+                    f"size={self.impulse_size_pips:.1f}p, "
+                    f"kill={self.kill_switch_level:.5f}"
+                )
+
+        # ââ STATE: WAIT_RETRACE ââââââââââââââââââââââââââââââââââââââââ
+        # Wait for pullback >= 1 AU OR 38.2%-50% Fib retracement
+        # Monitor 80% Kill Switch (close-only invalidation)
+        # Reference: cerebus_qa_recap.md Q5 (Kill), Q8 (DZ pullback), Q9 (DZ)
+        elif self.state == EngineState.WAIT_RETRACE:
+            # Kill Switch check (CLOSE-ONLY)
+            if self.impulse_direction == TradeDirection.LONG:
+                if bar.close < self.kill_switch_level:
+                    self.tel_kill_switch_80pct += 1
+                    _loop = self.loop_count
+                    self._reset_state_keep_loop(bar.close)
+                    self.loop_count = min(_loop + 1, self.max_loops)
+                    self.loop_start_time = bar.timestamp
+                    self._check_max_loops()
+                    sig = TradeSignal(
+                        event="KILL_SWITCH",
+                        direction=None, entry_price=None,
+                        sl_price=None, tp_price=None,
+                        au_used=self.au_pips, timestamp=bar.timestamp,
+                        reason="Q5: M5 close past 80% of impulse leg = pathway void",
+                        loop_count=_loop,
+                    )
+                    self.signal_log.append(sig)
+                    return sig
+            else:  # SHORT
+                if bar.close > self.kill_switch_level:
+                    self.tel_kill_switch_80pct += 1
+                    _loop = self.loop_count
+                    self._reset_state_keep_loop(bar.close)
+                    self.loop_count = min(_loop + 1, self.max_loops)
+                    self.loop_start_time = bar.timestamp
+                    self._check_max_loops()
+                    sig = TradeSignal(
+                        event="KILL_SWITCH",
+                        direction=None, entry_price=None,
+                        sl_price=None, tp_price=None,
+                        au_used=self.au_pips, timestamp=bar.timestamp,
+                        reason="Q5: M5 close past 80% of impulse leg = pathway void",
+                        loop_count=_loop,
+                    )
+                    self.signal_log.append(sig)
+                    return sig
+
+            # ââ Dynamic DZ Thresholds (Option B: Continuous Loop) ââââââââ
+            # Loop 1: strict Goldilocks zone (32%-50%)
+            # Loop 2+: relaxed floor (20%-50% â shallow momentum pullbacks)
+            if self.loop_count == 1:
+                min_retrace_pct = 0.32
+                max_retrace_pct = 0.50
+            else:
+                min_retrace_pct = 0.20
+                max_retrace_pct = 0.50
+
+
+
+            # Pullback measurement
+            if self.impulse_direction == TradeDirection.LONG:
+                pullback_px = self.impulse_extreme - bar.low
+            else:
+                pullback_px = bar.high - self.impulse_extreme
+
+            pullback_pips = pullback_px / self.pip_size
+            retrace_pct = (
+                pullback_pips / self.impulse_size_pips
+                if self.impulse_size_pips > 0 else 0
+            )
+
+            au_penetrated = pullback_pips >= self.au_pips
+            # Dynamic fib zone: min_retrace_pct to max_retrace_pct
+            fib_penetrated = min_retrace_pct <= retrace_pct <= max_retrace_pct
+
+            # TELEMETRY: Loop 1 DZ strictness â count AU-hit-but-fib-missed
+            if self.loop_count == 1 and au_penetrated and not fib_penetrated:
+                if retrace_pct < 0.32:
+                    self.tel_loop1_reject_shallow += 1
+                elif retrace_pct > 0.50:
+                    self.tel_loop1_reject_deep += 1
+
+            # ââ Cascade P90 Bypass (Loop 2+ only) ââââââââââââââââââââ
+            cascade_bypass = False
+            if (self.loop_count >= 2 and retrace_pct < min_retrace_pct
+                    and self.cascade_bias is not None
+                    and self.cascade_bias == self.impulse_direction):
+                cascade_bypass = True
+
+            if au_penetrated or fib_penetrated or cascade_bypass:
+                self.state = EngineState.WAIT_OCC
+                self.logger.debug(
+                    f"DZ penetrated: pullback={pullback_pips:.1f}p, "
+                    f"retrace={retrace_pct:.3f}, au_ok={au_penetrated}, "
+                    f"fib_ok={fib_penetrated}, loop={self.loop_count}, "
+                    f"min_ret={min_retrace_pct:.2f}"
+                )
+
+        # ââ STATE: WAIT_OCC ââââââââââââââââââââââââââââââââââââââââââââ
+        # Wait for Opposite Candle Close confirming impulse direction
+        # Reference: cerebus_qa_recap.md Q8, manual_ontology.md Computable Q3
+        elif self.state == EngineState.WAIT_OCC:
+            # Re-verify Kill Switch
+            if self.impulse_direction == TradeDirection.LONG:
+                if bar.close < self.kill_switch_level:
+                    _loop = self.loop_count
+                    self._reset_state_keep_loop(bar.close)
+                    self.loop_count = min(_loop + 1, self.max_loops)
+                    self.loop_start_time = bar.timestamp
+                    self._check_max_loops()
+                    sig = TradeSignal(
+                        event="KILL_SWITCH",
+                        direction=None, entry_price=None,
+                        sl_price=None, tp_price=None,
+                        au_used=self.au_pips, timestamp=bar.timestamp,
+                        reason="Q5: Kill switch breached in WAIT_OCC",
+                        loop_count=_loop,
+                    )
+                    self.signal_log.append(sig)
+                    return sig
+            else:
+                if bar.close > self.kill_switch_level:
+                    _loop = self.loop_count
+                    self._reset_state_keep_loop(bar.close)
+                    self.loop_count = min(_loop + 1, self.max_loops)
+                    self.loop_start_time = bar.timestamp
+                    self._check_max_loops()
+                    sig = TradeSignal(
+                        event="KILL_SWITCH",
+                        direction=None, entry_price=None,
+                        sl_price=None, tp_price=None,
+                        au_used=self.au_pips, timestamp=bar.timestamp,
+                        reason="Q5: Kill switch breached in WAIT_OCC",
+                        loop_count=_loop,
+                    )
+                    self.signal_log.append(sig)
+                    return sig
+
+            # OCC check: candle closing in impulse direction
+            occ_confirmed = (
+                (self.impulse_direction == TradeDirection.LONG and bar.is_bullish) or
+                (self.impulse_direction == TradeDirection.SHORT and bar.is_bearish)
+            )
+
+            if occ_confirmed:
+                self.entry_price = bar.close
+                # SL = Zero-Buffer Impulse Extreme (exact high/low of impulse bar)
+                # Per Nautilus strategy line 503: self.sl_price = self.impulse_extreme
+                # Per ontology cerebus_qa_recap.md: "SL = impulse_extreme (Zero Buffer)"
+                # The impulse_extreme is set in SEARCH state:
+                #   LONG  -> bar.high of impulse bar
+                #   SHORT -> bar.low of impulse bar
+                # No spread buffer, no OCC extreme â exact impulse extreme only.
+                self.sl_price = self.impulse_extreme
+                self.tp_price = (
+                    bar.close + self.active_au * self.impulse_direction.value
+                )
+                self.state = EngineState.IN_TRADE
+                self._just_entered = True  # Skip SL/TP check on entry bar (Nautilus fills on NEXT bar)
+
+                sig = TradeSignal(
+                    event="ENTRY",
+                    direction=self.impulse_direction,
+                    entry_price=self.entry_price,
+                    sl_price=self.sl_price,
+                    tp_price=self.tp_price,
+                    au_used=self.au_pips,
+                    timestamp=bar.timestamp,
+                    reason=f"Q8: OCC confirmed after DZ pullback â entry on close (loop {self.loop_count})",
+                    loop_count=self.loop_count,
+                )
+                self.signal_log.append(sig)
+                self.logger.info(
+                    f"ENTRY {'LONG' if self.impulse_direction == TradeDirection.LONG else 'SHORT'} "
+                    f"(loop {self.loop_count}): "
+                    f"entry={self.entry_price:.5f}, sl={self.sl_price:.5f}, "
+                    f"tp={self.tp_price:.5f} (1 AU = {self.au_pips}p)"
+                )
+                return sig
+
+        # ââ STATE: IN_TRADE ââââââââââââââââââââââââââââââââââââââââââââ
+        # Monitor TP (wick or close) and SL (CLOSE-ONLY)
+        # Reference: cerebus_dual_engine.md (Zero-Buffer SL, close-only)
+        elif self.state == EngineState.IN_TRADE:
+            # Skip SL/TP check on entry bar â Nautilus fills on NEXT bar
+            if self._just_entered:
+                self._just_entered = False
+                return None
+            if self.impulse_direction == TradeDirection.LONG:
+                # TP check: wick OR close
+                if bar.high >= self.tp_price:
+                    exit_price = self.tp_price
+                    _entry = self.entry_price
+                    _sl = self.sl_price
+                    _tp = self.tp_price
+                    _dir = self.impulse_direction
+                    _loop = self.loop_count
+                    self._reset_state_keep_loop(exit_price)
+                    self.loop_count = min(_loop + 1, self.max_loops)
+                    self.loop_start_time = bar.timestamp
+                    sig = TradeSignal(
+                        event="TP_HIT",
+                        direction=_dir,
+                        entry_price=_entry,
+                        sl_price=_sl,
+                        tp_price=_tp,
+                        au_used=self.au_pips,
+                        timestamp=bar.timestamp,
+                        reason=f"TP = 1 AU reached (wick or close) â loop {_loop} complete",
+                        loop_count=_loop,
+                    )
+                    self.signal_log.append(sig)
+                    self.logger.info(f"TP HIT: exit={exit_price:.5f} (loop {_loop} -> {self.loop_count})")
+                    return sig
+
+                # SL check: CLOSE-ONLY (wicks don't count)
+                if bar.close <= self.sl_price:
+                    exit_price = self.sl_price
+                    _entry = self.entry_price
+                    _sl = self.sl_price
+                    _tp = self.tp_price
+                    _dir = self.impulse_direction
+                    _loop = self.loop_count
+                    self._reset_state_keep_loop(exit_price)
+                    self.loop_count = min(_loop + 1, self.max_loops)
+                    self.loop_start_time = bar.timestamp
+                    sig = TradeSignal(
+                        event="SL_HIT",
+                        direction=_dir,
+                        entry_price=_entry,
+                        sl_price=_sl,
+                        tp_price=_tp,
+                        au_used=self.au_pips,
+                        timestamp=bar.timestamp,
+                        reason=f"Zero-Buffer SL hit (close-only invalidation) â loop {_loop} complete",
+                        loop_count=_loop,
+                    )
+                    self.signal_log.append(sig)
+                    self.logger.info(f"SL HIT: exit={exit_price:.5f} (loop {_loop} -> {self.loop_count})")
+                    return sig
+
+            else:  # SHORT
+                # TP check: wick OR close
+                if bar.low <= self.tp_price:
+                    exit_price = self.tp_price
+                    _entry = self.entry_price
+                    _sl = self.sl_price
+                    _tp = self.tp_price
+                    _dir = self.impulse_direction
+                    _loop = self.loop_count
+                    self._reset_state_keep_loop(exit_price)
+                    self.loop_count = min(_loop + 1, self.max_loops)
+                    self.loop_start_time = bar.timestamp
+                    sig = TradeSignal(
+                        event="TP_HIT",
+                        direction=_dir,
+                        entry_price=_entry,
+                        sl_price=_sl,
+                        tp_price=_tp,
+                        au_used=self.au_pips,
+                        timestamp=bar.timestamp,
+                        reason=f"TP = 1 AU reached (wick or close) â loop {_loop} complete",
+                        loop_count=_loop,
+                    )
+                    self.signal_log.append(sig)
+                    self.logger.info(f"TP HIT: exit={exit_price:.5f} (loop {_loop} -> {self.loop_count})")
+                    return sig
+
+                # SL check: CLOSE-ONLY
+                if bar.close >= self.sl_price:
+                    exit_price = self.sl_price
+                    _entry = self.entry_price
+                    _sl = self.sl_price
+                    _tp = self.tp_price
+                    _dir = self.impulse_direction
+                    _loop = self.loop_count
+                    self._reset_state_keep_loop(exit_price)
+                    self.loop_count = min(_loop + 1, self.max_loops)
+                    self.loop_start_time = bar.timestamp
+                    sig = TradeSignal(
+                        event="SL_HIT",
+                        direction=_dir,
+                        entry_price=_entry,
+                        sl_price=_sl,
+                        tp_price=_tp,
+                        au_used=self.au_pips,
+                        timestamp=bar.timestamp,
+                        reason=f"Zero-Buffer SL hit (close-only invalidation) â loop {_loop} complete",
+                        loop_count=_loop,
+                    )
+                    self.signal_log.append(sig)
+                    self.logger.info(f"SL HIT: exit={exit_price:.5f} (loop {_loop} -> {self.loop_count})")
+                    return sig
+
+        return None
+
+    # ââ State Reset ââââââââââââââââââââââââââââââââââââââââââââââââââââ
