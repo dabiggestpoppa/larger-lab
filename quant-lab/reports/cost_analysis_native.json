@@ -1,0 +1,1586 @@
+{
+  "AUDCAD": {
+    "symbol": "AUDCAD",
+    "raw": {
+      "trades": 1484,
+      "wr": 86.5,
+      "pf": 18.81,
+      "pnl_pips": 11220.0,
+      "avg_win": 9.24,
+      "avg_loss": -3.32,
+      "expectancy": 7.56,
+      "max_dd_pips": 57.7,
+      "sharpe": 12.26,
+      "kelly": 0.816
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.5,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 1.2,
+      "total_spread_cost_pips": 742.0,
+      "total_commission_cost_pips": 1038.8,
+      "total_cost_pips": 1780.8,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 1484,
+      "wr": 79.8,
+      "pf": 11.25,
+      "pnl_pips": 9439.2,
+      "avg_win": 8.75,
+      "avg_loss": -3.07,
+      "expectancy": 6.36,
+      "max_dd_pips": 58.9,
+      "sharpe": 10.31,
+      "kelly": 0.727
+    },
+    "delta": {
+      "wr_change": -6.7,
+      "pf_change": -7.56,
+      "pnl_change_pips": -1780.8,
+      "pnl_change_pct": -15.9
+    }
+  },
+  "AUDCHF": {
+    "symbol": "AUDCHF",
+    "raw": {
+      "trades": 2225,
+      "wr": 87.5,
+      "pf": 22.78,
+      "pnl_pips": 12920.5,
+      "avg_win": 6.94,
+      "avg_loss": -2.25,
+      "expectancy": 5.81,
+      "max_dd_pips": 35.1,
+      "sharpe": 11.67,
+      "kelly": 0.834
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.5,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 1.2,
+      "total_spread_cost_pips": 1112.5,
+      "total_commission_cost_pips": 1557.5,
+      "total_cost_pips": 2670.0,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 2225,
+      "wr": 78.6,
+      "pf": 11.02,
+      "pnl_pips": 10250.5,
+      "avg_win": 6.45,
+      "avg_loss": -2.15,
+      "expectancy": 4.61,
+      "max_dd_pips": 44.1,
+      "sharpe": 9.26,
+      "kelly": 0.715
+    },
+    "delta": {
+      "wr_change": -8.9,
+      "pf_change": -11.76,
+      "pnl_change_pips": -2670.0,
+      "pnl_change_pct": -20.7
+    }
+  },
+  "AUDJPY": {
+    "symbol": "AUDJPY",
+    "raw": {
+      "trades": 454,
+      "wr": 89.6,
+      "pf": 25.46,
+      "pnl_pips": 5802.1,
+      "avg_win": 14.84,
+      "avg_loss": -5.16,
+      "expectancy": 12.78,
+      "max_dd_pips": 28.4,
+      "sharpe": 12.4,
+      "kelly": 0.861
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.5,
+      "commission_pips_per_trade": 0.007,
+      "total_cost_pips_per_trade": 0.507,
+      "total_spread_cost_pips": 227.0,
+      "total_commission_cost_pips": 3.2,
+      "total_cost_pips": 230.2,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 1000.0
+    },
+    "adjusted": {
+      "trades": 454,
+      "wr": 88.5,
+      "pf": 22.25,
+      "pnl_pips": 5571.9,
+      "avg_win": 14.51,
+      "avg_loss": -5.04,
+      "expectancy": 12.27,
+      "max_dd_pips": 29.4,
+      "sharpe": 11.91,
+      "kelly": 0.846
+    },
+    "delta": {
+      "wr_change": -1.1,
+      "pf_change": -3.21,
+      "pnl_change_pips": -230.2,
+      "pnl_change_pct": -4.0
+    }
+  },
+  "AUDNZD": {
+    "symbol": "AUDNZD",
+    "raw": {
+      "trades": 1981,
+      "wr": 89.5,
+      "pf": 33.2,
+      "pnl_pips": 18718.6,
+      "avg_win": 10.89,
+      "avg_loss": -2.88,
+      "expectancy": 9.45,
+      "max_dd_pips": 26.2,
+      "sharpe": 12.8,
+      "kelly": 0.867
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.5,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 1.2,
+      "total_spread_cost_pips": 990.5,
+      "total_commission_cost_pips": 1386.7,
+      "total_cost_pips": 2377.2,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 1981,
+      "wr": 82.9,
+      "pf": 19.34,
+      "pnl_pips": 16341.4,
+      "avg_win": 10.49,
+      "avg_loss": -2.64,
+      "expectancy": 8.25,
+      "max_dd_pips": 28.6,
+      "sharpe": 11.17,
+      "kelly": 0.787
+    },
+    "delta": {
+      "wr_change": -6.6,
+      "pf_change": -13.86,
+      "pnl_change_pips": -2377.2,
+      "pnl_change_pct": -12.7
+    }
+  },
+  "AUDUSD": {
+    "symbol": "AUDUSD",
+    "raw": {
+      "trades": 2501,
+      "wr": 84.7,
+      "pf": 15.24,
+      "pnl_pips": 13255.1,
+      "avg_win": 6.69,
+      "avg_loss": -2.5,
+      "expectancy": 5.3,
+      "max_dd_pips": 27.9,
+      "sharpe": 12.2,
+      "kelly": 0.79
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.3,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 1.0,
+      "total_spread_cost_pips": 750.3,
+      "total_commission_cost_pips": 1750.7,
+      "total_cost_pips": 2501.0,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 2501,
+      "wr": 78.0,
+      "pf": 8.77,
+      "pnl_pips": 10754.1,
+      "avg_win": 6.23,
+      "avg_loss": -2.51,
+      "expectancy": 4.3,
+      "max_dd_pips": 30.7,
+      "sharpe": 9.9,
+      "kelly": 0.691
+    },
+    "delta": {
+      "wr_change": -6.8,
+      "pf_change": -6.48,
+      "pnl_change_pips": -2501.0,
+      "pnl_change_pct": -18.9
+    }
+  },
+  "BTCUSD": {
+    "symbol": "BTCUSD",
+    "raw": {
+      "trades": 0,
+      "wr": 0.0,
+      "pf": 0.0,
+      "pnl_pips": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": 0.0,
+      "expectancy": 0.0,
+      "max_dd_pips": 0.0,
+      "sharpe": 0.0,
+      "kelly": 0.0
+    },
+    "costs": {
+      "spread_pips_per_trade": 5.0,
+      "commission_pips_per_trade": 0.07,
+      "total_cost_pips_per_trade": 5.07,
+      "total_spread_cost_pips": 0.0,
+      "total_commission_cost_pips": 0.0,
+      "total_cost_pips": 0.0,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 100.0
+    },
+    "adjusted": {
+      "trades": 0,
+      "wr": 0.0,
+      "pf": 0.0,
+      "pnl_pips": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": 0.0,
+      "expectancy": 0.0,
+      "max_dd_pips": 0.0,
+      "sharpe": 0.0,
+      "kelly": 0.0
+    },
+    "delta": {
+      "wr_change": 0.0,
+      "pf_change": 0.0,
+      "pnl_change_pips": 0.0,
+      "pnl_change_pct": 0
+    }
+  },
+  "CADCHF": {
+    "symbol": "CADCHF",
+    "raw": {
+      "trades": 3859,
+      "wr": 84.4,
+      "pf": 13.93,
+      "pnl_pips": 16926.4,
+      "avg_win": 5.6,
+      "avg_loss": -2.28,
+      "expectancy": 4.39,
+      "max_dd_pips": 23.9,
+      "sharpe": 10.92,
+      "kelly": 0.781
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.5,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 1.2,
+      "total_spread_cost_pips": 1929.5,
+      "total_commission_cost_pips": 2701.3,
+      "total_cost_pips": 4630.8,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 3859,
+      "wr": 73.1,
+      "pf": 6.48,
+      "pnl_pips": 12295.6,
+      "avg_win": 5.15,
+      "avg_loss": -2.16,
+      "expectancy": 3.19,
+      "max_dd_pips": 28.5,
+      "sharpe": 7.93,
+      "kelly": 0.618
+    },
+    "delta": {
+      "wr_change": -11.3,
+      "pf_change": -7.45,
+      "pnl_change_pips": -4630.8,
+      "pnl_change_pct": -27.4
+    }
+  },
+  "CADJPY": {
+    "symbol": "CADJPY",
+    "raw": {
+      "trades": 588,
+      "wr": 87.4,
+      "pf": 22.95,
+      "pnl_pips": 6083.3,
+      "avg_win": 12.37,
+      "avg_loss": -3.96,
+      "expectancy": 10.35,
+      "max_dd_pips": 34.9,
+      "sharpe": 11.09,
+      "kelly": 0.834
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.5,
+      "commission_pips_per_trade": 0.007,
+      "total_cost_pips_per_trade": 0.507,
+      "total_spread_cost_pips": 294.0,
+      "total_commission_cost_pips": 4.1,
+      "total_cost_pips": 298.1,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 1000.0
+    },
+    "adjusted": {
+      "trades": 588,
+      "wr": 84.9,
+      "pf": 19.24,
+      "pnl_pips": 5785.2,
+      "avg_win": 12.23,
+      "avg_loss": -3.56,
+      "expectancy": 9.84,
+      "max_dd_pips": 35.4,
+      "sharpe": 10.55,
+      "kelly": 0.805
+    },
+    "delta": {
+      "wr_change": -2.6,
+      "pf_change": -3.71,
+      "pnl_change_pips": -298.1,
+      "pnl_change_pct": -4.9
+    }
+  },
+  "CHFJPY": {
+    "symbol": "CHFJPY",
+    "raw": {
+      "trades": 1067,
+      "wr": 85.8,
+      "pf": 17.38,
+      "pnl_pips": 12110.6,
+      "avg_win": 14.04,
+      "avg_loss": -4.93,
+      "expectancy": 11.35,
+      "max_dd_pips": 30.9,
+      "sharpe": 11.35,
+      "kelly": 0.808
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.5,
+      "commission_pips_per_trade": 0.007,
+      "total_cost_pips_per_trade": 0.507,
+      "total_spread_cost_pips": 533.5,
+      "total_commission_cost_pips": 7.5,
+      "total_cost_pips": 541.0,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 1000.0
+    },
+    "adjusted": {
+      "trades": 1067,
+      "wr": 84.1,
+      "pf": 15.1,
+      "pnl_pips": 11569.6,
+      "avg_win": 13.81,
+      "avg_loss": -4.83,
+      "expectancy": 10.84,
+      "max_dd_pips": 31.4,
+      "sharpe": 10.84,
+      "kelly": 0.785
+    },
+    "delta": {
+      "wr_change": -1.7,
+      "pf_change": -2.28,
+      "pnl_change_pips": -541.0,
+      "pnl_change_pct": -4.5
+    }
+  },
+  "DE30": {
+    "symbol": "DE30",
+    "raw": {
+      "trades": 480,
+      "wr": 81.9,
+      "pf": 14.62,
+      "pnl_pips": 11441.0,
+      "avg_win": 31.25,
+      "avg_loss": -10.64,
+      "expectancy": 23.84,
+      "max_dd_pips": 78.1,
+      "sharpe": 12.29,
+      "kelly": 0.757
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.5,
+      "commission_pips_per_trade": 7.0,
+      "total_cost_pips_per_trade": 7.5,
+      "total_spread_cost_pips": 240.0,
+      "total_commission_cost_pips": 3360.0,
+      "total_cost_pips": 3600.0,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 1.0
+    },
+    "adjusted": {
+      "trades": 480,
+      "wr": 65.6,
+      "pf": 5.4,
+      "pnl_pips": 7841.0,
+      "avg_win": 30.55,
+      "avg_loss": -10.79,
+      "expectancy": 16.34,
+      "max_dd_pips": 85.6,
+      "sharpe": 8.42,
+      "kelly": 0.535
+    },
+    "delta": {
+      "wr_change": -16.2,
+      "pf_change": -9.21,
+      "pnl_change_pips": -3600.0,
+      "pnl_change_pct": -31.5
+    }
+  },
+  "ETHUSD": {
+    "symbol": "ETHUSD",
+    "raw": {
+      "trades": 199,
+      "wr": 95.5,
+      "pf": 60.16,
+      "pnl_pips": 2614.8,
+      "avg_win": 13.99,
+      "avg_loss": -4.91,
+      "expectancy": 13.14,
+      "max_dd_pips": 10.2,
+      "sharpe": 18.37,
+      "kelly": 0.939
+    },
+    "costs": {
+      "spread_pips_per_trade": 5.0,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 5.7,
+      "total_spread_cost_pips": 995.0,
+      "total_commission_cost_pips": 139.3,
+      "total_cost_pips": 1134.3,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 199,
+      "wr": 82.4,
+      "pf": 10.67,
+      "pnl_pips": 1480.5,
+      "avg_win": 9.96,
+      "avg_loss": -4.37,
+      "expectancy": 7.44,
+      "max_dd_pips": 19.8,
+      "sharpe": 10.4,
+      "kelly": 0.747
+    },
+    "delta": {
+      "wr_change": -13.1,
+      "pf_change": -49.49,
+      "pnl_change_pips": -1134.3,
+      "pnl_change_pct": -43.4
+    }
+  },
+  "EURAUD": {
+    "symbol": "EURAUD",
+    "raw": {
+      "trades": 328,
+      "wr": 89.0,
+      "pf": 22.97,
+      "pnl_pips": 4229.9,
+      "avg_win": 15.15,
+      "avg_loss": -5.35,
+      "expectancy": 12.9,
+      "max_dd_pips": 31.4,
+      "sharpe": 11.64,
+      "kelly": 0.851
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.5,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 1.2,
+      "total_spread_cost_pips": 164.0,
+      "total_commission_cost_pips": 229.6,
+      "total_cost_pips": 393.6,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 328,
+      "wr": 83.5,
+      "pf": 16.59,
+      "pnl_pips": 3836.3,
+      "avg_win": 14.9,
+      "avg_loss": -4.56,
+      "expectancy": 11.7,
+      "max_dd_pips": 32.6,
+      "sharpe": 10.55,
+      "kelly": 0.785
+    },
+    "delta": {
+      "wr_change": -5.5,
+      "pf_change": -6.38,
+      "pnl_change_pips": -393.6,
+      "pnl_change_pct": -9.3
+    }
+  },
+  "EURCAD": {
+    "symbol": "EURCAD",
+    "raw": {
+      "trades": 1893,
+      "wr": 83.2,
+      "pf": 13.03,
+      "pnl_pips": 15649.1,
+      "avg_win": 10.76,
+      "avg_loss": -4.22,
+      "expectancy": 8.27,
+      "max_dd_pips": 54.5,
+      "sharpe": 11.31,
+      "kelly": 0.766
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.5,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 1.2,
+      "total_spread_cost_pips": 946.5,
+      "total_commission_cost_pips": 1325.1,
+      "total_cost_pips": 2271.6,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 1893,
+      "wr": 78.1,
+      "pf": 8.73,
+      "pnl_pips": 13377.5,
+      "avg_win": 10.21,
+      "avg_loss": -4.18,
+      "expectancy": 7.07,
+      "max_dd_pips": 58.1,
+      "sharpe": 9.67,
+      "kelly": 0.692
+    },
+    "delta": {
+      "wr_change": -5.1,
+      "pf_change": -4.29,
+      "pnl_change_pips": -2271.6,
+      "pnl_change_pct": -14.5
+    }
+  },
+  "EURCHF": {
+    "symbol": "EURCHF",
+    "raw": {
+      "trades": 3102,
+      "wr": 85.2,
+      "pf": 17.45,
+      "pnl_pips": 18077.0,
+      "avg_win": 7.25,
+      "avg_loss": -2.52,
+      "expectancy": 5.83,
+      "max_dd_pips": 19.3,
+      "sharpe": 11.31,
+      "kelly": 0.801
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.3,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 1.0,
+      "total_spread_cost_pips": 930.6,
+      "total_commission_cost_pips": 2171.4,
+      "total_cost_pips": 3102.0,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 3102,
+      "wr": 77.1,
+      "pf": 10.03,
+      "pnl_pips": 14975.0,
+      "avg_win": 6.95,
+      "avg_loss": -2.33,
+      "expectancy": 4.83,
+      "max_dd_pips": 21.4,
+      "sharpe": 9.37,
+      "kelly": 0.694
+    },
+    "delta": {
+      "wr_change": -8.1,
+      "pf_change": -7.41,
+      "pnl_change_pips": -3102.0,
+      "pnl_change_pct": -17.2
+    }
+  },
+  "EURGBP": {
+    "symbol": "EURGBP",
+    "raw": {
+      "trades": 3798,
+      "wr": 84.5,
+      "pf": 15.73,
+      "pnl_pips": 15255.8,
+      "avg_win": 5.08,
+      "avg_loss": -1.84,
+      "expectancy": 4.02,
+      "max_dd_pips": 28.1,
+      "sharpe": 12.27,
+      "kelly": 0.788
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.3,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 1.0,
+      "total_spread_cost_pips": 1139.4,
+      "total_commission_cost_pips": 2658.6,
+      "total_cost_pips": 3798.0,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 3798,
+      "wr": 73.0,
+      "pf": 7.34,
+      "pnl_pips": 11457.8,
+      "avg_win": 4.78,
+      "avg_loss": -1.76,
+      "expectancy": 3.02,
+      "max_dd_pips": 30.1,
+      "sharpe": 9.21,
+      "kelly": 0.631
+    },
+    "delta": {
+      "wr_change": -11.5,
+      "pf_change": -8.39,
+      "pnl_change_pips": -3798.0,
+      "pnl_change_pct": -24.9
+    }
+  },
+  "EURJPY": {
+    "symbol": "EURJPY",
+    "raw": {
+      "trades": 250,
+      "wr": 90.0,
+      "pf": 34.68,
+      "pnl_pips": 3734.6,
+      "avg_win": 17.09,
+      "avg_loss": -4.44,
+      "expectancy": 14.94,
+      "max_dd_pips": 16.6,
+      "sharpe": 12.6,
+      "kelly": 0.874
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.5,
+      "commission_pips_per_trade": 0.007,
+      "total_cost_pips_per_trade": 0.507,
+      "total_spread_cost_pips": 125.0,
+      "total_commission_cost_pips": 1.7,
+      "total_cost_pips": 126.7,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 1000.0
+    },
+    "adjusted": {
+      "trades": 250,
+      "wr": 88.4,
+      "pf": 29.95,
+      "pnl_pips": 3607.9,
+      "avg_win": 16.89,
+      "avg_loss": -4.3,
+      "expectancy": 14.43,
+      "max_dd_pips": 17.6,
+      "sharpe": 12.17,
+      "kelly": 0.854
+    },
+    "delta": {
+      "wr_change": -1.6,
+      "pf_change": -4.72,
+      "pnl_change_pips": -126.7,
+      "pnl_change_pct": -3.4
+    }
+  },
+  "EURNZD": {
+    "symbol": "EURNZD",
+    "raw": {
+      "trades": 332,
+      "wr": 89.2,
+      "pf": 41.66,
+      "pnl_pips": 6477.8,
+      "avg_win": 22.42,
+      "avg_loss": -4.55,
+      "expectancy": 19.51,
+      "max_dd_pips": 14.1,
+      "sharpe": 12.15,
+      "kelly": 0.87
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.7,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 1.4,
+      "total_spread_cost_pips": 232.4,
+      "total_commission_cost_pips": 232.4,
+      "total_cost_pips": 464.8,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 332,
+      "wr": 84.9,
+      "pf": 28.85,
+      "pnl_pips": 6013.0,
+      "avg_win": 22.09,
+      "avg_loss": -4.32,
+      "expectancy": 18.11,
+      "max_dd_pips": 16.3,
+      "sharpe": 11.28,
+      "kelly": 0.82
+    },
+    "delta": {
+      "wr_change": -4.2,
+      "pf_change": -12.81,
+      "pnl_change_pips": -464.8,
+      "pnl_change_pct": -7.2
+    }
+  },
+  "EURUSD": {
+    "symbol": "EURUSD",
+    "raw": {
+      "trades": 3940,
+      "wr": 82.8,
+      "pf": 12.17,
+      "pnl_pips": 23090.9,
+      "avg_win": 7.71,
+      "avg_loss": -3.13,
+      "expectancy": 5.86,
+      "max_dd_pips": 41.3,
+      "sharpe": 12.44,
+      "kelly": 0.758
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.1,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 0.8,
+      "total_spread_cost_pips": 394.0,
+      "total_commission_cost_pips": 2758.0,
+      "total_cost_pips": 3152.0,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 3940,
+      "wr": 78.1,
+      "pf": 8.46,
+      "pnl_pips": 19938.9,
+      "avg_win": 7.35,
+      "avg_loss": -3.18,
+      "expectancy": 5.06,
+      "max_dd_pips": 42.9,
+      "sharpe": 10.74,
+      "kelly": 0.686
+    },
+    "delta": {
+      "wr_change": -4.7,
+      "pf_change": -3.72,
+      "pnl_change_pips": -3152.0,
+      "pnl_change_pct": -13.7
+    }
+  },
+  "FR40": {
+    "symbol": "FR40",
+    "raw": {
+      "trades": 806,
+      "wr": 83.9,
+      "pf": 12.71,
+      "pnl_pips": 8933.0,
+      "avg_win": 14.34,
+      "avg_loss": -6.1,
+      "expectancy": 11.08,
+      "max_dd_pips": 40.4,
+      "sharpe": 11.78,
+      "kelly": 0.77
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.5,
+      "commission_pips_per_trade": 7.0,
+      "total_cost_pips_per_trade": 7.5,
+      "total_spread_cost_pips": 403.0,
+      "total_commission_cost_pips": 5642.0,
+      "total_cost_pips": 6045.0,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 1.0
+    },
+    "adjusted": {
+      "trades": 806,
+      "wr": 50.2,
+      "pf": 2.07,
+      "pnl_pips": 2888.0,
+      "avg_win": 13.77,
+      "avg_loss": -6.7,
+      "expectancy": 3.58,
+      "max_dd_pips": 128.8,
+      "sharpe": 3.81,
+      "kelly": 0.26
+    },
+    "delta": {
+      "wr_change": -33.6,
+      "pf_change": -10.64,
+      "pnl_change_pips": -6045.0,
+      "pnl_change_pct": -67.7
+    }
+  },
+  "GBPAUD": {
+    "symbol": "GBPAUD",
+    "raw": {
+      "trades": 575,
+      "wr": 86.1,
+      "pf": 23.09,
+      "pnl_pips": 7121.0,
+      "avg_win": 15.04,
+      "avg_loss": -4.24,
+      "expectancy": 12.38,
+      "max_dd_pips": 30.2,
+      "sharpe": 12.31,
+      "kelly": 0.822
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.5,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 1.2,
+      "total_spread_cost_pips": 287.5,
+      "total_commission_cost_pips": 402.5,
+      "total_cost_pips": 690.0,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 575,
+      "wr": 81.9,
+      "pf": 15.88,
+      "pnl_pips": 6431.0,
+      "avg_win": 14.57,
+      "avg_loss": -4.16,
+      "expectancy": 11.18,
+      "max_dd_pips": 37.4,
+      "sharpe": 11.12,
+      "kelly": 0.768
+    },
+    "delta": {
+      "wr_change": -4.2,
+      "pf_change": -7.22,
+      "pnl_change_pips": -690.0,
+      "pnl_change_pct": -9.7
+    }
+  },
+  "GBPCAD": {
+    "symbol": "GBPCAD",
+    "raw": {
+      "trades": 690,
+      "wr": 89.0,
+      "pf": 20.74,
+      "pnl_pips": 8874.4,
+      "avg_win": 15.19,
+      "avg_loss": -5.92,
+      "expectancy": 12.86,
+      "max_dd_pips": 33.8,
+      "sharpe": 11.38,
+      "kelly": 0.847
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.5,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 1.2,
+      "total_spread_cost_pips": 345.0,
+      "total_commission_cost_pips": 483.0,
+      "total_cost_pips": 828.0,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 690,
+      "wr": 83.5,
+      "pf": 15.36,
+      "pnl_pips": 8046.4,
+      "avg_win": 14.94,
+      "avg_loss": -4.91,
+      "expectancy": 11.66,
+      "max_dd_pips": 36.3,
+      "sharpe": 10.32,
+      "kelly": 0.78
+    },
+    "delta": {
+      "wr_change": -5.5,
+      "pf_change": -5.37,
+      "pnl_change_pips": -828.0,
+      "pnl_change_pct": -9.3
+    }
+  },
+  "GBPCHF": {
+    "symbol": "GBPCHF",
+    "raw": {
+      "trades": 933,
+      "wr": 89.6,
+      "pf": 23.36,
+      "pnl_pips": 7681.4,
+      "avg_win": 9.6,
+      "avg_loss": -3.54,
+      "expectancy": 8.23,
+      "max_dd_pips": 31.0,
+      "sharpe": 12.72,
+      "kelly": 0.858
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.5,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 1.2,
+      "total_spread_cost_pips": 466.5,
+      "total_commission_cost_pips": 653.1,
+      "total_cost_pips": 1119.6,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 933,
+      "wr": 83.9,
+      "pf": 14.46,
+      "pnl_pips": 6561.8,
+      "avg_win": 9.0,
+      "avg_loss": -3.25,
+      "expectancy": 7.03,
+      "max_dd_pips": 33.4,
+      "sharpe": 10.86,
+      "kelly": 0.781
+    },
+    "delta": {
+      "wr_change": -5.7,
+      "pf_change": -8.9,
+      "pnl_change_pips": -1119.6,
+      "pnl_change_pct": -14.6
+    }
+  },
+  "GBPJPY": {
+    "symbol": "GBPJPY",
+    "raw": {
+      "trades": 685,
+      "wr": 82.9,
+      "pf": 10.95,
+      "pnl_pips": 9156.8,
+      "avg_win": 17.74,
+      "avg_loss": -8.0,
+      "expectancy": 13.37,
+      "max_dd_pips": 154.9,
+      "sharpe": 10.58,
+      "kelly": 0.752
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.5,
+      "commission_pips_per_trade": 0.007,
+      "total_cost_pips_per_trade": 0.507,
+      "total_spread_cost_pips": 342.5,
+      "total_commission_cost_pips": 4.8,
+      "total_cost_pips": 347.3,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 1000.0
+    },
+    "adjusted": {
+      "trades": 685,
+      "wr": 81.9,
+      "pf": 9.98,
+      "pnl_pips": 8809.5,
+      "avg_win": 17.45,
+      "avg_loss": -7.91,
+      "expectancy": 12.86,
+      "max_dd_pips": 155.9,
+      "sharpe": 10.18,
+      "kelly": 0.737
+    },
+    "delta": {
+      "wr_change": -1.0,
+      "pf_change": -0.97,
+      "pnl_change_pips": -347.3,
+      "pnl_change_pct": -3.8
+    }
+  },
+  "GBPNZD": {
+    "symbol": "GBPNZD",
+    "raw": {
+      "trades": 386,
+      "wr": 84.5,
+      "pf": 21.21,
+      "pnl_pips": 6604.1,
+      "avg_win": 21.26,
+      "avg_loss": -5.84,
+      "expectancy": 17.11,
+      "max_dd_pips": 28.3,
+      "sharpe": 10.44,
+      "kelly": 0.802
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.7,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 1.4,
+      "total_spread_cost_pips": 270.2,
+      "total_commission_cost_pips": 270.2,
+      "total_cost_pips": 540.4,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 386,
+      "wr": 80.8,
+      "pf": 15.43,
+      "pnl_pips": 6063.7,
+      "avg_win": 20.78,
+      "avg_loss": -5.68,
+      "expectancy": 15.71,
+      "max_dd_pips": 31.1,
+      "sharpe": 9.58,
+      "kelly": 0.756
+    },
+    "delta": {
+      "wr_change": -3.6,
+      "pf_change": -5.78,
+      "pnl_change_pips": -540.4,
+      "pnl_change_pct": -8.2
+    }
+  },
+  "GBPUSD": {
+    "symbol": "GBPUSD",
+    "raw": {
+      "trades": 2864,
+      "wr": 84.2,
+      "pf": 14.65,
+      "pnl_pips": 22027.7,
+      "avg_win": 9.8,
+      "avg_loss": -3.68,
+      "expectancy": 7.69,
+      "max_dd_pips": 37.0,
+      "sharpe": 12.61,
+      "kelly": 0.783
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.3,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 1.0,
+      "total_spread_cost_pips": 859.2,
+      "total_commission_cost_pips": 2004.8,
+      "total_cost_pips": 2864.0,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 2864,
+      "wr": 79.0,
+      "pf": 9.99,
+      "pnl_pips": 19163.7,
+      "avg_win": 9.41,
+      "avg_loss": -3.55,
+      "expectancy": 6.69,
+      "max_dd_pips": 38.0,
+      "sharpe": 10.97,
+      "kelly": 0.711
+    },
+    "delta": {
+      "wr_change": -5.2,
+      "pf_change": -4.66,
+      "pnl_change_pips": -2864.0,
+      "pnl_change_pct": -13.0
+    }
+  },
+  "HK50": {
+    "symbol": "HK50",
+    "raw": {
+      "trades": 0,
+      "wr": 0.0,
+      "pf": 0.0,
+      "pnl_pips": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": 0.0,
+      "expectancy": 0.0,
+      "max_dd_pips": 0.0,
+      "sharpe": 0.0,
+      "kelly": 0.0
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.5,
+      "commission_pips_per_trade": 7.0,
+      "total_cost_pips_per_trade": 7.5,
+      "total_spread_cost_pips": 0.0,
+      "total_commission_cost_pips": 0.0,
+      "total_cost_pips": 0.0,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 1.0
+    },
+    "adjusted": {
+      "trades": 0,
+      "wr": 0.0,
+      "pf": 0.0,
+      "pnl_pips": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": 0.0,
+      "expectancy": 0.0,
+      "max_dd_pips": 0.0,
+      "sharpe": 0.0,
+      "kelly": 0.0
+    },
+    "delta": {
+      "wr_change": 0.0,
+      "pf_change": 0.0,
+      "pnl_change_pips": 0.0,
+      "pnl_change_pct": 0
+    }
+  },
+  "NZDCAD": {
+    "symbol": "NZDCAD",
+    "raw": {
+      "trades": 1994,
+      "wr": 88.7,
+      "pf": 24.62,
+      "pnl_pips": 16090.1,
+      "avg_win": 9.49,
+      "avg_loss": -3.2,
+      "expectancy": 8.07,
+      "max_dd_pips": 36.6,
+      "sharpe": 12.03,
+      "kelly": 0.848
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.5,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 1.2,
+      "total_spread_cost_pips": 997.0,
+      "total_commission_cost_pips": 1395.8,
+      "total_cost_pips": 2392.8,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 1994,
+      "wr": 81.9,
+      "pf": 14.4,
+      "pnl_pips": 13697.3,
+      "avg_win": 9.01,
+      "avg_loss": -2.83,
+      "expectancy": 6.87,
+      "max_dd_pips": 37.8,
+      "sharpe": 10.24,
+      "kelly": 0.762
+    },
+    "delta": {
+      "wr_change": -6.8,
+      "pf_change": -10.23,
+      "pnl_change_pips": -2392.8,
+      "pnl_change_pct": -14.9
+    }
+  },
+  "NZDCHF": {
+    "symbol": "NZDCHF",
+    "raw": {
+      "trades": 2606,
+      "wr": 87.7,
+      "pf": 23.7,
+      "pnl_pips": 15738.2,
+      "avg_win": 7.19,
+      "avg_loss": -2.3,
+      "expectancy": 6.04,
+      "max_dd_pips": 22.2,
+      "sharpe": 11.61,
+      "kelly": 0.838
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.7,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 1.4,
+      "total_spread_cost_pips": 1824.2,
+      "total_commission_cost_pips": 1824.2,
+      "total_cost_pips": 3648.4,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 2606,
+      "wr": 74.4,
+      "pf": 10.02,
+      "pnl_pips": 12089.8,
+      "avg_win": 6.92,
+      "avg_loss": -2.01,
+      "expectancy": 4.64,
+      "max_dd_pips": 24.7,
+      "sharpe": 8.92,
+      "kelly": 0.67
+    },
+    "delta": {
+      "wr_change": -13.3,
+      "pf_change": -13.68,
+      "pnl_change_pips": -3648.4,
+      "pnl_change_pct": -23.2
+    }
+  },
+  "NZDJPY": {
+    "symbol": "NZDJPY",
+    "raw": {
+      "trades": 550,
+      "wr": 90.4,
+      "pf": 38.89,
+      "pnl_pips": 6836.1,
+      "avg_win": 14.12,
+      "avg_loss": -3.68,
+      "expectancy": 12.43,
+      "max_dd_pips": 13.0,
+      "sharpe": 12.59,
+      "kelly": 0.879
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.5,
+      "commission_pips_per_trade": 0.007,
+      "total_cost_pips_per_trade": 0.507,
+      "total_spread_cost_pips": 275.0,
+      "total_commission_cost_pips": 3.9,
+      "total_cost_pips": 278.9,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 1000.0
+    },
+    "adjusted": {
+      "trades": 550,
+      "wr": 88.2,
+      "pf": 32.31,
+      "pnl_pips": 6557.3,
+      "avg_win": 13.95,
+      "avg_loss": -3.22,
+      "expectancy": 11.92,
+      "max_dd_pips": 13.5,
+      "sharpe": 12.07,
+      "kelly": 0.855
+    },
+    "delta": {
+      "wr_change": -2.2,
+      "pf_change": -6.59,
+      "pnl_change_pips": -278.8,
+      "pnl_change_pct": -4.1
+    }
+  },
+  "NZDUSD": {
+    "symbol": "NZDUSD",
+    "raw": {
+      "trades": 1440,
+      "wr": 87.4,
+      "pf": 20.44,
+      "pnl_pips": 8620.2,
+      "avg_win": 7.2,
+      "avg_loss": -2.59,
+      "expectancy": 5.99,
+      "max_dd_pips": 15.8,
+      "sharpe": 12.91,
+      "kelly": 0.828
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.3,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 1.0,
+      "total_spread_cost_pips": 432.0,
+      "total_commission_cost_pips": 1008.0,
+      "total_cost_pips": 1440.0,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 1440,
+      "wr": 81.8,
+      "pf": 11.94,
+      "pnl_pips": 7180.2,
+      "avg_win": 6.65,
+      "avg_loss": -2.51,
+      "expectancy": 4.99,
+      "max_dd_pips": 17.4,
+      "sharpe": 10.76,
+      "kelly": 0.75
+    },
+    "delta": {
+      "wr_change": -5.6,
+      "pf_change": -8.5,
+      "pnl_change_pips": -1440.0,
+      "pnl_change_pct": -16.7
+    }
+  },
+  "US500": {
+    "symbol": "US500",
+    "raw": {
+      "trades": 618,
+      "wr": 86.6,
+      "pf": 18.43,
+      "pnl_pips": 5344.6,
+      "avg_win": 10.56,
+      "avg_loss": -4.09,
+      "expectancy": 8.65,
+      "max_dd_pips": 27.2,
+      "sharpe": 11.27,
+      "kelly": 0.814
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.5,
+      "commission_pips_per_trade": 7.0,
+      "total_cost_pips_per_trade": 7.5,
+      "total_spread_cost_pips": 309.0,
+      "total_commission_cost_pips": 4326.0,
+      "total_cost_pips": 4635.0,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 1.0
+    },
+    "adjusted": {
+      "trades": 618,
+      "wr": 36.7,
+      "pf": 1.36,
+      "pnl_pips": 709.6,
+      "avg_win": 11.89,
+      "avg_loss": -5.09,
+      "expectancy": 1.15,
+      "max_dd_pips": 199.2,
+      "sharpe": 1.5,
+      "kelly": 0.097
+    },
+    "delta": {
+      "wr_change": -49.8,
+      "pf_change": -17.08,
+      "pnl_change_pips": -4635.0,
+      "pnl_change_pct": -86.7
+    }
+  },
+  "USDCAD": {
+    "symbol": "USDCAD",
+    "raw": {
+      "trades": 2632,
+      "wr": 83.8,
+      "pf": 15.19,
+      "pnl_pips": 17759.0,
+      "avg_win": 8.62,
+      "avg_loss": -3.07,
+      "expectancy": 6.75,
+      "max_dd_pips": 29.4,
+      "sharpe": 11.24,
+      "kelly": 0.78
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.3,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 1.0,
+      "total_spread_cost_pips": 789.6,
+      "total_commission_cost_pips": 1842.4,
+      "total_cost_pips": 2632.0,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 2632,
+      "wr": 77.4,
+      "pf": 9.62,
+      "pnl_pips": 15127.0,
+      "avg_win": 8.29,
+      "avg_loss": -2.95,
+      "expectancy": 5.75,
+      "max_dd_pips": 41.4,
+      "sharpe": 9.58,
+      "kelly": 0.693
+    },
+    "delta": {
+      "wr_change": -6.4,
+      "pf_change": -5.57,
+      "pnl_change_pips": -2632.0,
+      "pnl_change_pct": -14.8
+    }
+  },
+  "USDCHF": {
+    "symbol": "USDCHF",
+    "raw": {
+      "trades": 3732,
+      "wr": 82.3,
+      "pf": 12.66,
+      "pnl_pips": 20775.0,
+      "avg_win": 7.35,
+      "avg_loss": -2.82,
+      "expectancy": 5.57,
+      "max_dd_pips": 34.1,
+      "sharpe": 12.34,
+      "kelly": 0.755
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.3,
+      "commission_pips_per_trade": 0.7,
+      "total_cost_pips_per_trade": 1.0,
+      "total_spread_cost_pips": 1119.6,
+      "total_commission_cost_pips": 2612.4,
+      "total_cost_pips": 3732.0,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 10.0
+    },
+    "adjusted": {
+      "trades": 3732,
+      "wr": 75.2,
+      "pf": 7.67,
+      "pnl_pips": 17043.0,
+      "avg_win": 6.98,
+      "avg_loss": -2.76,
+      "expectancy": 4.57,
+      "max_dd_pips": 35.1,
+      "sharpe": 10.12,
+      "kelly": 0.654
+    },
+    "delta": {
+      "wr_change": -7.1,
+      "pf_change": -4.99,
+      "pnl_change_pips": -3732.0,
+      "pnl_change_pct": -18.0
+    }
+  },
+  "USDJPY": {
+    "symbol": "USDJPY",
+    "raw": {
+      "trades": 826,
+      "wr": 84.0,
+      "pf": 13.79,
+      "pnl_pips": 9501.1,
+      "avg_win": 14.76,
+      "avg_loss": -5.67,
+      "expectancy": 11.5,
+      "max_dd_pips": 61.7,
+      "sharpe": 11.19,
+      "kelly": 0.779
+    },
+    "costs": {
+      "spread_pips_per_trade": 0.3,
+      "commission_pips_per_trade": 0.007,
+      "total_cost_pips_per_trade": 0.307,
+      "total_spread_cost_pips": 247.8,
+      "total_commission_cost_pips": 5.8,
+      "total_cost_pips": 253.6,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 1000.0
+    },
+    "adjusted": {
+      "trades": 826,
+      "wr": 83.2,
+      "pf": 12.79,
+      "pnl_pips": 9247.5,
+      "avg_win": 14.6,
+      "avg_loss": -5.64,
+      "expectancy": 11.2,
+      "max_dd_pips": 62.0,
+      "sharpe": 10.89,
+      "kelly": 0.767
+    },
+    "delta": {
+      "wr_change": -0.8,
+      "pf_change": -1.0,
+      "pnl_change_pips": -253.6,
+      "pnl_change_pct": -2.7
+    }
+  },
+  "XAGUSD": {
+    "symbol": "XAGUSD",
+    "raw": {
+      "trades": 469,
+      "wr": 91.9,
+      "pf": 25.34,
+      "pnl_pips": 4612.3,
+      "avg_win": 11.14,
+      "avg_loss": -4.99,
+      "expectancy": 9.83,
+      "max_dd_pips": 29.1,
+      "sharpe": 13.52,
+      "kelly": 0.883
+    },
+    "costs": {
+      "spread_pips_per_trade": 1.5,
+      "commission_pips_per_trade": 7.0,
+      "total_cost_pips_per_trade": 8.5,
+      "total_spread_cost_pips": 703.5,
+      "total_commission_cost_pips": 3283.0,
+      "total_cost_pips": 3986.5,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 1.0
+    },
+    "adjusted": {
+      "trades": 469,
+      "wr": 42.0,
+      "pf": 1.47,
+      "pnl_pips": 625.8,
+      "avg_win": 9.94,
+      "avg_loss": -4.9,
+      "expectancy": 1.33,
+      "max_dd_pips": 87.2,
+      "sharpe": 1.83,
+      "kelly": 0.134
+    },
+    "delta": {
+      "wr_change": -49.9,
+      "pf_change": -23.87,
+      "pnl_change_pips": -3986.5,
+      "pnl_change_pct": -86.4
+    }
+  },
+  "XAUUSD": {
+    "symbol": "XAUUSD",
+    "raw": {
+      "trades": 528,
+      "wr": 83.0,
+      "pf": 12.78,
+      "pnl_pips": 10722.9,
+      "avg_win": 26.56,
+      "avg_loss": -10.11,
+      "expectancy": 20.31,
+      "max_dd_pips": 104.8,
+      "sharpe": 11.27,
+      "kelly": 0.765
+    },
+    "costs": {
+      "spread_pips_per_trade": 1.5,
+      "commission_pips_per_trade": 7.0,
+      "total_cost_pips_per_trade": 8.5,
+      "total_spread_cost_pips": 792.0,
+      "total_commission_cost_pips": 3696.0,
+      "total_cost_pips": 4488.0,
+      "lot_size": 0.01,
+      "commission_per_lot": 7.0,
+      "pip_value_per_lot": 1.0
+    },
+    "adjusted": {
+      "trades": 528,
+      "wr": 61.4,
+      "pf": 3.93,
+      "pnl_pips": 6234.9,
+      "avg_win": 25.82,
+      "avg_loss": -10.44,
+      "expectancy": 11.81,
+      "max_dd_pips": 132.3,
+      "sharpe": 6.55,
+      "kelly": 0.457
+    },
+    "delta": {
+      "wr_change": -21.6,
+      "pf_change": -8.86,
+      "pnl_change_pips": -4488.0,
+      "pnl_change_pct": -41.9
+    }
+  }
+}

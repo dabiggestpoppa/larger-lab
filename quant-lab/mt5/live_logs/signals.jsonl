@@ -1,0 +1,11 @@
+{"engine": "SymmetryTrap", "symbol": "EURNZD.PRO", "direction": "SELL", "entry": 1.8967, "sl": 1.8967, "tp": 1.8947, "event": "ENTRY", "loop": 1, "time": "2026-06-07 17:04:00"}
+{"engine": "SymmetryTrap", "symbol": "EURNZD.PRO", "direction": "SELL", "entry": 1.8967, "sl": 1.8967, "tp": 1.8947, "event": "TP_HIT", "loop": 1, "time": "2026-06-07 17:06:00"}
+{"engine": "SymmetryTrap", "symbol": "EURJPY.PRO", "direction": "SELL", "entry": 184.396, "sl": 115.097, "tp": 184.15599999999998, "event": "ENTRY", "loop": 1, "time": "2026-06-07 17:15:00"}
+{"engine": "SymmetryTrap", "symbol": "EURAUD.PRO", "direction": "BUY", "entry": 1.63708, "sl": 1.63794, "tp": 1.6385800000000001, "event": "ENTRY", "loop": 1, "time": "2026-06-07 17:15:00"}
+{"engine": "SymmetryTrap", "symbol": "GBPCAD.PRO", "direction": "BUY", "entry": 1.85652, "sl": 2.13485, "tp": 1.85832, "event": "ENTRY", "loop": 1, "time": "2026-06-07 17:15:00"}
+{"engine": "SymmetryTrap", "symbol": "EURJPY.PRO", "direction": "SELL", "entry": 184.396, "sl": 115.097, "tp": 184.15599999999998, "event": "SL_HIT", "loop": 1, "time": "2026-06-07 17:17:00"}
+{"engine": "SymmetryTrap", "symbol": "EURAUD.PRO", "direction": "BUY", "entry": 1.63708, "sl": 1.63794, "tp": 1.6385800000000001, "event": "SL_HIT", "loop": 1, "time": "2026-06-07 17:17:00"}
+{"engine": "SymmetryTrap", "symbol": "GBPCAD.PRO", "direction": "BUY", "entry": 1.85652, "sl": 2.13485, "tp": 1.85832, "event": "SL_HIT", "loop": 1, "time": "2026-06-07 17:17:00"}
+{"engine": "SymmetryTrap", "symbol": "GBPAUD.PRO", "direction": "BUY", "entry": 1.89531, "sl": 1.89541, "tp": 1.8967100000000001, "event": "ENTRY", "loop": 1, "time": "2026-06-07 17:31:00"}
+{"engine": "SymmetryTrap", "symbol": "GBPAUD.PRO", "direction": "BUY", "entry": 1.89531, "sl": 1.89541, "tp": 1.8967100000000001, "event": "SL_HIT", "loop": 1, "time": "2026-06-07 17:33:00"}
+{"engine": "SymmetryTrap", "symbol": "EURAUD.PRO", "direction": "SELL", "entry": 1.6360299999999999, "sl": 1.6360299999999999, "tp": 1.6345299999999998, "event": "ENTRY", "loop": 2, "time": "2026-06-07 17:54:00"}

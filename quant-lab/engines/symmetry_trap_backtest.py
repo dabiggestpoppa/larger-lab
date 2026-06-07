@@ -160,7 +160,7 @@ def load_m5_csv(filepath: str, pip_size: float = 0.0001) -> Tuple[List[Bar], str
             col_idx[h] = i
 
         # Determine how to read timestamps
-        ts_col = col_idx.get("timestamp") or col_idx.get("time")
+        ts_col = col_idx.get("timestamp") if col_idx.get("timestamp") is not None else col_idx.get("time")
         date_col = col_idx.get("date")
         time_col = col_idx.get("time")
         dt_is_split = ts_col is None and date_col is not None and time_col is not None

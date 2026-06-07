@@ -1,0 +1,11 @@
+{
+  "engine": "SymmetryTrap",
+  "symbol": "EURNZD.PRO",
+  "direction": "SELL",
+  "entry": 1.8967,
+  "sl": 1.8967,
+  "tp": 1.8947,
+  "event": "TP_HIT",
+  "loop": 1,
+  "time": "2026-06-07 17:06:00"
+}
