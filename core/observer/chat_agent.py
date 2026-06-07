@@ -4,8 +4,8 @@ from typing import Dict, Any, List, Optional
 
 MODEL_CHAIN = [
     "inclusionai/ring-2.6-1t",
-    "minimax/minimax-m3",
-    "nvidia/nemotron-3-ultra-550b-a55b",
+    "openrouter/owl-alpha",
+    "minimax/minimax-m2.5",
 ]
 
 from core.observer.tools import TOOL_DEFINITIONS, TOOL_FUNCTIONS
@@ -16,7 +16,7 @@ class ChatAgent:
         self.api_key = api_key or os.environ.get("OPENROUTER_API_KEY", "")
         self.base_url = "https://openrouter.ai/api/v1/chat/completions"
         self._history: List[Dict[str, str]] = []
-        self._max_history = 36
+        self._max_history = 50
         self._model_index = 0
 
     @property
@@ -232,26 +232,27 @@ class ChatAgent:
             used_model = None
             err = None
 
-            for attempt in range(len(MODEL_CHAIN)):
-                idx = (self._model_index + attempt) % len(MODEL_CHAIN)
-                model = MODEL_CHAIN[idx]
-                resp, tool_calls, used_model, err = self._call_llm(messages, model, tools=TOOL_DEFINITIONS)
-                if tool_calls:
-                    self._model_index = MODEL_CHAIN.index(used_model)
-                    break
-                elif resp and not err:
-                    self._model_index = MODEL_CHAIN.index(used_model)
-                    break
-                elif err and "http_400" in str(err):
-                    resp2, _, used_model2, err2 = self._call_llm(messages, model, tools=None)
-                    if resp2:
-                        resp = resp2
-                        used_model = used_model2
-                        err = err2
+            MODEL_RETRY_COUNT = 2
+            for model in MODEL_CHAIN:
+                for retry in range(MODEL_RETRY_COUNT):
+                    resp, tool_calls, used_model, err = self._call_llm(messages, model, tools=TOOL_DEFINITIONS)
+                    if tool_calls or (resp and not err):
                         self._model_index = MODEL_CHAIN.index(used_model)
                         break
-                elif err:
-                    continue
+                    if err and ("429" in str(err) or "5" in str(err)[:4] or "timeout" in str(err)):
+                        time.sleep(2 * (retry + 1))
+                        continue
+                    if err and "http_400" in str(err):
+                        resp2, _, used_model2, err2 = self._call_llm(messages, model, tools=None)
+                        if resp2:
+                            resp = resp2
+                            used_model = used_model2
+                            err = err2
+                            self._model_index = MODEL_CHAIN.index(used_model)
+                            break
+                    break
+                if tool_calls or (resp and not err):
+                    break
 
             if not resp and not tool_calls:
                 _notify("error", {"message": "All LLM providers failed"})
@@ -267,7 +268,7 @@ class ChatAgent:
                     messages.append({"role": "assistant", "content": resp or "", "tool_calls": [
                         {"id": f"tc_{round_num}", "type": "function", "function": {"name": tool_name, "arguments": json.dumps(tool_args)}}
                     ]})
-                    messages.append({"role": "tool", "tool_call_id": f"tc_{round_num}", "content": tool_result[:2000]})
+                    messages.append({"role": "tool", "tool_call_id": f"tc_{round_num}", "content": tool_result[:8000]})
                 continue
 
             parsed_tc = self._parse_tool_call(resp) if resp else None
