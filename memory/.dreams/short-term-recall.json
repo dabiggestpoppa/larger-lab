@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-22T11:31:52.911Z",
+  "updatedAt": "2026-06-07T15:01:26.675Z",
   "entries": {
     "memory:memory/2026-05-18.md:387:414": {
       "key": "memory:memory/2026-05-18.md:387:414",
@@ -1142,6 +1142,161 @@
         "re-spawn",
         "4-5",
         "non-lab"
+      ]
+    },
+    "memory:memory/2026-06-04.md:162:200": {
+      "key": "memory:memory/2026-06-04.md:162:200",
+      "path": "memory/2026-06-04.md",
+      "startLine": 162,
+      "endLine": 200,
+      "source": "memory",
+      "snippet": "### Files - `reports/trigger_sweep_max_accuracy.json` — Full curve data for all pairs - `tests/trigger_sweep_max_accuracy_all.py` — Sweep script - `tests/PLAN_max_accuracy_sweep.md` — ARC-approved plan --- ## DEPLOYMENT — LIVE (09:40 EDT) MAD Directive: Go live with 7 pairs. No demo. ### Deployment Config - **Floor (3):** EURUSD (T1=12p), USDJPY (T1=19p), CHFJPY (T1=17p) - **Ceiling (3):** NZDUSD (T1=26p), AUDUSD (T1=27p), USDCHF (T1=25.81p) - **Hedge/Knee (1):** GBPJPY (T1=35p) - **Lot size:** 0.01 for all pairs - **Engine:** Nautilus symmetry trap v4.0 (zero-buffer impulse extreme SL) - **Bridge:** cerebus_live_bridge.py v3.0 (execution only, no signal computation)",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-07T15:01:26.675Z",
+      "lastRecalledAt": "2026-06-07T15:01:26.675Z",
+      "queryHashes": [
+        "b056d889cb59"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "tests/plan-max-accuracy-sweep.md",
+        "arc-approved",
+        "25.81p",
+        "hedge/knee",
+        "0.01",
+        "v4.0",
+        "zero-buffer",
+        "cerebus-live-bridge.py"
+      ]
+    },
+    "memory:memory/2026-06-03.md:384:414": {
+      "key": "memory:memory/2026-06-03.md:384:414",
+      "path": "memory/2026-06-03.md",
+      "startLine": 384,
+      "endLine": 414,
+      "source": "memory",
+      "snippet": "- backtest/check_st_multi.py, check_wr.py, check_data.py - backtest/test1_eurusd_direct.py, test2_old_engine.py, test3_old_engine.py - backtest/debug_eurusd.py, run_old_eurusd.py, final_check.py - backtest/mc_vs_backtest.py - backtest/portfolio_matrix/asset_stats.py, mc_vs_backtest.py - backtest/portfolio_matrix/run_matrix.py, matrix_quick.py, test_imports.py - backtest/run_portfolio_mc_no_eu_uchf.py, gen_thresholds_5assets.py - engines/symmetry_trap_old.py (empty placeholder — for testing only) ## PM2 OCE Chat Fix (Final) - Fixed chat to use real LLM (ChatAgent/OpenRouter) instead of template synthesizer - All messages now route through claude-haiku-4 via OpenRouter - Chat resp",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-07T15:01:26.675Z",
+      "lastRecalledAt": "2026-06-07T15:01:26.675Z",
+      "queryHashes": [
+        "b056d889cb59"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "router",
+        "backtest/check-st-multi.py",
+        "check-wr.py",
+        "check-data.py",
+        "backtest/test1-eurusd-direct.py",
+        "test2-old-engine.py",
+        "test3-old-engine.py",
+        "backtest/debug-eurusd.py"
+      ]
+    },
+    "memory:memory/2026-06-04.md:26:60": {
+      "key": "memory:memory/2026-06-04.md:26:60",
+      "path": "memory/2026-06-04.md",
+      "startLine": 26,
+      "endLine": 60,
+      "source": "memory",
+      "snippet": "The accuracy-frequency curve is now fully mapped. For any pair, the optimal operating point can be selected between floor (max trades, ~81% WR) and ceiling (max accuracy, ~90%+ WR). The \"knee\" — where WR gains become marginal — is the natural target for portfolio optimization. ### Files - `reports/trigger_sweep_max_accuracy.json` — Full curve data for all pairs - `tests/trigger_sweep_max_accuracy_all.py` — Sweep script - `tests/PLAN_max_accuracy_sweep.md` — ARC-approved plan --- ## DEPLOYMENT — LIVE (09:40 EDT) MAD Directive: Go live with 7 pairs. No demo. ### Deployment Config - **Floor (3):** EURUSD (T1=12p), USDJPY (T1=19p), CHFJPY (T1=17p) - **Ceiling (3):** NZDUSD (T",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-07T15:01:26.675Z",
+      "lastRecalledAt": "2026-06-07T15:01:26.675Z",
+      "queryHashes": [
+        "b056d889cb59"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "accuracy-frequency",
+        "tests/plan-max-accuracy-sweep.md",
+        "arc-approved",
+        "accuracy",
+        "frequency",
+        "curve",
+        "now",
+        "fully"
+      ]
+    },
+    "memory:memory/2026-06-05.md:1:31": {
+      "key": "memory:memory/2026-06-05.md:1:31",
+      "path": "memory/2026-06-05.md",
+      "startLine": 1,
+      "endLine": 31,
+      "source": "memory",
+      "snippet": "# 2026-06-05 — Daily Notes ## Group Combinatorics Matrix — COMPLETE - Built full combinatorics script: `quant-lab/scripts/group_combinatorics.py` - Output: `quant-lab/reports/GROUP_COMBINATORICS.md` - Top 3 per category at every size 2-14 - MAD's Phase 1 (low cost → $250) and Phase 2 (max profit at $250+) documented ## Low Cost Hex — CRITICAL FAILURE & FIX - **FAILURE**: Bridge running Sign 7 pairs (EURUSD, USDJPY, CHFJPY, etc.) instead of Low Cost Hex - **Root Cause**: cerebus_guardian.py had HARDCODED Sign 7 symbols in PROCESSES[\"bridge\"][\"args\"] - When guardian/autopilot restarted, it passed old symbols to bridge, ignoring deploy_config.py - Bridge uses --symbols CLI arg if provided",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-07T15:01:26.675Z",
+      "lastRecalledAt": "2026-06-07T15:01:26.675Z",
+      "queryHashes": [
+        "b056d889cb59"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "2-14",
+        "cerebus-guardian.py",
+        "guardian/autopilot",
+        "deploy-config.py",
+        "group",
+        "combinatorics",
+        "matrix",
+        "complete"
+      ]
+    },
+    "memory:memory/archive/2026-05-20.md:57:87": {
+      "key": "memory:memory/archive/2026-05-20.md:57:87",
+      "path": "memory/archive/2026-05-20.md",
+      "startLine": 57,
+      "endLine": 87,
+      "source": "memory",
+      "snippet": "**Root Cause:** Dashboard toggle endpoint wrote flat state structure (`found_p90s: []`) that overwrote the nested structure (`state.symbols.EURUSD.PRO.known_p90s`). Live script read empty `known_p90s` every loop → re-inserted same P90s. **Fixes:** 1. State file corrected to nested `symbols` structure 2. Added DB-level dedup in `log_p90()` — SELECT COUNT before INSERT 3. Dashboard toggle/config endpoints no longer write to state file (only config.json) 4. 104 duplicate rows deleted from DB **4 Real P90s Today:** 07:30 SHORT 4.4p, 08:25 SHORT 4.9p, 09:15 LONG 4.9p, 11:10 SHORT 5.3p **0 trades placed** — AutoTrading was disabled in MT5 all day. ## 14:31 EDT — PORTFOLIO MODE ACTI",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-07T15:01:26.675Z",
+      "lastRecalledAt": "2026-06-07T15:01:26.675Z",
+      "queryHashes": [
+        "b056d889cb59"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "found-p90s",
+        "known-p90s",
+        "re-inserted",
+        "db-level",
+        "log-p90",
+        "toggle/config",
+        "config.json",
+        "4.4p"
       ]
     }
   }
