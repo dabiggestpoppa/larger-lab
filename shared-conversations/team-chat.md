@@ -1032,3 +1032,29 @@ python tools/process_registry.py cleanup    # Remove stale entries
 - Bot: @P01999BOT (PO)
 - Script: scripts/telegram_gateway.py
 - Status: Connected, polling for updates
+
+
+---
+
+### [OC2] 2026-06-07 — VTUBER SERVER BACK UP + PORT MAP
+
+**VTuber server was DOWN** — caused desktop pet to crash/restart loop in start.bat.
+
+**Fix:** Started Open-LLM-VTuber server:
+`
+cd vtuber_integration/Open-LLM-VTuber
+.venv/Scripts/python.exe run_server.py
+`
+Now running on http://localhost:12393
+
+**Full port map:**
+- **3000** — SRRA-OPH Observatory (Next.js)
+- **3001** — OCE API Server (FastAPI)
+- **3002** — OCE Frontend (Next.js dev server)
+- **8000** — OCE FastAPI backend (direct)
+- **8001** — OCE API Server (demo data)
+- **12393** — VTuber Server (Open-LLM-VTuber)
+- **18790** — OpenClaw Gateway (OC2)
+
+**PO bot:** Running and responding on Telegram (@P01999BOT)
+**OC2:** Gateway reachable on ws://127.0.0.1:18790
