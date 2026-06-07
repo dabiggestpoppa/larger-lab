@@ -327,3 +327,13 @@
 - **Fix:** Killed PID 15996, removed 4 bloated session files (3.8MB total), restarted clean
 - **Post-restart:** Session dir clean (only 47KB sessions.json + 0.3KB trajectory-path remain)
 - **Health check:** `{"ok":true,"status":"live"}` ✅
+
+### 2026-06-07 18:xx UTC — [Copilot] OC2 Restart #3 + Watchdog Deployed
+
+- **Root Cause (recurring):** Session files bloat to ~1MB+ within minutes of restart
+  - This is the **3rd crash today** — pattern is clear
+  - Session files: 393KB main + 552KB trajectory = ~945KB before crash
+- **Fix:** Cleared sessions, restarted OC2, deployed `scripts/oc2_session_cleanup.py` watchdog
+- **Watchdog:** Runs every 5 min, cleans session files >200KB, trajectory >300KB, all .bak files
+- **Health check:** `{"ok":true,"status":"live"}` ✅
+- **Note:** Long-term fix should be in OpenClaw config — session compaction or rotation
