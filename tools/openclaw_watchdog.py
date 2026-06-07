@@ -62,6 +62,7 @@ HEALTH_TIMEOUT_SEC = 5
 LOG_ERROR_WINDOW_MIN = 5
 MAX_CONSECUTIVE_FAILURES = 3
 RESTART_COOLDOWN_SEC = 60  # don't restart more than once per minute
+STARTUP_GRACE_SEC = 120  # after restart, wait this long before checking health
 
 
 # ============================================================================
@@ -285,9 +286,9 @@ def restart_gateway() -> tuple[bool, str]:
         if result.returncode != 0:
             return False, f"Start-ScheduledTask failed: {result.stderr}"
 
-        # Wait for it to come up
-        log("Waiting 30s for gateway to come up...", "INFO")
-        time.sleep(30)
+        # Wait for it to come up (gateway takes 30-90s to start)
+        log(f"Waiting {STARTUP_GRACE_SEC}s for gateway to come up...", "INFO")
+        time.sleep(STARTUP_GRACE_SEC)
 
         ok, msg = check_health()
         if ok:
@@ -354,6 +355,14 @@ def main():
         ok_log, log_msg = check_log_errors()
         ok_port, port_msg = check_port()
 
+        # Skip health checks during startup grace period after restart
+        now_ts = time.time()
+        if state.get("startup_grace_until", 0) > now_ts:
+            remaining = int(state["startup_grace_until"] - now_ts)
+            log(f"⏳ Startup grace period active ({remaining}s remaining), skipping health check")
+            save_state(state)
+            return True
+
         all_ok = ok_health and ok_log and ok_port
         status_emoji = "✅" if all_ok else "❌"
         log(f"{status_emoji} health={health_msg} | log={log_msg} | port={port_msg}")
@@ -381,6 +390,8 @@ def main():
                     if success:
                         state["last_restart"] = now
                         state["consecutive_failures"] = 0
+                        state["startup_grace_until"] = now + STARTUP_GRACE_SEC
+                        log(f"Startup grace period set for {STARTUP_GRACE_SEC}s", "INFO")
                         send_telegram_alert(f"✅ Auto-restart successful\n{msg}", state)
                     else:
                         send_telegram_alert(
