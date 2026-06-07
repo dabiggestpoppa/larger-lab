@@ -59,7 +59,7 @@
 
 ### Frontend Status
 - **SRRA-OPH Observatory (:3001):** ✅ All 5 phases, 13 pages complete
-- **OCE Cockpit (:3000):** 🔄 O-5 integration in progress (10/12 components)
+- **OCE Cockpit (:3002):** 🔄 All pages built, running on port 3002
   - ✅ Stores: topologyStore, timelineStore, entropyStore, repairStore, continuityStore
   - ✅ Lib: timeline/types, EntropyEngine, sync-clusters
   - ✅ Components: LiveDataProvider (unified WS), TopNav (layer controls), StatusBar, RightPanel
