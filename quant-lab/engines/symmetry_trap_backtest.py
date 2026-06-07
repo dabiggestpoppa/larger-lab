@@ -160,7 +160,7 @@ def load_m5_csv(filepath: str, pip_size: float = 0.0001) -> Tuple[List[Bar], str
             col_idx[h] = i
 
         # Determine how to read timestamps
-        ts_col = col_idx.get("timestamp")
+        ts_col = col_idx.get("timestamp") or col_idx.get("time")
         date_col = col_idx.get("date")
         time_col = col_idx.get("time")
         dt_is_split = ts_col is None and date_col is not None and time_col is not None
@@ -183,8 +183,14 @@ def load_m5_csv(filepath: str, pip_size: float = 0.0001) -> Tuple[List[Bar], str
                 dt: Optional[datetime] = None
 
                 if ts_col is not None and ts_col < len(cells):
-                    # Single ``timestamp`` column – expect ``YYYY-MM-DD HH:MM:SS``
-                    dt = datetime.strptime(cells[ts_col].strip(), "%Y-%m-%d %H:%M:%S")
+                    # Single timestamp/time column – try multiple formats
+                    ts_str = cells[ts_col].strip()
+                    for fmt in ts_formats:
+                        try:
+                            dt = datetime.strptime(ts_str, fmt)
+                            break
+                        except ValueError:
+                            continue
                 elif dt_is_split:
                     dt_str = cells[date_col].strip() + " " + cells[time_col].strip()  # type: ignore[index]
                     for fmt in ts_formats:
@@ -426,8 +432,8 @@ class SymmetryTrapBacktest:
                 if bar_est_h >= 19 or bar_est_h < 3:
                     continue
                 
-                if bar_est_h >= 12 and engine.state == EngineState.SEARCH:
-                    break
+                if bar_est_h >= 16 and engine.state == EngineState.SEARCH:
+                    break  # 4PM EST cutoff (optimized per June 4 calibration)
 
                 signal = engine.process_bar(bar)
 
