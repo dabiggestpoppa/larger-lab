@@ -41,9 +41,11 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 MODEL_CHAIN = [
     "inclusionai/ring-2.6-1t",
-    "minimax/minimax-m3",
-    "nvidia/nemotron-3-ultra-550b-a55b",
+    "minimax/minimax-m2.5",
+    "nvidia/nemotron-3-ultra-550b-a55b:free",
 ]
+
+MODEL_RETRY_COUNT = 2  # attempts per model before falling back
 
 # ─── Tool Definitions (OpenAI function calling format) ─────────────────────
 
@@ -877,6 +879,7 @@ class POAgent:
 
         for round_num in range(max_tool_rounds):
             # Try configured model first, then current model, then chain fallback
+            # Each model gets MODEL_RETRY_COUNT attempts before moving to next
             resp, tool_calls, used_model, err = None, None, None, None
             configured = self._load_configured_model()
             models_to_try = []
@@ -888,13 +891,22 @@ class POAgent:
                 if m not in models_to_try:
                     models_to_try.append(m)
 
-            for attempt, model in enumerate(models_to_try):
-                resp, tool_calls, used_model, err = self._call_llm(
-                    messages, model=model, tools=TOOL_DEFINITIONS, tool_choice="auto"
-                )
+            for model in models_to_try:
+                for retry in range(MODEL_RETRY_COUNT):
+                    resp, tool_calls, used_model, err = self._call_llm(
+                        messages, model=model, tools=TOOL_DEFINITIONS, tool_choice="auto"
+                    )
+                    if resp or tool_calls:
+                        if used_model in MODEL_CHAIN:
+                            self._model_index = MODEL_CHAIN.index(used_model)
+                        break
+                    # If error is retryable (429, 5xx, timeout), retry same model
+                    if err and ("429" in str(err) or "5" in str(err)[:4] or "timeout" in str(err)):
+                        time.sleep(2 * (retry + 1))  # backoff: 2s, 4s
+                        continue
+                    # Non-retryable error (402, 400, etc.) — move to next model
+                    break
                 if resp or tool_calls:
-                    if used_model in MODEL_CHAIN:
-                        self._model_index = MODEL_CHAIN.index(used_model)
                     break
 
             if not resp and not tool_calls:
