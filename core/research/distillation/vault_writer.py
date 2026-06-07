@@ -21,14 +21,10 @@ from typing import Optional
 from ..ingestion.models import Paper
 from ..ingestion.cache import Cache, DailyCapExceeded
 
-# Navigate from core/research/distillation/ → larger-lab/O2C-VAULT/research
-# parents[0]=distillation, [1]=research, [2]=core, [3]=larger-lab, [4]=projects
-_vault_candidate = Path(__file__).resolve().parents[3] / "O2C-VAULT" / "research"
-if not _vault_candidate.exists():
-    _vault_candidate = Path(__file__).resolve().parents[4] / "larger-lab" / "O2C-VAULT" / "research"
-if not _vault_candidate.exists():
-    _vault_candidate = Path(__file__).resolve().parents[4] / "O2C-VAULT" / "research"
-VAULT_ROOT = _vault_candidate
+# Navigate from core/research/distillation/ → Downloads/o2c/research (actual Obsidian vault)
+# parents[0]=distillation, [1]=research, [2]=core, [3]=larger-lab
+# The actual Obsidian vault is at C:\Users\wifik\Downloads\o2c\research
+VAULT_ROOT = Path(r"C:\Users\wifik\Downloads\o2c\research")
 
 
 class VaultWriter:

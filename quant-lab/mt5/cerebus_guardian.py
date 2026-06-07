@@ -1,21 +1,8 @@
 """
-CEREBUS GUARDIAN v2 — Process Watchdog
-======================================
-Monitors all Cerebus trading processes and auto-restarts on failure.
-Lightweight — just checks PIDs via PowerShell.
-
-Processes monitored:
-  1. cerebus_live_bridge.py (PRIMARY — executes all trades)
-
-Policy:
-  - Bridge is SOLE executor.
-  - If bridge dies → restart immediately
-  - Grace period after restart to avoid flapping
-  - Self-protect: cron job restarts guardian if it dies
-  - Max restart attempts per hour to prevent infinite loops
-
-Decommissioned:
-  - symmetry_trap_executor.py — removed 2026-06-05 (hardcoded SYMBOL, magic 20260531)
+CEREBUS LIVE GUARDIAN v3 — Process Watchdog
+===========================================
+Monitors live bridge and auto-restarts on failure.
+Uses PID file for reliable process detection.
 
 Usage:
   python cerebus_guardian.py [--once]
@@ -31,30 +18,24 @@ import logging
 from datetime import datetime
 from typing import Optional
 
-# ─── Config ───────────────────────────────────────────────────────────────────
-
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 LOG_DIR = os.path.join(SCRIPT_DIR, "live_logs")
 os.makedirs(LOG_DIR, exist_ok=True)
 
 LOG_FILE = os.path.join(LOG_DIR, "guardian.log")
-CHECK_INTERVAL = 60       # seconds between health checks
-GRACE_PERIOD = 30         # seconds after restart before checking again
-MAX_RESTARTS_PER_HOUR = 5 # prevent infinite restart loops
+CHECK_INTERVAL = 60
+GRACE_PERIOD = 60
+MAX_RESTARTS_PER_HOUR = 5
 PYTHON_EXE = r"C:\Users\wifik\AppData\Local\Programs\Python\Python311\python.exe"
-PYTHONW_EXE = r"C:\Users\wifik\AppData\Local\Programs\Python\Python311\pythonw.exe"
 
 PROCESSES = {
     "bridge": {
-        "exe": PYTHONW_EXE,
         "script": os.path.join(SCRIPT_DIR, "cerebus_live_bridge.py"),
         "args": ["--symbols", "EURJPY.PRO,EURNZD.PRO,GBPNZD.PRO,EURAUD.PRO,GBPAUD.PRO,GBPCAD.PRO", "--lot-size", "0.01"],
-        "critical": True,  # Alert if this dies
+        "pid_file": os.path.join(LOG_DIR, "bridge.pid"),
+        "critical": True,
     },
-    # st_executor DECOMMISSIONED 2026-06-05
 }
-
-# ─── Logging ──────────────────────────────────────────────────────────────────
 
 logging.basicConfig(
     level=logging.INFO,
@@ -64,34 +45,40 @@ logging.basicConfig(
         logging.StreamHandler(sys.stdout),
     ],
 )
-log = logging.getLogger("guardian")
+log = logging.getLogger("live_guardian")
 
 
-# ─── Helpers ──────────────────────────────────────────────────────────────────
-
-def is_process_alive(script_name: str) -> bool:
-    """Check if a Python process with the given script name is running."""
+def is_pid_alive(pid: int) -> bool:
+    """Check if a process with the given PID is still running."""
     try:
         result = subprocess.run(
             ["powershell", "-Command",
-             f"Get-CimInstance Win32_Process -Filter \"name='python.exe' OR name='pythonw.exe'\" | "
-             f"Where-Object {{ $_.CommandLine -match '{script_name}' }} | "
-             f"Select-Object -ExpandProperty ProcessId"],
-            capture_output=True, text=True, timeout=10
+             f"Get-Process -Id {pid} -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Id"],
+            capture_output=True, text=True, timeout=5
         )
-        return result.stdout.strip() != ""
+        return result.stdout.strip() == str(pid)
     except Exception:
         return False
 
 
-def get_process_pid(script_name: str) -> Optional[int]:
-    """Get PID of a running process by script name."""
+def read_pid_file(pid_file: str) -> Optional[int]:
+    """Read PID from file."""
+    try:
+        with open(pid_file, "r") as f:
+            pid = int(f.read().strip())
+            return pid if pid > 0 else None
+    except Exception:
+        return None
+
+
+def find_process_pid(script_name: str) -> Optional[int]:
+    """Find PID of a Python process running the given script."""
     try:
         result = subprocess.run(
             ["powershell", "-Command",
-             f"Get-CimInstance Win32_Process -Filter \"name='python.exe' OR name='pythonw.exe'\" | "
-             f"Where-Object {{ $_.CommandLine -match '{script_name}' }} | "
-             f"Select-Object -ExpandProperty ProcessId"],
+             f"Get-CimInstance Win32_Process -Filter \"name='python.exe'\" | "
+             f"Where-Object {{ $_.CommandLine -like '*{script_name}*' }} | "
+             f"Select-Object -First 1 -ExpandProperty ProcessId"],
             capture_output=True, text=True, timeout=10
         )
         pid_str = result.stdout.strip()
@@ -100,96 +87,101 @@ def get_process_pid(script_name: str) -> Optional[int]:
         return None
 
 
-def kill_process(script_name: str) -> bool:
-    """Kill a process by script name."""
+def kill_by_pid(pid: int):
+    """Kill a process by PID."""
     try:
         subprocess.run(
-            ["powershell", "-Command",
-             f"Get-CimInstance Win32_Process -Filter \"name='python.exe' OR name='pythonw.exe'\" | "
-             f"Where-Object {{ $_.CommandLine -match '{script_name}' }} | "
-             f"ForEach-Object {{ Stop-Process -Id $_.ProcessId -Force }}"],
-            capture_output=True, text=True, timeout=10
+            ["powershell", "-Command", f"Stop-Process -Id {pid} -Force"],
+            capture_output=True, text=True, timeout=5
         )
-        return True
     except Exception:
-        return False
+        pass
 
 
-def start_process(name: str, cfg: dict) -> bool:
-    """Start a Python script in the background. Returns True if started."""
+def start_process(cfg: dict) -> bool:
+    """Start a Python script in the background."""
     try:
-        cmd = [cfg["exe"], cfg["script"]] + cfg["args"]
-        subprocess.Popen(
+        cmd = [PYTHON_EXE, cfg["script"]] + cfg["args"]
+        proc = subprocess.Popen(
             cmd,
             cwd=SCRIPT_DIR,
             creationflags=subprocess.CREATE_NO_WINDOW,
         )
-        log.info(f"Started {name}: {cfg['script']} {' '.join(cfg['args'])}")
+        log.info(f"Started PID {proc.pid}: {cfg['script']} {' '.join(cfg['args'])}")
         return True
     except Exception as e:
-        log.error(f"Failed to start {name}: {e}")
+        log.error(f"Failed to start: {e}")
         return False
 
 
-def check_mt5_connection() -> bool:
-    """Quick check if MT5 terminal is responsive."""
-    try:
-        result = subprocess.run(
-            [PYTHON_EXE, "-c",
-             "import MetaTrader5 as mt5; "
-             "mt5.initialize(); "
-             "print(mt5.account_info().balance if mt5.account_info() else 'FAIL'); "
-             "mt5.shutdown()"],
-            capture_output=True, text=True, timeout=15,
-            cwd=SCRIPT_DIR
-        )
-        return "FAIL" not in result.stdout and result.stdout.strip() != ""
-    except Exception:
-        return False
+def is_process_alive(script_name: str, pid_file: str) -> bool:
+    """
+    Check if a process is alive using PID file first, then fallback to process scan.
+    """
+    pid = read_pid_file(pid_file)
+    if pid:
+        if is_pid_alive(pid):
+            return True
+        # PID file stale, remove it
+        try:
+            os.remove(pid_file)
+        except Exception:
+            pass
 
+    # Fallback: scan for process by script name
+    pid = find_process_pid(script_name)
+    if pid and is_pid_alive(pid):
+        # Found it, write PID file
+        try:
+            with open(pid_file, "w") as f:
+                f.write(str(pid))
+        except Exception:
+            pass
+        return True
 
-# ─── Main Loop ────────────────────────────────────────────────────────────────
+    return False
+
 
 def main(run_once: bool = False):
     log.info("=" * 60)
-    log.info("CEREBUS GUARDIAN v2 - Starting")
+    log.info("CEREBUS LIVE GUARDIAN v3 — Starting")
     log.info(f"Monitoring: {', '.join(PROCESSES.keys())}")
-    log.info(f"Check interval: {CHECK_INTERVAL}s | Grace period: {GRACE_PERIOD}s")
-    log.info(f"Max restarts/hour per process: {MAX_RESTARTS_PER_HOUR}")
+    log.info(f"Check interval: {CHECK_INTERVAL}s | Grace: {GRACE_PERIOD}s")
     log.info("=" * 60)
 
     last_restart: dict[str, float] = {}
     restart_count: dict[str, int] = {}
     restart_window_start: dict[str, float] = {}
 
-    # Initial check — start anything missing
     for name, cfg in PROCESSES.items():
         script_basename = os.path.basename(cfg["script"])
-        pid = get_process_pid(script_basename)
-        if pid:
-            log.info(f"{name} already running - OK (PID {pid})")
+        alive = is_process_alive(script_basename, cfg["pid_file"])
+        if alive:
+            pid = read_pid_file(cfg["pid_file"]) or find_process_pid(script_basename)
+            log.info(f"{name} already running — OK (PID {pid})")
         else:
-            log.info(f"{name} not running - starting...")
-            start_process(name, cfg)
+            log.info(f"{name} not running — starting...")
+            start_process(cfg)
             last_restart[name] = time.time()
 
     if run_once:
-        # Single check pass, then exit
-        dead = [n for n, c in PROCESSES.items() if not is_process_alive(os.path.basename(c["script"]))]
+        time.sleep(5)
+        dead = []
+        for name, cfg in PROCESSES.items():
+            script_basename = os.path.basename(cfg["script"])
+            if not is_process_alive(script_basename, cfg["pid_file"]):
+                dead.append(name)
         if dead:
-            log.warning(f"Processes not running after start attempt: {dead}")
+            log.warning(f"Processes not running: {dead}")
             sys.exit(1)
-        else:
-            log.info("All processes running.")
-            sys.exit(0)
+        log.info("All processes running.")
+        sys.exit(0)
 
-    # Monitor loop
     while True:
         try:
             time.sleep(CHECK_INTERVAL)
             now = time.time()
 
-            # Reset restart counters every hour
             for name in PROCESSES:
                 if name not in restart_window_start or (now - restart_window_start[name]) > 3600:
                     restart_count[name] = 0
@@ -198,44 +190,31 @@ def main(run_once: bool = False):
             for name, cfg in PROCESSES.items():
                 script_basename = os.path.basename(cfg["script"])
 
-                # Skip if in grace period
                 if name in last_restart and (now - last_restart[name]) < GRACE_PERIOD:
                     continue
 
-                pid = get_process_pid(script_basename)
-                if pid:
-                    log.debug(f"  {name} - alive (PID {pid})")
+                if is_process_alive(script_basename, cfg["pid_file"]):
                     continue
 
                 # Process is dead
                 is_critical = cfg.get("critical", False)
-                level = "CRITICAL" if is_critical else "WARNING"
-                log.warning(f"{level} {name} is DEAD (was PID {pid}) - restarting...")
+                log.warning(f"{'CRITICAL' if is_critical else 'WARNING'} {name} is DEAD — restarting...")
 
-                # Check restart rate limit
                 if restart_count.get(name, 0) >= MAX_RESTARTS_PER_HOUR:
-                    log.error(f"  {name} exceeded {MAX_RESTARTS_PER_HOUR}/hour restarts - SKIPPING. Manual intervention needed.")
+                    log.error(f"{name} exceeded {MAX_RESTARTS_PER_HOUR}/hour restarts — SKIPPING. Manual intervention needed.")
                     if is_critical:
-                        log.error(f"  CRITICAL PROCESS {name} IS DOWN - SEND ALERT TO MAD")
+                        log.error(f"CRITICAL PROCESS {name} IS DOWN")
                     continue
 
-                # Kill any zombie processes first
-                kill_process(script_basename)
-                time.sleep(2)
+                # Kill any stale PID
+                old_pid = read_pid_file(cfg["pid_file"])
+                if old_pid:
+                    kill_by_pid(old_pid)
 
-                if start_process(name, cfg):
+                if start_process(cfg):
                     last_restart[name] = now
                     restart_count[name] = restart_count.get(name, 0) + 1
-                    log.info(f"{name} restarted (attempt {restart_count[name]}/{MAX_RESTARTS_PER_HOUR} this hour)")
-                else:
-                    log.error(f"Failed to restart {name}")
-
-            # Periodic MT5 health check (every 5 cycles)
-            if int(now) % (CHECK_INTERVAL * 5) < CHECK_INTERVAL:
-                if check_mt5_connection():
-                    log.debug("  MT5 connection - OK")
-                else:
-                    log.warning("  MT5 connection - FAIL (terminal may need manual restart)")
+                    log.info(f"{name} restarted (attempt {restart_count[name]}/{MAX_RESTARTS_PER_HOUR})")
 
         except KeyboardInterrupt:
             log.info("Guardian stopped by user")
@@ -247,7 +226,7 @@ def main(run_once: bool = False):
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="Cerebus Guardian v2")
-    parser.add_argument("--once", action="store_true", help="Single check pass, then exit")
+    parser = argparse.ArgumentParser(description="Cerebus Live Guardian v3")
+    parser.add_argument("--once", action="store_true", help="Single check, then exit")
     args = parser.parse_args()
     main(run_once=args.once)

@@ -66,3 +66,23 @@
 ### DSPy Integration
 - Evaluated, ready to implement
 - DSPy pipelines exist in `oce/backend/dspy_*.py`
+
+---
+
+## O2C × MAD LABS Research Mesh (2026-06-06)
+
+### L1.6 — Ingestion Scheduler (COMPLETE)
+- `core/research/ingestion/scheduler.py` — APScheduler with daily cron + manual trigger
+- 6 tests passing
+
+### Research Mesh Integration
+- Vault paths fixed to point to actual Obsidian vault (`C:\Users\wifik\Downloads\o2c\research`)
+- All papers now write directly to Obsidian vault, not workspace staging
+- First autonomous research cycle executed successfully:
+  - 28 papers found via OpenAlex
+  - 5 PINNs-relevant papers distilled
+  - All 5 papers written to Obsidian vault
+
+### Status: ✅ COMPLETE
+- All assigned components built and tested
+- Vault integration verified with live data

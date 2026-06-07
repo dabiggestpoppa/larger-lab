@@ -52,32 +52,39 @@ class OpenRouterGateway:
     # Default provider configurations
     DEFAULT_PROVIDERS: list[dict[str, Any]] = [
         {
+            "name": "nemotron",
+            "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+            "max_context": 1000000,
+            "cost_per_1k_tokens": 0.0,
+            "priority": 1,
+        },
+        {
             "name": "qwen-coder",
             "model": "qwen/qwen-2.5-coder-32b-instruct",
             "max_context": 131072,
             "cost_per_1k_tokens": 0.002,
-            "priority": 1,
+            "priority": 2,
         },
         {
             "name": "ring",
             "model": "inclusionai/ring-2.6-1t",
             "max_context": 131072,
             "cost_per_1k_tokens": 0.0,
-            "priority": 1,
+            "priority": 3,
         },
         {
             "name": "minimax",
             "model": "minimax/minimax-m3",
             "max_context": 131072,
             "cost_per_1k_tokens": 0.0,
-            "priority": 2,
+            "priority": 4,
         },
         {
             "name": "qwen-plus",
             "model": "qwen/qwen-plus",
             "max_context": 131072,
             "cost_per_1k_tokens": 0.004,
-            "priority": 4,
+            "priority": 5,
         },
     ]
 
@@ -119,15 +126,15 @@ class OpenRouterGateway:
         # Task-based selection
         task_preferences: dict[str, list[str]] = {
             "coding": ["qwen-coder", "ring"],
-            "research": ["ring", "qwen-plus"],
-            "architecture": ["ring", "minimax"],
+            "research": ["nemotron", "ring"],
+            "architecture": ["nemotron", "ring"],
             "repair": ["qwen-coder", "ring"],
             "debugging": ["qwen-coder", "ring"],
-            "orchestration": ["ring", "qwen-plus"],
+            "orchestration": ["nemotron", "ring"],
             "visualization": ["qwen-coder", "ring"],
             "automation": ["qwen-coder", "ring"],
-            "system_analysis": ["ring", "minimax"],
-            "general": ["ring", "qwen-plus"],
+            "system_analysis": ["nemotron", "ring"],
+            "general": ["nemotron", "ring"],
         }
 
         preferences = task_preferences.get(task_type, ["deepseek-chat"])
@@ -206,3 +213,46 @@ class OpenRouterGateway:
             },
             "total_requests": sum(self._request_counts.values()),
         }
+
+    async def complete(self, prompt: str, max_tokens: int = 2000, model: str = "nvidia/nemotron-3-ultra-550b-a55b:free") -> str:
+        """
+        Send a completion request to OpenRouter.
+        
+        Args:
+            prompt: The prompt to send
+            max_tokens: Maximum tokens in response
+            model: Model to use (defaults to Nemotron)
+            
+        Returns:
+            Response text from the model
+        """
+        import httpx
+        import os
+        
+        api_key = os.environ.get("OPENROUTER_API_KEY", "")
+        if not api_key:
+            raise RuntimeError("OPENROUTER_API_KEY not set")
+        
+        provider = self.get_provider(model) or self.select_provider(task_type="research")
+        
+        messages = [{"role": "user", "content": prompt}]
+        request = self.build_request(provider, messages, max_tokens=max_tokens)
+        
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://larger-lab.local",
+        }
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"{provider.base_url}/chat/completions",
+                json=request,
+                headers=headers,
+                timeout=120.0,
+            )
+            response.raise_for_status()
+            data = response.json()
+            
+        self.record_request(provider.name, data.get("usage", {}).get("total_tokens", 0))
+        return data["choices"][0]["message"]["content"]
