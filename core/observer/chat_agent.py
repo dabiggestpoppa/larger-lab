@@ -194,7 +194,7 @@ class ChatAgent:
         except Exception as e:
             return f"Error executing {tool_name}: {e}"
 
-    def chat(self, message: str, sovereign_context: str = "", max_tool_rounds: int = 5,
+    def chat(self, message: str, sovereign_context: str = "", max_tool_rounds: int = 36,
              progress_callback=None) -> str:
         """Chat with tool-calling support. LLM can request tool executions.
 
