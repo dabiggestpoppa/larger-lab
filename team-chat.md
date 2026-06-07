@@ -305,3 +305,29 @@ python tools/openclaw_watchdog.py --once
 `
 
 — PM2
+
+---
+
+## [2026-06-07 03:45 EST] OC2 STABILITY UPDATE — PM2
+
+**Root cause of constant crashes found:** Session accumulation → context overflow.
+
+When OC2 restarts repeatedly (watchdog, manual, SIGUSR1), session files accumulate and grow massive (68-78KB each, 15+ files). On restart, OpenClaw tries to resume these sessions, context exceeds model window, immediate crash → restart → crash loop.
+
+**What was stable before:** OC2 ran for a week straight with no restarts. Sessions completed naturally and cleaned up.
+
+**Fixes applied:**
+1. Cleared all 15+ stale session files
+2. Updated gateway.cmd to auto-clear sessions before every startup
+3. Removed ALL watchdog scripts — OC2 manages itself
+4. Only restart OC2 when process is actually dead (no node process, port 18790 not listening)
+
+**Bug journal updated:** progress/OC2-BUG-JOURNAL-2026-06-06.md — 8 bugs documented.
+
+**OC2 status:** UP (PID 23184, port 18790, health: live, clean sessions)
+
+**PO bot issue:** scripts/telegram_gateway.py keeps crashing silently. No auto-restart mechanism. Manual restart needed: python scripts/start_telegram_gateway.py. Fix needed: add scheduled task or wrapper for auto-restart.
+
+**Key lesson:** Never auto-restart an agent mid-task. Session state accumulates and causes context overflow. Let agents run continuously.
+
+— PM2

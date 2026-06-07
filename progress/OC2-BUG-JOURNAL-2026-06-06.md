@@ -1,8 +1,23 @@
-# OC2 Bug Journal — 2026-06-06
+# OC2 Bug Journal — 2026-06-06 to 2026-06-07
 
 > **Key insight from operator:** "OC2 has a lot of little bugs that's just OpenClaw setup. We don't have none of these problems with PO. Which is telling that it's just OpenClaw itself."
 >
 > **Translation:** PO's custom Python gateway (scripts/telegram_gateway.py) is rock solid. OC2's OpenClaw-based gateway is the source of all these issues. The bugs are in OpenClaw, not in our code.
+
+---
+
+## Summary of All Bugs (8 total)
+
+| # | Bug | Status | Impact |
+|---|-----|--------|--------|
+| 1 | Gateway restart loop (Telegram fetch timeout) | OpenClaw issue | High — constant restarts |
+| 2 | Watchdog aggressive restart during startup | FIXED — removed | Medium — was making things worse |
+| 3 | Plugin skill symlink EPERM | Non-fatal | Low — cosmetic only |
+| 4 | Two-file config trap | Documented | Medium — caused 14 failed fix attempts |
+| 5 | sovereign_health_monitor.py truncated | FIXED — stub added | Low — PO needs to restore |
+| 6 | Session recovery stale responses | Documented — no code change | Medium — stale "No further note from me." |
+| 7 | Watchdog clipping OC2 mid-response | FIXED — removed entirely | High — was killing active responses |
+| 8 | Session accumulation → context overflow crash loop | FIXED — auto-cleanup in gateway.cmd | **CRITICAL** — root cause of all crashes |
 
 ---
 
@@ -156,3 +171,26 @@
 - Tracks downtime count and timestamps
 
 **Lesson learned:** Never auto-restart an agent that's mid-task. Just log and alert.
+
+---
+
+## Bug #9: PO Telegram Gateway Crashes Repeatedly (ACTIVE)
+
+**Symptom:** PO's Telegram bot (`scripts/telegram_gateway.py`) keeps crashing. Process dies, PID file goes stale, bot stops responding on Telegram.
+
+**Evidence:**
+- `telegram-gateway.log` last written at 11:41 PM on 2026-06-06 — stopped for hours
+- `telegram-gateway.err.log` is empty (0 bytes) — crashes silently
+- PID file `.telegram_gateway.pid` had stale PID 10468 (dead process)
+- Had to manually restart via `python scripts/start_telegram_gateway.py`
+
+**Root Cause:** Unknown — the gateway process exits silently without error logging. Could be:
+- Unhandled exception in the polling loop
+- Memory leak over long uptime
+- Telegram API connection timeout not being caught
+
+**Impact:** PO bot goes offline until manually restarted. Unlike OC2 (which has scheduled task auto-restart), PO's gateway has no auto-restart mechanism.
+
+**Fix needed:** Add a simple wrapper script or Windows scheduled task to auto-restart PO's gateway when it dies. Or add better error handling and logging to `telegram_gateway.py`.
+
+**Current workaround:** Manually restart with `python scripts/start_telegram_gateway.py` when PO stops responding.
