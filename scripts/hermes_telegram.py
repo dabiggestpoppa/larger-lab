@@ -100,6 +100,11 @@ def send(base_url, chat_id, text, parse_mode="Markdown"):
     if not text:
         return
 
+    # Dedup: skip if same text was already sent to this chat
+    if _is_duplicate(chat_id, text):
+        log(f"DEDUP: skipping duplicate message to chat {chat_id}")
+        return
+
     def _post(text_chunk: str, mode: str | None):
         payload = {"chat_id": chat_id, "text": text_chunk}
         if mode:
@@ -137,14 +142,38 @@ def send(base_url, chat_id, text, parse_mode="Markdown"):
         return True
 
     # Split long messages (Telegram 4096 char limit)
+    sent_ok = True
     while len(text) > 4000:
         idx = text.rfind("\n", 0, 4000)
         if idx == -1:
             idx = 4000
-        _send_chunk(text[:idx])
+        if not _send_chunk(text[:idx]):
+            sent_ok = False
         text = text[idx:]
     if text:
-        _send_chunk(text)
+        if not _send_chunk(text):
+            sent_ok = False
+
+    if sent_ok:
+        _record_sent(chat_id, text)
+
+# ─── Dedup: Track last sent message per chat ────────────────────────────────
+
+_last_sent: Dict[int, str] = {}
+_last_sent_lock = threading.Lock()
+
+def _is_duplicate(chat_id: int, text: str) -> bool:
+    """Check if this exact text was already sent to this chat."""
+    with _last_sent_lock:
+        prev = _last_sent.get(chat_id)
+        if prev and prev.strip() == text.strip():
+            return True
+        return False
+
+def _record_sent(chat_id: int, text: str):
+    """Record that we sent this text to this chat."""
+    with _last_sent_lock:
+        _last_sent[chat_id] = text
 
 def typing(base_url, chat_id):
     try:
