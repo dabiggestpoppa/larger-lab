@@ -1,5 +1,5 @@
 {
-  "start_time": "2026-06-07T18:26:38.092447+00:00",
+  "start_time": "2026-06-07T19:43:21.377278+00:00",
   "steps": [
     {
       "step": "ingestion",
@@ -11,8 +11,9 @@
     {
       "step": "distillation",
       "status": "ok",
-      "distilled": 20,
-      "graph_nodes": 283
+      "distilled": 15,
+      "graph_nodes": 322,
+      "graph_edges": 20572
     },
     {
       "step": "gap_detection",
@@ -23,25 +24,93 @@
     {
       "step": "research_agent",
       "status": "ok",
-      "task_id": "task_24cf547d26a6",
+      "task_id": "task_59f756a79dfa",
       "query": "research in pinns volatility",
-      "findings": 1
+      "findings": 1,
+      "findings_list": [
+        {
+          "title": "Fractional Brownian Motions, Fractional Noises and Applications",
+          "confidence": 0.76,
+          "source": "openalex",
+          "relevance": "Cross-domain bridge: fBm in stochastic PDEs (PINNs) and volatility modeling (finance)"
+        }
+      ]
     },
     {
       "step": "vault_sync",
       "status": "ok",
-      "nodes_added": 444,
-      "edges_added": 20527,
-      "papers_synced": 83,
+      "nodes_added": 504,
+      "edges_added": 20572,
+      "papers_synced": 98,
       "doctrine_synced": 135,
       "errors": []
     },
     {
       "step": "telemetry",
       "status": "ok"
+    },
+    {
+      "step": "pdf_report",
+      "status": "ok",
+      "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\progress\\reports\\research_report_20260607_194340.pdf",
+      "size_kb": 10.0
     }
   ],
   "errors": [],
-  "end_time": "2026-06-07T18:26:54.978602+00:00",
-  "duration_seconds": 16.886155
+  "ingestion": {
+    "step": "ingestion",
+    "status": "ok",
+    "total_papers": 154,
+    "openalex": 133,
+    "arxiv": 20
+  },
+  "distillation": {
+    "step": "distillation",
+    "status": "ok",
+    "distilled": 15,
+    "graph_nodes": 322,
+    "graph_edges": 20572
+  },
+  "gap_detection": {
+    "step": "gap_detection",
+    "status": "ok",
+    "gaps_found": 0,
+    "gaps": []
+  },
+  "research_agent": {
+    "step": "research_agent",
+    "status": "ok",
+    "task_id": "task_59f756a79dfa",
+    "query": "research in pinns volatility",
+    "findings": 1,
+    "findings_list": [
+      {
+        "title": "Fractional Brownian Motions, Fractional Noises and Applications",
+        "confidence": 0.76,
+        "source": "openalex",
+        "relevance": "Cross-domain bridge: fBm in stochastic PDEs (PINNs) and volatility modeling (finance)"
+      }
+    ]
+  },
+  "vault_sync": {
+    "step": "vault_sync",
+    "status": "ok",
+    "nodes_added": 504,
+    "edges_added": 20572,
+    "papers_synced": 98,
+    "doctrine_synced": 135,
+    "errors": []
+  },
+  "telemetry": {
+    "safety": {
+      "llm_cost": 0,
+      "vault_writes": 0,
+      "llm_remaining": 2.0,
+      "vault_remaining": 200,
+      "agents_running": 0,
+      "agents_remaining": 3
+    }
+  },
+  "end_time": "2026-06-07T19:43:40.333572+00:00",
+  "duration_seconds": 18.956294
 }

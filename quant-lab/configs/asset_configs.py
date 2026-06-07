@@ -27,9 +27,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.46,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 20.0, "au": 10.0, "trigger": 12.0},
-            "T2": {"ar_max": 30.0, "au": 12.0, "trigger": 15.0},
-            "T3": {"ar_max": 45.0, "au": 15.0, "trigger": 19.0},
+            "T1": {"ar_max": 60.0, "au": 10.0, "trigger": 12.0},
+            "T2": {"ar_max": 60.0, "au": 12.0, "trigger": 15.0},
+            "T3": {"ar_max": 60.0, "au": 15.0, "trigger": 19.0},
         },
         "gear_shifts": {
             "T1": [(15.0, "T2"), (19.0, "T3")],
@@ -44,9 +44,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.46,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 26.0, "au": 13.0, "trigger": 16.0},
-            "T2": {"ar_max": 39.0, "au": 16.0, "trigger": 19.0},
-            "T3": {"ar_max": 59.0, "au": 20.0, "trigger": 24.0},
+            "T1": {"ar_max": 60.0, "au": 13.0, "trigger": 16.0},
+            "T2": {"ar_max": 60.0, "au": 16.0, "trigger": 19.0},
+            "T3": {"ar_max": 60.0, "au": 20.0, "trigger": 24.0},
         },
         "gear_shifts": {
             "T1": [(19.0, "T2"), (24.0, "T3")],
@@ -61,9 +61,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.46,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 19.0, "au": 11.0, "trigger": 11.0},
-            "T2": {"ar_max": 29.0, "au": 15.0, "trigger": 15.0},
-            "T3": {"ar_max": 50.0, "au": 20.0, "trigger": 20.0},
+            "T1": {"ar_max": 60.0, "au": 11.0, "trigger": 11.0},
+            "T2": {"ar_max": 60.0, "au": 15.0, "trigger": 15.0},
+            "T3": {"ar_max": 60.0, "au": 20.0, "trigger": 20.0},
         },
         "gear_shifts": {
             "T1": [(15.0, "T2"), (20.0, "T3")],
@@ -78,9 +78,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.46,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 32.0, "au": 16.0, "trigger": 19.0},
-            "T2": {"ar_max": 52.0, "au": 26.0, "trigger": 31.0},
-            "T3": {"ar_max": 88.0, "au": 44.0, "trigger": 53.0},
+            "T1": {"ar_max": 60.0, "au": 16.0, "trigger": 19.0},
+            "T2": {"ar_max": 60.0, "au": 26.0, "trigger": 31.0},
+            "T3": {"ar_max": 60.0, "au": 44.0, "trigger": 53.0},
         },
         "gear_shifts": {
             "T1": [(31.0, "T2"), (53.0, "T3")],
@@ -95,9 +95,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.46,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 22.0, "au": 11.0, "trigger": 13.0},
-            "T2": {"ar_max": 33.0, "au": 14.0, "trigger": 17.0},
-            "T3": {"ar_max": 50.0, "au": 18.0, "trigger": 21.0},
+            "T1": {"ar_max": 60.0, "au": 11.0, "trigger": 13.0},
+            "T2": {"ar_max": 60.0, "au": 14.0, "trigger": 17.0},
+            "T3": {"ar_max": 60.0, "au": 18.0, "trigger": 21.0},
         },
         "gear_shifts": {
             "T1": [(17.0, "T2"), (21.0, "T3")],
@@ -112,9 +112,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.46,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 28.0, "au": 14.0, "trigger": 17.0},
-            "T2": {"ar_max": 42.0, "au": 17.0, "trigger": 20.0},
-            "T3": {"ar_max": 64.0, "au": 21.0, "trigger": 25.0},
+            "T1": {"ar_max": 60.0, "au": 14.0, "trigger": 17.0},
+            "T2": {"ar_max": 60.0, "au": 17.0, "trigger": 20.0},
+            "T3": {"ar_max": 60.0, "au": 21.0, "trigger": 25.0},
         },
         "gear_shifts": {
             "T1": [(20.0, "T2"), (25.0, "T3")],
@@ -132,9 +132,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.48,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 28.0, "au": 14.0, "trigger": 17.0},
-            "T2": {"ar_max": 48.0, "au": 24.0, "trigger": 29.0},
-            "T3": {"ar_max": 85.0, "au": 42.0, "trigger": 50.0},
+            "T1": {"ar_max": 60.0, "au": 14.0, "trigger": 17.0},
+            "T2": {"ar_max": 60.0, "au": 24.0, "trigger": 29.0},
+            "T3": {"ar_max": 60.0, "au": 42.0, "trigger": 50.0},
         },
         "gear_shifts": {
             "T1": [(29.0, "T2"), (50.0, "T3")],
@@ -150,9 +150,9 @@ ASSET_CONFIGS = {
         "sl_method": "OCC_PLUS_5P",
         "sl_buffer": 5.0,
         "tiers": {
-            "T1": {"ar_max": 38.0, "au": 19.0, "trigger": 23.0},
-            "T2": {"ar_max": 58.0, "au": 29.0, "trigger": 35.0},
-            "T3": {"ar_max": 95.0, "au": 48.0, "trigger": 58.0},
+            "T1": {"ar_max": 60.0, "au": 19.0, "trigger": 23.0},
+            "T2": {"ar_max": 60.0, "au": 29.0, "trigger": 35.0},
+            "T3": {"ar_max": 60.0, "au": 48.0, "trigger": 58.0},
         },
         "gear_shifts": {
             "T1": [(35.0, "T2"), (58.0, "T3")],
@@ -168,9 +168,9 @@ ASSET_CONFIGS = {
         "sl_method": "OCC_PLUS_8P",
         "sl_buffer": 8.0,
         "tiers": {
-            "T1": {"ar_max": 42.0, "au": 21.0, "trigger": 25.0},
-            "T2": {"ar_max": 64.0, "au": 32.0, "trigger": 38.0},
-            "T3": {"ar_max": 105.0, "au": 52.0, "trigger": 63.0},
+            "T1": {"ar_max": 60.0, "au": 21.0, "trigger": 25.0},
+            "T2": {"ar_max": 60.0, "au": 32.0, "trigger": 38.0},
+            "T3": {"ar_max": 60.0, "au": 52.0, "trigger": 63.0},
         },
         "gear_shifts": {
             "T1": [(38.0, "T2"), (63.0, "T3")],
@@ -186,9 +186,9 @@ ASSET_CONFIGS = {
         "sl_method": "OCC_PLUS_8P",
         "sl_buffer": 8.0,
         "tiers": {
-            "T1": {"ar_max": 48.0, "au": 24.0, "trigger": 29.0},
-            "T2": {"ar_max": 72.0, "au": 36.0, "trigger": 43.0},
-            "T3": {"ar_max": 118.0, "au": 59.0, "trigger": 71.0},
+            "T1": {"ar_max": 60.0, "au": 24.0, "trigger": 29.0},
+            "T2": {"ar_max": 60.0, "au": 36.0, "trigger": 43.0},
+            "T3": {"ar_max": 60.0, "au": 59.0, "trigger": 71.0},
         },
         "gear_shifts": {
             "T1": [(43.0, "T2"), (71.0, "T3")],
@@ -204,9 +204,9 @@ ASSET_CONFIGS = {
         "sl_method": "OCC_PLUS_6P",
         "sl_buffer": 6.0,
         "tiers": {
-            "T1": {"ar_max": 35.0, "au": 18.0, "trigger": 21.0},
-            "T2": {"ar_max": 54.0, "au": 27.0, "trigger": 32.0},
-            "T3": {"ar_max": 88.0, "au": 44.0, "trigger": 53.0},
+            "T1": {"ar_max": 60.0, "au": 18.0, "trigger": 21.0},
+            "T2": {"ar_max": 60.0, "au": 27.0, "trigger": 32.0},
+            "T3": {"ar_max": 60.0, "au": 44.0, "trigger": 53.0},
         },
         "gear_shifts": {
             "T1": [(32.0, "T2"), (53.0, "T3")],
@@ -225,9 +225,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.48,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 20.98, "au": 7, "trigger": 8},
-            "T2": {"ar_max": 40.33, "au": 14, "trigger": 17},
-            "T3": {"ar_max": 40.33, "au": 19, "trigger": 23},
+            "T1": {"ar_max": 60.0, "au": 7, "trigger": 8},
+            "T2": {"ar_max": 60.0, "au": 14, "trigger": 17},
+            "T3": {"ar_max": 60.0, "au": 19, "trigger": 23},
         },
         "gear_shifts": {
             "T1": [(8, "T2"), (17, "T3")],
@@ -242,9 +242,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.48,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 91.57, "au": 29, "trigger": 35},
-            "T2": {"ar_max": 160.35, "au": 63, "trigger": 75},
-            "T3": {"ar_max": 160.35, "au": 63, "trigger": 76},
+            "T1": {"ar_max": 60.0, "au": 29, "trigger": 35},
+            "T2": {"ar_max": 60.0, "au": 63, "trigger": 75},
+            "T3": {"ar_max": 60.0, "au": 63, "trigger": 76},
         },
         "gear_shifts": {
             "T1": [(35, "T2"), (75, "T3")],
@@ -259,9 +259,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.48,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 77.51, "au": 27, "trigger": 32},
-            "T2": {"ar_max": 135.4, "au": 51, "trigger": 61},
-            "T3": {"ar_max": 135.4, "au": 58, "trigger": 69},
+            "T1": {"ar_max": 60.0, "au": 27, "trigger": 32},
+            "T2": {"ar_max": 60.0, "au": 51, "trigger": 61},
+            "T3": {"ar_max": 60.0, "au": 58, "trigger": 69},
         },
         "gear_shifts": {
             "T1": [(32, "T2"), (61, "T3")],
@@ -276,9 +276,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.48,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 77.48, "au": 28, "trigger": 34},
-            "T2": {"ar_max": 143.25, "au": 49, "trigger": 59},
-            "T3": {"ar_max": 143.25, "au": 61, "trigger": 73},
+            "T1": {"ar_max": 60.0, "au": 28, "trigger": 34},
+            "T2": {"ar_max": 60.0, "au": 49, "trigger": 59},
+            "T3": {"ar_max": 60.0, "au": 61, "trigger": 73},
         },
         "gear_shifts": {
             "T1": [(34, "T2"), (59, "T3")],
@@ -293,9 +293,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.48,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 28.55, "au": 9, "trigger": 11},
-            "T2": {"ar_max": 53.15, "au": 19, "trigger": 23},
-            "T3": {"ar_max": 53.15, "au": 22, "trigger": 27},
+            "T1": {"ar_max": 60.0, "au": 9, "trigger": 11},
+            "T2": {"ar_max": 60.0, "au": 19, "trigger": 23},
+            "T3": {"ar_max": 60.0, "au": 22, "trigger": 27},
         },
         "gear_shifts": {
             "T1": [(11, "T2"), (23, "T3")],
@@ -310,9 +310,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.48,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 38.86, "au": 13, "trigger": 16},
-            "T2": {"ar_max": 75.87, "au": 25, "trigger": 31},
-            "T3": {"ar_max": 75.87, "au": 32, "trigger": 38},
+            "T1": {"ar_max": 60.0, "au": 13, "trigger": 16},
+            "T2": {"ar_max": 60.0, "au": 25, "trigger": 31},
+            "T3": {"ar_max": 60.0, "au": 32, "trigger": 38},
         },
         "gear_shifts": {
             "T1": [(16, "T2"), (31, "T3")],
@@ -327,9 +327,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.48,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 31.17, "au": 11, "trigger": 13},
-            "T2": {"ar_max": 56.88, "au": 20, "trigger": 24},
-            "T3": {"ar_max": 56.88, "au": 27, "trigger": 32},
+            "T1": {"ar_max": 60.0, "au": 11, "trigger": 13},
+            "T2": {"ar_max": 60.0, "au": 20, "trigger": 24},
+            "T3": {"ar_max": 60.0, "au": 27, "trigger": 32},
         },
         "gear_shifts": {
             "T1": [(13, "T2"), (24, "T3")],
@@ -344,9 +344,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.48,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 65.94, "au": 21, "trigger": 26},
-            "T2": {"ar_max": 119.73, "au": 45, "trigger": 53},
-            "T3": {"ar_max": 119.73, "au": 49, "trigger": 59},
+            "T1": {"ar_max": 60.0, "au": 21, "trigger": 26},
+            "T2": {"ar_max": 60.0, "au": 45, "trigger": 53},
+            "T3": {"ar_max": 60.0, "au": 49, "trigger": 59},
         },
         "gear_shifts": {
             "T1": [(26, "T2"), (53, "T3")],
@@ -361,9 +361,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.48,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 36.17, "au": 12, "trigger": 14},
-            "T2": {"ar_max": 65.5, "au": 24, "trigger": 29},
-            "T3": {"ar_max": 65.5, "au": 27, "trigger": 33},
+            "T1": {"ar_max": 60.0, "au": 12, "trigger": 14},
+            "T2": {"ar_max": 60.0, "au": 24, "trigger": 29},
+            "T3": {"ar_max": 60.0, "au": 27, "trigger": 33},
         },
         "gear_shifts": {
             "T1": [(14, "T2"), (29, "T3")],
@@ -378,9 +378,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.48,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 28.05, "au": 10, "trigger": 12},
-            "T2": {"ar_max": 55.24, "au": 18, "trigger": 22},
-            "T3": {"ar_max": 55.24, "au": 23, "trigger": 28},
+            "T1": {"ar_max": 60.0, "au": 10, "trigger": 12},
+            "T2": {"ar_max": 60.0, "au": 18, "trigger": 22},
+            "T3": {"ar_max": 60.0, "au": 23, "trigger": 28},
         },
         "gear_shifts": {
             "T1": [(12, "T2"), (22, "T3")],
@@ -395,9 +395,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.48,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 36.92, "au": 13, "trigger": 16},
-            "T2": {"ar_max": 67.8, "au": 24, "trigger": 29},
-            "T3": {"ar_max": 67.8, "au": 28, "trigger": 33},
+            "T1": {"ar_max": 60.0, "au": 13, "trigger": 16},
+            "T2": {"ar_max": 60.0, "au": 24, "trigger": 29},
+            "T3": {"ar_max": 60.0, "au": 28, "trigger": 33},
         },
         "gear_shifts": {
             "T1": [(16, "T2"), (29, "T3")],
@@ -412,9 +412,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.48,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 62.7, "au": 20, "trigger": 24},
-            "T2": {"ar_max": 100.51, "au": 44, "trigger": 53},
-            "T3": {"ar_max": 100.51, "au": 43, "trigger": 51},
+            "T1": {"ar_max": 60.0, "au": 20, "trigger": 24},
+            "T2": {"ar_max": 60.0, "au": 44, "trigger": 53},
+            "T3": {"ar_max": 60.0, "au": 43, "trigger": 51},
         },
         "gear_shifts": {
             "T1": [(24, "T2"), (53, "T3")],
@@ -429,9 +429,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.48,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 27.68, "au": 9, "trigger": 11},
-            "T2": {"ar_max": 49.57, "au": 18, "trigger": 22},
-            "T3": {"ar_max": 49.57, "au": 21, "trigger": 25},
+            "T1": {"ar_max": 60.0, "au": 9, "trigger": 11},
+            "T2": {"ar_max": 60.0, "au": 18, "trigger": 22},
+            "T3": {"ar_max": 60.0, "au": 21, "trigger": 25},
         },
         "gear_shifts": {
             "T1": [(11, "T2"), (22, "T3")],
@@ -446,9 +446,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.48,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 33.79, "au": 12, "trigger": 15},
-            "T2": {"ar_max": 63.21, "au": 22, "trigger": 26},
-            "T3": {"ar_max": 63.21, "au": 27, "trigger": 32},
+            "T1": {"ar_max": 60.0, "au": 12, "trigger": 15},
+            "T2": {"ar_max": 60.0, "au": 22, "trigger": 26},
+            "T3": {"ar_max": 60.0, "au": 27, "trigger": 32},
         },
         "gear_shifts": {
             "T1": [(15, "T2"), (26, "T3")],
@@ -463,9 +463,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.48,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 61.54, "au": 19, "trigger": 23},
-            "T2": {"ar_max": 107.57, "au": 43, "trigger": 51},
-            "T3": {"ar_max": 107.57, "au": 42, "trigger": 50},
+            "T1": {"ar_max": 60.0, "au": 19, "trigger": 23},
+            "T2": {"ar_max": 60.0, "au": 43, "trigger": 51},
+            "T3": {"ar_max": 60.0, "au": 42, "trigger": 50},
         },
         "gear_shifts": {
             "T1": [(23, "T2"), (51, "T3")],
@@ -480,9 +480,9 @@ ASSET_CONFIGS = {
         "k_factor": 0.48,
         "sl_method": "OCC_EXACT",
         "tiers": {
-            "T1": {"ar_max": 21.73, "au": 7, "trigger": 9},
-            "T2": {"ar_max": 41.15, "au": 14, "trigger": 17},
-            "T3": {"ar_max": 41.15, "au": 17, "trigger": 21},
+            "T1": {"ar_max": 60.0, "au": 7, "trigger": 9},
+            "T2": {"ar_max": 60.0, "au": 14, "trigger": 17},
+            "T3": {"ar_max": 60.0, "au": 17, "trigger": 21},
         },
         "gear_shifts": {
             "T1": [(9, "T2"), (17, "T3")],
@@ -498,9 +498,9 @@ ASSET_CONFIGS = {
         "sl_method": "OCC_PLUS_6P",
         "sl_buffer": 6.0,
         "tiers": {
-            "T1": {"ar_max": 59.7, "au": 20, "trigger": 24},
-            "T2": {"ar_max": 104.24, "au": 45, "trigger": 55},
-            "T3": {"ar_max": 104.24, "au": 42, "trigger": 50},
+            "T1": {"ar_max": 60.0, "au": 20, "trigger": 24},
+            "T2": {"ar_max": 60.0, "au": 45, "trigger": 55},
+            "T3": {"ar_max": 60.0, "au": 42, "trigger": 50},
         },
         "gear_shifts": {
             "T1": [(24, "T2"), (55, "T3")],
@@ -519,9 +519,9 @@ ASSET_CONFIGS = {
         "sl_method": "FIXED_BUFFER",
         "sl_buffer": {"T1": 12.0, "T2": 12.0, "T3": 18.0},
         "tiers": {
-            "T1": {"ar_max": 32.0, "au": 16.0, "trigger": 19.0},
-            "T2": {"ar_max": 58.0, "au": 29.0, "trigger": 35.0},
-            "T3": {"ar_max": 95.0, "au": 48.0, "trigger": 58.0},
+            "T1": {"ar_max": 60.0, "au": 16.0, "trigger": 19.0},
+            "T2": {"ar_max": 60.0, "au": 29.0, "trigger": 35.0},
+            "T3": {"ar_max": 60.0, "au": 48.0, "trigger": 58.0},
         },
         "gear_shifts": {
             "T1": [(35.0, "T2"), (58.0, "T3")],
@@ -538,9 +538,9 @@ ASSET_CONFIGS = {
         "sl_method": "FIXED_BUFFER",
         "sl_buffer": {"T1": 0.5, "T2": 0.8, "T3": 1.2},
         "tiers": {
-            "T1": {"ar_max": 50.0, "au": 25.0, "trigger": 30.0},
-            "T2": {"ar_max": 100.0, "au": 35.0, "trigger": 42.0},
-            "T3": {"ar_max": 200.0, "au": 50.0, "trigger": 60.0},
+            "T1": {"ar_max": 60.0, "au": 25.0, "trigger": 30.0},
+            "T2": {"ar_max": 60.0, "au": 35.0, "trigger": 42.0},
+            "T3": {"ar_max": 60.0, "au": 50.0, "trigger": 60.0},
         },
         "gear_shifts": {
             "T1": [(1.9, "T2"), (3.1, "T3")],
@@ -560,9 +560,9 @@ ASSET_CONFIGS = {
         "sl_method": "FIXED_BUFFER",
         "sl_buffer": 25.0,
         "tiers": {
-            "T1": {"ar_max": 750.0, "au": 205.0, "trigger": 246.0},
-            "T2": {"ar_max": 1700.0, "au": 545.0, "trigger": 654.0},
-            "T3": {"ar_max": 3000.0, "au": 1160.0, "trigger": 1392.0},
+            "T1": {"ar_max": 60.0, "au": 205.0, "trigger": 246.0},
+            "T2": {"ar_max": 60.0, "au": 545.0, "trigger": 654.0},
+            "T3": {"ar_max": 60.0, "au": 1160.0, "trigger": 1392.0},
         },
         "gear_shifts": {
             "T1": [(654.0, "T2"), (1392.0, "T3")],
@@ -579,9 +579,9 @@ ASSET_CONFIGS = {
         "sl_method": "FIXED_BUFFER",
         "sl_buffer": 5.0,
         "tiers": {
-            "T1": {"ar_max": 70.0, "au": 35.0, "trigger": 42.0},
-            "T2": {"ar_max": 105.0, "au": 42.0, "trigger": 52.0},
-            "T3": {"ar_max": 160.0, "au": 52.0, "trigger": 65.0},
+            "T1": {"ar_max": 60.0, "au": 35.0, "trigger": 42.0},
+            "T2": {"ar_max": 60.0, "au": 42.0, "trigger": 52.0},
+            "T3": {"ar_max": 60.0, "au": 52.0, "trigger": 65.0},
         },
         "gear_shifts": {
             "T1": [(52.0, "T2"), (65.0, "T3")],
@@ -601,9 +601,9 @@ ASSET_CONFIGS = {
         "sl_method": "FIXED_BUFFER",
         "sl_buffer": 12.0,
         "tiers": {
-            "T1": {"ar_max": 68.0, "au": 34.0, "trigger": 41.0},
-            "T2": {"ar_max": 128.0, "au": 64.0, "trigger": 77.0},
-            "T3": {"ar_max": 245.0, "au": 122.0, "trigger": 146.0},
+            "T1": {"ar_max": 60.0, "au": 34.0, "trigger": 41.0},
+            "T2": {"ar_max": 60.0, "au": 64.0, "trigger": 77.0},
+            "T3": {"ar_max": 60.0, "au": 122.0, "trigger": 146.0},
         },
         "gear_shifts": {
             "T1": [(77.0, "T2"), (146.0, "T3")],
@@ -620,9 +620,9 @@ ASSET_CONFIGS = {
         "sl_method": "FIXED_BUFFER",
         "sl_buffer": 7.0,
         "tiers": {
-            "T1": {"ar_max": 39.0, "au": 19.0, "trigger": 23.0},
-            "T2": {"ar_max": 74.0, "au": 37.0, "trigger": 44.0},
-            "T3": {"ar_max": 142.0, "au": 71.0, "trigger": 85.0},
+            "T1": {"ar_max": 60.0, "au": 19.0, "trigger": 23.0},
+            "T2": {"ar_max": 60.0, "au": 37.0, "trigger": 44.0},
+            "T3": {"ar_max": 60.0, "au": 71.0, "trigger": 85.0},
         },
         "gear_shifts": {
             "T1": [(44.0, "T2"), (85.0, "T3")],
@@ -639,9 +639,9 @@ ASSET_CONFIGS = {
         "sl_method": "FIXED_BUFFER",
         "sl_buffer": 9.0,
         "tiers": {
-            "T1": {"ar_max": 45.0, "au": 22.0, "trigger": 27.0},
-            "T2": {"ar_max": 85.0, "au": 42.0, "trigger": 51.0},
-            "T3": {"ar_max": 160.0, "au": 80.0, "trigger": 96.0},
+            "T1": {"ar_max": 60.0, "au": 22.0, "trigger": 27.0},
+            "T2": {"ar_max": 60.0, "au": 42.0, "trigger": 51.0},
+            "T3": {"ar_max": 60.0, "au": 80.0, "trigger": 96.0},
         },
         "gear_shifts": {
             "T1": [(51.0, "T2"), (96.0, "T3")],
@@ -658,9 +658,9 @@ ASSET_CONFIGS = {
         "sl_method": "FIXED_BUFFER",
         "sl_buffer": 7.0,
         "tiers": {
-            "T1": {"ar_max": 38.0, "au": 19.0, "trigger": 23.0},
-            "T2": {"ar_max": 72.0, "au": 36.0, "trigger": 43.0},
-            "T3": {"ar_max": 135.0, "au": 68.0, "trigger": 82.0},
+            "T1": {"ar_max": 60.0, "au": 19.0, "trigger": 23.0},
+            "T2": {"ar_max": 60.0, "au": 36.0, "trigger": 43.0},
+            "T3": {"ar_max": 60.0, "au": 68.0, "trigger": 82.0},
         },
         "gear_shifts": {
             "T1": [(43.0, "T2"), (82.0, "T3")],
@@ -677,9 +677,9 @@ ASSET_CONFIGS = {
         "sl_method": "FIXED_BUFFER",
         "sl_buffer": 35.0,
         "tiers": {
-            "T1": {"ar_max": 185.0, "au": 92.0, "trigger": 110.0},
-            "T2": {"ar_max": 340.0, "au": 170.0, "trigger": 204.0},
-            "T3": {"ar_max": 650.0, "au": 325.0, "trigger": 390.0},
+            "T1": {"ar_max": 60.0, "au": 92.0, "trigger": 110.0},
+            "T2": {"ar_max": 60.0, "au": 170.0, "trigger": 204.0},
+            "T3": {"ar_max": 60.0, "au": 325.0, "trigger": 390.0},
         },
         "gear_shifts": {
             "T1": [(204.0, "T2"), (390.0, "T3")],
