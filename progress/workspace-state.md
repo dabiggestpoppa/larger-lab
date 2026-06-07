@@ -303,3 +303,12 @@
 - **Fix applied:** Added EXCLUDE_DIRS to po_workspace.py (skips .venv, __pycache__, .git, node_modules, archive, .openclaw, memory-bank)
 - **Commit:** b562f1f1 pushed to origin/master
 - **Status:** Phase 3 ✅ COMPLETE — ready for Phase 4
+
+### 2026-06-07 13:23 UTC — [Copilot] Hermes Gateway Restarted
+
+- **Hermes Gateway:** Restarted on port 8642 (PID 22156)
+- **Health check:** `{"status": "ok", "platform": "hermes-agent"}`
+- **Platforms:** Discord connected, API server listening
+- **Telegram:** Token configured in workspace `.env` but needs `TELEGRAM_BOT_TOKEN` in `~/.hermes/.env` for activation
+- **Mermaid files:** Located in `docs/architecture/ALL_MERMAID_GRAPHS.md` and `docs/plans/CG-*-MERMAID-SPECS.md`
+- **CODEAMP:** No files found in workspace

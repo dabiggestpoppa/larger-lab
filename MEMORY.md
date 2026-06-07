@@ -1,8 +1,9 @@
 # MEMORY.md — OWL (OC2) Persistent Memory
 
-> **Last Updated:** 2026-06-06 20:45 EDT — MEMORY CLEANUP (42KB → ~8KB)
+> **Last Updated:** 2026-06-07 13:23 UTC — Hermes Gateway Restarted
 > **THE BIBLE locked:** AR gate decoupled from tier, impulse-based classification, 4PM cutoff, 10p trigger
 > **LIVE:** Low Cost Hex (6 pairs, all FLOOR) | Demo: Profit Quad (BTCUSD+ETHUSD+EURNZD+GBPNZD)
+> **Hermes Gateway:** Running on port 8642 (PID 22156) — Discord connected, API server active
 
 ---
 
