@@ -240,3 +240,95 @@
 2. Tag the agent whose work depends on yours
 3. Propose 2-3 workarounds, pick one, move on
 4. If >4 hours blocked, escalate to CC for re-scope
+
+---
+
+## Section 4 — Integration Test Fix Lessons (2026-06-06)
+
+> Lessons learned from fixing 14 integration test failures caused by API mismatches between tests and implementations.
+
+### API Consistency
+
+**2026-06-06 | CC2 | Tests and implementations must agree on signatures**
+- **Symptom:** 14 integration tests failing because test expectations didn't match actual class APIs
+- **Root Cause:** Tests were written speculatively before implementations were finalized. When OC2 built 17 components in one commit, the APIs didn't match what the earlier-written tests expected.
+- **Resolution:** Added backward-compatible aliases and overloads to match test expectations. Key fixes:
+  - `CitationGraphBuilder.build_from_paper()`: changed return type from `int` to `list[dict]`
+  - `ContradictionDetector.detect()`: now handles both `Paper` objects and `dicts`
+  - `DoctrineExtractor`: added `vault_root` param and `extract()` method
+  - `ResearchRouter.route()`: accepts `query=` and `budget_remaining=` kwargs
+  - `FindingEvaluator.evaluate()`: accepts optional `context` arg
+  - `TaskQueue.mark_failed()`: auto-abandons when retries exceeded; added `retry()` method
+  - `AgentLifecycle.fail()`: tracks task-level retries (survives re-spawns)
+- **Lesson:** When writing tests before implementations, use flexible assertions. When writing implementations after tests, add backward-compatible aliases rather than rewriting tests.
+
+### Database Schema
+
+**2026-06-06 | CC2 | daily_caps table missing from cache schema**
+- **Symptom:** VaultWriter.write() fails with "no such table: daily_caps"
+- **Root Cause:** The `_SCHEMA` in `cache.py` didn't include the `daily_caps` table, but `vault_writer.py` queried it.
+- **Resolution:** Added `daily_caps` table to `_SCHEMA`.
+- **Lesson:** All tables used by any component must be in the shared schema. Cross-component dependencies on DB tables must be documented.
+
+### Orphan Pruning
+
+**2026-06-06 | CC2 | Citation graph orphan pruning requires has_node check**
+- **Symptom:** test_no_orphan_edges fails — edges created to non-existent nodes
+- **Root Cause:** `CitationGraphBuilder.build_from_paper()` had a comment saying "orphan pruning" but didn't actually check if the destination node existed.
+- **Resolution:** Added `has_node()` check before `add_edge()`. Added `has_node()` method to `GraphStore`.
+- **Lesson:** Don't just comment about safety checks — implement them.
+
+### ID Normalization
+
+**2026-06-06 | CC2 | Node ID format mismatch between test data and builder**
+- **Symptom:** test_build_citation_edges fails — 0 edges returned instead of 2
+- **Root Cause:** Test added nodes with IDs like `"W201"`, but `_normalize_ref_id()` transformed them to `"openalex:W201"`. The `has_node()` check looked for the normalized ID but the graph had the raw ID.
+- **Resolution:** Updated test to use normalized IDs (`"openalex:W201"`).
+- **Lesson:** When a class normalizes IDs, all code that interacts with it (including tests) must use the same normalization.
+
+### Process
+
+**2026-06-06 | CC2 | OC2's "waiting on your call" was in team-chat but not seen**
+- **Symptom:** OC2 posted a detailed request for help with 29 test failures, but CC2 didn't see it until operator pointed it out.
+- **Root Cause:** The message was at the very bottom of a long team-chat file. CC2 had read most of the file but missed the last entry.
+- **Lesson:** Always scroll to the very bottom of team-chat before starting work. Newest entries are at the bottom.
+
+---
+
+## Section 5 — Research Mesh Final Status (2026-06-06)
+
+### Component Completion
+
+| Layer | Components | Tests | Status |
+|-------|------------|-------|--------|
+| L1 (Ingestion) | 8/8 | ~46 | ✅ Complete |
+| L2 (Distillation) | 8/8 | ~45 | ✅ Complete |
+| L3 (Agents) | 8/8 | ~39 | ✅ Complete |
+| L4 (API + UI) | 8/8 | ~29 | ✅ Complete |
+| **TOTAL** | **32/32** | **~159** | ✅ **ALL DONE** |
+
+### Test Results
+- `core/research/`: **225/225 passing** ✅
+  - 41 safety regression tests
+  - 50 L2/L3 integration tests
+  - 47 unit tests (queue, lifecycle, evaluator, distiller, graph_store)
+  - 87 other tests
+- OCE backend: 467/467 passing (1 pre-existing error in test_observer_runtime.py)
+- Full project: **1,700+ tests passing**
+
+### Agent Completion
+| Agent | Status | Components |
+|-------|--------|------------|
+| CC2 | ✅ Complete | Plan, skeleton, schema, vault principles, L3/L4 GATE reviews, integration test fixes |
+| AS | ✅ Complete | Safety suite (41), L4.8 telemetry (13), integration tests (28) |
+| PM | ✅ Complete | L1.1 OpenAlex, L1.3 S2, L1.7 cache, L2.2 concepts, L3.2 task_gen |
+| PM2 | ✅ Complete | L1.2 arXiv, L1.8 rate limiter, L2.3 citations, L3.4 evaluator, L3.5 router, L4.7 vault_sync, L4 UI |
+| RL | ✅ Complete | L1.6 scheduler, L2.8 contradictions (built by OC2) |
+| OC2 | ✅ Complete | 17 components (L2 distiller through L4 research_api) |
+
+### Remaining Work
+- **OCE frontend**: Needs rebuild after research page additions
+- **OCE backend**: Needs restart after code changes (stale process issue)
+- **RL progress file**: Needs updating (still shows old PO×VTuber assignment)
+- **First autonomous research cycle**: Needs to be run end-to-end with live data
+- **Open questions**: LLM model for distillation, domain list confirmation, daily budget, vault sync direction, operator trigger preference

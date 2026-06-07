@@ -113,7 +113,7 @@ class OpenAlexClient:
 
         return Paper(
             id=work.get("id", "").replace("https://openalex.org/", ""),
-            doi=work.get("doi", "").replace("https://doi.org/", ""),
+            doi=(work.get("doi") or "").replace("https://doi.org/", ""),
             title=work.get("display_name", ""),
             abstract=abstract,
             year=publication_year,
@@ -150,6 +150,28 @@ class OpenAlexClient:
                 words[pos] = word
         
         return " ".join(words)
+
+    async def search(
+        self,
+        query: str,
+        per_page: int = DEFAULT_PER_PAGE,
+        cursor: Optional[str] = None
+    ) -> List[Paper]:
+        """
+        General search by query string.
+        
+        Returns: List of Paper objects
+        """
+        params = {
+            "search": query,
+            "per_page": per_page,
+            "sort": "cited_by_count:desc",
+        }
+        if cursor:
+            params["cursor"] = cursor
+        data = await self._get(f"{self.BASE_URL}/works", params=params)
+        papers = [self._parse_paper(work) for work in data.get("results", [])]
+        return papers
 
     async def search_by_domain(
         self, 
