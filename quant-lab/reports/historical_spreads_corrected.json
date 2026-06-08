@@ -1,0 +1,182 @@
+{
+  "AUDCAD": {
+    "raw_points": 11.16647681100534,
+    "pips": 1.1166,
+    "file": "AUDCAD_PRO_M5.csv",
+    "has_spread_col": true
+  },
+  "AUDCHF": {
+    "raw_points": 9.863135524538496,
+    "pips": 0.9863,
+    "file": "AUDCHF_PRO_M5.csv",
+    "has_spread_col": true
+  },
+  "AUDJPY": {
+    "raw_points": 7.577351864203749,
+    "pips": 7.5774,
+    "file": "AUDJPY_PRO_M5.csv",
+    "has_spread_col": true
+  },
+  "AUDNZD": {
+    "raw_points": 11.34269282326996,
+    "pips": 1.1343,
+    "file": "AUDNZD_PRO_M5.csv",
+    "has_spread_col": true
+  },
+  "AUDUSD": {
+    "raw_points": 0.0003392018461696919,
+    "pips": 0.0,
+    "file": "AUDUSD_M5.csv",
+    "has_spread_col": false
+  },
+  "BTCUSD": {
+    "raw_points": 108.19170312266999,
+    "pips": 108.1917,
+    "file": "BTCUSD_M5.csv",
+    "has_spread_col": false
+  },
+  "CADCHF": {
+    "raw_points": 8.37008492140643,
+    "pips": 0.837,
+    "file": "CADCHF_PRO_M5.csv",
+    "has_spread_col": true
+  },
+  "CADJPY": {
+    "raw_points": 8.338833239748539,
+    "pips": 8.3388,
+    "file": "CADJPY_PRO_M5.csv",
+    "has_spread_col": true
+  },
+  "CHFJPY": {
+    "raw_points": 0.07508962600372465,
+    "pips": 0.0751,
+    "file": "CHFJPY_M5.csv",
+    "has_spread_col": false
+  },
+  "ETHUSD": {
+    "raw_points": 6.450072547007393,
+    "pips": 6.4501,
+    "file": "ETHUSD_M5.csv",
+    "has_spread_col": false
+  },
+  "EURAUD": {
+    "raw_points": 10.448774927840462,
+    "pips": 1.0449,
+    "file": "EURAUD_PRO_M5.csv",
+    "has_spread_col": true
+  },
+  "EURCAD": {
+    "raw_points": 8.768824563425738,
+    "pips": 0.8769,
+    "file": "EURCAD_PRO_M5.csv",
+    "has_spread_col": true
+  },
+  "EURCHF": {
+    "raw_points": 8.537847385684705,
+    "pips": 0.8538,
+    "file": "EURCHF_PRO_M5.csv",
+    "has_spread_col": true
+  },
+  "EURGBP": {
+    "raw_points": 4.606078020705626,
+    "pips": 0.4606,
+    "file": "EURGBP_PRO_M5.csv",
+    "has_spread_col": true
+  },
+  "EURJPY": {
+    "raw_points": 8.865842387680877,
+    "pips": 8.8658,
+    "file": "EURJPY_PRO_M5.csv",
+    "has_spread_col": true
+  },
+  "EURNZD": {
+    "raw_points": 19.313897815963795,
+    "pips": 1.9314,
+    "file": "EURNZD_PRO_M5.csv",
+    "has_spread_col": true
+  },
+  "EURUSD": {
+    "raw_points": 0.00038464188576617023,
+    "pips": 0.0,
+    "file": "EURUSD_M5.csv",
+    "has_spread_col": false
+  },
+  "GBPAUD": {
+    "raw_points": 0.000797993498284468,
+    "pips": 0.0001,
+    "file": "GBPAUD_M5.csv",
+    "has_spread_col": false
+  },
+  "GBPCAD": {
+    "raw_points": 13.966895051188391,
+    "pips": 1.3967,
+    "file": "GBPCAD_PRO_M5.csv",
+    "has_spread_col": true
+  },
+  "GBPCHF": {
+    "raw_points": 0.0004248438460371541,
+    "pips": 0.0,
+    "file": "GBPCHF_M5.csv",
+    "has_spread_col": false
+  },
+  "GBPJPY": {
+    "raw_points": 0.09115663046698619,
+    "pips": 0.0912,
+    "file": "GBPJPY_M5.csv",
+    "has_spread_col": false
+  },
+  "GBPNZD": {
+    "raw_points": 0.0008882784446276218,
+    "pips": 0.0001,
+    "file": "GBPNZD_M5.csv",
+    "has_spread_col": false
+  },
+  "GBPUSD": {
+    "raw_points": 0.0005020661763909233,
+    "pips": 0.0001,
+    "file": "GBPUSD_M5.csv",
+    "has_spread_col": false
+  },
+  "NZDCAD": {
+    "raw_points": 11.576892582475008,
+    "pips": 1.1577,
+    "file": "NZDCAD_PRO_M5.csv",
+    "has_spread_col": true
+  },
+  "NZDCHF": {
+    "raw_points": 11.031197183352372,
+    "pips": 1.1031,
+    "file": "NZDCHF_PRO_M5.csv",
+    "has_spread_col": true
+  },
+  "NZDJPY": {
+    "raw_points": 11.443746375062592,
+    "pips": 11.4437,
+    "file": "NZDJPY_PRO_M5.csv",
+    "has_spread_col": true
+  },
+  "NZDUSD": {
+    "raw_points": 0.0003169347523122774,
+    "pips": 0.0,
+    "file": "NZDUSD_M5.csv",
+    "has_spread_col": false
+  },
+  "USDCAD": {
+    "raw_points": 6.784817859997716,
+    "pips": 0.6785,
+    "file": "USDCAD_PRO_M5.csv",
+    "has_spread_col": true
+  },
+  "USDCHF": {
+    "raw_points": 0.00034953674410533725,
+    "pips": 0.0,
+    "file": "USDCHF_M5.csv",
+    "has_spread_col": false
+  },
+  "USDJPY": {
+    "raw_points": 0.06656645310032813,
+    "pips": 0.0666,
+    "file": "USDJPY_M5.csv",
+    "has_spread_col": false
+  }
+}

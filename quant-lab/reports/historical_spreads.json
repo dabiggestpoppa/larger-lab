@@ -1,0 +1,104 @@
+{
+  "USDCAD": {
+    "avg_spread": 6.784817859997716,
+    "samples": 175140,
+    "source": "spread_col",
+    "file": "USDCAD_PRO_M5.csv"
+  },
+  "EURGBP": {
+    "avg_spread": 4.606078020705626,
+    "samples": 234912,
+    "source": "spread_col",
+    "file": "EURGBP_PRO_M5.csv"
+  },
+  "EURJPY": {
+    "avg_spread": 8.865842387680877,
+    "samples": 217483,
+    "source": "spread_col",
+    "file": "EURJPY_PRO_M5.csv"
+  },
+  "EURCHF": {
+    "avg_spread": 8.537847385684705,
+    "samples": 261273,
+    "source": "spread_col",
+    "file": "EURCHF_PRO_M5.csv"
+  },
+  "AUDJPY": {
+    "avg_spread": 7.577351864203749,
+    "samples": 220389,
+    "source": "spread_col",
+    "file": "AUDJPY_PRO_M5.csv"
+  },
+  "NZDJPY": {
+    "avg_spread": 11.443746375062592,
+    "samples": 277591,
+    "source": "spread_col",
+    "file": "NZDJPY_PRO_M5.csv"
+  },
+  "AUDNZD": {
+    "avg_spread": 11.34269282326996,
+    "samples": 277508,
+    "source": "spread_col",
+    "file": "AUDNZD_PRO_M5.csv"
+  },
+  "AUDCAD": {
+    "avg_spread": 11.16647681100534,
+    "samples": 275648,
+    "source": "spread_col",
+    "file": "AUDCAD_PRO_M5.csv"
+  },
+  "AUDCHF": {
+    "avg_spread": 9.863135524538496,
+    "samples": 277625,
+    "source": "spread_col",
+    "file": "AUDCHF_PRO_M5.csv"
+  },
+  "CADJPY": {
+    "avg_spread": 8.338833239748539,
+    "samples": 254671,
+    "source": "spread_col",
+    "file": "CADJPY_PRO_M5.csv"
+  },
+  "CADCHF": {
+    "avg_spread": 8.37008492140643,
+    "samples": 272605,
+    "source": "spread_col",
+    "file": "CADCHF_PRO_M5.csv"
+  },
+  "EURNZD": {
+    "avg_spread": 19.313897815963795,
+    "samples": 259199,
+    "source": "spread_col",
+    "file": "EURNZD_PRO_M5.csv"
+  },
+  "EURAUD": {
+    "avg_spread": 10.448774927840462,
+    "samples": 243904,
+    "source": "spread_col",
+    "file": "EURAUD_PRO_M5.csv"
+  },
+  "EURCAD": {
+    "avg_spread": 8.768824563425738,
+    "samples": 277616,
+    "source": "spread_col",
+    "file": "EURCAD_PRO_M5.csv"
+  },
+  "GBPCAD": {
+    "avg_spread": 13.966895051188391,
+    "samples": 277602,
+    "source": "spread_col",
+    "file": "GBPCAD_PRO_M5.csv"
+  },
+  "NZDCAD": {
+    "avg_spread": 11.576892582475008,
+    "samples": 277478,
+    "source": "spread_col",
+    "file": "NZDCAD_PRO_M5.csv"
+  },
+  "NZDCHF": {
+    "avg_spread": 11.031197183352372,
+    "samples": 277493,
+    "source": "spread_col",
+    "file": "NZDCHF_PRO_M5.csv"
+  }
+}

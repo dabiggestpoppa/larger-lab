@@ -582,7 +582,15 @@ def run_live(symbols: list, lot_size: float = 0.01):
             log.info("[%s] Session INIT: AR=%.1f pips | tier=%s",
                      sym, ar_pips, st_engines[sym].tier_name)
         else:
-            log.warning("[%s] Cannot calculate Asian Range", sym)
+            # Fallback: AR unavailable (weekend/session gap) — use T1 defaults
+            # Set a small synthetic AR (10 pips) so session initializes as T1
+            # This is safe: AR gate is a filter, not a signal. Missing AR = allow T1.
+            last_close = bars[-1]["close"]
+            pip = pip_size(sym)
+            st_engines[sym].initialize_session(last_close + 10 * pip, last_close - 10 * pip)
+            if HAS_P90:
+                p90_engines[sym].initialize_session(last_close + 10 * pip, last_close - 10 * pip)
+            log.warning("[%s] Asian Range unavailable — defaulting to T1 (synthetic AR=10p)", sym)
 
     scan_count = 0
     signal_count = 0

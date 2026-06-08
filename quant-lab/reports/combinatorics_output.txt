@@ -1,0 +1,114 @@
+﻿Loading data...
+Total pairs: 36
+
+==============================================================================================================
+ALL PAIRS RANKED BY NET PROFIT (best config per pair)
+==============================================================================================================
+  # Pair       Type     Mode        Trades    WR%     PF   Tr/d         Net$  Cost%
+--------------------------------------------------------------------------------------------------------------
+  1 BTCUSD     CRYPTO   FLOOR         4203   75.2    8.1   2.61 $   8181.15    5.8
+  2 EURNZD     FOREX    FLOOR         5403   79.4   11.9   0.00 $   5727.02   11.7
+  3 GBPNZD     FOREX    FLOOR         5327   79.2   11.4   0.00 $   5608.49   11.7
+  4 GBPCAD     FOREX    FLOOR         6140   80.0   10.9   0.00 $   4889.27   13.1
+  5 GBPUSD     FOREX    FLOOR         7622   80.8   11.3   0.00 $   4776.20   13.8
+  6 CHFJPY     FOREX    FLOOR        11106   80.8   10.0   0.00 $   4558.98   22.6
+  7 GBPJPY     FOREX    FLOOR         6265   80.5   11.3   0.00 $   4400.76   14.6
+  8 GBPAUD     FOREX    FLOOR         4520   80.8   10.6   0.00 $   4239.69   11.3
+  9 EURCAD     FOREX    FLOOR         6869   80.7   11.1   0.00 $   4090.14   16.8
+ 10 USDCAD     FOREX    FLOOR         6090   80.9   11.6   0.00 $   3574.18   14.6
+ 11 USDJPY     FOREX    FLOOR         7177   80.4   10.5   0.00 $   3547.99   16.8
+ 12 EURAUD     FOREX    FLOOR         3080   80.7   12.3   0.00 $   3157.79   10.5
+ 13 EURUSD     FOREX    FLOOR         5593   82.9   12.5   4.17 $   2894.68   13.4
+ 14 USDCHF     FOREX    FLOOR         5847   80.3   11.0   0.00 $   2638.73   18.1
+ 15 NZDCAD     FOREX    FLOOR         6232   78.9   11.3   0.00 $   2584.32   22.4
+ 16 CADJPY     FOREX    FLOOR         7690   80.2   11.5   0.00 $   2565.75   26.5
+ 17 GBPCHF     FOREX    FLOOR         4454   80.4   10.6   0.00 $   2459.87   17.8
+ 18 AUDNZD     FOREX    FLOOR         5446   80.4   14.5   0.00 $   2426.26   21.2
+ 19 NZDJPY     FOREX    FLOOR         8141   79.3   10.6   0.00 $   2419.31   28.8
+ 20 AUDJPY     FOREX    FLOOR         5628   78.5   10.5   0.00 $   2414.36   21.9
+ 21 EURCHF     FOREX    FLOOR         6168   81.0   12.0   0.00 $   2300.05   21.1
+ 22 AUDCAD     FOREX    FLOOR         5184   80.2   11.5   0.00 $   2292.56   21.3
+ 23 AUDUSD     FOREX    FLOOR         5726   80.0   11.8   0.00 $   2266.61   20.2
+ 24 NZDUSD     FOREX    FLOOR         5941   80.3   11.6   0.00 $   2096.16   22.1
+ 25 AUDCHF     FOREX    FLOOR         6294   77.9   10.5   0.00 $   1846.44   29.0
+ 26 CADCHF     FOREX    FLOOR         6310   78.2   10.7   0.00 $   1793.92   29.7
+ 27 NZDCHF     FOREX    FLOOR         5761   79.2   11.7   0.00 $   1648.36   32.9
+ 28 EURGBP     FOREX    FLOOR         4323   84.3   14.8   1.39 $   1342.95   24.4
+ 29 EURJPY     FOREX    FLOOR         1070   88.1   18.0   0.35 $   1053.71   10.9
+ 30 DE30       INDEX    FLOOR         3873   84.3   10.8   2.41 $    413.77    4.5
+ 31 FR40       INDEX    FLOOR         5257   84.6   10.5   3.27 $    255.77    9.3
+ 32 HK50       INDEX    FLOOR          730   81.6    9.7   0.45 $    249.58    1.4
+ 33 US500      INDEX    FLOOR         4595   83.4   12.3   2.86 $    169.76   11.9
+ 34 XAUUSD     METAL    FLOOR         2337   84.9   11.8   1.46 $    145.64   57.7
+ 35 ETHUSD     CRYPTO   CEILING       1730   92.5   34.6   1.07 $    114.70   64.4
+ 36 XAGUSD     METAL    FLOOR         5111   84.1   12.8   3.18 $   -180.14  170.8
+
+==============================================================================================================
+CATEGORIES
+==============================================================================================================
+
+--- MAX PROFIT (net > $3,000) (12 pairs) ---
+  BTCUSD     CRYPTO   Net: $   8181.15 | WR:  75.2% | PF:   8.1 | Cost:   5.8%
+  EURNZD     FOREX    Net: $   5727.02 | WR:  79.4% | PF:  11.9 | Cost:  11.7%
+  GBPNZD     FOREX    Net: $   5608.49 | WR:  79.2% | PF:  11.4 | Cost:  11.7%
+  GBPCAD     FOREX    Net: $   4889.27 | WR:  80.0% | PF:  10.9 | Cost:  13.1%
+  GBPUSD     FOREX    Net: $   4776.20 | WR:  80.8% | PF:  11.3 | Cost:  13.8%
+  CHFJPY     FOREX    Net: $   4558.98 | WR:  80.8% | PF:  10.0 | Cost:  22.6%
+  GBPJPY     FOREX    Net: $   4400.76 | WR:  80.5% | PF:  11.3 | Cost:  14.6%
+  GBPAUD     FOREX    Net: $   4239.69 | WR:  80.8% | PF:  10.6 | Cost:  11.3%
+  EURCAD     FOREX    Net: $   4090.14 | WR:  80.7% | PF:  11.1 | Cost:  16.8%
+  USDCAD     FOREX    Net: $   3574.18 | WR:  80.9% | PF:  11.6 | Cost:  14.6%
+  USDJPY     FOREX    Net: $   3547.99 | WR:  80.4% | PF:  10.5 | Cost:  16.8%
+  EURAUD     FOREX    Net: $   3157.79 | WR:  80.7% | PF:  12.3 | Cost:  10.5%
+
+--- LOW COST (cost% < 10%) (4 pairs) ---
+  BTCUSD     CRYPTO   Net: $   8181.15 | WR:  75.2% | PF:   8.1 | Cost:   5.8%
+  DE30       INDEX    Net: $    413.77 | WR:  84.3% | PF:  10.8 | Cost:   4.5%
+  FR40       INDEX    Net: $    255.77 | WR:  84.6% | PF:  10.5 | Cost:   9.3%
+  HK50       INDEX    Net: $    249.58 | WR:  81.6% | PF:   9.7 | Cost:   1.4%
+
+--- HIGH ACCURACY (WR > 85%) (2 pairs) ---
+  EURJPY     FOREX    Net: $   1053.71 | WR:  88.1% | PF:  18.0 | Cost:  10.9%
+  ETHUSD     CRYPTO   Net: $    114.70 | WR:  92.5% | PF:  34.6 | Cost:  64.4%
+
+--- HIGH FREQUENCY (tr/d > 1.0) (9 pairs) ---
+  BTCUSD     CRYPTO   Net: $   8181.15 | WR:  75.2% | PF:   8.1 | Cost:   5.8%
+  EURUSD     FOREX    Net: $   2894.68 | WR:  82.9% | PF:  12.5 | Cost:  13.4%
+  EURGBP     FOREX    Net: $   1342.95 | WR:  84.3% | PF:  14.8 | Cost:  24.4%
+  DE30       INDEX    Net: $    413.77 | WR:  84.3% | PF:  10.8 | Cost:   4.5%
+  FR40       INDEX    Net: $    255.77 | WR:  84.6% | PF:  10.5 | Cost:   9.3%
+  US500      INDEX    Net: $    169.76 | WR:  83.4% | PF:  12.3 | Cost:  11.9%
+  XAUUSD     METAL    Net: $    145.64 | WR:  84.9% | PF:  11.8 | Cost:  57.7%
+  ETHUSD     CRYPTO   Net: $    114.70 | WR:  92.5% | PF:  34.6 | Cost:  64.4%
+  XAGUSD     METAL    Net: $   -180.14 | WR:  84.1% | PF:  12.8 | Cost: 170.8%
+
+--- AVOID (cost% > 25%) (8 pairs) ---
+  CADJPY     FOREX    Net: $   2565.75 | WR:  80.2% | PF:  11.5 | Cost:  26.5%
+  NZDJPY     FOREX    Net: $   2419.31 | WR:  79.3% | PF:  10.6 | Cost:  28.8%
+  AUDCHF     FOREX    Net: $   1846.44 | WR:  77.9% | PF:  10.5 | Cost:  29.0%
+  CADCHF     FOREX    Net: $   1793.92 | WR:  78.2% | PF:  10.7 | Cost:  29.7%
+  NZDCHF     FOREX    Net: $   1648.36 | WR:  79.2% | PF:  11.7 | Cost:  32.9%
+  XAUUSD     METAL    Net: $    145.64 | WR:  84.9% | PF:  11.8 | Cost:  57.7%
+  ETHUSD     CRYPTO   Net: $    114.70 | WR:  92.5% | PF:  34.6 | Cost:  64.4%
+  XAGUSD     METAL    Net: $   -180.14 | WR:  84.1% | PF:  12.8 | Cost: 170.8%
+
+==============================================================================================================
+OPTIMAL BASKETS (2-14 assets)
+==============================================================================================================
+Assets         Net$  Avg WR%   Trades Pairs
+--------------------------------------------------------------------------------------------------------------
+     2 $  13908.17     77.3     9606 BTCUSD, EURNZD
+     3 $  19516.66     77.9    14933 BTCUSD, EURNZD, GBPNZD
+     4 $  24405.93     78.4    21073 BTCUSD, EURNZD, GBPNZD, GBPCAD
+     5 $  29182.13     78.9    28695 BTCUSD, EURNZD, GBPNZD, GBPCAD, GBPUSD
+     6 $  33741.10     79.2    39801 BTCUSD, EURNZD, GBPNZD, GBPCAD, GBPUSD, CHFJPY
+     7 $  38141.86     79.4    46066 BTCUSD, EURNZD, GBPNZD, GBPCAD, GBPUSD, CHFJPY, GBPJPY
+     8 $  42381.55     79.6    50586 BTCUSD, EURNZD, GBPNZD, GBPCAD, GBPUSD, CHFJPY, GBPJPY, GBPAUD
+     9 $  46471.69     79.7    57455 BTCUSD, EURNZD, GBPNZD, GBPCAD, GBPUSD, CHFJPY, GBPJPY, GBPAUD, EURCAD
+    10 $  50045.87     79.8    63545 BTCUSD, EURNZD, GBPNZD, GBPCAD, GBPUSD, CHFJPY, GBPJPY, GBPAUD, EURCAD, USDCAD
+    11 $  53593.87     79.9    70722 BTCUSD, EURNZD, GBPNZD, GBPCAD, GBPUSD, CHFJPY, GBPJPY, GBPAUD, EURCAD, USDCAD, USDJPY
+    12 $  56751.66     79.9    73802 BTCUSD, EURNZD, GBPNZD, GBPCAD, GBPUSD, CHFJPY, GBPJPY, GBPAUD, EURCAD, USDCAD, USDJPY, EURAUD
+    13 $  59646.34     80.2    79395 BTCUSD, EURNZD, GBPNZD, GBPCAD, GBPUSD, CHFJPY, GBPJPY, GBPAUD, EURCAD, USDCAD, USDJPY, EURAUD, EURUSD
+    14 $  62285.07     80.2    85242 BTCUSD, EURNZD, GBPNZD, GBPCAD, GBPUSD, CHFJPY, GBPJPY, GBPAUD, EURCAD, USDCAD, USDJPY, EURAUD, EURUSD, USDCHF
+
+Saved to: C:\Users\wifik\Desktop\projects\larger-lab\quant-lab\reports\combinatorics_final.json

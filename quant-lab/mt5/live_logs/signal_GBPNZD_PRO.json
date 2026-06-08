@@ -1,10 +1,10 @@
 {
   "engine": "SymmetryTrap",
-  "symbol": "EURJPY.PRO",
+  "symbol": "GBPNZD.PRO",
   "direction": "BUY",
-  "entry": 91.778,
-  "sl": 184.776,
-  "tp": 92.018,
+  "entry": 1.06203,
+  "sl": 2.29982,
+  "tp": 1.06423,
   "event": "SL_HIT",
   "loop": 1,
   "time": "2026-06-07 21:23:00"
