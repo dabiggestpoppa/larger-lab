@@ -4,7 +4,30 @@
 > **Current focus:** O2C × MAD LABS Sovereign Research Mesh — Phases L1→L4
 > **Plan:** `docs/plans/O2C-RESEARCH-MESH.md`
 > **Tasks:** `progress/O2C-RESEARCH-MESH-TASKS.md`
-> **Last Updated:** 2026-06-08 (PO bridge fixes, predecessor data ingested, quant lab focus)
+> **Last Updated:** 2026-06-08 (Quant analysis complete — 9K config, Monte Carlo, forward test plan)
+>
+> ## 📊 Quant Analysis Complete (June 8)
+>
+> ### 9K Unlock Config Tested on All 36 Assets
+> - **Total trades:** 212,978 across 36 pairs
+> - **Config:** ar_max=999, per-asset trigger coefficients, 4PM cutoff, flat DZ
+> - **Results:** `quant-lab/reports/run_9k_config_results.json`
+> - **PDF:** `quant-lab/reports/CEREBUS_9K_CONFIG_REPORT.pdf`
+>
+> ### Best Quad Basket (Cost-Adjusted, Max Profits)
+> - **AUDNZD + EURGBP + EURCHF + AUDUSD**
+> - 111,374p PnL, 24,674 trades, 83.8% WR, avg PF 11.57
+>
+> ### Monte Carlo: $65 → $20K in 90-120 Days
+> - Top 8 pairs, 120 days, 1% risk: P50 = $21,682 | Hit rate = 99.6%
+> - All 36 pairs, 120 days: P50 = $57,635 | Hit rate = 100%
+> - **Position sizing path:** 0.01→0.02→0.05→0.10 lot at $200/$1K/$5K milestones
+>
+> ### Forward Test Plan
+> - Set up MT5 demo broker with same engine
+> - Test Best Quad config for 7-14 days
+> - Compare live results vs backtest
+> - **Quant Journal:** `quant-lab/QUANT_JOURNAL.md` (active tasks & results)
 
 ---
 
