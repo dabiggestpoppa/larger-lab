@@ -160,6 +160,84 @@ The gateway's agent task submission has a timeout that's too short for long mess
 
 ---
 
+## Issue #5: Agent Timeout Regression (CRITICAL)
+
+### Symptoms
+- `AGENT TIMEOUT` errors on messages that previously worked
+- Agent responses taking 2+ minutes then timing out
+- Thread leaks from cancelled futures
+
+### Root Cause
+The agent timeout was **reduced from 180s to 60s** by another agent's commit. The LLM call (`_call_llm`) has `timeout=120s`, and multi-round tool-calling loops can take 60-120s. With only 60s, the gateway kills the agent before the LLM can respond.
+
+Additionally, on timeout the future was not cancelled, causing thread leaks.
+
+### Fix
+- Restored agent timeout to **180s** (must be >= LLM timeout + tool overhead)
+- Added `future.cancel()` on timeout to prevent thread leak
+- Added exception handler for agent future errors
+
+### Commit
+`03e892be` — Comprehensive stability fix
+
+---
+
+## Issue #6: PID Lock Exits on Stale PID
+
+### Symptoms
+- Gateway fails to start after crash/restart
+- "Another instance already running" error despite old process being dead
+
+### Root Cause
+`_acquire_pid_lock()` checked if the PID in the file was alive. If the PID was reused by another process (e.g., a PowerShell terminal), the gateway would exit even though the old gateway was dead.
+
+### Fix
+- Now attempts to **kill the old instance** using `TerminateProcess` instead of exiting
+- If kill fails, overwrites the PID file and continues
+
+### Commit
+`03e892be`
+
+---
+
+## Issue #7: Session Not Reclaimed on Startup
+
+### Symptoms
+- Gateway starts but immediately gets 409 conflicts
+- Competing bot instance (VTuber) holds the session
+
+### Root Cause
+The startup sequence only called `deleteWebhook` once, then tried `getUpdates`. If the competing instance was still polling, the session wasn't reclaimed.
+
+### Fix
+- **Aggressive session reclaim loop**: 10 attempts of `deleteWebhook` + `getUpdates` with 1-3s delays
+- Logs "Session reclaimed!" on success
+- If all 10 attempts fail, continues to poll loop (which has its own 409 recovery)
+
+### Commit
+`03e892be`
+
+---
+
+## Issue #8: Poll Timeout Too Long (60s)
+
+### Symptoms
+- When a 409 occurs during a long poll, gateway is stuck waiting 60s before detecting it
+- Slow recovery from 409 conflicts
+
+### Root Cause
+Poll timeout was increased from 30s to 60s to "reduce requests" — but this made 409 detection slower.
+
+### Fix
+- Reduced poll timeout to **15s** — fast 409 detection
+- 409 backoff starts at **5s** (was 30s) with max **120s** (was 300s)
+- `deleteWebhook` sent on **every** 409 (not every 3rd) to aggressively reclaim session
+
+### Commit
+`03e892be`
+
+---
+
 ## Summary
 
 | # | Issue | Severity | Status | Commit |
@@ -167,8 +245,11 @@ The gateway's agent task submission has a timeout that's too short for long mess
 | 1 | Watchdog infinite restart loop | 🔴 CRITICAL | ✅ FIXED | `b0ee429ed` |
 | 2 | Telegram 409 Conflict (VTuber) | 🔴 CRITICAL | ✅ FIXED | `29d81d796`, `c66382933` |
 | 3 | Stale PID file | 🟡 MEDIUM | ✅ FIXED | `b0ee429ed` |
-| 4 | Gateway exits on 409 (sys.exit) | 🔴 CRITICAL | ✅ FIXED | `4ec7aa6c` |
-| 5 | Agent timeout on long messages | 🟡 MEDIUM | ⚠️ PARTIAL | — |
+| 4 | Gateway exits on 409 (sys.exit) | 🔴 CRITICAL | ✅ FIXED | `4ec7aa6c2` |
+| 5 | Agent timeout regression (60s) | 🔴 CRITICAL | ✅ FIXED | `03e892be` |
+| 6 | PID lock exits on stale PID | 🟡 MEDIUM | ✅ FIXED | `03e892be` |
+| 7 | Session not reclaimed on startup | 🟡 MEDIUM | ✅ FIXED | `03e892be` |
+| 8 | Poll timeout too long (60s) | 🟡 MEDIUM | ✅ FIXED | `03e892be` |
 
 ## Key Lessons
 
