@@ -65,8 +65,19 @@ def _acquire_pid_lock():
             with open(_PID_FILE, "r") as f:
                 old_pid = int(f.read().strip())
             if old_pid != pid and _is_process_alive(old_pid):
-                log("[FATAL] Another instance already running (PID %d). Exiting." % old_pid)
-                sys.exit(1)
+                log("[WARN] Stale PID file (PID %d alive). Killing old instance..." % old_pid)
+                try:
+                    import ctypes
+                    kernel32 = ctypes.windll.kernel32
+                    PROCESS_TERMINATE = 0x0001
+                    handle = kernel32.OpenProcess(PROCESS_TERMINATE, False, old_pid)
+                    if handle:
+                        kernel32.TerminateProcess(handle, 1)
+                        kernel32.CloseHandle(handle)
+                        log("Killed old instance PID %d" % old_pid)
+                        time.sleep(2)
+                except Exception as _ke:
+                    log("Could not kill old instance: %s" % _ke)
         except (ValueError, FileNotFoundError):
             pass
     with open(_PID_FILE, "w") as f:
@@ -265,38 +276,39 @@ def main():
     base_url = f"https://api.telegram.org/bot{token}"
     offset = 0
 
-    # Delete webhook first — clears any stuck long-poll sessions on Telegram's side
-    try:
-        _wh = requests.get(f"{base_url}/deleteWebhook", timeout=10)
-        log(f"deleteWebhook: {_wh.json().get('description', _wh.status_code)}")
-    except Exception as _e:
-        log(f"deleteWebhook error (non-fatal): {_e}")
-    time.sleep(2)
-
-    # Clear any stale updates from previous runs so we start fresh
-    # Retry with backoff to handle 409 conflicts from other instances
-    for _retry in range(5):
+    # ── Aggressive session reclaim ──
+    # Delete webhook + grab session before competing bot can
+    _session_reclaimed = False
+    for _reclaim in range(10):
         try:
+            # Always delete webhook first
+            _wh = requests.get(f"{base_url}/deleteWebhook", timeout=10)
+            log(f"deleteWebhook: {_wh.json().get('description', _wh.status_code)}")
+            time.sleep(1)
+            # Immediately try to grab the session
             _clear = requests.get(f"{base_url}/getUpdates", params={"offset": -1, "timeout": 0}, timeout=10)
             _data = _clear.json()
             if _data.get("ok"):
                 _cleared = _data.get("result", [])
-                log(f"Stale check: {len(_cleared)} pending updates")
+                log(f"Session reclaimed! Stale updates: {len(_cleared)}")
                 if _cleared:
                     offset = max(u["update_id"] for u in _cleared) + 1
                     log(f"Cleared stale updates, starting at offset {offset}")
+                _session_reclaimed = True
                 break
             else:
                 _err = _data.get("description", "")
                 if "409" in str(_data.get("error_code", "")) or "Conflict" in _err:
-                    log(f"Stale clear 409 (attempt {_retry+1}), waiting {10 + _retry*10}s...")
-                    time.sleep(10 + _retry*10)
+                    log(f"Reclaim attempt {_reclaim+1}: 409 Conflict, retrying in 3s...")
+                    time.sleep(3)
                 else:
-                    log(f"Stale clear attempt {_retry+1}: {_data}")
-                    time.sleep(5)
+                    log(f"Reclaim attempt {_reclaim+1}: {_data}")
+                    time.sleep(2)
         except Exception as _e:
-            log(f"Stale clear error (attempt {_retry+1}): {_e}")
-            time.sleep(5)
+            log(f"Reclaim error (attempt {_reclaim+1}): {_e}")
+            time.sleep(2)
+    if not _session_reclaimed:
+        log("[WARN] Could not reclaim session after 10 attempts. Will keep trying in poll loop.")
 
     log("Initializing Telegram Presence System — All 3 Phases + Agent...")
     vault = Vault()
@@ -326,7 +338,7 @@ def main():
     _heartbeat = time.time()
 
     _409_count = 0
-    _409_backoff = 30  # starts at 30s, doubles up to 300s
+    _409_backoff = 5  # starts at 5s, doubles up to 120s
     while True:
         try:
             # Heartbeat every 60s
@@ -334,22 +346,22 @@ def main():
                 log("HEARTBEAT: poll loop alive")
                 _heartbeat = time.time()
 
-            _poll_url = f"{base_url}/getUpdates?offset={offset}&limit=10&timeout=60"
-            r = requests.get(_poll_url, timeout=65)
+            # Use short timeout (15s) so we detect 409s fast and can recover
+            _poll_url = f"{base_url}/getUpdates?offset={offset}&limit=10&timeout=15"
+            r = requests.get(_poll_url, timeout=20)
             data = r.json()
             if not data.get("ok"):
                 _err = data.get("description", "")
                 if "409" in str(data.get("error_code", "")) or "Conflict" in _err:
                     _409_count += 1
-                    _409_backoff = min(_409_backoff * 2, 300)  # exponential backoff, max 5min
+                    _409_backoff = min(_409_backoff * 2, 120)  # exponential backoff, max 2min
                     log(f"409 Conflict (#{_409_count}): another bot instance polling. Backoff {_409_backoff}s...")
-                    # Try deleteWebhook to kill the other session
-                    if _409_count % 3 == 0:
-                        try:
-                            requests.get(f"{base_url}/deleteWebhook", timeout=10)
-                            log("Sent deleteWebhook to clear competing session")
-                        except:
-                            pass
+                    # Always try deleteWebhook + immediate retry to steal session back
+                    try:
+                        requests.get(f"{base_url}/deleteWebhook", timeout=10)
+                        log("Sent deleteWebhook to clear competing session")
+                    except:
+                        pass
                     time.sleep(_409_backoff)
                     continue
                 else:
@@ -360,7 +372,7 @@ def main():
                 if _409_count > 0:
                     log(f"409 resolved after {_409_count} conflicts. Resetting backoff.")
                 _409_count = 0
-                _409_backoff = 30  # Reset backoff on success
+                _409_backoff = 5  # Reset backoff on success
 
             results = data.get("result", [])
             log(f"poll: offset={offset} got={len(results)}")
@@ -464,15 +476,19 @@ def main():
 
                                 full_ctx = "\n\n".join(ctx_parts)
 
-                                # Run agent with limited tool rounds and timeout
+                                # Run agent — timeout must be >= LLM timeout (120s) + tool overhead
+                                # Use 180s to allow for multi-round tool-calling loops
                                 import concurrent.futures
+                                _agent_future = None
                                 with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-                                    future = executor.submit(agent.chat, msg_text, full_ctx, progress_callback=on_progress)
+                                    _agent_future = executor.submit(agent.chat, msg_text, full_ctx, progress_callback=on_progress)
                                     try:
-                                        resp = future.result(timeout=60)
+                                        resp = _agent_future.result(timeout=180)
                                     except concurrent.futures.TimeoutError:
-                                        resp = "⏱️ Response timed out after 60s. Try a simpler question or use /new to start fresh."
+                                        resp = "⏱️ Response timed out after 180s. Try a simpler question or use /new to start fresh."
                                         log("AGENT TIMEOUT")
+                                        # Cancel the future to prevent thread leak
+                                        _agent_future.cancel()
                                     except Exception as _agent_e:
                                         resp = f"❌ Agent error: `{str(_agent_e)[:200]}`"
                                         log(f"AGENT FUTURE ERROR: {_agent_e}")
