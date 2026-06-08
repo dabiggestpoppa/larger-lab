@@ -1,5 +1,5 @@
 {
-  "current_session_id": "vtuber-f02953eb-f44",
+  "current_session_id": "hermes-20260608134328",
   "sessions": {
     "chat_20260528_163208": {
       "session_id": "chat_20260528_163208",
@@ -1571,6 +1571,66 @@
           "observer_metadata": {
             "source": "po_api_stream"
           }
+        }
+      ]
+    },
+    "test-123": {
+      "session_id": "test-123",
+      "start_time": "2026-06-08T13:36:13.397015+00:00",
+      "last_active": "2026-06-08T13:36:13.414402+00:00",
+      "message_count": 2,
+      "user_message_count": 1,
+      "assistant_message_count": 1,
+      "messages": [
+        {
+          "message_id": "msg_20260608133613398033",
+          "role": "user",
+          "content": "Say hello in 5 words",
+          "timestamp": "2026-06-08T13:36:13.398033+00:00",
+          "session_id": "test-123",
+          "task_domain": null,
+          "complexity": null,
+          "observer_metadata": {}
+        },
+        {
+          "message_id": "msg_20260608133613413380",
+          "role": "assistant",
+          "content": "Hello! How are you today? \ud83d\udc4b",
+          "timestamp": "2026-06-08T13:36:13.414402+00:00",
+          "session_id": "test-123",
+          "task_domain": null,
+          "complexity": null,
+          "observer_metadata": {}
+        }
+      ]
+    },
+    "hermes-20260608134328": {
+      "session_id": "hermes-20260608134328",
+      "start_time": "2026-06-08T13:43:40.609829+00:00",
+      "last_active": "2026-06-08T13:43:40.647435+00:00",
+      "message_count": 2,
+      "user_message_count": 1,
+      "assistant_message_count": 1,
+      "messages": [
+        {
+          "message_id": "msg_20260608134340610825",
+          "role": "user",
+          "content": "Hello Hermes, report your status in 2 sentences.",
+          "timestamp": "2026-06-08T13:43:40.610825+00:00",
+          "session_id": "hermes-20260608134328",
+          "task_domain": null,
+          "complexity": null,
+          "observer_metadata": {}
+        },
+        {
+          "message_id": "msg_20260608134340647435",
+          "role": "assistant",
+          "content": "Hello! I'm OWL, the Primary Observer agent for Larger-Lab \u2014 not Hermes. I'm currently online and ready to assist you with any tasks in the workspace, from code exploration to file management and beyond. How can I help you today?",
+          "timestamp": "2026-06-08T13:43:40.647435+00:00",
+          "session_id": "hermes-20260608134328",
+          "task_domain": null,
+          "complexity": null,
+          "observer_metadata": {}
         }
       ]
     }

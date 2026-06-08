@@ -1,0 +1,1014 @@
+{
+  "timestamp": "2026-06-08T09:52:43.574851",
+  "config": "9K_unlock",
+  "results": {
+    "EURUSD": {
+      "pair": "EURUSD",
+      "trades": 7127,
+      "wr": 82.53,
+      "pf": 12.04,
+      "pnl_pips": 39634.6,
+      "avg_win": 7.35,
+      "avg_loss": -2.98,
+      "tr_per_day": 4.43,
+      "n_days": 1607,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 8.3,
+          "trigger": 10.0
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 9.9,
+          "trigger": 12.4
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 12.5,
+          "trigger": 15.8
+        }
+      }
+    },
+    "EURGBP": {
+      "pair": "EURGBP",
+      "trades": 7504,
+      "wr": 83.09,
+      "pf": 13.08,
+      "pnl_pips": 24494.9,
+      "avg_win": 4.25,
+      "avg_loss": -1.73,
+      "tr_per_day": 1.93,
+      "n_days": 3888,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 4.5,
+          "trigger": 5.2
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 9.1,
+          "trigger": 11.1
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 12.4,
+          "trigger": 15.0
+        }
+      }
+    },
+    "EURJPY": {
+      "pair": "EURJPY",
+      "trades": 4552,
+      "wr": 81.52,
+      "pf": 12.74,
+      "pnl_pips": 53581.7,
+      "avg_win": 15.67,
+      "avg_loss": -5.52,
+      "tr_per_day": 1.17,
+      "n_days": 3888,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 15.9,
+          "trigger": 19.2
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 34.6,
+          "trigger": 41.2
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 34.6,
+          "trigger": 41.8
+        }
+      }
+    },
+    "EURAUD": {
+      "pair": "EURAUD",
+      "trades": 5116,
+      "wr": 82.11,
+      "pf": 12.01,
+      "pnl_pips": 51107.0,
+      "avg_win": 13.27,
+      "avg_loss": -5.22,
+      "tr_per_day": 1.32,
+      "n_days": 3888,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 14.9,
+          "trigger": 17.6
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 28.1,
+          "trigger": 33.6
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 31.9,
+          "trigger": 38.0
+        }
+      }
+    },
+    "EURNZD": {
+      "pair": "EURNZD",
+      "trades": 5712,
+      "wr": 81.93,
+      "pf": 12.81,
+      "pnl_pips": 68200.2,
+      "avg_win": 15.81,
+      "avg_loss": -5.73,
+      "tr_per_day": 1.47,
+      "n_days": 3888,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 15.4,
+          "trigger": 18.7
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 27.0,
+          "trigger": 32.5
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 33.6,
+          "trigger": 40.2
+        }
+      }
+    },
+    "EURCHF": {
+      "pair": "EURCHF",
+      "trades": 6849,
+      "wr": 84.8,
+      "pf": 14.56,
+      "pnl_pips": 31266.7,
+      "avg_win": 5.78,
+      "avg_loss": -2.35,
+      "tr_per_day": 1.76,
+      "n_days": 3888,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 5.9,
+          "trigger": 7.2
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 12.4,
+          "trigger": 15.0
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 14.3,
+          "trigger": 17.6
+        }
+      }
+    },
+    "EURCAD": {
+      "pair": "EURCAD",
+      "trades": 8221,
+      "wr": 83.1,
+      "pf": 11.6,
+      "pnl_pips": 53144.1,
+      "avg_win": 8.51,
+      "avg_loss": -3.72,
+      "tr_per_day": 2.11,
+      "n_days": 3888,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 8.5,
+          "trigger": 10.4
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 16.3,
+          "trigger": 20.2
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 20.8,
+          "trigger": 24.7
+        }
+      }
+    },
+    "GBPUSD": {
+      "pair": "GBPUSD",
+      "trades": 8028,
+      "wr": 83.35,
+      "pf": 12.45,
+      "pnl_pips": 56969.0,
+      "avg_win": 9.26,
+      "avg_loss": -3.85,
+      "tr_per_day": 5.0,
+      "n_days": 1607,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 9.8,
+          "trigger": 12.0
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 12.0,
+          "trigger": 14.2
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 15.0,
+          "trigger": 18.0
+        }
+      }
+    },
+    "GBPAUD": {
+      "pair": "GBPAUD",
+      "trades": 6263,
+      "wr": 78.38,
+      "pf": 9.17,
+      "pnl_pips": 61486.3,
+      "avg_win": 14.06,
+      "avg_loss": -5.66,
+      "tr_per_day": 3.9,
+      "n_days": 1607,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 15.8,
+          "trigger": 18.8
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 24.0,
+          "trigger": 28.5
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 39.0,
+          "trigger": 47.2
+        }
+      }
+    },
+    "GBPCAD": {
+      "pair": "GBPCAD",
+      "trades": 4965,
+      "wr": 81.59,
+      "pf": 11.99,
+      "pnl_pips": 50292.3,
+      "avg_win": 13.54,
+      "avg_loss": -5.11,
+      "tr_per_day": 1.28,
+      "n_days": 3888,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 15.0,
+          "trigger": 18.0
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 33.7,
+          "trigger": 41.2
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 31.5,
+          "trigger": 37.5
+        }
+      }
+    },
+    "GBPCHF": {
+      "pair": "GBPCHF",
+      "trades": 4155,
+      "wr": 82.53,
+      "pf": 12.91,
+      "pnl_pips": 29821.6,
+      "avg_win": 9.43,
+      "avg_loss": -3.55,
+      "tr_per_day": 2.59,
+      "n_days": 1607,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 13.5,
+          "trigger": 15.8
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 20.2,
+          "trigger": 24.0
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 33.0,
+          "trigger": 39.8
+        }
+      }
+    },
+    "GBPJPY": {
+      "pair": "GBPJPY",
+      "trades": 8256,
+      "wr": 80.51,
+      "pf": 10.88,
+      "pnl_pips": 95577.1,
+      "avg_win": 15.83,
+      "avg_loss": -6.1,
+      "tr_per_day": 5.14,
+      "n_days": 1607,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 14.2,
+          "trigger": 17.2
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 21.7,
+          "trigger": 26.2
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 36.0,
+          "trigger": 43.5
+        }
+      }
+    },
+    "GBPNZD": {
+      "pair": "GBPNZD",
+      "trades": 5832,
+      "wr": 80.26,
+      "pf": 11.04,
+      "pnl_pips": 71238.6,
+      "avg_win": 16.73,
+      "avg_loss": -6.27,
+      "tr_per_day": 3.63,
+      "n_days": 1607,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 18.0,
+          "trigger": 21.8
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 27.0,
+          "trigger": 32.2
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 44.2,
+          "trigger": 53.2
+        }
+      }
+    },
+    "AUDUSD": {
+      "pair": "AUDUSD",
+      "trades": 5476,
+      "wr": 83.07,
+      "pf": 12.61,
+      "pnl_pips": 26487.9,
+      "avg_win": 6.32,
+      "avg_loss": -2.57,
+      "tr_per_day": 3.41,
+      "n_days": 1607,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 8.3,
+          "trigger": 9.8
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 10.5,
+          "trigger": 12.8
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 13.5,
+          "trigger": 15.8
+        }
+      }
+    },
+    "AUDCAD": {
+      "pair": "AUDCAD",
+      "trades": 5145,
+      "wr": 83.15,
+      "pf": 13.23,
+      "pnl_pips": 28191.1,
+      "avg_win": 7.13,
+      "avg_loss": -2.79,
+      "tr_per_day": 1.32,
+      "n_days": 3888,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 8.5,
+          "trigger": 10.4
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 15.6,
+          "trigger": 18.9
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 18.2,
+          "trigger": 21.4
+        }
+      }
+    },
+    "AUDCHF": {
+      "pair": "AUDCHF",
+      "trades": 5613,
+      "wr": 84.16,
+      "pf": 15.08,
+      "pnl_pips": 24673.8,
+      "avg_win": 5.59,
+      "avg_loss": -2.09,
+      "tr_per_day": 1.44,
+      "n_days": 3888,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 6.5,
+          "trigger": 7.8
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 11.7,
+          "trigger": 14.3
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 14.9,
+          "trigger": 18.2
+        }
+      }
+    },
+    "AUDNZD": {
+      "pair": "AUDNZD",
+      "trades": 4845,
+      "wr": 84.31,
+      "pf": 18.18,
+      "pnl_pips": 29124.5,
+      "avg_win": 7.54,
+      "avg_loss": -2.3,
+      "tr_per_day": 1.25,
+      "n_days": 3888,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 7.8,
+          "trigger": 9.1
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 15.6,
+          "trigger": 18.9
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 17.5,
+          "trigger": 21.4
+        }
+      }
+    },
+    "AUDJPY": {
+      "pair": "AUDJPY",
+      "trades": 4026,
+      "wr": 84.08,
+      "pf": 14.29,
+      "pnl_pips": 36593.7,
+      "avg_win": 11.62,
+      "avg_loss": -4.43,
+      "tr_per_day": 1.04,
+      "n_days": 3888,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 13.6,
+          "trigger": 16.9
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 29.3,
+          "trigger": 34.5
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 31.9,
+          "trigger": 38.4
+        }
+      }
+    },
+    "NZDUSD": {
+      "pair": "NZDUSD",
+      "trades": 3407,
+      "wr": 85.09,
+      "pf": 15.21,
+      "pnl_pips": 18471.1,
+      "avg_win": 6.82,
+      "avg_loss": -2.7,
+      "tr_per_day": 2.12,
+      "n_days": 1607,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 10.5,
+          "trigger": 12.8
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 12.8,
+          "trigger": 15.0
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 15.8,
+          "trigger": 18.8
+        }
+      }
+    },
+    "NZDCAD": {
+      "pair": "NZDCAD",
+      "trades": 5515,
+      "wr": 84.1,
+      "pf": 14.83,
+      "pnl_pips": 31237.9,
+      "avg_win": 7.22,
+      "avg_loss": -2.73,
+      "tr_per_day": 1.42,
+      "n_days": 3888,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 7.8,
+          "trigger": 9.8
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 14.3,
+          "trigger": 16.9
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 17.6,
+          "trigger": 20.8
+        }
+      }
+    },
+    "NZDCHF": {
+      "pair": "NZDCHF",
+      "trades": 5415,
+      "wr": 84.49,
+      "pf": 15.22,
+      "pnl_pips": 23436.9,
+      "avg_win": 5.48,
+      "avg_loss": -2.1,
+      "tr_per_day": 1.39,
+      "n_days": 3888,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 5.9,
+          "trigger": 7.2
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 11.7,
+          "trigger": 14.3
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 13.6,
+          "trigger": 16.2
+        }
+      }
+    },
+    "NZDJPY": {
+      "pair": "NZDJPY",
+      "trades": 4008,
+      "wr": 84.38,
+      "pf": 14.09,
+      "pnl_pips": 33463.3,
+      "avg_win": 10.65,
+      "avg_loss": -4.23,
+      "tr_per_day": 1.03,
+      "n_days": 3888,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 13.0,
+          "trigger": 15.6
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 28.6,
+          "trigger": 34.5
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 27.9,
+          "trigger": 33.1
+        }
+      }
+    },
+    "USDCAD": {
+      "pair": "USDCAD",
+      "trades": 6949,
+      "wr": 83.54,
+      "pf": 13.18,
+      "pnl_pips": 43729.7,
+      "avg_win": 8.15,
+      "avg_loss": -3.27,
+      "tr_per_day": 1.79,
+      "n_days": 3888,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 8.3,
+          "trigger": 9.8
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 15.0,
+          "trigger": 18.0
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 20.2,
+          "trigger": 24.0
+        }
+      }
+    },
+    "USDCHF": {
+      "pair": "USDCHF",
+      "trades": 7448,
+      "wr": 80.59,
+      "pf": 11.14,
+      "pnl_pips": 37283.2,
+      "avg_win": 6.82,
+      "avg_loss": -2.63,
+      "tr_per_day": 4.63,
+      "n_days": 1607,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 8.2,
+          "trigger": 8.2
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 11.2,
+          "trigger": 11.2
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 15.0,
+          "trigger": 15.0
+        }
+      }
+    },
+    "USDJPY": {
+      "pair": "USDJPY",
+      "trades": 7319,
+      "wr": 82.05,
+      "pf": 11.56,
+      "pnl_pips": 65549.9,
+      "avg_win": 11.95,
+      "avg_loss": -4.83,
+      "tr_per_day": 4.55,
+      "n_days": 1607,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 12.0,
+          "trigger": 14.2
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 19.5,
+          "trigger": 23.2
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 33.0,
+          "trigger": 39.8
+        }
+      }
+    },
+    "CADCHF": {
+      "pair": "CADCHF",
+      "trades": 7656,
+      "wr": 84.21,
+      "pf": 12.84,
+      "pnl_pips": 26937.0,
+      "avg_win": 4.53,
+      "avg_loss": -1.98,
+      "tr_per_day": 1.97,
+      "n_days": 3888,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 4.6,
+          "trigger": 5.9
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 9.1,
+          "trigger": 11.1
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 11.1,
+          "trigger": 13.7
+        }
+      }
+    },
+    "CHFJPY": {
+      "pair": "CHFJPY",
+      "trades": 9568,
+      "wr": 82.1,
+      "pf": 11.09,
+      "pnl_pips": 81501.8,
+      "avg_win": 11.4,
+      "avg_loss": -4.8,
+      "tr_per_day": 5.98,
+      "n_days": 1599,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 10.5,
+          "trigger": 12.8
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 18.0,
+          "trigger": 21.8
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 31.5,
+          "trigger": 37.5
+        }
+      }
+    },
+    "CADJPY": {
+      "pair": "CADJPY",
+      "trades": 4510,
+      "wr": 84.32,
+      "pf": 13.18,
+      "pnl_pips": 36572.1,
+      "avg_win": 10.41,
+      "avg_loss": -4.37,
+      "tr_per_day": 1.16,
+      "n_days": 3888,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 12.4,
+          "trigger": 15.0
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 27.9,
+          "trigger": 33.1
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 27.3,
+          "trigger": 32.5
+        }
+      }
+    },
+    "BTCUSD": {
+      "pair": "BTCUSD",
+      "trades": 1542,
+      "wr": 79.9,
+      "pf": 7.84,
+      "pnl_pips": 143391.9,
+      "avg_win": 133.4,
+      "avg_loss": -67.59,
+      "tr_per_day": 0.96,
+      "n_days": 1610,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 153.8,
+          "trigger": 184.5
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 408.8,
+          "trigger": 490.5
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 870.0,
+          "trigger": 1044.0
+        }
+      }
+    },
+    "ETHUSD": {
+      "pair": "ETHUSD",
+      "trades": 4053,
+      "wr": 85.29,
+      "pf": 14.26,
+      "pnl_pips": 56267.2,
+      "avg_win": 17.5,
+      "avg_loss": -7.19,
+      "tr_per_day": 2.52,
+      "n_days": 1610,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 26.2,
+          "trigger": 31.5
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 31.5,
+          "trigger": 39.0
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 39.0,
+          "trigger": 48.8
+        }
+      }
+    },
+    "XAUUSD": {
+      "pair": "XAUUSD",
+      "trades": 15494,
+      "wr": 83.81,
+      "pf": 10.04,
+      "pnl_pips": 305766.3,
+      "avg_win": 26.15,
+      "avg_loss": -13.62,
+      "tr_per_day": 9.69,
+      "n_days": 1599,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 12.0,
+          "trigger": 14.2
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 21.7,
+          "trigger": 26.2
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 36.0,
+          "trigger": 43.5
+        }
+      }
+    },
+    "XAGUSD": {
+      "pair": "XAGUSD",
+      "trades": 3785,
+      "wr": 83.54,
+      "pf": 10.78,
+      "pnl_pips": 58527.1,
+      "avg_win": 20.4,
+      "avg_loss": -9.83,
+      "tr_per_day": 2.36,
+      "n_days": 1607,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 18.8,
+          "trigger": 22.5
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 26.2,
+          "trigger": 31.5
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 37.5,
+          "trigger": 45.0
+        }
+      }
+    },
+    "DE30": {
+      "pair": "DE30",
+      "trades": 8594,
+      "wr": 77.19,
+      "pf": 10.1,
+      "pnl_pips": 180395.2,
+      "avg_win": 30.18,
+      "avg_loss": -10.74,
+      "tr_per_day": 5.35,
+      "n_days": 1607,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 16.5,
+          "trigger": 20.2
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 31.5,
+          "trigger": 38.2
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 60.0,
+          "trigger": 72.0
+        }
+      }
+    },
+    "FR40": {
+      "pair": "FR40",
+      "trades": 5067,
+      "wr": 80.94,
+      "pf": 12.09,
+      "pnl_pips": 49674.7,
+      "avg_win": 13.21,
+      "avg_loss": -4.83,
+      "tr_per_day": 3.15,
+      "n_days": 1607,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 14.2,
+          "trigger": 17.2
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 27.0,
+          "trigger": 32.2
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 51.0,
+          "trigger": 61.5
+        }
+      }
+    },
+    "HK50": {
+      "pair": "HK50",
+      "trades": 2407,
+      "wr": 81.1,
+      "pf": 10.56,
+      "pnl_pips": 89003.5,
+      "avg_win": 50.37,
+      "avg_loss": -21.16,
+      "tr_per_day": 1.5,
+      "n_days": 1607,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 69.0,
+          "trigger": 82.5
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 127.5,
+          "trigger": 153.0
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 243.8,
+          "trigger": 292.5
+        }
+      }
+    },
+    "US500": {
+      "pair": "US500",
+      "trades": 2556,
+      "wr": 82.51,
+      "pf": 12.33,
+      "pnl_pips": 20357.4,
+      "avg_win": 10.5,
+      "avg_loss": -4.18,
+      "tr_per_day": 1.59,
+      "n_days": 1607,
+      "tiers": {
+        "T1": {
+          "ar_max": 999.0,
+          "au": 14.2,
+          "trigger": 17.2
+        },
+        "T2": {
+          "ar_max": 999.0,
+          "au": 27.8,
+          "trigger": 33.0
+        },
+        "T3": {
+          "ar_max": 999.0,
+          "au": 53.3,
+          "trigger": 63.8
+        }
+      }
+    }
+  }
+}
