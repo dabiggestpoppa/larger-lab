@@ -716,32 +716,34 @@ def run_live(symbols: list, lot_size: float = 0.01):
                                 stale_keys = [k for k in active_trades if k[0] == sym]
                                 for sk in stale_keys:
                                     del active_trades[sk]
-                                    sl_p = to_pips(abs(st_sig.sl_price - st_sig.entry_price), sym)
-                                    tp_p = to_pips(abs(st_sig.tp_price - st_sig.entry_price), sym)
-                                    rr = round(tp_p / sl_p, 2) if sl_p > 0 else 0.0
-                                    log.info("ST ENTRY: %s %s @ %.5f | SL=%.1fp TP=%.1fp RR=%.2f",
-                                             direction, sym, st_sig.entry_price, sl_p, tp_p, rr)
-                                    # ALIEN EDGE: No hard SL sent to broker for ST
-                                    # Engine monitors M5 closes and returns SL_HIT
-                                    ticket = send_order(sym, direction, lot_size,
-                                                    st_sig.sl_price, st_sig.tp_price,
-                                                    "CEREBUS-ST-L%d" % st_sig.loop_count,
-                                                    no_sl=True)
-                                    if ticket:
-                                        exec_count += 1
-                                        daily_stats["entries"] += 1
-                                        daily_stats["rr_total"] += rr
-                                        # Register directly from order result ticket
-                                        # FIX: avoids get_positions() race condition
-                                        active_trades[(sym, "ST")] = {
-                                            "ticket": ticket,
-                                            "direction": direction,
-                                            "entry": st_sig.entry_price,
-                                            "sl": st_sig.sl_price,
-                                            "tp": st_sig.tp_price,
-                                            "engine": "ST",
-                                            "sl_moved": False,
-                                        }
+
+                                # ── Place new order ──
+                                sl_p = to_pips(abs(st_sig.sl_price - st_sig.entry_price), sym)
+                                tp_p = to_pips(abs(st_sig.tp_price - st_sig.entry_price), sym)
+                                rr = round(tp_p / sl_p, 2) if sl_p > 0 else 0.0
+                                log.info("ST ENTRY: %s %s @ %.5f | SL=%.1fp TP=%.1fp RR=%.2f",
+                                         direction, sym, st_sig.entry_price, sl_p, tp_p, rr)
+                                # ALIEN EDGE: No hard SL sent to broker for ST
+                                # Engine monitors M5 closes and returns SL_HIT
+                                ticket = send_order(sym, direction, lot_size,
+                                                st_sig.sl_price, st_sig.tp_price,
+                                                "CEREBUS-ST-L%d" % st_sig.loop_count,
+                                                no_sl=True)
+                                if ticket:
+                                    exec_count += 1
+                                    daily_stats["entries"] += 1
+                                    daily_stats["rr_total"] += rr
+                                    # Register directly from order result ticket
+                                    # FIX: avoids get_positions() race condition
+                                    active_trades[(sym, "ST")] = {
+                                        "ticket": ticket,
+                                        "direction": direction,
+                                        "entry": st_sig.entry_price,
+                                        "sl": st_sig.sl_price,
+                                        "tp": st_sig.tp_price,
+                                        "engine": "ST",
+                                        "sl_moved": False,
+                                    }
                             elif st_sig.event in ("TP_HIT", "SL_HIT", "KILL_SWITCH"):
                                 # Close position if still open
                                 key = (sym, "ST")

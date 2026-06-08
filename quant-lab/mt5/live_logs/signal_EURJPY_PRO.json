@@ -2,10 +2,10 @@
   "engine": "SymmetryTrap",
   "symbol": "EURJPY.PRO",
   "direction": "BUY",
-  "entry": 91.778,
-  "sl": 184.776,
-  "tp": 92.018,
+  "entry": 91.879,
+  "sl": 184.916,
+  "tp": 92.119,
   "event": "SL_HIT",
   "loop": 1,
-  "time": "2026-06-07 21:23:00"
+  "time": "2026-06-08 01:28:00"
 }
