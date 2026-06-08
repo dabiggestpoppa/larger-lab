@@ -3,40 +3,50 @@
 > **Purpose:** Quick-communication hub for CC/PM/PM2/AS/RL coordination.
 > **Current focus:** Quant Lab — 9K Config Test + Monte Carlo + Forward Test Prep
 > **Plan:** `quant-lab/QUANT_JOURNAL.md`
-> **Last Updated:** 2026-06-08 (CEREBUS PO stability fix — watchdog + 409 resilience, all servers stable)
+> **Last Updated:** 2026-06-08 (CEREBUS comprehensive PO stability fix — 8 issues resolved, all servers stable)
 
-> ## 🔴 June 8 — PO Stability Fixes (RESOLVED)
+> ## 🔴 June 8 — PO Stability Fixes (ALL RESOLVED)
 >
-> ### Issues Fixed Today
-> 1. **Watchdog infinite restart loop** — `$_` in PowerShell subprocess got stripped → watchdog always thought gateway was down → restarted every 60s → gateway never stabilized
-> 2. **Gateway 409 Conflict exit** — PM's VTuber bot polling same token → after 5 consecutive 409s, gateway called `sys.exit(1)` → died every ~30s
-> 3. **Stale PID file** — PID file pointed to wrong process (PowerShell terminal instead of gateway)
+> ### 8 Issues Found & Fixed Today
+> 1. **Watchdog infinite restart loop** — `$_` in PowerShell subprocess stripped → always thought gateway down → 40+ restarts in 75min
+> 2. **Gateway 409 Conflict exit** — `sys.exit(1)` after 5 conflicts → died every ~30s
+> 3. **Stale PID file** — pointed to wrong process (PowerShell terminal)
+> 4. **No 409 retry logic** — gateway gave up instead of retrying
+> 5. **Agent timeout regression** — reduced from 180s to 60s by another agent → complex messages timed out + thread leaks
+> 6. **PID lock exits on stale PID** — refused to start if any process reused the PID
+> 7. **Session not reclaimed** — single deleteWebhook wasn't enough to steal session from VTuber bot
+> 8. **Poll timeout too long** — 60s polls delayed 409 detection
 >
-> ### Fixes Applied
-> - Watchdog: Replaced broken `$_` subprocess with PID file check (ctypes OpenProcess) + Get-CimInstance fallback
-> - Gateway: Removed `sys.exit(1)` on 409 → exponential backoff (30s→60s→120s→240s→300s max) + deleteWebhook on startup + every 3rd 409 fires deleteWebhook to kill competing session
-> - PID file: Corrected to actual gateway PID
-> - Cleaned up stale pytest processes
+> ### Comprehensive Fix (Commit `03e892bee`)
+> - Watchdog: PID file check (ctypes OpenProcess) + Get-CimInstance fallback
+> - Gateway: Aggressive session reclaim (10-attempt deleteWebhook + getUpdates loop on startup)
+> - Gateway: PID lock now kills old instance instead of exiting
+> - Gateway: Agent timeout restored to 180s + future.cancel() on timeout (thread leak fix)
+> - Gateway: Poll timeout 15s (fast 409 detection), backoff 5s→120s, deleteWebhook on every 409
+> - Gateway: Never exits on 409 — exponential backoff with session reclaim
 >
 > ### Final Server Status (Verified Stable)
 > | Service | PID | Status |
 > |---------|-----|--------|
 > | OCE Backend | 11712 | ✅ UP |
 > | API Server | 21068 | ✅ UP |
-> | PO Telegram Gateway | 16064 | ✅ UP (polling clean) |
-> | PO Watchdog | 15248 | ✅ UP (stable, no restarts) |
+> | PO Telegram Gateway | 16712 | ✅ UP (polling clean) |
+> | PO Watchdog | 16392 | ✅ UP (stable, no restarts) |
 > | OCE Frontend | 3000 | ✅ UP |
 > | VTuber/POALA | — | 🔴 Offline per MAD directive |
 >
-> ### Commits
+> ### All Commits Today
 > - `b0ee429ed` — Fix watchdog broken $_ subprocess
 > - `4ec7aa6c2` — Gateway 409 resilience (exponential backoff)
 > - `614737afc` — PO Bug Journal created
 > - `97266b836` — Bug Journal updated with Issue #4
 > - `4415370b5` — PO memory system + vault integration fix
+> - `aeea59d2f` — Team chat update
+> - `03e892bee` — **Comprehensive fix: PID lock, session reclaim, agent timeout, 409 resilience**
+> - `155379d09` — Bug Journal updated with Issues #5-8
 >
 > ### Bug Journal
-> `progress/PO-BUG-JOURNAL-2026-06-08.md` — 5 issues documented with root causes, fixes, and lessons
+> `progress/PO-BUG-JOURNAL-2026-06-08.md` — 8 issues documented with root causes, fixes, and lessons
 > **Last Updated:** 2026-06-08 22:00 UTC (CEREBUS final sweep — all servers up, stale processes killed, MAD closing)
 > **Tasks:** `progress/O2C-RESEARCH-MESH-TASKS.md`
 > **Last Updated:** 2026-06-08 (Quant analysis complete — 9K config, Monte Carlo, forward test plan)
