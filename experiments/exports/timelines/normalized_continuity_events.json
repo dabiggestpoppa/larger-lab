@@ -1,27 +1,27 @@
 {
   "version": "0.1.0",
   "phase": "11.2-3B.3",
-  "timestamp": "2026-06-08T02:44:20.809998+00:00",
+  "timestamp": "2026-06-08T13:01:22.402840+00:00",
   "total_events": 30,
   "total_chains": 30,
   "entropy_profile": {
     "total_events": 30,
-    "total_entropy_injected": 2.4202041949089113,
-    "total_entropy_dissipated": 1.5117850388554737,
-    "net_entropy": 0.9084191560534375,
-    "avg_entropy_per_event": 0.1311,
-    "max_single_entropy": 0.27560279647718483,
-    "min_single_entropy": -0.19569643480903742
+    "total_entropy_injected": 1.5431148935196277,
+    "total_entropy_dissipated": 1.4565231865559396,
+    "net_entropy": 0.08659170696368812,
+    "avg_entropy_per_event": 0.1,
+    "max_single_entropy": 0.2859166132373129,
+    "min_single_entropy": -0.16518851088385794
   },
   "events": [
     {
-      "event_id": "evt_1c02284c74bf",
-      "timestamp": "2026-06-08T02:44:20.798995+00:00",
-      "event_type": "observer_sync",
-      "source": "entropy_1",
-      "continuity_score": 0.9082891303609003,
-      "entropy_delta": 0.23752604619821377,
-      "observer_pressure": 6,
+      "event_id": "evt_165dced1d48a",
+      "timestamp": "2026-06-08T13:01:22.390427+00:00",
+      "event_type": "memory_pull",
+      "source": "repair_2",
+      "continuity_score": 0.868027942107288,
+      "entropy_delta": 0.07859278309543549,
+      "observer_pressure": 5,
       "continuity_shift": 0.0,
       "field_zone": "zone_1",
       "attractor_region": "unknown",
@@ -30,87 +30,51 @@
       "duration_ms": 0.0,
       "success": true,
       "parent_event_id": null,
-      "chain_id": "chain_03e5a4ea"
+      "chain_id": "chain_2b5c951a"
     },
     {
-      "event_id": "evt_1f7a2dc73e8c",
-      "timestamp": "2026-06-08T02:44:20.798995+00:00",
+      "event_id": "evt_d1d25f065614",
+      "timestamp": "2026-06-08T13:01:22.390427+00:00",
       "event_type": "memory_pull",
-      "source": "memory_1",
-      "continuity_score": 0.9777680299515317,
-      "entropy_delta": -0.0999432656468428,
+      "source": "entropy_2",
+      "continuity_score": 0.7409870590121503,
+      "entropy_delta": -0.04327886309690804,
       "observer_pressure": 1,
       "continuity_shift": 0.0,
-      "field_zone": "zone_2",
+      "field_zone": "zone_1",
       "attractor_region": "unknown",
       "target": "",
       "details": {},
       "duration_ms": 0.0,
       "success": true,
       "parent_event_id": null,
-      "chain_id": "chain_f318561b"
+      "chain_id": "chain_1ba3fc0b"
     },
     {
-      "event_id": "evt_2c7ec9862631",
-      "timestamp": "2026-06-08T02:44:20.798995+00:00",
-      "event_type": "route_shift",
-      "source": "routing_2",
-      "continuity_score": 0.7055122608871288,
-      "entropy_delta": 0.010093122013860978,
+      "event_id": "evt_7d85c81e1b6b",
+      "timestamp": "2026-06-08T13:01:22.390427+00:00",
+      "event_type": "field_perturbation",
+      "source": "entropy_0",
+      "continuity_score": 0.8412301126767072,
+      "entropy_delta": -0.11070307956063169,
       "observer_pressure": 2,
       "continuity_shift": 0.0,
-      "field_zone": "zone_2",
+      "field_zone": "zone_4",
       "attractor_region": "unknown",
       "target": "",
       "details": {},
       "duration_ms": 0.0,
       "success": true,
       "parent_event_id": null,
-      "chain_id": "chain_f45d2efb"
+      "chain_id": "chain_6a8525b7"
     },
     {
-      "event_id": "evt_6c54cdee40c7",
-      "timestamp": "2026-06-08T02:44:20.798995+00:00",
-      "event_type": "memory_pull",
-      "source": "repair_0",
-      "continuity_score": 0.8712213131794937,
-      "entropy_delta": 0.1736922556509916,
-      "observer_pressure": 3,
-      "continuity_shift": 0.0,
-      "field_zone": "zone_3",
-      "attractor_region": "unknown",
-      "target": "",
-      "details": {},
-      "duration_ms": 0.0,
-      "success": true,
-      "parent_event_id": null,
-      "chain_id": "chain_3ecc8be6"
-    },
-    {
-      "event_id": "evt_e4913c81222c",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "event_type": "repair_trigger",
-      "source": "structural_2",
-      "continuity_score": 0.8213411376746675,
-      "entropy_delta": -0.08619989653694682,
-      "observer_pressure": 3,
-      "continuity_shift": 0.0,
-      "field_zone": "zone_2",
-      "attractor_region": "unknown",
-      "target": "",
-      "details": {},
-      "duration_ms": 0.0,
-      "success": true,
-      "parent_event_id": null,
-      "chain_id": "chain_e7772d3e"
-    },
-    {
-      "event_id": "evt_c19aed5dba9e",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "event_type": "route_shift",
-      "source": "continuity_0",
-      "continuity_score": 0.8856801292972462,
-      "entropy_delta": 0.27560279647718483,
+      "event_id": "evt_febf5df44b2e",
+      "timestamp": "2026-06-08T13:01:22.390427+00:00",
+      "event_type": "field_perturbation",
+      "source": "entropy_2",
+      "continuity_score": 0.7311137975830878,
+      "entropy_delta": 0.2859166132373129,
       "observer_pressure": 6,
       "continuity_shift": 0.0,
       "field_zone": "zone_0",
@@ -120,214 +84,70 @@
       "duration_ms": 0.0,
       "success": true,
       "parent_event_id": null,
-      "chain_id": "chain_eb14db7c"
+      "chain_id": "chain_1fc5d4ce"
     },
     {
-      "event_id": "evt_065bd49ea8e3",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "event_type": "observer_sync",
+      "event_id": "evt_bcdc2595c026",
+      "timestamp": "2026-06-08T13:01:22.390427+00:00",
+      "event_type": "repair_trigger",
       "source": "continuity_2",
-      "continuity_score": 0.753325466911641,
-      "entropy_delta": 0.1853021350567874,
-      "observer_pressure": 6,
-      "continuity_shift": 0.0,
-      "field_zone": "zone_0",
-      "attractor_region": "unknown",
-      "target": "",
-      "details": {},
-      "duration_ms": 0.0,
-      "success": true,
-      "parent_event_id": null,
-      "chain_id": "chain_56038333"
-    },
-    {
-      "event_id": "evt_1b67c642a823",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "event_type": "repair_trigger",
-      "source": "continuity_0",
-      "continuity_score": 0.7917164100927954,
-      "entropy_delta": 0.19310580469832206,
+      "continuity_score": 0.7149216462086474,
+      "entropy_delta": -0.04666540953366999,
       "observer_pressure": 2,
       "continuity_shift": 0.0,
-      "field_zone": "zone_5",
+      "field_zone": "zone_4",
       "attractor_region": "unknown",
       "target": "",
       "details": {},
       "duration_ms": 0.0,
       "success": true,
       "parent_event_id": null,
-      "chain_id": "chain_7087d330"
+      "chain_id": "chain_fe3e755f"
     },
     {
-      "event_id": "evt_91ec9b22a91d",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "event_type": "observer_sync",
-      "source": "repair_2",
-      "continuity_score": 0.9857918716562817,
-      "entropy_delta": -0.17692910667586753,
-      "observer_pressure": 1,
-      "continuity_shift": 0.0,
-      "field_zone": "zone_0",
-      "attractor_region": "unknown",
-      "target": "",
-      "details": {},
-      "duration_ms": 0.0,
-      "success": true,
-      "parent_event_id": null,
-      "chain_id": "chain_0a7edfa3"
-    },
-    {
-      "event_id": "evt_ff6376502659",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "event_type": "route_shift",
-      "source": "routing_2",
-      "continuity_score": 0.8850151981601615,
-      "entropy_delta": 0.2422294529711992,
-      "observer_pressure": 1,
-      "continuity_shift": 0.0,
-      "field_zone": "zone_5",
-      "attractor_region": "unknown",
-      "target": "",
-      "details": {},
-      "duration_ms": 0.0,
-      "success": true,
-      "parent_event_id": null,
-      "chain_id": "chain_bfebeac2"
-    },
-    {
-      "event_id": "evt_1e0026c95676",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "event_type": "observer_sync",
-      "source": "structural_1",
-      "continuity_score": 0.715518277186853,
-      "entropy_delta": 0.019993007063840607,
-      "observer_pressure": 5,
-      "continuity_shift": 0.0,
-      "field_zone": "zone_3",
-      "attractor_region": "unknown",
-      "target": "",
-      "details": {},
-      "duration_ms": 0.0,
-      "success": true,
-      "parent_event_id": null,
-      "chain_id": "chain_21f0193e"
-    },
-    {
-      "event_id": "evt_7564845f7a69",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "event_type": "repair_trigger",
-      "source": "memory_1",
-      "continuity_score": 0.9591093386042532,
-      "entropy_delta": 0.24130593066019446,
-      "observer_pressure": 6,
-      "continuity_shift": 0.0,
-      "field_zone": "zone_0",
-      "attractor_region": "unknown",
-      "target": "",
-      "details": {},
-      "duration_ms": 0.0,
-      "success": true,
-      "parent_event_id": null,
-      "chain_id": "chain_bd45e143"
-    },
-    {
-      "event_id": "evt_8246f800c67e",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "event_type": "route_shift",
-      "source": "repair_2",
-      "continuity_score": 0.8863858438966229,
-      "entropy_delta": -0.15037260892527138,
-      "observer_pressure": 2,
-      "continuity_shift": 0.0,
-      "field_zone": "zone_5",
-      "attractor_region": "unknown",
-      "target": "",
-      "details": {},
-      "duration_ms": 0.0,
-      "success": true,
-      "parent_event_id": null,
-      "chain_id": "chain_0e268bae"
-    },
-    {
-      "event_id": "evt_e710a560ec83",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
+      "event_id": "evt_ac107e6a476e",
+      "timestamp": "2026-06-08T13:01:22.390427+00:00",
       "event_type": "memory_pull",
-      "source": "repair_1",
-      "continuity_score": 0.8294369497986116,
-      "entropy_delta": -0.19059008766407526,
-      "observer_pressure": 4,
+      "source": "routing_0",
+      "continuity_score": 0.9893499141560631,
+      "entropy_delta": -0.12561148811126926,
+      "observer_pressure": 5,
       "continuity_shift": 0.0,
-      "field_zone": "zone_3",
+      "field_zone": "zone_0",
       "attractor_region": "unknown",
       "target": "",
       "details": {},
       "duration_ms": 0.0,
       "success": true,
       "parent_event_id": null,
-      "chain_id": "chain_546602e3"
+      "chain_id": "chain_0851554d"
     },
     {
-      "event_id": "evt_37eb5800ac24",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "event_type": "observer_sync",
-      "source": "routing_1",
-      "continuity_score": 0.7743046971942498,
-      "entropy_delta": 0.18680994493190634,
-      "observer_pressure": 4,
-      "continuity_shift": 0.0,
-      "field_zone": "zone_3",
-      "attractor_region": "unknown",
-      "target": "",
-      "details": {},
-      "duration_ms": 0.0,
-      "success": true,
-      "parent_event_id": null,
-      "chain_id": "chain_dc2a3166"
-    },
-    {
-      "event_id": "evt_cb82012f3cf6",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "event_type": "observer_sync",
+      "event_id": "evt_daa1a0be7ff2",
+      "timestamp": "2026-06-08T13:01:22.390427+00:00",
+      "event_type": "memory_pull",
       "source": "memory_2",
-      "continuity_score": 0.7286808254280053,
-      "entropy_delta": 0.022941946080183184,
+      "continuity_score": 0.8352751352786258,
+      "entropy_delta": -0.05133581803878606,
       "observer_pressure": 2,
       "continuity_shift": 0.0,
-      "field_zone": "zone_3",
+      "field_zone": "zone_0",
       "attractor_region": "unknown",
       "target": "",
       "details": {},
       "duration_ms": 0.0,
       "success": true,
       "parent_event_id": null,
-      "chain_id": "chain_2dd91de4"
+      "chain_id": "chain_fb4c1491"
     },
     {
-      "event_id": "evt_accb71af4b66",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
+      "event_id": "evt_3f9d7d944df2",
+      "timestamp": "2026-06-08T13:01:22.390427+00:00",
       "event_type": "observer_sync",
-      "source": "memory_1",
-      "continuity_score": 0.824039579996632,
-      "entropy_delta": 0.12664310905532822,
-      "observer_pressure": 4,
-      "continuity_shift": 0.0,
-      "field_zone": "zone_5",
-      "attractor_region": "unknown",
-      "target": "",
-      "details": {},
-      "duration_ms": 0.0,
-      "success": true,
-      "parent_event_id": null,
-      "chain_id": "chain_64f1fc5c"
-    },
-    {
-      "event_id": "evt_301387b52a23",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "event_type": "repair_trigger",
-      "source": "structural_0",
-      "continuity_score": 0.9205543646825398,
-      "entropy_delta": -0.19569643480903742,
-      "observer_pressure": 5,
+      "source": "continuity_0",
+      "continuity_score": 0.7054826301503295,
+      "entropy_delta": 0.02501336506932378,
+      "observer_pressure": 2,
       "continuity_shift": 0.0,
       "field_zone": "zone_2",
       "attractor_region": "unknown",
@@ -336,87 +156,15 @@
       "duration_ms": 0.0,
       "success": true,
       "parent_event_id": null,
-      "chain_id": "chain_e38bce08"
+      "chain_id": "chain_916271ea"
     },
     {
-      "event_id": "evt_e411e2e66d00",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "event_type": "field_perturbation",
-      "source": "continuity_0",
-      "continuity_score": 0.8553161253419687,
-      "entropy_delta": 0.14354146854772265,
-      "observer_pressure": 4,
-      "continuity_shift": 0.0,
-      "field_zone": "zone_4",
-      "attractor_region": "unknown",
-      "target": "",
-      "details": {},
-      "duration_ms": 0.0,
-      "success": true,
-      "parent_event_id": null,
-      "chain_id": "chain_b8a64337"
-    },
-    {
-      "event_id": "evt_417c483d656d",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
+      "event_id": "evt_8b27a49a7685",
+      "timestamp": "2026-06-08T13:01:22.390427+00:00",
       "event_type": "route_shift",
-      "source": "structural_1",
-      "continuity_score": 0.8268011303755165,
-      "entropy_delta": 0.007360332258114333,
-      "observer_pressure": 5,
-      "continuity_shift": 0.0,
-      "field_zone": "zone_5",
-      "attractor_region": "unknown",
-      "target": "",
-      "details": {},
-      "duration_ms": 0.0,
-      "success": true,
-      "parent_event_id": null,
-      "chain_id": "chain_6e51d85a"
-    },
-    {
-      "event_id": "evt_e7d34c94f61e",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "event_type": "observer_sync",
-      "source": "routing_0",
-      "continuity_score": 0.7915426179038936,
-      "entropy_delta": -0.1078865184300441,
-      "observer_pressure": 5,
-      "continuity_shift": 0.0,
-      "field_zone": "zone_1",
-      "attractor_region": "unknown",
-      "target": "",
-      "details": {},
-      "duration_ms": 0.0,
-      "success": true,
-      "parent_event_id": null,
-      "chain_id": "chain_7912422f"
-    },
-    {
-      "event_id": "evt_abbed2103707",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "event_type": "observer_sync",
-      "source": "entropy_1",
-      "continuity_score": 0.7856602484373443,
-      "entropy_delta": -0.10785223181343429,
-      "observer_pressure": 1,
-      "continuity_shift": 0.0,
-      "field_zone": "zone_5",
-      "attractor_region": "unknown",
-      "target": "",
-      "details": {},
-      "duration_ms": 0.0,
-      "success": true,
-      "parent_event_id": null,
-      "chain_id": "chain_9bf1448a"
-    },
-    {
-      "event_id": "evt_356f4368c517",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "event_type": "memory_pull",
-      "source": "continuity_1",
-      "continuity_score": 0.9150065830808756,
-      "entropy_delta": 0.010439463733178223,
+      "source": "structural_2",
+      "continuity_score": 0.9441383428187894,
+      "entropy_delta": 0.09007318999765873,
       "observer_pressure": 4,
       "continuity_shift": 0.0,
       "field_zone": "zone_1",
@@ -426,16 +174,16 @@
       "duration_ms": 0.0,
       "success": true,
       "parent_event_id": null,
-      "chain_id": "chain_900292ea"
+      "chain_id": "chain_4f4069ba"
     },
     {
-      "event_id": "evt_80764ab35571",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "event_type": "field_perturbation",
-      "source": "repair_0",
-      "continuity_score": 0.9738221879232484,
-      "entropy_delta": -0.09641661290479742,
-      "observer_pressure": 2,
+      "event_id": "evt_424a93ab65f9",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "event_type": "memory_pull",
+      "source": "repair_2",
+      "continuity_score": 0.769347396241119,
+      "entropy_delta": 0.16527063125491165,
+      "observer_pressure": 5,
       "continuity_shift": 0.0,
       "field_zone": "zone_3",
       "attractor_region": "unknown",
@@ -444,52 +192,34 @@
       "duration_ms": 0.0,
       "success": true,
       "parent_event_id": null,
-      "chain_id": "chain_3e9f1b5c"
+      "chain_id": "chain_6d46ab0e"
     },
     {
-      "event_id": "evt_551b309c7326",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "event_type": "repair_trigger",
-      "source": "repair_2",
-      "continuity_score": 0.7847722081907833,
-      "entropy_delta": -0.15257568308338287,
-      "observer_pressure": 5,
-      "continuity_shift": 0.0,
-      "field_zone": "zone_1",
-      "attractor_region": "unknown",
-      "target": "",
-      "details": {},
-      "duration_ms": 0.0,
-      "success": true,
-      "parent_event_id": null,
-      "chain_id": "chain_a423891a"
-    },
-    {
-      "event_id": "evt_d292b3f269bf",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "event_type": "field_perturbation",
-      "source": "continuity_0",
-      "continuity_score": 0.9327417088672937,
-      "entropy_delta": -0.06790538586353406,
-      "observer_pressure": 1,
-      "continuity_shift": 0.0,
-      "field_zone": "zone_1",
-      "attractor_region": "unknown",
-      "target": "",
-      "details": {},
-      "duration_ms": 0.0,
-      "success": true,
-      "parent_event_id": null,
-      "chain_id": "chain_b156b9eb"
-    },
-    {
-      "event_id": "evt_4dbac1c10fad",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
+      "event_id": "evt_b1ce00292c24",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
       "event_type": "memory_pull",
+      "source": "structural_2",
+      "continuity_score": 0.9462505254318906,
+      "entropy_delta": -0.16518851088385794,
+      "observer_pressure": 3,
+      "continuity_shift": 0.0,
+      "field_zone": "zone_2",
+      "attractor_region": "unknown",
+      "target": "",
+      "details": {},
+      "duration_ms": 0.0,
+      "success": true,
+      "parent_event_id": null,
+      "chain_id": "chain_8909621e"
+    },
+    {
+      "event_id": "evt_d80c77103a07",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "event_type": "repair_trigger",
       "source": "continuity_1",
-      "continuity_score": 0.8573797657126885,
-      "entropy_delta": 0.09063121865158641,
-      "observer_pressure": 2,
+      "continuity_score": 0.8108610283067409,
+      "entropy_delta": 0.15140454945815407,
+      "observer_pressure": 4,
       "continuity_shift": 0.0,
       "field_zone": "zone_5",
       "attractor_region": "unknown",
@@ -498,16 +228,52 @@
       "duration_ms": 0.0,
       "success": true,
       "parent_event_id": null,
-      "chain_id": "chain_e772cb62"
+      "chain_id": "chain_3920a67e"
     },
     {
-      "event_id": "evt_d87bfbe192c2",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
+      "event_id": "evt_9925d4cda1be",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "event_type": "repair_trigger",
+      "source": "continuity_0",
+      "continuity_score": 0.7010432222443916,
+      "entropy_delta": 0.1484890322381041,
+      "observer_pressure": 6,
+      "continuity_shift": 0.0,
+      "field_zone": "zone_4",
+      "attractor_region": "unknown",
+      "target": "",
+      "details": {},
+      "duration_ms": 0.0,
+      "success": true,
+      "parent_event_id": null,
+      "chain_id": "chain_90457419"
+    },
+    {
+      "event_id": "evt_7ba3734884f0",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
       "event_type": "memory_pull",
-      "source": "structural_0",
-      "continuity_score": 0.9239596699871316,
-      "entropy_delta": 0.09335448883108383,
+      "source": "structural_1",
+      "continuity_score": 0.9629507229307142,
+      "entropy_delta": -0.14378477388453292,
       "observer_pressure": 3,
+      "continuity_shift": 0.0,
+      "field_zone": "zone_3",
+      "attractor_region": "unknown",
+      "target": "",
+      "details": {},
+      "duration_ms": 0.0,
+      "success": true,
+      "parent_event_id": null,
+      "chain_id": "chain_27c14637"
+    },
+    {
+      "event_id": "evt_eb98c8bf27ad",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "event_type": "field_perturbation",
+      "source": "routing_0",
+      "continuity_score": 0.710796132080681,
+      "entropy_delta": -0.05857729932387917,
+      "observer_pressure": 2,
       "continuity_shift": 0.0,
       "field_zone": "zone_0",
       "attractor_region": "unknown",
@@ -516,16 +282,34 @@
       "duration_ms": 0.0,
       "success": true,
       "parent_event_id": null,
-      "chain_id": "chain_f16bc1e6"
+      "chain_id": "chain_9f97bdc0"
     },
     {
-      "event_id": "evt_529212a6d7c9",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "event_type": "repair_trigger",
-      "source": "continuity_0",
-      "continuity_score": 0.7284105016454255,
-      "entropy_delta": 0.1596316720292133,
-      "observer_pressure": 6,
+      "event_id": "evt_1276c0cb66b3",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "event_type": "observer_sync",
+      "source": "continuity_1",
+      "continuity_score": 0.7838538740317682,
+      "entropy_delta": -0.10830109143558159,
+      "observer_pressure": 4,
+      "continuity_shift": 0.0,
+      "field_zone": "zone_0",
+      "attractor_region": "unknown",
+      "target": "",
+      "details": {},
+      "duration_ms": 0.0,
+      "success": true,
+      "parent_event_id": null,
+      "chain_id": "chain_ff5f8449"
+    },
+    {
+      "event_id": "evt_fe8331bfdf10",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "event_type": "observer_sync",
+      "source": "entropy_1",
+      "continuity_score": 0.9772836477763807,
+      "entropy_delta": -0.08291397908119552,
+      "observer_pressure": 1,
       "continuity_shift": 0.0,
       "field_zone": "zone_3",
       "attractor_region": "unknown",
@@ -534,16 +318,34 @@
       "duration_ms": 0.0,
       "success": true,
       "parent_event_id": null,
-      "chain_id": "chain_326a4659"
+      "chain_id": "chain_d26cc008"
     },
     {
-      "event_id": "evt_4170fa0276f5",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "event_type": "repair_trigger",
-      "source": "entropy_1",
-      "continuity_score": 0.7353862632812184,
-      "entropy_delta": -0.07941720650223971,
+      "event_id": "evt_f74ab502e3f1",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "event_type": "field_perturbation",
+      "source": "memory_2",
+      "continuity_score": 0.7662517447383335,
+      "entropy_delta": -0.003510370472610491,
       "observer_pressure": 2,
+      "continuity_shift": 0.0,
+      "field_zone": "zone_3",
+      "attractor_region": "unknown",
+      "target": "",
+      "details": {},
+      "duration_ms": 0.0,
+      "success": true,
+      "parent_event_id": null,
+      "chain_id": "chain_b067ae9b"
+    },
+    {
+      "event_id": "evt_abea73e7d2e4",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "event_type": "repair_trigger",
+      "source": "continuity_2",
+      "continuity_score": 0.8421764693177817,
+      "entropy_delta": -0.05966951978134655,
+      "observer_pressure": 4,
       "continuity_shift": 0.0,
       "field_zone": "zone_4",
       "attractor_region": "unknown",
@@ -552,99 +354,297 @@
       "duration_ms": 0.0,
       "success": true,
       "parent_event_id": null,
-      "chain_id": "chain_0ba7b049"
+      "chain_id": "chain_b1c640bb"
+    },
+    {
+      "event_id": "evt_3ef3ae348847",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "event_type": "repair_trigger",
+      "source": "structural_0",
+      "continuity_score": 0.9180064339587175,
+      "entropy_delta": -0.1610174237190905,
+      "observer_pressure": 3,
+      "continuity_shift": 0.0,
+      "field_zone": "zone_4",
+      "attractor_region": "unknown",
+      "target": "",
+      "details": {},
+      "duration_ms": 0.0,
+      "success": true,
+      "parent_event_id": null,
+      "chain_id": "chain_ac95771f"
+    },
+    {
+      "event_id": "evt_7d37daf15914",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "event_type": "observer_sync",
+      "source": "routing_2",
+      "continuity_score": 0.7324588021430974,
+      "entropy_delta": 0.08332392890904522,
+      "observer_pressure": 1,
+      "continuity_shift": 0.0,
+      "field_zone": "zone_2",
+      "attractor_region": "unknown",
+      "target": "",
+      "details": {},
+      "duration_ms": 0.0,
+      "success": true,
+      "parent_event_id": null,
+      "chain_id": "chain_c1f80a3d"
+    },
+    {
+      "event_id": "evt_8d132e70482a",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "event_type": "route_shift",
+      "source": "structural_2",
+      "continuity_score": 0.9942426485263314,
+      "entropy_delta": -0.06869158242358359,
+      "observer_pressure": 5,
+      "continuity_shift": 0.0,
+      "field_zone": "zone_5",
+      "attractor_region": "unknown",
+      "target": "",
+      "details": {},
+      "duration_ms": 0.0,
+      "success": true,
+      "parent_event_id": null,
+      "chain_id": "chain_4c2648a3"
+    },
+    {
+      "event_id": "evt_d30b5a988285",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "event_type": "observer_sync",
+      "source": "continuity_0",
+      "continuity_score": 0.8136654681499694,
+      "entropy_delta": -0.002932748615926517,
+      "observer_pressure": 3,
+      "continuity_shift": 0.0,
+      "field_zone": "zone_5",
+      "attractor_region": "unknown",
+      "target": "",
+      "details": {},
+      "duration_ms": 0.0,
+      "success": true,
+      "parent_event_id": null,
+      "chain_id": "chain_76bc2770"
+    },
+    {
+      "event_id": "evt_ade39024fab6",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "event_type": "route_shift",
+      "source": "repair_1",
+      "continuity_score": 0.7104877170297182,
+      "entropy_delta": -0.11592841835157125,
+      "observer_pressure": 6,
+      "continuity_shift": 0.0,
+      "field_zone": "zone_5",
+      "attractor_region": "unknown",
+      "target": "",
+      "details": {},
+      "duration_ms": 0.0,
+      "success": true,
+      "parent_event_id": null,
+      "chain_id": "chain_be9f4d39"
+    },
+    {
+      "event_id": "evt_eccf8a70f693",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "event_type": "memory_pull",
+      "source": "routing_2",
+      "continuity_score": 0.9051657579313652,
+      "entropy_delta": -0.04561978183861071,
+      "observer_pressure": 6,
+      "continuity_shift": 0.0,
+      "field_zone": "zone_1",
+      "attractor_region": "unknown",
+      "target": "",
+      "details": {},
+      "duration_ms": 0.0,
+      "success": true,
+      "parent_event_id": null,
+      "chain_id": "chain_6831e5a7"
+    },
+    {
+      "event_id": "evt_3ed83440affd",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "event_type": "observer_sync",
+      "source": "continuity_0",
+      "continuity_score": 0.7484500732090386,
+      "entropy_delta": -0.06279302840288792,
+      "observer_pressure": 3,
+      "continuity_shift": 0.0,
+      "field_zone": "zone_5",
+      "attractor_region": "unknown",
+      "target": "",
+      "details": {},
+      "duration_ms": 0.0,
+      "success": true,
+      "parent_event_id": null,
+      "chain_id": "chain_fe48da4e"
+    },
+    {
+      "event_id": "evt_b9f993db12e3",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "event_type": "field_perturbation",
+      "source": "memory_1",
+      "continuity_score": 0.8423147746202262,
+      "entropy_delta": 0.243406492645117,
+      "observer_pressure": 1,
+      "continuity_shift": 0.0,
+      "field_zone": "zone_0",
+      "attractor_region": "unknown",
+      "target": "",
+      "details": {},
+      "duration_ms": 0.0,
+      "success": true,
+      "parent_event_id": null,
+      "chain_id": "chain_3a794f1e"
+    },
+    {
+      "event_id": "evt_b52cf354de24",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "event_type": "memory_pull",
+      "source": "structural_0",
+      "continuity_score": 0.8231065525507418,
+      "entropy_delta": 0.030888408049161653,
+      "observer_pressure": 2,
+      "continuity_shift": 0.0,
+      "field_zone": "zone_0",
+      "attractor_region": "unknown",
+      "target": "",
+      "details": {},
+      "duration_ms": 0.0,
+      "success": true,
+      "parent_event_id": null,
+      "chain_id": "chain_fc29f32e"
+    },
+    {
+      "event_id": "evt_f6c59b2349fd",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "event_type": "observer_sync",
+      "source": "structural_2",
+      "continuity_score": 0.8526707332442395,
+      "entropy_delta": 0.09844956375469804,
+      "observer_pressure": 5,
+      "continuity_shift": 0.0,
+      "field_zone": "zone_1",
+      "attractor_region": "unknown",
+      "target": "",
+      "details": {},
+      "duration_ms": 0.0,
+      "success": true,
+      "parent_event_id": null,
+      "chain_id": "chain_9f353861"
+    },
+    {
+      "event_id": "evt_f9bfed0b7747",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "event_type": "observer_sync",
+      "source": "repair_2",
+      "continuity_score": 0.9612304596404255,
+      "entropy_delta": 0.1422863358107052,
+      "observer_pressure": 1,
+      "continuity_shift": 0.0,
+      "field_zone": "zone_4",
+      "attractor_region": "unknown",
+      "target": "",
+      "details": {},
+      "duration_ms": 0.0,
+      "success": true,
+      "parent_event_id": null,
+      "chain_id": "chain_423840b5"
     }
   ],
   "chains": {
-    "chain_03e5a4ea": [
-      "evt_1c02284c74bf"
+    "chain_2b5c951a": [
+      "evt_165dced1d48a"
     ],
-    "chain_f318561b": [
-      "evt_1f7a2dc73e8c"
+    "chain_1ba3fc0b": [
+      "evt_d1d25f065614"
     ],
-    "chain_f45d2efb": [
-      "evt_2c7ec9862631"
+    "chain_6a8525b7": [
+      "evt_7d85c81e1b6b"
     ],
-    "chain_3ecc8be6": [
-      "evt_6c54cdee40c7"
+    "chain_1fc5d4ce": [
+      "evt_febf5df44b2e"
     ],
-    "chain_e7772d3e": [
-      "evt_e4913c81222c"
+    "chain_fe3e755f": [
+      "evt_bcdc2595c026"
     ],
-    "chain_eb14db7c": [
-      "evt_c19aed5dba9e"
+    "chain_0851554d": [
+      "evt_ac107e6a476e"
     ],
-    "chain_56038333": [
-      "evt_065bd49ea8e3"
+    "chain_fb4c1491": [
+      "evt_daa1a0be7ff2"
     ],
-    "chain_7087d330": [
-      "evt_1b67c642a823"
+    "chain_916271ea": [
+      "evt_3f9d7d944df2"
     ],
-    "chain_0a7edfa3": [
-      "evt_91ec9b22a91d"
+    "chain_4f4069ba": [
+      "evt_8b27a49a7685"
     ],
-    "chain_bfebeac2": [
-      "evt_ff6376502659"
+    "chain_6d46ab0e": [
+      "evt_424a93ab65f9"
     ],
-    "chain_21f0193e": [
-      "evt_1e0026c95676"
+    "chain_8909621e": [
+      "evt_b1ce00292c24"
     ],
-    "chain_bd45e143": [
-      "evt_7564845f7a69"
+    "chain_3920a67e": [
+      "evt_d80c77103a07"
     ],
-    "chain_0e268bae": [
-      "evt_8246f800c67e"
+    "chain_90457419": [
+      "evt_9925d4cda1be"
     ],
-    "chain_546602e3": [
-      "evt_e710a560ec83"
+    "chain_27c14637": [
+      "evt_7ba3734884f0"
     ],
-    "chain_dc2a3166": [
-      "evt_37eb5800ac24"
+    "chain_9f97bdc0": [
+      "evt_eb98c8bf27ad"
     ],
-    "chain_2dd91de4": [
-      "evt_cb82012f3cf6"
+    "chain_ff5f8449": [
+      "evt_1276c0cb66b3"
     ],
-    "chain_64f1fc5c": [
-      "evt_accb71af4b66"
+    "chain_d26cc008": [
+      "evt_fe8331bfdf10"
     ],
-    "chain_e38bce08": [
-      "evt_301387b52a23"
+    "chain_b067ae9b": [
+      "evt_f74ab502e3f1"
     ],
-    "chain_b8a64337": [
-      "evt_e411e2e66d00"
+    "chain_b1c640bb": [
+      "evt_abea73e7d2e4"
     ],
-    "chain_6e51d85a": [
-      "evt_417c483d656d"
+    "chain_ac95771f": [
+      "evt_3ef3ae348847"
     ],
-    "chain_7912422f": [
-      "evt_e7d34c94f61e"
+    "chain_c1f80a3d": [
+      "evt_7d37daf15914"
     ],
-    "chain_9bf1448a": [
-      "evt_abbed2103707"
+    "chain_4c2648a3": [
+      "evt_8d132e70482a"
     ],
-    "chain_900292ea": [
-      "evt_356f4368c517"
+    "chain_76bc2770": [
+      "evt_d30b5a988285"
     ],
-    "chain_3e9f1b5c": [
-      "evt_80764ab35571"
+    "chain_be9f4d39": [
+      "evt_ade39024fab6"
     ],
-    "chain_a423891a": [
-      "evt_551b309c7326"
+    "chain_6831e5a7": [
+      "evt_eccf8a70f693"
     ],
-    "chain_b156b9eb": [
-      "evt_d292b3f269bf"
+    "chain_fe48da4e": [
+      "evt_3ed83440affd"
     ],
-    "chain_e772cb62": [
-      "evt_4dbac1c10fad"
+    "chain_3a794f1e": [
+      "evt_b9f993db12e3"
     ],
-    "chain_f16bc1e6": [
-      "evt_d87bfbe192c2"
+    "chain_fc29f32e": [
+      "evt_b52cf354de24"
     ],
-    "chain_326a4659": [
-      "evt_529212a6d7c9"
+    "chain_9f353861": [
+      "evt_f6c59b2349fd"
     ],
-    "chain_0ba7b049": [
-      "evt_4170fa0276f5"
+    "chain_423840b5": [
+      "evt_f9bfed0b7747"
     ]
   }
 }
