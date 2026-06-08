@@ -1,7 +1,5 @@
 /**
- * Chat Store
- * Zustand store for chat state — messages, sessions, active conversation.
- * Supports real-time SSE streaming with live progress tracking.
+ * Chat Store - Zustand store for PO chat with real-time SSE streaming.
  */
 import { create } from "zustand";
 
@@ -33,7 +31,6 @@ export interface StreamStatus {
   round?: number;
   maxRounds?: number;
   tool?: string;
-  toolResult?: string;
 }
 
 interface ChatStore {
@@ -44,306 +41,186 @@ interface ChatStore {
   isSending: boolean;
   error: string | null;
   streamStatus: StreamStatus;
-
-  setMessages: (messages: ChatMessage[]) => void;
-  addMessage: (message: ChatMessage) => void;
-  setSessions: (sessions: ChatSession[]) => void;
-  setActiveSession: (sessionId: string | null) => void;
-  setLoading: (loading: boolean) => void;
-  setSending: (sending: boolean) => void;
-  setError: (error: string | null) => void;
-  setStreamStatus: (status: StreamStatus) => void;
-  clearStreamStatus: () => void;
-
+  setMessages: (m: ChatMessage[]) => void;
+  addMessage: (m: ChatMessage) => void;
+  setSessions: (s: ChatSession[]) => void;
+  setActiveSession: (id: string | null) => void;
+  setLoading: (v: boolean) => void;
+  setSending: (v: boolean) => void;
+  setError: (e: string | null) => void;
+  setStreamStatus: (s: StreamStatus) => void;
   loadSessions: () => Promise<void>;
   loadHistory: (sessionId: string) => Promise<void>;
   sendMessage: (message: string, sessionId?: string) => Promise<void>;
   createSession: (title?: string) => Promise<void>;
   deleteSession: (sessionId: string) => Promise<void>;
-  searchMessages: (query: string) => Promise<ChatMessage[]>;
 }
 
-export const useChatStore = create<ChatStore>((set, get) => {
-  let messageCounter = 0;
+let msgCounter = 0;
+const nextId = (p: string) => `${p}_${Date.now()}_${++msgCounter}`;
 
-  const getNextId = (prefix: string) => {
-    messageCounter += 1;
-    return `${prefix}_${Date.now()}_${messageCounter}`;
-  };
+export const useChatStore = create<ChatStore>((set, get) => ({
+  messages: [],
+  sessions: [],
+  activeSessionId: null,
+  isLoading: false,
+  isSending: false,
+  error: null,
+  streamStatus: { active: false, stage: "", detail: "" },
 
-  return {
-    messages: [],
-    sessions: [],
-    activeSessionId: null,
-    isLoading: false,
-    isSending: false,
-    error: null,
-    streamStatus: { active: false, stage: "", detail: "" },
+  setMessages: (m) => set({ messages: m }),
+  addMessage: (m) => set((s) => ({ messages: [...s.messages, m] })),
+  setSessions: (s) => set({ sessions: s }),
+  setActiveSession: (id) => set({ activeSessionId: id }),
+  setLoading: (v) => set({ isLoading: v }),
+  setSending: (v) => set({ isSending: v }),
+  setError: (e) => set({ error: e }),
+  setStreamStatus: (s) => set({ streamStatus: s }),
 
-    setMessages: (messages) => set({ messages }),
-    addMessage: (message) => set((s) => ({ messages: [...s.messages, message] })),
-    setSessions: (sessions) => set({ sessions }),
-    setActiveSession: (sessionId) => set({ activeSessionId: sessionId }),
-    setLoading: (loading) => set({ isLoading: loading }),
-    setSending: (sending) => set({ isSending: sending }),
-    setError: (error) => set({ error }),
-    setStreamStatus: (status) => set({ streamStatus: status }),
-    clearStreamStatus: () => set({ streamStatus: { active: false, stage: "", detail: "" } }),
+  loadSessions: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await fetch("/api/chat/sessions");
+      const data = await res.json();
+      set({ sessions: data.sessions || [] });
+    } catch {
+      set({ error: "Failed to load sessions" });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
 
-    loadSessions: async () => {
-      set({ isLoading: true, error: null });
-      try {
-        const res = await fetch("/api/chat/sessions");
-        const data = await res.json();
-        const raw = data.sessions || [];
-        const sessions: ChatSession[] = raw.map((s: Record<string, unknown>) => ({
-          session_id: (s.session_id as string) || "",
-          title: (s.title as string) || `Session ${(s.session_id as string || "").slice(-6)}`,
-          created_at: (s.created_at as string) || (s.start_time as string) || "",
-          updated_at: (s.updated_at as string) || (s.last_active as string) || "",
-          entry_count: (s.entry_count as number) || (s.message_count as number) || 0,
-          last_role: (s.last_role as string) || "",
-          last_preview: (s.last_preview as string) || "",
-        }));
-        set({ sessions });
-        const activeId = data.active_session as string | null;
-        if (activeId && !get().activeSessionId) {
-          set({ activeSessionId: activeId });
-        }
-      } catch (err) {
-        set({ error: "Failed to load sessions" });
-        console.error("Failed to load sessions:", err);
-      } finally {
-        set({ isLoading: false });
-      }
-    },
+  loadHistory: async (sessionId: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await fetch(`/api/chat/history/${sessionId}`);
+      const data = await res.json();
+      const raw = data.messages || data.entries || [];
+      const msgs: ChatMessage[] = raw.map((m: any) => ({
+        message_id: m.message_id || nextId("msg"),
+        role: m.role === "assistant" ? "observer" : (m.role || "user"),
+        content: m.content || "",
+        timestamp: m.timestamp || new Date().toISOString(),
+        session_id: m.session_id || sessionId,
+      }));
+      set({ messages: msgs, activeSessionId: sessionId });
+    } catch {
+      set({ error: "Failed to load history" });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
 
-    loadHistory: async (sessionId: string) => {
-      set({ isLoading: true, error: null });
-      try {
-        const res = await fetch(`/api/chat/history/${sessionId}`);
-        const data = await res.json();
-        const raw = data.messages || data.entries || [];
-        const msgs: ChatMessage[] = raw.map((m: Record<string, unknown>) => ({
-          message_id: (m.message_id as string) || getNextId("msg"),
-          role: (m.role as "user" | "observer" | "system") || (m.role as string) === "assistant" ? "observer" : (m.role as "user" | "observer" | "system"),
-          content: (m.content as string) || "",
-          timestamp: (m.timestamp as string) || new Date().toISOString(),
-          session_id: (m.session_id as string) || sessionId,
-          task_domain: m.task_domain as string | undefined,
-          complexity: m.complexity as string | undefined,
-          observer_metadata: (m.observer_metadata as Record<string, unknown>) || {},
-        }));
-        set({ messages: msgs, activeSessionId: sessionId });
-      } catch (err) {
-        set({ error: "Failed to load chat history" });
-        console.error("Failed to load chat history:", err);
-      } finally {
-        set({ isLoading: false });
-      }
-    },
+  sendMessage: async (message: string, sessionId?: string) => {
+    const sid = sessionId || get().activeSessionId || "";
+    set({
+      isSending: true,
+      error: null,
+      streamStatus: { active: true, stage: "thinking", detail: "Thinking..." }
+    });
 
-    sendMessage: async (message: string, sessionId?: string) => {
-      set({
-        isSending: true,
-        error: null,
-        streamStatus: { active: true, stage: "thinking", detail: "🧠 Thinking..." }
+    const userMsg: ChatMessage = {
+      message_id: nextId("usr"),
+      role: "user",
+      content: message,
+      timestamp: new Date().toISOString(),
+      session_id: sid,
+    };
+    set((s) => ({ messages: [...s.messages, userMsg] }));
+
+    try {
+      const res = await fetch("/api/chat/stream", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message, session_id: sid }),
       });
 
-      const userMsg: ChatMessage = {
-        message_id: getNextId("local"),
-        role: "user",
-        content: message,
-        timestamp: new Date().toISOString(),
-        session_id: sessionId || get().activeSessionId || "",
-      };
-      set((s) => ({ messages: [...s.messages, userMsg] }));
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-      try {
-        const res = await fetch("/api/chat/stream", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            message,
-            session_id: sessionId || get().activeSessionId,
-          }),
-        });
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let finalData: any = null;
 
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
-        }
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n\n");
+          buffer = lines.pop() || "";
 
-        const reader = res.body?.getReader();
-        const decoder = new TextDecoder();
-        let buffer = "";
-        let finalData: any = null;
+          for (const line of lines) {
+            if (!line.startsWith("data: ")) continue;
+            const jsonStr = line.slice(6).trim();
+            if (!jsonStr || jsonStr === "[DONE]") continue;
 
-        if (reader) {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
+            try {
+              const evt = JSON.parse(jsonStr);
+              const etype = evt.type || evt.event;
+              const edata = evt.data || {};
 
-            buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split("\n\n");
-            buffer = lines.pop() || "";
-
-            for (const line of lines) {
-              if (!line.startsWith("data: ")) continue;
-              const jsonStr = line.slice(6).trim();
-              if (!jsonStr || jsonStr === "[DONE]") continue;
-
-              try {
-                const evt = JSON.parse(jsonStr);
-                const eventType = evt.type || evt.event;
-                const data = evt.data || {};
-
-                if (eventType === "round") {
-                  set({
-                    streamStatus: {
-                      active: true,
-                      stage: "thinking",
-                      detail: `🔄 Round ${data.round}/${data.max} — Thinking...`,
-                      round: data.round,
-                      maxRounds: data.max,
-                    }
-                  });
-                } else if (eventType === "tool_call") {
-                  set({
-                    streamStatus: {
-                      active: true,
-                      stage: "tool_call",
-                      detail: `🔧 ${data.tool}`,
-                      tool: data.tool,
-                      round: data.round,
-                    }
-                  });
-                } else if (eventType === "tool_result") {
-                  const preview = (data.result || "").substring(0, 80);
-                  set({
-                    streamStatus: {
-                      active: true,
-                      stage: "tool_result",
-                      detail: `📋 ${data.tool}: ${preview}${data.result?.length > 80 ? "…" : ""}`,
-                      tool: data.tool,
-                      toolResult: preview,
-                    }
-                  });
-                } else if (eventType === "complete") {
-                  set({
-                    streamStatus: {
-                      active: true,
-                      stage: "responding",
-                      detail: "💬 Generating response...",
-                    }
-                  });
-                } else if (eventType === "max_rounds") {
-                  set({
-                    streamStatus: {
-                      active: true,
-                      stage: "responding",
-                      detail: "⚠️ Max rounds — Generating final response...",
-                    }
-                  });
-                } else if (eventType === "final") {
-                  finalData = data;
-                } else if (eventType === "error") {
-                  set({
-                    streamStatus: {
-                      active: true,
-                      stage: "error",
-                      detail: `❌ ${data.message || "Unknown error"}`,
-                    }
-                  });
-                }
-              } catch (_parseErr) {
-                // Skip malformed SSE events
+              if (etype === "round") {
+                set({ streamStatus: { active: true, stage: "thinking", detail: `Round ${edata.round}/${edata.max}`, round: edata.round, maxRounds: edata.max } });
+              } else if (etype === "tool_call") {
+                set({ streamStatus: { active: true, stage: "tool_call", detail: `Tool: ${edata.tool}`, tool: edata.tool } });
+              } else if (etype === "tool_result") {
+                const prev = (edata.result || "").substring(0, 60);
+                set({ streamStatus: { active: true, stage: "tool_result", detail: `${edata.tool}: ${prev}` } });
+              } else if (etype === "complete" || etype === "max_rounds") {
+                set({ streamStatus: { active: true, stage: "responding", detail: "Generating response..." } });
+              } else if (etype === "final") {
+                finalData = edata;
+              } else if (etype === "error") {
+                set({ streamStatus: { active: true, stage: "error", detail: edata.message || "Error" } });
               }
-            }
+            } catch (_) { /* skip malformed */ }
           }
         }
-
-        // Add final response as a chat message
-        if (finalData) {
-          const observerMsg: ChatMessage = {
-            message_id: getNextId("observer"),
-            role: "observer",
-            content: finalData.response || "No response",
-            timestamp: new Date().toISOString(),
-            session_id: finalData.session_id || sessionId || "",
-            task_domain: finalData.observer?.task_domain,
-            complexity: finalData.observer?.complexity,
-            observer_metadata: {
-              routing_path: finalData.observer?.routing_path,
-              model: finalData.observer?.model,
-              confidence: finalData.confidence,
-              agreement: finalData.observer?.agreement,
-              spawn_status: finalData.observer?.spawn_status,
-              system: finalData.system,
-            },
-          };
-          set((s) => ({
-            messages: [...s.messages, observerMsg],
-            streamStatus: { active: false, stage: "complete", detail: "" },
-          }));
-        } else {
-          set({ streamStatus: { active: false, stage: "", detail: "" } });
-        }
-
-        await get().loadSessions();
-      } catch (err) {
-        set({
-          error: "Failed to send message",
-          streamStatus: { active: false, stage: "error", detail: "Connection failed" },
-        });
-        console.error("Failed to send message:", err);
-      } finally {
-        set({ isSending: false });
       }
-    },
 
-    createSession: async (title?: string) => {
-      try {
-        const res = await fetch("/api/chat/sessions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ title }),
-        });
-        const data = await res.json();
-        if (data.session) {
-          set({ activeSessionId: data.session.session_id, messages: [] });
-          await get().loadSessions();
-        }
-      } catch (err) {
-        set({ error: "Failed to create session" });
-        console.error("Failed to create session:", err);
+      if (finalData) {
+        const obsMsg: ChatMessage = {
+          message_id: nextId("obs"),
+          role: "observer",
+          content: finalData.response || "No response",
+          timestamp: new Date().toISOString(),
+          session_id: finalData.session_id || sid,
+        };
+        set((s) => ({
+          messages: [...s.messages, obsMsg],
+          streamStatus: { active: false, stage: "done", detail: "" },
+        }));
+      } else {
+        set({ streamStatus: { active: false, stage: "", detail: "" } });
       }
-    },
+    } catch (err: any) {
+      set({ error: err.message || "Failed to send", streamStatus: { active: false, stage: "error", detail: "Connection failed" } });
+    } finally {
+      set({ isSending: false });
+    }
+  },
 
-    deleteSession: async (sessionId: string) => {
-      try {
-        await fetch(`/api/chat/sessions/${sessionId}`, { method: "DELETE" });
-        const { activeSessionId } = get();
-        if (activeSessionId === sessionId) {
-          set({ activeSessionId: null, messages: [] });
-        }
-        await get().loadSessions();
-      } catch (err) {
-        set({ error: "Failed to delete session" });
-        console.error("Failed to delete session:", err);
+  createSession: async (title?: string) => {
+    try {
+      const res = await fetch("/api/chat/sessions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title }),
+      });
+      const data = await res.json();
+      if (data.session) {
+        set({ activeSessionId: data.session.session_id, messages: [] });
       }
-    },
+    } catch { /* ignore */ }
+  },
 
-    searchMessages: async (query: string): Promise<ChatMessage[]> => {
-      try {
-        const res = await fetch(
-          `/api/chat/search?q=${encodeURIComponent(query)}`
-        );
-        const data = await res.json();
-        return data.results || [];
-      } catch (err) {
-        console.error("Failed to search messages:", err);
-        return [];
+  deleteSession: async (sessionId: string) => {
+    try {
+      await fetch(`/api/chat/sessions/${sessionId}`, { method: "DELETE" });
+      if (get().activeSessionId === sessionId) {
+        set({ activeSessionId: null, messages: [] });
       }
-    },
-  };
-});
+    } catch { /* ignore */ }
+  },
+}));
