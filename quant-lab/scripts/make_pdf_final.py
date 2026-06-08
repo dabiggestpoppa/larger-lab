@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Final PDF — readable, comprehensive."""
+"""Final PDF — full basket pair configs, all stats."""
 import json
 from pathlib import Path
 from datetime import datetime
@@ -88,28 +88,39 @@ do_assets(cm, "CRYPTO & METALS (4 pairs)")
 do_assets(idx, "INDICES (5 pairs)")
 story.append(PageBreak())
 
-# 2. OPTIMAL BASKETS
-story.append(Paragraph("2. OPTIMAL BASKETS (2-14 assets)", h1_s))
+# 2. OPTIMAL BASKETS — FULL PAIR CONFIGS
+story.append(Paragraph("2. OPTIMAL BASKETS — Full Pair Configs Per Basket", h1_s))
+story.append(Paragraph("Each basket shows every pair with its mode, net$, and cost%", h2_s))
 story.append(HRFlowable(width="100%", thickness=0.5, color=colors.grey))
 story.append(Spacer(1,2*mm))
-bdata = [["Assets","Net $","Avg WR%","Trades","Pairs Added"]]
-for n, net, wr, tr, pairs in [
-    (2,"$13,908","77.3%","9,606","BTCUSD, EURNZD"),
-    (3,"$19,517","77.9%","14,933","+ GBPNZD"),
-    (4,"$24,406","78.4%","21,073","+ GBPCAD"),
-    (5,"$29,182","78.9%","28,695","+ GBPUSD"),
-    (6,"$33,741","79.2%","39,801","+ CHFJPY"),
-    (7,"$38,142","79.4%","46,066","+ GBPJPY"),
-    (8,"$42,382","79.6%","50,586","+ GBPAUD"),
-    (9,"$46,472","79.7%","57,455","+ EURCAD"),
-    (10,"$50,046","79.8%","63,545","+ USDCAD"),
-    (11,"$53,594","79.9%","70,722","+ USDJPY"),
-    (12,"$56,752","79.9%","73,802","+ EURAUD"),
-    (13,"$59,646","80.2%","79,395","+ EURUSD"),
-    (14,"$62,285","80.2%","85,242","+ USDCHF"),
-]:
-    bdata.append([Paragraph(str(n),cell), Paragraph(net,cell), Paragraph(wr,cell), Paragraph(tr,cell), Paragraph(pairs,cell_l)])
-story.append(tbl(bdata, [18*mm,25*mm,18*mm,18*mm,130*mm]))
+
+sp = sorted(combo.items(), key=lambda x: x[1].get("net_usd",-999999), reverse=True)
+
+for n in range(2, min(15, len(sp)+1)):
+    basket = sp[:n]
+    total_net = sum(e.get("net_usd",0) for _,e in basket)
+    total_trades = sum(e.get("trades",0) for _,e in basket)
+    avg_wr = sum(e.get("wr",0) for _,e in basket) / len(basket)
+    
+    story.append(Paragraph(f"Basket: {n} assets | Net: ${total_net:,.0f} | Avg WR: {avg_wr:.1f}% | Trades: {total_trades:,}", h2_s))
+    
+    bdata = [["Pair","Type","Mode","Trades","WR%","PF","Net $","Cost%"]]
+    for sym, e in basket:
+        bdata.append([
+            Paragraph(sym, cell_l),
+            Paragraph(e.get("type",""), cell),
+            Paragraph(e.get("mode",""), cell),
+            Paragraph(str(e.get("trades",0)), cell),
+            Paragraph(f"{e.get('wr',0):.1f}", cell),
+            Paragraph(f"{e.get('pf',0):.1f}", cell),
+            Paragraph(f"${e.get('net_usd',0):,.0f}", cell),
+            Paragraph(f"{e.get('cost_pct',0):.1f}%", cell),
+        ])
+    story.append(tbl(bdata, [25*mm,16*mm,14*mm,14*mm,12*mm,12*mm,18*mm,12*mm]))
+    story.append(Spacer(1,3*mm))
+    if n % 3 == 0 and n < 14:
+        story.append(PageBreak())
+
 story.append(PageBreak())
 
 # 3. CATEGORIES
@@ -152,7 +163,7 @@ story.append(PageBreak())
 story.append(Paragraph("4. FULL PAIR RANKINGS (all 36 pairs)", h1_s))
 story.append(HRFlowable(width="100%", thickness=0.5, color=colors.grey))
 story.append(Spacer(1,2*mm))
-sp = sorted(combo.items(), key=lambda x: x[1].get("net_usd",-999999), reverse=True)
+
 rdata = [["#","Pair","Type","Mode","Trades","WR%","PF","Net $","Cost%","Status"]]
 for i,(sym,e) in enumerate(sp,1):
     net = e.get("net_usd",0); cost = e.get("cost_pct",999)
