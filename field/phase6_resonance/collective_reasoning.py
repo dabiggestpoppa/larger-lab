@@ -266,6 +266,7 @@ class CollectiveReasoningModule:
             concluded = sum(1 for s in self._sessions.values() if s.status == "concluded")
             deadlocked = sum(1 for s in self._sessions.values() if s.status == "deadlocked")
             total_args = sum(len(s.arguments) for s in self._sessions.values())
+            # Merge counters into top-level dict for test compatibility
             return {
                 "total_sessions": len(self._sessions),
                 "active_sessions": active,
@@ -273,8 +274,186 @@ class CollectiveReasoningModule:
                 "deadlocked_sessions": deadlocked,
                 "total_arguments": total_args,
                 "total_participants": len(self._agent_sessions),
-                "stats": dict(self._stats),
+                **self._stats,
             }
+
+    # ── Proposal / Voting / Debate API (test-compatible) ──────────
+
+    def submit_proposal(self, agent_id: str, content: str,
+                        metadata: Optional[Dict[str, Any]] = None) -> str:
+        """Submit a proposal — creates a consensus session behind the scenes.
+
+        Returns:
+            proposal_id (same as session_id).
+        """
+        pid = self.create_session(topic=content, mode=ReasoningMode.CONSENSUS,
+                                  participants=[agent_id])
+        # Store metadata on the session
+        with self._lock:
+            session = self._sessions.get(pid)
+            if session and metadata:
+                session.arguments.append(Argument(
+                    agent_id=agent_id,
+                    arg_type=ArgumentType.CLAIM,
+                    content=content,
+                    strength=1.0,
+                    metadata=metadata,
+                ))
+        self._stats["total_proposals"] = self._stats.get("total_proposals", 0) + 1
+        return pid
+
+    def get_proposals(self) -> List[Dict[str, Any]]:
+        """Get all proposals (consensus sessions) as dicts."""
+        with self._lock:
+            return [
+                {
+                    "proposal_id": sid,
+                    "topic": s.topic,
+                    "status": s.status,
+                    "created_at": s.created_at,
+                }
+                for sid, s in self._sessions.items()
+            ]
+
+    def cast_vote(self, agent_id: str, proposal_id: str, vote: str,
+                  weight: float = 1.0) -> bool:
+        """Cast a vote on a proposal.
+
+        Args:
+            agent_id: Voting agent.
+            proposal_id: The proposal/session ID.
+            vote: 'agree', 'disagree', or 'abstain'.
+            weight: Vote weight 0.0-1.0.
+
+        Returns:
+            True if vote recorded.
+        """
+        with self._lock:
+            session = self._sessions.get(proposal_id)
+            if not session or session.status != "active":
+                return False
+
+        arg_type = ArgumentType.EVIDENCE if vote == "agree" else ArgumentType.COUNTER
+        self.submit_argument(
+            session_id=proposal_id,
+            agent_id=agent_id,
+            arg_type=arg_type,
+            content=f"Vote: {vote}",
+            strength=weight,
+        )
+        self._stats["total_votes"] = self._stats.get("total_votes", 0) + 1
+        return True
+
+    def get_consensus(self, proposal_id: str) -> Optional[Dict[str, Any]]:
+        """Get consensus result for a proposal.
+
+        Returns:
+            Dict with status, agree_count, disagree_count, etc.
+        """
+        with self._lock:
+            session = self._sessions.get(proposal_id)
+            if not session:
+                return None
+
+            agree_count = sum(1 for a in session.arguments
+                              if a.arg_type == ArgumentType.EVIDENCE)
+            disagree_count = sum(1 for a in session.arguments
+                                 if a.arg_type == ArgumentType.COUNTER)
+            total = agree_count + disagree_count
+
+            if total == 0:
+                return {"status": "pending", "agree_count": 0, "disagree_count": 0}
+
+            agree_ratio = agree_count / total
+            if agree_ratio >= self.config.consensus_threshold:
+                status = "consensus"
+            elif disagree_count > agree_count:
+                status = "rejected"
+            else:
+                status = "pending"
+
+            return {
+                "status": status,
+                "agree_count": agree_count,
+                "disagree_count": disagree_count,
+                "total_votes": total,
+                "confidence": round(agree_ratio, 3),
+            }
+
+    def get_dissent_flags(self) -> List[Dict[str, Any]]:
+        """Get all dissent flags — agents who voted disagree.
+
+        Returns:
+            List of dicts with agent_id, proposal_id, reason.
+        """
+        flags = []
+        with self._lock:
+            for sid, session in self._sessions.items():
+                for arg in session.arguments:
+                    if arg.arg_type == ArgumentType.COUNTER:
+                        flags.append({
+                            "agent_id": arg.agent_id,
+                            "proposal_id": sid,
+                            "reason": arg.content,
+                        })
+        return flags
+
+    def open_debate(self, proposal_id: str, agent_id: str, argument: str) -> str:
+        """Open a debate thread on a proposal.
+
+        Returns:
+            debate_thread_id (same as the opening argument's ID).
+        """
+        arg_id = self.submit_argument(
+            session_id=proposal_id,
+            agent_id=agent_id,
+            arg_type=ArgumentType.COUNTER,
+            content=argument,
+        )
+        self._stats["total_debates"] = self._stats.get("total_debates", 0) + 1
+        return arg_id or str(uuid.uuid4())[:8]
+
+    def reply_to_debate(self, debate_id: str, agent_id: str, argument: str) -> bool:
+        """Reply to a debate thread.
+
+        Returns:
+            True if reply recorded.
+        """
+        # Find the session containing this debate
+        with self._lock:
+            for sid, session in self._sessions.items():
+                if any(a.argument_id == debate_id for a in session.arguments):
+                    self.submit_argument(
+                        session_id=sid,
+                        agent_id=agent_id,
+                        arg_type=ArgumentType.REBUTTAL,
+                        content=argument,
+                        targets=[debate_id],
+                    )
+                    return True
+        return False
+
+    def get_debate_thread(self, debate_id: str) -> Optional[Dict[str, Any]]:
+        """Get a debate thread by ID.
+
+        Returns:
+            Dict with thread info and replies.
+        """
+        with self._lock:
+            for sid, session in self._sessions.items():
+                for arg in session.arguments:
+                    if arg.argument_id == debate_id:
+                        replies = [
+                            a.model_dump() for a in session.arguments
+                            if debate_id in a.targets
+                        ]
+                        return {
+                            "debate_id": debate_id,
+                            "proposal_id": sid,
+                            "opening_argument": arg.content,
+                            "replies": replies,
+                        }
+        return None
 
     def _check_consensus(self, session_id: str) -> None:
         """Internal: check if consensus has been reached in a session."""
