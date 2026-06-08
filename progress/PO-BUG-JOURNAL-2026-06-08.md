@@ -258,3 +258,17 @@ Poll timeout was increased from 30s to 60s to "reduce requests" — but this mad
 3. **Watchdog processes need watchdog** — a broken watchdog is worse than no watchdog (causes restart loops).
 4. **PID files can go stale** — always verify PID matches the expected process, not just "is alive".
 5. **Coordinate before touching shared infrastructure** — PM's VTuber incident took down PO for hours.
+6. **Agent timeout must be >= LLM timeout + tool overhead** — reducing it below the LLM's own timeout causes silent failures and thread leaks.
+7. **Multiple agents editing the same file without coordination causes regressions** — the agent timeout was changed 4 times by different agents, each undoing the previous fix.
+8. **409 Conflict is a session contention problem, not a code problem** — the fix is aggressive session reclaim + never giving up, not just retrying.
+
+---
+
+## Verification (2026-06-08 19:40 UTC)
+
+All fixes applied and verified:
+- Gateway PID 16712: polling clean, no 409 errors, no restarts
+- Watchdog PID 16392: stable, no restart loop
+- OCE Backend PID 11712: running
+- API Server PID 21068: running
+- All 8 issues resolved, 8 commits pushed to master
