@@ -266,15 +266,24 @@ def main():
     offset = 0
 
     # Clear any stale updates from previous runs so we start fresh
-    try:
-        _clear = requests.get(f"{base_url}/getUpdates", params={"offset": -1, "timeout": 0}, timeout=5)
-        _cleared = _clear.json().get("result", [])
-        log(f"Stale check: {len(_cleared)} pending updates")
-        if _cleared:
-            offset = max(u["update_id"] for u in _cleared) + 1
-            log(f"Cleared stale updates, starting at offset {offset}")
-    except Exception as _e:
-        log(f"Stale clear error: {_e}")
+    # Retry up to 3 times to handle 409 conflicts from other instances
+    for _retry in range(3):
+        try:
+            _clear = requests.get(f"{base_url}/getUpdates", params={"offset": -1, "timeout": 0}, timeout=10)
+            _data = _clear.json()
+            if _data.get("ok"):
+                _cleared = _data.get("result", [])
+                log(f"Stale check: {len(_cleared)} pending updates")
+                if _cleared:
+                    offset = max(u["update_id"] for u in _cleared) + 1
+                    log(f"Cleared stale updates, starting at offset {offset}")
+                break
+            else:
+                log(f"Stale clear attempt {_retry+1}: {_data}")
+                time.sleep(5)
+        except Exception as _e:
+            log(f"Stale clear error (attempt {_retry+1}): {_e}")
+            time.sleep(5)
 
     log("Initializing Telegram Presence System — All 3 Phases + Agent...")
     vault = Vault()
@@ -303,6 +312,7 @@ def main():
     log("Poll loop started. PO is live on Telegram.")
     _heartbeat = time.time()
 
+    _409_count = 0
     while True:
         try:
             # Heartbeat every 60s
@@ -314,9 +324,22 @@ def main():
             r = requests.get(_poll_url, timeout=35)
             data = r.json()
             if not data.get("ok"):
-                log(f"getUpdates error: {data}")
-                time.sleep(5)
-                continue
+                _err = data.get("description", "")
+                if "409" in str(data.get("error_code", "")) or "Conflict" in _err:
+                    _409_count += 1
+                    log(f"409 Conflict (#{_409_count}): another bot instance is polling. Waiting 30s...")
+                    if _409_count >= 5:
+                        log("Too many 409 errors. Exiting — fix the duplicate bot instance.")
+                        _release_pid_lock()
+                        sys.exit(1)
+                    time.sleep(30)
+                    continue
+                else:
+                    log(f"getUpdates error: {data}")
+                    time.sleep(5)
+                    continue
+            else:
+                _409_count = 0  # Reset on success
 
             results = data.get("result", [])
             log(f"poll: offset={offset} got={len(results)}")
