@@ -28,11 +28,32 @@ def log(msg):
         pass
 
 def is_gateway_running():
-    """Check if telegram_gateway.py process is alive."""
+    """Check if telegram_gateway.py process is alive using PID file + process check."""
+    pid_file = os.path.join(SCRIPT_DIR, ".telegram_gateway.pid")
+    try:
+        if os.path.exists(pid_file):
+            with open(pid_file, "r") as f:
+                pid = int(f.read().strip())
+            # Check if process with this PID exists
+            if sys.platform == "win32":
+                import ctypes
+                kernel32 = ctypes.windll.kernel32
+                PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+                handle = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+                if handle:
+                    kernel32.CloseHandle(handle)
+                    return True
+                return False
+            else:
+                os.kill(pid, 0)
+                return True
+    except (ValueError, OSError, ProcessLookupError):
+        pass
+    # Fallback: scan all python processes for telegram_gateway in cmdline
     try:
         result = subprocess.run(
             ["powershell", "-Command",
-             "Get-Process -Name python -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine -like '*telegram*' } | Select-Object -ExpandProperty Id"],
+             "Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | Where-Object { $_.CommandLine -like '*telegram_gateway*' } | Select-Object -ExpandProperty ProcessId"],
             capture_output=True, text=True, timeout=10
         )
         return result.stdout.strip() != ""
