@@ -1,0 +1,18 @@
+{
+  "legacyEditor": false,
+  "livePreview": true,
+  "promptDelete": false,
+  "alwaysUpdateLinks": true,
+  "newLinkFormat": "shortest",
+  "useMarkdownLinks": false,
+  "showLineNumber": true,
+  "foldHeading": true,
+  "foldIndent": true,
+  "smartIndentList": true,
+  "strictLineBreaks": false,
+  "tabSize": 4,
+  "spellcheck": true,
+  "attachmentFolderPath": "attachments",
+  "newFileLocation": "folder",
+  "newFileFolderPath": "."
+}
