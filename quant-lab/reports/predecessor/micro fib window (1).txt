@@ -1,0 +1,211 @@
+CEREBUS Recursive Fibonacci Flow
+Multi-Timeframe Pattern Analysis Dashboard
+This dashboard visualizes the recursive temporal price logic across multiple timeframes (15M, 1H, 4H), revealing how Fibonacci patterns cascade and interact. The analysis
+focuses on pattern hit rates, session effectiveness, recursive relationships, and ILM continuation statistics.
+Key Performance Metrics
+Highest Hit Rate
+84%
+15M AB-CD Bullish (50% → -25%)
+Best ILM Continuation
+45%
+1H 3-Leg Bearish Pattern
+Fastest Completion
+3 bars
+4H AB-CD Bullish Pattern
+Most Recursive
+15M→1H→4H
+AB-CD Bullish Pattern
+Pattern Hit Rates by Timeframe
+Average Completion Time (Bars)
+5/20/25, 3:25 PM
+CEREBUS Recursive Fibonacci Flow - Complete Analysis Dashboard
+https://fgcehsdo.gensparkspace.com
+1/4
+Session Performance Analysis
+ILM Continuation Rates
+Recursive Pattern Relationships
+5/20/25, 3:25 PM
+CEREBUS Recursive Fibonacci Flow - Complete Analysis Dashboard
+https://fgcehsdo.gensparkspace.com
+2/4
+15M
+1H
+AB-CD Bullish
+84%
+AB-CD Bullish
+72%
+3-Leg Bullish
+58%
+3-Leg Bearish
+63%
+3-Leg Bearish
+60%
+Fibonacci Sequence Effectiveness
+CEREBUS Recursive Timeframe Logic Data
+Pattern
+Type
+Timeframe
+Fib Sequence
+Hit
+Rate
+Avg
+Completion
+Common
+Session
+Triggers
+Higher TF
+Recursive
+Pattern
+ILM
+Continuation
+AB-CD
+Bullish
+15M
+50% → -25%
+84%
+4 bars
+Asian
+Yes
+15M→1H→4H
+38%
+AB-CD
+Bearish
+15M
+61.8% → -50%
+76%
+6 bars
+London
+No
+None
+35%
+AB-CD
+Bullish
+1H
+78.6% → -100%
+72%
+4 bars
+London
+Yes
+1H→4H
+42%
+AB-CD
+Bearish
+1H
+72% → -100%
+67%
+5 bars
+NY
+No
+None
+37%
+3-Leg
+Bullish
+15M
+50% → 72% →
+-25%
+58%
+12 bars
+London
+Yes
+15M→1H
+32%
+5/20/25, 3:25 PM
+CEREBUS Recursive Fibonacci Flow - Complete Analysis Dashboard
+https://fgcehsdo.gensparkspace.com
+3/4
+Pattern
+Type
+Timeframe
+Fib Sequence
+Hit
+Rate
+Avg
+Completion
+Common
+Session
+Triggers
+Higher TF
+Recursive
+Pattern
+ILM
+Continuation
+AB-CD
+Bullish
+4H
+61.8% → -50%
+69%
+3 bars
+NY
+No
+None
+34%
+3-Leg
+Bearish
+1H
+61.8% → 78.6%
+→ -100%
+63%
+8 bars
+European
+Yes
+1H→4H
+45%
+AB-CD
+Bearish
+4H
+72% → -100%
+65%
+5 bars
+Asian
+No
+None
+36%
+3-Leg
+Bullish
+4H
+50% → 61.8% →
+-50%
+55%
+8 bars
+European
+No
+None
+38%
+3-Leg
+Bearish
+15M
+61.8% → 61.8%
+→ -50%
+60%
+10 bars
+NY
+Yes
+15M→1H
+40%
+Key Analysis Insights
+Pattern Effectiveness
+The 15M timeframe shows the highest hit rates, with the AB-CD Bullish pattern (50% → -25%) achieving an impressive 84% hit rate.
+AB-CD patterns generally outperform 3-Leg patterns in terms of hit rate, though 3-Leg patterns show stronger ILM continuation.
+Bullish patterns tend to have higher hit rates than bearish patterns across timeframes.
+The 4H timeframe shows the fastest pattern completion (3 bars average for AB-CD Bullish).
+Session Analysis
+The European/London session shows the highest overall effectiveness, with strong performance in both hit rates and ILM continuation.
+The Asian session is particularly effective for 15M AB-CD Bullish patterns.
+The NY session tends to favor bearish patterns in the 1H timeframe.
+European session patterns show the strongest recursive behavior, often triggering higher timeframe activations.
+Recursive Structure
+Four patterns demonstrate timeframe-flipping properties, where lower timeframe completions trigger higher timeframe activations.
+The strongest recursive chain is the 15M→1H→4H sequence starting with the AB-CD Bullish pattern.
+1H patterns that trigger 4H activations show higher average ILM continuation rates (42-45%).
+3-Leg patterns in 15M and 1H timeframes show significant ability to trigger higher timeframe patterns.
+Fibonacci Sequence Insights
+The 50% → -25% sequence shows the highest hit rate (84%) in the 15M timeframe.
+3-Leg sequences with 78.6% as the middle leg show stronger ILM continuation rates.
+The -100% extension level is common in 1H timeframe patterns, particularly for bearish patterns.
+Sequences containing the 61.8% retracement level appear in 5 out of 10 patterns, showing its significance across timeframes.
+CEREBUS Recursive Temporal Price Logic Decoder Project
+Comprehensive Multi-Timeframe Fibonacci Pattern Analysis
+5/20/25, 3:25 PM
+CEREBUS Recursive Fibonacci Flow - Complete Analysis Dashboard
+https://fgcehsdo.gensparkspace.com
+4/4

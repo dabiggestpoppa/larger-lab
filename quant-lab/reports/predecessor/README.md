@@ -1,8 +1,9 @@
 # CEREBUS Predecessor Data — Summary for CC Planning
 
 > **Compiled:** 2026-06-08 by PM2
-> **Source:** 12 PDF files + 1 Excel file from MAD's archive
+> **Source:** 60+ PDF files + 3 Excel files from MAD's archive
 > **Purpose:** Prepare data context for CC to make official integration plan
+> **Status:** 28 PDFs extracted to text, Excel pending processing
 
 ---
 
