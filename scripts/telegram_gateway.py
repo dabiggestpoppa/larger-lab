@@ -265,9 +265,17 @@ def main():
     base_url = f"https://api.telegram.org/bot{token}"
     offset = 0
 
+    # Delete webhook first — clears any stuck long-poll sessions on Telegram's side
+    try:
+        _wh = requests.get(f"{base_url}/deleteWebhook", timeout=10)
+        log(f"deleteWebhook: {_wh.json().get('description', _wh.status_code)}")
+    except Exception as _e:
+        log(f"deleteWebhook error (non-fatal): {_e}")
+    time.sleep(2)
+
     # Clear any stale updates from previous runs so we start fresh
-    # Retry up to 3 times to handle 409 conflicts from other instances
-    for _retry in range(3):
+    # Retry with backoff to handle 409 conflicts from other instances
+    for _retry in range(5):
         try:
             _clear = requests.get(f"{base_url}/getUpdates", params={"offset": -1, "timeout": 0}, timeout=10)
             _data = _clear.json()
@@ -279,8 +287,13 @@ def main():
                     log(f"Cleared stale updates, starting at offset {offset}")
                 break
             else:
-                log(f"Stale clear attempt {_retry+1}: {_data}")
-                time.sleep(5)
+                _err = _data.get("description", "")
+                if "409" in str(_data.get("error_code", "")) or "Conflict" in _err:
+                    log(f"Stale clear 409 (attempt {_retry+1}), waiting {10 + _retry*10}s...")
+                    time.sleep(10 + _retry*10)
+                else:
+                    log(f"Stale clear attempt {_retry+1}: {_data}")
+                    time.sleep(5)
         except Exception as _e:
             log(f"Stale clear error (attempt {_retry+1}): {_e}")
             time.sleep(5)
@@ -313,6 +326,7 @@ def main():
     _heartbeat = time.time()
 
     _409_count = 0
+    _409_backoff = 30  # starts at 30s, doubles up to 300s
     while True:
         try:
             # Heartbeat every 60s
@@ -320,26 +334,33 @@ def main():
                 log("HEARTBEAT: poll loop alive")
                 _heartbeat = time.time()
 
-            _poll_url = f"{base_url}/getUpdates?offset={offset}&limit=10&timeout=30"
-            r = requests.get(_poll_url, timeout=35)
+            _poll_url = f"{base_url}/getUpdates?offset={offset}&limit=10&timeout=60"
+            r = requests.get(_poll_url, timeout=65)
             data = r.json()
             if not data.get("ok"):
                 _err = data.get("description", "")
                 if "409" in str(data.get("error_code", "")) or "Conflict" in _err:
                     _409_count += 1
-                    log(f"409 Conflict (#{_409_count}): another bot instance is polling. Waiting 30s...")
-                    if _409_count >= 5:
-                        log("Too many 409 errors. Exiting — fix the duplicate bot instance.")
-                        _release_pid_lock()
-                        sys.exit(1)
-                    time.sleep(30)
+                    _409_backoff = min(_409_backoff * 2, 300)  # exponential backoff, max 5min
+                    log(f"409 Conflict (#{_409_count}): another bot instance polling. Backoff {_409_backoff}s...")
+                    # Try deleteWebhook to kill the other session
+                    if _409_count % 3 == 0:
+                        try:
+                            requests.get(f"{base_url}/deleteWebhook", timeout=10)
+                            log("Sent deleteWebhook to clear competing session")
+                        except:
+                            pass
+                    time.sleep(_409_backoff)
                     continue
                 else:
                     log(f"getUpdates error: {data}")
                     time.sleep(5)
                     continue
             else:
-                _409_count = 0  # Reset on success
+                if _409_count > 0:
+                    log(f"409 resolved after {_409_count} conflicts. Resetting backoff.")
+                _409_count = 0
+                _409_backoff = 30  # Reset backoff on success
 
             results = data.get("result", [])
             log(f"poll: offset={offset} got={len(results)}")
@@ -448,10 +469,13 @@ def main():
                                 with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
                                     future = executor.submit(agent.chat, msg_text, full_ctx, progress_callback=on_progress)
                                     try:
-                                        resp = future.result(timeout=180)
+                                        resp = future.result(timeout=60)
                                     except concurrent.futures.TimeoutError:
-                                        resp = "⏱️ Response timed out after 180s. Try a simpler question."
+                                        resp = "⏱️ Response timed out after 60s. Try a simpler question or use /new to start fresh."
                                         log("AGENT TIMEOUT")
+                                    except Exception as _agent_e:
+                                        resp = f"❌ Agent error: `{str(_agent_e)[:200]}`"
+                                        log(f"AGENT FUTURE ERROR: {_agent_e}")
 
                                 # Record in timeline and continuity cache
                                 TIMELINE.record("agent_chat", {"user": msg_text[:50], "response_len": len(resp)})
