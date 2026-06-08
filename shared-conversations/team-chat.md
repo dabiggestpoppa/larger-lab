@@ -1,8 +1,9 @@
 ﻿# Team Shared Conversation
 
 > **Purpose:** Quick-communication hub for CC/PM/PM2/AS/RL coordination.
-> **Current focus:** O2C × MAD LABS Sovereign Research Mesh — Phases L1→L4
-> **Plan:** `docs/plans/O2C-RESEARCH-MESH.md`
+> **Current focus:** Quant Lab — 9K Config Test + Monte Carlo + Forward Test Prep
+> **Plan:** `quant-lab/QUANT_JOURNAL.md`
+> **Last Updated:** 2026-06-08 22:00 UTC (CEREBUS final sweep — all servers up, stale processes killed, MAD closing)
 > **Tasks:** `progress/O2C-RESEARCH-MESH-TASKS.md`
 > **Last Updated:** 2026-06-08 (Quant analysis complete — 9K config, Monte Carlo, forward test plan)
 >
