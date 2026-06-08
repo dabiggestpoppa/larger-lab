@@ -1,0 +1,240 @@
+
+--- Page 1 ---
+
+1/4/26, 4:01 PM Part 3.2: Weekly Hold Position Management
+
+PART 3.2: WEEKLY HOLD POSITION MANAGEMENT
+
+EUR/USD & SPX Weekly Strategies | Monday Entry — Friday Exit
+
+BEST HOLD SCORE
+
+81.72%
+
+SPX Monday London
+
+BEST TP1 RATE
+
+98.22%
+
+EUR/USD Monday London
+
+FRIDAY SURVIVAL
+
+69.54%
+
+Both EUR/USD & SPX
+
+Weekly Position Lifecycle
+
+ENTRY ADD SCALE EXIT
+Monday Tuesday Wednesday Friday
+
+€ EUR/USD Strategy lv SPX Strategy
+
+€ EUR/USD Weekly Hold
+
+Config Entry Time
+Monday London Range 07:00 UTC
+Hold Score Friday Survival
+81.71% 69.54%
+
+Avg TP3 Time Best Add Day
+~48 hours Tuesday
+Best Add Time Risk Level
+08:00 UTC LOW
+
+https:/Awww.genspark.ai/api/files/s/KAYhOU66?access_token=FQmgVcMGb30UbfvkwSWPMDhyfTrAj%2F M8zd69TNNHNhX%2FOjPLxqc%2Bg%2BZ...
+
+1/5
+
+
+--- Page 2 ---
+
+1/4/26, 4:01 PM Part 3.2: Weekly Hold Position Management
+
+EUR/USD Weekly Playbook
+
+v ff ENTRY - Monday 07:00 UTC WEEK START
+
+I~ Measure Monday London High-Low range
+Establish the range from London open (07:00 UTC) through London close (16:00 UTC)
+
+Set Target Levels
+
+TP1 (-25%): 98.22% hit rate
+
+TP2 (-50%): 96.44% hit rate
+TP3 (-100%): 92.17% hit rate
+TP4 (-168%): 87.19% hit rate
+
+@ Pro Tip
+EUR/USD Monday London is THE signature setup with 98.22% TP1 hit rate - the most reliable setup of the entire week
+
+Vv © ADD - Tuesday Asian (00:00-08:00 UTC) CONFIRMATION
+
+Add to position if TP1 already hit and no 132% violation. This adds to winning position at optimal timing.
+
+Pre-Conditions Checklist:
+
+iv) TP1 already hit - 100% TP1 rate on Tuesday Asian confirms momentum
+
+@ No 132% violation detected - Position remains within expected range
+
+100% 08:00 UTC
+
+Tuesday Asian TP1 Rate Optimal Add Time
+
+Vv = MANAGE - Wednesday Scale-Out MID-WEEK
+
+e Scale out 50% at TP2 by Wednesday
+96.44% hit rate for TP2 - take profits on half position
+
+A Critical Risk Watch
+Watch for 132% violations (71.53% occurrence rate). Exit immediately if 132% hit - this invalidates the setup.
+
+35%
+
+Wednesday has highest 132% violation rate
+
+96.44% 71.53%
+TP2 Hit Rate 132% Violation Rate
+Vv (» EXIT - Friday Full Close WEEK END
+
+https:/Awww.genspark.ai/api/files/s/KAYhOU66?access_token=FQmgVcMGb30UbfvkwSWPMDhyfTrAj%2F M8zd69TNNHNhX%2FOjPLxqc%2Bg%2BZ...
+
+2/5
+
+
+--- Page 3 ---
+
+1/4/26, 4:01 PM Part 3.2: Weekly Hold Position Management
+
+F233 Full exit at TP3 by Friday
+92.17% should hit TP3 by Friday - close remaining position
+
+Contingency Plan:
+
+If TP3 not hit by Thursday close, exit Friday morning regardless. Risk increases significantly after 4 days.
+
+92.17% 69.54% ~A8h
+
+TP3 Hit Rate Friday Survival Avg TP3 Time
+
+A OIL Weekly Hold Assessment
+
+Hold Score Friday Survival
+71.60% 61.11%
+
+(vs 81.71-81.72%) (vs ~69.5%)
+
+Avg TP3 Time Risk Level
+~56h HIGH
+
+(slower than EUR/SPX)
+
+© NOT RECOMMENDED for Weekly Holds
+
+Significantly lower survival and faster decay vs EUR/USD/SPX
+Recommendation: Use DAILY positions only for OIL
+
+Recommended configs: Monday London or Daily Asian ranges for intraday setups
+
+Performance Comparison
+
+Hold Score Comparison Friday Survival Rate
+
+Weekly Hold Score by Asset Friday Survival Rate
+100% 100%
+
+90% 90%
+80% 80%
+70%
+60%
+50%
+40%
+30%
+20%
+10%
+
+0%
+
+SPX EUR/USD OIL EUR/USD oll
+
+https:/Awww.genspark.ai/api/files/s/KAYhOU66?access_token=FQmgVcMGb30UbfvkwSWPMDhyfTrAj%2F M8zd69TNNHNhX%2FOjPLxqc%2Bg%2BZ... 3/5
+
+
+--- Page 4 ---
+
+1/4/26, 4:01 PM Part 3.2: Weekly Hold Position Management
+
+TP Delivery Comparison
+
+Target Delivery Rates Comparison
+
+CJ euriusp (2) sex FES] or
+100% os _“_—a————S eeeeeSFs
+
+90%
+80%
+70%
+60%
+50%
+40%
+30%
+20%
+10%
+
+0%
+TP1 (-25%)
+
+Weekly Hold Summary
+
+W BEST WEEKLY HOLD ‘J RUNNER-UP
+SPX EUR/USD
+
+81.72% hold score, 69.54% Friday 81.71% hold score, 98.22% TP1
+
+survival Exceptional early delivery, scale out by
+
+Most reliable for 5-day positions Wednesday
+
+Optimal Add Times for Weekly Positions
+
+TP2 (-50%)
+
+© avoid WEEKLY
+OIL & BTC
+
+OIL: 71.60% hold score
+BTC: 81.34% but 78.71% 132% risk
+
+Use daily configs instead
+
+ASSET BEST ADD DAY BEST ADD TIME CONFIRMATION SIGNAL SUCCESS RATE
+EUR/USD Tuesday Asian session (00:00-08:00 UTC) 100% TP1 hit rate confirms momentum 100% TP1
+SPX Tuesday London session (11:00-15:00 UTC) 78.15% TP1 confirms weekly direction 78.15% TP1
+
+0
+
+Only add to weekly positions if TP1 already hit and no 132% violation detected
+
+Recommended Position Sizing
+
+https:/Awww.genspark.ai/api/files/s/KAYhOU66?access_token=FQmgVcMGb30UbfvkwSWPMDhyfTrAj%2F M8zd69TNNHNhX%2FOjPLxqc%2Bg%2BZ... 4/5
+
+
+--- Page 5 ---
+
+1/4/26, 4:01 PM Part 3.2: Weekly Hold Position Management
+
+Recommended Capital Allocation
+
+Data Sources
+
+Cross_Asset_Monday_Hold_Analysis (2019-2025)
+REPORT_PART_1_Targeting_Delivery, REPORT_PART_2_Rekey_TP_Timing
+
+Total Coverage: EUR/USD (1,401 sessions), BTC (209 weeks), SPX (325 weeks), OIL (2,679 sessions)
+
+https:/Awww.genspark.ai/api/files/s/KAYhOU66?access_token=FQmgVcMGb30UbfvkwSWPMDhyfTrAj%2F M8zd69TNNHNhX%2FOjPLxqc%2Bg%2BZ... 5/5

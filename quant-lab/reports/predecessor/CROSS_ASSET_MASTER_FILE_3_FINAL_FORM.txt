@@ -1,0 +1,1319 @@
+
+--- Page 1 ---
+
+1/4/26, 4:01 PM
+
+Part 2: Rekey Events & TP Timing Analysis
+
+nm PART 2: REKEY EVENTS & TP TIMING
+ANALYSIS
+
+132% Opportunities, 168% Invalidations & Optimal Entry/Exit Windows
+
+fH Data Period: 2019-2025
+
+W® BEST REKEY ASSET
+
+BTC +5.41pp
+
+78.71% hit 132%, only 73.30%
+
+hit 168%
+
+lx Assets: EUR/USD, BTC, SPX, OIL
+
+@ EUR/USD CRITICAL
+
+TIMING
+
+87.8%
+
+Targets hit before 9AM EST
+
+(14:00 UTC)
+
+l= BEST WEEKLY EXIT
+
+S Total Sessions: 8,000+
+
+96.44%
+
+EUR/USD TP2 scale
+
+Wednesday
+
+S Section A: 132% Rekey Opportunity Database
+
+Ranking by rekey opportunity score - Positive gap indicates rekey potential
+
+RANK ASSET
+
+1 BTC
+2 EUR/USD
+3 SPX
+4 OIL
+5 OIL
+6 OIL
+
+https:/Awww.genspark.ai/api/files/s/i40HD7Mx?access_token=FQmgVcMGb30UbfvkwSWPMDhyfTrAj%2FM8zd69TNNHNhX%2FOjPLxqc%2Bg%2BZ...
+
+CONFIG
+
+Monday
+London
+Range
+
+Monday
+London
+Range
+
+Monday
+London
+Open
+
+Monday
+London
+Range
+
+Daily
+Asian
+
+Daily
+London
+Open
+
+TOTAL
+SESSIONS
+
+209
+
+281
+
+325
+
+162
+
+2517
+
+2517
+
+132%
+VIOLATIONS
+
+165
+
+201
+
+198
+
+97
+
+1543
+
+1589
+
+VIOLATION
+RATE
+
+78.71%
+
+71.53%
+
+60.92%
+
+59.88%
+
+61.31%
+
+63.13%
+
+168%
+HITS
+
+153
+
+245
+
+242
+
+122
+
+1666
+
+1705
+
+HIT
+RATE
+
+73.30%
+
+87.19%
+
+74.46%
+
+75.31%
+
+66.21%
+
+67.74%
+
+4 BEST DAILY ENTRY
+
+71.43%
+
+BTC Tuesday Asian (TP3)
+
+REKEY
+
+STATUS
+OPPORTUNITY
++5.41pp REKEY
+-15.66pp EXIT
+-13.54pp EXIT
+-15.43pp EXIT
+-4.90pp EXIT
+-4.61pp EXIT
+
+1/14
+
+
+--- Page 2 ---
+
+1/4/26, 4:01 PM Part 2: Rekey Events & TP Timing Analysis
+
+TOTAL 132% VIOLATION 168% HIT REKEY
+RANK — ASSET CONFIG STATUS
+SESSIONS VIOLATIONS RATE HITS RATE OPPORTUNITY
+NY Open
+7 OIL R 2517 1611 64.00% 1723 68.46% -4.46pp EXIT
+ange
+
+@ Key Finding: BTC is the ONLY Positive Rekey Asset
+
+BTC shows a +5.41 percentage point gap between 132% violations (78.71%) and 168% hits (73.30%). This positive gap
+indicates that when BTC violates the 132% level, there's a higher probability it will NOT reach 168%, making it an
+
+excellent candidate for rekey entries at 50% retracement of the new range.
+
+Strategy: After a 132% violation in BTC, monitor for 50% retracement of the new range to re-enter with high confidence.
+
+All other assets show negative gaps, indicating immediate exit is the correct strategy upon 132% violation.
+
+Cross-Asset Rekey Opportunity Rankings
+
+| [
+i]
+
+Gap (percentage paints)
+th
+
+-20
+BTC Monday OIL NY Open OIL London OIL Asian SPX Monday OIL Monday
+
+@ Section B: 132% Timing by Asset
+
+Average time to reach 132% violation and timing distribution patterns
+
+€ EUR/USD - Monday London Range
+
+Average Time to 132% Violation Rate Most Common Day Primary Session
+
+28-36 hours 71.53% Wednesday London
+
+O Monday 07:00 UTC: Entry at London open
+
+O Tuesday-Wednesday: 132% violations most common (28-36 hour window)
+https:/Awww.genspark.ai/api/files/s/i40HD7Mx?access_token=FQmgVcMGb30UbfvkwSWPMDhyfTrAj%2FM8zd69TNNHNhX%2FOjPLxqc%2Bg%2BZ... 2/14
+
+
+--- Page 3 ---
+
+1/4/26, 4:01 PM Part 2: Rekey Events & TP Timing Analysis
+O Wednesday Peak: Highest 132% violation rate (~35% of weekly violations)
+
+O Action: Exit immediately on 132% - 87.19% probability of 168% continuation
+
+A Critical Timing: 87.8% of EUR/USD Fibonacci targets hit BEFORE 9 AM EST (14:00 UTC). This means most TP delivery
+occurs during Asian-London handoff. Late entries (after 14:00 UTC) significantly reduce probability of TP hits.
+
+© BTC - Monday London Range & Daily Asian
+
+Average Time to 132% Violation Rate 168% Hit Rate Rekey Gap
+32-48 hours 78.71% 73.30% +5.41pp
+Direct to Target (No 132%) 44 21.05% Hold to TP
+Target — 132% — Stop 11 5.26% Rekey Opportunity
+132% Before Target — Rekey Success 8 3.83% Rekey Entry
+Direct 132% Violation (No TP) 146 69.86% Monitor for Rekey
+
+fv) BTC Rekey Strategy: When BTC violates 132%, monitor for 50% retracement of the NEW range. The +5.41pp gap
+indicates 5.41% higher probability that price will NOT reach 168%, making rekey entries statistically favorable. Wait for clear
+50% retracement confirmation before re-entry.
+
+\~ SPX - Monday London Open
+
+Average Time to 132% Violation Rate 168% Hit Rate Rekey Gap
+
+36-52 hours 60.92% 74.46% -13.54pp
+
+SPX shows slower 132% timing (36-52 hours) compared to EUR/USD. However, the -13.54pp negative gap indicates that when
+132% is violated, there's a 13.54% HIGHER probability of reaching 168%. Strategy: Exit immediately on 132% violation. SPX is
+better suited for weekly holds due to its 81.72% hold score - focus on TP2/TP3 exits rather than rekey attempts.
+
+@ OIL - Multiple Configurations
+
+https:/Awww.genspark.ai/api/files/s/i40HD7Mx?access_token=FQmgVcMGb30UbfvkwSWPMDhyfTrAj%2FM8zd69TNNHNhX%2FOjPLxqc%2Bg%2BZ...
+
+3/14
+
+
+--- Page 4 ---
+
+1/4/26, 4:01 PM
+
+Monday London Range
+
+Daily Asian
+
+Daily London Open
+
+NY Open Range
+
+24-32 hours
+
+12-20 hours
+
+8-16 hours
+
+4-8 hours
+
+Part 2: Rekey Events & TP Timing Analysis
+
+59.88% 75.31% -15.43pp
+61.31% 66.21% -4,90pp
+63.13% 67.74% -4.61pp
+64.00% 68.46% -4.46pp
+
+Exit on 132%
+
+Exit on 132%
+
+Exit on 132%
+
+Exit on 132%
+
+OIL shows the fastest 132% violations (4-32 hours depending on config) but ALL configurations have negative rekey gaps. The
+NY Open Range shows the FASTEST 132% timing (4-8 hours) but also the smallest negative gap (-4.46pp). Strategy: Use OIL
+
+for daily intraday positions only, exit immediately on 132% violations.
+
+100
+90
+
+70
+
+Cumulative 132% Violation %
+
+6-16h
+
+Cumulative 132% Violation Rate Over Time
+
+[)cvruso [Jere LI sex Jou
+
+16-24h 24-32h 32-40h
+Time Since Entry
+
+O Section C: 168% Invalidation Patterns
+
+Understanding when Fibonacci extensions fail and continuation patterns
+
+Monday
+EUR/USD
+
+London
+
+Monday
+SPX
+
+London
+
+Monday
+BTC
+
+London
+
+https:/Awww.genspark.ai/api/files/s/i40HD7Mx?access_token=FQmgVcMGb30UbfvkwSWPMDhyfTrAj%2FM8zd69TNNHNhX%2FOjPLxqc%2Bg%2BZ...
+
+87.19%
+
+74.46%
+
+73.30%
+
+36-48 hours High (87%+) HIGH
+
+Moderate-High
+48-72 hours MEDIUM
+(74%)
+
+40-60 hours Moderate (73%) REKEY
+
+40-48h
+
+Strong continuation after
+132%
+
+Slower continuation
+
+Lower continuation - rekey
+favorable
+
+4/14
+
+
+--- Page 5 ---
+
+1/4/26, 4:01 PM Part 2: Rekey Events & TP Timing Analysis
+
+Monday
+OIL 75.31% 28-40 hours
+London
+Highest 168% Rate Best Rekey Profile
+EUR/USD 87.19% BTC 73.30%
+Exit immediately on 132% Lower continuation rate
+
+@ Invalidation Pattern Analysis
+
+High Continuation Assets (Exit on 132%)
+
+Moderate-High
+
+MEDIUM Fast continuation
+(75%)
+Fastest Invalidation Slowest Invalidation
+OIL 28-40h SPX 48-72h
+Quick decision window Extended hold potential
+
+Lower Continuation Asset (Rekey Potential)
+
+Section D: Best TP Days for Weekly Positions
+
+Optimal days to close weekly positions by asset (Monday entry — Friday exit)
+
+EUR/USD 98.22% 98.22%+ 96.44% (TP2)
+SPX 81.72% 81.72%+ 74.15% (TP2)
+BTC 93.07% 87.81% 85.33%
+OIL 82.10% 78.45% 76.89%
+
+| Weekly Position Management Timeline
+
+O MONDAY 07:00-11:00 UTC:
+
+https:/Awww.genspark.ai/api/files/s/i40HD7Mx?access_token=FQmgVcMGb30UbfvkwSWPMDhyfTrAj%2FM8zd69TNNHNhX%2FOjPLxqc%2Bg%2BZ...
+
+Close Scale out 50% at TP2 (Wed), full exit
+92.17% (TP3) _ .
+
+remaining TP3 (Thu-Fri)
+67.82% 69.54% Scale 50% at TP2, hold to Fri for
+(TP3) survival remaining (69% survive)
+
+NOT RECOMMENDED for weekly
+
+86.71% 87.92% .
+(78.71% 132% risk)
+
+NOT RECOMMENDED for weekly
+
+78.56% 78.67%
+° ° (71.60% hold score)
+
+5/14
+
+
+--- Page 6 ---
+
+1/4/26, 4:01 PM Part 2: Rekey Events & TP Timing Analysis
+
+EUR/USD: Exceptional 98.22% TP1 hit rate | SPX: Best hold score 81.72%
+
+© TUESDAY Asian/London:
+
+Add to positions IF TP1 already hit + no 132% violation (confirmation day)
+
+©  WEDNESDay:
+
+EUR/USD: 96.44% TP2 hit rate | SPX: 74.15% TP2 | CAUTION: Highest 132% violation day
+
+© _ THuRSDAY:
+
+EUR/USD: Target TP3 (92.17%) | SPX: Target TP3 (67.82%) | Prepare Friday exit strategy
+
+O FRIDAY Close:
+
+EUR/USD: Close remaining 50% | SPX: 69.54% survival to Friday - close all positions regardless of TP3 status
+
+® Best Weekly Position Assets
+
+EUR/USD - Exceptional Early Delivery
+
+TP1: 98.22% (best of all assets)
+
+TP2: 96.44% by Wednesday
+
+Hold Score: 81.71%
+
+Strategy: Scale out 50% at TP2 (Wed), exit remainder by
+
+Friday
+
+A, Risk: 71.53% chance of 132% violation - exit
+immediately if hit
+
+SPX - Best Hold Survival
+
+Hold Score: 81.72% (best of all)
+
+Friday Survival: 69.54%
+
+TP2: 74.15%
+
+Strategy: Suitable for larger position sizing, holds better
+
+through Friday
+
+v Advantage: Most reliable for full 5-day weekly positions
+
+> Section E: Optimal Entry Days for Daily Positions
+
+Best days for daily intraday setups by asset and TP3 hit rates
+
+https:/Awww.genspark.ai/api/files/s/i40HD7Mx?access_token=FQmgVcMGb30UbfvkwSWPMDhyfTrAj%2FM8zd69TnNNHNhX%2FOjPLxqc%2Bg%2BZ...
+
+6/14
+
+
+--- Page 7 ---
+
+1/4/26, 4:01 PM
+
+DAY
+
+MONDAY
+
+TUESDAY
+
+BEST
+
+ASSET
+
+EUR/USD
+
+BTC
+
+WEDNESDAY __ BTC
+
+THURSDAY
+
+FRIDAY
+
+100
+90
+80
+70
+
+6
+
+o
+
+5
+
+TP3 Hit Rate %
+S
+
+4
+
+o
+
+3
+
+o
+
+2
+
+i=]
+
+1
+
+o
+
+BTC
+
+BIC
+
+Monday
+
+Best Monday Setup
+
+EUR/USD
+
+98.22% TP1 | 92.17% TP3
+
+A
+
+CONFIG
+
+Monday
+London
+
+Daily Asian
+
+Daily Asian
+
+Daily Asian
+
+Daily Asian
+
+Part 2: Rekey Events & TP Timing Analysis
+
+RATE
+
+92.17%
+
+71.43%
+
+65.22%
+
+68.35%
+
+71.15%
+
+ENTRY
+TIME
+
+07:00 UTC
+
+08:00 UTC
+
+08:00 UTC
+
+08:00 UTC
+
+08:00 UTC
+
+EXIT WINDOW
+
+14:00-16:00
+UTC
+
+16:00-20:00
+UTC
+
+16:00-20:00
+UTC
+
+16:00-20:00
+UTC
+
+End of day
+
+NOTES
+
+BEST setup of week - 98.22% TP1
+
+Strong TP3 delivery, Asian range
+predictor
+
+CAUTION: Highest 132% violation
+day (35%)
+
+Strong TP3 delivery continues
+
+Peak BTC delivery - strongest TP3
+of week
+
+Daily Entry Performance by Day of Week (TP3 Hit Rates)
+
+Tuesday
+
+Best Tue-Fri Setup
+
+BTC Asian
+
+71.43% TP3 Tuesday (peak)
+
+Wednesday Risk Management
+
+[EUR/USD TP3 QQ BTC TP3 QE SPX TP3
+
+Wednesday
+
+Riskiest Day
+
+Wednesday
+
+35% 132% violation rate
+
+Thursday
+
+Best Friday Setup
+
+BTC 71.15%
+
+Peak end-of-week delivery
+
+Wednesday shows the highest 132% violation rate (~35% for EUR/USD) across the trading week. This is statistically
+
+significant and requires tighter stop management. When entering BTC Daily Asian setups on Wednesday (65.22% TP3), be
+
+prepared for higher volatility and consider reducing position size by 20-30% compared to other days.
+
+https:/Awww.genspark.ai/api/files/s/i40HD7Mx?access_token=FQmgVcMGb30UbfvkwSWPMDhyfTrAj%2FM8zd69TnNNHNhX%2FOjPLxqc%2Bg%2BZ...
+
+7/14
+
+
+--- Page 8 ---
+
+1/4/26, 4:01 PM
+
+Part 2: Rekey Events & TP Timing Analysis
+
+@ Section F: Session TP Windows
+
+Optimal TP timing by trading session (Asian, London, NY) with asset rankings
+
+%& Asian Session (00:00-08:00 UTC)
+
+Daily 16:00-20:00
+1 BTC ; 75.11% 08:00 UTC
+Asian UTC
+Daily
+2 EUR/USD . 54.09% 08:00 UTC London close
+Asian
+Daily
+3 OIL . 54.88% 08:00 UTC 16:00 UTC
+Asian
+
+Best Asian performer - dominates Asian
+session
+
+Perfect TP1/TP2 (100%) but weak TP3
+
+Moderate performance, watch volatility
+
+Asian Session Strategy: BTC Daily Asian Range (75.11% TP3) is the clear winner. EUR/USD shows exceptional TP1/TP2 (100%
+with tolerance) but weak TP3 - use for conservative TP1/TP2 targets only. Asian session also serves as the optimal window to
+ADD to EUR/USD or SPX weekly positions if Monday TP1 already hit (confirmation signal).
+
+67.82%
+
+92.17%
+
+53.34%
+
+11:00 UTC
+
+07:00 UTC
+
+11:00 UTC
+
+NY close
+
+14:00-16:00
+UTC
+
+16:00 UTC
+
+Best London delivery - institutional
+volume
+
+Signature setup - 98.22% TP1
+
+Lower performance in London
+
+This is the most important timing statistic for EUR/USD. 87.8% of Fibonacci targets are delivered BEFORE 9 AM EST
+(14:00 UTC) - during the Asian-London handoff and early London session. Late entries (after 14:00 UTC) have
+significantly reduced probability of hitting TP targets. Enter EUR/USD Monday London Range at 07:00 UTC sharp or
+
+https:/Awww.genspark.ai/api/files/s/i40HD7Mx?access_token=FQmgVcMGb30UbfvkwSWPMDhyfTrAj%2FM8zd69TNNHNhX%2FOjPLxqc%2Bg%2BZ...
+
+%, London Session (07:00-16:00 UTC)
+1 SPX Daily London
+Open
+2 EUR/USD Monday London
+Daily London
+3 OIL
+Open
+CRITICAL EUR/USD Timing: 87.8% of Targets Hit BEFORE 9 AM EST
+miss the optimal window.
+
+8/14
+
+
+--- Page 9 ---
+
+1/4/26, 4:01 PM Part 2: Rekey Events & TP Timing Analysis
+
+C NY Session (12:00-22:00 UTC)
+
+. . ok Monitor positions from Continuation of Asian
+1 BTC Daily Asian 65.62% Exit window .
+Asian momentum
+
+NY Open Moderate Lower conviction vs 12:00-14:00 UTC range,
+2 SPX 58.77% .
+
+Range setup London moderate delivery
+
+. . . 87.8% already hit targets
+
+- EUR/USD N/A - Exit only Avoid new entries
+
+before NY
+
+NY Session Strategy: NY is primarily an exit and management window, not an entry window. BTC shows continuation from
+Asian setups (65.62% TP3), but this is for positions entered at 08:00 UTC (Asian close). Avoid new EUR/USD entries during
+NY - 87.8% of targets already delivered. Focus on managing existing positions and taking profits during London-NY overlap
+(12:00-16:00 UTC).
+
+Cross-Asset Performance Profile (Session TP3 & Hold Metrics)
+
+Coy etc Fi Sjeurvusp (Sj 5px
+
+Asian Session
+
+100
+
+Friday Survival London Session
+
+Hold Score: NY Session
+
+( Section G: Day-by-Day Exit Strategy Matrix
+
+Comprehensive exit recommendations for each day (Mon-Fri) and asset
+
+https:/Awww.genspark.ai/api/files/s/i40HD7Mx?access_token=FQmgVcMGb30UbfvkwSWPMDhyfTrAj%2FM8zd69TNNHNhX%2FOjPLxqc%2Bg%2BZ... 9/14
+
+
+--- Page 10 ---
+
+1/4/26, 4:01 PM
+
+MONDAY
+
+TUESDAY
+
+WEDNESDAY
+
+THURSDAY
+
+ENTRY DAY
+
+Open Monday London
+Range (07:00 UTC)
+
+98.22% TP1 probability
+
+ADD Window
+
+IF TP1 hit + no 132%:
+Add in Asian (00:00-
+08:00)
+
+Y Confirmation signal:
+100% TP1
+
+SCALE OUT TP2
+
+Exit 50% at TP2 (96.44%
+probability)
+
+A Highest 132% risk day
+(35%)
+
+Plan Exit
+
+Target TP3 (92.17%) for
+remaining 50%
+
+Prepare Friday exit if not
+hit
+
+CLOSE ALL
+
+Exit remaining 50% of
+weekly position
+
+Close regardless of TP3
+status
+
+& Exit Strategy Summary
+
+MON
+
+Open Positions
+
+TUE
+Add to Winners
+
+Part 2: Rekey Events & TP Timing Analysis
+
+Monitor
+
+Track Monday
+London setup
+
+93.07% TP1 but
+78.71% 132% risk
+
+Daily Entry
+
+Best daily setup:
+Asian (08:00 UTC)
+
+71.43% TP3 (peak
+Tuesday)
+
+Tighten Stops
+
+Daily Asian entry:
+65.22% TP3
+
+A, Reduce size 20-
+30%
+
+Daily Entry
+
+Asian setup: 68.35%
+
+TP3
+
+Solid mid-week
+
+performance
+
+Peak Daily
+
+Best daily setup:
+Asian 71.15% TP3
+
+V Strongest TP3 of
+week
+
+ENTRY DAY
+
+Open Monday
+London Open (11:00
+UTC)
+
+81.72% hold score
+(best)
+
+ADD Window
+
+IF TP1 hit: Add in
+London (11:00-
+15:00)
+
+¥ 78.15% TP1
+confirms direction
+
+SCALE OUT TP2
+
+Exit 50% at TP2
+(74.15%)
+
+Monitor 132%
+violations
+
+Plan Exit
+
+Target TP3 (67.82%)
+for remaining 50%
+
+69% survive to Friday
+
+CLOSE ALL
+
+Exit all weekly
+positions by NY
+close
+
+69.54% survived to
+Friday
+
+WED
+
+Scale 50% at TP2
+
+® Section H: Cross-Asset Rekey Rankings
+
+Final ranking of all assets by rekey opportunity score
+
+Selective
+
+Only with strong
+confirmation
+
+Lower hit rates vs
+others
+
+Daily Entry
+Asian or London
+setups
+
+54.88% TP3
+
+Reduce Exposure
+
+Weakest OIL day
+(53.34% TP3 London)
+
+Ay Use caution
+
+Monitor
+Daily setups only
+54.88% TP3
+
+Close Out
+Avoid new entries
+
+End-of-week cleanup
+
+THU
+
+Plan Exits
+
+OPEN EUR/USD + SPX
+weekly positions
+
+ADD to EUR/USD if
+TP1 hit
+ADD to SPX in London
+
+SCALE OUT EUR/USD
+TP2 (96.44%)
+CAUTION: Highest
+132% day
+
+PLAN EXITS for
+EUR/USD & SPX
+weekly
+
+CLOSE ALL EUR/USD
++ SPX weekly
+positions
+
+FRI
+Close All Weekly
+
+https:/Awww.genspark.ai/api/files/s/i40HD7Mx?access_token=FQmgVcMGb30UbfvkwSWPMDhyfTrAj%2FM8zd69TNNHNhX%2FOjPLxqc%2Bg%2B...
+
+10/14
+
+
+--- Page 11 ---
+
+1/4/26, 4:01 PM
+
+s BTC
+
+1
+
+2 OIL
+
+3 OIL
+
+4 OIL
+
+5 SPX
+
+6 OIL
+
+7 EUR/USD
+
+Only Positive Rekey
+
+BTC
+
++5.41pp opportunity
+
+https:/Awww.genspark.ai/api/files/s/i40HD7Mx?access_token=FQmgVcMGb30UbfvkwSWPMDhyfTrAj%2FM8zd69TNNHNhX%2FOjPLxqc%2Bg%2B...
+
+Monday
+London
+Range
+
+NY Open
+Range
+
+Daily
+London
+Open
+
+Daily Asian
+
+Monday
+London
+Open
+
+Monday
+London
+Range
+
+Monday
+London
+Range
+
+78.71%
+
+64.00%
+
+63.13%
+
+61.31%
+
+60.92%
+
+59.88%
+
+71.53%
+
+Worst Rekey Asset
+
+EUR/USD
+
+Part 2: Rekey Events & TP Timing Analysis
+
+73.30%
+
+68.46%
+
+67.74%
+
+66.21%
+
+74.46%
+
+75.31%
+
+87.19%
+
+-15.66pp (exit immediately)
+
++5.41pp REKEY
+-4.46pp EXIT
+-4.61pp EXIT
+-4.90pp EXIT
+-13.54pp EXIT
+-15.43pp EXIT
+-15.66pp EXIT
+Assets Tested
+4
+
+7 configurations analyzed
+
+Re-enter at 50% retracement
+of new range after 132%
+violation
+
+Exit on 132% - small
+negative gap but still favors
+continuation
+
+Exit on 132% - negative gap
+
+Exit on 132% - negative gap
+
+Exit immediately on 132% -
+significant negative gap
+
+Exit immediately on 132% -
+large negative gap
+
+Exit immediately on 132% -
+LARGEST negative gap
+
+Total Sessions
+
+8,000+
+
+2019-2025 coverage
+
+11/14
+
+
+--- Page 12 ---
+
+1/4/26, 4:01 PM Part 2: Rekey Events & TP Timing Analysis
+
+@ Section I: Key Insights
+
+Critical findings and actionable takeaways for trading optimization
+
+WD sic: Only Positive Rekey Asset @© £URUSD Critical Timing: 87.8% Before 9AM
+BTC is the ONLY asset with a positive rekey EST
+opportunity (+5.41pp gap). When BTC violates 132%, 87.8% of EUR/USD Fibonacci targets hit BEFORE 9
+there's a 78.71% probability of hitting 132% but only AM EST (14:00 UTC) - during Asian-London handoff.
+73.30% probability of reaching 168% - a 5.41% This is the most critical timing statistic for EUR/USD
+LOWER probability of continuation. trading.
+Strategy: After 132% violation, monitor for 50% Impact: Late entries (after 14:00 UTC) have
+retracement of NEW range. Re-enter with high dramatically reduced TP probability. Entry at
+confidence based on positive statistical edge. Monday 07:00 UTC (London open) is ESSENTIAL for
+
+optimal EUR/USD performance.
+
+A Wednesday: Highest 132% Violation Day Best Weekly Exit: EUR/USD TP2 Wednesday
+Wednesday shows the highest 132% violation rate EUR/USD shows 96.44% TP2 hit rate by Wednesday.
+(~35% for EUR/USD) compared to other days of the This is the optimal scaling-out point for weekly
+week. This is statistically significant and requires Monday London Range positions - scale 50% at TP2,
+adjusted risk management. hold remaining 50% for TP3 (92.17%).
+
+Strategy: Tighten stops on Wednesday entries. Timing: Most TP2 hits occur during Tuesday-
+Reduce BTC Daily Asian position size by 20-30%. Wednesday London sessions. Monitor 132%
+
+https:/Awww.genspark.ai/api/files/s/i40HD7Mx?access_token=FQmgVcMGb30UbfvkwSWPMDhyfTrAj%2FM8zd69TNNHNhX%2FOjPLxqc%2Bg%2B... 12/14
+
+
+--- Page 13 ---
+
+1/4/26, 4:01 PM
+
+t
+
+Part 2: Rekey Events & TP Timing Analysis
+
+Scale out EUR/USD weekly positions at TP2
+(96.44%) by Wednesday.
+
+Best Daily Entry: BTC Tuesday Asian (71.43%
+TP3)
+
+BTC Daily Asian Range on Tuesday delivers 71.43%
+TP3 - the highest daily TP3 rate across the week. Entry
+at 08:00 UTC (Asian close), target TP3 by 16:00-20:00
+UTC.
+
+Pattern: BTC shows consistent TP3 delivery Tue-Fri
+(65-71%). Tuesday is peak performance day. Friday
+is second-best (71.15%).
+
+Optimal Add Timing: Tuesday Sessions
+
+Tuesday is the optimal day to ADD to weekly
+positions. EUR/USD: Asian session (00:00-08:00 UTC)
+shows 100% TP1 confirmation. SPX: London session
+(11:00-15:00 UTC) shows 78.15% TP1.
+
+Rule: Only add if (1) TP1 already hit from Monday
+entry, AND (2) No 132% violation detected. This is
+a confirmation-based add strategy.
+
+OIL: Daily Positions Only (NOT Weekly)
+
+OIL has significantly lower hold score (71.60% vs
+EUR/USD 81.71%, SPX 81.72%) and Friday survival
+
+(61.11% vs ~69.5%). NOT recommended for weekly
+
+positions.
+
+Strategy: Use OIL for daily intraday setups only
+(Asian, London Open). Exit on 132% violations. All
+OIL configs show negative rekey gaps.
+
+Action Summary Checklist
+
+DO:
+
+https:/Awww.genspark.ai/api/files/s/i40HD7Mx?access_token=FQmgVcMGb30UbfvkwSWPMDhyfTrAj%2FM8zd69TNNHNhX%2FOjPLxqc%2Bg%2B...
+
+DON'T:
+
+violations closely after scaling out.
+
+EUR/USD: Exit Immediately on 132%
+Violation
+
+EUR/USD has the WORST rekey profile (-15.66pp
+gap). When 132% is violated, there's an 87.19%
+probability of reaching 168% - a continuation rate
+15.66% HIGHER than the violation rate.
+
+Action: No rekey attempts for EUR/USD. Exit ALL
+positions immediately upon 132% violation. This is
+non-negotiable.
+
+SPX: Best Weekly Hold Asset (81.72% Hold
+Score)
+
+SPX shows the highest hold score (81.72%) and best
+Friday survival rate (69.54%), making it the most
+reliable asset for 5-day weekly positions. Better suited
+for weekly holds than EUR/USD.
+
+Position Sizing: Suitable for 25-35% allocation.
+Larger position sizing vs EUR/USD due to superior
+hold characteristics through Friday.
+
+13/14
+
+
+--- Page 14 ---
+
+1/4/26, 4:01 PM
+
+V BTC rekey entries after 132% violation (only asset with
++5.41pp edge)
+
+vV Enter EUR/USD Monday 07:00 UTC (87.8% targets hit
+before 9AM EST)
+
+V Scale EUR/USD weekly at TP2 (96.44%) by Wednesday
+
+Vv Use Tuesday to add to EUR/USD (Asian) and SPX (London)
+weekly positions
+
+VY Close all weekly positions Friday (69.54% survival to
+close)
+
+V Use SPX for weekly holds (81.72% hold score - best of all
+assets)
+
+V Trade BTC Daily Asian Tue-Fri (71.43% TP3 Tuesday,
+
+71.15% Friday)
+
+Part 2: Rekey Events & TP Timing Analysis
+
+X Rekey EUR/USD after 132% violation (-15.66pp - worst
+asset)
+
+X Rekey SPX or OIL after 132% violations (all negative gaps)
+X Enter EUR/USD after 14:00 UTC (87.8% already delivered
+targets)
+
+X Use OIL for weekly positions (71.60% hold score, 61.11%
+Friday survival)
+
+X Ignore Wednesday 132% risk (35% violation rate -
+highest of week)
+
+X Add to positions without TP1 confirmation (wait for TP1
+hit + no 132%)
+
+X Hold EUR/USD/SPX weekly past Friday (risk increases
+
+after 5 days)
+
+@ Report Part 2 Complete
+
+Data Sources: REPORT_PART_2_Rekey_TP_Timing | Cross_Asset_132_Opportunity | Cross_Asset_Monday_Hold_Analysis
+
+Coverage: EUR/USD (1,401 sessions), BTC (209 weeks), SPX (325 weeks), OIL (2,679 sessions) | Period: 2019-2025
+
+Generated: January 2026 | All percentages calculated from historical data | For educational purposes
+
+https:/Awww.genspark.ai/api/files/s/i40HD7Mx?access_token=FQmgVcMGb30UbfvkwSWPMDhyfTrAj%2FM8zd69TNNHNhX%2FOjPLxqc%2Bg%2B...
+
+14/14

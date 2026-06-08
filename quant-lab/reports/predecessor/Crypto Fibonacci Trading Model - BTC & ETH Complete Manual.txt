@@ -1,0 +1,294 @@
+
+--- Page 1 ---
+
+CRYPTO FIBONACCI TRADING MANUAL
+BTC & ETH RANGE A MODEL (PHASE 4)
+Reference Period: Friday Asian Session
+Time Window: Thursday 22:00 - Friday 05:00 EST
+Version: 4.0 (Crypto Adaptation)
+Table of Contents
+1. Executive Summary
+2. Range A Construction (Crypto-Specific)
+3. BTC Decision Tree (Phase 4)
+4. ETH Decision Tree (Phase 4)
+5. Cross-Market Comparison
+6. 132% Capture System
+7. Signal Analysis & Time Decay
+8. Risk Management Framework
+9. Quick Reference Cards
+1. Executive Summary
+
+
+--- Page 2 ---
+
+This manual defines the complete decision-tree protocol for trading Bitcoin (BTC)
+and Ethereum (ETH) using the Friday Asian Session Range A model. Unlike
+traditional forex models based on London Open volatility, this framework utilizes
+the Asian session liquidity build (Thursday 22:00 - Friday 05:00 EST) as the
+foundational range for projecting Friday's price action.
+The core framework relies on Fibonacci extension targets (-25%, -50%, -100%,
+-168%) derived from the 7-hour Range A size, validated across 156 weeks of crypto
+sessions and benchmarked against 281 weeks of London session data.
+KEY PERFORMANCE METRICS (BTC)
+132% Invalidation Rate: Hit in 78.7% of sessions (Primary Stop Logic)
+-100% Target Hit Rate: 82.2%
+-168% Target Hit Rate: 73.3%
+Regime Reliability: Fast Regime (89.3%), Normal Regime (89.0%)
+Critical Distinction: Range A refers specifically to the Friday Asian H1 session. It is
+NOT the Monday London 15M candle range used in legacy forex models.
+Application of the correct time window is the single most important factor for
+model accuracy.
+2. Range A Construction (Crypto-Specific)
+The construction of Range A is the mathematical foundation for all subsequent
+targets and invalidation levels. Precision in defining this range is non-negotiable.
+CRITICAL: RANGE DEFINITION
+Do NOT use Monday London Open. Do NOT use 15-minute candles.
+Correct Range A = Friday Asian Session (H1 Candles)
+Construction Parameters
+Parameter
+Definition
+
+
+--- Page 3 ---
+
+Time Window
+Thursday 22:00 EST to Friday 05:00 EST (7 Hours)
+UTC Equivalent
+Friday 03:00 UTC to Friday 10:00 UTC
+Candle Structure
+Seven consecutive H1 (Hourly) candles
+T+0 Anchor
+Friday 05:00 EST Close (Reference point for calculations)
+Directional Bias Determination
+Bias is determined at the T+0 Anchor point (Friday 05:00 EST Close):
+Bullish Bias: If T+0 Close > Range A Midpoint ((High + Low) / 2)
+Bearish Bias: If T+0 Close < Range A Midpoint
+Fibonacci Level Calculation
+All levels are calculated as: T+0 Close ± (Range A Size × Ratio)
+Targets: -25%, -50%, -100%, -168% (in direction of bias)
+Invalidation: 132% (in opposite direction of bias)
+Tolerance: ±0.025 (Adjust for crypto volatility)
+
+
+--- Page 4 ---
+
+3. BTC Decision Tree (Phase 4)
+Bitcoin (BTC) is the primary asset for this model, demonstrating superior reliability
+across Fast and Normal volatility regimes. The Phase 4 protocol categorizes market
+conditions into three regimes based on the size of Range A relative to the 20-week
+Simple Moving Average (SMA).
+Step 1: Regime Detection
+Regime
+Condition (Range A vs 20w SMA)
+Hit Rate Probability
+FAST
+Size > 1.5× Average
+89.3% (Highly Reliable)
+NORMAL
+Size 0.8× - 1.5× Average
+89.0% (Reliable)
+SLOW
+Size < 0.8× Average
+68.3% (Low Reliability)
+Step 2: Entry Protocols
+FAST REGIME PROTOCOL
+Entry: Scale in at -25% pullback (50% size). Add at -50% (30% size).
+Target: Full -168% extension.
+Stop: 132% Invalidation.
+NORMAL REGIME PROTOCOL
+Entry: Wait for -50% pullback. Initial position 60%. Add 40% at -100%.
+Avoid: Do NOT enter at -25% (False start risk).
+Target: -100% primary, scale out small portion at -168%.
+
+
+--- Page 5 ---
+
+SLOW REGIME PROTOCOL
+Action: SKIP or Micro-size (max 10% capital).
+Condition: Wait for regime upgrade signal (3-session velocity breakout).
+Step 3: Exit & Invalidation Logic
+Primary Invalidation (132%): If price hits 1.32x Range A in opposite direction,
+the setup is invalid. BTC violates this level in 78.7% of failed sessions.
+Time Decay:
+If -50% not hit by T+12h (Fri 17:00 EST) → Exit 50% (Prob drops to 22.1%).
+If -168% not hit by Sat 00:00 EST → Exit All (Weekend delivery < 11.3%).
+4. ETH Decision Tree (Phase 4)
+Ethereum (ETH) exhibits higher volatility and lower reliability than BTC. It often
+acts as a leading indicator (4-5 hours faster delivery) but suffers from a significantly
+higher failure rate in Normal regimes.
+ETH RISK WARNING
+ETH Hit Rate for 132% invalidation is only 57.0% (vs BTC 78.7%).
+Normal Regime failure rate is high (32.6%).
+ETH-Specific Modifications
+Parameter
+BTC Standard
+ETH Adjustment
+Fast Threshold
+> 1.5× SMA
+> 1.8× SMA (Higher volatility baseline)
+Normal Hit Rate
+89.0%
+67.4% (Avoid Normal Regime in ETH)
+Stop Loss
+132% Extension
+115% Extension (Tighter stop required)
+Time Window
+T+0 to T+8h
+T+0 to T+6h (Compressed delivery)
+ETH Strategy Matrix
+
+
+--- Page 6 ---
+
+Fast Regime: Enter at -25% (83.1% win rate). Target -100% max.
+Normal Regime: SKIP or reduce size by 70%. Wait for confirmed BTC movement.
+Slow Regime: Avoid entirely.
+Correlation Rule: If BTC hits -100% but ETH lags, reduce ETH size by 50%.
+
+
+--- Page 7 ---
+
+5. Cross-Market Comparison
+Understanding the interplay between BTC and ETH is crucial for capital allocation.
+BTC offers reliability; ETH offers velocity.
+Hit Rate Comparison (281 Weeks Data)
+Metric
+Bitcoin (BTC)
+Ethereum (ETH)
+Advantage
+-25% Target
+97.5%
+92.3%
+BTC (Reliability)
+-50% Target
+89.3%
+80.6%
+BTC (Reliability)
+-100% Target
+82.2%
+70.2%
+BTC (Depth)
+-168% Target
+73.3%
+61.3%
+BTC (Depth)
+Avg Delivery
+T+8 Hours
+T+3-4 Hours
+ETH (Speed)
+Portfolio Strategy
+Recommended Split: 70% BTC / 30% ETH.
+Rationale: Do not equal weight. BTC's superior performance in Normal regimes and
+deeper extension capability warrants the majority allocation. Use ETH primarily for
+"Fast Regime" scalps or as a timing indicator for BTC entries.
+6. 132% Capture System
+When the 132% invalidation level is hit, the session is not necessarily over. The
+"132% Capture System" defines three scenarios for managing failed setups.
+SCENARIO A: IMMEDIATE REVERSAL (34% FREQUENCY)
+Price hits 132% and immediately reverses within 2 H1 candles.
+Action: Flip position direction.
+
+
+--- Page 8 ---
+
+Target: 100% Range A in opposite direction.
+Success Rate: 82%
+SCENARIO B: RETEST & CONTINUATION (28% FREQUENCY)
+Price hits 132%, retraces to retest the level 2-4 candles later, then resumes
+original bias.
+Action: Re-enter original bias after retest confirmation.
+Probability: 76% Continuation.
+SCENARIO C: FULL INVALIDATION (38% FREQUENCY)
+Price enters random walk behavior or chops around 132%.
+Action: Full exit. Log failed session. Await next Range A.
+ETH Note: This scenario happens 52% of the time in ETH (vs 38% BTC).
+7. Signal Analysis & Time Decay
+Time is a critical filter in the Range A model. Probabilities degrade significantly as
+the session extends beyond the primary window.
+Time Decay Matrix (BTC)
+Checkpoint
+Condition
+Probability Impact
+Action
+T+8 Hours
+Standard Window Ends
+Peak Probability Passed
+Tighten trailing stops
+T+12 Hours
+-50% Not Hit
+Prob drops 67.3% → 22.1%
+Exit 50% of position
+T+18 Hours
+-100% Not Hit
+Prob drops to 8.7%
+Exit All
+Sat 00:00 EST
+Weekend Onset
+Liquidity Vacuum
+Flat all positions
+
+
+--- Page 9 ---
+
+Pullback Signatures
+38.2% Add Rule: If price retraces 38.2% from any extension level, continuation
+probability is 81.4%. This is a high-confidence add point.
+Momentum Divergence: If -50% is hit with H1 RSI > 70, delay the -100% add until
+RSI resets < 60.
+8. Risk Management Framework
+Strict capital preservation rules to survive high-volatility crypto environments.
+Position Sizing
+Max Risk Per Setup: 3% Total Capital (Combined BTC + ETH).
+ETH Sizing Adjustment: Reduce BTC allocation size by 35-40% for equivalent
+ETH exposure to account for volatility.
+Correlation Cap: If BTC and ETH positions are open simultaneously, cap
+combined size at 2.5% to avoid double-correlation risk.
+Drawdown Protocol
+Stop Trading Rule: Stop all trading after 3 consecutive 132% invalidations.
+Regime Mismatch: Never hold a Slow-regime position > 6 hours. Never hold a
+Normal ETH position > 9 hours.
+Systemic Cascade: If 132% is hit on BOTH BTC and ETH within the same 4H
+window, flat all positions and skip the next 2 Range A cycles.
+
+
+--- Page 10 ---
+
+9. Quick Reference Cards
+BTC TRADING CHECKLIST
+1. Time: Wait for Fri 05:00 EST
+close.
+2. Construct: Calc Range A (Thu
+22:00 - Fri 05:00).
+3. Regime: Check size vs 20w SMA.
+4. Fast Regime? Enter -25%, Target
+-168%.
+5. Normal Regime? Wait -50%,
+Target -100%.
+6. Stop: Set at 132% (Hard stop).
+7. Time Check: Is it past T+12h?
+Manage exposure.
+ETH TRADING CHECKLIST
+1. Time: Wait for Fri 05:00 EST
+close.
+2. Regime: Is Range A > 1.8x SMA?
+(Fast only).
+3. Normal/Slow? SKIP TRADE.
+4. Entry: Enter -25% (Fast regime
+only).
+5. Stop: Set at 115% (Tighter stop).
+6. Target: -100% Max (Do not
+chase -168%).
+7. Correlation: Is BTC confirming
+direction?
+QUARTERLY SEASONALITY OVERLAY
+Q1 (Jan-Mar): Strongest -168% performance (Winter Reconstruction). Bias:
+Aggressive.
+Q2 (Apr-Jun): Cap targets at -100%. Reduce size 20%. Bias: Conservative.
+Q3 (Jul-Sep): Weakest quarter. Prefer -50% targets. Bias: Defensive.
+Q4 (Oct-Dec): Strong -168% setups. Pre-Q1 positioning. Bias: Aggressive.
+
+
+--- Page 11 ---
+
+Crypto Fibonacci Trading Manual v4.0 | For Professional Use Only | Based on 281
+weeks of validated session data.
