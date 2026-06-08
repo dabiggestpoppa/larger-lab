@@ -34,6 +34,36 @@
 > - 409 Conflict is from Telegram's servers still having old session registered
 > - Bot falls back to normal polling after initial 409 errors
 > - All agent work for today is complete — see QUANT_JOURNAL.md for results
+>
+> ## 🚨 PM VTuber Incident (June 8 Evening)
+>
+> ### What PM Did Wrong
+> - PM was running POALA/VTuber integration without coordinating with MAD
+> - PM tried to connect the Telegram bot (@P01999BOT) to VTuber system
+> - This caused Telegram API 409 Conflict errors (two instances polling same bot token)
+> - PO gateway crashed repeatedly (10+ restarts by watchdog)
+> - PM also left PDF.co OCR processes running (3 instances) wasting resources
+>
+> ### Fix Applied
+> - Killed ALL stale processes (9 Python + 1 Node + 3 PDF.co)
+> - Force-cleared Telegram sessions via API (deleteWebhook + getUpdates with high offset)
+> - Restarted PO gateway clean — now polling stable
+> - Created `scripts/po_watchdog.py` — auto-restarts PO if it crashes
+> - VTuber/POALA taken offline per MAD directive — do NOT restart
+>
+> ### ⚠️ RULES FOR PM (Non-Negotiable)
+> 1. **NEVER touch PO telegram gateway** — it runs independently, don't connect anything to it
+> 2. **NEVER run VTuber/POALA without MAD explicit approval** — it conflicts with PO bot
+> 3. **ALWAYS check `ps aux | grep telegram` before starting any bot-related work**
+> 4. **ALWAYS clean up after yourself** — kill processes you start when done
+> 5. **COORDINATE with MAD before touching any shared infrastructure**
+>
+> ### Current Status (Verified Stable)
+> - PO Telegram (@P01999BOT): ✅ RUNNING — polling every 30s
+> - PO Watchdog: ✅ RUNNING — checks every 60s, auto-restarts if crash
+> - OCE Backend (8000): ✅ RUNNING
+> - API Server (8001): ✅ RUNNING
+> - VTuber/POALA (12393): 🔴 OFFLINE — do not restart without MAD approval
 > **Last Updated:** 2026-06-08 22:00 UTC (CEREBUS final sweep — all servers up, stale processes killed, MAD closing)
 > **Tasks:** `progress/O2C-RESEARCH-MESH-TASKS.md`
 > **Last Updated:** 2026-06-08 (Quant analysis complete — 9K config, Monte Carlo, forward test plan)
