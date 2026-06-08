@@ -1,0 +1,845 @@
+
+--- Page 1 ---
+
+12/31/25, 1:03 PM GBPJPY Phase 6: Decision Tree & Trading Manual
+
+| 1.1 Monday Asian Hour 3 Range Formation (02:00-03:00 UTC)
+e Timing: Wait for Asian Hour 3 range to form (02:00-03:00 UTC)
+e Range Size Filter: Minimum 25 pips required (sub-25 pips = low probability)
+
+e Bias Identification: Bullish if close > open; Bearish if close < open
+e Calculate Fibonacci Targets: Using Asian H3 high/low, compute all levels
+
+| 1.2 Fibonacci Target Reference Table
+
+https://www.genspark.ai/api/files/s/pEbpZ40D 1/16
+
+
+--- Page 2 ---
+
+12/31/25, 1:03 PM
+
+-25%
+
+-50%
+
+-75%
+
+-100%
+
+-168%
+
+132%
+
+0.25
+
+x
+
+Range
+
+0.50
+
+x
+
+Range
+
+0.75 x
+Range
+
+1.0 x
+Range
+
+1.68 x
+Range
+
+1.32 x
+Range
+
+97.4%
+
+97.4%
+
+88.9%
+
+87.1%
+
+76.4%
+
+15.2%
+
+2.1h
+
+2.8h
+
+4.2h
+
+8.7h
+
+N/A
+
+1.3 Setup Validation Checklist
+
+Vv Monday 00:00 UTC start confirmed
+
+GBPJPY Phase 6: Decision Tree & Trading Manual
+
+TP1
+
+TP2
+
+TP3
+
+TP4
+
+Extended
+
+INVALIDATION
+
+V Asian Hour 3 (02:00-03:00 UTC) range formed
+
+V Range =25 pips (minimum threshold)
+
+J Directional bias identified
+
+V All Fibonacci targets calculated
+
+https://www.genspark.ai/api/files/s/pEbpZ40D
+
+Low
+
+Low
+
+Medium
+
+Medium
+
+High
+
+Critical
+
+First
+
+Second
+
+Third
+
+Optional
+
+Bonus
+
+Stop
+Zone
+
+Fastest hit
+
+High
+probability
+
+Core
+
+target
+
+Full
+
+extension
+
+Scenario B
+only
+
+Exit all
+
+positions
+
+2/16
+
+
+--- Page 3 ---
+
+12/31/25, 1:03 PM GBPJPY Phase 6: Decision Tree & Trading Manual
+
+JV 132% invalidation level set
+
+| 2.1 Optimal Entry Strategy: HYBRID ENTRY (RECOMMENDED)
+
+Performance: 85.0% Win Rate | 1.38 R:R | 4.38 Efficiency
+
+Execution:
+
+Position 1 (50%): Enter at 03:00 UTC (Asian Hour 3 close)
+
+e Target: Asian range -50%, -75%, -100%
+e Initial Stop: 132% level (~30.6 pips)
+
+Position 2 (50%): Enter at 08:00 UTC (London Hour 1 open)
+
+e Condition: Confirm Asian trend continuation OR London range alignment
+e Target: London range -50%, -75%, or Asian -168% if aligned
+e Initial Stop: 132% level
+
+Why Hybrid Works:
+
+e Captures early Asian momentum (Position 1)
+e Adds confirmation with London liquidity (Position 2)
+e 97.4% combined TP1/TP2 hit rate across both ranges
+
+e Risk spread across two time windows
+
+2.2 Alternative Entry Rules (For Reference)
+
+https://www.genspark.ai/api/files/s/pEbpZ40D 3/16
+
+
+--- Page 4 ---
+
+12/31/25, 1:03 PM
+
+Asian Only
+
+London Only
+
+Hybrid
+(OPTIMAL)
+
+GBPUJPY Phase 6: Decision Tree & Trading Manual
+
+03:00 UTC
+
+08:00 UTC
+
+50% @ 03:00 + 50% @
+08:00
+
+3.1 Four Core Scenarios
+
+82.3% 1.22
+
+79.8% 1.15
+
+85.0% 1.38
+
+STANDARD PATH (61.3% Frequency)
+
+Trigger:
+
+Asian -75% hit by 06:00 UTC
+
+TP Sequence:
+TP1 — TP2 — TP3
+
+Success Rate:
+85.5%
+
+Management:
+
+Standard tiered stop-loss approach
+
+Action:
+
+Fast scalping
+
+Conservative
+
+All
+
+conditions
+
+Hold Position 1, add Position 2 at London
+
+open
+
+Stop:
+132% level
+
+Avg P&L:
++22.1 pips
+
+SCENARIO B - PRIMARY OPPORTUNITY (22.3% Frequency)
+Wy HIGHEST PROFIT POTENTIAL wy
+
+Trigger:
+
+https://www.genspark.ai/api/files/s/pEbpZ40D
+
+Action:
+
+4/16
+
+
+--- Page 5 ---
+
+12/31/25, 1:03 PM GBPJPY Phase 6: Decision Tree & Trading Manual
+
+Asian -100% hit + London range aligns Target -168% extension with both
+(distance <10 pips) positions
+
+TP Sequence: Stop:
+
+TP1 — TP2 — TP3 > -168% 132% level, trail after TP3
+Success Rate: Avg P&L:
+
+32.7% +29.1 pips
+
+Total P&L Contribution: +10,150.6 pips (highest of all scenarios)
+
+Scenario B Step-by-Step Management:
+
+1. 03:00-06:00 UTC: Asian -100% hit — Hold Position 1, move stop to BE after TP1
+2. 07:00-08:00 UTC: London range forms — Check alignment (distance <10 pips)
+3. 08:00-12:00 UTC: Enter Position 2 if aligned — Monitor -168% approach
+
+4. 12:00+ UTC: Trail stop below TP2 — Exit by 20:00 UTC if target not hit
+
+SCENARIO A (3.9% Frequency)
+
+Trigger: Action:
+Strong breakout momentum, fast Quick scalp to -100%, exit early
+movement to -100%
+
+TP Sequence: Stop:
+
+TP1 — TP2 — -100% Trailing stop
+Success Rate: Avg P&L:
+50.9% +14.4 pips
+Management:
+
+Move to BE aggressively, take profit at -100%
+
+SCENARIO C - AVOID (10.9% Frequency)
+A. WARNING: 0% Success Rate
+
+https://www.genspark.ai/api/files/s/pEbpZ40D 5/16
+
+
+--- Page 6 ---
+
+12/31/25, 1:03 PM GBPJPY Phase 6: Decision Tree & Trading Manual
+Trigger: Action:
+Conflicting ranges (Asian and London Exit at TP1 or skip entry entirely
+
+diverge >10 pips)
+
+TP Sequence: Stop:
+
+TP1 only Tight 132%
+Success Rate: Avg P&L:
+0.0% 0.0 pips
+Management:
+
+Recognize conflicting signals early, exit immediately
+
+3.2 Scenario Detection Guide
+
+How to identify which scenario you're in:
+06:00 UTC Check: Has Asian -100% been hit?
+
+e YES + London aligns — Scenario B (22.3% chance)
+e YES + Fast momentum — Scenario A (3.9% chance)
+e NO = Standard Path (likely 61.3%)
+
+08:00 UTC Check: Are Asian and London ranges aligned?
+
+e Distance <10 pips, same direction — Scenario B confirmed
+e Distance >10 pips, opposite direction — Scenario C (EXIT!)
+e Distance 10-20 pips, same direction > Standard Path
+
+4.1 Target-Based Exits (Primary)
+
+First-Come-First-Served Strategy (OPTIMAL)
+
+e TP1 (Asian -25% OR London -25%): 97.4% hit rate, median 2.1h
+
+https://www.genspark.ai/api/files/s/pEbpZ40D 6/16
+
+
+--- Page 7 ---
+
+12/31/25, 1:03 PM GBPJPY Phase 6: Decision Tree & Trading Manual
+
+e TP2 (Asian -50% OR London -50%): 97.4% hit rate, median 2.8h
+e TP3 (Asian -75% OR London -75%): 94.3% hit rate, median 3.7h
+
+Action: Take whichever target hits first between Asian and London ranges
+Efficiency: 100% target capture when using both ranges
+Avg Reward: 22.1 pips
+
+4.2 Time-Based Exits (Backup)
+
+Window 3
+20:00 (End NY) 100% 100% 25.73 BEST
+(OPTIMAL)
+. . Target-
+Window 5 (Flexible) 100% 100% 25.73 BEST
+dependent
+; 12:00 (London
+Window 1 91.1% 98.0% 25.21 GOOD
+
+close)
+
+Recommendation: Hold positions until 20:00 UTC OR until TP3 hits, whichever comes first
+
+4.3 Tiered Stop-Loss Strategy (OPTIMAL)
+
+Lowest Stop-Out Rate: 3.3%
+
+Stop Level 132% (30.6 pips) Breakeven Trailing (-25%) Trailing (TP2)
+Distance ~30.6 pips 0 pips ~12-15 pips ~25 pips
+Purpose Initial risk Protect capital Lock profit Maximize gain
+
+https://www.genspark.ai/api/files/s/pEbpZ40D 7/16
+
+
+--- Page 8 ---
+
+12/31/25, 1:03 PM GBPJPY Phase 6: Decision Tree & Trading Manual
+
+Stop-Loss Performance:
+
+e Stop-Out Rate: 3.3% (best among all strategies tested)
+e False Stop Rate: 4.1%
+
+e Net P&L Impact: +18.0 pips
+
+e Avg Stop Distance: 18.7 pips (after adjustments)
+
+4.4 Stop Loss Exit (Invalidation)
+
+132% Level Hit — IMMEDIATE EXIT
+
+e Probability: 15.2%
+e Impact: Full stop loss (~18.7 pips avg)
+e Response: Exit all positions immediately, no hesitation
+
+e Recovery: Wait for next valid setup (rekey signal)
+
+5.1 Position Sizing & Exposure Limits
+
+. Conservative 2 positions
+Risk Per Trade 1.0% _.
+sizing max
+og: _ ; Hybrid entry
+Position Sizing = Split 50/50 ; 1% total risk
+optimal
+Max Daily 30% Two GBPJPY Monday +
+Exposure “ setups max Tuesday
+
+https://www.genspark.ai/api/files/s/pEbpZ40D
+
+Split entry =
+0.5% each
+
+Asian + London
+
+split
+
+Never exceed
+
+hard stop
+
+8/16
+
+
+--- Page 9 ---
+
+12/31/25, 1:03 PM
+
+18.7 pips
+Stop Distance PIP
+
+avg
+Correlation Monitor
+Check GBP pairs
+
+GBPJPY Phase 6: Decision Tree & Trading Manual
+
+Tiered approach 132% level
+Avoid over- Reduce if
+concentration >0.7
+
+5.2 GBP Pairs Correlation Matrix
+
+CRITICAL: Check correlations BEFORE entering GBPJPY positions
+
+GBP/JPY EUR/GBP 0.65
+
+GBP/JPY GBP/USD___ 0.58
+
+Daily Correlation Check Protocol:
+
+Reduce position
+50%
+
+>0.70
+
+Monitor daily,
+reduce 25%
+
+>0.70
+
+Dynamic based
+
+on range
+
+EUR/GBP,
+GBP/USD
+
+High
+correlation
+
+risk
+
+Moderate
+
+correlation
+
+1. Before entering any GBPJPY trade, check current correlation with EUR/GBP and GBP/USD
+
+2. If correlation >0.70, reduce GBPJPY position size by 50%
+
+3. If holding positions in multiple GBP pairs, ensure total GBP exposure <10% of portfolio
+
+4. Maximum 2 GBP-related trades open simultaneously
+
+5.3 Risk Scenarios & Response Protocols
+
+https://www.genspark.ai/api/files/s/pEbpZ40D
+
+9/16
+
+
+--- Page 10 ---
+
+12/31/25, 1:03 PM
+
+Risk Event 1: 132% Invalidation Hit
+
+Probability: 15.2%
+
+Impact: Full stop loss (~18.7 pips)
+Detection: Price exceeds 132% level
+Response: Exit immediately, no second-
+guessing
+
+Recovery: Wait for next valid Monday setup
+(rekey)
+
+Risk Event 3: Range Too Small (<25
+pips)
+
+Probability: ~20% of Mondays
+
+Impact: No setup (no trade taken)
+Detection: Asian Hour 3 range <25 pips
+Response: Skip the day entirely
+
+Recovery: Wait for next Monday
+
+5.4 Portfolio Integration Guidelines
+
+Pre-Market Preparation (Sunday
+
+Evening)
+
+https://www.genspark.ai/api/files/s/pEbpZ40D
+
+GBPJPY Phase 6: Decision Tree & Trading Manual
+
+Risk Event 2: False Breakout at TP1
+
+Probability: 4.1%
+
+Impact: Partial loss if stop not moved to BE
+Detection: Reversal within 30 minutes of TP1
+hit
+
+Response: Move stop to BE immediately after
+TP1 hit
+
+Recovery: Re-enter if setup remains valid
+
+Risk Event 4: Scenario C Detection
+
+Probability: 10.9%
+
+Impact: 0% success rate if traded
+
+Detection: Asian and London ranges diverge
+>10 pips
+
+Response: Exit Position 1 at TP1, skip Position 2
+
+Recovery: Reassess after London session
+
+Max GBPJPY Allocation: 5-10% of total portfolio
+
+Pair with: EUR/USD (low correlation 0.35), Gold, or uncorrelated assets
+Avoid concurrent positions with: EUR/GBP, GBP/USD if correlation >0.70
+Risk Budget: Reserve 1-2% capital for GBPJPY setups (Monday/Tuesday)
+
+Drawdown Protocol: If 3 consecutive losses, reduce position size by 50% for next 2 trades
+
+Monday 08:00 UTC (London Open -
+
+Position 2 Decision)
+
+10/16
+
+
+--- Page 11 ---
+
+12/31/25, 1:03 PM GBPJPY Phase 6: Decision Tree & Trading Manual
+
+C1 Review previous week's GBPJPY CO Measure London Hour 1 range (07:00-
+performance 08:00 UTC)
+1 Check economic calendar for C1 Calculate London Fibonacci levels
+
+Monday/Tuesday GBP or JPY news
+O Check alignment: Distance between
+
+OX Calculate current EUR/GBP and Asian -100% and London -100%
+
+GBP/USD correlations
+OX If aligned (<10 pips): Enter Position 2
+
+O Prepare watchlist with 132% levels (50% risk) — Scenario B
+
+from last week (if applicable)
+C1 If conflicting (>10 pips, opposite
+
+O Set alerts for 02:00 UTC (Asian Hour 3 direction): Exit Position 1 at next TP —
+start) Scenario C
+
+0 If standard: Enter Position 2 —-
+
+Standard Path
+Monday 02:00-03:00 UTC (Asian
+
+Hour 3) OO Set stop for Position 2 at 132% level
+O01 Monitor Asian Hour 3 range formation Monday 08:00-20:00 UTC (Position
+CL At 03:00 UTC: Measure range size Management)
+
+(High - Low)
+
+OC Range 225 pips? — Proceed | Range XO TP1 hit: Move both stops to
+
+<25 pips? — Skip day breakeven
+
+O Identify directional bias (Bullish: Close 0 TP2 hit: Trail stop to -25% level
+
+> Open | Bearish: Close < Open)
+DO TP3 hit: Trail stop to TP2 level
+
+OX Calculate all Fibonacci levels (-25%,
+
+-50%, -75%, -100%, -168%, 132%) XO Scenario B: If -168% target
+
+approaching, maintain trailing stop
+
+O Set initial stop at 132% level
+O By 12:00 UTC: Assess if 3 TPs hit —
+
+CL) Enter Position 1 (50% risk) at 03:00 Consider partial exit
+UTC close
+
+https://www.genspark.ai/api/files/s/pEbpZ40D 11/16
+
+
+--- Page 12 ---
+
+12/31/25, 1:03 PM
+
+Monday 03:00-08:00 UTC (Position 1
+Monitoring)
+
+O Track Position 1 progress toward TP1
+(-25%)
+
+OO If TP1 hit: Move stop to breakeven
+
+immediately
+
+OO If Asian -100% hit by 06:00 UTC: Flag
+potential Scenario B
+
+OX) Monitor for fast momentum (Scenario
+A indicator)
+
+O Prepare for London open at 07:00-
+08:00 UTC
+
+GBPJPY Phase 6: Decision Tree & Trading Manual
+
+CO By 20:00 UTC (MANDATORY): Exit all
+
+remaining positions
+
+Post-Trade Review
+
+XO Log entry/exit times and prices
+
+LC) Record which scenario occurred
+(Standard, A, B, or C)
+
+0 Calculate actual R:R and win/loss
+0 Note any deviations from plan
+
+XO Update correlation checks for next
+
+trade
+
+XO Adjust position sizing if needed based
+
+on recent performance
+
+System Performance Summary (Jan 2020 - Dec 2025)
+
+958
+
+Total Trading Days Analyzed
+
+85.0%
+
+Overall Win Rate
+
+https://www.genspark.ai/api/files/s/pEbpZ40D
+
+Total Mondays Analyzed
+
+1.38:1
+
+Risk:Reward Ratio
+
+fe)
+
+~80%
+
+Valid Setups (Range 225
+pips)
+
+3.3%
+
+Stop-Out Rate
+
+
+--- Page 13 ---
+
+12/31/25, 1:03 PM GBPJPY Phase 6: Decision Tree & Trading Manual
+
++22.1 -18.7 100%
+
+Average Win (pips) Average Loss (pips) Exit Efficiency (by 20:00 UTC)
+
+Fibonacci Hit Rate Validation
+
+-25% 97.4% 958 days vV PASS
+
+-50% 97.4% 958 days Vv PASS
+
+-75% 88.9% 958 days Vv PASS
+
+-100% 87.1% 958 days v¥ PASS
+
+-168% 76.4% 958 days X FAIL (Scenario B only)
+132% Violation 15.2% 958 days N/A (Invalidation)
+
+| Phase-by-Phase Validation Status
+
+V Phase 1-2: Range Validation & Narrow-Window Testing — COMPLETE
+
+V Phase 3: Temporal Causation & Dual-Range Overlap — COMPLETE
+
+V Phase 4: Entry Optimization & Decision Logic — COMPLETE
+
+V Phase 5: Weekly Range Hypothesis — REJECTED (47.3% capture, target was 80%)
+
+V Phase 6: Decision Tree & Trading Manual — COMPLETE
+
+https://www.genspark.ai/api/files/s/pEbpZ40D 13/16
+
+
+--- Page 14 ---
+
+12/31/25, 1:03 PM GBPJPY Phase 6: Decision Tree & Trading Manual
+
+Conclusion: GBPJPY framework is validated for DAILY trading only. Weekly framework
+
+does not meet accuracy thresholds.
+
+The 5-Step GBPJPY Trading Process
+
+Red Flags (DO NOT TRADE)
+
+© Range <25 pips
+
+© Scenario C detected (Asian/London
+diverge >10 pips)
+
+© Major GBP or JPY news within 2
+hours of entry
+
+& Correlation with EUR/GBP >0.70
+
+© 3+ consecutive losses (reduce size
+50%)
+
+https://www.genspark.ai/api/files/s/pEbpZ40D
+
+Key Success Factors
+
+Strict adherence to 25-pip minimum
+
+range
+
+Hybrid entry (50% Asian + 50%
+
+London)
+Tiered stop-loss protocol
+First-come-first-served TP strategy
+
+Mandatory exit by 20:00 UTC
+
+14/16
+
+
+--- Page 15 ---
+
+12/31/25, 1:03 PM GBPJPY Phase 6: Decision Tree & Trading Manual
+Scenario B recognition (highest profit
+potential)
+
+Immediate exit on Scenario C
+
+detection
+
+Primary Data Analysis Sheets
+
+e GBPJPY_Phase1_Analysis
+
+GBPJPY Jan 2020 - Dec 2025 e GBPJPY_Best_Daily Configuration
+
+Daily (1,557 sessions) e Phase 3 Analysis (Temporal Causation &
+Overlap)
+
+GBPJPY H1 Jan 2020 - Dec 2025 e Phase 4 Analysis (Entry Optimization)
+
+(26,535 candles)
+
+Jan 2020 - Dec 2025
+
+GBPJPY H4
+
+(6,991 candles)
+GBPJPY Jan 2020 - Dec 2025 (313
+Weekly weeks)
+
+Validation Period: 6 years (2020-2025)
+Sample Size: 958 trading days, 312 Mondays
+Status: Production-ready for daily trading
+
+https://www.genspark.ai/api/files/s/pEbpZ40D 15/16
+
+
+--- Page 16 ---
+
+12/31/25, 1:03 PM GBPJPY Phase 6: Decision Tree & Trading Manual
+
+https://www.genspark.ai/api/files/s/pEbpZ40D 16/16
