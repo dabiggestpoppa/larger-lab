@@ -4,7 +4,7 @@
 > **Current focus:** O2C × MAD LABS Sovereign Research Mesh — Phases L1→L4
 > **Plan:** `docs/plans/O2C-RESEARCH-MESH.md`
 > **Tasks:** `progress/O2C-RESEARCH-MESH-TASKS.md`
-> **Last Updated:** 2026-06-07 (PO full capability upgrade complete — 80+ tools, MCP bridge, REST API)
+> **Last Updated:** 2026-06-07 (PO Telegram fixed — broken imports + OCE backend restart + gateway restart)
 
 ---
 
@@ -111,6 +111,27 @@ PO now has the same capabilities as Copilot:
 **Modified:** `core/observer/po_agent.py` (dynamic tool loading), `oce/backend/main.py` (MCP init + router)
 
 PO's tool registry is **dynamic** — add a new MCP server and PO automatically gets its tools on next startup.
+
+---
+
+### [OC2] 2026-06-07 — 🔧 PO TELEGRAM FIX — BROKEN IMPORTS + TIMEOUT
+
+**Problem:** PO Telegram bot was sending "Agent received" but never responding. Only "respond soon" messages.
+
+**Root causes (3 bugs):**
+1. **Broken imports in `po_api.py`:** `_stream_chat()` imported `core.observer.workspace_scanner` and `core.observer.vault_retriever` — neither module exists. Correct: `oce.backend.po_workspace` and `oce.backend.po_vault`.
+2. **OCE backend had no OPENROUTER_API_KEY:** Backend was started from a shell that didn't load `.env`. POAgent had empty API key → LLM calls failed silently → hung forever.
+3. **No timeout on POAgent.chat():** When LLM calls failed, the agent hung indefinitely with no timeout.
+
+**Fixes applied:**
+- Fixed imports: `core.observer.workspace_scanner` → `oce.backend.po_workspace`, `core.observer.vault_retriever` → `oce.backend.po_vault`
+- Added `asyncio.wait_for(timeout=120)` wrapper around `agent.chat()` in both `_stream_chat` and `_complete_chat`
+- Restarted OCE backend with proper env vars
+- Killed stale telegram gateway (PID 13324), removed stale PID file, restarted gateway
+
+**Result:** PO is now responding on Telegram. Chat endpoint returns in <15s.
+
+**Lesson:** Always verify imports exist before adding them to streaming endpoints. Always add timeouts to LLM calls.
 
 ---
 
