@@ -39,3 +39,5 @@
 {"engine": "SymmetryTrap", "symbol": "EURAUD.PRO", "direction": "BUY", "entry": 1.14737, "sl": 1.1477, "tp": 1.14887, "event": "SL_HIT", "loop": 3, "time": "2026-06-08 05:25:00"}
 {"engine": "SymmetryTrap", "symbol": "GBPNZD.PRO", "direction": "BUY", "entry": 1.06271, "sl": 2.29505, "tp": 1.06491, "event": "ENTRY", "loop": 1, "time": "2026-06-08 05:37:00"}
 {"engine": "SymmetryTrap", "symbol": "GBPNZD.PRO", "direction": "BUY", "entry": 1.06271, "sl": 2.29505, "tp": 1.06491, "event": "SL_HIT", "loop": 1, "time": "2026-06-08 05:39:00"}
+{"engine": "SymmetryTrap", "symbol": "GBPNZD.PRO", "direction": "SELL", "entry": 1.0619, "sl": 1.06188, "tp": 1.0607, "event": "ENTRY", "loop": 1, "time": "2026-06-08 09:03:00"}
+{"engine": "SymmetryTrap", "symbol": "GBPNZD.PRO", "direction": "SELL", "entry": 1.0619, "sl": 1.06188, "tp": 1.0607, "event": "SL_HIT", "loop": 1, "time": "2026-06-08 09:05:00"}

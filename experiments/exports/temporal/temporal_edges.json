@@ -1,664 +1,656 @@
 {
   "version": "0.1.0",
   "phase": "11.2-3B.2",
-  "timestamp": "2026-06-08T02:44:20.817000+00:00",
+  "timestamp": "2026-06-08T13:01:22.411730+00:00",
   "total_edges": 20,
   "total_snapshots": 0,
   "edges": [
     {
-      "edge_id": "te_9afddf9f918c",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "source": "routing_2",
-      "target": "structural_0",
-      "event_type": "sync",
-      "latency_ms": 77.19707773294502,
-      "entropy_before": 0.0,
-      "entropy_after": 0.21573349811239484,
-      "repair_triggered": false,
-      "continuity_shift": 0.023040368978469894,
-      "metadata": {}
-    },
-    {
-      "edge_id": "te_818c2af7b2ec",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "source": "structural_1",
-      "target": "entropy_1",
-      "event_type": "repair",
-      "latency_ms": 84.24275753504403,
-      "entropy_before": 0.0,
-      "entropy_after": 0.34937806310221303,
-      "repair_triggered": false,
-      "continuity_shift": -0.09385335581130311,
-      "metadata": {}
-    },
-    {
-      "edge_id": "te_1e37cbd54a12",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "source": "memory_0",
-      "target": "routing_0",
-      "event_type": "message",
-      "latency_ms": 177.87041124166717,
-      "entropy_before": 0.0,
-      "entropy_after": 0.19544116615585122,
-      "repair_triggered": false,
-      "continuity_shift": 0.020202363822202973,
-      "metadata": {}
-    },
-    {
-      "edge_id": "te_fafa89f07cc3",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "source": "entropy_2",
-      "target": "structural_0",
-      "event_type": "sync",
-      "latency_ms": 102.08382598409813,
-      "entropy_before": 0.0,
-      "entropy_after": 0.24257556880406922,
-      "repair_triggered": false,
-      "continuity_shift": -0.1938408183161366,
-      "metadata": {}
-    },
-    {
-      "edge_id": "te_c46bb80971f1",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "source": "entropy_2",
-      "target": "structural_0",
-      "event_type": "message",
-      "latency_ms": 123.65127050179593,
-      "entropy_before": 0.0,
-      "entropy_after": 0.006362445056591504,
-      "repair_triggered": false,
-      "continuity_shift": -0.02176138310551981,
-      "metadata": {}
-    },
-    {
-      "edge_id": "te_d3f2313caa2f",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "source": "routing_1",
-      "target": "continuity_2",
-      "event_type": "message",
-      "latency_ms": 46.594887697295114,
-      "entropy_before": 0.0,
-      "entropy_after": 0.40567876673332065,
-      "repair_triggered": false,
-      "continuity_shift": -0.01905152076815539,
-      "metadata": {}
-    },
-    {
-      "edge_id": "te_33e0c98d0d24",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "source": "structural_1",
-      "target": "entropy_2",
-      "event_type": "message",
-      "latency_ms": 40.92794622520595,
-      "entropy_before": 0.0,
-      "entropy_after": 0.20568521306878335,
-      "repair_triggered": false,
-      "continuity_shift": 0.08695024736848117,
-      "metadata": {}
-    },
-    {
-      "edge_id": "te_4a935f4aefab",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "source": "routing_1",
-      "target": "routing_2",
-      "event_type": "sync",
-      "latency_ms": 64.78097197272416,
-      "entropy_before": 0.0,
-      "entropy_after": 0.12108317798417828,
-      "repair_triggered": false,
-      "continuity_shift": 0.06077713101205667,
-      "metadata": {}
-    },
-    {
-      "edge_id": "te_293b360761e4",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "source": "memory_2",
-      "target": "continuity_2",
-      "event_type": "message",
-      "latency_ms": 189.55168772616852,
-      "entropy_before": 0.0,
-      "entropy_after": 0.1789909262578,
-      "repair_triggered": false,
-      "continuity_shift": -0.048358089956858225,
-      "metadata": {}
-    },
-    {
-      "edge_id": "te_583ed3e37be3",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
+      "edge_id": "te_d63280bb6812",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
       "source": "continuity_2",
-      "target": "memory_1",
-      "event_type": "message",
-      "latency_ms": 122.28127656234962,
-      "entropy_before": 0.0,
-      "entropy_after": 0.2020307922285537,
-      "repair_triggered": false,
-      "continuity_shift": 0.01066726956935335,
-      "metadata": {}
-    },
-    {
-      "edge_id": "te_fb796f35d983",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "source": "memory_1",
-      "target": "structural_1",
-      "event_type": "repair",
-      "latency_ms": 1.326276238066143,
-      "entropy_before": 0.0,
-      "entropy_after": 0.08323314105035795,
-      "repair_triggered": false,
-      "continuity_shift": -0.12069166577524632,
-      "metadata": {}
-    },
-    {
-      "edge_id": "te_a0da2eb52912",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "source": "continuity_2",
-      "target": "continuity_1",
-      "event_type": "sync",
-      "latency_ms": 69.40839236125008,
-      "entropy_before": 0.0,
-      "entropy_after": 0.05883383850506052,
-      "repair_triggered": false,
-      "continuity_shift": -0.19338182451644587,
-      "metadata": {}
-    },
-    {
-      "edge_id": "te_7157b2e11daf",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "source": "continuity_2",
-      "target": "structural_1",
-      "event_type": "message",
-      "latency_ms": 66.22949066837573,
-      "entropy_before": 0.0,
-      "entropy_after": 0.3495549656453077,
-      "repair_triggered": false,
-      "continuity_shift": -0.007726640690999043,
-      "metadata": {}
-    },
-    {
-      "edge_id": "te_ca3ee91cfcc3",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "source": "repair_1",
-      "target": "entropy_2",
-      "event_type": "repair",
-      "latency_ms": 110.65853132391194,
-      "entropy_before": 0.0,
-      "entropy_after": 0.44682042576876113,
-      "repair_triggered": false,
-      "continuity_shift": 0.06620857523467755,
-      "metadata": {}
-    },
-    {
-      "edge_id": "te_49b38d67fcbe",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "source": "continuity_1",
-      "target": "entropy_0",
-      "event_type": "message",
-      "latency_ms": 127.63943398490244,
-      "entropy_before": 0.0,
-      "entropy_after": 0.05804849852594862,
-      "repair_triggered": false,
-      "continuity_shift": -0.11632519975923368,
-      "metadata": {}
-    },
-    {
-      "edge_id": "te_62e4e5790e06",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "source": "structural_2",
-      "target": "routing_1",
-      "event_type": "message",
-      "latency_ms": 27.08774874142813,
-      "entropy_before": 0.0,
-      "entropy_after": 0.14708589549094503,
-      "repair_triggered": false,
-      "continuity_shift": -0.041878303700786795,
-      "metadata": {}
-    },
-    {
-      "edge_id": "te_788d946c8874",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "source": "memory_1",
-      "target": "entropy_1",
-      "event_type": "message",
-      "latency_ms": 103.53057913476182,
-      "entropy_before": 0.0,
-      "entropy_after": 0.43419445904373866,
-      "repair_triggered": false,
-      "continuity_shift": 0.05424678649502662,
-      "metadata": {}
-    },
-    {
-      "edge_id": "te_d54d461c70ce",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "source": "repair_1",
-      "target": "routing_0",
-      "event_type": "sync",
-      "latency_ms": 154.84406954782267,
-      "entropy_before": 0.0,
-      "entropy_after": 0.2964742109688313,
-      "repair_triggered": false,
-      "continuity_shift": -0.08917756565067536,
-      "metadata": {}
-    },
-    {
-      "edge_id": "te_cd375a8a7aa3",
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "source": "routing_1",
       "target": "repair_0",
-      "event_type": "repair",
-      "latency_ms": 52.826217222899984,
+      "event_type": "message",
+      "latency_ms": 168.54592890350258,
       "entropy_before": 0.0,
-      "entropy_after": 0.009041795296547528,
+      "entropy_after": 0.2893234499826762,
       "repair_triggered": false,
-      "continuity_shift": -0.0087831714542565,
+      "continuity_shift": 0.05646454420410785,
       "metadata": {}
     },
     {
-      "edge_id": "te_01637a554068",
-      "timestamp": "2026-06-08T02:44:20.800995+00:00",
+      "edge_id": "te_2ef054f4f81d",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
       "source": "memory_1",
-      "target": "routing_2",
-      "event_type": "sync",
-      "latency_ms": 137.10017490372175,
+      "target": "memory_0",
+      "event_type": "message",
+      "latency_ms": 9.376924073542616,
       "entropy_before": 0.0,
-      "entropy_after": 0.0473267073638291,
+      "entropy_after": 0.3829382095217624,
       "repair_triggered": false,
-      "continuity_shift": -0.19349353941991942,
+      "continuity_shift": 0.07410314543718666,
+      "metadata": {}
+    },
+    {
+      "edge_id": "te_29be599e7bc8",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "source": "entropy_1",
+      "target": "structural_2",
+      "event_type": "repair",
+      "latency_ms": 50.67382531121466,
+      "entropy_before": 0.0,
+      "entropy_after": 0.2844084122878024,
+      "repair_triggered": false,
+      "continuity_shift": -0.16853421453096862,
+      "metadata": {}
+    },
+    {
+      "edge_id": "te_8435a42f333a",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "source": "routing_0",
+      "target": "continuity_0",
+      "event_type": "message",
+      "latency_ms": 132.30419908019087,
+      "entropy_before": 0.0,
+      "entropy_after": 0.3581684655833725,
+      "repair_triggered": false,
+      "continuity_shift": -0.0924238021257417,
+      "metadata": {}
+    },
+    {
+      "edge_id": "te_b903eedda2ea",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "source": "memory_1",
+      "target": "structural_1",
+      "event_type": "repair",
+      "latency_ms": 68.23546862049005,
+      "entropy_before": 0.0,
+      "entropy_after": 0.2292975682566995,
+      "repair_triggered": false,
+      "continuity_shift": -0.18379350096066463,
+      "metadata": {}
+    },
+    {
+      "edge_id": "te_f0c25163234b",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "source": "structural_1",
+      "target": "memory_0",
+      "event_type": "sync",
+      "latency_ms": 69.04197310615154,
+      "entropy_before": 0.0,
+      "entropy_after": 0.011966351986505086,
+      "repair_triggered": false,
+      "continuity_shift": -0.012967744556613647,
+      "metadata": {}
+    },
+    {
+      "edge_id": "te_c477adfa4161",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "source": "continuity_1",
+      "target": "repair_2",
+      "event_type": "repair",
+      "latency_ms": 136.43823629033116,
+      "entropy_before": 0.0,
+      "entropy_after": 0.18751639246603646,
+      "repair_triggered": false,
+      "continuity_shift": -0.07924296820279553,
+      "metadata": {}
+    },
+    {
+      "edge_id": "te_a0c7eb64b87e",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "source": "continuity_0",
+      "target": "routing_1",
+      "event_type": "repair",
+      "latency_ms": 199.24285752961416,
+      "entropy_before": 0.0,
+      "entropy_after": 0.39643801240369064,
+      "repair_triggered": false,
+      "continuity_shift": 0.08593320040504276,
+      "metadata": {}
+    },
+    {
+      "edge_id": "te_31c101f8790e",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "source": "continuity_0",
+      "target": "structural_1",
+      "event_type": "repair",
+      "latency_ms": 42.47164686608431,
+      "entropy_before": 0.0,
+      "entropy_after": 0.18078553507995,
+      "repair_triggered": false,
+      "continuity_shift": -0.1510136548278661,
+      "metadata": {}
+    },
+    {
+      "edge_id": "te_73938e510e1c",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "source": "entropy_2",
+      "target": "continuity_0",
+      "event_type": "message",
+      "latency_ms": 120.09069315436237,
+      "entropy_before": 0.0,
+      "entropy_after": 0.10286173932813447,
+      "repair_triggered": false,
+      "continuity_shift": -0.061206600227826424,
+      "metadata": {}
+    },
+    {
+      "edge_id": "te_ac1a1ace51f1",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "source": "continuity_2",
+      "target": "repair_0",
+      "event_type": "sync",
+      "latency_ms": 73.74757574892647,
+      "entropy_before": 0.0,
+      "entropy_after": 0.18411269348662723,
+      "repair_triggered": false,
+      "continuity_shift": -0.08411668144736845,
+      "metadata": {}
+    },
+    {
+      "edge_id": "te_d980340fa452",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "source": "repair_2",
+      "target": "repair_1",
+      "event_type": "repair",
+      "latency_ms": 106.1245356817308,
+      "entropy_before": 0.0,
+      "entropy_after": 0.3829713343127927,
+      "repair_triggered": false,
+      "continuity_shift": -0.16133519500431043,
+      "metadata": {}
+    },
+    {
+      "edge_id": "te_90c7fd3b745e",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "source": "continuity_0",
+      "target": "structural_1",
+      "event_type": "repair",
+      "latency_ms": 127.50620937281937,
+      "entropy_before": 0.0,
+      "entropy_after": 0.3556388526979181,
+      "repair_triggered": false,
+      "continuity_shift": -0.0623629989060811,
+      "metadata": {}
+    },
+    {
+      "edge_id": "te_0ad601546c38",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "source": "entropy_2",
+      "target": "continuity_1",
+      "event_type": "message",
+      "latency_ms": 152.52465659552357,
+      "entropy_before": 0.0,
+      "entropy_after": 0.35471161520797695,
+      "repair_triggered": false,
+      "continuity_shift": 0.024381025760846498,
+      "metadata": {}
+    },
+    {
+      "edge_id": "te_d823781bcfc9",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "source": "memory_0",
+      "target": "continuity_2",
+      "event_type": "message",
+      "latency_ms": 41.70809001016951,
+      "entropy_before": 0.0,
+      "entropy_after": 0.2570880829569262,
+      "repair_triggered": false,
+      "continuity_shift": 0.03406373484528613,
+      "metadata": {}
+    },
+    {
+      "edge_id": "te_7e36587d0892",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "source": "continuity_2",
+      "target": "structural_0",
+      "event_type": "repair",
+      "latency_ms": 17.633927853338637,
+      "entropy_before": 0.0,
+      "entropy_after": 0.3158798116593948,
+      "repair_triggered": false,
+      "continuity_shift": -0.14787522356275645,
+      "metadata": {}
+    },
+    {
+      "edge_id": "te_33f68bb8f4d2",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "source": "repair_0",
+      "target": "memory_1",
+      "event_type": "repair",
+      "latency_ms": 33.81665175479231,
+      "entropy_before": 0.0,
+      "entropy_after": 0.25969010665696945,
+      "repair_triggered": false,
+      "continuity_shift": 0.030495021701526903,
+      "metadata": {}
+    },
+    {
+      "edge_id": "te_af168e9ad5b5",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "source": "routing_0",
+      "target": "continuity_2",
+      "event_type": "message",
+      "latency_ms": 155.0068676644765,
+      "entropy_before": 0.0,
+      "entropy_after": 0.20035854685933435,
+      "repair_triggered": false,
+      "continuity_shift": -0.03460151870245684,
+      "metadata": {}
+    },
+    {
+      "edge_id": "te_21996ff1f44f",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "source": "entropy_2",
+      "target": "routing_0",
+      "event_type": "sync",
+      "latency_ms": 100.65277189529861,
+      "entropy_before": 0.0,
+      "entropy_after": 0.13821598885423758,
+      "repair_triggered": false,
+      "continuity_shift": -7.357400781674017e-05,
+      "metadata": {}
+    },
+    {
+      "edge_id": "te_858c459c15bd",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "source": "repair_2",
+      "target": "structural_1",
+      "event_type": "message",
+      "latency_ms": 11.438755623479357,
+      "entropy_before": 0.0,
+      "entropy_after": 0.18140412956551422,
+      "repair_triggered": false,
+      "continuity_shift": 0.08034593503089377,
       "metadata": {}
     }
   ],
   "snapshots": [],
   "node_activity": {
-    "routing_2": {
-      "as_source": 1,
-      "as_target": 2,
-      "total_entropy_delta": 0.3841433834604022,
-      "repair_triggers": 0,
-      "avg_latency_ms": 93.03,
-      "total_interactions": 3
-    },
-    "structural_0": {
-      "as_source": 0,
-      "as_target": 3,
-      "total_entropy_delta": 0.46467151197305556,
-      "repair_triggers": 0,
-      "avg_latency_ms": 100.98,
-      "total_interactions": 3
-    },
-    "structural_1": {
-      "as_source": 2,
-      "as_target": 2,
-      "total_entropy_delta": 0.987851382866662,
-      "repair_triggers": 0,
-      "avg_latency_ms": 48.18,
-      "total_interactions": 4
-    },
-    "entropy_1": {
-      "as_source": 0,
-      "as_target": 2,
-      "total_entropy_delta": 0.7835725221459517,
-      "repair_triggers": 0,
-      "avg_latency_ms": 93.89,
-      "total_interactions": 2
-    },
-    "memory_0": {
-      "as_source": 1,
-      "as_target": 0,
-      "total_entropy_delta": 0.19544116615585122,
-      "repair_triggers": 0,
-      "avg_latency_ms": 177.87,
-      "total_interactions": 1
-    },
-    "routing_0": {
-      "as_source": 0,
-      "as_target": 2,
-      "total_entropy_delta": 0.49191537712468253,
-      "repair_triggers": 0,
-      "avg_latency_ms": 166.36,
-      "total_interactions": 2
-    },
-    "entropy_2": {
-      "as_source": 2,
-      "as_target": 2,
-      "total_entropy_delta": 0.9014436526982053,
-      "repair_triggers": 0,
-      "avg_latency_ms": 94.33,
-      "total_interactions": 4
-    },
-    "routing_1": {
-      "as_source": 3,
-      "as_target": 1,
-      "total_entropy_delta": 0.6828896355049916,
-      "repair_triggers": 0,
-      "avg_latency_ms": 47.82,
-      "total_interactions": 4
-    },
     "continuity_2": {
       "as_source": 3,
       "as_target": 2,
-      "total_entropy_delta": 1.1950892893700424,
+      "total_entropy_delta": 1.2467625849449586,
       "repair_triggers": 0,
-      "avg_latency_ms": 98.81,
+      "avg_latency_ms": 91.33,
       "total_interactions": 5
     },
-    "memory_2": {
+    "repair_0": {
       "as_source": 1,
-      "as_target": 0,
-      "total_entropy_delta": 0.1789909262578,
+      "as_target": 2,
+      "total_entropy_delta": 0.7331262501262729,
       "repair_triggers": 0,
-      "avg_latency_ms": 189.55,
-      "total_interactions": 1
+      "avg_latency_ms": 92.04,
+      "total_interactions": 3
     },
     "memory_1": {
-      "as_source": 3,
+      "as_source": 2,
       "as_target": 1,
-      "total_entropy_delta": 0.7667850996864793,
+      "total_entropy_delta": 0.8719258844354314,
       "repair_triggers": 0,
-      "avg_latency_ms": 91.06,
-      "total_interactions": 4
+      "avg_latency_ms": 37.14,
+      "total_interactions": 3
+    },
+    "memory_0": {
+      "as_source": 1,
+      "as_target": 2,
+      "total_entropy_delta": 0.6519926444651937,
+      "repair_triggers": 0,
+      "avg_latency_ms": 40.04,
+      "total_interactions": 3
+    },
+    "entropy_1": {
+      "as_source": 1,
+      "as_target": 0,
+      "total_entropy_delta": 0.2844084122878024,
+      "repair_triggers": 0,
+      "avg_latency_ms": 50.67,
+      "total_interactions": 1
+    },
+    "structural_2": {
+      "as_source": 0,
+      "as_target": 1,
+      "total_entropy_delta": 0.2844084122878024,
+      "repair_triggers": 0,
+      "avg_latency_ms": 50.67,
+      "total_interactions": 1
+    },
+    "routing_0": {
+      "as_source": 2,
+      "as_target": 1,
+      "total_entropy_delta": 0.6967430012969444,
+      "repair_triggers": 0,
+      "avg_latency_ms": 129.32,
+      "total_interactions": 3
+    },
+    "continuity_0": {
+      "as_source": 3,
+      "as_target": 2,
+      "total_entropy_delta": 1.3938926050930658,
+      "repair_triggers": 0,
+      "avg_latency_ms": 124.32,
+      "total_interactions": 5
+    },
+    "structural_1": {
+      "as_source": 1,
+      "as_target": 4,
+      "total_entropy_delta": 0.9590924375865869,
+      "repair_triggers": 0,
+      "avg_latency_ms": 63.74,
+      "total_interactions": 5
     },
     "continuity_1": {
       "as_source": 1,
       "as_target": 1,
-      "total_entropy_delta": 0.11688233703100914,
+      "total_entropy_delta": 0.5422280076740134,
       "repair_triggers": 0,
-      "avg_latency_ms": 98.52,
+      "avg_latency_ms": 144.48,
       "total_interactions": 2
+    },
+    "repair_2": {
+      "as_source": 2,
+      "as_target": 1,
+      "total_entropy_delta": 0.7518918563443433,
+      "repair_triggers": 0,
+      "avg_latency_ms": 84.67,
+      "total_interactions": 3
+    },
+    "routing_1": {
+      "as_source": 0,
+      "as_target": 1,
+      "total_entropy_delta": 0.39643801240369064,
+      "repair_triggers": 0,
+      "avg_latency_ms": 199.24,
+      "total_interactions": 1
+    },
+    "entropy_2": {
+      "as_source": 3,
+      "as_target": 0,
+      "total_entropy_delta": 0.595789343390349,
+      "repair_triggers": 0,
+      "avg_latency_ms": 124.42,
+      "total_interactions": 3
     },
     "repair_1": {
-      "as_source": 2,
-      "as_target": 0,
-      "total_entropy_delta": 0.7432946367375924,
-      "repair_triggers": 0,
-      "avg_latency_ms": 132.75,
-      "total_interactions": 2
-    },
-    "entropy_0": {
       "as_source": 0,
       "as_target": 1,
-      "total_entropy_delta": 0.05804849852594862,
+      "total_entropy_delta": 0.3829713343127927,
       "repair_triggers": 0,
-      "avg_latency_ms": 127.64,
+      "avg_latency_ms": 106.12,
       "total_interactions": 1
     },
-    "structural_2": {
-      "as_source": 1,
-      "as_target": 0,
-      "total_entropy_delta": 0.14708589549094503,
-      "repair_triggers": 0,
-      "avg_latency_ms": 27.09,
-      "total_interactions": 1
-    },
-    "repair_0": {
+    "structural_0": {
       "as_source": 0,
       "as_target": 1,
-      "total_entropy_delta": 0.009041795296547528,
+      "total_entropy_delta": 0.3158798116593948,
       "repair_triggers": 0,
-      "avg_latency_ms": 52.83,
+      "avg_latency_ms": 17.63,
       "total_interactions": 1
     }
   },
   "entropy_timeseries": [
     {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
       "entropy_before": 0.0,
-      "entropy_after": 0.21573349811239484,
-      "delta": 0.21573349811239484,
-      "source": "routing_2",
-      "target": "structural_0"
-    },
-    {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "entropy_before": 0.0,
-      "entropy_after": 0.34937806310221303,
-      "delta": 0.34937806310221303,
-      "source": "structural_1",
-      "target": "entropy_1"
-    },
-    {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "entropy_before": 0.0,
-      "entropy_after": 0.19544116615585122,
-      "delta": 0.19544116615585122,
-      "source": "memory_0",
-      "target": "routing_0"
-    },
-    {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "entropy_before": 0.0,
-      "entropy_after": 0.24257556880406922,
-      "delta": 0.24257556880406922,
-      "source": "entropy_2",
-      "target": "structural_0"
-    },
-    {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "entropy_before": 0.0,
-      "entropy_after": 0.006362445056591504,
-      "delta": 0.006362445056591504,
-      "source": "entropy_2",
-      "target": "structural_0"
-    },
-    {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "entropy_before": 0.0,
-      "entropy_after": 0.40567876673332065,
-      "delta": 0.40567876673332065,
-      "source": "routing_1",
-      "target": "continuity_2"
-    },
-    {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "entropy_before": 0.0,
-      "entropy_after": 0.20568521306878335,
-      "delta": 0.20568521306878335,
-      "source": "structural_1",
-      "target": "entropy_2"
-    },
-    {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "entropy_before": 0.0,
-      "entropy_after": 0.12108317798417828,
-      "delta": 0.12108317798417828,
-      "source": "routing_1",
-      "target": "routing_2"
-    },
-    {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "entropy_before": 0.0,
-      "entropy_after": 0.1789909262578,
-      "delta": 0.1789909262578,
-      "source": "memory_2",
-      "target": "continuity_2"
-    },
-    {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "entropy_before": 0.0,
-      "entropy_after": 0.2020307922285537,
-      "delta": 0.2020307922285537,
+      "entropy_after": 0.2893234499826762,
+      "delta": 0.2893234499826762,
       "source": "continuity_2",
-      "target": "memory_1"
-    },
-    {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "entropy_before": 0.0,
-      "entropy_after": 0.08323314105035795,
-      "delta": 0.08323314105035795,
-      "source": "memory_1",
-      "target": "structural_1"
-    },
-    {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "entropy_before": 0.0,
-      "entropy_after": 0.05883383850506052,
-      "delta": 0.05883383850506052,
-      "source": "continuity_2",
-      "target": "continuity_1"
-    },
-    {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "entropy_before": 0.0,
-      "entropy_after": 0.3495549656453077,
-      "delta": 0.3495549656453077,
-      "source": "continuity_2",
-      "target": "structural_1"
-    },
-    {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "entropy_before": 0.0,
-      "entropy_after": 0.44682042576876113,
-      "delta": 0.44682042576876113,
-      "source": "repair_1",
-      "target": "entropy_2"
-    },
-    {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "entropy_before": 0.0,
-      "entropy_after": 0.05804849852594862,
-      "delta": 0.05804849852594862,
-      "source": "continuity_1",
-      "target": "entropy_0"
-    },
-    {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "entropy_before": 0.0,
-      "entropy_after": 0.14708589549094503,
-      "delta": 0.14708589549094503,
-      "source": "structural_2",
-      "target": "routing_1"
-    },
-    {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "entropy_before": 0.0,
-      "entropy_after": 0.43419445904373866,
-      "delta": 0.43419445904373866,
-      "source": "memory_1",
-      "target": "entropy_1"
-    },
-    {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "entropy_before": 0.0,
-      "entropy_after": 0.2964742109688313,
-      "delta": 0.2964742109688313,
-      "source": "repair_1",
-      "target": "routing_0"
-    },
-    {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "entropy_before": 0.0,
-      "entropy_after": 0.009041795296547528,
-      "delta": 0.009041795296547528,
-      "source": "routing_1",
       "target": "repair_0"
     },
     {
-      "timestamp": "2026-06-08T02:44:20.800995+00:00",
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
       "entropy_before": 0.0,
-      "entropy_after": 0.0473267073638291,
-      "delta": 0.0473267073638291,
+      "entropy_after": 0.3829382095217624,
+      "delta": 0.3829382095217624,
       "source": "memory_1",
-      "target": "routing_2"
+      "target": "memory_0"
+    },
+    {
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "entropy_before": 0.0,
+      "entropy_after": 0.2844084122878024,
+      "delta": 0.2844084122878024,
+      "source": "entropy_1",
+      "target": "structural_2"
+    },
+    {
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "entropy_before": 0.0,
+      "entropy_after": 0.3581684655833725,
+      "delta": 0.3581684655833725,
+      "source": "routing_0",
+      "target": "continuity_0"
+    },
+    {
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "entropy_before": 0.0,
+      "entropy_after": 0.2292975682566995,
+      "delta": 0.2292975682566995,
+      "source": "memory_1",
+      "target": "structural_1"
+    },
+    {
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "entropy_before": 0.0,
+      "entropy_after": 0.011966351986505086,
+      "delta": 0.011966351986505086,
+      "source": "structural_1",
+      "target": "memory_0"
+    },
+    {
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "entropy_before": 0.0,
+      "entropy_after": 0.18751639246603646,
+      "delta": 0.18751639246603646,
+      "source": "continuity_1",
+      "target": "repair_2"
+    },
+    {
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "entropy_before": 0.0,
+      "entropy_after": 0.39643801240369064,
+      "delta": 0.39643801240369064,
+      "source": "continuity_0",
+      "target": "routing_1"
+    },
+    {
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "entropy_before": 0.0,
+      "entropy_after": 0.18078553507995,
+      "delta": 0.18078553507995,
+      "source": "continuity_0",
+      "target": "structural_1"
+    },
+    {
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "entropy_before": 0.0,
+      "entropy_after": 0.10286173932813447,
+      "delta": 0.10286173932813447,
+      "source": "entropy_2",
+      "target": "continuity_0"
+    },
+    {
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "entropy_before": 0.0,
+      "entropy_after": 0.18411269348662723,
+      "delta": 0.18411269348662723,
+      "source": "continuity_2",
+      "target": "repair_0"
+    },
+    {
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "entropy_before": 0.0,
+      "entropy_after": 0.3829713343127927,
+      "delta": 0.3829713343127927,
+      "source": "repair_2",
+      "target": "repair_1"
+    },
+    {
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "entropy_before": 0.0,
+      "entropy_after": 0.3556388526979181,
+      "delta": 0.3556388526979181,
+      "source": "continuity_0",
+      "target": "structural_1"
+    },
+    {
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "entropy_before": 0.0,
+      "entropy_after": 0.35471161520797695,
+      "delta": 0.35471161520797695,
+      "source": "entropy_2",
+      "target": "continuity_1"
+    },
+    {
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "entropy_before": 0.0,
+      "entropy_after": 0.2570880829569262,
+      "delta": 0.2570880829569262,
+      "source": "memory_0",
+      "target": "continuity_2"
+    },
+    {
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "entropy_before": 0.0,
+      "entropy_after": 0.3158798116593948,
+      "delta": 0.3158798116593948,
+      "source": "continuity_2",
+      "target": "structural_0"
+    },
+    {
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "entropy_before": 0.0,
+      "entropy_after": 0.25969010665696945,
+      "delta": 0.25969010665696945,
+      "source": "repair_0",
+      "target": "memory_1"
+    },
+    {
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "entropy_before": 0.0,
+      "entropy_after": 0.20035854685933435,
+      "delta": 0.20035854685933435,
+      "source": "routing_0",
+      "target": "continuity_2"
+    },
+    {
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "entropy_before": 0.0,
+      "entropy_after": 0.13821598885423758,
+      "delta": 0.13821598885423758,
+      "source": "entropy_2",
+      "target": "routing_0"
+    },
+    {
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "entropy_before": 0.0,
+      "entropy_after": 0.18140412956551422,
+      "delta": 0.18140412956551422,
+      "source": "repair_2",
+      "target": "structural_1"
     }
   ],
   "continuity_timeseries": [
     {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "continuity_shift": 0.023040368978469894,
-      "cumulative": 0.023040368978469894
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "continuity_shift": 0.05646454420410785,
+      "cumulative": 0.05646454420410785
     },
     {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "continuity_shift": -0.09385335581130311,
-      "cumulative": -0.07081298683283321
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "continuity_shift": 0.07410314543718666,
+      "cumulative": 0.1305676896412945
     },
     {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "continuity_shift": 0.020202363822202973,
-      "cumulative": -0.05061062301063024
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "continuity_shift": -0.16853421453096862,
+      "cumulative": -0.037966524889674114
     },
     {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "continuity_shift": -0.1938408183161366,
-      "cumulative": -0.24445144132676683
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "continuity_shift": -0.0924238021257417,
+      "cumulative": -0.1303903270154158
     },
     {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "continuity_shift": -0.02176138310551981,
-      "cumulative": -0.26621282443228667
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "continuity_shift": -0.18379350096066463,
+      "cumulative": -0.31418382797608047
     },
     {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "continuity_shift": -0.01905152076815539,
-      "cumulative": -0.2852643452004421
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "continuity_shift": -0.012967744556613647,
+      "cumulative": -0.3271515725326941
     },
     {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "continuity_shift": 0.08695024736848117,
-      "cumulative": -0.1983140978319609
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "continuity_shift": -0.07924296820279553,
+      "cumulative": -0.40639454073548964
     },
     {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "continuity_shift": 0.06077713101205667,
-      "cumulative": -0.13753696681990424
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "continuity_shift": 0.08593320040504276,
+      "cumulative": -0.3204613403304469
     },
     {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "continuity_shift": -0.048358089956858225,
-      "cumulative": -0.18589505677676246
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "continuity_shift": -0.1510136548278661,
+      "cumulative": -0.471474995158313
     },
     {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "continuity_shift": 0.01066726956935335,
-      "cumulative": -0.1752277872074091
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "continuity_shift": -0.061206600227826424,
+      "cumulative": -0.5326815953861395
     },
     {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "continuity_shift": -0.12069166577524632,
-      "cumulative": -0.29591945298265543
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "continuity_shift": -0.08411668144736845,
+      "cumulative": -0.6167982768335079
     },
     {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "continuity_shift": -0.19338182451644587,
-      "cumulative": -0.4893012774991013
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "continuity_shift": -0.16133519500431043,
+      "cumulative": -0.7781334718378183
     },
     {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "continuity_shift": -0.007726640690999043,
-      "cumulative": -0.49702791819010034
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "continuity_shift": -0.0623629989060811,
+      "cumulative": -0.8404964707438994
     },
     {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "continuity_shift": 0.06620857523467755,
-      "cumulative": -0.4308193429554228
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "continuity_shift": 0.024381025760846498,
+      "cumulative": -0.816115444983053
     },
     {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "continuity_shift": -0.11632519975923368,
-      "cumulative": -0.5471445427146565
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "continuity_shift": 0.03406373484528613,
+      "cumulative": -0.7820517101377669
     },
     {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "continuity_shift": -0.041878303700786795,
-      "cumulative": -0.5890228464154433
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "continuity_shift": -0.14787522356275645,
+      "cumulative": -0.9299269337005234
     },
     {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "continuity_shift": 0.05424678649502662,
-      "cumulative": -0.5347760599204168
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "continuity_shift": 0.030495021701526903,
+      "cumulative": -0.8994319119989964
     },
     {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "continuity_shift": -0.08917756565067536,
-      "cumulative": -0.6239536255710921
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "continuity_shift": -0.03460151870245684,
+      "cumulative": -0.9340334307014533
     },
     {
-      "timestamp": "2026-06-08T02:44:20.800003+00:00",
-      "continuity_shift": -0.0087831714542565,
-      "cumulative": -0.6327367970253486
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "continuity_shift": -7.357400781674017e-05,
+      "cumulative": -0.93410700470927
     },
     {
-      "timestamp": "2026-06-08T02:44:20.800995+00:00",
-      "continuity_shift": -0.19349353941991942,
-      "cumulative": -0.826230336445268
+      "timestamp": "2026-06-08T13:01:22.391930+00:00",
+      "continuity_shift": 0.08034593503089377,
+      "cumulative": -0.8537610696783762
     }
   ]
 }
