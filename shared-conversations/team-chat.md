@@ -1122,3 +1122,42 @@ Now running on http://localhost:12393
 **Fix:** Started OCE backend on port 8000.
 
 **Status:** OCE backend now UP. PO agent should respond normally now.
+
+---
+
+### 🔴 [PM] 2026-06-07 — FULL SYSTEM STATUS + HERMES REMOVAL + PROCESS REGISTRY
+
+**All Services Status:**
+| Service | Port | Status |
+|---------|------|--------|
+| OCE Frontend | :3000 | ✅ Running |
+| SRRA-OPH Frontend | :3001 | ✅ Running |
+| OCE Backend | :8000 | ✅ Running |
+| API Server | :8001 | ✅ Running |
+| PO Bot | Telegram | ✅ Running (single instance) |
+| OC2 Gateway | :18790 | ✅ Running (scheduled task) |
+
+**Hermes Bot — REMOVED:**
+- All hermes_telegram.py files, logs, tools, skills, vault notes removed
+- Was causing 6 duplicate instances burning OpenRouter credits
+- PO bot (@P01999BOT) and OC2 gateway are now the only Telegram bots
+
+**Process Registry Added:**
+- `tools/process_registry.py` — centralized process tracking
+- Prevents duplicate PIDs, stale entries, conflicting instances
+- All agents MUST check before starting any service
+
+**Model Chain (PO + OCE chat):**
+1. Ring 2.6 (primary)
+2. Owl Alpha (free backup)
+3. MiniMax M2.5 (tertiary)
+- 2 attempts per model, retry with backoff on 429/5xx/timeout
+
+**chat_agent.py synced with PO power-up (commit 3b3226869):**
+- History cap: 36 → 50 messages
+- Tool result cap: 2K → 8K chars
+- Model retry with backoff added
+
+**OpenRouter Account:** $6.20 balance remaining. Hermes was burning credits with duplicates.
+
+**Frontend Note:** Frontends crash when terminals are killed. Use `start_all_services.cmd` or `Start-Process -WindowStyle Hidden` for persistence.
