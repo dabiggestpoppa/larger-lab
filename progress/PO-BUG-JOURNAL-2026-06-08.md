@@ -111,7 +111,35 @@ The PID file was written by a previous gateway instance that was killed/crashed.
 
 ---
 
-## Issue #4: Agent Timeout on Long Messages
+## Issue #4: Gateway Exits on 409 Conflict (CRITICAL — Copilot Discovery)
+
+### Symptoms
+- PO gateway dies after ~30 seconds
+- Copilot identified: "if _409_count >= 5: sys.exit(1)" — gateway exits after 5 consecutive 409 errors
+- Watchdog restarts it, but it dies again in a loop
+
+### Root Cause
+PM's VTuber bot session is still registered on Telegram's servers, actively polling @P01999BOT. Every `getUpdates` request from our gateway collides with the VTuber instance → 409 Conflict. After 5 consecutive 409s, the gateway's original code called `sys.exit(1)`.
+
+The `deleteWebhook` + session clear from earlier (commit `c66382933`) was temporary — the VTuber instance re-registers its polling session.
+
+### Fix
+- **Removed `sys.exit(1)`** — gateway now retries indefinitely with exponential backoff
+- **Added `deleteWebhook` on startup** — clears stuck Telegram sessions before polling
+- **Exponential backoff:** 30s → 60s → 120s → 240s → 300s max
+- **Every 3rd 409:** sends `deleteWebhook` to try killing the competing session
+- **Increased poll timeout:** 30s → 60s (fewer requests = less collision chance)
+- **Backoff resets** on successful poll
+
+### Commit
+`4ec7aa6c` — `[CEREBUS] Make PO gateway resilient to 409 conflicts — exponential backoff instead of exit`
+
+### Related Files
+- `scripts/telegram_gateway.py` — poll loop 409 handling (FIXED)
+
+---
+
+## Issue #5: Agent Timeout on Long Messages
 
 ### Symptoms
 - `AGENT TIMEOUT` logged at 16:58:49
@@ -139,7 +167,8 @@ The gateway's agent task submission has a timeout that's too short for long mess
 | 1 | Watchdog infinite restart loop | 🔴 CRITICAL | ✅ FIXED | `b0ee429ed` |
 | 2 | Telegram 409 Conflict (VTuber) | 🔴 CRITICAL | ✅ FIXED | `29d81d796`, `c66382933` |
 | 3 | Stale PID file | 🟡 MEDIUM | ✅ FIXED | `b0ee429ed` |
-| 4 | Agent timeout on long messages | 🟡 MEDIUM | ⚠️ PARTIAL | — |
+| 4 | Gateway exits on 409 (sys.exit) | 🔴 CRITICAL | ✅ FIXED | `4ec7aa6c` |
+| 5 | Agent timeout on long messages | 🟡 MEDIUM | ⚠️ PARTIAL | — |
 
 ## Key Lessons
 
