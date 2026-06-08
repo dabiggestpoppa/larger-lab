@@ -83,7 +83,7 @@ class POProvider(StatelessLLMInterface):
         )
         self._client: httpx.AsyncClient | None = None
         self._timeout = httpx.Timeout(
-            connect=10.0, read=60.0, write=60.0, pool=None
+            connect=10.0, read=300.0, write=60.0, pool=None
         )
         logger.info(
             f"POProvider initialized: model={model}, oce_url={self.config.oce_url}"
