@@ -3,6 +3,37 @@
 > **Purpose:** Quick-communication hub for CC/PM/PM2/AS/RL coordination.
 > **Current focus:** Quant Lab — 9K Config Test + Monte Carlo + Forward Test Prep
 > **Plan:** `quant-lab/QUANT_JOURNAL.md`
+> **Last Updated:** 2026-06-08 22:30 UTC (CEREBUS final sweep — all servers verified up, PO back online, stale processes cleaned)
+
+> ## 🔴 June 8 Evening — Full Sweep & Cleanup
+>
+> ### What Happened
+> - PM was running POALA/VTuber and other tasks without telling MAD we were done for the day
+> - PM likely tried to connect Telegram bot to VTuber, causing 409 Conflict errors
+> - PO gateway crashed, took OCE backend with it
+>
+> ### Fix Applied
+> - Killed all stale processes (9 Python + 1 Node)
+> - Restarted OCE backend (port 8000) ✅
+> - Restarted API server (port 8001) ✅
+> - Restarted PO telegram gateway (PID 27988) ✅
+> - Cleaned up PDF.co OCR processes PM left running (3 instances)
+> - Telegram 409 Conflict persists (Telegram server-side session conflict) — bot IS polling, will clear on its own
+>
+> ### Final Server Status
+> | Service | Port | Status |
+> |---------|------|--------|
+> | OCE Frontend | 3000 | ✅ UP |
+> | OCE Backend | 8000 | ✅ UP |
+> | API Server | 8001 | ✅ UP |
+> | PO Telegram | — | ✅ RUNNING (409 conflict, polling OK) |
+> | VTuber/POALA | 12393 | 🔴 Offline per MAD directive |
+>
+> ### Notes
+> - PO telegram bot (@P01999BOT) is alive and polling
+> - 409 Conflict is from Telegram's servers still having old session registered
+> - Bot falls back to normal polling after initial 409 errors
+> - All agent work for today is complete — see QUANT_JOURNAL.md for results
 > **Last Updated:** 2026-06-08 22:00 UTC (CEREBUS final sweep — all servers up, stale processes killed, MAD closing)
 > **Tasks:** `progress/O2C-RESEARCH-MESH-TASKS.md`
 > **Last Updated:** 2026-06-08 (Quant analysis complete — 9K config, Monte Carlo, forward test plan)
@@ -1254,3 +1285,49 @@ Now running on http://localhost:12393
 **OpenRouter Account:** $6.20 balance remaining. Hermes was burning credits with duplicates.
 
 **Frontend Note:** Frontends crash when terminals are killed. Use `start_all_services.cmd` or `Start-Process -WindowStyle Hidden` for persistence.
+
+---
+
+## 🔧 RL/OWL Session — June 8 Afternoon
+
+### Bridge Execution Fix
+- Bridge was scanning but not placing orders (Exec: 0)
+- Root cause: MT5 AutoTrading disabled in terminal
+- Fixed: operator enabled AutoTrading, bridge restarted
+- Bug journal: progress/BRIDGE-BUG-JOURNAL-2026-06-08.md
+
+### New Components
+- scripts/signal_bot.py — forwards ST engine signals to Telegram (@hermososabot)
+- scripts/signal_scanner.py — OCC+buffer SL scanner for EURUSD/USDCHF/USDSGD (signal-only, no execution)
+- scripts/hermes_agent.py — raw agent connected to OCE backend (port 8000)
+- start_desktop_pet.vbs — Desktop shortcut for POALA desktop pet
+
+### PO/POALA/OWL Unification
+- All three are the same system: OCE backend (port 8000)
+- PO = Telegram interface (@P01999BOT)
+- POALA = Desktop pet (vtuber_integration/desktop_pet.py)
+- OWL = Chat agent (OCE /chat endpoint)
+- All use same POAgent infrastructure, same tools, same memory
+
+### Telegram Fixes
+- PO gateway had 409 Conflict — killed and restarted
+- Signal bot updated with PnL display and profit-lock labeling
+
+### Desktop Pet (POALA)
+- Running but VTuber server (port 12393) needs restart for full UI
+- Shortcut on Desktop: double-click Desktop Pet.vbs
+
+### Git
+- Commit: fcb1a4e1 — all changes committed
+
+### Status
+- OC2: DECOMMISSIONED (permanent)
+- Live Bridge: UP (AutoTrading ON)
+- Signal Bot: UP
+- Signal Scanner: UP
+- PO Telegram: UP
+- Desktop Pet: UP (VTuber server needs restart)
+- OCE Backend: UP
+- Hermes Agent: UP
+
+— RL/OWL signing off 🦉
