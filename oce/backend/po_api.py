@@ -247,6 +247,17 @@ async def _stream_chat(request: POChatRequest) -> AsyncGenerator[str, None]:
         session_mgr.add_message(stable_session_id, "user", last_user_text)
         session_mgr.add_message(stable_session_id, "assistant", response_text)
 
+        # Log to ChatLog for conversation history
+        try:
+            from core.observer.chat_log import get_chat_log
+            chat_log = get_chat_log()
+            chat_log.add_message("user", last_user_text, session_id=stable_session_id,
+                                 observer_metadata={"source": "po_api_stream"})
+            chat_log.add_message("assistant", response_text, session_id=stable_session_id,
+                                 observer_metadata={"source": "po_api_stream"})
+        except Exception as log_err:
+            logger.warning(f"ChatLog persist failed: {log_err}")
+
         # Stream the response word by word for the LLM feel
         words = response_text.split()
         accumulated = ""
@@ -311,6 +322,15 @@ async def _complete_chat(request: POChatRequest) -> Dict[str, Any]:
         # Persist to session
         session.add_message("user", last_content)
         session.add_message("assistant", response_text)
+
+        # Log to ChatLog for conversation history
+        try:
+            from core.observer.chat_log import get_chat_log
+            chat_log = get_chat_log()
+            chat_log.add_message("user", last_content, session_id=stable_session_id)
+            chat_log.add_message("assistant", response_text, session_id=stable_session_id)
+        except Exception as e:
+            logger.warning(f"ChatLog persist failed: {e}")
 
         return {
             "id": "chatcmpl-po",
