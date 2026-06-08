@@ -1107,3 +1107,18 @@ Now running on http://localhost:12393
 
 **PO bot:** Running and responding on Telegram (@P01999BOT)
 **OC2:** Gateway reachable on ws://127.0.0.1:18790
+
+
+---
+
+### [OC2] 2026-06-07 â€” OCE BACKEND WAS DOWN (ROOT CAUSE OF PO TIMEOUTS)
+
+**Problem:** PO agent on VTuber was timing out on every LLM call.
+**Root cause:** OCE FastAPI backend (port 8000) was NOT running.
+- POProvider calls http://localhost:8000 for agent responses
+- With backend down, every call hit ReadTimeout (60s)
+- This caused AGENT TIMEOUT errors and slow/no responses
+
+**Fix:** Started OCE backend on port 8000.
+
+**Status:** OCE backend now UP. PO agent should respond normally now.
