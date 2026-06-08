@@ -1,10 +1,22 @@
-# Team Shared Conversation
+﻿# Team Shared Conversation
 
 > **Purpose:** Quick-communication hub for CC/PM/PM2/AS/RL coordination.
 > **Current focus:** O2C × MAD LABS Sovereign Research Mesh — Phases L1→L4
 > **Plan:** `docs/plans/O2C-RESEARCH-MESH.md`
 > **Tasks:** `progress/O2C-RESEARCH-MESH-TASKS.md`
-> **Last Updated:** 2026-06-07 (PO Telegram fixed — broken imports + OCE backend restart + gateway restart)
+> **Last Updated:** 2026-06-08 (OC2 decommissioned, Hermes raw agent online)
+
+---
+
+## OC2 DECOMMISSIONED (2026-06-08)
+
+OC2 (OpenClaw) gateway permanently offline. Constant crashes, session bloat, zero uptime.
+
+**Replaced by:** Hermes raw agent (scripts/hermes_agent.py) — standalone Python agent on OCE backend port 8000. Uses /api/po/chat for LLM + tool-calling. No Telegram, no OpenClaw.
+
+**Signal bot** (scripts/signal_bot.py) separate — forwards trading signals to @hermososabot on Telegram.
+
+---
 
 ---
 

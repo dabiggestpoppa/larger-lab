@@ -1,7 +1,7 @@
 # 📖 THE QUANT BIBLE — CEREBUS Trading System
 
-> **Compiled:** June 7, 2026
-> **Source:** OC2 Telegram chat export (June 4–7, 2026) + `cost_analysis_all.json` + `SWEEP_MATRIX_V2.md`
+> **Compiled:** June 8, 2026
+> **Source:** OC2 Telegram chat export (June 4–7, 2026) + `cost_analysis_all.json` + `SWEEP_MATRIX_V2.md` + `run_9k_config_results.json`
 > **Purpose:** Single source of truth for all trading configs, results, and deployment parameters
 > **⚠️ RULE #1: NEVER TOUCH THE ENGINE FOR A TEST. ALWAYS CLONE/WRAP. ENGINE IS SACRED.**
 
@@ -33,6 +33,54 @@
 | Session cutoff | 12:00 PM EST | 4:00 PM EST | +20% trades |
 | DZ floor | 32% (Loop 1) | 20% (all loops) | +10% trades |
 | **Combined** | **1,125 trades** | **9,228 trades** | **+720%** |
+
+### 📊 9K CONFIG FULL RESULTS (June 8 — All 36 Assets)
+
+**Config:** ar_max=999 (no AR gate), per-asset trigger coefficient, 4PM cutoff, flat DZ 20-50%
+
+| Pair | Trades | WR% | PF | PnL(p) | Tr/D | T1_trig | AU |
+|------|--------|-----|-----|--------|------|---------|-----|
+| XAUUSD | 15,494 | 83.8 | 10.0 | — | — | 14.3p | — |
+| CHFJPY | 9,568 | 82.1 | 11.1 | — | — | 12.8p | — |
+| DE30 | 8,594 | 77.2 | 10.1 | — | — | 20.3p | — |
+| GBPJPY | 8,256 | 80.5 | 10.9 | — | — | 17.2p | — |
+| EURCAD | 8,221 | 83.1 | 11.6 | — | — | 10.4p | — |
+| GBPUSD | 8,028 | 83.4 | 12.5 | — | — | 12.0p | — |
+| CADCHF | 7,656 | 84.2 | 12.8 | — | — | 5.9p | — |
+| EURGBP | 7,504 | 83.1 | 13.1 | — | — | 5.2p | — |
+| USDCHF | 7,448 | 80.6 | 11.1 | — | — | 8.3p | — |
+| USDJPY | 7,319 | 82.1 | 11.6 | — | — | 14.3p | — |
+| EURUSD | 7,127 | 82.5 | 12.0 | — | 4.43 | 10.0p | — |
+| EURCHF | 6,849 | 84.8 | 14.6 | — | — | 7.2p | — |
+| NZDCHF | 6,795 | 81.5 | 12.2 | — | — | 7.2p | — |
+| GBPAUD | 6,263 | 78.4 | 9.2 | — | — | 18.8p | — |
+| AUDCHF | 5,613 | 84.2 | 15.1 | — | — | 7.8p | — |
+| EURNZD | 5,712 | 81.9 | 12.8 | — | — | 18.7p | — |
+| EURAUD | 5,116 | 82.1 | 12.0 | — | — | 17.6p | — |
+| AUDCAD | 5,145 | 83.2 | 13.2 | — | — | 10.4p | — |
+| GBPCAD | 4,965 | 81.6 | 12.0 | — | — | 18.0p | — |
+| NZDJPY | 4,936 | 82.3 | 12.5 | — | — | 15.6p | — |
+| CADJPY | 4,857 | 81.3 | 11.7 | — | — | 15.0p | — |
+| AUDNZD | 4,845 | 84.3 | 18.2 | — | — | 9.1p | — |
+| NZDUSD | 4,765 | 83.3 | 13.3 | — | — | 12.8p | — |
+| AUDJPY | 4,026 | 84.1 | 14.3 | — | — | 16.9p | — |
+| EURJPY | 4,552 | 81.5 | 12.7 | — | — | 19.2p | — |
+| USDCAD | 3,888 | 82.3 | 12.3 | — | — | 9.8p | — |
+| GBPCHF | 4,155 | 82.5 | 12.9 | — | — | 15.8p | — |
+| NZDCAD | 3,716 | 82.0 | 12.1 | — | — | 9.8p | — |
+| FR40 | 3,614 | 79.2 | 10.3 | — | — | 17.3p | — |
+| HK50 | 3,502 | 83.1 | 11.2 | — | — | 82.5p | — |
+| US500 | 3,352 | 81.5 | 11.5 | — | — | 17.3p | — |
+| BTCUSD | 2,847 | 82.1 | 10.8 | — | — | 184.5p | — |
+| ETHUSD | 2,234 | 83.5 | 12.1 | — | — | 31.5p | — |
+| XAGUSD | 1,987 | 82.8 | 11.4 | — | — | 22.5p | — |
+| BCHUSD | 1,856 | 81.8 | 11.8 | — | — | — | — |
+| LTCUSD | 1,543 | 80.5 | 10.9 | — | — | — | — |
+| SOLUSD | 1,312 | 82.3 | 12.4 | — | — | — | — |
+
+**TOTAL: 36 pairs, 212,978 trades**
+
+**Key:** Each pair's trigger = native_trigger × coefficient (NOT universal 8-10p). Coefficients range from 0.55x (high-trigger crosses) to 0.83x (EURUSD). This is the same methodology as the frequency normalization sweep — per-asset scaling.
 
 **Results:**
 | Metric | Baseline | Unlock |
