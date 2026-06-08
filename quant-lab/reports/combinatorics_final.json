@@ -1,0 +1,1115 @@
+{
+  "pairs": {
+    "BTCUSD": {
+      "trades": 4203,
+      "wr": 75.16059957173448,
+      "pf": 8.14811830700303,
+      "tr_per_day": 2.6089385474860336,
+      "gross_usd": 8685.507000000018,
+      "sprd_usd": 210.15,
+      "comm_usd": 294.21000000000004,
+      "net_usd": 8181.147000000018,
+      "cost_pct": 5.806914898577585,
+      "spread": 5.0,
+      "mode": "FLOOR",
+      "type": "CRYPTO"
+    },
+    "EURNZD": {
+      "trades": 5403,
+      "wr": 79.38182491208588,
+      "pf": 11.910657489524262,
+      "tr_per_day": 0,
+      "gross_usd": 6483.440000000006,
+      "sprd_usd": 378.21000000000004,
+      "comm_usd": 378.21000000000004,
+      "net_usd": 5727.020000000006,
+      "cost_pct": 11.666954579667573,
+      "spread": 0.7,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "GBPNZD": {
+      "trades": 5327,
+      "wr": 79.21907264877042,
+      "pf": 11.360616979993761,
+      "tr_per_day": 0,
+      "gross_usd": 6354.269999999983,
+      "sprd_usd": 372.89,
+      "comm_usd": 372.89000000000004,
+      "net_usd": 5608.4899999999825,
+      "cost_pct": 11.736674708503132,
+      "spread": 0.7,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "GBPCAD": {
+      "trades": 6140,
+      "wr": 79.95114006514657,
+      "pf": 10.914129132304195,
+      "tr_per_day": 0,
+      "gross_usd": 5626.069999999991,
+      "sprd_usd": 307.0,
+      "comm_usd": 429.80000000000007,
+      "net_usd": 4889.26999999999,
+      "cost_pct": 13.096175483063687,
+      "spread": 0.5,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "GBPUSD": {
+      "trades": 7622,
+      "wr": 80.81868276043033,
+      "pf": 11.322243966079574,
+      "tr_per_day": 0,
+      "gross_usd": 5538.4,
+      "sprd_usd": 228.66,
+      "comm_usd": 533.5400000000001,
+      "net_usd": 4776.2,
+      "cost_pct": 13.762097356637298,
+      "spread": 0.3,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "CHFJPY": {
+      "trades": 11106,
+      "wr": 80.83918602557176,
+      "pf": 10.02886719588073,
+      "tr_per_day": 0,
+      "gross_usd": 5891.697000000027,
+      "sprd_usd": 555.3000000000001,
+      "comm_usd": 777.4200000000001,
+      "net_usd": 4558.977000000027,
+      "cost_pct": 22.620307867156,
+      "spread": 0.5,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "GBPJPY": {
+      "trades": 6265,
+      "wr": 80.5267358339984,
+      "pf": 11.313721643850938,
+      "tr_per_day": 0,
+      "gross_usd": 5152.559999999993,
+      "sprd_usd": 313.25,
+      "comm_usd": 438.55000000000007,
+      "net_usd": 4400.759999999993,
+      "cost_pct": 14.590805347244887,
+      "spread": 0.5,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "GBPAUD": {
+      "trades": 4520,
+      "wr": 80.84070796460176,
+      "pf": 10.640533021530544,
+      "tr_per_day": 0,
+      "gross_usd": 4782.090000000008,
+      "sprd_usd": 226.0,
+      "comm_usd": 316.40000000000003,
+      "net_usd": 4239.690000000009,
+      "cost_pct": 11.342321035363181,
+      "spread": 0.5,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "EURCAD": {
+      "trades": 6869,
+      "wr": 80.69588004076284,
+      "pf": 11.118846130088334,
+      "tr_per_day": 0,
+      "gross_usd": 4914.420000000005,
+      "sprd_usd": 343.45000000000005,
+      "comm_usd": 480.83000000000004,
+      "net_usd": 4090.140000000005,
+      "cost_pct": 16.77268121161804,
+      "spread": 0.5,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "USDCAD": {
+      "trades": 6090,
+      "wr": 80.85385878489326,
+      "pf": 11.590329113924048,
+      "tr_per_day": 0,
+      "gross_usd": 4183.18000000001,
+      "sprd_usd": 182.70000000000002,
+      "comm_usd": 426.30000000000007,
+      "net_usd": 3574.1800000000103,
+      "cost_pct": 14.558302535391702,
+      "spread": 0.3,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "USDJPY": {
+      "trades": 7177,
+      "wr": 80.3957085133064,
+      "pf": 10.526701685270286,
+      "tr_per_day": 0,
+      "gross_usd": 4265.694999999999,
+      "sprd_usd": 215.31,
+      "comm_usd": 502.39000000000004,
+      "net_usd": 3547.994999999999,
+      "cost_pct": 16.824925363862167,
+      "spread": 0.3,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "EURAUD": {
+      "trades": 3080,
+      "wr": 80.71428571428572,
+      "pf": 12.262060598320632,
+      "tr_per_day": 0,
+      "gross_usd": 3527.390000000004,
+      "sprd_usd": 154.0,
+      "comm_usd": 215.60000000000002,
+      "net_usd": 3157.790000000004,
+      "cost_pct": 10.478002148897616,
+      "spread": 0.5,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "EURUSD": {
+      "trades": 5593,
+      "wr": 82.85356695869838,
+      "pf": 12.484948453608226,
+      "tr_per_day": 4.170768083519762,
+      "gross_usd": 3342.1199999999926,
+      "sprd_usd": 55.93000000000001,
+      "comm_usd": 391.51000000000005,
+      "net_usd": 2894.6799999999926,
+      "cost_pct": 13.387909470635437,
+      "spread": 0.1,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "USDCHF": {
+      "trades": 5847,
+      "wr": 80.26338293141782,
+      "pf": 11.000093069429791,
+      "tr_per_day": 0,
+      "gross_usd": 3223.43000000001,
+      "sprd_usd": 175.41,
+      "comm_usd": 409.29,
+      "net_usd": 2638.73000000001,
+      "cost_pct": 18.13906304774722,
+      "spread": 0.3,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "NZDCAD": {
+      "trades": 6232,
+      "wr": 78.94736842105263,
+      "pf": 11.266699531673597,
+      "tr_per_day": 0,
+      "gross_usd": 3332.15999999999,
+      "sprd_usd": 311.6,
+      "comm_usd": 436.24000000000007,
+      "net_usd": 2584.3199999999897,
+      "cost_pct": 22.44309997118993,
+      "spread": 0.5,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "CADJPY": {
+      "trades": 7690,
+      "wr": 80.16905071521457,
+      "pf": 11.534253524699308,
+      "tr_per_day": 0,
+      "gross_usd": 3488.555,
+      "sprd_usd": 384.5,
+      "comm_usd": 538.3000000000001,
+      "net_usd": 2565.7549999999997,
+      "cost_pct": 26.4522130222972,
+      "spread": 0.5,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "GBPCHF": {
+      "trades": 4454,
+      "wr": 80.35473731477325,
+      "pf": 10.64985497905251,
+      "tr_per_day": 0,
+      "gross_usd": 2994.349999999997,
+      "sprd_usd": 222.70000000000002,
+      "comm_usd": 311.78000000000003,
+      "net_usd": 2459.869999999997,
+      "cost_pct": 17.84961677826575,
+      "spread": 0.5,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "AUDNZD": {
+      "trades": 5446,
+      "wr": 80.40763863385972,
+      "pf": 14.461165260719465,
+      "tr_per_day": 0,
+      "gross_usd": 3079.7800000000057,
+      "sprd_usd": 272.3,
+      "comm_usd": 381.22,
+      "net_usd": 2426.2600000000057,
+      "cost_pct": 21.219697510861128,
+      "spread": 0.5,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "NZDJPY": {
+      "trades": 8141,
+      "wr": 79.2531630020882,
+      "pf": 10.576913207398189,
+      "tr_per_day": 0,
+      "gross_usd": 3396.2319999999986,
+      "sprd_usd": 407.05,
+      "comm_usd": 569.87,
+      "net_usd": 2419.3119999999985,
+      "cost_pct": 28.76481936451928,
+      "spread": 0.5,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "AUDJPY": {
+      "trades": 5628,
+      "wr": 78.46481876332622,
+      "pf": 10.547446518569789,
+      "tr_per_day": 0,
+      "gross_usd": 3089.716000000002,
+      "sprd_usd": 281.40000000000003,
+      "comm_usd": 393.96000000000004,
+      "net_usd": 2414.356000000002,
+      "cost_pct": 21.858319664331596,
+      "spread": 0.5,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "EURCHF": {
+      "trades": 6168,
+      "wr": 80.95006485084306,
+      "pf": 11.999094988498799,
+      "tr_per_day": 0,
+      "gross_usd": 2916.849999999998,
+      "sprd_usd": 185.04,
+      "comm_usd": 431.76000000000005,
+      "net_usd": 2300.049999999998,
+      "cost_pct": 21.146099388038483,
+      "spread": 0.3,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "AUDCAD": {
+      "trades": 5184,
+      "wr": 80.18904320987654,
+      "pf": 11.51343649677162,
+      "tr_per_day": 0,
+      "gross_usd": 2914.639999999994,
+      "sprd_usd": 259.2,
+      "comm_usd": 362.88000000000005,
+      "net_usd": 2292.559999999994,
+      "cost_pct": 21.343287678752827,
+      "spread": 0.5,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "AUDUSD": {
+      "trades": 5726,
+      "wr": 80.02095703807196,
+      "pf": 11.763144925887994,
+      "tr_per_day": 0,
+      "gross_usd": 2839.2100000000005,
+      "sprd_usd": 171.78,
+      "comm_usd": 400.82000000000005,
+      "net_usd": 2266.61,
+      "cost_pct": 20.167581827339294,
+      "spread": 0.3,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "NZDUSD": {
+      "trades": 5941,
+      "wr": 80.25584918363911,
+      "pf": 11.598668400110284,
+      "tr_per_day": 0,
+      "gross_usd": 2690.2599999999884,
+      "sprd_usd": 178.23000000000002,
+      "comm_usd": 415.87000000000006,
+      "net_usd": 2096.1599999999885,
+      "cost_pct": 22.083367406867836,
+      "spread": 0.3,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "AUDCHF": {
+      "trades": 6294,
+      "wr": 77.94725135049254,
+      "pf": 10.548647557529256,
+      "tr_per_day": 0,
+      "gross_usd": 2601.720000000003,
+      "sprd_usd": 314.70000000000005,
+      "comm_usd": 440.58000000000004,
+      "net_usd": 1846.4400000000032,
+      "cost_pct": 29.03002629030023,
+      "spread": 0.5,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "CADCHF": {
+      "trades": 6310,
+      "wr": 78.20919175911251,
+      "pf": 10.680200349093079,
+      "tr_per_day": 0,
+      "gross_usd": 2551.1199999999953,
+      "sprd_usd": 315.5,
+      "comm_usd": 441.70000000000005,
+      "net_usd": 1793.9199999999953,
+      "cost_pct": 29.681081250588033,
+      "spread": 0.5,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "NZDCHF": {
+      "trades": 5761,
+      "wr": 79.1702829369901,
+      "pf": 11.74636666083001,
+      "tr_per_day": 0,
+      "gross_usd": 2454.899999999998,
+      "sprd_usd": 403.27,
+      "comm_usd": 403.27000000000004,
+      "net_usd": 1648.3599999999979,
+      "cost_pct": 32.8542914171657,
+      "spread": 0.7,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "EURGBP": {
+      "trades": 4323,
+      "wr": 84.27018274346518,
+      "pf": 14.827011449489817,
+      "tr_per_day": 1.3940664301838117,
+      "gross_usd": 1775.2499999999993,
+      "sprd_usd": 129.69,
+      "comm_usd": 302.61,
+      "net_usd": 1342.9499999999994,
+      "cost_pct": 24.35149978876216,
+      "spread": 0.3,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "EURJPY": {
+      "trades": 1070,
+      "wr": 88.13084112149532,
+      "pf": 18.020056440233816,
+      "tr_per_day": 0.345049983876169,
+      "gross_usd": 1182.1109999999992,
+      "sprd_usd": 53.5,
+      "comm_usd": 74.9,
+      "net_usd": 1053.710999999999,
+      "cost_pct": 10.861924134028031,
+      "spread": 0.5,
+      "mode": "FLOOR",
+      "type": "FOREX"
+    },
+    "DE30": {
+      "trades": 3873,
+      "wr": 84.3,
+      "pf": 10.8,
+      "tr_per_day": 2.4101,
+      "gross_usd": 433.131,
+      "sprd_usd": 19.365000000000002,
+      "comm_usd": 0.0,
+      "net_usd": 413.76599999999996,
+      "cost_pct": 4.470933735982879,
+      "spread": 0.5,
+      "mode": "FLOOR",
+      "type": "INDEX"
+    },
+    "FR40": {
+      "trades": 5257,
+      "wr": 84.63,
+      "pf": 10.53,
+      "tr_per_day": 3.2713,
+      "gross_usd": 282.056,
+      "sprd_usd": 26.285,
+      "comm_usd": 0.0,
+      "net_usd": 255.771,
+      "cost_pct": 9.319071390078566,
+      "spread": 0.5,
+      "mode": "FLOOR",
+      "type": "INDEX"
+    },
+    "HK50": {
+      "trades": 730,
+      "wr": 81.64,
+      "pf": 9.65,
+      "tr_per_day": 0.4543,
+      "gross_usd": 253.227,
+      "sprd_usd": 3.65,
+      "comm_usd": 0.0,
+      "net_usd": 249.577,
+      "cost_pct": 1.4413944800514953,
+      "spread": 0.5,
+      "mode": "FLOOR",
+      "type": "INDEX"
+    },
+    "US500": {
+      "trades": 4595,
+      "wr": 83.39,
+      "pf": 12.26,
+      "tr_per_day": 2.8594,
+      "gross_usd": 192.733,
+      "sprd_usd": 22.975,
+      "comm_usd": 0.0,
+      "net_usd": 169.758,
+      "cost_pct": 11.920636320713111,
+      "spread": 0.5,
+      "mode": "FLOOR",
+      "type": "INDEX"
+    },
+    "XAUUSD": {
+      "trades": 2337,
+      "wr": 84.94,
+      "pf": 11.77,
+      "tr_per_day": 1.4615,
+      "gross_usd": 344.286,
+      "sprd_usd": 35.055,
+      "comm_usd": 163.59,
+      "net_usd": 145.641,
+      "cost_pct": 57.69766996043987,
+      "spread": 1.5,
+      "mode": "FLOOR",
+      "type": "METAL"
+    },
+    "ETHUSD": {
+      "trades": 1730,
+      "wr": 92.54335260115607,
+      "pf": 34.593495934959364,
+      "tr_per_day": 1.0738671632526382,
+      "gross_usd": 322.2959999999998,
+      "sprd_usd": 86.5,
+      "comm_usd": 121.10000000000001,
+      "net_usd": 114.69599999999981,
+      "cost_pct": 64.41283788815255,
+      "spread": 5.0,
+      "mode": "CEILING",
+      "type": "CRYPTO"
+    },
+    "XAGUSD": {
+      "trades": 5111,
+      "wr": 84.07,
+      "pf": 12.75,
+      "tr_per_day": 3.1805,
+      "gross_usd": 254.291,
+      "sprd_usd": 76.665,
+      "comm_usd": 357.77000000000004,
+      "net_usd": -180.14400000000006,
+      "cost_pct": 170.84167351577526,
+      "spread": 1.5,
+      "mode": "FLOOR",
+      "type": "METAL"
+    }
+  },
+  "categories": {
+    "MAX PROFIT (net > $3,000)": [
+      [
+        "BTCUSD",
+        {
+          "trades": 4203,
+          "wr": 75.16059957173448,
+          "pf": 8.14811830700303,
+          "tr_per_day": 2.6089385474860336,
+          "gross_usd": 8685.507000000018,
+          "sprd_usd": 210.15,
+          "comm_usd": 294.21000000000004,
+          "net_usd": 8181.147000000018,
+          "cost_pct": 5.806914898577585,
+          "spread": 5.0,
+          "mode": "FLOOR",
+          "type": "CRYPTO"
+        }
+      ],
+      [
+        "EURNZD",
+        {
+          "trades": 5403,
+          "wr": 79.38182491208588,
+          "pf": 11.910657489524262,
+          "tr_per_day": 0,
+          "gross_usd": 6483.440000000006,
+          "sprd_usd": 378.21000000000004,
+          "comm_usd": 378.21000000000004,
+          "net_usd": 5727.020000000006,
+          "cost_pct": 11.666954579667573,
+          "spread": 0.7,
+          "mode": "FLOOR",
+          "type": "FOREX"
+        }
+      ],
+      [
+        "GBPNZD",
+        {
+          "trades": 5327,
+          "wr": 79.21907264877042,
+          "pf": 11.360616979993761,
+          "tr_per_day": 0,
+          "gross_usd": 6354.269999999983,
+          "sprd_usd": 372.89,
+          "comm_usd": 372.89000000000004,
+          "net_usd": 5608.4899999999825,
+          "cost_pct": 11.736674708503132,
+          "spread": 0.7,
+          "mode": "FLOOR",
+          "type": "FOREX"
+        }
+      ],
+      [
+        "GBPCAD",
+        {
+          "trades": 6140,
+          "wr": 79.95114006514657,
+          "pf": 10.914129132304195,
+          "tr_per_day": 0,
+          "gross_usd": 5626.069999999991,
+          "sprd_usd": 307.0,
+          "comm_usd": 429.80000000000007,
+          "net_usd": 4889.26999999999,
+          "cost_pct": 13.096175483063687,
+          "spread": 0.5,
+          "mode": "FLOOR",
+          "type": "FOREX"
+        }
+      ],
+      [
+        "GBPUSD",
+        {
+          "trades": 7622,
+          "wr": 80.81868276043033,
+          "pf": 11.322243966079574,
+          "tr_per_day": 0,
+          "gross_usd": 5538.4,
+          "sprd_usd": 228.66,
+          "comm_usd": 533.5400000000001,
+          "net_usd": 4776.2,
+          "cost_pct": 13.762097356637298,
+          "spread": 0.3,
+          "mode": "FLOOR",
+          "type": "FOREX"
+        }
+      ],
+      [
+        "CHFJPY",
+        {
+          "trades": 11106,
+          "wr": 80.83918602557176,
+          "pf": 10.02886719588073,
+          "tr_per_day": 0,
+          "gross_usd": 5891.697000000027,
+          "sprd_usd": 555.3000000000001,
+          "comm_usd": 777.4200000000001,
+          "net_usd": 4558.977000000027,
+          "cost_pct": 22.620307867156,
+          "spread": 0.5,
+          "mode": "FLOOR",
+          "type": "FOREX"
+        }
+      ],
+      [
+        "GBPJPY",
+        {
+          "trades": 6265,
+          "wr": 80.5267358339984,
+          "pf": 11.313721643850938,
+          "tr_per_day": 0,
+          "gross_usd": 5152.559999999993,
+          "sprd_usd": 313.25,
+          "comm_usd": 438.55000000000007,
+          "net_usd": 4400.759999999993,
+          "cost_pct": 14.590805347244887,
+          "spread": 0.5,
+          "mode": "FLOOR",
+          "type": "FOREX"
+        }
+      ],
+      [
+        "GBPAUD",
+        {
+          "trades": 4520,
+          "wr": 80.84070796460176,
+          "pf": 10.640533021530544,
+          "tr_per_day": 0,
+          "gross_usd": 4782.090000000008,
+          "sprd_usd": 226.0,
+          "comm_usd": 316.40000000000003,
+          "net_usd": 4239.690000000009,
+          "cost_pct": 11.342321035363181,
+          "spread": 0.5,
+          "mode": "FLOOR",
+          "type": "FOREX"
+        }
+      ],
+      [
+        "EURCAD",
+        {
+          "trades": 6869,
+          "wr": 80.69588004076284,
+          "pf": 11.118846130088334,
+          "tr_per_day": 0,
+          "gross_usd": 4914.420000000005,
+          "sprd_usd": 343.45000000000005,
+          "comm_usd": 480.83000000000004,
+          "net_usd": 4090.140000000005,
+          "cost_pct": 16.77268121161804,
+          "spread": 0.5,
+          "mode": "FLOOR",
+          "type": "FOREX"
+        }
+      ],
+      [
+        "USDCAD",
+        {
+          "trades": 6090,
+          "wr": 80.85385878489326,
+          "pf": 11.590329113924048,
+          "tr_per_day": 0,
+          "gross_usd": 4183.18000000001,
+          "sprd_usd": 182.70000000000002,
+          "comm_usd": 426.30000000000007,
+          "net_usd": 3574.1800000000103,
+          "cost_pct": 14.558302535391702,
+          "spread": 0.3,
+          "mode": "FLOOR",
+          "type": "FOREX"
+        }
+      ],
+      [
+        "USDJPY",
+        {
+          "trades": 7177,
+          "wr": 80.3957085133064,
+          "pf": 10.526701685270286,
+          "tr_per_day": 0,
+          "gross_usd": 4265.694999999999,
+          "sprd_usd": 215.31,
+          "comm_usd": 502.39000000000004,
+          "net_usd": 3547.994999999999,
+          "cost_pct": 16.824925363862167,
+          "spread": 0.3,
+          "mode": "FLOOR",
+          "type": "FOREX"
+        }
+      ],
+      [
+        "EURAUD",
+        {
+          "trades": 3080,
+          "wr": 80.71428571428572,
+          "pf": 12.262060598320632,
+          "tr_per_day": 0,
+          "gross_usd": 3527.390000000004,
+          "sprd_usd": 154.0,
+          "comm_usd": 215.60000000000002,
+          "net_usd": 3157.790000000004,
+          "cost_pct": 10.478002148897616,
+          "spread": 0.5,
+          "mode": "FLOOR",
+          "type": "FOREX"
+        }
+      ]
+    ],
+    "LOW COST (cost% < 10%)": [
+      [
+        "BTCUSD",
+        {
+          "trades": 4203,
+          "wr": 75.16059957173448,
+          "pf": 8.14811830700303,
+          "tr_per_day": 2.6089385474860336,
+          "gross_usd": 8685.507000000018,
+          "sprd_usd": 210.15,
+          "comm_usd": 294.21000000000004,
+          "net_usd": 8181.147000000018,
+          "cost_pct": 5.806914898577585,
+          "spread": 5.0,
+          "mode": "FLOOR",
+          "type": "CRYPTO"
+        }
+      ],
+      [
+        "DE30",
+        {
+          "trades": 3873,
+          "wr": 84.3,
+          "pf": 10.8,
+          "tr_per_day": 2.4101,
+          "gross_usd": 433.131,
+          "sprd_usd": 19.365000000000002,
+          "comm_usd": 0.0,
+          "net_usd": 413.76599999999996,
+          "cost_pct": 4.470933735982879,
+          "spread": 0.5,
+          "mode": "FLOOR",
+          "type": "INDEX"
+        }
+      ],
+      [
+        "FR40",
+        {
+          "trades": 5257,
+          "wr": 84.63,
+          "pf": 10.53,
+          "tr_per_day": 3.2713,
+          "gross_usd": 282.056,
+          "sprd_usd": 26.285,
+          "comm_usd": 0.0,
+          "net_usd": 255.771,
+          "cost_pct": 9.319071390078566,
+          "spread": 0.5,
+          "mode": "FLOOR",
+          "type": "INDEX"
+        }
+      ],
+      [
+        "HK50",
+        {
+          "trades": 730,
+          "wr": 81.64,
+          "pf": 9.65,
+          "tr_per_day": 0.4543,
+          "gross_usd": 253.227,
+          "sprd_usd": 3.65,
+          "comm_usd": 0.0,
+          "net_usd": 249.577,
+          "cost_pct": 1.4413944800514953,
+          "spread": 0.5,
+          "mode": "FLOOR",
+          "type": "INDEX"
+        }
+      ]
+    ],
+    "HIGH ACCURACY (WR > 85%)": [
+      [
+        "EURJPY",
+        {
+          "trades": 1070,
+          "wr": 88.13084112149532,
+          "pf": 18.020056440233816,
+          "tr_per_day": 0.345049983876169,
+          "gross_usd": 1182.1109999999992,
+          "sprd_usd": 53.5,
+          "comm_usd": 74.9,
+          "net_usd": 1053.710999999999,
+          "cost_pct": 10.861924134028031,
+          "spread": 0.5,
+          "mode": "FLOOR",
+          "type": "FOREX"
+        }
+      ],
+      [
+        "ETHUSD",
+        {
+          "trades": 1730,
+          "wr": 92.54335260115607,
+          "pf": 34.593495934959364,
+          "tr_per_day": 1.0738671632526382,
+          "gross_usd": 322.2959999999998,
+          "sprd_usd": 86.5,
+          "comm_usd": 121.10000000000001,
+          "net_usd": 114.69599999999981,
+          "cost_pct": 64.41283788815255,
+          "spread": 5.0,
+          "mode": "CEILING",
+          "type": "CRYPTO"
+        }
+      ]
+    ],
+    "HIGH FREQUENCY (tr/d > 1.0)": [
+      [
+        "BTCUSD",
+        {
+          "trades": 4203,
+          "wr": 75.16059957173448,
+          "pf": 8.14811830700303,
+          "tr_per_day": 2.6089385474860336,
+          "gross_usd": 8685.507000000018,
+          "sprd_usd": 210.15,
+          "comm_usd": 294.21000000000004,
+          "net_usd": 8181.147000000018,
+          "cost_pct": 5.806914898577585,
+          "spread": 5.0,
+          "mode": "FLOOR",
+          "type": "CRYPTO"
+        }
+      ],
+      [
+        "EURUSD",
+        {
+          "trades": 5593,
+          "wr": 82.85356695869838,
+          "pf": 12.484948453608226,
+          "tr_per_day": 4.170768083519762,
+          "gross_usd": 3342.1199999999926,
+          "sprd_usd": 55.93000000000001,
+          "comm_usd": 391.51000000000005,
+          "net_usd": 2894.6799999999926,
+          "cost_pct": 13.387909470635437,
+          "spread": 0.1,
+          "mode": "FLOOR",
+          "type": "FOREX"
+        }
+      ],
+      [
+        "EURGBP",
+        {
+          "trades": 4323,
+          "wr": 84.27018274346518,
+          "pf": 14.827011449489817,
+          "tr_per_day": 1.3940664301838117,
+          "gross_usd": 1775.2499999999993,
+          "sprd_usd": 129.69,
+          "comm_usd": 302.61,
+          "net_usd": 1342.9499999999994,
+          "cost_pct": 24.35149978876216,
+          "spread": 0.3,
+          "mode": "FLOOR",
+          "type": "FOREX"
+        }
+      ],
+      [
+        "DE30",
+        {
+          "trades": 3873,
+          "wr": 84.3,
+          "pf": 10.8,
+          "tr_per_day": 2.4101,
+          "gross_usd": 433.131,
+          "sprd_usd": 19.365000000000002,
+          "comm_usd": 0.0,
+          "net_usd": 413.76599999999996,
+          "cost_pct": 4.470933735982879,
+          "spread": 0.5,
+          "mode": "FLOOR",
+          "type": "INDEX"
+        }
+      ],
+      [
+        "FR40",
+        {
+          "trades": 5257,
+          "wr": 84.63,
+          "pf": 10.53,
+          "tr_per_day": 3.2713,
+          "gross_usd": 282.056,
+          "sprd_usd": 26.285,
+          "comm_usd": 0.0,
+          "net_usd": 255.771,
+          "cost_pct": 9.319071390078566,
+          "spread": 0.5,
+          "mode": "FLOOR",
+          "type": "INDEX"
+        }
+      ],
+      [
+        "US500",
+        {
+          "trades": 4595,
+          "wr": 83.39,
+          "pf": 12.26,
+          "tr_per_day": 2.8594,
+          "gross_usd": 192.733,
+          "sprd_usd": 22.975,
+          "comm_usd": 0.0,
+          "net_usd": 169.758,
+          "cost_pct": 11.920636320713111,
+          "spread": 0.5,
+          "mode": "FLOOR",
+          "type": "INDEX"
+        }
+      ],
+      [
+        "XAUUSD",
+        {
+          "trades": 2337,
+          "wr": 84.94,
+          "pf": 11.77,
+          "tr_per_day": 1.4615,
+          "gross_usd": 344.286,
+          "sprd_usd": 35.055,
+          "comm_usd": 163.59,
+          "net_usd": 145.641,
+          "cost_pct": 57.69766996043987,
+          "spread": 1.5,
+          "mode": "FLOOR",
+          "type": "METAL"
+        }
+      ],
+      [
+        "ETHUSD",
+        {
+          "trades": 1730,
+          "wr": 92.54335260115607,
+          "pf": 34.593495934959364,
+          "tr_per_day": 1.0738671632526382,
+          "gross_usd": 322.2959999999998,
+          "sprd_usd": 86.5,
+          "comm_usd": 121.10000000000001,
+          "net_usd": 114.69599999999981,
+          "cost_pct": 64.41283788815255,
+          "spread": 5.0,
+          "mode": "CEILING",
+          "type": "CRYPTO"
+        }
+      ],
+      [
+        "XAGUSD",
+        {
+          "trades": 5111,
+          "wr": 84.07,
+          "pf": 12.75,
+          "tr_per_day": 3.1805,
+          "gross_usd": 254.291,
+          "sprd_usd": 76.665,
+          "comm_usd": 357.77000000000004,
+          "net_usd": -180.14400000000006,
+          "cost_pct": 170.84167351577526,
+          "spread": 1.5,
+          "mode": "FLOOR",
+          "type": "METAL"
+        }
+      ]
+    ],
+    "AVOID (cost% > 25%)": [
+      [
+        "CADJPY",
+        {
+          "trades": 7690,
+          "wr": 80.16905071521457,
+          "pf": 11.534253524699308,
+          "tr_per_day": 0,
+          "gross_usd": 3488.555,
+          "sprd_usd": 384.5,
+          "comm_usd": 538.3000000000001,
+          "net_usd": 2565.7549999999997,
+          "cost_pct": 26.4522130222972,
+          "spread": 0.5,
+          "mode": "FLOOR",
+          "type": "FOREX"
+        }
+      ],
+      [
+        "NZDJPY",
+        {
+          "trades": 8141,
+          "wr": 79.2531630020882,
+          "pf": 10.576913207398189,
+          "tr_per_day": 0,
+          "gross_usd": 3396.2319999999986,
+          "sprd_usd": 407.05,
+          "comm_usd": 569.87,
+          "net_usd": 2419.3119999999985,
+          "cost_pct": 28.76481936451928,
+          "spread": 0.5,
+          "mode": "FLOOR",
+          "type": "FOREX"
+        }
+      ],
+      [
+        "AUDCHF",
+        {
+          "trades": 6294,
+          "wr": 77.94725135049254,
+          "pf": 10.548647557529256,
+          "tr_per_day": 0,
+          "gross_usd": 2601.720000000003,
+          "sprd_usd": 314.70000000000005,
+          "comm_usd": 440.58000000000004,
+          "net_usd": 1846.4400000000032,
+          "cost_pct": 29.03002629030023,
+          "spread": 0.5,
+          "mode": "FLOOR",
+          "type": "FOREX"
+        }
+      ],
+      [
+        "CADCHF",
+        {
+          "trades": 6310,
+          "wr": 78.20919175911251,
+          "pf": 10.680200349093079,
+          "tr_per_day": 0,
+          "gross_usd": 2551.1199999999953,
+          "sprd_usd": 315.5,
+          "comm_usd": 441.70000000000005,
+          "net_usd": 1793.9199999999953,
+          "cost_pct": 29.681081250588033,
+          "spread": 0.5,
+          "mode": "FLOOR",
+          "type": "FOREX"
+        }
+      ],
+      [
+        "NZDCHF",
+        {
+          "trades": 5761,
+          "wr": 79.1702829369901,
+          "pf": 11.74636666083001,
+          "tr_per_day": 0,
+          "gross_usd": 2454.899999999998,
+          "sprd_usd": 403.27,
+          "comm_usd": 403.27000000000004,
+          "net_usd": 1648.3599999999979,
+          "cost_pct": 32.8542914171657,
+          "spread": 0.7,
+          "mode": "FLOOR",
+          "type": "FOREX"
+        }
+      ],
+      [
+        "XAUUSD",
+        {
+          "trades": 2337,
+          "wr": 84.94,
+          "pf": 11.77,
+          "tr_per_day": 1.4615,
+          "gross_usd": 344.286,
+          "sprd_usd": 35.055,
+          "comm_usd": 163.59,
+          "net_usd": 145.641,
+          "cost_pct": 57.69766996043987,
+          "spread": 1.5,
+          "mode": "FLOOR",
+          "type": "METAL"
+        }
+      ],
+      [
+        "ETHUSD",
+        {
+          "trades": 1730,
+          "wr": 92.54335260115607,
+          "pf": 34.593495934959364,
+          "tr_per_day": 1.0738671632526382,
+          "gross_usd": 322.2959999999998,
+          "sprd_usd": 86.5,
+          "comm_usd": 121.10000000000001,
+          "net_usd": 114.69599999999981,
+          "cost_pct": 64.41283788815255,
+          "spread": 5.0,
+          "mode": "CEILING",
+          "type": "CRYPTO"
+        }
+      ],
+      [
+        "XAGUSD",
+        {
+          "trades": 5111,
+          "wr": 84.07,
+          "pf": 12.75,
+          "tr_per_day": 3.1805,
+          "gross_usd": 254.291,
+          "sprd_usd": 76.665,
+          "comm_usd": 357.77000000000004,
+          "net_usd": -180.14400000000006,
+          "cost_pct": 170.84167351577526,
+          "spread": 1.5,
+          "mode": "FLOOR",
+          "type": "METAL"
+        }
+      ]
+    ]
+  }
+}

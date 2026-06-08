@@ -100,6 +100,11 @@ function ChatArea() {
   const endRef = useRef<HTMLDivElement>(null);
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, streamStatus]);
 
+  // Reset isSending on mount in case it was stuck from a previous session
+  useEffect(() => {
+    useChatStore.setState({ isSending: false, error: null });
+  }, []);
+
   const send = async () => {
     const t = input.trim();
     if (!t || isSending) return;
@@ -124,17 +129,16 @@ function ChatArea() {
         <div ref={endRef} />
       </div>
       <div className="p-3 border-t border-gray-700">
-        <div className="flex gap-2">
-          <textarea value={input} onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
-            placeholder="Type a message... (Enter to send)" rows={1}
-            className="flex-1 text-xs font-mono bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-100 outline-none focus:border-blue-500 resize-none"
+        <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex gap-2">
+          <input type="text" value={input} onChange={(e) => setInput(e.target.value)}
+            placeholder="Type a message... (Enter to send)"
+            className="flex-1 text-xs font-mono bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-100 outline-none focus:border-blue-500"
             disabled={isSending} />
-          <button onClick={send} disabled={!input.trim() || isSending}
+          <button type="submit" disabled={!input.trim() || isSending}
             className="px-4 py-2 text-xs font-mono bg-blue-600 text-white rounded-lg hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed">
             {isSending ? "..." : "SEND"}
           </button>
-        </div>
+        </form>
       </div>
     </div>
   );

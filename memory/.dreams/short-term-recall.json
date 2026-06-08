@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-07T22:02:50.132Z",
+  "updatedAt": "2026-06-08T02:06:30.452Z",
   "entries": {
     "memory:memory/2026-05-18.md:387:414": {
       "key": "memory:memory/2026-05-18.md:387:414",
@@ -1328,6 +1328,318 @@
         "ar-max",
         "loop",
         "iteration"
+      ]
+    },
+    "memory:memory/2026-06-04.md:137:173": {
+      "key": "memory:memory/2026-06-04.md:137:173",
+      "path": "memory/2026-06-04.md",
+      "startLine": 137,
+      "endLine": 173,
+      "source": "memory",
+      "snippet": "## Max Accuracy Sweep — COMPLETE (07:30 EDT) ARC-approved max accuracy sweep executed across all 28 pairs. Swept triggers UPWARD from native to find maximum WR (ceiling of accuracy-frequency curve). ### Results Summary - **Ceiling grand total:** 29,438 trades across 21 valid pairs - **Floor grand total:** ~158,375 trades (from max-trades sweep) - **Average WR ceiling:** 90.8% | **Average WR floor:** 81.1% - **Full curve data** stored in `reports/trigger_sweep_max_accuracy.json` ### Top Performers (Max Accuracy) - NZDUSD: 95.5% WR, 796tr, 0.59/d, PF 58.41 - AUDUSD: 94.2% WR, 790tr, 0.59/d, PF 63.14 - GBPAUD: 93.4% WR, 699tr, 0.52/d, PF 38.81 - GBPNZD: 93.3% WR, 682tr, 0.51/d,",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-07T22:34:02.730Z",
+      "lastRecalledAt": "2026-06-07T22:34:02.730Z",
+      "queryHashes": [
+        "61f5dbbe48d3"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "arc-approved",
+        "accuracy-frequency",
+        "max-trades",
+        "90.8",
+        "81.1",
+        "95.5",
+        "0.59/d",
+        "58.41"
+      ]
+    },
+    "memory:memory/2026-06-04.md:1:38": {
+      "key": "memory:memory/2026-06-04.md:1:38",
+      "path": "memory/2026-06-04.md",
+      "startLine": 1,
+      "endLine": 38,
+      "source": "memory",
+      "snippet": "# 2026-06-04 — Daily Log ## Max Accuracy Sweep — COMPLETE (07:30 EDT) ARC-approved max accuracy sweep executed across all 28 pairs. Swept triggers UPWARD from native to find maximum WR (ceiling of accuracy-frequency curve). ### Results Summary - **Ceiling grand total:** 29,438 trades across 21 valid pairs - **Floor grand total:** ~158,375 trades (from max-trades sweep) - **Average WR ceiling:** 90.8% | **Average WR floor:** 81.1% - **Full curve data** stored in `reports/trigger_sweep_max_accuracy.json` ### Top Performers (Max Accuracy) - NZDUSD: 95.5% WR, 796tr, 0.59/d, PF 58.41 - AUDUSD: 94.2% WR, 790tr, 0.59/d, PF 63.14 - GBPAUD: 93.4% WR, 699tr, 0.52/d, PF 38.81 - GBPN",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-07T22:34:02.730Z",
+      "lastRecalledAt": "2026-06-07T22:34:02.730Z",
+      "queryHashes": [
+        "61f5dbbe48d3"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "arc-approved",
+        "accuracy-frequency",
+        "max-trades",
+        "90.8",
+        "81.1",
+        "95.5",
+        "0.59/d",
+        "58.41"
+      ]
+    },
+    "memory:memory/2026-06-07.md:124:159": {
+      "key": "memory:memory/2026-06-07.md:124:159",
+      "path": "memory/2026-06-07.md",
+      "startLine": 124,
+      "endLine": 159,
+      "source": "memory",
+      "snippet": "- Top adjusted PF: NZDJPY 16.0, EURJPY 12.9, AUDJPY 13.0, NZDCAD 12.6 ### METALS/INDICES: DEAD AFTER COSTS (BUT COSTS WERE WRONG) - XAUUSD: 4.26 PF (cost 8.5p/trade) — **COST WAS WRONG** - XAGUSD: 3.34 PF (cost 8.5p/trade) — **COST WAS WRONG** - US500: 1.53 PF DEAD (cost 7.5p/trade) — **COST WAS WRONG** - FR40: 1.92 PF DEAD (cost 7.5p/trade) — **COST WAS WRONG** - BTCUSD: 6.64 PF | ETHUSD: 6.34 PF (marginal) ## 🔴 MAD'S CORRECTIVE (22:16 EDT) — COST CALCULATION IS WRONG ### The Problem MAD sent 3 transcript files and explained the cost calculation is fundamentally broken: 1. **Commission is $7/LOT, not $7 per 0.01 lot** - I was calculating commission correctly for 0.01 lot ($0.07 per",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-07T22:34:02.939Z",
+      "lastRecalledAt": "2026-06-07T23:03:44.253Z",
+      "queryHashes": [
+        "3dde30556aa5",
+        "b87e710697b5"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "16.0",
+        "12.9",
+        "13.0",
+        "12.6",
+        "metals/indices",
+        "4.26",
+        "8.5p/trade",
+        "3.34"
+      ]
+    },
+    "memory:memory/2026-06-07.md:97:130": {
+      "key": "memory:memory/2026-06-07.md:97:130",
+      "path": "memory/2026-06-07.md",
+      "startLine": 97,
+      "endLine": 130,
+      "source": "memory",
+      "snippet": "1. Session starts with T1 trigger (e.g., 12p for EURUSD) 2. First impulse detected at 25p → reclassified as T2 → trigger becomes 15p 3. Next loop iteration now requires 15p impulse instead of 12p 4. Subsequent loops have HIGHER threshold → fewer trades ### The Fix - Tier reclassification now ONLY updates `self.au_pips` (for DZ calculation) - `self.trigger_pips` stays at T1's value for ALL loop iterations - EURUSD validation: 5,850 trades vs 5,593 baseline = **+4.6%** ✅ ### Key Transcript Findings - June 3rd session ran 7 baskets: 39,866 trades | 87.5% WR ✅ - Percentile fix from Arch made things WORSE (-57% trades on EURGBP) - The 3 \"extras\" (4h timeout, 80% kill switch, dynamic DZ) were al",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-07T22:34:02.939Z",
+      "lastRecalledAt": "2026-06-07T23:03:44.253Z",
+      "queryHashes": [
+        "3dde30556aa5",
+        "b87e710697b5"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "e.g",
+        "self.au-pips",
+        "self.trigger-pips",
+        "4.6",
+        "87.5",
+        "starts",
+        "trigger",
+        "12p"
+      ]
+    },
+    "memory:memory/2026-06-03.md:202:226": {
+      "key": "memory:memory/2026-06-03.md:202:226",
+      "path": "memory/2026-06-03.md",
+      "startLine": 202,
+      "endLine": 226,
+      "source": "memory",
+      "snippet": "**Bug**: `to_pips(abs(sl - price), sym)` and `to_pips(abs(tp - price), sym)` — `sym` is not defined in `send_order()` scope. Parameter is `symbol`. **Impact**: Every ST entry crashes with `NameError: name 'sym' is not defined`. No ST trades can be entered. **Fix**: Replace all `sym` with `symbol` in `send_order()` function. ### Engine Fix Confirmed Working - `engines/symmetry_trap.py`: SL = impulse_extreme (zero-buffer), matches Nautilus line 503 - `_just_entered` flag prevents SL/TP check on entry bar - Bridge `send_order(no_sl=True)` omits SL from broker order - No SL/TP clamping in bridge — trusts engine values ### Next Steps 1. Fix `sym` → `symbol` in `send_order()` (4 lines",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-08T01:06:43.468Z",
+      "lastRecalledAt": "2026-06-08T01:06:43.468Z",
+      "queryHashes": [
+        "bb0032c5bdf2"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "to-pips",
+        "send-order",
+        "engines/symmetry-trap.py",
+        "impulse-extreme",
+        "zero-buffer",
+        "just-entered",
+        "sl/tp",
+        "no-sl"
+      ]
+    },
+    "memory:memory/2026-06-03.md:164:189": {
+      "key": "memory:memory/2026-06-03.md:164:189",
+      "path": "memory/2026-06-03.md",
+      "startLine": 164,
+      "endLine": 189,
+      "source": "memory",
+      "snippet": "- engines/symmetry_trap_old.py (empty placeholder — for testing only) ## PM2 Monitoring Session (12:00 UTC) ### Sync Infrastructure Audit - Audited all 9 sync/monitoring scripts for syntax and correctness - Fixed ools/progress-sync.py — REPO_MEMORY path was broken (pointed to non-existent external path) - Fixed ools/po_watchdog.py — indentation error on line 96 - Disabled ools/pm2_autopilot.py — renamed to .disabled after identifying it as source of ~50 spam git commits - Identified Telegram gateway crash: TELEGRAM_TOKEN missing from .env (only hardcoded in watchdog) - Updated workspace-state.md with current phase status - Updated PM2-progress.md and PM2-memory.md with monito",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-08T01:06:43.468Z",
+      "lastRecalledAt": "2026-06-08T01:06:43.468Z",
+      "queryHashes": [
+        "bb0032c5bdf2"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "gateway",
+        "engines/symmetry-trap-old.py",
+        "sync/monitoring",
+        "ools/progress-sync.py",
+        "repo-memory",
+        "non-existent",
+        "ools/po-watchdog.py",
+        "ools/pm2-autopilot.py"
+      ]
+    },
+    "memory:memory/2026-06-03.md:187:205": {
+      "key": "memory:memory/2026-06-03.md:187:205",
+      "path": "memory/2026-06-03.md",
+      "startLine": 187,
+      "endLine": 205,
+      "source": "memory",
+      "snippet": "1. **`.pyc` cache stale** — `__pycache__` had old bytecode from before fixes. Both `cerebus_live_bridge.cpython-311.pyc` and `symmetry_trap.cpython-311.pyc` needed deletion. 2. **12 PM hard exit in bridge** — Removed from bridge main loop (was never in old bridge, old bridge traded through afternoon) 3. **Multiple bridge instances** — Disabled cron \"Bridge Health Check + Auto-Restart\" was spawning 11+ instances. Killed all, confirmed single instance. 4. **`sym` vs `symbol` bug in `send_order()`** — Lines 229, 230, 235, 236 used `sym` (undefined in function scope) instead of `symbol` (the parameter name). This caused `name 'sym' is not defined` error on ST entry (GBPAUD.PRO). **NOT YET FIX",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-08T01:06:43.468Z",
+      "lastRecalledAt": "2026-06-08T01:06:43.468Z",
+      "queryHashes": [
+        "bb0032c5bdf2"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "symmetry-trap.cpython-311.pyc",
+        "auto-restart",
+        "send-order",
+        "gbpaud.pro",
+        "pyc",
+        "cache",
+        "stale",
+        "pycache"
+      ]
+    },
+    "memory:memory/2026-06-03.md:224:243": {
+      "key": "memory:memory/2026-06-03.md:224:243",
+      "path": "memory/2026-06-03.md",
+      "startLine": 224,
+      "endLine": 243,
+      "source": "memory",
+      "snippet": "1. **`.pyc` cache stale** — `__pycache__` had old bytecode from before fixes. Both `cerebus_live_bridge.cpython-311.pyc` and `symmetry_trap.cpython-311.pyc` needed deletion. 2. **12 PM hard exit in bridge** — Removed from bridge main loop (was never in old bridge, old bridge traded through afternoon) 3. **Multiple bridge instances** — Disabled cron \"Bridge Health Check + Auto-Restart\" was spawning 11+ instances. Killed all, confirmed single instance. 4. **`sym` vs `symbol` bug in `send_order()`** — Lines 229, 230, 235, 236 used `sym` (undefined in function scope) instead of `symbol` (the parameter name). This caused `name 'sym' is not defined` error on ST entry (GBPAUD.PRO). ### Bridge",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-08T01:06:43.468Z",
+      "lastRecalledAt": "2026-06-08T01:06:43.468Z",
+      "queryHashes": [
+        "bb0032c5bdf2"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "symmetry-trap.cpython-311.pyc",
+        "auto-restart",
+        "send-order",
+        "gbpaud.pro",
+        "pyc",
+        "cache",
+        "stale",
+        "pycache"
+      ]
+    },
+    "memory:memory/2026-06-04.md:274:285": {
+      "key": "memory:memory/2026-06-04.md:274:285",
+      "path": "memory/2026-06-04.md",
+      "startLine": 274,
+      "endLine": 285,
+      "source": "memory",
+      "snippet": "**ISSUE:** Bridge log shows TWO scan lines per timestamp (e.g., Scan #35 and Scan #25 at 13:55:00 with slightly different equity readings). This indicates two bridge processes are running simultaneously. **Risk:** Duplicate entries, conflicting closes, race conditions on MT5 positions. **Action needed:** Kill the older bridge process, keep only the latest one. Requires checking PIDs and killing the stale one. ### Status at 13:55 EDT - Equity: ~$65.00 (trending up from $64.62 at 13:00) - Open positions: 2 (CHFJPY BUY, EURUSD SELL) - No new signals since deploy - Bridge scanning normally otherwise",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-08T01:06:43.468Z",
+      "lastRecalledAt": "2026-06-08T01:06:43.468Z",
+      "queryHashes": [
+        "bb0032c5bdf2"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "e.g",
+        "65.00",
+        "64.62",
+        "issue",
+        "bridge",
+        "log",
+        "shows",
+        "two"
+      ]
+    },
+    "memory:memory/obsidian-vault/2026-05-31.md:1:49": {
+      "key": "memory:memory/obsidian-vault/2026-05-31.md:1:49",
+      "path": "memory/obsidian-vault/2026-05-31.md",
+      "startLine": 1,
+      "endLine": 49,
+      "source": "memory",
+      "snippet": "# 2026-05-31 — Daily Log > **Last Update:** 2026-06-01 01:16 EDT > **Mode:** UNIFIED FIELD | **Memory:** PERSISTENT --- ## Phase Status ### Track A — Tradovate/NinjaScript Migration **Status: COMPLETE (7/7 deliverables)** - `crypto/CryptoAssetScanner.py` — 23.8KB - `tradovate/CEREBUS_ST_NT8.cs` — 21.9KB - `tradovate/CEREBUS_P90_NT8.cs` — 25.4KB - `tradovate/CEREBUS_BacktestHarness.cs` — 12.4KB - `tradovate/CEREBUS_DeployConfig.json` — 3.1KB - `tradovate/CEREBUS_TradeCopier.cs` — 7.0KB - `tradovate/CEREBUS_AssetPresets.cs` — 10.1KB - All files written, awaiting MAD to import in NT8 GUI ### Track B — Crypto **Status: BLOCKED (needs MAD approval to retry)** - Previous",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-08T02:06:30.452Z",
+      "lastRecalledAt": "2026-06-08T02:06:30.452Z",
+      "queryHashes": [
+        "9e5671136ef0"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "tradovate/ninjascript",
+        "7/7",
+        "crypto/cryptoassetscanner.py",
+        "23.8kb",
+        "tradovate/cerebus-st-nt8.cs",
+        "21.9kb",
+        "tradovate/cerebus-p90-nt8.cs",
+        "25.4kb"
       ]
     }
   }

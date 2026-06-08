@@ -93,13 +93,14 @@ def get_pip_value_per_lot(symbol: str, pip_size: float) -> float:
     if "XAU" in sym or "XAG" in sym:
         return 1.0  # $1/pip for metals (1 lot = 100 oz)
     if "BTC" in sym:
-        return 100.0  # $100/pip for BTC (1 lot = 1 BTC, pip=$1)
+        return 1.0  # $1/pip for BTC (1 lot = 1 BTC, 1 point = $1)
     if "ETH" in sym:
-        return 10.0  # $10/pip for ETH
+        return 1.0  # $1/pip for ETH (1 lot = 1 ETH, 1 point = $1)
     if any(x in sym for x in ["US500", "DE30", "FR40", "HK50"]):
         return 1.0  # $1/pip for indices (1 lot = 1 contract)
-    # Standard forex: pip_value * 100,000 = $10/pip
-    return pip_size * 100000.0
+    # Standard forex: $10/pip per standard lot for ALL pairs (JPY and non-JPY)
+    # pip_size differs (0.0001 vs 0.01) but dollar value per pip is the same
+    return 10.0
 
 
 def apply_costs_to_trades(
@@ -136,10 +137,12 @@ def apply_costs_to_trades(
     
     # Commission per trade in pips
     # commission_per_lot is $/lot/round_turn
-    # For lot_size lots: commission = commission_per_lot * lot_size
-    # In pips: commission_pips = commission_$ / (pip_value_per_lot * lot_size)
+    # For lot_size lots: commission_$ = commission_per_lot * lot_size
+    # In pips: commission_pips = commission_$ / pip_value_per_lot
+    # Note: pip_value_per_lot is $ per pip for 1 standard lot
+    # The lot_size scaling is already in commission_per_trade_usd (numerator)
     commission_per_trade_usd = commission_per_lot * lot_size
-    commission_pips = commission_per_trade_usd / (pip_value_per_lot * lot_size) if pip_value_per_lot > 0 else 0
+    commission_pips = commission_per_trade_usd / pip_value_per_lot if pip_value_per_lot > 0 else 0
     
     # Total cost per trade in pips
     total_cost_pips = spread_pips + commission_pips

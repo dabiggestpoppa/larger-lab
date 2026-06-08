@@ -163,6 +163,45 @@ class DemoBridge:
             else:
                 log.warning(f"No config for {symbol}")
 
+        # Initialize engine sessions from historical bars
+        for symbol in self.symbols:
+            if symbol not in self.engines:
+                continue
+            try:
+                rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_M5, 0, 500)
+                if rates is not None and len(rates) > 0:
+                    bars = []
+                    for rate in rates:
+                        bars.append(Bar(
+                            time=datetime.fromtimestamp(rate[0], tz=EST),
+                            open=rate[1], high=rate[2], low=rate[3],
+                            close=rate[4], volume=rate[5],
+                        ))
+                    bars = list(reversed(bars))
+                    # Calculate Asian Range (7PM-3AM EST)
+                    now = datetime.now(EST)
+                    if now.hour >= 3:
+                        sess_end = now.replace(hour=3, minute=0, second=0, microsecond=0)
+                    else:
+                        sess_end = (now - timedelta(days=1)).replace(hour=3, minute=0, second=0, microsecond=0)
+                    sess_start = sess_end - timedelta(hours=8)
+                    asian = [b for b in bars if b.time >= sess_start and b.time <= sess_end]
+                    if asian:
+                        ah = max(b.high for b in asian)
+                        al = min(b.low for b in asian)
+                    else:
+                        # Fallback: AR unavailable — use synthetic 10 pip AR for T1 default
+                        last_close = bars[-1].close
+                        pip = self.engines[symbol].pip_size
+                        ah = last_close + 10 * pip
+                        al = last_close - 10 * pip
+                        log.warning(f"[{symbol}] Asian Range unavailable — defaulting to T1 (synthetic AR=10p)")
+                    self.engines[symbol].initialize_session(ah, al)
+                    ar_pips = (ah - al) / self.engines[symbol].pip_size
+                    log.info(f"[{symbol}] Session INIT: AR={ar_pips:.1f}p | tier={self.engines[symbol].tier_name}")
+            except Exception as e:
+                log.warning(f"[{symbol}] Session init failed: {e}")
+
         # Clear stale state
         self.positions = {}
         self.reset_daily_stats()
