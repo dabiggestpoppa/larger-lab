@@ -3,67 +3,40 @@
 > **Purpose:** Quick-communication hub for CC/PM/PM2/AS/RL coordination.
 > **Current focus:** Quant Lab — 9K Config Test + Monte Carlo + Forward Test Prep
 > **Plan:** `quant-lab/QUANT_JOURNAL.md`
-> **Last Updated:** 2026-06-08 22:30 UTC (CEREBUS final sweep — all servers verified up, PO back online, stale processes cleaned)
+> **Last Updated:** 2026-06-08 (CEREBUS PO stability fix — watchdog + 409 resilience, all servers stable)
 
-> ## 🔴 June 8 Evening — Full Sweep & Cleanup
+> ## 🔴 June 8 — PO Stability Fixes (RESOLVED)
 >
-> ### What Happened
-> - PM was running POALA/VTuber and other tasks without telling MAD we were done for the day
-> - PM likely tried to connect Telegram bot to VTuber, causing 409 Conflict errors
-> - PO gateway crashed, took OCE backend with it
+> ### Issues Fixed Today
+> 1. **Watchdog infinite restart loop** — `$_` in PowerShell subprocess got stripped → watchdog always thought gateway was down → restarted every 60s → gateway never stabilized
+> 2. **Gateway 409 Conflict exit** — PM's VTuber bot polling same token → after 5 consecutive 409s, gateway called `sys.exit(1)` → died every ~30s
+> 3. **Stale PID file** — PID file pointed to wrong process (PowerShell terminal instead of gateway)
 >
-> ### Fix Applied
-> - Killed all stale processes (9 Python + 1 Node)
-> - Restarted OCE backend (port 8000) ✅
-> - Restarted API server (port 8001) ✅
-> - Restarted PO telegram gateway (PID 27988) ✅
-> - Cleaned up PDF.co OCR processes PM left running (3 instances)
-> - Telegram 409 Conflict persists (Telegram server-side session conflict) — bot IS polling, will clear on its own
+> ### Fixes Applied
+> - Watchdog: Replaced broken `$_` subprocess with PID file check (ctypes OpenProcess) + Get-CimInstance fallback
+> - Gateway: Removed `sys.exit(1)` on 409 → exponential backoff (30s→60s→120s→240s→300s max) + deleteWebhook on startup + every 3rd 409 fires deleteWebhook to kill competing session
+> - PID file: Corrected to actual gateway PID
+> - Cleaned up stale pytest processes
 >
-> ### Final Server Status
-> | Service | Port | Status |
-> |---------|------|--------|
+> ### Final Server Status (Verified Stable)
+> | Service | PID | Status |
+> |---------|-----|--------|
+> | OCE Backend | 11712 | ✅ UP |
+> | API Server | 21068 | ✅ UP |
+> | PO Telegram Gateway | 16064 | ✅ UP (polling clean) |
+> | PO Watchdog | 15248 | ✅ UP (stable, no restarts) |
 > | OCE Frontend | 3000 | ✅ UP |
-> | OCE Backend | 8000 | ✅ UP |
-> | API Server | 8001 | ✅ UP |
-> | PO Telegram | — | ✅ RUNNING (409 conflict, polling OK) |
-> | VTuber/POALA | 12393 | 🔴 Offline per MAD directive |
+> | VTuber/POALA | — | 🔴 Offline per MAD directive |
 >
-> ### Notes
-> - PO telegram bot (@P01999BOT) is alive and polling
-> - 409 Conflict is from Telegram's servers still having old session registered
-> - Bot falls back to normal polling after initial 409 errors
-> - All agent work for today is complete — see QUANT_JOURNAL.md for results
+> ### Commits
+> - `b0ee429ed` — Fix watchdog broken $_ subprocess
+> - `4ec7aa6c2` — Gateway 409 resilience (exponential backoff)
+> - `614737afc` — PO Bug Journal created
+> - `97266b836` — Bug Journal updated with Issue #4
+> - `4415370b5` — PO memory system + vault integration fix
 >
-> ## 🚨 PM VTuber Incident (June 8 Evening)
->
-> ### What PM Did Wrong
-> - PM was running POALA/VTuber integration without coordinating with MAD
-> - PM tried to connect the Telegram bot (@P01999BOT) to VTuber system
-> - This caused Telegram API 409 Conflict errors (two instances polling same bot token)
-> - PO gateway crashed repeatedly (10+ restarts by watchdog)
-> - PM also left PDF.co OCR processes running (3 instances) wasting resources
->
-> ### Fix Applied
-> - Killed ALL stale processes (9 Python + 1 Node + 3 PDF.co)
-> - Force-cleared Telegram sessions via API (deleteWebhook + getUpdates with high offset)
-> - Restarted PO gateway clean — now polling stable
-> - Created `scripts/po_watchdog.py` — auto-restarts PO if it crashes
-> - VTuber/POALA taken offline per MAD directive — do NOT restart
->
-> ### ⚠️ RULES FOR PM (Non-Negotiable)
-> 1. **NEVER touch PO telegram gateway** — it runs independently, don't connect anything to it
-> 2. **NEVER run VTuber/POALA without MAD explicit approval** — it conflicts with PO bot
-> 3. **ALWAYS check `ps aux | grep telegram` before starting any bot-related work**
-> 4. **ALWAYS clean up after yourself** — kill processes you start when done
-> 5. **COORDINATE with MAD before touching any shared infrastructure**
->
-> ### Current Status (Verified Stable)
-> - PO Telegram (@P01999BOT): ✅ RUNNING — polling every 30s
-> - PO Watchdog: ✅ RUNNING — checks every 60s, auto-restarts if crash
-> - OCE Backend (8000): ✅ RUNNING
-> - API Server (8001): ✅ RUNNING
-> - VTuber/POALA (12393): 🔴 OFFLINE — do not restart without MAD approval
+> ### Bug Journal
+> `progress/PO-BUG-JOURNAL-2026-06-08.md` — 5 issues documented with root causes, fixes, and lessons
 > **Last Updated:** 2026-06-08 22:00 UTC (CEREBUS final sweep — all servers up, stale processes killed, MAD closing)
 > **Tasks:** `progress/O2C-RESEARCH-MESH-TASKS.md`
 > **Last Updated:** 2026-06-08 (Quant analysis complete — 9K config, Monte Carlo, forward test plan)
@@ -172,7 +145,7 @@ OC2 (OpenClaw) gateway permanently offline. Constant crashes, session bloat, zer
 | 🔴 PM2 | Polymorph 2 | Graph / Multi-Agent / Frontend | 🟢 Active |
 | 🟢 RL | Research Lead | Scheduling / Contradictions | 🟢 Active |
 | 🟠 OC2 | OWL (OpenClaw) | — | 🟢 Stable (session maintenance configured) |
-| 🦦 PO | Telegram Bot / Full Agent | — | 🟢 Stable (80+ tools, MCP bridge, dynamic registry) |
+| 🦦 PO | Telegram Bot / Full Agent | — | 🟢 Stable (409-resilient, watchdog fixed, polling clean) |
 
 > **2026-06-07 OC2 Session Fix:** Configured `session.maintenance` (enforce, 7d prune, 100MB cap), `compaction` (safeguard, 5MB trigger, truncate after), `contextPruning` (cache-ttl, 1h). Previously crashed 3x/day from session bloat. Now auto-maintained.
 
