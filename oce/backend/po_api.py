@@ -168,9 +168,9 @@ async def _stream_chat(request: POChatRequest) -> AsyncGenerator[str, None]:
 
     # Stage 2: Workspace scan
     try:
-        from core.observer.workspace_scanner import WorkspaceScanner
+        from oce.backend.po_workspace import WorkspaceScanner
         scanner = WorkspaceScanner()
-        scan_result = await scanner.scan()
+        scan_result = scanner.scan()
         yield _sse_chunk({
             "type": "event",
             "kind": "workspace_scan",
@@ -182,10 +182,10 @@ async def _stream_chat(request: POChatRequest) -> AsyncGenerator[str, None]:
 
     # Stage 3: Vault retrieval
     try:
-        from core.observer.vault_retriever import VaultRetriever
+        from oce.backend.po_vault import VaultRetriever
         retriever = VaultRetriever()
         last_text = _normalize_content(request.messages[-1].content) if request.messages else ""
-        retrieval = await retriever.retrieve(last_text)
+        retrieval = retriever.retrieve(last_text)
         yield _sse_chunk({
             "type": "event",
             "kind": "vault_retrieval",
@@ -226,13 +226,22 @@ async def _stream_chat(request: POChatRequest) -> AsyncGenerator[str, None]:
         merged_history = session_history + formatted_messages[:-1]
 
         agent = POAgent()
-        response_text = await asyncio.to_thread(
-            agent.chat,
-            last_user_text,
-            history=merged_history if merged_history else None,
-            session_id=stable_session_id,
-            max_tool_rounds=4,
-        )
+
+        # Run agent with timeout to prevent hanging
+        try:
+            response_text = await asyncio.wait_for(
+                asyncio.to_thread(
+                    agent.chat,
+                    last_user_text,
+                    history=merged_history if merged_history else None,
+                    session_id=stable_session_id,
+                    max_tool_rounds=4,
+                ),
+                timeout=120.0
+            )
+        except asyncio.TimeoutError:
+            response_text = "⏱️ Response timed out after 120s. The LLM may be unavailable. Try again or check OpenRouter status."
+            logger.error("PO chat timed out")
 
         # Persist this turn to session memory (auto-saves to disk)
         session_mgr.add_message(stable_session_id, "user", last_user_text)
@@ -284,13 +293,20 @@ async def _complete_chat(request: POChatRequest) -> Dict[str, Any]:
         if not isinstance(last_content, str):
             last_content = str(last_content)
 
-        response_text = await asyncio.to_thread(
-            agent.chat,
-            last_content,
-            history=merged_history if merged_history else None,
-            session_id=stable_session_id,
-            max_tool_rounds=4,
-        )
+        try:
+            response_text = await asyncio.wait_for(
+                asyncio.to_thread(
+                    agent.chat,
+                    last_content,
+                    history=merged_history if merged_history else None,
+                    session_id=stable_session_id,
+                    max_tool_rounds=4,
+                ),
+                timeout=120.0
+            )
+        except asyncio.TimeoutError:
+            response_text = "⏱️ Response timed out after 120s. The LLM may be unavailable."
+            logger.error("PO complete_chat timed out")
 
         # Persist to session
         session.add_message("user", last_content)
