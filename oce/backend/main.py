@@ -257,11 +257,41 @@ async def continuity_chat_stream(request: ContinuityChatRequest):
                     break
 
             response_text = await asyncio.wait_for(future, timeout=300)
+
+            # Log to chat log for conversation history
+            try:
+                from core.observer.chat_log import get_chat_log
+                chat_log = get_chat_log()
+                session_id = request.session_id or chat_log.get_current_session()
+                chat_log.add_message(
+                    role="user",
+                    content=request.message,
+                    session_id=session_id,
+                    observer_metadata={"source": "chat_stream"},
+                )
+                chat_log.add_message(
+                    role="assistant",
+                    content=response_text,
+                    session_id=session_id,
+                    observer_metadata={"source": "chat_stream"},
+                )
+            except Exception as log_err:
+                logger.warning(f"Chat log write failed (non-critical): {log_err}")
+
             yield f"data: {json.dumps({'type': 'final', 'data': {'response': response_text, 'session_id': request.session_id or '', 'observer': {}, 'system': {}, 'confidence': 1.0}}, default=str)}\n\n"
             executor.shutdown(wait=False)
 
         except Exception as e:
             logger.error(f"Stream error: {e}")
+            # Log error to chat log
+            try:
+                from core.observer.chat_log import get_chat_log
+                chat_log = get_chat_log()
+                session_id = request.session_id or chat_log.get_current_session()
+                chat_log.add_message(role="user", content=request.message, session_id=session_id)
+                chat_log.add_message(role="assistant", content=f"Error: {str(e)[:200]}", session_id=session_id)
+            except Exception:
+                pass
             yield f"data: {json.dumps({'type': 'error', 'data': {'message': str(e)[:500]}})}\n\n"
 
     return StreamingResponse(
