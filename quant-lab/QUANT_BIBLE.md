@@ -22,6 +22,33 @@
 - ⚠️ LOW COST HEX config approved but NOT deployed (still running SIGN 7)
 - ⚠️ Indices/metals commission suspicious (7 pips/trade at 0.01 lot)
 
+### 🔑 THE 9K TRADE UNLOCK CONFIG (June 4 Discovery)
+
+**The config that unlocked 9,228 trades on EURUSD (from MAX SWEEP INSIGHT):**
+
+| Parameter | Old (Baseline) | New (Unlock) | Impact |
+|-----------|---------------|--------------|--------|
+| AR gate | ar_max=20/30/45 | ar_max=999 (disabled) | +274% trades |
+| T1 trigger | 12 pips | 8-10 pips | +261% trades |
+| Session cutoff | 12:00 PM EST | 4:00 PM EST | +20% trades |
+| DZ floor | 32% (Loop 1) | 20% (all loops) | +10% trades |
+| **Combined** | **1,125 trades** | **9,228 trades** | **+720%** |
+
+**Results:**
+| Metric | Baseline | Unlock |
+|--------|----------|--------|
+| Trades | 1,125 | 9,228 |
+| WR | 84.6% | 84.3% |
+| PF | 8.18 | 11.74 |
+| PnL | +5,100p | +43,918p |
+| Tr/Day | 0.84 | 6.90 |
+
+**Key insight:** The AR gate was the #1 suppressor — it was silently killing entire trading days where the Asian session range exceeded the threshold. The 12-pip trigger was #2 — filtering out micro-impulses. Both are independent (multiplicative effect).
+
+**⚠️ This config was found but NOT yet deployed as the standard.** The current Bible config uses the calibrated values (AR gate at ar_max=60, trigger=10p, 4PM cutoff) which gives ~5,000-7,000 trades. The 9K config needs to be tested across all pairs before deployment.
+
+---
+
 ### Critical Numbers (Cost-Adjusted, FINAL — June 7)
 **Using MT5 live spread + flat $0.07 commission (no comm on indices):**
 
