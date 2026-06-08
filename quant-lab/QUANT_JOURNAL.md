@@ -93,7 +93,23 @@
 
 ---
 
-## 📋 PENDING TASKS
+## � June 8 Evening — MAD Closing
+
+### Server Status
+- **OCE Frontend (3000):** ✅ Up
+- **OCE Backend (8000):** ✅ Up
+- **API Server (8001):** ✅ Up
+- **VTuber/POALA (12393):** 🔴 Taken offline per MAD directive
+- **Stale processes:** 9 Python + 1 Node killed
+
+### Notes
+- VTuber/desktop pet process killed (was PID 21704, already gone from earlier cleanup)
+- All 3 critical servers remain untouched and running
+- POALA taken offline — not needed until tomorrow
+
+---
+
+## �📋 PENDING TASKS
 
 - [ ] Set up MT5 demo broker for forward test
 - [ ] Copy engine + configs to demo
