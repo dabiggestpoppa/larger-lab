@@ -63,6 +63,46 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
   );
 }
 
+function StreamStatusBar() {
+  const { streamStatus } = useChatStore();
+
+  if (!streamStatus.active && !streamStatus.detail) return null;
+
+  const stageColors: Record<string, string> = {
+    thinking: "text-yellow-400",
+    tool_call: "text-blue-400",
+    tool_result: "text-cyan-400",
+    responding: "text-green-400",
+    error: "text-red-400",
+    complete: "text-green-400",
+  };
+
+  const stageColor = stageColors[streamStatus.stage] || "text-[var(--text-muted)]";
+
+  return (
+    <div className="flex justify-start mb-3">
+      <div className="bg-[var(--bg-secondary)] border border-[var(--border-default)] rounded-lg px-4 py-2 max-w-[85%]">
+        <div className="flex items-center gap-2">
+          {streamStatus.active && (
+            <div className="w-1.5 h-1.5 rounded-full bg-[var(--accent-primary)] animate-pulse shrink-0" />
+          )}
+          <span className={`text-[11px] font-mono ${stageColor} truncate`}>
+            {streamStatus.detail}
+          </span>
+        </div>
+        {streamStatus.round && streamStatus.maxRounds && (
+          <div className="mt-1.5 h-1 bg-[var(--bg-tertiary)] rounded-full overflow-hidden">
+            <div
+              className="h-full bg-[var(--accent-primary)] rounded-full transition-all duration-300"
+              style={{ width: `${(streamStatus.round / streamStatus.maxRounds) * 100}%` }}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function SessionList() {
   const {
     sessions,
@@ -184,6 +224,7 @@ function ChatArea() {
     isSending,
     error,
     sendMessage,
+    streamStatus,
   } = useChatStore();
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -191,7 +232,7 @@ function ChatArea() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, streamStatus]);
 
   const handleSend = async () => {
     const trimmed = input.trim();
@@ -212,7 +253,7 @@ function ChatArea() {
     <div className="flex-1 flex flex-col min-w-0">
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4">
-        {messages.length === 0 ? (
+        {messages.length === 0 && !isSending ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <div className="text-2xl mb-3">◉</div>
             <h2 className="text-sm font-mono font-bold text-[var(--text-primary)] mb-1">
@@ -228,17 +269,10 @@ function ChatArea() {
             <MessageBubble key={msg.message_id} msg={msg} />
           ))
         )}
-        {isSending && (
-          <div className="flex justify-start mb-3">
-            <div className="bg-[var(--bg-secondary)] border border-[var(--border-default)] rounded-lg px-4 py-2.5">
-              <div className="flex items-center gap-1">
-                <div className="w-1.5 h-1.5 rounded-full bg-[var(--accent-primary)] animate-pulse" />
-                <div className="w-1.5 h-1.5 rounded-full bg-[var(--accent-primary)] animate-pulse delay-75" />
-                <div className="w-1.5 h-1.5 rounded-full bg-[var(--accent-primary)] animate-pulse delay-150" />
-              </div>
-            </div>
-          </div>
-        )}
+
+        {/* Live streaming status — shows PO's real-time activity */}
+        <StreamStatusBar />
+
         {error && (
           <div className="flex justify-center my-2">
             <span className="text-[10px] font-mono text-red-400 bg-red-400/10 px-3 py-1 rounded-full">
@@ -267,7 +301,7 @@ function ChatArea() {
             disabled={!input.trim() || isSending}
             className="px-4 py-2 text-xs font-mono bg-[var(--accent-primary)] text-white rounded-lg hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
           >
-            SEND
+            {isSending ? "..." : "SEND"}
           </button>
         </div>
       </div>
