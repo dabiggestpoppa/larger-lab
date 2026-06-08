@@ -1,6 +1,7 @@
 /**
  * Chat Store
  * Zustand store for chat state — messages, sessions, active conversation.
+ * Supports real-time SSE streaming with live progress tracking.
  */
 import { create } from "zustand";
 
@@ -25,20 +26,25 @@ export interface ChatSession {
   last_preview: string;
 }
 
+export interface StreamStatus {
+  active: boolean;
+  stage: string;
+  detail: string;
+  round?: number;
+  maxRounds?: number;
+  tool?: string;
+  toolResult?: string;
+}
+
 interface ChatStore {
-  // Messages for the active session
   messages: ChatMessage[];
-  // All sessions
   sessions: ChatSession[];
-  // Active session ID
   activeSessionId: string | null;
-  // Loading state
   isLoading: boolean;
   isSending: boolean;
-  // Error
   error: string | null;
+  streamStatus: StreamStatus;
 
-  // Actions
   setMessages: (messages: ChatMessage[]) => void;
   addMessage: (message: ChatMessage) => void;
   setSessions: (sessions: ChatSession[]) => void;
@@ -46,8 +52,9 @@ interface ChatStore {
   setLoading: (loading: boolean) => void;
   setSending: (sending: boolean) => void;
   setError: (error: string | null) => void;
+  setStreamStatus: (status: StreamStatus) => void;
+  clearStreamStatus: () => void;
 
-  // API calls
   loadSessions: () => Promise<void>;
   loadHistory: (sessionId: string) => Promise<void>;
   sendMessage: (message: string, sessionId?: string) => Promise<void>;
@@ -57,7 +64,6 @@ interface ChatStore {
 }
 
 export const useChatStore = create<ChatStore>((set, get) => {
-  // Counter for unique message IDs (Date.now() only has ms precision)
   let messageCounter = 0;
 
   const getNextId = (prefix: string) => {
@@ -72,263 +78,272 @@ export const useChatStore = create<ChatStore>((set, get) => {
     isLoading: false,
     isSending: false,
     error: null,
+    streamStatus: { active: false, stage: "", detail: "" },
 
     setMessages: (messages) => set({ messages }),
     addMessage: (message) => set((s) => ({ messages: [...s.messages, message] })),
-  setSessions: (sessions) => set({ sessions }),
-  setActiveSession: (sessionId) => set({ activeSessionId: sessionId }),
-  setLoading: (loading) => set({ isLoading: loading }),
-  setSending: (sending) => set({ isSending: sending }),
-  setError: (error) => set({ error }),
+    setSessions: (sessions) => set({ sessions }),
+    setActiveSession: (sessionId) => set({ activeSessionId: sessionId }),
+    setLoading: (loading) => set({ isLoading: loading }),
+    setSending: (sending) => set({ isSending: sending }),
+    setError: (error) => set({ error }),
+    setStreamStatus: (status) => set({ streamStatus: status }),
+    clearStreamStatus: () => set({ streamStatus: { active: false, stage: "", detail: "" } }),
 
-  loadSessions: async () => {
-    set({ isLoading: true, error: null });
-    try {
-      const res = await fetch("/api/chat/sessions");
-      const data = await res.json();
-      const raw = data.sessions || [];
-      const sessions: ChatSession[] = raw.map((s: Record<string, unknown>) => ({
-        session_id: (s.session_id as string) || "",
-        title: (s.title as string) || `Session ${(s.session_id as string || "").slice(-6)}`,
-        created_at: (s.created_at as string) || (s.start_time as string) || "",
-        updated_at: (s.updated_at as string) || (s.last_active as string) || "",
-        entry_count: (s.entry_count as number) || (s.message_count as number) || 0,
-        last_role: (s.last_role as string) || "",
-        last_preview: (s.last_preview as string) || "",
-      }));
-      set({ sessions });
-      const activeId = data.active_session as string | null;
-      if (activeId && !get().activeSessionId) {
-        set({ activeSessionId: activeId });
+    loadSessions: async () => {
+      set({ isLoading: true, error: null });
+      try {
+        const res = await fetch("/api/chat/sessions");
+        const data = await res.json();
+        const raw = data.sessions || [];
+        const sessions: ChatSession[] = raw.map((s: Record<string, unknown>) => ({
+          session_id: (s.session_id as string) || "",
+          title: (s.title as string) || `Session ${(s.session_id as string || "").slice(-6)}`,
+          created_at: (s.created_at as string) || (s.start_time as string) || "",
+          updated_at: (s.updated_at as string) || (s.last_active as string) || "",
+          entry_count: (s.entry_count as number) || (s.message_count as number) || 0,
+          last_role: (s.last_role as string) || "",
+          last_preview: (s.last_preview as string) || "",
+        }));
+        set({ sessions });
+        const activeId = data.active_session as string | null;
+        if (activeId && !get().activeSessionId) {
+          set({ activeSessionId: activeId });
+        }
+      } catch (err) {
+        set({ error: "Failed to load sessions" });
+        console.error("Failed to load sessions:", err);
+      } finally {
+        set({ isLoading: false });
       }
-    } catch (err) {
-      set({ error: "Failed to load sessions" });
-      console.error("Failed to load sessions:", err);
-    } finally {
-      set({ isLoading: false });
-    }
-  },
+    },
 
-  loadHistory: async (sessionId: string) => {
-    set({ isLoading: true, error: null });
-    try {
-      const res = await fetch(`/api/chat/history/${sessionId}`);
-      const data = await res.json();
-      // API returns { session, messages }
-      const raw = data.messages || data.entries || [];
-      const msgs: ChatMessage[] = raw.map((m: Record<string, unknown>) => ({
-        message_id: (m.message_id as string) || getNextId("msg"),
-        role: (m.role as "user" | "observer" | "system") || (m.role as string) === "assistant" ? "observer" : (m.role as "user" | "observer" | "system"),
-        content: (m.content as string) || "",
-        timestamp: (m.timestamp as string) || new Date().toISOString(),
-        session_id: (m.session_id as string) || sessionId,
-        task_domain: m.task_domain as string | undefined,
-        complexity: m.complexity as string | undefined,
-        observer_metadata: (m.observer_metadata as Record<string, unknown>) || {},
-      }));
-      set({ messages: msgs, activeSessionId: sessionId });
-    } catch (err) {
-      set({ error: "Failed to load chat history" });
-      console.error("Failed to load chat history:", err);
-    } finally {
-      set({ isLoading: false });
-    }
-  },
+    loadHistory: async (sessionId: string) => {
+      set({ isLoading: true, error: null });
+      try {
+        const res = await fetch(`/api/chat/history/${sessionId}`);
+        const data = await res.json();
+        const raw = data.messages || data.entries || [];
+        const msgs: ChatMessage[] = raw.map((m: Record<string, unknown>) => ({
+          message_id: (m.message_id as string) || getNextId("msg"),
+          role: (m.role as "user" | "observer" | "system") || (m.role as string) === "assistant" ? "observer" : (m.role as "user" | "observer" | "system"),
+          content: (m.content as string) || "",
+          timestamp: (m.timestamp as string) || new Date().toISOString(),
+          session_id: (m.session_id as string) || sessionId,
+          task_domain: m.task_domain as string | undefined,
+          complexity: m.complexity as string | undefined,
+          observer_metadata: (m.observer_metadata as Record<string, unknown>) || {},
+        }));
+        set({ messages: msgs, activeSessionId: sessionId });
+      } catch (err) {
+        set({ error: "Failed to load chat history" });
+        console.error("Failed to load chat history:", err);
+      } finally {
+        set({ isLoading: false });
+      }
+    },
 
-  sendMessage: async (message: string, sessionId?: string) => {
-    set({ isSending: true, error: null });
-    const userMsg: ChatMessage = {
-      message_id: getNextId("local"),
-      role: "user",
-      content: message,
-      timestamp: new Date().toISOString(),
-      session_id: sessionId || get().activeSessionId || "",
-    };
-    set((s) => ({ messages: [...s.messages, userMsg] }));
-
-    try {
-      // Use streaming endpoint for real-time progress updates
-      const res = await fetch("/api/chat/stream", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message,
-          session_id: sessionId || get().activeSessionId,
-        }),
+    sendMessage: async (message: string, sessionId?: string) => {
+      set({
+        isSending: true,
+        error: null,
+        streamStatus: { active: true, stage: "thinking", detail: "🧠 Thinking..." }
       });
 
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
+      const userMsg: ChatMessage = {
+        message_id: getNextId("local"),
+        role: "user",
+        content: message,
+        timestamp: new Date().toISOString(),
+        session_id: sessionId || get().activeSessionId || "",
+      };
+      set((s) => ({ messages: [...s.messages, userMsg] }));
 
-      // Read SSE stream
-      const reader = res.body?.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-      let finalData: any = null;
-      const progressMessages: ChatMessage[] = [];
+      try {
+        const res = await fetch("/api/chat/stream", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message,
+            session_id: sessionId || get().activeSessionId,
+          }),
+        });
 
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
 
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split("\n\n");
-          buffer = lines.pop() || "";
+        const reader = res.body?.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        let finalData: any = null;
 
-          for (const line of lines) {
-            if (!line.startsWith("data: ")) continue;
-            const jsonStr = line.slice(6).trim();
-            if (!jsonStr) continue;
+        if (reader) {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
 
-            try {
-              const evt = JSON.parse(jsonStr);
-              const eventType = evt.type || evt.event;
-              const data = evt.data || {};
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n\n");
+            buffer = lines.pop() || "";
 
-              if (eventType === "round") {
-                const msg: ChatMessage = {
-                  message_id: getNextId("progress_round"),
-                  role: "system",
-                  content: `🔄 Round ${data.round}/${data.max} — Thinking...`,
-                  timestamp: new Date().toISOString(),
-                  session_id: sessionId || get().activeSessionId || "",
-                };
-                progressMessages.push(msg);
-                set((s) => ({ messages: [...s.messages, msg] }));
-              } else if (eventType === "tool_call") {
-                const msg: ChatMessage = {
-                  message_id: getNextId("progress_tool"),
-                  role: "system",
-                  content: `🔧 Tool: ${data.tool} — Executing...`,
-                  timestamp: new Date().toISOString(),
-                  session_id: sessionId || get().activeSessionId || "",
-                };
-                progressMessages.push(msg);
-                set((s) => ({ messages: [...s.messages, msg] }));
-              } else if (eventType === "tool_result") {
-                const preview = (data.result || "").substring(0, 120);
-                const msg: ChatMessage = {
-                  message_id: getNextId("progress_result"),
-                  role: "system",
-                  content: `📋 ${data.tool}: ${preview}${data.result?.length > 120 ? "..." : ""}`,
-                  timestamp: new Date().toISOString(),
-                  session_id: sessionId || get().activeSessionId || "",
-                };
-                progressMessages.push(msg);
-                set((s) => ({ messages: [...s.messages, msg] }));
-              } else if (eventType === "complete") {
-                const msg: ChatMessage = {
-                  message_id: getNextId("progress_complete"),
-                  role: "system",
-                  content: "✅ Agent complete — Sending final response...",
-                  timestamp: new Date().toISOString(),
-                  session_id: sessionId || get().activeSessionId || "",
-                };
-                set((s) => ({ messages: [...s.messages, msg] }));
-              } else if (eventType === "max_rounds") {
-                const msg: ChatMessage = {
-                  message_id: getNextId("progress_max"),
-                  role: "system",
-                  content: "⚠️ Max tool rounds reached. Generating final response...",
-                  timestamp: new Date().toISOString(),
-                  session_id: sessionId || get().activeSessionId || "",
-                };
-                set((s) => ({ messages: [...s.messages, msg] }));
-              } else if (eventType === "final") {
-                finalData = data;
-              } else if (eventType === "error") {
-                const msg: ChatMessage = {
-                  message_id: getNextId("error"),
-                  role: "system",
-                  content: `❌ Error: ${data.message || "Unknown error"}`,
-                  timestamp: new Date().toISOString(),
-                  session_id: sessionId || get().activeSessionId || "",
-                };
-                set((s) => ({ messages: [...s.messages, msg] }));
+            for (const line of lines) {
+              if (!line.startsWith("data: ")) continue;
+              const jsonStr = line.slice(6).trim();
+              if (!jsonStr || jsonStr === "[DONE]") continue;
+
+              try {
+                const evt = JSON.parse(jsonStr);
+                const eventType = evt.type || evt.event;
+                const data = evt.data || {};
+
+                if (eventType === "round") {
+                  set({
+                    streamStatus: {
+                      active: true,
+                      stage: "thinking",
+                      detail: `🔄 Round ${data.round}/${data.max} — Thinking...`,
+                      round: data.round,
+                      maxRounds: data.max,
+                    }
+                  });
+                } else if (eventType === "tool_call") {
+                  set({
+                    streamStatus: {
+                      active: true,
+                      stage: "tool_call",
+                      detail: `🔧 ${data.tool}`,
+                      tool: data.tool,
+                      round: data.round,
+                    }
+                  });
+                } else if (eventType === "tool_result") {
+                  const preview = (data.result || "").substring(0, 80);
+                  set({
+                    streamStatus: {
+                      active: true,
+                      stage: "tool_result",
+                      detail: `📋 ${data.tool}: ${preview}${data.result?.length > 80 ? "…" : ""}`,
+                      tool: data.tool,
+                      toolResult: preview,
+                    }
+                  });
+                } else if (eventType === "complete") {
+                  set({
+                    streamStatus: {
+                      active: true,
+                      stage: "responding",
+                      detail: "💬 Generating response...",
+                    }
+                  });
+                } else if (eventType === "max_rounds") {
+                  set({
+                    streamStatus: {
+                      active: true,
+                      stage: "responding",
+                      detail: "⚠️ Max rounds — Generating final response...",
+                    }
+                  });
+                } else if (eventType === "final") {
+                  finalData = data;
+                } else if (eventType === "error") {
+                  set({
+                    streamStatus: {
+                      active: true,
+                      stage: "error",
+                      detail: `❌ ${data.message || "Unknown error"}`,
+                    }
+                  });
+                }
+              } catch (_parseErr) {
+                // Skip malformed SSE events
               }
-            } catch (parseErr) {
-              // Skip malformed SSE events
             }
           }
         }
-      }
 
-      // Send final response
-      if (finalData) {
-        const observerMsg: ChatMessage = {
-          message_id: getNextId("observer"),
-          role: "observer",
-          content: finalData.response || "No response",
-          timestamp: new Date().toISOString(),
-          session_id: finalData.session_id || sessionId || "",
-          task_domain: finalData.observer?.task_domain,
-          complexity: finalData.observer?.complexity,
-          observer_metadata: {
-            routing_path: finalData.observer?.routing_path,
-            model: finalData.observer?.model,
-            confidence: finalData.confidence,
-            agreement: finalData.observer?.agreement,
-            spawn_status: finalData.observer?.spawn_status,
-            system: finalData.system,
-          },
-        };
-        set((s) => ({ messages: [...s.messages, observerMsg] }));
-      }
+        // Add final response as a chat message
+        if (finalData) {
+          const observerMsg: ChatMessage = {
+            message_id: getNextId("observer"),
+            role: "observer",
+            content: finalData.response || "No response",
+            timestamp: new Date().toISOString(),
+            session_id: finalData.session_id || sessionId || "",
+            task_domain: finalData.observer?.task_domain,
+            complexity: finalData.observer?.complexity,
+            observer_metadata: {
+              routing_path: finalData.observer?.routing_path,
+              model: finalData.observer?.model,
+              confidence: finalData.confidence,
+              agreement: finalData.observer?.agreement,
+              spawn_status: finalData.observer?.spawn_status,
+              system: finalData.system,
+            },
+          };
+          set((s) => ({
+            messages: [...s.messages, observerMsg],
+            streamStatus: { active: false, stage: "complete", detail: "" },
+          }));
+        } else {
+          set({ streamStatus: { active: false, stage: "", detail: "" } });
+        }
 
-      // Reload sessions to update the list
-      await get().loadSessions();
-    } catch (err) {
-      set({ error: "Failed to send message" });
-      console.error("Failed to send message:", err);
-    } finally {
-      set({ isSending: false });
-    }
-  },
-
-  createSession: async (title?: string) => {
-    try {
-      const res = await fetch("/api/chat/sessions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title }),
-      });
-      const data = await res.json();
-      if (data.session) {
-        set({ activeSessionId: data.session.session_id, messages: [] });
         await get().loadSessions();
+      } catch (err) {
+        set({
+          error: "Failed to send message",
+          streamStatus: { active: false, stage: "error", detail: "Connection failed" },
+        });
+        console.error("Failed to send message:", err);
+      } finally {
+        set({ isSending: false });
       }
-    } catch (err) {
-      set({ error: "Failed to create session" });
-      console.error("Failed to create session:", err);
-    }
-  },
+    },
 
-  deleteSession: async (sessionId: string) => {
-    try {
-      await fetch(`/api/chat/sessions/${sessionId}`, { method: "DELETE" });
-      const { activeSessionId } = get();
-      if (activeSessionId === sessionId) {
-        set({ activeSessionId: null, messages: [] });
+    createSession: async (title?: string) => {
+      try {
+        const res = await fetch("/api/chat/sessions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title }),
+        });
+        const data = await res.json();
+        if (data.session) {
+          set({ activeSessionId: data.session.session_id, messages: [] });
+          await get().loadSessions();
+        }
+      } catch (err) {
+        set({ error: "Failed to create session" });
+        console.error("Failed to create session:", err);
       }
-      await get().loadSessions();
-    } catch (err) {
-      set({ error: "Failed to delete session" });
-      console.error("Failed to delete session:", err);
-    }
-  },
+    },
 
-  searchMessages: async (query: string): Promise<ChatMessage[]> => {
-    try {
-      const res = await fetch(
-        `/api/chat/search?q=${encodeURIComponent(query)}`
-      );
-      const data = await res.json();
-      return data.results || [];
-    } catch (err) {
-      console.error("Failed to search messages:", err);
-      return [];
-    }
-  },
-}});
+    deleteSession: async (sessionId: string) => {
+      try {
+        await fetch(`/api/chat/sessions/${sessionId}`, { method: "DELETE" });
+        const { activeSessionId } = get();
+        if (activeSessionId === sessionId) {
+          set({ activeSessionId: null, messages: [] });
+        }
+        await get().loadSessions();
+      } catch (err) {
+        set({ error: "Failed to delete session" });
+        console.error("Failed to delete session:", err);
+      }
+    },
+
+    searchMessages: async (query: string): Promise<ChatMessage[]> => {
+      try {
+        const res = await fetch(
+          `/api/chat/search?q=${encodeURIComponent(query)}`
+        );
+        const data = await res.json();
+        return data.results || [];
+      } catch (err) {
+        console.error("Failed to search messages:", err);
+        return [];
+      }
+    },
+  };
+});
