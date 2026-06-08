@@ -16,3 +16,26 @@ def test_scale_bridge_start_stop():
     assert mod.running is True
     mod.stop()
     assert mod.running is False
+
+
+def test_scale_bridge_register_translation():
+    """Register and retrieve scale translations."""
+    mod = ScaleBridgeModule()
+    mod.start()
+    mod.register_translation("tick", "bar", "sum", field="volume")
+    mod.register_translation("bar", "session", "aggregate")
+    assert mod.get_translation("tick", "bar") is not None
+    assert mod.get_translation("tick", "bar").strategy == "sum"
+    assert mod.get_translation("bar", "session").strategy == "aggregate"
+    assert mod.get_translation("tick", "daily") is None
+    mod.stop()
+
+
+def test_scale_bridge_translate():
+    """Translate data between scales."""
+    mod = ScaleBridgeModule()
+    mod.start()
+    mod.register_translation("tick", "bar", "sum")
+    result = mod.translate("tick", "bar", [1, 2, 3, 4])
+    assert result == 10
+    mod.stop()

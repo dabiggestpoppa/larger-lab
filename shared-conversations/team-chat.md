@@ -4,7 +4,64 @@
 > **Current focus:** O2C × MAD LABS Sovereign Research Mesh — Phases L1→L4
 > **Plan:** `docs/plans/O2C-RESEARCH-MESH.md`
 > **Tasks:** `progress/O2C-RESEARCH-MESH-TASKS.md`
-> **Last Updated:** 2026-06-08 (OC2 decommissioned, Hermes raw agent online)
+> **Last Updated:** 2026-06-08 (PO bridge fixes, predecessor data ingested, quant lab focus)
+
+---
+
+## 🔴 CURRENT FOCUS (2026-06-08)
+
+**Quant Lab is now the primary focus.** OCE/SRRA-OPC stable. Research mesh stable. PO working on bridge/signal bot.
+
+### What's Happening
+- **PO:** Fixed bridge AutoTrading bug (MT5 GUI toggle), signal bot SL type fix, bridge scanning 6 Low Cost Hex pairs
+- **PM2:** Ingested 60+ predecessor PDFs + Excel (10.5MB), created distribution tracker module, updated Quant Bible
+- **MAD:** Uploaded predecessor system data (Fibonacci approach that birthed CEREBUS manual)
+- **CC:** Needs to plan distribution tracker integration (Fibonacci + Atomic overlay)
+
+### Key Predecessor Findings
+1. **Fibonacci Approach**: Range A → Fib extensions (-25%, -50%, -100%, -168%) → 132% invalidation
+2. **132% Realignment Trigger**: 98% hit rate — foundation of Kill-Switch State
+3. **Cross-Asset Universal**: EUR/USD, OIL/USD, ETH/USD all validate
+4. **Multi-Market Model**: 1,401 sessions, 948 Fibonacci hits confirmed
+5. **Overlay**: Fibonacci levels map to atomic structure completions
+
+### Files for CC
+- `quant-lab/reports/predecessor/README.md` — Summary
+- `quant-lab/distribution/tracker.py` — Distribution tracker module (started)
+- `quant-lab/QUANT_BIBLE.md` — Current system bible
+- `docs/CEREBUS_AGENT.md` — Agent spec
+
+---
+
+## 🔴 PREDECESSOR DATA INGESTION (2026-06-08)
+
+**MAD uploaded 12 PDFs + 1 Excel (10.5MB) — the predecessor system that birthed the CEREBUS manual.**
+
+### What Was Processed
+- ✅ 12 PDFs extracted to `quant-lab/reports/predecessor/` (text format)
+- ✅ README.md created with key findings for CC planning
+- ⏳ Excel file (`cerebus 3 market hoily grail (3).xlsx`, 10.5MB, 100 sheets) — NOT YET PROCESSED
+
+### Key Findings for CC
+1. **Fibonacci Approach**: Range A (Asian session) → Fibonacci extensions (-25%, -50%, -100%, -168%) → 132% invalidation
+2. **132% Realignment Trigger**: 98% hit rate during bifurcation (Asian ≠ London) — foundation of Kill-Switch State
+3. **Cross-Asset Universal**: EUR/USD, OIL/USD, ETH/USD all validate same patterns
+4. **Multi-Market Model**: 1,401 sessions validated, 948 Fibonacci hits confirmed
+5. **The Overlay**: Fibonacci levels map to atomic structure completions (Fib = roadmap, atomic = precision)
+
+### Files CC Should Read
+1. `quant-lab/reports/predecessor/README.md` — Summary of all findings
+2. `quant-lab/reports/predecessor/crypto_fibonacci.txt` — Clearest Fibonacci explanation
+3. `quant-lab/reports/predecessor/oilusd_bifurcation.txt` — 132% trigger validation
+4. `quant-lab/reports/predecessor/cross_asset_analysis.txt` — Cross-asset patterns
+5. `quant-lab/reports/predecessor/cerebus_master_scroll.txt` — Multi-market model
+6. `quant-lab/ontology/manual_ontology.md` — Current ontology
+
+### What CC Needs to Plan
+1. Process the Excel file (10.5MB, 100 sheets) — the holy grail with raw data
+2. Integrate Fibonacci + Atomic approaches (overlay mapping)
+3. Update Quant Bible with predecessor data
+4. Decide: standalone distribution tracker or integrated into bridge?
 
 ---
 

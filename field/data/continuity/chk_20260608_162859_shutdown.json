@@ -1,0 +1,11 @@
+{
+  "checkpoint_id": "chk_20260608_162859_shutdown",
+  "session_id": "session_20260608_162811_15452",
+  "timestamp": "2026-06-08T16:28:59.811495+00:00",
+  "label": "shutdown",
+  "field_version": "4.0.0",
+  "modules": {},
+  "agents": {},
+  "metadata": {},
+  "checksum": "c8340cffa37b43b35d29049fdeb5576585a381e019e41f69225e5b319a4c245e"
+}

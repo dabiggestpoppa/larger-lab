@@ -41,3 +41,9 @@
 {"engine": "SymmetryTrap", "symbol": "GBPNZD.PRO", "direction": "BUY", "entry": 1.06271, "sl": 2.29505, "tp": 1.06491, "event": "SL_HIT", "loop": 1, "time": "2026-06-08 05:39:00"}
 {"engine": "SymmetryTrap", "symbol": "GBPNZD.PRO", "direction": "SELL", "entry": 1.0619, "sl": 1.06188, "tp": 1.0607, "event": "ENTRY", "loop": 1, "time": "2026-06-08 09:03:00"}
 {"engine": "SymmetryTrap", "symbol": "GBPNZD.PRO", "direction": "SELL", "entry": 1.0619, "sl": 1.06188, "tp": 1.0607, "event": "SL_HIT", "loop": 1, "time": "2026-06-08 09:05:00"}
+{"engine": "SymmetryTrap", "symbol": "GBPNZD.PRO", "direction": "BUY", "entry": 1.06341, "sl": 1.06372, "tp": 1.06461, "event": "ENTRY", "loop": 2, "time": "2026-06-08 10:57:00"}
+{"engine": "SymmetryTrap", "symbol": "GBPNZD.PRO", "direction": "BUY", "entry": 1.06341, "sl": 1.06372, "tp": 1.06461, "event": "SL_HIT", "loop": 2, "time": "2026-06-08 10:59:00"}
+{"engine": "SymmetryTrap", "symbol": "GBPCAD.PRO", "direction": "BUY", "entry": 1.86086, "sl": 1.8615, "tp": 1.8618599999999998, "event": "ENTRY", "loop": 1, "time": "2026-06-08 11:39:00"}
+{"engine": "SymmetryTrap", "symbol": "GBPCAD.PRO", "direction": "BUY", "entry": 1.86086, "sl": 1.8615, "tp": 1.8618599999999998, "event": "SL_HIT", "loop": 1, "time": "2026-06-08 11:41:00"}
+{"engine": "SymmetryTrap", "symbol": "GBPNZD.PRO", "direction": "BUY", "entry": 2.29563, "sl": 2.29639, "tp": 2.29683, "event": "ENTRY", "loop": 1, "time": "2026-06-08 13:51:00"}
+{"engine": "SymmetryTrap", "symbol": "GBPNZD.PRO", "direction": "BUY", "entry": 2.29563, "sl": 2.29639, "tp": 2.29683, "event": "SL_HIT", "loop": 1, "time": "2026-06-08 13:53:00"}
