@@ -860,18 +860,11 @@ def run_live(symbols: list, lot_size: float = 0.01):
         log.info("Stopped by user.")
     except Exception as e:
         log.error("FATAL: %s", e, exc_info=True)
-        log.info("Auto-restarting in 10 seconds...")
+        log.error("Auto-restart DISABLED — exiting. Use process_registry.py to restart.")
         try:
             mt5.shutdown()
         except Exception:
             pass
-        time.sleep(10)
-        # Reinitialize and restart
-        try:
-            mt5_connect()
-            run_live(symbols, lot_size)
-        except Exception as restart_err:
-            log.error("Restart failed: %s — exiting", restart_err)
     finally:
         try:
             mt5.shutdown()

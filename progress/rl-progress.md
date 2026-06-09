@@ -4,7 +4,47 @@
 > **Tag:** 🟢 [RL]
 > **Role:** Research Lead / DSPy Integration / Pipeline Optimization / Idle Runtime
 > **Reports to:** CC (Claude Code — Overseer)
-> **Last Updated:** 2026-06-05
+> **Last Updated:** 2026-06-08
+
+---
+
+## 🔴 DUPLICATE PROCESS CRISIS — RESOLVED (2026-06-08)
+
+**Severity:** CRITICAL — blocked all trading operations for 4+ days
+**Solution:** Built clean bridge with Windows mutex singleton enforcement
+
+### What Was Done:
+1. **Created `quant-lab/mt5/clean_bridge.py`** — New bridge with bulletproof singleton
+   - Windows named mutex (OS-level guarantee)
+   - PID file lock (fallback)
+   - Kills ALL other bridge processes on startup
+   - Explicit venv Python path (no UV interception)
+
+2. **Updated `scripts/signal_bot.py`** — Added same singleton enforcement pattern
+
+3. **Updated `scripts/process_registry.py`** — Points to clean_bridge.py
+
+4. **Updated `quant-lab/mt5/deploy_config.py`** — Added FR40.PRO configuration
+
+5. **Created `scripts/start_clean_bridge.ps1`** — Explicit venv startup script
+
+### Files Changed:
+- `quant-lab/mt5/clean_bridge.py` — NEW (bulletproof singleton)
+- `scripts/signal_bot.py` — Added singleton enforcement
+- `scripts/process_registry.py` — Updated to use clean_bridge
+- `quant-lab/mt5/deploy_config.py` — Added FR40.PRO
+- `scripts/kill_duplicates.ps1` — Updated to use clean_bridge
+- `scripts/start_clean_bridge.ps1` — NEW (explicit venv startup)
+
+### Usage:
+```powershell
+# Kill all duplicates and start clean
+powershell -ExecutionPolicy Bypass -File scripts/kill_duplicates.ps1
+
+# Or use process_registry
+.venv\Scripts\python.exe scripts/process_registry.py --clean
+.venv\Scripts\python.exe scripts/process_registry.py --start
+```
 
 ---
 
