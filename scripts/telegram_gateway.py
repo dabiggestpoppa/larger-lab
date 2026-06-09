@@ -43,33 +43,32 @@ _MUTEX_NAME = "Global\\TelegramGateway_Singleton_Mutex"
 
 def _kill_all_gateway_processes():
     """Kill ALL other telegram_gateway.py processes (except self)."""
-    import ctypes
-    kernel32 = ctypes.windll.kernel32
-    PROCESS_TERMINATE = 0x0001
-    PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
     my_pid = os.getpid()
     killed = 0
     try:
         result = __import__('subprocess').run(
-            ["powershell", "-Command",
-             "Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | "
-             "Where-Object { $_.CommandLine -like '*telegram_gateway*' -and $_.ProcessId -ne " + str(my_pid) + " } | "
-             "Select-Object -ExpandProperty ProcessId"],
-            capture_output=True, text=True, timeout=10
-        )
+            ["tasklist", "/FI", "IMAGENAME eq python.exe", "/FO", "CSV", "/NH"],
+            capture_output=True, text=True, timeout=10)
         for line in result.stdout.strip().split('\n'):
             line = line.strip()
-            if not line:
+            if not line or 'python.exe' not in line.lower():
+                continue
+            parts = line.split(',')
+            if len(parts) < 2:
                 continue
             try:
-                pid = int(line)
-                handle = kernel32.OpenProcess(PROCESS_TERMINATE, False, pid)
-                if handle:
-                    kernel32.TerminateProcess(handle, 1)
-                    kernel32.CloseHandle(handle)
+                pid = int(parts[1].strip('"'))
+                if pid == my_pid:
+                    continue
+                cmd_result = __import__('subprocess').run(
+                    ["wmic", "process", "where", f"ProcessId={pid}", "get", "CommandLine"],
+                    capture_output=True, text=True, timeout=5)
+                if 'telegram_gateway' in cmd_result.stdout:
+                    __import__('subprocess').run(["taskkill", "/F", "/PID", str(pid)],
+                        capture_output=True, timeout=5)
                     killed += 1
                     log(f"Killed duplicate gateway PID {pid}")
-            except (ValueError, OSError):
+            except (ValueError, OSError, IndexError):
                 pass
     except Exception as e:
         log(f"Error scanning for duplicates: {e}")
@@ -78,51 +77,25 @@ def _kill_all_gateway_processes():
     return killed
 
 def _acquire_singleton():
-    """Acquire Windows named mutex + kill all duplicates. Returns True if we own the singleton."""
-    import ctypes
-    kernel32 = ctypes.windll.kernel32
+    """Kill all duplicates + retry. No mutex — kill-duplicates is sufficient."""
+    # Step 1: Kill ALL other gateway processes
+    killed = _kill_all_gateway_processes()
 
-    # Step 1: Kill ALL other gateway processes first
-    _kill_all_gateway_processes()
-
-    # Step 2: Create Windows named mutex (true OS-level singleton)
-    # CREATE_NEW = 1, ERROR_ALREADY_EXISTS = 183
-    mutex = kernel32.CreateMutexW(None, False, _MUTEX_NAME)
-    last_error = kernel32.GetLastError()
-
-    if last_error == 183:  # ERROR_ALREADY_EXISTS
-        # Another instance holds the mutex — wait briefly then check again
-        # (it might be shutting down)
-        if mutex:
-            kernel32.CloseHandle(mutex)
-        time.sleep(3)
-        # Try killing duplicates again and re-acquire
-        _kill_all_gateway_processes()
-        mutex = kernel32.CreateMutexW(None, False, _MUTEX_NAME)
-        last_error = kernel32.GetLastError()
-        if last_error == 183:
-            log("[FATAL] Another gateway instance holds the mutex. Exiting.")
-            return False
+    # Step 2: If we killed something, wait longer for OS to clean up
+    if killed > 0:
+        time.sleep(5)
 
     # Step 3: Write PID file
-    with open(_PID_FILE, "w") as f:
-        f.write(str(os.getpid()))
+    try:
+        with open(_PID_FILE, "w") as f:
+            f.write(str(os.getpid()))
+    except Exception:
+        pass
 
     return True
 
 def _release_singleton():
-    """Release mutex and clean up PID file."""
-    import ctypes
-    kernel32 = ctypes.windll.kernel32
-    # Release mutex
-    try:
-        mutex = kernel32.OpenMutexW(0x00100000, False, _MUTEX_NAME)  # SYNCHRONIZE access
-        if mutex:
-            kernel32.ReleaseMutex(mutex)
-            kernel32.CloseHandle(mutex)
-    except:
-        pass
-    # Remove PID file
+    """Clean up PID file."""
     if os.path.exists(_PID_FILE):
         try:
             os.remove(_PID_FILE)
@@ -309,10 +282,11 @@ def main():
         log("ERROR: TELEGRAM_TOKEN not set")
         return
 
-    # Acquire singleton (kills all duplicates + Windows mutex)
+    # Acquire singleton (kills all duplicates)
     if not _acquire_singleton():
         sys.exit(1)
 
+    log(f"Starting telegram gateway with token {token[:10]}...")
     base_url = f"https://api.telegram.org/bot{token}"
     offset = 0
 
