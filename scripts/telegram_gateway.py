@@ -35,55 +35,94 @@ from core.observer.presence_engine import (
 )
 from oce.backend.rate_limit_tracker import record_api_call, get_rate_limit_tracker
 
-# --- PID File Lock ---
+# --- Singleton Enforcement (Windows Mutex + PID File) ---
+# Uses a Windows named mutex for true OS-level singleton guarantee.
+# Also kills ALL other telegram_gateway.py processes on startup.
 _PID_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".telegram_gateway.pid")
+_MUTEX_NAME = "Global\\TelegramGateway_Singleton_Mutex"
 
-def _is_process_alive(pid):
-    """Cross-platform process existence check."""
-    if pid == os.getpid():
-        return True
-    if sys.platform == "win32":
-        import ctypes
-        kernel32 = ctypes.windll.kernel32
-        PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
-        handle = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
-        if handle:
-            kernel32.CloseHandle(handle)
-            return True
-        return False
-    else:
-        try:
-            os.kill(pid, 0)
-            return True
-        except (OSError, ProcessLookupError):
+def _kill_all_gateway_processes():
+    """Kill ALL other telegram_gateway.py processes (except self)."""
+    import ctypes
+    kernel32 = ctypes.windll.kernel32
+    PROCESS_TERMINATE = 0x0001
+    PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+    my_pid = os.getpid()
+    killed = 0
+    try:
+        result = __import__('subprocess').run(
+            ["powershell", "-Command",
+             "Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | "
+             "Where-Object { $_.CommandLine -like '*telegram_gateway*' -and $_.ProcessId -ne " + str(my_pid) + " } | "
+             "Select-Object -ExpandProperty ProcessId"],
+            capture_output=True, text=True, timeout=10
+        )
+        for line in result.stdout.strip().split('\n'):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                pid = int(line)
+                handle = kernel32.OpenProcess(PROCESS_TERMINATE, False, pid)
+                if handle:
+                    kernel32.TerminateProcess(handle, 1)
+                    kernel32.CloseHandle(handle)
+                    killed += 1
+                    log(f"Killed duplicate gateway PID {pid}")
+            except (ValueError, OSError):
+                pass
+    except Exception as e:
+        log(f"Error scanning for duplicates: {e}")
+    if killed > 0:
+        time.sleep(2)  # Wait for processes to die
+    return killed
+
+def _acquire_singleton():
+    """Acquire Windows named mutex + kill all duplicates. Returns True if we own the singleton."""
+    import ctypes
+    kernel32 = ctypes.windll.kernel32
+
+    # Step 1: Kill ALL other gateway processes first
+    _kill_all_gateway_processes()
+
+    # Step 2: Create Windows named mutex (true OS-level singleton)
+    # CREATE_NEW = 1, ERROR_ALREADY_EXISTS = 183
+    mutex = kernel32.CreateMutexW(None, False, _MUTEX_NAME)
+    last_error = kernel32.GetLastError()
+
+    if last_error == 183:  # ERROR_ALREADY_EXISTS
+        # Another instance holds the mutex — wait briefly then check again
+        # (it might be shutting down)
+        if mutex:
+            kernel32.CloseHandle(mutex)
+        time.sleep(3)
+        # Try killing duplicates again and re-acquire
+        _kill_all_gateway_processes()
+        mutex = kernel32.CreateMutexW(None, False, _MUTEX_NAME)
+        last_error = kernel32.GetLastError()
+        if last_error == 183:
+            log("[FATAL] Another gateway instance holds the mutex. Exiting.")
             return False
 
-def _acquire_pid_lock():
-    pid = os.getpid()
-    if os.path.exists(_PID_FILE):
-        try:
-            with open(_PID_FILE, "r") as f:
-                old_pid = int(f.read().strip())
-            if old_pid != pid and _is_process_alive(old_pid):
-                log("[WARN] Stale PID file (PID %d alive). Killing old instance..." % old_pid)
-                try:
-                    import ctypes
-                    kernel32 = ctypes.windll.kernel32
-                    PROCESS_TERMINATE = 0x0001
-                    handle = kernel32.OpenProcess(PROCESS_TERMINATE, False, old_pid)
-                    if handle:
-                        kernel32.TerminateProcess(handle, 1)
-                        kernel32.CloseHandle(handle)
-                        log("Killed old instance PID %d" % old_pid)
-                        time.sleep(2)
-                except Exception as _ke:
-                    log("Could not kill old instance: %s" % _ke)
-        except (ValueError, FileNotFoundError):
-            pass
+    # Step 3: Write PID file
     with open(_PID_FILE, "w") as f:
-        f.write(str(pid))
+        f.write(str(os.getpid()))
 
-def _release_pid_lock():
+    return True
+
+def _release_singleton():
+    """Release mutex and clean up PID file."""
+    import ctypes
+    kernel32 = ctypes.windll.kernel32
+    # Release mutex
+    try:
+        mutex = kernel32.OpenMutexW(0x00100000, False, _MUTEX_NAME)  # SYNCHRONIZE access
+        if mutex:
+            kernel32.ReleaseMutex(mutex)
+            kernel32.CloseHandle(mutex)
+    except:
+        pass
+    # Remove PID file
     if os.path.exists(_PID_FILE):
         try:
             os.remove(_PID_FILE)
@@ -270,8 +309,9 @@ def main():
         log("ERROR: TELEGRAM_TOKEN not set")
         return
 
-    # Acquire PID lock FIRST — before any network connections
-    _acquire_pid_lock()
+    # Acquire singleton (kills all duplicates + Windows mutex)
+    if not _acquire_singleton():
+        sys.exit(1)
 
     base_url = f"https://api.telegram.org/bot{token}"
     offset = 0
