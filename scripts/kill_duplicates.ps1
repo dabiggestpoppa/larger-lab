@@ -26,9 +26,9 @@ $base = "C:\Users\wifik\Desktop\projects\larger-lab"
 
 Write-Host "`n=== STARTING CLEAN INSTANCES ===" -ForegroundColor Green
 
-# Bridge
-Start-Process -WindowStyle Hidden -FilePath $venv -ArgumentList "$base\quant-lab\mt5\cerebus_live_bridge.py","--symbols","EURJPY.PRO,EURNZD.PRO,GBPNZD.PRO,EURAUD.PRO,GBPAUD.PRO,GBPCAD.PRO,FR40.PRO","--lot-size","0.01" -WorkingDirectory "$base\quant-lab\mt5"
-Write-Host "Bridge started"
+# Bridge (using clean_bridge.py with singleton enforcement)
+Start-Process -WindowStyle Hidden -FilePath $venv -ArgumentList "$base\quant-lab\mt5\clean_bridge.py","--symbols","EURJPY.PRO,EURNZD.PRO,GBPNZD.PRO,EURAUD.PRO,GBPAUD.PRO,GBPCAD.PRO,FR40.PRO","--lot-size","0.01" -WorkingDirectory "$base\quant-lab\mt5"
+Write-Host "Bridge started (clean_bridge.py)"
 Start-Sleep -Seconds 5
 
 # Signal Bot

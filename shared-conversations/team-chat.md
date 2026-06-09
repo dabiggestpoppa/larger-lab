@@ -6,7 +6,7 @@
 
 ---
 
-## 🔴 DUPLICATE PROCESS CRISIS — PM2 ESCALATION (2026-06-08)
+## 🔴 DUPLICATE PROCESS CRISIS — RESOLVED (2026-06-08)
 
 **Severity:** CRITICAL — blocked all trading operations for 4+ days
 **Full Report:** `progress/DUPLICATE-CRISIS-REPORT.md`
@@ -28,6 +28,39 @@ Every time we start the trading engines, DUPLICATE processes spawn immediately. 
 - `Start-Process -WindowStyle Hidden` → processes die when terminal ends
 - `cmd /c "start /B ..."` → same issue
 - Killing ALL Python then starting fresh → duplicates within 5 seconds
+
+### ✅ SOLUTION IMPLEMENTED:
+1. **Created `clean_bridge.py`** — New bridge with bulletproof singleton enforcement
+   - Windows named mutex (OS-level guarantee)
+   - PID file lock (fallback)
+   - Kills ALL other bridge processes on startup
+   - Explicit venv Python path (no UV interception)
+
+2. **Updated `signal_bot.py`** — Added same singleton enforcement pattern
+
+3. **Updated `process_registry.py`** — Points to `clean_bridge.py` instead of `cerebus_live_bridge.py`
+
+4. **Updated `deploy_config.py`** — Added FR40.PRO configuration
+
+5. **Updated `kill_duplicates.ps1`** — Uses clean_bridge.py
+
+### Files Changed:
+- `quant-lab/mt5/clean_bridge.py` — NEW (bulletproof singleton)
+- `scripts/signal_bot.py` — Added singleton enforcement
+- `scripts/process_registry.py` — Updated to use clean_bridge
+- `quant-lab/mt5/deploy_config.py` — Added FR40.PRO
+- `scripts/kill_duplicates.ps1` — Updated to use clean_bridge
+- `scripts/start_clean_bridge.ps1` — NEW (explicit venv startup)
+
+### Usage:
+```powershell
+# Kill all duplicates and start clean
+powershell -ExecutionPolicy Bypass -File scripts/kill_duplicates.ps1
+
+# Or use process_registry
+.venv\Scripts\python.exe scripts/process_registry.py --clean
+.venv\Scripts\python.exe scripts/process_registry.py --start
+```
 - Using only venv Python → UV instances still spawn as children
 
 ### Critical Lesson:
