@@ -35,29 +35,28 @@
 
 ---
 
-## Current Context (2026-05-21 14:07:41 UTC)
+## Current Context (2026-06-08)
 
 ### Status
-🟢 Active — V3 Phase 9 COMPLETE
+🟢 Active — DUPLICATE CRISIS RESOLVED
 
 ### Active Phase
-**V3 Phase 10 — Recursive Field Computation** ✅ COMPLETE
-
-### Pending Tasks
-- V3 maintenance: Monitor and optimize
-- V3 documentation: Finalize all phase docs
+**PO × VTuber Integration** — P3.4 pending
 
 ### Recent Activity
-#### [RL] 2026-05-18 — V3 Phase 7 Complete
-- Phase 7 multiscale modules verified (7 modules)
-- 24 tests passing for multiscale modules
-- Phase 7 complete
+#### [RL] 2026-06-08 — Duplicate Process Crisis Resolved
+- Created `quant-lab/mt5/clean_bridge.py` with Windows mutex singleton
+- Updated `scripts/signal_bot.py` with singleton enforcement
+- Updated `scripts/process_registry.py` to use clean_bridge
+- Added FR40.PRO to `quant-lab/mt5/deploy_config.py`
+- Created `scripts/start_clean_bridge.ps1` for explicit venv startup
+- **Root cause:** UV Python spawning as child of venv bridge (PID parent chain)
+- **Solution:** Windows named mutex + kill-all-duplicates on startup
 
-#### [RL] 2026-05-18 — Phase 8 Coevolution Tests Complete
-- Phase 8 coevolution modules verified (8 modules built by AS/PM/RL)
-- 76 tests created and passing for coevolution modules
-- Fixed syntax errors in alignment_tracking.py and anti_manipulation.py
-- Total OCE tests now: 1039 passing (was 963)
+### V3 Phases 7-9 (2026-05-18)
+- Phase 7 multiscale modules verified (7 modules, 24 tests)
+- Phase 8 coevolution tests (76 tests passing)
+- Phase 9 research: field coherence, DSPy attractor optimization, positional reference systems
 - **Next:** DSPy research for operator coevolution patterns
 
 #### [RL] 2026-05-18 12:15 UTC — Phase 9 Assignment Received
