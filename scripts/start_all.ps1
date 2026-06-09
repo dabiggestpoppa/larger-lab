@@ -1,5 +1,5 @@
 # START_ALL.PS1 — Start all trading engines and servers
-# Uses WMI to create truly detached processes
+# Usage: powershell -ExecutionPolicy Bypass -File scripts/start_all.ps1
 $ErrorActionPreference = "Continue"
 $env:PYTHONIOENCODING = "utf-8"
 
@@ -10,49 +10,36 @@ Write-Host "=== KILLING EXISTING PYTHON PROCESSES ===" -ForegroundColor Yellow
 Get-Process python -ErrorAction SilentlyContinue | Stop-Process -Force
 Start-Sleep -Seconds 3
 
-# Helper: create detached process via WMI
-function Start-DetachedProcess {
-    param([string]$ExePath, [string]$Arguments, [string]$WorkingDir)
-    $cmdLine = "`"$ExePath`" $Arguments"
-    try {
-        $result = Invoke-WmiMethod -Class Win32_Process -Name Create -ArgumentList $cmdLine, $WorkingDir
-        if ($result.ReturnValue -eq 0) {
-            Write-Host "  Started PID $($result.ProcessId): $Arguments"
-        } else {
-            Write-Host "  FAILED to start (ReturnValue: $($result.ReturnValue)): $Arguments" -ForegroundColor Red
-        }
-    } catch {
-        Write-Host "  ERROR starting: $_" -ForegroundColor Red
-    }
-}
-
 Write-Host "`n=== STARTING OCE BACKEND ===" -ForegroundColor Green
-Start-DetachedProcess -ExePath $venv -Arguments "-m oce.backend.main" -WorkingDir $base
+$p1 = Start-Process -FilePath $venv -ArgumentList "-m","oce.backend.main" -WorkingDirectory $base -WindowStyle Hidden -PassThru
+Write-Host "  OCE Backend: PID $($p1.Id)"
 Start-Sleep -Seconds 10
 $oce = Get-NetTCPConnection -State Listen -LocalPort 8000 -ErrorAction SilentlyContinue
-if ($oce) { Write-Host "  OCE Backend UP (port 8000, PID $($oce.OwningProcess))" } else { Write-Host "  OCE Backend NOT UP" }
+if ($oce) { Write-Host "  OCE Backend UP (port 8000)" } else { Write-Host "  OCE Backend NOT UP" }
 
 Write-Host "`n=== STARTING CLEAN BRIDGE ===" -ForegroundColor Green
-Start-DetachedProcess -ExePath $venv -Arguments "`"$base\quant-lab\mt5\clean_bridge.py`" --symbols EURJPY.PRO,EURNZD.PRO,GBPNZD.PRO,EURAUD.PRO,GBPAUD.PRO,GBPCAD.PRO,FR40.PRO --lot-size 0.01" -WorkingDir "$base\quant-lab\mt5"
+$p2 = Start-Process -FilePath $venv -ArgumentList "$base\quant-lab\mt5\clean_bridge.py","--symbols","EURJPY.PRO,EURNZD.PRO,GBPNZD.PRO,EURAUD.PRO,GBPAUD.PRO,GBPCAD.PRO,FR40.PRO","--lot-size","0.01" -WorkingDirectory "$base\quant-lab\mt5" -WindowStyle Hidden -PassThru
+Write-Host "  Bridge: PID $($p2.Id)"
 Start-Sleep -Seconds 10
 
 Write-Host "`n=== STARTING SIGNAL BOT ===" -ForegroundColor Green
-Start-DetachedProcess -ExePath $venv -Arguments "`"$base\scripts\signal_bot.py`"" -WorkingDir $base
+$p3 = Start-Process -FilePath $venv -ArgumentList "$base\scripts\signal_bot.py" -WorkingDirectory $base -WindowStyle Hidden -PassThru
+Write-Host "  Signal Bot: PID $($p3.Id)"
 Start-Sleep -Seconds 8
 
 Write-Host "`n=== STARTING TELEGRAM GATEWAY ===" -ForegroundColor Green
-Start-DetachedProcess -ExePath $venv -Arguments "`"$base\scripts\telegram_gateway.py`"" -WorkingDir $base
+$p4 = Start-Process -FilePath $venv -ArgumentList "$base\scripts\telegram_gateway.py" -WorkingDirectory $base -WindowStyle Hidden -PassThru
+Write-Host "  Telegram: PID $($p4.Id)"
 Start-Sleep -Seconds 10
 
-Write-Host "`n=== FINAL STATUS ===" -ForegroundColor Cyan
-Write-Host "Python processes:"
+Write-Host "`n=== STATUS ===" -ForegroundColor Cyan
 Get-CimInstance Win32_Process -Filter "Name='python.exe'" | ForEach-Object {
     $cmd = $_.CommandLine
     if ($cmd.Length -gt 120) { $cmd = $cmd.Substring(0, 120) + "..." }
     Write-Host "  PID $($_.ProcessId): $cmd"
 }
 
-Write-Host "`nListening ports:"
-Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object { $_.LocalPort -in 3000,3001,3002,8000,8001 } | Select-Object LocalPort, OwningProcess | Format-Table -AutoSize
+Write-Host "`n=== PORTS ==="
+Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object { $_.LocalPort -in 8000,3000 } | Select-Object LocalPort, OwningProcess | Format-Table -AutoSize
 
 Write-Host "`nDone!" -ForegroundColor Green
