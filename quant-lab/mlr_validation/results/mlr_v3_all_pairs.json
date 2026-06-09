@@ -1,0 +1,478 @@
+{
+  "EURUSD": {
+    "pair": "EURUSD",
+    "data_file": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\data\\EURUSDPRO_M5_2023_2026.csv",
+    "days": 756,
+    "intraday": {
+      "pair": "EURUSD",
+      "level": "intraday",
+      "total": 756,
+      "combined": {
+        "ext_25": {
+          "hits": 756,
+          "total": 756
+        },
+        "ext_50": {
+          "hits": 756,
+          "total": 756
+        },
+        "ext_100": {
+          "hits": 1,
+          "total": 756
+        },
+        "rekey": {
+          "hits": 0,
+          "total": 756
+        }
+      },
+      "counts": {
+        "+ext_25": {
+          "hits": 548,
+          "total": 756
+        },
+        "-ext_25": {
+          "hits": 542,
+          "total": 756
+        },
+        "+ext_50": {
+          "hits": 384,
+          "total": 756
+        },
+        "-ext_50": {
+          "hits": 373,
+          "total": 756
+        },
+        "+ext_100": {
+          "hits": 1,
+          "total": 756
+        },
+        "-ext_100": {
+          "hits": 0,
+          "total": 756
+        },
+        "+rekey": {
+          "hits": 0,
+          "total": 756
+        },
+        "-rekey": {
+          "hits": 0,
+          "total": 756
+        }
+      }
+    },
+    "weekly": {
+      "pair": "EURUSD",
+      "level": "weekly",
+      "total": 152,
+      "combined": {
+        "ext_25": {
+          "hits": 152,
+          "total": 152
+        },
+        "ext_50": {
+          "hits": 152,
+          "total": 152
+        },
+        "ext_100": {
+          "hits": 127,
+          "total": 152
+        },
+        "rekey": {
+          "hits": 101,
+          "total": 152
+        }
+      },
+      "counts": {
+        "+ext_25": {
+          "hits": 141,
+          "total": 152
+        },
+        "-ext_25": {
+          "hits": 148,
+          "total": 152
+        },
+        "+ext_50": {
+          "hits": 124,
+          "total": 152
+        },
+        "-ext_50": {
+          "hits": 129,
+          "total": 152
+        },
+        "+ext_100": {
+          "hits": 67,
+          "total": 152
+        },
+        "-ext_100": {
+          "hits": 79,
+          "total": 152
+        },
+        "+rekey": {
+          "hits": 50,
+          "total": 152
+        },
+        "-rekey": {
+          "hits": 61,
+          "total": 152
+        }
+      }
+    }
+  },
+  "LCOUSD": {
+    "pair": "LCOUSD",
+    "data_file": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\data\\LCOUSDPRO_M5.csv",
+    "days": 881,
+    "intraday": {
+      "pair": "LCOUSD",
+      "level": "intraday",
+      "total": 881,
+      "combined": {
+        "ext_25": {
+          "hits": 881,
+          "total": 881
+        },
+        "ext_50": {
+          "hits": 881,
+          "total": 881
+        },
+        "ext_100": {
+          "hits": 18,
+          "total": 881
+        },
+        "rekey": {
+          "hits": 0,
+          "total": 881
+        }
+      },
+      "counts": {
+        "+ext_25": {
+          "hits": 647,
+          "total": 881
+        },
+        "-ext_25": {
+          "hits": 611,
+          "total": 881
+        },
+        "+ext_50": {
+          "hits": 459,
+          "total": 881
+        },
+        "-ext_50": {
+          "hits": 423,
+          "total": 881
+        },
+        "+ext_100": {
+          "hits": 17,
+          "total": 881
+        },
+        "-ext_100": {
+          "hits": 1,
+          "total": 881
+        },
+        "+rekey": {
+          "hits": 0,
+          "total": 881
+        },
+        "-rekey": {
+          "hits": 0,
+          "total": 881
+        }
+      }
+    },
+    "weekly": {
+      "pair": "LCOUSD",
+      "level": "weekly",
+      "total": 176,
+      "combined": {
+        "ext_25": {
+          "hits": 176,
+          "total": 176
+        },
+        "ext_50": {
+          "hits": 176,
+          "total": 176
+        },
+        "ext_100": {
+          "hits": 139,
+          "total": 176
+        },
+        "rekey": {
+          "hits": 104,
+          "total": 176
+        }
+      },
+      "counts": {
+        "+ext_25": {
+          "hits": 169,
+          "total": 176
+        },
+        "-ext_25": {
+          "hits": 168,
+          "total": 176
+        },
+        "+ext_50": {
+          "hits": 152,
+          "total": 176
+        },
+        "-ext_50": {
+          "hits": 143,
+          "total": 176
+        },
+        "+ext_100": {
+          "hits": 73,
+          "total": 176
+        },
+        "-ext_100": {
+          "hits": 84,
+          "total": 176
+        },
+        "+rekey": {
+          "hits": 52,
+          "total": 176
+        },
+        "-rekey": {
+          "hits": 56,
+          "total": 176
+        }
+      }
+    }
+  },
+  "OILUSD": {
+    "pair": "OILUSD",
+    "data_file": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\data\\OILUSDPRO_M5.csv",
+    "days": 881,
+    "intraday": {
+      "pair": "OILUSD",
+      "level": "intraday",
+      "total": 880,
+      "combined": {
+        "ext_25": {
+          "hits": 880,
+          "total": 880
+        },
+        "ext_50": {
+          "hits": 880,
+          "total": 880
+        },
+        "ext_100": {
+          "hits": 11,
+          "total": 880
+        },
+        "rekey": {
+          "hits": 0,
+          "total": 880
+        }
+      },
+      "counts": {
+        "+ext_25": {
+          "hits": 632,
+          "total": 880
+        },
+        "-ext_25": {
+          "hits": 627,
+          "total": 880
+        },
+        "+ext_50": {
+          "hits": 444,
+          "total": 880
+        },
+        "-ext_50": {
+          "hits": 439,
+          "total": 880
+        },
+        "+ext_100": {
+          "hits": 11,
+          "total": 880
+        },
+        "-ext_100": {
+          "hits": 0,
+          "total": 880
+        },
+        "+rekey": {
+          "hits": 0,
+          "total": 880
+        },
+        "-rekey": {
+          "hits": 0,
+          "total": 880
+        }
+      }
+    },
+    "weekly": {
+      "pair": "OILUSD",
+      "level": "weekly",
+      "total": 176,
+      "combined": {
+        "ext_25": {
+          "hits": 176,
+          "total": 176
+        },
+        "ext_50": {
+          "hits": 176,
+          "total": 176
+        },
+        "ext_100": {
+          "hits": 140,
+          "total": 176
+        },
+        "rekey": {
+          "hits": 98,
+          "total": 176
+        }
+      },
+      "counts": {
+        "+ext_25": {
+          "hits": 170,
+          "total": 176
+        },
+        "-ext_25": {
+          "hits": 169,
+          "total": 176
+        },
+        "+ext_50": {
+          "hits": 152,
+          "total": 176
+        },
+        "-ext_50": {
+          "hits": 145,
+          "total": 176
+        },
+        "+ext_100": {
+          "hits": 73,
+          "total": 176
+        },
+        "-ext_100": {
+          "hits": 85,
+          "total": 176
+        },
+        "+rekey": {
+          "hits": 46,
+          "total": 176
+        },
+        "-rekey": {
+          "hits": 56,
+          "total": 176
+        }
+      }
+    }
+  },
+  "USDCHF": {
+    "pair": "USDCHF",
+    "data_file": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\data\\USDCHFPRO_M5_MAD.csv",
+    "days": 881,
+    "intraday": {
+      "pair": "USDCHF",
+      "level": "intraday",
+      "total": 881,
+      "combined": {
+        "ext_25": {
+          "hits": 881,
+          "total": 881
+        },
+        "ext_50": {
+          "hits": 881,
+          "total": 881
+        },
+        "ext_100": {
+          "hits": 18,
+          "total": 881
+        },
+        "rekey": {
+          "hits": 0,
+          "total": 881
+        }
+      },
+      "counts": {
+        "+ext_25": {
+          "hits": 637,
+          "total": 881
+        },
+        "-ext_25": {
+          "hits": 628,
+          "total": 881
+        },
+        "+ext_50": {
+          "hits": 433,
+          "total": 881
+        },
+        "-ext_50": {
+          "hits": 448,
+          "total": 881
+        },
+        "+ext_100": {
+          "hits": 18,
+          "total": 881
+        },
+        "-ext_100": {
+          "hits": 0,
+          "total": 881
+        },
+        "+rekey": {
+          "hits": 0,
+          "total": 881
+        },
+        "-rekey": {
+          "hits": 0,
+          "total": 881
+        }
+      }
+    },
+    "weekly": {
+      "pair": "USDCHF",
+      "level": "weekly",
+      "total": 177,
+      "combined": {
+        "ext_25": {
+          "hits": 177,
+          "total": 177
+        },
+        "ext_50": {
+          "hits": 177,
+          "total": 177
+        },
+        "ext_100": {
+          "hits": 138,
+          "total": 177
+        },
+        "rekey": {
+          "hits": 109,
+          "total": 177
+        }
+      },
+      "counts": {
+        "+ext_25": {
+          "hits": 169,
+          "total": 177
+        },
+        "-ext_25": {
+          "hits": 162,
+          "total": 177
+        },
+        "+ext_50": {
+          "hits": 146,
+          "total": 177
+        },
+        "-ext_50": {
+          "hits": 137,
+          "total": 177
+        },
+        "+ext_100": {
+          "hits": 81,
+          "total": 177
+        },
+        "-ext_100": {
+          "hits": 69,
+          "total": 177
+        },
+        "+rekey": {
+          "hits": 60,
+          "total": 177
+        },
+        "-rekey": {
+          "hits": 53,
+          "total": 177
+        }
+      }
+    }
+  }
+}
