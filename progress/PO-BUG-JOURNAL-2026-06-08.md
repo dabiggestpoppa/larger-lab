@@ -264,11 +264,36 @@ Poll timeout was increased from 30s to 60s to "reduce requests" — but this mad
 
 ---
 
-## Verification (2026-06-08 19:40 UTC)
+## Issue #9: Chronic Duplicate Process Problem (CRITICAL — ROOT CAUSE)
+
+### Symptoms
+- 90% of all PO failures were caused by duplicate gateway processes
+- Every "fix" session spent 15-30 mins just identifying and killing duplicates
+- Watchdog would start new gateways while old ones were still running
+- PID file got out of sync with actual running processes constantly
+
+### Root Cause
+**No OS-level singleton enforcement.** The gateway relied on a PID file that could go stale, be overwritten, or point to the wrong process. The watchdog checked the PID file first — if it was stale, it started a NEW gateway without killing the old one. Multiple agents could also start gateways freely.
+
+### Permanent Fix (Commit `2511b4a5`)
+- **Windows named mutex** (`Global\TelegramGateway_Singleton_Mutex`) = true OS-level singleton
+- **Gateway startup**: kills ALL other `telegram_gateway.py` processes before acquiring mutex
+- **Gateway startup**: exits if mutex already held by another instance
+- **Watchdog**: checks mutex first (most reliable indicator), falls back to process scan
+- **Watchdog**: kills ALL gateways before restart (clean slate every time)
+- **Watchdog**: detects and cleans up stale PID files
+
+This eliminates the duplicate process issue permanently at the OS level.
+
+---
+
+## Verification (2026-06-08 20:47 UTC)
 
 All fixes applied and verified:
-- Gateway PID 16712: polling clean, no 409 errors, no restarts
-- Watchdog PID 16392: stable, no restart loop
+- Gateway PID 12032: polling clean, no 409 errors, no restarts
+- Watchdog PID 20916: stable, no restart loop
 - OCE Backend PID 11712: running
 - API Server PID 21068: running
-- All 8 issues resolved, 8 commits pushed to master
+- **Gateway count: 1 (enforced by Windows mutex)**
+- **Watchdog count: 1**
+- All 9 issues resolved, 10 commits pushed to master
