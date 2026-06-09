@@ -3,7 +3,44 @@
 > **Purpose:** Quick-communication hub for CC/PM/PM2/AS/RL coordination.
 > **Current focus:** Quant Lab — 9K Config Test + Monte Carlo + Forward Test Prep
 > **Plan:** `quant-lab/QUANT_JOURNAL.md`
-> **Last Updated:** 2026-06-08 (CEREBUS permanent PO stability fix — 9 issues resolved, Windows mutex singleton, all servers stable)
+
+---
+
+## 🔴 DUPLICATE PROCESS CRISIS — PM2 ESCALATION (2026-06-08)
+
+**Severity:** CRITICAL — blocked all trading operations for 4+ days
+**Full Report:** `progress/DUPLICATE-CRISIS-REPORT.md`
+
+### TL;DR:
+Every time we start the trading engines, DUPLICATE processes spawn immediately. 29 Python processes running, many duplicates. Every agent says "I fixed it" but it keeps coming back.
+
+### Root Cause Found:
+- **Two Python interpreters:** venv (correct) + UV Python (duplicate spawner)
+- **UV instances are CHILD PROCESSES of the venv bridge** — PID 13336 (UV) → Parent: 7176 (venv bridge)
+- **`pyproject.toml` has `requires-python = ">=3.12"`** — matches UV Python 3.12, may cause UV to intercept
+- Bridge code has NO subprocess/multiprocessing/uv references — something in MT5 library or workspace detection is causing UV interception
+
+### What PM2 Tried (ALL FAILED):
+- `process_registry.py --clean` then `--start` → duplicates appear within seconds
+- Killing UV Python → respawns immediately as child of venv bridge
+- Disabling `twin_bridge` scheduled task → no effect
+- Bridge auto-restart disable → duplicates appear immediately on startup (NOT from auto-restart)
+- `Start-Process -WindowStyle Hidden` → processes die when terminal ends
+- `cmd /c "start /B ..."` → same issue
+- Killing ALL Python then starting fresh → duplicates within 5 seconds
+- Using only venv Python → UV instances still spawn as children
+
+### Critical Lesson:
+**Every agent has been "fixing" duplicates by killing and restarting. But the RESTART is what CREATES the duplicate.** We need to prevent the spawning, not just kill after the fact.
+
+### Handoff to Team:
+1. Find what's spawning UV Python as child of bridge (MT5 lib? pyproject.toml workspace detection?)
+2. Fix process startup method (true detached processes)
+3. Add FR40 to live engine config
+4. Set up proper watchdog that prevents duplicates, not just restarts
+
+**This needs a fresh pair of eyes. PM2 has spent hours going in circles.**
+> **Last Updated:** 2026-06-08 (⚠️ DUPLICATE CRISIS — PM2 escalating to full team, see progress/DUPLICATE-CRISIS-REPORT.md)
 
 > ## 🔴 June 8 — PO Stability Fixes (ALL RESOLVED — PERMANENT)
 >
