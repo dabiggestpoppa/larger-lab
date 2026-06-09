@@ -1,0 +1,83 @@
+{
+  "sheet_name": "top5_claims_validation",
+  "headers": [
+    "Claim",
+    "Claimed_Accuracy",
+    "Actual_Accuracy",
+    "Variance",
+    "Pass_Status",
+    "Threshold",
+    "Notes",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 5,
+  "data": [
+    {
+      "Claim": "Q4 Reconstruction",
+      "Claimed_Accuracy": 95.8,
+      "Actual_Accuracy": 98.46153846153845,
+      "Variance": 2.6615384615384556,
+      "Pass_Status": "PASS",
+      "Threshold": 85.0,
+      "Notes": ""
+    },
+    {
+      "Claim": "132 Invalidation",
+      "Claimed_Accuracy": 95.0,
+      "Actual_Accuracy": 71.53024911032028,
+      "Variance": -23.469750889679716,
+      "Pass_Status": "FAIL",
+      "Threshold": 85.0,
+      "Notes": ""
+    },
+    {
+      "Claim": "Wilm Rekey",
+      "Claimed_Accuracy": 94.3,
+      "Actual_Accuracy": 96.42857142857143,
+      "Variance": 2.1285714285714334,
+      "Pass_Status": "PASS",
+      "Threshold": 84.0,
+      "Notes": "Simulated - requires 15M data"
+    },
+    {
+      "Claim": "Multi Timeframe",
+      "Claimed_Accuracy": 94.0,
+      "Actual_Accuracy": 100.0,
+      "Variance": 6.0,
+      "Pass_Status": "PASS",
+      "Threshold": 85.0,
+      "Notes": ""
+    },
+    {
+      "Claim": "618 Rekey",
+      "Claimed_Accuracy": 94.0,
+      "Actual_Accuracy": 98.22064056939502,
+      "Variance": 4.220640569395016,
+      "Pass_Status": "PASS",
+      "Threshold": 85.0,
+      "Notes": ""
+    }
+  ]
+}

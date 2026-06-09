@@ -1,0 +1,228 @@
+{
+  "sheet_name": "ETH_Data_Summary",
+  "headers": [
+    "ETH/USD MODEL DATA EXTRACTION SUMMARY",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 48,
+  "data": [
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "Data Sources:"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "ETH Sheets Found:",
+      "col_2": 18.0
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": 1.0,
+      "col_2": "ETH_Monday_Fibonacci"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": 2.0,
+      "col_2": "ETH_Sunday_Asian"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": 3.0,
+      "col_2": "ETH_Model_Comparison"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": 4.0,
+      "col_2": "ETH_Analysis_Summary"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": 5.0,
+      "col_2": "ETH_RANGE_EXPLORATION"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": 6.0,
+      "col_2": "ETH_M15_DATA"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": 7.0,
+      "col_2": "ETH_H1_DATA"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": 8.0,
+      "col_2": "ETH_Fib_Analysis"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": 9.0,
+      "col_2": "eth_friday_asian_ranges"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": 10.0,
+      "col_2": "eth_fibonacci_hit_results"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": 11.0,
+      "col_2": "eth_fibonacci_timing_analysis"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": 12.0,
+      "col_2": "eth_session_probabilities"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": 13.0,
+      "col_2": "eth_132_violations"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": 14.0,
+      "col_2": "eth_friday_asian_ranges_1"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": 15.0,
+      "col_2": "eth_fibonacci_hit_results_1"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": 16.0,
+      "col_2": "eth_fibonacci_timing_analysis_1"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": 17.0,
+      "col_2": "eth_session_probabilities_1"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": 18.0,
+      "col_2": "eth_132_violations_1"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "PRELIMINARY ETH METRICS (from user input):"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "Metric",
+      "col_2": "Value",
+      "col_3": "Context"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "132% Violation Rate",
+      "col_2": 74.4,
+      "col_3": "Overall"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "132% Violation (Monday)",
+      "col_2": 61.9,
+      "col_3": "Monday-specific"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "132% Violation (Asian)",
+      "col_2": 63.7,
+      "col_3": "Asian session"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "Friday Asian Range",
+      "col_2": "Anchor",
+      "col_3": "Session mechanic"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "-25% Hit Rate",
+      "col_2": 100.0,
+      "col_3": "Fibonacci level"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "-50% Hit Rate",
+      "col_2": 95.7,
+      "col_3": "Fibonacci level"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "Data Period",
+      "col_2": "2021-01-04 to 2025-12-18",
+      "col_3": "35,851 H1 rows"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "Timeframe",
+      "col_2": "H1",
+      "col_3": "Hourly data"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "KEY FINDINGS TO EXTRACT:"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "Category",
+      "col_2": "Required Data"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "Fibonacci Hit Rates",
+      "col_2": "-25%, -50%, -100%, -168%, 132% delivery rates"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "Temporal Delivery",
+      "col_2": "Hour-by-hour timing analysis (convert to EST)"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "Session Mechanics",
+      "col_2": "Friday Asian Range anchor analysis"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "132% Patterns",
+      "col_2": "Detailed violation patterns by day/session"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "Day-by-Day Timing",
+      "col_2": "Fibonacci delivery timing per weekday"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "Cross-Market Comparison",
+      "col_2": "Compare with EUR/USD and Oil models"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "DATA EXTRACTION STATUS:"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "Raw ETH Data Sheet Found:",
+      "col_2": "NO"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "ETH Analysis Sheets:",
+      "col_2": "YES"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "Next Steps:"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "1. Import ETH H1 raw data if not present in workbook"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "2. Run Fibonacci tolerance analysis on ETH data"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "3. Calculate day-by-day timing statistics"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "4. Extract session-specific metrics (Asian/London/NY)"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "5. Compile cross-market comparison with EUR/USD and Oil"
+    },
+    {
+      "ETH/USD MODEL DATA EXTRACTION SUMMARY": "6. Generate comprehensive PDF with all three markets"
+    }
+  ]
+}

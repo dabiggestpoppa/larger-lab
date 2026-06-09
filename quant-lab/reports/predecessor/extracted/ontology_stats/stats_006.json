@@ -1,0 +1,338 @@
+{
+  "pct_r3_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 3
+  },
+  "5025": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "50%\u2192-25%",
+    "row": 3
+  },
+  "5025__50_retracement__25_extension__286": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "50%\u2192-25% | 50% retracement \u2192 -25% extension | 28.6",
+    "row": 3
+  },
+  "50_retracement__25_extension__286__25": {
+    "value": 84.0,
+    "type": "percentage",
+    "context": "50% retracement \u2192 -25% extension | 28.6 | -25%",
+    "row": 3
+  },
+  "pct_r4_c0": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "",
+    "row": 4
+  },
+  "61850": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "61.8%\u2192-50%",
+    "row": 4
+  },
+  "61850__618_retracement__50_extension__238": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "61.8%\u2192-50% | 61.8% retracement \u2192 -50% extension | 23.8",
+    "row": 4
+  },
+  "618_retracement__50_extension__238__50": {
+    "value": 82.0,
+    "type": "percentage",
+    "context": "61.8% retracement \u2192 -50% extension | 23.8 | -50%",
+    "row": 4
+  },
+  "pct_r5_c0": {
+    "value": 72.0,
+    "type": "percentage",
+    "context": "",
+    "row": 5
+  },
+  "7225": {
+    "value": 72.0,
+    "type": "percentage",
+    "context": "72%\u2192-25%",
+    "row": 5
+  },
+  "7225__72_retracement__25_extension__316": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "72%\u2192-25% | 72% retracement \u2192 -25% extension | 31.6",
+    "row": 5
+  },
+  "72_retracement__25_extension__316__25": {
+    "value": 83.5,
+    "type": "percentage",
+    "context": "72% retracement \u2192 -25% extension | 31.6 | -25%",
+    "row": 5
+  },
+  "pct_r6_c0": {
+    "value": 78.6,
+    "type": "percentage",
+    "context": "",
+    "row": 6
+  },
+  "786100": {
+    "value": 78.6,
+    "type": "percentage",
+    "context": "78.6%\u2192-100%",
+    "row": 6
+  },
+  "786100__786_deep_retracement__100_extension__152": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "78.6%\u2192-100% | 78.6% deep retracement \u2192 -100% extension | 15.2",
+    "row": 6
+  },
+  "786_deep_retracement__100_extension__152__100": {
+    "value": 76.0,
+    "type": "percentage",
+    "context": "78.6% deep retracement \u2192 -100% extension | 15.2 | -100%",
+    "row": 6
+  },
+  "pct_r7_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 7
+  },
+  "507225__3leg_composite_sequence__787": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "50%\u219272%\u2192-25% | 3-leg composite sequence | 78.7",
+    "row": 7
+  },
+  "3leg_composite_sequence__787__25": {
+    "value": 78.7,
+    "type": "percentage",
+    "context": "3-leg composite sequence | 78.7 | -25%",
+    "row": 7
+  },
+  "pct_r8_c0": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "",
+    "row": 8
+  },
+  "618618_Retest": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "61.8%\u219261.8% Retest",
+    "row": 8
+  },
+  "618618_Retest__618__retest_at_618__357424": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "61.8%\u219261.8% Retest | 61.8% \u2192 retest at 61.8% | 35.7-42.4",
+    "row": 8
+  },
+  "618__retest_at_618__357424__618_retest": {
+    "value": 42.0,
+    "type": "percentage",
+    "context": "61.8% \u2192 retest at 61.8% | 35.7-42.4 | 61.8% retest",
+    "row": 8
+  },
+  "pct_r9_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 9
+  },
+  "5050_Retest": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "50%\u219250% Retest",
+    "row": 9
+  },
+  "5050_Retest__50__retest_at_50__832914": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "50%\u219250% Retest | 50% \u2192 retest at 50% | 83.2-91.4",
+    "row": 9
+  },
+  "50__retest_at_50__832914__50_retest": {
+    "value": 91.0,
+    "type": "percentage",
+    "context": "50% \u2192 retest at 50% | 83.2-91.4 | 50% retest",
+    "row": 9
+  },
+  "pct_r10_c0": {
+    "value": 72.0,
+    "type": "percentage",
+    "context": "",
+    "row": 10
+  },
+  "7272_Retest": {
+    "value": 72.0,
+    "type": "percentage",
+    "context": "72%\u219272% Retest",
+    "row": 10
+  },
+  "7272_Retest__72__retest_at_72__68": {
+    "value": 72.0,
+    "type": "percentage",
+    "context": "72%\u219272% Retest | 72% \u2192 retest at 72% | 68",
+    "row": 10
+  },
+  "72__retest_at_72__68__72_retest": {
+    "value": 68.0,
+    "type": "percentage",
+    "context": "72% \u2192 retest at 72% | 68 | 72% retest",
+    "row": 10
+  },
+  "786786786": {
+    "value": 78.6,
+    "type": "percentage",
+    "context": "78.6\u219278.6\u219278.6",
+    "row": 11
+  },
+  "786786786__Monthly_triple_786_sequence__246": {
+    "value": 78.6,
+    "type": "percentage",
+    "context": "78.6\u219278.6\u219278.6 | Monthly triple 78.6% sequence | 24.6",
+    "row": 11
+  },
+  "Monthly_triple_786_sequence__246__786_monthly": {
+    "value": 78.0,
+    "type": "percentage",
+    "context": "Monthly triple 78.6% sequence | 24.6 | 78.6% monthly",
+    "row": 11
+  },
+  "786_monthly__78__Monthly": {
+    "value": 24.6,
+    "type": "percentage",
+    "context": "78.6% monthly | 78% | Monthly",
+    "row": 11
+  },
+  "0236": {
+    "value": 23.6,
+    "type": "percentage",
+    "context": "0\u2192+23.6",
+    "row": 12
+  },
+  "0236__Measured_move_0_to_236__235": {
+    "value": 23.6,
+    "type": "percentage",
+    "context": "0\u2192+23.6 | Measured move 0 to +23.6% | 23.5",
+    "row": 12
+  },
+  "Measured_move_0_to_236__235__236": {
+    "value": 83.0,
+    "type": "percentage",
+    "context": "Measured move 0 to +23.6% | 23.5 | +23.6%",
+    "row": 12
+  },
+  "pct_r13_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 13
+  },
+  "50100__Measured_move_continuation__100": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "50%\u2192100% | Measured move continuation | 100",
+    "row": 13
+  },
+  "Measured_move_continuation__100__100": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Measured move continuation | 100 | 100%",
+    "row": 13
+  },
+  "100__100__All_TFs": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "100% | 100% | All TFs",
+    "row": 13
+  },
+  "1618_Extension_Steep__1618_extension_steep_angle": {
+    "value": 1.618,
+    "type": "percentage",
+    "context": "1.618 Extension Steep | 1.618 extension steep angle | 42.1",
+    "row": 14
+  },
+  "1618_extension_steep_angle__421__1618": {
+    "value": 42.1,
+    "type": "percentage",
+    "context": "1.618 extension steep angle | 42.1 | 1.618%",
+    "row": 14
+  },
+  "1618_Extension_Shallow__1618_extension_shallow_ang": {
+    "value": 1.618,
+    "type": "percentage",
+    "context": "1.618 Extension Shallow | 1.618 extension shallow angle | 73.5",
+    "row": 15
+  },
+  "1618_extension_shallow_angle__735__1618": {
+    "value": 73.5,
+    "type": "percentage",
+    "context": "1.618 extension shallow angle | 73.5 | 1.618%",
+    "row": 15
+  },
+  "pct_r16_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 16
+  },
+  "100_Level": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "-100% Level",
+    "row": 16
+  },
+  "100_Level__Extension_to_100__NA": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "-100% Level | Extension to -100% | N/A",
+    "row": 16
+  },
+  "pct_r17_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 17
+  },
+  "168_Level": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "-168% Level",
+    "row": 17
+  },
+  "168_Level__Extension_to_168__NA": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "-168% Level | Extension to -168% | N/A",
+    "row": 17
+  },
+  "pct_r18_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 18
+  },
+  "132_Invalidation": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "132% Invalidation",
+    "row": 18
+  },
+  "132_Invalidation__132_extension_invalidation__NA": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "132% Invalidation | 132% extension invalidation | N/A",
+    "row": 18
+  },
+  "132_extension_invalidation__NA__132": {
+    "value": 95.0,
+    "type": "percentage",
+    "context": "132% extension invalidation | N/A | 132%",
+    "row": 18
+  }
+}

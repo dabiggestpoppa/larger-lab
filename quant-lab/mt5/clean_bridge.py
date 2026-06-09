@@ -168,63 +168,6 @@ def check_autotrading() -> bool:
     info = mt5.terminal_info()
     return info is not None and info.trade_allowed
 
-def send_order(symbol, direction, volume, sl, tp, comment, no_sl=False):
-    if not check_autotrading():
-        log.warning("MT5 AutoTrading DISABLED"); return False
-    info = mt5.symbol_info(symbol)
-    if info is None or not info.visible:
-        mt5.symbol_select(symbol, True); time.sleep(1)
-        info = mt5.symbol_info(symbol)
-    if info is None: log.error("Symbol %s not found", symbol); return False
-    tick = mt5.symbol_info_tick(symbol)
-    if tick is None: log.error("No tick for %s", symbol); return False
-
-    order_type = mt5.ORDER_TYPE_BUY if direction == "BUY" else mt5.ORDER_TYPE_SELL
-    price = tick.ask if direction == "BUY" else tick.bid
-    sl_pips = to_pips(abs(sl - price), symbol) if sl > 0 else 0.0
-    tp_pips = to_pips(abs(tp - price), symbol)
-    rr = round(tp_pips / sl_pips, 2) if sl_pips > 0 else 0.0
-
-    if rr < 1.0:
-        log.warning("RR GATE: REJECTED %s %s RR=%.2f", direction, symbol, rr); return False
-
-    request = {
-        "action": mt5.TRADE_ACTION_DEAL, "symbol": symbol, "volume": volume,
-        "type": order_type, "price": price, "tp": round(tp, info.digits),
-        "deviation": 10, "magic": 20260601, "comment": comment,
-        "type_time": mt5.ORDER_TIME_GTC, "type_filling": mt5.ORDER_FILLING_IOC,
-    }
-    if not no_sl: request["sl"] = round(sl, info.digits)
-
-    result = mt5.order_send(request)
-    if result is None: log.error("order_send None: %s", mt5.last_error()); return False
-    if result.retcode == mt5.TRADE_RETCODE_DONE:
-        log.info("Order OK: %s %s ticket=%d", direction, symbol, result.order)
-        return result.order
-    log.error("Order FAILED: %s %s retcode=%d", direction, symbol, result.retcode)
-    return False
-
-def close_position(ticket):
-    positions = mt5.positions_get()
-    if positions is None: return False
-    pos = next((p for p in positions if p.ticket == ticket), None)
-    if pos is None: return False
-    tick = mt5.symbol_info_tick(pos.symbol)
-    if tick is None: return False
-    close_price = tick.bid if pos.type == mt5.ORDER_TYPE_BUY else tick.ask
-    request = {
-        "action": mt5.TRADE_ACTION_DEAL, "symbol": pos.symbol,
-        "volume": pos.volume,
-        "type": mt5.ORDER_TYPE_SELL if pos.type == mt5.ORDER_TYPE_BUY else mt5.ORDER_TYPE_BUY,
-        "position": ticket, "price": close_price, "deviation": 10,
-        "magic": 20260601, "type_time": mt5.ORDER_TIME_GTC,
-        "type_filling": mt5.ORDER_FILLING_IOC,
-    }
-    result = mt5.order_send(request)
-    if result and result.retcode == mt5.TRADE_RETCODE_DONE:
-        log.info("Closed ticket %d", ticket); return True
-    log.error("Close FAILED: ticket=%d", ticket); return False
-
 def calc_asian_range(bars):
     if not bars: return (0.0, 0.0)
     now = datetime.now(EST)
@@ -281,9 +224,8 @@ def run_live(symbols, lot_size=0.01):
             st_engines[sym].initialize_session(last_close + 10 * pip, last_close - 10 * pip)
             log.warning("[%s] AR unavailable — defaulting to T1", sym)
 
-    active_trades = {}
-    daily_stats = {"date": now.strftime("%Y-%m-%d"), "entries": 0, "wins": 0, "losses": 0, "pips": 0.0, "rr_total": 0.0}
-    scan_count = signal_count = exec_count = 0
+    daily_stats = {"date": now.strftime("%Y-%m-%d"), "entries": 0, "rr_total": 0.0}
+    scan_count = signal_count = 0
     last_minute = -1
 
     try:
@@ -294,15 +236,13 @@ def run_live(symbols, lot_size=0.01):
 
             last_minute = now.minute
             scan_count += 1
-            positions = get_positions()
             acct = mt5.account_info()
             equity = acct.equity if acct else 0
             avg_rr = round(daily_stats["rr_total"] / daily_stats["entries"], 2) if daily_stats["entries"] > 0 else 0.0
 
-            log.info("[%s] Scan #%d | Equity: $%.2f | Pos: %d | Sig: %d | Exec: %d | W%d L%d %+.1fp AvgRR=%.2f",
-                     now.strftime("%H:%M:%S"), scan_count, equity, len(positions),
-                     signal_count, exec_count, daily_stats["wins"], daily_stats["losses"],
-                     daily_stats["pips"], avg_rr)
+            log.info("[%s] Scan #%d | Equity: $%.2f | Sig: %d | Entries: %d | AvgRR=%.2f",
+                     now.strftime("%H:%M:%S"), scan_count, equity,
+                     signal_count, daily_stats["entries"], avg_rr)
 
             for sym in symbols:
                 try:
@@ -321,40 +261,18 @@ def run_live(symbols, lot_size=0.01):
                                      "time": now.strftime("%Y-%m-%d %H:%M:%S")})
 
                         if st_sig.event == "ENTRY":
-                            for op in [p for p in get_positions() if p["symbol"] == sym and p["magic"] == 20260601]:
-                                close_position(op["ticket"])
-                            for sk in [k for k in active_trades if k[0] == sym]: del active_trades[sk]
                             sl_p = to_pips(abs(st_sig.sl_price - st_sig.entry_price), sym)
                             tp_p = to_pips(abs(st_sig.tp_price - st_sig.entry_price), sym)
                             rr = round(tp_p / sl_p, 2) if sl_p > 0 else 0.0
-                            log.info("ST ENTRY: %s %s @ %.5f | SL=%.1fp TP=%.1fp RR=%.2f",
+                            log.info("ST ENTRY [SIGNALS ONLY]: %s %s @ %.5f | SL=%.1fp TP=%.1fp RR=%.2f",
                                      direction, sym, st_sig.entry_price, sl_p, tp_p, rr)
-                            ticket = send_order(sym, direction, lot_size, st_sig.sl_price, st_sig.tp_price,
-                                                f"CEREBUS-ST-L{st_sig.loop_count}", no_sl=True)
-                            if ticket:
-                                exec_count += 1; daily_stats["entries"] += 1; daily_stats["rr_total"] += rr
-                                active_trades[(sym, "ST")] = {"ticket": ticket, "direction": direction,
-                                    "entry": st_sig.entry_price, "sl": st_sig.sl_price, "tp": st_sig.tp_price,
-                                    "engine": "ST", "sl_moved": False}
+                            # SIGNALS ONLY — no order execution
+                            daily_stats["entries"] += 1; daily_stats["rr_total"] += rr
 
                         elif st_sig.event in ("TP_HIT", "SL_HIT", "KILL_SWITCH"):
-                            key = (sym, "ST")
-                            if key in active_trades:
-                                trade = active_trades[key]
-                                tick = mt5.symbol_info_tick(sym)
-                                if tick:
-                                    cp = tick.bid if trade["direction"] == "BUY" else tick.ask
-                                    pnl = to_pips(cp - trade["entry"], sym) if trade["direction"] == "BUY" else to_pips(trade["entry"] - cp, sym)
-                                else: pnl = 0.0
-                                won = st_sig.event == "TP_HIT"
-                                daily_stats["pips"] += pnl
-                                if won: daily_stats["wins"] += 1
-                                else: daily_stats["losses"] += 1
-                                log.info("ST CLOSE [%s]: %s %s | PnL: %+.1fp | W%d L%d %+.1fp",
-                                         st_sig.event, trade["direction"], sym, pnl,
-                                         daily_stats["wins"], daily_stats["losses"], daily_stats["pips"])
-                                close_position(trade["ticket"])
-                                del active_trades[key]
+                            log.info("ST CLOSE [SIGNALS ONLY]: %s %s | event=%s",
+                                     direction, sym, st_sig.event)
+                            # SIGNALS ONLY — no position closing
                 except Exception as e:
                     log.error("[%s] Error: %s", sym, e)
 
@@ -368,9 +286,8 @@ def run_live(symbols, lot_size=0.01):
         try: mt5.shutdown()
         except: pass
         avg_rr = round(daily_stats["rr_total"] / daily_stats["entries"], 2) if daily_stats["entries"] > 0 else 0.0
-        log.info("Shutdown. %d scans | %d signals | %d exec | W%d L%d %+.1fp AvgRR=%.2f",
-                 scan_count, signal_count, exec_count,
-                 daily_stats["wins"], daily_stats["losses"], daily_stats["pips"], avg_rr)
+        log.info("Shutdown. %d scans | %d signals | %d entries | AvgRR=%.2f",
+                 scan_count, signal_count, daily_stats["entries"], avg_rr)
 
 if __name__ == "__main__":
     import argparse

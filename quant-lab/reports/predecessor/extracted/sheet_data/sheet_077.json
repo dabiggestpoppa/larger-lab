@@ -1,0 +1,68 @@
+{
+  "sheet_name": "ETH_Model_Comparison",
+  "headers": [
+    "ETH/USD MODEL COMPARISON: 5-DAY vs 7-DAY",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 4,
+  "data": [
+    {
+      "ETH/USD MODEL COMPARISON: 5-DAY vs 7-DAY": "216 Weeks | Fibonacci Extension Analysis"
+    },
+    {
+      "ETH/USD MODEL COMPARISON: 5-DAY vs 7-DAY": "Model",
+      "col_2": "Total_Weeks",
+      "col_3": "Hit_Rate_25",
+      "col_4": "Hit_Rate_50",
+      "col_5": "Hit_Rate_100",
+      "col_6": "Hit_Rate_168",
+      "col_7": "Violation_Rate_132"
+    },
+    {
+      "ETH/USD MODEL COMPARISON: 5-DAY vs 7-DAY": "5-Day (Friday Close)",
+      "col_2": 216.0,
+      "col_3": 83.79629629629629,
+      "col_4": 77.77777777777779,
+      "col_5": 65.74074074074075,
+      "col_6": 54.629629629629626,
+      "col_7": 82.4074074074074
+    },
+    {
+      "ETH/USD MODEL COMPARISON: 5-DAY vs 7-DAY": "7-Day (Sunday Close)",
+      "col_2": 216.0,
+      "col_3": 84.72222222222221,
+      "col_4": 81.94444444444444,
+      "col_5": 71.75925925925925,
+      "col_6": 58.333333333333336,
+      "col_7": 83.79629629629629
+    }
+  ]
+}

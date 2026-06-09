@@ -1,0 +1,147 @@
+{
+  "sheet_name": "PHASE 3E - NY OPEN RANGE DATA",
+  "headers": [
+    "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 23,
+  "data": [
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "EUR/USD Analysis | 2020-2025 | 1,078 Trading Days Analyzed"
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "Analysis Date: December 2025"
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "SECTION 1: NY OPEN RANGE METRICS"
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "Metric",
+      "col_2": "Value",
+      "col_3": "Unit",
+      "col_4": "Comparison",
+      "col_5": "Status"
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "Trading Days Analyzed",
+      "col_2": 1078.0,
+      "col_3": "days",
+      "col_4": "N/A",
+      "col_5": "COMPLETE"
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "Average NY Range",
+      "col_2": 22.8,
+      "col_3": "pips",
+      "col_4": "vs London 14.1 pips",
+      "col_5": "57% LARGER"
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "NY Close Containment Rate",
+      "col_2": 0.266,
+      "col_3": "percentage",
+      "col_4": "Target: 30%",
+      "col_5": "BELOW TARGET"
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "Range Containment Events",
+      "col_2": 578.0,
+      "col_3": "events",
+      "col_4": "53.6% of total",
+      "col_5": "SIGNIFICANT"
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "SECTION 2: KEY METRICS SUMMARY"
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "Total Trading Days:",
+      "col_2": 1078.0
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "Average NY Range:",
+      "col_2": "22.8 pips"
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "NY Close Containment Rate:",
+      "col_2": 26.6
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "Range Containment Events:",
+      "col_2": "578 (53.6%)"
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "SECTION 3: NY vs LONDON RANGE COMPARISON"
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "Session",
+      "col_2": "Avg Range (pips)",
+      "col_3": "Containment Rate",
+      "col_4": "Volatility Profile",
+      "col_5": "Trading Implication"
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "NY Open (7-9 AM EST)",
+      "col_2": 22.8,
+      "col_3": 0.266,
+      "col_4": "High",
+      "col_5": "Liquidity sweep window"
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "London Open (2-4 AM EST)",
+      "col_2": 14.1,
+      "col_3": 0.831,
+      "col_4": "Moderate",
+      "col_5": "Primary entry window"
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "Difference",
+      "col_2": "+8.7 (+61.7%)",
+      "col_3": "-56.5 pp",
+      "col_4": "+High Risk",
+      "col_5": "NY for exits, London for entries"
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "SECTION 4: KEY FINDING"
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "NY ranges are 57% larger than London ranges (22.8 vs 14.1 pips)"
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "Only 26.6% of sessions close within the NY range - low containment"
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "Range containment at 53.6% indicates frequent breakout behavior"
+    },
+    {
+      "PHASE 3E: NY OPEN RANGE ANALYSIS (7-9 AM EST)": "NY Open serves as liquidity sweep window, not primary entry"
+    }
+  ]
+}

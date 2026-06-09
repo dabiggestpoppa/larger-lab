@@ -1,0 +1,118 @@
+{
+  "sheet_name": "Session & Timing Metrics",
+  "headers": [
+    "Session/Window",
+    "Time (UTC)",
+    "Key Characteristics",
+    "Velocity Boost",
+    "Pattern Preference",
+    "Success Rate Impact",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 10,
+  "data": [
+    {
+      "Session/Window": "Session/Window",
+      "Time (UTC)": "Time (UTC)",
+      "Key Characteristics": "Key Characteristics",
+      "Velocity Boost": "Velocity Boost",
+      "Pattern Preference": "Pattern Preference",
+      "Success Rate Impact": "Success Rate Impact"
+    },
+    {
+      "Session/Window": "London Session",
+      "Time (UTC)": "07:00-16:00 UTC (2-11 AM EST)",
+      "Key Characteristics": "Early London (07:00-10:00) highest daily vector prediction",
+      "Velocity Boost": "1.4x-1.8x",
+      "Pattern Preference": "All patterns",
+      "Success Rate Impact": "82.3% prediction accuracy"
+    },
+    {
+      "Session/Window": "London-NY Overlap",
+      "Time (UTC)": "14:00-18:00 UTC",
+      "Key Characteristics": "Critical window for pattern completion",
+      "Velocity Boost": "+8.3% to +9.4%",
+      "Pattern Preference": "72% Fibonacci continuation",
+      "Success Rate Impact": "83.5% continuation rate"
+    },
+    {
+      "Session/Window": "NY Session",
+      "Time (UTC)": "13:00-22:00 UTC",
+      "Key Characteristics": "Daily highs form 16:00-19:00, peak at 17:00",
+      "Velocity Boost": "1.5x-2.0x",
+      "Pattern Preference": "NY 9-10am Open Algo",
+      "Success Rate Impact": "High probability window"
+    },
+    {
+      "Session/Window": "News Window",
+      "Time (UTC)": "07:00-11:00 UTC",
+      "Key Characteristics": "71.3% odd hour preference, 92.3% HTF pivot correlation",
+      "Velocity Boost": "2.34x (highest)",
+      "Pattern Preference": "All patterns",
+      "Success Rate Impact": "Highest velocity period"
+    },
+    {
+      "Session/Window": "Asian Session",
+      "Time (UTC)": "00:00-08:00 UTC",
+      "Key Characteristics": "Daily lows bimodal 01:00-02:00",
+      "Velocity Boost": "0.8x-1.2x",
+      "Pattern Preference": "15M AB-CD Bullish",
+      "Success Rate Impact": "Lower volatility, selective patterns"
+    },
+    {
+      "Session/Window": "Wednesday Focus",
+      "Time (UTC)": "All day Wednesday",
+      "Key Characteristics": "23.8% of ILM interactions, mid-week pivot",
+      "Velocity Boost": "1.0x-1.3x",
+      "Pattern Preference": "Direction changes",
+      "Success Rate Impact": "67.4% direction change at 61.8%"
+    },
+    {
+      "Session/Window": "Odd Hours (1,3,5,7,9,11)",
+      "Time (UTC)": "Odd hours all sessions",
+      "Key Characteristics": "Alpha preference, structure inversion",
+      "Velocity Boost": "1.2x-1.6x",
+      "Pattern Preference": "Alpha patterns",
+      "Success Rate Impact": "62.7%-68.4% Alpha occurrence"
+    },
+    {
+      "Session/Window": "Odd Hours Inversion",
+      "Time (UTC)": "Odd hours all sessions",
+      "Key Characteristics": "Structure inversion probability",
+      "Velocity Boost": "1.3x",
+      "Pattern Preference": "All patterns",
+      "Success Rate Impact": "73.8% structure inversion"
+    },
+    {
+      "Session/Window": "Even Hours (0,2,4,6,8,10,12)",
+      "Time (UTC)": "Even hours all sessions",
+      "Key Characteristics": "Beta/Delta preference",
+      "Velocity Boost": "1.0x-1.4x",
+      "Pattern Preference": "Beta/Delta patterns",
+      "Success Rate Impact": "57.3%-64.1% Beta/Delta occurrence"
+    }
+  ]
+}

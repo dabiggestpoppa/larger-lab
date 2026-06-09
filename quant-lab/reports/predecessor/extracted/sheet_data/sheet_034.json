@@ -1,0 +1,128 @@
+{
+  "sheet_name": "PHASE 2 - OVERLAP ANALYSIS",
+  "headers": [
+    "PHASE 2: SESSION-DAILY TARGET OVERLAP ANALYSIS (Tolerance \u00b10.15 points, 2023-2025 Data)",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 16,
+  "data": [
+    {
+      "PHASE 2: SESSION-DAILY TARGET OVERLAP ANALYSIS (Tolerance \u00b10.15 points, 2023-2025 Data)": "HYPOTHESIS VALIDATION RESULTS"
+    },
+    {
+      "PHASE 2: SESSION-DAILY TARGET OVERLAP ANALYSIS (Tolerance \u00b10.15 points, 2023-2025 Data)": "Hypothesis_ID",
+      "col_2": "Description",
+      "col_3": "Target_Threshold",
+      "col_4": "Actual_Result",
+      "col_5": "Pass_Status",
+      "col_6": "Notes"
+    },
+    {
+      "PHASE 2: SESSION-DAILY TARGET OVERLAP ANALYSIS (Tolerance \u00b10.15 points, 2023-2025 Data)": "H1",
+      "col_2": "Session Fib targets overlap with Session Close",
+      "col_3": "\u226525%",
+      "col_4": 0.0,
+      "col_5": "FAIL",
+      "col_6": "0 overlaps in 1857 sessions"
+    },
+    {
+      "PHASE 2: SESSION-DAILY TARGET OVERLAP ANALYSIS (Tolerance \u00b10.15 points, 2023-2025 Data)": "H2",
+      "col_2": "Monday Range -25% = Tuesday Daily Close",
+      "col_3": "\u226540%",
+      "col_4": 0.0,
+      "col_5": "FAIL",
+      "col_6": "0 overlaps from 369 Mondays"
+    },
+    {
+      "PHASE 2: SESSION-DAILY TARGET OVERLAP ANALYSIS (Tolerance \u00b10.15 points, 2023-2025 Data)": "H3",
+      "col_2": "Asian session predicts same-day close",
+      "col_3": "\u226575%",
+      "col_4": 82.71,
+      "col_5": "PASS",
+      "col_6": "512/619 Asian sessions predicted correctly"
+    },
+    {
+      "PHASE 2: SESSION-DAILY TARGET OVERLAP ANALYSIS (Tolerance \u00b10.15 points, 2023-2025 Data)": "H4",
+      "col_2": "Previous day targets overlap with current sessions",
+      "col_3": "\u226530%",
+      "col_4": 2.43,
+      "col_5": "FAIL",
+      "col_6": "45 overlaps from 1854 sessions"
+    },
+    {
+      "PHASE 2: SESSION-DAILY TARGET OVERLAP ANALYSIS (Tolerance \u00b10.15 points, 2023-2025 Data)": "H5",
+      "col_2": "Wednesday-Thursday velocity spike",
+      "col_3": "20-40%",
+      "col_4": 0.15,
+      "col_5": "FAIL",
+      "col_6": "Wed-Thu avg: 7.92, Mon-Tue avg: 7.91"
+    },
+    {
+      "PHASE 2: SESSION-DAILY TARGET OVERLAP ANALYSIS (Tolerance \u00b10.15 points, 2023-2025 Data)": "H6",
+      "col_2": "Weekly confluence rate",
+      "col_3": "\u226560%",
+      "col_4": 0.32,
+      "col_5": "FAIL",
+      "col_6": "2/619 weeks with confluence"
+    },
+    {
+      "PHASE 2: SESSION-DAILY TARGET OVERLAP ANALYSIS (Tolerance \u00b10.15 points, 2023-2025 Data)": "DETAILED OVERLAP STATISTICS"
+    },
+    {
+      "PHASE 2: SESSION-DAILY TARGET OVERLAP ANALYSIS (Tolerance \u00b10.15 points, 2023-2025 Data)": "Total Sessions",
+      "col_2": 1857.0
+    },
+    {
+      "PHASE 2: SESSION-DAILY TARGET OVERLAP ANALYSIS (Tolerance \u00b10.15 points, 2023-2025 Data)": "Total H1 Overlaps",
+      "col_2": 0.0
+    },
+    {
+      "PHASE 2: SESSION-DAILY TARGET OVERLAP ANALYSIS (Tolerance \u00b10.15 points, 2023-2025 Data)": "H1 Frequency",
+      "col_2": 0.0
+    },
+    {
+      "PHASE 2: SESSION-DAILY TARGET OVERLAP ANALYSIS (Tolerance \u00b10.15 points, 2023-2025 Data)": "Asian Accuracy",
+      "col_2": 82.71
+    },
+    {
+      "PHASE 2: SESSION-DAILY TARGET OVERLAP ANALYSIS (Tolerance \u00b10.15 points, 2023-2025 Data)": "Monday\u2192Tuesday Rate",
+      "col_2": 0.0
+    },
+    {
+      "PHASE 2: SESSION-DAILY TARGET OVERLAP ANALYSIS (Tolerance \u00b10.15 points, 2023-2025 Data)": "Wed-Thu Velocity Increase",
+      "col_2": 0.15
+    },
+    {
+      "PHASE 2: SESSION-DAILY TARGET OVERLAP ANALYSIS (Tolerance \u00b10.15 points, 2023-2025 Data)": "Weekly Confluence Rate",
+      "col_2": 0.32
+    }
+  ]
+}

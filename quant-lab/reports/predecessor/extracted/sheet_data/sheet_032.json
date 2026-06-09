@@ -1,0 +1,1030 @@
+{
+  "sheet_name": "thursday_range_targets",
+  "headers": [
+    "Week_Number",
+    "Year",
+    "Thursday_Date",
+    "Thursday_High",
+    "Thursday_Low",
+    "Thursday_Range",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 124,
+  "data": [
+    {
+      "Week_Number": 1.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-01-05",
+      "Thursday_High": 134.98,
+      "Thursday_Low": 116.64,
+      "Thursday_Range": 18.34
+    },
+    {
+      "Week_Number": 2.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-01-12",
+      "Thursday_High": 226.95,
+      "Thursday_Low": 207.48,
+      "Thursday_Range": 19.47
+    },
+    {
+      "Week_Number": 3.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-01-19",
+      "Thursday_High": 315.38,
+      "Thursday_Low": 298.72,
+      "Thursday_Range": 16.66
+    },
+    {
+      "Week_Number": 4.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-01-26",
+      "Thursday_High": 409.92,
+      "Thursday_Low": 389.11,
+      "Thursday_Range": 20.81
+    },
+    {
+      "Week_Number": 5.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-02-02",
+      "Thursday_High": 501.09,
+      "Thursday_Low": 484.31,
+      "Thursday_Range": 16.78
+    },
+    {
+      "Week_Number": 6.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-02-09",
+      "Thursday_High": 590.45,
+      "Thursday_Low": 571.69,
+      "Thursday_Range": 18.76
+    },
+    {
+      "Week_Number": 7.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-02-16",
+      "Thursday_High": 684.55,
+      "Thursday_Low": 665.89,
+      "Thursday_Range": 18.66
+    },
+    {
+      "Week_Number": 8.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-02-23",
+      "Thursday_High": 782.5,
+      "Thursday_Low": 764.41,
+      "Thursday_Range": 18.09
+    },
+    {
+      "Week_Number": 9.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-03-02",
+      "Thursday_High": 878.79,
+      "Thursday_Low": 860.93,
+      "Thursday_Range": 17.86
+    },
+    {
+      "Week_Number": 10.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-03-09",
+      "Thursday_High": 965.93,
+      "Thursday_Low": 948.17,
+      "Thursday_Range": 17.76
+    },
+    {
+      "Week_Number": 11.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-03-16",
+      "Thursday_High": 1059.64,
+      "Thursday_Low": 1040.86,
+      "Thursday_Range": 18.78
+    },
+    {
+      "Week_Number": 12.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-03-23",
+      "Thursday_High": 1147.9,
+      "Thursday_Low": 1129.42,
+      "Thursday_Range": 18.48
+    },
+    {
+      "Week_Number": 13.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-03-30",
+      "Thursday_High": 1239.9,
+      "Thursday_Low": 1224.23,
+      "Thursday_Range": 15.67
+    },
+    {
+      "Week_Number": 14.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-04-06",
+      "Thursday_High": 1332.82,
+      "Thursday_Low": 1315.64,
+      "Thursday_Range": 17.18
+    },
+    {
+      "Week_Number": 15.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-04-13",
+      "Thursday_High": 1422.71,
+      "Thursday_Low": 1405.38,
+      "Thursday_Range": 17.33
+    },
+    {
+      "Week_Number": 16.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-04-20",
+      "Thursday_High": 1516.99,
+      "Thursday_Low": 1497.47,
+      "Thursday_Range": 19.52
+    },
+    {
+      "Week_Number": 17.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-04-27",
+      "Thursday_High": 1607.02,
+      "Thursday_Low": 1584.08,
+      "Thursday_Range": 22.94
+    },
+    {
+      "Week_Number": 18.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-05-04",
+      "Thursday_High": 1698.14,
+      "Thursday_Low": 1679.63,
+      "Thursday_Range": 18.51
+    },
+    {
+      "Week_Number": 19.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-05-11",
+      "Thursday_High": 1788.66,
+      "Thursday_Low": 1769.12,
+      "Thursday_Range": 19.54
+    },
+    {
+      "Week_Number": 20.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-05-18",
+      "Thursday_High": 1883.21,
+      "Thursday_Low": 1864.69,
+      "Thursday_Range": 18.52
+    },
+    {
+      "Week_Number": 21.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-05-25",
+      "Thursday_High": 1979.53,
+      "Thursday_Low": 1960.61,
+      "Thursday_Range": 18.92
+    },
+    {
+      "Week_Number": 22.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-06-01",
+      "Thursday_High": 2079.18,
+      "Thursday_Low": 2059.92,
+      "Thursday_Range": 19.26
+    },
+    {
+      "Week_Number": 23.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-06-08",
+      "Thursday_High": 2177.78,
+      "Thursday_Low": 2158.2,
+      "Thursday_Range": 19.58
+    },
+    {
+      "Week_Number": 24.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-06-15",
+      "Thursday_High": 2269.12,
+      "Thursday_Low": 2250.37,
+      "Thursday_Range": 18.75
+    },
+    {
+      "Week_Number": 25.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-06-22",
+      "Thursday_High": 2359.16,
+      "Thursday_Low": 2336.91,
+      "Thursday_Range": 22.25
+    },
+    {
+      "Week_Number": 26.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-06-29",
+      "Thursday_High": 2455.12,
+      "Thursday_Low": 2434.91,
+      "Thursday_Range": 20.21
+    },
+    {
+      "Week_Number": 27.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-07-06",
+      "Thursday_High": 2542.79,
+      "Thursday_Low": 2525.91,
+      "Thursday_Range": 16.88
+    },
+    {
+      "Week_Number": 28.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-07-13",
+      "Thursday_High": 2635.1,
+      "Thursday_Low": 2618.51,
+      "Thursday_Range": 16.59
+    },
+    {
+      "Week_Number": 29.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-07-20",
+      "Thursday_High": 2730.02,
+      "Thursday_Low": 2712.91,
+      "Thursday_Range": 17.11
+    },
+    {
+      "Week_Number": 30.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-07-27",
+      "Thursday_High": 2819.48,
+      "Thursday_Low": 2802.31,
+      "Thursday_Range": 17.17
+    },
+    {
+      "Week_Number": 31.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-08-03",
+      "Thursday_High": 2909.13,
+      "Thursday_Low": 2890.68,
+      "Thursday_Range": 18.45
+    },
+    {
+      "Week_Number": 32.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-08-10",
+      "Thursday_High": 3000.19,
+      "Thursday_Low": 2982.14,
+      "Thursday_Range": 18.05
+    },
+    {
+      "Week_Number": 33.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-08-17",
+      "Thursday_High": 3100.06,
+      "Thursday_Low": 3079.91,
+      "Thursday_Range": 20.15
+    },
+    {
+      "Week_Number": 34.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-08-24",
+      "Thursday_High": 3193.7,
+      "Thursday_Low": 3175.7,
+      "Thursday_Range": 18.0
+    },
+    {
+      "Week_Number": 35.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-08-31",
+      "Thursday_High": 3286.81,
+      "Thursday_Low": 3269.13,
+      "Thursday_Range": 17.68
+    },
+    {
+      "Week_Number": 36.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-09-07",
+      "Thursday_High": 3379.68,
+      "Thursday_Low": 3357.9,
+      "Thursday_Range": 21.78
+    },
+    {
+      "Week_Number": 37.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-09-14",
+      "Thursday_High": 3472.54,
+      "Thursday_Low": 3452.25,
+      "Thursday_Range": 20.29
+    },
+    {
+      "Week_Number": 38.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-09-21",
+      "Thursday_High": 3563.73,
+      "Thursday_Low": 3545.31,
+      "Thursday_Range": 18.42
+    },
+    {
+      "Week_Number": 39.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-09-28",
+      "Thursday_High": 3655.89,
+      "Thursday_Low": 3638.93,
+      "Thursday_Range": 16.96
+    },
+    {
+      "Week_Number": 40.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-10-05",
+      "Thursday_High": 3748.18,
+      "Thursday_Low": 3731.42,
+      "Thursday_Range": 16.76
+    },
+    {
+      "Week_Number": 41.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-10-12",
+      "Thursday_High": 3838.16,
+      "Thursday_Low": 3819.69,
+      "Thursday_Range": 18.47
+    },
+    {
+      "Week_Number": 42.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-10-19",
+      "Thursday_High": 3924.36,
+      "Thursday_Low": 3907.57,
+      "Thursday_Range": 16.79
+    },
+    {
+      "Week_Number": 43.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-10-26",
+      "Thursday_High": 4014.48,
+      "Thursday_Low": 3994.57,
+      "Thursday_Range": 19.91
+    },
+    {
+      "Week_Number": 44.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-11-02",
+      "Thursday_High": 4108.54,
+      "Thursday_Low": 4089.6,
+      "Thursday_Range": 18.94
+    },
+    {
+      "Week_Number": 45.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-11-09",
+      "Thursday_High": 4196.27,
+      "Thursday_Low": 4179.68,
+      "Thursday_Range": 16.59
+    },
+    {
+      "Week_Number": 46.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-11-16",
+      "Thursday_High": 4294.83,
+      "Thursday_Low": 4275.86,
+      "Thursday_Range": 18.97
+    },
+    {
+      "Week_Number": 47.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-11-23",
+      "Thursday_High": 4382.25,
+      "Thursday_Low": 4365.3,
+      "Thursday_Range": 16.95
+    },
+    {
+      "Week_Number": 48.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-11-30",
+      "Thursday_High": 4480.0,
+      "Thursday_Low": 4460.36,
+      "Thursday_Range": 19.64
+    },
+    {
+      "Week_Number": 49.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-12-07",
+      "Thursday_High": 4567.24,
+      "Thursday_Low": 4550.01,
+      "Thursday_Range": 17.23
+    },
+    {
+      "Week_Number": 50.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-12-14",
+      "Thursday_High": 4659.58,
+      "Thursday_Low": 4642.58,
+      "Thursday_Range": 17.0
+    },
+    {
+      "Week_Number": 51.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-12-21",
+      "Thursday_High": 4746.33,
+      "Thursday_Low": 4727.45,
+      "Thursday_Range": 18.88
+    },
+    {
+      "Week_Number": 52.0,
+      "Year": 2023.0,
+      "Thursday_Date": "2023-12-28",
+      "Thursday_High": 4840.15,
+      "Thursday_Low": 4822.88,
+      "Thursday_Range": 17.27
+    },
+    {
+      "Week_Number": 1.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-01-04",
+      "Thursday_High": 4932.04,
+      "Thursday_Low": 4912.05,
+      "Thursday_Range": 19.99
+    },
+    {
+      "Week_Number": 2.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-01-11",
+      "Thursday_High": 5024.41,
+      "Thursday_Low": 5004.57,
+      "Thursday_Range": 19.84
+    },
+    {
+      "Week_Number": 3.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-01-18",
+      "Thursday_High": 5120.33,
+      "Thursday_Low": 5101.47,
+      "Thursday_Range": 18.86
+    },
+    {
+      "Week_Number": 4.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-01-25",
+      "Thursday_High": 5215.19,
+      "Thursday_Low": 5195.48,
+      "Thursday_Range": 19.71
+    },
+    {
+      "Week_Number": 5.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-02-01",
+      "Thursday_High": 5307.78,
+      "Thursday_Low": 5289.53,
+      "Thursday_Range": 18.25
+    },
+    {
+      "Week_Number": 6.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-02-08",
+      "Thursday_High": 5394.74,
+      "Thursday_Low": 5375.36,
+      "Thursday_Range": 19.38
+    },
+    {
+      "Week_Number": 7.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-02-15",
+      "Thursday_High": 5483.81,
+      "Thursday_Low": 5465.94,
+      "Thursday_Range": 17.87
+    },
+    {
+      "Week_Number": 8.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-02-22",
+      "Thursday_High": 5575.43,
+      "Thursday_Low": 5555.58,
+      "Thursday_Range": 19.85
+    },
+    {
+      "Week_Number": 9.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-02-29",
+      "Thursday_High": 5665.1,
+      "Thursday_Low": 5646.34,
+      "Thursday_Range": 18.76
+    },
+    {
+      "Week_Number": 10.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-03-07",
+      "Thursday_High": 5753.73,
+      "Thursday_Low": 5737.1,
+      "Thursday_Range": 16.63
+    },
+    {
+      "Week_Number": 11.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-03-14",
+      "Thursday_High": 5845.17,
+      "Thursday_Low": 5825.59,
+      "Thursday_Range": 19.58
+    },
+    {
+      "Week_Number": 12.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-03-21",
+      "Thursday_High": 5929.27,
+      "Thursday_Low": 5912.36,
+      "Thursday_Range": 16.91
+    },
+    {
+      "Week_Number": 13.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-03-28",
+      "Thursday_High": 6023.18,
+      "Thursday_Low": 6003.01,
+      "Thursday_Range": 20.17
+    },
+    {
+      "Week_Number": 14.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-04-04",
+      "Thursday_High": 6118.99,
+      "Thursday_Low": 6102.69,
+      "Thursday_Range": 16.3
+    },
+    {
+      "Week_Number": 15.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-04-11",
+      "Thursday_High": 6211.1,
+      "Thursday_Low": 6191.19,
+      "Thursday_Range": 19.91
+    },
+    {
+      "Week_Number": 16.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-04-18",
+      "Thursday_High": 6303.08,
+      "Thursday_Low": 6281.38,
+      "Thursday_Range": 21.7
+    },
+    {
+      "Week_Number": 17.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-04-25",
+      "Thursday_High": 6397.62,
+      "Thursday_Low": 6377.7,
+      "Thursday_Range": 19.92
+    },
+    {
+      "Week_Number": 18.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-05-02",
+      "Thursday_High": 6484.44,
+      "Thursday_Low": 6464.45,
+      "Thursday_Range": 19.99
+    },
+    {
+      "Week_Number": 19.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-05-09",
+      "Thursday_High": 6575.43,
+      "Thursday_Low": 6554.8,
+      "Thursday_Range": 20.63
+    },
+    {
+      "Week_Number": 20.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-05-16",
+      "Thursday_High": 6667.62,
+      "Thursday_Low": 6649.37,
+      "Thursday_Range": 18.25
+    },
+    {
+      "Week_Number": 21.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-05-23",
+      "Thursday_High": 6752.0,
+      "Thursday_Low": 6734.63,
+      "Thursday_Range": 17.37
+    },
+    {
+      "Week_Number": 22.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-05-30",
+      "Thursday_High": 6845.98,
+      "Thursday_Low": 6825.82,
+      "Thursday_Range": 20.16
+    },
+    {
+      "Week_Number": 23.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-06-06",
+      "Thursday_High": 6940.76,
+      "Thursday_Low": 6921.8,
+      "Thursday_Range": 18.96
+    },
+    {
+      "Week_Number": 24.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-06-13",
+      "Thursday_High": 7032.55,
+      "Thursday_Low": 7013.19,
+      "Thursday_Range": 19.36
+    },
+    {
+      "Week_Number": 25.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-06-20",
+      "Thursday_High": 7122.58,
+      "Thursday_Low": 7104.48,
+      "Thursday_Range": 18.1
+    },
+    {
+      "Week_Number": 26.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-06-27",
+      "Thursday_High": 7214.06,
+      "Thursday_Low": 7194.17,
+      "Thursday_Range": 19.89
+    },
+    {
+      "Week_Number": 27.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-07-04",
+      "Thursday_High": 7304.21,
+      "Thursday_Low": 7284.73,
+      "Thursday_Range": 19.48
+    },
+    {
+      "Week_Number": 28.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-07-11",
+      "Thursday_High": 7395.85,
+      "Thursday_Low": 7373.5,
+      "Thursday_Range": 22.35
+    },
+    {
+      "Week_Number": 29.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-07-18",
+      "Thursday_High": 7487.37,
+      "Thursday_Low": 7467.88,
+      "Thursday_Range": 19.49
+    },
+    {
+      "Week_Number": 30.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-07-25",
+      "Thursday_High": 7577.08,
+      "Thursday_Low": 7559.54,
+      "Thursday_Range": 17.54
+    },
+    {
+      "Week_Number": 31.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-08-01",
+      "Thursday_High": 7665.66,
+      "Thursday_Low": 7647.48,
+      "Thursday_Range": 18.18
+    },
+    {
+      "Week_Number": 32.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-08-08",
+      "Thursday_High": 7760.77,
+      "Thursday_Low": 7741.24,
+      "Thursday_Range": 19.53
+    },
+    {
+      "Week_Number": 33.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-08-15",
+      "Thursday_High": 7854.06,
+      "Thursday_Low": 7835.97,
+      "Thursday_Range": 18.09
+    },
+    {
+      "Week_Number": 34.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-08-22",
+      "Thursday_High": 7950.98,
+      "Thursday_Low": 7932.77,
+      "Thursday_Range": 18.21
+    },
+    {
+      "Week_Number": 35.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-08-29",
+      "Thursday_High": 8039.95,
+      "Thursday_Low": 8020.7,
+      "Thursday_Range": 19.25
+    },
+    {
+      "Week_Number": 36.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-09-05",
+      "Thursday_High": 8134.82,
+      "Thursday_Low": 8116.73,
+      "Thursday_Range": 18.09
+    },
+    {
+      "Week_Number": 37.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-09-12",
+      "Thursday_High": 8229.25,
+      "Thursday_Low": 8210.24,
+      "Thursday_Range": 19.01
+    },
+    {
+      "Week_Number": 38.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-09-19",
+      "Thursday_High": 8320.15,
+      "Thursday_Low": 8303.34,
+      "Thursday_Range": 16.81
+    },
+    {
+      "Week_Number": 39.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-09-26",
+      "Thursday_High": 8414.93,
+      "Thursday_Low": 8395.87,
+      "Thursday_Range": 19.06
+    },
+    {
+      "Week_Number": 40.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-10-03",
+      "Thursday_High": 8507.29,
+      "Thursday_Low": 8488.36,
+      "Thursday_Range": 18.93
+    },
+    {
+      "Week_Number": 41.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-10-10",
+      "Thursday_High": 8595.47,
+      "Thursday_Low": 8578.41,
+      "Thursday_Range": 17.06
+    },
+    {
+      "Week_Number": 42.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-10-17",
+      "Thursday_High": 8691.44,
+      "Thursday_Low": 8672.12,
+      "Thursday_Range": 19.32
+    },
+    {
+      "Week_Number": 43.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-10-24",
+      "Thursday_High": 8786.12,
+      "Thursday_Low": 8764.9,
+      "Thursday_Range": 21.22
+    },
+    {
+      "Week_Number": 44.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-10-31",
+      "Thursday_High": 8877.45,
+      "Thursday_Low": 8857.24,
+      "Thursday_Range": 20.21
+    },
+    {
+      "Week_Number": 45.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-11-07",
+      "Thursday_High": 8972.68,
+      "Thursday_Low": 8953.69,
+      "Thursday_Range": 18.99
+    },
+    {
+      "Week_Number": 46.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-11-14",
+      "Thursday_High": 9061.41,
+      "Thursday_Low": 9040.69,
+      "Thursday_Range": 20.72
+    },
+    {
+      "Week_Number": 47.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-11-21",
+      "Thursday_High": 9151.57,
+      "Thursday_Low": 9132.1,
+      "Thursday_Range": 19.47
+    },
+    {
+      "Week_Number": 48.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-11-28",
+      "Thursday_High": 9242.31,
+      "Thursday_Low": 9225.1,
+      "Thursday_Range": 17.21
+    },
+    {
+      "Week_Number": 49.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-12-05",
+      "Thursday_High": 9329.78,
+      "Thursday_Low": 9311.79,
+      "Thursday_Range": 17.99
+    },
+    {
+      "Week_Number": 50.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-12-12",
+      "Thursday_High": 9433.8,
+      "Thursday_Low": 9411.16,
+      "Thursday_Range": 22.64
+    },
+    {
+      "Week_Number": 51.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-12-19",
+      "Thursday_High": 9523.01,
+      "Thursday_Low": 9504.65,
+      "Thursday_Range": 18.36
+    },
+    {
+      "Week_Number": 52.0,
+      "Year": 2024.0,
+      "Thursday_Date": "2024-12-26",
+      "Thursday_High": 9614.1,
+      "Thursday_Low": 9593.88,
+      "Thursday_Range": 20.22
+    },
+    {
+      "Week_Number": 1.0,
+      "Year": 2025.0,
+      "Thursday_Date": "2025-01-02",
+      "Thursday_High": 9708.73,
+      "Thursday_Low": 9689.26,
+      "Thursday_Range": 19.47
+    },
+    {
+      "Week_Number": 2.0,
+      "Year": 2025.0,
+      "Thursday_Date": "2025-01-09",
+      "Thursday_High": 9803.46,
+      "Thursday_Low": 9783.03,
+      "Thursday_Range": 20.43
+    },
+    {
+      "Week_Number": 3.0,
+      "Year": 2025.0,
+      "Thursday_Date": "2025-01-16",
+      "Thursday_High": 9903.06,
+      "Thursday_Low": 9882.47,
+      "Thursday_Range": 20.59
+    },
+    {
+      "Week_Number": 4.0,
+      "Year": 2025.0,
+      "Thursday_Date": "2025-01-23",
+      "Thursday_High": 9993.19,
+      "Thursday_Low": 9974.58,
+      "Thursday_Range": 18.61
+    },
+    {
+      "Week_Number": 5.0,
+      "Year": 2025.0,
+      "Thursday_Date": "2025-01-30",
+      "Thursday_High": 10078.73,
+      "Thursday_Low": 10061.06,
+      "Thursday_Range": 17.67
+    },
+    {
+      "Week_Number": 6.0,
+      "Year": 2025.0,
+      "Thursday_Date": "2025-02-06",
+      "Thursday_High": 10174.91,
+      "Thursday_Low": 10154.18,
+      "Thursday_Range": 20.73
+    },
+    {
+      "Week_Number": 7.0,
+      "Year": 2025.0,
+      "Thursday_Date": "2025-02-13",
+      "Thursday_High": 10262.36,
+      "Thursday_Low": 10244.17,
+      "Thursday_Range": 18.19
+    },
+    {
+      "Week_Number": 8.0,
+      "Year": 2025.0,
+      "Thursday_Date": "2025-02-20",
+      "Thursday_High": 10350.27,
+      "Thursday_Low": 10331.8,
+      "Thursday_Range": 18.47
+    },
+    {
+      "Week_Number": 9.0,
+      "Year": 2025.0,
+      "Thursday_Date": "2025-02-27",
+      "Thursday_High": 10444.06,
+      "Thursday_Low": 10424.76,
+      "Thursday_Range": 19.3
+    },
+    {
+      "Week_Number": 10.0,
+      "Year": 2025.0,
+      "Thursday_Date": "2025-03-06",
+      "Thursday_High": 10529.72,
+      "Thursday_Low": 10513.68,
+      "Thursday_Range": 16.04
+    },
+    {
+      "Week_Number": 11.0,
+      "Year": 2025.0,
+      "Thursday_Date": "2025-03-13",
+      "Thursday_High": 10617.52,
+      "Thursday_Low": 10599.5,
+      "Thursday_Range": 18.02
+    },
+    {
+      "Week_Number": 12.0,
+      "Year": 2025.0,
+      "Thursday_Date": "2025-03-20",
+      "Thursday_High": 10708.43,
+      "Thursday_Low": 10689.1,
+      "Thursday_Range": 19.33
+    },
+    {
+      "Week_Number": 13.0,
+      "Year": 2025.0,
+      "Thursday_Date": "2025-03-27",
+      "Thursday_High": 10799.26,
+      "Thursday_Low": 10780.26,
+      "Thursday_Range": 19.0
+    },
+    {
+      "Week_Number": 14.0,
+      "Year": 2025.0,
+      "Thursday_Date": "2025-04-03",
+      "Thursday_High": 10890.82,
+      "Thursday_Low": 10875.12,
+      "Thursday_Range": 15.7
+    },
+    {
+      "Week_Number": 15.0,
+      "Year": 2025.0,
+      "Thursday_Date": "2025-04-10",
+      "Thursday_High": 10985.33,
+      "Thursday_Low": 10966.79,
+      "Thursday_Range": 18.54
+    },
+    {
+      "Week_Number": 16.0,
+      "Year": 2025.0,
+      "Thursday_Date": "2025-04-17",
+      "Thursday_High": 11084.73,
+      "Thursday_Low": 11064.2,
+      "Thursday_Range": 20.53
+    },
+    {
+      "Week_Number": 17.0,
+      "Year": 2025.0,
+      "Thursday_Date": "2025-04-24",
+      "Thursday_High": 11175.18,
+      "Thursday_Low": 11157.7,
+      "Thursday_Range": 17.48
+    },
+    {
+      "Week_Number": 18.0,
+      "Year": 2025.0,
+      "Thursday_Date": "2025-05-01",
+      "Thursday_High": 11269.08,
+      "Thursday_Low": 11247.42,
+      "Thursday_Range": 21.66
+    },
+    {
+      "Week_Number": 19.0,
+      "Year": 2025.0,
+      "Thursday_Date": "2025-05-08",
+      "Thursday_High": 11360.93,
+      "Thursday_Low": 11342.28,
+      "Thursday_Range": 18.65
+    },
+    {
+      "Week_Number": 20.0,
+      "Year": 2025.0,
+      "Thursday_Date": "2025-05-15",
+      "Thursday_High": 11450.21,
+      "Thursday_Low": 11431.16,
+      "Thursday_Range": 19.05
+    }
+  ]
+}

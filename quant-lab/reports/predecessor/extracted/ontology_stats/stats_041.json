@@ -1,0 +1,1346 @@
+{
+  "pct_r5_c0": {
+    "value": 89.34,
+    "type": "percentage",
+    "context": "",
+    "row": 5
+  },
+  "pct_r6_c0": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "",
+    "row": 6
+  },
+  "pct_r7_c0": {
+    "value": 64.3,
+    "type": "percentage",
+    "context": "",
+    "row": 7
+  },
+  "Primary_Function__Range_Accumulation__Observation": {
+    "value": 34.2,
+    "type": "percentage",
+    "context": "Primary Function | Range Accumulation & Observation | Low volatility setup",
+    "row": 15
+  },
+  "Range_Accumulation__Observation__Low_volatility_se": {
+    "value": 89.34,
+    "type": "percentage",
+    "context": "Range Accumulation & Observation | Low volatility setup | Low (34.2% WILM)",
+    "row": 15
+  },
+  "ILM_Alignment_Status__Setup_validation__Static_ana": {
+    "value": 87.3,
+    "type": "percentage",
+    "context": "ILM Alignment Status | Setup validation | Static analysis",
+    "row": 18
+  },
+  "Monitor_00000800_price_action__NO_ENTRY__Document": {
+    "value": 89.34,
+    "type": "percentage",
+    "context": "Monitor 00:00-08:00 price action | NO ENTRY - Document range | N/A",
+    "row": 22
+  },
+  "ILM_Alignment_Check__Check_DailyWeeklyMonthly_ILM": {
+    "value": 87.3,
+    "type": "percentage",
+    "context": "ILM Alignment Check | Check Daily/Weekly/Monthly ILM | Record alignment status",
+    "row": 23
+  },
+  "WILM_Status": {
+    "value": 34.2,
+    "type": "percentage",
+    "context": "WILM Status",
+    "row": 26
+  },
+  "Wednesday_Alert": {
+    "value": 35.0,
+    "type": "percentage",
+    "context": "Wednesday Alert",
+    "row": 27
+  },
+  "Wednesday_Alert__If_Wednesday_note_35_violation__E": {
+    "value": 35.0,
+    "type": "percentage",
+    "context": "Wednesday Alert | If Wednesday, note 35% violation | Expect bifurcation",
+    "row": 27
+  },
+  "Liquidity_Levels__Identify_key_levels_in_range__Ma": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "Liquidity Levels | Identify key levels in range | Mark for London sweep",
+    "row": 29
+  },
+  "Tight_Range__30_pips__Consolidation": {
+    "value": 40.0,
+    "type": "percentage",
+    "context": "Tight Range < 30 pips | Consolidation",
+    "row": 34
+  },
+  "Wide_Range__80_pips__Early_volatility": {
+    "value": 15.0,
+    "type": "percentage",
+    "context": "Wide Range > 80 pips | Early volatility",
+    "row": 35
+  },
+  "False_Breakout__Spike_outside_range": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "False Breakout | Spike outside range",
+    "row": 36
+  },
+  "ILM_Full_Alignment__All_timeframes_aligned": {
+    "value": 87.3,
+    "type": "percentage",
+    "context": "ILM Full Alignment | All timeframes aligned",
+    "row": 37
+  },
+  "ILM_Misalignment__Conflicting_timeframes": {
+    "value": 12.7,
+    "type": "percentage",
+    "context": "ILM Misalignment | Conflicting timeframes",
+    "row": 38
+  },
+  "PreLondon_Spike__07300800_volatility": {
+    "value": 20.0,
+    "type": "percentage",
+    "context": "Pre-London Spike | 07:30-08:00 volatility",
+    "row": 39
+  },
+  "Wednesday_Asian__Midweek_positioning": {
+    "value": 35.0,
+    "type": "percentage",
+    "context": "Wednesday Asian | Mid-week positioning",
+    "row": 40
+  },
+  "Gap_Opening__Sunday_night_gap": {
+    "value": 10.0,
+    "type": "percentage",
+    "context": "Gap Opening | Sunday night gap",
+    "row": 41
+  },
+  "Holiday_Thin_Volume__Low_participation": {
+    "value": 5.0,
+    "type": "percentage",
+    "context": "Holiday Thin Volume | Low participation",
+    "row": 42
+  },
+  "Trend_Establishment__Entry__High_volatility_expans": {
+    "value": 87.3,
+    "type": "percentage",
+    "context": "Trend Establishment & Entry | High volatility expansion | Variable velocity",
+    "row": 47
+  },
+  "Optimal_Entry__Monday_07001000_UTC__ILMbased_direc": {
+    "value": 64.3,
+    "type": "percentage",
+    "context": "Optimal Entry | Monday 07:00-10:00 UTC | ILM-based directional bias",
+    "row": 48
+  },
+  "Monday_07001000_UTC__ILMbased_directional_bias__Da": {
+    "value": 87.3,
+    "type": "percentage",
+    "context": "Monday 07:00-10:00 UTC | ILM-based directional bias | Daily ILM 64.3%",
+    "row": 48
+  },
+  "Wednesday_Risk": {
+    "value": 35.0,
+    "type": "percentage",
+    "context": "Wednesday Risk",
+    "row": 50
+  },
+  "Wednesday_Risk__35_violation_probability__Bifurcat": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Wednesday Risk | 35% violation probability | Bifurcation day",
+    "row": 50
+  },
+  "pct_r51_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 51
+  },
+  "132_Mechanics": {
+    "value": 71.53,
+    "type": "percentage",
+    "context": "132% Mechanics",
+    "row": 51
+  },
+  "132_Mechanics__7153_violation_rate__Extension_targ": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "132% Mechanics | 71.53% violation rate | Extension targeting",
+    "row": 51
+  },
+  "London_Open_Entry__07001000_UTC__Daily_ILM_align": {
+    "value": 64.3,
+    "type": "percentage",
+    "context": "London Open Entry | 07:00-10:00 UTC + Daily ILM align | Enter in ILM direction",
+    "row": 56
+  },
+  "Full_ILM_Alignment__DailyWeeklyMonthly_aligned__In": {
+    "value": 87.3,
+    "type": "percentage",
+    "context": "Full ILM Alignment | Daily/Weekly/Monthly aligned | Increase position size",
+    "row": 57
+  },
+  "Partial_ILM__Daily_ILM_only_others_misaligned__Sta": {
+    "value": 64.3,
+    "type": "percentage",
+    "context": "Partial ILM | Daily ILM only, others misaligned | Standard position size",
+    "row": 58
+  },
+  "Asian_Range_Break__London_breaks_Asian_highlow__Co": {
+    "value": 75.0,
+    "type": "percentage",
+    "context": "Asian Range Break | London breaks Asian high/low | Confirm with volume, enter",
+    "row": 60
+  },
+  "pct_r61_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 61
+  },
+  "132_Target": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "132% Target",
+    "row": 61
+  },
+  "132_Target__Price_extends_to_132_level": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "132% Target | Price extends to 132% level",
+    "row": 61
+  },
+  "132_Target__Price_extends_to_132_level__Reduce_50": {
+    "value": 71.53,
+    "type": "percentage",
+    "context": "132% Target | Price extends to 132% level | Reduce 50% position",
+    "row": 61
+  },
+  "pct_r62_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 62
+  },
+  "132_Violation": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "132% Violation",
+    "row": 184
+  },
+  "132_Violation__Price_exceeds_132_by_5_pips__Exit_r": {
+    "value": 71.53,
+    "type": "percentage",
+    "context": "132% Violation | Price exceeds 132% by >5 pips | Exit remaining position",
+    "row": 62
+  },
+  "Price_exceeds_132_by_5_pips__Exit_remaining_positi": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Price exceeds 132% by >5 pips | Exit remaining position | 71.53%",
+    "row": 62
+  },
+  "Wednesday_Trading__If_Wednesday_session": {
+    "value": 30.0,
+    "type": "percentage",
+    "context": "Wednesday Trading | If Wednesday session",
+    "row": 63
+  },
+  "Wednesday_Trading__If_Wednesday_session__Reduce_si": {
+    "value": 35.0,
+    "type": "percentage",
+    "context": "Wednesday Trading | If Wednesday session | Reduce size by 30%",
+    "row": 63
+  },
+  "Wednesday_Close__Wednesday_1600_UTC": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Wednesday Close | Wednesday 16:00 UTC",
+    "row": 64
+  },
+  "Wednesday_Close__Wednesday_1600_UTC__Evaluate_25_p": {
+    "value": 70.0,
+    "type": "percentage",
+    "context": "Wednesday Close | Wednesday 16:00 UTC | Evaluate -25% position",
+    "row": 64
+  },
+  "Profit_Target_1": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Profit Target 1",
+    "row": 68
+  },
+  "Profit_Target_1__50_at_618_Fib_level__Book_partial": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "Profit Target 1 | 50% at 61.8% Fib level | Book partial profits",
+    "row": 68
+  },
+  "Profit_Target_2": {
+    "value": 30.0,
+    "type": "percentage",
+    "context": "Profit Target 2",
+    "row": 69
+  },
+  "Profit_Target_2__30_at_100_extension__Book_more_pr": {
+    "value": 65.0,
+    "type": "percentage",
+    "context": "Profit Target 2 | 30% at 100% extension | Book more profits",
+    "row": 69
+  },
+  "Full_ILM_Alignment__All_timeframes_bullishbearish": {
+    "value": 87.3,
+    "type": "percentage",
+    "context": "Full ILM Alignment | All timeframes bullish/bearish",
+    "row": 74
+  },
+  "873__High_probability_trend__Enter_full_size": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "87.3% | High probability trend | Enter full size",
+    "row": 74
+  },
+  "Daily_ILM_Only__WeeklyMonthly_misaligned": {
+    "value": 64.3,
+    "type": "percentage",
+    "context": "Daily ILM Only | Weekly/Monthly misaligned",
+    "row": 75
+  },
+  "643__Good_probability_move__Enter_standard_size": {
+    "value": 70.0,
+    "type": "percentage",
+    "context": "64.3% | Good probability move | Enter standard size",
+    "row": 75
+  },
+  "LOW__Choppyranging__Skip_or_micro": {
+    "value": 20.0,
+    "type": "percentage",
+    "context": "LOW | Choppy/ranging | Skip or micro",
+    "row": 76
+  },
+  "pct_r77_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 77
+  },
+  "132_Extension_Hit__Target_reached_cleanly": {
+    "value": 71.53,
+    "type": "percentage",
+    "context": "132% Extension Hit | Target reached cleanly",
+    "row": 77
+  },
+  "Target_reached_cleanly__7153__Take_profits": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Target reached cleanly | 71.53% | Take profits",
+    "row": 77
+  },
+  "7153__Take_profits__Reduce_50": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "71.53% | Take profits | Reduce 50%",
+    "row": 77
+  },
+  "pct_r78_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 78
+  },
+  "132_Violation_5_pips": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "132% Violation >5 pips",
+    "row": 78
+  },
+  "132_Violation_5_pips__Exceeded_132_level": {
+    "value": 71.53,
+    "type": "percentage",
+    "context": "132% Violation >5 pips | Exceeded 132% level",
+    "row": 78
+  },
+  "132_Violation_5_pips__Exceeded_132_level__7153": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "132% Violation >5 pips | Exceeded 132% level | 71.53%",
+    "row": 78
+  },
+  "7153__100_rekey_incoming__Exit_all": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "71.53% | 100% rekey incoming | Exit all",
+    "row": 78
+  },
+  "pct_r79_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 79
+  },
+  "132_Near_Miss": {
+    "value": 131.5,
+    "type": "percentage",
+    "context": "132% Near Miss",
+    "row": 79
+  },
+  "132_Near_Miss__Stopped_at_1315": {
+    "value": 28.47,
+    "type": "percentage",
+    "context": "132% Near Miss | Stopped at 131.5%",
+    "row": 79
+  },
+  "2847__Reversal_likely__Hold_with_tight_stop": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "28.47% | Reversal likely | Hold with tight stop",
+    "row": 79
+  },
+  "Wednesday_AM__Wed_07001200": {
+    "value": 35.0,
+    "type": "percentage",
+    "context": "Wednesday AM | Wed 07:00-12:00",
+    "row": 80
+  },
+  "Wed_07001200__35__Normal_trading_possible": {
+    "value": 30.0,
+    "type": "percentage",
+    "context": "Wed 07:00-12:00 | 35% | Normal trading possible",
+    "row": 80
+  },
+  "35__Normal_trading_possible__Reduce_size_30": {
+    "value": 70.0,
+    "type": "percentage",
+    "context": "35% | Normal trading possible | Reduce size 30%",
+    "row": 80
+  },
+  "pct_r81_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 81
+  },
+  "Wednesday_Close_25": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Wednesday Close -25%",
+    "row": 81
+  },
+  "Wednesday_Close_25__Wed_1600_at_25_level": {
+    "value": 70.0,
+    "type": "percentage",
+    "context": "Wednesday Close -25% | Wed 16:00 at -25% level",
+    "row": 81
+  },
+  "Wednesday_Close_25__Wed_1600_at_25_level__70": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Wednesday Close -25% | Wed 16:00 at -25% level | 70%",
+    "row": 81
+  },
+  "70__132_extension_risk__Exit_or_tight_stop": {
+    "value": 30.0,
+    "type": "percentage",
+    "context": "70% | 132% extension risk | Exit or tight stop",
+    "row": 81
+  },
+  "Wednesday_Close_Above": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Wednesday Close Above",
+    "row": 82
+  },
+  "Wednesday_Close_Above__Wed_1600_above_25": {
+    "value": 30.0,
+    "type": "percentage",
+    "context": "Wednesday Close Above | Wed 16:00 above -25%",
+    "row": 82
+  },
+  "30__Continuation_likely__Hold_position": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "30% | Continuation likely | Hold position",
+    "row": 82
+  },
+  "London_AM_Expansion__07001000_strong_move": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "London AM Expansion | 07:00-10:00 strong move",
+    "row": 83
+  },
+  "80__Trend_established__Add_to_position": {
+    "value": 120.0,
+    "type": "percentage",
+    "context": "80% | Trend established | Add to position",
+    "row": 83
+  },
+  "London_PM_Chop__12001600_rangebound": {
+    "value": 40.0,
+    "type": "percentage",
+    "context": "London PM Chop | 12:00-16:00 range-bound",
+    "row": 84
+  },
+  "40__Consolidation__Reduce_or_exit": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "40% | Consolidation | Reduce or exit",
+    "row": 84
+  },
+  "False_Breakout__Quick_reversal_after_break": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "False Breakout | Quick reversal after break",
+    "row": 85
+  },
+  "25__Trap_move__Exit_immediately": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "25% | Trap move | Exit immediately",
+    "row": 85
+  },
+  "Gap_Down_Monday__Asian_gap_into_London": {
+    "value": 15.0,
+    "type": "percentage",
+    "context": "Gap Down Monday | Asian gap into London",
+    "row": 86
+  },
+  "15__Gap_fill_attempt__Wait_for_confirmation": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "15% | Gap fill attempt | Wait for confirmation",
+    "row": 86
+  },
+  "NA__Volatility_spike__Exit_before_or_skip": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "N/A | Volatility spike | Exit before or skip",
+    "row": 87
+  },
+  "WILM_Low_Velocity": {
+    "value": 34.2,
+    "type": "percentage",
+    "context": "WILM Low Velocity",
+    "row": 88
+  },
+  "WILM_Low_Velocity__342_WILM_during_London": {
+    "value": 34.2,
+    "type": "percentage",
+    "context": "WILM Low Velocity | 34.2% WILM during London",
+    "row": 88
+  },
+  "342__Rangebound_likely__Smaller_targets": {
+    "value": 70.0,
+    "type": "percentage",
+    "context": "34.2% | Range-bound likely | Smaller targets",
+    "row": 88
+  },
+  "WILM_High_Velocity": {
+    "value": 94.3,
+    "type": "percentage",
+    "context": "WILM High Velocity",
+    "row": 89
+  },
+  "WILM_High_Velocity__943_WILM_rekey_pattern": {
+    "value": 94.3,
+    "type": "percentage",
+    "context": "WILM High Velocity | 94.3% WILM rekey pattern",
+    "row": 89
+  },
+  "943__Strong_trending__Full_position": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "94.3% | Strong trending | Full position",
+    "row": 89
+  },
+  "NA__Protect_gains__Trail_stop_50_pips": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "N/A | Protect gains | Trail stop 50 pips",
+    "row": 90
+  },
+  "Multiple_Rejections__Level_tested_3_times": {
+    "value": 60.0,
+    "type": "percentage",
+    "context": "Multiple Rejections | Level tested 3+ times",
+    "row": 91
+  },
+  "Liquidity_Sweep__Reversal__High_volatility_open__N": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "Liquidity Sweep & Reversal | High volatility open | NY Open spike then fade",
+    "row": 95
+  },
+  "13001400_UTC_liquidity_grab__Sweep_AsianLondon_ext": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "13:00-14:00 UTC liquidity grab | Sweep Asian/London extremes | Highest velocity",
+    "row": 96
+  },
+  "Fibonacci_Levels": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Fibonacci Levels",
+    "row": 97
+  },
+  "Fibonacci_Levels__25_and_50_key_levels__Reversalbo": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Fibonacci Levels | -25% and -50% key levels | Reversal/bounce zones",
+    "row": 97
+  },
+  "pct_r98_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 98
+  },
+  "Post132_Entry": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Post-132% Entry",
+    "row": 114
+  },
+  "1224h_after_132_violation__Reentry_opportunity__Da": {
+    "value": 85.0,
+    "type": "percentage",
+    "context": "+12-24h after 132% violation | Re-entry opportunity | Daily ILM alignment",
+    "row": 98
+  },
+  "NY_Open_Liquidity__13001400_spike_to_HiLo__Wait_fo": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "NY Open Liquidity | 13:00-14:00 spike to Hi/Lo | Wait for reversal",
+    "row": 104
+  },
+  "HiLo_Sweep_Entry__AsianLondon_extreme_hit__Enter_c": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "Hi/Lo Sweep Entry | Asian/London extreme hit | Enter counter-trend",
+    "row": 105
+  },
+  "False_Breakout__Quick_spike_and_rejection__Enter_o": {
+    "value": 75.0,
+    "type": "percentage",
+    "context": "False Breakout | Quick spike and rejection | Enter on rejection candle",
+    "row": 106
+  },
+  "PostSweep_Hold__If_London_position_held__Continue": {
+    "value": 70.0,
+    "type": "percentage",
+    "context": "Post-Sweep Hold | If London position held | Continue if trend intact",
+    "row": 107
+  },
+  "pct_r109_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 109
+  },
+  "25_Fibonacci": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "-25% Fibonacci",
+    "row": 109
+  },
+  "25_Fibonacci__Price_reaches_25_level__Strong_suppo": {
+    "value": 98.22,
+    "type": "percentage",
+    "context": "-25% Fibonacci | Price reaches -25% level | Strong support/resistance",
+    "row": 109
+  },
+  "pct_r110_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 110
+  },
+  "50_Fibonacci": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "-50% Fibonacci",
+    "row": 110
+  },
+  "50_Fibonacci__Price_reaches_50_level__Major_suppor": {
+    "value": 96.44,
+    "type": "percentage",
+    "context": "-50% Fibonacci | Price reaches -50% level | Major support/resistance",
+    "row": 110
+  },
+  "Fib_Bounce_Entry": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Fib Bounce Entry",
+    "row": 111
+  },
+  "Fib_Bounce_Entry__Rejection_at_25_or_50__Enter_in": {
+    "value": 98.0,
+    "type": "percentage",
+    "context": "Fib Bounce Entry | Rejection at -25% or -50% | Enter in bounce direction",
+    "row": 111
+  },
+  "Fib_Break__Clean_break_through_Fib_level__Enter_co": {
+    "value": 85.0,
+    "type": "percentage",
+    "context": "Fib Break | Clean break through Fib level | Enter continuation",
+    "row": 112
+  },
+  "pct_r113_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 113
+  },
+  "Post132_Setup": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Post-132% Setup",
+    "row": 113
+  },
+  "Post132_Setup__1224h_after_132_violation__Check_Da": {
+    "value": 85.0,
+    "type": "percentage",
+    "context": "Post-132% Setup | +12-24h after 132% violation | Check Daily ILM alignment",
+    "row": 113
+  },
+  "pct_r114_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 114
+  },
+  "Post132_Entry__Daily_ILM_aligned_post132__Enter_ne": {
+    "value": 85.0,
+    "type": "percentage",
+    "context": "Post-132% Entry | Daily ILM aligned post-132% | Enter new position",
+    "row": 114
+  },
+  "pct_r115_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 115
+  },
+  "Post132_Skip": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Post-132% Skip",
+    "row": 115
+  },
+  "NY_Late_Profit_Book__19002200_profit_zone": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "NY Late Profit Book | 19:00-22:00 profit zone",
+    "row": 117
+  },
+  "Multiple_Timeframes__All_timeframes_align_NY__Hold": {
+    "value": 90.0,
+    "type": "percentage",
+    "context": "Multiple Timeframes | All timeframes align NY | Hold through close",
+    "row": 121
+  },
+  "NY_Open_Spike_Up__13001400_sharp_rise": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "NY Open Spike Up | 13:00-14:00 sharp rise",
+    "row": 124
+  },
+  "80__Sweep_high_reverse_down__Wait_then_short": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "80% | Sweep high, reverse down | Wait then short",
+    "row": 124
+  },
+  "NY_Open_Spike_Down__13001400_sharp_fall": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "NY Open Spike Down | 13:00-14:00 sharp fall",
+    "row": 125
+  },
+  "80__Sweep_low_reverse_up__Wait_then_long": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "80% | Sweep low, reverse up | Wait then long",
+    "row": 125
+  },
+  "HiLo_Takeout_Clean__Extreme_clearly_broken": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "Hi/Lo Takeout Clean | Extreme clearly broken",
+    "row": 126
+  },
+  "80__Reversal_imminent__Enter_countertrend": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "80% | Reversal imminent | Enter counter-trend",
+    "row": 126
+  },
+  "HiLo_Fake_Takeout__Spike_but_no_close_beyond": {
+    "value": 20.0,
+    "type": "percentage",
+    "context": "Hi/Lo Fake Takeout | Spike but no close beyond",
+    "row": 127
+  },
+  "20__Continuation_possible__Wait_for_confirmation": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "20% | Continuation possible | Wait for confirmation",
+    "row": 127
+  },
+  "pct_r128_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 128
+  },
+  "25_Level_Hit": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "-25% Level Hit",
+    "row": 128
+  },
+  "25_Level_Hit__Price_reaches_25_Fib": {
+    "value": 98.22,
+    "type": "percentage",
+    "context": "-25% Level Hit | Price reaches -25% Fib",
+    "row": 128
+  },
+  "9822__Strong_supportresist__Enter_bounce": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "98.22% | Strong support/resist | Enter bounce",
+    "row": 128
+  },
+  "pct_r129_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 129
+  },
+  "25_Level_Break": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "-25% Level Break",
+    "row": 129
+  },
+  "25_Level_Break__Clean_break_through_25": {
+    "value": 1.78,
+    "type": "percentage",
+    "context": "-25% Level Break | Clean break through -25%",
+    "row": 129
+  },
+  "25_Level_Break__Clean_break_through_25__178": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "-25% Level Break | Clean break through -25% | 1.78%",
+    "row": 129
+  },
+  "178__Continue_to_50__Hold_or_add": {
+    "value": 120.0,
+    "type": "percentage",
+    "context": "1.78% | Continue to -50% | Hold or add",
+    "row": 129
+  },
+  "pct_r130_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 130
+  },
+  "50_Level_Hit": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "-50% Level Hit",
+    "row": 130
+  },
+  "50_Level_Hit__Price_reaches_50_Fib": {
+    "value": 96.44,
+    "type": "percentage",
+    "context": "-50% Level Hit | Price reaches -50% Fib",
+    "row": 130
+  },
+  "9644__Extreme_reversal_zone__Strong_entry": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "96.44% | Extreme reversal zone | Strong entry",
+    "row": 130
+  },
+  "pct_r131_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 131
+  },
+  "50_Level_Break": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "-50% Level Break",
+    "row": 131
+  },
+  "50_Level_Break__Clean_break_through_50": {
+    "value": 3.56,
+    "type": "percentage",
+    "context": "-50% Level Break | Clean break through -50%",
+    "row": 131
+  },
+  "356__Major_trend_shift__Hold_or_exit": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "3.56% | Major trend shift | Hold or exit",
+    "row": 131
+  },
+  "pct_r132_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 132
+  },
+  "Post132_12h": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Post-132% +12h",
+    "row": 132
+  },
+  "Post132_12h__12h_after_132_violation": {
+    "value": 85.0,
+    "type": "percentage",
+    "context": "Post-132% +12h | 12h after 132% violation",
+    "row": 132
+  },
+  "85__Daily_ILM_aligned__Enter_new_position": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "85% | Daily ILM aligned | Enter new position",
+    "row": 132
+  },
+  "pct_r133_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 133
+  },
+  "Post132_24h": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Post-132% +24h",
+    "row": 133
+  },
+  "Post132_24h__24h_after_132_violation": {
+    "value": 85.0,
+    "type": "percentage",
+    "context": "Post-132% +24h | 24h after 132% violation",
+    "row": 133
+  },
+  "85__Optimal_reentry__Full_position": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "85% | Optimal re-entry | Full position",
+    "row": 133
+  },
+  "pct_r134_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 134
+  },
+  "Post132_No_ILM": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Post-132% No ILM",
+    "row": 134
+  },
+  "Post132_No_ILM__Post132_misaligned": {
+    "value": 15.0,
+    "type": "percentage",
+    "context": "Post-132% No ILM | Post-132% misaligned",
+    "row": 134
+  },
+  "15__Low_probability__Skip_or_micro": {
+    "value": 20.0,
+    "type": "percentage",
+    "context": "15% | Low probability | Skip or micro",
+    "row": 134
+  },
+  "NY_Mid_Chop__15001900_rangebound": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "NY Mid Chop | 15:00-19:00 range-bound",
+    "row": 135
+  },
+  "50__Consolidation__Hold_or_reduce": {
+    "value": 70.0,
+    "type": "percentage",
+    "context": "50% | Consolidation | Hold or reduce",
+    "row": 135
+  },
+  "NA__Session_closing__Book_profits": {
+    "value": 20.0,
+    "type": "percentage",
+    "context": "N/A | Session closing | Book profits",
+    "row": 136
+  },
+  "NA__Weekend_gap_risk__Exit_all": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "N/A | Weekend gap risk | Exit all",
+    "row": 137
+  },
+  "NA__Gap_opening_risk__Exit_or_tight_stop": {
+    "value": 30.0,
+    "type": "percentage",
+    "context": "N/A | Gap opening risk | Exit or tight stop",
+    "row": 138
+  },
+  "NA__Volatile_reaction__Exit_or_avoid": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "N/A | Volatile reaction | Exit or avoid",
+    "row": 139
+  },
+  "Multiple_Fib_Reject": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Multiple Fib Reject",
+    "row": 140
+  },
+  "Multiple_Fib_Reject__Both_25_and_50_hold": {
+    "value": 95.0,
+    "type": "percentage",
+    "context": "Multiple Fib Reject | Both -25% and -50% hold",
+    "row": 140
+  },
+  "95__Strong_levels__Trade_bounces": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "95%+ | Strong levels | Trade bounces",
+    "row": 140
+  },
+  "Large_winning_position__NA__Secure_gains": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "Large winning position | N/A | Secure gains",
+    "row": 141
+  },
+  "NA__Secure_gains__Exit_80_by_1900": {
+    "value": 20.0,
+    "type": "percentage",
+    "context": "N/A | Secure gains | Exit 80% by 19:00",
+    "row": 141
+  },
+  "NA__Stop_loss_hit__Exit_immediately": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "N/A | Stop loss hit | Exit immediately",
+    "row": 142
+  },
+  "Reversal_Pattern__Clear_reversal_signal": {
+    "value": 70.0,
+    "type": "percentage",
+    "context": "Reversal Pattern | Clear reversal signal",
+    "row": 143
+  },
+  "70__Trend_change__Exit_or_reverse": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "70% | Trend change | Exit or reverse",
+    "row": 143
+  },
+  "Monday__07001000__Primary_entry_with_ILM": {
+    "value": 87.3,
+    "type": "percentage",
+    "context": "Monday | 07:00-10:00 | Primary entry with ILM",
+    "row": 148
+  },
+  "Any_Day__13001400__Liquidity_sweep_reversal": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "Any Day | 13:00-14:00 | Liquidity sweep reversal",
+    "row": 149
+  },
+  "3": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "3",
+    "row": 150
+  },
+  "1224h__Any_Time__Fresh_setup_after_rekey": {
+    "value": 85.0,
+    "type": "percentage",
+    "context": "+12-24h | Any Time | Fresh setup after rekey",
+    "row": 150
+  },
+  "4": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "4",
+    "row": 151
+  },
+  "Any_Day__Any_Session__Key_reversal_level": {
+    "value": 98.22,
+    "type": "percentage",
+    "context": "Any Day | Any Session | Key reversal level",
+    "row": 151
+  },
+  "5": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "5",
+    "row": 152
+  },
+  "Any_Day__Any_Session__Extreme_reversal_level": {
+    "value": 96.44,
+    "type": "percentage",
+    "context": "Any Day | Any Session | Extreme reversal level",
+    "row": 152
+  },
+  "MonTue_ThuFri__10001400__Trend_continuation": {
+    "value": 75.0,
+    "type": "percentage",
+    "context": "Mon-Tue, Thu-Fri | 10:00-14:00 | Trend continuation",
+    "row": 153
+  },
+  "Wednesday__1600__Critical_decision_point": {
+    "value": 70.0,
+    "type": "percentage",
+    "context": "Wednesday | 16:00 | Critical decision point",
+    "row": 155
+  },
+  "Any_Day__00000800__Setup_identification": {
+    "value": 89.34,
+    "type": "percentage",
+    "context": "Any Day | 00:00-08:00 | Setup identification",
+    "row": 156
+  },
+  "Asian__Observe_only__NO_ENTRY__Check_ILM_alignment": {
+    "value": 89.34,
+    "type": "percentage",
+    "context": "Asian | Observe only - NO ENTRY | Check ILM alignment, measure range",
+    "row": 161
+  },
+  "Mon_07001000__London_Early__PRIMARY_ENTRY_WINDOW": {
+    "value": 64.3,
+    "type": "percentage",
+    "context": "Mon 07:00-10:00 | London Early | PRIMARY ENTRY WINDOW",
+    "row": 162
+  },
+  "Mon_10001300__London_Mid__Monitor_position": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Mon 10:00-13:00 | London Mid | Monitor position",
+    "row": 163
+  },
+  "London_Mid__Monitor_position__Check_for_132_approa": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "London Mid | Monitor position | Check for 132% approach",
+    "row": 163
+  },
+  "Mon_13001400__NY_Open__Liquidity_sweep_alert": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "Mon 13:00-14:00 | NY Open | Liquidity sweep alert",
+    "row": 164
+  },
+  "Mon_14001900__NY_Mid__Position_management": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Mon 14:00-19:00 | NY Mid | Position management",
+    "row": 165
+  },
+  "Mon_19002200__NY_Late__Profit_booking_window": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "Mon 19:00-22:00 | NY Late | Profit booking window",
+    "row": 166
+  },
+  "Wed_07001600__Wednesday_Alert": {
+    "value": 30.0,
+    "type": "percentage",
+    "context": "Wed 07:00-16:00 | Wednesday Alert",
+    "row": 168
+  },
+  "Wed_07001600__Wednesday_Alert__REDUCE_SIZE_30": {
+    "value": 35.0,
+    "type": "percentage",
+    "context": "Wed 07:00-16:00 | Wednesday Alert | REDUCE SIZE 30%",
+    "row": 168
+  },
+  "Wed_1600__Wednesday_Close__CRITICAL_DECISION": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Wed 16:00 | Wednesday Close | CRITICAL DECISION",
+    "row": 169
+  },
+  "Wednesday_Close__CRITICAL_DECISION__Check_25_posit": {
+    "value": 70.0,
+    "type": "percentage",
+    "context": "Wednesday Close | CRITICAL DECISION | Check -25% position",
+    "row": 169
+  },
+  "Wed_1600_Exit__Wed_Close_Action": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Wed 16:00 Exit | Wed Close Action",
+    "row": 170
+  },
+  "Wed_1600_Exit__Wed_Close_Action__Exit_or_tight_sto": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Wed 16:00 Exit | Wed Close Action | Exit or tight stop if -25% miss",
+    "row": 170
+  },
+  "pct_r173_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 173
+  },
+  "Any_Session__REENTRY_OPPORTUNITY__Check_Daily_ILM": {
+    "value": 85.0,
+    "type": "percentage",
+    "context": "Any Session | RE-ENTRY OPPORTUNITY | Check Daily ILM alignment",
+    "row": 173
+  },
+  "pct_r174_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 174
+  },
+  "Any_Fib_Touch__Any_Session__HIGH_PROBABILITY_SETUP": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Any Fib Touch | Any Session | HIGH PROBABILITY SETUP",
+    "row": 175
+  },
+  "Asian__London__Range_to_Expansion": {
+    "value": 89.34,
+    "type": "percentage",
+    "context": "Asian | London | Range to Expansion",
+    "row": 180
+  },
+  "London__NY_Open__Trend_to_Liquidity_Sweep": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "London | NY Open | Trend to Liquidity Sweep",
+    "row": 181
+  },
+  "pct_r182_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 182
+  },
+  "London_132__Weekly_Close__Extension_to_Completion": {
+    "value": 98.22,
+    "type": "percentage",
+    "context": "London 132% | Weekly Close | Extension to Completion",
+    "row": 182
+  },
+  "Weekly_Close__Extension_to_Completion__9822": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Weekly Close | Extension to Completion | 98.22%",
+    "row": 182
+  },
+  "Wednesday__Rekey_Event__Bifurcation_to_Reset": {
+    "value": 85.0,
+    "type": "percentage",
+    "context": "Wednesday | Rekey Event | Bifurcation to Reset",
+    "row": 183
+  },
+  "Rekey_Event__Bifurcation_to_Reset__850": {
+    "value": 35.0,
+    "type": "percentage",
+    "context": "Rekey Event | Bifurcation to Reset | 85.0%",
+    "row": 183
+  },
+  "pct_r184_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 184
+  },
+  "132_Violation__Post132_12h__Rekey_to_Reentry": {
+    "value": 85.0,
+    "type": "percentage",
+    "context": "132% Violation | Post-132% +12h | Rekey to Re-entry",
+    "row": 184
+  },
+  "Daily_ILM__London_Entry__Alignment_to_Entry": {
+    "value": 64.3,
+    "type": "percentage",
+    "context": "Daily ILM | London Entry | Alignment to Entry",
+    "row": 185
+  },
+  "Full_ILM__London_Entry__Full_Alignment_to_Entry": {
+    "value": 87.3,
+    "type": "percentage",
+    "context": "Full ILM | London Entry | Full Alignment to Entry",
+    "row": 186
+  },
+  "pct_r188_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 188
+  },
+  "25_Fib__BounceBreak__Key_Level_to_Action": {
+    "value": 98.22,
+    "type": "percentage",
+    "context": "-25% Fib | Bounce/Break | Key Level to Action",
+    "row": 188
+  },
+  "CRITICAL_SESSION_INSIGHTS__BounceBreak__Extreme_Le": {
+    "value": 96.44,
+    "type": "percentage",
+    "context": "CRITICAL SESSION INSIGHTS | Bounce/Break | Extreme Level to Action",
+    "row": 189
+  },
+  "pct_r191_c0": {
+    "value": 89.34,
+    "type": "percentage",
+    "context": "",
+    "row": 191
+  },
+  "pct_r192_c0": {
+    "value": 64.3,
+    "type": "percentage",
+    "context": "",
+    "row": 192
+  },
+  "pct_r193_c0": {
+    "value": 35.0,
+    "type": "percentage",
+    "context": "",
+    "row": 193
+  },
+  "pct_r194_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 194
+  },
+  "pct_r195_c0": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "",
+    "row": 195
+  },
+  "pct_r196_c0": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "",
+    "row": 196
+  },
+  "pct_r197_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 197
+  }
+}

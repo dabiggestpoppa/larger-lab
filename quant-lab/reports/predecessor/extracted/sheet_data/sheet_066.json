@@ -1,0 +1,145 @@
+{
+  "sheet_name": "PHASE 3C - TEMPORAL LENS DATA",
+  "headers": [
+    "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 23,
+  "data": [
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "EUR/USD Analysis | 2020-2025 | Delivery Speed Classifications"
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "Analysis Date: December 2025"
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "SECTION 1: DELIVERY SPEED CLASSIFICATIONS"
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "Delivery Type",
+      "col_2": "Count",
+      "col_3": "Percentage",
+      "col_4": "Avg Pullback (pips)",
+      "col_5": "Characteristics"
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "Fast",
+      "col_2": 33.0,
+      "col_3": 0.041,
+      "col_4": 22.4,
+      "col_5": "Rapid target achievement, smallest pullbacks"
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "Normal",
+      "col_2": 639.0,
+      "col_3": 0.803,
+      "col_4": 28.3,
+      "col_5": "Standard delivery pattern, typical pullbacks"
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "Slow",
+      "col_2": 124.0,
+      "col_3": 0.156,
+      "col_4": 32.1,
+      "col_5": "Extended delivery time, larger pullbacks"
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "SECTION 2: KEY METRICS SUMMARY"
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "Total Deliveries Analyzed:",
+      "col_2": 796.0
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "Fast Delivery Rate:",
+      "col_2": "4.1% (33 instances)"
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "Normal Delivery Rate:",
+      "col_2": "80.3% (639 instances)"
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "Slow Delivery Rate:",
+      "col_2": "15.6% (124 instances)"
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "SECTION 3: KEY FINDINGS"
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "\u2022 Fast deliveries produce smaller pullbacks (22.4 pips vs 28.3 normal)"
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "\u2022 Normal delivery is the dominant pattern (80.3%)"
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "\u2022 Slow deliveries have largest pullbacks (32.1 pips) - higher risk"
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "SECTION 4: AVERAGE DELIVERY TIMES BY FIBONACCI LEVEL"
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "Fibonacci Level",
+      "col_2": "Avg Delivery Time (hours)",
+      "col_3": "Delivery Classification",
+      "col_4": "Trading Window"
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "-25% Extension",
+      "col_2": 1.48,
+      "col_3": "Fast",
+      "col_4": "Mon London - Mon NY"
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "-50% Extension",
+      "col_2": 3.2,
+      "col_3": "Normal",
+      "col_4": "Mon NY - Tue London"
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "-100% Extension",
+      "col_2": 6.5,
+      "col_3": "Normal",
+      "col_4": "Tue NY - Wed London"
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "-168% Extension",
+      "col_2": 12.4,
+      "col_3": "Slow",
+      "col_4": "Wed-Thu Sessions"
+    },
+    {
+      "PHASE 3C: TEMPORAL LENS FRAMEWORK - TARGET DELIVERY RATE ANALYSIS": "132% Violation",
+      "col_2": 4.8,
+      "col_3": "Normal",
+      "col_4": "Peak on Wednesday"
+    }
+  ]
+}

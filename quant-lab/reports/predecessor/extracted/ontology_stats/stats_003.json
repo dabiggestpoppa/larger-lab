@@ -1,0 +1,74 @@
+{
+  "pct_r3_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 3
+  },
+  "132_Level_Hit": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "132% Level Hit",
+    "row": 3
+  },
+  "1H_pattern__15M_to_1H__Any": {
+    "value": 26.6,
+    "type": "percentage",
+    "context": "1H pattern | 15M to 1H | Any",
+    "row": 10
+  },
+  "4H_pattern__1H_to_4H__Any": {
+    "value": 27.4,
+    "type": "percentage",
+    "context": "4H pattern | 1H to 4H | Any",
+    "row": 11
+  },
+  "Daily_pattern__4H_to_Daily__Any": {
+    "value": 28.7,
+    "type": "percentage",
+    "context": "Daily pattern | 4H to Daily | Any",
+    "row": 12
+  },
+  "pct_r17_c0": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "",
+    "row": 17
+  },
+  "Wednesday_618_Change": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "Wednesday 61.8% Change",
+    "row": 17
+  },
+  "pct_r18_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 18
+  },
+  "100168_Levels": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "-100%/-168% Levels",
+    "row": 18
+  },
+  "15M_microlegs__4H_to_15M__Any": {
+    "value": 247.0,
+    "type": "percentage",
+    "context": "15M micro-legs | 4H to 15M | Any",
+    "row": 19
+  },
+  "15M_micropattern__Daily_to_15M__Daily_ILM_missed": {
+    "value": 320.0,
+    "type": "percentage",
+    "context": "15M micro-pattern | Daily to 15M | Daily ILM missed",
+    "row": 20
+  },
+  "Range_Expansion_Failure__Range_fails_to_expand__72": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "Range Expansion Failure | Range fails to expand | 72",
+    "row": 21
+  }
+}

@@ -1,0 +1,172 @@
+{
+  "sheet_name": "Top 10 Claims - Testing Framework",
+  "headers": [
+    "TOP 10 CLAIMS (\u226590% ACCURACY) - VALIDATION TESTING",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 16,
+  "data": [
+    {
+      "TOP 10 CLAIMS (\u226590% ACCURACY) - VALIDATION TESTING": "Claim #",
+      "col_2": "Claim Description",
+      "col_3": "Claimed %",
+      "col_4": "Test Method",
+      "col_5": "Required Data",
+      "col_6": "Status",
+      "col_7": "Priority"
+    },
+    {
+      "TOP 10 CLAIMS (\u226590% ACCURACY) - VALIDATION TESTING": "#1",
+      "col_2": "Q4 Reconstruction",
+      "col_3": 95.8,
+      "col_4": "Historical Q4 analysis",
+      "col_5": "Quarterly data + ILM states",
+      "col_6": "Pending",
+      "col_7": "High"
+    },
+    {
+      "TOP 10 CLAIMS (\u226590% ACCURACY) - VALIDATION TESTING": "#2",
+      "col_2": "132% Level Invalidation",
+      "col_3": 95.0,
+      "col_4": "Track 132% violations",
+      "col_5": "All session data",
+      "col_6": "Pending",
+      "col_7": "Critical"
+    },
+    {
+      "TOP 10 CLAIMS (\u226590% ACCURACY) - VALIDATION TESTING": "#3",
+      "col_2": "15M 61.8-88 under WILM \u2192 4H Rekey",
+      "col_3": 94.3,
+      "col_4": "Pattern rekey analysis",
+      "col_5": "15M/4H patterns + WILM states",
+      "col_6": "Pending",
+      "col_7": "High"
+    },
+    {
+      "TOP 10 CLAIMS (\u226590% ACCURACY) - VALIDATION TESTING": "#4",
+      "col_2": "Multi-Timeframe Alignment",
+      "col_3": 94.0,
+      "col_4": "Timeframe correlation",
+      "col_5": "15M/1H/4H alignment data",
+      "col_6": "Pending",
+      "col_7": "High"
+    },
+    {
+      "TOP 10 CLAIMS (\u226590% ACCURACY) - VALIDATION TESTING": "#5",
+      "col_2": "61.8% Rekey Accuracy",
+      "col_3": 94.0,
+      "col_4": "Rekey success tracking",
+      "col_5": "All rekey events",
+      "col_6": "Pending",
+      "col_7": "High"
+    },
+    {
+      "TOP 10 CLAIMS (\u226590% ACCURACY) - VALIDATION TESTING": "#6",
+      "col_2": "Q1 Reconstruction",
+      "col_3": 93.2,
+      "col_4": "Historical Q1 analysis",
+      "col_5": "Quarterly data + ILM states",
+      "col_6": "Pending",
+      "col_7": "Medium"
+    },
+    {
+      "TOP 10 CLAIMS (\u226590% ACCURACY) - VALIDATION TESTING": "#7",
+      "col_2": "15M + WILM Active Rekey",
+      "col_3": 92.0,
+      "col_4": "WILM rekey patterns",
+      "col_5": "15M patterns + WILM data",
+      "col_6": "Pending",
+      "col_7": "High"
+    },
+    {
+      "TOP 10 CLAIMS (\u226590% ACCURACY) - VALIDATION TESTING": "#8",
+      "col_2": "ILM High/Low within 2H",
+      "col_3": 91.2,
+      "col_4": "Timing analysis",
+      "col_5": "ILM formation times",
+      "col_6": "Pending",
+      "col_7": "Medium"
+    },
+    {
+      "TOP 10 CLAIMS (\u226590% ACCURACY) - VALIDATION TESTING": "#9",
+      "col_2": "50%\u219250% Retest",
+      "col_3": "83.2-91.4%",
+      "col_4": "Retest success rate",
+      "col_5": "All 50% retest patterns",
+      "col_6": "Pending",
+      "col_7": "Medium"
+    },
+    {
+      "TOP 10 CLAIMS (\u226590% ACCURACY) - VALIDATION TESTING": "#10",
+      "col_2": "-25% Extension Hit Rate",
+      "col_3": 90.0,
+      "col_4": "Weekly hit rate calculation",
+      "col_5": "1,401 Monday sessions + Friday close",
+      "col_6": "Pending",
+      "col_7": "CRITICAL"
+    },
+    {
+      "TOP 10 CLAIMS (\u226590% ACCURACY) - VALIDATION TESTING": "SECTION 2: TESTING METHODOLOGY"
+    },
+    {
+      "TOP 10 CLAIMS (\u226590% ACCURACY) - VALIDATION TESTING": "Claim #",
+      "col_2": "Test Description",
+      "col_3": "Data Required",
+      "col_4": "Calculation Method",
+      "col_5": "Pass/Fail Criteria",
+      "col_6": "Priority"
+    },
+    {
+      "TOP 10 CLAIMS (\u226590% ACCURACY) - VALIDATION TESTING": "#10",
+      "col_2": "-25% Extension Weekly Hit Rate",
+      "col_3": "All 1,401 Monday London sessions + weekly OHLC through Friday",
+      "col_4": "For each Monday: Calculate -25% extension from range. Track if weekly high/low hits -25% by Friday close",
+      "col_5": "Actual hit rate \u226578% (validation threshold), Target: 90%",
+      "col_6": "CRITICAL"
+    },
+    {
+      "TOP 10 CLAIMS (\u226590% ACCURACY) - VALIDATION TESTING": "#2",
+      "col_2": "132% Invalidation Analysis",
+      "col_3": "All sessions with 132% level calculations",
+      "col_4": "Count sessions where price violates 132% level. Calculate invalidation success rate",
+      "col_5": "Success rate \u226585% (90% claimed)",
+      "col_6": "Critical"
+    },
+    {
+      "TOP 10 CLAIMS (\u226590% ACCURACY) - VALIDATION TESTING": "#4",
+      "col_2": "Multi-Timeframe Alignment",
+      "col_3": "15M/1H/4H pattern completions",
+      "col_4": "Identify sessions with pattern alignment across timeframes. Calculate completion rate",
+      "col_5": "Completion rate \u226584% (94% claimed)",
+      "col_6": "High"
+    }
+  ]
+}

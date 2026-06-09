@@ -1,0 +1,82 @@
+{
+  "sheet_name": "ETH_Fib_Analysis",
+  "headers": [
+    "Week Start",
+    "Bias",
+    "Asian High",
+    "Asian Low",
+    "Range",
+    "25% Level",
+    "50% Level",
+    "100% Level",
+    "168% Level",
+    "132% Invalid",
+    "25% Hit (5D)",
+    "50% Hit (5D)",
+    "100% Hit (5D)",
+    "168% Hit (5D)",
+    "Inv (5D)",
+    "25% Hit (7D)",
+    "50% Hit (7D)",
+    "100% Hit (7D)",
+    "168% Hit (7D)",
+    "Inv (7D)",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 8,
+  "data": [
+    {
+      "Week Start": "Phase 4 PDF Validated Hit Rates"
+    },
+    {
+      "Week Start": "Level",
+      "Bias": "Combined",
+      "Asian High": "Bullish",
+      "Asian Low": "Bearish"
+    },
+    {
+      "Week Start": -25.0,
+      "Bias": 1.0,
+      "Asian High": 1.0,
+      "Asian Low": 1.0
+    },
+    {
+      "Week Start": -50.0,
+      "Bias": 0.9570000000000001,
+      "Asian High": 0.951,
+      "Asian Low": 0.966
+    },
+    {
+      "Week Start": -100.0,
+      "Bias": 0.862,
+      "Asian High": 0.872,
+      "Asian Low": 0.8490000000000001,
+      "Range": "168% Hit Rate",
+      "25% Level": "132% Violation Rate"
+    },
+    {
+      "Week Start": -168.0,
+      "Bias": 0.763,
+      "Asian High": 0.785,
+      "Asian Low": 0.733
+    },
+    {
+      "Week Start": "132% Violation",
+      "Bias": 0.7440000000000001,
+      "Asian High": 0.738,
+      "Asian Low": 0.753
+    },
+    {
+      "Week Start": "Source: ETH/USD Phase 4 PDF - 5-Day Model, 215 weeks, 948 Fibonacci hits"
+    }
+  ]
+}

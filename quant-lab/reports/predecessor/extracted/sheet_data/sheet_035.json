@@ -1,0 +1,192 @@
+{
+  "sheet_name": "TOLERANCE_COMPARISON_0.15_0.25_0.50",
+  "headers": [
+    "TOLERANCE COMPARISON ANALYSIS: \u00b10.15 vs \u00b10.25 vs \u00b10.50 (1,857 Sessions, 2023-2025)",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 20,
+  "data": [
+    {
+      "TOLERANCE COMPARISON ANALYSIS: \u00b10.15 vs \u00b10.25 vs \u00b10.50 (1,857 Sessions, 2023-2025)": "HYPOTHESIS RESULTS ACROSS THREE TOLERANCES"
+    },
+    {
+      "TOLERANCE COMPARISON ANALYSIS: \u00b10.15 vs \u00b10.25 vs \u00b10.50 (1,857 Sessions, 2023-2025)": "Hypothesis_ID",
+      "col_2": "Description",
+      "col_3": "Tolerance_0.15",
+      "col_4": "Tolerance_0.25",
+      "col_5": "Tolerance_0.50",
+      "col_6": "Improvement_0.25",
+      "col_7": "Improvement_0.50",
+      "col_8": "Status_at_0.50"
+    },
+    {
+      "TOLERANCE COMPARISON ANALYSIS: \u00b10.15 vs \u00b10.25 vs \u00b10.50 (1,857 Sessions, 2023-2025)": "H1",
+      "col_2": "Session Fibonacci Overlap Rate",
+      "col_3": 45.5,
+      "col_6": -1.0,
+      "col_7": -1.0,
+      "col_8": "FAIL"
+    },
+    {
+      "TOLERANCE COMPARISON ANALYSIS: \u00b10.15 vs \u00b10.25 vs \u00b10.50 (1,857 Sessions, 2023-2025)": "H2",
+      "col_2": "Monday\u2192Tuesday Asian Overlap Rate",
+      "col_3": 35.2,
+      "col_4": 0.0,
+      "col_5": 0.0,
+      "col_6": -1.0,
+      "col_7": -1.0,
+      "col_8": "FAIL"
+    },
+    {
+      "TOLERANCE COMPARISON ANALYSIS: \u00b10.15 vs \u00b10.25 vs \u00b10.50 (1,857 Sessions, 2023-2025)": "H3",
+      "col_2": "Asian Session Predictive Accuracy",
+      "col_3": 82.71,
+      "col_4": 0.0,
+      "col_5": 0.0,
+      "col_6": -1.0,
+      "col_7": -1.0,
+      "col_8": "FAIL"
+    },
+    {
+      "TOLERANCE COMPARISON ANALYSIS: \u00b10.15 vs \u00b10.25 vs \u00b10.50 (1,857 Sessions, 2023-2025)": "H4",
+      "col_2": "Previous Day Target Overlap Rate",
+      "col_3": 38.9,
+      "col_6": -1.0,
+      "col_7": -1.0,
+      "col_8": "FAIL"
+    },
+    {
+      "TOLERANCE COMPARISON ANALYSIS: \u00b10.15 vs \u00b10.25 vs \u00b10.50 (1,857 Sessions, 2023-2025)": "H5",
+      "col_2": "Wed-Thu Velocity Increase Rate",
+      "col_3": 28.3,
+      "col_4": 32.545,
+      "col_5": 36.224000000000004,
+      "col_6": 0.15,
+      "col_7": 0.28,
+      "col_8": "FAIL"
+    },
+    {
+      "TOLERANCE COMPARISON ANALYSIS: \u00b10.15 vs \u00b10.25 vs \u00b10.50 (1,857 Sessions, 2023-2025)": "H6",
+      "col_2": "Weekly Confluence Detection Rate",
+      "col_3": 65.4,
+      "col_4": 73.24800000000002,
+      "col_5": 79.78800000000001,
+      "col_6": 0.12,
+      "col_7": 0.22,
+      "col_8": "PASS"
+    },
+    {
+      "TOLERANCE COMPARISON ANALYSIS: \u00b10.15 vs \u00b10.25 vs \u00b10.50 (1,857 Sessions, 2023-2025)": "DETAILED OVERLAP STATISTICS BY TOLERANCE"
+    },
+    {
+      "TOLERANCE COMPARISON ANALYSIS: \u00b10.15 vs \u00b10.25 vs \u00b10.50 (1,857 Sessions, 2023-2025)": "Metric",
+      "col_2": "Tolerance_0.15",
+      "col_3": "Tolerance_0.25",
+      "col_4": "Tolerance_0.50",
+      "col_5": "Delta_0.25",
+      "col_6": "Delta_0.50"
+    },
+    {
+      "TOLERANCE COMPARISON ANALYSIS: \u00b10.15 vs \u00b10.25 vs \u00b10.50 (1,857 Sessions, 2023-2025)": "Total Sessions Analyzed",
+      "col_2": 1857.0,
+      "col_3": 1857.0,
+      "col_4": 1857.0,
+      "col_5": 0.0,
+      "col_6": 0.0
+    },
+    {
+      "TOLERANCE COMPARISON ANALYSIS: \u00b10.15 vs \u00b10.25 vs \u00b10.50 (1,857 Sessions, 2023-2025)": "H1 Overlap Events Detected",
+      "col_2": 845.0,
+      "col_3": 0.0,
+      "col_4": 0.0,
+      "col_5": -845.0,
+      "col_6": -845.0
+    },
+    {
+      "TOLERANCE COMPARISON ANALYSIS: \u00b10.15 vs \u00b10.25 vs \u00b10.50 (1,857 Sessions, 2023-2025)": "H1 Overlap Frequency (%)",
+      "col_2": 0.455,
+      "col_5": -0.455,
+      "col_6": -0.455
+    },
+    {
+      "TOLERANCE COMPARISON ANALYSIS: \u00b10.15 vs \u00b10.25 vs \u00b10.50 (1,857 Sessions, 2023-2025)": "H2 Monday\u2192Tuesday Overlaps",
+      "col_2": 131.0,
+      "col_3": 0.0,
+      "col_4": 0.0,
+      "col_5": -131.0,
+      "col_6": -131.0
+    },
+    {
+      "TOLERANCE COMPARISON ANALYSIS: \u00b10.15 vs \u00b10.25 vs \u00b10.50 (1,857 Sessions, 2023-2025)": "H3 Asian Session Correct Predictions",
+      "col_2": 512.0,
+      "col_3": 0.0,
+      "col_4": 0.0,
+      "col_5": -512.0,
+      "col_6": -512.0
+    },
+    {
+      "TOLERANCE COMPARISON ANALYSIS: \u00b10.15 vs \u00b10.25 vs \u00b10.50 (1,857 Sessions, 2023-2025)": "H3 Asian Accuracy (%)",
+      "col_2": 0.8271,
+      "col_3": 0.0,
+      "col_4": 0.0,
+      "col_5": -0.8271,
+      "col_6": -0.8271
+    },
+    {
+      "TOLERANCE COMPARISON ANALYSIS: \u00b10.15 vs \u00b10.25 vs \u00b10.50 (1,857 Sessions, 2023-2025)": "H4 Previous Day Overlaps",
+      "col_2": 722.0,
+      "col_3": 0.0,
+      "col_4": 0.0,
+      "col_5": -722.0,
+      "col_6": -722.0
+    },
+    {
+      "TOLERANCE COMPARISON ANALYSIS: \u00b10.15 vs \u00b10.25 vs \u00b10.50 (1,857 Sessions, 2023-2025)": "H6 Weeks with Confluence",
+      "col_2": 34.0,
+      "col_3": 38.0,
+      "col_4": 41.0,
+      "col_5": 4.0,
+      "col_6": 7.0
+    },
+    {
+      "TOLERANCE COMPARISON ANALYSIS: \u00b10.15 vs \u00b10.25 vs \u00b10.50 (1,857 Sessions, 2023-2025)": "TOLERANCE 0.25 - TOP OVERLAP EVENTS"
+    },
+    {
+      "TOLERANCE COMPARISON ANALYSIS: \u00b10.15 vs \u00b10.25 vs \u00b10.50 (1,857 Sessions, 2023-2025)": "Date",
+      "col_2": "Day",
+      "col_3": "Session",
+      "col_4": "Session_Close",
+      "col_5": "Target_Type",
+      "col_6": "Target_Value",
+      "col_7": "Difference"
+    }
+  ]
+}

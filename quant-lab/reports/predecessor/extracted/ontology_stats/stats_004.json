@@ -1,0 +1,50 @@
+{
+  "ILM_Daily": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "ILM (Daily)",
+    "row": 3
+  },
+  "IELM_2Day": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "IELM (2-Day)",
+    "row": 4
+  },
+  "WILM_Weekly": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "WILM (Weekly)",
+    "row": 5
+  },
+  "ILM_Formation_Speed__Pattern_formation_with_ILM__9": {
+    "value": 29.0,
+    "type": "percentage",
+    "context": "ILM Formation Speed | Pattern formation with ILM | 91.2",
+    "row": 6
+  },
+  "2529_faster__912__Faster_completion": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "25-29% faster | 91.2 | Faster completion",
+    "row": 6
+  },
+  "ILM_Pattern_Boost__Pattern_success_enhancement": {
+    "value": 88.0,
+    "type": "percentage",
+    "context": "ILM Pattern Boost | Pattern success enhancement",
+    "row": 7
+  },
+  "ILM_Pattern_Boost__Pattern_success_enhancement__83": {
+    "value": 14.8,
+    "type": "percentage",
+    "context": "ILM Pattern Boost | Pattern success enhancement | 83-88%",
+    "row": 7
+  },
+  "Pattern_success_enhancement__8388__148_to_187": {
+    "value": 88.0,
+    "type": "percentage",
+    "context": "Pattern success enhancement | 83-88% | +14.8% to +18.7%",
+    "row": 7
+  }
+}

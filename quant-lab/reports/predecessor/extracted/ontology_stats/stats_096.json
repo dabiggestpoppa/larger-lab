@@ -1,0 +1,110 @@
+{
+  "Calculation_Source__Model_Type": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Calculation Source | Model Type",
+    "row": 3
+  },
+  "Calculation_Source__Model_Type__100_Hit_Rate": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "Calculation Source | Model Type | -100% Hit Rate",
+    "row": 3
+  },
+  "Root_Cause_Analysis__Not_specified": {
+    "value": 0.862,
+    "type": "ratio",
+    "context": "Root Cause Analysis | Not specified",
+    "row": 4
+  },
+  "Root_Cause_Analysis__Not_specified__0862": {
+    "value": 0.763,
+    "type": "ratio",
+    "context": "Root Cause Analysis | Not specified | 0.862",
+    "row": 4
+  },
+  "All_models": {
+    "value": 0.5721,
+    "type": "ratio",
+    "context": "All models",
+    "row": 5
+  },
+  "All_models__05721": {
+    "value": 0.44880000000000003,
+    "type": "ratio",
+    "context": "All models | 0.5721",
+    "row": 5
+  },
+  "Current_Calculation__5_day_only": {
+    "value": 0.5581,
+    "type": "ratio",
+    "context": "Current Calculation | 5_day only",
+    "row": 6
+  },
+  "Current_Calculation__5_day_only__05581": {
+    "value": 0.4372,
+    "type": "ratio",
+    "context": "Current Calculation | 5_day only | 0.5581",
+    "row": 6
+  },
+  "Verification_Status__7_day_only": {
+    "value": 0.586,
+    "type": "ratio",
+    "context": "Verification Status | 7_day only",
+    "row": 7
+  },
+  "Verification_Status__7_day_only__0586": {
+    "value": 0.46049999999999996,
+    "type": "ratio",
+    "context": "Verification Status | 7_day only | 0.586",
+    "row": 7
+  },
+  "pct_r12_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 12
+  },
+  "100": {
+    "value": 57.21,
+    "type": "percentage",
+    "context": "-100%",
+    "row": 12
+  },
+  "100__5721": {
+    "value": 86.2,
+    "type": "percentage",
+    "context": "-100% | 57.21%",
+    "row": 12
+  },
+  "pct_r13_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 13
+  },
+  "168": {
+    "value": 44.88,
+    "type": "percentage",
+    "context": "-168%",
+    "row": 13
+  },
+  "168__4488": {
+    "value": 76.3,
+    "type": "percentage",
+    "context": "-168% | 44.88%",
+    "row": 13
+  },
+  "2_Discrepancy": {
+    "value": 29.0,
+    "type": "percentage",
+    "context": "2. Discrepancy",
+    "row": 16
+  },
+  "4_Next_Steps": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "4. Next Steps",
+    "row": 18
+  }
+}

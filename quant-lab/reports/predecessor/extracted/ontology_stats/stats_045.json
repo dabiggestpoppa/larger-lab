@@ -1,0 +1,140 @@
+{
+  "pct_r1_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 1
+  },
+  "OVERALL_METRICS__COVID_Failure_Rate": {
+    "value": 0.18,
+    "type": "ratio",
+    "context": "OVERALL METRICS | COVID Failure Rate:",
+    "row": 6
+  },
+  "Total_Sessions_Analyzed__281__NonCOVID_Failure_Rat": {
+    "value": 0.105,
+    "type": "ratio",
+    "context": "Total Sessions Analyzed | 281 | Non-COVID Failure Rate:",
+    "row": 7
+  },
+  "COVID_Period_Sessions__Difference_COVID__NonCOVID": {
+    "value": 0.075,
+    "type": "ratio",
+    "context": "COVID Period Sessions | Difference (COVID - Non-COVID):",
+    "row": 8
+  },
+  "pct_r11_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 11
+  },
+  "Overall_168_Hit_Rate": {
+    "value": 0.8719,
+    "type": "ratio",
+    "context": "Overall -168% Hit Rate",
+    "row": 11
+  },
+  "pct_r12_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 12
+  },
+  "pct_r13_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 13
+  },
+  "Overall_168_Failure_Rate": {
+    "value": 0.1281,
+    "type": "ratio",
+    "context": "Overall -168% Failure Rate",
+    "row": 13
+  },
+  "pct_r16_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 16
+  },
+  "COVID_Failure_Rate": {
+    "value": 0.18,
+    "type": "ratio",
+    "context": "COVID Failure Rate",
+    "row": 17
+  },
+  "pct_r20_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 20
+  },
+  "NonCOVID_Failure_Rate": {
+    "value": 0.105,
+    "type": "ratio",
+    "context": "Non-COVID Failure Rate",
+    "row": 21
+  },
+  "Quarter__Total_Weeks": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "Quarter | Total Weeks",
+    "row": 24
+  },
+  "pct_r31_c0": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "",
+    "row": 31
+  },
+  "pct_r35_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 35
+  },
+  "pct_r48_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 48
+  },
+  "Monday_Range__Week_High__Week_Low": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "Monday Range | Week High | Week Low",
+    "row": 49
+  },
+  "1_COVID_Impact": {
+    "value": 18.0,
+    "type": "percentage",
+    "context": "1. COVID Impact:",
+    "row": 56
+  },
+  "2_Seasonal_Clustering": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "2. Seasonal Clustering:",
+    "row": 58
+  },
+  "3_Volatility_Pattern": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "3. Volatility Pattern:",
+    "row": 60
+  },
+  "4_Directional_Bias": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "4. Directional Bias:",
+    "row": 62
+  },
+  "5_Trading_Recommendation": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "5. Trading Recommendation:",
+    "row": 64
+  }
+}

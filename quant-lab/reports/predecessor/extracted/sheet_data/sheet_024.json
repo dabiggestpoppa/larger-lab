@@ -1,0 +1,378 @@
+{
+  "sheet_name": "PHASE 4 - MONTHLY RANGE RECONNAISSANCE",
+  "headers": [
+    "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 68,
+  "data": [
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "Data Availability & Claim Analysis for Monthly Delivery System"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "SECTION A: AVAILABLE DATA SUMMARY"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "Data Source",
+      "col_2": "Date Range",
+      "col_3": "Total Records",
+      "col_4": "Key Fields",
+      "col_5": "Usability for Monthly",
+      "col_6": "Status"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "Monday Sessions",
+      "col_2": "2020-01-06 - \"\"",
+      "col_3": "281 weeks",
+      "col_4": "Date, Week, Month, Quarter, Fib levels",
+      "col_5": "Primary data source",
+      "col_6": "\u2705"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "Weekly Data",
+      "col_2": "Derived from Monday sessions",
+      "col_3": "281 weeks",
+      "col_4": "Week High/Low/Close",
+      "col_5": "Can aggregate to monthly",
+      "col_6": "\u2705"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "Quarterly Analysis",
+      "col_2": "Q1-Q4",
+      "col_3": "8 quarter-bias combos",
+      "col_4": "Hit rates, ranges, multipliers",
+      "col_5": "Seasonal context",
+      "col_6": "\u2705"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "Pattern Formations",
+      "col_2": "Various timeframes",
+      "col_3": "19 patterns",
+      "col_4": "7 Monthly patterns identified",
+      "col_5": "Monthly-specific patterns exist",
+      "col_6": "\u2705"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "1H/4H/Daily Data",
+      "col_2": "Status: TO BE DETERMINED",
+      "col_3": "TBD",
+      "col_4": "OHLC data",
+      "col_5": "Need to verify availability",
+      "col_6": "\u26a0\ufe0f"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "SECTION B: MONTHLY-RELEVANT CLAIMS FROM VALIDATION CHECKLIST"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "Claim #",
+      "col_2": "Claim Description",
+      "col_3": "Claimed Accuracy",
+      "col_4": "Priority",
+      "col_5": "Status",
+      "col_6": "Relevance to Monthly"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 6.0,
+      "col_2": "Quarter level interaction (\u00b110 points)",
+      "col_3": 80.5,
+      "col_4": "PENDING - Requires Phase 1 Data Test",
+      "col_6": "Quarterly/Seasonal"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 7.0,
+      "col_2": "Weekly+Monthly alignment",
+      "col_3": 94.0,
+      "col_4": "PENDING - Requires Phase 1 Data Test",
+      "col_6": "Direct"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 14.0,
+      "col_2": "Quarter + structure inversion transition",
+      "col_3": 82.3,
+      "col_4": "PENDING - Requires Phase 1 Data Test",
+      "col_6": "Quarterly/Seasonal"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 27.0,
+      "col_2": "Monthly 78.6\u219278.6\u219278.6",
+      "col_3": 78.0,
+      "col_4": "PENDING - Requires Phase 1 Data Test",
+      "col_6": "Direct"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 28.0,
+      "col_2": "Monthly 0\u2192+23.6 flow",
+      "col_3": 83.0,
+      "col_4": "PENDING - Requires Phase 1 Data Test",
+      "col_6": "Direct"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "SECTION C: EXISTING MONTHLY PATTERNS (from Pattern Formations)"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "Pattern Name",
+      "col_2": "Structure",
+      "col_3": "Success Rate",
+      "col_4": "Frequency",
+      "col_5": "Completion Time",
+      "col_6": "Bias",
+      "col_7": "Notes"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "Monthly Fibonacci",
+      "col_2": "78.6\u219278.6\u219278.6",
+      "col_3": 78.0,
+      "col_4": "Monthly cycle",
+      "col_5": "Monthly scale",
+      "col_6": "Monthly ILM",
+      "col_7": "N/A"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "Monthly Fib Frequency",
+      "col_2": "78.6\u219278.6\u219278.6 occurrence",
+      "col_3": 24.6,
+      "col_4": "N/A",
+      "col_5": "N/A",
+      "col_6": "24.6% frequency",
+      "col_7": "78% bullish bias"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "Monthly Structure",
+      "col_2": "H4-L1-C5 pattern",
+      "col_3": 78.0,
+      "col_4": "Monthly cycle",
+      "col_5": "Monthly scale",
+      "col_6": "N/A",
+      "col_7": "18.5% most common"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "Monthly Flow",
+      "col_2": "0\u2192+23.6 Fibonacci",
+      "col_3": 83.0,
+      "col_4": "Early month",
+      "col_5": "Fast early",
+      "col_6": "N/A",
+      "col_7": "23.5% frequency"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "Day 1 Monthly High",
+      "col_2": "First day forms monthly high",
+      "col_3": 10.77,
+      "col_4": "Day 1",
+      "col_5": "N/A",
+      "col_6": "N/A",
+      "col_7": "Early month"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "Day 1 Monthly Low",
+      "col_2": "First day forms monthly low",
+      "col_3": 13.85,
+      "col_4": "Day 1",
+      "col_5": "N/A",
+      "col_6": "N/A",
+      "col_7": "Early month"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "Week 1 Monthly Pivot",
+      "col_2": "Week 1 forms high or low",
+      "col_3": 56.24,
+      "col_4": "Week 1",
+      "col_5": "N/A",
+      "col_6": "N/A",
+      "col_7": "First week"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "SECTION D: DATA GAPS & REQUIREMENTS"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 1.0,
+      "col_2": "Higher timeframe data availability (1H, 4H, Daily, Weekly)"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 2.0,
+      "col_2": "Method to aggregate weekly data into monthly ranges"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 3.0,
+      "col_2": "Historical monthly high/low data for validation"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 4.0,
+      "col_2": "Seasonal/quarterly context for monthly patterns"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 5.0,
+      "col_2": "Intra-month weekly delivery data for temporal analysis"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 6.0,
+      "col_2": "Monthly Fibonacci extension hit rates (-25%, -50%, -100%, -168%)"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 7.0,
+      "col_2": "132% invalidation applicability at monthly scale"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "SECTION E: TESTING FRAMEWORK DESIGN (Preliminary)"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "12-17 Day Range Window Testing Approach:"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 1.0,
+      "col_2": "Define 'First Week' as Days 1-7 of each month (analogous to Monday for weekly)"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 2.0,
+      "col_2": "Test range windows: 12, 13, 14, 15, 16, 17 days from start of month"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 3.0,
+      "col_2": "For each window size:"
+    },
+    {
+      "col_2": "a. Calculate range from first N days of each month"
+    },
+    {
+      "col_2": "b. Calculate Fibonacci extensions (-25%, -50%, -100%, -168%)"
+    },
+    {
+      "col_2": "c. Calculate 132% invalidation level"
+    },
+    {
+      "col_2": "d. Track monthly high/low to determine hit rates"
+    },
+    {
+      "col_2": "e. Calculate statistics: mean, std dev, hit rate accuracy"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 4.0,
+      "col_2": "Compare accuracy across all window sizes (12-17 days)"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 5.0,
+      "col_2": "Identify optimal window with highest accuracy"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 6.0,
+      "col_2": "Analyze temporal delivery: which weeks deliver which targets?"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "SECTION F: HYPOTHESIS TO TEST (User's 4-Week Temporal Delivery Theory)"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "Week 1 (Days 1-7):",
+      "col_2": "Establish Monthly Range (anchor - like Monday for weekly)"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "Week 2 (Days 8-14):",
+      "col_2": "Create intra-month sequence/entry points"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "Week 3 (Days 15-21):",
+      "col_2": "Primary target delivery window"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "Week 4 (Days 22-28+):",
+      "col_2": "Extension delivery OR profit booking"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "Key Questions:"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 1.0,
+      "col_2": "What range window (12-17 days) gives highest accuracy?"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 2.0,
+      "col_2": "Do Fibonacci extensions work at monthly scale?"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 3.0,
+      "col_2": "Does 132% invalidation apply to monthly timeframe?"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 4.0,
+      "col_2": "What are the temporal delivery patterns by week?"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 5.0,
+      "col_2": "How do seasonal/quarterly factors affect monthly ranges?"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 6.0,
+      "col_2": "Can we identify a 'Wednesday bifurcation' equivalent for monthly?"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": "SECTION G: NEXT STEPS"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 1.0,
+      "col_2": "Validate remaining claims from checklist (focus on monthly/quarterly) - PRIORITY HIGH"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 2.0,
+      "col_2": "Review CEREBUS PDFs for monthly/scaling law claims"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 3.0,
+      "col_2": "Extract or verify 1H/4H/Daily/Weekly data availability"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 4.0,
+      "col_2": "Build monthly range dataset (aggregate weekly data to monthly)"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 5.0,
+      "col_2": "Run systematic tests for 12-17 day range windows"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 6.0,
+      "col_2": "Analyze temporal delivery patterns by week"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 7.0,
+      "col_2": "Identify seasonal/quarterly effects on monthly ranges"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 8.0,
+      "col_2": "Build monthly delivery dashboard"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 9.0,
+      "col_2": "Test 132% invalidation at monthly scale"
+    },
+    {
+      "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE": 10.0,
+      "col_2": "Validate Fibonacci extension accuracy (-25%, -50%, -100%, -168%)"
+    }
+  ]
+}

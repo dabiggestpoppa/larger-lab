@@ -1,0 +1,195 @@
+{
+  "sheet_name": "Cross_Market_Comparison",
+  "headers": [
+    "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD",
+    "1",
+    "0.9570000000000001",
+    "0.862",
+    "0.763",
+    "0.7440000000000001",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 31,
+  "data": [
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "Phase 4 PDF Validated - 5-Day Model",
+      "1": "EUR/USD: Jan 2020 - Dec 2025 (281 weeks) | OIL/USD: Jan 2020 - May 2025 | ETH/USD: Jan 2021 - Dec 2025"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "SECTION 1: ANCHOR SYSTEMS COMPARISON"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "Market",
+      "1": "Weekly Anchor",
+      "0.9570000000000001": "Anchor Session",
+      "0.862": "Key Differentiator"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "EUR/USD",
+      "1": "Monday Range",
+      "0.9570000000000001": "London Session",
+      "0.862": "Primary predictor M1 (effectiveness 123.13)"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "OIL/USD",
+      "1": "Monday Range",
+      "0.9570000000000001": "London Session",
+      "0.862": "Same framework as EUR/USD"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "ETH/USD",
+      "1": "Friday Asian Range",
+      "0.9570000000000001": "Asian Session",
+      "0.862": "Uses Friday as anchor (not Monday)"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "SECTION 2: FIBONACCI HIT RATES COMPARISON"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "Fib Level",
+      "1": "EUR/USD",
+      "0.9570000000000001": "OIL/USD",
+      "0.862": "ETH/USD",
+      "0.763": "Notes"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": 0.0,
+      "1": 0.9822,
+      "0.9570000000000001": 0.9822,
+      "0.862": 1.0,
+      "0.763": "ETH perfect, EUR/OIL near-perfect"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": 0.0,
+      "1": 0.9644,
+      "0.9570000000000001": 0.9644,
+      "0.862": 0.957,
+      "0.763": "All markets >95%"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": -100.0,
+      "1": 0.9217,
+      "0.9570000000000001": 0.9217,
+      "0.862": 0.572093023255814,
+      "0.763": "High reliability"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": -168.0,
+      "1": 0.8719,
+      "0.9570000000000001": 0.8719,
+      "0.862": 0.448837209302326,
+      "0.763": "Deep extension"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "132% Violation",
+      "1": 0.7153,
+      "0.9570000000000001": 0.7153,
+      "0.862": 0.744,
+      "0.763": "ETH slightly higher violation rate"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "SECTION 3: 132% VIOLATION MECHANICS"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "Metric",
+      "1": "EUR/USD",
+      "0.9570000000000001": "OIL/USD",
+      "0.862": "ETH/USD"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "Overall Violation Rate",
+      "1": 0.7153,
+      "0.9570000000000001": 0.7153,
+      "0.862": 0.744
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "Rekey Rate Post-132%",
+      "1": 1.0,
+      "0.9570000000000001": 1.0,
+      "0.862": 1.0
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "Wednesday Share of Violations",
+      "1": 0.35,
+      "0.9570000000000001": 0.35,
+      "0.862": "TBD"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "Rekey Method",
+      "1": "Method B (85.4%)",
+      "0.9570000000000001": "78.6% Retrace",
+      "0.862": "TBD"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "SECTION 4: SESSION MECHANICS COMPARISON"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "Session",
+      "1": "EUR/USD Function",
+      "0.9570000000000001": "OIL/USD Function",
+      "0.862": "ETH/USD Function"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "Asian",
+      "1": "Range accumulation (89.34% accuracy)",
+      "0.9570000000000001": "Same",
+      "0.862": "Friday Anchor (63.7% 132%)"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "London",
+      "1": "Primary entry (98.22% -25%)",
+      "0.9570000000000001": "Same",
+      "0.862": "Secondary delivery"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "NY Open",
+      "1": "80% Hi/Lo takeout",
+      "0.9570000000000001": "Same",
+      "0.862": "Target continuation"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "SECTION 5: KEY TRADING ALERTS"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "EUR/USD"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "\u2022 Monday M1 predictor (123.13 effectiveness) is primary anchor\n\u2022 98.22% reliability at -25% Fibonacci\n\u2022 Wednesday accounts for 35% of 132% violations\n\u2022 Method B rekey (85.4%) post-132% violation\n\u2022 London session primary entry with 98.22% -25% hit rate"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "OIL/USD"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "\u2022 Identical framework to EUR/USD (same anchor system)\n\u2022 98.22% reliability at -25% Fibonacci\n\u2022 78.6% retrace for rekey methodology\n\u2022 Same session mechanics as EUR/USD\n\u2022 Shared 71.53% 132% violation rate"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "ETH/USD"
+    },
+    {
+      "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD": "\u2022 Friday Asian Range anchor (unique differentiator)\n\u2022 Perfect 100% -25% Fibonacci hit rate\n\u2022 74.4% 132% violation rate (slightly higher)\n\u2022 63.7% Friday Asian sessions lead to 132% violations\n\u2022 Friday as predictor vs Monday in other markets"
+    }
+  ]
+}

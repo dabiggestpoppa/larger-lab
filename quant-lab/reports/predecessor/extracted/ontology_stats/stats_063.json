@@ -1,0 +1,188 @@
+{
+  "pct_r2_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 2
+  },
+  "pct_r7_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 7
+  },
+  "Average_Range__594_pips__138_pips": {
+    "value": 76.9,
+    "type": "percentage",
+    "context": "Average Range | 59.4 pips | 13.8 pips",
+    "row": 12
+  },
+  "pct_r14_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 14
+  },
+  "25_Hit_Rate_5pip": {
+    "value": 54.5,
+    "type": "percentage",
+    "context": "-25% Hit Rate (\u00b15pip)",
+    "row": 14
+  },
+  "25_Hit_Rate_5pip__545": {
+    "value": 99.2,
+    "type": "percentage",
+    "context": "-25% Hit Rate (\u00b15pip) | 54.5%",
+    "row": 14
+  },
+  "545__992__447pp": {
+    "value": 90.0,
+    "type": "percentage",
+    "context": "54.5% | 99.2% | +44.7pp",
+    "row": 14
+  },
+  "pct_r15_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 15
+  },
+  "50_Hit_Rate_5pip": {
+    "value": 33.1,
+    "type": "percentage",
+    "context": "-50% Hit Rate (\u00b15pip)",
+    "row": 15
+  },
+  "50_Hit_Rate_5pip__331": {
+    "value": 93.8,
+    "type": "percentage",
+    "context": "-50% Hit Rate (\u00b15pip) | 33.1%",
+    "row": 15
+  },
+  "331__938__607pp": {
+    "value": 90.0,
+    "type": "percentage",
+    "context": "33.1% | 93.8% | +60.7pp",
+    "row": 15
+  },
+  "pct_r16_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 16
+  },
+  "100_Hit_Rate_5pip": {
+    "value": 11.8,
+    "type": "percentage",
+    "context": "-100% Hit Rate (\u00b15pip)",
+    "row": 16
+  },
+  "100_Hit_Rate_5pip__118": {
+    "value": 83.1,
+    "type": "percentage",
+    "context": "-100% Hit Rate (\u00b15pip) | 11.8%",
+    "row": 16
+  },
+  "118__831__713pp": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "11.8% | 83.1% | +71.3pp",
+    "row": 16
+  },
+  "pct_r17_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 17
+  },
+  "168_Hit_Rate_5pip": {
+    "value": 5.2,
+    "type": "percentage",
+    "context": "-168% Hit Rate (\u00b15pip)",
+    "row": 17
+  },
+  "168_Hit_Rate_5pip__52": {
+    "value": 65.3,
+    "type": "percentage",
+    "context": "-168% Hit Rate (\u00b15pip) | 5.2%",
+    "row": 17
+  },
+  "pct_r18_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 18
+  },
+  "132_Violation_Rate__NA": {
+    "value": 52.4,
+    "type": "percentage",
+    "context": "132% Violation Rate | N/A",
+    "row": 18
+  },
+  "pct_r21_c0": {
+    "value": 77.0,
+    "type": "percentage",
+    "context": "",
+    "row": 21
+  },
+  "pct_r23_c0": {
+    "value": 99.2,
+    "type": "percentage",
+    "context": "",
+    "row": 23
+  },
+  "pct_r31_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 31
+  },
+  "25_Hit_Rate": {
+    "value": 99.2,
+    "type": "percentage",
+    "context": "-25% Hit Rate",
+    "row": 31
+  },
+  "25_Hit_Rate__992": {
+    "value": 88.6,
+    "type": "percentage",
+    "context": "-25% Hit Rate | 99.2%",
+    "row": 31
+  },
+  "pct_r32_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 32
+  },
+  "50_Hit_Rate": {
+    "value": 93.8,
+    "type": "percentage",
+    "context": "-50% Hit Rate",
+    "row": 32
+  },
+  "50_Hit_Rate__938": {
+    "value": 80.1,
+    "type": "percentage",
+    "context": "-50% Hit Rate | 93.8%",
+    "row": 32
+  },
+  "pct_r33_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 33
+  },
+  "100_Hit_Rate": {
+    "value": 83.1,
+    "type": "percentage",
+    "context": "-100% Hit Rate",
+    "row": 33
+  },
+  "100_Hit_Rate__831": {
+    "value": 66.4,
+    "type": "percentage",
+    "context": "-100% Hit Rate | 83.1%",
+    "row": 33
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "sheet_name": "MONDAY-ASIAN SESSION CROSS-REF",
+  "headers": [
+    "MONDAY FIBONACCI vs 15M ASIAN SESSION CROSS-REFERENCE ANALYSIS (2023-2025 Overlap Period)",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 8,
+  "data": [
+    {
+      "MONDAY FIBONACCI vs 15M ASIAN SESSION CROSS-REFERENCE ANALYSIS (2023-2025 Overlap Period)": "OVERLAP PERIOD SUMMARY"
+    },
+    {
+      "MONDAY FIBONACCI vs 15M ASIAN SESSION CROSS-REFERENCE ANALYSIS (2023-2025 Overlap Period)": "Total Monday Weeks Analyzed",
+      "col_2": 0.0
+    },
+    {
+      "MONDAY FIBONACCI vs 15M ASIAN SESSION CROSS-REFERENCE ANALYSIS (2023-2025 Overlap Period)": "Total 15M Sessions in Period",
+      "col_2": 0.0
+    },
+    {
+      "MONDAY FIBONACCI vs 15M ASIAN SESSION CROSS-REFERENCE ANALYSIS (2023-2025 Overlap Period)": "Total Asian Sessions Analyzed",
+      "col_2": 0.0
+    },
+    {
+      "MONDAY FIBONACCI vs 15M ASIAN SESSION CROSS-REFERENCE ANALYSIS (2023-2025 Overlap Period)": "Overlap Period Start Date",
+      "col_2": "2023-01-01"
+    },
+    {
+      "MONDAY FIBONACCI vs 15M ASIAN SESSION CROSS-REFERENCE ANALYSIS (2023-2025 Overlap Period)": "Overlap Period End Date",
+      "col_2": "2025-12-31"
+    },
+    {
+      "MONDAY FIBONACCI vs 15M ASIAN SESSION CROSS-REFERENCE ANALYSIS (2023-2025 Overlap Period)": "ASIAN SESSION ACCURACY BY MONDAY FIBONACCI FRAMEWORK"
+    },
+    {
+      "MONDAY FIBONACCI vs 15M ASIAN SESSION CROSS-REFERENCE ANALYSIS (2023-2025 Overlap Period)": "Week_Start_Date",
+      "col_2": "Monday_Range",
+      "col_3": "Monday_Bias",
+      "col_4": "Monday_Fib_Minus_25",
+      "col_5": "Monday_Fib_Minus_50",
+      "col_6": "Asian_Sessions_Count",
+      "col_7": "Asian_Correct_Predictions",
+      "col_8": "Asian_Accuracy_Percent",
+      "col_9": "Weekly_Close",
+      "col_10": "Monday_Target_Hit",
+      "col_11": "132%_Violation"
+    }
+  ]
+}

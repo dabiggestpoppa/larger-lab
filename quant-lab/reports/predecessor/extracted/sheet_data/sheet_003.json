@@ -1,0 +1,226 @@
+{
+  "sheet_name": "Pattern Failures & Rekeys",
+  "headers": [
+    "Failure Type",
+    "Trigger Condition",
+    "Rekey Probability (%)",
+    "New Pattern",
+    "Timing",
+    "ILM State",
+    "Notes",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 21,
+  "data": [
+    {
+      "Failure Type": "Failure Type",
+      "Trigger Condition": "Trigger Condition",
+      "Rekey Probability (%)": "Rekey Probability (%)",
+      "New Pattern": "New Pattern",
+      "Timing": "Timing",
+      "ILM State": "ILM State",
+      "Notes": "Notes"
+    },
+    {
+      "Failure Type": "132% Level Hit",
+      "Trigger Condition": "Price reaches 132% extension",
+      "Rekey Probability (%)": 95.0,
+      "New Pattern": "Pattern invalidation",
+      "Timing": "Immediate",
+      "ILM State": "Any",
+      "Notes": "Invalidation zone - pattern fails"
+    },
+    {
+      "Failure Type": "C-D Leg Failure",
+      "Trigger Condition": "C-D leg fails to complete",
+      "Rekey Probability (%)": 81.7,
+      "New Pattern": "Alpha rekey",
+      "Timing": "Within 2-4 hours",
+      "ILM State": "Any",
+      "Notes": "Most common rekey trigger"
+    },
+    {
+      "Failure Type": "A-B Leg Failure",
+      "Trigger Condition": "A-B leg fails to complete",
+      "Rekey Probability (%)": 78.0,
+      "New Pattern": "Gamma rekey",
+      "Timing": "Within 1-3 hours",
+      "ILM State": "Any",
+      "Notes": "Early pattern failure"
+    },
+    {
+      "Failure Type": "Leg 3 Failure",
+      "Trigger Condition": "Pattern fails at C-D leg",
+      "Rekey Probability (%)": 82.0,
+      "New Pattern": "Various rekeys",
+      "Timing": "2-4 hours",
+      "ILM State": "Any",
+      "Notes": "Most common failure point"
+    },
+    {
+      "Failure Type": "15M + Daily ILM Miss + IELM",
+      "Trigger Condition": "15M pattern misses Daily ILM with IELM active",
+      "Rekey Probability (%)": 83.0,
+      "New Pattern": "Higher TF pattern",
+      "Timing": "15M to 1H/4H",
+      "ILM State": "IELM active",
+      "Notes": "Strong rekey probability"
+    },
+    {
+      "Failure Type": "15M + WILM Active",
+      "Trigger Condition": "15M pattern with WILM active",
+      "Rekey Probability (%)": 92.0,
+      "New Pattern": "4H pattern",
+      "Timing": "15M to 4H",
+      "ILM State": "WILM active",
+      "Notes": "Highest rekey probability"
+    },
+    {
+      "Failure Type": "Baseline Rekey",
+      "Trigger Condition": "Pattern failure without ILM",
+      "Rekey Probability (%)": 38.0,
+      "New Pattern": "Any pattern",
+      "Timing": "Variable",
+      "ILM State": "No ILM",
+      "Notes": "Lowest rekey probability"
+    },
+    {
+      "Failure Type": "WEZ + 15M Failure",
+      "Trigger Condition": "WEZ presence on 15M failure",
+      "Rekey Probability (%)": 65.6,
+      "New Pattern": "1H pattern",
+      "Timing": "15M to 1H",
+      "ILM State": "Any",
+      "Notes": "+26.6% vs baseline"
+    },
+    {
+      "Failure Type": "WEZ + 1H Failure",
+      "Trigger Condition": "WEZ presence on 1H failure",
+      "Rekey Probability (%)": 65.4,
+      "New Pattern": "4H pattern",
+      "Timing": "1H to 4H",
+      "ILM State": "Any",
+      "Notes": "+27.4% vs baseline"
+    },
+    {
+      "Failure Type": "WEZ + 4H Failure",
+      "Trigger Condition": "WEZ presence on 4H failure",
+      "Rekey Probability (%)": 66.7,
+      "New Pattern": "Daily pattern",
+      "Timing": "4H to Daily",
+      "ILM State": "Any",
+      "Notes": "+28.7% vs baseline"
+    },
+    {
+      "Failure Type": "Quarter + Inversion",
+      "Trigger Condition": "Quarter level hit with structure inversion",
+      "Rekey Probability (%)": 82.3,
+      "New Pattern": "State transition",
+      "Timing": "Variable",
+      "ILM State": "State_Bistable",
+      "Notes": "High probability transition"
+    },
+    {
+      "Failure Type": "Hidden Delayed Rekey",
+      "Trigger Condition": "After 3 DBlocks in State_Bistable",
+      "Rekey Probability (%)": 76.9,
+      "New Pattern": "Delayed pattern",
+      "Timing": "After 3 blocks",
+      "ILM State": "State_Bistable",
+      "Notes": "Time-delayed rekey mechanism"
+    },
+    {
+      "Failure Type": "Steep 1.618 Failure",
+      "Trigger Condition": "Steep angle 1.618 extension failure",
+      "Rekey Probability (%)": 26.5,
+      "New Pattern": "Retracement",
+      "Timing": "Quick",
+      "ILM State": "Any",
+      "Notes": "Low completion rate - expect failure"
+    },
+    {
+      "Failure Type": "Shallow 1.618 Success",
+      "Trigger Condition": "Shallow angle 1.618 extension",
+      "Rekey Probability (%)": 57.9,
+      "New Pattern": "Continuation",
+      "Timing": "Extended",
+      "ILM State": "Any",
+      "Notes": "Better success rate"
+    },
+    {
+      "Failure Type": "Wednesday 61.8% Change",
+      "Trigger Condition": "Wednesday at 61.8% level",
+      "Rekey Probability (%)": 67.4,
+      "New Pattern": "Direction change",
+      "Timing": "Wednesday",
+      "ILM State": "Any",
+      "Notes": "Mid-week pivot probability"
+    },
+    {
+      "Failure Type": "-100%/-168% Levels",
+      "Trigger Condition": "Price reaches -100% or -168%",
+      "New Pattern": "Profit booking + new sequence",
+      "Timing": "Variable",
+      "ILM State": "Any",
+      "Notes": "NOT a failure - natural completion"
+    },
+    {
+      "Failure Type": "4H A-B Failure",
+      "Trigger Condition": "4H A-B target failure",
+      "Rekey Probability (%)": 85.0,
+      "New Pattern": "15M micro-legs",
+      "Timing": "4H to 15M",
+      "ILM State": "Any",
+      "Notes": "+247% micro-leg increase"
+    },
+    {
+      "Failure Type": "Daily ILM Miss",
+      "Trigger Condition": "Pattern misses Daily ILM",
+      "Rekey Probability (%)": 88.0,
+      "New Pattern": "15M micro-pattern",
+      "Timing": "Daily to 15M",
+      "ILM State": "Daily ILM missed",
+      "Notes": "+320% micro-pattern probability"
+    },
+    {
+      "Failure Type": "Range Expansion Failure",
+      "Trigger Condition": "Range fails to expand",
+      "Rekey Probability (%)": 72.0,
+      "New Pattern": "50-61.8% retracement",
+      "Timing": "Within session",
+      "ILM State": "Any",
+      "Notes": "Contraction phase begins"
+    },
+    {
+      "Failure Type": "WILM Boundary",
+      "Trigger Condition": "Price at WILM zone boundary",
+      "Rekey Probability (%)": 76.0,
+      "New Pattern": "Secondary path",
+      "Timing": "At boundary",
+      "ILM State": "WILM active",
+      "Notes": "3.1x secondary path probability"
+    }
+  ]
+}

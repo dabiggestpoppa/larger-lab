@@ -2,10 +2,10 @@
   "engine": "SymmetryTrap",
   "symbol": "EURAUD.PRO",
   "direction": "BUY",
-  "entry": 1.14737,
-  "sl": 1.1477,
-  "tp": 1.14887,
+  "entry": 1.63654,
+  "sl": 1.6370900000000002,
+  "tp": 1.6377400000000002,
   "event": "SL_HIT",
-  "loop": 3,
-  "time": "2026-06-08 05:25:00"
+  "loop": 1,
+  "time": "2026-06-08 22:38:00"
 }

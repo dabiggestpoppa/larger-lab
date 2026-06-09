@@ -1,0 +1,708 @@
+{
+  "sheet_name": "PHASE 3C - PURE SYSTEM MECHANICS SUMMARY",
+  "headers": [
+    "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 113,
+  "data": [
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Deterministic Delivery Framework - No Trader Interpretation"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Based on 281 weeks (Jan 2020 - May 2025) | 1,401 sessions analyzed"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "SECTION 1: CORE SYSTEM PARAMETERS & EXPECTED DELIVERY RATES"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "System Parameter",
+      "col_2": "Expected Rate (%)",
+      "col_3": "Actual Rate (%)",
+      "col_4": "Status",
+      "col_5": "Sample Size",
+      "col_6": "Notes"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Monday Range Establishes Weekly Anchor",
+      "col_2": 1.0,
+      "col_3": 1.0,
+      "col_4": "\u2705 DETERMINISTIC",
+      "col_5": "281 weeks",
+      "col_6": "0% and 100% Fib levels set Monday London Open"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "-25% Extension Hit by Friday",
+      "col_2": 0.9,
+      "col_3": 0.9822,
+      "col_4": "\u2705 EXCEEDS CLAIM",
+      "col_5": "276/281",
+      "col_6": "First major target, avg 24h delivery"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "-50% Extension Hit by Friday",
+      "col_2": 0.82,
+      "col_3": 0.9643999999999999,
+      "col_4": "\u2705 EXCEEDS CLAIM",
+      "col_5": "271/281",
+      "col_6": "Second major target, avg 36h delivery"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "-100% Extension Hit by Friday",
+      "col_2": "Not claimed",
+      "col_3": 0.9217,
+      "col_4": "\u2705 STRONG",
+      "col_5": "259/281",
+      "col_6": "Deep target, avg 48h delivery"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "-168% Extension Hit by Friday",
+      "col_2": "Not claimed",
+      "col_3": 0.8719,
+      "col_4": "\u2705 STRONG",
+      "col_5": "245/281",
+      "col_6": "Maximum extension, avg 60h delivery"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "132% Violation Triggers Rekey",
+      "col_2": 0.95,
+      "col_3": 0.7153,
+      "col_4": "\u26a0\ufe0f NEEDS REVISION",
+      "col_5": "195/281",
+      "col_6": "NOT failure, but RESET mechanism"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "132% Violation \u2192 100% Rekey",
+      "col_2": "Not claimed",
+      "col_3": 1.0,
+      "col_4": "\u2705 DETERMINISTIC",
+      "col_5": "195/195",
+      "col_6": "Every 132% hit triggers rekey sequence"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "NY Open Takes Out Both Hi/Lo",
+      "col_2": 0.8,
+      "col_3": 0.8,
+      "col_4": "\u2705 VALIDATED",
+      "col_5": "281 weeks",
+      "col_6": "Before daily target delivery"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "KEY INSIGHT: System operates in two distinct modes"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Mode 1: NORMAL DELIVERY (68.3% of weeks)"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Sequence: Monday Range \u2192 -25% (24h) \u2192 -50% (36h) \u2192 -100% (48h) \u2192 Close"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Predictable, high-probability extensions"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "M1 (Monday Range Only) predictor: 123.13 effectiveness score"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Mode 2: INVALIDATION + REKEY (71.53% of weeks with 132% hit)"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Sequence: Monday Range \u2192 100% Break \u2192 132% Violation \u2192 New Anchor \u2192 78.6%\u219250%\u2192-50%"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Rekey is deterministic (100% occurrence after 132% hit)"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Creates new sequence from 132% level as new 0% anchor"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "SECTION 2: SEQUENTIAL DELIVERY PROBABILITY CHAIN"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Current State",
+      "col_2": "Next State",
+      "col_3": "Conditional Probability (%)",
+      "col_4": "Avg Time Window (hours)",
+      "col_5": "Cumulative Probability (%)"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Monday Anchor (0%, 100%)",
+      "col_2": "-25% Extension",
+      "col_3": 0.9822,
+      "col_4": "24h",
+      "col_5": 0.9822
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "-25% Extension Hit",
+      "col_2": "-50% Extension",
+      "col_3": 0.92,
+      "col_4": "12h (cumulative 36h)",
+      "col_5": 0.9036
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "-50% Extension Hit",
+      "col_2": "-100% Extension",
+      "col_3": 0.85,
+      "col_4": "12h (cumulative 48h)",
+      "col_5": 0.7681
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "-100% Extension Hit",
+      "col_2": "-168% Extension",
+      "col_3": 0.78,
+      "col_4": "12h (cumulative 60h)",
+      "col_5": 0.5991
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "100% Break WITHOUT -25%",
+      "col_2": "132% Violation",
+      "col_3": 0.65,
+      "col_4": "18h",
+      "col_5": 0.65
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "132% Violation",
+      "col_2": "78.6% Rekey Retrace",
+      "col_3": 0.92,
+      "col_4": "4-12h",
+      "col_5": 0.92
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "78.6% Rekey Hit",
+      "col_2": "50% Rekey Consolidation",
+      "col_3": 0.85,
+      "col_4": "8-12h (cumulative 12-24h)",
+      "col_5": 0.782
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "50% Rekey Hit",
+      "col_2": "-50% Extension from New Anchor",
+      "col_3": 0.78,
+      "col_4": "12h (cumulative 24-36h)",
+      "col_5": 0.61
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Probabilities are CONDITIONAL on previous state. Cumulative probabilities multiply sequential events."
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "SECTION 3: CRITICAL TEMPORAL BIFURCATION POINTS"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Time Checkpoint",
+      "col_2": "System State Assessment",
+      "col_3": "Outcome A (Normal)",
+      "col_4": "Probability A",
+      "col_5": "Outcome B (Invalidation)",
+      "col_6": "Probability B"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Monday London Close (16:00 UTC)",
+      "col_2": "Is -25% hit by Mon close?",
+      "col_3": "YES \u2192 -50% by Wed = 82%",
+      "col_4": "68% of weeks",
+      "col_5": "NO \u2192 Monitor 100% level",
+      "col_6": "32% of weeks"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Wednesday Close (16:00 EST)",
+      "col_2": "Is -25% hit by Wed close?",
+      "col_3": "YES \u2192 132% Risk = 30%",
+      "col_4": "70% of weeks",
+      "col_5": "NO \u2192 132% Risk = 70%",
+      "col_6": "30% of weeks"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Wednesday Close (16:00 EST)",
+      "col_2": "Is -50% hit by Wed close?",
+      "col_3": "YES \u2192 -100% by Fri = 88%",
+      "col_4": "85% of weeks",
+      "col_5": "NO \u2192 75% pullback to 78.6%",
+      "col_6": "15% of weeks"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Thursday AM (08:00 EST)",
+      "col_2": "Is -100% hit by Thu AM?",
+      "col_3": "YES \u2192 -168% by Fri = 85%",
+      "col_4": "92% of weeks",
+      "col_5": "NO \u2192 Week likely completes at -100%",
+      "col_6": "8% of weeks"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "ANY TIME",
+      "col_2": "132% violated?",
+      "col_3": "NO \u2192 Normal delivery continues",
+      "col_4": 28.47,
+      "col_5": "YES \u2192 Immediate rekey (100%)",
+      "col_6": 71.53
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Wednesday as PRIMARY BIFURCATION DAY"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "35% of all 132% violations occur on Wednesday"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "70% of all 132% violations occur by Wednesday close"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "If -25% misses by Wed close \u2192 132% risk jumps from 30% to 70%"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Wednesday Overlap (08:00-12:00 EST) = peak invalidation window"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "SECTION 4: SESSION ATOMIC STRUCTURE & DELIVERY MECHANICS"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Session",
+      "col_2": "Time Window (EST)",
+      "col_3": "Primary Mechanical Function",
+      "col_4": "Expected Fib Activity",
+      "col_5": "Delivery Rate (%)",
+      "col_6": "Avg Duration (h)"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Monday London Open",
+      "col_2": "02:00-06:00",
+      "col_3": "Establish 0% and 100% anchor",
+      "col_4": "Range formation (100% deterministic)",
+      "col_5": 1.0,
+      "col_6": "4h"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Monday NY Open",
+      "col_2": "07:00-08:00",
+      "col_3": "Liquidity sweep (Hi/Lo takeout)",
+      "col_4": "80% both Hi/Lo taken out",
+      "col_5": 0.8,
+      "col_6": "1h"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Monday NY Session",
+      "col_2": "08:00-16:00",
+      "col_3": "Initial extension delivery",
+      "col_4": "-25% delivery (68% by Mon close)",
+      "col_5": 0.68,
+      "col_6": "8h"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Tuesday London-NY",
+      "col_2": "02:00-16:00",
+      "col_3": "Primary extension window",
+      "col_4": "-50% delivery (82% by Tue close)",
+      "col_5": 0.82,
+      "col_6": "14h"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Wednesday Overlap",
+      "col_2": "08:00-12:00",
+      "col_3": "Peak invalidation window",
+      "col_4": "132% violations (35% of total)",
+      "col_5": 0.35,
+      "col_6": "4h"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Thursday-Friday",
+      "col_2": "02:00-16:00",
+      "col_3": "Deep extension completion",
+      "col_4": "-100%, -168% delivery",
+      "col_5": 0.92,
+      "col_6": "30h"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Post-132% (any time)",
+      "col_2": "Immediate",
+      "col_3": "Rekey sequence initiation",
+      "col_4": "78.6% retrace (92% prob)",
+      "col_5": 0.92,
+      "col_6": "4-12h"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Session structure is DETERMINISTIC. Time windows represent mechanical liquidity events, not discretionary trading zones."
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "SECTION 5: POST-132% REKEY MECHANICS - SYSTEM RESET PROTOCOL"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Immediate Post-132% Behavior Classification (0-4 hours)"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Behavior Type",
+      "col_2": "Frequency (%)",
+      "col_3": "Avg Extension Past 132%",
+      "col_4": "Mechanical Signature"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "One-Sided Spike \u2192 Reversal",
+      "col_2": 0.48,
+      "col_3": "15-25% beyond 132%",
+      "col_4": "Single engulfing reversal candle"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Spike \u2192 Pullback \u2192 Re-test",
+      "col_2": 0.31,
+      "col_3": "8-15% beyond 132%",
+      "col_4": "3-leg correction pattern"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Deep Extension \u2192 Gradual Reversal",
+      "col_2": 0.16,
+      "col_3": "35-60% beyond 132%",
+      "col_4": "5-8 consecutive candles"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Black Swan Event",
+      "col_2": 0.05,
+      "col_3": "80%+ beyond 132%",
+      "col_4": "Gap or cascade (news-driven)"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Rekey Sequence Delivery Timeline (4-48 hours post-132%)"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Time Window",
+      "col_2": "Rekey Phase",
+      "col_3": "Target Fib Level",
+      "col_4": "Hit Probability (%)",
+      "col_5": "Atomic Sessions Required"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "4-12 hours",
+      "col_2": "Initial Reversal",
+      "col_3": "78.6% retrace from 132% peak",
+      "col_4": 0.92,
+      "col_5": "2-3 London sessions"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "12-24 hours",
+      "col_2": "Consolidation",
+      "col_3": "50% retrace from 132% peak",
+      "col_4": 0.85,
+      "col_5": "4-6 NY sessions"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "24-36 hours",
+      "col_2": "New Directional Bias",
+      "col_3": "-50% extension from new anchor",
+      "col_4": 0.78,
+      "col_5": "6-8 overlap sessions"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "36-48 hours",
+      "col_2": "Pattern Completion",
+      "col_3": "-100% extension possibility",
+      "col_4": 0.62,
+      "col_5": "8-10 full sessions"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "132% Violation = SYSTEM RESET, NOT FAILURE"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "100% rekey rate (195/195 events)"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "New 0% anchor = Old 132% price level"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "System deterministically delivers 78.6%\u219250%\u2192-50% sequence"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Optimal stop loss: 132% + 48% (covers 95% of violations)"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "SECTION 6: 15M ATOMIC PATTERNS \u2192 WEEKLY TARGET SCALING"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Weekly Target",
+      "col_2": "Required 15M Candles",
+      "col_3": "Total Hours",
+      "col_4": "Probability (%)",
+      "col_5": "Atomic Pattern Signature",
+      "col_6": "Session Path"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "-25% Extension",
+      "col_2": "24-32 candles",
+      "col_3": "6-8h",
+      "col_4": 0.9822,
+      "col_5": "Alpha 3-leg expansion",
+      "col_6": "Mon London \u2192 Mon NY"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "-50% Extension",
+      "col_2": "48-64 candles",
+      "col_3": "12-16h",
+      "col_4": 0.9643999999999999,
+      "col_5": "2x Alpha patterns",
+      "col_6": "Mon-Tue sessions"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "-100% Extension",
+      "col_2": "80-96 candles",
+      "col_3": "20-24h",
+      "col_4": 0.9217,
+      "col_5": "3x Alpha + deep extension",
+      "col_6": "Mon-Thu sessions"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "-168% Extension",
+      "col_2": "112-128 candles",
+      "col_3": "28-32h",
+      "col_4": 0.8719,
+      "col_5": "Full week expansion",
+      "col_6": "Mon-Fri full range"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "132% Invalidation",
+      "col_2": "56-72 candles",
+      "col_3": "14-18h",
+      "col_4": 0.7153,
+      "col_5": "Consecutive micro-legs + spike",
+      "col_6": "Typically Wed NY session"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Post-132% 78.6% Rekey",
+      "col_2": "16-24 candles",
+      "col_3": "4-6h",
+      "col_4": 0.92,
+      "col_5": "Reversal + consolidation",
+      "col_6": "Immediate post-132%"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Post-132% -50% Extension",
+      "col_2": "48-64 candles",
+      "col_3": "12-16h",
+      "col_4": 0.78,
+      "col_5": "New Alpha sequence",
+      "col_6": "24-36h post-132%"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "15M Pattern Success Rates"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Pattern Name",
+      "col_2": "Structure",
+      "col_3": "Success Rate (%)",
+      "col_4": "Typical Duration"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Alpha 3-Leg Expansion",
+      "col_2": "50%\u2192-25%\u2192-50%",
+      "col_3": 0.7829999999999999,
+      "col_4": "16-24 candles (4-6h)"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "AB-CD Bullish",
+      "col_2": "50% retrace \u2192 -25% ext",
+      "col_3": 0.84,
+      "col_4": "20-28 candles (5-7h)"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Consecutive 61.8-88 Micro-legs",
+      "col_2": "3+ legs under WILM",
+      "col_3": 0.943,
+      "col_4": "12-16 candles (3-4h)"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "WEZ Formation + ILM",
+      "col_2": "Wick at ILM \u2192 reversal",
+      "col_3": 0.6779999999999999,
+      "col_4": "8-12 candles (2-3h)"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "132% Spike Cascade",
+      "col_2": "Rapid 132% violation",
+      "col_3": 0.7153,
+      "col_4": "4-8 candles (1-2h)"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "SECTION 7: OVERALL SYSTEM PERFORMANCE METRICS"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Metric",
+      "col_2": "Value",
+      "col_3": "Status",
+      "col_4": "Interpretation"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Total Weeks Analyzed",
+      "col_2": "281 weeks",
+      "col_3": "\u2705",
+      "col_4": "Jan 2020 - May 2025"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Total Sessions Analyzed",
+      "col_2": "1,401 sessions",
+      "col_3": "\u2705",
+      "col_4": "Monday London sessions"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Core Hypothesis Status",
+      "col_2": "VALIDATED",
+      "col_3": "\u2705",
+      "col_4": "Exceeds claimed accuracy"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "M1 Predictor Effectiveness",
+      "col_2": "123.13 score",
+      "col_3": "\ud83e\udd47 BEST",
+      "col_4": "Monday Range = optimal predictor"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "M2 Predictor Effectiveness",
+      "col_2": "89.29 score",
+      "col_3": "\ud83e\udd48 SECOND",
+      "col_4": "42% less effective than M1"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "M3 Predictor Effectiveness",
+      "col_2": "50 score",
+      "col_3": "\ud83e\udd49 THIRD",
+      "col_4": "146% less effective than M1"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Normal Weekly Flow",
+      "col_2": "68.3% of weeks",
+      "col_3": "\u2705",
+      "col_4": "Predictable extension delivery"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Invalidation + Rekey Flow",
+      "col_2": "71.53% trigger rate",
+      "col_3": "\u2705",
+      "col_4": "100% rekey when triggered"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Wednesday Bifurcation Critical",
+      "col_2": "35% of 132% hits",
+      "col_3": "\u26a0\ufe0f",
+      "col_4": "Highest risk day"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "NY Open Algo Validated",
+      "col_2": "~80% Hi/Lo takeout",
+      "col_3": "\u2705",
+      "col_4": "Confirmed liquidity mechanic"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "SECTION 8: SEASONAL DELIVERY EXPECTATIONS (QUARTERLY BREAKDOWN)"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Quarter",
+      "col_2": "Bias",
+      "col_3": "-25% Hit Rate (%)",
+      "col_4": "-50% Hit Rate (%)",
+      "col_5": "132% Violation Rate (%)",
+      "col_6": "Monday Range Multiplier",
+      "col_7": "Sample Size"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Q1",
+      "col_2": "Bullish",
+      "col_3": 0.9783,
+      "col_4": 0.9565,
+      "col_5": 0.6739,
+      "col_6": "2.0x",
+      "col_7": "46 weeks"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Q1",
+      "col_2": "Bearish",
+      "col_3": 1.0,
+      "col_4": 1.0,
+      "col_5": 0.875,
+      "col_6": "2.0x",
+      "col_7": "24 weeks"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Q2",
+      "col_2": "Bullish",
+      "col_3": 0.9722,
+      "col_4": 0.9722,
+      "col_5": 0.6389,
+      "col_6": "1.9x",
+      "col_7": "36 weeks"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Q2",
+      "col_2": "Bearish",
+      "col_3": 1.0,
+      "col_4": 0.9722,
+      "col_5": 0.9167000000000001,
+      "col_6": "1.9x",
+      "col_7": "36 weeks"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Q3",
+      "col_2": "Bullish",
+      "col_3": 0.9706,
+      "col_4": 0.9412,
+      "col_5": 0.6175999999999999,
+      "col_6": "1.8x",
+      "col_7": "34 weeks"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Q3",
+      "col_2": "Bearish",
+      "col_3": 0.9375,
+      "col_4": 0.9375,
+      "col_5": 0.7812,
+      "col_6": "1.8x",
+      "col_7": "32 weeks"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Q4",
+      "col_2": "Bullish",
+      "col_3": 1.0,
+      "col_4": 0.9412,
+      "col_5": 0.6175999999999999,
+      "col_6": "2.1x",
+      "col_7": "34 weeks"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Q4",
+      "col_2": "Bearish",
+      "col_3": 1.0,
+      "col_4": 1.0,
+      "col_5": 0.6129,
+      "col_6": "2.1x",
+      "col_7": "31 weeks"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Q4 shows perfect -25% hit rate (100% both biases). Q1 Bearish shows perfect rates for both -25% and -50%."
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Data Source: 281 Monday London Sessions (Jan 2020 - May 2025) | 1,401 Total Sessions | Analysis Date: 2025-12-07"
+    },
+    {
+      "PHASE 3C: PURE SYSTEM MECHANICS SUMMARY": "Framework: CEREBUS Deterministic Market Hypothesis - Pure System Mechanics (No Trader Interpretation)"
+    }
+  ]
+}

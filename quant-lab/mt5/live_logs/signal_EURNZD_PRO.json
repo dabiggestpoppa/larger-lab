@@ -2,10 +2,10 @@
   "engine": "SymmetryTrap",
   "symbol": "EURNZD.PRO",
   "direction": "BUY",
-  "entry": 0.86438,
-  "sl": 1.9872,
-  "tp": 0.86638,
+  "entry": 1.98552,
+  "sl": 1.9856099999999999,
+  "tp": 1.98672,
   "event": "SL_HIT",
   "loop": 1,
-  "time": "2026-06-07 23:40:00"
+  "time": "2026-06-08 22:56:00"
 }

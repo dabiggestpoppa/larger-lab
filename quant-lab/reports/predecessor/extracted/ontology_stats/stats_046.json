@@ -1,0 +1,80 @@
+{
+  "pct_r1_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 1
+  },
+  "pct_r6_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 6
+  },
+  "Overall_168_Hit_Rate": {
+    "value": 0.8719,
+    "type": "ratio",
+    "context": "Overall -168% Hit Rate:",
+    "row": 6
+  },
+  "Overall_168_Hit_Rate__08719__COVID_Period_Failure": {
+    "value": 0.292,
+    "type": "ratio",
+    "context": "Overall -168% Hit Rate: | 0.8719 | COVID Period Failure Rate:",
+    "row": 6
+  },
+  "pct_r7_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 7
+  },
+  "Total_168_Failures__36__NonCOVID_Period_Failure_Ra": {
+    "value": 0.094,
+    "type": "ratio",
+    "context": "Total -168% Failures: | 36 | Non-COVID Period Failure Rate:",
+    "row": 7
+  },
+  "Overall_Failure_Rate": {
+    "value": 0.1281,
+    "type": "ratio",
+    "context": "Overall Failure Rate:",
+    "row": 8
+  },
+  "COVID_Period_Sessions": {
+    "value": 17.1,
+    "type": "percentage",
+    "context": "COVID Period Sessions:",
+    "row": 10
+  },
+  "NonCOVID_Sessions": {
+    "value": 82.9,
+    "type": "percentage",
+    "context": "Non-COVID Sessions:",
+    "row": 11
+  },
+  "pct_r15_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 15
+  },
+  "pct_r16_c0": {
+    "value": 63.7,
+    "type": "percentage",
+    "context": "",
+    "row": 16
+  },
+  "pct_r17_c0": {
+    "value": 54.5,
+    "type": "percentage",
+    "context": "",
+    "row": 17
+  },
+  "pct_r18_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 18
+  }
+}

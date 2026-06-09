@@ -1,0 +1,104 @@
+{
+  "pct_r7_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 7
+  },
+  "132__168_Rekey__90": {
+    "value": 0.874,
+    "type": "ratio",
+    "context": "132% \u2192 168% Rekey | 90",
+    "row": 7
+  },
+  "pct_r8_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 8
+  },
+  "168__132_Rekey__13": {
+    "value": 0.126,
+    "type": "ratio",
+    "context": "168% \u2192 132% Rekey | 13",
+    "row": 8
+  },
+  "pct_r13_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 13
+  },
+  "Double_Rekey_132168": {
+    "value": 87.4,
+    "type": "percentage",
+    "context": "Double Rekey (132%\u2192168%):",
+    "row": 13
+  },
+  "pct_r14_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 14
+  },
+  "Double_Rekey_168132": {
+    "value": 12.6,
+    "type": "percentage",
+    "context": "Double Rekey (168%\u2192132%):",
+    "row": 14
+  },
+  "Most_Common_Sequence": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Most Common Sequence:",
+    "row": 15
+  },
+  "pct_r20_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 20
+  },
+  "25__50__100__168__28__812h": {
+    "value": 0.872,
+    "type": "ratio",
+    "context": "-25% \u2192 -50% \u2192 -100% \u2192 -168% | 28 | 8-12h",
+    "row": 20
+  },
+  "pct_r21_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 21
+  },
+  "pct_r22_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 22
+  },
+  "25__50_Stop__24__46h": {
+    "value": 0.964,
+    "type": "ratio",
+    "context": "-25% \u2192 -50% (Stop) | 24 | 4-6h",
+    "row": 22
+  },
+  "pct_r23_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 23
+  },
+  "pct_r29_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 29
+  },
+  "pct_r30_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 30
+  }
+}

@@ -1,0 +1,194 @@
+{
+  "Asian_High__Asian_Low__Range": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Asian High | Asian Low | Range",
+    "row": 1
+  },
+  "Asian_Low__Range__25_Level": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Asian Low | Range | 25% Level",
+    "row": 1
+  },
+  "Range__25_Level__50_Level": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Range | 25% Level | 50% Level",
+    "row": 1
+  },
+  "25_Level__50_Level__100_Level": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "25% Level | 50% Level | 100% Level",
+    "row": 1
+  },
+  "50_Level__100_Level__168_Level": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "50% Level | 100% Level | 168% Level",
+    "row": 1
+  },
+  "100_Level__168_Level__132_Invalid": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "100% Level | 168% Level | 132% Invalid",
+    "row": 1
+  },
+  "168_Level__132_Invalid__25_Hit_5D": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "168% Level | 132% Invalid | 25% Hit (5D)",
+    "row": 1
+  },
+  "132_Invalid__25_Hit_5D__50_Hit_5D": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "132% Invalid | 25% Hit (5D) | 50% Hit (5D)",
+    "row": 1
+  },
+  "25_Hit_5D__50_Hit_5D__100_Hit_5D": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "25% Hit (5D) | 50% Hit (5D) | 100% Hit (5D)",
+    "row": 1
+  },
+  "100_Hit_5D__168_Hit_5D__Inv_5D": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "100% Hit (5D) | 168% Hit (5D) | Inv (5D)",
+    "row": 1
+  },
+  "168_Hit_5D__Inv_5D__25_Hit_7D": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "168% Hit (5D) | Inv (5D) | 25% Hit (7D)",
+    "row": 1
+  },
+  "Inv_5D__25_Hit_7D__50_Hit_7D": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Inv (5D) | 25% Hit (7D) | 50% Hit (7D)",
+    "row": 1
+  },
+  "25_Hit_7D__50_Hit_7D__100_Hit_7D": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "25% Hit (7D) | 50% Hit (7D) | 100% Hit (7D)",
+    "row": 1
+  },
+  "pct_r4_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 4
+  },
+  "pct_r5_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 5
+  },
+  "50": {
+    "value": 0.9570000000000001,
+    "type": "ratio",
+    "context": "-50%",
+    "row": 5
+  },
+  "50__09570000000000001": {
+    "value": 0.951,
+    "type": "ratio",
+    "context": "-50% | 0.9570000000000001",
+    "row": 5
+  },
+  "50__09570000000000001__0951": {
+    "value": 0.966,
+    "type": "ratio",
+    "context": "-50% | 0.9570000000000001 | 0.951",
+    "row": 5
+  },
+  "pct_r6_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 6
+  },
+  "100": {
+    "value": 0.862,
+    "type": "ratio",
+    "context": "-100%",
+    "row": 6
+  },
+  "100__0862": {
+    "value": 0.872,
+    "type": "ratio",
+    "context": "-100% | 0.862",
+    "row": 6
+  },
+  "100__0862__0872": {
+    "value": 0.8490000000000001,
+    "type": "ratio",
+    "context": "-100% | 0.862 | 0.872",
+    "row": 6
+  },
+  "0862__0872__08490000000000001": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "0.862 | 0.872 | 0.8490000000000001",
+    "row": 6
+  },
+  "0872__08490000000000001__168_Hit_Rate": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "0.872 | 0.8490000000000001 | 168% Hit Rate",
+    "row": 6
+  },
+  "pct_r7_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 7
+  },
+  "168": {
+    "value": 0.763,
+    "type": "ratio",
+    "context": "-168%",
+    "row": 7
+  },
+  "168__0763": {
+    "value": 0.785,
+    "type": "ratio",
+    "context": "-168% | 0.763",
+    "row": 7
+  },
+  "168__0763__0785": {
+    "value": 0.733,
+    "type": "ratio",
+    "context": "-168% | 0.763 | 0.785",
+    "row": 7
+  },
+  "pct_r8_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 8
+  },
+  "132_Violation": {
+    "value": 0.7440000000000001,
+    "type": "ratio",
+    "context": "132% Violation",
+    "row": 8
+  },
+  "132_Violation__07440000000000001": {
+    "value": 0.738,
+    "type": "ratio",
+    "context": "132% Violation | 0.7440000000000001",
+    "row": 8
+  },
+  "132_Violation__07440000000000001__0738": {
+    "value": 0.753,
+    "type": "ratio",
+    "context": "132% Violation | 0.7440000000000001 | 0.738",
+    "row": 8
+  }
+}

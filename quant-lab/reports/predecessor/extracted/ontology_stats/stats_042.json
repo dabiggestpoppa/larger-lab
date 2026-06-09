@@ -1,0 +1,62 @@
+{
+  "Core_Hypothesis_Status": {
+    "value": 98.0,
+    "type": "percentage",
+    "context": "Core Hypothesis Status",
+    "row": 8
+  },
+  "Primary_Findings": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Primary Findings",
+    "row": 9
+  },
+  "Expected_Outcomes": {
+    "value": 87.3,
+    "type": "percentage",
+    "context": "Expected Outcomes",
+    "row": 11
+  },
+  "Critical_Insights": {
+    "value": 35.0,
+    "type": "percentage",
+    "context": "Critical Insights",
+    "row": 12
+  },
+  "Success_Factors": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Success Factors",
+    "row": 13
+  },
+  "pct_r21_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 21
+  },
+  "Check_last_weeks_132_status": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Check last week's 132% status",
+    "row": 21
+  },
+  "Review_if_132_violated_previous_Monday__Rekey_mode": {
+    "value": 71.53,
+    "type": "percentage",
+    "context": "Review if 132% violated previous Monday | Rekey mode active | Normal mode",
+    "row": 21
+  },
+  "Identify_current_quarter__Q4Q1__High_reliability_z": {
+    "value": 98.46,
+    "type": "percentage",
+    "context": "Identify current quarter | Q4/Q1 \u2192 High reliability zone | Q2/Q3 \u2192 Standard reliability",
+    "row": 22
+  },
+  "Check_DailyIELMWILM_status__DailyIELMWILM_aligned": {
+    "value": 87.3,
+    "type": "percentage",
+    "context": "Check Daily+IELM+WILM status | Daily+IELM+WILM aligned \u2192 Aggressive stance | Partial/None \u2192 Cautious/Avoid",
+    "row": 23
+  }
+}

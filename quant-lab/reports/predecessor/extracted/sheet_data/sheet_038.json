@@ -1,0 +1,68 @@
+{
+  "sheet_name": "PHASE 3 - SESSION CORRELATION MATRIX",
+  "headers": [
+    "PHASE 3: SESSION CORRELATION MATRIX & CROSS-SESSION DELIVERY MECHANICS",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 8,
+  "data": [
+    {
+      "PHASE 3: SESSION CORRELATION MATRIX & CROSS-SESSION DELIVERY MECHANICS": "Synthesized from 281 Weeks (Jan 2020 - May 2025), 1,401 Sessions, PHASE 3C Temporal Analysis"
+    },
+    {
+      "PHASE 3: SESSION CORRELATION MATRIX & CROSS-SESSION DELIVERY MECHANICS": "EXECUTIVE SUMMARY"
+    },
+    {
+      "PHASE 3: SESSION CORRELATION MATRIX & CROSS-SESSION DELIVERY MECHANICS": "Total Weeks Analyzed:",
+      "col_2": 281.0
+    },
+    {
+      "PHASE 3: SESSION CORRELATION MATRIX & CROSS-SESSION DELIVERY MECHANICS": "Total Sessions Analyzed:",
+      "col_2": 1401.0
+    },
+    {
+      "PHASE 3: SESSION CORRELATION MATRIX & CROSS-SESSION DELIVERY MECHANICS": "Data Source:",
+      "col_2": "PHASE 3C Pure System Mechanics + PHASE 2 Validation + Asian Session Analysis"
+    },
+    {
+      "PHASE 3: SESSION CORRELATION MATRIX & CROSS-SESSION DELIVERY MECHANICS": "Asian Sessions:",
+      "col_2": 619.0
+    },
+    {
+      "PHASE 3: SESSION CORRELATION MATRIX & CROSS-SESSION DELIVERY MECHANICS": "Primary Correlations:",
+      "col_2": "12 key cross-session patterns validated"
+    },
+    {
+      "PHASE 3: SESSION CORRELATION MATRIX & CROSS-SESSION DELIVERY MECHANICS": "Key Finding:",
+      "col_2": "Monday Range (M1) effectiveness score 123.13, Asian session 89.34% accuracy (\u00b10.25), Wednesday 35% of 132% violations, NY Open 80% Hi/Lo takeout"
+    }
+  ]
+}

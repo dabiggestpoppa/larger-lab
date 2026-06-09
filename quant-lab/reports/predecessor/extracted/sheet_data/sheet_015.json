@@ -1,0 +1,65 @@
+{
+  "sheet_name": "measurement_comparison",
+  "headers": [
+    "Measurement",
+    "Description",
+    "Weeks_Analyzed",
+    "Minus_25_Hit_Rate",
+    "Minus_50_Hit_Rate",
+    "Violation_132_Rate",
+    "Effectiveness_Score",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 3,
+  "data": [
+    {
+      "Measurement": "M1: Monday Range Only",
+      "Description": "Monday London range predicts Friday close (A=D)",
+      "Weeks_Analyzed": 281.0,
+      "Minus_25_Hit_Rate": 98.22064056939502,
+      "Minus_50_Hit_Rate": 96.44128113879003,
+      "Violation_132_Rate": 71.53024911032028,
+      "Effectiveness_Score": 123.13167259786476
+    },
+    {
+      "Measurement": "M2: Monday + Tuesday Range",
+      "Description": "Combined Mon+Tue range predicts Wed-Fri delivery (A-B=C-D)",
+      "Weeks_Analyzed": 280.0,
+      "Minus_25_Hit_Rate": 68.92857142857143,
+      "Minus_50_Hit_Rate": 59.285714285714285,
+      "Violation_132_Rate": 38.92857142857143,
+      "Effectiveness_Score": 89.28571428571429
+    },
+    {
+      "Measurement": "M3: Monday + Tuesday + Wednesday Range",
+      "Description": "Combined Mon+Tue+Wed range predicts Thu-Fri delivery (A-B-C=D)",
+      "Weeks_Analyzed": 280.0,
+      "Minus_25_Hit_Rate": 39.64285714285714,
+      "Minus_50_Hit_Rate": 29.642857142857142,
+      "Violation_132_Rate": 19.28571428571429,
+      "Effectiveness_Score": 49.999999999999986
+    }
+  ]
+}

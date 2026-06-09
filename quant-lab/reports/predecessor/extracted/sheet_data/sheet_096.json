@@ -1,0 +1,132 @@
+{
+  "sheet_name": "ETH_Discrepancy_Analysis",
+  "headers": [
+    "ETH Fibonacci Hit Rate Discrepancy Analysis",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 17,
+  "data": [
+    {
+      "ETH Fibonacci Hit Rate Discrepancy Analysis": "STATUS: RESOLVED"
+    },
+    {
+      "ETH Fibonacci Hit Rate Discrepancy Analysis": "Calculation Source",
+      "col_2": "Model Type",
+      "col_3": "-100% Hit Rate",
+      "col_4": "-168% Hit Rate",
+      "col_5": "Sample Size",
+      "col_6": "Notes"
+    },
+    {
+      "ETH Fibonacci Hit Rate Discrepancy Analysis": "Root Cause Analysis",
+      "col_2": "Not specified",
+      "col_3": 0.862,
+      "col_4": 0.763,
+      "col_5": "Unknown",
+      "col_6": "Target values from Phase 4 document"
+    },
+    {
+      "ETH Fibonacci Hit Rate Discrepancy Analysis": "Discrepancy was due to using all models (430 rows) vs 5-Day model only (215 weeks)",
+      "col_2": "All models",
+      "col_3": 0.5721,
+      "col_4": 0.44880000000000003,
+      "col_5": 430.0,
+      "col_6": "Calculated from eth_fibonacci_hit_results"
+    },
+    {
+      "ETH Fibonacci Hit Rate Discrepancy Analysis": "Current Calculation",
+      "col_2": "5_day only",
+      "col_3": 0.5581,
+      "col_4": 0.4372,
+      "col_5": 215.0,
+      "col_6": "Filtered for 5_day model only"
+    },
+    {
+      "ETH Fibonacci Hit Rate Discrepancy Analysis": "Verification Status",
+      "col_2": "7_day only",
+      "col_3": 0.586,
+      "col_4": 0.46049999999999996,
+      "col_5": 215.0,
+      "col_6": "Filtered for 7_day model only"
+    },
+    {
+      "ETH Fibonacci Hit Rate Discrepancy Analysis": "Phase 4 PDF values VERIFIED - 5-Day Model confirmed"
+    },
+    {
+      "ETH Fibonacci Hit Rate Discrepancy Analysis": "Discrepancy Analysis"
+    },
+    {
+      "ETH Fibonacci Hit Rate Discrepancy Analysis": "Validated Values",
+      "col_2": "Phase 4 Value",
+      "col_3": "Current Value",
+      "col_4": "Difference",
+      "col_5": "% Difference"
+    },
+    {
+      "ETH Fibonacci Hit Rate Discrepancy Analysis": "Level",
+      "col_2": "Old (All Models)",
+      "col_3": "New (5-Day PDF)",
+      "col_4": "#VALUE!",
+      "col_5": "#VALUE!"
+    },
+    {
+      "ETH Fibonacci Hit Rate Discrepancy Analysis": -100.0,
+      "col_2": 57.21,
+      "col_3": 86.2,
+      "col_4": -0.2899,
+      "col_5": -0.506729592728544
+    },
+    {
+      "ETH Fibonacci Hit Rate Discrepancy Analysis": -168.0,
+      "col_2": 44.88,
+      "col_3": 76.3
+    },
+    {
+      "ETH Fibonacci Hit Rate Discrepancy Analysis": "Key Findings"
+    },
+    {
+      "ETH Fibonacci Hit Rate Discrepancy Analysis": "Source: ETH/USD Phase 4 PDF - 5-Day Model, 215 weeks, 948 Fibonacci hits",
+      "col_2": "Current calculations use eth_fibonacci_hit_results sheet with all models combined"
+    },
+    {
+      "ETH Fibonacci Hit Rate Discrepancy Analysis": "2. Discrepancy",
+      "col_2": "Phase 4 shows ~29% higher for -100% (86.2% vs 57.21%) and ~31% higher for -168% (76.3% vs 44.88%)"
+    },
+    {
+      "ETH Fibonacci Hit Rate Discrepancy Analysis": "3. Possible Causes",
+      "col_2": "- Different data filtering (5_day vs 7_day model) - Different time period - Different hit criteria definition - Data quality issues"
+    },
+    {
+      "ETH Fibonacci Hit Rate Discrepancy Analysis": "4. Next Steps",
+      "col_2": "- Review Phase 4 document methodology - Check for additional filtering criteria - Verify hit definition (when is -100% considered 'hit') - Examine data quality and completeness"
+    }
+  ]
+}

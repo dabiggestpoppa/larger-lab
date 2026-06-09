@@ -1,0 +1,8 @@
+{
+  "Asian_Accuracy_Percent__Weekly_Close__Monday_Targe": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Asian_Accuracy_Percent | Weekly_Close | Monday_Target_Hit",
+    "row": 12
+  }
+}

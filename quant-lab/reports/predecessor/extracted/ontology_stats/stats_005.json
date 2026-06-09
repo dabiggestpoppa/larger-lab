@@ -1,0 +1,62 @@
+{
+  "Early_London_07001000_highest_daily_vector_predict": {
+    "value": 82.3,
+    "type": "percentage",
+    "context": "Early London (07:00-10:00) highest daily vector prediction | 1.4x-1.8x | All patterns",
+    "row": 3
+  },
+  "LondonNY_Overlap__14001800_UTC__Critical_window_fo": {
+    "value": 8.3,
+    "type": "percentage",
+    "context": "London-NY Overlap | 14:00-18:00 UTC | Critical window for pattern completion",
+    "row": 4
+  },
+  "14001800_UTC__Critical_window_for_pattern_completi": {
+    "value": 72.0,
+    "type": "percentage",
+    "context": "14:00-18:00 UTC | Critical window for pattern completion | +8.3% to +9.4%",
+    "row": 4
+  },
+  "Critical_window_for_pattern_completion__83_to_94": {
+    "value": 83.5,
+    "type": "percentage",
+    "context": "Critical window for pattern completion | +8.3% to +9.4% | 72% Fibonacci continuation",
+    "row": 4
+  },
+  "News_Window__07001100_UTC": {
+    "value": 71.3,
+    "type": "percentage",
+    "context": "News Window | 07:00-11:00 UTC",
+    "row": 6
+  },
+  "Wednesday_Focus__All_day_Wednesday": {
+    "value": 23.8,
+    "type": "percentage",
+    "context": "Wednesday Focus | All day Wednesday",
+    "row": 8
+  },
+  "238_of_ILM_interactions_midweek_pivot__10x13x__Dir": {
+    "value": 67.4,
+    "type": "percentage",
+    "context": "23.8% of ILM interactions, mid-week pivot | 1.0x-1.3x | Direction changes",
+    "row": 8
+  },
+  "Alpha_preference_structure_inversion__12x16x__Alph": {
+    "value": 62.7,
+    "type": "percentage",
+    "context": "Alpha preference, structure inversion | 1.2x-1.6x | Alpha patterns",
+    "row": 9
+  },
+  "Structure_inversion_probability__13x__All_patterns": {
+    "value": 73.8,
+    "type": "percentage",
+    "context": "Structure inversion probability | 1.3x | All patterns",
+    "row": 10
+  },
+  "BetaDelta_preference__10x14x__BetaDelta_patterns": {
+    "value": 57.3,
+    "type": "percentage",
+    "context": "Beta/Delta preference | 1.0x-1.4x | Beta/Delta patterns",
+    "row": 11
+  }
+}

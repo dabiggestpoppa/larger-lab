@@ -1,0 +1,128 @@
+{
+  "pct_r1_c0": {
+    "value": 90.0,
+    "type": "percentage",
+    "context": "",
+    "row": 1
+  },
+  "1__Q4_Reconstruction": {
+    "value": 95.8,
+    "type": "percentage",
+    "context": "#1 | Q4 Reconstruction",
+    "row": 4
+  },
+  "2": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "#2",
+    "row": 19
+  },
+  "2__132_Level_Invalidation": {
+    "value": 95.0,
+    "type": "percentage",
+    "context": "#2 | 132% Level Invalidation",
+    "row": 5
+  },
+  "2__132_Level_Invalidation__95": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "#2 | 132% Level Invalidation | 95%",
+    "row": 5
+  },
+  "3__15M_61888_under_WILM__4H_Rekey": {
+    "value": 94.3,
+    "type": "percentage",
+    "context": "#3 | 15M 61.8-88 under WILM \u2192 4H Rekey",
+    "row": 6
+  },
+  "4__MultiTimeframe_Alignment": {
+    "value": 94.0,
+    "type": "percentage",
+    "context": "#4 | Multi-Timeframe Alignment",
+    "row": 7
+  },
+  "5": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "#5",
+    "row": 8
+  },
+  "5__618_Rekey_Accuracy": {
+    "value": 94.0,
+    "type": "percentage",
+    "context": "#5 | 61.8% Rekey Accuracy",
+    "row": 8
+  },
+  "6__Q1_Reconstruction": {
+    "value": 93.2,
+    "type": "percentage",
+    "context": "#6 | Q1 Reconstruction",
+    "row": 9
+  },
+  "7__15M__WILM_Active_Rekey": {
+    "value": 92.0,
+    "type": "percentage",
+    "context": "#7 | 15M + WILM Active Rekey",
+    "row": 10
+  },
+  "8__ILM_HighLow_within_2H": {
+    "value": 91.2,
+    "type": "percentage",
+    "context": "#8 | ILM High/Low within 2H",
+    "row": 11
+  },
+  "9": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "#9",
+    "row": 12
+  },
+  "9__5050_Retest": {
+    "value": 91.4,
+    "type": "percentage",
+    "context": "#9 | 50%\u219250% Retest",
+    "row": 12
+  },
+  "5050_Retest__832914__Retest_success_rate": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "50%\u219250% Retest | 83.2-91.4% | Retest success rate",
+    "row": 12
+  },
+  "10": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "#10",
+    "row": 18
+  },
+  "10__25_Extension_Hit_Rate": {
+    "value": 90.0,
+    "type": "percentage",
+    "context": "#10 | -25% Extension Hit Rate",
+    "row": 13
+  },
+  "10__25_Extension_Weekly_Hit_Rate__All_1401_Monday": {
+    "value": 78.0,
+    "type": "percentage",
+    "context": "#10 | -25% Extension Weekly Hit Rate | All 1,401 Monday London sessions + weekly OHLC through Friday",
+    "row": 18
+  },
+  "2__132_Invalidation_Analysis": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "#2 | 132% Invalidation Analysis",
+    "row": 19
+  },
+  "2__132_Invalidation_Analysis__All_sessions_with_13": {
+    "value": 85.0,
+    "type": "percentage",
+    "context": "#2 | 132% Invalidation Analysis | All sessions with 132% level calculations",
+    "row": 19
+  },
+  "4__MultiTimeframe_Alignment__15M1H4H_pattern_compl": {
+    "value": 84.0,
+    "type": "percentage",
+    "context": "#4 | Multi-Timeframe Alignment | 15M/1H/4H pattern completions",
+    "row": 20
+  }
+}

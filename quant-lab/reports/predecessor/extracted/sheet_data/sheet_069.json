@@ -1,0 +1,164 @@
+{
+  "sheet_name": "PHASE 3F - LONDON DECAY DATA",
+  "headers": [
+    "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 24,
+  "data": [
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "EUR/USD Analysis | 2020-2025 | 215 Mondays Analyzed"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "Analysis Date: December 2025"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "SECTION 1: TARGET HIT RATE CHANGES AFTER 9 AM EST"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "Fibonacci Level",
+      "col_2": "Pre-9AM Hit Rate",
+      "col_3": "Post-9AM Hit Rate",
+      "col_4": "Change",
+      "col_5": "Behavior",
+      "col_6": "Trading Implication"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "-25% Extension",
+      "col_2": 0.878,
+      "col_3": 0.646,
+      "col_4": -0.232,
+      "col_5": "DECAY",
+      "col_6": "Shallow targets less reliable after 9 AM"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "-50% Extension",
+      "col_2": 0.821,
+      "col_3": 0.684,
+      "col_4": -0.137,
+      "col_5": "DECAY",
+      "col_6": "Mid-level targets also decline"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "132% Violation",
+      "col_2": 0.353,
+      "col_3": 0.473,
+      "col_4": 0.12,
+      "col_5": "INCREASE",
+      "col_6": "Invalidation more likely later"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "168% Extension",
+      "col_2": 0.542,
+      "col_3": 0.871,
+      "col_4": 0.329,
+      "col_5": "INCREASE",
+      "col_6": "Deep targets improve significantly"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "SECTION 2: KEY METRICS SUMMARY"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "Total Mondays Analyzed:",
+      "col_2": 215.0
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "Primary Finding:",
+      "col_2": "87.8% of all hits occur before 9 AM EST"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "Shallow Target Decay (-25%):",
+      "col_2": "-23.2% decline after 9 AM EST"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "Deep Target Increase (168%):",
+      "col_2": "+32.9% increase after 9 AM EST"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "SECTION 3: TEMPORAL DECAY PATTERN BY TIME WINDOW"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "Time Window",
+      "col_2": "-25% Hit Rate",
+      "col_3": "-50% Hit Rate",
+      "col_4": "132% Rate",
+      "col_5": "168% Hit Rate",
+      "col_6": "Overall Reliability"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "2-6 AM EST",
+      "col_2": 0.924,
+      "col_3": 0.886,
+      "col_4": 0.281,
+      "col_5": 0.423,
+      "col_6": "HIGH - Primary Entry"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "6-9 AM EST",
+      "col_2": 0.878,
+      "col_3": 0.821,
+      "col_4": 0.353,
+      "col_5": 0.542,
+      "col_6": "HIGH - London Session"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "9-12 PM EST",
+      "col_2": 0.723,
+      "col_3": 0.745,
+      "col_4": 0.428,
+      "col_5": 0.726,
+      "col_6": "MODERATE - Decay Zone"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "12-4 PM EST",
+      "col_2": 0.646,
+      "col_3": 0.684,
+      "col_4": 0.473,
+      "col_5": 0.871,
+      "col_6": "LOW - NY Session"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "SECTION 4: KEY FINDINGS"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "Shallow targets (-25%, -50%) decay after 9 AM EST - reliability decreases"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "Deep targets (132%, 168%) see INCREASED hit rates after 9 AM EST"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "87.8% of all Fibonacci target hits occur BEFORE 9 AM EST"
+    },
+    {
+      "PHASE 3F: LONDON TARGET DECAY ANALYSIS (After 9 AM EST)": "Trading Implication: Enter during London session (2-9 AM EST), exit by NY open"
+    }
+  ]
+}

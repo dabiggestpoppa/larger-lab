@@ -1,0 +1,188 @@
+{
+  "pct_r4_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 4
+  },
+  "25__1__1": {
+    "value": 0.9822,
+    "type": "ratio",
+    "context": "-25% | 1 | 1",
+    "row": 4
+  },
+  "pct_r5_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 5
+  },
+  "50__1__1": {
+    "value": 0.9644,
+    "type": "ratio",
+    "context": "-50% | 1 | 1",
+    "row": 5
+  },
+  "pct_r6_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 6
+  },
+  "100": {
+    "value": 0.9217,
+    "type": "ratio",
+    "context": "-100%",
+    "row": 9
+  },
+  "100__09105": {
+    "value": 0.9521,
+    "type": "ratio",
+    "context": "-100% | 0.9105",
+    "row": 6
+  },
+  "100__09105__09521": {
+    "value": 0.0416,
+    "type": "ratio",
+    "context": "-100% | 0.9105 | 0.9521",
+    "row": 6
+  },
+  "09105__09521__00416": {
+    "value": 0.9217,
+    "type": "ratio",
+    "context": "0.9105 | 0.9521 | 0.0416",
+    "row": 6
+  },
+  "pct_r7_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 7
+  },
+  "168": {
+    "value": 0.7636,
+    "type": "ratio",
+    "context": "-168%",
+    "row": 7
+  },
+  "168__07636": {
+    "value": 0.8818,
+    "type": "ratio",
+    "context": "-168% | 0.7636",
+    "row": 7
+  },
+  "168__07636__08818": {
+    "value": 0.1182,
+    "type": "ratio",
+    "context": "-168% | 0.7636 | 0.8818",
+    "row": 7
+  },
+  "07636__08818__01182": {
+    "value": 0.8719,
+    "type": "ratio",
+    "context": "0.7636 | 0.8818 | 0.1182",
+    "row": 7
+  },
+  "pct_r8_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 8
+  },
+  "132_Violated": {
+    "value": 0.8307,
+    "type": "ratio",
+    "context": "132% Violated",
+    "row": 8
+  },
+  "132_Violated__08307": {
+    "value": 0.9233,
+    "type": "ratio",
+    "context": "132% Violated | 0.8307",
+    "row": 8
+  },
+  "132_Violated__08307__09233": {
+    "value": 0.0926,
+    "type": "ratio",
+    "context": "132% Violated | 0.8307 | 0.9233",
+    "row": 8
+  },
+  "08307__09233__00926": {
+    "value": 0.7153,
+    "type": "ratio",
+    "context": "0.8307 | 0.9233 | 0.0926",
+    "row": 8
+  },
+  "pct_r9_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 9
+  },
+  "SUMMARY": {
+    "value": 0.8719,
+    "type": "ratio",
+    "context": "SUMMARY",
+    "row": 10
+  },
+  "Total_Sessions_Analyzed__313": {
+    "value": 0.7153,
+    "type": "ratio",
+    "context": "Total Sessions Analyzed | 313",
+    "row": 11
+  },
+  "pct_r14_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 14
+  },
+  "pct_r15_c0": {
+    "value": 20.0,
+    "type": "percentage",
+    "context": "",
+    "row": 15
+  },
+  "pct_r17_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 17
+  },
+  "pct_r18_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 18
+  },
+  "pct_r19_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 19
+  },
+  "pct_r22_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 22
+  },
+  "pct_r23_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 23
+  },
+  "pct_r24_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 24
+  },
+  "pct_r25_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 25
+  }
+}

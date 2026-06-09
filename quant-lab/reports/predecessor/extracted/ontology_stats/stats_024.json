@@ -1,0 +1,68 @@
+{
+  "246__NA__NA": {
+    "value": 24.6,
+    "type": "percentage",
+    "context": "24.6 | N/A | N/A",
+    "row": 28
+  },
+  "NA__NA__246_frequency": {
+    "value": 78.0,
+    "type": "percentage",
+    "context": "N/A | N/A | 24.6% frequency",
+    "row": 28
+  },
+  "Monthly_cycle__Monthly_scale__NA": {
+    "value": 18.5,
+    "type": "percentage",
+    "context": "Monthly cycle | Monthly scale | N/A",
+    "row": 29
+  },
+  "Early_month__Fast_early__NA": {
+    "value": 23.5,
+    "type": "percentage",
+    "context": "Early month | Fast early | N/A",
+    "row": 30
+  },
+  "6": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "6",
+    "row": 43
+  },
+  "7": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "7",
+    "row": 44
+  },
+  "pct_r54_c1": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 54
+  },
+  "pct_r55_c1": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 55
+  },
+  "3": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "3",
+    "row": 73
+  },
+  "9": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "9",
+    "row": 89
+  },
+  "10": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "10",
+    "row": 90
+  }
+}

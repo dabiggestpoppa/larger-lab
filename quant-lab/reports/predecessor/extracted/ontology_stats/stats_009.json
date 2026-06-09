@@ -1,0 +1,74 @@
+{
+  "2": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "2",
+    "row": 4
+  },
+  "2__Measured_Move_50100": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "2 | Measured Move 50%\u2192100%",
+    "row": 4
+  },
+  "Required__London__Daily_ILM_active": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Required | London | Daily ILM active",
+    "row": 4
+  },
+  "3__Q4_Reconstruction__Quarterly_rebalancing_patter": {
+    "value": 0.7,
+    "type": "ratio",
+    "context": "3 | Q4 Reconstruction | Quarterly rebalancing pattern",
+    "row": 5
+  },
+  "4": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "4",
+    "row": 6
+  },
+  "4__5050_Retest_4H": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "4 | 50%\u219250% Retest 4H",
+    "row": 6
+  },
+  "4H__Enhanced__LondonOverlap": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "4H | Enhanced | London/Overlap",
+    "row": 6
+  },
+  "Enhanced__LondonOverlap__Clean_50_retracement": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Enhanced | London/Overlap | Clean 50% retracement",
+    "row": 6
+  },
+  "5": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "5",
+    "row": 7
+  },
+  "5__5050_Retest_15M": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "5 | 50%\u219250% Retest 15M",
+    "row": 7
+  },
+  "15M__Neutral__Any": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "15M | Neutral | Any",
+    "row": 7
+  },
+  "Neutral__Any__Clean_50_retracement": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Neutral | Any | Clean 50% retracement",
+    "row": 7
+  }
+}

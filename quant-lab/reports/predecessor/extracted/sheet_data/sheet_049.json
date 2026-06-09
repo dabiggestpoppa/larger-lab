@@ -1,0 +1,104 @@
+{
+  "sheet_name": "EURUSD_Oil_Comparison",
+  "headers": [
+    "EUR/USD vs Oil Fibonacci Hit Rate Comparison",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 12,
+  "data": [
+    {
+      "EUR/USD vs Oil Fibonacci Hit Rate Comparison": "Fibonacci Level",
+      "col_2": "EUR/USD Hit Rate",
+      "col_3": "Oil Benchmark Rate",
+      "col_4": "Variance",
+      "col_5": "Absolute Variance",
+      "col_6": "Status"
+    },
+    {
+      "EUR/USD vs Oil Fibonacci Hit Rate Comparison": -25.0,
+      "col_2": 0.9904153354632588,
+      "col_3": 0.9822,
+      "col_4": 0.00821533546325881,
+      "col_5": 0.00821533546325881,
+      "col_6": "Similar"
+    },
+    {
+      "EUR/USD vs Oil Fibonacci Hit Rate Comparison": -50.0,
+      "col_2": 0.9424920127795527,
+      "col_3": 0.9643999999999999,
+      "col_4": -0.02190798722044718,
+      "col_5": 0.02190798722044718,
+      "col_6": "Similar"
+    },
+    {
+      "EUR/USD vs Oil Fibonacci Hit Rate Comparison": -100.0,
+      "col_2": 0.853035143769968,
+      "col_3": 0.9217,
+      "col_4": -0.068664856230032,
+      "col_5": 0.068664856230032,
+      "col_6": "Moderate Difference"
+    },
+    {
+      "EUR/USD vs Oil Fibonacci Hit Rate Comparison": -168.0,
+      "col_2": 0.7635782747603834,
+      "col_3": 0.8719,
+      "col_4": -0.1083217252396166,
+      "col_5": 0.1083217252396166,
+      "col_6": "Significant Difference"
+    },
+    {
+      "EUR/USD vs Oil Fibonacci Hit Rate Comparison": "132% Violated",
+      "col_2": 0.7060702875399361,
+      "col_3": 0.7153,
+      "col_4": -0.00922971246006398,
+      "col_5": 0.00922971246006398,
+      "col_6": "Similar"
+    },
+    {
+      "EUR/USD vs Oil Fibonacci Hit Rate Comparison": "Summary Statistics:"
+    },
+    {
+      "EUR/USD vs Oil Fibonacci Hit Rate Comparison": "Total EUR/USD Monday Observations: 313"
+    },
+    {
+      "EUR/USD vs Oil Fibonacci Hit Rate Comparison": "Analysis Date: 12/18/2025"
+    },
+    {
+      "EUR/USD vs Oil Fibonacci Hit Rate Comparison": "Key Findings:"
+    },
+    {
+      "EUR/USD vs Oil Fibonacci Hit Rate Comparison": "\u2022 -100%: EUR/USD is 6.87% lower than Oil benchmark"
+    },
+    {
+      "EUR/USD vs Oil Fibonacci Hit Rate Comparison": "\u2022 -168%: EUR/USD is 10.83% lower than Oil benchmark"
+    }
+  ]
+}

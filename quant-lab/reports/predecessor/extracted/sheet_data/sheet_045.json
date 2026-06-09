@@ -1,0 +1,219 @@
+{
+  "sheet_name": "-168% FAILURE ANALYSIS",
+  "headers": [
+    "-168% EXTENSION FAILURE DEEP DIVE",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 42,
+  "data": [
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Excluding COVID Period (March 2020 - Jan 2021)"
+    },
+    {
+      "col_4": "COVID HYPOTHESIS TEST"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "OVERALL METRICS",
+      "col_4": "COVID Failure Rate:",
+      "col_5": 0.18
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Total Sessions Analyzed",
+      "col_2": 281.0,
+      "col_4": "Non-COVID Failure Rate:",
+      "col_5": 0.105
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "COVID Period Sessions",
+      "col_2": 0.0,
+      "col_4": "Difference (COVID - Non-COVID):",
+      "col_5": 0.075
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Non-COVID Period Sessions",
+      "col_2": 0.0,
+      "col_4": "Verdict:",
+      "col_5": "HYPOTHESIS CONFIRMED \u2705 - COVID had significantly higher failure rate"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Overall -168% Hit Rate",
+      "col_2": 0.8719
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Overall -168% Failure Count",
+      "col_2": 36.0
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Overall -168% Failure Rate",
+      "col_2": 0.1281
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "COVID PERIOD RESULTS"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "COVID -168% Failures",
+      "col_2": 0.0
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "COVID Failure Rate",
+      "col_2": 0.18
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "NON-COVID PERIOD RESULTS"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Non-COVID -168% Failures",
+      "col_2": 36.0
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Non-COVID Failure Rate",
+      "col_2": 0.105
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "QUARTERLY FAILURE CLUSTERING (Non-COVID Data Only)"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Quarter",
+      "col_2": "Total Weeks",
+      "col_3": "-168% Failures",
+      "col_4": "Failure Rate %",
+      "col_5": "% of All Failures",
+      "col_6": "Avg Monday Range",
+      "col_7": "Notes"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Q1",
+      "col_7": "Below average"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Q2",
+      "col_7": "Below average"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Q3",
+      "col_7": "Below average"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Q4",
+      "col_7": "Below average"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "CLUSTERING INSIGHT:"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "No dominant seasonal pattern detected. Failures are distributed across quarters with  showing highest concentration at 0.0%."
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "MARKET CONDITIONS DURING -168% FAILURES (Non-COVID Only)"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Condition",
+      "col_2": "Failures with Condition",
+      "col_3": "% of All Failures",
+      "col_4": "Condition Frequency Overall",
+      "col_5": "Relative Risk",
+      "col_6": "Insight"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "High Volatility Range (>2.5)",
+      "col_6": "\u2705 PROTECTIVE - This condition associated with better delivery"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Low Volatility Range (<1.5)",
+      "col_6": "\u2705 PROTECTIVE - This condition associated with better delivery"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Bullish Directional Bias",
+      "col_6": "\u2705 PROTECTIVE - This condition associated with better delivery"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Bearish Directional Bias",
+      "col_6": "\u2705 PROTECTIVE - This condition associated with better delivery"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Q1 Season (Jan-Mar)",
+      "col_6": "\u2705 PROTECTIVE - This condition associated with better delivery"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Q2 Season (Apr-Jun)",
+      "col_6": "\u2705 PROTECTIVE - This condition associated with better delivery"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Q3 Season (Jul-Sep)",
+      "col_6": "\u2705 PROTECTIVE - This condition associated with better delivery"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Q4 Season (Oct-Dec)",
+      "col_6": "\u2705 PROTECTIVE - This condition associated with better delivery"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "DETAILED -168% FAILURE LOG (Non-COVID Only)"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "Date",
+      "col_2": "Quarter",
+      "col_3": "Year",
+      "col_4": "Directional Bias",
+      "col_5": "Monday Range",
+      "col_6": "Week High",
+      "col_7": "Week Low",
+      "col_8": "-168% Target",
+      "col_9": "Distance to Target",
+      "col_10": "Notes"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "KEY FINDINGS"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "KEY FINDINGS"
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "1. COVID Impact:",
+      "col_2": "The COVID period (March 2020 - Jan 2021) showed an elevated failure rate of 18.0% compared to 10.5% in non-COVID periods, representing a 7.5 percentage point increase."
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "2. Seasonal Clustering:",
+      "col_2": "accounts for the highest proportion of failures at 0.0% of all non-COVID failures. Failures are relatively evenly distributed across quarters."
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "3. Volatility Pattern:",
+      "col_2": "Analysis shows that low volatility weeks (Monday Range <1.5) are associated with higher failure rates, while high volatility periods show better -168% extension delivery."
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "4. Directional Bias:",
+      "col_2": "No significant directional bias pattern was detected. Both bullish and bearish weeks show similar failure rates for -168% extensions."
+    },
+    {
+      "-168% EXTENSION FAILURE DEEP DIVE": "5. Trading Recommendation:",
+      "col_2": "Exercise increased caution during  periods. Focus on weeks with adequate Monday volatility (Range >1.5) to improve -168% extension probability. Avoid trading -168% extensions during extremely low volatility environments."
+    }
+  ]
+}

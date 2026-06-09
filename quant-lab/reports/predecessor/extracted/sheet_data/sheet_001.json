@@ -1,0 +1,338 @@
+{
+  "sheet_name": "Delivery Stats",
+  "headers": [
+    "Metric Category",
+    "Claim/Pattern",
+    "Hit Rate (%)",
+    "Confidence Interval",
+    "Sample Size",
+    "Source Document",
+    "Timeframe",
+    "Notes",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 30,
+  "data": [
+    {
+      "Metric Category": "Metric Category",
+      "Claim/Pattern": "Claim/Pattern",
+      "Hit Rate (%)": "Hit Rate (%)",
+      "Confidence Interval": "Confidence Interval",
+      "Sample Size": "Sample Size",
+      "Source Document": "Source Document",
+      "Timeframe": "Timeframe",
+      "Notes": "Notes"
+    },
+    {
+      "Metric Category": "Extension Targets",
+      "Claim/Pattern": "-25% extension hit rate",
+      "Hit Rate (%)": 90.0,
+      "Confidence Interval": "High",
+      "Sample Size": "Multiple sessions",
+      "Source Document": "Multiple docs",
+      "Timeframe": "All timeframes",
+      "Notes": "Claimed in multiple documents"
+    },
+    {
+      "Metric Category": "Extension Targets",
+      "Claim/Pattern": "-50% extension hit rate",
+      "Hit Rate (%)": 82.0,
+      "Confidence Interval": "High",
+      "Sample Size": "Multiple sessions",
+      "Source Document": "Multiple docs",
+      "Timeframe": "All timeframes",
+      "Notes": "Claimed across reports"
+    },
+    {
+      "Metric Category": "Fibonacci Continuation",
+      "Claim/Pattern": "72% retracement continuation",
+      "Hit Rate (%)": 83.5,
+      "Confidence Interval": "\u00b13.2%",
+      "Sample Size": "London-NY sessions",
+      "Source Document": "Doc 5, 12",
+      "Timeframe": "London-NY overlap",
+      "Notes": "Strongest during overlap period"
+    },
+    {
+      "Metric Category": "Pattern Sequence",
+      "Claim/Pattern": "AB(72%)\u2192BC(-25%)\u2192CD(61.8%)",
+      "Hit Rate (%)": 81.2,
+      "Confidence Interval": "\u00b12.8%",
+      "Sample Size": "487 patterns",
+      "Source Document": "Doc 8, 15",
+      "Timeframe": "Multi-timeframe",
+      "Notes": "Alpha sequence success"
+    },
+    {
+      "Metric Category": "Timeframe Transition",
+      "Claim/Pattern": "1H\u21924H transition with WILM",
+      "Hit Rate (%)": "76.2-89.5",
+      "Confidence Interval": "Range",
+      "Sample Size": "356 transitions",
+      "Source Document": "Doc 14, 19",
+      "Timeframe": "1H to 4H",
+      "Notes": "WILM enhancement factor"
+    },
+    {
+      "Metric Category": "Rekey Trigger",
+      "Claim/Pattern": "Consecutive 15M 61.8-88 under WILM \u2192 4H rekey",
+      "Hit Rate (%)": 94.3,
+      "Confidence Interval": "\u00b11.8%",
+      "Sample Size": "218 occurrences",
+      "Source Document": "Doc 20",
+      "Timeframe": "15M to 4H",
+      "Notes": "Highest probability rekey condition"
+    },
+    {
+      "Metric Category": "Daily Pivot Formation",
+      "Claim/Pattern": "Daily high/low from 1H rekey",
+      "Hit Rate (%)": "72.9-78.3",
+      "Confidence Interval": "Range",
+      "Sample Size": "1,245 days",
+      "Source Document": "Doc 3, 11, 16",
+      "Timeframe": "Daily",
+      "Notes": "Alpha 78.3%, Delta 72.9%"
+    },
+    {
+      "Metric Category": "Alpha Pattern",
+      "Claim/Pattern": "Alpha sequence formation",
+      "Hit Rate (%)": "76.3-78.3",
+      "Confidence Interval": "Range",
+      "Sample Size": "892 patterns",
+      "Source Document": "Doc 7, 13",
+      "Timeframe": "Daily",
+      "Notes": "Most reliable pattern type"
+    },
+    {
+      "Metric Category": "ILM Interaction",
+      "Claim/Pattern": "ILM zone interaction",
+      "Hit Rate (%)": "65.8-75",
+      "Confidence Interval": "Varies by type",
+      "Sample Size": "2,134 touches",
+      "Source Document": "Doc 9, 17",
+      "Timeframe": "All ILM types",
+      "Notes": "Daily ILM 69%, IELM 48.3%, WILM 34.2%"
+    },
+    {
+      "Metric Category": "ILM Continuation",
+      "Claim/Pattern": "ILM\u2192Tag\u2192Continuation",
+      "Hit Rate (%)": 65.0,
+      "Confidence Interval": "vs 35% reversal",
+      "Sample Size": "1,567 setups",
+      "Source Document": "Doc 10",
+      "Timeframe": "ILM zones",
+      "Notes": "Continuation favored over reversal"
+    },
+    {
+      "Metric Category": "Quarter Level",
+      "Claim/Pattern": "Quarter level interaction",
+      "Hit Rate (%)": 80.5,
+      "Confidence Interval": "\u00b110 points",
+      "Sample Size": "3,421 touches",
+      "Source Document": "Doc 6, 18",
+      "Timeframe": "All timeframes",
+      "Notes": "High precision targeting"
+    },
+    {
+      "Metric Category": "Level Preference",
+      "Claim/Pattern": "75 level highest interaction",
+      "Hit Rate (%)": 56.0,
+      "Confidence Interval": "\u00b15%",
+      "Sample Size": "Quarter analysis",
+      "Source Document": "Doc 18",
+      "Timeframe": "All quarters",
+      "Notes": "Most magnetic level"
+    },
+    {
+      "Metric Category": "Multi-TF Alignment",
+      "Claim/Pattern": "Weekly+Monthly alignment",
+      "Hit Rate (%)": 94.0,
+      "Confidence Interval": "High confidence",
+      "Sample Size": "327 setups",
+      "Source Document": "Doc 21",
+      "Timeframe": "Weekly/Monthly",
+      "Notes": "Highest success when aligned"
+    },
+    {
+      "Metric Category": "Session Range",
+      "Claim/Pattern": "Session Opening Range (NY/London)",
+      "Hit Rate (%)": 100.0,
+      "Confidence Interval": "Claimed",
+      "Sample Size": "All sessions",
+      "Source Document": "Doc 4",
+      "Timeframe": "Session open",
+      "Notes": "79.1% compressed range"
+    },
+    {
+      "Metric Category": "Rekey Accuracy",
+      "Claim/Pattern": "61.8% rekey accuracy",
+      "Hit Rate (%)": 94.0,
+      "Confidence Interval": "Improved",
+      "Sample Size": "Updated dataset",
+      "Source Document": "Doc 15",
+      "Timeframe": "All timeframes",
+      "Notes": "Improved from 76% baseline"
+    },
+    {
+      "Metric Category": "Trend Angle - Shallow",
+      "Claim/Pattern": "Shallow angle completion",
+      "Hit Rate (%)": 78.9,
+      "Confidence Interval": "\u00b14.1%",
+      "Sample Size": "234 trends",
+      "Source Document": "Doc 12",
+      "Timeframe": "All timeframes",
+      "Notes": "Best completion rate"
+    },
+    {
+      "Metric Category": "Trend Angle - Moderate",
+      "Claim/Pattern": "Moderate angle completion",
+      "Hit Rate (%)": 62.6,
+      "Confidence Interval": "\u00b15.3%",
+      "Sample Size": "189 trends",
+      "Source Document": "Doc 12",
+      "Timeframe": "All timeframes",
+      "Notes": "Moderate success"
+    },
+    {
+      "Metric Category": "Trend Angle - Steep",
+      "Claim/Pattern": "Steep angle completion",
+      "Hit Rate (%)": 40.4,
+      "Confidence Interval": "\u00b16.8%",
+      "Sample Size": "156 trends",
+      "Source Document": "Doc 12",
+      "Timeframe": "All timeframes",
+      "Notes": "Lower reliability"
+    },
+    {
+      "Metric Category": "Trend Angle - Reflex",
+      "Claim/Pattern": "Reflex angle completion",
+      "Hit Rate (%)": 19.8,
+      "Confidence Interval": "\u00b18.2%",
+      "Sample Size": "92 trends",
+      "Source Document": "Doc 12",
+      "Timeframe": "All timeframes",
+      "Notes": "Lowest success - caution"
+    },
+    {
+      "Metric Category": "WEZ Formation - 15M",
+      "Claim/Pattern": "15M WEZ formation",
+      "Hit Rate (%)": "35.9-42.7",
+      "Confidence Interval": "Range",
+      "Sample Size": "567 zones",
+      "Source Document": "Doc 13",
+      "Timeframe": "15 minute",
+      "Notes": "Lower timeframe frequency"
+    },
+    {
+      "Metric Category": "WEZ Formation - 1H",
+      "Claim/Pattern": "1H WEZ formation",
+      "Hit Rate (%)": "43.7-48.5",
+      "Confidence Interval": "Range",
+      "Sample Size": "423 zones",
+      "Source Document": "Doc 13",
+      "Timeframe": "1 hour",
+      "Notes": "Mid timeframe frequency"
+    },
+    {
+      "Metric Category": "WEZ Formation - 4H",
+      "Claim/Pattern": "4H WEZ formation",
+      "Hit Rate (%)": "52.3-56.8",
+      "Confidence Interval": "Range",
+      "Sample Size": "298 zones",
+      "Source Document": "Doc 13",
+      "Timeframe": "4 hour",
+      "Notes": "Higher timeframe frequency"
+    },
+    {
+      "Metric Category": "WEZ Re-entry",
+      "Claim/Pattern": "WEZ re-entry in WILM zones",
+      "Hit Rate (%)": "73.6-88.7",
+      "Confidence Interval": "Range",
+      "Sample Size": "412 re-entries",
+      "Source Document": "Doc 14",
+      "Timeframe": "WILM active",
+      "Notes": "Strong re-entry probability"
+    },
+    {
+      "Metric Category": "Fibonacci Loop",
+      "Claim/Pattern": "61.8%\u219261.8% retest",
+      "Hit Rate (%)": "35.7-42.4",
+      "Confidence Interval": "Most frequent",
+      "Sample Size": "1,234 loops",
+      "Source Document": "Doc 16",
+      "Timeframe": "All timeframes",
+      "Notes": "Common reset mechanism"
+    },
+    {
+      "Metric Category": "Alpha Timing",
+      "Claim/Pattern": "Alpha odd-hour preference",
+      "Hit Rate (%)": "62.7-68.4",
+      "Confidence Interval": "Range",
+      "Sample Size": "892 Alphas",
+      "Source Document": "Doc 7",
+      "Timeframe": "Odd hours",
+      "Notes": "Structure preference timing"
+    },
+    {
+      "Metric Category": "Quarterly - Q1",
+      "Claim/Pattern": "Q1 reconstruction",
+      "Hit Rate (%)": 93.2,
+      "Confidence Interval": "\u00b12.3%",
+      "Sample Size": "Q1 2020-2024",
+      "Source Document": "Doc 19",
+      "Timeframe": "Quarterly",
+      "Notes": "Highest quarterly accuracy"
+    },
+    {
+      "Metric Category": "Quarterly - Q2",
+      "Claim/Pattern": "Q2 reconstruction",
+      "Hit Rate (%)": 89.7,
+      "Confidence Interval": "\u00b12.8%",
+      "Sample Size": "Q2 2020-2024",
+      "Source Document": "Doc 19",
+      "Timeframe": "Quarterly",
+      "Notes": "Strong performance"
+    },
+    {
+      "Metric Category": "Quarterly - Q3",
+      "Claim/Pattern": "Q3 reconstruction",
+      "Hit Rate (%)": 86.3,
+      "Confidence Interval": "\u00b13.1%",
+      "Sample Size": "Q3 2020-2024",
+      "Source Document": "Doc 19",
+      "Timeframe": "Quarterly",
+      "Notes": "Good reliability"
+    },
+    {
+      "Metric Category": "Quarterly - Q4",
+      "Claim/Pattern": "Q4 reconstruction",
+      "Hit Rate (%)": 95.8,
+      "Confidence Interval": "\u00b11.9%",
+      "Sample Size": "Q4 2020-2024",
+      "Source Document": "Doc 19",
+      "Timeframe": "Quarterly",
+      "Notes": "Exceptional accuracy"
+    }
+  ]
+}

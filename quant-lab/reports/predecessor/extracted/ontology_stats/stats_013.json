@@ -1,0 +1,32 @@
+{
+  "pct_r2_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 2
+  },
+  "pct_r3_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 3
+  },
+  "pct_r4_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 4
+  },
+  "pct_r5_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 5
+  },
+  "pct_r6_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 6
+  }
+}

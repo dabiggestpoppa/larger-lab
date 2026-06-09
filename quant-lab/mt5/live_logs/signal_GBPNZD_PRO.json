@@ -2,10 +2,10 @@
   "engine": "SymmetryTrap",
   "symbol": "GBPNZD.PRO",
   "direction": "BUY",
-  "entry": 2.29563,
-  "sl": 2.29639,
-  "tp": 2.29683,
+  "entry": 2.29793,
+  "sl": 2.29857,
+  "tp": 2.29913,
   "event": "SL_HIT",
   "loop": 1,
-  "time": "2026-06-08 13:53:00"
+  "time": "2026-06-08 20:30:00"
 }

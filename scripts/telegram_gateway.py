@@ -490,16 +490,17 @@ def main():
 
                                 full_ctx = "\n\n".join(ctx_parts)
 
-                                # Run agent — timeout must be >= LLM timeout (120s) + tool overhead
-                                # Use 180s to allow for multi-round tool-calling loops
+                                # Run agent — timeout must cover full model chain:
+                                # 3 models × 120s LLM timeout × 1 retry = 360s worst case
+                                # Use 300s — if it takes longer, something is wrong
                                 import concurrent.futures
                                 _agent_future = None
                                 with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
                                     _agent_future = executor.submit(agent.chat, msg_text, full_ctx, progress_callback=on_progress)
                                     try:
-                                        resp = _agent_future.result(timeout=180)
+                                        resp = _agent_future.result(timeout=300)
                                     except concurrent.futures.TimeoutError:
-                                        resp = "⏱️ Response timed out after 180s. Try a simpler question or use /new to start fresh."
+                                        resp = "🕑 Response timed out after 300s. Try a simpler question or use /new to start fresh."
                                         log("AGENT TIMEOUT")
                                         # Cancel the future to prevent thread leak
                                         _agent_future.cancel()

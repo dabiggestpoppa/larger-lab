@@ -1,0 +1,169 @@
+{
+  "sheet_name": "RANGE_COMPARISON_SUMMARY",
+  "headers": [
+    "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 27,
+  "data": [
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "Testing \u00b15 pip tolerance (0.0005) | Target: -25%/-50% \u226590%, -100% \u226580%"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "Analysis Period: Oct 2021 - Dec 2025 | 1,082 Trading Days"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "\u2705 WINNER: 2AM-4AM EST (07:00-09:00 UTC)"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "All target thresholds EXCEEDED:"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "-25%: 99.2% (target \u226590%) | -50%: 93.8% (target \u226590%) | -100%: 83.1% (target \u226580%)"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "Ready for Phase 3: Temporal Pattern Analysis"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "RANGE WINDOW COMPARISON"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "Metric",
+      "col_2": "Full Asian (23:00-08:00 UTC)",
+      "col_3": "2AM-4AM EST (07:00-09:00 UTC)",
+      "col_4": "Improvement",
+      "col_5": "Meets Target?"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "Average Range",
+      "col_2": "59.4 pips",
+      "col_3": "13.8 pips",
+      "col_4": -76.9,
+      "col_5": "-"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "Trading Days",
+      "col_2": 1083.0,
+      "col_3": 1082.0,
+      "col_4": "-",
+      "col_5": "-"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "-25% Hit Rate (\u00b15pip)",
+      "col_2": 54.5,
+      "col_3": 99.2,
+      "col_4": "+44.7pp",
+      "col_5": "\u2705 YES (\u226590%)"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "-50% Hit Rate (\u00b15pip)",
+      "col_2": 33.1,
+      "col_3": 93.8,
+      "col_4": "+60.7pp",
+      "col_5": "\u2705 YES (\u226590%)"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "-100% Hit Rate (\u00b15pip)",
+      "col_2": 11.8,
+      "col_3": 83.1,
+      "col_4": "+71.3pp",
+      "col_5": "\u2705 YES (\u226580%)"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "-168% Hit Rate (\u00b15pip)",
+      "col_2": 5.2,
+      "col_3": 65.3,
+      "col_4": "+60.1pp",
+      "col_5": "-"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "132% Violation Rate",
+      "col_2": "N/A",
+      "col_3": 52.4,
+      "col_4": "-",
+      "col_5": "-"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "KEY INSIGHTS"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "1. Narrower Range = Higher Predictability: 2AM-4AM EST has 77% smaller range (13.8 vs 59.4 pips) but 45-71pp higher hit rates"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "2. Tolerance Calibration: \u00b15 pip tolerance is optimal for 2AM-4AM range, allowing for minor price variations while maintaining high prediction accuracy"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "3. Daily Prediction Framework: 2AM-4AM range provides reliable daily Fibonacci levels with 99.2% accuracy at -25%, 93.8% at -50%, and 83.1% at -100%"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "4. Phase 3 Readiness: With all targets exceeded, proceed to temporal pattern analysis to identify day-of-week, monthly, and seasonal variations"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "COMPARISON TO MONDAY LONDON WEEKLY"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "Metric",
+      "col_2": "2AM-4AM Daily (\u00b15pip)",
+      "col_3": "Monday London Weekly (\u00b15pip)",
+      "col_4": "Difference"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "Average Range",
+      "col_2": "13.8 pips",
+      "col_3": "125.4 pips",
+      "col_4": "+111.6 pips"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "Sample Size",
+      "col_2": "1,082 days",
+      "col_3": "211 weeks",
+      "col_4": "5.1x more samples"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "-25% Hit Rate",
+      "col_2": 99.2,
+      "col_3": 88.6,
+      "col_4": "+10.6pp"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "-50% Hit Rate",
+      "col_2": 93.8,
+      "col_3": 80.1,
+      "col_4": "+13.7pp"
+    },
+    {
+      "EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results": "-100% Hit Rate",
+      "col_2": 83.1,
+      "col_3": 66.4,
+      "col_4": "+16.7pp"
+    }
+  ]
+}

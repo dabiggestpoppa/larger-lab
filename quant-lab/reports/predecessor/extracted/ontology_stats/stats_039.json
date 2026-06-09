@@ -1,0 +1,32 @@
+{
+  "15M_Atomic_Patterns__1857_sessions": {
+    "value": 72.0,
+    "type": "percentage",
+    "context": "15M Atomic Patterns | 1,857 sessions",
+    "row": 6
+  },
+  "Weekly_Target_Scaling__281_weeks": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Weekly Target Scaling | 281 weeks",
+    "row": 7
+  },
+  "CrossSession_Handoffs__619_Asian_sessions": {
+    "value": 89.34,
+    "type": "percentage",
+    "context": "Cross-Session Handoffs | 619 Asian sessions",
+    "row": 8
+  },
+  "pct_r10_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 10
+  },
+  "132_Atomic_Signature__195_invalidations": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "132% Atomic Signature | 195 invalidations",
+    "row": 10
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "pct_r11_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 11
+  },
+  "Exact_100_Hit_Rate": {
+    "value": 0.3943,
+    "type": "ratio",
+    "context": "Exact -100% Hit Rate",
+    "row": 11
+  },
+  "Exact_100_Hit_Rate__03943": {
+    "value": 0.9105,
+    "type": "ratio",
+    "context": "Exact -100% Hit Rate | 0.3943",
+    "row": 11
+  }
+}
