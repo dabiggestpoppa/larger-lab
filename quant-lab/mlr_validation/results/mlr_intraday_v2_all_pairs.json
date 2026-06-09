@@ -1,0 +1,94 @@
+{
+  "EURUSD": {
+    "pair": "EURUSD",
+    "total": 779,
+    "skipped": 1,
+    "combined": {
+      "ext_25": {
+        "hits": 775,
+        "total": 779
+      },
+      "ext_50": {
+        "hits": 705,
+        "total": 779
+      },
+      "ext_100": {
+        "hits": 399,
+        "total": 779
+      },
+      "rekey": {
+        "hits": 266,
+        "total": 779
+      }
+    }
+  },
+  "LCOUSD": {
+    "pair": "LCOUSD",
+    "total": 801,
+    "skipped": 80,
+    "combined": {
+      "ext_25": {
+        "hits": 795,
+        "total": 801
+      },
+      "ext_50": {
+        "hits": 672,
+        "total": 801
+      },
+      "ext_100": {
+        "hits": 346,
+        "total": 801
+      },
+      "rekey": {
+        "hits": 213,
+        "total": 801
+      }
+    }
+  },
+  "OILUSD": {
+    "pair": "OILUSD",
+    "total": 880,
+    "skipped": 1,
+    "combined": {
+      "ext_25": {
+        "hits": 855,
+        "total": 880
+      },
+      "ext_50": {
+        "hits": 694,
+        "total": 880
+      },
+      "ext_100": {
+        "hits": 353,
+        "total": 880
+      },
+      "rekey": {
+        "hits": 196,
+        "total": 880
+      }
+    }
+  },
+  "USDCHF": {
+    "pair": "USDCHF",
+    "total": 755,
+    "skipped": 156,
+    "combined": {
+      "ext_25": {
+        "hits": 750,
+        "total": 755
+      },
+      "ext_50": {
+        "hits": 678,
+        "total": 755
+      },
+      "ext_100": {
+        "hits": 409,
+        "total": 755
+      },
+      "rekey": {
+        "hits": 287,
+        "total": 755
+      }
+    }
+  }
+}

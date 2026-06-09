@@ -1,0 +1,618 @@
+{
+  "AUDCAD": {
+    "total": 1200,
+    "skipped": 717,
+    "combined": {
+      "ext_25": {
+        "hits": 1173,
+        "total": 1200
+      },
+      "ext_50": {
+        "hits": 970,
+        "total": 1200
+      },
+      "ext_100": {
+        "hits": 445,
+        "total": 1200
+      },
+      "rekey": {
+        "hits": 267,
+        "total": 1200
+      }
+    }
+  },
+  "AUDCHF": {
+    "total": 1201,
+    "skipped": 717,
+    "combined": {
+      "ext_25": {
+        "hits": 1176,
+        "total": 1201
+      },
+      "ext_50": {
+        "hits": 942,
+        "total": 1201
+      },
+      "ext_100": {
+        "hits": 439,
+        "total": 1201
+      },
+      "rekey": {
+        "hits": 251,
+        "total": 1201
+      }
+    }
+  },
+  "AUDJPY": {
+    "total": 1201,
+    "skipped": 717,
+    "combined": {
+      "ext_25": {
+        "hits": 1178,
+        "total": 1201
+      },
+      "ext_50": {
+        "hits": 919,
+        "total": 1201
+      },
+      "ext_100": {
+        "hits": 398,
+        "total": 1201
+      },
+      "rekey": {
+        "hits": 239,
+        "total": 1201
+      }
+    }
+  },
+  "AUDNZD": {
+    "total": 1201,
+    "skipped": 717,
+    "combined": {
+      "ext_25": {
+        "hits": 1091,
+        "total": 1201
+      },
+      "ext_50": {
+        "hits": 655,
+        "total": 1201
+      },
+      "ext_100": {
+        "hits": 182,
+        "total": 1201
+      },
+      "rekey": {
+        "hits": 81,
+        "total": 1201
+      }
+    }
+  },
+  "AUDUSD": {
+    "total": 1201,
+    "skipped": 717,
+    "combined": {
+      "ext_25": {
+        "hits": 1185,
+        "total": 1201
+      },
+      "ext_50": {
+        "hits": 1009,
+        "total": 1201
+      },
+      "ext_100": {
+        "hits": 514,
+        "total": 1201
+      },
+      "rekey": {
+        "hits": 328,
+        "total": 1201
+      }
+    }
+  },
+  "CADCHF": {
+    "total": 1201,
+    "skipped": 717,
+    "combined": {
+      "ext_25": {
+        "hits": 1189,
+        "total": 1201
+      },
+      "ext_50": {
+        "hits": 1069,
+        "total": 1201
+      },
+      "ext_100": {
+        "hits": 680,
+        "total": 1201
+      },
+      "rekey": {
+        "hits": 481,
+        "total": 1201
+      }
+    }
+  },
+  "CADJPY": {
+    "total": 1137,
+    "skipped": 768,
+    "combined": {
+      "ext_25": {
+        "hits": 1119,
+        "total": 1137
+      },
+      "ext_50": {
+        "hits": 979,
+        "total": 1137
+      },
+      "ext_100": {
+        "hits": 514,
+        "total": 1137
+      },
+      "rekey": {
+        "hits": 340,
+        "total": 1137
+      }
+    }
+  },
+  "CHFJPY": {
+    "total": 1201,
+    "skipped": 717,
+    "combined": {
+      "ext_25": {
+        "hits": 1186,
+        "total": 1201
+      },
+      "ext_50": {
+        "hits": 1026,
+        "total": 1201
+      },
+      "ext_100": {
+        "hits": 537,
+        "total": 1201
+      },
+      "rekey": {
+        "hits": 330,
+        "total": 1201
+      }
+    }
+  },
+  "EURAUD": {
+    "total": 1201,
+    "skipped": 717,
+    "combined": {
+      "ext_25": {
+        "hits": 1187,
+        "total": 1201
+      },
+      "ext_50": {
+        "hits": 1004,
+        "total": 1201
+      },
+      "ext_100": {
+        "hits": 511,
+        "total": 1201
+      },
+      "rekey": {
+        "hits": 283,
+        "total": 1201
+      }
+    }
+  },
+  "EURCAD": {
+    "total": 1201,
+    "skipped": 717,
+    "combined": {
+      "ext_25": {
+        "hits": 1196,
+        "total": 1201
+      },
+      "ext_50": {
+        "hits": 1132,
+        "total": 1201
+      },
+      "ext_100": {
+        "hits": 798,
+        "total": 1201
+      },
+      "rekey": {
+        "hits": 597,
+        "total": 1201
+      }
+    }
+  },
+  "EURCHF": {
+    "total": 1201,
+    "skipped": 717,
+    "combined": {
+      "ext_25": {
+        "hits": 1175,
+        "total": 1201
+      },
+      "ext_50": {
+        "hits": 1016,
+        "total": 1201
+      },
+      "ext_100": {
+        "hits": 657,
+        "total": 1201
+      },
+      "rekey": {
+        "hits": 502,
+        "total": 1201
+      }
+    }
+  },
+  "EURGBP": {
+    "total": 1201,
+    "skipped": 717,
+    "combined": {
+      "ext_25": {
+        "hits": 1195,
+        "total": 1201
+      },
+      "ext_50": {
+        "hits": 1122,
+        "total": 1201
+      },
+      "ext_100": {
+        "hits": 823,
+        "total": 1201
+      },
+      "rekey": {
+        "hits": 623,
+        "total": 1201
+      }
+    }
+  },
+  "EURJPY": {
+    "total": 1201,
+    "skipped": 717,
+    "combined": {
+      "ext_25": {
+        "hits": 1189,
+        "total": 1201
+      },
+      "ext_50": {
+        "hits": 1059,
+        "total": 1201
+      },
+      "ext_100": {
+        "hits": 569,
+        "total": 1201
+      },
+      "rekey": {
+        "hits": 366,
+        "total": 1201
+      }
+    }
+  },
+  "EURNZD": {
+    "total": 1201,
+    "skipped": 717,
+    "combined": {
+      "ext_25": {
+        "hits": 1171,
+        "total": 1201
+      },
+      "ext_50": {
+        "hits": 931,
+        "total": 1201
+      },
+      "ext_100": {
+        "hits": 401,
+        "total": 1201
+      },
+      "rekey": {
+        "hits": 233,
+        "total": 1201
+      }
+    }
+  },
+  "GBPAUD": {
+    "total": 1137,
+    "skipped": 768,
+    "combined": {
+      "ext_25": {
+        "hits": 1124,
+        "total": 1137
+      },
+      "ext_50": {
+        "hits": 949,
+        "total": 1137
+      },
+      "ext_100": {
+        "hits": 495,
+        "total": 1137
+      },
+      "rekey": {
+        "hits": 320,
+        "total": 1137
+      }
+    }
+  },
+  "GBPCAD": {
+    "total": 982,
+    "skipped": 892,
+    "combined": {
+      "ext_25": {
+        "hits": 980,
+        "total": 982
+      },
+      "ext_50": {
+        "hits": 939,
+        "total": 982
+      },
+      "ext_100": {
+        "hits": 698,
+        "total": 982
+      },
+      "rekey": {
+        "hits": 530,
+        "total": 982
+      }
+    }
+  },
+  "GBPCHF": {
+    "total": 1201,
+    "skipped": 717,
+    "combined": {
+      "ext_25": {
+        "hits": 1193,
+        "total": 1201
+      },
+      "ext_50": {
+        "hits": 1077,
+        "total": 1201
+      },
+      "ext_100": {
+        "hits": 713,
+        "total": 1201
+      },
+      "rekey": {
+        "hits": 517,
+        "total": 1201
+      }
+    }
+  },
+  "GBPJPY": {
+    "total": 1201,
+    "skipped": 717,
+    "combined": {
+      "ext_25": {
+        "hits": 1196,
+        "total": 1201
+      },
+      "ext_50": {
+        "hits": 1074,
+        "total": 1201
+      },
+      "ext_100": {
+        "hits": 642,
+        "total": 1201
+      },
+      "rekey": {
+        "hits": 453,
+        "total": 1201
+      }
+    }
+  },
+  "GBPNZD": {
+    "total": 984,
+    "skipped": 890,
+    "combined": {
+      "ext_25": {
+        "hits": 963,
+        "total": 984
+      },
+      "ext_50": {
+        "hits": 793,
+        "total": 984
+      },
+      "ext_100": {
+        "hits": 328,
+        "total": 984
+      },
+      "rekey": {
+        "hits": 187,
+        "total": 984
+      }
+    }
+  },
+  "GBPUSD": {
+    "total": 1202,
+    "skipped": 716,
+    "combined": {
+      "ext_25": {
+        "hits": 1200,
+        "total": 1202
+      },
+      "ext_50": {
+        "hits": 1140,
+        "total": 1202
+      },
+      "ext_100": {
+        "hits": 887,
+        "total": 1202
+      },
+      "rekey": {
+        "hits": 693,
+        "total": 1202
+      }
+    }
+  },
+  "NZDCAD": {
+    "total": 1137,
+    "skipped": 768,
+    "combined": {
+      "ext_25": {
+        "hits": 1089,
+        "total": 1137
+      },
+      "ext_50": {
+        "hits": 840,
+        "total": 1137
+      },
+      "ext_100": {
+        "hits": 341,
+        "total": 1137
+      },
+      "rekey": {
+        "hits": 188,
+        "total": 1137
+      }
+    }
+  },
+  "NZDCHF": {
+    "total": 1137,
+    "skipped": 768,
+    "combined": {
+      "ext_25": {
+        "hits": 1102,
+        "total": 1137
+      },
+      "ext_50": {
+        "hits": 798,
+        "total": 1137
+      },
+      "ext_100": {
+        "hits": 318,
+        "total": 1137
+      },
+      "rekey": {
+        "hits": 161,
+        "total": 1137
+      }
+    }
+  },
+  "NZDJPY": {
+    "total": 1137,
+    "skipped": 768,
+    "combined": {
+      "ext_25": {
+        "hits": 1099,
+        "total": 1137
+      },
+      "ext_50": {
+        "hits": 808,
+        "total": 1137
+      },
+      "ext_100": {
+        "hits": 307,
+        "total": 1137
+      },
+      "rekey": {
+        "hits": 175,
+        "total": 1137
+      }
+    }
+  },
+  "NZDUSD": {
+    "total": 981,
+    "skipped": 886,
+    "combined": {
+      "ext_25": {
+        "hits": 960,
+        "total": 981
+      },
+      "ext_50": {
+        "hits": 765,
+        "total": 981
+      },
+      "ext_100": {
+        "hits": 345,
+        "total": 981
+      },
+      "rekey": {
+        "hits": 217,
+        "total": 981
+      }
+    }
+  },
+  "USDCAD": {
+    "total": 1201,
+    "skipped": 717,
+    "combined": {
+      "ext_25": {
+        "hits": 1194,
+        "total": 1201
+      },
+      "ext_50": {
+        "hits": 1109,
+        "total": 1201
+      },
+      "ext_100": {
+        "hits": 735,
+        "total": 1201
+      },
+      "rekey": {
+        "hits": 514,
+        "total": 1201
+      }
+    }
+  },
+  "USDJPY": {
+    "total": 1201,
+    "skipped": 717,
+    "combined": {
+      "ext_25": {
+        "hits": 1189,
+        "total": 1201
+      },
+      "ext_50": {
+        "hits": 1025,
+        "total": 1201
+      },
+      "ext_100": {
+        "hits": 516,
+        "total": 1201
+      },
+      "rekey": {
+        "hits": 341,
+        "total": 1201
+      }
+    }
+  },
+  "XAGUSD": {
+    "total": 1116,
+    "skipped": 775,
+    "combined": {
+      "ext_25": {
+        "hits": 1098,
+        "total": 1116
+      },
+      "ext_50": {
+        "hits": 916,
+        "total": 1116
+      },
+      "ext_100": {
+        "hits": 513,
+        "total": 1116
+      },
+      "rekey": {
+        "hits": 345,
+        "total": 1116
+      }
+    }
+  },
+  "XAUUSD": {
+    "total": 1129,
+    "skipped": 765,
+    "combined": {
+      "ext_25": {
+        "hits": 1118,
+        "total": 1129
+      },
+      "ext_50": {
+        "hits": 940,
+        "total": 1129
+      },
+      "ext_100": {
+        "hits": 539,
+        "total": 1129
+      },
+      "rekey": {
+        "hits": 380,
+        "total": 1129
+      }
+    }
+  }
+}
