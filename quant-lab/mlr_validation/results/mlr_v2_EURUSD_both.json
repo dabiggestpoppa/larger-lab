@@ -1,6 +1,6 @@
 {
   "pair": "EURUSD",
-  "data_file": "quant-lab/data/EURUSDPRO_M5_2023_2026.csv",
+  "data_file": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\data\\EURUSDPRO_M5_2023_2026.csv",
   "intraday": {
     "pair": "EURUSD",
     "level": "intraday",
