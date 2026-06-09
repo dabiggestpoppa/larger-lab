@@ -41,74 +41,55 @@ MUTEX_NAME = "Global\\SignalBot_Singleton"
 
 def _kill_all_signal_bot_processes():
     """Kill ALL other signal_bot.py processes (except self)."""
-    kernel32 = ctypes.windll.kernel32
-    PROCESS_TERMINATE = 0x0001
     my_pid = os.getpid()
     killed = 0
     try:
+        # Use tasklist to find python processes, then wmic to check command line
         result = __import__('subprocess').run(
-            ["powershell", "-Command",
-             "Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | "
-             "Where-Object { $_.CommandLine -like '*signal_bot*' -and $_.ProcessId -ne " + str(my_pid) + " } | "
-             "Select-Object -ExpandProperty ProcessId"],
-            capture_output=True, text=True, timeout=10
-        )
+            ["tasklist", "/FI", "IMAGENAME eq python.exe", "/FO", "CSV", "/NH"],
+            capture_output=True, text=True, timeout=10)
         for line in result.stdout.strip().split('\n'):
             line = line.strip()
-            if not line:
+            if not line or 'python.exe' not in line.lower():
+                continue
+            parts = line.split(',')
+            if len(parts) < 2:
                 continue
             try:
-                pid = int(line)
-                handle = kernel32.OpenProcess(PROCESS_TERMINATE, False, pid)
-                if handle:
-                    kernel32.TerminateProcess(handle, 1)
-                    kernel32.CloseHandle(handle)
+                pid = int(parts[1].strip('"'))
+                if pid == my_pid:
+                    continue
+                # Check if this is a signal_bot process
+                cmd_result = __import__('subprocess').run(
+                    ["wmic", "process", "where", f"ProcessId={pid}", "get", "CommandLine"],
+                    capture_output=True, text=True, timeout=5)
+                if 'signal_bot' in cmd_result.stdout:
+                    __import__('subprocess').run(["taskkill", "/F", "/PID", str(pid)],
+                        capture_output=True, timeout=5)
                     killed += 1
-                    log(f"Killed duplicate signal_bot PID {pid}")
-            except (ValueError, OSError):
+                    print(f"[SIGNAL BOT] Killed duplicate PID {pid}")
+            except (ValueError, OSError, IndexError):
                 pass
     except Exception as e:
-        log(f"Error scanning for duplicates: {e}")
+        print(f"[SIGNAL BOT] Error scanning: {e}")
     if killed > 0:
-        time.sleep(2)
+        time.sleep(3)
     return killed
 
 def _acquire_singleton():
-    """Acquire Windows named mutex + kill all duplicates. Returns True if we own the singleton."""
-    kernel32 = ctypes.windll.kernel32
-
-    # Step 1: Kill ALL other signal_bot processes first
-    _kill_all_signal_bot_processes()
-
-    # Step 2: Create Windows named mutex (true OS-level singleton)
-    mutex = kernel32.CreateMutexW(None, False, MUTEX_NAME)
-    last_error = kernel32.GetLastError()
-
-    if last_error == 183:  # ERROR_ALREADY_EXISTS
-        if mutex:
-            kernel32.CloseHandle(mutex)
-        log("[FATAL] Another signal_bot instance holds the mutex. Exiting.")
-        return False
-
-    # Step 3: Write PID file
+    """Kill all duplicates. No mutex — kill-duplicates is sufficient."""
+    killed = _kill_all_signal_bot_processes()
+    if killed > 0:
+        time.sleep(5)
     try:
         with open(PID_FILE, "w") as f:
             f.write(str(os.getpid()))
     except Exception:
         pass
-
     return True
 
 def _release_singleton():
-    """Release mutex and clean up PID file."""
-    kernel32 = ctypes.windll.kernel32
-    try:
-        mutex = kernel32.OpenMutexW(0x00100000, False, MUTEX_NAME)
-        if mutex:
-            kernel32.ReleaseMutex(mutex)
-            kernel32.CloseHandle(mutex)
-    except:
-        pass
+    """Clean up PID file."""
     if PID_FILE.exists():
         try:
             PID_FILE.unlink()
@@ -389,5 +370,9 @@ if __name__ == "__main__":
             sys.exit(1)
         try:
             run_daemon()
+        except Exception as _e:
+            log(f"FATAL: {_e}")
+            import traceback
+            traceback.print_exc()
         finally:
             _release_singleton()
