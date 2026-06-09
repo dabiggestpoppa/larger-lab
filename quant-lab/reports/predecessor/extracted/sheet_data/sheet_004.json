@@ -1,0 +1,137 @@
+{
+  "sheet_name": "ILM Zone Behaviors",
+  "headers": [
+    "ILM Type",
+    "Definition",
+    "Hit Rate (%)",
+    "Velocity Factor",
+    "Continuation %",
+    "Avg Time in Zone",
+    "Dominant Conditions",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 11,
+  "data": [
+    {
+      "ILM Type": "ILM Type",
+      "Definition": "Definition",
+      "Hit Rate (%)": "Hit Rate (%)",
+      "Velocity Factor": "Velocity Factor",
+      "Continuation %": "Continuation %",
+      "Avg Time in Zone": "Avg Time in Zone",
+      "Dominant Conditions": "Dominant Conditions"
+    },
+    {
+      "ILM Type": "ILM (Daily)",
+      "Definition": "Previous day 50-61.8% zone",
+      "Hit Rate (%)": 64.3,
+      "Velocity Factor": "1.2x-1.6x",
+      "Continuation %": 69.0,
+      "Avg Time in Zone": "2.8 hrs",
+      "Dominant Conditions": "Daily touch, strong continuation"
+    },
+    {
+      "ILM Type": "IELM (2-Day)",
+      "Definition": "Previous 2 days 50-61.8%",
+      "Hit Rate (%)": 48.3,
+      "Velocity Factor": "1.5x-2.1x",
+      "Continuation %": 48.3,
+      "Avg Time in Zone": "24-48h influence",
+      "Dominant Conditions": "Medium-term influence"
+    },
+    {
+      "ILM Type": "WILM (Weekly)",
+      "Definition": "Previous week 50-61.8%",
+      "Hit Rate (%)": 34.2,
+      "Velocity Factor": "1.8x-2.8x",
+      "Continuation %": 34.2,
+      "Avg Time in Zone": "48-120h influence",
+      "Dominant Conditions": "Strongest velocity factor, lowest continuation"
+    },
+    {
+      "ILM Type": "ILM Formation Speed",
+      "Definition": "Pattern formation with ILM",
+      "Hit Rate (%)": 91.2,
+      "Velocity Factor": "25-29% faster",
+      "Continuation %": 91.2,
+      "Avg Time in Zone": "Faster completion",
+      "Dominant Conditions": "High/low within 2H for 15M -25%"
+    },
+    {
+      "ILM Type": "ILM Pattern Boost",
+      "Definition": "Pattern success enhancement",
+      "Hit Rate (%)": "83-88%",
+      "Velocity Factor": "+14.8% to +18.7%",
+      "Continuation %": "83-88%",
+      "Avg Time in Zone": "Variable",
+      "Dominant Conditions": "Success rate boost from ILM"
+    },
+    {
+      "ILM Type": "ILM Velocity Boost",
+      "Definition": "Velocity acceleration with ILM",
+      "Hit Rate (%)": 85.0,
+      "Velocity Factor": "+1.62x to +1.95x",
+      "Continuation %": 85.0,
+      "Avg Time in Zone": "Accelerated",
+      "Dominant Conditions": "Speed increase in ILM zones"
+    },
+    {
+      "ILM Type": "Quarter Levels",
+      "Definition": "Quarter level zones (25/50/75/100)",
+      "Hit Rate (%)": 80.5,
+      "Velocity Factor": "1.3x-1.8x",
+      "Continuation %": 72.0,
+      "Avg Time in Zone": "Variable",
+      "Dominant Conditions": "Intermediate between Regular and ILM"
+    },
+    {
+      "ILM Type": "4H ILM",
+      "Definition": "4-hour timeframe ILM",
+      "Hit Rate (%)": 67.8,
+      "Velocity Factor": "0.85x-1.12x",
+      "Continuation %": 67.8,
+      "Avg Time in Zone": "4-8h influence",
+      "Dominant Conditions": "Higher timeframe ILM behavior"
+    },
+    {
+      "ILM Type": "Full ILM Alignment",
+      "Definition": "All ILM types aligned",
+      "Hit Rate (%)": 87.3,
+      "Velocity Factor": "2.5x+",
+      "Continuation %": 87.3,
+      "Avg Time in Zone": "Strong confluence",
+      "Dominant Conditions": "Highest execution probability"
+    },
+    {
+      "ILM Type": "Complete Misalignment",
+      "Definition": "No ILM alignment",
+      "Hit Rate (%)": 31.5,
+      "Velocity Factor": "0.8x-1.0x",
+      "Continuation %": 31.5,
+      "Avg Time in Zone": "Minimal",
+      "Dominant Conditions": "Failure scenario - avoid trades"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "True__True__True": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "True | True | True",
+    "row": 10
+  },
+  "True__True__False": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "True | True | False",
+    "row": 9
+  },
+  "False__False__True": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "False | False | True",
+    "row": 8
+  }
+}

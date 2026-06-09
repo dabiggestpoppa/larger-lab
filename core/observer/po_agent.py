@@ -60,7 +60,7 @@ MODEL_CHAIN = [
     "minimax/minimax-m2.5",
 ]
 
-MODEL_RETRY_COUNT = 2  # attempts per model before falling back
+MODEL_RETRY_COUNT = 1  # attempts per model before falling back (1 = no retry, move to next model fast)
 
 # ─── Tool Definitions (OpenAI function calling format) ─────────────────────
 

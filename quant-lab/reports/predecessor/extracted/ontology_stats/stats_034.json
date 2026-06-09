@@ -1,0 +1,98 @@
+{
+  "H1__Session_Fib_targets_overlap_with_Session_Close": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "H1 | Session Fib targets overlap with Session Close | \u226525%",
+    "row": 6
+  },
+  "H2": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "H2",
+    "row": 7
+  },
+  "H2__Monday_Range_25__Tuesday_Daily_Close": {
+    "value": 40.0,
+    "type": "percentage",
+    "context": "H2 | Monday Range -25% = Tuesday Daily Close",
+    "row": 7
+  },
+  "H2__Monday_Range_25__Tuesday_Daily_Close__40": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "H2 | Monday Range -25% = Tuesday Daily Close | \u226540%",
+    "row": 7
+  },
+  "H3__Asian_session_predicts_sameday_close": {
+    "value": 75.0,
+    "type": "percentage",
+    "context": "H3 | Asian session predicts same-day close",
+    "row": 8
+  },
+  "H3__Asian_session_predicts_sameday_close__75": {
+    "value": 82.71,
+    "type": "percentage",
+    "context": "H3 | Asian session predicts same-day close | \u226575%",
+    "row": 8
+  },
+  "H4__Previous_day_targets_overlap_with_current_sess": {
+    "value": 2.43,
+    "type": "percentage",
+    "context": "H4 | Previous day targets overlap with current sessions | \u226530%",
+    "row": 9
+  },
+  "H5__WednesdayThursday_velocity_spike": {
+    "value": 40.0,
+    "type": "percentage",
+    "context": "H5 | Wednesday-Thursday velocity spike",
+    "row": 10
+  },
+  "H5__WednesdayThursday_velocity_spike__2040": {
+    "value": 0.15,
+    "type": "percentage",
+    "context": "H5 | Wednesday-Thursday velocity spike | 20-40%",
+    "row": 10
+  },
+  "H6__Weekly_confluence_rate": {
+    "value": 60.0,
+    "type": "percentage",
+    "context": "H6 | Weekly confluence rate",
+    "row": 11
+  },
+  "H6__Weekly_confluence_rate__60": {
+    "value": 0.32,
+    "type": "percentage",
+    "context": "H6 | Weekly confluence rate | \u226560%",
+    "row": 11
+  },
+  "H1_Frequency": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "H1 Frequency",
+    "row": 19
+  },
+  "Asian_Accuracy": {
+    "value": 82.71,
+    "type": "percentage",
+    "context": "Asian Accuracy",
+    "row": 20
+  },
+  "MondayTuesday_Rate": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "Monday\u2192Tuesday Rate",
+    "row": 21
+  },
+  "WedThu_Velocity_Increase": {
+    "value": 0.15,
+    "type": "percentage",
+    "context": "Wed-Thu Velocity Increase",
+    "row": 22
+  },
+  "Weekly_Confluence_Rate": {
+    "value": 0.32,
+    "type": "percentage",
+    "context": "Weekly Confluence Rate",
+    "row": 23
+  }
+}

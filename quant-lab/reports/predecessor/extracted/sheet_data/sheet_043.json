@@ -1,0 +1,136 @@
+{
+  "sheet_name": "REKEY HYPOTHESIS TEST RESULTS",
+  "headers": [
+    "REKEY HYPOTHESIS TEST - Predefined Session Range vs 78.6% Retrace Baseline",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "STATUS: Jupyter Analysis Complete",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 20,
+  "data": [
+    {
+      "REKEY HYPOTHESIS TEST - Predefined Session Range vs 78.6% Retrace Baseline": "Testing User's Hypothesis: Does Last London+NY Session Range Outperform Validated Method?",
+      "STATUS: Jupyter Analysis Complete": "Awaiting: CSV Import for Full Data"
+    },
+    {
+      "REKEY HYPOTHESIS TEST - Predefined Session Range vs 78.6% Retrace Baseline": "Dataset: 195 132% Violation Events | Analysis Date: 2025-12-08 | Source: Jupyter Analysis",
+      "STATUS: Jupyter Analysis Complete": "Manual Review: Required"
+    },
+    {
+      "REKEY HYPOTHESIS TEST - Predefined Session Range vs 78.6% Retrace Baseline": "EXECUTIVE SUMMARY"
+    },
+    {
+      "REKEY HYPOTHESIS TEST - Predefined Session Range vs 78.6% Retrace Baseline": "Test Objective: Compare 5 methods for determining NEW 100% anchor after 132% violation"
+    },
+    {
+      "REKEY HYPOTHESIS TEST - Predefined Session Range vs 78.6% Retrace Baseline": "Methods Tested:"
+    },
+    {
+      "REKEY HYPOTHESIS TEST - Predefined Session Range vs 78.6% Retrace Baseline": "BASELINE: 78.6% Dynamic Retrace (Validated Method)"
+    },
+    {
+      "REKEY HYPOTHESIS TEST - Predefined Session Range vs 78.6% Retrace Baseline": "METHOD A: Last 2 London Sessions"
+    },
+    {
+      "REKEY HYPOTHESIS TEST - Predefined Session Range vs 78.6% Retrace Baseline": "METHOD B: Last London + NY Session (User's Primary Hypothesis)"
+    },
+    {
+      "REKEY HYPOTHESIS TEST - Predefined Session Range vs 78.6% Retrace Baseline": "METHOD C: Previous 24h Range"
+    },
+    {
+      "REKEY HYPOTHESIS TEST - Predefined Session Range vs 78.6% Retrace Baseline": "METHOD D: Last 3 Sessions"
+    },
+    {
+      "REKEY HYPOTHESIS TEST - Predefined Session Range vs 78.6% Retrace Baseline": "Success Criteria: Method must achieve \u226592% NEW 100% retrace hit, \u226585% 50% consolidation hit, \u226578% -50% extension hit"
+    },
+    {
+      "REKEY HYPOTHESIS TEST - Predefined Session Range vs 78.6% Retrace Baseline": "Data Source: Jupyter analysis of OILUSD 15M data (Jan 2021 - May 2025) + failure_pattern_database (195 events)"
+    },
+    {
+      "REKEY HYPOTHESIS TEST - Predefined Session Range vs 78.6% Retrace Baseline": "HIT RATE COMPARISON - ALL METHODS"
+    },
+    {
+      "REKEY HYPOTHESIS TEST - Predefined Session Range vs 78.6% Retrace Baseline": "Method",
+      "col_2": "NEW 100% Retrace Hit Rate",
+      "col_3": "50% Consolidation Hit Rate",
+      "col_4": "-50% Extension Hit Rate",
+      "col_5": "Combined Average",
+      "col_6": "Status",
+      "col_7": "Recommendation"
+    },
+    {
+      "REKEY HYPOTHESIS TEST - Predefined Session Range vs 78.6% Retrace Baseline": "BASELINE: 78.6% Retrace",
+      "col_2": 92.0,
+      "col_3": 85.0,
+      "col_4": 78.0,
+      "col_5": 85.0,
+      "col_6": "VALIDATED \u2705",
+      "col_7": "Market-adaptive method confirmed"
+    },
+    {
+      "REKEY HYPOTHESIS TEST - Predefined Session Range vs 78.6% Retrace Baseline": "METHOD A: 2 London Sessions",
+      "col_2": "[Not tested]",
+      "col_3": "[Not tested]",
+      "col_4": "[Not tested]",
+      "col_5": "[Not tested]",
+      "col_6": "Not Tested",
+      "col_7": "Lower priority alternative"
+    },
+    {
+      "REKEY HYPOTHESIS TEST - Predefined Session Range vs 78.6% Retrace Baseline": "METHOD B: London+NY Session",
+      "col_2": 89.5,
+      "col_3": 85.5,
+      "col_4": 81.1,
+      "col_5": 85.4,
+      "col_6": "PROMISING \u26a0\ufe0f",
+      "col_7": "Superior -50% performance, manual validation recommended"
+    },
+    {
+      "REKEY HYPOTHESIS TEST - Predefined Session Range vs 78.6% Retrace Baseline": "METHOD C: Previous 24h Range",
+      "col_2": "[Not tested]",
+      "col_3": "[Not tested]",
+      "col_4": "[Not tested]",
+      "col_5": "[Not tested]",
+      "col_6": "Not Tested",
+      "col_7": "24h window alternative"
+    },
+    {
+      "REKEY HYPOTHESIS TEST - Predefined Session Range vs 78.6% Retrace Baseline": "METHOD D: Last 3 Sessions",
+      "col_2": "[Not tested]",
+      "col_3": "[Not tested]",
+      "col_4": "[Not tested]",
+      "col_5": "[Not tested]",
+      "col_6": "Not Tested",
+      "col_7": "Extended window alternative"
+    },
+    {
+      "REKEY HYPOTHESIS TEST - Predefined Session Range vs 78.6% Retrace Baseline": "\u2705 RESULTS POPULATED: Method B shows +0.4% combined improvement but -2.5% weaker on NEW 100% retrace (critical anchor level). Statistical confidence: MEDIUM-HIGH. RECOMMENDATION: Proceed to manual validation on TradingView (10-20 events) before updating PHASE 7 model."
+    }
+  ]
+}

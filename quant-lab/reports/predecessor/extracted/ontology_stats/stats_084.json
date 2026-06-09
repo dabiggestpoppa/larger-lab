@@ -1,0 +1,14 @@
+{
+  "True__True__hit_neg100_Rate": {
+    "value": 0.572093023255814,
+    "type": "ratio",
+    "context": "True | True | hit_neg100 Rate",
+    "row": 4
+  },
+  "True__True__hit_neg168_Rate": {
+    "value": 0.448837209302326,
+    "type": "ratio",
+    "context": "True | True | hit_neg168 Rate",
+    "row": 5
+  }
+}

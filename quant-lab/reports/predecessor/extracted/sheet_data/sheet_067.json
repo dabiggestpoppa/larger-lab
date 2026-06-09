@@ -1,0 +1,137 @@
+{
+  "sheet_name": "PHASE 3D - FIB SEQUENCES DATA",
+  "headers": [
+    "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 21,
+  "data": [
+    {
+      "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION": "EUR/USD Analysis | 2020-2025 | 103 Sequence Patterns Identified"
+    },
+    {
+      "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION": "Analysis Date: December 2025"
+    },
+    {
+      "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION": "SECTION 1: DOUBLE REKEY PATTERN ANALYSIS"
+    },
+    {
+      "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION": "Pattern Type",
+      "col_2": "Count",
+      "col_3": "Percentage",
+      "col_4": "Avg Duration (hours)",
+      "col_5": "Characteristics"
+    },
+    {
+      "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION": "132% \u2192 168% Rekey",
+      "col_2": 90.0,
+      "col_3": 0.874,
+      "col_4": 1.8,
+      "col_5": "Fast sequential extension, dominant pattern"
+    },
+    {
+      "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION": "168% \u2192 132% Rekey",
+      "col_2": 13.0,
+      "col_3": 0.126,
+      "col_4": 3.9,
+      "col_5": "Slower reversal pattern, less common"
+    },
+    {
+      "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION": "SECTION 2: KEY METRICS SUMMARY"
+    },
+    {
+      "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION": "Total Sequences Identified:",
+      "col_2": 103.0
+    },
+    {
+      "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION": "Double Rekey (132%\u2192168%):",
+      "col_2": "90 patterns (87.4%)"
+    },
+    {
+      "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION": "Double Rekey (168%\u2192132%):",
+      "col_2": "13 patterns (12.6%)"
+    },
+    {
+      "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION": "Most Common Sequence:",
+      "col_2": "-25% \u2192 -50% \u2192 -100% \u2192 -168% (28 cases)"
+    },
+    {
+      "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION": "SECTION 3: COMMON SEQUENCE PATTERNS"
+    },
+    {
+      "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION": "Sequence Pattern",
+      "col_2": "Frequency",
+      "col_3": "Avg Completion Time",
+      "col_4": "Success Rate",
+      "col_5": "Trading Implication"
+    },
+    {
+      "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION": "-25% \u2192 -50% \u2192 -100% \u2192 -168%",
+      "col_2": 28.0,
+      "col_3": "8-12h",
+      "col_4": 0.872,
+      "col_5": "Full extension delivery"
+    },
+    {
+      "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION": "-25% \u2192 -50% \u2192 132% (Rekey)",
+      "col_2": 18.0,
+      "col_3": "6-8h",
+      "col_4": 1.0,
+      "col_5": "Rekey trigger sequence"
+    },
+    {
+      "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION": "-25% \u2192 -50% (Stop)",
+      "col_2": 24.0,
+      "col_3": "4-6h",
+      "col_4": 0.964,
+      "col_5": "Partial delivery, consolidation"
+    },
+    {
+      "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION": "-25% \u2192 132% (Direct)",
+      "col_2": 12.0,
+      "col_3": "3-5h",
+      "col_4": 1.0,
+      "col_5": "Rapid invalidation"
+    },
+    {
+      "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION": "SECTION 4: KEY FINDING"
+    },
+    {
+      "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION": "Double rekey patterns occur frequently (103 total sequences)"
+    },
+    {
+      "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION": "132% \u2192 168% is the dominant pattern (87.4%) and significantly faster (1.8h vs 3.9h)"
+    },
+    {
+      "PHASE 3D: FIBONACCI SEQUENCE IDENTIFICATION": "Full extension sequence (-25% \u2192 -50% \u2192 -100% \u2192 -168%) is most common with 28 occurrences"
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "sheet_name": "PHASE 7 - MODEL SYNTHESIS & INTEGRATION",
+  "headers": [
+    "Unified Trading Model - Decision Trees, Risk Framework & Execution Protocols",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 18,
+  "data": [
+    {
+      "Unified Trading Model - Decision Trees, Risk Framework & Execution Protocols": "Based on: 281 Monday weeks (Jan 2020-May 2025) | 1,857 15M sessions (2023-2025) | Phases 2-6 Integration"
+    },
+    {
+      "Unified Trading Model - Decision Trees, Risk Framework & Execution Protocols": "EXECUTIVE SUMMARY - COMPLETE MODEL OVERVIEW"
+    },
+    {
+      "Unified Trading Model - Decision Trees, Risk Framework & Execution Protocols": "Component",
+      "col_2": "Value / Description"
+    },
+    {
+      "Unified Trading Model - Decision Trees, Risk Framework & Execution Protocols": "Total Validation Scope",
+      "col_2": "281 Monday weeks (Jan 2020-May 2025) + 1,857 15M sessions (2023-2025)"
+    },
+    {
+      "Unified Trading Model - Decision Trees, Risk Framework & Execution Protocols": "Core Hypothesis Status",
+      "col_2": "VALIDATED - 4 of 5 top claims passing with 87-98% success rates"
+    },
+    {
+      "Unified Trading Model - Decision Trees, Risk Framework & Execution Protocols": "Primary Findings",
+      "col_2": "M1 optimal (123.13 effectiveness) | -25%: 98.22% | -50%: 96.44% | 132%: 71.53% violation rate"
+    },
+    {
+      "Unified Trading Model - Decision Trees, Risk Framework & Execution Protocols": "Model Components",
+      "col_2": "5 Integrated Systems: (1) Decision Tree, (2) Risk Framework, (3) Execution Checklist, (4) Performance KPIs, (5) Weekly Workflow"
+    },
+    {
+      "Unified Trading Model - Decision Trees, Risk Framework & Execution Protocols": "Expected Outcomes",
+      "col_2": "87.3% Full ILM success | 80% NY Open sweep | 85% post-132% rekey | 98.22% -25% delivery"
+    },
+    {
+      "Unified Trading Model - Decision Trees, Risk Framework & Execution Protocols": "Critical Insights",
+      "col_2": "Wednesday 35% violations (bifurcation point) | London Early primary entry | Post-132% optimal re-entry at 50%"
+    },
+    {
+      "Unified Trading Model - Decision Trees, Risk Framework & Execution Protocols": "Success Factors",
+      "col_2": "ILM alignment mandatory | 132% immediate exit | Monday Range foundation | Wednesday high alert"
+    },
+    {
+      "Unified Trading Model - Decision Trees, Risk Framework & Execution Protocols": "Model Status",
+      "col_2": "PRODUCTION READY - Validated across 281 weeks and 1,857 sessions"
+    },
+    {
+      "Unified Trading Model - Decision Trees, Risk Framework & Execution Protocols": "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550"
+    },
+    {
+      "Unified Trading Model - Decision Trees, Risk Framework & Execution Protocols": "PART 1: UNIFIED TRADING DECISION TREE"
+    },
+    {
+      "Unified Trading Model - Decision Trees, Risk Framework & Execution Protocols": "1.1 PRE-MONDAY PREPARATION (Sunday Evening / Monday Asian Session)"
+    },
+    {
+      "Unified Trading Model - Decision Trees, Risk Framework & Execution Protocols": "Decision Node",
+      "col_2": "Condition Check",
+      "col_3": "IF TRUE \u2192 Action",
+      "col_4": "IF FALSE \u2192 Action",
+      "col_5": "Success Probability",
+      "col_6": "Notes"
+    },
+    {
+      "Unified Trading Model - Decision Trees, Risk Framework & Execution Protocols": "Check last week's 132% status",
+      "col_2": "Review if 132% violated previous Monday",
+      "col_3": "Rekey mode active",
+      "col_4": "Normal mode",
+      "col_5": "71.53% / 28.47%",
+      "col_6": "Track rekey progress"
+    },
+    {
+      "Unified Trading Model - Decision Trees, Risk Framework & Execution Protocols": "Review quarterly context",
+      "col_2": "Identify current quarter",
+      "col_3": "Q4/Q1 \u2192 High reliability zone",
+      "col_4": "Q2/Q3 \u2192 Standard reliability",
+      "col_5": "Q4: 98.46% / Q1-Q3: 86-93%",
+      "col_6": "Seasonal bias confirmed"
+    },
+    {
+      "Unified Trading Model - Decision Trees, Risk Framework & Execution Protocols": "Identify ILM alignment",
+      "col_2": "Check Daily+IELM+WILM status",
+      "col_3": "Daily+IELM+WILM aligned \u2192 Aggressive stance",
+      "col_4": "Partial/None \u2192 Cautious/Avoid",
+      "col_5": "87.3% Full / 64.3% Daily / 31.5% None",
+      "col_6": "Critical filter"
+    }
+  ]
+}

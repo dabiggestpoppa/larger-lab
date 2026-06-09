@@ -1,0 +1,116 @@
+{
+  "pct_r1_c0": {
+    "value": 78.6,
+    "type": "percentage",
+    "context": "",
+    "row": 1
+  },
+  "pct_r3_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 3
+  },
+  "pct_r7_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 7
+  },
+  "pct_r9_c0": {
+    "value": 78.6,
+    "type": "percentage",
+    "context": "",
+    "row": 9
+  },
+  "pct_r15_c0": {
+    "value": 92.0,
+    "type": "percentage",
+    "context": "",
+    "row": 15
+  },
+  "Method": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Method",
+    "row": 24
+  },
+  "Method__NEW_100_Retrace_Hit_Rate": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Method | NEW 100% Retrace Hit Rate",
+    "row": 24
+  },
+  "Method__NEW_100_Retrace_Hit_Rate__50_Consolidation": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Method | NEW 100% Retrace Hit Rate | 50% Consolidation Hit Rate",
+    "row": 24
+  },
+  "pct_r25_c0": {
+    "value": 78.6,
+    "type": "percentage",
+    "context": "",
+    "row": 25
+  },
+  "BASELINE_786_Retrace": {
+    "value": 92.0,
+    "type": "percentage",
+    "context": "BASELINE: 78.6% Retrace",
+    "row": 25
+  },
+  "BASELINE_786_Retrace__920": {
+    "value": 85.0,
+    "type": "percentage",
+    "context": "BASELINE: 78.6% Retrace | 92.0%",
+    "row": 25
+  },
+  "BASELINE_786_Retrace__920__850": {
+    "value": 78.0,
+    "type": "percentage",
+    "context": "BASELINE: 78.6% Retrace | 92.0% | 85.0%",
+    "row": 25
+  },
+  "920__850__780": {
+    "value": 85.0,
+    "type": "percentage",
+    "context": "92.0% | 85.0% | 78.0%",
+    "row": 25
+  },
+  "METHOD_B_LondonNY_Session": {
+    "value": 89.5,
+    "type": "percentage",
+    "context": "METHOD B: London+NY Session",
+    "row": 27
+  },
+  "METHOD_B_LondonNY_Session__895": {
+    "value": 85.5,
+    "type": "percentage",
+    "context": "METHOD B: London+NY Session | 89.5%",
+    "row": 27
+  },
+  "METHOD_B_LondonNY_Session__895__855": {
+    "value": 81.1,
+    "type": "percentage",
+    "context": "METHOD B: London+NY Session | 89.5% | 85.5%",
+    "row": 27
+  },
+  "895__855__811": {
+    "value": 85.4,
+    "type": "percentage",
+    "context": "89.5% | 85.5% | 81.1%",
+    "row": 27
+  },
+  "811__854__PROMISING": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "81.1% | 85.4% | PROMISING \u26a0\ufe0f",
+    "row": 27
+  },
+  "pct_r31_c0": {
+    "value": 0.4,
+    "type": "percentage",
+    "context": "",
+    "row": 31
+  }
+}

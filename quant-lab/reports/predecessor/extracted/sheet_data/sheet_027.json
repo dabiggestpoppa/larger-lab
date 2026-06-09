@@ -1,0 +1,529 @@
+{
+  "sheet_name": "PHASE 4C - GROUP B ANALYSIS",
+  "headers": [
+    "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 53,
+  "data": [
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "Pure Failure Pattern Analysis | 281 Monday Sessions | Jan 2020 - May 2025"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "PART 1: GROUP B IDENTIFICATION & CHARACTERISTICS"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "Metric",
+      "col_2": "Group B (Pivot=FALSE)",
+      "col_3": "Group A (Pivot=TRUE)",
+      "col_4": "Variance",
+      "col_5": "Notes"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "Total Months",
+      "col_2": 43.0,
+      "col_3": 18.0,
+      "col_4": -25.0,
+      "col_5": "Sample size"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "Percentage of Total",
+      "col_2": 0.7049180327868853,
+      "col_3": 0.29508196721311475,
+      "col_4": -0.409836065573771,
+      "col_5": "Distribution"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "Avg Month Range",
+      "col_2": 7.268382558139532,
+      "col_3": 8.016555000000004,
+      "col_4": 0.748172441860472,
+      "col_5": "Points"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "Avg Week 1 Range",
+      "col_2": 1.7143188372093023,
+      "col_3": 1.727107777777778,
+      "col_4": 0.0127889405684756,
+      "col_5": "Points"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "Avg Week1\u2192Monthly Multiplier",
+      "col_2": 6.022851068524644,
+      "col_3": 6.305843392237872,
+      "col_4": 0.282992323713228,
+      "col_5": "Expansion factor"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "PART 2: GROUP B MONTH CATALOG - COMPLETE LIST"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "YearMonth",
+      "col_2": "Month_High",
+      "col_3": "Month_Low",
+      "col_4": "Month_Range",
+      "col_5": "Week1_Range",
+      "col_6": "Week1\u2192Monthly_Multiplier",
+      "col_7": "Quarter",
+      "col_8": "Notes"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2020-1",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 8.161099999999998,
+      "col_5": 1.8363,
+      "col_6": 4.44431737733486,
+      "col_7": "Q1 2020",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2020-10",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 5.689800000000005,
+      "col_5": 1.85324,
+      "col_6": 3.07019058513738,
+      "col_7": "Q4 2020",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2020-2",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 9.846440000000001,
+      "col_5": 1.55921,
+      "col_6": 6.31501850295983,
+      "col_7": "Q1 2020",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2020-3",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 11.512479999999996,
+      "col_5": 1.14895,
+      "col_6": 10.0200008703599,
+      "col_7": "Q1 2020",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2020-4",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 10.468889999999995,
+      "col_5": 3.52019,
+      "col_6": 2.97395595124127,
+      "col_7": "Q2 2020",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2020-5",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 7.333910000000003,
+      "col_5": 1.05467,
+      "col_6": 6.95374856590213,
+      "col_7": "Q2 2020",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2020-6",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 8.756260000000012,
+      "col_5": 4.53425,
+      "col_6": 1.93113745382368,
+      "col_7": "Q2 2020",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2020-8",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 6.5875799999999884,
+      "col_5": 4.79747,
+      "col_6": 1.37313625723558,
+      "col_7": "Q3 2020",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2020-9",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 7.827950000000001,
+      "col_5": 3.6827,
+      "col_6": 2.12560078203492,
+      "col_7": "Q3 2020",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2021-10",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 4.560300000000002,
+      "col_5": 1.05579,
+      "col_6": 4.31932486574035,
+      "col_7": "Q4 2021",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2021-11",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 8.104500000000002,
+      "col_5": 0.48822,
+      "col_6": 16.6000983163328,
+      "col_7": "Q4 2021",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2021-12",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 8.034970000000001,
+      "col_5": 1.13081,
+      "col_6": 7.10549959763356,
+      "col_7": "Q4 2021",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2021-6",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 5.026969999999995,
+      "col_5": 1.11886,
+      "col_6": 4.49293924172818,
+      "col_7": "Q2 2021",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2021-8",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 8.489729999999998,
+      "col_5": 0.69398,
+      "col_6": 12.2333928931669,
+      "col_7": "Q3 2021",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2022-1",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 6.483269999999997,
+      "col_5": 0.9301,
+      "col_6": 6.97050854746801,
+      "col_7": "Q1 2022",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2022-10",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 8.33251,
+      "col_5": 2.88242,
+      "col_6": 2.89080356089675,
+      "col_7": "Q4 2022",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2022-11",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 10.181089999999998,
+      "col_5": 4.28353,
+      "col_6": 2.37679904191169,
+      "col_7": "Q4 2022",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2022-12",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 6.902420000000006,
+      "col_5": 2.09345,
+      "col_6": 3.29715063650911,
+      "col_7": "Q4 2022",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2022-2",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 3.633879999999998,
+      "col_5": 0.41973,
+      "col_6": 8.6576608772306,
+      "col_7": "Q1 2022",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2022-3",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 7.948260000000001,
+      "col_5": 1.42912,
+      "col_6": 5.56164632781012,
+      "col_7": "Q1 2022",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2022-4",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 9.73339,
+      "col_5": 1.25661,
+      "col_6": 7.7457524609863,
+      "col_7": "Q2 2022",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2022-5",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 10.266110000000005,
+      "col_5": 1.49357,
+      "col_6": 6.8735378991276,
+      "col_7": "Q2 2022",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2022-6",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 8.394419999999997,
+      "col_5": 1.4885,
+      "col_6": 5.63951629156869,
+      "col_7": "Q2 2022",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2022-7",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 8.712259999999993,
+      "col_5": 0.88527,
+      "col_6": 9.84135913337173,
+      "col_7": "Q3 2022",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2022-8",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 7.406659999999995,
+      "col_5": 2.45789,
+      "col_6": 3.01342208154148,
+      "col_7": "Q3 2022",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2022-9",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 5.71332000000001,
+      "col_5": 1.06762,
+      "col_6": 5.35145463741782,
+      "col_7": "Q3 2022",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2023-1",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 7.461410000000001,
+      "col_5": 3.81235,
+      "col_6": 1.95716815087807,
+      "col_7": "Q1 2023",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2023-11",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 5.423680000000001,
+      "col_5": 0.40816,
+      "col_6": 13.2881223049784,
+      "col_7": "Q4 2023",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2023-2",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 4.0166599999999875,
+      "col_5": 1.97401,
+      "col_6": 2.03477186032492,
+      "col_7": "Q1 2023",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2023-3",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 4.493700000000004,
+      "col_5": 1.83825,
+      "col_6": 2.44455324357405,
+      "col_7": "Q1 2023",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2023-4",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 7.0530100000000004,
+      "col_5": 2.03305,
+      "col_6": 3.46917685251224,
+      "col_7": "Q2 2023",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2023-7",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 6.24062,
+      "col_5": 1.37766,
+      "col_6": 4.5298694888434,
+      "col_7": "Q3 2023",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2024-10",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 8.903480000000002,
+      "col_5": 2.09075,
+      "col_6": 4.25851010402966,
+      "col_7": "Q4 2024",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2024-11",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 7.698060000000005,
+      "col_5": 0.93332,
+      "col_6": 8.24803925770369,
+      "col_7": "Q4 2024",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2024-12",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 5.111019999999996,
+      "col_5": 1.61809,
+      "col_6": 3.15867473379107,
+      "col_7": "Q4 2024",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2024-2",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 5.613410000000002,
+      "col_5": 1.29159,
+      "col_6": 4.34612376992699,
+      "col_7": "Q1 2024",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2024-3",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 4.91893,
+      "col_5": 0.36126,
+      "col_6": 13.6160383103582,
+      "col_7": "Q1 2024",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2024-4",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 5.538550000000001,
+      "col_5": 0.72849,
+      "col_6": 7.60278109514201,
+      "col_7": "Q2 2024",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2024-5",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 7.906120000000001,
+      "col_5": 1.15694,
+      "col_6": 6.833647380158,
+      "col_7": "Q2 2024",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2024-7",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 4.217070000000003,
+      "col_5": 0.33936,
+      "col_6": 12.4265381895332,
+      "col_7": "Q3 2024",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2024-8",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 8.427389999999999,
+      "col_5": 1.57504,
+      "col_6": 5.35058792157659,
+      "col_7": "Q3 2024",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2024-9",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 12.121380000000002,
+      "col_5": 1.04776,
+      "col_6": 11.568851645415,
+      "col_7": "Q3 2024",
+      "col_8": "Week 1 pivot failure"
+    },
+    {
+      "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 \u2260 MONTHLY PIVOT": "2025-1",
+      "col_2": "TBD",
+      "col_3": "TBD",
+      "col_4": 3.287489999999991,
+      "col_5": 1.96718,
+      "col_6": 1.67116888134283,
+      "col_7": "Q1 2025",
+      "col_8": "Week 1 pivot failure"
+    }
+  ]
+}

@@ -1,0 +1,242 @@
+{
+  "sheet_name": "ETH_Model_Compilation",
+  "headers": [
+    "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 50,
+  "data": [
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "Data Period:",
+      "col_2": "2021-01-04 to 2025-12-18"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "Weekly Anchor:",
+      "col_2": "Friday Asian Range"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "FIBONACCI HIT RATES"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "Level",
+      "col_2": "Hit Rate",
+      "col_3": "Context",
+      "col_4": "Significance"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": -25.0,
+      "col_2": 100.0,
+      "col_3": "Perfect delivery",
+      "col_4": "Primary target zone"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": -100.0,
+      "col_2": 0.862,
+      "col_3": 0.0,
+      "col_4": "Phase 4 PDF validated (5-Day Model)"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "-100% Fibonacci"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "Fibonacci Hit Rates - Phase 4 PDF Validated",
+      "col_2": 0.763,
+      "col_4": "Phase 4 PDF validated (5-Day Model)"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "Fibonacci Level",
+      "col_2": "Combined Rate",
+      "col_3": "Bullish Rate",
+      "col_4": "Bearish Rate"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": -25.0,
+      "col_2": 1.0,
+      "col_3": 1.0,
+      "col_4": 1.0
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": -50.0,
+      "col_2": 0.9570000000000001,
+      "col_3": 0.951,
+      "col_4": 0.966
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": -100.0,
+      "col_2": 0.862,
+      "col_3": 0.872,
+      "col_4": 0.8490000000000001
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": -168.0,
+      "col_2": 0.763,
+      "col_3": 0.785,
+      "col_4": 0.733
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "132% Violation",
+      "col_2": 0.7440000000000001,
+      "col_3": 0.738,
+      "col_4": 0.753
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "Asian Session",
+      "col_2": 63.7
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "Source: ETH/USD Phase 4 PDF - 5-Day Model, 215 weeks, 948 Fibonacci hits"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "SESSION MECHANICS & ANCHOR SYSTEM"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "Anchor Type:",
+      "col_2": "Friday Asian Range"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "Differentiator:",
+      "col_2": "Unlike EUR/USD (Monday Range), ETH uses Friday Asian as weekly reference"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "Key Sessions:",
+      "col_2": "Asian \u2192 London \u2192 New York"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "DAY-BY-DAY FIBONACCI DELIVERY"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "Day",
+      "col_2": "Role/Significance",
+      "col_3": "132% Violation"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "Friday",
+      "col_2": "WEEKLY ANCHOR - Asian Range establishes Fibonacci reference",
+      "col_3": "-"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "Monday",
+      "col_2": "Week opening, lower violation tendency",
+      "col_3": 61.9
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "DATA SOURCES & SHEETS"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "ETH-Related Sheets Found:",
+      "col_2": 19.0
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "ETH_Monday_Fibonacci"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "ETH_Sunday_Asian"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "ETH_Model_Comparison"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "ETH_Analysis_Summary"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "ETH_RANGE_EXPLORATION"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "ETH_M15_DATA"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "ETH_H1_DATA"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "ETH_Fib_Analysis"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "eth_friday_asian_ranges"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "eth_fibonacci_hit_results"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "eth_fibonacci_timing_analysis"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "eth_session_probabilities"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "eth_132_violations"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "eth_friday_asian_ranges_1"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "eth_fibonacci_hit_results_1"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "eth_fibonacci_timing_analysis_1"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "eth_session_probabilities_1"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "eth_132_violations_1"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "ETH_Data_Summary"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "CROSS-MARKET COMPARISON"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "Market",
+      "col_2": "-25% Hit",
+      "col_3": "-50% Hit",
+      "col_4": "132% Violation"
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "ETH/USD",
+      "col_2": 100.0,
+      "col_3": 95.7,
+      "col_4": 74.4
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "EUR/USD",
+      "col_2": 98.22,
+      "col_3": 96.44,
+      "col_4": 71.53
+    },
+    {
+      "ETH/USD MODEL - COMPREHENSIVE DATA COMPILATION": "OIL/USD",
+      "col_2": "See OILUSD sheets",
+      "col_3": "See OILUSD sheets",
+      "col_4": "See OILUSD sheets"
+    }
+  ]
+}

@@ -1,11 +1,37 @@
 {
   "session_id": "session_20260608_015414",
   "start_time": "2026-06-08T01:54:14.056759+00:00",
-  "last_active": "2026-06-08T01:54:14.056759+00:00",
-  "workflow_count": 0,
-  "success_count": 0,
+  "last_active": "2026-06-09T00:56:20.487531+00:00",
+  "workflow_count": 2,
+  "success_count": 2,
   "failure_count": 0,
   "active_goals": [],
-  "workflow_history": [],
-  "routing_patterns": {}
+  "workflow_history": [
+    {
+      "workflow_id": "chat_45741aa4",
+      "domain": "visualization",
+      "complexity": "low",
+      "timestamp": "2026-06-09T00:55:10.870432+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "workflow_id": "chat_b39abe4a",
+      "domain": "conversation",
+      "complexity": "low",
+      "timestamp": "2026-06-09T00:56:20.487531+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
+    }
+  ],
+  "routing_patterns": {
+    "TaskType.VISUALIZATION:": 1,
+    "TaskType.CONVERSATION:": 1
+  }
 }

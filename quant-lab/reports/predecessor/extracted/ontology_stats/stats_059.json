@@ -1,0 +1,200 @@
+{
+  "Overall__All_Sessions__1083": {
+    "value": 65.19,
+    "type": "percentage",
+    "context": "Overall | All Sessions | 1083",
+    "row": 2
+  },
+  "All_Sessions__1083__6519": {
+    "value": 54.94,
+    "type": "percentage",
+    "context": "All Sessions | 1083 | 65.19%",
+    "row": 2
+  },
+  "1083__6519__5494": {
+    "value": 39.43,
+    "type": "percentage",
+    "context": "1083 | 65.19% | 54.94%",
+    "row": 2
+  },
+  "6519__5494__3943": {
+    "value": 23.82,
+    "type": "percentage",
+    "context": "65.19% | 54.94% | 39.43%",
+    "row": 2
+  },
+  "5494__3943__2382": {
+    "value": 47.28,
+    "type": "percentage",
+    "context": "54.94% | 39.43% | 23.82%",
+    "row": 2
+  },
+  "3943__2382__4728": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "39.43% | 23.82% | 47.28%",
+    "row": 2
+  },
+  "2382__4728__10000": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "23.82% | 47.28% | 100.00%",
+    "row": 2
+  },
+  "4728__10000__10000": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "47.28% | 100.00% | 100.00%",
+    "row": 2
+  },
+  "10000__10000__10000": {
+    "value": 98.19,
+    "type": "percentage",
+    "context": "100.00% | 100.00% | 100.00%",
+    "row": 4
+  },
+  "10000__10000__9861": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "100.00% | 100.00% | 98.61%",
+    "row": 2
+  },
+  "Directional_Bias__Bullish_Sessions__586": {
+    "value": 65.02,
+    "type": "percentage",
+    "context": "Directional Bias | Bullish Sessions | 586",
+    "row": 3
+  },
+  "Bullish_Sessions__586__6502": {
+    "value": 53.41,
+    "type": "percentage",
+    "context": "Bullish Sessions | 586 | 65.02%",
+    "row": 3
+  },
+  "586__6502__5341": {
+    "value": 38.05,
+    "type": "percentage",
+    "context": "586 | 65.02% | 53.41%",
+    "row": 3
+  },
+  "6502__5341__3805": {
+    "value": 22.35,
+    "type": "percentage",
+    "context": "65.02% | 53.41% | 38.05%",
+    "row": 3
+  },
+  "5341__3805__2235": {
+    "value": 46.08,
+    "type": "percentage",
+    "context": "53.41% | 38.05% | 22.35%",
+    "row": 3
+  },
+  "3805__2235__4608": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "38.05% | 22.35% | 46.08%",
+    "row": 3
+  },
+  "2235__4608__10000": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "22.35% | 46.08% | 100.00%",
+    "row": 3
+  },
+  "4608__10000__10000": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "46.08% | 100.00% | 100.00%",
+    "row": 3
+  },
+  "10000__10000__9898": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "100.00% | 100.00% | 98.98%",
+    "row": 3
+  },
+  "Directional_Bias__Bearish_Sessions__497": {
+    "value": 65.39,
+    "type": "percentage",
+    "context": "Directional Bias | Bearish Sessions | 497",
+    "row": 4
+  },
+  "Bearish_Sessions__497__6539": {
+    "value": 56.74,
+    "type": "percentage",
+    "context": "Bearish Sessions | 497 | 65.39%",
+    "row": 4
+  },
+  "497__6539__5674": {
+    "value": 41.05,
+    "type": "percentage",
+    "context": "497 | 65.39% | 56.74%",
+    "row": 4
+  },
+  "6539__5674__4105": {
+    "value": 25.55,
+    "type": "percentage",
+    "context": "65.39% | 56.74% | 41.05%",
+    "row": 4
+  },
+  "5674__4105__2555": {
+    "value": 48.69,
+    "type": "percentage",
+    "context": "56.74% | 41.05% | 25.55%",
+    "row": 4
+  },
+  "4105__2555__4869": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "41.05% | 25.55% | 48.69%",
+    "row": 4
+  },
+  "2555__4869__10000": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "25.55% | 48.69% | 100.00%",
+    "row": 4
+  },
+  "4869__10000__10000": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "48.69% | 100.00% | 100.00%",
+    "row": 4
+  },
+  "10000__10000__9819": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "100.00% | 100.00% | 98.19%",
+    "row": 4
+  },
+  "Benchmark_Comparison__Monday_London_Weekly__313": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Benchmark Comparison | Monday London Weekly | 313",
+    "row": 5
+  },
+  "Monday_London_Weekly__313__10000": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Monday London Weekly | 313 | 100.00%",
+    "row": 5
+  },
+  "313__10000__10000": {
+    "value": 86.58,
+    "type": "percentage",
+    "context": "313 | 100.00% | 100.00%",
+    "row": 5
+  },
+  "10000__10000__8658": {
+    "value": 69.65,
+    "type": "percentage",
+    "context": "100.00% | 100.00% | 86.58%",
+    "row": 5
+  },
+  "10000__8658__6965": {
+    "value": 70.61,
+    "type": "percentage",
+    "context": "100.00% | 86.58% | 69.65%",
+    "row": 5
+  }
+}

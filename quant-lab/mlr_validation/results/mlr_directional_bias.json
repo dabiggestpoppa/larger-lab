@@ -1,0 +1,62 @@
+{
+  "EURUSD": {
+    "intraday": {
+      "pair": "EURUSD",
+      "level": "intraday",
+      "total": 779,
+      "bias": {
+        "Bullish": 455,
+        "Bearish": 324
+      },
+      "ext_25": {
+        "hits": 621,
+        "total": 779,
+        "rate": 79.7
+      },
+      "ext_50": {
+        "hits": 447,
+        "total": 779,
+        "rate": 57.4
+      },
+      "ext_100": {
+        "hits": 212,
+        "total": 779,
+        "rate": 27.2
+      },
+      "rekey": {
+        "hits": 148,
+        "total": 779,
+        "rate": 19.0
+      }
+    },
+    "weekly": {
+      "pair": "EURUSD",
+      "level": "weekly",
+      "total": 155,
+      "bias": {
+        "Bullish": 84,
+        "Bearish": 71
+      },
+      "ext_25": {
+        "hits": 143,
+        "total": 155,
+        "rate": 92.3
+      },
+      "ext_50": {
+        "hits": 132,
+        "total": 155,
+        "rate": 85.2
+      },
+      "ext_100": {
+        "hits": 112,
+        "total": 155,
+        "rate": 72.3
+      },
+      "rekey": {
+        "hits": 107,
+        "total": 155,
+        "rate": 69.0
+      }
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "sheet_name": "DECISION TREE - WEEKLY CLOSE",
+  "headers": [
+    "WEEKLY CLOSE PREDICTION DECISION TREE",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 7,
+  "data": [
+    {
+      "WEEKLY CLOSE PREDICTION DECISION TREE": "EUR/USD Deterministic Model - Navigating Daily Delivery to Weekly Close"
+    },
+    {
+      "WEEKLY CLOSE PREDICTION DECISION TREE": "Based on 313 Monday sessions, 281 validated weeks (Jan 2020 - Dec 2025)"
+    },
+    {
+      "WEEKLY CLOSE PREDICTION DECISION TREE": "MODEL OBJECTIVE"
+    },
+    {
+      "WEEKLY CLOSE PREDICTION DECISION TREE": "Goal:",
+      "col_2": "Predict weekly close location relative to Monday Fibonacci levels"
+    },
+    {
+      "WEEKLY CLOSE PREDICTION DECISION TREE": "Primary Predictor:",
+      "col_2": "M1 (Monday Range) with 123.13 effectiveness score"
+    },
+    {
+      "WEEKLY CLOSE PREDICTION DECISION TREE": "Key Decision Points:",
+      "col_2": "Monday Close, Wednesday Close, Thursday AM, Friday Close"
+    },
+    {
+      "WEEKLY CLOSE PREDICTION DECISION TREE": "Two Operating Modes:",
+      "col_2": "Normal Delivery (68.3%) vs Invalidation+Rekey (71.53%)"
+    }
+  ]
+}

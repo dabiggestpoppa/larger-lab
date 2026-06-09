@@ -1,0 +1,92 @@
+{
+  "Percentage_of_Total": {
+    "value": 0.7049180327868853,
+    "type": "ratio",
+    "context": "Percentage of Total",
+    "row": 8
+  },
+  "Percentage_of_Total__07049180327868853": {
+    "value": 0.29508196721311475,
+    "type": "ratio",
+    "context": "Percentage of Total | 0.7049180327868853",
+    "row": 8
+  },
+  "Avg_Month_Range__7268382558139532__801655500000000": {
+    "value": 0.748172441860472,
+    "type": "ratio",
+    "context": "Avg Month Range | 7.268382558139532 | 8.016555000000004",
+    "row": 9
+  },
+  "Avg_Week_1_Range__17143188372093023__1727107777777": {
+    "value": 0.0127889405684756,
+    "type": "ratio",
+    "context": "Avg Week 1 Range | 1.7143188372093023 | 1.727107777777778",
+    "row": 10
+  },
+  "Avg_Week1Monthly_Multiplier__6022851068524644__630": {
+    "value": 0.282992323713228,
+    "type": "ratio",
+    "context": "Avg Week1\u2192Monthly Multiplier | 6.022851068524644 | 6.305843392237872",
+    "row": 11
+  },
+  "TBD__TBD__8104500000000002": {
+    "value": 0.48822,
+    "type": "ratio",
+    "context": "TBD | TBD | 8.104500000000002",
+    "row": 27
+  },
+  "TBD__TBD__8489729999999998": {
+    "value": 0.69398,
+    "type": "ratio",
+    "context": "TBD | TBD | 8.489729999999998",
+    "row": 30
+  },
+  "TBD__TBD__6483269999999997": {
+    "value": 0.9301,
+    "type": "ratio",
+    "context": "TBD | TBD | 6.483269999999997",
+    "row": 31
+  },
+  "TBD__TBD__3633879999999998": {
+    "value": 0.41973,
+    "type": "ratio",
+    "context": "TBD | TBD | 3.633879999999998",
+    "row": 35
+  },
+  "TBD__TBD__8712259999999993": {
+    "value": 0.88527,
+    "type": "ratio",
+    "context": "TBD | TBD | 8.712259999999993",
+    "row": 40
+  },
+  "TBD__TBD__5423680000000001": {
+    "value": 0.40816,
+    "type": "ratio",
+    "context": "TBD | TBD | 5.423680000000001",
+    "row": 44
+  },
+  "TBD__TBD__7698060000000005": {
+    "value": 0.93332,
+    "type": "ratio",
+    "context": "TBD | TBD | 7.698060000000005",
+    "row": 50
+  },
+  "TBD__TBD__491893": {
+    "value": 0.36126,
+    "type": "ratio",
+    "context": "TBD | TBD | 4.91893",
+    "row": 53
+  },
+  "TBD__TBD__5538550000000001": {
+    "value": 0.72849,
+    "type": "ratio",
+    "context": "TBD | TBD | 5.538550000000001",
+    "row": 54
+  },
+  "TBD__TBD__4217070000000003": {
+    "value": 0.33936,
+    "type": "ratio",
+    "context": "TBD | TBD | 4.217070000000003",
+    "row": 56
+  }
+}

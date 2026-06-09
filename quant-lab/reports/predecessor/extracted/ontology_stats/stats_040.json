@@ -1,0 +1,176 @@
+{
+  "pct_r3_c0": {
+    "value": 94.3,
+    "type": "percentage",
+    "context": "",
+    "row": 3
+  },
+  "WILM_Velocity_Mechanics__281_weeks_195_rekey_event": {
+    "value": 34.2,
+    "type": "percentage",
+    "context": "WILM Velocity Mechanics | 281 weeks, 195 rekey events",
+    "row": 6
+  },
+  "Daily_ILM_Velocity__1857_sessions": {
+    "value": 64.3,
+    "type": "percentage",
+    "context": "Daily ILM Velocity | 1,857 sessions",
+    "row": 7
+  },
+  "IELM_Velocity__1857_sessions": {
+    "value": 48.3,
+    "type": "percentage",
+    "context": "IELM Velocity | 1,857 sessions",
+    "row": 8
+  },
+  "Full_ILM_Alignment__281_weeks": {
+    "value": 87.3,
+    "type": "percentage",
+    "context": "Full ILM Alignment | 281 weeks",
+    "row": 9
+  },
+  "Complete_Misalignment__281_weeks": {
+    "value": 31.5,
+    "type": "percentage",
+    "context": "Complete Misalignment | 281 weeks",
+    "row": 10
+  },
+  "pct_r11_c0": {
+    "value": 94.3,
+    "type": "percentage",
+    "context": "",
+    "row": 11
+  },
+  "ILM_Pattern_Boost__1857_sessions": {
+    "value": 14.8,
+    "type": "percentage",
+    "context": "ILM Pattern Boost | 1,857 sessions",
+    "row": 12
+  },
+  "pct_r14_c0": {
+    "value": 34.2,
+    "type": "percentage",
+    "context": "",
+    "row": 14
+  },
+  "pct_r16_c0": {
+    "value": 64.3,
+    "type": "percentage",
+    "context": "",
+    "row": 16
+  },
+  "pct_r17_c0": {
+    "value": 87.3,
+    "type": "percentage",
+    "context": "",
+    "row": 17
+  },
+  "pct_r18_c0": {
+    "value": 94.3,
+    "type": "percentage",
+    "context": "",
+    "row": 18
+  },
+  "Daily_ILM": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "Daily ILM",
+    "row": 24
+  },
+  "IELM_2Day": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "IELM (2-Day)",
+    "row": 25
+  },
+  "WILM_Weekly": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "WILM (Weekly)",
+    "row": 26
+  },
+  "187__29__Monday_anchor_Wednesday_violations": {
+    "value": 94.3,
+    "type": "percentage",
+    "context": "18.7 | 29 | Monday anchor, Wednesday violations",
+    "row": 26
+  },
+  "4H_ILM": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "4H ILM",
+    "row": 27
+  },
+  "pct_r32_c0": {
+    "value": 64.3,
+    "type": "percentage",
+    "context": "",
+    "row": 32
+  },
+  "pct_r33_c0": {
+    "value": 34.2,
+    "type": "percentage",
+    "context": "",
+    "row": 33
+  },
+  "pct_r34_c0": {
+    "value": 48.3,
+    "type": "percentage",
+    "context": "",
+    "row": 34
+  },
+  "pct_r36_c0": {
+    "value": 29.0,
+    "type": "percentage",
+    "context": "",
+    "row": 36
+  },
+  "pct_r37_c0": {
+    "value": 29.0,
+    "type": "percentage",
+    "context": "",
+    "row": 37
+  },
+  "pct_r38_c0": {
+    "value": 27.0,
+    "type": "percentage",
+    "context": "",
+    "row": 38
+  },
+  "pct_r39_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 39
+  },
+  "pct_r40_c0": {
+    "value": 22.0,
+    "type": "percentage",
+    "context": "",
+    "row": 40
+  },
+  "pct_r42_c0": {
+    "value": 8.5,
+    "type": "percentage",
+    "context": "",
+    "row": 42
+  },
+  "pct_r43_c0": {
+    "value": 18.7,
+    "type": "percentage",
+    "context": "",
+    "row": 43
+  },
+  "pct_r44_c0": {
+    "value": 16.2,
+    "type": "percentage",
+    "context": "",
+    "row": 44
+  },
+  "pct_r45_c0": {
+    "value": 14.8,
+    "type": "percentage",
+    "context": "",
+    "row": 45
+  }
+}

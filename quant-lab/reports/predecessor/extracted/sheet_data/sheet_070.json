@@ -1,0 +1,248 @@
+{
+  "sheet_name": "PHASE 3 - CONSOLIDATED SUMMARY",
+  "headers": [
+    "Analysis",
+    "Metric",
+    "Result",
+    "Sample_Size",
+    "Status",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 34,
+  "data": [
+    {
+      "Analysis": "Daily Range Capture by 12 PM EST",
+      "Metric": "Both Hi/Lo by noon",
+      "Result": 36.0,
+      "Sample_Size": 100.0,
+      "Status": "HYPOTHESIS REJECTED"
+    },
+    {
+      "Analysis": "Daily Range Capture by 12 PM EST",
+      "Metric": "High by noon only",
+      "Result": 71.0,
+      "Sample_Size": 100.0,
+      "Status": "INCOMPLETE"
+    },
+    {
+      "Analysis": "Daily Range Capture by 12 PM EST",
+      "Metric": "Low by noon only",
+      "Result": 60.0,
+      "Sample_Size": 100.0,
+      "Status": "INCOMPLETE"
+    },
+    {
+      "Analysis": "Daily Range Capture by 12 PM EST",
+      "Metric": "Average range captured",
+      "Result": 82.2,
+      "Sample_Size": 100.0,
+      "Status": "STRONG MAJORITY"
+    },
+    {
+      "Analysis": "Afternoon Delivery Windows",
+      "Metric": "Days requiring afternoon completion",
+      "Result": 64.0,
+      "Sample_Size": 64.0,
+      "Status": "MAJORITY PATTERN"
+    },
+    {
+      "Analysis": "Afternoon Delivery Windows",
+      "Metric": "Average afternoon high time",
+      "Result": "17:00 EST",
+      "Sample_Size": 29.0,
+      "Status": "NY LATE SESSION"
+    },
+    {
+      "Analysis": "Afternoon Delivery Windows",
+      "Metric": "Average afternoon low time",
+      "Result": "18:00 EST",
+      "Sample_Size": 40.0,
+      "Status": "NY CLOSE PROXIMITY"
+    },
+    {
+      "Analysis": "PHASE 3 COMPONENT DIRECTORY"
+    },
+    {
+      "Analysis": "Component",
+      "Metric": "Key Metrics",
+      "Result": "Sample Size",
+      "Sample_Size": "Primary Finding",
+      "Status": "Status",
+      "col_6": "Link",
+      "col_7": "Notes"
+    },
+    {
+      "Analysis": "PHASE 3B - FIB BEHAVIOR",
+      "Metric": "796 level hits, pullbacks 24-29 pips",
+      "Result": "796 hits",
+      "Sample_Size": "Consistent pullback range",
+      "Status": "\u2713 Complete",
+      "col_7": "Fibonacci behavior"
+    },
+    {
+      "Analysis": "PHASE 3C - TEMPORAL LENS",
+      "Metric": "Fast 4.1%, Normal 80.3%, Slow 15.6%",
+      "Result": "796 deliveries",
+      "Sample_Size": "Delivery speed categorized",
+      "Status": "\u2713 Complete",
+      "col_7": "Delivery timing"
+    },
+    {
+      "Analysis": "PHASE 3D - FIB SEQUENCES",
+      "Metric": "103 patterns, 132%\u2192168% dominant 87.4%",
+      "Result": "103 patterns",
+      "Sample_Size": "Extension sequences mapped",
+      "Status": "\u2713 Complete",
+      "col_7": "Sequence patterns"
+    },
+    {
+      "Analysis": "PHASE 3E - NY OPEN RANGE",
+      "Metric": "1,078 days, 22.8 pips avg range",
+      "Result": "1,078 days",
+      "Sample_Size": "NY session characteristics",
+      "Status": "\u2713 Complete",
+      "col_7": "NY session data"
+    },
+    {
+      "Analysis": "PHASE 3F - LONDON DECAY",
+      "Metric": "215 Mondays, 87.8% hits before 9 AM",
+      "Result": "215 days",
+      "Sample_Size": "Morning momentum validated",
+      "Status": "\u2713 Complete",
+      "col_7": "London decay analysis"
+    },
+    {
+      "Analysis": "WINDOW-SPECIFIC HIT RATE ANALYSIS"
+    },
+    {
+      "Analysis": "Window (EST)",
+      "Metric": "-25% Hit",
+      "Result": "-50% Hit",
+      "Sample_Size": "-100% Hit",
+      "Status": "-168% Hit",
+      "col_6": "132% Viol",
+      "col_7": "Risk Level",
+      "col_8": "Notes"
+    },
+    {
+      "Analysis": "2-6 AM EST",
+      "Metric": 0.924,
+      "Result": 0.886,
+      "Sample_Size": 0.878,
+      "Status": 0.423,
+      "col_6": 0.281,
+      "col_7": "LOW",
+      "col_8": "Best -100% window, Lowest 132%"
+    },
+    {
+      "Analysis": "6-9 AM EST",
+      "Metric": 0.878,
+      "Result": 0.821,
+      "Sample_Size": 0.831,
+      "Status": 0.542,
+      "col_6": 0.353,
+      "col_7": "MEDIUM",
+      "col_8": "London-NY transition"
+    },
+    {
+      "Analysis": "9-12 PM EST",
+      "Metric": 0.723,
+      "Result": 0.745,
+      "Sample_Size": 0.723,
+      "Status": 0.726,
+      "col_6": 0.428,
+      "col_7": "HIGH",
+      "col_8": "Increased violation risk"
+    },
+    {
+      "Analysis": "12-4 PM EST",
+      "Metric": 0.646,
+      "Result": 0.684,
+      "Sample_Size": 0.646,
+      "Status": 0.871,
+      "col_6": 0.473,
+      "col_7": "HIGH",
+      "col_8": "NY afternoon, deep targets only"
+    },
+    {
+      "Analysis": "KEY FINDINGS"
+    },
+    {
+      "Analysis": "\u2713 BEST WINDOW FOR -100% TARGET: 2-6 AM EST (87.8% hit rate)"
+    },
+    {
+      "Analysis": "\u2713 LOWEST 132% VIOLATION WINDOW: 2-6 AM EST (28.1%)"
+    },
+    {
+      "Analysis": "\u2713 Risk increases progressively through the day, peaking during NY session"
+    },
+    {
+      "Analysis": "\u2713 London-NY transition (6-9 AM) shows balanced performance across all targets"
+    },
+    {
+      "Analysis": "DAILY RANGE CAPTURE BY 12 PM EST"
+    },
+    {
+      "Analysis": "Hypothesis:",
+      "Metric": "80% of daily range captured by 12 PM EST"
+    },
+    {
+      "Analysis": "Result:",
+      "Metric": "CONFIRMED \u2705"
+    },
+    {
+      "Analysis": "Metric",
+      "Metric": "Value",
+      "Result": "Interpretation"
+    },
+    {
+      "Analysis": "Average Range Captured",
+      "Metric": 0.822,
+      "Result": "82.2% of daily range formed by noon"
+    },
+    {
+      "Analysis": "High by Noon Only",
+      "Metric": 0.71,
+      "Result": "71% of days reach daily high before noon"
+    },
+    {
+      "Analysis": "Low by Noon Only",
+      "Metric": 0.6,
+      "Result": "60% of days reach daily low before noon"
+    },
+    {
+      "Analysis": "Both Hi/Lo by Noon",
+      "Metric": 0.36,
+      "Result": "36% of days complete full range by noon"
+    },
+    {
+      "Analysis": "Days Requiring Afternoon",
+      "Metric": 0.64,
+      "Result": "64% need afternoon session for completion"
+    }
+  ]
+}

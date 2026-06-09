@@ -1,0 +1,141 @@
+{
+  "sheet_name": "EURUSD_TOLERANCE_ANALYSIS",
+  "headers": [
+    "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 24,
+  "data": [
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": "Fibonacci Level",
+      "col_2": "Original Hit Rate",
+      "col_3": "With \u00b10.025 Tolerance",
+      "col_4": "Improvement",
+      "col_5": "Oil Benchmark"
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": -25.0,
+      "col_2": 1.0,
+      "col_3": 1.0,
+      "col_4": 0.0,
+      "col_5": 0.9822
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": -50.0,
+      "col_2": 1.0,
+      "col_3": 1.0,
+      "col_4": 0.0,
+      "col_5": 0.9644
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": -100.0,
+      "col_2": 0.9105,
+      "col_3": 0.9521,
+      "col_4": 0.0416,
+      "col_5": 0.9217
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": -168.0,
+      "col_2": 0.7636,
+      "col_3": 0.8818,
+      "col_4": 0.1182,
+      "col_5": 0.8719
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": "132% Violated",
+      "col_2": 0.8307,
+      "col_3": 0.9233,
+      "col_4": 0.0926,
+      "col_5": 0.7153
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": -100.0,
+      "col_5": 0.9217
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": "SUMMARY",
+      "col_5": 0.8719
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": "Total Sessions Analyzed",
+      "col_2": 313.0,
+      "col_5": 0.7153
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": "Bullish Sessions",
+      "col_2": 141.0
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": "Bearish Sessions",
+      "col_2": 172.0
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": "-100% Failures (Rekey Candidates)",
+      "col_2": 28.0
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": "1. -20% (Alternative): NaN% hit rate (+NaN% improvement)"
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": "TOP 3 RECOMMENDED LEVELS"
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": "1. -25%: 100.00% hit rate (PERFECT)"
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": "2. -50%: 100.00% hit rate (PERFECT)"
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": "3. -100%: 95.21% hit rate with \u00b10.025 tolerance"
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": "\u2022 \u00b10.025 tolerance (25 pips) improves ALL Fibonacci levels"
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": "KEY FINDINGS"
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": "\u2022 EUR/USD EXCEEDS Oil on -25% and -50% (100% vs 98%/96%)"
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": "\u2022 \u00b10.025 tolerance improves -168% by +11.82%"
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": "\u2022 132% violation rate HIGHER than Oil (83% vs 72%)"
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": "\u2022 28 weeks where -100% failed = rekey candidates"
+    },
+    {
+      "EUR/USD Fibonacci Hit Rate Analysis with \u00b10.025 Spread Tolerance": "\u2022 Total sessions analyzed: 0"
+    }
+  ]
+}

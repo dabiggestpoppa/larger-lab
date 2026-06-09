@@ -1,0 +1,225 @@
+{
+  "sheet_name": "Hit Rate Analysis Framework",
+  "headers": [
+    "SECTION 1: MEASUREMENT DEFINITIONS",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 25,
+  "data": [
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "MEASUREMENT 1: Monday Range (A=D)",
+      "col_5": "Monday London session range predicts Friday close target"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "MEASUREMENT 2: Monday+Tuesday Range (A-B=C-D)",
+      "col_5": "Combined Mon+Tue range predicts Wed-Fri delivery"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "MEASUREMENT 3: Monday+Tuesday+Wednesday Range (A-B-C=D)",
+      "col_5": "Combined Mon+Tue+Wed range predicts Thu-Fri delivery"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "SECTION 2: FIBONACCI CALCULATION RULES"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "BULLISH BIAS (Close > Open):",
+      "col_5": "BEARISH BIAS (Close < Open):"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "- 0% = Session LOW",
+      "col_5": "- 0% = Session HIGH"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "- 100% = Session HIGH",
+      "col_5": "- 100% = Session LOW"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "- Extensions ABOVE: -25%, -50%, -100%, -168% (above high)",
+      "col_5": "- Extensions BELOW: -25%, -50%, -100%, -168% (below low)"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "- Invalidation BELOW: 132% (below low)",
+      "col_5": "- Invalidation ABOVE: 132% (above high)"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "EXAMPLE: Bullish Range LOW=85.76, HIGH=89.46"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "0% = 85.76"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "100% = 89.46"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "-25% = 90.387 (extension above)"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "-50% = 91.312"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "-100% = 93.16"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "-168% = 95.675"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "132% = 84.583 (invalidation below)"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "SECTION 3: HIT RATE ANALYSIS STRUCTURE"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "Session Date",
+      "col_2": "Day",
+      "col_3": "Open",
+      "col_4": "High",
+      "col_5": "Low",
+      "col_6": "Close",
+      "col_7": "Range",
+      "col_8": "Bias",
+      "col_9": "0% Level",
+      "col_10": "100% Level",
+      "col_11": "-25% Level",
+      "col_12": "-50% Level",
+      "col_13": "-100% Level",
+      "col_14": "-168% Level",
+      "col_15": "132% Level",
+      "col_16": "-25% Hit?",
+      "col_17": "-50% Hit?",
+      "col_18": "-100% Hit?",
+      "col_19": "-168% Hit?",
+      "col_20": "132% Hit?",
+      "col_21": "Week High",
+      "col_22": "Week Low",
+      "col_23": "ILM State",
+      "col_24": "Measurement",
+      "col_25": "Notes"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "2020-01-06",
+      "col_2": "Monday",
+      "col_3": 65.2,
+      "col_4": 68.5,
+      "col_5": 64.8,
+      "col_6": 67.9,
+      "col_7": 3.700000000000003,
+      "col_8": "Bullish",
+      "col_9": 64.8,
+      "col_10": 68.5,
+      "col_11": 69.425,
+      "col_12": 70.35,
+      "col_13": 72.2,
+      "col_14": 74.71600000000001,
+      "col_15": 63.616,
+      "col_24": 1.0,
+      "col_25": "Sample calculation demo - awaiting full Phase 1 dataset integration"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "2020-01-13",
+      "col_2": "Monday",
+      "col_3": 72.5,
+      "col_4": 73.1,
+      "col_5": 69.8,
+      "col_6": 70.2,
+      "col_7": 3.299999999999997,
+      "col_8": "Bearish",
+      "col_9": 73.1,
+      "col_10": 69.8,
+      "col_11": 68.975,
+      "col_12": 68.15,
+      "col_13": 66.5,
+      "col_14": 64.256,
+      "col_15": 74.15599999999999,
+      "col_24": 1.0,
+      "col_25": "Sample calculation demo - awaiting full Phase 1 dataset integration"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "2020-01-20",
+      "col_2": "Monday",
+      "col_3": 58.4,
+      "col_4": 61.75,
+      "col_5": 58.1,
+      "col_6": 61.2,
+      "col_7": 3.6499999999999986,
+      "col_8": "Bullish",
+      "col_9": 58.1,
+      "col_10": 61.75,
+      "col_11": 62.6625,
+      "col_12": 63.575,
+      "col_13": 65.4,
+      "col_14": 67.88199999999999,
+      "col_15": 56.932,
+      "col_24": 1.0,
+      "col_25": "Sample calculation demo - awaiting full Phase 1 dataset integration"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "2020-01-27",
+      "col_2": "Monday",
+      "col_3": 85.6,
+      "col_4": 86.2,
+      "col_5": 82.3,
+      "col_6": 83.1,
+      "col_7": 3.9000000000000057,
+      "col_8": "Bearish",
+      "col_9": 86.2,
+      "col_10": 82.3,
+      "col_11": 81.32499999999999,
+      "col_12": 80.35,
+      "col_13": 78.39999999999999,
+      "col_14": 75.74799999999999,
+      "col_15": 87.44800000000001,
+      "col_24": 1.0,
+      "col_25": "Sample calculation demo - awaiting full Phase 1 dataset integration"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "2020-02-03",
+      "col_2": "Monday",
+      "col_3": 75.25,
+      "col_4": 76.8,
+      "col_5": 74.5,
+      "col_6": 76.15,
+      "col_7": 2.299999999999997,
+      "col_8": "Bullish",
+      "col_9": 74.5,
+      "col_10": 76.8,
+      "col_11": 77.375,
+      "col_12": 77.94999999999999,
+      "col_13": 79.1,
+      "col_14": 80.66399999999999,
+      "col_15": 73.764,
+      "col_24": 1.0,
+      "col_25": "Sample calculation demo - awaiting full Phase 1 dataset integration"
+    },
+    {
+      "SECTION 1: MEASUREMENT DEFINITIONS": "\ud83d\udcca FIBONACCI CALCULATION METHODOLOGY DEMONSTRATED ABOVE\n\nFull Phase 1 Dataset Integration Instructions:\n1. Import london_sessions_phase1.csv (1,401 sessions available)\n2. Filter for Monday sessions only (for Measurement 1: A=D)\n3. Apply Fibonacci calculation formulas shown above to all rows\n4. Add weekly OHLC data (through Friday) for hit rate validation\n5. Populate hit flag columns (P-T) by comparing weekly targets to Fib levels\n6. Calculate final hit rates in Summary Statistics section\n\nVALIDATION TARGET: Test Claim #10 (-25% Extension Hit Rate = 90%)\nExpected Result: -25% level should be hit by Friday close in ~90% of weeks"
+    }
+  ]
+}

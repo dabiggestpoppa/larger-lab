@@ -1,0 +1,8 @@
+{
+  "Claims_Validated__5_of_5_Top_Claims__Pass_Rate": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "Claims Validated | 5 of 5 Top Claims | Pass Rate",
+    "row": 6
+  }
+}

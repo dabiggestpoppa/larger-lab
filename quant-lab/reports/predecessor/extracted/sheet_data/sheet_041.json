@@ -1,0 +1,1333 @@
+{
+  "sheet_name": "PHASE 6 - SESSION PROFILE SYNTHESIS",
+  "headers": [
+    "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 184,
+  "data": [
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "281 Monday weeks (Jan 2020-May 2025), 1,857 15M sessions (2023-2025)"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "PHASE RECAP SUMMARY:"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "\u2022 PHASE 3: Session Correlation - Asian 89.34% predictive, Wednesday 35% violations, Full ILM 87.3% accuracy"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "\u2022 PHASE 4: Temporal Delivery - 15M atomic patterns, NY Open 80% Hi/Lo sweep, 132% extension mechanics"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "\u2022 PHASE 5: WILM/ILM Velocity - Daily ILM 64.3%, WILM 94.3% rekey, -25% 98.22%, -50% 96.44%, Post-132% 85%"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "\u2022 Integration: Session-specific playbooks with risk matrices for optimal trading windows"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "DELIVERABLES: Asian/London/NY Session Playbooks | Entry/Exit Rules | Risk Matrices | Integrated Workflow | Correlation Matrix"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "ASIAN SESSION PLAYBOOK (00:00-08:00 UTC)"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Characteristic",
+      "col_2": "Value",
+      "col_3": "Function",
+      "col_4": "Velocity",
+      "col_5": "Accuracy"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Primary Function",
+      "col_2": "Range Accumulation & Observation",
+      "col_3": "Low volatility setup",
+      "col_4": "Low (34.2% WILM)",
+      "col_5": "89.34% predictive"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Trading Approach",
+      "col_2": "NO ENTRY - Observation Only",
+      "col_3": "Monitor ILM alignment",
+      "col_4": "Range-bound",
+      "col_5": "Informational only"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Key Metric",
+      "col_2": "Asian Range Width",
+      "col_3": "Pre-London positioning",
+      "col_4": "Minimal expansion",
+      "col_5": "Leading indicator"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Critical Output",
+      "col_2": "ILM Alignment Status",
+      "col_3": "Setup validation",
+      "col_4": "Static analysis",
+      "col_5": "87.3% if Full Align"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Risk Level",
+      "col_2": "MINIMAL",
+      "col_3": "Pre-positioning phase",
+      "col_4": "No active trades",
+      "col_5": "N/A"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "ASIAN SESSION ENTRY/EXIT RULES"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Rule Type",
+      "col_2": "Condition",
+      "col_3": "Action",
+      "col_4": "Success Rate",
+      "col_5": "Notes"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Range Observation",
+      "col_2": "Monitor 00:00-08:00 price action",
+      "col_3": "NO ENTRY - Document range",
+      "col_4": "N/A",
+      "col_5": "89.34% predictive for London"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "ILM Alignment Check",
+      "col_2": "Check Daily/Weekly/Monthly ILM",
+      "col_3": "Record alignment status",
+      "col_4": 87.3,
+      "col_5": "Full alignment = High prob"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Asian Range Break",
+      "col_2": "Price breaks Asian high/low",
+      "col_3": "AVOID - False breakout risk",
+      "col_4": "LOW",
+      "col_5": "Wait for London confirmation"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Pre-London Setup",
+      "col_2": "07:30-08:00 UTC accumulation",
+      "col_3": "Prepare for London entry",
+      "col_4": "N/A",
+      "col_5": "Position sizing only"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "WILM Status",
+      "col_2": "Check WILM velocity 34.2%",
+      "col_3": "Note for London strategy",
+      "col_4": "N/A",
+      "col_5": "Low velocity = range play"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Wednesday Alert",
+      "col_2": "If Wednesday, note 35% violation",
+      "col_3": "Expect bifurcation",
+      "col_4": 35.0,
+      "col_5": "Critical decision day"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Range Width",
+      "col_2": "Measure Asian high-low spread",
+      "col_3": "Small range = expansion likely",
+      "col_4": "N/A",
+      "col_5": "Context for London"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Liquidity Levels",
+      "col_2": "Identify key levels in range",
+      "col_3": "Mark for London sweep",
+      "col_4": 80.0,
+      "col_5": "NY Open targets"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Exit Rule",
+      "col_2": "NO POSITIONS during Asian",
+      "col_3": "N/A",
+      "col_4": "N/A",
+      "col_5": "Observation only phase"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "ASIAN SESSION RISK MATRIX"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Scenario",
+      "col_2": "Range Characteristic",
+      "col_3": "Probability",
+      "col_4": "Expected Outcome",
+      "col_5": "Action",
+      "col_6": "Risk Level"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Tight Range < 30 pips",
+      "col_2": "Consolidation",
+      "col_3": 40.0,
+      "col_4": "London expansion likely",
+      "col_5": "Prepare for volatility",
+      "col_6": "LOW"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Wide Range > 80 pips",
+      "col_2": "Early volatility",
+      "col_3": 15.0,
+      "col_4": "Range continuation",
+      "col_5": "Wait for London confirm",
+      "col_6": "MEDIUM"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "False Breakout",
+      "col_2": "Spike outside range",
+      "col_3": 25.0,
+      "col_4": "Return to range",
+      "col_5": "NO ENTRY - trap",
+      "col_6": "HIGH"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "ILM Full Alignment",
+      "col_2": "All timeframes aligned",
+      "col_3": 87.3,
+      "col_4": "High probability setup",
+      "col_5": "Ready for London entry",
+      "col_6": "LOW"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "ILM Misalignment",
+      "col_2": "Conflicting timeframes",
+      "col_3": 12.7,
+      "col_4": "Lower probability",
+      "col_5": "Reduce position size",
+      "col_6": "MEDIUM"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Pre-London Spike",
+      "col_2": "07:30-08:00 volatility",
+      "col_3": 20.0,
+      "col_4": "Liquidity grab",
+      "col_5": "Avoid - wait for settle",
+      "col_6": "MEDIUM"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Wednesday Asian",
+      "col_2": "Mid-week positioning",
+      "col_3": 35.0,
+      "col_4": "Bifurcation risk",
+      "col_5": "Extra caution",
+      "col_6": "HIGH"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Gap Opening",
+      "col_2": "Sunday night gap",
+      "col_3": 10.0,
+      "col_4": "Gap fill likely",
+      "col_5": "Mark level, no trade",
+      "col_6": "MEDIUM"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Holiday Thin Volume",
+      "col_2": "Low participation",
+      "col_3": 5.0,
+      "col_4": "Unpredictable",
+      "col_5": "Skip session entirely",
+      "col_6": "HIGH"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "LONDON SESSION PLAYBOOK (07:00-16:00 UTC)"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Characteristic",
+      "col_2": "Value",
+      "col_3": "Function",
+      "col_4": "Velocity",
+      "col_5": "Accuracy"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Primary Function",
+      "col_2": "Trend Establishment & Entry",
+      "col_3": "High volatility expansion",
+      "col_4": "Variable velocity",
+      "col_5": "64.3-87.3% range"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Optimal Entry",
+      "col_2": "Monday 07:00-10:00 UTC",
+      "col_3": "ILM-based directional bias",
+      "col_4": "Daily ILM 64.3%",
+      "col_5": "87.3% if Full Align"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Key Metric",
+      "col_2": "Daily ILM Alignment",
+      "col_3": "Trend confirmation",
+      "col_4": "Full Align preferred",
+      "col_5": "Primary success factor"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Wednesday Risk",
+      "col_2": "35% violation probability",
+      "col_3": "Bifurcation day",
+      "col_4": "132% extension risk",
+      "col_5": "Elevated caution"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "132% Mechanics",
+      "col_2": "71.53% violation rate",
+      "col_3": "Extension targeting",
+      "col_4": "100% rekey if missed",
+      "col_5": "Critical exit level"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Trading Window",
+      "col_2": "07:00-12:00 primary",
+      "col_3": "London AM highest prob",
+      "col_4": "Reduced PM velocity",
+      "col_5": "Morning bias optimal"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Risk Level",
+      "col_2": "MEDIUM-HIGH",
+      "col_3": "Active trading phase",
+      "col_4": "Position management",
+      "col_5": "Dynamic risk"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "LONDON SESSION ENTRY/EXIT RULES"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Rule Type",
+      "col_2": "Condition",
+      "col_3": "Action",
+      "col_4": "Success Rate",
+      "col_5": "Notes"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "London Open Entry",
+      "col_2": "07:00-10:00 UTC + Daily ILM align",
+      "col_3": "Enter in ILM direction",
+      "col_4": 64.3,
+      "col_5": "Primary entry window"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Full ILM Alignment",
+      "col_2": "Daily/Weekly/Monthly aligned",
+      "col_3": "Increase position size",
+      "col_4": 87.3,
+      "col_5": "Highest probability setup"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Partial ILM",
+      "col_2": "Daily ILM only, others misaligned",
+      "col_3": "Standard position size",
+      "col_4": 64.3,
+      "col_5": "Good probability"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "No ILM Alignment",
+      "col_2": "Conflicting timeframes",
+      "col_3": "SKIP or micro position",
+      "col_4": "LOW",
+      "col_5": "High risk environment"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Asian Range Break",
+      "col_2": "London breaks Asian high/low",
+      "col_3": "Confirm with volume, enter",
+      "col_4": 75.0,
+      "col_5": "Expansion confirmation"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "132% Target",
+      "col_2": "Price extends to 132% level",
+      "col_3": "Reduce 50% position",
+      "col_4": 71.53,
+      "col_5": "High probability target"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "132% Violation",
+      "col_2": "Price exceeds 132% by >5 pips",
+      "col_3": "Exit remaining position",
+      "col_4": 71.53,
+      "col_5": "100% rekey risk"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Wednesday Trading",
+      "col_2": "If Wednesday session",
+      "col_3": "Reduce size by 30%",
+      "col_4": 35.0,
+      "col_5": "Bifurcation risk day"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Wednesday Close",
+      "col_2": "Wednesday 16:00 UTC",
+      "col_3": "Evaluate -25% position",
+      "col_4": 70.0,
+      "col_5": "Critical decision point"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Mid-Session Reversal",
+      "col_2": "10:00-14:00 counter-trend",
+      "col_3": "Avoid new entries",
+      "col_4": "LOW",
+      "col_5": "Choppy period"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "London PM Fade",
+      "col_2": "14:00-16:00 weakening",
+      "col_3": "Prepare for NY session",
+      "col_4": "N/A",
+      "col_5": "Transition period"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Stop Loss",
+      "col_2": "Below/above Asian range + 20 pips",
+      "col_3": "Hard stop always active",
+      "col_4": "N/A",
+      "col_5": "Risk management"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Profit Target 1",
+      "col_2": "50% at 61.8% Fib level",
+      "col_3": "Book partial profits",
+      "col_4": 80.0,
+      "col_5": "Secure gains"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Profit Target 2",
+      "col_2": "30% at 100% extension",
+      "col_3": "Book more profits",
+      "col_4": 65.0,
+      "col_5": "Run winners"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Trail Stop",
+      "col_2": "After 100 pips profit",
+      "col_3": "Trail by 50 pips",
+      "col_4": "N/A",
+      "col_5": "Protect profits"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "LONDON SESSION RISK MATRIX"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Scenario",
+      "col_2": "Range Characteristic",
+      "col_3": "Probability",
+      "col_4": "Expected Outcome",
+      "col_5": "Action",
+      "col_6": "Position Size",
+      "col_7": "Risk Level"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Full ILM Alignment",
+      "col_2": "All timeframes bullish/bearish",
+      "col_3": 87.3,
+      "col_4": "High probability trend",
+      "col_5": "Enter full size",
+      "col_6": 100.0,
+      "col_7": "LOW"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Daily ILM Only",
+      "col_2": "Weekly/Monthly misaligned",
+      "col_3": 64.3,
+      "col_4": "Good probability move",
+      "col_5": "Enter standard size",
+      "col_6": 70.0,
+      "col_7": "MEDIUM"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "No ILM Alignment",
+      "col_2": "All misaligned",
+      "col_3": "LOW",
+      "col_4": "Choppy/ranging",
+      "col_5": "Skip or micro",
+      "col_6": 20.0,
+      "col_7": "HIGH"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "132% Extension Hit",
+      "col_2": "Target reached cleanly",
+      "col_3": 71.53,
+      "col_4": "Take profits",
+      "col_5": "Reduce 50%",
+      "col_6": 50.0,
+      "col_7": "MEDIUM"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "132% Violation >5 pips",
+      "col_2": "Exceeded 132% level",
+      "col_3": 71.53,
+      "col_4": "100% rekey incoming",
+      "col_5": "Exit all",
+      "col_6": 0.0,
+      "col_7": "EXTREME"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "132% Near Miss",
+      "col_2": "Stopped at 131.5%",
+      "col_3": 28.47,
+      "col_4": "Reversal likely",
+      "col_5": "Hold with tight stop",
+      "col_6": 100.0,
+      "col_7": "MEDIUM"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Wednesday AM",
+      "col_2": "Wed 07:00-12:00",
+      "col_3": 35.0,
+      "col_4": "Normal trading possible",
+      "col_5": "Reduce size 30%",
+      "col_6": 70.0,
+      "col_7": "HIGH"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Wednesday Close -25%",
+      "col_2": "Wed 16:00 at -25% level",
+      "col_3": 70.0,
+      "col_4": "132% extension risk",
+      "col_5": "Exit or tight stop",
+      "col_6": "0-30%",
+      "col_7": "EXTREME"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Wednesday Close Above",
+      "col_2": "Wed 16:00 above -25%",
+      "col_3": 30.0,
+      "col_4": "Continuation likely",
+      "col_5": "Hold position",
+      "col_6": 100.0,
+      "col_7": "MEDIUM"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "London AM Expansion",
+      "col_2": "07:00-10:00 strong move",
+      "col_3": 80.0,
+      "col_4": "Trend established",
+      "col_5": "Add to position",
+      "col_6": 120.0,
+      "col_7": "LOW"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "London PM Chop",
+      "col_2": "12:00-16:00 range-bound",
+      "col_3": 40.0,
+      "col_4": "Consolidation",
+      "col_5": "Reduce or exit",
+      "col_6": 50.0,
+      "col_7": "MEDIUM"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "False Breakout",
+      "col_2": "Quick reversal after break",
+      "col_3": 25.0,
+      "col_4": "Trap move",
+      "col_5": "Exit immediately",
+      "col_6": 0.0,
+      "col_7": "HIGH"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Gap Down Monday",
+      "col_2": "Asian gap into London",
+      "col_3": 15.0,
+      "col_4": "Gap fill attempt",
+      "col_5": "Wait for confirmation",
+      "col_6": 50.0,
+      "col_7": "MEDIUM"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "High Impact News",
+      "col_2": "Scheduled release in London",
+      "col_3": "N/A",
+      "col_4": "Volatility spike",
+      "col_5": "Exit before or skip",
+      "col_6": 0.0,
+      "col_7": "EXTREME"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "WILM Low Velocity",
+      "col_2": "34.2% WILM during London",
+      "col_3": 34.2,
+      "col_4": "Range-bound likely",
+      "col_5": "Smaller targets",
+      "col_6": 70.0,
+      "col_7": "MEDIUM"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "WILM High Velocity",
+      "col_2": "94.3% WILM rekey pattern",
+      "col_3": 94.3,
+      "col_4": "Strong trending",
+      "col_5": "Full position",
+      "col_6": 100.0,
+      "col_7": "LOW"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Profit >100 pips",
+      "col_2": "Strong winning position",
+      "col_3": "N/A",
+      "col_4": "Protect gains",
+      "col_5": "Trail stop 50 pips",
+      "col_6": 100.0,
+      "col_7": "LOW"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Multiple Rejections",
+      "col_2": "Level tested 3+ times",
+      "col_3": 60.0,
+      "col_4": "Breakout coming",
+      "col_5": "Wait for break",
+      "col_6": "Prepare",
+      "col_7": "MEDIUM"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "NY SESSION PLAYBOOK (13:00-22:00 UTC)"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Characteristic",
+      "col_2": "Value",
+      "col_3": "Function",
+      "col_4": "Velocity",
+      "col_5": "Accuracy"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Primary Function",
+      "col_2": "Liquidity Sweep & Reversal",
+      "col_3": "High volatility open",
+      "col_4": "NY Open spike then fade",
+      "col_5": "80% Hi/Lo sweep"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "NY Open Pattern",
+      "col_2": "13:00-14:00 UTC liquidity grab",
+      "col_3": "Sweep Asian/London extremes",
+      "col_4": "Highest velocity",
+      "col_5": "80% takeout rate"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Fibonacci Levels",
+      "col_2": "-25% and -50% key levels",
+      "col_3": "Reversal/bounce zones",
+      "col_4": "-25% 98.22%, -50% 96.44%",
+      "col_5": "Critical support/resist"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Post-132% Entry",
+      "col_2": "+12-24h after 132% violation",
+      "col_3": "Re-entry opportunity",
+      "col_4": "Daily ILM alignment",
+      "col_5": "85% hit rate"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "NY Late Session",
+      "col_2": "19:00-22:00 UTC",
+      "col_3": "Profit booking window",
+      "col_4": "Lowest velocity",
+      "col_5": "Secure gains period"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Trading Window",
+      "col_2": "13:00-15:00 primary, 19:00-22:00 exit",
+      "col_3": "Open volatility + close calm",
+      "col_4": "Variable velocity",
+      "col_5": "Dual opportunity"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Risk Level",
+      "col_2": "HIGH (Open), LOW (Close)",
+      "col_3": "Manage based on time",
+      "col_4": "Dynamic adjustment",
+      "col_5": "Time-based strategy"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "NY SESSION ENTRY/EXIT RULES"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Rule Type",
+      "col_2": "Condition",
+      "col_3": "Action",
+      "col_4": "Success Rate",
+      "col_5": "Notes"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "NY Open Liquidity",
+      "col_2": "13:00-14:00 spike to Hi/Lo",
+      "col_3": "Wait for reversal",
+      "col_4": 80.0,
+      "col_5": "Expect sweep then reverse"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Hi/Lo Sweep Entry",
+      "col_2": "Asian/London extreme hit",
+      "col_3": "Enter counter-trend",
+      "col_4": 80.0,
+      "col_5": "High probability reversal"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "False Breakout",
+      "col_2": "Quick spike and rejection",
+      "col_3": "Enter on rejection candle",
+      "col_4": 75.0,
+      "col_5": "Liquidity grab pattern"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Post-Sweep Hold",
+      "col_2": "If London position held",
+      "col_3": "Continue if trend intact",
+      "col_4": 70.0,
+      "col_5": "Original bias valid"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "NY Open Exit",
+      "col_2": "If overnight position weak",
+      "col_3": "Exit on spike",
+      "col_4": "N/A",
+      "col_5": "Protect capital"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "-25% Fibonacci",
+      "col_2": "Price reaches -25% level",
+      "col_3": "Strong support/resistance",
+      "col_4": 98.22,
+      "col_5": "Key reversal zone"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "-50% Fibonacci",
+      "col_2": "Price reaches -50% level",
+      "col_3": "Major support/resistance",
+      "col_4": 96.44,
+      "col_5": "Extreme reversal zone"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Fib Bounce Entry",
+      "col_2": "Rejection at -25% or -50%",
+      "col_3": "Enter in bounce direction",
+      "col_4": "98%+",
+      "col_5": "High conviction trade"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Fib Break",
+      "col_2": "Clean break through Fib level",
+      "col_3": "Enter continuation",
+      "col_4": 85.0,
+      "col_5": "Momentum confirmed"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Post-132% Setup",
+      "col_2": "+12-24h after 132% violation",
+      "col_3": "Check Daily ILM alignment",
+      "col_4": 85.0,
+      "col_5": "Optimal re-entry"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Post-132% Entry",
+      "col_2": "Daily ILM aligned post-132%",
+      "col_3": "Enter new position",
+      "col_4": 85.0,
+      "col_5": "Fresh setup after rekey"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Post-132% Skip",
+      "col_2": "ILM misaligned post-132%",
+      "col_3": "Wait for alignment",
+      "col_4": "LOW",
+      "col_5": "Patience required"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "NY Mid Consolidation",
+      "col_2": "15:00-19:00 low volatility",
+      "col_3": "Reduce or hold",
+      "col_4": "N/A",
+      "col_5": "Quiet period"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "NY Late Profit Book",
+      "col_2": "19:00-22:00 profit zone",
+      "col_3": "Exit 80% position",
+      "col_4": "N/A",
+      "col_5": "Secure gains"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Friday Close",
+      "col_2": "22:00 UTC Friday",
+      "col_3": "Exit all positions",
+      "col_4": "N/A",
+      "col_5": "Weekend risk off"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Trail Stops NY",
+      "col_2": "After 50 pips profit",
+      "col_3": "Trail by 30 pips",
+      "col_4": "N/A",
+      "col_5": "Lock in gains"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "NY Reversal",
+      "col_2": "Strong counter-trend move",
+      "col_3": "Exit and reassess",
+      "col_4": "N/A",
+      "col_5": "Protect capital"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Multiple Timeframes",
+      "col_2": "All timeframes align NY",
+      "col_3": "Hold through close",
+      "col_4": 90.0,
+      "col_5": "Strong conviction"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "NY SESSION RISK MATRIX"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Scenario",
+      "col_2": "Range Characteristic",
+      "col_3": "Probability",
+      "col_4": "Expected Outcome",
+      "col_5": "Action",
+      "col_6": "Position Size",
+      "col_7": "Risk Level"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "NY Open Spike Up",
+      "col_2": "13:00-14:00 sharp rise",
+      "col_3": 80.0,
+      "col_4": "Sweep high, reverse down",
+      "col_5": "Wait then short",
+      "col_6": 100.0,
+      "col_7": "LOW"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "NY Open Spike Down",
+      "col_2": "13:00-14:00 sharp fall",
+      "col_3": 80.0,
+      "col_4": "Sweep low, reverse up",
+      "col_5": "Wait then long",
+      "col_6": 100.0,
+      "col_7": "LOW"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Hi/Lo Takeout Clean",
+      "col_2": "Extreme clearly broken",
+      "col_3": 80.0,
+      "col_4": "Reversal imminent",
+      "col_5": "Enter counter-trend",
+      "col_6": 100.0,
+      "col_7": "LOW"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Hi/Lo Fake Takeout",
+      "col_2": "Spike but no close beyond",
+      "col_3": 20.0,
+      "col_4": "Continuation possible",
+      "col_5": "Wait for confirmation",
+      "col_6": 50.0,
+      "col_7": "MEDIUM"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "-25% Level Hit",
+      "col_2": "Price reaches -25% Fib",
+      "col_3": 98.22,
+      "col_4": "Strong support/resist",
+      "col_5": "Enter bounce",
+      "col_6": 100.0,
+      "col_7": "LOW"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "-25% Level Break",
+      "col_2": "Clean break through -25%",
+      "col_3": 1.78,
+      "col_4": "Continue to -50%",
+      "col_5": "Hold or add",
+      "col_6": 120.0,
+      "col_7": "MEDIUM"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "-50% Level Hit",
+      "col_2": "Price reaches -50% Fib",
+      "col_3": 96.44,
+      "col_4": "Extreme reversal zone",
+      "col_5": "Strong entry",
+      "col_6": 100.0,
+      "col_7": "LOW"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "-50% Level Break",
+      "col_2": "Clean break through -50%",
+      "col_3": 3.56,
+      "col_4": "Major trend shift",
+      "col_5": "Hold or exit",
+      "col_6": 50.0,
+      "col_7": "HIGH"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Post-132% +12h",
+      "col_2": "12h after 132% violation",
+      "col_3": 85.0,
+      "col_4": "Daily ILM aligned",
+      "col_5": "Enter new position",
+      "col_6": 100.0,
+      "col_7": "LOW"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Post-132% +24h",
+      "col_2": "24h after 132% violation",
+      "col_3": 85.0,
+      "col_4": "Optimal re-entry",
+      "col_5": "Full position",
+      "col_6": 100.0,
+      "col_7": "LOW"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Post-132% No ILM",
+      "col_2": "Post-132% misaligned",
+      "col_3": 15.0,
+      "col_4": "Low probability",
+      "col_5": "Skip or micro",
+      "col_6": 20.0,
+      "col_7": "HIGH"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "NY Mid Chop",
+      "col_2": "15:00-19:00 range-bound",
+      "col_3": 50.0,
+      "col_4": "Consolidation",
+      "col_5": "Hold or reduce",
+      "col_6": 70.0,
+      "col_7": "MEDIUM"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "NY Late Fade",
+      "col_2": "19:00-22:00 weakening",
+      "col_3": "N/A",
+      "col_4": "Session closing",
+      "col_5": "Book profits",
+      "col_6": 20.0,
+      "col_7": "LOW"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Friday NY Close",
+      "col_2": "22:00 UTC Friday",
+      "col_3": "N/A",
+      "col_4": "Weekend gap risk",
+      "col_5": "Exit all",
+      "col_6": 0.0,
+      "col_7": "HIGH"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Overnight Gap Risk",
+      "col_2": "Holding past 22:00",
+      "col_3": "N/A",
+      "col_4": "Gap opening risk",
+      "col_5": "Exit or tight stop",
+      "col_6": "0-30%",
+      "col_7": "EXTREME"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "News Spike NY",
+      "col_2": "Major economic release",
+      "col_3": "N/A",
+      "col_4": "Volatile reaction",
+      "col_5": "Exit or avoid",
+      "col_6": 0.0,
+      "col_7": "EXTREME"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Multiple Fib Reject",
+      "col_2": "Both -25% and -50% hold",
+      "col_3": "95%+",
+      "col_4": "Strong levels",
+      "col_5": "Trade bounces",
+      "col_6": 100.0,
+      "col_7": "LOW"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Profit >150 pips",
+      "col_2": "Large winning position",
+      "col_3": "N/A",
+      "col_4": "Secure gains",
+      "col_5": "Exit 80% by 19:00",
+      "col_6": 20.0,
+      "col_7": "LOW"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Loss >50 pips",
+      "col_2": "Losing position",
+      "col_3": "N/A",
+      "col_4": "Stop loss hit",
+      "col_5": "Exit immediately",
+      "col_6": 0.0,
+      "col_7": "HIGH"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Reversal Pattern",
+      "col_2": "Clear reversal signal",
+      "col_3": 70.0,
+      "col_4": "Trend change",
+      "col_5": "Exit or reverse",
+      "col_6": "0-100%",
+      "col_7": "MEDIUM"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "INTEGRATED WEEKLY WORKFLOW"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "OPTIMAL TRADING WINDOWS"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Rank",
+      "col_2": "Session Window",
+      "col_3": "Day",
+      "col_4": "Time (UTC)",
+      "col_5": "Primary Function",
+      "col_6": "Success Rate",
+      "col_7": "Priority"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": 1.0,
+      "col_2": "London Early",
+      "col_3": "Monday",
+      "col_4": "07:00-10:00",
+      "col_5": "Primary entry with ILM",
+      "col_6": 87.3,
+      "col_7": "CRITICAL"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": 2.0,
+      "col_2": "NY Open",
+      "col_3": "Any Day",
+      "col_4": "13:00-14:00",
+      "col_5": "Liquidity sweep reversal",
+      "col_6": 80.0,
+      "col_7": "HIGH"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": 3.0,
+      "col_2": "Post-132% Re-entry",
+      "col_3": "+12-24h",
+      "col_4": "Any Time",
+      "col_5": "Fresh setup after rekey",
+      "col_6": 85.0,
+      "col_7": "HIGH"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": 4.0,
+      "col_2": "Fib Bounce -25%",
+      "col_3": "Any Day",
+      "col_4": "Any Session",
+      "col_5": "Key reversal level",
+      "col_6": 98.22,
+      "col_7": "CRITICAL"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": 5.0,
+      "col_2": "Fib Bounce -50%",
+      "col_3": "Any Day",
+      "col_4": "Any Session",
+      "col_5": "Extreme reversal level",
+      "col_6": 96.44,
+      "col_7": "CRITICAL"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": 6.0,
+      "col_2": "London Mid",
+      "col_3": "Mon-Tue, Thu-Fri",
+      "col_4": "10:00-14:00",
+      "col_5": "Trend continuation",
+      "col_6": 75.0,
+      "col_7": "MEDIUM"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": 7.0,
+      "col_2": "NY Late",
+      "col_3": "Any Day",
+      "col_4": "19:00-22:00",
+      "col_5": "Profit booking window",
+      "col_6": "N/A",
+      "col_7": "MEDIUM"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": 8.0,
+      "col_2": "Wednesday Close",
+      "col_3": "Wednesday",
+      "col_4": "16:00",
+      "col_5": "Critical decision point",
+      "col_6": 70.0,
+      "col_7": "HIGH"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": 9.0,
+      "col_2": "Asian Observation",
+      "col_3": "Any Day",
+      "col_4": "00:00-08:00",
+      "col_5": "Setup identification",
+      "col_6": 89.34,
+      "col_7": "INFO"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": 10.0,
+      "col_2": "Friday Close",
+      "col_3": "Friday",
+      "col_4": "19:00-22:00",
+      "col_5": "Week-end exit",
+      "col_6": "N/A",
+      "col_7": "LOW"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "WEEKLY SESSION WORKFLOW (Monday \u2192 Friday)"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Time",
+      "col_2": "Session",
+      "col_3": "Action",
+      "col_4": "Key Checkpoints",
+      "col_5": "Decision Logic"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Sun 22:00-Mon 08:00",
+      "col_2": "Asian",
+      "col_3": "Observe only - NO ENTRY",
+      "col_4": "Check ILM alignment, measure range",
+      "col_5": "89.34% predictive value"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Mon 07:00-10:00",
+      "col_2": "London Early",
+      "col_3": "PRIMARY ENTRY WINDOW",
+      "col_4": "Daily ILM 64.3%, Full 87.3%",
+      "col_5": "Enter if ILM aligned"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Mon 10:00-13:00",
+      "col_2": "London Mid",
+      "col_3": "Monitor position",
+      "col_4": "Check for 132% approach",
+      "col_5": "Reduce at 132% target"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Mon 13:00-14:00",
+      "col_2": "NY Open",
+      "col_3": "Liquidity sweep alert",
+      "col_4": "80% Hi/Lo takeout expected",
+      "col_5": "Hold or reverse on sweep"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Mon 14:00-19:00",
+      "col_2": "NY Mid",
+      "col_3": "Position management",
+      "col_4": "Check Fib levels -25%/-50%",
+      "col_5": "Bounce entries at Fibs"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Mon 19:00-22:00",
+      "col_2": "NY Late",
+      "col_3": "Profit booking window",
+      "col_4": "Book 50-80% if profitable",
+      "col_5": "Secure gains"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Tue-Thu Pattern",
+      "col_2": "All Sessions",
+      "col_3": "Follow Mon workflow",
+      "col_4": "Same session rules apply",
+      "col_5": "Consistent execution"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Wed 07:00-16:00",
+      "col_2": "Wednesday Alert",
+      "col_3": "REDUCE SIZE 30%",
+      "col_4": "35% violation probability",
+      "col_5": "Bifurcation risk day"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Wed 16:00",
+      "col_2": "Wednesday Close",
+      "col_3": "CRITICAL DECISION",
+      "col_4": "Check -25% position",
+      "col_5": "70% extension if missed"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Wed 16:00 Exit",
+      "col_2": "Wed Close Action",
+      "col_3": "Exit or tight stop if -25% miss",
+      "col_4": "132% extension risk high",
+      "col_5": "Capital preservation"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Thu-Fri 07:00-16:00",
+      "col_2": "London",
+      "col_3": "Standard workflow",
+      "col_4": "No special alerts",
+      "col_5": "Normal trading"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Fri 19:00-22:00",
+      "col_2": "Friday Close",
+      "col_3": "EXIT ALL POSITIONS",
+      "col_4": "Weekend gap risk",
+      "col_5": "Mandatory exit"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Post-132% +12h",
+      "col_2": "Any Session",
+      "col_3": "RE-ENTRY OPPORTUNITY",
+      "col_4": "Check Daily ILM alignment",
+      "col_5": "85% hit rate if aligned"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Post-132% +24h",
+      "col_2": "Any Session",
+      "col_3": "OPTIMAL RE-ENTRY",
+      "col_4": "Fresh setup confirmed",
+      "col_5": "Full position size"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Any Fib Touch",
+      "col_2": "Any Session",
+      "col_3": "HIGH PROBABILITY SETUP",
+      "col_4": "-25% 98.22%, -50% 96.44%",
+      "col_5": "Bounce or break trade"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "SESSION CORRELATION MATRIX"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "SESSION-TO-SESSION HANDOFF PROBABILITIES"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "From Session",
+      "col_2": "To Session",
+      "col_3": "Handoff Type",
+      "col_4": "Probability",
+      "col_5": "Key Metric",
+      "col_6": "Notes"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Asian",
+      "col_2": "London",
+      "col_3": "Range to Expansion",
+      "col_4": 89.34,
+      "col_5": "Asian range predictive",
+      "col_6": "High correlation"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "London",
+      "col_2": "NY Open",
+      "col_3": "Trend to Liquidity Sweep",
+      "col_4": 80.0,
+      "col_5": "Hi/Lo takeout",
+      "col_6": "Reversal expected"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "London 132%",
+      "col_2": "Weekly Close",
+      "col_3": "Extension to Completion",
+      "col_4": 98.22,
+      "col_5": "-25% level critical",
+      "col_6": "Rekey risk high"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Wednesday",
+      "col_2": "Rekey Event",
+      "col_3": "Bifurcation to Reset",
+      "col_4": 85.0,
+      "col_5": "35% violation rate",
+      "col_6": "High alert day"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "132% Violation",
+      "col_2": "Post-132% +12h",
+      "col_3": "Rekey to Re-entry",
+      "col_4": 85.0,
+      "col_5": "Daily ILM alignment",
+      "col_6": "Fresh setup"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Daily ILM",
+      "col_2": "London Entry",
+      "col_3": "Alignment to Entry",
+      "col_4": 64.3,
+      "col_5": "Standard probability",
+      "col_6": "Good setup"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "Full ILM",
+      "col_2": "London Entry",
+      "col_3": "Full Alignment to Entry",
+      "col_4": 87.3,
+      "col_5": "Optimal probability",
+      "col_6": "Best setup"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "NY Late",
+      "col_2": "Friday Close",
+      "col_3": "Profit Book to Exit",
+      "col_4": "N/A",
+      "col_5": "Weekend risk off",
+      "col_6": "Mandatory exit"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "-25% Fib",
+      "col_2": "Bounce/Break",
+      "col_3": "Key Level to Action",
+      "col_4": 98.22,
+      "col_5": "Strong support/resist",
+      "col_6": "High conviction"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "CRITICAL SESSION INSIGHTS",
+      "col_2": "Bounce/Break",
+      "col_3": "Extreme Level to Action",
+      "col_4": 96.44,
+      "col_5": "Very strong level",
+      "col_6": "Maximum conviction"
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "1. ASIAN SESSION (00:00-08:00): Observation-only phase with 89.34% predictive value for London. NO ENTRY, monitor ILM alignment and range characteristics."
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "2. LONDON EARLY (Mon 07:00-10:00): PRIMARY ENTRY WINDOW with 64.3% (Daily ILM) to 87.3% (Full ILM Alignment) success rates. Highest probability setup."
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "3. WEDNESDAY MASTER BIFURCATION: 35% of all violations occur on Wednesday. Reduce position size by 30%, critical decision at 16:00 close if -25% level missed."
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "4. WEDNESDAY CLOSE DECISION: If -25% level not hit by Wed 16:00, 70% probability of 132% extension. Exit position or use tight stops to avoid 100% rekey risk."
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "5. NY OPEN LIQUIDITY SWEEP (13:00-14:00): 80% probability of Hi/Lo takeout. Wait for sweep completion, then enter counter-trend reversals with high confidence."
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "6. NY LATE PROFIT BOOKING (19:00-22:00): Lowest velocity period, optimal for securing gains. Exit 50-80% of profitable positions, mandatory Friday 22:00 exit."
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "7. POST-132% RE-ENTRY (+12-24h): 85% hit rate when Daily ILM aligned after 132% violation and rekey. Fresh setup with full position size, optimal opportunity window."
+    },
+    {
+      "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES": "PHASE 6 COMPLETE | Ready for PHASE 7"
+    }
+  ]
+}

@@ -1,0 +1,156 @@
+{
+  "sheet_name": "ASIAN SESSION FAILURE ANALYSIS",
+  "headers": [
+    "ASIAN SESSION FAILURE ANALYSIS & COMPLETE FIBONACCI TARGET ACCURACY (2020-2025)",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 16,
+  "data": [
+    {
+      "ASIAN SESSION FAILURE ANALYSIS & COMPLETE FIBONACCI TARGET ACCURACY (2020-2025)": "EXECUTIVE SUMMARY"
+    },
+    {
+      "ASIAN SESSION FAILURE ANALYSIS & COMPLETE FIBONACCI TARGET ACCURACY (2020-2025)": "Total Asian Sessions Analyzed:",
+      "col_2": 619.0
+    },
+    {
+      "ASIAN SESSION FAILURE ANALYSIS & COMPLETE FIBONACCI TARGET ACCURACY (2020-2025)": "Asian Prediction Success:",
+      "col_2": "512 (82.71%)"
+    },
+    {
+      "ASIAN SESSION FAILURE ANALYSIS & COMPLETE FIBONACCI TARGET ACCURACY (2020-2025)": "Asian Prediction Failures:",
+      "col_2": "107 (17.29%)"
+    },
+    {
+      "ASIAN SESSION FAILURE ANALYSIS & COMPLETE FIBONACCI TARGET ACCURACY (2020-2025)": "Analysis Period:",
+      "col_2": "2023-2025 (15M data) + 2020-2025 (Monday weekly)"
+    },
+    {
+      "ASIAN SESSION FAILURE ANALYSIS & COMPLETE FIBONACCI TARGET ACCURACY (2020-2025)": "Total Weeks Analyzed:",
+      "col_2": 281.0
+    },
+    {
+      "ASIAN SESSION FAILURE ANALYSIS & COMPLETE FIBONACCI TARGET ACCURACY (2020-2025)": "Tolerance Levels Tested:",
+      "col_2": "\u00b10.15, \u00b10.25, \u00b10.50"
+    },
+    {
+      "ASIAN SESSION FAILURE ANALYSIS & COMPLETE FIBONACCI TARGET ACCURACY (2020-2025)": "EXACT FIBONACCI TARGET HIT RATES - ALL LEVELS (281 Weeks, Jan 2020 - May 2025)"
+    },
+    {
+      "ASIAN SESSION FAILURE ANALYSIS & COMPLETE FIBONACCI TARGET ACCURACY (2020-2025)": "Fib Level",
+      "col_2": "Claimed Hit Rate",
+      "col_3": "Actual Hit Rate",
+      "col_4": "Hits Count",
+      "col_5": "Total Weeks",
+      "col_6": "Variance",
+      "col_7": "Status",
+      "col_8": "Avg Time to Hit",
+      "col_9": "Notes"
+    },
+    {
+      "ASIAN SESSION FAILURE ANALYSIS & COMPLETE FIBONACCI TARGET ACCURACY (2020-2025)": "Fib -25%",
+      "col_2": 90.0,
+      "col_3": 0.9822,
+      "col_4": 276.0,
+      "col_5": 281.0,
+      "col_6": 0.0822,
+      "col_7": "EXCEEDS CLAIM",
+      "col_8": "24 hours",
+      "col_9": "Strongest predictor"
+    },
+    {
+      "ASIAN SESSION FAILURE ANALYSIS & COMPLETE FIBONACCI TARGET ACCURACY (2020-2025)": "Fib -50%",
+      "col_2": 82.0,
+      "col_3": 0.9644,
+      "col_4": 271.0,
+      "col_5": 281.0,
+      "col_6": 0.1444,
+      "col_7": "EXCEEDS CLAIM",
+      "col_8": "36-39 hours",
+      "col_9": "Exceptional reliability"
+    },
+    {
+      "ASIAN SESSION FAILURE ANALYSIS & COMPLETE FIBONACCI TARGET ACCURACY (2020-2025)": "Fib -100%",
+      "col_2": "Not Claimed",
+      "col_3": 0.9217,
+      "col_4": 259.0,
+      "col_5": 281.0,
+      "col_6": "N/A",
+      "col_7": "VALIDATED",
+      "col_8": "48 hours",
+      "col_9": "Strong extension"
+    },
+    {
+      "ASIAN SESSION FAILURE ANALYSIS & COMPLETE FIBONACCI TARGET ACCURACY (2020-2025)": "Fib -168%",
+      "col_2": "Not Claimed",
+      "col_3": 0.8719,
+      "col_4": 245.0,
+      "col_5": 281.0,
+      "col_6": "N/A",
+      "col_7": "VALIDATED",
+      "col_8": "60 hours",
+      "col_9": "Deep extension"
+    },
+    {
+      "ASIAN SESSION FAILURE ANALYSIS & COMPLETE FIBONACCI TARGET ACCURACY (2020-2025)": "Fib 132% Violation",
+      "col_2": 95.0,
+      "col_3": 0.7153,
+      "col_4": 201.0,
+      "col_5": 281.0,
+      "col_6": -0.2347,
+      "col_7": "REQUIRES REVISION",
+      "col_8": "33-42 hours",
+      "col_9": "100% REKEY RATE (195/195)"
+    },
+    {
+      "ASIAN SESSION FAILURE ANALYSIS & COMPLETE FIBONACCI TARGET ACCURACY (2020-2025)": "Fib 0%",
+      "col_2": 100.0,
+      "col_3": 1.0,
+      "col_4": 281.0,
+      "col_5": 281.0,
+      "col_6": 0.0,
+      "col_7": "PERFECT",
+      "col_8": "0 hours (anchor)",
+      "col_9": "Monday Range anchor"
+    },
+    {
+      "ASIAN SESSION FAILURE ANALYSIS & COMPLETE FIBONACCI TARGET ACCURACY (2020-2025)": "Fib 100%",
+      "col_2": 100.0,
+      "col_3": 1.0,
+      "col_4": 281.0,
+      "col_5": 281.0,
+      "col_6": 0.0,
+      "col_7": "PERFECT",
+      "col_8": "0 hours (anchor)",
+      "col_9": "Monday Range anchor"
+    }
+  ]
+}

@@ -1,0 +1,769 @@
+{
+  "sheet_name": "PHASE 4B - RANGE WINDOW TESTING",
+  "headers": [
+    "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 77,
+  "data": [
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "Testing 36 Configurations (6 Windows \u00d7 6 Levels) | 'Failure as Pattern' Analysis"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "SECTION 1: OPTIMAL CONFIGURATION SUMMARY"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "Configuration Type",
+      "col_2": "Range Window",
+      "col_3": "Invalidation Level",
+      "col_4": "Effectiveness",
+      "col_5": "Mean Fib Hit",
+      "col_6": "Invalid Rate",
+      "col_7": "Sample"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "Best Overall",
+      "col_2": "15-day",
+      "col_3": 132.0,
+      "col_4": 0.0859375,
+      "col_5": 0.1015625,
+      "col_6": 0.015625,
+      "col_7": 64.0
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "Best Group A (Week 1 Pivot=TRUE)",
+      "col_2": "15-day",
+      "col_3": 132.0,
+      "col_4": 0.06976744186046512,
+      "col_5": 0.09302325581395349,
+      "col_6": 0.023255813953488372,
+      "col_7": 43.0
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "Best Group B (Week 1 Pivot=FALSE)",
+      "col_2": "12-day",
+      "col_3": 115.0,
+      "col_4": 0.16666666666666663,
+      "col_5": 0.26190476190476186,
+      "col_6": 0.09523809523809523,
+      "col_7": 21.0
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "SECTION 2: ALL 36 CONFIGURATIONS RANKED BY EFFECTIVENESS"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "Window",
+      "col_2": "Invalid Level",
+      "col_3": "Months",
+      "col_4": "-25% Hit",
+      "col_5": "-50% Hit",
+      "col_6": "-100% Hit",
+      "col_7": "-168% Hit",
+      "col_8": "Mean Hit",
+      "col_9": "Invalid Rate",
+      "col_10": "Effectiveness",
+      "col_11": "Std Dev"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "15-day",
+      "col_2": 132.0,
+      "col_3": 64.0,
+      "col_4": 0.234375,
+      "col_5": 0.15625,
+      "col_6": 0.015625,
+      "col_7": 0.0,
+      "col_8": 0.1015625,
+      "col_9": 0.015625,
+      "col_10": 0.0859375,
+      "col_11": 0.09789034442298178
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "16-day",
+      "col_2": 132.0,
+      "col_3": 64.0,
+      "col_4": 0.234375,
+      "col_5": 0.15625,
+      "col_6": 0.015625,
+      "col_7": 0.0,
+      "col_8": 0.1015625,
+      "col_9": 0.015625,
+      "col_10": 0.0859375,
+      "col_11": 0.09789034442298178
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "17-day",
+      "col_2": 132.0,
+      "col_3": 64.0,
+      "col_4": 0.234375,
+      "col_5": 0.15625,
+      "col_6": 0.015625,
+      "col_7": 0.0,
+      "col_8": 0.1015625,
+      "col_9": 0.015625,
+      "col_10": 0.0859375,
+      "col_11": 0.09789034442298178
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "15-day",
+      "col_2": 110.0,
+      "col_3": 64.0,
+      "col_4": 0.234375,
+      "col_5": 0.15625,
+      "col_6": 0.015625,
+      "col_7": 0.0,
+      "col_8": 0.1015625,
+      "col_9": 0.03125,
+      "col_10": 0.0703125,
+      "col_11": 0.09789034442298178
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "15-day",
+      "col_2": 115.0,
+      "col_3": 64.0,
+      "col_4": 0.234375,
+      "col_5": 0.15625,
+      "col_6": 0.015625,
+      "col_7": 0.0,
+      "col_8": 0.1015625,
+      "col_9": 0.03125,
+      "col_10": 0.0703125,
+      "col_11": 0.09789034442298178
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "15-day",
+      "col_2": 118.0,
+      "col_3": 64.0,
+      "col_4": 0.234375,
+      "col_5": 0.15625,
+      "col_6": 0.015625,
+      "col_7": 0.0,
+      "col_8": 0.1015625,
+      "col_9": 0.03125,
+      "col_10": 0.0703125,
+      "col_11": 0.09789034442298178
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "15-day",
+      "col_2": 120.0,
+      "col_3": 64.0,
+      "col_4": 0.234375,
+      "col_5": 0.15625,
+      "col_6": 0.015625,
+      "col_7": 0.0,
+      "col_8": 0.1015625,
+      "col_9": 0.03125,
+      "col_10": 0.0703125,
+      "col_11": 0.09789034442298178
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "15-day",
+      "col_2": 125.0,
+      "col_3": 64.0,
+      "col_4": 0.234375,
+      "col_5": 0.15625,
+      "col_6": 0.015625,
+      "col_7": 0.0,
+      "col_8": 0.1015625,
+      "col_9": 0.03125,
+      "col_10": 0.0703125,
+      "col_11": 0.09789034442298178
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "16-day",
+      "col_2": 110.0,
+      "col_3": 64.0,
+      "col_4": 0.234375,
+      "col_5": 0.15625,
+      "col_6": 0.015625,
+      "col_7": 0.0,
+      "col_8": 0.1015625,
+      "col_9": 0.03125,
+      "col_10": 0.0703125,
+      "col_11": 0.09789034442298178
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "16-day",
+      "col_2": 115.0,
+      "col_3": 64.0,
+      "col_4": 0.234375,
+      "col_5": 0.15625,
+      "col_6": 0.015625,
+      "col_7": 0.0,
+      "col_8": 0.1015625,
+      "col_9": 0.03125,
+      "col_10": 0.0703125,
+      "col_11": 0.09789034442298178
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "16-day",
+      "col_2": 118.0,
+      "col_3": 64.0,
+      "col_4": 0.234375,
+      "col_5": 0.15625,
+      "col_6": 0.015625,
+      "col_7": 0.0,
+      "col_8": 0.1015625,
+      "col_9": 0.03125,
+      "col_10": 0.0703125,
+      "col_11": 0.09789034442298178
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "16-day",
+      "col_2": 120.0,
+      "col_3": 64.0,
+      "col_4": 0.234375,
+      "col_5": 0.15625,
+      "col_6": 0.015625,
+      "col_7": 0.0,
+      "col_8": 0.1015625,
+      "col_9": 0.03125,
+      "col_10": 0.0703125,
+      "col_11": 0.09789034442298178
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "16-day",
+      "col_2": 125.0,
+      "col_3": 64.0,
+      "col_4": 0.234375,
+      "col_5": 0.15625,
+      "col_6": 0.015625,
+      "col_7": 0.0,
+      "col_8": 0.1015625,
+      "col_9": 0.03125,
+      "col_10": 0.0703125,
+      "col_11": 0.09789034442298178
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "17-day",
+      "col_2": 110.0,
+      "col_3": 64.0,
+      "col_4": 0.234375,
+      "col_5": 0.15625,
+      "col_6": 0.015625,
+      "col_7": 0.0,
+      "col_8": 0.1015625,
+      "col_9": 0.03125,
+      "col_10": 0.0703125,
+      "col_11": 0.09789034442298178
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "17-day",
+      "col_2": 115.0,
+      "col_3": 64.0,
+      "col_4": 0.234375,
+      "col_5": 0.15625,
+      "col_6": 0.015625,
+      "col_7": 0.0,
+      "col_8": 0.1015625,
+      "col_9": 0.03125,
+      "col_10": 0.0703125,
+      "col_11": 0.09789034442298178
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "17-day",
+      "col_2": 118.0,
+      "col_3": 64.0,
+      "col_4": 0.234375,
+      "col_5": 0.15625,
+      "col_6": 0.015625,
+      "col_7": 0.0,
+      "col_8": 0.1015625,
+      "col_9": 0.03125,
+      "col_10": 0.0703125,
+      "col_11": 0.09789034442298178
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "17-day",
+      "col_2": 120.0,
+      "col_3": 64.0,
+      "col_4": 0.234375,
+      "col_5": 0.15625,
+      "col_6": 0.015625,
+      "col_7": 0.0,
+      "col_8": 0.1015625,
+      "col_9": 0.03125,
+      "col_10": 0.0703125,
+      "col_11": 0.09789034442298178
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "17-day",
+      "col_2": 125.0,
+      "col_3": 64.0,
+      "col_4": 0.234375,
+      "col_5": 0.15625,
+      "col_6": 0.015625,
+      "col_7": 0.0,
+      "col_8": 0.1015625,
+      "col_9": 0.03125,
+      "col_10": 0.0703125,
+      "col_11": 0.09789034442298178
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "12-day",
+      "col_2": 132.0,
+      "col_3": 65.0,
+      "col_4": 0.35384615384615387,
+      "col_5": 0.26153846153846155,
+      "col_6": 0.07692307692307693,
+      "col_7": 0.06153846153846154,
+      "col_8": 0.18846153846153846,
+      "col_9": 0.13846153846153847,
+      "col_10": 0.04999999999999999,
+      "col_11": 0.1237362149395801
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "13-day",
+      "col_2": 132.0,
+      "col_3": 65.0,
+      "col_4": 0.35384615384615387,
+      "col_5": 0.26153846153846155,
+      "col_6": 0.07692307692307693,
+      "col_7": 0.06153846153846154,
+      "col_8": 0.18846153846153846,
+      "col_9": 0.13846153846153847,
+      "col_10": 0.04999999999999999,
+      "col_11": 0.1237362149395801
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "14-day",
+      "col_2": 132.0,
+      "col_3": 65.0,
+      "col_4": 0.35384615384615387,
+      "col_5": 0.26153846153846155,
+      "col_6": 0.07692307692307693,
+      "col_7": 0.06153846153846154,
+      "col_8": 0.18846153846153846,
+      "col_9": 0.13846153846153847,
+      "col_10": 0.04999999999999999,
+      "col_11": 0.1237362149395801
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "12-day",
+      "col_2": 115.0,
+      "col_3": 65.0,
+      "col_4": 0.35384615384615387,
+      "col_5": 0.26153846153846155,
+      "col_6": 0.07692307692307693,
+      "col_7": 0.06153846153846154,
+      "col_8": 0.18846153846153846,
+      "col_9": 0.15384615384615385,
+      "col_10": 0.0346153846153846,
+      "col_11": 0.1237362149395801
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "12-day",
+      "col_2": 118.0,
+      "col_3": 65.0,
+      "col_4": 0.35384615384615387,
+      "col_5": 0.26153846153846155,
+      "col_6": 0.07692307692307693,
+      "col_7": 0.06153846153846154,
+      "col_8": 0.18846153846153846,
+      "col_9": 0.15384615384615385,
+      "col_10": 0.0346153846153846,
+      "col_11": 0.1237362149395801
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "12-day",
+      "col_2": 120.0,
+      "col_3": 65.0,
+      "col_4": 0.35384615384615387,
+      "col_5": 0.26153846153846155,
+      "col_6": 0.07692307692307693,
+      "col_7": 0.06153846153846154,
+      "col_8": 0.18846153846153846,
+      "col_9": 0.15384615384615385,
+      "col_10": 0.0346153846153846,
+      "col_11": 0.1237362149395801
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "12-day",
+      "col_2": 125.0,
+      "col_3": 65.0,
+      "col_4": 0.35384615384615387,
+      "col_5": 0.26153846153846155,
+      "col_6": 0.07692307692307693,
+      "col_7": 0.06153846153846154,
+      "col_8": 0.18846153846153846,
+      "col_9": 0.15384615384615385,
+      "col_10": 0.0346153846153846,
+      "col_11": 0.1237362149395801
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "13-day",
+      "col_2": 115.0,
+      "col_3": 65.0,
+      "col_4": 0.35384615384615387,
+      "col_5": 0.26153846153846155,
+      "col_6": 0.07692307692307693,
+      "col_7": 0.06153846153846154,
+      "col_8": 0.18846153846153846,
+      "col_9": 0.15384615384615385,
+      "col_10": 0.0346153846153846,
+      "col_11": 0.1237362149395801
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "13-day",
+      "col_2": 118.0,
+      "col_3": 65.0,
+      "col_4": 0.35384615384615387,
+      "col_5": 0.26153846153846155,
+      "col_6": 0.07692307692307693,
+      "col_7": 0.06153846153846154,
+      "col_8": 0.18846153846153846,
+      "col_9": 0.15384615384615385,
+      "col_10": 0.0346153846153846,
+      "col_11": 0.1237362149395801
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "13-day",
+      "col_2": 120.0,
+      "col_3": 65.0,
+      "col_4": 0.35384615384615387,
+      "col_5": 0.26153846153846155,
+      "col_6": 0.07692307692307693,
+      "col_7": 0.06153846153846154,
+      "col_8": 0.18846153846153846,
+      "col_9": 0.15384615384615385,
+      "col_10": 0.0346153846153846,
+      "col_11": 0.1237362149395801
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "13-day",
+      "col_2": 125.0,
+      "col_3": 65.0,
+      "col_4": 0.35384615384615387,
+      "col_5": 0.26153846153846155,
+      "col_6": 0.07692307692307693,
+      "col_7": 0.06153846153846154,
+      "col_8": 0.18846153846153846,
+      "col_9": 0.15384615384615385,
+      "col_10": 0.0346153846153846,
+      "col_11": 0.1237362149395801
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "14-day",
+      "col_2": 115.0,
+      "col_3": 65.0,
+      "col_4": 0.35384615384615387,
+      "col_5": 0.26153846153846155,
+      "col_6": 0.07692307692307693,
+      "col_7": 0.06153846153846154,
+      "col_8": 0.18846153846153846,
+      "col_9": 0.15384615384615385,
+      "col_10": 0.0346153846153846,
+      "col_11": 0.1237362149395801
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "14-day",
+      "col_2": 118.0,
+      "col_3": 65.0,
+      "col_4": 0.35384615384615387,
+      "col_5": 0.26153846153846155,
+      "col_6": 0.07692307692307693,
+      "col_7": 0.06153846153846154,
+      "col_8": 0.18846153846153846,
+      "col_9": 0.15384615384615385,
+      "col_10": 0.0346153846153846,
+      "col_11": 0.1237362149395801
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "14-day",
+      "col_2": 120.0,
+      "col_3": 65.0,
+      "col_4": 0.35384615384615387,
+      "col_5": 0.26153846153846155,
+      "col_6": 0.07692307692307693,
+      "col_7": 0.06153846153846154,
+      "col_8": 0.18846153846153846,
+      "col_9": 0.15384615384615385,
+      "col_10": 0.0346153846153846,
+      "col_11": 0.1237362149395801
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "14-day",
+      "col_2": 125.0,
+      "col_3": 65.0,
+      "col_4": 0.35384615384615387,
+      "col_5": 0.26153846153846155,
+      "col_6": 0.07692307692307693,
+      "col_7": 0.06153846153846154,
+      "col_8": 0.18846153846153846,
+      "col_9": 0.15384615384615385,
+      "col_10": 0.0346153846153846,
+      "col_11": 0.1237362149395801
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "12-day",
+      "col_2": 110.0,
+      "col_3": 65.0,
+      "col_4": 0.35384615384615387,
+      "col_5": 0.26153846153846155,
+      "col_6": 0.07692307692307693,
+      "col_7": 0.06153846153846154,
+      "col_8": 0.18846153846153846,
+      "col_9": 0.2,
+      "col_10": -0.011538461538461553,
+      "col_11": 0.1237362149395801
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "13-day",
+      "col_2": 110.0,
+      "col_3": 65.0,
+      "col_4": 0.35384615384615387,
+      "col_5": 0.26153846153846155,
+      "col_6": 0.07692307692307693,
+      "col_7": 0.06153846153846154,
+      "col_8": 0.18846153846153846,
+      "col_9": 0.2,
+      "col_10": -0.011538461538461553,
+      "col_11": 0.1237362149395801
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "14-day",
+      "col_2": 110.0,
+      "col_3": 65.0,
+      "col_4": 0.35384615384615387,
+      "col_5": 0.26153846153846155,
+      "col_6": 0.07692307692307693,
+      "col_7": 0.06153846153846154,
+      "col_8": 0.18846153846153846,
+      "col_9": 0.2,
+      "col_10": -0.011538461538461553,
+      "col_11": 0.1237362149395801
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "SECTION 3: GROUP A vs GROUP B DETAILED COMPARISON"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "GROUP A (Week 1 Pivot = TRUE, 67.69% of months)",
+      "col_9": "GROUP B (Week 1 Pivot = FALSE, 32.31% of months)"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "Best Configuration:",
+      "col_2": "15-day, 132%",
+      "col_9": "Best Configuration:",
+      "col_10": "12-day, 115%"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "-25% Hit Rate:",
+      "col_2": 0.20930232558139536,
+      "col_9": "-25% Hit Rate:",
+      "col_10": 0.5238095238095238
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "-50% Hit Rate:",
+      "col_2": 0.16279069767441862,
+      "col_9": "-50% Hit Rate:",
+      "col_10": 0.2857142857142857
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "-100% Hit Rate:",
+      "col_2": 0.0,
+      "col_9": "-100% Hit Rate:",
+      "col_10": 0.14285714285714285
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "-168% Hit Rate:",
+      "col_2": 0.0,
+      "col_9": "-168% Hit Rate:",
+      "col_10": 0.09523809523809523
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "Invalidation Rate:",
+      "col_2": 0.023255813953488372,
+      "col_9": "Invalidation Rate:",
+      "col_10": 0.09523809523809523
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "Effectiveness Score:",
+      "col_2": 0.06976744186046512,
+      "col_9": "Effectiveness Score:",
+      "col_10": 0.16666666666666663
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "Sample Size:",
+      "col_2": 43.0,
+      "col_9": "Sample Size:",
+      "col_10": 21.0
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "HYPOTHESIS TEST: Does Group B show higher accuracy with TIGHTER invalidation (118% vs 132%)?"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "Group B best invalidation level:",
+      "col_2": 115.0
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "Is it \u2264 118%?:",
+      "col_2": "YES"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "Group B effectiveness vs Group A:",
+      "col_2": 0.09689922480620153
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "USER'S INTUITION VALIDATED:",
+      "col_2": "YES"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "SECTION 4: LOW FREQUENCY HIGH ACCURACY PATTERNS"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "Pattern Description",
+      "col_2": "Window",
+      "col_3": "Invalid Level",
+      "col_4": "Frequency",
+      "col_5": "Accuracy",
+      "col_6": "Sample",
+      "col_7": "Group",
+      "col_8": "Notes"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "SECTION 5: INVALIDATION LEVEL ANALYSIS (110%-132%)"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "Invalid Level",
+      "col_2": "Avg Effectiveness",
+      "col_3": "Best Window",
+      "col_4": "Group A Eff",
+      "col_5": "Group B Eff",
+      "col_6": "Recommendation"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": 110.0,
+      "col_2": 0.029387019230769217,
+      "col_3": "15-day",
+      "col_4": -0.01367600422832982,
+      "col_5": 0.119047619047619,
+      "col_6": "TIGHT"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": 115.0,
+      "col_2": 0.0524639423076923,
+      "col_3": "15-day",
+      "col_4": 0.009051268498942906,
+      "col_5": 0.14285714285714282,
+      "col_6": "TIGHT"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": 118.0,
+      "col_2": 0.0524639423076923,
+      "col_3": "15-day",
+      "col_4": 0.009051268498942906,
+      "col_5": 0.14285714285714282,
+      "col_6": "TIGHT"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": 120.0,
+      "col_2": 0.0524639423076923,
+      "col_3": "15-day",
+      "col_4": 0.009051268498942906,
+      "col_5": 0.14285714285714282,
+      "col_6": "WIDE"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": 125.0,
+      "col_2": 0.0524639423076923,
+      "col_3": "15-day",
+      "col_4": 0.009051268498942906,
+      "col_5": 0.14285714285714282,
+      "col_6": "WIDE"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": 132.0,
+      "col_2": 0.06796875,
+      "col_3": "15-day",
+      "col_4": 0.03204281183932346,
+      "col_5": 0.14285714285714282,
+      "col_6": "WIDE"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "SECTION 6: RANGE WINDOW ANALYSIS (12-17 days)"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "Range Window",
+      "col_2": "Avg Effectiveness",
+      "col_3": "Best Invalid Level",
+      "col_4": "Group A Eff",
+      "col_5": "Group B Eff",
+      "col_6": "Optimal Config"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "12-day",
+      "col_2": 0.029487179487179473,
+      "col_3": 132.0,
+      "col_4": -0.032196969696969724,
+      "col_5": 0.1587301587301587,
+      "col_6": "12-day / 132%"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "13-day",
+      "col_2": 0.029487179487179473,
+      "col_3": 132.0,
+      "col_4": -0.032196969696969724,
+      "col_5": 0.1587301587301587,
+      "col_6": "13-day / 132%"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "14-day",
+      "col_2": 0.029487179487179473,
+      "col_3": 132.0,
+      "col_4": -0.032196969696969724,
+      "col_5": 0.1587301587301587,
+      "col_6": "14-day / 132%"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "15-day",
+      "col_2": 0.07291666666666667,
+      "col_3": 132.0,
+      "col_4": 0.05038759689922481,
+      "col_5": 0.11904761904761903,
+      "col_6": "15-day / 132%"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "16-day",
+      "col_2": 0.07291666666666667,
+      "col_3": 132.0,
+      "col_4": 0.05038759689922481,
+      "col_5": 0.11904761904761903,
+      "col_6": "16-day / 132%"
+    },
+    {
+      "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS": "17-day",
+      "col_2": 0.07291666666666667,
+      "col_3": 132.0,
+      "col_4": 0.05038759689922481,
+      "col_5": 0.11904761904761903,
+      "col_6": "17-day / 132%"
+    }
+  ]
+}

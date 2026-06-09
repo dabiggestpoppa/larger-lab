@@ -1,0 +1,170 @@
+{
+  "pct_r9_c0": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "",
+    "row": 9
+  },
+  "0__Session_LOW": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "- 0% = Session LOW",
+    "row": 9
+  },
+  "pct_r10_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 10
+  },
+  "100__Session_HIGH": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "- 100% = Session HIGH",
+    "row": 10
+  },
+  "pct_r11_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 11
+  },
+  "Extensions_ABOVE_25_50_100_168_above_high": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "- Extensions ABOVE: -25%, -50%, -100%, -168% (above high)",
+    "row": 11
+  },
+  "pct_r12_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 12
+  },
+  "Invalidation_BELOW_132_below_low": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "- Invalidation BELOW: 132% (below low)",
+    "row": 12
+  },
+  "pct_r15_c0": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "",
+    "row": 15
+  },
+  "pct_r16_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 16
+  },
+  "pct_r17_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 17
+  },
+  "pct_r18_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 18
+  },
+  "pct_r19_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 19
+  },
+  "pct_r20_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 20
+  },
+  "pct_r21_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 21
+  },
+  "Close__Range__Bias": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "Close | Range | Bias",
+    "row": 25
+  },
+  "Range__Bias__0_Level": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Range | Bias | 0% Level",
+    "row": 25
+  },
+  "Bias__0_Level__100_Level": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Bias | 0% Level | 100% Level",
+    "row": 25
+  },
+  "0_Level__100_Level__25_Level": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "0% Level | 100% Level | -25% Level",
+    "row": 25
+  },
+  "100_Level__25_Level__50_Level": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "100% Level | -25% Level | -50% Level",
+    "row": 25
+  },
+  "25_Level__50_Level__100_Level": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "-25% Level | -50% Level | -100% Level",
+    "row": 25
+  },
+  "50_Level__100_Level__168_Level": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "-50% Level | -100% Level | -168% Level",
+    "row": 25
+  },
+  "100_Level__168_Level__132_Level": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "-100% Level | -168% Level | 132% Level",
+    "row": 25
+  },
+  "168_Level__132_Level__25_Hit": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "-168% Level | 132% Level | -25% Hit?",
+    "row": 25
+  },
+  "132_Level__25_Hit__50_Hit": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "132% Level | -25% Hit? | -50% Hit?",
+    "row": 25
+  },
+  "25_Hit__50_Hit__100_Hit": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "-25% Hit? | -50% Hit? | -100% Hit?",
+    "row": 25
+  },
+  "50_Hit__100_Hit__168_Hit": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "-50% Hit? | -100% Hit? | -168% Hit?",
+    "row": 25
+  },
+  "pct_r35_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 35
+  }
+}

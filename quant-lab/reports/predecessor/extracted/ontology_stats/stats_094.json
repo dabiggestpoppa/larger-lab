@@ -1,0 +1,206 @@
+{
+  "pct_r7_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 7
+  },
+  "25": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "-25%",
+    "row": 7
+  },
+  "pct_r8_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 8
+  },
+  "100": {
+    "value": 0.862,
+    "type": "ratio",
+    "context": "-100%",
+    "row": 14
+  },
+  "pct_r9_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 9
+  },
+  "Fibonacci_Hit_Rates__Phase_4_PDF_Validated": {
+    "value": 0.763,
+    "type": "ratio",
+    "context": "Fibonacci Hit Rates - Phase 4 PDF Validated",
+    "row": 10
+  },
+  "pct_r12_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 12
+  },
+  "pct_r13_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 13
+  },
+  "50": {
+    "value": 0.9570000000000001,
+    "type": "ratio",
+    "context": "-50%",
+    "row": 13
+  },
+  "50__09570000000000001": {
+    "value": 0.951,
+    "type": "ratio",
+    "context": "-50% | 0.9570000000000001",
+    "row": 13
+  },
+  "50__09570000000000001__0951": {
+    "value": 0.966,
+    "type": "ratio",
+    "context": "-50% | 0.9570000000000001 | 0.951",
+    "row": 13
+  },
+  "pct_r14_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 14
+  },
+  "100__0862": {
+    "value": 0.872,
+    "type": "ratio",
+    "context": "-100% | 0.862",
+    "row": 14
+  },
+  "100__0862__0872": {
+    "value": 0.8490000000000001,
+    "type": "ratio",
+    "context": "-100% | 0.862 | 0.872",
+    "row": 14
+  },
+  "pct_r15_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 15
+  },
+  "168": {
+    "value": 0.763,
+    "type": "ratio",
+    "context": "-168%",
+    "row": 15
+  },
+  "168__0763": {
+    "value": 0.785,
+    "type": "ratio",
+    "context": "-168% | 0.763",
+    "row": 15
+  },
+  "168__0763__0785": {
+    "value": 0.733,
+    "type": "ratio",
+    "context": "-168% | 0.763 | 0.785",
+    "row": 15
+  },
+  "pct_r16_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 16
+  },
+  "132_Violation": {
+    "value": 0.7440000000000001,
+    "type": "ratio",
+    "context": "132% Violation",
+    "row": 16
+  },
+  "132_Violation__07440000000000001": {
+    "value": 0.738,
+    "type": "ratio",
+    "context": "132% Violation | 0.7440000000000001",
+    "row": 16
+  },
+  "132_Violation__07440000000000001__0738": {
+    "value": 0.753,
+    "type": "ratio",
+    "context": "132% Violation | 0.7440000000000001 | 0.738",
+    "row": 16
+  },
+  "Asian_Session": {
+    "value": 63.7,
+    "type": "percentage",
+    "context": "Asian Session",
+    "row": 17
+  },
+  "Day__RoleSignificance": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Day | Role/Significance",
+    "row": 25
+  },
+  "Monday__Week_opening_lower_violation_tendency": {
+    "value": 61.9,
+    "type": "percentage",
+    "context": "Monday | Week opening, lower violation tendency",
+    "row": 27
+  },
+  "Market": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Market",
+    "row": 53
+  },
+  "Market__25_Hit": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Market | -25% Hit",
+    "row": 53
+  },
+  "Market__25_Hit__50_Hit": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Market | -25% Hit | -50% Hit",
+    "row": 53
+  },
+  "ETHUSD": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "ETH/USD",
+    "row": 54
+  },
+  "ETHUSD__100": {
+    "value": 95.7,
+    "type": "percentage",
+    "context": "ETH/USD | 100%",
+    "row": 54
+  },
+  "ETHUSD__100__957": {
+    "value": 74.4,
+    "type": "percentage",
+    "context": "ETH/USD | 100% | 95.7%",
+    "row": 54
+  },
+  "EURUSD": {
+    "value": 98.22,
+    "type": "percentage",
+    "context": "EUR/USD",
+    "row": 55
+  },
+  "EURUSD__9822": {
+    "value": 96.44,
+    "type": "percentage",
+    "context": "EUR/USD | 98.22%",
+    "row": 55
+  },
+  "EURUSD__9822__9644": {
+    "value": 71.53,
+    "type": "percentage",
+    "context": "EUR/USD | 98.22% | 96.44%",
+    "row": 55
+  }
+}

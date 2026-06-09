@@ -1,0 +1,224 @@
+{
+  "CROSSMARKET_TRADING_MODEL_COMPARISON_EURUSD_vs_OIL": {
+    "value": 0.862,
+    "type": "ratio",
+    "context": "CROSS-MARKET TRADING MODEL COMPARISON: EUR/USD vs OIL/USD vs ETH/USD | 1 | 0.9570000000000001",
+    "row": 1
+  },
+  "1__09570000000000001__0862": {
+    "value": 0.763,
+    "type": "ratio",
+    "context": "1 | 0.9570000000000001 | 0.862",
+    "row": 1
+  },
+  "09570000000000001__0862__0763": {
+    "value": 0.7440000000000001,
+    "type": "ratio",
+    "context": "0.9570000000000001 | 0.862 | 0.763",
+    "row": 1
+  },
+  "ratio_r12_c1": {
+    "value": 0.9822,
+    "type": "ratio",
+    "context": "",
+    "row": 12
+  },
+  "09822": {
+    "value": 0.9822,
+    "type": "ratio",
+    "context": "0.9822",
+    "row": 12
+  },
+  "ratio_r13_c1": {
+    "value": 0.9644,
+    "type": "ratio",
+    "context": "",
+    "row": 13
+  },
+  "09644": {
+    "value": 0.9644,
+    "type": "ratio",
+    "context": "0.9644",
+    "row": 13
+  },
+  "09644__09644": {
+    "value": 0.957,
+    "type": "ratio",
+    "context": "0.9644 | 0.9644",
+    "row": 13
+  },
+  "09644__09644__0957": {
+    "value": 95.0,
+    "type": "percentage",
+    "context": "0.9644 | 0.9644 | 0.957",
+    "row": 13
+  },
+  "pct_r14_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 14
+  },
+  "100": {
+    "value": 0.9217,
+    "type": "ratio",
+    "context": "-100%",
+    "row": 14
+  },
+  "100__09217": {
+    "value": 0.9217,
+    "type": "ratio",
+    "context": "-100% | 0.9217",
+    "row": 14
+  },
+  "100__09217__09217": {
+    "value": 0.572093023255814,
+    "type": "ratio",
+    "context": "-100% | 0.9217 | 0.9217",
+    "row": 14
+  },
+  "pct_r15_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 15
+  },
+  "168": {
+    "value": 0.8719,
+    "type": "ratio",
+    "context": "-168%",
+    "row": 15
+  },
+  "168__08719": {
+    "value": 0.8719,
+    "type": "ratio",
+    "context": "-168% | 0.8719",
+    "row": 15
+  },
+  "168__08719__08719": {
+    "value": 0.448837209302326,
+    "type": "ratio",
+    "context": "-168% | 0.8719 | 0.8719",
+    "row": 15
+  },
+  "pct_r16_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 16
+  },
+  "132_Violation": {
+    "value": 0.7153,
+    "type": "ratio",
+    "context": "132% Violation",
+    "row": 16
+  },
+  "132_Violation__07153": {
+    "value": 0.7153,
+    "type": "ratio",
+    "context": "132% Violation | 0.7153",
+    "row": 16
+  },
+  "132_Violation__07153__07153": {
+    "value": 0.744,
+    "type": "ratio",
+    "context": "132% Violation | 0.7153 | 0.7153",
+    "row": 16
+  },
+  "pct_r18_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 18
+  },
+  "Overall_Violation_Rate": {
+    "value": 0.7153,
+    "type": "ratio",
+    "context": "Overall Violation Rate",
+    "row": 20
+  },
+  "Overall_Violation_Rate__07153": {
+    "value": 0.7153,
+    "type": "ratio",
+    "context": "Overall Violation Rate | 0.7153",
+    "row": 20
+  },
+  "Overall_Violation_Rate__07153__07153": {
+    "value": 0.744,
+    "type": "ratio",
+    "context": "Overall Violation Rate | 0.7153 | 0.7153",
+    "row": 20
+  },
+  "pct_r21_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 21
+  },
+  "Wednesday_Share_of_Violations": {
+    "value": 0.35,
+    "type": "ratio",
+    "context": "Wednesday Share of Violations",
+    "row": 22
+  },
+  "Wednesday_Share_of_Violations__035": {
+    "value": 0.35,
+    "type": "ratio",
+    "context": "Wednesday Share of Violations | 0.35",
+    "row": 22
+  },
+  "Rekey_Method": {
+    "value": 85.4,
+    "type": "percentage",
+    "context": "Rekey Method",
+    "row": 23
+  },
+  "Rekey_Method__Method_B_854": {
+    "value": 78.6,
+    "type": "percentage",
+    "context": "Rekey Method | Method B (85.4%)",
+    "row": 23
+  },
+  "Asian": {
+    "value": 89.34,
+    "type": "percentage",
+    "context": "Asian",
+    "row": 27
+  },
+  "Asian__Range_accumulation_8934_accuracy__Same": {
+    "value": 63.7,
+    "type": "percentage",
+    "context": "Asian | Range accumulation (89.34% accuracy) | Same",
+    "row": 27
+  },
+  "London": {
+    "value": 98.22,
+    "type": "percentage",
+    "context": "London",
+    "row": 28
+  },
+  "NY_Open": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "NY Open",
+    "row": 29
+  },
+  "pct_r33_c0": {
+    "value": 98.22,
+    "type": "percentage",
+    "context": "",
+    "row": 33
+  },
+  "pct_r35_c0": {
+    "value": 98.22,
+    "type": "percentage",
+    "context": "",
+    "row": 35
+  },
+  "pct_r37_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 37
+  }
+}

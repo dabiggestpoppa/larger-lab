@@ -1,0 +1,191 @@
+{
+  "sheet_name": "Fibonacci Sequences Catalog",
+  "headers": [
+    "Sequence Name",
+    "Structure",
+    "Frequency (%)",
+    "Target Levels",
+    "Completion Rate",
+    "Timeframe",
+    "Associated Pattern",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 17,
+  "data": [
+    {
+      "Sequence Name": "Sequence Name",
+      "Structure": "Structure",
+      "Frequency (%)": "Frequency (%)",
+      "Target Levels": "Target Levels",
+      "Completion Rate": "Completion Rate",
+      "Timeframe": "Timeframe",
+      "Associated Pattern": "Associated Pattern"
+    },
+    {
+      "Sequence Name": "50%\u2192-25%",
+      "Structure": "50% retracement \u2192 -25% extension",
+      "Frequency (%)": 28.6,
+      "Target Levels": -25.0,
+      "Completion Rate": 84.0,
+      "Timeframe": "15M/1H",
+      "Associated Pattern": "Common entry, fast delivery"
+    },
+    {
+      "Sequence Name": "61.8%\u2192-50%",
+      "Structure": "61.8% retracement \u2192 -50% extension",
+      "Frequency (%)": 23.8,
+      "Target Levels": -50.0,
+      "Completion Rate": 82.0,
+      "Timeframe": "15M/1H/4H",
+      "Associated Pattern": "High probability, 21 days target"
+    },
+    {
+      "Sequence Name": "72%\u2192-25%",
+      "Structure": "72% retracement \u2192 -25% extension",
+      "Frequency (%)": 31.6,
+      "Target Levels": -25.0,
+      "Completion Rate": 83.5,
+      "Timeframe": "All TFs",
+      "Associated Pattern": "Premium continuation, strong in trends"
+    },
+    {
+      "Sequence Name": "78.6%\u2192-100%",
+      "Structure": "78.6% deep retracement \u2192 -100% extension",
+      "Frequency (%)": 15.2,
+      "Target Levels": -100.0,
+      "Completion Rate": 76.0,
+      "Timeframe": "Higher TFs",
+      "Associated Pattern": "Deep retracement sequence"
+    },
+    {
+      "Sequence Name": "50%\u219272%\u2192-25%",
+      "Structure": "3-leg composite sequence",
+      "Frequency (%)": 78.7,
+      "Target Levels": -25.0,
+      "Completion Rate": 78.7,
+      "Timeframe": "All TFs",
+      "Associated Pattern": "Trend body formation"
+    },
+    {
+      "Sequence Name": "61.8%\u219261.8% Retest",
+      "Structure": "61.8% \u2192 retest at 61.8%",
+      "Frequency (%)": "35.7-42.4",
+      "Target Levels": "61.8% retest",
+      "Completion Rate": "38-42%",
+      "Timeframe": "All TFs",
+      "Associated Pattern": "Most frequent loop, reset mechanism"
+    },
+    {
+      "Sequence Name": "50%\u219250% Retest",
+      "Structure": "50% \u2192 retest at 50%",
+      "Frequency (%)": "83.2-91.4",
+      "Target Levels": "50% retest",
+      "Completion Rate": "83-91%",
+      "Timeframe": "All TFs",
+      "Associated Pattern": "Highest success, Alpha sequence initiation"
+    },
+    {
+      "Sequence Name": "72%\u219272% Retest",
+      "Structure": "72% \u2192 retest at 72%",
+      "Frequency (%)": 68.0,
+      "Target Levels": "72% retest",
+      "Completion Rate": 68.0,
+      "Timeframe": "All TFs",
+      "Associated Pattern": "Gamma sequence, Q3 preference"
+    },
+    {
+      "Sequence Name": "78.6\u219278.6\u219278.6",
+      "Structure": "Monthly triple 78.6% sequence",
+      "Frequency (%)": 24.6,
+      "Target Levels": "78.6% monthly",
+      "Completion Rate": 78.0,
+      "Timeframe": "Monthly",
+      "Associated Pattern": "24.6% frequency, 78% bullish bias"
+    },
+    {
+      "Sequence Name": "0\u2192+23.6",
+      "Structure": "Measured move 0 to +23.6%",
+      "Frequency (%)": 23.5,
+      "Target Levels": 23.6,
+      "Completion Rate": 83.0,
+      "Timeframe": "Monthly",
+      "Associated Pattern": "Early month pattern"
+    },
+    {
+      "Sequence Name": "50%\u2192100%",
+      "Structure": "Measured move continuation",
+      "Frequency (%)": 100.0,
+      "Target Levels": 100.0,
+      "Completion Rate": 100.0,
+      "Timeframe": "All TFs",
+      "Associated Pattern": "100% continuation rate"
+    },
+    {
+      "Sequence Name": "1.618 Extension Steep",
+      "Structure": "1.618 extension steep angle",
+      "Frequency (%)": 42.1,
+      "Target Levels": 1.618,
+      "Completion Rate": 42.1,
+      "Timeframe": "All TFs",
+      "Associated Pattern": "Lower success on steep angles"
+    },
+    {
+      "Sequence Name": "1.618 Extension Shallow",
+      "Structure": "1.618 extension shallow angle",
+      "Frequency (%)": 73.5,
+      "Target Levels": 1.618,
+      "Completion Rate": 73.5,
+      "Timeframe": "All TFs",
+      "Associated Pattern": "Higher success on shallow angles"
+    },
+    {
+      "Sequence Name": "-100% Level",
+      "Structure": "Extension to -100%",
+      "Frequency (%)": "N/A",
+      "Target Levels": -100.0,
+      "Completion Rate": "Variable",
+      "Timeframe": "All TFs",
+      "Associated Pattern": "Profit booking zone, new sequence creation"
+    },
+    {
+      "Sequence Name": "-168% Level",
+      "Structure": "Extension to -168%",
+      "Frequency (%)": "N/A",
+      "Target Levels": -168.0,
+      "Completion Rate": "Variable",
+      "Timeframe": "All TFs",
+      "Associated Pattern": "Deep extension, new sequence creation"
+    },
+    {
+      "Sequence Name": "132% Invalidation",
+      "Structure": "132% extension invalidation",
+      "Frequency (%)": "N/A",
+      "Target Levels": 132.0,
+      "Completion Rate": "95% failure",
+      "Timeframe": "All TFs",
+      "Associated Pattern": "Pattern invalidation zone"
+    }
+  ]
+}

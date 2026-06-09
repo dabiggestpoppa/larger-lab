@@ -1,0 +1,134 @@
+{
+  "Extension_Targets": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Extension Targets",
+    "row": 4
+  },
+  "Fibonacci_Continuation": {
+    "value": 72.0,
+    "type": "percentage",
+    "context": "Fibonacci Continuation",
+    "row": 5
+  },
+  "Fibonacci_Continuation__72_retracement_continuatio": {
+    "value": 3.2,
+    "type": "percentage",
+    "context": "Fibonacci Continuation | 72% retracement continuation | 83.5",
+    "row": 5
+  },
+  "Pattern_Sequence": {
+    "value": 72.0,
+    "type": "percentage",
+    "context": "Pattern Sequence",
+    "row": 6
+  },
+  "Pattern_Sequence__AB72BC25CD618__812": {
+    "value": 2.8,
+    "type": "percentage",
+    "context": "Pattern Sequence | AB(72%)\u2192BC(-25%)\u2192CD(61.8%) | 81.2",
+    "row": 6
+  },
+  "Rekey_Trigger__Consecutive_15M_61888_under_WILM__4": {
+    "value": 1.8,
+    "type": "percentage",
+    "context": "Rekey Trigger | Consecutive 15M 61.8-88 under WILM \u2192 4H rekey | 94.3",
+    "row": 8
+  },
+  "1245_days__Doc_3_11_16__Daily": {
+    "value": 78.3,
+    "type": "percentage",
+    "context": "1,245 days | Doc 3, 11, 16 | Daily",
+    "row": 9
+  },
+  "2134_touches__Doc_9_17__All_ILM_types": {
+    "value": 69.0,
+    "type": "percentage",
+    "context": "2,134 touches | Doc 9, 17 | All ILM types",
+    "row": 11
+  },
+  "ILM_Continuation__ILMTagContinuation__65": {
+    "value": 35.0,
+    "type": "percentage",
+    "context": "ILM Continuation | ILM\u2192Tag\u2192Continuation | 65",
+    "row": 12
+  },
+  "Level_Preference__75_level_highest_interaction__56": {
+    "value": 5.0,
+    "type": "percentage",
+    "context": "Level Preference | 75 level highest interaction | 56",
+    "row": 14
+  },
+  "All_sessions__Doc_4__Session_open": {
+    "value": 79.1,
+    "type": "percentage",
+    "context": "All sessions | Doc 4 | Session open",
+    "row": 16
+  },
+  "Rekey_Accuracy": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "Rekey Accuracy",
+    "row": 17
+  },
+  "Updated_dataset__Doc_15__All_timeframes": {
+    "value": 76.0,
+    "type": "percentage",
+    "context": "Updated dataset | Doc 15 | All timeframes",
+    "row": 17
+  },
+  "Trend_Angle__Shallow__Shallow_angle_completion__78": {
+    "value": 4.1,
+    "type": "percentage",
+    "context": "Trend Angle - Shallow | Shallow angle completion | 78.9",
+    "row": 18
+  },
+  "Trend_Angle__Moderate__Moderate_angle_completion": {
+    "value": 5.3,
+    "type": "percentage",
+    "context": "Trend Angle - Moderate | Moderate angle completion | 62.6",
+    "row": 19
+  },
+  "Trend_Angle__Steep__Steep_angle_completion__404": {
+    "value": 6.8,
+    "type": "percentage",
+    "context": "Trend Angle - Steep | Steep angle completion | 40.4",
+    "row": 20
+  },
+  "Trend_Angle__Reflex__Reflex_angle_completion__198": {
+    "value": 8.2,
+    "type": "percentage",
+    "context": "Trend Angle - Reflex | Reflex angle completion | 19.8",
+    "row": 21
+  },
+  "Fibonacci_Loop": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "Fibonacci Loop",
+    "row": 26
+  },
+  "Quarterly__Q1__Q1_reconstruction__932": {
+    "value": 2.3,
+    "type": "percentage",
+    "context": "Quarterly - Q1 | Q1 reconstruction | 93.2",
+    "row": 28
+  },
+  "Quarterly__Q2__Q2_reconstruction__897": {
+    "value": 2.8,
+    "type": "percentage",
+    "context": "Quarterly - Q2 | Q2 reconstruction | 89.7",
+    "row": 29
+  },
+  "Quarterly__Q3__Q3_reconstruction__863": {
+    "value": 3.1,
+    "type": "percentage",
+    "context": "Quarterly - Q3 | Q3 reconstruction | 86.3",
+    "row": 30
+  },
+  "Quarterly__Q4__Q4_reconstruction__958": {
+    "value": 1.9,
+    "type": "percentage",
+    "context": "Quarterly - Q4 | Q4 reconstruction | 95.8",
+    "row": 31
+  }
+}

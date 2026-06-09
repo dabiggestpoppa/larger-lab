@@ -1,0 +1,62 @@
+{
+  "Claimed_Accuracy___Validation_Status__Phase_1_Test": {
+    "value": 78.0,
+    "type": "percentage",
+    "context": "Claimed Accuracy (%) | Validation Status | Phase 1 Test Result (%)",
+    "row": 2
+  },
+  "1": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "1",
+    "row": 3
+  },
+  "2": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "2",
+    "row": 4
+  },
+  "3": {
+    "value": 72.0,
+    "type": "percentage",
+    "context": "3",
+    "row": 5
+  },
+  "4": {
+    "value": 72.0,
+    "type": "percentage",
+    "context": "4",
+    "row": 6
+  },
+  "8": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "8",
+    "row": 10
+  },
+  "19": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "19",
+    "row": 21
+  },
+  "20": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "20",
+    "row": 22
+  },
+  "21": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "21",
+    "row": 23
+  },
+  "22": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "22",
+    "row": 24
+  }
+}

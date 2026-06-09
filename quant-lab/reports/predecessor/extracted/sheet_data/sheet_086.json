@@ -1,0 +1,278 @@
+{
+  "sheet_name": "eth_session_probabilities",
+  "headers": [
+    "bias",
+    "fib_level",
+    "session",
+    "hits",
+    "total_hits",
+    "probability",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 30,
+  "data": [
+    {
+      "bias": "BULLISH",
+      "fib_level": "neg25",
+      "session": "Asian",
+      "hits": 22.0,
+      "total_hits": 104.0,
+      "probability": 21.153846153846153
+    },
+    {
+      "bias": "BULLISH",
+      "fib_level": "neg25",
+      "session": "London",
+      "hits": 49.0,
+      "total_hits": 104.0,
+      "probability": 47.11538461538461
+    },
+    {
+      "bias": "BULLISH",
+      "fib_level": "neg25",
+      "session": "NY",
+      "hits": 33.0,
+      "total_hits": 104.0,
+      "probability": 31.73076923076923
+    },
+    {
+      "bias": "BULLISH",
+      "fib_level": "neg50",
+      "session": "Asian",
+      "hits": 22.0,
+      "total_hits": 95.0,
+      "probability": 23.157894736842106
+    },
+    {
+      "bias": "BULLISH",
+      "fib_level": "neg50",
+      "session": "London",
+      "hits": 35.0,
+      "total_hits": 95.0,
+      "probability": 36.84210526315789
+    },
+    {
+      "bias": "BULLISH",
+      "fib_level": "neg50",
+      "session": "NY",
+      "hits": 38.0,
+      "total_hits": 95.0,
+      "probability": 40.0
+    },
+    {
+      "bias": "BULLISH",
+      "fib_level": "neg100",
+      "session": "Asian",
+      "hits": 20.0,
+      "total_hits": 81.0,
+      "probability": 24.691358024691358
+    },
+    {
+      "bias": "BULLISH",
+      "fib_level": "neg100",
+      "session": "London",
+      "hits": 29.0,
+      "total_hits": 81.0,
+      "probability": 35.80246913580247
+    },
+    {
+      "bias": "BULLISH",
+      "fib_level": "neg100",
+      "session": "NY",
+      "hits": 32.0,
+      "total_hits": 81.0,
+      "probability": 39.50617283950617
+    },
+    {
+      "bias": "BULLISH",
+      "fib_level": "neg168",
+      "session": "Asian",
+      "hits": 18.0,
+      "total_hits": 65.0,
+      "probability": 27.692307692307693
+    },
+    {
+      "bias": "BULLISH",
+      "fib_level": "neg168",
+      "session": "London",
+      "hits": 17.0,
+      "total_hits": 65.0,
+      "probability": 26.153846153846157
+    },
+    {
+      "bias": "BULLISH",
+      "fib_level": "neg168",
+      "session": "NY",
+      "hits": 30.0,
+      "total_hits": 65.0,
+      "probability": 46.15384615384615
+    },
+    {
+      "bias": "BULLISH",
+      "fib_level": "132_inv",
+      "session": "Asian",
+      "hits": 23.0,
+      "total_hits": 92.0,
+      "probability": 25.0
+    },
+    {
+      "bias": "BULLISH",
+      "fib_level": "132_inv",
+      "session": "London",
+      "hits": 31.0,
+      "total_hits": 92.0,
+      "probability": 33.69565217391305
+    },
+    {
+      "bias": "BULLISH",
+      "fib_level": "132_inv",
+      "session": "NY",
+      "hits": 38.0,
+      "total_hits": 92.0,
+      "probability": 41.30434782608695
+    },
+    {
+      "bias": "BEARISH",
+      "fib_level": "neg25",
+      "session": "Asian",
+      "hits": 22.0,
+      "total_hits": 72.0,
+      "probability": 30.555555555555557
+    },
+    {
+      "bias": "BEARISH",
+      "fib_level": "neg25",
+      "session": "London",
+      "hits": 23.0,
+      "total_hits": 72.0,
+      "probability": 31.944444444444443
+    },
+    {
+      "bias": "BEARISH",
+      "fib_level": "neg25",
+      "session": "NY",
+      "hits": 27.0,
+      "total_hits": 72.0,
+      "probability": 37.5
+    },
+    {
+      "bias": "BEARISH",
+      "fib_level": "neg50",
+      "session": "Asian",
+      "hits": 21.0,
+      "total_hits": 61.0,
+      "probability": 34.42622950819672
+    },
+    {
+      "bias": "BEARISH",
+      "fib_level": "neg50",
+      "session": "London",
+      "hits": 16.0,
+      "total_hits": 61.0,
+      "probability": 26.229508196721312
+    },
+    {
+      "bias": "BEARISH",
+      "fib_level": "neg50",
+      "session": "NY",
+      "hits": 24.0,
+      "total_hits": 61.0,
+      "probability": 39.34426229508197
+    },
+    {
+      "bias": "BEARISH",
+      "fib_level": "neg100",
+      "session": "Asian",
+      "hits": 20.0,
+      "total_hits": 45.0,
+      "probability": 44.44444444444444
+    },
+    {
+      "bias": "BEARISH",
+      "fib_level": "neg100",
+      "session": "London",
+      "hits": 11.0,
+      "total_hits": 45.0,
+      "probability": 24.444444444444443
+    },
+    {
+      "bias": "BEARISH",
+      "fib_level": "neg100",
+      "session": "NY",
+      "hits": 14.0,
+      "total_hits": 45.0,
+      "probability": 31.11111111111111
+    },
+    {
+      "bias": "BEARISH",
+      "fib_level": "neg168",
+      "session": "Asian",
+      "hits": 12.0,
+      "total_hits": 34.0,
+      "probability": 35.294117647058826
+    },
+    {
+      "bias": "BEARISH",
+      "fib_level": "neg168",
+      "session": "London",
+      "hits": 8.0,
+      "total_hits": 34.0,
+      "probability": 23.52941176470588
+    },
+    {
+      "bias": "BEARISH",
+      "fib_level": "neg168",
+      "session": "NY",
+      "hits": 14.0,
+      "total_hits": 34.0,
+      "probability": 41.17647058823529
+    },
+    {
+      "bias": "BEARISH",
+      "fib_level": "132_inv",
+      "session": "Asian",
+      "hits": 22.0,
+      "total_hits": 57.0,
+      "probability": 38.59649122807017
+    },
+    {
+      "bias": "BEARISH",
+      "fib_level": "132_inv",
+      "session": "London",
+      "hits": 10.0,
+      "total_hits": 57.0,
+      "probability": 17.543859649122805
+    },
+    {
+      "bias": "BEARISH",
+      "fib_level": "132_inv",
+      "session": "NY",
+      "hits": 25.0,
+      "total_hits": 57.0,
+      "probability": 43.859649122807014
+    }
+  ]
+}

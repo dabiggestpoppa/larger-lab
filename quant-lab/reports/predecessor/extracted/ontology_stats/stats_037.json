@@ -1,0 +1,134 @@
+{
+  "Asian_Prediction_Success": {
+    "value": 82.71,
+    "type": "percentage",
+    "context": "Asian Prediction Success:",
+    "row": 6
+  },
+  "Asian_Prediction_Failures": {
+    "value": 17.29,
+    "type": "percentage",
+    "context": "Asian Prediction Failures:",
+    "row": 7
+  },
+  "pct_r15_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 15
+  },
+  "Fib_25": {
+    "value": 90.0,
+    "type": "percentage",
+    "context": "Fib -25%",
+    "row": 15
+  },
+  "Fib_25__90": {
+    "value": 0.9822,
+    "type": "ratio",
+    "context": "Fib -25% | 90%",
+    "row": 15
+  },
+  "09822__276__281": {
+    "value": 0.0822,
+    "type": "ratio",
+    "context": "0.9822 | 276 | 281",
+    "row": 15
+  },
+  "pct_r16_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 16
+  },
+  "Fib_50": {
+    "value": 82.0,
+    "type": "percentage",
+    "context": "Fib -50%",
+    "row": 16
+  },
+  "Fib_50__82": {
+    "value": 0.9644,
+    "type": "ratio",
+    "context": "Fib -50% | 82%",
+    "row": 16
+  },
+  "09644__271__281": {
+    "value": 0.1444,
+    "type": "ratio",
+    "context": "0.9644 | 271 | 281",
+    "row": 16
+  },
+  "pct_r17_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 17
+  },
+  "Fib_100__Not_Claimed": {
+    "value": 0.9217,
+    "type": "ratio",
+    "context": "Fib -100% | Not Claimed",
+    "row": 17
+  },
+  "pct_r18_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 18
+  },
+  "Fib_168__Not_Claimed": {
+    "value": 0.8719,
+    "type": "ratio",
+    "context": "Fib -168% | Not Claimed",
+    "row": 18
+  },
+  "pct_r19_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 19
+  },
+  "Fib_132_Violation": {
+    "value": 95.0,
+    "type": "percentage",
+    "context": "Fib 132% Violation",
+    "row": 19
+  },
+  "Fib_132_Violation__95": {
+    "value": 0.7153,
+    "type": "ratio",
+    "context": "Fib 132% Violation | 95%",
+    "row": 19
+  },
+  "02347__REQUIRES_REVISION__3342_hours": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "-0.2347 | REQUIRES REVISION | 33-42 hours",
+    "row": 19
+  },
+  "pct_r20_c0": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "",
+    "row": 20
+  },
+  "Fib_0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Fib 0%",
+    "row": 20
+  },
+  "pct_r21_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 21
+  },
+  "Fib_100": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Fib 100%",
+    "row": 21
+  }
+}

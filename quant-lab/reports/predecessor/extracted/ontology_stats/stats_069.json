@@ -1,0 +1,254 @@
+{
+  "pct_r7_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 7
+  },
+  "25_Extension": {
+    "value": 0.878,
+    "type": "ratio",
+    "context": "-25% Extension",
+    "row": 7
+  },
+  "25_Extension__0878": {
+    "value": 0.646,
+    "type": "ratio",
+    "context": "-25% Extension | 0.878",
+    "row": 7
+  },
+  "pct_r8_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 8
+  },
+  "50_Extension": {
+    "value": 0.821,
+    "type": "ratio",
+    "context": "-50% Extension",
+    "row": 8
+  },
+  "50_Extension__0821": {
+    "value": 0.684,
+    "type": "ratio",
+    "context": "-50% Extension | 0.821",
+    "row": 8
+  },
+  "pct_r9_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 9
+  },
+  "132_Violation": {
+    "value": 0.353,
+    "type": "ratio",
+    "context": "132% Violation",
+    "row": 9
+  },
+  "132_Violation__0353": {
+    "value": 0.473,
+    "type": "ratio",
+    "context": "132% Violation | 0.353",
+    "row": 9
+  },
+  "132_Violation__0353__0473": {
+    "value": 0.12,
+    "type": "ratio",
+    "context": "132% Violation | 0.353 | 0.473",
+    "row": 9
+  },
+  "pct_r10_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 10
+  },
+  "168_Extension": {
+    "value": 0.542,
+    "type": "ratio",
+    "context": "168% Extension",
+    "row": 10
+  },
+  "168_Extension__0542": {
+    "value": 0.871,
+    "type": "ratio",
+    "context": "168% Extension | 0.542",
+    "row": 10
+  },
+  "168_Extension__0542__0871": {
+    "value": 0.329,
+    "type": "ratio",
+    "context": "168% Extension | 0.542 | 0.871",
+    "row": 10
+  },
+  "Primary_Finding": {
+    "value": 87.8,
+    "type": "percentage",
+    "context": "Primary Finding:",
+    "row": 15
+  },
+  "pct_r16_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 16
+  },
+  "Shallow_Target_Decay_25": {
+    "value": 23.2,
+    "type": "percentage",
+    "context": "Shallow Target Decay (-25%):",
+    "row": 16
+  },
+  "pct_r17_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 17
+  },
+  "Deep_Target_Increase_168": {
+    "value": 32.9,
+    "type": "percentage",
+    "context": "Deep Target Increase (168%):",
+    "row": 17
+  },
+  "Time_Window": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Time Window",
+    "row": 21
+  },
+  "Time_Window__25_Hit_Rate": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Time Window | -25% Hit Rate",
+    "row": 21
+  },
+  "Time_Window__25_Hit_Rate__50_Hit_Rate": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Time Window | -25% Hit Rate | -50% Hit Rate",
+    "row": 21
+  },
+  "25_Hit_Rate__50_Hit_Rate__132_Rate": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "-25% Hit Rate | -50% Hit Rate | 132% Rate",
+    "row": 21
+  },
+  "26_AM_EST": {
+    "value": 0.924,
+    "type": "ratio",
+    "context": "2-6 AM EST",
+    "row": 22
+  },
+  "26_AM_EST__0924": {
+    "value": 0.886,
+    "type": "ratio",
+    "context": "2-6 AM EST | 0.924",
+    "row": 22
+  },
+  "26_AM_EST__0924__0886": {
+    "value": 0.281,
+    "type": "ratio",
+    "context": "2-6 AM EST | 0.924 | 0.886",
+    "row": 22
+  },
+  "0924__0886__0281": {
+    "value": 0.423,
+    "type": "ratio",
+    "context": "0.924 | 0.886 | 0.281",
+    "row": 22
+  },
+  "69_AM_EST": {
+    "value": 0.878,
+    "type": "ratio",
+    "context": "6-9 AM EST",
+    "row": 23
+  },
+  "69_AM_EST__0878": {
+    "value": 0.821,
+    "type": "ratio",
+    "context": "6-9 AM EST | 0.878",
+    "row": 23
+  },
+  "69_AM_EST__0878__0821": {
+    "value": 0.353,
+    "type": "ratio",
+    "context": "6-9 AM EST | 0.878 | 0.821",
+    "row": 23
+  },
+  "0878__0821__0353": {
+    "value": 0.542,
+    "type": "ratio",
+    "context": "0.878 | 0.821 | 0.353",
+    "row": 23
+  },
+  "912_PM_EST": {
+    "value": 0.723,
+    "type": "ratio",
+    "context": "9-12 PM EST",
+    "row": 24
+  },
+  "912_PM_EST__0723": {
+    "value": 0.745,
+    "type": "ratio",
+    "context": "9-12 PM EST | 0.723",
+    "row": 24
+  },
+  "912_PM_EST__0723__0745": {
+    "value": 0.428,
+    "type": "ratio",
+    "context": "9-12 PM EST | 0.723 | 0.745",
+    "row": 24
+  },
+  "0723__0745__0428": {
+    "value": 0.726,
+    "type": "ratio",
+    "context": "0.723 | 0.745 | 0.428",
+    "row": 24
+  },
+  "124_PM_EST": {
+    "value": 0.646,
+    "type": "ratio",
+    "context": "12-4 PM EST",
+    "row": 25
+  },
+  "124_PM_EST__0646": {
+    "value": 0.684,
+    "type": "ratio",
+    "context": "12-4 PM EST | 0.646",
+    "row": 25
+  },
+  "124_PM_EST__0646__0684": {
+    "value": 0.473,
+    "type": "ratio",
+    "context": "12-4 PM EST | 0.646 | 0.684",
+    "row": 25
+  },
+  "0646__0684__0473": {
+    "value": 0.871,
+    "type": "ratio",
+    "context": "0.646 | 0.684 | 0.473",
+    "row": 25
+  },
+  "pct_r29_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 29
+  },
+  "pct_r30_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 30
+  },
+  "pct_r31_c0": {
+    "value": 87.8,
+    "type": "percentage",
+    "context": "",
+    "row": 31
+  }
+}

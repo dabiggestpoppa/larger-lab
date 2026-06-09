@@ -1,0 +1,878 @@
+{
+  "Best_Overall__15day": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Best Overall | 15-day",
+    "row": 6
+  },
+  "Best_Overall__15day__132": {
+    "value": 0.0859375,
+    "type": "ratio",
+    "context": "Best Overall | 15-day | 132%",
+    "row": 6
+  },
+  "15day__132__00859375": {
+    "value": 0.1015625,
+    "type": "ratio",
+    "context": "15-day | 132% | 0.0859375",
+    "row": 6
+  },
+  "132__00859375__01015625": {
+    "value": 0.015625,
+    "type": "ratio",
+    "context": "132% | 0.0859375 | 0.1015625",
+    "row": 6
+  },
+  "Best_Group_A_Week_1_PivotTRUE__15day": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Best Group A (Week 1 Pivot=TRUE) | 15-day",
+    "row": 7
+  },
+  "Best_Group_A_Week_1_PivotTRUE__15day__132": {
+    "value": 0.06976744186046512,
+    "type": "ratio",
+    "context": "Best Group A (Week 1 Pivot=TRUE) | 15-day | 132%",
+    "row": 7
+  },
+  "15day__132__006976744186046512": {
+    "value": 0.09302325581395349,
+    "type": "ratio",
+    "context": "15-day | 132% | 0.06976744186046512",
+    "row": 7
+  },
+  "132__006976744186046512__009302325581395349": {
+    "value": 0.023255813953488372,
+    "type": "ratio",
+    "context": "132% | 0.06976744186046512 | 0.09302325581395349",
+    "row": 7
+  },
+  "Best_Group_B_Week_1_PivotFALSE__12day": {
+    "value": 115.0,
+    "type": "percentage",
+    "context": "Best Group B (Week 1 Pivot=FALSE) | 12-day",
+    "row": 8
+  },
+  "Best_Group_B_Week_1_PivotFALSE__12day__115": {
+    "value": 0.16666666666666663,
+    "type": "ratio",
+    "context": "Best Group B (Week 1 Pivot=FALSE) | 12-day | 115%",
+    "row": 8
+  },
+  "12day__115__016666666666666663": {
+    "value": 0.26190476190476186,
+    "type": "ratio",
+    "context": "12-day | 115% | 0.16666666666666663",
+    "row": 8
+  },
+  "115__016666666666666663__026190476190476186": {
+    "value": 0.09523809523809523,
+    "type": "ratio",
+    "context": "115% | 0.16666666666666663 | 0.26190476190476186",
+    "row": 8
+  },
+  "Window__Invalid_Level__Months": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Window | Invalid Level | Months",
+    "row": 11
+  },
+  "Invalid_Level__Months__25_Hit": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Invalid Level | Months | -25% Hit",
+    "row": 11
+  },
+  "Months__25_Hit__50_Hit": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Months | -25% Hit | -50% Hit",
+    "row": 11
+  },
+  "25_Hit__50_Hit__100_Hit": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "-25% Hit | -50% Hit | -100% Hit",
+    "row": 11
+  },
+  "15day": {
+    "value": 0.07291666666666667,
+    "type": "ratio",
+    "context": "15-day",
+    "row": 86
+  },
+  "15day__132__64": {
+    "value": 0.234375,
+    "type": "ratio",
+    "context": "15-day | 132% | 64",
+    "row": 12
+  },
+  "132__64__0234375": {
+    "value": 0.15625,
+    "type": "ratio",
+    "context": "132% | 64 | 0.234375",
+    "row": 14
+  },
+  "64__0234375__015625": {
+    "value": 0.015625,
+    "type": "ratio",
+    "context": "64 | 0.234375 | 0.15625",
+    "row": 29
+  },
+  "0234375__015625__0015625": {
+    "value": 0.1015625,
+    "type": "ratio",
+    "context": "0.234375 | 0.15625 | 0.015625",
+    "row": 29
+  },
+  "015625__0015625__01015625": {
+    "value": 0.03125,
+    "type": "ratio",
+    "context": "0.15625 | 0.015625 | 0.1015625",
+    "row": 29
+  },
+  "0015625__01015625__0015625": {
+    "value": 0.0859375,
+    "type": "ratio",
+    "context": "0.015625 | 0.1015625 | 0.015625",
+    "row": 14
+  },
+  "01015625__0015625__00859375": {
+    "value": 0.09789034442298178,
+    "type": "ratio",
+    "context": "0.1015625 | 0.015625 | 0.0859375",
+    "row": 14
+  },
+  "16day": {
+    "value": 0.07291666666666667,
+    "type": "ratio",
+    "context": "16-day",
+    "row": 87
+  },
+  "16day__132__64": {
+    "value": 0.234375,
+    "type": "ratio",
+    "context": "16-day | 132% | 64",
+    "row": 13
+  },
+  "17day": {
+    "value": 0.07291666666666667,
+    "type": "ratio",
+    "context": "17-day",
+    "row": 88
+  },
+  "17day__132__64": {
+    "value": 0.234375,
+    "type": "ratio",
+    "context": "17-day | 132% | 64",
+    "row": 14
+  },
+  "15day__110__64": {
+    "value": 0.234375,
+    "type": "ratio",
+    "context": "15-day | 110% | 64",
+    "row": 15
+  },
+  "110__64__0234375": {
+    "value": 0.15625,
+    "type": "ratio",
+    "context": "110% | 64 | 0.234375",
+    "row": 25
+  },
+  "0015625__01015625__003125": {
+    "value": 0.0703125,
+    "type": "ratio",
+    "context": "0.015625 | 0.1015625 | 0.03125",
+    "row": 29
+  },
+  "01015625__003125__00703125": {
+    "value": 0.09789034442298178,
+    "type": "ratio",
+    "context": "0.1015625 | 0.03125 | 0.0703125",
+    "row": 29
+  },
+  "15day__115__64": {
+    "value": 0.234375,
+    "type": "ratio",
+    "context": "15-day | 115% | 64",
+    "row": 16
+  },
+  "115__64__0234375": {
+    "value": 0.15625,
+    "type": "ratio",
+    "context": "115% | 64 | 0.234375",
+    "row": 26
+  },
+  "15day__118__64": {
+    "value": 0.234375,
+    "type": "ratio",
+    "context": "15-day | 118% | 64",
+    "row": 17
+  },
+  "118__64__0234375": {
+    "value": 0.15625,
+    "type": "ratio",
+    "context": "118% | 64 | 0.234375",
+    "row": 27
+  },
+  "15day__120__64": {
+    "value": 0.234375,
+    "type": "ratio",
+    "context": "15-day | 120% | 64",
+    "row": 18
+  },
+  "120__64__0234375": {
+    "value": 0.15625,
+    "type": "ratio",
+    "context": "120% | 64 | 0.234375",
+    "row": 28
+  },
+  "15day__125__64": {
+    "value": 0.234375,
+    "type": "ratio",
+    "context": "15-day | 125% | 64",
+    "row": 19
+  },
+  "125__64__0234375": {
+    "value": 0.15625,
+    "type": "ratio",
+    "context": "125% | 64 | 0.234375",
+    "row": 29
+  },
+  "16day__110__64": {
+    "value": 0.234375,
+    "type": "ratio",
+    "context": "16-day | 110% | 64",
+    "row": 20
+  },
+  "16day__115__64": {
+    "value": 0.234375,
+    "type": "ratio",
+    "context": "16-day | 115% | 64",
+    "row": 21
+  },
+  "16day__118__64": {
+    "value": 0.234375,
+    "type": "ratio",
+    "context": "16-day | 118% | 64",
+    "row": 22
+  },
+  "16day__120__64": {
+    "value": 0.234375,
+    "type": "ratio",
+    "context": "16-day | 120% | 64",
+    "row": 23
+  },
+  "16day__125__64": {
+    "value": 0.234375,
+    "type": "ratio",
+    "context": "16-day | 125% | 64",
+    "row": 24
+  },
+  "17day__110__64": {
+    "value": 0.234375,
+    "type": "ratio",
+    "context": "17-day | 110% | 64",
+    "row": 25
+  },
+  "17day__115__64": {
+    "value": 0.234375,
+    "type": "ratio",
+    "context": "17-day | 115% | 64",
+    "row": 26
+  },
+  "17day__118__64": {
+    "value": 0.234375,
+    "type": "ratio",
+    "context": "17-day | 118% | 64",
+    "row": 27
+  },
+  "17day__120__64": {
+    "value": 0.234375,
+    "type": "ratio",
+    "context": "17-day | 120% | 64",
+    "row": 28
+  },
+  "17day__125__64": {
+    "value": 0.234375,
+    "type": "ratio",
+    "context": "17-day | 125% | 64",
+    "row": 29
+  },
+  "12day": {
+    "value": 0.029487179487179473,
+    "type": "ratio",
+    "context": "12-day",
+    "row": 83
+  },
+  "12day__132__65": {
+    "value": 0.35384615384615387,
+    "type": "ratio",
+    "context": "12-day | 132% | 65",
+    "row": 30
+  },
+  "132__65__035384615384615387": {
+    "value": 0.26153846153846155,
+    "type": "ratio",
+    "context": "132% | 65 | 0.35384615384615387",
+    "row": 32
+  },
+  "65__035384615384615387__026153846153846155": {
+    "value": 0.07692307692307693,
+    "type": "ratio",
+    "context": "65 | 0.35384615384615387 | 0.26153846153846155",
+    "row": 47
+  },
+  "035384615384615387__026153846153846155__0076923076": {
+    "value": 0.06153846153846154,
+    "type": "ratio",
+    "context": "0.35384615384615387 | 0.26153846153846155 | 0.07692307692307693",
+    "row": 47
+  },
+  "026153846153846155__007692307692307693__0061538461": {
+    "value": 0.18846153846153846,
+    "type": "ratio",
+    "context": "0.26153846153846155 | 0.07692307692307693 | 0.06153846153846154",
+    "row": 47
+  },
+  "007692307692307693__006153846153846154__0188461538": {
+    "value": 0.2,
+    "type": "ratio",
+    "context": "0.07692307692307693 | 0.06153846153846154 | 0.18846153846153846",
+    "row": 47
+  },
+  "006153846153846154__018846153846153846__0138461538": {
+    "value": 0.04999999999999999,
+    "type": "ratio",
+    "context": "0.06153846153846154 | 0.18846153846153846 | 0.13846153846153847",
+    "row": 32
+  },
+  "018846153846153846__013846153846153847__0049999999": {
+    "value": 0.1237362149395801,
+    "type": "ratio",
+    "context": "0.18846153846153846 | 0.13846153846153847 | 0.04999999999999999",
+    "row": 32
+  },
+  "13day": {
+    "value": 0.029487179487179473,
+    "type": "ratio",
+    "context": "13-day",
+    "row": 84
+  },
+  "13day__132__65": {
+    "value": 0.35384615384615387,
+    "type": "ratio",
+    "context": "13-day | 132% | 65",
+    "row": 31
+  },
+  "14day": {
+    "value": 0.029487179487179473,
+    "type": "ratio",
+    "context": "14-day",
+    "row": 85
+  },
+  "14day__132__65": {
+    "value": 0.35384615384615387,
+    "type": "ratio",
+    "context": "14-day | 132% | 65",
+    "row": 32
+  },
+  "12day__115__65": {
+    "value": 0.35384615384615387,
+    "type": "ratio",
+    "context": "12-day | 115% | 65",
+    "row": 33
+  },
+  "115__65__035384615384615387": {
+    "value": 0.26153846153846155,
+    "type": "ratio",
+    "context": "115% | 65 | 0.35384615384615387",
+    "row": 41
+  },
+  "006153846153846154__018846153846153846__0153846153": {
+    "value": 0.0346153846153846,
+    "type": "ratio",
+    "context": "0.06153846153846154 | 0.18846153846153846 | 0.15384615384615385",
+    "row": 44
+  },
+  "018846153846153846__015384615384615385__0034615384": {
+    "value": 0.1237362149395801,
+    "type": "ratio",
+    "context": "0.18846153846153846 | 0.15384615384615385 | 0.0346153846153846",
+    "row": 44
+  },
+  "12day__118__65": {
+    "value": 0.35384615384615387,
+    "type": "ratio",
+    "context": "12-day | 118% | 65",
+    "row": 34
+  },
+  "118__65__035384615384615387": {
+    "value": 0.26153846153846155,
+    "type": "ratio",
+    "context": "118% | 65 | 0.35384615384615387",
+    "row": 42
+  },
+  "12day__120__65": {
+    "value": 0.35384615384615387,
+    "type": "ratio",
+    "context": "12-day | 120% | 65",
+    "row": 35
+  },
+  "120__65__035384615384615387": {
+    "value": 0.26153846153846155,
+    "type": "ratio",
+    "context": "120% | 65 | 0.35384615384615387",
+    "row": 43
+  },
+  "12day__125__65": {
+    "value": 0.35384615384615387,
+    "type": "ratio",
+    "context": "12-day | 125% | 65",
+    "row": 36
+  },
+  "125__65__035384615384615387": {
+    "value": 0.26153846153846155,
+    "type": "ratio",
+    "context": "125% | 65 | 0.35384615384615387",
+    "row": 44
+  },
+  "13day__115__65": {
+    "value": 0.35384615384615387,
+    "type": "ratio",
+    "context": "13-day | 115% | 65",
+    "row": 37
+  },
+  "13day__118__65": {
+    "value": 0.35384615384615387,
+    "type": "ratio",
+    "context": "13-day | 118% | 65",
+    "row": 38
+  },
+  "13day__120__65": {
+    "value": 0.35384615384615387,
+    "type": "ratio",
+    "context": "13-day | 120% | 65",
+    "row": 39
+  },
+  "13day__125__65": {
+    "value": 0.35384615384615387,
+    "type": "ratio",
+    "context": "13-day | 125% | 65",
+    "row": 40
+  },
+  "14day__115__65": {
+    "value": 0.35384615384615387,
+    "type": "ratio",
+    "context": "14-day | 115% | 65",
+    "row": 41
+  },
+  "14day__118__65": {
+    "value": 0.35384615384615387,
+    "type": "ratio",
+    "context": "14-day | 118% | 65",
+    "row": 42
+  },
+  "14day__120__65": {
+    "value": 0.35384615384615387,
+    "type": "ratio",
+    "context": "14-day | 120% | 65",
+    "row": 43
+  },
+  "14day__125__65": {
+    "value": 0.35384615384615387,
+    "type": "ratio",
+    "context": "14-day | 125% | 65",
+    "row": 44
+  },
+  "12day__110__65": {
+    "value": 0.35384615384615387,
+    "type": "ratio",
+    "context": "12-day | 110% | 65",
+    "row": 45
+  },
+  "110__65__035384615384615387": {
+    "value": 0.26153846153846155,
+    "type": "ratio",
+    "context": "110% | 65 | 0.35384615384615387",
+    "row": 47
+  },
+  "018846153846153846__02__0011538461538461553": {
+    "value": 0.1237362149395801,
+    "type": "ratio",
+    "context": "0.18846153846153846 | 0.2 | -0.011538461538461553",
+    "row": 47
+  },
+  "13day__110__65": {
+    "value": 0.35384615384615387,
+    "type": "ratio",
+    "context": "13-day | 110% | 65",
+    "row": 46
+  },
+  "14day__110__65": {
+    "value": 0.35384615384615387,
+    "type": "ratio",
+    "context": "14-day | 110% | 65",
+    "row": 47
+  },
+  "pct_r51_c0": {
+    "value": 67.69,
+    "type": "percentage",
+    "context": "",
+    "row": 51
+  },
+  "GROUP_A_Week_1_Pivot__TRUE_6769_of_months": {
+    "value": 32.31,
+    "type": "percentage",
+    "context": "GROUP A (Week 1 Pivot = TRUE, 67.69% of months)",
+    "row": 51
+  },
+  "Best_Configuration": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Best Configuration:",
+    "row": 52
+  },
+  "Best_Configuration__15day_132__Best_Configuration": {
+    "value": 115.0,
+    "type": "percentage",
+    "context": "Best Configuration: | 15-day, 132% | Best Configuration:",
+    "row": 52
+  },
+  "pct_r53_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 53
+  },
+  "25_Hit_Rate": {
+    "value": 0.20930232558139536,
+    "type": "ratio",
+    "context": "-25% Hit Rate:",
+    "row": 53
+  },
+  "25_Hit_Rate__020930232558139536": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "-25% Hit Rate: | 0.20930232558139536",
+    "row": 53
+  },
+  "25_Hit_Rate__020930232558139536__25_Hit_Rate": {
+    "value": 0.5238095238095238,
+    "type": "ratio",
+    "context": "-25% Hit Rate: | 0.20930232558139536 | -25% Hit Rate:",
+    "row": 53
+  },
+  "pct_r54_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 54
+  },
+  "50_Hit_Rate": {
+    "value": 0.16279069767441862,
+    "type": "ratio",
+    "context": "-50% Hit Rate:",
+    "row": 54
+  },
+  "50_Hit_Rate__016279069767441862": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "-50% Hit Rate: | 0.16279069767441862",
+    "row": 54
+  },
+  "50_Hit_Rate__016279069767441862__50_Hit_Rate": {
+    "value": 0.2857142857142857,
+    "type": "ratio",
+    "context": "-50% Hit Rate: | 0.16279069767441862 | -50% Hit Rate:",
+    "row": 54
+  },
+  "pct_r55_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 55
+  },
+  "100_Hit_Rate": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "-100% Hit Rate:",
+    "row": 55
+  },
+  "100_Hit_Rate__100_Hit_Rate": {
+    "value": 0.14285714285714285,
+    "type": "ratio",
+    "context": "-100% Hit Rate: | -100% Hit Rate:",
+    "row": 55
+  },
+  "pct_r56_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 56
+  },
+  "168_Hit_Rate": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "-168% Hit Rate:",
+    "row": 56
+  },
+  "168_Hit_Rate__168_Hit_Rate": {
+    "value": 0.09523809523809523,
+    "type": "ratio",
+    "context": "-168% Hit Rate: | -168% Hit Rate:",
+    "row": 56
+  },
+  "Invalidation_Rate": {
+    "value": 0.023255813953488372,
+    "type": "ratio",
+    "context": "Invalidation Rate:",
+    "row": 57
+  },
+  "Invalidation_Rate__0023255813953488372__Invalidati": {
+    "value": 0.09523809523809523,
+    "type": "ratio",
+    "context": "Invalidation Rate: | 0.023255813953488372 | Invalidation Rate:",
+    "row": 57
+  },
+  "Effectiveness_Score": {
+    "value": 0.06976744186046512,
+    "type": "ratio",
+    "context": "Effectiveness Score:",
+    "row": 58
+  },
+  "Effectiveness_Score__006976744186046512__Effective": {
+    "value": 0.16666666666666663,
+    "type": "ratio",
+    "context": "Effectiveness Score: | 0.06976744186046512 | Effectiveness Score:",
+    "row": 58
+  },
+  "pct_r61_c0": {
+    "value": 118.0,
+    "type": "percentage",
+    "context": "",
+    "row": 61
+  },
+  "Group_B_best_invalidation_level": {
+    "value": 115.0,
+    "type": "percentage",
+    "context": "Group B best invalidation level:",
+    "row": 62
+  },
+  "pct_r63_c0": {
+    "value": 118.0,
+    "type": "percentage",
+    "context": "",
+    "row": 63
+  },
+  "Group_B_effectiveness_vs_Group_A": {
+    "value": 0.09689922480620153,
+    "type": "ratio",
+    "context": "Group B effectiveness vs Group A:",
+    "row": 64
+  },
+  "pct_r71_c0": {
+    "value": 110.0,
+    "type": "percentage",
+    "context": "",
+    "row": 71
+  },
+  "pct_r73_c0": {
+    "value": 110.0,
+    "type": "percentage",
+    "context": "",
+    "row": 73
+  },
+  "110": {
+    "value": 0.029387019230769217,
+    "type": "ratio",
+    "context": "110%",
+    "row": 73
+  },
+  "0029387019230769217__15day__001367600422832982": {
+    "value": 0.119047619047619,
+    "type": "ratio",
+    "context": "0.029387019230769217 | 15-day | -0.01367600422832982",
+    "row": 73
+  },
+  "pct_r74_c0": {
+    "value": 115.0,
+    "type": "percentage",
+    "context": "",
+    "row": 74
+  },
+  "115": {
+    "value": 0.0524639423076923,
+    "type": "ratio",
+    "context": "115%",
+    "row": 74
+  },
+  "115__00524639423076923__15day": {
+    "value": 0.009051268498942906,
+    "type": "ratio",
+    "context": "115% | 0.0524639423076923 | 15-day",
+    "row": 74
+  },
+  "00524639423076923__15day__0009051268498942906": {
+    "value": 0.14285714285714282,
+    "type": "ratio",
+    "context": "0.0524639423076923 | 15-day | 0.009051268498942906",
+    "row": 77
+  },
+  "pct_r75_c0": {
+    "value": 118.0,
+    "type": "percentage",
+    "context": "",
+    "row": 75
+  },
+  "118": {
+    "value": 0.0524639423076923,
+    "type": "ratio",
+    "context": "118%",
+    "row": 75
+  },
+  "118__00524639423076923__15day": {
+    "value": 0.009051268498942906,
+    "type": "ratio",
+    "context": "118% | 0.0524639423076923 | 15-day",
+    "row": 75
+  },
+  "pct_r76_c0": {
+    "value": 120.0,
+    "type": "percentage",
+    "context": "",
+    "row": 76
+  },
+  "120": {
+    "value": 0.0524639423076923,
+    "type": "ratio",
+    "context": "120%",
+    "row": 76
+  },
+  "120__00524639423076923__15day": {
+    "value": 0.009051268498942906,
+    "type": "ratio",
+    "context": "120% | 0.0524639423076923 | 15-day",
+    "row": 76
+  },
+  "pct_r77_c0": {
+    "value": 125.0,
+    "type": "percentage",
+    "context": "",
+    "row": 77
+  },
+  "125": {
+    "value": 0.0524639423076923,
+    "type": "ratio",
+    "context": "125%",
+    "row": 77
+  },
+  "125__00524639423076923__15day": {
+    "value": 0.009051268498942906,
+    "type": "ratio",
+    "context": "125% | 0.0524639423076923 | 15-day",
+    "row": 77
+  },
+  "pct_r78_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 78
+  },
+  "132": {
+    "value": 0.06796875,
+    "type": "ratio",
+    "context": "132%",
+    "row": 78
+  },
+  "132__006796875__15day": {
+    "value": 0.03204281183932346,
+    "type": "ratio",
+    "context": "132% | 0.06796875 | 15-day",
+    "row": 78
+  },
+  "006796875__15day__003204281183932346": {
+    "value": 0.14285714285714282,
+    "type": "ratio",
+    "context": "0.06796875 | 15-day | 0.03204281183932346",
+    "row": 78
+  },
+  "12day__0029487179487179473": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "12-day | 0.029487179487179473",
+    "row": 83
+  },
+  "0029487179487179473__132__0032196969696969724": {
+    "value": 0.1587301587301587,
+    "type": "ratio",
+    "context": "0.029487179487179473 | 132% | -0.032196969696969724",
+    "row": 85
+  },
+  "132__0032196969696969724__01587301587301587": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "132% | -0.032196969696969724 | 0.1587301587301587",
+    "row": 85
+  },
+  "13day__0029487179487179473": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "13-day | 0.029487179487179473",
+    "row": 84
+  },
+  "14day__0029487179487179473": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "14-day | 0.029487179487179473",
+    "row": 85
+  },
+  "15day__007291666666666667": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "15-day | 0.07291666666666667",
+    "row": 86
+  },
+  "15day__007291666666666667__132": {
+    "value": 0.05038759689922481,
+    "type": "ratio",
+    "context": "15-day | 0.07291666666666667 | 132%",
+    "row": 86
+  },
+  "007291666666666667__132__005038759689922481": {
+    "value": 0.11904761904761903,
+    "type": "ratio",
+    "context": "0.07291666666666667 | 132% | 0.05038759689922481",
+    "row": 88
+  },
+  "132__005038759689922481__011904761904761903": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "132% | 0.05038759689922481 | 0.11904761904761903",
+    "row": 88
+  },
+  "16day__007291666666666667": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "16-day | 0.07291666666666667",
+    "row": 87
+  },
+  "16day__007291666666666667__132": {
+    "value": 0.05038759689922481,
+    "type": "ratio",
+    "context": "16-day | 0.07291666666666667 | 132%",
+    "row": 87
+  },
+  "17day__007291666666666667": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "17-day | 0.07291666666666667",
+    "row": 88
+  },
+  "17day__007291666666666667__132": {
+    "value": 0.05038759689922481,
+    "type": "ratio",
+    "context": "17-day | 0.07291666666666667 | 132%",
+    "row": 88
+  }
+}

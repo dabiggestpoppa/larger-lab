@@ -1,0 +1,274 @@
+{
+  "sheet_name": "Validation Checklist",
+  "headers": [
+    "Claim #",
+    "Original Claim",
+    "Claimed Accuracy (%)",
+    "Validation Status",
+    "Phase 1 Test Result (%)",
+    "Meets \u226578% Threshold",
+    "Priority for Testing",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 30,
+  "data": [
+    {
+      "Claim #": "Claim #",
+      "Original Claim": "Original Claim",
+      "Claimed Accuracy (%)": "Claimed Accuracy (%)",
+      "Validation Status": "Validation Status",
+      "Phase 1 Test Result (%)": "Phase 1 Test Result (%)",
+      "Meets \u226578% Threshold": "Meets \u226578% Threshold",
+      "Priority for Testing": "Priority for Testing"
+    },
+    {
+      "Claim #": 1.0,
+      "Original Claim": "-25% extension hit rate",
+      "Claimed Accuracy (%)": 90.0,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 2.0,
+      "Original Claim": "-50% extension hit rate",
+      "Claimed Accuracy (%)": 82.0,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 3.0,
+      "Original Claim": "72% retracement continuation (London-NY)",
+      "Claimed Accuracy (%)": 83.5,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 4.0,
+      "Original Claim": "AB(72%)\u2192BC(-25%)\u2192CD(61.8%) success",
+      "Claimed Accuracy (%)": 81.2,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 5.0,
+      "Original Claim": "Consecutive 15M 61.8-88 under WILM \u2192 4H rekey",
+      "Claimed Accuracy (%)": 94.3,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 6.0,
+      "Original Claim": "Quarter level interaction (\u00b110 points)",
+      "Claimed Accuracy (%)": 80.5,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 7.0,
+      "Original Claim": "Weekly+Monthly alignment",
+      "Claimed Accuracy (%)": 94.0,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 8.0,
+      "Original Claim": "61.8% rekey accuracy (improved)",
+      "Claimed Accuracy (%)": 94.0,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 9.0,
+      "Original Claim": "Shallow trend angle completion",
+      "Claimed Accuracy (%)": 78.9,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "Medium"
+    },
+    {
+      "Claim #": 10.0,
+      "Original Claim": "Alpha sequence daily high/low formation",
+      "Claimed Accuracy (%)": 78.3,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "Medium"
+    },
+    {
+      "Claim #": 11.0,
+      "Original Claim": "Early London daily vector prediction",
+      "Claimed Accuracy (%)": 82.3,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 12.0,
+      "Original Claim": "15M + WILM Active rekey probability",
+      "Claimed Accuracy (%)": 92.0,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 13.0,
+      "Original Claim": "C-D Leg failure \u2192 Alpha rekey",
+      "Claimed Accuracy (%)": 81.7,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 14.0,
+      "Original Claim": "Quarter + structure inversion transition",
+      "Claimed Accuracy (%)": 82.3,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 15.0,
+      "Original Claim": "15M + Daily ILM Miss + IELM rekey",
+      "Claimed Accuracy (%)": 83.0,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 16.0,
+      "Original Claim": "4H A-B failure micro-leg increase",
+      "Claimed Accuracy (%)": 85.0,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 17.0,
+      "Original Claim": "Daily ILM miss micro-pattern increase",
+      "Claimed Accuracy (%)": 88.0,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 18.0,
+      "Original Claim": "Full ILM alignment execution",
+      "Claimed Accuracy (%)": 87.3,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 19.0,
+      "Original Claim": "ILM high/low within 2H (15M -25%)",
+      "Claimed Accuracy (%)": 91.2,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 20.0,
+      "Original Claim": "50%\u219250% retest (highest success)",
+      "Claimed Accuracy (%)": "83.2-91.4",
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 21.0,
+      "Original Claim": "Layered Fibonacci 50%\u219278.6%",
+      "Claimed Accuracy (%)": 83.0,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 22.0,
+      "Original Claim": "15M AB-CD Bullish (50%\u2192-25%)",
+      "Claimed Accuracy (%)": 84.0,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 23.0,
+      "Original Claim": "Q1 reconstruction",
+      "Claimed Accuracy (%)": 93.2,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 24.0,
+      "Original Claim": "Q2 reconstruction",
+      "Claimed Accuracy (%)": 89.7,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 25.0,
+      "Original Claim": "Q3 reconstruction",
+      "Claimed Accuracy (%)": 86.3,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 26.0,
+      "Original Claim": "Q4 reconstruction",
+      "Claimed Accuracy (%)": 95.8,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": 27.0,
+      "Original Claim": "Monthly 78.6\u219278.6\u219278.6",
+      "Claimed Accuracy (%)": 78.0,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "Medium"
+    },
+    {
+      "Claim #": 28.0,
+      "Original Claim": "Monthly 0\u2192+23.6 flow",
+      "Claimed Accuracy (%)": 83.0,
+      "Validation Status": "PENDING - Requires Phase 1 Data Test",
+      "Meets \u226578% Threshold": "TBD",
+      "Priority for Testing": "High"
+    },
+    {
+      "Claim #": "NOTE: Phase 1 testing will use 1,401 London sessions to validate these claims against live market data."
+    }
+  ]
+}

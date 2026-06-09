@@ -1,0 +1,644 @@
+{
+  "pct_r7_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 7
+  },
+  "25_Extension": {
+    "value": 0.9822,
+    "type": "ratio",
+    "context": "-25% Extension",
+    "row": 7
+  },
+  "09822__24__MondayTuesday": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "0.9822 | 24 | Monday-Tuesday",
+    "row": 7
+  },
+  "24__MondayTuesday__50_Extension": {
+    "value": 0.92,
+    "type": "ratio",
+    "context": "24 | Monday-Tuesday | -50% Extension",
+    "row": 7
+  },
+  "pct_r8_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 8
+  },
+  "50_Extension": {
+    "value": 0.9643999999999999,
+    "type": "ratio",
+    "context": "-50% Extension",
+    "row": 8
+  },
+  "09643999999999999__36__TuesdayWednesday": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "0.9643999999999999 | 36 | Tuesday-Wednesday",
+    "row": 8
+  },
+  "36__TuesdayWednesday__100_Extension": {
+    "value": 0.85,
+    "type": "ratio",
+    "context": "36 | Tuesday-Wednesday | -100% Extension",
+    "row": 8
+  },
+  "pct_r9_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 9
+  },
+  "100_Extension": {
+    "value": 0.9217,
+    "type": "ratio",
+    "context": "-100% Extension",
+    "row": 9
+  },
+  "09217__48__WednesdayThursday": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "0.9217 | 48 | Wednesday-Thursday",
+    "row": 9
+  },
+  "48__WednesdayThursday__168_Extension": {
+    "value": 0.78,
+    "type": "ratio",
+    "context": "48 | Wednesday-Thursday | -168% Extension",
+    "row": 9
+  },
+  "pct_r10_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 10
+  },
+  "168_Extension": {
+    "value": 0.8719,
+    "type": "ratio",
+    "context": "-168% Extension",
+    "row": 10
+  },
+  "60__ThursdayFriday__Week_Complete": {
+    "value": 0.95,
+    "type": "ratio",
+    "context": "60 | Thursday-Friday | Week Complete",
+    "row": 10
+  },
+  "pct_r11_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 11
+  },
+  "132_Violation": {
+    "value": 0.7153,
+    "type": "ratio",
+    "context": "132% Violation",
+    "row": 11
+  },
+  "07153__42__Wednesday_Peak": {
+    "value": 78.6,
+    "type": "percentage",
+    "context": "0.7153 | 42 | Wednesday Peak",
+    "row": 11
+  },
+  "42__Wednesday_Peak__REKEY_to_786": {
+    "value": 0.92,
+    "type": "ratio",
+    "context": "42 | Wednesday Peak | REKEY to 78.6%",
+    "row": 11
+  },
+  "Sequence": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Sequence:",
+    "row": 23
+  },
+  "Probability": {
+    "value": 71.53,
+    "type": "percentage",
+    "context": "Probability:",
+    "row": 20
+  },
+  "pct_r22_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 22
+  },
+  "Total_Time": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Total Time:",
+    "row": 24
+  },
+  "pct_r29_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 29
+  },
+  "50_NOT_hit_by_Wed_Close__Wed_1600_EST_checkpoint": {
+    "value": 0.75,
+    "type": "ratio",
+    "context": "-50% NOT hit by Wed Close | Wed 16:00 EST checkpoint",
+    "row": 29
+  },
+  "Wed_1600_EST_checkpoint__075__68_occurrences": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Wed 16:00 EST checkpoint | 0.75 | 68 occurrences",
+    "row": 29
+  },
+  "pct_r30_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 30
+  },
+  "25_NOT_hit_by_Wed_Close__Wed_1600_EST_checkpoint": {
+    "value": 0.7,
+    "type": "ratio",
+    "context": "-25% NOT hit by Wed Close | Wed 16:00 EST checkpoint",
+    "row": 30
+  },
+  "pct_r31_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 31
+  },
+  "100_Break_WITHOUT_25_follow__TueWed_sessions": {
+    "value": 0.65,
+    "type": "ratio",
+    "context": "100% Break WITHOUT -25% follow | Tue-Wed sessions",
+    "row": 31
+  },
+  "pct_r32_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 32
+  },
+  "100_hit_by_Thursday_AM__Thu_0800_EST": {
+    "value": 0.85,
+    "type": "ratio",
+    "context": "-100% hit by Thursday AM | Thu 08:00 EST",
+    "row": 32
+  },
+  "pct_r33_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 33
+  },
+  "pct_r37_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 37
+  },
+  "25_HIT_by_Wed_Close": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "-25% HIT by Wed Close",
+    "row": 37
+  },
+  "pct_r38_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 38
+  },
+  "25_MISS_by_Wed_Close": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "-25% MISS by Wed Close",
+    "row": 38
+  },
+  "pct_r39_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 39
+  },
+  "50_HIT_by_Wed_Close": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "-50% HIT by Wed Close",
+    "row": 39
+  },
+  "pct_r40_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 40
+  },
+  "50_MISS_by_Wed_Close": {
+    "value": 78.6,
+    "type": "percentage",
+    "context": "-50% MISS by Wed Close",
+    "row": 40
+  },
+  "pct_r42_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 42
+  },
+  "pct_r43_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 43
+  },
+  "Behavior_Type__Frequency": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Behavior Type | Frequency",
+    "row": 44
+  },
+  "OneSided_Spike__Immediate_Reversal": {
+    "value": 0.48,
+    "type": "ratio",
+    "context": "One-Sided Spike \u2192 Immediate Reversal",
+    "row": 45
+  },
+  "OneSided_Spike__Immediate_Reversal__048": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "One-Sided Spike \u2192 Immediate Reversal | 0.48",
+    "row": 45
+  },
+  "pct_r46_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 46
+  },
+  "Spike__Pullback__Retest_132": {
+    "value": 0.31,
+    "type": "ratio",
+    "context": "Spike \u2192 Pullback \u2192 Re-test 132%",
+    "row": 46
+  },
+  "Spike__Pullback__Retest_132__031": {
+    "value": 15.0,
+    "type": "percentage",
+    "context": "Spike \u2192 Pullback \u2192 Re-test 132% | 0.31",
+    "row": 46
+  },
+  "Deep_Extension__Gradual_Reversal": {
+    "value": 0.16,
+    "type": "ratio",
+    "context": "Deep Extension \u2192 Gradual Reversal",
+    "row": 47
+  },
+  "Deep_Extension__Gradual_Reversal__016": {
+    "value": 60.0,
+    "type": "percentage",
+    "context": "Deep Extension \u2192 Gradual Reversal | 0.16",
+    "row": 47
+  },
+  "Black_Swan_Event": {
+    "value": 0.05,
+    "type": "ratio",
+    "context": "Black Swan Event",
+    "row": 48
+  },
+  "Black_Swan_Event__005": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "Black Swan Event | 0.05",
+    "row": 48
+  },
+  "pct_r50_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 50
+  },
+  "412_hours__High_volatility_fade": {
+    "value": 78.6,
+    "type": "percentage",
+    "context": "4-12 hours | High volatility fade",
+    "row": 52
+  },
+  "412_hours__High_volatility_fade__786_retrace_from": {
+    "value": 0.92,
+    "type": "ratio",
+    "context": "4-12 hours | High volatility fade | 78.6% retrace from 132% peak",
+    "row": 52
+  },
+  "1224_hours__Consolidation_phase": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "12-24 hours | Consolidation phase",
+    "row": 53
+  },
+  "1224_hours__Consolidation_phase__50_retrace_from_1": {
+    "value": 0.85,
+    "type": "ratio",
+    "context": "12-24 hours | Consolidation phase | 50% retrace from 132% peak",
+    "row": 53
+  },
+  "2436_hours__New_directional_bias": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "24-36 hours | New directional bias",
+    "row": 54
+  },
+  "2436_hours__New_directional_bias__50_extension_fro": {
+    "value": 0.78,
+    "type": "ratio",
+    "context": "24-36 hours | New directional bias | -50% extension from new anchor",
+    "row": 54
+  },
+  "3648_hours__Pattern_completion": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "36-48 hours | Pattern completion",
+    "row": 55
+  },
+  "3648_hours__Pattern_completion__100_extension_poss": {
+    "value": 0.62,
+    "type": "ratio",
+    "context": "36-48 hours | Pattern completion | -100% extension possibility",
+    "row": 55
+  },
+  "pct_r59_c0": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "",
+    "row": 59
+  },
+  "NY_Open_HiLo_BOTH_Taken_Out": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "NY Open Hi/Lo BOTH Taken Out",
+    "row": 61
+  },
+  "NY_Open_HiLo_BOTH_Taken_Out__80": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "NY Open Hi/Lo BOTH Taken Out | 80%",
+    "row": 61
+  },
+  "Occurs_BEFORE_Daily_Target_Hit__Implied": {
+    "value": 78.0,
+    "type": "percentage",
+    "context": "Occurs BEFORE Daily Target Hit | Implied",
+    "row": 62
+  },
+  "Implied__78_of_takeout_events__CONFIRMED": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Implied | 78% of takeout events | CONFIRMED \u2705",
+    "row": 62
+  },
+  "Most_Common_Day_for_Takeout__Not_specified": {
+    "value": 35.0,
+    "type": "percentage",
+    "context": "Most Common Day for Takeout | Not specified",
+    "row": 63
+  },
+  "London_Range__Monday_Range": {
+    "value": 92.0,
+    "type": "percentage",
+    "context": "London Range \u2192 Monday Range",
+    "row": 67
+  },
+  "pct_r68_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 68
+  },
+  "London_Range_Expansion__25_Hit": {
+    "value": 98.22,
+    "type": "percentage",
+    "context": "London Range Expansion \u2192 -25% Hit",
+    "row": 68
+  },
+  "London_Range_Expansion__25_Hit__9822__Direct": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "London Range Expansion \u2192 -25% Hit | 98.22% | Direct",
+    "row": 68
+  },
+  "Daily_High_Formula__AsianLondon_Low__Range__10": {
+    "value": 78.0,
+    "type": "percentage",
+    "context": "Daily High Formula | Asian/London Low + (Range \u00d7 1.0)",
+    "row": 69
+  },
+  "Daily_Low_Formula__AsianLondon_High__Range__10": {
+    "value": 78.0,
+    "type": "percentage",
+    "context": "Daily Low Formula | Asian/London High - (Range \u00d7 1.0)",
+    "row": 70
+  },
+  "Monday_London_Open__02000600": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "Monday London Open | 02:00-06:00",
+    "row": 74
+  },
+  "Monday_London_Open__02000600__Establish_weekly_anc": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "Monday London Open | 02:00-06:00 | Establish weekly anchor (0% and 100%)",
+    "row": 74
+  },
+  "Monday_NY_Open__07000800": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "Monday NY Open | 07:00-08:00",
+    "row": 75
+  },
+  "Monday_NY_Session__08001600": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Monday NY Session | 08:00-16:00",
+    "row": 76
+  },
+  "Monday_NY_Session__08001600__Initial_25_delivery": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Monday NY Session | 08:00-16:00 | Initial -25% delivery",
+    "row": 76
+  },
+  "Tuesday_LondonNY__02001600": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Tuesday London-NY | 02:00-16:00",
+    "row": 77
+  },
+  "Tuesday_LondonNY__02001600__50_delivery_window": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Tuesday London-NY | 02:00-16:00 | -50% delivery window",
+    "row": 77
+  },
+  "Wednesday_Overlap__08001200": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Wednesday Overlap | 08:00-12:00",
+    "row": 78
+  },
+  "Wednesday_Overlap__08001200__Peak_132_violation_wi": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Wednesday Overlap | 08:00-12:00 | Peak 132% violation window",
+    "row": 78
+  },
+  "ThursdayFriday__02001600__Deep_extension_delivery": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Thursday-Friday | 02:00-16:00 | Deep extension delivery",
+    "row": 79
+  },
+  "Alpha_3Leg_Expansion": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Alpha 3-Leg Expansion",
+    "row": 83
+  },
+  "Alpha_3Leg_Expansion__502550__1624_candles_46h": {
+    "value": 0.7829999999999999,
+    "type": "ratio",
+    "context": "Alpha 3-Leg Expansion | 50%\u2192-25%\u2192-50% | 16-24 candles (4-6h)",
+    "row": 83
+  },
+  "502550__1624_candles_46h__07829999999999999": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "50%\u2192-25%\u2192-50% | 16-24 candles (4-6h) | 0.7829999999999999",
+    "row": 83
+  },
+  "ABCD_Bullish": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "AB-CD Bullish",
+    "row": 84
+  },
+  "ABCD_Bullish__50_retrace__25_extension__2028_candl": {
+    "value": 0.84,
+    "type": "ratio",
+    "context": "AB-CD Bullish | 50% retrace \u2192 -25% extension | 20-28 candles (5-7h)",
+    "row": 84
+  },
+  "50_retrace__25_extension__2028_candles_57h__084": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "50% retrace \u2192 -25% extension | 20-28 candles (5-7h) | 0.84",
+    "row": 84
+  },
+  "Consecutive_61888_Microlegs__3_legs_stacking_under": {
+    "value": 0.943,
+    "type": "ratio",
+    "context": "Consecutive 61.8-88 Micro-legs | 3+ legs stacking under WILM | 12-16 candles (3-4h)",
+    "row": 85
+  },
+  "3_legs_stacking_under_WILM__1216_candles_34h__0943": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "3+ legs stacking under WILM | 12-16 candles (3-4h) | 0.943",
+    "row": 85
+  },
+  "WEZ_Formation__ILM__Wick_at_ILM_zone__reversal__81": {
+    "value": 0.6779999999999999,
+    "type": "ratio",
+    "context": "WEZ Formation + ILM | Wick at ILM zone \u2192 reversal | 8-12 candles (2-3h)",
+    "row": 86
+  },
+  "pct_r87_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 87
+  },
+  "132_Spike_Cascade": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "132% Spike Cascade",
+    "row": 87
+  },
+  "132_Spike_Cascade__Rapid_extension_past_132__48_ca": {
+    "value": 0.7153,
+    "type": "ratio",
+    "context": "132% Spike Cascade | Rapid extension past 132% | 4-8 candles (1-2h)",
+    "row": 87
+  },
+  "Rapid_extension_past_132__48_candles_12h__07153": {
+    "value": 78.6,
+    "type": "percentage",
+    "context": "Rapid extension past 132% | 4-8 candles (1-2h) | 0.7153",
+    "row": 87
+  },
+  "pct_r91_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 91
+  },
+  "25_Extension__2432_candles__68h": {
+    "value": 0.9822,
+    "type": "ratio",
+    "context": "-25% Extension | 24-32 candles | 6-8h",
+    "row": 91
+  },
+  "pct_r92_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 92
+  },
+  "50_Extension__4864_candles__1216h": {
+    "value": 0.9643999999999999,
+    "type": "ratio",
+    "context": "-50% Extension | 48-64 candles | 12-16h",
+    "row": 92
+  },
+  "pct_r93_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 93
+  },
+  "100_Extension__8096_candles__2024h": {
+    "value": 0.9217,
+    "type": "ratio",
+    "context": "-100% Extension | 80-96 candles | 20-24h",
+    "row": 93
+  },
+  "pct_r94_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 94
+  },
+  "132_Invalidation__5672_candles__1418h": {
+    "value": 0.7153,
+    "type": "ratio",
+    "context": "132% Invalidation | 56-72 candles | 14-18h",
+    "row": 94
+  },
+  "pct_r95_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 95
+  },
+  "Post132_Rekey_786__1624_candles__46h": {
+    "value": 0.92,
+    "type": "ratio",
+    "context": "Post-132% Rekey (78.6%) | 16-24 candles | 4-6h",
+    "row": 95
+  }
+}

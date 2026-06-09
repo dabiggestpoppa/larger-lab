@@ -1,0 +1,2594 @@
+{
+  "20200106": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-01-06",
+    "row": 2
+  },
+  "20200106__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-01-06 | 132% Invalidation | Pattern Breakdown",
+    "row": 2
+  },
+  "20200113": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-01-13",
+    "row": 3
+  },
+  "20200113__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-01-13 | 132% Invalidation | Pattern Breakdown",
+    "row": 3
+  },
+  "20200120": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-01-20",
+    "row": 4
+  },
+  "20200120__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-01-20 | 132% Invalidation | Pattern Breakdown",
+    "row": 4
+  },
+  "20200127": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-01-27",
+    "row": 5
+  },
+  "20200127__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-01-27 | 132% Invalidation | Pattern Breakdown",
+    "row": 5
+  },
+  "20200210": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-02-10",
+    "row": 6
+  },
+  "20200210__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-02-10 | 132% Invalidation | Pattern Breakdown",
+    "row": 6
+  },
+  "20200217": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-02-17",
+    "row": 7
+  },
+  "20200217__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-02-17 | 132% Invalidation | Pattern Breakdown",
+    "row": 7
+  },
+  "20200302": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-03-02",
+    "row": 8
+  },
+  "20200302__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-03-02 | 132% Invalidation | Pattern Breakdown",
+    "row": 8
+  },
+  "20200316": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-03-16",
+    "row": 9
+  },
+  "20200316__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-03-16 | 132% Invalidation | Pattern Breakdown",
+    "row": 9
+  },
+  "20200323": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "2020-03-23",
+    "row": 12
+  },
+  "20200323__25_Extension__Target_Not_Hit": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "2020-03-23 | -25% Extension | Target Not Hit",
+    "row": 10
+  },
+  "20200323__50_Extension__Target_Not_Hit": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "2020-03-23 | -50% Extension | Target Not Hit",
+    "row": 11
+  },
+  "20200323__618_Rekey_Failure__Rekey_Failed": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "2020-03-23 | 61.8% Rekey Failure | Rekey Failed",
+    "row": 12
+  },
+  "20200330": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-03-30",
+    "row": 13
+  },
+  "20200330__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-03-30 | 132% Invalidation | Pattern Breakdown",
+    "row": 13
+  },
+  "20200406": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-04-06",
+    "row": 14
+  },
+  "20200406__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-04-06 | 132% Invalidation | Pattern Breakdown",
+    "row": 14
+  },
+  "20200413": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-04-13",
+    "row": 15
+  },
+  "20200413__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-04-13 | 132% Invalidation | Pattern Breakdown",
+    "row": 15
+  },
+  "20200420": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-04-20",
+    "row": 16
+  },
+  "20200420__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-04-20 | 132% Invalidation | Pattern Breakdown",
+    "row": 16
+  },
+  "20200504": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-05-04",
+    "row": 17
+  },
+  "20200504__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-05-04 | 132% Invalidation | Pattern Breakdown",
+    "row": 17
+  },
+  "20200511": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-05-11",
+    "row": 18
+  },
+  "20200511__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-05-11 | 132% Invalidation | Pattern Breakdown",
+    "row": 18
+  },
+  "20200518": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-05-18",
+    "row": 19
+  },
+  "20200518__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-05-18 | 132% Invalidation | Pattern Breakdown",
+    "row": 19
+  },
+  "20200525": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-05-25",
+    "row": 20
+  },
+  "20200525__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-05-25 | 132% Invalidation | Pattern Breakdown",
+    "row": 20
+  },
+  "20200608": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-06-08",
+    "row": 21
+  },
+  "20200608__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-06-08 | 132% Invalidation | Pattern Breakdown",
+    "row": 21
+  },
+  "20200615": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-06-15",
+    "row": 22
+  },
+  "20200615__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-06-15 | 132% Invalidation | Pattern Breakdown",
+    "row": 22
+  },
+  "20200622": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-06-22",
+    "row": 23
+  },
+  "20200622__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-06-22 | 132% Invalidation | Pattern Breakdown",
+    "row": 23
+  },
+  "20200629": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-06-29",
+    "row": 24
+  },
+  "20200629__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-06-29 | 132% Invalidation | Pattern Breakdown",
+    "row": 24
+  },
+  "20200706": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-07-06",
+    "row": 25
+  },
+  "20200706__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-07-06 | 132% Invalidation | Pattern Breakdown",
+    "row": 25
+  },
+  "20200713": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-07-13",
+    "row": 26
+  },
+  "20200713__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-07-13 | 132% Invalidation | Pattern Breakdown",
+    "row": 26
+  },
+  "20200727": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-07-27",
+    "row": 27
+  },
+  "20200727__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-07-27 | 132% Invalidation | Pattern Breakdown",
+    "row": 27
+  },
+  "20200803": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "2020-08-03",
+    "row": 30
+  },
+  "20200803__25_Extension__Target_Not_Hit": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "2020-08-03 | -25% Extension | Target Not Hit",
+    "row": 28
+  },
+  "20200803__50_Extension__Target_Not_Hit": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "2020-08-03 | -50% Extension | Target Not Hit",
+    "row": 29
+  },
+  "20200803__618_Rekey_Failure__Rekey_Failed": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "2020-08-03 | 61.8% Rekey Failure | Rekey Failed",
+    "row": 30
+  },
+  "20200810": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "2020-08-10",
+    "row": 33
+  },
+  "20200810__25_Extension__Target_Not_Hit": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "2020-08-10 | -25% Extension | Target Not Hit",
+    "row": 31
+  },
+  "20200810__50_Extension__Target_Not_Hit": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "2020-08-10 | -50% Extension | Target Not Hit",
+    "row": 32
+  },
+  "20200810__618_Rekey_Failure__Rekey_Failed": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "2020-08-10 | 61.8% Rekey Failure | Rekey Failed",
+    "row": 33
+  },
+  "20200817": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-08-17",
+    "row": 34
+  },
+  "20200817__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-08-17 | 132% Invalidation | Pattern Breakdown",
+    "row": 34
+  },
+  "20200831": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-08-31",
+    "row": 35
+  },
+  "20200831__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-08-31 | 132% Invalidation | Pattern Breakdown",
+    "row": 35
+  },
+  "20200907": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-09-07",
+    "row": 36
+  },
+  "20200907__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-09-07 | 132% Invalidation | Pattern Breakdown",
+    "row": 36
+  },
+  "20200914": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-09-14",
+    "row": 37
+  },
+  "20200914__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-09-14 | 132% Invalidation | Pattern Breakdown",
+    "row": 37
+  },
+  "20200921": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "2020-09-21",
+    "row": 38
+  },
+  "20200921__50_Extension__Target_Not_Hit": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "2020-09-21 | -50% Extension | Target Not Hit",
+    "row": 38
+  },
+  "20201005": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-10-05",
+    "row": 39
+  },
+  "20201005__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-10-05 | 132% Invalidation | Pattern Breakdown",
+    "row": 39
+  },
+  "20201012": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-10-12",
+    "row": 40
+  },
+  "20201012__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-10-12 | 132% Invalidation | Pattern Breakdown",
+    "row": 40
+  },
+  "20201026": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-10-26",
+    "row": 41
+  },
+  "20201026__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-10-26 | 132% Invalidation | Pattern Breakdown",
+    "row": 41
+  },
+  "20201102": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-11-02",
+    "row": 42
+  },
+  "20201102__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-11-02 | 132% Invalidation | Pattern Breakdown",
+    "row": 42
+  },
+  "20201109": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-11-09",
+    "row": 43
+  },
+  "20201109__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-11-09 | 132% Invalidation | Pattern Breakdown",
+    "row": 43
+  },
+  "20201123": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-11-23",
+    "row": 44
+  },
+  "20201123__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-11-23 | 132% Invalidation | Pattern Breakdown",
+    "row": 44
+  },
+  "20201130": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-11-30",
+    "row": 45
+  },
+  "20201130__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-11-30 | 132% Invalidation | Pattern Breakdown",
+    "row": 45
+  },
+  "20201207": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-12-07",
+    "row": 46
+  },
+  "20201207__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-12-07 | 132% Invalidation | Pattern Breakdown",
+    "row": 46
+  },
+  "20201221": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-12-21",
+    "row": 47
+  },
+  "20201221__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-12-21 | 132% Invalidation | Pattern Breakdown",
+    "row": 47
+  },
+  "20201228": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-12-28",
+    "row": 48
+  },
+  "20201228__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2020-12-28 | 132% Invalidation | Pattern Breakdown",
+    "row": 48
+  },
+  "20210104": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-01-04",
+    "row": 49
+  },
+  "20210104__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-01-04 | 132% Invalidation | Pattern Breakdown",
+    "row": 49
+  },
+  "20210111": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-01-11",
+    "row": 50
+  },
+  "20210111__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-01-11 | 132% Invalidation | Pattern Breakdown",
+    "row": 50
+  },
+  "20210118": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-01-18",
+    "row": 51
+  },
+  "20210118__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-01-18 | 132% Invalidation | Pattern Breakdown",
+    "row": 51
+  },
+  "20210125": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-01-25",
+    "row": 52
+  },
+  "20210125__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-01-25 | 132% Invalidation | Pattern Breakdown",
+    "row": 52
+  },
+  "20210215": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "2021-02-15",
+    "row": 53
+  },
+  "20210215__50_Extension__Target_Not_Hit": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "2021-02-15 | -50% Extension | Target Not Hit",
+    "row": 53
+  },
+  "20210222": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-02-22",
+    "row": 54
+  },
+  "20210222__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-02-22 | 132% Invalidation | Pattern Breakdown",
+    "row": 54
+  },
+  "20210301": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-03-01",
+    "row": 55
+  },
+  "20210301__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-03-01 | 132% Invalidation | Pattern Breakdown",
+    "row": 55
+  },
+  "20210308": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-03-08",
+    "row": 56
+  },
+  "20210308__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-03-08 | 132% Invalidation | Pattern Breakdown",
+    "row": 56
+  },
+  "20210315": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-03-15",
+    "row": 57
+  },
+  "20210315__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-03-15 | 132% Invalidation | Pattern Breakdown",
+    "row": 57
+  },
+  "20210322": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-03-22",
+    "row": 58
+  },
+  "20210322__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-03-22 | 132% Invalidation | Pattern Breakdown",
+    "row": 58
+  },
+  "20210329": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-03-29",
+    "row": 59
+  },
+  "20210329__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-03-29 | 132% Invalidation | Pattern Breakdown",
+    "row": 59
+  },
+  "20210405": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-04-05",
+    "row": 60
+  },
+  "20210405__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-04-05 | 132% Invalidation | Pattern Breakdown",
+    "row": 60
+  },
+  "20210419": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-04-19",
+    "row": 61
+  },
+  "20210419__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-04-19 | 132% Invalidation | Pattern Breakdown",
+    "row": 61
+  },
+  "20210426": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-04-26",
+    "row": 62
+  },
+  "20210426__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-04-26 | 132% Invalidation | Pattern Breakdown",
+    "row": 62
+  },
+  "20210503": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-05-03",
+    "row": 63
+  },
+  "20210503__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-05-03 | 132% Invalidation | Pattern Breakdown",
+    "row": 63
+  },
+  "20210510": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-05-10",
+    "row": 64
+  },
+  "20210510__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-05-10 | 132% Invalidation | Pattern Breakdown",
+    "row": 64
+  },
+  "20210524": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-05-24",
+    "row": 65
+  },
+  "20210524__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-05-24 | 132% Invalidation | Pattern Breakdown",
+    "row": 65
+  },
+  "20210607": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-06-07",
+    "row": 66
+  },
+  "20210607__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-06-07 | 132% Invalidation | Pattern Breakdown",
+    "row": 66
+  },
+  "20210614": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-06-14",
+    "row": 67
+  },
+  "20210614__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-06-14 | 132% Invalidation | Pattern Breakdown",
+    "row": 67
+  },
+  "20210621": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-06-21",
+    "row": 68
+  },
+  "20210621__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-06-21 | 132% Invalidation | Pattern Breakdown",
+    "row": 68
+  },
+  "20210628": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-06-28",
+    "row": 69
+  },
+  "20210628__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-06-28 | 132% Invalidation | Pattern Breakdown",
+    "row": 69
+  },
+  "20210705": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-07-05",
+    "row": 70
+  },
+  "20210705__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-07-05 | 132% Invalidation | Pattern Breakdown",
+    "row": 70
+  },
+  "20210712": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-07-12",
+    "row": 71
+  },
+  "20210712__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-07-12 | 132% Invalidation | Pattern Breakdown",
+    "row": 71
+  },
+  "20210719": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-07-19",
+    "row": 72
+  },
+  "20210719__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-07-19 | 132% Invalidation | Pattern Breakdown",
+    "row": 72
+  },
+  "20210726": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-07-26",
+    "row": 73
+  },
+  "20210726__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-07-26 | 132% Invalidation | Pattern Breakdown",
+    "row": 73
+  },
+  "20210802": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-08-02",
+    "row": 74
+  },
+  "20210802__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-08-02 | 132% Invalidation | Pattern Breakdown",
+    "row": 74
+  },
+  "20210809": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-08-09",
+    "row": 75
+  },
+  "20210809__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-08-09 | 132% Invalidation | Pattern Breakdown",
+    "row": 75
+  },
+  "20210816": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-08-16",
+    "row": 76
+  },
+  "20210816__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-08-16 | 132% Invalidation | Pattern Breakdown",
+    "row": 76
+  },
+  "20210823": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-08-23",
+    "row": 77
+  },
+  "20210823__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-08-23 | 132% Invalidation | Pattern Breakdown",
+    "row": 77
+  },
+  "20210830": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-08-30",
+    "row": 78
+  },
+  "20210830__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-08-30 | 132% Invalidation | Pattern Breakdown",
+    "row": 78
+  },
+  "20210906": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-09-06",
+    "row": 79
+  },
+  "20210906__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-09-06 | 132% Invalidation | Pattern Breakdown",
+    "row": 79
+  },
+  "20210913": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-09-13",
+    "row": 80
+  },
+  "20210913__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-09-13 | 132% Invalidation | Pattern Breakdown",
+    "row": 80
+  },
+  "20210920": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-09-20",
+    "row": 81
+  },
+  "20210920__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-09-20 | 132% Invalidation | Pattern Breakdown",
+    "row": 81
+  },
+  "20210927": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-09-27",
+    "row": 82
+  },
+  "20210927__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-09-27 | 132% Invalidation | Pattern Breakdown",
+    "row": 82
+  },
+  "20211018": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-10-18",
+    "row": 83
+  },
+  "20211018__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-10-18 | 132% Invalidation | Pattern Breakdown",
+    "row": 83
+  },
+  "20211025": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-10-25",
+    "row": 84
+  },
+  "20211025__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-10-25 | 132% Invalidation | Pattern Breakdown",
+    "row": 84
+  },
+  "20211101": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-11-01",
+    "row": 85
+  },
+  "20211101__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-11-01 | 132% Invalidation | Pattern Breakdown",
+    "row": 85
+  },
+  "20211115": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-11-15",
+    "row": 86
+  },
+  "20211115__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-11-15 | 132% Invalidation | Pattern Breakdown",
+    "row": 86
+  },
+  "20211122": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-11-22",
+    "row": 87
+  },
+  "20211122__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-11-22 | 132% Invalidation | Pattern Breakdown",
+    "row": 87
+  },
+  "20211206": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-12-06",
+    "row": 88
+  },
+  "20211206__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-12-06 | 132% Invalidation | Pattern Breakdown",
+    "row": 88
+  },
+  "20211213": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-12-13",
+    "row": 89
+  },
+  "20211213__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-12-13 | 132% Invalidation | Pattern Breakdown",
+    "row": 89
+  },
+  "20211220": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-12-20",
+    "row": 90
+  },
+  "20211220__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2021-12-20 | 132% Invalidation | Pattern Breakdown",
+    "row": 90
+  },
+  "20220103": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-01-03",
+    "row": 91
+  },
+  "20220103__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-01-03 | 132% Invalidation | Pattern Breakdown",
+    "row": 91
+  },
+  "20220110": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-01-10",
+    "row": 92
+  },
+  "20220110__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-01-10 | 132% Invalidation | Pattern Breakdown",
+    "row": 92
+  },
+  "20220124": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-01-24",
+    "row": 93
+  },
+  "20220124__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-01-24 | 132% Invalidation | Pattern Breakdown",
+    "row": 93
+  },
+  "20220207": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-02-07",
+    "row": 94
+  },
+  "20220207__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-02-07 | 132% Invalidation | Pattern Breakdown",
+    "row": 94
+  },
+  "20220214": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-02-14",
+    "row": 95
+  },
+  "20220214__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-02-14 | 132% Invalidation | Pattern Breakdown",
+    "row": 95
+  },
+  "20220221": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-02-21",
+    "row": 96
+  },
+  "20220221__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-02-21 | 132% Invalidation | Pattern Breakdown",
+    "row": 96
+  },
+  "20220228": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-02-28",
+    "row": 97
+  },
+  "20220228__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-02-28 | 132% Invalidation | Pattern Breakdown",
+    "row": 97
+  },
+  "20220307": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-03-07",
+    "row": 98
+  },
+  "20220307__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-03-07 | 132% Invalidation | Pattern Breakdown",
+    "row": 98
+  },
+  "20220328": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-03-28",
+    "row": 99
+  },
+  "20220328__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-03-28 | 132% Invalidation | Pattern Breakdown",
+    "row": 99
+  },
+  "20220404": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-04-04",
+    "row": 100
+  },
+  "20220404__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-04-04 | 132% Invalidation | Pattern Breakdown",
+    "row": 100
+  },
+  "20220411": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-04-11",
+    "row": 101
+  },
+  "20220411__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-04-11 | 132% Invalidation | Pattern Breakdown",
+    "row": 101
+  },
+  "20220418": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-04-18",
+    "row": 102
+  },
+  "20220418__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-04-18 | 132% Invalidation | Pattern Breakdown",
+    "row": 102
+  },
+  "20220425": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-04-25",
+    "row": 103
+  },
+  "20220425__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-04-25 | 132% Invalidation | Pattern Breakdown",
+    "row": 103
+  },
+  "20220502": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-05-02",
+    "row": 104
+  },
+  "20220502__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-05-02 | 132% Invalidation | Pattern Breakdown",
+    "row": 104
+  },
+  "20220516": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-05-16",
+    "row": 105
+  },
+  "20220516__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-05-16 | 132% Invalidation | Pattern Breakdown",
+    "row": 105
+  },
+  "20220523": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-05-23",
+    "row": 106
+  },
+  "20220523__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-05-23 | 132% Invalidation | Pattern Breakdown",
+    "row": 106
+  },
+  "20220530": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-05-30",
+    "row": 107
+  },
+  "20220530__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-05-30 | 132% Invalidation | Pattern Breakdown",
+    "row": 107
+  },
+  "20220606": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-06-06",
+    "row": 108
+  },
+  "20220606__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-06-06 | 132% Invalidation | Pattern Breakdown",
+    "row": 108
+  },
+  "20220613": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-06-13",
+    "row": 109
+  },
+  "20220613__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-06-13 | 132% Invalidation | Pattern Breakdown",
+    "row": 109
+  },
+  "20220627": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-06-27",
+    "row": 110
+  },
+  "20220627__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-06-27 | 132% Invalidation | Pattern Breakdown",
+    "row": 110
+  },
+  "20220711": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-07-11",
+    "row": 111
+  },
+  "20220711__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-07-11 | 132% Invalidation | Pattern Breakdown",
+    "row": 111
+  },
+  "20220801": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-08-01",
+    "row": 112
+  },
+  "20220801__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-08-01 | 132% Invalidation | Pattern Breakdown",
+    "row": 112
+  },
+  "20220808": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-08-08",
+    "row": 113
+  },
+  "20220808__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-08-08 | 132% Invalidation | Pattern Breakdown",
+    "row": 113
+  },
+  "20220822": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-08-22",
+    "row": 114
+  },
+  "20220822__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-08-22 | 132% Invalidation | Pattern Breakdown",
+    "row": 114
+  },
+  "20220912": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-09-12",
+    "row": 115
+  },
+  "20220912__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-09-12 | 132% Invalidation | Pattern Breakdown",
+    "row": 115
+  },
+  "20220919": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "2022-09-19",
+    "row": 118
+  },
+  "20220919__25_Extension__Target_Not_Hit": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "2022-09-19 | -25% Extension | Target Not Hit",
+    "row": 116
+  },
+  "20220919__50_Extension__Target_Not_Hit": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "2022-09-19 | -50% Extension | Target Not Hit",
+    "row": 117
+  },
+  "20220919__618_Rekey_Failure__Rekey_Failed": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "2022-09-19 | 61.8% Rekey Failure | Rekey Failed",
+    "row": 118
+  },
+  "20220926": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-09-26",
+    "row": 119
+  },
+  "20220926__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-09-26 | 132% Invalidation | Pattern Breakdown",
+    "row": 119
+  },
+  "20221017": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-10-17",
+    "row": 120
+  },
+  "20221017__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-10-17 | 132% Invalidation | Pattern Breakdown",
+    "row": 120
+  },
+  "20221024": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-10-24",
+    "row": 121
+  },
+  "20221024__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-10-24 | 132% Invalidation | Pattern Breakdown",
+    "row": 121
+  },
+  "20221031": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-10-31",
+    "row": 122
+  },
+  "20221031__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-10-31 | 132% Invalidation | Pattern Breakdown",
+    "row": 122
+  },
+  "20221107": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-11-07",
+    "row": 123
+  },
+  "20221107__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-11-07 | 132% Invalidation | Pattern Breakdown",
+    "row": 123
+  },
+  "20221114": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "2022-11-14",
+    "row": 124
+  },
+  "20221114__50_Extension__Target_Not_Hit": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "2022-11-14 | -50% Extension | Target Not Hit",
+    "row": 124
+  },
+  "20221121": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-11-21",
+    "row": 125
+  },
+  "20221121__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-11-21 | 132% Invalidation | Pattern Breakdown",
+    "row": 125
+  },
+  "20221128": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "2022-11-28",
+    "row": 126
+  },
+  "20221128__50_Extension__Target_Not_Hit": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "2022-11-28 | -50% Extension | Target Not Hit",
+    "row": 126
+  },
+  "20221205": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-12-05",
+    "row": 127
+  },
+  "20221205__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-12-05 | 132% Invalidation | Pattern Breakdown",
+    "row": 127
+  },
+  "20221226": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-12-26",
+    "row": 128
+  },
+  "20221226__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2022-12-26 | 132% Invalidation | Pattern Breakdown",
+    "row": 128
+  },
+  "20230116": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-01-16",
+    "row": 129
+  },
+  "20230116__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-01-16 | 132% Invalidation | Pattern Breakdown",
+    "row": 129
+  },
+  "20230130": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-01-30",
+    "row": 130
+  },
+  "20230130__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-01-30 | 132% Invalidation | Pattern Breakdown",
+    "row": 130
+  },
+  "20230206": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-02-06",
+    "row": 131
+  },
+  "20230206__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-02-06 | 132% Invalidation | Pattern Breakdown",
+    "row": 131
+  },
+  "20230213": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-02-13",
+    "row": 132
+  },
+  "20230213__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-02-13 | 132% Invalidation | Pattern Breakdown",
+    "row": 132
+  },
+  "20230227": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-02-27",
+    "row": 133
+  },
+  "20230227__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-02-27 | 132% Invalidation | Pattern Breakdown",
+    "row": 133
+  },
+  "20230306": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-03-06",
+    "row": 134
+  },
+  "20230306__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-03-06 | 132% Invalidation | Pattern Breakdown",
+    "row": 134
+  },
+  "20230313": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-03-13",
+    "row": 135
+  },
+  "20230313__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-03-13 | 132% Invalidation | Pattern Breakdown",
+    "row": 135
+  },
+  "20230320": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-03-20",
+    "row": 136
+  },
+  "20230320__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-03-20 | 132% Invalidation | Pattern Breakdown",
+    "row": 136
+  },
+  "20230327": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-03-27",
+    "row": 137
+  },
+  "20230327__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-03-27 | 132% Invalidation | Pattern Breakdown",
+    "row": 137
+  },
+  "20230410": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-04-10",
+    "row": 138
+  },
+  "20230410__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-04-10 | 132% Invalidation | Pattern Breakdown",
+    "row": 138
+  },
+  "20230417": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-04-17",
+    "row": 139
+  },
+  "20230417__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-04-17 | 132% Invalidation | Pattern Breakdown",
+    "row": 139
+  },
+  "20230424": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-04-24",
+    "row": 140
+  },
+  "20230424__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-04-24 | 132% Invalidation | Pattern Breakdown",
+    "row": 140
+  },
+  "20230501": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-05-01",
+    "row": 141
+  },
+  "20230501__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-05-01 | 132% Invalidation | Pattern Breakdown",
+    "row": 141
+  },
+  "20230508": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-05-08",
+    "row": 142
+  },
+  "20230508__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-05-08 | 132% Invalidation | Pattern Breakdown",
+    "row": 142
+  },
+  "20230515": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-05-15",
+    "row": 143
+  },
+  "20230515__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-05-15 | 132% Invalidation | Pattern Breakdown",
+    "row": 143
+  },
+  "20230522": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-05-22",
+    "row": 144
+  },
+  "20230522__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-05-22 | 132% Invalidation | Pattern Breakdown",
+    "row": 144
+  },
+  "20230529": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-05-29",
+    "row": 145
+  },
+  "20230529__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-05-29 | 132% Invalidation | Pattern Breakdown",
+    "row": 145
+  },
+  "20230612": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "2023-06-12",
+    "row": 146
+  },
+  "20230612__50_Extension__Target_Not_Hit": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "2023-06-12 | -50% Extension | Target Not Hit",
+    "row": 146
+  },
+  "20230619": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-06-19",
+    "row": 147
+  },
+  "20230619__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-06-19 | 132% Invalidation | Pattern Breakdown",
+    "row": 147
+  },
+  "20230626": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-06-26",
+    "row": 148
+  },
+  "20230626__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-06-26 | 132% Invalidation | Pattern Breakdown",
+    "row": 148
+  },
+  "20230703": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-07-03",
+    "row": 149
+  },
+  "20230703__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-07-03 | 132% Invalidation | Pattern Breakdown",
+    "row": 149
+  },
+  "20230710": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-07-10",
+    "row": 150
+  },
+  "20230710__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-07-10 | 132% Invalidation | Pattern Breakdown",
+    "row": 150
+  },
+  "20230807": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-08-07",
+    "row": 151
+  },
+  "20230807__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-08-07 | 132% Invalidation | Pattern Breakdown",
+    "row": 151
+  },
+  "20230814": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-08-14",
+    "row": 152
+  },
+  "20230814__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-08-14 | 132% Invalidation | Pattern Breakdown",
+    "row": 152
+  },
+  "20230821": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-08-21",
+    "row": 153
+  },
+  "20230821__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-08-21 | 132% Invalidation | Pattern Breakdown",
+    "row": 153
+  },
+  "20230911": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-09-11",
+    "row": 154
+  },
+  "20230911__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-09-11 | 132% Invalidation | Pattern Breakdown",
+    "row": 154
+  },
+  "20230918": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-09-18",
+    "row": 155
+  },
+  "20230918__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-09-18 | 132% Invalidation | Pattern Breakdown",
+    "row": 155
+  },
+  "20231002": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-10-02",
+    "row": 156
+  },
+  "20231002__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-10-02 | 132% Invalidation | Pattern Breakdown",
+    "row": 156
+  },
+  "20231023": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-10-23",
+    "row": 157
+  },
+  "20231023__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-10-23 | 132% Invalidation | Pattern Breakdown",
+    "row": 157
+  },
+  "20231030": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-10-30",
+    "row": 158
+  },
+  "20231030__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-10-30 | 132% Invalidation | Pattern Breakdown",
+    "row": 158
+  },
+  "20231113": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-11-13",
+    "row": 159
+  },
+  "20231113__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-11-13 | 132% Invalidation | Pattern Breakdown",
+    "row": 159
+  },
+  "20231120": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-11-20",
+    "row": 160
+  },
+  "20231120__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-11-20 | 132% Invalidation | Pattern Breakdown",
+    "row": 160
+  },
+  "20231127": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-11-27",
+    "row": 161
+  },
+  "20231127__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-11-27 | 132% Invalidation | Pattern Breakdown",
+    "row": 161
+  },
+  "20231204": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-12-04",
+    "row": 162
+  },
+  "20231204__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-12-04 | 132% Invalidation | Pattern Breakdown",
+    "row": 162
+  },
+  "20231218": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-12-18",
+    "row": 163
+  },
+  "20231218__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-12-18 | 132% Invalidation | Pattern Breakdown",
+    "row": 163
+  },
+  "20231225": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-12-25",
+    "row": 164
+  },
+  "20231225__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2023-12-25 | 132% Invalidation | Pattern Breakdown",
+    "row": 164
+  },
+  "20240101": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-01-01",
+    "row": 165
+  },
+  "20240101__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-01-01 | 132% Invalidation | Pattern Breakdown",
+    "row": 165
+  },
+  "20240108": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-01-08",
+    "row": 166
+  },
+  "20240108__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-01-08 | 132% Invalidation | Pattern Breakdown",
+    "row": 166
+  },
+  "20240115": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-01-15",
+    "row": 167
+  },
+  "20240115__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-01-15 | 132% Invalidation | Pattern Breakdown",
+    "row": 167
+  },
+  "20240129": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-01-29",
+    "row": 168
+  },
+  "20240129__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-01-29 | 132% Invalidation | Pattern Breakdown",
+    "row": 168
+  },
+  "20240205": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-02-05",
+    "row": 169
+  },
+  "20240205__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-02-05 | 132% Invalidation | Pattern Breakdown",
+    "row": 169
+  },
+  "20240212": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-02-12",
+    "row": 170
+  },
+  "20240212__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-02-12 | 132% Invalidation | Pattern Breakdown",
+    "row": 170
+  },
+  "20240219": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-02-19",
+    "row": 171
+  },
+  "20240219__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-02-19 | 132% Invalidation | Pattern Breakdown",
+    "row": 171
+  },
+  "20240226": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-02-26",
+    "row": 172
+  },
+  "20240226__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-02-26 | 132% Invalidation | Pattern Breakdown",
+    "row": 172
+  },
+  "20240311": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-03-11",
+    "row": 173
+  },
+  "20240311__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-03-11 | 132% Invalidation | Pattern Breakdown",
+    "row": 173
+  },
+  "20240318": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-03-18",
+    "row": 174
+  },
+  "20240318__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-03-18 | 132% Invalidation | Pattern Breakdown",
+    "row": 174
+  },
+  "20240325": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-03-25",
+    "row": 175
+  },
+  "20240325__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-03-25 | 132% Invalidation | Pattern Breakdown",
+    "row": 175
+  },
+  "20240408": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-04-08",
+    "row": 176
+  },
+  "20240408__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-04-08 | 132% Invalidation | Pattern Breakdown",
+    "row": 176
+  },
+  "20240422": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-04-22",
+    "row": 177
+  },
+  "20240422__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-04-22 | 132% Invalidation | Pattern Breakdown",
+    "row": 177
+  },
+  "20240429": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-04-29",
+    "row": 178
+  },
+  "20240429__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-04-29 | 132% Invalidation | Pattern Breakdown",
+    "row": 178
+  },
+  "20240506": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-05-06",
+    "row": 179
+  },
+  "20240506__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-05-06 | 132% Invalidation | Pattern Breakdown",
+    "row": 179
+  },
+  "20240513": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-05-13",
+    "row": 180
+  },
+  "20240513__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-05-13 | 132% Invalidation | Pattern Breakdown",
+    "row": 180
+  },
+  "20240527": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-05-27",
+    "row": 181
+  },
+  "20240527__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-05-27 | 132% Invalidation | Pattern Breakdown",
+    "row": 181
+  },
+  "20240603": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-06-03",
+    "row": 182
+  },
+  "20240603__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-06-03 | 132% Invalidation | Pattern Breakdown",
+    "row": 182
+  },
+  "20240610": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-06-10",
+    "row": 183
+  },
+  "20240610__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-06-10 | 132% Invalidation | Pattern Breakdown",
+    "row": 183
+  },
+  "20240617": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-06-17",
+    "row": 184
+  },
+  "20240617__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-06-17 | 132% Invalidation | Pattern Breakdown",
+    "row": 184
+  },
+  "20240624": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-06-24",
+    "row": 185
+  },
+  "20240624__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-06-24 | 132% Invalidation | Pattern Breakdown",
+    "row": 185
+  },
+  "20240701": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-07-01",
+    "row": 186
+  },
+  "20240701__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-07-01 | 132% Invalidation | Pattern Breakdown",
+    "row": 186
+  },
+  "20240708": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-07-08",
+    "row": 187
+  },
+  "20240708__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-07-08 | 132% Invalidation | Pattern Breakdown",
+    "row": 187
+  },
+  "20240715": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-07-15",
+    "row": 188
+  },
+  "20240715__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-07-15 | 132% Invalidation | Pattern Breakdown",
+    "row": 188
+  },
+  "20240722": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-07-22",
+    "row": 189
+  },
+  "20240722__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-07-22 | 132% Invalidation | Pattern Breakdown",
+    "row": 189
+  },
+  "20240729": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-07-29",
+    "row": 190
+  },
+  "20240729__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-07-29 | 132% Invalidation | Pattern Breakdown",
+    "row": 190
+  },
+  "20240805": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-08-05",
+    "row": 191
+  },
+  "20240805__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-08-05 | 132% Invalidation | Pattern Breakdown",
+    "row": 191
+  },
+  "20240812": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-08-12",
+    "row": 192
+  },
+  "20240812__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-08-12 | 132% Invalidation | Pattern Breakdown",
+    "row": 192
+  },
+  "20240819": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-08-19",
+    "row": 193
+  },
+  "20240819__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-08-19 | 132% Invalidation | Pattern Breakdown",
+    "row": 193
+  },
+  "20240826": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-08-26",
+    "row": 194
+  },
+  "20240826__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-08-26 | 132% Invalidation | Pattern Breakdown",
+    "row": 194
+  },
+  "20240902": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-09-02",
+    "row": 195
+  },
+  "20240902__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-09-02 | 132% Invalidation | Pattern Breakdown",
+    "row": 195
+  },
+  "20240909": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-09-09",
+    "row": 196
+  },
+  "20240909__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-09-09 | 132% Invalidation | Pattern Breakdown",
+    "row": 196
+  },
+  "20240916": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-09-16",
+    "row": 197
+  },
+  "20240916__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-09-16 | 132% Invalidation | Pattern Breakdown",
+    "row": 197
+  },
+  "20240923": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-09-23",
+    "row": 198
+  },
+  "20240923__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-09-23 | 132% Invalidation | Pattern Breakdown",
+    "row": 198
+  },
+  "20241028": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-10-28",
+    "row": 199
+  },
+  "20241028__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-10-28 | 132% Invalidation | Pattern Breakdown",
+    "row": 199
+  },
+  "20241104": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-11-04",
+    "row": 200
+  },
+  "20241104__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-11-04 | 132% Invalidation | Pattern Breakdown",
+    "row": 200
+  },
+  "20241118": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-11-18",
+    "row": 201
+  },
+  "20241118__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-11-18 | 132% Invalidation | Pattern Breakdown",
+    "row": 201
+  },
+  "20241202": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-12-02",
+    "row": 202
+  },
+  "20241202__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-12-02 | 132% Invalidation | Pattern Breakdown",
+    "row": 202
+  },
+  "20241216": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-12-16",
+    "row": 203
+  },
+  "20241216__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-12-16 | 132% Invalidation | Pattern Breakdown",
+    "row": 203
+  },
+  "20241230": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-12-30",
+    "row": 204
+  },
+  "20241230__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2024-12-30 | 132% Invalidation | Pattern Breakdown",
+    "row": 204
+  },
+  "20250113": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-01-13",
+    "row": 205
+  },
+  "20250113__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-01-13 | 132% Invalidation | Pattern Breakdown",
+    "row": 205
+  },
+  "20250120": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-01-20",
+    "row": 206
+  },
+  "20250120__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-01-20 | 132% Invalidation | Pattern Breakdown",
+    "row": 206
+  },
+  "20250127": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-01-27",
+    "row": 207
+  },
+  "20250127__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-01-27 | 132% Invalidation | Pattern Breakdown",
+    "row": 207
+  },
+  "20250203": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-02-03",
+    "row": 208
+  },
+  "20250203__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-02-03 | 132% Invalidation | Pattern Breakdown",
+    "row": 208
+  },
+  "20250210": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-02-10",
+    "row": 209
+  },
+  "20250210__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-02-10 | 132% Invalidation | Pattern Breakdown",
+    "row": 209
+  },
+  "20250217": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-02-17",
+    "row": 210
+  },
+  "20250217__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-02-17 | 132% Invalidation | Pattern Breakdown",
+    "row": 210
+  },
+  "20250224": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-02-24",
+    "row": 211
+  },
+  "20250224__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-02-24 | 132% Invalidation | Pattern Breakdown",
+    "row": 211
+  },
+  "20250303": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-03-03",
+    "row": 212
+  },
+  "20250303__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-03-03 | 132% Invalidation | Pattern Breakdown",
+    "row": 212
+  },
+  "20250317": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-03-17",
+    "row": 213
+  },
+  "20250317__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-03-17 | 132% Invalidation | Pattern Breakdown",
+    "row": 213
+  },
+  "20250324": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-03-24",
+    "row": 214
+  },
+  "20250324__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-03-24 | 132% Invalidation | Pattern Breakdown",
+    "row": 214
+  },
+  "20250331": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-03-31",
+    "row": 215
+  },
+  "20250331__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-03-31 | 132% Invalidation | Pattern Breakdown",
+    "row": 215
+  },
+  "20250414": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-04-14",
+    "row": 216
+  },
+  "20250414__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-04-14 | 132% Invalidation | Pattern Breakdown",
+    "row": 216
+  },
+  "20250428": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-04-28",
+    "row": 217
+  },
+  "20250428__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-04-28 | 132% Invalidation | Pattern Breakdown",
+    "row": 217
+  },
+  "20250505": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-05-05",
+    "row": 218
+  },
+  "20250505__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-05-05 | 132% Invalidation | Pattern Breakdown",
+    "row": 218
+  },
+  "20250512": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-05-12",
+    "row": 219
+  },
+  "20250512__132_Invalidation__Pattern_Breakdown": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "2025-05-12 | 132% Invalidation | Pattern Breakdown",
+    "row": 219
+  },
+  "20250519": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "2025-05-19",
+    "row": 222
+  },
+  "20250519__25_Extension__Target_Not_Hit": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "2025-05-19 | -25% Extension | Target Not Hit",
+    "row": 220
+  },
+  "20250519__50_Extension__Target_Not_Hit": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "2025-05-19 | -50% Extension | Target Not Hit",
+    "row": 221
+  },
+  "20250519__618_Rekey_Failure__Rekey_Failed": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "2025-05-19 | 61.8% Rekey Failure | Rekey Failed",
+    "row": 222
+  }
+}

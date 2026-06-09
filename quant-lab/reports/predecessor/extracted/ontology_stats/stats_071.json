@@ -1,0 +1,194 @@
+{
+  "Time_Window_EST": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Time Window EST",
+    "row": 3
+  },
+  "Time_Window_EST__25_Rate": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Time Window EST | -25% Rate",
+    "row": 3
+  },
+  "Time_Window_EST__25_Rate__50_Rate": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Time Window EST | -25% Rate | -50% Rate",
+    "row": 3
+  },
+  "25_Rate__50_Rate__100_Rate": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "-25% Rate | -50% Rate | -100% Rate",
+    "row": 3
+  },
+  "50_Rate__100_Rate__168_Rate": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "-50% Rate | -100% Rate | -168% Rate",
+    "row": 3
+  },
+  "26_AM_EST": {
+    "value": 0.924,
+    "type": "ratio",
+    "context": "2-6 AM EST",
+    "row": 4
+  },
+  "26_AM_EST__0924": {
+    "value": 0.886,
+    "type": "ratio",
+    "context": "2-6 AM EST | 0.924",
+    "row": 4
+  },
+  "26_AM_EST__0924__0886": {
+    "value": 0.878,
+    "type": "ratio",
+    "context": "2-6 AM EST | 0.924 | 0.886",
+    "row": 4
+  },
+  "0924__0886__0878": {
+    "value": 0.423,
+    "type": "ratio",
+    "context": "0.924 | 0.886 | 0.878",
+    "row": 4
+  },
+  "0886__0878__0423": {
+    "value": 0.281,
+    "type": "ratio",
+    "context": "0.886 | 0.878 | 0.423",
+    "row": 4
+  },
+  "69_AM_EST": {
+    "value": 0.878,
+    "type": "ratio",
+    "context": "6-9 AM EST",
+    "row": 5
+  },
+  "69_AM_EST__0878": {
+    "value": 0.821,
+    "type": "ratio",
+    "context": "6-9 AM EST | 0.878",
+    "row": 5
+  },
+  "69_AM_EST__0878__0821": {
+    "value": 0.831,
+    "type": "ratio",
+    "context": "6-9 AM EST | 0.878 | 0.821",
+    "row": 5
+  },
+  "0878__0821__0831": {
+    "value": 0.542,
+    "type": "ratio",
+    "context": "0.878 | 0.821 | 0.831",
+    "row": 5
+  },
+  "0821__0831__0542": {
+    "value": 0.353,
+    "type": "ratio",
+    "context": "0.821 | 0.831 | 0.542",
+    "row": 5
+  },
+  "912_PM_EST": {
+    "value": 0.723,
+    "type": "ratio",
+    "context": "9-12 PM EST",
+    "row": 6
+  },
+  "912_PM_EST__0723": {
+    "value": 0.745,
+    "type": "ratio",
+    "context": "9-12 PM EST | 0.723",
+    "row": 6
+  },
+  "912_PM_EST__0723__0745": {
+    "value": 0.723,
+    "type": "ratio",
+    "context": "9-12 PM EST | 0.723 | 0.745",
+    "row": 6
+  },
+  "0723__0745__0723": {
+    "value": 0.726,
+    "type": "ratio",
+    "context": "0.723 | 0.745 | 0.723",
+    "row": 6
+  },
+  "0745__0723__0726": {
+    "value": 0.428,
+    "type": "ratio",
+    "context": "0.745 | 0.723 | 0.726",
+    "row": 6
+  },
+  "124_PM_EST": {
+    "value": 0.646,
+    "type": "ratio",
+    "context": "12-4 PM EST",
+    "row": 7
+  },
+  "124_PM_EST__0646": {
+    "value": 0.684,
+    "type": "ratio",
+    "context": "12-4 PM EST | 0.646",
+    "row": 7
+  },
+  "124_PM_EST__0646__0684": {
+    "value": 0.646,
+    "type": "ratio",
+    "context": "12-4 PM EST | 0.646 | 0.684",
+    "row": 7
+  },
+  "0646__0684__0646": {
+    "value": 0.871,
+    "type": "ratio",
+    "context": "0.646 | 0.684 | 0.646",
+    "row": 7
+  },
+  "0684__0646__0871": {
+    "value": 0.473,
+    "type": "ratio",
+    "context": "0.684 | 0.646 | 0.871",
+    "row": 7
+  },
+  "pct_r10_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 10
+  },
+  "pct_r11_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 11
+  },
+  "Both_HiLo_by_noon": {
+    "value": 36.0,
+    "type": "percentage",
+    "context": "Both Hi/Lo by noon",
+    "row": 17
+  },
+  "High_by_noon_only": {
+    "value": 71.0,
+    "type": "percentage",
+    "context": "High by noon only",
+    "row": 18
+  },
+  "Low_by_noon_only": {
+    "value": 60.0,
+    "type": "percentage",
+    "context": "Low by noon only",
+    "row": 19
+  },
+  "Avg_range_captured": {
+    "value": 82.2,
+    "type": "percentage",
+    "context": "Avg range captured",
+    "row": 20
+  },
+  "pct_r23_c0": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "",
+    "row": 23
+  }
+}

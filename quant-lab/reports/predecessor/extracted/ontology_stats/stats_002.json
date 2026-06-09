@@ -1,0 +1,134 @@
+{
+  "Alpha": {
+    "value": 72.0,
+    "type": "percentage",
+    "context": "Alpha",
+    "row": 3
+  },
+  "783__72_hrs__10x_baseline": {
+    "value": 14.8,
+    "type": "percentage",
+    "context": "78.3 | 7.2 hrs | 1.0x baseline",
+    "row": 3
+  },
+  "Beta": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Beta",
+    "row": 4
+  },
+  "746__68_hrs__11x": {
+    "value": 15.2,
+    "type": "percentage",
+    "context": "74.6 | 6.8 hrs | 1.1x",
+    "row": 4
+  },
+  "Gamma": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "Gamma",
+    "row": 5
+  },
+  "768__63_hrs__115x": {
+    "value": 16.3,
+    "type": "percentage",
+    "context": "76.8 | 6.3 hrs | 1.15x",
+    "row": 5
+  },
+  "Delta": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Delta",
+    "row": 6
+  },
+  "729__58_hrs__12x": {
+    "value": 14.8,
+    "type": "percentage",
+    "context": "72.9 | 5.8 hrs | 1.2x",
+    "row": 6
+  },
+  "15M_ABCD_Bullish": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "15M AB-CD Bullish",
+    "row": 7
+  },
+  "84__105_min__Fast": {
+    "value": 18.7,
+    "type": "percentage",
+    "context": "84 | 105 min | Fast",
+    "row": 7
+  },
+  "15M_ABCD_Bearish": {
+    "value": 61.8,
+    "type": "percentage",
+    "context": "15M AB-CD Bearish",
+    "row": 8
+  },
+  "66__85_min__Fast": {
+    "value": 15.4,
+    "type": "percentage",
+    "context": "66 | 85 min | Fast",
+    "row": 8
+  },
+  "1H_Patterns__Same_structure_as_15M": {
+    "value": 78.0,
+    "type": "percentage",
+    "context": "1H Patterns | Same structure as 15M",
+    "row": 9
+  },
+  "7678__23x_vs_15M__Moderate": {
+    "value": 16.8,
+    "type": "percentage",
+    "context": "76-78% | 2.3x vs 15M | Moderate",
+    "row": 9
+  },
+  "Layered_Fibonacci": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Layered Fibonacci",
+    "row": 10
+  },
+  "Layered_Fibonacci_Freq": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Layered Fibonacci Freq",
+    "row": 11
+  },
+  "35__NA__NA": {
+    "value": 35.0,
+    "type": "percentage",
+    "context": "35 | N/A | N/A",
+    "row": 11
+  },
+  "Measured_Moves": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Measured Moves",
+    "row": 12
+  },
+  "246__NA__NA": {
+    "value": 24.6,
+    "type": "percentage",
+    "context": "24.6 | N/A | N/A",
+    "row": 14
+  },
+  "NA__NA__246_frequency": {
+    "value": 78.0,
+    "type": "percentage",
+    "context": "N/A | N/A | 24.6% frequency",
+    "row": 14
+  },
+  "Monthly_cycle__Monthly_scale__NA": {
+    "value": 18.5,
+    "type": "percentage",
+    "context": "Monthly cycle | Monthly scale | N/A",
+    "row": 15
+  },
+  "Early_month__Fast_early__NA": {
+    "value": 23.5,
+    "type": "percentage",
+    "context": "Early month | Fast early | N/A",
+    "row": 16
+  }
+}

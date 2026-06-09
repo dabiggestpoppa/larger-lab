@@ -1,0 +1,86 @@
+{
+  "ny_close_price__day_high_after_ny__day_low_after_n": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "ny_close_price | day_high_after_ny | day_low_after_ny",
+    "row": 1
+  },
+  "day_high_after_ny__day_low_after_ny__ny_fib_25": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "day_high_after_ny | day_low_after_ny | ny_fib_-25%",
+    "row": 1
+  },
+  "day_low_after_ny__ny_fib_25__hit_ny_25": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "day_low_after_ny | ny_fib_-25% | hit_ny_-25%",
+    "row": 1
+  },
+  "ny_fib_25__hit_ny_25__ny_fib_50": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "ny_fib_25% | hit_ny_25% | ny_fib_50%",
+    "row": 1
+  },
+  "hit_ny_25__ny_fib_50__hit_ny_50": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "hit_ny_25% | ny_fib_50% | hit_ny_50%",
+    "row": 1
+  },
+  "ny_fib_50__hit_ny_50__ny_fib_100": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "ny_fib_50% | hit_ny_50% | ny_fib_100%",
+    "row": 1
+  },
+  "hit_ny_50__ny_fib_100__hit_ny_100": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "hit_ny_50% | ny_fib_100% | hit_ny_100%",
+    "row": 1
+  },
+  "ny_fib_100__hit_ny_100__ny_fib_168": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "ny_fib_-100% | hit_ny_-100% | ny_fib_-168%",
+    "row": 1
+  },
+  "hit_ny_100__ny_fib_168__hit_ny_168": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "hit_ny_-100% | ny_fib_-168% | hit_ny_-168%",
+    "row": 1
+  },
+  "ny_fib_168__hit_ny_168__ny_fib_25": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "ny_fib_-168% | hit_ny_-168% | ny_fib_25%",
+    "row": 1
+  },
+  "hit_ny_168__ny_fib_25__hit_ny_25": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "hit_ny_-168% | ny_fib_25% | hit_ny_25%",
+    "row": 1
+  },
+  "ny_fib_100__hit_ny_100__ny_fib_132": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "ny_fib_100% | hit_ny_100% | ny_fib_132%",
+    "row": 1
+  },
+  "hit_ny_100__ny_fib_132__hit_ny_132": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "hit_ny_100% | ny_fib_132% | hit_ny_132%",
+    "row": 1
+  },
+  "ny_fib_132__hit_ny_132__ny_fib_168": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "ny_fib_132% | hit_ny_132% | ny_fib_168%",
+    "row": 1
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "sheet_name": "hit_rate_summary",
+  "headers": [
+    "Fibonacci_Level",
+    "Hit_Rate_Percent",
+    "Total_Weeks",
+    "Hits_Count",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 5,
+  "data": [
+    {
+      "Fibonacci_Level": -168.0,
+      "Hit_Rate_Percent": 87.18861209964413,
+      "Total_Weeks": 281.0,
+      "Hits_Count": 245.0
+    },
+    {
+      "Fibonacci_Level": -100.0,
+      "Hit_Rate_Percent": 92.17081850533808,
+      "Total_Weeks": 281.0,
+      "Hits_Count": 259.0
+    },
+    {
+      "Fibonacci_Level": -50.0,
+      "Hit_Rate_Percent": 96.44128113879003,
+      "Total_Weeks": 281.0,
+      "Hits_Count": 271.0
+    },
+    {
+      "Fibonacci_Level": -25.0,
+      "Hit_Rate_Percent": 98.22064056939502,
+      "Total_Weeks": 281.0,
+      "Hits_Count": 276.0
+    },
+    {
+      "Fibonacci_Level": "132% Violation",
+      "Hit_Rate_Percent": 71.53024911032028,
+      "Total_Weeks": 281.0,
+      "Hits_Count": 201.0
+    }
+  ]
+}

@@ -1,0 +1,1249 @@
+{
+  "AUDCAD": {
+    "pair": "AUDCAD",
+    "level": "intraday_directional",
+    "total": 1198,
+    "bias": {
+      "Bullish": 715,
+      "Bearish": 483
+    },
+    "ext_25": {
+      "hits": 830,
+      "total": 1197,
+      "rate": 69.3
+    },
+    "ext_50": {
+      "hits": 551,
+      "total": 1197,
+      "rate": 46.0
+    },
+    "ext_100": {
+      "hits": 233,
+      "total": 1197,
+      "rate": 19.5
+    },
+    "rekey": {
+      "hits": 143,
+      "total": 1197,
+      "rate": 11.9
+    }
+  },
+  "AUDCHF": {
+    "pair": "AUDCHF",
+    "level": "intraday_directional",
+    "total": 1198,
+    "bias": {
+      "Bullish": 728,
+      "Bearish": 470
+    },
+    "ext_25": {
+      "hits": 811,
+      "total": 1197,
+      "rate": 67.8
+    },
+    "ext_50": {
+      "hits": 538,
+      "total": 1197,
+      "rate": 44.9
+    },
+    "ext_100": {
+      "hits": 217,
+      "total": 1197,
+      "rate": 18.1
+    },
+    "rekey": {
+      "hits": 137,
+      "total": 1197,
+      "rate": 11.4
+    }
+  },
+  "AUDJPY": {
+    "pair": "AUDJPY",
+    "level": "intraday_directional",
+    "total": 1200,
+    "bias": {
+      "Bullish": 681,
+      "Bearish": 519
+    },
+    "ext_25": {
+      "hits": 847,
+      "total": 1199,
+      "rate": 70.6
+    },
+    "ext_50": {
+      "hits": 530,
+      "total": 1199,
+      "rate": 44.2
+    },
+    "ext_100": {
+      "hits": 201,
+      "total": 1199,
+      "rate": 16.8
+    },
+    "rekey": {
+      "hits": 129,
+      "total": 1199,
+      "rate": 10.8
+    }
+  },
+  "AUDNZD": {
+    "pair": "AUDNZD",
+    "level": "intraday_directional",
+    "total": 1199,
+    "bias": {
+      "Bullish": 724,
+      "Bearish": 475
+    },
+    "ext_25": {
+      "hits": 719,
+      "total": 1198,
+      "rate": 60.0
+    },
+    "ext_50": {
+      "hits": 357,
+      "total": 1198,
+      "rate": 29.8
+    },
+    "ext_100": {
+      "hits": 89,
+      "total": 1198,
+      "rate": 7.4
+    },
+    "rekey": {
+      "hits": 44,
+      "total": 1198,
+      "rate": 3.7
+    }
+  },
+  "AUDUSD": {
+    "pair": "AUDUSD",
+    "level": "intraday_directional",
+    "total": 1201,
+    "bias": {
+      "Bullish": 679,
+      "Bearish": 522
+    },
+    "ext_25": {
+      "hits": 857,
+      "total": 1200,
+      "rate": 71.4
+    },
+    "ext_50": {
+      "hits": 581,
+      "total": 1200,
+      "rate": 48.4
+    },
+    "ext_100": {
+      "hits": 253,
+      "total": 1200,
+      "rate": 21.1
+    },
+    "rekey": {
+      "hits": 168,
+      "total": 1200,
+      "rate": 14.0
+    }
+  },
+  "BCHUSD": {
+    "pair": "BCHUSD",
+    "level": "intraday_directional",
+    "total": 962,
+    "bias": {
+      "Bullish": 500,
+      "Bearish": 462
+    },
+    "ext_25": {
+      "hits": 651,
+      "total": 962,
+      "rate": 67.7
+    },
+    "ext_50": {
+      "hits": 455,
+      "total": 962,
+      "rate": 47.3
+    },
+    "ext_100": {
+      "hits": 234,
+      "total": 962,
+      "rate": 24.3
+    },
+    "rekey": {
+      "hits": 105,
+      "total": 962,
+      "rate": 10.9
+    }
+  },
+  "BNBUSD": {
+    "pair": "BNBUSD",
+    "level": "intraday_directional",
+    "total": 1089,
+    "bias": {
+      "Bullish": 583,
+      "Bearish": 506
+    },
+    "ext_25": {
+      "hits": 774,
+      "total": 1088,
+      "rate": 71.1
+    },
+    "ext_50": {
+      "hits": 540,
+      "total": 1088,
+      "rate": 49.6
+    },
+    "ext_100": {
+      "hits": 248,
+      "total": 1088,
+      "rate": 22.8
+    },
+    "rekey": {
+      "hits": 111,
+      "total": 1088,
+      "rate": 10.2
+    }
+  },
+  "BTCUSD": {
+    "pair": "BTCUSD",
+    "level": "intraday_directional",
+    "total": 1150,
+    "bias": {
+      "Bullish": 589,
+      "Bearish": 561
+    },
+    "ext_25": {
+      "hits": 681,
+      "total": 1150,
+      "rate": 59.2
+    },
+    "ext_50": {
+      "hits": 402,
+      "total": 1150,
+      "rate": 35.0
+    },
+    "ext_100": {
+      "hits": 154,
+      "total": 1150,
+      "rate": 13.4
+    },
+    "rekey": {
+      "hits": 65,
+      "total": 1150,
+      "rate": 5.7
+    }
+  },
+  "CADCHF": {
+    "pair": "CADCHF",
+    "level": "intraday_directional",
+    "total": 1197,
+    "bias": {
+      "Bullish": 701,
+      "Bearish": 496
+    },
+    "ext_25": {
+      "hits": 902,
+      "total": 1196,
+      "rate": 75.4
+    },
+    "ext_50": {
+      "hits": 663,
+      "total": 1196,
+      "rate": 55.4
+    },
+    "ext_100": {
+      "hits": 340,
+      "total": 1196,
+      "rate": 28.4
+    },
+    "rekey": {
+      "hits": 265,
+      "total": 1196,
+      "rate": 22.2
+    }
+  },
+  "CADJPY": {
+    "pair": "CADJPY",
+    "level": "intraday_directional",
+    "total": 1133,
+    "bias": {
+      "Bullish": 617,
+      "Bearish": 516
+    },
+    "ext_25": {
+      "hits": 860,
+      "total": 1132,
+      "rate": 76.0
+    },
+    "ext_50": {
+      "hits": 620,
+      "total": 1132,
+      "rate": 54.8
+    },
+    "ext_100": {
+      "hits": 307,
+      "total": 1132,
+      "rate": 27.1
+    },
+    "rekey": {
+      "hits": 151,
+      "total": 1132,
+      "rate": 13.3
+    }
+  },
+  "CHFJPY": {
+    "pair": "CHFJPY",
+    "level": "intraday_directional",
+    "total": 1201,
+    "bias": {
+      "Bullish": 688,
+      "Bearish": 513
+    },
+    "ext_25": {
+      "hits": 922,
+      "total": 1200,
+      "rate": 76.8
+    },
+    "ext_50": {
+      "hits": 653,
+      "total": 1200,
+      "rate": 54.4
+    },
+    "ext_100": {
+      "hits": 287,
+      "total": 1200,
+      "rate": 23.9
+    },
+    "rekey": {
+      "hits": 167,
+      "total": 1200,
+      "rate": 13.9
+    }
+  },
+  "DE30": {
+    "pair": "DE30",
+    "level": "intraday_directional",
+    "total": 925,
+    "bias": {
+      "Bullish": 514,
+      "Bearish": 411
+    },
+    "ext_25": {
+      "hits": 759,
+      "total": 925,
+      "rate": 82.1
+    },
+    "ext_50": {
+      "hits": 610,
+      "total": 925,
+      "rate": 65.9
+    },
+    "ext_100": {
+      "hits": 357,
+      "total": 925,
+      "rate": 38.6
+    },
+    "rekey": {
+      "hits": 225,
+      "total": 925,
+      "rate": 24.3
+    }
+  },
+  "ETHUSD": {
+    "pair": "ETHUSD",
+    "level": "intraday_directional",
+    "total": 1147,
+    "bias": {
+      "Bullish": 582,
+      "Bearish": 565
+    },
+    "ext_25": {
+      "hits": 680,
+      "total": 1147,
+      "rate": 59.3
+    },
+    "ext_50": {
+      "hits": 413,
+      "total": 1147,
+      "rate": 36.0
+    },
+    "ext_100": {
+      "hits": 163,
+      "total": 1147,
+      "rate": 14.2
+    },
+    "rekey": {
+      "hits": 82,
+      "total": 1147,
+      "rate": 7.1
+    }
+  },
+  "EURAUD": {
+    "pair": "EURAUD",
+    "level": "intraday_directional",
+    "total": 1199,
+    "bias": {
+      "Bullish": 629,
+      "Bearish": 570
+    },
+    "ext_25": {
+      "hits": 853,
+      "total": 1198,
+      "rate": 71.2
+    },
+    "ext_50": {
+      "hits": 588,
+      "total": 1198,
+      "rate": 49.1
+    },
+    "ext_100": {
+      "hits": 268,
+      "total": 1198,
+      "rate": 22.4
+    },
+    "rekey": {
+      "hits": 145,
+      "total": 1198,
+      "rate": 12.1
+    }
+  },
+  "EURCAD": {
+    "pair": "EURCAD",
+    "level": "intraday_directional",
+    "total": 1201,
+    "bias": {
+      "Bullish": 713,
+      "Bearish": 488
+    },
+    "ext_25": {
+      "hits": 977,
+      "total": 1200,
+      "rate": 81.4
+    },
+    "ext_50": {
+      "hits": 764,
+      "total": 1200,
+      "rate": 63.7
+    },
+    "ext_100": {
+      "hits": 441,
+      "total": 1200,
+      "rate": 36.8
+    },
+    "rekey": {
+      "hits": 332,
+      "total": 1200,
+      "rate": 27.7
+    }
+  },
+  "EURCHF": {
+    "pair": "EURCHF",
+    "level": "intraday_directional",
+    "total": 1197,
+    "bias": {
+      "Bullish": 717,
+      "Bearish": 480
+    },
+    "ext_25": {
+      "hits": 867,
+      "total": 1196,
+      "rate": 72.5
+    },
+    "ext_50": {
+      "hits": 621,
+      "total": 1196,
+      "rate": 51.9
+    },
+    "ext_100": {
+      "hits": 348,
+      "total": 1196,
+      "rate": 29.1
+    },
+    "rekey": {
+      "hits": 269,
+      "total": 1196,
+      "rate": 22.5
+    }
+  },
+  "EURGBP": {
+    "pair": "EURGBP",
+    "level": "intraday_directional",
+    "total": 1195,
+    "bias": {
+      "Bullish": 753,
+      "Bearish": 442
+    },
+    "ext_25": {
+      "hits": 933,
+      "total": 1194,
+      "rate": 78.1
+    },
+    "ext_50": {
+      "hits": 723,
+      "total": 1194,
+      "rate": 60.6
+    },
+    "ext_100": {
+      "hits": 435,
+      "total": 1194,
+      "rate": 36.4
+    },
+    "rekey": {
+      "hits": 347,
+      "total": 1194,
+      "rate": 29.1
+    }
+  },
+  "EURJPY": {
+    "pair": "EURJPY",
+    "level": "intraday_directional",
+    "total": 1201,
+    "bias": {
+      "Bullish": 664,
+      "Bearish": 537
+    },
+    "ext_25": {
+      "hits": 898,
+      "total": 1200,
+      "rate": 74.8
+    },
+    "ext_50": {
+      "hits": 652,
+      "total": 1200,
+      "rate": 54.3
+    },
+    "ext_100": {
+      "hits": 305,
+      "total": 1200,
+      "rate": 25.4
+    },
+    "rekey": {
+      "hits": 188,
+      "total": 1200,
+      "rate": 15.7
+    }
+  },
+  "EURNZD": {
+    "pair": "EURNZD",
+    "level": "intraday_directional",
+    "total": 1202,
+    "bias": {
+      "Bullish": 677,
+      "Bearish": 525
+    },
+    "ext_25": {
+      "hits": 846,
+      "total": 1201,
+      "rate": 70.4
+    },
+    "ext_50": {
+      "hits": 551,
+      "total": 1201,
+      "rate": 45.9
+    },
+    "ext_100": {
+      "hits": 211,
+      "total": 1201,
+      "rate": 17.6
+    },
+    "rekey": {
+      "hits": 127,
+      "total": 1201,
+      "rate": 10.6
+    }
+  },
+  "EURUSD": {
+    "pair": "EURUSD",
+    "level": "intraday_directional",
+    "total": 777,
+    "bias": {
+      "Bullish": 455,
+      "Bearish": 322
+    },
+    "ext_25": {
+      "hits": 619,
+      "total": 777,
+      "rate": 79.7
+    },
+    "ext_50": {
+      "hits": 446,
+      "total": 777,
+      "rate": 57.4
+    },
+    "ext_100": {
+      "hits": 212,
+      "total": 777,
+      "rate": 27.3
+    },
+    "rekey": {
+      "hits": 148,
+      "total": 777,
+      "rate": 19.0
+    }
+  },
+  "FR40": {
+    "pair": "FR40",
+    "level": "intraday_directional",
+    "total": 915,
+    "bias": {
+      "Bullish": 459,
+      "Bearish": 456
+    },
+    "ext_25": {
+      "hits": 755,
+      "total": 915,
+      "rate": 82.5
+    },
+    "ext_50": {
+      "hits": 609,
+      "total": 915,
+      "rate": 66.6
+    },
+    "ext_100": {
+      "hits": 356,
+      "total": 915,
+      "rate": 38.9
+    },
+    "rekey": {
+      "hits": 221,
+      "total": 915,
+      "rate": 24.2
+    }
+  },
+  "GBPAUD": {
+    "pair": "GBPAUD",
+    "level": "intraday_directional",
+    "total": 1137,
+    "bias": {
+      "Bullish": 590,
+      "Bearish": 547
+    },
+    "ext_25": {
+      "hits": 804,
+      "total": 1136,
+      "rate": 70.8
+    },
+    "ext_50": {
+      "hits": 537,
+      "total": 1136,
+      "rate": 47.3
+    },
+    "ext_100": {
+      "hits": 240,
+      "total": 1136,
+      "rate": 21.1
+    },
+    "rekey": {
+      "hits": 173,
+      "total": 1136,
+      "rate": 15.2
+    }
+  },
+  "GBPCAD": {
+    "pair": "GBPCAD",
+    "level": "intraday_directional",
+    "total": 982,
+    "bias": {
+      "Bullish": 611,
+      "Bearish": 371
+    },
+    "ext_25": {
+      "hits": 816,
+      "total": 981,
+      "rate": 83.2
+    },
+    "ext_50": {
+      "hits": 632,
+      "total": 981,
+      "rate": 64.4
+    },
+    "ext_100": {
+      "hits": 365,
+      "total": 981,
+      "rate": 37.2
+    },
+    "rekey": {
+      "hits": 291,
+      "total": 981,
+      "rate": 29.7
+    }
+  },
+  "GBPCHF": {
+    "pair": "GBPCHF",
+    "level": "intraday_directional",
+    "total": 1200,
+    "bias": {
+      "Bullish": 707,
+      "Bearish": 493
+    },
+    "ext_25": {
+      "hits": 922,
+      "total": 1199,
+      "rate": 76.9
+    },
+    "ext_50": {
+      "hits": 691,
+      "total": 1199,
+      "rate": 57.6
+    },
+    "ext_100": {
+      "hits": 383,
+      "total": 1199,
+      "rate": 31.9
+    },
+    "rekey": {
+      "hits": 277,
+      "total": 1199,
+      "rate": 23.1
+    }
+  },
+  "GBPJPY": {
+    "pair": "GBPJPY",
+    "level": "intraday_directional",
+    "total": 1201,
+    "bias": {
+      "Bullish": 661,
+      "Bearish": 540
+    },
+    "ext_25": {
+      "hits": 918,
+      "total": 1200,
+      "rate": 76.5
+    },
+    "ext_50": {
+      "hits": 683,
+      "total": 1200,
+      "rate": 56.9
+    },
+    "ext_100": {
+      "hits": 356,
+      "total": 1200,
+      "rate": 29.7
+    },
+    "rekey": {
+      "hits": 213,
+      "total": 1200,
+      "rate": 17.8
+    }
+  },
+  "GBPNZD": {
+    "pair": "GBPNZD",
+    "level": "intraday_directional",
+    "total": 964,
+    "bias": {
+      "Bullish": 545,
+      "Bearish": 419
+    },
+    "ext_25": {
+      "hits": 711,
+      "total": 964,
+      "rate": 73.8
+    },
+    "ext_50": {
+      "hits": 503,
+      "total": 964,
+      "rate": 52.2
+    },
+    "ext_100": {
+      "hits": 217,
+      "total": 964,
+      "rate": 22.5
+    },
+    "rekey": {
+      "hits": 111,
+      "total": 964,
+      "rate": 11.5
+    }
+  },
+  "GBPUSD": {
+    "pair": "GBPUSD",
+    "level": "intraday_directional",
+    "total": 1200,
+    "bias": {
+      "Bullish": 659,
+      "Bearish": 541
+    },
+    "ext_25": {
+      "hits": 976,
+      "total": 1199,
+      "rate": 81.4
+    },
+    "ext_50": {
+      "hits": 775,
+      "total": 1199,
+      "rate": 64.6
+    },
+    "ext_100": {
+      "hits": 474,
+      "total": 1199,
+      "rate": 39.5
+    },
+    "rekey": {
+      "hits": 397,
+      "total": 1199,
+      "rate": 33.1
+    }
+  },
+  "HK50": {
+    "pair": "HK50",
+    "level": "intraday_directional",
+    "total": 854,
+    "bias": {
+      "Bullish": 440,
+      "Bearish": 414
+    },
+    "ext_25": {
+      "hits": 762,
+      "total": 853,
+      "rate": 89.3
+    },
+    "ext_50": {
+      "hits": 676,
+      "total": 853,
+      "rate": 79.2
+    },
+    "ext_100": {
+      "hits": 527,
+      "total": 853,
+      "rate": 61.8
+    },
+    "rekey": {
+      "hits": 437,
+      "total": 853,
+      "rate": 51.2
+    }
+  },
+  "LCOUSD": {
+    "pair": "LCOUSD",
+    "level": "intraday_directional",
+    "total": 795,
+    "bias": {
+      "Bullish": 342,
+      "Bearish": 453
+    },
+    "ext_25": {
+      "hits": 579,
+      "total": 794,
+      "rate": 72.9
+    },
+    "ext_50": {
+      "hits": 404,
+      "total": 794,
+      "rate": 50.9
+    },
+    "ext_100": {
+      "hits": 191,
+      "total": 794,
+      "rate": 24.1
+    },
+    "rekey": {
+      "hits": 107,
+      "total": 794,
+      "rate": 13.5
+    }
+  },
+  "LTCUSD": {
+    "pair": "LTCUSD",
+    "level": "intraday_directional",
+    "total": 960,
+    "bias": {
+      "Bullish": 521,
+      "Bearish": 439
+    },
+    "ext_25": {
+      "hits": 650,
+      "total": 960,
+      "rate": 67.7
+    },
+    "ext_50": {
+      "hits": 397,
+      "total": 960,
+      "rate": 41.4
+    },
+    "ext_100": {
+      "hits": 176,
+      "total": 960,
+      "rate": 18.3
+    },
+    "rekey": {
+      "hits": 107,
+      "total": 960,
+      "rate": 11.1
+    }
+  },
+  "NZDCAD": {
+    "pair": "NZDCAD",
+    "level": "intraday_directional",
+    "total": 1135,
+    "bias": {
+      "Bullish": 652,
+      "Bearish": 483
+    },
+    "ext_25": {
+      "hits": 770,
+      "total": 1134,
+      "rate": 67.9
+    },
+    "ext_50": {
+      "hits": 483,
+      "total": 1134,
+      "rate": 42.6
+    },
+    "ext_100": {
+      "hits": 182,
+      "total": 1134,
+      "rate": 16.0
+    },
+    "rekey": {
+      "hits": 91,
+      "total": 1134,
+      "rate": 8.0
+    }
+  },
+  "NZDCHF": {
+    "pair": "NZDCHF",
+    "level": "intraday_directional",
+    "total": 1137,
+    "bias": {
+      "Bullish": 704,
+      "Bearish": 433
+    },
+    "ext_25": {
+      "hits": 759,
+      "total": 1136,
+      "rate": 66.8
+    },
+    "ext_50": {
+      "hits": 453,
+      "total": 1136,
+      "rate": 39.9
+    },
+    "ext_100": {
+      "hits": 161,
+      "total": 1136,
+      "rate": 14.2
+    },
+    "rekey": {
+      "hits": 87,
+      "total": 1136,
+      "rate": 7.7
+    }
+  },
+  "NZDJPY": {
+    "pair": "NZDJPY",
+    "level": "intraday_directional",
+    "total": 1137,
+    "bias": {
+      "Bullish": 673,
+      "Bearish": 464
+    },
+    "ext_25": {
+      "hits": 765,
+      "total": 1136,
+      "rate": 67.3
+    },
+    "ext_50": {
+      "hits": 462,
+      "total": 1136,
+      "rate": 40.7
+    },
+    "ext_100": {
+      "hits": 155,
+      "total": 1136,
+      "rate": 13.6
+    },
+    "rekey": {
+      "hits": 84,
+      "total": 1136,
+      "rate": 7.4
+    }
+  },
+  "NZDUSD": {
+    "pair": "NZDUSD",
+    "level": "intraday_directional",
+    "total": 963,
+    "bias": {
+      "Bullish": 561,
+      "Bearish": 402
+    },
+    "ext_25": {
+      "hits": 699,
+      "total": 963,
+      "rate": 72.6
+    },
+    "ext_50": {
+      "hits": 481,
+      "total": 963,
+      "rate": 49.9
+    },
+    "ext_100": {
+      "hits": 237,
+      "total": 963,
+      "rate": 24.6
+    },
+    "rekey": {
+      "hits": 136,
+      "total": 963,
+      "rate": 14.1
+    }
+  },
+  "OILUSD": {
+    "pair": "OILUSD",
+    "level": "intraday_directional",
+    "total": 872,
+    "bias": {
+      "Bullish": 420,
+      "Bearish": 452
+    },
+    "ext_25": {
+      "hits": 618,
+      "total": 871,
+      "rate": 71.0
+    },
+    "ext_50": {
+      "hits": 423,
+      "total": 871,
+      "rate": 48.6
+    },
+    "ext_100": {
+      "hits": 197,
+      "total": 871,
+      "rate": 22.6
+    },
+    "rekey": {
+      "hits": 93,
+      "total": 871,
+      "rate": 10.7
+    }
+  },
+  "SOLUSD": {
+    "pair": "SOLUSD",
+    "level": "intraday_directional",
+    "total": 1083,
+    "bias": {
+      "Bullish": 527,
+      "Bearish": 556
+    },
+    "ext_25": {
+      "hits": 717,
+      "total": 1082,
+      "rate": 66.3
+    },
+    "ext_50": {
+      "hits": 445,
+      "total": 1082,
+      "rate": 41.1
+    },
+    "ext_100": {
+      "hits": 186,
+      "total": 1082,
+      "rate": 17.2
+    },
+    "rekey": {
+      "hits": 93,
+      "total": 1082,
+      "rate": 8.6
+    }
+  },
+  "US500": {
+    "pair": "US500",
+    "level": "intraday_directional",
+    "total": 951,
+    "bias": {
+      "Bullish": 528,
+      "Bearish": 423
+    },
+    "ext_25": {
+      "hits": 529,
+      "total": 951,
+      "rate": 55.6
+    },
+    "ext_50": {
+      "hits": 260,
+      "total": 951,
+      "rate": 27.3
+    },
+    "ext_100": {
+      "hits": 87,
+      "total": 951,
+      "rate": 9.1
+    },
+    "rekey": {
+      "hits": 64,
+      "total": 951,
+      "rate": 6.7
+    }
+  },
+  "USDCAD": {
+    "pair": "USDCAD",
+    "level": "intraday_directional",
+    "total": 1200,
+    "bias": {
+      "Bullish": 665,
+      "Bearish": 535
+    },
+    "ext_25": {
+      "hits": 931,
+      "total": 1199,
+      "rate": 77.6
+    },
+    "ext_50": {
+      "hits": 708,
+      "total": 1199,
+      "rate": 59.0
+    },
+    "ext_100": {
+      "hits": 366,
+      "total": 1199,
+      "rate": 30.5
+    },
+    "rekey": {
+      "hits": 286,
+      "total": 1199,
+      "rate": 23.9
+    }
+  },
+  "USDCHF": {
+    "pair": "USDCHF",
+    "level": "intraday_directional",
+    "total": 879,
+    "bias": {
+      "Bullish": 486,
+      "Bearish": 393
+    },
+    "ext_25": {
+      "hits": 597,
+      "total": 879,
+      "rate": 67.9
+    },
+    "ext_50": {
+      "hits": 405,
+      "total": 879,
+      "rate": 46.1
+    },
+    "ext_100": {
+      "hits": 168,
+      "total": 879,
+      "rate": 19.1
+    },
+    "rekey": {
+      "hits": 92,
+      "total": 879,
+      "rate": 10.5
+    }
+  },
+  "USDJPY": {
+    "pair": "USDJPY",
+    "level": "intraday_directional",
+    "total": 1201,
+    "bias": {
+      "Bullish": 643,
+      "Bearish": 558
+    },
+    "ext_25": {
+      "hits": 887,
+      "total": 1200,
+      "rate": 73.9
+    },
+    "ext_50": {
+      "hits": 625,
+      "total": 1200,
+      "rate": 52.1
+    },
+    "ext_100": {
+      "hits": 290,
+      "total": 1200,
+      "rate": 24.2
+    },
+    "rekey": {
+      "hits": 172,
+      "total": 1200,
+      "rate": 14.3
+    }
+  },
+  "XAGUSD": {
+    "pair": "XAGUSD",
+    "level": "intraday_directional",
+    "total": 1106,
+    "bias": {
+      "Bullish": 632,
+      "Bearish": 474
+    },
+    "ext_25": {
+      "hits": 800,
+      "total": 1106,
+      "rate": 72.3
+    },
+    "ext_50": {
+      "hits": 549,
+      "total": 1106,
+      "rate": 49.6
+    },
+    "ext_100": {
+      "hits": 281,
+      "total": 1106,
+      "rate": 25.4
+    },
+    "rekey": {
+      "hits": 206,
+      "total": 1106,
+      "rate": 18.6
+    }
+  },
+  "XAUUSD": {
+    "pair": "XAUUSD",
+    "level": "intraday_directional",
+    "total": 1117,
+    "bias": {
+      "Bullish": 620,
+      "Bearish": 497
+    },
+    "ext_25": {
+      "hits": 805,
+      "total": 1117,
+      "rate": 72.1
+    },
+    "ext_50": {
+      "hits": 558,
+      "total": 1117,
+      "rate": 50.0
+    },
+    "ext_100": {
+      "hits": 299,
+      "total": 1117,
+      "rate": 26.8
+    },
+    "rekey": {
+      "hits": 200,
+      "total": 1117,
+      "rate": 17.9
+    }
+  },
+  "XLMUSD": {
+    "pair": "XLMUSD",
+    "level": "intraday_directional",
+    "total": 945,
+    "bias": {
+      "Bullish": 492,
+      "Bearish": 453
+    },
+    "ext_25": {
+      "hits": 641,
+      "total": 944,
+      "rate": 67.9
+    },
+    "ext_50": {
+      "hits": 421,
+      "total": 944,
+      "rate": 44.6
+    },
+    "ext_100": {
+      "hits": 172,
+      "total": 944,
+      "rate": 18.2
+    },
+    "rekey": {
+      "hits": 86,
+      "total": 944,
+      "rate": 9.1
+    }
+  }
+}

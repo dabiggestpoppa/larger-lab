@@ -1,0 +1,284 @@
+{
+  "Daily_Range_Capture_by_12_PM_EST__Both_HiLo_by_noo": {
+    "value": 36.0,
+    "type": "percentage",
+    "context": "Daily Range Capture by 12 PM EST | Both Hi/Lo by noon",
+    "row": 2
+  },
+  "Daily_Range_Capture_by_12_PM_EST__High_by_noon_onl": {
+    "value": 71.0,
+    "type": "percentage",
+    "context": "Daily Range Capture by 12 PM EST | High by noon only",
+    "row": 3
+  },
+  "Daily_Range_Capture_by_12_PM_EST__Low_by_noon_only": {
+    "value": 60.0,
+    "type": "percentage",
+    "context": "Daily Range Capture by 12 PM EST | Low by noon only",
+    "row": 4
+  },
+  "Daily_Range_Capture_by_12_PM_EST__Average_range_ca": {
+    "value": 82.2,
+    "type": "percentage",
+    "context": "Daily Range Capture by 12 PM EST | Average range captured",
+    "row": 5
+  },
+  "Afternoon_Delivery_Windows__Days_requiring_afterno": {
+    "value": 64.0,
+    "type": "percentage",
+    "context": "Afternoon Delivery Windows | Days requiring afternoon completion",
+    "row": 6
+  },
+  "PHASE_3C__TEMPORAL_LENS": {
+    "value": 4.1,
+    "type": "percentage",
+    "context": "PHASE 3C - TEMPORAL LENS",
+    "row": 14
+  },
+  "PHASE_3D__FIB_SEQUENCES": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "PHASE 3D - FIB SEQUENCES",
+    "row": 15
+  },
+  "PHASE_3F__LONDON_DECAY": {
+    "value": 87.8,
+    "type": "percentage",
+    "context": "PHASE 3F - LONDON DECAY",
+    "row": 17
+  },
+  "Window_EST": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Window (EST)",
+    "row": 21
+  },
+  "Window_EST__25_Hit": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Window (EST) | -25% Hit",
+    "row": 21
+  },
+  "Window_EST__25_Hit__50_Hit": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Window (EST) | -25% Hit | -50% Hit",
+    "row": 21
+  },
+  "25_Hit__50_Hit__100_Hit": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "-25% Hit | -50% Hit | -100% Hit",
+    "row": 21
+  },
+  "50_Hit__100_Hit__168_Hit": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "-50% Hit | -100% Hit | -168% Hit",
+    "row": 21
+  },
+  "26_AM_EST": {
+    "value": 0.924,
+    "type": "ratio",
+    "context": "2-6 AM EST",
+    "row": 22
+  },
+  "26_AM_EST__0924": {
+    "value": 0.886,
+    "type": "ratio",
+    "context": "2-6 AM EST | 0.924",
+    "row": 22
+  },
+  "26_AM_EST__0924__0886": {
+    "value": 0.878,
+    "type": "ratio",
+    "context": "2-6 AM EST | 0.924 | 0.886",
+    "row": 22
+  },
+  "0924__0886__0878": {
+    "value": 0.423,
+    "type": "ratio",
+    "context": "0.924 | 0.886 | 0.878",
+    "row": 22
+  },
+  "0886__0878__0423": {
+    "value": 0.281,
+    "type": "ratio",
+    "context": "0.886 | 0.878 | 0.423",
+    "row": 22
+  },
+  "0423__0281__LOW": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "0.423 | 0.281 | LOW",
+    "row": 22
+  },
+  "69_AM_EST": {
+    "value": 0.878,
+    "type": "ratio",
+    "context": "6-9 AM EST",
+    "row": 23
+  },
+  "69_AM_EST__0878": {
+    "value": 0.821,
+    "type": "ratio",
+    "context": "6-9 AM EST | 0.878",
+    "row": 23
+  },
+  "69_AM_EST__0878__0821": {
+    "value": 0.831,
+    "type": "ratio",
+    "context": "6-9 AM EST | 0.878 | 0.821",
+    "row": 23
+  },
+  "0878__0821__0831": {
+    "value": 0.542,
+    "type": "ratio",
+    "context": "0.878 | 0.821 | 0.831",
+    "row": 23
+  },
+  "0821__0831__0542": {
+    "value": 0.353,
+    "type": "ratio",
+    "context": "0.821 | 0.831 | 0.542",
+    "row": 23
+  },
+  "912_PM_EST": {
+    "value": 0.723,
+    "type": "ratio",
+    "context": "9-12 PM EST",
+    "row": 24
+  },
+  "912_PM_EST__0723": {
+    "value": 0.745,
+    "type": "ratio",
+    "context": "9-12 PM EST | 0.723",
+    "row": 24
+  },
+  "912_PM_EST__0723__0745": {
+    "value": 0.723,
+    "type": "ratio",
+    "context": "9-12 PM EST | 0.723 | 0.745",
+    "row": 24
+  },
+  "0723__0745__0723": {
+    "value": 0.726,
+    "type": "ratio",
+    "context": "0.723 | 0.745 | 0.723",
+    "row": 24
+  },
+  "0745__0723__0726": {
+    "value": 0.428,
+    "type": "ratio",
+    "context": "0.745 | 0.723 | 0.726",
+    "row": 24
+  },
+  "124_PM_EST": {
+    "value": 0.646,
+    "type": "ratio",
+    "context": "12-4 PM EST",
+    "row": 25
+  },
+  "124_PM_EST__0646": {
+    "value": 0.684,
+    "type": "ratio",
+    "context": "12-4 PM EST | 0.646",
+    "row": 25
+  },
+  "124_PM_EST__0646__0684": {
+    "value": 0.646,
+    "type": "ratio",
+    "context": "12-4 PM EST | 0.646 | 0.684",
+    "row": 25
+  },
+  "0646__0684__0646": {
+    "value": 0.871,
+    "type": "ratio",
+    "context": "0.646 | 0.684 | 0.646",
+    "row": 25
+  },
+  "0684__0646__0871": {
+    "value": 0.473,
+    "type": "ratio",
+    "context": "0.684 | 0.646 | 0.871",
+    "row": 25
+  },
+  "pct_r29_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 29
+  },
+  "pct_r30_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 30
+  },
+  "Hypothesis": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "Hypothesis:",
+    "row": 36
+  },
+  "Average_Range_Captured": {
+    "value": 0.822,
+    "type": "ratio",
+    "context": "Average Range Captured",
+    "row": 40
+  },
+  "Average_Range_Captured__0822": {
+    "value": 82.2,
+    "type": "percentage",
+    "context": "Average Range Captured | 0.822",
+    "row": 40
+  },
+  "High_by_Noon_Only": {
+    "value": 0.71,
+    "type": "ratio",
+    "context": "High by Noon Only",
+    "row": 41
+  },
+  "High_by_Noon_Only__071": {
+    "value": 71.0,
+    "type": "percentage",
+    "context": "High by Noon Only | 0.71",
+    "row": 41
+  },
+  "Low_by_Noon_Only": {
+    "value": 0.6,
+    "type": "ratio",
+    "context": "Low by Noon Only",
+    "row": 42
+  },
+  "Low_by_Noon_Only__06": {
+    "value": 60.0,
+    "type": "percentage",
+    "context": "Low by Noon Only | 0.6",
+    "row": 42
+  },
+  "Both_HiLo_by_Noon": {
+    "value": 0.36,
+    "type": "ratio",
+    "context": "Both Hi/Lo by Noon",
+    "row": 43
+  },
+  "Both_HiLo_by_Noon__036": {
+    "value": 36.0,
+    "type": "percentage",
+    "context": "Both Hi/Lo by Noon | 0.36",
+    "row": 43
+  },
+  "Days_Requiring_Afternoon": {
+    "value": 0.64,
+    "type": "ratio",
+    "context": "Days Requiring Afternoon",
+    "row": 44
+  },
+  "Days_Requiring_Afternoon__064": {
+    "value": 64.0,
+    "type": "percentage",
+    "context": "Days Requiring Afternoon | 0.64",
+    "row": 44
+  }
+}

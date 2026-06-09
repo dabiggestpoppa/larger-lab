@@ -1,0 +1,127 @@
+{
+  "sheet_name": "ITERATION 1 - WINDOW & RANGE ANALYSIS",
+  "headers": [
+    "STEP 2: WINDOW-SPECIFIC HIT RATE ANALYSIS",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 18,
+  "data": [
+    {
+      "STEP 2: WINDOW-SPECIFIC HIT RATE ANALYSIS": "Time Window EST",
+      "col_2": "-25% Rate",
+      "col_3": "-50% Rate",
+      "col_4": "-100% Rate",
+      "col_5": "-168% Rate",
+      "col_6": "132% Rate",
+      "col_7": "Risk Level"
+    },
+    {
+      "STEP 2: WINDOW-SPECIFIC HIT RATE ANALYSIS": "2-6 AM EST",
+      "col_2": 0.924,
+      "col_3": 0.886,
+      "col_4": 0.878,
+      "col_5": 0.423,
+      "col_6": 0.281,
+      "col_7": "LOW"
+    },
+    {
+      "STEP 2: WINDOW-SPECIFIC HIT RATE ANALYSIS": "6-9 AM EST",
+      "col_2": 0.878,
+      "col_3": 0.821,
+      "col_4": 0.831,
+      "col_5": 0.542,
+      "col_6": 0.353,
+      "col_7": "MEDIUM"
+    },
+    {
+      "STEP 2: WINDOW-SPECIFIC HIT RATE ANALYSIS": "9-12 PM EST",
+      "col_2": 0.723,
+      "col_3": 0.745,
+      "col_4": 0.723,
+      "col_5": 0.726,
+      "col_6": 0.428,
+      "col_7": "HIGH"
+    },
+    {
+      "STEP 2: WINDOW-SPECIFIC HIT RATE ANALYSIS": "12-4 PM EST",
+      "col_2": 0.646,
+      "col_3": 0.684,
+      "col_4": 0.646,
+      "col_5": 0.871,
+      "col_6": 0.473,
+      "col_7": "HIGH"
+    },
+    {
+      "STEP 2: WINDOW-SPECIFIC HIT RATE ANALYSIS": "KEY FINDINGS:"
+    },
+    {
+      "STEP 2: WINDOW-SPECIFIC HIT RATE ANALYSIS": "BEST WINDOW FOR -100% HIT RATE: 2-6 AM EST (87.8% hit rate)"
+    },
+    {
+      "STEP 2: WINDOW-SPECIFIC HIT RATE ANALYSIS": "LOWEST 132% VIOLATION WINDOW: 2-6 AM EST (28.1% violation rate)"
+    },
+    {
+      "STEP 2: WINDOW-SPECIFIC HIT RATE ANALYSIS": "SAFEST ENTRY WINDOW: 2-6 AM EST (Highest extension rates, lowest invalidation)"
+    },
+    {
+      "STEP 2: WINDOW-SPECIFIC HIT RATE ANALYSIS": "STEP 3: DAILY RANGE CAPTURE BY 12 PM EST"
+    },
+    {
+      "STEP 2: WINDOW-SPECIFIC HIT RATE ANALYSIS": "Metric",
+      "col_2": "Result"
+    },
+    {
+      "STEP 2: WINDOW-SPECIFIC HIT RATE ANALYSIS": "Both Hi/Lo by noon",
+      "col_2": 36.0
+    },
+    {
+      "STEP 2: WINDOW-SPECIFIC HIT RATE ANALYSIS": "High by noon only",
+      "col_2": 71.0
+    },
+    {
+      "STEP 2: WINDOW-SPECIFIC HIT RATE ANALYSIS": "Low by noon only",
+      "col_2": 60.0
+    },
+    {
+      "STEP 2: WINDOW-SPECIFIC HIT RATE ANALYSIS": "Avg range captured",
+      "col_2": 82.2
+    },
+    {
+      "STEP 2: WINDOW-SPECIFIC HIT RATE ANALYSIS": "HYPOTHESIS TEST:"
+    },
+    {
+      "STEP 2: WINDOW-SPECIFIC HIT RATE ANALYSIS": "\"80% daily range captured by 12 PM EST\""
+    },
+    {
+      "STEP 2: WINDOW-SPECIFIC HIT RATE ANALYSIS": "Result: CONFIRMED"
+    }
+  ]
+}

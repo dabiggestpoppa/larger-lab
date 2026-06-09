@@ -1,0 +1,68 @@
+{
+  "228__pips__vs_London_141_pips": {
+    "value": 57.0,
+    "type": "percentage",
+    "context": "22.8 | pips | vs London 14.1 pips",
+    "row": 8
+  },
+  "NY_Close_Containment_Rate": {
+    "value": 26.6,
+    "type": "percentage",
+    "context": "NY Close Containment Rate:",
+    "row": 16
+  },
+  "NY_Close_Containment_Rate__0266__percentage": {
+    "value": 30.0,
+    "type": "percentage",
+    "context": "NY Close Containment Rate | 0.266 | percentage",
+    "row": 9
+  },
+  "Range_Containment_Events__578__events": {
+    "value": 53.6,
+    "type": "percentage",
+    "context": "Range Containment Events | 578 | events",
+    "row": 10
+  },
+  "Range_Containment_Events": {
+    "value": 53.6,
+    "type": "percentage",
+    "context": "Range Containment Events:",
+    "row": 17
+  },
+  "NY_Open_79_AM_EST__228": {
+    "value": 0.266,
+    "type": "ratio",
+    "context": "NY Open (7-9 AM EST) | 22.8",
+    "row": 22
+  },
+  "London_Open_24_AM_EST__141": {
+    "value": 0.831,
+    "type": "ratio",
+    "context": "London Open (2-4 AM EST) | 14.1",
+    "row": 23
+  },
+  "Difference": {
+    "value": 61.7,
+    "type": "percentage",
+    "context": "Difference",
+    "row": 24
+  },
+  "pct_r29_c0": {
+    "value": 57.0,
+    "type": "percentage",
+    "context": "",
+    "row": 29
+  },
+  "pct_r30_c0": {
+    "value": 26.6,
+    "type": "percentage",
+    "context": "",
+    "row": 30
+  },
+  "pct_r31_c0": {
+    "value": 53.6,
+    "type": "percentage",
+    "context": "",
+    "row": 31
+  }
+}

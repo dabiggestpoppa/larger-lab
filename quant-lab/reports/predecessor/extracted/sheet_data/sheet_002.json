@@ -1,0 +1,218 @@
+{
+  "sheet_name": "Pattern Formations",
+  "headers": [
+    "Pattern Type",
+    "Sequence Structure",
+    "Success Rate (%)",
+    "Avg Completion Time",
+    "Velocity Factor",
+    "ILM Impact",
+    "Session Preference",
+    "Source",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 18,
+  "data": [
+    {
+      "Pattern Type": "Pattern Type",
+      "Sequence Structure": "Sequence Structure",
+      "Success Rate (%)": "Success Rate (%)",
+      "Avg Completion Time": "Avg Completion Time",
+      "Velocity Factor": "Velocity Factor",
+      "ILM Impact": "ILM Impact",
+      "Session Preference": "Session Preference",
+      "Source": "Source"
+    },
+    {
+      "Pattern Type": "Alpha",
+      "Sequence Structure": "A-B(72%)\u2192B-C(-25%)\u2192C-D(61.8%)",
+      "Success Rate (%)": 78.3,
+      "Avg Completion Time": "7.2 hrs",
+      "Velocity Factor": "1.0x baseline",
+      "ILM Impact": "+14.8% to +18.7%",
+      "Session Preference": "All sessions",
+      "Source": "Doc 7, 13, 16"
+    },
+    {
+      "Pattern Type": "Beta",
+      "Sequence Structure": "A-B(50%)\u2192B-C(72%)\u2192C-D(-25%)",
+      "Success Rate (%)": 74.6,
+      "Avg Completion Time": "6.8 hrs",
+      "Velocity Factor": "1.1x",
+      "ILM Impact": 15.2,
+      "Session Preference": "Even hours pref",
+      "Source": "Doc 7, 13"
+    },
+    {
+      "Pattern Type": "Gamma",
+      "Sequence Structure": "A-B(61.8%)\u2192B-C(-50%)\u2192C-D(50%)",
+      "Success Rate (%)": 76.8,
+      "Avg Completion Time": "6.3 hrs",
+      "Velocity Factor": "1.15x",
+      "ILM Impact": 16.3,
+      "Session Preference": "All sessions",
+      "Source": "Doc 7, 13"
+    },
+    {
+      "Pattern Type": "Delta",
+      "Sequence Structure": "A-B(50%)\u2192B-C(-25%)\u2192C-D(50%)",
+      "Success Rate (%)": 72.9,
+      "Avg Completion Time": "5.8 hrs",
+      "Velocity Factor": "1.2x",
+      "ILM Impact": 14.8,
+      "Session Preference": "Even hours pref",
+      "Source": "Doc 7, 13, 16"
+    },
+    {
+      "Pattern Type": "15M AB-CD Bullish",
+      "Sequence Structure": "50%\u2192-25%",
+      "Success Rate (%)": 84.0,
+      "Avg Completion Time": "105 min",
+      "Velocity Factor": "Fast",
+      "ILM Impact": "+18.7% (ILM)",
+      "Session Preference": "Asian/London",
+      "Source": "Doc 5, 11"
+    },
+    {
+      "Pattern Type": "15M AB-CD Bearish",
+      "Sequence Structure": "61.8%\u2192-50%",
+      "Success Rate (%)": 66.0,
+      "Avg Completion Time": "85 min",
+      "Velocity Factor": "Fast",
+      "ILM Impact": 15.4,
+      "Session Preference": "All sessions",
+      "Source": "Doc 5, 11"
+    },
+    {
+      "Pattern Type": "1H Patterns",
+      "Sequence Structure": "Same structure as 15M",
+      "Success Rate (%)": "76-78%",
+      "Avg Completion Time": "2.3x vs 15M",
+      "Velocity Factor": "Moderate",
+      "ILM Impact": 16.8,
+      "Session Preference": "All sessions",
+      "Source": "Doc 11, 14"
+    },
+    {
+      "Pattern Type": "Layered Fibonacci",
+      "Sequence Structure": "50%\u219278.6%",
+      "Success Rate (%)": 83.0,
+      "Avg Completion Time": "Variable",
+      "Velocity Factor": "1.3x",
+      "ILM Impact": "Strong",
+      "Session Preference": "Trending markets",
+      "Source": "Doc 8"
+    },
+    {
+      "Pattern Type": "Layered Fibonacci Freq",
+      "Sequence Structure": "50%\u219278.6% occurrence",
+      "Success Rate (%)": 35.0,
+      "Avg Completion Time": "N/A",
+      "Velocity Factor": "N/A",
+      "ILM Impact": "35% of patterns",
+      "Session Preference": "Trending markets",
+      "Source": "Doc 8"
+    },
+    {
+      "Pattern Type": "Measured Moves",
+      "Sequence Structure": "50%\u2192100% continuation",
+      "Success Rate (%)": 100.0,
+      "Avg Completion Time": "Variable",
+      "Velocity Factor": "1.0x",
+      "ILM Impact": "N/A",
+      "Session Preference": "All sessions",
+      "Source": "Doc 4, 8"
+    },
+    {
+      "Pattern Type": "Monthly Fibonacci",
+      "Sequence Structure": "78.6\u219278.6\u219278.6",
+      "Success Rate (%)": 78.0,
+      "Avg Completion Time": "Monthly cycle",
+      "Velocity Factor": "Monthly scale",
+      "ILM Impact": "Monthly ILM",
+      "Session Preference": "N/A",
+      "Source": "Doc 19"
+    },
+    {
+      "Pattern Type": "Monthly Fib Frequency",
+      "Sequence Structure": "78.6\u219278.6\u219278.6 occurrence",
+      "Success Rate (%)": 24.6,
+      "Avg Completion Time": "N/A",
+      "Velocity Factor": "N/A",
+      "ILM Impact": "24.6% frequency",
+      "Session Preference": "78% bullish bias",
+      "Source": "Doc 19"
+    },
+    {
+      "Pattern Type": "Monthly Structure",
+      "Sequence Structure": "H4-L1-C5 pattern",
+      "Success Rate (%)": 78.0,
+      "Avg Completion Time": "Monthly cycle",
+      "Velocity Factor": "Monthly scale",
+      "ILM Impact": "N/A",
+      "Session Preference": "18.5% most common",
+      "Source": "Doc 19"
+    },
+    {
+      "Pattern Type": "Monthly Flow",
+      "Sequence Structure": "0\u2192+23.6 Fibonacci",
+      "Success Rate (%)": 83.0,
+      "Avg Completion Time": "Early month",
+      "Velocity Factor": "Fast early",
+      "ILM Impact": "N/A",
+      "Session Preference": "23.5% frequency",
+      "Source": "Doc 19"
+    },
+    {
+      "Pattern Type": "Day 1 Monthly High",
+      "Sequence Structure": "First day forms monthly high",
+      "Success Rate (%)": 10.77,
+      "Avg Completion Time": "Day 1",
+      "Velocity Factor": "N/A",
+      "ILM Impact": "N/A",
+      "Session Preference": "Early month",
+      "Source": "Doc 19"
+    },
+    {
+      "Pattern Type": "Day 1 Monthly Low",
+      "Sequence Structure": "First day forms monthly low",
+      "Success Rate (%)": 13.85,
+      "Avg Completion Time": "Day 1",
+      "Velocity Factor": "N/A",
+      "ILM Impact": "N/A",
+      "Session Preference": "Early month",
+      "Source": "Doc 19"
+    },
+    {
+      "Pattern Type": "Week 1 Monthly Pivot",
+      "Sequence Structure": "Week 1 forms high or low",
+      "Success Rate (%)": 56.24,
+      "Avg Completion Time": "Week 1",
+      "Velocity Factor": "N/A",
+      "ILM Impact": "N/A",
+      "Session Preference": "First week",
+      "Source": "Doc 19"
+    }
+  ]
+}

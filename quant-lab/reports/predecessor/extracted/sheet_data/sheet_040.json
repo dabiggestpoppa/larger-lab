@@ -1,0 +1,230 @@
+{
+  "sheet_name": "PHASE 5 - WILM ILM VELOCITY ANALYSIS",
+  "headers": [
+    "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS",
+    "col_2",
+    "col_3",
+    "col_4",
+    "col_5",
+    "col_6",
+    "col_7",
+    "col_8",
+    "col_9",
+    "col_10",
+    "col_11",
+    "col_12",
+    "col_13",
+    "col_14",
+    "col_15",
+    "col_16",
+    "col_17",
+    "col_18",
+    "col_19",
+    "col_20",
+    "col_21",
+    "col_22",
+    "col_23",
+    "col_24",
+    "col_25",
+    "col_26",
+    "col_27",
+    "col_28",
+    "col_29",
+    "col_30"
+  ],
+  "row_count": 36,
+  "data": [
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "Dataset: 281 Monday weeks (Jan 2020-May 2025) + 1,857 15M sessions (2023-2025)"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "Objective: Analyze WILM vs ILM velocity mechanics, alignment scenarios, misalignment risks, and 94.3% WILM rekey signal"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "ILM Component",
+      "col_2": "Data Coverage",
+      "col_3": "Key Finding",
+      "col_4": "Validation Status"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "WILM Velocity Mechanics",
+      "col_2": "281 weeks, 195 rekey events",
+      "col_3": "Highest velocity (1.8x-2.8x) but lowest hit rate (34.2%)",
+      "col_4": "VALIDATED \u2705"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "Daily ILM Velocity",
+      "col_2": "1,857 sessions",
+      "col_3": "Moderate velocity (1.2x-1.6x), highest hit rate (64.3%)",
+      "col_4": "VALIDATED \u2705"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "IELM Velocity",
+      "col_2": "1,857 sessions",
+      "col_3": "Balanced velocity (1.5x-2.1x), medium hit rate (48.3%)",
+      "col_4": "VALIDATED \u2705"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "Full ILM Alignment",
+      "col_2": "281 weeks",
+      "col_3": "87.3% hit rate, 2.5x+ velocity when aligned",
+      "col_4": "VALIDATED \u2705"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "Complete Misalignment",
+      "col_2": "281 weeks",
+      "col_3": "31.5% hit rate, velocity drops to 0.8x-1.0x, failure scenario",
+      "col_4": "VALIDATED \u2705"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "WILM Rekey Signal (94.3%)",
+      "col_2": "195 rekey events",
+      "col_3": "Consecutive 15M 61.8-88 micro-legs under WILM = HIGHEST rekey predictor",
+      "col_4": "VALIDATED \u2705"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "ILM Pattern Boost",
+      "col_2": "1,857 sessions",
+      "col_3": "14.8%-18.7% success boost, 25-29% faster formation",
+      "col_4": "VALIDATED \u2705"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "CRITICAL INSIGHT: WILM is the HIGHEST VELOCITY state (1.8x-2.8x) but LOWEST HIT RATE (34.2%)"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "- WILM is NOT a standalone entry signal. It accelerates existing patterns but does NOT guarantee success."
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "- Daily ILM has HIGHEST HIT RATE (64.3%) with moderate velocity (1.2x-1.6x) \u2192 BEST for pattern entry confirmation"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "- Full ILM Alignment (WILM + IELM + Daily ILM) = 87.3% success, 2.5x+ velocity \u2192 OPTIMAL EXECUTION ZONE"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "- Consecutive 61.8-88 micro-legs under WILM = 94.3% rekey signal \u2192 HIGHEST ACCURACY pattern in entire system"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "PART 1: WILM vs DAILY ILM vs IELM - VELOCITY & HIT RATE COMPARISON"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "ILM Type",
+      "col_2": "Definition (Zone)",
+      "col_3": "Time Influence",
+      "col_4": "Hit Rate (%)",
+      "col_5": "Continuation Rate (%)",
+      "col_6": "Velocity Multiplier",
+      "col_7": "Pattern Boost (%)",
+      "col_8": "Formation Speed Boost (%)",
+      "col_9": "Primary Session",
+      "col_10": "Use Case",
+      "col_11": "Risk Level"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "Daily ILM",
+      "col_2": "Previous day 50-61.8% zone",
+      "col_3": "2.8 hours",
+      "col_4": 64.3,
+      "col_5": 69.0,
+      "col_6": "1.2x-1.6x",
+      "col_7": 14.8,
+      "col_8": 25.0,
+      "col_9": "London, NY",
+      "col_10": "Short-term pattern confirmation, intraday entries",
+      "col_11": "LOW (Most reliable)"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "IELM (2-Day)",
+      "col_2": "Previous 2 days 50-61.8% zone",
+      "col_3": "24-48 hours",
+      "col_4": 48.3,
+      "col_5": 48.3,
+      "col_6": "1.5x-2.1x",
+      "col_7": 16.2,
+      "col_8": 27.0,
+      "col_9": "Tuesday-Thursday",
+      "col_10": "Multi-day continuation, swing entries",
+      "col_11": "MEDIUM (Balanced)"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "WILM (Weekly)",
+      "col_2": "Previous week 50-61.8% zone",
+      "col_3": "48-120 hours",
+      "col_4": 34.2,
+      "col_5": 34.2,
+      "col_6": "1.8x-2.8x (HIGHEST)",
+      "col_7": 18.7,
+      "col_8": 29.0,
+      "col_9": "Monday anchor, Wednesday violations",
+      "col_10": "High-velocity acceleration, rekey detection (94.3%)",
+      "col_11": "HIGH (Lowest hit rate)"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "4H ILM",
+      "col_2": "Previous 4H 50-61.8% zone",
+      "col_3": "4-8 hours",
+      "col_4": 67.8,
+      "col_5": 67.8,
+      "col_6": "1.3x-1.9x",
+      "col_7": 12.3,
+      "col_8": 22.0,
+      "col_9": "Intraday all sessions",
+      "col_10": "Micro-pattern confirmation, scalping",
+      "col_11": "LOW (High reliability)"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "Quarter Levels",
+      "col_2": "25/50/75/100 zones",
+      "col_3": "Variable (2-24h)",
+      "col_4": 80.5,
+      "col_5": 72.1,
+      "col_6": "1.3x-1.8x",
+      "col_7": 8.5,
+      "col_8": 18.0,
+      "col_9": "All sessions",
+      "col_10": "Universal reference points, support/resistance",
+      "col_11": "LOW (Most frequent)"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "KEY INSIGHT #1: ILM Hit Rate vs Velocity = INVERSE RELATIONSHIP"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "- Daily ILM: Highest hit rate (64.3%) but lowest velocity (1.2x-1.6x) \u2192 Best for ENTRY CONFIRMATION"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "- WILM: Lowest hit rate (34.2%) but highest velocity (1.8x-2.8x) \u2192 Best for ACCELERATION / REKEY DETECTION"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "- IELM: Balanced middle ground (48.3% hit, 1.5x-2.1x velocity) \u2192 Best for SWING POSITIONING"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "KEY INSIGHT #2: Pattern Formation Speed Boost = 22-29% faster when ILM present"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "- WILM: +29% faster (from 7.2h avg to 5.1h), but only 34.2% hit rate"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "- IELM: +27% faster (from 6.8h avg to 5.0h), 48.3% hit rate"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "- Daily ILM: +25% faster (from 6.2h avg to 4.6h), 64.3% hit rate (BEST)"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "- 4H ILM: +22% faster (from 4.5h avg to 3.5h), 67.8% hit rate"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "KEY INSIGHT #3: Pattern Success Boost = +8.5% to +18.7% when ILM present"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "- WILM: +18.7% boost (from 72% to 85.5% success) but only 34.2% engagement rate"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "- IELM: +16.2% boost (from 74% to 86.4% success), 48.3% engagement"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "- Daily ILM: +14.8% boost (from 76% to 87.2% success), 64.3% engagement (HIGHEST)"
+    },
+    {
+      "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS": "- Conclusion: Daily ILM is OPTIMAL FILTER for pattern entries (highest engagement \u00d7 good boost)"
+    }
+  ]
+}

@@ -1,0 +1,1034 @@
+{
+  "1___DETERMINISTIC__281_weeks": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "1 | \u2705 DETERMINISTIC | 281 weeks",
+    "row": 7
+  },
+  "pct_r8_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 8
+  },
+  "25_Extension_Hit_by_Friday": {
+    "value": 0.9,
+    "type": "ratio",
+    "context": "-25% Extension Hit by Friday",
+    "row": 8
+  },
+  "25_Extension_Hit_by_Friday__09": {
+    "value": 0.9822,
+    "type": "ratio",
+    "context": "-25% Extension Hit by Friday | 0.9",
+    "row": 8
+  },
+  "pct_r9_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 9
+  },
+  "50_Extension_Hit_by_Friday": {
+    "value": 0.82,
+    "type": "ratio",
+    "context": "-50% Extension Hit by Friday",
+    "row": 9
+  },
+  "50_Extension_Hit_by_Friday__082": {
+    "value": 0.9643999999999999,
+    "type": "ratio",
+    "context": "-50% Extension Hit by Friday | 0.82",
+    "row": 9
+  },
+  "pct_r10_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 10
+  },
+  "100_Extension_Hit_by_Friday__Not_claimed": {
+    "value": 0.9217,
+    "type": "ratio",
+    "context": "-100% Extension Hit by Friday | Not claimed",
+    "row": 10
+  },
+  "pct_r11_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 11
+  },
+  "168_Extension_Hit_by_Friday__Not_claimed": {
+    "value": 0.8719,
+    "type": "ratio",
+    "context": "-168% Extension Hit by Friday | Not claimed",
+    "row": 11
+  },
+  "pct_r12_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 12
+  },
+  "132_Violation_Triggers_Rekey": {
+    "value": 0.95,
+    "type": "ratio",
+    "context": "132% Violation Triggers Rekey",
+    "row": 12
+  },
+  "132_Violation_Triggers_Rekey__095": {
+    "value": 0.7153,
+    "type": "ratio",
+    "context": "132% Violation Triggers Rekey | 0.95",
+    "row": 12
+  },
+  "pct_r13_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 13
+  },
+  "1___DETERMINISTIC__195195": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "1 | \u2705 DETERMINISTIC | 195/195",
+    "row": 13
+  },
+  "NY_Open_Takes_Out_Both_HiLo": {
+    "value": 0.8,
+    "type": "ratio",
+    "context": "NY Open Takes Out Both Hi/Lo",
+    "row": 14
+  },
+  "NY_Open_Takes_Out_Both_HiLo__08": {
+    "value": 0.8,
+    "type": "ratio",
+    "context": "NY Open Takes Out Both Hi/Lo | 0.8",
+    "row": 14
+  },
+  "pct_r17_c0": {
+    "value": 68.3,
+    "type": "percentage",
+    "context": "",
+    "row": 17
+  },
+  "pct_r18_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 18
+  },
+  "pct_r22_c0": {
+    "value": 71.53,
+    "type": "percentage",
+    "context": "",
+    "row": 22
+  },
+  "pct_r23_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 23
+  },
+  "pct_r24_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 24
+  },
+  "pct_r25_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 25
+  },
+  "pct_r29_c0": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "",
+    "row": 29
+  },
+  "Monday_Anchor_0_100": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Monday Anchor (0%, 100%)",
+    "row": 29
+  },
+  "Monday_Anchor_0_100__25_Extension": {
+    "value": 0.9822,
+    "type": "ratio",
+    "context": "Monday Anchor (0%, 100%) | -25% Extension",
+    "row": 29
+  },
+  "25_Extension__09822__24h": {
+    "value": 0.9822,
+    "type": "ratio",
+    "context": "-25% Extension | 0.9822 | 24h",
+    "row": 29
+  },
+  "pct_r30_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 30
+  },
+  "25_Extension_Hit": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "-25% Extension Hit",
+    "row": 30
+  },
+  "25_Extension_Hit__50_Extension": {
+    "value": 0.92,
+    "type": "ratio",
+    "context": "-25% Extension Hit | -50% Extension",
+    "row": 30
+  },
+  "50_Extension__092__12h_cumulative_36h": {
+    "value": 0.9036,
+    "type": "ratio",
+    "context": "-50% Extension | 0.92 | 12h (cumulative 36h)",
+    "row": 30
+  },
+  "pct_r31_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 31
+  },
+  "50_Extension_Hit": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "-50% Extension Hit",
+    "row": 31
+  },
+  "50_Extension_Hit__100_Extension": {
+    "value": 0.85,
+    "type": "ratio",
+    "context": "-50% Extension Hit | -100% Extension",
+    "row": 31
+  },
+  "100_Extension__085__12h_cumulative_48h": {
+    "value": 0.7681,
+    "type": "ratio",
+    "context": "-100% Extension | 0.85 | 12h (cumulative 48h)",
+    "row": 31
+  },
+  "pct_r32_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 32
+  },
+  "100_Extension_Hit": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "-100% Extension Hit",
+    "row": 32
+  },
+  "100_Extension_Hit__168_Extension": {
+    "value": 0.78,
+    "type": "ratio",
+    "context": "-100% Extension Hit | -168% Extension",
+    "row": 32
+  },
+  "168_Extension__078__12h_cumulative_60h": {
+    "value": 0.5991,
+    "type": "ratio",
+    "context": "-168% Extension | 0.78 | 12h (cumulative 60h)",
+    "row": 32
+  },
+  "pct_r33_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 33
+  },
+  "100_Break_WITHOUT_25": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "100% Break WITHOUT -25%",
+    "row": 33
+  },
+  "100_Break_WITHOUT_25__132_Violation": {
+    "value": 0.65,
+    "type": "ratio",
+    "context": "100% Break WITHOUT -25% | 132% Violation",
+    "row": 33
+  },
+  "132_Violation__065__18h": {
+    "value": 0.65,
+    "type": "ratio",
+    "context": "132% Violation | 0.65 | 18h",
+    "row": 33
+  },
+  "pct_r34_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 34
+  },
+  "132_Violation": {
+    "value": 78.6,
+    "type": "percentage",
+    "context": "132% Violation",
+    "row": 34
+  },
+  "132_Violation__786_Rekey_Retrace": {
+    "value": 0.92,
+    "type": "ratio",
+    "context": "132% Violation | 78.6% Rekey Retrace",
+    "row": 34
+  },
+  "786_Rekey_Retrace__092__412h": {
+    "value": 0.92,
+    "type": "ratio",
+    "context": "78.6% Rekey Retrace | 0.92 | 4-12h",
+    "row": 34
+  },
+  "pct_r35_c0": {
+    "value": 78.6,
+    "type": "percentage",
+    "context": "",
+    "row": 35
+  },
+  "786_Rekey_Hit": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "78.6% Rekey Hit",
+    "row": 35
+  },
+  "786_Rekey_Hit__50_Rekey_Consolidation": {
+    "value": 0.85,
+    "type": "ratio",
+    "context": "78.6% Rekey Hit | 50% Rekey Consolidation",
+    "row": 35
+  },
+  "50_Rekey_Consolidation__085__812h_cumulative_1224h": {
+    "value": 0.782,
+    "type": "ratio",
+    "context": "50% Rekey Consolidation | 0.85 | 8-12h (cumulative 12-24h)",
+    "row": 35
+  },
+  "pct_r36_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 36
+  },
+  "50_Rekey_Hit": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "50% Rekey Hit",
+    "row": 36
+  },
+  "50_Rekey_Hit__50_Extension_from_New_Anchor": {
+    "value": 0.78,
+    "type": "ratio",
+    "context": "50% Rekey Hit | -50% Extension from New Anchor",
+    "row": 36
+  },
+  "50_Extension_from_New_Anchor__078__12h_cumulative": {
+    "value": 0.61,
+    "type": "ratio",
+    "context": "-50% Extension from New Anchor | 0.78 | 12h (cumulative 24-36h)",
+    "row": 36
+  },
+  "Monday_London_Close_1600_UTC": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Monday London Close (16:00 UTC)",
+    "row": 42
+  },
+  "Monday_London_Close_1600_UTC__Is_25_hit_by_Mon_clo": {
+    "value": 68.0,
+    "type": "percentage",
+    "context": "Monday London Close (16:00 UTC) | Is -25% hit by Mon close? | YES \u2192 -50% by Wed = 82%",
+    "row": 42
+  },
+  "Is_25_hit_by_Mon_close__YES__50_by_Wed__82__68_of": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Is -25% hit by Mon close? | YES \u2192 -50% by Wed = 82% | 68% of weeks",
+    "row": 42
+  },
+  "YES__50_by_Wed__82__68_of_weeks__NO__Monitor_100_l": {
+    "value": 32.0,
+    "type": "percentage",
+    "context": "YES \u2192 -50% by Wed = 82% | 68% of weeks | NO \u2192 Monitor 100% level",
+    "row": 42
+  },
+  "Wednesday_Close_1600_EST": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Wednesday Close (16:00 EST)",
+    "row": 44
+  },
+  "Wednesday_Close_1600_EST__Is_25_hit_by_Wed_close": {
+    "value": 70.0,
+    "type": "percentage",
+    "context": "Wednesday Close (16:00 EST) | Is -25% hit by Wed close? | YES \u2192 132% Risk = 30%",
+    "row": 43
+  },
+  "Is_25_hit_by_Wed_close__YES__132_Risk__30__70_of_w": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Is -25% hit by Wed close? | YES \u2192 132% Risk = 30% | 70% of weeks",
+    "row": 43
+  },
+  "YES__132_Risk__30__70_of_weeks__NO__132_Risk__70": {
+    "value": 30.0,
+    "type": "percentage",
+    "context": "YES \u2192 132% Risk = 30% | 70% of weeks | NO \u2192 132% Risk = 70%",
+    "row": 43
+  },
+  "Wednesday_Close_1600_EST__Is_50_hit_by_Wed_close": {
+    "value": 85.0,
+    "type": "percentage",
+    "context": "Wednesday Close (16:00 EST) | Is -50% hit by Wed close? | YES \u2192 -100% by Fri = 88%",
+    "row": 44
+  },
+  "Is_50_hit_by_Wed_close__YES__100_by_Fri__88__85_of": {
+    "value": 75.0,
+    "type": "percentage",
+    "context": "Is -50% hit by Wed close? | YES \u2192 -100% by Fri = 88% | 85% of weeks",
+    "row": 44
+  },
+  "YES__100_by_Fri__88__85_of_weeks__NO__75_pullback": {
+    "value": 15.0,
+    "type": "percentage",
+    "context": "YES \u2192 -100% by Fri = 88% | 85% of weeks | NO \u2192 75% pullback to 78.6%",
+    "row": 44
+  },
+  "Thursday_AM_0800_EST": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Thursday AM (08:00 EST)",
+    "row": 45
+  },
+  "Thursday_AM_0800_EST__Is_100_hit_by_Thu_AM": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "Thursday AM (08:00 EST) | Is -100% hit by Thu AM?",
+    "row": 45
+  },
+  "Thursday_AM_0800_EST__Is_100_hit_by_Thu_AM__YES__1": {
+    "value": 92.0,
+    "type": "percentage",
+    "context": "Thursday AM (08:00 EST) | Is -100% hit by Thu AM? | YES \u2192 -168% by Fri = 85%",
+    "row": 45
+  },
+  "Is_100_hit_by_Thu_AM__YES__168_by_Fri__85__92_of_w": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Is -100% hit by Thu AM? | YES \u2192 -168% by Fri = 85% | 92% of weeks",
+    "row": 45
+  },
+  "YES__168_by_Fri__85__92_of_weeks__NO__Week_likely": {
+    "value": 8.0,
+    "type": "percentage",
+    "context": "YES \u2192 -168% by Fri = 85% | 92% of weeks | NO \u2192 Week likely completes at -100%",
+    "row": 45
+  },
+  "ANY_TIME": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "ANY TIME",
+    "row": 46
+  },
+  "ANY_TIME__132_violated__NO__Normal_delivery_contin": {
+    "value": 28.47,
+    "type": "percentage",
+    "context": "ANY TIME | 132% violated? | NO \u2192 Normal delivery continues",
+    "row": 46
+  },
+  "132_violated__NO__Normal_delivery_continues__2847": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "132% violated? | NO \u2192 Normal delivery continues | 28.47%",
+    "row": 46
+  },
+  "NO__Normal_delivery_continues__2847__YES__Immediat": {
+    "value": 71.53,
+    "type": "percentage",
+    "context": "NO \u2192 Normal delivery continues | 28.47% | YES \u2192 Immediate rekey (100%)",
+    "row": 46
+  },
+  "pct_r49_c0": {
+    "value": 35.0,
+    "type": "percentage",
+    "context": "",
+    "row": 49
+  },
+  "pct_r50_c0": {
+    "value": 70.0,
+    "type": "percentage",
+    "context": "",
+    "row": 50
+  },
+  "pct_r51_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 51
+  },
+  "Monday_London_Open__02000600": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "Monday London Open | 02:00-06:00",
+    "row": 56
+  },
+  "Monday_London_Open__02000600__Establish_0_and_100": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Monday London Open | 02:00-06:00 | Establish 0% and 100% anchor",
+    "row": 56
+  },
+  "Monday_NY_Open__07000800__Liquidity_sweep_HiLo_tak": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "Monday NY Open | 07:00-08:00 | Liquidity sweep (Hi/Lo takeout)",
+    "row": 57
+  },
+  "07000800__Liquidity_sweep_HiLo_takeout__80_both_Hi": {
+    "value": 0.8,
+    "type": "ratio",
+    "context": "07:00-08:00 | Liquidity sweep (Hi/Lo takeout) | 80% both Hi/Lo taken out",
+    "row": 57
+  },
+  "Monday_NY_Session__08001600__Initial_extension_del": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Monday NY Session | 08:00-16:00 | Initial extension delivery",
+    "row": 58
+  },
+  "08001600__Initial_extension_delivery__25_delivery": {
+    "value": 0.68,
+    "type": "ratio",
+    "context": "08:00-16:00 | Initial extension delivery | -25% delivery (68% by Mon close)",
+    "row": 58
+  },
+  "Tuesday_LondonNY__02001600__Primary_extension_wind": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Tuesday London-NY | 02:00-16:00 | Primary extension window",
+    "row": 59
+  },
+  "02001600__Primary_extension_window__50_delivery_82": {
+    "value": 0.82,
+    "type": "ratio",
+    "context": "02:00-16:00 | Primary extension window | -50% delivery (82% by Tue close)",
+    "row": 59
+  },
+  "Wednesday_Overlap__08001200__Peak_invalidation_win": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Wednesday Overlap | 08:00-12:00 | Peak invalidation window",
+    "row": 60
+  },
+  "08001200__Peak_invalidation_window__132_violations": {
+    "value": 0.35,
+    "type": "ratio",
+    "context": "08:00-12:00 | Peak invalidation window | 132% violations (35% of total)",
+    "row": 60
+  },
+  "ThursdayFriday__02001600__Deep_extension_completio": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Thursday-Friday | 02:00-16:00 | Deep extension completion",
+    "row": 61
+  },
+  "02001600__Deep_extension_completion__100_168_deliv": {
+    "value": 0.92,
+    "type": "ratio",
+    "context": "02:00-16:00 | Deep extension completion | -100%, -168% delivery",
+    "row": 61
+  },
+  "pct_r62_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 62
+  },
+  "Post132_any_time__Immediate__Rekey_sequence_initia": {
+    "value": 78.6,
+    "type": "percentage",
+    "context": "Post-132% (any time) | Immediate | Rekey sequence initiation",
+    "row": 62
+  },
+  "Immediate__Rekey_sequence_initiation__786_retrace": {
+    "value": 0.92,
+    "type": "ratio",
+    "context": "Immediate | Rekey sequence initiation | 78.6% retrace (92% prob)",
+    "row": 62
+  },
+  "pct_r66_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 66
+  },
+  "pct_r67_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 67
+  },
+  "Behavior_Type__Frequency": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Behavior Type | Frequency (%)",
+    "row": 68
+  },
+  "OneSided_Spike__Reversal": {
+    "value": 0.48,
+    "type": "ratio",
+    "context": "One-Sided Spike \u2192 Reversal",
+    "row": 69
+  },
+  "OneSided_Spike__Reversal__048": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "One-Sided Spike \u2192 Reversal | 0.48",
+    "row": 69
+  },
+  "Spike__Pullback__Retest": {
+    "value": 0.31,
+    "type": "ratio",
+    "context": "Spike \u2192 Pullback \u2192 Re-test",
+    "row": 70
+  },
+  "Spike__Pullback__Retest__031": {
+    "value": 15.0,
+    "type": "percentage",
+    "context": "Spike \u2192 Pullback \u2192 Re-test | 0.31",
+    "row": 70
+  },
+  "Deep_Extension__Gradual_Reversal": {
+    "value": 0.16,
+    "type": "ratio",
+    "context": "Deep Extension \u2192 Gradual Reversal",
+    "row": 71
+  },
+  "Deep_Extension__Gradual_Reversal__016": {
+    "value": 60.0,
+    "type": "percentage",
+    "context": "Deep Extension \u2192 Gradual Reversal | 0.16",
+    "row": 71
+  },
+  "Black_Swan_Event": {
+    "value": 0.05,
+    "type": "ratio",
+    "context": "Black Swan Event",
+    "row": 72
+  },
+  "Black_Swan_Event__005": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "Black Swan Event | 0.05",
+    "row": 72
+  },
+  "pct_r74_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 74
+  },
+  "412_hours__Initial_Reversal": {
+    "value": 78.6,
+    "type": "percentage",
+    "context": "4-12 hours | Initial Reversal",
+    "row": 76
+  },
+  "412_hours__Initial_Reversal__786_retrace_from_132": {
+    "value": 0.92,
+    "type": "ratio",
+    "context": "4-12 hours | Initial Reversal | 78.6% retrace from 132% peak",
+    "row": 76
+  },
+  "1224_hours__Consolidation": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "12-24 hours | Consolidation",
+    "row": 77
+  },
+  "1224_hours__Consolidation__50_retrace_from_132_pea": {
+    "value": 0.85,
+    "type": "ratio",
+    "context": "12-24 hours | Consolidation | 50% retrace from 132% peak",
+    "row": 77
+  },
+  "2436_hours__New_Directional_Bias": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "24-36 hours | New Directional Bias",
+    "row": 78
+  },
+  "2436_hours__New_Directional_Bias__50_extension_fro": {
+    "value": 0.78,
+    "type": "ratio",
+    "context": "24-36 hours | New Directional Bias | -50% extension from new anchor",
+    "row": 78
+  },
+  "3648_hours__Pattern_Completion": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "36-48 hours | Pattern Completion",
+    "row": 79
+  },
+  "3648_hours__Pattern_Completion__100_extension_poss": {
+    "value": 0.62,
+    "type": "ratio",
+    "context": "36-48 hours | Pattern Completion | -100% extension possibility",
+    "row": 79
+  },
+  "pct_r81_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 81
+  },
+  "pct_r82_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 82
+  },
+  "pct_r83_c0": {
+    "value": 0.0,
+    "type": "percentage",
+    "context": "",
+    "row": 83
+  },
+  "pct_r84_c0": {
+    "value": 78.6,
+    "type": "percentage",
+    "context": "",
+    "row": 84
+  },
+  "pct_r85_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 85
+  },
+  "pct_r89_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 89
+  },
+  "25_Extension__2432_candles__68h": {
+    "value": 0.9822,
+    "type": "ratio",
+    "context": "-25% Extension | 24-32 candles | 6-8h",
+    "row": 89
+  },
+  "pct_r90_c0": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "",
+    "row": 90
+  },
+  "50_Extension__4864_candles__1216h": {
+    "value": 0.9643999999999999,
+    "type": "ratio",
+    "context": "-50% Extension | 48-64 candles | 12-16h",
+    "row": 90
+  },
+  "pct_r91_c0": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "",
+    "row": 91
+  },
+  "100_Extension__8096_candles__2024h": {
+    "value": 0.9217,
+    "type": "ratio",
+    "context": "-100% Extension | 80-96 candles | 20-24h",
+    "row": 91
+  },
+  "pct_r92_c0": {
+    "value": 168.0,
+    "type": "percentage",
+    "context": "",
+    "row": 92
+  },
+  "168_Extension__112128_candles__2832h": {
+    "value": 0.8719,
+    "type": "ratio",
+    "context": "-168% Extension | 112-128 candles | 28-32h",
+    "row": 92
+  },
+  "pct_r93_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 93
+  },
+  "132_Invalidation__5672_candles__1418h": {
+    "value": 0.7153,
+    "type": "ratio",
+    "context": "132% Invalidation | 56-72 candles | 14-18h",
+    "row": 93
+  },
+  "pct_r94_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 94
+  },
+  "Post132_786_Rekey__1624_candles__46h": {
+    "value": 0.92,
+    "type": "ratio",
+    "context": "Post-132% 78.6% Rekey | 16-24 candles | 4-6h",
+    "row": 94
+  },
+  "46h__092__Reversal__consolidation": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "4-6h | 0.92 | Reversal + consolidation",
+    "row": 94
+  },
+  "pct_r95_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 95
+  },
+  "Post132_50_Extension__4864_candles__1216h": {
+    "value": 0.78,
+    "type": "ratio",
+    "context": "Post-132% -50% Extension | 48-64 candles | 12-16h",
+    "row": 95
+  },
+  "1216h__078__New_Alpha_sequence": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "12-16h | 0.78 | New Alpha sequence",
+    "row": 95
+  },
+  "Alpha_3Leg_Expansion": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Alpha 3-Leg Expansion",
+    "row": 99
+  },
+  "Alpha_3Leg_Expansion__502550": {
+    "value": 0.7829999999999999,
+    "type": "ratio",
+    "context": "Alpha 3-Leg Expansion | 50%\u2192-25%\u2192-50%",
+    "row": 99
+  },
+  "ABCD_Bullish": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "AB-CD Bullish",
+    "row": 100
+  },
+  "ABCD_Bullish__50_retrace__25_ext": {
+    "value": 0.84,
+    "type": "ratio",
+    "context": "AB-CD Bullish | 50% retrace \u2192 -25% ext",
+    "row": 100
+  },
+  "Consecutive_61888_Microlegs__3_legs_under_WILM": {
+    "value": 0.943,
+    "type": "ratio",
+    "context": "Consecutive 61.8-88 Micro-legs | 3+ legs under WILM",
+    "row": 101
+  },
+  "WEZ_Formation__ILM__Wick_at_ILM__reversal": {
+    "value": 0.6779999999999999,
+    "type": "ratio",
+    "context": "WEZ Formation + ILM | Wick at ILM \u2192 reversal",
+    "row": 102
+  },
+  "pct_r103_c0": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "",
+    "row": 103
+  },
+  "132_Spike_Cascade": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "132% Spike Cascade",
+    "row": 103
+  },
+  "132_Spike_Cascade__Rapid_132_violation": {
+    "value": 0.7153,
+    "type": "ratio",
+    "context": "132% Spike Cascade | Rapid 132% violation",
+    "row": 103
+  },
+  "M2_Predictor_Effectiveness__8929_score___SECOND": {
+    "value": 42.0,
+    "type": "percentage",
+    "context": "M2 Predictor Effectiveness | 89.29 score | \ud83e\udd48 SECOND",
+    "row": 111
+  },
+  "M3_Predictor_Effectiveness__50_score___THIRD": {
+    "value": 146.0,
+    "type": "percentage",
+    "context": "M3 Predictor Effectiveness | 50 score | \ud83e\udd49 THIRD",
+    "row": 112
+  },
+  "Normal_Weekly_Flow": {
+    "value": 68.3,
+    "type": "percentage",
+    "context": "Normal Weekly Flow",
+    "row": 113
+  },
+  "Invalidation__Rekey_Flow": {
+    "value": 71.53,
+    "type": "percentage",
+    "context": "Invalidation + Rekey Flow",
+    "row": 114
+  },
+  "Invalidation__Rekey_Flow__7153_trigger_rate": {
+    "value": 100.0,
+    "type": "percentage",
+    "context": "Invalidation + Rekey Flow | 71.53% trigger rate | \u2705",
+    "row": 114
+  },
+  "Wednesday_Bifurcation_Critical": {
+    "value": 35.0,
+    "type": "percentage",
+    "context": "Wednesday Bifurcation Critical",
+    "row": 115
+  },
+  "NY_Open_Algo_Validated": {
+    "value": 80.0,
+    "type": "percentage",
+    "context": "NY Open Algo Validated",
+    "row": 116
+  },
+  "Quarter__Bias": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "Quarter | Bias",
+    "row": 119
+  },
+  "Quarter__Bias__25_Hit_Rate": {
+    "value": 50.0,
+    "type": "percentage",
+    "context": "Quarter | Bias | -25% Hit Rate (%)",
+    "row": 119
+  },
+  "Bias__25_Hit_Rate___50_Hit_Rate": {
+    "value": 132.0,
+    "type": "percentage",
+    "context": "Bias | -25% Hit Rate (%) | -50% Hit Rate (%)",
+    "row": 119
+  },
+  "Q1__Bullish": {
+    "value": 0.9783,
+    "type": "ratio",
+    "context": "Q1 | Bullish",
+    "row": 120
+  },
+  "Q1__Bullish__09783": {
+    "value": 0.9565,
+    "type": "ratio",
+    "context": "Q1 | Bullish | 0.9783",
+    "row": 120
+  },
+  "Bullish__09783__09565": {
+    "value": 0.6739,
+    "type": "ratio",
+    "context": "Bullish | 0.9783 | 0.9565",
+    "row": 120
+  },
+  "Bearish__1__1": {
+    "value": 0.6129,
+    "type": "ratio",
+    "context": "Bearish | 1 | 1",
+    "row": 127
+  },
+  "Q2__Bullish": {
+    "value": 0.9722,
+    "type": "ratio",
+    "context": "Q2 | Bullish",
+    "row": 122
+  },
+  "Q2__Bullish__09722": {
+    "value": 0.9722,
+    "type": "ratio",
+    "context": "Q2 | Bullish | 0.9722",
+    "row": 122
+  },
+  "Bullish__09722__09722": {
+    "value": 0.6389,
+    "type": "ratio",
+    "context": "Bullish | 0.9722 | 0.9722",
+    "row": 122
+  },
+  "Q2__Bearish__1": {
+    "value": 0.9722,
+    "type": "ratio",
+    "context": "Q2 | Bearish | 1",
+    "row": 123
+  },
+  "Bearish__1__09722": {
+    "value": 0.9167000000000001,
+    "type": "ratio",
+    "context": "Bearish | 1 | 0.9722",
+    "row": 123
+  },
+  "Q3__Bullish": {
+    "value": 0.9706,
+    "type": "ratio",
+    "context": "Q3 | Bullish",
+    "row": 124
+  },
+  "Q3__Bullish__09706": {
+    "value": 0.9412,
+    "type": "ratio",
+    "context": "Q3 | Bullish | 0.9706",
+    "row": 124
+  },
+  "Bullish__09706__09412": {
+    "value": 0.6175999999999999,
+    "type": "ratio",
+    "context": "Bullish | 0.9706 | 0.9412",
+    "row": 124
+  },
+  "Q3__Bearish": {
+    "value": 0.9375,
+    "type": "ratio",
+    "context": "Q3 | Bearish",
+    "row": 125
+  },
+  "Q3__Bearish__09375": {
+    "value": 0.9375,
+    "type": "ratio",
+    "context": "Q3 | Bearish | 0.9375",
+    "row": 125
+  },
+  "Bearish__09375__09375": {
+    "value": 0.7812,
+    "type": "ratio",
+    "context": "Bearish | 0.9375 | 0.9375",
+    "row": 125
+  },
+  "Q4__Bullish__1": {
+    "value": 0.9412,
+    "type": "ratio",
+    "context": "Q4 | Bullish | 1",
+    "row": 126
+  },
+  "Bullish__1__09412": {
+    "value": 0.6175999999999999,
+    "type": "ratio",
+    "context": "Bullish | 1 | 0.9412",
+    "row": 126
+  },
+  "pct_r129_c0": {
+    "value": 25.0,
+    "type": "percentage",
+    "context": "",
+    "row": 129
+  }
+}
