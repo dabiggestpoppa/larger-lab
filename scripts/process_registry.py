@@ -20,7 +20,7 @@ from pathlib import Path
 LOG_FILE = Path(__file__).resolve().parent.parent / "logs" / "process_registry.log"
 
 PROCESSES = [
-    {"name": "bridge", "script": "quant-lab/mt5/cerebus_live_bridge.py",
+    {"name": "bridge", "script": "quant-lab/mt5/clean_bridge.py",
      "args": ["--symbols", "EURJPY.PRO,EURNZD.PRO,GBPNZD.PRO,EURAUD.PRO,GBPAUD.PRO,GBPCAD.PRO,FR40.PRO", "--lot-size", "0.01"],
      "cwd": "quant-lab/mt5", "max": 1},
     {"name": "signal_bot", "script": "scripts/signal_bot.py", "args": [], "cwd": ".", "max": 1},

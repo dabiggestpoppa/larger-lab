@@ -89,6 +89,17 @@ DEPLOYMENT_CONFIGS = {
         },
         "expected": {"wr": 80.0, "pf": 10.9, "tr_per_day": 2.01, "rr": 2.7},
     },
+    "FR40.PRO": {
+        "name": "FR40",
+        "pip_value": 0.01,
+        "mode": "floor",
+        "tiers": {
+            "T1": {"ar_max": 60.0, "au": 12.0, "trigger": 16.0},
+            "T2": {"ar_max": 60.0, "au": 16.0, "trigger": 16.0},
+            "T3": {"ar_max": 60.0, "au": 22.0, "trigger": 16.0},
+        },
+        "expected": {"wr": 80.0, "pf": 12.0, "tr_per_day": 1.5, "rr": 2.8},
+    },
 }
 
 DEPLOY_SYMBOLS = list(DEPLOYMENT_CONFIGS.keys())
