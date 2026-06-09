@@ -1,0 +1,1094 @@
+{
+  "AUDCAD": {
+    "days": 1917,
+    "intraday": {
+      "ext_25": {
+        "hits": 1917,
+        "total": 1917
+      },
+      "ext_50": {
+        "hits": 1917,
+        "total": 1917
+      },
+      "ext_100": {
+        "hits": 16,
+        "total": 1917
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1917
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 263,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 204,
+        "total": 336
+      }
+    }
+  },
+  "AUDCHF": {
+    "days": 1918,
+    "intraday": {
+      "ext_25": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_50": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_100": {
+        "hits": 11,
+        "total": 1918
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1918
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 245,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 188,
+        "total": 336
+      }
+    }
+  },
+  "AUDJPY": {
+    "days": 1918,
+    "intraday": {
+      "ext_25": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_50": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_100": {
+        "hits": 1,
+        "total": 1918
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1918
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 261,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 213,
+        "total": 336
+      }
+    }
+  },
+  "AUDNZD": {
+    "days": 1918,
+    "intraday": {
+      "ext_25": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_50": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_100": {
+        "hits": 10,
+        "total": 1918
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1918
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 239,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 182,
+        "total": 336
+      }
+    }
+  },
+  "AUDUSD": {
+    "days": 1918,
+    "intraday": {
+      "ext_25": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_50": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_100": {
+        "hits": 5,
+        "total": 1918
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1918
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 259,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 200,
+        "total": 336
+      }
+    }
+  },
+  "CADCHF": {
+    "days": 1918,
+    "intraday": {
+      "ext_25": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_50": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_100": {
+        "hits": 10,
+        "total": 1918
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1918
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 261,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 197,
+        "total": 336
+      }
+    }
+  },
+  "CADJPY": {
+    "days": 1905,
+    "intraday": {
+      "ext_25": {
+        "hits": 1905,
+        "total": 1905
+      },
+      "ext_50": {
+        "hits": 1905,
+        "total": 1905
+      },
+      "ext_100": {
+        "hits": 6,
+        "total": 1905
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1905
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 257,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 202,
+        "total": 336
+      }
+    }
+  },
+  "CHFJPY": {
+    "days": 1918,
+    "intraday": {
+      "ext_25": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_50": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_100": {
+        "hits": 12,
+        "total": 1918
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1918
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 256,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 195,
+        "total": 336
+      }
+    }
+  },
+  "EURAUD": {
+    "days": 1918,
+    "intraday": {
+      "ext_25": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_50": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_100": {
+        "hits": 6,
+        "total": 1918
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1918
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 248,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 189,
+        "total": 336
+      }
+    }
+  },
+  "EURCAD": {
+    "days": 1918,
+    "intraday": {
+      "ext_25": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_50": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_100": {
+        "hits": 6,
+        "total": 1918
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1918
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 260,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 201,
+        "total": 336
+      }
+    }
+  },
+  "EURCHF": {
+    "days": 1918,
+    "intraday": {
+      "ext_25": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_50": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_100": {
+        "hits": 15,
+        "total": 1918
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1918
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 231,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 169,
+        "total": 336
+      }
+    }
+  },
+  "EURGBP": {
+    "days": 1918,
+    "intraday": {
+      "ext_25": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_50": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_100": {
+        "hits": 14,
+        "total": 1918
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1918
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 264,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 199,
+        "total": 336
+      }
+    }
+  },
+  "EURJPY": {
+    "days": 1918,
+    "intraday": {
+      "ext_25": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_50": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_100": {
+        "hits": 3,
+        "total": 1918
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1918
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 257,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 196,
+        "total": 336
+      }
+    }
+  },
+  "EURNZD": {
+    "days": 1918,
+    "intraday": {
+      "ext_25": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_50": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_100": {
+        "hits": 6,
+        "total": 1918
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1918
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 256,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 184,
+        "total": 336
+      }
+    }
+  },
+  "GBPAUD": {
+    "days": 1905,
+    "intraday": {
+      "ext_25": {
+        "hits": 1905,
+        "total": 1905
+      },
+      "ext_50": {
+        "hits": 1905,
+        "total": 1905
+      },
+      "ext_100": {
+        "hits": 1,
+        "total": 1905
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1905
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 253,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 197,
+        "total": 336
+      }
+    }
+  },
+  "GBPCAD": {
+    "days": 1874,
+    "intraday": {
+      "ext_25": {
+        "hits": 1874,
+        "total": 1874
+      },
+      "ext_50": {
+        "hits": 1874,
+        "total": 1874
+      },
+      "ext_100": {
+        "hits": 6,
+        "total": 1874
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1874
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 258,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 195,
+        "total": 336
+      }
+    }
+  },
+  "GBPCHF": {
+    "days": 1918,
+    "intraday": {
+      "ext_25": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_50": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_100": {
+        "hits": 6,
+        "total": 1918
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1918
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 261,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 201,
+        "total": 336
+      }
+    }
+  },
+  "GBPJPY": {
+    "days": 1918,
+    "intraday": {
+      "ext_25": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_50": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_100": {
+        "hits": 3,
+        "total": 1918
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1918
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 250,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 189,
+        "total": 336
+      }
+    }
+  },
+  "GBPNZD": {
+    "days": 1874,
+    "intraday": {
+      "ext_25": {
+        "hits": 1874,
+        "total": 1874
+      },
+      "ext_50": {
+        "hits": 1874,
+        "total": 1874
+      },
+      "ext_100": {
+        "hits": 10,
+        "total": 1874
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1874
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 257,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 174,
+        "total": 336
+      }
+    }
+  },
+  "GBPUSD": {
+    "days": 1918,
+    "intraday": {
+      "ext_25": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_50": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_100": {
+        "hits": 2,
+        "total": 1918
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1918
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 267,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 216,
+        "total": 336
+      }
+    }
+  },
+  "NZDCAD": {
+    "days": 1905,
+    "intraday": {
+      "ext_25": {
+        "hits": 1905,
+        "total": 1905
+      },
+      "ext_50": {
+        "hits": 1905,
+        "total": 1905
+      },
+      "ext_100": {
+        "hits": 16,
+        "total": 1905
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1905
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 263,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 193,
+        "total": 336
+      }
+    }
+  },
+  "NZDCHF": {
+    "days": 1905,
+    "intraday": {
+      "ext_25": {
+        "hits": 1905,
+        "total": 1905
+      },
+      "ext_50": {
+        "hits": 1905,
+        "total": 1905
+      },
+      "ext_100": {
+        "hits": 13,
+        "total": 1905
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1905
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 253,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 189,
+        "total": 336
+      }
+    }
+  },
+  "NZDJPY": {
+    "days": 1905,
+    "intraday": {
+      "ext_25": {
+        "hits": 1905,
+        "total": 1905
+      },
+      "ext_50": {
+        "hits": 1905,
+        "total": 1905
+      },
+      "ext_100": {
+        "hits": 5,
+        "total": 1905
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1905
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 254,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 188,
+        "total": 336
+      }
+    }
+  },
+  "NZDUSD": {
+    "days": 1867,
+    "intraday": {
+      "ext_25": {
+        "hits": 1867,
+        "total": 1867
+      },
+      "ext_50": {
+        "hits": 1867,
+        "total": 1867
+      },
+      "ext_100": {
+        "hits": 9,
+        "total": 1867
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1867
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 334,
+        "total": 334
+      },
+      "ext_50": {
+        "hits": 334,
+        "total": 334
+      },
+      "ext_100": {
+        "hits": 256,
+        "total": 334
+      },
+      "rekey": {
+        "hits": 198,
+        "total": 334
+      }
+    }
+  },
+  "USDCAD": {
+    "days": 1918,
+    "intraday": {
+      "ext_25": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_50": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_100": {
+        "hits": 7,
+        "total": 1918
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1918
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 257,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 197,
+        "total": 336
+      }
+    }
+  },
+  "USDJPY": {
+    "days": 1918,
+    "intraday": {
+      "ext_25": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_50": {
+        "hits": 1918,
+        "total": 1918
+      },
+      "ext_100": {
+        "hits": 2,
+        "total": 1918
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1918
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 258,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 212,
+        "total": 336
+      }
+    }
+  },
+  "XAGUSD": {
+    "days": 1891,
+    "intraday": {
+      "ext_25": {
+        "hits": 1891,
+        "total": 1891
+      },
+      "ext_50": {
+        "hits": 1891,
+        "total": 1891
+      },
+      "ext_100": {
+        "hits": 9,
+        "total": 1891
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1891
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 252,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 193,
+        "total": 336
+      }
+    }
+  },
+  "XAUUSD": {
+    "days": 1894,
+    "intraday": {
+      "ext_25": {
+        "hits": 1894,
+        "total": 1894
+      },
+      "ext_50": {
+        "hits": 1894,
+        "total": 1894
+      },
+      "ext_100": {
+        "hits": 1,
+        "total": 1894
+      },
+      "rekey": {
+        "hits": 0,
+        "total": 1894
+      }
+    },
+    "weekly": {
+      "ext_25": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_50": {
+        "hits": 336,
+        "total": 336
+      },
+      "ext_100": {
+        "hits": 247,
+        "total": 336
+      },
+      "rekey": {
+        "hits": 192,
+        "total": 336
+      }
+    }
+  }
+}
