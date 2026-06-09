@@ -3,11 +3,11 @@
 > **Purpose:** Quick-communication hub for CC/PM/PM2/AS/RL coordination.
 > **Current focus:** Quant Lab — 9K Config Test + Monte Carlo + Forward Test Prep
 > **Plan:** `quant-lab/QUANT_JOURNAL.md`
-> **Last Updated:** 2026-06-08 (CEREBUS comprehensive PO stability fix — 8 issues resolved, all servers stable)
+> **Last Updated:** 2026-06-08 (CEREBUS permanent PO stability fix — 9 issues resolved, Windows mutex singleton, all servers stable)
 
-> ## 🔴 June 8 — PO Stability Fixes (ALL RESOLVED)
+> ## 🔴 June 8 — PO Stability Fixes (ALL RESOLVED — PERMANENT)
 >
-> ### 8 Issues Found & Fixed Today
+> ### 9 Issues Found & Fixed Today
 > 1. **Watchdog infinite restart loop** — `$_` in PowerShell subprocess stripped → always thought gateway down → 40+ restarts in 75min
 > 2. **Gateway 409 Conflict exit** — `sys.exit(1)` after 5 conflicts → died every ~30s
 > 3. **Stale PID file** — pointed to wrong process (PowerShell terminal)
@@ -17,12 +17,13 @@
 > 7. **Session not reclaimed** — single deleteWebhook wasn't enough to steal session from VTuber bot
 > 8. **Poll timeout too long** — 60s polls delayed 409 detection
 >
-> ### Comprehensive Fix (Commit `03e892bee`)
-> - Watchdog: PID file check (ctypes OpenProcess) + Get-CimInstance fallback
-> - Gateway: Aggressive session reclaim (10-attempt deleteWebhook + getUpdates loop on startup)
-> - Gateway: PID lock now kills old instance instead of exiting
-> - Gateway: Agent timeout restored to 180s + future.cancel() on timeout (thread leak fix)
-> - Gateway: Poll timeout 15s (fast 409 detection), backoff 5s→120s, deleteWebhook on every 409
+> ### Comprehensive Fix (Commits `03e892bee` + `2511b4a55`)
+> - **Windows named mutex** = true OS-level singleton (permanent duplicate prevention)
+> - Gateway startup: kills ALL other gateway processes before acquiring mutex
+> - Gateway: Aggressive session reclaim (10-attempt deleteWebhook + getUpdates loop)
+> - Gateway: Agent timeout restored to 180s + future.cancel() on timeout
+> - Gateway: Poll timeout 15s, backoff 5s→120s, deleteWebhook on every 409
+> - Watchdog: mutex-aware detection, kills ALL gateways before restart
 > - Gateway: Never exits on 409 — exponential backoff with session reclaim
 >
 > ### Final Server Status (Verified Stable)
@@ -30,8 +31,8 @@
 > |---------|-----|--------|
 > | OCE Backend | 11712 | ✅ UP |
 > | API Server | 21068 | ✅ UP |
-> | PO Telegram Gateway | 16712 | ✅ UP (polling clean) |
-> | PO Watchdog | 16392 | ✅ UP (stable, no restarts) |
+> | PO Telegram Gateway | 12032 | ✅ UP (polling clean, mutex-enforced singleton) |
+> | PO Watchdog | 20916 | ✅ UP (stable, no restarts) |
 > | OCE Frontend | 3000 | ✅ UP |
 > | VTuber/POALA | — | 🔴 Offline per MAD directive |
 >
@@ -42,11 +43,18 @@
 > - `97266b836` — Bug Journal updated with Issue #4
 > - `4415370b5` — PO memory system + vault integration fix
 > - `aeea59d2f` — Team chat update
-> - `03e892bee` — **Comprehensive fix: PID lock, session reclaim, agent timeout, 409 resilience**
+> - `03e892bee` — Comprehensive fix: PID lock, session reclaim, agent timeout, 409 resilience
 > - `155379d09` — Bug Journal updated with Issues #5-8
+> - `2511b4a55` — **PERMANENT: Windows mutex singleton + kill-all-duplicates**
+> - `0c908f44a` — Bug Journal Issue #9 (chronic duplicates root cause)
+> - `cfd23a0d8` — June 8 session commit (PO fixes + MLR + predecessor extraction)
 >
 > ### Bug Journal
-> `progress/PO-BUG-JOURNAL-2026-06-08.md` — 8 issues documented with root causes, fixes, and lessons
+> `progress/PO-BUG-JOURNAL-2026-06-08.md` — 9 issues documented with root causes, fixes, and lessons
+>
+> ### ⚠️ RULE: Never start telegram_gateway.py manually
+> The gateway is enforced as a singleton via Windows mutex. Only the watchdog should restart it.
+> Starting it manually will either fail (mutex held) or kill the running instance.
 > **Last Updated:** 2026-06-08 22:00 UTC (CEREBUS final sweep — all servers up, stale processes killed, MAD closing)
 > **Tasks:** `progress/O2C-RESEARCH-MESH-TASKS.md`
 > **Last Updated:** 2026-06-08 (Quant analysis complete — 9K config, Monte Carlo, forward test plan)
