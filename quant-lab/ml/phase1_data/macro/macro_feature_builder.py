@@ -14,11 +14,11 @@ This module builds the COMPLETE macro feature matrix by combining:
 3. 132% kill-switch proximity (from kill_switch)
 4. ILM states (from ilm_detector)
 5. Regime ratios (from ilm_detector)
-6. Pattern recognition (from pattern_recognizer)
+6. Pattern recognition (from pattern_recognizer) — ALL patterns
 7. Time block features (computed here)
 
-Total macro features per candle: ~20
-Combined with micro features: ~30 total
+Total macro features per candle: ~50+
+Combined with micro features: ~60+ total
 
 RULE: All features are computed on M5 closes unless otherwise specified.
 RULE: No future leakage — all features use only past/current data.
@@ -32,19 +32,26 @@ import pandas as pd
 from .mlr_engine import compute_mlr_features, compute_fib_targets
 from .kill_switch import compute_132_proximity, compute_rekey_state
 from .ilm_detector import compute_ilm_state, compute_regime_ratio
-from .pattern_recognizer import detect_alpha_leg, detect_beta_leg, detect_abcd, detect_occ_extreme
+from .pattern_recognizer import (
+    detect_alpha_leg, detect_beta_leg, detect_abcd,
+    detect_ny_sweep, detect_gamma, detect_rekey_132, detect_rekey_sequence,
+    detect_occ_extreme, detect_ilm_zone, detect_density_zone,
+    detect_wednesday_bifurcation, detect_hard_exit, detect_gear_shift,
+    detect_fib_retrace_levels, detect_fib_extension_levels,
+    detect_micro_macro_phase, detect_all_patterns,
+)
 
 
 # Session boundaries (UTC)
 # Asian session: 00:00-08:00 UTC = 7pm-3am EST (per CEREBUS v4 Manual)
 SESSION_ASIAN_START = 0     # 00:00 UTC = 19:00 EST (Asian session start)
 SESSION_ASIAN_END = 8       # 08:00 UTC = 03:00 EST (Asian session end)
-SESSION_LONDON_START = 7    # 07:00 UTC = 03:00 EST (London open)
-SESSION_LONDON_END = 16     # 16:00 UTC = 11:00 EST (London session end)
-SESSION_NY_START = 12       # 12:00 UTC = 08:00 EST (NY open)
-SESSION_NY_END = 21         # 21:00 UTC = 16:00 EST (NY afternoon)
-BLACK_ZONE_START = 21       # 21:00 UTC = 16:00 EST (gap before Asian)
-BLACK_ZONE_END = 24         # 24:00 UTC = 19:00 EST
+SESSION_LONDON_START = 8    # 08:00 UTC = 03:00 EST (London open)
+SESSION_LONDON_END = 12     # 12:00 UTC = 07:00 EST (London morning)
+SESSION_NY_START = 12       # 12:00 UTC = 07:00 EST (NY open)
+SESSION_NY_END = 17         # 17:00 UTC = 12:00 EST (NY afternoon)
+BLACK_ZONE_START = 17       # 17:00 UTC = 12:00 EST
+BLACK_ZONE_END = 20         # 20:00 UTC = 15:00 EST
 
 
 def _compute_time_blocks(df: pd.DataFrame) -> pd.DataFrame:
@@ -55,20 +62,8 @@ def _compute_time_blocks(df: pd.DataFrame) -> pd.DataFrame:
         - day_of_week: 0=Monday, 4=Friday
         - hour_utc: Hour of day in UTC
         - session: 'ASIAN', 'LONDON', 'NY', 'BLACK_ZONE'
-        - is_monday: Binary flag
-        - is_friday: Binary flag
-        - is_wednesday: Binary flag
-        - hours_since_mlr: Hours since MLR formation (filled from MLR engine)
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Must have DatetimeIndex with UTC timezone.
-
-    Returns
-    -------
-    pd.DataFrame
-        DataFrame with time block columns added.
+        - is_monday, is_friday, is_wednesday: Binary flags
+        - is_asian, is_london, is_ny, is_black_zone: Binary flags
     """
     df = df.copy()
 
@@ -80,10 +75,6 @@ def _compute_time_blocks(df: pd.DataFrame) -> pd.DataFrame:
 
     # Session classification
     hours = df.index.hour
-    # Asian: 00:00-08:00 UTC (no wrap-around with new boundaries)
-    # London: 07:00-16:00 UTC
-    # NY: 12:00-21:00 UTC
-    # Black zone: 21:00-24:00 UTC
     conditions = [
         (hours >= SESSION_ASIAN_START) & (hours < SESSION_ASIAN_END),
         (hours >= SESSION_LONDON_START) & (hours < SESSION_LONDON_END),
@@ -93,7 +84,6 @@ def _compute_time_blocks(df: pd.DataFrame) -> pd.DataFrame:
     choices = ['ASIAN', 'LONDON', 'NY', 'BLACK_ZONE']
     df['session'] = np.select(conditions, choices, default='OFF_HOURS')
 
-    # One-hot encode session
     for sess in ['ASIAN', 'LONDON', 'NY', 'BLACK_ZONE']:
         df[f'is_{sess.lower()}'] = (df['session'] == sess).astype(int)
 
@@ -110,55 +100,38 @@ def build_macro_feature_matrix(
     """
     Build the complete macro feature matrix.
 
-    This is the MAIN ENTRY POINT for macro feature computation.
-    It chains all macro feature modules in the correct order.
-
-    For forex/OIL: Uses Monday London Range (07:00-15:00 UTC) as weekly anchor.
-    For BTC/ETH: Uses Friday Asian Range as weekly anchor (crypto 24/7).
-
     Pipeline:
-    1. Weekly anchor → compute_mlr_features (forex) or compute_friday_asian_anchor (crypto)
-    2. Fib targets → mlr_engine.compute_fib_targets
-    3. 132% proximity → kill_switch.compute_132_proximity
-    4. Rekey state → kill_switch.compute_rekey_state
-    5. ILM state → ilm_detector.compute_ilm_state
-    6. Regime ratio → ilm_detector.compute_regime_ratio
-    7. Pattern recognition → pattern_recognizer (optional)
-    8. Time blocks → _compute_time_blocks (optional)
+    1. MLR features
+    2. Fibonacci targets
+    3. 132% proximity
+    4. Rekey state
+    5. ILM state
+    6. Regime ratio
+    7. ALL pattern recognition (optional)
+    8. Time blocks (optional)
 
     Parameters
     ----------
     df : pd.DataFrame
         Must have DatetimeIndex with UTC timezone and OHLC columns.
     pip_size : float
-        Pip size for the asset (e.g., 0.0001 for EURUSD, 0.01 for USDJPY).
+        Pip size for the asset.
     include_patterns : bool
-        Whether to include pattern recognition features (slower).
+        Whether to include ALL pattern recognition features.
     include_time_blocks : bool
         Whether to include time block features.
     symbol : str
-        Asset symbol (e.g., 'EURUSD', 'BTCUSD'). Used to determine weekly anchor type.
+        Asset symbol (e.g., 'EURUSD', 'BTCUSD').
 
     Returns
     -------
     pd.DataFrame
         Original DataFrame with all macro feature columns added.
-
-    Examples
-    --------
-    >>> import pandas as pd
-    >>> df = pd.read_parquet('EURUSD_M5.parquet')
-    >>> df_macro = build_macro_feature_matrix(df, pip_size=0.0001)
-    >>> print([c for c in df_macro.columns if c not in ['open','high','low','close','volume']])
     """
     df = df.copy()
 
-    # Step 1: Weekly anchor (MLR for forex/OIL, Friday Asian for crypto)
-    sym_upper = symbol.upper() if symbol else ""
-    if "BTC" in sym_upper or "ETH" in sym_upper:
-        df = compute_friday_asian_anchor(df, symbol)
-    else:
-        df = compute_mlr_features(df)
+    # Step 1: MLR features
+    df = compute_mlr_features(df)
 
     # Step 2: Fibonacci targets
     df = compute_fib_targets(df)
@@ -175,19 +148,9 @@ def build_macro_feature_matrix(
     # Step 6: Regime ratio
     df = compute_regime_ratio(df, pip_size=pip_size)
 
-    # Step 7: Pattern recognition (optional — computationally expensive)
+    # Step 7: ALL pattern recognition
     if include_patterns:
-        df = detect_alpha_leg(df)
-        df = detect_beta_leg(df)
-        df = detect_abcd(df)
-        df = detect_occ_extreme(df)
-
-        # Combined pattern flag
-        df['any_pattern'] = (
-            (df['alpha_pattern'] == 1) |
-            (df['beta_pattern'] == 1) |
-            (df['abcd_pattern'] == 1)
-        ).astype(int)
+        df = detect_all_patterns(df, pip_size=pip_size)
 
     # Step 8: Time blocks
     if include_time_blocks:
@@ -199,11 +162,6 @@ def build_macro_feature_matrix(
 def get_macro_feature_names() -> list[str]:
     """
     Return the list of macro feature column names.
-
-    Returns
-    -------
-    list[str]
-        List of feature names that build_macro_feature_matrix adds.
     """
     return [
         # MLR features
@@ -224,11 +182,40 @@ def get_macro_feature_names() -> list[str]:
         # Regime ratio
         'regime_ratio', 'regime_label', 'regime_encoded',
         'is_confirmed', 'is_caution', 'is_failed',
-        # Pattern recognition
+        # Pattern recognition — 3-Leg
         'alpha_pattern', 'alpha_direction',
         'beta_pattern', 'beta_direction',
+        # Pattern recognition — AB-CD
         'abcd_pattern', 'abcd_direction', 'abcd_extension',
+        # Pattern recognition — NY Sweep
+        'ny_sweep_pattern', 'ny_sweep_direction',
+        # Pattern recognition — Gamma
+        'gamma_zone', 'gamma_level', 'gamma_direction',
+        # Pattern recognition — Rekey 132
+        'rekey_132_triggered', 'rekey_132_breach_idx',
+        # Pattern recognition — Rekey Sequence
+        'rekey_sequence_active', 'rekey_sequence_bar_count',
+        # Pattern recognition — OCC
         'occ_extreme_high', 'occ_extreme_low', 'occ_direction', 'is_at_occ_extreme',
+        # Pattern recognition — ILM Zone
+        'ilm_zone_state', 'ilm_zone_extension_ratio',
+        # Pattern recognition — Density Zone
+        'density_zone_high', 'density_zone_low', 'density_zone_range',
+        'density_zone_position', 'is_in_density_zone',
+        # Pattern recognition — Wednesday Bifurcation
+        'wednesday_bifurcation_flag', 'wednesday_bifurcation_stress',
+        # Pattern recognition — Hard Exit
+        'hard_exit_flag', 'minutes_to_hard_exit',
+        # Pattern recognition — Gear Shift
+        'gear_shift_active', 'gear_shift_target_modifier',
+        # Pattern recognition — Fib Levels
+        'fib_retrace_382', 'fib_retrace_500', 'fib_retrace_618', 'fib_retrace_786',
+        'closest_fib_retrace', 'dist_to_closest_fib_retrace',
+        'fib_extension_1272', 'fib_extension_1618', 'fib_extension_2000', 'fib_extension_2618',
+        'closest_fib_extension', 'dist_to_closest_fib_extension',
+        # Pattern recognition — Micro-Macro Phase
+        'micro_macro_phase', 'micro_macro_alignment', 'micro_macro_phase_encoded',
+        # Combined
         'any_pattern',
         # Time blocks
         'day_of_week', 'hour_utc', 'session',

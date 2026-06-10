@@ -264,10 +264,13 @@ def compute_friday_asian_anchor(df: pd.DataFrame, symbol: str = "") -> pd.DataFr
     )
 
     # For each bar, find its week's Friday and look up anchor
+    # For crypto: Fri→Sun belong to the current week's Friday anchor
+    # Mon→Thu belong to the previous week's Friday anchor
     bar_dow = df.index.dayofweek
-    # Calculate the Friday of the current week for each bar
-    days_to_fa = (fa_day - bar_dow) % 7
-    bar_friday = df.index.normalize() + pd.to_timedelta(days_to_fa, unit='D')
+    # For Fri(4), Sat(5), Sun(6): use this week's Friday
+    # For Mon(0), Tue(1), Wed(2), Thu(3): use previous week's Friday
+    days_since_fa = (bar_dow - fa_day) % 7
+    bar_friday = df.index.normalize() - pd.to_timedelta(days_since_fa, unit='D')
 
     # Map weekly anchor to bars
     week_high = weekly['mlr_high']

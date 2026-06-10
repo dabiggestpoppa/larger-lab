@@ -349,7 +349,7 @@ def detect_ny_sweep(df):
             continue
 
         # Check bars after the sweep window on the same day
-        after_sweep = day_mask & ~sweep_window
+        after_sweep = day_mask & ~is_sweep_window
         if after_sweep.sum() < 1:
             continue
 
@@ -854,5 +854,22 @@ def detect_all_patterns(df, pip_size=0.0001):
 
     # Micro-Macro phase
     df = detect_micro_macro_phase(df)
+
+    # Combined pattern flag: 1 if any pattern detected
+    df['any_pattern'] = (
+        (df['alpha_pattern'] == 1) |
+        (df['beta_pattern'] == 1) |
+        (df['abcd_pattern'] == 1) |
+        (df['ny_sweep_pattern'] == 1) |
+        (df['gamma_zone'] > 0) |
+        (df['rekey_132_triggered'] == 1) |
+        (df['rekey_sequence_state'] == 1) |
+        (df['is_at_occ_extreme'] == 1) |
+        (df['price_in_ilm_zone'] == 1) |
+        (df['wednesday_bifurcation_flag'] == 1) |
+        (df['hard_exit_imminent'] == 1) |
+        (df['gear_shift_signal'] == 1) |
+        (df['phase_alignment'] != 0)
+    ).astype(int)
 
     return df
