@@ -10,7 +10,7 @@
 - Git: Synced to origin/master
 
 ## Active Build: CEREBUS Neuro-Symbolic Scanner (2026-06-10)
-- **Status:** Wave 1 ✅ COMPLETE | Wave 2 🔄 In Progress | Wave 3 ⏳ Pending
+- **Status:** Wave 1 ✅ COMPLETE | Wave 2 ✅ COMPLETE | Wave 3 ✅ COMPLETE | Markov ✅
 - **Plan:** `quant-lab/ml/CEREBUS_NEURO_SYMBOLIC_SCANNER_PLAN.md`
 - **Build Notes:** `quant-lab/ml/BUILD_NOTES_CEREBUS.md`
 - **4 Steps:** Data+Features → Retrain Models → RAG Oracle → Guardian Pipeline
