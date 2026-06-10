@@ -1,13 +1,36 @@
 ﻿# 🔴 Polymorph — Sub-Progress Log
 
 > **Agent:** Polymorph (PM)
-> **Role:** Debugger / Tool & Skill Builder
+> **Role:** Data Extraction (COMPLETE) — Standing by for CEREBUS build
 > **Sync Rule:** Every 7 updates → auto-sync. Every 20 entries → LLM summarization.
 > **Reports to:** CC (Claude Code)
 
 ---
 
-## Status: 🟢 ALL PM TASKS COMPLETE — STANDING BY
+## Status: 🟢 CEREBUS MACRO ENGINE — 3 MODULES BUILT + 61 TESTS PASSING
+
+### 🔴 CEREBUS Macro Engine — Missing Modules Built (2026-06-10)
+- **ilm_detector.py** — ILM state (DAILY_ILM/IELM/WILM/MISALIGNED) + regime ratio (CONFIRMED/CAUTION/FAILED)
+- **pattern_recognizer.py** — Alpha 3-Leg (72% retrace), Beta 3-Leg (61.8%), AB-CD Fibonacci extension, OCC Extreme
+- **macro_feature_builder.py** — Full macro feature matrix builder (~20 macro features per bar)
+- **test_macro_engine.py** — 61 tests, ALL PASSING
+- **Commit:** `8e63883` — pushed to origin/master
+- **Note:** ILM detector groupby-per-day is correct but slow on 463K bars — needs vectorization for production
+
+### CEREBUS Data Extraction (2026-06-10) — COMPLETE ✅
+- **Excel:** 97 sheets ripped → 94 CSV files (raw_data/ + stats/)
+- **PDFs:** 55 PDFs processed → 1101 stat entries in pdf_master_stats.json
+- **Unified:** 1626 entries in master_feature_store.json + .parquet
+- **Total:** 99 files, 35MB extracted
+- **Known issues:** 1040 entries need asset classification, 1066 need pattern tagging
+- **Output dir:** `quant-lab/data/holy_grail_extracted/`
+- **Extraction report:** `quant-lab/data/holy_grail_extracted/EXTRACTION_REPORT.md`
+
+### 🔴 NEW: CEREBUS Neuro-Symbolic Scanner — PM on standby
+- **Phase 1A (Data Cleanup)** — CC leads, PM supports if needed
+- **Phase 1B (Macro Features)** — CC leads
+- **Phase 1C (Pattern Recognition)** — PM2 assigned
+- **PM role:** Support data validation, assist with UNKNOWN entry classification
 
 ### O2C × MAD LABS Research Mesh — PM Tasks (2026-06-06)
 - [x] **RM-PM-1** L1.7 Cache + dedup layer (`core/research/ingestion/cache.py`) — 6 tests PASS
