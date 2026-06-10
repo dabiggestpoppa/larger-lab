@@ -1,0 +1,579 @@
+﻿
+=== PAGE 20 ===
+REVERSAL SCENARIO ΓÇö WHEN OPPOSITE DIRECTION P90 PRINTS
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+Initial Direction of Constraint Resolution: 2:30 AM LONG
+New Signal: 6:00 AM P90 SHORT
+DEFAULT ACTION: IGNORE
+  ΓåÆ Stay with original direction of constraint resolution (LONG)
+  ΓåÆ Opposite P90 = noise, not a resolution direction change
+  ΓåÆ Win rate on reversals without confirmation: only 52.4%
+EXCEPTION ΓÇö VALID DIRECTION REVERSAL (BOTH must be true):
+  1. Resolution output CLOSES beyond 200% Deep State [10] of Initial P90
+  2. 132% Kill-Switch State [10] ALSO triggered
+If BOTH are true:
+  ΓåÆ Close ALL LONG positions (constraint set invalidated)
+  ΓåÆ NEW Constraint Resolution Direction = SHORT
+  ΓåÆ Restart cascade count (max 3 more activations)
+  ΓåÆ Win rate on valid reversals: 68.2%
+Frequency: Only 1.4% of sessions qualify for direction reversal
+Recommendation: Wait for next day 99% of the time
+TARGET TRIMMING PROTOCOL
+TARGET TRIMMING MATRIX ΓÇö CONSTRAINT DEFICIT RESOLUTION SCHEDULE
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+Asian Range <20 pips (Tier 1 ΓÇö Gold, tight constraint deficit):
+  TP1 (Asian -25%): ~5 pips ΓåÆ Trim 20%
+  TP2 (Asian -50%): ~10 pips ΓåÆ Trim 50%
+  TP3 (Daily -50%): ~36 pips ΓåÆ Trim 25%
+  Runner (Daily -100%): ~72 pips ΓåÆ Hold 5%
+Asian Range 20-30 pips (Tier 2 ΓÇö Standard):
+  TP1 (Asian -25%): ~6 pips ΓåÆ Trim 20%
+  TP2 (Asian -50%): ~12 pips ΓåÆ Trim 50%
+  TP3 (Daily -50%): ~29 pips ΓåÆ Trim 30%
+  Runner: Skip (edge thin ΓÇö constraint deficit mostly satisfied)
+Asian Range 30-45 pips (Tier 3 ΓÇö Caution, wide constraint deficit):
+  TP1 (Asian -25%): ~9 pips ΓåÆ Trim 30%
+  TP2 (Asian -50%): ~18 pips ΓåÆ Trim 70%
+  TP3+: Skip entirely
+Hard Exit: 12 PM EST (close ALL remaining ΓÇö resolution window ends)
+Question
+Answer
+
+
+=== PAGE 21 ===
+Session Bias
+First P90 in 2-6 AM EST sets constraint resolution direction for ENTIRE day
+Cascade Window
+30-90 min from INITIAL only (optimal 45-60 min ΓÇö peak momentum)
+After 90 min
+Still valid until 11 AM, but reduce size (resolution momentum degrading)
+6:00 AM Example
+VALID (if same constraint resolution direction), but use 50% size
+Opposite P90
+IGNORE unless Deep State (200%) + Kill-Switch (132%) BOTH triggered
+Targets
+Asian -50% primary; Daily -50% for runners (full deficit resolution)
+Hard Exit
+12 PM EST ΓÇö all positions closed, constraint resolution window ends
+End of Part 3 | CEREBUS Operational Protocol v18.2.18 | March 2026
+
+
+=== PAGE 22 ===
+PART 4 STALL-HARVEST TRADING SYSTEM Unified CFD & Binary
+Execution Strategy | 168% Stall Zone Fibonacci Analysis EUR/USD M5 |
+October 2023 | PROPRIETARY & CONFIDENTIAL
+The following 9 slides are the original Stall-Harvest system presentation. All data, charts, and execution
+protocols are presented in full. Vocabulary has been aligned with the constraint-system framework throughout.
+SLIDE 1 ΓÇö STALL-HARVEST TRADING SYSTEM: OVERVIEW
+Slide 1: Title & Session Performance Snapshot
+Session
+Expansion Win Rate
+2-4 AM EST
+94.2%
+4-7 AM EST
+88.6%
+7-11 AM EST
+82.4%
+Key Risk Metric
+Value
+Main Rejection Rate
+10.3%
+True Rejection (Stall Zone)
+64.2%
+Shallow Violation
+21.4%
+
+
+=== PAGE 23 ===
+Deep Violation
+14.4%
+SLIDE 2 ΓÇö EXECUTIVE SUMMARY: THE STALL-HARVEST EDGE
+Slide 2: Executive Summary ΓÇö Key Performance Indicators & Core Concept
+Key Performance Indicator
+Value / Metric
+Candles Analyzed (Jan '22 ΓÇô Mar '26)
+315,000+
+Resolution Output Stalls Resulting in Profitable Expansion
+86%
+Expected Weekly Return
++38-48R
+Asset Class Focus
+EUR/USD M5 CFD & Binary
+SLIDE 3 ΓÇö THE 168% STALL ZONE MECHANISM: STRUCTURAL ASYMMETRY
+
+
+=== PAGE 24 ===
+Slide 3: Structural Asymmetry ΓÇö Stall Event Outcomes & Probability Metrics
+Outcome Scenario
+Frequency
+Profit Probability
+Order Flow Dynamics
+True Rejection
+64.2%
+High
+Available pathway harvesting [4] & Confirmed Rebalancing
+Shallow Violation
+21.4%
+High
+Boundary Hunt [8] & Retracement
+Deep Violation
+14.4%
+Low
+Constraint System Continuation
+SLIDE 4 ΓÇö CFD LEG: LIMIT ACTIVATION & CONSTRAINT BOUNDARY
+PLACEMENT
+
+
+=== PAGE 25 ===
+Slide 4: CFD Execution Protocol ΓÇö M5 Chart Detailed Activation Rules
+Step
+Action
+Detail
+1. LIMIT ACTIVATION
+168% Stall Zone [10]
+Bullish: Low - (Body├ù1.68) | Bearish: High + (Body├ù1.68)
+2. BOUNDARY
+PLACEMENT
+200% Deep State [10]
+SL at 200%; Buffer = 1.5x candle body beyond 168%
+3. TARGET & RISK
+-50% Daily Range
+Reward-to-Risk: 1:4 to 1:6
+VIOLATION FILTER
+Abort if close > 200%
+Abort if M5 candle closes beyond 200% Deep State
+SLIDE 5 ΓÇö BINARY LEG: DYNAMIC EXPIRY BY TIME-OF-DAY
+
+
+=== PAGE 26 ===
+Slide 5: Binary Option Expiry Framework ΓÇö Session Metrics
+Session (EST)
+Dynamic Expiry
+Target Win Rate
+02:00-06:00 EST
+90 min
+88.4%
+06:00-09:00 EST
+60 min
+82.1%
+09:00-11:00 EST
+45 min
+74.6%
+After 12:00 EST
+No Trade
+ΓÇö
+Session (EST)
+Dynamic WR%
+Std. 60-min WR% (Sim)
+Marginal Delta
+02:00-06:00 EST
+88.4%
+72.1%
++16.3%
+06:00-09:00 EST
+82.1%
+74.5%
++7.6%
+09:00-11:00 EST
+74.6%
+70.8%
++3.8%
+SLIDE 6 ΓÇö SESSION WINDOWS & PERFORMANCE METRICS
+
+
+=== PAGE 27 ===
+Slide 6: Session Windows ΓÇö Stall Rate, Expansion Win Rate & Asian Range Filters
+Session
+Stall Zone Rate
+Expansion Win Rate
+2-4 AM EST
+31.1%
+94.2%
+4-7 AM EST
+35.4%
+88.6%
+7-11 AM EST
+38.2%
+82.4%
+SLIDE 7 ΓÇö UNIFIED EXECUTION PLAYBOOK
+
+
+=== PAGE 28 ===
+Slide 7: Unified Execution Playbook ΓÇö Position Sizing Matrix & Workflow
+Position
+Sizing
+Boundary Specifications
+1
+40%
+80% Fib Constraint Boundary [8]
+2
+40%
+1.5x Constraint Boundary
+3
+20%
+45-min add activation [9]
+Phase
+Action
+Detail
+Pre-Session Setup
+Asian range check + mark states
+Range <45p; mark 168% Stall Zone & 200% Deep State
+Trigger ID
+Resolution output touches 168%
+Stall Zone
+Watch M5 chart for P90 + stall signal
+Split Execution
+CFD + Binary simultaneous
+CFD: Limit @ 168% | Binary: Activation on Touch
+Exit Management
+CFD Targets + Binary Expiry
+CFD: -25%/-50% | Binary: Dynamic | Kill: 132%
+SLIDE 8 ΓÇö RISK MANAGEMENT & EDGE KILL SWITCHES
+
+
+=== PAGE 29 ===
+Slide 8: Risk Management ΓÇö Systematic Controls Matrix & Loser Elimination
+Parameter
+Rule / Trigger
+Action
+Asian Range
+> 45 Pips
+NO-GO ΓÇö constraint deficit too wide
+Kill-Switch State [10]
+132% Violation
+Close All Positions
+Time Constraint
+After 11 AM EST
+No New Activations
+Friday Time
+After 10 AM EST
+Reduced Size (50%)
+Regime Shift
+< 80% Win Rate (20 activations)
+PAUSE
+Regime Shift
+132% Violations > 50% / Week
+Reduce Size 50%
+SLIDE 9 ΓÇö EXPECTED PERFORMANCE & STRATEGIC ADVANTAGES
+
+
+=== PAGE 30 ===
+Slide 9: Performance Expectations ΓÇö Aggregated Metrics & Strategic Advantages
+Metric
+Expectation
+Weekly Qualifying Activations
+22
+Weighted Win Rate
+86.4%
+Expected R-Multiple
++38-48R
+Account Growth (Target)
+10-15%
+Est. Account Growth
+6-10%
+Full-Loss Mitigation
+-31.6%
+Strategic Advantage
+Description
+1. Boundary Hunt Conversion
+Converts CFD constraint boundary hunts into precise binary activation points.
+2. Asymmetric Risk-Reward
+Limit activations create superior R:R scenarios.
+3. Time-Based Expiry
+Expiries dynamically optimized by session window data.
+STALL-HARVEST MASTER SYSTEM SUMMARY
+
+
+=== PAGE 31 ===
+COMPLETE SYSTEM AT A GLANCE ΓÇö CONSTRAINT-SYSTEM FRAMEWORK
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+168% STALL ZONE MECHANISM [10]:
+  ΓÇó 34.2% of P90s reach Stall Zone State (168% within 35 min)
+  ΓÇó 65.8% of P90s expand through (168% NOT hit ΓÇö resolution continues)
+  ΓÇó 86% of stall events result in profitable expansion or rebalancing
+DUAL-LEG EXECUTION:
+  ΓÇó CFD Leg: Limit activation at 168% Stall Zone | Boundary at 200% Deep State (1.5x buffer)
+  ΓÇó Binary Leg: Activation on touch | Dynamic expiry by session
+  ΓÇó Combined: Hedge effect ΓÇö one leg profits regardless of resolution direction
+SESSION PERFORMANCE:
+  ΓÇó 2-4 AM EST: 94.2% expansion win rate | 31.1% stall rate
+  ΓÇó 4-7 AM EST: 88.6% expansion win rate | 35.4% stall rate
+  ΓÇó 7-11 AM EST: 82.4% expansion win rate | 38.2% stall rate
+KILL SWITCHES:
+  ΓÇó Asian Range >45 pips ΓåÆ NO-GO (constraint deficit too wide)
+  ΓÇó 132% Kill-Switch State [10] ΓåÆ Close all immediately
+  ΓÇó After 11 AM EST ΓåÆ No new activations (resolution window closing)
+  ΓÇó Win rate <80% over 20 activations ΓåÆ PAUSE & recalibrate
+End of Part 4 | Stall-Harvest Trading System | CEREBUS FX v3.0 | March 2026
+
+
+=== PAGE 32 ===
+PART 5 P90P WINDOW DISTRIBUTION TRACKER ΓÇö ENHANCED FORMULA
+90-95% Accuracy System | Multi-Factor Weighted | 2-3 Pip Precision Zones 6
+AM & 9 AM Checkpoints | Regime Confirmation | CEREBUS FX v18.2.23
+Enhanced Multi-Factor Weighted System | Pushing Beyond 85% Baseline
+SECTION 1: THE ENHANCED CORE FORMULA
+P90P WINDOW = 7:00 PM EST (Day N-1) ΓåÆ 12:00 PM EST (Day N)
+FINAL TARGET = Asian Range ├ù Weighted Expansion Factor
+Weighted Expansion =
+  (Base Tier Factor  ├ù 0.40) +
+  (Regime Adjustment ├ù 0.25) +
+  (P90 Confirmation  ├ù 0.20) +
+  (Cascade Timing    ├ù 0.10) +
+  (Time Decay        ├ù 0.05)
+PRECISION ZONE  = ┬▒(Asian Range ├ù Confidence Buffer)
+ACCURACY TARGET = 90-95%  (┬▒2-3 pips)
+Asian Range Tier
+Base Factor
+Regime Boost
+P90 Boost
+Cascade Boost
+Max Precision
+< 20 pips (T1)
+3.12x
++0.31x
++0.15x
++0.08x
+┬▒2.5 pips
+20-30 pips (T2)
+2.68x
++0.27x
++0.13x
++0.07x
+┬▒3.0 pips
+30-45 pips (T3)
+2.18x
++0.22x
++0.11x
++0.05x
+┬▒3.5 pips
+> 45 pips (NO-GO)
+1.52x
++0.00x
++0.00x
++0.00x
+SKIP
+SECTION 2: ENHANCED PRE-SESSION CALCULATION (1:45 AM EST)
+
+
+=== PAGE 33 ===
+STEP 1: MEASURE ASIAN RANGE + CLASSIFY TIER
+  Asian High/Low = 7:00 PM - 3:00 AM EST
+  Tier: <20p (T1=3.12x) | 20-30p (T2=2.68x) | 30-45p (T3=2.18x) | >45p NO-GO
+STEP 2: CALCULATE ENHANCED BASE TARGET (Tier 2 example, 25 pips)
+  Base Factor = 2.68x | Base Target = 25 ├ù 2.68 = 67 pips
+  Regime Boost (+0.27x): IF P90 signal printed 2-6 AM
+  P90 Boost    (+0.13x): IF P90 body >= threshold (4.6p)
+  Cascade Boost (+0.07x): IF cascade printed 45-60 min later
+  Example ΓÇö All Conditions Met:
+  Weighted Factor = (2.68├ù0.40) + (2.95├ù0.25) + (2.81├ù0.20) + (2.75├ù0.10) + (2.68├ù0.05)
+                  = 1.072 + 0.738 + 0.562 + 0.275 + 0.134 = 2.78x
+  Enhanced Target = 25 ├ù 2.78 = 69.5 pips | Precision Zone = ┬▒3.0 pips
+STEP 3: MARK ENHANCED KEY LEVELS ON CHART
+  1. Asian High & Asian Low (constraint deficit boundaries [11])
+  2. Enhanced Target Zone (Target ┬▒3 pips)
+  3. 6 AM Check Level: Base ├ù 0.65 (+5% if P90 confirmed)
+  4. 9 AM Check Level: Base ├ù 0.82 (apply regime multiplier at 9 AM)
+  5. Regime Reference Line (1.5x ratio)
+SECTION 3: ENHANCED 6 AM CHECKPOINT
+6:00 AM EST CHECK ΓÇö 65% of Constraint Resolution Window Complete
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  Current Range = High(7PM-6AM) - Low(7PM-6AM)
+  Expected at 6 AM = Expected Final ├ù 0.65 (+5% if P90 confirmed)
+  Example: 67 ├ù 0.65 ├ù 1.05 = 45.7 pips | Acceptable Zone = 42.7-48.7 pips
+  I In Zone + P90 Confirmed (HIGH CONFIDENCE 92-95%):
+     Adjusted Target = Current ├╖ 0.65 ├ù 1.05 | Precision = ┬▒2.5 pips
+  I In Zone + No P90 (MODERATE CONFIDENCE 88-90%):
+     Adjusted Target = Current ├╖ 0.65 | Precision = ┬▒3.5 pips
+  II Below Lower Bound: Reduce target 8-12% (New Target = Expected ├ù 0.90)
+  II Above Upper Bound: Take profits at -50% ΓÇö don't wait for full target
+Asian
+Range
+Tier
+Base Expected 6 AM
+P90 Adjustment
+Acceptable Zone
+Confidence
+< 20p
+T1
+Asian ├ù 2.03
++0.10x
+┬▒2.5 pips
+93-95%
+20-30p
+T2
+Asian ├ù 1.74
++0.09x
+┬▒3.0 pips
+90-92%
+30-45p
+T3
+Asian ├ù 1.42
++0.07x
+┬▒3.5 pips
+88-90%
+SECTION 4: ENHANCED 9 AM CHECKPOINT ΓÇö KEY TO 95%
+
+
+=== PAGE 34 ===
+9:00 AM EST CHECK ΓÇö Regime-Confirmed (82% of Window Complete)
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+STEP 1: CALCULATE REGIME RATIO
+  Regime Ratio = Daily Range (3AM-9AM) ├╖ Asian Range
+  >= 1.50 ΓåÆ CONFIRMED (Expansion) ΓåÆ Boost +10% | Completion = 90.2%
+  1.45-1.49 ΓåÆ CAUTION ΓåÆ Boost +5%  | Completion = 86.1%
+  < 1.45   ΓåÆ FAILED (Compression)  ΓåÆ Reduce -10% | Completion = 73.8%
+STEP 2: ENHANCED DECISION RULES
+  I In Zone + Regime CONFIRMED ΓåÆ MAXIMUM CONFIDENCE (94-95%)
+     Final Target = Current ├╖ 0.902 | Precision Zone = ┬▒2.0 pips
+     Action: Hold to full target, trail constraint boundaries aggressively
+  I In Zone + Regime CAUTION ΓåÆ HIGH CONFIDENCE (90-92%)
+     Final Target = Current ├╖ 0.861 | Precision Zone = ┬▒2.5 pips
+     Action: Take profits at -50%, hold small runner
+  II In Zone + Regime FAILED ΓåÆ MODERATE CONFIDENCE (85-88%)
+     Final Target = Current ├╖ 0.738 ├ù 0.90 | Precision Zone = ┬▒3.5 pips
+     Action: Exit at -25% or -50%, no runners
+  II Outside Zone ΓåÆ Recalculate: Final Target = Current ├╖ (Actual Completion %)
+     Widen precision zone by +1 pip
+Asian
+Range
+Tier
+Regime
+Expected
+Completion
+Final Target Formula
+Precision
+Accuracy
+< 20p
+T1
+CONFIRMED
+90.2%
+Current ├╖ 0.902
+┬▒2.0p
+94-95%
+< 20p
+T1
+CAUTION
+86.1%
+Current ├╖ 0.861
+┬▒2.5p
+91-93%
+< 20p
+T1
+FAILED
+73.8%
+Current ├╖ 0.738 ├ù 0.90
+┬▒3.5p
+86-88%
+20-30p
+T2
+CONFIRMED
+90.2%
+Current ├╖ 0.902
+┬▒2.5p
+93-94%
+20-30p
+T2
+CAUTION
+86.1%
+Current ├╖ 0.861
+┬▒3.0p
+90-92%
+20-30p
+T2
+FAILED
+73.8%
+Current ├╖ 0.738 ├ù 0.90
+┬▒4.0p
+85-87%
+30-45p
+T3
+CONFIRMED
+90.2%
+Current ├╖ 0.902
+┬▒3.0p
+91-93%
+30-45p
+T3
+CAUTION
+86.1%
+Current ├╖ 0.861
+┬▒3.5p
+88-90%
+30-45p
+T3
+FAILED
+73.8%
+Current ├╖ 0.738 ├ù 0.90
+┬▒4.5p
+83-85%
+SECTION 5: ENHANCED WORKED EXAMPLE ΓÇö 95% ACCURACY
+
+
+=== PAGE 35 ===
+SCENARIO: EUR/USD ΓÇö All Conditions Optimal | Asian Range = 25p, Tier 2
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+PRE-SESSION: Range = 25p (Tier 2) | P90 LONG at 2:30 AM (5.2p) | Cascade at 3:15 AM (45 min)
+  Weighted = (2.68├ù0.40)+(2.81├ù0.20)+(2.75├ù0.10)+(2.68├ù0.05) = 2.043 (partial, regime TBD)
+6:00 AM: Current Range = 45p | Expected = 45.7p | IN ZONE I
+  Adjusted Target = 45 ├╖ 0.65 ├ù 1.05 = 72.7 pips | Zone = ┬▒3.0 pips
+9:00 AM: Daily Range (3-9AM) = 62p | Regime Ratio = 62 ├╖ 25 = 2.48x ΓåÆ CONFIRMED I
+  Enhanced Factor = 2.68 ├ù 1.10 = 2.95x | Final Target = 25 ├ù 2.95 = 73.8 pips
+  Expected at 9 AM = 73.8 ├ù 0.902 = 66.6 pips | Current = 60 pips (slightly below, regime offsets)
+  Final Target = 60 ├╖ 0.902 ├ù 1.10 = 73.2 pips | Zone = ┬▒2.5 pips (93-94% accuracy)
+FINAL OUTCOME (12 PM): Actual High = 1.0924 | Predicted = 1.09232
+  Difference = 0.8 pips I | Within ┬▒2.5 pip zone? YES I
+  Result: 94-95% accuracy achieved
+SECTION 6: ENHANCED QUICK REFERENCE CHEAT SHEET
+PRE-SESSION (1:45 AM EST)
+  I Measure Asian Range (7 PM - 3 AM) | Classify Tier
+  I Calculate Base Target: T1├ù3.12 | T2├ù2.68 | T3├ù2.18
+  I Check Boosts: P90 2-6 AM? (+0.13x T2) | Cascade 45-60 min? (+0.07x T2)
+  I Mark Target Zone ┬▒3 pips | 6 AM Check: Base├ù0.65 | 9 AM Check: Base├ù0.82
+6 AM CHECKPOINT
+  I Measure Current Range | Check P90 Confirmation
+  I P90 + In Zone ΓåÆ HIGH CONFIDENCE | Target = Current ├╖ 0.65 ├ù 1.05 | ┬▒2.5p
+  I No P90 + In Zone ΓåÆ MODERATE | Target = Current ├╖ 0.65 | ┬▒3.5p
+  I Outside Zone ΓåÆ Recalculate | Widen ┬▒1 pip
+9 AM CHECKPOINT ΓÇö KEY TO 95%
+  I Regime Ratio = Daily(3-9AM) ├╖ Asian Range
+  I >=1.50x CONFIRMED: Target = Current ├╖ 0.902 | ┬▒2.0p (94-95%)
+  I 1.45-1.49x CAUTION: Target = Current ├╖ 0.861 | ┬▒2.5p (90-92%)
+  I <1.45x FAILED: Target = Current ├╖ 0.738 ├ù 0.90 | ┬▒3.5p (85-88%)
+12 PM HARD EXIT: Close ALL positions ΓÇö no exceptions
+Checkpoint
+Condition
+Accuracy Within
+Hit Rate
+Notes
+Pre-Session
+Base Only
+┬▒10 pips
+78%
+Baseline
+Pre-Session
++P90 Confirmed
+┬▒7 pips
+84%
+Improved
+6 AM
+Base Only
+┬▒7 pips
+82%
+Standard
+6 AM
++P90 Confirmed
+┬▒4 pips
+89%
+Enhanced
+9 AM
+Base Only
+┬▒5 pips
+85%
+Standard
+9 AM
++Regime CONFIRMED
+┬▒3 pips
+91%
+Enhanced
+

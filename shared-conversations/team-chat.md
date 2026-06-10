@@ -203,3 +203,55 @@ The **largest build yet** â€” a complete Neuro-Symbolic Scanner (4 Steps):
 4. Tier governs reverse loop size
 5. Temporal band 32-78 min applies to reverse
 6. Deep rebalance has 4 resolution paths
+
+---
+
+## ?? RL — DMR/Stall-Harvest Strategy Extracted (2026-06-10 20:00 UTC)
+**Source:** CEREBUS FX v4 Manual Part 4 (pages 20-31) + p90_engine_dmr.py + dmr_strategy.py
+
+### DMR Core Concept
+- DMR = Deep Mean Reversion, a nested sub-routine inside P90 IN_TRADE (NOT a separate strategy)
+- When P90 enters, a conditional limit order is placed at Deep State (DS) = 200% of P90 body beyond Asian band
+- Direction: OPPOSITE of P90. SL = same as P90. TP = -50% AR
+- Reference results: 94.8% WR, 671 trades, +7903 pips, PF 205 (EUR/USD 2022-2026)
+
+### Stall Zone (168% of AR)
+- 34.2% of P90s reach Stall Zone within 35 min
+- 65.8% expand through (168% NOT hit)
+- 86% of stall events result in profitable expansion or rebalancing
+
+### Session Performance
+| Window | Expansion WR | Stall Rate |
+|--------|-------------|------------|
+| 2-4 AM | 94.2% | 31.1% |
+| 4-7 AM | 88.6% | 35.4% |
+| 7-11 AM | 82.4% | 38.2% |
+
+### Stall Outcomes
+- True Rejection: 64.2% (price rejects at stall zone and reverts)
+- Shallow Violation: 21.4% (boundary hunt + retracement)
+- Deep Violation: 14.4% (constraint system continuation)
+
+### Target Trimming Matrix
+| Tier | TP1 (-25%) | TP2 (-50%) | TP3 (Daily -50%) | Runner |
+|------|-----------|-----------|-----------------|--------|
+| T1 (<20p) | ~5p trim 20% | ~10p trim 50% | ~36p trim 25% | ~72p hold 5% |
+| T2 (20-30p) | ~6p trim 20% | ~12p trim 50% | ~29p trim 30% | Skip |
+| T3 (30-45p) | ~9p trim 30% | ~18p trim 70% | Skip | Skip |
+
+### Reversal Scenario (Opposite P90 prints)
+- DEFAULT: IGNORE (stay with original direction)
+- EXCEPTION: Valid reversal requires BOTH: (1) Close beyond 200% DS, (2) 132% Kill-Switch triggered
+- Valid reversal WR: 68.2%, Frequency: 1.4% of sessions
+- Recommendation: Wait for next day 99% of the time
+
+### Risk Management
+- Asian Range >45p = NO-GO
+- 132% violation = Close All
+- After 11 AM = No new activations
+- Friday after 10 AM = 50% size
+- Hard exit: 12 PM EST
+
+### Files Created
+- quant-lab/ml/phase1_data/dmr_features.py — DMR feature computation
+- Updated all_decision_trees.json with DMR data
