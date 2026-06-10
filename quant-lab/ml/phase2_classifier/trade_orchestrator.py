@@ -326,7 +326,7 @@ class TradeOrchestrator:
                 reasons.append("-50% hit: Trail SL to -25% level")
 
         # ── 132% violation check ──
-        if current_state == TradeState.REKEY:
+        if current_state == TradeState.REKEY_SEQUENCE:
             return TradeDecision(
                 "EXIT", 0.0,
                 "132% violation: Exit original, begin rekey sequence",
