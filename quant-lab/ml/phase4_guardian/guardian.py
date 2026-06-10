@@ -2,6 +2,7 @@
 Guardian Alert Pipeline — Live Scanning Engine
 ================================================
 Orchestrates the full pipeline: features → model → alignment → RAG → alert → dispatch.
+Uses TradeOrchestrator for position sizing, risk management, and trade state decisions.
 """
 from __future__ import annotations
 
@@ -23,6 +24,10 @@ if str(_ml_dir) not in sys.path:
     sys.path.insert(0, str(_ml_dir))
 from phase3_rag_oracle.vector_store import RAGVectorStore
 from phase3_rag_oracle.query_engine import RAGQueryEngine
+from phase2_classifier.trade_orchestrator import (
+    TradeOrchestrator, TradeSetup, TradeDecision,
+    TradeState, RegimeState,
+)
 
 logger = logging.getLogger("cerebus.guardian")
 
@@ -81,9 +86,13 @@ class GuardianPipeline:
         self.rag_engine = RAGQueryEngine(self.rag_store)
         logger.info(f"  RAG store: {self.rag_store.count()} chunks")
 
+        # Trade orchestrator — position sizing, risk management, trade state
+        self.orchestrator = TradeOrchestrator()
+
         # State tracking
         self.last_alert_time: dict[str, float] = {}
         self.alert_cooldown_seconds: int = 300  # 5 min between alerts per symbol
+        self.active_trades: dict[str, dict] = {}  # symbol -> trade state
 
     def process_candle(self, df: pd.DataFrame, symbol: str) -> Optional[str]:
         """
@@ -126,6 +135,11 @@ class GuardianPipeline:
         if not self._check_alignment(features, regime, confidence):
             return None
 
+        # ── Manage active trades (orchestrator) ──
+        trade_update = self._orchestrate_active_trade(symbol, features, latest)
+        if trade_update and trade_update.action in ("EXIT", "HEDGE"):
+            logger.info(f"Trade management[{symbol}]: {trade_update.action} — {trade_update.reason}")
+
         # Check cooldown
         now = time.time()
         last_alert = self.last_alert_time.get(symbol, 0)
@@ -161,10 +175,33 @@ class GuardianPipeline:
             time_to_delivery=time_to_delivery,
         )
 
+        # ── Trade Orchestrator: entry decision ──
+        trade_decision = self._orchestrate_entry(features, symbol, regime)
+        if trade_decision:
+            alert += f"\n\n📊 ORCHESTRATOR DECISION: {trade_decision.action}"
+            alert += f"\n  Size: {trade_decision.size_multiplier:.0%}"
+            alert += f"\n  Reason: {trade_decision.reason}"
+            if trade_decision.targets:
+                alert += f"\n  Targets: {json.dumps(trade_decision.targets, indent=2)}"
+            alert += f"\n  SL Buffer: {trade_decision.sl_buffer_pips:.1f}p"
+            alert += f"\n  Time Stop: {trade_decision.time_stop_bars} bars"
+
+            # Track active trade
+            if trade_decision.action in ("ENTER", "REDUCE"):
+                self.active_trades[symbol] = {
+                    "state": TradeState.T1_ACTIVE,  # Will be refined by tier
+                    "bars_in_trade": 0,
+                    "targets_hit": [],
+                    "entry_confidence": confidence,
+                    "size_multiplier": trade_decision.size_multiplier,
+                    "sl_buffer_pips": trade_decision.sl_buffer_pips,
+                }
+
         # Update cooldown
         self.last_alert_time[symbol] = now
 
-        logger.info(f"Alert generated for {symbol}: {regime} @ {confidence:.0%}")
+        logger.info(f"Alert generated for {symbol}: {regime} @ {confidence:.0%} | "
+                    f"Orchestrator: {trade_decision.action if trade_decision else 'N/A'}")
         return alert
 
     def _build_features(self, bar: pd.Series) -> dict:
@@ -246,6 +283,148 @@ class GuardianPipeline:
             "FAILED": 48.0,
         }
         return base_hours.get(regime, 24.0)
+
+    def _orchestrate_entry(self, features: dict, symbol: str, regime: str) -> Optional[TradeDecision]:
+        """
+        Pass the alert's feature set to the TradeOrchestrator for an entry decision.
+        Maps guardian feature dict → TradeSetup → TradeOrchestrator.evaluate_entry().
+        """
+        # Map regime string → RegimeState enum
+        regime_map = {
+            "CONFIRMED": RegimeState.CONFIRMED,
+            "CAUTION": RegimeState.CAUTION,
+            "FAILED": RegimeState.FAILED,
+            "NO-GO": RegimeState.FAILED,
+        }
+        regime_state = regime_map.get(regime, RegimeState.CAUTION)
+
+        # Determine tier from Asian Range
+        ar_pips = features.get("asian_range_pips", 0)
+        if ar_pips > 0:
+            if ar_pips < 20:
+                tier = 1
+            elif ar_pips < 30:
+                tier = 2
+            elif ar_pips < 45:
+                tier = 3
+            else:
+                tier = 3  # T4 = NO-GO, but we still classify
+        else:
+            tier = 2  # Default if AR not available
+
+        # Determine session from hour
+        hour_utc = datetime.now(timezone.utc).hour
+        if 2 <= hour_utc < 4:
+            session = "2-4AM"
+        elif 4 <= hour_utc < 7:
+            session = "4-7AM"
+        elif 7 <= hour_utc < 11:
+            session = "7-11AM"
+        else:
+            session = "7-11AM"  # Default
+
+        # Day of week
+        dow = datetime.now(timezone.utc).strftime("%A")
+
+        # Quarter
+        month = datetime.now(timezone.utc).month
+        quarter = f"Q{(month - 1) // 3 + 1}"
+
+        # ILM alignment
+        ilm = features.get("ilm_state", "")
+        if ilm in ("IELM", "DAILY_ILM"):
+            ilm_align = "FULL"
+        elif ilm == "WILM":
+            ilm_align = "PARTIAL"
+        else:
+            ilm_align = "NONE"
+
+        # Build TradeSetup
+        setup = TradeSetup(
+            symbol=symbol,
+            tier=tier,
+            ar_pips=ar_pips,
+            regime=regime_state,
+            session=session,
+            day_of_week=dow,
+            quarter=quarter,
+            ilm_alignment=ilm_align,
+            is_wednesday_pm=bool(features.get("is_wednesday_pm", 0)),
+            consecutive_losses=int(features.get("consecutive_losses", 0)),
+            spread_vs_avg=features.get("spread_vs_20d_avg", 1.0),
+        )
+
+        # Get orchestrator decision
+        decision = self.orchestrator.evaluate_entry(setup)
+
+        logger.info(f"Orchestrator[{symbol}]: {decision.action} @ {decision.size_multiplier:.0%} "
+                    f"| {decision.reason[:80]}")
+
+        return decision
+
+    def _orchestrate_active_trade(self, symbol: str, features: dict, latest: pd.Series) -> Optional[TradeDecision]:
+        """
+        Manage an active trade. Called every bar for symbols with active positions.
+        Uses TradeOrchestrator.evaluate_during_trade() for hold/trim/hedge/exit decisions.
+        """
+        if symbol not in self.active_trades:
+            return None
+
+        trade = self.active_trades[symbol]
+        trade["bars_in_trade"] += 1
+
+        # Check if targets were hit
+        dist_25 = features.get("dist_to_25_pips", 999)
+        dist_50 = features.get("dist_to_50_pips", 999)
+        dist_100 = features.get("dist_to_100_pips", 999)
+        dist_132 = features.get("dist_to_132_pips", 999)
+
+        if dist_25 <= 0 and "TARGET_25" not in trade["targets_hit"]:
+            trade["targets_hit"].append("TARGET_25")
+        if dist_50 <= 0 and "TARGET_50" not in trade["targets_hit"]:
+            trade["targets_hit"].append("TARGET_50")
+        if dist_100 <= 0 and "TARGET_100" not in trade["targets_hit"]:
+            trade["targets_hit"].append("TARGET_100")
+
+        # Determine current trade state
+        current_state = trade["state"]
+        if dist_132 <= 0:
+            current_state = TradeState.REKEY_SEQUENCE
+        elif dist_25 > 5 and trade["bars_in_trade"] > 48:
+            current_state = TradeState.FAILURE
+
+        # Current PnL estimate
+        current_pnl = -dist_25 if dist_25 > 0 else (25 if "TARGET_25" in trade["targets_hit"] else 0)
+
+        # Build setup for orchestrator
+        ar_pips = features.get("asian_range_pips", 15)
+        setup = TradeSetup(
+            symbol=symbol,
+            tier=1,
+            ar_pips=ar_pips,
+            regime=RegimeState.CONFIRMED,
+            session="7-11AM",
+            day_of_week=datetime.now(timezone.utc).strftime("%A"),
+            quarter=f"Q{(datetime.now(timezone.utc).month - 1) // 3 + 1}",
+            ilm_alignment="FULL",
+            is_wednesday_pm=bool(features.get("is_wednesday_pm", 0)),
+            consecutive_losses=int(features.get("consecutive_losses", 0)),
+            spread_vs_avg=features.get("spread_vs_20d_avg", 1.0),
+        )
+
+        decision = self.orchestrator.evaluate_during_trade(
+            setup=setup,
+            current_state=current_state,
+            bars_in_trade=trade["bars_in_trade"],
+            targets_hit=trade["targets_hit"],
+            current_pnl_pips=current_pnl,
+        )
+
+        # Clean up exited trades
+        if decision.action == "EXIT":
+            del self.active_trades[symbol]
+
+        return decision
 
     def dispatch_alert(self, alert: str, symbol: str = ""):
         """

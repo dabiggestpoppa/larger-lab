@@ -168,7 +168,10 @@ class MarkovChainModel:
 
     def _init_from_priors(self):
         """Initialize transition matrix from Holy Grail prior probabilities."""
-        for (from_state, to_state), prob in HOLY_GRAIL_PRIORS.items():
+        for key, prob in HOLY_GRAIL_PRIORS.items():
+            if not isinstance(key, tuple) or len(key) != 2:
+                continue  # Skip non-transition keys (day_modifiers, etc.)
+            from_state, to_state = key
             if from_state in STATE_IDX and to_state in STATE_IDX:
                 i, j = STATE_IDX[from_state], STATE_IDX[to_state]
                 self.transition_counts[i, j] = prob * 100  # Scale to counts
