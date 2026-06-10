@@ -121,45 +121,54 @@ for fold, (ti, vi) in enumerate(tscv.split(X_train)):
 mean_cv = np.mean(cv_scores)
 print(f'CV: {mean_cv:.1%} ± {np.std(cv_scores):.1%}')
 
-# SHAP
-print('\nSHAP physics check...')
-sample_size = min(10000, len(X_val))
-explainer = shap.TreeExplainer(model)
-shap_values = explainer.shap_values(X_val[:sample_size])
-
-if isinstance(shap_values, list):
-    mean_abs_shap = np.zeros(len(feature_names))
-    for sv in shap_values:
-        if sv.ndim == 2:
-            mean_abs_shap += np.abs(sv).mean(axis=0)
-    mean_abs_shap /= len(shap_values)
-elif shap_values.ndim == 2:
-    mean_abs_shap = np.abs(shap_values).mean(axis=0)
-
-importance = pd.DataFrame({
-    'feature': feature_names,
-    'mean_abs_shap': mean_abs_shap,
-}).sort_values('mean_abs_shap', ascending=False).reset_index(drop=True)
-importance['rank'] = range(1, len(importance) + 1)
-
-print('\nTop 10 SHAP:')
-for _, row in importance.head(10).iterrows():
-    print(f'  #{int(row["rank"])} {row["feature"]}: {row["mean_abs_shap"]:.4f}')
-
-top5 = importance.head(5)['feature'].tolist()
-if 'dist_to_132_pips' in top5:
-    print('\n  OK SHAP PHYSICS CHECK PASSED')
-else:
-    rank = importance[importance['feature'] == 'dist_to_132_pips']['rank'].values
-    print(f'\n  WARN: dist_to_132_pips rank {int(rank[0]) if len(rank) > 0 else "N/A"}')
-
-# Save
+# Save model first (before SHAP which can fail)
 artifact = {
     'model': model, 'feature_names': feature_names,
     'cv_scores': cv_scores, 'val_accuracy': val_acc,
-    'is_trained': True, 'version': 'full_30feat_v2'
+    'is_trained': True, 'version': 'full_41feat_v2'
 }
 joblib.dump(artifact, MODEL_DIR / 'regime_classifier_full.pkl')
-importance.to_csv(SHAP_DIR / 'feature_importance_full.csv', index=False)
-print('\nModel + SHAP saved')
+print('\nModel saved')
+
+# SHAP (best-effort)
+print('\nSHAP physics check...')
+try:
+    sample_size = min(5000, len(X_val))
+    X_sample = X_val[:sample_size].astype(np.float64)
+    explainer = shap.TreeExplainer(model)
+    shap_values = explainer.shap_values(X_sample)
+
+    mean_abs_shap = np.zeros(len(feature_names))
+    if isinstance(shap_values, list):
+        for sv in shap_values:
+            if hasattr(sv, 'ndim') and sv.ndim == 2 and sv.shape[1] == len(feature_names):
+                mean_abs_shap += np.abs(sv).mean(axis=0)
+        if len(shap_values) > 0:
+            mean_abs_shap /= len(shap_values)
+    elif hasattr(shap_values, 'ndim') and shap_values.ndim == 2:
+        mean_abs_shap = np.abs(shap_values).mean(axis=0)
+
+    importance = pd.DataFrame({
+        'feature': feature_names,
+        'mean_abs_shap': mean_abs_shap,
+    }).sort_values('mean_abs_shap', ascending=False).reset_index(drop=True)
+    importance['rank'] = range(1, len(importance) + 1)
+
+    print('\nTop 10 SHAP:')
+    for _, row in importance.head(10).iterrows():
+        print(f'  #{int(row["rank"])} {row["feature"]}: {row["mean_abs_shap"]:.4f}')
+
+    top5 = importance.head(5)['feature'].tolist()
+    if 'dist_to_132_pips' in top5:
+        print('\n  OK SHAP PHYSICS CHECK PASSED: dist_to_132_pips in top 5')
+    else:
+        rank = importance[importance['feature'] == 'dist_to_132_pips']['rank'].values
+        print(f'\n  WARN: dist_to_132_pips rank {int(rank[0]) if len(rank) > 0 else "N/A"}')
+
+    importance.to_csv(SHAP_DIR / 'feature_importance_full.csv', index=False)
+    print('SHAP importance saved')
+except Exception as e:
+    print(f'SHAP failed (non-critical): {e}')
+    import traceback; traceback.print_exc()
+
 print('=== RETRAIN COMPLETE ===')

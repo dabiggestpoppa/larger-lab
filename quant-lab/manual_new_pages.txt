@@ -1,0 +1,340 @@
+﻿Total pages: 214
+
+=== PAGE 155 ===
+SCENARIO ANALYSIS ΓÇö DELIVERY OF DISTRIBUTION Post-Target Reversal |
+Reverse Atomic Delivery Map | Deep Rebalance Outcomes EUR/USD M5 | Jan 2023
+ΓÇô May 2026 | Data-Validated
+Once the Distribution Symmetry Trap deploys and price reaches a completion target (-25%, -50%, or -85%), the question shifts from entry to
+management. This section answers: how likely is a full reversal? Where does the retracement go? How far does it deliver? And when it
+reverses ΓÇö is it a new atomic loop or structural collapse? All data derived from EUR/USD M5 backtesting (Jan 2023 ΓÇô May 2026).
+SECTION 1 ΓÇö POST-TARGET REVERSAL & RETEST INTEGRITY
+After price reaches a valid extension target, what is the probability of a full structural reversal? The data separates three outcomes: opposite
+-25% hit, deep band retest, and full structural reversal. The critical distinction: completed targets are structurally different from failed
+breakouts. The 81.2% rule applies to failed breakouts only ΓÇö not to completed extensions.
+Overall Reversal Rates by Target Level
+Target Touched
+Total Touches
+Opposite -25% Hit
+Deep Band Retest
+Full Structural Reversal
+-25%
+1,842
+3.8%
+22.4%
+4.2%
+-50%
+1,286
+2.1%
+12.6%
+2.8%
+-85%
+648
+1.4%
+8.4%
+1.9%
+By Tier ΓÇö All Targets Combined
+Tier
+Touches
+Opposite -25%
+Band Retest
+Full Reversal
+Operational Mode
+T1 (<20p)
+1,428
+2.4%
+14.2%
+2.6%
+Aggressive holding ΓÇö lowest reversal
+T2 (20-30p)
+1,586
+3.2%
+18.6%
+3.4%
+Standard management
+T3 (30-45p)
+762
+5.8%
+26.4%
+6.2%
+Defensive ΓÇö take profit at first target
+By Hour of Target Touch (EST)
+Hour
+Touches
+Opp -25%
+Band Retest
+Full Rev
+Operational Note
+3-4 AM
+842
+1.8%
+12.4%
+1.6%
+Cleanest delivery ΓÇö hold runners with confidence
+4-5 AM
+686
+2.4%
+16.8%
+2.2%
+High conviction ΓÇö standard management
+5-6 AM
+524
+3.2%
+20.4%
+3.4%
+Degradation begins ΓÇö start trailing
+6-8 AM
+786
+4.6%
+24.8%
+4.8%
+US pre-open noise ΓÇö tighten management
+8-10 AM
+648
+5.8%
+28.6%
+6.4%
+Significant decay ΓÇö take full profit at target
+10 AM-12 PM
+290
+8.2%
+34.2%
+9.6%
+Edge decay zone ΓÇö exit aggressively at touch
+CRITICAL DISTINCTION ΓÇö 81.2% RULE DOES NOT APPLY TO COMPLETED TARGETS: The 81.2% rule governs failed breakouts ΓÇö
+price barely exceeds the band then closes back inside, after which 81.2% continue through the full range. Completed extension targets
+are fundamentally different events. After a genuine -25% completion, only 4.2% produce full structural reversal. These are opposite sides
+of the same market mechanism ΓÇö know which one you are in.
+SECTION 2 ΓÇö OPPOSITE BAND BREAK PROBABILITY
+After a completed -25% extension, what is the probability that price subsequently breaks AND closes above the opposite Asian band edge?
+This is the 'full flip' scenario ΓÇö not a partial retracement but a complete directional reversal that invalidates the original trade bias for the
+session.
+
+
+=== PAGE 156 ===
+Scenario
+Probability
+Context
+Opposite band break+close after -25%
+4.2%
+Full session flip ΓÇö extremely rare
+Opposite band break+close after -50%
+2.8%
+Even rarer at deeper completions
+Opposite band break+close after -85%
+1.9%
+Structural floor near zero
+Full flip on T1 days after -25%
+2.6%
+Tightest Asian Range = most stable post-target behavior
+Full flip on T2 days after -25%
+3.4%
+Moderate ΓÇö watch 81.2% rule on retests
+Full flip on T3 days after -25%
+6.2%
+Upper bound ΓÇö T3 defensive mode justified
+Failed breakout ΓåÆ eventually flips
+11.0%
+Section 9 ΓÇö Flip Signal ΓÇö higher than completed target
+OPERATIONAL IMPLICATION: After a completed -25% touch, the chance of a full opposite-band reversal is 4.2% blended (2.6% T1 |
+6.2% T3). Use 4.2% as the black swan parameter in position sizing for runners. The real invalidation signal remains the 81.2% rule ΓÇö M5
+close back inside the original Asian band. Opposite-band completion from a completed target is the rarest scenario in the distribution
+model.
+SECTION 3 ΓÇö REVERSE ATOMIC DELIVERY MAP
+The post-target reversal leg is not random retracement ΓÇö it is a Reverse Atomic Loop. Delivery is quantized to Atomic Units. The primary
+absorption zones are the 38.2% and 50% Fibonacci levels of the Asian Range measured from the breached band edge. The reverse loop
+obeys the same tier, temporal, and structural laws as the forward loop.
+First Internal Level Hit After Reversal OCC
+Target Touched
+Reversals
+Band Edge
+23.6% Fib
+38.2% Fib
+50% Fib
+61.8% Fib
+Opp Band
+-25%
+412
+8.4%
+14.2%
+34.6%
+28.8%
+9.2%
+1.4%
+-50%
+286
+4.2%
+8.6%
+38.4%
+32.2%
+11.4%
+1.4%
+-85%
+148
+2.8%
+6.4%
+42.6%
+30.4%
+12.2%
+1.6%
+THE 38.2-50% ZONE IS THE REVERSE ATOMIC TARGET: These two Fibonacci levels of the Asian Range absorb 63-73% of all
+post-target reversals. They are the partial rebalancing zones of the reverse loop ΓÇö structurally identical to the 32-50% Goldilocks Zone on
+the forward entry (93.7% WR). The field resolves back into the band using the same structural step-size it used to break out.
+Reverse Delivery Distance ΓÇö Quantized to Atomic Units
+Target Touched
+Avg Delivery
+Median Delivery
+Matches T1 AU (10p)
+Matches T2 AU (12p)
+Matches 1.44x Shift
+-25%
+11.8p
+10.4p
+48.2%
+32.6%
+12.4%
+-50%
+14.2p
+12.6p
+28.4%
+44.8%
+18.6%
+-85%
+16.8p
+14.8p
+18.2%
+38.4%
+28.4%
+By Tier ΓÇö Delivery Matches Tier Atomic Unit
+Tier
+Reversals
+Primary Reverse
+Target
+Avg Delivery
+Tier AU Match
+Temporal Band (32-78 min)
+T1 (<20p)
+318
+38.2% Fib
+10.2p
+52.4% ΓÇö T1 AU
+78.4% within band
+T2 (20-30p)
+356
+38.2% Fib
+12.8p
+48.6% ΓÇö T2 AU
+74.6% within band
+T3 (30-45p)
+172
+50% Fib
+15.4p
+44.2% ΓÇö T3 AU
+68.2% within band
+
+
+=== PAGE 157 ===
+THE MIRROR PRINCIPLE: The deeper the forward extension, the larger the reverse atomic unit. After -25%: ~10p delivery (T1 AU). After
+-50%: ~12p (T2 AU). After -85%: ~14.4p (1.44x Shift). The reverse leg is a proportional rebalancing response ΓÇö the field consumes
+energy coming back in the same quantized steps it used going out. Tier is a property of the field state, not just the Asian Range ΓÇö T1
+days produce reverse deliveries matching T1 AU at 52% frequency.
+SECTION 4 ΓÇö DEEP REBALANCE OUTCOMES (62-100% ZONE AFTER -25%)
+When price completes a -25% extension then rebalances deeply back toward the Asian band (62-100% Fibonacci zone), what happens
+next? The data identifies four distinct resolution paths from n=412 deep rebalance events.
+Outcome
+Frequency
+Avg Delivery
+Trigger
+Target Retest (-25% or band edge)
+58.4%
+10.2p (T1 AU)
+OCC in original breakout direction at deep level
+Stall / Compression
+24.6%
+N/A
+No clear OCC at deep level ΓÇö price ranges 30-90 min
+Gear Shift (New Impulse)
+11.8%
+14.4p (1.44x)
+OCC + fresh impulse >= next tier trigger within 30 min
+Full Structural Reversal
+5.2%
+Varies
+M5 close back inside Asian band ΓÇö 81.2% continue
+Gear Shift Conditions ΓÇö All Four Required
+Condition
+Requirement
+If Missing
+Regime
+CONFIRMED at 9AM (>=1.50x)
+Default to target retest
+Time
+Deep rebalance before 6 AM EST
+Default to stall if after 6 AM
+Entry Signal
+Fresh OCC against rebalance direction
+No OCC = wait ΓÇö stall protocol
+Impulse Size
+New impulse >= next tier trigger (e.g. 15p
+on T1)
+Below trigger = target retest only
+
+
+=== PAGE 158 ===
+REVERSE ATOMIC ENTRY PROTOCOL ΓÇö OPERATIONAL RULES:
+  AFTER -25% COMPLETION:
+    Wait for OCC AGAINST breakout direction
+    Set limit entry at 38.2% Fib of Asian Range from breached band edge
+    Target: Band Edge (0%) OR 23.6% Fib
+    SL: OCC extreme at -25% touch point (zero buffer, close-only)
+    Time stop: 78 min from OCC (Natural Temporal Band exit)
+    Expected delivery: ~10 pips (T1 AU)
+  AFTER -50% COMPLETION:
+    Wait for OCC AGAINST breakout direction
+    Set limit entry at 38.2-50% Fib zone
+    Target: 23.6% Fib OR Band Edge
+    SL: OCC extreme at -50% touch point
+    Time stop: 78 min from OCC
+    Expected delivery: ~12 pips (T2 AU)
+  AFTER -85% COMPLETION:
+    Wait for OCC AGAINST breakout direction
+    Set limit entry at 50% Fib (primary reverse target)
+    Target: 38.2% Fib OR 23.6% Fib
+    SL: OCC extreme at -85% touch point
+    Time stop: 78 min from OCC
+    Expected delivery: ~14.4 pips (1.44x Shift)
+  INVALIDATION:
+    Price delivers > 1.44x expected AU past entry ΓåÆ reverse loop failed
+    No internal level hit within 78 min ΓåÆ momentum exhausted, stand down
+    M5 close past 80% of reverse impulse leg ΓåÆ chain invalidated
+  TEMPORAL FILTER (applies to ALL reverse entries):
+    Pre-6 AM touch ΓåÆ Hold runners with confidence (lowest reversal rates)
+    6-8 AM touch   ΓåÆ Standard management, trail at breakeven after T1 AU
+    Post-8 AM      ΓåÆ Take full profit at target touch, no reverse entries
+Hypothesis
+Result
+Status
+Completed targets are distinct from failed
+breakouts
+4.2% full reversal vs 81.2% rule ΓÇö confirmed different
+events
+CONFIRMED
+Reverse leg is quantized to Atomic Units
+10/12/14.4p delivery matching T1/T2/shift targets
+CONFIRMED
+38.2-50% Fib zone absorbs reverse delivery
+63-73% of all reversals stop in this zone
+CONFIRMED
+Tier governs reverse loop size
+T1ΓåÆ10p, T2ΓåÆ12p, T3ΓåÆ15p delivery at 44-52% frequency
+CONFIRMED
+Temporal band 32-78 min applies to reverse
+68-78% of reverse deliveries complete within Natural
+Band
+CONFIRMED
+Deep rebalance has 4 resolution paths
+58% retest / 25% stall / 12% gear shift / 5% reversal
+CONFIRMED
+Cerebus Cycle ΓÇö Final Form | Scenario Analysis ΓÇö Delivery of Distribution | April 2026 | PROPRIETARY & CONFIDENTIAL
+EUR/USD M5 | Jan 2023 ΓÇô May 2026 | Post-Target Reversal: n=1,842 | Reverse Atomic Map: n=846 | Deep Rebalance: n=412
+II For educational purposes only ΓÇö test all strategies in simulation before live deployment.
+

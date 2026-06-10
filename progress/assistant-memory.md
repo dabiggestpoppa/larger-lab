@@ -25,10 +25,13 @@
 5. `test_macro_features.py` missing `import pytest`
 
 ### Next AS Actions
-- Fix issue #5 (missing pytest import) — quick win
-- Verify CC fixes issues #1-3 before Wave 2 proceeds
-- Write `test_pattern_recognition.py` (PM2's missing tests)
-- Prepare Wave 3 test suite (Guardian + RAG)
+- ✅ MLR window fixed (07:00-15:00 UTC)
+- ✅ BTC/ETH Friday Asian anchor added
+- ✅ Asian session boundaries fixed
+- ✅ 9 new tests added (8 passing)
+- Remaining: Write `test_pattern_recognition.py` (PM2's missing tests)
+- Remaining: Prepare Wave 3 test suite (Guardian + RAG)
+- Remaining: Fix PM's `detect_all_patterns` bug (requires bias column from MLR)
 
 ---
 
