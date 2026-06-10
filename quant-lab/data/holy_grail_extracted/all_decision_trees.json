@@ -36,50 +36,166 @@
       "violations_132_pct": 160,
       "violation_rate": "74.4%",
       "hit_rates": {
-        "minus_25_pct": {"bullish": "100.0%", "bearish": "100.0%", "combined": "100.0%", "vs_eurusd": "+8.0%", "vs_oil": "+1.78%", "status": "EXCEPTIONAL"},
-        "minus_50_pct": {"bullish": "95.1%", "bearish": "96.6%", "combined": "95.7%", "vs_eurusd": "+15.7%", "vs_oil": "-0.74%", "status": "EXCEPTIONAL"},
-        "minus_100_pct": {"bullish": "87.2%", "bearish": "84.9%", "combined": "86.2%", "vs_eurusd": "+0.9%", "vs_oil": "-5.97%", "status": "VALIDATED"},
-        "minus_168_pct": {"bullish": "78.5%", "bearish": "73.3%", "combined": "76.3%", "vs_eurusd": "-0.1%", "vs_oil": "-10.89%", "status": "VALIDATED"},
-        "132_pct_violation": {"bullish": "73.8%", "bearish": "75.3%", "combined": "74.4%", "vs_eurusd": "+3.79%", "vs_oil": "+2.87%", "status": "HIGHER RISK"},
-        "rekey_success": {"bullish": "100%", "bearish": "100%", "combined": "100%", "status": "DETERMINISTIC"}
+        "minus_25_pct": {
+          "bullish": "100.0%",
+          "bearish": "100.0%",
+          "combined": "100.0%",
+          "vs_eurusd": "+8.0%",
+          "vs_oil": "+1.78%",
+          "status": "EXCEPTIONAL"
+        },
+        "minus_50_pct": {
+          "bullish": "95.1%",
+          "bearish": "96.6%",
+          "combined": "95.7%",
+          "vs_eurusd": "+15.7%",
+          "vs_oil": "-0.74%",
+          "status": "EXCEPTIONAL"
+        },
+        "minus_100_pct": {
+          "bullish": "87.2%",
+          "bearish": "84.9%",
+          "combined": "86.2%",
+          "vs_eurusd": "+0.9%",
+          "vs_oil": "-5.97%",
+          "status": "VALIDATED"
+        },
+        "minus_168_pct": {
+          "bullish": "78.5%",
+          "bearish": "73.3%",
+          "combined": "76.3%",
+          "vs_eurusd": "-0.1%",
+          "vs_oil": "-10.89%",
+          "status": "VALIDATED"
+        },
+        "132_pct_violation": {
+          "bullish": "73.8%",
+          "bearish": "75.3%",
+          "combined": "74.4%",
+          "vs_eurusd": "+3.79%",
+          "vs_oil": "+2.87%",
+          "status": "HIGHER RISK"
+        },
+        "rekey_success": {
+          "bullish": "100%",
+          "bearish": "100%",
+          "combined": "100%",
+          "status": "DETERMINISTIC"
+        }
       },
       "decision_tree": {
         "node_1_pre_friday": {
           "name": "PRE-FRIDAY PREPARATION (Thursday Evening / Pre-Asian Session)",
           "checks": [
-            {"check": "Last week 132% status", "if_true": "Rekey mode active - wait for 78.6% retrace", "if_false": "Normal mode - prepare for fresh entry", "prob": "74.4% / 25.6%"},
-            {"check": "Quarterly context", "if_true": "Q4/Q1 → High reliability zone", "if_false": "Q2/Q3 → Standard reliability", "prob": "Q4: ~95% / Q1-Q3: 85-92%"},
-            {"check": "BTC correlation", "if_true": "BTC aligned → Higher confidence", "if_false": "BTC diverging → Reduce position", "prob": "~85% correlation periods"},
-            {"check": "Weekend liquidity", "if_true": "High volume → Full position", "if_false": "Low volume → Reduce 25%", "prob": "Variable"}
+            {
+              "check": "Last week 132% status",
+              "if_true": "Rekey mode active - wait for 78.6% retrace",
+              "if_false": "Normal mode - prepare for fresh entry",
+              "prob": "74.4% / 25.6%"
+            },
+            {
+              "check": "Quarterly context",
+              "if_true": "Q4/Q1 → High reliability zone",
+              "if_false": "Q2/Q3 → Standard reliability",
+              "prob": "Q4: ~95% / Q1-Q3: 85-92%"
+            },
+            {
+              "check": "BTC correlation",
+              "if_true": "BTC aligned → Higher confidence",
+              "if_false": "BTC diverging → Reduce position",
+              "prob": "~85% correlation periods"
+            },
+            {
+              "check": "Weekend liquidity",
+              "if_true": "High volume → Full position",
+              "if_false": "Low volume → Reduce 25%",
+              "prob": "Variable"
+            }
           ]
         },
         "node_2_friday_asian": {
           "name": "FRIDAY ASIAN RANGE FORMATION (7:00 PM - 2:00 AM EST)",
           "anchor": "PRIMARY ANCHOR WINDOW - establishes weekly framework",
           "checks": [
-            {"check": "Measure Friday Asian Range", "action": "Calculate High - Low (00:00-07:00 UTC)", "prob": "100% deterministic"},
-            {"check": "Determine Directional Bias", "action": "Close > Open → Bullish / Close < Open → Bearish", "prob": "100% deterministic"},
-            {"check": "Calculate Fibonacci Levels", "action": "Bullish: 0%=Low, 100%=High, Extensions above / Bearish: 0%=High, 100%=Low, Extensions below", "prob": "100% / 95.7%"},
-            {"check": "Calculate 132% Invalidation Level", "action": "Bullish: 132% below Low / Bearish: 132% above High", "prob": "74.4% violation rate"},
-            {"check": "Set Optimal Stop Loss", "action": "132% Level + 48% buffer", "prob": "95% coverage"},
-            {"check": "Set Target Levels", "action": "Primary: -25% (14-17h) / Secondary: -50% (18-24h) / Tertiary: -100% (24-48h)", "prob": "100% / 95.7% / 86.2%"}
+            {
+              "check": "Measure Friday Asian Range",
+              "action": "Calculate High - Low (00:00-07:00 UTC)",
+              "prob": "100% deterministic"
+            },
+            {
+              "check": "Determine Directional Bias",
+              "action": "Close > Open → Bullish / Close < Open → Bearish",
+              "prob": "100% deterministic"
+            },
+            {
+              "check": "Calculate Fibonacci Levels",
+              "action": "Bullish: 0%=Low, 100%=High, Extensions above / Bearish: 0%=High, 100%=Low, Extensions below",
+              "prob": "100% / 95.7%"
+            },
+            {
+              "check": "Calculate 132% Invalidation Level",
+              "action": "Bullish: 132% below Low / Bearish: 132% above High",
+              "prob": "74.4% violation rate"
+            },
+            {
+              "check": "Set Optimal Stop Loss",
+              "action": "132% Level + 48% buffer",
+              "prob": "95% coverage"
+            },
+            {
+              "check": "Set Target Levels",
+              "action": "Primary: -25% (14-17h) / Secondary: -50% (18-24h) / Tertiary: -100% (24-48h)",
+              "prob": "100% / 95.7% / 86.2%"
+            }
           ]
         },
         "node_3_friday_post_asian": {
           "name": "FRIDAY POST-ASIAN SESSION (2:00 AM - 5:00 PM EST)",
           "checks": [
-            {"check": "Monitor -25% delivery", "if_true": "Prepare to book 50% profit", "if_false": "Continue monitoring", "prob": "~70% hit by Fri close"},
-            {"check": "Asian range expansion", "if_true": "Range > 1.5x typical → Higher probability of -25% within session", "if_false": "Standard delivery timing"},
-            {"check": "Friday London session activity", "if_true": "London confirms Asian bias → Add to position (if <100%)", "if_false": "Hold current position", "prob": "75% confirmation rate"},
-            {"check": "Monitor 132% approach", "if_true": "Price within 20% of 132% level → ALERT: Prepare to exit", "if_false": "Continue normal monitoring"}
+            {
+              "check": "Monitor -25% delivery",
+              "if_true": "Prepare to book 50% profit",
+              "if_false": "Continue monitoring",
+              "prob": "~70% hit by Fri close"
+            },
+            {
+              "check": "Asian range expansion",
+              "if_true": "Range > 1.5x typical → Higher probability of -25% within session",
+              "if_false": "Standard delivery timing"
+            },
+            {
+              "check": "Friday London session activity",
+              "if_true": "London confirms Asian bias → Add to position (if <100%)",
+              "if_false": "Hold current position",
+              "prob": "75% confirmation rate"
+            },
+            {
+              "check": "Monitor 132% approach",
+              "if_true": "Price within 20% of 132% level → ALERT: Prepare to exit",
+              "if_false": "Continue normal monitoring"
+            }
           ]
         },
         "node_4_saturday": {
           "name": "SATURDAY CONTINUATION (All Day - 24/7 Crypto)",
           "checks": [
-            {"check": "-25% Status Check", "if_true": "Book 50% profit, move stop to breakeven", "if_false": "Continue monitoring, reduce position 25%", "prob": "100% eventual hit"},
-            {"check": "-50% Proximity", "if_true": "Prepare to book additional 25% profit", "if_false": "Continue monitoring", "prob": "95.7% hit rate"},
-            {"check": "Weekend liquidity assessment", "if_true": "Volume declining significantly → Tighten stops 10%", "if_false": "Maintain normal stops"}
+            {
+              "check": "-25% Status Check",
+              "if_true": "Book 50% profit, move stop to breakeven",
+              "if_false": "Continue monitoring, reduce position 25%",
+              "prob": "100% eventual hit"
+            },
+            {
+              "check": "-50% Proximity",
+              "if_true": "Prepare to book additional 25% profit",
+              "if_false": "Continue monitoring",
+              "prob": "95.7% hit rate"
+            },
+            {
+              "check": "Weekend liquidity assessment",
+              "if_true": "Volume declining significantly → Tighten stops 10%",
+              "if_false": "Maintain normal stops"
+            }
           ]
         }
       }
@@ -90,7 +206,12 @@
       "data": "Based on 313 Monday sessions, 281 validated weeks (Jan 2020 - Dec 2025)",
       "model_objective": "Predict weekly close location relative to Monday Fibonacci levels",
       "primary_predictor": "M1 (Monday Range) with 123.13 effectiveness score",
-      "key_decision_points": ["Monday Close", "Wednesday Close", "Thursday AM", "Friday Close"],
+      "key_decision_points": [
+        "Monday Close",
+        "Wednesday Close",
+        "Thursday AM",
+        "Friday Close"
+      ],
       "operating_modes": {
         "normal_delivery": "68.3%",
         "invalidation_rekey": "71.53%"
@@ -99,45 +220,158 @@
         "node_1_monday_london": {
           "name": "NODE 1: MONDAY LONDON OPEN (02:00-06:00 EST)",
           "checks": [
-            {"check": "Monday Range Set?", "condition": "London Open establishes 0% and 100%", "prob": "100%", "action": "Calculate Fib levels (-25%, -50%, -100%, -168%, 132%)", "next": "Node 2"},
-            {"check": "Directional Bias", "condition": "Close > Open = Bullish, Close < Open = Bearish", "prob": "100%", "action": "Set extension direction", "next": "Node 2"},
-            {"check": "Range Size Check", "condition": "Range > 50 pips = Normal, < 50 pips = Caution", "prob": "~70% Normal", "action": "Adjust position size", "next": "Node 2"}
+            {
+              "check": "Monday Range Set?",
+              "condition": "London Open establishes 0% and 100%",
+              "prob": "100%",
+              "action": "Calculate Fib levels (-25%, -50%, -100%, -168%, 132%)",
+              "next": "Node 2"
+            },
+            {
+              "check": "Directional Bias",
+              "condition": "Close > Open = Bullish, Close < Open = Bearish",
+              "prob": "100%",
+              "action": "Set extension direction",
+              "next": "Node 2"
+            },
+            {
+              "check": "Range Size Check",
+              "condition": "Range > 50 pips = Normal, < 50 pips = Caution",
+              "prob": "~70% Normal",
+              "action": "Adjust position size",
+              "next": "Node 2"
+            }
           ]
         },
         "node_2_monday_ny": {
           "name": "NODE 2: MONDAY NY OPEN (07:00-09:00 EST)",
           "checks": [
-            {"check": "NY Hi/Lo Takeout", "condition": "Both Monday Hi AND Lo taken out", "prob": "80%", "outcome": "Liquidity sweep complete", "action": "Proceed to -25% target"},
-            {"check": "-25% Delivery Check", "condition": "-25% hit by Monday close?", "prob": "68%", "outcome": "Normal flow initiated", "action": "Monitor -50% (Node 3)"},
-            {"check": "-25% NOT hit", "condition": "Price consolidates within range", "prob": "32%", "outcome": "Increased 132% risk", "action": "HIGH ALERT (Node 4)"}
+            {
+              "check": "NY Hi/Lo Takeout",
+              "condition": "Both Monday Hi AND Lo taken out",
+              "prob": "80%",
+              "outcome": "Liquidity sweep complete",
+              "action": "Proceed to -25% target"
+            },
+            {
+              "check": "-25% Delivery Check",
+              "condition": "-25% hit by Monday close?",
+              "prob": "68%",
+              "outcome": "Normal flow initiated",
+              "action": "Monitor -50% (Node 3)"
+            },
+            {
+              "check": "-25% NOT hit",
+              "condition": "Price consolidates within range",
+              "prob": "32%",
+              "outcome": "Increased 132% risk",
+              "action": "HIGH ALERT (Node 4)"
+            }
           ]
         },
         "node_3_tuesday_wednesday": {
           "name": "NODE 3: TUESDAY-WEDNESDAY (PRIMARY DELIVERY WINDOW)",
           "checks": [
-            {"check": "Tuesday Close", "condition": "-25% hit by Tue close?", "if_true": "-50% by Wed = 82%", "prob_true": "85%", "if_false": "Monitor 100% level", "prob_false": "15%"},
-            {"check": "Wednesday Close", "condition": "-50% hit by Wed close?", "if_true": "-100% by Fri = 88%", "prob_true": "70%", "if_false": "75% pullback to 78.6%", "prob_false": "30%"},
-            {"check": "Wednesday Close (132% risk)", "condition": "-25% hit by Wed close?", "if_true": "132% Risk = 30%", "prob_true": "70%", "if_false": "132% Risk = 70%", "prob_false": "30%"},
-            {"note": "KEY: Wednesday is PRIMARY BIFURCATION DAY (35% of all 132% violations)"}
+            {
+              "check": "Tuesday Close",
+              "condition": "-25% hit by Tue close?",
+              "if_true": "-50% by Wed = 82%",
+              "prob_true": "85%",
+              "if_false": "Monitor 100% level",
+              "prob_false": "15%"
+            },
+            {
+              "check": "Wednesday Close",
+              "condition": "-50% hit by Wed close?",
+              "if_true": "-100% by Fri = 88%",
+              "prob_true": "70%",
+              "if_false": "75% pullback to 78.6%",
+              "prob_false": "30%"
+            },
+            {
+              "check": "Wednesday Close (132% risk)",
+              "condition": "-25% hit by Wed close?",
+              "if_true": "132% Risk = 30%",
+              "prob_true": "70%",
+              "if_false": "132% Risk = 70%",
+              "prob_false": "30%"
+            },
+            {
+              "note": "KEY: Wednesday is PRIMARY BIFURCATION DAY (35% of all 132% violations)"
+            }
           ]
         },
         "node_4_132_violation": {
           "name": "NODE 4: 132% VIOLATION - SYSTEM RESET PROTOCOL",
           "stages": [
-            {"stage": "Detection", "trigger": "Price touches 132% level", "prob": "71.53% of weeks", "time_frame": "Any time (peak Wed)", "action": "IMMEDIATE EXIT"},
-            {"stage": "Rekey Initiation", "trigger": "Direction reverses from 132%", "prob": "100%", "time_frame": "0-4 hours", "action": "Wait for new anchor"},
-            {"stage": "78.6% Retrace", "trigger": "First pullback to 78.6% of violation", "prob": "92%", "time_frame": "4-12 hours", "action": "FIRST RE-ENTRY ZONE"},
-            {"stage": "50% Consolidation", "trigger": "Secondary pullback to 50%", "prob": "85%", "time_frame": "12-24 hours", "action": "OPTIMAL RE-ENTRY"},
-            {"stage": "New -50% Extension", "trigger": "Intraweek target from new anchor", "prob": "78%", "time_frame": "24-48 hours", "action": "Take profit"}
+            {
+              "stage": "Detection",
+              "trigger": "Price touches 132% level",
+              "prob": "71.53% of weeks",
+              "time_frame": "Any time (peak Wed)",
+              "action": "IMMEDIATE EXIT"
+            },
+            {
+              "stage": "Rekey Initiation",
+              "trigger": "Direction reverses from 132%",
+              "prob": "100%",
+              "time_frame": "0-4 hours",
+              "action": "Wait for new anchor"
+            },
+            {
+              "stage": "78.6% Retrace",
+              "trigger": "First pullback to 78.6% of violation",
+              "prob": "92%",
+              "time_frame": "4-12 hours",
+              "action": "FIRST RE-ENTRY ZONE"
+            },
+            {
+              "stage": "50% Consolidation",
+              "trigger": "Secondary pullback to 50%",
+              "prob": "85%",
+              "time_frame": "12-24 hours",
+              "action": "OPTIMAL RE-ENTRY"
+            },
+            {
+              "stage": "New -50% Extension",
+              "trigger": "Intraweek target from new anchor",
+              "prob": "78%",
+              "time_frame": "24-48 hours",
+              "action": "Take profit"
+            }
           ]
         },
         "node_5_thursday_friday": {
           "name": "NODE 5: THURSDAY-FRIDAY (TARGET COMPLETION)",
           "checks": [
-            {"check": "Thursday AM", "condition": "-100% hit by Thu AM?", "outcome": "-168% by Fri = 85%", "prob": "92%", "weekly_close": "Close near -168% zone"},
-            {"check": "Thursday AM (not hit)", "condition": "-100% NOT hit", "outcome": "Week completes at -100%", "prob": "8%", "weekly_close": "Close near -100% zone"},
-            {"check": "Friday Close (normal)", "condition": "Normal flow complete", "outcome": "Close at deepest extension reached", "prob": "68.3%", "weekly_close": "-100% to -168% zone"},
-            {"check": "Friday Close (rekey)", "condition": "Post-rekey flow", "outcome": "Close at new anchor -50%", "prob": "31.7%", "weekly_close": "Rekey target zone"}
+            {
+              "check": "Thursday AM",
+              "condition": "-100% hit by Thu AM?",
+              "outcome": "-168% by Fri = 85%",
+              "prob": "92%",
+              "weekly_close": "Close near -168% zone"
+            },
+            {
+              "check": "Thursday AM (not hit)",
+              "condition": "-100% NOT hit",
+              "outcome": "Week completes at -100%",
+              "prob": "8%",
+              "weekly_close": "Close near -100% zone"
+            },
+            {
+              "check": "Friday Close (normal)",
+              "condition": "Normal flow complete",
+              "outcome": "Close at deepest extension reached",
+              "prob": "68.3%",
+              "weekly_close": "-100% to -168% zone"
+            },
+            {
+              "check": "Friday Close (rekey)",
+              "condition": "Post-rekey flow",
+              "outcome": "Close at new anchor -50%",
+              "prob": "31.7%",
+              "weekly_close": "Rekey target zone"
+            }
           ]
         }
       }
@@ -145,15 +379,90 @@
     "ilm_alignment_matrix": {
       "source": "Holy Grail Excel - PHASE 5 WILM ILM VELOCITY ANALYSIS",
       "scenarios": [
-        {"scenario": "FULL ALIGNMENT (Triple Confluence)", "description": "WILM + IELM + Daily ILM all aligned", "hit_rate": "87.3%", "continuation": "87.3%", "velocity": "2.5x+ (PEAK)", "sessions": 124, "avg_duration_hrs": 4.2, "execution": "EXCELLENT", "action": "AGGRESSIVE ENTRY", "risk": "LOW"},
-        {"scenario": "WILM + IELM Alignment", "hit_rate": "62.5%", "velocity": "2.1x-2.6x", "sessions": 187, "execution": "GOOD", "action": "MODERATE ENTRY", "risk": "MEDIUM"},
-        {"scenario": "WILM + Daily ILM Alignment", "hit_rate": "58.3%", "velocity": "1.9x-2.4x", "sessions": 203, "execution": "GOOD", "action": "MODERATE ENTRY", "risk": "MEDIUM"},
-        {"scenario": "IELM + Daily ILM Alignment", "hit_rate": "71.2%", "velocity": "1.8x-2.2x", "sessions": 412, "execution": "VERY GOOD", "action": "STANDARD ENTRY", "risk": "LOW"},
-        {"scenario": "Daily ILM Only", "hit_rate": "64.3%", "velocity": "1.2x-1.6x", "sessions": 531, "execution": "ACCEPTABLE", "action": "CONSERVATIVE ENTRY", "risk": "MEDIUM"},
-        {"scenario": "IELM Only", "hit_rate": "48.3%", "velocity": "1.5x-2.1x", "sessions": 294, "execution": "WEAK", "action": "AVOID", "risk": "HIGH"},
-        {"scenario": "WILM Only", "hit_rate": "34.2%", "velocity": "1.8x-2.8x", "sessions": 106, "execution": "POOR", "action": "AVOID", "risk": "VERY HIGH"},
-        {"scenario": "PARTIAL MISALIGNMENT", "hit_rate": "42.7%", "velocity": "1.0x-1.4x", "sessions": 368, "execution": "POOR", "action": "AVOID", "risk": "HIGH"},
-        {"scenario": "COMPLETE MISALIGNMENT", "hit_rate": "31.5%", "velocity": "0.8x-1.0x", "sessions": 142, "execution": "FAILURE SCENARIO", "action": "EXIT", "risk": "EXTREME"}
+        {
+          "scenario": "FULL ALIGNMENT (Triple Confluence)",
+          "description": "WILM + IELM + Daily ILM all aligned",
+          "hit_rate": "87.3%",
+          "continuation": "87.3%",
+          "velocity": "2.5x+ (PEAK)",
+          "sessions": 124,
+          "avg_duration_hrs": 4.2,
+          "execution": "EXCELLENT",
+          "action": "AGGRESSIVE ENTRY",
+          "risk": "LOW"
+        },
+        {
+          "scenario": "WILM + IELM Alignment",
+          "hit_rate": "62.5%",
+          "velocity": "2.1x-2.6x",
+          "sessions": 187,
+          "execution": "GOOD",
+          "action": "MODERATE ENTRY",
+          "risk": "MEDIUM"
+        },
+        {
+          "scenario": "WILM + Daily ILM Alignment",
+          "hit_rate": "58.3%",
+          "velocity": "1.9x-2.4x",
+          "sessions": 203,
+          "execution": "GOOD",
+          "action": "MODERATE ENTRY",
+          "risk": "MEDIUM"
+        },
+        {
+          "scenario": "IELM + Daily ILM Alignment",
+          "hit_rate": "71.2%",
+          "velocity": "1.8x-2.2x",
+          "sessions": 412,
+          "execution": "VERY GOOD",
+          "action": "STANDARD ENTRY",
+          "risk": "LOW"
+        },
+        {
+          "scenario": "Daily ILM Only",
+          "hit_rate": "64.3%",
+          "velocity": "1.2x-1.6x",
+          "sessions": 531,
+          "execution": "ACCEPTABLE",
+          "action": "CONSERVATIVE ENTRY",
+          "risk": "MEDIUM"
+        },
+        {
+          "scenario": "IELM Only",
+          "hit_rate": "48.3%",
+          "velocity": "1.5x-2.1x",
+          "sessions": 294,
+          "execution": "WEAK",
+          "action": "AVOID",
+          "risk": "HIGH"
+        },
+        {
+          "scenario": "WILM Only",
+          "hit_rate": "34.2%",
+          "velocity": "1.8x-2.8x",
+          "sessions": 106,
+          "execution": "POOR",
+          "action": "AVOID",
+          "risk": "VERY HIGH"
+        },
+        {
+          "scenario": "PARTIAL MISALIGNMENT",
+          "hit_rate": "42.7%",
+          "velocity": "1.0x-1.4x",
+          "sessions": 368,
+          "execution": "POOR",
+          "action": "AVOID",
+          "risk": "HIGH"
+        },
+        {
+          "scenario": "COMPLETE MISALIGNMENT",
+          "hit_rate": "31.5%",
+          "velocity": "0.8x-1.0x",
+          "sessions": 142,
+          "execution": "FAILURE SCENARIO",
+          "action": "EXIT",
+          "risk": "EXTREME"
+        }
       ]
     },
     "session_playbooks": {
@@ -164,18 +473,72 @@
         "key_metric": "Asian Range Width",
         "risk_level": "MINIMAL",
         "entry_rules": [
-          {"rule": "Range Observation", "condition": "Monitor 00:00-08:00 price action", "action": "NO ENTRY - Document range", "notes": "89.34% predictive for London"},
-          {"rule": "ILM Alignment Check", "condition": "Check Daily/Weekly/Monthly ILM", "action": "Record alignment status", "success_rate": "87.3%"},
-          {"rule": "Asian Range Break", "condition": "Price breaks Asian high/low", "action": "AVOID - False breakout risk", "risk": "HIGH"},
-          {"rule": "Pre-London Setup", "condition": "07:30-08:00 UTC accumulation", "action": "Prepare for London entry", "notes": "Position sizing only"},
-          {"rule": "Exit Rule", "condition": "NO POSITIONS during Asian", "action": "N/A"}
+          {
+            "rule": "Range Observation",
+            "condition": "Monitor 00:00-08:00 price action",
+            "action": "NO ENTRY - Document range",
+            "notes": "89.34% predictive for London"
+          },
+          {
+            "rule": "ILM Alignment Check",
+            "condition": "Check Daily/Weekly/Monthly ILM",
+            "action": "Record alignment status",
+            "success_rate": "87.3%"
+          },
+          {
+            "rule": "Asian Range Break",
+            "condition": "Price breaks Asian high/low",
+            "action": "AVOID - False breakout risk",
+            "risk": "HIGH"
+          },
+          {
+            "rule": "Pre-London Setup",
+            "condition": "07:30-08:00 UTC accumulation",
+            "action": "Prepare for London entry",
+            "notes": "Position sizing only"
+          },
+          {
+            "rule": "Exit Rule",
+            "condition": "NO POSITIONS during Asian",
+            "action": "N/A"
+          }
         ],
         "risk_matrix": [
-          {"scenario": "Tight Range < 30 pips", "prob": "40%", "outcome": "London expansion likely", "action": "Prepare for volatility", "risk": "LOW"},
-          {"scenario": "Wide Range > 80 pips", "prob": "15%", "outcome": "Range continuation", "action": "Wait for London confirm", "risk": "MEDIUM"},
-          {"scenario": "False Breakout", "prob": "25%", "outcome": "Return to range", "action": "NO ENTRY - trap", "risk": "HIGH"},
-          {"scenario": "ILM Full Alignment", "prob": "87.3%", "outcome": "High probability setup", "action": "Ready for London entry", "risk": "LOW"},
-          {"scenario": "Wednesday Asian", "prob": "35%", "outcome": "Bifurcation risk", "action": "Extra caution", "risk": "HIGH"}
+          {
+            "scenario": "Tight Range < 30 pips",
+            "prob": "40%",
+            "outcome": "London expansion likely",
+            "action": "Prepare for volatility",
+            "risk": "LOW"
+          },
+          {
+            "scenario": "Wide Range > 80 pips",
+            "prob": "15%",
+            "outcome": "Range continuation",
+            "action": "Wait for London confirm",
+            "risk": "MEDIUM"
+          },
+          {
+            "scenario": "False Breakout",
+            "prob": "25%",
+            "outcome": "Return to range",
+            "action": "NO ENTRY - trap",
+            "risk": "HIGH"
+          },
+          {
+            "scenario": "ILM Full Alignment",
+            "prob": "87.3%",
+            "outcome": "High probability setup",
+            "action": "Ready for London entry",
+            "risk": "LOW"
+          },
+          {
+            "scenario": "Wednesday Asian",
+            "prob": "35%",
+            "outcome": "Bifurcation risk",
+            "action": "Extra caution",
+            "risk": "HIGH"
+          }
         ]
       },
       "london_session": {
@@ -184,16 +547,65 @@
         "key_metric": "Daily ILM Alignment",
         "risk_level": "MEDIUM-HIGH",
         "entry_rules": [
-          {"rule": "London Open Entry", "condition": "07:00-10:00 UTC + Daily ILM align", "action": "Enter in ILM direction", "success_rate": "64.3%"},
-          {"rule": "Full ILM Alignment", "condition": "Daily/Weekly/Monthly aligned", "action": "Increase position size", "success_rate": "87.3%"},
-          {"rule": "Partial ILM", "condition": "Daily ILM only, others misaligned", "action": "Standard position size", "success_rate": "64.3%"},
-          {"rule": "No ILM Alignment", "condition": "Conflicting timeframes", "action": "SKIP or micro position", "success_rate": "LOW"},
-          {"rule": "132% Target", "condition": "Price extends to 132% level", "action": "Reduce 50% position", "success_rate": "71.53%"},
-          {"rule": "132% Violation", "condition": "Price exceeds 132% by >5 pips", "action": "Exit remaining position", "success_rate": "71.53%"},
-          {"rule": "Wednesday Trading", "condition": "If Wednesday session", "action": "Reduce size by 30%", "success_rate": "35%"},
-          {"rule": "Stop Loss", "condition": "Below/above Asian range + 20 pips", "action": "Hard stop always active"},
-          {"rule": "Profit Target 1", "condition": "50% at 61.8% Fib level", "action": "Book partial profits", "success_rate": "80%"},
-          {"rule": "Profit Target 2", "condition": "30% at 100% extension", "action": "Book more profits", "success_rate": "65%"}
+          {
+            "rule": "London Open Entry",
+            "condition": "07:00-10:00 UTC + Daily ILM align",
+            "action": "Enter in ILM direction",
+            "success_rate": "64.3%"
+          },
+          {
+            "rule": "Full ILM Alignment",
+            "condition": "Daily/Weekly/Monthly aligned",
+            "action": "Increase position size",
+            "success_rate": "87.3%"
+          },
+          {
+            "rule": "Partial ILM",
+            "condition": "Daily ILM only, others misaligned",
+            "action": "Standard position size",
+            "success_rate": "64.3%"
+          },
+          {
+            "rule": "No ILM Alignment",
+            "condition": "Conflicting timeframes",
+            "action": "SKIP or micro position",
+            "success_rate": "LOW"
+          },
+          {
+            "rule": "132% Target",
+            "condition": "Price extends to 132% level",
+            "action": "Reduce 50% position",
+            "success_rate": "71.53%"
+          },
+          {
+            "rule": "132% Violation",
+            "condition": "Price exceeds 132% by >5 pips",
+            "action": "Exit remaining position",
+            "success_rate": "71.53%"
+          },
+          {
+            "rule": "Wednesday Trading",
+            "condition": "If Wednesday session",
+            "action": "Reduce size by 30%",
+            "success_rate": "35%"
+          },
+          {
+            "rule": "Stop Loss",
+            "condition": "Below/above Asian range + 20 pips",
+            "action": "Hard stop always active"
+          },
+          {
+            "rule": "Profit Target 1",
+            "condition": "50% at 61.8% Fib level",
+            "action": "Book partial profits",
+            "success_rate": "80%"
+          },
+          {
+            "rule": "Profit Target 2",
+            "condition": "30% at 100% extension",
+            "action": "Book more profits",
+            "success_rate": "65%"
+          }
         ]
       },
       "ny_session": {
@@ -202,39 +614,441 @@
         "key_metric": "NY Open Hi/Lo takeout",
         "risk_level": "HIGH (Open), LOW (Close)",
         "entry_rules": [
-          {"rule": "NY Open Liquidity", "condition": "13:00-14:00 spike to Hi/Lo", "action": "Wait for reversal", "success_rate": "80%"},
-          {"rule": "Hi/Lo Sweep Entry", "condition": "Asian/London extreme hit", "action": "Enter counter-trend", "success_rate": "80%"},
-          {"rule": "-25% Fibonacci", "condition": "Price reaches -25% level", "action": "Strong support/resistance", "success_rate": "98.22%"},
-          {"rule": "-50% Fibonacci", "condition": "Price reaches -50% level", "action": "Major support/resistance", "success_rate": "96.44%"},
-          {"rule": "Post-132% Setup", "condition": "+12-24h after 132% violation", "action": "Check Daily ILM alignment", "success_rate": "85%"},
-          {"rule": "Friday Close", "condition": "22:00 UTC Friday", "action": "Exit all positions"}
+          {
+            "rule": "NY Open Liquidity",
+            "condition": "13:00-14:00 spike to Hi/Lo",
+            "action": "Wait for reversal",
+            "success_rate": "80%"
+          },
+          {
+            "rule": "Hi/Lo Sweep Entry",
+            "condition": "Asian/London extreme hit",
+            "action": "Enter counter-trend",
+            "success_rate": "80%"
+          },
+          {
+            "rule": "-25% Fibonacci",
+            "condition": "Price reaches -25% level",
+            "action": "Strong support/resistance",
+            "success_rate": "98.22%"
+          },
+          {
+            "rule": "-50% Fibonacci",
+            "condition": "Price reaches -50% level",
+            "action": "Major support/resistance",
+            "success_rate": "96.44%"
+          },
+          {
+            "rule": "Post-132% Setup",
+            "condition": "+12-24h after 132% violation",
+            "action": "Check Daily ILM alignment",
+            "success_rate": "85%"
+          },
+          {
+            "rule": "Friday Close",
+            "condition": "22:00 UTC Friday",
+            "action": "Exit all positions"
+          }
         ]
       }
     },
     "wilm_rekey_signals": {
       "source": "Holy Grail Excel - PHASE 5 WILM ILM VELOCITY ANALYSIS",
       "signals": [
-        {"signal": "Consecutive 15M 61.8-88 Micro-legs", "description": "3+ consecutive 15M candles showing 61.8-88% retracements under WILM zone", "frequency": "18.7% (35 out of 187 WILM sessions)", "rekey_probability": "94.3%", "avg_time_to_132": "3.2h", "avg_time_to_rekey": "28h", "primary_session": "Wednesday Overlap (35% of all)", "observable_pattern": "Stair-step pattern with shallow retracements", "velocity": "1.8x-2.8x (accelerating)", "action": "EXIT immediately - 132% violation imminent"},
-        {"signal": "WILM Active + 100% Break (No -25% Follow)", "frequency": "23.4% (44 out of 187)", "rekey_probability": "78.2%", "avg_time_to_132": "6.8h", "action": "REDUCE exposure - High 132% risk"},
-        {"signal": "WILM + Daily ILM Miss", "frequency": "31.6% (59 out of 187)", "rekey_probability": "83%", "avg_time_to_132": "8.4h", "action": "TIGHTEN stops - Misalignment detected"},
-        {"signal": "WILM + Asian Range >150% Monday", "frequency": "12.3% (23 out of 187)", "rekey_probability": "85%", "avg_time_to_132": "4.6h", "action": "EXIT before London - Same-day 132% likely"},
-        {"signal": "WILM Rekey Pattern (15M Alpha Inversion)", "frequency": "14.4% (27 out of 187)", "rekey_probability": "72.5%", "avg_time_to_132": "5.2h", "action": "WATCH closely - Inversion signal"}
+        {
+          "signal": "Consecutive 15M 61.8-88 Micro-legs",
+          "description": "3+ consecutive 15M candles showing 61.8-88% retracements under WILM zone",
+          "frequency": "18.7% (35 out of 187 WILM sessions)",
+          "rekey_probability": "94.3%",
+          "avg_time_to_132": "3.2h",
+          "avg_time_to_rekey": "28h",
+          "primary_session": "Wednesday Overlap (35% of all)",
+          "observable_pattern": "Stair-step pattern with shallow retracements",
+          "velocity": "1.8x-2.8x (accelerating)",
+          "action": "EXIT immediately - 132% violation imminent"
+        },
+        {
+          "signal": "WILM Active + 100% Break (No -25% Follow)",
+          "frequency": "23.4% (44 out of 187)",
+          "rekey_probability": "78.2%",
+          "avg_time_to_132": "6.8h",
+          "action": "REDUCE exposure - High 132% risk"
+        },
+        {
+          "signal": "WILM + Daily ILM Miss",
+          "frequency": "31.6% (59 out of 187)",
+          "rekey_probability": "83%",
+          "avg_time_to_132": "8.4h",
+          "action": "TIGHTEN stops - Misalignment detected"
+        },
+        {
+          "signal": "WILM + Asian Range >150% Monday",
+          "frequency": "12.3% (23 out of 187)",
+          "rekey_probability": "85%",
+          "avg_time_to_132": "4.6h",
+          "action": "EXIT before London - Same-day 132% likely"
+        },
+        {
+          "signal": "WILM Rekey Pattern (15M Alpha Inversion)",
+          "frequency": "14.4% (27 out of 187)",
+          "rekey_probability": "72.5%",
+          "avg_time_to_132": "5.2h",
+          "action": "WATCH closely - Inversion signal"
+        }
       ]
     },
     "validation_checklist": {
       "source": "Holy Grail Excel - Validation Checklist",
       "claims": [
-        {"claim": 1, "name": "-25% extension hit rate", "claimed": "90%", "status": "PENDING", "priority": "High"},
-        {"claim": 2, "name": "-50% extension hit rate", "claimed": "82%", "status": "PENDING", "priority": "High"},
-        {"claim": 3, "name": "72% retracement continuation (London-NY)", "claimed": "83.5%", "status": "PENDING", "priority": "High"},
-        {"claim": 4, "name": "AB(72%)→BC(-25%)→CD(61.8%) success", "claimed": "81.2%", "status": "PENDING", "priority": "High"},
-        {"claim": 5, "name": "Consecutive 15M 61.8-88 under WILM → 4H rekey", "claimed": "94.3%", "status": "PENDING", "priority": "High"},
-        {"claim": 6, "name": "Quarter level interaction", "claimed": "80.5%", "status": "PENDING", "priority": "High"},
-        {"claim": 7, "name": "Weekly+Monthly alignment", "claimed": "94%", "status": "PENDING", "priority": "High"},
-        {"claim": 8, "name": "61.8% rekey accuracy", "claimed": "94%", "status": "PENDING", "priority": "High"},
-        {"claim": 9, "name": "Shallow trend angle completion", "claimed": "78.9%", "status": "PENDING", "priority": "Medium"},
-        {"claim": 10, "name": "Alpha sequence daily high/low formation", "claimed": "78.3%", "status": "PENDING", "priority": "Medium"}
+        {
+          "claim": 1,
+          "name": "-25% extension hit rate",
+          "claimed": "90%",
+          "status": "PENDING",
+          "priority": "High"
+        },
+        {
+          "claim": 2,
+          "name": "-50% extension hit rate",
+          "claimed": "82%",
+          "status": "PENDING",
+          "priority": "High"
+        },
+        {
+          "claim": 3,
+          "name": "72% retracement continuation (London-NY)",
+          "claimed": "83.5%",
+          "status": "PENDING",
+          "priority": "High"
+        },
+        {
+          "claim": 4,
+          "name": "AB(72%)→BC(-25%)→CD(61.8%) success",
+          "claimed": "81.2%",
+          "status": "PENDING",
+          "priority": "High"
+        },
+        {
+          "claim": 5,
+          "name": "Consecutive 15M 61.8-88 under WILM → 4H rekey",
+          "claimed": "94.3%",
+          "status": "PENDING",
+          "priority": "High"
+        },
+        {
+          "claim": 6,
+          "name": "Quarter level interaction",
+          "claimed": "80.5%",
+          "status": "PENDING",
+          "priority": "High"
+        },
+        {
+          "claim": 7,
+          "name": "Weekly+Monthly alignment",
+          "claimed": "94%",
+          "status": "PENDING",
+          "priority": "High"
+        },
+        {
+          "claim": 8,
+          "name": "61.8% rekey accuracy",
+          "claimed": "94%",
+          "status": "PENDING",
+          "priority": "High"
+        },
+        {
+          "claim": 9,
+          "name": "Shallow trend angle completion",
+          "claimed": "78.9%",
+          "status": "PENDING",
+          "priority": "Medium"
+        },
+        {
+          "claim": 10,
+          "name": "Alpha sequence daily high/low formation",
+          "claimed": "78.3%",
+          "status": "PENDING",
+          "priority": "Medium"
+        }
       ]
     }
+  },
+  "post_target_reversal": {
+    "source": "CEREBUS_FX_v4_Complete_Manual (2).pdf pages 155-158",
+    "data_period": "EUR/USD M5 Jan 2023 - May 2026",
+    "critical_distinction": "81.2% rule applies to failed breakouts ONLY, not completed targets",
+    "overall_reversal_rates": {
+      "-25%": {
+        "touches": 1842,
+        "opposite_25%_hit": "3.8%",
+        "deep_band_retest": "22.4%",
+        "full_structural_reversal": "4.2%"
+      },
+      "-50%": {
+        "touches": 1286,
+        "opposite_25%_hit": "2.1%",
+        "deep_band_retest": "12.6%",
+        "full_structural_reversal": "2.8%"
+      },
+      "-85%": {
+        "touches": 648,
+        "opposite_25%_hit": "1.4%",
+        "deep_band_retest": "8.4%",
+        "full_structural_reversal": "1.9%"
+      }
+    },
+    "by_tier": {
+      "T1": {
+        "touches": 1428,
+        "opposite_25%": "2.4%",
+        "band_retest": "14.2%",
+        "full_reversal": "2.6%",
+        "mode": "Aggressive holding"
+      },
+      "T2": {
+        "touches": 1586,
+        "opposite_25%": "3.2%",
+        "band_retest": "18.6%",
+        "full_reversal": "3.4%",
+        "mode": "Standard management"
+      },
+      "T3": {
+        "touches": 762,
+        "opposite_25%": "5.8%",
+        "band_retest": "26.4%",
+        "full_reversal": "6.2%",
+        "mode": "Defensive - take profit at first target"
+      }
+    },
+    "by_hour_est": {
+      "3-4 AM": {
+        "touches": 842,
+        "opp_25%": "1.8%",
+        "band_retest": "12.4%",
+        "full_rev": "1.6%",
+        "note": "Cleanest delivery - hold runners"
+      },
+      "4-5 AM": {
+        "touches": 686,
+        "opp_25%": "2.4%",
+        "band_retest": "16.8%",
+        "full_rev": "2.2%",
+        "note": "High conviction - standard management"
+      },
+      "5-6 AM": {
+        "touches": 524,
+        "opp_25%": "3.2%",
+        "band_retest": "20.4%",
+        "full_rev": "3.4%",
+        "note": "Degradation begins - start trailing"
+      },
+      "6-8 AM": {
+        "touches": 786,
+        "opp_25%": "4.6%",
+        "band_retest": "24.8%",
+        "full_rev": "4.8%",
+        "note": "US pre-open noise - tighten management"
+      },
+      "8-10 AM": {
+        "touches": 648,
+        "opp_25%": "5.8%",
+        "band_retest": "28.6%",
+        "full_rev": "6.4%",
+        "note": "Significant decay - take full profit at target"
+      },
+      "10 AM-12 PM": {
+        "touches": 290,
+        "opp_25%": "8.2%",
+        "band_retest": "34.2%",
+        "full_rev": "9.6%",
+        "note": "Edge decay zone - exit aggressively"
+      }
+    }
+  },
+  "opposite_band_break": {
+    "after_-25%": "4.2% full session flip",
+    "after_-50%": "2.8%",
+    "after_-85%": "1.9%",
+    "T1_days_after_-25%": "2.6%",
+    "T2_days_after_-25%": "3.4%",
+    "T3_days_after_-25%": "6.2%",
+    "failed_breakout_flip_rate": "11.0%",
+    "black_swan_parameter": "4.2% for position sizing runners"
+  },
+  "reverse_atomic_delivery_map": {
+    "description": "Post-target reversal is a Reverse Atomic Loop, quantized to Atomic Units",
+    "primary_absorption_zones": "38.2% and 50% Fibonacci levels of Asian Range",
+    "reverse_loop_obeys": "Same tier, temporal, and structural laws as forward loop",
+    "first_internal_level_after_reversal": {
+      "-25%": {
+        "reversals": 412,
+        "23.6%_fib": "8.4%",
+        "38.2%_fib": "14.2%",
+        "50%_fib": "34.6%",
+        "61.8%_fib": "28.8%",
+        "opp_band": "9.2%",
+        "beyond": "1.4%"
+      },
+      "-50%": {
+        "reversals": 286,
+        "23.6%_fib": "4.2%",
+        "38.2%_fib": "8.6%",
+        "50%_fib": "38.4%",
+        "61.8%_fib": "32.2%",
+        "opp_band": "11.4%",
+        "beyond": "1.4%"
+      },
+      "-85%": {
+        "reversals": 148,
+        "23.6%_fib": "2.8%",
+        "38.2%_fib": "6.4%",
+        "50%_fib": "42.6%",
+        "61.8%_fib": "30.4%",
+        "opp_band": "12.2%",
+        "beyond": "1.6%"
+      }
+    },
+    "38.2-50%_zone": "Absorbs 63-73% of all post-target reversals",
+    "reverse_delivery_distance": {
+      "-25%": {
+        "avg": "11.8p",
+        "median": "10.4p",
+        "matches_T1_AU_10p": "48.2%",
+        "matches_T2_AU_12p": "32.6%",
+        "matches_1.44x_shift": "12.4%"
+      },
+      "-50%": {
+        "avg": "14.2p",
+        "median": "12.6p",
+        "matches_T1_AU_10p": "28.4%",
+        "matches_T2_AU_12p": "44.8%",
+        "matches_1.44x_shift": "18.6%"
+      },
+      "-85%": {
+        "avg": "16.8p",
+        "median": "14.8p",
+        "matches_T1_AU_10p": "18.2%",
+        "matches_T2_AU_12p": "38.4%",
+        "matches_1.44x_shift": "28.4%"
+      }
+    },
+    "mirror_principle": "Deeper forward extension = larger reverse atomic unit. After -25%: ~10p (T1 AU). After -50%: ~12p (T2 AU). After -85%: ~14.4p (1.44x Shift)",
+    "by_tier_reverse": {
+      "T1": {
+        "reversals": 318,
+        "primary_target": "38.2% Fib",
+        "avg_delivery": "10.2p",
+        "tier_AU_match": "52.4%",
+        "temporal_band_32_78min": "78.4%"
+      },
+      "T2": {
+        "reversals": 356,
+        "primary_target": "38.2% Fib",
+        "avg_delivery": "12.8p",
+        "tier_AU_match": "48.6%",
+        "temporal_band_32_78min": "74.6%"
+      },
+      "T3": {
+        "reversals": 172,
+        "primary_target": "50% Fib",
+        "avg_delivery": "15.4p",
+        "tier_AU_match": "44.2%",
+        "temporal_band_32_78min": "68.2%"
+      }
+    }
+  },
+  "deep_rebalance_outcomes": {
+    "description": "4 resolution paths after -25% completion + deep rebalance (62-100% zone)",
+    "sample_size": 412,
+    "outcomes": [
+      {
+        "outcome": "Target Retest (-25% or band edge)",
+        "frequency": "58.4%",
+        "avg_delivery": "10.2p (T1 AU)",
+        "trigger": "OCC in original breakout direction at deep level"
+      },
+      {
+        "outcome": "Stall / Compression",
+        "frequency": "24.6%",
+        "avg_delivery": "N/A",
+        "trigger": "No clear OCC - price ranges 30-90 min"
+      },
+      {
+        "outcome": "Gear Shift (New Impulse)",
+        "frequency": "11.8%",
+        "avg_delivery": "14.4p (1.44x)",
+        "trigger": "OCC + fresh impulse >= next tier trigger within 30 min"
+      },
+      {
+        "outcome": "Full Structural Reversal",
+        "frequency": "5.2%",
+        "avg_delivery": "Varies",
+        "trigger": "M5 close back inside Asian band - 81.2% continue"
+      }
+    ],
+    "gear_shift_conditions_all_required": [
+      {
+        "condition": "Regime CONFIRMED at 9AM (>=1.50x)",
+        "if_missing": "Default to target retest"
+      },
+      {
+        "condition": "Deep rebalance before 6 AM EST",
+        "if_missing": "Default to stall if after 6 AM"
+      },
+      {
+        "condition": "Fresh OCC against rebalance direction",
+        "if_missing": "No OCC = wait - stall protocol"
+      },
+      {
+        "condition": "New impulse >= next tier trigger",
+        "if_missing": "Below trigger = target retest only"
+      }
+    ]
+  },
+  "reverse_atomic_entry_protocol": {
+    "after_-25%": {
+      "wait_for": "OCC AGAINST breakout direction",
+      "entry": "38.2% Fib of Asian Range from breached band edge",
+      "target": "Band Edge (0%) OR 23.6% Fib",
+      "SL": "OCC extreme at -25% touch (zero buffer, close-only)",
+      "time_stop": "78 min from OCC",
+      "expected_delivery": "~10 pips (T1 AU)"
+    },
+    "after_-50%": {
+      "wait_for": "OCC AGAINST breakout direction",
+      "entry": "38.2-50% Fib zone",
+      "target": "23.6% Fib OR Band Edge",
+      "SL": "OCC extreme at -50% touch",
+      "time_stop": "78 min from OCC",
+      "expected_delivery": "~12 pips (T2 AU)"
+    },
+    "after_-85%": {
+      "wait_for": "OCC AGAINST breakout direction",
+      "entry": "50% Fib (primary reverse target)",
+      "target": "38.2% Fib OR 23.6% Fib",
+      "SL": "OCC extreme at -85% touch",
+      "time_stop": "78 min from OCC",
+      "expected_delivery": "~14.4 pips (1.44x Shift)"
+    },
+    "invalidation": [
+      "Price delivers > 1.44x expected AU past entry = reverse loop failed",
+      "No internal level hit within 78 min = momentum exhausted, stand down",
+      "M5 close past 80% of reverse impulse leg = chain invalidated"
+    ],
+    "temporal_filter": {
+      "pre-6 AM touch": "Hold runners with confidence (lowest reversal rates)",
+      "6-8 AM touch": "Standard management, trail at breakeven after T1 AU",
+      "post-8 AM": "Take full profit at target touch, no reverse entries"
+    }
+  },
+  "validation_summary": {
+    "6_hypotheses_all_confirmed": [
+      "Completed targets are distinct from failed breakouts (4.2% vs 81.2%)",
+      "Reverse leg is quantized to Atomic Units (10/12/14.4p)",
+      "38.2-50% Fib zone absorbs 63-73% of reversals",
+      "Tier governs reverse loop size (T1→10p, T2→12p, T3→15p)",
+      "Temporal band 32-78 min applies to reverse (68-78% complete within)",
+      "Deep rebalance has 4 resolution paths (58% retest / 25% stall / 12% gear shift / 5% reversal)"
+    ]
   }
 }
