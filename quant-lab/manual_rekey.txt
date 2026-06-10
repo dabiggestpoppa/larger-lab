@@ -1,0 +1,294 @@
+﻿Total pages: 214
+
+=== PAGE 1 ===
+CEREBUS FX
+Cerebus Cycle ΓÇö Final Form
+Constraint-System Framework | Asian Range P90 | Stall-Harvest | Deep Mean Rebalancing | Dual-Engine Execution | Failure
+Repair Model | Atomic Market Structure | Macro Setup
+II DISCLAIMER ΓÇö For educational purposes only. Trading Forex involves significant risk. Past performance
+does not guarantee future results. Always test in simulation before live deployment.
+SECTION
+CONTENT
+PAGE
+FRAMEWORK
+Constraint-System Vocabulary
+2
+PART 1
+CEREBUS FX v2.0 ΓÇö Core Manual
+5
+PART 2
+P90 Cascade Activation Analysis
+10
+PART 3
+Cascade Methodology & Operational Protocol
+16
+PART 4
+Stall-Harvest Trading System
+20
+PART 5
+P90P Window Distribution Tracker ΓÇö Enhanced
+30
+PART 6
+Monte Carlo Simulation
+35
+PART 7
+Monday Asian Range Float Mechanism
+38
+PART 8
+Daily Asian Range Float Mechanism
+43
+PART 9
+Full-Day Range Regime Tracker
+51
+PART 10
+Dual-Engine Execution Model
+58
+PART 11
+Failure Sequence Analysis ΓÇö The Repair Model
+78
+PART 12
+The Two Plays ΓÇö Final Execution Framework
+79
+PART 13
+Deep Dive Monte Carlo ΓÇö Triple-Engine Validation
+85
+PART 14
+Blind Structural Chain Law ΓÇö Recursive Loop Engine
+90
+PART 15
+Fractal Resolution Engine ΓÇö Nested Cycle Analysis
+100
+DAILY SETUPS & IDEAS
+Context Framework + Setups 1-6
+109
+ATOMIC MARKET
+STRUCTURE
+Density Zone | Grand Unified Equation | Shift Targets
+131
+Cerebus Cycle ΓÇö Final Form | April 2026 | EUR/USD M5 | 315,000+ Candles | PROPRIETARY & CONFIDENTIAL
+
+
+=== PAGE 71 ===
+PART 11 FAILURE SEQUENCE ANALYSIS ΓÇö THE REPAIR MODEL
+Constraint Violation Failure Taxonomy | Day-of-Week Edge | First vs Second
+Acceptance | Fail Box & Flip Timing EUR/USD M5 | 2022-2026 | 465 Valid
+2h-Hold Setups | CEREBUS FX v18.2.40
+Asian Break ΓåÆ 2-Hour Hold Model | Full Failure Sequence Study | Sep 2022 ΓÇô Apr 2026 | Live Data
+WHAT THIS PART ADDRESSES When the Asian constraint violation [5] holds for 2 hours but then fails before
+reaching the 1x constraint deficit resolution target ΓÇö what happens next? This study maps the full post-failure
+resolution sequence: which structural levels the field [1] repairs to first, whether a second acceptance attempt
+forms and how often it succeeds, and the precise timing and location of the failure itself. The core finding: failure
+is not the end of the day. It is the beginning of a new resolution state.
+SECTION 1: FAILURE SEQUENCE ΓÇö CORE DATA
+Failure Definition: After a valid 2-hour acceptance hold [5], failure = first M5 close back INSIDE the Asian constraint band before the 1x
+constraint deficit resolution target [11] is hit. This is structural failure ΓÇö not noise or a wick touch.
+Metric
+Count
+Rate
+Notes
+Valid 2h-hold setups tested
+465
+ΓÇö
+Full sample Sep 2022 ΓÇô Apr 2026
+Hit 1x target before failure
+242
+52.0%
+Constraint deficit resolved cleanly
+Failed first (close back in)
+210
+45.2%
+Structural failure ΓÇö re-enters band
+Neither cleanly resolved
+13
+2.8%
+Day ended in compression
+Post-Failure Level Sequence ΓÇö What Gets Hit Most Often
+Constraint band midpoint
+73.8% of failures
+Opposite constraint band edge
+51.0% of failures
+Opposite 1x resolution target
+20.0% of failures
+
+
+=== PAGE 72 ===
+POST-FAILURE SEQUENCE ΓÇö DOMINANT PATTERN:
+  1. Valid 2h acceptance hold ΓåÆ price fails (M5 close back inside band)
+  2. Constraint band midpoint hit first (73.8% of all failures)
+  3. ~Half of those continue to opposite band edge (51.0% overall)
+  4. Minority fully flip to opposite 1x target (20.0% overall)
+  INTERPRETATION:
+  The most common failure sequence is NOT "fail ΓåÆ full reversal."
+  It is: fail ΓåÆ midpoint repair ΓåÆ new acceptance attempt ΓåÆ decide.
+  The midpoint functions as the first structural rebalancing node [6]
+  after a failed constraint violation [5] ΓÇö analogous to how the
+  168% Stall Zone [10] operates in the P90 model:
+  P90 model:        168% = "extension too far ΓåÆ partial rebalancing first"
+  Asian break model: midpoint = "acceptance failed ΓåÆ internal rebalancing first"
+  Same role. First repair zone. Not final reversal proof.
+SECTION 2: FAILURE TAXONOMY ΓÇö THREE RESOLUTION STATES
+Failure Type
+What Happens
+Frequency
+Action
+Type 1 ΓÇö Soft Failure
+(Midpoint repair only)
+Fails back inside band ΓåÆ midpoint hit ΓåÆ field
+compresses. No clean follow-through in either
+direction.
+Most common
+Stand down. Wait for new close
+signal.
+Type 2 ΓÇö Internal Reset
+(Same-side recycle)
+Fails ΓåÆ midpoint repair ΓåÆ field later reclaims
+original side ΓåÆ second 2h acceptance ΓåÆ
+constraint resolution continues.
+Second most common
+(89% of second
+breaks)
+Wait for second acceptance
+hold. Re-enter aligned.
+Type 3 ΓÇö Regime Flip
+(Opposite-side confirmed)
+Fails ΓåÆ midpoint ΓåÆ opposite edge ΓåÆ opposite
+constraint violation ΓåÆ second 2h hold ΓåÆ opposite
+1x target prints.
+Minority (11% of
+second breaks)
+Rarer but highest win rate
+(84.6%). Wait for full
+confirmation.
+THE REAL POST-FAILURE STRUCTURE:
+  Do NOT assume full direction of constraint resolution reversal [3] on failure.
+  The dominant next event is midpoint repair ΓÇö not opposite-side completion.
+  Think of it as three sequential questions:
+    1. Does price stall and compress at midpoint?   ΓåÆ Type 1 (stand down)
+    2. Does price reclaim 
+
+=== PAGE 80 ===
+PART 11 ΓÇö FINAL VERDICT: THE REPAIR MODEL
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+FAILURE IS A STATE, NOT A DEAD END:
+  Initial win rate (strict 1x before failure): 52.0%
+  With second accepted move (50.5% of failures reform): ~69.8%
+  Opposite-side confirmed flip when valid: 84.6%
+THE DOMINANT POST-FAILURE FLOW:
+  Fail ΓåÆ midpoint repair (73.8%) ΓåÆ new acceptance attempt
+NOT: fail ΓåÆ immediately fade the opposite direction
+THE DAY-OF-WEEK EXECUTION LAYER (lock these in):
+  Tuesday:   First violation = the move. Trust it. Win rate 82-88%.
+  Wednesday: First violation = the move. Slight flip awareness. Win rate 78-85%.
+  Thursday:  First violation = often bait. Second move = the trade. Win rate 65-75%.
+  Monday:    Reduced size. Confirm structure. Win rate 70-75%.
+  Friday:    Quick scalp only. No extended runners. Win rate 68-78%.
+THE FAIL BOX:
+  Asian band edge ΓåÆ 32% partial rebalancing ΓåÆ 50% midpoint
+  65% of fake violations fail within 30 minutes
+  Fast rejection = high-probability fake
+THE FLIP NUMBERS:
+  After failure ΓåÆ opposite side probability:
+    Mon/Wed: 60-70%  |  Tue: 50-60%  |  Thu: 70-80% (BEST)  |  Fri: 55-65%
+  But NEVER act on this until second 2h hold confirms.
+  The second accepted move is the edge. Not the emotional reaction to failure.
+CEREBUS FX v18.2.40  |  April 2026  |  465 Setups Analyzed
+CEREBUS FX v4.0 ΓÇö Complete Operational Manual | April 2026 | PROPRIETARY & CONFIDENTIAL
+Data: EUR/USD M5 | Sep 2022 ΓÇô Apr 2026 | 465 valid 2h-hold setups analyzed
+II For educational purposes only ΓÇö test all strategies in simulation before live deployment.
+
+
+=== PAGE 81 ===
+PART 12 THE TWO PLAYS ΓÇö FINAL EXECUTION FRAMEWORK Base 80
+Play | T3 Max Accuracy | Regime Confirmed Push CEREBUS FX v4 ΓÇö Final
+Form | April 2026
+The complete system synthesized into three executable plays. No optimization. No extra filters. Push the button.
+SYSTEM SYNTHESIS Everything in this manual ΓÇö the constraint deficit [11], the activation signals [9], the partial
+rebalancing states [6], the regime tracker, the Dual-Engine architecture, the failure repair model ΓÇö resolves into
+three execution modes. Base 80 is your floor. T3 Model 2 is your defensive edge. Regime Confirmed is your
+ceiling. Everything else is noise.
+PLAY 1 ΓÇö BASE 80 (YOUR BREAD & BUTTER)
+85-90% filtered win rate. Trade this every qualifying day. No overthinking.
+Pre-Conditions ΓÇö ALL must be TRUE
+Condition
+Requirement
+Notes
+Asian Range
+< 30 pips (T1: <20p or T2: 20-30p)
+Constraint deficit [11] ΓÇö coiled spring
+Activation Window
+2:00 AM ΓÇô 11:00 AM EST
+Full window ΓÇö threshold increases by session
+P90 Body (2-4 AM)
+>= 4.1 pips
+Activation signal [9] ΓÇö close only
+P90 Body (4-8 AM)
+>= 4.6 pips
+Activation signal [9]
+P90 Body (8-11 AM)
+>= 5.9-6.2 pips
+Activation signal [9]
+News filter
+No major news within 4 hours
+NFP / CPI / FOMC = SKIP
+Day filter (optional boost)
+Tuesday or Wednesday = higher
+conviction
+Not required ΓÇö but elevates win rate
+Execution
+
+
+=== PAGE 135 ===
+SETUP 6 ΓÇö POST-FAILURE REPAIR SEQUENCE ΓÇö MIDPOINT AS DECISION ZONE, NOT
+REVERSAL
+When a Setup 5 (5-Day Anchor) activation fails ΓÇö price closes back inside the band and stops you out ΓÇö what happens next is not
+random. The failure sequence data from Part 11 (465 setups, 210 failures) maps exactly what the field [1] does after a failed
+constraint violation [5]. This setup defines how to read the repair sequence and when ΓÇö and when not ΓÇö to re-enter.
+CRITICAL: THE MIDPOINT IS NOT A REVERSAL SIGNAL 73.8% of failures hit the midpoint of the 5-day range
+first. This is a structural repair node ΓÇö the field rebalancing, not committing to a new direction. Of failures that
+form a second move, 89% recycle back to the ORIGINAL breakout side (same-side re-acceptance). Only 11%
+genuinely flip to the opposite band. Targeting the opposite band from the midpoint trades against an 89%
+probability. Midpoint = Observe. Opposite Band + 2h Hold = Execute.
+The Actual Post-Failure Sequence
+Based on Part 11 failure sequence data, cross-applied to the macro 5-day anchor. Example: bullish breakout above 5-Day High is
+stopped out.
+Ste
+p
+What Happens
+Data
+Action
+1
+Stop out at 5-Day High. Trade invalidated.
+ΓÇö
+Exit. Done. No hope, no averaging.
+2
+Price rebalances toward midpoint.
+73.8%
+Observe only. Do not enter.
+3
+Midpoint = Decision Zone. Three outcomes:
+ΓÇö
+Stand down and read the sequence.
+3a
+Price stalls at midpoint and compresses.
+Type 1
+Stand down. No trade.
+3b
+Price reclaims original breakout side.
+89% of secondary
+moves
+Same-side re-entry setup (see below).
+3c
+Price drives through to opposite band.
+11% of secondary
+moves
+Potential flip ΓÇö requires full acceptance
+confirmation.
+4
+Flip to opposite side requires new acceptance.
+81.2% rule
+M5 close below 5-Day Low + 2h hold required.
+Only then 84.6% WR.
+WHY 89% RECYCLE SAME-SIDE (NOT FLIP):
+  The midpoint absorbs the failed breakout liquidity. It is where available
+  resolution pathways [4] are harvested before the field [1] attempts
+  re-accepta
