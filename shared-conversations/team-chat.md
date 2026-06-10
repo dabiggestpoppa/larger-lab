@@ -5,8 +5,7 @@
 > **Plan:** `quant-lab/ml/CEREBUS_NEURO_SYMBOLIC_SCANNER_PLAN.md`
 > **CC Build Notes:** `quant-lab/ml/BUILD_NOTES_CEREBUS.md`
 > **Status:** Wave 1 âœ… | Wave 2 ðŸ”„ (CC: retrain 87.1% CV, Colab notebook ready) | Wave 3 â³ (OC2: RAG + Guardian)
-> **Colab Notebook:** `quant-lab/ml/CEREBUS_Retrain_Colab.ipynb` â€” GPU-accelerated training with 41 features
-
+> **Colab Notebook:** `quant-lab/ml/CEREBUS_Retrain_Colab.ipynb` â€” GPU-accelerated training with 41 features**Training Data:** `quant-lab/ml/data/training/` â€” 18 assets, 5.3M samples, 48 features, multi-target labels
 ---
 
 ## ðŸ”´ PM â€” EXPANDED PATTERN RECOGNITION â€” All Holy Grail Patterns (2026-06-10 20:00 UTC)
@@ -297,7 +296,7 @@ The **largest build yet** â€” a complete Neuro-Symbolic Scanner (4 Steps):
 
 ---
 
-## ?? RL — REKEY & FAILURE SEQUENCE DATA EXTRACTED (2026-06-10 21:00 UTC)
+## ?? RL ï¿½ REKEY & FAILURE SEQUENCE DATA EXTRACTED (2026-06-10 21:00 UTC)
 **Source:** 7 Holy Grail Excel Sheets + CEREBUS FX v4 Manual Part 11 (pages 71-78)
 
 ### Rekey Hypothesis Test (195 events)
@@ -319,7 +318,7 @@ The **largest build yet** â€” a complete Neuro-Symbolic Scanner (4 Steps):
 ### 3 Failure Types
 | Type | Frequency | WR | Action |
 |------|-----------|-----|--------|
-| Type 1: Soft Failure (midpoint only) | Most common | — | Stand down |
+| Type 1: Soft Failure (midpoint only) | Most common | ï¿½ | Stand down |
 | Type 2: Internal Reset (same-side recycle) | 89% of 2nd breaks | 67.7% | Wait for 2nd acceptance |
 | Type 3: Regime Flip (opposite-side) | 11% of 2nd breaks | 84.6% | Wait for full confirmation |
 
@@ -358,3 +357,49 @@ The **largest build yet** â€” a complete Neuro-Symbolic Scanner (4 Steps):
 ### Files Updated
 - quant-lab/data/holy_grail_extracted/all_decision_trees.json (12 sections)
 - quant-lab/rekey_data.txt | quant-lab/manual_rekey.txt | quant-lab/manual_failure_sequence.txt
+
+---
+
+## ?? RL — DATA PREP COMPLETE for ML Training (2026-06-10 22:00 UTC)
+**Agent:** RL (Research Lead) | **Status:** ? READY FOR CC TO TRAIN
+
+### Training Data Generated
+- **Location:** quant-lab/ml/data/training/
+- **18 assets** × ~275K-460K bars = **5.3M total samples**
+- **48 features per bar** (micro + macro + pattern + DMR)
+- **Multi-target labels:** label_25_delivery, label_50_delivery, rekey_triggered, regime_at_time
+- **Format:** Parquet files per asset + manifest.json
+
+### Label Definitions
+- label_25_delivery: -25% AR extension hit by Friday (3-class: FAILED/CHOP/CONFIRMED)
+- label_50_delivery: -50% AR extension hit by Friday (3-class)
+- ekey_triggered: 132% kill-switch breach (binary)
+- egime_at_time: Current regime state (CONFIRMED/CAUTION/FAILED/NO-GO)
+
+### Feature Groups (48 total)
+- **Micro (8):** asian_range_pips, vol_ratio_3am_9am, hour_est, spread_vs_20d_avg, impulse_to_ar_ratio, day_of_week, consecutive_losses, prior_session_wr
+- **Macro (12):** dist_to_25/50/132_pips, dist_to_mlr_high/low, regime_ratio, ilm_state, is_wednesday_pm, hours_since_mlr, minutes_to_12pm_est, mlr_range_pips, bias_encoded
+- **Pattern (18):** Alpha/Beta/AB-CD detection, OCC extreme, ILM zone, density zone, Wednesday bifurcation, hard exit, gear shift, Fib retrace/extension levels
+- **DMR (10):** Deep State distance, Stall Zone proximity, DMR tier, session timing windows, kill switch proximity
+
+### Key Stats Available for Training
+- **Fib hit rates:** -25%=98.22%, -50%=96.44%, -100%=92.17%, -168%=87.19%
+- **132% violations:** 71.53% hit rate, 100% rekey rate (195/195)
+- **Rekey duration:** 2.0 days avg, 49.4% next-day reversal
+- **Failure types:** Type 1 (soft, most common), Type 2 (reset, 67.7% WR), Type 3 (flip, 84.6% WR)
+- **Second acceptance:** 69.8% WR on second break
+- **Day-of-week:** Tue/Wed play first, Thu wait for second
+- **Seasonal:** Q1+Q4 = 63.7% of failures
+- **DMR reference:** 94.8% WR, PF 205 (EUR/USD 2022-2026)
+
+### Files for CC
+- quant-lab/ml/phase2_classifier/run_training.py — Training pipeline (fixed paths)
+- quant-lab/ml/phase2_classifier/prep_training_data.py — Data prep script
+- quant-lab/ml/phase1_data/dmr_features.py — DMR feature computation
+- quant-lab/data/holy_grail_extracted/all_decision_trees.json — 12 sections of decision rules
+
+### Next Steps for CC
+1. Run python quant-lab/ml/phase2_classifier/run_training.py
+2. Model trains on 5.3M samples, 48 features, 18 assets
+3. TimeSeriesSplit CV + SHAP physics check
+4. Gate: CV accuracy >= 88%, dist_to_132_pips in top-5 SHAP
