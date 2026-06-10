@@ -449,17 +449,16 @@ class SymmetryTrapOCCBufferEngine:
 
             if occ_confirmed:
                 self.entry_price = bar.close
-                # SL = Impulse Extreme + Regular Buffer (NOT zero-buffer profit lock)
-                # MAD Directive 2026-06-10: Regular SL with spread buffer
-                # Buffer prevents spread-wick stop-outs on tight levels
-                # For LONG:  SL = impulse_high - buffer (BELOW entry = real stop)
-                # For SHORT: SL = impulse_low + buffer (ABOVE entry = real stop)
-                buffer_pips = self.spread_buffer + self.min_sl_buffer
-                buffer_px = buffer_pips * self.pip_size
+                # SL = 2 PIPS FROM ENTRY (MAD Directive 2026-06-10 revised)
+                # Simple fixed 2-pip buffer from entry price
+                # For LONG:  SL = entry - 2 pips
+                # For SHORT: SL = entry + 2 pips
+                FIXED_SL_PIPS = 2.0
+                buffer_px = FIXED_SL_PIPS * self.pip_size
                 if self.impulse_direction == TradeDirection.LONG:
-                    self.sl_price = self.impulse_extreme - buffer_px
+                    self.sl_price = bar.close - buffer_px
                 else:
-                    self.sl_price = self.impulse_extreme + buffer_px
+                    self.sl_price = bar.close + buffer_px
                 self.tp_price = (
                     bar.close + self.active_au * self.impulse_direction.value
                 )

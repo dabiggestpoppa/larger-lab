@@ -1,11 +1,11 @@
 {
   "engine": "SymmetryTrap",
   "symbol": "GBPCAD.PRO",
-  "direction": "BUY",
-  "entry": 1.86086,
-  "sl": 1.8615,
-  "tp": 1.8618599999999998,
+  "direction": "SELL",
+  "entry": 1.86441,
+  "sl": 1.8641100000000002,
+  "tp": 1.86341,
   "event": "SL_HIT",
   "loop": 1,
-  "time": "2026-06-08 11:41:00"
+  "time": "2026-06-10 07:28:00"
 }

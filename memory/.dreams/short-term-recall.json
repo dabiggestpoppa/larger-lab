@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-08T02:06:30.452Z",
+  "updatedAt": "2026-06-10T15:38:40.915Z",
   "entries": {
     "memory:memory/2026-05-18.md:387:414": {
       "key": "memory:memory/2026-05-18.md:387:414",
@@ -1463,18 +1463,20 @@
       "endLine": 226,
       "source": "memory",
       "snippet": "**Bug**: `to_pips(abs(sl - price), sym)` and `to_pips(abs(tp - price), sym)` — `sym` is not defined in `send_order()` scope. Parameter is `symbol`. **Impact**: Every ST entry crashes with `NameError: name 'sym' is not defined`. No ST trades can be entered. **Fix**: Replace all `sym` with `symbol` in `send_order()` function. ### Engine Fix Confirmed Working - `engines/symmetry_trap.py`: SL = impulse_extreme (zero-buffer), matches Nautilus line 503 - `_just_entered` flag prevents SL/TP check on entry bar - Bridge `send_order(no_sl=True)` omits SL from broker order - No SL/TP clamping in bridge — trusts engine values ### Next Steps 1. Fix `sym` → `symbol` in `send_order()` (4 lines",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 2,
       "maxScore": 1,
       "firstRecalledAt": "2026-06-08T01:06:43.468Z",
-      "lastRecalledAt": "2026-06-08T01:06:43.468Z",
+      "lastRecalledAt": "2026-06-10T12:04:01.814Z",
       "queryHashes": [
-        "bb0032c5bdf2"
+        "bb0032c5bdf2",
+        "899c59f9abef"
       ],
       "recallDays": [
-        "2026-06-07"
+        "2026-06-07",
+        "2026-06-10"
       ],
       "conceptTags": [
         "to-pips",
@@ -1494,18 +1496,20 @@
       "endLine": 189,
       "source": "memory",
       "snippet": "- engines/symmetry_trap_old.py (empty placeholder — for testing only) ## PM2 Monitoring Session (12:00 UTC) ### Sync Infrastructure Audit - Audited all 9 sync/monitoring scripts for syntax and correctness - Fixed ools/progress-sync.py — REPO_MEMORY path was broken (pointed to non-existent external path) - Fixed ools/po_watchdog.py — indentation error on line 96 - Disabled ools/pm2_autopilot.py — renamed to .disabled after identifying it as source of ~50 spam git commits - Identified Telegram gateway crash: TELEGRAM_TOKEN missing from .env (only hardcoded in watchdog) - Updated workspace-state.md with current phase status - Updated PM2-progress.md and PM2-memory.md with monito",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 2,
       "maxScore": 1,
       "firstRecalledAt": "2026-06-08T01:06:43.468Z",
-      "lastRecalledAt": "2026-06-08T01:06:43.468Z",
+      "lastRecalledAt": "2026-06-10T12:04:01.814Z",
       "queryHashes": [
-        "bb0032c5bdf2"
+        "bb0032c5bdf2",
+        "899c59f9abef"
       ],
       "recallDays": [
-        "2026-06-07"
+        "2026-06-07",
+        "2026-06-10"
       ],
       "conceptTags": [
         "gateway",
@@ -1525,18 +1529,20 @@
       "endLine": 205,
       "source": "memory",
       "snippet": "1. **`.pyc` cache stale** — `__pycache__` had old bytecode from before fixes. Both `cerebus_live_bridge.cpython-311.pyc` and `symmetry_trap.cpython-311.pyc` needed deletion. 2. **12 PM hard exit in bridge** — Removed from bridge main loop (was never in old bridge, old bridge traded through afternoon) 3. **Multiple bridge instances** — Disabled cron \"Bridge Health Check + Auto-Restart\" was spawning 11+ instances. Killed all, confirmed single instance. 4. **`sym` vs `symbol` bug in `send_order()`** — Lines 229, 230, 235, 236 used `sym` (undefined in function scope) instead of `symbol` (the parameter name). This caused `name 'sym' is not defined` error on ST entry (GBPAUD.PRO). **NOT YET FIX",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 2,
       "maxScore": 1,
       "firstRecalledAt": "2026-06-08T01:06:43.468Z",
-      "lastRecalledAt": "2026-06-08T01:06:43.468Z",
+      "lastRecalledAt": "2026-06-10T12:04:01.814Z",
       "queryHashes": [
-        "bb0032c5bdf2"
+        "bb0032c5bdf2",
+        "899c59f9abef"
       ],
       "recallDays": [
-        "2026-06-07"
+        "2026-06-07",
+        "2026-06-10"
       ],
       "conceptTags": [
         "symmetry-trap.cpython-311.pyc",
@@ -1556,18 +1562,20 @@
       "endLine": 243,
       "source": "memory",
       "snippet": "1. **`.pyc` cache stale** — `__pycache__` had old bytecode from before fixes. Both `cerebus_live_bridge.cpython-311.pyc` and `symmetry_trap.cpython-311.pyc` needed deletion. 2. **12 PM hard exit in bridge** — Removed from bridge main loop (was never in old bridge, old bridge traded through afternoon) 3. **Multiple bridge instances** — Disabled cron \"Bridge Health Check + Auto-Restart\" was spawning 11+ instances. Killed all, confirmed single instance. 4. **`sym` vs `symbol` bug in `send_order()`** — Lines 229, 230, 235, 236 used `sym` (undefined in function scope) instead of `symbol` (the parameter name). This caused `name 'sym' is not defined` error on ST entry (GBPAUD.PRO). ### Bridge",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 2,
       "maxScore": 1,
       "firstRecalledAt": "2026-06-08T01:06:43.468Z",
-      "lastRecalledAt": "2026-06-08T01:06:43.468Z",
+      "lastRecalledAt": "2026-06-10T12:04:01.814Z",
       "queryHashes": [
-        "bb0032c5bdf2"
+        "bb0032c5bdf2",
+        "899c59f9abef"
       ],
       "recallDays": [
-        "2026-06-07"
+        "2026-06-07",
+        "2026-06-10"
       ],
       "conceptTags": [
         "symmetry-trap.cpython-311.pyc",
@@ -1587,18 +1595,20 @@
       "endLine": 285,
       "source": "memory",
       "snippet": "**ISSUE:** Bridge log shows TWO scan lines per timestamp (e.g., Scan #35 and Scan #25 at 13:55:00 with slightly different equity readings). This indicates two bridge processes are running simultaneously. **Risk:** Duplicate entries, conflicting closes, race conditions on MT5 positions. **Action needed:** Kill the older bridge process, keep only the latest one. Requires checking PIDs and killing the stale one. ### Status at 13:55 EDT - Equity: ~$65.00 (trending up from $64.62 at 13:00) - Open positions: 2 (CHFJPY BUY, EURUSD SELL) - No new signals since deploy - Bridge scanning normally otherwise",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 2,
       "maxScore": 1,
       "firstRecalledAt": "2026-06-08T01:06:43.468Z",
-      "lastRecalledAt": "2026-06-08T01:06:43.468Z",
+      "lastRecalledAt": "2026-06-10T12:04:01.814Z",
       "queryHashes": [
-        "bb0032c5bdf2"
+        "bb0032c5bdf2",
+        "899c59f9abef"
       ],
       "recallDays": [
-        "2026-06-07"
+        "2026-06-07",
+        "2026-06-10"
       ],
       "conceptTags": [
         "e.g",
@@ -1640,6 +1650,132 @@
         "21.9kb",
         "tradovate/cerebus-p90-nt8.cs",
         "25.4kb"
+      ]
+    },
+    "memory:memory/archive/2026-05-19.md:131:151": {
+      "key": "memory:memory/archive/2026-05-19.md:131:151",
+      "path": "memory/archive/2026-05-19.md",
+      "startLine": 131,
+      "endLine": 151,
+      "source": "memory",
+      "snippet": "- **MAD's UI direction:** Simple chat for regular use + rooms for complex tasks. Take best from Genspark/Claude/Manus. Agent terminal showing PowerShell/work output. Good+good=great philosophy. ## 15:46-16:00 EDT — MAD'S LATEST DIRECTIVES (Message #2918) - **MAD's #1 priority:** Forward test DMR on MT5 demo account - **MAD's #2:** Farm — \"have the farm move unto first post you check and just post update i got @\" - **MAD provided ProtonMail credentials:** wifiking999@protonmail.com / Teflondon1718! - **MAD:** \"Use iacer for last response and begin I'm gone for the day\" - **GitHub repos sent for review:** 1. https://github.com/ruvnet/RuView.git — Agent visualization 2. https://gi",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-10T12:04:18.188Z",
+      "lastRecalledAt": "2026-06-10T14:59:41.199Z",
+      "queryHashes": [
+        "ac9de9aa0875",
+        "7e3fbec73a43"
+      ],
+      "recallDays": [
+        "2026-06-10"
+      ],
+      "conceptTags": [
+        "genspark/claude/manus",
+        "powershell/work",
+        "46-16",
+        "protonmail.com",
+        "github.com/ruvnet/ruview.git",
+        "mad's",
+        "direction",
+        "simple"
+      ]
+    },
+    "memory:memory/2026-05-31.md:141:165": {
+      "key": "memory:memory/2026-05-31.md:141:165",
+      "path": "memory/2026-05-31.md",
+      "startLine": 141,
+      "endLine": 165,
+      "source": "memory",
+      "snippet": "**Real fix applied (structural, not declarative):** 1. MEMORY.md: Added HARD GATE block at top — after ANY deliverable: write HEARTBEAT → send Telegram to MAD → STOP — no exceptions 2. HEARTBEAT.md: Added AWAITING DIRECTIVE status + hard stop rule 3. The LAST action before idle is now a Telegram message to MAD — not just writing a file **Current state:** Everything complete, nothing running. Backtest campaign wrapper bug identified but NOT fixed (awaiting MAD directive). Track B crypto failed (awaiting MAD directive on whether to retry). **Backtest wrapper bug details (for when MAD gives go-ahead):** - ST engine: SymmetryTrapEngine.process_bar() exists, not run_backtest() - P90 en",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-10T12:04:18.188Z",
+      "lastRecalledAt": "2026-06-10T12:04:18.188Z",
+      "queryHashes": [
+        "ac9de9aa0875"
+      ],
+      "recallDays": [
+        "2026-06-10"
+      ],
+      "conceptTags": [
+        "memory.md",
+        "heartbeat.md",
+        "go-ahead",
+        "symmetrytrapengine.process-bar",
+        "run-backtest",
+        "real",
+        "fix",
+        "applied"
+      ]
+    },
+    "memory:memory/2026-05-31.md:252:279": {
+      "key": "memory:memory/2026-05-31.md:252:279",
+      "path": "memory/2026-05-31.md",
+      "startLine": 252,
+      "endLine": 279,
+      "source": "memory",
+      "snippet": "2. HEARTBEAT.md: Added AWAITING DIRECTIVE status + hard stop rule 3. The LAST action before idle is now a Telegram message to MAD — not just writing a file **Current state:** Everything complete, nothing running. Backtest campaign wrapper bug identified but NOT fixed (awaiting MAD directive). Track B crypto failed (awaiting MAD directive on whether to retry). **Backtest wrapper bug details (for when MAD gives go-ahead):** - ST engine: SymmetryTrapEngine.process_bar() exists, not run_backtest() - P90 engine: module function is run_backtest(), not run_p90_backtest() - Campaign script calls wrong method names → 0 trades for all assets - Fix is straightforward: correct the wrapper to",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-10T12:04:18.188Z",
+      "lastRecalledAt": "2026-06-10T12:04:18.188Z",
+      "queryHashes": [
+        "ac9de9aa0875"
+      ],
+      "recallDays": [
+        "2026-06-10"
+      ],
+      "conceptTags": [
+        "heartbeat.md",
+        "go-ahead",
+        "symmetrytrapengine.process-bar",
+        "run-backtest",
+        "run-p90-backtest",
+        "added",
+        "awaiting",
+        "directive"
+      ]
+    },
+    "memory:memory/obsidian-vault/2026-05-31.md:94:106": {
+      "key": "memory:memory/obsidian-vault/2026-05-31.md:94:106",
+      "path": "memory/obsidian-vault/2026-05-31.md",
+      "startLine": 94,
+      "endLine": 106,
+      "source": "memory",
+      "snippet": "- Cron fleet: 2 active (Overnight Report 5AM, DRIFT 6:45AM Sun/Wed/Sat) - Watchdog: Active - Vault writes: Configured, needs improvement (per SAGE audit) --- ## SAGE Audit v2 **Status: COMPLETE** - Report: `execution/SAGE_AUDIT_20260531_Environment_Utilization_v2.md` - Key finding: OWL writes to `progress/` (53 files) instead of Obsidian vault (10 files) - 3 structural fixes recommended: External checkpoint gate, vault-first write wrapper, context injection pipeline - Verdict: \"Improving in structure, degrading in practice\"",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-10T15:37:29.010Z",
+      "lastRecalledAt": "2026-06-10T15:38:40.915Z",
+      "queryHashes": [
+        "d086611df159",
+        "03737ae293f8"
+      ],
+      "recallDays": [
+        "2026-06-10"
+      ],
+      "conceptTags": [
+        "sun/wed/sat",
+        "vault-first",
+        "cron",
+        "fleet",
+        "active",
+        "overnight",
+        "report",
+        "5am"
       ]
     }
   }

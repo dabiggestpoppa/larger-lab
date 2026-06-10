@@ -7,7 +7,24 @@
 
 ---
 
-## Status: 🟢 Active — Research Mesh Safety Suite Landed
+## Status: 🟢 Active — CEREBUS Build Planning Complete, Ready for Wave 1
+
+### CEREBUS Neuro-Symbolic Scanner — AS Assignments
+- **Tests:** Full test suite for all new components (40+ new tests)
+- **Quality:** Verify SHAP physics check, Wednesday stress test, alignment matrix
+- **Documentation:** Keep build notes + plan updated as phases complete
+- **Safety:** Enforce 12 Ironclad Rules from CEREBUS BUILD.txt
+
+### Observer Core — Overall Status (2026-06-10)
+| Phase | Backend | Frontend | Tests | Agent | Status |
+|-------|---------|----------|-------|-------|--------|
+| O-1 | 9/9 | 10/10 | 42/42 | CC | ✅ Complete |
+| O-2 | 10/10 | 7/7 | needs alignment | PM2 | ✅ Complete |
+| O-3 | 10/10 | 8/8 | needs alignment | OC2 | ✅ Complete |
+| O-4 | 11/11 | 9/9 | 14/14 | AS+RL+OC2 | ✅ Complete |
+| O-5 | 0/12 | 12/12 | 0 | CC | 🔄 In Progress |
+| O-6 | 0/11 | 0/8 | 0 | PM | ⏳ Planned |
+| O-7 | 0/12 | 0/9 | 0 | AS | ⏳ Planned |
 
 ### Observer Core — Overall Status (2026-05-27)
 | Phase | Backend | Frontend | Tests | Agent | Status |

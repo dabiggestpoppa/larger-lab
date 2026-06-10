@@ -1,0 +1,92 @@
+{
+  "AUDUSD": {
+    "rows": 275184,
+    "columns": 47,
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\labels\\AUDUSD_labeled.parquet"
+  },
+  "BTCUSD": {
+    "rows": 459149,
+    "columns": 47,
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\labels\\BTCUSD_labeled.parquet"
+  },
+  "CHFJPY": {
+    "rows": 276411,
+    "columns": 47,
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\labels\\CHFJPY_labeled.parquet"
+  },
+  "DE30": {
+    "rows": 261213,
+    "columns": 47,
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\labels\\DE30_labeled.parquet"
+  },
+  "ETHUSD": {
+    "rows": 458286,
+    "columns": 47,
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\labels\\ETHUSD_labeled.parquet"
+  },
+  "EURUSD": {
+    "rows": 275183,
+    "columns": 47,
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\labels\\EURUSD_labeled.parquet"
+  },
+  "FR40": {
+    "rows": 259819,
+    "columns": 47,
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\labels\\FR40_labeled.parquet"
+  },
+  "GBPAUD": {
+    "rows": 278411,
+    "columns": 47,
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\labels\\GBPAUD_labeled.parquet"
+  },
+  "GBPCHF": {
+    "rows": 278390,
+    "columns": 47,
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\labels\\GBPCHF_labeled.parquet"
+  },
+  "GBPJPY": {
+    "rows": 278279,
+    "columns": 47,
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\labels\\GBPJPY_labeled.parquet"
+  },
+  "GBPNZD": {
+    "rows": 278483,
+    "columns": 47,
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\labels\\GBPNZD_labeled.parquet"
+  },
+  "GBPUSD": {
+    "rows": 278402,
+    "columns": 47,
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\labels\\GBPUSD_labeled.parquet"
+  },
+  "NZDUSD": {
+    "rows": 278390,
+    "columns": 47,
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\labels\\NZDUSD_labeled.parquet"
+  },
+  "US500": {
+    "rows": 264493,
+    "columns": 47,
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\labels\\US500_labeled.parquet"
+  },
+  "USDCHF": {
+    "rows": 278434,
+    "columns": 47,
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\labels\\USDCHF_labeled.parquet"
+  },
+  "USDJPY": {
+    "rows": 278412,
+    "columns": 47,
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\labels\\USDJPY_labeled.parquet"
+  },
+  "XAGUSD": {
+    "rows": 308699,
+    "columns": 47,
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\labels\\XAGUSD_labeled.parquet"
+  },
+  "XAUUSD": {
+    "rows": 310629,
+    "columns": 47,
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\labels\\XAUUSD_labeled.parquet"
+  }
+}

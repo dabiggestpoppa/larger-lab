@@ -100,3 +100,11 @@
 {"engine": "SymmetryTrap", "symbol": "EURNZD.PRO", "direction": "BUY", "entry": 1.98281, "sl": 1.98272, "tp": 1.98401, "event": "ENTRY", "loop": 3, "time": "2026-06-09 10:22:00"}
 {"engine": "SymmetryTrap", "symbol": "EURNZD.PRO", "direction": "BUY", "entry": 1.98281, "sl": 1.98272, "tp": 1.98401, "event": "SL_HIT", "loop": 3, "time": "2026-06-09 10:24:00"}
 {"engine": "SymmetryTrap", "symbol": "GBPAUD.PRO", "direction": "BUY", "entry": 1.90147, "sl": 1.90205, "tp": 1.90287, "event": "ENTRY", "loop": 2, "time": "2026-06-09 10:27:00"}
+{"engine": "SymmetryTrap", "symbol": "EURNZD.PRO", "direction": "SELL", "entry": 1.98708, "sl": 1.98686, "tp": 1.9858799999999999, "event": "ENTRY", "loop": 1, "time": "2026-06-10 06:59:00"}
+{"engine": "SymmetryTrap", "symbol": "EURNZD.PRO", "direction": "SELL", "entry": 1.98708, "sl": 1.98686, "tp": 1.9858799999999999, "event": "SL_HIT", "loop": 1, "time": "2026-06-10 07:01:00"}
+{"engine": "SymmetryTrap", "symbol": "EURJPY.PRO", "direction": "SELL", "entry": 185.306, "sl": 185.243, "tp": 185.16600000000003, "event": "ENTRY", "loop": 1, "time": "2026-06-10 07:20:00"}
+{"engine": "SymmetryTrap", "symbol": "EURJPY.PRO", "direction": "SELL", "entry": 185.306, "sl": 185.243, "tp": 185.16600000000003, "event": "SL_HIT", "loop": 1, "time": "2026-06-10 07:22:00"}
+{"engine": "SymmetryTrap", "symbol": "GBPCAD.PRO", "direction": "SELL", "entry": 1.86441, "sl": 1.8641100000000002, "tp": 1.86341, "event": "ENTRY", "loop": 1, "time": "2026-06-10 07:26:00"}
+{"engine": "SymmetryTrap", "symbol": "EURNZD.PRO", "direction": "BUY", "entry": 1.9886599999999999, "sl": 1.98857, "tp": 1.98986, "event": "ENTRY", "loop": 2, "time": "2026-06-10 07:28:00"}
+{"engine": "SymmetryTrap", "symbol": "GBPCAD.PRO", "direction": "SELL", "entry": 1.86441, "sl": 1.8641100000000002, "tp": 1.86341, "event": "SL_HIT", "loop": 1, "time": "2026-06-10 07:28:00"}
+{"engine": "SymmetryTrap", "symbol": "EURNZD.PRO", "direction": "BUY", "entry": 1.9886599999999999, "sl": 1.98857, "tp": 1.98986, "event": "SL_HIT", "loop": 2, "time": "2026-06-10 07:30:00"}
