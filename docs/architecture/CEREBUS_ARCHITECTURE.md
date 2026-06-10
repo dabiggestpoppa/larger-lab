@@ -212,6 +212,107 @@ stateDiagram-v2
 
 ---
 
+## ST + P90 Focused Markov Chain
+
+> **Purpose:** Lean state machine for the two tradeable engines only. Calibrated to actual backtest results.
+
+### Design Philosophy
+
+The full 17-state Markov chain (above) models the entire CEREBUS ontology. The ST+P90 focused chain strips away everything that isn't a tradeable decision:
+
+1. **Session filter first** — Is this session worth trading? (~28-32% are NO-GO)
+2. **Pipeline filter second** — Did the entry pattern complete? (~6-7% filtered)
+3. **Trade outcome last** — Given entry, what's the result?
+
+This matches how the engines actually work in the backtest:
+- **ST:** 3-step pipeline (impulse → retrace → OCC) naturally filters noise. 892 trades from 910 sessions.
+- **P90:** Immediate entry on P90 close. 1,038 trades from 911 sessions.
+
+### ST Markov (6 states)
+
+```mermaid
+stateDiagram-v2
+    [*] --> ST_RESET: New Session
+    ST_RESET --> ST_NO_GO: 28% (AR>45p / no impulse)
+    ST_RESET --> ST_FILTERED: 7% (impulse fired, pipeline failed)
+    ST_RESET --> ST_IN_TRADE: 65% (OCC complete → 1 AU target)
+
+    ST_IN_TRADE --> ST_TP_HIT: 85.7% (1 AU reached)
+    ST_IN_TRADE --> ST_SL_HIT: 14.3% (zero-buffer extreme)
+
+    ST_TP_HIT --> ST_RESET: Next session
+    ST_SL_HIT --> ST_RESET: Next session
+    ST_NO_GO --> ST_RESET: Next session
+    ST_FILTERED --> ST_RESET: Next session
+```
+
+### P90 Markov (12 states)
+
+```mermaid
+stateDiagram-v2
+    [*] --> P90_RESET: New Session
+    P90_RESET --> P90_NO_GO: 32% (AR>45p / no P90)
+    P90_RESET --> P90_FILTERED: 6% (P90 fired, no clean entry)
+    P90_RESET --> P90_IN_TRADE: 62% (dual entry, -25/-50% AR targets)
+
+    P90_IN_TRADE --> P90_TP1_HIT: 55% (-25% AR)
+    P90_IN_TRADE --> P90_TP2_HIT: 10% (-50% AR)
+    P90_IN_TRADE --> P90_SL_HIT: 18% (80% body SL)
+    P90_IN_TRADE --> P90_KILL_SWITCH: 5% (132% breach)
+    P90_IN_TRADE --> P90_HARD_EXIT: 3.7% (12PM EST)
+    P90_IN_TRADE --> P90_EWS_EXIT: 8.3% (opposite P90 at target)
+
+    P90_TP1_HIT --> P90_TP2_HIT: 65% continue
+    P90_TP1_HIT --> P90_EWS_EXIT: 20% EWS cut
+    P90_TP1_HIT --> P90_HARD_EXIT: 15% time stop
+
+    P90_TP2_HIT --> P90_REKEY: 10% (132% reached)
+    P90_TP2_HIT --> P90_HARD_EXIT: 90% done
+
+    P90_REKEY --> P90_REKEY_EXTENSION: 78% delivers
+    P90_REKEY --> P90_SL_HIT: 22% fails
+```
+
+### Simulation Results (10,000 sessions each)
+
+| Metric | ST | P90 |
+|--------|-----|------|
+| **Win rate (traded)** | 77.7% | 59.9% |
+| **NO-GO rate** | 28.2% | 32.0% |
+| **Filter rate** | 6.9% | 6.1% |
+| **TP1 / base target** | 55.8% (1 AU) | 34.6% (-25% AR) |
+| **TP2 / extension** | — | 6.1% (-50% AR) |
+| **EWS exit** | — | 5.1% |
+| **SL hit** | 9.1% | 10.8% |
+| **Kill switch** | — | 3.2% |
+| **Hard exit** | — | 2.1% |
+| **Backtest WR** | 85.7% | 78.7% |
+| **Backtest PF** | 8.18 | 3.09 |
+| **Backtest Max DD** | 39.3p | 72.2p |
+
+### How to Use This
+
+**For the scanner:**
+1. On each M5 candle, compute current state for both chains
+2. ST chain: track impulse → retrace → OCC pipeline progress
+3. P90 chain: track P90 activation → entry → target progression
+4. Use transition probabilities to estimate P(next state | current state)
+
+**For position sizing:**
+- ST: 65% of sessions produce a trade, 77.7% WR when traded → size confidently
+- P90: 62% of sessions produce a trade, 59.9% WR when traded → size smaller, bigger targets
+- When both fire same direction: increase size (confluence)
+- When ST fires opposite P90: ST takes priority (higher edge)
+
+**For target management:**
+- ST: Single 1 AU target. Trail to BE at 0.5 AU. No ladder.
+- P90: TP1 at -25% (34.6% of all sessions), TP2 at -50% (6.1%). EWS = exit signal.
+- P90 rekey: Only 10% of TP2 hits reach 132%. When they do, 78% deliver extension.
+
+**Key insight:** ST is the higher-edge base strategy (PF 8.18 vs 3.09). P90 captures bigger moves but with lower consistency. Best approach: ST for reliable base, P90 for extension plays when regime is CONFIRMED.
+
+---
+
 ## Trade Orchestrator
 
 ```mermaid
@@ -447,7 +548,8 @@ graph LR
 | SHAP | #1 Feature | dist_to_132_pips (0.149) ✅ |
 | RAG | Chunks | 55 PDFs + manual |
 | RAG | Tests | 22/22 passing |
-| Markov | States | 17 |
+| Markov (Full) | States | 17 |
+| Markov (ST+P90) | States | 6 + 12 |
 | Orchestrator | Trade States | 17 |
 | Orchestrator | Integration | ✅ Wired into Guardian |
 | Macro Engine | Features/bar | 102 |
