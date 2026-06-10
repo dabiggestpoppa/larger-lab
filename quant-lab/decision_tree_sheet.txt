@@ -1,0 +1,55 @@
+﻿python : Traceback (most recent call last):
+At line:1 char:58
++ cd C:\Users\wifik\Desktop\projects\larger-lab\quant-lab; python -c "
++                                                          ~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last) 
+   ::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "<string>", line 11, in <module>
+  File "C:\Users\wifik\AppData\Local\Programs\Python\Python311\Lib\encodings\cp
+1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2192' in 
+position 34: character maps to <undefined>
+=== DECISION TREE - WEEKLY CLOSE (all rows) ===
+  row 0: ['WEEKLY CLOSE PREDICTION DECISION TREE']
+  row 1: ['EUR/USD Deterministic Model - Navigating Daily Delivery to Weekly Close']
+  row 2: ['Based on 313 Monday sessions, 281 validated weeks (Jan 2020 - Dec 2025)']
+  row 4: ['MODEL OBJECTIVE']
+  row 5: ['Goal:', 'Predict weekly close location relative to Monday Fibonacci levels']
+  row 6: ['Primary Predictor:', 'M1 (Monday Range) with 123.13 effectiveness score']
+  row 7: ['Key Decision Points:', 'Monday Close, Wednesday Close, Thursday AM, Friday Close']
+  row 8: ['Two Operating Modes:', 'Normal Delivery (68.3%) vs Invalidation+Rekey (71.53%)']
+  row 14: ['NODE 1: MONDAY LONDON OPEN (02:00-06:00 EST)']
+  row 15: ['Check', 'Condition', 'Probability', 'Action', 'Next Node']
+  row 16: ['Monday Range Set?', 'London Open establishes 0% and 100%', '100%', 'Calculate Fib levels (-25%, -50%, -100%, -168%, 132%)', 'Node 2']
+  row 17: ['Directional Bias', 'Close > Open = Bullish, Close < Open = Bearish', '100%', 'Set extension direction', 'Node 2']
+  row 18: ['Range Size Check', 'Range > 50 pips = Normal, < 50 pips = Caution', '~70% Normal', 'Adjust position size', 'Node 2']
+  row 27: ['NODE 2: MONDAY NY OPEN (07:00-09:00 EST)']
+  row 28: ['Check', 'Condition', 'Probability', 'Outcome', 'Action']
+  row 29: ['NY Hi/Lo Takeout', 'Both Monday Hi AND Lo taken out', '80%', 'Liquidity sweep complete', 'Proceed to -25% target']
+  row 30: ['-25% Delivery Check', '-25% hit by Monday close?', '68%', 'Normal flow initiated', 'Monitor -50% (Node 3)']
+  row 31: ['-25% NOT hit', 'Price consolidates within range', '32%', 'Increased 132% risk', 'HIGH ALERT (Node 4)']
+  row 40: ['NODE 3: TUESDAY-WEDNESDAY (PRIMARY DELIVERY WINDOW)']
+  row 41: ['Checkpoint', 'Condition', 'If TRUE', 'Prob(TRUE)', 'If FALSE', 'Prob(FALSE)']
+  row 42: ['Tuesday Close', '-25% hit by Tue close?', '-50% by Wed = 82%', '85%', 'Monitor 100% level', '15%']
+  row 43: ['Wednesday Close', '-50% hit by Wed close?', '-100% by Fri = 88%', '70%', '75% pullback to 78.6%', '30%']
+  row 44: ['Wednesday Close', '-25% hit by Wed close?', '132% Risk = 30%', '70%', '132% Risk = 70%', '30%']
+  row 45: ['KEY: Wednesday is PRIMARY BIFURCATION DAY (35% of all 132% violations)']
+  row 57: ['NODE 4: 132% VIOLATION - SYSTEM RESET PROTOCOL']
+  row 58: ['Stage', 'Trigger', 'Probability', 'Time Frame', 'Action']
+  row 59: ['Detection', 'Price touches 132% level', '71.53% of weeks', 'Any time (peak Wed)', 'IMMEDIATE EXIT']
+  row 60: ['Rekey Initiation', 'Direction reverses from 132%', '100%', '0-4 hours', 'Wait for new anchor']
+  row 61: ['78.6% Retrace', 'First pullback to 78.6% of violation', '92%', '4-12 hours', 'FIRST RE-ENTRY ZONE']
+  row 62: ['50% Consolidation', 'Secondary pullback to 50%', '85%', '12-24 hours', 'OPTIMAL RE-ENTRY']
+  row 63: ['New -50% Extension', 'Intraweek target from new anchor', '78%', '24-48 hours', 'Take profit']
+  row 74: ['NODE 5: THURSDAY-FRIDAY (TARGET COMPLETION)']
+  row 75: ['Checkpoint', 'Condition', 'Outcome', 'Probability', 'Weekly Close Prediction']
+  row 76: ['Thursday AM', '-100% hit by Thu AM?', '-168% by Fri = 85%', '92%', 'Close near -168% zone']
+  row 77: ['Thursday AM', '-100% NOT hit', 'Week completes at -100%', '8%', 'Close near -100% zone']
+  row 78: ['Friday Close', 'Normal flow complete', 'Close at deepest extension reached', '68.3%', '-100% to -168% zone']
+  row 79: ['Friday Close', 'Post-rekey flow', 'Close at new anchor -50%', '31.7%', 'Rekey target zone']
+  row 90: ['WEEKLY CLOSE PREDICTION MATRIX']
+  row 91: ['Scenario', 'Conditions', 'Weekly Close Zone', 'Probability', 'Confidence']

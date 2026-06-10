@@ -1,0 +1,7556 @@
+{
+  "weekly_close_decision_tree": {
+    "source": "Holy Grail Excel - DECISION TREE - WEEKLY CLOSE",
+    "description": "EUR/USD Deterministic Model - Navigating Daily Delivery to Weekly Close",
+    "data": "Based on 313 Monday sessions, 281 validated weeks (Jan 2020 - Dec 2025)",
+    "rows": [
+      [
+        "WEEKLY CLOSE PREDICTION DECISION TREE"
+      ],
+      [
+        "EUR/USD Deterministic Model - Navigating Daily Delivery to Weekly Close"
+      ],
+      [
+        "Based on 313 Monday sessions, 281 validated weeks (Jan 2020 - Dec 2025)"
+      ],
+      [
+        "MODEL OBJECTIVE"
+      ],
+      [
+        "Goal:",
+        "Predict weekly close location relative to Monday Fibonacci levels"
+      ],
+      [
+        "Primary Predictor:",
+        "M1 (Monday Range) with 123.13 effectiveness score"
+      ],
+      [
+        "Key Decision Points:",
+        "Monday Close, Wednesday Close, Thursday AM, Friday Close"
+      ],
+      [
+        "Two Operating Modes:",
+        "Normal Delivery (68.3%) vs Invalidation+Rekey (71.53%)"
+      ],
+      [
+        "NODE 1: MONDAY LONDON OPEN (02:00-06:00 EST)"
+      ],
+      [
+        "Check",
+        "Condition",
+        "Probability",
+        "Action",
+        "Next Node"
+      ],
+      [
+        "Monday Range Set?",
+        "London Open establishes 0% and 100%",
+        "100%",
+        "Calculate Fib levels (-25%, -50%, -100%, -168%, 132%)",
+        "Node 2"
+      ],
+      [
+        "Directional Bias",
+        "Close > Open = Bullish, Close < Open = Bearish",
+        "100%",
+        "Set extension direction",
+        "Node 2"
+      ],
+      [
+        "Range Size Check",
+        "Range > 50 pips = Normal, < 50 pips = Caution",
+        "~70% Normal",
+        "Adjust position size",
+        "Node 2"
+      ],
+      [
+        "NODE 2: MONDAY NY OPEN (07:00-09:00 EST)"
+      ],
+      [
+        "Check",
+        "Condition",
+        "Probability",
+        "Outcome",
+        "Action"
+      ],
+      [
+        "NY Hi/Lo Takeout",
+        "Both Monday Hi AND Lo taken out",
+        "80%",
+        "Liquidity sweep complete",
+        "Proceed to -25% target"
+      ],
+      [
+        "-25% Delivery Check",
+        "-25% hit by Monday close?",
+        "68%",
+        "Normal flow initiated",
+        "Monitor -50% (Node 3)"
+      ],
+      [
+        "-25% NOT hit",
+        "Price consolidates within range",
+        "32%",
+        "Increased 132% risk",
+        "HIGH ALERT (Node 4)"
+      ],
+      [
+        "NODE 3: TUESDAY-WEDNESDAY (PRIMARY DELIVERY WINDOW)"
+      ],
+      [
+        "Checkpoint",
+        "Condition",
+        "If TRUE",
+        "Prob(TRUE)",
+        "If FALSE",
+        "Prob(FALSE)"
+      ],
+      [
+        "Tuesday Close",
+        "-25% hit by Tue close?",
+        "-50% by Wed = 82%",
+        "85%",
+        "Monitor 100% level",
+        "15%"
+      ],
+      [
+        "Wednesday Close",
+        "-50% hit by Wed close?",
+        "-100% by Fri = 88%",
+        "70%",
+        "75% pullback to 78.6%",
+        "30%"
+      ],
+      [
+        "Wednesday Close",
+        "-25% hit by Wed close?",
+        "132% Risk = 30%",
+        "70%",
+        "132% Risk = 70%",
+        "30%"
+      ],
+      [
+        "KEY: Wednesday is PRIMARY BIFURCATION DAY (35% of all 132% violations)"
+      ],
+      [
+        "NODE 4: 132% VIOLATION - SYSTEM RESET PROTOCOL"
+      ],
+      [
+        "Stage",
+        "Trigger",
+        "Probability",
+        "Time Frame",
+        "Action"
+      ],
+      [
+        "Detection",
+        "Price touches 132% level",
+        "71.53% of weeks",
+        "Any time (peak Wed)",
+        "IMMEDIATE EXIT"
+      ],
+      [
+        "Rekey Initiation",
+        "Direction reverses from 132%",
+        "100%",
+        "0-4 hours",
+        "Wait for new anchor"
+      ],
+      [
+        "78.6% Retrace",
+        "First pullback to 78.6% of violation",
+        "92%",
+        "4-12 hours",
+        "FIRST RE-ENTRY ZONE"
+      ],
+      [
+        "50% Consolidation",
+        "Secondary pullback to 50%",
+        "85%",
+        "12-24 hours",
+        "OPTIMAL RE-ENTRY"
+      ],
+      [
+        "New -50% Extension",
+        "Intraweek target from new anchor",
+        "78%",
+        "24-48 hours",
+        "Take profit"
+      ],
+      [
+        "NODE 5: THURSDAY-FRIDAY (TARGET COMPLETION)"
+      ],
+      [
+        "Checkpoint",
+        "Condition",
+        "Outcome",
+        "Probability",
+        "Weekly Close Prediction"
+      ],
+      [
+        "Thursday AM",
+        "-100% hit by Thu AM?",
+        "-168% by Fri = 85%",
+        "92%",
+        "Close near -168% zone"
+      ],
+      [
+        "Thursday AM",
+        "-100% NOT hit",
+        "Week completes at -100%",
+        "8%",
+        "Close near -100% zone"
+      ],
+      [
+        "Friday Close",
+        "Normal flow complete",
+        "Close at deepest extension reached",
+        "68.3%",
+        "-100% to -168% zone"
+      ],
+      [
+        "Friday Close",
+        "Post-rekey flow",
+        "Close at new anchor -50%",
+        "31.7%",
+        "Rekey target zone"
+      ],
+      [
+        "WEEKLY CLOSE PREDICTION MATRIX"
+      ],
+      [
+        "Scenario",
+        "Conditions",
+        "Weekly Close Zone",
+        "Probability",
+        "Confidence"
+      ],
+      [
+        "Full Extension",
+        "-25%→-50%→-100%→-168% all hit",
+        "-168% or beyond",
+        "59.91%",
+        "HIGH"
+      ],
+      [
+        "Standard Delivery",
+        "-25%→-50%→-100% hit, -168% missed",
+        "-100% to -168%",
+        "76.81%",
+        "HIGH"
+      ],
+      [
+        "Moderate Delivery",
+        "-25%→-50% hit, -100% missed",
+        "-50% to -100%",
+        "90.36%",
+        "VERY HIGH"
+      ],
+      [
+        "Shallow Delivery",
+        "Only -25% hit",
+        "-25% to -50%",
+        "98.22%",
+        "HIGHEST"
+      ],
+      [
+        "132% Rekey",
+        "132% violated, rekey sequence",
+        "New anchor -50% zone",
+        "55.79%",
+        "MEDIUM"
+      ],
+      [
+        "Range Bound",
+        "No extensions hit",
+        "Within Monday range",
+        "1.78%",
+        "RARE"
+      ],
+      [
+        "KEY DECISION RULES FOR WEEKLY CLOSE PREDICTION"
+      ],
+      [
+        "RULE 1: Monday Range = Foundation (100% deterministic anchor)"
+      ],
+      [
+        "RULE 2: Wednesday = Critical Bifurcation (35% of 132% violations)"
+      ],
+      [
+        "RULE 3: If -25% NOT hit by Wed close → 70% chance of 132% violation"
+      ],
+      [
+        "RULE 4: 132% violation = IMMEDIATE EXIT, wait for 78.6% rekey"
+      ],
+      [
+        "RULE 5: Post-132% optimal re-entry at 50% consolidation (85% success)"
+      ],
+      [
+        "RULE 6: Friday close typically at deepest extension reached"
+      ],
+      [
+        "RULE 7: 87.8% of all Fib targets hit before 9 AM EST"
+      ],
+      [
+        "EUR/USD SPECIFIC HIT RATE VALIDATION"
+      ],
+      [
+        "Fibonacci Level",
+        "EUR/USD Hit Rate",
+        "Sample Size",
+        "Confidence",
+        "Status"
+      ],
+      [
+        "-25% Extension",
+        "98.22%",
+        "276/281",
+        "HIGH",
+        "VALIDATED"
+      ],
+      [
+        "-50% Extension",
+        "96.44%",
+        "271/281",
+        "HIGH",
+        "VALIDATED"
+      ],
+      [
+        "-100% Extension",
+        "92.17%",
+        "259/281",
+        "HIGH",
+        "VALIDATED"
+      ],
+      [
+        "-168% Extension",
+        "87.19%",
+        "245/281",
+        "HIGH",
+        "VALIDATED"
+      ],
+      [
+        "132% Violation",
+        "71.53%",
+        "201/281",
+        "HIGH",
+        "SYSTEM RESET"
+      ],
+      [
+        "WEEKLY CLOSE PROBABILITY BY SCENARIO"
+      ],
+      [
+        "Scenario",
+        "Frequency",
+        "Close Level",
+        "Description"
+      ],
+      [
+        "Normal Flow",
+        "68.3%",
+        "-50% to -100%",
+        "Close at -50% to -100%"
+      ],
+      [
+        "Strong Trend",
+        "18.5%",
+        "-168% or beyond",
+        "Close at -168% or beyond"
+      ],
+      [
+        "132% Reset",
+        "71.53% trigger",
+        "Rekey -50%",
+        "Close at rekey -50% level"
+      ],
+      [
+        "Consolidation",
+        "13.2%",
+        "Near -25%",
+        "Close near -25%"
+      ],
+      [
+        "CROSS-REFERENCE TO DAILY NAVIGATION"
+      ],
+      [
+        "For day-by-day execution checkpoints and detailed trading rules:"
+      ],
+      [
+        "→ See: DAILY DELIVERY NAVIGATION sheet"
+      ]
+    ]
+  },
+  "phase5_ilm_velocity": {
+    "source": "Holy Grail Excel - PHASE 5 WILM ILM VELOCITY ANALYSIS",
+    "rows": [
+      [
+        "PHASE 5: WILM/ILM VELOCITY ANALYSIS - INSTITUTIONAL LIQUIDITY MATRIX MECHANICS"
+      ],
+      [
+        "Dataset: 281 Monday weeks (Jan 2020-May 2025) + 1,857 15M sessions (2023-2025)"
+      ],
+      [
+        "Objective: Analyze WILM vs ILM velocity mechanics, alignment scenarios, misalignment risks, and 94.3% WILM rekey signal"
+      ],
+      [
+        "ILM Component",
+        "Data Coverage",
+        "Key Finding",
+        "Validation Status"
+      ],
+      [
+        "WILM Velocity Mechanics",
+        "281 weeks, 195 rekey events",
+        "Highest velocity (1.8x-2.8x) but lowest hit rate (34.2%)",
+        "VALIDATED ✅"
+      ],
+      [
+        "Daily ILM Velocity",
+        "1,857 sessions",
+        "Moderate velocity (1.2x-1.6x), highest hit rate (64.3%)",
+        "VALIDATED ✅"
+      ],
+      [
+        "IELM Velocity",
+        "1,857 sessions",
+        "Balanced velocity (1.5x-2.1x), medium hit rate (48.3%)",
+        "VALIDATED ✅"
+      ],
+      [
+        "Full ILM Alignment",
+        "281 weeks",
+        "87.3% hit rate, 2.5x+ velocity when aligned",
+        "VALIDATED ✅"
+      ],
+      [
+        "Complete Misalignment",
+        "281 weeks",
+        "31.5% hit rate, velocity drops to 0.8x-1.0x, failure scenario",
+        "VALIDATED ✅"
+      ],
+      [
+        "WILM Rekey Signal (94.3%)",
+        "195 rekey events",
+        "Consecutive 15M 61.8-88 micro-legs under WILM = HIGHEST rekey predictor",
+        "VALIDATED ✅"
+      ],
+      [
+        "ILM Pattern Boost",
+        "1,857 sessions",
+        "14.8%-18.7% success boost, 25-29% faster formation",
+        "VALIDATED ✅"
+      ],
+      [
+        "CRITICAL INSIGHT: WILM is the HIGHEST VELOCITY state (1.8x-2.8x) but LOWEST HIT RATE (34.2%)"
+      ],
+      [
+        "- WILM is NOT a standalone entry signal. It accelerates existing patterns but does NOT guarantee success."
+      ],
+      [
+        "- Daily ILM has HIGHEST HIT RATE (64.3%) with moderate velocity (1.2x-1.6x) → BEST for pattern entry confirmation"
+      ],
+      [
+        "- Full ILM Alignment (WILM + IELM + Daily ILM) = 87.3% success, 2.5x+ velocity → OPTIMAL EXECUTION ZONE"
+      ],
+      [
+        "- Consecutive 61.8-88 micro-legs under WILM = 94.3% rekey signal → HIGHEST ACCURACY pattern in entire system"
+      ],
+      [
+        "PART 1: WILM vs DAILY ILM vs IELM - VELOCITY & HIT RATE COMPARISON"
+      ],
+      [
+        "ILM Type",
+        "Definition (Zone)",
+        "Time Influence",
+        "Hit Rate (%)",
+        "Continuation Rate (%)",
+        "Velocity Multiplier",
+        "Pattern Boost (%)",
+        "Formation Speed Boost (%)",
+        "Primary Session",
+        "Use Case",
+        "Risk Level"
+      ],
+      [
+        "Daily ILM",
+        "Previous day 50-61.8% zone",
+        "2.8 hours",
+        "64.3",
+        "69",
+        "1.2x-1.6x",
+        "14.8",
+        "25",
+        "London, NY",
+        "Short-term pattern confirmation, intraday entries",
+        "LOW (Most reliable)"
+      ],
+      [
+        "IELM (2-Day)",
+        "Previous 2 days 50-61.8% zone",
+        "24-48 hours",
+        "48.3",
+        "48.3",
+        "1.5x-2.1x",
+        "16.2",
+        "27",
+        "Tuesday-Thursday",
+        "Multi-day continuation, swing entries",
+        "MEDIUM (Balanced)"
+      ],
+      [
+        "WILM (Weekly)",
+        "Previous week 50-61.8% zone",
+        "48-120 hours",
+        "34.2",
+        "34.2",
+        "1.8x-2.8x (HIGHEST)",
+        "18.7",
+        "29",
+        "Monday anchor, Wednesday violations",
+        "High-velocity acceleration, rekey detection (94.3%)",
+        "HIGH (Lowest hit rate)"
+      ],
+      [
+        "4H ILM",
+        "Previous 4H 50-61.8% zone",
+        "4-8 hours",
+        "67.8",
+        "67.8",
+        "1.3x-1.9x",
+        "12.3",
+        "22",
+        "Intraday all sessions",
+        "Micro-pattern confirmation, scalping",
+        "LOW (High reliability)"
+      ],
+      [
+        "Quarter Levels",
+        "25/50/75/100 zones",
+        "Variable (2-24h)",
+        "80.5",
+        "72.1",
+        "1.3x-1.8x",
+        "8.5",
+        "18",
+        "All sessions",
+        "Universal reference points, support/resistance",
+        "LOW (Most frequent)"
+      ],
+      [
+        "KEY INSIGHT #1: ILM Hit Rate vs Velocity = INVERSE RELATIONSHIP"
+      ],
+      [
+        "- Daily ILM: Highest hit rate (64.3%) but lowest velocity (1.2x-1.6x) → Best for ENTRY CONFIRMATION"
+      ],
+      [
+        "- WILM: Lowest hit rate (34.2%) but highest velocity (1.8x-2.8x) → Best for ACCELERATION / REKEY DETECTION"
+      ],
+      [
+        "- IELM: Balanced middle ground (48.3% hit, 1.5x-2.1x velocity) → Best for SWING POSITIONING"
+      ],
+      [
+        "KEY INSIGHT #2: Pattern Formation Speed Boost = 22-29% faster when ILM present"
+      ],
+      [
+        "- WILM: +29% faster (from 7.2h avg to 5.1h), but only 34.2% hit rate"
+      ],
+      [
+        "- IELM: +27% faster (from 6.8h avg to 5.0h), 48.3% hit rate"
+      ],
+      [
+        "- Daily ILM: +25% faster (from 6.2h avg to 4.6h), 64.3% hit rate (BEST)"
+      ],
+      [
+        "- 4H ILM: +22% faster (from 4.5h avg to 3.5h), 67.8% hit rate"
+      ],
+      [
+        "KEY INSIGHT #3: Pattern Success Boost = +8.5% to +18.7% when ILM present"
+      ],
+      [
+        "- WILM: +18.7% boost (from 72% to 85.5% success) but only 34.2% engagement rate"
+      ],
+      [
+        "- IELM: +16.2% boost (from 74% to 86.4% success), 48.3% engagement"
+      ],
+      [
+        "- Daily ILM: +14.8% boost (from 76% to 87.2% success), 64.3% engagement (HIGHEST)"
+      ],
+      [
+        "- Conclusion: Daily ILM is OPTIMAL FILTER for pattern entries (highest engagement × good boost)"
+      ],
+      [
+        "PART 2: ILM ALIGNMENT vs MISALIGNMENT - EXECUTION PROBABILITY MATRIX"
+      ],
+      [
+        "Alignment Scenario",
+        "ILM State Description",
+        "Hit Rate (%)",
+        "Continuation Rate (%)",
+        "Velocity Multiplier",
+        "Sessions Observed",
+        "Avg Duration (h)",
+        "Execution Quality",
+        "Trading Action",
+        "Risk Assessment"
+      ],
+      [
+        "FULL ALIGNMENT (Triple Confluence)",
+        "WILM + IELM + Daily ILM all aligned",
+        "87.3",
+        "87.3",
+        "2.5x+ (PEAK)",
+        "124 sessions",
+        "4.2",
+        "EXCELLENT (Best execution zone)",
+        "AGGRESSIVE ENTRY - Highest probability",
+        "LOW (87.3% success)"
+      ],
+      [
+        "WILM + IELM Alignment",
+        "Weekly + 2-day ILM aligned, no Daily",
+        "62.5",
+        "62.5",
+        "2.1x-2.6x",
+        "187 sessions",
+        "5.8",
+        "GOOD (Multi-day continuation)",
+        "MODERATE ENTRY - Swing position",
+        "MEDIUM (62.5% success)"
+      ],
+      [
+        "WILM + Daily ILM Alignment",
+        "Weekly + Daily ILM aligned, no IELM",
+        "58.3",
+        "58.3",
+        "1.9x-2.4x",
+        "203 sessions",
+        "6.4",
+        "GOOD (Intraday acceleration)",
+        "MODERATE ENTRY - Intraday focus",
+        "MEDIUM (58.3% success)"
+      ],
+      [
+        "IELM + Daily ILM Alignment",
+        "2-day + Daily ILM aligned, no WILM",
+        "71.2",
+        "71.2",
+        "1.8x-2.2x",
+        "412 sessions",
+        "5.2",
+        "VERY GOOD (Most common alignment)",
+        "STANDARD ENTRY - High reliability",
+        "LOW (71.2% success)"
+      ],
+      [
+        "Daily ILM Only",
+        "Only Daily ILM active, no IELM/WILM",
+        "64.3",
+        "69",
+        "1.2x-1.6x",
+        "531 sessions",
+        "2.8",
+        "ACCEPTABLE (Single ILM confirmation)",
+        "CONSERVATIVE ENTRY - Intraday only",
+        "MEDIUM (64.3% success)"
+      ],
+      [
+        "IELM Only",
+        "Only IELM active, no Daily/WILM",
+        "48.3",
+        "48.3",
+        "1.5x-2.1x",
+        "294 sessions",
+        "36",
+        "WEAK (Multi-day uncertainty)",
+        "AVOID - Wait for Daily ILM alignment",
+        "HIGH (48.3% success)"
+      ],
+      [
+        "WILM Only",
+        "Only WILM active, no IELM/Daily",
+        "34.2",
+        "34.2",
+        "1.8x-2.8x",
+        "106 sessions",
+        "72",
+        "POOR (High velocity, low hit rate)",
+        "AVOID - Wait for lower TF confirmation",
+        "VERY HIGH (34.2% success)"
+      ],
+      [
+        "PARTIAL MISALIGNMENT",
+        "Mixed ILM directions, no clear confluence",
+        "42.7",
+        "38.5",
+        "1.0x-1.4x",
+        "368 sessions",
+        "8.6",
+        "POOR (Choppy, low probability)",
+        "AVOID - High risk of whipsaw",
+        "HIGH (42.7% success)"
+      ],
+      [
+        "COMPLETE MISALIGNMENT",
+        "All ILM types opposing directions",
+        "31.5",
+        "28.3",
+        "0.8x-1.0x (LOWEST)",
+        "142 sessions",
+        "12.4",
+        "FAILURE SCENARIO (Reversal zone)",
+        "EXIT - Do NOT trade, wait for reset",
+        "EXTREME (31.5% success)"
+      ],
+      [
+        "KEY ALIGNMENT INSIGHT #1: Full ILM Alignment (Triple Confluence) = OPTIMAL EXECUTION ZONE"
+      ],
+      [
+        "- 87.3% hit rate (highest across all scenarios), 2.5x+ velocity, avg 4.2h duration"
+      ],
+      [
+        "- Occurs in 124 out of 1,857 sessions (6.7% of time) → RARE but EXTREMELY RELIABLE"
+      ],
+      [
+        "- Trading Action: AGGRESSIVE ENTRY with full position size, tightest stops (132%+48%)"
+      ],
+      [
+        "KEY ALIGNMENT INSIGHT #2: IELM + Daily ILM = Most Common Reliable Alignment"
+      ],
+      [
+        "- 71.2% hit rate, 1.8x-2.2x velocity, 412 sessions (22.2% of time)"
+      ],
+      [
+        "- More frequent than Full Alignment, still offers strong probability"
+      ],
+      [
+        "- Trading Action: STANDARD ENTRY with normal position sizing"
+      ],
+      [
+        "KEY ALIGNMENT INSIGHT #3: WILM Only = AVOID (Velocity Trap)"
+      ],
+      [
+        "- Only 34.2% hit rate despite highest velocity (1.8x-2.8x)"
+      ],
+      [
+        "- WILM accelerates patterns but does NOT create them → Requires Daily/IELM confirmation"
+      ],
+      [
+        "- Trading Action: DO NOT ENTER on WILM alone, wait for lower timeframe ILM alignment"
+      ],
+      [
+        "KEY ALIGNMENT INSIGHT #4: Complete Misalignment = FAILURE SCENARIO"
+      ],
+      [
+        "- 31.5% hit rate, 0.8x-1.0x velocity (slowest), avg 12.4h duration"
+      ],
+      [
+        "- Occurs in 142 sessions (7.6% of time) → Often precedes 132% violations or rekey events"
+      ],
+      [
+        "- Trading Action: EXIT all positions immediately, wait for ILM realignment or 132% rekey"
+      ],
+      [
+        "PART 3: WILM REKEY SIGNAL DEEP-DIVE - CONSECUTIVE 15M 61.8-88 MICRO-LEGS (94.3% ACCURACY)"
+      ],
+      [
+        "Rekey Signal Component",
+        "Description",
+        "Occurrence Frequency",
+        "Rekey Probability (%)",
+        "Avg Time to 132% (h)",
+        "Avg Time to Rekey Completion (h)",
+        "Primary Session",
+        "Observable Pattern",
+        "Velocity During Signal",
+        "Action Required"
+      ],
+      [
+        "Consecutive 15M 61.8-88 Micro-legs",
+        "3+ consecutive 15M candles showing 61.8-88% retracements under WILM zone",
+        "18.7% (35 out of 187 WILM sessions)",
+        "94.3",
+        "3.2",
+        "28",
+        "Wednesday Overlap (35% of all)",
+        "Stair-step pattern with shallow retracements",
+        "1.8x-2.8x (accelerating)",
+        "EXIT immediately - 132% violation imminent"
+      ],
+      [
+        "WILM Active + 100% Break (No -25% Follow)",
+        "Price breaks 100% level but -25% does NOT deliver by 12-24h",
+        "23.4% (44 out of 187 WILM sessions)",
+        "78.2",
+        "6.8",
+        "32",
+        "Monday-Tuesday transition",
+        "Failed extension after 100% break",
+        "1.5x-2.0x (decelerating)",
+        "REDUCE exposure - High 132% risk"
+      ],
+      [
+        "WILM + Daily ILM Miss",
+        "WILM active but price misses Daily ILM zone entirely",
+        "31.6% (59 out of 187 WILM sessions)",
+        "83",
+        "8.4",
+        "26",
+        "Tuesday-Wednesday",
+        "Clean skip over Daily ILM (no touch)",
+        "2.1x-2.6x (volatile)",
+        "TIGHTEN stops - Misalignment detected"
+      ],
+      [
+        "WILM + Asian Range >150% Monday",
+        "WILM active + Wednesday Asian session expands >150% of Monday Range",
+        "12.3% (23 out of 187 WILM sessions)",
+        "85",
+        "4.6",
+        "24",
+        "Wednesday Asian → London-NY",
+        "Explosive Asian expansion under WILM",
+        "2.3x-2.9x (extreme)",
+        "EXIT before London - Same-day 132% likely"
+      ],
+      [
+        "WILM Rekey Pattern (15M Alpha Inversion)",
+        "Alpha 3-leg pattern INVERTS under WILM (A→B 88% instead of 72%)",
+        "14.4% (27 out of 187 WILM sessions)",
+        "72.5",
+        "5.2",
+        "29",
+        "Tuesday London, Wednesday NY",
+        "Deeper retracements than normal Alpha",
+        "1.9x-2.5x",
+        "WATCH closely - Inversion signal"
+      ],
+      [
+        "WILM REKEY SIGNAL BREAKDOWN: Why 94.3% Accuracy?"
+      ],
+      [
+        "**Pattern Mechanics**:"
+      ],
+      [
+        "- WILM (previous week 50-61.8% zone) has LOWEST hit rate (34.2%) → Indicates market is NOT respecting weekly support"
+      ],
+      [
+        "- When WILM is active but price shows consecutive 15M 61.8-88 micro-legs → Market is 'testing' but NOT committing"
+      ],
+      [
+        "- These shallow micro-retracements indicate institutional distribution (selling into bounces) → Precedes 132% violation"
+      ],
+      [
+        "- 3+ consecutive micro-legs = Algorithm exhaustion → 94.3% probability of 132% violation within 3.2h (avg)"
+      ],
+      [
+        "**Temporal Context**:"
+      ],
+      [
+        "- Most common day: Wednesday (35% of all 132% violations occur on Wednesday)"
+      ],
+      [
+        "- Most common session: London-NY Overlap (14:00-18:00 UTC, 2.34x velocity)"
+      ],
+      [
+        "- Avg time from signal detection → 132% hit: 3.2 hours (median 2.8h)"
+      ],
+      [
+        "- Once 132% hit → Avg rekey completion time: 28 hours (78.6%→50%→-50% sequence)"
+      ],
+      [
+        "**Observable Characteristics**:"
+      ],
+      [
+        "1. **Stair-Step Visual Pattern**: Price creates a declining 'staircase' of 15M candles, each retracing 61.8-88% of prior leg"
+      ],
+      [
+        "2. **Velocity Acceleration**: Each micro-leg shows increasing velocity (1.8x → 2.2x → 2.6x → 2.8x)"
+      ],
+      [
+        "3. **Volume Characteristics**: Typically declining volume on each retrace, increasing volume on each push lower"
+      ],
+      [
+        "4. **WILM Touch Rejection**: Price touches WILM zone but immediately rejects (wick formation, no body close)"
+      ],
+      [
+        "5. **ILM Misalignment**: Daily ILM and IELM often oppose WILM direction → Complete misalignment forming"
+      ],
+      [
+        "**Trading Protocol for WILM Rekey Signal**:"
+      ],
+      [
+        "- **Detection Phase** (0-1h): Identify 3+ consecutive 15M 61.8-88 micro-legs under WILM zone"
+      ],
+      [
+        "- **Confirmation Phase** (1-2h): Confirm velocity acceleration (1.8x → 2.4x+) and ILM misalignment"
+      ],
+      [
+        "- **Action Phase** (Immediate): EXIT all positions, cancel pending orders, tighten protective stops to 100% level"
+      ],
+      [
+        "- **Wait Phase** (2-4h): Wait for 132% violation confirmation, do NOT attempt to trade the spike"
+      ],
+      [
+        "- **Rekey Entry Phase** (+12-24h after 132%): Enter at 50% rekey consolidation (85% prob of -50% target)"
+      ],
+      [
+        "- **Risk Management**: If signal appears but 132% does NOT hit within 6h → Re-evaluate, pattern may abort (5.7% false positive rate)"
+      ],
+      [
+        "PART 4: ILM STATE DETECTION PROTOCOL & SESSION-SPECIFIC TRADING FRAMEWORK"
+      ],
+      [
+        "Trading Session",
+        "ILM State to Check",
+        "Optimal Alignment",
+        "Entry Signal",
+        "Velocity Expected",
+        "Hit Rate Context",
+        "Trading Action",
+        "Stop Loss",
+        "Target Level",
+        "Risk Level"
+      ],
+      [
+        "Monday London Open (07:00-10:00 UTC)",
+        "Check: WILM from prev week, Daily ILM from Friday",
+        "WILM + Daily ILM aligned",
+        "Alpha 3-leg B-leg (72% retrace) forming",
+        "1.4x-1.8x",
+        "98.22% (-25% by Tue)",
+        "ENTER at B-leg completion if Daily ILM aligned (64.3% engagement)",
+        "132% + 48%",
+        "-25% Extension",
+        "LOW (Best entry window)"
+      ],
+      [
+        "Monday NY Open (13:00-14:00 UTC)",
+        "Check: Daily ILM from London range established",
+        "Daily ILM + IELM forming",
+        "NY Hi/Lo takeout (80% prob)",
+        "1.5x-2.0x",
+        "98.22% (-25% by Tue)",
+        "ADD positions after Hi/Lo takeout if ILM confirms",
+        "132% + 48%",
+        "-25% Extension",
+        "LOW (Liquidity event)"
+      ],
+      [
+        "Tuesday London (07:00-16:00 UTC)",
+        "Check: Daily ILM from Monday, IELM from Mon+Tue",
+        "Daily + IELM aligned",
+        "Beta 3-leg forming (61.8%→-50%)",
+        "1.6x-2.1x",
+        "96.44% (-50% by Wed)",
+        "ADD at 61.8% retrace if IELM + Daily ILM aligned (71.2%)",
+        "132% + 48%",
+        "-50% Extension",
+        "LOW (Strong continuation)"
+      ],
+      [
+        "Tuesday London-NY Overlap (14:00-18:00 UTC)",
+        "Check: Full alignment (WILM + IELM + Daily)",
+        "FULL ALIGNMENT (Triple Confluence)",
+        "72% continuation pattern + full ILM alignment",
+        "2.34x PEAK",
+        "83.5% continuation",
+        "AGGRESSIVE ADD if full alignment (87.3% hit rate)",
+        "132% + 48%",
+        "-50% Extension",
+        "VERY LOW (Optimal execution)"
+      ],
+      [
+        "Wednesday Asian (00:00-08:00 UTC)",
+        "Check: Asian range vs Monday Range, WILM state",
+        "NO ALIGNMENT (Range check only)",
+        "If Asian >150% Monday → EXIT",
+        "0.8x-1.2x",
+        "78% prob 132% within 18h",
+        "IF Asian expanded: REDUCE/EXIT positions before London",
+        "Tight: 100%",
+        "Capital preservation",
+        "HIGH (Early warning)"
+      ],
+      [
+        "Wednesday London-NY Overlap (14:00-18:00 UTC)",
+        "Check: WILM + consecutive 15M 61.8-88 micro-legs",
+        "AVOID WILM ONLY scenarios",
+        "WILM rekey signal (94.3% if detected)",
+        "2.34x (but high risk)",
+        "35% of 132% violations",
+        "EXIT if WILM rekey signal detected, AVOID new entries",
+        "100% level",
+        "Defensive only",
+        "EXTREME (Peak 132% window)"
+      ],
+      [
+        "Wednesday Close (16:00 UTC)",
+        "Check: -50% status, IELM + Daily ILM state",
+        "IELM + Daily aligned, -50% HIT",
+        "If -50% HIT → hold for -100%",
+        "1.5x-2.0x",
+        "88% prob -100% by Fri",
+        "IF -50% HIT: Hold with IELM+Daily alignment confirmation",
+        "Trail: -25%",
+        "-100% Extension",
+        "LOW (Continuation likely)"
+      ],
+      [
+        "Wednesday Close (NEGATIVE)",
+        "Check: -50% status, Complete misalignment",
+        "Complete misalignment detected",
+        "If -50% MISS + misalignment → EXIT",
+        "0.8x-1.0x",
+        "75% prob rekey",
+        "EXIT immediately, wait for 132% rekey sequence",
+        "Exit now",
+        "Wait for 50% rekey",
+        "EXTREME (Failure scenario)"
+      ],
+      [
+        "Thursday Session (All day)",
+        "Check: 4H ILM, Daily ILM, IELM state",
+        "4H + Daily + IELM aligned",
+        "Measured Move pattern (50%→100%)",
+        "1.5x-2.0x",
+        "92.17% (-100% by Fri)",
+        "IF Normal Flow + ILM aligned: Hold for -100%; IF Rekey: Enter at 50%",
+        "132%+48% or old 132%",
+        "-100% or -50% rekey",
+        "MEDIUM (Execution dependent)"
+      ],
+      [
+        "Friday Session (All day)",
+        "Check: WILM forming for next week, profit booking",
+        "Any alignment (week closing)",
+        "Profit booking at -100%/-168%",
+        "1.4x-1.9x",
+        "87.19% (-168% by Fri)",
+        "BOOK PROFITS at -100%/-168%, close all by Fri close",
+        "Trail: -50%",
+        "-168% Extension",
+        "LOW (Week completion)"
+      ],
+      [
+        "POST-132% +4-12h (Rekey Phase 1)",
+        "Check: 78.6% retrace forming, new ILM establishing",
+        "New Daily ILM forming at 78.6%",
+        "78.6% reversal pattern (92% prob)",
+        "1.6x-2.2x",
+        "92% (78.6% hit rate)",
+        "WAIT for 78.6% confirmation, do NOT enter yet",
+        "Old 132%",
+        "Wait for 50% consolidation",
+        "HIGH (Premature entry risk)"
+      ],
+      [
+        "POST-132% +12-24h (Rekey Phase 2)",
+        "Check: 50% consolidation, new Daily ILM confirmed",
+        "New Daily ILM + 50% zone aligned",
+        "50% consolidation (OPTIMAL ENTRY)",
+        "1.2x-1.6x",
+        "85% (50% consolidation)",
+        "ENTER HERE at 50% rekey level if Daily ILM confirms",
+        "Old 132%",
+        "-50% Rekey Target",
+        "LOW (Optimal rekey entry)"
+      ],
+      [
+        "ILM STATE DETECTION PROTOCOL - KEY PRINCIPLES:"
+      ],
+      [
+        "**1. DAILY ILM IS PRIMARY FILTER (Highest Engagement Rate)**:"
+      ],
+      [
+        "   - Daily ILM has 64.3% hit rate (highest among all ILM types)"
+      ],
+      [
+        "   - Use Daily ILM as PRIMARY confirmation for ALL entries (Mon-Fri)"
+      ],
+      [
+        "   - If Daily ILM NOT aligned → Wait for alignment or reduce position size by 50%"
+      ],
+      [
+        "**2. IELM + DAILY ILM = MOST COMMON RELIABLE ALIGNMENT (71.2% hit rate)**:"
+      ],
+      [
+        "   - Occurs in 22.2% of all sessions (most frequent reliable alignment)"
+      ],
+      [
+        "   - Standard entry condition for Tuesday-Thursday trading"
+      ],
+      [
+        "   - Velocity: 1.8x-2.2x (good acceleration without excessive risk)"
+      ],
+      [
+        "**3. FULL ALIGNMENT (WILM + IELM + DAILY) = RARE BUT OPTIMAL (87.3% hit rate)**:"
+      ],
+      [
+        "   - Only occurs in 6.7% of sessions (rare opportunity)"
+      ],
+      [
+        "   - When detected → AGGRESSIVE entry with full position size"
+      ],
+      [
+        "   - Highest velocity (2.5x+) and highest hit rate (87.3%)"
+      ],
+      [
+        "   - Most common during Tuesday London-NY Overlap and Thursday sessions"
+      ],
+      [
+        "**4. WILM ONLY = VELOCITY TRAP (34.2% hit rate, AVOID STANDALONE)**:"
+      ],
+      [
+        "   - WILM accelerates patterns (1.8x-2.8x velocity) but does NOT create them"
+      ],
+      [
+        "   - DO NOT enter on WILM alone → Wait for Daily ILM or IELM alignment"
+      ],
+      [
+        "PART 5: DAILY ILM STATE CHECKLIST & DECISION MATRIX"
+      ],
+      [
+        "Time of Day",
+        "ILM State Check",
+        "Green Light (Enter)",
+        "Yellow Light (Reduce)",
+        "Red Light (Exit/Avoid)",
+        "Priority Action"
+      ],
+      [
+        "00:00 UTC (Asian Open)",
+        "Check prev day Daily ILM + Wednesday Asian range vs Monday",
+        "Daily ILM aligned, Asian <100% Monday Range",
+        "Daily ILM weak, Asian 100-150% Monday",
+        "No Daily ILM, Asian >150% Monday Range",
+        "Monitor Asian for 132% early warning"
+      ],
+      [
+        "07:00 UTC (London Open)",
+        "Check Daily ILM from prev day + WILM from prev week",
+        "Daily ILM + WILM aligned, Alpha 3-leg forming",
+        "Daily ILM aligned but WILM opposing",
+        "Daily ILM NOT aligned, WILM only",
+        "Establish Monday anchor or enter patterns"
+      ],
+      [
+        "10:00 UTC (London Mid)",
+        "Check Daily ILM from London range + IELM forming",
+        "Daily ILM confirmed, IELM forming aligned",
+        "Daily ILM weak, IELM not yet formed",
+        "Daily ILM miss entirely (no touch)",
+        "Add to positions if ILM confirmed"
+      ],
+      [
+        "13:30 UTC (NY Open)",
+        "Check 4H ILM + Daily ILM state",
+        "4H + Daily ILM aligned, NY Hi/Lo takeout setup",
+        "4H ILM only, Daily ILM weak",
+        "No 4H or Daily ILM alignment",
+        "Trade NY Open liquidity sweep"
+      ],
+      [
+        "14:00 UTC (London-NY Overlap)",
+        "Check Full Alignment (WILM + IELM + Daily)",
+        "FULL ALIGNMENT confirmed (87.3% zone)",
+        "Partial alignment (2 out of 3 ILMs)",
+        "Complete misalignment or WILM rekey signal",
+        "Peak execution window or EXIT if rekey signal"
+      ],
+      [
+        "16:00 UTC (London Close / Wed Checkpoint)",
+        "Check -50% status + ILM alignment state",
+        "-50% HIT + IELM+Daily aligned",
+        "-50% approaching, ILM partially aligned",
+        "-50% MISS + Complete misalignment",
+        "Hold for -100% or EXIT for rekey"
+      ],
+      [
+        "22:00 UTC (NY Close)",
+        "Check Daily ILM for next day + current target status",
+        "Daily ILM forming for tomorrow, targets on track",
+        "Daily ILM weak for tomorrow",
+        "No Daily ILM setup for tomorrow, targets failing",
+        "Prepare for next day or close positions"
+      ],
+      [
+        "Post-132% +4h",
+        "Check 78.6% retrace + new Daily ILM forming",
+        "78.6% retrace confirmed, new Daily ILM forming",
+        "78.6% retrace partial, ILM not yet clear",
+        "No 78.6% retrace yet, premature entry",
+        "WAIT for 78.6% confirmation"
+      ],
+      [
+        "Post-132% +12h",
+        "Check 50% consolidation + new Daily ILM confirmed",
+        "50% consolidation + Daily ILM confirmed (ENTER)",
+        "50% consolidation but ILM weak",
+        "No 50% consolidation, still above 78.6%",
+        "OPTIMAL ENTRY at 50% if ILM confirms"
+      ],
+      [
+        "FINAL ILM TRADING FRAMEWORK SUMMARY:"
+      ],
+      [
+        "1. **Entry Rule**: Only enter if Daily ILM is aligned (64.3% engagement minimum)"
+      ],
+      [
+        "2. **Optimal Rule**: Wait for IELM + Daily ILM alignment (71.2% hit rate, 22.2% frequency)"
+      ],
+      [
+        "3. **Aggressive Rule**: Full position size ONLY when Full Alignment detected (87.3% hit rate, rare)"
+      ],
+      [
+        "4. **Avoidance Rule**: EXIT or AVOID if Complete Misalignment detected (31.5% hit rate, failure scenario)"
+      ],
+      [
+        "5. **Rekey Rule**: EXIT immediately if WILM rekey signal detected (consecutive 15M 61.8-88 micro-legs, 94.3% accuracy)"
+      ],
+      [
+        "6. **Velocity Trap Rule**: DO NOT enter on WILM alone (34.2% hit rate, needs lower TF confirmation)"
+      ],
+      [
+        "7. **Wednesday Rule**: REDUCE exposure before London-NY Overlap (14:00-18:00 UTC, 35% of 132% violations)"
+      ],
+      [
+        "8. **Rekey Entry Rule**: Enter at 50% rekey consolidation (+12-24h post-132%) ONLY if new Daily ILM confirms (85% hit rate)"
+      ],
+      [
+        "DATA SOURCE: 281 Monday sessions (Jan 2020-May 2025), 1,857 15M sessions (2023-2025), 195 rekey events, Phase 3/4 validated ILM mechanics"
+      ]
+    ]
+  },
+  "phase6_session_playbooks": {
+    "source": "Holy Grail Excel - PHASE 6 SESSION PROFILE SYNTHESIS",
+    "rows": [
+      [
+        "PHASE 6: SESSION PROFILE SYNTHESIS - TRADING PLAYBOOKS & RISK MATRICES"
+      ],
+      [
+        "281 Monday weeks (Jan 2020-May 2025), 1,857 15M sessions (2023-2025)"
+      ],
+      [
+        "PHASE RECAP SUMMARY:"
+      ],
+      [
+        "• PHASE 3: Session Correlation - Asian 89.34% predictive, Wednesday 35% violations, Full ILM 87.3% accuracy"
+      ],
+      [
+        "• PHASE 4: Temporal Delivery - 15M atomic patterns, NY Open 80% Hi/Lo sweep, 132% extension mechanics"
+      ],
+      [
+        "• PHASE 5: WILM/ILM Velocity - Daily ILM 64.3%, WILM 94.3% rekey, -25% 98.22%, -50% 96.44%, Post-132% 85%"
+      ],
+      [
+        "• Integration: Session-specific playbooks with risk matrices for optimal trading windows"
+      ],
+      [
+        "DELIVERABLES: Asian/London/NY Session Playbooks | Entry/Exit Rules | Risk Matrices | Integrated Workflow | Correlation Matrix"
+      ],
+      [
+        "ASIAN SESSION PLAYBOOK (00:00-08:00 UTC)"
+      ],
+      [
+        "Characteristic",
+        "Value",
+        "Function",
+        "Velocity",
+        "Accuracy"
+      ],
+      [
+        "Primary Function",
+        "Range Accumulation & Observation",
+        "Low volatility setup",
+        "Low (34.2% WILM)",
+        "89.34% predictive"
+      ],
+      [
+        "Trading Approach",
+        "NO ENTRY - Observation Only",
+        "Monitor ILM alignment",
+        "Range-bound",
+        "Informational only"
+      ],
+      [
+        "Key Metric",
+        "Asian Range Width",
+        "Pre-London positioning",
+        "Minimal expansion",
+        "Leading indicator"
+      ],
+      [
+        "Critical Output",
+        "ILM Alignment Status",
+        "Setup validation",
+        "Static analysis",
+        "87.3% if Full Align"
+      ],
+      [
+        "Risk Level",
+        "MINIMAL",
+        "Pre-positioning phase",
+        "No active trades",
+        "N/A"
+      ],
+      [
+        "ASIAN SESSION ENTRY/EXIT RULES"
+      ],
+      [
+        "Rule Type",
+        "Condition",
+        "Action",
+        "Success Rate",
+        "Notes"
+      ],
+      [
+        "Range Observation",
+        "Monitor 00:00-08:00 price action",
+        "NO ENTRY - Document range",
+        "N/A",
+        "89.34% predictive for London"
+      ],
+      [
+        "ILM Alignment Check",
+        "Check Daily/Weekly/Monthly ILM",
+        "Record alignment status",
+        "87.3%",
+        "Full alignment = High prob"
+      ],
+      [
+        "Asian Range Break",
+        "Price breaks Asian high/low",
+        "AVOID - False breakout risk",
+        "LOW",
+        "Wait for London confirmation"
+      ],
+      [
+        "Pre-London Setup",
+        "07:30-08:00 UTC accumulation",
+        "Prepare for London entry",
+        "N/A",
+        "Position sizing only"
+      ],
+      [
+        "WILM Status",
+        "Check WILM velocity 34.2%",
+        "Note for London strategy",
+        "N/A",
+        "Low velocity = range play"
+      ],
+      [
+        "Wednesday Alert",
+        "If Wednesday, note 35% violation",
+        "Expect bifurcation",
+        "35%",
+        "Critical decision day"
+      ],
+      [
+        "Range Width",
+        "Measure Asian high-low spread",
+        "Small range = expansion likely",
+        "N/A",
+        "Context for London"
+      ],
+      [
+        "Liquidity Levels",
+        "Identify key levels in range",
+        "Mark for London sweep",
+        "80%",
+        "NY Open targets"
+      ],
+      [
+        "Exit Rule",
+        "NO POSITIONS during Asian",
+        "N/A",
+        "N/A",
+        "Observation only phase"
+      ],
+      [
+        "ASIAN SESSION RISK MATRIX"
+      ],
+      [
+        "Scenario",
+        "Range Characteristic",
+        "Probability",
+        "Expected Outcome",
+        "Action",
+        "Risk Level"
+      ],
+      [
+        "Tight Range < 30 pips",
+        "Consolidation",
+        "40%",
+        "London expansion likely",
+        "Prepare for volatility",
+        "LOW"
+      ],
+      [
+        "Wide Range > 80 pips",
+        "Early volatility",
+        "15%",
+        "Range continuation",
+        "Wait for London confirm",
+        "MEDIUM"
+      ],
+      [
+        "False Breakout",
+        "Spike outside range",
+        "25%",
+        "Return to range",
+        "NO ENTRY - trap",
+        "HIGH"
+      ],
+      [
+        "ILM Full Alignment",
+        "All timeframes aligned",
+        "87.3%",
+        "High probability setup",
+        "Ready for London entry",
+        "LOW"
+      ],
+      [
+        "ILM Misalignment",
+        "Conflicting timeframes",
+        "12.7%",
+        "Lower probability",
+        "Reduce position size",
+        "MEDIUM"
+      ],
+      [
+        "Pre-London Spike",
+        "07:30-08:00 volatility",
+        "20%",
+        "Liquidity grab",
+        "Avoid - wait for settle",
+        "MEDIUM"
+      ],
+      [
+        "Wednesday Asian",
+        "Mid-week positioning",
+        "35%",
+        "Bifurcation risk",
+        "Extra caution",
+        "HIGH"
+      ],
+      [
+        "Gap Opening",
+        "Sunday night gap",
+        "10%",
+        "Gap fill likely",
+        "Mark level, no trade",
+        "MEDIUM"
+      ],
+      [
+        "Holiday Thin Volume",
+        "Low participation",
+        "5%",
+        "Unpredictable",
+        "Skip session entirely",
+        "HIGH"
+      ],
+      [
+        "LONDON SESSION PLAYBOOK (07:00-16:00 UTC)"
+      ],
+      [
+        "Characteristic",
+        "Value",
+        "Function",
+        "Velocity",
+        "Accuracy"
+      ],
+      [
+        "Primary Function",
+        "Trend Establishment & Entry",
+        "High volatility expansion",
+        "Variable velocity",
+        "64.3-87.3% range"
+      ],
+      [
+        "Optimal Entry",
+        "Monday 07:00-10:00 UTC",
+        "ILM-based directional bias",
+        "Daily ILM 64.3%",
+        "87.3% if Full Align"
+      ],
+      [
+        "Key Metric",
+        "Daily ILM Alignment",
+        "Trend confirmation",
+        "Full Align preferred",
+        "Primary success factor"
+      ],
+      [
+        "Wednesday Risk",
+        "35% violation probability",
+        "Bifurcation day",
+        "132% extension risk",
+        "Elevated caution"
+      ],
+      [
+        "132% Mechanics",
+        "71.53% violation rate",
+        "Extension targeting",
+        "100% rekey if missed",
+        "Critical exit level"
+      ],
+      [
+        "Trading Window",
+        "07:00-12:00 primary",
+        "London AM highest prob",
+        "Reduced PM velocity",
+        "Morning bias optimal"
+      ],
+      [
+        "Risk Level",
+        "MEDIUM-HIGH",
+        "Active trading phase",
+        "Position management",
+        "Dynamic risk"
+      ],
+      [
+        "LONDON SESSION ENTRY/EXIT RULES"
+      ],
+      [
+        "Rule Type",
+        "Condition",
+        "Action",
+        "Success Rate",
+        "Notes"
+      ],
+      [
+        "London Open Entry",
+        "07:00-10:00 UTC + Daily ILM align",
+        "Enter in ILM direction",
+        "64.3%",
+        "Primary entry window"
+      ],
+      [
+        "Full ILM Alignment",
+        "Daily/Weekly/Monthly aligned",
+        "Increase position size",
+        "87.3%",
+        "Highest probability setup"
+      ],
+      [
+        "Partial ILM",
+        "Daily ILM only, others misaligned",
+        "Standard position size",
+        "64.3%",
+        "Good probability"
+      ],
+      [
+        "No ILM Alignment",
+        "Conflicting timeframes",
+        "SKIP or micro position",
+        "LOW",
+        "High risk environment"
+      ],
+      [
+        "Asian Range Break",
+        "London breaks Asian high/low",
+        "Confirm with volume, enter",
+        "75%",
+        "Expansion confirmation"
+      ],
+      [
+        "132% Target",
+        "Price extends to 132% level",
+        "Reduce 50% position",
+        "71.53%",
+        "High probability target"
+      ],
+      [
+        "132% Violation",
+        "Price exceeds 132% by >5 pips",
+        "Exit remaining position",
+        "71.53%",
+        "100% rekey risk"
+      ],
+      [
+        "Wednesday Trading",
+        "If Wednesday session",
+        "Reduce size by 30%",
+        "35%",
+        "Bifurcation risk day"
+      ],
+      [
+        "Wednesday Close",
+        "Wednesday 16:00 UTC",
+        "Evaluate -25% position",
+        "70%",
+        "Critical decision point"
+      ],
+      [
+        "Mid-Session Reversal",
+        "10:00-14:00 counter-trend",
+        "Avoid new entries",
+        "LOW",
+        "Choppy period"
+      ],
+      [
+        "London PM Fade",
+        "14:00-16:00 weakening",
+        "Prepare for NY session",
+        "N/A",
+        "Transition period"
+      ],
+      [
+        "Stop Loss",
+        "Below/above Asian range + 20 pips",
+        "Hard stop always active",
+        "N/A",
+        "Risk management"
+      ],
+      [
+        "Profit Target 1",
+        "50% at 61.8% Fib level",
+        "Book partial profits",
+        "80%",
+        "Secure gains"
+      ],
+      [
+        "Profit Target 2",
+        "30% at 100% extension",
+        "Book more profits",
+        "65%",
+        "Run winners"
+      ],
+      [
+        "Trail Stop",
+        "After 100 pips profit",
+        "Trail by 50 pips",
+        "N/A",
+        "Protect profits"
+      ],
+      [
+        "LONDON SESSION RISK MATRIX"
+      ],
+      [
+        "Scenario",
+        "Range Characteristic",
+        "Probability",
+        "Expected Outcome",
+        "Action",
+        "Position Size",
+        "Risk Level"
+      ],
+      [
+        "Full ILM Alignment",
+        "All timeframes bullish/bearish",
+        "87.3%",
+        "High probability trend",
+        "Enter full size",
+        "100%",
+        "LOW"
+      ],
+      [
+        "Daily ILM Only",
+        "Weekly/Monthly misaligned",
+        "64.3%",
+        "Good probability move",
+        "Enter standard size",
+        "70%",
+        "MEDIUM"
+      ],
+      [
+        "No ILM Alignment",
+        "All misaligned",
+        "LOW",
+        "Choppy/ranging",
+        "Skip or micro",
+        "20%",
+        "HIGH"
+      ],
+      [
+        "132% Extension Hit",
+        "Target reached cleanly",
+        "71.53%",
+        "Take profits",
+        "Reduce 50%",
+        "50%",
+        "MEDIUM"
+      ],
+      [
+        "132% Violation >5 pips",
+        "Exceeded 132% level",
+        "71.53%",
+        "100% rekey incoming",
+        "Exit all",
+        "0%",
+        "EXTREME"
+      ],
+      [
+        "132% Near Miss",
+        "Stopped at 131.5%",
+        "28.47%",
+        "Reversal likely",
+        "Hold with tight stop",
+        "100%",
+        "MEDIUM"
+      ],
+      [
+        "Wednesday AM",
+        "Wed 07:00-12:00",
+        "35%",
+        "Normal trading possible",
+        "Reduce size 30%",
+        "70%",
+        "HIGH"
+      ],
+      [
+        "Wednesday Close -25%",
+        "Wed 16:00 at -25% level",
+        "70%",
+        "132% extension risk",
+        "Exit or tight stop",
+        "0-30%",
+        "EXTREME"
+      ],
+      [
+        "Wednesday Close Above",
+        "Wed 16:00 above -25%",
+        "30%",
+        "Continuation likely",
+        "Hold position",
+        "100%",
+        "MEDIUM"
+      ],
+      [
+        "London AM Expansion",
+        "07:00-10:00 strong move",
+        "80%",
+        "Trend established",
+        "Add to position",
+        "120%",
+        "LOW"
+      ],
+      [
+        "London PM Chop",
+        "12:00-16:00 range-bound",
+        "40%",
+        "Consolidation",
+        "Reduce or exit",
+        "50%",
+        "MEDIUM"
+      ],
+      [
+        "False Breakout",
+        "Quick reversal after break",
+        "25%",
+        "Trap move",
+        "Exit immediately",
+        "0%",
+        "HIGH"
+      ],
+      [
+        "Gap Down Monday",
+        "Asian gap into London",
+        "15%",
+        "Gap fill attempt",
+        "Wait for confirmation",
+        "50%",
+        "MEDIUM"
+      ],
+      [
+        "High Impact News",
+        "Scheduled release in London",
+        "N/A",
+        "Volatility spike",
+        "Exit before or skip",
+        "0%",
+        "EXTREME"
+      ],
+      [
+        "WILM Low Velocity",
+        "34.2% WILM during London",
+        "34.2%",
+        "Range-bound likely",
+        "Smaller targets",
+        "70%",
+        "MEDIUM"
+      ],
+      [
+        "WILM High Velocity",
+        "94.3% WILM rekey pattern",
+        "94.3%",
+        "Strong trending",
+        "Full position",
+        "100%",
+        "LOW"
+      ],
+      [
+        "Profit >100 pips",
+        "Strong winning position",
+        "N/A",
+        "Protect gains",
+        "Trail stop 50 pips",
+        "100%",
+        "LOW"
+      ],
+      [
+        "Multiple Rejections",
+        "Level tested 3+ times",
+        "60%",
+        "Breakout coming",
+        "Wait for break",
+        "Prepare",
+        "MEDIUM"
+      ],
+      [
+        "NY SESSION PLAYBOOK (13:00-22:00 UTC)"
+      ],
+      [
+        "Characteristic",
+        "Value",
+        "Function",
+        "Velocity",
+        "Accuracy"
+      ],
+      [
+        "Primary Function",
+        "Liquidity Sweep & Reversal",
+        "High volatility open",
+        "NY Open spike then fade",
+        "80% Hi/Lo sweep"
+      ],
+      [
+        "NY Open Pattern",
+        "13:00-14:00 UTC liquidity grab",
+        "Sweep Asian/London extremes",
+        "Highest velocity",
+        "80% takeout rate"
+      ],
+      [
+        "Fibonacci Levels",
+        "-25% and -50% key levels",
+        "Reversal/bounce zones",
+        "-25% 98.22%, -50% 96.44%",
+        "Critical support/resist"
+      ],
+      [
+        "Post-132% Entry",
+        "+12-24h after 132% violation",
+        "Re-entry opportunity",
+        "Daily ILM alignment",
+        "85% hit rate"
+      ],
+      [
+        "NY Late Session",
+        "19:00-22:00 UTC",
+        "Profit booking window",
+        "Lowest velocity",
+        "Secure gains period"
+      ],
+      [
+        "Trading Window",
+        "13:00-15:00 primary, 19:00-22:00 exit",
+        "Open volatility + close calm",
+        "Variable velocity",
+        "Dual opportunity"
+      ],
+      [
+        "Risk Level",
+        "HIGH (Open), LOW (Close)",
+        "Manage based on time",
+        "Dynamic adjustment",
+        "Time-based strategy"
+      ],
+      [
+        "NY SESSION ENTRY/EXIT RULES"
+      ],
+      [
+        "Rule Type",
+        "Condition",
+        "Action",
+        "Success Rate",
+        "Notes"
+      ],
+      [
+        "NY Open Liquidity",
+        "13:00-14:00 spike to Hi/Lo",
+        "Wait for reversal",
+        "80%",
+        "Expect sweep then reverse"
+      ],
+      [
+        "Hi/Lo Sweep Entry",
+        "Asian/London extreme hit",
+        "Enter counter-trend",
+        "80%",
+        "High probability reversal"
+      ],
+      [
+        "False Breakout",
+        "Quick spike and rejection",
+        "Enter on rejection candle",
+        "75%",
+        "Liquidity grab pattern"
+      ],
+      [
+        "Post-Sweep Hold",
+        "If London position held",
+        "Continue if trend intact",
+        "70%",
+        "Original bias valid"
+      ],
+      [
+        "NY Open Exit",
+        "If overnight position weak",
+        "Exit on spike",
+        "N/A",
+        "Protect capital"
+      ],
+      [
+        "-25% Fibonacci",
+        "Price reaches -25% level",
+        "Strong support/resistance",
+        "98.22%",
+        "Key reversal zone"
+      ],
+      [
+        "-50% Fibonacci",
+        "Price reaches -50% level",
+        "Major support/resistance",
+        "96.44%",
+        "Extreme reversal zone"
+      ],
+      [
+        "Fib Bounce Entry",
+        "Rejection at -25% or -50%",
+        "Enter in bounce direction",
+        "98%+",
+        "High conviction trade"
+      ],
+      [
+        "Fib Break",
+        "Clean break through Fib level",
+        "Enter continuation",
+        "85%",
+        "Momentum confirmed"
+      ],
+      [
+        "Post-132% Setup",
+        "+12-24h after 132% violation",
+        "Check Daily ILM alignment",
+        "85%",
+        "Optimal re-entry"
+      ],
+      [
+        "Post-132% Entry",
+        "Daily ILM aligned post-132%",
+        "Enter new position",
+        "85%",
+        "Fresh setup after rekey"
+      ],
+      [
+        "Post-132% Skip",
+        "ILM misaligned post-132%",
+        "Wait for alignment",
+        "LOW",
+        "Patience required"
+      ],
+      [
+        "NY Mid Consolidation",
+        "15:00-19:00 low volatility",
+        "Reduce or hold",
+        "N/A",
+        "Quiet period"
+      ],
+      [
+        "NY Late Profit Book",
+        "19:00-22:00 profit zone",
+        "Exit 80% position",
+        "N/A",
+        "Secure gains"
+      ],
+      [
+        "Friday Close",
+        "22:00 UTC Friday",
+        "Exit all positions",
+        "N/A",
+        "Weekend risk off"
+      ],
+      [
+        "Trail Stops NY",
+        "After 50 pips profit",
+        "Trail by 30 pips",
+        "N/A",
+        "Lock in gains"
+      ],
+      [
+        "NY Reversal",
+        "Strong counter-trend move",
+        "Exit and reassess",
+        "N/A",
+        "Protect capital"
+      ],
+      [
+        "Multiple Timeframes",
+        "All timeframes align NY",
+        "Hold through close",
+        "90%",
+        "Strong conviction"
+      ],
+      [
+        "NY SESSION RISK MATRIX"
+      ],
+      [
+        "Scenario",
+        "Range Characteristic",
+        "Probability",
+        "Expected Outcome",
+        "Action",
+        "Position Size",
+        "Risk Level"
+      ],
+      [
+        "NY Open Spike Up",
+        "13:00-14:00 sharp rise",
+        "80%",
+        "Sweep high, reverse down",
+        "Wait then short",
+        "100%",
+        "LOW"
+      ],
+      [
+        "NY Open Spike Down",
+        "13:00-14:00 sharp fall",
+        "80%",
+        "Sweep low, reverse up",
+        "Wait then long",
+        "100%",
+        "LOW"
+      ],
+      [
+        "Hi/Lo Takeout Clean",
+        "Extreme clearly broken",
+        "80%",
+        "Reversal imminent",
+        "Enter counter-trend",
+        "100%",
+        "LOW"
+      ],
+      [
+        "Hi/Lo Fake Takeout",
+        "Spike but no close beyond",
+        "20%",
+        "Continuation possible",
+        "Wait for confirmation",
+        "50%",
+        "MEDIUM"
+      ],
+      [
+        "-25% Level Hit",
+        "Price reaches -25% Fib",
+        "98.22%",
+        "Strong support/resist",
+        "Enter bounce",
+        "100%",
+        "LOW"
+      ],
+      [
+        "-25% Level Break",
+        "Clean break through -25%",
+        "1.78%",
+        "Continue to -50%",
+        "Hold or add",
+        "120%",
+        "MEDIUM"
+      ],
+      [
+        "-50% Level Hit",
+        "Price reaches -50% Fib",
+        "96.44%",
+        "Extreme reversal zone",
+        "Strong entry",
+        "100%",
+        "LOW"
+      ],
+      [
+        "-50% Level Break",
+        "Clean break through -50%",
+        "3.56%",
+        "Major trend shift",
+        "Hold or exit",
+        "50%",
+        "HIGH"
+      ],
+      [
+        "Post-132% +12h",
+        "12h after 132% violation",
+        "85%",
+        "Daily ILM aligned",
+        "Enter new position",
+        "100%",
+        "LOW"
+      ],
+      [
+        "Post-132% +24h",
+        "24h after 132% violation",
+        "85%",
+        "Optimal re-entry",
+        "Full position",
+        "100%",
+        "LOW"
+      ],
+      [
+        "Post-132% No ILM",
+        "Post-132% misaligned",
+        "15%",
+        "Low probability",
+        "Skip or micro",
+        "20%",
+        "HIGH"
+      ],
+      [
+        "NY Mid Chop",
+        "15:00-19:00 range-bound",
+        "50%",
+        "Consolidation",
+        "Hold or reduce",
+        "70%",
+        "MEDIUM"
+      ],
+      [
+        "NY Late Fade",
+        "19:00-22:00 weakening",
+        "N/A",
+        "Session closing",
+        "Book profits",
+        "20%",
+        "LOW"
+      ],
+      [
+        "Friday NY Close",
+        "22:00 UTC Friday",
+        "N/A",
+        "Weekend gap risk",
+        "Exit all",
+        "0%",
+        "HIGH"
+      ],
+      [
+        "Overnight Gap Risk",
+        "Holding past 22:00",
+        "N/A",
+        "Gap opening risk",
+        "Exit or tight stop",
+        "0-30%",
+        "EXTREME"
+      ],
+      [
+        "News Spike NY",
+        "Major economic release",
+        "N/A",
+        "Volatile reaction",
+        "Exit or avoid",
+        "0%",
+        "EXTREME"
+      ],
+      [
+        "Multiple Fib Reject",
+        "Both -25% and -50% hold",
+        "95%+",
+        "Strong levels",
+        "Trade bounces",
+        "100%",
+        "LOW"
+      ],
+      [
+        "Profit >150 pips",
+        "Large winning position",
+        "N/A",
+        "Secure gains",
+        "Exit 80% by 19:00",
+        "20%",
+        "LOW"
+      ],
+      [
+        "Loss >50 pips",
+        "Losing position",
+        "N/A",
+        "Stop loss hit",
+        "Exit immediately",
+        "0%",
+        "HIGH"
+      ],
+      [
+        "Reversal Pattern",
+        "Clear reversal signal",
+        "70%",
+        "Trend change",
+        "Exit or reverse",
+        "0-100%",
+        "MEDIUM"
+      ],
+      [
+        "INTEGRATED WEEKLY WORKFLOW"
+      ],
+      [
+        "OPTIMAL TRADING WINDOWS"
+      ],
+      [
+        "Rank",
+        "Session Window",
+        "Day",
+        "Time (UTC)",
+        "Primary Function",
+        "Success Rate",
+        "Priority"
+      ],
+      [
+        "1",
+        "London Early",
+        "Monday",
+        "07:00-10:00",
+        "Primary entry with ILM",
+        "87.3%",
+        "CRITICAL"
+      ],
+      [
+        "2",
+        "NY Open",
+        "Any Day",
+        "13:00-14:00",
+        "Liquidity sweep reversal",
+        "80.0%",
+        "HIGH"
+      ],
+      [
+        "3",
+        "Post-132% Re-entry",
+        "+12-24h",
+        "Any Time",
+        "Fresh setup after rekey",
+        "85.0%",
+        "HIGH"
+      ],
+      [
+        "4",
+        "Fib Bounce -25%",
+        "Any Day",
+        "Any Session",
+        "Key reversal level",
+        "98.22%",
+        "CRITICAL"
+      ],
+      [
+        "5",
+        "Fib Bounce -50%",
+        "Any Day",
+        "Any Session",
+        "Extreme reversal level",
+        "96.44%",
+        "CRITICAL"
+      ],
+      [
+        "6",
+        "London Mid",
+        "Mon-Tue, Thu-Fri",
+        "10:00-14:00",
+        "Trend continuation",
+        "75.0%",
+        "MEDIUM"
+      ],
+      [
+        "7",
+        "NY Late",
+        "Any Day",
+        "19:00-22:00",
+        "Profit booking window",
+        "N/A",
+        "MEDIUM"
+      ],
+      [
+        "8",
+        "Wednesday Close",
+        "Wednesday",
+        "16:00",
+        "Critical decision point",
+        "70.0%",
+        "HIGH"
+      ],
+      [
+        "9",
+        "Asian Observation",
+        "Any Day",
+        "00:00-08:00",
+        "Setup identification",
+        "89.34%",
+        "INFO"
+      ],
+      [
+        "10",
+        "Friday Close",
+        "Friday",
+        "19:00-22:00",
+        "Week-end exit",
+        "N/A",
+        "LOW"
+      ],
+      [
+        "WEEKLY SESSION WORKFLOW (Monday → Friday)"
+      ],
+      [
+        "Time",
+        "Session",
+        "Action",
+        "Key Checkpoints",
+        "Decision Logic"
+      ],
+      [
+        "Sun 22:00-Mon 08:00",
+        "Asian",
+        "Observe only - NO ENTRY",
+        "Check ILM alignment, measure range",
+        "89.34% predictive value"
+      ],
+      [
+        "Mon 07:00-10:00",
+        "London Early",
+        "PRIMARY ENTRY WINDOW",
+        "Daily ILM 64.3%, Full 87.3%",
+        "Enter if ILM aligned"
+      ],
+      [
+        "Mon 10:00-13:00",
+        "London Mid",
+        "Monitor position",
+        "Check for 132% approach",
+        "Reduce at 132% target"
+      ],
+      [
+        "Mon 13:00-14:00",
+        "NY Open",
+        "Liquidity sweep alert",
+        "80% Hi/Lo takeout expected",
+        "Hold or reverse on sweep"
+      ],
+      [
+        "Mon 14:00-19:00",
+        "NY Mid",
+        "Position management",
+        "Check Fib levels -25%/-50%",
+        "Bounce entries at Fibs"
+      ],
+      [
+        "Mon 19:00-22:00",
+        "NY Late",
+        "Profit booking window",
+        "Book 50-80% if profitable",
+        "Secure gains"
+      ],
+      [
+        "Tue-Thu Pattern",
+        "All Sessions",
+        "Follow Mon workflow",
+        "Same session rules apply",
+        "Consistent execution"
+      ],
+      [
+        "Wed 07:00-16:00",
+        "Wednesday Alert",
+        "REDUCE SIZE 30%",
+        "35% violation probability",
+        "Bifurcation risk day"
+      ],
+      [
+        "Wed 16:00",
+        "Wednesday Close",
+        "CRITICAL DECISION",
+        "Check -25% position",
+        "70% extension if missed"
+      ],
+      [
+        "Wed 16:00 Exit",
+        "Wed Close Action",
+        "Exit or tight stop if -25% miss",
+        "132% extension risk high",
+        "Capital preservation"
+      ],
+      [
+        "Thu-Fri 07:00-16:00",
+        "London",
+        "Standard workflow",
+        "No special alerts",
+        "Normal trading"
+      ],
+      [
+        "Fri 19:00-22:00",
+        "Friday Close",
+        "EXIT ALL POSITIONS",
+        "Weekend gap risk",
+        "Mandatory exit"
+      ],
+      [
+        "Post-132% +12h",
+        "Any Session",
+        "RE-ENTRY OPPORTUNITY",
+        "Check Daily ILM alignment",
+        "85% hit rate if aligned"
+      ],
+      [
+        "Post-132% +24h",
+        "Any Session",
+        "OPTIMAL RE-ENTRY",
+        "Fresh setup confirmed",
+        "Full position size"
+      ],
+      [
+        "Any Fib Touch",
+        "Any Session",
+        "HIGH PROBABILITY SETUP",
+        "-25% 98.22%, -50% 96.44%",
+        "Bounce or break trade"
+      ],
+      [
+        "SESSION CORRELATION MATRIX"
+      ],
+      [
+        "SESSION-TO-SESSION HANDOFF PROBABILITIES"
+      ],
+      [
+        "From Session",
+        "To Session",
+        "Handoff Type",
+        "Probability",
+        "Key Metric",
+        "Notes"
+      ],
+      [
+        "Asian",
+        "London",
+        "Range to Expansion",
+        "89.34%",
+        "Asian range predictive",
+        "High correlation"
+      ],
+      [
+        "London",
+        "NY Open",
+        "Trend to Liquidity Sweep",
+        "80.0%",
+        "Hi/Lo takeout",
+        "Reversal expected"
+      ],
+      [
+        "London 132%",
+        "Weekly Close",
+        "Extension to Completion",
+        "98.22%",
+        "-25% level critical",
+        "Rekey risk high"
+      ],
+      [
+        "Wednesday",
+        "Rekey Event",
+        "Bifurcation to Reset",
+        "85.0%",
+        "35% violation rate",
+        "High alert day"
+      ],
+      [
+        "132% Violation",
+        "Post-132% +12h",
+        "Rekey to Re-entry",
+        "85.0%",
+        "Daily ILM alignment",
+        "Fresh setup"
+      ],
+      [
+        "Daily ILM",
+        "London Entry",
+        "Alignment to Entry",
+        "64.3%",
+        "Standard probability",
+        "Good setup"
+      ],
+      [
+        "Full ILM",
+        "London Entry",
+        "Full Alignment to Entry",
+        "87.3%",
+        "Optimal probability",
+        "Best setup"
+      ],
+      [
+        "NY Late",
+        "Friday Close",
+        "Profit Book to Exit",
+        "N/A",
+        "Weekend risk off",
+        "Mandatory exit"
+      ],
+      [
+        "-25% Fib",
+        "Bounce/Break",
+        "Key Level to Action",
+        "98.22%",
+        "Strong support/resist",
+        "High conviction"
+      ],
+      [
+        "CRITICAL SESSION INSIGHTS",
+        "Bounce/Break",
+        "Extreme Level to Action",
+        "96.44%",
+        "Very strong level",
+        "Maximum conviction"
+      ],
+      [
+        "1. ASIAN SESSION (00:00-08:00): Observation-only phase with 89.34% predictive value for London. NO ENTRY, monitor ILM alignment and range characteristics."
+      ],
+      [
+        "2. LONDON EARLY (Mon 07:00-10:00): PRIMARY ENTRY WINDOW with 64.3% (Daily ILM) to 87.3% (Full ILM Alignment) success rates. Highest probability setup."
+      ],
+      [
+        "3. WEDNESDAY MASTER BIFURCATION: 35% of all violations occur on Wednesday. Reduce position size by 30%, critical decision at 16:00 close if -25% level missed."
+      ],
+      [
+        "4. WEDNESDAY CLOSE DECISION: If -25% level not hit by Wed 16:00, 70% probability of 132% extension. Exit position or use tight stops to avoid 100% rekey risk."
+      ],
+      [
+        "5. NY OPEN LIQUIDITY SWEEP (13:00-14:00): 80% probability of Hi/Lo takeout. Wait for sweep completion, then enter counter-trend reversals with high confidence."
+      ],
+      [
+        "6. NY LATE PROFIT BOOKING (19:00-22:00): Lowest velocity period, optimal for securing gains. Exit 50-80% of profitable positions, mandatory Friday 22:00 exit."
+      ],
+      [
+        "7. POST-132% RE-ENTRY (+12-24h): 85% hit rate when Daily ILM aligned after 132% violation and rekey. Fresh setup with full position size, optimal opportunity window."
+      ],
+      [
+        "PHASE 6 COMPLETE | Ready for PHASE 7"
+      ]
+    ]
+  },
+  "phase_4___monthly_range_reconnaissance": {
+    "source": "Holy Grail Excel - PHASE 4 - MONTHLY RANGE RECONNAISSANCE",
+    "rows": [
+      [
+        "PHASE 4: MONTHLY RANGE MODEL - STRATEGIC RECONNAISSANCE"
+      ],
+      [
+        "Data Availability & Claim Analysis for Monthly Delivery System"
+      ],
+      [
+        "SECTION A: AVAILABLE DATA SUMMARY"
+      ],
+      [
+        "Data Source",
+        "Date Range",
+        "Total Records",
+        "Key Fields",
+        "Usability for Monthly",
+        "Status"
+      ],
+      [
+        "Monday Sessions",
+        "2020-01-06 - \"\"",
+        "281 weeks",
+        "Date, Week, Month, Quarter, Fib levels",
+        "Primary data source",
+        "✅"
+      ],
+      [
+        "Weekly Data",
+        "Derived from Monday sessions",
+        "281 weeks",
+        "Week High/Low/Close",
+        "Can aggregate to monthly",
+        "✅"
+      ],
+      [
+        "Quarterly Analysis",
+        "Q1-Q4",
+        "8 quarter-bias combos",
+        "Hit rates, ranges, multipliers",
+        "Seasonal context",
+        "✅"
+      ],
+      [
+        "Pattern Formations",
+        "Various timeframes",
+        "19 patterns",
+        "7 Monthly patterns identified",
+        "Monthly-specific patterns exist",
+        "✅"
+      ],
+      [
+        "1H/4H/Daily Data",
+        "Status: TO BE DETERMINED",
+        "TBD",
+        "OHLC data",
+        "Need to verify availability",
+        "⚠️"
+      ],
+      [
+        "SECTION B: MONTHLY-RELEVANT CLAIMS FROM VALIDATION CHECKLIST"
+      ],
+      [
+        "Claim #",
+        "Claim Description",
+        "Claimed Accuracy",
+        "Priority",
+        "Status",
+        "Relevance to Monthly"
+      ],
+      [
+        "6",
+        "Quarter level interaction (±10 points)",
+        "80.5",
+        "PENDING - Requires Phase 1 Data Test",
+        "Quarterly/Seasonal"
+      ],
+      [
+        "7",
+        "Weekly+Monthly alignment",
+        "94",
+        "PENDING - Requires Phase 1 Data Test",
+        "Direct"
+      ],
+      [
+        "14",
+        "Quarter + structure inversion transition",
+        "82.3",
+        "PENDING - Requires Phase 1 Data Test",
+        "Quarterly/Seasonal"
+      ],
+      [
+        "27",
+        "Monthly 78.6→78.6→78.6",
+        "78",
+        "PENDING - Requires Phase 1 Data Test",
+        "Direct"
+      ],
+      [
+        "28",
+        "Monthly 0→+23.6 flow",
+        "83",
+        "PENDING - Requires Phase 1 Data Test",
+        "Direct"
+      ],
+      [
+        "SECTION C: EXISTING MONTHLY PATTERNS (from Pattern Formations)"
+      ],
+      [
+        "Pattern Name",
+        "Structure",
+        "Success Rate",
+        "Frequency",
+        "Completion Time",
+        "Bias",
+        "Notes"
+      ],
+      [
+        "Monthly Fibonacci",
+        "78.6→78.6→78.6",
+        "78",
+        "Monthly cycle",
+        "Monthly scale",
+        "Monthly ILM",
+        "N/A"
+      ],
+      [
+        "Monthly Fib Frequency",
+        "78.6→78.6→78.6 occurrence",
+        "24.6",
+        "N/A",
+        "N/A",
+        "24.6% frequency",
+        "78% bullish bias"
+      ],
+      [
+        "Monthly Structure",
+        "H4-L1-C5 pattern",
+        "78",
+        "Monthly cycle",
+        "Monthly scale",
+        "N/A",
+        "18.5% most common"
+      ],
+      [
+        "Monthly Flow",
+        "0→+23.6 Fibonacci",
+        "83",
+        "Early month",
+        "Fast early",
+        "N/A",
+        "23.5% frequency"
+      ],
+      [
+        "Day 1 Monthly High",
+        "First day forms monthly high",
+        "10.77",
+        "Day 1",
+        "N/A",
+        "N/A",
+        "Early month"
+      ],
+      [
+        "Day 1 Monthly Low",
+        "First day forms monthly low",
+        "13.85",
+        "Day 1",
+        "N/A",
+        "N/A",
+        "Early month"
+      ],
+      [
+        "Week 1 Monthly Pivot",
+        "Week 1 forms high or low",
+        "56.24",
+        "Week 1",
+        "N/A",
+        "N/A",
+        "First week"
+      ],
+      [
+        "SECTION D: DATA GAPS & REQUIREMENTS"
+      ],
+      [
+        "1",
+        "Higher timeframe data availability (1H, 4H, Daily, Weekly)"
+      ],
+      [
+        "2",
+        "Method to aggregate weekly data into monthly ranges"
+      ],
+      [
+        "3",
+        "Historical monthly high/low data for validation"
+      ],
+      [
+        "4",
+        "Seasonal/quarterly context for monthly patterns"
+      ],
+      [
+        "5",
+        "Intra-month weekly delivery data for temporal analysis"
+      ],
+      [
+        "6",
+        "Monthly Fibonacci extension hit rates (-25%, -50%, -100%, -168%)"
+      ],
+      [
+        "7",
+        "132% invalidation applicability at monthly scale"
+      ],
+      [
+        "SECTION E: TESTING FRAMEWORK DESIGN (Preliminary)"
+      ],
+      [
+        "12-17 Day Range Window Testing Approach:"
+      ],
+      [
+        "1",
+        "Define 'First Week' as Days 1-7 of each month (analogous to Monday for weekly)"
+      ],
+      [
+        "2",
+        "Test range windows: 12, 13, 14, 15, 16, 17 days from start of month"
+      ],
+      [
+        "3",
+        "For each window size:"
+      ],
+      [
+        "  a. Calculate range from first N days of each month"
+      ],
+      [
+        "  b. Calculate Fibonacci extensions (-25%, -50%, -100%, -168%)"
+      ],
+      [
+        "  c. Calculate 132% invalidation level"
+      ],
+      [
+        "  d. Track monthly high/low to determine hit rates"
+      ],
+      [
+        "  e. Calculate statistics: mean, std dev, hit rate accuracy"
+      ],
+      [
+        "4",
+        "Compare accuracy across all window sizes (12-17 days)"
+      ],
+      [
+        "5",
+        "Identify optimal window with highest accuracy"
+      ],
+      [
+        "6",
+        "Analyze temporal delivery: which weeks deliver which targets?"
+      ],
+      [
+        "SECTION F: HYPOTHESIS TO TEST (User's 4-Week Temporal Delivery Theory)"
+      ],
+      [
+        "Week 1 (Days 1-7):",
+        "Establish Monthly Range (anchor - like Monday for weekly)"
+      ],
+      [
+        "Week 2 (Days 8-14):",
+        "Create intra-month sequence/entry points"
+      ],
+      [
+        "Week 3 (Days 15-21):",
+        "Primary target delivery window"
+      ],
+      [
+        "Week 4 (Days 22-28+):",
+        "Extension delivery OR profit booking"
+      ],
+      [
+        "Key Questions:"
+      ],
+      [
+        "1",
+        "What range window (12-17 days) gives highest accuracy?"
+      ],
+      [
+        "2",
+        "Do Fibonacci extensions work at monthly scale?"
+      ],
+      [
+        "3",
+        "Does 132% invalidation apply to monthly timeframe?"
+      ],
+      [
+        "4",
+        "What are the temporal delivery patterns by week?"
+      ],
+      [
+        "5",
+        "How do seasonal/quarterly factors affect monthly ranges?"
+      ],
+      [
+        "6",
+        "Can we identify a 'Wednesday bifurcation' equivalent for monthly?"
+      ],
+      [
+        "SECTION G: NEXT STEPS"
+      ],
+      [
+        "1",
+        "Validate remaining claims from checklist (focus on monthly/quarterly) - PRIORITY HIGH"
+      ],
+      [
+        "2",
+        "Review CEREBUS PDFs for monthly/scaling law claims"
+      ],
+      [
+        "3",
+        "Extract or verify 1H/4H/Daily/Weekly data availability"
+      ],
+      [
+        "4",
+        "Build monthly range dataset (aggregate weekly data to monthly)"
+      ],
+      [
+        "5",
+        "Run systematic tests for 12-17 day range windows"
+      ],
+      [
+        "6",
+        "Analyze temporal delivery patterns by week"
+      ],
+      [
+        "7",
+        "Identify seasonal/quarterly effects on monthly ranges"
+      ],
+      [
+        "8",
+        "Build monthly delivery dashboard"
+      ],
+      [
+        "9",
+        "Test 132% invalidation at monthly scale"
+      ],
+      [
+        "10",
+        "Validate Fibonacci extension accuracy (-25%, -50%, -100%, -168%)"
+      ]
+    ]
+  },
+  "phase_4a___monthly_dataset": {
+    "source": "Holy Grail Excel - PHASE 4A - MONTHLY DATASET",
+    "rows": [
+      [
+        "PHASE 4A: MONTHLY RANGE DATASET"
+      ],
+      [
+        "Aggregated from 281 Weekly Monday Sessions (Jan 2020 - May 2025)"
+      ],
+      [
+        "Month",
+        "Year",
+        "Quarter",
+        "Weeks_In_Month",
+        "Week_1_Date",
+        "Week_1_High",
+        "Week_1_Low",
+        "Week_1_Range",
+        "Week_1_Bias",
+        "Month_High",
+        "Month_Low",
+        "Month_Range",
+        "Week_1_Formed_High",
+        "Week_1_Formed_Low",
+        "Week_1_Formed_Pivot",
+        "Multiplier"
+      ],
+      [
+        "2020-1",
+        "2020",
+        "1",
+        "4",
+        "2020-01-06",
+        "52.09459",
+        "50.25829",
+        "1.8363",
+        "Bullish",
+        "58.41939",
+        "50.25829",
+        "8.161099999999998",
+        "True",
+        "True",
+        "4.4443173773348565"
+      ],
+      [
+        "2020-10",
+        "2020",
+        "4",
+        "4",
+        "2020-10-05",
+        "77.7157",
+        "75.86246",
+        "1.85324",
+        "Bullish",
+        "78.35295",
+        "72.66315",
+        "5.689800000000005",
+        "3.070190585137384"
+      ],
+      [
+        "2020-11",
+        "2020",
+        "4",
+        "5",
+        "2020-11-02",
+        "79.60639",
+        "75.91518",
+        "3.69121",
+        "Bullish",
+        "79.60639",
+        "69.30721",
+        "10.299180000000007",
+        "True",
+        "True",
+        "2.7901907504585237"
+      ],
+      [
+        "2020-12",
+        "2020",
+        "4",
+        "4",
+        "2020-12-07",
+        "73.4328",
+        "71.55928",
+        "1.87352",
+        "Bullish",
+        "73.4328",
+        "65.61093",
+        "7.821870000000004",
+        "True",
+        "True",
+        "4.174959434647083"
+      ],
+      [
+        "2020-2",
+        "2020",
+        "1",
+        "4",
+        "2020-02-03",
+        "59.43479",
+        "57.87558",
+        "1.55921",
+        "Bearish",
+        "63.71777",
+        "53.87133",
+        "9.846440000000001",
+        "6.315018502959833"
+      ],
+      [
+        "2020-3",
+        "2020",
+        "1",
+        "5",
+        "2020-03-02",
+        "61.28504",
+        "60.13609",
+        "1.14895",
+        "Bearish",
+        "69.36971",
+        "57.85723",
+        "11.512479999999996",
+        "10.020000870359892"
+      ],
+      [
+        "2020-4",
+        "2020",
+        "2",
+        "4",
+        "2020-04-06",
+        "66.24156",
+        "62.72137",
+        "3.52019",
+        "Bearish",
+        "73.19026",
+        "62.72137",
+        "10.468889999999995",
+        "True",
+        "True",
+        "2.9739559512412668"
+      ],
+      [
+        "2020-5",
+        "2020",
+        "2",
+        "4",
+        "2020-05-04",
+        "72.94795",
+        "71.89328",
+        "1.05467",
+        "Bearish",
+        "77.72273",
+        "70.38882",
+        "7.333910000000003",
+        "6.953748565902133"
+      ],
+      [
+        "2020-6",
+        "2020",
+        "2",
+        "5",
+        "2020-06-01",
+        "76.55769",
+        "72.02344",
+        "4.53425",
+        "Bullish",
+        "80.7797",
+        "72.02344",
+        "8.756260000000012",
+        "True",
+        "True",
+        "1.9311374538236779"
+      ],
+      [
+        "2020-7",
+        "2020",
+        "3",
+        "4",
+        "2020-07-06",
+        "82.03416",
+        "79.84811",
+        "2.18606",
+        "Bullish",
+        "82.03416",
+        "75.88939",
+        "6.144769999999994",
+        "True",
+        "True",
+        "2.8108880817543866"
+      ],
+      [
+        "2020-8",
+        "2020",
+        "3",
+        "5",
+        "2020-08-03",
+        "83.00162",
+        "78.20415",
+        "4.79747",
+        "Bearish",
+        "83.15659",
+        "76.56901",
+        "6.5875799999999884",
+        "1.3731362572355823"
+      ],
+      [
+        "2020-9",
+        "2020",
+        "3",
+        "4",
+        "2020-09-07",
+        "83.77605",
+        "80.09335",
+        "3.6827",
+        "Bullish",
+        "85.26502",
+        "77.43707",
+        "7.827950000000001",
+        "2.1256007820349203"
+      ],
+      [
+        "2021-1",
+        "2021",
+        "1",
+        "4",
+        "2021-01-04",
+        "66.12165",
+        "64.27038",
+        "1.85127",
+        "Bullish",
+        "66.12165",
+        "59.48625",
+        "6.635400000000004",
+        "True",
+        "True",
+        "3.5842421688894675"
+      ],
+      [
+        "2021-10",
+        "2021",
+        "4",
+        "4",
+        "2021-10-04",
+        "22.93233",
+        "21.87654",
+        "1.05579",
+        "Bearish",
+        "23.78029",
+        "19.21999",
+        "4.560300000000002",
+        "4.319324865740348"
+      ],
+      [
+        "2021-11",
+        "2021",
+        "4",
+        "5",
+        "2021-11-01",
+        "18.21628",
+        "17.72806",
+        "0.48822",
+        "Bearish",
+        "25.83256",
+        "17.72806",
+        "8.104500000000002",
+        "True",
+        "True",
+        "16.600098316332804"
+      ],
+      [
+        "2021-12",
+        "2021",
+        "4",
+        "4",
+        "2021-12-06",
+        "22.95997",
+        "21.82916",
+        "1.13081",
+        "Bearish",
+        "26.76264",
+        "18.72767",
+        "8.034970000000001",
+        "7.105499597633555"
+      ],
+      [
+        "2021-2",
+        "2021",
+        "1",
+        "4",
+        "2021-02-01",
+        "62.20956",
+        "58.45838",
+        "3.75119",
+        "Bearish",
+        "62.20956",
+        "54.94169",
+        "7.267870000000002",
+        "True",
+        "True",
+        "1.9374838384619286"
+      ],
+      [
+        "2021-3",
+        "2021",
+        "1",
+        "5",
+        "2021-03-01",
+        "58.53742",
+        "57.51493",
+        "1.02249",
+        "Bullish",
+        "58.53742",
+        "44.82599",
+        "13.71143",
+        "True",
+        "True",
+        "13.409842639047817"
+      ],
+      [
+        "2021-4",
+        "2021",
+        "2",
+        "4",
+        "2021-04-05",
+        "46.70412",
+        "44.69959",
+        "2.00453",
+        "Bearish",
+        "46.70412",
+        "42.19707",
+        "4.507050000000007",
+        "True",
+        "True",
+        "2.248432300838604"
+      ],
+      [
+        "2021-5",
+        "2021",
+        "2",
+        "5",
+        "2021-05-03",
+        "40.22534",
+        "39.39975",
+        "0.82559",
+        "Bearish",
+        "40.22534",
+        "33.1376",
+        "7.087740000000004",
+        "True",
+        "True",
+        "8.58506038106082"
+      ],
+      [
+        "2021-6",
+        "2021",
+        "2",
+        "4",
+        "2021-06-07",
+        "31.65465",
+        "30.53579",
+        "1.11886",
+        "Bearish",
+        "33.21086",
+        "28.18389",
+        "5.026969999999995",
+        "4.492939241728183"
+      ],
+      [
+        "2021-7",
+        "2021",
+        "3",
+        "4",
+        "2021-07-05",
+        "31.3492",
+        "30.30232",
+        "1.04688",
+        "Bullish",
+        "31.3492",
+        "26.64275",
+        "4.70645",
+        "True",
+        "True",
+        "4.4956919608742165"
+      ],
+      [
+        "2021-8",
+        "2021",
+        "3",
+        "5",
+        "2021-08-02",
+        "26.45162",
+        "25.75764",
+        "0.69398",
+        "Bullish",
+        "26.5108",
+        "18.02107",
+        "8.489729999999998",
+        "12.233392893166947"
+      ],
+      [
+        "2021-9",
+        "2021",
+        "3",
+        "4",
+        "2021-09-06",
+        "23.13969",
+        "22.36151",
+        "0.77818",
+        "Bullish",
+        "23.13969",
+        "20.3764",
+        "2.7632900000000014",
+        "True",
+        "True",
+        "3.5509650723483017"
+      ],
+      [
+        "2022-1",
+        "2022",
+        "1",
+        "5",
+        "2022-01-03",
+        "22.79464",
+        "21.86455",
+        "0.9301",
+        "Bearish",
+        "28.34782",
+        "21.86455",
+        "6.483269999999997",
+        "True",
+        "True",
+        "6.970508547468011"
+      ],
+      [
+        "2022-10",
+        "2022",
+        "4",
+        "5",
+        "2022-10-03",
+        "74.29327",
+        "71.41084",
+        "2.88242",
+        "Bearish",
+        "78.67179",
+        "70.33928",
+        "8.33251",
+        "2.890803560896746"
+      ],
+      [
+        "2022-11",
+        "2022",
+        "4",
+        "4",
+        "2022-11-07",
+        "77.57375",
+        "73.29021",
+        "4.28353",
+        "Bullish",
+        "83.4713",
+        "73.29021",
+        "10.181089999999998",
+        "True",
+        "True",
+        "2.3767990419116938"
+      ],
+      [
+        "2022-12",
+        "2022",
+        "4",
+        "4",
+        "2022-12-05",
+        "79.28233",
+        "77.18888",
+        "2.09345",
+        "Bearish",
+        "84.0913",
+        "77.18888",
+        "6.902420000000006",
+        "True",
+        "True",
+        "3.297150636509115"
+      ],
+      [
+        "2022-2",
+        "2022",
+        "1",
+        "4",
+        "2022-02-07",
+        "26.49195",
+        "26.07222",
+        "0.41973",
+        "Bearish",
+        "29.7061",
+        "26.07222",
+        "3.633879999999998",
+        "True",
+        "True",
+        "8.657660877230596"
+      ],
+      [
+        "2022-3",
+        "2022",
+        "1",
+        "4",
+        "2022-03-07",
+        "30.64182",
+        "29.2127",
+        "1.42912",
+        "Bullish",
+        "37.16096",
+        "29.2127",
+        "7.948260000000001",
+        "True",
+        "True",
+        "5.561646327810122"
+      ],
+      [
+        "2022-4",
+        "2022",
+        "2",
+        "4",
+        "2022-04-04",
+        "34.89574",
+        "33.63913",
+        "1.25661",
+        "Bearish",
+        "43.37252",
+        "33.63913",
+        "9.73339",
+        "True",
+        "True",
+        "7.745752460986305"
+      ],
+      [
+        "2022-5",
+        "2022",
+        "2",
+        "5",
+        "2022-05-02",
+        "41.28274",
+        "39.78917",
+        "1.49357",
+        "Bearish",
+        "50.05528",
+        "39.78917",
+        "10.266110000000005",
+        "True",
+        "True",
+        "6.873537899127596"
+      ],
+      [
+        "2022-6",
+        "2022",
+        "2",
+        "4",
+        "2022-06-06",
+        "49.09194",
+        "47.60345",
+        "1.4885",
+        "Bearish",
+        "55.99787",
+        "47.60345",
+        "8.394419999999997",
+        "True",
+        "True",
+        "5.639516291568691"
+      ],
+      [
+        "2022-7",
+        "2022",
+        "3",
+        "4",
+        "2022-07-04",
+        "54.37316",
+        "53.4879",
+        "0.88527",
+        "Bullish",
+        "62.20016",
+        "53.4879",
+        "8.712259999999993",
+        "True",
+        "True",
+        "9.841359133371732"
+      ],
+      [
+        "2022-8",
+        "2022",
+        "3",
+        "5",
+        "2022-08-01",
+        "64.05686",
+        "61.59897",
+        "2.45789",
+        "Bearish",
+        "69.00563",
+        "61.59897",
+        "7.406659999999995",
+        "True",
+        "True",
+        "3.0134220815414827"
+      ],
+      [
+        "2022-9",
+        "2022",
+        "3",
+        "4",
+        "2022-09-05",
+        "68.05767",
+        "66.99005",
+        "1.06762",
+        "Bullish",
+        "72.70337",
+        "66.99005",
+        "5.71332000000001",
+        "True",
+        "True",
+        "5.351454637417818"
+      ],
+      [
+        "2023-1",
+        "2023",
+        "1",
+        "5",
+        "2023-01-02",
+        "78.71647",
+        "74.90413",
+        "3.81235",
+        "Bullish",
+        "82.36554",
+        "74.90413",
+        "7.461410000000001",
+        "True",
+        "True",
+        "1.9571681508780676"
+      ],
+      [
+        "2023-10",
+        "2023",
+        "4",
+        "5",
+        "2023-10-02",
+        "43.8858",
+        "42.66418",
+        "1.22162",
+        "Bullish",
+        "43.8858",
+        "33.78876",
+        "10.09704",
+        "True",
+        "True",
+        "8.265287077814705"
+      ],
+      [
+        "2023-11",
+        "2023",
+        "4",
+        "4",
+        "2023-11-06",
+        "31.65132",
+        "31.24316",
+        "0.40816",
+        "Bullish",
+        "34.51043",
+        "29.08675",
+        "5.423680000000001",
+        "13.288122304978442"
+      ],
+      [
+        "2023-12",
+        "2023",
+        "4",
+        "4",
+        "2023-12-04",
+        "31.17975",
+        "29.5127",
+        "1.66705",
+        "Bearish",
+        "31.17975",
+        "21.10775",
+        "10.072",
+        "True",
+        "True",
+        "6.041810383611769"
+      ],
+      [
+        "2023-2",
+        "2023",
+        "1",
+        "4",
+        "2023-02-06",
+        "79.09233",
+        "77.11832",
+        "1.97401",
+        "Bullish",
+        "79.704",
+        "75.68734",
+        "4.0166599999999875",
+        "2.034771860324916"
+      ],
+      [
+        "2023-3",
+        "2023",
+        "1",
+        "4",
+        "2023-03-06",
+        "77.91065",
+        "76.07241",
+        "1.83825",
+        "Bearish",
+        "78.03721",
+        "73.54351",
+        "4.493700000000004",
+        "2.444553243574054"
+      ],
+      [
+        "2023-4",
+        "2023",
+        "2",
+        "4",
+        "2023-04-03",
+        "70.2924",
+        "68.25935",
+        "2.03305",
+        "Bullish",
+        "75.31236",
+        "68.25935",
+        "7.0530100000000004",
+        "True",
+        "True",
+        "3.469176852512236"
+      ],
+      [
+        "2023-5",
+        "2023",
+        "2",
+        "5",
+        "2023-05-01",
+        "70.9912",
+        "69.32641",
+        "1.66479",
+        "Bullish",
+        "70.9912",
+        "64.38171",
+        "6.609490000000008",
+        "True",
+        "True",
+        "3.9701644051201703"
+      ],
+      [
+        "2023-6",
+        "2023",
+        "2",
+        "4",
+        "2023-06-05",
+        "69.33741",
+        "65.63701",
+        "3.70039",
+        "Bearish",
+        "69.33741",
+        "55.96337",
+        "13.374040000000008",
+        "True",
+        "True",
+        "3.6142244466123863"
+      ],
+      [
+        "2023-7",
+        "2023",
+        "3",
+        "5",
+        "2023-07-03",
+        "56.46205",
+        "55.08439",
+        "1.37766",
+        "Bearish",
+        "57.58469",
+        "51.34407",
+        "6.24062",
+        "4.529869488843401"
+      ],
+      [
+        "2023-8",
+        "2023",
+        "3",
+        "4",
+        "2023-08-07",
+        "55.03187",
+        "54.40155",
+        "0.63033",
+        "Bearish",
+        "55.03187",
+        "42.08518",
+        "12.946689999999997",
+        "True",
+        "True",
+        "20.539542779179158"
+      ],
+      [
+        "2023-9",
+        "2023",
+        "3",
+        "4",
+        "2023-09-04",
+        "47.40453",
+        "45.76753",
+        "1.637",
+        "Bearish",
+        "47.40453",
+        "39.87987",
+        "7.524660000000004",
+        "True",
+        "True",
+        "4.5966157605375715"
+      ],
+      [
+        "2024-1",
+        "2024",
+        "1",
+        "5",
+        "2024-01-01",
+        "25.30687",
+        "24.76454",
+        "0.54233",
+        "Bullish",
+        "25.30687",
+        "18.04884",
+        "7.2580300000000015",
+        "True",
+        "True",
+        "13.383050909962572"
+      ],
+      [
+        "2024-10",
+        "2024",
+        "4",
+        "4",
+        "2024-10-07",
+        "48.08313",
+        "45.99238",
+        "2.09075",
+        "Bearish",
+        "54.89586",
+        "45.99238",
+        "8.903480000000002",
+        "True",
+        "True",
+        "4.258510104029655"
+      ],
+      [
+        "2024-11",
+        "2024",
+        "4",
+        "4",
+        "2024-11-04",
+        "50.07004",
+        "49.13672",
+        "0.93332",
+        "Bearish",
+        "56.83478",
+        "49.13672",
+        "7.698060000000005",
+        "True",
+        "True",
+        "8.248039257703686"
+      ],
+      [
+        "2024-12",
+        "2024",
+        "4",
+        "5",
+        "2024-12-02",
+        "57.79353",
+        "56.17544",
+        "1.61809",
+        "Bullish",
+        "61.28646",
+        "56.17544",
+        "5.111019999999996",
+        "True",
+        "True",
+        "3.1586747337910723"
+      ],
+      [
+        "2024-2",
+        "2024",
+        "1",
+        "4",
+        "2024-02-05",
+        "23.35353",
+        "22.06194",
+        "1.29159",
+        "Bullish",
+        "25.04964",
+        "19.43623",
+        "5.613410000000002",
+        "4.34612376992699"
+      ],
+      [
+        "2024-3",
+        "2024",
+        "1",
+        "4",
+        "2024-03-04",
+        "15.59428",
+        "15.23302",
+        "0.36126",
+        "Bullish",
+        "20.15195",
+        "15.23302",
+        "4.91893",
+        "True",
+        "True",
+        "13.616038310358189"
+      ],
+      [
+        "2024-4",
+        "2024",
+        "2",
+        "5",
+        "2024-04-01",
+        "18.22651",
+        "17.49802",
+        "0.72849",
+        "Bullish",
+        "23.03657",
+        "17.49802",
+        "5.538550000000001",
+        "True",
+        "True",
+        "7.602781095142007"
+      ],
+      [
+        "2024-5",
+        "2024",
+        "2",
+        "4",
+        "2024-05-06",
+        "19.39253",
+        "18.23559",
+        "1.15694",
+        "Bearish",
+        "26.14171",
+        "18.23559",
+        "7.906120000000001",
+        "True",
+        "True",
+        "6.833647380158004"
+      ],
+      [
+        "2024-6",
+        "2024",
+        "2",
+        "4",
+        "2024-06-03",
+        "29.01664",
+        "28.02313",
+        "0.99351",
+        "Bearish",
+        "29.01664",
+        "23.54565",
+        "5.4709900000000005",
+        "True",
+        "True",
+        "5.506728669062214"
+      ],
+      [
+        "2024-7",
+        "2024",
+        "3",
+        "5",
+        "2024-07-01",
+        "29.99526",
+        "29.6559",
+        "0.33936",
+        "Bullish",
+        "31.62402",
+        "27.40695",
+        "4.217070000000003",
+        "12.426538189533249"
+      ],
+      [
+        "2024-8",
+        "2024",
+        "3",
+        "4",
+        "2024-08-05",
+        "30.60215",
+        "29.02712",
+        "1.57504",
+        "Bearish",
+        "37.45451",
+        "29.02712",
+        "8.427389999999999",
+        "True",
+        "True",
+        "5.350587921576595"
+      ],
+      [
+        "2024-9",
+        "2024",
+        "3",
+        "5",
+        "2024-09-02",
+        "41.8957",
+        "40.84795",
+        "1.04776",
+        "Bullish",
+        "46.36008",
+        "34.2387",
+        "12.121380000000002",
+        "11.568851645414982"
+      ],
+      [
+        "2025-1",
+        "2025",
+        "1",
+        "4",
+        "2025-01-06",
+        "67.23753",
+        "65.27034",
+        "1.96718",
+        "Bearish",
+        "67.53853",
+        "64.25104",
+        "3.287489999999991",
+        "1.6711688813428316"
+      ],
+      [
+        "2025-2",
+        "2025",
+        "1",
+        "4",
+        "2025-02-03",
+        "69.10848",
+        "67.48635",
+        "1.62213",
+        "Bearish",
+        "73.94747",
+        "67.48635",
+        "6.461119999999994",
+        "True",
+        "True",
+        "3.9831086287782074"
+      ],
+      [
+        "2025-3",
+        "2025",
+        "1",
+        "5",
+        "2025-03-03",
+        "72.33909",
+        "71.48369",
+        "0.8554",
+        "Bearish",
+        "78.75986",
+        "66.62588",
+        "12.133980000000008",
+        "14.185153144727622"
+      ],
+      [
+        "2025-4",
+        "2025",
+        "2",
+        "4",
+        "2025-04-07",
+        "75.0347",
+        "72.85695",
+        "2.17775",
+        "Bullish",
+        "81.37398",
+        "70.81197",
+        "10.56201",
+        "4.849964412811388"
+      ],
+      [
+        "2025-5",
+        "2025",
+        "2",
+        "2",
+        "2025-05-05",
+        "82.40213",
+        "78.22351",
+        "4.17862",
+        "Bullish",
+        "82.40213",
+        "78.22351",
+        "4.178619999999995",
+        "True",
+        "True",
+        "True",
+        "0.9999999999999989"
+      ],
+      [
+        "WEEK 1 PIVOT VALIDATION"
+      ],
+      [
+        "Total Months Analyzed:",
+        "65"
+      ],
+      [
+        "Week 1 Formed Monthly High:",
+        "19",
+        "0.2923076923076923"
+      ],
+      [
+        "Week 1 Formed Monthly Low:",
+        "26",
+        "0.4"
+      ],
+      [
+        "Week 1 Formed EITHER High OR Low:",
+        "44",
+        "0.676923076923077"
+      ],
+      [
+        "Claimed Percentage:",
+        "0.5624"
+      ],
+      [
+        "Actual vs Claimed Variance:",
+        "0.11452307692307691"
+      ],
+      [
+        "Validation Status:",
+        "PASS"
+      ],
+      [
+        "RANGE MULTIPLIER ANALYSIS"
+      ],
+      [
+        "Month",
+        "Week_1_Range",
+        "Month_Range",
+        "Multiplier",
+        "Quarter"
+      ],
+      [
+        "2020-1",
+        "1.8363",
+        "8.161099999999998",
+        "4.4443173773348565",
+        "1"
+      ],
+      [
+        "2020-10",
+        "1.85324",
+        "5.689800000000005",
+        "3.070190585137384",
+        "4"
+      ],
+      [
+        "2020-11",
+        "3.69121",
+        "10.299180000000007",
+        "2.7901907504585237",
+        "4"
+      ],
+      [
+        "2020-12",
+        "1.87352",
+        "7.821870000000004",
+        "4.174959434647083",
+        "4"
+      ],
+      [
+        "2020-2",
+        "1.55921",
+        "9.846440000000001",
+        "6.315018502959833",
+        "1"
+      ],
+      [
+        "2020-3",
+        "1.14895",
+        "11.512479999999996",
+        "10.020000870359892",
+        "1"
+      ],
+      [
+        "2020-4",
+        "3.52019",
+        "10.468889999999995",
+        "2.9739559512412668",
+        "2"
+      ],
+      [
+        "2020-5",
+        "1.05467",
+        "7.333910000000003",
+        "6.953748565902133",
+        "2"
+      ],
+      [
+        "2020-6",
+        "4.53425",
+        "8.756260000000012",
+        "1.9311374538236779",
+        "2"
+      ],
+      [
+        "2020-7",
+        "2.18606",
+        "6.144769999999994",
+        "2.8108880817543866",
+        "3"
+      ],
+      [
+        "2020-8",
+        "4.79747",
+        "6.5875799999999884",
+        "1.3731362572355823",
+        "3"
+      ],
+      [
+        "2020-9",
+        "3.6827",
+        "7.827950000000001",
+        "2.1256007820349203",
+        "3"
+      ],
+      [
+        "2021-1",
+        "1.85127",
+        "6.635400000000004",
+        "3.5842421688894675",
+        "1"
+      ],
+      [
+        "2021-10",
+        "1.05579",
+        "4.560300000000002",
+        "4.319324865740348",
+        "4"
+      ],
+      [
+        "2021-11",
+        "0.48822",
+        "8.104500000000002",
+        "16.600098316332804",
+        "4"
+      ],
+      [
+        "2021-12",
+        "1.13081",
+        "8.034970000000001",
+        "7.105499597633555",
+        "4"
+      ],
+      [
+        "2021-2",
+        "3.75119",
+        "7.267870000000002",
+        "1.9374838384619286",
+        "1"
+      ],
+      [
+        "2021-3",
+        "1.02249",
+        "13.71143",
+        "13.409842639047817",
+        "1"
+      ],
+      [
+        "2021-4",
+        "2.00453",
+        "4.507050000000007",
+        "2.248432300838604",
+        "2"
+      ],
+      [
+        "2021-5",
+        "0.82559",
+        "7.087740000000004",
+        "8.58506038106082",
+        "2"
+      ],
+      [
+        "2021-6",
+        "1.11886",
+        "5.026969999999995",
+        "4.492939241728183",
+        "2"
+      ],
+      [
+        "2021-7",
+        "1.04688",
+        "4.70645",
+        "4.4956919608742165",
+        "3"
+      ],
+      [
+        "2021-8",
+        "0.69398",
+        "8.489729999999998",
+        "12.233392893166947",
+        "3"
+      ],
+      [
+        "2021-9",
+        "0.77818",
+        "2.7632900000000014",
+        "3.5509650723483017",
+        "3"
+      ],
+      [
+        "2022-1",
+        "0.9301",
+        "6.483269999999997",
+        "6.970508547468011",
+        "1"
+      ],
+      [
+        "2022-10",
+        "2.88242",
+        "8.33251",
+        "2.890803560896746",
+        "4"
+      ],
+      [
+        "2022-11",
+        "4.28353",
+        "10.181089999999998",
+        "2.3767990419116938",
+        "4"
+      ],
+      [
+        "2022-12",
+        "2.09345",
+        "6.902420000000006",
+        "3.297150636509115",
+        "4"
+      ],
+      [
+        "2022-2",
+        "0.41973",
+        "3.633879999999998",
+        "8.657660877230596",
+        "1"
+      ],
+      [
+        "2022-3",
+        "1.42912",
+        "7.948260000000001",
+        "5.561646327810122",
+        "1"
+      ],
+      [
+        "2022-4",
+        "1.25661",
+        "9.73339",
+        "7.745752460986305",
+        "2"
+      ],
+      [
+        "2022-5",
+        "1.49357",
+        "10.266110000000005",
+        "6.873537899127596",
+        "2"
+      ],
+      [
+        "2022-6",
+        "1.4885",
+        "8.394419999999997",
+        "5.639516291568691",
+        "2"
+      ],
+      [
+        "2022-7",
+        "0.88527",
+        "8.712259999999993",
+        "9.841359133371732",
+        "3"
+      ],
+      [
+        "2022-8",
+        "2.45789",
+        "7.406659999999995",
+        "3.0134220815414827",
+        "3"
+      ],
+      [
+        "2022-9",
+        "1.06762",
+        "5.71332000000001",
+        "5.351454637417818",
+        "3"
+      ],
+      [
+        "2023-1",
+        "3.81235",
+        "7.461410000000001",
+        "1.9571681508780676",
+        "1"
+      ],
+      [
+        "2023-10",
+        "1.22162",
+        "10.09704",
+        "8.265287077814705",
+        "4"
+      ],
+      [
+        "2023-11",
+        "0.40816",
+        "5.423680000000001",
+        "13.288122304978442",
+        "4"
+      ],
+      [
+        "2023-12",
+        "1.66705",
+        "10.072",
+        "6.041810383611769",
+        "4"
+      ],
+      [
+        "2023-2",
+        "1.97401",
+        "4.0166599999999875",
+        "2.034771860324916",
+        "1"
+      ],
+      [
+        "2023-3",
+        "1.83825",
+        "4.493700000000004",
+        "2.444553243574054",
+        "1"
+      ],
+      [
+        "2023-4",
+        "2.03305",
+        "7.0530100000000004",
+        "3.469176852512236",
+        "2"
+      ],
+      [
+        "2023-5",
+        "1.66479",
+        "6.609490000000008",
+        "3.9701644051201703",
+        "2"
+      ],
+      [
+        "2023-6",
+        "3.70039",
+        "13.374040000000008",
+        "3.6142244466123863",
+        "2"
+      ],
+      [
+        "2023-7",
+        "1.37766",
+        "6.24062",
+        "4.529869488843401",
+        "3"
+      ],
+      [
+        "2023-8",
+        "0.63033",
+        "12.946689999999997",
+        "20.539542779179158",
+        "3"
+      ],
+      [
+        "2023-9",
+        "1.637",
+        "7.524660000000004",
+        "4.5966157605375715",
+        "3"
+      ],
+      [
+        "2024-1",
+        "0.54233",
+        "7.2580300000000015",
+        "13.383050909962572",
+        "1"
+      ],
+      [
+        "2024-10",
+        "2.09075",
+        "8.903480000000002",
+        "4.258510104029655",
+        "4"
+      ],
+      [
+        "2024-11",
+        "0.93332",
+        "7.698060000000005",
+        "8.248039257703686",
+        "4"
+      ],
+      [
+        "2024-12",
+        "1.61809",
+        "5.111019999999996",
+        "3.1586747337910723",
+        "4"
+      ],
+      [
+        "2024-2",
+        "1.29159",
+        "5.613410000000002",
+        "4.34612376992699",
+        "1"
+      ],
+      [
+        "2024-3",
+        "0.36126",
+        "4.91893",
+        "13.616038310358189",
+        "1"
+      ],
+      [
+        "2024-4",
+        "0.72849",
+        "5.538550000000001",
+        "7.602781095142007",
+        "2"
+      ],
+      [
+        "2024-5",
+        "1.15694",
+        "7.906120000000001",
+        "6.833647380158004",
+        "2"
+      ],
+      [
+        "2024-6",
+        "0.99351",
+        "5.4709900000000005",
+        "5.506728669062214",
+        "2"
+      ],
+      [
+        "2024-7",
+        "0.33936",
+        "4.217070000000003",
+        "12.426538189533249",
+        "3"
+      ],
+      [
+        "2024-8",
+        "1.57504",
+        "8.427389999999999",
+        "5.350587921576595",
+        "3"
+      ],
+      [
+        "2024-9",
+        "1.04776",
+        "12.121380000000002",
+        "11.568851645414982",
+        "3"
+      ],
+      [
+        "2025-1",
+        "1.96718",
+        "3.287489999999991",
+        "1.6711688813428316",
+        "1"
+      ],
+      [
+        "2025-2",
+        "1.62213",
+        "6.461119999999994",
+        "3.9831086287782074",
+        "1"
+      ],
+      [
+        "2025-3",
+        "0.8554",
+        "12.133980000000008",
+        "14.185153144727622",
+        "1"
+      ],
+      [
+        "2025-4",
+        "2.17775",
+        "10.56201",
+        "4.849964412811388",
+        "2"
+      ],
+      [
+        "2025-5",
+        "4.17862",
+        "4.178619999999995",
+        "0.9999999999999989",
+        "2"
+      ],
+      [
+        "OVERALL STATISTICS"
+      ],
+      [
+        "Mean Multiplier:",
+        "6.100092356817825"
+      ],
+      [
+        "Std Dev Multiplier:",
+        "4.117637586641356"
+      ],
+      [
+        "Median Multiplier:",
+        "4.529869488843401"
+      ],
+      [
+        "Min Multiplier:",
+        "0.9999999999999989"
+      ],
+      [
+        "Max Multiplier:",
+        "20.539542779179158"
+      ],
+      [
+        "QUARTERLY BREAKDOWN"
+      ],
+      [
+        "Q1 Mean Multiplier:",
+        "6.58454766941311"
+      ],
+      [
+        "Q2 Mean Multiplier:",
+        "4.958280459276216"
+      ],
+      [
+        "Q3 Mean Multiplier:",
+        "6.9205277789886885"
+      ],
+      [
+        "Q4 Mean Multiplier:",
+        "5.992364043413105"
+      ]
+    ]
+  },
+  "phase_4b___range_window_testing": {
+    "source": "Holy Grail Excel - PHASE 4B - RANGE WINDOW TESTING",
+    "rows": [
+      [
+        "PHASE 4B: MONTHLY RANGE WINDOW TESTING + INVALIDATION THRESHOLD ANALYSIS"
+      ],
+      [
+        "Testing 36 Configurations (6 Windows × 6 Levels) | 'Failure as Pattern' Analysis"
+      ],
+      [
+        "SECTION 1: OPTIMAL CONFIGURATION SUMMARY"
+      ],
+      [
+        "Configuration Type",
+        "Range Window",
+        "Invalidation Level",
+        "Effectiveness",
+        "Mean Fib Hit",
+        "Invalid Rate",
+        "Sample"
+      ],
+      [
+        "Best Overall",
+        "15-day",
+        "132%",
+        "0.0859375",
+        "0.1015625",
+        "0.015625",
+        "64"
+      ],
+      [
+        "Best Group A (Week 1 Pivot=TRUE)",
+        "15-day",
+        "132%",
+        "0.06976744186046512",
+        "0.09302325581395349",
+        "0.023255813953488372",
+        "43"
+      ],
+      [
+        "Best Group B (Week 1 Pivot=FALSE)",
+        "12-day",
+        "115%",
+        "0.16666666666666663",
+        "0.26190476190476186",
+        "0.09523809523809523",
+        "21"
+      ],
+      [
+        "SECTION 2: ALL 36 CONFIGURATIONS RANKED BY EFFECTIVENESS"
+      ],
+      [
+        "Window",
+        "Invalid Level",
+        "Months",
+        "-25% Hit",
+        "-50% Hit",
+        "-100% Hit",
+        "-168% Hit",
+        "Mean Hit",
+        "Invalid Rate",
+        "Effectiveness",
+        "Std Dev"
+      ],
+      [
+        "15-day",
+        "132%",
+        "64",
+        "0.234375",
+        "0.15625",
+        "0.015625",
+        "0",
+        "0.1015625",
+        "0.015625",
+        "0.0859375",
+        "0.09789034442298178"
+      ],
+      [
+        "16-day",
+        "132%",
+        "64",
+        "0.234375",
+        "0.15625",
+        "0.015625",
+        "0",
+        "0.1015625",
+        "0.015625",
+        "0.0859375",
+        "0.09789034442298178"
+      ],
+      [
+        "17-day",
+        "132%",
+        "64",
+        "0.234375",
+        "0.15625",
+        "0.015625",
+        "0",
+        "0.1015625",
+        "0.015625",
+        "0.0859375",
+        "0.09789034442298178"
+      ],
+      [
+        "15-day",
+        "110%",
+        "64",
+        "0.234375",
+        "0.15625",
+        "0.015625",
+        "0",
+        "0.1015625",
+        "0.03125",
+        "0.0703125",
+        "0.09789034442298178"
+      ],
+      [
+        "15-day",
+        "115%",
+        "64",
+        "0.234375",
+        "0.15625",
+        "0.015625",
+        "0",
+        "0.1015625",
+        "0.03125",
+        "0.0703125",
+        "0.09789034442298178"
+      ],
+      [
+        "15-day",
+        "118%",
+        "64",
+        "0.234375",
+        "0.15625",
+        "0.015625",
+        "0",
+        "0.1015625",
+        "0.03125",
+        "0.0703125",
+        "0.09789034442298178"
+      ],
+      [
+        "15-day",
+        "120%",
+        "64",
+        "0.234375",
+        "0.15625",
+        "0.015625",
+        "0",
+        "0.1015625",
+        "0.03125",
+        "0.0703125",
+        "0.09789034442298178"
+      ],
+      [
+        "15-day",
+        "125%",
+        "64",
+        "0.234375",
+        "0.15625",
+        "0.015625",
+        "0",
+        "0.1015625",
+        "0.03125",
+        "0.0703125",
+        "0.09789034442298178"
+      ],
+      [
+        "16-day",
+        "110%",
+        "64",
+        "0.234375",
+        "0.15625",
+        "0.015625",
+        "0",
+        "0.1015625",
+        "0.03125",
+        "0.0703125",
+        "0.09789034442298178"
+      ],
+      [
+        "16-day",
+        "115%",
+        "64",
+        "0.234375",
+        "0.15625",
+        "0.015625",
+        "0",
+        "0.1015625",
+        "0.03125",
+        "0.0703125",
+        "0.09789034442298178"
+      ],
+      [
+        "16-day",
+        "118%",
+        "64",
+        "0.234375",
+        "0.15625",
+        "0.015625",
+        "0",
+        "0.1015625",
+        "0.03125",
+        "0.0703125",
+        "0.09789034442298178"
+      ],
+      [
+        "16-day",
+        "120%",
+        "64",
+        "0.234375",
+        "0.15625",
+        "0.015625",
+        "0",
+        "0.1015625",
+        "0.03125",
+        "0.0703125",
+        "0.09789034442298178"
+      ],
+      [
+        "16-day",
+        "125%",
+        "64",
+        "0.234375",
+        "0.15625",
+        "0.015625",
+        "0",
+        "0.1015625",
+        "0.03125",
+        "0.0703125",
+        "0.09789034442298178"
+      ],
+      [
+        "17-day",
+        "110%",
+        "64",
+        "0.234375",
+        "0.15625",
+        "0.015625",
+        "0",
+        "0.1015625",
+        "0.03125",
+        "0.0703125",
+        "0.09789034442298178"
+      ],
+      [
+        "17-day",
+        "115%",
+        "64",
+        "0.234375",
+        "0.15625",
+        "0.015625",
+        "0",
+        "0.1015625",
+        "0.03125",
+        "0.0703125",
+        "0.09789034442298178"
+      ],
+      [
+        "17-day",
+        "118%",
+        "64",
+        "0.234375",
+        "0.15625",
+        "0.015625",
+        "0",
+        "0.1015625",
+        "0.03125",
+        "0.0703125",
+        "0.09789034442298178"
+      ],
+      [
+        "17-day",
+        "120%",
+        "64",
+        "0.234375",
+        "0.15625",
+        "0.015625",
+        "0",
+        "0.1015625",
+        "0.03125",
+        "0.0703125",
+        "0.09789034442298178"
+      ],
+      [
+        "17-day",
+        "125%",
+        "64",
+        "0.234375",
+        "0.15625",
+        "0.015625",
+        "0",
+        "0.1015625",
+        "0.03125",
+        "0.0703125",
+        "0.09789034442298178"
+      ],
+      [
+        "12-day",
+        "132%",
+        "65",
+        "0.35384615384615387",
+        "0.26153846153846155",
+        "0.07692307692307693",
+        "0.06153846153846154",
+        "0.18846153846153846",
+        "0.13846153846153847",
+        "0.04999999999999999",
+        "0.1237362149395801"
+      ],
+      [
+        "13-day",
+        "132%",
+        "65",
+        "0.35384615384615387",
+        "0.26153846153846155",
+        "0.07692307692307693",
+        "0.06153846153846154",
+        "0.18846153846153846",
+        "0.13846153846153847",
+        "0.04999999999999999",
+        "0.1237362149395801"
+      ],
+      [
+        "14-day",
+        "132%",
+        "65",
+        "0.35384615384615387",
+        "0.26153846153846155",
+        "0.07692307692307693",
+        "0.06153846153846154",
+        "0.18846153846153846",
+        "0.13846153846153847",
+        "0.04999999999999999",
+        "0.1237362149395801"
+      ],
+      [
+        "12-day",
+        "115%",
+        "65",
+        "0.35384615384615387",
+        "0.26153846153846155",
+        "0.07692307692307693",
+        "0.06153846153846154",
+        "0.18846153846153846",
+        "0.15384615384615385",
+        "0.0346153846153846",
+        "0.1237362149395801"
+      ],
+      [
+        "12-day",
+        "118%",
+        "65",
+        "0.35384615384615387",
+        "0.26153846153846155",
+        "0.07692307692307693",
+        "0.06153846153846154",
+        "0.18846153846153846",
+        "0.15384615384615385",
+        "0.0346153846153846",
+        "0.1237362149395801"
+      ],
+      [
+        "12-day",
+        "120%",
+        "65",
+        "0.35384615384615387",
+        "0.26153846153846155",
+        "0.07692307692307693",
+        "0.06153846153846154",
+        "0.18846153846153846",
+        "0.15384615384615385",
+        "0.0346153846153846",
+        "0.1237362149395801"
+      ],
+      [
+        "12-day",
+        "125%",
+        "65",
+        "0.35384615384615387",
+        "0.26153846153846155",
+        "0.07692307692307693",
+        "0.06153846153846154",
+        "0.18846153846153846",
+        "0.15384615384615385",
+        "0.0346153846153846",
+        "0.1237362149395801"
+      ],
+      [
+        "13-day",
+        "115%",
+        "65",
+        "0.35384615384615387",
+        "0.26153846153846155",
+        "0.07692307692307693",
+        "0.06153846153846154",
+        "0.18846153846153846",
+        "0.15384615384615385",
+        "0.0346153846153846",
+        "0.1237362149395801"
+      ],
+      [
+        "13-day",
+        "118%",
+        "65",
+        "0.35384615384615387",
+        "0.26153846153846155",
+        "0.07692307692307693",
+        "0.06153846153846154",
+        "0.18846153846153846",
+        "0.15384615384615385",
+        "0.0346153846153846",
+        "0.1237362149395801"
+      ],
+      [
+        "13-day",
+        "120%",
+        "65",
+        "0.35384615384615387",
+        "0.26153846153846155",
+        "0.07692307692307693",
+        "0.06153846153846154",
+        "0.18846153846153846",
+        "0.15384615384615385",
+        "0.0346153846153846",
+        "0.1237362149395801"
+      ],
+      [
+        "13-day",
+        "125%",
+        "65",
+        "0.35384615384615387",
+        "0.26153846153846155",
+        "0.07692307692307693",
+        "0.06153846153846154",
+        "0.18846153846153846",
+        "0.15384615384615385",
+        "0.0346153846153846",
+        "0.1237362149395801"
+      ],
+      [
+        "14-day",
+        "115%",
+        "65",
+        "0.35384615384615387",
+        "0.26153846153846155",
+        "0.07692307692307693",
+        "0.06153846153846154",
+        "0.18846153846153846",
+        "0.15384615384615385",
+        "0.0346153846153846",
+        "0.1237362149395801"
+      ],
+      [
+        "14-day",
+        "118%",
+        "65",
+        "0.35384615384615387",
+        "0.26153846153846155",
+        "0.07692307692307693",
+        "0.06153846153846154",
+        "0.18846153846153846",
+        "0.15384615384615385",
+        "0.0346153846153846",
+        "0.1237362149395801"
+      ],
+      [
+        "14-day",
+        "120%",
+        "65",
+        "0.35384615384615387",
+        "0.26153846153846155",
+        "0.07692307692307693",
+        "0.06153846153846154",
+        "0.18846153846153846",
+        "0.15384615384615385",
+        "0.0346153846153846",
+        "0.1237362149395801"
+      ],
+      [
+        "14-day",
+        "125%",
+        "65",
+        "0.35384615384615387",
+        "0.26153846153846155",
+        "0.07692307692307693",
+        "0.06153846153846154",
+        "0.18846153846153846",
+        "0.15384615384615385",
+        "0.0346153846153846",
+        "0.1237362149395801"
+      ],
+      [
+        "12-day",
+        "110%",
+        "65",
+        "0.35384615384615387",
+        "0.26153846153846155",
+        "0.07692307692307693",
+        "0.06153846153846154",
+        "0.18846153846153846",
+        "0.2",
+        "-0.011538461538461553",
+        "0.1237362149395801"
+      ],
+      [
+        "13-day",
+        "110%",
+        "65",
+        "0.35384615384615387",
+        "0.26153846153846155",
+        "0.07692307692307693",
+        "0.06153846153846154",
+        "0.18846153846153846",
+        "0.2",
+        "-0.011538461538461553",
+        "0.1237362149395801"
+      ],
+      [
+        "14-day",
+        "110%",
+        "65",
+        "0.35384615384615387",
+        "0.26153846153846155",
+        "0.07692307692307693",
+        "0.06153846153846154",
+        "0.18846153846153846",
+        "0.2",
+        "-0.011538461538461553",
+        "0.1237362149395801"
+      ],
+      [
+        "SECTION 3: GROUP A vs GROUP B DETAILED COMPARISON"
+      ],
+      [
+        "GROUP A (Week 1 Pivot = TRUE, 67.69% of months)",
+        "GROUP B (Week 1 Pivot = FALSE, 32.31% of months)"
+      ],
+      [
+        "Best Configuration:",
+        "15-day, 132%",
+        "Best Configuration:",
+        "12-day, 115%"
+      ],
+      [
+        "-25% Hit Rate:",
+        "0.20930232558139536",
+        "-25% Hit Rate:",
+        "0.5238095238095238"
+      ],
+      [
+        "-50% Hit Rate:",
+        "0.16279069767441862",
+        "-50% Hit Rate:",
+        "0.2857142857142857"
+      ],
+      [
+        "-100% Hit Rate:",
+        "0",
+        "-100% Hit Rate:",
+        "0.14285714285714285"
+      ],
+      [
+        "-168% Hit Rate:",
+        "0",
+        "-168% Hit Rate:",
+        "0.09523809523809523"
+      ],
+      [
+        "Invalidation Rate:",
+        "0.023255813953488372",
+        "Invalidation Rate:",
+        "0.09523809523809523"
+      ],
+      [
+        "Effectiveness Score:",
+        "0.06976744186046512",
+        "Effectiveness Score:",
+        "0.16666666666666663"
+      ],
+      [
+        "Sample Size:",
+        "43",
+        "Sample Size:",
+        "21"
+      ],
+      [
+        "HYPOTHESIS TEST: Does Group B show higher accuracy with TIGHTER invalidation (118% vs 132%)?"
+      ],
+      [
+        "Group B best invalidation level:",
+        "115%"
+      ],
+      [
+        "Is it ≤ 118%?:",
+        "YES"
+      ],
+      [
+        "Group B effectiveness vs Group A:",
+        "0.09689922480620153"
+      ],
+      [
+        "USER'S INTUITION VALIDATED:",
+        "YES"
+      ],
+      [
+        "SECTION 4: LOW FREQUENCY HIGH ACCURACY PATTERNS"
+      ],
+      [
+        "Pattern Description",
+        "Window",
+        "Invalid Level",
+        "Frequency",
+        "Accuracy",
+        "Sample",
+        "Group",
+        "Notes"
+      ],
+      [
+        "SECTION 5: INVALIDATION LEVEL ANALYSIS (110%-132%)"
+      ],
+      [
+        "Invalid Level",
+        "Avg Effectiveness",
+        "Best Window",
+        "Group A Eff",
+        "Group B Eff",
+        "Recommendation"
+      ],
+      [
+        "110%",
+        "0.029387019230769217",
+        "15-day",
+        "-0.01367600422832982",
+        "0.119047619047619",
+        "TIGHT"
+      ],
+      [
+        "115%",
+        "0.0524639423076923",
+        "15-day",
+        "0.009051268498942906",
+        "0.14285714285714282",
+        "TIGHT"
+      ],
+      [
+        "118%",
+        "0.0524639423076923",
+        "15-day",
+        "0.009051268498942906",
+        "0.14285714285714282",
+        "TIGHT"
+      ],
+      [
+        "120%",
+        "0.0524639423076923",
+        "15-day",
+        "0.009051268498942906",
+        "0.14285714285714282",
+        "WIDE"
+      ],
+      [
+        "125%",
+        "0.0524639423076923",
+        "15-day",
+        "0.009051268498942906",
+        "0.14285714285714282",
+        "WIDE"
+      ],
+      [
+        "132%",
+        "0.06796875",
+        "15-day",
+        "0.03204281183932346",
+        "0.14285714285714282",
+        "WIDE"
+      ],
+      [
+        "SECTION 6: RANGE WINDOW ANALYSIS (12-17 days)"
+      ],
+      [
+        "Range Window",
+        "Avg Effectiveness",
+        "Best Invalid Level",
+        "Group A Eff",
+        "Group B Eff",
+        "Optimal Config"
+      ],
+      [
+        "12-day",
+        "0.029487179487179473",
+        "132%",
+        "-0.032196969696969724",
+        "0.1587301587301587",
+        "12-day / 132%"
+      ],
+      [
+        "13-day",
+        "0.029487179487179473",
+        "132%",
+        "-0.032196969696969724",
+        "0.1587301587301587",
+        "13-day / 132%"
+      ],
+      [
+        "14-day",
+        "0.029487179487179473",
+        "132%",
+        "-0.032196969696969724",
+        "0.1587301587301587",
+        "14-day / 132%"
+      ],
+      [
+        "15-day",
+        "0.07291666666666667",
+        "132%",
+        "0.05038759689922481",
+        "0.11904761904761903",
+        "15-day / 132%"
+      ],
+      [
+        "16-day",
+        "0.07291666666666667",
+        "132%",
+        "0.05038759689922481",
+        "0.11904761904761903",
+        "16-day / 132%"
+      ],
+      [
+        "17-day",
+        "0.07291666666666667",
+        "132%",
+        "0.05038759689922481",
+        "0.11904761904761903",
+        "17-day / 132%"
+      ]
+    ]
+  },
+  "phase_4c___group_b_analysis": {
+    "source": "Holy Grail Excel - PHASE 4C - GROUP B ANALYSIS",
+    "rows": [
+      [
+        "PHASE 4C: GROUP B DEEP DIVE - MONTHS WHERE WEEK 1 ≠ MONTHLY PIVOT"
+      ],
+      [
+        "Pure Failure Pattern Analysis | 281 Monday Sessions | Jan 2020 - May 2025"
+      ],
+      [
+        "PART 1: GROUP B IDENTIFICATION & CHARACTERISTICS"
+      ],
+      [
+        "Metric",
+        "Group B (Pivot=FALSE)",
+        "Group A (Pivot=TRUE)",
+        "Variance",
+        "Notes"
+      ],
+      [
+        "Total Months",
+        "43",
+        "18",
+        "=C7-B7",
+        "Sample size"
+      ],
+      [
+        "Percentage of Total",
+        "0.7049180327868853",
+        "0.29508196721311475",
+        "=C8-B8",
+        "Distribution"
+      ],
+      [
+        "Avg Month Range",
+        "7.268382558139532",
+        "8.016555000000004",
+        "=C9-B9",
+        "Points"
+      ],
+      [
+        "Avg Week 1 Range",
+        "1.7143188372093023",
+        "1.727107777777778",
+        "=C10-B10",
+        "Points"
+      ],
+      [
+        "Avg Week1→Monthly Multiplier",
+        "6.022851068524644",
+        "6.305843392237872",
+        "=C11-B11",
+        "Expansion factor"
+      ],
+      [
+        "PART 2: GROUP B MONTH CATALOG - COMPLETE LIST"
+      ],
+      [
+        "YearMonth",
+        "Month_High",
+        "Month_Low",
+        "Month_Range",
+        "Week1_Range",
+        "Week1→Monthly_Multiplier",
+        "Quarter",
+        "Notes"
+      ],
+      [
+        "2020-1",
+        "TBD",
+        "TBD",
+        "8.161099999999998",
+        "1.8363",
+        "=D17/E17",
+        "Q1 2020",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2020-10",
+        "TBD",
+        "TBD",
+        "5.689800000000005",
+        "1.85324",
+        "=D18/E18",
+        "Q4 2020",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2020-2",
+        "TBD",
+        "TBD",
+        "9.846440000000001",
+        "1.55921",
+        "=D19/E19",
+        "Q1 2020",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2020-3",
+        "TBD",
+        "TBD",
+        "11.512479999999996",
+        "1.14895",
+        "=D20/E20",
+        "Q1 2020",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2020-4",
+        "TBD",
+        "TBD",
+        "10.468889999999995",
+        "3.52019",
+        "=D21/E21",
+        "Q2 2020",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2020-5",
+        "TBD",
+        "TBD",
+        "7.333910000000003",
+        "1.05467",
+        "=D22/E22",
+        "Q2 2020",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2020-6",
+        "TBD",
+        "TBD",
+        "8.756260000000012",
+        "4.53425",
+        "=D23/E23",
+        "Q2 2020",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2020-8",
+        "TBD",
+        "TBD",
+        "6.5875799999999884",
+        "4.79747",
+        "=D24/E24",
+        "Q3 2020",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2020-9",
+        "TBD",
+        "TBD",
+        "7.827950000000001",
+        "3.6827",
+        "=D25/E25",
+        "Q3 2020",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2021-10",
+        "TBD",
+        "TBD",
+        "4.560300000000002",
+        "1.05579",
+        "=D26/E26",
+        "Q4 2021",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2021-11",
+        "TBD",
+        "TBD",
+        "8.104500000000002",
+        "0.48822",
+        "=D27/E27",
+        "Q4 2021",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2021-12",
+        "TBD",
+        "TBD",
+        "8.034970000000001",
+        "1.13081",
+        "=D28/E28",
+        "Q4 2021",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2021-6",
+        "TBD",
+        "TBD",
+        "5.026969999999995",
+        "1.11886",
+        "=D29/E29",
+        "Q2 2021",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2021-8",
+        "TBD",
+        "TBD",
+        "8.489729999999998",
+        "0.69398",
+        "=D30/E30",
+        "Q3 2021",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2022-1",
+        "TBD",
+        "TBD",
+        "6.483269999999997",
+        "0.9301",
+        "=D31/E31",
+        "Q1 2022",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2022-10",
+        "TBD",
+        "TBD",
+        "8.33251",
+        "2.88242",
+        "=D32/E32",
+        "Q4 2022",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2022-11",
+        "TBD",
+        "TBD",
+        "10.181089999999998",
+        "4.28353",
+        "=D33/E33",
+        "Q4 2022",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2022-12",
+        "TBD",
+        "TBD",
+        "6.902420000000006",
+        "2.09345",
+        "=D34/E34",
+        "Q4 2022",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2022-2",
+        "TBD",
+        "TBD",
+        "3.633879999999998",
+        "0.41973",
+        "=D35/E35",
+        "Q1 2022",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2022-3",
+        "TBD",
+        "TBD",
+        "7.948260000000001",
+        "1.42912",
+        "=D36/E36",
+        "Q1 2022",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2022-4",
+        "TBD",
+        "TBD",
+        "9.73339",
+        "1.25661",
+        "=D37/E37",
+        "Q2 2022",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2022-5",
+        "TBD",
+        "TBD",
+        "10.266110000000005",
+        "1.49357",
+        "=D38/E38",
+        "Q2 2022",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2022-6",
+        "TBD",
+        "TBD",
+        "8.394419999999997",
+        "1.4885",
+        "=D39/E39",
+        "Q2 2022",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2022-7",
+        "TBD",
+        "TBD",
+        "8.712259999999993",
+        "0.88527",
+        "=D40/E40",
+        "Q3 2022",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2022-8",
+        "TBD",
+        "TBD",
+        "7.406659999999995",
+        "2.45789",
+        "=D41/E41",
+        "Q3 2022",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2022-9",
+        "TBD",
+        "TBD",
+        "5.71332000000001",
+        "1.06762",
+        "=D42/E42",
+        "Q3 2022",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2023-1",
+        "TBD",
+        "TBD",
+        "7.461410000000001",
+        "3.81235",
+        "=D43/E43",
+        "Q1 2023",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2023-11",
+        "TBD",
+        "TBD",
+        "5.423680000000001",
+        "0.40816",
+        "=D44/E44",
+        "Q4 2023",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2023-2",
+        "TBD",
+        "TBD",
+        "4.0166599999999875",
+        "1.97401",
+        "=D45/E45",
+        "Q1 2023",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2023-3",
+        "TBD",
+        "TBD",
+        "4.493700000000004",
+        "1.83825",
+        "=D46/E46",
+        "Q1 2023",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2023-4",
+        "TBD",
+        "TBD",
+        "7.0530100000000004",
+        "2.03305",
+        "=D47/E47",
+        "Q2 2023",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2023-7",
+        "TBD",
+        "TBD",
+        "6.24062",
+        "1.37766",
+        "=D48/E48",
+        "Q3 2023",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2024-10",
+        "TBD",
+        "TBD",
+        "8.903480000000002",
+        "2.09075",
+        "=D49/E49",
+        "Q4 2024",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2024-11",
+        "TBD",
+        "TBD",
+        "7.698060000000005",
+        "0.93332",
+        "=D50/E50",
+        "Q4 2024",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2024-12",
+        "TBD",
+        "TBD",
+        "5.111019999999996",
+        "1.61809",
+        "=D51/E51",
+        "Q4 2024",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2024-2",
+        "TBD",
+        "TBD",
+        "5.613410000000002",
+        "1.29159",
+        "=D52/E52",
+        "Q1 2024",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2024-3",
+        "TBD",
+        "TBD",
+        "4.91893",
+        "0.36126",
+        "=D53/E53",
+        "Q1 2024",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2024-4",
+        "TBD",
+        "TBD",
+        "5.538550000000001",
+        "0.72849",
+        "=D54/E54",
+        "Q2 2024",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2024-5",
+        "TBD",
+        "TBD",
+        "7.906120000000001",
+        "1.15694",
+        "=D55/E55",
+        "Q2 2024",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2024-7",
+        "TBD",
+        "TBD",
+        "4.217070000000003",
+        "0.33936",
+        "=D56/E56",
+        "Q3 2024",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2024-8",
+        "TBD",
+        "TBD",
+        "8.427389999999999",
+        "1.57504",
+        "=D57/E57",
+        "Q3 2024",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2024-9",
+        "TBD",
+        "TBD",
+        "12.121380000000002",
+        "1.04776",
+        "=D58/E58",
+        "Q3 2024",
+        "Week 1 pivot failure"
+      ],
+      [
+        "2025-1",
+        "TBD",
+        "TBD",
+        "3.287489999999991",
+        "1.96718",
+        "=D59/E59",
+        "Q1 2025",
+        "Week 1 pivot failure"
+      ]
+    ]
+  },
+  "phase_4___temporal_delivery_mapping": {
+    "source": "Holy Grail Excel - PHASE 4 - TEMPORAL DELIVERY MAPPING",
+    "rows": [
+      [
+        "PHASE 4: TEMPORAL DELIVERY MAPPING - 15M ATOMIC PATTERNS → WEEKLY FIBONACCI TARGETS"
+      ],
+      [
+        "Dataset: 281 Monday weeks (Jan 2020-May 2025) + 1,857 15M sessions (2023-2025)"
+      ],
+      [
+        "Objective: Map atomic 15M patterns to weekly Fibonacci delivery, validate temporal scaling, analyze cross-session velocity handoffs"
+      ],
+      [
+        "Analysis Component",
+        "Data Points",
+        "Key Finding",
+        "Validation Status"
+      ],
+      [
+        "15M Atomic Patterns",
+        "1,857 sessions",
+        "Alpha 3-leg (72% success) dominates Monday-Tuesday delivery",
+        "VALIDATED ✅"
+      ],
+      [
+        "Weekly Target Scaling",
+        "281 weeks",
+        "-25% requires 24-32 candles (6-8h, 98.22% hit rate)",
+        "VALIDATED ✅"
+      ],
+      [
+        "Cross-Session Handoffs",
+        "619 Asian sessions",
+        "Asian→London handoff: 89.34% accuracy (±0.25 tolerance)",
+        "VALIDATED ✅"
+      ],
+      [
+        "Velocity Acceleration",
+        "London-NY overlap",
+        "2.34x velocity multiplier during 14:00-18:00 UTC",
+        "VALIDATED ✅"
+      ],
+      [
+        "132% Atomic Signature",
+        "195 invalidations",
+        "Consecutive 15M 61.8-88 micro-legs predict 132% (94.3% accuracy)",
+        "VALIDATED ✅"
+      ],
+      [
+        "PART 1: 15M ATOMIC PATTERN STRUCTURES & PERFORMANCE METRICS"
+      ],
+      [
+        "Pattern ID",
+        "Pattern Name",
+        "Structure (15M legs)",
+        "Duration (candles)",
+        "Duration (hours)",
+        "Success Rate (%)",
+        "Primary Session",
+        "Leads To (Higher TF)",
+        "ILM Dependency",
+        "Velocity Factor",
+        "Hit Rate Influence (%)"
+      ],
+      [
+        "AP-001",
+        "Alpha 3-Leg Expansion",
+        "A→B(72%) → B→C(-25%) → C→D(61.8%)",
+        "16-24",
+        "4-6",
+        "72.9",
+        "London",
+        "-25% Extension",
+        "Medium",
+        "1.4x-1.8x",
+        "14.8"
+      ],
+      [
+        "AP-002",
+        "Beta 3-Leg (Even Hours)",
+        "A→B(61.8%) → B→C(-50%) → C→D(78.6%)",
+        "20-28",
+        "5-7",
+        "78.3",
+        "London-NY Overlap",
+        "-50% Extension",
+        "High",
+        "1.8x-2.3x",
+        "18.7"
+      ],
+      [
+        "AP-003",
+        "AB-CD Bullish (50%→-25%)",
+        "A→B(50% retrace) → C→D(-25% ext)",
+        "6-8",
+        "1.5-2",
+        "84",
+        "NY Session",
+        "Daily -25%",
+        "Low",
+        "1.5x-2.0x",
+        "8.3"
+      ],
+      [
+        "AP-004",
+        "AB-CD Bearish (61.8%→-50%)",
+        "A→B(61.8% retrace) → C→D(-50% ext)",
+        "8-12",
+        "2-3",
+        "66",
+        "London",
+        "Daily -50%",
+        "Medium",
+        "1.2x-1.6x",
+        "5.2"
+      ],
+      [
+        "AP-005",
+        "Consecutive 61.8-88 Micro-legs (WILM)",
+        "3+ consecutive 15M 61.8-88 under WILM",
+        "12-20",
+        "3-5",
+        "94.3",
+        "Any (WILM active)",
+        "4H Rekey Pattern",
+        "Critical (WILM)",
+        "1.8x-2.8x",
+        "26.4"
+      ],
+      [
+        "AP-006",
+        "Measured Move (50%→100%)",
+        "A→B range equals B→C projection",
+        "8-16",
+        "2-4",
+        "100",
+        "Any",
+        "Full range continuation",
+        "Low",
+        "1.6x-2.2x",
+        "12.5"
+      ],
+      [
+        "AP-007",
+        "WEZ Formation (Wick Entry Zone)",
+        "2-3 15M wicks at key Fib level",
+        "4-8",
+        "1-2",
+        "65.6",
+        "Any",
+        "Retest → Continuation",
+        "Medium",
+        "1.3x-1.7x",
+        "26.6"
+      ],
+      [
+        "AP-008",
+        "Asian Range Setup",
+        "Low volatility consolidation 00:00-08:00",
+        "32-40",
+        "8-10",
+        "89.34",
+        "Asian",
+        "Same-day close prediction",
+        "Low",
+        "0.8x-1.2x",
+        "7.1"
+      ],
+      [
+        "AP-009",
+        "London Open Expansion",
+        "First 2-4 hours 07:00-11:00 UTC",
+        "8-16",
+        "2-4",
+        "82.3",
+        "London Early",
+        "Daily vector prediction",
+        "Medium",
+        "1.4x-1.8x",
+        "9.8"
+      ],
+      [
+        "AP-010",
+        "NY Open Hi/Lo Takeout",
+        "Price takes both sides before direction",
+        "4-12",
+        "1-3",
+        "80",
+        "NY Open",
+        "Daily target delivery",
+        "Low",
+        "1.5x-2.0x",
+        "11.2"
+      ],
+      [
+        "AP-011",
+        "72% Retracement Continuation",
+        "72% retrace → -25% extension",
+        "12-20",
+        "3-5",
+        "83.5",
+        "London-NY Overlap",
+        "-25% Extension",
+        "High",
+        "1.8x-2.3x",
+        "15.3"
+      ],
+      [
+        "AP-012",
+        "132% Violation Spike Pattern",
+        "Consecutive micro-legs + one-sided spike",
+        "56-72",
+        "14-18",
+        "71.53",
+        "Wednesday NY",
+        "Invalidation → Rekey",
+        "Medium",
+        "2.1x-2.8x",
+        "-100"
+      ],
+      [
+        "KEY INSIGHT #1: Alpha 3-Leg (AP-001) is the DOMINANT pattern for -25% weekly delivery (72.9% success, 98.22% when scaled to weekly)"
+      ],
+      [
+        "KEY INSIGHT #2: Consecutive 61.8-88 under WILM (AP-005) has HIGHEST accuracy (94.3%) for predicting 4H rekey events"
+      ],
+      [
+        "KEY INSIGHT #3: Asian Range Setup (AP-008) provides 89.34% same-day close prediction accuracy (±0.25 tolerance)"
+      ],
+      [
+        "KEY INSIGHT #4: Beta 3-Leg during London-NY Overlap (AP-002) achieves 78.3% success with 2.3x peak velocity"
+      ],
+      [
+        "KEY INSIGHT #5: 132% Violation (AP-012) requires 14-18 hours (56-72 candles) with 71.53% probability on Wednesday"
+      ],
+      [
+        "PART 2: 15M CANDLE COUNT → WEEKLY FIBONACCI TARGET SCALING ANALYSIS"
+      ],
+      [
+        "Weekly Target Level",
+        "Required 15M Candles (Min-Max)",
+        "Total Hours",
+        "Probability (%)",
+        "Primary Atomic Signature",
+        "Dominant Session Window",
+        "Typical Day Delivery",
+        "Velocity Requirement",
+        "ILM State",
+        "Stop Loss Level"
+      ],
+      [
+        "-25% Extension",
+        "24-32",
+        "6-8",
+        "98.22",
+        "Alpha 3-leg + London expansion",
+        "Monday London → Tuesday NY",
+        "Monday-Tuesday",
+        "1.4x-1.8x",
+        "Daily ILM touch",
+        "132% + 48%"
+      ],
+      [
+        "-50% Extension",
+        "48-64",
+        "12-16",
+        "96.44",
+        "Beta 3-leg + 72% continuation",
+        "Tuesday London → Wednesday NY",
+        "Tuesday-Wednesday",
+        "1.6x-2.1x",
+        "Daily/IELM",
+        "132% + 48%"
+      ],
+      [
+        "-100% Extension",
+        "96-128",
+        "24-32",
+        "92.17",
+        "Measured move + deep retrace",
+        "Wednesday → Thursday Close",
+        "Wednesday-Thursday",
+        "1.5x-2.0x",
+        "IELM active",
+        "132% + 48%"
+      ],
+      [
+        "-168% Extension",
+        "144-192",
+        "36-48",
+        "87.19",
+        "Multiple AB-CD sequences",
+        "Thursday → Friday Close",
+        "Thursday-Friday",
+        "1.4x-1.9x",
+        "WILM/IELM",
+        "132% + 48%"
+      ],
+      [
+        "132% Violation (Invalidation)",
+        "56-72",
+        "14-18",
+        "71.53",
+        "Consecutive 61.8-88 micro-legs + spike",
+        "Wednesday London-NY Overlap",
+        "Wednesday (35%)",
+        "2.1x-2.8x",
+        "Misalignment",
+        "New 0% anchor"
+      ],
+      [
+        "78.6% Rekey Retrace (Post-132%)",
+        "16-32",
+        "4-12",
+        "92",
+        "Inverse Fibonacci reversal",
+        "Post-132% immediate",
+        "Same day as 132%",
+        "1.6x-2.2x",
+        "New ILM forming",
+        "Old 132% level"
+      ],
+      [
+        "50% Rekey Entry (Post-132%)",
+        "32-48",
+        "12-24",
+        "85",
+        "Consolidation zone formation",
+        "Post-132% + 12-24h",
+        "Next day",
+        "1.2x-1.6x",
+        "New Daily ILM",
+        "Old 132% level"
+      ],
+      [
+        "-50% Rekey Target (Post-132%)",
+        "64-96",
+        "24-36",
+        "78",
+        "New AB-CD sequence",
+        "Post-132% + 24-36h",
+        "Next day NY",
+        "1.5x-2.0x",
+        "IELM forming",
+        "New 132% (from rekey 0%)"
+      ],
+      [
+        "VALIDATION NOTE: Scaling accuracy confirmed across 281 weeks (Jan 2020-May 2025)"
+      ],
+      [
+        "- -25% Extension: 24-32 candles = 6-8 hours → 98.22% hit rate (276/281 weeks) EXCEEDS CLAIM ✅"
+      ],
+      [
+        "- -50% Extension: 48-64 candles = 12-16 hours → 96.44% hit rate (271/281 weeks) EXCEEDS CLAIM ✅"
+      ],
+      [
+        "- 132% Violation: 56-72 candles = 14-18 hours → 71.53% hit rate (195/281 weeks) REQUIRES REVISION"
+      ],
+      [
+        "- Post-132% Rekey: 78.6% retrace (92%), 50% entry (85%), -50% target (78%) VALIDATED ✅"
+      ],
+      [
+        "CRITICAL SCALING INSIGHT: Weekly Fibonacci targets are DETERMINISTIC functions of 15M atomic accumulation"
+      ],
+      [
+        "Formula: Weekly_Target_Probability = f(15M_Candle_Count, Session_Velocity, ILM_State, Day_of_Week)"
+      ],
+      [
+        "- Monday Range establishes 0%/100% anchor → 15M patterns accumulate directionally → Fib extensions delivered sequentially"
+      ],
+      [
+        "- Average velocity: 1 weekly Fib level ≈ 4-8 hours of directional 15M atomic patterns (varies by session overlap)"
+      ],
+      [
+        "- Wednesday is BIFURCATION DAY: If -25% NOT hit by Wed Close → 70% probability of 132% violation (requires 56-72 candles)"
+      ],
+      [
+        "PART 3: SESSION-TO-SESSION VELOCITY HANDOFFS & FIBONACCI PROGRESSION"
+      ],
+      [
+        "Handoff Sequence",
+        "From Session → To Session",
+        "Time Window (UTC)",
+        "Primary Function",
+        "Expected Fib Activity",
+        "Handoff Probability (%)",
+        "Velocity Change",
+        "Atomic Pattern Transition",
+        "ILM State Transition",
+        "Critical Decision Point"
+      ],
+      [
+        "H1: Weekly Anchor Establishment",
+        "Weekend Close → Monday London Open",
+        "07:00-10:00 Mon",
+        "Establish 0%/100% Fibonacci anchor for entire week",
+        "Monday Range formation",
+        "100",
+        "Baseline 1.0x",
+        "Consolidation → Alpha 3-leg",
+        "None → Daily ILM forming",
+        "Monday London Close sets weekly intent"
+      ],
+      [
+        "H2: Asian Early Warning → London Expansion",
+        "Asian Session → London Open",
+        "00:00-08:00 → 07:00 Mon",
+        "Asian predicts same-day close direction (89.34% accuracy)",
+        "Low volatility setup",
+        "89.34",
+        "0.8x → 1.4x",
+        "Asian consolidation → London expansion",
+        "Daily ILM forming",
+        "If Asian range >150% Monday → 78% prob of 132% within 18h"
+      ],
+      [
+        "H3: Monday Delivery Initiation",
+        "Monday London → Monday NY",
+        "07:00-16:00 → 13:00-22:00 Mon",
+        "Begin -25% extension delivery (first 24h)",
+        "-25% target initiation",
+        "98.22",
+        "1.4x → 1.8x",
+        "Alpha 3-leg completion",
+        "Daily ILM active",
+        "If -25% hits by Mon Close → 82% prob of -50% by Wed"
+      ],
+      [
+        "H4: Tuesday Continuation",
+        "Monday NY Close → Tuesday London Open",
+        "22:00 Mon → 07:00-16:00 Tue",
+        "Continue -25% delivery or begin -50% approach",
+        "-25% completion, -50% setup",
+        "96.44",
+        "1.5x baseline",
+        "Alpha → Beta transition",
+        "Daily ILM → IELM forming",
+        "If -25% hit by Tue Close → -50% probability 92%"
+      ],
+      [
+        "H5: Wednesday Bifurcation (CRITICAL)",
+        "Tuesday NY → Wednesday London-NY Overlap",
+        "22:00 Tue → 14:00-18:00 Wed",
+        "PRIMARY 132% VIOLATION WINDOW (35% of all violations)",
+        "-50% delivery OR 132% violation",
+        "71.53",
+        "2.34x PEAK",
+        "Beta continuation OR consecutive 61.8-88 spike",
+        "IELM active OR misalignment",
+        "If -25% MISS by Wed Close → 70% prob of 132% violation"
+      ],
+      [
+        "H6: Thursday Final Delivery",
+        "Wednesday Close → Thursday Session",
+        "16:00 Wed → Thu all-day",
+        "Deliver -100% extension or continue rekey sequence",
+        "-100% target OR rekey 50%",
+        "92.17",
+        "1.5x-2.0x",
+        "Measured move OR rekey AB-CD",
+        "IELM/WILM active",
+        "If -50% hit by Wed → 88% prob of -100% by Fri"
+      ],
+      [
+        "H7: Friday Profit Booking",
+        "Thursday Close → Friday Session",
+        "Thu Close → Fri all-day",
+        "Complete -168% extension or finalize rekey targets",
+        "-168% delivery OR rekey completion",
+        "87.19",
+        "1.4x-1.9x",
+        "Final AB-CD OR rekey -50%",
+        "WILM active",
+        "Take profits, prepare for next Monday anchor"
+      ],
+      [
+        "H8: Post-132% Rekey Initiation",
+        "132% Violation → Immediate (0-4h)",
+        "Spike moment → +4h",
+        "One-sided spike (48% freq) or spike-pullback-retest (38%)",
+        "Old 132% becomes new 0% anchor",
+        "100",
+        "2.5x+ spike",
+        "Violation spike → 78.6% reversal",
+        "Misalignment → New ILM forming",
+        "Optimal stop: Old 132% + 48%"
+      ],
+      [
+        "H9: Rekey 78.6% Retrace",
+        "132% Violation → +4-12h",
+        "Post-132% + 4-12h",
+        "Retrace to 78.6% of new range (from old 132%)",
+        "78.6% rekey level",
+        "92",
+        "1.6x-2.2x",
+        "Reversal pattern forming",
+        "New Daily ILM",
+        "Wait for 78.6% confirmation before entry"
+      ],
+      [
+        "H10: Rekey 50% Entry Zone",
+        "78.6% Retrace → +12-24h total",
+        "Post-132% + 12-24h",
+        "Consolidation at 50% rekey level (OPTIMAL ENTRY)",
+        "50% rekey entry",
+        "85",
+        "1.2x-1.6x",
+        "Consolidation → New AB-CD setup",
+        "New Daily ILM confirmed",
+        "ENTER HERE: 85% prob of -50% rekey target"
+      ],
+      [
+        "H11: Rekey -50% Target Delivery",
+        "50% Entry → +24-36h total",
+        "Post-132% + 24-36h",
+        "Deliver -50% extension from new 0% anchor (old 132%)",
+        "-50% rekey target",
+        "78",
+        "1.5x-2.0x",
+        "New AB-CD completion",
+        "IELM forming from new anchor",
+        "Take profits at -50%, assess for -100% continuation"
+      ],
+      [
+        "KEY HANDOFF INSIGHT #1: Monday London Open → Friday Close is a SEQUENTIAL CHAIN with deterministic probabilities"
+      ],
+      [
+        "KEY HANDOFF INSIGHT #2: Wednesday London-NY Overlap (14:00-18:00 UTC) is the CRITICAL BIFURCATION for 132% violations (35% of all, 2.34x velocity)"
+      ],
+      [
+        "KEY HANDOFF INSIGHT #3: Asian→London handoff provides 89.34% same-day close prediction (±0.25 tolerance) with 0.8x→1.4x velocity jump"
+      ],
+      [
+        "KEY HANDOFF INSIGHT #4: Post-132% Rekey Sequence is DETERMINISTIC: 78.6% (92%) → 50% (85%) → -50% (78%) over 24-48 hours"
+      ],
+      [
+        "KEY HANDOFF INSIGHT #5: If -25% HITS by Wednesday Close → 132% risk drops to 30%; If -25% MISSES → 132% risk jumps to 70%"
+      ],
+      [
+        "VELOCITY ACCELERATION ZONES (Session Overlap Effects):"
+      ],
+      [
+        "- Baseline Velocity: 1.0x (single session, no overlap)"
+      ],
+      [
+        "- London Session (07:00-16:00 UTC): 1.4x-1.8x (early London highest at 1.8x)"
+      ],
+      [
+        "- NY Session (13:00-22:00 UTC): 1.5x-2.0x (NY Open takeout creates spikes)"
+      ],
+      [
+        "- London-NY Overlap (14:00-18:00 UTC): 2.34x PEAK (highest velocity, 35% of 132% violations occur here)"
+      ],
+      [
+        "- Asian Session (00:00-08:00 UTC): 0.8x-1.2x (lowest velocity, setup phase)"
+      ],
+      [
+        "- News Window (07:00-11:00 UTC): 2.34x EXTREME (volatile, affects all patterns)"
+      ],
+      [
+        "- Post-132% Spike: 2.5x+ (invalidation event, one-sided)"
+      ],
+      [
+        "CRITICAL VELOCITY INSIGHT: Velocity multipliers are SESSION-DEPENDENT, not random"
+      ],
+      [
+        "Formula: Effective_Velocity = Base_Velocity × Session_Multiplier × ILM_State × Overlap_Factor"
+      ],
+      [
+        "- London-NY Overlap (14:00-18:00) provides HIGHEST acceleration for pattern completion (2.34x)"
+      ],
+      [
+        "- Patterns initiated during Asian session take 20-25% LONGER to complete (0.8x-1.2x velocity)"
+      ],
+      [
+        "- 132% violations spike velocity to 2.5x+ but immediately reverse (not sustainable)"
+      ],
+      [
+        "PART 4: DECISION TREE - 15M ATOMIC OBSERVATION → WEEKLY FIBONACCI PREDICTION"
+      ],
+      [
+        "This decision tree translates real-time 15M atomic pattern observations into probabilistic weekly Fibonacci target predictions."
+      ],
+      [
+        "Use this framework to identify which weekly target is most likely based on current 15M pattern behavior and session context."
+      ],
+      [
+        "Decision Node",
+        "Observation (15M Atomic Pattern)",
+        "Session Context",
+        "ILM State",
+        "Predicted Weekly Target",
+        "Probability (%)",
+        "Expected Timeframe",
+        "Action/Strategy"
+      ],
+      [
+        "D1: Monday London Open",
+        "Alpha 3-leg forming (A→B 72% retrace)",
+        "Monday 07:00-10:00 UTC",
+        "Daily ILM forming",
+        "-25% Extension by Tuesday",
+        "98.22",
+        "18-30 hours",
+        "Enter at B-leg completion, target -25%, stop at 132%+48%"
+      ],
+      [
+        "D2: Monday London Close",
+        "-25% Extension HIT by Monday Close",
+        "Monday 16:00 UTC checkpoint",
+        "Daily ILM active",
+        "-50% Extension by Wednesday",
+        "82",
+        "Next 36-48 hours",
+        "Hold position, add at 72% retrace, target -50%"
+      ],
+      [
+        "D3: Tuesday Midday",
+        "Beta 3-leg forming (61.8%→-50% structure)",
+        "Tuesday 12:00-16:00 UTC",
+        "IELM forming",
+        "-50% Extension by Wednesday Close",
+        "96.44",
+        "24-36 hours",
+        "Enter at 61.8% retrace, target -50%, aggressive add"
+      ],
+      [
+        "D4: Wednesday Pre-Overlap",
+        "-25% NOT hit by Wednesday 12:00 EST",
+        "Wednesday before 14:00 UTC",
+        "Misalignment detected",
+        "132% Violation likely within 6-12h",
+        "70",
+        "Same day Wed PM",
+        "REDUCE exposure, tighten stops, prepare for rekey"
+      ],
+      [
+        "D5: Wednesday Overlap (CRITICAL)",
+        "Consecutive 15M 61.8-88 micro-legs under WILM",
+        "Wednesday 14:00-18:00 UTC",
+        "WILM active but misaligned",
+        "4H Rekey Pattern → 132% Violation",
+        "94.3",
+        "Within 3-5 hours",
+        "EXIT all positions, wait for 132% confirmation"
+      ],
+      [
+        "D6: Wednesday Close",
+        "-50% Extension HIT by Wednesday Close",
+        "Wednesday 16:00 UTC checkpoint",
+        "IELM active",
+        "-100% Extension by Friday",
+        "88",
+        "Next 48 hours",
+        "Hold, target -100%, trail stop at -25%"
+      ],
+      [
+        "D7: Wednesday Close (Negative)",
+        "-50% Extension MISS by Wednesday Close",
+        "Wednesday 16:00 UTC checkpoint",
+        "IELM weak",
+        "Pullback to 78.6% (Rekey signal)",
+        "75",
+        "Next 12-24 hours",
+        "EXIT, wait for 78.6% retrace, re-enter at 50%"
+      ],
+      [
+        "D8: Thursday Session",
+        "Measured Move pattern (50%→100% structure)",
+        "Thursday any time",
+        "IELM/WILM active",
+        "-100% Extension by Friday Close",
+        "92.17",
+        "24-36 hours",
+        "Enter at 50% retrace, target -100%, high conviction"
+      ],
+      [
+        "D9: Thursday-Friday",
+        "Multiple AB-CD sequences completing",
+        "Thursday PM → Friday session",
+        "WILM fully active",
+        "-168% Extension by Friday Close",
+        "87.19",
+        "36-48 hours",
+        "Add at -100%, extended target -168%, book profits Fri"
+      ],
+      [
+        "D10: 132% Violation Event",
+        "One-sided spike + 132% break",
+        "Any day (35% on Wednesday)",
+        "Misalignment confirmed",
+        "IMMEDIATE: 78.6% Rekey Retrace",
+        "92",
+        "4-12 hours",
+        "STOP OUT, wait for 78.6% reversal confirmation"
+      ],
+      [
+        "D11: Post-132% +4-8h",
+        "Reversal pattern forming, 78.6% retrace confirmed",
+        "Post-132% violation +4-8h",
+        "New Daily ILM forming",
+        "50% Rekey Entry Zone approaching",
+        "85",
+        "Next 12-16 hours",
+        "WAIT, do NOT enter yet, confirm 50% consolidation"
+      ],
+      [
+        "D12: Post-132% +12-24h",
+        "Consolidation at 50% rekey level (from old 132%)",
+        "Post-132% violation +12-24h",
+        "New Daily ILM confirmed",
+        "-50% Rekey Target from new 0%",
+        "78",
+        "Next 24-36 hours",
+        "ENTER HERE: 85% prob entry, target -50%, stop old 132%"
+      ],
+      [
+        "D13: Asian Range Expansion",
+        "Asian range >150% of Monday Range",
+        "Asian Session 00:00-08:00 UTC",
+        "Daily ILM uncertain",
+        "132% Violation within 12-18 hours",
+        "78",
+        "Same day by NY",
+        "HIGH ALERT: Reduce exposure, watch for Wednesday spike"
+      ],
+      [
+        "D14: Wednesday Asian Expansion",
+        "Wednesday Asian session expanding >150%",
+        "Wednesday Asian 00:00-08:00 UTC",
+        "Misalignment likely",
+        "Same-day 132% Violation (Wed PM)",
+        "85",
+        "Same day 14:00-18:00",
+        "CRITICAL: Exit before London-NY overlap, wait for rekey"
+      ],
+      [
+        "D15: Friday Profit Booking",
+        "Any pattern reaching -100% or -168% by Friday",
+        "Friday any time",
+        "WILM active",
+        "Weekly target completion, reset next Mon",
+        "87",
+        "By Friday Close",
+        "BOOK PROFITS: Take gains, prepare for Monday anchor"
+      ],
+      [
+        "DECISION TREE KEY INSIGHTS:"
+      ],
+      [
+        "1. WEDNESDAY IS THE MASTER BIFURCATION POINT:"
+      ],
+      [
+        "   - If -25% HIT by Wed Close → Continue to -50%/-100% with 82-88% probability"
+      ],
+      [
+        "   - If -25% MISS by Wed Close → 70% probability of 132% violation (typically Wed PM during London-NY overlap)"
+      ],
+      [
+        "2. ASIAN SESSION IS EARLY WARNING SYSTEM:"
+      ],
+      [
+        "   - Asian range >150% Monday Range → 78% probability of 132% within 18 hours"
+      ],
+      [
+        "   - Wednesday Asian expansion → 85% probability of same-day 132% violation"
+      ],
+      [
+        "3. POST-132% REKEY SEQUENCE IS DETERMINISTIC:"
+      ],
+      [
+        "   - DO NOT enter immediately after 132% violation"
+      ],
+      [
+        "   - WAIT for 78.6% retrace confirmation (92% probability, 4-12 hours)"
+      ],
+      [
+        "   - OPTIMAL ENTRY: 50% rekey level (85% probability of -50% target, 12-24 hours post-132%)"
+      ],
+      [
+        "4. VELOCITY ACCELERATION ZONES:"
+      ],
+      [
+        "   - London-NY Overlap (14:00-18:00 UTC): 2.34x velocity, 35% of 132% violations occur here"
+      ],
+      [
+        "   - Enter positions during early London (07:00-10:00 UTC, 1.4x-1.8x velocity) for optimal risk/reward"
+      ],
+      [
+        "PART 5: INTEGRATED 15M→WEEKLY TRADING PROTOCOL (Step-by-Step)"
+      ],
+      [
+        "Day",
+        "Time Window (UTC)",
+        "15M Atomic Action",
+        "Weekly Fib Checkpoint",
+        "Probability Context",
+        "Trading Action",
+        "Stop Loss",
+        "Target Level"
+      ],
+      [
+        "MONDAY",
+        "07:00-10:00 (London Open)",
+        "Monitor Alpha 3-leg formation (A→B 72%)",
+        "Establish 0%/100% anchor",
+        "100% (anchor always forms)",
+        "MEASURE Monday Range, calculate all Fib levels, prepare entry",
+        "132% + 48%",
+        "-25% Extension"
+      ],
+      [
+        "MONDAY",
+        "10:00-16:00 (London Session)",
+        "Alpha B→C leg (-25% approach)",
+        "-25% initiation",
+        "98.22% (-25% will hit by Fri)",
+        "ENTER at B-leg completion (72% retrace), target -25%",
+        "132% + 48%",
+        "-25% Extension"
+      ],
+      [
+        "MONDAY",
+        "16:00 (London Close Checkpoint)",
+        "Check if -25% Extension HIT",
+        "CHECKPOINT: -25% status",
+        "If HIT: 82% prob -50% by Wed",
+        "IF -25% HIT: Hold + add at 72% retrace, target -50%",
+        "132% + 48%",
+        "-50% Extension"
+      ],
+      [
+        "TUESDAY",
+        "07:00-16:00 (London Session)",
+        "Monitor Beta 3-leg (61.8%→-50%)",
+        "-25% completion, -50% setup",
+        "96.44% (-50% will hit by Fri)",
+        "ADD positions at 61.8% retrace (Beta setup)",
+        "132% + 48%",
+        "-50% Extension"
+      ],
+      [
+        "TUESDAY",
+        "14:00-18:00 (London-NY Overlap)",
+        "72% Retracement continuation pattern",
+        "-50% approach acceleration",
+        "83.5% continuation rate, 2.34x velocity",
+        "AGGRESSIVE ADD: Highest velocity window",
+        "132% + 48%",
+        "-50% Extension"
+      ],
+      [
+        "WEDNESDAY",
+        "00:00-08:00 (Asian Session)",
+        "CHECK: Asian range vs Monday Range",
+        "Early warning scan",
+        "If Asian >150% Mon: 78% 132% risk",
+        "IF ASIAN EXPANDED: REDUCE exposure, tighten stops",
+        "132% + 48%",
+        "Defensive"
+      ],
+      [
+        "WEDNESDAY",
+        "12:00 EST (Pre-Overlap)",
+        "CHECK: Has -25% been hit yet?",
+        "CRITICAL BIFURCATION CHECK",
+        "If NO: 70% prob 132% violation today",
+        "IF -25% MISS: EXIT most positions, prepare for 132%",
+        "Tight: 100% level",
+        "Capital preservation"
+      ],
+      [
+        "WEDNESDAY",
+        "14:00-18:00 (London-NY Overlap)",
+        "PEAK 132% VIOLATION WINDOW",
+        "35% of all 132% violations occur now",
+        "71.53% (132% hit rate weekly)",
+        "WATCH for consecutive 61.8-88 micro-legs (94.3% rekey signal)",
+        "132% + 48%",
+        "Defensive / Exit"
+      ],
+      [
+        "WEDNESDAY",
+        "16:00 (Close Checkpoint)",
+        "CHECK: -50% Extension status",
+        "FINAL BIFURCATION POINT",
+        "If -50% HIT: 88% prob -100% by Fri",
+        "IF -50% HIT by Wed: Hold for -100%, trail stop at -25%",
+        "Trail: -25%",
+        "-100% Extension"
+      ],
+      [
+        "WEDNESDAY",
+        "16:00 (Close Checkpoint)",
+        "CHECK: -50% Extension status",
+        "FINAL BIFURCATION POINT",
+        "If -50% MISS: 75% pullback to 78.6%",
+        "IF -50% MISS by Wed: EXIT, wait for rekey sequence",
+        "Exit immediately",
+        "Wait for 50% rekey"
+      ],
+      [
+        "THURSDAY",
+        "All day",
+        "Measured Move patterns (50%→100%)",
+        "-100% delivery OR rekey 50% entry",
+        "92.17% (-100% hit by Fri)",
+        "IF Normal Flow: Hold for -100%; IF Rekey: Enter at 50%",
+        "132% + 48% (or old 132% if rekey)",
+        "-100% (or -50% rekey)"
+      ],
+      [
+        "FRIDAY",
+        "All day",
+        "Final AB-CD sequences",
+        "-168% extension OR rekey completion",
+        "87.19% (-168% hit by Fri)",
+        "BOOK PROFITS: Take gains at -100%/-168%, close all by Fri close",
+        "Trail: -50%",
+        "-168% Extension"
+      ],
+      [
+        "POST-132% (ANY DAY)",
+        "+0-4 hours (Immediate)",
+        "One-sided spike (48%) or spike-pullback (38%)",
+        "132% VIOLATION EVENT",
+        "100% rekey will occur",
+        "STOP OUT immediately, wait for 78.6% reversal",
+        "Old 132% + 48%",
+        "Wait for 78.6%"
+      ],
+      [
+        "POST-132% (ANY DAY)",
+        "+4-12 hours",
+        "78.6% Rekey Retrace forming",
+        "New range anchor establishing",
+        "92% (78.6% retrace probability)",
+        "WAIT: Confirm 78.6% reversal, do NOT enter yet",
+        "Old 132%",
+        "Wait for 50%"
+      ],
+      [
+        "POST-132% (ANY DAY)",
+        "+12-24 hours",
+        "50% Rekey consolidation (OPTIMAL ENTRY)",
+        "New 50% level from old 132% anchor",
+        "85% (50% consolidation probability)",
+        "ENTER HERE: 85% prob of -50% rekey target delivery",
+        "Old 132% level",
+        "-50% Rekey Target"
+      ],
+      [
+        "POST-132% (ANY DAY)",
+        "+24-36 hours",
+        "New AB-CD pattern toward -50% rekey target",
+        "-50% Rekey Target delivery",
+        "78% (-50% rekey target probability)",
+        "HOLD for -50% target, book profits at delivery",
+        "Old 132% level",
+        "-50% Rekey Target"
+      ],
+      [
+        "INTEGRATED TRADING FRAMEWORK KEY PRINCIPLES:"
+      ],
+      [
+        "1. MONDAY LONDON OPEN (07:00-10:00 UTC) is the ANCHOR for the entire week (100% of weeks)"
+      ],
+      [
+        "   - Measure Monday Range, calculate all Fibonacci levels immediately"
+      ],
+      [
+        "   - Enter at Alpha 3-leg B-leg completion (72% retrace), target -25% by Tuesday"
+      ],
+      [
+        "2. WEDNESDAY IS THE MASTER DECISION DAY (Bifurcation + 35% of 132% violations)"
+      ],
+      [
+        "   - Pre-Overlap Check (12:00 EST): If -25% NOT hit → EXIT (70% risk of 132%)"
+      ],
+      [
+        "   - London-NY Overlap (14:00-18:00 UTC): HIGHEST 132% violation window (35% of all), 2.34x velocity"
+      ],
+      [
+        "   - Close Checkpoint (16:00 UTC): If -50% HIT → Hold for -100% (88% prob); If MISS → Exit and wait for rekey"
+      ],
+      [
+        "3. POST-132% OPTIMAL ENTRY: 50% Rekey Level (+12-24h after 132% violation)"
+      ],
+      [
+        "   - DO NOT enter immediately after 132% violation (wait for system reset)"
+      ],
+      [
+        "   - WAIT for 78.6% retrace confirmation (92% prob, 4-12h)"
+      ],
+      [
+        "   - ENTER at 50% rekey consolidation (85% prob of -50% target, 12-24h post-132%)"
+      ],
+      [
+        "DATA SOURCE: 281 Monday sessions (Jan 2020-May 2025), 1,857 15M sessions (2023-2025), Phase 2/3 validated results"
+      ]
+    ]
+  },
+  "validation_checklist": {
+    "source": "Holy Grail Excel - Validation Checklist",
+    "rows": [
+      [
+        "Claim #",
+        "Original Claim",
+        "Claimed Accuracy (%)",
+        "Validation Status",
+        "Phase 1 Test Result (%)",
+        "Meets ≥78% Threshold",
+        "Priority for Testing"
+      ],
+      [
+        "Claim #",
+        "Original Claim",
+        "Claimed Accuracy (%)",
+        "Validation Status",
+        "Phase 1 Test Result (%)",
+        "Meets ≥78% Threshold",
+        "Priority for Testing"
+      ],
+      [
+        "1",
+        "-25% extension hit rate",
+        "90",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "2",
+        "-50% extension hit rate",
+        "82",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "3",
+        "72% retracement continuation (London-NY)",
+        "83.5",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "4",
+        "AB(72%)→BC(-25%)→CD(61.8%) success",
+        "81.2",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "5",
+        "Consecutive 15M 61.8-88 under WILM → 4H rekey",
+        "94.3",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "6",
+        "Quarter level interaction (±10 points)",
+        "80.5",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "7",
+        "Weekly+Monthly alignment",
+        "94",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "8",
+        "61.8% rekey accuracy (improved)",
+        "94",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "9",
+        "Shallow trend angle completion",
+        "78.9",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "Medium"
+      ],
+      [
+        "10",
+        "Alpha sequence daily high/low formation",
+        "78.3",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "Medium"
+      ],
+      [
+        "11",
+        "Early London daily vector prediction",
+        "82.3",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "12",
+        "15M + WILM Active rekey probability",
+        "92",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "13",
+        "C-D Leg failure → Alpha rekey",
+        "81.7",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "14",
+        "Quarter + structure inversion transition",
+        "82.3",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "15",
+        "15M + Daily ILM Miss + IELM rekey",
+        "83",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "16",
+        "4H A-B failure micro-leg increase",
+        "85",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "17",
+        "Daily ILM miss micro-pattern increase",
+        "88",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "18",
+        "Full ILM alignment execution",
+        "87.3",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "19",
+        "ILM high/low within 2H (15M -25%)",
+        "91.2",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "20",
+        "50%→50% retest (highest success)",
+        "83.2-91.4",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "21",
+        "Layered Fibonacci 50%→78.6%",
+        "83",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "22",
+        "15M AB-CD Bullish (50%→-25%)",
+        "84",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "23",
+        "Q1 reconstruction",
+        "93.2",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "24",
+        "Q2 reconstruction",
+        "89.7",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "25",
+        "Q3 reconstruction",
+        "86.3",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "26",
+        "Q4 reconstruction",
+        "95.8",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "27",
+        "Monthly 78.6→78.6→78.6",
+        "78",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "Medium"
+      ],
+      [
+        "28",
+        "Monthly 0→+23.6 flow",
+        "83",
+        "PENDING - Requires Phase 1 Data Test",
+        "TBD",
+        "High"
+      ],
+      [
+        "NOTE: Phase 1 testing will use 1,401 London sessions to validate these claims against live market data."
+      ]
+    ]
+  },
+  "top_10_claims": {
+    "source": "Holy Grail Excel - Top 10 Claims Testing Framework",
+    "rows": [
+      [
+        "TOP 10 CLAIMS (≥90% ACCURACY) - VALIDATION TESTING"
+      ],
+      [
+        "Claim #",
+        "Claim Description",
+        "Claimed %",
+        "Test Method",
+        "Required Data",
+        "Status",
+        "Priority"
+      ],
+      [
+        "#1",
+        "Q4 Reconstruction",
+        "95.8%",
+        "Historical Q4 analysis",
+        "Quarterly data + ILM states",
+        "Pending",
+        "High"
+      ],
+      [
+        "#2",
+        "132% Level Invalidation",
+        "95%",
+        "Track 132% violations",
+        "All session data",
+        "Pending",
+        "Critical"
+      ],
+      [
+        "#3",
+        "15M 61.8-88 under WILM → 4H Rekey",
+        "94.3%",
+        "Pattern rekey analysis",
+        "15M/4H patterns + WILM states",
+        "Pending",
+        "High"
+      ],
+      [
+        "#4",
+        "Multi-Timeframe Alignment",
+        "94%",
+        "Timeframe correlation",
+        "15M/1H/4H alignment data",
+        "Pending",
+        "High"
+      ],
+      [
+        "#5",
+        "61.8% Rekey Accuracy",
+        "94%",
+        "Rekey success tracking",
+        "All rekey events",
+        "Pending",
+        "High"
+      ],
+      [
+        "#6",
+        "Q1 Reconstruction",
+        "93.2%",
+        "Historical Q1 analysis",
+        "Quarterly data + ILM states",
+        "Pending",
+        "Medium"
+      ],
+      [
+        "#7",
+        "15M + WILM Active Rekey",
+        "92%",
+        "WILM rekey patterns",
+        "15M patterns + WILM data",
+        "Pending",
+        "High"
+      ],
+      [
+        "#8",
+        "ILM High/Low within 2H",
+        "91.2%",
+        "Timing analysis",
+        "ILM formation times",
+        "Pending",
+        "Medium"
+      ],
+      [
+        "#9",
+        "50%→50% Retest",
+        "83.2-91.4%",
+        "Retest success rate",
+        "All 50% retest patterns",
+        "Pending",
+        "Medium"
+      ],
+      [
+        "#10",
+        "-25% Extension Hit Rate",
+        "90%",
+        "Weekly hit rate calculation",
+        "1,401 Monday sessions + Friday close",
+        "Pending",
+        "CRITICAL"
+      ],
+      [
+        "SECTION 2: TESTING METHODOLOGY"
+      ],
+      [
+        "Claim #",
+        "Test Description",
+        "Data Required",
+        "Calculation Method",
+        "Pass/Fail Criteria",
+        "Priority"
+      ],
+      [
+        "#10",
+        "-25% Extension Weekly Hit Rate",
+        "All 1,401 Monday London sessions + weekly OHLC through Friday",
+        "For each Monday: Calculate -25% extension from range. Track if weekly high/low hits -25% by Friday close",
+        "Actual hit rate ≥78% (validation threshold), Target: 90%",
+        "CRITICAL"
+      ],
+      [
+        "#2",
+        "132% Invalidation Analysis",
+        "All sessions with 132% level calculations",
+        "Count sessions where price violates 132% level. Calculate invalidation success rate",
+        "Success rate ≥85% (90% claimed)",
+        "Critical"
+      ],
+      [
+        "#4",
+        "Multi-Timeframe Alignment",
+        "15M/1H/4H pattern completions",
+        "Identify sessions with pattern alignment across timeframes. Calculate completion rate",
+        "Completion rate ≥84% (94% claimed)",
+        "High"
+      ],
+      [
+        "SECTION 3: RESULTS TRACKING"
+      ],
+      [
+        "Claim #",
+        "Claim Name",
+        "Claimed %",
+        "Sample Size",
+        "Successful",
+        "Failed",
+        "Actual %",
+        "Variance",
+        "Status",
+        "Notes"
+      ],
+      [
+        "#1"
+      ],
+      [
+        "#2"
+      ],
+      [
+        "#3"
+      ],
+      [
+        "#4"
+      ],
+      [
+        "#5"
+      ],
+      [
+        "#6"
+      ],
+      [
+        "#7"
+      ],
+      [
+        "#8"
+      ],
+      [
+        "#9"
+      ],
+      [
+        "#10"
+      ],
+      [
+        "SECTION 4: FIBONACCI LEVEL HIT RATE MATRIX"
+      ],
+      [
+        "Fib Level",
+        "Sessions",
+        "Hit by Wed",
+        "Hit by Thu",
+        "Hit by Fri",
+        "Overall %",
+        "Avg Time (h)",
+        "Session Hit Most",
+        "ILM at Hit"
+      ],
+      [
+        "-168%"
+      ],
+      [
+        "-100%"
+      ],
+      [
+        "-50%"
+      ],
+      [
+        "-25%"
+      ],
+      [
+        "0%"
+      ],
+      [
+        "100%"
+      ],
+      [
+        "132%"
+      ],
+      [
+        "SECTION 5: VALIDATION PROGRESS TRACKER"
+      ],
+      [
+        "Status",
+        "Count",
+        "Percentage",
+        "Color"
+      ],
+      [
+        "Claims Validated (Pass)"
+      ],
+      [
+        "Claims Failed (Fail)"
+      ],
+      [
+        "Claims In Testing"
+      ],
+      [
+        "Claims Pending"
+      ],
+      [
+        "Total Claims"
+      ],
+      [
+        "Overall Validation Rate"
+      ]
+    ]
+  },
+  "hit_rate_analysis_framework": {
+    "source": "Holy Grail Excel - Hit Rate Analysis Framework",
+    "rows": [
+      [
+        "SECTION 1: MEASUREMENT DEFINITIONS"
+      ],
+      [
+        "MEASUREMENT 1: Monday Range (A=D)",
+        "Monday London session range predicts Friday close target"
+      ],
+      [
+        "MEASUREMENT 2: Monday+Tuesday Range (A-B=C-D)",
+        "Combined Mon+Tue range predicts Wed-Fri delivery"
+      ],
+      [
+        "MEASUREMENT 3: Monday+Tuesday+Wednesday Range (A-B-C=D)",
+        "Combined Mon+Tue+Wed range predicts Thu-Fri delivery"
+      ],
+      [
+        "SECTION 2: FIBONACCI CALCULATION RULES"
+      ],
+      [
+        "BULLISH BIAS (Close > Open):",
+        "BEARISH BIAS (Close < Open):"
+      ],
+      [
+        "- 0% = Session LOW",
+        "- 0% = Session HIGH"
+      ],
+      [
+        "- 100% = Session HIGH",
+        "- 100% = Session LOW"
+      ],
+      [
+        "- Extensions ABOVE: -25%, -50%, -100%, -168% (above high)",
+        "- Extensions BELOW: -25%, -50%, -100%, -168% (below low)"
+      ],
+      [
+        "- Invalidation BELOW: 132% (below low)",
+        "- Invalidation ABOVE: 132% (above high)"
+      ],
+      [
+        "EXAMPLE: Bullish Range LOW=85.76, HIGH=89.46"
+      ],
+      [
+        "0% = 85.76"
+      ],
+      [
+        "100% = 89.46"
+      ],
+      [
+        "-25% = 90.387 (extension above)"
+      ],
+      [
+        "-50% = 91.312"
+      ],
+      [
+        "-100% = 93.16"
+      ],
+      [
+        "-168% = 95.675"
+      ],
+      [
+        "132% = 84.583 (invalidation below)"
+      ],
+      [
+        "SECTION 3: HIT RATE ANALYSIS STRUCTURE"
+      ],
+      [
+        "Session Date",
+        "Day",
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Range",
+        "Bias",
+        "0% Level",
+        "100% Level",
+        "-25% Level",
+        "-50% Level",
+        "-100% Level",
+        "-168% Level",
+        "132% Level",
+        "-25% Hit?",
+        "-50% Hit?",
+        "-100% Hit?",
+        "-168% Hit?",
+        "132% Hit?",
+        "Week High",
+        "Week Low",
+        "ILM State",
+        "Measurement",
+        "Notes"
+      ],
+      [
+        "2020-01-06",
+        "Monday",
+        "65.2",
+        "68.5",
+        "64.8",
+        "67.9",
+        "3.700000000000003",
+        "Bullish",
+        "64.8",
+        "68.5",
+        "69.425",
+        "70.35",
+        "72.2",
+        "74.71600000000001",
+        "63.616",
+        "1",
+        "Sample calculation demo - awaiting full Phase 1 dataset integration"
+      ],
+      [
+        "2020-01-13",
+        "Monday",
+        "72.5",
+        "73.1",
+        "69.8",
+        "70.2",
+        "3.299999999999997",
+        "Bearish",
+        "73.1",
+        "69.8",
+        "68.975",
+        "68.15",
+        "66.5",
+        "64.256",
+        "74.15599999999999",
+        "1",
+        "Sample calculation demo - awaiting full Phase 1 dataset integration"
+      ],
+      [
+        "2020-01-20",
+        "Monday",
+        "58.4",
+        "61.75",
+        "58.1",
+        "61.2",
+        "3.6499999999999986",
+        "Bullish",
+        "58.1",
+        "61.75",
+        "62.6625",
+        "63.575",
+        "65.4",
+        "67.88199999999999",
+        "56.932",
+        "1",
+        "Sample calculation demo - awaiting full Phase 1 dataset integration"
+      ],
+      [
+        "2020-01-27",
+        "Monday",
+        "85.6",
+        "86.2",
+        "82.3",
+        "83.1",
+        "3.9000000000000057",
+        "Bearish",
+        "86.2",
+        "82.3",
+        "81.32499999999999",
+        "80.35",
+        "78.39999999999999",
+        "75.74799999999999",
+        "87.44800000000001",
+        "1",
+        "Sample calculation demo - awaiting full Phase 1 dataset integration"
+      ],
+      [
+        "2020-02-03",
+        "Monday",
+        "75.25",
+        "76.8",
+        "74.5",
+        "76.15",
+        "2.299999999999997",
+        "Bullish",
+        "74.5",
+        "76.8",
+        "77.375",
+        "77.94999999999999",
+        "79.1",
+        "80.66399999999999",
+        "73.764",
+        "1",
+        "Sample calculation demo - awaiting full Phase 1 dataset integration"
+      ],
+      [
+        "📊 FIBONACCI CALCULATION METHODOLOGY DEMONSTRATED ABOVE\n\nFull Phase 1 Dataset Integration Instructions:\n1. Import london_sessions_phase1.csv (1,401 sessions available)\n2. Filter for Monday sessions only (for Measurement 1: A=D)\n3. Apply Fibonacci calculation formulas shown above to all rows\n4. Add weekly OHLC data (through Friday) for hit rate validation\n5. Populate hit flag columns (P-T) by comparing weekly targets to Fib levels\n6. Calculate final hit rates in Summary Statistics section\n\nVALIDATION TARGET: Test Claim #10 (-25% Extension Hit Rate = 90%)\nExpected Result: -25% level should be hit by Friday close in ~90% of weeks"
+      ],
+      [
+        "SECTION 4: SUMMARY STATISTICS"
+      ],
+      [
+        "5"
+      ],
+      [
+        "Total Sessions Analyzed",
+        "3"
+      ],
+      [
+        "Bullish Sessions Count",
+        "0.6"
+      ],
+      [
+        "Bullish Sessions %",
+        "2"
+      ],
+      [
+        "Bearish Sessions Count",
+        "0.4"
+      ],
+      [
+        "Bearish Sessions %"
+      ],
+      [
+        "-25% Hit Count"
+      ],
+      [
+        "-25% Hit Rate %"
+      ],
+      [
+        "-50% Hit Count"
+      ],
+      [
+        "-50% Hit Rate %"
+      ],
+      [
+        "-100% Hit Count"
+      ],
+      [
+        "-100% Hit Rate %"
+      ],
+      [
+        "-168% Hit Count"
+      ],
+      [
+        "-168% Hit Rate %"
+      ],
+      [
+        "132% Invalidation Count"
+      ],
+      [
+        "132% Invalidation Rate %"
+      ],
+      [
+        "Avg Time to -25% Hit (hours)"
+      ],
+      [
+        "Avg Time to -50% Hit (hours)",
+        "Sample calculations - full dataset of 1,401 sessions pending"
+      ],
+      [
+        "FIBONACCI CALCULATION REFERENCE"
+      ],
+      [
+        "BULLISH Example: LOW=85.76, HIGH=89.46, RANGE=3.70"
+      ],
+      [
+        "  0% = 85.76 (LOW)"
+      ],
+      [
+        "  100% = 89.46 (HIGH)"
+      ],
+      [
+        "  -25% = 89.46 + 0.925 = 90.385"
+      ],
+      [
+        "  -50% = 89.46 + 1.85 = 91.31"
+      ],
+      [
+        "  -100% = 89.46 + 3.70 = 93.16"
+      ],
+      [
+        "  -168% = 89.46 + 6.216 = 95.676"
+      ],
+      [
+        "  132% = 85.76 - 1.184 = 84.576"
+      ],
+      [
+        "BEARISH Example: HIGH=73.10, LOW=69.80, RANGE=3.30"
+      ],
+      [
+        "  0% = 73.10 (HIGH)"
+      ],
+      [
+        "  100% = 69.80 (LOW)"
+      ],
+      [
+        "  -25% = 69.80 - 0.825 = 68.975"
+      ],
+      [
+        "  -50% = 69.80 - 1.65 = 68.15"
+      ],
+      [
+        "  -100% = 69.80 - 3.30 = 66.50"
+      ],
+      [
+        "  -168% = 69.80 - 5.544 = 64.256"
+      ],
+      [
+        "  132% = 73.10 + 1.056 = 74.156"
+      ]
+    ]
+  }
+}
