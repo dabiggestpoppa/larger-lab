@@ -74,10 +74,23 @@ def classify_chunk(text: str) -> tuple[str, dict]:
     """Classify a chunk by type and extract tags."""
     text_lower = text.lower()
 
-    # Count keyword matches
-    temporal_score = sum(1 for kw in TEMPORAL_KEYWORDS if kw in text_lower)
-    structural_score = sum(1 for kw in STRUCTURAL_KEYWORDS if kw in text_lower)
-    asset_score = sum(1 for kw in ASSET_KEYWORDS if kw in text_lower)
+    # Count keyword matches (use word-boundary regex to avoid false positives)
+    def count_matches(keywords, text):
+        score = 0
+        for kw in keywords:
+            # Use word boundary for short keywords (<=3 chars), substring for longer
+            if len(kw) <= 3:
+                pattern = r'\b' + re.escape(kw) + r'\b'
+                if re.search(pattern, text):
+                    score += 1
+            else:
+                if kw in text:
+                    score += 1
+        return score
+
+    temporal_score = count_matches(TEMPORAL_KEYWORDS, text_lower)
+    structural_score = count_matches(STRUCTURAL_KEYWORDS, text_lower)
+    asset_score = count_matches(ASSET_KEYWORDS, text_lower)
 
     # Determine type
     scores = {

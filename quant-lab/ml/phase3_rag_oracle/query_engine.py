@@ -38,6 +38,11 @@ class RAGQueryEngine:
         # Build query text from market state
         query_parts = []
 
+        # Asset (include in query for semantic search relevance)
+        asset = self._symbol_to_asset(symbol)
+        if asset != "GENERAL":
+            query_parts.append(f"{asset} trading rules")
+
         # Regime
         regime = features.get("regime_status", "UNKNOWN")
         query_parts.append(f"Regime {regime}")
