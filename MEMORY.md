@@ -362,4 +362,38 @@ This is because the pkl was computed with different spread assumptions.
 The forex pairs NEED to be re-swept with current spread data to get accurate velocity.
 This is a DATA QUALITY issue, not a strategy issue.
 
+---
+
+## 📝 CONTENT ENGINE (2026-06-10)
+
+### Structure
+- `content-engine/BRAND_VOICE.md` — Brand guidelines, platform-specific voice
+- `content-engine/knowledge/CONTENT_FUEL.md` — 1,626 stats organized for content
+- `content-engine/posts/BATCH_1.md` — 15 ready-to-post pieces (Twitter x5, TikTok x5, Instagram x3, YouTube x2)
+- `content-engine/templates/` — TikTok + Tweet templates
+
+### Brand Positioning
+- Anti-fake-trader, data-first, no vibes
+- "We cracked the code" narrative
+- 5 content pillars: Results, Lifestyle, Education, Community, Provocation
+
+### Accounts
+- YouTube: KEMETTRUCKING@GMAIL.COM (@FBO_LEGACY)
+- Instagram: fbo_WXRLD
+- TikTok: FBO_WXRLD (DABIGGESTPOPPA@GMAIL.COM)
+- Credentials stored: `credentials/fbo_accounts.md` (gitignored)
+
+### Status
+- BATCH_1 complete, not yet posted
+- Content CEO subagent produced all copy from Holy Grail data
+
+---
+
+## 🔐 CREDENTIALS
+
+- Stored in `credentials/` directory (gitignored)
+- `credentials/fbo_accounts.md` — FBO social media accounts
+- Never commit credentials to any repo
+
+_Last updated: 2026-06-10 12:40 EDT — Content engine + credentials documented_
 _Last updated: 2026-06-07 02:30 EDT — Velocity optimizer complete, forex re-sweep needed_
