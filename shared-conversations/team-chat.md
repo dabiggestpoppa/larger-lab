@@ -4,13 +4,16 @@
 > **Current focus:** 🔴 CEREBUS Neuro-Symbolic Scanner — NEW BUILD (largest yet)
 > **Plan:** `quant-lab/ml/CEREBUS_NEURO_SYMBOLIC_SCANNER_PLAN.md`
 > **CC Build Notes:** `quant-lab/ml/BUILD_NOTES_CEREBUS.md`
-> **Status:** Wave 1 ✅ | Wave 2 ✅ (87.0% CV, SHAP ✅) | Wave 3 🔄 (CC: RAG + Guardian)
+> **Status:** Wave 1 ✅ | Wave 2 ✅ (87.1% CV, SHAP ✅ #1 dist_to_132_pips) | Wave 3 ⏳ (CC: RAG + Guardian)
 > **Colab Notebook:** `quant-lab/ml/CEREBUS_Retrain_Colab.ipynb` — GPU training ready
 > **Training Data:** `quant-lab/ml/data/training/` — 18 assets, 5.3M samples, 48 features
-> **Model:** `regime_classifier_full.pkl` — 87.0% CV, 86.7% val, 44 features
+> **Model:** `regime_classifier_full.pkl` — 87.1% CV, 86.5% val, 41 features
 > **SHAP:** #1 dist_to_132_pips (0.149) ✅ | #2 dist_to_mlr_low_pips | #3 fib_sequence_state
 > **RL Additions:** trade_orchestrator.py (17 trade states), sweep_configs_all.json (38 assets), extension verification
-> **Wave 3 Plan:** CC handles RAG Oracle + Guardian (OC2 decommissioned). AS to begin test suite.
+> **PM Additions:** 18 pattern detectors (70/70 tests), 102 macro features, Friday Asian anchor for crypto
+> **AS Fixes:** MLR window (07:00-15:00 UTC), Friday Asian anchor, Asian session boundaries (00:00-08:00 UTC)
+> **Wave 3 Plan:** CC handles RAG Oracle + Guardian. AS to begin test suite (40+ new tests).
+> **Retrain:** `run_training_v2.py` ✅ runs successfully (exit code 0)
 ---
 
 ## 🔴 PM — EXPANDED PATTERN RECOGNITION — All Holy Grail Patterns (2026-06-10 20:00 UTC)
