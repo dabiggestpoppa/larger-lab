@@ -13,7 +13,7 @@ from collections import defaultdict
 
 DATA_DIR = Path("ml/data/training")
 OUTPUT_DIR = Path("mlr_validation/results")
-OUTPUT_DIR.mkdir(parents_ok=True)
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 TOLERANCE_PIPS = 2.0
 

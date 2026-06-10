@@ -1,0 +1,631 @@
+{
+  "per_asset": {
+    "AUDUSD": {
+      "ext_25": {
+        "hits": 3386,
+        "failed": 137,
+        "chop": 1022,
+        "total": 4545,
+        "rate": 0.745
+      },
+      "ext_50": {
+        "hits": 3078,
+        "failed": 513,
+        "chop": 954,
+        "total": 4545,
+        "rate": 0.6772
+      },
+      "ext_100": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "ext_168": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "rekey_132": {
+        "hits": 137,
+        "failed": 0,
+        "chop": 4408,
+        "total": 4545,
+        "rate": 0.0301
+      }
+    },
+    "BTCUSD": {
+      "ext_25": {
+        "hits": 3129,
+        "failed": 650,
+        "chop": 1717,
+        "total": 5496,
+        "rate": 0.5693
+      },
+      "ext_50": {
+        "hits": 3244,
+        "failed": 1490,
+        "chop": 762,
+        "total": 5496,
+        "rate": 0.5902
+      },
+      "ext_100": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "ext_168": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "rekey_132": {
+        "hits": 650,
+        "failed": 0,
+        "chop": 4846,
+        "total": 5496,
+        "rate": 0.1183
+      }
+    },
+    "CHFJPY": {
+      "ext_25": {
+        "hits": 3162,
+        "failed": 422,
+        "chop": 977,
+        "total": 4561,
+        "rate": 0.6933
+      },
+      "ext_50": {
+        "hits": 2804,
+        "failed": 648,
+        "chop": 1109,
+        "total": 4561,
+        "rate": 0.6148
+      },
+      "ext_100": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "ext_168": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "rekey_132": {
+        "hits": 422,
+        "failed": 0,
+        "chop": 4139,
+        "total": 4561,
+        "rate": 0.0925
+      }
+    },
+    "DE30": {
+      "ext_25": {
+        "hits": 3249,
+        "failed": 647,
+        "chop": 520,
+        "total": 4416,
+        "rate": 0.7357
+      },
+      "ext_50": {
+        "hits": 2944,
+        "failed": 864,
+        "chop": 608,
+        "total": 4416,
+        "rate": 0.6667
+      },
+      "ext_100": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "ext_168": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "rekey_132": {
+        "hits": 647,
+        "failed": 0,
+        "chop": 3769,
+        "total": 4416,
+        "rate": 0.1465
+      }
+    },
+    "ETHUSD": {
+      "ext_25": {
+        "hits": 3435,
+        "failed": 469,
+        "chop": 1592,
+        "total": 5496,
+        "rate": 0.625
+      },
+      "ext_50": {
+        "hits": 3461,
+        "failed": 1358,
+        "chop": 677,
+        "total": 5496,
+        "rate": 0.6297
+      },
+      "ext_100": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "ext_168": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "rekey_132": {
+        "hits": 469,
+        "failed": 0,
+        "chop": 5027,
+        "total": 5496,
+        "rate": 0.0853
+      }
+    },
+    "EURUSD": {
+      "ext_25": {
+        "hits": 3316,
+        "failed": 448,
+        "chop": 781,
+        "total": 4545,
+        "rate": 0.7296
+      },
+      "ext_50": {
+        "hits": 3017,
+        "failed": 912,
+        "chop": 616,
+        "total": 4545,
+        "rate": 0.6638
+      },
+      "ext_100": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "ext_168": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "rekey_132": {
+        "hits": 448,
+        "failed": 0,
+        "chop": 4097,
+        "total": 4545,
+        "rate": 0.0986
+      }
+    },
+    "FR40": {
+      "ext_25": {
+        "hits": 2748,
+        "failed": 507,
+        "chop": 897,
+        "total": 4152,
+        "rate": 0.6618
+      },
+      "ext_50": {
+        "hits": 2472,
+        "failed": 717,
+        "chop": 963,
+        "total": 4152,
+        "rate": 0.5954
+      },
+      "ext_100": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "ext_168": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "rekey_132": {
+        "hits": 507,
+        "failed": 0,
+        "chop": 3645,
+        "total": 4152,
+        "rate": 0.1221
+      }
+    },
+    "GBPAUD": {
+      "ext_25": {
+        "hits": 3012,
+        "failed": 416,
+        "chop": 1165,
+        "total": 4593,
+        "rate": 0.6558
+      },
+      "ext_50": {
+        "hits": 2870,
+        "failed": 700,
+        "chop": 1023,
+        "total": 4593,
+        "rate": 0.6249
+      },
+      "ext_100": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "ext_168": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "rekey_132": {
+        "hits": 416,
+        "failed": 0,
+        "chop": 4177,
+        "total": 4593,
+        "rate": 0.0906
+      }
+    },
+    "GBPCHF": {
+      "ext_25": {
+        "hits": 3372,
+        "failed": 534,
+        "chop": 687,
+        "total": 4593,
+        "rate": 0.7342
+      },
+      "ext_50": {
+        "hits": 3177,
+        "failed": 893,
+        "chop": 523,
+        "total": 4593,
+        "rate": 0.6917
+      },
+      "ext_100": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "ext_168": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "rekey_132": {
+        "hits": 534,
+        "failed": 0,
+        "chop": 4059,
+        "total": 4593,
+        "rate": 0.1163
+      }
+    },
+    "GBPJPY": {
+      "ext_25": {
+        "hits": 3242,
+        "failed": 454,
+        "chop": 897,
+        "total": 4593,
+        "rate": 0.7059
+      },
+      "ext_50": {
+        "hits": 2840,
+        "failed": 840,
+        "chop": 913,
+        "total": 4593,
+        "rate": 0.6183
+      },
+      "ext_100": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "ext_168": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "rekey_132": {
+        "hits": 454,
+        "failed": 0,
+        "chop": 4139,
+        "total": 4593,
+        "rate": 0.0988
+      }
+    },
+    "GBPNZD": {
+      "ext_25": {
+        "hits": 3118,
+        "failed": 470,
+        "chop": 1029,
+        "total": 4617,
+        "rate": 0.6753
+      },
+      "ext_50": {
+        "hits": 3145,
+        "failed": 753,
+        "chop": 719,
+        "total": 4617,
+        "rate": 0.6812
+      },
+      "ext_100": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "ext_168": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "rekey_132": {
+        "hits": 470,
+        "failed": 0,
+        "chop": 4147,
+        "total": 4617,
+        "rate": 0.1018
+      }
+    },
+    "GBPUSD": {
+      "ext_25": {
+        "hits": 3476,
+        "failed": 430,
+        "chop": 687,
+        "total": 4593,
+        "rate": 0.7568
+      },
+      "ext_50": {
+        "hits": 3129,
+        "failed": 744,
+        "chop": 720,
+        "total": 4593,
+        "rate": 0.6813
+      },
+      "ext_100": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "ext_168": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "rekey_132": {
+        "hits": 430,
+        "failed": 0,
+        "chop": 4163,
+        "total": 4593,
+        "rate": 0.0936
+      }
+    },
+    "NZDUSD": {
+      "ext_25": {
+        "hits": 3242,
+        "failed": 288,
+        "chop": 1062,
+        "total": 4592,
+        "rate": 0.706
+      },
+      "ext_50": {
+        "hits": 3128,
+        "failed": 752,
+        "chop": 712,
+        "total": 4592,
+        "rate": 0.6812
+      },
+      "ext_100": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "ext_168": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "rekey_132": {
+        "hits": 288,
+        "failed": 0,
+        "chop": 4304,
+        "total": 4592,
+        "rate": 0.0627
+      }
+    },
+    "US500": {
+      "ext_25": {
+        "hits": 3690,
+        "failed": 529,
+        "chop": 293,
+        "total": 4512,
+        "rate": 0.8178
+      },
+      "ext_50": {
+        "hits": 3432,
+        "failed": 912,
+        "chop": 168,
+        "total": 4512,
+        "rate": 0.7606
+      },
+      "ext_100": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "ext_168": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "rekey_132": {
+        "hits": 529,
+        "failed": 0,
+        "chop": 3983,
+        "total": 4512,
+        "rate": 0.1172
+      }
+    },
+    "USDCHF": {
+      "ext_25": {
+        "hits": 3432,
+        "failed": 410,
+        "chop": 751,
+        "total": 4593,
+        "rate": 0.7472
+      },
+      "ext_50": {
+        "hits": 2981,
+        "failed": 912,
+        "chop": 700,
+        "total": 4593,
+        "rate": 0.649
+      },
+      "ext_100": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "ext_168": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "rekey_132": {
+        "hits": 410,
+        "failed": 0,
+        "chop": 4183,
+        "total": 4593,
+        "rate": 0.0893
+      }
+    },
+    "USDJPY": {
+      "ext_25": {
+        "hits": 2959,
+        "failed": 433,
+        "chop": 1201,
+        "total": 4593,
+        "rate": 0.6442
+      },
+      "ext_50": {
+        "hits": 2610,
+        "failed": 792,
+        "chop": 1191,
+        "total": 4593,
+        "rate": 0.5683
+      },
+      "ext_100": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "ext_168": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "rekey_132": {
+        "hits": 433,
+        "failed": 0,
+        "chop": 4160,
+        "total": 4593,
+        "rate": 0.0943
+      }
+    },
+    "XAGUSD": {
+      "ext_25": {
+        "hits": 3698,
+        "failed": 581,
+        "chop": 1001,
+        "total": 5280,
+        "rate": 0.7004
+      },
+      "ext_50": {
+        "hits": 3464,
+        "failed": 981,
+        "chop": 835,
+        "total": 5280,
+        "rate": 0.6561
+      },
+      "ext_100": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "ext_168": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "rekey_132": {
+        "hits": 581,
+        "failed": 0,
+        "chop": 4699,
+        "total": 5280,
+        "rate": 0.11
+      }
+    },
+    "XAUUSD": {
+      "ext_25": {
+        "hits": 3932,
+        "failed": 340,
+        "chop": 1056,
+        "total": 5328,
+        "rate": 0.738
+      },
+      "ext_50": {
+        "hits": 3589,
+        "failed": 816,
+        "chop": 923,
+        "total": 5328,
+        "rate": 0.6736
+      },
+      "ext_100": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "ext_168": {
+        "hits": 0,
+        "total": 0,
+        "rates": []
+      },
+      "rekey_132": {
+        "hits": 340,
+        "failed": 0,
+        "chop": 4988,
+        "total": 5328,
+        "rate": 0.0638
+      }
+    }
+  },
+  "combined": {
+    "ext_25": {
+      "hits": 59598,
+      "failed": 8165,
+      "chop": 17335,
+      "total": 85098
+    },
+    "ext_50": {
+      "hits": 55385,
+      "failed": 15597,
+      "chop": 14116,
+      "total": 85098
+    },
+    "ext_100": {
+      "hits": 0,
+      "failed": 0,
+      "chop": 0,
+      "total": 0
+    },
+    "ext_168": {
+      "hits": 0,
+      "failed": 0,
+      "chop": 0,
+      "total": 0
+    },
+    "rekey_132": {
+      "hits": 8165,
+      "failed": 0,
+      "chop": 76933,
+      "total": 85098
+    }
+  },
+  "tolerance_pips": 2.0
+}
