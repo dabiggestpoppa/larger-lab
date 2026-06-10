@@ -7,6 +7,7 @@
 > **Status:** Wave 1 ✅ | Wave 2 ✅ | Wave 3 ✅ (22/22 tests) | Docs ✅ | AS Integration ✅
 > **Total Tests:** 120/120 passing (macro 70 + phase2 18 + phase5 10 + RAG 22)
 > **Orchestrator→Guardian:** Wired ✅ (entry decisions + active trade management in alert pipeline)
+> **Markov Chain:** ✅ 10K weekly simulations run — see RL update below
 > **Colab Notebook:** `quant-lab/ml/CEREBUS_Retrain_Colab.ipynb` — GPU training ready
 > **Training Data:** `quant-lab/ml/data/training/` — 18 assets, 5.3M samples, 48 features
 > **Model:** `regime_classifier_full.pkl` — 87.1% CV, 86.5% val, 41 features
@@ -563,3 +564,59 @@ Key examples:
 - 465 failure sequence setups
 - 38 asset sweep configs (floor/ceiling/knee)
 - 40+ pages of manual text extracted
+
+---
+
+## 🔴 RL — MARKOV CHAIN SIMULATION COMPLETE (2026-06-10 23:00 UTC)
+**Agent:** RL (Research Lead) | **Status:** ✅ COMPLETE — 10K weekly simulations run
+
+### Holy Grail Prior Transitions (Top 10)
+| From | To | Probability |
+|------|-----|-------------|
+| FAILURE | REGIME_FLIP | 54.8% |
+| REKEY_CONSOLID | FAILURE | 22.0% |
+| STALL_ZONE | FAILURE | 21.4% |
+| REKEY | REGIME_FLIP | 15.0% |
+| T3_ACTIVE | FAILURE | 12.8% |
+| TARGET_50 | HARD_EXIT | 7.8% |
+| T1_ACTIVE | RESET | 6.1% |
+| T1_ACTIVE | AR_SET | 6.1% |
+| T1_ACTIVE | P90_FIRED | 6.1% |
+| T1_ACTIVE | T1_ACTIVE | 6.1% |
+
+### Weekly Simulation Outcomes (10,000 runs from RESET)
+| Outcome | Count | Percentage |
+|---------|-------|------------|
+| REGIME_FLIP | 3,881 | 38.8% |
+| HARD_EXIT | 2,499 | 25.0% |
+| REKEY_EXTENSION | 2,428 | 24.3% |
+| FAILURE | 1,189 | 11.9% |
+| INCOMPLETE | 3 | 0.0% |
+
+### Extension Delivery Analysis (Computed from Priors)
+| Metric | Value | Note |
+|--------|-------|------|
+| P(hit -25% extension) | 91.0% | Weighted avg across T1/T2/T3 |
+| P(hit -50% extension) | 87.7% | 91.0% × 96.4% |
+| P(hit -100% extension) | 80.8% | 87.7% × 92.2% |
+| P(rekey triggered) | 62.7% | Given -50% hit |
+| P(DMR deep state) | 3.8% | Given -25% hit |
+| P(failure before -25%) | 9.0% | Weighted avg across tiers |
+
+### Key Insights
+1. **REGIME_FLIP is the #1 terminal outcome (38.8%)** — FAILURE → REGIME_FLIP at 54.8% is the strongest transition
+2. **HARD_EXIT = 25%** — 12PM EST forced exit catches 1 in 4 sequences
+3. **REKEY_EXTENSION = 24.3%** — Nearly 1 in 4 weeks ends with successful rekey delivery
+4. **FAILURE rate = 11.9%** — Matches the ~9% prior × amplification through stall/deep paths
+5. **-100% delivery = 80.8%** (priors) vs **65.1%** (verified across all assets/sessions)
+   - Gap explained by: priors are EURUSD-validated only; verification includes ALL assets + ALL sessions
+
+### Files Created/Updated
+- `quant-lab/ml/phase2_classifier/run_markov_local.py` — Clean simulation script
+- `quant-lab/ml/phase2_classifier/markov_chain_model.py` — Added `simulate_weeks()` method
+- `quant-lab/ml/data/markov_results/markov_local_results.json` — Full results saved
+
+### Next Steps
+- Markov model is ready for integration with live scanner
+- Weekly forecast: feed current state → predict next state distribution
+- Combine with XGBoost regime classifier for hybrid neuro-symbolic signal
