@@ -1,0 +1,367 @@
+{
+  "per_asset": {
+    "AUDUSD": {
+      "label_25_delivery": {
+        "hits": 0,
+        "total": 272324,
+        "rate": 0.0
+      },
+      "label_50_delivery": {
+        "hits": 0,
+        "total": 272324,
+        "rate": 0.0
+      },
+      "rekey_triggered": {
+        "hits": 0,
+        "total": 272324,
+        "rate": 0.0
+      },
+      "symbol": "AUDUSD",
+      "total_samples": 272324
+    },
+    "BTCUSD": {
+      "label_25_delivery": {
+        "hits": 0,
+        "total": 458856,
+        "rate": 0.0
+      },
+      "label_50_delivery": {
+        "hits": 0,
+        "total": 458856,
+        "rate": 0.0
+      },
+      "rekey_triggered": {
+        "hits": 0,
+        "total": 458856,
+        "rate": 0.0
+      },
+      "symbol": "BTCUSD",
+      "total_samples": 458856
+    },
+    "CHFJPY": {
+      "label_25_delivery": {
+        "hits": 0,
+        "total": 273254,
+        "rate": 0.0
+      },
+      "label_50_delivery": {
+        "hits": 0,
+        "total": 273254,
+        "rate": 0.0
+      },
+      "rekey_triggered": {
+        "hits": 0,
+        "total": 273254,
+        "rate": 0.0
+      },
+      "symbol": "CHFJPY",
+      "total_samples": 273254
+    },
+    "DE30": {
+      "label_25_delivery": {
+        "hits": 0,
+        "total": 250504,
+        "rate": 0.0
+      },
+      "label_50_delivery": {
+        "hits": 0,
+        "total": 250504,
+        "rate": 0.0
+      },
+      "rekey_triggered": {
+        "hits": 0,
+        "total": 250504,
+        "rate": 0.0
+      },
+      "symbol": "DE30",
+      "total_samples": 250504
+    },
+    "ETHUSD": {
+      "label_25_delivery": {
+        "hits": 0,
+        "total": 457998,
+        "rate": 0.0
+      },
+      "label_50_delivery": {
+        "hits": 0,
+        "total": 457998,
+        "rate": 0.0
+      },
+      "rekey_triggered": {
+        "hits": 0,
+        "total": 457998,
+        "rate": 0.0
+      },
+      "symbol": "ETHUSD",
+      "total_samples": 457998
+    },
+    "EURUSD": {
+      "label_25_delivery": {
+        "hits": 0,
+        "total": 272326,
+        "rate": 0.0
+      },
+      "label_50_delivery": {
+        "hits": 0,
+        "total": 272326,
+        "rate": 0.0
+      },
+      "rekey_triggered": {
+        "hits": 0,
+        "total": 272326,
+        "rate": 0.0
+      },
+      "symbol": "EURUSD",
+      "total_samples": 272326
+    },
+    "FR40": {
+      "label_25_delivery": {
+        "hits": 0,
+        "total": 243055,
+        "rate": 0.0
+      },
+      "label_50_delivery": {
+        "hits": 0,
+        "total": 243055,
+        "rate": 0.0
+      },
+      "rekey_triggered": {
+        "hits": 0,
+        "total": 243055,
+        "rate": 0.0
+      },
+      "symbol": "FR40",
+      "total_samples": 243055
+    },
+    "GBPAUD": {
+      "label_25_delivery": {
+        "hits": 0,
+        "total": 275264,
+        "rate": 0.0
+      },
+      "label_50_delivery": {
+        "hits": 0,
+        "total": 275264,
+        "rate": 0.0
+      },
+      "rekey_triggered": {
+        "hits": 0,
+        "total": 275264,
+        "rate": 0.0
+      },
+      "symbol": "GBPAUD",
+      "total_samples": 275264
+    },
+    "GBPCHF": {
+      "label_25_delivery": {
+        "hits": 0,
+        "total": 275136,
+        "rate": 0.0
+      },
+      "label_50_delivery": {
+        "hits": 0,
+        "total": 275136,
+        "rate": 0.0
+      },
+      "rekey_triggered": {
+        "hits": 0,
+        "total": 275136,
+        "rate": 0.0
+      },
+      "symbol": "GBPCHF",
+      "total_samples": 275136
+    },
+    "GBPJPY": {
+      "label_25_delivery": {
+        "hits": 0,
+        "total": 275059,
+        "rate": 0.0
+      },
+      "label_50_delivery": {
+        "hits": 0,
+        "total": 275059,
+        "rate": 0.0
+      },
+      "rekey_triggered": {
+        "hits": 0,
+        "total": 275059,
+        "rate": 0.0
+      },
+      "symbol": "GBPJPY",
+      "total_samples": 275059
+    },
+    "GBPNZD": {
+      "label_25_delivery": {
+        "hits": 0,
+        "total": 276493,
+        "rate": 0.0
+      },
+      "label_50_delivery": {
+        "hits": 0,
+        "total": 276493,
+        "rate": 0.0
+      },
+      "rekey_triggered": {
+        "hits": 0,
+        "total": 276493,
+        "rate": 0.0
+      },
+      "symbol": "GBPNZD",
+      "total_samples": 276493
+    },
+    "GBPUSD": {
+      "label_25_delivery": {
+        "hits": 0,
+        "total": 275226,
+        "rate": 0.0
+      },
+      "label_50_delivery": {
+        "hits": 0,
+        "total": 275226,
+        "rate": 0.0
+      },
+      "rekey_triggered": {
+        "hits": 0,
+        "total": 275226,
+        "rate": 0.0
+      },
+      "symbol": "GBPUSD",
+      "total_samples": 275226
+    },
+    "NZDUSD": {
+      "label_25_delivery": {
+        "hits": 0,
+        "total": 275215,
+        "rate": 0.0
+      },
+      "label_50_delivery": {
+        "hits": 0,
+        "total": 275215,
+        "rate": 0.0
+      },
+      "rekey_triggered": {
+        "hits": 0,
+        "total": 275215,
+        "rate": 0.0
+      },
+      "symbol": "NZDUSD",
+      "total_samples": 275215
+    },
+    "US500": {
+      "label_25_delivery": {
+        "hits": 0,
+        "total": 257731,
+        "rate": 0.0
+      },
+      "label_50_delivery": {
+        "hits": 0,
+        "total": 257731,
+        "rate": 0.0
+      },
+      "rekey_triggered": {
+        "hits": 0,
+        "total": 257731,
+        "rate": 0.0
+      },
+      "symbol": "US500",
+      "total_samples": 257731
+    },
+    "USDCHF": {
+      "label_25_delivery": {
+        "hits": 0,
+        "total": 275251,
+        "rate": 0.0
+      },
+      "label_50_delivery": {
+        "hits": 0,
+        "total": 275251,
+        "rate": 0.0
+      },
+      "rekey_triggered": {
+        "hits": 0,
+        "total": 275251,
+        "rate": 0.0
+      },
+      "symbol": "USDCHF",
+      "total_samples": 275251
+    },
+    "USDJPY": {
+      "label_25_delivery": {
+        "hits": 0,
+        "total": 275199,
+        "rate": 0.0
+      },
+      "label_50_delivery": {
+        "hits": 0,
+        "total": 275199,
+        "rate": 0.0
+      },
+      "rekey_triggered": {
+        "hits": 0,
+        "total": 275199,
+        "rate": 0.0
+      },
+      "symbol": "USDJPY",
+      "total_samples": 275199
+    },
+    "XAGUSD": {
+      "label_25_delivery": {
+        "hits": 0,
+        "total": 302808,
+        "rate": 0.0
+      },
+      "label_50_delivery": {
+        "hits": 0,
+        "total": 302808,
+        "rate": 0.0
+      },
+      "rekey_triggered": {
+        "hits": 0,
+        "total": 302808,
+        "rate": 0.0
+      },
+      "symbol": "XAGUSD",
+      "total_samples": 302808
+    },
+    "XAUUSD": {
+      "label_25_delivery": {
+        "hits": 0,
+        "total": 305324,
+        "rate": 0.0
+      },
+      "label_50_delivery": {
+        "hits": 0,
+        "total": 305324,
+        "rate": 0.0
+      },
+      "rekey_triggered": {
+        "hits": 0,
+        "total": 305324,
+        "rate": 0.0
+      },
+      "symbol": "XAUUSD",
+      "total_samples": 305324
+    }
+  },
+  "combined": {
+    "label_25_delivery": {
+      "hits": 0,
+      "total": 5297023
+    },
+    "label_50_delivery": {
+      "hits": 0,
+      "total": 5297023
+    },
+    "rekey_triggered": {
+      "hits": 0,
+      "total": 5297023
+    }
+  },
+  "holy_grail_claims": {
+    "ext_25": 0.9,
+    "ext_50": 0.82,
+    "ext_100": null,
+    "ext_168": null,
+    "rekey": 0.95
+  }
+}
