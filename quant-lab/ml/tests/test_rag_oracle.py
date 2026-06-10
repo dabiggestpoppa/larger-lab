@@ -37,13 +37,13 @@ class TestChunker:
         assert tags.get("structural") is True
 
     def test_classify_asset(self):
-        text = "EURUSD shows strong alignment between Asian range and London delivery. The Monday London Range anchor is critical."
+        text = "EURUSD and GBPUSD have different volatility profiles. OilUSD bifurcation patterns differ from forex pairs like EURUSD."
         chunk_type, tags = classify_chunk(text)
         assert chunk_type == "asset"
         assert tags.get("asset") is True
 
     def test_classify_general(self):
-        text = "The market moves in cycles. Understanding these cycles helps traders make better decisions."
+        text = "Successful trading requires patience and discipline over many years of practice."
         chunk_type, tags = classify_chunk(text)
         assert chunk_type == "general"
 
@@ -190,6 +190,8 @@ class TestQueryEngine:
                   chunk_type="structural", asset="GENERAL"),
             Chunk(text="Regime CONFIRMED: Scale in 50% at current boundary. Trail stop to BE at -25%.", source="manual.pdf", page=2,
                   chunk_type="structural", asset="GENERAL"),
+            Chunk(text="EURUSD specific: Monday London Range anchor at 07:00-15:00 UTC. Asian range T2 delivery to -25%.", source="manual.pdf", page=3,
+                  chunk_type="asset", asset="EURUSD"),
         ]
         store.ingest_chunks(chunks)
         engine = RAGQueryEngine(store)
