@@ -133,3 +133,73 @@ The **largest build yet** — a complete Neuro-Symbolic Scanner (4 Steps):
 - `scripts/po_watchdog.py` — mutex-aware
 - `scripts/signal_bot.py` — singleton enforcement
 - `scripts/process_registry.py` — updated to use clean_bridge
+
+---
+
+## ?? RL � Updated Manual Pages 155-158 Extracted (2026-06-10 19:00 UTC)
+**Source:** CEREBUS_FX_v4_Complete_Manual (2).pdf � 4 new pages after DST protocol
+
+### Post-Target Reversal Rates (n=3,776 touches)
+| Target | Full Reversal | Deep Band Retest | Opp -25% Hit |
+|--------|--------------|------------------|--------------|
+| -25% | 4.2% | 22.4% | 3.8% |
+| -50% | 2.8% | 12.6% | 2.1% |
+| -85% | 1.9% | 8.4% | 1.4% |
+
+### By Tier (All Targets Combined)
+| Tier | Full Reversal | Operational Mode |
+|------|--------------|------------------|
+| T1 (<20p) | 2.6% | Aggressive holding |
+| T2 (20-30p) | 3.4% | Standard management |
+| T3 (30-45p) | 6.2% | Defensive - take profit at first target |
+
+### By Hour of Target Touch (EST)
+| Hour | Full Rev | Note |
+|------|----------|------|
+| 3-4 AM | 1.6% | Cleanest delivery - hold runners |
+| 8-10 AM | 6.4% | Significant decay - take full profit |
+| 10 AM-12 PM | 9.6% | Edge decay zone - exit aggressively |
+
+### CRITICAL: 81.2% Rule Does NOT Apply to Completed Targets
+- 81.2% rule = failed breakouts only (price barely exceeds band, closes back inside)
+- Completed targets: only 4.2% full structural reversal
+- These are opposite sides of the same market mechanism
+
+### Reverse Atomic Delivery Map
+- Post-target reversal = Reverse Atomic Loop (not random retracement)
+- Primary absorption: 38.2% and 50% Fib of Asian Range (absorbs 63-73% of reversals)
+- Delivery quantized to Atomic Units:
+  - After -25%: ~10p (T1 AU match 48.2%)
+  - After -50%: ~12p (T2 AU match 44.8%)
+  - After -85%: ~14.4p (1.44x shift match 28.4%)
+- Mirror Principle: Deeper forward extension = larger reverse AU
+- Temporal band 32-78 min applies to reverse (68-78% complete within)
+
+### Deep Rebalance Outcomes (n=412, after -25%)
+| Outcome | Frequency | Trigger |
+|---------|-----------|---------|
+| Target Retest | 58.4% | OCC in original breakout direction |
+| Stall/Compression | 24.6% | No clear OCC, ranges 30-90 min |
+| Gear Shift | 11.8% | OCC + fresh impulse >= next tier trigger |
+| Full Reversal | 5.2% | M5 close back inside Asian band |
+
+### Gear Shift Conditions (ALL 4 required)
+1. Regime CONFIRMED at 9AM (>=1.50x)
+2. Deep rebalance before 6 AM EST
+3. Fresh OCC against rebalance direction
+4. New impulse >= next tier trigger
+
+### Reverse Atomic Entry Protocol
+- After -25%: Entry at 38.2% Fib, Target Band Edge, SL at OCC extreme, Time stop 78 min
+- After -50%: Entry at 38.2-50% zone, Target 23.6% Fib, Time stop 78 min
+- After -85%: Entry at 50% Fib, Target 38.2% Fib, Time stop 78 min
+- Invalidation: >1.44x AU past entry OR no level hit in 78 min
+- Temporal filter: Pre-6AM = hold runners, Post-8AM = no reverse entries
+
+### 6 Hypotheses All Confirmed
+1. Completed targets distinct from failed breakouts
+2. Reverse leg quantized to Atomic Units
+3. 38.2-50% Fib zone absorbs 63-73% of reversals
+4. Tier governs reverse loop size
+5. Temporal band 32-78 min applies to reverse
+6. Deep rebalance has 4 resolution paths
