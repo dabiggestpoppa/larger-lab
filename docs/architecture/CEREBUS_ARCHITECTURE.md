@@ -435,13 +435,43 @@ graph LR
 
 | Component | Metric | Value |
 |-----------|--------|-------|
+| **Code** | Python Files | 77 |
+| **Code** | Total Lines | ~13,700 |
+| **Tests** | Total Passing | 120/120 |
 | Training Data | Samples | 5.3M |
-| Training Data | Features | 44 |
+| Training Data | Features | 41 |
 | Training Data | Assets | 18 |
-| XGBoost | CV Accuracy | 87.0% ± 1.7% |
-| XGBoost | Val Accuracy | 86.7% |
-| SHAP | #1 Feature | dist_to_132_pips (0.149) |
+| Training Data | Parquet Files | 172 |
+| XGBoost | CV Accuracy | 87.1% ± 1.8% |
+| XGBoost | Val Accuracy | 86.5% |
+| SHAP | #1 Feature | dist_to_132_pips (0.149) ✅ |
 | RAG | Chunks | 55 PDFs + manual |
 | RAG | Tests | 22/22 passing |
 | Markov | States | 17 |
 | Orchestrator | Trade States | 17 |
+| Orchestrator | Integration | ✅ Wired into Guardian |
+| Macro Engine | Features/bar | 102 |
+| Macro Engine | Pattern Detectors | 18 |
+| Macro Engine | Tests | 70/70 passing |
+| Models | Trained Files | 23 |
+| Sweep Configs | Assets | 38 |
+| Validation Results | JSON Files | 21 |
+
+## What's Proven vs What Needs Testing
+
+### ✅ Proven (Backtested on Historical Data)
+- Feature engineering (MLR, Fib, ILM, Asian Range, 18 patterns)
+- XGBoost regime classification (87.1% CV, SHAP verified)
+- RAG Oracle retrieval (22/22 tests)
+- Trade orchestration logic (entry + management)
+- Guardian pipeline (scan → align → RAG → alert)
+- Markov chain weekly simulation
+- Extension verification (85,098 sessions)
+
+### ⏳ Needs Live Testing
+- Forward test on live market data (never run on real-time feed)
+- Telegram dispatch (currently print() only)
+- MT5/Nautilus broker integration (skeleton exists, not connected)
+- Production model drift monitoring
+- BTC/ETH weekend handling on live crypto data
+- Multi-asset concurrent scanning performance
