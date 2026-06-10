@@ -32,7 +32,7 @@ MICRO FEATURES (from CEREBUS BUILD.txt Phase 1.1):
  23. minutes_to_12pm_est — minutes until 17:00 UTC hard exit
 
 MACRO FEATURES (from CEREBUS BUILD.txt Phase 1.1):
- 24. mlr_high — Monday London Range high (07:00-10:00 UTC)
+ 24. mlr_high — Monday London Range high (07:00-15:00 UTC = 3am-11am EST)
  25. mlr_low — Monday London Range low
  26. mlr_close — MLR close
  27. mlr_range — MLR range in price
@@ -417,14 +417,14 @@ def compute_ilm_state(df: pd.DataFrame) -> pd.DataFrame:
 # ============================================================
 
 def compute_mlr(df: pd.DataFrame) -> pd.DataFrame:
-    """Compute Monday London Range (07:00-10:00 UTC)."""
+    """Compute Monday London Range (07:00-15:00 UTC = 3am-11am EST)."""
     df = df.copy()
     df["mlr_high"] = np.nan
     df["mlr_low"] = np.nan
     df["mlr_close"] = np.nan
 
     is_monday = df.index.dayofweek == 0
-    is_mlr_hour = (df.index.hour >= 7) & (df.index.hour < 10)
+    is_mlr_hour = (df.index.hour >= 7) & (df.index.hour < 15)
     mlr_mask = is_monday & is_mlr_hour
 
     if mlr_mask.sum() == 0:

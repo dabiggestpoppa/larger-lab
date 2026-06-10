@@ -1,7 +1,7 @@
 """
 MLR (Monday London Range) Engine
 ==================================
-Calculates the Monday London Range anchor (07:00-10:00 UTC Monday),
+Calculates the Monday London Range anchor (07:00-15:00 UTC Monday = 3am-11am EST),
 bias direction, and Fibonacci extension targets.
 
 Per CEREBUS v4 Manual:
@@ -36,7 +36,7 @@ def compute_mlr_features(df: pd.DataFrame) -> pd.DataFrame:
     """
     Compute Monday London Range (MLR) for each trading week. Vectorized.
 
-    MLR Window: Monday 07:00-10:00 UTC
+    MLR Window: Monday 07:00-15:00 UTC (3am-11am EST)
     Forward-filled: Tuesday through Friday (or until next Monday)
 
     Adds columns:
@@ -62,10 +62,10 @@ def compute_mlr_features(df: pd.DataFrame) -> pd.DataFrame:
     df['mlr_low'] = np.nan
     df['mlr_close'] = np.nan
 
-    # Find Monday 07:00-10:00 UTC bars
+    # Find Monday 07:00-15:00 UTC bars (3am-11am EST)
     dow = df.index.dayofweek
     hr = df.index.hour
-    mlr_mask = (dow == 0) & (hr >= 7) & (hr < 10)
+    mlr_mask = (dow == 0) & (hr >= 7) & (hr < 15)
 
     if not mlr_mask.any():
         df['mlr_range'] = np.nan
@@ -115,8 +115,8 @@ def compute_mlr_features(df: pd.DataFrame) -> pd.DataFrame:
         np.where(df['mlr_close'] < df['mlr_mid'], 'BEARISH', 'NEUTRAL')
     )
 
-    # Hours since MLR (Monday 10:00 UTC = end of MLR window)
-    mlr_end = bar_monday + pd.Timedelta(hours=10)
+    # Hours since MLR (Monday 15:00 UTC = end of MLR window)
+    mlr_end = bar_monday + pd.Timedelta(hours=15)
     delta = df.index - mlr_end
     hours = delta.total_seconds() / 3600
     df['hours_since_mlr'] = np.where(df['mlr_high'].notna(), hours, np.nan)
