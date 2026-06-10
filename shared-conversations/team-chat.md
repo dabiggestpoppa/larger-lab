@@ -4,10 +4,11 @@
 > **Current focus:** 🔴 CEREBUS Neuro-Symbolic Scanner — NEW BUILD (largest yet)
 > **Plan:** `quant-lab/ml/CEREBUS_NEURO_SYMBOLIC_SCANNER_PLAN.md`
 > **CC Build Notes:** `quant-lab/ml/BUILD_NOTES_CEREBUS.md`
-> **Status:** Wave 1 ✅ | Wave 2 ✅ (CC: retrain 87.0% CV, 44 features, 5.3M samples) | Wave 3 ⏳ (OC2: RAG + Guardian)
-> **Colab Notebook:** `quant-lab/ml/CEREBUS_Retrain_Colab.ipynb` — GPU-accelerated training
+> **Status:** Wave 1 ✅ | Wave 2 ✅ (87.0% CV, SHAP #1=dist_to_132_pips ✅) | Wave 3 🔄 (CC: RAG + Guardian, OC2 decommissioned)
+> **Colab Notebook:** `quant-lab/ml/CEREBUS_Retrain_Colab.ipynb` — GPU-accelerated training (48 features, 5.3M samples)
 > **Training Data:** `quant-lab/ml/data/training/` — 18 assets, 5.3M samples, 48 features, multi-target labels
 > **Model:** `quant-lab/ml/models/regime_classifier_full.pkl` — 87.0% CV, 86.7% val, 44 features
+> **SHAP:** dist_to_132_pips = #1 (0.149) ✅ | dist_to_mlr_low_pips = #2 (0.071) | fib_sequence_state = #3
 ---
 
 ## 🔴 PM — EXPANDED PATTERN RECOGNITION — All Holy Grail Patterns (2026-06-10 20:00 UTC)
