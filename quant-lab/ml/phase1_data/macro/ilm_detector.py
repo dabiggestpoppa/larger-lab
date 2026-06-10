@@ -32,48 +32,121 @@ class ILMState(IntEnum):
     """ILM alignment states."""
     MISALIGNED = 0
     DAILY_ILM = 1
-    IELM = 2      # Impulse Extended Level Monitor
-    WILM = 3      # Weekly ILM
+    IELM = 2
+    WILM = 3
 
 
-# Regime ratio thresholds
 CONFIRMED_THRESHOLD = 1.50
 CAUTION_LOW_THRESHOLD = 1.45
-CAUTION_HIGH_THRESHOLD = 1.49
-
-# IELM extension threshold
 IELM_THRESHOLD = 1.50
 
 
-def compute_ilm_state(
-    df: pd.DataFrame,
-    pip_size: float = 0.0001,
-) -> pd.DataFrame:
+def _get_session_series(idx: pd.DatetimeIndex) -> pd.Series:
+    """Return a Series mapping each bar to its trading session date."""
+    if idx.tz is None:
+        idx = idx.tz_localize('UTC')
+    est = idx.tz_convert('America/New_York')
+    hours = est.hour
+    dates = est.date
+    session = np.where(hours >= 19, dates,
+                       (est - pd.Timedelta(days=1)).date)
+    return pd.Series(session, index=idx, name='session')
+
+
+def _compute_daily_df(df: pd.DataFrame, pip_size: float) -> pd.DataFrame:
+    """Compute per-day Asian/London session ranges. Returns DataFrame indexed by session date."""
+    idx = df.index
+    if idx.tz is None:
+        idx = idx.tz_localize('UTC')
+    est = idx.tz_convert('America/New_York')
+
+    hours = est.hour
+    session = np.where(hours >= 19, est.date,
+                       (est - pd.Timedelta(days=1)).date)
+
+    work = pd.DataFrame({
+        'high': df['high'].values,
+        'low': df['low'].values,
+        'close': df['close'].values,
+        'session': session,
+        'hour_est': hours,
+    })
+
+    # Asian session: 19:00-03:00 EST
+    asian = work[(work['hour_est'] >= 19) | (work['hour_est'] < 3)]
+    # London session: 03:00-09:00 EST
+    london = work[(work['hour_est'] >= 3) & (work['hour_est'] < 9)]
+
+    ag = asian.groupby('session').agg(ah=('high', 'max'), al=('low', 'min'))
+    ag['ar'] = ag['ah'] - ag['al']
+    ag['ar_pips'] = ag['ar'] / pip_size
+
+    lg = london.groupby('session').agg(lh=('high', 'max'), ll=('low', 'min'))
+    lg['lr'] = lg['lh'] - lg['ll']
+    lg['lr_pips'] = lg['lr'] / pip_size
+    lg['lc'] = london.groupby('session')['close'].last()
+
+    daily = ag.join(lg, how='inner')
+    daily['amid'] = daily['al'] + daily['ar'] / 2
+
+    # ILM state from extension ratio
+    ext = daily['lr'] / daily['ar'].replace(0, np.nan)
+    cond = [ext >= IELM_THRESHOLD, ext >= 1.0]
+    daily['ilm_state'] = np.select(cond, [ILMState.IELM, ILMState.DAILY_ILM],
+                                    default=ILMState.MISALIGNED)
+    label_map = {s.value: s.name for s in ILMState}
+    daily['ilm_state_label'] = daily['ilm_state'].map(label_map)
+
+    # Impulse direction: bullish if London close > Asian midpoint
+    daily['impulse_direction'] = np.where(
+        daily['lc'] > daily['amid'], 1,
+        np.where(daily['lc'] < daily['amid'], -1, 0))
+
+    # Regime ratio = London range / Asian range
+    daily['regime_ratio'] = ext
+
+    return daily
+
+
+def _apply_wilm(daily: pd.DataFrame, session_s: pd.Series) -> pd.Series:
     """
-    Compute ILM (Impulse Level Monitor) state for each trading day.
+    Compute WILM flag per bar.
+    If Monday is DAILY_ILM or IELM, the entire week (Mon-Fri) is marked WILM.
+    """
+    wilm_dates = set()
+    for day, row in daily.iterrows():
+        try:
+            if pd.Timestamp(day).dayofweek == 0 and row['ilm_state'] in (ILMState.DAILY_ILM, ILMState.IELM):
+                for off in range(5):
+                    wilm_dates.add((pd.Timestamp(day) + pd.Timedelta(days=off)).date())
+        except Exception:
+            continue
+    return session_s.isin(wilm_dates).astype(int)
+
+
+def compute_ilm_state(df: pd.DataFrame, pip_size: float = 0.0001) -> pd.DataFrame:
+    """
+    Compute ILM (Impulse Level Monitor) state for each bar.
 
     The ILM measures whether the London session impulse (03:00-09:00 EST)
     aligns with and exceeds the Asian Range (19:00-03:00 EST).
 
     Adds columns:
-        - asian_high: Asian session high
-        - asian_low: Asian session low
-        - asian_range: Asian session range in price units
-        - asian_range_pips: Asian session range in pips
-        - london_high: London session (3AM-9AM EST) high
-        - london_low: London session low
-        - london_range: London session range in price units
-        - london_range_pips: London session range in pips
-        - ilm_state: ILMState value
-        - ilm_state_label: Human-readable ILM state
+        - asian_high, asian_low: Asian session high/low
+        - asian_range, asian_range_pips: Asian session range
+        - london_high, london_low: London session high/low
+        - london_range, london_range_pips: London session range
+        - ilm_state: ILMState value (MISALIGNED/DAILY_ILM/IELM/WILM)
+        - ilm_state_label: Human-readable state name
         - impulse_direction: 1 (bullish), -1 (bearish), 0 (none)
+        - is_wilm: 1 if bar is in a WILM week
 
     Parameters
     ----------
     df : pd.DataFrame
         Must have DatetimeIndex with UTC timezone and OHLC columns.
     pip_size : float
-        Pip size for the asset (e.g., 0.0001 for EURUSD).
+        Pip size for the asset.
 
     Returns
     -------
@@ -81,135 +154,40 @@ def compute_ilm_state(
         DataFrame with ILM columns added.
     """
     df = df.copy()
+    session_s = _get_session_series(df.index)
+    daily = _compute_daily_df(df, pip_size)
 
-    # Initialize columns
-    for col in ['asian_high', 'asian_low', 'asian_range', 'asian_range_pips',
-                'london_high', 'london_low', 'london_range', 'london_range_pips',
-                'ilm_state', 'ilm_state_label', 'impulse_direction']:
-        if col in ['ilm_state_label']:
-            df[col] = 'UNKNOWN'
-        elif col == 'impulse_direction':
-            df[col] = 0
-        else:
-            df[col] = np.nan
+    # Map daily values to bars using pd.Series.map() for C-speed lookup
+    df['asian_high'] = session_s.map(daily['ah']).values
+    df['asian_low'] = session_s.map(daily['al']).values
+    df['asian_range'] = session_s.map(daily['ar']).values
+    df['asian_range_pips'] = session_s.map(daily['ar_pips']).values
+    df['london_high'] = session_s.map(daily['lh']).values
+    df['london_low'] = session_s.map(daily['ll']).values
+    df['london_range'] = session_s.map(daily['lr']).values
+    df['london_range_pips'] = session_s.map(daily['lr_pips']).values
+    df['ilm_state'] = session_s.map(daily['ilm_state']).values
+    df['ilm_state_label'] = session_s.map(daily['ilm_state_label']).values
+    df['impulse_direction'] = session_s.map(daily['impulse_direction']).values
 
-    # Convert to EST for session detection
-    if df.index.tz is None:
-        df_utc = df.tz_localize('UTC')
-    else:
-        df_utc = df.copy()
-
-    df_est = df_utc.tz_convert('America/New_York')
-
-    # Assign each bar to its trading day
-    session_dates = []
-    for ts in df_est.index:
-        if ts.hour >= 19:
-            session_dates.append(ts.date())
-        else:
-            session_dates.append((ts - pd.Timedelta(days=1)).date())
-
-    df_est['_session'] = session_dates
-    df_est['_orig_idx'] = df_est.index
-
-    # Compute Asian and London ranges per trading day
-    daily_ilm = {}
-    for day, group in df_est.groupby('_session'):
-        # Asian session: 19:00-03:00 EST
-        asian = group[(group.index.hour >= 19) | (group.index.hour < 3)]
-        # London session: 03:00-09:00 EST
-        london = group[(group.index.hour >= 3) & (group.index.hour < 9)]
-
-        if len(asian) == 0 or len(london) == 0:
-            continue
-
-        asian_high = asian['high'].max()
-        asian_low = asian['low'].min()
-        asian_range = asian_high - asian_low
-
-        london_high = london['high'].max()
-        london_low = london['low'].min()
-        london_range = london_high - london_low
-
-        # Impulse direction: bullish if London close > Asian midpoint
-        london_close = london['close'].iloc[-1] if len(london) > 0 else np.nan
-        asian_mid = asian_low + (asian_range / 2) if asian_range > 0 else np.nan
-
-        if not np.isnan(london_close) and not np.isnan(asian_mid):
-            impulse_dir = 1 if london_close > asian_mid else (-1 if london_close < asian_mid else 0)
-        else:
-            impulse_dir = 0
-
-        # ILM state determination
-        if asian_range > 0 and london_range > 0:
-            extension_ratio = london_range / asian_range
-
-            if extension_ratio >= IELM_THRESHOLD:
-                state = ILMState.IELM
-            elif extension_ratio >= 1.0:
-                state = ILMState.DAILY_ILM
-            else:
-                state = ILMState.MISALIGNED
-        else:
-            state = ILMState.MISALIGNED
-            extension_ratio = np.nan
-
-        daily_ilm[day] = {
-            'asian_high': asian_high,
-            'asian_low': asian_low,
-            'asian_range': asian_range,
-            'asian_range_pips': asian_range / pip_size if pip_size > 0 else np.nan,
-            'london_high': london_high,
-            'london_low': london_low,
-            'london_range': london_range,
-            'london_range_pips': london_range / pip_size if pip_size > 0 else np.nan,
-            'ilm_state': state,
-            'ilm_state_label': state.name,
-            'impulse_direction': impulse_dir,
-        }
-
-    # Map daily ILM data back to each bar in the DataFrame
-    for ts in df.index:
-        # Convert to EST to find session date
-        ts_est = ts.tz_convert('America/New_York') if ts.tz is not None else ts
-        if ts_est.hour >= 19:
-            day = ts_est.date()
-        else:
-            day = (ts_est - pd.Timedelta(days=1)).date()
-
-        if day in daily_ilm:
-            data = daily_ilm[day]
-            for key, val in data.items():
-                df.at[ts, key] = val
-
-    # Compute WILM: Monday's ILM state applies to the whole week
-    # WILM = Monday is IELM or DAILY_ILM and the weekly range exceeds threshold
-    df['is_wilm'] = 0
-    is_monday = df.index.dayofweek == 0
-    monday_ilm = df.loc[is_monday, 'ilm_state']
-
-    for monday_ts, state in monday_ilm.items():
-        if state in [ILMState.DAILY_ILM, ILMState.IELM]:
-            # Apply WILM to all bars in this week (Mon-Fri)
-            week_end = monday_ts + pd.Timedelta(days=4, hours=23, minutes=59)
-            week_mask = (df.index >= monday_ts) & (df.index <= week_end)
-            df.loc[week_mask, 'ilm_state'] = ILMState.WILM
-            df.loc[week_mask, 'ilm_state_label'] = 'WILM'
-            df.loc[week_mask, 'is_wilm'] = 1
+    # WILM: Monday IELM/DAILY_ILM -> whole week = WILM
+    is_wilm = _apply_wilm(daily, session_s)
+    df['is_wilm'] = is_wilm.values
+    wilm_mask = is_wilm.astype(bool)
+    if wilm_mask.any():
+        df.loc[wilm_mask, 'ilm_state'] = ILMState.WILM
+        df.loc[wilm_mask, 'ilm_state_label'] = 'WILM'
 
     return df
 
 
-def compute_regime_ratio(
-    df: pd.DataFrame,
-    pip_size: float = 0.0001,
-) -> pd.DataFrame:
+def compute_regime_ratio(df: pd.DataFrame, pip_size: float = 0.0001) -> pd.DataFrame:
     """
-    Compute the 9AM checkpoint regime ratio.
+    Compute the 9AM checkpoint regime ratio for each bar.
 
     Regime Ratio = (03:00-09:00 EST range) / Asian Range
 
-    This is the PRIMARY regime classifier in CEREBUS:
+    Classification:
     - CONFIRMED: ratio >= 1.50 (strong impulse)
     - CAUTION:   ratio 1.45-1.49 (weak impulse)
     - FAILED:    ratio < 1.45 (no impulse)
@@ -235,89 +213,22 @@ def compute_regime_ratio(
         DataFrame with regime ratio columns added.
     """
     df = df.copy()
+    session_s = _get_session_series(df.index)
+    daily = _compute_daily_df(df, pip_size)
 
-    # Initialize columns
-    df['regime_ratio'] = np.nan
-    df['regime_label'] = 'UNKNOWN'
-    df['regime_encoded'] = np.nan
-    df['is_confirmed'] = 0
-    df['is_caution'] = 0
-    df['is_failed'] = 0
+    rr = session_s.map(daily['regime_ratio'])
 
-    # Convert to EST
-    if df.index.tz is None:
-        df_utc = df.tz_localize('UTC')
-    else:
-        df_utc = df.copy()
+    conditions = [
+        rr >= CONFIRMED_THRESHOLD,
+        rr >= CAUTION_LOW_THRESHOLD,
+    ]
+    rlab = np.select(conditions, ['CONFIRMED', 'CAUTION'], default='FAILED')
+    renc = np.select(conditions, [0.0, 1.0], default=2.0)
 
-    df_est = df_utc.tz_convert('America/New_York')
-
-    # Assign trading day
-    session_dates = []
-    for ts in df_est.index:
-        if ts.hour >= 19:
-            session_dates.append(ts.date())
-        else:
-            session_dates.append((ts - pd.Timedelta(days=1)).date())
-
-    df_est['_session'] = session_dates
-
-    # Compute regime ratio per trading day
-    daily_regime = {}
-    for day, group in df_est.groupby('_session'):
-        # Asian session: 19:00-03:00 EST
-        asian = group[(group.index.hour >= 19) | (group.index.hour < 3)]
-        # London impulse: 03:00-09:00 EST
-        london = group[(group.index.hour >= 3) & (group.index.hour < 9)]
-
-        if len(asian) == 0 or len(london) == 0:
-            continue
-
-        asian_range = asian['high'].max() - asian['low'].min()
-        london_range = london['high'].max() - london['low'].min()
-
-        if asian_range > 0:
-            ratio = london_range / asian_range
-        else:
-            ratio = np.nan
-
-        if not np.isnan(ratio):
-            if ratio >= CONFIRMED_THRESHOLD:
-                label = 'CONFIRMED'
-                encoded = 0
-            elif ratio >= CAUTION_LOW_THRESHOLD:
-                label = 'CAUTION'
-                encoded = 1
-            else:
-                label = 'FAILED'
-                encoded = 2
-        else:
-            label = 'UNKNOWN'
-            encoded = np.nan
-
-        daily_regime[day] = {
-            'regime_ratio': ratio,
-            'regime_label': label,
-            'regime_encoded': encoded,
-        }
-
-    # Map back to DataFrame
-    for ts in df.index:
-        ts_est = ts.tz_convert('America/New_York') if ts.tz is not None else ts
-        if ts_est.hour >= 19:
-            day = ts_est.date()
-        else:
-            day = (ts_est - pd.Timedelta(days=1)).date()
-
-        if day in daily_regime:
-            data = daily_regime[day]
-            df.at[ts, 'regime_ratio'] = data['regime_ratio']
-            df.at[ts, 'regime_label'] = data['regime_label']
-            df.at[ts, 'regime_encoded'] = data['regime_encoded']
-
-    # Binary flags
-    df['is_confirmed'] = (df['regime_label'] == 'CONFIRMED').astype(int)
-    df['is_caution'] = (df['regime_label'] == 'CAUTION').astype(int)
-    df['is_failed'] = (df['regime_label'] == 'FAILED').astype(int)
-
+    df['regime_ratio'] = rr.values
+    df['regime_label'] = rlab
+    df['regime_encoded'] = renc
+    df['is_confirmed'] = (rlab == 'CONFIRMED').astype(int)
+    df['is_caution'] = (rlab == 'CAUTION').astype(int)
+    df['is_failed'] = (rlab == 'FAILED').astype(int)
     return df

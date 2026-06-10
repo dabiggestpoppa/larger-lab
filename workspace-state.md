@@ -1,4 +1,4 @@
-# Workspace State — 2026-06-08 21:00 UTC
+# Workspace State — 2026-06-10 12:00 UTC
 
 ## System Status
 - OCE Backend (11712): ✅ Healthy
@@ -8,6 +8,16 @@
 - OCE Frontend (3000): ✅ UP
 - VTuber/POALA: 🔴 Offline per MAD directive
 - Git: 12 commits ahead of origin/master (all PO stability + MLR + predecessor work)
+
+## Active Build: CEREBUS Neuro-Symbolic Scanner (2026-06-10)
+- **Status:** PLANNING COMPLETE — Ready to build
+- **Plan:** `quant-lab/ml/CEREBUS_NEURO_SYMBOLIC_SCANNER_PLAN.md`
+- **Build Notes:** `quant-lab/ml/BUILD_NOTES_CEREBUS.md`
+- **4 Steps:** Data+Features → Retrain Models → RAG Oracle → Guardian Pipeline
+- **PM Data:** 99 files extracted (35MB), 1626 unified entries
+- **Existing baseline:** 40/40 tests passing, Phase 1-5 code exists
+- **New code target:** ~4,400 lines, 80+ total tests
+- **GATE:** Data cleanup (1A) must complete before features/labels can start
 
 ## What Happened (June 8 — Full Day)
 

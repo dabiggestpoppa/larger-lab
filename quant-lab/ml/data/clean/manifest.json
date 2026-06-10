@@ -1,0 +1,116 @@
+{
+  "AUDUSD": {
+    "rows": 275184,
+    "start": "2022-01-03 00:00:00+00:00",
+    "end": "2026-05-29 23:50:00+00:00",
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\clean\\AUDUSD_clean.parquet"
+  },
+  "BTCUSD": {
+    "rows": 459149,
+    "start": "2022-01-02 00:00:00+00:00",
+    "end": "2026-05-31 03:45:00+00:00",
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\clean\\BTCUSD_clean.parquet"
+  },
+  "CHFJPY": {
+    "rows": 276411,
+    "start": "2022-01-03 00:00:00+00:00",
+    "end": "2026-05-21 18:25:00+00:00",
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\clean\\CHFJPY_clean.parquet"
+  },
+  "DE30": {
+    "rows": 261213,
+    "start": "2022-01-03 00:00:00+00:00",
+    "end": "2026-05-29 23:50:00+00:00",
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\clean\\DE30_clean.parquet"
+  },
+  "ETHUSD": {
+    "rows": 458286,
+    "start": "2022-01-02 00:00:00+00:00",
+    "end": "2026-05-31 03:45:00+00:00",
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\clean\\ETHUSD_clean.parquet"
+  },
+  "EURUSD": {
+    "rows": 275183,
+    "start": "2022-01-03 00:00:00+00:00",
+    "end": "2026-05-29 23:50:00+00:00",
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\clean\\EURUSD_clean.parquet"
+  },
+  "FR40": {
+    "rows": 259819,
+    "start": "2022-01-03 00:00:00+00:00",
+    "end": "2026-05-29 23:50:00+00:00",
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\clean\\FR40_clean.parquet"
+  },
+  "GBPAUD": {
+    "rows": 278411,
+    "start": "2022-01-03 00:00:00+00:00",
+    "end": "2026-05-29 23:50:00+00:00",
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\clean\\GBPAUD_clean.parquet"
+  },
+  "GBPCHF": {
+    "rows": 278390,
+    "start": "2022-01-03 00:00:00+00:00",
+    "end": "2026-05-29 23:50:00+00:00",
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\clean\\GBPCHF_clean.parquet"
+  },
+  "GBPJPY": {
+    "rows": 278279,
+    "start": "2022-01-03 00:00:00+00:00",
+    "end": "2026-05-29 23:50:00+00:00",
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\clean\\GBPJPY_clean.parquet"
+  },
+  "GBPNZD": {
+    "rows": 278483,
+    "start": "2022-01-03 00:00:00+00:00",
+    "end": "2026-05-29 23:50:00+00:00",
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\clean\\GBPNZD_clean.parquet"
+  },
+  "GBPUSD": {
+    "rows": 278402,
+    "start": "2022-01-03 00:00:00+00:00",
+    "end": "2026-05-29 23:50:00+00:00",
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\clean\\GBPUSD_clean.parquet"
+  },
+  "NZDUSD": {
+    "rows": 278390,
+    "start": "2022-01-03 00:00:00+00:00",
+    "end": "2026-05-29 23:50:00+00:00",
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\clean\\NZDUSD_clean.parquet"
+  },
+  "TEST": {
+    "rows": 100,
+    "start": "2024-01-01 00:00:00+00:00",
+    "end": "2024-01-01 08:15:00+00:00",
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\clean\\TEST_clean.parquet"
+  },
+  "US500": {
+    "rows": 264493,
+    "start": "2022-01-03 00:00:00+00:00",
+    "end": "2026-05-29 23:50:00+00:00",
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\clean\\US500_clean.parquet"
+  },
+  "USDCHF": {
+    "rows": 278434,
+    "start": "2022-01-03 00:00:00+00:00",
+    "end": "2026-05-29 23:50:00+00:00",
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\clean\\USDCHF_clean.parquet"
+  },
+  "USDJPY": {
+    "rows": 278412,
+    "start": "2022-01-03 00:00:00+00:00",
+    "end": "2026-05-29 23:50:00+00:00",
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\clean\\USDJPY_clean.parquet"
+  },
+  "XAGUSD": {
+    "rows": 308699,
+    "start": "2022-01-03 00:00:00+00:00",
+    "end": "2026-05-29 23:50:00+00:00",
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\clean\\XAGUSD_clean.parquet"
+  },
+  "XAUUSD": {
+    "rows": 310629,
+    "start": "2022-01-03 00:00:00+00:00",
+    "end": "2026-05-21 18:25:00+00:00",
+    "path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\data\\clean\\XAUUSD_clean.parquet"
+  }
+}

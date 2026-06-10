@@ -44,9 +44,9 @@ SYMBOLS = ["EURUSD.PRO", "USDCHF.PRO"]
 LOT_SIZE = 0.01
 MAGIC = 20260610
 
-LOG_DIR = REPO_ROOT / "quant-lab" / "mt5" / "live_logs"
+LOG_DIR = REPO_ROOT / "mt5" / "live_logs"
 SIGNAL_FILE = LOG_DIR / "occ_buffer_signals.jsonl"
-ACCOUNT_PATH = REPO_ROOT / "quant-lab" / "mt5" / "live_account.json"
+ACCOUNT_PATH = REPO_ROOT / "mt5" / "live_account.json"
 
 logging.basicConfig(
     level=logging.INFO,

@@ -1,6 +1,6 @@
 # MEMORY.md — OWL (OC2) Persistent Memory
 
-> **Last Updated:** 2026-06-07 13:23 UTC — Hermes Gateway Restarted
+> **Last Updated:** 2026-06-10 12:40 EDT — Content engine created, credentials stored, memory update cron set up
 > **THE BIBLE locked:** AR gate decoupled from tier, impulse-based classification, 4PM cutoff, 10p trigger
 > **LIVE:** Low Cost Hex (6 pairs, all FLOOR) | Demo: Profit Quad (BTCUSD+ETHUSD+EURNZD+GBPNZD)
 > **Hermes Gateway:** Running on port 8642 (PID 22156) — Discord connected, API server active
@@ -69,6 +69,8 @@
 ---
 
 ## 🔴 CRITICAL HARD RULES
+
+0. **BRIDGE IS OFF BY DEFAULT.** The live bridge and guardian must NOT be running unless MAD explicitly says "turn bridge on" or "start trading." If MAD says "turn bridge off" → kill bridge + guardian immediately, no questions. This has been told multiple times. NEVER restart the bridge without MAD's explicit directive.
 
 1. **AU is ALWAYS per-pair, never universal.** When adding/swapping assets, MUST run a sweep. Never copy AU from one pair to another.
 2. **Bridge is SOLE executor.** Never restart standalone executors. Bridge handles all order flow.

@@ -2088,10 +2088,10 @@
     "hermes-20260610095506": {
       "session_id": "hermes-20260610095506",
       "start_time": "2026-06-10T09:55:15.587504+00:00",
-      "last_active": "2026-06-10T10:47:04.239999+00:00",
-      "message_count": 12,
-      "user_message_count": 6,
-      "assistant_message_count": 6,
+      "last_active": "2026-06-10T11:17:38.586362+00:00",
+      "message_count": 18,
+      "user_message_count": 9,
+      "assistant_message_count": 9,
       "messages": [
         {
           "message_id": "msg_20260610095515587504",
@@ -2208,6 +2208,66 @@
           "role": "assistant",
           "content": "\n\n\ud83e\udec0 **Heartbeat #5 received \u2014 10:46 UTC**\n\nAll systems nominal. Standing by for tasks.",
           "timestamp": "2026-06-10T10:47:04.239999+00:00",
+          "session_id": "hermes-20260610095506",
+          "task_domain": null,
+          "complexity": null,
+          "observer_metadata": {}
+        },
+        {
+          "message_id": "msg_20260610105723439398",
+          "role": "user",
+          "content": "[SYSTEM] Hermes heartbeat #6 \u2014 10:57 UTC. Status check: all nominal.",
+          "timestamp": "2026-06-10T10:57:23.440392+00:00",
+          "session_id": "hermes-20260610095506",
+          "task_domain": null,
+          "complexity": null,
+          "observer_metadata": {}
+        },
+        {
+          "message_id": "msg_20260610105723453405",
+          "role": "assistant",
+          "content": "\n\n\u2705 Hermes heartbeat #6 received \u2014 10:57 UTC. All systems nominal. Standing by.",
+          "timestamp": "2026-06-10T10:57:23.453405+00:00",
+          "session_id": "hermes-20260610095506",
+          "task_domain": null,
+          "complexity": null,
+          "observer_metadata": {}
+        },
+        {
+          "message_id": "msg_20260610110730049027",
+          "role": "user",
+          "content": "[SYSTEM] Hermes heartbeat #7 \u2014 11:07 UTC. Status check: all nominal.",
+          "timestamp": "2026-06-10T11:07:30.050037+00:00",
+          "session_id": "hermes-20260610095506",
+          "task_domain": null,
+          "complexity": null,
+          "observer_metadata": {}
+        },
+        {
+          "message_id": "msg_20260610110730089853",
+          "role": "assistant",
+          "content": "\n\n\u2705 Hermes heartbeat #7 received at 11:07 UTC. All systems nominal. Standing by.",
+          "timestamp": "2026-06-10T11:07:30.089853+00:00",
+          "session_id": "hermes-20260610095506",
+          "task_domain": null,
+          "complexity": null,
+          "observer_metadata": {}
+        },
+        {
+          "message_id": "msg_20260610111738579729",
+          "role": "user",
+          "content": "[SYSTEM] Hermes heartbeat #8 \u2014 11:17 UTC. Status check: all nominal.",
+          "timestamp": "2026-06-10T11:17:38.579729+00:00",
+          "session_id": "hermes-20260610095506",
+          "task_domain": null,
+          "complexity": null,
+          "observer_metadata": {}
+        },
+        {
+          "message_id": "msg_20260610111738586362",
+          "role": "assistant",
+          "content": "\u2705 Hermes heartbeat #8 received at 11:17 UTC. All systems nominal. Standing by.",
+          "timestamp": "2026-06-10T11:17:38.586362+00:00",
           "session_id": "hermes-20260610095506",
           "task_domain": null,
           "complexity": null,

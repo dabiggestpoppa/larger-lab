@@ -1,0 +1,97 @@
+{
+  "AUDUSD": {
+    "rows": 275184,
+    "columns": 41,
+    "path": "quant-lab\\ml\\data\\macro_features\\AUDUSD_macro.parquet"
+  },
+  "BTCUSD": {
+    "rows": 459149,
+    "columns": 41,
+    "path": "quant-lab\\ml\\data\\macro_features\\BTCUSD_macro.parquet"
+  },
+  "CHFJPY": {
+    "rows": 276411,
+    "columns": 41,
+    "path": "quant-lab\\ml\\data\\macro_features\\CHFJPY_macro.parquet"
+  },
+  "DE30": {
+    "rows": 261213,
+    "columns": 41,
+    "path": "quant-lab\\ml\\data\\macro_features\\DE30_macro.parquet"
+  },
+  "ETHUSD": {
+    "rows": 458286,
+    "columns": 41,
+    "path": "quant-lab\\ml\\data\\macro_features\\ETHUSD_macro.parquet"
+  },
+  "EURUSD": {
+    "rows": 275183,
+    "columns": 41,
+    "path": "quant-lab\\ml\\data\\macro_features\\EURUSD_macro.parquet"
+  },
+  "FR40": {
+    "rows": 259819,
+    "columns": 41,
+    "path": "quant-lab\\ml\\data\\macro_features\\FR40_macro.parquet"
+  },
+  "GBPAUD": {
+    "rows": 278411,
+    "columns": 41,
+    "path": "quant-lab\\ml\\data\\macro_features\\GBPAUD_macro.parquet"
+  },
+  "GBPCHF": {
+    "rows": 278390,
+    "columns": 41,
+    "path": "quant-lab\\ml\\data\\macro_features\\GBPCHF_macro.parquet"
+  },
+  "GBPJPY": {
+    "rows": 278279,
+    "columns": 41,
+    "path": "quant-lab\\ml\\data\\macro_features\\GBPJPY_macro.parquet"
+  },
+  "GBPNZD": {
+    "rows": 278483,
+    "columns": 41,
+    "path": "quant-lab\\ml\\data\\macro_features\\GBPNZD_macro.parquet"
+  },
+  "GBPUSD": {
+    "rows": 278402,
+    "columns": 41,
+    "path": "quant-lab\\ml\\data\\macro_features\\GBPUSD_macro.parquet"
+  },
+  "NZDUSD": {
+    "rows": 278390,
+    "columns": 41,
+    "path": "quant-lab\\ml\\data\\macro_features\\NZDUSD_macro.parquet"
+  },
+  "TEST": {
+    "rows": 100,
+    "columns": 41,
+    "path": "quant-lab\\ml\\data\\macro_features\\TEST_macro.parquet"
+  },
+  "US500": {
+    "rows": 264493,
+    "columns": 41,
+    "path": "quant-lab\\ml\\data\\macro_features\\US500_macro.parquet"
+  },
+  "USDCHF": {
+    "rows": 278434,
+    "columns": 41,
+    "path": "quant-lab\\ml\\data\\macro_features\\USDCHF_macro.parquet"
+  },
+  "USDJPY": {
+    "rows": 278412,
+    "columns": 41,
+    "path": "quant-lab\\ml\\data\\macro_features\\USDJPY_macro.parquet"
+  },
+  "XAGUSD": {
+    "rows": 308699,
+    "columns": 41,
+    "path": "quant-lab\\ml\\data\\macro_features\\XAGUSD_macro.parquet"
+  },
+  "XAUUSD": {
+    "rows": 310629,
+    "columns": 41,
+    "path": "quant-lab\\ml\\data\\macro_features\\XAUUSD_macro.parquet"
+  }
+}

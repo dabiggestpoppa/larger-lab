@@ -1,0 +1,24 @@
+{
+  "feature_names": [
+    "hour_est",
+    "day_of_week",
+    "dist_to_25_pips",
+    "dist_to_50_pips",
+    "dist_to_132_pips",
+    "dist_to_mlr_high_pips",
+    "dist_to_mlr_low_pips",
+    "regime_ratio",
+    "ilm_state",
+    "is_wednesday_pm",
+    "hours_since_mlr",
+    "minutes_to_12pm_est",
+    "mlr_range_pips",
+    "bias_encoded"
+  ],
+  "n_features": 14,
+  "cv_mean": 0.8600088978319531,
+  "cv_std": 0.0,
+  "val_accuracy": 0.8491014458478279,
+  "model_type": "XGBoost",
+  "version": "full_30feat"
+}
