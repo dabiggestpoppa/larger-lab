@@ -294,3 +294,67 @@ The **largest build yet** â€” a complete Neuro-Symbolic Scanner (4 Steps):
 ### Files Created
 - quant-lab/ml/phase1_data/dmr_features.py ï¿½ DMR feature computation
 - Updated all_decision_trees.json with DMR data
+
+---
+
+## ?? RL — REKEY & FAILURE SEQUENCE DATA EXTRACTED (2026-06-10 21:00 UTC)
+**Source:** 7 Holy Grail Excel Sheets + CEREBUS FX v4 Manual Part 11 (pages 71-78)
+
+### Rekey Hypothesis Test (195 events)
+| Method | Combined Score | Status |
+|--------|---------------|--------|
+| **Method B: London+NY Session** | **85.4%** | ?? WINNER |
+| Baseline: 78.6% Retrace | 85.0% | ? VALIDATED |
+
+### Rekey Duration (6,660 violations, 2020-2025)
+- Avg duration: 2.0 days | Most common: 1 day | Next-day reversal: 49.4%
+- Peak day: Thursday (22.5% of violations)
+- Direction interaction: Bearish Thursday most common (758 events)
+
+### Failure Sequence (465 setups)
+- 52.0% hit target before failure | 45.2% failed first
+- Post-failure: 73.8% hit midpoint first ? 51.0% continue to opposite edge ? 20.0% full flip
+- **Key:** Fail ? midpoint repair ? re-acceptance (NOT full reversal)
+
+### 3 Failure Types
+| Type | Frequency | WR | Action |
+|------|-----------|-----|--------|
+| Type 1: Soft Failure (midpoint only) | Most common | — | Stand down |
+| Type 2: Internal Reset (same-side recycle) | 89% of 2nd breaks | 67.7% | Wait for 2nd acceptance |
+| Type 3: Regime Flip (opposite-side) | 11% of 2nd breaks | 84.6% | Wait for full confirmation |
+
+### Second Acceptance Edge
+- 2nd break fires in ~100% of failures | Valid 2nd hold: 50.5%
+- **2nd acceptance WR: 69.8%** | Same-side: 67.7% | Opposite: 84.6%
+
+### Day-of-Week Rules
+| Day | Rule |
+|-----|------|
+| Tue/Wed | ? Play first violation (75-85% real) |
+| Thursday | ?? Wait for second (first = coin flip) |
+| Friday | Mixed (tradeable but weaker) |
+| Monday | Reduce size (false first common) |
+
+### Fib Hit Rates Validated (281 weeks)
+| Level | Actual | Status |
+|-------|--------|--------|
+| -25% | 98.22% | ? Exceeds 90% claim |
+| -50% | 96.44% | ? Exceeds 82% claim |
+| -100% | 92.17% | ? Validated |
+| -168% | 87.19% | ? Validated |
+| 132% Violation | 71.53% | ?? Below 95% claim |
+| 132% Rekey | 100% | ?? Always rekeys (195/195) |
+
+### Seasonal Clustering
+- Q1+Q4 (winter) = 63.7% of failures
+- Q2/Q3 = optimal for extensions
+- Protective: high volatility, bearish bias | Risk: low volatility, bullish bias
+
+### Pattern Failure Triggers (16 types)
+- 132% Level Hit: 95% rekey | C-D Leg Failure: 81.7% | A-B Leg Failure: 78%
+- 15M + WILM Active: 92% | 15M + ILM Miss + IELM: 83%
+- WEZ failures: 65-67% rekey probability
+
+### Files Updated
+- quant-lab/data/holy_grail_extracted/all_decision_trees.json (12 sections)
+- quant-lab/rekey_data.txt | quant-lab/manual_rekey.txt | quant-lab/manual_failure_sequence.txt
