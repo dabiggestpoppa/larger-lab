@@ -1,8 +1,7 @@
-import sys
+import sys, json, numpy as np, pandas as pd
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 from markov_chain_model import MarkovChainModel, STATES, STATE_IDX
-import json, pandas as pd, numpy as np
 
 DATA_DIR = Path('ml/data/training')
 OUTPUT_DIR = Path('ml/data/markov_results')
@@ -24,14 +23,12 @@ for symbol, df in all_data.items():
     seq = []
     for _, row in df.iterrows():
         state = STATE_IDX.get('RESET', 0)
-        if 'label_25_delivery' in row.index:
-            val = row.get('label_25_delivery')
-            if pd.notna(val):
-                state = STATE_IDX.get('TARGET_25', 6) if val == 1 else STATE_IDX.get('FAILURE', 14)
-        if 'rekey_triggered' in row.index:
-            val = row.get('rekey_triggered')
-            if pd.notna(val) and val == 1:
-                state = STATE_IDX.get('REKEY', 11)
+        v25 = row.get('label_25_delivery', None)
+        if pd.notna(v25):
+            state = STATE_IDX.get('TARGET_25', 6) if v25 == 1 else STATE_IDX.get('FAILURE', 14)
+        vrk = row.get('rekey_triggered', None)
+        if pd.notna(vrk) and vrk == 1:
+            state = STATE_IDX.get('REKEY', 11)
         seq.append(state)
     if len(seq) > 10:
         sequences.append(seq)
@@ -68,7 +65,7 @@ results = {
     'n_assets': len(all_data),
     'n_sequences': len(sequences),
 }
-with open(OUTPUT_DIR / 'markov_local_results.json', 'w') as f:
+out_file = OUTPUT_DIR / 'markov_local_results.json'
+with open(out_file, 'w') as f:
     json.dump(results, f, indent=2, default=str)
-out_path = OUTPUT_DIR / "markov_local_results.json"
-print(f"Saved to {out_path}")
+print(f'Saved to {out_file}')

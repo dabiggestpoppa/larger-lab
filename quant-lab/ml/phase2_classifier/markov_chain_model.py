@@ -296,6 +296,29 @@ class MarkovChainModel:
         adjusted_prob = base_prob * day_mod * tier_mod
         return min(adjusted_prob, 1.0)
 
+    def simulate_weeks(self, n_simulations: int = 10000, max_steps: int = 20) -> Dict[str, int]:
+        """
+        Simulate weekly sequences starting from RESET.
+        Returns count of terminal outcomes.
+        """
+        outcomes = Counter()
+        for _ in range(n_simulations):
+            state = STATE_IDX["RESET"]
+            for step in range(max_steps):
+                probs = self.transition_probs[state]
+                next_state = np.random.choice(self.n_states, p=probs)
+                # Check for terminal states
+                if STATES[next_state] in ("HARD_EXIT", "REKEY_EXTENSION", "REGIME_FLIP"):
+                    outcomes[STATES[next_state]] += 1
+                    break
+                if STATES[next_state] == "FAILURE" and step > 3:
+                    outcomes["FAILURE"] += 1
+                    break
+                state = next_state
+            else:
+                outcomes["MAX_STEPS"] += 1
+        return dict(outcomes)
+
     def to_json(self) -> Dict:
         """Serialize model to JSON."""
         return {
