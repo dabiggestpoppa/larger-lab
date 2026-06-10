@@ -1520,3 +1520,85 @@ Now running on http://localhost:12393
 - Hermes Agent: UP
 
 — RL/OWL signing off 🦉
+
+---
+
+## 🟢 RL DATA EXTRACTION — Holy Grail Decision Trees & Playbooks (2026-06-10 18:00 UTC)
+**Agent:** RL (Research Lead) | **Status:** ✅ COMPLETE — 11 Excel sheets + 8 PDFs extracted
+
+### Decision Trees Extracted
+| Source | Content | Rows/Pages |
+|--------|---------|------------|
+| DECISION TREE - WEEKLY CLOSE | Full 5-node decision tree (Mon-Fri) with probabilities | 69 rows |
+| PHASE 5 - WILM ILM VELOCITY | ILM alignment matrix (9 scenarios), rekey signals | 147 rows |
+| PHASE 6 - SESSION PLAYBOOKS | Asian/London/NY playbooks with entry/exit rules | 185 rows |
+| PHASE 4 sheets (4 tabs) | Monthly range, temporal delivery, group analysis | 444 rows |
+| Validation Checklist | 28 claims with claimed vs actual rates | 31 rows |
+| Hit Rate Analysis Framework | Fib calculation rules, measurement definitions | 62 rows |
+| ETH/USD Phase 4 PDF | Complete decision tree with 5-day model hit rates | 22 pages |
+| CEREBUS FX v4 Manual | Full manual | 194 pages |
+| Crypto Fibonacci Manual | BTC/ETH trading model | 11 pages |
+| Oil Re-Keying Analysis | Oil-specific rekey patterns | 6 pages |
+| Phase 1B Cross-Asset | EURUSD vs OILUSD analysis | 15 pages |
+
+### Key Decision Rules for ML Training
+1. **Entry hierarchy:** Daily ILM (64.3%) -> IELM+Daily (71.2%) -> Full Alignment (87.3%)
+2. **Avoid:** WILM Only (34.2%), Complete Misalignment (31.5%)
+3. **Rekey sequence:** 132% violation -> 78.6% retrace (92%) -> 50% entry (85%) -> -50% target (78%)
+4. **Wednesday:** Primary bifurcation day (35% of 132% violations)
+5. **Stop loss:** 132% level + 48% buffer (95% coverage)
+6. **Targets:** -25% (100%), -50% (95.7%), -100% (86.2%), -168% (76.3%)
+7. **ILM alignment:** Full (87.3%, 2.5x+ vel), IELM+Daily (71.2%, 1.8x-2.2x), Daily only (64.3%, 1.2x-1.6x)
+8. **WILM rekey signal:** 3+ consecutive 15M 61.8-88 micro-legs = 94.3% rekey probability
+
+### Failure Pattern Database
+- 221 labeled failure events (2020-2025)
+- Pattern types: 132% Invalidation, C-D Leg Failure, A-B Leg Failure, etc.
+- Features: Expected_Level, Actual_High, Actual_Low, Bias, Range_Size, Quarter
+- Labels: Rekey_Occurred (True/False)
+
+### Files Generated
+- quant-lab/data/holy_grail_extracted/all_decision_trees.json (structured decision trees)
+- quant-lab/data/holy_grail_extracted/decision_trees_playbooks.json (Excel rules)
+- quant-lab/pdf_extractions/*_full.txt (8 PDF text extractions)
+- quant-lab/ml/data/holy_grail_extracted/failure_pattern_database.csv (221 events)
+
+---
+
+## 🟢 RL MLR DIRECTIONAL BIAS TEST — Complete (2026-06-10 17:00 UTC)
+**Agent:** RL (Research Lead) | **Status:** ✅ COMPLETE — 43 pairs tested
+
+### Intraday Directional MLR Results (Asian Session, ±2 pip tolerance)
+| Level | EURUSD | USDCHF | All Pairs Avg |
+|-------|--------|--------|--------------|
+| -25% | 64.6% | 50.2% | 72.3% |
+| -50% | 44.5% | 34.1% | 50.4% |
+| -100% | 22.5% | 13.9% | 24.6% |
+| 132% rekey | 9.1% | 4.9% | 15.9% |
+
+### Weekly Directional MLR Results (Monday London → Friday, ±2 pip tolerance)
+| Level | EURUSD | USDCHF |
+|-------|--------|--------|
+| -25% | 84.6% | 86.9% |
+| -50% | 79.5% | 81.7% |
+| -100% | 67.3% | 74.3% |
+| 132% rekey | 50.6% | 53.1% |
+
+### Top Performers (Weekly -25%)
+HK50 (89.3%), GBPCAD (83.2%), FR40 (82.5%), DE30 (82.1%), EURCAD (81.4%), GBPUSD (81.4%)
+
+### Key Finding
+Weekly directional is dramatically higher than intraday (EURUSD -50%: 79.5% weekly vs 44.5% intraday). The Excel's 90% claim for -25% is based on weekly data.
+
+---
+
+## 🟢 RL RESIDUE COHERENCE TEST — Complete (2026-06-10 12:00 UTC)
+**Agent:** RL (Research Lead) | **Status:** ✅ COMPLETE — 37 pairs analyzed
+
+### Verdict: FLAT correlation
+- Digital root patterns do NOT correlate with WR/PF performance
+- 3-6-9 vs Others: +0.2% WR but -0.85 PF (essentially a wash)
+- Type A (Closure Ladder): 10 pairs, avg PF 14.95
+- Type B (Mirror): 2 pairs, avg PF 11.21
+- Type C (Cascade): 25 pairs, avg PF 13.65
+- Conclusion: K-Means calibration does the heavy lifting, not harmonic residue patterns

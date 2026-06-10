@@ -1,0 +1,429 @@
+﻿
+============================================================
+SOURCE: feature_store (1626 entries)
+============================================================
+
+  [REKEY] 140 matches
+    {"source": "excel", "sheet": "ASIAN_LONDON_ALGO_-_PHASE_1", "column": "Rekey_132", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "values": [1.1141112000000002, 1.1100696, 1.1067844], "mean": 1.1103217333333333, "min": 1.1067844, "max": 1.1141112000000002, "count": 3}
+    {"source": "excel", "sheet": "EURUSD_DAILY_REKEYS", "column": "EUR/USD DAILY REKEYS - Asian Session -100% Failures", "asset": "EURUSD", "timeframe": "D1", "pattern": "UNKNOWN", "values": [100.0], "mean": 100.0, "min": 100.0, "max": 100.0, "count": 1}
+    ... and 138 more
+
+  [132_KILL_SWITCH] 103 matches
+    {"source": "excel", "sheet": "EURUSD_WEEKLY_REKEYS", "column": "ny_fib_132%", "asset": "EURUSD", "timeframe": "W1", "pattern": "UNKNOWN", "values": [1.1656012000000004, 1.1659628000000002, 1.1658948000000002, 1.1639032000000002, 1.1634792, 1.1653804, 1.1671320000000005, 1.15937, 1.1627288, 1.1610884
+    {"source": "excel", "sheet": "EURUSD_WEEKLY_REKEYS", "column": "hit_ny_132%", "asset": "EURUSD", "timeframe": "W1", "pattern": "UNKNOWN", "values": [false, false, false, false, false, true, false, true, false, true, true, true, false, false, false, false, false, false, false, false, true, false, fal
+    ... and 101 more
+
+  [NY_SWEEP] 1 matches
+    {"source": "pdf", "file": "Phase 1B Cross-Asset Analysis_ EURUSD vs OILUSD - Complete Research Report.pdf", "page": 12, "asset": "EURUSD", "timeframe": "W1", "pattern": "Monday_Range", "hit_rates": [81.0, 74.8, 100.0, 64.7, 168.0, 65.1, 100.0, 55.0, 168.0, 132.0, 98.0, 132.0, 132.0], "sample_sizes":
+
+  [GAMMA] 91 matches
+    {"source": "pdf", "file": "cerebus dual incomplete  bydatry (1).pdf", "page": 5, "asset": "EURUSD", "timeframe": "UNKNOWN", "pattern": "Gamma", "hit_rates": [132.0, 78.6, 50.0, 50.0, 100.0, 100.0, 25.0], "sample_sizes": ["281"], "fib_levels": ["100", "50", "132", "25", "78.6"], "mean_hit_rate": 76.5
+    {"source": "pdf", "file": "cerebus dual incomplete  bydatry (1).pdf", "page": 11, "asset": "UNKNOWN", "timeframe": "H4", "pattern": "Gamma", "hit_rates": [50.0, 50.0, 132.0, 85.0, 50.0, 50.0, 50.0, 50.0, 50.0, 78.0, 89.34, 25.0], "sample_sizes": [], "fib_levels": ["50", "132", "25"], "mean_hit_rate"
+    ... and 89 more
+
+  [MICRO_MACRO] 67 matches
+    {"source": "pdf", "file": "121001_A_Portfolio_Approach_to_Impact_Investment.pdf", "page": 24, "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "hit_rates": [25.0], "sample_sizes": [], "fib_levels": ["25"], "mean_hit_rate": 25.0, "raw_snippet": " \n \n \n \n \n \n \n \n \n \n \n \n \
+    {"source": "pdf", "file": "cerbus oil 15-4h candle&rekey flow.pdf", "page": 2, "asset": "OILUSD", "timeframe": "M15", "pattern": "ILM_Zone", "hit_rates": [87.2, 82.6, 83.5, 90.9, 73.8, 68.4, 69.2, 78.4, 94.3, 89.7, 91.6, 97.0, 76.8, 77.3, 72.4, 81.2, 92.0, 94.3, 89.7, 67.8], "sample_sizes": [], "fib
+    ... and 65 more
+
+  [PHASE_3_4] 45 matches
+    {"source": "excel", "sheet": "PHASE_3B_-_Temporal_Delivery_System", "column": "PHASE 3B: TEMPORAL DELIVERY SYSTEM - CELLULAR-LEVEL PATTERN ANALYSIS", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "Session_Delivery", "values": [132.0, 25.0, 50.0, 100.0, 168.0, 132.0, 0.0, 100.0, 0.0, 25.0, 5
+    {"source": "excel", "sheet": "PHASE_3_-_Comprehensive_Analysis", "column": "PHASE 3: 132% DEEP DIVE, TEMPORAL PATTERNS & WEEKLY CORRELATION ANALYSIS", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "values": [25.0, 98.22, 90.0, 8.22, 50.0, 96.44, 82.0, 14.44, 132.0, 71.53, 95.0, 1
+    ... and 43 more
+
+  [SEQUENCE] 91 matches
+    {"source": "excel", "sheet": "Fibonacci_Sequences_Catalog", "column": "Sequence Name", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "values": [50.0, 25.0, 61.8, 50.0, 72.0, 25.0, 78.6, 100.0, 50.0, 72.0, 25.0, 61.8, 61.8, 50.0, 50.0, 72.0, 72.0, 50.0, 100.0, 100.0, 168.0, 132.0]
+    {"source": "excel", "sheet": "Fibonacci_Sequences_Catalog", "column": "Structure", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "values": [50.0, 25.0, 61.8, 50.0, 72.0, 25.0, 78.6, 100.0, 61.8, 61.8, 50.0, 50.0, 72.0, 72.0, 78.6, 23.6, 100.0, 168.0, 132.0], "mean": 70.1157894736
+    ... and 89 more
+
+  [BIFURCATION] 25 matches
+    {"source": "pdf", "file": "cerebus dual incomplete  bydatry (1).pdf", "page": 24, "asset": "EURUSD", "timeframe": "W1", "pattern": "Monday_Range", "hit_rates": [35.0, 132.0, 35.0, 35.0, 25.0, 25.0, 68.4, 25.0, 35.0, 132.0, 25.0, 50.0, 58.7, 50.0, 100.0, 168.0, 25.0], "sample_sizes": [], "fib_levels"
+    {"source": "pdf", "file": "cerebus dual incomplete  bydatry (2).pdf", "page": 24, "asset": "EURUSD", "timeframe": "W1", "pattern": "Monday_Range", "hit_rates": [35.0, 132.0, 35.0, 35.0, 25.0, 25.0, 68.4, 25.0, 35.0, 132.0, 25.0, 50.0, 58.7, 50.0, 100.0, 168.0, 25.0], "sample_sizes": [], "fib_levels"
+    ... and 23 more
+
+  [FIB_EXTENSION] 12 matches
+    {"source": "excel", "sheet": "Fibonacci_Sequences_Catalog", "column": "Target Levels", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "values": [25.0, 50.0, 25.0, 100.0, 25.0, 61.8, 50.0, 72.0, 78.6, 23.6, 100.0, 1.618, 1.618, 100.0, 168.0, 132.0], "mean": 63.38975000000001, "min"
+    {"source": "pdf", "file": "cerebus dual incomplete  bydatry (1).pdf", "page": 7, "asset": "EURUSD", "timeframe": "UNKNOWN", "pattern": "Beta", "hit_rates": [25.0, 90.0, 98.22, 22.0, 50.0, 82.0, 96.44, 14.44, 100.0, 75.0, 92.17, 17.17, 168.0, 68.0, 87.19, 19.19, 132.0, 95.0, 71.53, 25.0], "sample_siz
+    ... and 10 more
+
+  [FIB_RETRACE] 6 matches
+    {"source": "excel", "sheet": "Failure_Pattern_Database", "column": "Range_Size", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "values": [1.8363, 0.91061, 1.12668, 1.90177, 2.1785, 1.76058, 1.14895, 3.23149, 3.75215, 3.75215, 3.75215, 0.66428, 3.52019, 1.76917, 2.02025, 1.05467, 
+    {"source": "excel", "sheet": "ITERATION_1_-_WINDOW___RANGE_ANALYSIS", "column": "-100% Rate", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "values": [0.878, 0.831, 0.723, 0.646], "mean": 0.7695, "min": 0.646, "max": 0.878, "count": 4}
+    ... and 4 more
+
+  [OCC] 63 matches
+    {"source": "excel", "sheet": "Failure_Pattern_Database", "column": "Rekey_Occurred", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "values": [true, true, true, true, true, true, true, true, false, false, false, true, true, true, true, true, true, true, true, true, true, true, tru
+    {"source": "pdf", "file": "cerebus 1hr intra candle formation pt 1..pdf", "page": 6, "asset": "UNKNOWN", "timeframe": "H1", "pattern": "Alpha", "hit_rates": [50.0, 25.0, 72.0, 50.0, 72.4, 16.3, 78.3, 61.8, 68.7, 14.8], "sample_sizes": [], "fib_levels": ["50", "72", "61.8", "25"], "mean_hit_rate": 50
+    ... and 61 more
+
+  [ILM] 103 matches
+    {"source": "excel", "sheet": "ILM_Zone_Behaviors", "column": "Definition", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "ILM_Zone", "values": [61.8, 61.8, 61.8], "mean": 61.79999999999999, "min": 61.8, "max": 61.8, "count": 3}
+    {"source": "excel", "sheet": "ILM_Zone_Behaviors", "column": "Hit Rate (%)", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "ILM_Zone", "values": [88.0], "mean": 88.0, "min": 88.0, "max": 88.0, "count": 1}
+    ... and 101 more
+
+  [REGIME] 79 matches
+    {"source": "pdf", "file": "CEREBUS Phase V OIL DYNAMICAL ANGLES PT 1.pdf", "page": 6, "asset": "OILUSD", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "hit_rates": [82.9, 18.3, 62.7, 68.4, 76.2, 71.8, 80.6, 78.0, 73.5, 82.5, 67.5, 63.1, 71.9, 68.5, 64.0, 73.0, 83.7, 79.4, 88.0, 88.7], "sample_sizes"
+    {"source": "pdf", "file": "CEREBUS v18.2.5  3 market final form master scroll (1).pdf", "page": 30, "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "hit_rates": [61.9, 74.4, 25.0, 100.0, 50.0, 95.7, 25.0, 100.0, 86.2, 168.0, 76.3, 132.0, 100.0, 168.0, 132.0, 74.4, 100.0, 78.6, 50.0
+    ... and 77 more
+
+  [TIME_BLOCK] 40 matches
+    {"source": "excel", "sheet": "EURUSD_DAILY_REKEYS", "column": "EUR/USD DAILY REKEYS - Asian Session -100% Failures", "asset": "EURUSD", "timeframe": "D1", "pattern": "UNKNOWN", "values": [100.0], "mean": 100.0, "min": 100.0, "max": 100.0, "count": 1}
+    {"source": "excel", "sheet": "Hit_Rate_Analysis_Framework", "column": "Monday London session range predicts Friday close target", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "values": [0.0, 100.0, 25.0, 50.0, 100.0, 168.0, 132.0], "mean": 82.14285714285714, "min": 0.0, "max": 1
+    ... and 38 more
+
+  [MONDAY_LONDON] 44 matches
+    {"source": "excel", "sheet": "Hit_Rate_Analysis_Framework", "column": "MEASUREMENT 1: Monday Range (A=D)", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "values": [0.0, 100.0, 25.0, 50.0, 100.0, 168.0, 132.0, 0.0, 100.0, 25.0, 50.0, 100.0, 168.0, 132.0, 25.0, 90.0, 25.0, 90.0, 25
+    {"source": "excel", "sheet": "Hit_Rate_Analysis_Framework", "column": "Monday London session range predicts Friday close target", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "values": [0.0, 100.0, 25.0, 50.0, 100.0, 168.0, 132.0], "mean": 82.14285714285714, "min": 0.0, "max": 1
+    ... and 42 more
+
+  [BIAS] 35 matches
+    {"source": "pdf", "file": "CEREBUS oil nothly tendecies.pdf", "page": 2, "asset": "OILUSD", "timeframe": "UNKNOWN", "pattern": "Delta", "hit_rates": [50.0, 60.0, 40.0, 50.0, 30.0, 50.0, 25.0, 28.6], "sample_sizes": ["15"], "fib_levels": ["50", "25"], "mean_hit_rate": 41.7, "raw_snippet": "Key Findin
+    {"source": "pdf", "file": "CEREBUS v18.2.5  3 market final form master scroll (1).pdf", "page": 2, "asset": "EURUSD", "timeframe": "UNKNOWN", "pattern": "Beta", "hit_rates": [100.0, 25.0, 50.0, 100.0, 25.0, 132.0, 75.0, 132.0, 100.0, 70.61, 71.53, 74.4, 25.0, 100.0, 98.22, 50.0, 100.0, 96.44, 100.0,
+    ... and 33 more
+
+  [WEDNESDAY_STRESS] 43 matches
+    {"source": "pdf", "file": "cerebus 1hr intra candle formation pt 1..pdf", "page": 1, "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "Alpha", "hit_rates": [72.0, 61.8, 67.4, 72.0, 25.0, 61.8, 81.2], "sample_sizes": [], "fib_levels": ["72", "61.8", "25"], "mean_hit_rate": 63.02857142857143, "r
+    {"source": "pdf", "file": "cerebus dual incomplete  bydatry (1).pdf", "page": 4, "asset": "EURUSD", "timeframe": "W1", "pattern": "132%_Rekey", "hit_rates": [35.0, 132.0, 132.0, 132.0, 100.0, 25.0, 98.0, 50.0, 96.0, 100.0, 168.0], "sample_sizes": [], "fib_levels": ["100", "168", "50", "132", "25"], 
+    ... and 41 more
+
+  [HARD_EXIT] 15 matches
+    {"source": "pdf", "file": "CEREBUS v18.2.5  3 market final form master scroll (1).pdf", "page": 28, "asset": "EURUSD", "timeframe": "W1", "pattern": "Monday_Range", "hit_rates": [132.0, 100.0, 168.0, 100.0, 95.21, 168.0, 88.18, 100.0, 92.17, 168.0, 87.19, 132.0, 78.6, 50.0, 132.0], "sample_sizes": [
+    {"source": "pdf", "file": "CEREBUS v18.2.5  3 market final form master scroll.pdf", "page": 28, "asset": "EURUSD", "timeframe": "W1", "pattern": "Monday_Range", "hit_rates": [132.0, 100.0, 168.0, 100.0, 95.21, 168.0, 88.18, 100.0, 92.17, 168.0, 87.19, 132.0, 78.6, 50.0, 132.0], "sample_sizes": [], "
+    ... and 13 more
+
+  [GEAR_SHIFT] 2 matches
+    {"source": "pdf", "file": "CEREBUS_FX_v4_Complete_Manual (1).pdf", "page": 145, "asset": "EURUSD", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "hit_rates": [129.0, 74.3, 89.1, 91.2, 59.0, 85.9, 87.2, 80.8, 91.4, 86.0, 86.6, 71.0], "sample_sizes": [], "fib_levels": [], "mean_hit_rate": 85.958333333
+    {"source": "pdf", "file": "CEREBUS_FX_v4_Complete_Manual (1).pdf", "page": 147, "asset": "EURUSD", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "hit_rates": [83.0, 76.8, 88.4, 90.2, 59.0, 86.6, 85.4, 78.7, 89.8, 45.0, 83.0, 88.4, 80.0, 90.0], "sample_sizes": ["3", "3"], "fib_levels": [], "mean_hit_
+
+  [DENSITY_ZONE] 25 matches
+    {"source": "pdf", "file": "CEREBUS_9K_CONFIG_REPORT.pdf", "page": 0, "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "Gamma", "hit_rates": [50.0], "sample_sizes": [], "fib_levels": ["50"], "mean_hit_rate": 50.0, "raw_snippet": "CEREBUS 9K UNLOCK CONFIG TEST\nFull Analysis \u2014 All 36 Assets
+    {"source": "pdf", "file": "CEREBUS_FX_Cheat_Sheet.pdf", "page": 0, "asset": "EURUSD", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "hit_rates": [80.0, 98.9], "sample_sizes": [], "fib_levels": [], "mean_hit_rate": 89.45, "raw_snippet": "CEREBUS FX v4.0 \u2014 SIMPLE CHEAT SHEET\nEUR/USD \u2014 \u201
+    ... and 23 more
+
+  [ATOMIC_UNIT] 120 matches
+    {"source": "pdf", "file": "10.1109ICACTM.2019.8776701.pdf", "page": 2, "asset": "FR40", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "hit_rates": [92.06], "sample_sizes": [], "fib_levels": [], "mean_hit_rate": 92.06, "raw_snippet": "2019 International Conference on Automation, Computational and Tec
+    {"source": "pdf", "file": "cerebus dual incomplete  bydatry (1).pdf", "page": 24, "asset": "EURUSD", "timeframe": "W1", "pattern": "Monday_Range", "hit_rates": [35.0, 132.0, 35.0, 35.0, 25.0, 25.0, 68.4, 25.0, 35.0, 132.0, 25.0, 50.0, 58.7, 50.0, 100.0, 168.0, 25.0], "sample_sizes": [], "fib_levels"
+    ... and 118 more
+
+  [TIER] 151 matches
+    {"source": "pdf", "file": "CEREBUS_FX_Cheat_Sheet.pdf", "page": 0, "asset": "EURUSD", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "hit_rates": [80.0, 98.9], "sample_sizes": [], "fib_levels": [], "mean_hit_rate": 89.45, "raw_snippet": "CEREBUS FX v4.0 \u2014 SIMPLE CHEAT SHEET\nEUR/USD \u2014 \u201
+    {"source": "pdf", "file": "CEREBUS_FX_v4_Complete_Manual (1).pdf", "page": 2, "asset": "XAUUSD", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "hit_rates": [25.0, 75.0, 75.0, 50.0, 132.0, 40.0, 50.0, 93.7, 50.0, 81.2, 98.0, 50.0, 64.4, 18.8, 20.0, 20.0, 59.0, 98.7, 75.0], "sample_sizes": [], "fib_le
+    ... and 149 more
+
+  [ASIAN_RANGE] 883 matches
+    {"source": "excel", "sheet": "previous_day_targets", "column": "Previous_Day_Minus_25", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "values": [95.72, 95.72, 95.72], "mean": 95.71999999999998, "min": 95.72, "max": 95.72, "count": 3}
+    {"source": "excel", "sheet": "previous_day_targets", "column": "Previous_Day_Minus_50", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "values": [98.22, 98.22, 98.22], "mean": 98.21999999999998, "min": 98.22, "max": 98.22, "count": 3}
+    ... and 881 more
+
+  [LONDON_IMPULSE] 36 matches
+    {"source": "pdf", "file": "CEREBUS_FX_v4_Complete_Manual (1).pdf", "page": 94, "asset": "EURUSD", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "hit_rates": [73.6, 80.0, 88.7, 80.0, 11.0, 80.3, 80.0, 74.0, 11.0, 80.0], "sample_sizes": ["3", "3", "3", "4"], "fib_levels": [], "mean_hit_rate": 65.86, "
+    {"source": "pdf", "file": "CEREBUS_FX_v4_Complete_Manual (1).pdf", "page": 97, "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "Gamma", "hit_rates": [50.0, 80.0, 50.0, 80.0, 93.7, 62.0, 66.0, 80.0, 93.0], "sample_sizes": [], "fib_levels": ["50"], "mean_hit_rate": 72.74444444444445, "raw_snipp
+    ... and 34 more
+
+  [DELIVERY] 109 matches
+    {"source": "excel", "sheet": "Delivery_Stats", "column": "Claim/Pattern", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "values": [25.0, 50.0, 72.0, 72.0, 25.0, 61.8, 61.8, 61.8, 61.8], "mean": 54.57777777777778, "min": 25.0, "max": 72.0, "count": 9}
+    {"source": "excel", "sheet": "Delivery_Stats", "column": "Confidence Interval", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "values": [3.2, 2.8, 1.8, 35.0, 5.0, 4.1, 5.3, 6.8, 8.2, 2.3, 2.8, 3.1, 1.9], "mean": 6.33076923076923, "min": 1.8, "max": 35.0, "count": 13}
+    ... and 107 more
+
+============================================================
+SOURCE: feature_store_fixed (1626 entries)
+============================================================
+
+  [REKEY] 233 matches
+    {"source": "excel", "sheet": "DECISION_TREE_-_WEEKLY_CLOSE", "column": "Goal:", "asset": "UNKNOWN", "timeframe": "W1", "pattern": "132%_Rekey", "values": [25.0, 25.0, 35.0, 132.0, 132.0, 78.6, 50.0, 50.0, 132.0, 100.0, 35.0, 132.0, 25.0, 70.0, 132.0, 132.0, 78.6, 132.0, 50.0, 85.0, 87.8, 25.0, 50.0,
+    {"source": "excel", "sheet": "DECISION_TREE_-_WEEKLY_CLOSE", "column": "Unnamed: 2", "asset": "UNKNOWN", "timeframe": "W1", "pattern": "132%_Rekey", "values": [100.0, 100.0, 70.0, 80.0, 68.0, 32.0, 50.0, 82.0, 100.0, 88.0, 132.0, 30.0, 71.53, 100.0, 92.0, 85.0, 78.0, 168.0, 85.0, 100.0, 50.0, 168.0,
+    ... and 231 more
+
+  [132_KILL_SWITCH] 230 matches
+    {"source": "excel", "sheet": "DECISION_TREE_-_WEEKLY_CLOSE", "column": "Goal:", "asset": "UNKNOWN", "timeframe": "W1", "pattern": "132%_Rekey", "values": [25.0, 25.0, 35.0, 132.0, 132.0, 78.6, 50.0, 50.0, 132.0, 100.0, 35.0, 132.0, 25.0, 70.0, 132.0, 132.0, 78.6, 132.0, 50.0, 85.0, 87.8, 25.0, 50.0,
+    {"source": "excel", "sheet": "DECISION_TREE_-_WEEKLY_CLOSE", "column": "Unnamed: 2", "asset": "UNKNOWN", "timeframe": "W1", "pattern": "132%_Rekey", "values": [100.0, 100.0, 70.0, 80.0, 68.0, 32.0, 50.0, 82.0, 100.0, 88.0, 132.0, 30.0, 71.53, 100.0, 92.0, 85.0, 78.0, 168.0, 85.0, 100.0, 50.0, 168.0,
+    ... and 228 more
+
+  [NY_SWEEP] 1 matches
+    {"source": "pdf", "file": "Phase 1B Cross-Asset Analysis_ EURUSD vs OILUSD - Complete Research Report.pdf", "page": 12, "asset": "EURUSD", "timeframe": "W1", "pattern": "Monday_Range", "hit_rates": [81.0, 74.8, 100.0, 64.7, 168.0, 65.1, 100.0, 55.0, 168.0, 132.0, 98.0, 132.0, 132.0], "sample_sizes":
+
+  [GAMMA] 91 matches
+    {"source": "pdf", "file": "cerebus dual incomplete  bydatry (1).pdf", "page": 5, "asset": "EURUSD", "timeframe": "UNKNOWN", "pattern": "Gamma", "hit_rates": [132.0, 78.6, 50.0, 50.0, 100.0, 100.0, 25.0], "sample_sizes": ["281"], "fib_levels": ["100", "50", "132", "25", "78.6"], "mean_hit_rate": 76.5
+    {"source": "pdf", "file": "cerebus dual incomplete  bydatry (1).pdf", "page": 11, "asset": "UNKNOWN", "timeframe": "H4", "pattern": "Gamma", "hit_rates": [50.0, 50.0, 132.0, 85.0, 50.0, 50.0, 50.0, 50.0, 50.0, 78.0, 89.34, 25.0], "sample_sizes": [], "fib_levels": ["50", "132", "25"], "mean_hit_rate"
+    ... and 89 more
+
+  [MICRO_MACRO] 67 matches
+    {"source": "pdf", "file": "121001_A_Portfolio_Approach_to_Impact_Investment.pdf", "page": 24, "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "hit_rates": [25.0], "sample_sizes": [], "fib_levels": ["25"], "mean_hit_rate": 25.0, "raw_snippet": " \n \n \n \n \n \n \n \n \n \n \n \n \
+    {"source": "pdf", "file": "cerbus oil 15-4h candle&rekey flow.pdf", "page": 2, "asset": "OILUSD", "timeframe": "M15", "pattern": "ILM_Zone", "hit_rates": [87.2, 82.6, 83.5, 90.9, 73.8, 68.4, 69.2, 78.4, 94.3, 89.7, 91.6, 97.0, 76.8, 77.3, 72.4, 81.2, 92.0, 94.3, 89.7, 67.8], "sample_sizes": [], "fib
+    ... and 65 more
+
+  [PHASE_3_4] 45 matches
+    {"source": "excel", "sheet": "PHASE_3B_-_Temporal_Delivery_System", "column": "PHASE 3B: TEMPORAL DELIVERY SYSTEM - CELLULAR-LEVEL PATTERN ANALYSIS", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "Session_Delivery", "values": [132.0, 25.0, 50.0, 100.0, 168.0, 132.0, 0.0, 100.0, 0.0, 25.0, 5
+    {"source": "excel", "sheet": "PHASE_3_-_Comprehensive_Analysis", "column": "PHASE 3: 132% DEEP DIVE, TEMPORAL PATTERNS & WEEKLY CORRELATION ANALYSIS", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "132%_Rekey", "values": [25.0, 98.22, 90.0, 8.22, 50.0, 96.44, 82.0, 14.44, 132.0, 71.53, 95.0
+    ... and 43 more
+
+  [SEQUENCE] 91 matches
+    {"source": "excel", "sheet": "Fibonacci_Sequences_Catalog", "column": "Sequence Name", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "132%_Rekey", "values": [50.0, 25.0, 61.8, 50.0, 72.0, 25.0, 78.6, 100.0, 50.0, 72.0, 25.0, 61.8, 61.8, 50.0, 50.0, 72.0, 72.0, 50.0, 100.0, 100.0, 168.0, 132
+    {"source": "excel", "sheet": "Fibonacci_Sequences_Catalog", "column": "Structure", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "132%_Rekey", "values": [50.0, 25.0, 61.8, 50.0, 72.0, 25.0, 78.6, 100.0, 61.8, 61.8, 50.0, 50.0, 72.0, 72.0, 78.6, 23.6, 100.0, 168.0, 132.0], "mean": 70.1157894
+    ... and 89 more
+
+  [BIFURCATION] 25 matches
+    {"source": "pdf", "file": "cerebus dual incomplete  bydatry (1).pdf", "page": 24, "asset": "EURUSD", "timeframe": "W1", "pattern": "Monday_Range", "hit_rates": [35.0, 132.0, 35.0, 35.0, 25.0, 25.0, 68.4, 25.0, 35.0, 132.0, 25.0, 50.0, 58.7, 50.0, 100.0, 168.0, 25.0], "sample_sizes": [], "fib_levels"
+    {"source": "pdf", "file": "cerebus dual incomplete  bydatry (2).pdf", "page": 24, "asset": "EURUSD", "timeframe": "W1", "pattern": "Monday_Range", "hit_rates": [35.0, 132.0, 35.0, 35.0, 25.0, 25.0, 68.4, 25.0, 35.0, 132.0, 25.0, 50.0, 58.7, 50.0, 100.0, 168.0, 25.0], "sample_sizes": [], "fib_levels"
+    ... and 23 more
+
+  [FIB_EXTENSION] 12 matches
+    {"source": "excel", "sheet": "Fibonacci_Sequences_Catalog", "column": "Target Levels", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "132%_Rekey", "values": [25.0, 50.0, 25.0, 100.0, 25.0, 61.8, 50.0, 72.0, 78.6, 23.6, 100.0, 1.618, 1.618, 100.0, 168.0, 132.0], "mean": 63.38975000000001, "m
+    {"source": "pdf", "file": "cerebus dual incomplete  bydatry (1).pdf", "page": 7, "asset": "EURUSD", "timeframe": "UNKNOWN", "pattern": "Beta", "hit_rates": [25.0, 90.0, 98.22, 22.0, 50.0, 82.0, 96.44, 14.44, 100.0, 75.0, 92.17, 17.17, 168.0, 68.0, 87.19, 19.19, 132.0, 95.0, 71.53, 25.0], "sample_siz
+    ... and 10 more
+
+  [FIB_RETRACE] 6 matches
+    {"source": "excel", "sheet": "Failure_Pattern_Database", "column": "Range_Size", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "values": [1.8363, 0.91061, 1.12668, 1.90177, 2.1785, 1.76058, 1.14895, 3.23149, 3.75215, 3.75215, 3.75215, 0.66428, 3.52019, 1.76917, 2.02025, 1.05467, 
+    {"source": "excel", "sheet": "ITERATION_1_-_WINDOW___RANGE_ANALYSIS", "column": "-100% Rate", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "values": [0.878, 0.831, 0.723, 0.646], "mean": 0.7695, "min": 0.646, "max": 0.878, "count": 4}
+    ... and 4 more
+
+  [OCC] 63 matches
+    {"source": "excel", "sheet": "Failure_Pattern_Database", "column": "Rekey_Occurred", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "132%_Rekey", "values": [true, true, true, true, true, true, true, true, false, false, false, true, true, true, true, true, true, true, true, true, true, true, 
+    {"source": "pdf", "file": "cerebus 1hr intra candle formation pt 1..pdf", "page": 6, "asset": "UNKNOWN", "timeframe": "H1", "pattern": "Alpha", "hit_rates": [50.0, 25.0, 72.0, 50.0, 72.4, 16.3, 78.3, 61.8, 68.7, 14.8], "sample_sizes": [], "fib_levels": ["50", "72", "61.8", "25"], "mean_hit_rate": 50
+    ... and 61 more
+
+  [ILM] 103 matches
+    {"source": "excel", "sheet": "ILM_Zone_Behaviors", "column": "Definition", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "ILM_Zone", "values": [61.8, 61.8, 61.8], "mean": 61.79999999999999, "min": 61.8, "max": 61.8, "count": 3}
+    {"source": "excel", "sheet": "ILM_Zone_Behaviors", "column": "Hit Rate (%)", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "ILM_Zone", "values": [88.0], "mean": 88.0, "min": 88.0, "max": 88.0, "count": 1}
+    ... and 101 more
+
+  [REGIME] 79 matches
+    {"source": "pdf", "file": "CEREBUS Phase V OIL DYNAMICAL ANGLES PT 1.pdf", "page": 6, "asset": "OILUSD", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "hit_rates": [82.9, 18.3, 62.7, 68.4, 76.2, 71.8, 80.6, 78.0, 73.5, 82.5, 67.5, 63.1, 71.9, 68.5, 64.0, 73.0, 83.7, 79.4, 88.0, 88.7], "sample_sizes"
+    {"source": "pdf", "file": "CEREBUS v18.2.5  3 market final form master scroll (1).pdf", "page": 30, "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "hit_rates": [61.9, 74.4, 25.0, 100.0, 50.0, 95.7, 25.0, 100.0, 86.2, 168.0, 76.3, 132.0, 100.0, 168.0, 132.0, 74.4, 100.0, 78.6, 50.0
+    ... and 77 more
+
+  [TIME_BLOCK] 40 matches
+    {"source": "excel", "sheet": "EURUSD_DAILY_REKEYS", "column": "EUR/USD DAILY REKEYS - Asian Session -100% Failures", "asset": "EURUSD", "timeframe": "D1", "pattern": "132%_Rekey", "values": [100.0], "mean": 100.0, "min": 100.0, "max": 100.0, "count": 1}
+    {"source": "excel", "sheet": "Hit_Rate_Analysis_Framework", "column": "Monday London session range predicts Friday close target", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "Monday_Range", "values": [0.0, 100.0, 25.0, 50.0, 100.0, 168.0, 132.0], "mean": 82.14285714285714, "min": 0.0, "ma
+    ... and 38 more
+
+  [MONDAY_LONDON] 44 matches
+    {"source": "excel", "sheet": "Hit_Rate_Analysis_Framework", "column": "MEASUREMENT 1: Monday Range (A=D)", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "Monday_Range", "values": [0.0, 100.0, 25.0, 50.0, 100.0, 168.0, 132.0, 0.0, 100.0, 25.0, 50.0, 100.0, 168.0, 132.0, 25.0, 90.0, 25.0, 90.
+    {"source": "excel", "sheet": "Hit_Rate_Analysis_Framework", "column": "Monday London session range predicts Friday close target", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "Monday_Range", "values": [0.0, 100.0, 25.0, 50.0, 100.0, 168.0, 132.0], "mean": 82.14285714285714, "min": 0.0, "ma
+    ... and 42 more
+
+  [BIAS] 35 matches
+    {"source": "pdf", "file": "CEREBUS oil nothly tendecies.pdf", "page": 2, "asset": "OILUSD", "timeframe": "UNKNOWN", "pattern": "Delta", "hit_rates": [50.0, 60.0, 40.0, 50.0, 30.0, 50.0, 25.0, 28.6], "sample_sizes": ["15"], "fib_levels": ["50", "25"], "mean_hit_rate": 41.7, "raw_snippet": "Key Findin
+    {"source": "pdf", "file": "CEREBUS v18.2.5  3 market final form master scroll (1).pdf", "page": 2, "asset": "EURUSD", "timeframe": "UNKNOWN", "pattern": "Beta", "hit_rates": [100.0, 25.0, 50.0, 100.0, 25.0, 132.0, 75.0, 132.0, 100.0, 70.61, 71.53, 74.4, 25.0, 100.0, 98.22, 50.0, 100.0, 96.44, 100.0,
+    ... and 33 more
+
+  [WEDNESDAY_STRESS] 43 matches
+    {"source": "pdf", "file": "cerebus 1hr intra candle formation pt 1..pdf", "page": 1, "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "Alpha", "hit_rates": [72.0, 61.8, 67.4, 72.0, 25.0, 61.8, 81.2], "sample_sizes": [], "fib_levels": ["72", "61.8", "25"], "mean_hit_rate": 63.02857142857143, "r
+    {"source": "pdf", "file": "cerebus dual incomplete  bydatry (1).pdf", "page": 4, "asset": "EURUSD", "timeframe": "W1", "pattern": "132%_Rekey", "hit_rates": [35.0, 132.0, 132.0, 132.0, 100.0, 25.0, 98.0, 50.0, 96.0, 100.0, 168.0], "sample_sizes": [], "fib_levels": ["100", "168", "50", "132", "25"], 
+    ... and 41 more
+
+  [HARD_EXIT] 15 matches
+    {"source": "pdf", "file": "CEREBUS v18.2.5  3 market final form master scroll (1).pdf", "page": 28, "asset": "EURUSD", "timeframe": "W1", "pattern": "Monday_Range", "hit_rates": [132.0, 100.0, 168.0, 100.0, 95.21, 168.0, 88.18, 100.0, 92.17, 168.0, 87.19, 132.0, 78.6, 50.0, 132.0], "sample_sizes": [
+    {"source": "pdf", "file": "CEREBUS v18.2.5  3 market final form master scroll.pdf", "page": 28, "asset": "EURUSD", "timeframe": "W1", "pattern": "Monday_Range", "hit_rates": [132.0, 100.0, 168.0, 100.0, 95.21, 168.0, 88.18, 100.0, 92.17, 168.0, 87.19, 132.0, 78.6, 50.0, 132.0], "sample_sizes": [], "
+    ... and 13 more
+
+  [GEAR_SHIFT] 2 matches
+    {"source": "pdf", "file": "CEREBUS_FX_v4_Complete_Manual (1).pdf", "page": 145, "asset": "EURUSD", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "hit_rates": [129.0, 74.3, 89.1, 91.2, 59.0, 85.9, 87.2, 80.8, 91.4, 86.0, 86.6, 71.0], "sample_sizes": [], "fib_levels": [], "mean_hit_rate": 85.958333333
+    {"source": "pdf", "file": "CEREBUS_FX_v4_Complete_Manual (1).pdf", "page": 147, "asset": "EURUSD", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "hit_rates": [83.0, 76.8, 88.4, 90.2, 59.0, 86.6, 85.4, 78.7, 89.8, 45.0, 83.0, 88.4, 80.0, 90.0], "sample_sizes": ["3", "3"], "fib_levels": [], "mean_hit_
+
+  [DENSITY_ZONE] 25 matches
+    {"source": "pdf", "file": "CEREBUS_9K_CONFIG_REPORT.pdf", "page": 0, "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "Gamma", "hit_rates": [50.0], "sample_sizes": [], "fib_levels": ["50"], "mean_hit_rate": 50.0, "raw_snippet": "CEREBUS 9K UNLOCK CONFIG TEST\nFull Analysis \u2014 All 36 Assets
+    {"source": "pdf", "file": "CEREBUS_FX_Cheat_Sheet.pdf", "page": 0, "asset": "EURUSD", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "hit_rates": [80.0, 98.9], "sample_sizes": [], "fib_levels": [], "mean_hit_rate": 89.45, "raw_snippet": "CEREBUS FX v4.0 \u2014 SIMPLE CHEAT SHEET\nEUR/USD \u2014 \u201
+    ... and 23 more
+
+  [ATOMIC_UNIT] 120 matches
+    {"source": "pdf", "file": "10.1109ICACTM.2019.8776701.pdf", "page": 2, "asset": "FR40", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "hit_rates": [92.06], "sample_sizes": [], "fib_levels": [], "mean_hit_rate": 92.06, "raw_snippet": "2019 International Conference on Automation, Computational and Tec
+    {"source": "pdf", "file": "cerebus dual incomplete  bydatry (1).pdf", "page": 24, "asset": "EURUSD", "timeframe": "W1", "pattern": "Monday_Range", "hit_rates": [35.0, 132.0, 35.0, 35.0, 25.0, 25.0, 68.4, 25.0, 35.0, 132.0, 25.0, 50.0, 58.7, 50.0, 100.0, 168.0, 25.0], "sample_sizes": [], "fib_levels"
+    ... and 118 more
+
+  [TIER] 151 matches
+    {"source": "pdf", "file": "CEREBUS_FX_Cheat_Sheet.pdf", "page": 0, "asset": "EURUSD", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "hit_rates": [80.0, 98.9], "sample_sizes": [], "fib_levels": [], "mean_hit_rate": 89.45, "raw_snippet": "CEREBUS FX v4.0 \u2014 SIMPLE CHEAT SHEET\nEUR/USD \u2014 \u201
+    {"source": "pdf", "file": "CEREBUS_FX_v4_Complete_Manual (1).pdf", "page": 2, "asset": "XAUUSD", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "hit_rates": [25.0, 75.0, 75.0, 50.0, 132.0, 40.0, 50.0, 93.7, 50.0, 81.2, 98.0, 50.0, 64.4, 18.8, 20.0, 20.0, 59.0, 98.7, 75.0], "sample_sizes": [], "fib_le
+    ... and 149 more
+
+  [ASIAN_RANGE] 883 matches
+    {"source": "excel", "sheet": "previous_day_targets", "column": "Previous_Day_Minus_25", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "values": [95.72, 95.72, 95.72], "mean": 95.71999999999998, "min": 95.72, "max": 95.72, "count": 3}
+    {"source": "excel", "sheet": "previous_day_targets", "column": "Previous_Day_Minus_50", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "values": [98.22, 98.22, 98.22], "mean": 98.21999999999998, "min": 98.22, "max": 98.22, "count": 3}
+    ... and 881 more
+
+  [LONDON_IMPULSE] 36 matches
+    {"source": "pdf", "file": "CEREBUS_FX_v4_Complete_Manual (1).pdf", "page": 94, "asset": "EURUSD", "timeframe": "UNKNOWN", "pattern": "UNKNOWN", "hit_rates": [73.6, 80.0, 88.7, 80.0, 11.0, 80.3, 80.0, 74.0, 11.0, 80.0], "sample_sizes": ["3", "3", "3", "4"], "fib_levels": [], "mean_hit_rate": 65.86, "
+    {"source": "pdf", "file": "CEREBUS_FX_v4_Complete_Manual (1).pdf", "page": 97, "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "Gamma", "hit_rates": [50.0, 80.0, 50.0, 80.0, 93.7, 62.0, 66.0, 80.0, 93.0], "sample_sizes": [], "fib_levels": ["50"], "mean_hit_rate": 72.74444444444445, "raw_snipp
+    ... and 34 more
+
+  [DELIVERY] 165 matches
+    {"source": "excel", "sheet": "-168__FAILURE_ANALYSIS", "column": "Non-COVID Period Sessions", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "Session_Delivery", "values": [168.0, 168.0, 168.0, 168.0, 168.0, 0.0, 168.0, 168.0], "mean": 147.0, "min": 0.0, "max": 168.0, "count": 8}
+    {"source": "excel", "sheet": "-168__FAILURE_INVESTIGATION", "column": "COVID Period Sessions:", "asset": "UNKNOWN", "timeframe": "UNKNOWN", "pattern": "Session_Delivery", "values": [168.0, 38.9, 17.1, 63.7, 36.4, 54.5, 168.0, 63.7, 168.0, 36.4, 168.0, 168.0, 300.0, 132.0, 48.0, 168.0, 168.0, 168.0, 
+    ... and 163 more
+
+============================================================
+SOURCE: pdf_stats (1118 entries)
+============================================================
+
+  [REKEY] 117 matches
+    {"source": "cerbus oil 15-4h candle&rekey flow.pdf", "page": 0, "type": "text", "hit_rates": ["76.2", "71.8", "80.6", "68.5", "64.0", "73.0", "53.9", "49.1", "58.7", "82.3", "77.9", "86.7", "79.8", "75.4", "84.2", "87.2", "83.5", "90.9", "89.5", "85.7"], "sample_sizes": [], "fib_levels": [], "succes
+    {"source": "cerbus oil 15-4h candle&rekey flow.pdf", "page": 1, "type": "text", "hit_rates": ["76.2", "89.5", "89.5"], "sample_sizes": [], "fib_levels": [], "success_rates": [], "times": [], "assets": [], "raw_snippet": "15M \u2192 1H \u2192 4H Recursive Construction Flow\nKey Findings:\nWILM signif
+    ... and 115 more
+
+  [132_KILL_SWITCH] 159 matches
+    {"source": "cerebus dual incomplete  bydatry (1).pdf", "page": 1, "type": "text", "hit_rates": ["132"], "sample_sizes": [], "fib_levels": ["132"], "success_rates": [], "times": ["5", "4"], "assets": [], "raw_snippet": "Table of Contents\nPART 1: EXECUTIVE SUMMARY\nPage 3\n1.1 Cross-Market Overview\n
+    {"source": "cerebus dual incomplete  bydatry (1).pdf", "page": 3, "type": "text", "hit_rates": ["25", "98.22", "98.22", "100.00", "50", "96.44", "96.44", "95.70", "100", "92.17", "92.17", "168", "87.19", "87.19", "132", "71.53", "71.53", "74.40", "100", "100"], "sample_sizes": ["281", "401", "281", 
+    ... and 157 more
+
+  [NY_SWEEP] 1 matches
+    {"source": "Phase 1B Cross-Asset Analysis_ EURUSD vs OILUSD - Complete Research Report.pdf", "page": 12, "type": "text", "hit_rates": ["81", "74.8", "100", "64.7", "168", "65.1", "100", "55.0", "168", "132", "98", "132", "132"], "sample_sizes": ["90", "60"], "fib_levels": ["100", "132", "168"], "suc
+
+  [GAMMA] 27 matches
+    {"source": "CEREBUS BTC - Phase I_ Foundational Deterministic Structure & Temporal Execution Analysis.pdf", "page": 2, "type": "text", "hit_rates": ["61.8", "38.2", "161.8", "84.62", "15.38", "50", "61.8", "127", "76.92", "23.08", "78.6", "50", "161.8", "88.46", "11.54", "88.6", "61.8", "127", "73.0
+    {"source": "CEREBUS Framework micro-macro seasonality.pdf", "page": 3, "type": "text", "hit_rates": ["56.7", "23.4", "25", "61.8", "88"], "sample_sizes": [], "fib_levels": ["88", "61.8", "25"], "success_rates": [], "times": [], "assets": [], "raw_snippet": "P(1H Gamma Structure | 15M Alpha in active
+    ... and 25 more
+
+  [MICRO_MACRO] 85 matches
+    {"source": "121001_A_Portfolio_Approach_to_Impact_Investment.pdf", "page": 24, "type": "text", "hit_rates": ["25"], "sample_sizes": [], "fib_levels": ["25"], "success_rates": [], "times": [], "assets": [], "raw_snippet": " \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n  \n \n \n \n \n \n \n \n \n \n \
+    {"source": "cerbus oil 15-4h candle&rekey flow.pdf", "page": 2, "type": "text", "hit_rates": ["87.2", "82.6", "83.5", "90.9", "73.8", "68.4", "69.2", "78.4", "94.3", "89.7", "91.6", "97.0", "76.8", "77.3", "72.4", "81.2", "92.0", "94.3", "89.7", "67.8"], "sample_sizes": [], "fib_levels": [], "succes
+    ... and 83 more
+
+  [PHASE_3_4] 44 matches
+    {"source": "CEREBUS Phase III wick zones.pdf", "page": 0, "type": "text", "hit_rates": ["26.6", "28.7", "87.6", "93.2", "82.3", "89.7", "79.4", "86.3", "91.2", "95.8", "52.3", "56.8", "81.7", "92.3"], "sample_sizes": [], "fib_levels": [], "success_rates": [], "times": [], "assets": [], "raw_snippet"
+    {"source": "CEREBUS Phase III wick zones.pdf", "page": 1, "type": "text", "hit_rates": ["62.7", "68.4", "60.3", "61.8", "61.8", "35.7", "42.4"], "sample_sizes": [], "fib_levels": ["61.8"], "success_rates": [], "times": [], "assets": [], "raw_snippet": "Clear preference for odd vs. even hour initiati
+    ... and 42 more
+
+  [SEQUENCE] 113 matches
+    {"source": "cerbus oil 15-4h candle&rekey flow.pdf", "page": 1, "type": "text", "hit_rates": ["76.2", "89.5", "89.5"], "sample_sizes": [], "fib_levels": [], "success_rates": [], "times": [], "assets": [], "raw_snippet": "15M \u2192 1H \u2192 4H Recursive Construction Flow\nKey Findings:\nWILM signif
+    {"source": "cereburs oil initial  blocks.pdf", "page": 0, "type": "text", "hit_rates": ["50", "25", "72", "50", "72.4", "16.3", "78.3", "61.8", "50", "50", "25", "68.7", "14.8", "71.6", "72", "25", "61.8", "50", "81.2", "18.7"], "sample_sizes": [], "fib_levels": ["50", "72", "61.8", "25"], "success_
+    ... and 111 more
+
+  [BIFURCATION] 30 matches
+    {"source": "cerebus dual incomplete  bydatry (1).pdf", "page": 24, "type": "text", "hit_rates": ["35", "132", "35", "35", "25", "25", "68.4", "25", "35", "132", "25", "50", "58.7", "50", "100", "168", "25"], "sample_sizes": [], "fib_levels": ["100", "168", "50", "132", "25"], "success_rates": [], "t
+    {"source": "cerebus dual incomplete  bydatry (2).pdf", "page": 24, "type": "text", "hit_rates": ["35", "132", "35", "35", "25", "25", "68.4", "25", "35", "132", "25", "50", "58.7", "50", "100", "168", "25"], "sample_sizes": [], "fib_levels": ["100", "168", "50", "132", "25"], "success_rates": [], "t
+    ... and 28 more
+
+  [FIB_EXTENSION] 35 matches
+    {"source": "cerebus dual incomplete  bydatry (1).pdf", "page": 7, "type": "text", "hit_rates": ["25", "90", "98.22", "22", "50", "82", "96.44", "14.44", "100", "75", "92.17", "17.17", "168", "68", "87.19", "19.19", "132", "95", "71.53", "25"], "sample_sizes": ["281", "281", "281", "281", "281"], "fi
+    {"source": "cerebus dual incomplete  bydatry (1).pdf", "page": 9, "type": "text", "hit_rates": ["100", "78", "168", "73", "132", "132", "100", "132", "132", "71.53", "132", "71.53", "95", "23.47", "100", "132", "71.53", "95", "28.47", "100"], "sample_sizes": ["281"], "fib_levels": ["100", "132", "16
+    ... and 33 more
+
+  [FIB_RETRACE] 7 matches
+    {"source": "CEREBUS BTC - Phase I_ Foundational Deterministic Structure & Temporal Execution Analysis.pdf", "page": 0, "type": "text", "hit_rates": ["85.42", "71.81", "54.30", "94.21", "12.57"], "sample_sizes": [], "fib_levels": [], "success_rates": [], "times": [], "assets": ["BTCUSD"], "raw_snippe
+    {"source": "CEREBUS BTC - Phase I_ Foundational Deterministic Structure & Temporal Execution Analysis.pdf", "page": 2, "type": "text", "hit_rates": ["61.8", "38.2", "161.8", "84.62", "15.38", "50", "61.8", "127", "76.92", "23.08", "78.6", "50", "161.8", "88.46", "11.54", "88.6", "61.8", "127", "73.0
+    ... and 5 more
+
+  [OCC] 127 matches
+    {"source": "cereburs oil initial  blocks.pdf", "page": 0, "type": "text", "hit_rates": ["50", "25", "72", "50", "72.4", "16.3", "78.3", "61.8", "50", "50", "25", "68.7", "14.8", "71.6", "72", "25", "61.8", "50", "81.2", "18.7"], "sample_sizes": [], "fib_levels": ["50", "72", "61.8", "25"], "success_
+    {"source": "cerebus 1hr intra candle formation pt 1..pdf", "page": 2, "type": "text", "hit_rates": ["18.7"], "sample_sizes": [], "fib_levels": [], "success_rates": [], "times": [], "assets": [], "raw_snippet": "This heatmap visualizes the correlation between sequence types, success rates, and ILM zo
+    ... and 125 more
+
+  [ILM] 111 matches
+    {"source": "cerbus oil 15-4h candle&rekey flow.pdf", "page": 0, "type": "text", "hit_rates": ["76.2", "71.8", "80.6", "68.5", "64.0", "73.0", "53.9", "49.1", "58.7", "82.3", "77.9", "86.7", "79.8", "75.4", "84.2", "87.2", "83.5", "90.9", "89.5", "85.7"], "sample_sizes": [], "fib_levels": [], "succes
+    {"source": "cerbus oil 15-4h candle&rekey flow.pdf", "page": 1, "type": "text", "hit_rates": ["76.2", "89.5", "89.5"], "sample_sizes": [], "fib_levels": [], "success_rates": [], "times": [], "assets": [], "raw_snippet": "15M \u2192 1H \u2192 4H Recursive Construction Flow\nKey Findings:\nWILM signif
+    ... and 109 more
+
+  [REGIME] 178 matches
+    {"source": "cerebus dual incomplete  bydatry (1).pdf", "page": 20, "type": "text", "hit_rates": ["25", "50", "35", "132", "78.6", "78.6", "132", "100", "92", "100", "132", "50", "85", "50", "50", "78", "50", "78.6", "92", "100"], "sample_sizes": [], "fib_levels": ["100", "50", "132", "25", "78.6"], 
+    {"source": "cerebus dual incomplete  bydatry (2).pdf", "page": 20, "type": "text", "hit_rates": ["25", "50", "35", "132", "78.6", "78.6", "132", "100", "92", "100", "132", "50", "85", "50", "50", "78", "50", "78.6", "92", "100"], "sample_sizes": [], "fib_levels": ["100", "50", "132", "25", "78.6"], 
+    ... and 176 more
+
+  [TIME_BLOCK] 86 matches
+    {"source": "cerebus dual incomplete  bydatry (1).pdf", "page": 8, "type": "text", "hit_rates": ["100", "92.17", "168", "87.19", "168", "15", "25", "50", "25", "96.08", "98.22", "99.29", "25", "50", "93.24", "96.44", "98.22", "25", "100", "88.97"], "sample_sizes": [], "fib_levels": ["50", "100", "168
+    {"source": "cerebus dual incomplete  bydatry (1).pdf", "page": 10, "type": "text", "hit_rates": ["132", "132", "35", "132", "70", "50", "132", "20", "48", "25", "132", "70", "25", "132", "30", "25", "132", "25", "132", "25"], "sample_sizes": [], "fib_levels": ["100", "50", "132", "25", "78.6"], "suc
+    ... and 84 more
+
+  [MONDAY_LONDON] 70 matches
+    {"source": "cerebus 1hr intra candle formation pt 1..pdf", "page": 10, "type": "text", "hit_rates": ["82.3", "61.8", "67.4"], "sample_sizes": [], "fib_levels": ["61.8"], "success_rates": [], "times": ["4", "4", "4", "4"], "assets": [], "raw_snippet": "The London-NY overlap (14:00-18:00 UTC) amplifie
+    {"source": "cerebus dual incomplete  bydatry (1).pdf", "page": 3, "type": "text", "hit_rates": ["25", "98.22", "98.22", "100.00", "50", "96.44", "96.44", "95.70", "100", "92.17", "92.17", "168", "87.19", "87.19", "132", "71.53", "71.53", "74.40", "100", "100"], "sample_sizes": ["281", "401", "281", 
+    ... and 68 more
+
+  [BIAS] 83 matches
+    {"source": "cerebus dual incomplete  bydatry (1).pdf", "page": 12, "type": "text", "hit_rates": ["132", "34.6", "132", "34.6", "132", "25", "98.22", "100", "25", "27", "25", "25", "50", "132", "48", "80", "80", "80", "25", "50"], "sample_sizes": [], "fib_levels": ["50", "100", "132", "25"], "success
+    {"source": "cerebus dual incomplete  bydatry (2).pdf", "page": 12, "type": "text", "hit_rates": ["132", "34.6", "132", "34.6", "132", "25", "98.22", "100", "25", "27", "25", "25", "50", "132", "48", "80", "80", "80", "25", "50"], "sample_sizes": [], "fib_levels": ["50", "100", "132", "25"], "success
+    ... and 81 more
+
+  [WEDNESDAY_STRESS] 71 matches
+    {"source": "cerebus 1hr intra candle formation pt 1..pdf", "page": 1, "type": "text", "hit_rates": ["72", "61.8", "67.4", "72", "25", "61.8", "81.2"], "sample_sizes": [], "fib_levels": ["72", "61.8", "25"], "success_rates": [], "times": [], "assets": [], "raw_snippet": "Quarter Level Magnetism\n75.5
+    {"source": "cerebus 1hr intra candle formation pt 1..pdf", "page": 10, "type": "text", "hit_rates": ["82.3", "61.8", "67.4"], "sample_sizes": [], "fib_levels": ["61.8"], "success_rates": [], "times": ["4", "4", "4", "4"], "assets": [], "raw_snippet": "The London-NY overlap (14:00-18:00 UTC) amplifie
+    ... and 69 more
+
+  [HARD_EXIT] 46 matches
+    {"source": "cerebus dual incomplete  bydatry (1).pdf", "page": 4, "type": "text", "hit_rates": ["35", "132", "132", "132", "100", "25", "98", "50", "96", "100", "168"], "sample_sizes": [], "fib_levels": ["100", "168", "50", "132", "25"], "success_rates": [], "times": [], "assets": [], "raw_snippet":
+    {"source": "cerebus dual incomplete  bydatry (2).pdf", "page": 4, "type": "text", "hit_rates": ["35", "132", "132", "132", "100", "25", "98", "50", "96", "100", "168"], "sample_sizes": [], "fib_levels": ["100", "168", "50", "132", "25"], "success_rates": [], "times": [], "assets": [], "raw_snippet":
+    ... and 44 more
+
+  [GEAR_SHIFT] 5 matches
+    {"source": "CEREBUS_FX_Cheat_Sheet.pdf", "page": 0, "type": "text", "hit_rates": ["80", "98.9"], "sample_sizes": [], "fib_levels": [], "success_rates": [], "times": [], "assets": [], "raw_snippet": "CEREBUS FX v4.0 \u2014 SIMPLE CHEAT SHEET\nEUR/USD \u2014 \u201cTHE GRINDER\u201d\nTier\nAsian Range\
+    {"source": "CEREBUS_FX_v4_Complete_Manual (1).pdf", "page": 145, "type": "text", "hit_rates": ["129", "74.3", "89.1", "91.2", "59", "85.9", "87.2", "80.8", "91.4", "86", "86.6", "71"], "sample_sizes": [], "fib_levels": [], "success_rates": [], "times": [], "assets": [], "raw_snippet": "GEAR SHIFT OV
+    ... and 3 more
+
+  [DENSITY_ZONE] 50 matches
+    {"source": "CEREBUS_9K_CONFIG_REPORT.pdf", "page": 0, "type": "text", "hit_rates": ["50"], "sample_sizes": [], "fib_levels": ["50"], "success_rates": [], "times": [], "assets": [], "raw_snippet": "CEREBUS 9K UNLOCK CONFIG TEST\nFull Analysis \u2014 All 36 Assets\nGenerated: June 08, 2026 10:26\nConf
+    {"source": "CEREBUS_FX_Cheat_Sheet.pdf", "page": 0, "type": "text", "hit_rates": ["80", "98.9"], "sample_sizes": [], "fib_levels": [], "success_rates": [], "times": [], "assets": [], "raw_snippet": "CEREBUS FX v4.0 \u2014 SIMPLE CHEAT SHEET\nEUR/USD \u2014 \u201cTHE GRINDER\u201d\nTier\nAsian Range\
+    ... and 48 more
+
+  [ATOMIC_UNIT] 224 matches
+    {"source": "10.1109ICACTM.2019.8776701.pdf", "page": 2, "type": "text", "hit_rates": ["92.06"], "sample_sizes": [], "fib_levels": [], "success_rates": [], "times": [], "assets": [], "raw_snippet": "2019 International Conference on Automation, Computational and Technology Management (ICACTM) \nAmity 
+    {"source": "121001_A_Portfolio_Approach_to_Impact_Investment.pdf", "page": 22, "type": "text", "hit_rates": ["15"], "sample_sizes": [], "fib_levels": [], "success_rates": [], "times": [], "assets": [], "raw_snippet": " \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n 
+    ... and 222 more
+
+  [TIER] 220 matches
+    {"source": "CEREBUS_FX_Cheat_Sheet.pdf", "page": 0, "type": "text", "hit_rates": ["80", "98.9"], "sample_sizes": [], "fib_levels": [], "success_rates": [], "times": [], "assets": [], "raw_snippet": "CEREBUS FX v4.0 \u2014 SIMPLE CHEAT SHEET\nEUR/USD \u2014 \u201cTHE GRINDER\u201d\nTier\nAsian Range\
+    {"source": "CEREBUS_FX_v4_Complete_Manual (1).pdf", "page": 1, "type": "text", "hit_rates": ["50", "81.2"], "sample_sizes": [], "fib_levels": ["50"], "success_rates": [], "times": [], "assets": ["NAS100", "US500"], "raw_snippet": "CEREBUS FX \u2014 QUICK REFERENCE CARD\nScan this before every sessio
+    ... and 218 more
+
+  [ASIAN_RANGE] 1023 matches
+    {"source": "10.1109ICACTM.2019.8776701.pdf", "page": 2, "type": "text", "hit_rates": ["92.06"], "sample_sizes": [], "fib_levels": [], "success_rates": [], "times": [], "assets": [], "raw_snippet": "2019 International Conference on Automation, Computational and Technology Management (ICACTM) \nAmity 
+    {"source": "121001_A_Portfolio_Approach_to_Impact_Investment.pdf", "page": 11, "type": "text", "hit_rates": ["25"], "sample_sizes": [], "fib_levels": ["25"], "success_rates": [], "times": [], "assets": [], "raw_snippet": " \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n  \n \n \
+    ... and 1021 more
+
+  [LONDON_IMPULSE] 79 matches
+    {"source": "CEREBUS_FX_Cheat_Sheet.pdf", "page": 0, "type": "text", "hit_rates": ["80", "98.9"], "sample_sizes": [], "fib_levels": [], "success_rates": [], "times": [], "assets": [], "raw_snippet": "CEREBUS FX v4.0 \u2014 SIMPLE CHEAT SHEET\nEUR/USD \u2014 \u201cTHE GRINDER\u201d\nTier\nAsian Range\
+    {"source": "CEREBUS_FX_v4_Complete_Manual (1).pdf", "page": 94, "type": "text", "hit_rates": ["73.6", "80", "88.7", "80", "11", "80.3", "80", "74", "11", "80"], "sample_sizes": ["3", "3", "3", "4"], "fib_levels": [], "success_rates": [], "times": ["3", "3", "3", "4"], "assets": [], "raw_snippet": "P
+    ... and 77 more
+
+  [DELIVERY] 118 matches
+    {"source": "cerebus dual incomplete  bydatry (1).pdf", "page": 1, "type": "text", "hit_rates": ["132"], "sample_sizes": [], "fib_levels": ["132"], "success_rates": [], "times": ["5", "4"], "assets": [], "raw_snippet": "Table of Contents\nPART 1: EXECUTIVE SUMMARY\nPage 3\n1.1 Cross-Market Overview\n
+    {"source": "cerebus dual incomplete  bydatry (1).pdf", "page": 7, "type": "text", "hit_rates": ["25", "90", "98.22", "22", "50", "82", "96.44", "14.44", "100", "75", "92.17", "17.17", "168", "68", "87.19", "19.19", "132", "95", "71.53", "25"], "sample_sizes": ["281", "281", "281", "281", "281"], "fi
+    ... and 116 more
+
+  [LABEL] 3 matches
+    {"source": "CEREBUS_FX_v4_Complete_Manual (1).pdf", "page": 113, "type": "text", "hit_rates": ["80"], "sample_sizes": ["917"], "fib_levels": [], "success_rates": [], "times": ["917"], "assets": [], "raw_snippet": "DAILY SETUPS & IDEAS Live Research | Structural Setups | Executable\nEdge Concepts Cer
+    {"source": "CEREBUS_FX_v4_Complete_Manual (11).pdf", "page": 111, "type": "text", "hit_rates": ["80"], "sample_sizes": ["917"], "fib_levels": [], "success_rates": [], "times": ["917"], "assets": [], "raw_snippet": "DAILY SETUPS & IDEAS Live Research | Structural Setups | Executable\nEdge Concepts Ce
+    ... and 1 more
+
+  [SHAP] 1 matches
+    {"source": "CEREBUS Framework_ 15M Atomic Unit & ILM Variant Influence Analysis pt 1.pdf", "page": 5, "type": "text", "hit_rates": ["29"], "sample_sizes": [], "fib_levels": [], "success_rates": [], "times": [], "assets": [], "raw_snippet": "This analysis provides compelling evidence supporting the C
+
+SKIP decision_trees: file not found
+
+SKIP playbooks: file not found
+
+SKIP stats_index: file not found
+
+
+============================================================
+CSV STATS FILES
+============================================================
+  [asian_range] OTHER_previous_day_targets.csv
+  [asian_range] OTHER_thursday_range_targets.csv
+  [asian_range] STATS_Cross_Market_Comparison.csv
+  [delivery] STATS_Delivery_Stats.csv
+  [asian_range] STATS_ETH_Analysis_Summary.csv
+  [asian_range] STATS_ETH_Model_Comparison.csv
+  [rekey] STATS_EURUSD_DAILY_REKEYS.csv
+  [asian_range] STATS_EURUSD_Oil_Comparison.csv
+  [rekey] STATS_EURUSD_WEEKLY_REKEYS.csv
+  [sequence] STATS_Fibonacci_Sequences_Catalog.csv
+  [ilm] STATS_ILM_Zone_Behaviors.csv
+  [rekey] STATS_ITERATION_2_-_132__REKEY_DURATION.csv
+  [asian_range] STATS_PHASE2_SUMMARY_COMPARISON.csv
+  [delivery] STATS_PHASE_3B_-_Temporal_Delivery_System.csv
+  [asian_range] STATS_PHASE_3C_-_PURE_SYSTEM_MECHANICS_SUMMARY.csv
+  [delivery] STATS_PHASE_3C_-_TEMPORAL_DELIVERY__REVISED_.csv
+  [sequence] STATS_PHASE_3D_-_FIB_SEQUENCES_DATA.csv
+  [asian_range] STATS_PHASE_3_-_CONSOLIDATED_SUMMARY.csv
+  [asian_range] STATS_PHASE_3_-_EURUSD_SUMMARY.csv
+  [delivery] STATS_PHASE_4_-_TEMPORAL_DELIVERY_MAPPING.csv
+  [ilm] STATS_PHASE_5_-_WILM_ILM_VELOCITY_ANALYSIS.csv
+  [rekey] STATS_Pattern_Failures___Rekeys.csv
+  [asian_range] STATS_RANGE_COMPARISON_SUMMARY.csv
+  [rekey] STATS_REKEY_HYPOTHESIS_TEST_RESULTS.csv
+  [asian_range] STATS_TOLERANCE_COMPARISON_0.15_0.25_0.50.csv
+  [asian_range] STATS_hit_rate_summary.csv
+  [asian_range] STATS_measurement_comparison.csv
+  [asian_range] STATS_quarterly_analysis.csv
+
+
+DONE.
