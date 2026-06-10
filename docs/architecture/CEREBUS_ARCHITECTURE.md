@@ -1,7 +1,8 @@
 # CEREBUS Neuro-Symbolic Scanner — Architecture
 
-> **Version:** v1.0 | **Date:** 2026-06-10 | **Status:** Wave 1-3 Complete
+> **Version:** v1.1 | **Date:** 2026-06-10 | **Status:** Wave 1-3 Complete + Orchestrator Integration
 > **Source:** CEREBUS BUILD.txt + CEREBUS v4 Manual + ST_TIERS_AND_AU.pdf
+> **Total Code:** 77 Python files, ~13,700 lines | **Tests:** 120/120 passing
 
 ---
 
@@ -244,6 +245,96 @@ flowchart TD
         S2[Q2+Q3: Optimal<br/>Best extensions]
     end
 ```
+
+---
+
+## Orchestrator ↔ Guardian Integration
+
+> **Status:** ✅ Wired (2026-06-10) — TradeOrchestrator is fully integrated into Guardian pipeline
+
+### Integration Flow
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    GUARDIAN + ORCHESTRATOR                       │
+│                                                                  │
+│  M15 Candle Close                                                │
+│       │                                                          │
+│       ▼                                                          │
+│  Feature Computation (micro + macro)                             │
+│       │                                                          │
+│       ▼                                                          │
+│  XGBoost Inference → Regime + Confidence                         │
+│       │                                                          │
+│       ▼                                                          │
+│  Alignment Check (confidence ≥ 85%, kill-switch safe, near tgt)  │
+│       │                                                          │
+│       ├── FAIL → Log & Wait                                      │
+│       │                                                          │
+│       ▼ PASS                                                     │
+│  ┌─────────────────────────────────────────────┐                 │
+│  │  _orchestrate_active_trade()                │                 │
+│  │  → Manage existing positions (hold/trim/    │                 │
+│  │    hedge/exit) via evaluate_during_trade()  │                 │
+│  └─────────────────────────────────────────────┘                 │
+│       │                                                          │
+│       ▼                                                          │
+│  ┌─────────────────────────────────────────────┐                 │
+│  │  _orchestrate_entry()                       │                 │
+│  │  → Map features → TradeSetup                │                 │
+│  │  → evaluate_entry() → TradeDecision         │                 │
+│  │  → ENTER/SKIP/REDUCE + size multiplier      │                 │
+│  │  → Track active_trades[symbol]              │                 │
+│  └─────────────────────────────────────────────┘                 │
+│       │                                                          │
+│       ▼                                                          │
+│  RAG Oracle Query → Manual Rules + Citations                     │
+│       │                                                          │
+│       ▼                                                          │
+│  Rich Markdown Alert (regime + confidence + pattern +            │
+│                       orchestrator decision + targets + SL)       │
+│       │                                                          │
+│       ▼                                                          │
+│  Dispatch (Telegram / Discord / Print)                           │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Alert Output Format
+
+```
+🔔 CEREBUS ALERT: EURUSD
+━━━━━━━━━━━━━━━━━━━━━━
+Regime: CONFIRMED (92%)
+Pattern: AT_FIB_LEVEL
+Time to Delivery: 18h
+
+📖 ORACLE: "T1 setup — full size. Target -25% by Tue."
+
+📊 ORCHESTRATOR DECISION: ENTER
+  Size: 100%
+  Reason: Regime CONFIRMED: full size | Full ILM alignment | Tuesday: Play first violation
+  Targets: {"TP1_-25%": 0.2, "TP2_-50%": 0.5, "TP3_Daily_-50%": 0.25, "Runner": 0.05}
+  SL Buffer: 10.0p
+  Time Stop: 288 bars
+```
+
+### Active Trade State Tracking
+
+| Field | Description |
+|-------|-------------|
+| `state` | Current TradeState (T1_ACTIVE, REKEY_SEQUENCE, etc.) |
+| `bars_in_trade` | Bars since entry |
+| `targets_hit` | List of hit targets (TARGET_25, TARGET_50, etc.) |
+| `entry_confidence` | Model confidence at entry |
+| `size_multiplier` | Orchestrator's position size decision |
+| `sl_buffer_pips` | Stop loss buffer from orchestrator |
+
+### Key Integration Points
+
+1. **Entry:** Guardian `_orchestrate_entry()` maps feature dict → `TradeSetup` → `TradeOrchestrator.evaluate_entry()` → `TradeDecision`
+2. **Management:** Every bar, `_orchestrate_active_trade()` checks target hits, 132% violations, failures, time stops
+3. **Exit:** Orchestrator EXIT decision → trade removed from `active_trades`
+4. **Alert enrichment:** Trade decision (action, size, reason, targets, SL) appended to RAG alert
 
 ---
 

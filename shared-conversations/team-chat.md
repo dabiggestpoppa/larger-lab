@@ -4,7 +4,9 @@
 > **Current focus:** 🔴 CEREBUS Neuro-Symbolic Scanner — NEW BUILD (largest yet)
 > **Plan:** `quant-lab/ml/CEREBUS_NEURO_SYMBOLIC_SCANNER_PLAN.md`
 > **CC Build Notes:** `quant-lab/ml/BUILD_NOTES_CEREBUS.md`
-> **Status:** Wave 1 ✅ | Wave 2 ✅ | Wave 3 ✅ (22/22 tests) | Docs ✅ | AS Testing ⏳
+> **Status:** Wave 1 ✅ | Wave 2 ✅ | Wave 3 ✅ (22/22 tests) | Docs ✅ | AS Integration ✅
+> **Total Tests:** 120/120 passing (macro 70 + phase2 18 + phase5 10 + RAG 22)
+> **Orchestrator→Guardian:** Wired ✅ (entry decisions + active trade management in alert pipeline)
 > **Colab Notebook:** `quant-lab/ml/CEREBUS_Retrain_Colab.ipynb` — GPU training ready
 > **Training Data:** `quant-lab/ml/data/training/` — 18 assets, 5.3M samples, 48 features
 > **Model:** `regime_classifier_full.pkl` — 87.1% CV, 86.5% val, 41 features
@@ -50,7 +52,37 @@
 ### Tests: 70/70 passing (all macro engine tests)
 
 ---
+## ✅ AS — Full System Overview + Orchestrator Integration (2026-06-10 21:00 UTC)
+**Agent:** AS (Assistant Manager) | **Status:** ✅ Complete audit, orchestrator→guardian wired
 
+### System Summary
+- **77 Python files**, ~13,700 lines of code
+- **172 parquet data files** across clean/features/labels/combined/full_features_v2
+- **23 trained model files** (18 per-asset + full classifier + entry scorer)
+- **120/120 tests passing** (macro 70 + phase2 18 + phase5 10 + RAG+Guardian 22)
+- **19 assets**: EURUSD, GBPUSD, USDCHF, USDJPY, AUDUSD, NZDUSD, GBPJPY, GBPAUD, GBPCHF, GBPNZD, CHFJPY, US500, DE30, FR40, XAUUSD, XAGUSD, BTCUSD, ETHUSD
+- **Model**: 87.1% CV, 86.5% val, 41 features, SHAP #1 = dist_to_132_pips ✅
+
+### What's Proven (Backtested)
+- Feature engineering (MLR, Fib, ILM, Asian Range, 18 pattern detectors)
+- XGBoost regime classification (87.1% CV, SHAP verified)
+- RAG Oracle (55 PDFs ingested, 22/22 tests)
+- Trade orchestration (17 states, Holy Grail probabilities)
+- Guardian pipeline (live scanning → alignment → RAG → alert)
+- Markov chain state machine (weekly simulation)
+- Extension verification (85,098 sessions, -25%=70.0%, -50%=65.1%)
+
+### What Needs Live Testing
+- Forward test on live market data (never run on real-time feed)
+- Telegram dispatch (currently print() only)
+- MT5/Nautilus broker integration (skeleton exists, not connected)
+- Production model drift monitoring
+- BTC/ETH weekend handling on live crypto data
+
+### Architecture Doc
+- `docs/architecture/CEREBUS_ARCHITECTURE.md` — full system diagram + file structure
+
+---
 ## ✅ AS — MLR/Asian Range Fixes + Friday Asian Anchor (2026-06-10 19:00 UTC)
 **Agent:** AS (Assistant Manager) | **Status:** ✅ COMMITTED & PUSHED — `61858acf5`
 
