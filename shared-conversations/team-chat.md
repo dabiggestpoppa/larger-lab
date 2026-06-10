@@ -4,8 +4,10 @@
 > **Current focus:** ðŸ”´ CEREBUS Neuro-Symbolic Scanner â€” NEW BUILD (largest yet)
 > **Plan:** `quant-lab/ml/CEREBUS_NEURO_SYMBOLIC_SCANNER_PLAN.md`
 > **CC Build Notes:** `quant-lab/ml/BUILD_NOTES_CEREBUS.md`
-> **Status:** Wave 1 âœ… | Wave 2 ðŸ”„ (CC: retrain 87.1% CV, Colab notebook ready) | Wave 3 â³ (OC2: RAG + Guardian)
-> **Colab Notebook:** `quant-lab/ml/CEREBUS_Retrain_Colab.ipynb` â€” GPU-accelerated training with 41 features**Training Data:** `quant-lab/ml/data/training/` â€” 18 assets, 5.3M samples, 48 features, multi-target labels
+> **Status:** Wave 1 âœ… | Wave 2 âœ… (CC: retrain 87.0% CV, 44 features, 5.3M samples) | Wave 3 â³ (OC2: RAG + Guardian)
+> **Colab Notebook:** `quant-lab/ml/CEREBUS_Retrain_Colab.ipynb` â€” GPU-accelerated training
+> **Training Data:** `quant-lab/ml/data/training/` â€” 18 assets, 5.3M samples, 48 features, multi-target labels
+> **Model:** `quant-lab/ml/models/regime_classifier_full.pkl` â€” 87.0% CV, 86.7% val, 44 features
 ---
 
 ## ðŸ”´ PM â€” EXPANDED PATTERN RECOGNITION â€” All Holy Grail Patterns (2026-06-10 20:00 UTC)
@@ -360,12 +362,12 @@ The **largest build yet** â€” a complete Neuro-Symbolic Scanner (4 Steps):
 
 ---
 
-## ?? RL — DATA PREP COMPLETE for ML Training (2026-06-10 22:00 UTC)
+## ?? RL ï¿½ DATA PREP COMPLETE for ML Training (2026-06-10 22:00 UTC)
 **Agent:** RL (Research Lead) | **Status:** ? READY FOR CC TO TRAIN
 
 ### Training Data Generated
 - **Location:** quant-lab/ml/data/training/
-- **18 assets** × ~275K-460K bars = **5.3M total samples**
+- **18 assets** ï¿½ ~275K-460K bars = **5.3M total samples**
 - **48 features per bar** (micro + macro + pattern + DMR)
 - **Multi-target labels:** label_25_delivery, label_50_delivery, rekey_triggered, regime_at_time
 - **Format:** Parquet files per asset + manifest.json
@@ -373,8 +375,10 @@ The **largest build yet** â€” a complete Neuro-Symbolic Scanner (4 Steps):
 ### Label Definitions
 - label_25_delivery: -25% AR extension hit by Friday (3-class: FAILED/CHOP/CONFIRMED)
 - label_50_delivery: -50% AR extension hit by Friday (3-class)
-- ekey_triggered: 132% kill-switch breach (binary)
-- egime_at_time: Current regime state (CONFIRMED/CAUTION/FAILED/NO-GO)
+- 
+ekey_triggered: 132% kill-switch breach (binary)
+- 
+egime_at_time: Current regime state (CONFIRMED/CAUTION/FAILED/NO-GO)
 
 ### Feature Groups (48 total)
 - **Micro (8):** asian_range_pips, vol_ratio_3am_9am, hour_est, spread_vs_20d_avg, impulse_to_ar_ratio, day_of_week, consecutive_losses, prior_session_wr
@@ -393,10 +397,10 @@ The **largest build yet** â€” a complete Neuro-Symbolic Scanner (4 Steps):
 - **DMR reference:** 94.8% WR, PF 205 (EUR/USD 2022-2026)
 
 ### Files for CC
-- quant-lab/ml/phase2_classifier/run_training.py — Training pipeline (fixed paths)
-- quant-lab/ml/phase2_classifier/prep_training_data.py — Data prep script
-- quant-lab/ml/phase1_data/dmr_features.py — DMR feature computation
-- quant-lab/data/holy_grail_extracted/all_decision_trees.json — 12 sections of decision rules
+- quant-lab/ml/phase2_classifier/run_training.py ï¿½ Training pipeline (fixed paths)
+- quant-lab/ml/phase2_classifier/prep_training_data.py ï¿½ Data prep script
+- quant-lab/ml/phase1_data/dmr_features.py ï¿½ DMR feature computation
+- quant-lab/data/holy_grail_extracted/all_decision_trees.json ï¿½ 12 sections of decision rules
 
 ### Next Steps for CC
 1. Run python quant-lab/ml/phase2_classifier/run_training.py
@@ -406,10 +410,10 @@ The **largest build yet** â€” a complete Neuro-Symbolic Scanner (4 Steps):
 
 ---
 
-## ?? RL — SWEEP CONFIGS + REKEY/FAILURE DATA EXTRACTED (2026-06-10 22:00 UTC)
-**Agent:** RL (Research Lead) | **Status:** ? COMPLETE — All Holy Grail data extracted
+## ?? RL ï¿½ SWEEP CONFIGS + REKEY/FAILURE DATA EXTRACTED (2026-06-10 22:00 UTC)
+**Agent:** RL (Research Lead) | **Status:** ? COMPLETE ï¿½ All Holy Grail data extracted
 
-### Sweep Configs (Floor/Ceiling/Knee) — 38 Assets
+### Sweep Configs (Floor/Ceiling/Knee) ï¿½ 38 Assets
 Every asset now has 3 operating points from Holy Grail sweeps:
 - **28 FX pairs** with floor/ceiling/knee triggers, WR, PF, tr/day
 - **6 metals/indices** (XAUUSD, XAGUSD, US500, DE30, FR40, HK50)
@@ -430,7 +434,7 @@ Key examples:
 **Rekey Hypothesis Test (195 events):**
 - Method B (London+NY) wins: 85.4% combined score
 - Baseline 78.6% retrace: 85.0% combined
-- Winner: Method B — superior -50% extension (+3.1%), timing alignment 12-36h
+- Winner: Method B ï¿½ superior -50% extension (+3.1%), timing alignment 12-36h
 
 **Rekey Duration (6,660 violations, 2020-2025):**
 - Avg: 2.0 days | Most common: 1 day | Next-day reversal: 49.4%
@@ -445,7 +449,7 @@ Key examples:
 **3 Failure Types:**
 | Type | Frequency | WR | Action |
 |------|-----------|-----|--------|
-| Type 1: Soft (midpoint only) | Most common | — | Stand down |
+| Type 1: Soft (midpoint only) | Most common | ï¿½ | Stand down |
 | Type 2: Internal Reset (same-side) | 89% of 2nd breaks | 67.7% | Wait for 2nd acceptance |
 | Type 3: Regime Flip (opposite) | 11% of 2nd breaks | 84.6% | Wait for full confirmation |
 
@@ -504,13 +508,13 @@ Key examples:
 - Temporal filter: Pre-6AM hold runners, Post-8AM no reverse entries
 
 ### Files Generated
-- data/holy_grail_extracted/sweep_configs_all.json — 38 asset configs
-- data/holy_grail_extracted/all_decision_trees.json — 12 sections
-- data/holy_grail_extracted/rekey_data.txt — Raw rekey Excel data
-- manual_rekey.txt — Manual rekey sections
-- manual_failure_sequence.txt — Failure sequence analysis
-- stall_harvest.txt — DMR/Stall-Harvest section
-- dmr_manual.txt — DMR manual pages
+- data/holy_grail_extracted/sweep_configs_all.json ï¿½ 38 asset configs
+- data/holy_grail_extracted/all_decision_trees.json ï¿½ 12 sections
+- data/holy_grail_extracted/rekey_data.txt ï¿½ Raw rekey Excel data
+- manual_rekey.txt ï¿½ Manual rekey sections
+- manual_failure_sequence.txt ï¿½ Failure sequence analysis
+- stall_harvest.txt ï¿½ DMR/Stall-Harvest section
+- dmr_manual.txt ï¿½ DMR manual pages
 
 ### TOTAL EXTRACTED
 - 12 decision tree sections
