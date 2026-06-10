@@ -711,9 +711,15 @@ def run_full_pipeline(symbol: str, output_dir: Path) -> bool:
     print("  Computing Impulse features...")
     df = compute_impulse_features(df, symbol)
 
-    # Step 4: MLR
-    print("  Computing MLR...")
-    df = compute_mlr(df)
+    # Step 4: Weekly Anchor (MLR for forex, Friday Asian for crypto)
+    sym_upper = symbol.upper()
+    if "BTC" in sym_upper or "ETH" in sym_upper:
+        print("  Computing Friday Asian Anchor (crypto weekly)...")
+        from macro import compute_friday_asian_anchor
+        df = compute_friday_asian_anchor(df, symbol)
+    else:
+        print("  Computing MLR (Monday London Range)...")
+        df = compute_mlr(df)
 
     # Step 5: Fib targets
     print("  Computing Fib targets...")

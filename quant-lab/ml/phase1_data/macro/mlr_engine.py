@@ -182,6 +182,125 @@ def compute_fib_targets(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def compute_friday_asian_anchor(df: pd.DataFrame, symbol: str = "") -> pd.DataFrame:
+    """
+    Compute Friday Asian Range anchor for crypto (BTC/ETH).
+
+    Per CEREBUS Crypto Manual:
+    - BTC: Friday Asian Session = Thursday 22:00 EST to Friday 05:00 EST
+      UTC: Friday 03:00-10:00 UTC
+    - ETH: Friday Asian Range = Thursday 19:00 EST to Friday 02:00 EST
+      UTC: Friday 00:00-07:00 UTC
+
+    This is the CRYPTO WEEKLY ANCHOR — equivalent to MLR for forex.
+    Forward-filled from Friday to Sunday (or until next Friday).
+
+    Adds same columns as compute_mlr_features:
+        - mlr_high, mlr_low, mlr_close, mlr_range, mlr_mid
+        - bias (BULLISH/BEARISH/NEUTRAL)
+        - hours_since_mlr
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Must have DatetimeIndex with UTC timezone and OHLC columns.
+    symbol : str
+        Asset symbol (e.g., 'BTCUSD', 'ETHUSD').
+
+    Returns
+    -------
+    pd.DataFrame
+        Original DataFrame with Friday Asian anchor columns added.
+    """
+    df = df.copy()
+
+    # Determine Friday Asian window based on symbol
+    sym = symbol.upper() if symbol else ""
+    if "BTC" in sym:
+        # BTC: Friday 03:00-10:00 UTC (Thu 22:00 - Fri 05:00 EST)
+        fa_start_hour = 3
+        fa_end_hour = 10
+        fa_day = 4  # Friday
+    elif "ETH" in sym:
+        # ETH: Friday 00:00-07:00 UTC (Thu 19:00 - Fri 02:00 EST)
+        fa_start_hour = 0
+        fa_end_hour = 7
+        fa_day = 4  # Friday
+    else:
+        # Default to ETH window for any crypto
+        fa_start_hour = 0
+        fa_end_hour = 7
+        fa_day = 4  # Friday
+
+    # Initialize
+    df['mlr_high'] = np.nan
+    df['mlr_low'] = np.nan
+    df['mlr_close'] = np.nan
+
+    # Find Friday Asian bars
+    dow = df.index.dayofweek
+    hr = df.index.hour
+    fa_mask = (dow == fa_day) & (hr >= fa_start_hour) & (hr < fa_end_hour)
+
+    if not fa_mask.any():
+        df['mlr_range'] = np.nan
+        df['mlr_mid'] = np.nan
+        df['bias'] = 'UNKNOWN'
+        df['hours_since_mlr'] = np.nan
+        return df
+
+    # Compute weekly anchor from Friday Asian bars
+    fa_bars = df[fa_mask].copy()
+    # Week label: Friday of each week
+    # For Friday bars, the week_start is the Friday itself
+    week_starts = fa_bars.index.to_series().apply(
+        lambda x: x.normalize() - pd.Timedelta(days=x.dayofweek - fa_day) if x.dayofweek >= fa_day
+        else x.normalize() - pd.Timedelta(days=x.dayofweek - fa_day + 7))
+
+    weekly = fa_bars.groupby(week_starts).agg(
+        mlr_high=('high', 'max'),
+        mlr_low=('low', 'min'),
+        mlr_close=('close', 'last'),
+    )
+
+    # For each bar, find its week's Friday and look up anchor
+    bar_dow = df.index.dayofweek
+    # Calculate the Friday of the current week for each bar
+    days_to_fa = (fa_day - bar_dow) % 7
+    bar_friday = df.index.normalize() + pd.to_timedelta(days_to_fa, unit='D')
+
+    # Map weekly anchor to bars
+    week_high = weekly['mlr_high']
+    week_low = weekly['mlr_low']
+    week_close = weekly['mlr_close']
+
+    mlr_h = week_high.reindex(bar_friday).values
+    mlr_l = week_low.reindex(bar_friday).values
+    mlr_c = week_close.reindex(bar_friday).values
+
+    df['mlr_high'] = mlr_h
+    df['mlr_low'] = mlr_l
+    df['mlr_close'] = mlr_c
+
+    # Derived
+    df['mlr_range'] = df['mlr_high'] - df['mlr_low']
+    df['mlr_mid'] = df['mlr_low'] + df['mlr_range'] / 2
+
+    # Bias
+    df['bias'] = np.where(
+        df['mlr_close'] > df['mlr_mid'], 'BULLISH',
+        np.where(df['mlr_close'] < df['mlr_mid'], 'BEARISH', 'NEUTRAL')
+    )
+
+    # Hours since anchor (Friday end_hour UTC = end of anchor window)
+    mlr_end = bar_friday + pd.Timedelta(hours=fa_end_hour)
+    delta = df.index - mlr_end
+    hours = delta.total_seconds() / 3600
+    df['hours_since_mlr'] = np.where(df['mlr_high'].notna(), hours, np.nan)
+
+    return df
+
+
 def get_mlr_summary(df: pd.DataFrame) -> pd.DataFrame:
     """Return weekly MLR summary."""
     has_mlr = df['mlr_high'].notna()

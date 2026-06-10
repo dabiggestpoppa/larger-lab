@@ -105,6 +105,7 @@ def build_macro_feature_matrix(
     pip_size: float = 0.0001,
     include_patterns: bool = True,
     include_time_blocks: bool = True,
+    symbol: str = "",
 ) -> pd.DataFrame:
     """
     Build the complete macro feature matrix.
@@ -112,8 +113,11 @@ def build_macro_feature_matrix(
     This is the MAIN ENTRY POINT for macro feature computation.
     It chains all macro feature modules in the correct order.
 
+    For forex/OIL: Uses Monday London Range (07:00-15:00 UTC) as weekly anchor.
+    For BTC/ETH: Uses Friday Asian Range as weekly anchor (crypto 24/7).
+
     Pipeline:
-    1. MLR features → mlr_engine.compute_mlr_features
+    1. Weekly anchor → compute_mlr_features (forex) or compute_friday_asian_anchor (crypto)
     2. Fib targets → mlr_engine.compute_fib_targets
     3. 132% proximity → kill_switch.compute_132_proximity
     4. Rekey state → kill_switch.compute_rekey_state
@@ -132,6 +136,8 @@ def build_macro_feature_matrix(
         Whether to include pattern recognition features (slower).
     include_time_blocks : bool
         Whether to include time block features.
+    symbol : str
+        Asset symbol (e.g., 'EURUSD', 'BTCUSD'). Used to determine weekly anchor type.
 
     Returns
     -------
@@ -147,8 +153,12 @@ def build_macro_feature_matrix(
     """
     df = df.copy()
 
-    # Step 1: MLR features
-    df = compute_mlr_features(df)
+    # Step 1: Weekly anchor (MLR for forex/OIL, Friday Asian for crypto)
+    sym_upper = symbol.upper() if symbol else ""
+    if "BTC" in sym_upper or "ETH" in sym_upper:
+        df = compute_friday_asian_anchor(df, symbol)
+    else:
+        df = compute_mlr_features(df)
 
     # Step 2: Fibonacci targets
     df = compute_fib_targets(df)

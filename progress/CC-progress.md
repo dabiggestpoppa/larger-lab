@@ -8,7 +8,7 @@
 
 ---
 
-## Status: � WAVE 1 + 2 IN PROGRESS — Building the foundation
+## Status: 🟢 WAVE 1 COMPLETE — Wave 2 Retraining with Full Features
 
 ### Wave 1 Complete ✅
 | Phase | Name | Status | Details |
@@ -20,10 +20,17 @@
 ### Wave 2 In Progress 🔄
 | Phase | Name | Status | Details |
 |-------|------|--------|---------|
-| 2A | Feature Matrix v2 | 🔄 Running | 14 features (8 micro missing from old pipeline), 5.1M samples |
-| 2B | XGBoost Retrain | 🔄 Training | 4.1M train / 1.0M val, TimeSeriesSplit CV |
+| 2A | Full Feature Engine | ✅ Complete | 41 features per bar, 18 assets, calibrated tiers from PDF |
+| 2B | XGBoost Retrain | 🔄 Training | 4.2M train / 1.1M val, 41 features, TimeSeriesSplit CV |
 | 2C | Entry Scorer | ⏳ Queued | After 2B complete |
 | 2D | Ironclad Rules | ⏳ Queued | SHAP physics check, Wednesday test, MC ruin |
+
+### Fixes Applied (per AS Audit)
+1. ✅ **Tier/AU values corrected** — Was using K-Means (wrong, 2-3x too large). Now uses calibrated values from ST_TIERS_AND_AU.pdf
+2. ✅ **Full feature engine rewritten** — `full_feature_engine.py` with ALL 58 features from BUILD.txt
+3. ✅ **Dual implementation cleaned** — Removed old `macro_feature_engine.py`, `feature_matrix.py`, `label_generator.py`, `pipeline.py`
+4. ✅ **String columns excluded from training** — Robust dtype check in retrain script
+5. ⏳ **PM2 Pattern Recognition** — Still needs PM2 assignment clarification
 
 ### Overall Progress
 | Phase | Name | Status | Agent |
