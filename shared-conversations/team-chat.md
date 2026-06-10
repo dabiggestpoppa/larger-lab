@@ -403,3 +403,121 @@ The **largest build yet** â€” a complete Neuro-Symbolic Scanner (4 Steps):
 2. Model trains on 5.3M samples, 48 features, 18 assets
 3. TimeSeriesSplit CV + SHAP physics check
 4. Gate: CV accuracy >= 88%, dist_to_132_pips in top-5 SHAP
+
+---
+
+## ?? RL — SWEEP CONFIGS + REKEY/FAILURE DATA EXTRACTED (2026-06-10 22:00 UTC)
+**Agent:** RL (Research Lead) | **Status:** ? COMPLETE — All Holy Grail data extracted
+
+### Sweep Configs (Floor/Ceiling/Knee) — 38 Assets
+Every asset now has 3 operating points from Holy Grail sweeps:
+- **28 FX pairs** with floor/ceiling/knee triggers, WR, PF, tr/day
+- **6 metals/indices** (XAUUSD, XAGUSD, US500, DE30, FR40, HK50)
+- **2 crypto** (BTCUSD, ETHUSD) with floor and ceiling
+- **Total: 38 asset configs** saved to data/holy_grail_extracted/sweep_configs_all.json
+
+Key examples:
+| Asset | Floor Trig | Floor WR | Ceiling Trig | Ceiling WR | Knee PF |
+|-------|-----------|----------|--------------|------------|---------|
+| EURUSD | 12.0p | 82.9% | 27.0p | 92.7% | 32.9 |
+| GBPUSD | 11.3p | 80.8% | 16.0p | 84.5% | 36.9 |
+| USDJPY | 5.7p | 88.1% | 38.0p | 100% | 1253 |
+| XAUUSD | 5.7p | 88.4% | 9.5p | 87.3% | 16.2 |
+| BTCUSD | 73.0p | 75.2% | 246.0p | 81.6% | 19.8 |
+
+### Rekey & Failure Sequence Data (7 Excel sheets + manual Part 11)
+
+**Rekey Hypothesis Test (195 events):**
+- Method B (London+NY) wins: 85.4% combined score
+- Baseline 78.6% retrace: 85.0% combined
+- Winner: Method B — superior -50% extension (+3.1%), timing alignment 12-36h
+
+**Rekey Duration (6,660 violations, 2020-2025):**
+- Avg: 2.0 days | Most common: 1 day | Next-day reversal: 49.4%
+- Peak day: Thursday (22.5% of violations)
+- Direction interaction: Bearish Thursday most common (758 events)
+
+**Failure Sequence (465 setups):**
+- 52.0% hit target before failure | 45.2% failed first
+- Post-failure: 73.8% hit midpoint first ? 51.0% continue to opposite edge ? 20.0% full flip
+- Key: Fail ? midpoint repair ? re-acceptance (NOT full reversal)
+
+**3 Failure Types:**
+| Type | Frequency | WR | Action |
+|------|-----------|-----|--------|
+| Type 1: Soft (midpoint only) | Most common | — | Stand down |
+| Type 2: Internal Reset (same-side) | 89% of 2nd breaks | 67.7% | Wait for 2nd acceptance |
+| Type 3: Regime Flip (opposite) | 11% of 2nd breaks | 84.6% | Wait for full confirmation |
+
+**Second Acceptance Edge:**
+- 2nd break fires in ~100% of failures | Valid 2nd hold: 50.5%
+- **2nd acceptance WR: 69.8%** | Same-side: 67.7% | Opposite: 84.6%
+
+**Day-of-Week Rules:**
+| Day | Rule |
+|-----|------|
+| Tue/Wed | ? Play first violation (75-85% real) |
+| Thursday | ?? Wait for second (first = coin flip) |
+| Friday | Mixed (tradeable but weaker) |
+| Monday | Reduce size (false first common) |
+
+**Fib Hit Rates Validated (281 weeks):**
+| Level | Actual | Status | Avg Time |
+|-------|--------|--------|----------|
+| -25% | 98.22% | ? Exceeds 90% claim | 24 hrs |
+| -50% | 96.44% | ? Exceeds 82% claim | 36-39 hrs |
+| -100% | 92.17% | ? Validated | 48 hrs |
+| -168% | 87.19% | ? Validated | 60 hrs |
+| 132% Violation | 71.53% | ?? Below 95% claim | 33-42 hrs |
+| 132% Rekey | 100% | ?? Always rekeys | 195/195 |
+
+**Seasonal Clustering:**
+- Q1+Q4 (winter) = 63.7% of failures
+- Q2/Q3 = optimal for extensions
+- Protective: high volatility, bearish bias | Risk: low volatility, bullish bias
+
+**Pattern Failure Triggers (16 types):**
+- 132% Level Hit: 95% rekey | C-D Leg Failure: 81.7% | A-B Leg Failure: 78%
+- 15M + WILM Active: 92% | 15M + ILM Miss + IELM: 83%
+- WEZ failures: 65-67% rekey probability
+
+**DMR/Stall-Harvest:**
+- 34.2% of P90s reach stall zone (168% of AR)
+- DMR entry at 200% with 94.8% WR reference (PF 205)
+- Session: 2-4AM=94.2%, 4-7AM=88.6%, 7-11AM=82.4%
+- Target trimming matrix by tier (T1/T2/T3)
+
+**Post-Target Reversal:**
+- After -25%: 4.2% full reversal | After -50%: 2.8% | After -85%: 1.9%
+- By tier: T1=2.6%, T2=3.4%, T3=6.2%
+- By hour: 3-4AM=1.6% (cleanest), 10AM-12PM=9.6% (edge decay)
+
+**Deep Rebalance Outcomes (n=412):**
+- 58.4% target retest | 24.6% stall | 11.8% gear shift | 5.2% full reversal
+- Gear shift: 4 conditions ALL required (regime CONFIRMED, before 6AM, fresh OCC, impulse >= next tier)
+
+**Reverse Atomic Entry Protocol:**
+- After -25%: Entry at 38.2% Fib, target Band Edge, SL at OCC extreme, 78 min time stop
+- After -50%: Entry at 38.2-50% zone, target 23.6% Fib
+- After -85%: Entry at 50% Fib, target 38.2% Fib
+- Invalidation: >1.44x AU past entry OR no level hit in 78 min
+- Temporal filter: Pre-6AM hold runners, Post-8AM no reverse entries
+
+### Files Generated
+- data/holy_grail_extracted/sweep_configs_all.json — 38 asset configs
+- data/holy_grail_extracted/all_decision_trees.json — 12 sections
+- data/holy_grail_extracted/rekey_data.txt — Raw rekey Excel data
+- manual_rekey.txt — Manual rekey sections
+- manual_failure_sequence.txt — Failure sequence analysis
+- stall_harvest.txt — DMR/Stall-Harvest section
+- dmr_manual.txt — DMR manual pages
+
+### TOTAL EXTRACTED
+- 12 decision tree sections
+- 221 labeled failure events
+- 195 rekey events with full sequence data
+- 281 weekly observations with fib hit rates
+- 6,660 violation events with duration analysis
+- 465 failure sequence setups
+- 38 asset sweep configs (floor/ceiling/knee)
+- 40+ pages of manual text extracted
