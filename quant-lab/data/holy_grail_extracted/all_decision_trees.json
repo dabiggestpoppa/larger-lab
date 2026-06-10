@@ -1050,5 +1050,96 @@
       "Temporal band 32-78 min applies to reverse (68-78% complete within)",
       "Deep rebalance has 4 resolution paths (58% retest / 25% stall / 12% gear shift / 5% reversal)"
     ]
+  },
+  "dmr_stall_harvest": {
+    "source": "CEREBUS FX v4 Manual Part 4 (pages 20-31) + p90_engine_dmr.py",
+    "description": "Deep Mean Reversion (DMR) / Stall-Harvest Trading System",
+    "core_concept": "When P90 enters IN_TRADE, a conditional limit order is placed at Deep State (DS) = 200% of P90 body beyond Asian band. DMR captures mean reversion when price extends too far.",
+    "dmr_mechanics": {
+      "deep_state_calculation": "DS = activation_boundary + 2.0 * p90_body (opposite direction)",
+      "entry_type": "Limit order at DS (NOT market)",
+      "direction": "OPPOSITE of P90 direction",
+      "SL": "SAME boundary as P90 SL (one boundary, both positions)",
+      "TP": "-50% AR (the P90 TP2 coordinate)",
+      "no_standalone_bias": "DMR has NO standalone bias filter or state machine",
+      "cancellation": "P90 exit always cancels/clears DMR"
+    },
+    "stall_zone": {
+      "level": "168% of Asian Range from band edge",
+      "frequency": "34.2% of P90s reach Stall Zone within 35 min",
+      "expansion_through": "65.8% of P90s expand through (168% NOT hit)",
+      "profitable_stall_rate": "86% of stall events result in profitable expansion or rebalancing"
+    },
+    "session_performance": {
+      "2-4_am_est": {
+        "expansion_wr": "94.2%",
+        "stall_rate": "31.1%"
+      },
+      "4-7_am_est": {
+        "expansion_wr": "88.6%",
+        "stall_rate": "35.4%"
+      },
+      "7-11_am_est": {
+        "expansion_wr": "82.4%",
+        "stall_rate": "38.2%"
+      }
+    },
+    "stall_outcomes": {
+      "true_rejection": {
+        "frequency": "64.2%",
+        "description": "Price rejects at stall zone and reverts"
+      },
+      "shallow_violation": {
+        "frequency": "21.4%",
+        "description": "Boundary hunt and retracement"
+      },
+      "deep_violation": {
+        "frequency": "14.4%",
+        "description": "Constraint system continuation"
+      }
+    },
+    "target_trimming_matrix": {
+      "T1_less_than_20p": {
+        "TP1_-25%": "~5p trim 20%",
+        "TP2_-50%": "~10p trim 50%",
+        "TP3_daily_-50%": "~36p trim 25%",
+        "runner_daily_-100%": "~72p hold 5%"
+      },
+      "T2_20_30p": {
+        "TP1_-25%": "~6p trim 20%",
+        "TP2_-50%": "~12p trim 50%",
+        "TP3_daily_-50%": "~29p trim 30%",
+        "runner": "Skip"
+      },
+      "T3_30_45p": {
+        "TP1_-25%": "~9p trim 30%",
+        "TP2_-50%": "~18p trim 70%",
+        "TP3+": "Skip entirely"
+      }
+    },
+    "reversal_scenario": {
+      "trigger": "Opposite direction P90 prints while in trade",
+      "default_action": "IGNORE - stay with original direction",
+      "exception": "Valid direction reversal requires BOTH: (1) Resolution output closes beyond 200% Deep State, (2) 132% Kill-Switch ALSO triggered",
+      "valid_reversal_wr": "68.2%",
+      "frequency": "Only 1.4% of sessions qualify",
+      "recommendation": "Wait for next day 99% of the time"
+    },
+    "risk_management": {
+      "asian_range_filter": ">45 pips = NO-GO",
+      "kill_switch": "132% violation = Close All Positions",
+      "time_constraint": "After 11 AM EST = No New Activations",
+      "friday": "After 10 AM EST = Reduced Size 50%",
+      "regime_shift": "<80% WR (20 activations) = PAUSE",
+      "hard_exit": "12 PM EST close ALL"
+    },
+    "dmr_reference_results": {
+      "source": "dmr_strategy.py (Nautilus implementation)",
+      "wr": "94.8%",
+      "trades": 671,
+      "pips": "+7903",
+      "pf": 205,
+      "period": "EUR/USD 2022-2026"
+    }
   }
 }

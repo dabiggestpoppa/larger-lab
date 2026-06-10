@@ -1,0 +1,4404 @@
+﻿Total pages: 214
+
+=== PAGE 1 ===
+CEREBUS FX
+Cerebus Cycle ΓÇö Final Form
+Constraint-System Framework | Asian Range P90 | Stall-Harvest | Deep Mean Rebalancing | Dual-Engine Execution | Failure
+Repair Model | Atomic Market Structure | Macro Setup
+II DISCLAIMER ΓÇö For educational purposes only. Trading Forex involves significant risk. Past performance
+does not guarantee future results. Always test in simulation before live deployment.
+SECTION
+CONTENT
+PAGE
+FRAMEWORK
+Constraint-System Vocabulary
+2
+PART 1
+CEREBUS FX v2.0 ΓÇö Core Manual
+5
+PART 2
+P90 Cascade Activation Analysis
+10
+PART 3
+Cascade Methodology & Operational Protocol
+16
+PART 4
+Stall-Harvest Trading System
+20
+PART 5
+P90P Window Distribution Tracker ΓÇö Enhanced
+30
+PART 6
+Monte Carlo Simulation
+35
+PART 7
+Monday Asian Range Float Mechanism
+38
+PART 8
+Daily Asian Range Float Mechanism
+43
+PART 9
+Full-Day Range Regime Tracker
+51
+PART 10
+Dual-Engine Execution Model
+58
+PART 11
+Failure Sequence Analysis ΓÇö The Repair Model
+78
+PART 12
+The Two Plays ΓÇö Final Execution Framework
+79
+PART 13
+Deep Dive Monte Carlo ΓÇö Triple-Engine Validation
+85
+PART 14
+Blind Structural Chain Law ΓÇö Recursive Loop Engine
+90
+PART 15
+Fractal Resolution Engine ΓÇö Nested Cycle Analysis
+100
+DAILY SETUPS & IDEAS
+Context Framework + Setups 1-6
+109
+ATOMIC MARKET
+STRUCTURE
+Density Zone | Grand Unified Equation | Shift Targets
+131
+Cerebus Cycle ΓÇö Final Form | April 2026 | EUR/USD M5 | 315,000+ Candles | PROPRIETARY & CONFIDENTIAL
+
+
+=== PAGE 4 ===
+CONSTRAINT-SYSTEM FRAMEWORK Vocabulary, Definitions & Operating
+Logic
+This section reinterprets traditional market concepts into constraint-system language. Every operational section
+that follows uses this vocabulary. Footnote references [1]ΓÇô[13] map directly to the terms defined here.
+FROM RETAIL LOGIC TO CONSTRAINT THINKING
+Traditional retail trading assumes buyers vs. sellers create price movement, that trends persist, and that more indicators add edge.
+This manual replaces that frame with constraint logic.
+Traditional Term
+Constraint-System Term
+Operational Meaning
+Market
+Field
+The entire operational environment ΓÇö a system of constraints, not a
+battleground.
+Price
+Resolution Output
+The numeric output printed when the field resolves a constraint. Minimal
+change required.
+Trend
+Direction of Constraint Resolution
+Current orientation of the field's resolution process. Not assumed to persist.
+Liquidity
+Available Resolution Pathways
+Channels through which the field resolves constraints. 'Liquidity grabs' =
+pathway harvesting.
+Breakout
+Constraint Violation
+Required when the field can no longer balance constraints with small
+adjustments.
+Pullback
+Partial Rebalancing
+Temporary adjustment after a strong move. Not a reversal ΓÇö just short-term
+rebalancing.
+Stall
+Resolution Output Stall
+Field pauses to process a local constraint cluster. Precedes continuation or
+reversal.
+Stop / Stop-Loss
+Constraint Boundary
+Point at which the current constraint set is invalidated. Not arbitrary ΓÇö
+structurally defined.
+Entry
+Activation Signal
+Defined condition showing a new constraint-resolution process has started.
+P90 = one signal.
+Fib Retracement Zone
+Partial Rebalancing Range
+Zone where the field rebalances by a measured proportion of the preceding
+move.
+200% Extension
+Deep State
+Resolution output extends far beyond daily mean variance. Often exhaustion
+or last stage.
+168% Extension
+Stall Zone State
+Region where resolution output frequently pauses. Field may continue or
+begin rebalancing
+
+=== PAGE 5 ===
+CORE OPERATING PRINCIPLES
+CONSTRAINT LOGIC ΓÇö SIX OPERATING PRINCIPLES
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+1. THE FIELD IS NOT A BATTLEGROUND
+   The field resolves conflicting intents through minimal changes (resolution outputs).
+   There are no "buyers" or "sellers" ΓÇö only constraint states being resolved.
+2. NO INHERENT DIRECTION
+   Direction of Constraint Resolution = the orientation of the current resolution process.
+   It is not assumed to persist. Each session begins fresh with a new constraint set.
+3. INDICATORS DO NOT CREATE INFORMATION
+   Strong Subadditivity (SSA): the current state already embeds all past information.
+   Adding more indicators does not increase edge ΓÇö it increases noise.
+4. BREAKOUTS ARE CONSTRAINT VIOLATIONS
+   Resolution occurs when existing constraints cannot contain the state.
+   The 132% level is the Kill-Switch State: the constraint set has been violated.
+5. FIBONACCI LEVELS ARE STATES, NOT TARGETS
+   168% = Stall Zone State (resolution output pausing at a constraint cluster)
+   200% = Deep State (extended resolution, often exhaustion)
+   132% = Kill-Switch State (invalidation of current constraint set)
+6. TRADING IS STATE RECOGNITION, NOT CANDLE PREDICTION
+   The Markov Property: the current state contains all necessary information.
+   Past data is fully embedded in the present state. Align with the field's resolution.
+CONSTRAINT-SYSTEM VOCABULARY GLOSSARY
+Full footnote reference ΓÇö these definitions apply throughout all Parts:
+[1] Field
+Replaces 'market.' The entire operational environment viewed as a system of constraints. Each resolution output is the minimal
+adjustment that satisfies current constraints.
+[2] Resolution Output
+Replaces 'price.' The numeric output printed when the field resolves a constraint. Not an intrinsic value or an opinion ΓÇö it is the minimal
+change required.
+[3] Direction of Constraint Resolution
+Replaces 'trend.' The current orientation of the field's resolution process. Describe
+
+=== PAGE 6 ===
+Replaces 'breakout.' A sudden change when the field's constraints are exceeded. Not random ΓÇö required when the field can no longer
+balance constraints with small adjustments.
+[6] Partial Rebalancing
+Replaces 'pullback.' Temporary adjustment after a strong movement. Indicates short-term resolution of an imbalance, not a reversal
+signal.
+[7] Resolution Output Stall
+Replaces 'stall.' A period when the field temporarily stops advancing because it is processing a local constraint cluster. The
+Stall-Harvest Trading System focuses on this phase.
+[8] Constraint Boundary
+Replaces 'stop' or 'stop-loss.' A state at which the current constraint set is invalidated. Not arbitrary ΓÇö represents the limit beyond which
+the resolution process must be reevaluated.
+[9] Activation Signal
+Replaces 'entry.' A defined condition showing that a new constraint-resolution process has started. The P90 candle is one such
+activation signal.
+[10] Fib Extension States
+168%, 200%, 132% are not entries or stops. They are states describing how far the resolution output has extended. 168% = stall state;
+200% = deep state; 132% = kill-switch state.
+[11] Constraint Deficit and Expansion
+Small Asian ranges act as a 'coiled spring.' When the field is under-resolved, it must expand to reach its daily mean variance.
+[12] Strong Subadditivity (SSA)
+Adding more indicators does not create new information. The current state already embeds all past information.
+[13] Markov Property
+The current state contains all necessary information for future probabilities. Past data is fully embedded in the present state; more
+context does not add predictive power.
+Constraint-System Framework | CEREBUS FX v4.0 | April 2026
+
+
+=== PAGE 7 ===
+PART 1 CEREBUS FX v2.0 ΓÇö The Complete Operational Manual Asian
+Range P90 ΓÇó Deep Mean Rebalancing ΓÇó Daily Distribution Matrix
+1. EXECUTIVE SUMMARY: THE EDGE
+The CEREBUS System exploits the statistical correlation between the Asian Session Range and the Daily Distribution.
+Constraint Logic: Small Asian ranges create a Constraint Deficit [11]. The field is under-resolved and must expand to reach its daily
+mean variance. The Asian Range defines the day's constraint set. Resolution Outputs [2] then satisfy that deficit.
+Core Thesis: Small Asian ranges (<30 pips) act as a constraint deficit [11]. The field must expand to resolve it.
+CFD Expansion Engine: Captures the initial resolution output expansion with tight constraint boundaries [8] and pyramided
+activation signals [9].
+Binary/Mean Reversion Engine: Capitalizes on available resolution pathway harvesting [4] at deep states (168%-200%) [10]
+where the resolution output stalls [7] before reversing or continuing.
+Target Metric
+Value
+Win Rate (Filtered)
+85% ΓÇô 90%
+Daily Goal
+1.0% ΓÇô 1.5%
+Max Daily Drawdown
+< 0.50%
+Prop Firm Circuit Breaker
+Hard constraint boundary [8] at 0.40% loss
+2. PRE-SESSION CHECKLIST (Daily @ 1:45 AM EST)
+Step 1: Measure Asian Range
+Timeframe: 00:00 ΓÇô 08:00 UTC (7:00 PM ΓÇô 3:00 AM EST). Calculate the constraint deficit [11] ΓÇö the distance between Asian High
+and Asian Low.
+Asian Range Size
+Field Status
+Action
+Position Sizing
+< 20 pips
+TIER 1 (Gold)
+Full Conviction
+100% Size
+20 ΓÇô 30 pips
+TIER 2 (Standard)
+Moderate Conviction
+75% Size
+30 ΓÇô 45 pips
+TIER 3 (Caution)
+Reduced Conviction
+50% Size
+> 45 pips
+NO-GO
+Stand Down
+0% (Skip Day)
+Step 2: Define Daily Targets (Expected Constraint Resolution Range)
+Asian <20p: Target Daily Range = ~72 pips
+Asian 20-30p: Target Daily Range = ~58 pips
+Asian 30-45p: Target Daily Range = ~48 pips
+Step 3: Check Filters
+
+
+=== PAGE 8 ===
+News: High-impact news (NFP, CPI, FOMC) within 4 hours? ΓåÆ SKIP.
+Day of Week: Monday (reduce size 25%). Friday (reduce size 50% after 10 AM).
+3. STRATEGY A: CFD EXPANSION ENGINE (The Primary Engine)
+This engine captures the initial Constraint Deficit expansion [11]. The P90 candle is the Activation Signal [9] that marks the start of a new
+resolution process. Stop-losses are Constraint Boundaries [8] ΓÇö structurally defined invalidation points.
+A. Activation Signal Identification (P90 Candle)
+Wait for an M5 candle to close within the Activation Window (2:00 AM ΓÇô 11:00 AM EST) meeting the threshold below. This is the
+P90 Activation Signal [9].
+Time Window (EST)
+Bullish/Bearish Threshold
+2:00 ΓÇô 4:00 AM
+>= 4.1 pips
+4:00 ΓÇô 6:00 AM
+>= 4.6 pips
+6:00 ΓÇô 8:00 AM
+>= 4.6 pips
+8:00 ΓÇô 10:00 AM
+>= 5.9 pips
+10:00 ΓÇô 11:00 AM
+>= 6.2 pips
+B. Activation & Scaling Protocol
+Do not activate all at once. Use a pyramid model to manage constraint boundary exposure.
+Activation
+Timing
+Condition
+Size
+Constraint Boundary
+Target
+Signal 1
+P90 Close
+Activation Confirmed
+40%
+80% of P90 Body
+-25% Daily Range
+Signal 2
+P90 Close
+Simultaneous
+40%
+1.5x P90 Body
+-25% Daily Range
+Signal 3
++45 Mins
+Resolution Output +8 pips
+20%
+Breakeven (Signal 1)
+-50% Daily Range
+Regime Shift Confirmation (8:45 AM EST): If Current Daily Range > 1.5x Asian Range, proceed with full size. If not, reduce size
+by 50%.
+C. Exit Management
+TP1 (-25% of Asian Range):  Close 50% of total position. Move constraint boundaries to Breakeven.
+TP2 (-50% of Asian Range):  Close remaining core positions.
+Hard Exit (12:00 PM EST):   Close ALL positions ΓÇö 82% of daily constraint resolution complete.
+Kill Switch (132% State):   Resolution output violates 132% of Asian Range [10] ΓåÆ Close ALL.
+4. STRATEGY B: DEEP MEAN REBALANCING (The Resolution Output Stall Play)
+This strategy monetizes the Resolution Output Stall [7] ΓÇö where the resolution output taps a deep state (168%-200%) [10] via available
+resolution pathway harvesting [4], then fails to c
+
+=== PAGE 9 ===
+When the resolution output extends aggressively, it often reaches the Stall Zone (168%) [10] or Deep State (200%) [10] to harvest
+available resolution pathways before rebalancing.
+CFD Context: Usually a constraint boundary-out signal [8].
+Binary/Mean Reversion Context: A high-probability activation signal [9] for a rebalancing snap-back.
+B. The Setup
+Trigger: Resolution output touches Stall Zone (168%) or Deep State (200%) [10] of the P90 candle.
+Condition: Must occur before 12:00 PM EST.
+Filter: The -50% Daily Target has NOT yet been hit.
+C. Execution ΓÇö Option 1: Binary Options (Time-Based)
+Session (EST)
+Dynamic Expiry
+Target Win Rate
+2 AM ΓÇô 6 AM
+90 Minutes
+~84% (early session)
+6 AM ΓÇô 9 AM
+60 Minutes
+~78%
+9 AM ΓÇô 12 PM
+45 Minutes
+~74%
+After 12 PM
+No Trade
+ΓÇö
+Direction: Same as the direction of constraint resolution [3] if Regime Shift confirmed. Counter-direction if resolution momentum is
+exhausted.
+C. Execution ΓÇö Option 2: CFD Limit Order at Deep State (Deep Value)
+LIMIT ORDER at 200% Deep State Level [10]
+Constraint Boundary: 8 pips beyond 200% level (approx. 220% extension)
+  ΓåÆ Data shows 90% of violations do NOT exceed 6.5 pips past 200%.
+  ΓåÆ Filters noise while protecting capital.
+Take Profit:
+  TP1: Return to 0% (Activation Resolution Output [9])
+  TP2: -50% Daily Range
+R:R Potential: 1:5 to 1:7
+D. When to AVOID the Rebalancing Play
+  Resolution output CLOSES strongly beyond 220% level (True constraint violation)
+  Major news is imminent
+  Asian Range was >45 pips (constraint deficit too wide ΓÇö edge exhausted)
+5. ADVANCED: PLAYING THE OVER-EXTENSION
+If the Asian -50% Target is hit before 11:00 AM EST, do not exit fully. Switch to Daily Distribution Targets ΓÇö the resolution process
+has more constraint deficit to satisfy.
+Asian Size
+Expected Daily Avg
+Current Move (-50%)
+Remaining Potential
+Action
+
+
+=== PAGE 10 ===
+< 20 pips
+~72 pips
+~10 pips
+~60 pips left
+Hold Runner to Daily -50%
+20-30 pips
+~58 pips
+~15 pips
+~40 pips left
+Trail Boundary to Daily -25%
+> 30 pips
+~48 pips
+~24 pips
+~20 pips left
+Take Profit ΓÇö Edge thinning
+Runner Protocol
+1. Close 50% at Asian -50% target.
+2. Move Constraint Boundary to Breakeven + 2 pips.
+3. Target Daily -50% (calculated from Asian High/Low constraint violation [5]).
+4. Hard Exit: 12:00 PM EST.
+6. RISK MANAGEMENT & PROP RULES
+Parameter
+Value
+Rule
+Risk Per Activation
+0.12% of Equity
+Per signal limit
+Max Concurrent Risk
+0.36% (3 signals)
+All open constraint positions combined
+Daily Constraint Boundary
+0.40%
+Close ALL if hit; no more activation that day
+Personal Daily Limit
+0.50%
+0.40% hard boundary preserves the buffer
+Correlation Warning
+Do not activate EUR/USD and GBP/USD simultaneously in the same direction of constraint resolution unless reduced size is
+applied. Treat them as one constraint position.
+Weekly Review ΓÇö Pause & Recalibrate If:
+  Win rate drops below 80% over 20-activation sample
+  132% Kill-Switch State violations increase >50% in a week
+  Asian Range (constraint deficit) consistently >45 pips
+7. QUICK REFERENCE CHEAT SHEET
+GO CONDITIONS
+NO-GO CONDITIONS
+1. Asian Range < 45 pips (constraint deficit active)
+2. Time is 2:00 AM ΓÇô 11:00 AM EST (activation window)
+3. -25% / -50% Targets NOT already hit
+4. 132% Kill-Switch NOT triggered
+1. Asian Range > 45 pips (constraint deficit too wide)
+2. Major News within 4 hours
+3. Daily Loss > 0.40%
+4. Time > 12:00 PM EST
+Level
+Constraint State
+Action
+168% Ext
+Stall Zone State [10]
+Watch for Binary Activation / Limit Order
+200% Ext
+Deep State [10]
+Limit Activation (constraint boundary +8p)
+
+
+=== PAGE 11 ===
+220% Ext
+Violation State
+Hard Constraint Boundary / Exit All
+132% Asian
+Kill-Switch State [10]
+Kill Switch ΓÇö Close All Immediately
+12:00 PM EST
+End of Edge
+Hard Exit ΓÇö All Positions
+8. FINAL THOUGHTS
+The CEREBUS system is not about predicting the future; it is about probabilistic alignment with the field's constraint
+resolution process.
+Trust the Asian Range to define the constraint deficit.
+Trust the P90 Candle to define the activation signal.
+Trust the 200% Deep State to define your deep value activations.
+Trust the 12:00 PM Hard Exit to protect your resolution profits.
+Discipline > Prediction.  Align with the field.
+End of Part 1 | CEREBUS FX v2.0 Core Manual | March 2026
+
+
+=== PAGE 14 ===
+80% Fib (Standard)
+83.3%
+6.4 pips
+16.7%
+1:2.9
+Too tight for cascade
+1.5x Candle
+85.8%
+7.8 pips
+14.2%
+1:2.9
+GOOD
+168% Fib
+87.8%
+8.6 pips
+12.2%
+1:2.6
+BEST for cascade
+200% Fib
+88.2%
+10.2 pips
+11.8%
+1:2.2
+Too wide
+WHY 168% STALL ZONE STATE FOR CASCADE CONSTRAINT BOUNDARY
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  Standard 80% Fib: Good for initial activation, too tight for cascade partial rebalancing [6]
+  Cascade 168% Stall Zone [10]: 8.6p avg, conflict rate 12.2% (-4.5% vs standard)
+  Net EV: 168% boundary is +0.32R better than 80% boundary
+  Trade-off: Lower R:R (1:2.6) but HIGHER win rate (+4.5%)
+SECTION 4: CASCADE TIMING ANALYSIS
+Time After 1st P90
+Cascade Signals
+Win Rate
+Avg Extension
+Recommendation
+15-30 min
+412
+82.4%
+19.8 pips
+Too soon ΓÇö resolution not confirmed
+30-45 min
+687
+86.8%
+21.4 pips
+GOOD
+45-60 min
+524
+88.2%
+23.2 pips
+BEST ΓÇö Resolution Sweet Spot
+60-90 min
+224
+85.4%
+20.8 pips
+GOOD
+90-120 min
+98
+79.8%
+17.4 pips
+Late ΓÇö Reduce size
+OPERATIONAL RULE:
+  ΓÇó Allow cascade activations 30-90 min after 1st P90
+  ΓÇó Optimal window: 45-60 min (resolution momentum peak)
+  ΓÇó Skip cascades after 90 min from initial activation
+SECTION 5: CASCADE vs 45-MIN ADD LOGIC
+Metric
+45-Min Add (Original)
+Cascade P90 (New)
+Winner
+Trigger
+Time-based (+45 min)
+Signal-based (new P90)
+Cascade
+Condition
+Resolution output +8p
+New P90 candle
+Cascade
+Win Rate
+91.2%
+87.8%
+45-Min Add
+Frequency
+64.3% of signals
+56.6% of signals
+45-Min Add
+Boundary Method
+Breakeven
+168% of new P90
+Cascade
+Avg Extension
+26.8 pips
+22.6 pips
+45-Min Add
+Combined Win Rate
+ΓÇö
+ΓÇö
+93.4% (both)
+
+
+=== PAGE 17 ===
+CASCADE ACTIVATION WORKFLOW
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+STEP 1: Initial P90 Activation (2-11 AM EST)
+  ΓåÆ Wait for P90 candle close >= threshold
+  ΓåÆ Activate 40% size | Boundary: 80% of P90 body
+  ΓåÆ Set direction of constraint resolution [3]: LONG or SHORT
+  ΓåÆ Start 120-min resolution timer
+STEP 2: 45-Min Add Check (+45 min from Signal 1)
+  ΓåÆ Check if resolution output extended +8 pips
+  ΓåÆ If YES: Activate 30% size | Boundary: Breakeven (Signal 1 output)
+  ΓåÆ If NO: Skip, wait for cascade signal
+STEP 3: Cascade P90 Check (30-90 min from Signal 1)
+  ΓåÆ Watch for new P90 candle in SAME direction of constraint resolution
+  ΓåÆ If SAME: Activate 20% size | Boundary: 168% of THIS P90 body (Stall Zone [10])
+  ΓåÆ If OPPOSITE: IGNORE (opposite direction = noise, not reversal)
+STEP 4: Cascade 2 P90 Check (60-90 min from Signal 1)
+  ΓåÆ If SAME direction: Activate 10% size | Boundary: 168% of THIS P90 body
+  ΓåÆ STOP here (max 3 cascades ΓÇö resolution momentum exhausts at 4th+)
+STEP 5: Exit Management
+  ΓåÆ TP1 (-25%): Close 50% of total, move boundary to Breakeven
+  ΓåÆ TP2 (-50%): Close remaining
+  ΓåÆ Hard Exit (12 PM EST): Close ALL (constraint resolution window ends)
+  ΓåÆ Kill Switch (132% State [10]): Close ALL immediately
+CASCADE FINAL VERDICT
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  I CASCADE VALIDATED: 2nd P90 = 87.8% | 3rd = 84.2% | 4th+ = AVOID (76.4%)
+  I OPTIMAL BOUNDARY: 168% Stall Zone | Conflict rate -4.5% | EV +0.32R
+  I OPTIMAL TIMING: 45-60 min after initial | 88.2% win rate | Skip after 90 min
+  I COMPLEMENTARY WITH 45-MIN ADD: Combined win rate = 93.4%
+  II RISK TRADE-OFF: +37% weekly R but +11.3% Max DD ΓÇö use for growth accounts
+  I EXPECTED WEEKLY: 23 signals | 87.4% win rate | +52R net
+End of Part 2 | CEREBUS v18.2.15 [CASCADE ACTIVATION] | March 2026
+
+
+=== PAGE 20 ===
+REVERSAL SCENARIO ΓÇö WHEN OPPOSITE DIRECTION P90 PRINTS
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+Initial Direction of Constraint Resolution: 2:30 AM LONG
+New Signal: 6:00 AM P90 SHORT
+DEFAULT ACTION: IGNORE
+  ΓåÆ Stay with original direction of constraint resolution (LONG)
+  ΓåÆ Opposite P90 = noise, not a resolution direction change
+  ΓåÆ Win rate on reversals without confirmation: only 52.4%
+EXCEPTION ΓÇö VALID DIRECTION REVERSAL (BOTH must be true):
+  1. Resolution output CLOSES beyond 200% Deep State [10] of Initial P90
+  2. 132% Kill-Switch State [10] ALSO triggered
+If BOTH are true:
+  ΓåÆ Close ALL LONG positions (constraint set invalidated)
+  ΓåÆ NEW Constraint Resolution Direction = SHORT
+  ΓåÆ Restart cascade count (max 3 more activations)
+  ΓåÆ Win rate on valid reversals: 68.2%
+Frequency: Only 1.4% of sessions qualify for direction reversal
+Recommendation: Wait for next day 99% of the time
+TARGET TRIMMING PROTOCOL
+TARGET TRIMMING MATRIX ΓÇö CONSTRAINT DEFICIT RESOLUTION SCHEDULE
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+Asian Range <20 pips (Tier 1 ΓÇö Gold, tight constraint deficit):
+  TP1 (Asian -25%): ~5 pips ΓåÆ Trim 20%
+  TP2 (Asian -50%): ~10 pips ΓåÆ Trim 50%
+  TP3 (Daily -50%): ~36 pips ΓåÆ Trim 25%
+  Runner (Daily -100%): ~72 pips ΓåÆ Hold 5%
+Asian Range 20-30 pips (Tier 2 ΓÇö Standard):
+  TP1 (Asian -25%): ~6 pips ΓåÆ Trim 20%
+  TP2 (Asian -50%): ~12 pips ΓåÆ Trim 50%
+  TP3 (Daily -50%): ~29 pips ΓåÆ Trim 30%
+  Runner: Skip (edge thin ΓÇö constraint deficit mostly satisfied)
+Asian Range 30-45 pips (Tier 3 ΓÇö Caution, wide constraint deficit):
+  TP1 (Asian -25%): ~9 pips ΓåÆ Trim 30%
+  TP2 (Asian -50%): ~18 pips ΓåÆ Trim 70%
+  TP3+: Skip entirely
+Hard Exit: 12 PM EST (close ALL remaining ΓÇö resolution window ends)
+Question
+Answer
+
+
+=== PAGE 21 ===
+Session Bias
+First P90 in 2-6 AM EST sets constraint resolution direction for ENTIRE day
+Cascade Window
+30-90 min from INITIAL only (optimal 45-60 min ΓÇö peak momentum)
+After 90 min
+Still valid until 11 AM, but reduce size (resolution momentum degrading)
+6:00 AM Example
+VALID (if same constraint resolution direction), but use 50% size
+Opposite P90
+IGNORE unless Deep State (200%) + Kill-Switch (132%) BOTH triggered
+Targets
+Asian -50% primary; Daily -50% for runners (full deficit resolution)
+Hard Exit
+12 PM EST ΓÇö all positions closed, constraint resolution window ends
+End of Part 3 | CEREBUS Operational Protocol v18.2.18 | March 2026
+
+
+=== PAGE 22 ===
+PART 4 STALL-HARVEST TRADING SYSTEM Unified CFD & Binary
+Execution Strategy | 168% Stall Zone Fibonacci Analysis EUR/USD M5 |
+October 2023 | PROPRIETARY & CONFIDENTIAL
+The following 9 slides are the original Stall-Harvest system presentation. All data, charts, and execution
+protocols are presented in full. Vocabulary has been aligned with the constraint-system framework throughout.
+SLIDE 1 ΓÇö STALL-HARVEST TRADING SYSTEM: OVERVIEW
+Slide 1: Title & Session Performance Snapshot
+Session
+Expansion Win Rate
+2-4 AM EST
+94.2%
+4-7 AM EST
+88.6%
+7-11 AM EST
+82.4%
+Key Risk Metric
+Value
+Main Rejection Rate
+10.3%
+True Rejection (Stall Zone)
+64.2%
+Shallow Violation
+21.4%
+
+
+=== PAGE 23 ===
+Deep Violation
+14.4%
+SLIDE 2 ΓÇö EXECUTIVE SUMMARY: THE STALL-HARVEST EDGE
+Slide 2: Executive Summary ΓÇö Key Performance Indicators & Core Concept
+Key Performance Indicator
+Value / Metric
+Candles Analyzed (Jan '22 ΓÇô Mar '26)
+315,000+
+Resolution Output Stalls Resulting in Profitable Expansion
+86%
+Expected Weekly Return
++38-48R
+Asset Class Focus
+EUR/USD M5 CFD & Binary
+SLIDE 3 ΓÇö THE 168% STALL ZONE MECHANISM: STRUCTURAL ASYMMETRY
+
+
+=== PAGE 24 ===
+Slide 3: Structural Asymmetry ΓÇö Stall Event Outcomes & Probability Metrics
+Outcome Scenario
+Frequency
+Profit Probability
+Order Flow Dynamics
+True Rejection
+64.2%
+High
+Available pathway harvesting [4] & Confirmed Rebalancing
+Shallow Violation
+21.4%
+High
+Boundary Hunt [8] & Retracement
+Deep Violation
+14.4%
+Low
+Constraint System Continuation
+SLIDE 4 ΓÇö CFD LEG: LIMIT ACTIVATION & CONSTRAINT BOUNDARY
+PLACEMENT
+
+
+=== PAGE 25 ===
+Slide 4: CFD Execution Protocol ΓÇö M5 Chart Detailed Activation Rules
+Step
+Action
+Detail
+1. LIMIT ACTIVATION
+168% Stall Zone [10]
+Bullish: Low - (Body├ù1.68) | Bearish: High + (Body├ù1.68)
+2. BOUNDARY
+PLACEMENT
+200% Deep State [10]
+SL at 200%; Buffer = 1.5x candle body beyond 168%
+3. TARGET & RISK
+-50% Daily Range
+Reward-to-Risk: 1:4 to 1:6
+VIOLATION FILTER
+Abort if close > 200%
+Abort if M5 candle closes beyond 200% Deep State
+SLIDE 5 ΓÇö BINARY LEG: DYNAMIC EXPIRY BY TIME-OF-DAY
+
+
+=== PAGE 27 ===
+Slide 6: Session Windows ΓÇö Stall Rate, Expansion Win Rate & Asian Range Filters
+Session
+Stall Zone Rate
+Expansion Win Rate
+2-4 AM EST
+31.1%
+94.2%
+4-7 AM EST
+35.4%
+88.6%
+7-11 AM EST
+38.2%
+82.4%
+SLIDE 7 ΓÇö UNIFIED EXECUTION PLAYBOOK
+
+
+=== PAGE 28 ===
+Slide 7: Unified Execution Playbook ΓÇö Position Sizing Matrix & Workflow
+Position
+Sizing
+Boundary Specifications
+1
+40%
+80% Fib Constraint Boundary [8]
+2
+40%
+1.5x Constraint Boundary
+3
+20%
+45-min add activation [9]
+Phase
+Action
+Detail
+Pre-Session Setup
+Asian range check + mark states
+Range <45p; mark 168% Stall Zone & 200% Deep State
+Trigger ID
+Resolution output touches 168%
+Stall Zone
+Watch M5 chart for P90 + stall signal
+Split Execution
+CFD + Binary simultaneous
+CFD: Limit @ 168% | Binary: Activation on Touch
+Exit Management
+CFD Targets + Binary Expiry
+CFD: -25%/-50% | Binary: Dynamic | Kill: 132%
+SLIDE 8 ΓÇö RISK MANAGEMENT & EDGE KILL SWITCHES
+
+
+=== PAGE 30 ===
+Slide 9: Performance Expectations ΓÇö Aggregated Metrics & Strategic Advantages
+Metric
+Expectation
+Weekly Qualifying Activations
+22
+Weighted Win Rate
+86.4%
+Expected R-Multiple
++38-48R
+Account Growth (Target)
+10-15%
+Est. Account Growth
+6-10%
+Full-Loss Mitigation
+-31.6%
+Strategic Advantage
+Description
+1. Boundary Hunt Conversion
+Converts CFD constraint boundary hunts into precise binary activation points.
+2. Asymmetric Risk-Reward
+Limit activations create superior R:R scenarios.
+3. Time-Based Expiry
+Expiries dynamically optimized by session window data.
+STALL-HARVEST MASTER SYSTEM SUMMARY
+
+
+=== PAGE 31 ===
+COMPLETE SYSTEM AT A GLANCE ΓÇö CONSTRAINT-SYSTEM FRAMEWORK
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+168% STALL ZONE MECHANISM [10]:
+  ΓÇó 34.2% of P90s reach Stall Zone State (168% within 35 min)
+  ΓÇó 65.8% of P90s expand through (168% NOT hit ΓÇö resolution continues)
+  ΓÇó 86% of stall events result in profitable expansion or rebalancing
+DUAL-LEG EXECUTION:
+  ΓÇó CFD Leg: Limit activation at 168% Stall Zone | Boundary at 200% Deep State (1.5x buffer)
+  ΓÇó Binary Leg: Activation on touch | Dynamic expiry by session
+  ΓÇó Combined: Hedge effect ΓÇö one leg profits regardless of resolution direction
+SESSION PERFORMANCE:
+  ΓÇó 2-4 AM EST: 94.2% expansion win rate | 31.1% stall rate
+  ΓÇó 4-7 AM EST: 88.6% expansion win rate | 35.4% stall rate
+  ΓÇó 7-11 AM EST: 82.4% expansion win rate | 38.2% stall rate
+KILL SWITCHES:
+  ΓÇó Asian Range >45 pips ΓåÆ NO-GO (constraint deficit too wide)
+  ΓÇó 132% Kill-Switch State [10] ΓåÆ Close all immediately
+  ΓÇó After 11 AM EST ΓåÆ No new activations (resolution window closing)
+  ΓÇó Win rate <80% over 20 activations ΓåÆ PAUSE & recalibrate
+End of Part 4 | Stall-Harvest Trading System | CEREBUS FX v3.0 | March 2026
+
+
+=== PAGE 40 ===
+PART 7 MONDAY ASIAN RANGE FLOAT MECHANISM Intra-Week Constraint
+Distribution Analysis EUR/USD M5 | Jan 2022 ΓÇô Jan 2026 | 201 Weeks
+Analyzed
+Pattern: Monday Asian Range acts as a weekly constraint boundary ΓÇö quantified below.
+PATTERN TESTED After Monday Asian session closes (3 AM EST), price breaks out of the constraint band. This
+analysis quantifies: (1) how often that band is never retested for 24-48h ΓÇö the weekly float; (2) which Fibonacci
+states the weekly extreme stalls at; (3) the temporal distribution of the mid-week shift (counter-trend extreme
+timing).
+Metric
+Value
+Notes
+Total weeks analyzed
+201
+Jan 2022 ΓÇô Jan 2026
+Tradeable weeks (Tier 1-3)
+156
+Mon Asian range 3-45 pips
+True 24h float rate
+29.5%
+Tue full day stays outside Mon range
+48h float rate
+21.8%
+Both Tue AND Wed full day float
+Tue Asian float rate (T1/T2)
+52.6-71.1%
+Tue Asian session never tests Mon range
+Weekly expansion (mean)
+6.62x
+Full week range ├╖ Monday Asian range
+Weekly expansion (median)
+5.95x
+More robust central tendency
+TEST 1: FLOAT FREQUENCY ΓÇö HOW OFTEN DOES THE BAND HOLD?
+Float Type
+Count
+Rate
+Interpretation
+24h: Tue Asian session floats
+82 / 156
+52.6%
+More than half of Tier 1-2 weeks ΓÇö Tue Asia never tests
+Mon range
+24h: Tue FULL day float (TRUE)
+46 / 156
+29.5%
+~3 in 10 weeks ΓÇö strong structural hold
+48h: Tue + Wed full day float
+34 / 156
+21.8%
+~2 in 10 weeks ΓÇö extended 48h constraint hold
+Tier
+Asian Range
+n Weeks
+Tue Asian Float
+True 24h Float
+48h Float
+Tier 1
+< 20 pips
+45
+71.1%
+33.3%
+26.7%
+Tier 2
+20-30 pips
+66
+54.5%
+37.9%
+25.8%
+Tier 3
+30-45 pips
+45
+31.1%
+13.3%
+11.1%
+
+
+=== PAGE 41 ===
+KEY FINDINGS ΓÇö FLOAT RATE BY TIER:
+  Tier 1 (<20p):  71.1% chance Tuesday Asian never tests Monday range
+                  33.3% full-day float (strong for small constraint deficits)
+  Tier 2 (20-30p): 54.5% Tue Asian float | 37.9% full-day float ΓåÉ HIGHEST full-day rate
+  Tier 3 (30-45p): 31.1% Tue float | 13.3% full-day float ΓÇö too rare to trade
+  BIAS NOTE: Weekly directional bias (bull vs bear) has almost NO effect on float rate.
+  Float is a structural phenomenon driven by constraint deficit size, not direction.
+TEST 2: RETEST TIMING ΓÇö FLOAT CONTEXT
+IMPORTANT CONTEXT ON RETEST TIMING:
+  Monday 08:00 UTC = London Open ΓåÆ Price frequently tests the Asian band immediately.
+  This is normal London session behavior ΓÇö not the float signal.
+  The TRUE float signal is whether the SUBSEQUENT Asian session (Tuesday 00:00-08:00 UTC)
+  tests the Monday band. That requires price to have stayed outside through:
+    ΓåÆ Mon London session  ΓåÆ Mon NY session  ΓåÆ Mon close  ΓåÆ Tue Asian open
+  That is a genuine ~17-20h sustained directional move ΓÇö a weekly constraint float.
+  Tier 1-2 Float Rates:
+    T1: 71.1% of Tue Asian sessions never test Monday range
+    T2: 54.5% ΓÇö both confirm the float as a real weekly structural phenomenon
+TEST 3: FIB STALL ZONES ΓÇö WHERE DOES THE WEEKLY EXTREME FORM?
+Fib Level (from Mon Asian HIGH)
+Tight Hits (<=5p)
+% of Weeks
+Avg Dist
+State
+100% (Asian High itself)
+10
+6.4%
+1.5p
+Constraint boundary retest
+127% Extension
+5
+3.2%
+2.1p
+Minor stall state
+162% Extension
+5
+3.2%
+0.5p
+TIGHTEST ΓÇö avg 0.5p
+168% Extension (Stall Zone [10])
+6
+3.8%
+1.9p
+Intraday stall level ΓÇö weekly too
+200% Extension (Deep State [10])
+9
+5.8%
+2.5p
+High frequency weekly stall
+261% Extension
+8
+5.1%
+1.5p
+Major weekly target
+Fib Level (from Mon Asian LOW)
+Tight Hits (<=5p)
+% of Weeks
+Avg Dist
+State
+0% (Asian Low itself)
+7
+4.5%
+2.5p
+Constraint boundary retest
+-68% Extension
+7
+4.5%
+0.9p
+TIGHTEST bear side
+-100% Extension
+9
+5.8%
+2.6p
+High frequency bear stall
+-161% Extension
+8
+5.1%
+1.9p
+Major we
+
+=== PAGE 42 ===
+KEY FINDING ΓÇö DOMINANT WEEKLY STALL ZONES:
+  Most weekly highs reach 261% (64.7%) or lows reach -161% (62.2%) of Monday Asian range
+  ΓÇö the field resolves the weekly constraint deficit FAR beyond the Monday band.
+  PRECISION STALL ZONES (tightest hits, best for weekly targets):
+    162%: avg 0.5p  |  -68%: avg 0.9p  |  168%: avg 1.9p  |  200%/-100%: avg 2.5-2.6p
+  MOST TRADEABLE (highest frequency + tight):
+    200% extension: 5.8% of weeks, avg 2.5p
+    -100% mirror:   5.8% of weeks, avg 2.6p
+    100% level:     6.4% of weeks, avg 1.5p
+TEST 4: TEMPORAL ΓÇö WHEN DOES THE WEEKLY EXTREME FORM?
+Extreme
+Mean Hours from Mon Asian Close
+Median Hours
+Notes
+Weekly HIGH
+53.2h
+57.5h
+~2.4 days ΓÇö late Tue / early Wed
+Weekly LOW
+58.0h
+59.3h
+~2.5 days ΓÇö similar, slight Fri skew
+Bull LOW (counter-trend pullback)
+33.4h
+26.8h
+Mon/Tue mostly (65-66% of extremes)
+Bear HIGH (counter-trend bounce)
+33.5h
+26.3h
+Mon/Tue mostly (64-65% of extremes)
+Week Type
+Counter-Trend Extreme
+Mon
+Tue
+Wed
+Thu
+Fri
+BULL (n=77)
+Low (pullback)
+44.2%
+22.1%
+11.7%
+15.6%
+6.5%
+BEAR (n=79)
+High (bounce)
+43.0%
+21.5%
+13.9%
+13.9%
+7.6%
+KEY FINDING ΓÇö TIMING:
+  Counter-trend extreme (pullback in bull weeks, bounce in bear) forms at median 26-27h.
+  Calendar: Mon Asian closes 08:00 UTC + 27h = Tue 11:00 UTC ΓåÆ Tuesday mid-morning European.
+  Mon + Tue combined = 65-66% of all counter-trend extremes already formed.
+  The "mid-week shift" in the charts is the CONTINUATION off that Mon/Tue extreme.
+  Weekly extreme (full high/low): median ~58h ΓåÆ Thu Asian / early London.
+  This is when the field completes its weekly constraint deficit resolution.
+TEST 5: FLOAT WEEKS vs NON-FLOAT ΓÇö MID-WEEK SHIFT COMPARISON
+Group
+Count
+Counter-Trend Mean
+Counter-Trend Median
+Std Dev
+FLOAT weeks (Tue full day out)
+46
+27.1 hours
+7.0 hours
+37.1h
+NON-FLOAT weeks
+110
+36.1 hours
+30.0 hours
+30.1h
+0-12h (Mon same day)
+63.0% 29 wks
+12-24h (Mon late)
+2.2% 1 wk
+
+
+=== PAGE 44 ===
+WEEKLY FLOAT OPERATIONAL FRAMEWORK
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+MONDAY PRE-SESSION (1:45 AM EST):
+  1. Measure Monday Asian Range ΓåÆ Classify Tier (T1/T2/T3/T4)
+  2. Mark Monday Asian HIGH and LOW as WEEKLY STRUCTURAL CONSTRAINT BOUNDARIES
+  3. Float probability: T1=71% | T2=55% | T3=31% | T4=skip
+  4. Mark fib extension states from Mon Asian range:
+       Bull targets: 100%, 162%, 168%, 200%, 261% above Mon Asian High
+       Bear targets: -68%, -100%, -161% below Mon Asian Low
+MONDAY SESSION WATCH (3 AM ΓÇô 12 PM EST):
+  London open breaks out of Asian constraint band.
+  Watch: does the counter-trend partial rebalancing happen on Monday?
+    ΓåÆ 43-44% of counter-trend extremes form ON MONDAY itself
+    ΓåÆ In float weeks: 63% form within first 12h (Mon session)
+    ΓåÆ The low/high that forms on Monday = key constraint support/resistance all week
+FLOAT CONFIRMATION (Tuesday Asian 00:00-08:00 UTC):
+  If Tuesday Asian session does NOT overlap Monday Asian band ΓåÆ FLOAT CONFIRMED
+  ΓåÆ Occurs 52.6% of Tier 1-2 weeks
+  ΓåÆ Hold directional bias | Target 161-261% fib states
+  ΓåÆ Expected weekly range: 5-9x Monday Asian range (tier dependent)
+MID-WEEK RETEST EXPECTATION:
+  Weekly constraint deficit fully resolves at median ~58h from Mon Asian close
+  ΓåÆ Thursday Asian / early London
+  ΓåÆ The mid-week charts show price returning to Mon range from outside
+  ΓåÆ Either: bounces back (continuation, more common on 48h float)
+  ΓåÆ Or:     breaks back through (less common, T3 weeks mostly)
+Tier
+Range
+Tue Asian Float
+True 24h Float
+48h Float
+Action
+T1
+<20p
+71.1%
+33.3%
+26.7%
+Strong float ΓÇö hold directional bias all week
+T2
+20-30p
+54.5%
+37.9%
+25.8%
+Strong float ΓÇö T2 has HIGHEST true float rate
+T3
+30-45p
+31.1%
+13.3%
+11.1%
+Weak signal ΓÇö expect retest by Tuesday
+T4
+>45p
+N/A
+N/A
+N/A
+NO-GO ΓÇö constraint deficit too wide
+End of Part 7 | Monday Asian Float Mechanism | April 2026 | 201 Weeks
+
+
+=== PAGE 45 ===
+PART 8 DAILY ASIAN RANGE FLOAT MECHANISM Shallow Partial
+Rebalancing | Run & Retest | Extension Stall States | Constraint Boundary
+Placement EUR/USD M5 | Jan 2022 ΓÇô Jan 2026 | 648 Qualifying Days
+Pattern: London open breaks Asian constraint band, shallow partial rebalancing holds, constraint deficit resolved.
+PATTERN TESTED After the daily Asian session closes (3 AM EST / 08:00 UTC), London open breaks out. This
+test measures: (1) how often the partial rebalancing [6] is shallow (38% or less of Asian range) and price never
+re-enters the constraint band ΓÇö the daily run-and-retest; (2) which Fibonacci state the partial rebalancing stalls
+at ΓÇö directly applicable to constraint boundary [8] placement on larger ideas; and (3) where the continuation run
+ultimately reaches ΓÇö the daily extension stall state [7].
+Metric
+Value
+Notes
+Qualifying days (Tier 1-3)
+648
+Daily Asian range 3-45 pips
+Direction split
+330 Bull / 318 Bear
+Balanced sample
+Never re-entered Asian band
+122 (18.8%)
+Broad float ΓÇö band held as constraint boundary
+all day
+Shallow float (<=38%, no reentry)
+19 (2.9%)
+Pure run-and-retest days
+Dominant partial rebalancing
+FULL >100% (64.4%)
+Market usually fully reverses through range
+Float day median partial rebalancing
+14.4 pips
+vs 33.5p on non-float days
+Float day median buffer from band
+8.4 pips
+Typical distance maintained outside constraint
+band
+Shallow float continuation
+56.4p mean / 52.5p median
+After run-and-retest, constraint deficit resolves far
+TEST 1: FLOAT FREQUENCY ΓÇö HOW OFTEN IS PARTIAL REBALANCING
+SHALLOW?
+Partial Rebalancing Class
+Count
+% of Days
+Never Re-entered Band
+Float Rate
+MICRO (< 25% of Asian range)
+10
+1.5%
+6 (60.0%)
+0.9%
+SHALLOW (25-38% of Asian range)
+19
+2.9%
+13 (68.4%)
+2.0%
+MEDIUM (38-50%)
+36
+5.6%
+19 (52.8%)
+2.9%
+MEDIUM+ (50-62%)
+24
+3.7%
+10 (41.7%)
+1.5%
+DEEP (62-100%)
+142
+21.9%
+43 (30.3%)
+6.6%
+FULL (>100% ΓÇö full rebalancing)
+417
+64.4%
+31 (7.4%)
+4.8%
+
+
+=== PAGE 47 ===
+CONSTRAINT BOUNDARY PLACEMENT ΓÇö FLOAT DAY DATA:
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  Median partial rebalancing from extension peak on float days = 14.4 pips
+  90th percentile partial rebalancing                          = 36.8 pips ΓåÉ BOUNDARY UPPER BOUND
+  Maximum ever on a float day                                  = 65.7 pips
+  Median buffer maintained above Asian constraint band = 8.4 pips
+  18% of float days come within 3 pips of band before continuing
+  DERIVED CONSTRAINT BOUNDARY RULE:
+  ΓåÆ For 90% confidence on float days: boundary must absorb up to 36.8p from peak
+  ΓåÆ In practice: Boundary AT or slightly inside the Asian High/Low covers this
+  ΓåÆ Price that M5-CLOSES back inside the constraint band has 81.2% chance of NOT floating
+  ΓåÆ Exit on M5 close back inside band ΓÇö do not wait
+TEST 3: PARTIAL REBALANCING FIB STALL ΓÇö WHERE DOES THE PULLBACK
+STOP?
+Fibonacci partial rebalancing levels measured from the INITIAL EXTENSION LEG (Asian High/Low to the first extension peak after
+London open breakout). These are the Partial Rebalancing Range states [10] where the pullback terminates.
+Fib State (% of Initial Leg)
+All Days
+Tight Hits (<=3p)
+Avg Dist (tight)
+Notes
+23.6% partial rebalancing
+9 (1.4%)
+8 (1.2%)
+1.8p
+Very shallow ΓÇö rare
+38.2% partial rebalancing
+17 (2.6%)
+15 (2.3%)
+0.8p
+RUN-AND-RETEST CLASSIC ΓÇö
+tightest
+50.0% partial rebalancing
+14 (2.2%)
+13 (2.0%)
+0.8p
+Half-rebalancing, very precise
+61.8% partial rebalancing
+27 (4.2%)
+26 (4.0%)
+0.9p
+Golden ratio ΓÇö reliable hold
+78.6% partial rebalancing
+36 (5.6%)
+35 (5.4%)
+1.0p
+Deep ΓÇö approaching constraint
+band
+100% partial rebalancing
+41 (6.3%)
+38 (5.9%)
+1.0p
+Back to breakout point (Asian
+band)
+127%+ (full re-resolution)
+504 (77.8%)
+47 (7.3%)
+1.3p
+Full reversal ΓÇö dominant pattern
+KEY FINDING ΓÇö PARTIAL REBALANCING FIB STALL STATES:
+  38.2%: avg 0.8p ΓåÉ TIGHTEST SHALLOW STALL ΓÇö run-and-retest classic
+  50.0%: avg 0.8p ΓåÉ equally precise half-rebalancing
+  61.8%: avg 0.9p ΓåÉ golden ratio, most re
+
+=== PAGE 48 ===
+TEST 4: EXTENSION FIB STALL STATES ΓÇö WHERE DOES THE CONTINUATION
+RUN TO?
+Extension State
+All Days
+Tight Hits (<=3p)
+Tight %
+Avg Dist
+Reliability
+50% (0.5x Asian above High)
+193 (29.8%)
+96 (14.8%)
+49.7%
+1.5p
+Highest frequency
+100% (1.0x above)
+114 (17.6%)
+63 (9.7%)
+55.3%
+1.5p
+Very high
+127% (1.27x above)
+57 (8.8%)
+52 (8.0%)
+91.2%
+1.2p
+Near-perfect tight rate
+138% (1.38x above)
+27 (4.2%)
+27 (4.2%)
+100%
+0.7p
+100% tight ΓÇö very precise
+150% (1.5x above)
+17 (2.6%)
+17 (2.6%)
+100%
+0.8p
+100% tight rate
+162% (1.618x above)
+23 (3.5%)
+23 (3.5%)
+100%
+0.5p
+TIGHTEST OF ALL
+168% Stall Zone [10]
+34 (5.2%)
+34 (5.2%)
+100%
+1.0p
+100% tight ΓÇö confirms model
+200% Deep State [10]
+58 (9.0%)
+37 (5.7%)
+63.8%
+1.5p
+High frequency
+261% Extension
+46 (7.1%)
+27 (4.2%)
+58.7%
+1.5p
+Moderate
+300% Extension
+29 (4.5%)
+21 (3.2%)
+72.4%
+1.8p
+Moderate
+KEY FINDING ΓÇö EXTENSION FIB STALL STATE PRECISION RANKING:
+  162%: avg 0.5p ΓåÉ TIGHTEST ΓÇö every time it stalls here, within 0.5p precision
+  138%: avg 0.7p ΓåÉ 100% tight hit rate
+  150%: avg 0.8p ΓåÉ 100% tight hit rate
+  168% Stall Zone [10]: avg 1.0p ΓåÉ 100% tight rate ΓÇö CONFIRMS CEREBUS intraday model
+  127%: avg 1.2p ΓåÉ 91.2% tight hit rate
+  FREQUENCY RANKING (most common daily stall states):
+    50%  extension: 14.8% of all days stall here within 3p (highest daily frequency)
+    100% extension: 9.7% | 127%: 8.0% | 168%: 5.2% (100% tight rate)
+  63.7% of all days stall within 3 pips of a fib extension state ΓÇö very high precision.
+TEST 5: CONTINUATION PROFIT ΓÇö HOW FAR AFTER SHALLOW FLOAT?
+Partial Rebalancing Class (float days
+only)
+n
+Initial Ext Mean
+Cont Ext Mean
+Full Day Ext
+MICRO (<25% rebalancing)
+6
+ΓÇö
+50.6p
+57.9p
+SHALLOW (25-38%)
+13
+22.2p
+59.1p
+59.1p
+MEDIUM (38-50%)
+19
+ΓÇö
+51.4p
+56.5p
+DEEP (62-100%)
+43
+ΓÇö
+ΓÇö
+40.1p
+FULL (>100% ΓÇö reversal)
+31
+ΓÇö
+3.2p
+26.1p
+30-45 pips
+31.6% 6 days
+
+
+=== PAGE 49 ===
+45-60 pips
+26.3% 5 days
+60-80 pips
+31.6% 6 days
+80+ pips
+10.5% 2 days
+KEY FINDING ΓÇö CONTINUATION AFTER SHALLOW FLOAT (RUN-AND-RETEST):
+  100% of shallow float days extend at least 30 pips from the Asian constraint band.
+  Mean: 56.4p | Median: 52.5p
+  RETRACE DEPTH IS INVERSELY CORRELATED WITH CONTINUATION:
+    Shallow (<38%):   59.1p mean ΓåÆ run-and-retest = strong directional constraint resolution
+    Medium  (38-50%): 56.5p mean ΓåÆ still good
+    Deep    (62-100%):40.1p mean ΓåÆ weakening resolution momentum
+    Full reversal:     3.2p mean ΓåÆ constraint resolution exhausted ΓÇö no continuation
+TEST 6: CONSTRAINT BOUNDARY PLACEMENT FRAMEWORK
+CONSTRAINT BOUNDARY PLACEMENT TIERS ΓÇö DAILY FLOAT / RUN-AND-RETEST TRADES
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+TIER A ΓÇö TIGHT BOUNDARY (Shallow float confirmed, 23.6-38.2% partial rebalancing stall):
+  Condition: Partial rebalancing stalls at 38.2% or 23.6% of initial extension leg
+  Boundary placement: AT Asian High (bull) or Asian Low (bear) ΓÇö 0-2p buffer
+  Logic: 38.2% stall holds outside band with avg 0.8p precision.
+         Any M5 candle CLOSE back inside band = 81% chance of full reversal ΓåÆ exit.
+  Typical boundary distance from activation: initial_ext + 2p (usually 8-18p)
+TIER B ΓÇö STANDARD BOUNDARY (Moderate stall, 50-61.8% of initial leg):
+  Condition: Partial rebalancing to 50% or 61.8% of leg, still above constraint band
+  Boundary placement: 5-8p below Asian High (bull) / above Asian Low (bear)
+  Logic: Median buffer on float days = 8.4p. Covers 82% of float days.
+  Breakeven trigger: move to breakeven when continuation reaches 20p from band
+TIER C ΓÇö WIDE BOUNDARY (Deep stall, 78.6% of leg, approaching constraint band):
+  Condition: Partial rebalancing reaches 78.6% of initial extension leg
+  Boundary placement: AT Asian High/Low exactly (0p buffer ΓÇö exit on M5 close inside)
+  Logic: 78.6% stall holds with 1.0p avg. Close inside band = invalidation.
+INVALIDATION RULE (all tiers):
+  M5 CANDLE CL
+
+=== PAGE 51 ===
+DAILY ASIAN FLOAT ΓÇö COMPLETE OPERATIONAL FRAMEWORK
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+STEP 1: ASIAN SESSION CONSTRAINT BAND (00:00-08:00 UTC / 7PM-3AM EST)
+  Mark: Asian High and Asian Low (constraint deficit boundaries [11])
+  Classify: T1 (<20p) | T2 (20-30p) | T3 (30-45p) | T4: skip
+  Pre-mark extension states: 162%, 168%, 200% above High (or below Low)
+STEP 2: LONDON OPEN CONSTRAINT VIOLATION (08:00-09:00 UTC / 3-4 AM EST)
+  Determine direction of constraint resolution [3] ΓÇö which side breaks first?
+  Measure initial extension from constraint band to first peak (LEG 1)
+  This is the anchor for partial rebalancing fib calculations
+STEP 3: PARTIAL REBALANCING PHASE ΓÇö FLOAT QUALIFICATION (08:30-10:30 UTC)
+  Monitor pullback from initial extension peak:
+  < 38.2% of Leg 1 AND above constraint band = SHALLOW FLOAT (highest quality)
+    ΓåÆ Most common stall at 38.2% fib state (avg 0.8p precision)
+    ΓåÆ Continuation target: 56-59p mean from Asian constraint band
+  38.2-61.8% AND above band = STANDARD FLOAT (good quality)
+    ΓåÆ Common stall at 61.8% fib state (0.9p avg)
+    ΓåÆ Continuation target: 45-55p from band
+  78.6% of Leg 1, barely above band = DEEP FLOAT (marginal)
+    ΓåÆ Last-chance boundary level, low conviction
+  M5 candle CLOSES inside constraint band = EXIT ΓÇö float invalidated (81% rule)
+STEP 4: CONSTRAINT BOUNDARY PLACEMENT
+  Shallow rebalancing (<=38%): Boundary AT Asian High/Low (0-2p buffer)
+  Standard rebalancing (50-62%): Boundary 5-8p beyond Asian band
+  Deep rebalancing (78.6%): Boundary AT Asian band, exit on M5 close inside
+  NEVER place boundary more than 8-10p beyond the constraint band on float setups
+STEP 5: EXTENSION STATE TARGETS (continuation run)
+  TP1: 162% of Asian range (avg 0.5p stall ΓÇö tightest precision state of all)
+  TP2: 168% Stall Zone [10] (avg 1.0p, 100% tight rate ΓÇö confirms CEREBUS model)
+  TP3: 200% Deep State [10] (avg 1.5p, 63.8% tight rate)
+  TP4: 261% (avg 1.5p ΓÇö used on shallow float days 21% o
+
+=== PAGE 52 ===
+DAILY FLOAT vs MONDAY WEEKLY FLOAT ΓÇö SAME MECHANISM, DIFFERENT TIMEFRAMES
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+DAILY FLOAT (Part 8):
+  Timeframe: Single trading day
+  Frequency: 18.8% of days never re-enter constraint band / 2.9% shallow float
+  Partial rebalancing: median 14.4p, stalls at 38.2-61.8% of initial extension leg
+  Target: 162%-200% extension states (45-70p continuation)
+  Boundary: Asian High/Low ┬▒ 2-8p depending on rebalancing depth
+WEEKLY MONDAY FLOAT (Part 7):
+  Timeframe: 24-48 hours (two Asian sessions)
+  Frequency: 29.5% true 24h float (Tier 1-2), 52.6% Tue Asian float
+  Partial rebalancing: counter-trend extreme forms median 26-27h from Mon Asian close
+  Target: 161-261% extension of Monday Asian range over the week
+  Boundary: Monday Asian High/Low as weekly structural constraint boundary
+MULTI-TIMEFRAME CONFIRMATION RULE:
+  If Monday float is confirmed (T1/T2, Tue Asian stays outside Mon range)
+  AND individual daily sessions show float behavior (rebalancing <38%, no re-entry):
+  ΓåÆ Both timeframes confirm same direction of constraint resolution [3]
+  ΓåÆ Daily boundary: daily Asian band level ┬▒ 2-8p
+  ΓåÆ Weekly boundary: Monday Asian band level (wider ΓÇö structural)
+  ΓåÆ Daily targets: 162-168% for intraday
+  ΓåÆ Weekly targets: 200-261% for swing constraint deficit resolution
+CEREBUS FX v4.0 ΓÇö Complete Operational Manual | April 2026 | PROPRIETARY & CONFIDENTIAL
+Data: EUR/USD M5 | Jan 2022 ΓÇô Jan 2026 | 315,000+ candles | 201 Weeks Float Analysis | 648 Days Daily Float Analysis
+II For educational purposes only ΓÇö test all strategies in simulation before live deployment.
+
+
+=== PAGE 54 ===
+KEY INSIGHT ΓÇö REGIME ACCURACY vs CLOSURE PROBABILITY:
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  REGIME ACCURACY (97% for CONFIRMED):
+    = "Did price move in the predicted direction of constraint resolution?"
+    = VolBand >1.2 predicted expansion ΓåÆ did price expand beyond CRD?
+    = Binary outcome: YES / NO
+  CLOSURE PROBABILITY (84.1% for CONFIRMED):
+    = "Did price close within the PRECISION ZONE of the exact target?"
+    = Target was 72.5 pips ┬▒3.0 pips ΓåÆ did close land in [69.5, 75.5]?
+    = Continuous outcome: distance from target
+  WHY THE GAP?
+  Even when the regime direction is correct (97%), the EXACT target has variance:
+    ΓÇó Fib stall zones have 0.5-1.5p natural variance (per daily float data)
+    ΓÇó Spread/slippage/news spikes add noise
+    ΓÇó The 97% says "direction right" ΓÇö the 84.1% says "target precise"
+  PRACTICAL USE:
+    Use Regime Accuracy for POSITION SIZE (CONFIRMED = full size)
+    Use Closure Probability for TARGET ADJUSTMENT (84.1% = expect ┬▒3p variance)
+SECTION 1: TIME-OF-DAY CHECKPOINT PERFORMANCE
+Checkpoint (EST)
+Accuracy
+Avg Closure Prob
+Hours Elapsed
+Completion %
+Time Factor
+12:00 PM (Baseline)
+81.0%
+78.7%
+17h
+82%
+1.00x
+2:00 PM
+79.0%
+80.1%
+19h
+85%
+1.07x
+4:00 PM
+81.0%
+81.2%
+21h
+90%
+1.13x
+6:00 PM (Pre-close)
+78.0%
+82.5%
+23h
+95%
+1.18x
+1:30 PM (Setup 2)
+86-88% (T2)
+80-82%
+18.5h
+~85%
+1.04x (interpolated)
+Observation: Accuracy remains stable across checkpoints. Closure probability naturally increases as time approaches 7PM ΓÇö the
+constraint deficit is closer to full resolution, narrowing the uncertainty band.
+SECTION 2: FULL TIER PERFORMANCE BREAKDOWN
+Tier 1 ΓÇö Gold (<20 pips Asian Range)
+Category
+Metric
+Value
+Sample
+Days analyzed
+271 days (2022-2026)
+Distribution
+Avg Daily Range
+72.1 pips | Expansion: 3.12x
+6 AM Accuracy
+With P90 + Regime CONF
+93-95%
+9 AM Accuracy
+All conditions optimal
+94-95%
+
+
+=== PAGE 55 ===
+12 PM Accuracy
+Realistic sustained
+90-92%
+1:30 PM Accuracy
+Post-window decay
+88-90%
+Float ΓÇö Median retrace
+Float days
+14.4 pips from peak
+Float ΓÇö 90th %ile retrace
+Boundary upper
+36.8 pips ΓåÉ SL UPPER BOUND
+Float ΓÇö Band buffer
+Median
+8.4 pips above Asian High/Low
+Continuation (shallow float)
+Mean / Median
+57.9p mean / 52.5p median
+CONFIRMED regime
+Accuracy / Closure
+97.2% regime | 86.3% closure
+NORMAL regime
+Accuracy / Closure
+81.4% regime | 82.1% closure
+COMPRESSION regime
+Accuracy / Closure
+68.9% regime | 79.2% closure
+Tier 2 ΓÇö Sweet Spot (20-30 pips Asian Range) I
+Category
+Metric
+Value
+Sample
+Days analyzed
+234 days (2022-2026)
+Distribution
+Avg Daily Range
+58.3 pips | Expansion: 2.68x
+6 AM Accuracy
+With P90 + Regime CONF
+90-92%
+9 AM Accuracy
+All conditions optimal
+93-94%
+12 PM Accuracy
+Realistic sustained
+88-90%
+1:30 PM Accuracy
+Setup 2 window
+86-88% ΓåÉ LAST SETUP WINDOW
+Float rate
+True 24h float rate
+37.9% ΓÇö HIGHEST of all tiers
+Float ΓÇö Median retrace
+Float days
+14.4 pips from peak
+Float ΓÇö 90th %ile
+Boundary upper bound
+36.8 pips
+Continuation (shallow float)
+Mean / Median
+59.1p mean / 54.2p median
+168% Stall Zone
+Tight hit rate
+100% tight (avg 1.0p precision)
+CONFIRMED regime
+Accuracy / Closure
+96.8% regime | 84.7% closure
+NORMAL regime
+Accuracy / Closure
+79.2% regime | 81.3% closure
+COMPRESSION
+Accuracy / Closure
+66.1% regime | 78.4% closure
+Tier 3 ΓÇö Caution (30-45 pips Asian Range)
+Category
+Metric
+Value
+Sample
+Days analyzed
+143 days (2022-2026)
+Distribution
+Avg Daily Range
+48.2 pips | Expansion: 2.18x
+6 AM Accuracy
+With P90 + Regime CONF
+88-90%
+9 AM Accuracy
+All conditions optimal
+91-93%
+
+
+=== PAGE 58 ===
+REGIME CLASSIFICATION LOGIC (12 PM EST)
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  1. Classify Tier from Asian Range (as per manual tiers T1/T2/T3/SKIP)
+  2. Calculate Current Range Delta (CRD):
+     CRD = High(7PM ΓåÆ now) - Low(7PM ΓåÆ now)
+  3. Calculate Volatility Band:
+     VolBand = Tier Average Daily Range / CRD
+  4. Classify Regime:
+     VolBand > 1.2  ΓåÆ CONFIRMED   (97% direction accuracy ΓÇö full size)
+     VolBand 0.8-1.2 ΓåÆ NORMAL     (79% direction accuracy ΓÇö standard size)
+     VolBand < 0.8  ΓåÆ COMPRESSION (67% direction accuracy ΓÇö reduce size)
+  5. Calculate Closure Probability (weighted function):
+     Tier weight:    35%  (T1=95pts, T2=90pts, T3=85pts)
+     VolBand weight: 30%  (scaled 70-95 based on VolBand value)
+     Time weight:    20%  (scaled to completion factor)
+     Regime weight:  10%  (CONFIRMED=90, NORMAL=85, COMPRESSION=80)
+     1hr Vol weight:  5%  (avg 1-hr range proxy for noise)
+Constraint Boundary Placement ΓÇö Per Backtest Validation
+CONSTRAINT BOUNDARY PLACEMENT ΓÇö REGIME TRACKER VALIDATED
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  T1/T2 Float Days:
+    Median retrace from peak:  14.4 pips
+    90th percentile retrace:   36.8 pips ΓåÉ BOUNDARY UPPER BOUND
+    Boundary placement: AT Asian High/Low ┬▒ 2-8p (per retrace depth tier)
+  Boundary Tier Matrix:
+    Rebalancing stalls Γëñ38%:  Boundary AT Asian High/Low (0-2p buffer)
+    Rebalancing stalls 50-62%: Boundary 5-8p beyond Asian band
+    Rebalancing stalls 78.6%: Boundary AT Asian High/Low exactly (last line)
+  INVALIDATION RULE:
+    M5 CLOSE back inside Asian constraint band = EXIT immediately
+    81.2% of band re-entries continue through the full constraint range
+Take Profit Targets ΓÇö Fib Extension States (Backtest Confirmed)
+Priority
+Fib Extension State
+Avg Stall Precision
+Frequency
+Notes
+1st (tightest)
+162% extension
+0.5p avg stall
+3.5% of days
+100% tight hit rate
+2nd
+138% / 150% / 168%
+0.7-1.0p avg
+4-5% each
+All 100% tight hit rate
+3rd
+200% Dee
+
+=== PAGE 63 ===
+CRITICAL FINDING ΓÇö THE SYNERGY GAP:
+  Taking a Resolution Amplifier AGAINST your Constraint Anchor direction of constraint
+  resolution [3] destroys edge entirely.
+  Aligned Amplifiers:     84.2% win rate  |  +2.48R  |  Profit Factor 3.65
+  Misaligned Amplifiers:  58.4% win rate  |  +0.92R  |  Profit Factor 1.12
+  The win rate drops to near-random (58%) and R-multiple collapses by 63%.
+  RULE #1 OF DUAL-ENGINE (NON-NEGOTIABLE):
+  Never take a Resolution Amplifier that contradicts the Constraint Anchor's
+  direction of constraint resolution unless the Regime has explicitly shifted
+  to FAILED status (triggered by BOTH 200% Deep State [10] AND 132% Kill-Switch [10]).
+SECTION 4: COMBINED MODEL PERFORMANCE ΓÇö ALLOCATION OPTIMIZATION
+Five capital allocation strategies tested to find the optimal balance between Anchor certainty and Amplifier efficiency.
+Allocation Strategy
+Avg Daily R
+Win Rate
+Sharpe
+Max DD
+Verdict
+Anchor Only (100/0)
++1.42R
+91.7%
+2.84
+-4.2R
+Safe, limited growth
+70% Anchor / 30% Amplifiers
++1.86R
+89.4%
+3.42
+-5.1R
+OPTIMAL
+50% Anchor / 50% Amplifiers
++1.92R
+86.2%
+3.15
+-6.8R
+High volatility
+30% Anchor / 70% Amplifiers
++1.78R
+81.5%
+2.68
+-9.4R
+Too risky
+Amplifiers Only (0/100)
++2.18R
+74.3%
+2.12
+-12.4R
+Unstable
+WINNING STRATEGY: 70% ANCHOR / 30% AMPLIFIERS
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  Condition: Amplifiers ONLY triggered when they match Anchor direction of constraint
+             resolution [3] AND Asian Range < 30 pips (T1/T2 only)
+  Results vs Anchor-Only:
+    Avg Daily R:   +1.86R   (+31% improvement over Anchor-alone +1.42R)
+    Win Rate:       89.4%   (only -2.3% from pure Anchor 91.7%)
+    Sharpe Ratio:   3.42    (excellent risk-adjusted return)
+    Max Drawdown:  -5.1R    (only +0.9R increase vs Anchor-alone -4.2R)
+  The 70/30 split captures the Amplifier edge while preserving the Anchor's
+  structural safety ΓÇö minimal win rate sacrifice, maximum R-multiple gain.
+SECTION 5: TIER-BY-TIER CAPITAL DEPLOYMENT ARCHITECTURE
+
+
+=== PAGE 65 ===
+Total Activations
+98
+86
+Model 1 higher frequency
+Win Rate
+54.1%
+76.7%
+Model 2 dominates
+(+22.6%)
+Avg R-Multiple
++1.32R
++2.14R
+Model 2 superior (+0.82R)
+Max Drawdown
+-8.4R
+-4.2R
+Model 2 safer (half the DD)
+Profit Factor
+1.45
+2.88
+Model 2 highly efficient
+KEY FINDING ΓÇö T3 MODEL SELECTION:
+  The 2-hour wait filter in Model 2 eliminates ~35% of failed constraint violations [5]
+  that would trap Model 1 traders. In wider constraint deficits [11], the field [1]
+  needs time to confirm acceptance beyond the band before resolution output [2] extends.
+  Model 1 (54.1% win rate): near coin-flip ΓÇö noise in wider ranges degrades the
+  partial rebalancing [6] entry zones. 32% Fib entries get tagged before reversing;
+  61.8% Fib entries fail to reach return-to-band target because T3 resolution
+  momentum is weaker than T1/T2.
+  Model 2 (76.7% win rate): 65.8% of constraint violations hold outside band
+  for 2 hours (validity rate). Those that hold become high-probability continuation
+  activations. Structural constraint boundary [8] at the band provides logical
+  invalidation with room for T3 volatility.
+Model 2 Detailed Stats ΓÇö T3 Post-Resolution
+Metric
+Value
+Notes
+Breakout signals detected
+184
+All T3 valid setups over 4 years
+Held outside band at 2h (valid)
+121 (65.8%)
+Failed constraint violations filtered out
+Failed (closed back inside band)
+63 (34.2%)
+Automatic skip ΓÇö 81% rule
+Win Rate (1x Range target)
+76.7%
+Matches document prediction ~77.6%
+Win Rate (168% Stall Zone [10])
+51.2%
+Strong runner potential
+Avg R-Multiple
++2.14R
+Driven by structural boundary (band edge)
+Partial rebal 25-61% win rate
+82%
+Sweet spot entry zone for Model 2
+Deep partial rebal (>78%) WR
+40%
+Failed 60% of time ΓÇö avoid in T3
+SECTION 7: MODEL 2 ALL-TIER CONSOLIDATED PERFORMANCE
+Model 2 (2-hour post-resolution confirmation) tested across ALL tiers. 484 total valid activations across Tier 1, 2, and 3.
+Metric
+T1 (<20p)
+T2 (20-30p)
+T3 (30-45p)
+Trend
+Total Activations
+142
+198
+144
+Balanced
+Validity Rate (held
+
+=== PAGE 66 ===
+Win Rate (1x Range target)
+88.2%
+81.4%
+76.7%
+Decreases with range size
+Win Rate (168% Stall Zone [10])
+64.5%
+54.8%
+51.2%
+Deep targets harder in wide
+ranges
+Avg R-Multiple
++3.12R
++2.45R
++2.14R
+Highest ROI in T1
+Max Drawdown
+-2.8R
+-3.4R
+-4.2R
+Risk increases with range
+width
+Profit Factor
+4.15
+3.28
+2.88
+T1 most efficient
+Partial rebal sweet spot
+25-50% (91% WR)
+32-61% (84% WR)
+32-50% (82% WR)
+Wider = deeper rebal
+needed
+CORE INSIGHT ΓÇö MODEL 2 ACROSS ALL TIERS:
+  Model 2 is a HIGH-PROBABILITY system across all tiers. Even in T3, 76.7% win rate
+  with +2.14R makes it highly tradeable with appropriate size reduction.
+  As the Asian constraint deficit [11] widens (T1 ΓåÆ T2 ΓåÆ T3):
+    Win rates decrease: 88.2% ΓåÆ 81.4% ΓåÆ 76.7% (~6% per tier step)
+    R-multiples decrease: +3.12R ΓåÆ +2.45R ΓåÆ +2.14R (~0.5R per tier step)
+    BUT all three remain strongly positive expectancy
+  T1 is the "Unicorn" setup (88%, +3.1R, Profit Factor 4.15).
+  T2 is the "Bread & Butter" (81%, +2.4R) ΓÇö most frequent, reliable.
+  T3 is the "Defensive" (77%, +2.1R) ΓÇö conservative size, strict discipline required.
+SECTION 8: THE OVERFILLED FILTER ΓÇö CRITICAL RISK MANAGEMENT
+Rule: If the daily constraint resolution output has already moved >40 pips by 9:00 AM EST, the constraint deficit is substantially
+resolved ΓÇö skip or reduce sharply.
+Tier
+Condition
+Anchor Win Rate
+Amplifier WR (Aligned)
+Combined Action
+T1
+Normal (<40p)
+89.4%
+86.2%
+Full Dual-Engine deployment
+T1
+Overfilled (>40p)
+62.5%
+54.8%
+Anchor ONLY ΓÇö reduce size 50%
+T2
+Normal (<40p)
+82.8%
+79.4%
+Full Dual-Engine deployment
+T2
+Overfilled (>40p)
+44.8%
+38.2%
+STAND DOWN ΓÇö negative expectancy
+T3
+Normal (<40p)
+79.4%
+N/A
+Model 2 Anchor ΓÇö 50-75% size
+T3
+Overfilled (>40p)
+41.2%
+N/A
+STAND DOWN ΓÇö negative expectancy
+
+
+=== PAGE 67 ===
+OVERFILLED FILTER ΓÇö CRITICAL ALERT:
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  T1 RESILIENCE: Even when overfilled, T1 retains some edge (~62% WR) due to
+  extreme constraint deficit compression. Trade Anchor-only at 50% size.
+  T2 / T3 COLLAPSE: Once T2 or T3 days exceed 40 pips by 9 AM EST:
+    ΓåÆ Constraint deficit [11] already largely resolved
+    ΓåÆ New constraint violations [5] become exhaustion traps, not genuine breaks
+    ΓåÆ Both Anchor and Amplifier engines become negative expectancy
+    ΓåÆ STAND DOWN immediately ΓÇö strict adherence saves ~8R drawdown per month
+  Both Dual-Engine models fail under overfilled conditions in T2/T3 because:
+    Model 1: Partial rebalancing [6] often becomes full re-resolution against break
+    Model 2: 2-hour hold becomes a "bull trap" ΓÇö resolution output exhausted
+SECTION 9: EXIT LOGIC OPTIMIZATION ΓÇö SEPARATED BY ENGINE
+The test confirmed that treating Constraint Anchor and Resolution Amplifier exits identically is suboptimal. Each engine has a
+different constraint resolution completion profile.
+Engine
+Exit 1
+Exit 2
+Trailing Logic
+Constraint Anchor
+Close 50% at -25% extension (91% hit
+rate)
+Close remaining at -50% extension (80%
+hit rate)
+Move ALL boundaries to
+BE+2p when TP1 hit
+Resolution Amplifier
+Close 100% at fixed 20p OR 1:2.5 RR
+No extended holding ΓÇö scalp the path
+Exit fully when target hit ΓÇö
+no runners
+EXIT LOGIC REASONING:
+  CONSTRAINT ANCHOR exits:
+    Holding to -100% extension drops win rate to ~60% without adding significant R.
+    Best close at -25% (TP1: 91% hit rate) + -50% (TP2: 80% hit rate).
+    At TP1, move ALL boundaries (Anchor + Amplifiers) to Breakeven + 2 pips.
+    This locks the certainty-layer profit while allowing Amplifier path scalps.
+  RESOLUTION AMPLIFIER exits:
+    Amplifiers are path-exploitation activations [9] ΓÇö designed as quick scalps.
+    Holding for large extensions increases variance without adding meaningful R.
+    Fixed 20-pip target or 1:2.5 RR is optimal. Exit im
+
+=== PAGE 68 ===
+T1
+Overfilled (>40p)
+Anchor Only
+Deep rebal 50-61%
+Asian Band
+1x Range
+Skip
+50%
+T2
+Normal
+Dual-Engine
+Partial rebal 32-61%
+Asian Band
+1x Range
+168% Stall
+100%
+T2
+Overfilled (>40p)
+STAND DOWN
+ΓÇö
+ΓÇö
+ΓÇö
+ΓÇö
+SKIP
+T3
+Normal
+Model 2
+Partial rebal 32-50%
+Asian Band
+1x Range
+Skip
+50-75%
+T3
+Strong momentum
+Model 2
+Continuation break
+Asian Band
+168% Stall
+ΓÇö
+50-75%
+T3
+Overfilled (>40p)
+STAND DOWN
+ΓÇö
+ΓÇö
+ΓÇö
+ΓÇö
+SKIP
+T4
+>45p
+NO-GO
+ΓÇö
+ΓÇö
+ΓÇö
+ΓÇö
+0%
+SECTION 11: COMPLETE DEPLOYMENT PROTOCOL ΓÇö THE MACHINE
+
+
+=== PAGE 72 ===
+POST-FAILURE SEQUENCE ΓÇö DOMINANT PATTERN:
+  1. Valid 2h acceptance hold ΓåÆ price fails (M5 close back inside band)
+  2. Constraint band midpoint hit first (73.8% of all failures)
+  3. ~Half of those continue to opposite band edge (51.0% overall)
+  4. Minority fully flip to opposite 1x target (20.0% overall)
+  INTERPRETATION:
+  The most common failure sequence is NOT "fail ΓåÆ full reversal."
+  It is: fail ΓåÆ midpoint repair ΓåÆ new acceptance attempt ΓåÆ decide.
+  The midpoint functions as the first structural rebalancing node [6]
+  after a failed constraint violation [5] ΓÇö analogous to how the
+  168% Stall Zone [10] operates in the P90 model:
+  P90 model:        168% = "extension too far ΓåÆ partial rebalancing first"
+  Asian break model: midpoint = "acceptance failed ΓåÆ internal rebalancing first"
+  Same role. First repair zone. Not final reversal proof.
+SECTION 2: FAILURE TAXONOMY ΓÇö THREE RESOLUTION STATES
+Failure Type
+What Happens
+Frequency
+Action
+Type 1 ΓÇö Soft Failure
+(Midpoint repair only)
+Fails back inside band ΓåÆ midpoint hit ΓåÆ field
+compresses. No clean follow-through in either
+direction.
+Most common
+Stand down. Wait for new close
+signal.
+Type 2 ΓÇö Internal Reset
+(Same-side recycle)
+Fails ΓåÆ midpoint repair ΓåÆ field later reclaims
+original side ΓåÆ second 2h acceptance ΓåÆ
+constraint resolution continues.
+Second most common
+(89% of second
+breaks)
+Wait for second acceptance
+hold. Re-enter aligned.
+Type 3 ΓÇö Regime Flip
+(Opposite-side confirmed)
+Fails ΓåÆ midpoint ΓåÆ opposite edge ΓåÆ opposite
+constraint violation ΓåÆ second 2h hold ΓåÆ opposite
+1x target prints.
+Minority (11% of
+second breaks)
+Rarer but highest win rate
+(84.6%). Wait for full
+confirmation.
+THE REAL POST-FAILURE STRUCTURE:
+  Do NOT assume full direction of constraint resolution reversal [3] on failure.
+  The dominant next event is midpoint repair ΓÇö not opposite-side completion.
+  Think of it as three sequential questions:
+    1. Does price stall and compress at midpoint?   ΓåÆ Type 1 (stand down)
+    2. Does price reclaim 
+
+=== PAGE 75 ===
+Day
+Win Rate
+Signal
+Quality
+Structural Character
+Size Tier
+Monday
+70-75%
+Low
+Setup day ΓÇö still positioning. Higher false violation [5]
+rate.
+B ΓÇö Controlled
+Tuesday
+82-88% I
+BEST
+Primary kill day. Cleanest acceptance holds. ONE
+clean break.
+A+ ΓÇö Full size
+Wednesday
+78-85%
+Strong
+Continuation or decision day. Trend OR reversal
+potential.
+A ΓÇö Full size
+Thursday
+65-75%
+Messy
+Trap day. False violations [5] common. Fades >
+breaks.
+C ΓÇö Specialized only
+Friday
+68-78%
+Medium
+Quick resolution output [2] only. No extended
+runners.
+B ΓÇö Controlled
+Monday (setup)
+70-75% B-day
+Tuesday (expansion)
+82-88% A+ day
+Wednesday (continuation)
+78-85% A-day
+Thursday (rebalance)
+65-75% C-day
+Friday (cleanup)
+68-78% B-day
+Weekly Constraint Resolution Flow
+Day
+Weekly Role
+Primary Approach
+Monday
+Constraint set-up
+Reduced size. Confirm structure before activating.
+Tuesday
+Full expansion
+GO HARD. Trust the first violation. Full size.
+Wednesday
+Continuation/decision
+Strong edge. Maintain awareness of flip potential.
+Thursday
+Partial rebalancing
+ONLY trade stalls and fades. Not breakouts.
+Friday
+Cleanup
+Quick resolution only. Exit early. No runners.
+CORE INSIGHT ΓÇö WEEKLY EDGE DISTRIBUTION:
+  The market pays you Tuesday and Wednesday.
+  The rest of the week tests whether you'll give it back.
+  If you ONLY traded Tuesday + Wednesday:
+    ΓåÆ Highest win rate days (82-88% / 78-85%)
+    ΓåÆ Cleanest constraint violation structure [5]
+    ΓåÆ Best follow-through on 2h acceptance holds
+    ΓåÆ Least noise from false acceptance attempts
+  Thursday is NOT a breakout day ΓÇö it is a partial rebalancing [6] day.
+  Playing it as a breakout day (Tue/Wed style) destroys edge systematically.
+
+
+=== PAGE 78 ===
+THE FAIL BOX ΓÇö STRUCTURAL ZONE
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  Asian High/Low (constraint band edge)
+        Γåô
+  32% partial rebalancing [6] of initial extension leg
+        Γåô
+  50% partial rebalancing (constraint band midpoint)
+  VISUAL:
+           resolution output
+                Γåæ
+                I (breakout)
+  IIIIIIIIIIIIIIIIIIIIIIIIIIIII  ΓåÉ Asian High (constraint band)
+                I
+      IIIIIIIIIIIIIIII FAIL BOX
+              32% rebalancing
+              50% (midpoint)
+  All four failure patterns terminate within this zone:
+  Pattern A (0-15 min):   Wick above ΓåÆ M5 close back inside within 1-2 candles
+  Pattern B (15-30 min):  Break ΓåÆ slight range ΓåÆ collapses before 2h mark
+  Pattern C (30-60 min):  Ranges above band ΓåÆ slowly collapses back through
+  Pattern D (60-120 min): Almost holds ΓåÆ fails just before 2h confirmation
+  Once price is back below the constraint band (for a bull break), the 50%
+  midpoint becomes the first structural rebalancing node [6] ΓÇö same function
+  as the 168% Stall Zone [10] in the P90 intraday model.
+SECTION 9: THE FLIP SIGNAL ΓÇö OPPOSITE-SIDE PROBABILITY AFTER FAILURE
+After a confirmed failure (M5 close back inside band), what is the probability that the OPPOSITE side becomes the actual direction
+of constraint resolution [3] for the day?
+Day
+Prob Opposite Side Becomes Real Move
+Action on Failure
+Monday
+60-70%
+Moderate flip probability ΓÇö watch for opposite signal
+Tuesday
+50-60%
+Lower flip ΓÇö often same-side re-acceptance instead
+Wednesday
+60-70%
+Moderate flip ΓÇö be aware of direction shift potential
+Thursday
+70-80% I
+BEST FLIP DAY ΓÇö failure here often means opposite is real
+Friday
+55-65%
+Moderate flip ΓÇö but limited follow-through expected
+
+
+=== PAGE 79 ===
+FLIP EXECUTION SEQUENCE ΓÇö THE MONEY PATTERN:
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  STEP 1 ΓÇö Observe first constraint violation attempt
+  STEP 2 ΓÇö Monitor failure timing:
+    Fast rejection (<30 min) = HIGH probability fake ΓåÆ watch for flip
+    Slow failure (>60 min)   = CAUTION ΓÇö could still reform same-side
+  STEP 3 ΓÇö After failure confirmed:
+    Expect midpoint (73.8% probability) as first repair level [6]
+  STEP 4 ΓÇö Ask three questions:
+    a) Does price stall and compress at midpoint? ΓåÆ Type 1 (stand down)
+    b) Does price reclaim the original side? ΓåÆ Type 2 (same-side re-entry)
+    c) Does price drive to opposite edge? ΓåÆ Type 3 (regime flip incoming)
+  STEP 5 ΓÇö ONLY take the next trade if:
+    ΓåÆ A new M5 close signal fires outside the band (either side)
+    ΓåÆ Price holds outside for 2 hours (full acceptance confirmation)
+    ΓåÆ That second 2h hold = the real activation signal [9]
+  THURSDAY SPECIALIST RULE:
+  On Thursday, if the first constraint violation fails quickly (<30 min):
+    ΓåÆ 70-80% probability the opposite side is the real resolution direction [3]
+    ΓåÆ Load the opposite-side second accepted move when it confirms
+    ΓåÆ Win rate on confirmed opposite-side Thursday flip: ~84% range
+  THE MACHINE QUESTION:
+  "Is today a FIRST-MOVE dayΓÇª or a FLIP day?"
+  ΓåÆ Tue/Wed: First move. Go hard on the initial violation.
+  ΓåÆ Thu: Flip day. Wait. The second move is the trade.
+SECTION 10: MASTER EXECUTION FRAMEWORK ΓÇö FAILURE STATE TO NEW
+EDGE
+State
+What It Means
+Immediate Action
+Next Look-For
+First 2h hold VALID
+Constraint accepted by field [1]
+Standard activation [9]
+1x target / fib states [10]
+First 2h hold FAILS
+(quick < 30 min)
+Failed constraint violation [5] ΓÇö fake
+acceptance
+No panic. Note direction. Watch
+midpoint.
+Midpoint (73.8%) then: compress /
+same-side / flip
+First 2h hold FAILS
+(slow 30-120 min)
+Late failure ΓÇö reduce confidence
+Stand down. Do not chase
+opposite blindly.
+Wait for full new close signal + 2h hold
+Midpoint hit af
+
+=== PAGE 84 ===
+SIZE (Upgrade from Base 80):
+  T1: 100% (full conviction ΓÇö maximum constraint deficit compression)
+  T2: 100% (upgraded from base 75%)
+CASCADE ADDS (Resolution Amplifiers ΓÇö same direction of constraint resolution only):
+  T1: Up to 2 cascade P90s (same direction, 30-90 min from initial)
+      Boundary: 168% of NEW P90 body (Stall Zone [10])
+  T2: Max 1 cascade P90 (50% partial rebalancing entry ONLY)
+      Boundary: 168% of NEW P90 body
+  T3: NO AMPLIFIERS regardless of regime
+TARGETS (Extended ΓÇö constraint deficit resolving fully):
+  TP1: -25% Asian Range ΓåÆ Close 50% | Move ALL boundaries to BE+2p
+  TP2: -50% Asian Range ΓåÆ Close 25%
+  TP3: 168% Stall Zone [10] ΓåÆ Close 20%
+  Runner: 200% Deep State [10] ΓåÆ Hold 5% (T1 only)
+HARD EXIT: 12:00 PM EST ΓÇö still applies, no exceptions
+KILL SWITCH: 132% Kill-Switch State [10] ΓåÆ Close ALL immediately
+Expected Outcome
+Value
+Notes
+Win Rate
+92-95%
+All optimal conditions aligned ΓÇö maximum confidence state
+Avg R:R
+1:3 to 1:5
+With cascade + extended fib state targets
+Weekly R
++25-35R
+When Regime Confirmed fires on Tue/Wed
+THE ONE-PAGE CHEAT SHEET
+
+
+=== PAGE 85 ===
+BASE 80 PLAY (Your FLOOR ΓÇö bet every qualifying day):
+  Asian <30p + P90 2-11AM + Close outside constraint band
+  ΓåÆ Enter on P90 close | 80% body boundary | TP1 -25% / TP2 -50% | Exit 12PM
+  ΓåÆ T1: 100% size | T2: 75% size | Win rate: 85-90%
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+T3 MAX ACCURACY (Defensive ΓÇö only when T3 prints):
+  Asian 30-45p + Close outside + HOLD 2 HOURS
+  ΓåÆ Enter pullback 32-50% | Boundary AT Asian band | Target 1x range | No cascade
+  ΓåÆ 50-75% size | Win rate: 76.7% | 81% rule: M5 close back inside = exit now
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+REGIME CONFIRMED PUSH (Your CEILING ΓÇö when all boxes check):
+  Base 80 + Ratio >=1.5x + P90 confirmed + Tue/Wed
+  ΓåÆ Full size both tiers | Add cascade (T1:2 amps / T2:1 amp) | Targets to 168-200%
+  ΓåÆ Win rate: 92-95% | Exit 12PM | Kill switch: 132% Kill-Switch State = close all
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+STAND DOWN IMMEDIATELY IF:
+  ΓÇó Asian Range > 45 pips (constraint deficit too wide)
+  ΓÇó T2/T3 already >40 pips by 9 AM (constraint deficit resolved ΓÇö overfilled)
+  ΓÇó Major news within 4 hours
+  ΓÇó Time > 12:00 PM EST (resolution window closed)
+  ΓÇó Opposite P90 fires (ignore unless 200% Deep State + 132% Kill-Switch BOTH hit)
+  ΓÇó Thursday + no second acceptance confirmation (first constraint violation = coin flip)
+BASE 80 MENTAL MODEL ΓÇö LIVE DASHBOARD
+Read the dashboard. Execute. Nothing else required.
+Tier ΓåÆ Play ΓåÆ Win Rate
+Asian Range
+Tier
+What To Do
+Win Rate
+Size
+< 20 pips
+T1 (GOLD)
+Full send ΓåÆ ENGINE 1
+88-92%
+100%
+20-30 pips
+T2 (STANDARD)
+Standard ΓåÆ ENGINE 1
+81-86%
+75%
+30-45 pips
+T3 (DEFENSIVE)
+Defensive ΓåÆ T3 MODEL 2
+76-82%
+50%
+> 45 pips
+NO-GO
+STAND DOWN
+ΓÇö
+0%
+Dashboard Read ΓåÆ Action
+Dashboard Shows
+Your Action
+T1 + Not Overfilled
+ENGINE 1 ΓÇö full size (88-92% win rate)
+T2 + Not Overfilled
+ENGINE 1 ΓÇö 75% size (81-86% win rate)
+
+
+=== PAGE 87 ===
+PART 13 DEEP DIVE MONTE CARLO ΓÇö VARIANCE ANALYSIS ENGINE
+10,000 Simulated Years | Full Geometric Reality | Triple-Engine Validation
+Sequence Risk | Drawdown Geometry | Prop Firm Survival | Ruin Probability
+EUR/USD M5 | 2022-2026 Historical Data | CEREBUS FX v18.2.50
+$10,000 Starting Balance | 1.0% Risk Per Activation | Beta Distribution Win Rate | Poisson Trade Frequency | Full Intraday Trailing
+DD Path Tracking
+SIMULATION SCOPE This simulation models the full geometric reality of the CEREBUS Cycle system ΓÇö not just
+binary win/loss outcomes. It tracks sequence risk (consecutive losing days), drawdown geometry (intraday vs
+end-of-day depth and duration), regime sensitivity (T1/T2/T3 splits, float weeks vs retest weeks), the Stall-Harvest
+edge (Overfilled Stall pattern impact on CAGR and DD), and prop firm survival rates under Trailing (6%) and
+Static (10%) drawdown limits. Win rate variance uses Beta distribution. R-multiple variance uses Normal
+distribution clipped at 0.5-5.0R. Two full simulation runs are reported: the single-engine baseline and the
+triple-engine optimized system.
+SECTION 1: SINGLE-ENGINE BASELINE RESULTS (10,000 SIMULATIONS)
+The baseline simulation runs the Base 80 system in isolation ΓÇö single activation engine, no complementary uncorrelated
+strategies. This establishes the floor for all risk comparisons.
+Performance Metrics
+Metric
+Value
+Interpretation
+Median Final Balance
+$47,850
+Most likely outcome: ~378% return on $10k starting capital
+Mean Final Balance
+$51,200
+Skewed by outlier high-streak years ΓÇö median is more reliable
+90th Percentile (Top 10%)
+$92,400
+Top 10% of simulated years yield ~824% return
+10th Percentile (Bottom 10%)
+$17,900
+Even the worst 10% of years yield ~79% return ΓÇö high floor
+Median CAGR
+378%
+Constraint deficit [11] compounding velocity
+Risk & Ruin ΓÇö Single Engine
+Account Type
+DD Limit
+Breach Probability
+Verdict
+Static (FTMO/Funding Pips)
+10% Static DD
+0.4%
+Near bulletproof at 1% risk
+Trailing (Goat/Instant)
+6% Trailing DD
+8
+
+=== PAGE 90 ===
+Max days stuck in drawdown
+42 days
+Rare extreme ΓÇö only in chaotic sustained low-regime periods
+Max drawdown (controlled)
+-4 to -6R
+With proper sizing, rarely exceeds 6% total account drawdown
+Intraday vs EOD breach risk
+Key factor
+Trailing accounts track intraday equity ΓÇö peak never resets EOD
+DRAWDOWN GEOMETRY ΓÇö KEY DISTINCTION FOR PROP ACCOUNTS:
+  Trailing equity accounts (Goat/Instant) track the INTRADAY peak.
+  The trailing limit moves with every new intraday high ΓÇö it never resets.
+  This is why the 8.9% breach probability exists at 1% risk on trailing accounts:
+  even if the account closes green, an intraday dip can breach the trailing floor.
+  The Triple-Engine system reduces this risk because:
+  ΓåÆ Multiple uncorrelated engines rarely all dip simultaneously
+  ΓåÆ The equity curve stays elevated intraday across more sessions
+  ΓåÆ The trailing floor is less likely to be violated on any given intraday move
+SECTION 5: REGIME SENSITIVITY & STALL-HARVEST VALIDATION
+Regime / Condition
+Mean Accuracy
+10th Pctile
+90th Pctile
+CAGR Impact
+CONFIRMED (ratio >= 1.50x)
+92.8%
+87.2%
+97.4%
++5% accuracy boost
+CAUTION (ratio 1.45-1.49x)
+87.4%
+81.8%
+93.2%
+Baseline
+FAILED (ratio < 1.45x)
+82.6%
+76.4%
+88.8%
+-10% ΓÇö exit at -25% only
+Float weeks (no Mon/Tue retest)
+Higher tail
+ΓÇö
+ΓÇö
+Extended runners validated
+Retest weeks
+Baseline
+ΓÇö
+ΓÇö
+Standard targets only
+STALL-HARVEST OVERFILLED PATTERN ΓÇö SIMULATION CONFIRMED:
+  Test: holding Anchor bias vs reversing on Overfilled Stall days
+  (days where >65% constraint deficit resolves by 6 AM + late opposite P90 fires)
+  Result:
+    CAGR improvement from holding bias:    +18%
+    Max Drawdown reduction:                -1.2%
+  Conclusion: Ignoring the late opposite P90 and maintaining the Anchor direction
+  of constraint resolution [3] on these days is a confirmed alpha generator.
+  The simulation validates the operational rule to not reverse on Overfilled Stall days.
+SECTION 6: TIER PERFORMANCE SPLIT
+Tier
+Win Rate
+Avg R
+Expansion
+Signal Freq
+System Con
+
+=== PAGE 91 ===
+T3 (30-45p)
+76-82%
++1.82R
+2.18x
+25%
+Defensive contribution ΓÇö reduced size
+Weighted
+85-90%
++2.15R
+2.68x
+100%
+Full system ΓÇö Base 80 filters applied
+SECTION 7: COMPLETE RISK PROTOCOL ΓÇö DERIVED FROM SIMULATION
+PROP FIRM RISK PROTOCOL (Simulation-Derived):
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  TRAILING EQUITY ACCOUNTS (6% DD limit ΓÇö Goat / Instant):
+    Phase 1 (start):         0.75% risk per activation
+    Ruin rate at 0.75%:      ~1.4% ΓÇö acceptable for high-growth prop deployment
+    Trigger to scale up:     4% profit buffer established
+    Phase 2 (after buffer):  Scale to 1.0% risk
+    Triple-engine mode:      0.75-1.0% both viable ΓÇö <1.5% ruin across both
+  STATIC BALANCE ACCOUNTS (10% DD limit ΓÇö FTMO / Funding Pips):
+    Risk level:              Full 1.0% immediately ΓÇö 0.4% ruin rate
+    Aggressive mode:         1.25% if targeting faster compounding
+    Triple-engine mode:      <0.05% ruin ΓÇö primary growth engines of the portfolio
+  SEQUENCE RISK PROTOCOL:
+    Days 1-4 consecutive loss: Execute normally ΓÇö quarterly noise
+    Days 5-6 consecutive loss: Check three filters (T4 creep / news / regime)
+    Days 7+ consecutive loss:  Reduce to 0.75% temporarily
+    Return to full risk:        After 2 consecutive winning days
+  KILL SWITCH STATE [10] PROTOCOL:
+    Annual probability: 1.2%
+    Trigger:            132% constraint violation ΓÇö structural invalidation
+    Action:             Close ALL positions immediately
+    Stand down:         Full trading day after trigger
+    Resume:             Next session at normal risk level
+STALL-HARVEST RULE (simulation confirmed):
+    +18% CAGR from holding Anchor bias on Overfilled Stall days
+    -1.2% Max DD reduction
+    Never reverse on late opposite P90 during Overfilled Stall conditions
+SUMMARY (lock these numbers in):
+  Single-engine trailing ruin:    8.9%    ΓåÆ reduce to 0.75% risk = 1.4%
+  Triple-engine trailing ruin:    <1.5%   ΓåÆ 0.75-1.0% both viable
+  Static account ruin (any mode): <0.4%   ΓåÆ 
+
+=== PAGE 100 ===
+SECTION 7: THE POST-12PM REALITY ΓÇö WHY THE ENGINE SHUTS DOWN
+Tier
+Avg Cycles by 12PM
+Avg Cycles After 12PM
+Additional Pips After 12PM
+Verdict
+T1
+1.02
+0.01
++0.3 pips
+Resolved hours earlier ΓÇö dead after noon
+T2
+1.28
+0.04
++0.6 pips
+Dead ΓÇö no real cycle after 12PM
+T3
+1.94
+0.12
++0.8 pips
+Dead ΓÇö the 0.12 extra cycle is
+noise/reversion, not a new impulse
+THE 12PM HARD EXIT ΓÇö STRUCTURAL EXPLANATION:
+  The constraint resolution engine operates on institutional volume.
+  The London/NY overlap (approximately 8AM-12PM EST) provides the activation
+  energy required for each cycle's impulse phase.
+  By 12PM EST, that volume dries up. Without the volume to form a valid Impulse (A),
+  the loop mechanism cannot restart. Any cycle attempting to start after 12PM has
+  less than 15% success rate and typically results in a fade or reversal into close.
+  This is why the 12PM Hard Exit is not an arbitrary rule ΓÇö it is the
+  natural shutdown of the loop engine. By 12PM, 98.9% of the daily
+  constraint deficit [11] has been resolved. The remaining 1.1% is noise.
+  Post-12PM activity breakdown by tier:
+    T1: Avg 0.01 cycles ΓÇö effectively zero additional constraint resolution
+    T2: Avg 0.04 cycles ΓÇö trace activity, no tradeable impulse
+    T3: Avg 0.12 cycles ΓÇö occasional small move but insufficient for a real entry
+SECTION 8: TIER-SPECIFIC LOOP PROTOCOLS
+T1 Protocol ΓÇö The One-Shot
+T1 (<20p Asian Range) ΓÇö THE SNIPER PROTOCOL:
+  Expectation: 1 clean constraint resolution cycle (84.2% of T1 days)
+  Action: Enter on the first valid partial rebalancing (32-50%)
+  If it stalls: Do NOT wait for a 2nd cycle unless price holds structure for
+                >45 min with intact constraint band. If it fails, stand down.
+  Target: Expect resolution before 9-10 AM
+  Cycle 2 indicator: A shallower pullback forming 30-60 min after the first
+                     continuation leg ΓÇö enter with the Cascade protocol
+  Post-12PM: ZERO activity expected
+T2 Protocol ΓÇö The Double-Tap
+
+
+=== PAGE 101 ===
+T2 (20-30p Asian Range) ΓÇö THE WORKHORSE PROTOCOL:
+  Expectation: 1 cycle (69%) or 2 cycles (26%)
+  Cycle 1 action: Enter first valid 32-50% partial rebalancing
+  If Cycle 1 stalls short of target: WATCH for Cycle 2
+  Cycle 2 signal: A SHALLOWER pullback (avg 34% vs 47% in Cycle 1) forming
+                  between 9AM-11AM after the first continuation
+  Cycle 2 entry: This is the cascade activation ΓÇö partial rebalancing is
+                 already confirming shallower depth means prior liquidity cleared
+  Target: Expect resolution by 11AM
+  Post-12PM: ZERO activity
+T3 Protocol ΓÇö The Stacker (Model 2 + Loop Logic)
+T3 (30-45p Asian Range) ΓÇö THE GRINDER PROTOCOL:
+  Expectation: 2-3 cycles is the NORM (41.8% two cycles, 19.5% three cycles)
+  Cycle 1: Often partial or volatile. Apply Model 2 ΓÇö wait for the 2-hour hold.
+           Cycle 1 in T3 clears the initial available resolution pathways [4].
+  Cycle 2: The primary trade. Enter on the 32-50% partial rebalancing [6]
+           (typically shallower than Cycle 1 due to liquidity cleared)
+  Cycle 3: If target still not reached by 11AM, look for the final loop.
+           Cycle 3 duration avg ~30 min ΓÇö faster and shallower than Cycle 2.
+  NO CASCADE ADDS IN T3 ΓÇö Anchor only. Noise is too high for amplifiers.
+  Target: Hit by 12PM sharp
+  Post-12PM: ZERO activity ΓÇö the engine is out of gas
+  T3 CYCLE TIMING (data-validated):
+    Cycle 1 avg duration: ~65 minutes
+    Cycle 2 avg duration: ~45 minutes (faster)
+    Cycle 3 avg duration: ~30 minutes (fastest ΓÇö final push to target)
+SECTION 9: LOOP-TRIGGERED CASCADE PROTOCOL ΓÇö V4.1
+The Recursive Loop Engine integrates directly with the P90 Cascade protocol from Part 2. Rather than adding at a fixed time offset,
+cascades are deployed when the loop's Partial Rebalancing phase (B) completes ΓÇö a structural trigger replacing the time-based
++45 minute add.
+Loop-Triggered Cascade: Instead of 'add at +45 minutes,' the rule becomes 'add when Loop N Partial Rebalancing completes.' This
+r
+
+=== PAGE 102 ===
+PHASE 1: ANCHOR ACTIVATION (Loop 1)
+  Trigger:    Standard P90 candle close outside Asian constraint band [5]
+              (2 AM ΓÇô 11 AM EST, within applicable Tier threshold)
+  Action:     Enter 40% size (Base 80 Play)
+  Boundary:   80% of P90 body ΓÇö structural constraint invalidation [8]
+  Targets:    TP1 (-25% Asian Range) / TP2 (-50% Asian Range)
+  State:      Wait for Loop 1 continuation to stall and form Loop 2 rebalancing
+Phase 2 ΓÇö First Loop-Triggered Cascade (Loop 2 Entry)
+PHASE 2: FIRST CASCADE ΓÇö LOOP 2 PARTIAL REBALANCING TRIGGER
+  Wait for:   Loop 1 continuation (C1) to extend, then pull back (B2)
+  Filter 1:   Did price pull back to 32-50% of the previous impulse leg?
+  Filter 2:   No M5 candle closed past 80% of that leg? (no invalidation [8])
+  Time check: Is it within 30-90 minutes of the previous continuation peak?
+              (validated optimal window from Part 2 Cascade data)
+  Trigger:    A new P90-style candle (Micro-P90) forms inside the rebalancing
+              zone and breaks out in the SAME direction of constraint resolution [3]
+              Note: Does not require a full Asian band break ΓÇö local consolidation
+              high/low breakout qualifies
+  Action:     Enter 20-30% size (Cascade Add)
+  Boundary:   168% of the new Micro-P90 body (Stall Zone [10])
+  Logic:      Entering when the field has reset its resolution energy for the
+              next constraint deficit cycle ΓÇö maximum R-multiple, minimum boundary risk
+Phase 3 ΓÇö Second Loop-Triggered Cascade (Loop 3, T1/T2 Only)
+PHASE 3: SECOND CASCADE ΓÇö LOOP 3 (T1/T2 ONLY + REGIME CONFIRMED)
+  Context:    Only if Tier is T1 or T2 AND Regime CONFIRMED (>1.5x ratio)
+  Wait for:   Loop 2 continuation, then the partial rebalancing (B3)
+  Expectation: Shallower than B2 (avg 32-38%) ΓÇö liquidity cleared by prior cycles
+  Trigger:    Another Micro-P90 breakout in same direction [3]
+  Action:     Enter 10% size (Final Resolution Amplifier)
+  Boundary:   168% of new Micro-P90 body
+  Stop:      
+
+=== PAGE 103 ===
+PHASE 4: EXIT PROTOCOL (unchanged from base system)
+  Time Exit:    12:00 PM EST ΓÇö Close ALL (resolution engine shuts down)
+  Target Exit:  Hit Daily Target (Tier Factor ├ù Asian Range)
+  Kill Switch:  132% Kill-Switch State [10] ΓåÆ Close ALL immediately
+SECTION 10: THE STALL-HARVEST LOOP CASCADE ΓÇö COMBINED PATTERN
+The intersection of the Stall-Harvest system (Part 4) and the Recursive Loop Engine creates the highest-conviction intraday pattern
+in the CEREBUS system. When Loop 1 hits the 168% Stall Zone [10] early, pulls back deeply, then reforms a Micro-P90 at the 50%
+level, Loop 2 is launching toward the 200% Deep State [10].
+STALL-HARVEST LOOP CASCADE ΓÇö STRUCTURAL SEQUENCE:
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  Step 1: Loop 1 runs hard and hits the 168% Stall Zone [10] early (by 6-7 AM)
+  Step 2: Instead of full reversal, price enters a Deep Partial Rebalancing [6]
+          pulling back to 50-61% of the impulse leg
+  Step 3: The trap ΓÇö most traders read this as a reversal and stand down
+  Step 4: A Micro-P90 forms AT the 50% rebalancing level and breaks out
+          in the SAME direction of constraint resolution [3] as Loop 1
+  Step 5: This Micro-P90 IS the cascade entry ΓÇö Loop 2 launching toward
+          the 200% Deep State [10]
+  MECHANICS:
+    Loop 1 harvested available resolution pathways [4] at the 168% Stall Zone
+    The deep partial rebalancing cleared the remaining liquidity pool
+    Loop 2 now has clean resolution pathways ΓÇö unencumbered extension
+  WIN RATE VALIDATION:
+    Manual Part 4 (Stall-Harvest) + Loop Data combined:
+    Estimated 91-94% win rate on confirmed Stall-Harvest Loop Cascade setups
+  TARGET:
+    Loop 2 from this configuration targets the 200% Deep State [10]
+    Average continuation from 50% rebalancing level: 25-35 pips
+SECTION 11: LIVE EXECUTION CHECKLIST ΓÇö LOOP PROTOCOL
+
+
+=== PAGE 109 ===
+THE RECURSIVE SHIFT ENGINE ΓÇö COMPLETE FORMULA:
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  STEP 1: Impulse (I) forms and exceeds Tier threshold
+          T1: 10-12p | T2: 14-16p | T3: 18-20p
+  STEP 2: Does price close ΓëÑ80% back into I without reclaiming within 5 bars?
+    NO  ΓåÆ Continuation likely. Maintain position.
+    YES ΓåÆ Shift triggered.
+  STEP 3: Shift executes in opposite direction
+          Target = 1.44x ├ù Impulse size (range: 1.20xΓÇô1.68x)
+  STEP 4: Recursion check
+    If shift completes the daily distribution target [11] ΓåÆ STOP (Monolith path)
+    If shift does NOT reach target ΓåÆ the shift itself becomes the new Impulse
+                                     base for the next cycle
+                                     Repeat from Step 1 (Staircase path)
+SHIFT FREQUENCY BY PATH TYPE:
+  Staircase path: avg 2.8 shifts per day | ~65% of total range built by shifts
+  Monolith path:  avg 0.6 shifts per day | ~15% of range from shifts
+WHY TIERS EXIST (constraint logic):
+  T1: Requires 3-4 iterations of the loop (I ΓåÆ Shift ΓåÆ I ΓåÆ Shift) to reach target
+  T2: 1-2 iterations
+  T3: The first I is large enough that 1.44├ùI (or direct continuation) hits target
+      The loop is rarely needed ΓÇö one burst resolves the deficit
+Trading the Shift ΓÇö Operational Rules
+SHIFT TRADE EXECUTION PROTOCOL:
+  1. Identify failed impulse: move > Tier threshold that closes back >80%
+  2. Confirm stall: price does NOT reclaim the high/low within 5 bars (25 min)
+  3. Enter in the opposite direction of constraint resolution [3]
+  4. Target: 1.44x the size of the failed impulse (TP)
+     Example: Failed bull impulse = 12 pips ΓåÆ Bear shift target = 12 ├ù 1.44 = 17.3 pips
+  5. Stop: Above the failed impulse high (or below low for bull shift)
+CONTEXT FILTERS:
+  2+ shifts already visible today ΓåÆ expect T1/Staircase behavior
+                                   ΓåÆ keep trading the loops
+  0 shifts + large single impulse ΓåÆ expect T3/Monolith behavior
+                               
+
+=== PAGE 111 ===
+Entry
+Market on C_opp close (LONG)
+1.0836
+SL (combined extreme)
+MIN(1.0825, 1.0824)
+1.0824 ΓÇö 12p risk
+Target (1.44├ù 25p)
+25 ├ù 1.44 = 36p shift
+1.0836 + 36 = 1.0872
+R:R
+36p reward / 12p risk
+3.0R
+Why the Two-Candle Extreme Is a Structural Pivot
+STRUCTURAL PIVOT LOGIC:
+  The combined extreme of C_trigger + C_opp marks the boundary where
+  the impulse direction of constraint resolution [3] and the shift
+  direction of constraint resolution meet.
+  If price breaks this level, it confirms that:
+    a) The original impulse momentum is still active
+    b) C_opp was a temporary partial rebalancing [6], not a shift initiation
+    c) The constraint deficit [11] is still resolving in the original direction
+  The two-candle structure absorbs the natural M5 volatility (wicks above/below)
+  while defining the exact point where the shift thesis is invalidated.
+  This is more precise than an arbitrary pip buffer because it uses the
+  market's own structure ΓÇö the actual printed extremes ΓÇö as the boundary.
+  STALL CONFIRMATION (5-bar rule):
+  For added conviction, confirm the shift by checking that price does NOT
+  reclaim the impulse extreme within 5 bars (25 minutes) of C_opp close.
+  This eliminates fast false signals where the "opposite" candle was a wick,
+  not a genuine shift.
+Trigger-Oppose Protocol ΓÇö Execution Checklist
+
+
+=== PAGE 112 ===
+TRIGGER-OPPOSE EXTREME SL ΓÇö LIVE EXECUTION CHECKLIST:
+  I IMPULSE DETECTED:
+     Price has moved > Tier threshold from 3AM base (or previous cycle end)
+     T1: ΓëÑ10p | T2: ΓëÑ14p | T3: ΓëÑ18p
+  I TRIGGER CANDLE IDENTIFIED:
+     The last strong directional M5 candle completing or extending the impulse
+     Note its extreme: High (bull trigger) or Low (bear trigger)
+  I OPPOSITE CANDLE PRINTS:
+     Next M5 candle closes in the OPPOSITE direction to the impulse
+     Entry fires on the CLOSE of this candle ΓÇö no waiting required
+  I SL CALCULATED:
+     SHORT shift: SL = MAX(C_trigger high, C_opp high) + 0.5p buffer
+     LONG shift:  SL = MIN(C_trigger low, C_opp low) - 0.5p buffer
+     Check risk: If SL > 15p from entry ΓåÆ skip (setup too wide)
+  I TARGET CALCULATED:
+     Target = Entry ┬▒ (Impulse Size ├ù 1.44)
+     Secondary: 1.20x minimum | 1.68x maximum (regime flip territory above this)
+  I STALL CONFIRMATION (OPTIONAL, HIGHER CONVICTION):
+     Does price fail to reclaim the impulse extreme within 5 bars (25 min)?
+     YES ΓåÆ Shift confirmed, hold the entry
+     NO  ΓåÆ Caution ΓÇö impulse may be resuming
+  I CONTEXT CHECK:
+     Multiple shifts already today ΓåÆ T1/Staircase ΓÇö continue trading loops
+     No shifts + large impulse     ΓåÆ T3/Monolith ΓÇö do NOT fade, ride continuation
+SECTION 4: NESTED RESOLUTION SYNTHESIS ΓÇö THE COMPLETE FRACTAL
+MAP
+All three components of Part 15 confirm the same underlying principle: the constraint resolution engine [11] operates recursively
+across all timeframes. The same Impulse ΓåÆ Partial Rebalancing ΓåÆ Continuation law governs the 5-minute candle, the daily
+session, the trading week, and the calendar month.
+
+
+=== PAGE 115 ===
+CEREBUS ATOMIC & MACRO LOGIC FRAMEWORK Context Transfer Document
+ΓÇö Session Alignment Reference
+This document synthesizes the full CEREBUS system into six operating principles. Read before each session.
+The entire manual reduces to: recognize the state, align with the field's resolution, harvest the first 60% of the
+cycle, stand down at completion.
+I. CORE OPERATING PRINCIPLES
+#
+Principle
+Operational Meaning
+1
+Constraint-System Logic
+Market = field [1] resolving constraint deficits [11]. Price = resolution output [2]. No prediction ΓÇö only state
+recognition.
+2
+Markov Property
+Current state embeds all past information. Lagging indicators add noise, not edge. The field's current
+structure contains everything needed.
+3
+Front-Loaded Distribution
+~60% of any cycle's time window resolves ~99% of the constraint deficit. The second half is
+rebalancing/compression noise. Trade early.
+4
+Structural Invalidation
+M5 candle close beyond defined constraint boundary [8] = edge dead. Wicks ignored. Closes only. No
+negotiation.
+5
+Regime Dependency
+Edge scales with expansion state (Current Range / Base Range). Filters false violations [5]. Adjusts targets
+and position size.
+6
+Recursive Loop Engine
+Impulse ΓåÆ Partial Rebalancing [6] (32-50%) ΓåÆ Continuation ΓåÆ Reset. Same physics on M5, Daily,
+Weekly, Monthly.
+II. TIME-TO-COMPLETION ΓÇö DISTRIBUTION PHYSICS
+Timeframe
+Constraint Base
+Resolution Point
+% Cycle Elapsed
+Post-Resolution Status
+M5 Shift
+2-candle pair
+~25 min post-trigger
+~60%
+Less than 15% continuation. Dead engine.
+Daily
+Asian Range (7PM-3AM)
+12:00 PM EST
+50%
+98.9% complete. Post-noon =
+micro-rebalancing.
+Weekly
+Mon Asian Range
+Day 4.5 / 58h
+58%
+Extreme prints. Thu PM / Fri = compression.
+Monthly
+Week 1 Range (Days 1-5)
+Trading Day 13
+62%
+80% of extremes print Days 11-15. Days
+16-21 = noise.
+DISTRIBUTION LAW:
+  Constraint resolution is non-linear. Violent early expansion ΓåÆ partial rebalancing
+  pause (32-50%) ΓåÆ final push ΓåÆ stall. The field resolves quickly, then spends
+  remaining
+
+=== PAGE 117 ===
+Runner Target
+1.44x shift (daily) | 2.0x-2.68x (monthly) ΓÇö never hold past completion window
+Time Filters
+12PM hard exit (daily) | Day 15 hard exit (monthly) ΓÇö no new activations post-window
+Regime Check
+9 AM (daily) or Day 10 (monthly) ΓÇö adjust size and targets based on expansion ratio
+Mental Model
+Front-load exposure. Harvest first 60%. Stand down on completion. Trade structure, not hope.
+THE SINGLE OPERATING STATEMENT:
+  "Pattern doesn't exist. It persists."
+  This framework is deterministic within bounds ΓÇö driven by structural
+  completion probability, regime state, and fractal constraint physics.
+  Use it to align with the field's resolution rhythm, not to predict it.
+Cerebus Cycle ΓÇö Final Form | Atomic and Macro Logic Context | April 2026 | PROPRIETARY & CONFIDENTIAL
+
+
+=== PAGE 122 ===
+T2
+~2.2 hours
+4.4 hours
+~4.1 hours
+6.2 hours
+ONE-LINE TIMING RULE:
+  If price has not hit -25% by 2├ù the tier's median time ΓåÆ edge thinning.
+  If price has not hit -50% by 1.5├ù the tier's median time ΓåÆ use EWS as exit.
+  T1: -25% not hit by 3.0h ΓåÆ edge thinning | -50% not hit by 4.2h ΓåÆ EWS exit
+  T2: -25% not hit by 4.4h ΓåÆ edge thinning | -50% not hit by 6.2h ΓåÆ EWS exit
+  Slow -25% delivery (after 4.0h from activation for either tier):
+    Take full profit at -25%. Do not chase -50%.
+    The field's partial rebalancing phase is elongating ΓÇö hold probability drops.
+EWS ΓÇö Momentum Exhaustion Signal at Targets
+An opposite P90 candle at or near a target level is not a reversal signal. It is a momentum exhaustion signal ΓÇö the field harvesting
+available resolution pathways [4] before a partial rebalancing [6]. When it prints at a target, it signals the constraint resolution
+momentum [3] is spent at that level. Exit rather than hold.
+Scenario
+EWS Trigger
+Action
+Price hits -25% + opposite P90 prints
+Body ΓëÑ4.6p, closes against bias
+Close remaining 50% immediately ΓÇö do not hold for
+-50%
+Price hits -50% + opposite P90 prints
+Body ΓëÑ4.6p, closes against bias
+Close 100% ΓÇö constraint deficit likely resolved
+Price stalls at -40% + opposite P90 prints
+Body ΓëÑ4.6p, closes against bias
+Trail boundary to BE+2p, exit on next M5 close against
+bias
+EWS RULE CLARIFICATION:
+  EWS (Early Warning Signal) at targets Γëá reversal.
+  It is the field harvesting available resolution pathways [4] at a stall zone [10].
+  This aligns with Part 10 operational rule:
+    An opposite P90 is noise UNLESS both:
+    (a) 200% Deep State [10] has been reached, AND
+    (b) 132% Kill-Switch State [10] has triggered.
+  If neither of those conditions is true, the opposite P90 at a target level
+  is a momentum exhaustion signal ΓÇö a valid exit, not a reversal trade.
+  Integration with the 81.2% rule (Part 11):
+    If price closes back inside the Asian constraint band after hitting -25%,
+    exit immediately ΓÇö 81.2% of
+
+=== PAGE 123 ===
+T2
+< 3.0h
+< 5.5h
+> 6.5h
+Standard ΓåÆ trail boundary after -25%. EWS at -50%. Slow (>6h) ΓåÆ EWS as
+early exit.
+Both
+ΓÇö
+ΓÇö
+After 10 AM
+Edge decayed ΓåÆ stand down, no new activations
+FAST DELIVERY ΓÇö THE UNICORN SETUP:
+  T1 day, -25% hit before 2.0 hours from activation:
+    This is the highest-conviction daily delivery pattern.
+    Hold to -50% with confidence.
+    If Regime = CONFIRMED, consider a small runner to the 168% Stall Zone [10].
+    The constraint deficit [11] is resolving violently ΓÇö the full loop is live.
+STANDARD T2 DELIVERY (3-5h to -50%):
+  This is the bread and butter. Take profits at -50%. No runners needed.
+  The constraint deficit is resolving at its natural pace.
+SLOW DELIVERY (T2 > 6h, T1 > 4h):
+  The field is in extended partial rebalancing [6].
+  Do not wait for the clock. Use the EWS as the exit trigger.
+  Stand down after 10 AM ΓÇö no new activations regardless of tier.
+Setup 2 ΓÇö Execution Framework
+
+
+=== PAGE 124 ===
+SETUP 2 ΓÇö TEMPORAL DELIVERY + EWS EXIT: LIVE FRAMEWORK
+  AT ACTIVATION (first M5 close outside Asian band):
+    Note the time ΓåÆ Start the tier delivery clock
+    T1: expect -25% by 1.5h, -50% by 2.8h
+    T2: expect -25% by 2.2h, -50% by 4.1h
+  WHEN -25% IS HIT:
+    Fast delivery (within tier median):  Hold standard. Monitor for EWS.
+    Slow delivery (>2├ù tier median):     Close full position at -25%. Done.
+    EWS prints at -25% (opposite P90 ΓëÑ4.6p close): Close remaining 50% immediately.
+  BETWEEN -25% AND -50%:
+    This is the partial rebalancing zone [6] ΓÇö where variance lives.
+    If time elapsed > 1.5├ù tier median and price still short of -50%:
+      ΓåÆ Trail boundary to BE+2p | Use EWS as the exit trigger
+    If any M5 candle CLOSES back inside Asian constraint band:
+      ΓåÆ Exit immediately (81.2% rule ΓÇö field reversing constraint resolution [5])
+  WHEN -50% IS HIT:
+    Standard close: take full profits at -50%
+    EWS prints at -50% (opposite P90 ΓëÑ4.6p): Close 100% ΓÇö constraint deficit resolved
+    Unicorn (T1, fast delivery, Regime CONFIRMED): small runner to 168% Stall Zone [10]
+  TIMING KILL SWITCHES:
+    T1 ΓÇö -50% not hit by 4.2h from activation ΓåÆ use EWS as exit signal
+    T2 ΓÇö -50% not hit by 6.2h from activation ΓåÆ use EWS as exit signal
+    10:00 AM EST ΓÇö if -25% not yet hit ΓåÆ stand down, no new activations
+    12:00 PM EST ΓÇö hard exit, all positions closed regardless of target status
+Cerebus Cycle ΓÇö Final Form | Daily Setups & Ideas | April 2026 | PROPRIETARY & CONFIDENTIAL
+EUR/USD M5 | T1/T2 Only | Setup 2 of ongoing series
+II For educational purposes only ΓÇö test all strategies in simulation before live deployment.
+
+
+=== PAGE 127 ===
+Core Results
+Metric
+Value
+Interpretation
+Days with Cascade EWS (45-60 min)
+142
+15.5% of qualifying days ΓÇö rare but meaningful
+Reversal entry win rate
+64.8%
+Above random but below the 85%+ CEREBUS standard
+Trim/exit effectiveness on Anchor
+78.4%
+When used to exit Anchor position, avoided 78.4% of subsequent
+drawdown
+Avg R-Multiple (reversal entry)
++1.18R
+Positive but below Base 80 (+1.42R) ΓÇö not a primary strategy
+Regime FAILED + Cascade EWS win rate
+77.1%
+Regime filter is critical ΓÇö jumps 12.3% when regime is compressing
+Cascade EWS Timing Breakdown
+Time After Initial P90
+Signals
+Reversal WR
+Trim Effectiveness
+Verdict
+15-30 min
+89
+58.4%
+68.2%
+Too early ΓÇö noise, not a momentum shift
+30-45 min
+124
+62.1%
+73.5%
+Improving ΓÇö marginal for entry
+45-60 min (OPTIMAL)
+142
+64.8%
+78.4%
+Sweet spot ΓÇö best trim signal window
+60-90 min
+98
+59.3%
+71.2%
+Late ΓÇö edge decays
+90+ min
+67
+54.2%
+65.8%
+Resolution window closing ΓÇö ignore
+THE CORE FINDING:
+  The Cascade EWS is NOT a reversal entry signal at 64.8% win rate.
+  The CEREBUS standard requires 85%+. A 64.8% standalone entry is marginal.
+  The Cascade EWS IS a high-value trim and exit tool at 78.4% effectiveness.
+  When an opposite P90 fires at 45-60 min, the primary use is:
+    ΓåÆ Exit 50% of the Anchor position
+    ΓåÆ Move constraint boundary [8] to Breakeven+2p on the remainder
+    ΓåÆ Hold the residual only if Regime = CONFIRMED
+  The 15.5% frequency means this tool fires about once every 6.5 trading days.
+  It does not appear daily ΓÇö when it does appear, it deserves attention.
+Three Cascade EWS Patterns
+Pattern
+Frequency
+What Happens
+Action
+False Cascade
+32.4%
+Opposite P90 fires ΓåÆ price reverses 5-8p briefly
+ΓåÆ resumes original direction of constraint
+resolution [3]
+TRIM only. Do not reverse. Field [1]
+harvesting available resolution pathways [4].
+Regime Flip Confirmation
+18.3%
+Opposite P90 ΓåÆ price reverses AND holds 2+
+hours ΓåÆ new direction of constraint resolution
+confirmed
+VALID reversal entry ΓÇö but ONLY after 2h
+hold confirms. Requ
+
+=== PAGE 128 ===
+WHY THE SYNERGY GAP HOLDS HERE (Part 10):
+  Aligned cascade P90s (same direction): 87.8% win rate
+  Opposite cascade P90s (Cascade EWS):   64.8% win rate
+  The 23% gap exists because the field [1] has a strong preference
+  to continue the initial direction of constraint resolution [3].
+  An opposite cascade is almost always a partial rebalancing pause [6],
+  not a full regime flip. Only 18.3% of Cascade EWS events represent
+  a genuine direction of constraint resolution reversal.
+  Regime filter explains the 12.3% win rate jump:
+  When Regime = CONFIRMED, the field is actively expanding ΓÇö opposite
+  cascades are near-certain noise (58.4% WR).
+  When Regime = FAILED, the field is compressing ΓÇö opposite cascades
+  have genuine reversal potential (77.1% WR).
+Conditional Reversal Entry ΓÇö Full Requirements
+CASCADE EWS REVERSAL ENTRY ΓÇö ONLY VALID WHEN ALL FOUR CONDITIONS MET:
+  1. Regime = FAILED at 9 AM (ratio <1.45x)
+  2. Cascade EWS fires in 45-60 min window (opposite P90 ΓëÑ threshold)
+  3. Resolution output [2] CLOSES beyond 200% Deep State [10] of initial P90
+  4. Price HOLDS outside original constraint band for 2 hours (Model 2 confirmation)
+  When all four conditions are met: win rate = 77.1%
+  If any condition is missing: reversal entry drops below 65% ΓÇö not a CEREBUS trade
+  This is the Model 2 two-hour hold protocol from Part 12 applied to intraday
+  cascade context. The 2-hour hold is not optional ΓÇö it is the confirmation
+  that the direction of constraint resolution [3] has genuinely shifted.
+Setup 4 ΓÇö Execution Framework
+
+
+=== PAGE 129 ===
+SETUP 4 ΓÇö CASCADE EWS @ 45-MIN WINDOW: EXECUTION FRAMEWORK
+  IDENTIFICATION:
+    Opposite-direction P90 candle, body ΓëÑ session threshold
+    Fires 45-60 minutes after initial activation signal [9]
+    Frequency: ~15.5% of qualifying days
+  PRIMARY USE ΓÇö TRIM/EXIT EXISTING ANCHOR (78.4% effectiveness):
+    Cascade EWS fires ΓåÆ
+      Exit 50% of Anchor position immediately
+      Move constraint boundary [8] to Breakeven+2p on remainder
+      Hold residual ONLY if Regime = CONFIRMED AND original direction still active
+  CONDITIONAL REVERSAL ENTRY (77.1% WR when all conditions met):
+    ONLY enter opposite direction if ALL four conditions are true:
+      (a) Regime = FAILED at 9 AM (ratio <1.45x)
+      (b) Cascade EWS in 45-60 min window
+      (c) Resolution output closes beyond 200% Deep State [10]
+      (d) Price holds outside original band for 2 hours
+    Target: -25% / -50% in the new direction of constraint resolution
+    Size: Standard per tier (T1/T2 only ΓÇö T3 excluded from cascade entries)
+  REGIME DECISION TREE:
+    Regime CONFIRMED: Cascade EWS = noise ΓåÆ trim Anchor only, do not reverse
+    Regime CAUTION:   Cascade EWS = trim signal, small runner held tight
+    Regime FAILED:    Cascade EWS = potential flip ΓåÆ evaluate all four conditions
+  STAND DOWN:
+    Outside 45-60 min window: edge decays ΓÇö ignore
+    Asian Range >30p (T3): too much constraint noise for cascade signals
+    4th+ cascade already fired: resolution momentum exhausted per Part 2
+  THREE-PATTERN QUICK REFERENCE:
+    False Cascade (32.4%):     Trim only. Price resumes original direction.
+    Exhaustion Cascade (49.3%): Trim 50-75%. Small runner with tight boundary.
+    Regime Flip (18.3%):       Conditional reversal after 2h hold confirmation.
+Cerebus Cycle ΓÇö Final Form | Daily Setups & Ideas | April 2026 | PROPRIETARY & CONFIDENTIAL
+EUR/USD M5 | Jan 2022 ΓÇô Apr 2026 | Setup 3: 216 T3 Days | Setup 4: 917 Days / 142 Cascade EWS Events | Setups 3-4 of ongoing series
+II For educational purposes only 
+
+=== PAGE 130 ===
+SETUP 5 ΓÇö 5-DAY ANCHOR MACRO SETUP ΓÇö MONTHLY CONSTRAINT RESOLUTION
+The macro setup uses the first five trading days of each month as the structural constraint anchor ΓÇö the monthly equivalent of the
+Asian Range. A daily close outside the 5-day High/Low combined with a 2-hour M5 hold produces an 81-84% win rate to the 2.0x
+(200%) extension target by Trading Day 15. Validated across EUR/USD daily data 2022-2026.
+THE 2-HOUR HOLD FILTER The same Model 2 confirmation protocol from intraday T3 (Part 12) applies here at
+macro scale. An M5 close outside the 5-day band is not sufficient alone ΓÇö price must HOLD outside for a full two
+hours before the activation is considered valid. This removes approximately 35% of false breakouts and lifts
+signal validity from ~50% to 65-78%. The 81.2% close-back-inside rule also applies: if an M5 candle closes back
+inside the 5-day band at any point, exit immediately.
+Core Setup Specifications ΓÇö Validated
+Component
+Specification
+Validation
+Anchor
+First 5 Trading Days range (High to Low)
+83.7% hit rate for 2.0x by Day 15
+Activation signal
+M5 CLOSE outside 5-day band + 2-hour hold
+Model 2 filter lifts validity to 65-78%
+Target
+2.0x (200% extension) of the 5-day range
+Deep State stall zone ΓÇö avg ┬▒1.5p precision, 63.8% tight hit rate
+Win rate
+81-84%
+Consistent across T1/T2; drops in T3
+Time to target
+Days 10-14 (median Day 11.4)
+80% of monthly extremes print by Day 15
+Hard exit
+Trading Day 15
+Monthly constraint resolution window closes
+Invalidation
+M5 close back inside the 5-day band
+81.2% rule: close inside = structural failure, exit now
+Tier Classification ΓÇö 5-Day Range
+The tier thresholds scale up from the intraday Asian Range because a 5-day range accumulates approximately 1.8x more volatility
+than a single session. Keeping intraday thresholds would label nearly every month as NO-GO.
+Tier
+5-Day Range
+Expansion Multiplier
+Target (Approx.)
+Win Rate
+Position Size
+M-T1
+less than 60p
+2.8x to 3.2x
+~170-190 pips
+~86%
+Full ΓÇö aggressive
+M-T2
+60-90p
+2
+
+=== PAGE 131 ===
+TIER LOGIC ΓÇö WHY THE THRESHOLDS SCALE:
+  M-T1 (less than 60p): Compressed first week = coiled spring = violent expansion.
+    Fast resolution, often hits target by Day 9-10. Highest win rate (86%).
+  M-T2 (60-90p): Institutional flow baseline. Most consistent edge.
+    Median hit Day 11-12. The core bread-and-butter macro tier.
+  M-T3 (90-125p): Wide 5-day range = deficit partially resolved already.
+    Slower grind, more false breaks. Use 1.6x target (not 2.0x).
+    Win rate 75% ΓÇö trade it smaller and take profits earlier.
+  NO-GO (over 125p): Monthly constraint deficit largely priced in.
+    Edge collapses. Skip the month entirely.
+Target Adjustment by Tier
+Tier
+Primary Target
+Why
+Exit Protocol
+M-T1
+2.0x range
+Full constraint deficit resolution
+Close 70% at 2.0x | trail 30% to 2.61x if CONFIRMED
+regime
+M-T2
+2.0x range
+Core resolution completion
+Close 70% at 2.0x | trail 30% to 2.61x if CONFIRMED
+regime
+M-T3
+1.6x range
+Wider range = lower expansion momentum
+Close 100% at 1.6x ΓÇö do not push to 2.0x in T3
+All
+Day 15 hard exit
+Monthly resolution window closes
+Close all positions regardless of target status
+Why This Works
+THREE REASONS THE 5-DAY ANCHOR MACRO SETUP WORKS:
+  1. THE 5-DAY ANCHOR:
+     Captures the full weekly institutional positioning cycle.
+     One week of price action contains the complete opening range before
+     directional flows resolve the monthly constraint deficit [11].
+     A 3-day range captures incomplete positioning; 5 days captures it fully.
+  2. THE 2-HOUR HOLD FILTER:
+     The same Model 2 confirmation protocol proven in intraday T3 (Part 12)
+     operates identically at macro scale. Any breakout that fails the 2h hold
+     was a false constraint violation [5]. The filter removes 35% of fakes
+     and lifts signal validity from ~50% to 65-78%.
+  3. THE 2.0x TARGET:
+     The 2.0x (200%) extension is the Deep State stall zone [10] at macro scale.
+     This is where the monthly constraint deficit [11] fully resolves.
+     You are not chasing
+
+=== PAGE 135 ===
+SETUP 6 ΓÇö POST-FAILURE REPAIR SEQUENCE ΓÇö MIDPOINT AS DECISION ZONE, NOT
+REVERSAL
+When a Setup 5 (5-Day Anchor) activation fails ΓÇö price closes back inside the band and stops you out ΓÇö what happens next is not
+random. The failure sequence data from Part 11 (465 setups, 210 failures) maps exactly what the field [1] does after a failed
+constraint violation [5]. This setup defines how to read the repair sequence and when ΓÇö and when not ΓÇö to re-enter.
+CRITICAL: THE MIDPOINT IS NOT A REVERSAL SIGNAL 73.8% of failures hit the midpoint of the 5-day range
+first. This is a structural repair node ΓÇö the field rebalancing, not committing to a new direction. Of failures that
+form a second move, 89% recycle back to the ORIGINAL breakout side (same-side re-acceptance). Only 11%
+genuinely flip to the opposite band. Targeting the opposite band from the midpoint trades against an 89%
+probability. Midpoint = Observe. Opposite Band + 2h Hold = Execute.
+The Actual Post-Failure Sequence
+Based on Part 11 failure sequence data, cross-applied to the macro 5-day anchor. Example: bullish breakout above 5-Day High is
+stopped out.
+Ste
+p
+What Happens
+Data
+Action
+1
+Stop out at 5-Day High. Trade invalidated.
+ΓÇö
+Exit. Done. No hope, no averaging.
+2
+Price rebalances toward midpoint.
+73.8%
+Observe only. Do not enter.
+3
+Midpoint = Decision Zone. Three outcomes:
+ΓÇö
+Stand down and read the sequence.
+3a
+Price stalls at midpoint and compresses.
+Type 1
+Stand down. No trade.
+3b
+Price reclaims original breakout side.
+89% of secondary
+moves
+Same-side re-entry setup (see below).
+3c
+Price drives through to opposite band.
+11% of secondary
+moves
+Potential flip ΓÇö requires full acceptance
+confirmation.
+4
+Flip to opposite side requires new acceptance.
+81.2% rule
+M5 close below 5-Day Low + 2h hold required.
+Only then 84.6% WR.
+WHY 89% RECYCLE SAME-SIDE (NOT FLIP):
+  The midpoint absorbs the failed breakout liquidity. It is where available
+  resolution pathways [4] are harvested before the field [1] attempts
+  re-accepta
+
+=== PAGE 140 ===
+Component
+Role
+EUR/USD Size
+Function
+Tier Impulse
+Direction Setter
+>=10p T1/>=15p T2/>=19p T3
+Breaks the Asian band. Establishes direction. Harvests available
+pathways [4].
+Atomic Unit
+Cycle Completer
+10p T1 / 12p T2 / 15p T3
+Rebalances after the impulse. Confirms structural validity. Provides
+scalp target.
+Combined
+Full Resolution
+Impulse + AU = Centroid
+One complete constraint deficit resolution cycle.
+LIVE EXECUTION CYCLE:
+  [Impulse >= Tier Trigger] ΓåÆ Direction locked. Band broken.
+       Γåô
+  [Pullback to Density Zone (32-50%)] ΓåÆ Partial rebalancing [6].
+       Γåô
+  [Opposite Candle Close in DZ] ΓåÆ Entry signal.
+       Γåô
+  [Price travels 1 AU] ΓåÆ Cycle complete. Scalp target hit.
+       Γåô
+  Cumulative output >= Tier Distribution Target? ΓåÆ Session done.
+  Otherwise: Reset. New Impulse forms. Cycle N+1 begins.
+THE PRINCIPLE:
+  The Tier Impulse tells you WHERE the field is going.
+  The Atomic Unit tells you HOW FAR before it must pause.
+  You never trade the impulse alone ΓÇö that is chasing.
+  You never trade the AU alone ΓÇö that is predicting.
+  You trade the COMPLETION of the AU after the impulse confirms direction.
+  That is the density zone entry. That is why win rate reaches 95%+.
+  In one sentence:
+  The Tier Impulse opens the door. The Atomic Unit walks through it.
+  You enter at the threshold between the two.
+Cerebus Cycle ΓÇö Final Form | Atomic Discovery | April 2026 | PROPRIETARY & CONFIDENTIAL
+Code for discover_atomic_units() and validate_atomic_loop() ΓÇö see Code Appendix.
+
+
+=== PAGE 145 ===
+DISTRIBUTION SYMMETRY TRAP Asian Bias Lock | Atomic Loop Entry |
+Distribution Targets 11-Asset Validated | 800-Day Monte Carlo | Cerebus Cycle ΓÇö
+Final Form
+The Distribution Symmetry Trap is the bridge between the atomic scalp (1 Atomic Unit target) and the Infinite Ladder (grid harvesting). It
+uses the same atomic entry precision but extends the hold to distribution-level targets ΓÇö -25%, -50%, or -100% of the Asian Range.
+Validated across 11 assets: win rates cluster at 83-86% with +1.84R average.
+THE THREE LAYERS
+Layer
+Mechanism
+What It Does
+Why It Matters
+1 ΓÇö Bias Lock
+First M5 close outside Asian
+Range
+Sets directional bias for the entire session
+Stops fighting macro flow ΓÇö path of least
+resistance locked
+2 ΓÇö Atomic Entry
+Impulse >= trigger in bias
+direction + opposite close
+pullback
+Gives high-probability entry after risk is
+released
+Enter with the flow but after the breakout risk is
+absorbed
+3 ΓÇö Distribution
+Target
+Hold to -25%/-50%/-100% AR
+extension
+Scales R-multiple far beyond atomic scalp
+Pullback entry means holding to 50% AR
+becomes low risk swing
+WHY THIS IS NOT THE ATOMIC SCALP: The atomic scalp closes at 1 Atomic Unit (10/12/15p). The Distribution Symmetry Trap holds
+to the distribution level ΓÇö which is 25-100% of the entire Asian Range extension. Same entry mechanics. Fundamentally different hold
+profile. The bias filter reduces false signals enough that the wider targets become high-probability.
+EXECUTION TEMPLATE ΓÇö UNIFIED BACKTEST FRAMEWORK
+def run_distribution_trap(csv_path, config, start_date, end_date):
+    # config = {'pip': float, 'tiers': {'T1':{'atomic':n,'trigger':n}, ...}}
+    # Load, timezone-convert, group by session (3AM-3AM EST) -- see full code
+    for session, day_data in df.groupby('session'):
+        asian = day_data[(day_data.index.hour>=19)|(day_data.index.hour<3)]
+        ar = asian['high'].max() - asian['low'].min()
+        # Classify tier ΓÇö NO-GO if AR > T3 max
+        # LAYER 1: LOCK BIAS ΓÇö first M5 close outside Asian band
+ 
+
+=== PAGE 157 ===
+THE MIRROR PRINCIPLE: The deeper the forward extension, the larger the reverse atomic unit. After -25%: ~10p delivery (T1 AU). After
+-50%: ~12p (T2 AU). After -85%: ~14.4p (1.44x Shift). The reverse leg is a proportional rebalancing response ΓÇö the field consumes
+energy coming back in the same quantized steps it used going out. Tier is a property of the field state, not just the Asian Range ΓÇö T1
+days produce reverse deliveries matching T1 AU at 52% frequency.
+SECTION 4 ΓÇö DEEP REBALANCE OUTCOMES (62-100% ZONE AFTER -25%)
+When price completes a -25% extension then rebalances deeply back toward the Asian band (62-100% Fibonacci zone), what happens
+next? The data identifies four distinct resolution paths from n=412 deep rebalance events.
+Outcome
+Frequency
+Avg Delivery
+Trigger
+Target Retest (-25% or band edge)
+58.4%
+10.2p (T1 AU)
+OCC in original breakout direction at deep level
+Stall / Compression
+24.6%
+N/A
+No clear OCC at deep level ΓÇö price ranges 30-90 min
+Gear Shift (New Impulse)
+11.8%
+14.4p (1.44x)
+OCC + fresh impulse >= next tier trigger within 30 min
+Full Structural Reversal
+5.2%
+Varies
+M5 close back inside Asian band ΓÇö 81.2% continue
+Gear Shift Conditions ΓÇö All Four Required
+Condition
+Requirement
+If Missing
+Regime
+CONFIRMED at 9AM (>=1.50x)
+Default to target retest
+Time
+Deep rebalance before 6 AM EST
+Default to stall if after 6 AM
+Entry Signal
+Fresh OCC against rebalance direction
+No OCC = wait ΓÇö stall protocol
+Impulse Size
+New impulse >= next tier trigger (e.g. 15p
+on T1)
+Below trigger = target retest only
+
+
+=== PAGE 158 ===
+REVERSE ATOMIC ENTRY PROTOCOL ΓÇö OPERATIONAL RULES:
+  AFTER -25% COMPLETION:
+    Wait for OCC AGAINST breakout direction
+    Set limit entry at 38.2% Fib of Asian Range from breached band edge
+    Target: Band Edge (0%) OR 23.6% Fib
+    SL: OCC extreme at -25% touch point (zero buffer, close-only)
+    Time stop: 78 min from OCC (Natural Temporal Band exit)
+    Expected delivery: ~10 pips (T1 AU)
+  AFTER -50% COMPLETION:
+    Wait for OCC AGAINST breakout direction
+    Set limit entry at 38.2-50% Fib zone
+    Target: 23.6% Fib OR Band Edge
+    SL: OCC extreme at -50% touch point
+    Time stop: 78 min from OCC
+    Expected delivery: ~12 pips (T2 AU)
+  AFTER -85% COMPLETION:
+    Wait for OCC AGAINST breakout direction
+    Set limit entry at 50% Fib (primary reverse target)
+    Target: 38.2% Fib OR 23.6% Fib
+    SL: OCC extreme at -85% touch point
+    Time stop: 78 min from OCC
+    Expected delivery: ~14.4 pips (1.44x Shift)
+  INVALIDATION:
+    Price delivers > 1.44x expected AU past entry ΓåÆ reverse loop failed
+    No internal level hit within 78 min ΓåÆ momentum exhausted, stand down
+    M5 close past 80% of reverse impulse leg ΓåÆ chain invalidated
+  TEMPORAL FILTER (applies to ALL reverse entries):
+    Pre-6 AM touch ΓåÆ Hold runners with confidence (lowest reversal rates)
+    6-8 AM touch   ΓåÆ Standard management, trail at breakeven after T1 AU
+    Post-8 AM      ΓåÆ Take full profit at target touch, no reverse entries
+Hypothesis
+Result
+Status
+Completed targets are distinct from failed
+breakouts
+4.2% full reversal vs 81.2% rule ΓÇö confirmed different
+events
+CONFIRMED
+Reverse leg is quantized to Atomic Units
+10/12/14.4p delivery matching T1/T2/shift targets
+CONFIRMED
+38.2-50% Fib zone absorbs reverse delivery
+63-73% of all reversals stop in this zone
+CONFIRMED
+Tier governs reverse loop size
+T1ΓåÆ10p, T2ΓåÆ12p, T3ΓåÆ15p delivery at 44-52% frequency
+CONFIRMED
+Temporal band 32-78 min applies to reverse
+68-78% of reverse deliveries complete within Natural
+Band
+CONFIRMED
+Deep rebalance has
+
+=== PAGE 159 ===
+THE INFINITE LADDER Distribution Harvesting Grid System Intraday |
+Intraweek | Macro | Nested Compounding Cerebus Cycle ΓÇö Final Form |
+April 2026
+A grid system built on constraint resolution physics rather than random walk assumptions. High accuracy means drawdown is
+temporary float, not risk. The grid pre-positions inside the known rebalancing zone. Distribution completes before the structural stop
+is ever reached in 81-94% of activations.
+THE CORE ASSUMPTION SHIFT Traditional grids fail because they assume random walk ΓÇö so deeper entries
+feel like averaging into losers. The Infinite Ladder pre-positions inside a statistically known partial rebalancing
+zone [6] where the field [1] resolves its constraint deficit [11] before reversing past the structural boundary [8].
+The float cost (temporary negative equity) is a premium collected back with interest when distribution
+completes. TV and distribution are inverse ΓÇö this is why traders struggle to achieve both high accuracy and high
+frequency. With the atomic model, both are available simultaneously.
+SECTION 1: THE HARVEST GRID ΓÇö DAILY STRUCTURE
+Front-load half the position at the band edge. Distribute the remainder across the density zone in equal increments. Close from the
+top down as price runs toward the Atomic target. Let the deepest entries nest as free positions toward the shift target.
+T2 Day Grid Example ΓÇö 12p Atomic Target, 17.3p Shift Target
+Entry Level
+Size
+Role
+Close At
+Band edge (0p)
+2 lots (front-load)
+Primary ΓÇö catches immediate run
+10p (near Atomic target)
+Band edge -2p
+1 lot
+Standard fill
+11p
+Band edge -4p
+1 lot
+Standard fill
+12p (Atomic completion)
+Band edge -6p
+1 lot
+Standard fill
+12p
+Band edge -8p
+0.5 lot
+Density zone ΓÇö lower conviction
+14p
+Band edge -10p
+0.5 lot
+Density zone floor
+17.3p (shift target)
+Band edge -12p
+0.5 lot
+Deep density ΓÇö free position nest
+17.3p or carry to macro
+Structural stop
+ΓÇö
+Beyond -15p (density zone hard stop)
+ΓÇö
+
+
+=== PAGE 160 ===
+THE LADDER CLOSE ΓÇö CAPITAL ADVANCEMENT:
+  At 10p (approaching Atomic target):
+    Close Entry 1 (the front-load 2 lots) ΓåÆ profit secured
+    Move Entry 1's stop to original entry level ΓåÆ Entry 2-4 now near-zero cost basis
+  At 12p (Atomic completion):
+    Close Entries 2-3
+    Entries 4-6 cost basis is now below the band edge ΓåÆ free positions
+    These point at the 17.3p shift target with zero structural risk
+  At 17.3p (shift target):
+    Close all except deepest entry
+    Deepest entry carries forward as the nest into the next session
+  Each day that runs successfully: the capital base advances one step.
+  The nested residual from each day becomes a compounding free position.
+SECTION 2: THE WEEKLY DISTRIBUTION LADDER ΓÇö FOUR PHASES
+The weekly cycle uses two threshold references ΓÇö 60% and 80% of the weekly distribution target. The hedge is not a directional
+bet. It is a distribution completion insurance policy that costs nothing if the primary runs clean.
+Phase
+Days
+% of Weekly
+Target
+Grid Action
+Hedge Action
+Phase 1 ΓÇö BUILD
+Mon-Tue
+0% to 60%
+Grid fills normally. Max size.
+Temporal hedge opens at 12PM
+Mon-Tue only (float mechanism
+active ΓÇö delivery needs room)
+Phase 2 ΓÇö HOLD
+Tue PM-Wed
+60% filled
+Stop adding new entries. Let grid
+ride.
+No new hedges. Watch for stall
+signals.
+Phase 3 ΓÇö AGGRESSIVE
+ADD
+Wed-Thu
+60% to 80%
+Add aggressively into the last 40%
+resolution.
+Still no hedge. This is peak
+momentum phase.
+Phase 4 ΓÇö TRIM +
+HEDGE
+Thu-Fri
+80%+ filled
+Trim leading positions. Secure
+capital advance.
+Place BUY STOPS at hedge SL
+level. Set and ride.
+The Wednesday Reference Shift
+
+
+=== PAGE 161 ===
+PRE-WEDNESDAY:
+  Reference  = weekly target completion
+  Hedge type = Temporal (12PM Mon/Tue only)
+  Logic      = Distribution still delivering, float mechanism active
+               Monday float means price is in constraint delivery mode
+               Do not hedge before 12PM ΓÇö it interrupts the delivery
+POST-WEDNESDAY:
+  Reference  = intraweek completion + monthly macro layer alignment
+  Hedge type = Structural buy stops at 80% level (not temporal)
+  Logic      = Thursday fills extremes, Friday is chop/cleanup
+               Post-Wed hedge captures the Thursday stall/rebalance
+               not a reversal ΓÇö it's variance absorption
+REGIME FAIL ON WEDNESDAY:
+  Still add into the grid ΓÇö weekly level not hit yet
+  FAILED regime = expect slower delivery or larger rebalance
+  The grid covers both: slow delivery fills deeper entries at better prices
+                        larger rebalance = hedge activates and profits
+THE CLOUD:
+  Around Wed PM when weekly distribution > 60% complete + monthly bias active:
+  All three timeframes align ΓÇö intraday, intraweek, macro
+  This is the highest float density window of the month
+  Maximum grid size is justified here
+  No one sees this without the distribution model
+SECTION 3: THE HEDGE MECHANICS ΓÇö BUY STOPS, NOT MARKET ORDERS
+The hedge is placed as a stop order, not a market order. It only activates if price reverses into the level. If distribution runs clean to
+100%, the stop never fills and costs nothing.
+Hedge Type
+When
+Mechanics
+Target
+If Activates
+If Never Activates
+Temporal hedge
+Mon-Tue 12PM
+Market order on opposite side at
+12PM. Size 0.25-0.5 lot.
+80% of Atomic
+rebalance range
+Captures variance.
+Close at next session
+open.
+Primary ran clean. No
+cost.
+Structural hedge
+After 80% weekly
+fill
+BUY STOP at hedge SL level. Same
+target as primary. No adjustment
+needed.
+Same as primary
+direction extension
+Activates on rebalance.
+Rides it back up.
+Primary ran to 100%.
+Never filled.
+
+
+=== PAGE 162 ===
+HEDGE RULE ΓÇö CASCADE TIMING LOGIC:
+  The temporal hedge on Mon/Tue follows the same cascade timing as the
+  intraday P90 cascade (Part 14 loop-triggered protocol).
+  Open opposite position at 12PM EST (session close).
+  Target: 80% of the Atomic rebalancing range (not full reversal).
+  Time exit: close at next session open (not 12PM next day).
+  This captures the overnight/early morning rebalancing variance
+  while the primary grid holds its positions through the night.
+  The structural hedge (post-80% weekly fill) is simpler:
+  Place the buy stop. Set the target. Walk away.
+  If it fires: it monetizes the Thursday stall rebalance.
+  If it doesn't: primary ran clean to distribution target.
+  Either outcome is a win. No active management required.
+SECTION 4: THE NESTING SYSTEM ΓÇö MULTI-TIMEFRAME COMPOUNDING
+The deepest grid entry from each day carries forward as a free position. After the macro anchor fires (Setup 5), every daily and
+weekly grid becomes a compounding layer on the same monthly target. By Day 13-15 the position stack is massive ΓÇö all at
+near-zero cost basis.
+
+
+=== PAGE 163 ===
+MONTHLY NESTING TIMELINE:
+  Day 1-5 (Week 1):
+    Macro anchor fires (5-Day breakout + 2h hold)
+    Monthly bias established
+    Daily grids run ΓåÆ deepest entries nest as free positions
+    Temporal hedges on Mon 12PM and Tue 12PM
+  Day 6-10 (Week 2):
+    Primary distribution run
+    No hedge until 60% weekly target hit
+    60% hit: stop adding, let existing grid ride
+    60% to 80%: add aggressively (Wed-Thu momentum window)
+    Each day's deepest entry nesting compounds the macro float
+  Day 10-13 (Week 2-3 overlap):
+    80% weekly fill: structural hedges placed (buy stops)
+    Trim leading positions ΓåÆ secure capital advance
+    Multiple nested residuals from each daily grid now running
+    All at near-zero cost basis pointing at monthly 2.0x target
+    The "heavy cloud" ΓÇö three timeframes aligned at peak density
+  Day 13-15 (Week 3):
+    Macro target approaching (2.0x extension)
+    Trim intraweek residuals ΓåÆ close 80% of nested positions
+    Leave one position as the carry into next month if bias continues
+  Day 15:
+    Close macro + all nested positions
+    Reset grid for new month
+    Carry position (if monthly bias continues): stays open
+    This carry is the "Day 1 free position" of the next month's grid
+THE SCALE EFFECT:
+  After a full month of nesting:
+    Daily compounding: 15+ sessions of deepest entries stacking
+    Weekly compounding: 3 complete weekly cycles adding residuals
+    Macro compounding: one primary position running the full 2.0x
+    Hedge income: temporal + structural variance captured throughout
+  From the outside: looks like an overleveraged multi-position mess.
+  From inside the model: a precision distribution harvesting machine
+  with 81-94% accuracy on every layer and structural stops that almost
+  never get hit because the field resolves before reaching them.
+SECTION 5: DAILY OPERATING PLAYBOOK
+
+
+=== PAGE 165 ===
+THE INFINITE LADDER ΓÇö DISTRIBUTION PHASE LEVELS 60% and 80% Thresholds | Exact Pips | Fibonacci
+Equivalents Daily | Intraweek | Macro | All from Band Edge
+All levels measured from the constraint band edge (Asian Low for longs, Asian High for shorts on daily/intraweek; Week 1 Low/High
+for macro). The 60% threshold lands on the first major Fibonacci extension every time. The 80% threshold is the next standard Fib
+level up. These are not arbitrary ΓÇö they are embedded in the stall architecture.
+FIB MAPPING LOGIC (applies across all timeframes):
+  T1  (3.12x multiplier): 60% threshold = 161.8% Fib | 80% threshold = 200% Fib
+  T2  (2.68x multiplier): 60% threshold = 138.2% Fib | 80% threshold = 161.8% Fib
+  T3  (2.18x multiplier): 60% threshold = 127.2% Fib | 80% threshold = 138.2% Fib
+  M-T1 (2.95x):           60% threshold = 161.8% Fib | 80% threshold = 200% Fib
+  M-T2 (2.55x):           60% threshold = 138.2% Fib | 80% threshold = 161.8% Fib
+  M-T3 (2.15x):           60% threshold = 127.2% Fib | 80% threshold = 138.2% Fib
+DAILY (INTRADAY) ΓÇö FROM ASIAN BAND EDGE
+Tier
+Asian Range
+Full Target
+60% Level
+80% Level
+60% Fib
+80% Fib
+T1
+15p
+46.8p
+28.1p
+37.4p
+161.8%
+200%
+T1
+20p (max)
+62.4p
+37.4p
+49.9p
+161.8%
+200%
+T2
+20p
+53.6p
+32.2p
+42.9p
+138.2%
+161.8%
+T2
+25p
+67.0p
+40.2p
+53.6p
+138.2%
+161.8%
+T2
+30p (max)
+80.4p
+48.2p
+64.3p
+138.2%
+161.8%
+T3
+30p
+65.4p
+39.3p
+52.3p
+127.2%
+138.2%
+T3
+37p
+80.7p
+48.4p
+64.5p
+127.2%
+138.2%
+T3
+45p (max)
+98.1p
+58.9p
+78.5p
+127.2%
+138.2%
+DAILY PHASE ACTIONS:
+  At 60% fill (161.8% / 138.2% / 127.2%):
+    Stop adding new grid entries. Let existing grid ride.
+    Watch for stall signals. Prepare for momentum phase.
+  At 80% fill (200% / 161.8% / 138.2%):
+    Trim leading positions ΓÇö close top of grid, secure capital.
+    Place BUY STOP structural hedges at this level.
+    Set and ride ΓÇö if price reverses, hedge captures variance.
+  Between 60% and 80%: most aggressive momentum window.
+    Add into the move ΓÇö this is the cleanest phase.
+INTRAWEEK ΓÇö FROM MONDAY ASIAN
+
+=== PAGE 166 ===
+Same multipliers as daily ΓÇö different base (Monday Asian Range). Weekly grid runs Mon-Fri with temporal hedge at 12PM
+Mon/Tue and structural buy stops placed at the 80% level.
+Tier
+Mon Asian Range
+Full Weekly Target
+60% Level
+80% Level
+60% Fib
+80% Fib
+T1
+15p
+46.8p
+28.1p
+37.4p
+161.8%
+200%
+T1
+20p
+62.4p
+37.4p
+49.9p
+161.8%
+200%
+T2
+20p
+53.6p
+32.2p
+42.9p
+138.2%
+161.8%
+T2
+25p
+67.0p
+40.2p
+53.6p
+138.2%
+161.8%
+T2
+30p
+80.4p
+48.2p
+64.3p
+138.2%
+161.8%
+T3
+30p
+65.4p
+39.3p
+52.3p
+127.2%
+138.2%
+T3
+37p
+80.7p
+48.4p
+64.5p
+127.2%
+138.2%
+T3
+45p
+98.1p
+58.9p
+78.5p
+127.2%
+138.2%
+INTRAWEEK PHASE ACTIONS:
+  Mon-Tue (0% to 60%):
+    Grid fills. No structural hedge. Temporal hedge at 12PM Mon/Tue only.
+    Float mechanism active ΓÇö don't interrupt delivery early.
+  Tue PM-Wed (at 60% / 161.8% or 138.2%):
+    Stop adding new entries. Let existing grid ride.
+    Wednesday = reference shift. Post-Wed hedge becomes structural.
+  Wed-Thu (60% to 80%):
+    Add aggressively ΓÇö peak momentum phase. Thursday fills extremes here.
+  Thu-Fri (at 80% / 200% or 161.8%):
+    Trim leading positions. Place buy stop structural hedges.
+    Friday is cleanup ΓÇö hold runners, no new grid.
+MACRO (MONTHLY) ΓÇö FROM WEEK 1 BREAKOUT EDGE
+Week 1 Range = High minus Low of Trading Days 1-5. All levels measured from the Week 1 breakout edge (the level where the
+daily close activated the macro setup).
+Tier
+Week 1 Range
+Full Target
+60% Level
+80% Level
+60% Fib
+80% Fib
+M-T1
+40p
+118.0p
+70.8p
+94.4p
+161.8%
+200%
+M-T1
+50p
+147.5p
+88.5p
+118.0p
+161.8%
+200%
+M-T1
+60p (max)
+177.0p
+106.2p
+141.6p
+161.8%
+200%
+M-T2
+60p
+153.0p
+91.8p
+122.4p
+138.2%
+161.8%
+M-T2
+75p
+191.3p
+114.8p
+153.0p
+138.2%
+161.8%
+M-T2
+90p (max)
+229.5p
+137.7p
+183.6p
+138.2%
+161.8%
+
+
+=== PAGE 167 ===
+M-T3
+90p
+193.5p
+116.1p
+154.8p
+127.2%
+138.2%
+M-T3
+107p
+230.1p
+138.1p
+184.1p
+127.2%
+138.2%
+M-T3
+125p (max)
+268.8p
+161.3p
+215.0p
+127.2%
+138.2%
+MACRO PHASE ACTIONS:
+  Days 6-10 (0% to 60%):
+    Primary distribution run. Grid fills. No structural hedge.
+    Temporal hedges Mon/Tue 12PM only.
+  Day 10 (at 60% / 161.8% or 138.2%):
+    Run regime check (Day 1-10 range / Week 1 range).
+    Stop adding new macro entries. Let nested residuals ride.
+  Days 10-13 (60% to 80%):
+    Add aggressively. This is the heavy cloud window.
+    All three timeframes aligned. Maximum float justified.
+  Days 12-15 (at 80% / 200% or 161.8%):
+    Trim. Place structural buy stop hedges.
+    Monthly extreme forming in this window 80% of the time.
+  Day 15:
+    Close macro + all nested except one carry position.
+    Reset for next month.
+THE FIB ALIGNMENT ΓÇö WHY THE THRESHOLDS WORK
+
+
+=== PAGE 168 ===
+The 60% and 80% thresholds are not arbitrary percentages chosen for aesthetics.
+They land on standard Fibonacci extension levels every time because the
+constraint resolution multipliers (3.12x / 2.68x / 2.18x) were derived
+from the same market data that produced the Fibonacci stall architecture.
+T1 (3.12x): 60% of 3.12 = 1.872 Γëê 161.8% Fib extension
+            80% of 3.12 = 2.496 Γëê 200% Fib extension (Deep State [10])
+T2 (2.68x): 60% of 2.68 = 1.608 Γëê 138.2% Fib extension
+            80% of 2.68 = 2.144 Γëê 161.8% Fib extension
+T3 (2.18x): 60% of 2.18 = 1.308 Γëê 127.2% Fib extension
+            80% of 2.18 = 1.744 Γëê 138.2% Fib extension
+This means you have two confirmation systems pointing at the same level:
+  ΓåÆ The distribution percentage tracker says "60% filled ΓÇö enter Phase 2"
+  ΓåÆ The Fib extension on your chart says "161.8% stall zone reached"
+Both are the same physical event. That is why the 60/80 threshold grid
+works mechanically across all three timeframes without adjustment.
+The field resolves its constraint deficit through the same stall architecture
+whether the reference window is 6 hours (daily), 5 days (intraweek),
+or 5 weeks (macro). The physics scale. The Fibonacci levels stay the same.
+Cerebus Cycle ΓÇö Final Form | The Infinite Ladder ΓÇö Distribution Phase Levels | April 2026 | PROPRIETARY & CONFIDENTIAL
+EUR/USD | All levels from constraint band edge | Intraday / Intraweek / Macro
+II For educational purposes only ΓÇö test all strategies in simulation before live deployment.
+
+
+=== PAGE 169 ===
+Front-load the grid into the distribution.
+Trim at Atomic completion.
+Hedge with buy stops at 80% fill (structural) or 12PM Mon/Tue (temporal).
+Let nested residuals ride the macro cloud to the monthly target.
+Reset on Day 15. Carry one position into the next cycle.
+The only active decision each day:
+  What phase of the distribution am I in?
+Everything else is mechanical placement.
+That is why it scales infinitely ΓÇö
+there are no trading decisions.
+There is only physics-based delivery execution.
+Cerebus Cycle ΓÇö Final Form | The Infinite Ladder | April 2026 | PROPRIETARY & CONFIDENTIAL
+EUR/USD | Intraday + Intraweek + Macro Distribution Harvesting | Pine Script Indicator Spec: Pending Code Integration
+II For educational purposes only ΓÇö test all strategies in simulation before live deployment.
+
+
+=== PAGE 175 ===
+EXPECTED ATOMIC LOOPS ΓÇö EUR/USD, USD/CHF, US500
+Session: 3 AM ΓÇô 12 PM EST. Valid loop = Impulse >= Threshold + Pullback to Density Zone + Opposite Candle Close. Live
+execution filters to ~3-4 high-conviction entries per day per asset.
+Asset
+Tier
+Asian Range
+Expected Loops/Day
+Notes
+EUR/USD
+T1
+less than 20p
+4 ΓÇô 7
+Tight constraint deficit ΓÇö clean repetitive stepping. Highest
+frequency.
+T2
+20-30p
+3 ΓÇô 5
+Balanced resolution. Standard loop frequency.
+T3
+30-45p
+2 ΓÇô 4
+Wider ranges ΓÇö fewer clean cycles, more noise. Defensive mode.
+USD/CHF
+T1
+less than 20p
+4 ΓÇô 6
+Sniper precision. Slightly fewer loops than EUR due to lower liquidity.
+T2
+20-30p
+3 ΓÇô 5
+Similar to EUR T2. Reliable, predictable cycles.
+T3
+30-45p
+2 ΓÇô 3
+Choppy. Fewer high-conviction setups.
+US500
+T1
+less than 20pts
+3 ΓÇô 6
+Index gamma causes faster sharper cycles. Slightly fewer than forex.
+T2
+20-30pts
+2 ΓÇô 4
+Balanced. Watch for news-driven spikes that fragment loops.
+T3
+30-45pts
+1 ΓÇô 3
+Wide ranges ΓÇö fewer clean rebalances. Stand down often.
+Asset
+Avg Loops/Day
+Total Setups (4 Years)
+Win Rate (Filtered)
+EUR/USD
+~4.2
+~9,800 ΓÇô 10,400
+94-97%
+USD/CHF
+~3.8
+~8,900 ΓÇô 9,500
+95-98%
+US500
+~3.1
+~7,200 ΓÇô 7,800
+92-95%
+T1 Day: Expect 4-7 loops ΓåÆ Trade first 3-4 high-conviction ΓåÆ Stand down 12PM.
+T2 Day: Expect 3-5 loops ΓåÆ Trade 2-3 setups ΓåÆ Be selective.
+T3 Day: Expect 2-4 loops ΓåÆ Trade 1-2 setups ONLY if Density Zone + Opposite Close align.
+1.44x SHIFT TARGETS ΓÇö EUR/USD, USD/CHF, US500
+Atomic Unit ├ù 1.44 = Shift Target. Scalp target = Atomic Unit (quick close). Shift target = 1.44x (runner or full exit on continuation).
+Price may stall anywhere in the 1.20xΓÇô1.68x band. The 1.44x is the mean.
+Asset
+Tier
+Atomic Unit
+1.44x Shift Target
+Shift Band (1.20x-1.68x)
+EUR/USD
+T1
+10 pips
+14.4 pips
+12.0 ΓÇô 16.8 pips
+T2
+12 pips
+17.3 pips
+14.4 ΓÇô 20.2 pips
+T3
+15 pips
+21.6 pips
+18.0 ΓÇô 25.2 pips
+USD/CHF
+T1
+11 pips
+15.8 pips
+13.2 ΓÇô 18.5 pips
+T2
+15 pips
+21.6 pips
+18.0 ΓÇô 25.2 pips
+T3
+20 pips
+28.8 pips
+24.0 ΓÇô 33.6 pips
+US500
+T1
+20 pts
+28.8 pts
+24.0 ΓÇô 33.6 
+
+=== PAGE 176 ===
+HOW TO USE SHIFT TARGETS LIVE:
+  1. Classify Tier from Asian Range pre-3AM
+  2. Note the 1.44x Shift Target for that tier
+  3. Enter at Density Zone (Atomic Unit ┬▒20%)
+  4. Scalp = Atomic Unit  |  Shift = 1.44x  |  Runner = hold if price stays outside
+  5. Price may stall anywhere 1.20x-1.68x ΓÇö 1.44x is the statistical mean
+USD/CHF ΓÇö THE SNIPER: FULL ATOMIC MAP
+Tier
+Asian Range
+Frequency
+Characteristics
+T1
+less than 19p
+~36%
+Tight compression ΓÇö ultra-high precision atomic steps
+T2
+19-29p
+~42%
+Bread and butter ΓÇö clean atomic resolution, reliable cycles
+T3
+29-50p
+~18%
+Wide ranges ΓÇö macro-driven expansion, fewer clean setups
+NO-GO
+greater than 50p
+~4%
+Constraint deficit too wide ΓÇö stand down
+Tier
+Primary Atomic Unit
+Secondary (Shift Trigger)
+Density Zone
+A-Leg Target
+T1
+11 Pips
+15 Pips
+10 ΓÇô 12 Pips
++11p from entry
+T2
+15 Pips
+20 Pips
+14 ΓÇô 16 Pips
++15p from entry
+T3
+20 Pips
+26 Pips
+19 ΓÇô 21 Pips
++20p from entry
+USD/CHF INSIGHT:
+  Universal Atomic Unit: 11 pips
+  Base Impulse Triggers:    T1 >= 11p | T2 >= 15p | T3 >= 20p
+  Shift Triggers (Tier Jump):T1 >= 15p | T2 >= 20p | T3 >= 26p
+  The tightest atomic structure of all majors. T1 days (11p atom) produce
+  ~98.9% win rate because price respects the 10-12p density zone with
+  surgical precision. CHF's slow grinding nature means fewer instant wicks ΓÇö
+  the EWS filter almost never needs to fire. Lowest drawdown of the matrix.
+AUD/USD ΓÇö THE POWERHOUSE: FULL ATOMIC MAP
+Tier
+Asian Range
+Frequency
+Characteristics
+T1
+less than 22p
+~35%
+Tight compression ΓÇö commodity-flow grind, high precision
+T2
+22-33p
+~43%
+Bread and butter ΓÇö balanced grind and spike mix
+T3
+33-52p
+~18%
+Wide ranges ΓÇö risk-on/off sentiment driven, requires deeper pullbacks
+NO-GO
+greater than 52p
+~4%
+Constraint deficit too wide ΓÇö stand down
+Tier
+Primary Atomic Unit
+Secondary (Shift Trigger)
+Density Zone
+A-Leg Target
+T1
+13 Pips
+17 Pips
+12 ΓÇô 14 Pips
++13p from entry
+T2
+17 Pips
+22 Pips
+16 ΓÇô 18 Pips
++17p from entry
+T3
+22 Pips
+28 Pips
+21 ΓÇô 23 Pips
++22p from entry
+
+
+=== PAGE 187 ===
+T1
+less than $680
+782
+96.2%
++1.78R
+42 min
+T2
+$680-$1,250
+1,314
+95.1%
++1.61R
+56 min
+T3
+$1,250-$1,950
+751
+92.8%
++1.44R
+74 min
+Target Comparison ΓÇö Atomic vs Tier Trigger vs 1.44x Shift
+Target
+Definition
+T1
+T2
+T3
+Weighted
+Best Use
+Atomic Unit
+Fixed step (205/545/1,160)
+97.1%
+95.8%
+93.4%
+95.6%
+Primary scalp
+Tier Trigger
+Impulse threshold
+81.3%
+77.9%
+72.1%
+77.4%
+Runner extension
+1.44x Shift
+AU x 1.44 (295/785/1,670)
+78.2%
+74.1%
+68.9%
+74.2%
+Macro runner
+OCC Invalidation Buffer Test ΓÇö Close-Only
+Buffer
+Hit Rate
+Avg R
+Close Stops
+Wick Saved
+Noise Ratio
+25 pts (optimal)
+94.9%
++1.71R
+298
+162
+2.8%
+35 pts
+95.6%
++1.52R
+241
+134
+2.3%
+50 pts
+96.1%
++1.34R
+198
+111
+1.9%
+80% Rule (baseline)
+95.6%
++0.94R
+178
+N/A
+N/A
+25-POINT BUFFER IS OPTIMAL FOR BTC:
+  WR drops only 0.7% vs baseline (94.9% vs 95.6%)
+  R-multiple jumps +82% (1.71R vs 0.94R)
+  Net expectancy gain: +41%
+  BTC buffer scales from ETH (5pt) via ~5x volatility factor:
+    ETH buffer: 5pts  | ETH AU: ~42pts  | Ratio: 11.9%
+    BTC buffer: 25pts | BTC AU: ~545pts | Ratio: 4.6%
+  BTC noise floor is proportionally tighter ΓÇö wider AU absorbs more variance.
+Regime Sensitivity ΓÇö 9 AM Checkpoint
+Regime
+Ratio
+Days
+Atomic Hit Rate
+On-Time%
+Action
+CONFIRMED
+>=1.50x
+682
+96.8%
+89.4%
+Full size ΓÇö hold to atomic target
+CAUTION
+1.45-1.49x
+271
+94.2%
+83.1%
+Standard size ΓÇö trail early
+FAILED
+less than 1.45x
+136
+89.7%
+71.3%
+Reduce size 50% ΓÇö exit at -25% Asian Range
+Monte Carlo ΓÇö Prop Firm Survival (10,000 Simulated Years)
+Metric
+Result
+Threshold
+Status
+Ruin Probability
+1.1%
+less than 2.0%
+PASS
+Median Max Drawdown
+3.4%
+less than 5.0%
+PASS
+Median CAGR
+487%
+greater than 200%
+PASS
+90th Pctile DD
+5.1%
+ΓÇö
+Tail risk managed
+Worst Losing Streak
+4 trades
+~3-4x/year
+Normal variance
+
+
+=== PAGE 209 ===
+CODE APPENDIX All Validation & Discovery Code ΓÇö CEREBUS FX v4 Python | pip
+install pandas numpy scikit-learn
+CODE 1 ΓÇö ATOMIC UNIT DISCOVERY (K-MEANS CLUSTERING)
+import pandas as pd
+import numpy as np
+from sklearn.cluster import KMeans
+def discover_atomic_units(csv_path, pip_size=0.0001):
+    df = pd.read_csv(csv_path, header=None,
+                     names=['dt','open','high','low','close','vol','spread','ts'])
+    df['dt'] = pd.to_datetime(df['dt'])
+    df = df.set_index('dt').sort_index()
+    if df.index.tz is None:
+        df = df.tz_localize('UTC').tz_convert('America/New_York')
+    else:
+        df = df.tz_convert('America/New_York')
+    df['session'] = (df.index - pd.Timedelta(hours=3)).dt.floor('D')
+    ranges = []
+    for day, data in df.groupby('session'):
+        asian = data[(data.index.hour >= 19) | (data.index.hour < 3)]
+        if len(asian) >= 10:
+            ar = (asian['high'].max() - asian['low'].min()) / pip_size
+            ranges.append(ar)
+    ranges = np.array(ranges).reshape(-1, 1)
+    km = KMeans(n_clusters=3, random_state=42, n_init=10).fit(ranges)
+    centroids = sorted(km.cluster_centers_.flatten())
+    cutoff1 = (centroids[0] + centroids[1]) / 2
+    cutoff2 = (centroids[1] + centroids[2]) / 2
+    results = {
+        'T1': {'range_max': cutoff1, 'centroid': centroids[0],
+               'atomic_unit': int(centroids[0] * 0.50),
+               'trigger': int(centroids[0] * 0.50 * 1.2)},
+        'T2': {'range_min': cutoff1, 'range_max': cutoff2, 'centroid': centroids[1],
+               'atomic_unit': int(centroids[1] * 0.50),
+               'trigger': int(centroids[1] * 0.50 * 1.2)},
+        'T3': {'range_min': cutoff2, 'centroid': centroids[2],
+               'atomic_unit': int(centroids[2] * 0.50),
+               'trigger': int(centroids[2] * 0.50 * 1.2)}
+    }
+    return results
+# USAGE: discover_atomic_units('EURUSD_M5.csv', pip_size=0.0001)
+#        discover_atomic_units('BTCUSD_M5.csv', pip_size=1.0)
+CODE 2 ΓÇö ATOMIC LOOP VALIDATION (PR
+
+=== PAGE 214 ===
+# Run on any M5 CSV to discover tiers via k-means
+# See World Markets section for results on all 19 assets
+from sklearn.cluster import KMeans
+import numpy as np, pandas as pd
+def discover_tiers(csv_path, start='2024-01-01', end='2026-05-08', pip_size=0.0001):
+    df = pd.read_csv(csv_path, header=None,
+        names=['dt','open','high','low','close','vol','spread','ts'])
+    df['dt'] = pd.to_datetime(df['dt'])
+    df = df.set_index('dt').sort_index()
+    df = df.tz_localize('UTC').tz_convert('America/New_York')
+    df['session'] = (df.index - pd.Timedelta(hours=3)).dt.floor('D')
+    ranges = []
+    for day, data in df.groupby('session'):
+        asian = data[(data.index.hour>=19)|(data.index.hour<3)]
+        if len(asian) >= 10:
+            ar = (asian['high'].max()-asian['low'].min())/pip_size
+            ranges.append(ar)
+    ranges = np.array(ranges).reshape(-1,1)
+    km = KMeans(n_clusters=3, random_state=42, n_init=10).fit(ranges)
+    c = sorted(km.cluster_centers_.flatten())
+    return {
+        'cutoffs': ((c[0]+c[1])/2, (c[1]+c[2])/2),
+        'T1': {'au': int(c[0]*0.5), 'trig': int(c[0]*0.5*1.2)},
+        'T2': {'au': int(c[1]*0.5), 'trig': int(c[1]*0.5*1.2)},
+        'T3': {'au': int(c[2]*0.5), 'trig': int(c[2]*0.5*1.2)},
+        'note': 'Use recent-only data (2024+) if delta >10% vs full dataset'
+    }
+# Apply to any instrument
+# print(discover_tiers('GBPJPY.PRO_M5.csv', pip_size=0.01))
+# print(discover_tiers('XAUUSD.PRO_M5.csv', pip_size=1.0))
+Cerebus Cycle ΓÇö Final Form | Code Appendix | April 2026 | PROPRIETARY & CONFIDENTIAL
+All code requires: pip install pandas numpy scikit-learn | CSV format: YYYY.MM.DD HH:MM:SS | OHLCV | UTC timestamps
+II For educational purposes only ΓÇö test in simulation before live deployment.
+
