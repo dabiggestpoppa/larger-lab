@@ -1,0 +1,159 @@
+{
+  "assets": [
+    "AUDUSD",
+    "BTCUSD",
+    "CHFJPY",
+    "DE30",
+    "ETHUSD",
+    "EURUSD",
+    "FR40",
+    "GBPAUD",
+    "GBPCHF",
+    "GBPJPY",
+    "GBPNZD",
+    "GBPUSD",
+    "NZDUSD",
+    "US500",
+    "USDCHF",
+    "USDJPY",
+    "XAGUSD",
+    "XAUUSD"
+  ],
+  "total_rows": 5297023,
+  "feature_count": 48,
+  "available_features": 48,
+  "label_cols": [
+    "label_25_delivery",
+    "label_50_delivery",
+    "rekey_triggered",
+    "regime_at_time"
+  ],
+  "per_asset": {
+    "AUDUSD": {
+      "rows": 272324,
+      "features": 47,
+      "missing": [
+        "vol_ratio_3am_9am"
+      ]
+    },
+    "BTCUSD": {
+      "rows": 458856,
+      "features": 47,
+      "missing": [
+        "vol_ratio_3am_9am"
+      ]
+    },
+    "CHFJPY": {
+      "rows": 273254,
+      "features": 47,
+      "missing": [
+        "vol_ratio_3am_9am"
+      ]
+    },
+    "DE30": {
+      "rows": 250504,
+      "features": 47,
+      "missing": [
+        "vol_ratio_3am_9am"
+      ]
+    },
+    "ETHUSD": {
+      "rows": 457998,
+      "features": 47,
+      "missing": [
+        "vol_ratio_3am_9am"
+      ]
+    },
+    "EURUSD": {
+      "rows": 272326,
+      "features": 47,
+      "missing": [
+        "vol_ratio_3am_9am"
+      ]
+    },
+    "FR40": {
+      "rows": 243055,
+      "features": 47,
+      "missing": [
+        "vol_ratio_3am_9am"
+      ]
+    },
+    "GBPAUD": {
+      "rows": 275264,
+      "features": 47,
+      "missing": [
+        "vol_ratio_3am_9am"
+      ]
+    },
+    "GBPCHF": {
+      "rows": 275136,
+      "features": 47,
+      "missing": [
+        "vol_ratio_3am_9am"
+      ]
+    },
+    "GBPJPY": {
+      "rows": 275059,
+      "features": 47,
+      "missing": [
+        "vol_ratio_3am_9am"
+      ]
+    },
+    "GBPNZD": {
+      "rows": 276493,
+      "features": 47,
+      "missing": [
+        "vol_ratio_3am_9am"
+      ]
+    },
+    "GBPUSD": {
+      "rows": 275226,
+      "features": 47,
+      "missing": [
+        "vol_ratio_3am_9am"
+      ]
+    },
+    "NZDUSD": {
+      "rows": 275215,
+      "features": 47,
+      "missing": [
+        "vol_ratio_3am_9am"
+      ]
+    },
+    "US500": {
+      "rows": 257731,
+      "features": 47,
+      "missing": [
+        "vol_ratio_3am_9am"
+      ]
+    },
+    "USDCHF": {
+      "rows": 275251,
+      "features": 47,
+      "missing": [
+        "vol_ratio_3am_9am"
+      ]
+    },
+    "USDJPY": {
+      "rows": 275199,
+      "features": 47,
+      "missing": [
+        "vol_ratio_3am_9am"
+      ]
+    },
+    "XAGUSD": {
+      "rows": 302808,
+      "features": 47,
+      "missing": [
+        "vol_ratio_3am_9am"
+      ]
+    },
+    "XAUUSD": {
+      "rows": 305324,
+      "features": 47,
+      "missing": [
+        "vol_ratio_3am_9am"
+      ]
+    }
+  }
+}
