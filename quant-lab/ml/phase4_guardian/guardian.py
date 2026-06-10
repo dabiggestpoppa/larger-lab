@@ -103,7 +103,27 @@ class GuardianPipeline:
         self.last_alert_time: dict[str, float] = {}
         self.alert_cooldown_seconds: int = 300  # 5 min between alerts per symbol
         self.active_trades: dict[str, dict] = {}  # symbol -> trade state
+        # Send startup message to Telegram
+        self._send_startup_message()
 
+    def _send_startup_message(self):
+        """Send a startup notification to Telegram when guardian initializes."""
+        startup_msg = (
+            "🔱 <b>CEREBUS NEURO-SYMBOLIC SCANNER</b>\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+            "✅ <b>System initialized and online.</b>\n\n"
+            "📊 <b>Pipeline Status:</b>\n"
+            f"  • Model: {len(self.feature_names)} features loaded\n"
+            f"  • RAG Store: {self.rag_store.count()} chunks indexed\n"
+            f"  • Orchestrator: {len(self.orchestrator.transition_probs)} transitions loaded\n"
+            f"  • Active trades: {len(self.active_trades)}\n\n"
+            "⏳ Scanning for setups...\n"
+            "  Alignment threshold: 85%\n"
+            "  Hard exit: 12PM EST\n"
+            "  Kill-switch: 132% structural invalidation"
+        )
+        self._send_telegram(startup_msg)
+        logger.info("Startup message sent to Telegram")
     def process_candle(self, df: pd.DataFrame, symbol: str) -> Optional[str]:
         """
         Process a new M15 candle and generate an alert if conditions are met.
@@ -437,7 +457,7 @@ class GuardianPipeline:
         return decision
 
     def _discover_chat_id(self, token: str) -> str:
-        """Auto-discover chat_id from Telegram getUpdates API."""
+        """Auto-discover chat_id from Telegram getUpdates API. Saves to .env for persistence."""
         try:
             r = requests.get(
                 f"https://api.telegram.org/bot{token}/getUpdates?limit=1&timeout=5",
@@ -447,10 +467,32 @@ class GuardianPipeline:
             if data.get("ok") and data.get("result"):
                 cid = str(data["result"][0]["message"]["chat"]["id"])
                 logger.info(f"Auto-discovered chat_id: {cid}")
+                # Save to .env for persistence
+                self._save_chat_id_to_env(cid)
                 return cid
         except Exception as e:
             logger.warning(f"getUpdates error: {e}")
         return ""
+
+    def _save_chat_id_to_env(self, chat_id: str):
+        """Save chat_id to .env file for persistence across restarts."""
+        try:
+            env_path = Path(__file__).resolve().parent.parent.parent.parent / ".env"
+            if env_path.exists():
+                content = env_path.read_text(encoding="utf-8")
+                lines = content.splitlines()
+                updated = False
+                for i, line in enumerate(lines):
+                    if line.strip().startswith("HERMES_TELEGRAM_CHAT_ID"):
+                        lines[i] = f"HERMES_TELEGRAM_CHAT_ID={chat_id}"
+                        updated = True
+                        break
+                if not updated:
+                    lines.append(f"HERMES_TELEGRAM_CHAT_ID={chat_id}")
+                env_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+                logger.info(f"Saved chat_id to .env: {chat_id}")
+        except Exception as e:
+            logger.warning(f"Failed to save chat_id to .env: {e}")
 
     def _send_telegram(self, text: str) -> bool:
         """Send message to Telegram via Hermes bot."""
