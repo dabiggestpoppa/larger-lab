@@ -7,7 +7,43 @@
 
 ---
 
-## 🔴 PM BUILDS 3 MISSING MACRO MODULES (2026-06-10 15:30 UTC)
+## � AS QUALITY AUDIT — CEREBUS Wave 1+2 Code Review (2026-06-10 16:00 UTC)
+**Agent:** AS (Assistant Manager) | **Scope:** All CC + PM CEREBUS code
+
+### Grade: B+ — Core logic real, infrastructure gaps need cleanup
+
+**Tests:** 126/127 passing (1 failure = old test file floating point tolerance, not logic bug)
+
+**✅ Confirmed REAL (not placeholder):**
+- MLR engine — proper 07:00-10:00 UTC range, forward-fill, Fib targets
+- ILM detector — session-based Asian/London range, regime ratio
+- Pattern recognizer — Alpha/Beta/AB-CD with swing detection
+- Kill switch — 132% proximity + full rekey state machine
+- Label generator v2 — forward-looking, order-of-events, no future leakage
+- Data cleanup — 19 assets, OHLCV validated, 0 NaN/duplicates
+- All retrain uses TimeSeriesSplit (no random split)
+- No retail indicators (RSI/MACD/BB) in any new code
+- test_macro_engine.py — 61 tests, comprehensive, real assertions
+
+**🚨 5 Issues Found:**
+
+1. **DUAL IMPLEMENTATION** — `macro_feature_engine.py` (old flat file) AND `macro/` package (new) both exist. Tests split between them. Old one has simpler/worse ILM logic. **Need to delete old file and consolidate.**
+
+2. **RETRAIN PATH MISMATCH** — `retrain_full.py` references `data/combined/` but combined files are in `data/` root. **Retrain will fail as-is.**
+
+3. **MISSING MICRO FEATURES** — Old `data/features/` has 16 basic columns. Missing 6 CEREBUS micro features: `asian_range_pips`, `vol_ratio_3am_9am`, `spread_vs_20d_avg`, `impulse_to_ar_ratio`, `consecutive_losses`, `prior_session_wr`. `micro_features.py` exists but was never integrated into the pipeline.
+
+4. **PM2 PATTERN RECOGNITION GAP** — PM2 was assigned Phase 1C but never built code. PM (Polymorph) built it instead. PM2's progress says "assigned" but no PM2 pattern code exists. `test_pattern_recognition.py` does NOT exist.
+
+5. **MINOR** — `test_macro_features.py` missing `import pytest` (uses `pytest.skip()` without import)
+
+**Constitution:** 11/12 rules enforced. Rule 10 (RAG purity) not yet tested (Wave 2).
+
+**Recommendation:** Fix issues #1-3 before Wave 2 starts. Issue #4 needs PM2 assignment clarification.
+
+---
+
+## �🔴 PM BUILDS 3 MISSING MACRO MODULES (2026-06-10 15:30 UTC)
 **Agent:** PM (Polymorph) | **Status:** ✅ COMPLETE — 4 files, 1562 lines, 61 tests PASS
 
 CC's macro `__init__.py` imported 3 modules that didn't exist. PM built them:

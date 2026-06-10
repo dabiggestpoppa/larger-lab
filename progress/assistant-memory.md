@@ -6,6 +6,32 @@
 
 ---
 
+## Current Context (2026-06-10 16:00 UTC)
+
+### Status
+🟢 Active — CEREBUS Quality Audit Complete
+
+### Active Build: CEREBUS Neuro-Symbolic Scanner
+- **Wave 1:** ✅ Complete (Data Cleanup, Macro Features, Labels — all real code)
+- **Wave 2:** 🔄 In Progress (Retrain — has path/feature mismatch bugs)
+- **Tests:** 126/127 passing
+- **Grade:** B+ (core real, infrastructure gaps)
+
+### Key Issues to Track
+1. Dual macro implementation (old flat file vs new `macro/` package) — needs consolidation
+2. Retrain path wrong (`data/combined/` vs `data/`) — will fail as-is
+3. Missing micro features in old feature matrices — 6 of 8 micro features absent
+4. PM2 never built pattern recognition — PM did it instead
+5. `test_macro_features.py` missing `import pytest`
+
+### Next AS Actions
+- Fix issue #5 (missing pytest import) — quick win
+- Verify CC fixes issues #1-3 before Wave 2 proceeds
+- Write `test_pattern_recognition.py` (PM2's missing tests)
+- Prepare Wave 3 test suite (Guardian + RAG)
+
+---
+
 ## PowerShell/Windows Execution Gotchas
 
 ### Encoding Issues

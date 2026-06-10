@@ -7,7 +7,7 @@
 
 ---
 
-## Status: 🟢 Active — CEREBUS Build Planning Complete, Ready for Wave 1
+## Status: 🟢 Active — CEREBUS Quality Audit Complete (2026-06-10)
 
 ### CEREBUS Neuro-Symbolic Scanner — AS Assignments
 - **Tests:** Full test suite for all new components (40+ new tests)
@@ -92,9 +92,40 @@
 - Documented O-7 expected structure (12 backend + 9 frontend components)
 - Noted quality issues across the codebase
 
-#### [AS] 2026-05-26 — Memory Reconstruction from Git
-- All agent memory files stale, reconstructed from git log
-- Updated progress + memory files for all agents
+#### [AS] 2026-06-10 — CEREBUS Quality Audit (Full Code Review)
+**Scope:** All Wave 1 + Wave 2 code (CC + PM2)
 
-#### [AS] 2026-05-24 — OCE Frontend Phase 1-4 COMPLETE
-- 6 routes, clean compile. Zustand stores, right-panel inspection, chaos metrics.
+**Test Results:** 126/127 passing (1 failure = old test file floating point tolerance, not a logic bug)
+
+**✅ What's REAL (not placeholder):**
+- MLR engine (macro/mlr_engine.py) — proper 07:00-10:00 UTC, forward-fill, Fib targets
+- ILM detector (macro/ilm_detector.py) — session-based Asian/London range, regime ratio
+- Pattern recognizer (macro/pattern_recognizer.py) — Alpha/Beta/AB-CD with swing detection
+- Kill switch (macro/kill_switch.py) — 132% proximity + full rekey state machine
+- Label generator v2 — forward-looking, order-of-events tracking, no future leakage
+- Data cleanup — 19 assets cleaned, OHLCV validated, 0 NaN/duplicates
+- Macro features — 41 columns per asset, 19 assets
+- Labels — delivery/rekey/regime for 18 assets
+- test_macro_engine.py — 61 tests, comprehensive, real assertions
+- All retrain code uses TimeSeriesSplit (no random split)
+- No retail indicators (RSI/MACD/BB) found in any new code
+
+**🚨 Issues Found (5):**
+
+1. **DUAL IMPLEMENTATION** — Two parallel macro engines exist:
+   - Old: `phase1_data/macro_feature_engine.py` (flat file, simpler)
+   - New: `phase1_data/macro/` package (proper session-based ILM, rekey state machine)
+   - `test_macro_features.py` tests the OLD one, `test_macro_engine.py` tests the NEW one
+   - **Fix needed:** Delete old file or merge, update tests to reference new package
+
+2. **RETRAIN PATH MISMATCH** — `retrain_full.py` references `data/combined/` but combined files are in `data/` root. Also expects 20 features but only 12 available (8 micro missing from old feature matrices). **Retrain will fail as-is.**
+
+3. **MISSING MICRO FEATURES** — Old `data/features/` has only 16 basic columns. Missing 6 CEREBUS micro features: `asian_range_pips`, `vol_ratio_3am_9am`, `spread_vs_20d_avg`, `impulse_to_ar_ratio`, `consecutive_losses`, `prior_session_wr`. The `micro_features.py` file exists but was never integrated into the pipeline.
+
+4. **PM2 PATTERN RECOGNITION = CC'S CODE** — PM2 was assigned Phase 1C but never built `pattern_recognizer.py`. CC built it inside `macro/pattern_recognizer.py`. PM2's progress file says "assigned" but no PM2 code exists. `test_pattern_recognition.py` does NOT exist.
+
+5. **MINOR:** `test_macro_features.py` missing `import pytest` (uses `pytest.skip()` without import)
+
+**Constitution Compliance:** 11/12 rules enforced. Rule 10 (RAG purity) not yet tested (Wave 2).
+
+**Overall Grade: B+** — Core logic is real and well-tested. Infrastructure gaps (dual implementation, missing micro features, retrain path bugs) need cleanup before Wave 2 can proceed.
