@@ -1,0 +1,12 @@
+﻿python :   File "<string>", line 54
+At line:1 char:58
++ cd C:\Users\wifik\Desktop\projects\larger-lab\quant-lab; python -c "
++                                                          ~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (  File "<string>", line 54:String 
+   ) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+    print(f'  {pair}: {n_points} sweep points | Floor T1={f.get(" 
+t1_trigger\,\?\):.1f}
+          ^
+SyntaxError: unterminated string literal (detected at line 54)
