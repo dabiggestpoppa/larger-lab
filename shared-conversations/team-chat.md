@@ -4,7 +4,8 @@
 > **Current focus:** 🔴 CEREBUS Neuro-Symbolic Scanner — NEW BUILD (largest yet)
 > **Plan:** `quant-lab/ml/CEREBUS_NEURO_SYMBOLIC_SCANNER_PLAN.md`
 > **CC Build Notes:** `quant-lab/ml/BUILD_NOTES_CEREBUS.md`
-> **Status:** Wave 1 ✅ | Wave 2 🔄 (CC: retrain in progress) | Wave 3 ⏳ (OC2: RAG + Guardian)
+> **Status:** Wave 1 ✅ | Wave 2 🔄 (CC: retrain 87.1% CV, Colab notebook ready) | Wave 3 ⏳ (OC2: RAG + Guardian)
+> **Colab Notebook:** `quant-lab/ml/CEREBUS_Retrain_Colab.ipynb` — GPU-accelerated training with 41 features
 
 ---
 
@@ -106,11 +107,49 @@ The **largest build yet** — a complete Neuro-Symbolic Scanner (4 Steps):
 | 1B+: ILM + Builder | PM | ilm_detector, macro_feature_builder | ✅ Built |
 | 1C: Pattern Recog | PM | 18 pattern detectors | ✅ Built |
 | 1D: Labels v2 | CC | Forward-looking with order-of-events | ✅ Built |
-| 2: Retrain + Rules | CC | XGBoost on 30 features + ironclad | 🔄 In Progress |
+| 2: Retrain + Rules | CC | XGBoost on 41 features + ironclad | 🔄 87.1% CV (needs 88%) |
 | 3: RAG Oracle | OC2 | ChromaDB + chunker + query engine | ⏳ Pending |
 | 4: Guardian | OC2 | Live scanner + Telegram dispatch | ⏳ Pending |
 | Tests | AS | Full test suite (40 new tests) | ⏳ Pending |
 | Macro Tests | PM | 70 tests for macro engine | ✅ 70/70 PASS |
+
+---
+
+## 🔴 CC — Retrain Results + Colab Notebook (2026-06-10 22:00 UTC)
+
+### XGBoost Retrain Results (41 features, 5.3M samples, 18 assets)
+| Metric | Value |
+|--------|-------|
+| Train Accuracy | 90.0% |
+| Val Accuracy | 86.5% |
+| CV Accuracy | 87.1% ± 1.8% |
+| CV Folds | 83.8%, 88.0%, 87.0%, 87.6%, 89.1% |
+| Features | 41 (from full_features_v2 80-col files) |
+| Samples | 5,298,869 (4.2M train / 1.1M val) |
+| Assets | 18 (all except TEST) |
+
+### SHAP Physics Check
+- **Status:** All SHAP values = 0.0000 (TreeExplainer issue with multi-class)
+- **dist_to_132_pips rank:** 22 (unreliable due to SHAP failure)
+- **Fix needed:** Use `pred_contribs=True` or switch to KernelExplainer
+
+### Colab Notebook Created
+- **File:** `quant-lab/ml/CEREBUS_Retrain_Colab.ipynb`
+- **Purpose:** GPU-accelerated training (tree_method='gpu_hist')
+- **To use:** Upload full_features_v2 + labels to Google Drive, mount in Colab, run all cells
+- **Expected speedup:** 5-10x vs CPU training
+
+### Issues Fixed
+1. ✅ Tier/AU values corrected using ST_TIERS_AND_AU.pdf (was 2-3x too large with K-Means)
+2. ✅ String columns excluded from features (tier, bias, regime_status, session)
+3. ✅ Model saves before SHAP (so SHAP failure doesn't lose model)
+4. ✅ Dual implementation files cleaned up
+
+### Next Steps
+1. Run Colab notebook with GPU for faster iteration
+2. Incorporate PM's 18 pattern detectors (107 features) into training
+3. Fix SHAP analysis (use KernelExplainer or pred_contribs)
+4. Target: CV >= 88%, dist_to_132_pips in top-5 SHAP
 
 ---
 
@@ -136,8 +175,8 @@ The **largest build yet** — a complete Neuro-Symbolic Scanner (4 Steps):
 
 ---
 
-## ?? RL � Updated Manual Pages 155-158 Extracted (2026-06-10 19:00 UTC)
-**Source:** CEREBUS_FX_v4_Complete_Manual (2).pdf � 4 new pages after DST protocol
+## ?? RL � Updated Manual Pages 155-158 Extracted (2026-06-10 19:00 UTC)
+**Source:** CEREBUS_FX_v4_Complete_Manual (2).pdf � 4 new pages after DST protocol
 
 ### Post-Target Reversal Rates (n=3,776 touches)
 | Target | Full Reversal | Deep Band Retest | Opp -25% Hit |
@@ -206,7 +245,7 @@ The **largest build yet** — a complete Neuro-Symbolic Scanner (4 Steps):
 
 ---
 
-## ?? RL � DMR/Stall-Harvest Strategy Extracted (2026-06-10 20:00 UTC)
+## ?? RL � DMR/Stall-Harvest Strategy Extracted (2026-06-10 20:00 UTC)
 **Source:** CEREBUS FX v4 Manual Part 4 (pages 20-31) + p90_engine_dmr.py + dmr_strategy.py
 
 ### DMR Core Concept
@@ -253,5 +292,5 @@ The **largest build yet** — a complete Neuro-Symbolic Scanner (4 Steps):
 - Hard exit: 12 PM EST
 
 ### Files Created
-- quant-lab/ml/phase1_data/dmr_features.py � DMR feature computation
+- quant-lab/ml/phase1_data/dmr_features.py � DMR feature computation
 - Updated all_decision_trees.json with DMR data
