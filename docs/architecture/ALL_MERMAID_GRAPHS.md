@@ -1,8 +1,27 @@
 OK# 📊 All Mermaid Graphs — Canonical Reference
 
 > **Purpose:** Single file containing every Mermaid diagram in the workspace.
-> **Last Updated:** 2026-06-01
-> **Total Diagrams:** 40+
+> **Last Updated:** 2026-06-10
+> **Total Diagrams:** 50+
+
+---
+
+## CEREBUS Neuro-Symbolic Scanner (NEW — 2026-06-10)
+
+| # | Diagram | File |
+|---|---------|------|
+| 1 | Master 4-Step Architecture | `CEREBUS_MERMAID_GRAPHS.md` |
+| 2 | Neuro-Symbolic Scanner Pipeline | `CEREBUS_MERMAID_GRAPHS.md` |
+| 3 | Markov Chain State Machine (17 states) | `CEREBUS_MERMAID_GRAPHS.md` |
+| 4 | Guardian Alert Flow (Sequence) | `CEREBUS_MERMAID_GRAPHS.md` |
+| 5 | RAG Oracle Architecture | `CEREBUS_MERMAID_GRAPHS.md` |
+| 6 | Feature Engineering Pipeline | `CEREBUS_MERMAID_GRAPHS.md` |
+| 7 | Trade Orchestrator State Flow | `CEREBUS_MERMAID_GRAPHS.md` |
+| 8 | Data Flow End-to-End | `CEREBUS_MERMAID_GRAPHS.md` |
+| 9 | SHAP Feature Importance (Bar) | `CEREBUS_MERMAID_GRAPHS.md` |
+| 10 | System File Structure | `CEREBUS_MERMAID_GRAPHS.md` |
+
+See also: `CEREBUS_ARCHITECTURE.md` for detailed architecture documentation.
 
 ---
 
