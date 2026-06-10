@@ -9,6 +9,7 @@ from __future__ import annotations
 import time
 import json
 import logging
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
@@ -16,9 +17,18 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 import joblib
+import requests
+
+# Load .env file for Telegram credentials
+_env_path = Path(__file__).resolve().parent.parent.parent.parent / ".env"
+if _env_path.exists():
+    for line in _env_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            k, v = line.split("=", 1)
+            os.environ.setdefault(k.strip(), v.strip())
 
 import sys
-from pathlib import Path
 _ml_dir = Path(__file__).parent.parent
 if str(_ml_dir) not in sys.path:
     sys.path.insert(0, str(_ml_dir))
@@ -52,9 +62,9 @@ class GuardianConfig:
     NY_START: int = 12      # 12:00 UTC = 8AM EST
     NY_END: int = 21        # 21:00 UTC = 5PM EST
 
-    # Telegram
-    TELEGRAM_BOT_TOKEN: str = ""
-    TELEGRAM_CHAT_ID: str = ""
+    # Telegram (Hermes bot — reads from .env if not set)
+    TELEGRAM_BOT_TOKEN: str = os.environ.get("HERMES_TELEGRAM_TOKEN", "")
+    TELEGRAM_CHAT_ID: str = os.environ.get("HERMES_TELEGRAM_CHAT_ID", "")
 
 
 class GuardianPipeline:
@@ -426,17 +436,64 @@ class GuardianPipeline:
 
         return decision
 
+    def _discover_chat_id(self, token: str) -> str:
+        """Auto-discover chat_id from Telegram getUpdates API."""
+        try:
+            r = requests.get(
+                f"https://api.telegram.org/bot{token}/getUpdates?limit=1&timeout=5",
+                timeout=10,
+            )
+            data = r.json()
+            if data.get("ok") and data.get("result"):
+                cid = str(data["result"][0]["message"]["chat"]["id"])
+                logger.info(f"Auto-discovered chat_id: {cid}")
+                return cid
+        except Exception as e:
+            logger.warning(f"getUpdates error: {e}")
+        return ""
+
+    def _send_telegram(self, text: str) -> bool:
+        """Send message to Telegram via Hermes bot."""
+        token = self.config.TELEGRAM_BOT_TOKEN
+        chat_id = self.config.TELEGRAM_CHAT_ID
+
+        if not token:
+            logger.warning("HERMES_TELEGRAM_TOKEN not set — skipping Telegram dispatch")
+            return False
+
+        if not chat_id:
+            chat_id = self._discover_chat_id(token)
+            if not chat_id:
+                logger.warning("No CHAT_ID — skipping Telegram dispatch")
+                return False
+            self.config.TELEGRAM_CHAT_ID = chat_id
+
+        try:
+            for chunk in [text[i:i+4096] for i in range(0, len(text), 4096)]:
+                r = requests.post(
+                    f"https://api.telegram.org/bot{token}/sendMessage",
+                    json={"chat_id": chat_id, "text": chunk, "parse_mode": "HTML"},
+                    timeout=15,
+                )
+                if not r.json().get("ok"):
+                    logger.error(f"Telegram API error: {r.json()}")
+                    return False
+            logger.info(f"Telegram message sent ({len(text)} chars)")
+            return True
+        except Exception as e:
+            logger.error(f"Telegram send failed: {e}")
+            return False
+
     def dispatch_alert(self, alert: str, symbol: str = ""):
         """
         Dispatch alert to configured channels.
-        Currently logs + prints. Telegram/Discord integration pending.
+        Logs + prints + sends to Telegram via Hermes bot.
         """
         logger.info(f"DISPATCH [{symbol}]: {alert[:100]}...")
         print(alert)
 
-        # TODO: Telegram dispatch
-        # if self.config.TELEGRAM_BOT_TOKEN:
-        #     self._send_telegram(alert)
+        # Telegram dispatch
+        self._send_telegram(alert)
 
     def run_batch_scan(self, data_dir: str, symbols: list[str]) -> dict:
         """
