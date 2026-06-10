@@ -1141,5 +1141,397 @@
       "pf": 205,
       "period": "EUR/USD 2022-2026"
     }
+  },
+  "rekey_failure_sequence": {
+    "source": "Holy Grail Excel (7 sheets) + CEREBUS FX v4 Manual Part 11 (pages 71-78)",
+    "description": "Complete rekey and failure sequence analysis",
+    "rekey_hypothesis_test": {
+      "source": "REKEY HYPOTHESIS TEST RESULTS sheet",
+      "sample": "195 132% violation events",
+      "baseline_78.6%_retrace": {
+        "new_100%_retrace": "92.0%",
+        "50%_consolidation": "85.0%",
+        "-50%_extension": "78.0%",
+        "combined": "85.0%"
+      },
+      "method_B_london_ny": {
+        "new_100%_retrace": "89.5%",
+        "50%_consolidation": "85.5%",
+        "-50%_extension": "81.1%",
+        "combined": "85.4%",
+        "rank": 1,
+        "verdict": "PROMISING - Superior -50% performance"
+      },
+      "winner": "METHOD B (London+NY Session) - 85.4% combined score",
+      "recommendation": "Proceed to manual validation on TradingView (10-20 events) before updating PHASE 7 model"
+    },
+    "rekey_duration": {
+      "source": "ITERATION 2 - 132% REKEY DURATION sheet",
+      "sample": "6,660 violation events (2020-2025)",
+      "avg_rekey_duration": "2.0 days",
+      "most_common_duration": "1.0 day (immediate next-day reversal)",
+      "overall_next_day_reversal_rate": "49.4%",
+      "by_day": {
+        "Thursday": {
+          "violations": 1501,
+          "pct": "22.5%",
+          "avg_duration": "1.99 days",
+          "next_day_reversal": "51.2%",
+          "risk": "PEAK DAY"
+        },
+        "Wednesday": {
+          "violations": 1349,
+          "pct": "20.3%",
+          "avg_duration": "2.01 days",
+          "next_day_reversal": "48.0%",
+          "risk": "HIGH RISK"
+        },
+        "Friday": {
+          "violations": 1342,
+          "pct": "20.2%",
+          "avg_duration": "1.96 days",
+          "next_day_reversal": "46.7%",
+          "risk": "MODERATE"
+        },
+        "Tuesday": {
+          "violations": 1260,
+          "pct": "18.9%",
+          "avg_duration": "1.97 days",
+          "next_day_reversal": "50.3%",
+          "risk": "MODERATE"
+        },
+        "Monday": {
+          "violations": 1195,
+          "pct": "17.9%",
+          "avg_duration": "1.98 days",
+          "next_day_reversal": "50.7%",
+          "risk": "LOWEST"
+        }
+      },
+      "direction_day_interaction": {
+        "Bearish_Thursday": {
+          "count": 758,
+          "avg_duration": 2,
+          "reversal_rate": "49.3%"
+        },
+        "Bullish_Thursday": {
+          "count": 743,
+          "avg_duration": 1.9,
+          "reversal_rate": "53.2%"
+        },
+        "Bullish_Wednesday": {
+          "count": 701,
+          "avg_duration": 1.9,
+          "reversal_rate": "53.6%"
+        },
+        "Bearish_Friday": {
+          "count": 686,
+          "avg_duration": 2.1,
+          "reversal_rate": "43.9%"
+        }
+      }
+    },
+    "failure_sequence_analysis": {
+      "source": "CEREBUS FX v4 Manual Part 11 (pages 71-78)",
+      "sample": "465 valid 2h-hold setups (Sep 2022 - Apr 2026)",
+      "core_data": {
+        "hit_1x_target_before_failure": "242 (52.0%)",
+        "failed_first": "210 (45.2%)",
+        "neither_cleanly_resolved": "13 (2.8%)"
+      },
+      "post_failure_level_sequence": {
+        "constraint_band_midpoint": "73.8% of failures",
+        "opposite_constraint_band_edge": "51.0% of failures",
+        "opposite_1x_resolution_target": "20.0% of failures"
+      },
+      "dominant_pattern": "fail -> midpoint repair -> new acceptance attempt -> decide",
+      "interpretation": "Most common failure sequence is NOT full reversal. It is: fail -> midpoint repair -> re-acceptance attempt"
+    },
+    "failure_taxonomy_3_types": {
+      "Type_1_Soft_Failure": {
+        "description": "Fails back inside band -> midpoint hit -> field compresses. No clean follow-through.",
+        "frequency": "Most common",
+        "action": "Stand down. Wait for new close signal."
+      },
+      "Type_2_Internal_Reset": {
+        "description": "Fails -> midpoint repair -> field later reclaims original side -> second 2h acceptance -> constraint resolution continues.",
+        "frequency": "Second most common (89% of second breaks)",
+        "win_rate": "67.7%",
+        "action": "Wait for second acceptance hold. Re-enter aligned."
+      },
+      "Type_3_Regime_Flip": {
+        "description": "Fails -> midpoint -> opposite edge -> opposite constraint violation -> second 2h hold -> opposite 1x target prints.",
+        "frequency": "Minority (11% of second breaks)",
+        "win_rate": "84.6%",
+        "action": "Rarer but highest win rate. Wait for full confirmation."
+      }
+    },
+    "second_acceptance_edge": {
+      "second_break_fires_in_basically_all_failures": "~100%",
+      "second_signal_becomes_valid_2h_hold": "50.5%",
+      "win_rate_on_second_accepted_move": "69.8%",
+      "same_side_re_acceptance": "67.7% WR (89% of second breaks)",
+      "opposite_side_flip": "84.6% WR (11% of second breaks)",
+      "practical_rule": "Requires (a) new M5 close signal outside band, (b) price holds outside for 2 hours. ONLY THEN is it valid."
+    },
+    "day_of_week_execution_rules": {
+      "Tuesday_Wednesday": {
+        "first_break_real": "75-85%",
+        "second_break_real": "15-25%",
+        "rule": "PLAY THE FIRST CONSTRAINT VIOLATION. High conviction. Full size. Trust the 2h hold."
+      },
+      "Thursday": {
+        "first_break_real": "50-60%",
+        "second_break_real": "40-50%",
+        "rule": "WAIT FOR THE SECOND VIOLATION. First violation = coin flip. Second violation = the actual trade."
+      },
+      "Friday": {
+        "first_break_real": "65-75%",
+        "second_break_real": "25-35%",
+        "rule": "Mixed. First move tradeable but weaker follow-through."
+      },
+      "Monday": {
+        "first_break_real": "60-65%",
+        "second_break_real": "35-40%",
+        "rule": "Indecisive. False first move is common. Reduce size."
+      }
+    },
+    "pattern_failures_rekeys": {
+      "source": "Pattern Failures & Rekeys sheet",
+      "triggers": [
+        {
+          "trigger": "132% Level Hit",
+          "rekey_prob": "95%",
+          "new_pattern": "Pattern invalidation",
+          "timing": "Immediate"
+        },
+        {
+          "trigger": "C-D Leg Failure",
+          "rekey_prob": "81.7%",
+          "new_pattern": "Alpha rekey",
+          "timing": "Within 2-4 hours"
+        },
+        {
+          "trigger": "A-B Leg Failure",
+          "rekey_prob": "78%",
+          "new_pattern": "Gamma rekey",
+          "timing": "Within 1-3 hours"
+        },
+        {
+          "trigger": "15M + WILM Active",
+          "rekey_prob": "92%",
+          "new_pattern": "4H pattern",
+          "timing": "15M to 4H"
+        },
+        {
+          "trigger": "15M + Daily ILM Miss + IELM",
+          "rekey_prob": "83%",
+          "new_pattern": "Higher TF pattern",
+          "timing": "15M to 1H/4H"
+        },
+        {
+          "trigger": "Baseline (no ILM)",
+          "rekey_prob": "38%",
+          "new_pattern": "Any pattern",
+          "timing": "Variable"
+        },
+        {
+          "trigger": "WEZ + 15M Failure",
+          "rekey_prob": "65.6%",
+          "new_pattern": "1H pattern",
+          "notes": "+26.6% vs baseline"
+        },
+        {
+          "trigger": "WEZ + 1H Failure",
+          "rekey_prob": "65.4%",
+          "new_pattern": "4H pattern",
+          "notes": "+27.4% vs baseline"
+        },
+        {
+          "trigger": "WEZ + 4H Failure",
+          "rekey_prob": "66.7%",
+          "new_pattern": "Daily pattern",
+          "notes": "+28.7% vs baseline"
+        },
+        {
+          "trigger": "Quarter + Inversion",
+          "rekey_prob": "82.3%",
+          "new_pattern": "State transition"
+        },
+        {
+          "trigger": "Hidden Delayed Rekey (3 DBlocks)",
+          "rekey_prob": "76.9%",
+          "new_pattern": "Delayed pattern"
+        },
+        {
+          "trigger": "Steep 1.618 Failure",
+          "rekey_prob": "26.5%",
+          "new_pattern": "Retracement",
+          "notes": "Low completion rate - expect failure"
+        },
+        {
+          "trigger": "Shallow 1.618 Success",
+          "rekey_prob": "57.9%",
+          "new_pattern": "Continuation"
+        },
+        {
+          "trigger": "Wednesday 61.8% Change",
+          "rekey_prob": "67.4%",
+          "new_pattern": "Direction change"
+        },
+        {
+          "trigger": "WILM Boundary",
+          "rekey_prob": "76%",
+          "new_pattern": "Secondary path",
+          "notes": "3.1x secondary path probability"
+        }
+      ]
+    },
+    "fibonacci_hit_rates_validated": {
+      "source": "ASIAN SESSION FAILURE ANALYSIS sheet",
+      "sample": "281 weeks (Jan 2020 - May 2025)",
+      "levels": {
+        "Fib -25%": {
+          "claimed": "90%",
+          "actual": "98.22%",
+          "hits": 276,
+          "weeks": 281,
+          "variance": "+8.22%",
+          "status": "EXCEEDS CLAIM",
+          "avg_time": "24 hours"
+        },
+        "Fib -50%": {
+          "claimed": "82%",
+          "actual": "96.44%",
+          "hits": 271,
+          "weeks": 281,
+          "variance": "+14.44%",
+          "status": "EXCEEDS CLAIM",
+          "avg_time": "36-39 hours"
+        },
+        "Fib -100%": {
+          "claimed": "N/A",
+          "actual": "92.17%",
+          "hits": 259,
+          "weeks": 281,
+          "status": "VALIDATED",
+          "avg_time": "48 hours"
+        },
+        "Fib -168%": {
+          "claimed": "N/A",
+          "actual": "87.19%",
+          "hits": 245,
+          "weeks": 281,
+          "status": "VALIDATED",
+          "avg_time": "60 hours"
+        },
+        "Fib 132% Violation": {
+          "claimed": "95%",
+          "actual": "71.53%",
+          "hits": 201,
+          "weeks": 281,
+          "variance": "-23.47%",
+          "status": "REQUIRES REVISION",
+          "avg_time": "33-42 hours",
+          "notes": "100% REKEY RATE (195/195)"
+        },
+        "Fib 0%": {
+          "claimed": "100%",
+          "actual": "100%",
+          "status": "PERFECT"
+        },
+        "Fib 100%": {
+          "claimed": "100%",
+          "actual": "100%",
+          "status": "PERFECT"
+        }
+      },
+      "asian_session_predictive_accuracy": {
+        "exact": "82.71% (512/619 sessions)",
+        "plus_minus_0.15_tolerance": "82.71%",
+        "plus_minus_0.25_tolerance": "89.34%",
+        "plus_minus_0.50_tolerance": "96.93%",
+        "optimal_tolerance": "±0.25 (best balance precision/reliability)"
+      }
+    },
+    "failure_pattern_categories": {
+      "source": "ASIAN SESSION FAILURE ANALYSIS sheet",
+      "total_failures": 107,
+      "categories": [
+        {
+          "category": "Wednesday 132% Violation During Asian",
+          "count": 37,
+          "pct": "34.6%",
+          "rekey_prob": "100%"
+        },
+        {
+          "category": "Asian Range Contraction (<0.5 Monday Range)",
+          "count": 28,
+          "pct": "26.2%",
+          "rekey_prob": "45%"
+        },
+        {
+          "category": "ILM Misalignment",
+          "count": 18,
+          "pct": "16.8%",
+          "rekey_prob": "65%"
+        },
+        {
+          "category": "News Window Interference (07:00-11:00 UTC)",
+          "count": 12,
+          "pct": "11.2%",
+          "rekey_prob": "78%"
+        },
+        {
+          "category": "False Breakout Pattern",
+          "count": 8,
+          "pct": "7.5%",
+          "rekey_prob": "52%"
+        }
+      ]
+    },
+    "seasonal_failure_clustering": {
+      "source": "-168% FAILURE INVESTIGATION sheet",
+      "sample": "281 weeks (Jan 2020 - May 2025)",
+      "overall_168_hit_rate": "87.19%",
+      "overall_failure_rate": "12.81%",
+      "by_quarter": {
+        "Q1": {
+          "failure_rate": "13.8%",
+          "pct_of_failures": "36.4%",
+          "risk": "HIGH RISK",
+          "recommendation": "Exercise increased caution, tighter stops"
+        },
+        "Q2": {
+          "failure_rate": "5.2%",
+          "pct_of_failures": "13.6%",
+          "risk": "LOW RISK",
+          "recommendation": "Optimal period for -168% extensions"
+        },
+        "Q3": {
+          "failure_rate": "5.1%",
+          "pct_of_failures": "13.6%",
+          "risk": "LOW RISK",
+          "recommendation": "Reliable delivery period"
+        },
+        "Q4": {
+          "failure_rate": "13.8%",
+          "pct_of_failures": "36.4%",
+          "risk": "HIGH RISK",
+          "recommendation": "Avoid or reduce position size"
+        }
+      },
+      "key_finding": "Q1 + Q4 (winter months) account for 63.7% of all Non-COVID -168% failures",
+      "protective_factors": [
+        "High volatility (>2.5 range)",
+        "Bearish bias",
+        "Q2/Q3 seasons"
+      ],
+      "risk_factors": [
+        "Low volatility (<1.5 range)",
+        "Bullish bias",
+        "Q1/Q4 seasons"
+      ]
+    }
   }
 }
