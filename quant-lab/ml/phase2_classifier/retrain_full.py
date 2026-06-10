@@ -34,6 +34,8 @@ from collections import Counter
 
 LABELS_DIR = Path(__file__).parent.parent / "data" / "labels"
 FEATURES_DIR = Path(__file__).parent.parent / "data" / "features"
+MACRO_DIR = Path(__file__).parent.parent / "data" / "macro_features"
+COMBINED_DIR = Path(__file__).parent.parent / "data"  # Combined files are in data/ root, not data/combined/
 ML_DATA_DIR = Path(__file__).parent.parent / "data"
 MODEL_DIR = Path(__file__).parent.parent / "models"
 SHAP_DIR = Path(__file__).parent.parent / "shap"
