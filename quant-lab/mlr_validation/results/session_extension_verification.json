@@ -1,0 +1,492 @@
+{
+  "per_asset": {
+    "AUDUSD": {
+      "symbol": "AUDUSD",
+      "total_samples": 272324,
+      "session_samples": 4545,
+      "label_25_delivery": {
+        "confirmed": 3386,
+        "failed": 137,
+        "chop": 1022,
+        "total": 4545,
+        "rate": 0.745
+      },
+      "label_50_delivery": {
+        "confirmed": 3078,
+        "failed": 513,
+        "chop": 954,
+        "total": 4545,
+        "rate": 0.6772
+      },
+      "rekey_triggered": {
+        "confirmed": 137,
+        "failed": 0,
+        "chop": 4408,
+        "total": 4545,
+        "rate": 0.0301
+      }
+    },
+    "BTCUSD": {
+      "symbol": "BTCUSD",
+      "total_samples": 458856,
+      "session_samples": 5496,
+      "label_25_delivery": {
+        "confirmed": 3129,
+        "failed": 650,
+        "chop": 1717,
+        "total": 5496,
+        "rate": 0.5693
+      },
+      "label_50_delivery": {
+        "confirmed": 3244,
+        "failed": 1490,
+        "chop": 762,
+        "total": 5496,
+        "rate": 0.5902
+      },
+      "rekey_triggered": {
+        "confirmed": 650,
+        "failed": 0,
+        "chop": 4846,
+        "total": 5496,
+        "rate": 0.1183
+      }
+    },
+    "CHFJPY": {
+      "symbol": "CHFJPY",
+      "total_samples": 273254,
+      "session_samples": 4561,
+      "label_25_delivery": {
+        "confirmed": 3162,
+        "failed": 422,
+        "chop": 977,
+        "total": 4561,
+        "rate": 0.6933
+      },
+      "label_50_delivery": {
+        "confirmed": 2804,
+        "failed": 648,
+        "chop": 1109,
+        "total": 4561,
+        "rate": 0.6148
+      },
+      "rekey_triggered": {
+        "confirmed": 422,
+        "failed": 0,
+        "chop": 4139,
+        "total": 4561,
+        "rate": 0.0925
+      }
+    },
+    "DE30": {
+      "symbol": "DE30",
+      "total_samples": 250504,
+      "session_samples": 4416,
+      "label_25_delivery": {
+        "confirmed": 3249,
+        "failed": 647,
+        "chop": 520,
+        "total": 4416,
+        "rate": 0.7357
+      },
+      "label_50_delivery": {
+        "confirmed": 2944,
+        "failed": 864,
+        "chop": 608,
+        "total": 4416,
+        "rate": 0.6667
+      },
+      "rekey_triggered": {
+        "confirmed": 647,
+        "failed": 0,
+        "chop": 3769,
+        "total": 4416,
+        "rate": 0.1465
+      }
+    },
+    "ETHUSD": {
+      "symbol": "ETHUSD",
+      "total_samples": 457998,
+      "session_samples": 5496,
+      "label_25_delivery": {
+        "confirmed": 3435,
+        "failed": 469,
+        "chop": 1592,
+        "total": 5496,
+        "rate": 0.625
+      },
+      "label_50_delivery": {
+        "confirmed": 3461,
+        "failed": 1358,
+        "chop": 677,
+        "total": 5496,
+        "rate": 0.6297
+      },
+      "rekey_triggered": {
+        "confirmed": 469,
+        "failed": 0,
+        "chop": 5027,
+        "total": 5496,
+        "rate": 0.0853
+      }
+    },
+    "EURUSD": {
+      "symbol": "EURUSD",
+      "total_samples": 272326,
+      "session_samples": 4545,
+      "label_25_delivery": {
+        "confirmed": 3316,
+        "failed": 448,
+        "chop": 781,
+        "total": 4545,
+        "rate": 0.7296
+      },
+      "label_50_delivery": {
+        "confirmed": 3017,
+        "failed": 912,
+        "chop": 616,
+        "total": 4545,
+        "rate": 0.6638
+      },
+      "rekey_triggered": {
+        "confirmed": 448,
+        "failed": 0,
+        "chop": 4097,
+        "total": 4545,
+        "rate": 0.0986
+      }
+    },
+    "FR40": {
+      "symbol": "FR40",
+      "total_samples": 243055,
+      "session_samples": 4152,
+      "label_25_delivery": {
+        "confirmed": 2748,
+        "failed": 507,
+        "chop": 897,
+        "total": 4152,
+        "rate": 0.6618
+      },
+      "label_50_delivery": {
+        "confirmed": 2472,
+        "failed": 717,
+        "chop": 963,
+        "total": 4152,
+        "rate": 0.5954
+      },
+      "rekey_triggered": {
+        "confirmed": 507,
+        "failed": 0,
+        "chop": 3645,
+        "total": 4152,
+        "rate": 0.1221
+      }
+    },
+    "GBPAUD": {
+      "symbol": "GBPAUD",
+      "total_samples": 275264,
+      "session_samples": 4593,
+      "label_25_delivery": {
+        "confirmed": 3012,
+        "failed": 416,
+        "chop": 1165,
+        "total": 4593,
+        "rate": 0.6558
+      },
+      "label_50_delivery": {
+        "confirmed": 2870,
+        "failed": 700,
+        "chop": 1023,
+        "total": 4593,
+        "rate": 0.6249
+      },
+      "rekey_triggered": {
+        "confirmed": 416,
+        "failed": 0,
+        "chop": 4177,
+        "total": 4593,
+        "rate": 0.0906
+      }
+    },
+    "GBPCHF": {
+      "symbol": "GBPCHF",
+      "total_samples": 275136,
+      "session_samples": 4593,
+      "label_25_delivery": {
+        "confirmed": 3372,
+        "failed": 534,
+        "chop": 687,
+        "total": 4593,
+        "rate": 0.7342
+      },
+      "label_50_delivery": {
+        "confirmed": 3177,
+        "failed": 893,
+        "chop": 523,
+        "total": 4593,
+        "rate": 0.6917
+      },
+      "rekey_triggered": {
+        "confirmed": 534,
+        "failed": 0,
+        "chop": 4059,
+        "total": 4593,
+        "rate": 0.1163
+      }
+    },
+    "GBPJPY": {
+      "symbol": "GBPJPY",
+      "total_samples": 275059,
+      "session_samples": 4593,
+      "label_25_delivery": {
+        "confirmed": 3242,
+        "failed": 454,
+        "chop": 897,
+        "total": 4593,
+        "rate": 0.7059
+      },
+      "label_50_delivery": {
+        "confirmed": 2840,
+        "failed": 840,
+        "chop": 913,
+        "total": 4593,
+        "rate": 0.6183
+      },
+      "rekey_triggered": {
+        "confirmed": 454,
+        "failed": 0,
+        "chop": 4139,
+        "total": 4593,
+        "rate": 0.0988
+      }
+    },
+    "GBPNZD": {
+      "symbol": "GBPNZD",
+      "total_samples": 276493,
+      "session_samples": 4617,
+      "label_25_delivery": {
+        "confirmed": 3118,
+        "failed": 470,
+        "chop": 1029,
+        "total": 4617,
+        "rate": 0.6753
+      },
+      "label_50_delivery": {
+        "confirmed": 3145,
+        "failed": 753,
+        "chop": 719,
+        "total": 4617,
+        "rate": 0.6812
+      },
+      "rekey_triggered": {
+        "confirmed": 470,
+        "failed": 0,
+        "chop": 4147,
+        "total": 4617,
+        "rate": 0.1018
+      }
+    },
+    "GBPUSD": {
+      "symbol": "GBPUSD",
+      "total_samples": 275226,
+      "session_samples": 4593,
+      "label_25_delivery": {
+        "confirmed": 3476,
+        "failed": 430,
+        "chop": 687,
+        "total": 4593,
+        "rate": 0.7568
+      },
+      "label_50_delivery": {
+        "confirmed": 3129,
+        "failed": 744,
+        "chop": 720,
+        "total": 4593,
+        "rate": 0.6813
+      },
+      "rekey_triggered": {
+        "confirmed": 430,
+        "failed": 0,
+        "chop": 4163,
+        "total": 4593,
+        "rate": 0.0936
+      }
+    },
+    "NZDUSD": {
+      "symbol": "NZDUSD",
+      "total_samples": 275215,
+      "session_samples": 4592,
+      "label_25_delivery": {
+        "confirmed": 3242,
+        "failed": 288,
+        "chop": 1062,
+        "total": 4592,
+        "rate": 0.706
+      },
+      "label_50_delivery": {
+        "confirmed": 3128,
+        "failed": 752,
+        "chop": 712,
+        "total": 4592,
+        "rate": 0.6812
+      },
+      "rekey_triggered": {
+        "confirmed": 288,
+        "failed": 0,
+        "chop": 4304,
+        "total": 4592,
+        "rate": 0.0627
+      }
+    },
+    "US500": {
+      "symbol": "US500",
+      "total_samples": 257731,
+      "session_samples": 4512,
+      "label_25_delivery": {
+        "confirmed": 3690,
+        "failed": 529,
+        "chop": 293,
+        "total": 4512,
+        "rate": 0.8178
+      },
+      "label_50_delivery": {
+        "confirmed": 3432,
+        "failed": 912,
+        "chop": 168,
+        "total": 4512,
+        "rate": 0.7606
+      },
+      "rekey_triggered": {
+        "confirmed": 529,
+        "failed": 0,
+        "chop": 3983,
+        "total": 4512,
+        "rate": 0.1172
+      }
+    },
+    "USDCHF": {
+      "symbol": "USDCHF",
+      "total_samples": 275251,
+      "session_samples": 4593,
+      "label_25_delivery": {
+        "confirmed": 3432,
+        "failed": 410,
+        "chop": 751,
+        "total": 4593,
+        "rate": 0.7472
+      },
+      "label_50_delivery": {
+        "confirmed": 2981,
+        "failed": 912,
+        "chop": 700,
+        "total": 4593,
+        "rate": 0.649
+      },
+      "rekey_triggered": {
+        "confirmed": 410,
+        "failed": 0,
+        "chop": 4183,
+        "total": 4593,
+        "rate": 0.0893
+      }
+    },
+    "USDJPY": {
+      "symbol": "USDJPY",
+      "total_samples": 275199,
+      "session_samples": 4593,
+      "label_25_delivery": {
+        "confirmed": 2959,
+        "failed": 433,
+        "chop": 1201,
+        "total": 4593,
+        "rate": 0.6442
+      },
+      "label_50_delivery": {
+        "confirmed": 2610,
+        "failed": 792,
+        "chop": 1191,
+        "total": 4593,
+        "rate": 0.5683
+      },
+      "rekey_triggered": {
+        "confirmed": 433,
+        "failed": 0,
+        "chop": 4160,
+        "total": 4593,
+        "rate": 0.0943
+      }
+    },
+    "XAGUSD": {
+      "symbol": "XAGUSD",
+      "total_samples": 302808,
+      "session_samples": 5280,
+      "label_25_delivery": {
+        "confirmed": 3698,
+        "failed": 581,
+        "chop": 1001,
+        "total": 5280,
+        "rate": 0.7004
+      },
+      "label_50_delivery": {
+        "confirmed": 3464,
+        "failed": 981,
+        "chop": 835,
+        "total": 5280,
+        "rate": 0.6561
+      },
+      "rekey_triggered": {
+        "confirmed": 581,
+        "failed": 0,
+        "chop": 4699,
+        "total": 5280,
+        "rate": 0.11
+      }
+    },
+    "XAUUSD": {
+      "symbol": "XAUUSD",
+      "total_samples": 305324,
+      "session_samples": 5328,
+      "label_25_delivery": {
+        "confirmed": 3932,
+        "failed": 340,
+        "chop": 1056,
+        "total": 5328,
+        "rate": 0.738
+      },
+      "label_50_delivery": {
+        "confirmed": 3589,
+        "failed": 816,
+        "chop": 923,
+        "total": 5328,
+        "rate": 0.6736
+      },
+      "rekey_triggered": {
+        "confirmed": 340,
+        "failed": 0,
+        "chop": 4988,
+        "total": 5328,
+        "rate": 0.0638
+      }
+    }
+  },
+  "combined": {
+    "label_25_delivery": {
+      "confirmed": 59598,
+      "failed": 8165,
+      "chop": 17335,
+      "total": 85098
+    },
+    "label_50_delivery": {
+      "confirmed": 55385,
+      "failed": 15597,
+      "chop": 14116,
+      "total": 85098
+    },
+    "rekey_triggered": {
+      "confirmed": 8165,
+      "failed": 0,
+      "chop": 76933,
+      "total": 85098
+    }
+  }
+}
