@@ -65,17 +65,23 @@ def chat_with_oce(message: str, session_id: str = "") -> str:
     }
 
     try:
-        r = requests.post(OCE_CHAT_URL, json=payload, timeout=120)
+        log(f"OCE request: {message[:60]}...")
+        t0 = time.time()
+        r = requests.post(OCE_CHAT_URL, json=payload, timeout=300)
+        elapsed = time.time() - t0
+        log(f"OCE response: status={r.status_code} in {elapsed:.1f}s")
         if r.status_code != 200:
-            log(f"OCE error: {r.status_code} {r.text[:200]}")
+            log(f"OCE error body: {r.text[:200]}")
             return ""
         data = r.json()
         choices = data.get("choices", [])
         if choices:
-            return choices[0].get("message", {}).get("content", "")
+            resp = choices[0].get("message", {}).get("content", "")
+            log(f"OCE reply: {resp[:80]}...")
+            return resp
         return ""
     except requests.exceptions.Timeout:
-        log("OCE request timed out")
+        log("OCE request timed out after 300s")
         return ""
     except Exception as e:
         log(f"OCE request error: {e}")
@@ -168,23 +174,28 @@ def run_autonomous():
         if not check_oce_health():
             log("OCE still down — exiting")
             sys.exit(1)
-    ctx = get_workspace_context()
+    # Send short startup message
+    log("Sending startup message to OCE...")
     chat_with_oce(
-        f"[SYSTEM] Hermes agent started. Session: {SESSION_ID}\n\n"
-        f"Workspace context:\n{ctx}\n\n"
-        "I'm online and connected to OCE. Ready for tasks."
+        f"[SYSTEM] Hermes agent started. Session: {SESSION_ID}. "
+        f"Ready for tasks."
     )
+    log("Startup message sent successfully.")
+    cycle = 0
     while True:
         try:
-            time.sleep(300)
+            time.sleep(600)  # 10 min between heartbeats
             if not check_oce_health():
                 log("OCE unreachable — skipping cycle")
                 continue
-            ctx = get_workspace_context()
+            cycle += 1
+            log(f"Heartbeat #{cycle}...")
             chat_with_oce(
-                f"[SYSTEM] Hermes heartbeat — {datetime.now(timezone.utc).strftime('%H:%M UTC')}\n\n"
-                f"Workspace:\n{ctx}"
+                f"[SYSTEM] Hermes heartbeat #{cycle} — "
+                f"{datetime.now(timezone.utc).strftime('%H:%M UTC')}. "
+                f"Status check: all nominal."
             )
+            log(f"Heartbeat #{cycle} complete.")
         except KeyboardInterrupt:
             log("Stopped.")
             break

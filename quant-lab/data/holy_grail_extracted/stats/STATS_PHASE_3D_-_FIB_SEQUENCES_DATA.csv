@@ -1,0 +1,18 @@
+﻿Pattern Type,Count,Percentage,Avg Duration (hours),Characteristics
+132% → 168% Rekey,90,0.874,1.8,"Fast sequential extension, dominant pattern"
+168% → 132% Rekey,13,0.126,3.9,"Slower reversal pattern, less common"
+SECTION 2: KEY METRICS SUMMARY,,,,
+Total Sequences Identified:,103,,,
+Double Rekey (132%→168%):,90 patterns (87.4%),,,
+Double Rekey (168%→132%):,13 patterns (12.6%),,,
+Most Common Sequence:,-25% → -50% → -100% → -168% (28 cases),,,
+SECTION 3: COMMON SEQUENCE PATTERNS,,,,
+Sequence Pattern,Frequency,Avg Completion Time,Success Rate,Trading Implication
+-25% → -50% → -100% → -168%,28,8-12h,0.872,Full extension delivery
+-25% → -50% → 132% (Rekey),18,6-8h,1,Rekey trigger sequence
+-25% → -50% (Stop),24,4-6h,0.964,"Partial delivery, consolidation"
+-25% → 132% (Direct),12,3-5h,1,Rapid invalidation
+SECTION 4: KEY FINDING,,,,
+Double rekey patterns occur frequently (103 total sequences),,,,
+132% → 168% is the dominant pattern (87.4%) and significantly faster (1.8h vs 3.9h),,,,
+Full extension sequence (-25% → -50% → -100% → -168%) is most common with 28 occurrences,,,,

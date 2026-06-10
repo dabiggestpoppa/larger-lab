@@ -1,0 +1,78 @@
+{
+  "pair": "EURUSD",
+  "session_type": "Weekly",
+  "total": 778,
+  "bias": {
+    "Bullish": 390,
+    "Bearish": 388
+  },
+  "tolerance_pips": 2,
+  "pip_size": 0.0001,
+  "levels": {
+    "ext_25": {
+      "exact": {
+        "hits": 648,
+        "total": 778,
+        "rate": 83.3
+      },
+      "tolerance": {
+        "hits": 657,
+        "total": 778,
+        "rate": 84.4
+      },
+      "diff": 1.2
+    },
+    "ext_50": {
+      "exact": {
+        "hits": 590,
+        "total": 778,
+        "rate": 75.8
+      },
+      "tolerance": {
+        "hits": 603,
+        "total": 778,
+        "rate": 77.5
+      },
+      "diff": 1.7
+    },
+    "ext_100": {
+      "exact": {
+        "hits": 478,
+        "total": 778,
+        "rate": 61.4
+      },
+      "tolerance": {
+        "hits": 491,
+        "total": 778,
+        "rate": 63.1
+      },
+      "diff": 1.7
+    },
+    "ext_168": {
+      "exact": {
+        "hits": 357,
+        "total": 778,
+        "rate": 45.9
+      },
+      "tolerance": {
+        "hits": 371,
+        "total": 778,
+        "rate": 47.7
+      },
+      "diff": 1.8
+    },
+    "rekey_132": {
+      "exact": {
+        "hits": 328,
+        "total": 778,
+        "rate": 42.2
+      },
+      "tolerance": {
+        "hits": 337,
+        "total": 778,
+        "rate": 43.3
+      },
+      "diff": 1.2
+    }
+  }
+}

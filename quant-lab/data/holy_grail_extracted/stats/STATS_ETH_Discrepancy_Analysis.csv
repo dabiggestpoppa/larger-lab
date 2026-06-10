@@ -1,0 +1,17 @@
+﻿Calculation Source,Model Type,-100% Hit Rate,-168% Hit Rate,Sample Size,Notes
+Root Cause Analysis,Not specified,0.862,0.763,Unknown,Target values from Phase 4 document
+Discrepancy was due to using all models (430 rows) vs 5-Day model only (215 weeks),All models,0.5721,0.44880000000000003,430,Calculated from eth_fibonacci_hit_results
+Current Calculation,5_day only,0.5581,0.4372,215,Filtered for 5_day model only
+Verification Status,7_day only,0.586,0.46049999999999996,215,Filtered for 7_day model only
+Phase 4 PDF values VERIFIED - 5-Day Model confirmed,,,,,
+Discrepancy Analysis,,,,,
+Validated Values,Phase 4 Value,Current Value,Difference,% Difference,
+Level,Old (All Models),New (5-Day PDF),,,
+-100%,57.21%,86.2%,-0.2899,-0.506729592728544,
+-168%,44.88%,76.3%,,,
+Key Findings,,,,,
+"Source: ETH/USD Phase 4 PDF - 5-Day Model, 215 weeks, 948 Fibonacci hits",Current calculations use eth_fibonacci_hit_results sheet with all models combined,,,,
+2. Discrepancy,Phase 4 shows ~29% higher for -100% (86.2% vs 57.21%) and ~31% higher for -168% (76.3% vs 44.88%),,,,
+3. Possible Causes,- Different data filtering (5_day vs 7_day model) - Different time period - Different hit criteria definition - Data quality issues,,,,
+4. Next Steps,- Review Phase 4 document methodology - Check for additional filtering criteria - Verify hit definition (when is -100% considered 'hit') - Examine data quality and completeness,,,,
+VERIFICATION STATUS,Phase 4 PDF values VERIFIED,Source: 5-Day Model recalculation (215 weeks),"-100%: 86.2% (87.2% Bull, 84.9% Bear)","-168%: 76.3% (78.5% Bull, 73.3% Bear)",

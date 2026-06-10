@@ -1,0 +1,4 @@
+﻿Measurement,Description,Weeks_Analyzed,Minus_25_Hit_Rate,Minus_50_Hit_Rate,Violation_132_Rate,Effectiveness_Score
+M1: Monday Range Only,Monday London range predicts Friday close (A=D),281,98.22064056939502,96.44128113879003,71.53024911032028,123.13167259786476
+M2: Monday + Tuesday Range,Combined Mon+Tue range predicts Wed-Fri delivery (A-B=C-D),280,68.92857142857143,59.285714285714285,38.92857142857143,89.28571428571429
+M3: Monday + Tuesday + Wednesday Range,Combined Mon+Tue+Wed range predicts Thu-Fri delivery (A-B-C=D),280,39.64285714285714,29.642857142857142,19.28571428571429,49.999999999999986

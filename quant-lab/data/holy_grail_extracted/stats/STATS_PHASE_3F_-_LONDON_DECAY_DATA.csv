@@ -1,0 +1,21 @@
+﻿Fibonacci Level,Pre-9AM Hit Rate,Post-9AM Hit Rate,Change,Behavior,Trading Implication
+-25% Extension,0.878,0.646,-0.232,DECAY,Shallow targets less reliable after 9 AM
+-50% Extension,0.821,0.684,-0.137,DECAY,Mid-level targets also decline
+132% Violation,0.353,0.473,0.12,INCREASE,Invalidation more likely later
+168% Extension,0.542,0.871,0.329,INCREASE,Deep targets improve significantly
+SECTION 2: KEY METRICS SUMMARY,,,,,
+Total Mondays Analyzed:,215,,,,
+Primary Finding:,87.8% of all hits occur before 9 AM EST,,,,
+Shallow Target Decay (-25%):,-23.2% decline after 9 AM EST,,,,
+Deep Target Increase (168%):,+32.9% increase after 9 AM EST,,,,
+SECTION 3: TEMPORAL DECAY PATTERN BY TIME WINDOW,,,,,
+Time Window,-25% Hit Rate,-50% Hit Rate,132% Rate,168% Hit Rate,Overall Reliability
+2-6 AM EST,0.924,0.886,0.281,0.423,HIGH - Primary Entry
+6-9 AM EST,0.878,0.821,0.353,0.542,HIGH - London Session
+9-12 PM EST,0.723,0.745,0.428,0.726,MODERATE - Decay Zone
+12-4 PM EST,0.646,0.684,0.473,0.871,LOW - NY Session
+SECTION 4: KEY FINDINGS,,,,,
+"Shallow targets (-25%, -50%) decay after 9 AM EST - reliability decreases",,,,,
+"Deep targets (132%, 168%) see INCREASED hit rates after 9 AM EST",,,,,
+87.8% of all Fibonacci target hits occur BEFORE 9 AM EST,,,,,
+"Trading Implication: Enter during London session (2-9 AM EST), exit by NY open",,,,,

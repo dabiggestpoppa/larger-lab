@@ -1,0 +1,18 @@
+﻿Time Window EST,-25% Rate,-50% Rate,-100% Rate,-168% Rate,132% Rate,Risk Level
+2-6 AM EST,0.924,0.886,0.878,0.423,0.281,LOW
+6-9 AM EST,0.878,0.821,0.831,0.542,0.353,MEDIUM
+9-12 PM EST,0.723,0.745,0.723,0.726,0.428,HIGH
+12-4 PM EST,0.646,0.684,0.646,0.871,0.473,HIGH
+KEY FINDINGS:,,,,,,
+BEST WINDOW FOR -100% HIT RATE: 2-6 AM EST (87.8% hit rate),,,,,,
+LOWEST 132% VIOLATION WINDOW: 2-6 AM EST (28.1% violation rate),,,,,,
+"SAFEST ENTRY WINDOW: 2-6 AM EST (Highest extension rates, lowest invalidation)",,,,,,
+STEP 3: DAILY RANGE CAPTURE BY 12 PM EST,,,,,,
+Metric,Result,,,,,
+Both Hi/Lo by noon,36.0%,,,,,
+High by noon only,71.0%,,,,,
+Low by noon only,60.0%,,,,,
+Avg range captured,82.2%,,,,,
+HYPOTHESIS TEST:,,,,,,
+"""80% daily range captured by 12 PM EST""",,,,,,
+Result: CONFIRMED,,,,,,

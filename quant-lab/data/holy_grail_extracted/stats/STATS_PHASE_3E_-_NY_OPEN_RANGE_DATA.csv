@@ -1,0 +1,20 @@
+﻿Metric,Value,Unit,Comparison,Status
+Trading Days Analyzed,1078,days,,COMPLETE
+Average NY Range,22.8,pips,vs London 14.1 pips,57% LARGER
+NY Close Containment Rate,0.266,percentage,Target: 30%,BELOW TARGET
+Range Containment Events,578,events,53.6% of total,SIGNIFICANT
+SECTION 2: KEY METRICS SUMMARY,,,,
+Total Trading Days:,"1,078",,,
+Average NY Range:,22.8 pips,,,
+NY Close Containment Rate:,26.6%,,,
+Range Containment Events:,578 (53.6%),,,
+SECTION 3: NY vs LONDON RANGE COMPARISON,,,,
+Session,Avg Range (pips),Containment Rate,Volatility Profile,Trading Implication
+NY Open (7-9 AM EST),22.8,0.266,High,Liquidity sweep window
+London Open (2-4 AM EST),14.1,0.831,Moderate,Primary entry window
+Difference,+8.7 (+61.7%),-56.5 pp,+High Risk,"NY for exits, London for entries"
+SECTION 4: KEY FINDING,,,,
+NY ranges are 57% larger than London ranges (22.8 vs 14.1 pips),,,,
+Only 26.6% of sessions close within the NY range - low containment,,,,
+Range containment at 53.6% indicates frequent breakout behavior,,,,
+"NY Open serves as liquidity sweep window, not primary entry",,,,

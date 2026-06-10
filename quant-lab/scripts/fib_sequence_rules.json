@@ -1,0 +1,82 @@
+{
+  "levels": {
+    "-25%": 0.25,
+    "-50%": 0.5,
+    "-100%": 1.0,
+    "-168%": 1.68,
+    "132%_rekey": 1.32
+  },
+  "sequences": [
+    {
+      "name": "Full Extension",
+      "pattern": [
+        "-25%\u2192-50%\u2192-100%\u2192-168%"
+      ],
+      "freq": "28/103",
+      "completion": "87.2%",
+      "duration": "8-12h"
+    },
+    {
+      "name": "Rekey Trigger",
+      "pattern": [
+        "-25%\u2192-50%\u2192132%"
+      ],
+      "freq": "18/103",
+      "completion": "100%",
+      "duration": "6-8h"
+    },
+    {
+      "name": "Partial Delivery",
+      "pattern": [
+        "-25%\u2192-50%"
+      ],
+      "freq": "24/103",
+      "completion": "96.4%",
+      "duration": "4-6h"
+    },
+    {
+      "name": "Direct Invalidation",
+      "pattern": [
+        "-25%\u2192132%"
+      ],
+      "freq": "12/103",
+      "completion": "100%",
+      "duration": "3-5h"
+    },
+    {
+      "name": "Double Rekey 132\u2192168",
+      "pattern": [
+        "132%\u2192168%"
+      ],
+      "freq": "90/103 (87.4%)",
+      "duration": "1.8h",
+      "note": "Dominant pattern"
+    },
+    {
+      "name": "Double Rekey 168\u2192132",
+      "pattern": [
+        "168%\u2192132%"
+      ],
+      "freq": "13/103 (12.6%)",
+      "duration": "3.9h",
+      "note": "Slower reversal"
+    },
+    {
+      "name": "50%\u219250% Retest",
+      "pattern": [
+        "50%\u219250%"
+      ],
+      "freq": "83-91%",
+      "completion": "Highest success",
+      "note": "Alpha sequence initiation"
+    }
+  ],
+  "pullbacks": {
+    "-25%": 29,
+    "-50%": 27.8,
+    "132%": 26.8,
+    "168%": 24.2
+  },
+  "bias_rule": "Bullish if Session_Close > Session_Open, Bearish if Close < Open",
+  "tolerance": "2 pips"
+}

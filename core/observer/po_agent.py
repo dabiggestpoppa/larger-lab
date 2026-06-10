@@ -37,6 +37,48 @@ from oce.backend.rate_limit_tracker import record_api_call
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
+# ─── OCE Tools API ──────────────────────────────────────────────────────────
+OCE_TOOLS_URL = "http://localhost:8000/api/po/tools"
+
+def _discover_tools(category: str = "") -> str:
+    """Query the OCE tools API to discover available tools."""
+    try:
+        import requests as _req
+        url = OCE_TOOLS_URL
+        if category:
+            url = f"{OCE_TOOLS_URL}/{category}"
+        r = _req.get(url, timeout=10)
+        if r.status_code == 200:
+            data = r.json()
+            tools = data.get("tools", [])
+            if not tools:
+                return "No tools found."
+            lines = [f"Available tools ({len(tools)}):"]
+            for t in tools:
+                name = t.get("name", "?")
+                desc = t.get("description", "")[:80]
+                cat = t.get("category", "general")
+                lines.append(f"  - {name} [{cat}]: {desc}")
+            return "\n".join(lines)
+        return f"Error: HTTP {r.status_code}"
+    except Exception as e:
+        return f"Error discovering tools: {e}"
+
+def _execute_remote_tool(tool_name: str, arguments: dict = None) -> str:
+    """Execute any tool via the OCE tools REST API."""
+    try:
+        import requests as _req
+        payload = {"tool_name": tool_name, "arguments": arguments or {}}
+        r = _req.post(f"{OCE_TOOLS_URL}/execute", json=payload, timeout=120)
+        if r.status_code == 200:
+            data = r.json()
+            if data.get("success"):
+                return str(data.get("result", ""))
+            return f"Tool error: {data.get('error', 'unknown')}"
+        return f"HTTP {r.status_code}: {r.text[:200]}"
+    except Exception as e:
+        return f"Error executing {tool_name}: {e}"
+
 # ─── Dynamic Tool Registry ──────────────────────────────────────────────────
 # Import the unified capability functions and tool registry
 # This gives PO access to ALL tools: file, git, exec, search, github,
@@ -55,9 +97,9 @@ except ImportError:
 # ─── Model Configuration ────────────────────────────────────────────────────
 
 MODEL_CHAIN = [
-    "inclusionai/ring-2.6-1t",
     "openrouter/owl-alpha",
     "minimax/minimax-m2.5",
+    "inclusionai/ring-2.6-1t",
 ]
 
 MODEL_RETRY_COUNT = 1  # attempts per model before falling back (1 = no retry, move to next model fast)
@@ -65,10 +107,37 @@ MODEL_RETRY_COUNT = 1  # attempts per model before falling back (1 = no retry, m
 # ─── Tool Definitions (OpenAI function calling format) ─────────────────────
 
 TOOL_DEFINITIONS = [
+    # ── Meta-tools: dynamic tool discovery & execution ──
     {
         "type": "function",
         "function": {
-            "name": "list_directory",
+            "name": "discover_tools",
+            "description": "Discover all available tools beyond the core set. Returns tool names, descriptions, and categories. Use this when you need a capability not in the core 15 tools (e.g. git_push, git_pull, create_directory, delete_file, multi_edit, install_package, pdf_extract, notebook, etc.). 70+ additional tools available.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "category": {"type": "string", "description": "Filter by category: file, git, exec, search, github, browser, memory, system, vscode, notebook, pdf, mcp. Empty = all."},
+                },
+                "required": [],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "execute_tool",
+            "description": "Execute any tool by name via the OCE tools API. Use discover_tools() first to find available tools and their parameters. This gives access to 70+ tools beyond the core set.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "tool_name": {"type": "string", "description": "Name of the tool to execute (from discover_tools)"},
+                    "arguments": {"type": "object", "description": "Tool-specific arguments as a JSON object"},
+                },
+                "required": ["tool_name"],
+            },
+        },
+    },
+    # ── Core file tools ──
             "description": "List files and directories. Use to explore workspace structure.",
             "parameters": {
                 "type": "object",
@@ -652,6 +721,10 @@ def execute_python(code: str, timeout: int = 60) -> str:
 # ─── Tool Function Map ──────────────────────────────────────────────────────
 
 TOOL_FUNCTIONS: Dict[str, Callable] = {
+    # Meta-tools
+    "discover_tools": lambda category="": _discover_tools(category),
+    "execute_tool": lambda tool_name, arguments=None: _execute_remote_tool(tool_name, arguments),
+    # Core tools
     "list_directory": list_directory,
     "read_file": read_file,
     "write_file": write_file,
@@ -680,27 +753,18 @@ def _get_all_tool_definitions() -> List[Dict[str, Any]]:
     1. Original hardcoded tools (for backward compatibility)
     2. Dynamic tools from the tool registry (new capabilities)
 
-    This ensures PO has access to ALL tools that Copilot has.
+    PO uses a small core toolset + dynamic discovery via discover_tools/execute_tool.
+    This keeps the LLM prompt lean while giving access to 70+ tools at runtime.
     """
-    # Start with original tools
-    all_tools = list(TOOL_DEFINITIONS)
-
-    # Add dynamic tools from registry
-    if DYNAMIC_TOOLS_ENABLED and _dyn_registry:
-        dynamic_schemas = _dyn_registry.to_openai_tools()
-        # Avoid duplicates — only add tools not already in TOOL_DEFINITIONS
-        existing_names = {t["function"]["name"] for t in TOOL_DEFINITIONS}
-        for tool in dynamic_schemas:
-            if tool["function"]["name"] not in existing_names:
-                all_tools.append(tool)
-
-    return all_tools
+    # Return only the core TOOL_DEFINITIONS (15 core + 2 meta-tools)
+    # Use discover_tools() and execute_tool() to access the full 70+ toolset
+    return list(TOOL_DEFINITIONS)
 
 
 def _execute_any_tool(tool_name: str, arguments: Dict[str, Any]) -> str:
     """
-    Execute a tool by name, checking both the original TOOL_FUNCTIONS
-    and the dynamic CAPABILITY_FUNCTIONS.
+    Execute a tool by name. Checks TOOL_FUNCTIONS first, then falls back
+    to the OCE tools API for dynamic tools.
     """
     # Check original functions first
     if tool_name in TOOL_FUNCTIONS:
@@ -709,11 +773,8 @@ def _execute_any_tool(tool_name: str, arguments: Dict[str, Any]) -> str:
         except Exception as e:
             return f"Error executing {tool_name}: {e}"
 
-    # Check dynamic capabilities
-    if DYNAMIC_TOOLS_ENABLED and execute_tool:
-        return execute_tool(tool_name, arguments)
-
-    return f"Unknown tool: {tool_name}"
+    # Fallback: try OCE tools API for dynamic tools
+    return _execute_remote_tool(tool_name, arguments)
 
 
 # ─── PO Agent ───────────────────────────────────────────────────────────────
@@ -831,6 +892,10 @@ class POAgent:
             payload["tool_choice"] = tool_choice
 
         try:
+            import logging as _logging
+            _llm_log = _logging.getLogger("po_agent")
+            _llm_log.info(f"LLM CALL START: model={model}, msgs={len(messages)}, tools={len(tools) if tools else 0}")
+            _t0 = time.time()
             r = requests.post(
                 self.base_url,
                 headers={
@@ -838,8 +903,9 @@ class POAgent:
                     "Content-Type": "application/json",
                 },
                 json=payload,
-                timeout=120,
+                timeout=60,
             )
+            _llm_log.info(f"LLM CALL DONE: model={model}, status={r.status_code}, time={time.time()-_t0:.1f}s")
             if r.status_code == 429:
                 record_api_call(model=model, status_code=429, error_type="rate_limited")
                 return None, None, model, "rate_limited"
@@ -964,14 +1030,21 @@ class POAgent:
                 if m not in models_to_try:
                     models_to_try.append(m)
 
-            # Use dynamic tool definitions (includes all capabilities)
-            all_tool_defs = _get_all_tool_definitions()
+            # Use ESSENTIAL tool definitions only — 72 tools overwhelms the LLM
+            # and causes timeouts on the first call. Use the curated static set.
+            all_tool_defs = TOOL_DEFINITIONS
+
+            import logging as _alog
+            _agent_log = _alog.getLogger("po_agent")
+            _agent_log.info(f"AGENT ROUND {round_num+1}: trying models={models_to_try}")
 
             for model in models_to_try:
+                _agent_log.info(f"AGENT: calling model={model}")
                 for retry in range(MODEL_RETRY_COUNT):
                     resp, tool_calls, used_model, err = self._call_llm(
                         messages, model=model, tools=all_tool_defs, tool_choice="auto"
                     )
+                    _agent_log.info(f"AGENT: model={model} resp={'yes' if resp else 'no'} tools={'yes' if tool_calls else 'no'} err={err}")
                     if resp or tool_calls:
                         if used_model in MODEL_CHAIN:
                             self._model_index = MODEL_CHAIN.index(used_model)
@@ -1058,12 +1131,9 @@ class POAgent:
         for model in models_to_try:
             resp, _, used_model, err = self._call_llm(messages, model=model)
             if resp:
-                with self._lock:
-                    self._history.append({"role": "user", "content": message})
-                    self._history.append({"role": "assistant", "content": resp})
+                _notify("complete", {})
                 return resp
-
-        return "⚠️ All LLM providers failed after tool calls."
+        return "⚠️ Max rounds reached and all models failed to produce a final response."
 
     def clear_history(self):
         with self._lock:

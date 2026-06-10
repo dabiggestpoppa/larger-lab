@@ -1,0 +1,20 @@
+﻿Delivery Type,Count,Percentage,Avg Pullback (pips),Characteristics
+Fast,33,0.041,22.4,"Rapid target achievement, smallest pullbacks"
+Normal,639,0.803,28.3,"Standard delivery pattern, typical pullbacks"
+Slow,124,0.156,32.1,"Extended delivery time, larger pullbacks"
+SECTION 2: KEY METRICS SUMMARY,,,,
+Total Deliveries Analyzed:,796,,,
+Fast Delivery Rate:,4.1% (33 instances),,,
+Normal Delivery Rate:,80.3% (639 instances),,,
+Slow Delivery Rate:,15.6% (124 instances),,,
+SECTION 3: KEY FINDINGS,,,,
+• Fast deliveries produce smaller pullbacks (22.4 pips vs 28.3 normal),,,,
+• Normal delivery is the dominant pattern (80.3%),,,,
+• Slow deliveries have largest pullbacks (32.1 pips) - higher risk,,,,
+SECTION 4: AVERAGE DELIVERY TIMES BY FIBONACCI LEVEL,,,,
+Fibonacci Level,Avg Delivery Time (hours),Delivery Classification,Trading Window,
+-25% Extension,1.48,Fast,Mon London - Mon NY,
+-50% Extension,3.2,Normal,Mon NY - Tue London,
+-100% Extension,6.5,Normal,Tue NY - Wed London,
+-168% Extension,12.4,Slow,Wed-Thu Sessions,
+132% Violation,4.8,Normal,Peak on Wednesday,

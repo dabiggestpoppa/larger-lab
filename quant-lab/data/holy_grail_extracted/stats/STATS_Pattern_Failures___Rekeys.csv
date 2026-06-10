@@ -1,0 +1,22 @@
+﻿Failure Type,Trigger Condition,Rekey Probability (%),New Pattern,Timing,ILM State,Notes
+Failure Type,Trigger Condition,Rekey Probability (%),New Pattern,Timing,ILM State,Notes
+132% Level Hit,Price reaches 132% extension,95,Pattern invalidation,Immediate,Any,Invalidation zone - pattern fails
+C-D Leg Failure,C-D leg fails to complete,81.7,Alpha rekey,Within 2-4 hours,Any,Most common rekey trigger
+A-B Leg Failure,A-B leg fails to complete,78,Gamma rekey,Within 1-3 hours,Any,Early pattern failure
+Leg 3 Failure,Pattern fails at C-D leg,82,Various rekeys,2-4 hours,Any,Most common failure point
+15M + Daily ILM Miss + IELM,15M pattern misses Daily ILM with IELM active,83,Higher TF pattern,15M to 1H/4H,IELM active,Strong rekey probability
+15M + WILM Active,15M pattern with WILM active,92,4H pattern,15M to 4H,WILM active,Highest rekey probability
+Baseline Rekey,Pattern failure without ILM,38,Any pattern,Variable,No ILM,Lowest rekey probability
+WEZ + 15M Failure,WEZ presence on 15M failure,65.6,1H pattern,15M to 1H,Any,+26.6% vs baseline
+WEZ + 1H Failure,WEZ presence on 1H failure,65.4,4H pattern,1H to 4H,Any,+27.4% vs baseline
+WEZ + 4H Failure,WEZ presence on 4H failure,66.7,Daily pattern,4H to Daily,Any,+28.7% vs baseline
+Quarter + Inversion,Quarter level hit with structure inversion,82.3,State transition,Variable,State_Bistable,High probability transition
+Hidden Delayed Rekey,After 3 DBlocks in State_Bistable,76.9,Delayed pattern,After 3 blocks,State_Bistable,Time-delayed rekey mechanism
+Steep 1.618 Failure,Steep angle 1.618 extension failure,26.5,Retracement,Quick,Any,Low completion rate - expect failure
+Shallow 1.618 Success,Shallow angle 1.618 extension,57.9,Continuation,Extended,Any,Better success rate
+Wednesday 61.8% Change,Wednesday at 61.8% level,67.4,Direction change,Wednesday,Any,Mid-week pivot probability
+-100%/-168% Levels,Price reaches -100% or -168%,,Profit booking + new sequence,Variable,Any,NOT a failure - natural completion
+4H A-B Failure,4H A-B target failure,85,15M micro-legs,4H to 15M,Any,+247% micro-leg increase
+Daily ILM Miss,Pattern misses Daily ILM,88,15M micro-pattern,Daily to 15M,Daily ILM missed,+320% micro-pattern probability
+Range Expansion Failure,Range fails to expand,72,50-61.8% retracement,Within session,Any,Contraction phase begins
+WILM Boundary,Price at WILM zone boundary,76,Secondary path,At boundary,WILM active,3.1x secondary path probability

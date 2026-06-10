@@ -28,15 +28,9 @@ DATA_DIR = REPO_ROOT / "quant-lab" / "data"
 SIGNALS_FILE = REPO_ROOT / "quant-lab" / "mt5" / "live_logs" / "mlr_signals.jsonl"
 LOG_FILE = REPO_ROOT / "quant-lab" / "mlr_validation" / "mlr_scanner.log"
 
-# Pairs to scan — all MT5 pairs we have data for
+# Pairs to scan — EURUSD + USDCHF + BTCUSD (MAD directive)
 PAIRS = [
-    "EURUSD", "GBPUSD", "USDJPY", "USDCHF", "AUDUSD", "NZDUSD", "USDCAD",
-    "EURGBP", "EURJPY", "EURCHF", "EURAUD", "EURNZD", "EURCAD",
-    "GBPJPY", "GBPCHF", "GBPAUD", "GBPCAD", "GBPNZD",
-    "AUDJPY", "AUDCHF", "AUDNZD", "AUDCAD",
-    "NZDJPY", "NZDCHF", "NZDCAD",
-    "CADJPY", "CADCHF", "CHFJPY",
-    "XAUUSD", "XAGUSD", "OILUSD", "LCOUSD",
+    "EURUSD", "USDCHF", "BTCUSD",
 ]
 
 # MT5 symbol mapping
@@ -52,16 +46,34 @@ ACTIVATION_END = 12 # 12:00 EST
 EXTENSIONS = {"ext_25": 0.25, "ext_50": 0.50, "ext_100": 1.00}
 REKEY_PCT = 1.32
 
-# Tier config (same as ST engine)
-TIER_CONFIG = {
-    "T1": {"ar_max": 60.0, "au": 10.0, "trigger": 12.0},
-    "T2": {"ar_max": 60.0, "au": 12.0, "trigger": 15.0},
-    "T3": {"ar_max": 60.0, "au": 15.0, "trigger": 19.0},
+# Tier config — per-pair native tiers (from asset_configs.py / sweep data)
+# AU is ALWAYS per-pair, never universal.
+PAIR_TIER_CONFIG = {
+    "EURUSD": {
+        "T1": {"ar_max": 60.0, "au": 10.0, "trigger": 12.0},
+        "T2": {"ar_max": 60.0, "au": 12.0, "trigger": 15.0},
+        "T3": {"ar_max": 60.0, "au": 15.0, "trigger": 19.0},
+    },
+    "USDCHF": {
+        "T1": {"ar_max": 60.0, "au": 11.0, "trigger": 11.0},
+        "T2": {"ar_max": 60.0, "au": 15.0, "trigger": 15.0},
+        "T3": {"ar_max": 60.0, "au": 20.0, "trigger": 20.0},
+    },
+    "BTCUSD": {
+        "T1": {"ar_max": 400.0, "au": 205.0, "trigger": 246.0},
+        "T2": {"ar_max": 800.0, "au": 545.0, "trigger": 654.0},
+        "T3": {"ar_max": 1500.0, "au": 1160.0, "trigger": 1392.0},
+    },
 }
+
+# Default fallback
+TIER_CONFIG = PAIR_TIER_CONFIG["EURUSD"]
 
 # Pip sizes
 def get_pip_size(symbol):
     s = symbol.upper().replace(".PRO", "")
+    if "BTC" in s:
+        return 1.0
     if "JPY" in s:
         return 0.01
     if any(x in s for x in ["XAU", "XAG", "LCO", "OIL"]):
@@ -183,12 +195,13 @@ def calc_asian_range(bars, target_date):
     }
 
 
-def classify_tier(range_pips):
-    """Classify session into Tier based on Asian Range."""
+def classify_tier(range_pips, pair):
+    """Classify session into Tier based on Asian Range. Uses per-pair config."""
+    cfg = PAIR_TIER_CONFIG.get(pair, TIER_CONFIG)
     for tier_name in ("T1", "T2", "T3"):
-        if tier_name in TIER_CONFIG and range_pips <= TIER_CONFIG[tier_name]["ar_max"]:
-            cfg = TIER_CONFIG[tier_name]
-            return tier_name, cfg["au"], cfg["trigger"]
+        if tier_name in cfg and range_pips <= cfg[tier_name]["ar_max"]:
+            tcfg = cfg[tier_name]
+            return tier_name, tcfg["au"], tcfg["trigger"]
     return "NO_GO", 0.0, 0.0
 
 
@@ -252,7 +265,7 @@ class MLRScanner:
             pip_size = get_pip_size(pair)
             ar_pips = ar["range"] / pip_size
 
-            tier_name, au, trigger = classify_tier(ar_pips)
+            tier_name, au, trigger = classify_tier(ar_pips, pair)
             if tier_name == "NO_GO":
                 continue
 
@@ -270,6 +283,7 @@ class MLRScanner:
             tier_report.append({
                 "pair": pair,
                 "tier": tier_name,
+                "au": au,
                 "ar_pips": round(ar_pips, 1),
                 "t0": ar["t0_anchor"],
                 "ext_25_up": levels["+ext_25"],
@@ -307,7 +321,9 @@ class MLRScanner:
             t0 = r["t0"]
 
             # Format levels based on pair type
-            if "JPY" in pair:
+            if "BTC" in pair:
+                fmt = lambda x: f"{x:.1f}"
+            elif "JPY" in pair:
                 fmt = lambda x: f"{x:.2f}"
             elif any(x in pair for x in ["XAU", "XAG"]):
                 fmt = lambda x: f"{x:.1f}"
@@ -315,7 +331,7 @@ class MLRScanner:
                 fmt = lambda x: f"{x:.5f}"
 
             lines.append(
-                f"<b>{pair}</b> | {tier} | AR={ar}p"
+                f"<b>{pair}</b> | {tier} | AU={r['au']}p | AR={ar}p"
             )
             lines.append(
                 f"  +25%: {fmt(r['ext_25_up'])}  -25%: {fmt(r['ext_25_dn'])}"

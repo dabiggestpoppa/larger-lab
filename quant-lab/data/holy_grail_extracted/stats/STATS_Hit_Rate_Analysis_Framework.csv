@@ -1,0 +1,72 @@
+﻿MEASUREMENT 1: Monday Range (A=D),,,,Monday London session range predicts Friday close target,,,,,,,,,,,,,,,,,,,,
+MEASUREMENT 2: Monday+Tuesday Range (A-B=C-D),,,,Combined Mon+Tue range predicts Wed-Fri delivery,,,,,,,,,,,,,,,,,,,,
+MEASUREMENT 3: Monday+Tuesday+Wednesday Range (A-B-C=D),,,,Combined Mon+Tue+Wed range predicts Thu-Fri delivery,,,,,,,,,,,,,,,,,,,,
+SECTION 2: FIBONACCI CALCULATION RULES,,,,,,,,,,,,,,,,,,,,,,,,
+BULLISH BIAS (Close > Open):,,,,BEARISH BIAS (Close < Open):,,,,,,,,,,,,,,,,,,,,
+- 0% = Session LOW,,,,- 0% = Session HIGH,,,,,,,,,,,,,,,,,,,,
+- 100% = Session HIGH,,,,- 100% = Session LOW,,,,,,,,,,,,,,,,,,,,
+"- Extensions ABOVE: -25%, -50%, -100%, -168% (above high)",,,,"- Extensions BELOW: -25%, -50%, -100%, -168% (below low)",,,,,,,,,,,,,,,,,,,,
+- Invalidation BELOW: 132% (below low),,,,- Invalidation ABOVE: 132% (above high),,,,,,,,,,,,,,,,,,,,
+"EXAMPLE: Bullish Range LOW=85.76, HIGH=89.46",,,,,,,,,,,,,,,,,,,,,,,,
+0% = 85.76,,,,,,,,,,,,,,,,,,,,,,,,
+100% = 89.46,,,,,,,,,,,,,,,,,,,,,,,,
+-25% = 90.387 (extension above),,,,,,,,,,,,,,,,,,,,,,,,
+-50% = 91.312,,,,,,,,,,,,,,,,,,,,,,,,
+-100% = 93.16,,,,,,,,,,,,,,,,,,,,,,,,
+-168% = 95.675,,,,,,,,,,,,,,,,,,,,,,,,
+132% = 84.583 (invalidation below),,,,,,,,,,,,,,,,,,,,,,,,
+SECTION 3: HIT RATE ANALYSIS STRUCTURE,,,,,,,,,,,,,,,,,,,,,,,,
+Session Date,Day,Open,High,Low,Close,Range,Bias,0% Level,100% Level,-25% Level,-50% Level,-100% Level,-168% Level,132% Level,-25% Hit?,-50% Hit?,-100% Hit?,-168% Hit?,132% Hit?,Week High,Week Low,ILM State,Measurement,Notes
+2020-01-06,Monday,65.2,68.5,64.8,67.9,3.700000000000003,Bullish,64.8,68.5,69.425,70.35,72.2,74.71600000000001,63.616,,,,,,,,,1,Sample calculation demo - awaiting full Phase 1 dataset integration
+2020-01-13,Monday,72.5,73.1,69.8,70.2,3.299999999999997,Bearish,73.1,69.8,68.975,68.15,66.5,64.256,74.15599999999999,,,,,,,,,1,Sample calculation demo - awaiting full Phase 1 dataset integration
+2020-01-20,Monday,58.4,61.75,58.1,61.2,3.6499999999999986,Bullish,58.1,61.75,62.6625,63.575,65.4,67.88199999999999,56.932,,,,,,,,,1,Sample calculation demo - awaiting full Phase 1 dataset integration
+2020-01-27,Monday,85.6,86.2,82.3,83.1,3.9000000000000057,Bearish,86.2,82.3,81.32499999999999,80.35,78.39999999999999,75.74799999999999,87.44800000000001,,,,,,,,,1,Sample calculation demo - awaiting full Phase 1 dataset integration
+2020-02-03,Monday,75.25,76.8,74.5,76.15,2.299999999999997,Bullish,74.5,76.8,77.375,77.94999999999999,79.1,80.66399999999999,73.764,,,,,,,,,1,Sample calculation demo - awaiting full Phase 1 dataset integration
+"📊 FIBONACCI CALCULATION METHODOLOGY DEMONSTRATED ABOVE
+
+Full Phase 1 Dataset Integration Instructions:
+1. Import london_sessions_phase1.csv (1,401 sessions available)
+2. Filter for Monday sessions only (for Measurement 1: A=D)
+3. Apply Fibonacci calculation formulas shown above to all rows
+4. Add weekly OHLC data (through Friday) for hit rate validation
+5. Populate hit flag columns (P-T) by comparing weekly targets to Fib levels
+6. Calculate final hit rates in Summary Statistics section
+
+VALIDATION TARGET: Test Claim #10 (-25% Extension Hit Rate = 90%)
+Expected Result: -25% level should be hit by Friday close in ~90% of weeks",,,,,,,,,,,,,,,,,,,,,,,,
+SECTION 4: SUMMARY STATISTICS,,,,,,,,,,,,,,,,,,,,,,,,
+,5,,,,,,,,,,,,,,,,,,,,,,,
+Total Sessions Analyzed,3,,,,,,,,,,,,,,,,,,,,,,,
+Bullish Sessions Count,0.6,,,,,,,,,,,,,,,,,,,,,,,
+Bullish Sessions %,2,,,,,,,,,,,,,,,,,,,,,,,
+Bearish Sessions Count,0.4,,,,,,,,,,,,,,,,,,,,,,,
+Bearish Sessions %,,,,,,,,,,,,,,,,,,,,,,,,
+-25% Hit Count,,,,,,,,,,,,,,,,,,,,,,,,
+-25% Hit Rate %,,,,,,,,,,,,,,,,,,,,,,,,
+-50% Hit Count,,,,,,,,,,,,,,,,,,,,,,,,
+-50% Hit Rate %,,,,,,,,,,,,,,,,,,,,,,,,
+-100% Hit Count,,,,,,,,,,,,,,,,,,,,,,,,
+-100% Hit Rate %,,,,,,,,,,,,,,,,,,,,,,,,
+-168% Hit Count,,,,,,,,,,,,,,,,,,,,,,,,
+-168% Hit Rate %,,,,,,,,,,,,,,,,,,,,,,,,
+132% Invalidation Count,,,,,,,,,,,,,,,,,,,,,,,,
+132% Invalidation Rate %,,,,,,,,,,,,,,,,,,,,,,,,
+Avg Time to -25% Hit (hours),,,,,,,,,,,,,,,,,,,,,,,,
+Avg Time to -50% Hit (hours),"Sample calculations - full dataset of 1,401 sessions pending",,,,,,,,,,,,,,,,,,,,,,,
+FIBONACCI CALCULATION REFERENCE,,,,,,,,,,,,,,,,,,,,,,,,
+"BULLISH Example: LOW=85.76, HIGH=89.46, RANGE=3.70",,,,,,,,,,,,,,,,,,,,,,,,
+  0% = 85.76 (LOW),,,,,,,,,,,,,,,,,,,,,,,,
+  100% = 89.46 (HIGH),,,,,,,,,,,,,,,,,,,,,,,,
+  -25% = 89.46 + 0.925 = 90.385,,,,,,,,,,,,,,,,,,,,,,,,
+  -50% = 89.46 + 1.85 = 91.31,,,,,,,,,,,,,,,,,,,,,,,,
+  -100% = 89.46 + 3.70 = 93.16,,,,,,,,,,,,,,,,,,,,,,,,
+  -168% = 89.46 + 6.216 = 95.676,,,,,,,,,,,,,,,,,,,,,,,,
+  132% = 85.76 - 1.184 = 84.576,,,,,,,,,,,,,,,,,,,,,,,,
+"BEARISH Example: HIGH=73.10, LOW=69.80, RANGE=3.30",,,,,,,,,,,,,,,,,,,,,,,,
+  0% = 73.10 (HIGH),,,,,,,,,,,,,,,,,,,,,,,,
+  100% = 69.80 (LOW),,,,,,,,,,,,,,,,,,,,,,,,
+  -25% = 69.80 - 0.825 = 68.975,,,,,,,,,,,,,,,,,,,,,,,,
+  -50% = 69.80 - 1.65 = 68.15,,,,,,,,,,,,,,,,,,,,,,,,
+  -100% = 69.80 - 3.30 = 66.50,,,,,,,,,,,,,,,,,,,,,,,,
+  -168% = 69.80 - 5.544 = 64.256,,,,,,,,,,,,,,,,,,,,,,,,
+  132% = 73.10 + 1.056 = 74.156,,,,,,,,,,,,,,,,,,,,,,,,

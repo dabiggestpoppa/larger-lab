@@ -1,0 +1,18 @@
+﻿Sequence Name,Structure,Frequency (%),Target Levels,Completion Rate,Timeframe,Associated Pattern
+Sequence Name,Structure,Frequency (%),Target Levels,Completion Rate,Timeframe,Associated Pattern
+50%→-25%,50% retracement → -25% extension,28.6,-25%,84%,15M/1H,"Common entry, fast delivery"
+61.8%→-50%,61.8% retracement → -50% extension,23.8,-50%,82%,15M/1H/4H,"High probability, 21 days target"
+72%→-25%,72% retracement → -25% extension,31.6,-25%,83.5%,All TFs,"Premium continuation, strong in trends"
+78.6%→-100%,78.6% deep retracement → -100% extension,15.2,-100%,76%,Higher TFs,Deep retracement sequence
+50%→72%→-25%,3-leg composite sequence,78.7,-25%,78.7%,All TFs,Trend body formation
+61.8%→61.8% Retest,61.8% → retest at 61.8%,35.7-42.4,61.8% retest,38-42%,All TFs,"Most frequent loop, reset mechanism"
+50%→50% Retest,50% → retest at 50%,83.2-91.4,50% retest,83-91%,All TFs,"Highest success, Alpha sequence initiation"
+72%→72% Retest,72% → retest at 72%,68,72% retest,68%,All TFs,"Gamma sequence, Q3 preference"
+78.6→78.6→78.6,Monthly triple 78.6% sequence,24.6,78.6% monthly,78%,Monthly,"24.6% frequency, 78% bullish bias"
+0→+23.6,Measured move 0 to +23.6%,23.5,+23.6%,83%,Monthly,Early month pattern
+50%→100%,Measured move continuation,100,100%,100%,All TFs,100% continuation rate
+1.618 Extension Steep,1.618 extension steep angle,42.1,1.618%,42.1%,All TFs,Lower success on steep angles
+1.618 Extension Shallow,1.618 extension shallow angle,73.5,1.618%,73.5%,All TFs,Higher success on shallow angles
+-100% Level,Extension to -100%,,-100%,Variable,All TFs,"Profit booking zone, new sequence creation"
+-168% Level,Extension to -168%,,-168%,Variable,All TFs,"Deep extension, new sequence creation"
+132% Invalidation,132% extension invalidation,,132%,95% failure,All TFs,Pattern invalidation zone

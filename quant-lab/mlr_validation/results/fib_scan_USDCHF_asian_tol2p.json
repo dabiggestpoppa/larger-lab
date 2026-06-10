@@ -1,0 +1,78 @@
+{
+  "pair": "USDCHF",
+  "session_type": "Asian",
+  "total": 879,
+  "bias": {
+    "Bullish": 486,
+    "Bearish": 393
+  },
+  "tolerance_pips": 2,
+  "pip_size": 0.0001,
+  "levels": {
+    "ext_25": {
+      "exact": {
+        "hits": 390,
+        "total": 879,
+        "rate": 44.4
+      },
+      "tolerance": {
+        "hits": 441,
+        "total": 879,
+        "rate": 50.2
+      },
+      "diff": 5.8
+    },
+    "ext_50": {
+      "exact": {
+        "hits": 253,
+        "total": 879,
+        "rate": 28.8
+      },
+      "tolerance": {
+        "hits": 300,
+        "total": 879,
+        "rate": 34.1
+      },
+      "diff": 5.3
+    },
+    "ext_100": {
+      "exact": {
+        "hits": 103,
+        "total": 879,
+        "rate": 11.7
+      },
+      "tolerance": {
+        "hits": 122,
+        "total": 879,
+        "rate": 13.9
+      },
+      "diff": 2.2
+    },
+    "ext_168": {
+      "exact": {
+        "hits": 33,
+        "total": 879,
+        "rate": 3.8
+      },
+      "tolerance": {
+        "hits": 40,
+        "total": 879,
+        "rate": 4.6
+      },
+      "diff": 0.8
+    },
+    "rekey_132": {
+      "exact": {
+        "hits": 35,
+        "total": 879,
+        "rate": 4.0
+      },
+      "tolerance": {
+        "hits": 43,
+        "total": 879,
+        "rate": 4.9
+      },
+      "diff": 0.9
+    }
+  }
+}

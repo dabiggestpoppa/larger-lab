@@ -1,0 +1,11 @@
+﻿Session/Window,Time (UTC),Key Characteristics,Velocity Boost,Pattern Preference,Success Rate Impact
+Session/Window,Time (UTC),Key Characteristics,Velocity Boost,Pattern Preference,Success Rate Impact
+London Session,07:00-16:00 UTC (2-11 AM EST),Early London (07:00-10:00) highest daily vector prediction,1.4x-1.8x,All patterns,82.3% prediction accuracy
+London-NY Overlap,14:00-18:00 UTC,Critical window for pattern completion,+8.3% to +9.4%,72% Fibonacci continuation,83.5% continuation rate
+NY Session,13:00-22:00 UTC,"Daily highs form 16:00-19:00, peak at 17:00",1.5x-2.0x,NY 9-10am Open Algo,High probability window
+News Window,07:00-11:00 UTC,"71.3% odd hour preference, 92.3% HTF pivot correlation",2.34x (highest),All patterns,Highest velocity period
+Asian Session,00:00-08:00 UTC,Daily lows bimodal 01:00-02:00,0.8x-1.2x,15M AB-CD Bullish,"Lower volatility, selective patterns"
+Wednesday Focus,All day Wednesday,"23.8% of ILM interactions, mid-week pivot",1.0x-1.3x,Direction changes,67.4% direction change at 61.8%
+"Odd Hours (1,3,5,7,9,11)",Odd hours all sessions,"Alpha preference, structure inversion",1.2x-1.6x,Alpha patterns,62.7%-68.4% Alpha occurrence
+Odd Hours Inversion,Odd hours all sessions,Structure inversion probability,1.3x,All patterns,73.8% structure inversion
+"Even Hours (0,2,4,6,8,10,12)",Even hours all sessions,Beta/Delta preference,1.0x-1.4x,Beta/Delta patterns,57.3%-64.1% Beta/Delta occurrence

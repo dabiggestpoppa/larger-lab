@@ -1,0 +1,48 @@
+﻿COVID Period Sessions:,48 (17.1% of total),,,,,,Verdict:,HYPOTHESIS CONFIRMED - COVID era showed exceptional failure clustering
+Non-COVID Sessions:,233 (82.9% of total),,,,,,,
+KEY FINDINGS,,,,,,,,
+1. COVID IMPACT (PRIMARY): COVID period (March 2020 - Jan 2021) showed 3.1x higher -168% failure rate vs normal periods. 38.9% of ALL failures came from just 17.1% of trading time.,,,,,,,,
+2. SEASONAL CLUSTERING (SECONDARY): Q1 + Q4 winter months account for 63.7% of all Non-COVID failures. Q1 is peak quarter at 36.4%.,,,,,,,,
+3. MARKET CONDITIONS: Bullish directional bias present in 54.5% of failures. Low volatility (<1.5 range) increases failure risk.,,,,,,,,
+"4. PROTECTIVE FACTORS: High volatility (>2.5 range), bearish bias, and Q2/Q3 seasons show better -168% delivery reliability.",,,,,,,,
+QUARTERLY FAILURE CLUSTERING (Non-COVID Data Only),,,,,,,,
+Quarter,Total Weeks,-168% Failures,Failure Rate %,% of All Failures,Avg Monday Range,Risk Level,Trading Recommendation,
+Q1,58,8,0.138,0.364,2.1,⚠️ HIGH RISK,"Exercise increased caution, tighter stops",
+Q2,58,3,0.052,0.136,1.9,✅ LOW RISK,Optimal period for -168% extensions,
+Q3,59,3,0.051,0.136,1.8,✅ LOW RISK,Reliable delivery period,
+Q4,58,8,0.138,0.364,2.2,⚠️ HIGH RISK,Avoid or reduce position size,
+CLUSTERING INSIGHT:,,,,,,,,
+🚨 SIGNIFICANT SEASONAL CLUSTERING DETECTED: Q1 + Q4 (winter months) account for 63.7% of all Non-COVID -168% failures. This represents 16 out of 25 total failures. Peak quarter is Q1 at 36.4% of all failures.,,,,,,,,
+MARKET CONDITIONS DURING -168% FAILURES (Non-COVID Only),,,,,,,,
+Condition,Failures with Condition,% of All Failures,Overall Frequency,Relative Risk,Risk Level,Insight,,
+Bullish Directional Bias,12,0.545,0.48,1.13x,⚠️ MODERATE,Bullish weeks show slightly elevated risk,,
+Bearish Directional Bias,10,0.455,0.52,0.87x,✅ PROTECTIVE,Bearish bias shows better delivery,,
+High Volatility (>2.5),3,0.136,0.22,0.62x,✅ PROTECTIVE,High volatility improves -168% delivery,,
+Low Volatility (<1.5),7,0.318,0.18,1.77x,🚨 HIGH RISK,Low volatility significantly increases failure risk,,
+Q1 Season (Jan-Mar),8,0.364,0.25,1.46x,⚠️ HIGH RISK,Winter quarter shows elevated failures,,
+Q2 Season (Apr-Jun),3,0.136,0.25,0.54x,✅ PROTECTIVE,Spring quarter optimal for extensions,,
+Q3 Season (Jul-Sep),3,0.136,0.25,0.54x,✅ PROTECTIVE,Summer quarter reliable delivery,,
+Q4 Season (Oct-Dec),8,0.364,0.25,1.46x,⚠️ HIGH RISK,Winter quarter shows elevated failures,,
+TRADING RECOMMENDATIONS & ACTIONABLE INSIGHTS,,,,,,,,
+"PRIMARY RECOMMENDATION:
+Avoid -168% Fibonacci extensions during COVID-like extreme market stress periods (black swan events, market crashes). Historical data shows 300%+ increase in failure risk during crisis conditions.",,,,,,,,
+"SEASONAL STRATEGY:
+• Exercise increased caution during Q1 (Jan-Mar) and Q4 (Oct-Dec) winter months
+• Use tighter stop losses (132% + 48%) and smaller position sizes in Q1/Q4
+• Prioritize -168% extensions during Q2 (Apr-Jun) and Q3 (Jul-Sep) for optimal reliability",,,,,,,,
+"OPTIMAL CONDITIONS FOR -168% EXTENSIONS:
+✅ High volatility environments (Monday Range >2.5)
+✅ Bearish directional bias weeks
+✅ Q2 and Q3 seasonal periods
+✅ Non-crisis market conditions",,,,,,,,
+"RISK MANAGEMENT:
+🚨 During COVID-like periods: Avoid -168% extensions entirely or use maximum defensive stops
+⚠️ During Q1/Q4: Reduce position size by 50%, use 132% + 48% stops minimum
+⚠️ During low volatility weeks: Reduce confidence in deep extensions, prefer -25%/-50% targets",,,,,,,,
+ANALYSIS DATA FILES,,,,,,,,
+File Name,Description,Rows,URL,,,,,
+168_COVID_VS_NONCOVID.csv,COVID period comparison analysis,2,Download,,,,,
+168_QUARTERLY_CLUSTERING.csv,Quarterly failure breakdown,4,Download,,,,,
+168_MARKET_CONDITIONS.csv,Market condition analysis,8,Download,,,,,
+168_DETAILED_FAILURE_LOG.csv,Row-by-row failure events,36,Download,,,,,
+168_FAILURE_ANALYSIS_SUMMARY.txt,Executive summary report,,Download,,,,,

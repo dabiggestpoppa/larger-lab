@@ -1,0 +1,19 @@
+﻿Pattern Type,Sequence Structure,Success Rate (%),Avg Completion Time,Velocity Factor,ILM Impact,Session Preference,Source
+Pattern Type,Sequence Structure,Success Rate (%),Avg Completion Time,Velocity Factor,ILM Impact,Session Preference,Source
+Alpha,A-B(72%)→B-C(-25%)→C-D(61.8%),78.3,7.2 hrs,1.0x baseline,+14.8% to +18.7%,All sessions,"Doc 7, 13, 16"
+Beta,A-B(50%)→B-C(72%)→C-D(-25%),74.6,6.8 hrs,1.1x,+15.2%,Even hours pref,"Doc 7, 13"
+Gamma,A-B(61.8%)→B-C(-50%)→C-D(50%),76.8,6.3 hrs,1.15x,+16.3%,All sessions,"Doc 7, 13"
+Delta,A-B(50%)→B-C(-25%)→C-D(50%),72.9,5.8 hrs,1.2x,+14.8%,Even hours pref,"Doc 7, 13, 16"
+15M AB-CD Bullish,50%→-25%,84,105 min,Fast,+18.7% (ILM),Asian/London,"Doc 5, 11"
+15M AB-CD Bearish,61.8%→-50%,66,85 min,Fast,+15.4%,All sessions,"Doc 5, 11"
+1H Patterns,Same structure as 15M,76-78%,2.3x vs 15M,Moderate,+16.8%,All sessions,"Doc 11, 14"
+Layered Fibonacci,50%→78.6%,83,Variable,1.3x,Strong,Trending markets,Doc 8
+Layered Fibonacci Freq,50%→78.6% occurrence,35,,,35% of patterns,Trending markets,Doc 8
+Measured Moves,50%→100% continuation,100,Variable,1.0x,,All sessions,"Doc 4, 8"
+Monthly Fibonacci,78.6→78.6→78.6,78,Monthly cycle,Monthly scale,Monthly ILM,,Doc 19
+Monthly Fib Frequency,78.6→78.6→78.6 occurrence,24.6,,,24.6% frequency,78% bullish bias,Doc 19
+Monthly Structure,H4-L1-C5 pattern,78,Monthly cycle,Monthly scale,,18.5% most common,Doc 19
+Monthly Flow,0→+23.6 Fibonacci,83,Early month,Fast early,,23.5% frequency,Doc 19
+Day 1 Monthly High,First day forms monthly high,10.77,Day 1,,,Early month,Doc 19
+Day 1 Monthly Low,First day forms monthly low,13.85,Day 1,,,Early month,Doc 19
+Week 1 Monthly Pivot,Week 1 forms high or low,56.24,Week 1,,,First week,Doc 19

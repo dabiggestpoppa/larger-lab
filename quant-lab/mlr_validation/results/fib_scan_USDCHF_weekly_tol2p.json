@@ -1,0 +1,78 @@
+{
+  "pair": "USDCHF",
+  "session_type": "Weekly",
+  "total": 876,
+  "bias": {
+    "Bullish": 436,
+    "Bearish": 440
+  },
+  "tolerance_pips": 2,
+  "pip_size": 0.0001,
+  "levels": {
+    "ext_25": {
+      "exact": {
+        "hits": 740,
+        "total": 876,
+        "rate": 84.5
+      },
+      "tolerance": {
+        "hits": 761,
+        "total": 876,
+        "rate": 86.9
+      },
+      "diff": 2.4
+    },
+    "ext_50": {
+      "exact": {
+        "hits": 672,
+        "total": 876,
+        "rate": 76.7
+      },
+      "tolerance": {
+        "hits": 692,
+        "total": 876,
+        "rate": 79.0
+      },
+      "diff": 2.3
+    },
+    "ext_100": {
+      "exact": {
+        "hits": 562,
+        "total": 876,
+        "rate": 64.2
+      },
+      "tolerance": {
+        "hits": 577,
+        "total": 876,
+        "rate": 65.9
+      },
+      "diff": 1.7
+    },
+    "ext_168": {
+      "exact": {
+        "hits": 408,
+        "total": 876,
+        "rate": 46.6
+      },
+      "tolerance": {
+        "hits": 414,
+        "total": 876,
+        "rate": 47.3
+      },
+      "diff": 0.7
+    },
+    "rekey_132": {
+      "exact": {
+        "hits": 347,
+        "total": 876,
+        "rate": 39.6
+      },
+      "tolerance": {
+        "hits": 371,
+        "total": 876,
+        "rate": 42.4
+      },
+      "diff": 2.7
+    }
+  }
+}

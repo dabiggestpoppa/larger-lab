@@ -1,0 +1,222 @@
+﻿Date,Pattern_Type,Failure_Point,Trigger_Condition,Expected_Level,Actual_High,Actual_Low,Bias,Range_Size,Quarter,Rekey_Occurred
+2020-01-06,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,49.67067,52.09459,48.78669,Bullish,1.8363,1,True
+2020-01-13,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,50.08197,55.75807,48.23067,Bullish,0.91061,1,True
+2020-01-20,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,53.2262,55.62227,50.20496,Bullish,1.12668,1,True
+2020-01-27,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,55.90905,58.41939,50.82577,Bullish,1.90177,1,True
+2020-02-10,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,56.74695,61.78533,53.87133,Bearish,2.1785,1,True
+2020-02-17,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,61.23144,62.63956,56.40158,Bearish,1.76058,1,True
+2020-03-02,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,61.6527,64.62492,58.57004,Bearish,1.14895,1,True
+2020-03-16,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,67.49333,67.79066,63.22776,Bearish,3.23149,1,True
+2020-03-23,-25% Extension,Target Not Hit,Weekly high/low did not reach -25% Fibonacci extension,70.30775,69.36971,64.91466,Bullish,3.75215,1,False
+2020-03-23,-50% Extension,Target Not Hit,Weekly high/low did not reach -50% Fibonacci extension,71.24578,69.36971,64.91466,Bullish,3.75215,1,False
+2020-03-23,61.8% Rekey Failure,Rekey Failed,61.8% level tested but pattern did not continue,67.05089,69.36971,64.91466,Bullish,3.75215,1,False
+2020-03-30,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,65.95436,72.59886,65.92281,Bullish,0.66428,1,True
+2020-04-06,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,67.36802,74.76472,62.72137,Bearish,3.52019,2,True
+2020-04-13,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,68.3957,72.62879,68.26174,Bullish,1.76917,2,True
+2020-04-20,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,68.93219,71.59892,68.03837,Bullish,2.02025,2,True
+2020-05-04,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,73.28544,75.86484,69.25209,Bearish,1.05467,2,True
+2020-05-11,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,72.40074,76.6283,67.40501,Bearish,1.52418,2,True
+2020-05-18,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,70.54785,78.09134,69.79212,Bullish,4.27998,2,True
+2020-05-25,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,78.34285,78.68803,70.78882,Bearish,1.93787,2,True
+2020-06-08,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,77.09472,77.18362,73.76535,Bearish,1.56711,2,True
+2020-06-15,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,76.82636,81.06783,74.56544,Bearish,1.56572,2,True
+2020-06-22,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,74.46302,81.07929,73.52567,Bullish,4.78536,2,True
+2020-06-29,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,76.90852,85.2236,75.4875,Bullish,1.30058,2,True
+2020-07-06,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,79.14857,82.03416,74.2977,Bullish,2.18606,3,True
+2020-07-13,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,75.39449,80.55274,74.35563,Bullish,1.54655,3,True
+2020-07-27,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,81.45243,82.2565,71.08638,Bearish,3.06974,3,True
+2020-08-03,-25% Extension,Target Not Hit,Weekly high/low did not reach -25% Fibonacci extension,77.00478,84.14398,78.06475,Bearish,4.79747,3,False
+2020-08-03,-50% Extension,Target Not Hit,Weekly high/low did not reach -50% Fibonacci extension,75.80541,84.14398,78.06475,Bearish,4.79747,3,False
+2020-08-03,61.8% Rekey Failure,Rekey Failed,61.8% level tested but pattern did not continue,81.16899,84.14398,78.06475,Bearish,4.79747,3,False
+2020-08-10,-25% Extension,Target Not Hit,Weekly high/low did not reach -25% Fibonacci extension,77.69653,82.84357,78.72594,Bearish,4.11762,3,False
+2020-08-10,-50% Extension,Target Not Hit,Weekly high/low did not reach -50% Fibonacci extension,76.66713,82.84357,78.72594,Bearish,4.11762,3,False
+2020-08-10,61.8% Rekey Failure,Rekey Failed,61.8% level tested but pattern did not continue,81.27064,82.84357,78.72594,Bearish,4.11762,3,False
+2020-08-17,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,79.22304,83.15659,77.50894,Bullish,2.97996,3,True
+2020-08-31,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,79.76057,86.87256,75.0774,Bearish,1.32604,3,True
+2020-09-07,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,78.91489,83.77605,74.2716,Bullish,3.6827,3,True
+2020-09-14,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,78.75617,82.1115,76.63059,Bullish,2.22073,3,True
+2020-09-21,-50% Extension,Target Not Hit,Weekly high/low did not reach -50% Fibonacci extension,81.58201,81.56142,77.04422,Bullish,2.76329,3,False
+2020-10-05,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,75.26942,83.00084,74.31188,Bullish,1.85324,4,True
+2020-10-12,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,75.15284,81.43167,72.66315,Bearish,1.88613,4,True
+2020-10-26,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,78.67782,79.34716,72.18383,Bearish,1.01521,4,True
+2020-11-02,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,74.73399,79.60639,70.06113,Bullish,3.69121,4,True
+2020-11-09,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,72.10882,78.31333,69.25078,Bullish,4.70039,4,True
+2020-11-23,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,68.96267,74.81747,68.51348,Bullish,1.0767,4,True
+2020-11-30,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,70.0903,75.53149,68.84927,Bullish,2.64002,4,True
+2020-12-07,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,70.95975,75.93279,65.25901,Bullish,1.87352,4,True
+2020-12-21,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,67.57077,72.68192,63.4107,Bullish,2.87122,4,True
+2020-12-28,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,67.88771,69.39612,64.47356,Bearish,0.72575,4,True
+2021-01-04,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,63.67797,67.09814,61.12002,Bullish,1.85127,1,True
+2021-01-11,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,64.15035,65.76019,61.21494,Bearish,1.08771,1,True
+2021-01-18,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,63.13767,65.04809,58.21936,Bullish,1.13683,1,True
+2021-01-25,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,58.47517,63.85553,58.09821,Bullish,3.15961,1,True
+2021-02-15,-50% Extension,Target Not Hit,Weekly high/low did not reach -50% Fibonacci extension,59.39153,59.10911,55.09182,Bullish,2.58916,1,False
+2021-02-22,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,58.38682,58.7893,52.95951,Bearish,1.23077,1,True
+2021-03-01,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,57.18773,58.53742,50.87943,Bullish,1.02249,1,True
+2021-03-08,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,49.74125,57.09395,48.16816,Bullish,1.74448,1,True
+2021-03-15,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,48.00595,53.2521,45.46491,Bullish,3.03235,1,True
+2021-03-22,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,46.99109,52.49304,44.82599,Bearish,1.64023,1,True
+2021-03-29,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,47.03253,51.70017,45.89915,Bullish,0.83343,1,True
+2021-04-05,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,47.34557,50.26354,41.15163,Bearish,2.00453,2,True
+2021-04-19,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,43.76236,46.60941,38.82139,Bearish,0.76524,2,True
+2021-04-26,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,44.85348,46.41037,38.27213,Bearish,1.28558,2,True
+2021-05-03,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,40.48953,43.89185,39.09735,Bearish,0.82559,2,True
+2021-05-10,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,37.18152,39.93866,33.0953,Bullish,1.48892,2,True
+2021-05-24,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,38.01828,38.92553,31.16497,Bearish,1.63541,2,True
+2021-06-07,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,32.01269,35.89783,30.40965,Bearish,1.11886,2,True
+2021-06-14,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,31.72041,34.87172,29.1151,Bullish,1.12913,2,True
+2021-06-21,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,30.59638,32.42491,25.25297,Bullish,1.38525,2,True
+2021-06-28,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,28.94174,32.32362,28.18389,Bearish,0.57413,2,True
+2021-07-05,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,29.96732,32.52872,29.74887,Bullish,1.04688,3,True
+2021-07-12,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,29.11903,30.51002,25.28282,Bearish,1.01106,3,True
+2021-07-19,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,26.50335,27.07838,22.1551,Bullish,0.43563,3,True
+2021-07-26,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,26.81025,29.29067,24.40595,Bullish,1.2702,3,True
+2021-08-02,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,25.53557,29.7023,23.69054,Bullish,0.69398,3,True
+2021-08-09,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,24.59085,26.88147,20.67341,Bullish,1.45451,3,True
+2021-08-16,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,23.10028,25.04258,20.68723,Bullish,0.62523,3,True
+2021-08-23,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,22.66069,24.16612,20.53172,Bullish,1.14047,3,True
+2021-08-30,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,17.77719,25.62063,16.86477,Bullish,0.76212,3,True
+2021-09-06,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,22.11249,24.34257,18.15527,Bullish,0.77818,3,True
+2021-09-13,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,22.55449,25.05067,21.71659,Bearish,0.63477,3,True
+2021-09-20,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,23.03968,23.22316,18.32122,Bearish,0.44851,3,True
+2021-09-27,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,20.89245,23.17161,20.3764,Bearish,0.39095,3,True
+2021-10-18,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,20.30693,21.73558,16.10756,Bullish,0.6124,4,True
+2021-10-25,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,19.96188,23.80496,17.91339,Bearish,0.56204,4,True
+2021-11-01,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,18.37251,25.11258,17.72806,Bearish,0.48822,4,True
+2021-11-15,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,24.2082,25.83256,16.83029,Bullish,1.23057,4,True
+2021-11-22,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,18.89518,23.60869,18.16363,Bullish,1.45405,4,True
+2021-12-06,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,23.32183,24.9487,17.19313,Bearish,1.13081,4,True
+2021-12-13,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,19.71603,24.56265,17.41616,Bearish,0.74876,4,True
+2021-12-20,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,21.98468,22.07911,19.1971,Bearish,0.54102,4,True
+2022-01-03,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,23.09227,25.4414,21.50812,Bearish,0.9301,1,True
+2022-01-10,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,22.68486,26.02632,21.25325,Bullish,0.74815,1,True
+2022-01-24,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,26.94162,29.0244,21.67078,Bullish,1.0653,1,True
+2022-02-07,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,26.62626,32.06006,24.72661,Bearish,0.41973,1,True
+2022-02-14,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,27.27447,32.75397,25.83089,Bullish,1.09498,1,True
+2022-02-21,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,28.74206,34.76641,27.56397,Bearish,0.89249,1,True
+2022-02-28,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,30.00505,34.43163,28.77187,Bearish,0.93423,1,True
+2022-03-07,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,28.75538,34.03494,27.59194,Bullish,1.42912,1,True
+2022-03-28,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,36.54284,38.1539,34.69129,Bullish,0.46827,1,True
+2022-04-04,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,35.29786,42.08827,32.36287,Bearish,1.25661,2,True
+2022-04-11,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,42.30961,43.40797,33.96802,Bearish,2.24202,2,True
+2022-04-18,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,43.34343,43.63461,37.50276,Bearish,1.21217,2,True
+2022-04-25,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,43.60552,46.21241,40.60973,Bearish,0.72812,2,True
+2022-05-02,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,41.76068,48.73157,39.78917,Bearish,1.49357,2,True
+2022-05-16,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,48.04741,51.03852,44.56865,Bearish,1.68484,2,True
+2022-05-23,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,49.81431,50.14732,45.48151,Bearish,2.00499,2,True
+2022-05-30,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,47.76946,53.28802,47.57511,Bullish,1.73168,2,True
+2022-06-06,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,49.56826,53.73445,47.60345,Bearish,1.4885,2,True
+2022-06-13,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,52.83335,58.38072,47.89062,Bearish,1.39853,2,True
+2022-06-27,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,57.4382,60.58708,51.49683,Bearish,4.50103,2,True
+2022-07-11,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,56.7022,62.30218,56.21335,Bullish,1.86281,3,True
+2022-08-01,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,64.84338,67.86308,57.57187,Bearish,2.45789,3,True
+2022-08-08,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,63.33994,66.98828,60.32597,Bearish,1.03905,3,True
+2022-08-22,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,66.04364,69.92711,63.03359,Bearish,2.28034,3,True
+2022-09-12,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,69.98175,74.58807,67.59474,Bearish,0.98212,3,True
+2022-09-19,-25% Extension,Target Not Hit,Weekly high/low did not reach -25% Fibonacci extension,73.44038,73.32161,67.63543,Bullish,3.85969,3,False
+2022-09-19,-50% Extension,Target Not Hit,Weekly high/low did not reach -50% Fibonacci extension,74.4053,73.32161,67.63543,Bullish,3.85969,3,False
+2022-09-19,61.8% Rekey Failure,Rekey Failed,61.8% level tested but pattern did not continue,70.09017,73.32161,67.63543,Bullish,3.85969,3,False
+2022-09-26,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,73.46779,78.58463,68.49366,Bearish,2.3888,3,True
+2022-10-17,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,74.51381,78.7883,70.33928,Bearish,3.16252,4,True
+2022-10-24,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,73.0984,81.46022,70.87036,Bullish,1.46435,4,True
+2022-10-31,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,78.32272,81.64214,74.69605,Bearish,2.11143,4,True
+2022-11-07,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,71.91948,80.55158,71.0177,Bullish,4.28353,4,True
+2022-11-14,-50% Extension,Target Not Hit,Weekly high/low did not reach -50% Fibonacci extension,79.65436,79.3544,74.86313,Bullish,3.19416,4,False
+2022-11-21,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,79.25269,83.4713,75.17507,Bullish,3.19592,4,True
+2022-11-28,-50% Extension,Target Not Hit,Weekly high/low did not reach -50% Fibonacci extension,82.05013,81.45564,75.13289,Bullish,4.61149,4,False
+2022-12-05,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,79.95223,85.80256,76.24611,Bearish,2.09345,4,True
+2022-12-26,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,80.84407,83.97214,78.74165,Bullish,2.36975,4,True
+2023-01-16,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,80.75673,83.5277,77.20256,Bullish,1.2188,1,True
+2023-01-30,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,80.70793,82.80361,74.64882,Bearish,2.90398,1,True
+2023-02-06,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,76.48664,83.02863,76.36271,Bullish,1.97401,1,True
+2023-02-13,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,79.99697,81.31706,76.72834,Bearish,1.91157,1,True
+2023-02-27,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,78.01356,80.35974,75.48433,Bearish,1.76228,1,True
+2023-03-06,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,78.49889,83.35598,75.2633,Bearish,1.83825,1,True
+2023-03-13,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,75.30848,82.83276,73.54351,Bearish,1.3371,1,True
+2023-03-20,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,78.60421,80.63134,72.79772,Bearish,1.77188,1,True
+2023-03-27,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,76.6893,78.12225,70.85483,Bearish,1.20478,1,True
+2023-04-10,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,73.62797,76.72613,70.37993,Bullish,1.27605,2,True
+2023-04-17,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,70.77362,74.85153,66.96284,Bullish,3.08932,2,True
+2023-04-24,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,73.84437,75.88857,69.07932,Bearish,3.23192,2,True
+2023-05-01,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,68.79368,76.18519,67.85364,Bullish,1.66479,2,True
+2023-05-08,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,66.98894,70.93201,63.9133,Bullish,1.16982,2,True
+2023-05-15,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,66.83103,72.16758,65.60462,Bullish,3.11916,2,True
+2023-05-22,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,71.2316,71.84826,62.87193,Bearish,2.97116,2,True
+2023-05-29,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,63.72737,68.15606,62.45766,Bullish,2.04481,2,True
+2023-06-12,-50% Extension,Target Not Hit,Weekly high/low did not reach -50% Fibonacci extension,59.45267,65.69021,60.07621,Bearish,3.71639,2,False
+2023-06-19,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,61.39825,65.45448,54.90249,Bearish,4.11733,2,True
+2023-06-26,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,58.77346,62.9709,55.45033,Bullish,3.17988,2,True
+2023-07-03,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,56.9029,60.97055,55.08439,Bearish,1.37766,3,True
+2023-07-10,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,56.48086,59.61987,55.35114,Bearish,0.85584,3,True
+2023-08-07,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,55.23358,56.72199,49.68904,Bearish,0.63033,3,True
+2023-08-14,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,49.01299,51.96621,47.01215,Bearish,1.51579,3,True
+2023-08-21,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,47.07686,51.86029,45.80779,Bullish,2.17881,3,True
+2023-09-11,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,45.28685,50.24881,42.99353,Bearish,0.43441,3,True
+2023-09-18,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,42.31732,45.27222,36.83485,Bearish,1.28349,3,True
+2023-10-02,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,42.27326,45.51101,37.25363,Bullish,1.22162,4,True
+2023-10-23,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,33.52125,37.16621,30.87744,Bullish,0.83596,4,True
+2023-10-30,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,36.59214,40.55078,34.27915,Bullish,0.7373,4,True
+2023-11-13,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,35.01445,36.55527,31.6548,Bearish,1.57505,4,True
+2023-11-20,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,30.64221,31.5775,27.65501,Bearish,1.17837,4,True
+2023-11-27,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,29.28419,32.53618,24.38438,Bullish,0.55992,4,True
+2023-12-04,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,31.71321,34.03608,25.95236,Bearish,1.66705,4,True
+2023-12-18,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,28.09825,29.90371,25.12041,Bullish,0.49098,4,True
+2023-12-25,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,22.21369,29.50813,21.10775,Bearish,0.83784,4,True
+2024-01-01,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,24.59099,62.47204,23.59341,Bullish,0.54233,1,True
+2024-01-08,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,21.45704,30.22074,20.95229,Bearish,0.38239,1,True
+2024-01-15,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,25.37003,25.93154,19.93767,Bearish,0.42836,1,True
+2024-01-29,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,24.19516,24.86359,19.54718,Bullish,0.50639,1,True
+2024-02-05,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,21.64863,24.72065,20.53983,Bullish,1.29159,1,True
+2024-02-12,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,19.80384,23.41495,16.62065,Bullish,1.33718,1,True
+2024-02-19,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,23.01689,25.08844,16.95123,Bullish,1.53996,1,True
+2024-02-26,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,19.01511,20.75221,18.26243,Bullish,1.31599,1,True
+2024-03-11,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,18.53739,26.23653,18.00435,Bearish,0.34637,1,True
+2024-03-18,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,19.00256,23.72657,17.44118,Bearish,1.18286,1,True
+2024-03-25,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,19.07446,23.98315,18.46685,Bullish,0.81628,1,True
+2024-04-08,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,19.48235,21.28573,18.798,Bullish,0.29233,2,True
+2024-04-22,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,19.32455,22.23787,17.54163,Bullish,0.63143,2,True
+2024-04-29,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,21.62499,23.52559,19.48834,Bearish,0.80119,2,True
+2024-05-06,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,19.76275,24.70915,18.23559,Bearish,1.15694,2,True
+2024-05-13,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,21.40674,24.3084,19.17855,Bullish,0.72832,2,True
+2024-05-27,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,25.46315,26.14171,21.8402,Bullish,0.51406,2,True
+2024-06-03,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,29.33456,30.25404,21.02395,Bearish,0.99351,2,True
+2024-06-10,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,24.29048,26.37094,22.73995,Bearish,0.46597,2,True
+2024-06-17,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,23.40731,26.97814,22.90455,Bullish,0.43231,2,True
+2024-06-24,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,26.97273,30.39445,23.31664,Bearish,0.79004,2,True
+2024-07-01,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,29.5473,31.35074,26.68942,Bullish,0.33936,3,True
+2024-07-08,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,27.24927,29.7393,25.72284,Bullish,0.49276,3,True
+2024-07-15,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,29.93512,33.68548,28.5621,Bullish,1.27948,3,True
+2024-07-22,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,31.11359,33.34223,27.1595,Bearish,1.18901,3,True
+2024-07-29,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,31.33451,36.23622,30.37799,Bearish,0.72464,3,True
+2024-08-05,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,31.10616,35.30413,29.02712,Bearish,1.57504,3,True
+2024-08-12,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,36.90253,37.05231,32.72907,Bearish,1.29344,3,True
+2024-08-19,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,35.92423,40.79295,33.62884,Bearish,1.28004,3,True
+2024-08-26,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,37.8022,41.59116,31.64216,Bearish,1.08653,3,True
+2024-09-02,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,40.51267,43.10789,37.89336,Bullish,1.04776,3,True
+2024-09-09,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,35.30004,43.55612,34.2387,Bearish,0.80405,3,True
+2024-09-16,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,39.10918,43.90139,37.61344,Bullish,2.90273,3,True
+2024-09-23,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,42.50288,46.28866,40.42303,Bearish,1.57565,3,True
+2024-10-28,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,47.56871,52.78459,46.42862,Bullish,0.65258,4,True
+2024-11-04,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,50.3687,57.44997,44.79412,Bearish,0.93332,4,True
+2024-11-18,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,57.22479,57.67978,53.12198,Bearish,1.21879,4,True
+2024-12-02,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,55.65765,59.31547,54.58577,Bullish,1.61809,4,True
+2024-12-16,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,58.0954,63.51654,57.20587,Bearish,0.67389,4,True
+2024-12-30,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,61.93189,62.47204,23.59341,Bearish,2.99134,4,True
+2025-01-13,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,64.58948,69.97142,61.10127,Bullish,1.23105,1,True
+2025-01-20,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,67.32928,69.06382,62.22413,Bearish,1.86425,1,True
+2025-01-27,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,68.59053,75.06555,64.25104,Bearish,3.28749,1,True
+2025-02-03,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,69.62756,74.91071,66.1154,Bearish,1.62213,1,True
+2025-02-10,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,68.9597,72.84573,66.90645,Bullish,0.59428,1,True
+2025-02-17,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,73.2809,77.01001,69.29991,Bearish,1.13708,1,True
+2025-02-24,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,70.10213,77.41689,69.50011,Bullish,2.91314,1,True
+2025-03-03,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,72.61282,77.42408,70.70904,Bearish,0.8554,1,True
+2025-03-17,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,76.55481,80.285,70.94737,Bearish,1.63268,1,True
+2025-03-24,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,72.94571,81.24381,71.52817,Bullish,3.33128,1,True
+2025-03-31,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,76.06923,81.40029,73.5232,Bullish,2.03835,1,True
+2025-04-14,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,79.62407,84.101,73.17102,Bearish,4.88867,2,True
+2025-04-28,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,78.81619,84.20198,75.28368,Bullish,1.93772,2,True
+2025-05-05,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,76.88635,85.37391,74.97469,Bullish,4.17862,2,True
+2025-05-12,132% Invalidation,Pattern Breakdown,Price violated 132% invalidation level,83.12623,84.81436,78.13886,Bearish,2.37873,2,True
+2025-05-19,-25% Extension,Target Not Hit,Weekly high/low did not reach -25% Fibonacci extension,84.72929,83.25999,77.38279,Bullish,5.8772,2,False
+2025-05-19,-50% Extension,Target Not Hit,Weekly high/low did not reach -50% Fibonacci extension,86.19859,83.25999,77.38279,Bullish,5.8772,2,False
+2025-05-19,61.8% Rekey Failure,Rekey Failed,61.8% level tested but pattern did not continue,79.62788,83.25999,77.38279,Bullish,5.8772,2,False

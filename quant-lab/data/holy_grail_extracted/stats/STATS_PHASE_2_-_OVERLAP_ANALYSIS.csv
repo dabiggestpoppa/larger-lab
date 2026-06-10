@@ -1,0 +1,132 @@
+﻿Hypothesis_ID,Description,Target_Threshold,Actual_Result,Pass_Status,Notes,
+H1,Session Fib targets overlap with Session Close,≥25%,0.00%,FAIL,0 overlaps in 1857 sessions,
+H2,Monday Range -25% = Tuesday Daily Close,≥40%,0.00%,FAIL,0 overlaps from 369 Mondays,
+H3,Asian session predicts same-day close,≥75%,82.71%,PASS,512/619 Asian sessions predicted correctly,
+H4,Previous day targets overlap with current sessions,≥30%,2.43%,FAIL,45 overlaps from 1854 sessions,
+H5,Wednesday-Thursday velocity spike,20-40%,0.15%,FAIL,"Wed-Thu avg: 7.92, Mon-Tue avg: 7.91",
+H6,Weekly confluence rate,≥60%,0.32%,FAIL,2/619 weeks with confluence,
+DETAILED OVERLAP STATISTICS,,,,,,
+Total Sessions,1857,,,,,
+Total H1 Overlaps,0,,,,,
+H1 Frequency,0.00%,,,,,
+Asian Accuracy,82.71%,,,,,
+Monday→Tuesday Rate,0.00%,,,,,
+Wed-Thu Velocity Increase,0.15%,,,,,
+Weekly Confluence Rate,0.32%,,,,,
+HYPOTHESIS 1 DETAILS: Session Fib Overlap Events (Top 20),,,,,,
+Date,Day,Session,Session_Close,Target_Type,Target_Value,Difference
+HYPOTHESIS 2 DETAILS: Monday→Tuesday Overlap Events,,,,,,
+Monday_Date,Monday_Fib_Minus_25,Tuesday_Date,Tuesday_Close,Difference,,
+HYPOTHESIS 3 DETAILS: Asian Session Predictions (First 30),,,,,,
+2023-01-03,Tuesday,84.49,80.02,84.49,YES,"High diff: 0.00, Low diff: 4.47"
+2023-01-04,Wednesday,101.46,95.9,101.29,NO,No overlap detected
+2023-01-05,Thursday,120.75,116.64,120.75,YES,"High diff: 0.00, Low diff: 4.11"
+2023-01-06,Friday,140.78,135.06,140.78,YES,"High diff: 0.00, Low diff: 5.72"
+2023-01-09,Monday,156.77,152.65,156.77,YES,"High diff: 0.00, Low diff: 4.12"
+2023-01-10,Tuesday,175.09,168.55,174.64,NO,No overlap detected
+2023-01-11,Wednesday,195.03,189.33,195.03,YES,"High diff: 0.00, Low diff: 5.70"
+2023-01-12,Thursday,211.26,207.48,211.26,YES,"High diff: 0.00, Low diff: 3.78"
+2023-01-13,Friday,232.61,226.56,232.61,YES,"High diff: 0.00, Low diff: 6.05"
+2023-01-16,Monday,248.42,243.38,248.42,YES,"High diff: 0.00, Low diff: 5.04"
+2023-01-17,Tuesday,267.05,260.55,267.05,YES,"High diff: 0.00, Low diff: 6.50"
+2023-01-18,Wednesday,282.35,279.1,282.35,YES,"High diff: 0.00, Low diff: 3.25"
+2023-01-19,Thursday,302.34,298.72,302.23,YES,"High diff: 0.11, Low diff: 3.51"
+2023-01-20,Friday,319.64,315.6,319.26,NO,No overlap detected
+2023-01-23,Monday,337.11,332,337.11,YES,"High diff: 0.00, Low diff: 5.11"
+2023-01-24,Tuesday,357.09,351.5,357.09,YES,"High diff: 0.00, Low diff: 5.59"
+2023-01-25,Wednesday,375.77,371.18,375.77,YES,"High diff: 0.00, Low diff: 4.59"
+2023-01-26,Thursday,394.73,389.11,394.73,YES,"High diff: 0.00, Low diff: 5.62"
+2023-01-27,Friday,414.95,410.28,414.95,YES,"High diff: 0.00, Low diff: 4.67"
+2023-01-30,Monday,434.32,428.18,434.32,YES,"High diff: 0.00, Low diff: 6.14"
+2023-01-31,Tuesday,454.64,449.13,454.64,YES,"High diff: 0.00, Low diff: 5.51"
+2023-02-01,Wednesday,471.68,466.47,471.68,YES,"High diff: 0.00, Low diff: 5.21"
+2023-02-02,Thursday,489.03,484.31,488.86,NO,No overlap detected
+2023-02-03,Friday,505.76,501.29,505.7,YES,"High diff: 0.06, Low diff: 4.41"
+2023-02-06,Monday,525.2,520.05,525.2,YES,"High diff: 0.00, Low diff: 5.15"
+2023-02-07,Tuesday,543.02,538.93,542.82,NO,No overlap detected
+2023-02-08,Wednesday,559.59,554.29,559.59,YES,"High diff: 0.00, Low diff: 5.30"
+2023-02-09,Thursday,577.24,571.69,577.24,YES,"High diff: 0.00, Low diff: 5.55"
+2023-02-10,Friday,594.2,589.48,594.2,YES,"High diff: 0.00, Low diff: 4.72"
+2023-02-13,Monday,613.42,608.45,613.42,YES,"High diff: 0.00, Low diff: 4.97"
+HYPOTHESIS 4 DETAILS: Previous Day Overlap Events (First 30),,,,,,
+2023-02-13,Monday,Asian,613.42,Low-PrevMinus50,"PrevMinus25: 605.76, PrevMinus50: 608.35",
+2023-02-15,Wednesday,Asian,652.4,Low-PrevMinus50,"PrevMinus25: 644.65, PrevMinus50: 646.97",
+2023-04-05,Wednesday,Asian,1302.88,Low-PrevMinus50,"PrevMinus25: 1295.38, PrevMinus50: 1297.99",
+2023-04-17,Monday,Asian,1448.04,Low-PrevMinus50,"PrevMinus25: 1439.69, PrevMinus50: 1442.51",
+2023-04-19,Wednesday,Asian,1485.94,Close-PrevMinus50,"PrevMinus25: 1483.46, PrevMinus50: 1485.98",
+2023-05-30,Tuesday,Asian,2024.83,Low-PrevMinus50,"PrevMinus25: 2016.71, PrevMinus50: 2019.50",
+2023-06-06,Tuesday,Asian,2122.62,Low-PrevMinus50,"PrevMinus25: 2115.88, PrevMinus50: 2118.34",
+2023-06-12,Monday,Asian,2198.68,Low-PrevMinus50,"PrevMinus25: 2190.92, PrevMinus50: 2193.19",
+2023-07-07,Friday,Asian,2548.16,Low-PrevMinus50,"PrevMinus25: 2540.41, PrevMinus50: 2542.70",
+2023-07-18,Tuesday,Asian,2677.76,Low-PrevMinus50,"PrevMinus25: 2670.34, PrevMinus50: 2672.90",
+2023-08-16,Wednesday,Asian,3064.47,Low-PrevMinus50,"PrevMinus25: 3055.73, PrevMinus50: 3058.46",
+2023-09-12,Tuesday,Asian,3419.46,Low-PrevMinus50,"PrevMinus25: 3413.31, PrevMinus50: 3415.78",
+2023-09-25,Monday,Asian,3586.05,Low-PrevMinus50,"PrevMinus25: 3579.37, PrevMinus50: 3581.77",
+2023-11-08,Wednesday,Asian,4166.81,Low-PrevMinus50,"PrevMinus25: 4159.05, PrevMinus50: 4161.57",
+2023-11-10,Friday,Asian,4201.43,Low-PrevMinus50,"PrevMinus25: 4193.84, PrevMinus50: 4196.17",
+2023-11-20,Monday,London,4323.68,Low-PrevMinus50,"PrevMinus25: 4310.17, PrevMinus50: 4312.81",
+2023-12-05,Tuesday,Asian,4520.78,Low-PrevMinus50,"PrevMinus25: 4514.89, PrevMinus50: 4517.31",
+2023-12-26,Tuesday,Asian,4790.55,Low-PrevMinus50,"PrevMinus25: 4781.74, PrevMinus50: 4784.41",
+2023-12-29,Friday,London,4851.94,Low-PrevMinus50,"PrevMinus25: 4839.04, PrevMinus50: 4841.69",
+2024-01-02,Tuesday,Asian,4879.55,Low-PrevMinus50,"PrevMinus25: 4872.37, PrevMinus50: 4874.86",
+2024-01-04,Thursday,Asian,4917.51,Low-PrevMinus50,"PrevMinus25: 4909.53, PrevMinus50: 4912.12",
+2024-01-16,Tuesday,Asian,5067.8,Low-PrevMinus50,"PrevMinus25: 5059.15, PrevMinus50: 5061.76",
+2024-01-17,Wednesday,Asian,5087.35,Low-PrevMinus50,"PrevMinus25: 5079.91, PrevMinus50: 5082.60",
+2024-01-18,Thursday,London,5115.83,Low-PrevMinus50,"PrevMinus25: 5101.61, PrevMinus50: 5104.68",
+2024-01-24,Wednesday,Asian,5182.47,Low-PrevMinus50,"PrevMinus25: 5173.96, PrevMinus50: 5176.43",
+2024-03-08,Friday,Asian,5759.63,Low-PrevMinus50,"PrevMinus25: 5751.61, PrevMinus50: 5753.89",
+2024-03-22,Friday,Asian,5934.53,Low-PrevMinus50,"PrevMinus25: 5926.85, PrevMinus50: 5929.11",
+2024-03-28,Thursday,Asian,6008.79,Low-PrevMinus50,"PrevMinus25: 6000.17, PrevMinus50: 6002.97",
+2024-04-10,Wednesday,Asian,6178.91,Low-PrevMinus50,"PrevMinus25: 6171.98, PrevMinus50: 6174.25",
+2024-05-01,Wednesday,Asian,6450.35,Low-PrevMinus50,"PrevMinus25: 6442.87, PrevMinus50: 6445.15",
+Week,Sessions_Count,Has_Confluence,Confluence_Rate,,,
+HYPOTHESIS 5 DETAILS: Daily Average Range Comparison,,,,,,
+Monday,7.863658536585361,369,,,,
+Tuesday,7.959784946236559,372,,,,
+Wednesday,7.924166666666668,372,,,,
+Thursday,7.922446236559134,372,,,,
+Friday,7.876021505376338,372,,,,
+Summary,Mon-Tue Avg: 7.91,,,,,
+,Wed-Thu Avg: 7.92,,,,,
+,Velocity Increase: 0.15%,,,,,
+HYPOTHESIS 6 DETAILS: Weekly Confluence Summary (First 40 Weeks),,,,,,
+2023-01-03,3,NO,NOT FOUND,,,
+2023-01-04,3,NO,NOT FOUND,,,
+2023-01-05,3,NO,NOT FOUND,,,
+2023-01-06,3,NO,NOT FOUND,,,
+2023-01-09,3,NO,NOT FOUND,,,
+2023-01-10,3,NO,NOT FOUND,,,
+2023-01-11,3,NO,NOT FOUND,,,
+2023-01-12,3,NO,NOT FOUND,,,
+2023-01-13,3,NO,NOT FOUND,,,
+2023-01-16,3,NO,NOT FOUND,,,
+2023-01-17,3,NO,NOT FOUND,,,
+2023-01-18,3,NO,NOT FOUND,,,
+2023-01-19,3,NO,NOT FOUND,,,
+2023-01-20,3,NO,NOT FOUND,,,
+2023-01-23,3,NO,NOT FOUND,,,
+2023-01-24,3,NO,NOT FOUND,,,
+2023-01-25,3,NO,NOT FOUND,,,
+2023-01-26,3,NO,NOT FOUND,,,
+2023-01-27,3,NO,NOT FOUND,,,
+2023-01-30,3,NO,NOT FOUND,,,
+2023-01-31,3,NO,NOT FOUND,,,
+2023-02-01,3,NO,NOT FOUND,,,
+2023-02-02,3,NO,NOT FOUND,,,
+2023-02-03,3,NO,NOT FOUND,,,
+2023-02-06,3,NO,NOT FOUND,,,
+2023-02-07,3,NO,NOT FOUND,,,
+2023-02-08,3,NO,NOT FOUND,,,
+2023-02-09,3,NO,NOT FOUND,,,
+2023-02-10,3,NO,NOT FOUND,,,
+2023-02-13,3,NO,NOT FOUND,,,
+2023-02-14,3,NO,NOT FOUND,,,
+2023-02-15,3,NO,NOT FOUND,,,
+2023-02-16,3,NO,NOT FOUND,,,
+2023-02-17,3,NO,NOT FOUND,,,
+2023-02-20,3,NO,NOT FOUND,,,
+2023-02-21,3,NO,NOT FOUND,,,
+2023-02-22,3,NO,NOT FOUND,,,
+2023-02-23,3,NO,NOT FOUND,,,
+2023-02-24,3,NO,NOT FOUND,,,
+2023-02-27,3,NO,NOT FOUND,,,

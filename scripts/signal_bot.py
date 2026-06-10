@@ -33,6 +33,7 @@ ENV_PATH = REPO_ROOT / ".env"
 SIGNALS_FILES = [
     REPO_ROOT / "quant-lab" / "mt5" / "live_logs" / "signals.jsonl",
     REPO_ROOT / "quant-lab" / "mt5" / "live_logs" / "mlr_signals.jsonl",
+    REPO_ROOT / "quant-lab" / "mt5" / "live_logs" / "occ_buffer_signals.jsonl",
 ]
 
 # ─── SINGLETON ENFORCEMENT ───────────────────────────────────────────────
@@ -195,13 +196,16 @@ def format_signal(sig):
     # ST engine: SL is profit-lock (SL_HIT = profit taken at impulse extreme)
     is_profit_lock = engine == "SymmetryTrap" and event == "SL_HIT"
 
+    # OCC Buffer engine: SL is a real stop loss (not profit lock)
+    is_occ_buffer = engine == "OCCBuffer"
+
     lines = [
         f"<b>{label}</b> — {symbol}",
         f"",
         f"Engine: {engine}",
         f"Direction: <b>{direction}</b>",
         f"Entry: {entry}",
-        f"SL: {sl} ({sl_pips}p){' [PROFIT-LOCK]' if is_profit_lock else ''}",
+        f"SL: {sl} ({sl_pips}p){' [PROFIT-LOCK]' if is_profit_lock else ''}{' [BUFFER]' if is_occ_buffer else ''}",
         f"TP: {tp} ({tp_pips}p)",
         f"RR: {rr}",
     ]
@@ -314,7 +318,7 @@ def run_daemon():
         "Signal Bot Started\n\n"
         "Engines:\n"
         "  1. SymmetryTrap (live trades)\n"
-        "  2. OCC+Buffer\n"
+        "  2. OCC Buffer (signal-only, regular SL)\n"
         "  3. MLR Scanner (tier + level alerts)\n\n"
         "New signals will appear here in real-time."
     )

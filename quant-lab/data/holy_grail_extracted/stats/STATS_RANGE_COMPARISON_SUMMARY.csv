@@ -1,0 +1,28 @@
+﻿EUR/USD RANGE WINDOW COMPARISON - Phase 2B Results,,,,
+"Testing ±5 pip tolerance (0.0005) | Target: -25%/-50% ≥90%, -100% ≥80%",,,,
+"Analysis Period: Oct 2021 - Dec 2025 | 1,082 Trading Days",,,,
+✅ WINNER: 2AM-4AM EST (07:00-09:00 UTC),,,,
+All target thresholds EXCEEDED:,,,,
+-25%: 99.2% (target ≥90%) | -50%: 93.8% (target ≥90%) | -100%: 83.1% (target ≥80%),,,,
+Ready for Phase 3: Temporal Pattern Analysis,,,,
+RANGE WINDOW COMPARISON,,,,
+Metric,Full Asian (23:00-08:00 UTC),2AM-4AM EST (07:00-09:00 UTC),Improvement,Meets Target?
+Average Range,59.4 pips,13.8 pips,-76.9%,-
+Trading Days,"1,083","1,082",-,-
+-25% Hit Rate (±5pip),54.5%,99.2%,+44.7pp,✅ YES (≥90%)
+-50% Hit Rate (±5pip),33.1%,93.8%,+60.7pp,✅ YES (≥90%)
+-100% Hit Rate (±5pip),11.8%,83.1%,+71.3pp,✅ YES (≥80%)
+-168% Hit Rate (±5pip),5.2%,65.3%,+60.1pp,-
+132% Violation Rate,,52.4%,-,-
+KEY INSIGHTS,,,,
+1. Narrower Range = Higher Predictability: 2AM-4AM EST has 77% smaller range (13.8 vs 59.4 pips) but 45-71pp higher hit rates,,,,
+"2. Tolerance Calibration: ±5 pip tolerance is optimal for 2AM-4AM range, allowing for minor price variations while maintaining high prediction accuracy",,,,
+"3. Daily Prediction Framework: 2AM-4AM range provides reliable daily Fibonacci levels with 99.2% accuracy at -25%, 93.8% at -50%, and 83.1% at -100%",,,,
+"4. Phase 3 Readiness: With all targets exceeded, proceed to temporal pattern analysis to identify day-of-week, monthly, and seasonal variations",,,,
+COMPARISON TO MONDAY LONDON WEEKLY,,,,
+Metric,2AM-4AM Daily (±5pip),Monday London Weekly (±5pip),Difference,
+Average Range,13.8 pips,125.4 pips,+111.6 pips,
+Sample Size,"1,082 days",211 weeks,5.1x more samples,
+-25% Hit Rate,99.2%,88.6%,+10.6pp,
+-50% Hit Rate,93.8%,80.1%,+13.7pp,
+-100% Hit Rate,83.1%,66.4%,+16.7pp,

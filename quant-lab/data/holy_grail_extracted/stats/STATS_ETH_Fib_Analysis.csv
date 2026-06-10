@@ -1,0 +1,9 @@
+﻿Week Start,Bias,Asian High,Asian Low,Range,25% Level,50% Level,100% Level,168% Level,132% Invalid,25% Hit (5D),50% Hit (5D),100% Hit (5D),168% Hit (5D),Inv (5D),25% Hit (7D),50% Hit (7D),100% Hit (7D),168% Hit (7D),Inv (7D)
+Phase 4 PDF Validated Hit Rates,,,,,,,,,,,,,,,,,,,
+Level,Combined,Bullish,Bearish,,,,,,,,,,,,,,,,
+-25%,1,1,1,,,,,,,,,,,,,,,,
+-50%,0.9570000000000001,0.951,0.966,,,,,,,,,,,,,,,,
+-100%,0.862,0.872,0.8490000000000001,168% Hit Rate,132% Violation Rate,,,,,,,,,,,,,,
+-168%,0.763,0.785,0.733,,,,,,,,,,,,,,,,
+132% Violation,0.7440000000000001,0.738,0.753,,,,,,,,,,,,,,,,
+"Source: ETH/USD Phase 4 PDF - 5-Day Model, 215 weeks, 948 Fibonacci hits",,,,,,,,,,,,,,,,,,,
