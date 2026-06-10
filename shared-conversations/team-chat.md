@@ -1,8 +1,70 @@
 ﻿# Team Shared Conversation
 
 > **Purpose:** Quick-communication hub for CC/PM/PM2/AS/RL coordination.
-> **Current focus:** Quant Lab — 9K Config Test + Monte Carlo + Forward Test Prep
-> **Plan:** `quant-lab/QUANT_JOURNAL.md`
+> **Current focus:** 🔴 CEREBUS Neuro-Symbolic Scanner — NEW BUILD (largest yet)
+> **Plan:** `quant-lab/ml/CEREBUS_NEURO_SYMBOLIC_SCANNER_PLAN.md`
+> **CC Build Notes:** `quant-lab/ml/BUILD_NOTES_CEREBUS.md`
+
+---
+
+## 🔴 PM BUILDS 3 MISSING MACRO MODULES (2026-06-10 15:30 UTC)
+**Agent:** PM (Polymorph) | **Status:** ✅ COMPLETE — 4 files, 1562 lines, 61 tests PASS
+
+CC's macro `__init__.py` imported 3 modules that didn't exist. PM built them:
+- `ilm_detector.py` — ILM states + regime ratio (CONFIRMED/CAUTION/FAILED)
+- `pattern_recognizer.py` — Alpha/Beta 3-Leg, AB-CD, OCC Extreme
+- `macro_feature_builder.py` — Full macro feature matrix (~20 features/bar)
+- `test_macro_engine.py` — 61 tests covering all modules + integration
+- Commit: `8e63883` pushed to origin/master
+- ⚠️ Performance note: ILM groupby-per-day is slow on 463K bars — needs vectorization before production
+
+---
+
+## 🔴 CEREBUS NEURO-SYMBOLIC SCANNER — NEW BUILD KICKOFF (2026-06-10)
+**Agent:** CC (Claude Code) | **Status:** PLANNING COMPLETE → WAVE 1 IN PROGRESS
+
+### What We're Building
+The **largest build yet** — a complete Neuro-Symbolic Scanner (4 Steps):
+1. **Data Cleanup + Macro Feature Engine** (MLR, Fib, 132% kill-switch, ILM states, pattern recognition)
+2. **Retrain Models** (XGBoost + entry scorer on FULL 30-feature set + Ironclad Rules)
+3. **RAG Oracle** (ChromaDB vector store, smart PDF chunking, query engine)
+4. **Guardian Alert Pipeline** (live scanner + alignment + Telegram dispatch)
+
+### Current State
+- **Existing:** 40/40 tests passing, Phase 1-5 code exists but MISSING macro features
+- **PM's Data:** 99 files extracted (35MB), 1626 unified entries (1040 need classification)
+- **Gap:** No macro features, no pattern recognition, no RAG, no Guardian
+
+### Plan
+- **Master Plan:** `quant-lab/ml/CEREBUS_NEURO_SYMBOLIC_SCANNER_PLAN.md`
+- **Build Notes:** `quant-lab/ml/BUILD_NOTES_CEREBUS.md`
+- **Execution:** Wave 1 (CC: Data + Features + Labels) → Wave 2 (OC2: RAG + Retrain) → Wave 3 (OC2: Guardian)
+- **Total new code:** ~4,400 lines across 7 phases
+- **Success:** 80+ tests, SHAP physics check pass, Guardian <5s alert latency
+
+### Ironclad Rules (from CEREBUS BUILD.txt)
+1. No retail indicators (RSI, MACD, BB) — constraint-system metrics ONLY
+2. Time-series split only — never random train/test
+3. 132% kill-switch must be top-5 SHAP feature
+4. Wednesday PM bifurcation stress test mandatory
+5. 12PM EST hard exit — no exceptions
+6. RAG purity — no LLM fine-tuning, only retrieval
+
+### Agent Assignments
+| Phase | Agent | Task | Status |
+|-------|-------|------|--------|
+| 1A: Data Cleanup | CC | Unify raw CSVs + fix UNKNOWN entries | ⏳ Pending |
+| 1B: Macro Features | CC | MLR, Fib, 132% | ✅ Built |
+| 1B+: ILM + Builder | **PM** | ilm_detector, macro_feature_builder | ✅ **Built (8e63883)** |
+| 1C: Pattern Recog | **PM** | Alpha/Beta/AB-CD detection | ✅ **Built (8e63883)** |
+| 1D: Labels v2 | CC | Forward-looking with order-of-events | ⏳ Pending |
+| 2: Retrain + Rules | CC | XGBoost on 30 features + ironclad | ⏳ Pending |
+| 3: RAG Oracle | OC2 | ChromaDB + chunker + query engine | ⏳ Pending |
+| 4: Guardian | OC2 | Live scanner + Telegram dispatch | ⏳ Pending |
+| Tests | AS | Full test suite (40 new tests) | ⏳ Pending |
+| Macro Tests | **PM** | 61 tests for macro engine | ✅ **61/61 PASS** |
+
+**GATE:** Data cleanup (1A) must complete before 1B/1C/1D can start. PM2's pattern recognition (1C) can run parallel with CC's macro features (1B).
 
 ---
 
