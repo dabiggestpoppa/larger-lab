@@ -1,0 +1,61 @@
+{
+  "st_markov": {
+    "states": [
+      "ST_RESET",
+      "ST_NO_GO",
+      "ST_FILTERED",
+      "ST_IN_TRADE",
+      "ST_TP_HIT",
+      "ST_SL_HIT"
+    ],
+    "n_states": 6,
+    "outcomes": {
+      "ST_SL_HIT": 909,
+      "ST_TP_HIT": 5580,
+      "ST_NO_GO": 2818,
+      "ST_FILTERED": 693
+    },
+    "win_rate_traded": 0.7769,
+    "nogo_rate": 0.2818
+  },
+  "p90_markov": {
+    "states": [
+      "P90_RESET",
+      "P90_NO_GO",
+      "P90_FILTERED",
+      "P90_IN_TRADE",
+      "P90_TP1_HIT",
+      "P90_TP2_HIT",
+      "P90_SL_HIT",
+      "P90_KILL_SWITCH",
+      "P90_HARD_EXIT",
+      "P90_EWS_EXIT",
+      "P90_REKEY",
+      "P90_REKEY_EXTENSION"
+    ],
+    "n_states": 12,
+    "outcomes": {
+      "P90_FILTERED": 606,
+      "P90_SL_HIT": 1079,
+      "P90_TP1_HIT": 3465,
+      "P90_NO_GO": 3202,
+      "P90_TP2_HIT": 607,
+      "P90_KILL_SWITCH": 316,
+      "P90_EWS_EXIT": 510,
+      "P90_HARD_EXIT": 215
+    },
+    "tp1_rate": 0.3465,
+    "tp2_rate": 0.0607,
+    "rekey_rate": 0.0,
+    "win_rate_traded": 0.599,
+    "nogo_rate": 0.3202
+  },
+  "comparison": {
+    "st_wr_backtest": 0.857,
+    "p90_wr_backtest": 0.787,
+    "st_pf_backtest": 8.18,
+    "p90_pf_backtest": 3.09,
+    "st_dd_pips": 39.3,
+    "p90_dd_pips": 72.2
+  }
+}
