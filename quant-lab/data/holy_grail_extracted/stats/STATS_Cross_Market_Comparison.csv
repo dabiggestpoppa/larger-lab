@@ -1,0 +1,41 @@
+﻿Market,Weekly Anchor,Anchor Session,Key Differentiator,,
+EUR/USD,Monday Range,London Session,Primary predictor M1 (effectiveness 123.13),,
+OIL/USD,Monday Range,London Session,Same framework as EUR/USD,,
+ETH/USD,Friday Asian Range,Asian Session,Uses Friday as anchor (not Monday),,
+SECTION 2: FIBONACCI HIT RATES COMPARISON,,,,,
+Fib Level,EUR/USD,OIL/USD,ETH/USD,Notes,
+0,0.9822,0.9822,1,"ETH perfect, EUR/OIL near-perfect",
+0,0.9644,0.9644,0.957,All markets >95%,
+-100%,0.9217,0.9217,0.572093023255814,High reliability,
+-168%,0.8719,0.8719,0.448837209302326,Deep extension,
+132% Violation,0.7153,0.7153,0.744,ETH slightly higher violation rate,
+SECTION 3: 132% VIOLATION MECHANICS,,,,,
+Metric,EUR/USD,OIL/USD,ETH/USD,,
+Overall Violation Rate,0.7153,0.7153,0.744,,
+Rekey Rate Post-132%,1,1,1,,
+Wednesday Share of Violations,0.35,0.35,TBD,,
+Rekey Method,Method B (85.4%),78.6% Retrace,TBD,,
+SECTION 4: SESSION MECHANICS COMPARISON,,,,,
+Session,EUR/USD Function,OIL/USD Function,ETH/USD Function,,
+Asian,Range accumulation (89.34% accuracy),Same,Friday Anchor (63.7% 132%),,
+London,Primary entry (98.22% -25%),Same,Secondary delivery,,
+NY Open,80% Hi/Lo takeout,Same,Target continuation,,
+SECTION 5: KEY TRADING ALERTS,,,,,
+EUR/USD,,,,,
+"• Monday M1 predictor (123.13 effectiveness) is primary anchor
+• 98.22% reliability at -25% Fibonacci
+• Wednesday accounts for 35% of 132% violations
+• Method B rekey (85.4%) post-132% violation
+• London session primary entry with 98.22% -25% hit rate",,,,,
+OIL/USD,,,,,
+"• Identical framework to EUR/USD (same anchor system)
+• 98.22% reliability at -25% Fibonacci
+• 78.6% retrace for rekey methodology
+• Same session mechanics as EUR/USD
+• Shared 71.53% 132% violation rate",,,,,
+ETH/USD,,,,,
+"• Friday Asian Range anchor (unique differentiator)
+• Perfect 100% -25% Fibonacci hit rate
+• 74.4% 132% violation rate (slightly higher)
+• 63.7% Friday Asian sessions lead to 132% violations
+• Friday as predictor vs Monday in other markets",,,,,

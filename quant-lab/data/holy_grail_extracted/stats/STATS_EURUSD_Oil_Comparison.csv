@@ -1,0 +1,12 @@
+﻿Fibonacci Level,EUR/USD Hit Rate,Oil Benchmark Rate,Variance,Absolute Variance,Status
+-25%,0.9904153354632588,0.9822,0.00821533546325881,0.00821533546325881,Similar
+-50%,0.9424920127795527,0.9643999999999999,-0.02190798722044718,0.02190798722044718,Similar
+-100%,0.853035143769968,0.9217,-0.068664856230032,0.068664856230032,Moderate Difference
+-168%,0.7635782747603834,0.8719,-0.1083217252396166,0.1083217252396166,Significant Difference
+132% Violated,0.7060702875399361,0.7153,-0.00922971246006398,0.00922971246006398,Similar
+Summary Statistics:,,,,,
+Total EUR/USD Monday Observations: 313,,,,,
+Analysis Date: 12/18/2025,,,,,
+Key Findings:,,,,,
+• -100%: EUR/USD is 6.87% lower than Oil benchmark,,,,,
+• -168%: EUR/USD is 10.83% lower than Oil benchmark,,,,,

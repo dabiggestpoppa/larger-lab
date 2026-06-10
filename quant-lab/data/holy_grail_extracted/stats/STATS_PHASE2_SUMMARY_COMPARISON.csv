@@ -1,0 +1,30 @@
+﻿Metric,Asian Daily Model,Monday London Weekly,Difference,Notes
+Total Sessions,1083,313,770,Asian has 3.5x more data points
+Time Period,Oct 2021 - Dec 2025,Jan 2020 - Dec 2025,-,Asian data starts later
+Prediction Scope,Same-day High/Low,Weekly High/Low,-,Different timeframes
+Average Range,35.0 pips,78.3 pips,-43.3 pips,Asian ranges are smaller
+Exact -100% Hit Rate,0.3943,0.9105,-0.5162,Monday London more predictable
+FIBONACCI HIT RATES COMPARISON,,,,
+Fib Level,Asian Daily (Exact),Asian Daily (Tolerance),Monday London,Asian vs Monday
+-25%,0.6519,1,1,-34.81% (exact)
+-50%,0.5494,1,1,-45.06% (exact)
+-100%,0.3943,1,0.9105,-51.62% (exact)
+-168%,0.2382,0.9861,0.7636,-52.54% (exact)
+132% Violation,0.4728,1,0.7061,-23.33% (exact)
+KEY INSIGHTS,,,,
+1. Tolerance Impact:,±0.025 spread tolerance dramatically improves Asian daily hit rates to ~100%,,,
+2. Model Precision:,Monday London Weekly has higher exact hit rates (more predictable),,,
+3. Opportunity Frequency:,Asian Daily offers 3.5x more trading opportunities,,,
+4. Rekey Candidates:,656 Asian sessions (60.6%) failed -100% → potential daily rekeys,,,
+5. Weekly Rekeys:,28 Monday sessions (8.95%) failed -100% → potential weekly rekeys,,,
+REKEY OPPORTUNITY COMPARISON,,,,
+Metric,Asian Daily Rekeys,Monday London Rekeys,,
+Total Failures,656,28,,
+Failure Rate,0.6057,0.0895,,
+Avg Distance Missed,0.000589573170731702,17.8,,
+Avg % Range Missed,2.29545105679119,0.2289,,
+STRATEGIC RECOMMENDATIONS,,,,
+PRIMARY:,Use Monday London Weekly model for high-probability weekly targets,,,
+SECONDARY:,Use Asian Daily model with ±0.025 tolerance for daily opportunities,,,
+REKEY STRATEGY:,Monitor 656 daily rekey candidates for same-day reversals,,,
+RISK MANAGEMENT:,Apply tighter stops on Asian session trades due to lower exact hit rates,,,

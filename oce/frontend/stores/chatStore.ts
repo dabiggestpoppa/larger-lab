@@ -140,7 +140,8 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
-      let finalData: any = null;
+      let accumulatedResponse = "";
+      let streamError = null;
 
       if (reader) {
         while (true) {
@@ -170,29 +171,61 @@ export const useChatStore = create<ChatStore>((set, get) => ({
               } else if (etype === "complete" || etype === "max_rounds") {
                 set({ streamStatus: { active: true, stage: "responding", detail: "Generating response..." } });
               } else if (etype === "final") {
-                finalData = edata;
+                // Direct final response (Telegram-style)
+                accumulatedResponse = edata.response || "";
+              } else if (etype === "chunk") {
+                // Word-by-word streaming chunk (OCE backend style)
+                const delta = evt.choices?.[0]?.delta?.content || edata.content || "";
+                if (delta) accumulatedResponse += delta;
+              } else if (etype === "done") {
+                // Stream complete — response is ready
+                set({ streamStatus: { active: true, stage: "responding", detail: "Finalizing..." } });
               } else if (etype === "error") {
-                set({ streamStatus: { active: true, stage: "error", detail: edata.message || "Error" } });
+                streamError = edata.message || "Unknown error";
+                set({ streamStatus: { active: true, stage: "error", detail: streamError } });
               }
             } catch (_) { /* skip malformed */ }
           }
         }
       }
 
-      if (finalData) {
+      // Add the observer message with whatever response we got
+      if (accumulatedResponse) {
         const obsMsg: ChatMessage = {
           message_id: nextId("obs"),
           role: "observer",
-          content: finalData.response || "No response",
+          content: accumulatedResponse,
           timestamp: new Date().toISOString(),
-          session_id: finalData.session_id || sid,
+          session_id: sid,
         };
         set((s) => ({
           messages: [...s.messages, obsMsg],
           streamStatus: { active: false, stage: "done", detail: "" },
         }));
+      } else if (streamError) {
+        const errMsg: ChatMessage = {
+          message_id: nextId("err"),
+          role: "observer",
+          content: `❌ Error: ${streamError}`,
+          timestamp: new Date().toISOString(),
+          session_id: sid,
+        };
+        set((s) => ({
+          messages: [...s.messages, errMsg],
+          streamStatus: { active: false, stage: "error", detail: streamError },
+        }));
       } else {
-        set({ streamStatus: { active: false, stage: "", detail: "" } });
+        const noRespMsg: ChatMessage = {
+          message_id: nextId("empty"),
+          role: "observer",
+          content: "⚠️ No response received. The agent may have timed out.",
+          timestamp: new Date().toISOString(),
+          session_id: sid,
+        };
+        set((s) => ({
+          messages: [...s.messages, noRespMsg],
+          streamStatus: { active: false, stage: "done", detail: "" },
+        }));
       }
     } catch (err: any) {
       set({ error: err.message || "Failed to send", streamStatus: { active: false, stage: "error", detail: "Connection failed" } });

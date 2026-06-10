@@ -1,0 +1,7 @@
+﻿Pattern ID,Pattern Name,Pattern Structure,Frequency (%),Accuracy (%),Sample Size,Timeframe,ILM Dependency,Session Dependency,Trigger Conditions,Target Levels,Avg Completion Time,Velocity Factor,Risk Level,Validation Status,First Observed,Last Observed,Notes
+Pattern ID,Pattern Name,Pattern Structure,Frequency (%),Accuracy (%),Sample Size,Timeframe,ILM Dependency,Session Dependency,Trigger Conditions,Target Levels,Avg Completion Time,Velocity Factor,Risk Level,Validation Status,First Observed,Last Observed,Notes
+1,1.618 Extension Shallow Angle,Range → 1.618 extension,42.1,73.5,592,1H,Enhanced,Any,Shallow angle required,1.618 extension,8-12h,Medium,Medium,Testing,,,Alpha pattern variant
+2,Measured Move 50%→100%,50% retracement → 100% continuation,3.2,100,45,4H,Required,London,Daily ILM active,100% extension,12-24h,High,Low,Confirmed,,,Rare but perfect success
+3,Q4 Reconstruction,Quarterly rebalancing pattern,0.7,95.8,10,Daily/Weekly,Required,Any,Q4 timing + ILM alignment,Multiple Fib levels,Days-weeks,Low,Low,Confirmed,,,Seasonal pattern
+4,50%→50% Retest 4H,50% retest on 4H timeframe,28.4,91.4,398,4H,Enhanced,London/Overlap,Clean 50% retracement,50% level,4-8h,Medium,Low,Confirmed,,,High success pattern
+5,50%→50% Retest 15M,50% retest on 15M timeframe,28.4,83.2,398,15M,Neutral,Any,Clean 50% retracement,50% level,1-2h,High,Medium,Testing,,,Lower timeframe variant

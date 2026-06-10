@@ -49,14 +49,22 @@ CHAT_ID = os.environ.get("HERMES_TELEGRAM_CHAT_ID", "")
 SYMBOLS = [
     "EURUSD.PRO",
     "USDCHF.PRO",
-    "USDSGD.PRO",
+    "BTCUSD",
 ]
 
 # OCC + Buffer SL config
 SPREAD_BUFFER_PIPS = {
     "EURUSD.PRO": 1.5,
     "USDCHF.PRO": 2.0,
-    "USDSGD.PRO": 2.5,
+    "BTCUSD": 50.0,
+}
+
+# Per-pair tier config (from sweep data / asset_configs.py)
+# AU is ALWAYS per-pair, never universal.
+PAIR_TIER_CONFIG = {
+    "EURUSD.PRO":  {"T1": {"au": 10, "ar_max": 20}, "T2": {"au": 12, "ar_max": 30}, "T3": {"au": 15, "ar_max": 45}},
+    "USDCHF.PRO": {"T1": {"au": 11, "ar_max": 20}, "T2": {"au": 15, "ar_max": 30}, "T3": {"au": 20, "ar_max": 45}},
+    "BTCUSD":     {"T1": {"au": 205, "ar_max": 400}, "T2": {"au": 545, "ar_max": 800}, "T3": {"au": 1160, "ar_max": 1500}},
 }
 
 SCAN_INTERVAL = 60  # seconds between scans
@@ -113,7 +121,10 @@ def send_telegram(text):
 
 
 def get_pip_size(symbol):
-    if "JPY" in symbol:
+    s = symbol.upper()
+    if "BTC" in s:
+        return 1.0
+    if "JPY" in s:
         return 0.01
     return 0.0001
 
@@ -226,20 +237,22 @@ def run_scan():
             al = min(b["low"] for b in recent)
             ar_pips = (ah - al) / pip
 
-            # AR gate
-            if ar_pips > 60 or ar_pips < 3:
+            # AR gate — per-pair max AR
+            ar_gate_max = 1500 if "BTC" in symbol else 60
+            if ar_pips > ar_gate_max or ar_pips < 3:
                 continue
 
-            # Classify tier
-            if ar_pips < 20:
+            # Classify tier — per-pair config
+            pair_cfg = PAIR_TIER_CONFIG.get(symbol, PAIR_TIER_CONFIG["EURUSD.PRO"])
+            if ar_pips < pair_cfg["T2"]["ar_max"]:
                 tier = "T1"
-                au = 10
-            elif ar_pips < 30:
+                au = pair_cfg["T1"]["au"]
+            elif ar_pips < pair_cfg["T3"]["ar_max"]:
                 tier = "T2"
-                au = 12
-            elif ar_pips <= 45:
+                au = pair_cfg["T2"]["au"]
+            elif ar_pips <= 1500:
                 tier = "T3"
-                au = 15
+                au = pair_cfg["T3"]["au"]
             else:
                 continue
 

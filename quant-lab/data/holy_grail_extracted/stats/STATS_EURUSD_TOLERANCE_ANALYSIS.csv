@@ -1,0 +1,24 @@
+﻿Fibonacci Level,Original Hit Rate,With ±0.025 Tolerance,Improvement,Oil Benchmark
+-25%,1,1,0,0.9822
+-50%,1,1,0,0.9644
+-100%,0.9105,0.9521,0.0416,0.9217
+-168%,0.7636,0.8818,0.1182,0.8719
+132% Violated,0.8307,0.9233,0.0926,0.7153
+-100%,,,,0.9217
+SUMMARY,,,,0.8719
+Total Sessions Analyzed,313,,,0.7153
+Bullish Sessions,141,,,
+Bearish Sessions,172,,,
+-100% Failures (Rekey Candidates),28,,,
+1. -20% (Alternative): NaN% hit rate (+NaN% improvement),,,,
+TOP 3 RECOMMENDED LEVELS,,,,
+1. -25%: 100.00% hit rate (PERFECT),,,,
+2. -50%: 100.00% hit rate (PERFECT),,,,
+3. -100%: 95.21% hit rate with ±0.025 tolerance,,,,
+• ±0.025 tolerance (25 pips) improves ALL Fibonacci levels,,,,
+KEY FINDINGS,,,,
+• EUR/USD EXCEEDS Oil on -25% and -50% (100% vs 98%/96%),,,,
+• ±0.025 tolerance improves -168% by +11.82%,,,,
+• 132% violation rate HIGHER than Oil (83% vs 72%),,,,
+• 28 weeks where -100% failed = rekey candidates,,,,
+• Total sessions analyzed: 0,,,,

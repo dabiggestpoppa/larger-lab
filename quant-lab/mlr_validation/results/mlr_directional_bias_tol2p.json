@@ -1,0 +1,65 @@
+{
+  "USDCHF": {
+    "pair": "USDCHF",
+    "level": "intraday_directional",
+    "total": 879,
+    "bias": {
+      "Bullish": 486,
+      "Bearish": 393
+    },
+    "tolerance_pips": 2,
+    "pip_size": 0.0001,
+    "ext_25": {
+      "exact": {
+        "hits": 597,
+        "total": 879,
+        "rate": 67.9
+      },
+      "tolerance": {
+        "hits": 694,
+        "total": 879,
+        "rate": 79.0
+      },
+      "diff": 11.0
+    },
+    "ext_50": {
+      "exact": {
+        "hits": 405,
+        "total": 879,
+        "rate": 46.1
+      },
+      "tolerance": {
+        "hits": 458,
+        "total": 879,
+        "rate": 52.1
+      },
+      "diff": 6.0
+    },
+    "ext_100": {
+      "exact": {
+        "hits": 168,
+        "total": 879,
+        "rate": 19.1
+      },
+      "tolerance": {
+        "hits": 198,
+        "total": 879,
+        "rate": 22.5
+      },
+      "diff": 3.4
+    },
+    "rekey": {
+      "exact": {
+        "hits": 92,
+        "total": 879,
+        "rate": 10.5
+      },
+      "tolerance": {
+        "hits": 103,
+        "total": 879,
+        "rate": 11.7
+      },
+      "diff": 1.3
+    }
+  }
+}

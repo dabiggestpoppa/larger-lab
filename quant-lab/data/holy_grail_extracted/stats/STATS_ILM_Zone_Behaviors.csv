@@ -1,0 +1,12 @@
+﻿ILM Type,Definition,Hit Rate (%),Velocity Factor,Continuation %,Avg Time in Zone,Dominant Conditions
+ILM Type,Definition,Hit Rate (%),Velocity Factor,Continuation %,Avg Time in Zone,Dominant Conditions
+ILM (Daily),Previous day 50-61.8% zone,64.3,1.2x-1.6x,69,2.8 hrs,"Daily touch, strong continuation"
+IELM (2-Day),Previous 2 days 50-61.8%,48.3,1.5x-2.1x,48.3,24-48h influence,Medium-term influence
+WILM (Weekly),Previous week 50-61.8%,34.2,1.8x-2.8x,34.2,48-120h influence,"Strongest velocity factor, lowest continuation"
+ILM Formation Speed,Pattern formation with ILM,91.2,25-29% faster,91.2,Faster completion,High/low within 2H for 15M -25%
+ILM Pattern Boost,Pattern success enhancement,83-88%,+14.8% to +18.7%,83-88%,Variable,Success rate boost from ILM
+ILM Velocity Boost,Velocity acceleration with ILM,85,+1.62x to +1.95x,85,Accelerated,Speed increase in ILM zones
+Quarter Levels,Quarter level zones (25/50/75/100),80.5,1.3x-1.8x,72,Variable,Intermediate between Regular and ILM
+4H ILM,4-hour timeframe ILM,67.8,0.85x-1.12x,67.8,4-8h influence,Higher timeframe ILM behavior
+Full ILM Alignment,All ILM types aligned,87.3,2.5x+,87.3,Strong confluence,Highest execution probability
+Complete Misalignment,No ILM alignment,31.5,0.8x-1.0x,31.5,Minimal,Failure scenario - avoid trades

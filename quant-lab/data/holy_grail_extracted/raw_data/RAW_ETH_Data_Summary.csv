@@ -1,0 +1,49 @@
+﻿ETH/USD MODEL DATA EXTRACTION SUMMARY,,
+Data Sources:,,
+ETH Sheets Found:,18,
+1,ETH_Monday_Fibonacci,
+2,ETH_Sunday_Asian,
+3,ETH_Model_Comparison,
+4,ETH_Analysis_Summary,
+5,ETH_RANGE_EXPLORATION,
+6,ETH_M15_DATA,
+7,ETH_H1_DATA,
+8,ETH_Fib_Analysis,
+9,eth_friday_asian_ranges,
+10,eth_fibonacci_hit_results,
+11,eth_fibonacci_timing_analysis,
+12,eth_session_probabilities,
+13,eth_132_violations,
+14,eth_friday_asian_ranges_1,
+15,eth_fibonacci_hit_results_1,
+16,eth_fibonacci_timing_analysis_1,
+17,eth_session_probabilities_1,
+18,eth_132_violations_1,
+PRELIMINARY ETH METRICS (from user input):,,
+Metric,Value,Context
+132% Violation Rate,74.4%,Overall
+132% Violation (Monday),61.9%,Monday-specific
+132% Violation (Asian),63.7%,Asian session
+Friday Asian Range,Anchor,Session mechanic
+-25% Hit Rate,100%,Fibonacci level
+-50% Hit Rate,95.7%,Fibonacci level
+Data Period,2021-01-04 to 2025-12-18,"35,851 H1 rows"
+Timeframe,H1,Hourly data
+KEY FINDINGS TO EXTRACT:,,
+Category,Required Data,
+Fibonacci Hit Rates,"-25%, -50%, -100%, -168%, 132% delivery rates",
+Temporal Delivery,Hour-by-hour timing analysis (convert to EST),
+Session Mechanics,Friday Asian Range anchor analysis,
+132% Patterns,Detailed violation patterns by day/session,
+Day-by-Day Timing,Fibonacci delivery timing per weekday,
+Cross-Market Comparison,Compare with EUR/USD and Oil models,
+DATA EXTRACTION STATUS:,,
+Raw ETH Data Sheet Found:,NO,
+ETH Analysis Sheets:,YES,
+Next Steps:,,
+1. Import ETH H1 raw data if not present in workbook,,
+2. Run Fibonacci tolerance analysis on ETH data,,
+3. Calculate day-by-day timing statistics,,
+4. Extract session-specific metrics (Asian/London/NY),,
+5. Compile cross-market comparison with EUR/USD and Oil,,
+6. Generate comprehensive PDF with all three markets,,

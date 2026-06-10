@@ -1,0 +1,5 @@
+﻿Category,Subcategory,Session_Count,Fib_25_Exact,Fib_50_Exact,Fib_100_Exact,Fib_168_Exact,Violation_132_Exact,Fib_25_Tolerance,Fib_50_Tolerance,Fib_100_Tolerance,Fib_168_Tolerance,Violation_132_Tolerance
+Overall,All Sessions,1083,65.19%,54.94%,39.43%,23.82%,47.28%,100.00%,100.00%,100.00%,98.61%,100.00%
+Directional Bias,Bullish Sessions,586,65.02%,53.41%,38.05%,22.35%,46.08%,100.00%,100.00%,100.00%,98.98%,100.00%
+Directional Bias,Bearish Sessions,497,65.39%,56.74%,41.05%,25.55%,48.69%,100.00%,100.00%,100.00%,98.19%,100.00%
+Benchmark Comparison,Monday London Weekly,313,100.00%,100.00%,86.58%,69.65%,70.61%,,,,,

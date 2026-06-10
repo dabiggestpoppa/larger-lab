@@ -1,0 +1,236 @@
+{
+  "intraday_asian": {
+    "pair": "EURUSD",
+    "level": "intraday_asian",
+    "total": 777,
+    "bias": {
+      "Bullish": 455,
+      "Bearish": 322
+    },
+    "tolerance_pips": 2,
+    "pip_size": 0.0001,
+    "levels": {
+      "ext_25": {
+        "exact": {
+          "hits": 449,
+          "total": 777,
+          "rate": 57.8
+        },
+        "tolerance": {
+          "hits": 502,
+          "total": 777,
+          "rate": 64.6
+        },
+        "diff": 6.8
+      },
+      "ext_50": {
+        "exact": {
+          "hits": 293,
+          "total": 777,
+          "rate": 37.7
+        },
+        "tolerance": {
+          "hits": 346,
+          "total": 777,
+          "rate": 44.5
+        },
+        "diff": 6.8
+      },
+      "ext_100": {
+        "exact": {
+          "hits": 149,
+          "total": 777,
+          "rate": 19.2
+        },
+        "tolerance": {
+          "hits": 175,
+          "total": 777,
+          "rate": 22.5
+        },
+        "diff": 3.3
+      },
+      "ext_168": {
+        "exact": {
+          "hits": 54,
+          "total": 777,
+          "rate": 6.9
+        },
+        "tolerance": {
+          "hits": 62,
+          "total": 777,
+          "rate": 8.0
+        },
+        "diff": 1.0
+      },
+      "rekey_132": {
+        "exact": {
+          "hits": 58,
+          "total": 777,
+          "rate": 7.5
+        },
+        "tolerance": {
+          "hits": 71,
+          "total": 777,
+          "rate": 9.1
+        },
+        "diff": 1.7
+      }
+    }
+  },
+  "intraday_london": {
+    "pair": "EURUSD",
+    "level": "intraday_london",
+    "total": 778,
+    "bias": {
+      "Bullish": 390,
+      "Bearish": 388
+    },
+    "tolerance_pips": 2,
+    "pip_size": 0.0001,
+    "levels": {
+      "ext_25": {
+        "exact": {
+          "hits": 409,
+          "total": 777,
+          "rate": 52.6
+        },
+        "tolerance": {
+          "hits": 446,
+          "total": 777,
+          "rate": 57.4
+        },
+        "diff": 4.8
+      },
+      "ext_50": {
+        "exact": {
+          "hits": 271,
+          "total": 777,
+          "rate": 34.9
+        },
+        "tolerance": {
+          "hits": 306,
+          "total": 777,
+          "rate": 39.4
+        },
+        "diff": 4.5
+      },
+      "ext_100": {
+        "exact": {
+          "hits": 108,
+          "total": 777,
+          "rate": 13.9
+        },
+        "tolerance": {
+          "hits": 126,
+          "total": 777,
+          "rate": 16.2
+        },
+        "diff": 2.3
+      },
+      "ext_168": {
+        "exact": {
+          "hits": 37,
+          "total": 777,
+          "rate": 4.8
+        },
+        "tolerance": {
+          "hits": 41,
+          "total": 777,
+          "rate": 5.3
+        },
+        "diff": 0.5
+      },
+      "rekey_132": {
+        "exact": {
+          "hits": 51,
+          "total": 777,
+          "rate": 6.6
+        },
+        "tolerance": {
+          "hits": 56,
+          "total": 777,
+          "rate": 7.2
+        },
+        "diff": 0.6
+      }
+    }
+  },
+  "weekly": {
+    "pair": "EURUSD",
+    "level": "weekly",
+    "total": 156,
+    "bias": {
+      "Bullish": 85,
+      "Bearish": 71
+    },
+    "tolerance_pips": 2,
+    "pip_size": 0.0001,
+    "levels": {
+      "ext_25": {
+        "exact": {
+          "hits": 131,
+          "total": 156,
+          "rate": 84.0
+        },
+        "tolerance": {
+          "hits": 132,
+          "total": 156,
+          "rate": 84.6
+        },
+        "diff": 0.6
+      },
+      "ext_50": {
+        "exact": {
+          "hits": 123,
+          "total": 156,
+          "rate": 78.8
+        },
+        "tolerance": {
+          "hits": 124,
+          "total": 156,
+          "rate": 79.5
+        },
+        "diff": 0.6
+      },
+      "ext_100": {
+        "exact": {
+          "hits": 102,
+          "total": 156,
+          "rate": 65.4
+        },
+        "tolerance": {
+          "hits": 105,
+          "total": 156,
+          "rate": 67.3
+        },
+        "diff": 1.9
+      },
+      "ext_168": {
+        "exact": {
+          "hits": 85,
+          "total": 156,
+          "rate": 54.5
+        },
+        "tolerance": {
+          "hits": 86,
+          "total": 156,
+          "rate": 55.1
+        },
+        "diff": 0.6
+      },
+      "rekey_132": {
+        "exact": {
+          "hits": 78,
+          "total": 156,
+          "rate": 50.0
+        },
+        "tolerance": {
+          "hits": 79,
+          "total": 156,
+          "rate": 50.6
+        },
+        "diff": 0.6
+      }
+    }
+  }
+}

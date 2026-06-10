@@ -227,7 +227,8 @@ async def _stream_chat(request: POChatRequest) -> AsyncGenerator[str, None]:
 
         agent = POAgent()
 
-        # Run agent with timeout to prevent hanging
+        # Run agent with timeout — needs to cover LLM calls + tool execution
+        # 3 models × 120s LLM timeout = 360s worst case, use 300s
         try:
             response_text = await asyncio.wait_for(
                 asyncio.to_thread(
@@ -237,7 +238,7 @@ async def _stream_chat(request: POChatRequest) -> AsyncGenerator[str, None]:
                     session_id=stable_session_id,
                     max_tool_rounds=4,
                 ),
-                timeout=120.0
+                timeout=300.0
             )
         except asyncio.TimeoutError:
             response_text = "⏱️ Response timed out after 120s. The LLM may be unavailable. Try again or check OpenRouter status."

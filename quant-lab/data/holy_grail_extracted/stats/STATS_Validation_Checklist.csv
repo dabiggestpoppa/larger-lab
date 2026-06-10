@@ -1,0 +1,31 @@
+﻿Claim #,Original Claim,Claimed Accuracy (%),Validation Status,Phase 1 Test Result (%),Meets ≥78% Threshold,Priority for Testing
+Claim #,Original Claim,Claimed Accuracy (%),Validation Status,Phase 1 Test Result (%),Meets ≥78% Threshold,Priority for Testing
+1,-25% extension hit rate,90,PENDING - Requires Phase 1 Data Test,,TBD,High
+2,-50% extension hit rate,82,PENDING - Requires Phase 1 Data Test,,TBD,High
+3,72% retracement continuation (London-NY),83.5,PENDING - Requires Phase 1 Data Test,,TBD,High
+4,AB(72%)→BC(-25%)→CD(61.8%) success,81.2,PENDING - Requires Phase 1 Data Test,,TBD,High
+5,Consecutive 15M 61.8-88 under WILM → 4H rekey,94.3,PENDING - Requires Phase 1 Data Test,,TBD,High
+6,Quarter level interaction (±10 points),80.5,PENDING - Requires Phase 1 Data Test,,TBD,High
+7,Weekly+Monthly alignment,94,PENDING - Requires Phase 1 Data Test,,TBD,High
+8,61.8% rekey accuracy (improved),94,PENDING - Requires Phase 1 Data Test,,TBD,High
+9,Shallow trend angle completion,78.9,PENDING - Requires Phase 1 Data Test,,TBD,Medium
+10,Alpha sequence daily high/low formation,78.3,PENDING - Requires Phase 1 Data Test,,TBD,Medium
+11,Early London daily vector prediction,82.3,PENDING - Requires Phase 1 Data Test,,TBD,High
+12,15M + WILM Active rekey probability,92,PENDING - Requires Phase 1 Data Test,,TBD,High
+13,C-D Leg failure → Alpha rekey,81.7,PENDING - Requires Phase 1 Data Test,,TBD,High
+14,Quarter + structure inversion transition,82.3,PENDING - Requires Phase 1 Data Test,,TBD,High
+15,15M + Daily ILM Miss + IELM rekey,83,PENDING - Requires Phase 1 Data Test,,TBD,High
+16,4H A-B failure micro-leg increase,85,PENDING - Requires Phase 1 Data Test,,TBD,High
+17,Daily ILM miss micro-pattern increase,88,PENDING - Requires Phase 1 Data Test,,TBD,High
+18,Full ILM alignment execution,87.3,PENDING - Requires Phase 1 Data Test,,TBD,High
+19,ILM high/low within 2H (15M -25%),91.2,PENDING - Requires Phase 1 Data Test,,TBD,High
+20,50%→50% retest (highest success),83.2-91.4,PENDING - Requires Phase 1 Data Test,,TBD,High
+21,Layered Fibonacci 50%→78.6%,83,PENDING - Requires Phase 1 Data Test,,TBD,High
+22,15M AB-CD Bullish (50%→-25%),84,PENDING - Requires Phase 1 Data Test,,TBD,High
+23,Q1 reconstruction,93.2,PENDING - Requires Phase 1 Data Test,,TBD,High
+24,Q2 reconstruction,89.7,PENDING - Requires Phase 1 Data Test,,TBD,High
+25,Q3 reconstruction,86.3,PENDING - Requires Phase 1 Data Test,,TBD,High
+26,Q4 reconstruction,95.8,PENDING - Requires Phase 1 Data Test,,TBD,High
+27,Monthly 78.6→78.6→78.6,78,PENDING - Requires Phase 1 Data Test,,TBD,Medium
+28,Monthly 0→+23.6 flow,83,PENDING - Requires Phase 1 Data Test,,TBD,High
+"NOTE: Phase 1 testing will use 1,401 London sessions to validate these claims against live market data.",,,,,,

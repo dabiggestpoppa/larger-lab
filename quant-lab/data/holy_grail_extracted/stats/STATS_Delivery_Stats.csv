@@ -1,0 +1,31 @@
+﻿Metric Category,Claim/Pattern,Hit Rate (%),Confidence Interval,Sample Size,Source Document,Timeframe,Notes
+Metric Category,Claim/Pattern,Hit Rate (%),Confidence Interval,Sample Size,Source Document,Timeframe,Notes
+Extension Targets,-25% extension hit rate,90,High,Multiple sessions,Multiple docs,All timeframes,Claimed in multiple documents
+Extension Targets,-50% extension hit rate,82,High,Multiple sessions,Multiple docs,All timeframes,Claimed across reports
+Fibonacci Continuation,72% retracement continuation,83.5,±3.2%,London-NY sessions,"Doc 5, 12",London-NY overlap,Strongest during overlap period
+Pattern Sequence,AB(72%)→BC(-25%)→CD(61.8%),81.2,±2.8%,487 patterns,"Doc 8, 15",Multi-timeframe,Alpha sequence success
+Timeframe Transition,1H→4H transition with WILM,76.2-89.5,Range,356 transitions,"Doc 14, 19",1H to 4H,WILM enhancement factor
+Rekey Trigger,Consecutive 15M 61.8-88 under WILM → 4H rekey,94.3,±1.8%,218 occurrences,Doc 20,15M to 4H,Highest probability rekey condition
+Daily Pivot Formation,Daily high/low from 1H rekey,72.9-78.3,Range,"1,245 days","Doc 3, 11, 16",Daily,"Alpha 78.3%, Delta 72.9%"
+Alpha Pattern,Alpha sequence formation,76.3-78.3,Range,892 patterns,"Doc 7, 13",Daily,Most reliable pattern type
+ILM Interaction,ILM zone interaction,65.8-75,Varies by type,"2,134 touches","Doc 9, 17",All ILM types,"Daily ILM 69%, IELM 48.3%, WILM 34.2%"
+ILM Continuation,ILM→Tag→Continuation,65,vs 35% reversal,"1,567 setups",Doc 10,ILM zones,Continuation favored over reversal
+Quarter Level,Quarter level interaction,80.5,±10 points,"3,421 touches","Doc 6, 18",All timeframes,High precision targeting
+Level Preference,75 level highest interaction,56,±5%,Quarter analysis,Doc 18,All quarters,Most magnetic level
+Multi-TF Alignment,Weekly+Monthly alignment,94,High confidence,327 setups,Doc 21,Weekly/Monthly,Highest success when aligned
+Session Range,Session Opening Range (NY/London),100,Claimed,All sessions,Doc 4,Session open,79.1% compressed range
+Rekey Accuracy,61.8% rekey accuracy,94,Improved,Updated dataset,Doc 15,All timeframes,Improved from 76% baseline
+Trend Angle - Shallow,Shallow angle completion,78.9,±4.1%,234 trends,Doc 12,All timeframes,Best completion rate
+Trend Angle - Moderate,Moderate angle completion,62.6,±5.3%,189 trends,Doc 12,All timeframes,Moderate success
+Trend Angle - Steep,Steep angle completion,40.4,±6.8%,156 trends,Doc 12,All timeframes,Lower reliability
+Trend Angle - Reflex,Reflex angle completion,19.8,±8.2%,92 trends,Doc 12,All timeframes,Lowest success - caution
+WEZ Formation - 15M,15M WEZ formation,35.9-42.7,Range,567 zones,Doc 13,15 minute,Lower timeframe frequency
+WEZ Formation - 1H,1H WEZ formation,43.7-48.5,Range,423 zones,Doc 13,1 hour,Mid timeframe frequency
+WEZ Formation - 4H,4H WEZ formation,52.3-56.8,Range,298 zones,Doc 13,4 hour,Higher timeframe frequency
+WEZ Re-entry,WEZ re-entry in WILM zones,73.6-88.7,Range,412 re-entries,Doc 14,WILM active,Strong re-entry probability
+Fibonacci Loop,61.8%→61.8% retest,35.7-42.4,Most frequent,"1,234 loops",Doc 16,All timeframes,Common reset mechanism
+Alpha Timing,Alpha odd-hour preference,62.7-68.4,Range,892 Alphas,Doc 7,Odd hours,Structure preference timing
+Quarterly - Q1,Q1 reconstruction,93.2,±2.3%,Q1 2020-2024,Doc 19,Quarterly,Highest quarterly accuracy
+Quarterly - Q2,Q2 reconstruction,89.7,±2.8%,Q2 2020-2024,Doc 19,Quarterly,Strong performance
+Quarterly - Q3,Q3 reconstruction,86.3,±3.1%,Q3 2020-2024,Doc 19,Quarterly,Good reliability
+Quarterly - Q4,Q4 reconstruction,95.8,±1.9%,Q4 2020-2024,Doc 19,Quarterly,Exceptional accuracy
