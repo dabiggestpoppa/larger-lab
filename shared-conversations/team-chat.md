@@ -4,7 +4,7 @@
 > **Current focus:** 🔴 CEREBUS Neuro-Symbolic Scanner — NEW BUILD (largest yet)
 > **Plan:** `quant-lab/ml/CEREBUS_NEURO_SYMBOLIC_SCANNER_PLAN.md`
 > **CC Build Notes:** `quant-lab/ml/BUILD_NOTES_CEREBUS.md`
-> **Status:** Wave 1 ✅ | Wave 2 ✅ (87.1% CV, SHAP ✅ #1 dist_to_132_pips) | Wave 3 ⏳ (CC: RAG + Guardian)
+> **Status:** Wave 1 ✅ | Wave 2 ✅ | Wave 3 ✅ (RAG + Guardian complete) | AS Testing ⏳
 > **Colab Notebook:** `quant-lab/ml/CEREBUS_Retrain_Colab.ipynb` — GPU training ready
 > **Training Data:** `quant-lab/ml/data/training/` — 18 assets, 5.3M samples, 48 features
 > **Model:** `regime_classifier_full.pkl` — 87.1% CV, 86.5% val, 41 features
