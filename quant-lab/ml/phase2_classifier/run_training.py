@@ -11,6 +11,7 @@ Usage:
     python run_training.py
 """
 import sys
+from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from prep_training_data import main as prep_data
@@ -20,6 +21,8 @@ from retrain_full import (
     MODEL_DIR, SHAP_DIR, ALL_FEATURES
 )
 import json
+import numpy as np
+import pandas as pd
 from pathlib import Path
 
 

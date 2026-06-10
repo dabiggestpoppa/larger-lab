@@ -1,0 +1,618 @@
+{
+  "EURUSD": {
+    "floor": {
+      "t1_trigger": 12.0,
+      "wr": 82.85356695869838,
+      "pf": 12.484948453608226,
+      "tr_per_day": 4.170768083519762,
+      "trades": 5593
+    },
+    "ceiling": {
+      "t1_trigger": 27,
+      "wr": 92.73504273504274,
+      "pf": 31.599608282036968,
+      "tr_per_day": 0.87248322147651
+    },
+    "knee": {
+      "t1_trigger": 26,
+      "wr": 92.91338582677166,
+      "pf": 32.92756036636139,
+      "tr_per_day": 0.947054436987323
+    },
+    "sweep_points": 12
+  },
+  "EURGBP": {
+    "floor": {
+      "t1_trigger": 8.0,
+      "wr": 84.27018274346518,
+      "pf": 14.827011449489817,
+      "tr_per_day": 1.3940664301838117,
+      "trades": 4323
+    },
+    "ceiling": {
+      "t1_trigger": 13.93,
+      "wr": 89.78622327790974,
+      "pf": 19.728609352664897,
+      "tr_per_day": 0.5430506288294099
+    },
+    "knee": {
+      "t1_trigger": 16.0,
+      "wr": 91.4543960558751,
+      "pf": 33.60999123575812,
+      "tr_per_day": 0.3924540470815866
+    },
+    "sweep_points": 13
+  },
+  "EURJPY": {
+    "floor": {
+      "t1_trigger": 10.5,
+      "wr": 95.05,
+      "pf": 69.42,
+      "tr_per_day": 0.1039,
+      "trades": 404
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 59.5,
+      "wr": 100.0,
+      "pf": 40800.0,
+      "tr_per_day": 0.0005
+    },
+    "sweep_points": 11
+  },
+  "EURAUD": {
+    "floor": {
+      "t1_trigger": 26.7,
+      "wr": 86.8673050615595,
+      "pf": 18.65353272284299,
+      "tr_per_day": null,
+      "trades": 1462
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 26.7,
+      "wr": 86.8673050615595,
+      "pf": 18.65353272284299,
+      "tr_per_day": null
+    },
+    "sweep_points": 10
+  },
+  "EURNZD": {
+    "floor": {
+      "t1_trigger": 28.3,
+      "wr": 84.61091753774681,
+      "pf": 18.794627096204767,
+      "tr_per_day": null,
+      "trades": 1722
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 28.3,
+      "wr": 84.61091753774681,
+      "pf": 18.794627096204767,
+      "tr_per_day": null
+    },
+    "sweep_points": 12
+  },
+  "EURCHF": {
+    "floor": {
+      "t1_trigger": 9.2,
+      "wr": 82.94635708566854,
+      "pf": 14.142319687144195,
+      "tr_per_day": null,
+      "trades": 4996
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 9.2,
+      "wr": 82.94635708566854,
+      "pf": 14.142319687144195,
+      "tr_per_day": null
+    },
+    "sweep_points": 7
+  },
+  "EURCAD": {
+    "floor": {
+      "t1_trigger": 13.3,
+      "wr": 82.23944875107667,
+      "pf": 11.941786203051356,
+      "tr_per_day": null,
+      "trades": 5805
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 13.3,
+      "wr": 82.23944875107667,
+      "pf": 11.941786203051356,
+      "tr_per_day": null
+    },
+    "sweep_points": 7
+  },
+  "GBPUSD": {
+    "floor": {
+      "t1_trigger": 13.3,
+      "wr": 82.32778371773331,
+      "pf": 12.735676709708272,
+      "tr_per_day": null,
+      "trades": 6547
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 13.3,
+      "wr": 82.32778371773331,
+      "pf": 12.735676709708272,
+      "tr_per_day": null
+    },
+    "sweep_points": 7
+  },
+  "GBPAUD": {
+    "floor": {
+      "t1_trigger": 20.8,
+      "wr": 82.31003039513678,
+      "pf": 12.27275400676372,
+      "tr_per_day": null,
+      "trades": 3290
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 20.8,
+      "wr": 82.31003039513678,
+      "pf": 12.27275400676372,
+      "tr_per_day": null
+    },
+    "sweep_points": 7
+  },
+  "GBPCAD": {
+    "floor": {
+      "t1_trigger": 20.0,
+      "wr": 84.81272447408928,
+      "pf": 17.987165408373354,
+      "tr_per_day": null,
+      "trades": 1949
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 20.0,
+      "wr": 84.81272447408928,
+      "pf": 17.987165408373354,
+      "tr_per_day": null
+    },
+    "sweep_points": 9
+  },
+  "GBPCHF": {
+    "floor": {
+      "t1_trigger": 17.5,
+      "wr": 84.76190476190476,
+      "pf": 16.660662122687448,
+      "tr_per_day": null,
+      "trades": 2835
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 17.5,
+      "wr": 84.76190476190476,
+      "pf": 16.660662122687448,
+      "tr_per_day": null
+    },
+    "sweep_points": 8
+  },
+  "GBPJPY": {
+    "floor": {
+      "t1_trigger": 19.2,
+      "wr": 81.77349989760393,
+      "pf": 11.950109698018295,
+      "tr_per_day": null,
+      "trades": 4883
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 18.45,
+      "wr": 81.61319890009166,
+      "pf": 12.370101399962765,
+      "tr_per_day": null
+    },
+    "sweep_points": 7
+  },
+  "GBPNZD": {
+    "floor": {
+      "t1_trigger": 24.2,
+      "wr": 83.63636363636363,
+      "pf": 16.457645119941404,
+      "tr_per_day": null,
+      "trades": 2915
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 24.2,
+      "wr": 83.63636363636363,
+      "pf": 16.457645119941404,
+      "tr_per_day": null
+    },
+    "sweep_points": 9
+  },
+  "AUDUSD": {
+    "floor": {
+      "t1_trigger": 13.0,
+      "wr": 85.01424501424502,
+      "pf": 16.223892041097976,
+      "tr_per_day": 2.61744966442953,
+      "trades": 3510
+    },
+    "ceiling": {
+      "t1_trigger": 28,
+      "wr": 94.02985074626866,
+      "pf": 63.124170616113744,
+      "tr_per_day": 0.5495898583146905
+    },
+    "knee": {
+      "t1_trigger": 27,
+      "wr": 94.17721518987342,
+      "pf": 63.136888888888905,
+      "tr_per_day": 0.5891126025354213
+    },
+    "sweep_points": 12
+  },
+  "AUDCAD": {
+    "floor": {
+      "t1_trigger": 16.0,
+      "wr": 86.64138221660346,
+      "pf": 18.284710186789873,
+      "tr_per_day": 0.7649903288201161,
+      "trades": 2373
+    },
+    "ceiling": {
+      "t1_trigger": 18.69,
+      "wr": 89.67286722257857,
+      "pf": 24.13163773844299,
+      "tr_per_day": 0.5025789813023855
+    },
+    "knee": {
+      "t1_trigger": 21,
+      "wr": 89.82387475538161,
+      "pf": 33.38781950142004,
+      "tr_per_day": 0.329464861379755
+    },
+    "sweep_points": 10
+  },
+  "AUDCHF": {
+    "floor": {
+      "t1_trigger": 12.0,
+      "wr": 87.36149584487535,
+      "pf": 20.891275964391717,
+      "tr_per_day": 0.9307122139864648,
+      "trades": 2888
+    },
+    "ceiling": {
+      "t1_trigger": 16.5,
+      "wr": 90.30186255619782,
+      "pf": 28.48860882210376,
+      "tr_per_day": 0.5017724782468579
+    },
+    "knee": {
+      "t1_trigger": 18.0,
+      "wr": 92.01646090534979,
+      "pf": 31.667109634551522,
+      "tr_per_day": 0.39155655816951335
+    },
+    "sweep_points": 12
+  },
+  "AUDJPY": {
+    "floor": {
+      "t1_trigger": 7.8,
+      "wr": 91.34,
+      "pf": 34.75,
+      "tr_per_day": 0.1129,
+      "trades": 439
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 31.2,
+      "wr": 100.0,
+      "pf": 97600.0,
+      "tr_per_day": 0.0023
+    },
+    "sweep_points": 12
+  },
+  "AUDNZD": {
+    "floor": {
+      "t1_trigger": 14.0,
+      "wr": 88.71681415929203,
+      "pf": 27.78650430119539,
+      "tr_per_day": 0.8739929100870125,
+      "trades": 2712
+    },
+    "ceiling": {
+      "t1_trigger": 18.5,
+      "wr": 91.4047466324567,
+      "pf": 43.02451302254332,
+      "tr_per_day": 0.5024170157911698
+    },
+    "knee": {
+      "t1_trigger": 21,
+      "wr": 94.01888772298005,
+      "pf": 62.634687892752446,
+      "tr_per_day": 0.3071221398646471
+    },
+    "sweep_points": 12
+  },
+  "NZDUSD": {
+    "floor": {
+      "t1_trigger": 10.0,
+      "wr": 82.05804749340369,
+      "pf": 12.776133909287282,
+      "tr_per_day": null,
+      "trades": 4548
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 10.0,
+      "wr": 82.05804749340369,
+      "pf": 12.776133909287282,
+      "tr_per_day": null
+    },
+    "sweep_points": 7
+  },
+  "NZDCAD": {
+    "floor": {
+      "t1_trigger": 11.7,
+      "wr": 83.73320537428023,
+      "pf": 15.675956138004803,
+      "tr_per_day": null,
+      "trades": 4168
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 11.7,
+      "wr": 83.73320537428023,
+      "pf": 15.675956138004803,
+      "tr_per_day": null
+    },
+    "sweep_points": 8
+  },
+  "NZDCHF": {
+    "floor": {
+      "t1_trigger": 10.0,
+      "wr": 84.8253595538597,
+      "pf": 15.987268701565728,
+      "tr_per_day": null,
+      "trades": 3407
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 10.0,
+      "wr": 84.8253595538597,
+      "pf": 15.987268701565728,
+      "tr_per_day": null
+    },
+    "sweep_points": 8
+  },
+  "NZDJPY": {
+    "floor": {
+      "t1_trigger": 11.7,
+      "wr": 83.56449375866852,
+      "pf": 13.229343845055556,
+      "tr_per_day": null,
+      "trades": 5768
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 11.7,
+      "wr": 83.56449375866852,
+      "pf": 13.229343845055556,
+      "tr_per_day": null
+    },
+    "sweep_points": 8
+  },
+  "USDCAD": {
+    "floor": {
+      "t1_trigger": 14.2,
+      "wr": 83.67783321454027,
+      "pf": 14.741529730645432,
+      "tr_per_day": null,
+      "trades": 4209
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 14.2,
+      "wr": 83.67783321454027,
+      "pf": 14.741529730645432,
+      "tr_per_day": null
+    },
+    "sweep_points": 8
+  },
+  "USDCHF": {
+    "floor": {
+      "t1_trigger": 11.7,
+      "wr": 81.51294498381877,
+      "pf": 11.936103194840276,
+      "tr_per_day": null,
+      "trades": 4944
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 11.7,
+      "wr": 81.51294498381877,
+      "pf": 11.936103194840276,
+      "tr_per_day": null
+    },
+    "sweep_points": 7
+  },
+  "USDJPY": {
+    "floor": {
+      "t1_trigger": 15.0,
+      "wr": 82.15434083601286,
+      "pf": 11.055785394709726,
+      "tr_per_day": null,
+      "trades": 6220
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 15.0,
+      "wr": 82.15434083601286,
+      "pf": 11.055785394709726,
+      "tr_per_day": null
+    },
+    "sweep_points": 7
+  },
+  "CADCHF": {
+    "floor": {
+      "t1_trigger": 10.0,
+      "wr": 84.6316345392131,
+      "pf": 14.019387027797578,
+      "tr_per_day": null,
+      "trades": 3787
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 10.0,
+      "wr": 84.6316345392131,
+      "pf": 14.019387027797578,
+      "tr_per_day": null
+    },
+    "sweep_points": 8
+  },
+  "CADJPY": {
+    "floor": {
+      "t1_trigger": 12.5,
+      "wr": 84.03314917127072,
+      "pf": 14.1606970634208,
+      "tr_per_day": null,
+      "trades": 5430
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 12.5,
+      "wr": 84.03314917127072,
+      "pf": 14.1606970634208,
+      "tr_per_day": null
+    },
+    "sweep_points": 8
+  },
+  "CHFJPY": {
+    "floor": {
+      "t1_trigger": 11.7,
+      "wr": 82.64454184930077,
+      "pf": 11.661880752524471,
+      "tr_per_day": null,
+      "trades": 9582
+    },
+    "ceiling": {
+      "t1_trigger": null,
+      "wr": null,
+      "pf": null,
+      "tr_per_day": null
+    },
+    "knee": {
+      "t1_trigger": 11.7,
+      "wr": 82.64454184930077,
+      "pf": 11.661880752524471,
+      "tr_per_day": null
+    },
+    "sweep_points": 8
+  }
+}

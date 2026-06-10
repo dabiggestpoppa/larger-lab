@@ -42,31 +42,56 @@ SHAP_DIR = Path(__file__).parent.parent / "shap"
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
 SHAP_DIR.mkdir(parents=True, exist_ok=True)
 
-# Feature columns for the full model
+# Feature columns for the full model — expanded to include all CEREBUS features
+# from PM's pattern recognizer (18 detectors, 107 cols) + RL's DMR features + AS fixes
 MICRO_FEATURES = [
     "asian_range_pips",
-    "vol_ratio_3am_9am",
     "hour_est",
     "spread_vs_20d_avg",
     "impulse_to_ar_ratio",
     "day_of_week",
     "consecutive_losses",
     "prior_session_wr",
+    "pullback_pct",
+    "occ_body_pips",
+    "occ_body_to_au_ratio",
+    "volume_spike_ratio",
+    "spread_at_entry",
+    "distance_to_dz_center",
+    "in_density_zone",
+    "time_since_impulse_min",
+    "impulse_size_pips",
+    "au_deficit_pips",
+    "constraint_deficit_pips",
 ]
 
 MACRO_FEATURES = [
     "dist_to_25_pips",
     "dist_to_50_pips",
+    "dist_to_100_pips",
     "dist_to_132_pips",
+    "dist_to_168_pips",
     "dist_to_mlr_high_pips",
     "dist_to_mlr_low_pips",
+    "dist_to_mlr_mid_pips",
+    "dist_to_weekly_target_pips",
     "regime_ratio",
     "ilm_state",
     "is_wednesday_pm",
+    "is_monday",
+    "is_wednesday",
+    "is_friday",
     "hours_since_mlr",
     "minutes_to_12pm_est",
     "mlr_range_pips",
     "bias_encoded",
+    "kill_switch_132",
+    "weekly_kill_switch_132",
+    "daily_range",
+    "weekly_range",
+    "price_range_from_open",
+    "expected_range",
+    "fib_sequence_state",
 ]
 
 ALL_FEATURES = MICRO_FEATURES + MACRO_FEATURES
