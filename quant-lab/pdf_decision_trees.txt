@@ -1,0 +1,9 @@
+﻿=== CEREBUS PHASE 4 DARA.pdf ===
+
+=== ETH_USD CEREBUS PHASE 4 - Complete Decision Tree & Conditional Mapping.pdf ===
+  ERROR: 'charmap' codec can't encode character '\uf201' in position 10: character maps to <undefined>
+
+=== CEREBUS GJ PHASE 6 PLAYBOOK.pdf ===
+
+=== CEREBUS PHASE 6 TRADE PLAYBOOK.pdf ===
+

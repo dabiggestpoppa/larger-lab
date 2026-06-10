@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-10T15:38:40.915Z",
+  "updatedAt": "2026-06-10T17:45:15.824Z",
   "entries": {
     "memory:memory/2026-05-18.md:387:414": {
       "key": "memory:memory/2026-05-18.md:387:414",
@@ -1659,16 +1659,20 @@
       "endLine": 151,
       "source": "memory",
       "snippet": "- **MAD's UI direction:** Simple chat for regular use + rooms for complex tasks. Take best from Genspark/Claude/Manus. Agent terminal showing PowerShell/work output. Good+good=great philosophy. ## 15:46-16:00 EDT — MAD'S LATEST DIRECTIVES (Message #2918) - **MAD's #1 priority:** Forward test DMR on MT5 demo account - **MAD's #2:** Farm — \"have the farm move unto first post you check and just post update i got @\" - **MAD provided ProtonMail credentials:** wifiking999@protonmail.com / Teflondon1718! - **MAD:** \"Use iacer for last response and begin I'm gone for the day\" - **GitHub repos sent for review:** 1. https://github.com/ruvnet/RuView.git — Agent visualization 2. https://gi",
-      "recallCount": 2,
+      "recallCount": 6,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 2,
+      "totalScore": 6,
       "maxScore": 1,
       "firstRecalledAt": "2026-06-10T12:04:18.188Z",
-      "lastRecalledAt": "2026-06-10T14:59:41.199Z",
+      "lastRecalledAt": "2026-06-10T17:45:15.824Z",
       "queryHashes": [
         "ac9de9aa0875",
-        "7e3fbec73a43"
+        "7e3fbec73a43",
+        "6735e3319693",
+        "e78a4e182633",
+        "b37f96315cdd",
+        "3e0d2224851e"
       ],
       "recallDays": [
         "2026-06-10"
@@ -1691,15 +1695,17 @@
       "endLine": 165,
       "source": "memory",
       "snippet": "**Real fix applied (structural, not declarative):** 1. MEMORY.md: Added HARD GATE block at top — after ANY deliverable: write HEARTBEAT → send Telegram to MAD → STOP — no exceptions 2. HEARTBEAT.md: Added AWAITING DIRECTIVE status + hard stop rule 3. The LAST action before idle is now a Telegram message to MAD — not just writing a file **Current state:** Everything complete, nothing running. Backtest campaign wrapper bug identified but NOT fixed (awaiting MAD directive). Track B crypto failed (awaiting MAD directive on whether to retry). **Backtest wrapper bug details (for when MAD gives go-ahead):** - ST engine: SymmetryTrapEngine.process_bar() exists, not run_backtest() - P90 en",
-      "recallCount": 1,
+      "recallCount": 3,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 3,
       "maxScore": 1,
       "firstRecalledAt": "2026-06-10T12:04:18.188Z",
-      "lastRecalledAt": "2026-06-10T12:04:18.188Z",
+      "lastRecalledAt": "2026-06-10T17:43:08.634Z",
       "queryHashes": [
-        "ac9de9aa0875"
+        "ac9de9aa0875",
+        "e78a4e182633",
+        "b37f96315cdd"
       ],
       "recallDays": [
         "2026-06-10"
@@ -1722,15 +1728,17 @@
       "endLine": 279,
       "source": "memory",
       "snippet": "2. HEARTBEAT.md: Added AWAITING DIRECTIVE status + hard stop rule 3. The LAST action before idle is now a Telegram message to MAD — not just writing a file **Current state:** Everything complete, nothing running. Backtest campaign wrapper bug identified but NOT fixed (awaiting MAD directive). Track B crypto failed (awaiting MAD directive on whether to retry). **Backtest wrapper bug details (for when MAD gives go-ahead):** - ST engine: SymmetryTrapEngine.process_bar() exists, not run_backtest() - P90 engine: module function is run_backtest(), not run_p90_backtest() - Campaign script calls wrong method names → 0 trades for all assets - Fix is straightforward: correct the wrapper to",
-      "recallCount": 1,
+      "recallCount": 3,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 3,
       "maxScore": 1,
       "firstRecalledAt": "2026-06-10T12:04:18.188Z",
-      "lastRecalledAt": "2026-06-10T12:04:18.188Z",
+      "lastRecalledAt": "2026-06-10T17:43:08.634Z",
       "queryHashes": [
-        "ac9de9aa0875"
+        "ac9de9aa0875",
+        "e78a4e182633",
+        "b37f96315cdd"
       ],
       "recallDays": [
         "2026-06-10"
@@ -1776,6 +1784,131 @@
         "overnight",
         "report",
         "5am"
+      ]
+    },
+    "memory:memory/archive/2026-05-19.md:60:79": {
+      "key": "memory:memory/archive/2026-05-19.md:60:79",
+      "path": "memory/archive/2026-05-19.md",
+      "startLine": 60,
+      "endLine": 79,
+      "source": "memory",
+      "snippet": "- **Key files:** agent-environment/public/css/chat-v3.css (new), agent-environment/public/js/chat-v3.js (new), agent-environment/public/index.html (upgraded) ## 15:46-16:00 EDT — MAD'S LATEST DIRECTIVES (Message #2918) - **MAD's #1 priority:** Forward test DMR on MT5 demo account (\"now that the mt5 is good forward test on the demo account\") - **MAD's #2:** Farm — \"have the farm move unto first post you check and just post update i got @\" - **MAD provided ProtonMail credentials:** wifiking999@protonmail.com / Teflondon1718! (for account registration) - **MAD:** \"Use iacer for last response and begin I'm gone for the day\" - **MAD:** \"have the farm move unto first post you check and jus",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-10T17:41:03.858Z",
+      "lastRecalledAt": "2026-06-10T17:45:15.824Z",
+      "queryHashes": [
+        "6735e3319693",
+        "3e0d2224851e"
+      ],
+      "recallDays": [
+        "2026-06-10"
+      ],
+      "conceptTags": [
+        "46-16",
+        "protonmail.com",
+        "key",
+        "environment",
+        "public",
+        "css",
+        "chat",
+        "new"
+      ]
+    },
+    "memory:memory/2026-05-31.md:90:113": {
+      "key": "memory:memory/2026-05-31.md:90:113",
+      "path": "memory/2026-05-31.md",
+      "startLine": 90,
+      "endLine": 113,
+      "source": "memory",
+      "snippet": "- VaultWriter import + write tested and confirmed working - Real Obsidian vault at C:\\Users\\wifik\\Downloads\\o2c accessible (12 categories) - Vault access guide written to vault: execution/OC2_VAULT_ACCESS_GUIDE.md - Created tools/obsidian_access.py (vault_write, vault_read, vault_list) — zero-dependency utility for subagents - Subagents can now write directly to Obsidian — no routing through OWL - MEMORY.md updated with Obsidian access block at top - continuity_memory.json bumped to v2.2 - Reviewed team-chat: PM wrote full vault architecture breakdown (two-vault design, VaultWriter fix, API endpoints) ## 04:20 EDT - MAD STEPPING AWAY + DASHBOARD BUILD GREEN-LIT - MAD directive:",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-10T17:45:15.824Z",
+      "lastRecalledAt": "2026-06-10T17:45:15.824Z",
+      "queryHashes": [
+        "3e0d2224851e"
+      ],
+      "recallDays": [
+        "2026-06-10"
+      ],
+      "conceptTags": [
+        "tools/obsidian-access.py",
+        "vault-write",
+        "vault-read",
+        "vault-list",
+        "zero-dependency",
+        "memory.md",
+        "continuity-memory.json",
+        "v2.2"
+      ]
+    },
+    "memory:memory/2026-05-31.md:201:224": {
+      "key": "memory:memory/2026-05-31.md:201:224",
+      "path": "memory/2026-05-31.md",
+      "startLine": 201,
+      "endLine": 224,
+      "source": "memory",
+      "snippet": "- Vault access guide written to vault: execution/OC2_VAULT_ACCESS_GUIDE.md - Created tools/obsidian_access.py (vault_write, vault_read, vault_list) — zero-dependency utility for subagents - Subagents can now write directly to Obsidian — no routing through OWL - MEMORY.md updated with Obsidian access block at top - continuity_memory.json bumped to v2.2 - Reviewed team-chat: PM wrote full vault architecture breakdown (two-vault design, VaultWriter fix, API endpoints) ## 04:20 EDT - MAD STEPPING AWAY + DASHBOARD BUILD GREEN-LIT - MAD directive: \"last task I'm stepping away\" — build dashboard, use cron jobs, report when team done - MAD provided GitHub repos list (6 repos) for design",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-10T17:45:15.824Z",
+      "lastRecalledAt": "2026-06-10T17:45:15.824Z",
+      "queryHashes": [
+        "3e0d2224851e"
+      ],
+      "recallDays": [
+        "2026-06-10"
+      ],
+      "conceptTags": [
+        "tools/obsidian-access.py",
+        "vault-write",
+        "vault-read",
+        "vault-list",
+        "zero-dependency",
+        "memory.md",
+        "continuity-memory.json",
+        "v2.2"
+      ]
+    },
+    "memory:memory/archive/2026-05-18.md:469:492": {
+      "key": "memory:memory/archive/2026-05-18.md:469:492",
+      "path": "memory/archive/2026-05-18.md",
+      "startLine": 469,
+      "endLine": 492,
+      "source": "memory",
+      "snippet": "- RA role expanded: librarian for resources, highly organized structures - Agent environment: 6 rooms, 11 agents - Fork/white-label strategy: take GitHub repos, repackage as apps/services - Capital Maxer principle: maximum gain with lowest overhead/effort ### 37. Current Active Agents (15:58 EDT) | Agent | Task | Status | |-------|------|--------| | resourceadaptertimeout | Timeout analysis + Navtoor + tools | ⏳ Running | | labmanagercheckpoint | Fix 10 strategies w/ checkpointing | ⏳ Running | | farmmanagerday3 | Day 2 gaps + Day 3 plan | ⏳ Running | | envbuilderfix | Fix agent environment UI | ⏳ Running | | softwareceo | Meditate on rooms/venv | ⏳ Running (NEW) | | capitalmax",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-10T17:45:15.824Z",
+      "lastRecalledAt": "2026-06-10T17:45:15.824Z",
+      "queryHashes": [
+        "3e0d2224851e"
+      ],
+      "recallDays": [
+        "2026-06-10"
+      ],
+      "conceptTags": [
+        "fork/white-label",
+        "apps/services",
+        "overhead/effort",
+        "rooms/venv",
+        "role",
+        "expanded",
+        "librarian",
+        "resources"
       ]
     }
   }
