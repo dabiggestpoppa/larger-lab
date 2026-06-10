@@ -20,13 +20,26 @@ import joblib
 import requests
 
 # Load .env file for Telegram credentials
+# Handles both newline-delimited and single-line formats
 _env_path = Path(__file__).resolve().parent.parent.parent.parent / ".env"
 if _env_path.exists():
-    for line in _env_path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
+    content = _env_path.read_text(encoding="utf-8")
+    # Try splitting by newlines first, then by common delimiters
+    lines = content.splitlines()
+    if len(lines) <= 1:
+        # Single-line format: split by known key patterns
+        import re
+        # Match KEY=VALUE pairs, stopping at the next KEY=
+        pairs = re.findall(r'([A-Z_][A-Z0-9_]*)=(.*?)(?=(?:[A-Z_][A-Z0-9_]*=|$))', content, re.DOTALL)
+        lines = [f"{k}={v}" for k, v in pairs]
+    for line in lines:
+        line = line.strip().strip("\r")
         if line and not line.startswith("#") and "=" in line:
             k, v = line.split("=", 1)
-            os.environ.setdefault(k.strip(), v.strip())
+            k = k.strip()
+            v = v.strip().strip('"').strip("'")
+            if k:
+                os.environ.setdefault(k, v)
 
 import sys
 _ml_dir = Path(__file__).parent.parent
