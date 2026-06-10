@@ -418,30 +418,32 @@ def main():
                             try:
                                 log(f"DO_AGENT START: {msg_text[:60]}")
 
-                                # Send initial acknowledgment immediately
-                                send(base_url, chat_id,
-                                     f"🧠 *Agent received:* `{msg_text[:80]}`\n\n"
-                                     f"🔧 19 tools available. Working...")
+                                # Send brief acknowledgment (typing indicator is enough)
                                 typing(base_url, chat_id)
 
-                                # Progress callback — sends real-time updates to Telegram
+                                # Progress callback — throttled to reduce message spam
+                                _progress_lock = threading.Lock()
+                                _last_progress_time = [0.0]
                                 def on_progress(event_type, data):
                                     try:
+                                        # Throttle: max 1 progress msg per 5 seconds
+                                        now = time.time()
+                                        with _progress_lock:
+                                            if now - _last_progress_time[0] < 5.0 and event_type in ("round", "tool_result", "complete"):
+                                                return
+                                            _last_progress_time[0] = now
                                         if event_type == "round":
-                                            send(base_url, chat_id,
-                                                 f"🔄 *Round {data.get('round', '?')}/{data.get('max', '?')}* — Thinking...")
+                                            pass  # Suppress round-by-round noise
                                         elif event_type == "tool_call":
                                             tool_name = data.get("tool", "unknown")
-                                            send(base_url, chat_id,
-                                                 f"🔧 *Tool:* `{tool_name}` — Executing...")
+                                            _fast_tools = {"read_file", "grep", "glob", "list_dir"}
+                                            if tool_name not in _fast_tools:
+                                                send(base_url, chat_id,
+                                                     f"🔧 `{tool_name}`")
                                         elif event_type == "tool_result":
-                                            tool_name = data.get("tool", "unknown")
-                                            result_preview = (data.get("result", "") or "")[:200]
-                                            send(base_url, chat_id,
-                                                 f"📋 *{tool_name}:*\n```\n{result_preview}\n```")
+                                            pass  # Suppress tool result previews
                                         elif event_type == "complete":
-                                            send(base_url, chat_id,
-                                                 "✅ *Agent complete* — Sending final response...")
+                                            pass  # Suppress — final response follows
                                         elif event_type == "max_rounds":
                                             send(base_url, chat_id,
                                                  "⚠️ Max tool rounds reached. Generating final response...")
