@@ -1,0 +1,111 @@
+
+--- PAGE 0 ---
+CEREBUS FX v4.0 — SIMPLE CHEAT SHEET
+EUR/USD — “THE GRINDER”
+Tier
+Asian Range
+AU
+Trigger
+Density Zone
+SL Buffer
+1.44x Shift
+T1
+< 20p
+10p
+12p
+8–12p
+5p
+14.4p
+T2
+20–30p
+12p
+15p
+9.6–14.4p
+6p
+17.3p
+T3
+30–45p
+15p
+19p
+12–18p
+8p
+21.6p
+NO-GO
+> 45p
+-
+-
+-
+-
+Skip Day
+Gear Shift Override
+• T1 + impulse ≥ 15p → Use T2 AU (12p)
+• T1 or T2 + impulse ≥ 19p → Use T3 AU (15p)
+• SL remains at OCC Extreme (close-only invalidation)
+Critical Invalidation
+• M5 CLOSE back inside Asian range = Exit
+• M5 CLOSE beyond 80% retrace = Cancel cascades
+• Hard Exit = 12PM EST
+USD/CHF — “THE SNIPER”
+Profile
+• Highest Win Rate: 98.9%
+• Lowest Drawdown: 0.6%
+• Profit Factor: 48.5
+• Universal AU: 11p
+Tier
+Asian Range
+AU
+Base Trigger
+Shift Trigger
+Density Zone
+SL Buffer
+T1
+< 19p
+11p
+11p
+15p
+10–12p
+5–8p
+T2
+19–29p
+15p
+15p
+20p
+14–16p
+5–8p
+T3
+29–50p
+20p
+20p
+26p
+19–21p
+5–8p
+NO-GO
+> 50p
+-
+-
+-
+-
+Skip Day
+1.44x Shift Targets
+Tier
+AU
+1.44x Shift Target
+T1
+11p
+15.8p
+T2
+15p
+21.6p
+T3
+20p
+28.8p
+Execution Flow
+1. Measure Asian Range
+2. Classify Tier
+
+--- PAGE 1 ---
+3. Wait for Impulse Trigger
+4. Enter at Density Zone
+5. Use OCC invalidation
+6. Target AU / 1.44x expansion
+7. Respect Hard Exit

@@ -36,14 +36,15 @@ from .pattern_recognizer import detect_alpha_leg, detect_beta_leg, detect_abcd, 
 
 
 # Session boundaries (UTC)
-SESSION_ASIAN_START = 20    # 20:00 UTC = 15:00 EST (Asian afternoon)
-SESSION_ASIAN_END = 2       # 02:00 UTC = 21:00 EST (Asian evening)
+# Asian session: 00:00-08:00 UTC = 7pm-3am EST (per CEREBUS v4 Manual)
+SESSION_ASIAN_START = 0     # 00:00 UTC = 19:00 EST (Asian session start)
+SESSION_ASIAN_END = 8       # 08:00 UTC = 03:00 EST (Asian session end)
 SESSION_LONDON_START = 7    # 07:00 UTC = 03:00 EST (London open)
-SESSION_LONDON_END = 12     # 12:00 UTC = 08:00 EST (London morning)
+SESSION_LONDON_END = 16     # 16:00 UTC = 11:00 EST (London session end)
 SESSION_NY_START = 12       # 12:00 UTC = 08:00 EST (NY open)
-SESSION_NY_END = 17         # 17:00 UTC = 13:00 EST (NY afternoon)
-BLACK_ZONE_START = 17       # 17:00 UTC = 13:00 EST
-BLACK_ZONE_END = 20         # 20:00 UTC = 15:00 EST
+SESSION_NY_END = 21         # 21:00 UTC = 16:00 EST (NY afternoon)
+BLACK_ZONE_START = 21       # 21:00 UTC = 16:00 EST (gap before Asian)
+BLACK_ZONE_END = 24         # 24:00 UTC = 19:00 EST
 
 
 def _compute_time_blocks(df: pd.DataFrame) -> pd.DataFrame:
@@ -79,11 +80,15 @@ def _compute_time_blocks(df: pd.DataFrame) -> pd.DataFrame:
 
     # Session classification
     hours = df.index.hour
+    # Asian: 00:00-08:00 UTC (no wrap-around with new boundaries)
+    # London: 07:00-16:00 UTC
+    # NY: 12:00-21:00 UTC
+    # Black zone: 21:00-24:00 UTC
     conditions = [
-        (hours >= SESSION_ASIAN_START) | (hours < SESSION_ASIAN_END),
+        (hours >= SESSION_ASIAN_START) & (hours < SESSION_ASIAN_END),
         (hours >= SESSION_LONDON_START) & (hours < SESSION_LONDON_END),
         (hours >= SESSION_NY_START) & (hours < SESSION_NY_END),
-        (hours >= BLACK_ZONE_START) & (hours < BLACK_ZONE_START + 3),
+        (hours >= BLACK_ZONE_START) & (hours < BLACK_ZONE_END),
     ]
     choices = ['ASIAN', 'LONDON', 'NY', 'BLACK_ZONE']
     df['session'] = np.select(conditions, choices, default='OFF_HOURS')
