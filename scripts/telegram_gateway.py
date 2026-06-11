@@ -156,25 +156,61 @@ def typing(base_url, chat_id):
 # ─── Session Manager ─────────────────────────────────────────────────────
 
 class SessionManager:
-    def __init__(self, window=20, ttl=3600):
+    def __init__(self, window=12, ttl=7200, compact_threshold=8):
         self._sessions = defaultdict(list)
-        self._window = window
-        self._ttl = ttl
+        self._window = window          # max messages to keep verbatim
+        self._ttl = ttl                # 2 hour TTL
+        self._compact_threshold = compact_threshold  # compact when exceeding this
+        self._summaries = defaultdict(list)  # compacted summaries per chat
 
     def add(self, chat_id, role, text):
         self._sessions[chat_id].append({"role": role, "text": text, "ts": time.time()})
-        if len(self._sessions[chat_id]) > self._window * 2:
-            self._sessions[chat_id] = self._sessions[chat_id][-self._window:]
+        # Auto-compact: when session gets too long, summarize older messages
+        if len(self._sessions[chat_id]) > self._compact_threshold * 2:
+            self._compact(chat_id)
 
-    def get_context(self, chat_id):
+    def _compact(self, chat_id):
+        """Summarize older messages to reduce context size."""
+        msgs = self._sessions[chat_id]
+        if len(msgs) <= self._compact_threshold:
+            return
+        # Keep the most recent N messages verbatim, summarize the rest
+        old_msgs = msgs[:-self._compact_threshold]
+        recent_msgs = msgs[-self._compact_threshold:]
+        # Create a compact summary of old messages
+        summary_parts = []
+        for m in old_msgs:
+            role = m["role"]
+            text = m["text"][:100]
+            summary_parts.append(f"{role}: {text}")
+        summary = f"[Earlier conversation ({len(old_msgs)} messages): " + " | ".join(summary_parts[-4:]) + "]"
+        self._summaries[chat_id].append(summary)
+        self._sessions[chat_id] = recent_msgs
+
+    def get_context(self, chat_id, max_chars=2000):
+        """Get conversation context, compacted to fit within max_chars."""
         now = time.time()
         msgs = [m for m in self._sessions.get(chat_id, []) if now - m["ts"] < self._ttl]
         self._sessions[chat_id] = msgs
-        return [{"role": m["role"], "content": m["text"]} for m in msgs]
+        result = []
+        total_chars = 0
+        # Add compacted summaries first
+        for s in self._summaries.get(chat_id, []):
+            result.insert(0, {"role": "system", "content": s})
+            total_chars += len(s)
+        # Add recent messages, newest first, until we hit the char limit
+        for m in reversed(msgs):
+            entry = {"role": m["role"], "content": m["text"]}
+            total_chars += len(m["text"])
+            if total_chars > max_chars:
+                result.insert(0, {"role": "system", "content": f"[... {len(msgs) - len(result)} more messages truncated]"})
+                break
+            result.insert(0, entry)
+        return result
 
     def get_summary(self, chat_id):
         """Return a brief summary of recent conversation for continuity."""
-        ctx = self.get_context(chat_id)
+        ctx = self.get_context(chat_id, max_chars=500)
         if not ctx:
             return "No prior conversation."
         lines = []
@@ -183,6 +219,11 @@ class SessionManager:
             text = m['content'][:120]
             lines.append(f"• **{role}:** {text}")
         return "\n".join(lines)
+
+    def clear(self, chat_id):
+        """Clear all session data for a chat (for /new command)."""
+        self._sessions[chat_id] = []
+        self._summaries[chat_id] = []
 
 SESSIONS = SessionManager()
 
@@ -416,7 +457,18 @@ def main():
                 try:
                     if text.strip().startswith("/"):
                         # Slash command — synchronous (fast)
-                        cmd = text.strip()
+                        cmd = text.strip().lower()
+                        # Handle /new — clear session and compact
+                        if cmd == "/new" or cmd == "/reset":
+                            SESSIONS.clear(cid)
+                            send(base_url, cid, "🔄 *Session reset.* Starting fresh conversation.")
+                            continue
+                        # Handle /status — show session stats
+                        if cmd == "/status":
+                            ctx = SESSIONS.get_context(cid)
+                            summary = SESSIONS.get_summary(cid)
+                            send(base_url, cid, f"📊 *Session Stats*\n• Messages: {len(ctx)}\n• TTL: 2h\n• Auto-compact: 8 msgs\n\n*Recent:*\n{summary}")
+                            continue
                         send(base_url, cid, f"⚡ `{cmd}`")
                         typing(base_url, cid)
                         resp = router.handle(cmd)
@@ -496,12 +548,12 @@ def main():
                                         ctx_parts.append(f"## Tasks\n{task_summary}")
                                 except: pass
 
-                                # Add session history
-                                history = SESSIONS.get_context(chat_id)
+                                # Add session history (compacted, char-limited)
+                                history = SESSIONS.get_context(chat_id, max_chars=1500)
                                 if history:
                                     ctx_parts.append("## Recent Conversation")
-                                    for h in history[-4:]:
-                                        ctx_parts.append(f"- **{h['role']}:** {h['content'][:80]}")
+                                    for h in history[-6:]:
+                                        ctx_parts.append(f"- **{h['role']}:** {h['content'][:200]}")
 
                                 full_ctx = "\n\n".join(ctx_parts)
 

@@ -215,37 +215,59 @@ def scan_with_guardian(symbol, df, guardian, dry_run):
 
 
 def scan_with_st_p90(symbol, df, dry_run):
+    """Run ST + P90 engines with convergence detection."""
     signals = []
     ps = get_pip_size(symbol)
     try:
         bars = [Bar(timestamp=idx, open=float(r['open']), high=float(r['high']), low=float(r['low']), close=float(r['close'])) for idx, r in df.iterrows()]
         if len(bars) < 50: return signals
 
-        # Symmetry Trap
+        # Run both engines on the same bar stream
         st = SymmetryTrapEngine()
+        p90 = P90Engine()
+        st_signal = None
+        p90_signal = None
+
         for bar in bars:
-            result = st.process_bar(bar)
-            if result:
-                d = "LONG" if result.direction == TradeDirection.LONG else "SHORT"
-                sl_p = abs(result.entry_price - result.sl_price)/ps
-                tp_p = abs(result.tp_price - result.entry_price)/ps
-                msg = f"⚡ ST SIGNAL: {symbol} {d}\n  Entry: {result.entry_price:.5f}\n  SL: {result.sl_price:.5f} ({sl_p:.1f}p)\n  TP: {result.tp_price:.5f} ({tp_p:.1f}p)"
-                logger.info(f"  {msg}")
-                signals.append({'engine':'ST','symbol':symbol,'direction':d,'entry':result.entry_price,'sl':result.sl_price,'tp':result.tp_price,'message':msg})
+            if st_signal is None:
+                st_result = st.process_bar(bar)
+                if st_result:
+                    st_signal = st_result
+            if p90_signal is None:
+                p90_result = p90.process_bar(bar)
+                if p90_result:
+                    p90_signal = p90_result
+            if st_signal and p90_signal:
                 break
 
-        # P90
-        p90 = P90Engine()
-        for bar in bars:
-            result = p90.process_bar(bar)
-            if result:
-                d = "LONG" if result.direction == TradeDirection.LONG else "SHORT"
-                sl_p = abs(result.entry_price - result.sl_price)/ps
-                tp_p = abs(result.tp_price - result.entry_price)/ps
-                msg = f"🎯 P90 SIGNAL: {symbol} {d}\n  Entry: {result.entry_price:.5f}\n  SL: {result.sl_price:.5f} ({sl_p:.1f}p)\n  TP: {result.tp_price:.5f} ({tp_p:.1f}p)"
-                logger.info(f"  {msg}")
-                signals.append({'engine':'P90','symbol':symbol,'direction':d,'entry':result.entry_price,'sl':result.sl_price,'tp':result.tp_price,'message':msg})
-                break
+        # Check convergence: both engines fired in same direction
+        convergence = False
+        if st_signal and p90_signal:
+            st_dir = st_signal.direction
+            p90_dir = p90_signal.direction
+            # Both LONG or both SHORT
+            if st_dir == p90_dir and st_dir != TradeDirection.FLAT:
+                convergence = True
+                logger.info(f"  🔥 CONVERGENCE: {symbol} both engines {st_dir.name}")
+
+        # Build signals
+        if st_signal:
+            d = "LONG" if st_signal.direction == TradeDirection.LONG else "SHORT"
+            sl_p = abs(st_signal.entry_price - st_signal.sl_price)/ps
+            tp_p = abs(st_signal.tp_price - st_signal.entry_price)/ps
+            conv_tag = " 🔥CONV" if convergence else ""
+            msg = f"⚡ ST SIGNAL: {symbol} {d}{conv_tag}\n  Entry: {st_signal.entry_price:.5f}\n  SL: {st_signal.sl_price:.5f} ({sl_p:.1f}p)\n  TP: {st_signal.tp_price:.5f} ({tp_p:.1f}p)"
+            logger.info(f"  {msg}")
+            signals.append({'engine':'ST','symbol':symbol,'direction':d,'entry':st_signal.entry_price,'sl':st_signal.sl_price,'tp':st_signal.tp_price,'convergence':convergence,'message':msg})
+
+        if p90_signal:
+            d = "LONG" if p90_signal.direction == TradeDirection.LONG else "SHORT"
+            sl_p = abs(p90_signal.entry_price - p90_signal.sl_price)/ps
+            tp_p = abs(p90_signal.tp_price - p90_signal.entry_price)/ps
+            conv_tag = " 🔥CONV" if convergence else ""
+            msg = f"🎯 P90 SIGNAL: {symbol} {d}{conv_tag}\n  Entry: {p90_signal.entry_price:.5f}\n  SL: {p90_signal.sl_price:.5f} ({sl_p:.1f}p)\n  TP: {p90_signal.tp_price:.5f} ({tp_p:.1f}p)"
+            logger.info(f"  {msg}")
+            signals.append({'engine':'P90','symbol':symbol,'direction':d,'entry':p90_signal.entry_price,'sl':p90_signal.sl_price,'tp':p90_signal.tp_price,'convergence':convergence,'message':msg})
 
         if signals and not dry_run:
             import requests
