@@ -582,6 +582,18 @@ def main():
                                 SESSIONS.add(chat_id, "assistant", resp)
                                 send(base_url, chat_id, resp)
                                 log(f"AGENT RESP ({len(resp)} chars)")
+
+                                # Auto-save conversation to Obsidian vault (PO's memory)
+                                try:
+                                    _vault = Vault()
+                                    _ts = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')
+                                    _title = f"PO Chat {chat_id} — {_ts}"
+                                    _content = f"# PO Chat Session\n\n**Time:** {_ts}\n**Chat ID:** {chat_id}\n\n## User\n{msg_text[:500]}\n\n## PO Response\n{resp[:2000]}\n"
+                                    _vp = _vault.save_note(_title, _content)
+                                    if _vp:
+                                        log(f"VAULT: saved {os.path.basename(_vp)}")
+                                except Exception as _ve:
+                                    log(f"VAULT write error: {_ve}")
                             except Exception as e:
                                 import traceback as _tb
                                 log("AGENT ERR: " + str(e) + "\n" + _tb.format_exc())

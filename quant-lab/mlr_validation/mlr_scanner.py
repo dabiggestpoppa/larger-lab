@@ -472,7 +472,7 @@ class MLRScanner:
 
     def run(self):
         """Main scanner loop."""
-        log("=" * 60)
+        logger.info("=" * 60)
         logger.info("MLR SCANNER — Starting")
         logger.info(f"Pairs: {len(PAIRS)}")
         logger.info(f"Signals file: {SIGNALS_FILE}")
