@@ -1,14 +1,14 @@
-# CEREBUS DTB LAB — MASTER REPORT
+# CEREBUS DTB LAB v2 â€” MASTER REPORT
 
-**Generated:** 2026-06-11T12:52:02.035731
+**Generated:** 2026-06-11T13:17:57.259643
 
-**Total combinations scanned:** 101 firms × 54 pairs = 5,454
+**Fixes applied:** Vectorized loop detection, Î”_t sample weighting, checkpoint labels
 
 ## Phase 1: Macro MLR Lens
 - **Samples:** 6062
 - **Features:** 7
 - **Avg CV MAE:** 2457.162 pips
-- **Avg CV R²:** 0.7753
+- **Avg CV RÂ²:** 0.7753
 
 **Feature Importance:**
   - mlr_range_pips: 0.4884
@@ -22,42 +22,42 @@
 ## Phase 2: Micro Atomic Lens
 - **Samples:** 15570
 - **Features:** 13
-- **Avg CV MAE:** 17.154 pips
-- **Avg CV R²:** 0.29396
+- **Avg CV MAE:** 16.636 pips
+- **Avg CV RÂ²:** 0.32526
 
 **Feature Importance:**
-  - au_pips: 0.2005
-  - asian_range_pips: 0.1810
-  - regime_encoded: 0.1631
-  - regime_ratio: 0.1484
-  - loop_duration: 0.1174
-  - day_of_week: 0.0475
-  - is_wednesday_pm: 0.0368
-  - Delta_t: 0.0353
-  - entropy_encoded: 0.0266
-  - L_theoretical: 0.0233
-  - time_to_12pm_mins: 0.0201
-  - L_actual: 0.0000
-  - Omega_L: 0.0000
+  - regime_encoded: 0.2335
+  - au_pips: 0.1741
+  - asian_range_pips: 0.1420
+  - regime_ratio: 0.1118
+  - loop_duration: 0.0946
+  - time_to_12pm_mins: 0.0815
+  - entropy_encoded: 0.0514
+  - Omega_L: 0.0441
+  - L_actual: 0.0364
+  - day_of_week: 0.0182
+  - is_wednesday_pm: 0.0068
+  - L_theoretical: 0.0056
+  - Delta_t: 0.0000
 
 ## Phase 3: Merge Unified BVP
 - **Samples:** 15570
 - **Features:** 14
-- **Avg CV MAE:** 17.052 pips
-- **Avg CV R²:** 0.296
+- **Avg CV MAE:** 16.452 pips
+- **Avg CV RÂ²:** 0.33148
 
 **Feature Importance:**
-  - mlr_range_pips: 0.2614
-  - au_pips: 0.1672
-  - asian_range_pips: 0.1204
-  - regime_ratio: 0.1043
-  - micro_macro_alignment: 0.0904
-  - hit_25: 0.0876
-  - day_of_week: 0.0506
-  - hit_50: 0.0473
-  - is_wednesday_pm: 0.0391
-  - L_theoretical: 0.0174
-  - time_to_12pm_mins: 0.0143
-  - L_actual: 0.0000
-  - Omega_L: 0.0000
+  - mlr_range_pips: 0.2772
+  - au_pips: 0.1550
+  - asian_range_pips: 0.1219
+  - regime_ratio: 0.0799
+  - time_to_12pm_mins: 0.0687
+  - micro_macro_alignment: 0.0676
+  - Omega_L: 0.0563
+  - L_actual: 0.0522
+  - hit_25: 0.0504
+  - hit_50: 0.0240
+  - day_of_week: 0.0216
+  - is_wednesday_pm: 0.0150
+  - L_theoretical: 0.0103
   - Delta_t: 0.0000
