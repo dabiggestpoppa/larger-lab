@@ -4,11 +4,13 @@ Port 8090
 Serves: sniper data, backtest reports, trade history, equity curves, system health
 """
 import sys
-sys.path.insert(0, r'C:\Users\wifik\Desktop\projects\larger-lab')
+from pathlib import Path
+ROOT = Path(r'C:\Users\wifik\Desktop\projects\larger-lab')
+sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / 'quant-lab'))
 
 import json
 import os
-from pathlib import Path
 from datetime import date, datetime, timedelta
 from typing import Optional
 
@@ -17,7 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 # Database functions from sniper module
-from quant_lab.sniper.database import (
+from sniper.database import (
     get_connection,
     list_firms,
     get_firm_by_name,
