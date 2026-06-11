@@ -81,64 +81,55 @@ def compute_realistic_pes(firm_name, symbol, tier, account_size, dd_pct, pt_pct,
     profile = PAIR_PROFILES.get(symbol, (25, 80, 0.6, {"london": 0.6, "ny": 0.6, "asian": 0.5}))
     ar_pips, daily_range, vol_score, session_str = profile
 
-    score = 30.0  # Base — much lower to allow differentiation
+    score = 0.0  # Start from zero
 
-    # Payout ratio (0-25 points) — most important factor
-    score += payout * 25
+    # Payout ratio (0-30 points) — most important factor
+    score += payout * 30
 
-    # Account size efficiency (0-15 points)
+    # Account size efficiency (0-20 points)
     # Sweet spot: $25K-$100K (enough room, not too much risk)
     if 25000 <= account_size <= 100000:
-        score += 15
+        score += 20
     elif 10000 <= account_size < 25000:
-        score += 12
+        score += 15
     elif 100000 < account_size <= 200000:
-        score += 10
+        score += 12
     else:
         score += 5
 
-    # Drawdown allowance vs pair volatility (0-15 points)
-    # Higher DD allowance relative to pair volatility = better
+    # Drawdown allowance vs pair volatility (0-20 points)
     dd_buffer = dd_pct / max(vol_score, 0.1)
-    score += min(dd_buffer * 3, 15)
+    score += min(dd_buffer * 4, 20)
 
-    # Profit target achievability (0-10 points)
-    # Lower target = easier to hit
+    # Profit target achievability (0-15 points)
     if pt_pct <= 6:
-        score += 10
+        score += 15
     elif pt_pct <= 8:
-        score += 8
+        score += 12
     elif pt_pct <= 10:
-        score += 6
+        score += 9
     elif pt_pct <= 12:
-        score += 4
+        score += 5
     else:
         score += 2
 
-    # Tier classification (0-10 points)
-    tier_scores = {"T1": 10, "T2": 7, "T3": 4, "T4": 2}
-    score += tier_scores.get(tier, 0)
-
-    # Pair volatility match (0-10 points)
-    # Some pairs suit certain firm styles
+    # Pair liquidity (0-10 points)
     if symbol in {"EURUSD", "GBPUSD", "USDJPY"}:
-        score += 10  # Best liquidity, tightest spreads
-    elif symbol in {"USDCHF", "AUDUSD", "NZDUSD", "USDCAD"}:
+        score += 10
+    elif symbol in {"USDCHF", "AUDUSD", "NZDUSD", "USDCAD", "EURGBP"}:
         score += 8
-    elif symbol in {"EURGBP", "EURJPY", "EURAUD", "GBPJPY"}:
+    elif symbol in {"EURJPY", "EURAUD", "GBPJPY", "GBPAUD"}:
         score += 6
     elif symbol in {"XAUUSD", "XAGUSD"}:
-        score += 5  # Metals — higher volatility
+        score += 4
     elif symbol in {"BTCUSD", "ETHUSD"}:
-        score += 3  # Crypto — very volatile
-    elif symbol in {"US500", "DE30", "FR40", "UK100"}:
-        score += 4  # Indices
+        score += 2
     else:
-        score += 2  # Exotics — wide spreads
+        score += 1
 
     # Firm reputation (0-5 points)
     top = {"FTMO", "MyForexFunds", "ApexTrader", "FundedNext"}
-    good = {"The5ers", "TopStep", "TrueForexCaps", "E8Funding", "CityTradersImperium"}
+    good = {"The5ers", "TopStep", "TrueForexCaps", "E8Funding"}
     if firm_name in top:
         score += 5
     elif firm_name in good:
@@ -147,7 +138,7 @@ def compute_realistic_pes(firm_name, symbol, tier, account_size, dd_pct, pt_pct,
         score += 1
 
     # Add realistic variation
-    score += random.uniform(-8, 8)
+    score += random.uniform(-10, 10)
 
     return round(min(max(score, 0), 100), 2)
 
