@@ -1,9 +1,5 @@
 {
-  "known_tasks": {
-    "\\RtkAudUService64_BG": true
-  },
-  "known_startup": [
-    "desktop.ini"
-  ],
-  "last_check": "2026-06-11T06:32:06.911772"
+  "known_tasks": {},
+  "known_startup": [],
+  "last_check": "2026-06-11T07:53:35.752403"
 }
