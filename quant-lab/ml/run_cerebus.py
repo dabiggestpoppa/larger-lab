@@ -44,6 +44,8 @@ ALL_SYMBOLS = [
     "GBPJPY", "GBPAUD", "GBPCHF", "GBPNZD", "CHFJPY",
     "US500", "DE30", "FR40", "XAUUSD", "XAGUSD", "BTCUSD", "ETHUSD",
 ]
+# Default scan set (EURUSD + BTCUSD)
+DEFAULT_SYMBOLS = ["EURUSD", "BTCUSD"]
 
 
 def run_scan(symbols: list[str], dry_run: bool = False):
@@ -102,7 +104,7 @@ def send_test_alert():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CEREBUS Neuro-Symbolic Scanner")
-    parser.add_argument("--symbols", nargs="+", default=ALL_SYMBOLS, help="Symbols to scan")
+    parser.add_argument("--symbols", nargs="+", default=DEFAULT_SYMBOLS, help="Symbols to scan")
     parser.add_argument("--test", action="store_true", help="Send test alert and exit")
     parser.add_argument("--dry-run", action="store_true", help="Scan without dispatching alerts")
     args = parser.parse_args()
