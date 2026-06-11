@@ -59,6 +59,16 @@ Capture what matters. Decisions, context, things to remember. Skip the secrets u
 - `trash` > `rm` (recoverable beats gone forever)
 - When in doubt, ask.
 
+## 🚨 System Guardrails (NEVER Violate)
+
+- **NEVER create Windows Scheduled Tasks.** If you need a background process, use a Python script with a PID file — not a scheduled task. Scheduled tasks created by agents can have restrictive ACLs that even admin can't remove without `takeown` + `icacls` gymnastics.
+- **NEVER create startup shortcuts** in the Windows Startup folder. If something needs to run on boot, ask the user first.
+- **NEVER set restrictive ACLs** on files or directories. Don't use `icacls` to deny or restrict access. All files should remain deletable by the user.
+- **NEVER install Windows services** or register persistent system-level artifacts without explicit user approval.
+- **ALWAYS use PID files** (`scripts/.somename.pid`) for singleton enforcement — never OS-level primitives.
+- If you accidentally create any of the above, **immediately tell the user** and help them remove it.
+- Run `python scripts/guardrail_check.py` periodically to detect any new system-level artifacts.
+
 ## External vs Internal
 
 **Safe to do freely:**
