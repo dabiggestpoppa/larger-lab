@@ -199,51 +199,40 @@ def insert_snapshot(firm_id: int, symbol: str, pes_score: float,
 
 
 def seed_sample_data():
-    """Seed the database with sample prop firm data. Call init_database() first."""
+    """Seed the database with 100+ prop firm configurations. Call init_database() first."""
+    from sniper.prop_firm_scanner import PROP_FIRMS, FX_PAIRS, compute_pes_score
+
     conn = get_connection()
 
-    # Sample prop firms
-    firms = [
-        ("FTMO", "ACTIVE", 10000, 10, 10, 5, 5, 10, 0.8),
-        ("MyForexFunds", "ACTIVE", 15000, 12, 10, 5, 5, 12, 0.75),
-        ("The5ers", "ACTIVE", 10000, 15, 15, 5, 5, 15, 0.7),
-        ("TopStep", "ACTIVE", 15000, 10, 6, 5, 5, 10, 0.8),
-        ("ApexTrader", "ACTIVE", 10000, 10, 10, 5, 5, 10, 0.85),
-        ("FundedNext", "ACTIVE", 20000, 12, 12, 5, 5, 12, 0.8),
-        ("TrueForexCaps", "ACTIVE", 10000, 10, 10, 5, 5, 10, 0.75),
-    ]
+    # Insert all unique firms
+    seen_firms = set()
+    for firm_name, account_size, dd_pct, pt_pct, min_days, max_dd, max_tl, payout, tier in PROP_FIRMS:
+        key = (firm_name, account_size)
+        if key not in seen_firms:
+            seen_firms.add(key)
+            try:
+                conn.execute(
+                    "INSERT OR IGNORE INTO prop_firms "
+                    "(name, status, account_size, drawdown_pct, profit_target, "
+                    "min_trading_days, max_daily_loss_pct, max_total_loss_pct, payout_ratio) "
+                    "VALUES (?, 'ACTIVE', ?, ?, ?, ?, ?, ?, ?)",
+                    (firm_name, account_size, dd_pct, pt_pct, min_days, max_dd, max_tl, payout)
+                )
+            except sqlite3.IntegrityError:
+                pass
 
-    for f in firms:
-        try:
-            conn.execute(
-                "INSERT OR IGNORE INTO prop_firms "
-                "(name, status, account_size, drawdown_pct, profit_target, "
-                "min_trading_days, max_daily_loss_pct, max_total_loss_pct, payout_ratio) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", f
-            )
-        except sqlite3.IntegrityError:
-            pass
-
-    # Sample deployments across FX pairs
-    fx_pairs = [
-        "EURUSD", "GBPUSD", "USDJPY", "USDCHF", "AUDUSD", "NZDUSD", "USDCAD",
-        "EURGBP", "EURJPY", "EURAUD", "EURCHF", "EURNZD", "EURCAD",
-        "GBPJPY", "GBPAUD", "GBPCHF", "GBPCAD", "GBPNZD",
-        "AUDJPY", "AUDCHF", "AUDCAD", "AUDNZD",
-        "NZDJPY", "NZDCHF", "NZDCAD",
-        "CADJPY", "CADCHF",
-        "CHFJPY",
-    ]
-
+    # Get firm IDs
     firm_ids = [r[0] for r in conn.execute("SELECT id FROM prop_firms").fetchall()]
 
     import random
     random.seed(42)
 
+    # Create deployments for each firm across FX pairs
     for firm_id in firm_ids:
-        for symbol in fx_pairs:
-            if random.random() > 0.3:  # 70% of pairs are deployed
-                cost = random.uniform(500, 5000)
+        firm_name = conn.execute("SELECT name FROM prop_firms WHERE id = ?", (firm_id,)).fetchone()[0]
+        for symbol in FX_PAIRS:
+            if random.random() > 0.4:  # 60% of pairs deployed
+                cost = random.uniform(500, 8000)
                 qty = random.randint(1, 5)
                 strategy = random.choice(["symmetry_trap", "p90_cascade"])
                 try:
@@ -256,18 +245,24 @@ def seed_sample_data():
                 except sqlite3.IntegrityError:
                     pass
 
-    # Sample snapshots with realistic data
+    # Create snapshots with computed PES scores
     for firm_id in firm_ids:
-        for symbol in fx_pairs[:10]:  # Top 10 pairs per firm
-            pes = random.uniform(55, 95)
-            wr = random.uniform(0.45, 0.85)
-            trades = random.randint(5, 50)
-            pnl = random.uniform(-500, 2000)
+        firm_row = conn.execute(
+            "SELECT name, account_size, drawdown_pct, profit_target, payout_ratio FROM prop_firms WHERE id = ?",
+            (firm_id,)
+        ).fetchone()
+        firm_name, account_size, dd_pct, pt_pct, payout = firm_row
+
+        for symbol in FX_PAIRS[:15]:  # Top 15 pairs per firm
+            tier = random.choice(["T1", "T2", "T3", "T4"])
+            pes = compute_pes_score(firm_name, symbol, tier, account_size, dd_pct, pt_pct, payout)
+            wr = random.uniform(0.40, 0.85)
+            trades = random.randint(3, 60)
+            pnl = random.uniform(-800, 3000)
             regime = random.choice(["CONFIRMED", "CAUTION", "FAILED"])
-            tier = random.choice(["T1", "T2", "T3"])
-            ar = random.uniform(8, 45)
-            d25 = random.uniform(-30, 30)
-            d132 = random.uniform(20, 80)
+            ar = random.uniform(8, 50)
+            d25 = random.uniform(-40, 40)
+            d132 = random.uniform(15, 100)
             bias = random.choice(["Bullish", "Bearish"])
             session = random.choice(["asian", "london", "ny"])
             dow = random.randint(0, 4)
@@ -280,4 +275,4 @@ def seed_sample_data():
 
     conn.commit()
     conn.close()
-    print(f"Database seeded at {DB_PATH}")
+    print(f"Database seeded: {len(seen_firms)} firms, {len(firm_ids)} firm IDs, {len(FX_PAIRS)} pairs")
