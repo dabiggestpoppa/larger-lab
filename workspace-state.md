@@ -1,4 +1,4 @@
-# Workspace State — 2026-06-11 10:30 UTC
+# Workspace State — 2026-06-11 13:00 UTC
 
 ## System Status
 - OCE Backend: ✅ Healthy (port 8000)
@@ -9,8 +9,16 @@
 - Git: Synced to origin/master (commit 98686d99c)
 
 ## Active Build: CEREBUS Neuro-Symbolic Scanner
-- **Status:** Wave 1-3 ✅ | Docs ✅ | AS Integration ✅ | 120/120 tests
+- **Status:** Wave 1-3 ✅ | Docs ✅ | AS Integration ✅ | DTB Pipeline ✅ | 120/120 tests
 - **Plan:** `quant-lab/ml/CEREBUS_NEURO_SYMBOLIC_SCANNER_PLAN.md`
+
+## DTB Training Pipeline (2026-06-11 12:52 UTC) — COMPLETE
+- **Phase 1 (Macro MLR):** 6062 weeks, MAE=2457 pips, R²=0.775, 28 FX pairs
+- **Phase 2 (Micro Atomic):** 15570 days, MAE=17.2 pips, R²=0.294
+- **Phase 3 (Merge BVP):** 15570 days, MAE=17.1 pips, R²=0.296
+- **Commit:** `a5959a22a`
+- **Key Issue:** Omega_L/L_actual zeroed (simplified proxy), temporal decay not learned
+- **Next:** Fix loop detection, add temporal constraints, retrain
 
 ## PO Agent Infrastructure (2026-06-11) — COMPLETE
 - **Dynamic Tool Discovery:** `discover_tools()` + `execute_tool()` — 70+ tools via OCE API
