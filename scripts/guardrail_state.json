@@ -1,22 +1,9 @@
 {
   "known_tasks": {
-    "\\RtkAudUService64_BG": true,
-    "\\Hewlett-Packard\\HP Support Assistant\\WarrantyChecker": true,
-    "\\SoftLanding\\S-1-5-21-4204742516-198655256-1099670796-1001\\SoftLandingDeferralTask-{23e53670-169c-46f3-bcbb-e76ac99b189a}": true,
-    "\\GoogleUserPEH\\RunPlatformExperienceHelper_Metrics": true,
-    "\\OneDrive Reporting Task-S-1-5-21-4204742516-198655256-1099670796-1001": true,
-    "\\Hewlett-Packard\\HP Support Assistant\\HP Support Assistant Update Notice": true,
-    "\\OC3-TwinHeartbeat": true,
-    "\\GoogleUserPEH\\RunPlatformExperienceHelper_Daily": true,
-    "\\SoftLanding\\S-1-5-21-4204742516-198655256-1099670796-1001\\SoftLandingCreativeManagementTask": true,
-    "\\SoftLanding\\S-1-5-21-4204742516-198655256-1099670796-1001\\SoftLandingTriggerTask-128000000001615609-render-{4a04b5eb-f2aa-4aed-93ac-0b22c282999b}": true,
-    "\\OC2-Demo-4hr-Report": true,
-    "\\Hewlett-Packard\\HP Support Assistant\\WarrantyChecker_DeviceScan": true,
-    "\\OneDrive Startup Task-S-1-5-21-4204742516-198655256-1099670796-1001": true,
-    "\\OneDrive Standalone Update Task-S-1-5-21-4204742516-198655256-1099670796-1001": true
+    "\\RtkAudUService64_BG": true
   },
   "known_startup": [
     "desktop.ini"
   ],
-  "last_check": "2026-06-11T06:09:09.116109"
+  "last_check": "2026-06-11T06:32:06.911772"
 }

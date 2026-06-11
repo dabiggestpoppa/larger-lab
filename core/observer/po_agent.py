@@ -419,6 +419,37 @@ TOOL_DEFINITIONS = [
             },
         },
     },
+    # ── Memory tools (Obsidian vault) ──
+    {
+        "type": "function",
+        "function": {
+            "name": "memory_write",
+            "description": "Save a note to the Obsidian vault (PO's long-term memory). Use to record decisions, findings, task results, or anything worth remembering. The note is saved as a markdown file with a timestamp.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "title": {"type": "string", "description": "Short title for the note (e.g. 'Phase 11 test results', 'MT5 bridge fix')"},
+                    "content": {"type": "string", "description": "Full note content in markdown. Include what was done, why, and any follow-up items."},
+                },
+                "required": ["title", "content"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "memory_read",
+            "description": "Read a specific note from the Obsidian vault by path or search by keyword. Use to recall past decisions or findings.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "path": {"type": "string", "description": "Path relative to vault root (e.g. 'journal_20260608T174533Z_stop_all.md')"},
+                    "query": {"type": "string", "description": "Search keyword to find relevant notes (alternative to path)"},
+                },
+                "required": [],
+            },
+        },
+    },
 ]
 
 
@@ -695,6 +726,44 @@ def vault_read(path: str) -> str:
         return f"Vault read error: {e}"
 
 
+def _save_memory_note(title: str, content: str) -> str:
+    """Save a note to the Obsidian vault as PO's long-term memory."""
+    try:
+        from core.observer.vault import Vault
+        v = Vault()
+        fp = v.save_note(title, content)
+        if fp:
+            return f"✅ Saved to vault: {os.path.basename(fp)}"
+        return "❌ Failed to save note"
+    except Exception as e:
+        return f"Memory write error: {e}"
+
+
+def _read_memory_note(path: str = "", query: str = "") -> str:
+    """Read a specific note or search the vault."""
+    try:
+        from core.observer.vault import Vault
+        v = Vault()
+        if path:
+            note_path = v.path / path
+            if not note_path.exists():
+                note_path = v.path / (path + ".md")
+            if note_path.exists():
+                return note_path.read_text(encoding="utf-8")[:3000]
+            return f"Note not found: {path}"
+        if query:
+            hits = v.search_notes(query.split(), max_results=5)
+            if not hits:
+                return f"No notes found for: {query}"
+            lines = [f"🔍 Search: {query}"]
+            for h in hits:
+                lines.append(f"  📄 {h['path']}: {h['snippet'][:80]}")
+            return "\n".join(lines)
+        return "Provide path or query"
+    except Exception as e:
+        return f"Memory read error: {e}"
+
+
 def execute_python(code: str, timeout: int = 60) -> str:
     """Execute Python code in the project virtualenv."""
     try:
@@ -748,6 +817,9 @@ TOOL_FUNCTIONS: Dict[str, Callable] = {
     "vault_search": vault_search,
     "vault_read": vault_read,
     "execute_python": execute_python,
+    # Memory tools
+    "memory_write": lambda title, content: _save_memory_note(title, content),
+    "memory_read": lambda path="", query="": _read_memory_note(path, query),
 }
 
 
@@ -835,20 +907,24 @@ class POAgent:
             f"Current time: {ts}\n"
             f"Workspace: C:\\Users\\wifik\\Desktop\\projects\\larger-lab\n"
             f"Branch: master (default: main)\n"
-            f"Available tools: {len(all_tools)}\n\n"
+            f"Available core tools: {len(all_tools)}\n"
+            "For additional tools (git_push, git_pull, create_directory, delete_file, multi_edit, "
+            "install_package, pdf, notebook, etc.), use discover_tools() to find them and "
+            "execute_tool() to run them. 70+ additional tools available.\n\n"
             "## Tool Categories\n"
-            "- File: list_directory, read_file, write_file, edit_file, multi_edit_file, create_directory, delete_file\n"
-            "- Git: git_status, git_log, git_diff, git_commit, git_push, git_pull, git_branch, git_stash, git_blame\n"
-            "- Exec: run_command, execute_python, run_python_file, install_python_package\n"
-            "- Search: search_files, search_content, grep_search, web_search, web_fetch\n"
-            "- GitHub: github_pr_list, github_pr_create, github_pr_view, github_pr_merge, github_issue_list, github_issue_create, github_ci_status, github_search\n"
-            "- System: system_env, system_processes, system_kill_process, system_disk_usage, system_info\n"
-            "- Memory: memory_read, memory_write, memory_list, memory_search\n"
+            "- File: list_directory, read_file, write_file, edit_file\n"
+            "- Git: git_status, git_log, git_diff, git_commit (+ git_push, git_pull, etc. via execute_tool)\n"
+            "- Exec: run_command, execute_python\n"
+            "- Search: search_files, search_content\n"
+            "- GitHub: github_operation\n"
+            "- Memory: memory_write, memory_read (Obsidian vault — PO's long-term memory)\n"
             "- Vault: vault_search, vault_read\n"
-            "- VS Code: vscode_run_command, vscode_get_errors\n"
-            "- Notebook: notebook_list, notebook_read\n"
-            "- PDF: pdf_extract_text, pdf_merge, pdf_split, pdf_compress\n"
-            "- Tasks: task_list, task_update\n\n"
+            "- Meta: discover_tools, execute_tool (access 70+ additional tools)\n\n"
+            "## Memory Rules\n"
+            "1. Use memory_write(title, content) to save important findings, decisions, or results to the Obsidian vault\n"
+            "2. Use memory_read(path) or memory_read(query='keyword') to recall past notes\n"
+            "3. Save a memory note after completing significant work — this is PO's long-term memory\n"
+            "4. The vault is at memory/obsidian-vault/ — you can also read/write files directly\n\n"
             "## Rules\n"
             "1. Use tools to accomplish tasks — don't just describe what to do\n"
             "2. Read files before editing them\n"

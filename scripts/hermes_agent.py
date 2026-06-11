@@ -53,6 +53,17 @@ def check_oce_health() -> bool:
         return False
 
 
+def heartbeat_oce() -> str:
+    """Lightweight OCE heartbeat — just check health, no agent pipeline."""
+    try:
+        r = requests.get(OCE_HEALTH_URL, timeout=10)
+        if r.status_code == 200:
+            data = r.json()
+            return f"OCE healthy: {data.get('service', 'unknown')}"
+        return f"OCE unhealthy: HTTP {r.status_code}"
+    except Exception as e:
+        return f"OCE unreachable: {e}"
+
 def chat_with_oce(message: str, session_id: str = "") -> str:
     """Send a message to OCE's PO chat endpoint and get the response."""
     sid = session_id or SESSION_ID
@@ -185,17 +196,11 @@ def run_autonomous():
     while True:
         try:
             time.sleep(600)  # 10 min between heartbeats
-            if not check_oce_health():
-                log("OCE unreachable — skipping cycle")
-                continue
             cycle += 1
             log(f"Heartbeat #{cycle}...")
-            chat_with_oce(
-                f"[SYSTEM] Hermes heartbeat #{cycle} — "
-                f"{datetime.now(timezone.utc).strftime('%H:%M UTC')}. "
-                f"Status check: all nominal."
-            )
-            log(f"Heartbeat #{cycle} complete.")
+            # Use lightweight health check for heartbeats (no agent pipeline)
+            status = heartbeat_oce()
+            log(f"Heartbeat #{cycle}: {status}")
         except KeyboardInterrupt:
             log("Stopped.")
             break

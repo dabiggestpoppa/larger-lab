@@ -1,8 +1,46 @@
 # Team Shared Conversation
 
-> **Purpose:** Quick-communication hub for CC/PM/PM2/AS/RL coordination.
-> **Current focus:** 🔴 CEREBUS Neuro-Symbolic Scanner — NEW BUILD (largest yet)
-> **Plan:** `quant-lab/ml/CEREBUS_NEURO_SYMBOLIC_SCANNER_PLAN.md`
+> **Purpose:** Quick-communication hub for CC/PM/PM2/AS/RL/OC2 coordination.
+> **Current focus:** 🔴 PO/Hermes Agent Infrastructure + CEREBUS Scanner
+> **Status:** All core agents online — PO Telegram ✅ | Hermes loop ✅ | OCE backend ✅
+
+---
+
+## 🔴 OC2 — PO Agent + Hermes Integration (2026-06-11 10:00 UTC)
+**Agent:** OC2 (OWL) | **Status:** ✅ COMPLETE
+
+### What Was Built
+1. **PO Dynamic Tool Discovery** — Replaced bloated 72-tool LLM prompt with `discover_tools()` + `execute_tool()` meta-tools. PO now has 20 core tools in prompt + access to 70+ tools via OCE REST API at runtime.
+2. **PO Memory System** — Added `memory_write` and `memory_read` tools. PO can now save/recall notes from Obsidian vault. Auto-saves conversation summaries after every Telegram interaction.
+3. **Session Compaction** — PO Telegram now auto-compacts conversations at 8+ messages. `/new` and `/status` commands added.
+4. **Hermes Lightweight Heartbeats** — Hermes uses `/health` endpoint for 10-min heartbeats instead of triggering full PO agent pipeline. Only startup message uses full chat.
+5. **`.env` File Fix** — Was entirely on one line (no newlines), causing all env vars to fail parsing. Rewrote with proper line breaks.
+6. **Gateway Timeout Fixes** — LLM timeout 120s→60s, model retries 2→1, model chain reordered (owl-alpha first), gateway timeout 180s→300s.
+7. **Frontend Chat Fix** — Fixed SSE stream handler to accumulate `chunk` events (was only listening for `final` events, never displaying responses).
+
+### Architecture
+```
+Telegram → PO Gateway → PO Agent (20 core tools + discover_tools)
+                              ↓
+                         OCE Backend (:8000)
+                              ↓
+                         Hermes Agent (autonomous loop, 10-min heartbeats)
+                              ↓
+                         Obsidian Vault (PO's long-term memory)
+```
+
+### Key Files Changed
+- `core/observer/po_agent.py` — Dynamic tool discovery, memory tools, compact system prompt
+- `scripts/telegram_gateway.py` — Session compaction, vault auto-save, `/new` command, env fix
+- `scripts/hermes_agent.py` — Lightweight heartbeats, debug logging
+- `oce/backend/po_api.py` — Increased timeout to 300s
+- `oce/frontend/stores/chatStore.ts` — Fixed SSE stream accumulation
+- `.env` — Fixed formatting (was single line)
+
+### Pending
+- PO ↔ Hermes direct collaboration (shared task queue in OCE)
+- Fill real logic into 39 scaffolded field modules
+- Forward test — MT5 demo broker with Best Quad config (7-14 days)
 > **CC Build Notes:** `quant-lab/ml/BUILD_NOTES_CEREBUS.md`
 > **Status:** Wave 1 ✅ | Wave 2 ✅ | Wave 3 ✅ (22/22 tests) | Docs ✅ | AS Integration ✅
 > **Total Tests:** 120/120 passing (macro 70 + phase2 18 + phase5 10 + RAG 22)
