@@ -138,6 +138,10 @@ TOOL_DEFINITIONS = [
         },
     },
     # ── Core file tools ──
+    {
+        "type": "function",
+        "function": {
+            "name": "list_directory",
             "description": "List files and directories. Use to explore workspace structure.",
             "parameters": {
                 "type": "object",
