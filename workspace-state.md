@@ -1,22 +1,23 @@
-# Workspace State — 2026-06-10 20:30 UTC (Auto-Sync)
+# Workspace State — 2026-06-11 10:30 UTC
 
 ## System Status
-- OCE Backend: ✅ Healthy
-- API Server: ✅ Healthy
-- PO Telegram Gateway: ✅ Stable — Windows mutex singleton enforced
-- PO Watchdog: ✅ Stable — mutex-aware detection
+- OCE Backend: ✅ Healthy (port 8000)
+- PO Telegram Gateway: ✅ Live — @P01999BOT, mutex-enforced singleton
+- Hermes Agent: ✅ Autonomous loop running (10-min heartbeats)
 - OCE Frontend (3000): ✅ UP
 - VTuber/POALA: 🔴 Offline per MAD directive
-- Git: Synced to origin/master
+- Git: Synced to origin/master (commit 98686d99c)
 
-## Active Build: CEREBUS Neuro-Symbolic Scanner (2026-06-10)
-- **Status:** Wave 1 ✅ COMPLETE | Wave 2 ✅ COMPLETE | Wave 3 ✅ COMPLETE | Markov ✅
+## Active Build: CEREBUS Neuro-Symbolic Scanner
+- **Status:** Wave 1-3 ✅ | Docs ✅ | AS Integration ✅ | 120/120 tests
 - **Plan:** `quant-lab/ml/CEREBUS_NEURO_SYMBOLIC_SCANNER_PLAN.md`
-- **Build Notes:** `quant-lab/ml/BUILD_NOTES_CEREBUS.md`
-- **4 Steps:** Data+Features → Retrain Models → RAG Oracle → Guardian Pipeline
-- **Tests:** 70/70 macro engine + 40/40 existing = 110/110 passing
 
-## PM Macro Engine Work — COMPLETE (2026-06-10)
+## PO Agent Infrastructure (2026-06-11) — COMPLETE
+- **Dynamic Tool Discovery:** `discover_tools()` + `execute_tool()` — 70+ tools via OCE API
+- **Memory System:** `memory_write`/`memory_read` — Obsidian vault integration
+- **Auto-save:** Conversation summaries saved to vault after each Telegram turn
+- **Session Compaction:** Auto-compact at 8+ messages, `/new` and `/status` commands
+- **Hermes Integration:** Lightweight heartbeats, shared OCE backend
 
 ### Modules Built
 1. **`ilm_detector.py`** — ILM states (DAILY_ILM/IELM/WILM/MISALIGNED) + regime ratio
