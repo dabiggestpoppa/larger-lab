@@ -98,11 +98,18 @@ def _release_singleton():
             pass
 
 if ENV_PATH.exists():
-    for line in ENV_PATH.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
+    import re as _re
+    _content = ENV_PATH.read_text(encoding="utf-8")
+    _lines = _content.splitlines()
+    if len(_lines) <= 1:
+        # Single-line format: split by known KEY=VALUE patterns
+        _pairs = _re.findall(r'([A-Z_][A-Z0-9_]*)=(.*?)(?=(?:[A-Z_][A-Z0-9_]*=|$))', _content, _re.DOTALL)
+        _lines = [f"{k}={v}" for k, v in _pairs]
+    for line in _lines:
+        line = line.strip().strip("\r")
         if line and not line.startswith("#") and "=" in line:
             k, v = line.split("=", 1)
-            os.environ.setdefault(k.strip(), v.strip())
+            os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
 
 os.environ.setdefault("PYTHONIOENCODING", "utf-8")
 

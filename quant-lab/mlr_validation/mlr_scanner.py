@@ -19,7 +19,8 @@ import sys
 import time
 import logging
 from collections import defaultdict
-from datetime import datetime, timedelta, time, date
+from datetime import datetime, timedelta, date
+import time as _time
 from pathlib import Path
 
 # ─── CONFIG ─────────────────────────────────────────────────────────
@@ -509,7 +510,7 @@ class MLRScanner:
                 self.tier_sent = False
 
             # Scan every 60 seconds
-            time.sleep(60)
+            _time.sleep(60)
 
 
 def main():
