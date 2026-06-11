@@ -2278,10 +2278,10 @@
     "hermes-20260611094931": {
       "session_id": "hermes-20260611094931",
       "start_time": "2026-06-11T09:49:41.208063+00:00",
-      "last_active": "2026-06-11T09:49:41.217062+00:00",
-      "message_count": 2,
-      "user_message_count": 1,
-      "assistant_message_count": 1,
+      "last_active": "2026-06-11T10:00:01.897025+00:00",
+      "message_count": 4,
+      "user_message_count": 2,
+      "assistant_message_count": 2,
       "messages": [
         {
           "message_id": "msg_20260611094941208063",
@@ -2298,6 +2298,26 @@
           "role": "assistant",
           "content": "\n\nI'm OWL, the Primary Observer for Larger-Lab. I'm ready to assist you with any tasks \u2014 code, research, file management, GitHub operations, or anything else you need.\n\nWhat would you like me to work on?",
           "timestamp": "2026-06-11T09:49:41.217062+00:00",
+          "session_id": "hermes-20260611094931",
+          "task_domain": null,
+          "complexity": null,
+          "observer_metadata": {}
+        },
+        {
+          "message_id": "msg_20260611100001894484",
+          "role": "user",
+          "content": "[SYSTEM] Hermes heartbeat #1 \u2014 09:59 UTC. Status check: all nominal.",
+          "timestamp": "2026-06-11T10:00:01.894484+00:00",
+          "session_id": "hermes-20260611094931",
+          "task_domain": null,
+          "complexity": null,
+          "observer_metadata": {}
+        },
+        {
+          "message_id": "msg_20260611100001897025",
+          "role": "assistant",
+          "content": "\u2705 Hermes heartbeat #1 received at 09:59 UTC. All systems nominal.",
+          "timestamp": "2026-06-11T10:00:01.897025+00:00",
           "session_id": "hermes-20260611094931",
           "task_domain": null,
           "complexity": null,

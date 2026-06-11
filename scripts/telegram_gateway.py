@@ -23,6 +23,19 @@ if os.path.exists(_env_path):
                 _parts = _line.split("=", 1)
                 os.environ.setdefault(_parts[0].strip(), _parts[1].strip())
 
+# Verify token is loaded
+if not os.environ.get("TELEGRAM_TOKEN"):
+    # Fallback: try loading from project root explicitly
+    _repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    _env_fallback = os.path.join(_repo_root, ".env")
+    if os.path.exists(_env_fallback):
+        with open(_env_fallback, "r", encoding="utf-8") as _f:
+            for _line in _f:
+                _line = _line.strip()
+                if _line and not _line.startswith("#") and "=" in _line:
+                    _parts = _line.split("=", 1)
+                    os.environ.setdefault(_parts[0].strip(), _parts[1].strip())
+
 from core.observer.vault import Vault
 from core.observer.journal import Journal
 from core.observer.autonomous_orchestrator import AutonomousOrchestrator

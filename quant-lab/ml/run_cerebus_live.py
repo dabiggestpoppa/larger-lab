@@ -1,9 +1,10 @@
 """
 CEREBUS Neuro-Symbolic Scanner — LIVE MT5 Edition
 ===================================================
-Pulls live M15 candle data from MT5, computes CEREBUS features,
-runs the Guardian (XGBoost + Orchestrator), and sends alerts to Telegram.
-Does NOT execute trades — signals only.
+Pulls live M15 candle data from MT5, runs BOTH:
+  1. Guardian (XGBoost + Orchestrator + RAG)
+  2. ST/P90 Engines (Symmetry Trap + P90 Kinetic)
+Sends alerts to Telegram. Does NOT execute trades — signals only.
 
 Usage:
     python run_cerebus_live.py                    # Scan EURUSD + BTCUSD (default)
@@ -11,6 +12,9 @@ Usage:
     python run_cerebus_live.py --interval 60      # Scan interval in seconds (default: 300)
     python run_cerebus_live.py --once             # Single scan and exit
     python run_cerebus_live.py --dry-run          # Scan without sending Telegram alerts
+    python run_cerebus_live.py --engine guardian  # Only XGBoost Guardian
+    python run_cerebus_live.py --engine stp90     # Only ST/P90 engines
+    python run_cerebus_live.py --engine both      # Both (default)
 """
 import os
 import sys
@@ -18,14 +22,13 @@ import time
 import argparse
 import logging
 from pathlib import Path
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 # Load .env
 env_path = Path(__file__).resolve().parent.parent.parent / ".env"
 if env_path.exists():
     import re
     content = env_path.read_text(encoding="utf-8")
-    # Handle both newline-delimited and single-line formats
     lines = content.splitlines()
     if len(lines) <= 1:
         pairs = re.findall(r'([A-Z_][A-Z0-9_]*)=(.*?)(?=(?:[A-Z_][A-Z0-9_]*=|$))', content, re.DOTALL)
@@ -48,6 +51,11 @@ import MetaTrader5 as mt5
 sys.path.insert(0, str(Path(__file__).parent))
 from phase4_guardian.guardian import GuardianPipeline, GuardianConfig
 
+# ST/P90 Engine Imports
+sys.path.insert(0, str(Path(__file__).parent.parent / "engines"))
+from symmetry_trap import SymmetryTrapEngine, Bar, TradeDirection
+from p90_engine import P90Engine
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(name)s] %(levelname)s: %(message)s",
@@ -55,340 +63,252 @@ logging.basicConfig(
 )
 logger = logging.getLogger("cerebus.live")
 
-# ─── CONFIG ────────────────────────────────────────────────────────
 DEFAULT_SYMBOLS = ["EURUSD", "BTCUSD"]
-SCAN_INTERVAL = 300  # 5 minutes (M15 candle close)
-LOOKBACK_BARS = 500  # Number of M15 bars to fetch for feature computation
+SCAN_INTERVAL = 300
+LOOKBACK_BARS = 500
 
 MODEL_PATH = Path(__file__).parent / "models" / "regime_classifier_full.pkl"
 RAG_STORE_PATH = Path(__file__).parent / "data" / "rag_chroma"
-FEATURES_DIR = Path(__file__).parent / "data" / "full_features_v2"
+EST = timezone(timedelta(hours=-5))
 
 
-def get_pip_size(symbol: str) -> float:
-    """Return pip size for a symbol."""
+def get_pip_size(symbol):
     s = symbol.upper()
-    if "JPY" in s:
-        return 0.01
-    if "XAU" in s or "GOLD" in s:
-        return 0.1
-    if "XAG" in s or "SILVER" in s:
-        return 0.001
-    if any(x in s for x in ["BTC", "ETH", "US500", "NAS100", "DE30", "FR40", "HK50", "US30"]):
-        return 1.0
+    if "JPY" in s: return 0.01
+    if "XAU" in s: return 0.1
+    if "XAG" in s: return 0.001
+    if any(x in s for x in ["BTC","ETH","US500","NAS100","DE30","FR40","HK50","US30"]): return 1.0
     return 0.0001
 
 
-def fetch_live_candles(symbol: str, num_bars: int = LOOKBACK_BARS) -> pd.DataFrame:
-    """
-    Fetch recent M15 candles from MT5.
-    Returns DataFrame with columns: time, open, high, low, close, volume
-    """
+def fetch_live_candles(symbol, num_bars=LOOKBACK_BARS):
     if not mt5.initialize():
-        logger.error("MT5 initialization failed")
+        logger.error("MT5 init failed")
         return pd.DataFrame()
-
     try:
-        # Try the symbol as-is, then with .PRO suffix
         rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_M15, 0, num_bars)
         if rates is None or len(rates) == 0:
             rates = mt5.copy_rates_from_pos(f"{symbol}.PRO", mt5.TIMEFRAME_M15, 0, num_bars)
         if rates is None or len(rates) == 0:
-            logger.warning(f"No candle data for {symbol}")
+            logger.warning(f"No data for {symbol}")
             return pd.DataFrame()
-
         df = pd.DataFrame(rates)
         df['time'] = pd.to_datetime(df['time'], unit='s', utc=True)
-        df = df.set_index('time')
-        df = df.rename(columns={'tick_volume': 'volume'})
-        df = df[['open', 'high', 'low', 'close', 'volume']]
-
-        logger.info(f"Fetched {len(df)} M15 candles for {symbol} (last: {df.index[-1]})")
+        df = df.set_index('time').rename(columns={'tick_volume': 'volume'})
+        df = df[['open','high','low','close','volume']]
+        logger.info(f"Fetched {len(df)} M15 candles for {symbol}")
         return df
     except Exception as e:
-        logger.error(f"Error fetching candles for {symbol}: {e}")
+        logger.error(f"Error fetching {symbol}: {e}")
         return pd.DataFrame()
 
 
-def compute_live_features(df: pd.DataFrame, symbol: str) -> pd.DataFrame:
-    """
-    Compute CEREBUS features from live candle data.
-    This is a streamlined version of the full feature engine,
-    computing only the features needed by the XGBoost model.
-    """
-    if df.empty or len(df) < 50:
-        logger.warning(f"Insufficient data for {symbol}: {len(df)} bars")
-        return pd.DataFrame()
-
-    pip_size = get_pip_size(symbol)
+def compute_live_features(df, symbol):
+    if df.empty or len(df) < 50: return pd.DataFrame()
+    ps = get_pip_size(symbol)
     df = df.copy()
-
-    # ── Basic price features ──
     df['body'] = df['close'] - df['open']
     df['range'] = df['high'] - df['low']
     df['body_ratio'] = df['body'] / df['range'].replace(0, np.nan)
     df['price_range_from_open'] = df['close'] - df['open']
-
-    # ── Time features ──
-    df['hour_est'] = df.index.hour - 5  # Convert UTC to EST
-    df['hour_est'] = df['hour_est'].apply(lambda x: x + 24 if x < 0 else x)
+    df['hour_est'] = ((df.index.hour - 5) % 24)
     df['day_of_week'] = df.index.dayofweek
     df['is_monday'] = (df.index.dayofweek == 0).astype(int)
     df['is_friday'] = (df.index.dayofweek == 4).astype(int)
     df['is_wednesday'] = (df.index.dayofweek == 2).astype(int)
     df['is_wednesday_pm'] = ((df.index.dayofweek == 2) & (df.index.hour >= 12)).astype(int)
     df['minutes_to_12pm_est'] = ((12 - df['hour_est']) % 24) * 60
-
-    # ── Session features ──
     df['is_asian'] = ((df.index.hour >= 0) & (df.index.hour < 8)).astype(int)
     df['is_london'] = ((df.index.hour >= 7) & (df.index.hour < 16)).astype(int)
     df['is_ny'] = ((df.index.hour >= 12) & (df.index.hour < 21)).astype(int)
 
-    # ── Asian Range (00:00-08:00 UTC = 7pm-3am EST) ──
-    df['asian_high'] = np.nan
-    df['asian_low'] = np.nan
-    df['asian_range_pips'] = np.nan
-
+    # Asian Range
     for date in df.index.date:
-        day_mask = df.index.date == date
-        asian_mask = day_mask & (df.index.hour >= 0) & (df.index.hour < 8)
-        asian_bars = df.loc[asian_mask]
-        if len(asian_bars) > 0:
-            ah = asian_bars['high'].max()
-            al = asian_bars['low'].min()
-            df.loc[day_mask, 'asian_high'] = ah
-            df.loc[day_mask, 'asian_low'] = al
-            df.loc[day_mask, 'asian_range_pips'] = (ah - al) / pip_size
+        dm = df.index.date == date
+        am = dm & (df.index.hour >= 0) & (df.index.hour < 8)
+        ab = df.loc[am]
+        if len(ab) > 0:
+            df.loc[dm, 'asian_high'] = ab['high'].max()
+            df.loc[dm, 'asian_low'] = ab['low'].min()
+            df.loc[dm, 'asian_range_pips'] = (ab['high'].max() - ab['low'].min()) / ps
 
-    # ── MLR (Monday London Range: 07:00-15:00 UTC) ──
-    df['mlr_high'] = np.nan
-    df['mlr_low'] = np.nan
-    df['mlr_close'] = np.nan
-    df['mlr_range'] = np.nan
-    df['mlr_mid'] = np.nan
-    df['mlr_range_pips'] = np.nan
-    df['bias'] = 'UNKNOWN'
+    # MLR
+    df['mlr_high'] = np.nan; df['mlr_low'] = np.nan; df['mlr_close'] = np.nan
+    df['mlr_range'] = np.nan; df['mlr_mid'] = np.nan; df['mlr_range_pips'] = np.nan
     df['hours_since_mlr'] = np.nan
+    for ws in pd.date_range(df.index.min().normalize(), df.index.max().normalize(), freq='W-MON'):
+        wm = (df.index >= ws) & (df.index < ws + pd.Timedelta(days=7))
+        mm = wm & (df.index.dayofweek == 0) & (df.index.hour >= 7) & (df.index.hour < 15)
+        mb = df.loc[mm]
+        if len(mb) > 0:
+            mh, ml = mb['high'].max(), mb['low'].min()
+            mc = mb['close'].iloc[-1]
+            mr = mh - ml
+            df.loc[wm, 'mlr_high'] = mh; df.loc[wm, 'mlr_low'] = ml
+            df.loc[wm, 'mlr_close'] = mc; df.loc[wm, 'mlr_range'] = mr
+            df.loc[wm, 'mlr_mid'] = ml + mr/2; df.loc[wm, 'mlr_range_pips'] = mr/ps
+            bias = np.where(mc > ml+mr/2, 'BULLISH', np.where(mc < ml+mr/2, 'BEARISH', 'NEUTRAL'))
+            df.loc[wm, 'bias'] = bias
+            me = ws + pd.Timedelta(hours=15)
+            for idx in df.loc[wm].index:
+                df.loc[idx, 'hours_since_mlr'] = (idx - me).total_seconds() / 3600
 
-    for week_start in pd.date_range(df.index.min().normalize(), df.index.max().normalize(), freq='W-MON'):
-        week_mask = (df.index >= week_start) & (df.index < week_start + pd.Timedelta(days=7))
-        monday_mask = week_mask & (df.index.dayofweek == 0) & (df.index.hour >= 7) & (df.index.hour < 15)
-        monday_bars = df.loc[monday_mask]
+    # Fib targets
+    df['target_25'] = np.where(df['bias']=='BULLISH', df['mlr_high']+0.25*df['mlr_range'],
+                                np.where(df['bias']=='BEARISH', df['mlr_low']-0.25*df['mlr_range'], np.nan))
+    df['target_50'] = np.where(df['bias']=='BULLISH', df['mlr_high']+0.50*df['mlr_range'],
+                                np.where(df['bias']=='BEARISH', df['mlr_low']-0.50*df['mlr_range'], np.nan))
+    df['target_100'] = np.where(df['bias']=='BULLISH', df['mlr_high']+1.00*df['mlr_range'],
+                                 np.where(df['bias']=='BEARISH', df['mlr_low']-1.00*df['mlr_range'], np.nan))
+    df['target_168'] = np.where(df['bias']=='BULLISH', df['mlr_high']+1.68*df['mlr_range'],
+                                  np.where(df['bias']=='BEARISH', df['mlr_low']-1.68*df['mlr_range'], np.nan))
+    df['kill_switch_132'] = np.where(df['bias']=='BULLISH', df['mlr_low']-1.32*df['mlr_range'],
+                                      np.where(df['bias']=='BEARISH', df['mlr_high']+1.32*df['mlr_range'], np.nan))
+    df['dist_to_25_pips'] = (df['close']-df['target_25']).abs()/ps
+    df['dist_to_50_pips'] = (df['close']-df['target_50']).abs()/ps
+    df['dist_to_100_pips'] = (df['close']-df['target_100']).abs()/ps
+    df['dist_to_168_pips'] = (df['close']-df['target_168']).abs()/ps
+    df['dist_to_132_pips'] = (df['close']-df['kill_switch_132']).abs()/ps
+    df['dist_to_mlr_high_pips'] = (df['close']-df['mlr_high']).abs()/ps
+    df['dist_to_mlr_low_pips'] = (df['close']-df['mlr_low']).abs()/ps
+    df['dist_to_mlr_mid_pips'] = (df['close']-df['mlr_mid']).abs()/ps
 
-        if len(monday_bars) > 0:
-            mlr_h = monday_bars['high'].max()
-            mlr_l = monday_bars['low'].min()
-            mlr_c = monday_bars['close'].iloc[-1]
-            mlr_range = mlr_h - mlr_l
-            mlr_mid = mlr_l + mlr_range / 2
-
-            # Forward fill to all bars in the week
-            df.loc[week_mask, 'mlr_high'] = mlr_h
-            df.loc[week_mask, 'mlr_low'] = mlr_l
-            df.loc[week_mask, 'mlr_close'] = mlr_c
-            df.loc[week_mask, 'mlr_range'] = mlr_range
-            df.loc[week_mask, 'mlr_mid'] = mlr_mid
-            df.loc[week_mask, 'mlr_range_pips'] = mlr_range / pip_size
-
-            # Bias
-            if mlr_c > mlr_mid:
-                df.loc[week_mask, 'bias'] = 'BULLISH'
-            elif mlr_c < mlr_mid:
-                df.loc[week_mask, 'bias'] = 'BEARISH'
-            else:
-                df.loc[week_mask, 'bias'] = 'NEUTRAL'
-
-            # Hours since MLR
-            mlr_end = week_start + pd.Timedelta(hours=15)
-            for idx in df.loc[week_mask].index:
-                df.loc[idx, 'hours_since_mlr'] = (idx - mlr_end).total_seconds() / 3600
-
-    # ── Fibonacci targets ──
-    df['target_25'] = np.where(
-        df['bias'] == 'BULLISH',
-        df['mlr_high'] + 0.25 * df['mlr_range'],
-        np.where(df['bias'] == 'BEARISH', df['mlr_low'] - 0.25 * df['mlr_range'], np.nan)
-    )
-    df['target_50'] = np.where(
-        df['bias'] == 'BULLISH',
-        df['mlr_high'] + 0.50 * df['mlr_range'],
-        np.where(df['bias'] == 'BEARISH', df['mlr_low'] - 0.50 * df['mlr_range'], np.nan)
-    )
-    df['target_100'] = np.where(
-        df['bias'] == 'BULLISH',
-        df['mlr_high'] + 1.00 * df['mlr_range'],
-        np.where(df['bias'] == 'BEARISH', df['mlr_low'] - 1.00 * df['mlr_range'], np.nan)
-    )
-    df['target_168'] = np.where(
-        df['bias'] == 'BULLISH',
-        df['mlr_high'] + 1.68 * df['mlr_range'],
-        np.where(df['bias'] == 'BEARISH', df['mlr_low'] - 1.68 * df['mlr_range'], np.nan)
-    )
-    df['kill_switch_132'] = np.where(
-        df['bias'] == 'BULLISH',
-        df['mlr_low'] - 1.32 * df['mlr_range'],
-        np.where(df['bias'] == 'BEARISH', df['mlr_high'] + 1.32 * df['mlr_range'], np.nan)
-    )
-
-    # ── Distance features (pips) ──
-    df['dist_to_25_pips'] = (df['close'] - df['target_25']).abs() / pip_size
-    df['dist_to_50_pips'] = (df['close'] - df['target_50']).abs() / pip_size
-    df['dist_to_100_pips'] = (df['close'] - df['target_100']).abs() / pip_size
-    df['dist_to_168_pips'] = (df['close'] - df['target_168']).abs() / pip_size
-    df['dist_to_132_pips'] = (df['close'] - df['kill_switch_132']).abs() / pip_size
-    df['dist_to_mlr_high_pips'] = (df['close'] - df['mlr_high']).abs() / pip_size
-    df['dist_to_mlr_low_pips'] = (df['close'] - df['mlr_low']).abs() / pip_size
-    df['dist_to_mlr_mid_pips'] = (df['close'] - df['mlr_mid']).abs() / pip_size
-
-    # ── ILM / Regime features ──
-    df['regime_ratio'] = np.nan
-    df['regime_status'] = 'UNKNOWN'
-    df['ilm_state'] = 'MISALIGNED'
-
+    # ILM/Regime
+    df['regime_ratio'] = np.nan; df['regime_status'] = 'UNKNOWN'; df['ilm_state'] = 'MISALIGNED'
     for date in df.index.date:
-        day_mask = df.index.date == date
-        asian_bars = df.loc[day_mask & (df.index.hour >= 0) & (df.index.hour < 8)]
-        london_bars = df.loc[day_mask & (df.index.hour >= 3) & (df.index.hour < 9)]
+        dm = df.index.date == date
+        ab = df.loc[dm & (df.index.hour>=0) & (df.index.hour<8)]
+        lb = df.loc[dm & (df.index.hour>=3) & (df.index.hour<9)]
+        if len(ab)>0 and len(lb)>0:
+            ar = (ab['high'].max()-ab['low'].min())/ps
+            lr = (lb['high'].max()-lb['low'].min())/ps
+            ratio = lr/ar if ar>0 else 0
+            df.loc[dm,'regime_ratio'] = ratio
+            if ratio >= 1.5: df.loc[dm,'regime_status']='CONFIRMED'; df.loc[dm,'ilm_state']='IELM'
+            elif ratio >= 1.0: df.loc[dm,'regime_status']='CAUTION'; df.loc[dm,'ilm_state']='DAILY_ILM'
+            else: df.loc[dm,'regime_status']='FAILED'; df.loc[dm,'ilm_state']='MISALIGNED'
 
-        if len(asian_bars) > 0 and len(london_bars) > 0:
-            ar = (asian_bars['high'].max() - asian_bars['low'].min()) / pip_size
-            lr = (london_bars['high'].max() - london_bars['low'].min()) / pip_size
-            ratio = lr / ar if ar > 0 else 0
-
-            df.loc[day_mask, 'regime_ratio'] = ratio
-            if ratio >= 1.5:
-                df.loc[day_mask, 'regime_status'] = 'CONFIRMED'
-                df.loc[day_mask, 'ilm_state'] = 'IELM'
-            elif ratio >= 1.45:
-                df.loc[day_mask, 'regime_status'] = 'CAUTION'
-                df.loc[day_mask, 'ilm_state'] = 'DAILY_ILM'
-            elif ratio >= 1.0:
-                df.loc[day_mask, 'regime_status'] = 'CAUTION'
-                df.loc[day_mask, 'ilm_state'] = 'DAILY_ILM'
-            else:
-                df.loc[day_mask, 'regime_status'] = 'FAILED'
-                df.loc[day_mask, 'ilm_state'] = 'MISALIGNED'
-
-    # ── Volatility features ──
     df['rolling_vol_20'] = df['range'].rolling(20).mean()
-    df['vol_ratio'] = df['range'] / df['rolling_vol_20'].replace(0, np.nan)
-    df['spread_vs_20d_avg'] = df['range'] / df['range'].rolling(480).mean().replace(0, np.nan)
-
-    # ── Consecutive losses (simplified) ──
-    df['consecutive_losses'] = 0
-    df['prior_session_wr'] = 0.5
-
-    # ── Encode all categorical features as numeric ──
-    # Bias: BULLISH=1, BEARISH=-1, NEUTRAL/UNKNOWN=0
-    df['bias_encoded'] = np.where(df['bias'] == 'BULLISH', 1,
-                                   np.where(df['bias'] == 'BEARISH', -1, 0))
-
-    # Regime status: CONFIRMED=2, CAUTION=1, FAILED=0, UNKNOWN=0
-    df['regime_status_encoded'] = np.where(df['regime_status'] == 'CONFIRMED', 2,
-                                            np.where(df['regime_status'] == 'CAUTION', 1, 0))
-
-    # ILM state: IELM=3, DAILY_ILM=2, WILM=1, MISALIGNED/UNKNOWN=0
-    df['ilm_state_encoded'] = np.where(df['ilm_state'] == 'IELM', 3,
-                                        np.where(df['ilm_state'] == 'DAILY_ILM', 2,
-                                                  np.where(df['ilm_state'] == 'WILM', 1, 0)))
-
-    # Session encoding
-    df['session_encoded'] = np.where((df.index.hour >= 0) & (df.index.hour < 8), 0,  # Asian
-                                      np.where((df.index.hour >= 7) & (df.index.hour < 16), 1,  # London
-                                                np.where((df.index.hour >= 12) & (df.index.hour < 21), 2, 3)))  # NY / Other
-
-    # ── Fill NaN values ──
+    df['vol_ratio'] = df['range']/df['rolling_vol_20'].replace(0,np.nan)
+    df['spread_vs_20d_avg'] = df['range']/df['range'].rolling(480).mean().replace(0,np.nan)
+    df['consecutive_losses'] = 0; df['prior_session_wr'] = 0.5
+    df['bias_encoded'] = np.where(df['bias']=='BULLISH', 1, np.where(df['bias']=='BEARISH', -1, 0))
+    df['regime_status_encoded'] = np.where(df['regime_status']=='CONFIRMED', 2, np.where(df['regime_status']=='CAUTION', 1, 0))
+    df['ilm_state_encoded'] = np.where(df['ilm_state']=='IELM', 3, np.where(df['ilm_state']=='DAILY_ILM', 2, np.where(df['ilm_state']=='WILM', 1, 0)))
+    df['session_encoded'] = np.where((df.index.hour>=0)&(df.index.hour<8), 0, np.where((df.index.hour>=7)&(df.index.hour<16), 1, np.where((df.index.hour>=12)&(df.index.hour<21), 2, 3)))
     df = df.ffill().fillna(0)
-
-    # ── Drop string columns that the model can't handle ──
-    string_cols = df.select_dtypes(include=['object']).columns.tolist()
-    if string_cols:
-        df = df.drop(columns=string_cols)
-
+    sc = df.select_dtypes(include=['object']).columns.tolist()
+    if sc: df = df.drop(columns=sc)
     return df
 
 
-def scan_symbol(symbol: str, guardian: GuardianPipeline, dry_run: bool = False) -> str:
-    """
-    Scan a single symbol: fetch live data → compute features → Guardian → alert.
-    Returns alert string or None.
-    """
-    logger.info(f"{'='*50}")
-    logger.info(f"Scanning {symbol}...")
+def scan_with_guardian(symbol, df, guardian, dry_run):
+    try:
+        alert = guardian.process_candle(df, symbol)
+        if alert:
+            logger.info(f"  ✅ GUARDIAN ALERT for {symbol}!")
+            if not dry_run: guardian.dispatch_alert(alert, symbol)
+            return alert
+    except Exception as e:
+        logger.error(f"  Guardian error: {e}")
+    return None
 
-    # 1. Fetch live candles
+
+def scan_with_st_p90(symbol, df, dry_run):
+    signals = []
+    ps = get_pip_size(symbol)
+    try:
+        bars = [Bar(timestamp=idx, open=float(r['open']), high=float(r['high']), low=float(r['low']), close=float(r['close'])) for idx, r in df.iterrows()]
+        if len(bars) < 50: return signals
+
+        # Symmetry Trap
+        st = SymmetryTrapEngine()
+        for bar in bars:
+            result = st.process_bar(bar)
+            if result:
+                d = "LONG" if result.direction == TradeDirection.LONG else "SHORT"
+                sl_p = abs(result.entry_price - result.sl_price)/ps
+                tp_p = abs(result.tp_price - result.entry_price)/ps
+                msg = f"⚡ ST SIGNAL: {symbol} {d}\n  Entry: {result.entry_price:.5f}\n  SL: {result.sl_price:.5f} ({sl_p:.1f}p)\n  TP: {result.tp_price:.5f} ({tp_p:.1f}p)"
+                logger.info(f"  {msg}")
+                signals.append({'engine':'ST','symbol':symbol,'direction':d,'entry':result.entry_price,'sl':result.sl_price,'tp':result.tp_price,'message':msg})
+                break
+
+        # P90
+        p90 = P90Engine()
+        for bar in bars:
+            result = p90.process_bar(bar)
+            if result:
+                d = "LONG" if result.direction == TradeDirection.LONG else "SHORT"
+                sl_p = abs(result.entry_price - result.sl_price)/ps
+                tp_p = abs(result.tp_price - result.entry_price)/ps
+                msg = f"🎯 P90 SIGNAL: {symbol} {d}\n  Entry: {result.entry_price:.5f}\n  SL: {result.sl_price:.5f} ({sl_p:.1f}p)\n  TP: {result.tp_price:.5f} ({tp_p:.1f}p)"
+                logger.info(f"  {msg}")
+                signals.append({'engine':'P90','symbol':symbol,'direction':d,'entry':result.entry_price,'sl':result.sl_price,'tp':result.tp_price,'message':msg})
+                break
+
+        if signals and not dry_run:
+            import requests
+            cfg = GuardianConfig()
+            token = cfg.TELEGRAM_BOT_TOKEN
+            chat_id = cfg.TELEGRAM_CHAT_ID
+            if not chat_id:
+                r = requests.get(f"https://api.telegram.org/bot{token}/getUpdates?limit=1&timeout=5", timeout=10)
+                d = r.json()
+                if d.get("ok") and d.get("result"):
+                    chat_id = str(d["result"][0]["message"]["chat"]["id"])
+            if chat_id:
+                for sig in signals:
+                    requests.post(f"https://api.telegram.org/bot{token}/sendMessage", json={"chat_id":chat_id,"text":sig['message'],"parse_mode":"HTML"}, timeout=15)
+                    logger.info(f"  📨 {sig['engine']} signal sent to Telegram")
+    except Exception as e:
+        logger.error(f"  ST/P90 error: {e}")
+    return signals
+
+
+def scan_symbol(symbol, guardian, engine, dry_run):
+    logger.info(f"{'='*50}\nScanning {symbol}...")
     df = fetch_live_candles(symbol)
-    if df.empty:
-        logger.warning(f"  No data for {symbol}")
-        return None
+    if df.empty: return
 
-    # 2. Compute features
-    df = compute_live_features(df, symbol)
-    if df.empty:
-        logger.warning(f"  Feature computation failed for {symbol}")
-        return None
+    if engine in ('guardian','both'):
+        df_feat = compute_live_features(df, symbol)
+        if not df_feat.empty:
+            scan_with_guardian(symbol, df_feat, guardian, dry_run)
+        else:
+            logger.warning(f"  Feature computation failed for {symbol}")
 
-    # 3. Run Guardian
-    alert = guardian.process_candle(df, symbol)
-
-    if alert:
-        logger.info(f"  ✅ ALERT for {symbol}!")
-        if not dry_run:
-            guardian.dispatch_alert(alert, symbol)
-        return alert
-    else:
-        logger.info(f"  — No alert for {symbol} (conditions not met)")
-        return None
+    if engine in ('stp90','both'):
+        scan_with_st_p90(symbol, df, dry_run)
 
 
-def run_live_scan(symbols: list[str], interval: int = SCAN_INTERVAL, dry_run: bool = False, once: bool = False):
-    """Main live scan loop."""
-    logger.info("=" * 60)
-    logger.info("🔱 CEREBUS NEURO-SYMBOLIC SCANNER — LIVE MT5")
-    logger.info("=" * 60)
-    logger.info(f"Symbols: {', '.join(symbols)}")
-    logger.info(f"Interval: {interval}s | Dry run: {dry_run}")
-    logger.info(f"Model: {MODEL_PATH.name}")
-    logger.info("")
-
-    # Initialize Guardian (sends startup message to Telegram)
+def run_live_scan(symbols, interval, dry_run, once, engine):
+    logger.info("="*60+"\n🔱 CEREBUS NEURO-SYMBOLIC SCANNER — LIVE MT5\n"+"="*60)
+    logger.info(f"Symbols: {', '.join(symbols)} | Engine: {engine} | Interval: {interval}s")
     config = GuardianConfig()
-    guardian = GuardianPipeline(
-        model_path=str(MODEL_PATH),
-        rag_store_path=str(RAG_STORE_PATH),
-        config=config,
-    )
-
+    guardian = GuardianPipeline(model_path=str(MODEL_PATH), rag_store_path=str(RAG_STORE_PATH), config=config)
     scan_count = 0
     try:
         while True:
             scan_count += 1
             logger.info(f"\n📊 Scan #{scan_count} — {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}")
-
-            for symbol in symbols:
-                try:
-                    scan_symbol(symbol, guardian, dry_run)
-                except Exception as e:
-                    logger.error(f"  Error scanning {symbol}: {e}")
-
+            for sym in symbols:
+                try: scan_symbol(sym, guardian, engine, dry_run)
+                except Exception as e: logger.error(f"  Error: {e}")
             if once:
-                logger.info("\nSingle scan complete. Exiting.")
-                break
-
+                logger.info("\nSingle scan complete."); break
             logger.info(f"\n⏳ Next scan in {interval}s... (Ctrl+C to stop)")
             time.sleep(interval)
-
     except KeyboardInterrupt:
-        logger.info("\n\n🛑 CEREBUS scanner stopped by user.")
-        logger.info(f"Total scans: {scan_count}")
+        logger.info(f"\n🛑 Stopped. Total scans: {scan_count}")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="CEREBUS Neuro-Symbolic Scanner — Live MT5")
-    parser.add_argument("--symbols", nargs="+", default=DEFAULT_SYMBOLS, help="Symbols to scan")
-    parser.add_argument("--interval", type=int, default=SCAN_INTERVAL, help="Scan interval in seconds")
-    parser.add_argument("--once", action="store_true", help="Single scan and exit")
-    parser.add_argument("--dry-run", action="store_true", help="Scan without sending Telegram alerts")
+    parser = argparse.ArgumentParser(description="CEREBUS Live MT5 Scanner")
+    parser.add_argument("--symbols", nargs="+", default=DEFAULT_SYMBOLS)
+    parser.add_argument("--interval", type=int, default=SCAN_INTERVAL)
+    parser.add_argument("--once", action="store_true")
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--engine", choices=["guardian","stp90","both"], default="both")
     args = parser.parse_args()
-
-    run_live_scan(args.symbols, args.interval, args.dry_run, args.once)
+    run_live_scan(args.symbols, args.interval, args.dry_run, args.once, args.engine)
