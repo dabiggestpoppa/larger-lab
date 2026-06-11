@@ -4,25 +4,35 @@ $venv = "C:\Users\wifik\Desktop\projects\larger-lab\.venv\Scripts\python.exe"
 $repo = "C:\Users\wifik\Desktop\projects\larger-lab"
 
 $services = @(
-    @{Name="OCE Backend"; Args=@("-m","oce.backend.main")},
-    @{Name="Telegram Gateway"; Args=@("scripts/telegram_gateway.py")},
-    @{Name="CEREBUS Live"; Args=@("quant-lab/ml/run_cerebus_live.py","--interval","300","--engine","both")},
-    @{Name="MLR Scanner"; Args=@("quant-lab/mlr_validation/mlr_scanner.py")},
-    @{Name="Signal Bot"; Args=@("scripts/signal_bot.py")}
+    @{Name="OCE";        Args=@("-m","oce.backend.main")},
+    @{Name="Telegram";   Args=@("scripts/telegram_gateway.py")},
+    @{Name="CEREBUS";    Args=@("quant-lab/ml/run_cerebus_live.py","--interval","300","--engine","both")},
+    @{Name="MLR";        Args=@("quant-lab/mlr_validation/mlr_scanner.py")},
+    @{Name="Signal";     Args=@("scripts/signal_bot.py")}
 )
 
+# Kill existing
+Get-Process python -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+Start-Sleep -Seconds 3
+
+# Start each
 $pids = @()
 foreach ($svc in $services) {
     Write-Host "Starting $($svc.Name)..."
     $proc = Start-Process -FilePath $venv -ArgumentList $svc.Args -WorkingDirectory $repo -WindowStyle Hidden -PassThru
-    $pids += $proc.Id
-    Write-Host "  PID: $($proc.Id)"
+    $pids += [PSCustomObject]@{Name=$svc.Name; PID=$proc.Id}
     Start-Sleep -Seconds 2
 }
 
-$pids | Set-Content "$repo\.scanner_pids.txt"
-Write-Host "`nAll $($services.Count) services started."
+# Save PIDs
+$pids | ConvertTo-Json | Set-Content "$repo\.scanner_pids.json"
+Write-Host "`nAll $($services.Count) scanners started."
 
-Start-Sleep -Seconds 3
-Write-Host "`nRunning processes:"
-Get-Process python -ErrorAction SilentlyContinue | Select-Object Id, ProcessName, @{N='CmdLine';E={(Get-CimInstance Win32_Process -Filter "ProcessId=$($_.Id)").CommandLine}} | Format-Table -AutoSize -Wrap
+# Verify after 5 seconds
+Start-Sleep -Seconds 5
+Write-Host "`nVerifying..."
+foreach ($p in $pids) {
+    $proc = Get-Process -Id $p.PID -ErrorAction SilentlyContinue
+    if ($proc) { Write-Host "  OK: $($p.Name) (PID $($p.PID))" }
+    else { Write-Host "  DEAD: $($p.Name) (PID $($p.PID))" }
+}

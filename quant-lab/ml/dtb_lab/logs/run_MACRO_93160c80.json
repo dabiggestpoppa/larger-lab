@@ -1,0 +1,60 @@
+{
+  "run_id": "93160c80",
+  "lens_type": "MACRO",
+  "timestamp": "2026-06-11T12:36:01.638826",
+  "elapsed_seconds": 44.6,
+  "phase": "attempt_1_macro",
+  "n_samples": 8344,
+  "n_features": 7,
+  "feature_cols": [
+    "mlr_range_pips",
+    "target_25_pips",
+    "target_50_pips",
+    "dist_to_132_pips",
+    "time_to_friday_hours",
+    "is_wednesday_pm",
+    "bias_encoded"
+  ],
+  "cv_scores": [
+    {
+      "fold": 1,
+      "mae": 5565458.86,
+      "r2": 0.5801
+    },
+    {
+      "fold": 2,
+      "mae": 283335.89,
+      "r2": -0.9494
+    },
+    {
+      "fold": 3,
+      "mae": 1341363.84,
+      "r2": -1.2185
+    },
+    {
+      "fold": 4,
+      "mae": 58445.82,
+      "r2": 0.1899
+    },
+    {
+      "fold": 5,
+      "mae": 204670.06,
+      "r2": -0.0657
+    }
+  ],
+  "avg_mae": 1490654.89,
+  "avg_r2": -0.2927,
+  "feature_importance": {
+    "mlr_range_pips": 0.5151535868644714,
+    "target_25_pips": 0.05218246579170227,
+    "target_50_pips": 0.10580625385046005,
+    "dist_to_132_pips": 0.26299789547920227,
+    "time_to_friday_hours": 0.0,
+    "is_wednesday_pm": 0.019255835562944412,
+    "bias_encoded": 0.0446038655936718
+  },
+  "hit_25_rate": 0.9479,
+  "hit_50_rate": 0.9065,
+  "hit_132_rate": 0.6989,
+  "model_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\dtb_lab\\attempt_1_macro\\macro_xgb_93160c80.joblib"
+}
