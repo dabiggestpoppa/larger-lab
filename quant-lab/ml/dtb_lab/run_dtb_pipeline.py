@@ -1,25 +1,15 @@
 """
-DTB (Distribution to Boundary) Temporal-Spatial Testing Protocol
-===================================================================
-Predicts Notional Distribution (Nominal Size) constrained by Time.
-NOT predicting price direction — predicting how much distribution
-the market can physically produce given time remaining.
-
-Phases:
-0. Environment setup + logging
-1. Macro MLR Lens (Weekly distribution)
-2. Micro Atomic Lens (Daily session distribution)
-3. Merge Unified BVP (Cross-timeframe causality)
+DTB v2 — Distribution to Boundary Variance Compression Engine
+=============================================================
+Predicts Remaining Notional Distribution at temporal checkpoints.
+Time is the independent variable — it compresses variance as it advances.
 
 Key equation: N = aR × Φ_T × Ψ_R × Ω_L × Δ_t
-Where:
-  aR = Asian Range (initial deficit)
-  Φ_T = Tier expansion coefficient
-  Ψ_R = Regime efficiency (9AM checkpoint)
-  Ω_L = Loop Realization Ratio (L_actual / L_theoretical)
-  Δ_t = Temporal Decay (logistic decay to 0 at 12PM EST)
 
-OPTIMIZED: Vectorized groupby operations, log-transform targets, FX-only symbols.
+Three fixes vs v1:
+  1. Proper vectorized loop detection (impulse-rebalance cycles)
+  2. Δ_t sample weighting in XGBoost (time compresses learning)
+  3. Multi-checkpoint trajectory labels (T0=3AM, T1=6AM, T2=9AM, T3=10:30AM)
 """
 from __future__ import annotations
 
@@ -44,18 +34,16 @@ warnings.filterwarnings("ignore")
 # PATHS
 # ============================================================
 LAB_DIR = Path(__file__).parent
-DATA_DIR = LAB_DIR / "data"
 ATTEMPT1_DIR = LAB_DIR / "attempt_1_macro"
 ATTEMPT2_DIR = LAB_DIR / "attempt_2_micro"
 MERGE_DIR = LAB_DIR / "merge_unified"
 LOGS_DIR = LAB_DIR / "logs"
 
-for d in [DATA_DIR, ATTEMPT1_DIR, ATTEMPT2_DIR, MERGE_DIR, LOGS_DIR]:
+for d in [ATTEMPT1_DIR, ATTEMPT2_DIR, MERGE_DIR, LOGS_DIR]:
     d.mkdir(parents=True, exist_ok=True)
 
 RAW_DATA_DIR = Path("quant-lab/data")
 
-# Only FX pairs (skip crypto/indices for session-based analysis)
 FX_SYMBOLS = [
     "EURUSD", "GBPUSD", "USDJPY", "USDCHF", "USDCAD", "AUDUSD", "NZDUSD",
     "EURGBP", "EURJPY", "EURCHF", "EURAUD", "EURNZD", "EURCAD",
@@ -65,9 +53,23 @@ FX_SYMBOLS = [
     "CADJPY", "CADCHF", "CHFJPY",
 ]
 
+# Checkpoint definitions (EST hours → UTC hours)
+# T0 = 3AM EST = 8AM UTC (Asian Range close / London open)
+# T1 = 6AM EST = 11AM UTC (65% checkpoint)
+# T2 = 9AM EST = 14AM UTC (Regime lock)
+# T3 = 10:30AM EST = 15:30 UTC (Temporal decay phase)
+# SINK = 12PM EST = 17PM UTC (Hard exit)
+CHECKPOINTS = {
+    "T0": 8,   # 3AM EST
+    "T1": 11,  # 6AM EST
+    "T2": 14,  # 9AM EST
+    "T3": 15,  # 10:30AM EST (15:30 UTC)
+}
+SINK_HOUR_UTC = 17  # 12PM EST
+
 
 # ============================================================
-# PHASE 0: RUN LOGGER
+# RUN LOGGER
 # ============================================================
 
 class RunLogger:
@@ -91,8 +93,6 @@ class RunLogger:
         }
         path = LOGS_DIR / f"run_{self.lens_type}_{self.run_id}.json"
         path.write_text(json.dumps(manifest, indent=2, default=str))
-        if model_path:
-            manifest["model_path"] = str(model_path)
         print(f"  ✓ Run logged: {path.name}")
         return manifest
 
@@ -116,14 +116,8 @@ def load_m5_data(symbol: str) -> pd.DataFrame:
         cl = c.lower().strip()
         if cl in ("date", "datetime", "time", "timestamp"):
             col_map[c] = "dt"
-        elif cl == "open":
-            col_map[c] = "open"
-        elif cl == "high":
-            col_map[c] = "high"
-        elif cl == "low":
-            col_map[c] = "low"
-        elif cl == "close":
-            col_map[c] = "close"
+        elif cl in ("open", "high", "low", "close"):
+            col_map[c] = cl
         elif cl in ("volume", "vol", "tick_volume", "tickvol"):
             col_map[c] = "volume"
     df = df.rename(columns=col_map)
@@ -151,7 +145,6 @@ def load_all_symbols() -> Dict[str, pd.DataFrame]:
 # ============================================================
 
 def classify_tier(ar_pips: float) -> Tuple[str, float, int]:
-    """Return (tier, au, loop_dur)."""
     if ar_pips < 20:
         return "T1", ar_pips * 0.5, 52
     elif ar_pips < 30:
@@ -175,10 +168,96 @@ def compute_regime(am_range: float, ar: float) -> Tuple[str, float]:
 
 
 def temporal_decay(minutes_to_exit: float) -> float:
+    """Logistic decay — approaches 0 as time approaches 12PM."""
     if minutes_to_exit <= 0:
         return 0.0
     k = 0.015
     return 1.0 / (1.0 + np.exp(-k * (minutes_to_exit - 120)))
+
+
+def pips_to_dollars(pips: float, symbol: str) -> float:
+    """Convert pips to approximate dollar value per standard lot."""
+    if "JPY" in symbol:
+        return pips * 1000 / 100  # 1 pip = 0.01 JPY
+    elif "XAU" in symbol:
+        return pips * 10  # 1 pip = $0.10
+    elif "XAG" in symbol:
+        return pips * 50  # 1 pip = $0.05
+    else:
+        return pips * 10  # 1 pip = $0.10 for standard FX
+
+
+# ============================================================
+# FIX #1: PROPER VECTORIZED LOOP DETECTION
+# ============================================================
+
+def count_loops_vectorized(high: np.ndarray, low: np.ndarray,
+                           close: np.ndarray, ah: float, al: float) -> int:
+    """
+    Count impulse-rebalance cycles using vectorized numpy.
+
+    A loop = price impulses above Asian High (or below Asian Low),
+    then retraces 32-50% of the impulse range.
+
+    Vectorized approach: find all impulse start points, then for each
+    compute running max and retrace using cumulative operations.
+    """
+    if len(high) == 0 or ah <= 0:
+        return 0
+
+    n = len(high)
+
+    # Find impulse start points: first bar above AH after not being above
+    above_ah = high > ah
+    if not above_ah.any():
+        # Check for bearish impulses below AL
+        below_al = low < al
+        if not below_al.any():
+            return 0
+        # Bearish impulse logic
+        impulse_starts = np.where(below_al & ~np.roll(below_al, 1))[0]
+        impulse_starts = impulse_starts[impulse_starts > 0]
+        if len(impulse_starts) == 0:
+            return 0
+
+        count = 0
+        for start in impulse_starts:
+            seg_low = low[start:]
+            seg_close = close[start:]
+            running_min = np.minimum.accumulate(seg_low)
+            impulse_range = ah - running_min  # Distance from AH to running low
+            valid = impulse_range > 0
+            if not valid.any():
+                continue
+            # Retrace = how much price recovered from the low
+            retrace = (seg_close[valid] - running_min[valid]) / impulse_range[valid]
+            retrace_bars = np.where((retrace >= 0.32) & (retrace <= 0.50))[0]
+            if len(retrace_bars) > 0:
+                count += 1
+        return count
+
+    # Bullish impulse logic
+    impulse_starts = np.where(above_ah & ~np.roll(above_ah, 1))[0]
+    impulse_starts = impulse_starts[impulse_starts > 0]
+    if len(impulse_starts) == 0:
+        return 0
+
+    count = 0
+    for start in impulse_starts:
+        seg_high = high[start:]
+        seg_close = close[start:]
+        running_max = np.maximum.accumulate(seg_high)
+        impulse_range = running_max - ah  # Distance from AH to running high
+        valid = impulse_range > 0
+        if not valid.any():
+            continue
+        # Retrace = how much price dropped from the high
+        retrace = (running_max[valid] - seg_close[valid]) / impulse_range[valid]
+        retrace_bars = np.where((retrace >= 0.32) & (retrace <= 0.50))[0]
+        if len(retrace_bars) > 0:
+            count += 1
+
+    return count
 
 
 # ============================================================
@@ -279,7 +358,6 @@ def run_attempt1(symbols: Dict[str, pd.DataFrame]) -> dict:
     data["bias_encoded"] = (data["bias"] == "BULLISH").astype(int)
     feature_cols.append("bias_encoded")
 
-    # Log-transform target
     data["target_log"] = np.log1p(data["weekly_distribution_pips"])
 
     X = data[feature_cols].values
@@ -325,48 +403,30 @@ def run_attempt1(symbols: Dict[str, pd.DataFrame]) -> dict:
     hit_25_rate = data["hit_25"].mean()
     hit_50_rate = data["hit_50"].mean()
     hit_132_rate = data["hit_132"].mean()
-    print(f"\n  Hit Rates:")
-    print(f"    -25% target: {hit_25_rate:.1%}")
-    print(f"    -50% target: {hit_50_rate:.1%}")
-    print(f"    132% kill-switch: {hit_132_rate:.1%}")
+    print(f"\n  Hit Rates: -25%={hit_25_rate:.1%}, -50%={hit_50_rate:.1%}, 132%={hit_132_rate:.1%}")
 
     avg_mae = np.mean([s["mae"] for s in cv_scores])
     avg_r2 = np.mean([s["r2"] for s in cv_scores])
 
-    logger.log(
-        phase="attempt_1_macro",
-        n_samples=len(data),
-        n_features=len(feature_cols),
-        feature_cols=feature_cols,
-        cv_scores=cv_scores,
-        avg_mae=round(avg_mae, 2),
-        avg_r2=round(avg_r2, 4),
-        feature_importance=importance,
-        hit_25_rate=round(hit_25_rate, 4),
-        hit_50_rate=round(hit_50_rate, 4),
-        hit_132_rate=round(hit_132_rate, 4),
-        model_path=str(model_path),
-    )
+    logger.log(phase="attempt_1_macro", n_samples=len(data), n_features=len(feature_cols),
+               feature_cols=feature_cols, cv_scores=cv_scores,
+               avg_mae=round(avg_mae, 2), avg_r2=round(avg_r2, 4),
+               feature_importance=importance, model_path=str(model_path))
     logger.save(model_path)
 
-    return {
-        "data": data,
-        "model": final_model,
-        "cv_scores": cv_scores,
-        "avg_mae": avg_mae,
-        "avg_r2": avg_r2,
-        "importance": importance,
-    }
+    return {"data": data, "model": final_model, "cv_scores": cv_scores,
+            "avg_mae": avg_mae, "avg_r2": avg_r2, "importance": importance}
 
 
 # ============================================================
-# PHASE 2: MICRO ATOMIC LENS
+# PHASE 2: MICRO ATOMIC LENS — WITH FIXES #1, #2, #3
 # ============================================================
 
-def build_micro_features(df: pd.DataFrame, symbol: str) -> pd.DataFrame:
+def build_micro_features_v2(df: pd.DataFrame, symbol: str) -> pd.DataFrame:
     """
-    Build Micro Atomic Lens features — VECTORIZED.
-    No bar-by-bar iteration. Uses groupby aggregates.
+    Build Micro Atomic Lens features with:
+    - FIX #1: Proper vectorized loop detection
+    - FIX #3: Multi-checkpoint trajectory labels (T0-T3)
     """
     records = []
     df = df.copy()
@@ -374,7 +434,7 @@ def build_micro_features(df: pd.DataFrame, symbol: str) -> pd.DataFrame:
     df["is_asian"] = (df["est_hour"] >= 19) | (df["est_hour"] < 3)
     df["trade_date"] = df.index.date
 
-    # Pre-compute daily aggregates via groupby (fast)
+    # Pre-compute daily aggregates
     daily_groups = df.groupby("trade_date")
     daily_high = daily_groups["high"].max()
     daily_low = daily_groups["low"].min()
@@ -398,18 +458,14 @@ def build_micro_features(df: pd.DataFrame, symbol: str) -> pd.DataFrame:
     else:
         am_range = pd.Series(0.0, index=daily_high.index)
 
-    # Build a clean DataFrame indexed by trade_date
+    # Build day DataFrame
     day_df = pd.DataFrame({
-        "daily_high": daily_high,
-        "daily_low": daily_low,
-        "daily_dist": daily_dist,
-        "asian_high": asian_high,
-        "asian_low": asian_low,
-        "asian_range": asian_range,
+        "daily_high": daily_high, "daily_low": daily_low, "daily_dist": daily_dist,
+        "asian_high": asian_high, "asian_low": asian_low, "asian_range": asian_range,
     })
     day_df["am_range"] = am_range.reindex(day_df.index, fill_value=0.0)
 
-    # First bar metadata per day
+    # First bar metadata
     first_ts = daily_groups.apply(lambda x: x.index[0])
     day_df["first_ts"] = first_ts.reindex(day_df.index)
     day_df = day_df.dropna(subset=["first_ts"])
@@ -429,34 +485,45 @@ def build_micro_features(df: pd.DataFrame, symbol: str) -> pd.DataFrame:
     day_df["tier"] = tier_results.apply(lambda x: x[0])
     day_df["au"] = tier_results.apply(lambda x: x[1])
     day_df["loop_dur"] = tier_results.apply(lambda x: x[2])
-
     day_df["au_pips"] = day_df["au"] * 10000
+
     day_df["regime_ratio"] = np.where(
         day_df["asian_range"] > 0,
-        day_df["am_range"] / day_df["asian_range"], 0.0
-    )
+        day_df["am_range"] / day_df["asian_range"], 0.0)
     day_df["regime"] = day_df["regime_ratio"].apply(
-        lambda r: "CONFIRMED" if r >= 1.5 else ("CAUTION" if r >= 1.0 else "FAILED")
-    )
+        lambda r: "CONFIRMED" if r >= 1.5 else ("CAUTION" if r >= 1.0 else "FAILED"))
 
     day_df["l_theoretical"] = np.where(
         day_df["loop_dur"] < 999,
-        np.maximum(0.0, day_df["mins_to_12pm"] / day_df["loop_dur"]),
-        0.0
-    )
+        np.maximum(0.0, day_df["mins_to_12pm"] / day_df["loop_dur"]), 0.0)
 
-    # Simplified L_actual
-    day_df["l_actual"] = np.where(
-        (day_df["au_pips"] > 0) & (day_df["l_theoretical"] > 0),
-        np.minimum(ar_pips / day_df["au_pips"], (day_df["l_theoretical"] * 2).astype(int)),
-        0
-    ).astype(int)
+    # Pre-compute day groups once (avoid repeated full-DataFrame filtering)
+    day_grouped = {date: group for date, group in df.groupby("trade_date")}
 
+    # FIX #1: Proper vectorized loop detection per day
+    loop_counts = []
+    for date in day_df.index:
+        day_bars = day_grouped.get(date)
+        if day_bars is None or len(day_bars) < 10:
+            loop_counts.append(0)
+            continue
+        ah_val = day_df.loc[date, "asian_high"]
+        al_val = day_df.loc[date, "asian_low"]
+        h = day_bars["high"].values
+        l = day_bars["low"].values
+        c = day_bars["close"].values
+        try:
+            loops = count_loops_vectorized(h, l, c, ah_val, al_val)
+        except Exception:
+            loops = 0
+        loop_counts.append(loops)
+
+    day_df["l_actual"] = loop_counts
     day_df["omega_l"] = np.where(
         day_df["l_theoretical"] > 0,
-        day_df["l_actual"] / day_df["l_theoretical"], 0.0
-    )
+        day_df["l_actual"] / day_df["l_theoretical"], 0.0)
 
+    # FIX #2: Δ_t sample weight
     day_df["delta_t"] = day_df["mins_to_12pm"].apply(temporal_decay)
 
     # Entropy triggers
@@ -470,10 +537,29 @@ def build_micro_features(df: pd.DataFrame, symbol: str) -> pd.DataFrame:
 
     day_df["is_wed_pm"] = (day_df["is_wed"]) & (day_df["est_hour"] >= 12)
 
-    # Build output
-    records = []
+    # FIX #3: Multi-checkpoint trajectory labels
+    # Pre-compute total daily range and checkpoint remaining ranges
+    total_daily_ranges = {}
+    checkpoint_ranges = {cp: {} for cp in CHECKPOINTS}
+    for date, day_bars in day_grouped.items():
+        if len(day_bars) == 0:
+            continue
+        total_daily_ranges[date] = (day_bars["high"].max() - day_bars["low"].min()) * 10000
+        for cp_name, cp_hour_utc in CHECKPOINTS.items():
+            cp_bars = day_bars[day_bars.index.hour >= cp_hour_utc]
+            if len(cp_bars) > 0:
+                checkpoint_ranges[cp_name][date] = (cp_bars["high"].max() - cp_bars["low"].min()) * 10000
+            else:
+                checkpoint_ranges[cp_name][date] = 0.0
+
+    for date in day_df.index:
+        day_df.loc[date, "total_daily_pips"] = total_daily_ranges.get(date, 0.0)
+        for cp_name in CHECKPOINTS:
+            day_df.loc[date, f"remaining_{cp_name}_pips"] = checkpoint_ranges[cp_name].get(date, 0.0)
+
+    # Build output records
     for date, row in day_df.iterrows():
-        records.append({
+        rec = {
             "symbol": symbol,
             "date": str(date),
             "asian_range_pips": round(row["asian_range"] * 10000, 2),
@@ -487,11 +573,18 @@ def build_micro_features(df: pd.DataFrame, symbol: str) -> pd.DataFrame:
             "L_actual": int(row["l_actual"]),
             "Omega_L": round(row["omega_l"], 3),
             "Delta_t": round(row["delta_t"], 4),
+            "delta_t_weight": round(row["delta_t"], 4),  # For XGBoost sample_weight
             "entropy_trigger": row["entropy_trigger"],
             "is_wednesday_pm": int(row["is_wed_pm"]),
             "day_of_week": int(row["dow"]),
             "daily_distribution_pips": round(row["daily_dist"] * 10000, 2),
-        })
+            "total_daily_pips": round(row["total_daily_pips"], 2),
+        }
+        # Add checkpoint labels
+        for cp_name in CHECKPOINTS:
+            rec[f"remaining_{cp_name}_pips"] = round(row[f"remaining_{cp_name}_pips"], 2)
+
+        records.append(rec)
 
     return pd.DataFrame(records)
 
@@ -499,13 +592,13 @@ def build_micro_features(df: pd.DataFrame, symbol: str) -> pd.DataFrame:
 def run_attempt2(symbols: Dict[str, pd.DataFrame]) -> dict:
     logger = RunLogger("MICRO")
     print("\n" + "=" * 70)
-    print("PHASE 2: ATTEMPT 2 — MICRO ATOMIC LENS")
+    print("PHASE 2: ATTEMPT 2 — MICRO ATOMIC LENS (v2: loops + Δ_t + checkpoints)")
     print("=" * 70)
 
     all_records = []
     for sym, df in symbols.items():
         try:
-            feats = build_micro_features(df, sym)
+            feats = build_micro_features_v2(df, sym)
             if len(feats) > 0:
                 all_records.append(feats)
                 print(f"  {sym}: {len(feats)} days")
@@ -543,19 +636,25 @@ def run_attempt2(symbols: Dict[str, pd.DataFrame]) -> dict:
     X = data[feature_cols].values
     y = data["target_log"].values
 
+    # FIX #2: Δ_t sample weighting
+    sample_weights = data["delta_t_weight"].values
+    # Ensure minimum weight so zero-delta samples don't get ignored
+    sample_weights = np.maximum(sample_weights, 0.01)
+
     tscv = TimeSeriesSplit(n_splits=5)
     cv_scores = []
 
     for fold, (train_idx, test_idx) in enumerate(tscv.split(X)):
         X_train, X_test = X[train_idx], X[test_idx]
         y_train, y_test = y[train_idx], y[test_idx]
+        w_train = sample_weights[train_idx]
 
         model = xgb.XGBRegressor(
             n_estimators=200, max_depth=5, learning_rate=0.05,
             subsample=0.8, colsample_bytree=0.8, min_child_weight=3,
             reg_alpha=0.1, reg_lambda=1.0, random_state=42, n_jobs=-1,
         )
-        model.fit(X_train, y_train, verbose=False)
+        model.fit(X_train, y_train, sample_weight=w_train, verbose=False)
 
         y_pred = np.expm1(model.predict(X_test))
         y_actual = np.expm1(y_test)
@@ -569,7 +668,7 @@ def run_attempt2(symbols: Dict[str, pd.DataFrame]) -> dict:
         subsample=0.8, colsample_bytree=0.8, min_child_weight=3,
         reg_alpha=0.1, reg_lambda=1.0, random_state=42, n_jobs=-1,
     )
-    final_model.fit(X, y)
+    final_model.fit(X, y, sample_weight=sample_weights)
 
     importance = dict(zip(feature_cols, final_model.feature_importances_.tolist()))
     sorted_imp = sorted(importance.items(), key=lambda x: x[1], reverse=True)
@@ -579,7 +678,7 @@ def run_attempt2(symbols: Dict[str, pd.DataFrame]) -> dict:
 
     top3 = [f[0] for f in sorted_imp[:3]]
     physics_pass = all(f in top3 for f in ["time_to_12pm_mins", "Omega_L", "asian_range_pips"])
-    print(f"\n  SHAP Physics Check: {'PASS ✓' if physics_pass else 'FAIL ✗'}")
+    print(f"\n  SHAP Physics Check: {'PASS' if physics_pass else 'FAIL'}")
     print(f"    Top 3 features: {top3}")
 
     model_path = ATTEMPT2_DIR / f"micro_xgb_{logger.run_id}.joblib"
@@ -596,32 +695,33 @@ def run_attempt2(symbols: Dict[str, pd.DataFrame]) -> dict:
         print(f"    Late session (<30m): {late_dist:.1f} pips avg")
         print(f"    Decay ratio: {late_dist/max(early_dist, 0.01):.1%}")
 
+    # Checkpoint label stats
+    print(f"\n  Checkpoint Remaining Distribution (avg pips):")
+    for cp_name in CHECKPOINTS:
+        col = f"remaining_{cp_name}_pips"
+        if col in data.columns:
+            print(f"    {cp_name}: {data[col].mean():.1f} pips")
+
+    # L_actual stats
+    print(f"\n  L_actual stats: mean={data['L_actual'].mean():.2f}, "
+          f"max={data['L_actual'].max()}, non-zero={data['L_actual'].gt(0).sum()}")
+    print(f"  Omega_L stats: mean={data['Omega_L'].mean():.3f}, "
+          f"max={data['Omega_L'].max():}")
+    print(f"  Delta_t weight stats: mean={sample_weights.mean():.4f}, "
+          f"min={sample_weights.min():.4f}, max={sample_weights.max():.4f}")
+
     avg_mae = np.mean([s["mae"] for s in cv_scores])
     avg_r2 = np.mean([s["r2"] for s in cv_scores])
 
-    logger.log(
-        phase="attempt_2_micro",
-        n_samples=len(data),
-        n_features=len(feature_cols),
-        feature_cols=feature_cols,
-        cv_scores=cv_scores,
-        avg_mae=round(avg_mae, 2),
-        avg_r2=round(avg_r2, 4),
-        feature_importance=importance,
-        shap_physics_check=physics_pass,
-        top_3_shap=top3,
-        model_path=str(model_path),
-    )
+    logger.log(phase="attempt_2_micro", n_samples=len(data), n_features=len(feature_cols),
+               feature_cols=feature_cols, cv_scores=cv_scores,
+               avg_mae=round(avg_mae, 2), avg_r2=round(avg_r2, 4),
+               feature_importance=importance, shap_physics_check=physics_pass,
+               top_3_shap=top3, model_path=str(model_path))
     logger.save(model_path)
 
-    return {
-        "data": data,
-        "model": final_model,
-        "cv_scores": cv_scores,
-        "avg_mae": avg_mae,
-        "avg_r2": avg_r2,
-        "importance": importance,
-    }
+    return {"data": data, "model": final_model, "cv_scores": cv_scores,
+            "avg_mae": avg_mae, "avg_r2": avg_r2, "importance": importance}
 
 
 # ============================================================
@@ -639,17 +739,14 @@ def run_merge(data_macro: pd.DataFrame, data_micro: pd.DataFrame,
 
     if "week_key" in data_macro.columns:
         macro_agg = data_macro.groupby("symbol").agg({
-            "mlr_range_pips": "mean",
-            "hit_25": "mean",
-            "hit_50": "mean",
-            "hit_132": "mean",
+            "mlr_range_pips": "mean", "hit_25": "mean",
+            "hit_50": "mean", "hit_132": "mean",
         }).reset_index()
         merged = merged.merge(macro_agg, on="symbol", how="left", suffixes=("", "_macro"))
 
     if "hit_25" in merged.columns:
         merged["micro_macro_alignment"] = (
-            (merged["regime"] == "CONFIRMED") & (merged["hit_25"] > 0.5)
-        ).astype(int)
+            (merged["regime"] == "CONFIRMED") & (merged["hit_25"] > 0.5)).astype(int)
 
     feature_cols = ["asian_range_pips", "au_pips", "regime_ratio",
                     "time_to_12pm_mins", "L_theoretical", "L_actual",
@@ -658,13 +755,19 @@ def run_merge(data_macro: pd.DataFrame, data_micro: pd.DataFrame,
     for extra in ["mlr_range_pips", "hit_25", "hit_50", "micro_macro_alignment"]:
         if extra in merged.columns:
             feature_cols.append(extra)
-
     feature_cols = [c for c in feature_cols if c in merged.columns]
 
     merged["target_log"] = np.log1p(merged["daily_distribution_pips"])
 
     X = merged[feature_cols].values
     y = merged["target_log"].values
+
+    # Δ_t weighting for merge too
+    if "delta_t_weight" in merged.columns:
+        sample_weights = merged["delta_t_weight"].values
+        sample_weights = np.maximum(sample_weights, 0.01)
+    else:
+        sample_weights = None
 
     tscv = TimeSeriesSplit(n_splits=5)
     cv_scores = []
@@ -678,7 +781,10 @@ def run_merge(data_macro: pd.DataFrame, data_micro: pd.DataFrame,
             subsample=0.8, colsample_bytree=0.8, min_child_weight=3,
             reg_alpha=0.1, reg_lambda=1.0, random_state=42, n_jobs=-1,
         )
-        model.fit(X_train, y_train, verbose=False)
+        if sample_weights is not None:
+            model.fit(X_train, y_train, sample_weight=sample_weights[train_idx], verbose=False)
+        else:
+            model.fit(X_train, y_train, verbose=False)
 
         y_pred = np.expm1(model.predict(X_test))
         y_actual = np.expm1(y_test)
@@ -692,7 +798,10 @@ def run_merge(data_macro: pd.DataFrame, data_micro: pd.DataFrame,
         subsample=0.8, colsample_bytree=0.8, min_child_weight=3,
         reg_alpha=0.1, reg_lambda=1.0, random_state=42, n_jobs=-1,
     )
-    final_model.fit(X, y)
+    if sample_weights is not None:
+        final_model.fit(X, y, sample_weight=sample_weights)
+    else:
+        final_model.fit(X, y)
 
     importance = dict(zip(feature_cols, final_model.feature_importances_.tolist()))
     sorted_imp = sorted(importance.items(), key=lambda x: x[1], reverse=True)
@@ -706,27 +815,14 @@ def run_merge(data_macro: pd.DataFrame, data_micro: pd.DataFrame,
     avg_mae = np.mean([s["mae"] for s in cv_scores])
     avg_r2 = np.mean([s["r2"] for s in cv_scores])
 
-    logger.log(
-        phase="merge_unified",
-        n_samples=len(merged),
-        n_features=len(feature_cols),
-        feature_cols=feature_cols,
-        cv_scores=cv_scores,
-        avg_mae=round(avg_mae, 2),
-        avg_r2=round(avg_r2, 4),
-        feature_importance=importance,
-        model_path=str(model_path),
-    )
+    logger.log(phase="merge_unified", n_samples=len(merged), n_features=len(feature_cols),
+               feature_cols=feature_cols, cv_scores=cv_scores,
+               avg_mae=round(avg_mae, 2), avg_r2=round(avg_r2, 4),
+               feature_importance=importance, model_path=str(model_path))
     logger.save(model_path)
 
-    return {
-        "data": merged,
-        "model": final_model,
-        "cv_scores": cv_scores,
-        "avg_mae": avg_mae,
-        "avg_r2": avg_r2,
-        "importance": importance,
-    }
+    return {"data": merged, "model": final_model, "cv_scores": cv_scores,
+            "avg_mae": avg_mae, "avg_r2": avg_r2, "importance": importance}
 
 
 # ============================================================
@@ -735,9 +831,9 @@ def run_merge(data_macro: pd.DataFrame, data_micro: pd.DataFrame,
 
 def generate_master_report(results: dict):
     report = []
-    report.append("# CEREBUS DTB LAB — MASTER REPORT")
+    report.append("# CEREBUS DTB LAB v2 — MASTER REPORT")
     report.append(f"\n**Generated:** {datetime.now().isoformat()}")
-    report.append(f"\n**Total combinations scanned:** 101 firms × 54 pairs = 5,454")
+    report.append(f"\n**Fixes applied:** Vectorized loop detection, Δ_t sample weighting, checkpoint labels")
 
     for phase_name, phase_key in [("Phase 1: Macro MLR Lens", "attempt_1"),
                                     ("Phase 2: Micro Atomic Lens", "attempt_2"),
@@ -756,8 +852,8 @@ def generate_master_report(results: dict):
 
     report_text = "\n".join(report)
     report_path = LAB_DIR / "MASTER_LAB_REPORT.md"
-    report_path.write_text(report_text)
-    print(f"\n  ✓ Master report saved: {report_path}")
+    report_path.write_text(report_text, encoding="utf-8")
+    print(f"\n  Master report saved: {report_path}")
     return report_text
 
 
@@ -767,49 +863,40 @@ def generate_master_report(results: dict):
 
 def main():
     print("=" * 70)
-    print("CEREBUS DTB — DISTRIBUTION TO BOUNDARY TEMPORAL-SPATIAL PROTOCOL")
+    print("CEREBUS DTB v2 — VARIANCE COMPRESSION ENGINE")
     print("=" * 70)
+    print("\nFixes: vectorized loops + dt weighting + checkpoint labels")
 
     print("\n[DATA] Loading M5 data...")
     symbols = load_all_symbols()
-
     if not symbols:
         print("ERROR: No M5 data found!")
         return
 
-    print("\n[PHASE 1] Building Macro MLR features...")
+    print("\n[PHASE 1] Macro MLR Lens...")
     result1 = run_attempt1(symbols)
 
-    print("\n[PHASE 2] Building Micro Atomic features...")
+    print("\n[PHASE 2] Micro Atomic Lens (v2)...")
     result2 = run_attempt2(symbols)
 
-    print("\n[PHASE 3] Merging into Unified BVP...")
+    print("\n[PHASE 3] Merge Unified BVP...")
     if result1 and result2:
         result3 = run_merge(
             result1.get("data", pd.DataFrame()),
             result2.get("data", pd.DataFrame()),
-            result1.get("model"),
-            result2.get("model"),
+            result1.get("model"), result2.get("model"),
         )
     else:
         result3 = {}
         print("  SKIP: Missing phase 1 or 2 results")
 
     print("\n[REPORT] Generating master lab report...")
-    all_results = {
-        "attempt_1": result1,
-        "attempt_2": result2,
-        "merge": result3,
-    }
-    report = generate_master_report(all_results)
+    all_results = {"attempt_1": result1, "attempt_2": result2, "merge": result3}
+    generate_master_report(all_results)
 
     print("\n" + "=" * 70)
-    print("DTB LAB COMPLETE")
+    print("DTB v2 LAB COMPLETE")
     print("=" * 70)
-    print(f"\nResults saved to: {LAB_DIR}")
-    print(f"Models: {ATTEMPT1_DIR}, {ATTEMPT2_DIR}, {MERGE_DIR}")
-    print(f"Logs: {LOGS_DIR}")
-    print(f"Report: {LAB_DIR / 'MASTER_LAB_REPORT.md'}")
 
 
 if __name__ == "__main__":

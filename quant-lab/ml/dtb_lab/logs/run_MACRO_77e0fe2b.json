@@ -1,0 +1,57 @@
+{
+  "run_id": "77e0fe2b",
+  "lens_type": "MACRO",
+  "timestamp": "2026-06-11T13:11:34.923169",
+  "elapsed_seconds": 29.8,
+  "phase": "attempt_1_macro",
+  "n_samples": 6062,
+  "n_features": 7,
+  "feature_cols": [
+    "mlr_range_pips",
+    "target_25_pips",
+    "target_50_pips",
+    "dist_to_132_pips",
+    "time_to_friday_hours",
+    "is_wednesday_pm",
+    "bias_encoded"
+  ],
+  "cv_scores": [
+    {
+      "fold": 1,
+      "mae": 2478.14,
+      "r2": 0.8121
+    },
+    {
+      "fold": 2,
+      "mae": 2552.46,
+      "r2": 0.7594
+    },
+    {
+      "fold": 3,
+      "mae": 2086.75,
+      "r2": 0.7629
+    },
+    {
+      "fold": 4,
+      "mae": 1764.64,
+      "r2": 0.7561
+    },
+    {
+      "fold": 5,
+      "mae": 3403.82,
+      "r2": 0.786
+    }
+  ],
+  "avg_mae": 2457.16,
+  "avg_r2": 0.7753,
+  "feature_importance": {
+    "mlr_range_pips": 0.48840099573135376,
+    "target_25_pips": 0.10392635315656662,
+    "target_50_pips": 0.22195862233638763,
+    "dist_to_132_pips": 0.18057970702648163,
+    "time_to_friday_hours": 0.0,
+    "is_wednesday_pm": 0.0028198992367833853,
+    "bias_encoded": 0.002314353594556451
+  },
+  "model_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\dtb_lab\\attempt_1_macro\\macro_xgb_77e0fe2b.joblib"
+}

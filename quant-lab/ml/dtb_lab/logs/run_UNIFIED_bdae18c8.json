@@ -1,0 +1,71 @@
+{
+  "run_id": "bdae18c8",
+  "lens_type": "UNIFIED",
+  "timestamp": "2026-06-11T13:17:57.233597",
+  "elapsed_seconds": 2.0,
+  "phase": "merge_unified",
+  "n_samples": 15570,
+  "n_features": 14,
+  "feature_cols": [
+    "asian_range_pips",
+    "au_pips",
+    "regime_ratio",
+    "time_to_12pm_mins",
+    "L_theoretical",
+    "L_actual",
+    "Omega_L",
+    "Delta_t",
+    "is_wednesday_pm",
+    "day_of_week",
+    "mlr_range_pips",
+    "hit_25",
+    "hit_50",
+    "micro_macro_alignment"
+  ],
+  "cv_scores": [
+    {
+      "fold": 1,
+      "mae": 20.04,
+      "r2": 0.0885
+    },
+    {
+      "fold": 2,
+      "mae": 16.43,
+      "r2": 0.4963
+    },
+    {
+      "fold": 3,
+      "mae": 18.43,
+      "r2": 0.4249
+    },
+    {
+      "fold": 4,
+      "mae": 14.6,
+      "r2": 0.2425
+    },
+    {
+      "fold": 5,
+      "mae": 12.76,
+      "r2": 0.4052
+    }
+  ],
+  "avg_mae": 16.45,
+  "avg_r2": 0.3315,
+  "feature_importance": {
+    "asian_range_pips": 0.12187287211418152,
+    "au_pips": 0.15503829717636108,
+    "regime_ratio": 0.07990112155675888,
+    "time_to_12pm_mins": 0.0687166154384613,
+    "L_theoretical": 0.010250897146761417,
+    "L_actual": 0.05222760885953903,
+    "Omega_L": 0.056320976465940475,
+    "Delta_t": 0.0,
+    "is_wednesday_pm": 0.01495075598359108,
+    "day_of_week": 0.021580452099442482,
+    "mlr_range_pips": 0.2771925628185272,
+    "hit_25": 0.05036425217986107,
+    "hit_50": 0.023997623473405838,
+    "micro_macro_alignment": 0.06758595257997513
+  },
+  "model_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\dtb_lab\\merge_unified\\unified_xgb_bdae18c8.joblib"
+}
