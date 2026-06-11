@@ -122,6 +122,68 @@ Telegram → PO Gateway → PO Agent (20 core tools + discover_tools)
 - `docs/architecture/CEREBUS_ARCHITECTURE.md` — full system diagram + file structure
 
 ---
+## 🔴 CC — DTB (Distribution to Boundary) Training Pipeline (2026-06-11 12:52 UTC)
+**Agent:** CC (Claude Code / OWL) | **Status:** ✅ COMPLETE — All 3 phases, exit code 0
+
+### What Was Built
+Full DTB temporal-spatial training pipeline predicting **Nominal Distribution bounded by Time**.
+Paradigm: Time on Y-axis, Price on X-axis. Predicts how much distribution the market can
+physically produce given time remaining.
+
+**Key equation:** `N = aR × Φ_T × Ψ_R × Ω_L × Δ_t`
+- aR = Asian Range (initial deficit)
+- Φ_T = Tier expansion coefficient (T1/T2/T3 classification)
+- Ψ_R = Regime efficiency (9AM EST checkpoint)
+- Ω_L = Loop Realization Ratio (L_actual / L_theoretical)
+- Δ_t = Temporal Decay (logistic decay to 0 at 12PM EST)
+
+### Phase 1: Macro MLR Lens (Weekly Distribution)
+- **Samples:** 6,062 weeks across 28 FX symbols
+- **Features:** 7 (MLR range, Fib targets, 132% distance, time to Friday, Wednesday PM, bias)
+- **Target:** Weekly notional distribution (log-transformed)
+- **Results:** Avg CV MAE=2,457 pips, Avg CV R²=0.775
+- **Hit Rates:** -25% target=94.8%, -50%=90.3%, 132% kill-switch=67.6%
+- **Top Features:** mlr_range_pips (0.488), target_50_pips (0.222), dist_to_132_pips (0.181)
+
+### Phase 2: Micro Atomic Lens (Daily Session Distribution)
+- **Samples:** 15,570 days (after T4 filter) across 28 FX symbols
+- **Features:** 13 (Asian Range, AU, regime, time to 12PM, loop metrics, entropy, day of week)
+- **Target:** Daily session distribution (log-transformed)
+- **Results:** Avg CV MAE=17.2 pips, Avg CV R²=0.294
+- **Top Features:** au_pips (0.201), asian_range_pips (0.181), regime_encoded (0.163)
+- **SHAP Physics Check:** ✗ FAIL — top 3 = [au_pips, asian_range_pips, regime_encoded]
+  - Expected: [time_to_12pm_mins, Omega_L, asian_range_pips]
+  - Root cause: L_actual/L_Omega_L are zeroed out (simplified proxy doesn't capture loop dynamics)
+- **Temporal Decay Validation:** 107.7% (late/early ratio) — should be <100%, decay not yet learned
+
+### Phase 3: Merge Unified BVP (Cross-Timeframe)
+- **Samples:** 15,570 days
+- **Features:** 14 (micro + macro context: MLR range, hit rates, micro-macro alignment)
+- **Results:** Avg CV MAE=17.1 pips, Avg CV R²=0.296
+- **Top Features:** mlr_range_pips (0.261), au_pips (0.167), asian_range_pips (0.120)
+- **Improvement over Phase 2:** Marginal (MAE 17.2→17.1, R² 0.294→0.296)
+
+### Key Issues Identified
+1. **Omega_L / L_actual = 0** for all samples — simplified proxy (range/AU ratio) doesn't capture real loop dynamics. Need proper impulse-rebalance cycle detection.
+2. **Temporal decay not learned** — late session distribution > early session (107.7% vs expected <100%). Model isn't capturing the time constraint.
+3. **SHAP physics check fails** — time_to_12pm and Omega_L should be top-3 per DTB theory but are near zero importance.
+4. **Phase 1 MAE high** (2,457 pips) — expected for weekly distribution prediction; some weeks have 10K+ pip ranges.
+
+### Files Created
+- `quant-lab/ml/dtb_lab/run_dtb_pipeline.py` — Full 3-phase pipeline (optimized, vectorized)
+- `quant-lab/ml/dtb_lab/attempt_1_macro/` — Macro XGBoost model
+- `quant-lab/ml/dtb_lab/attempt_2_micro/` — Micro XGBoost model
+- `quant-lab/ml/dtb_lab/merge_unified/` — Unified BVP XGBoost model
+- `quant-lab/ml/dtb_lab/logs/` — JSON run manifests with full metrics
+- `quant-lab/ml/dtb_lab/MASTER_LAB_REPORT.md` — Summary report
+
+### Next Steps for DTB Improvement
+1. **Fix L_actual computation** — implement proper vectorized impulse-rebalance cycle detection
+2. **Add temporal decay as explicit constraint** — weight samples by Delta_t or add time-bucket features
+3. **Investigate regime_ratio** — currently top-3 feature, may be leaking future information
+4. **Run on more data** — extend beyond 2022-2026 if available
+
+---
 ## ✅ AS — MLR/Asian Range Fixes + Friday Asian Anchor (2026-06-10 19:00 UTC)
 **Agent:** AS (Assistant Manager) | **Status:** ✅ COMMITTED & PUSHED — `61858acf5`
 

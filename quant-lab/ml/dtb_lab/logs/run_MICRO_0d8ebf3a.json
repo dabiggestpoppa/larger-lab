@@ -1,0 +1,75 @@
+{
+  "run_id": "0d8ebf3a",
+  "lens_type": "MICRO",
+  "timestamp": "2026-06-11T12:51:58.785153",
+  "elapsed_seconds": 14.7,
+  "phase": "attempt_2_micro",
+  "n_samples": 15570,
+  "n_features": 13,
+  "feature_cols": [
+    "asian_range_pips",
+    "au_pips",
+    "regime_ratio",
+    "time_to_12pm_mins",
+    "loop_duration",
+    "L_theoretical",
+    "L_actual",
+    "Omega_L",
+    "Delta_t",
+    "is_wednesday_pm",
+    "day_of_week",
+    "regime_encoded",
+    "entropy_encoded"
+  ],
+  "cv_scores": [
+    {
+      "fold": 1,
+      "mae": 19.47,
+      "r2": 0.133
+    },
+    {
+      "fold": 2,
+      "mae": 18.55,
+      "r2": 0.4219
+    },
+    {
+      "fold": 3,
+      "mae": 19.21,
+      "r2": 0.3669
+    },
+    {
+      "fold": 4,
+      "mae": 14.84,
+      "r2": 0.1973
+    },
+    {
+      "fold": 5,
+      "mae": 13.7,
+      "r2": 0.3507
+    }
+  ],
+  "avg_mae": 17.15,
+  "avg_r2": 0.294,
+  "feature_importance": {
+    "asian_range_pips": 0.18100541830062866,
+    "au_pips": 0.2004900574684143,
+    "regime_ratio": 0.14837056398391724,
+    "time_to_12pm_mins": 0.0200823824852705,
+    "loop_duration": 0.1174076497554779,
+    "L_theoretical": 0.02330639958381653,
+    "L_actual": 0.0,
+    "Omega_L": 0.0,
+    "Delta_t": 0.03533259406685829,
+    "is_wednesday_pm": 0.0368342325091362,
+    "day_of_week": 0.047511301934719086,
+    "regime_encoded": 0.16308343410491943,
+    "entropy_encoded": 0.0265759639441967
+  },
+  "shap_physics_check": false,
+  "top_3_shap": [
+    "au_pips",
+    "asian_range_pips",
+    "regime_encoded"
+  ],
+  "model_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\dtb_lab\\attempt_2_micro\\micro_xgb_0d8ebf3a.joblib"
+}
