@@ -13,6 +13,12 @@ import os, sys, time, argparse, logging
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 
+# --- SINGLETON: Kill duplicates, exit if already running ---
+_repo_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(_repo_root / "scripts"))
+from singleton import enforce_singleton
+enforce_singleton("cerebus_scanner", kill_others=True)
+
 # Load .env
 env_path = Path(__file__).resolve().parent.parent.parent / ".env"
 if env_path.exists():

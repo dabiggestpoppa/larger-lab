@@ -11,6 +11,15 @@ Provides endpoints for:
 - Memory view
 - Browser control proxy (OC2 sidecar)
 """
+import os
+import sys
+from pathlib import Path
+
+# --- SINGLETON: Kill duplicates, exit if already running ---
+_repo_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(_repo_root / "scripts"))
+from singleton import enforce_singleton
+enforce_singleton("oce_backend", kill_others=True)
 
 from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware

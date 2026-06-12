@@ -1,24 +1,43 @@
-# Workspace State — 2026-06-12 18:00 UTC
+# Workspace State — 2026-06-12 20:00 UTC
 
 ## System Status
-- OCE Backend: ✅ Healthy (port 8000)
-- PO Telegram Gateway: ✅ Live — @P01999BOT, mutex-enforced singleton
-- Hermes Agent: ✅ Autonomous loop running (10-min heartbeats)
-- OCE Frontend (3000): ✅ UP
-- VTuber/POALA: 🔴 Offline per MAD directive
-- Git: Synced to origin/master (commit 98686d99c)
+- OCE Backend: ✅ Running (PID 10988)
+- CEREBUS Unified Scanner: ✅ Running (PID 20548) — desktop alerts active
+- Watchdog: ✅ Clean start, no duplicates, no zombies
+- MLR Scanner: ❌ Removed (replaced by CEREBUS)
+- Telegram Gateway: ❌ Removed (desktop alerts only)
+- Signal Bot: ❌ Removed (desktop alerts only)
+- Git: Synced to origin/master (commit 790cbe45f)
 
 ## Active Build: CEREBUS Neuro-Symbolic Scanner
 - **Status:** Wave 1-3 ✅ | Docs ✅ | AS Integration ✅ | DTB Pipeline ✅ | 120/120 tests
 - **Plan:** `quant-lab/ml/CEREBUS_NEURO_SYMBOLIC_SCANNER_PLAN.md`
 
-## DTB Training Pipeline (2026-06-11 12:52 UTC) — COMPLETE
-- **Phase 1 (Macro MLR):** 6062 weeks, MAE=2457 pips, R²=0.775, 28 FX pairs
-- **Phase 2 (Micro Atomic):** 15570 days, MAE=17.2 pips, R²=0.294
-- **Phase 3 (Merge BVP):** 15570 days, MAE=17.1 pips, R²=0.296
-- **Commit:** `a5959a22a`
-- **Key Issue:** Omega_L/L_actual zeroed (simplified proxy), temporal decay not learned
-- **Next:** Fix loop detection, add temporal constraints, retrain
+## DTB Training Pipeline — COMPLETE
+
+### Intraday DTB v4 (2026-06-12) — Production Ready
+- **T0 (3AM):** MAE=12.02 pips, R²=0.47
+- **T1 (6AM):** MAE=2.96 pips, R²=0.95
+- **T2 (9AM):** MAE=1.95 pips, R²=0.97
+- **EURUSD T2:** MAE=2.09, R²=0.972
+- **USDCHF T2:** MAE=1.80, R²=0.970
+- **Target -25% hit rate:** 98.4%+
+- **Models:** `models_v4/v4_T0.joblib`, `v4_T1.joblib`, `v4_T2.joblib`
+
+### Macro Monthly DTB v2 (2026-06-12) — Production Ready
+- **T0 (Day 5):** MAE=33.5 pips, R²=0.707, 201 samples
+- **T1 (Day 8):** MAE=11.0 pips, R²=0.966, 199 samples
+- **T2 (Day 11):** MAE=8.4 pips, R²=0.966, 192 samples
+- **T3 (Day 13):** MAE=6.2 pips, R²=0.975, 188 samples
+- **Variance compression:** YES — MAE 33.5→11.0→8.4→6.2
+- **Models:** `models_macro_v2/macro_v2_T0.joblib` through `macro_v2_T3.joblib`
+
+### Directional Bias Synthesis (2026-06-12) — Production Ready
+- **3-Lens Ternary:** 69-78% base accuracy
+- **GEAR_SHIFT pathway:** 84-86% accuracy (dominant, 70% of signaled days)
+- **FULL_SIZE trades:** 78-83% accuracy
+- **Target -25% hit:** 98.4%+
+- **File:** `dtb_lab/synthesis.py`
 
 ## PO Agent Infrastructure (2026-06-11) — COMPLETE
 - **Dynamic Tool Discovery:** `discover_tools()` + `execute_tool()` — 70+ tools via OCE API
