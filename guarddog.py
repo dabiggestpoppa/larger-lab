@@ -100,7 +100,14 @@ def find_running_service(service_name: str) -> list:
                 if pid and cmd:
                     cmd_lower = cmd.lower()
                     for identifier in cmd_identifiers:
-                        if identifier.lower() in cmd_lower:
+                        arg_lower = identifier.lower()
+                        if arg_lower.endswith(".py"):
+                            # Match exact script name as path component
+                            script_name = Path(arg_lower).name
+                            if f"\\{script_name}" in cmd_lower or f"/{script_name}" in cmd_lower or cmd_lower.endswith(script_name):
+                                pids.append(pid)
+                                break
+                        elif arg_lower.startswith("-m") and arg_lower in cmd_lower:
                             pids.append(pid)
                             break
     except Exception as e:

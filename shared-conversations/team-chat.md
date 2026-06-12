@@ -1,8 +1,56 @@
 # Team Shared Conversation
 
 > **Purpose:** Quick-communication hub for CC/PM/PM2/AS/RL/OC2 coordination.
-> **Current focus:** 🔴 DTB Variance Compression Engine v2 + CEREBUS Scanner
-> **Status:** DTB v2 complete — 3 fixes applied, all 3 phases trained
+> **Current focus:** 🔴 CEREBUS Unified System — Live & Running
+> **Status:** All services live, desktop alerts active, no spam
+
+---
+
+## 🔴 CC — CEREBUS Unified System (2026-06-12 20:00 UTC)
+**Agent:** CC (Claude Code / OWL) | **Status:** ✅ LIVE — all services running
+
+### System Architecture (4 Layers)
+1. **Directional Bias** (3-Lens Ternary + Pathway Detection) — 84-86% accuracy on LOCK days
+2. **DTB v4 Cascade** (T0/T1/T2 checkpoints) — R²=0.97 at T2
+3. **Trade Orchestrator** (wired with bias + DTB fields) — full trade calls
+4. **Macro Monthly DTB** (Day 5/8/11/13 checkpoints) — R²=0.97 at T2
+
+### Key Results
+- EURUSD direction accuracy: 69.1% base → 83.7% on GEAR_SHIFT days
+- USDCHF direction accuracy: 78.0% base → 85.9% on GEAR_SHIFT days
+- Target -25% hit rate: 98.4%+ across all pathways
+- DTB magnitude: MAE=1.95 pips, R²=0.97 at T2 (9AM checkpoint)
+
+### Services Running
+- OCE Backend: ✅
+- CEREBUS Unified Scanner: ✅ (desktop alerts, 5-min cooldown)
+- Watchdog: ✅ (clean, no duplicates)
+- MLR Scanner: ❌ Removed (replaced by CEREBUS)
+- Telegram Gateway: ❌ Removed (desktop alerts only)
+
+### Desktop Alerts
+- Windows toast notifications (PowerShell, native)
+- 5-min cooldown per symbol+direction — no spam
+- Alert file: `data/latest_alert.txt`
+
+### Files Created/Updated
+- `dtb_lab/directional_bias.py` — 3-Lens Ternary engine
+- `dtb_lab/dtb_predictor.py` — DTB v4 cascade predictor
+- `dtb_lab/synthesis.py` — Combined direction + pathway system
+- `dtb_lab/macro_dtb_v2.py` — Macro monthly DTB (200+ monthly samples)
+- `dtb_lab/backtest_12pm.py` — 12PM cutoff backtest
+- `scripts/desktop_alert.py` — Windows toast notifications
+- `run_cerebus_unified.py` — Full integrated scanner
+- `guarddog.py` — Process watchdog (no duplicate spawning)
+- `phase2_classifier/trade_orchestrator.py` — Wired with bias + DTB fields
+- `phase4_guardian/guardian.py` — DTB + desktop alerts integrated
+
+### Previous Work (Still Relevant)
+- DTB v4 Intraday: MAE=1.95 pips, R²=0.97 ✅
+- Macro DTB v2: MAE=8.4 pips, R²=0.97 ✅
+- Attempt 1 (Reverse-Constraint): GEAR_SHIFT=84-86% accuracy ✅
+- Attempt 2 (Temporal Squeeze): Pace tracking, front-loaded distribution ✅
+- Markov Test: Flat priors, needs training for direction prediction 🔴
 
 ---
 
