@@ -74,10 +74,18 @@ def load_m5(symbol):
     return df
 
 
-def tier(ar_pips):
-    if ar_pips < 20: return "T1", ar_pips * 0.5, 52
-    if ar_pips < 30: return "T2", ar_pips * 0.5, 68
-    if ar_pips < 45: return "T3", ar_pips * 0.5, 94
+def tier(ar_pct, symbol=""):
+    """
+    Tier classification using percentage-based thresholds.
+    ar_pct = ar / mid_price * 100 (percentage move)
+    T1: < 0.15% (tight Asian Range)
+    T2: 0.15-0.35% (normal)
+    T3: 0.35-0.70% (wide)
+    T4: > 0.70% (extreme, skip)
+    """
+    if ar_pct < 0.15: return "T1", ar_pct * 50, 52
+    if ar_pct < 0.35: return "T2", ar_pct * 50, 68
+    if ar_pct < 0.70: return "T3", ar_pct * 50, 94
     return "T4", 0.0, 999
 
 
@@ -130,8 +138,10 @@ def build_features_for_checkpoint(df, symbol, cp_hour_utc):
         if len(ab) < 2: continue
 
         ah = ab["high"].max(); al = ab["low"].min()
-        ar = ah - al; ar_p = ar * 10000
-        t, au, ld = tier(ar_p)
+        ar = ah - al
+        mid_price = (ah + al) / 2
+        ar_pct = (ar / mid_price) * 100 if mid_price > 0 else 0
+        t, au, ld = tier(ar_pct, symbol)
         if t == "T4": continue
 
         # Bars BEFORE checkpoint (no lookahead)
@@ -170,12 +180,12 @@ def build_features_for_checkpoint(df, symbol, cp_hour_utc):
         # Entropy
         ent = 0
         if ol < 0.5 and lt > 1: ent = 1
-        elif ar_p > 35 and reg == 2: ent = 2
+        elif ar_pct > 0.5 and reg == 2: ent = 2
         elif la > lt * 1.44: ent = 3
 
         records.append({
             "symbol": symbol, "date": str(date), "checkpoint": cp_hour_utc,
-            "ar_pips": round(ar_p, 2), "au_pips": round(au * 10000, 2),
+            "ar_pct": round(ar_pct, 4), "au": round(au, 4),
             "regime": reg, "regime_ratio": round(rr, 3),
             "mins_remaining": mins_remaining, "mins_elapsed": mins_elapsed,
             "L_theoretical": round(lt, 2), "L_actual": la, "Omega_L": round(ol, 3),
@@ -209,7 +219,7 @@ def train_checkpoint_model(symbols, cp_hour_utc, cp_name):
     print(f"  Total: {len(data)} samples")
 
     feature_cols = [
-        "ar_pips", "au_pips", "regime", "regime_ratio",
+        "ar_pct", "au", "regime", "regime_ratio",
         "mins_remaining", "mins_elapsed", "L_theoretical", "L_actual",
         "Omega_L", "delta_t", "dist_so_far", "velocity",
         "is_wed_pm", "dow", "entropy",
@@ -286,7 +296,7 @@ def run_cascade_simulation(models, symbols):
         data = pd.concat(all_data, ignore_index=True)
 
         feature_cols = [
-            "ar_pips", "au_pips", "regime", "regime_ratio",
+            "ar_pct", "au", "regime", "regime_ratio",
             "mins_remaining", "mins_elapsed", "L_theoretical", "L_actual",
             "Omega_L", "delta_t", "dist_so_far", "velocity",
             "is_wed_pm", "dow", "entropy",
