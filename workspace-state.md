@@ -1,4 +1,4 @@
-# Workspace State — 2026-06-11 13:00 UTC
+# Workspace State — 2026-06-12 18:00 UTC
 
 ## System Status
 - OCE Backend: ✅ Healthy (port 8000)
@@ -28,6 +28,16 @@
 - **Hermes Integration:** Lightweight heartbeats, shared OCE backend
 
 ### Modules Built
+
+## OCE Backend Architecture Cleanup (2026-06-12) — COMPLETE
+- **Deleted 9 orphaned directories** from `oce/backend/`: field_core, cognition, introspection, multiscale, production, temporal, recursive_compute, coevolution, phase10
+- **Fixed phantom imports** in po_vault.py (3 broken → relative imports)
+- **Fixed persistent_field_api.py** — HTTP 503 + logging (was silent 200 OK errors)
+- **Fixed vault_api.py** — logging + proper HTTP 503
+- **Fixed srrs_adapter.py** — try/except wrappers on module-level imports
+- **Tests:** 492/492 passing
+- **Health Score:** 94/100
+- **Audit File:** `oce/backend/PO_FIELD_CHECK.md`
 1. **`ilm_detector.py`** — ILM states (DAILY_ILM/IELM/WILM/MISALIGNED) + regime ratio
 2. **`pattern_recognizer.py`** (29KB) — 18 pattern detectors:
    - Alpha/Beta 3-Leg, AB-CD, NY Sweep, Gamma, Rekey 132, Rekey Sequence

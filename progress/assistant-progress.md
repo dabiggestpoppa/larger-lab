@@ -7,7 +7,17 @@
 
 ---
 
-## Status: 🟢 Active — MLR/Asian Range Fixes Complete (2026-06-10 19:00 UTC)
+## Status: 🟢 Active — OCE Backend Cleanup + PO Fixes Complete (2026-06-12)
+
+### OCE Backend Architecture Cleanup (2026-06-12)
+- **Deleted 9 orphaned directories** from `oce/backend/`: field_core, cognition, introspection, multiscale, production, temporal, recursive_compute, coevolution, phase10
+- **Fixed phantom imports** in po_vault.py (3 broken → relative imports)
+- **Fixed persistent_field_api.py** — all 12 endpoints now return HTTP 503 + logging (was silent 200 OK)
+- **Fixed vault_api.py** — added logging + proper HTTP 503 on sync failures
+- **Fixed srrs_adapter.py** — wrapped module-level core.* imports in try/except
+- **Tests:** 492/492 passing after all fixes
+- **Health score:** 94/100 (up from 89/100 before fixes)
+- **Full audit:** `oce/backend/PO_FIELD_CHECK.md`
 
 ### CEREBUS Neuro-Symbolic Scanner — AS Assignments
 - **Tests:** Full test suite for all new components (40+ new tests)

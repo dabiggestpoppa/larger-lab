@@ -6,16 +6,20 @@
 
 ---
 
-## Current Context (2026-06-10 16:00 UTC)
+## Current Context (2026-06-12 18:00 UTC)
 
 ### Status
-🟢 Active — CEREBUS Quality Audit Complete
+🟢 Active — OCE Backend Architecture Cleanup Complete
 
-### Active Build: CEREBUS Neuro-Symbolic Scanner
-- **Wave 1:** ✅ Complete (Data Cleanup, Macro Features, Labels — all real code)
-- **Wave 2:** 🔄 In Progress (Retrain — has path/feature mismatch bugs)
-- **Tests:** 126/127 passing
-- **Grade:** B+ (core real, infrastructure gaps)
+### OCE Backend Cleanup (2026-06-12)
+- **Deleted 9 orphaned directories**: field_core, cognition, introspection, multiscale, production, temporal, recursive_compute, coevolution, phase10
+- **Fixed 3 phantom imports** in po_vault.py
+- **Fixed persistent_field_api.py** — HTTP 503 + logging (was silent 200 OK errors)
+- **Fixed vault_api.py** — logging + proper HTTP 503
+- **Fixed srrs_adapter.py** — try/except wrappers on module-level imports
+- **Tests:** 492/492 passing
+- **Health score:** 94/100
+- **Audit file:** `oce/backend/PO_FIELD_CHECK.md`
 
 ### Key Issues to Track
 1. Dual macro implementation (old flat file vs new `macro/` package) — needs consolidation
