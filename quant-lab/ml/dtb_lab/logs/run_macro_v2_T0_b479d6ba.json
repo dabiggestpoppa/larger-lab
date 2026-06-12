@@ -1,0 +1,28 @@
+{
+  "run_id": "b479d6ba",
+  "name": "macro_v2_T0",
+  "timestamp": "2026-06-12T12:37:15.142049",
+  "elapsed_s": 0.9,
+  "cp": "T0",
+  "n": 201,
+  "cv_scores": [
+    {
+      "fold": 1,
+      "mae": 83.07,
+      "r2": -0.1333
+    },
+    {
+      "fold": 2,
+      "mae": 72.8,
+      "r2": -1.1479
+    },
+    {
+      "fold": 3,
+      "mae": 75.33,
+      "r2": -0.5002
+    }
+  ],
+  "avg_mae": 77.07,
+  "avg_r2": -0.5938,
+  "model_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\dtb_lab\\models_macro_v2\\macro_v2_T0.joblib"
+}
