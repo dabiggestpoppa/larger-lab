@@ -112,6 +112,15 @@ class GuardianPipeline:
         # Trade orchestrator — position sizing, risk management, trade state
         self.orchestrator = TradeOrchestrator()
 
+        # DTB Cascade Predictor — London Distribution prediction
+        try:
+            from dtb_lab.dtb_predictor import DTBPredictor
+            self.dtb_predictor = DTBPredictor()
+            logger.info("  DTB v4 Cascade Predictor loaded (T0/T1/T2)")
+        except Exception as e:
+            logger.warning(f"  DTB Predictor not available: {e}")
+            self.dtb_predictor = None
+
         # State tracking
         self.last_alert_time: dict[str, float] = {}
         self.alert_cooldown_seconds: int = 300  # 5 min between alerts per symbol
@@ -195,6 +204,22 @@ class GuardianPipeline:
         # Estimate time to delivery
         time_to_delivery = self._estimate_time_to_delivery(features, regime)
 
+        # ── DTB Cascade Prediction ──
+        dtb_prediction = None
+        if self.dtb_predictor is not None:
+            try:
+                dtb_cascade = self.dtb_predictor.predict_cascade(df, symbol)
+                dtb_prediction = dtb_cascade.best_prediction
+                if dtb_prediction:
+                    logger.info(
+                        f"DTB[{symbol}] {dtb_prediction.checkpoint}: "
+                        f"{dtb_prediction.remaining_pips:.1f}p remaining, "
+                        f"conf={dtb_prediction.confidence:.0%}, "
+                        f"regime={dtb_prediction.regime}"
+                    )
+            except Exception as e:
+                logger.debug(f"DTB prediction failed: {e}")
+
         # Build feature dict for RAG query
         feature_dict = {
             "regime_status": regime,
@@ -228,6 +253,14 @@ class GuardianPipeline:
                 alert += f"\n  Targets: {json.dumps(trade_decision.targets, indent=2)}"
             alert += f"\n  SL Buffer: {trade_decision.sl_buffer_pips:.1f}p"
             alert += f"\n  Time Stop: {trade_decision.time_stop_bars} bars"
+
+        # ── DTB Cascade Prediction in alert ──
+        if dtb_prediction:
+            alert += f"\n\n🎯 DTB CASCADE ({dtb_prediction.checkpoint}):"
+            alert += f"\n  Remaining: {dtb_prediction.remaining_pips:.1f}p"
+            alert += f"\n  Confidence: {dtb_prediction.confidence:.0%}"
+            alert += f"\n  Tier: {dtb_prediction.tier} | Regime: {dtb_prediction.regime}"
+            alert += f"\n  Ω_L: {dtb_prediction.omega_l:.3f} ({dtb_prediction.l_actual}/{dtb_prediction.l_theoretical:.0f} loops)"
 
             # Track active trade
             if trade_decision.action in ("ENTER", "REDUCE"):
