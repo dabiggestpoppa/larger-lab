@@ -10,13 +10,9 @@ if errorlevel 1 start "OCE" /B .venv\Scripts\python.exe -m oce.backend.main
 tasklist /FI "IMAGENAME eq python.exe" /FI "WINDOWTITLE eq TG*" 2>nul | find /I "python.exe" >nul
 if errorlevel 1 start "TG" /B .venv\Scripts\python.exe scripts/telegram_gateway.py
 
-:: Check CEREBUS Live
+:: Check CEREBUS Unified Scanner (Direction + Magnitude + ST/P90)
 tasklist /FI "IMAGENAME eq python.exe" /FI "WINDOWTITLE eq CEREBUS*" 2>nul | find /I "python.exe" >nul
-if errorlevel 1 start "CEREBUS" /B .venv\Scripts\python.exe quant-lab/ml/run_cerebus_live.py --interval 300 --engine both
-
-:: Check MLR Scanner
-tasklist /FI "IMAGENAME eq python.exe" /FI "WINDOWTITLE eq MLR*" 2>nul | find /I "python.exe" >nul
-if errorlevel 1 start "MLR" /B .venv\Scripts\python.exe quant-lab/mlr_validation/mlr_scanner.py
+if errorlevel 1 start "CEREBUS" /B .venv\Scripts\python.exe quant-lab/ml/run_cerebus_unified.py --interval 300
 
 :: Check Signal Bot
 tasklist /FI "IMAGENAME eq python.exe" /FI "WINDOWTITLE eq SIGNAL*" 2>nul | find /I "python.exe" >nul
