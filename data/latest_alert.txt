@@ -1,0 +1,6 @@
+[14:11:52 EST] 🟢 CEREBUS: EURUSD LONG
+Predicted: 34.1 pips remaining
+Confidence: 84% | Pathway: GEAR_SHIFT
+Regime: CONFIRMED
+TP1: 12.5p | TP2: 30.0p | SL: 15.0p
+Hard Exit: 12PM EST
