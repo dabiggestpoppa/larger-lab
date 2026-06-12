@@ -437,3 +437,33 @@ if __name__ == "__main__":
     print(f"\nWeekly Forecast:")
     for k, v in forecast.items():
         print(f"  {k}: {v}")
+
+    # DTB Cascade Prediction
+    try:
+        from dtb_lab.dtb_predictor import DTBPredictor
+        predictor = DTBPredictor()
+        cascade = predictor.predict_cascade(
+            _build_m5_from_setup(setup), setup.symbol
+        )
+        if cascade.best_prediction:
+            pred = cascade.best_prediction
+            print(f"\nDTB Cascade Prediction ({pred.checkpoint}):")
+            print(f"  Remaining Distribution: {pred.remaining_pips:.1f} pips")
+            print(f"  Confidence: {pred.confidence:.0%}")
+            print(f"  Regime: {pred.regime}")
+            print(f"  Tier: {pred.tier}")
+            print(f"  Omega_L: {pred.omega_l:.3f}")
+            print(f"  Loops: {pred.l_actual}/{pred.l_theoretical:.1f}")
+            if cascade.variance_compression:
+                print(f"  Variance Compression: {cascade.variance_compression:.1%}")
+    except Exception as e:
+        print(f"\nDTB Predictor not available: {e}")
+
+
+def _build_m5_from_setup(setup: TradeSetup) -> pd.DataFrame:
+    """
+    Build a minimal M5 DataFrame from TradeSetup for DTB prediction.
+    In production, this would use real-time market data.
+    For now, returns empty DataFrame (DTB needs real bars).
+    """
+    return pd.DataFrame()
