@@ -413,7 +413,8 @@ Event emitted (SRRA-OPH / OCE)
 
 ```
 larger-lab/
-  ├── 📄 README.md              ← You are here
+  ├── 📄 README.md              ← You are here — project overview
+  ├── 📄 ARCHITECTURE.md        ← 🏗️ Full system architecture + Mermaid diagrams
   ├── 📄 CLAUDE.md              ← 12-rule behavioral contract (read first)
   ├── 📄 AGENTS.md              ← Team manifest, phase status, orchestration rules
   ├── 📄 CODEMAP.md             ← Code map with Mermaid architecture diagrams
@@ -499,8 +500,84 @@ larger-lab/
   │   ├── terminal_cleanup.py   ← Kill stale processes (run at session start)
   │   └── arch-commit.py        ← Architecture change tracking
   │
-  └── 📁 research/              ← Research notes + resource index
+  ├── 📁 research/              ← Research notes + resource index
+  │
+  ├── 📁 core/                   ← 🧠 Cognition substrate (Phase 1-3)
+  │   ├── parser/               ← 📄 Parser orchestration (Phase 1.2)
+  │   │   ├── README.md         ← Parser architecture + engine details
+  │   │   ├── markitdown/       ← Microsoft MarkItDown (universal parser)
+  │   │   ├── odl-pdf/          ← OpenDataLoader PDF (research extraction)
+  │   │   ├── liteparse/        ← LiteParse (code + web parsing)
+  │   │   ├── chandra/          ← Chandra (OCR/vision)
+  │   │   └── orchestration/    ← Router + CognitionObject + engines
+  │   ├── semantic/             ← 🔢 Embeddings + vectors (Phase 1.3)
+  │   │   ├── README.md         ← Semantic memory architecture
+  │   │   ├── chunking/         ← Semantic chunker
+  │   │   ├── embeddings/       ← Embedding engine (OpenAI + local)
+  │   │   └── vector/turbovec/  ← TurboQuant vector search
+  │   ├── knowledge/            ← 🕸️ Knowledge graph (Phase 1.5)
+  │   │   ├── graph/            ← Entity extractor + graph store + ontology
+  │   │   └── ontology/         ← Concept hierarchy engine
+  │   ├── cognition/            ← ⚙️ Procedural cognition (Phase 1.6)
+  │   │   └── procedural/       ← Skill loader + workflow engine + router
+  │   └── research/             ← 📚 Research mesh (Phase 1-3)
+  │       ├── README.md         ← Research mesh architecture
+  │       ├── ingestion/        ← Source clients + cache + scheduler
+  │       ├── distillation/     ← Distiller + doctrine + vault writer
+  │       ├── agents/           ← Gap detector + research agent + queue
+  │       └── distiller/        ← Phase 2 distillation engine
+  │
+  ├── 📁 quant-lab/             ← 📈 Quantitative trading
+  │   ├── ARCHITECTURE.md       ← Quant Lab architecture + Mermaid diagrams
+  │   ├── engines/              ← P90 + Symmetry Trap engines
+  │   ├── ml/                   ← ML pipeline (5 phases)
+  │   │   ├── phase1_data/      ← Data foundation
+  │   │   ├── phase2_classifier/← XGBoost classifier
+  │   │   ├── phase3_rag_oracle/← RAG oracle
+  │   │   ├── phase4_guardian/  ← Guardian monitor
+  │   │   ├── phase5_hardening/← Production hardening
+  │   │   └── shap/             ← SHAP explainability
+  │   ├── mt5/                  ← MT5 bridge
+  │   └── backtest/             ← Backtesting engine
+  │
+  ├── 📁 content-farm/          ← 🌐 Content generation
+  │   ├── README.md             ← Content farm architecture
+  │   ├── sites/reclip/         ← Video downloader
+  │   └── design/open-design/   ← Design asset generation
+  │
+  ├── 📁 vtuber_integration/    ← 🎭 VTuber system
+  │   ├── README.md             ← VTuber architecture
+  │   ├── Open-LLM-VTuber/      ← Avatar runtime
+  │   ├── dograh/               ← Voice AI platform
+  │   └── dotlottie-web/        ← Animation engine
+  │
+  └── 📁 docs/                  ← 📝 Documentation
+      └── plans/                ← Build plans and specifications
 ```
+
+---
+
+## 📖 Documentation Map
+
+| Document | Description |
+|----------|-------------|
+| `README.md` | ← You are here — project overview + quick start |
+| `ARCHITECTURE.md` | 🏗️ Full system architecture with Mermaid diagrams |
+| `oce/ARCHITECTURE.md` | 🧠 OCE backend architecture (30+ modules, API endpoints) |
+| `quant-lab/ARCHITECTURE.md` | 📈 Quant Lab / CEREBUS architecture (engines + ML pipeline) |
+| `core/parser/README.md` | 📄 Parser orchestration (Phase 1.2) |
+| `core/semantic/README.md` | 🔢 Semantic memory (Phase 1.3) |
+| `core/knowledge/graph/README.md` | 🕸️ Knowledge graph (Phase 1.5) |
+| `core/research/README.md` | 📚 Research mesh (Phase 1-3) |
+| `content-farm/README.md` | 🌐 Content farm architecture |
+| `vtuber_integration/README.md` | 🎭 VTuber integration architecture |
+| `workspace-state.md` | 📊 Current system state |
+| `AGENTS.md` | 🤖 Agent rules and conventions |
+| `MEMORY.md` | 💾 Long-term memory |
+| `progress/BUILD-NOTES.md` | 🔨 Build themes and principles |
+| `progress/TEAM-NOTES.md` | 🔧 Shared troubleshooting |
+| `docs/plans/O2C-RESEARCH-MESH.md` | 📋 Research mesh plan |
+| `quant-lab/ml/CEREBUS_NEURO_SYMBOLIC_SCANNER_PLAN.md` | 📋 CEREBUS plan |
 
 ---
 
