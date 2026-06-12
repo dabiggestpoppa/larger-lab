@@ -1,0 +1,28 @@
+{
+  "run_id": "af22fead",
+  "name": "macro_T0",
+  "timestamp": "2026-06-12T11:50:53.151171",
+  "elapsed_s": 5.7,
+  "cp": "T0",
+  "n": 78,
+  "cv_scores": [
+    {
+      "fold": 1,
+      "mae": 46.55,
+      "r2": 0.2457
+    },
+    {
+      "fold": 2,
+      "mae": 85.5,
+      "r2": -0.9175
+    },
+    {
+      "fold": 3,
+      "mae": 69.16,
+      "r2": 0.0271
+    }
+  ],
+  "avg_mae": 67.07,
+  "avg_r2": -0.2149,
+  "model_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\dtb_lab\\models_macro\\macro_T0.joblib"
+}

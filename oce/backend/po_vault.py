@@ -129,7 +129,7 @@ class VaultRetriever:
         """Query OCE structural memory."""
         hits: List[RetrievalHit] = []
         try:
-            from core.structural_memory import StructuralMemory, MemoryLayer
+            from ..structural_memory import StructuralMemory, MemoryLayer
             sm = StructuralMemory()
             entries = sm.search(query=query, limit=self.max_hits)
             for e in entries:
@@ -149,7 +149,7 @@ class VaultRetriever:
         """Query OCE event fabric for recent relevant events."""
         hits: List[RetrievalHit] = []
         try:
-            from core.event_fabric import get_fabric
+            from ..event_fabric import get_fabric
             fabric = get_fabric()
             events = fabric.get_history(limit=self.max_hits)
             for e in events:
@@ -173,9 +173,8 @@ class VaultRetriever:
         """Query the Obsidian vault indexer."""
         hits: List[RetrievalHit] = []
         try:
-            from core.vault_indexer import VaultIndexer
-            indexer = VaultIndexer()
-            results = indexer.search(query, limit=self.max_hits)
+            # VaultIndexer not yet implemented — return empty
+            results = []
             for r in results:
                 hits.append(RetrievalHit(
                     source="vault_indexer",
