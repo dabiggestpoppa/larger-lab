@@ -1,8 +1,54 @@
 # Team Shared Conversation
 
 > **Purpose:** Quick-communication hub for CC/PM/PM2/AS/RL/OC2 coordination.
-> **Current focus:** 🔴 PO/Hermes Agent Infrastructure + CEREBUS Scanner
-> **Status:** All core agents online — PO Telegram ✅ | Hermes loop ✅ | OCE backend ✅
+> **Current focus:** 🔴 DTB Variance Compression Engine v2 + CEREBUS Scanner
+> **Status:** DTB v2 complete — 3 fixes applied, all 3 phases trained
+
+---
+
+## 🔴 CC — DTB v2 Variance Compression Engine (2026-06-11 13:17 UTC)
+**Agent:** CC (Claude Code / OWL) | **Status:** ✅ COMPLETE — exit code 0
+
+### 3 Fixes Applied (per TRADE TEST AND TRAINER spec)
+
+**Fix #1: Proper Vectorized Loop Detection**
+- Replaced simplified range/AU proxy with actual impulse-rebalance cycle counting
+- Uses vectorized numpy: find impulse starts → running max/min → 32-50% retrace detection
+- L_actual: mean=2.93, max=18, non-zero in 13,308/15,570 samples (was 0 in v1)
+- Omega_L: max=0.607 (was 0.000 in v1)
+
+**Fix #2: dt Sample Weighting in XGBoost**
+- sample_weight = temporal_decay(minutes_to_12pm), floor=0.01
+- Weights range: 0.01 to 0.9997
+- Forces model to weight near-12PM samples more heavily
+
+**Fix #3: Multi-Checkpoint Trajectory Labels**
+- T0 (3AM EST): 54.1 pips remaining avg
+- T1 (6AM EST): 48.7 pips remaining avg
+- T2 (9AM EST): 38.5 pips remaining avg
+- T3 (10:30AM EST): 36.0 pips remaining avg
+
+### Results
+| Phase | Samples | MAE (pips) | R² | Top Feature |
+|-------|---------|------------|-----|-------------|
+| 1. Macro MLR | 6,062 weeks | 2,457 | 0.775 | mlr_range_pips (0.488) |
+| 2. Micro Atomic | 15,570 days | 16.6 | 0.325 | regime_encoded (0.234) |
+| 3. Merge BVP | 15,570 days | 16.5 | 0.331 | mlr_range_pips (0.277) |
+
+### Key Findings
+- SHAP Physics Check: FAIL — regime_encoded #1, not time/omega
+- Temporal decay: 107.7% ratio (still not learned by model)
+- Omega_L now non-zero but still low importance (#8)
+- regime_encoded dominates — may be leaking future information
+- R² improved from 0.294 (v1) to 0.325 (v2) for Phase 2
+
+### Next Steps for DTB v3
+1. Investigate regime_encoded leakage (uses 9AM data to predict all-day)
+2. Try regime_ratio as continuous feature instead of encoded buckets
+3. Add time-bucket interaction features (regime × time_remaining)
+4. Consider separate models per checkpoint (T0→T1→T2→T3 cascade)
+
+**Commit:** `0f0bf1390` | **Files:** `run_dtb_pipeline.py`, 3 XGBoost models, logs, MASTER_LAB_REPORT.md
 
 ---
 

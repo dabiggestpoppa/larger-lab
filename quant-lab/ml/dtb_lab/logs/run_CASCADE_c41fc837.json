@@ -1,0 +1,15 @@
+{
+  "run_id": "c41fc837",
+  "lens_type": "CASCADE",
+  "timestamp": "2026-06-12T09:25:24.411299",
+  "elapsed_seconds": 99.7,
+  "phase": "cascade_v3",
+  "n_samples": 19480,
+  "cascade_maes": {
+    "T0": 12.32836707030968,
+    "T1": 9.481328209518653,
+    "T2": 7.478802132919827,
+    "T3": 6.637174559004559
+  },
+  "model_path": "cascade_models"
+}
