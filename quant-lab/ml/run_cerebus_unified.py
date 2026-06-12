@@ -173,10 +173,10 @@ def synthesize_alert(symbol, bias, dtb_t2, st_sig, p90_sig, guardian_alert, now_
 
     # Build message
     lines = []
-    lines.append(f"🚨 CEREBUS TRADE CALL ({symbol})")
+    lines.append(f"CEREBUS TRADE CALL ({symbol})")
     lines.append(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
     lines.append(f"")
-    lines.append(f"📊 DIRECTION:")
+    lines.append(f"DIRECTION:")
     lines.append(f"  Bias: {direction} ({bias.state.value})")
     lines.append(f"  Confidence: {confidence:.0%}")
     lines.append(f"  Pathway: {bias.pathway}")
@@ -252,6 +252,19 @@ def main():
 
     logger.info("All engines loaded")
 
+    # Import desktop alert (scripts/ is relative to repo root)
+    try:
+        repo_root = Path(__file__).parent.parent.parent
+        script_dir = repo_root / "scripts"
+        if str(script_dir) not in sys.path:
+            sys.path.insert(0, str(script_dir))
+        from desktop_alert import show_trade_alert, show_system_alert
+        DESKTOP_ALERT_AVAILABLE = True
+        logger.info("Desktop alert system loaded")
+    except Exception as e:
+        logger.warning(f"Desktop alert not available: {e}")
+        DESKTOP_ALERT_AVAILABLE = False
+
     # Main loop
     while True:
         for symbol in args.symbols:
@@ -262,6 +275,22 @@ def main():
                 )
                 for alert in alerts:
                     logger.info(f"\n{alert['message']}")
+                    # Send desktop notification
+                    if DESKTOP_ALERT_AVAILABLE and not args.dry_run:
+                        try:
+                            show_trade_alert(
+                                symbol=alert["symbol"],
+                                direction=alert["direction"],
+                                pips=alert.get("dtb_pips", 0),
+                                confidence=alert["confidence"],
+                                pathway=alert["pathway"],
+                                regime=alert["regime"],
+                                tp1=alert.get("dtb_pips", 0) * 0.25,
+                                tp2=alert.get("dtb_pips", 0) * 0.50,
+                                sl=alert.get("dtb_pips", 0) * 0.80,
+                            )
+                        except Exception as e:
+                            logger.debug(f"Desktop alert failed: {e}")
             except Exception as e:
                 logger.error(f"Scan failed for {symbol}: {e}")
 
