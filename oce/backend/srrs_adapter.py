@@ -35,27 +35,50 @@ from srrs_opc import (
 )
 
 # O-1 Observer Core
-from core.observer import (
-    PrimaryObserver, ObserverState, RuntimeAwareness,
-    TaskIntentAnalyzer, ContextDistiller, ContinuityMemory,
-    ObserverSession, ObserverLifecycle, EventAwareness,
-    ChatLog, get_chat_log,
-)
+try:
+    from core.observer import (
+        PrimaryObserver, ObserverState, RuntimeAwareness,
+        TaskIntentAnalyzer, ContextDistiller, ContinuityMemory,
+        ObserverSession, ObserverLifecycle, EventAwareness,
+        ChatLog, get_chat_log,
+    )
+except ImportError as e:
+    logger.warning(f"core.observer not available: {e}")
+    PrimaryObserver = ObserverState = RuntimeAwareness = None
+    TaskIntentAnalyzer = ContextDistiller = ContinuityMemory = None
+    ObserverSession = ObserverLifecycle = EventAwareness = None
+    ChatLog = get_chat_log = None
+
 # O-2 Consensus
-from core.consensus import (
-    ObserverConsensus, TaskClassifier, RoutingConsensus,
-    ComplexityScorer, SpawnPlanner, ModelSelector,
-    CapabilityMatcher, ConsensusMemory, ObserverSpecialization,
-    ConsensusReplay,
-)
+try:
+    from core.consensus import (
+        ObserverConsensus, TaskClassifier, RoutingConsensus,
+        ComplexityScorer, SpawnPlanner, ModelSelector,
+        CapabilityMatcher, ConsensusMemory, ObserverSpecialization,
+        ConsensusReplay,
+    )
+except ImportError as e:
+    logger.warning(f"core.consensus not available: {e}")
+    ObserverConsensus = TaskClassifier = RoutingConsensus = None
+    ComplexityScorer = SpawnPlanner = ModelSelector = None
+    CapabilityMatcher = ConsensusMemory = ObserverSpecialization = None
+    ConsensusReplay = None
+
 # O-3 Spawn Engine
-from core.spawn import (
-    AgentSpawner, SpawnBlueprint,
-    ContextInjector, AgentLifecycle, ExecutionBoundary,
-    MultiAgentCoordinator, TraceFeedback, SpawnReplay,
-    SpawnRegistry, SpawnRecord,
-)
-from core.spawn.agent_spawner import SpawnResult
+try:
+    from core.spawn import (
+        AgentSpawner, SpawnBlueprint,
+        ContextInjector, AgentLifecycle, ExecutionBoundary,
+        MultiAgentCoordinator, TraceFeedback, SpawnReplay,
+        SpawnRegistry, SpawnRecord,
+    )
+    from core.spawn.agent_spawner import SpawnResult
+except ImportError as e:
+    logger.warning(f"core.spawn not available: {e}")
+    AgentSpawner = SpawnBlueprint = None
+    ContextInjector = AgentLifecycle = ExecutionBoundary = None
+    MultiAgentCoordinator = TraceFeedback = SpawnReplay = None
+    SpawnRegistry = SpawnRecord = SpawnResult = None
 
 
 class SRRSAdapter:

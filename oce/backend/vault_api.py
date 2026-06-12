@@ -9,10 +9,13 @@ Supports two vaults:
 Use query param ?vault=obsidian to target the real Obsidian vault.
 """
 
+import logging
 import os
 from pathlib import Path
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, status
 from pydantic import BaseModel
+
+logger = logging.getLogger("oce.vault_api")
 
 from core.obsidian.vault_writer import VaultWriter, DEFAULT_VAULT_PATH
 from core.obsidian.linker import Linker
@@ -186,7 +189,8 @@ def register_vault_endpoints(app: FastAPI):
             written, skipped = sync_to_obsidian()
             return {"status": "ok", "written": written, "skipped": skipped}
         except Exception as e:
-            return {"status": "error", "detail": str(e)}
+            logger.error(f"Vault sync error: {e}")
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
 
     @app.get("/api/vault/sync/status")
     async def vault_sync_status():
@@ -195,7 +199,8 @@ def register_vault_endpoints(app: FastAPI):
             from core.obsidian.live_sync import get_live_sync
             return get_live_sync().get_status()
         except Exception as e:
-            return {"status": "error", "detail": str(e)}
+            logger.error(f"Vault sync status error: {e}")
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
 
     # --- Phase 01: Error Intelligence ---
 
