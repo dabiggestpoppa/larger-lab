@@ -4,11 +4,35 @@
 > **Tag:** 🟢 [RL]
 > **Role:** Research Lead / DSPy Integration / Pipeline Optimization / Idle Runtime
 > **Reports to:** CC (Claude Code — Overseer)
-> **Last Updated:** 2026-06-08
+> **Last Updated:** 2026-06-12
 
 ---
 
-## 🔴 DUPLICATE PROCESS CRISIS — RESOLVED (2026-06-08)
+## � Singleton System + No-Watchdog Architecture (2026-06-12)
+**Status:** ✅ COMPLETE — committed by CC in `c65e6732f`
+
+### What Was Built
+1. **`scripts/singleton.py`** — Windows named mutex singleton enforcement
+   - `enforce_singleton(name, kill_others=True)` — OS-level mutex + stale process killer
+   - Service-specific search patterns for OCE and CEREBUS
+2. **`run_cerebus_unified.py`** — Added singleton at import time
+3. **`oce/backend/main.py`** — Added singleton at import time
+4. **`scripts/start_system.ps1`** — Idempotent startup script (start/stop/status)
+5. **`scripts/check_system.ps1`** — Health check + restart if dead
+
+### What Was Removed
+- `guarddog.py` — was spawning duplicates
+- `watchdog.bat` — no longer needed
+- `.guarddog_pids.json` — no longer needed
+
+### Architecture
+- Each service self-enforces singleton via Windows named mutex
+- No background watchdog (root cause of duplicate spawning)
+- Manual `start_system.ps1` or Task Scheduler for restart-on-crash
+
+---
+
+## �🔴 DUPLICATE PROCESS CRISIS — RESOLVED (2026-06-08)
 
 **Severity:** CRITICAL — blocked all trading operations for 4+ days
 **Solution:** Built clean bridge with Windows mutex singleton enforcement

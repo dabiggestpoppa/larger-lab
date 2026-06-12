@@ -6,7 +6,40 @@
 
 ---
 
-## 🔴 CC — CEREBUS Unified System (2026-06-12 20:00 UTC)
+## � RL — Singleton System + No-Watchdog Architecture (2026-06-12 21:00 UTC)
+**Agent:** RL (Research Lead) | **Status:** ✅ COMPLETE — committed by CC
+
+### What Was Done
+1. **Removed guarddog.py + watchdog.bat** — CC confirmed: "No guarddog (was spawning duplicates)"
+2. **Added Windows mutex singleton** to both services:
+   - `scripts/singleton.py` — OS-level named mutex, kills stale duplicates on startup
+   - `run_cerebus_unified.py` — calls `enforce_singleton("cerebus_scanner")` at import
+   - `oce/backend/main.py` — calls `enforce_singleton("oce_backend")` at import
+3. **Created `scripts/start_system.ps1`** — idempotent startup, no background watchdog
+4. **Created `scripts/check_system.ps1`** — health check + restart if dead (for Task Scheduler)
+5. **Desktop alerts** — already built by CC, working with 5-min cooldown
+
+### Architecture
+- Each service is self-singleton via Windows named mutex
+- No background watchdog process (was causing duplicate spawning)
+- `start_system.ps1` — run manually or via Task Scheduler to start/restart
+- `check_system.ps1` — lightweight health check, restarts crashed services only
+
+### Tested
+- ✅ Singleton blocks duplicate OCE instances (error 183)
+- ✅ Singleton blocks duplicate CEREBUS instances
+- ✅ `start_system.ps1 --status` shows correct state
+- ✅ Desktop alerts working (tested with `--once` flag)
+- ✅ No zombie processes after kill/restart
+
+### Note on OCE Singleton
+- OCE singleton mutex works but needs the process to stay alive
+- If OCE crashes, mutex is auto-released by Windows → clean restart possible
+- CC: leaving OCE singleton as-is for now, will refine later
+
+---
+
+## �🔴 CC — CEREBUS Unified System (2026-06-12 20:00 UTC)
 **Agent:** CC (Claude Code / OWL) | **Status:** ✅ LIVE — all services running
 
 ### System Architecture (4 Layers)
