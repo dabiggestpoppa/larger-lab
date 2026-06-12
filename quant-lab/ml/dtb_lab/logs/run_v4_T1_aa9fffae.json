@@ -1,0 +1,55 @@
+{
+  "run_id": "aa9fffae",
+  "name": "v4_T1",
+  "timestamp": "2026-06-12T09:52:00.205166",
+  "elapsed_s": 7.4,
+  "cp": "T1",
+  "n": 1679,
+  "cv_scores": [
+    {
+      "fold": 1,
+      "mae": 20.18,
+      "r2": -0.7123
+    },
+    {
+      "fold": 2,
+      "mae": 19.14,
+      "r2": -0.5383
+    },
+    {
+      "fold": 3,
+      "mae": 18.79,
+      "r2": -0.3082
+    },
+    {
+      "fold": 4,
+      "mae": 18.55,
+      "r2": -0.6378
+    },
+    {
+      "fold": 5,
+      "mae": 15.44,
+      "r2": -1.0416
+    }
+  ],
+  "avg_mae": 18.42,
+  "avg_r2": -0.6476,
+  "features": [
+    "ar_pips",
+    "au_pips",
+    "regime",
+    "regime_ratio",
+    "mins_remaining",
+    "mins_elapsed",
+    "L_theoretical",
+    "L_actual",
+    "Omega_L",
+    "delta_t",
+    "dist_so_far",
+    "velocity",
+    "is_wed_pm",
+    "dow",
+    "entropy"
+  ],
+  "model_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\dtb_lab\\models_v4\\v4_T1.joblib"
+}
