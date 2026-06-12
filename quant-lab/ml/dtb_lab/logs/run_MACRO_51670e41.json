@@ -1,0 +1,38 @@
+{
+  "run_id": "51670e41",
+  "lens_type": "MACRO",
+  "timestamp": "2026-06-12T09:23:44.706429",
+  "elapsed_seconds": 30.8,
+  "phase": "attempt_1_macro",
+  "n_samples": 6062,
+  "avg_mae": 2457.16,
+  "avg_r2": 0.7753,
+  "cv_scores": [
+    {
+      "fold": 1,
+      "mae": 2478.14,
+      "r2": 0.8121
+    },
+    {
+      "fold": 2,
+      "mae": 2552.46,
+      "r2": 0.7594
+    },
+    {
+      "fold": 3,
+      "mae": 2086.75,
+      "r2": 0.7629
+    },
+    {
+      "fold": 4,
+      "mae": 1764.64,
+      "r2": 0.7561
+    },
+    {
+      "fold": 5,
+      "mae": 3403.82,
+      "r2": 0.786
+    }
+  ],
+  "model_path": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\quant-lab\\ml\\dtb_lab\\attempt_1_macro\\macro_xgb_51670e41.joblib"
+}

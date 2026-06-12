@@ -1,0 +1,8 @@
+{
+  "run_id": "b74d1f03",
+  "lens_type": "MERGE",
+  "timestamp": "2026-06-12T09:25:24.492520",
+  "elapsed_seconds": 0.0,
+  "phase": "merge_v3",
+  "model_path": "cascade_T2"
+}
