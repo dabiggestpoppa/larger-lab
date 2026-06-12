@@ -161,6 +161,13 @@ class TradeSetup:
     is_wednesday_pm: bool
     consecutive_losses: int
     spread_vs_avg: float
+    # Directional Bias fields (from 3-Lens Ternary + Pathway)
+    bias_state: Optional[str] = None       # "9/9_LOCK", "KINETIC_CONFLICT", "EXHAUSTION", "COILED_SPRING"
+    bias_direction: Optional[str] = None  # "LONG", "SHORT", "NONE"
+    bias_confidence: Optional[float] = None  # 0-1
+    # DTB Magnitude fields (from DTB v4 cascade)
+    dtb_predicted_pips: Optional[float] = None  # Predicted remaining pips
+    dtb_checkpoint: Optional[str] = None  # "T0", "T1", "T2"
 
 
 @dataclass
@@ -195,6 +202,22 @@ class TradeOrchestrator:
         """
         reasons = []
         size_mult = 1.0
+
+        # ── Directional Bias filter (3-Lens Ternary + Pathway) ──
+        # This is the "Vector" — does the market want to move in this direction?
+        if hasattr(setup, 'bias_state') and setup.bias_state is not None:
+            bias_state = setup.bias_state
+            if bias_state == "KINETIC_CONFLICT":
+                return TradeDecision("SKIP", 0.0,
+                    "BIAS CONFLICT: Structural and kinetic lenses disagree — fakeout risk")
+            elif bias_state == "EXHAUSTION":
+                size_mult *= 0.3
+                reasons.append("BIAS EXHAUSTION: Direction valid but regime failed — scalp only")
+            elif bias_state == "9/9_LOCK":
+                reasons.append("BIAS LOCK: 3 lenses aligned, high conviction")
+            elif bias_state == "COILED_SPRING":
+                size_mult *= 0.5
+                reasons.append("COILED: No breakout yet but regime confirmed — reduced size")
 
         # ── Regime check ──
         if setup.regime == RegimeState.FAILED:
@@ -250,18 +273,24 @@ class TradeOrchestrator:
             size_mult *= 0.5
             reasons.append(f"Spread {setup.spread_vs_avg:.1f}x above avg: reduce size")
 
+        # ── DTB Magnitude: Use predicted remaining pips to set targets ──
+        dtb_target_pips = None
+        if hasattr(setup, 'dtb_predicted_pips') and setup.dtb_predicted_pips is not None:
+            dtb_target_pips = setup.dtb_predicted_pips
+            reasons.append(f"DTB: {dtb_target_pips:.1f}p predicted remaining")
+
         # ── Tier-based target trimming ──
         tier_key = f"T{setup.tier}"
         trimming = self.target_trimming.get(tier_key, {})
 
-        # Build targets
+        # Build targets — use DTB prediction if available
         targets = {}
         if setup.tier == 1:
             targets = {
-                "TP1_-25%": 0.20,  # Trim 20% at -25%
-                "TP2_-50%": 0.50,  # Trim 50% at -50%
-                "TP3_Daily_-50%": 0.25,  # Trim 25% at Daily -50%
-                "Runner": 0.05,  # Hold 5% for runner
+                "TP1_-25%": 0.20,
+                "TP2_-50%": 0.50,
+                "TP3_Daily_-50%": 0.25,
+                "Runner": 0.05,
             }
         elif setup.tier == 2:
             targets = {
@@ -278,6 +307,15 @@ class TradeOrchestrator:
                 "Runner": 0.0,
             }
 
+        # If DTB predicted pips available, set dynamic TP
+        if dtb_target_pips is not None and dtb_target_pips > 0:
+            targets["DTB_Target"] = dtb_target_pips
+            # Adjust runner based on DTB confidence
+            if dtb_target_pips > 50:
+                targets["Runner"] = 0.10  # High confidence — hold more
+            else:
+                targets["Runner"] = 0.02  # Low confidence — trim more
+
         # ── Final decision ──
         if size_mult < 0.1:
             return TradeDecision("SKIP", 0.0, " | ".join(reasons))
@@ -289,8 +327,8 @@ class TradeOrchestrator:
             size_multiplier=min(size_mult, 1.0),
             reason=" | ".join(reasons),
             targets=targets,
-            sl_buffer_pips=setup.ar_pips * 0.8,  # 80% of AR as SL buffer
-            time_stop_bars=288,  # 24 hours of M5 bars
+            sl_buffer_pips=setup.ar_pips * 0.8,
+            time_stop_bars=288,
         )
 
     def evaluate_during_trade(
