@@ -5,7 +5,7 @@ O-7 Persistent Field API Endpoints
 Exposes persistent field functionality via FastAPI.
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
 from typing import Optional
 import logging
 
@@ -23,7 +23,8 @@ def register_persistent_field_endpoints(app: FastAPI) -> None:
             rt = PersistentRuntime.get_instance()
             return rt.get_status()
         except Exception as e:
-            return {"status": "unavailable", "error": str(e)}
+            logger.error(f"Persistent field status error: {e}")
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
 
     @app.get("/api/persistent-field/heartbeat")
     async def get_heartbeat():
@@ -33,7 +34,8 @@ def register_persistent_field_endpoints(app: FastAPI) -> None:
             hb = RuntimeHeartbeat()
             return hb.get_current()
         except Exception as e:
-            return {"status": "unavailable", "error": str(e)}
+            logger.error(f"Persistent field heartbeat error: {e}")
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
 
     @app.post("/api/persistent-field/heartbeat")
     async def pulse_heartbeat():
@@ -43,7 +45,8 @@ def register_persistent_field_endpoints(app: FastAPI) -> None:
             hb = RuntimeHeartbeat()
             return hb.pulse()
         except Exception as e:
-            return {"status": "unavailable", "error": str(e)}
+            logger.error(f"Persistent field heartbeat pulse error: {e}")
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
 
     @app.get("/api/persistent-field/dormant-state")
     async def get_dormant_state():
@@ -53,7 +56,8 @@ def register_persistent_field_endpoints(app: FastAPI) -> None:
             mgr = DormantStateManager()
             return mgr.get_summary()
         except Exception as e:
-            return {"status": "unavailable", "error": str(e)}
+            logger.error(f"Persistent field dormant state error: {e}")
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
 
     @app.post("/api/persistent-field/dormant-state/transition")
     async def transition_dormant_state(state: str, reason: str = ""):
@@ -65,7 +69,8 @@ def register_persistent_field_endpoints(app: FastAPI) -> None:
             success = mgr.transition(new_state, reason)
             return {"success": success, "state": mgr.get_state()}
         except Exception as e:
-            return {"status": "unavailable", "error": str(e)}
+            logger.error(f"Persistent field dormant transition error: {e}")
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
 
     @app.get("/api/persistent-field/environment")
     async def get_environment():
@@ -75,7 +80,8 @@ def register_persistent_field_endpoints(app: FastAPI) -> None:
             mon = EnvironmentalMonitor()
             return mon.check_environment()
         except Exception as e:
-            return {"status": "unavailable", "error": str(e)}
+            logger.error(f"Persistent field environment error: {e}")
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
 
     @app.get("/api/persistent-field/repair")
     async def get_repair_status():
@@ -85,7 +91,8 @@ def register_persistent_field_endpoints(app: FastAPI) -> None:
             repair = AutonomousRepair()
             return repair.get_status()
         except Exception as e:
-            return {"status": "unavailable", "error": str(e)}
+            logger.error(f"Persistent field repair status error: {e}")
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
 
     @app.post("/api/persistent-field/repair")
     async def trigger_repair(action: str, target: str):
@@ -102,7 +109,8 @@ def register_persistent_field_endpoints(app: FastAPI) -> None:
                 "duration_seconds": result.duration_seconds,
             }
         except Exception as e:
-            return {"status": "unavailable", "error": str(e)}
+            logger.error(f"Persistent field repair trigger error: {e}")
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
 
     @app.get("/api/persistent-field/drift")
     async def get_drift_report():
@@ -112,7 +120,8 @@ def register_persistent_field_endpoints(app: FastAPI) -> None:
             detector = OperationalDriftDetector()
             return detector.get_drift_report()
         except Exception as e:
-            return {"status": "unavailable", "error": str(e)}
+            logger.error(f"Persistent field drift report error: {e}")
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
 
     @app.get("/api/persistent-field/scheduler")
     async def get_scheduler_status():
@@ -122,7 +131,8 @@ def register_persistent_field_endpoints(app: FastAPI) -> None:
             scheduler = PersistentScheduler()
             return scheduler.get_status()
         except Exception as e:
-            return {"status": "unavailable", "error": str(e)}
+            logger.error(f"Persistent field scheduler error: {e}")
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
 
     @app.get("/api/persistent-field/continuity")
     async def get_continuity():
@@ -132,7 +142,8 @@ def register_persistent_field_endpoints(app: FastAPI) -> None:
             preserver = ContinuityPreserver()
             return preserver.get_summary()
         except Exception as e:
-            return {"status": "unavailable", "error": str(e)}
+            logger.error(f"Persistent field continuity error: {e}")
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
 
     @app.get("/api/persistent-field/recovery")
     async def get_recovery_status():
@@ -142,7 +153,8 @@ def register_persistent_field_endpoints(app: FastAPI) -> None:
             recovery = RecoveryPersistence()
             return recovery.get_recovery_status()
         except Exception as e:
-            return {"status": "unavailable", "error": str(e)}
+            logger.error(f"Persistent field recovery error: {e}")
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
 
     @app.post("/api/persistent-field/snapshot")
     async def create_snapshot(components: list[str], data: dict = None):
@@ -157,6 +169,7 @@ def register_persistent_field_endpoints(app: FastAPI) -> None:
                 "components": snapshot.components,
             }
         except Exception as e:
-            return {"status": "unavailable", "error": str(e)}
+            logger.error(f"Persistent field snapshot error: {e}")
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
 
     logger.info("O-7 Persistent Field endpoints registered")
