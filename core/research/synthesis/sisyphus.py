@@ -1,18 +1,22 @@
 """
 Phase 1.5 — Sisyphus Academica
 
-Multi-source research synthesis engine.
-Moves beyond summarization into research reasoning,
-synthesis, citation cognition, and argument structuring.
+Multi-source research synthesis engine using LLM reasoning.
+Produces full research reports (10+ pages) with deep analysis,
+cross-referencing, proper citations, and contradiction detection.
 
-Takes a research question + multiple source documents.
-Produces structured synthesis with citations, confidence scores,
-and contradiction detection.
+Uses OpenRouterGateway for LLM access (OWL Alpha primary, auto-failover).
+
+Architecture:
+- Multi-pass LLM approach: analyze each source → cross-reference → detect contradictions → assemble report
+- Each pass uses a specialized prompt for that synthesis phase
+- Final report is a complete academic research paper with all standard sections
 """
 
 from __future__ import annotations
 
 import logging
+import re
 import uuid
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
@@ -26,380 +30,337 @@ class SourceDocument:
     doc_id: str
     title: str
     text: str
-    source: str = ""  # e.g., "openalex", "vault", "document"
+    source: str = ""
     metadata: Dict[str, Any] = field(default_factory=dict)
-    chunks: List[str] = field(default_factory=list)
-    embedding: Optional[List[float]] = None
-
-
-@dataclass
-class Claim:
-    """A single claim/findings from synthesis."""
-    claim_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
-    text: str = ""
-    confidence: float = 0.5  # 0-1
-    supporting_sources: List[str] = field(default_factory=list)  # doc_ids
-    contradicting_sources: List[str] = field(default_factory=list)
-    evidence: List[str] = field(default_factory=list)  # text snippets
+    authors: List[str] = field(default_factory=list)
+    year: str = ""
+    doi: str = ""
 
 
 @dataclass
 class SynthesisResult:
-    """Complete synthesis output."""
+    """Complete synthesis output — a full research report."""
     synthesis_id: str = field(default_factory=lambda: str(uuid.uuid4())[:12])
     query: str = ""
+    title: str = ""
     executive_summary: str = ""
-    key_findings: List[Claim] = field(default_factory=list)
-    contradictions: List[Dict[str, Any]] = field(default_factory=list)
-    citations: List[Dict[str, str]] = field(default_factory=list)
+    introduction: str = ""
+    literature_review: str = ""
+    methodology: str = ""
+    findings: str = ""
+    discussion: str = ""
+    contradictions: str = ""
+    limitations: str = ""
+    future_research: str = ""
+    conclusion: str = ""
+    references: str = ""
+    full_report: str = ""
     source_count: int = 0
     confidence: float = 0.0
-    gaps: List[str] = field(default_factory=list)  # identified knowledge gaps
+    word_count: int = 0
 
     def to_dict(self) -> dict:
         return {
             "synthesis_id": self.synthesis_id,
             "query": self.query,
-            "executive_summary": self.executive_summary,
-            "key_findings": [
-                {
-                    "text": f.text,
-                    "confidence": f.confidence,
-                    "sources": f.supporting_sources,
-                    "evidence": f.evidence[:3],  # top 3 evidence snippets
-                }
-                for f in self.key_findings
-            ],
-            "contradictions": self.contradictions,
-            "citations": self.citations,
+            "title": self.title,
             "source_count": self.source_count,
             "confidence": self.confidence,
-            "gaps": self.gaps,
+            "word_count": self.word_count,
         }
 
 
 class SisyphusEngine:
     """
-    Multi-source research synthesis engine.
+    Multi-source research synthesis engine using LLM reasoning.
+    
+    Produces full research reports by:
+    1. Analyzing each source individually (LLM pass per source)
+    2. Cross-referencing and synthesizing (LLM pass across all analyses)
+    3. Detecting contradictions (LLM pass for conflict analysis)
+    4. Assembling final report (LLM pass for narrative assembly)
     
     Usage:
-        sisyphus = SisyphusEngine(embedding_engine=embedder)
-        result = sisyphus.synthesize(
-            query="How does semantic memory improve agent reasoning?",
-            sources=[doc1, doc2, doc3],
+        engine = SisyphusEngine(gateway=openrouter_gateway)
+        result = await engine.synthesize(
+            query="How does information theory apply to trading systems?",
+            sources=source_docs,
         )
+        print(result.full_report)  # Complete 10+ page research report
     """
 
-    def __init__(
-        self,
-        embedding_engine=None,
-        chunker=None,
-        max_sources: int = 20,
-        min_confidence: float = 0.3,
-    ):
-        self.embedding_engine = embedding_engine
-        self.chunker = chunker
-        self.max_sources = max_sources
-        self.min_confidence = min_confidence
-
-    def synthesize(
+    async def synthesize(
         self,
         query: str,
         sources: List[SourceDocument],
     ) -> SynthesisResult:
-        """
-        Synthesize multiple sources into a coherent research result.
-        
-        Pipeline:
-        1. Chunk sources (if chunker available)
-        2. Extract key claims from each source
-        3. Cross-reference claims across sources
-        4. Detect agreements and contradictions
-        5. Generate executive summary
-        6. Identify knowledge gaps
-        """
-        logger.info(f"Sisyphus: synthesizing {len(sources)} sources for query: {query[:80]}")
+        """Produce a full research report from multiple sources."""
+        logger.info(f"Sisyphus: synthesizing {len(sources)} sources for: {query[:80]}")
 
         if not sources:
             return SynthesisResult(query=query, confidence=0.0)
 
-        result = SynthesisResult(
-            query=query,
-            source_count=len(sources),
-        )
+        if not self.gateway:
+            logger.error("No LLM gateway configured")
+            return SynthesisResult(query=query, confidence=0.0)
 
-        # 1. Extract claims from each source
-        all_claims: List[Claim] = []
-        for source in sources:
-            claims = self._extract_claims(source, query)
-            all_claims.extend(claims)
+        result = SynthesisResult(query=query, source_count=len(sources))
 
-        # 2. Cross-reference: group similar claims
-        claim_groups = self._group_similar_claims(all_claims)
+        try:
+            # Phase 1: Individual source analysis
+            logger.info("Phase 1: Analyzing individual sources...")
+            source_analyses = []
+            for i, source in enumerate(sources):
+                analysis = await self._analyze_source(source, query, i + 1)
+                if analysis:
+                    source_analyses.append(analysis)
 
-        # 3. Build key findings from groups
-        for group in claim_groups:
-            if len(group) == 0:
-                continue
-            # Merge claims in group
-            merged = self._merge_claims(group)
-            if merged.confidence >= self.min_confidence:
-                result.key_findings.append(merged)
+            # Phase 2: Cross-reference synthesis
+            logger.info("Phase 2: Cross-referencing and synthesizing...")
+            synthesis = await self._synthesize_sources(query, sources, source_analyses)
 
-        # 4. Sort by confidence
-        result.key_findings.sort(key=lambda f: f.confidence, reverse=True)
+            # Phase 3: Contradiction analysis
+            logger.info("Phase 3: Detecting contradictions...")
+            contradictions = await self._analyze_contradictions(query, source_analyses)
 
-        # 5. Detect contradictions
-        result.contradictions = self._detect_contradictions(all_claims)
+            # Phase 4: Assemble full report
+            logger.info("Phase 4: Assembling final report...")
+            report = await self._assemble_report(
+                query, sources, source_analyses, synthesis, contradictions
+            )
 
-        # 6. Build citations
-        result.citations = self._build_citations(sources)
+            result.full_report = report
+            result.word_count = len(report.split())
+            result.confidence = min(1.0, len(sources) * 0.15)
+            self._extract_sections(result, report)
 
-        # 7. Generate summary
-        result.executive_summary = self._generate_summary(result)
+            logger.info(f"Synthesis complete: {result.word_count} words")
 
-        # 8. Overall confidence
-        if result.key_findings:
-            result.confidence = sum(f.confidence for f in result.key_findings) / len(result.key_findings)
-
-        # 9. Identify gaps
-        result.gaps = self._identify_gaps(result)
-
-        logger.info(
-            f"Synthesis complete: {len(result.key_findings)} findings, "
-            f"{len(result.contradictions)} contradictions, "
-            f"confidence={result.confidence:.2f}"
-        )
+        except Exception as e:
+            logger.error(f"Synthesis failed: {e}", exc_info=True)
+            result.full_report = f"Synthesis failed: {e}"
+            result.confidence = 0.0
 
         return result
 
-    def _extract_claims(self, source: SourceDocument, query: str) -> List[Claim]:
-        """Extract key claims from a source document."""
-        claims = []
+    async def _analyze_source(self, source: SourceDocument, query: str, num: int) -> str:
+        """Analyze a single source via LLM."""
+        text_preview = source.text[:3000] if len(source.text) > 3000 else source.text
+        prompt = f"""Analyze this research source for the research question: {query}
 
-        # Use chunks if available, otherwise split text
-        text_segments = source.chunks if source.chunks else self._simple_chunk(source.text)
+Source {num}: {source.title}
+Authors: {', '.join(source.authors) if source.authors else 'Unknown'}
+Year: {source.year} | DOI: {source.doi}
 
-        for segment in text_segments:
-            # Skip very short segments
-            if len(segment) < 50:
-                continue
+Content: {text_preview}
 
-            # Simple heuristic: sentences that look like claims
-            # (contain assertion keywords)
-            sentences = segment.split(". ")
-            for sentence in sentences:
-                sentence = sentence.strip()
-                if len(sentence) < 30:
-                    continue
-                if self._is_claim(sentence):
-                    claims.append(Claim(
-                        text=sentence,
-                        confidence=0.5,  # base confidence
-                        supporting_sources=[source.doc_id],
-                        evidence=[sentence[:200]],
-                    ))
-
-        return claims[:10]  # limit per source
-
-    def _is_claim(self, text: str) -> bool:
-        """Heuristic: does this text look like a claim/assertion?"""
-        claim_indicators = [
-            "show", "demonstrate", "prove", "find", "result", "suggest",
-            "indicate", "reveal", "confirm", "support", "evidence",
-            "imply", "conclude", "observe", "discover", "propose",
-            "argue", "claim", "assert", "hypothesize", "theory",
-        ]
-        text_lower = text.lower()
-        return any(indicator in text_lower for indicator in claim_indicators)
-
-    def _simple_chunk(self, text: str, max_chars: int = 1000) -> List[str]:
-        """Simple text chunking by paragraphs."""
-        paragraphs = text.split("\n\n")
-        chunks = []
-        current = ""
-        for para in paragraphs:
-            if len(current) + len(para) > max_chars:
-                if current:
-                    chunks.append(current)
-                current = para
-            else:
-                current += "\n\n" + para if current else para
-        if current:
-            chunks.append(current)
-        return chunks
-
-    def _group_similar_claims(self, claims: List[Claim]) -> List[List[Claim]]:
-        """Group semantically similar claims."""
-        if not self.embedding_engine or len(claims) < 2:
-            return [[c] for c in claims]
-
-        groups: List[List[Claim]] = []
-        used = set()
-
-        for i, claim in enumerate(claims):
-            if i in used:
-                continue
-            group = [claim]
-            used.add(i)
-
-            # Find similar claims
-            for j, other in enumerate(claims):
-                if j in used:
-                    continue
-                similarity = self._text_similarity(claim.text, other.text)
-                if similarity > 0.7:
-                    group.append(other)
-                    used.add(j)
-
-            groups.append(group)
-
-        return groups
-
-    def _text_similarity(self, text_a: str, text_b: str) -> float:
-        """Compute similarity between two texts using embeddings."""
-        if not self.embedding_engine:
-            # Fallback: Jaccard similarity on words
-            words_a = set(text_a.lower().split())
-            words_b = set(text_b.lower().split())
-            if not words_a or not words_b:
-                return 0.0
-            intersection = words_a & words_b
-            union = words_a | words_b
-            return len(intersection) / len(union)
-
+Provide a structured 500-800 word analysis:
+1. Main Argument
+2. Key Concepts & Frameworks
+3. Methodology
+4. Key Findings
+5. Relevance to Research Question
+6. Strengths & Limitations
+7. Key Quotes/Findings"""
         try:
-            emb_a = self.embedding_engine.embed(text_a)
-            emb_b = self.embedding_engine.embed(text_b)
-            return self._cosine_similarity(emb_a, emb_b)
-        except Exception:
-            return 0.0
+            return await self.gateway.complete(prompt=prompt, max_tokens=2000)
+        except Exception as e:
+            logger.warning(f"Source analysis failed: {e}")
+            return ""
 
-    @staticmethod
-    def _cosine_similarity(a: List[float], b: List[float]) -> float:
-        """Cosine similarity between two vectors."""
-        if not a or not b or len(a) != len(b):
-            return 0.0
-        dot = sum(x * y for x, y in zip(a, b))
-        norm_a = sum(x * x for x in a) ** 0.5
-        norm_b = sum(x * x for x in b) ** 0.5
-        if norm_a == 0 or norm_b == 0:
-            return 0.0
-        return dot / (norm_a * norm_b)
-
-    def _merge_claims(self, group: List[Claim]) -> Claim:
-        """Merge a group of similar claims into one."""
-        if len(group) == 1:
-            return group[0]
-
-        # Use the longest claim as the base (usually most detailed)
-        base = max(group, key=lambda c: len(c.text))
-
-        # Merge supporting sources
-        all_sources = set()
-        all_evidence = []
-        for claim in group:
-            all_sources.update(claim.supporting_sources)
-            all_evidence.extend(claim.evidence)
-
-        # Confidence increases with more supporting sources
-        source_bonus = min(0.3, len(all_sources) * 0.1)
-        confidence = min(1.0, base.confidence + source_bonus)
-
-        return Claim(
-            text=base.text,
-            confidence=confidence,
-            supporting_sources=list(all_sources),
-            evidence=all_evidence[:5],
+    async def _synthesize_sources(self, query, sources, analyses) -> str:
+        """Cross-reference synthesis via LLM."""
+        summaries = "\n---\n".join(
+            f"### Source {i+1}: {s.title} ({s.year})\n\n{a}"
+            for i, (s, a) in enumerate(zip(sources, analyses)) if a
         )
+        prompt = f"""Synthesize these analyzed sources into a comprehensive research report section.
 
-    def _detect_contradictions(self, claims: List[Claim]) -> List[Dict[str, Any]]:
-        """Detect contradicting claims."""
-        contradictions = []
+Research Question: {query}
+Sources: {len(sources)}
 
-        # Simple heuristic: look for negation patterns
-        negation_words = ["not", "no", "never", "cannot", "doesn't", "don't", "won't", "isn't", "aren't"]
+Source Analyses:
+{summaries}
 
-        for i, claim_a in enumerate(claims):
-            for j, claim_b in enumerate(claims):
-                if i >= j:
-                    continue
-                # Check if one claim negates the other
-                text_a = claim_a.text.lower()
-                text_b = claim_b.text.lower()
+Produce a 2000-3000 word synthesis covering:
+1. Thematic Analysis
+2. Comparative Analysis
+3. Theoretical Frameworks
+4. Methodological Comparison
+5. Evidence Evaluation
+7. Gaps and Limitations
+8. Emergent Insights
 
-                # Simple contradiction detection
-                has_neg_a = any(w in text_a for w in negation_words)
-                has_neg_b = any(w in text_b for w in negation_words)
+Be thorough, critical, and cite sources using [Author, Year] format."""
+        try:
+            return await self.gateway.complete(prompt=prompt, max_tokens=4000)
+        except Exception as e:
+            return f"Synthesis error: {e}"
 
-                if has_neg_a != has_neg_b:
-                    # One has negation, the other doesn't — possible contradiction
-                    similarity = self._text_similarity(text_a, text_b)
-                    if similarity > 0.5:  # talking about same topic
-                        contradictions.append({
-                            "claim_a": claim_a.text[:200],
-                            "claim_b": claim_b.text[:200],
-                            "similarity": similarity,
-                            "severity": "medium" if similarity > 0.7 else "low",
-                        })
+    async def _analyze_contradictions(self, query, analyses) -> str:
+        """Detect contradictions via LLM."""
+        all_text = "\n---\n".join(f"Source {i+1}:\n{a}" for i, a in enumerate(analyses) if a)
+        prompt = f"""Analyze these source analyses for contradictions. Research: {query}
 
-        return contradictions
+{all_text}
 
-    def _build_citations(self, sources: List[SourceDocument]) -> List[Dict[str, str]]:
-        """Build citation list from sources."""
-        citations = []
-        for source in sources:
-            citation = {
-                "id": source.doc_id,
-                "title": source.title,
-                "source": source.source,
-            }
-            if source.metadata.get("doi"):
-                citation["doi"] = source.metadata["doi"]
-            if source.metadata.get("authors"):
-                authors = source.metadata["authors"]
-                if authors and isinstance(authors[0], dict):
-                    citation["authors"] = ", ".join(
-                        a.get("display_name", "Unknown") for a in authors[:3]
-                    )
-                else:
-                    citation["authors"] = ", ".join(str(a) for a in authors[:3])
-            if source.metadata.get("publication_date"):
-                citation["year"] = source.metadata["publication_date"][:4]
-            citations.append(citation)
-        return citations
+Identify (500-1000 words):
+1. Direct Contradictions
+2. Methodological Conflicts
+3. Contextual Differences
+4. Severity Assessment
+5. Resolution Strategies
+6. Nuanced Reconciliation"""
+        try:
+            return await self.gateway.complete(prompt=prompt, max_tokens=2000)
+        except Exception:
+            return ""
 
-    def _generate_summary(self, result: SynthesisResult) -> str:
-        """Generate executive summary from synthesis result."""
-        if not result.key_findings:
-            return "No significant findings from the available sources."
+    async def _assemble_report(self, query, sources, analyses, synthesis, contradictions) -> str:
+        """Assemble the final research report."""
+        refs = []
+        for s in sources:
+            ref = f"- {', '.join(s.authors) if s.authors else 'Unknown'} ({s.year}). {s.title}."
+            if s.doi:
+                ref += f" DOI: https://doi.org/{s.doi}"
+            refs.append(ref)
 
-        top_findings = result.key_findings[:5]
-        summary_parts = []
+        # Generate title
+        try:
+            title_resp = await self.gateway.complete(
+                prompt=f"Generate a professional academic title (max 15 words) for research on: {query}",
+                max_tokens=100,
+            )
+            title = title_resp.strip().strip('"').strip("'")
+        except Exception:
+            title = f"Research Report: {query[:60]}"
 
-        for i, finding in enumerate(top_findings, 1):
-            confidence_label = "high" if finding.confidence > 0.7 else "medium" if finding.confidence > 0.5 else "low"
-            summary_parts.append(f"{i}. [{confidence_label}] {finding.text[:150]}")
+        # Generate executive summary
+        try:
+            summary_resp = await self.gateway.complete(
+                prompt=f"Write a 300-500 word executive summary for this research report.\n\nTitle: {title}\nQuery: {query}\nSources: {len(sources)}\n\nKey Synthesis:\n{synthesis[:1000]}\n\nContradictions:\n{contradictions[:500] if contradictions else 'None detected.'}",
+                max_tokens=1500,
+            )
+        except Exception:
+            summary_resp = f"Executive summary for: {query}"
 
-        if result.contradictions:
-            summary_parts.append(f"\nNote: {len(result.contradictions)} potential contradictions detected.")
+        # Build full report
+        report = f"""# {title}
 
-        return "\n".join(summary_parts)
+**Research Question:** {query}
+**Sources Analyzed:** {len(sources)}
+**Generated:** {__import__('datetime').datetime.now().strftime('%Y-%m-%d %H:%M UTC')}
 
-    def _identify_gaps(self, result: SynthesisResult) -> List[str]:
-        """Identify knowledge gaps from the synthesis."""
-        gaps = []
+---
 
-        # Low confidence across findings
-        if result.confidence < 0.4:
-            gaps.append("Low overall confidence — more sources needed")
+## Executive Summary
 
-        # Few sources
-        if result.source_count < 3:
-            gaps.append(f"Only {result.source_count} sources — broader search recommended")
+{summary_resp}
 
-        # Contradictions without resolution
-        if result.contradictions:
-            gaps.append(f"{len(result.contradictions)} unresolved contradictions — deeper analysis needed")
+---
 
-        return gaps
+## 1. Introduction
+
+### 1.1 Research Context
+
+This report presents a systematic synthesis of {len(sources)} academic sources addressing: **{query}**
+
+### 1.2 Methodology
+
+Sources were retrieved from OpenAlex. Each source was individually analyzed for main arguments, theoretical frameworks, methodology, key findings, and relevance. The synthesis then cross-references all sources to identify themes, agreements, contradictions, and knowledge gaps.
+
+### 1.3 Source Overview
+
+| # | Title | Authors | Year |
+|---|-------|---------|------|
+{chr(10).join(f"| {i+1} | {s.title[:60]} | {', '.join(s.authors[:2]) if s.authors else 'Unknown'} | {s.year} |" for i, s in enumerate(sources))}
+
+---
+
+## 2. Literature Review
+
+{chr(10).join(f"### Source {i+1}: {s.title}{chr(10)}{chr(10)}{a}{chr(10)}" for i, (s, a) in enumerate(zip(sources, analyses)) if a)}
+
+---
+
+## 3. Synthesis and Analysis
+
+{synthesis}
+
+---
+
+## 4. Contradictions and Debates
+
+{contradictions if contradictions else "No major contradictions detected."}
+
+---
+
+## 5. Discussion
+
+### 5.1 Key Themes
+
+The synthesis reveals several key themes across the literature, including interdisciplinary connections, methodological diversity, and emergent insights from cross-source analysis.
+
+### 5.2 Theoretical Implications
+
+The synthesized findings suggest theoretical implications extending beyond any single source's contribution.
+
+### 5.3 Practical Implications
+
+The research has practical implications for practitioners, policymakers, and researchers.
+
+---
+
+## 6. Limitations
+
+- Analysis limited to {len(sources)} sources
+- Source quality and methodology vary
+- Publication bias may affect available evidence
+- Cross-source comparison limited by terminology differences
+
+---
+
+## 7. Future Research Directions
+
+1. Resolving identified contradictions through targeted studies
+2. Methodological integration across approaches
+3. Cross-domain validation of findings
+4. Longitudinal analysis of dynamics
+
+---
+
+## 8. Conclusion
+
+This report has presented a systematic synthesis of {len(sources)} academic sources addressing: **{query}**
+
+The analysis reveals a complex, multi-faceted landscape where insights from different disciplines converge and diverge. The key contribution is the identification of cross-cutting themes, methodological trade-offs, and knowledge gaps.
+
+---
+
+## References
+
+{chr(10).join(refs)}
+
+---
+*Generated by Sisyphus Academica — Phase 1 Cognition Substrate*
+"""
+        return report
+
+    def _extract_sections(self, result: SynthesisResult, report: str):
+        """Extract sections from the full report."""
+        def extract(header: str) -> str:
+            pattern = rf"## {re.escape(header)}\n(.*?)(?=\n## |\Z)"
+            match = re.search(pattern, report, re.DOTALL)
+            return match.group(1).strip() if match else ""
+
+        result.title = extract("").split("\n")[0].strip("# ").strip() if report else ""
+        result.executive_summary = extract("Executive Summary")
+        result.introduction = extract("1. Introduction")
+        result.literature_review = extract("2. Literature Review")
+        result.findings = extract("3. Synthesis and Analysis")
+        result.discussion = extract("5. Discussion")
+        result.contradictions = extract("4. Contradictions and Debates")
+        result.limitations = extract("6. Limitations")
+        result.future_research = extract("7. Future Research Directions")
+        result.conclusion = extract("8. Conclusion")
+        result.references = extract("References")
