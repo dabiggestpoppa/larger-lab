@@ -55,6 +55,7 @@ class SynthesisResult:
     conclusion: str = ""
     references: str = ""
     full_report: str = ""
+    pdf_path: str = ""
     source_count: int = 0
     confidence: float = 0.0
     word_count: int = 0
@@ -143,6 +144,24 @@ class SisyphusEngine:
             result.word_count = len(report.split())
             result.confidence = min(1.0, len(sources) * 0.15)
             self._extract_sections(result, report)
+
+            # Phase 5: Generate PDF
+            logger.info("Phase 5: Generating PDF...")
+            try:
+                from core.research.synthesis.pdf_generator import PDFReportGenerator
+                pdf_gen = PDFReportGenerator()
+                pdf_path = pdf_gen.generate(
+                    markdown=report,
+                    title=result.title or f"Research Report: {query[:60]}",
+                    output_path=None,  # Auto-generate path
+                )
+                if pdf_path:
+                    result.pdf_path = pdf_path
+                    logger.info(f"PDF generated: {pdf_path}")
+                else:
+                    logger.warning("PDF generation returned None")
+            except Exception as pdf_err:
+                logger.warning(f"PDF generation failed (non-critical): {pdf_err}")
 
             logger.info(f"Synthesis complete: {result.word_count} words")
 
