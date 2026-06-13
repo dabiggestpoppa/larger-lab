@@ -66,26 +66,37 @@ def save_config(cfg):
         json.dump(cfg, f, indent=2)
 
 
-def parse_alert_file():
-    if not LATEST_ALERT_FILE.exists():
-        return None
-    try:
-        text = LATEST_ALERT_FILE.read_text(encoding="utf-8").strip()
-        if not text:
-            return None
-        lines = text.split("\n")
-        timestamp = ""
-        title = ""
-        details = []
-        for line in lines:
-            if line.startswith("[") and "]" in line:
-                timestamp = line.split("]")[0].lstrip("[")
-                title = line.split("]", 1)[1].strip()
-            else:
-                details.append(line.strip())
-        return {"timestamp": timestamp, "title": title, "details": details, "raw": text}
-    except Exception:
-        return None
+def parse_latest_alert():
+    """Get the most recent alert from history JSON (falls back to latest_alert.txt)."""
+    # Primary: read from alerts_history.json (always up-to-date)
+    history = load_alerts_history()
+    if history:
+        last = history[-1]
+        msg = last.get("message", "")
+        ts = last.get("timestamp", "")
+        lines = msg.split("\n") if msg else []
+        title = lines[0] if lines else "Alert"
+        details = lines[1:] if len(lines) > 1 else []
+        return {"timestamp": ts, "title": title, "details": details, "raw": msg}
+    # Fallback: read from latest_alert.txt
+    if LATEST_ALERT_FILE.exists():
+        try:
+            text = LATEST_ALERT_FILE.read_text(encoding="utf-8").strip()
+            if text:
+                lines = text.split("\n")
+                timestamp = ""
+                title = ""
+                details = []
+                for line in lines:
+                    if line.startswith("[") and "]" in line:
+                        timestamp = line.split("]")[0].lstrip("[")
+                        title = line.split("]", 1)[1].strip()
+                    else:
+                        details.append(line.strip())
+                return {"timestamp": timestamp, "title": title, "details": details, "raw": text}
+        except Exception:
+            pass
+    return None
 
 
 def _no_window_kwargs():
