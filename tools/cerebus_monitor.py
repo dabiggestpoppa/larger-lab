@@ -67,8 +67,7 @@ def save_config(cfg):
 
 
 def parse_latest_alert():
-    """Get the most recent alert from history JSON (falls back to latest_alert.txt)."""
-    # Primary: read from alerts_history.json (always up-to-date)
+    """Get the most recent alert from alerts_history.json."""
     history = load_alerts_history()
     if history:
         last = history[-1]
@@ -78,24 +77,6 @@ def parse_latest_alert():
         title = lines[0] if lines else "Alert"
         details = lines[1:] if len(lines) > 1 else []
         return {"timestamp": ts, "title": title, "details": details, "raw": msg}
-    # Fallback: read from latest_alert.txt
-    if LATEST_ALERT_FILE.exists():
-        try:
-            text = LATEST_ALERT_FILE.read_text(encoding="utf-8").strip()
-            if text:
-                lines = text.split("\n")
-                timestamp = ""
-                title = ""
-                details = []
-                for line in lines:
-                    if line.startswith("[") and "]" in line:
-                        timestamp = line.split("]")[0].lstrip("[")
-                        title = line.split("]", 1)[1].strip()
-                    else:
-                        details.append(line.strip())
-                return {"timestamp": timestamp, "title": title, "details": details, "raw": text}
-        except Exception:
-            pass
     return None
 
 
