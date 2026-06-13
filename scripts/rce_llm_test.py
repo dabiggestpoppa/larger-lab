@@ -1,4 +1,9 @@
-"""Full RCE pipeline test with LLM-powered reasoning."""
+"""Full RCE pipeline test with LLM-powered reasoning.
+
+Two-model strategy:
+- FAST (nemotron): R1 extraction, R2 relationships, R3 reasoning, R5 validation
+- POWER (nex-n2-pro): R4 final theory synthesis and report generation
+"""
 import asyncio
 import json
 import os
@@ -18,7 +23,7 @@ TOPICS = [
     "geopolitical risk emerging markets capital flows financial crisis",
 ]
 
-Papers_PER_SOURCE = 5  # Reduced for speed
+PAPERS_PER_SOURCE = 5
 YEAR_FROM = 2016
 
 
@@ -40,7 +45,7 @@ async def main():
         
         papers = await fetcher.fetch_papers(
             query=topic,
-            per_source=Papers_PER_SOURCE,
+            per_source=PAPERS_PER_SOURCE,
             year_from=YEAR_FROM,
         )
         
