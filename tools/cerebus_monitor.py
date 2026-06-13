@@ -95,7 +95,8 @@ def get_scanner_status():
         result = subprocess.run(
             ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass",
              "-File", str(helper)],
-            capture_output=True, text=True, timeout=8
+            capture_output=True, text=True, timeout=8,
+            creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
         )
         pid_str = result.stdout.strip()
         if pid_str and pid_str.isdigit():
@@ -489,7 +490,7 @@ class CerebusMonitor(tk.Tk):
             subprocess.Popen(
                 cmd, cwd=str(REPO_ROOT),
                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if sys.platform == "win32" else 0
+                creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
             )
             messagebox.showinfo("Started", "Scanner started.")
         except Exception as e:
@@ -498,11 +499,10 @@ class CerebusMonitor(tk.Tk):
     def _stop_scanner(self):
         try:
             subprocess.run(
-                ["powershell", "-Command",
-                 "Get-Process python -ErrorAction SilentlyContinue | "
-                 "Where-Object { $_.CommandLine -match 'run_cerebus_unified' } | "
-                 "Stop-Process -Force"],
-                capture_output=True, text=True, timeout=5
+                ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass",
+                 "-File", str(REPO_ROOT / "tools" / "_stop_scanner.ps1")],
+                capture_output=True, text=True, timeout=5,
+                creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
             )
             messagebox.showinfo("Stopped", "Scanner stopped.")
         except Exception as e:
