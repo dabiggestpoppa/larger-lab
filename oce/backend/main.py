@@ -1389,6 +1389,10 @@ register_ml_endpoints(app)
 from .research_api import register_research_endpoints
 register_research_endpoints(app)
 
+# Register RCE (Research Cognition Engine) API endpoints
+from .rce_api import router as rce_router
+app.include_router(rce_router)
+
 # Register PO API endpoints (PO × VTuber integration)
 app.include_router(po_router)
 
