@@ -1,3 +1,3 @@
 @echo off
 cd /d C:\Users\wifik\Desktop\projects\larger-lab
-python tools\cerebus_monitor.py
+start "CEREBUS Monitor" /B pythonw tools\cerebus_monitor.py
