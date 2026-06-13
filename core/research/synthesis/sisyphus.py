@@ -89,6 +89,16 @@ class SisyphusEngine:
         print(result.full_report)  # Complete 10+ page research report
     """
 
+    def __init__(
+        self,
+        gateway=None,
+        chunker=None,
+        max_sources: int = 20,
+    ):
+        self.gateway = gateway
+        self.chunker = chunker
+        self.max_sources = max_sources
+
     async def synthesize(
         self,
         query: str,
