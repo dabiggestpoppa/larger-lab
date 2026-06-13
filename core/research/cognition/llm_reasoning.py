@@ -381,17 +381,17 @@ class LLMReasoning:
         Returns dict with: main_claims, mechanisms, assumptions,
         equations, limitations, novel_contribution, etc.
         """
+        # Use first 6000 chars to keep response within token limits
         prompt = R1_CLAIM_EXTRACTION_PROMPT.format(
             title=title or "Unknown",
-            text=text[:8000],  # Limit to first 8000 chars for better extraction
+            text=text[:6000],
         )
         
-        response = await self._call_llm(prompt, max_tokens=3000, model=self.FAST_MODEL)
+        response = await self._call_llm(prompt, max_tokens=4000, model=self.FAST_MODEL)
         result = self._parse_json(response)
         
         if not result:
             logger.warning(f"R1 extraction returned empty for: {title}")
-            # Return a minimal structure so pipeline doesn't break
             return {
                 "paper_title": title,
                 "main_claims": [],
