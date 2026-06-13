@@ -381,13 +381,15 @@ class LLMReasoning:
         Returns dict with: main_claims, mechanisms, assumptions,
         equations, limitations, novel_contribution, etc.
         """
-        # Use first 6000 chars to keep response within token limits
+        # nemotron has 1M context, so we can use more text and higher max_tokens
+        # Limit to 12000 chars to stay well within context
         prompt = R1_CLAIM_EXTRACTION_PROMPT.format(
             title=title or "Unknown",
-            text=text[:6000],
+            text=text[:12000],
         )
         
-        response = await self._call_llm(prompt, max_tokens=4000, model=self.FAST_MODEL)
+        # nemotron: 1M context, can use high max_tokens
+        response = await self._call_llm(prompt, max_tokens=8000, model=self.FAST_MODEL)
         result = self._parse_json(response)
         
         if not result:
@@ -476,7 +478,7 @@ class LLMReasoning:
             paper_json=papers_json,
         )
         
-        response = await self._call_llm(prompt, max_tokens=2000, model=self.FAST_MODEL)
+        response = await self._call_llm(prompt, max_tokens=4000, model=self.FAST_MODEL)
         result = self._parse_json(response)
         
         if not result:
@@ -502,7 +504,7 @@ class LLMReasoning:
             papers_json=papers_json[:8000],
         )
         
-        response = await self._call_llm(prompt, max_tokens=2500, model=self.FAST_MODEL)
+        response = await self._call_llm(prompt, max_tokens=5000, model=self.FAST_MODEL)
         result = self._parse_json(response)
         
         if not result:
@@ -522,12 +524,13 @@ class LLMReasoning:
         
         Returns dict with: unified_theory, research_report, confidence.
         """
+        # nex-n2-pro has 128K context — truncate reasoning to stay within limits
+        reasoning_truncated = reasoning_json[:4000]
         prompt = R4_SYNTHESIS_PROMPT.format(
             topic=topic,
-            reasoning_json=reasoning_json[:6000],
+            reasoning_json=reasoning_truncated,
         )
-        
-        response = await self._call_llm(prompt, max_tokens=4000, model=self.POWER_MODEL)
+        response = await self._call_llm(prompt, max_tokens=6000, model=self.POWER_MODEL)
         result = self._parse_json(response)
         
         if not result:
@@ -552,7 +555,7 @@ class LLMReasoning:
             report_text=report_text[:6000],
         )
         
-        response = await self._call_llm(prompt, max_tokens=1500, model=self.FAST_MODEL)
+        response = await self._call_llm(prompt, max_tokens=3000, model=self.FAST_MODEL)
         result = self._parse_json(response)
         
         if not result:
