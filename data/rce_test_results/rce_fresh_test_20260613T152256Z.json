@@ -1,0 +1,227 @@
+{
+  "test": "rce_fresh_test",
+  "timestamp": "20260613T152256Z",
+  "sources": [
+    "openalex",
+    "arxiv",
+    "s2"
+  ],
+  "topics": [
+    "information theory trading systems financial markets entropy",
+    "geopolitical risk emerging markets financial contagion systemic risk"
+  ],
+  "papers_per_source": 8,
+  "year_from": 2018,
+  "results": [
+    {
+      "topic": "information theory trading systems financial markets entropy",
+      "num_papers": 10,
+      "num_knowledge_objects": 10,
+      "r1": {
+        "claims": 3,
+        "mechanisms": 19,
+        "assumptions": 0,
+        "equations": 6,
+        "limitations": 0,
+        "novelty": 7,
+        "avg_completeness": 0.3
+      },
+      "r2": {
+        "num_concepts": 379,
+        "num_relationships": 644,
+        "num_causal_chains": 0,
+        "num_clusters": 48,
+        "num_papers": 10
+      },
+      "r3": {
+        "num_papers": 10,
+        "num_contradictions": 0,
+        "num_consensus": 0,
+        "num_assumption_conflicts": 0,
+        "num_reasoning_chains": 0,
+        "landscape": "developing"
+      },
+      "r4": {
+        "confidence": 0.3,
+        "report_word_count": 353,
+        "report_title": "Synthesis Report: finance × biology × general",
+        "domains_covered": [
+          "finance",
+          "biology",
+          "general",
+          "physics",
+          "mathematics"
+        ]
+      },
+      "r5": {
+        "passed": false,
+        "completeness": 0.3,
+        "mechanism_coverage": 0.7,
+        "synthesis_confidence": 0.3,
+        "benchmarks": [
+          {
+            "name": "R1_Decomposition",
+            "passed": false
+          },
+          {
+            "name": "R2_Relationships",
+            "passed": true
+          },
+          {
+            "name": "R3_Contradictions",
+            "passed": false
+          },
+          {
+            "name": "R4_Synthesis",
+            "passed": true
+          },
+          {
+            "name": "R5_CrossDomain",
+            "passed": true
+          }
+        ]
+      },
+      "report_excerpt": "## Executive Summary\nAnalysis of 10 papers across 5 domains.\nKey finding: Primary mechanism: traditional, centralized machine learning and data science a (observed in 1 papers)\n\n## Introduction\nThis report synthesizes findings from 10 research papers spanning the domain(s) of finance, biology, general, physics, mathematics. The analysis employs structured knowledge decomposition, cross-document reasoning, and theory synthesis to identify dominant mechanisms, consensus areas, and open questions. ..."
+    },
+    {
+      "topic": "geopolitical risk emerging markets financial contagion systemic risk",
+      "num_papers": 10,
+      "num_knowledge_objects": 10,
+      "r1": {
+        "claims": 3,
+        "mechanisms": 16,
+        "assumptions": 3,
+        "equations": 1,
+        "limitations": 3,
+        "novelty": 6,
+        "avg_completeness": 0.3
+      },
+      "r2": {
+        "num_concepts": 390,
+        "num_relationships": 500,
+        "num_causal_chains": 0,
+        "num_clusters": 45,
+        "num_papers": 10
+      },
+      "r3": {
+        "num_papers": 10,
+        "num_contradictions": 0,
+        "num_consensus": 0,
+        "num_assumption_conflicts": 0,
+        "num_reasoning_chains": 0,
+        "landscape": "developing"
+      },
+      "r4": {
+        "confidence": 0.3,
+        "report_word_count": 441,
+        "report_title": "Synthesis Report: general × finance × computer science",
+        "domains_covered": [
+          "general",
+          "finance",
+          "computer science",
+          "physics"
+        ]
+      },
+      "r5": {
+        "passed": false,
+        "completeness": 0.3,
+        "mechanism_coverage": 0.9,
+        "synthesis_confidence": 0.3,
+        "benchmarks": [
+          {
+            "name": "R1_Decomposition",
+            "passed": false
+          },
+          {
+            "name": "R2_Relationships",
+            "passed": true
+          },
+          {
+            "name": "R3_Contradictions",
+            "passed": false
+          },
+          {
+            "name": "R4_Synthesis",
+            "passed": true
+          },
+          {
+            "name": "R5_CrossDomain",
+            "passed": true
+          }
+        ]
+      },
+      "report_excerpt": "## Executive Summary\nAnalysis of 10 papers across 4 domains.\nKey finding: Primary mechanism: nd when firms' social capital derived from interorganization (observed in 1 papers)\n\n## Introduction\nThis report synthesizes findings from 10 research papers spanning the domain(s) of general, finance, computer science, physics. The analysis employs structured knowledge decomposition, cross-document reasoning, and theory synthesis to identify dominant mechanisms, consensus areas, and open questions. Unli..."
+    },
+    {
+      "topic": "COMBINED (All Topics)",
+      "num_papers": 20,
+      "num_knowledge_objects": 20,
+      "r1": {
+        "claims": 6,
+        "mechanisms": 35,
+        "assumptions": 3,
+        "equations": 7,
+        "limitations": 3,
+        "novelty": 13,
+        "avg_completeness": 0.3
+      },
+      "r2": {
+        "num_concepts": 710,
+        "num_relationships": 1144,
+        "num_causal_chains": 0,
+        "num_clusters": 74,
+        "num_papers": 20
+      },
+      "r3": {
+        "num_papers": 20,
+        "num_contradictions": 0,
+        "num_consensus": 0,
+        "num_assumption_conflicts": 0,
+        "num_reasoning_chains": 0,
+        "landscape": "developing"
+      },
+      "r4": {
+        "confidence": 0.3,
+        "report_word_count": 605,
+        "report_title": "Synthesis Report: finance × biology × general",
+        "domains_covered": [
+          "finance",
+          "biology",
+          "general",
+          "computer science",
+          "physics",
+          "mathematics"
+        ]
+      },
+      "r5": {
+        "passed": false,
+        "completeness": 0.3,
+        "mechanism_coverage": 0.8,
+        "synthesis_confidence": 0.3,
+        "benchmarks": [
+          {
+            "name": "R1_Decomposition",
+            "passed": false
+          },
+          {
+            "name": "R2_Relationships",
+            "passed": true
+          },
+          {
+            "name": "R3_Contradictions",
+            "passed": false
+          },
+          {
+            "name": "R4_Synthesis",
+            "passed": true
+          },
+          {
+            "name": "R5_CrossDomain",
+            "passed": true
+          }
+        ]
+      },
+      "report_excerpt": "## Executive Summary\nAnalysis of 20 papers across 6 domains.\nKey finding: Primary mechanism: corresponding models without jets yield higher efficiencies  (observed in 2 papers)\n\n## Introduction\nThis report synthesizes findings from 20 research papers spanning the domain(s) of finance, biology, general, computer science, physics, mathematics. The analysis employs structured knowledge decomposition, cross-document reasoning, and theory synthesis to identify dominant mechanisms, consensus areas, an..."
+    }
+  ]
+}
