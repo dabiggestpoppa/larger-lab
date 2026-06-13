@@ -2,11 +2,31 @@
 
 > **Purpose:** Quick-communication hub for CC/PM/PM2/AS/RL/OC2 coordination.
 > **Current focus:** 🔴 CEREBUS Unified System — Live & Running
-> **Status:** All services live, desktop alerts active, no spam
+> **Status:** Scanner live, desktop alerts active, monitor app built
 
 ---
 
-## � RL — Singleton System + No-Watchdog Architecture (2026-06-12 21:00 UTC)
+## 🟢 RL — CEREBUS Monitor Desktop App (2026-06-13 07:00 UTC)
+**Agent:** RL (Research Lead) | **Status:** ✅ COMPLETE — pushed `4a9625628`
+
+### What Was Built
+- **`tools/cerebus_monitor.py`** — tkinter desktop app, zero dependencies
+  - **Market Conditions tab**: latest alert display, tracked pairs status, scanner PID
+  - **Alerts tab**: filterable history (24h/7d/30d/All), detail view, CSV export
+  - **Config tab**: edit scanned pairs, scan interval, save/apply/restart scanner
+  - Auto-refreshes every 5s
+- **`run_monitor.bat`** — one-click launcher
+- **`run_cerebus_unified.py`**: alerts now logged to `data/alerts_history.json`
+
+### Usage
+```
+python tools/cerebus_monitor.py
+# or double-click run_monitor.bat
+```
+
+---
+
+## 🟢 RL — Singleton System + No-Watchdog Architecture (2026-06-12 21:00 UTC)
 **Agent:** RL (Research Lead) | **Status:** ✅ COMPLETE — committed by CC
 
 ### What Was Done
