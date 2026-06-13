@@ -128,6 +128,59 @@ python -c "
 - **Before:** All 12 endpoints returned `200 OK {"status": "unavailable"}` on failure
 - **After:** All endpoints raise `HTTPException(status_code=503)` + `logger.error()`
 
+---
+
+# Daily Summary — 2026-06-13 (Fri) — Phase 1 Cognition Substrate Complete
+
+## 🧠 PHASE 1 — COGNITION SUBSTRATE FOUNDATION — COMPLETE
+
+### What Was Built (this session)
+
+**Phase 1.1 — OpenAlex Stabilization:**
+- `OpenAlexClient` — Async API client with rate limiting, DOI/author search, pagination
+- `OpenAlexNormalizer` — Normalizes API responses, reconstructs abstracts, semantic tagging
+- `OpenAlexIngester` — Full pipeline: Fetch → Normalize → Chunk → Embed → Store (dedup by DOI)
+
+**Phase 1.4 — Retrieval + Semantic Memory:**
+- `RTRVR` — Live semantic search over vector memory (pre-existing, now tested)
+- `SHIJI` — Associative memory recall with multi-hop retrieval (pre-existing, now tested)
+- `ContextAssembler` — Merges retrieval results into reasoning-ready context windows
+
+**Phase 1.5 — Sisyphus Synthesis Engine:**
+- `SisyphusEngine` — Multi-source research synthesis with claim extraction, cross-referencing
+- `ArgumentStructurer` — Builds argument trees with Mermaid diagram output
+- `CitationMapper` — Extracts DOIs/arXiv IDs, generates APA/BibTeX bibliographies
+- `ContradictionDetector` — Detects conflicting claims across sources with severity scoring
+- `ResearchReportGenerator` — Generates structured reports in Markdown, JSON, HTML
+
+**Phase 1.7 — Unified Cognition Router:**
+- `CognitionRouter` — Single entry point routing to all cognition subsystems
+- Status reporting for all subsystems
+
+### Integration Tests — 61/61 PASSING ✅
+
+**Test Topics (interdisciplinary stress tests):**
+1. Emerging Markets × Geopolitics
+2. Information Theory × Trading Systems
+3. Thermodynamics × Economic Systems
+4. Cognitive Science × Machine Learning
+
+**What was tested:**
+- OpenAlex API integration (real calls, rate limiting, pagination, DOI lookup)
+- Full ingestion pipeline (4 topics, 5+ sources each, deduplication, domain diversity)
+- Sisyphus synthesis (multi-source, claim extraction, citation mapping)
+- Argument structuring (evidence nodes, gap detection, Mermaid output)
+- Citation mapping (DOI/arXiv extraction, APA/BibTeX generation)
+- Contradiction detection (3 contradictions detected across test claims)
+- Report generation (Markdown, JSON, HTML — saved to data/test_reports/)
+
+### Telegram Signal Spam — FIXED
+- Killed 10+ `signal_bot.py` instances
+- Killed 20+ `run_cerebus_unified.py` instances
+- Killed `guarddog.py` watchdog (root cause of respawning)
+- Removed guarddog PID file to prevent respawning
+- **Result:** 0 signal-related processes remaining
+
 ### Issue 2: `vault_api.py` — Missing logging
 - **Before:** Sync endpoints silently returned error JSON
 - **After:** Added `logger` + proper HTTP 503 with logging

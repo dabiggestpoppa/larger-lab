@@ -1,8 +1,22 @@
-# Workspace State — 2026-06-12 20:00 UTC
+# Workspace State — 2026-06-13 07:30 UTC
 
 ## System Status
-- OCE Backend: ✅ Running (PID 10988)
-- CEREBUS Unified Scanner: ✅ Running (PID 20548) — desktop alerts active
+- OCE Backend: ✅ Healthy (492/492 tests passing)
+- CEREBUS Unified Scanner: ✅ Running
+- Telegram Signal Bot: 🔴 STOPPED (was spamming — all instances killed)
+- Guarddog Watchdog: 🔴 STOPPED (was respawning signal bots)
+
+## Phase 1 — Cognition Substrate (2026-06-13) — COMPLETE
+- **Phase 1.1** OpenAlex stabilization ✅ — Client, normalizer, ingester
+- **Phase 1.2** Multimodal parser orchestration ✅ (pre-existing)
+- **Phase 1.3** Embedding + vector cognition ✅ (pre-existing)
+- **Phase 1.4** Retrieval + semantic memory ✅ — RTRVR, SHIJI, ContextAssembler
+- **Phase 1.5** Sisyphus synthesis engine ✅ — Multi-source synthesis, arguments, citations, contradictions
+- **Phase 1.6** Procedural cognition ✅ (pre-existing)
+- **Phase 1.7** Unified cognition router ✅ — Single entry point for all cognition
+- **Integration tests** ✅ — 61/61 passing with real OpenAlex API
+- **Test topics**: Emerging Markets × Geopolitics, Information Theory × Trading, Thermodynamics × Economics, Cognitive Science × ML
+- **Reports**: data/test_reports/ (Markdown, JSON, HTML)
 - Watchdog: ✅ Clean start, no duplicates, no zombies
 - MLR Scanner: ❌ Removed (replaced by CEREBUS)
 - Telegram Gateway: ❌ Removed (desktop alerts only)
