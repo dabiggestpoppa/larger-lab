@@ -333,7 +333,7 @@ async def test_sisyphus_synthesis(result: TestResult):
 
             # Synthesize
             start = time.time()
-            synthesis = sisyphus.synthesize(
+            synthesis = await sisyphus.synthesize(
                 query=f"How does {topic['name'].split(' × ')[0].lower()} relate to {topic['name'].split(' × ')[1].lower()}?",
                 sources=sources,
             )
@@ -347,21 +347,27 @@ async def test_sisyphus_synthesis(result: TestResult):
 
             if synthesis:
                 result.record(
-                    f"[{topic['name']}] Has findings",
-                    len(synthesis.key_findings) > 0,
-                    f"{len(synthesis.key_findings)} findings",
+                    f"[{topic['name']}] Has full report",
+                    len(synthesis.full_report) > 500,
+                    f"Report: {len(synthesis.full_report)} chars",
                 )
 
                 result.record(
-                    f"[{topic['name']}] Has summary",
-                    len(synthesis.executive_summary) > 50,
-                    f"Summary length: {len(synthesis.executive_summary)}",
+                    f"[{topic['name']}] Has executive summary",
+                    len(synthesis.executive_summary) > 100,
+                    f"Summary: {len(synthesis.executive_summary)} chars",
                 )
 
                 result.record(
-                    f"[{topic['name']}] Has citations",
-                    len(synthesis.citations) > 0,
-                    f"{len(synthesis.citations)} citations",
+                    f"[{topic['name']}] Has title",
+                    len(synthesis.title) > 10,
+                    f"Title: {synthesis.title[:80]}",
+                )
+
+                result.record(
+                    f"[{topic['name']}] Word count > 500",
+                    synthesis.word_count > 500,
+                    f"Words: {synthesis.word_count}",
                 )
 
                 result.record(
@@ -370,26 +376,13 @@ async def test_sisyphus_synthesis(result: TestResult):
                     f"Confidence: {synthesis.confidence:.2f}",
                 )
 
-                # Check finding quality
-                if synthesis.key_findings:
-                    top_finding = synthesis.key_findings[0]
-                    result.record(
-                        f"[{topic['name']}] Top finding has sources",
-                        len(top_finding.supporting_sources) > 0,
-                        f"Sources: {top_finding.supporting_sources[:3]}",
-                    )
-
-                    result.record(
-                        f"[{topic['name']}] Top finding has evidence",
-                        len(top_finding.evidence) > 0,
-                        f"Evidence items: {len(top_finding.evidence)}",
-                    )
-
-                # Log the actual output
-                logger.info(f"\n  Executive Summary:\n  {synthesis.executive_summary[:300]}")
-                logger.info(f"\n  Top Findings:")
-                for i, f in enumerate(synthesis.key_findings[:3], 1):
-                    logger.info(f"    {i}. [{f.confidence:.0%}] {f.text[:120]}")
+                # Save full report
+                report_path = REPO_ROOT / "data" / "test_reports" / f"synthesis_{topic['name'].replace(' ', '_').replace('x', 'x')}.md"
+                report_path.parent.mkdir(parents=True, exist_ok=True)
+                report_path.write_text(synthesis.full_report, encoding="utf-8")
+                logger.info(f"\n  Report saved to: {report_path}")
+                logger.info(f"  Title: {synthesis.title}")
+                logger.info(f"  Words: {synthesis.word_count}")
 
     finally:
         await ingester.close()
