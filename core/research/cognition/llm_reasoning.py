@@ -245,46 +245,85 @@ class LLMReasoning:
     """
     LLM-powered reasoning for all RCE phases.
     
+    Two-model strategy:
+    - FAST_MODEL (nemotron): R1 extraction, R2 relationships, R3 reasoning, R5 validation
+    - POWER_MODEL (nex-n2-pro): R4 final theory synthesis and report generation
+    
     Wraps OpenRouterGateway with structured prompts and JSON parsing.
     Each method corresponds to one RCE phase.
     """
     
-    def __init__(self, gateway: Optional[Any] = None):
+    FAST_MODEL = "nvidia/nemotron-3-ultra-550b-a55b:free"
+    POWER_MODEL = "nex-agi/nex-n2-pro:free"
+    
+    def __init__(self, gateway: Optional[Any] = None, max_concurrent: int = 3):
         """
         Initialize with an OpenRouterGateway instance.
         
-        If no gateway creates one with default config (owl-alpha primary).
+        If no gateway creates one with default config.
+        max_concurrent: max parallel LLM calls (to avoid rate limiting).
         """
         if gateway is None:
             from core.spawn.openrouter_gateway import OpenRouterGateway
             self.gateway = OpenRouterGateway()
         else:
             self.gateway = gateway
+        self._semaphore = asyncio.Semaphore(max_concurrent)
     
     async def _call_llm(
         self,
         prompt: str,
         max_tokens: int = 2000,
-        model: str = "openrouter/owl-alpha",
+        model: str = "",
     ) -> str:
         """Call the LLM and return the response text."""
+        if not model:
+            model = self.FAST_MODEL
         try:
-            response = await self.gateway.complete(
-                prompt=prompt,
-                max_tokens=max_tokens,
-                model=model,
-            )
+            async with self._semaphore:
+                response = await self.gateway.complete(
+                    prompt=prompt,
+                    max_tokens=max_tokens,
+                    model=model,
+                )
             return response
         except Exception as e:
-            logger.error(f"LLM call failed: {e}")
+            error_str = str(e)
+            logger.error(f"LLM call failed ({model}): {error_str}")
+            
+            # If it's a 400 error, the model may not be available — failover
+            if "400" in error_str or "Provider returned error" in error_str:
+                fallback_models = [
+                    "openrouter/owl-alpha",
+                    "nvidia/nemotron-3-ultra-550b-a55b:free",
+                    "nex-agi/nex-n2-pro:free",
+                ]
+                for fallback in fallback_models:
+                    if fallback == model:
+                        continue
+                    try:
+                        logger.info(f"Trying fallback model: {fallback}")
+                        response = await self.gateway.complete(
+                            prompt=prompt,
+                            max_tokens=max_tokens,
+                            model=fallback,
+                        )
+                        return response
+                    except Exception as e2:
+                        logger.warning(f"Fallback {fallback} also failed: {e2}")
+                        continue
+            
+            # Re-raise if no fallback worked
             raise
     
     def _parse_json(self, text: str) -> Dict[str, Any]:
-        """Parse JSON from LLM response, handling markdown fences."""
-        # Strip markdown fences
+        """Parse JSON from LLM response, handling markdown fences and truncation."""
+        import re as _re
+        
         text = text.strip()
+        
+        # Strip markdown fences
         if text.startswith("```"):
-            # Remove first line (```json or ```) and last line (```)
             lines = text.split("\n")
             if lines[-1].strip() == "```":
                 lines = lines[1:-1]
@@ -292,7 +331,6 @@ class LLMReasoning:
                 lines = lines[1:]
             text = "\n".join(lines)
         
-        # Try to find JSON in the response
         text = text.strip()
         
         # Try direct parse
@@ -301,16 +339,33 @@ class LLMReasoning:
         except json.JSONDecodeError:
             pass
         
-        # Try to find JSON object in text
+        # Try to find JSON object in text (find first { to last })
         start = text.find("{")
         end = text.rfind("}")
-        if start >= 0 and end >= 0:
+        if start >= 0 and end >= 0 and end > start:
+            candidate = text[start:end + 1]
             try:
-                return json.loads(text[start:end + 1])
+                return json.loads(candidate)
             except json.JSONDecodeError:
-                pass
+                # Try to fix truncated JSON by closing open brackets
+                open_braces = candidate.count("{") - candidate.count("}")
+                open_brackets = candidate.count("[") - candidate.count("]")
+                if open_braces > 0 or open_brackets > 0:
+                    fixed = candidate + "}" * open_braces + "]" * open_brackets
+                    try:
+                        return json.loads(fixed)
+                    except json.JSONDecodeError:
+                        pass
         
-        logger.warning(f"Failed to parse JSON from LLM response: {text[:200]}...")
+        # Try to extract JSON from ```json ... ``` blocks
+        json_blocks = _re.findall(r'```(?:json)?\s*\n?(.*?)\n?```', text, _re.DOTALL)
+        for block in json_blocks:
+            try:
+                return json.loads(block.strip())
+            except json.JSONDecodeError:
+                continue
+        
+        logger.warning(f"Failed to parse JSON from LLM response: {text[:300]}...")
         return {}
     
     # ─── R1: Knowledge Decomposition ───
@@ -328,14 +383,24 @@ class LLMReasoning:
         """
         prompt = R1_CLAIM_EXTRACTION_PROMPT.format(
             title=title or "Unknown",
-            text=text[:4000],  # Limit to first 4000 chars
+            text=text[:8000],  # Limit to first 8000 chars for better extraction
         )
         
-        response = await self._call_llm(prompt, max_tokens=1500)
+        response = await self._call_llm(prompt, max_tokens=3000, model=self.FAST_MODEL)
         result = self._parse_json(response)
         
         if not result:
             logger.warning(f"R1 extraction returned empty for: {title}")
+            # Return a minimal structure so pipeline doesn't break
+            return {
+                "paper_title": title,
+                "main_claims": [],
+                "mechanisms": [],
+                "assumptions": [],
+                "equations": [],
+                "limitations": [],
+                "error": "LLM extraction failed",
+            }
         
         return result
     
@@ -343,21 +408,53 @@ class LLMReasoning:
         self,
         papers: List[Dict[str, str]],
     ) -> List[Dict[str, Any]]:
-        """R1: Extract knowledge from multiple papers."""
-        results = []
+        """R1: Extract knowledge from multiple papers (parallel)."""
+        import asyncio
+        
+        tasks = []
         for paper in papers:
-            try:
-                result = await self.extract_knowledge(
-                    text=paper.get("text", ""),
-                    title=paper.get("title", ""),
-                )
-                result["paper_title"] = paper.get("title", "")
-                result["paper_id"] = paper.get("id", "")
-                results.append(result)
-            except Exception as e:
-                logger.error(f"R1 batch extraction failed for '{paper.get('title', '?')}': {e}")
-                results.append({"paper_title": paper.get("title", ""), "error": str(e)})
-        return results
+            task = self.extract_knowledge_safe(
+                text=paper.get("text", ""),
+                title=paper.get("title", ""),
+            )
+            tasks.append(task)
+        
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        processed = []
+        for i, result in enumerate(results):
+            if isinstance(result, Exception):
+                logger.error(f"R1 batch failed for paper {i}: {result}")
+                processed.append({
+                    "paper_title": papers[i].get("title", ""),
+                    "error": str(result),
+                })
+            else:
+                processed.append(result)
+        
+        return processed
+    
+    async def extract_knowledge_safe(
+        self,
+        text: str,
+        title: str = "",
+    ) -> Dict[str, Any]:
+        """R1: Extract knowledge with error handling."""
+        try:
+            result = await self.extract_knowledge(text, title)
+            result["paper_title"] = title
+            return result
+        except Exception as e:
+            logger.error(f"R1 extraction failed for '{title}': {e}")
+            return {
+                "paper_title": title,
+                "main_claims": [],
+                "mechanisms": [],
+                "assumptions": [],
+                "equations": [],
+                "limitations": [],
+                "error": str(e),
+            }
     
     # ─── R2: Semantic Relationships ───
     
@@ -379,7 +476,7 @@ class LLMReasoning:
             paper_json=papers_json,
         )
         
-        response = await self._call_llm(prompt, max_tokens=2000)
+        response = await self._call_llm(prompt, max_tokens=2000, model=self.FAST_MODEL)
         result = self._parse_json(response)
         
         if not result:
@@ -405,7 +502,7 @@ class LLMReasoning:
             papers_json=papers_json[:8000],
         )
         
-        response = await self._call_llm(prompt, max_tokens=2500)
+        response = await self._call_llm(prompt, max_tokens=2500, model=self.FAST_MODEL)
         result = self._parse_json(response)
         
         if not result:
@@ -430,7 +527,7 @@ class LLMReasoning:
             reasoning_json=reasoning_json[:6000],
         )
         
-        response = await self._call_llm(prompt, max_tokens=3000)
+        response = await self._call_llm(prompt, max_tokens=4000, model=self.POWER_MODEL)
         result = self._parse_json(response)
         
         if not result:
@@ -455,7 +552,7 @@ class LLMReasoning:
             report_text=report_text[:6000],
         )
         
-        response = await self._call_llm(prompt, max_tokens=1500)
+        response = await self._call_llm(prompt, max_tokens=1500, model=self.FAST_MODEL)
         result = self._parse_json(response)
         
         if not result:
@@ -473,6 +570,12 @@ class LLMReasoning:
         """
         Run the full RCE pipeline (R1→R5) on a set of papers.
         
+        Two-model strategy:
+        - R1-R3, R5: FAST_MODEL (nemotron) — fast extraction, reasoning, validation
+        - R4: POWER_MODEL (nex-n2-pro) — deep synthesis and report generation
+        
+        R1 extractions run in parallel for speed.
+        
         Args:
             topic: Research topic/query
             papers: List of dicts with 'text', 'title', 'id' keys
@@ -481,31 +584,33 @@ class LLMReasoning:
             Complete pipeline results with all phases.
         """
         logger.info(f"RCE pipeline starting: {topic} ({len(papers)} papers)")
+        logger.info(f"Fast model: {self.FAST_MODEL}")
+        logger.info(f"Power model: {self.POWER_MODEL}")
         
-        # R1: Extract knowledge
-        logger.info("R1: Extracting knowledge from papers...")
+        # R1: Extract knowledge (PARALLEL for speed)
+        logger.info("R1: Extracting knowledge from papers (parallel)...")
         r1_results = await self.extract_knowledge_batch(papers)
         logger.info(f"R1: Extracted {len(r1_results)} knowledge objects")
         
-        # R2: Build relationships
+        # R2: Build relationships (fast model)
         logger.info("R2: Building semantic relationships...")
         r2_results = await self.build_relationships(topic, r1_results)
         logger.info(f"R2: Found {len(r2_results.get('relationships', []))} relationships")
         
-        # R3: Cross-document reasoning
+        # R3: Cross-document reasoning (fast model)
         logger.info("R3: Cross-document reasoning...")
         papers_json = json.dumps(r1_results, ensure_ascii=False, indent=2)
         r3_results = await self.cross_document_reason(topic, papers_json)
         logger.info(f"R3: Found {len(r3_results.get('contradictions', []))} contradictions, "
                      f"{len(r3_results.get('consensus', []))} consensus areas")
         
-        # R4: Theory synthesis
-        logger.info("R4: Synthesizing theory...")
+        # R4: Theory synthesis (POWER MODEL for deep reasoning)
+        logger.info("R4: Synthesizing theory (power model)...")
         reasoning_json = json.dumps(r3_results, ensure_ascii=False, indent=2)
         r4_results = await self.synthesize_theory(topic, reasoning_json)
         logger.info(f"R4: Synthesis confidence: {r4_results.get('confidence', 0):.3f}")
         
-        # R5: Validation
+        # R5: Validation (fast model)
         logger.info("R5: Validating synthesis...")
         report_text = r4_results.get("research_report", {}).get("full_report", "")
         r5_results = await self.validate_synthesis(topic, report_text)
