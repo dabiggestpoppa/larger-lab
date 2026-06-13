@@ -1,4 +1,4 @@
-# Workspace State — 2026-06-13 07:30 UTC
+# Workspace State — 2026-06-13 08:45 UTC
 
 ## System Status
 - OCE Backend: ✅ Healthy (492/492 tests passing)
@@ -18,6 +18,13 @@
 - **Test topics**: Emerging Markets × Geopolitics, Information Theory × Trading, Thermodynamics × Economics, Cognitive Science × ML
 - **Reports**: data/test_reports/ (Markdown, JSON, HTML)
 - Watchdog: ✅ Clean start, no duplicates, no zombies
+
+## Phase 1.6 + 1.7 — Orchestration + Self-Evolution (2026-06-13 09:00 UTC) — COMPLETE
+- **Phase 1.6** Orchestration ✅ — Controller, planner, workflow, scheduler, governance, agents, memory, reflection (25 tests)
+- **Phase 1.7** Self-evolution ✅ — Self-evaluation, research generator, learning loop, architecture evolution, strategy mutation, capability generation, model benchmarking, long-term adaptation (26 tests)
+- **PDF Generation** ✅ — reportlab-based, 95KB research reports generated
+- **Unit tests** ✅ — 51/51 passing for orchestration + evolution
+- **Reports**: data/test_reports/ (4 MD reports 52-89KB, 2 PDFs 63-95KB)
 - MLR Scanner: ❌ Removed (replaced by CEREBUS)
 - Telegram Gateway: ❌ Removed (desktop alerts only)
 - Signal Bot: ❌ Removed (desktop alerts only)
