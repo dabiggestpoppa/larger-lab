@@ -1,5 +1,7 @@
 /**
  * Chat Store - Zustand store for PO chat with real-time SSE streaming.
+ * Persists sessions and messages to localStorage for cross-session continuity.
+ * Syncs with backend OCE API for field-aware context.
  */
 import { create } from "zustand";
 
@@ -12,6 +14,7 @@ export interface ChatMessage {
   task_domain?: string;
   complexity?: string;
   observer_metadata?: Record<string, unknown>;
+  source?: "web" | "telegram";  // Track which channel the message came from
 }
 
 export interface ChatSession {
@@ -54,28 +57,86 @@ interface ChatStore {
   sendMessage: (message: string, sessionId?: string) => Promise<void>;
   createSession: (title?: string) => Promise<void>;
   deleteSession: (sessionId: string) => Promise<void>;
+  persistToStorage: () => void;
+  loadFromStorage: () => void;
 }
 
 let msgCounter = 0;
 const nextId = (p: string) => `${p}_${Date.now()}_${++msgCounter}`;
 
+// localStorage keys
+const STORAGE_KEY_SESSIONS = "oce_chat_sessions";
+const STORAGE_KEY_MESSAGES_PREFIX = "oce_chat_msgs_";
+const STORAGE_KEY_ACTIVE = "oce_chat_active_session";
+
+function saveSessionsToStorage(sessions: ChatSession[]) {
+  try { localStorage.setItem(STORAGE_KEY_SESSIONS, JSON.stringify(sessions)); } catch { /* quota */ }
+}
+
+function saveMessagesToStorage(sessionId: string, messages: ChatMessage[]) {
+  try { localStorage.setItem(`${STORAGE_KEY_MESSAGES_PREFIX}${sessionId}`, JSON.stringify(messages)); } catch { /* quota */ }
+}
+
+function loadSessionsFromStorage(): ChatSession[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_SESSIONS);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
+export function loadMessagesFromStorage(sessionId: string): ChatMessage[] {
+  try {
+    const raw = localStorage.getItem(`${STORAGE_KEY_MESSAGES_PREFIX}${sessionId}`);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
 export const useChatStore = create<ChatStore>((set, get) => ({
   messages: [],
-  sessions: [],
-  activeSessionId: null,
+  sessions: loadSessionsFromStorage(),  // Load from localStorage on init
+  activeSessionId: localStorage.getItem(STORAGE_KEY_ACTIVE) || null,
   isLoading: false,
   isSending: false,
   error: null,
   streamStatus: { active: false, stage: "", detail: "" },
 
-  setMessages: (m) => set({ messages: m }),
-  addMessage: (m) => set((s) => ({ messages: [...s.messages, m] })),
-  setSessions: (s) => set({ sessions: s }),
-  setActiveSession: (id) => set({ activeSessionId: id }),
+  setMessages: (m) => { set({ messages: m }); saveMessagesToStorage(get().activeSessionId || "default", m); },
+  addMessage: (m) => {
+    const msgs = [...get().messages, m];
+    set({ messages: msgs });
+    saveMessagesToStorage(m.session_id || get().activeSessionId || "default", msgs);
+  },
+  setSessions: (s) => { set({ sessions: s }); saveSessionsToStorage(s); },
+  setActiveSession: (id) => {
+    set({ activeSessionId: id });
+    if (id) localStorage.setItem(STORAGE_KEY_ACTIVE, id);
+    else localStorage.removeItem(STORAGE_KEY_ACTIVE);
+    // Load messages for this session from storage
+    if (id) {
+      const msgs = loadMessagesFromStorage(id);
+      if (msgs.length > 0) set({ messages: msgs });
+    }
+  },
   setLoading: (v) => set({ isLoading: v }),
   setSending: (v) => set({ isSending: v }),
   setError: (e) => set({ error: e }),
   setStreamStatus: (s) => set({ streamStatus: s }),
+
+  persistToStorage: () => {
+    saveSessionsToStorage(get().sessions);
+    const sid = get().activeSessionId;
+    if (sid) saveMessagesToStorage(sid, get().messages);
+  },
+
+  loadFromStorage: () => {
+    const sessions = loadSessionsFromStorage();
+    const activeId = localStorage.getItem(STORAGE_KEY_ACTIVE);
+    set({ sessions, activeSessionId: activeId });
+    if (activeId) {
+      const msgs = loadMessagesFromStorage(activeId);
+      if (msgs.length > 0) set({ messages: msgs });
+    }
+  },
 
   loadSessions: async () => {
     set({ isLoading: true, error: null });
@@ -112,28 +173,40 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   },
 
   sendMessage: async (message: string, sessionId?: string) => {
-    const sid = sessionId || get().activeSessionId || "";
-    set({
-      isSending: true,
-      error: null,
-      streamStatus: { active: true, stage: "thinking", detail: "Thinking..." }
-    });
+    const sid = sessionId || get().activeSessionId || `session_${Date.now()}`;
+    set({ isSending: true, error: null, streamStatus: { active: true, stage: "thinking", detail: "Thinking..." } });
 
     const userMsg: ChatMessage = {
-      message_id: nextId("usr"),
-      role: "user",
-      content: message,
-      timestamp: new Date().toISOString(),
-      session_id: sid,
+      message_id: nextId("usr"), role: "user", content: message,
+      timestamp: new Date().toISOString(), session_id: sid, source: "web",
     };
     set((s) => ({ messages: [...s.messages, userMsg] }));
+    saveMessagesToStorage(sid, [...get().messages, userMsg]);
+
+    // Create session if it doesn't exist
+    const existingSession = get().sessions.find(s => s.session_id === sid);
+    if (!existingSession) {
+      const newSession: ChatSession = {
+        session_id: sid, title: message.substring(0, 40),
+        created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+        entry_count: 1, last_role: "user", last_preview: message.substring(0, 60),
+      };
+      const updatedSessions = [...get().sessions, newSession];
+      set({ sessions: updatedSessions, activeSessionId: sid });
+      saveSessionsToStorage(updatedSessions);
+    }
 
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 min timeout
+
       const res = await fetch("/api/chat/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message, session_id: sid }),
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
@@ -142,6 +215,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       let buffer = "";
       let accumulatedResponse = "";
       let streamError = null;
+      let chunkCount = 0;
 
       if (reader) {
         while (true) {
@@ -164,21 +238,18 @@ export const useChatStore = create<ChatStore>((set, get) => ({
               if (etype === "round") {
                 set({ streamStatus: { active: true, stage: "thinking", detail: `Round ${edata.round}/${edata.max}`, round: edata.round, maxRounds: edata.max } });
               } else if (etype === "tool_call") {
-                set({ streamStatus: { active: true, stage: "tool_call", detail: `Tool: ${edata.tool}`, tool: edata.tool } });
+                set({ streamStatus: { active: true, stage: "tool_call", detail: `🔧 ${edata.tool}`, tool: edata.tool } });
               } else if (etype === "tool_result") {
-                const prev = (edata.result || "").substring(0, 60);
-                set({ streamStatus: { active: true, stage: "tool_result", detail: `${edata.tool}: ${prev}` } });
+                const prev = (edata.result || "").substring(0, 80);
+                set({ streamStatus: { active: true, stage: "tool_result", detail: `✅ ${edata.tool}: ${prev}...` } });
               } else if (etype === "complete" || etype === "max_rounds") {
                 set({ streamStatus: { active: true, stage: "responding", detail: "Generating response..." } });
               } else if (etype === "final") {
-                // Direct final response (Telegram-style)
                 accumulatedResponse = edata.response || "";
               } else if (etype === "chunk") {
-                // Word-by-word streaming chunk (OCE backend style)
                 const delta = evt.choices?.[0]?.delta?.content || edata.content || "";
-                if (delta) accumulatedResponse += delta;
+                if (delta) { accumulatedResponse += delta; chunkCount++; }
               } else if (etype === "done") {
-                // Stream complete — response is ready
                 set({ streamStatus: { active: true, stage: "responding", detail: "Finalizing..." } });
               } else if (etype === "error") {
                 streamError = edata.message || "Unknown error";
@@ -187,6 +258,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
             } catch (_) { /* skip malformed */ }
           }
         }
+      }
       }
 
       // Add the observer message with whatever response we got
@@ -235,16 +307,22 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   },
 
   createSession: async (title?: string) => {
+    const sid = `session_${Date.now()}`;
+    const sessionTitle = title || `Chat ${new Date().toLocaleDateString()}`;
+    const newSession: ChatSession = {
+      session_id: sid, title: sessionTitle,
+      created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+      entry_count: 0, last_role: "", last_preview: "",
+    };
+    const updatedSessions = [...get().sessions, newSession];
+    set({ sessions: updatedSessions, activeSessionId: sid, messages: [] });
+    saveSessionsToStorage(updatedSessions);
+    // Also try to create on backend (non-critical)
     try {
-      const res = await fetch("/api/chat/sessions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title }),
+      await fetch("/api/chat/sessions", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: sessionTitle }),
       });
-      const data = await res.json();
-      if (data.session) {
-        set({ activeSessionId: data.session.session_id, messages: [] });
-      }
     } catch { /* ignore */ }
   },
 

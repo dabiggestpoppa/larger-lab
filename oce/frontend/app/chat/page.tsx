@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useChatStore, type ChatMessage } from "@/stores/chatStore";
+import { useChatStore, loadMessagesFromStorage, type ChatMessage } from "@/stores/chatStore";
 
 function formatTime(ts: string): string {
   try { return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); } catch { return ""; }
@@ -145,6 +145,17 @@ function ChatArea() {
 }
 
 export default function ChatPage() {
+  // Load persisted sessions and messages on mount
+  useEffect(() => {
+    const store = useChatStore.getState();
+    store.loadFromStorage();
+    // If there's an active session, load its history
+    if (store.activeSessionId) {
+      const msgs = loadMessagesFromStorage(store.activeSessionId);
+      if (msgs.length > 0) setMessages(msgs);
+    }
+  }, []);
+
   return (
     <div className="flex h-full bg-gray-950">
       <SessionList />
