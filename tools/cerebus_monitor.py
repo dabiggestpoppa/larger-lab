@@ -91,16 +91,15 @@ def parse_alert_file():
 def get_scanner_status():
     """Check if the CEREBUS scanner process is running. Returns (running, pid)."""
     try:
+        helper = REPO_ROOT / "tools" / "_check_scanner.ps1"
         result = subprocess.run(
-            ["powershell", "-Command",
-             "Get-Process python -ErrorAction SilentlyContinue | "
-             "Where-Object { $_.CommandLine -match 'run_cerebus_unified' } | "
-             "Select-Object -ExpandProperty Id"],
-            capture_output=True, text=True, timeout=5
+            ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass",
+             "-File", str(helper)],
+            capture_output=True, text=True, timeout=8
         )
         pid_str = result.stdout.strip()
-        if pid_str:
-            return True, pid_str.split("\n")[0].strip()
+        if pid_str and pid_str.isdigit():
+            return True, pid_str
     except Exception:
         pass
     return False, None
