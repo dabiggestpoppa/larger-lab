@@ -88,6 +88,18 @@ def parse_alert_file():
         return None
 
 
+def _no_window_kwargs():
+    """Return kwargs to suppress console window in subprocess calls."""
+    kw = {}
+    if sys.platform == "win32":
+        si = subprocess.STARTUPINFO()
+        si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        si.wShowWindow = 0  # SW_HIDE
+        kw["startupinfo"] = si
+        kw["creationflags"] = subprocess.CREATE_NO_WINDOW
+    return kw
+
+
 def get_scanner_status():
     """Check if the CEREBUS scanner process is running. Returns (running, pid)."""
     try:
@@ -96,7 +108,7 @@ def get_scanner_status():
             ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass",
              "-File", str(helper)],
             capture_output=True, text=True, timeout=8,
-            creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+            **_no_window_kwargs()
         )
         pid_str = result.stdout.strip()
         if pid_str and pid_str.isdigit():
@@ -490,7 +502,7 @@ class CerebusMonitor(tk.Tk):
             subprocess.Popen(
                 cmd, cwd=str(REPO_ROOT),
                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+                **_no_window_kwargs()
             )
             messagebox.showinfo("Started", "Scanner started.")
         except Exception as e:
@@ -502,7 +514,7 @@ class CerebusMonitor(tk.Tk):
                 ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass",
                  "-File", str(REPO_ROOT / "tools" / "_stop_scanner.ps1")],
                 capture_output=True, text=True, timeout=5,
-                creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+                **_no_window_kwargs()
             )
             messagebox.showinfo("Stopped", "Scanner stopped.")
         except Exception as e:
