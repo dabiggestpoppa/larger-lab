@@ -125,7 +125,11 @@ class DirectionalBias:
         lens_b, lens_b_time = self._evaluate_lens_b(bars)
 
         # ── Lens C: 9 AM Regime Ratio ──
-        lens_c, regime_ratio = self._evaluate_lens_c(bars, asian_range)
+        # Get current EST hour from the latest bar
+        current_est_hour = bars["est_hour"].iloc[-1] if len(bars) > 0 else 14
+        lens_c, regime_ratio = self._evaluate_lens_c(
+            bars, asian_range, current_est_hour=current_est_hour
+        )
 
         # ── Ternary Logic Matrix ──
         state, direction, confidence, action, details = self._ternary_matrix(
@@ -189,11 +193,14 @@ class DirectionalBias:
         return BiasDirection.NONE, None
 
     def _evaluate_lens_c(
-        self, bars: pd.DataFrame, asian_range: float
+        self, bars: pd.DataFrame, asian_range: float, current_est_hour: int = 14
     ) -> Tuple[RegimeState, float]:
         """
         Lens C: 9 AM Regime Ratio = Daily Range (3AM-9AM) / Asian Range.
         Returns (regime_state, ratio).
+
+        Regime CONFIRMED only if current time >= 9AM EST (14 UTC).
+        Before 9AM, max regime is CAUTION regardless of ratio.
         """
         # Daily range from 3AM (8UTC) to 9AM (14UTC)
         daily_window = bars[(bars.index.hour >= 8) & (bars.index.hour < 14)]
@@ -208,12 +215,20 @@ class DirectionalBias:
 
         ratio = daily_range / asian_range
 
-        if ratio >= self.CONFIRMED_THRESHOLD:
-            return RegimeState.CONFIRMED, ratio
-        elif ratio >= self.CAUTION_THRESHOLD:
-            return RegimeState.CAUTION, ratio
+        # Time gate: regime can only be CONFIRMED after 9AM EST
+        if current_est_hour >= 14:
+            if ratio >= self.CONFIRMED_THRESHOLD:
+                return RegimeState.CONFIRMED, ratio
+            elif ratio >= self.CAUTION_THRESHOLD:
+                return RegimeState.CAUTION, ratio
+            else:
+                return RegimeState.FAILED, ratio
         else:
-            return RegimeState.FAILED, ratio
+            # Before 9AM: cap at CAUTION even if ratio is high
+            if ratio >= self.CAUTION_THRESHOLD:
+                return RegimeState.CAUTION, ratio
+            else:
+                return RegimeState.FAILED, ratio
 
     def _ternary_matrix(
         self,
