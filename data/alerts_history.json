@@ -82,5 +82,17 @@
     "message": "CEREBUS TRADE CALL (BTCUSD)\nDirection: SHORT (9/9_LOCK, 97% confidence)\nPathway: GEAR_SHIFT | Regime: CONFIRMED (1.97x)\nHard Exit: 12PM EST | Time: 06:23 EST",
     "timestamp": "2026-06-13 06:23:30",
     "datetime": "2026-06-13T06:23:30.397342-05:00"
+  },
+  {
+    "symbol": "BTCUSD",
+    "direction": "SHORT",
+    "confidence": 0.97,
+    "dtb_pips": null,
+    "pathway": "GEAR_SHIFT",
+    "regime": "CONFIRMED",
+    "engines_aligned": false,
+    "message": "CEREBUS TRADE CALL (BTCUSD)\nDirection: SHORT (9/9_LOCK, 97% confidence)\nPathway: GEAR_SHIFT | Regime: CONFIRMED (1.97x)\nHard Exit: 12PM EST | Time: 06:28 EST",
+    "timestamp": "2026-06-13 06:28:32",
+    "datetime": "2026-06-13T06:28:32.060427-05:00"
   }
 ]
