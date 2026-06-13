@@ -9,6 +9,7 @@ Handles model selection, rate limiting, failover, and response parsing.
 
 from __future__ import annotations
 
+import json
 import logging
 import time
 from dataclasses import dataclass, field
@@ -273,6 +274,12 @@ class OpenRouterGateway:
                     response.raise_for_status()
                     data = response.json()
                     
+                # Log response structure for debugging
+                if "choices" not in data:
+                    logger.error(f"Unexpected response from {prov.name}: {json.dumps(data)[:500]}")
+                    last_error = f"Unexpected response from {prov.name}: {json.dumps(data)[:200]}"
+                    continue
+                
                 self.record_request(prov.name, data.get("usage", {}).get("total_tokens", 0))
                 logger.info(f"LLM request succeeded with {prov.name}")
                 return data["choices"][0]["message"]["content"]
