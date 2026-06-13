@@ -125,8 +125,11 @@ class DirectionalBias:
         lens_b, lens_b_time = self._evaluate_lens_b(bars)
 
         # ── Lens C: 9 AM Regime Ratio ──
-        # Get current EST hour from the latest bar
-        current_est_hour = bars["est_hour"].iloc[-1] if len(bars) > 0 else 14
+        # Use actual current time (not bar time) for the time gate
+        from datetime import datetime, timezone, timedelta
+        _est = timezone(timedelta(hours=-5))
+        _now_est = datetime.now(_est)
+        current_est_hour = _now_est.hour
         lens_c, regime_ratio = self._evaluate_lens_c(
             bars, asian_range, current_est_hour=current_est_hour
         )

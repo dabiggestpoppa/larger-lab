@@ -357,7 +357,13 @@ class SisyphusEngine:
             if source.metadata.get("doi"):
                 citation["doi"] = source.metadata["doi"]
             if source.metadata.get("authors"):
-                citation["authors"] = ", ".join(source.metadata["authors"][:3])
+                authors = source.metadata["authors"]
+                if authors and isinstance(authors[0], dict):
+                    citation["authors"] = ", ".join(
+                        a.get("display_name", "Unknown") for a in authors[:3]
+                    )
+                else:
+                    citation["authors"] = ", ".join(str(a) for a in authors[:3])
             if source.metadata.get("publication_date"):
                 citation["year"] = source.metadata["publication_date"][:4]
             citations.append(citation)
