@@ -11,12 +11,12 @@ import os
 import sys
 import json
 import time
-import threading
+import csv
+import subprocess
 import tkinter as tk
-from tkinter import ttk, messagebox, scrolledtext
+from tkinter import ttk, messagebox, filedialog, scrolledtext
 from pathlib import Path
-from datetime import datetime, timezone, timedelta, timedelta as td
-from collections import deque
+from datetime import datetime, timezone, timedelta as td
 
 os.environ.setdefault("PYTHONIOENCODING", "utf-8")
 
@@ -25,9 +25,15 @@ DATA_DIR = REPO_ROOT / "data"
 ALERTS_FILE = DATA_DIR / "alerts_history.json"
 LATEST_ALERT_FILE = DATA_DIR / "latest_alert.txt"
 CONFIG_FILE = DATA_DIR / "monitor_config.json"
-SCANNER_LOG = REPO_ROOT / "quant-lab" / "ml" / "cerebus_scanner.log"
 
 EST = timezone(td(hours=-5))
+
+# All available pairs
+ALL_PAIRS = [
+    "EURUSD", "GBPUSD", "USDCHF", "USDJPY", "AUDUSD", "NZDUSD", "USDCAD",
+    "EURGBP", "EURCHF", "EURJPY", "GBPCHF", "GBPJPY", "AUDJPY", "NZDJPY",
+    "BTCUSD", "ETHUSD",
+]
 
 
 # ── Data helpers ──────────────────────────────────────────────
@@ -42,16 +48,8 @@ def load_alerts_history():
     return []
 
 
-def save_alerts_history(alerts):
-    with open(ALERTS_FILE, "w", encoding="utf-8") as f:
-        json.dump(alerts[-500:], f, indent=2)  # keep last 500
-
-
 def load_config():
-    defaults = {
-        "symbols": ["EURUSD", "BTCUSD"],
-        "interval": 300,
-    }
+    defaults = {"symbols": ["EURUSD", "BTCUSD"], "interval": 300}
     if CONFIG_FILE.exists():
         try:
             with open(CONFIG_FILE, encoding="utf-8") as f:
@@ -63,6 +61,7 @@ def load_config():
 
 
 def save_config(cfg):
+    CONFIG_FILE.parent.mkdir(parents=True, exist_ok=True)
     with open(CONFIG_FILE, "w", encoding="utf-8") as f:
         json.dump(cfg, f, indent=2)
 
@@ -90,19 +89,18 @@ def parse_alert_file():
 
 
 def get_scanner_status():
-    """Check if the CEREBUS scanner process is running."""
+    """Check if the CEREBUS scanner process is running. Returns (running, pid)."""
     try:
-        import subprocess
         result = subprocess.run(
-            ["tasklist", "/FI", "IMAGENAME eq python.exe", "/FO", "CSV", "/NH"],
+            ["powershell", "-Command",
+             "Get-Process python -ErrorAction SilentlyContinue | "
+             "Where-Object { $_.CommandLine -match 'run_cerebus_unified' } | "
+             "Select-Object -ExpandProperty Id"],
             capture_output=True, text=True, timeout=5
         )
-        for line in result.stdout.strip().split("\n"):
-            if "run_cerebus_unified" in line.lower():
-                parts = line.split(",")
-                if len(parts) >= 2:
-                    pid = parts[1].strip('"')
-                    return True, pid
+        pid_str = result.stdout.strip()
+        if pid_str:
+            return True, pid_str.split("\n")[0].strip()
     except Exception:
         pass
     return False, None
@@ -114,79 +112,72 @@ class CerebusMonitor(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("CEREBUS Monitor")
-        self.geometry("900x650")
-        self.minsize(750, 500)
+        self.geometry("920x680")
+        self.minsize(780, 520)
         self.configure(bg="#1a1a2e")
 
         self.config_data = load_config()
         self.alerts_history = load_alerts_history()
-        self.filter_days = tk.IntVar(value=1)
+        self.filter_var = tk.StringVar(value="24h")
+        self.pair_vars = {}
 
         self._setup_styles()
         self._build_ui()
         self._refresh()
 
-    # ── Styles ─────────────────────────────────────────────
-
     def _setup_styles(self):
-        self.style = ttk.Style(self)
-        self.style.theme_use("clam")
-        bg = "#1a1a2e"
-        fg = "#e0e0e0"
-        accent = "#0f3460"
-        highlight = "#e94560"
+        style = ttk.Style(self)
+        style.theme_use("clam")
+        bg, fg, accent, hi = "#1a1a2e", "#e0e0e0", "#0f3460", "#e94560"
 
-        self.style.configure(".", background=bg, foreground=fg, fieldbackground=accent)
-        self.style.configure("TFrame", background=bg)
-        self.style.configure("TLabel", background=bg, foreground=fg, font=("Segoe UI", 10))
-        self.style.configure("Header.TLabel", font=("Segoe UI", 14, "bold"), foreground="#00d2ff")
-        self.style.configure("Status.TLabel", font=("Segoe UI", 9))
-        self.style.configure("AlertTitle.TLabel", font=("Segoe UI", 11, "bold"), foreground="#00d2ff")
-        self.style.configure("AlertDetail.TLabel", font=("Segoe UI", 9), foreground="#b0b0b0")
-        self.style.configure("TButton", background=accent, foreground=fg, font=("Segoe UI", 9))
-        self.style.configure("Accent.TButton", background=highlight, foreground="white")
-        self.style.configure("TNotebook", background=bg)
-        self.style.configure("TNotebook.Tab", background=accent, foreground=fg, padding=[12, 4])
-        self.style.map("TNotebook.Tab", background=[("selected", highlight)])
-        self.style.configure("Treeview", background="#16213e", foreground=fg, fieldbackground="#16213e")
-        self.style.configure("Treeview.Heading", background=accent, foreground=fg)
-        self.style.map("Treeview", background=[("selected", highlight)])
-
-    # ── UI ──────────────────────────────────────────────────
+        style.configure(".", background=bg, foreground=fg, fieldbackground=accent)
+        style.configure("TFrame", background=bg)
+        style.configure("TLabel", background=bg, foreground=fg, font=("Segoe UI", 10))
+        style.configure("Header.TLabel", font=("Segoe UI", 16, "bold"), foreground="#00d2ff")
+        style.configure("Sub.TLabel", font=("Segoe UI", 9), foreground="#888888")
+        style.configure("Status.TLabel", font=("Segoe UI", 9))
+        style.configure("AlertTitle.TLabel", font=("Segoe UI", 11, "bold"), foreground="#00d2ff")
+        style.configure("TButton", background=accent, foreground=fg, font=("Segoe UI", 9))
+        style.configure("Accent.TButton", background=hi, foreground="white")
+        style.configure("TNotebook", background=bg)
+        style.configure("TNotebook.Tab", background=accent, foreground=fg, padding=[14, 5])
+        style.map("TNotebook.Tab", background=[("selected", hi)])
+        style.configure("Treeview", background="#16213e", foreground=fg,
+                        fieldbackground="#16213e", borderwidth=0)
+        style.configure("Treeview.Heading", background=accent, foreground=fg,
+                        font=("Segoe UI", 9, "bold"))
+        style.map("Treeview", background=[("selected", hi)])
+        style.configure("TLabelframe", background=bg, foreground="#aaaaaa")
+        style.configure("TLabelframe.Label", background=bg, foreground="#aaaaaa",
+                        font=("Segoe UI", 9, "bold"))
 
     def _build_ui(self):
-        # Header
         header = ttk.Frame(self)
-        header.pack(fill="x", padx=10, pady=(10, 4))
+        header.pack(fill="x", padx=12, pady=(10, 2))
         ttk.Label(header, text="CEREBUS Monitor", style="Header.TLabel").pack(side="left")
-
-        self.status_label = ttk.Label(header, text="● Checking...", style="Status.TLabel")
+        self.status_label = ttk.Label(header, text="...", style="Status.TLabel")
         self.status_label.pack(side="right")
 
-        # Notebook (tabs)
-        self.notebook = ttk.Notebook(self)
-        self.notebook.pack(fill="both", expand=True, padx=10, pady=4)
+        nb = ttk.Notebook(self)
+        nb.pack(fill="both", expand=True, padx=12, pady=4)
+        self.notebook = nb
 
-        self._build_conditions_tab()
-        self._build_alerts_tab()
-        self._build_config_tab()
+        self._build_conditions_tab(nb)
+        self._build_alerts_tab(nb)
+        self._build_config_tab(nb)
 
-        # Footer
         footer = ttk.Frame(self)
-        footer.pack(fill="x", padx=10, pady=(0, 8))
-        self.time_label = ttk.Label(footer, text="", style="Status.TLabel")
+        footer.pack(fill="x", padx=12, pady=(0, 8))
+        self.time_label = ttk.Label(footer, text="", style="Sub.TLabel")
         self.time_label.pack(side="right")
-        ttk.Button(footer, text="Refresh", command=self._refresh).pack(side="left", padx=2)
+        ttk.Button(footer, text="Refresh", command=self._manual_refresh).pack(side="left", padx=2)
         ttk.Button(footer, text="Start Scanner", command=self._start_scanner).pack(side="left", padx=2)
         ttk.Button(footer, text="Stop Scanner", command=self._stop_scanner).pack(side="left", padx=2)
 
-    # ── Tab 1: Market Conditions ────────────────────────────
+    def _build_conditions_tab(self, nb):
+        frame = ttk.Frame(nb)
+        nb.add(frame, text="  Market Conditions  ")
 
-    def _build_conditions_tab(self):
-        frame = ttk.Frame(self.notebook)
-        self.notebook.add(frame, text="  Market Conditions  ")
-
-        # Latest alert display
         alert_frame = ttk.LabelFrame(frame, text="Latest Alert")
         alert_frame.pack(fill="x", padx=8, pady=6)
 
@@ -194,123 +185,163 @@ class CerebusMonitor(tk.Tk):
         self.alert_title.pack(anchor="w", padx=10, pady=(6, 2))
 
         self.alert_body = scrolledtext.ScrolledText(
-            alert_frame, height=6, bg="#16213e", fg="#e0e0e0",
-            font=("Consolas", 9), relief="flat", state="disabled"
+            alert_frame, height=5, bg="#16213e", fg="#e0e0e0",
+            font=("Consolas", 9), relief="flat", state="disabled", wrap="word"
         )
         self.alert_body.pack(fill="x", padx=10, pady=(0, 6))
 
-        # Pairs status
-        pairs_frame = ttk.LabelFrame(frame, text="Tracked Pairs")
+        pairs_frame = ttk.LabelFrame(frame, text="Tracked Pairs (click to toggle)")
         pairs_frame.pack(fill="both", expand=True, padx=8, pady=6)
 
-        columns = ("pair", "status", "last_scan")
-        self.pairs_tree = ttk.Treeview(pairs_frame, columns=columns, show="headings", height=6)
+        canvas = tk.Canvas(pairs_frame, bg="#1a1a2e", highlightthickness=0)
+        scrollbar = ttk.Scrollbar(pairs_frame, orient="vertical", command=canvas.yview)
+        scroll_frame = ttk.Frame(canvas)
+        scroll_frame.bind("<Configure>",
+                          lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        current_symbols = set(self.config_data.get("symbols", []))
+        cols = 4
+        for i, pair in enumerate(ALL_PAIRS):
+            var = tk.BooleanVar(value=(pair in current_symbols))
+            self.pair_vars[pair] = var
+            row, col = i // cols, i % cols
+            cb = tk.Checkbutton(
+                scroll_frame, text=pair, variable=var,
+                bg="#16213e", fg="#e0e0e0", selectcolor="#0f3460",
+                activebackground="#0f3460", activeforeground="#00d2ff",
+                font=("Segoe UI", 10),
+                command=self._on_pair_toggle
+            )
+            cb.grid(row=row, column=col, padx=4, pady=2, sticky="w")
+
+        canvas.pack(side="left", fill="both", expand=True, padx=4, pady=4)
+        scrollbar.pack(side="right", fill="y", pady=4)
+
+        status_frame = ttk.LabelFrame(frame, text="Pair Status")
+        status_frame.pack(fill="x", padx=8, pady=(0, 6))
+
+        columns = ("pair", "direction", "confidence", "last_alert")
+        self.pairs_tree = ttk.Treeview(status_frame, columns=columns,
+                                        show="headings", height=4)
         self.pairs_tree.heading("pair", text="Pair")
-        self.pairs_tree.heading("status", text="Status")
-        self.pairs_tree.heading("last_scan", text="Last Scan")
-        self.pairs_tree.column("pair", width=120)
-        self.pairs_tree.column("status", width=200)
-        self.pairs_tree.column("last_scan", width=180)
-        self.pairs_tree.pack(fill="both", expand=True, padx=4, pady=4)
+        self.pairs_tree.heading("direction", text="Direction")
+        self.pairs_tree.heading("confidence", text="Confidence")
+        self.pairs_tree.heading("last_alert", text="Last Alert")
+        self.pairs_tree.column("pair", width=100)
+        self.pairs_tree.column("direction", width=100)
+        self.pairs_tree.column("confidence", width=100)
+        self.pairs_tree.column("last_alert", width=200)
+        self.pairs_tree.pack(fill="x", padx=4, pady=4)
 
-    # ── Tab 2: Alerts History ───────────────────────────────
+    def _build_alerts_tab(self, nb):
+        frame = ttk.Frame(nb)
+        nb.add(frame, text="  Alerts  ")
 
-    def _build_alerts_tab(self):
-        frame = ttk.Frame(self.notebook)
-        self.notebook.add(frame, text="  Alerts  ")
+        bar = ttk.Frame(frame)
+        bar.pack(fill="x", padx=8, pady=6)
+        ttk.Label(bar, text="Show:").pack(side="left")
+        for val, label in [("24h", "24 Hours"), ("7d", "7 Days"),
+                           ("30d", "30 Days"), ("all", "All")]:
+            rb = tk.Radiobutton(
+                bar, text=label, variable=self.filter_var, value=val,
+                bg="#1a1a2e", fg="#e0e0e0", selectcolor="#0f3460",
+                activebackground="#0f3460", activeforeground="#00d2ff",
+                font=("Segoe UI", 9),
+                command=self._refresh_alerts
+            )
+            rb.pack(side="left", padx=6)
+        ttk.Button(bar, text="Export CSV", command=self._export_csv).pack(side="right")
 
-        # Filter bar
-        filter_bar = ttk.Frame(frame)
-        filter_bar.pack(fill="x", padx=8, pady=6)
-        ttk.Label(filter_bar, text="Show last:").pack(side="left")
-        for val, label in [(1, "24h"), (7, "7d"), (30, "30d"), (0, "All")]:
-            ttk.Radiobutton(filter_bar, text=label, variable=self.filter_days,
-                            value=val, command=self._refresh_alerts).pack(side="left", padx=4)
-        ttk.Button(filter_bar, text="Export CSV", command=self._export_csv).pack(side="right")
-
-        # Alerts tree
         columns = ("time", "symbol", "direction", "confidence", "pathway", "regime", "pips")
-        self.alerts_tree = ttk.Treeview(frame, columns=columns, show="headings", height=14)
-        self.alerts_tree.heading("time", text="Time (EST)")
-        self.alerts_tree.heading("symbol", text="Symbol")
-        self.alerts_tree.heading("direction", text="Direction")
-        self.alerts_tree.heading("confidence", text="Conf.")
-        self.alerts_tree.heading("pathway", text="Pathway")
-        self.alerts_tree.heading("regime", text="Regime")
-        self.alerts_tree.heading("pips", text="Pips")
-        for col in columns:
-            self.alerts_tree.column(col, width=100)
-        self.alerts_tree.column("time", width=140)
+        tree_frame = ttk.Frame(frame)
+        tree_frame.pack(fill="both", expand=True, padx=8, pady=2)
 
-        scrollbar = ttk.Scrollbar(frame, orient="vertical", command=self.alerts_tree.yview)
-        self.alerts_tree.configure(yscrollcommand=scrollbar.set)
-        self.alerts_tree.pack(side="left", fill="both", expand=True, padx=(8, 0), pady=4)
-        scrollbar.pack(side="right", fill="y", pady=4, padx=(0, 8))
+        self.alerts_tree = ttk.Treeview(tree_frame, columns=columns,
+                                         show="headings", height=12)
+        for col, txt, w in [
+            ("time", "Time (EST)", 140), ("symbol", "Symbol", 80),
+            ("direction", "Dir", 60), ("confidence", "Conf", 60),
+            ("pathway", "Pathway", 100), ("regime", "Regime", 100),
+            ("pips", "Pips", 70),
+        ]:
+            self.alerts_tree.heading(col, text=txt)
+            self.alerts_tree.column(col, width=w)
 
-        # Detail view
+        vsb = ttk.Scrollbar(tree_frame, orient="vertical", command=self.alerts_tree.yview)
+        self.alerts_tree.configure(yscrollcommand=vsb.set)
+        self.alerts_tree.pack(side="left", fill="both", expand=True)
+        vsb.pack(side="right", fill="y")
+
         self.alert_detail = scrolledtext.ScrolledText(
-            frame, height=5, bg="#16213e", fg="#e0e0e0",
-            font=("Consolas", 9), relief="flat", state="disabled"
+            frame, height=4, bg="#16213e", fg="#e0e0e0",
+            font=("Consolas", 9), relief="flat", state="disabled", wrap="word"
         )
-        self.alert_detail.pack(fill="x", padx=8, pady=(0, 6))
+        self.alert_detail.pack(fill="x", padx=8, pady=(2, 6))
         self.alerts_tree.bind("<<TreeviewSelect>>", self._on_alert_select)
 
-    # ── Tab 3: Configuration ────────────────────────────────
+    def _build_config_tab(self, nb):
+        frame = ttk.Frame(nb)
+        nb.add(frame, text="  Settings  ")
 
-    def _build_config_tab(self):
-        frame = ttk.Frame(self.notebook)
-        self.notebook.add(frame, text="  Configuration  ")
-
-        # Pairs
-        pairs_frame = ttk.LabelFrame(frame, text="Scanned Pairs (comma-separated)")
-        pairs_frame.pack(fill="x", padx=8, pady=8)
-        self.pairs_entry = ttk.Entry(pairs_frame, font=("Segoe UI", 11))
-        self.pairs_entry.insert(0, ", ".join(self.config_data.get("symbols", ["EURUSD", "BTCUSD"])))
-        self.pairs_entry.pack(fill="x", padx=10, pady=8)
-
-        # Interval
-        interval_frame = ttk.LabelFrame(frame, text="Scan Interval (seconds)")
-        interval_frame.pack(fill="x", padx=8, pady=8)
-        self.interval_entry = ttk.Entry(interval_frame, font=("Segoe UI", 11))
+        int_frame = ttk.LabelFrame(frame, text="Scan Interval")
+        int_frame.pack(fill="x", padx=8, pady=8)
+        inner = ttk.Frame(int_frame)
+        inner.pack(fill="x", padx=10, pady=8)
+        ttk.Label(inner, text="Seconds:").pack(side="left")
+        self.interval_entry = ttk.Entry(inner, width=10, font=("Segoe UI", 11))
         self.interval_entry.insert(0, str(self.config_data.get("interval", 300)))
-        self.interval_entry.pack(fill="x", padx=10, pady=8)
+        self.interval_entry.pack(side="left", padx=8)
+        ttk.Label(inner, text="(60-3600)", style="Sub.TLabel").pack(side="left")
 
-        # Buttons
+        active_frame = ttk.LabelFrame(frame, text="Active Pairs")
+        active_frame.pack(fill="x", padx=8, pady=8)
+        self.active_pairs_label = ttk.Label(active_frame, text="", style="Status.TLabel")
+        self.active_pairs_label.pack(anchor="w", padx=10, pady=8)
+        self._update_active_label()
+
         btn_frame = ttk.Frame(frame)
         btn_frame.pack(fill="x", padx=8, pady=12)
-        ttk.Button(btn_frame, text="Save Config", style="Accent.TButton",
+        ttk.Button(btn_frame, text="Save Settings", style="Accent.TButton",
                    command=self._save_config).pack(side="left", padx=4)
         ttk.Button(btn_frame, text="Apply & Restart Scanner",
                    command=self._apply_and_restart).pack(side="left", padx=4)
 
-        # Info
-        info_frame = ttk.LabelFrame(frame, text="Scanner Command")
-        info_frame.pack(fill="x", padx=8, pady=8)
-        self.cmd_label = ttk.Label(info_frame, text="", style="Status.TLabel")
+        cmd_frame = ttk.LabelFrame(frame, text="Scanner Command")
+        cmd_frame.pack(fill="x", padx=8, pady=8)
+        self.cmd_label = ttk.Label(cmd_frame, text="", style="Sub.TLabel")
         self.cmd_label.pack(anchor="w", padx=10, pady=8)
         self._update_cmd_label()
 
-    # ── Actions ─────────────────────────────────────────────
+    def _manual_refresh(self):
+        self.alerts_history = load_alerts_history()
+        self._refresh()
 
     def _refresh(self):
         self._refresh_status()
         self._refresh_conditions()
         self._refresh_alerts()
         self._update_time()
-        self.after(5000, self._refresh)  # auto-refresh every 5s
+        self._update_active_label()
+        self.after(5000, self._refresh)
 
     def _refresh_status(self):
         running, pid = get_scanner_status()
         if running:
-            self.status_label.configure(text=f"● Scanner RUNNING (PID {pid})", foreground="#00ff88")
+            self.status_label.configure(
+                text="  Scanner RUNNING (PID {})  ".format(pid),
+                foreground="#00ff88")
         else:
-            self.status_label.configure(text="● Scanner STOPPED", foreground="#ff4444")
+            self.status_label.configure(
+                text="  Scanner STOPPED  ",
+                foreground="#ff4444")
 
     def _refresh_conditions(self):
-        # Latest alert
         alert = parse_alert_file()
         if alert:
-            self.alert_title.configure(text=f"[{alert['timestamp']}] {alert['title']}")
+            self.alert_title.configure(
+                text="[{}] {}".format(alert["timestamp"], alert["title"]))
             self.alert_body.configure(state="normal")
             self.alert_body.delete("1.0", "end")
             self.alert_body.insert("1.0", "\n".join(alert["details"]))
@@ -319,48 +350,55 @@ class CerebusMonitor(tk.Tk):
             self.alert_title.configure(text="No alerts yet")
             self.alert_body.configure(state="normal")
             self.alert_body.delete("1.0", "end")
-            self.alert_body.insert("1.0", "Waiting for trade calls...")
+            self.alert_body.insert("1.0",
+                "Waiting for trade calls...\n\nScanner checks every {}s during "
+                "active hours (3AM-12PM EST for FX, 24/7 for crypto).".format(
+                    self.config_data.get("interval", 300)))
             self.alert_body.configure(state="disabled")
 
-        # Pairs
         for item in self.pairs_tree.get_children():
             self.pairs_tree.delete(item)
-        symbols = self.config_data.get("symbols", ["EURUSD", "BTCUSD"])
-        now_est = datetime.now(EST)
-        for sym in symbols:
-            # Check if we have recent alert data for this pair
+        active = self._get_active_pairs()
+        for sym in active:
             recent = [a for a in self.alerts_history if a.get("symbol") == sym]
             if recent:
                 last = recent[-1]
                 self.pairs_tree.insert("", "end", values=(
-                    sym, f"Last: {last.get('direction', '?')} ({last.get('confidence', 0):.0%})",
-                    last.get("timestamp", "?")
+                    sym, last.get("direction", "?"),
+                    "{:.0%}".format(last.get("confidence", 0)),
+                    last.get("timestamp", "?"),
                 ))
             else:
-                self.pairs_tree.insert("", "end", values=(sym, "Scanning...", now_est.strftime("%H:%M:%S")))
+                self.pairs_tree.insert("", "end",
+                                       values=(sym, "—", "—", "No alerts yet"))
 
     def _refresh_alerts(self):
         for item in self.alerts_tree.get_children():
             self.alerts_tree.delete(item)
 
-        days = self.filter_days.get()
+        filt = self.filter_var.get()
+        now = datetime.now(EST)
         cutoff = None
-        if days > 0:
-            cutoff = datetime.now(EST) - td(days=days)
+        if filt == "24h":
+            cutoff = now - td(hours=24)
+        elif filt == "7d":
+            cutoff = now - td(days=7)
+        elif filt == "30d":
+            cutoff = now - td(days=30)
 
         filtered = self.alerts_history
         if cutoff:
-            filtered = [a for a in filtered if a.get("datetime", datetime.min.replace(tzinfo=EST)) >= cutoff]
+            filtered = [a for a in filtered
+                        if _parse_dt(a.get("datetime", "")) >= cutoff]
 
-        for alert in reversed(filtered[-200:]):  # last 200
+        for alert in reversed(filtered[-300:]):
+            pips = alert.get("dtb_pips")
             self.alerts_tree.insert("", "end", values=(
-                alert.get("timestamp", ""),
-                alert.get("symbol", ""),
+                alert.get("timestamp", ""), alert.get("symbol", ""),
                 alert.get("direction", ""),
-                f"{alert.get('confidence', 0):.0%}",
-                alert.get("pathway", ""),
-                alert.get("regime", ""),
-                f"{alert.get('dtb_pips', 0):.1f}" if alert.get("dtb_pips") else "—",
+                "{:.0%}".format(alert.get("confidence", 0)),
+                alert.get("pathway", ""), alert.get("regime", ""),
+                "{:.1f}".format(pips) if pips else "—",
             ))
 
     def _on_alert_select(self, event):
@@ -368,11 +406,18 @@ class CerebusMonitor(tk.Tk):
         if not sel:
             return
         idx = self.alerts_tree.index(sel[0])
-        days = self.filter_days.get()
-        cutoff = datetime.now(EST) - td(days=days) if days > 0 else None
+        filt = self.filter_var.get()
+        now = datetime.now(EST)
+        cutoff = None
+        if filt == "24h":
+            cutoff = now - td(hours=24)
+        elif filt == "7d":
+            cutoff = now - td(days=7)
+        elif filt == "30d":
+            cutoff = now - td(days=30)
         filtered = [a for a in self.alerts_history
-                    if not cutoff or a.get("datetime", datetime.min.replace(tzinfo=EST)) >= cutoff]
-        filtered = list(reversed(filtered[-200:]))
+                    if not cutoff or _parse_dt(a.get("datetime", "")) >= cutoff]
+        filtered = list(reversed(filtered[-300:]))
         if idx < len(filtered):
             alert = filtered[idx]
             self.alert_detail.configure(state="normal")
@@ -380,33 +425,50 @@ class CerebusMonitor(tk.Tk):
             self.alert_detail.insert("1.0", alert.get("message", ""))
             self.alert_detail.configure(state="disabled")
 
-    def _update_time(self):
-        now_est = datetime.now(EST)
-        self.time_label.configure(text=f"EST: {now_est.strftime('%Y-%m-%d %H:%M:%S')}")
-
-    def _update_cmd_label(self):
-        pairs = ", ".join(self.config_data.get("symbols", ["EURUSD", "BTCUSD"]))
-        interval = self.config_data.get("interval", 300)
-        cmd = f"python quant-lab/ml/run_cerebus_unified.py --interval {interval} --symbols {pairs}"
-        self.cmd_label.configure(text=cmd)
-
-    def _save_config(self):
-        pairs_text = self.pairs_entry.get().strip()
-        symbols = [s.strip().upper() for s in pairs_text.split(",") if s.strip()]
-        try:
-            interval = int(self.interval_entry.get().strip())
-        except ValueError:
-            interval = 300
-        self.config_data["symbols"] = symbols
-        self.config_data["interval"] = interval
+    def _on_pair_toggle(self):
+        active = self._get_active_pairs()
+        self.config_data["symbols"] = active
         save_config(self.config_data)
         self._update_cmd_label()
-        messagebox.showinfo("Saved", "Configuration saved.")
+        self._update_active_label()
+        self._refresh_conditions()
+
+    def _get_active_pairs(self):
+        return [p for p, v in sorted(self.pair_vars.items()) if v.get()]
+
+    def _update_active_label(self):
+        active = self._get_active_pairs()
+        self.active_pairs_label.configure(
+            text="{} pairs: {}".format(len(active), ", ".join(active)))
+
+    def _update_cmd_label(self):
+        pairs = " ".join(self._get_active_pairs())
+        interval = self.config_data.get("interval", 300)
+        self.cmd_label.configure(
+            text="python quant-lab/ml/run_cerebus_unified.py "
+                 "--interval {} --symbols {}".format(interval, pairs))
+
+    def _update_time(self):
+        now = datetime.now(EST)
+        self.time_label.configure(text="EST: {}".format(now.strftime("%Y-%m-%d %H:%M:%S")))
+
+    def _save_config(self):
+        try:
+            interval = int(self.interval_entry.get().strip())
+            interval = max(60, min(3600, interval))
+        except ValueError:
+            interval = 300
+        self.config_data["interval"] = interval
+        self.interval_entry.delete(0, "end")
+        self.interval_entry.insert(0, str(interval))
+        save_config(self.config_data)
+        self._update_cmd_label()
+        messagebox.showinfo("Saved", "Settings saved.")
 
     def _apply_and_restart(self):
         self._save_config()
         self._stop_scanner()
-        time.sleep(1)
+        time.sleep(2)
         self._start_scanner()
 
     def _start_scanner(self):
@@ -414,75 +476,73 @@ class CerebusMonitor(tk.Tk):
         if running:
             messagebox.showinfo("Info", "Scanner is already running.")
             return
-        symbols = self.config_data.get("symbols", ["EURUSD", "BTCUSD"])
+        symbols = self._get_active_pairs()
+        if not symbols:
+            messagebox.showwarning("Warning", "No pairs selected.")
+            return
         interval = self.config_data.get("interval", 300)
         cmd = [
             sys.executable,
             str(REPO_ROOT / "quant-lab" / "ml" / "run_cerebus_unified.py"),
-            "--interval", str(interval),
-            "--symbols",
+            "--interval", str(interval), "--symbols",
         ] + symbols
         try:
-            subprocess.Popen(cmd, cwd=str(REPO_ROOT),
-                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                             creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if sys.platform == "win32" else 0)
-            messagebox.showinfo("Started", f"Scanner started (PID will appear on refresh).")
+            subprocess.Popen(
+                cmd, cwd=str(REPO_ROOT),
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if sys.platform == "win32" else 0
+            )
+            messagebox.showinfo("Started", "Scanner started.")
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to start scanner: {e}")
+            messagebox.showerror("Error", "Failed to start: {}".format(e))
 
     def _stop_scanner(self):
         try:
-            import subprocess
-            result = subprocess.run(
-                ["tasklist", "/FI", "IMAGENAME eq python.exe", "/FO", "CSV", "/NH"],
+            subprocess.run(
+                ["powershell", "-Command",
+                 "Get-Process python -ErrorAction SilentlyContinue | "
+                 "Where-Object { $_.CommandLine -match 'run_cerebus_unified' } | "
+                 "Stop-Process -Force"],
                 capture_output=True, text=True, timeout=5
             )
-            killed = 0
-            for line in result.stdout.strip().split("\n"):
-                if "run_cerebus_unified" in line.lower():
-                    parts = line.split(",")
-                    if len(parts) >= 2:
-                        pid = int(parts[1].strip('"'))
-                        subprocess.run(["taskkill", "/F", "/PID", str(pid)],
-                                       capture_output=True, timeout=5)
-                        killed += 1
-            if killed:
-                messagebox.showinfo("Stopped", f"Scanner stopped ({killed} process(es)).")
-            else:
-                messagebox.showinfo("Info", "Scanner was not running.")
+            messagebox.showinfo("Stopped", "Scanner stopped.")
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to stop scanner: {e}")
+            messagebox.showerror("Error", "Failed to stop: {}".format(e))
 
     def _export_csv(self):
-        from tkinter import filedialog
         path = filedialog.asksaveasfilename(
             defaultextension=".csv",
             filetypes=[("CSV files", "*.csv")],
-            initialfile=f"cerebus_alerts_{datetime.now(EST).strftime('%Y%m%d')}.csv"
-        )
+            initialfile="cerebus_alerts_{}.csv".format(
+                datetime.now(EST).strftime("%Y%m%d")))
         if not path:
             return
         try:
-            import csv
             with open(path, "w", newline="", encoding="utf-8") as f:
-                writer = csv.writer(f)
-                writer.writerow(["Time", "Symbol", "Direction", "Confidence", "Pathway", "Regime", "Pips"])
-                for alert in self.alerts_history:
-                    writer.writerow([
-                        alert.get("timestamp", ""),
-                        alert.get("symbol", ""),
-                        alert.get("direction", ""),
-                        f"{alert.get('confidence', 0):.0%}",
-                        alert.get("pathway", ""),
-                        alert.get("regime", ""),
-                        alert.get("dtb_pips", ""),
+                w = csv.writer(f)
+                w.writerow(["Time", "Symbol", "Direction", "Confidence",
+                            "Pathway", "Regime", "Pips"])
+                for a in self.alerts_history:
+                    w.writerow([
+                        a.get("timestamp", ""), a.get("symbol", ""),
+                        a.get("direction", ""),
+                        "{:.0%}".format(a.get("confidence", 0)),
+                        a.get("pathway", ""), a.get("regime", ""),
+                        a.get("dtb_pips", ""),
                     ])
-            messagebox.showinfo("Exported", f"Alerts exported to {path}")
+            messagebox.showinfo("Exported", "Alerts exported to:\n{}".format(path))
         except Exception as e:
-            messagebox.showerror("Error", f"Export failed: {e}")
+            messagebox.showerror("Error", "Export failed: {}".format(e))
 
 
-# ── Entry point ──────────────────────────────────────────────
+def _parse_dt(s):
+    if not s:
+        return datetime.min.replace(tzinfo=EST)
+    try:
+        return datetime.fromisoformat(s)
+    except Exception:
+        return datetime.min.replace(tzinfo=EST)
+
 
 if __name__ == "__main__":
     app = CerebusMonitor()
