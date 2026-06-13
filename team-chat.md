@@ -1,3 +1,174 @@
+# 📋 ORGANIZATION UPDATE — 2026-06-13 (Fri)
+> **Agent:** OC2 (OWL) | **Purpose:** Full inventory of GitHub repos, apps, agents, and docs
+
+---
+
+## 🎯 What Was Done
+
+Organized ALL GitHub repos from the `INTERSTING GITHUBS` file into the workspace, created architecture documentation for every system, built content agents, and got all services running.
+
+---
+
+## 📁 GitHub Repos Forked (17 Total)
+
+### Phase 1.2 — Parser Stack
+| Repo | Location | Purpose |
+|------|----------|---------|
+| `microsoft/markitdown` | `core/parser/markitdown/` | Universal file → Markdown |
+| `opendataloader-project/opendataloader-pdf` | `core/parser/odl-pdf/` | Research PDF extraction |
+| `run-llama/liteparse` | `core/parser/liteparse/` | Code + web parsing |
+| `datalab-to/chandra` | `core/parser/chandra/` | OCR / vision extraction |
+
+### Phase 1.3 — Vector Cognition
+| Repo | Location | Purpose |
+|------|----------|---------|
+| `RyanCodrai/turbovec` | `core/semantic/vector/turbovec/` | Vector search (beats FAISS) |
+
+### Phase 1.5 — Knowledge Graph
+| Repo | Location | Purpose |
+|------|----------|---------|
+| `colbymchenry/codegraph` | `tools/codegraph/` | Code knowledge graph for agents |
+
+### Phase 1.6 — Procedural Cognition
+| Repo | Location | Purpose |
+|------|----------|---------|
+| `virgiliojr94/book-to-skill` | `core/cognition/procedural/book-to-skill/` | Document → skill converter |
+| `maipianworni/SkillTree` | `core/cognition/router/skilltree/` | Skill router tree |
+| `mattpocock/skills` | `skills/` | Engineering best practices |
+
+### Phase 2 — Distillation
+| Repo | Location | Purpose |
+|------|----------|---------|
+| `teng-lin/notebooklm-py` | `content-farm/github-repos/notebooklm-py/` | Content distillation |
+
+### Phase 3 — Research Signals
+| Repo | Location | Purpose |
+|------|----------|---------|
+| `Thysrael/Horizon` | `core/research/horizon/` | News/trend radar |
+
+### Phase 4 — Embodiment
+| Repo | Location | Purpose |
+|------|----------|---------|
+| `dograh-hq/dograh` | `vtuber_integration/dograh/` | Voice AI platform |
+| `LottieFiles/dotlottie-web` | `vtuber_integration/dotlottie-web/` | Animation engine |
+
+### Content Farm
+| Repo | Location | Purpose |
+|------|----------|---------|
+| `nexu-io/open-design` | `content-farm/design/open-design/` | Design workspace (63.9k stars) |
+| `averygan/reclip` | `content-farm/sites/reclip/` | Video downloader |
+
+### Infrastructure
+| Repo | Location | Purpose |
+|------|----------|---------|
+| `terrastruct/d2` | `tools/d2/` | Diagram scripting |
+
+### Tools (New Forks)
+| Repo | Location | Purpose |
+|------|----------|---------|
+| `capcom6/android-sms-gateway` | `tools/sms-gateway/` | SMS gateway for alerts |
+| `jamiepine/voicebox` | `tools/voicebox/` | Local voice cloning |
+| `Leonxlnx/taste-skill` | `skills/taste-skill/` | Agent skill framework |
+
+### Still Need Forking
+- `unslothai/unsloth` — Fine-tune LLMs 5x faster, 70% less VRAM
+- `debpalash/OmniVoice-Studio` — Multi-engine TTS/voice cloning
+
+---
+
+## 🤖 Content Agents Built
+
+### 1. Content Creator (`/content`)
+**Location:** `agents/content-creator.agent.md` + `.github/agents/content-creator.agent.md`
+- `/content script "topic"` — TikTok/Reels scripts
+- `/content deck "topic"` — Presentation decks (PPTX/PDF/MP4)
+- `/content image "topic"` — AI image generation
+- `/content social "topic"` — Social media posts
+- Uses Open Design (`content-farm/design/open-design/`) for asset generation
+- Uses ReClip (`content-farm/sites/reclip/`) for video downloads
+- Follows brand voice from `content-engine/BRAND_VOICE.md`
+
+### 2. Content Strategist (`/strategy`)
+**Location:** `agents/content-strategist.agent.md` + `.github/agents/content-strategist.agent.md`
+- `/strategy calendar` — Weekly content calendar
+- `/strategy repurpose "content"` — Adapt across platforms
+- `/strategy analytics` — Performance report
+- Multi-channel: X, TikTok, YouTube, Reddit, Newsletter, Instagram
+
+---
+
+## 📊 Architecture Docs Created
+
+| File | Description |
+|------|-------------|
+| `ARCHITECTURE.md` | Full system architecture + Mermaid graphs |
+| `oce/ARCHITECTURE.md` | OCE backend (30+ modules, API endpoints) |
+| `quant-lab/ARCHITECTURE.md` | CEREBUS scanner (engines + ML pipeline) |
+| `quant-lab/ml/CEREBUS_PREDICTION_REFERENCE.md` | All predictions + accuracy data |
+| `core/parser/README.md` | Parser orchestration |
+| `core/semantic/README.md` | Semantic memory |
+| `core/knowledge/graph/README.md` | Knowledge graph |
+| `core/research/README.md` | Research mesh |
+| `content-farm/README.md` | Content farm architecture |
+| `vtuber_integration/README.md` | VTuber system |
+| `docs/DESIGN_AND_APP_REPOS.md` | All design/app GitHub repos |
+| `docs/CONTENT_FARM_TOOLS.md` | Presentation, video, image tools |
+
+---
+
+## 🎬 Content Farm Tools (From Your List)
+
+### Presentations & Decks
+- **Open Design** (forked) — 5 presentation skills, 150 design systems, 261 plugins
+- **D2** (forked) — Text-to-diagram for architecture docs
+
+### Video
+- **ReClip** (forked) — Self-hosted video downloader (1000+ sites)
+- **Open Design video skills** — `video-hyperframes`, `fal-video-edit`, 50+ templates
+- **Free tools:** cobalt.tools, yt-dlp, 4K Video Downloader, greenvideo.cc, tiktokio.bio
+
+### Images
+- **Open Design image skills** — `imagegen`, `fal-image-edit`, `venice-image-generate`, 45+ templates
+- **Free tools:** Photopea, MagicEraser, TinyWow
+
+### Voice
+- **Dograh** (forked) — Self-hosted voice AI
+- **VoiceBox** (forked) — Local voice cloning (ElevenLabs alternative)
+
+---
+
+## 🖥️ Services Running
+
+| Service | Port | Status |
+|---------|------|--------|
+| OCE Backend | 8000 | ✅ Healthy (492 tests) |
+| OCE Frontend | 3000 | ✅ Running |
+| Telegram Gateway | — | ✅ Connected (@P01999BOT) |
+| CEREBUS Monitor | — | ✅ Running |
+
+---
+
+## 📈 Test Coverage
+
+| System | Tests | Status |
+|--------|-------|--------|
+| OCE Backend | 492 | ✅ All passing |
+| Research Mesh | 106 | ✅ All passing |
+| CEREBUS Scanner | 120 | ✅ All passing |
+| SRRA-OPH | 57 | ✅ All passing |
+| **Total** | **775+** | ✅ |
+
+---
+
+## 🔑 Key Files
+
+- `QUANTLAB_BIBLE.md` — Locked parameters + 20 calibrated assets
+- `CEREBUS_PREDICTION_REFERENCE.md` — All predictions + accuracy
+- `content-engine/BRAND_VOICE.md` — Brand voice + content pillars
+- `content-engine/templates/` — TikTok + Tweet templates
+
+---
+
 # Daily Summary — 2026-06-02 (Tue)
 
 ## Sync Results
