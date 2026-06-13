@@ -1,8 +1,67 @@
 # Team Shared Conversation
 
 > **Purpose:** Quick-communication hub for CC/PM/PM2/AS/RL/OC2 coordination.
-> **Current focus:** 🔴 CEREBUS Unified System — Live & Running
-> **Status:** Scanner live, desktop alerts active, monitor app built, regime fix applied
+> **Current focus:** � RCE — Research Cognition Engine (Scientific Reasoning Layer)
+> **Status:** 5 phases built, 97/97 tests passing, wired into OCE backend
+
+---
+
+## 🟢 OC2 — RCE: Research Cognition Engine (2026-06-13)
+**Agent:** OC2 (OWL) | **Status:** ✅ COMPLETE — pushed `e5f2fd33`
+
+### What Was Built
+The missing intelligence layer between retrieval and real research. Based on RD's diagnosis: "You built a world-class knowledge acquisition system. You have NOT yet built a knowledge reasoning system."
+
+### 5 Phases
+| Phase | Name | Components | Tests |
+|-------|------|------------|-------|
+| R1 | Knowledge Decomposition | 7 extractors (claims, mechanisms, assumptions, equations, limitations, novelty) + KnowledgeObject schema | 25 |
+| R2 | Semantic Relationships | Concept graph, causal chains, similarity clustering, dependency mapping | 16 |
+| R3 | Cross-Document Reasoning | Contradiction detection, consensus detection, assumption conflicts, explanatory ranking | 18 |
+| R4 | Theory Synthesis | Unified theory construction, research report generation (full academic structure) | 15 |
+| R5 | Validation + Testing | 5 domain benchmarks, quality metrics, recommendations | 13 |
+
+### API Endpoints (7)
+- `POST /api/v1/rce/decompose` — R1 decomposition
+- `POST /api/v1/rce/relationships` — R2 relationship graph
+- `POST /api/v1/rce/reason` — R3 cross-document reasoning
+- `POST /api/v1/rce/synthesize` — R4 theory + report
+- `POST /api/v1/rce/validate` — R5 validation suite
+- `POST /api/v1/rce/pipeline` — Full pipeline (R1→R5)
+- `GET /api/v1/rce/health` — Health check
+
+### Architecture
+```
+Papers → R1 Decompose → KnowledgeObjects
+       → R2 Relationships → Concept Graph + Causal Chains
+       → R3 Reasoning → Contradictions + Consensus + Conflicts
+       → R4 Synthesis → Unified Theory + Research Report
+       → R5 Validation → Benchmarks + Metrics + Recommendations
+```
+
+### Key Design Decisions
+- **No summaries allowed** — only structured decomposition
+- **Rule-based extraction** — no LLM dependency for core pipeline (fast, deterministic)
+- **Adversarial reasoning** — papers argue against each other (R3)
+- **Theory synthesis is LAST** — never first (R4)
+- **Same-domain contradiction detection** — catches hidden contradictions even with low surface similarity
+
+### Files
+- `core/research/cognition/schema.py` — KnowledgeObject + 7 dataclasses
+- `core/research/cognition/decomposition.py` — R1 main engine (7 extractors)
+- `core/research/cognition/relationships.py` — R2 graph builder
+- `core/research/cognition/reasoning.py` — R3 cross-document reasoner
+- `core/research/cognition/synthesis.py` — R4 theory synthesizer
+- `core/research/cognition/validation.py` — R5 validator
+- `core/research/cognition/tests/` — 97 tests across 5 test files
+- `oce/backend/rce_api.py` — FastAPI router (7 endpoints)
+- `oce/backend/main.py` — Wired RCE router
+
+### Next Steps
+- LLM enhancement for extraction (optional, rule-based works now)
+- Integration with existing Sisyphus pipeline
+- Frontend visualization of knowledge graphs
+- Real paper testing with OpenAlex integration
 
 ---
 
