@@ -7,7 +7,22 @@
 
 ---
 
-## Status: 🟢 Active — OCE Backend Cleanup + PO Fixes Complete (2026-06-12)
+## Status: 🟢 Active — Phase 1.6 + 1.7 Orchestration + Self-Evolution Complete (2026-06-13 09:00 UTC)
+
+### Phase 1.6 — Autonomous Cognitive Orchestration (2026-06-13)
+- Built core/orchestration/ package: controller, planner, workflow, scheduler, governance, agents, memory, reflection
+- 25/25 unit tests passing
+- OCE now has centralized execution authority with task routing and safety governance
+
+### Phase 1.7 — Self-Evolution Engine (2026-06-13)
+- Built core/evolution/ package: self-evaluation, research generator, learning loop, architecture evolution, strategy mutation, capability generation, model benchmarking, long-term adaptation
+- 26/26 unit tests passing
+- OCE can now detect weaknesses, generate research objectives, and evolve its own architecture
+
+### PDF Report Generation
+- Integrated PDFReportGenerator into Sisyphus synthesis pipeline
+- Generated 2 PDF research reports (63-95 KB) saved to desktop
+- Reports: Information Theory x Trading Systems, Emerging Markets x Geopolitics
 
 ### OCE Backend Architecture Cleanup (2026-06-12)
 - **Deleted 9 orphaned directories** from `oce/backend/`: field_core, cognition, introspection, multiscale, production, temporal, recursive_compute, coevolution, phase10

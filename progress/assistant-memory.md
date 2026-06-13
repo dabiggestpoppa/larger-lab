@@ -6,13 +6,25 @@
 
 ---
 
-## Current Context (2026-06-12 18:00 UTC)
+## Current Context (2026-06-13 09:00 UTC)
 
 ### Status
-🟢 Active — OCE Backend Architecture Cleanup Complete
+🟢 Active — Phase 1.6 + 1.7 Orchestration + Self-Evolution Complete
 
-### OCE Backend Cleanup (2026-06-12)
-- **Deleted 9 orphaned directories**: field_core, cognition, introspection, multiscale, production, temporal, recursive_compute, coevolution, phase10
+### Phase 1.6 — Orchestration (2026-06-13)
+- core/orchestration/ — Controller, planner, workflow, scheduler, governance, agents, memory, reflection
+- 25/25 unit tests passing
+- Central execution authority with task routing, recursion limits, safety governance
+
+### Phase 1.7 — Self-Evolution (2026-06-13)
+- core/evolution/ — Self-evaluation, research generator, learning loop, architecture evolution, strategy mutation, capability generation, model benchmarking, long-term adaptation
+- 26/26 unit tests passing
+- OCE can now detect its own weaknesses, generate research objectives, and evolve its architecture
+
+### PDF Generation
+- core/research/synthesis/pdf_generator.py — reportlab-based PDF generation
+- Reports saved to data/reports/ and desktop
+- Generated 2 PDF research reports (63-95 KB)
 - **Fixed 3 phantom imports** in po_vault.py
 - **Fixed persistent_field_api.py** — HTTP 503 + logging (was silent 200 OK errors)
 - **Fixed vault_api.py** — logging + proper HTTP 503
