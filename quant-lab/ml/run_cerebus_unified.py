@@ -9,7 +9,7 @@ Usage:
     python run_cerebus_unified.py --once             # Single scan
     python run_cerebus_unified.py --dry-run          # No alerts
 """
-import os, sys, time, argparse, logging
+import os, sys, time, argparse, logging, json
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 
@@ -209,12 +209,33 @@ def main():
         logger.warning(f"Desktop alert not available: {e}")
         DESKTOP_ALERT = False
 
+    def _log_alert(alert):
+        """Append alert to JSON history for monitor app."""
+        try:
+            alerts_file = Path(__file__).parent.parent.parent / "data" / "alerts_history.json"
+            history = []
+            if alerts_file.exists():
+                with open(alerts_file, encoding="utf-8") as f:
+                    history = json.load(f)
+            now_est = datetime.now(EST)
+            entry = {
+                **alert,
+                "timestamp": now_est.strftime("%Y-%m-%d %H:%M:%S"),
+                "datetime": now_est.isoformat(),
+            }
+            history.append(entry)
+            with open(alerts_file, "w", encoding="utf-8") as f:
+                json.dump(history[-500:], f, indent=2)
+        except Exception:
+            pass
+
     while True:
         for symbol in args.symbols:
             try:
                 alerts = scan_symbol(symbol, bias_engine, dtb_predictor, st_engine, p90_engine, args.dry_run)
                 for alert in alerts:
                     logger.info(f"\n{alert['message']}")
+                    _log_alert(alert)
                     if DESKTOP_ALERT and not args.dry_run:
                         try:
                             show_trade_alert(
