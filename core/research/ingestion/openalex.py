@@ -199,13 +199,18 @@ class OpenAlexClient:
         query: str,
         limit: int = 25,
         offset: int = 0,
+        page: int = 0,
         filters: Optional[dict] = None,
     ) -> List[dict]:
         """Search for works by query string."""
+        if page > 0:
+            page_num = page
+        else:
+            page_num = (offset // OPENALEX_PAGE_SIZE) + 1
         params = {
             "search": query,
             "per-page": min(limit, OPENALEX_PAGE_SIZE),
-            "page": (offset // OPENALEX_PAGE_SIZE) + 1,
+            "page": page_num,
         }
         if filters:
             filter_str = ",".join(f"{k}:{v}" for k, v in filters.items())

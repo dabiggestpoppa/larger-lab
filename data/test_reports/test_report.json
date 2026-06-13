@@ -1,0 +1,54 @@
+{
+  "query": "How does information theory relate to trading systems?",
+  "source_count": 5,
+  "confidence": 0.78,
+  "executive_summary": "Information theory provides fundamental frameworks for understanding market microstructure and trading system design.",
+  "key_findings": [
+    {
+      "text": "Entropy measures from information theory quantify market uncertainty",
+      "confidence": 0.85,
+      "sources": [
+        "doc1",
+        "doc2"
+      ]
+    },
+    {
+      "text": "Trading systems using information-theoretic features show improved risk-adjusted returns",
+      "confidence": 0.72,
+      "sources": [
+        "doc3"
+      ]
+    }
+  ],
+  "contradictions": [
+    {
+      "claim_a": "Entropy measures improve trading performance",
+      "claim_b": "Entropy measures do not improve trading performance in live tests",
+      "severity": "medium"
+    }
+  ],
+  "gaps": [
+    "Limited live testing data",
+    "Most studies use backtested results"
+  ],
+  "citations": [
+    {
+      "id": "doc1",
+      "title": "Information Theory in Markets",
+      "authors": [
+        "Smith, J."
+      ],
+      "year": "2023",
+      "doi": "10.1000/test1"
+    },
+    {
+      "id": "doc2",
+      "title": "Entropy and Trading",
+      "authors": [
+        "Doe, A."
+      ],
+      "year": "2024",
+      "doi": "10.1000/test2"
+    }
+  ]
+}
