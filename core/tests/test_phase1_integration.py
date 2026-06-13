@@ -294,13 +294,15 @@ async def test_sisyphus_synthesis(result: TestResult):
     try:
         from core.research.synthesis.sisyphus import SisyphusEngine, SourceDocument
         from core.research.ingestion.openalex import OpenAlexIngester, OpenAlexClient
+        from core.spawn.openrouter_gateway import OpenRouterGateway
     except ImportError as e:
         result.record("Synthesis import", False, str(e))
         return
 
     client = OpenAlexClient()
     ingester = OpenAlexIngester(client=client)
-    sisyphus = SisyphusEngine()
+    gateway = OpenRouterGateway()
+    sisyphus = SisyphusEngine(gateway=gateway)
 
     try:
         for topic in TEST_TOPICS[:2]:  # Test with 2 topics to save time

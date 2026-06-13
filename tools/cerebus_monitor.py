@@ -80,31 +80,20 @@ def parse_latest_alert():
     return None
 
 
-def _no_window_kwargs():
-    """Return kwargs to suppress console window in subprocess calls."""
-    kw = {}
-    if sys.platform == "win32":
-        si = subprocess.STARTUPINFO()
-        si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        si.wShowWindow = 0  # SW_HIDE
-        kw["startupinfo"] = si
-        kw["creationflags"] = subprocess.CREATE_NO_WINDOW
-    return kw
-
-
 def get_scanner_status():
     """Check if the CEREBUS scanner process is running. Returns (running, pid)."""
     try:
-        helper = REPO_ROOT / "tools" / "_check_scanner.ps1"
         result = subprocess.run(
-            ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass",
-             "-File", str(helper)],
-            capture_output=True, text=True, timeout=8,
-            **_no_window_kwargs()
+            ["tasklist", "/FI", "IMAGENAME eq python.exe", "/FO", "CSV", "/NH"],
+            capture_output=True, text=True, timeout=5
         )
-        pid_str = result.stdout.strip()
-        if pid_str and pid_str.isdigit():
-            return True, pid_str
+        for line in result.stdout.strip().split("\n"):
+            if "run_cerebus_unified" in line.lower():
+                parts = line.split(",")
+                if len(parts) >= 2:
+                    pid = parts[1].strip('"')
+                    if pid.isdigit():
+                        return True, pid
     except Exception:
         pass
     return False, None
@@ -323,11 +312,14 @@ class CerebusMonitor(tk.Tk):
         self._refresh()
 
     def _refresh(self):
-        self._refresh_status()
-        self._refresh_conditions()
-        self._refresh_alerts()
-        self._update_time()
-        self._update_active_label()
+        try:
+            self._refresh_status()
+            self._refresh_conditions()
+            self._refresh_alerts()
+            self._update_time()
+            self._update_active_label()
+        except Exception as e:
+            pass
         self.after(5000, self._refresh)
 
     def _refresh_status(self):

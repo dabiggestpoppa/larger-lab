@@ -2,7 +2,29 @@
 
 > **Purpose:** Quick-communication hub for CC/PM/PM2/AS/RL/OC2 coordination.
 > **Current focus:** 🔴 CEREBUS Unified System — Live & Running
-> **Status:** Scanner live, desktop alerts active, monitor app built
+> **Status:** Scanner live, desktop alerts active, monitor app built, regime fix applied
+
+---
+
+## 🟢 RL — Regime Fix + Monitor Window + Scanner Detection (2026-06-13 08:00 UTC)
+**Agent:** RL (Research Lead) | **Status:** ✅ COMPLETE — pushed `4e704fbf`
+
+### Fixes Applied
+1. **Regime confirmation timing** — Was using bar timestamp instead of actual current time
+   - Before 9AM EST: regime capped at CAUTION even if ratio >= 1.5x
+   - After 9AM EST: regime can be CONFIRMED
+   - Tested with live MT5 data: CAUTION at 6:43 AM with ratio 1.51x ✅
+2. **Monitor app window** — Was not visible when launched
+   - Fixed: uses `start "CEREBUS Monitor" /B pythonw` via batch file
+   - Desktop shortcut updated
+3. **Scanner detection** — Simplified to use `tasklist` instead of PowerShell helper
+   - Removed `parts(1)` bug (was `parts(1)` instead of `parts[1]`)
+   - Wrapped `_refresh()` in try/except to prevent crashes
+4. **Monitor alert source** — Now reads from `alerts_history.json` (always current) instead of stale `latest_alert.txt`
+
+### Known Minor Issues
+- Monitor app needs a few seconds to load on startup
+- Don't double-click shortcut rapidly (spawns duplicates)
 
 ---
 
