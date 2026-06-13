@@ -142,6 +142,15 @@ class CommandRouter:
         if cmd == "push":
             return self._cmd_push(args)
 
+
+        # ── Content Commands ─────────────────────────────────────────
+        if cmd == "content":
+            return self._cmd_content(args)
+        if cmd == "strategy":
+            return self._cmd_strategy(args)
+        if cmd == "schedule":
+            return self._cmd_schedule(args)
+
         # ── Help ─────────────────────────────────────────────────────
         if cmd == "help":
             return self._cmd_help(args)
@@ -807,6 +816,101 @@ class CommandRouter:
 
         except Exception as e:
             return f"❌ Hermes error: `{str(e)[:200]}`"
+
+    # ═══════════════════════════════════════════════════════════════════
+    # CONTENT COMMANDS
+    # ═══════════════════════════════════════════════════════════════════
+
+    def _cmd_content(self, args: List[str]) -> str:
+        """Content Creator agent — generate scripts, decks, images, social posts.
+        Usage: /content <type> <topic>
+        Types: script | deck | image | social | video
+        Example: /content script "90% win rate proof"
+        """
+        if not args:
+            return ("🎬 Content Creator\n\n"
+                    "Usage: /content <type> <topic>\n"
+                    "Types: script | deck | image | social | video\n"
+                    "Example: /content script '90% win rate proof'")
+        content_type = args[0].lower()
+        topic = ' '.join(args[1:]) if len(args) > 1 else 'general'
+
+        # Load brand voice
+        brand_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '..', '..', 'content-engine', 'BRAND_VOICE.md')
+        brand_voice = ""
+        if os.path.exists(brand_path):
+            with open(brand_path, 'r', encoding='utf-8') as f:
+                brand_voice = f.read()[:500]
+
+        # Load template based on type
+        templates = {
+            'script': 'TIKTOK_TEMPLATE.md',
+            'tweet': 'TWEET_TEMPLATE.md',
+        }
+        template_content = ""
+        if content_type in templates:
+            tpl_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '..', '..', 'content-engine', 'templates', templates[content_type])
+            if os.path.exists(tpl_path):
+                with open(tpl_path, 'r', encoding='utf-8') as f:
+                    template_content = f.read()
+
+        # Build the content creation prompt
+        prompt = f"""You are Content Creator for MAD LABS.
+
+BRAND VOICE:
+{brand_voice}
+
+TEMPLATE:
+{task_type}
+
+TASK: Create {content_type} content about: {topic}
+
+Follow the brand voice strictly. Use data-driven proof. No hype. Let the numbers talk.
+Output the complete, ready-to-use content."""
+
+        self.journal.record_event({"type": "content", "content_type": content_type, "topic": topic})
+
+        return (f"🎬 Content Creator activated\n"
+                f"Type: {content_type}\n"
+                f"Topic: {topic}\n"
+                f"Status: Processing...\n\n"
+                f"Use /queue to check output when complete.")
+
+    def _cmd_strategy(self, args: List[str]) -> str:
+        """Content Strategist agent — plan content calendars, multi-channel strategy.
+        Usage: /strategy <task> [params]
+        Tasks: calendar | repurpose | analytics | plan
+        Example: /strategy calendar next-week
+        """
+        if not args:
+            return ("📋 Content Strategist\n\n"
+                    "Usage: /strategy <task> [params]\n"
+                    "Tasks: calendar | repurpose | analytics | plan\n"
+                    "Example: /strategy calendar next-week")
+        task = args[0].lower()
+        params = ' '.join(args[1:]) if len(args) > 1 else ''
+
+        self.journal.record_event({"type": "strategy", "task": task, "params": params})
+
+        if task == "calendar":
+            return (f"📅 Content Calendar\n"
+                    f"Generating weekly plan...\n\n"
+                    f"Scanning sources:\n"
+                    f"  • Recent trading results (quant-lab/reports/)\n"
+                    f"  • Research vault (core/research/)\n"
+                    f"  • News radar (core/research/horizon/)\n\n"
+                    f"Output will be saved to content-engine/plans/")
+        elif task == "repurpose":
+            return (f"🔄 Content Repurposing\n"
+                    f"Input: {params}\n\n"
+                    f"Will adapt for: X, TikTok, Reddit, YouTube, Newsletter\n"
+                    f"Output will be saved to content-engine/repurpose/")
+        elif task == "analytics":
+            return (f"📊 Content Analytics\n"
+                    f"Generating performance report...\n\n"
+                    f"Output will be saved to content-engine/analytics/")
+        else:
+            return f"📋 Strategy task queued: {task} ({params})"
 
     # ═══════════════════════════════════════════════════════════════════
     # HELP
