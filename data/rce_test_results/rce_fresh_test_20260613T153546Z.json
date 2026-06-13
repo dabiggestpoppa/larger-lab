@@ -1,0 +1,220 @@
+{
+  "test": "rce_fresh_test",
+  "timestamp": "20260613T153546Z",
+  "sources": [
+    "openalex",
+    "arxiv",
+    "s2"
+  ],
+  "topics": [
+    "transfer entropy financial markets systemic risk contagion",
+    "geopolitical risk emerging markets capital flows financial crisis"
+  ],
+  "papers_per_source": 10,
+  "year_from": 2016,
+  "results": [
+    {
+      "topic": "transfer entropy financial markets systemic risk contagion",
+      "num_papers": 5,
+      "num_knowledge_objects": 5,
+      "r1": {
+        "claims": 0,
+        "mechanisms": 7,
+        "assumptions": 1,
+        "equations": 3,
+        "limitations": 1,
+        "novelty": 2,
+        "avg_completeness": 0.267
+      },
+      "r2": {
+        "num_concepts": 127,
+        "num_relationships": 14,
+        "num_causal_chains": 0,
+        "num_clusters": 17,
+        "num_papers": 5
+      },
+      "r3": {
+        "num_papers": 5,
+        "num_contradictions": 0,
+        "num_consensus": 0,
+        "num_assumption_conflicts": 0,
+        "num_reasoning_chains": 0,
+        "landscape": "developing"
+      },
+      "r4": {
+        "confidence": 0.267,
+        "report_word_count": 258,
+        "report_title": "Synthesis Report: finance × physics × biology",
+        "domains_covered": [
+          "finance",
+          "physics",
+          "biology"
+        ]
+      },
+      "r5": {
+        "passed": false,
+        "completeness": 0.267,
+        "mechanism_coverage": 0.8,
+        "synthesis_confidence": 0.267,
+        "benchmarks": [
+          {
+            "name": "R1_Decomposition",
+            "passed": false
+          },
+          {
+            "name": "R2_Relationships",
+            "passed": true
+          },
+          {
+            "name": "R3_Contradictions",
+            "passed": false
+          },
+          {
+            "name": "R4_Synthesis",
+            "passed": true
+          },
+          {
+            "name": "R5_CrossDomain",
+            "passed": true
+          }
+        ]
+      },
+      "report_excerpt": "## Executive Summary\nAnalysis of 5 papers across 3 domains.\nKey finding: Primary mechanism: through motion planning and reinforcement learning. the data (observed in 1 papers)\n\n## Introduction\nThis report synthesizes findings from 5 research papers spanning the domain(s) of finance, physics, biology. The analysis employs structured knowledge decomposition, cross-document reasoning, and theory synthesis to identify dominant mechanisms, consensus areas, and open questions. Unlike simple summarizat..."
+    },
+    {
+      "topic": "geopolitical risk emerging markets capital flows financial crisis",
+      "num_papers": 9,
+      "num_knowledge_objects": 9,
+      "r1": {
+        "claims": 2,
+        "mechanisms": 13,
+        "assumptions": 3,
+        "equations": 1,
+        "limitations": 1,
+        "novelty": 3,
+        "avg_completeness": 0.216
+      },
+      "r2": {
+        "num_concepts": 279,
+        "num_relationships": 265,
+        "num_causal_chains": 0,
+        "num_clusters": 29,
+        "num_papers": 9
+      },
+      "r3": {
+        "num_papers": 9,
+        "num_contradictions": 0,
+        "num_consensus": 0,
+        "num_assumption_conflicts": 0,
+        "num_reasoning_chains": 0,
+        "landscape": "developing"
+      },
+      "r4": {
+        "confidence": 0.216,
+        "report_word_count": 406,
+        "report_title": "Synthesis Report: finance × biology",
+        "domains_covered": [
+          "finance",
+          "biology"
+        ]
+      },
+      "r5": {
+        "passed": false,
+        "completeness": 0.216,
+        "mechanism_coverage": 0.667,
+        "synthesis_confidence": 0.216,
+        "benchmarks": [
+          {
+            "name": "R1_Decomposition",
+            "passed": false
+          },
+          {
+            "name": "R2_Relationships",
+            "passed": true
+          },
+          {
+            "name": "R3_Contradictions",
+            "passed": false
+          },
+          {
+            "name": "R4_Synthesis",
+            "passed": true
+          },
+          {
+            "name": "R5_CrossDomain",
+            "passed": true
+          }
+        ]
+      },
+      "report_excerpt": "## Executive Summary\nAnalysis of 9 papers across 2 domains.\nKey finding: Primary mechanism: by showing that it correctly identifies calls containing ext (observed in 1 papers)\n\n## Introduction\nThis report synthesizes findings from 9 research papers spanning the domain(s) of finance, biology. The analysis employs structured knowledge decomposition, cross-document reasoning, and theory synthesis to identify dominant mechanisms, consensus areas, and open questions. Unlike simple summarization, this..."
+    },
+    {
+      "topic": "COMBINED (All Topics)",
+      "num_papers": 14,
+      "num_knowledge_objects": 14,
+      "r1": {
+        "claims": 2,
+        "mechanisms": 20,
+        "assumptions": 4,
+        "equations": 4,
+        "limitations": 2,
+        "novelty": 5,
+        "avg_completeness": 0.234
+      },
+      "r2": {
+        "num_concepts": 399,
+        "num_relationships": 279,
+        "num_causal_chains": 0,
+        "num_clusters": 40,
+        "num_papers": 14
+      },
+      "r3": {
+        "num_papers": 14,
+        "num_contradictions": 0,
+        "num_consensus": 0,
+        "num_assumption_conflicts": 0,
+        "num_reasoning_chains": 0,
+        "landscape": "developing"
+      },
+      "r4": {
+        "confidence": 0.234,
+        "report_word_count": 470,
+        "report_title": "Synthesis Report: finance × physics × biology",
+        "domains_covered": [
+          "finance",
+          "physics",
+          "biology"
+        ]
+      },
+      "r5": {
+        "passed": false,
+        "completeness": 0.234,
+        "mechanism_coverage": 0.714,
+        "synthesis_confidence": 0.234,
+        "benchmarks": [
+          {
+            "name": "R1_Decomposition",
+            "passed": false
+          },
+          {
+            "name": "R2_Relationships",
+            "passed": true
+          },
+          {
+            "name": "R3_Contradictions",
+            "passed": false
+          },
+          {
+            "name": "R4_Synthesis",
+            "passed": true
+          },
+          {
+            "name": "R5_CrossDomain",
+            "passed": true
+          }
+        ]
+      },
+      "report_excerpt": "## Executive Summary\nAnalysis of 14 papers across 3 domains.\nKey finding: Primary mechanism: through motion planning and reinforcement learning. the data (observed in 1 papers)\n\n## Introduction\nThis report synthesizes findings from 14 research papers spanning the domain(s) of finance, physics, biology. The analysis employs structured knowledge decomposition, cross-document reasoning, and theory synthesis to identify dominant mechanisms, consensus areas, and open questions. Unlike simple summariz..."
+    }
+  ]
+}
