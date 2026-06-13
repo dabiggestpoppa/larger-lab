@@ -342,7 +342,7 @@ class CerebusMonitor(tk.Tk):
                 foreground="#ff4444")
 
     def _refresh_conditions(self):
-        alert = parse_alert_file()
+        alert = parse_latest_alert()
         if alert:
             self.alert_title.configure(
                 text="[{}] {}".format(alert["timestamp"], alert["title"]))
