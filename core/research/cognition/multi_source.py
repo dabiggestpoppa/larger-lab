@@ -118,10 +118,7 @@ class MultiSourceFetcher:
             Dict mapping query → list of Papers
         """
         results = {}
-        for i, query in enumerate(queries):
-            if i > 0:
-                # Delay between topics to avoid S2 rate limits
-                await asyncio.sleep(3)
+        for query in queries:
             papers = await self.fetch_papers(query, per_source, year_from)
             results[query] = papers
         return results
@@ -273,31 +270,24 @@ class MultiSourceFetcher:
     async def _fetch_s2(
         self, query: str, limit: int, year_from: int
     ) -> List[Paper]:
-        """Fetch from Semantic Scholar with rate limit retry."""
+        """Fetch from Semantic Scholar. If rate-limited, log and return empty."""
         async with S2Client(api_key=self.s2_api_key, timeout=self.timeout) as client:
-            papers = []
-            for attempt in range(3):
-                try:
-                    papers = await client.search_by_query(
-                        query,
-                        limit=limit,
-                    )
-                    break
-                except Exception as e:
-                    if "429" in str(e) and attempt < 2:
-                        wait = 2 ** (attempt + 1)  # 2s, 4s
-                        logger.warning(f"S2 rate limited (attempt {attempt+1}), waiting {wait}s...")
-                        await asyncio.sleep(wait)
-                    else:
-                        if attempt == 2:
-                            logger.warning(f"S2 failed after 3 attempts: {e}")
-                        break
-            
-            if year_from:
-                papers = [p for p in papers if p.year >= year_from]
-            for p in papers:
-                p.source = "s2"
-            return papers
+            try:
+                papers = await client.search_by_query(
+                    query,
+                    limit=limit,
+                )
+                if year_from:
+                    papers = [p for p in papers if p.year >= year_from]
+                for p in papers:
+                    p.source = "s2"
+                return papers
+            except Exception as e:
+                if "429" in str(e):
+                    logger.warning(f"S2 rate limited (daily quota). Skipping S2 for: {query[:50]}")
+                else:
+                    logger.warning(f"S2 error: {e}")
+                return []
     
     # ─── Relevance Filtering ───
     
