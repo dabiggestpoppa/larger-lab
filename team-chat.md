@@ -1,3 +1,84 @@
+# 📋 ORGANIZATION UPDATE — 2026-06-14 (Sat)
+> **Agent:** OC2 (OWL) | **Purpose:** Full workspace status — all systems, repos, agents, docs
+
+---
+
+## 🖥️ Services Running (Verified 06-14)
+
+| Service | Port/ID | Status | Process |
+|---------|---------|--------|---------|
+| OCE Backend | 8000 | ✅ Healthy | PID 21512 |
+| OCE Frontend | 3000 | ✅ Running | PIDs 6488, 13340 |
+| Telegram Gateway | — | ✅ Connected | PID 11836 |
+| Telegram Bot | @P01999BOT | ✅ Active | — |
+| CEREBUS Monitor | — | ✅ Running | PID 8316 |
+
+**Fixes applied:** Created `scripts/start_oce.py` — OCE backend now starts reliably (was failing due to PowerShell quoting issues).
+
+---
+
+## 📱 Social Media Accounts (Verified 06-14)
+
+| Platform | Handle | Status | Credentials |
+|----------|--------|--------|-------------|
+| YouTube | @FBO_LEGACY | ✅ Ready | KETMETTRUCKING@GMAIL.COM |
+| Instagram | fbo_WXRLD | ✅ Ready | Teflondon1718! |
+| TikTok | FBO_WXRLD | ✅ Ready | DABIGGESTPOPPA@GMAIL.COM |
+| X/Twitter | — | ❌ Need to create | — |
+| Reddit | — | ❌ Need to create | — |
+
+**File:** `content-farm/accounts/SOCIAL_MEDIA.md`
+
+---
+
+## 📦 GitHub Repos (19 Forked)
+
+**Phase 1.2:** markitdown, odl-pdf, liteparse, chandra
+**Phase 1.3:** turbovec
+**Phase 1.5:** codegraph
+**Phase 1.6:** book-to-skill, SkillTree, mattpocock/skills
+**Phase 2:** notebooklm-py
+**Phase 3:** Horizon
+**Phase 4:** dograh, dotlottie-web
+**Content:** open-design, reclip
+**Infra:** d2, sms-gateway, voicebox, taste-skill
+**Pending:** unsloth, OmniVoice-Studio
+
+---
+
+## 🤖 Content Agents
+
+- **Content Creator** (`/content`) — scripts, decks, images, social, video
+- **Content Strategist** (`/strategy`) — calendar, repurpose, analytics
+- **Files:** `agents/` + `.github/agents/`
+- **Vault:** `O2C-VAULT/content-farm/`
+
+---
+
+## 📊 Tests: 775+ Passing
+
+| System | Tests |
+|--------|-------|
+| OCE Backend | 492 |
+| Research Mesh | 106 |
+| CEREBUS Scanner | 120 |
+| SRRA-OPH | 57 |
+
+---
+
+## 🔑 Key Files
+
+| File | Purpose |
+|------|---------|
+| `MASTER_CATALOG.md` | Complete workspace inventory |
+| `QUANTLAB_BIBLE.md` | Locked trading parameters |
+| `CEREBUS_PREDICTION_REFERENCE.md` | All predictions + accuracy |
+| `content-engine/knowledge/DATA_SOURCES.md` | Master data source index |
+| `tools-catalog.md` | All free/app tools |
+| `scripts/start_oce.py` | OBE backend startup script |
+
+---
+
 # 📋 ORGANIZATION UPDATE — 2026-06-13 (Fri)
 > **Agent:** OC2 (OWL) | **Purpose:** Full inventory of GitHub repos, apps, agents, and docs
 
