@@ -582,13 +582,15 @@ class LLMReasoning:
         papers: List[Dict[str, str]],
     ) -> Dict[str, Any]:
         """
-        Run the full RCE pipeline (R1→R5) on a set of papers.
+        Run the full RCE pipeline with RD 3-phase cognition revision.
         
-        Two-model strategy:
-        - R1-R3, R5: FAST_MODEL (nemotron) — fast extraction, reasoning, validation
-        - R4: POWER_MODEL (nex-n2-pro) — deep synthesis and report generation
+        Pipeline: REV-1 (decompose) → REV-2 (attack) → REV-3 (judge) → R4 (synthesize) → R5 (validate)
         
-        R1 extractions run in parallel for speed.
+        REV-1: Structural Decomposition Hardening — no summarization, only atomic extraction
+        REV-2: Adversarial Scientific Reasoning — contradiction pressure, alternatives, skepticism
+        REV-3: Theory Competition — rank theories, synthesize only after ranking
+        R4: LLM-powered deep synthesis and report generation
+        R5: Validation and quality judgment
         
         Args:
             topic: Research topic/query
@@ -597,45 +599,125 @@ class LLMReasoning:
         Returns:
             Complete pipeline results with all phases.
         """
+        import asyncio
+        from .rev1_mechanisms import decompose_papers
+        from .rev2_adversarial import run_adversarial_reasoning
+        from .rev3_theory import run_theory_competition
+        
         logger.info(f"RCE pipeline starting: {topic} ({len(papers)} papers)")
-        logger.info(f"Fast model: {self.FAST_MODEL}")
-        logger.info(f"Power model: {self.POWER_MODEL}")
         
-        # R1: Extract knowledge (PARALLEL for speed)
-        logger.info("R1: Extracting knowledge from papers (parallel)...")
-        r1_results = await self.extract_knowledge_batch(papers)
-        logger.info(f"R1: Extracted {len(r1_results)} knowledge objects")
+        # ═══ REV-1: Structural Decomposition Hardening ═══
+        logger.info("REV-1: Structural decomposition (hardened)...")
+        rev1_objects = decompose_papers(papers)
+        rev1_results = [obj.to_dict() if hasattr(obj, 'to_dict') else obj for obj in rev1_objects]
         
-        # R2: Build relationships (fast model)
-        logger.info("R2: Building semantic relationships...")
-        r2_results = await self.build_relationships(topic, r1_results)
-        logger.info(f"R2: Found {len(r2_results.get('relationships', []))} relationships")
+        total_claims = sum(len(obj.get("claims", [])) for obj in rev1_results)
+        total_assumptions = sum(
+            len(obj.get("explicit_assumptions", [])) + len(obj.get("implicit_assumptions", []))
+            for obj in rev1_results
+        )
+        total_mechanisms = sum(len(obj.get("mechanisms", [])) for obj in rev1_results)
+        total_limitations = sum(len(obj.get("limitations", [])) for obj in rev1_results)
+        avg_quality = sum(obj.get("decomposition_quality", 0) for obj in rev1_results) / max(len(rev1_results), 1)
         
-        # R3: Cross-document reasoning (fast model)
-        logger.info("R3: Cross-document reasoning...")
-        papers_json = json.dumps(r1_results, ensure_ascii=False, indent=2)
-        r3_results = await self.cross_document_reason(topic, papers_json)
-        logger.info(f"R3: Found {len(r3_results.get('contradictions', []))} contradictions, "
-                     f"{len(r3_results.get('consensus', []))} consensus areas")
+        logger.info(
+            f"REV-1: {len(rev1_results)} objects | claims={total_claims} | "
+            f"assumptions={total_assumptions} | mechanisms={total_mechanisms} | "
+            f"limitations={total_limitations} | avg_quality={avg_quality:.2f}"
+        )
         
-        # R4: Theory synthesis (POWER MODEL for deep reasoning)
-        logger.info("R4: Synthesizing theory (power model)...")
-        reasoning_json = json.dumps(r3_results, ensure_ascii=False, indent=2)
-        r4_results = await self.synthesize_theory(topic, reasoning_json)
-        logger.info(f"R4: Synthesis confidence: {r4_results.get('confidence', 0):.3f}")
+        # ═══ REV-2: Adversarial Scientific Reasoning ═══
+        logger.info("REV-2: Adversarial reasoning...")
+        rev2_results = run_adversarial_reasoning(rev1_results)
         
-        # R5: Validation (fast model)
+        logger.info(
+            f"REV-2: contradictions={rev2_results['summary']['num_contradictions']} | "
+            f"attacks={rev2_results['summary']['total_attacks_generated']} | "
+            f"papers_analyzed={rev2_results['summary']['num_papers_analyzed']}"
+        )
+        
+        # ═══ REV-3: Theory Competition + Scientific Judgment ═══
+        logger.info("REV-3: Theory competition...")
+        rev3_results = run_theory_competition(rev1_results, rev2_results)
+        
+        winner = rev3_results.get("ranking", {}).get("winner")
+        if winner:
+            logger.info(
+                f"REV-3: winner='{winner.get('theory_name', '?')[:50]}' | "
+                f"score={winner.get('composite_score', 0):.3f} | "
+                f"theories_evaluated={rev3_results.get('theories_extracted', 0)}"
+            )
+        
+        # ═══ R4: LLM-Powered Deep Synthesis ═══
+        logger.info("R4: LLM deep synthesis (owl-alpha, 8000 tokens)...")
+        
+        # Build rich context from REV-1, REV-2, REV-3 for the LLM
+        synthesis_context = {
+            "topic": topic,
+            "num_papers": len(papers),
+            "rev1_decomposition": {
+                "total_claims": total_claims,
+                "total_assumptions": total_assumptions,
+                "total_mechanisms": total_mechanisms,
+                "total_limitations": total_limitations,
+                "avg_quality": round(avg_quality, 2),
+                "papers": [
+                    {
+                        "title": obj.get("paper_title", ""),
+                        "domain": obj.get("domain", ""),
+                        "claims": obj.get("claims", [])[:5],
+                        "explicit_assumptions": obj.get("explicit_assumptions", [])[:3],
+                        "implicit_assumptions": obj.get("implicit_assumptions", [])[:3],
+                        "mechanisms": obj.get("mechanisms", [])[:3],
+                        "limitations": obj.get("limitations", [])[:3],
+                        "decomposition_quality": obj.get("decomposition_quality", 0),
+                    }
+                    for obj in rev1_results
+                ],
+            },
+            "rev2_adversarial": rev2_results["summary"],
+            "rev3_theory": {
+                "theories_extracted": rev3_results.get("theories_extracted", 0),
+                "winner": {
+                    "name": winner.get("theory_name", "") if winner else "",
+                    "score": winner.get("composite_score", 0) if winner else 0,
+                    "explanatory_score": winner.get("explanatory_score", 0) if winner else 0,
+                    "assumption_cost": winner.get("assumption_cost_score", 0) if winner else 0,
+                    "generalization": winner.get("generalization_score", 0) if winner else 0,
+                } if winner else None,
+                "synthesis": rev3_results.get("synthesis", {}),
+            },
+        }
+        
+        reasoning_json = json.dumps(synthesis_context, ensure_ascii=False, indent=2)
+        
+        # Use owl-alpha for R4 — 1M context, best for long-form synthesis
+        response = await self._call_llm(
+            R4_SYNTHESIS_PROMPT.format(topic=topic, reasoning_json=reasoning_json[:4000]),
+            max_tokens=8000,
+            model="openrouter/owl-alpha"
+        )
+        r4_results = self._parse_json(response)
+        
+        if not r4_results:
+            logger.warning("R4 synthesis returned empty")
+            r4_results = {"research_report": {"full_report": "Synthesis failed.", "word_count": 0}, "confidence": 0}
+        
+        logger.info(f"R4: Report words={r4_results.get('research_report', {}).get('word_count', 0)}, "
+                     f"confidence={r4_results.get('confidence', 0):.3f}")
+        
+        # ═══ R5: Validation ═══
         logger.info("R5: Validating synthesis...")
         report_text = r4_results.get("research_report", {}).get("full_report", "")
         r5_results = await self.validate_synthesis(topic, report_text)
-        logger.info(f"R5: Passed: {r5_results.get('passed', False)}")
+        logger.info(f"R5: Passed={r5_results.get('passed', False)}")
         
         return {
             "topic": topic,
             "num_papers": len(papers),
-            "r1": r1_results,
-            "r2": r2_results,
-            "r3": r3_results,
+            "rev1": rev1_results,
+            "rev2": rev2_results,
+            "rev3": rev3_results,
             "r4": r4_results,
             "r5": r5_results,
         }
