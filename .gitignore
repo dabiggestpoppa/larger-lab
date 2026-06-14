@@ -78,6 +78,13 @@ temp/
 
 # OCE data directories
 oce/backend/data/
+
+# Hyperliquid generated data & reports
+quant-lab/data/*USD_M5.csv
+quant-lab/data/*USD_*.csv
+quant-lab/data/hyperliquid_*.csv
+quant-lab/reports/hyperliquid/
+quant-lab/reports/hyperliquid_nautilus/
 oce/data/
 
 # Build artifacts
