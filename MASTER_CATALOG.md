@@ -197,12 +197,21 @@
 | File | Purpose |
 |------|---------|
 | `QUANTLAB_BIBLE.md` | Locked parameters + 20 calibrated assets |
+| `QUANT_BIBLE.md` | Alternate bible (older version) |
 | `CEREBUS_ONTOLOGY.md` | Strategy philosophy + MAD's definitions |
+| `ontology/manual_ontology.md` | 55 Q&As on market physics |
 | `CEREBUS_NEURO_SYMBOLIC_SCANNER_PLAN.md` | 4-step build plan |
 | `CEREBUS_PREDICTION_REFERENCE.md` | All predictions + accuracy |
+| `reports/SWEEP_MATRIX.md` | Accuracy-frequency curve (28 pairs) |
+| `reports/trigger_sweep_*.json` | Per-pair trigger optimization (20+ files) |
+| `ml/dtb_lab/MASTER_LAB_REPORT.md` | DTB training results (R²=0.97) |
+| `ml/BUILD_NOTES_CEREBUS.md` | Scanner build results (120 tests) |
 | `content-engine/BRAND_VOICE.md` | Brand voice + content pillars |
+| `content-engine/knowledge/CONTENT_FUEL.md` | 1,626 stats for content |
+| `content-engine/knowledge/DATA_SOURCES.md` | Master index of ALL data sources |
 | `content-engine/templates/TIKTOK_TEMPLATE.md` | TikTok script template |
 | `content-engine/templates/TWEET_TEMPLATE.md` | Twitter post template |
+| `tools-catalog.md` | All free/app tools (OC2 curated) |
 | `.env` | API keys (Telegram, OpenRouter, etc.) |
 | `pyproject.toml` | Python dependencies |
 | `requirements.txt` | Python requirements |
