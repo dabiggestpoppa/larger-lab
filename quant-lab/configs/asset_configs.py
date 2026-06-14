@@ -560,9 +560,9 @@ ASSET_CONFIGS = {
         "sl_method": "FIXED_BUFFER",
         "sl_buffer": 25.0,
         "tiers": {
-            "T1": {"ar_max": 60.0, "au": 205.0, "trigger": 246.0},
-            "T2": {"ar_max": 60.0, "au": 545.0, "trigger": 654.0},
-            "T3": {"ar_max": 60.0, "au": 1160.0, "trigger": 1392.0},
+            "T1": {"ar_max": 1500.0, "au": 205.0, "trigger": 246.0},
+            "T2": {"ar_max": 3000.0, "au": 545.0, "trigger": 654.0},
+            "T3": {"ar_max": 7000.0, "au": 1160.0, "trigger": 1392.0},
         },
         "gear_shifts": {
             "T1": [(654.0, "T2"), (1392.0, "T3")],
@@ -579,9 +579,9 @@ ASSET_CONFIGS = {
         "sl_method": "FIXED_BUFFER",
         "sl_buffer": 5.0,
         "tiers": {
-            "T1": {"ar_max": 60.0, "au": 35.0, "trigger": 42.0},
-            "T2": {"ar_max": 60.0, "au": 42.0, "trigger": 52.0},
-            "T3": {"ar_max": 60.0, "au": 52.0, "trigger": 65.0},
+            "T1": {"ar_max": 100.0, "au": 35.0, "trigger": 42.0},
+            "T2": {"ar_max": 200.0, "au": 42.0, "trigger": 52.0},
+            "T3": {"ar_max": 300.0, "au": 52.0, "trigger": 65.0},
         },
         "gear_shifts": {
             "T1": [(52.0, "T2"), (65.0, "T3")],
@@ -589,6 +589,25 @@ ASSET_CONFIGS = {
         },
         "p90_threshold": 18.2,   # 35.0 * 0.52
         "fixed_tp": 70.0,        # 35.0 * 2.0
+        "class": "B-Tier",
+    },
+    "SOLUSD": {
+        "name": "SOL/USD",
+        "pip_value": 1.0,
+        "k_factor": 0.52,
+        "sl_method": "FIXED_BUFFER",
+        "sl_buffer": 0.5,
+        "tiers": {
+            "T1": {"ar_max": 5.0, "au": 1.5, "trigger": 1.8},
+            "T2": {"ar_max": 10.0, "au": 2.5, "trigger": 3.0},
+            "T3": {"ar_max": 15.0, "au": 4.0, "trigger": 5.0},
+        },
+        "gear_shifts": {
+            "T1": [(3.0, "T2"), (5.0, "T3")],
+            "T2": [(5.0, "T3")],
+        },
+        "p90_threshold": 0.78,   # 1.5 * 0.52
+        "fixed_tp": 3.0,         # 1.5 * 2.0
         "class": "B-Tier",
     },
     # ─────────────────────────────────────────────────────

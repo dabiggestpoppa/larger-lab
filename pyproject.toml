@@ -44,6 +44,8 @@ dependencies = [
     "beautifulsoup4>=4.14.3",
     "pygments>=2.20.0",
     "lithosai-motus>=0.4.1",
+    # Hyperliquid DEX
+    "hyperliquid-python-sdk>=0.24.0",
 ]
 
 [dependency-groups]

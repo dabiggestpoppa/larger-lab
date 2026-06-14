@@ -80,12 +80,15 @@ for _key, _cfg in ASSET_CONFIGS.items():
 for _alias in ["XAU/USD", "XAUUSD"]:
     if _alias not in PIP_DIVISORS:
         PIP_DIVISORS[_alias] = PIP_DIVISORS.get("XAUUSD", 10.0)
-for _alias in ["BTC/USD", "BTCUSD"]:
+for _alias in ["BTC/USD", "BTCUSD", "BTCUSD-PERP", "BTCUSDPERP"]:
     if _alias not in PIP_DIVISORS:
         PIP_DIVISORS[_alias] = PIP_DIVISORS.get("BTCUSD", 1.0)
-for _alias in ["ETH/USD", "ETHUSD"]:
+for _alias in ["ETH/USD", "ETHUSD", "ETHUSD-PERP", "ETHUSDPERP"]:
     if _alias not in PIP_DIVISORS:
         PIP_DIVISORS[_alias] = PIP_DIVISORS.get("ETHUSD", 1.0)
+for _alias in ["SOL/USD", "SOLUSD", "SOLUSD-PERP", "SOLUSDPERP"]:
+    if _alias not in PIP_DIVISORS:
+        PIP_DIVISORS[_alias] = PIP_DIVISORS.get("SOLUSD", 1.0)
 
 # Structural constants
 KILL_SWITCH_PCT = 0.80         # 80% of impulse leg — close-only invalidation
