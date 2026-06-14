@@ -1,8 +1,10 @@
-# Workspace State — 2026-06-13 11:30 UTC
+# Workspace State — 2026-06-14 09:00 UTC
 
 ## System Status
-- OCE Backend: ✅ Running (port 8000, healthy)
-- PO Telegram: ✅ Running (@P01999BOT, PID 9524)
+- OCE Backend: ✅ Running (port 8000, healthy, PID 21512)
+- OCE Frontend: ✅ Running (port 3000)
+- PO Telegram: ✅ Running (@P01999BOT, PID 11836)
+- CEREBUS Monitor: ✅ Running (PID 8316)
 - CEREBUS Unified Scanner: ✅ Running
 - Telegram Signal Bot: 🔴 STOPPED (was spamming — all instances killed)
 - Guarddog Watchdog: 🔴 STOPPED (was respawning signal bots)
