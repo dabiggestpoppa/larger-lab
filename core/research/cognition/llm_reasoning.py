@@ -153,38 +153,44 @@ Rules:
 Return ONLY valid JSON, no markdown fences.
 """
 
-R4_SYNTHESIS_PROMPT = """You are a senior research scientist synthesizing a unified theory from multiple papers.
+R4_SYNTHESIS_PROMPT = """You are a senior research scientist with deep expertise across multiple disciplines. Your task is to produce a MAXIMALLY DETAILED research synthesis that demonstrates PhD-level reasoning, structural analysis, and interdisciplinary insight.
 
 Topic: {topic}
 
 Cross-document reasoning results:
 {reasoning_json}
 
-Generate a unified theory and research report as JSON:
+Produce a comprehensive unified theory and research report. The report must be 1500+ words with deep structural analysis. Think like a professor writing a landmark review paper — every section should be substantive, nuanced, and demonstrate genuine intellectual synthesis.
+
+Generate as JSON:
 {{
   "unified_theory": {{
-    "statement": "...",
-    "components": ["..."],
-    "consensus_basis": ["..."],
-    "mechanism_basis": ["..."],
-    "open_questions": ["..."],
+    "statement": "A single paragraph stating the core theoretical contribution — this must be a NOVEL synthesis that connects findings across papers into a coherent framework, not a summary",
+    "components": ["List 3-5 key theoretical components that make up the unified framework"],
+    "consensus_basis": ["What do the papers agree on? Be specific."],
+    "mechanism_basis": ["What causal mechanisms underpin the theory? Describe each in detail."],
+    "structural_themes": ["Identify 2-3 structural themes that emerge across papers — e.g., feedback loops, phase transitions, network effects, information asymmetry, regime shifts"],
+    "interdisciplinary_connections": ["How does this theory bridge different disciplines? What insights from one field illuminate another?"],
+    "open_questions": ["List 5+ specific open questions that emerge from the synthesis — these should be researchable, not vague"],
     "contradictions_remaining": 0,
     "consensus_areas": 0
   }},
   "research_report": {{
-    "title": "...",
+    "title": "A compelling, specific academic title",
     "sections": {{
-      "executive_summary": "...",
-      "introduction": "...",
-      "literature_review": "...",
-      "theoretical_framework": "...",
-      "key_mechanisms": "...",
-      "consensus_and_conflict": "...",
-      "open_questions": "...",
-      "limitations": "...",
-      "conclusion": "..."
+      "executive_summary": "3-4 paragraph executive summary that captures the key findings, theoretical contribution, and implications. Must be substantive — not a teaser.",
+      "introduction": "Detailed introduction (4-5 paragraphs) establishing the research context, why this topic matters, the gap in current knowledge, and the approach taken. Cite specific phenomena, historical context, or real-world stakes.",
+      "literature_review": "Comprehensive literature review (5-6 paragraphs) analyzing each paper's contribution, methodology, and findings. Compare and contrast approaches. Identify what each paper adds to the overall picture. Be specific about methods, results, and limitations.",
+      "theoretical_framework": "Deep theoretical framework section (5-6 paragraphs) presenting the unified theory. Explain the core logic, derive key propositions, describe how components interact. Use formal reasoning where appropriate. This is the intellectual heart of the paper.",
+      "key_mechanisms": "Detailed analysis of key mechanisms (4-5 paragraphs). For each mechanism: describe the causal logic, provide evidence from the papers, explain boundary conditions, and discuss how it connects to the broader theory.",
+      "structural_themes": "Analysis of structural themes (3-4 paragraphs). What recurring patterns emerge? How do micro-level findings connect to macro-level phenomena? What is the deep structure underlying the surface findings?",
+      "interdisciplinary_synthesis": "Interdisciplinary analysis (3-4 paragraphs). How do insights from different fields converge or diverge? What does each discipline contribute that others miss? How does the synthesis transcend disciplinary boundaries?",
+      "consensus_and_conflict": "Detailed assessment of consensus and conflict (3-4 paragraphs). Where do papers agree? Where do they diverge? Are the divergences genuine contradictions or different perspectives on the same phenomenon? How can they be resolved?",
+      "open_questions": "Research agenda (3-4 paragraphs). What are the most important open questions? What experiments or studies would resolve them? What are the methodological challenges?",
+      "limitations": "Honest limitations section (2-3 paragraphs). What are the constraints of this synthesis? What evidence is missing? What alternative explanations exist?",
+      "conclusion": "Substantive conclusion (3-4 paragraphs) summarizing the theoretical contribution, practical implications, and future directions. End with a forward-looking statement about the field."
     }},
-    "full_report": "...",
+    "full_report": "The complete report as a single markdown string with all sections. MUST be 1500+ words. Each section should be substantive and detailed.",
     "word_count": 0,
     "num_references": 0
   }},
@@ -193,12 +199,14 @@ Generate a unified theory and research report as JSON:
   "domains_covered": ["..."]
 }}
 
-Rules:
-- unified_theory.statement should be a novel synthesis, NOT a summary of individual papers.
-- The theory should connect findings across papers into a coherent framework.
-- research_report.full_report should be a complete academic-style report (500+ words).
-- Use proper section headers in the report.
-- confidence should reflect the quality and coherence of the evidence.
+CRITICAL RULES:
+1. DEPTH OVER BREVITY — Every section must be substantive. No filler, no hand-waving. If you make a claim, support it with reasoning or evidence.
+2. STRUCTURAL THEMES — Identify deep structural patterns (e.g., feedback loops, phase transitions, network effects, information cascades, regime shifts, emergence, self-organization). These are the hidden architectures that connect surface findings.
+3. INTERDISCIPLINARY BRIDGING — Explicitly connect insights across fields. Show how a concept from one discipline illuminates a problem in another.
+4. NOVEL SYNTHESIS — The unified theory must be genuinely new. It should not restate individual paper findings but create something that didn't exist before.
+5. SPECIFICITY — Use precise language. Name specific mechanisms, specific findings, specific gaps. Avoid vague generalities.
+6. full_report must be 1500+ words. Count carefully. If sections are too short, expand them with deeper analysis.
+7. Use proper academic formatting with clear section headers in the full_report.
 
 Return ONLY valid JSON, no markdown fences.
 """
@@ -525,13 +533,15 @@ class LLMReasoning:
         
         Returns dict with: unified_theory, research_report, confidence.
         """
-        # nex-n2-pro has 128K context — truncate reasoning to stay within limits
-        reasoning_truncated = reasoning_json[:4000]
+        # nex-n2-pro has 128K context — truncate reasoning input to stay within limits
+        # but allow max output tokens for detailed report
+        reasoning_truncated = reasoning_json[:3000]
         prompt = R4_SYNTHESIS_PROMPT.format(
             topic=topic,
             reasoning_json=reasoning_truncated,
         )
-        response = await self._call_llm(prompt, max_tokens=6000, model=self.POWER_MODEL)
+        # Use owl-alpha for R4 — it has 1M context and is better for long-form synthesis
+        response = await self._call_llm(prompt, max_tokens=8000, model="openrouter/owl-alpha")
         result = self._parse_json(response)
         
         if not result:
