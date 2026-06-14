@@ -289,13 +289,28 @@ class LLMReasoning:
         if not model:
             model = self.FAST_MODEL
         try:
-            async with self._semaphore:
-                response = await self.gateway.complete(
-                    prompt=prompt,
-                    max_tokens=max_tokens,
-                    model=model,
-                )
-            return response
+            acquired = False
+            try:
+                acquired = await asyncio.wait_for(self._semaphore.acquire(), timeout=10.0)
+            except asyncio.TimeoutError:
+                logger.warning("Semaphore timeout, forcing through")
+                acquired = True  # Force through
+            
+            if acquired:
+                try:
+                    response = await asyncio.wait_for(
+                        self.gateway.complete(
+                            prompt=prompt,
+                            max_tokens=max_tokens,
+                            model=model,
+                        ),
+                        timeout=300.0,  # 5 minute timeout per LLM call
+                    )
+                    return response
+                finally:
+                    self._semaphore.release()
+            else:
+                raise RuntimeError("Could not acquire semaphore")
         except Exception as e:
             error_str = str(e)
             logger.error(f"LLM call failed ({model}): {error_str}")
@@ -649,53 +664,43 @@ class LLMReasoning:
             )
         
         # ═══ R4: LLM-Powered Deep Synthesis ═══
-        logger.info("R4: LLM deep synthesis (owl-alpha, 8000 tokens)...")
+        logger.info("R4: LLM deep synthesis...")
         
-        # Build rich context from REV-1, REV-2, REV-3 for the LLM
+        # Build compact context from REV-1, REV-2, REV-3
+        # Keep it under 2000 chars to leave room for 8000 token output
+        paper_summaries = []
+        for obj in rev1_results[:5]:
+            paper_summaries.append({
+                "title": obj.get("paper_title", "")[:60],
+                "domain": obj.get("domain", ""),
+                "top_claims": [c.get("claim", "")[:100] for c in obj.get("claims", [])[:3]],
+                "key_assumptions": [a.get("assumption", "")[:80] for a in obj.get("explicit_assumptions", [])[:2] + obj.get("implicit_assumptions", [])[:2]],
+                "mechanisms": [m.get("mechanism", "")[:100] for m in obj.get("mechanisms", [])[:2]],
+                "limitations": [l.get("limitation", "")[:80] for l in obj.get("limitations", [])[:2]],
+            })
+        
         synthesis_context = {
             "topic": topic,
             "num_papers": len(papers),
-            "rev1_decomposition": {
-                "total_claims": total_claims,
-                "total_assumptions": total_assumptions,
-                "total_mechanisms": total_mechanisms,
-                "total_limitations": total_limitations,
-                "avg_quality": round(avg_quality, 2),
-                "papers": [
-                    {
-                        "title": obj.get("paper_title", ""),
-                        "domain": obj.get("domain", ""),
-                        "claims": obj.get("claims", [])[:5],
-                        "explicit_assumptions": obj.get("explicit_assumptions", [])[:3],
-                        "implicit_assumptions": obj.get("implicit_assumptions", [])[:3],
-                        "mechanisms": obj.get("mechanisms", [])[:3],
-                        "limitations": obj.get("limitations", [])[:3],
-                        "decomposition_quality": obj.get("decomposition_quality", 0),
-                    }
-                    for obj in rev1_results
-                ],
+            "decomposition_stats": {
+                "claims": total_claims, "assumptions": total_assumptions,
+                "mechanisms": total_mechanisms, "limitations": total_limitations,
             },
-            "rev2_adversarial": rev2_results["summary"],
-            "rev3_theory": {
-                "theories_extracted": rev3_results.get("theories_extracted", 0),
-                "winner": {
-                    "name": winner.get("theory_name", "") if winner else "",
-                    "score": winner.get("composite_score", 0) if winner else 0,
-                    "explanatory_score": winner.get("explanatory_score", 0) if winner else 0,
-                    "assumption_cost": winner.get("assumption_cost_score", 0) if winner else 0,
-                    "generalization": winner.get("generalization_score", 0) if winner else 0,
-                } if winner else None,
-                "synthesis": rev3_results.get("synthesis", {}),
+            "adversarial_stats": rev2_results["summary"],
+            "theory_winner": {
+                "name": winner.get("theory_name", "")[:60] if winner else "N/A",
+                "score": winner.get("composite_score", 0) if winner else 0,
             },
+            "papers": paper_summaries,
         }
         
-        reasoning_json = json.dumps(synthesis_context, ensure_ascii=False, indent=2)
+        reasoning_json = json.dumps(synthesis_context, ensure_ascii=False)
         
-        # Use owl-alpha for R4 — 1M context, best for long-form synthesis
+        # Use nemotron for R4 — fast, 1M context
         response = await self._call_llm(
-            R4_SYNTHESIS_PROMPT.format(topic=topic, reasoning_json=reasoning_json[:4000]),
-            max_tokens=8000,
-            model="openrouter/owl-alpha"
+            R4_SYNTHESIS_PROMPT.format(topic=topic, reasoning_json=reasoning_json),
+            max_tokens=4000,
+            model=self.FAST_MODEL
         )
         r4_results = self._parse_json(response)
         
