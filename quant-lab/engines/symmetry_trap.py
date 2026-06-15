@@ -156,16 +156,22 @@ def classify_tier_by_impulse(
 ) -> Tuple[str, float, float]:
     """
     Classify tier by impulse leg size (optimized per June 4 calibration).
-    T1: impulse < 20p | T2: 20-30p | T3: > 30p
+    Uses tier_config trigger values for boundaries (not hardcoded 20/30).
+    T1: impulse < T2_trigger | T2: T2_trigger to T3_trigger | T3: > T3_trigger
     AR gate is decoupled — this is purely impulse-based.
     """
-    if impulse_size_pips < 20.0:
+    t1_cfg = tier_config.get("T1", {})
+    t2_cfg = tier_config.get("T2", {})
+    t3_cfg = tier_config.get("T3", {})
+    t2_trigger = t2_cfg.get("trigger", 30.0)
+    t3_trigger = t3_cfg.get("trigger", 45.0)
+    if impulse_size_pips < t2_trigger:
         tier_name = "T1"
-    elif impulse_size_pips <= 30.0:
+    elif impulse_size_pips <= t3_trigger:
         tier_name = "T2"
     else:
         tier_name = "T3"
-    cfg = tier_config.get(tier_name, tier_config["T1"])
+    cfg = tier_config.get(tier_name, t1_cfg)
     return tier_name, cfg["au"], cfg["trigger"]
 
 
