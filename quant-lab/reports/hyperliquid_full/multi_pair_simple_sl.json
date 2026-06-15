@@ -1,0 +1,59 @@
+{
+  "BTCUSD": {
+    "trades": 3402,
+    "wins": 1683,
+    "losses": 1719,
+    "win_rate": 49.5,
+    "pnl_pips": -3720.0,
+    "tp_hits": 1683,
+    "sl_hits": 1719,
+    "tr_per_day": 2.3,
+    "days": 1459,
+    "avg_win": 139.0,
+    "avg_loss": -138.3,
+    "tier_dist": {
+      "T1": 3100,
+      "T2": 272,
+      "T3": 30
+    },
+    "pf": 0.98
+  },
+  "ETHUSD": {
+    "trades": 840,
+    "wins": 422,
+    "losses": 418,
+    "win_rate": 50.2,
+    "pnl_pips": 355.0,
+    "tp_hits": 422,
+    "sl_hits": 418,
+    "tr_per_day": 0.6,
+    "days": 1459,
+    "avg_win": 38.2,
+    "avg_loss": -37.7,
+    "tier_dist": {
+      "T1": 587,
+      "T2": 179,
+      "T3": 74
+    },
+    "pf": 1.02
+  },
+  "SOLUSD": {
+    "trades": 1312,
+    "wins": 655,
+    "losses": 657,
+    "win_rate": 49.9,
+    "pnl_pips": 4.5,
+    "tp_hits": 655,
+    "sl_hits": 657,
+    "tr_per_day": 0.9,
+    "days": 1459,
+    "avg_win": 1.6,
+    "avg_loss": -1.6,
+    "tier_dist": {
+      "T1": 1192,
+      "T2": 105,
+      "T3": 15
+    },
+    "pf": 1.0
+  }
+}
