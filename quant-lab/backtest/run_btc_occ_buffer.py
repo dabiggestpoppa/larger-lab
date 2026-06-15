@@ -10,30 +10,39 @@ from asset_configs import ASSET_CONFIGS
 from symmetry_trap import SymmetryTrapEngine, TradeSignal, Bar, TradeDirection
 import ccxt
 
-exchange = ccxt.binance({'enableRateLimit': True})
-now_ms = int(time.time() * 1000)
-start_ms = now_ms - 1460 * 24 * 3600 * 1000
-
-all_candles = []
-current_since = start_ms
-req_count = 0
-print("[Binance] Fetching 4 years of BTC 5m...")
-while current_since < now_ms and req_count < 500:
-    ohlcv = exchange.fetch_ohlcv('BTC/USDT', '5m', since=current_since, limit=1000)
-    if not ohlcv: break
-    batch = [c for c in ohlcv if c[0] >= start_ms and c[0] <= now_ms]
-    if not batch: break
-    existing_ts = set(c[0] for c in all_candles)
-    new_candles = [c for c in batch if c[0] not in existing_ts]
-    all_candles.extend(new_candles)
-    if req_count % 100 == 0:
-        print(f"  req {req_count+1}: {len(new_candles)} new, total: {len(all_candles)}")
-    if len(batch) < 1000: break
-    current_since = batch[-1][0] + 1
-    req_count += 1
-    time.sleep(0.1)
-all_candles.sort(key=lambda x: x[0])
-print(f"[Binance] Total: {len(all_candles)} candles")
+import json
+cache_path = Path("quant-lab/data/btc_5m_4yr.json")
+if cache_path.exists():
+    print(f"[Cache] Loading BTC 5m data from cache...")
+    with open(cache_path) as f:
+        all_candles = json.load(f)
+    print(f"[Cache] Loaded {len(all_candles)} candles")
+else:
+    exchange = ccxt.binance({'enableRateLimit': True})
+    now_ms = int(time.time() * 1000)
+    start_ms = now_ms - 1460 * 24 * 3600 * 1000
+    all_candles = []
+    current_since = start_ms
+    req_count = 0
+    print("[Binance] Fetching 4 years of BTC 5m...")
+    while current_since < now_ms and req_count < 500:
+        ohlcv = exchange.fetch_ohlcv('BTC/USDT', '5m', since=current_since, limit=1000)
+        if not ohlcv: break
+        batch = [c for c in ohlcv if c[0] >= start_ms and c[0] <= now_ms]
+        if not batch: break
+        existing_ts = set(c[0] for c in all_candles)
+        new_candles = [c for c in batch if c[0] not in existing_ts]
+        all_candles.extend(new_candles)
+        if req_count % 100 == 0:
+            print(f"  req {req_count+1}: {len(new_candles)} new, total: {len(all_candles)}")
+        if len(batch) < 1000: break
+        current_since = batch[-1][0] + 1
+        req_count += 1
+        time.sleep(0.1)
+    all_candles.sort(key=lambda x: x[0])
+    with open(cache_path, "w") as f:
+        json.dump(all_candles, f)
+    print(f"[Binance] Total: {len(all_candles)} candles (cached)")
 
 config = ASSET_CONFIGS["BTCUSD"]
 SPREAD_BUFFER = config.get("sl_buffer", 50.0)
@@ -108,7 +117,8 @@ print(f"Trades: {total} | WR: {wr:.1f}% | PnL: {pnl:.0f} pips")
 print(f"TP: {tp_hits} | SL: {sl_hits} | Tr/Day: {tr_per_day:.1f}")
 print(f"Tier dist: {dict(tiers)}")
 if wins > 0: print(f"Avg win: {sum(t['pnl_pips'] for t in trades if t['pnl_pips']>0)/wins:.1f} pips")
-if losses > 0: print(f"Avg loss: {sum(t['pnl_pips'] for t in trades if t['pnl_pips']<0)/losses:.1f} pips")
+n_losses = sum(1 for t in trades if t['pnl_pips'] <= 0)
+if n_losses > 0: print(f"Avg loss: {sum(t['pnl_pips'] for t in trades if t['pnl_pips']<0)/n_losses:.1f} pips")
 
 # Save
 report_dir = Path(r"C:\Users\wifik\Desktop\projects\larger-lab\quant-lab\reports\hyperliquid_full")
