@@ -57,7 +57,7 @@ def fetch_candles(
     chunk_days: int = 30,
 ) -> list[dict]:
     """
-    Fetch candles in chunks (Hyperliquid has per-request time limits).
+    Fetch candles in chunks (Hyperliquid has per-request limits).
     Returns list of candle dicts sorted by time.
     """
     all_candles = []
@@ -93,6 +93,82 @@ def fetch_candles(
             deduped.append(c)
 
     deduped.sort(key=lambda x: x["t"])
+    return deduped
+
+
+def fetch_candles_paginated(
+    info: Info,
+    coin: str,
+    interval: str,
+    start_ms: int,
+    end_ms: int,
+    max_per_request: int = 5000,
+) -> list[dict]:
+    """
+    Fetch candles by paginating backwards from end_ms.
+    Hyperliquid API returns max ~5000 candles per request regardless of time range.
+    This function paginates backwards using the oldest candle's timestamp as the new end.
+    """
+    all_candles = []
+    current_end = end_ms
+    oldest_seen = end_ms
+    request_count = 0
+    max_requests = 200  # Safety limit
+
+    while current_end > start_ms and request_count < max_requests:
+        try:
+            batch = info.candles_snapshot(coin, interval, start_ms, current_end)
+            if not batch:
+                print(f"  [{coin}] no data before {datetime.fromtimestamp(current_end/1000, tz=timezone.utc).strftime('%Y-%m-%d')}")
+                break
+
+            # Deduplicate
+            new_candles = [c for c in batch if c["t"] not in [x["t"] for x in all_candles]]
+            all_candles.extend(new_candles)
+
+            oldest_in_batch = min(c["t"] for c in batch)
+            newest_in_batch = max(c["t"] for c in batch)
+
+            print(f"  [{coin}] req {request_count+1}: {len(batch)} candles, "
+                  f"range {datetime.fromtimestamp(oldest_in_batch/1000, tz=timezone.utc).strftime('%Y-%m-%d')} "
+                  f"→ {datetime.fromtimestamp(newest_in_batch/1000, tz=timezone.utc).strftime('%Y-%m-%d')}, "
+                  f"total unique: {len(all_candles)}")
+
+            # If we got fewer than max_per_request, we've reached the end of available data
+            if len(batch) < max_per_request:
+                print(f"  [{coin}] reached end of available data")
+                break
+
+            # Move the end pointer back to the oldest candle in this batch
+            current_end = oldest_in_batch
+
+            # If we're not making progress, stop
+            if current_end >= oldest_seen:
+                print(f"  [{coin}] no further progress, stopping")
+                break
+            oldest_seen = current_end
+
+            request_count += 1
+            time.sleep(0.3)  # Rate limit
+
+        except Exception as e:
+            print(f"  [{coin}] ERROR: {e}")
+            time.sleep(2)
+            continue
+
+    # Final dedup and sort
+    seen = set()
+    deduped = []
+    for c in all_candles:
+        if c["t"] not in seen:
+            seen.add(c["t"])
+            deduped.append(c)
+    deduped.sort(key=lambda x: x["t"])
+
+    # Filter to requested range
+    deduped = [c for c in deduped if start_ms <= c["t"] <= end_ms]
+
+    print(f"  [{coin}] total: {len(deduped)} candles over {request_count} requests")
     return deduped
 
 

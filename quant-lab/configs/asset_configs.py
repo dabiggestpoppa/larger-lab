@@ -560,9 +560,9 @@ ASSET_CONFIGS = {
         "sl_method": "FIXED_BUFFER",
         "sl_buffer": 25.0,
         "tiers": {
-            "T1": {"ar_max": 1500.0, "au": 205.0, "trigger": 246.0},
-            "T2": {"ar_max": 3000.0, "au": 545.0, "trigger": 654.0},
-            "T3": {"ar_max": 7000.0, "au": 1160.0, "trigger": 1392.0},
+            "T1": {"ar_max": 1500.0, "au": 120.0, "trigger": 140.0},
+            "T2": {"ar_max": 3000.0, "au": 300.0, "trigger": 360.0},
+            "T3": {"ar_max": 7000.0, "au": 600.0, "trigger": 720.0},
         },
         "gear_shifts": {
             "T1": [(654.0, "T2"), (1392.0, "T3")],
