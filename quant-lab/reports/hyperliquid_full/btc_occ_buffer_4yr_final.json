@@ -16,5 +16,23 @@
   "avg_win_pips": 169.1,
   "avg_loss_pips": -82.9,
   "sl_type": "OCC+BUFFER",
-  "spread_buffer": 50.0
+  "spread_buffer": 50.0,
+  "config": {
+    "pip_value": 1.0,
+    "ar_max": {
+      "T1": 3000,
+      "T2": 5000,
+      "T3": 8000
+    },
+    "trigger": {
+      "T1": 140,
+      "T2": 360,
+      "T3": 720
+    },
+    "au": {
+      "T1": 200,
+      "T2": 500,
+      "T3": 1000
+    }
+  }
 }
