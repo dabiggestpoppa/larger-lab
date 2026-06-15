@@ -557,12 +557,12 @@ ASSET_CONFIGS = {
         "name": "BTC/USD",
         "pip_value": 1.0,
         "k_factor": 0.52,
-        "sl_method": "FIXED_BUFFER",
-        "sl_buffer": 25.0,
+        "sl_method": "OCC_PLUS_BUFFER",
+        "sl_buffer": 50.0,
         "tiers": {
-            "T1": {"ar_max": 1500.0, "au": 120.0, "trigger": 140.0},
-            "T2": {"ar_max": 3000.0, "au": 300.0, "trigger": 360.0},
-            "T3": {"ar_max": 7000.0, "au": 600.0, "trigger": 720.0},
+            "T1": {"ar_max": 3000.0, "au": 200.0, "trigger": 240.0},
+            "T2": {"ar_max": 5000.0, "au": 500.0, "trigger": 600.0},
+            "T3": {"ar_max": 8000.0, "au": 1000.0, "trigger": 1200.0},
         },
         "gear_shifts": {
             "T1": [(654.0, "T2"), (1392.0, "T3")],
