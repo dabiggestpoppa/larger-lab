@@ -1,0 +1,20 @@
+{
+  "total_trades": 10638,
+  "wins": 7308,
+  "losses": 3330,
+  "win_rate": 68.7,
+  "total_pnl_pips": 972711,
+  "tp_hits": 1659,
+  "sl_hits": 8979,
+  "tr_per_day": 7.3,
+  "tier_dist": {
+    "T1": 8562,
+    "T2": 1612,
+    "T3": 464
+  },
+  "days": 1459,
+  "avg_win_pips": 169.1,
+  "avg_loss_pips": -82.9,
+  "sl_type": "OCC+BUFFER",
+  "spread_buffer": 50.0
+}

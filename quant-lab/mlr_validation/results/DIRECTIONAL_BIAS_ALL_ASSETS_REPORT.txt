@@ -1,0 +1,67 @@
+======================================================================
+DIRECTIONAL BIAS INTRADAY TEST — ALL ASSETS
+======================================================================
+
+Test: Asian session close > open = Bullish, close < open = Bearish
+Target: +25% of Asian range in bias direction during activation window
+Data source: quant-lab/mlr_validation/results/mlr_directional_bias_intraday.json
+
+ASSET      DAYS     BULL     BEAR   EXT25%   EXT50%
+----------------------------------------------------------------------
+HK50        854      440      414    89.3%    79.2%
+GBPCAD      982      611      371    83.2%    64.4%
+FR40        915      459      456    82.5%    66.6%
+DE30        925      514      411    82.1%    65.9%
+EURCAD     1201      713      488    81.4%    63.7%
+GBPUSD     1200      659      541    81.4%    64.6%
+EURUSD      777      455      322    79.7%    57.4%
+EURGBP     1195      753      442    78.1%    60.6%
+USDCAD     1200      665      535    77.6%    59.0%
+GBPCHF     1200      707      493    76.9%    57.6%
+CHFJPY     1201      688      513    76.8%    54.4%
+GBPJPY     1201      661      540    76.5%    56.9%
+CADJPY     1133      617      516    76.0%    54.8%
+CADCHF     1197      701      496    75.4%    55.4%
+EURJPY     1201      664      537    74.8%    54.3%
+USDJPY     1201      643      558    73.9%    52.1%
+GBPNZD      964      545      419    73.8%    52.2%
+LCOUSD      795      342      453    72.9%    50.9%
+NZDUSD      963      561      402    72.6%    49.9%
+EURCHF     1197      717      480    72.5%    51.9%
+XAGUSD     1106      632      474    72.3%    49.6%
+XAUUSD     1117      620      497    72.1%    50.0%
+AUDUSD     1201      679      522    71.4%    48.4%
+EURAUD     1199      629      570    71.2%    49.1%
+BNBUSD     1089      583      506    71.1%    49.6%
+OILUSD      872      420      452    71.0%    48.6%
+GBPAUD     1137      590      547    70.8%    47.3%
+AUDJPY     1200      681      519    70.6%    44.2%
+EURNZD     1202      677      525    70.4%    45.9%
+AUDCAD     1198      715      483    69.3%    46.0%
+NZDCAD     1135      652      483    67.9%    42.6%
+USDCHF      879      486      393    67.9%    46.1%
+XLMUSD      945      492      453    67.9%    44.6%
+AUDCHF     1198      728      470    67.8%    44.9%
+BCHUSD      962      500      462    67.7%    47.3%
+LTCUSD      960      521      439    67.7%    41.4%
+NZDJPY     1137      673      464    67.3%    40.7%
+NZDCHF     1137      704      433    66.8%    39.9%
+SOLUSD     1083      527      556    66.3%    41.1%
+AUDNZD     1199      724      475    60.0%    29.8%
+ETHUSD     1147      582      565    59.3%    36.0%
+BTCUSD     1150      589      561    59.2%    35.0%
+US500       951      528      423    55.6%    27.3%
+
+======================================================================
+TOP 10 ASSETS BY DIRECTIONAL BIAS ACCURACY
+======================================================================
+1. HK50    : EXT25=89.3%  EXT50=79.2%  days=854  bull=440  bear=414
+2. GBPCAD  : EXT25=83.2%  EXT50=64.4%  days=982  bull=611  bear=371
+3. FR40    : EXT25=82.5%  EXT50=66.6%  days=915  bull=459  bear=456
+4. DE30    : EXT25=82.1%  EXT50=65.9%  days=925  bull=514  bear=411
+5. EURCAD  : EXT25=81.4%  EXT50=63.7%  days=1201  bull=713  bear=488
+6. GBPUSD  : EXT25=81.4%  EXT50=64.6%  days=1200  bull=659  bear=541
+7. EURUSD  : EXT25=79.7%  EXT50=57.4%  days=777  bull=455  bear=322
+8. EURGBP  : EXT25=78.1%  EXT50=60.6%  days=1195  bull=753  bear=442
+9. USDCAD  : EXT25=77.6%  EXT50=59.0%  days=1200  bull=665  bear=535
+10. GBPCHF  : EXT25=76.9%  EXT50=57.6%  days=1200  bull=707  bear=493
