@@ -1,0 +1,436 @@
+{
+  "EURUSD": {
+    "trades": 2739,
+    "wins": 11,
+    "losses": 446,
+    "ews_exits": 519,
+    "win_rate": 0.4,
+    "pnl_pips": -3273.6,
+    "tr_per_day": 1.7,
+    "days": 1607,
+    "variants": {
+      "INITIAL": 1056,
+      "CASCADE": 1683
+    }
+  },
+  "GBPUSD": {
+    "trades": 4523,
+    "wins": 14,
+    "losses": 571,
+    "ews_exits": 1222,
+    "win_rate": 0.3,
+    "pnl_pips": -4885.7,
+    "tr_per_day": 2.8,
+    "days": 1607,
+    "variants": {
+      "INITIAL": 1099,
+      "CASCADE": 3424
+    }
+  },
+  "USDCHF": {
+    "trades": 2034,
+    "wins": 8,
+    "losses": 352,
+    "ews_exits": 378,
+    "win_rate": 0.4,
+    "pnl_pips": -2581.5,
+    "tr_per_day": 1.3,
+    "days": 1607,
+    "variants": {
+      "INITIAL": 827,
+      "CASCADE": 1207
+    }
+  },
+  "USDJPY": {
+    "trades": 1939,
+    "wins": 8,
+    "losses": 279,
+    "ews_exits": 598,
+    "win_rate": 0.4,
+    "pnl_pips": -2423.1,
+    "tr_per_day": 1.2,
+    "days": 1607,
+    "variants": {
+      "INITIAL": 523,
+      "CASCADE": 1416
+    }
+  },
+  "AUDUSD": {
+    "trades": 1090,
+    "wins": 2,
+    "losses": 244,
+    "ews_exits": 211,
+    "win_rate": 0.2,
+    "pnl_pips": -1617.8,
+    "tr_per_day": 0.7,
+    "days": 1607,
+    "variants": {
+      "INITIAL": 570,
+      "CASCADE": 520
+    }
+  },
+  "NZDUSD": {
+    "trades": 849,
+    "wins": 2,
+    "losses": 192,
+    "ews_exits": 136,
+    "win_rate": 0.2,
+    "pnl_pips": -1388.8,
+    "tr_per_day": 0.5,
+    "days": 1607,
+    "variants": {
+      "INITIAL": 477,
+      "CASCADE": 372
+    }
+  },
+  "CHFJPY": {
+    "trades": 2170,
+    "wins": 10,
+    "losses": 261,
+    "ews_exits": 753,
+    "win_rate": 0.5,
+    "pnl_pips": -2325.2,
+    "tr_per_day": 1.4,
+    "days": 1599,
+    "variants": {
+      "INITIAL": 417,
+      "CASCADE": 1753
+    }
+  },
+  "GBPJPY": {
+    "trades": 2861,
+    "wins": 6,
+    "losses": 267,
+    "ews_exits": 1104,
+    "win_rate": 0.2,
+    "pnl_pips": -2796.1,
+    "tr_per_day": 1.8,
+    "days": 1607,
+    "variants": {
+      "INITIAL": 414,
+      "CASCADE": 2447
+    }
+  },
+  "GBPAUD": {
+    "trades": 2296,
+    "wins": 2,
+    "losses": 266,
+    "ews_exits": 813,
+    "win_rate": 0.1,
+    "pnl_pips": -2565.9,
+    "tr_per_day": 1.4,
+    "days": 1607,
+    "variants": {
+      "INITIAL": 410,
+      "CASCADE": 1886
+    }
+  },
+  "GBPNZD": {
+    "trades": 1120,
+    "wins": 5,
+    "losses": 128,
+    "ews_exits": 414,
+    "win_rate": 0.4,
+    "pnl_pips": -1405.2,
+    "tr_per_day": 0.7,
+    "days": 1607,
+    "variants": {
+      "INITIAL": 195,
+      "CASCADE": 925
+    }
+  },
+  "GBPCHF": {
+    "trades": 3004,
+    "wins": 12,
+    "losses": 476,
+    "ews_exits": 724,
+    "win_rate": 0.4,
+    "pnl_pips": -3864.8,
+    "tr_per_day": 1.9,
+    "days": 1607,
+    "variants": {
+      "INITIAL": 897,
+      "CASCADE": 2107
+    }
+  },
+  "EURGBP": {
+    "trades": 1514,
+    "wins": 6,
+    "losses": 287,
+    "ews_exits": 315,
+    "win_rate": 0.4,
+    "pnl_pips": -2009.3,
+    "tr_per_day": 0.6,
+    "days": 2349,
+    "variants": {
+      "INITIAL": 630,
+      "CASCADE": 884
+    }
+  },
+  "EURJPY": {
+    "trades": 2345,
+    "wins": 5,
+    "losses": 281,
+    "ews_exits": 746,
+    "win_rate": 0.2,
+    "pnl_pips": -2530.8,
+    "tr_per_day": 1.0,
+    "days": 2349,
+    "variants": {
+      "INITIAL": 473,
+      "CASCADE": 1872
+    }
+  },
+  "EURAUD": {
+    "trades": 2317,
+    "wins": 9,
+    "losses": 303,
+    "ews_exits": 778,
+    "win_rate": 0.4,
+    "pnl_pips": -2691.0,
+    "tr_per_day": 1.0,
+    "days": 2349,
+    "variants": {
+      "INITIAL": 466,
+      "CASCADE": 1851
+    }
+  },
+  "EURNZD": {
+    "trades": 1999,
+    "wins": 10,
+    "losses": 334,
+    "ews_exits": 673,
+    "win_rate": 0.5,
+    "pnl_pips": -3380.6,
+    "tr_per_day": 0.9,
+    "days": 2349,
+    "variants": {
+      "INITIAL": 410,
+      "CASCADE": 1589
+    }
+  },
+  "EURCHF": {
+    "trades": 1982,
+    "wins": 3,
+    "losses": 385,
+    "ews_exits": 406,
+    "win_rate": 0.2,
+    "pnl_pips": -2766.0,
+    "tr_per_day": 0.8,
+    "days": 2349,
+    "variants": {
+      "INITIAL": 747,
+      "CASCADE": 1235
+    }
+  },
+  "EURCAD": {
+    "trades": 5370,
+    "wins": 22,
+    "losses": 695,
+    "ews_exits": 1637,
+    "win_rate": 0.4,
+    "pnl_pips": -6148.4,
+    "tr_per_day": 2.3,
+    "days": 2349,
+    "variants": {
+      "INITIAL": 1096,
+      "CASCADE": 4274
+    }
+  },
+  "USDCAD": {
+    "trades": 4569,
+    "wins": 11,
+    "losses": 592,
+    "ews_exits": 1187,
+    "win_rate": 0.2,
+    "pnl_pips": -5181.5,
+    "tr_per_day": 1.9,
+    "days": 2349,
+    "variants": {
+      "INITIAL": 1109,
+      "CASCADE": 3460
+    }
+  },
+  "AUDJPY": {
+    "trades": 2113,
+    "wins": 7,
+    "losses": 321,
+    "ews_exits": 551,
+    "win_rate": 0.3,
+    "pnl_pips": -2624.3,
+    "tr_per_day": 0.9,
+    "days": 2349,
+    "variants": {
+      "INITIAL": 584,
+      "CASCADE": 1529
+    }
+  },
+  "AUDNZD": {
+    "trades": 892,
+    "wins": 11,
+    "losses": 260,
+    "ews_exits": 129,
+    "win_rate": 1.2,
+    "pnl_pips": -1655.3,
+    "tr_per_day": 0.4,
+    "days": 2349,
+    "variants": {
+      "INITIAL": 508,
+      "CASCADE": 384
+    }
+  },
+  "AUDCHF": {
+    "trades": 1259,
+    "wins": 5,
+    "losses": 267,
+    "ews_exits": 217,
+    "win_rate": 0.4,
+    "pnl_pips": -1827.5,
+    "tr_per_day": 0.5,
+    "days": 2349,
+    "variants": {
+      "INITIAL": 577,
+      "CASCADE": 682
+    }
+  },
+  "AUDCAD": {
+    "trades": 2140,
+    "wins": 6,
+    "losses": 385,
+    "ews_exits": 468,
+    "win_rate": 0.3,
+    "pnl_pips": -2718.8,
+    "tr_per_day": 0.9,
+    "days": 2349,
+    "variants": {
+      "INITIAL": 817,
+      "CASCADE": 1323
+    }
+  },
+  "NZDJPY": {
+    "trades": 1809,
+    "wins": 8,
+    "losses": 344,
+    "ews_exits": 473,
+    "win_rate": 0.4,
+    "pnl_pips": -2633.7,
+    "tr_per_day": 0.8,
+    "days": 2349,
+    "variants": {
+      "INITIAL": 617,
+      "CASCADE": 1192
+    }
+  },
+  "NZDCHF": {
+    "trades": 915,
+    "wins": 4,
+    "losses": 227,
+    "ews_exits": 140,
+    "win_rate": 0.4,
+    "pnl_pips": -1599.3,
+    "tr_per_day": 0.4,
+    "days": 2349,
+    "variants": {
+      "INITIAL": 483,
+      "CASCADE": 432
+    }
+  },
+  "NZDCAD": {
+    "trades": 1930,
+    "wins": 11,
+    "losses": 341,
+    "ews_exits": 384,
+    "win_rate": 0.6,
+    "pnl_pips": -2434.6,
+    "tr_per_day": 0.8,
+    "days": 2349,
+    "variants": {
+      "INITIAL": 761,
+      "CASCADE": 1169
+    }
+  },
+  "CADJPY": {
+    "trades": 3034,
+    "wins": 7,
+    "losses": 417,
+    "ews_exits": 846,
+    "win_rate": 0.2,
+    "pnl_pips": -3474.4,
+    "tr_per_day": 1.3,
+    "days": 2349,
+    "variants": {
+      "INITIAL": 758,
+      "CASCADE": 2276
+    }
+  },
+  "CADCHF": {
+    "trades": 1757,
+    "wins": 7,
+    "losses": 316,
+    "ews_exits": 297,
+    "win_rate": 0.4,
+    "pnl_pips": -2169.9,
+    "tr_per_day": 0.7,
+    "days": 2349,
+    "variants": {
+      "INITIAL": 749,
+      "CASCADE": 1008
+    }
+  },
+  "GBPCAD": {
+    "trades": 4400,
+    "wins": 17,
+    "losses": 563,
+    "ews_exits": 1475,
+    "win_rate": 0.4,
+    "pnl_pips": -5117.9,
+    "tr_per_day": 1.9,
+    "days": 2349,
+    "variants": {
+      "INITIAL": 768,
+      "CASCADE": 3632
+    }
+  },
+  "XAUUSD": {
+    "trades": 1257,
+    "wins": 8,
+    "losses": 117,
+    "ews_exits": 530,
+    "win_rate": 0.6,
+    "pnl_pips": -1429.2,
+    "tr_per_day": 0.8,
+    "days": 1599,
+    "variants": {
+      "INITIAL": 142,
+      "CASCADE": 1115
+    }
+  },
+  "XAGUSD": {
+    "trades": 1468,
+    "wins": 5,
+    "losses": 297,
+    "ews_exits": 245,
+    "win_rate": 0.3,
+    "pnl_pips": -2153.0,
+    "tr_per_day": 0.9,
+    "days": 1607,
+    "variants": {
+      "INITIAL": 678,
+      "CASCADE": 790
+    }
+  },
+  "US500": {
+    "trades": 923,
+    "wins": 11,
+    "losses": 158,
+    "ews_exits": 154,
+    "win_rate": 1.2,
+    "pnl_pips": -1147.9,
+    "tr_per_day": 0.6,
+    "days": 1607,
+    "variants": {
+      "INITIAL": 479,
+      "CASCADE": 444
+    }
+  }
+}
