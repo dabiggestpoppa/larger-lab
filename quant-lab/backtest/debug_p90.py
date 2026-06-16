@@ -40,9 +40,9 @@ for i, b in enumerate(bars[:5000]):
         sdate = b.timestamp.date()
         if sdate != current_date:
             current_date = sdate
-            # Collect Asian bars
+            # Collect Asian bars (19:00-03:00 EST)
             asian_bars = []
-            for j in range(i, -1, -1):
+            for j in range(i - 1, -1, -1):  # Start from bar before 3AM
                 bj = bars[j]
                 bj_hour = bj.timestamp.hour
                 if bj_hour >= 19 or bj_hour < 3:

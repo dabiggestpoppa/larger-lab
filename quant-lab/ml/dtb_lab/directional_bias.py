@@ -113,7 +113,20 @@ class DirectionalBias:
         ah = asian_bars["high"].max()
         al = asian_bars["low"].min()
         asian_range = ah - al
-        asian_range_pips = asian_range * 10000
+
+        # Auto-detect pip value based on price magnitude
+        # Forex: ~1.0 → pip=0.0001 → multiply by 10000
+        # BTC/Indices: ~1000-100000 → pip=1.0 → multiply by 1
+        # JPY: ~100-200 → pip=0.01 → multiply by 100
+        avg_price = (ah + al) / 2
+        if avg_price > 100:
+            pip_multiplier = 1.0
+        elif avg_price > 10:
+            pip_multiplier = 100.0
+        else:
+            pip_multiplier = 10000.0
+
+        asian_range_pips = asian_range * pip_multiplier
 
         if asian_range_pips < 1:
             return self._no_signal_result()
