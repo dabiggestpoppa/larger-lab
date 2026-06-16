@@ -1,0 +1,591 @@
+{
+  "EURUSD": {
+    "signals": 5832,
+    "wins": 2806,
+    "losses": 3026,
+    "timeouts": 0,
+    "win_rate": 48.1,
+    "avg_win_time": 5.1,
+    "avg_loss_time": 5.0,
+    "tr_per_day": 3.6,
+    "days": 1607,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 2.9,
+      "4": 5.3,
+      "6": 5.0,
+      "8": 4.5,
+      "10": 6.9
+    }
+  },
+  "GBPUSD": {
+    "signals": 5518,
+    "wins": 2692,
+    "losses": 2826,
+    "timeouts": 0,
+    "win_rate": 48.8,
+    "avg_win_time": 5.1,
+    "avg_loss_time": 5.1,
+    "tr_per_day": 3.4,
+    "days": 1607,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 3.6,
+      "4": 7.1,
+      "6": 6.7,
+      "8": 6.3,
+      "10": 8.7
+    }
+  },
+  "USDCHF": {
+    "signals": 5368,
+    "wins": 2634,
+    "losses": 2734,
+    "timeouts": 0,
+    "win_rate": 49.1,
+    "avg_win_time": 5.1,
+    "avg_loss_time": 5.1,
+    "tr_per_day": 3.3,
+    "days": 1607,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 2.4,
+      "4": 4.8,
+      "6": 4.5,
+      "8": 4.0,
+      "10": 6.3
+    }
+  },
+  "USDJPY": {
+    "signals": 6899,
+    "wins": 3434,
+    "losses": 3465,
+    "timeouts": 0,
+    "win_rate": 49.8,
+    "avg_win_time": 5.0,
+    "avg_loss_time": 5.1,
+    "tr_per_day": 4.3,
+    "days": 1607,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 6.4,
+      "4": 8.8,
+      "6": 7.4,
+      "8": 6.6,
+      "10": 10.4
+    }
+  },
+  "AUDUSD": {
+    "signals": 6285,
+    "wins": 3056,
+    "losses": 3229,
+    "timeouts": 0,
+    "win_rate": 48.6,
+    "avg_win_time": 5.1,
+    "avg_loss_time": 5.1,
+    "tr_per_day": 3.9,
+    "days": 1607,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 3.2,
+      "4": 4.3,
+      "6": 3.7,
+      "8": 3.3,
+      "10": 5.1
+    }
+  },
+  "NZDUSD": {
+    "signals": 5773,
+    "wins": 2888,
+    "losses": 2885,
+    "timeouts": 0,
+    "win_rate": 50.0,
+    "avg_win_time": 5.1,
+    "avg_loss_time": 5.1,
+    "tr_per_day": 3.6,
+    "days": 1607,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 2.8,
+      "4": 4.0,
+      "6": 3.5,
+      "8": 3.2,
+      "10": 4.8
+    }
+  },
+  "CHFJPY": {
+    "signals": 5981,
+    "wins": 2832,
+    "losses": 3149,
+    "timeouts": 0,
+    "win_rate": 47.3,
+    "avg_win_time": 5.0,
+    "avg_loss_time": 5.0,
+    "tr_per_day": 3.7,
+    "days": 1599,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 6.2,
+      "4": 10.0,
+      "6": 9.1,
+      "8": 7.6,
+      "10": 10.3
+    }
+  },
+  "GBPJPY": {
+    "signals": 6317,
+    "wins": 3105,
+    "losses": 3212,
+    "timeouts": 0,
+    "win_rate": 49.2,
+    "avg_win_time": 5.0,
+    "avg_loss_time": 5.0,
+    "tr_per_day": 3.9,
+    "days": 1607,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 7.8,
+      "4": 12.4,
+      "6": 11.0,
+      "8": 9.8,
+      "10": 12.3
+    }
+  },
+  "GBPAUD": {
+    "signals": 6005,
+    "wins": 2931,
+    "losses": 3074,
+    "timeouts": 0,
+    "win_rate": 48.8,
+    "avg_win_time": 5.0,
+    "avg_loss_time": 5.0,
+    "tr_per_day": 3.7,
+    "days": 1607,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 7.0,
+      "4": 10.1,
+      "6": 9.0,
+      "8": 8.4,
+      "10": 10.5
+    }
+  },
+  "GBPNZD": {
+    "signals": 5240,
+    "wins": 2572,
+    "losses": 2668,
+    "timeouts": 0,
+    "win_rate": 49.1,
+    "avg_win_time": 5.0,
+    "avg_loss_time": 5.0,
+    "tr_per_day": 3.3,
+    "days": 1607,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 7.4,
+      "4": 11.0,
+      "6": 10.1,
+      "8": 9.2,
+      "10": 12.3
+    }
+  },
+  "GBPCHF": {
+    "signals": 4747,
+    "wins": 2292,
+    "losses": 2455,
+    "timeouts": 0,
+    "win_rate": 48.3,
+    "avg_win_time": 5.0,
+    "avg_loss_time": 5.1,
+    "tr_per_day": 3.0,
+    "days": 1607,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 2.7,
+      "4": 6.1,
+      "6": 5.9,
+      "8": 5.3,
+      "10": 6.5
+    }
+  },
+  "EURGBP": {
+    "signals": 8166,
+    "wins": 4001,
+    "losses": 4165,
+    "timeouts": 0,
+    "win_rate": 49.0,
+    "avg_win_time": 5.1,
+    "avg_loss_time": 5.1,
+    "tr_per_day": 3.5,
+    "days": 2349,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 3.6,
+      "4": 3.6,
+      "6": 4.1,
+      "8": 3.6,
+      "10": 2.5
+    }
+  },
+  "EURJPY": {
+    "signals": 7162,
+    "wins": 3501,
+    "losses": 3661,
+    "timeouts": 0,
+    "win_rate": 48.9,
+    "avg_win_time": 5.0,
+    "avg_loss_time": 5.0,
+    "tr_per_day": 3.0,
+    "days": 2349,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 8.4,
+      "4": 8.0,
+      "6": 10.5,
+      "8": 8.9,
+      "10": 6.3
+    }
+  },
+  "EURAUD": {
+    "signals": 6493,
+    "wins": 3217,
+    "losses": 3276,
+    "timeouts": 0,
+    "win_rate": 49.5,
+    "avg_win_time": 5.0,
+    "avg_loss_time": 5.0,
+    "tr_per_day": 2.8,
+    "days": 2349,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 7.6,
+      "4": 7.6,
+      "6": 10.2,
+      "8": 9.2,
+      "10": 6.3
+    }
+  },
+  "EURNZD": {
+    "signals": 6336,
+    "wins": 2995,
+    "losses": 3341,
+    "timeouts": 0,
+    "win_rate": 47.3,
+    "avg_win_time": 5.0,
+    "avg_loss_time": 5.0,
+    "tr_per_day": 2.7,
+    "days": 2349,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 8.4,
+      "4": 8.3,
+      "6": 11.0,
+      "8": 9.4,
+      "10": 6.6
+    }
+  },
+  "EURCHF": {
+    "signals": 7487,
+    "wins": 3653,
+    "losses": 3834,
+    "timeouts": 0,
+    "win_rate": 48.8,
+    "avg_win_time": 5.1,
+    "avg_loss_time": 5.1,
+    "tr_per_day": 3.2,
+    "days": 2349,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 4.2,
+      "4": 3.9,
+      "6": 4.9,
+      "8": 4.4,
+      "10": 3.0
+    }
+  },
+  "EURCAD": {
+    "signals": 7995,
+    "wins": 3885,
+    "losses": 4110,
+    "timeouts": 0,
+    "win_rate": 48.6,
+    "avg_win_time": 5.0,
+    "avg_loss_time": 5.0,
+    "tr_per_day": 3.4,
+    "days": 2349,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 5.9,
+      "4": 6.6,
+      "6": 9.2,
+      "8": 7.8,
+      "10": 5.7
+    }
+  },
+  "USDCAD": {
+    "signals": 7657,
+    "wins": 3819,
+    "losses": 3838,
+    "timeouts": 0,
+    "win_rate": 49.9,
+    "avg_win_time": 5.1,
+    "avg_loss_time": 5.1,
+    "tr_per_day": 3.3,
+    "days": 2349,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 4.3,
+      "4": 5.1,
+      "6": 7.9,
+      "8": 7.1,
+      "10": 5.3
+    }
+  },
+  "AUDJPY": {
+    "signals": 6409,
+    "wins": 3168,
+    "losses": 3241,
+    "timeouts": 0,
+    "win_rate": 49.4,
+    "avg_win_time": 5.0,
+    "avg_loss_time": 5.0,
+    "tr_per_day": 2.7,
+    "days": 2349,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 5.7,
+      "4": 5.5,
+      "6": 7.9,
+      "8": 7.1,
+      "10": 5.2
+    }
+  },
+  "AUDNZD": {
+    "signals": 5191,
+    "wins": 2515,
+    "losses": 2676,
+    "timeouts": 0,
+    "win_rate": 48.4,
+    "avg_win_time": 5.1,
+    "avg_loss_time": 5.1,
+    "tr_per_day": 2.2,
+    "days": 2349,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 3.2,
+      "4": 3.2,
+      "6": 4.0,
+      "8": 3.5,
+      "10": 2.5
+    }
+  },
+  "AUDCHF": {
+    "signals": 6422,
+    "wins": 3080,
+    "losses": 3342,
+    "timeouts": 0,
+    "win_rate": 48.0,
+    "avg_win_time": 5.1,
+    "avg_loss_time": 5.1,
+    "tr_per_day": 2.7,
+    "days": 2349,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 3.4,
+      "4": 3.3,
+      "6": 4.5,
+      "8": 4.0,
+      "10": 2.8
+    }
+  },
+  "AUDCAD": {
+    "signals": 6704,
+    "wins": 3268,
+    "losses": 3436,
+    "timeouts": 0,
+    "win_rate": 48.7,
+    "avg_win_time": 5.1,
+    "avg_loss_time": 5.1,
+    "tr_per_day": 2.9,
+    "days": 2349,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 3.6,
+      "4": 3.9,
+      "6": 5.7,
+      "8": 4.9,
+      "10": 3.5
+    }
+  },
+  "NZDJPY": {
+    "signals": 5926,
+    "wins": 2866,
+    "losses": 3060,
+    "timeouts": 0,
+    "win_rate": 48.4,
+    "avg_win_time": 5.1,
+    "avg_loss_time": 5.0,
+    "tr_per_day": 2.5,
+    "days": 2349,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 5.2,
+      "4": 4.9,
+      "6": 6.8,
+      "8": 6.2,
+      "10": 4.5
+    }
+  },
+  "NZDCHF": {
+    "signals": 5463,
+    "wins": 2667,
+    "losses": 2796,
+    "timeouts": 0,
+    "win_rate": 48.8,
+    "avg_win_time": 5.1,
+    "avg_loss_time": 5.1,
+    "tr_per_day": 2.3,
+    "days": 2349,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 3.1,
+      "4": 2.9,
+      "6": 3.9,
+      "8": 3.4,
+      "10": 2.5
+    }
+  },
+  "NZDCAD": {
+    "signals": 5954,
+    "wins": 2962,
+    "losses": 2992,
+    "timeouts": 0,
+    "win_rate": 49.7,
+    "avg_win_time": 5.1,
+    "avg_loss_time": 5.1,
+    "tr_per_day": 2.5,
+    "days": 2349,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 3.6,
+      "4": 3.7,
+      "6": 5.4,
+      "8": 4.6,
+      "10": 3.2
+    }
+  },
+  "CADJPY": {
+    "signals": 6689,
+    "wins": 3347,
+    "losses": 3342,
+    "timeouts": 0,
+    "win_rate": 50.0,
+    "avg_win_time": 5.0,
+    "avg_loss_time": 5.1,
+    "tr_per_day": 2.8,
+    "days": 2349,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 5.4,
+      "4": 5.7,
+      "6": 8.4,
+      "8": 7.3,
+      "10": 5.3
+    }
+  },
+  "CADCHF": {
+    "signals": 7307,
+    "wins": 3566,
+    "losses": 3741,
+    "timeouts": 0,
+    "win_rate": 48.8,
+    "avg_win_time": 5.1,
+    "avg_loss_time": 5.1,
+    "tr_per_day": 3.1,
+    "days": 2349,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 3.3,
+      "4": 3.4,
+      "6": 4.7,
+      "8": 4.1,
+      "10": 2.9
+    }
+  },
+  "GBPCAD": {
+    "signals": 6866,
+    "wins": 3373,
+    "losses": 3493,
+    "timeouts": 0,
+    "win_rate": 49.1,
+    "avg_win_time": 5.0,
+    "avg_loss_time": 5.0,
+    "tr_per_day": 2.9,
+    "days": 2349,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 7.3,
+      "4": 8.0,
+      "6": 10.7,
+      "8": 9.2,
+      "10": 6.5
+    }
+  },
+  "XAUUSD": {
+    "signals": 6874,
+    "wins": 3384,
+    "losses": 3490,
+    "timeouts": 0,
+    "win_rate": 49.2,
+    "avg_win_time": 5.0,
+    "avg_loss_time": 5.0,
+    "tr_per_day": 4.3,
+    "days": 1599,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 20.9,
+      "4": 25.8,
+      "6": 23.3,
+      "8": 23.1,
+      "10": 38.5
+    }
+  },
+  "XAGUSD": {
+    "signals": 6667,
+    "wins": 3347,
+    "losses": 3320,
+    "timeouts": 0,
+    "win_rate": 50.2,
+    "avg_win_time": 5.0,
+    "avg_loss_time": 5.0,
+    "tr_per_day": 4.1,
+    "days": 1607,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 5.7,
+      "4": 6.8,
+      "6": 5.9,
+      "8": 6.0,
+      "10": 10.3
+    }
+  },
+  "US500": {
+    "signals": 4073,
+    "wins": 1943,
+    "losses": 2130,
+    "timeouts": 0,
+    "win_rate": 47.7,
+    "avg_win_time": 5.1,
+    "avg_loss_time": 5.1,
+    "tr_per_day": 2.5,
+    "days": 1607,
+    "timing_sweet_spot_45_60": 0,
+    "thresholds": {
+      "2": 2.0,
+      "4": 3.2,
+      "6": 3.15,
+      "8": 3.1,
+      "10": 4.5
+    }
+  }
+}

@@ -979,7 +979,9 @@ Timeout:       Neither within expiry window (excluded from WR)
 
 ### 6.2 Full Expiry Sweep Results (1-120 min)
 
-**All 27 pairs tested. Every single pair exceeds 83% WR at 120min expiry.**
+**All 31 pairs tested (27 FX + 4 crypto). Every single pair exceeds 83% WR at 120min expiry.**
+
+**Crypto pairs (new — fetched from MT5 June 16):**
 
 | Pair | 5m | 10m | 15m | 20m | 30m | 45m | 60m | 90m | 120m | Best |
 |------|-----|-----|-----|-----|-----|-----|-----|-----|------|------|
@@ -1014,19 +1016,28 @@ Timeout:       Neither within expiry window (excluded from WR)
 | EURCHF | 46.0 | 58.2 | 64.5 | 68.2 | 73.6 | 78.1 | 80.6 | 84.0 | **85.8** | 120m |
 | EURGBP | 45.9 | 58.5 | 64.6 | 68.6 | 73.6 | 78.0 | 80.6 | 84.1 | **85.9** | 120m |
 | AUDNZD | 43.7 | 55.4 | 61.9 | 65.6 | 70.9 | 75.3 | 77.8 | 81.7 | **83.8** | 120m |
+| XRPUSD | 46.9 | 59.4 | 66.1 | 70.3 | 75.5 | 79.9 | 82.6 | 85.8 | **87.8** | 120m |
+| BTCUSD | 47.3 | 59.4 | 65.9 | 69.7 | 74.7 | 78.8 | 81.9 | 85.2 | **87.1** | 120m |
+| SOLUSD | 47.0 | 59.2 | 65.7 | 69.6 | 74.5 | 78.8 | 81.7 | 84.9 | **87.1** | 120m |
+| ETHUSD | 45.5 | 56.9 | 63.2 | 66.7 | 71.7 | 75.3 | 78.5 | 81.2 | **83.3** | 120m |
 
 ### 6.3 Key Findings
 
-1. **Universal edge**: ALL 27 pairs exceed 83% WR at 120min expiry
+1. **Universal edge**: ALL 31 pairs (27 FX + 4 crypto) exceed 83% WR at 120min expiry
 2. **Gold (XAUUSD) highest**: 88.4% WR at 120min
-3. **GBP crosses cluster 87-88%**: Confirms manual's "GBP cluster 89-91%" finding
-4. **JPY pairs 85-88%**: Higher volatility but strong directional follow-through
-5. **Indices (US500) 87.6%**: Strong edge even on indices
-6. **AUDNZD lowest at 83.8%**: Still well above 75% threshold
-7. **30min expiry = 75%+ WR** for most pairs → cascade add window
-8. **45min expiry = 78-81% WR** → the "resolution sweet spot" from manual
-9. **1-3min expiry = 0% WR**: Price needs at least 5 min to establish direction
-10. **5min expiry ≈ 48% WR**: Essentially a coin flip on next candle
+3. **XRPUSD 87.8%**: Strongest crypto, 30min expiry already at 75.5% WR
+4. **BTCUSD 87.1%**: 45min expiry at 78.8% — solid cascade window
+5. **SOLUSD 87.1%**: Matches BTC, 45min at 78.8%
+6. **ETHUSD 83.3%**: Lowest crypto but still strong, needs 45min for 75%+ WR
+7. **GBP crosses cluster 87-88%**: Confirms manual's "GBP cluster 89-91%" finding
+8. **JPY pairs 85-88%**: Higher volatility but strong directional follow-through
+9. **Indices (US500) 87.6%**: Strong edge even on indices
+10. **AUDNZD lowest at 83.8%**: Still well above 75% threshold
+11. **30min expiry = 75%+ WR** for most pairs → cascade add window
+12. **45min expiry = 78-81% WR** → the "resolution sweet spot" from manual
+13. **1-3min expiry = 0% WR**: Price needs at least 5 min to establish direction
+14. **5min expiry ≈ 48% WR**: Essentially a coin flip on next candle
+15. **USDSEK**: Not available on OxSecurities broker — needs alternative data source
 
 ### 6.4 Cascade Timing Implications
 
@@ -1078,3 +1089,24 @@ The binary test proves the cascade timing windows from the manual:
 | XAUUSD | 30min | 120min | 88.4% |
 | XAGUSD | 30min | 120min | 87.5% |
 | US500 | 30min | 120min | 87.6% |
+| BTCUSD | 45min | 120min | 87.1% |
+| ETHUSD | 45min | 120min | 83.3% |
+| SOLUSD | 45min | 120min | 87.1% |
+| XRPUSD | 30min | 120min | 87.8% |
+
+### 6.6 Data Sources & Notes
+
+**MT5 Data (OxSecurities-Live broker):**
+- BTCUSD, ETHUSD, SOLUSD, XRPUSD: Fetched June 16, 2026 (463K-461K bars, 2022-2026)
+- USDSEK: **NOT available** on this broker — needs alternative source
+- All M5 data saved as `quant-lab/data/{SYMBOL}_M5.csv`
+
+**Asset Config Additions:**
+- XRPUSD: Added to `quant-lab/configs/asset_configs.py` (pip=0.0001, k=0.52, crypto tier)
+- USDSEK: Added to `quant-lab/configs/asset_configs.py` (pip=0.0001, k=0.46, forex tier)
+- BTCUSD, ETHUSD, SOLUSD: Already existed in config
+
+**Files:**
+- `quant-lab/backtest/run_p90_binary_simple.py` — Main binary test (FX pairs)
+- `quant-lab/backtest/run_p90_binary_new_pairs.py` — Crypto pairs binary test
+- `quant-lab/reports/hyperliquid_full/p90_binary_simple_all_pairs.json` — Full results JSON
