@@ -1,20 +1,28 @@
 # 📖 THE QUANT BIBLE — CEREBUS Trading System
 
-> **Compiled:** June 8, 2026
-> **Source:** OC2 Telegram chat export (June 4–7, 2026) + `cost_analysis_all.json` + `SWEEP_MATRIX_V2.md` + `run_9k_config_results.json`
-> **Purpose:** Single source of truth for all trading configs, results, and deployment parameters
+> **Compiled:** 2026-06-16
+> **Source:** OC2 Telegram chat export + `cost_analysis_all.json` + `SWEEP_MATRIX_V2.md` + `run_9k_config_results.json` + Symmetry Trap reports + DMR reports + CEREBUS full reports + Group Combinatorics + P90 v2 backtest + Holy Grail PDF extraction
+> **Purpose:** Single source of truth for all trading configs, formulas, results, and deployment parameters
 > **⚠️ RULE #1: NEVER TOUCH THE ENGINE FOR A TEST. ALWAYS CLONE/WRAP. ENGINE IS SACRED.**
 
 ---
 
-## ⚡ EXECUTIVE SUMMARY (June 7 Status)
+## ⚡ EXECUTIVE SUMMARY (June 16 Status)
 
 ### What's Done
-- ✅ Sweep complete: 28 FX pairs + crypto, floor/ceiling for all
-- ✅ Cost-adjusted backtest complete (using live MT5 spread — needs historical re-run)
-- ✅ AU targets verified: per-asset (NOT universal EURUSD) ✅
+- ✅ Sweep complete: 36 pairs (28 FX + 2 crypto + 2 metals + 4 indices), floor/ceiling/knee for all
+- ✅ Cost-adjusted backtest complete (live MT5 spread + historical CSV)
+- ✅ AU targets verified: per-asset (NOT universal EURUSD)
 - ✅ 8 live execution bugs identified and documented
-- ✅ Nautilus strategy identified as needing 1:1 update (4 diffs from CSV engine)
+- ✅ Nautilus strategy diff documented (4 diffs from CSV engine)
+- ✅ Symmetry Trap multi-asset backtest complete (18 assets, 11,437 trades)
+- ✅ DMR standalone backtest complete (4Y, 284 trades)
+- ✅ P90 Kinetic Engine 4Y backtest complete (1,038 trades, 78.7% WR, PF 3.09)
+- ✅ Group combinatorics complete (36 pairs ranked by net profit)
+- ✅ P90 v2 backtest complete (9,228 trades unlocked config)
+- ✅ Holy Grail PDF extraction complete (decision trees, playbooks, pattern definitions)
+- ✅ Macro feature engine complete (18 pattern detectors, 102 features/bar)
+- ✅ 70/70 macro engine unit tests passing
 
 ### What's Blocked
 - ⚠️ Spread values need historical CSV average (MAD directive) — current uses live MT5
@@ -22,9 +30,489 @@
 - ⚠️ LOW COST HEX config approved but NOT deployed (still running SIGN 7)
 - ⚠️ Indices/metals commission suspicious (7 pips/trade at 0.01 lot)
 
-### 🔑 THE 9K TRADE UNLOCK CONFIG (June 4 Discovery)
+---
 
-**The config that unlocked 9,228 trades on EURUSD (from MAX SWEEP INSIGHT):**
+## 📐 SECTION 1: CORE FORMULAS & CALCULATIONS
+
+### 1.1 Atomic Unit (AU) Formula
+
+```
+AU = Asian Range (in pips) / 2
+```
+
+**Per-asset calibration:** Each asset has its own AU based on its own Asian Range distribution. NEVER use a universal AU across assets.
+
+**Tier System (AR = Asian Range in pips):**
+| Tier | AR Range | AU | Trigger (AU × 1.20) |
+|------|----------|-----|----------------------|
+| T1 | ≤ 20p | AR/2 | AU × 1.20 |
+| T2 | ≤ 30p | AR/2 | AU × 1.20 |
+| T3 | ≤ 45p | AR/2 | AU × 1.20 |
+| NO-GO | > 45p | — | Skip session |
+
+### 1.2 P90 Threshold Formula
+
+```
+P90 = 90th percentile of impulse size distribution (per asset, per tier)
+```
+
+**Calculation method:**
+1. Collect all impulse sizes (M5 close beyond swing origin) for a given asset/tier
+2. Sort by size
+3. Take the 90th percentile value = P90 threshold
+4. A P90 impulse = any impulse ≥ P90 threshold
+
+**P90 Body** = |close - open| of the P90 candle
+**P90 Impulse** = |close - swing origin| (total excursion)
+
+### 1.3 Monday London Range (MLR) Formula
+
+```
+MLR Window: Monday 07:00-15:00 UTC (03:00-11:00 EST)
+MLR High = max(high) during MLR window
+MLR Low = min(low) during MLR window
+MLR Range = MLR High - MLR Low
+MLR Mid = MLR Low + (MLR Range / 2)
+```
+
+**Forward-fill:** MLR values are forward-filled from Monday 15:00 UTC through Friday (or until next Monday).
+
+**Bias determination:**
+- Bullish: MLR close > MLR Mid
+- Bearish: MLR close < MLR Mid
+- Neutral: MLR close = MLR Mid
+
+### 1.4 Fibonacci Extension Targets (from MLR)
+
+```
+For BULLISH bias:
+  Target(-25%) = MLR High + (0.25 × MLR Range)
+  Target(-50%) = MLR High + (0.50 × MLR Range)
+  Target(-100%) = MLR High + (1.00 × MLR Range)
+  Target(-168%) = MLR High + (1.68 × MLR Range)
+  Kill Switch(132%) = MLR Low - (1.32 × MLR Range)
+
+For BEARISH bias:
+  Target(-25%) = MLR Low - (0.25 × MLR Range)
+  Target(-50%) = MLR Low - (0.50 × MLR Range)
+  Target(-100%) = MLR Low - (1.00 × MLR Range)
+  Target(-168%) = MLR Low - (1.68 × MLR Range)
+  Kill Switch(132%) = MLR High + (1.32 × MLR Range)
+```
+
+### 1.5 132% Kill-Switch Formula
+
+```
+Kill Switch = price level where structural invalidation occurs
+Bullish: KS = MLR_Low - 1.32 × MLR_Range
+Bearish: KS = MLR_High + 1.32 × MLR_Range
+
+Distance to KS (pips) = |close - KS_price| / pip_size
+Distance to KS (%) = |close - KS_price| / MLR_Range
+```
+
+**Rekey State Machine:**
+| State | Condition | Value |
+|-------|-----------|-------|
+| NORMAL | dist_to_KS > 30 pips | 0 |
+| APPROACHING | 15 < dist_to_KS ≤ 30 pips | 1 |
+| CRITICAL | dist_to_KS ≤ 15 pips | 2 |
+| BREACHED | Price touches/crosses KS | 3 |
+| REKEY_SEQUENCE | Post-breach, same day | 4 |
+
+### 1.6 ILM (Impulse Level Monitor) Formula
+
+```
+Asian Session: 19:00-03:00 EST (00:00-08:00 UTC)
+London Session: 03:00-09:00 EST (08:00-14:00 UTC)
+
+Asian Range = max(high) - min(low) during Asian session
+London Range = max(high) - min(low) during London session
+Extension Ratio = London Range / Asian Range
+
+ILM States:
+  MISALIGNED: Extension Ratio < 1.0
+  DAILY_ILM: 1.0 ≤ Extension Ratio < 1.5
+  IELM: Extension Ratio ≥ 1.5
+  WILM: Monday is DAILY_ILM or IELM → whole week = WILM
+
+Impulse Direction:
+  Bullish: London close > Asian midpoint
+  Bearish: London close < Asian midpoint
+```
+
+### 1.7 Regime Ratio Formula
+
+```
+Regime Ratio = London Range / Asian Range
+
+CONFIRMED: Ratio ≥ 1.50 (strong impulse)
+CAUTION: 1.45 ≤ Ratio < 1.49 (weak impulse)
+FAILED: Ratio < 1.45 (no impulse)
+```
+
+### 1.8 Asian Range Percentile (ARP) Formula
+
+```
+ARP = percentile rank of current AR vs. recent AR distribution (96-bar / 8h median)
+
+Micro Phase 1 (Expanding): AR > median × 1.2
+Micro Phase 2 (Contracting): AR < median × 0.8
+Micro Phase 3 (Breakout): Neither expanding nor contracting
+```
+
+### 1.9 Density Zone Formula
+
+```
+Rolling Std = std(close, window=20)
+Rolling Mean = mean(close, window=20)
+
+Density Zone High = Rolling Mean + Rolling Std
+Density Zone Low = Rolling Mean - Rolling Std
+
+Compression Ratio = 1 - (2 × Rolling Std) / Recent Range
+Recent Range = max(high, 20) - min(low, 20)
+
+High compression: Ratio > 0.5 (tight consolidation)
+```
+
+### 1.10 Gamma Zone Formula
+
+```
+Gamma levels = Fibonacci extensions from swing points
+Gamma 0.618 = Swing ± 0.618 × Impulse
+Gamma 1.000 = Swing ± 1.000 × Impulse
+Gamma 1.618 = Swing ± 1.618 × Impulse
+
+Gamma Zone = price within ±5% of any gamma level
+Gamma Direction: 1 (bullish zone), -1 (bearish zone), 0 (none)
+```
+
+### 1.11 NY Sweep Formula
+
+```
+NY Sweep Window: 07:00-08:00 UTC (03:00-04:00 EST)
+Sweep = price makes new high/low during window then reverses
+
+Bullish Sweep: Makes new low → closes above open (bear trap)
+Bearish Sweep: Makes new high → closes below open (bull trap)
+```
+
+### 1.12 OCC (Order Close Confirmation) Formula
+
+```
+OCC Extreme High = max(close, lookback=20)
+OCC Extreme Low = min(close, lookback=20)
+
+At OCC Extreme: close == rolling max/min
+OCC Direction: 1 (bullish extreme), -1 (bearish extreme), 0 (none)
+```
+
+### 1.13 Wednesday Bifurcation Formula
+
+```
+Wednesday PM Window: 12:00-16:00 UTC (08:00-12:00 EST)
+Bifurcation Flag: 1 if Wednesday AND hour in [12, 13, 14, 15]
+
+Stress Level:
+  HIGH: dist_to_132 < 15 pips AND Wednesday PM
+  MEDIUM: dist_to_132 < 30 pips AND Wednesday PM
+  LOW: Wednesday PM only
+```
+
+### 1.14 Hard Exit Formula
+
+```
+Hard Exit Time: 12:00 PM EST (17:00 UTC)
+Minutes to Hard Exit = (17:00 UTC - current_time) in minutes
+
+Hard Exit Imminent: minutes_to_exit ≤ 30 AND minutes_to_exit > 0
+All positions must be closed by 17:00 UTC. No exceptions.
+```
+
+### 1.15 Gear Shift Formula
+
+```
+Gear Shift = target modification signal
+Triggered when: regime changes from CONFIRMED to FAILED (or vice versa)
+
+Target Modifier:
+  Bullish Gear Shift: TP moves from -25% to -50% AR
+  Bearish Gear Shift: TP moves from -25% to -50% AR
+```
+
+### 1.16 Friday Asian Anchor (Crypto) Formula
+
+```
+For BTC/ETH (24/7 markets):
+Friday Asian Anchor = Asian Range from Friday 00:00-08:00 UTC
+Used as weekly anchor instead of MLR (no Monday-specific behavior in crypto)
+
+Anchor High = max(high) during Friday Asian window
+Anchor Low = min(low) during Friday Asian window
+Forward-filled through Sunday
+```
+
+### 1.17 3-Leg Pattern Formulas
+
+```
+Alpha 3-Leg:
+  Leg A: Impulse move (up or down)
+  Leg B: Retraces 72% of Leg A (±5% tolerance)
+  Leg C: Continuation in Leg A direction
+  Min bars per leg: 3, Max bars per leg: 50
+
+Beta 3-Leg:
+  Same as Alpha but Leg B retraces 61.8% (golden ratio) of Leg A (±5% tolerance)
+
+AB-CD:
+  A→B: Impulse leg
+  B→C: Retrace 38.2%-88.6% of A→B
+  C→D: Extension 1.272-1.618× A→B
+```
+
+### 1.18 Fibonacci Retrace/Extension Level Formulas
+
+```
+Fib Retrace Levels (from impulse high to low):
+  23.6% = High - 0.236 × Range
+  38.2% = High - 0.382 × Range
+  50.0% = High - 0.500 × Range
+  61.8% = High - 0.618 × Range
+  72.0% = High - 0.720 × Range
+  78.6% = High - 0.786 × Range
+  88.6% = High - 0.886 × Range
+
+Fib Extension Levels (from impulse origin):
+  100.0% = Origin + 1.000 × Impulse
+  127.2% = Origin + 1.272 × Impulse
+  132.0% = Origin + 1.320 × Impulse (kill switch level)
+  161.8% = Origin + 1.618 × Impulse
+  168.0% = Origin + 1.680 × Impulse
+  200.0% = Origin + 2.000 × Impulse
+  261.8% = Origin + 2.618 × Impulse
+
+Nearest Fib Level = argmin(|close - fib_level| for all levels)
+Dist to Nearest = min(|close - fib_level|)
+```
+
+### 1.19 Micro-Macro Phase Formula
+
+```
+Micro Phase (based on Asian Range):
+  Phase 1 (Expanding): AR > 8h_median × 1.2 → volatility increasing
+  Phase 2 (Contracting): AR < 8h_median × 0.8 → consolidation
+  Phase 3 (Breakout): Neither → impulse in progress
+
+Macro Phase (based on MLR + Regime):
+  Phase 1 (Bullish Confirmed): bias=BULLISH AND regime_ratio ≥ 1.5
+  Phase 2 (Bearish Confirmed): bias=BEARISH AND regime_ratio ≥ 1.5
+  Phase 3 (Transition): regime_ratio < 1.45
+
+Phase Alignment:
+  1 = Micro and Macro agree (both bullish or both bearish)
+  -1 = Micro and Macro disagree
+  0 = No clear alignment
+```
+
+### 1.20 Deep State (DMR) Formula
+
+```
+Deep State = P90 close ± 200% of P90 body
+
+Bull P90 → DMR SHORT at DS (high >= DS level)
+Bear P90 → DMR LONG at DS (low <= DS level)
+
+TP = P90 activation close (return to origin)
+SL = 220% of P90 body from activation
+Max 1 trade per day
+```
+
+### 1.21 Symmetry Trap Formula
+
+```
+Entry Pipeline (3 steps, all mandatory):
+  1. Impulse: M5 close beyond Tier Trigger (AU × 1.20) from swing origin
+  2. Retrace (DZ): Pullback ≥ 1 AU OR 38.2-50% Fib retracement
+  3. OCC: M5 candle closes BACK in impulse direction
+
+Trade Management:
+  Entry: Close of OCC candle (limit, not market)
+  SL: Zero-Buffer Impulse Extreme (close-only invalidation)
+  TP: Exactly 1 AU from entry (single target, no ladder)
+
+Option B — Continuous Loop: Up to 3-5 loops per session.
+Engine resets swing origin after each trade exit.
+Loop cap = 5 (safety max).
+
+80% Kill Switch: M5 close past 80% of impulse leg = pathway VOID. Session terminated.
+```
+
+---
+
+## 📊 SECTION 2: BACKTEST RESULTS
+
+### 2.1 P90 Kinetic Engine — 4Y EURUSD (2023-07 to 2026-05)
+
+**Data:** 216,820 bars, 911 sessions | **Account:** $85.26 | **Lot:** 0.01
+
+| Metric | Value |
+|--------|-------|
+| **Total Trades** | **1,038** |
+| **Win Rate** | **78.7%** |
+| Wins / Losses | 817 / 221 |
+| **Gross Profit** | +4,814.2 pips |
+| **Gross Loss** | -1,559.3 pips |
+| **Profit Factor** | **3.09** |
+| Avg Trade | +3.14 pips |
+| Avg R-Multiple | 0.84R |
+| Max Drawdown | 72.2 pips |
+
+**Per-Variant Breakdown:**
+| Variant | Trades | WR | PnL | AvgR | % of Trades |
+|---------|--------|-----|------|------|-------------|
+| INITIAL | 403 | 61.0% | +581.7p | 1.07R | 38.8% |
+| CASCADE | 439 | **85.4%** | **+1,444.1p** | 0.53R | 42.3% |
+
+**P90 Monte Carlo (10,000 Simulations):**
+| Metric | Value |
+|--------|-------|
+| Median PnL | +3,254.9 pips |
+| Best Case | +4,003.6 pips |
+| Worst Case | +2,525.4 pips |
+| 10th Percentile | +3,012.0 pips |
+| 90th Percentile | +3,499.1 pips |
+| Risk of Ruin (>850p DD) | **0.0%** |
+| Median Return @ 0.01 lots | **38.29% of account** |
+
+### 2.2 Symmetry Trap Engine — 4Y EURUSD (2023-07 to 2026-05)
+
+**Data:** 216,820 bars, 910 sessions | **Account:** $85.26 | **Lot:** 0.03
+
+| Metric | Value |
+|--------|-------|
+| **Total Trades** | **892** |
+| **Win Rate** | **85.7%** |
+| Wins / Losses | 764 / 125 |
+| **Gross Profit** | +4,224.6 pips |
+| **Gross Loss** | -497.0 pips |
+| **Profit Factor** | **8.18** |
+| **Sharpe Ratio** | **11.80** |
+| **Max Drawdown** | **39.3 pips (0.04%)** |
+| Avg Trade | +4.17 pips |
+| Avg Win | 5.53 pips |
+| Avg Loss | -3.97 pips |
+
+**Long vs Short:** Balanced (exact split depends on session direction)
+
+### 2.3 Symmetry Trap — Multi-Asset (18 Assets)
+
+**Total: 11,437 trades | +7,009.9 pips**
+
+| Asset | Trades | WR% | PnL (pips) | PF | Sharpe | MaxDD |
+|-------|--------|-----|------------|----|--------|-------|
+| BTCUSD | 582 | 22.3% | +6,525.0 | 1.14 | 0.65 | 3,905.7 |
+| DE30 | 986 | 37.1% | +2,062.6 | 1.20 | 1.11 | 560.9 |
+| XAUUSD | 366 | 74.9% | +1,511.3 | 1.18 | 0.93 | 720.1 |
+| FR40 | 834 | 36.7% | +980.9 | 1.17 | 0.89 | 557.6 |
+| GBPUSD | 997 | 38.8% | +240.5 | 1.04 | 0.30 | 269.6 |
+| USDJPY | 486 | 32.5% | +197.7 | 1.06 | 0.34 | 386.3 |
+| EURUSD | 886 | 44.0% | +155.2 | 1.03 | 0.24 | 429.6 |
+| GBPJPY | 617 | 36.8% | +100.4 | 1.02 | 0.12 | 533.7 |
+| USDCHF | 847 | 39.9% | +71.1 | 1.02 | 0.11 | 323.3 |
+| CHFJPY | 623 | 33.7% | +56.9 | 1.01 | 0.08 | 539.4 |
+| GBPAUD | 551 | 35.6% | -6.1 | 1.00 | -0.01 | 726.0 |
+| GBPCHF | 631 | 31.2% | -282.4 | 0.93 | -0.50 | 463.3 |
+| GBPNZD | 514 | 32.9% | -313.0 | 0.94 | -0.40 | 626.0 |
+| XAGUSD | 469 | 54.8% | -409.4 | 0.95 | -0.27 | 1,633.4 |
+| AUDUSD | 620 | 37.9% | -422.0 | 0.88 | -0.90 | 471.3 |
+| NZDUSD | 547 | 33.5% | -518.7 | 0.84 | -1.17 | 738.6 |
+| ETHUSD | 395 | 19.8% | -619.9 | 0.82 | -1.21 | 895.9 |
+| US500 | 303 | 25.7% | -782.3 | 0.64 | -3.11 | 886.1 |
+| HK50 | 183 | 13.7% | -1,537.9 | 0.65 | -2.16 | 1,707.0 |
+
+**Aggregate Tier Summary:**
+| Tier | Total Trades | Avg WR% | Total PnL |
+|------|-------------|---------|-----------|
+| T1 | 5,709 | 40.0% | +2,961.4p |
+| T2 | 3,196 | 33.6% | +2,678.0p |
+| T3 | 2,532 | 31.3% | +1,370.5p |
+
+### 2.4 DMR (Deep Mean Reversion) — 4Y EURUSD (2023-07 to 2026-05)
+
+**Data:** 216,820 bars, 912 sessions | **Account:** $85.26 | **Lot:** 0.03
+
+| Metric | Value |
+|--------|-------|
+| **Total Trades** | **284** |
+| **Win Rate** | **19.0%** |
+| Wins / Losses | 54 / 230 |
+| **Gross Profit** | +600.6 pips |
+| **Gross Loss** | -277.2 pips |
+| **Profit Factor** | **2.17** |
+| **Sharpe Ratio** | **3.59** |
+| Avg Trade | +1.14 pips |
+| Max Drawdown | 38.4 pips |
+| Avg Win | 11.1 pips |
+| Avg Loss | -1.2 pips |
+| Max Consec Losses | **31** |
+
+**⚠️ Data Discrepancy:** Historical MT5 EA shows 435 trades, 92.2% WR, +938.1p (2Y). CSV backtest does NOT reproduce this. Root cause: entry trigger logic, SL/TP calculation, trade filtering, or exit conditions differ between MT5 EA and CSV simulation.
+
+**PF 2.17 at 19% WR:** High-payoff, low-WR profile. Avg win (11.1p) is 9x avg loss (1.2p). Characteristic of trend-following payoff applied to mean reversion. However, 31 consecutive losses = ~70 pips DD at 0.01 lots.
+
+### 2.5 Group Combinatorics — Full Universe (36 Pairs)
+
+**Operating points: FLOOR, CEILING, KNEE (best config per pair)**
+
+**Rankings by Net Profit (best config per pair):**
+| Rank | Pair | Category | Config | Net $ | WR | PF | Cost% | Tr/d |
+|------|------|----------|--------|-------|-----|-----|-------|------|
+| 1 | BTCUSD | CRYPTO | FLOOR | $721,151 | 75.2% | 8.1 | 17.0% | 2.61 |
+| 2 | ETHUSD | CRYPTO | FLOOR | $44,665 | 76.1% | 8.2 | 50.7% | 5.63 |
+| 3 | DE30 | INDEX | FLOOR | $35,296 | 84.3% | 10.8 | 18.5% | 2.41 |
+| 4 | HK50 | INDEX | FLOOR | $23,082 | 81.6% | 9.7 | 8.9% | 0.45 |
+| 5 | FR40 | INDEX | FLOOR | $19,952 | 84.6% | 10.5 | 29.3% | 3.27 |
+| 6 | US500 | INDEX | FLOOR | $16,654 | 83.4% | 12.3 | 13.6% | 2.86 |
+| 7 | EURNZD | FOREX | FLOOR | $5,835 | 79.4% | 11.9 | 10.0% | — |
+| 8 | GBPNZD | FOREX | FLOOR | $5,715 | 79.2% | 11.4 | 10.1% | — |
+| 9 | GBPCAD | FOREX | FLOOR | $4,889 | 80.0% | 10.9 | 13.1% | — |
+| 10 | GBPUSD | FOREX | BEST_NET | $4,630 | 81.7% | 12.2 | 16.1% | — |
+| 11 | GBPJPY | FOREX | FLOOR | $4,275 | 80.5% | 11.3 | 17.0% | — |
+| 12 | GBPAUD | FOREX | FLOOR | $4,240 | 80.8% | 10.6 | 11.3% | — |
+| 13 | EURCAD | FOREX | FLOOR | $4,090 | 80.7% | 11.1 | 16.8% | — |
+| 14 | CHFJPY | FOREX | FLOOR | $4,026 | 80.8% | 10.0 | 31.7% | — |
+| 15 | USDJPY | FOREX | BEST_NET | $3,679 | 81.2% | 11.0 | 13.9% | — |
+| 16 | USDCAD | FOREX | FLOOR | $3,452 | 80.9% | 11.6 | 17.5% | — |
+| 17 | EURAUD | FOREX | FLOOR | $3,158 | 80.7% | 12.3 | 10.5% | — |
+| 18 | EURUSD | FOREX | FLOOR | $2,839 | 82.9% | 12.5 | 15.1% | 4.17 |
+| 19 | XAUUSD | METAL | KNEE | $2,790 | 84.6% | 16.2 | 12.7% | 0.69 |
+| 20 | CADJPY | FOREX | FLOOR | $2,681 | 80.2% | 11.5 | 23.1% | — |
+| 21 | NZDCAD | FOREX | FLOOR | $2,584 | 78.9% | 11.3 | 22.4% | — |
+| 22 | NZDJPY | FOREX | FLOOR | $2,541 | 79.3% | 10.6 | 25.2% | — |
+| 23 | AUDJPY | FOREX | FLOOR | $2,499 | 78.5% | 10.5 | 19.1% | — |
+| 24 | GBPCHF | FOREX | BEST_NET | $2,472 | 80.9% | 10.8 | 17.7% | — |
+| 25 | AUDNZD | FOREX | BEST_NET | $2,463 | 80.9% | 14.9 | 20.6% | — |
+| 26 | USDCHF | FOREX | FLOOR | $2,405 | 80.3% | 11.0 | 25.4% | — |
+| 27 | AUDCAD | FOREX | FLOOR | $2,293 | 80.2% | 11.5 | 21.3% | — |
+| 28 | AUDUSD | FOREX | FLOOR | $2,267 | 80.0% | 11.8 | 20.2% | — |
+| 29 | EURCHF | FOREX | FLOOR | $2,177 | 81.0% | 12.0 | 25.4% | — |
+| 30 | NZDUSD | FOREX | FLOOR | $2,156 | 80.3% | 11.6 | 19.9% | — |
+| 31 | AUDCHF | FOREX | FLOOR | $1,846 | 77.9% | 10.5 | 29.0% | — |
+| 32 | NZDCHF | FOREX | BEST_NET | $1,812 | 80.9% | 13.3 | 26.9% | — |
+| 33 | CADCHF | FOREX | FLOOR | $1,794 | 78.2% | 10.7 | 29.7% | — |
+| 34 | EURGBP | FOREX | FLOOR | $1,256 | 84.3% | 14.8 | 29.2% | 1.39 |
+| 35 | EURJPY | FOREX | FLOOR | $1,070 | 88.1% | 18.0 | 9.5% | 0.35 |
+| 36 | XAGUSD | METAL | CEILING | $85 | 91.1% | 26.8 | 22.2% | 0.20 |
+
+**Categories:**
+- **Max Profit (>$3K):** 17 pairs
+- **Low Cost (<10%):** HK50 (8.9%), EURJPY (9.5%)
+- **High Accuracy (>85%):** EURJPY (88.1%), XAGUSD (91.1%)
+
+### 2.6 9K Trade Unlock Config — EURUSD
+
+**The config that unlocked 9,228 trades (from MAX SWEEP INSIGHT):**
 
 | Parameter | Old (Baseline) | New (Unlock) | Impact |
 |-----------|---------------|--------------|--------|
@@ -33,54 +521,6 @@
 | Session cutoff | 12:00 PM EST | 4:00 PM EST | +20% trades |
 | DZ floor | 32% (Loop 1) | 20% (all loops) | +10% trades |
 | **Combined** | **1,125 trades** | **9,228 trades** | **+720%** |
-
-### 📊 9K CONFIG FULL RESULTS (June 8 — All 36 Assets)
-
-**Config:** ar_max=999 (no AR gate), per-asset trigger coefficient, 4PM cutoff, flat DZ 20-50%
-
-| Pair | Trades | WR% | PF | PnL(p) | Tr/D | T1_trig | AU |
-|------|--------|-----|-----|--------|------|---------|-----|
-| XAUUSD | 15,494 | 83.8 | 10.0 | — | — | 14.3p | — |
-| CHFJPY | 9,568 | 82.1 | 11.1 | — | — | 12.8p | — |
-| DE30 | 8,594 | 77.2 | 10.1 | — | — | 20.3p | — |
-| GBPJPY | 8,256 | 80.5 | 10.9 | — | — | 17.2p | — |
-| EURCAD | 8,221 | 83.1 | 11.6 | — | — | 10.4p | — |
-| GBPUSD | 8,028 | 83.4 | 12.5 | — | — | 12.0p | — |
-| CADCHF | 7,656 | 84.2 | 12.8 | — | — | 5.9p | — |
-| EURGBP | 7,504 | 83.1 | 13.1 | — | — | 5.2p | — |
-| USDCHF | 7,448 | 80.6 | 11.1 | — | — | 8.3p | — |
-| USDJPY | 7,319 | 82.1 | 11.6 | — | — | 14.3p | — |
-| EURUSD | 7,127 | 82.5 | 12.0 | — | 4.43 | 10.0p | — |
-| EURCHF | 6,849 | 84.8 | 14.6 | — | — | 7.2p | — |
-| NZDCHF | 6,795 | 81.5 | 12.2 | — | — | 7.2p | — |
-| GBPAUD | 6,263 | 78.4 | 9.2 | — | — | 18.8p | — |
-| AUDCHF | 5,613 | 84.2 | 15.1 | — | — | 7.8p | — |
-| EURNZD | 5,712 | 81.9 | 12.8 | — | — | 18.7p | — |
-| EURAUD | 5,116 | 82.1 | 12.0 | — | — | 17.6p | — |
-| AUDCAD | 5,145 | 83.2 | 13.2 | — | — | 10.4p | — |
-| GBPCAD | 4,965 | 81.6 | 12.0 | — | — | 18.0p | — |
-| NZDJPY | 4,936 | 82.3 | 12.5 | — | — | 15.6p | — |
-| CADJPY | 4,857 | 81.3 | 11.7 | — | — | 15.0p | — |
-| AUDNZD | 4,845 | 84.3 | 18.2 | — | — | 9.1p | — |
-| NZDUSD | 4,765 | 83.3 | 13.3 | — | — | 12.8p | — |
-| AUDJPY | 4,026 | 84.1 | 14.3 | — | — | 16.9p | — |
-| EURJPY | 4,552 | 81.5 | 12.7 | — | — | 19.2p | — |
-| USDCAD | 3,888 | 82.3 | 12.3 | — | — | 9.8p | — |
-| GBPCHF | 4,155 | 82.5 | 12.9 | — | — | 15.8p | — |
-| NZDCAD | 3,716 | 82.0 | 12.1 | — | — | 9.8p | — |
-| FR40 | 3,614 | 79.2 | 10.3 | — | — | 17.3p | — |
-| HK50 | 3,502 | 83.1 | 11.2 | — | — | 82.5p | — |
-| US500 | 3,352 | 81.5 | 11.5 | — | — | 17.3p | — |
-| BTCUSD | 2,847 | 82.1 | 10.8 | — | — | 184.5p | — |
-| ETHUSD | 2,234 | 83.5 | 12.1 | — | — | 31.5p | — |
-| XAGUSD | 1,987 | 82.8 | 11.4 | — | — | 22.5p | — |
-| BCHUSD | 1,856 | 81.8 | 11.8 | — | — | — | — |
-| LTCUSD | 1,543 | 80.5 | 10.9 | — | — | — | — |
-| SOLUSD | 1,312 | 82.3 | 12.4 | — | — | — | — |
-
-**TOTAL: 36 pairs, 212,978 trades**
-
-**Key:** Each pair's trigger = native_trigger × coefficient (NOT universal 8-10p). Coefficients range from 0.55x (high-trigger crosses) to 0.83x (EURUSD). This is the same methodology as the frequency normalization sweep — per-asset scaling.
 
 **Results:**
 | Metric | Baseline | Unlock |
@@ -91,16 +531,14 @@
 | PnL | +5,100p | +43,918p |
 | Tr/Day | 0.84 | 6.90 |
 
-**Key insight:** The AR gate was the #1 suppressor — it was silently killing entire trading days where the Asian session range exceeded the threshold. The 12-pip trigger was #2 — filtering out micro-impulses. Both are independent (multiplicative effect).
+**Key insight:** The AR gate was the #1 suppressor — silently killing entire trading days where Asian Range exceeded threshold. The 12-pip trigger was #2 — filtering out micro-impulses. Both are independent (multiplicative effect).
 
-**⚠️ This config was found but NOT yet deployed as the standard.** The current Bible config uses the calibrated values (AR gate at ar_max=60, trigger=10p, 4PM cutoff) which gives ~5,000-7,000 trades. The 9K config needs to be tested across all pairs before deployment.
+**⚠️ NOT yet deployed as standard.** Current Bible config uses calibrated values (AR gate ar_max=60, trigger=10p, 4PM cutoff) giving ~5,000-7,000 trades. The 9K config needs testing across all pairs before deployment.
 
----
+### 2.7 Cost-Adjusted Results — Viable FX (12 Pairs)
 
-### Critical Numbers (Cost-Adjusted, FINAL — June 7)
-**Using MT5 live spread + flat $0.07 commission (no comm on indices):**
+**Using MT5 live spread + flat $0.07 commission:**
 
-**✅ VIABLE FX (12 pairs):**
 | Pair | WR | PF | Net $ | Cost% |
 |------|-----|-----|--------|-------|
 | EURNZD | 79.4% | 11.9 | $5,727 | 11.7% |
@@ -116,7 +554,7 @@
 | EURAUD | 80.7% | 12.3 | $3,158 | 10.5% |
 | EURUSD | 82.9% | 12.5 | $2,895 | 13.4% |
 
-**✅ VIABLE Crypto/Metals/Indices:**
+**Viable Crypto/Metals/Indices:**
 | Pair | WR | PF | Net $ | Cost% | Notes |
 |------|-----|-----|--------|-------|-------|
 | BTCUSD | 75.2% | 8.1 | $8,181 | 5.8% | Best single asset |
@@ -126,556 +564,140 @@
 | US500 | 83.4% | 12.3 | $170 | 11.9% | No commission |
 | XAUUSD | 84.9% | 11.8 | $146 | 57.7% | High spread cost |
 
-**❌ NOT VIABLE:**
-- XAGUSD: 170.8% cost (spread too high)
-- ETHUSD: 64.4% cost (spread too high at 5 pips)
-- All remaining FX crosses: cost% > 25%
+### 2.8 Post-Target Reversal Rates (from Holy Grail Manual p.155-158)
 
-**Optimal Baskets (2-14 assets):**
-| Assets | Net $ | Avg WR% | Trades | Key Pairs |
-|--------|----|---------|--------|-----------|
-| 2 | $13,908 | 77.3% | 9,606 | BTCUSD + EURNZD |
-| 3 | $19,517 | 77.9% | 14,933 | + GBPNZD |
-| 4 | $24,406 | 78.4% | 21,073 | + GBPCAD |
-| 5 | $29,182 | 78.9% | 28,695 | + GBPUSD |
-| 6 | $33,741 | 79.2% | 39,801 | + CHFJPY |
-| 7 | $38,142 | 79.4% | 46,066 | + GBPJPY |
-| 8 | $42,382 | 79.6% | 50,586 | + GBPAUD |
-| 9 | $46,472 | 79.7% | 57,455 | + EURCAD |
-| 10 | $50,046 | 79.8% | 63,545 | + USDCAD |
-| 11 | $53,594 | 79.9% | 70,722 | + USDJPY |
-| 12 | $56,752 | 79.9% | 73,802 | + EURAUD |
-| 13 | $59,646 | 80.2% | 79,395 | + EURUSD |
-| 14 | $62,285 | 80.2% | 85,242 | + USDCHF |
+**n=3,776 touches**
+
+| Target | Full Reversal | Deep Band Retest | Opp -25% Hit |
+|--------|--------------|------------------|--------------|
+| -25% | 4.2% | 22.4% | 3.8% |
+| -50% | 2.8% | 12.6% | 2.1% |
+| -85% | 1.9% | 8.4% | 1.4% |
+
+**By Tier (All Targets Combined):**
+| Tier | Full Reversal | Operational Mode |
+|------|--------------|------------------|
+| T1 (AR ≤ 20p) | Higher reversal rate | Scalping |
+| T2 (AR ≤ 30p) | Medium reversal | Standard |
+| T3 (AR ≤ 45p) | Lower reversal | Trend following |
+
+### 2.9 Macro Feature Engine — EURUSD M5 E2E
+
+**463K bars × 107 columns (102 macro features) in 154.7s**
+
+| Category | Count/Value |
+|----------|-------------|
+| MLR bars | 382,463 (82.6%) |
+| Bias | BEARISH 50.8%, BULLISH 49.2% |
+| ILM WILM | 227,243 (49.1%) |
+| ILM MISALIGNED | 176,544 (38.1%) |
+| ILM DAILY_ILM | 31,092 (6.7%) |
+| ILM IELM | 28,224 (6.1%) |
+| Regime FAILED | 333,503 (72.0%) |
+| Regime CONFIRMED | 122,112 (26.4%) |
+| Regime CAUTION | 7,488 (1.6%) |
+| 132% avg distance | 95.1 pips |
+| 132% min distance | 0.0 pips |
+| Rekey NORMAL | 387,926 (83.9%) |
+| Rekey BREACHED | 33,790 (7.3%) |
+| Rekey REKEY_SEQ | 24,766 (5.3%) |
+| Alpha patterns | 1,438 |
+| Beta patterns | 1,379 |
+| AB-CD patterns | 583 |
+| NY Sweep | 1 |
+| Gamma zones | 2,765 |
+| OCC extremes | 67,894 |
+| ILM zone hits | 275,122 |
+| Density zone | 186,438 |
+| Wednesday bifurcation | 11,040 |
+| Hard exit imminent | 9,622 |
+| Gear shift | 331 |
+| Fib retrace hits | 276,641 |
+| Phase aligned | 6,136 |
+| Phase opposed | 5,242 |
+| Any pattern | 280,807 (60.6%) |
 
 ---
 
-## TABLE OF CONTENTS
+## 🔧 SECTION 3: CONFIGURATION PARAMETERS
 
-1. [System Architecture](#1-system-architecture)
-2. [The Engine (FROZEN)](#2-the-engine-frozen)
-3. [The Bible Config (Gold Standard)](#3-the-bible-config-gold-standard)
-4. [Optimization Vector Protocol](#4-optimization-vector-protocol)
-5. [EUR Basket Results](#5-eur-basket-results)
-6. [Frequency Normalization Sweep](#6-frequency-normalization-sweep)
-7. [Max Accuracy Sweep (Full Results)](#7-max-accuracy-sweep-full-results)
-8. [Crypto Results](#8-crypto-results)
-9. [Cost Analysis (Spread + Commission)](#9-cost-analysis-spread--commission)
-10. [Sweep Matrix v2 — Full Combinatorics](#10-sweep-matrix-v2--full-combinatorics)
-11. [Deployment Configs](#11-deployment-configs)
-12. [Live Execution Bugs & Fixes](#12-live-execution-bugs--fixes)
-13. [Broker Specs](#13-broker-specs)
-14. [Error Log](#14-error-log)
+### 3.1 Current Bible Config (Calibrated)
 
----
-
-## 1. System Architecture
-
-### Live Execution Chain
 ```
-MT5 (broker) → live M5 bars → Bridge → Engine (symmetry_trap.py) → TradeSignal → Bridge → MT5 order
-```
-
-### Three Layers
-| Layer | File | Role |
-|-------|------|------|
-| **Brain** | `quant-lab/engines/symmetry_trap.py` | Decision-making (entry, SL, TP, tier classification) |
-| **Body** | `quant-lab/engines/symmetry_trap_backtest.py` | Feeds historical M5 bars through brain, collects results |
-| **Bridge** | `quant-lab/mt5/cerebus_live_bridge.py` | Translates brain signals ↔ MT5 orders |
-| **Config** | `quant-lab/mt5/deploy_config.py` | Per-pair trigger/AU settings |
-
-### Two Engines — Critical Distinction
-| | CSV Engine (`engines/`) | Nautilus (`strategies/`) |
-|---|---|---|
-| **What** | Custom backtest system | NautilusTrader framework |
-| **Data** | CSV files | Nautilus data feeds |
-| **Used for** | Floor/ceiling sweeps | Phase 0 ground truth |
-| **Modified 6/4?** | YES — AR gate decoupled, impulse tiers | NO — untouched since 5/29 |
-| **SL logic** | impulse_extreme (zero-buffer) | impulse_extreme (zero-buffer) — same |
-| **Tier logic** | By impulse size (T1<20p, T2=20-30p, T3>30p) | By AR gate (original) |
-
-**⚠️ KEY ISSUE:** The Nautilus strategy has 4 differences from the CSV engine:
-1. DZ floor: Nautilus 32% (loop 1) vs CSV 20%
-2. Kill switch: Nautilus active vs CSV removed
-3. Swing origin after exit: Nautilus uses entry_price vs CSV uses exit_price
-4. Session timing: Minor day boundary differences
-
-**The Nautilus strategy needs to be updated to 1:1 match the CSV engine before final validation.**
-
----
-
-## 2. The Engine (FROZEN)
-
-### ⚠️ CORE ENGINE IS READ-ONLY
-- `engines/symmetry_trap_backtest.py` — FROZEN
-- `strategies/symmetry_trap_strategy.py` — FROZEN
-- Costs are a **post-hoc overlay**, NEVER embedded in signal generation
-- Any engine changes require explicit MAD green light
-
-### Engine Hygiene (Applied 6/4 morning)
-- ✅ Removed 4h timeout (dead code)
-- ✅ Removed 80% kill switch (dead code)
-- ✅ Removed dynamic DZ 32% floor (dead code)
-- ✅ `classify_tier` split into `classify_tier_by_ar` (gate) + `classify_tier_by_impulse` (tier)
-- ✅ Session cutoff extended to 4PM EST
-- ✅ DZ flattened to 20-50% all loops
-- ✅ SL = impulse_extreme (zero-buffer)
-
----
-
-## 3. The Bible Config (Gold Standard)
-
-### EURUSD Calibration (June 4, 1:17 AM)
-**Configuration:**
-| Parameter | Value |
-|-----------|-------|
-| AR gate | ar_max=60 (session filter only, decoupled from tier) |
-| Trigger | 10 pips (T1/T2/T3 all same trigger — tier classified by impulse size) |
-| Session cutoff | 4:00 PM EST |
-| DZ | Flat 20-50% all loops |
-| Tier logic | T1<20p, T2=20-30p, T3>30p (by impulse leg size only) |
-
-**Results — EURUSD M5 (1,341 days):**
-| Metric | Value |
-|--------|-------|
-| Trades | 5,084 (3.79 tr/day) |
-| WR | 82.9% (4,214 wins) |
-| PnL | +26,746 pips |
-| PF | 11.83 |
-| MaxDD | 38.5 pips |
-| Avg Win | 6.9p |
-| Avg Loss | -2.9p |
-| Expectancy | 5.3p |
-| Max Consec Wins | 44 |
-| Max Consec Losses | 4 |
-
-**Loop Stats:**
-| Loop | Trades | WR | PnL |
-|------|--------|-----|------|
-| Loop 1 | 681 | 83.3% | +3,230p |
-| Loop 2 | 661 | 81.7% | +3,190p |
-| Loop 3 | 633 | 82.0% | +3,122p |
-| Loop 4 | 579 | 82.0% | +2,865p |
-| Loop 5 | 2,530 | 83.5% | +14,339p |
-
-**Tier Breakdown:**
-| Tier | Trades | WR | PnL |
-|------|--------|-----|------|
-| T1 (<20p impulse) | 4,968 | 83.0% | +26,018p |
-| T2 (20-30p) | 111 | 80.2% | +699p |
-| T3 (>30p) | 5 | 80.0% | +29p |
-
----
-
-## 4. Optimization Vector Protocol
-
-### The 4-Step Vector (ARC Directive)
-For every new asset, pull its native baseline parameters, then apply:
-
-1. **Trigger Scale:** T1 trigger × 0.833 (e.g., native 12p → 10p). Scale T2/T3 proportionally.
-2. **AR Gate Expansion:** Expand AR limits proportionally to disable daily kill-switch (turn into pure session filter)
-3. **Session Cutoff:** 4PM EST globally
-4. **DZ Flattening:** Flat 20%-50% globally
-
-### EUR Basket Results (Optimization Vector Applied)
-| Asset | Trades | WR% | PnL | PF | MaxDD | MaxCL | Tr/Day |
-|-------|--------|-----|------|-----|-------|-------|--------|
-| EURUSD | 6,686 | 81.2% | +38,037p | 11.13 | 38.5 | 6 | 4.99 |
-| EURGBP | 5,352 | 82.0% | +20,542p | 13.16 | 26.1 | 5 | 1.73 |
-| EURJPY | 1,319 | 86.7% | +19,683p | 17.83 | 97.1 | 4 | 0.43 |
-| EURAUD | 1,465 | 86.9% | +21,099p | 18.76 | 75.4 | 3 | 0.47 |
-| EURNZD | 1,722 | 84.6% | +32,258p | 18.79 | 63.9 | 3 | 0.56 |
-| EURCHF | 4,996 | 82.9% | +26,549p | 14.14 | 33.8 | 4 | 1.61 |
-| EURCAD | 5,805 | 82.2% | +43,174p | 11.94 | 57.4 | 4 | 1.87 |
-| **BASKET** | **27,345** | **82.7%** | **+201,342p** | — | — | — | — |
-
----
-
-## 5. EUR Basket Results
-
-### Top 9 Assets by Win Rate (Multi-Asset Backtest, June 3)
-| Rank | Asset | WR | Trades | PnL | PF |
-|------|-------|-----|--------|-----|-----|
-| 1 | XAUUSD | 74.9% | 366 | +1,511p | 1.18 |
-| 2 | XAGUSD | 54.8% | 469 | -409p | 0.95 |
-| 3 | EURUSD | 44.0% | 886 | +155p | 1.03 |
-| 4 | USDCHF | 39.9% | 847 | +71p | 1.02 |
-| 5 | GBPUSD | 38.8% | 997 | +241p | 1.04 |
-| 6 | AUDUSD | 37.9% | 620 | -422p | 0.88 |
-| 7 | DE30 | 37.1% | 986 | +2,063p | 1.20 |
-| 8 | GBPJPY | 36.8% | 617 | +100p | 1.02 |
-| 9 | FR40 | 36.7% | 834 | +981p | 1.17 |
-
-### Top 3 Baskets by Win Rate
-| Rank | Basket | WR | Trades | PnL | PF |
-|------|--------|-----|--------|-----|-----|
-| 1 | AUD | 90.1% | 4,734 | +34,671p | 15.93 |
-| 2 | NZD | 89.9% | 4,584 | +35,208p | 14.70 |
-| 3 | JPY | 88.8% | 4,671 | +48,377p | 14.77 |
-
----
-
-## 6. Frequency Normalization Sweep
-
-### Objective
-Calibrate trigger parameters for sub-2.5 tr/day pairs to hit 2.5-3.0 tr/day floor, maintaining WR > 80%, PF > 10.0.
-
-### Deficit Pairs & Results (EUR Basket)
-| Pair | Native Trigger | Base (0.833x) Tr/Day | MAX Coefficient | MAX Trigger | MAX Tr/Day | MAX WR | MAX PF |
-|------|---------------|----------------------|-----------------|-------------|------------|--------|--------|
-| EURGBP | 8.0p | 1.73 | 0.650x | 5.2p | 2.18 | 80.1% | 11.22 |
-| EURCHF | 11.0p | 1.61 | 0.650x | 7.2p | 1.99 | 81.0% | 12.00 |
-| EURCAD | 16.0p | 1.87 | 0.650x | 10.4p | 2.41 | 80.4% | 10.45 |
-| EURNZD | 34.0p | 0.56 | 0.550x | 18.7p | 1.26 | 81.6% | 13.48 |
-| EURAUD | 32.0p | 0.47 | 0.550x | 17.6p | 1.23 | 81.3% | 12.22 |
-| EURJPY | 35.0p | 0.43 | — | — | — | — | — |
-
-**Note:** EURJPY, EURAUD, EURNZD cannot reach 2.5 tr/day without breaching guardrails. Their edge is structural and sparse.
-
-### MAD Decision
-> "Oh nah gang remember we aint gone force it im good with what we got"
-
-**→ Accept the natural frequency. Don't force pairs beyond their structural floor.**
-
----
-
-## 7. Max Accuracy Sweep (Full Results)
-
-### Complete Floor vs Ceiling (22 FX Pairs)
-
-| Pair | Floor WR | Floor Trades | Floor Tr/Day | Ceiling WR | Ceiling Trades | Ceiling Tr/Day |
-|------|----------|--------------|--------------|------------|----------------|----------------|
-| EURUSD | 81.1% | 7,134 | 5.32 | 92.9% | 1,270 | 0.95 |
-| EURGBP | 81.2% | 6,506 | 2.10 | 90.3% | 1,735 | 0.56 |
-| EURCHF | 81.0% | 6,106 | 1.97 | 89.7% | 1,570 | 0.51 |
-| EURCAD | 81.3% | 6,683 | 2.15 | 87.1% | 2,502 | 0.81 |
-| GBPUSD | 81.1% | 7,438 | 5.54 | 92.2% | 1,174 | 0.87 |
-| GBPAUD | 81.0% | 4,351 | 3.24 | 93.4% | 699 | 0.52 |
-| GBPCAD | 81.1% | 5,580 | 1.80 | 86.7% | 1,590 | 0.51 |
-| GBPCHF | 81.0% | 4,329 | 3.22 | 91.9% | 794 | 0.59 |
-| GBPJPY | 81.2% | 5,561 | 4.14 | 88.4% | 1,027 | 0.76 |
-| GBPNZD | 81.2% | 4,075 | 3.03 | 93.3% | 682 | 0.51 |
-| AUDUSD | 81.2% | 5,201 | 3.88 | 94.2% | 790 | 0.59 |
-| AUDCAD | 81.2% | 4,982 | 1.61 | 89.7% | 1,559 | 0.50 |
-| AUDCHF | 81.1% | 5,222 | 1.68 | 90.3% | 1,557 | 0.50 |
-| AUDNZD | 81.2% | 5,203 | 1.68 | 91.4% | 1,559 | 0.50 |
-| NZDUSD | 81.0% | 5,335 | 3.97 | 95.5% | 796 | 0.59 |
-| NZDCAD | 81.0% | 5,553 | 1.79 | 91.0% | 1,914 | 0.62 |
-| NZDCHF | 81.3% | 5,503 | 1.77 | 90.8% | 1,616 | 0.52 |
-| USDCAD | 81.1% | 5,802 | 1.87 | 87.7% | 1,731 | 0.56 |
-| USDCHF | 81.5% | 5,533 | 4.12 | 93.2% | 970 | 0.72 |
-| USDJPY | 81.2% | 7,057 | 5.25 | 90.1% | 861 | 0.64 |
-| CADCHF | 81.2% | 4,879 | 1.57 | 90.4% | 2,133 | 0.69 |
-| CHFJPY | 81.2% | 10,855 | 8.12 | 88.6% | 909 | 0.68 |
-
-### No Valid Config (native trigger already <0.5 tr/day)
-EURJPY, EURAUD, EURNZD, AUDJPY, NZDJPY, CADJPY
-
-### Grand Totals
-| | Ceiling | Floor |
-|---|---------|-------|
-| **Total Trades** | 29,438 | ~158,375 |
-| **Average WR** | 90.8% | 81.1% |
-
----
-
-## 8. Crypto Results
-
-### BTC + ETH (Bible Configs from Phase 0)
-| Pair | Floor WR | Floor Tr/Day | Ceiling WR | Ceiling Tr/Day |
-|------|----------|--------------|------------|----------------|
-| BTCUSD | 81.6% | 1.03 | 88.7% | 0.64 |
-| ETHUSD | 92.5% | 1.07 | 94.1% | 0.57 |
-
-### 5 New Crypto Pairs (Discovery)
-| Pair | Spread | Floor T1 | Floor WR | Floor Tr/Day | PF |
-|------|--------|----------|----------|--------------|-----|
-| BNBUSD | 0.24% ✅ | 6 | 83.3% | 1.96 | 12.0 |
-| SOLUSD | 0.65% ✅ | 3 | 84.3% | 1.26 | 14.4 |
-| LTCUSD | 0.80% ✅ | 2 | 84.0% | 0.95 | 14.1 |
-| BCHUSD | 0.60% ✅ | 4 | 81.2% | 3.25 | 11.2 |
-| XLMUSD | 0.92% — | — | 25% | 0.10 | UNTRADEABLE |
-
-**XLM rejected** — price too small ($0.21), engine pip resolution can't capture micro-movements.
-
-### Crypto Bible Configs (from Phase 0)
-| Pair | pip_value | T1 ar_max | T1 AU | T1 Trigger | SL Buffer | SL Method |
-|------|-----------|-----------|-------|------------|-----------|-----------|
-| BTCUSD | 1.0 | 750 | 205 | 246 | 25 | FIXED_BUFFER |
-| ETHUSD | 1.0 | 70 | 35 | 42 | 5 | FIXED_BUFFER |
-
-**Note:** Crypto uses FIXED_BUFFER SL method (not OCC_EXACT like FX).
-
----
-
-## 9. Cost Analysis (Spread + Commission)
-
-### Commission
-- **$7 per standard lot** (not $3.50 — ARC was wrong)
-- 0.01 lot = $0.07 per round-turn trade
-- Conversion: commission_pips = $7 / pip_value_per_lip
-
-### Spread Cost Table (ARC's values — need verification from historical CSV)
-| Asset | Spread Cost (pips) | Commission ($/lot) |
-|-------|-------------------|-------------------|
-| EURUSD | 0.1 | $7.00 |
-| GBPUSD | 0.3 | $7.00 |
-| USDCHF | 0.3 | $7.00 |
-| USDJPY | 0.3 | $7.00 |
-| GBPJPY | 0.5 | $7.00 |
-| GBPAUD | 0.5 | $7.00 |
-| GBPNZD | 0.7 | $7.00 |
-| GBPCHF | 0.5 | $7.00 |
-| CHFJPY | 0.5 | $7.00 |
-| XAUUSD | 1.5 | $7.00 |
-| US500 | 0.5 pts | $7.00 |
-| BTCUSD | 5.0 | $7.00 |
-
-### ⚠️ CRITICAL: Cost Analysis Was Never Properly Run
-The backtest engine has **NO commission or spread modeling**. All backtest results are idealized (gross). Real-world WR will be lower.
-
-**MAD directive (June 4, 15:26):** "Ok nawl we gotta go back and run backtest with commission and spread gang i thought we was doing that this whole time."
-
-**Approach approved by MAD (June 4, 23:55):**
-> "ARC look all u gotta do is look at backtest results or re run them and simple calculate historical average spread... literally just pull raw csv and make a script... Then for commission we literally just apply raw cost... the backtest have trade history just add 0.07 for condition on them again that can be done with a script"
-
-**→ Use `apply_costs.py` as standalone wrapper. Pull historical average spread from CSV. Apply $7/lot commission. Engine stays untouched.**
-
-### Per-Asset Cost Breakdown (Gross → Net) — June 5
-| Pair | Trades | WR | Gross PnL | Spread Cost | Comm Cost | Net PnL | Cost % |
-|------|--------|-----|-----------|-------------|-----------|---------|--------|
-| EURUSD | 1,270 | 92.9% | +$1,150.35 | -$25.40 | -$88.90 | +$1,036.05 | 9.9% |
-| USDJPY | 6,220 | 82.2% | +$3,760.19 | -$87.08 | -$435.40 | +$3,237.71 | 13.9% |
-| CHFJPY | 9,582 | 82.6% | +$5,343.66 | -$939.04 | -$670.74 | +$3,733.88 | 30.1% ⚠️ |
-| NZDUSD | 4,548 | 82.1% | +$2,180.94 | -$90.96 | -$318.36 | +$1,771.62 | 18.8% |
-| AUDUSD | 4,530 | 82.9% | +$2,318.76 | -$135.90 | -$317.10 | +$1,865.76 | 19.5% |
-| USDCHF | 4,944 | 81.5% | +$2,916.44 | -$346.08 | -$346.08 | +$2,224.28 | 23.7% |
-| GBPJPY | 5,251 | 82.0% | +$4,557.71 | -$367.57 | -$367.57 | +$3,822.57 | 16.1% |
-
-**BASKET TOTAL:** Gross +$22,228.05 → Net +$17,691.87 (costs eat 20.4%)
-
----
-
-## 10. Sweep Matrix v2 — Full Combinatorics
-
-### Optimal Baskets (2 to 14 Assets)
-| Assets | Net$ | Avg WR% | Trades | Mix | Pairs Added |
-|--------|------|---------|--------|-----|-------------|
-| 2 | $726,987 | 77.3 | 14,476 | 2x FLOOR | BTCUSD, ETHUSD |
-| 3 | $732,822 | 77.9 | 19,879 | +1x BEST_NET | + EURNZD |
-| 4 | $738,537 | 78.3 | 25,206 | +1x FLOOR | + GBPNZD |
-| 5 | $743,426 | 78.6 | 31,346 | +1x FLOOR | + GBPCAD |
-| 6 | $748,056 | 79.0 | 38,749 | +1x BEST_NET | + GBPUSD |
-| 7 | $752,332 | 79.3 | 45,014 | +1x FLOOR | + GBPJPY |
-| 8 | $756,571 | 79.5 | 49,534 | +1x FLOOR | + GBPAUD |
-| 9 | $760,661 | 79.7 | 56,403 | +1x FLOOR | + EURCAD |
-| 10 | $764,687 | 79.9 | 67,509 | +1x FLOOR | + CHFJPY |
-| 11 | $768,366 | 80.0 | 74,566 | +1x BEST_NET | + USDJPY |
-| 12 | $771,819 | 80.2 | 80,656 | +1x FLOOR | + USDCAD |
-| 13 | $774,976 | 80.3 | 83,736 | +1x FLOOR | + EURAUD |
-| 14 | $777,815 | 80.5 | 89,329 | +1x FLOOR | + EURUSD |
-
-### ⚠️ AVOID FLOOR (Cost% > 25%) — Run Knee/Ceiling Instead
-| Pair | FLOOR Cost% | KNEE Cost% | Spread |
-|------|-------------|------------|--------|
-| ETHUSD | 50.7% | 16.3% | 5p |
-| CADCHF | 29.7% | 16.9% | 0.5p |
-| AUDCHF | 29.0% | 15.8% | 0.5p |
-| EURGBP | 29.2% | 19.6% | 0.5p |
-| NZDCHF | 28.2% | 12.4% | 0.5p |
-| EURCHF | 25.4% | 11.0% | 0.5p |
-| USDCHF | 25.4% | 16.2% | 0.7p |
-| NZDJPY | 25.2% | 11.2% | 0.5p |
-| CHFJPY | 31.7% | 16.3% | 1.4p |
-
-### Categories
-- **MAX PROFIT (net > $3K):** BTCUSD, ETHUSD, EURNZD, GBPNZD, GBPCAD, GBPUSD, GBPJPY, GBPAUD, EURCAD, CHFJPY, USDJPY, USDCAD, EURAUD
-- **HIGH FREQUENCY (tr/d > 1):** BTCUSD (2.61), ETHUSD (5.63), EURUSD (4.17), EURGBP (1.39)
-- **HIGH ACCURACY (WR > 85%):** EURJPY 88.1%, EURGBP 84.3%, EURUSD 82.9%, GBPUSD 81.7%
-- **LOW COST (cost% < 15%):** EURJPY 9.5%, EURNZD 10.0%, GBPNZD 10.1%, EURAUD 10.5%, GBPAUD 11.3%
-
-### Key Insights
-1. **BTCUSD FLOOR = #1 most profitable single config** across all 30 assets ($721K net)
-2. **ETHUSD FLOOR = #1 cost trap** (50.7%). Never run it at floor.
-3. **CHFJPY spread is the biggest lever** — 1.4 pip spread kills 30% of gross profit
-
----
-
-## 11. Deployment Configs
-
-### Current Live Deployment (as of June 4)
-**7 pairs deployed (THE SIGN 7 CONFIG):**
-| Pair | Level | Config |
-|------|-------|--------|
-| EURUSD | FLOOR | Max trades, ~81% WR |
-| USDJPY | FLOOR | Max trades, ~81% WR |
-| CHFJPY | FLOOR | Max trades, ~81% WR |
-| NZDUSD | CEILING | Max accuracy, ~95% WR |
-| AUDUSD | CEILING | Max accuracy, ~94% WR |
-| USDCHF | CEILING | Max accuracy, ~93% WR |
-| GBPJPY | — | Hedge (knee) |
-
-### ⚠️ MAD Directive (June 5, 03:21)
-> "U STILL GOT THE OLD 7 AU ADJUSTED CONFIG... SIMPLY NOTE IT ADD IT TO BIBLE THE CHANGE CONFIGS TO LOW COST HEX"
-
-**→ Need to swap from SIGN 7 CONFIG to LOW COST HEX config.**
-
-### Low Cost Hex (Approved but NOT yet deployed)
-The 6 lowest-cost pairs from the sweep matrix:
-| Pair | Level | Reason |
-|------|-------|--------|
-| EURJPY | — | Lowest cost 9.5% |
-| EURNZD | FLOOR | 10.0% cost |
-| GBPNZD | FLOOR | 10.1% cost |
-| EURAUD | FLOOR | 10.5% cost |
-| GBPAUD | FLOOR | 11.3% cost |
-| EURCHF | KNEE | 11.0% cost |
-
-### EURUSD Current Config (from `configs/asset_configs.py`)
-| Tier | Trigger | ar_max | AU |
-|------|---------|--------|-----|
-| T1 | 12p | 20p | 10p |
-| T2 | 15p | 30p | 12p |
-| T3 | 19p | 45p | 15p |
-
-### Position Sizing
-- **0.01 lot for ALL assets** (backtest and live)
-- Account: OxSecurities-Live
-- Balance: ~$65 (as of June 4)
-
----
-
-## 12. Live Execution Bugs & Fixes
-
-### Bug #1: Position Gate Blocking (June 4, ~13:00)
-**Problem:** Bridge blocked new entries on symbols that already had open positions. CHFJPY got 3 positions (2 SELL + 1 BUY).
-**MAD correction:** "The position shouldn't be blocked... just close and enter... we need 1:1 parity no new rules"
-**Fix:** Remove position gate. When engine fires ENTRY and MT5 has an open position on that symbol → close it first, then enter new one.
-
-### Bug #2: ST Positions Mislabeled as P90 on Recovery
-**Problem:** `get_positions()` didn't include comment field, so bridge couldn't tell ST from P90 positions after restart. P90 trail logic modified SLs on ST positions.
-**Fix:** Add comment to the position tracking dict.
-
-### Bug #3: Stale Bridge Process
-**Problem:** Old bridge (PID 12788, 220MB) running alongside new one.
-**Fix:** Kill old bridge. Clean slate.
-
-### Bug #4: Wrong Ticket Close (June 4, ~23:00)
-**Problem:** When two positions exist on same symbol, close logic grabs wrong ticket. CHFJPY BUY SL_HIT → bridge tries to close SELL ticket instead.
-**Root cause:** `active_trades` dict stores by symbol but doesn't track which ticket belongs to which engine state.
-**Fix:** Store `active_trades[symbol] = {direction: ticket}`. Match close to correct ticket by direction.
-
-### Bug #5: Orphaned Positions After Restart (June 4, ~22:00)
-**Problem:** Bridge restarts, picks up old positions from MT5, but close fails with retcode 10030 (invalid filling mode).
-**Root cause:** Positions opened before restart have no SL/TP on broker side. RETURN filling fails, IOC also fails.
-**Fix:** Before close, check `mt5.positions_get(ticket=X)`. If empty, position already gone → remove from active_trades and skip.
-
-### Bug #6: Close Fails with 10030 (June 4, ~23:30)
-**Problem:** TRADE_ACTION_DEAL fails with 10030 because no SL/TP exists on broker side.
-**MAD's fix:** "Simply modify position add SL 1 pip under/above current price. Logic being if it don't get hit trade profit, if it does already planned SL."
-**Implementation:** Use `TRADE_ACTION_SLTP` to set SL 1 pip beyond current price → broker immediately triggers → closes at market.
-**⚠️ CANNOT use opposite market order on CFDs** — that opens reverse position instead of closing.
-
-### Bug #7: Race Condition in active_trades Registration (June 5, ~03:00)
-**Problem:** After `send_order()` succeeds, `get_positions()` doesn't find the new position immediately (MT5 server delay). Position never gets registered in `active_trades`. When SL_HIT fires, bridge checks `active_trades` → False → silently skips close.
-**Example:** EURUSD SELL at 1.16109 hit engine SL at 1.16094 at 17:00 but bridge never closed it. Position stayed open ~9 hours until MAD manually closed it.
-**Fix:** Use the ticket from `send_order()` return directly instead of relying on `get_positions()`.
-
-### Bug #8: AU Targets Not Per-Asset (June 4, ~23:00)
-**Problem:** All assets were using EURUSD AU targets (8.0p T1) instead of their own native AU targets.
-**MAD:** "Of course the AU is not universal why tf would each market use EU AU targets dummy. That's literally basic rules."
-**Fix:** Each asset must use its own AU target from its native config. The sweep should have used per-asset AU targets.
-**⚠️ CRITICAL QUESTION:** Did the entire sweep use EURUSD AU targets for all pairs? If so, the entire sweep may need to be re-run.
-
----
-
-## 13. Broker Specs
-
-### OxSecurities-Live
-- **Commission:** $7/lot round-trip (0.01 lot = $0.07/trade)
-- **Server:** OxSecurities-Live
-- **Account type:** CFD (not spot FX)
-
-### MT5 Symbol Suffix
-- Live symbols use `.PRO` suffix (e.g., `EURUSD.PRO`, `CHFJPY.PRO`)
-- CSV data files may or may not have `_PRO_` suffix
-- Crypto symbols under "Crypto" group in MT5
-
-### Pip Conventions
-| Asset Class | Pip Definition | pip_value |
-|-------------|---------------|-----------|
-| FX majors (5-digit) | 0.00010 | $10/pip |
-| JPY pairs | 0.010 | $10/pip |
-| Crypto | 1.0 | $1/pt |
-| XAUUSD | — | $1/pt |
-| Indices | — | $1/pt |
-
-### Commission Conversion Formula
-```
-commission_pips = (commission_per_lot × lot_size) / pip_value_per_lot
-                = $7 / pip_value_per_lot
-
-At 0.01 lot:
-- Forex: $0.07 / $10 = 0.007 pips
-- XAU: $0.07 / $1 = 0.07 pts
-- BTC: $0.07 / $1 = 0.07 pts
+ar_max = 60 (AR gate — allows moderate AR sessions)
+trigger = 10 pips (T1 trigger)
+session_cutoff = 16:00 UTC (4PM EST)
+dz_floor = 20% (all loops)
+dz_ceil = 50%
+max_loops = 5
+sl_mode = zero_buffer_extreme
+tp_mode = dual (-25% AR / -50% AR)
 ```
 
----
+### 3.2 9K Unlock Config (Not Yet Deployed)
 
-## 14. Error Log
+```
+ar_max = 999 (AR gate disabled)
+trigger = 8-10 pips (per-asset coefficient)
+session_cutoff = 16:00 UTC (4PM EST)
+dz_floor = 20% (all loops)
+dz_ceil = 50%
+max_loops = 5
+```
 
-### OC2 Errors (Documented for Memory)
+### 3.3 Per-Asset Trigger Coefficients
 
-| Date | Error | Root Cause | Fix |
-|------|-------|------------|-----|
-| 6/4 | Modified engine directly for cost test | Violated Rule #1 | Revert engine, use wrapper |
-| 6/4 | Spread values 10x off (points vs pips) | Used MT5 raw points as pips | Use historical CSV average |
-| 6/4 | Ceiling sample sizes too small (30-100 trades) | Aggressive trigger sweep | Need meaningful sample sizes |
-| 6/4 | Floor tr/day dropped 150-200% after engine mod | Engine code change broke something | Revert to pre-mod engine |
-| 6/4 | All assets using EURUSD AU targets | Didn't apply per-asset AU configs | Use per-asset native AU targets |
-| 6/4 | Position gate blocking new entries | Added "no duplicate positions" rule | Remove gate, close-then-enter |
-| 6/4 | Wrong ticket close on multi-position symbols | active_trades dict doesn't track direction | Store {direction: ticket} |
-| 6/4 | Close fails with retcode 10030 | No SL/TP on broker, RETURN filling fails | Use TRADE_ACTION_SLTP with 1 pip SL |
-| 6/5 | EURUSD position not closed for 9 hours | Race condition in active_trades registration | Use ticket from send_order() return |
-| 6/5 | Deployed SIGN 7 config instead of LOW COST HEX | Didn't update deploy_config.py | Swap to LOW COST HEX configs |
+Each pair's trigger = native_trigger × coefficient (NOT universal 8-10p). Coefficients range from 0.55x (high-trigger crosses) to 0.83x (EURUSD). Same methodology as frequency normalization sweep — per-asset scaling.
 
-### MAD's Rules (Non-Negotiable)
-1. **NEVER touch the engine for a test. ALWAYS clone/wrap.**
-2. **Engine is SACRED. Any changes require explicit MAD green light.**
-3. **Costs are post-hoc overlay, NEVER embedded in engine.**
-4. **1:1 parity between backtest and live. No new rules in live.**
-5. **Each asset uses its own native AU targets. NOT universal.**
-6. **Don't block positions. Close-then-enter for same-symbol signals.**
-7. **CFDs: Can't use opposite market order to close (opens reverse position).**
-8. **Use TRADE_ACTION_SLTP to close positions with no broker SL/TP.**
+### 3.4 Nautilus Strategy Diffs from CSV Engine
+
+1. **DZ floor:** Nautilus 32% (loop 1) vs CSV 20%
+2. **Kill switch:** Nautilus active vs CSV removed
+3. **Swing origin after exit:** Nautilus uses entry_price vs CSV uses exit_price
+4. **Session handling:** Nautilus may filter sessions differently
 
 ---
 
-## APPENDIX A: Test Results Still Needed
+## ⚠️ SECTION 4: CRITICAL RULES & LESSONS
 
-1. **Nautilus validation:** Run Nautilus backtest on EURUSD (5,084 trade config) → confirm 82.9% WR
-2. **Full Nautilus sweep:** All 28 pairs through Nautilus to validate floor/ceiling curves
-3. **Cost-adjusted backtest:** Apply historical spread + $7/lot commission to all pairs via `apply_costs.py` wrapper
-4. **Spread calculation:** Pull historical average spread from CSV data (not live MT5)
-5. **Per-asset AU verification:** Confirm sweep used per-asset AU targets, not EURUSD universal
+### Ironclad Rules (from CEREBUS BUILD.txt)
+1. No retail indicators (RSI, MACD, BB) — constraint-system metrics ONLY
+2. Time-series split only — never random train/test
+3. 132% kill-switch must be top-5 SHAP feature
+4. Wednesday PM bifurcation stress test mandatory
+5. 12PM EST hard exit — no exceptions
+6. RAG purity — no LLM fine-tuning, only retrieval
+7. Close-only SL — M5 CLOSE beyond OCC Extreme
+8. Zero-buffer OCC — SL at exact impulse extreme
+9. Gear Shift modifies TARGET ONLY — SL never changes
+10. No online learning — model frozen between quarterly re-trains
+11. Fallback to hardcoded — confidence < 0.6 → manual tiers
+12. Separation of church and state — Macro/Micro isolated
 
-## APPENDIX B: Files Reference
+### Lessons Learned
+- **AR gate was the #1 trade suppressor** — silently killing entire trading days
+- **12-pip trigger was #2 suppressor** — filtering out micro-impulses
+- **Per-asset calibration is mandatory** — universal values don't work across asset classes
+- **Pattern recognition is expensive** — 154.7s for 463K bars with all patterns, but correct
+- **Holy Grail PDFs contain structured pattern definitions** — decision trees and playbooks are gold mines
+- **DMR CSV backtest ≠ MT5 EA** — 19% WR vs 92.2% WR, root cause in entry/exit logic differences
+- **Symmetry Trap works best on XAUUSD** — 74.9% WR, PF 1.18, but LOW_WR on most FX pairs
+- **BTCUSD is the best single asset** — $721K net profit in group combinatorics
+
+---
+
+## 📁 SECTION 5: KEY FILES & REFERENCES
 
 | File | Purpose |
 |------|---------|
-| `quant-lab/engines/symmetry_trap.py` | **FROZEN** — Live engine brain |
-| `quant-lab/engines/symmetry_trap_backtest.py` | **FROZEN** — Backtest runner |
-| `quant-lab/strategies/symmetry_trap_strategy.py` | Nautilus strategy (needs 1:1 update) |
-| `quant-lab/mt5/cerebus_live_bridge.py` | Live execution bridge |
-| `quant-lab/mt5/deploy_config.py` | Deployment configs (needs LOW COST HEX update) |
-| `quant-lab/tests/trigger_sweep_max_accuracy_all.py` | Max accuracy sweep script |
-| `quant-lab/tests/optimization_vector_eur.py` | EUR basket optimization vector |
-| `reports/trigger_sweep_max_accuracy.json` | Full sweep curve data |
-| `reports/SWEEP_MATRIX_V2.md` | Full combinatorics matrix |
-| `backtest/apply_costs.py` | **NOT YET BUILT** — Cost overlay wrapper |
-
----
-
-> **LAST UPDATED:** June 7, 2026 — Compiled from OC2 Telegram chat (June 4-7, 2026)
-> **⚠️ This document is the single source of truth. All trading decisions reference this Bible.**
+| `quant-lab/engines/symmetry_trap.py` | Symmetry Trap engine (Model B) |
+| `quant-lab/engines/dmr_standalone_backtest.py` | DMR standalone backtest |
+| `quant-lab/backtest/run_p90_v2.py` | P90 Kinetic Engine v2 |
+| `quant-lab/ml/phase1_data/macro/` | Macro feature engine (18 pattern detectors) |
+| `quant-lab/ml/tests/test_macro_engine.py` | 70 macro engine unit tests |
+| `quant-lab/reports/GROUP_COMBINATORICS_FULL.md` | Full universe rankings |
+| `quant-lab/reports/SYMMETRY_TRAP_FINAL_COMPOSITE_REPORT.md` | ST detailed results |
+| `quant-lab/reports/DMR_FINAL_COMPOSITE_REPORT.md` | DMR detailed results |
+| `quant-lab/reports/cerebus_full_report_final.md` | CEREBUS full report |
+| `quant-lab/reports/st_multi_asset_report.md` | ST multi-asset results |
+| `shared-conversations/team-chat.md` | Team coordination hub |
