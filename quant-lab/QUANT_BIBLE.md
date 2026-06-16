@@ -430,17 +430,49 @@ Loop cap = 5 (safety max).
 |------|-----------|-------|-----------|-------|-----------|-------|-----------|-------|
 | OILUSD | 0.01 | Varies by regime | — | — | — | — | — | See 1B.3 |
 
-### 1B.3 OILUSD — Regime-Dependent AR Sizes
+### 1B.3 OILUSD — Regime-Dependent AR Sizes (in Dollars)
 
 **Source:** Phase 1B OILUSD Session Bifurcation Analysis (678 trading days)
+**Note:** OILUSD pip_value = 0.01 (1 cent). 100 pips = $1.00. All values below in dollar denomination.
 
-| Regime | Days | AR Mean (pips) | T1 Count | T2 Count | T3 Count | NO_GO Count |
-|--------|------|----------------|----------|----------|----------|-------------|
-| PRE_WAR | 198 | 29.2p | 55 | 113 | 16 | 14 |
-| WAR_ONSET | 122 | 30.9p | 39 | 61 | 15 | 7 |
-| WAR_SPIKE | 65 | 22.0p | 17 | 38 | 6 | 4 |
-| NORMALIZATION | 194 | 27.0p | 61 | 99 | 20 | 14 |
-| CURRENT | 300 | 64.9p | 117 | 133 | 26 | 24 |
+**AR Mean by Regime:**
+| Regime | Days | AR Mean | T1 Count | T2 Count | T3 Count | NO_GO Count |
+|--------|------|---------|----------|----------|----------|-------------|
+| WAR_SPIKE | 65 | 22p = **$0.22** | 17 | 38 | 6 | 4 |
+| NORMALIZATION | 194 | 27p = **$0.27** | 61 | 99 | 20 | 14 |
+| PRE_WAR | 198 | 29.2p = **$0.29** | 55 | 113 | 16 | 14 |
+| WAR_ONSET | 122 | 30.9p = **$0.31** | 39 | 61 | 15 | 7 |
+| CURRENT | 300 | 64.9p = **$0.65** | 117 | 133 | 26 | 24 |
+
+**Standard Tiers (in dollars):**
+| Tier | AR Max | AU | Trigger |
+|------|--------|-----|---------|
+| T1 | 20p = **$0.20** | 10p = $0.10 | 12p = $0.12 |
+| T2 | 30p = **$0.30** | 15p = $0.15 | 18p = $0.18 |
+| T3 | 45p = **$0.45** | 22.5p = $0.23 | 27p = $0.27 |
+| NO_GO | > 45p = **>$0.45** | Skip | — |
+
+**⚠️ CURRENT REGIME ADJUSTMENT:** OILUSD AR mean has shifted to $0.65 (64.9p), far exceeding standard T3 max of $0.45. Proposed adjusted tiers for current regime:
+
+| Tier | AR Max | AU | Trigger |
+|------|--------|-----|---------|
+| T1 | 35p = **$0.35** | 17.5p = $0.17 | 21p = $0.21 |
+| T2 | 55p = **$0.55** | 27.5p = $0.28 | 33p = $0.33 |
+| T3 | 80p = **$0.80** | 40p = $0.40 | 48p = $0.48 |
+| NO_GO | > 80p = **>$0.80** | Skip | — |
+
+**AU and Trigger at Key AR Levels (dollar denomination):**
+| AR | AU | Trigger |
+|----|-----|---------|
+| 20p ($0.20) | 10p ($0.10) | 12p ($0.12) |
+| 25p ($0.25) | 12.5p ($0.12) | 15p ($0.15) |
+| 30p ($0.30) | 15p ($0.15) | 18p ($0.18) |
+| 35p ($0.35) | 17.5p ($0.17) | 21p ($0.21) |
+| 40p ($0.40) | 20p ($0.20) | 24p ($0.24) |
+| 45p ($0.45) | 22.5p ($0.23) | 27p ($0.27) |
+| 55p ($0.55) | 27.5p ($0.28) | 33p ($0.33) |
+| 65p ($0.65) | 32.5p ($0.33) | 39p ($0.39) |
+| 80p ($0.80) | 40p ($0.40) | 48p ($0.48) |
 
 **OILUSD ST Tier Distribution (2,651 trades):**
 | Tier | Trades | WR | PnL |
@@ -448,6 +480,8 @@ Loop cap = 5 (safety max).
 | T1 | 1,067 | 73.3% | +3,795.0p |
 | T2 | 1,282 | 76.6% | +10,316.4p |
 | T3 | 302 | 75.8% | +3,555.9p |
+
+**Key Insight:** T2 is the sweet spot for OILUSD — highest total PnL (+10,316p) with 76.6% WR. The CURRENT regime (AR mean $0.65) frequently exceeds standard T3 max ($0.45), meaning many sessions are NO-GO under standard tiers. Adjusted tiers recommended for current market conditions.
 
 ### 1B.4 ST Backtest Tier Results (Per-Asset)
 
@@ -475,7 +509,7 @@ Loop cap = 5 (safety max).
 | XAUUSD | 30-100p | Metal, wide range |
 | BTCUSD | 500-3000p | Crypto, extremely wide range |
 | DE30 | 40-150p | Index, moderate range |
-| OILUSD | 22-65p | Regime-dependent (see 1B.3) |
+| OILUSD | $0.22-$0.65 | Regime-dependent (see 1B.3). CURRENT regime needs adjusted tiers. |
 
 **AU = AR / 2 (always)**
 
