@@ -9,13 +9,16 @@ from pathlib import Path
 UTC = timezone.utc
 EST = timezone(timedelta(hours=-5))
 
-OIL_PIP = 0.01  # 1 cent = 1 pip
+OIL_PIP = 0.01  # 1 cent = 1 pip in MT5 terms
+# But OILUSD price is ~$70-90, so AR in pips = AR_in_dollars / 0.01
+# e.g., AR of $2.90 = 290 pips
 
-# Adjusted tiers for OILUSD CURRENT regime (in pips, where 100 pips = $1.00)
+# Adjusted tiers for OILUSD CURRENT regime
+# In pips (where price ~$70, 1 pip = $0.01)
 TIERS = {
-    "T1": {"ar_max": 35.0, "au": 17.5, "trigger": 21.0},
-    "T2": {"ar_max": 55.0, "au": 27.5, "trigger": 33.0},
-    "T3": {"ar_max": 80.0, "au": 40.0, "trigger": 48.0},
+    "T1": {"ar_max": 350.0, "au": 175.0, "trigger": 210.0},   # AR $3.50, AU $1.75, Trig $2.10
+    "T2": {"ar_max": 550.0, "au": 275.0, "trigger": 330.0},   # AR $5.50, AU $2.75, Trig $3.30
+    "T3": {"ar_max": 800.0, "au": 400.0, "trigger": 480.0},   # AR $8.00, AU $4.00, Trig $4.80
 }
 
 def load_bars(csv_path):
