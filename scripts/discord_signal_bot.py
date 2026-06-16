@@ -36,7 +36,10 @@ TG_CHAT = os.environ.get("HERMES_TELEGRAM_CHAT_ID", "")
 SIGNALS_FILES = [
     REPO_ROOT / "quant-lab" / "mt5" / "live_logs" / "signals.jsonl",
     REPO_ROOT / "quant-lab" / "mt5" / "live_logs" / "occ_buffer_signals.jsonl",
+    REPO_ROOT / "data" / "alerts_history.json",
 ]
+
+LATEST_ALERT_FILE = REPO_ROOT / "data" / "latest_alert.txt"
 
 # Track last processed position per file
 file_positions = {}
