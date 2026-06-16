@@ -158,13 +158,13 @@ class DirectionalBias:
         self, bars: pd.DataFrame, ah: float, al: float
     ) -> Tuple[BiasDirection, Optional[str]]:
         """
-        Lens A: First M5 close outside Asian Band after 3AM EST (8 UTC).
+        Lens A: First M5 close outside Asian Band during activation window (3AM-12PM EST = 8-17 UTC).
         Returns (direction, time_string).
         """
-        # Filter bars after 3AM EST (8:00 UTC)
-        post_3am = bars[bars.index.hour >= 8]
+        # Filter bars in activation window: 3AM-12PM EST = 8:00-17:00 UTC
+        activation = bars[(bars.index.hour >= 8) & (bars.index.hour < 17)]
 
-        for idx, bar in post_3am.iterrows():
+        for idx, bar in activation.iterrows():
             close = bar["close"]
             if close > ah:
                 return BiasDirection.LONG, idx.strftime("%H:%M")
