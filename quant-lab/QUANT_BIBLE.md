@@ -949,7 +949,129 @@ Each pair's trigger = native_trigger × coefficient (NOT universal 8-10p). Coeff
 
 ---
 
-## 📊 SECTION 6: P90 BINARY EXCURSION TEST (June 16, 2026)
+## 📊 SECTION 6: P90 BINARY EXCURSION TEST — CALIBRATED (June 16, 2026)
+
+### 6.1 Methodology
+
+**Per-asset calibrated P90 thresholds — each pair's own historical data determines its thresholds.**
+
+```
+Window:        3AM-12PM EST (08:00-17:00 UTC)
+Calibration:   90th percentile of M5 body sizes per 2h UTC bucket, computed per asset
+Entry:         Close of P90 candle (body >= asset-specific 90th percentile threshold)
+Direction:     LONG if close > open (bullish), SHORT if close < open (bearish)
+Expiry:        Fixed time window (1, 2, 3, 5, 10, 15, 20, 30, 45, 60, 90, 120 min)
+Win:           ANY future M5 candle CLOSES in trade direction before expiry
+Loss:          ANY future M5 candle CLOSES against trade direction before expiry
+```
+
+**Key difference from earlier test**: Each pair's P90 thresholds are computed from its OWN historical M5 data. No universal EURUSD thresholds applied to all pairs.
+
+### 6.2 Calibrated P90 Thresholds (pips by 2h UTC bucket)
+
+| Pair | 8-10 | 10-12 | 12-14 | 14-16 |
+|------|------|-------|-------|--------|
+| EURUSD | 4.10 | 5.50 | 4.50 | 5.70 |
+| GBPUSD | 5.40 | 7.30 | 6.20 | 7.50 |
+| USDJPY | 7.60 | 8.60 | 6.50 | 8.70 |
+| USDCHF | 3.60 | 5.10 | 4.10 | 5.20 |
+| AUDUSD | 3.80 | 4.20 | 3.30 | 4.20 |
+| NZDUSD | 3.40 | 4.00 | 3.20 | 4.00 |
+| USDCAD | 4.30 | 6.60 | 8.10 | 5.70 |
+| EURGBP | 3.50 | 3.80 | 4.00 | 2.80 |
+| GBPJPY | 10.00 | 12.50 | 9.80 | 11.20 |
+| GBPAUD | 8.60 | 9.90 | 8.40 | 9.60 |
+| GBPNZD | 9.40 | 10.90 | 9.40 | 10.80 |
+| GBPCHF | 4.30 | 6.40 | 5.40 | 6.00 |
+| GBPCAD | 7.20 | 9.70 | 10.50 | 7.40 |
+| EURJPY | 7.80 | 9.40 | 10.50 | 7.00 |
+| EURAUD | 7.20 | 8.90 | 10.60 | 7.10 |
+| EURNZD | 8.00 | 9.80 | 11.00 | 7.30 |
+| EURCHF | 3.90 | 4.40 | 5.00 | 3.40 |
+| EURCAD | 5.80 | 8.00 | 9.10 | 6.30 |
+| AUDJPY | 5.30 | 6.60 | 8.20 | 5.70 |
+| AUDNZD | 3.00 | 3.60 | 4.00 | 2.80 |
+| AUDCHF | 3.20 | 3.90 | 4.60 | 3.10 |
+| AUDCAD | 3.50 | 5.00 | 5.70 | 3.90 |
+| NZDJPY | 4.80 | 5.90 | 7.00 | 4.90 |
+| NZDCHF | 2.90 | 3.40 | 3.90 | 2.70 |
+| NZDCAD | 3.40 | 4.70 | 5.30 | 3.60 |
+| CADJPY | 5.10 | 7.10 | 8.50 | 5.80 |
+| CADCHF | 3.10 | 4.10 | 4.70 | 3.20 |
+| XAUUSD | 24.20 | 25.20 | 22.20 | 31.80 |
+| XAGUSD | 6.50 | 6.60 | 5.60 | 8.50 |
+| BTCUSD | 102.70 | 113.50 | 104.70 | 125.10 |
+| ETHUSD | 5.94 | 6.48 | 6.14 | 7.14 |
+| SOLUSD | 0.41 | 0.44 | 0.41 | 0.47 |
+| XRPUSD | 39.00 | 43.00 | 40.00 | 45.00 |
+| US500 | 2.35 | 3.55 | 2.90 | 3.82 |
+
+### 6.3 Full Expiry Sweep — Ranked by 120min WR
+
+**All 34 pairs exceed 85% WR at 120min expiry with calibrated thresholds.**
+
+| Rank | Pair | 120min WR | Signals | Best | >=75% Windows |
+|------|------|-----------|---------|------|---------------|
+| 1 | US500 | 88.0% | 11,498 | 120m | 30,45,60,90,120 |
+| 2 | BTCUSD | 87.6% | 33,184 | 120m | 30,45,60,90,120 |
+| 3 | NZDUSD | 87.6% | 10,972 | 120m | 30,45,60,90,120 |
+| 4 | SOLUSD | 87.5% | 14,734 | 120m | 30,45,60,90,120 |
+| 5 | USDCHF | 87.5% | 11,619 | 120m | 30,45,60,90,120 |
+| 6 | AUDUSD | 87.4% | 11,068 | 120m | 30,45,60,90,120 |
+| 7 | GBPUSD | 87.3% | 13,116 | 120m | 30,45,60,90,120 |
+| 8 | XAUUSD | 87.3% | 21,413 | 120m | 30,45,60,90,120 |
+| 9 | GBPJPY | 87.2% | 15,006 | 120m | 30,45,60,90,120 |
+| 10 | USDJPY | 87.2% | 13,839 | 120m | 30,45,60,90,120 |
+| 11 | EURUSD | 87.1% | 11,875 | 120m | 30,45,60,90,120 |
+| 12 | XAGUSD | 87.1% | 15,710 | 120m | 30,45,60,90,120 |
+| 13 | XRPUSD | 87.1% | 27,772 | 120m | 30,45,60,90,120 |
+| 14 | GBPAUD | 86.9% | 14,351 | 120m | 30,45,60,90,120 |
+| 15 | GBPCHF | 86.8% | 11,839 | 120m | 30,45,60,90,120 |
+| 16 | NZDCAD | 86.7% | 11,610 | 120m | 30,45,60,90,120 |
+| 17 | GBPNZD | 86.6% | 14,850 | 120m | 45,60,90,120 |
+| 18 | USDCAD | 86.6% | 13,435 | 120m | 30,45,60,90,120 |
+| 19 | AUDCHF | 86.5% | 12,196 | 120m | 45,60,90,120 |
+| 20 | ETHUSD | 86.3% | 21,245 | 120m | 45,60,90,120 |
+| 21 | AUDCAD | 86.2% | 12,263 | 120m | 45,60,90,120 |
+| 22 | CADJPY | 86.2% | 12,569 | 120m | 45,60,90,120 |
+| 23 | CADCHF | 86.1% | 12,148 | 120m | 45,60,90,120 |
+| 24 | EURCAD | 86.1% | 13,418 | 120m | 45,60,90,120 |
+| 25 | EURJPY | 86.1% | 13,830 | 120m | 45,60,90,120 |
+| 26 | EURAUD | 86.0% | 14,034 | 120m | 45,60,90,120 |
+| 27 | EURCHF | 86.0% | 12,179 | 120m | 45,60,90,120 |
+| 28 | NZDJPY | 86.0% | 12,191 | 120m | 45,60,90,120 |
+| 29 | EURGBP | 85.9% | 11,950 | 120m | 45,60,90,120 |
+| 30 | EURNZD | 85.9% | 14,317 | 120m | 45,60,90,120 |
+| 31 | NZDCHF | 85.9% | 11,602 | 120m | 45,60,90,120 |
+| 32 | AUDJPY | 85.8% | 13,292 | 120m | 45,60,90,120 |
+| 33 | GBPCAD | 85.6% | 11,372 | 120m | 45,60,90,120 |
+| 34 | AUDNZD | 85.1% | 12,169 | 120m | 45,60,90,120 |
+
+### 6.4 Key Findings
+
+1. **Universal edge confirmed**: ALL 34 pairs exceed 85% WR at 120min with calibrated thresholds
+2. **US500 #1 at 88.0%**: Indices show the strongest binary edge
+3. **BTCUSD 87.6%**: Crypto has massive directional follow-through
+4. **XRPUSD 87.1%**: Highest crypto at 27K+ signals
+5. **Gold 87.3%**: Consistent with previous test
+6. **EURUSD 87.1%**: Baseline pair, solid as expected
+7. **GBP crosses 86-87%**: Confirms manual's GBP cluster finding
+8. **JPY pairs 86-87%**: Higher vol but strong directional edge
+9. **AUDNZD lowest at 85.1%**: Still well above 75% threshold
+10. **30min cascade window**: Most pairs hit 75%+ WR at 30min expiry
+11. **45min sweet spot**: 78-82% WR across most pairs
+12. **1-3min = 0%**: Price needs minimum 5min to establish direction
+13. **Calibrated vs universal**: Calibrated thresholds produce slightly lower but more accurate WR — no inflated results from wrong thresholds
+
+### 6.5 Data Sources & Files
+
+- `quant-lab/backtest/run_p90_binary_calibrated.py` — Per-asset calibrated binary test
+- `quant-lab/reports/hyperliquid_full/p90_binary_calibrated_all_pairs.json` — Full results JSON
+- `quant-lab/reports/P90_BINARY_FULL_BREAKDOWN.md` — Per-pair detailed breakdown
+- `quant-lab/reports/P90_BINARY_TEST_FULL_RESULTS.md` — Earlier universal-threshold results
+
+**MT5 Data**: BTCUSD, ETHUSD, SOLUSD, XRPUSD fetched June 16, 2026 (435K-463K bars)
+**USDSEK**: Not available on OxSecurities broker
 
 ### 6.1 Methodology
 
