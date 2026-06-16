@@ -1,24 +1,19 @@
 """
-DISCORD SIGNAL BOT — Symmetry Trap Signal Forwarder
-====================================================
-Watches signal files and forwards to Discord via webhook.
-Also sends to Telegram (dual broadcast).
+DISCORD SIGNAL BOT — CEREBUS Scanner Forwarder
+==============================================
+Watches scanner alert files and forwards to Discord.
+Sends at regime check times: 3AM, 6AM, 9AM, 12PM EST.
 
 Usage:
     python scripts/discord_signal_bot.py              # run continuously
     python scripts/discord_signal_bot.py --once       # send latest and exit
     python scripts/discord_signal_bot.py --test       # send test message
-
-Environment variables (in .env):
-    DISCORD_WEBHOOK_URL — Discord webhook URL for the channel
-    HERMES_TELEGRAM_TOKEN — Telegram bot token
-    HERMES_TELEGRAM_CHAT_ID — Telegram chat ID
 """
 import os, sys, json, time, requests
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).parent.parent
 ENV_PATH = REPO_ROOT / ".env"
 
 # Load .env
@@ -30,19 +25,20 @@ if ENV_PATH.exists():
             os.environ.setdefault(k.strip(), v.strip())
 
 DISCORD_WEBHOOK = os.environ.get("DISCORD_WEBHOOK_URL", "")
-TG_TOKEN = os.environ.get("HERMES_TELEGRAM_TOKEN", "")
-TG_CHAT = os.environ.get("HERMES_TELEGRAM_CHAT_ID", "")
 
 SIGNALS_FILES = [
-    REPO_ROOT / "quant-lab" / "mt5" / "live_logs" / "signals.jsonl",
-    REPO_ROOT / "quant-lab" / "mt5" / "live_logs" / "occ_buffer_signals.jsonl",
     REPO_ROOT / "data" / "alerts_history.json",
 ]
 
 LATEST_ALERT_FILE = REPO_ROOT / "data" / "latest_alert.txt"
 
-# Track last processed position per file
+# Track last processed count per file
 file_positions = {}
+
+EST = timezone(timedelta(hours=-5))
+
+# Regime check times (EST): 3AM, 6AM, 9AM, 12PM
+CHECK_HOURS = [3, 6, 9, 12]
 
 
 def send_discord(message: str):
@@ -58,53 +54,26 @@ def send_discord(message: str):
         return False
 
 
-def send_telegram(message: str):
-    """Send message to Telegram."""
-    if not TG_TOKEN or not TG_CHAT:
-        print("[TG] No token/chat_id set, skipping")
-        return False
-    try:
-        url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
-        resp = requests.post(url, json={"chat_id": TG_CHAT, "text": message, "parse_mode": "HTML"}, timeout=10)
-        return resp.ok
-    except Exception as e:
-        print(f"[TG] Error: {e}")
-        return False
+def format_alert(alert: dict) -> str:
+    """Format a CEREBUS alert dict into a Discord message."""
+    symbol = alert.get("symbol", "?")
+    direction = alert.get("direction", "?")
+    confidence = alert.get("confidence", 0)
+    pathway = alert.get("pathway", "?")
+    regime = alert.get("regime", "?")
+    regime_ratio = alert.get("regime_ratio", 0)
+    asian_range = alert.get("asian_range_pips", 0)
+    timestamp = alert.get("timestamp", datetime.now(EST).strftime("%Y-%m-%d %H:%M"))
 
+    emoji = "🟢" if direction == "LONG" else "🔴" if direction == "SHORT" else "📡"
 
-def format_signal(sig: dict) -> str:
-    """Format a signal dict into a readable message."""
-    sig_type = sig.get("type", "UNKNOWN")
-    symbol = sig.get("symbol", "?")
-    direction = sig.get("direction", "?")
-    entry = sig.get("entry", 0)
-    sl = sig.get("sl", 0)
-    tp = sig.get("tp", 0)
-    tier = sig.get("tier", "?")
-    sl_type = sig.get("sl_type", "OCC+BUFFER")
-    timestamp = sig.get("time", datetime.now().strftime("%Y-%m-%d %H:%M"))
-
-    if sig_type == "ENTRY":
-        emoji = "🟢" if direction == "LONG" else "🔴"
-        return (
-            f"{emoji} **{sig_type}** — {symbol}\n"
-            f"Direction: **{direction}** | Tier: **{tier}**\n"
-            f"Entry: `{entry:.1f}` | SL: `{sl:.1f}` | TP: `{tp:.1f}`\n"
-            f"SL Type: {sl_type}\n"
-            f"Time: {timestamp}"
-        )
-    elif sig_type in ("TP_HIT", "SL_HIT"):
-        emoji = "✅" if sig_type == "TP_HIT" else "❌"
-        pnl = sig.get("pnl_pips", 0)
-        return (
-            f"{emoji} **{sig_type}** — {symbol} {direction}\n"
-            f"PnL: {pnl:+.1f} pips\n"
-            f"Time: {timestamp}"
-        )
-    elif sig_type == "KILL_SWITCH":
-        return f"⚠️ **KILL SWITCH** — {symbol} {direction}\nTime: {timestamp}"
-    else:
-        return f"📡 **{sig_type}** — {symbol}\n{json.dumps(sig, indent=2)[:500]}"
+    return (
+        f"{emoji} **CEREBUS SCAN** — {symbol}\n"
+        f"Direction: **{direction}** | Confidence: **{confidence:.0%}**\n"
+        f"Pathway: {pathway} | Regime: {regime} ({regime_ratio:.2f}x)\n"
+        f"Asian Range: {asian_range:.1f} pips\n"
+        f"Time: {timestamp} EST"
+    )
 
 
 def scan_files():
@@ -114,79 +83,83 @@ def scan_files():
         if not fpath.exists():
             continue
         fkey = str(fpath)
-        last_pos = file_positions.get(fkey, 0)
+        last_count = file_positions.get(fkey, 0)
 
         try:
             with open(fpath, "r", encoding="utf-8") as f:
-                f.seek(last_pos)
-                for line in f:
-                    line = line.strip()
-                    if not line:
-                        continue
-                    try:
-                        sig = json.loads(line)
-                        new_signals.append(sig)
-                    except json.JSONDecodeError:
-                        pass
-                file_positions[fkey] = f.tell()
+                content = f.read().strip()
+                if not content:
+                    continue
+                data = json.loads(content)
+                if isinstance(data, list):
+                    new_entries = data[last_count:]
+                    for entry in new_entries:
+                        if isinstance(entry, dict):
+                            new_signals.append(entry)
+                    file_positions[fkey] = len(data)
         except Exception as e:
             print(f"[SCANNER] Error reading {fpath}: {e}")
-
     return new_signals
+
+
+def should_send_now():
+    """Check if current EST time is a regime check time."""
+    now_est = datetime.now(EST)
+    return now_est.hour in CHECK_HOURS
 
 
 def main():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("--once", action="store_true", help="Send latest signal and exit")
-    parser.add_argument("--test", action="store_true", help="Send test message and exit")
+    parser.add_argument("--once", action="store_true", help="Send latest and exit")
+    parser.add_argument("--test", action="store_true", help="Send test and exit")
     args = parser.parse_args()
 
     print("=" * 60)
-    print("  DISCORD SIGNAL BOT — Symmetry Trap")
+    print("  DISCORD SIGNAL BOT — CEREBUS Scanner")
     print("=" * 60)
     print(f"  Discord webhook: {'SET' if DISCORD_WEBHOOK else 'NOT SET'}")
-    print(f"  Telegram: {'SET' if TG_TOKEN and TG_CHAT else 'NOT SET'}")
-    print(f"  Signal files: {[str(f.name) for f in SIGNALS_FILES]}")
+    print(f"  Check times: 3AM, 6AM, 9AM, 12PM EST")
     print("=" * 60)
 
     if args.test:
-        msg = "🟢 **TEST SIGNAL** — Bot is online and ready!\nTime: " + datetime.now().strftime("%H:%M:%S")
+        msg = "🟢 **CEREBUS BOT TEST** — Online!\nTime: " + datetime.now(EST).strftime("%H:%M:%S EST")
         send_discord(msg)
-        send_telegram(msg)
-        print("Test message sent.")
+        print("Test sent to Discord.")
         return
 
     if args.once:
         signals = scan_files()
-        if signals:
-            for sig in signals[-5:]:  # last 5 signals
-                msg = format_signal(sig)
-                send_discord(msg)
-                send_telegram(msg)
-                print(f"Sent: {sig.get('type', '?')} {sig.get('symbol', '?')}")
-        else:
-            print("No new signals found.")
+        for sig in signals[-5:]:
+            send_discord(format_alert(sig))
+        print(f"Sent {len(signals[-5:])} signals.")
         return
 
-    # Continuous mode
-    print("\n[SCANNER] Watching for new signals... (Ctrl+C to stop)")
+    print("\n[BOT] Watching... sends at 3AM, 6AM, 9AM, 12PM EST")
+    last_sent_hour = -1
+
     while True:
         try:
-            signals = scan_files()
-            for sig in signals:
-                msg = format_signal(sig)
-                send_discord(msg)
-                send_telegram(msg)
-                print(f"[{datetime.now().strftime('%H:%M:%S')}] {sig.get('type', '?')} {sig.get('symbol', '?')} {sig.get('direction', '?')}")
+            now_est = datetime.now(EST)
+            current_hour = now_est.hour
 
-            time.sleep(30)  # Check every 30 seconds
+            if should_send_now() and current_hour != last_sent_hour:
+                signals = scan_files()
+                if signals:
+                    for sig in signals:
+                        send_discord(format_alert(sig))
+                        print(f"[{now_est.strftime('%H:%M')}] {sig.get('symbol')} {sig.get('direction')} {sig.get('confidence', 0):.0%}")
+                last_sent_hour = current_hour
+            elif current_hour not in CHECK_HOURS:
+                last_sent_hour = -1
+
+            time.sleep(60)
 
         except KeyboardInterrupt:
-            print("\n[SCANNER] Stopped.")
+            print("\n[BOT] Stopped.")
             break
         except Exception as e:
-            print(f"[SCANNER] Error: {e}")
+            print(f"[BOT] Error: {e}")
             time.sleep(60)
 
 
