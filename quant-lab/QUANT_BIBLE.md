@@ -15,7 +15,7 @@
 - ✅ AU targets verified: per-asset (NOT universal EURUSD)
 - ✅ 8 live execution bugs identified and documented
 - ✅ Nautilus strategy diff documented (4 diffs from CSV engine)
-- ✅ Symmetry Trap multi-asset backtest complete (18 assets, 11,437 trades)
+- ✅ Symmetry Trap multi-asset backtest complete (19 assets, 14,088 trades incl. OILUSD)
 - ✅ DMR standalone backtest complete (4Y, 284 trades)
 - ✅ P90 Kinetic Engine 4Y backtest complete (1,038 trades, 78.7% WR, PF 3.09)
 - ✅ Group combinatorics complete (36 pairs ranked by net profit)
@@ -405,12 +405,13 @@ Loop cap = 5 (safety max).
 
 **Long vs Short:** Balanced (exact split depends on session direction)
 
-### 2.3 Symmetry Trap — Multi-Asset (18 Assets)
+### 2.3 Symmetry Trap — Multi-Asset (19 Assets)
 
-**Total: 11,437 trades | +7,009.9 pips**
+**Total: 14,088 trades | +24,677.2 pips** (including OILUSD)
 
 | Asset | Trades | WR% | PnL (pips) | PF | Sharpe | MaxDD |
 |-------|--------|-----|------------|----|--------|-------|
+| OILUSD | 2,651 | 75.2% | +17,667.3 | 6.54 | 9.06 | 89.7 |
 | BTCUSD | 582 | 22.3% | +6,525.0 | 1.14 | 0.65 | 3,905.7 |
 | DE30 | 986 | 37.1% | +2,062.6 | 1.20 | 1.11 | 560.9 |
 | XAUUSD | 366 | 74.9% | +1,511.3 | 1.18 | 0.93 | 720.1 |
@@ -431,12 +432,83 @@ Loop cap = 5 (safety max).
 | US500 | 303 | 25.7% | -782.3 | 0.64 | -3.11 | 886.1 |
 | HK50 | 183 | 13.7% | -1,537.9 | 0.65 | -2.16 | 1,707.0 |
 
-**Aggregate Tier Summary:**
+**Aggregate Tier Summary (18 assets, ex-OILUSD):**
 | Tier | Total Trades | Avg WR% | Total PnL |
 |------|-------------|---------|-----------|
 | T1 | 5,709 | 40.0% | +2,961.4p |
 | T2 | 3,196 | 33.6% | +2,678.0p |
 | T3 | 2,532 | 31.3% | +1,370.5p |
+
+### 2.3b OILUSD — Symmetry Trap Deep Dive
+
+**Data:** 2,651 trades | **Engine:** Symmetry Trap (Regime-Adaptive) | **Generated:** 2026-06-01
+
+| Metric | Value |
+|--------|-------|
+| **Total Trades** | **2,651** |
+| **Win Rate** | **75.2%** |
+| **Profit Factor** | **6.54** |
+| **Total PnL** | **+17,667.3 pips** |
+| **Max Drawdown** | **89.7 pips (0.1%)** |
+| **Expectancy** | **6.66 pips/trade** |
+| **Sharpe** | **9.06** |
+| **Sortino** | **15.24** |
+
+**Monte Carlo (10,000 Simulations):**
+| Metric | Value |
+|--------|-------|
+| Equity P5 | +16,696.7 pips |
+| Equity P25 | +17,251.7 pips |
+| Equity Median | +17,656.1 pips |
+| Equity P75 | +18,065.0 pips |
+| Equity P95 | +18,668.2 pips |
+| Max DD Median | 72.0 pips |
+| Max DD P95 | 99.0 pips |
+| Ruin (10%) | 0.0% |
+| Ruin (20%) | 0.0% |
+| Ruin (30%) | 0.0% |
+| Kelly | 0.606 |
+| Half-Kelly | 0.303 |
+
+**Regime Breakdown:**
+| Regime | Trades | WR | PnL | PF |
+|--------|--------|-----|------|-----|
+| PRE_WAR | 608 | 74.5% | +2,930.0p | 4.36 |
+| WAR_ONSET | 395 | 74.2% | +2,171.3p | 5.08 |
+| WAR_SPIKE | 230 | 68.3% | +793.9p | 4.25 |
+| NORMALIZATION | 566 | 73.3% | +3,025.0p | 8.08 |
+
+### 2.3c OILUSD — 132% Realignment Trigger (Bifurcation Analysis)
+
+**Source:** Holy Grail PDF — Phase 1B OILUSD Session Bifurcation Analysis (678 trading days)
+
+**Key Findings:**
+| Metric | Value |
+|--------|-------|
+| Total Trading Days | 678 |
+| Bifurcation Rate | 51.5% (Asian Range ≠ London Open) |
+| **132% Trigger Success** | **98.0%** (expected ~70%, achieved 98%) |
+| Asian Open Predictive | 77.4% containment rate |
+| London Dominance | London 132% hits first 63.3% of time during bifurcation |
+| Perfect Target Clustering | -25% and -50% within 10 pips 100% of time when aligned |
+| Monday London Weekly Bias | 55.0% reach -168% by Friday, 65.1% reach -100% |
+
+**Session Definitions (EST):**
+| Session | Time | Duration |
+|---------|------|----------|
+| Asian Range | 7:00 PM - 3:00 AM | 8 hours |
+| London Open | 2:00 AM - 6:00 AM | 4 hours |
+| Asian Open Range | 6:00 PM - 9:30 PM | 3.5 hours |
+| Monday London | Mon 3:00 AM - 11:00 AM | 8 hours |
+| NY-AM | 6:00 AM - 9:00 AM | 3 hours |
+| NY-PM | 9:00 AM - 11:00 AM | 2 hours |
+| Black Zone | 12:00 PM - 7:00 PM | 7 hours |
+
+**Cross-Asset Validation (EUR/USD, OIL/USD, ETH/USD):**
+- 132% invalidation is universal: 70-75% violation rate
+- -25% and -50% targets: >89% hit rate across all markets
+- OIL/USD: 98% hit rate on 132% realignment trigger during bifurcation
+- 1,401 sessions analyzed
 
 ### 2.4 DMR (Deep Mean Reversion) — 4Y EURUSD (2023-07 to 2026-05)
 
@@ -683,6 +755,8 @@ Each pair's trigger = native_trigger × coefficient (NOT universal 8-10p). Coeff
 - **DMR CSV backtest ≠ MT5 EA** — 19% WR vs 92.2% WR, root cause in entry/exit logic differences
 - **Symmetry Trap works best on XAUUSD** — 74.9% WR, PF 1.18, but LOW_WR on most FX pairs
 - **BTCUSD is the best single asset** — $721K net profit in group combinatorics
+- **OILUSD is the best ST performer** — 75.2% WR, PF 6.54, Sharpe 9.06, 0% ruin rate
+- **OILUSD 132% realignment trigger: 98% hit rate** during bifurcation (Holy Grail PDF validated)
 
 ---
 
