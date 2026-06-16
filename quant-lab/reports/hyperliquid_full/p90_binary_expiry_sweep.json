@@ -1,0 +1,5644 @@
+{
+  "EURUSD": {
+    "best_expiry": 10,
+    "best_wr": 48.122105985251245,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 5832,
+        "wins": 2767,
+        "losses": 3001,
+        "timeouts": 64,
+        "wr": 48.0
+      },
+      "10": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3025,
+        "timeouts": 1,
+        "wr": 48.1
+      },
+      "15": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      },
+      "20": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      },
+      "25": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      },
+      "30": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      },
+      "35": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      },
+      "40": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      },
+      "45": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      },
+      "50": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      },
+      "55": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      },
+      "60": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      },
+      "65": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      },
+      "70": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      },
+      "75": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      },
+      "80": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      },
+      "85": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      },
+      "90": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      },
+      "95": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      },
+      "100": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      },
+      "105": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      },
+      "110": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      },
+      "115": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      },
+      "120": {
+        "signals": 5832,
+        "wins": 2806,
+        "losses": 3026,
+        "timeouts": 0,
+        "wr": 48.1
+      }
+    },
+    "thresholds": {
+      "2": 2.9,
+      "4": 5.3,
+      "6": 5.0,
+      "8": 4.5,
+      "10": 6.9
+    }
+  },
+  "GBPUSD": {
+    "best_expiry": 5,
+    "best_wr": 48.78987898789879,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 5518,
+        "wins": 2661,
+        "losses": 2793,
+        "timeouts": 64,
+        "wr": 48.8
+      },
+      "10": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "15": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "20": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "25": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "30": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "35": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "40": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "45": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "50": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "55": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "60": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "65": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "70": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "75": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "80": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "85": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "90": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "95": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "100": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "105": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "110": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "115": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "120": {
+        "signals": 5518,
+        "wins": 2692,
+        "losses": 2826,
+        "timeouts": 0,
+        "wr": 48.8
+      }
+    },
+    "thresholds": {
+      "2": 3.6,
+      "4": 7.1,
+      "6": 6.7,
+      "8": 6.3,
+      "10": 8.7
+    }
+  },
+  "USDCHF": {
+    "best_expiry": 25,
+    "best_wr": 49.068554396423245,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 5368,
+        "wins": 2587,
+        "losses": 2694,
+        "timeouts": 87,
+        "wr": 49.0
+      },
+      "10": {
+        "signals": 5368,
+        "wins": 2633,
+        "losses": 2734,
+        "timeouts": 1,
+        "wr": 49.1
+      },
+      "15": {
+        "signals": 5368,
+        "wins": 2633,
+        "losses": 2734,
+        "timeouts": 1,
+        "wr": 49.1
+      },
+      "20": {
+        "signals": 5368,
+        "wins": 2633,
+        "losses": 2734,
+        "timeouts": 1,
+        "wr": 49.1
+      },
+      "25": {
+        "signals": 5368,
+        "wins": 2634,
+        "losses": 2734,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "30": {
+        "signals": 5368,
+        "wins": 2634,
+        "losses": 2734,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "35": {
+        "signals": 5368,
+        "wins": 2634,
+        "losses": 2734,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "40": {
+        "signals": 5368,
+        "wins": 2634,
+        "losses": 2734,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "45": {
+        "signals": 5368,
+        "wins": 2634,
+        "losses": 2734,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "50": {
+        "signals": 5368,
+        "wins": 2634,
+        "losses": 2734,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "55": {
+        "signals": 5368,
+        "wins": 2634,
+        "losses": 2734,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "60": {
+        "signals": 5368,
+        "wins": 2634,
+        "losses": 2734,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "65": {
+        "signals": 5368,
+        "wins": 2634,
+        "losses": 2734,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "70": {
+        "signals": 5368,
+        "wins": 2634,
+        "losses": 2734,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "75": {
+        "signals": 5368,
+        "wins": 2634,
+        "losses": 2734,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "80": {
+        "signals": 5368,
+        "wins": 2634,
+        "losses": 2734,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "85": {
+        "signals": 5368,
+        "wins": 2634,
+        "losses": 2734,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "90": {
+        "signals": 5368,
+        "wins": 2634,
+        "losses": 2734,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "95": {
+        "signals": 5368,
+        "wins": 2634,
+        "losses": 2734,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "100": {
+        "signals": 5368,
+        "wins": 2634,
+        "losses": 2734,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "105": {
+        "signals": 5368,
+        "wins": 2634,
+        "losses": 2734,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "110": {
+        "signals": 5368,
+        "wins": 2634,
+        "losses": 2734,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "115": {
+        "signals": 5368,
+        "wins": 2634,
+        "losses": 2734,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "120": {
+        "signals": 5368,
+        "wins": 2634,
+        "losses": 2734,
+        "timeouts": 0,
+        "wr": 49.1
+      }
+    },
+    "thresholds": {
+      "2": 2.4,
+      "4": 4.8,
+      "6": 4.5,
+      "8": 4.0,
+      "10": 6.3
+    }
+  },
+  "USDJPY": {
+    "best_expiry": 5,
+    "best_wr": 49.853971962616825,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 6899,
+        "wins": 3414,
+        "losses": 3434,
+        "timeouts": 51,
+        "wr": 49.9
+      },
+      "10": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3463,
+        "timeouts": 2,
+        "wr": 49.8
+      },
+      "15": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3464,
+        "timeouts": 1,
+        "wr": 49.8
+      },
+      "20": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3464,
+        "timeouts": 1,
+        "wr": 49.8
+      },
+      "25": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3465,
+        "timeouts": 0,
+        "wr": 49.8
+      },
+      "30": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3465,
+        "timeouts": 0,
+        "wr": 49.8
+      },
+      "35": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3465,
+        "timeouts": 0,
+        "wr": 49.8
+      },
+      "40": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3465,
+        "timeouts": 0,
+        "wr": 49.8
+      },
+      "45": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3465,
+        "timeouts": 0,
+        "wr": 49.8
+      },
+      "50": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3465,
+        "timeouts": 0,
+        "wr": 49.8
+      },
+      "55": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3465,
+        "timeouts": 0,
+        "wr": 49.8
+      },
+      "60": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3465,
+        "timeouts": 0,
+        "wr": 49.8
+      },
+      "65": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3465,
+        "timeouts": 0,
+        "wr": 49.8
+      },
+      "70": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3465,
+        "timeouts": 0,
+        "wr": 49.8
+      },
+      "75": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3465,
+        "timeouts": 0,
+        "wr": 49.8
+      },
+      "80": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3465,
+        "timeouts": 0,
+        "wr": 49.8
+      },
+      "85": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3465,
+        "timeouts": 0,
+        "wr": 49.8
+      },
+      "90": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3465,
+        "timeouts": 0,
+        "wr": 49.8
+      },
+      "95": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3465,
+        "timeouts": 0,
+        "wr": 49.8
+      },
+      "100": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3465,
+        "timeouts": 0,
+        "wr": 49.8
+      },
+      "105": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3465,
+        "timeouts": 0,
+        "wr": 49.8
+      },
+      "110": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3465,
+        "timeouts": 0,
+        "wr": 49.8
+      },
+      "115": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3465,
+        "timeouts": 0,
+        "wr": 49.8
+      },
+      "120": {
+        "signals": 6899,
+        "wins": 3434,
+        "losses": 3465,
+        "timeouts": 0,
+        "wr": 49.8
+      }
+    },
+    "thresholds": {
+      "2": 6.4,
+      "4": 8.8,
+      "6": 7.4,
+      "8": 6.6,
+      "10": 10.4
+    }
+  },
+  "AUDUSD": {
+    "best_expiry": 15,
+    "best_wr": 48.62370723945903,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 6285,
+        "wins": 2998,
+        "losses": 3181,
+        "timeouts": 106,
+        "wr": 48.5
+      },
+      "10": {
+        "signals": 6285,
+        "wins": 3055,
+        "losses": 3228,
+        "timeouts": 2,
+        "wr": 48.6
+      },
+      "15": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "20": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "25": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "30": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "35": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "40": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "45": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "50": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "55": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "60": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "65": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "70": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "75": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "80": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "85": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "90": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "95": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "100": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "105": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "110": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "115": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "120": {
+        "signals": 6285,
+        "wins": 3056,
+        "losses": 3229,
+        "timeouts": 0,
+        "wr": 48.6
+      }
+    },
+    "thresholds": {
+      "2": 3.2,
+      "4": 4.3,
+      "6": 3.7,
+      "8": 3.3,
+      "10": 5.1
+    }
+  },
+  "NZDUSD": {
+    "best_expiry": 5,
+    "best_wr": 50.07037297677692,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 5773,
+        "wins": 2846,
+        "losses": 2838,
+        "timeouts": 89,
+        "wr": 50.1
+      },
+      "10": {
+        "signals": 5773,
+        "wins": 2887,
+        "losses": 2881,
+        "timeouts": 5,
+        "wr": 50.1
+      },
+      "15": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2884,
+        "timeouts": 1,
+        "wr": 50.0
+      },
+      "20": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2884,
+        "timeouts": 1,
+        "wr": 50.0
+      },
+      "25": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2884,
+        "timeouts": 1,
+        "wr": 50.0
+      },
+      "30": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2884,
+        "timeouts": 1,
+        "wr": 50.0
+      },
+      "35": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2884,
+        "timeouts": 1,
+        "wr": 50.0
+      },
+      "40": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2884,
+        "timeouts": 1,
+        "wr": 50.0
+      },
+      "45": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2884,
+        "timeouts": 1,
+        "wr": 50.0
+      },
+      "50": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2884,
+        "timeouts": 1,
+        "wr": 50.0
+      },
+      "55": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2884,
+        "timeouts": 1,
+        "wr": 50.0
+      },
+      "60": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2885,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "65": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2885,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "70": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2885,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "75": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2885,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "80": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2885,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "85": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2885,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "90": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2885,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "95": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2885,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "100": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2885,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "105": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2885,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "110": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2885,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "115": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2885,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "120": {
+        "signals": 5773,
+        "wins": 2888,
+        "losses": 2885,
+        "timeouts": 0,
+        "wr": 50.0
+      }
+    },
+    "thresholds": {
+      "2": 2.8,
+      "4": 4.0,
+      "6": 3.5,
+      "8": 3.2,
+      "10": 4.8
+    }
+  },
+  "CHFJPY": {
+    "best_expiry": 5,
+    "best_wr": 47.37462133961629,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 5981,
+        "wins": 2815,
+        "losses": 3127,
+        "timeouts": 39,
+        "wr": 47.4
+      },
+      "10": {
+        "signals": 5981,
+        "wins": 2831,
+        "losses": 3149,
+        "timeouts": 1,
+        "wr": 47.3
+      },
+      "15": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "20": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "25": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "30": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "35": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "40": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "45": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "50": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "55": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "60": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "65": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "70": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "75": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "80": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "85": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "90": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "95": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "100": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "105": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "110": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "115": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "120": {
+        "signals": 5981,
+        "wins": 2832,
+        "losses": 3149,
+        "timeouts": 0,
+        "wr": 47.3
+      }
+    },
+    "thresholds": {
+      "2": 6.2,
+      "4": 10.0,
+      "6": 9.1,
+      "8": 7.6,
+      "10": 10.3
+    }
+  },
+  "GBPJPY": {
+    "best_expiry": 15,
+    "best_wr": 49.15307899319297,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 6317,
+        "wins": 3089,
+        "losses": 3197,
+        "timeouts": 31,
+        "wr": 49.1
+      },
+      "10": {
+        "signals": 6317,
+        "wins": 3104,
+        "losses": 3212,
+        "timeouts": 1,
+        "wr": 49.1
+      },
+      "15": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "20": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "25": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "30": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "35": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "40": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "45": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "50": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "55": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "60": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "65": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "70": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "75": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "80": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "85": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "90": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "95": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "100": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "105": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "110": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "115": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "120": {
+        "signals": 6317,
+        "wins": 3105,
+        "losses": 3212,
+        "timeouts": 0,
+        "wr": 49.2
+      }
+    },
+    "thresholds": {
+      "2": 7.8,
+      "4": 12.4,
+      "6": 11.0,
+      "8": 9.8,
+      "10": 12.3
+    }
+  },
+  "GBPAUD": {
+    "best_expiry": 10,
+    "best_wr": 48.80932556203164,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 6005,
+        "wins": 2906,
+        "losses": 3052,
+        "timeouts": 47,
+        "wr": 48.8
+      },
+      "10": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "15": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "20": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "25": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "30": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "35": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "40": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "45": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "50": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "55": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "60": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "65": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "70": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "75": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "80": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "85": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "90": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "95": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "100": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "105": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "110": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "115": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "120": {
+        "signals": 6005,
+        "wins": 2931,
+        "losses": 3074,
+        "timeouts": 0,
+        "wr": 48.8
+      }
+    },
+    "thresholds": {
+      "2": 7.0,
+      "4": 10.1,
+      "6": 9.0,
+      "8": 8.4,
+      "10": 10.5
+    }
+  },
+  "GBPNZD": {
+    "best_expiry": 5,
+    "best_wr": 49.105253030594575,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 5240,
+        "wins": 2552,
+        "losses": 2645,
+        "timeouts": 43,
+        "wr": 49.1
+      },
+      "10": {
+        "signals": 5240,
+        "wins": 2571,
+        "losses": 2666,
+        "timeouts": 3,
+        "wr": 49.1
+      },
+      "15": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "20": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "25": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "30": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "35": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "40": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "45": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "50": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "55": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "60": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "65": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "70": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "75": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "80": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "85": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "90": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "95": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "100": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "105": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "110": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "115": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "120": {
+        "signals": 5240,
+        "wins": 2572,
+        "losses": 2668,
+        "timeouts": 0,
+        "wr": 49.1
+      }
+    },
+    "thresholds": {
+      "2": 7.4,
+      "4": 11.0,
+      "6": 10.1,
+      "8": 9.2,
+      "10": 12.3
+    }
+  },
+  "GBPCHF": {
+    "best_expiry": 5,
+    "best_wr": 48.34254143646409,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 4747,
+        "wins": 2275,
+        "losses": 2431,
+        "timeouts": 41,
+        "wr": 48.3
+      },
+      "10": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2454,
+        "timeouts": 1,
+        "wr": 48.3
+      },
+      "15": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      },
+      "20": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      },
+      "25": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      },
+      "30": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      },
+      "35": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      },
+      "40": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      },
+      "45": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      },
+      "50": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      },
+      "55": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      },
+      "60": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      },
+      "65": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      },
+      "70": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      },
+      "75": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      },
+      "80": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      },
+      "85": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      },
+      "90": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      },
+      "95": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      },
+      "100": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      },
+      "105": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      },
+      "110": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      },
+      "115": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      },
+      "120": {
+        "signals": 4747,
+        "wins": 2292,
+        "losses": 2455,
+        "timeouts": 0,
+        "wr": 48.3
+      }
+    },
+    "thresholds": {
+      "2": 2.7,
+      "4": 6.1,
+      "6": 5.9,
+      "8": 5.3,
+      "10": 6.5
+    }
+  },
+  "EURGBP": {
+    "best_expiry": 15,
+    "best_wr": 48.99583639480774,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 8166,
+        "wins": 3945,
+        "losses": 4107,
+        "timeouts": 114,
+        "wr": 49.0
+      },
+      "10": {
+        "signals": 8166,
+        "wins": 3998,
+        "losses": 4165,
+        "timeouts": 3,
+        "wr": 49.0
+      },
+      "15": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      },
+      "20": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      },
+      "25": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      },
+      "30": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      },
+      "35": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      },
+      "40": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      },
+      "45": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      },
+      "50": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      },
+      "55": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      },
+      "60": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      },
+      "65": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      },
+      "70": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      },
+      "75": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      },
+      "80": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      },
+      "85": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      },
+      "90": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      },
+      "95": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      },
+      "100": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      },
+      "105": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      },
+      "110": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      },
+      "115": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      },
+      "120": {
+        "signals": 8166,
+        "wins": 4001,
+        "losses": 4165,
+        "timeouts": 0,
+        "wr": 49.0
+      }
+    },
+    "thresholds": {
+      "2": 3.6,
+      "4": 3.6,
+      "6": 4.1,
+      "8": 3.6,
+      "10": 2.5
+    }
+  },
+  "EURJPY": {
+    "best_expiry": 10,
+    "best_wr": 48.8898198575618,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 7162,
+        "wins": 3478,
+        "losses": 3649,
+        "timeouts": 35,
+        "wr": 48.8
+      },
+      "10": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3660,
+        "timeouts": 1,
+        "wr": 48.9
+      },
+      "15": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3660,
+        "timeouts": 1,
+        "wr": 48.9
+      },
+      "20": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3660,
+        "timeouts": 1,
+        "wr": 48.9
+      },
+      "25": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3660,
+        "timeouts": 1,
+        "wr": 48.9
+      },
+      "30": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3660,
+        "timeouts": 1,
+        "wr": 48.9
+      },
+      "35": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3660,
+        "timeouts": 1,
+        "wr": 48.9
+      },
+      "40": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3660,
+        "timeouts": 1,
+        "wr": 48.9
+      },
+      "45": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3660,
+        "timeouts": 1,
+        "wr": 48.9
+      },
+      "50": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3660,
+        "timeouts": 1,
+        "wr": 48.9
+      },
+      "55": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3660,
+        "timeouts": 1,
+        "wr": 48.9
+      },
+      "60": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3660,
+        "timeouts": 1,
+        "wr": 48.9
+      },
+      "65": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3660,
+        "timeouts": 1,
+        "wr": 48.9
+      },
+      "70": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3660,
+        "timeouts": 1,
+        "wr": 48.9
+      },
+      "75": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3660,
+        "timeouts": 1,
+        "wr": 48.9
+      },
+      "80": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3660,
+        "timeouts": 1,
+        "wr": 48.9
+      },
+      "85": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3660,
+        "timeouts": 1,
+        "wr": 48.9
+      },
+      "90": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3660,
+        "timeouts": 1,
+        "wr": 48.9
+      },
+      "95": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3660,
+        "timeouts": 1,
+        "wr": 48.9
+      },
+      "100": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3660,
+        "timeouts": 1,
+        "wr": 48.9
+      },
+      "105": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3661,
+        "timeouts": 0,
+        "wr": 48.9
+      },
+      "110": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3661,
+        "timeouts": 0,
+        "wr": 48.9
+      },
+      "115": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3661,
+        "timeouts": 0,
+        "wr": 48.9
+      },
+      "120": {
+        "signals": 7162,
+        "wins": 3501,
+        "losses": 3661,
+        "timeouts": 0,
+        "wr": 48.9
+      }
+    },
+    "thresholds": {
+      "2": 8.4,
+      "4": 8.0,
+      "6": 10.5,
+      "8": 8.9,
+      "10": 6.3
+    }
+  },
+  "EURAUD": {
+    "best_expiry": 10,
+    "best_wr": 49.55329636475662,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 6493,
+        "wins": 3194,
+        "losses": 3253,
+        "timeouts": 46,
+        "wr": 49.5
+      },
+      "10": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3275,
+        "timeouts": 1,
+        "wr": 49.6
+      },
+      "15": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3275,
+        "timeouts": 1,
+        "wr": 49.6
+      },
+      "20": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3275,
+        "timeouts": 1,
+        "wr": 49.6
+      },
+      "25": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3276,
+        "timeouts": 0,
+        "wr": 49.5
+      },
+      "30": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3276,
+        "timeouts": 0,
+        "wr": 49.5
+      },
+      "35": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3276,
+        "timeouts": 0,
+        "wr": 49.5
+      },
+      "40": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3276,
+        "timeouts": 0,
+        "wr": 49.5
+      },
+      "45": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3276,
+        "timeouts": 0,
+        "wr": 49.5
+      },
+      "50": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3276,
+        "timeouts": 0,
+        "wr": 49.5
+      },
+      "55": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3276,
+        "timeouts": 0,
+        "wr": 49.5
+      },
+      "60": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3276,
+        "timeouts": 0,
+        "wr": 49.5
+      },
+      "65": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3276,
+        "timeouts": 0,
+        "wr": 49.5
+      },
+      "70": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3276,
+        "timeouts": 0,
+        "wr": 49.5
+      },
+      "75": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3276,
+        "timeouts": 0,
+        "wr": 49.5
+      },
+      "80": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3276,
+        "timeouts": 0,
+        "wr": 49.5
+      },
+      "85": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3276,
+        "timeouts": 0,
+        "wr": 49.5
+      },
+      "90": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3276,
+        "timeouts": 0,
+        "wr": 49.5
+      },
+      "95": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3276,
+        "timeouts": 0,
+        "wr": 49.5
+      },
+      "100": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3276,
+        "timeouts": 0,
+        "wr": 49.5
+      },
+      "105": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3276,
+        "timeouts": 0,
+        "wr": 49.5
+      },
+      "110": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3276,
+        "timeouts": 0,
+        "wr": 49.5
+      },
+      "115": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3276,
+        "timeouts": 0,
+        "wr": 49.5
+      },
+      "120": {
+        "signals": 6493,
+        "wins": 3217,
+        "losses": 3276,
+        "timeouts": 0,
+        "wr": 49.5
+      }
+    },
+    "thresholds": {
+      "2": 7.6,
+      "4": 7.6,
+      "6": 10.2,
+      "8": 9.2,
+      "10": 6.3
+    }
+  },
+  "EURNZD": {
+    "best_expiry": 35,
+    "best_wr": 47.269570707070706,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 6336,
+        "wins": 2971,
+        "losses": 3321,
+        "timeouts": 44,
+        "wr": 47.2
+      },
+      "10": {
+        "signals": 6336,
+        "wins": 2994,
+        "losses": 3341,
+        "timeouts": 1,
+        "wr": 47.3
+      },
+      "15": {
+        "signals": 6336,
+        "wins": 2994,
+        "losses": 3341,
+        "timeouts": 1,
+        "wr": 47.3
+      },
+      "20": {
+        "signals": 6336,
+        "wins": 2994,
+        "losses": 3341,
+        "timeouts": 1,
+        "wr": 47.3
+      },
+      "25": {
+        "signals": 6336,
+        "wins": 2994,
+        "losses": 3341,
+        "timeouts": 1,
+        "wr": 47.3
+      },
+      "30": {
+        "signals": 6336,
+        "wins": 2994,
+        "losses": 3341,
+        "timeouts": 1,
+        "wr": 47.3
+      },
+      "35": {
+        "signals": 6336,
+        "wins": 2995,
+        "losses": 3341,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "40": {
+        "signals": 6336,
+        "wins": 2995,
+        "losses": 3341,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "45": {
+        "signals": 6336,
+        "wins": 2995,
+        "losses": 3341,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "50": {
+        "signals": 6336,
+        "wins": 2995,
+        "losses": 3341,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "55": {
+        "signals": 6336,
+        "wins": 2995,
+        "losses": 3341,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "60": {
+        "signals": 6336,
+        "wins": 2995,
+        "losses": 3341,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "65": {
+        "signals": 6336,
+        "wins": 2995,
+        "losses": 3341,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "70": {
+        "signals": 6336,
+        "wins": 2995,
+        "losses": 3341,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "75": {
+        "signals": 6336,
+        "wins": 2995,
+        "losses": 3341,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "80": {
+        "signals": 6336,
+        "wins": 2995,
+        "losses": 3341,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "85": {
+        "signals": 6336,
+        "wins": 2995,
+        "losses": 3341,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "90": {
+        "signals": 6336,
+        "wins": 2995,
+        "losses": 3341,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "95": {
+        "signals": 6336,
+        "wins": 2995,
+        "losses": 3341,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "100": {
+        "signals": 6336,
+        "wins": 2995,
+        "losses": 3341,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "105": {
+        "signals": 6336,
+        "wins": 2995,
+        "losses": 3341,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "110": {
+        "signals": 6336,
+        "wins": 2995,
+        "losses": 3341,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "115": {
+        "signals": 6336,
+        "wins": 2995,
+        "losses": 3341,
+        "timeouts": 0,
+        "wr": 47.3
+      },
+      "120": {
+        "signals": 6336,
+        "wins": 2995,
+        "losses": 3341,
+        "timeouts": 0,
+        "wr": 47.3
+      }
+    },
+    "thresholds": {
+      "2": 8.4,
+      "4": 8.3,
+      "6": 11.0,
+      "8": 9.4,
+      "10": 6.6
+    }
+  },
+  "EURCHF": {
+    "best_expiry": 15,
+    "best_wr": 48.791238146119944,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 7487,
+        "wins": 3602,
+        "losses": 3784,
+        "timeouts": 101,
+        "wr": 48.8
+      },
+      "10": {
+        "signals": 7487,
+        "wins": 3652,
+        "losses": 3834,
+        "timeouts": 1,
+        "wr": 48.8
+      },
+      "15": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "20": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "25": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "30": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "35": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "40": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "45": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "50": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "55": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "60": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "65": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "70": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "75": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "80": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "85": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "90": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "95": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "100": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "105": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "110": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "115": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "120": {
+        "signals": 7487,
+        "wins": 3653,
+        "losses": 3834,
+        "timeouts": 0,
+        "wr": 48.8
+      }
+    },
+    "thresholds": {
+      "2": 4.2,
+      "4": 3.9,
+      "6": 4.9,
+      "8": 4.4,
+      "10": 3.0
+    }
+  },
+  "EURCAD": {
+    "best_expiry": 10,
+    "best_wr": 48.59894921190893,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 7995,
+        "wins": 3850,
+        "losses": 4079,
+        "timeouts": 66,
+        "wr": 48.6
+      },
+      "10": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4109,
+        "timeouts": 1,
+        "wr": 48.6
+      },
+      "15": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "20": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "25": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "30": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "35": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "40": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "45": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "50": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "55": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "60": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "65": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "70": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "75": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "80": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "85": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "90": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "95": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "100": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "105": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "110": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "115": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      },
+      "120": {
+        "signals": 7995,
+        "wins": 3885,
+        "losses": 4110,
+        "timeouts": 0,
+        "wr": 48.6
+      }
+    },
+    "thresholds": {
+      "2": 5.9,
+      "4": 6.6,
+      "6": 9.2,
+      "8": 7.8,
+      "10": 5.7
+    }
+  },
+  "USDCAD": {
+    "best_expiry": 5,
+    "best_wr": 49.88126649076517,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 7657,
+        "wins": 3781,
+        "losses": 3799,
+        "timeouts": 77,
+        "wr": 49.9
+      },
+      "10": {
+        "signals": 7657,
+        "wins": 3817,
+        "losses": 3838,
+        "timeouts": 2,
+        "wr": 49.9
+      },
+      "15": {
+        "signals": 7657,
+        "wins": 3817,
+        "losses": 3838,
+        "timeouts": 2,
+        "wr": 49.9
+      },
+      "20": {
+        "signals": 7657,
+        "wins": 3817,
+        "losses": 3838,
+        "timeouts": 2,
+        "wr": 49.9
+      },
+      "25": {
+        "signals": 7657,
+        "wins": 3817,
+        "losses": 3838,
+        "timeouts": 2,
+        "wr": 49.9
+      },
+      "30": {
+        "signals": 7657,
+        "wins": 3818,
+        "losses": 3838,
+        "timeouts": 1,
+        "wr": 49.9
+      },
+      "35": {
+        "signals": 7657,
+        "wins": 3819,
+        "losses": 3838,
+        "timeouts": 0,
+        "wr": 49.9
+      },
+      "40": {
+        "signals": 7657,
+        "wins": 3819,
+        "losses": 3838,
+        "timeouts": 0,
+        "wr": 49.9
+      },
+      "45": {
+        "signals": 7657,
+        "wins": 3819,
+        "losses": 3838,
+        "timeouts": 0,
+        "wr": 49.9
+      },
+      "50": {
+        "signals": 7657,
+        "wins": 3819,
+        "losses": 3838,
+        "timeouts": 0,
+        "wr": 49.9
+      },
+      "55": {
+        "signals": 7657,
+        "wins": 3819,
+        "losses": 3838,
+        "timeouts": 0,
+        "wr": 49.9
+      },
+      "60": {
+        "signals": 7657,
+        "wins": 3819,
+        "losses": 3838,
+        "timeouts": 0,
+        "wr": 49.9
+      },
+      "65": {
+        "signals": 7657,
+        "wins": 3819,
+        "losses": 3838,
+        "timeouts": 0,
+        "wr": 49.9
+      },
+      "70": {
+        "signals": 7657,
+        "wins": 3819,
+        "losses": 3838,
+        "timeouts": 0,
+        "wr": 49.9
+      },
+      "75": {
+        "signals": 7657,
+        "wins": 3819,
+        "losses": 3838,
+        "timeouts": 0,
+        "wr": 49.9
+      },
+      "80": {
+        "signals": 7657,
+        "wins": 3819,
+        "losses": 3838,
+        "timeouts": 0,
+        "wr": 49.9
+      },
+      "85": {
+        "signals": 7657,
+        "wins": 3819,
+        "losses": 3838,
+        "timeouts": 0,
+        "wr": 49.9
+      },
+      "90": {
+        "signals": 7657,
+        "wins": 3819,
+        "losses": 3838,
+        "timeouts": 0,
+        "wr": 49.9
+      },
+      "95": {
+        "signals": 7657,
+        "wins": 3819,
+        "losses": 3838,
+        "timeouts": 0,
+        "wr": 49.9
+      },
+      "100": {
+        "signals": 7657,
+        "wins": 3819,
+        "losses": 3838,
+        "timeouts": 0,
+        "wr": 49.9
+      },
+      "105": {
+        "signals": 7657,
+        "wins": 3819,
+        "losses": 3838,
+        "timeouts": 0,
+        "wr": 49.9
+      },
+      "110": {
+        "signals": 7657,
+        "wins": 3819,
+        "losses": 3838,
+        "timeouts": 0,
+        "wr": 49.9
+      },
+      "115": {
+        "signals": 7657,
+        "wins": 3819,
+        "losses": 3838,
+        "timeouts": 0,
+        "wr": 49.9
+      },
+      "120": {
+        "signals": 7657,
+        "wins": 3819,
+        "losses": 3838,
+        "timeouts": 0,
+        "wr": 49.9
+      }
+    },
+    "thresholds": {
+      "2": 4.3,
+      "4": 5.1,
+      "6": 7.9,
+      "8": 7.1,
+      "10": 5.3
+    }
+  },
+  "AUDJPY": {
+    "best_expiry": 5,
+    "best_wr": 49.44156048450527,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 6409,
+        "wins": 3143,
+        "losses": 3214,
+        "timeouts": 52,
+        "wr": 49.4
+      },
+      "10": {
+        "signals": 6409,
+        "wins": 3167,
+        "losses": 3241,
+        "timeouts": 1,
+        "wr": 49.4
+      },
+      "15": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      },
+      "20": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      },
+      "25": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      },
+      "30": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      },
+      "35": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      },
+      "40": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      },
+      "45": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      },
+      "50": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      },
+      "55": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      },
+      "60": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      },
+      "65": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      },
+      "70": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      },
+      "75": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      },
+      "80": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      },
+      "85": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      },
+      "90": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      },
+      "95": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      },
+      "100": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      },
+      "105": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      },
+      "110": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      },
+      "115": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      },
+      "120": {
+        "signals": 6409,
+        "wins": 3168,
+        "losses": 3241,
+        "timeouts": 0,
+        "wr": 49.4
+      }
+    },
+    "thresholds": {
+      "2": 5.7,
+      "4": 5.5,
+      "6": 7.9,
+      "8": 7.1,
+      "10": 5.2
+    }
+  },
+  "AUDNZD": {
+    "best_expiry": 20,
+    "best_wr": 48.458574181117534,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 5191,
+        "wins": 2464,
+        "losses": 2631,
+        "timeouts": 96,
+        "wr": 48.4
+      },
+      "10": {
+        "signals": 5191,
+        "wins": 2512,
+        "losses": 2674,
+        "timeouts": 5,
+        "wr": 48.4
+      },
+      "15": {
+        "signals": 5191,
+        "wins": 2514,
+        "losses": 2675,
+        "timeouts": 2,
+        "wr": 48.4
+      },
+      "20": {
+        "signals": 5191,
+        "wins": 2515,
+        "losses": 2675,
+        "timeouts": 1,
+        "wr": 48.5
+      },
+      "25": {
+        "signals": 5191,
+        "wins": 2515,
+        "losses": 2676,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "30": {
+        "signals": 5191,
+        "wins": 2515,
+        "losses": 2676,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "35": {
+        "signals": 5191,
+        "wins": 2515,
+        "losses": 2676,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "40": {
+        "signals": 5191,
+        "wins": 2515,
+        "losses": 2676,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "45": {
+        "signals": 5191,
+        "wins": 2515,
+        "losses": 2676,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "50": {
+        "signals": 5191,
+        "wins": 2515,
+        "losses": 2676,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "55": {
+        "signals": 5191,
+        "wins": 2515,
+        "losses": 2676,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "60": {
+        "signals": 5191,
+        "wins": 2515,
+        "losses": 2676,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "65": {
+        "signals": 5191,
+        "wins": 2515,
+        "losses": 2676,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "70": {
+        "signals": 5191,
+        "wins": 2515,
+        "losses": 2676,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "75": {
+        "signals": 5191,
+        "wins": 2515,
+        "losses": 2676,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "80": {
+        "signals": 5191,
+        "wins": 2515,
+        "losses": 2676,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "85": {
+        "signals": 5191,
+        "wins": 2515,
+        "losses": 2676,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "90": {
+        "signals": 5191,
+        "wins": 2515,
+        "losses": 2676,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "95": {
+        "signals": 5191,
+        "wins": 2515,
+        "losses": 2676,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "100": {
+        "signals": 5191,
+        "wins": 2515,
+        "losses": 2676,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "105": {
+        "signals": 5191,
+        "wins": 2515,
+        "losses": 2676,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "110": {
+        "signals": 5191,
+        "wins": 2515,
+        "losses": 2676,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "115": {
+        "signals": 5191,
+        "wins": 2515,
+        "losses": 2676,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "120": {
+        "signals": 5191,
+        "wins": 2515,
+        "losses": 2676,
+        "timeouts": 0,
+        "wr": 48.4
+      }
+    },
+    "thresholds": {
+      "2": 3.2,
+      "4": 3.2,
+      "6": 4.0,
+      "8": 3.5,
+      "10": 2.5
+    }
+  },
+  "AUDCHF": {
+    "best_expiry": 10,
+    "best_wr": 47.96760629185485,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 6422,
+        "wins": 3026,
+        "losses": 3301,
+        "timeouts": 95,
+        "wr": 47.8
+      },
+      "10": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3341,
+        "timeouts": 1,
+        "wr": 48.0
+      },
+      "15": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      },
+      "20": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      },
+      "25": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      },
+      "30": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      },
+      "35": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      },
+      "40": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      },
+      "45": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      },
+      "50": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      },
+      "55": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      },
+      "60": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      },
+      "65": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      },
+      "70": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      },
+      "75": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      },
+      "80": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      },
+      "85": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      },
+      "90": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      },
+      "95": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      },
+      "100": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      },
+      "105": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      },
+      "110": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      },
+      "115": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      },
+      "120": {
+        "signals": 6422,
+        "wins": 3080,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 48.0
+      }
+    },
+    "thresholds": {
+      "2": 3.4,
+      "4": 3.3,
+      "6": 4.5,
+      "8": 4.0,
+      "10": 2.8
+    }
+  },
+  "AUDCAD": {
+    "best_expiry": 10,
+    "best_wr": 48.76156371232468,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 6704,
+        "wins": 3234,
+        "losses": 3400,
+        "timeouts": 70,
+        "wr": 48.7
+      },
+      "10": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3434,
+        "timeouts": 2,
+        "wr": 48.8
+      },
+      "15": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      },
+      "20": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      },
+      "25": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      },
+      "30": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      },
+      "35": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      },
+      "40": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      },
+      "45": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      },
+      "50": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      },
+      "55": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      },
+      "60": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      },
+      "65": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      },
+      "70": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      },
+      "75": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      },
+      "80": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      },
+      "85": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      },
+      "90": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      },
+      "95": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      },
+      "100": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      },
+      "105": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      },
+      "110": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      },
+      "115": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      },
+      "120": {
+        "signals": 6704,
+        "wins": 3268,
+        "losses": 3436,
+        "timeouts": 0,
+        "wr": 48.7
+      }
+    },
+    "thresholds": {
+      "2": 3.6,
+      "4": 3.9,
+      "6": 5.7,
+      "8": 4.9,
+      "10": 3.5
+    }
+  },
+  "NZDJPY": {
+    "best_expiry": 10,
+    "best_wr": 48.363145460681736,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 5926,
+        "wins": 2836,
+        "losses": 3037,
+        "timeouts": 53,
+        "wr": 48.3
+      },
+      "10": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "15": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "20": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "25": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "30": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "35": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "40": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "45": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "50": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "55": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "60": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "65": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "70": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "75": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "80": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "85": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "90": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "95": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "100": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "105": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "110": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "115": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      },
+      "120": {
+        "signals": 5926,
+        "wins": 2866,
+        "losses": 3060,
+        "timeouts": 0,
+        "wr": 48.4
+      }
+    },
+    "thresholds": {
+      "2": 5.2,
+      "4": 4.9,
+      "6": 6.8,
+      "8": 6.2,
+      "10": 4.5
+    }
+  },
+  "NZDCHF": {
+    "best_expiry": 15,
+    "best_wr": 48.81933003844042,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 5463,
+        "wins": 2620,
+        "losses": 2747,
+        "timeouts": 96,
+        "wr": 48.8
+      },
+      "10": {
+        "signals": 5463,
+        "wins": 2666,
+        "losses": 2795,
+        "timeouts": 2,
+        "wr": 48.8
+      },
+      "15": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "20": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "25": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "30": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "35": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "40": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "45": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "50": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "55": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "60": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "65": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "70": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "75": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "80": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "85": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "90": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "95": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "100": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "105": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "110": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "115": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "120": {
+        "signals": 5463,
+        "wins": 2667,
+        "losses": 2796,
+        "timeouts": 0,
+        "wr": 48.8
+      }
+    },
+    "thresholds": {
+      "2": 3.1,
+      "4": 2.9,
+      "6": 3.9,
+      "8": 3.4,
+      "10": 2.5
+    }
+  },
+  "NZDCAD": {
+    "best_expiry": 15,
+    "best_wr": 49.7480685253611,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 5954,
+        "wins": 2916,
+        "losses": 2947,
+        "timeouts": 91,
+        "wr": 49.7
+      },
+      "10": {
+        "signals": 5954,
+        "wins": 2961,
+        "losses": 2992,
+        "timeouts": 1,
+        "wr": 49.7
+      },
+      "15": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      },
+      "20": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      },
+      "25": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      },
+      "30": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      },
+      "35": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      },
+      "40": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      },
+      "45": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      },
+      "50": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      },
+      "55": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      },
+      "60": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      },
+      "65": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      },
+      "70": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      },
+      "75": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      },
+      "80": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      },
+      "85": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      },
+      "90": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      },
+      "95": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      },
+      "100": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      },
+      "105": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      },
+      "110": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      },
+      "115": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      },
+      "120": {
+        "signals": 5954,
+        "wins": 2962,
+        "losses": 2992,
+        "timeouts": 0,
+        "wr": 49.7
+      }
+    },
+    "thresholds": {
+      "2": 3.6,
+      "4": 3.7,
+      "6": 5.4,
+      "8": 4.6,
+      "10": 3.2
+    }
+  },
+  "CADJPY": {
+    "best_expiry": 10,
+    "best_wr": 50.05982650314089,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 6689,
+        "wins": 3315,
+        "losses": 3309,
+        "timeouts": 65,
+        "wr": 50.0
+      },
+      "10": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3339,
+        "timeouts": 3,
+        "wr": 50.1
+      },
+      "15": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "20": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "25": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "30": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "35": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "40": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "45": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "50": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "55": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "60": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "65": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "70": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "75": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "80": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "85": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "90": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "95": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "100": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "105": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "110": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "115": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      },
+      "120": {
+        "signals": 6689,
+        "wins": 3347,
+        "losses": 3342,
+        "timeouts": 0,
+        "wr": 50.0
+      }
+    },
+    "thresholds": {
+      "2": 5.4,
+      "4": 5.7,
+      "6": 8.4,
+      "8": 7.3,
+      "10": 5.3
+    }
+  },
+  "CADCHF": {
+    "best_expiry": 10,
+    "best_wr": 48.81587953456537,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 7307,
+        "wins": 3503,
+        "losses": 3684,
+        "timeouts": 120,
+        "wr": 48.7
+      },
+      "10": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3739,
+        "timeouts": 2,
+        "wr": 48.8
+      },
+      "15": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3740,
+        "timeouts": 1,
+        "wr": 48.8
+      },
+      "20": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3741,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "25": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3741,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "30": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3741,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "35": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3741,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "40": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3741,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "45": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3741,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "50": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3741,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "55": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3741,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "60": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3741,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "65": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3741,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "70": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3741,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "75": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3741,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "80": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3741,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "85": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3741,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "90": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3741,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "95": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3741,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "100": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3741,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "105": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3741,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "110": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3741,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "115": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3741,
+        "timeouts": 0,
+        "wr": 48.8
+      },
+      "120": {
+        "signals": 7307,
+        "wins": 3566,
+        "losses": 3741,
+        "timeouts": 0,
+        "wr": 48.8
+      }
+    },
+    "thresholds": {
+      "2": 3.3,
+      "4": 3.4,
+      "6": 4.7,
+      "8": 4.1,
+      "10": 2.9
+    }
+  },
+  "GBPCAD": {
+    "best_expiry": 5,
+    "best_wr": 49.17864476386037,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 6866,
+        "wins": 3353,
+        "losses": 3465,
+        "timeouts": 48,
+        "wr": 49.2
+      },
+      "10": {
+        "signals": 6866,
+        "wins": 3372,
+        "losses": 3491,
+        "timeouts": 3,
+        "wr": 49.1
+      },
+      "15": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3492,
+        "timeouts": 1,
+        "wr": 49.1
+      },
+      "20": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3493,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "25": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3493,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "30": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3493,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "35": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3493,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "40": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3493,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "45": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3493,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "50": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3493,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "55": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3493,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "60": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3493,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "65": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3493,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "70": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3493,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "75": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3493,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "80": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3493,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "85": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3493,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "90": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3493,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "95": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3493,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "100": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3493,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "105": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3493,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "110": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3493,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "115": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3493,
+        "timeouts": 0,
+        "wr": 49.1
+      },
+      "120": {
+        "signals": 6866,
+        "wins": 3373,
+        "losses": 3493,
+        "timeouts": 0,
+        "wr": 49.1
+      }
+    },
+    "thresholds": {
+      "2": 7.3,
+      "4": 8.0,
+      "6": 10.7,
+      "8": 9.2,
+      "10": 6.5
+    }
+  },
+  "XAUUSD": {
+    "best_expiry": 10,
+    "best_wr": 49.22897876054699,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 6874,
+        "wins": 3375,
+        "losses": 3482,
+        "timeouts": 17,
+        "wr": 49.2
+      },
+      "10": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "15": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "20": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "25": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "30": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "35": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "40": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "45": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "50": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "55": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "60": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "65": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "70": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "75": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "80": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "85": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "90": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "95": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "100": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "105": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "110": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "115": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      },
+      "120": {
+        "signals": 6874,
+        "wins": 3384,
+        "losses": 3490,
+        "timeouts": 0,
+        "wr": 49.2
+      }
+    },
+    "thresholds": {
+      "2": 20.9,
+      "4": 25.8,
+      "6": 23.3,
+      "8": 23.1,
+      "10": 38.5
+    }
+  },
+  "XAGUSD": {
+    "best_expiry": 5,
+    "best_wr": 50.21860394994724,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 6667,
+        "wins": 3331,
+        "losses": 3302,
+        "timeouts": 34,
+        "wr": 50.2
+      },
+      "10": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3319,
+        "timeouts": 1,
+        "wr": 50.2
+      },
+      "15": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      },
+      "20": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      },
+      "25": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      },
+      "30": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      },
+      "35": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      },
+      "40": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      },
+      "45": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      },
+      "50": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      },
+      "55": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      },
+      "60": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      },
+      "65": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      },
+      "70": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      },
+      "75": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      },
+      "80": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      },
+      "85": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      },
+      "90": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      },
+      "95": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      },
+      "100": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      },
+      "105": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      },
+      "110": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      },
+      "115": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      },
+      "120": {
+        "signals": 6667,
+        "wins": 3347,
+        "losses": 3320,
+        "timeouts": 0,
+        "wr": 50.2
+      }
+    },
+    "thresholds": {
+      "2": 5.7,
+      "4": 6.8,
+      "6": 5.9,
+      "8": 6.0,
+      "10": 10.3
+    }
+  },
+  "US500": {
+    "best_expiry": 5,
+    "best_wr": 47.846770155232846,
+    "high_wr_windows": {},
+    "all_expiries": {
+      "5": {
+        "signals": 4073,
+        "wins": 1911,
+        "losses": 2083,
+        "timeouts": 79,
+        "wr": 47.8
+      },
+      "10": {
+        "signals": 4073,
+        "wins": 1940,
+        "losses": 2125,
+        "timeouts": 8,
+        "wr": 47.7
+      },
+      "15": {
+        "signals": 4073,
+        "wins": 1942,
+        "losses": 2128,
+        "timeouts": 3,
+        "wr": 47.7
+      },
+      "20": {
+        "signals": 4073,
+        "wins": 1943,
+        "losses": 2129,
+        "timeouts": 1,
+        "wr": 47.7
+      },
+      "25": {
+        "signals": 4073,
+        "wins": 1943,
+        "losses": 2130,
+        "timeouts": 0,
+        "wr": 47.7
+      },
+      "30": {
+        "signals": 4073,
+        "wins": 1943,
+        "losses": 2130,
+        "timeouts": 0,
+        "wr": 47.7
+      },
+      "35": {
+        "signals": 4073,
+        "wins": 1943,
+        "losses": 2130,
+        "timeouts": 0,
+        "wr": 47.7
+      },
+      "40": {
+        "signals": 4073,
+        "wins": 1943,
+        "losses": 2130,
+        "timeouts": 0,
+        "wr": 47.7
+      },
+      "45": {
+        "signals": 4073,
+        "wins": 1943,
+        "losses": 2130,
+        "timeouts": 0,
+        "wr": 47.7
+      },
+      "50": {
+        "signals": 4073,
+        "wins": 1943,
+        "losses": 2130,
+        "timeouts": 0,
+        "wr": 47.7
+      },
+      "55": {
+        "signals": 4073,
+        "wins": 1943,
+        "losses": 2130,
+        "timeouts": 0,
+        "wr": 47.7
+      },
+      "60": {
+        "signals": 4073,
+        "wins": 1943,
+        "losses": 2130,
+        "timeouts": 0,
+        "wr": 47.7
+      },
+      "65": {
+        "signals": 4073,
+        "wins": 1943,
+        "losses": 2130,
+        "timeouts": 0,
+        "wr": 47.7
+      },
+      "70": {
+        "signals": 4073,
+        "wins": 1943,
+        "losses": 2130,
+        "timeouts": 0,
+        "wr": 47.7
+      },
+      "75": {
+        "signals": 4073,
+        "wins": 1943,
+        "losses": 2130,
+        "timeouts": 0,
+        "wr": 47.7
+      },
+      "80": {
+        "signals": 4073,
+        "wins": 1943,
+        "losses": 2130,
+        "timeouts": 0,
+        "wr": 47.7
+      },
+      "85": {
+        "signals": 4073,
+        "wins": 1943,
+        "losses": 2130,
+        "timeouts": 0,
+        "wr": 47.7
+      },
+      "90": {
+        "signals": 4073,
+        "wins": 1943,
+        "losses": 2130,
+        "timeouts": 0,
+        "wr": 47.7
+      },
+      "95": {
+        "signals": 4073,
+        "wins": 1943,
+        "losses": 2130,
+        "timeouts": 0,
+        "wr": 47.7
+      },
+      "100": {
+        "signals": 4073,
+        "wins": 1943,
+        "losses": 2130,
+        "timeouts": 0,
+        "wr": 47.7
+      },
+      "105": {
+        "signals": 4073,
+        "wins": 1943,
+        "losses": 2130,
+        "timeouts": 0,
+        "wr": 47.7
+      },
+      "110": {
+        "signals": 4073,
+        "wins": 1943,
+        "losses": 2130,
+        "timeouts": 0,
+        "wr": 47.7
+      },
+      "115": {
+        "signals": 4073,
+        "wins": 1943,
+        "losses": 2130,
+        "timeouts": 0,
+        "wr": 47.7
+      },
+      "120": {
+        "signals": 4073,
+        "wins": 1943,
+        "losses": 2130,
+        "timeouts": 0,
+        "wr": 47.7
+      }
+    },
+    "thresholds": {
+      "2": 2.0,
+      "4": 3.2,
+      "6": 3.15,
+      "8": 3.1,
+      "10": 4.5
+    }
+  }
+}

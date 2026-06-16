@@ -610,6 +610,44 @@ ASSET_CONFIGS = {
         "fixed_tp": 3.0,         # 1.5 * 2.0
         "class": "B-Tier",
     },
+    "XRPUSD": {
+        "name": "XRP/USD",
+        "pip_value": 0.0001,
+        "k_factor": 0.52,
+        "sl_method": "FIXED_BUFFER",
+        "sl_buffer": 0.005,
+        "tiers": {
+            "T1": {"ar_max": 0.05, "au": 0.015, "trigger": 0.018},
+            "T2": {"ar_max": 0.10, "au": 0.025, "trigger": 0.030},
+            "T3": {"ar_max": 0.15, "au": 0.040, "trigger": 0.050},
+        },
+        "gear_shifts": {
+            "T1": [(0.030, "T2"), (0.050, "T3")],
+            "T2": [(0.050, "T3")],
+        },
+        "p90_threshold": 0.00078,  # 0.0015 * 0.52
+        "fixed_tp": 0.0030,        # 0.0015 * 2.0
+        "class": "B-Tier",
+    },
+    "USDSEK": {
+        "name": "USD/SEK",
+        "pip_value": 0.0001,
+        "k_factor": 0.46,
+        "sl_method": "OCC_PLUS_BUFFER",
+        "sl_buffer": 5.0,
+        "tiers": {
+            "T1": {"ar_max": 60.0, "au": 15.0, "trigger": 18.0},
+            "T2": {"ar_max": 80.0, "au": 20.0, "trigger": 24.0},
+            "T3": {"ar_max": 100.0, "au": 25.0, "trigger": 30.0},
+        },
+        "gear_shifts": {
+            "T1": [(24.0, "T2"), (30.0, "T3")],
+            "T2": [(30.0, "T3")],
+        },
+        "p90_threshold": 6.9,   # 15.0 * 0.46
+        "fixed_tp": 30.0,       # 15.0 * 2.0
+        "class": "B-Tier",
+    },
     # ─────────────────────────────────────────────────────
     # INDICES
     # ─────────────────────────────────────────────────────
