@@ -1,4 +1,4 @@
-# CLAUDE.md — 12-Rule Behavioral Contract
+YOO# CLAUDE.md — 12-Rule Behavioral Contract
 
 > **Source**: Karpathy's 4 foundational rules (via [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills)) + 8 operational rules (via [@Mnilax](https://x.com/Mnilax/status/2053116311132155938)).
 > **Testing**: 30 codebases, 6 weeks — mistake rate dropped from 41% → 3%.
