@@ -111,13 +111,13 @@ def run_p90_backtest(symbol: str, bars: list, config: dict) -> dict:
     if total == 0:
         return {"trades": 0}
 
-    wins = sum(1 for s in engine.signal_log if s.event in ("TP1_HIT", "TP2_HIT"))
-    losses = sum(1 for s in engine.signal_log if s.event in ("SL_HIT", "END_OF_SESSION"))
+    wins = sum(1 for s in engine.signal_log if s.event == "TP_HIT")
+    losses = sum(1 for s in engine.signal_log if s.event == "SL_HIT")
     ews = sum(1 for s in engine.signal_log if s.event == "EWS_EXIT")
 
     total_pnl = 0.0
     for s in engine.signal_log:
-        if s.event in ("TP1_HIT", "TP2_HIT") and s.entry_price and s.tp_price:
+        if s.event == "TP_HIT" and s.entry_price and s.tp_price:
             total_pnl += abs(s.entry_price - s.tp_price) / engine.pip_size
         elif s.event == "SL_HIT" and s.entry_price and s.sl_price:
             total_pnl -= abs(s.entry_price - s.sl_price) / engine.pip_size
