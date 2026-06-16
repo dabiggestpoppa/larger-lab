@@ -103,15 +103,36 @@ class DirectionalBias:
         bars["est_hour"] = (bars.index.hour - 5) % 24
         bars["est_minute"] = bars.index.minute
 
-        # ── Compute Asian Range ──
+        # ── Compute Asian Range (most recent complete session only) ──
+        # Asian session: 7PM-3AM EST = 0-8 UTC
+        # Find the most recent complete Asian session
         asian_mask = (bars["est_hour"] >= 19) | (bars["est_hour"] < 3)
         asian_bars = bars[asian_mask]
 
         if len(asian_bars) < 2:
             return self._no_signal_result()
 
-        ah = asian_bars["high"].max()
-        al = asian_bars["low"].min()
+        # Get the most recent Asian session only
+        # Find the last gap in Asian bars (indicates session boundary)
+        asian_times = asian_bars.index
+        if len(asian_times) > 1:
+            # Find the largest gap between consecutive Asian bars
+            gaps = [(asian_times[i+1] - asian_times[i], i) for i in range(len(asian_times)-1)]
+            max_gap_idx = max(gaps, key=lambda x: x[0])[1] if gaps else 0
+            
+            # Take only the bars after the last gap (most recent session)
+            if max_gap_idx > 0:
+                recent_asian = asian_bars.iloc[max_gap_idx+1:]
+            else:
+                recent_asian = asian_bars
+        else:
+            recent_asian = asian_bars
+
+        if len(recent_asian) < 2:
+            recent_asian = asian_bars
+
+        ah = recent_asian["high"].max()
+        al = recent_asian["low"].min()
         asian_range = ah - al
 
         # Auto-detect pip value based on price magnitude
