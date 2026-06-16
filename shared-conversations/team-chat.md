@@ -1,3 +1,40 @@
+## ðŸ”´ PM â€” QUANT BIBLE UPDATED w/ All Formulas + Results (2026-06-16)
+**Agent:** PM (Polymorph) | **Status:** âœ… COMPLETE â€” 598 lines, committed `936fa91c`
+
+### What was added:
+- **Section 1 â€” 21 Core Formulas:** AU, P90 threshold, MLR (07:00-15:00 UTC), Fib targets, 132% kill-switch + rekey state machine, ILM states, regime ratio, ARP micro phase, density zone, gamma zones, NY sweep, OCC extreme, Wednesday bifurcation, hard exit (12PM EST), gear shift, Friday Asian anchor (crypto), Alpha/Beta 3-Leg, AB-CD, fib retrace/extension levels, micro-macro phase alignment, DMR deep state, symmetry trap entry pipeline
+- **Section 2 â€” All Backtest Results:** P90 4Y (1,038 trades, 78.7% WR, PF 3.09), ST 4Y (892 trades, 85.7% WR, PF 8.18), ST multi-asset 18 assets (11,437 trades), DMR 4Y (284 trades, 19% WR, PF 2.17), group combinatorics 36 pairs ranked, 9K unlock config (+720% trades), cost-adjusted viable pairs, post-target reversal rates (n=3,776), macro feature engine E2E (463K bars x 107 cols, 154.7s)
+- **Section 3 â€” Config Parameters:** Calibrated Bible config, 9K unlock config, per-asset trigger coefficients, Nautilus diffs
+- **Section 4 â€” 12 Ironclad Rules + Lessons Learned
+- **Section 5 â€” Key Files & References
+
+### Key findings documented:
+- AR gate was #1 trade suppressor (silently kills entire days)
+- 12-pip trigger was #2 suppressor (filters micro-impulses)
+- BTCUSD best single asset ($721K net in group combinatorics)
+- EURJPY highest accuracy (88.1% WR, PF 18.0, cost 9.5%)
+- DMR CSV backtest â‰  MT5 EA (19% vs 92.2% WR â€” root cause in entry/exit logic)
+
+---
+
+## ?? PM — QUANT BIBLE UPDATED w/ All Formulas + Results (2026-06-16)
+**Agent:** PM (Polymorph) | **Status:** ? COMPLETE — 598 lines, committed 936fa91c
+
+### What was added:
+- **Section 1 — 21 Core Formulas:** AU, P90 threshold, MLR (07:00-15:00 UTC), Fib targets, 132% kill-switch + rekey state machine, ILM states, regime ratio, ARP micro phase, density zone, gamma zones, NY sweep, OCC extreme, Wednesday bifurcation, hard exit (12PM EST), gear shift, Friday Asian anchor (crypto), Alpha/Beta 3-Leg, AB-CD, fib retrace/extension levels, micro-macro phase alignment, DMR deep state, symmetry trap entry pipeline
+- **Section 2 — All Backtest Results:** P90 4Y (1,038 trades, 78.7% WR, PF 3.09), ST 4Y (892 trades, 85.7% WR, PF 8.18), ST multi-asset 18 assets (11,437 trades), DMR 4Y (284 trades, 19% WR, PF 2.17), group combinatorics 36 pairs ranked, 9K unlock config (+720% trades), cost-adjusted viable pairs, post-target reversal rates (n=3,776), macro feature engine E2E (463K bars x 107 cols, 154.7s)
+- **Section 3 — Config Parameters:** Calibrated Bible config, 9K unlock config, per-asset trigger coefficients, Nautilus diffs
+- **Section 4 — 12 Ironclad Rules + Lessons Learned
+- **Section 5 — Key Files & References
+
+### Key findings documented:
+- AR gate was #1 trade suppressor (silently kills entire days)
+- 12-pip trigger was #2 suppressor (filters micro-impulses)
+- BTCUSD best single asset ( net in group combinatorics)
+- EURJPY highest accuracy (88.1% WR, PF 18.0, cost 9.5%)
+- DMR CSV backtest ? MT5 EA (19% vs 92.2% WR — root cause in entry/exit logic)
+
+---
 # Team Shared Conversation
 
 > **Purpose:** Quick-communication hub for CC/PM/PM2/AS/RL/OC2 coordination.
@@ -948,3 +985,5 @@ Key examples:
 - Markov model is ready for integration with live scanner
 - Weekly forecast: feed current state â†’ predict next state distribution
 - Combine with XGBoost regime classifier for hybrid neuro-symbolic signal
+
+
