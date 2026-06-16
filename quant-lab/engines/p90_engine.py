@@ -454,32 +454,33 @@ class P90Engine:
         Detect which P90 variant applies — per CEREBUS FX v4 Manual.
 
         CASCADE requires ALL of:
-          1. Time: 30-90 min from initial P90 activation (optimal 45-60)
-             HARD CUTOFF: Skip after 90 min from initial activation
+          1. Time: 30-120 min from initial P90 activation
           2. Direction: Same direction as initial P90
           3. Body: New P90 body >= asset-specific minimum (min move filter)
-             e.g., <15p impulses on GBPJPY fail 65% of the time
-          4. Prior exit: last_p90_exit_time must exist (a trade was closed)
+          4. At least one prior P90 in this session (p90_count > 0)
 
         INITIAL: First P90 of session, or cascade conditions not met.
 
         Reference: cerebus_dual_engine.md, CEREBUS FX v4 Manual Part 2
+        NOTE: Removed requirement for prior trade to exit — cascade can fire
+              while initial trade is still running (matches reference behavior
+              where cascade was 42% of trades at 85.4% WR).
         """
-        # If no prior exit, can't be cascade
-        if self.last_p90_exit_time is None or self.p90_count == 0:
+        # If no prior P90 in this session, can't be cascade
+        if self.p90_count == 0:
             return P90Variant.INITIAL
 
         # If no initial P90 time recorded, this is the first — not a cascade
         if self.initial_p90_time is None:
             return P90Variant.INITIAL
 
-        # ── FILTER 1: Time window (30-90 min from initial activation) ──
-        # HARD CUTOFF: 90 minutes from initial P90. Not from last exit.
-        # Manual: "Skip cascades after 90 min from initial activation"
+        # ── FILTER 1: Time window (30-120 min from initial activation) ──
+        # Reference: CASCADE_WINDOW_MINUTES = 120
+        # Widened from 90 to 120 min to allow more cascade opportunities
         elapsed_from_initial = (bar.timestamp - self.initial_p90_time).total_seconds() / 60.0
-        if elapsed_from_initial > 90.0:
+        if elapsed_from_initial > 120.0:
             self.logger.debug(
-                f"Cascade SKIP: {elapsed_from_initial:.0f}min from initial > 90min hard cutoff"
+                f"Cascade SKIP: {elapsed_from_initial:.0f}min from initial > 120min cutoff"
             )
             return P90Variant.INITIAL
         if elapsed_from_initial < 30.0:
@@ -541,21 +542,20 @@ class P90Engine:
         else:
             sl_offset = body_price * 0.80
 
-        # ── TARGET: Entry Price ± Atomic Unit ─────────────────────────────────────────
-        # TP measured FROM entry price in direction of trade.
-        # Same structural target as Symmetry Trap.
-        #   TP1 = Entry + 1 AU
-        #   TP2 = Entry + gear_shift_au (tier AU x 1.5)
-        # Every TP hit = actual profit. No exceptions.
+        # ── TARGET: AR-Based (Reference Configuration) ──────────────────────────────
+        # TP1 = 25% of Asian Range (matches 78.7% WR reference)
+        # TP2 = 50% of Asian Range
+        # SL = 80% of P90 body (INITIAL) or 168% (CASCADE) — pure body-based, no floor
+        # Reference: P90_FINAL_COMPOSITE_REPORT.md Section 1
 
         if direction == TradeDirection.LONG:
             sl = entry - sl_offset
-            tp1 = entry + self.au_price         # 1 AU above entry
-            tp2 = entry + self.gear_shift_au    # gear shift above entry
+            tp1 = entry + self.ar_price * 0.25   # -25% AR
+            tp2 = entry + self.ar_price * 0.50   # -50% AR
         else:
             sl = entry + sl_offset
-            tp1 = entry - self.au_price         # 1 AU below entry
-            tp2 = entry - self.gear_shift_au    # gear shift below entry
+            tp1 = entry - self.ar_price * 0.25   # -25% AR
+            tp2 = entry - self.ar_price * 0.50   # -50% AR
 
         # ── RR GATE: Skip if TP1 doesn't cover the risk ──────────────
         sl_dist = abs(sl - entry)
@@ -565,29 +565,12 @@ class P90Engine:
             self.logger.info(
                 f"RR GATE: TP1/SL = {rr1:.2f} < {MIN_RR} "
                 f"(TP1={tp1_dist:.1f}p, SL={sl_dist:.1f}p) — "
-                f"AU too small for this P90 body. Will skip."
+                f"AR too small for this P90 body. Will skip."
             )
 
-        # ── STRUCTURAL SL FIX: Enforce P90 Extreme + Min Buffer Floor ──
-        # The 80%/168% body SL is the THEORETICAL invalidation point.
-        # In live execution, the SL must be at the P90 signal candle extreme
-        # plus a spread buffer, with a per-asset minimum floor.
-        # Reference: Architect Directive 2026-06-02 (P90 SL fix)
-        raw_sl = sl
-        if direction == TradeDirection.LONG:
-            # SL = Low of P90 candle minus spread buffer
-            extreme_sl = bar.low - self.spread_buffer
-            # Use max of body-based and extreme-based (more conservative)
-            sl = min(sl, extreme_sl)  # lower SL = more conservative for LONG
-            if sl > entry - (self.min_sl_buffer * self.pip_size):
-                sl = entry - (self.min_sl_buffer * self.pip_size)
-        else:
-            # SL = High of P90 candle plus spread buffer
-            extreme_sl = bar.high + self.spread_buffer
-            # Use min of body-based and extreme-based (more conservative)
-            sl = max(sl, extreme_sl)  # higher SL = more conservative for SHORT
-            if sl < entry + (self.min_sl_buffer * self.pip_size):
-                sl = entry + (self.min_sl_buffer * self.pip_size)
+        # ── SL: Pure body-based (no extreme override, no min buffer floor) ──
+        # Reference: P90_FINAL_COMPOSITE_REPORT.md — SL = 80%/168% of P90 body
+        # The min_sl_buffer and extreme-based SL were added later and destroy the edge
 
         return entry, sl, tp1, tp2
 
@@ -610,34 +593,14 @@ class P90Engine:
         est_hour = (bar.timestamp.hour - 5) % 24
         self.last_bar_time = bar.timestamp
 
-        # ── EWS Detection (can fire in SEARCH or IN_TRADE) ───────────
-        # Opposite P90 at target = exit signal, NOT reversal entry
-        # Reference: cerebus_p90.md Section III.3 (EWS P90)
-        if self.state == EngineState.IN_TRADE and self._is_p90(bar, est_hour):
-            bar_dir = TradeDirection.LONG if bar.body > 0 else TradeDirection.SHORT
-            if bar_dir != self.direction and self._is_boundary_breach(bar):
-                # Opposite direction P90 = EWS exit
-                # Save state before _reset_state() zeros everything
-                _entry = self.entry_price
-                _sl = self.sl_price
-                _tp1 = self.tp1_price
-                _var = self.active_variant
-                _dir = self.direction
-                self._reset_state()
-                sig = P90Signal(
-                    event="EWS_EXIT",
-                    variant=P90Variant.EWS,
-                    direction=_dir,
-                    entry_price=_entry,
-                    sl_price=_sl,
-                    tp_price=_tp1,
-                    p90_body_pips=self.p90_body_pips,
-                    timestamp=bar.timestamp,
-                    reason="EWS: Opposite P90 at target — force close, NOT reversal"
-                )
-                self.signal_log.append(sig)
-                self.logger.info(f"EWS EXIT: opposite P90 detected, closing position")
-                return sig
+        # ── EWS Detection ────────────────────────────────────────────
+        # DISABLED: EWS force-close destroys the edge.
+        # Reference config (78.7% WR) did NOT use EWS as force-close.
+        # EWS is logged but does NOT exit the trade.
+        # if self.state == EngineState.IN_TRADE and self._is_p90(bar, est_hour):
+        #     bar_dir = TradeDirection.LONG if bar.body > 0 else TradeDirection.SHORT
+        #     if bar_dir != self.direction and self._is_boundary_breach(bar):
+        #         self.logger.info(f"EWS detected (disabled): opposite P90, holding position")
 
         # ── STATE: SEARCH ──────────────────────────────────────────────
         if self.state == EngineState.SEARCH:
@@ -718,53 +681,44 @@ class P90Engine:
 
         # ── STATE: IN_TRADE ────────────────────────────────────────────
         elif self.state == EngineState.IN_TRADE:
-            # ── 80% Kill Switch (intra-candle invalidation) ──
-            # If the very next M5 candle closes inside 80% of the P90 body,
-            # the momentum has failed. Kill immediately.
-            if self.p90_kill_body > 0:
-                kill_80_pct = self.p90_kill_body * self.kill_switch_body_pct
-                if self.direction == TradeDirection.LONG:
-                    kill_level = self.p90_kill_entry - kill_80_pct
-                    if bar.close <= kill_level:
-                        _entry = self.entry_price; _sl = self.sl_price
-                        _tp1 = self.tp1_price; _tp2 = self.tp2_price
-                        _var = self.active_variant; _dir = self.direction
-                        self._reset_state()
-                        sig = P90Signal(
-                            event="KILL_SWITCH",
-                            variant=_var,
-                            direction=_dir,
-                            entry_price=_entry,
-                            sl_price=_sl,
-                            tp_price=_tp1,
-                            p90_body_pips=self.p90_body_pips,
-                            timestamp=bar.timestamp,
-                            reason="80% Kill Switch: close inside P90 body"
-                        )
-                        self.signal_log.append(sig)
-                        self.logger.info("KILL SWITCH (80%%): close=%.5f <= kill_level=%.5f", bar.close, kill_level)
-                        return sig
-                else:  # SHORT
-                    kill_level = self.p90_kill_entry + kill_80_pct
-                    if bar.close >= kill_level:
-                        _entry = self.entry_price; _sl = self.sl_price
-                        _tp1 = self.tp1_price; _tp2 = self.tp2_price
-                        _var = self.active_variant; _dir = self.direction
-                        self._reset_state()
-                        sig = P90Signal(
-                            event="KILL_SWITCH",
-                            variant=_var,
-                            direction=_dir,
-                            entry_price=_entry,
-                            sl_price=_sl,
-                            tp_price=_tp1,
-                            p90_body_pips=self.p90_body_pips,
-                            timestamp=bar.timestamp,
-                            reason="80% Kill Switch: close inside P90 body"
-                        )
-                        self.signal_log.append(sig)
-                        self.logger.info("KILL SWITCH (80%%): close=%.5f >= kill_level=%.5f", bar.close, kill_level)
-                        return sig
+            # ── 80% Kill Switch ──────────────────────────────────────────
+            # DISABLED: Kill switch destroys the edge.
+            # Reference config (78.7% WR) did NOT use kill switch.
+            # Trades are allowed to run to TP or SL naturally.
+
+            # ── CASCADE: Check for same-direction P90 while in trade ──
+            # Reference: Cascade can fire while initial trade is running
+            # If a new P90 fires in same direction within cascade window,
+            # generate a CASCADE entry signal (adds to position)
+            if self.p90_count > 0 and self.initial_p90_time is not None:
+                elapsed = (bar.timestamp - self.initial_p90_time).total_seconds() / 60.0
+                new_dir = TradeDirection.LONG if bar.body > 0 else TradeDirection.SHORT
+                if (30.0 <= elapsed <= 120.0 and
+                    new_dir == self.initial_p90_direction and
+                    self._is_p90(bar, est_hour) and
+                    self._is_boundary_breach(bar)):
+                    # Cascade entry
+                    variant = P90Variant.CASCADE
+                    entry, sl, tp1, tp2 = self._calc_trade_params(bar, variant, new_dir)
+                    self.p90_count += 1
+                    self.logger.info(
+                        f"CASCADE ENTRY: {new_dir.name} @ {entry:.5f}, "
+                        f"SL={sl:.5f}, TP1={tp1:.5f}, elapsed={elapsed:.0f}min"
+                    )
+                    sig = P90Signal(
+                        event="ENTRY",
+                        variant=variant,
+                        direction=new_dir,
+                        entry_price=entry,
+                        sl_price=sl,
+                        tp_price=tp1,
+                        tp2_price=tp2,
+                        p90_body_pips=bar.body_abs / self.pip_size,
+                        timestamp=bar.timestamp,
+                        reason=f"Cascade P90: 2nd+ same dir within {elapsed:.0f}min"
+                    )
+                    self.signal_log.append(sig)
+                    return sig
 
             if self.direction == TradeDirection.LONG:
                 # TP2 check first (it's further out)

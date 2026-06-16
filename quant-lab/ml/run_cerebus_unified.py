@@ -175,6 +175,8 @@ def synthesize_alert(symbol, bias, dtb_t2, st_sig, p90_sig, now_est):
         "dtb_pips": dtb_pips,
         "pathway": pathway,
         "regime": regime,
+        "regime_ratio": bias.regime_ratio,
+        "asian_range_pips": bias.asian_range_pips if hasattr(bias, 'asian_range_pips') else 0,
         "engines_aligned": engines_aligned,
         "message": "\n".join(lines),
     }
