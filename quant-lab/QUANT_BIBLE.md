@@ -496,6 +496,74 @@ Loop cap = 5 (safety max).
 | DE30 | 501 | 79.0% | +4,557.1p | 368 | 80.7% | +5,514.0p | 276 | 92.4% | +8,395.7p |
 | CHFJPY | 298 | 78.2% | +1,257.7p | 222 | 87.4% | +1,775.5p | 231 | 95.7% | +4,133.8p |
 
+### 1B.5 Native Tier Master Table (K-Means Calibrated)
+
+**Source:** `quant-lab/reports/tier_discovery_summary.md` + `fx_calibration_summary.md`
+**Method:** K-Means Clustering (k=3) on Asian Range per asset
+**Note:** These are the ACTUAL native tiers used in backtests, calibrated per-asset from data.
+T1 ar_max = T2 boundary, T2 ar_max = T3 boundary. NO_GO = AR > T3 ar_max.
+
+#### Forex Majors
+
+| Pair | Pip | k | T1 AR Max | T1 AU | T1 Trig | T2 AR Max | T2 AU | T2 Trig | T3 AR Max | T3 AU | T3 Trig | P90 Thr | SL Method |
+|------|-----|---|-----------|-------|---------|-----------|-------|---------|-----------|-------|---------|---------|-----------|
+| EURUSD | 0.0001 | 0.46 | 20.0p | 10.0p | 12.0p | 30.0p | 12.0p | 15.0p | 45.0p | 15.0p | 19.0p | 4.6p | OCC_EXACT |
+| GBPUSD | 0.0001 | 0.46 | 26.0p | 13.0p | 16.0p | 39.0p | 16.0p | 19.0p | 59.0p | 20.0p | 24.0p | 5.98p | OCC_EXACT |
+| USDCHF | 0.0001 | 0.46 | 20.0p | 11.0p | 11.0p | 30.0p | 15.0p | 15.0p | 45.0p | 20.0p | 20.0p | 5.06p | OCC_EXACT |
+| USDJPY | 0.01 | 0.46 | 30.0p | 16.0p | 19.0p | 50.0p | 26.0p | 31.0p | 80.0p | 44.0p | 53.0p | 7.36p | OCC_EXACT |
+| AUDUSD | 0.0001 | 0.46 | 20.0p | 11.0p | 13.0p | 30.0p | 14.0p | 17.0p | 45.0p | 18.0p | 21.0p | 5.06p | OCC_EXACT |
+| NZDUSD | 0.0001 | 0.46 | 25.0p | 14.0p | 17.0p | 35.0p | 17.0p | 20.0p | 50.0p | 21.0p | 25.0p | 6.44p | OCC_EXACT |
+
+#### Forex Crosses (K-Means Calibrated)
+
+| Pair | Pip | T1 AR Max | T1 AU | T1 Trig | T2 AR Max | T2 AU | T2 Trig | T3 AR Max | T3 AU | T3 Trig | P90 Thr | SL Method |
+|------|-----|-----------|-------|---------|-----------|-------|---------|-----------|-------|---------|---------|-----------|
+| EURGBP | 0.0001 | 14.7p | 7p | 8p | 23.0p | 14p | 17p | 23.0p | 26p | 32p | 4.6p | OCC_EXACT |
+| EURJPY | 0.01 | 55.1p | 29p | 35p | 81.4p | 63p | 75p | 81.4p | 185p | 222p | 26.5p | OCC_EXACT |
+| EURAUD | 0.0001 | 52.9p | 27p | 32p | 78.27p | 51p | 61p | 78.27p | 107p | 129p | 25.4p | OCC_EXACT |
+| EURNZD | 0.0001 | 59.6p | 28p | 34p | 84.4p | 49p | 59p | 84.4p | 94p | 113p | 28.6p | OCC_EXACT |
+| EURCHF | 0.0001 | 18.37p | 9p | 11p | 26.7p | 19p | 23p | 26.7p | 41p | 49p | 4.6p | OCC_EXACT |
+| EURCAD | 0.0001 | 28.9p | 13p | 16p | 43.5p | 25p | 31p | 43.5p | 50p | 60p | 5.5p | OCC_EXACT |
+| USDCAD | 0.0001 | 23.4p | 11p | 13p | 34.4p | 20p | 24p | 34.4p | 37p | 44p | 5.0p | OCC_EXACT |
+| AUDJPY | 0.01 | 42.9p | 21p | 26p | 65.47p | 45p | 53p | 65.47p | 121p | 146p | 20.6p | OCC_EXACT |
+| AUDNZD | 0.0001 | 23.57p | 12p | 14p | 34.3p | 24p | 29p | 34.3p | 51p | 62p | 5.0p | OCC_EXACT |
+| AUDCHF | 0.0001 | 20.7p | 10p | 12p | 31.2p | 18p | 22p | 31.2p | 37p | 44p | 5.0p | OCC_EXACT |
+| AUDCAD | 0.0001 | 26.2p | 13p | 16p | 37.2p | 24p | 29p | 37.2p | 46p | 55p | 5.0p | OCC_EXACT |
+| NZDJPY | 0.01 | 37.8p | 20p | 24p | 54.84p | 44p | 53p | 54.84p | 143p | 172p | 18.1p | OCC_EXACT |
+| NZDCHF | 0.0001 | 18.4p | 9p | 11p | 26.7p | 18p | 22p | 26.7p | 39p | 47p | 5.0p | OCC_EXACT |
+| NZDCAD | 0.0001 | 24.9p | 12p | 15p | 35.44p | 22p | 26p | 35.44p | 42p | 50p | 5.0p | OCC_EXACT |
+| CADJPY | 0.01 | 35.7p | 19p | 23p | 54.4p | 43p | 51p | 54.4p | 139p | 166p | 17.1p | OCC_EXACT |
+| CADCHF | 0.0001 | 15.0p | 7p | 9p | 22.3p | 14p | 17p | 22.3p | 32p | 38p | 4.6p | OCC_EXACT |
+| GBPCAD | 0.0001 | 37.1p | 20p | 24p | 53.94p | 45p | 55p | 53.94p | 329p | 395p | 5.0p | OCC_PLUS_6P |
+| GBPJPY | 0.01 | 40.0p | 19p | 23p | 70.0p | 29p | 35p | 100.0p | 48p | 58p | 9.12p | OCC_PLUS_5P |
+| GBPAUD | 0.0001 | 45.0p | 21p | 25p | 75.0p | 32p | 38p | 110.0p | 52p | 63p | 10.08p | OCC_PLUS_8P |
+| GBPNZD | 0.0001 | 50.0p | 24p | 29p | 85.0p | 36p | 43p | 120.0p | 59p | 71p | 11.52p | OCC_PLUS_8P |
+| GBPCHF | 0.0001 | 35.0p | 18p | 21p | 55.0p | 27p | 32p | 80.0p | 44p | 53p | 8.64p | OCC_PLUS_6P |
+
+#### Indices
+
+| Pair | Pip | T1 AR Max | T1 AU | T1 Trig | T2 AR Max | T2 AU | T2 Trig | T3 AR Max | T3 AU | T3 Trig | SL Method |
+|------|-----|-----------|-------|---------|-----------|-------|---------|-----------|-------|---------|-----------|
+| DE30 | 1.0 | 50.0p | 20p | 24p | 80.0p | 30p | 37p | 120.0p | 46p | 55p | FIXED_BUFFER |
+| FR40 | 1.0 | 45.0p | 17p | 21p | 70.0p | 26p | 31p | 100.0p | 39p | 46p | FIXED_BUFFER |
+| US500 | 1.0 | 45.0p | 17p | 21p | 70.0p | 26p | 31p | 100.0p | 39p | 46p | FIXED_BUFFER |
+| HK50 | 1.0 | 150.0p | 83p | 99p | 200.0p | 124p | 149p | 300.0p | 186p | 223p | FIXED_BUFFER |
+
+#### Metals & Crypto
+
+| Pair | Pip | T1 AR Max | T1 AU | T1 Trig | T2 AR Max | T2 AU | T2 Trig | T3 AR Max | T3 AU | T3 Trig | SL Method |
+|------|-----|-----------|-------|---------|-----------|-------|---------|-----------|-------|---------|-----------|
+| XAUUSD | 0.01 | 32.0p | 16p | 19p | 58.0p | 29p | 35p | 95.0p | 48p | 58p | FIXED_BUFFER |
+| XAGUSD | 0.0001 | 45.0p | 23p | 27p | 67.5p | 34p | 41p | 112.5p | 56p | 68p | FIXED_BUFFER |
+| BTCUSD | 1.0 | 750p | 205p | 246p | 1700p | 545p | 654p | 3000p | 1160p | 1392p | FIXED_BUFFER |
+| ETHUSD | 1.0 | 100p | 32p | 38p | 250p | 79p | 95p | 500p | 158p | 189p | FIXED_BUFFER |
+
+#### Commodities
+
+| Pair | Pip | T1 AR Max | T1 AU | T1 Trig | T2 AR Max | T2 AU | T2 Trig | T3 AR Max | T3 AU | T3 Trig | Notes |
+|------|-----|-----------|-------|---------|-----------|-------|---------|-----------|-------|---------|-------|
+| OILUSD | 0.01 | 20p ($0.20) | 10p ($0.10) | 12p ($0.12) | 30p ($0.30) | 12p ($0.12) | 15p ($0.15) | 45p ($0.45) | 15p ($0.15) | 19p ($0.19) | See 1B.3 for regime-adjusted |
+
 ### 1B.5 Key AR Size Observations
 
 **Typical Asian Range Sizes by Asset Class:**
