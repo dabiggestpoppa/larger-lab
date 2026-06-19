@@ -58,7 +58,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger("cerebus.unified")
 
-DEFAULT_SYMBOLS = ["EURUSD", "BTCUSD"]
+DEFAULT_SYMBOLS = [
+    "EURUSD", "GBPUSD", "USDCHF", "USDJPY", "AUDUSD", "NZDUSD", "USDCAD",
+    "EURGBP", "EURCHF", "EURJPY", "GBPCHF", "GBPJPY", "AUDJPY", "NZDJPY",
+    "CHFJPY", "AUDNZD", "GBPAUD", "GBPCAD", "AUDCAD", "EURAUD", "EURNZD",
+    "EURCAD", "NZDCAD", "NZDCHF", "CADJPY", "CADCHF", "GBPNZD",
+    "XAUUSD", "XAGUSD", "BTCUSD", "ETHUSD", "SOLUSD", "US500",
+]
 SCAN_INTERVAL = 300
 EST = timezone(timedelta(hours=-5))
 
