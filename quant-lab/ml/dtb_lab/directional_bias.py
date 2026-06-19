@@ -105,28 +105,48 @@ class DirectionalBias:
 
         # ── Compute Asian Range (most recent complete session only) ──
         # Asian session: 7PM-3AM EST = 0-8 UTC
-        # Find the most recent complete Asian session
+        # Group Asian bars by trading day and find the most recent complete session
         asian_mask = (bars["est_hour"] >= 19) | (bars["est_hour"] < 3)
         asian_bars = bars[asian_mask]
 
         if len(asian_bars) < 2:
             return self._no_signal_result()
 
-        # Get the most recent Asian session only
-        # Find the last gap in Asian bars (indicates session boundary)
-        asian_times = asian_bars.index
-        if len(asian_times) > 1:
-            # Find the largest gap between consecutive Asian bars
-            gaps = [(asian_times[i+1] - asian_times[i], i) for i in range(len(asian_times)-1)]
-            max_gap_idx = max(gaps, key=lambda x: x[0])[1] if gaps else 0
-            
-            # Take only the bars after the last gap (most recent session)
-            if max_gap_idx > 0:
-                recent_asian = asian_bars.iloc[max_gap_idx+1:]
-            else:
-                recent_asian = asian_bars
-        else:
+        # Group Asian bars by date (the date the session started, i.e., 7PM EST = 0UTC)
+        # Asian bars from 0-8 UTC belong to the same trading day
+        asian_dates = {}
+        for idx, bar in asian_bars.iterrows():
+            d = idx.date()
+            if d not in asian_dates:
+                asian_dates[d] = []
+            asian_dates[d].append(idx)
+
+        # Find the most recent complete session (has bars spanning most of the 8-hour window)
+        # A complete session should have ~96 bars (8 hours * 12 bars/hour)
+        # We want the last session that has a bar near 3AM EST (8UTC) — indicating it completed
+        best_date = None
+        best_count = 0
+        for d in sorted(asian_dates.keys()):
+            times_list = asian_dates[d]
+            count = len(times_list)
+            # Check if this session has bars near the end of the Asian window (close to 8UTC)
+            has_end_bar = any(t.hour >= 7 for t in times_list)  # Has bar at 7AM+ EST
+            if has_end_bar and count > best_count:
+                best_date = d
+                best_count = count
+
+        # If no complete session found, use the most recent one with enough bars
+        if best_date is None:
+            for d in sorted(asian_dates.keys(), reverse=True):
+                if len(asian_dates[d]) >= 12:  # At least 1 hour of data
+                    best_date = d
+                    break
+        
+        # If still no session, use all Asian bars
+        if best_date is None:
             recent_asian = asian_bars
+        else:
+            recent_asian = asian_bars.loc[asian_dates[best_date][0]:asian_dates[best_date][-1]]
 
         if len(recent_asian) < 2:
             recent_asian = asian_bars
