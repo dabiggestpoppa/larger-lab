@@ -103,6 +103,21 @@ def scan_symbol(symbol, bias_engine, dtb_predictor, st_engine, p90_engine, dry_r
         logger.info(f"{symbol}: outside active window ({now_est.strftime('%H:%M')} EST)")
         return alerts
 
+    # Compute Asian session high/low for ST engine (most recent session only)
+    asian = df[(df['est_hour'] >= 19) | (df['est_hour'] < 3)]
+    if len(asian) > 0:
+        # Get the most recent complete Asian session
+        df['date'] = df.index.date
+        last_date = df['date'].max()
+        last_asian = asian[asian.index.date == last_date]
+        if len(last_asian) > 0:
+            asian_high = last_asian['high'].max()
+            asian_low = last_asian['low'].min()
+        else:
+            asian_high = asian['high'].max()
+            asian_low = asian['low'].min()
+        st_engine.initialize_session(asian_high, asian_low)
+
     bias_result = bias_engine.evaluate(df, symbol)
 
     dtb_t2 = None
@@ -115,8 +130,14 @@ def scan_symbol(symbol, bias_engine, dtb_predictor, st_engine, p90_engine, dry_r
     st_signal = None
     p90_signal = None
     try:
-        st_engine.process_bars(df)
-        st_signal = st_engine.get_signal()
+        # ST engine processes bars one at a time
+        from symmetry_trap import Bar
+        for i in range(len(df)):
+            row = df.iloc[i]
+            bar = Bar(timestamp=row.name, open=row['open'], high=row['high'], low=row['low'], close=row['close'])
+            sig = st_engine.process_bar(bar)
+            if sig is not None:
+                st_signal = sig
     except Exception as e:
         logger.debug(f"ST engine failed: {e}")
     try:
@@ -203,8 +224,11 @@ def main():
 
     bias_engine = DirectionalBias()
     dtb_predictor = DTBPredictor()
-    st_engine = SymmetryTrapEngine()
     p90_engine = P90Engine()
+    
+    # Import per-asset tier configs
+    sys.path.insert(0, str(Path(__file__).parent.parent / "configs"))
+    from asset_configs import ASSET_CONFIGS
 
     try:
         script_dir = Path(__file__).parent.parent.parent / "scripts"
@@ -240,6 +264,11 @@ def main():
     while True:
         for symbol in args.symbols:
             try:
+                # Create per-asset ST engine with correct tier config
+                asset_cfg = ASSET_CONFIGS.get(symbol, {})
+                tier_cfg = asset_cfg.get("tiers", None)
+                st_engine = SymmetryTrapEngine(tier_config=tier_cfg)
+                
                 alerts = scan_symbol(symbol, bias_engine, dtb_predictor, st_engine, p90_engine, args.dry_run)
                 for alert in alerts:
                     logger.info(f"\n{alert['message']}")
