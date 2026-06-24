@@ -1,3 +1,37 @@
+## ðŸ”´ PM â€” COMPLETE SYSTEM UPDATE (2026-06-24)
+**Agent:** PM (Polymorph) | **Status:** âœ… ALL SYSTEMS UPDATED
+
+### What was done:
+1. **Quant Bible Updated** â€” All 21 formulas, all backtest results, AR tier master table (36 pairs), native K-Means calibrated tiers
+2. **Tier Discovery Summary** â€” Updated with all 36 pairs including forex majors (EURUSD, GBPUSD, USDCHF, USDJPY, AUDUSD, NZDUSD), indices, metals, crypto
+3. **Asset Configs Synced** â€” Per-asset tier configurations aligned with tier discovery
+4. **OILUSD Analysis** â€” Native tier test from March 2024: T1=23.6% sessions, T2=35%, T3=20.3%, NO_GO=21%. Current regime needs adjusted tiers (T1=$0.35, T2=$0.55, T3=$0.80)
+5. **Top 6 FX Pairs by Trades/Day** (native config): GBPUSD (4.74), EURUSD (4.17), USDCHF (4.01), CHFJPY (2.95), GBPJPY (2.91), USDJPY (2.30)
+
+### Key Files Updated:
+- `quant-lab/QUANT_BIBLE.md` â€” Complete reference (21 formulas, results, tier tables)
+- `quant-lab/reports/tier_discovery_summary.md` â€” All 36 pairs with native configs
+- `quant-lab/configs/asset_configs.py` â€” Per-asset tier alignment
+
+---
+
+
+## ?? PM ï¿½ COMPLETE SYSTEM UPDATE (2026-06-24)
+**Agent:** PM (Polymorph) | **Status:** ? ALL SYSTEMS UPDATED
+
+### What was done:
+1. **Quant Bible Updated** ï¿½ All 21 formulas, all backtest results, AR tier master table (36 pairs), native K-Means calibrated tiers
+2. **Tier Discovery Summary** ï¿½ Updated with all 36 pairs including forex majors (EURUSD, GBPUSD, USDCHF, USDJPY, AUDUSD, NZDUSD), indices, metals, crypto
+3. **Asset Configs Synced** ï¿½ Per-asset tier configurations aligned with tier discovery
+4. **OILUSD Analysis** ï¿½ Native tier test from March 2024: T1=23.6% sessions, T2=35%, T3=20.3%, NO_GO=21%. Current regime needs adjusted tiers (T1=.35, T2=.55, T3=.80)
+5. **Top 6 FX Pairs by Trades/Day** (native config): GBPUSD (4.74), EURUSD (4.17), USDCHF (4.01), CHFJPY (2.95), GBPJPY (2.91), USDJPY (2.30)
+
+### Key Files Updated:
+- quant-lab/QUANT_BIBLE.md ï¿½ Complete reference (21 formulas, results, tier tables)
+- quant-lab/reports/tier_discovery_summary.md ï¿½ All 36 pairs with native configs
+- quant-lab/configs/asset_configs.py ï¿½ Per-asset tier alignment
+
+---
 ## ðŸ”´ PM â€” QUANT BIBLE UPDATED w/ All Formulas + Results (2026-06-16)
 **Agent:** PM (Polymorph) | **Status:** âœ… COMPLETE â€” 598 lines, committed `936fa91c`
 
@@ -17,22 +51,22 @@
 
 ---
 
-## ?? PM — QUANT BIBLE UPDATED w/ All Formulas + Results (2026-06-16)
-**Agent:** PM (Polymorph) | **Status:** ? COMPLETE — 598 lines, committed 936fa91c
+## ?? PM ï¿½ QUANT BIBLE UPDATED w/ All Formulas + Results (2026-06-16)
+**Agent:** PM (Polymorph) | **Status:** ? COMPLETE ï¿½ 598 lines, committed 936fa91c
 
 ### What was added:
-- **Section 1 — 21 Core Formulas:** AU, P90 threshold, MLR (07:00-15:00 UTC), Fib targets, 132% kill-switch + rekey state machine, ILM states, regime ratio, ARP micro phase, density zone, gamma zones, NY sweep, OCC extreme, Wednesday bifurcation, hard exit (12PM EST), gear shift, Friday Asian anchor (crypto), Alpha/Beta 3-Leg, AB-CD, fib retrace/extension levels, micro-macro phase alignment, DMR deep state, symmetry trap entry pipeline
-- **Section 2 — All Backtest Results:** P90 4Y (1,038 trades, 78.7% WR, PF 3.09), ST 4Y (892 trades, 85.7% WR, PF 8.18), ST multi-asset 18 assets (11,437 trades), DMR 4Y (284 trades, 19% WR, PF 2.17), group combinatorics 36 pairs ranked, 9K unlock config (+720% trades), cost-adjusted viable pairs, post-target reversal rates (n=3,776), macro feature engine E2E (463K bars x 107 cols, 154.7s)
-- **Section 3 — Config Parameters:** Calibrated Bible config, 9K unlock config, per-asset trigger coefficients, Nautilus diffs
-- **Section 4 — 12 Ironclad Rules + Lessons Learned
-- **Section 5 — Key Files & References
+- **Section 1 ï¿½ 21 Core Formulas:** AU, P90 threshold, MLR (07:00-15:00 UTC), Fib targets, 132% kill-switch + rekey state machine, ILM states, regime ratio, ARP micro phase, density zone, gamma zones, NY sweep, OCC extreme, Wednesday bifurcation, hard exit (12PM EST), gear shift, Friday Asian anchor (crypto), Alpha/Beta 3-Leg, AB-CD, fib retrace/extension levels, micro-macro phase alignment, DMR deep state, symmetry trap entry pipeline
+- **Section 2 ï¿½ All Backtest Results:** P90 4Y (1,038 trades, 78.7% WR, PF 3.09), ST 4Y (892 trades, 85.7% WR, PF 8.18), ST multi-asset 18 assets (11,437 trades), DMR 4Y (284 trades, 19% WR, PF 2.17), group combinatorics 36 pairs ranked, 9K unlock config (+720% trades), cost-adjusted viable pairs, post-target reversal rates (n=3,776), macro feature engine E2E (463K bars x 107 cols, 154.7s)
+- **Section 3 ï¿½ Config Parameters:** Calibrated Bible config, 9K unlock config, per-asset trigger coefficients, Nautilus diffs
+- **Section 4 ï¿½ 12 Ironclad Rules + Lessons Learned
+- **Section 5 ï¿½ Key Files & References
 
 ### Key findings documented:
 - AR gate was #1 trade suppressor (silently kills entire days)
 - 12-pip trigger was #2 suppressor (filters micro-impulses)
 - BTCUSD best single asset ( net in group combinatorics)
 - EURJPY highest accuracy (88.1% WR, PF 18.0, cost 9.5%)
-- DMR CSV backtest ? MT5 EA (19% vs 92.2% WR — root cause in entry/exit logic)
+- DMR CSV backtest ? MT5 EA (19% vs 92.2% WR ï¿½ root cause in entry/exit logic)
 
 ---
 # Team Shared Conversation
@@ -985,5 +1019,6 @@ Key examples:
 - Markov model is ready for integration with live scanner
 - Weekly forecast: feed current state â†’ predict next state distribution
 - Combine with XGBoost regime classifier for hybrid neuro-symbolic signal
+
 
 
