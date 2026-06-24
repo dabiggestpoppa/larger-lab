@@ -1,8 +1,9 @@
 //@version=6
-// CEREBUS P90 V5 PER-ASSET — Auto-configured for 35 assets
-// Generated from asset_configs.py — Original: CEREBUS 👁️ V5 LIVE PERFECT FORM FIXED v5
+// CEREBUS P90 V5 PER-ASSET — Auto-configured for 38 assets
+// Generated from asset_configs.py + tier_discovery_summary.md
+// Original: CEREBUS 👁️ V5 LIVE PERFECT FORM FIXED v5
 // This copy adds per-asset P90 thresholds + auto pip_size detection
-// All 35 assets from asset_configs.py with calibrated P90 thresholds
+// All 38 assets with native K-Means calibrated tiers from tier_discovery_summary.md
 
 strategy("CEREBUS 👁️ P90 V5 PER-ASSET [AUTO]", 
          overlay=true, 
@@ -133,10 +134,15 @@ _ethusd = str.contains(_sym, "ETHUSD") or str.contains(_sym, "ETH")
 
 // ── Indices ──
 _nas100 = str.contains(_sym, "NAS100") or str.contains(_sym, "USTEC") or str.contains(_sym, "US100") or str.contains(_sym, "NASDAQ")
-_us500  = str.contains(_sym, "US500") or str.contains(_sym, "SPX500") or str.contains(_sym, "US500") or str.contains(_sym, "SP500")
+_us500  = str.contains(_sym, "US500") or str.contains(_sym, "SPX500") or str.contains(_sym, "SP500")
 _de30   = str.contains(_sym, "DE30") or str.contains(_sym, "GER40") or str.contains(_sym, "DAX")
 _fr40   = str.contains(_sym, "FR40") or str.contains(_sym, "CAC40")
 _hk50   = str.contains(_sym, "HK50") or str.contains(_sym, "HSI")
+
+// ── Additional Pairs ──
+_usdsek = str.contains(_sym, "USDSEK")
+_solusd  = str.contains(_sym, "SOLUSD") or str.contains(_sym, "SOL")
+_xrpusd  = str.contains(_sym, "XRPUSD") or str.contains(_sym, "XRP")
 
 // ── Pip Size Auto-Detection ──
 // JPY pairs: 0.01 | Indices/Metals/Crypto: 1.0/0.1/0.01 | Forex: 0.0001
@@ -144,6 +150,9 @@ pip_size = _usdjpy or _gbpjpy or _chfjpy or _eurjpy or _audjpy or _nzdjpy or _ca
            _btcusd or _ethusd or _nas100 or _us500 or _de30 or _fr40 or _hk50 ? 1.0 :
            _xauusd ? 0.1 :
            _xagusd ? 0.01 :
+           _usdsek ? 0.0001 :
+           _solusd ? 1.0 :
+           _xrpusd ? 0.0001 :
            0.0001
 
 // ── Per-Asset Base P90 Threshold (4-6 AM EST reference hour) ──
@@ -186,6 +195,9 @@ base_p90 = _eurusd ? 4.6 :
            _de30 ? 10.56 :
            _fr40 ? 9.12 :
            _hk50 ? 44.16 :
+           _usdsek ? 5.5 :
+           _solusd ? 0.78 :
+           _xrpusd ? 0.00078 :
            4.6  // fallback EUR/USD
 
 // ── Hour-Scaled P90 Threshold Functions ──
@@ -252,6 +264,9 @@ get_active_asset_name() =>
     _de30 ? "DE30" :
     _fr40 ? "FR40" :
     _hk50 ? "HK50" :
+    _usdsek ? "USD/SEK" :
+    _solusd ? "SOL/USD" :
+    _xrpusd ? "XRP/USD" :
     "UNKNOWN"
 
 // ============================================================================
