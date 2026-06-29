@@ -4,6 +4,36 @@
 > This is working memory — compact, current, task-focused.
 > Max ~2,000 chars. Prune old entries when full.
 
+## Current Context (2026-06-26 12:10 UTC — All Endpoints Fixed + PO Test Assigned)
+
+### Status
+🟢 OCE BACKEND RUNNING on port 8000 — ALL 26 ENDPOINTS PASSING
+
+### Fixes Applied (this session)
+1. **sovereign_api.py**: `.stats` → `.get_stats()` for ExecutiveRouter + ToolEmbodimentLayer
+2. **sovereign_api.py**: `_get_shell().get_status()` → `_get_shell().state.to_dict()`
+3. **resonance_api.py**: `_field_manager.state` → `_field_manager.current_state`
+4. **resonance_api.py**: `_signal_field.stats()` → `_signal_field.stats` (property, not method)
+5. **Terminal cleanup**: Killed stale node daemon (34h), duplicate DDG MCP, stale PowerShell terminals
+
+### Active Task
+**PO Field Testing — COMPLETE (26 PASS / 14 FAIL out of 40)**
+- CC executed all tests on behalf of PM2
+- 4 bugs found: observer persistence (MEDIUM), PO chat blocks backend, rate limit 503, events compress 422
+- Vault: `O2C-VAULT/journal_20260626T140000Z_pm2_po_test_results.md`
+- Test script: `tests/pm2_po_field_test.py`
+
+**Whop Store Build — COMPLETE (9/9 PASS)**
+- All 15 products configured in `whop-store/`
+- 3 consultations ACTIVE, 12 future offerings ready
+- Brand, payments, integrations all configured
+- Results: `progress/PO-FIRST-TEST-RESULTS.md`
+
+**PM2 Whop Verification — COMPLETE (10/10 PASS)**
+- PM2 executed `tests/pm2_whop_verify.py` via terminal
+- Created observer, ingested event, proposed governance, injected resonance
+- Vault: `O2C-VAULT/journal_20260626T142000Z_pm2_whop_build.json`
+
 ---
 
 ## PowerShell/Windows Execution Gotchas

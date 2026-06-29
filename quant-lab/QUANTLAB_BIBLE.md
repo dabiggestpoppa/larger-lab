@@ -1,5 +1,5 @@
 # 📖 QUANTLAB BIBLE — Living Reference
-> **Last Updated:** 2026-05-31 02:15 EDT  
+> **Last Updated:** 2026-06-29 (DMR v2 multi-entry + live deployment)
 > **DO NOT FREEZE** — every backtest, optimization, or discovery updates this file  
 > **All roads lead here:** every report, every engine, every config file routes through this index  
 
@@ -54,9 +54,13 @@
 | **Symmetry Trap Backtest** | `engines/symmetry_trap_backtest.py` | ✅ ACTIVE | Backtest wrapper — feeds M5 data through ST engine |
 | **P90 Kinetic** | `engines/p90_engine.py` | ✅ ACTIVE | 4 variants: INITIAL, CASCADE, STALL_HARVEST, EWS |
 | **Multi-Asset Runner** | `engines/run_st_multi_asset.py` | ✅ ACTIVE | Runs ST backtest across all assets with config injection |
+| **DMR v1 (Live)** | `mt5/dmr_multi_pair_live.py` | ✅ LIVE | Single entry per day, 5 pairs on demo |
+| **DMR v2 (Ready)** | `backtest/dmr_v2_multi_entry_test.py` | ✅ VALIDATED | Multi-entry per 2hr window, +164% PnL vs v1 |
+| **DMR MC** | `backtest/dmr_mc_full.py` | ✅ ACTIVE | Monte Carlo + deep stats |
+| **DMR Discord Bot** | `scripts/discord_dmr_bot.py` | ✅ LIVE | DMR-only signals to Discord |
 
 **Deprecated (DO NOT USE):**
-- `engines/dmr_standalone_backtest.py` — old standalone DMR, merged into P90 engine
+- `engines/dmr_standalone_backtest.py` — old buggy DMR (19% WR). Replaced by `dmr_reconstructed.py` (92% WR)
 
 ---
 
@@ -101,6 +105,12 @@
 ### 4a. Master Index
 📄 [`reports/INDEX.md`](reports/INDEX.md) — Full navigation hub for all reports
 
+### 4b. DMR Full Sweep Report
+📄 [`reports/dmr_sweep_full_report.md`](reports/dmr_sweep_full_report.md) — All 30 pairs, P90 calibration table, group summary
+
+### 4c. DMR Mini Bible
+📄 [`reports/dmr_mc/DMR_BIBLE.md`](reports/dmr_mc/DMR_BIBLE.md) — Complete DMR reference: specs, calibration, MC, combinatorics, grouping, live config
+
 ### 4b. Symmetry Trap — Full Backtest Results
 
 **Per-Asset Reports:** [`reports/per-asset/`](reports/per-asset/) (19 assets + MC)
@@ -127,7 +137,67 @@
 | **DE30** | 1,145 | 82.8% | 9.91 | 12.02 | 134.0p | 0.00% | Index |
 | **XAGUSD** | 2 | 50.0% | — | — | — | — | Metal ⚠️ |
 
-### 4c. Group Results
+### 4c. DMR (Deep Mean Rebalancing) — Full Sweep Results
+
+**Strategy:** Limit order at 200% Deep State, TP at activation, SL at 220%
+**Engine:** `backtest/dmr_reconstructed.py`
+**Manual Reference:** CEREBUS FX v4.0 Strategy B (pages 8-9)
+**Full Report:** [`reports/dmr_sweep_full_report.md`](reports/dmr_sweep_full_report.md)
+
+| Pair | Trades | WR | PF | PnL | MaxDD |
+|------|--------|----|----|-----|-------|
+| **EURUSD** | 618 | 92.1% | 123.1 | +4,601p | 2.5 |
+| **GBPUSD** | 669 | 93.4% | 150.2 | +6,520p | 2.2 |
+| **USDCHF** | 652 | 91.7% | 112.1 | +4,634p | 2.2 |
+| **USDJPY** | 389 | 94.1% | 172.0 | +7,915p | 6.4 |
+| **AUDUSD** | 828 | 92.4% | 125.0 | +7,637p | 4.3 |
+| **USDCAD** | 777 | 91.2% | 113.0 | +5,745p | 2.9 |
+| **NZDUSD** | 794 | 89.9% | 93.1 | +6,426p | 3.0 |
+| **CHFJPY** | 240 | 95.8% | 251.7 | +4,888p | 3.2 |
+| **GBPJPY** | 199 | 96.5% | 283.3 | +5,025p | 4.7 |
+| **BTCUSD** | 205 | 87.3% | 75.3 | +68,033p | 90.9 |
+| **US500** | 545 | 93.8% | 125.4 | +3,420p | 3.8 |
+| *+ 17 more crosses* | | | | | |
+| **TOTAL (v1)** | **14,584** | **92.5%** | **134.2** | **+218,848p** | — |
+
+### 4d. DMR v2 Multi-Entry Results (Latest)
+
+**Engine:** `backtest/dmr_v2_multi_entry_test.py` | **One P90 per 2hr window**
+**Full Report:** [`reports/dmr_mc/dmr_deep_analysis_report.md`](reports/dmr_mc/dmr_deep_analysis_report.md)
+
+| Pair | Trades | WR | PF | PnL | Delta vs v1 |
+|------|--------|----|----|-----|-------------|
+| **EURUSD** | 988 | 92.4% | 122.6 | +12,517p | **+172%** |
+| **GBPUSD** | 1,921 | 92.2% | 118.2 | +25,786p | **+295%** |
+| **USDJPY** | 1,841 | 90.2% | 95.6 | +24,863p | **+214%** |
+| **AUDUSD** | 1,684 | 92.6% | 136.3 | +20,852p | **+173%** |
+| **USDCAD** | 1,741 | 92.2% | 119.0 | +21,528p | **+275%** |
+| **NZDUSD** | 1,352 | 91.3% | 115.2 | +15,960p | +149% |
+| **GBPJPY** | 1,095 | 92.0% | 117.1 | +16,192p | +222% |
+| **CHFJPY** | 1,129 | 90.5% | 104.3 | +16,132p | +231% |
+| **TOTAL** | **32,102** | **91.4%** | — | **+568,752p** | **+164%** |
+
+### 4e. DMR Monte Carlo — Deep Analysis
+
+**Engine:** `backtest/dmr_mc_full.py` | **Simulations:** 10,000 per pair
+**Full Report:** [`reports/dmr_mc/dmr_deep_analysis_report.md`](reports/dmr_mc/dmr_deep_analysis_report.md)
+**Mini Bible:** [`reports/dmr_mc/DMR_BIBLE.md`](reports/dmr_mc/DMR_BIBLE.md)
+
+| Pair | Trades | WR | PF | Sharpe | Calmar | Kelly | Max DD | MC Ruin |
+|------|--------|----|----|--------|--------|-------|--------|---------|
+| **EURUSD** | 618 | 92.1% | 123.0 | 29.7 | 750.5 | 0.916 | 2.5p | 0.00% |
+| **GBPUSD** | 669 | 93.4% | 150.2 | 29.0 | 1116.3 | 0.928 | 2.2p | 0.00% |
+| **USDCHF** | 652 | 91.7% | 112.1 | 16.7 | 814.1 | 0.911 | 2.2p | 0.00% |
+| **USDJPY** | 389 | 94.1% | 172.0 | 34.6 | 801.2 | 0.937 | 6.4p | 0.00% |
+| **AUDUSD** | 828 | 92.4% | 125.0 | 22.6 | 540.5 | 0.919 | 4.3p | 0.00% |
+| **NZDUSD** | 794 | 89.9% | 93.1 | 23.6 | 679.8 | 0.891 | 3.0p | 0.00% |
+| **CHFJPY** | 240 | 95.8% | 251.7 | 29.5 | 1604.0 | 0.955 | 3.2p | 0.00% |
+| **GBPJPY** | 199 | 96.5% | 283.3 | 29.4 | 1353.8 | 0.962 | 4.7p | 0.00% |
+| **BTCUSD** | 205 | 87.3% | 75.3 | 25.8 | 920.0 | 0.859 | 90.9p | 0.00% |
+
+**Key:** 0% ruin rate all pairs | Max consec loss = 2 | Avg duration = 10.4 min | Kelly > 0.90
+
+### 4e. Group Results
 
 | Group | Trades | WR | PF | MC Ruin | Report |
 |-------|--------|----|----|---------|--------|

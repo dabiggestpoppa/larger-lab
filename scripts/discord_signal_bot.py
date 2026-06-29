@@ -1,7 +1,7 @@
 """
-DISCORD SIGNAL BOT — CEREBUS Scanner Forwarder
-==============================================
-Watches data/alerts_history.json and forwards new alerts to Discord immediately.
+DISCORD SIGNAL BOT — CEREBUS + DMR Scanner Forwarder
+=====================================================
+Watches data/alerts_history.json and dmr_signals.jsonl, forwards to Discord.
 Checks every 10 seconds. Sends as soon as scanner fires.
 """
 import os, sys, json, time, requests
@@ -53,23 +53,50 @@ def format_alert(alert):
     ) % (emoji, symbol, direction, int(confidence * 100), pathway, regime, regime_ratio, asian_range, timestamp)
 
 
+def format_dmr_signal(sig):
+    """Format DMR-specific signal for Discord."""
+    symbol = sig.get("symbol", "?")
+    direction = sig.get("direction", "?")
+    entry = sig.get("entry_price", 0)
+    sl = sig.get("sl_price", 0)
+    tp = sig.get("tp_price", 0)
+    body = sig.get("body_pips", 0)
+    ds = sig.get("ds_level", 0)
+    ar = sig.get("asian_range_pips", 0)
+    ts = sig.get("timestamp", datetime.now(EST).strftime("%H:%M:%S"))
+    emoji = "🟢" if direction == "LONG" else "🔴"
+    return (
+        "%s **DMR SIGNAL** — %s\n"
+        "Direction: **%s** | Entry: **%s**\n"
+        "SL: %s | TP: %s\n"
+        "Body: %.1fp | DS Level: %s | AR: %.1fp\n"
+        "Time: %s EST"
+    ) % (emoji, symbol, direction, entry, sl, tp, body, ds, ar, ts)
+
+
 def scan_files():
     new_signals = []
-    alerts_file = REPO_ROOT / "data" / "alerts_history.json"
-    if not alerts_file.exists():
-        return new_signals
-    fkey = str(alerts_file)
-    last_count = file_positions.get(fkey, 0)
-    try:
-        with open(alerts_file, "r", encoding="utf-8") as f:
-            data = json.loads(f.read().strip())
-            if isinstance(data, list):
-                for entry in data[last_count:]:
-                    if isinstance(entry, dict):
-                        new_signals.append(entry)
-                file_positions[fkey] = len(data)
-    except Exception as e:
-        print("[SCANNER] Error: %s" % e)
+    
+    # ONLY watch DMR signals (ignore generic alerts_history.json to avoid flooding)
+    dmr_file = REPO_ROOT / "quant-lab" / "mt5" / "live_logs" / "dmr_signals.jsonl"
+    if dmr_file.exists():
+        fkey = str(dmr_file)
+        last_pos = file_positions.get(fkey, 0)
+        try:
+            with open(dmr_file, "r", encoding="utf-8") as f:
+                f.seek(last_pos)
+                for line in f:
+                    line = line.strip()
+                    if line:
+                        try:
+                            entry = json.loads(line)
+                            new_signals.append(("dmr", entry))
+                        except:
+                            pass
+                file_positions[fkey] = f.tell()
+        except Exception as e:
+            print("[DMR SCANNER] Error: %s" % e)
+    
     return new_signals
 
 
@@ -80,9 +107,9 @@ def main():
     args = parser.parse_args()
 
     print("=" * 60)
-    print("  DISCORD SIGNAL BOT — CEREBUS Scanner")
+    print("  DISCORD SIGNAL BOT — DMR Only")
     print("  Discord webhook: %s" % ("SET" if DISCORD_WEBHOOK else "NOT SET"))
-    print("  Watching: data/alerts_history.json (10s interval)")
+    print("  Watching: quant-lab/mt5/live_logs/dmr_signals.jsonl")
     print("=" * 60)
 
     if args.test:
@@ -91,15 +118,18 @@ def main():
         print("Test sent.")
         return
 
-    print("\n[BOT] Watching for scanner alerts... (Ctrl+C to stop)\n")
+    print("\n[BOT] Watching for DMR signals only... (Ctrl+C to stop)\n")
     while True:
         try:
             signals = scan_files()
-            for sig in signals:
-                if send_discord(format_alert(sig)):
-                    print("[%s] %s %s %d%%" % (
+            for sig_type, sig in signals:
+                msg = format_dmr_signal(sig)
+                if send_discord(msg):
+                    print("[%s] [DMR] %s %s @ %s" % (
                         datetime.now(EST).strftime("%H:%M:%S"),
-                        sig.get("symbol"), sig.get("direction"), int(sig.get("confidence", 0) * 100)))
+                        sig.get("symbol", "?"),
+                        sig.get("direction", "?"),
+                        sig.get("entry_price", "?")))
             time.sleep(10)
         except KeyboardInterrupt:
             print("\n[BOT] Stopped.")

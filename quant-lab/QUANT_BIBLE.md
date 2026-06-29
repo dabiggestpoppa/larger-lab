@@ -817,28 +817,47 @@ T1 ar_max = T2 boundary, T2 ar_max = T3 boundary. NO_GO = AR > T3 ar_max.
 - OIL/USD: 98% hit rate on 132% realignment trigger during bifurcation
 - 1,401 sessions analyzed
 
-### 2.4 DMR (Deep Mean Reversion) — 4Y EURUSD (2023-07 to 2026-05)
+### 2.4 DMR (Deep Mean Rebalancing) — Multi-Asset (30 Pairs, 4.4 Years)
 
-**Data:** 216,820 bars, 912 sessions | **Account:** $85.26 | **Lot:** 0.03
+**Data:** M5, 2022-01 to 2026-06 (~4.4 years) | **Engine:** `dmr_reconstructed.py` + `dmr_v2_multi_entry_test.py`
+
+#### v2 Multi-Entry Results (Latest — One P90 per 2hr Window)
+
+| Pair | Trades | WR | PF | PnL | TP | SL |
+|------|--------|----|----|-----|----|----|-----|
+| **EURUSD** | 988 | 92.4% | 122.6 | +12,517p | 913 | 75 |
+| **GBPUSD** | 1,921 | 92.2% | 118.2 | +25,786p | 1,771 | 150 |
+| **USDCHF** | 1,425 | 91.2% | 122.3 | +19,449p | 1,298 | 125 |
+| **USDJPY** | 1,841 | 90.2% | 95.6 | +24,863p | 1,661 | 180 |
+| **AUDUSD** | 1,684 | 92.6% | 136.3 | +20,852p | 1,5604 |
+| **USDCAD** | 1,741 | 92.2% | 119.0 | +21,528p | 1,605 | 135 |
+| **NZDUSD** | 1,352 | 91.3% | 115.2 | +15,960p | 1,232 | 117 |
+| **GBPJPY** | 1,095 | 92.0% | 117.1 | +16,192p | 1,007 | 88 |
+| **CHFJPY** | 1,129 | 90.5% | 104.3 | +16,132p | 1,022 | 107 |
+| **TOTAL** | **32,102** | **91.4%** | — | **+568,752p** | | |
+
+#### v1 vs v2 Comparison
+
+| Metric | v1 (single entry) | v2 (multi-entry) | Delta |
+|--------|-------------------|-------------------|-------|
+| **Total Trades** | 14,582 | 32,102 | **+120%** |
+| **Total PnL** | +215,661p | +568,752p | **+164%** |
+| **Blended WR** | 92.6% | 91.4% | -1.3pp |
+| **0% Ruin Rate** | ✅ All pairs | ✅ All pairs | — |
+
+#### Key DMR Stats
 
 | Metric | Value |
 |--------|-------|
-| **Total Trades** | **284** |
-| **Win Rate** | **19.0%** |
-| Wins / Losses | 54 / 230 |
-| **Gross Profit** | +600.6 pips |
-| **Gross Loss** | -277.2 pips |
-| **Profit Factor** | **2.17** |
-| **Sharpe Ratio** | **3.59** |
-| Avg Trade | +1.14 pips |
-| Max Drawdown | 38.4 pips |
-| Avg Win | 11.1 pips |
-| Avg Loss | -1.2 pips |
-| Max Consec Losses | **31** |
+| **Max Consec Losses** | 2 (most forex pairs) |
+| **Avg MaxDD (Forex)** | 2.9 pips |
+| **Avg Trade Duration** | 10.4 minutes |
+| **Kelly Criterion** | > 0.90 (all forex) |
+| **Hard Exits** | 5 of 14,584 (0.03%) |
+| **Live Deployment** | v1 on demo (5 pairs), v2 ready |
 
-**⚠️ Data Discrepancy:** Historical MT5 EA shows 435 trades, 92.2% WR, +938.1p (2Y). CSV backtest does NOT reproduce this. Root cause: entry trigger logic, SL/TP calculation, trade filtering, or exit conditions differ between MT5 EA and CSV simulation.
-
-**PF 2.17 at 19% WR:** High-payoff, low-WR profile. Avg win (11.1p) is 9x avg loss (1.2p). Characteristic of trend-following payoff applied to mean reversion. However, 31 consecutive losses = ~70 pips DD at 0.01 lots.
+**Full per-pair breakdown:** [`reports/dmr_mc/dmr_deep_analysis_report.md`](reports/dmr_mc/dmr_deep_analysis_report.md)
+**DMR Mini Bible:** [`reports/dmr_mc/DMR_BIBLE.md`](reports/dmr_mc/DMR_BIBLE.md)
 
 ### 2.5 Group Combinatorics — Full Universe (36 Pairs)
 
@@ -1075,7 +1094,13 @@ Each pair's trigger = native_trigger × coefficient (NOT universal 8-10p). Coeff
 | `quant-lab/engines/rekey_intraday.py` | Rekey Intraday engine (bifurcation model) |
 | `quant-lab/engines/stall_harvest_test.py` | Stall Harvest engine (P90 deep retracement) |
 | `quant-lab/config/rekey_strategy.yaml` | Rekey strategy configuration |
-| `quant-lab/engines/dmr_standalone_backtest.py` | DMR standalone backtest |
+| `quant-lab/backtest/dmr_reconstructed.py` | DMR v1 backtest engine (single entry) |
+| `quant-lab/backtest/dmr_v2_multi_entry_test.py` | DMR v2 backtest engine (multi-entry) |
+| `quant-lab/backtest/dmr_mc_full.py` | DMR Monte Carlo + deep stats |
+| `quant-lab/backtest/dmr_combinatorics.py` | DMR portfolio combinatorics |
+| `quant-lab/mt5/dmr_multi_pair_live.py` | DMR v1 live engine (demo) |
+| `quant-lab/mt5/dmr_multi_pair_live_v2.py` | DMR v2 live engine (ready) |
+| `scripts/discord_dmr_bot.py` | DMR Discord bot (clean signals) |
 | `quant-lab/backtest/run_p90_v2.py` | P90 Kinetic Engine v2 |
 | `quant-lab/ml/phase1_data/macro/` | Macro feature engine (18 pattern detectors) |
 | `quant-lab/ml/tests/test_macro_engine.py` | 70 macro engine unit tests |

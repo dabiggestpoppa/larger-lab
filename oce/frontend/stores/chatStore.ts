@@ -91,10 +91,12 @@ export function loadMessagesFromStorage(sessionId: string): ChatMessage[] {
   } catch { return []; }
 }
 
+const isBrowser = typeof window !== "undefined";
+
 export const useChatStore = create<ChatStore>((set, get) => ({
   messages: [],
-  sessions: loadSessionsFromStorage(),  // Load from localStorage on init
-  activeSessionId: localStorage.getItem(STORAGE_KEY_ACTIVE) || null,
+  sessions: isBrowser ? loadSessionsFromStorage() : [],
+  activeSessionId: isBrowser ? (localStorage.getItem(STORAGE_KEY_ACTIVE) || null) : null,
   isLoading: false,
   isSending: false,
   error: null,
@@ -258,7 +260,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
             } catch (_) { /* skip malformed */ }
           }
         }
-      }
       }
 
       // Add the observer message with whatever response we got

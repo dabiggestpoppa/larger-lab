@@ -6,6 +6,28 @@
 
 ---
 
+## Section 0A — DMR Strategy Deployment (2026-06-29)
+
+### DMR v1 — Live on Demo ✅
+- **Engine:** `quant-lab/mt5/dmr_multi_pair_live.py` (single entry per day)
+- **Discord Bot:** `scripts/discord_dmr_bot.py` (DMR-only signals)
+- **Pairs:** EURUSD, GBPUSD, USDJPY, GBPJPY, CHFJPY (~5 tr/day)
+- **Results:** 14,582 trades, 92.6% WR, PF 134.2, +215,661p PnL
+- **Status:** Running on demo account 1114712
+
+### DMR v2 — Multi-Entry Optimization (PAUSED)
+- **Engine:** `quant-lab/mt5/dmr_multi_pair_live_v2.py` (one P90 per 2hr window)
+- **Results:** 32,102 trades, 91.4% WR, +568,752p PnL (+164% vs v1)
+- **Status:** PAUSED — retcode 10027 on demo (stale signals from Sunday market close)
+- **Note:** v2 code logic is correct but needs fresh market data to validate. Do NOT modify strategy execution logic (SL/TP distances, entry logic). The issue is stale signal timing, not broker rejection.
+
+### Key Lesson
+- **NEVER change strategy execution logic when debugging deployment issues.** The v1 engine works identically to v2 in terms of SL/TP calculation. The 10027 errors were from stale signals (Sunday market close), not broker rejection.
+- **Always preserve working versions.** v1 remains live while v2 is optimized separately.
+- **retcode 10027 = "Invalid stops"** — caused by stale entry prices when market is closed, NOT by SL/TP distance being too tight.
+
+---
+
 ## Section 0 — Active Mission: Research Mesh Pitfalls (READ FIRST)
 
 > Specific traps to avoid when building the research mesh. Add to this as we discover new ones.

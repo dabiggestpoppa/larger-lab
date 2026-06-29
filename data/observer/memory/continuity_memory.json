@@ -1,9 +1,9 @@
 {
   "session_id": "session_20260608_015414",
   "start_time": "2026-06-08T01:54:14.056759+00:00",
-  "last_active": "2026-06-09T00:56:20.487531+00:00",
-  "workflow_count": 2,
-  "success_count": 2,
+  "last_active": "2026-06-26T15:14:37.362277+00:00",
+  "workflow_count": 3,
+  "success_count": 3,
   "failure_count": 0,
   "active_goals": [],
   "workflow_history": [
@@ -28,10 +28,22 @@
       "model_used": "",
       "duration_ms": 0.0,
       "error": null
+    },
+    {
+      "workflow_id": "chat_2c987df6",
+      "domain": "coding",
+      "complexity": "medium",
+      "timestamp": "2026-06-26T15:14:37.358736+00:00",
+      "success": true,
+      "routing_path": "",
+      "model_used": "",
+      "duration_ms": 0.0,
+      "error": null
     }
   ],
   "routing_patterns": {
     "TaskType.VISUALIZATION:": 1,
-    "TaskType.CONVERSATION:": 1
+    "TaskType.CONVERSATION:": 1,
+    "TaskType.CODING:": 1
   }
 }

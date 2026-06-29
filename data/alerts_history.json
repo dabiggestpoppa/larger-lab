@@ -130,5 +130,560 @@
     "message": "CEREBUS TRADE CALL (BTCUSD)\nDirection: SHORT (9/9_LOCK, 97% confidence)\nPathway: GEAR_SHIFT | Regime: CONFIRMED (1.62x)\nHard Exit: 12PM EST | Time: 14:09 EST",
     "timestamp": "2026-06-16 14:09:50",
     "datetime": "2026-06-16T14:09:50.789623-05:00"
+  },
+  {
+    "symbol": "EURUSD",
+    "direction": "LONG",
+    "entry": 1.15621,
+    "sl": 1.15645,
+    "tp": 1.15771,
+    "tier": "T3",
+    "asian_range_pips": 26.8,
+    "timestamp": "2026-06-19 06:11:14"
+  },
+  {
+    "symbol": "GBPUSD",
+    "direction": "LONG",
+    "entry": 1.33237,
+    "sl": 1.33244,
+    "tp": 1.33437,
+    "tier": "T2",
+    "asian_range_pips": 43.0,
+    "timestamp": "2026-06-19 06:11:14"
+  },
+  {
+    "symbol": "USDCHF",
+    "direction": "SHORT",
+    "entry": 0.80393,
+    "sl": 0.80395,
+    "tp": 0.80283,
+    "tier": "T1",
+    "asian_range_pips": 17.4,
+    "timestamp": "2026-06-19 06:11:14"
+  },
+  {
+    "symbol": "AUDUSD",
+    "direction": "SHORT",
+    "entry": 0.70037,
+    "sl": 0.69907,
+    "tp": 0.6992700000000001,
+    "tier": "T2",
+    "asian_range_pips": 30.2,
+    "timestamp": "2026-06-19 06:11:14"
+  },
+  {
+    "symbol": "NZDUSD",
+    "direction": "LONG",
+    "entry": 0.57419,
+    "sl": 0.57444,
+    "tp": 0.5755899999999999,
+    "tier": "T1",
+    "asian_range_pips": 42.5,
+    "timestamp": "2026-06-19 06:11:14"
+  },
+  {
+    "symbol": "GBPAUD",
+    "direction": "SHORT",
+    "entry": 1.88185,
+    "sl": 1.8815300000000001,
+    "tp": 1.87975,
+    "tier": "T1",
+    "asian_range_pips": 46.8,
+    "timestamp": "2026-06-19 06:11:14"
+  },
+  {
+    "symbol": "GBPCHF",
+    "direction": "SHORT",
+    "entry": 1.06122,
+    "sl": 1.06089,
+    "tp": 1.05942,
+    "tier": "T1",
+    "asian_range_pips": 27.1,
+    "timestamp": "2026-06-19 06:11:14"
+  },
+  {
+    "symbol": "EURGBP",
+    "direction": "LONG",
+    "entry": 0.86651,
+    "sl": 0.86758,
+    "tp": 0.86721,
+    "tier": "T1",
+    "asian_range_pips": 11.8,
+    "timestamp": "2026-06-19 06:11:14"
+  },
+  {
+    "symbol": "EURAUD",
+    "direction": "SHORT",
+    "entry": 1.63307,
+    "sl": 1.63172,
+    "tp": 1.63037,
+    "tier": "T1",
+    "asian_range_pips": 37.4,
+    "timestamp": "2026-06-19 06:11:14"
+  },
+  {
+    "symbol": "EURCHF",
+    "direction": "SHORT",
+    "entry": 0.91814,
+    "sl": 0.917,
+    "tp": 0.91594,
+    "tier": "T2",
+    "asian_range_pips": 33.5,
+    "timestamp": "2026-06-19 06:11:14"
+  },
+  {
+    "symbol": "EURCAD",
+    "direction": "SHORT",
+    "entry": 1.6183800000000002,
+    "sl": 1.61721,
+    "tp": 1.61708,
+    "tier": "T1",
+    "asian_range_pips": 45.9,
+    "timestamp": "2026-06-19 06:11:14"
+  },
+  {
+    "symbol": "USDCAD",
+    "direction": "SHORT",
+    "entry": 1.41411,
+    "sl": 1.41407,
+    "tp": 1.4130099999999999,
+    "tier": "T1",
+    "asian_range_pips": 17.2,
+    "timestamp": "2026-06-19 06:11:14"
+  },
+  {
+    "symbol": "AUDCHF",
+    "direction": "SHORT",
+    "entry": 0.56367,
+    "sl": 0.56358,
+    "tp": 0.56267,
+    "tier": "T1",
+    "asian_range_pips": 19.3,
+    "timestamp": "2026-06-19 06:11:14"
+  },
+  {
+    "symbol": "AUDCAD",
+    "direction": "LONG",
+    "entry": 0.99091,
+    "sl": 0.99135,
+    "tp": 0.9922099999999999,
+    "tier": "T1",
+    "asian_range_pips": 43.8,
+    "timestamp": "2026-06-19 06:11:14"
+  },
+  {
+    "symbol": "NZDCHF",
+    "direction": "LONG",
+    "entry": 0.46287,
+    "sl": 0.46302,
+    "tp": 0.46377,
+    "tier": "T1",
+    "asian_range_pips": 29.2,
+    "timestamp": "2026-06-19 06:11:14"
+  },
+  {
+    "symbol": "NZDCAD",
+    "direction": "LONG",
+    "entry": 0.81219,
+    "sl": 0.81223,
+    "tp": 0.81339,
+    "tier": "T1",
+    "asian_range_pips": 54.0,
+    "timestamp": "2026-06-19 06:11:14"
+  },
+  {
+    "symbol": "CADCHF",
+    "direction": "SHORT",
+    "entry": 0.57046,
+    "sl": 0.57018,
+    "tp": 0.5697599999999999,
+    "tier": "T1",
+    "asian_range_pips": 13.4,
+    "timestamp": "2026-06-19 06:11:14"
+  },
+  {
+    "symbol": "EURUSD",
+    "direction": "LONG",
+    "entry": 1.15621,
+    "sl": 1.15645,
+    "tp": 1.15771,
+    "tier": "T3",
+    "asian_range_pips": 26.8,
+    "timestamp": "2026-06-19 06:11:54"
+  },
+  {
+    "symbol": "GBPUSD",
+    "direction": "LONG",
+    "entry": 1.33237,
+    "sl": 1.33244,
+    "tp": 1.33437,
+    "tier": "T2",
+    "asian_range_pips": 43.0,
+    "timestamp": "2026-06-19 06:11:54"
+  },
+  {
+    "symbol": "USDCHF",
+    "direction": "SHORT",
+    "entry": 0.80393,
+    "sl": 0.80395,
+    "tp": 0.80283,
+    "tier": "T1",
+    "asian_range_pips": 17.4,
+    "timestamp": "2026-06-19 06:11:54"
+  },
+  {
+    "symbol": "AUDUSD",
+    "direction": "SHORT",
+    "entry": 0.70037,
+    "sl": 0.69907,
+    "tp": 0.6992700000000001,
+    "tier": "T2",
+    "asian_range_pips": 30.2,
+    "timestamp": "2026-06-19 06:11:54"
+  },
+  {
+    "symbol": "NZDUSD",
+    "direction": "LONG",
+    "entry": 0.57419,
+    "sl": 0.57444,
+    "tp": 0.5755899999999999,
+    "tier": "T1",
+    "asian_range_pips": 42.5,
+    "timestamp": "2026-06-19 06:11:54"
+  },
+  {
+    "symbol": "GBPAUD",
+    "direction": "SHORT",
+    "entry": 1.88185,
+    "sl": 1.8815300000000001,
+    "tp": 1.87975,
+    "tier": "T1",
+    "asian_range_pips": 46.8,
+    "timestamp": "2026-06-19 06:11:54"
+  },
+  {
+    "symbol": "GBPCHF",
+    "direction": "SHORT",
+    "entry": 1.06122,
+    "sl": 1.06089,
+    "tp": 1.05942,
+    "tier": "T1",
+    "asian_range_pips": 27.1,
+    "timestamp": "2026-06-19 06:11:54"
+  },
+  {
+    "symbol": "EURGBP",
+    "direction": "LONG",
+    "entry": 0.86651,
+    "sl": 0.86758,
+    "tp": 0.86721,
+    "tier": "T1",
+    "asian_range_pips": 11.8,
+    "timestamp": "2026-06-19 06:11:54"
+  },
+  {
+    "symbol": "EURAUD",
+    "direction": "SHORT",
+    "entry": 1.63307,
+    "sl": 1.63172,
+    "tp": 1.63037,
+    "tier": "T1",
+    "asian_range_pips": 37.4,
+    "timestamp": "2026-06-19 06:11:54"
+  },
+  {
+    "symbol": "EURCHF",
+    "direction": "SHORT",
+    "entry": 0.91814,
+    "sl": 0.917,
+    "tp": 0.91594,
+    "tier": "T2",
+    "asian_range_pips": 33.5,
+    "timestamp": "2026-06-19 06:11:54"
+  },
+  {
+    "symbol": "EURCAD",
+    "direction": "SHORT",
+    "entry": 1.6183800000000002,
+    "sl": 1.61721,
+    "tp": 1.61708,
+    "tier": "T1",
+    "asian_range_pips": 45.9,
+    "timestamp": "2026-06-19 06:11:54"
+  },
+  {
+    "symbol": "USDCAD",
+    "direction": "SHORT",
+    "entry": 1.41411,
+    "sl": 1.41407,
+    "tp": 1.4130099999999999,
+    "tier": "T1",
+    "asian_range_pips": 17.2,
+    "timestamp": "2026-06-19 06:11:54"
+  },
+  {
+    "symbol": "AUDCHF",
+    "direction": "SHORT",
+    "entry": 0.56367,
+    "sl": 0.56358,
+    "tp": 0.56267,
+    "tier": "T1",
+    "asian_range_pips": 19.3,
+    "timestamp": "2026-06-19 06:11:54"
+  },
+  {
+    "symbol": "AUDCAD",
+    "direction": "LONG",
+    "entry": 0.99091,
+    "sl": 0.99135,
+    "tp": 0.9922099999999999,
+    "tier": "T1",
+    "asian_range_pips": 43.8,
+    "timestamp": "2026-06-19 06:11:54"
+  },
+  {
+    "symbol": "NZDCHF",
+    "direction": "LONG",
+    "entry": 0.46287,
+    "sl": 0.46302,
+    "tp": 0.46377,
+    "tier": "T1",
+    "asian_range_pips": 29.2,
+    "timestamp": "2026-06-19 06:11:54"
+  },
+  {
+    "symbol": "NZDCAD",
+    "direction": "LONG",
+    "entry": 0.81219,
+    "sl": 0.81223,
+    "tp": 0.81339,
+    "tier": "T1",
+    "asian_range_pips": 54.0,
+    "timestamp": "2026-06-19 06:11:54"
+  },
+  {
+    "symbol": "CADCHF",
+    "direction": "SHORT",
+    "entry": 0.57046,
+    "sl": 0.57018,
+    "tp": 0.5697599999999999,
+    "tier": "T1",
+    "asian_range_pips": 13.4,
+    "timestamp": "2026-06-19 06:11:54"
+  },
+  {
+    "symbol": "EURUSD",
+    "direction": "SHORT",
+    "entry": 1.1511,
+    "sl": 1.15115,
+    "tp": 1.1501000000000001,
+    "tier": "T2",
+    "asian_range_pips": 26.8,
+    "timestamp": "2026-06-19 06:16:55"
+  },
+  {
+    "symbol": "GBPUSD",
+    "direction": "LONG",
+    "entry": 1.33237,
+    "sl": 1.33244,
+    "tp": 1.33437,
+    "tier": "T2",
+    "asian_range_pips": 43.0,
+    "timestamp": "2026-06-19 06:16:55"
+  },
+  {
+    "symbol": "USDCHF",
+    "direction": "SHORT",
+    "entry": 0.80393,
+    "sl": 0.80395,
+    "tp": 0.80283,
+    "tier": "T1",
+    "asian_range_pips": 17.4,
+    "timestamp": "2026-06-19 06:16:55"
+  },
+  {
+    "symbol": "AUDUSD",
+    "direction": "SHORT",
+    "entry": 0.70037,
+    "sl": 0.69907,
+    "tp": 0.6992700000000001,
+    "tier": "T2",
+    "asian_range_pips": 30.2,
+    "timestamp": "2026-06-19 06:16:55"
+  },
+  {
+    "symbol": "NZDUSD",
+    "direction": "LONG",
+    "entry": 0.57419,
+    "sl": 0.57444,
+    "tp": 0.5755899999999999,
+    "tier": "T1",
+    "asian_range_pips": 42.5,
+    "timestamp": "2026-06-19 06:16:55"
+  },
+  {
+    "symbol": "GBPAUD",
+    "direction": "SHORT",
+    "entry": 1.88185,
+    "sl": 1.8815300000000001,
+    "tp": 1.87975,
+    "tier": "T1",
+    "asian_range_pips": 46.8,
+    "timestamp": "2026-06-19 06:16:55"
+  },
+  {
+    "symbol": "GBPCHF",
+    "direction": "SHORT",
+    "entry": 1.06122,
+    "sl": 1.06089,
+    "tp": 1.05942,
+    "tier": "T1",
+    "asian_range_pips": 27.1,
+    "timestamp": "2026-06-19 06:16:55"
+  },
+  {
+    "symbol": "EURGBP",
+    "direction": "LONG",
+    "entry": 0.86651,
+    "sl": 0.86758,
+    "tp": 0.86721,
+    "tier": "T1",
+    "asian_range_pips": 11.8,
+    "timestamp": "2026-06-19 06:16:55"
+  },
+  {
+    "symbol": "EURAUD",
+    "direction": "SHORT",
+    "entry": 1.63307,
+    "sl": 1.63172,
+    "tp": 1.63037,
+    "tier": "T1",
+    "asian_range_pips": 37.4,
+    "timestamp": "2026-06-19 06:16:55"
+  },
+  {
+    "symbol": "EURCHF",
+    "direction": "SHORT",
+    "entry": 0.91814,
+    "sl": 0.917,
+    "tp": 0.91594,
+    "tier": "T2",
+    "asian_range_pips": 33.5,
+    "timestamp": "2026-06-19 06:16:55"
+  },
+  {
+    "symbol": "EURCAD",
+    "direction": "SHORT",
+    "entry": 1.6183800000000002,
+    "sl": 1.61721,
+    "tp": 1.61708,
+    "tier": "T1",
+    "asian_range_pips": 45.9,
+    "timestamp": "2026-06-19 06:16:55"
+  },
+  {
+    "symbol": "USDCAD",
+    "direction": "SHORT",
+    "entry": 1.41411,
+    "sl": 1.41407,
+    "tp": 1.4130099999999999,
+    "tier": "T1",
+    "asian_range_pips": 17.2,
+    "timestamp": "2026-06-19 06:16:55"
+  },
+  {
+    "symbol": "AUDCHF",
+    "direction": "SHORT",
+    "entry": 0.56367,
+    "sl": 0.56358,
+    "tp": 0.56267,
+    "tier": "T1",
+    "asian_range_pips": 19.3,
+    "timestamp": "2026-06-19 06:16:55"
+  },
+  {
+    "symbol": "AUDCAD",
+    "direction": "LONG",
+    "entry": 0.99091,
+    "sl": 0.99135,
+    "tp": 0.9922099999999999,
+    "tier": "T1",
+    "asian_range_pips": 43.8,
+    "timestamp": "2026-06-19 06:16:55"
+  },
+  {
+    "symbol": "NZDCHF",
+    "direction": "LONG",
+    "entry": 0.46287,
+    "sl": 0.46302,
+    "tp": 0.46377,
+    "tier": "T1",
+    "asian_range_pips": 29.2,
+    "timestamp": "2026-06-19 06:16:55"
+  },
+  {
+    "symbol": "NZDCAD",
+    "direction": "LONG",
+    "entry": 0.81219,
+    "sl": 0.81223,
+    "tp": 0.81339,
+    "tier": "T1",
+    "asian_range_pips": 54.0,
+    "timestamp": "2026-06-19 06:16:55"
+  },
+  {
+    "symbol": "CADCHF",
+    "direction": "SHORT",
+    "entry": 0.57046,
+    "sl": 0.57018,
+    "tp": 0.5697599999999999,
+    "tier": "T1",
+    "asian_range_pips": 13.4,
+    "timestamp": "2026-06-19 06:16:55"
+  },
+  {
+    "symbol": "EURUSD",
+    "direction": "LONG",
+    "confidence": 0.92,
+    "pathway": "DMR_200DS",
+    "regime": "DMR",
+    "regime_ratio": 0.0,
+    "asian_range_pips": 22.4,
+    "entry_price": 1.1391,
+    "sl_price": 1.13902,
+    "tp_price": 1.13988,
+    "body_pips": 3.9,
+    "ds_level": 1.1391,
+    "timestamp": "2026-06-29 10:28:34"
+  },
+  {
+    "symbol": "GBPJPY",
+    "direction": "LONG",
+    "confidence": 0.92,
+    "pathway": "DMR_200DS",
+    "regime": "DMR",
+    "regime_ratio": 0.0,
+    "asian_range_pips": 33.7,
+    "entry_price": 213.712,
+    "sl_price": 213.6928,
+    "tp_price": 213.904,
+    "body_pips": 9.6,
+    "ds_level": 213.712,
+    "timestamp": "2026-06-29 10:29:34"
+  },
+  {
+    "symbol": "CHFJPY",
+    "direction": "LONG",
+    "confidence": 0.92,
+    "pathway": "DMR_200DS",
+    "regime": "DMR",
+    "regime_ratio": 0.0,
+    "asian_range_pips": 24.1,
+    "entry_price": 199.999,
+    "sl_price": 199.9852,
+    "tp_price": 200.137,
+    "body_pips": 6.9,
+    "ds_level": 199.999,
+    "timestamp": "2026-06-29 10:29:34"
   }
 ]
