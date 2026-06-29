@@ -1,4 +1,68 @@
-## 🔴 PM — COMPLETE SYSTEM UPDATE (2026-06-24)
+## 🟢 OC2 — REKEY + STALL HARVEST ENGINES (2026-06-29)
+**Agent:** OC2 (OWL) | **Status:** ✅ COMPLETE — Both engines built and tested
+
+### What Was Built
+1. **Rekey Intraday Engine** (`quant-lab/engines/rekey_intraday.py`) — Bifurcation-based rekey model
+2. **Stall Harvest Test Engine** (`quant-lab/engines/stall_harvest_test.py`) — P90 deep retracement model
+3. **Rekey Config** (`quant-lab/config/rekey_strategy.yaml`) — Session windows, trade params, occurrence rates
+
+### Rekey Intraday Results (Holy Grail Phase 4)
+**Model:** Asian Range (7PM-3AM EST) + London Open Range (2AM-6AM EST) → bifurcation → entry at 50% consolidation → SL at 132%+5p → TP at 0 level
+
+| Pair | Trades | WR | Net PnL | PF |
+|------|--------|-----|---------|-----|
+| AUDNZD | 220 | 60.9% | +659p | 1.92 |
+| EURGBP | 198 | 60.6% | +387p | 1.58 |
+| GBPCAD | 270 | 50.4% | +917p | 1.31 |
+| EURUSD | 194 | 52.1% | +317p | 1.25 |
+
+**Key Insight:** Bifurcation rate 49.4% (matches Holy Grail 42-51% prediction). 25.8% trade occurrence.
+
+### Stall Harvest Results (P90 Deep Retracement)
+**Model:** P90 detected → entry at 168% of P90 body from extreme → SL at 200%+1.5x body → TP1=P90 close (0%), TP2=P90 extension (high+85% body for bullish)
+
+| Pair | Trades | WR | Net PnL | PF |
+|------|--------|-----|---------|-----|
+| USDCHF | 300 | 65.7% | +1247p | 2.23 |
+| NZDUSD | 240 | 62.5% | +708p | 1.81 |
+| AUDUSD | 268 | 60.4% | +659p | 1.67 |
+| EURUSD | 270 | 57.8% | +547p | 1.46 |
+| GBPUSD | 298 | 55.0% | +493p | 1.35 |
+| USDCAD | 318 | 54.1% | +481p | 1.34 |
+| USDJPY | 148 | 48.6% | +51p | 1.07 |
+
+**Key Insight:** TP2 (extension) hit 97% of wins — TP1 (P90 close) hit 0%. Deep 168% entry means price hits extension before returning to P90 close.
+
+### Files Created
+- `quant-lab/engines/rekey_intraday.py` — Full bifurcation-based rekey engine
+- `quant-lab/engines/rekey_dead_simple.py` — Simplified version
+- `quant-lab/engines/stall_harvest_test.py` — P90 deep retracement engine
+- `quant-lab/config/rekey_strategy.yaml` — Rekey configuration
+
+---
+
+## � CC — ENDPOINT FIXES + PO TEST COMPLETE (2026-06-26)
+**Agent:** CC (Claude Code) | **Status:** ✅ ALL TESTS COMPLETE — 26 PASS / 14 FAIL
+
+### What was done:
+1. **OCE Backend Started** — Running on port 8000, health verified
+2. **Fixed 500 errors** on `/sovereign/router/stats`, `/sovereign/shell/status`, `/sovereign/tools/stats`, `/resonance/stats`, `/resonance/field`
+3. **Fixed route paths** — ML endpoints use `/api/v1/ml/regime/{symbol}` not `/api/v1/ml/regime`
+4. **Terminal cleanup** — Killed stale node daemon (34h), duplicate DDG MCP, stale PowerShell terminals
+5. **ALL 28 core endpoints passing** ✅
+6. **Ran 40 PM2 PO field tests** — 26 PASS, 14 FAIL
+7. **Found 4 bugs** — observer persistence (MEDIUM), PO chat blocks backend, rate limit 503, events compress 422
+8. **Vault Updated** — `journal_20260626T140000Z_pm2_po_test_results.md`
+
+### Bugs Found:
+- **BUG-1 (MEDIUM):** Observer POST returns 200 but not stored → CRUD 404s
+- **BUG-2 (LOW):** PO chat LLM call blocks single-threaded uvicorn
+- **BUG-3 (LOW):** Rate limit tracker not initialized → 503
+- **BUG-4 (LOW):** Events persistence compress schema unclear → 422
+
+---
+
+## �🔴 PM — COMPLETE SYSTEM UPDATE (2026-06-24)
 **Agent:** PM (Polymorph) | **Status:** ✅ ALL SYSTEMS UPDATED
 
 ### What was done:

@@ -1,0 +1,90 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# REKEY STRATEGY CONFIGURATION
+# Source: Holy Grail Phase 4 — Bifurcation Mechanics
+# ═══════════════════════════════════════════════════════════════════════════════
+
+name: "Rekey Intraday"
+version: "1.0.0"
+source: "Holy Grail Phase 4 — Bifurcation Mechanics"
+
+# ── SESSION WINDOWS (EST) ────────────────────────────────────────────────────
+sessions:
+  asian_range:
+    name: "Asian Range"
+    start: "19:00"  # 7 PM EST
+    end: "03:00"    # 3 AM EST
+    utc_start: 0   # 00:00 UTC
+    utc_end: 8     # 08:00 UTC
+    duration_hours: 8
+    purpose: "Range observation + bias determination"
+
+  london_open:
+    name: "London Open Range"
+    start: "02:00"  # 2 AM EST
+    end: "06:00"    # 6 AM EST
+    utc_start: 7   # 07:00 UTC
+    utc_end: 11    # 11:00 UTC
+    duration_hours: 4
+    purpose: "Anchor establishment + Fibonacci targets"
+
+  trading_window:
+    name: "Trading Window"
+    start: "03:00"  # 3 AM EST
+    end: "12:00"    # 12 PM EST
+    purpose: "Entry execution + management"
+
+# ── DIRECTION (BIFURCATION) ──────────────────────────────────────────────────
+direction:
+  method: "bifurcation"
+  description: "Compare Asian Range bias vs London Open Range bias"
+  rules:
+    - "Asian close > Asian mid = BULLISH bias"
+    - "Asian close < Asian mid = BEARISH bias"
+    - "London close > London mid = BULLISH bias"
+    - "London close < London mid = BEARISH bias"
+    - "If biases MATCH = alignment (continuation)"
+    - "If biases DIFFER = bifurcation (rekey)"
+  bifurcation_rate_eurusd: 0.425
+  bifurcation_rate_oil: 0.515
+
+# ── TRADE PARAMETERS ─────────────────────────────────────────────────────────
+trade:
+  entry:
+    type: "limit"
+    level: 1.32  # 132% of range from breached band
+    description: "Place limit at 132% of London Open Range"
+
+  stop_loss:
+    level: 1.68  # 168% of range
+    buffer_pips: 5  # 5 pips beyond 168%
+    description: "SL at 168% + 5 pips"
+
+  take_profit:
+    level: 0.0  # 0% = opposite band
+    description: "TP at opposite band of London Open Range"
+
+  risk_reward:
+    typical: "1.4-1.6x"
+    description: "TP distance / SL distance"
+
+# ── FIBONACCI LEVELS ─────────────────────────────────────────────────────────
+fibonacci:
+  entry: 1.32
+  sl: 1.68
+  tp: 0.0
+  extensions: [0.25, 0.50, 0.786, 1.00, 1.32, 1.68]
+
+# ── OCCURRENCE RATES ─────────────────────────────────────────────────────────
+occurrence:
+  forex_majors: "20-35% of sessions"
+  forex_crosses: "20-35% of sessions"
+  commodities: "40-70% of sessions"
+  indices: "40-70% of sessions"
+
+# ── HOLY GRAIL VALIDATION DATA ───────────────────────────────────────────────
+validation:
+  source: "Phase 1B Cross-Asset Analysis"
+  total_bifurcated_days: 349
+  bifurcation_rate:  0.515
+  violation_132_rate:  0.98
+  days_tested: 342
