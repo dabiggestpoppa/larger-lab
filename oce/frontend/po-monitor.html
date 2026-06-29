@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PO Monitor — Primary Observer Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            padding: 2rem;
+        }
+        h1 { color: #c96442; margin-bottom: 0.5rem; font-size: 1.5rem; }
+        .subtitle { color: #666; margin-bottom: 2rem; font-size: 0.85rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .card {
+            background: #111118;
+            border: 1px solid #1a1a25;
+            border-radius: 8px;
+            padding: 1.25rem;
+        }
+        .card h3 { color: #888; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
+        .card .value { color: #fff; font-size: 2rem; font-weight: 600; }
+        .card .label { color: #666; font-size: 0.8rem; margin-top: 0.25rem; }
+        .events-list { background: #111118; border: 1px solid #1a1a25; border-radius: 8px; padding: 1.25rem; max-height: 400px; overflow-y: auto; }
+        .event-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #1a1a25;
+            font-size: 0.8rem;
+        }
+        .event-type { color: #c96442; font-weight: 500; }
+        .event-source { color: #666; }
+        .event-time { color: #444; font-size: 0.7rem; }
+        .refresh-btn {
+            background: #c96442;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+        .refresh-btn:hover { background: #b8553a; }
+        .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #4ade80; margin-right: 0.5rem; }
+        .learning-log { background: #111118; border: 1px solid #1a1a25; border-radius: 8px; padding: 1.25rem; margin-top: 1rem; }
+        .learning-log h3 { color: #c96442; margin-bottom: 0.75rem; }
+        .learning-log ul { list-style: none; }
+        .learning-log li { padding: 0.4rem 0; color: #aaa; font-size: 0.85rem; border-bottom: 1px solid #1a1a25; }
+        .learning-log li:before { content: "→ "; color: #c96442; }
+    </style>
+</head>
+<body>
+    <h1>🔍 PO Monitor</h1>
+    <p class="subtitle">Primary Observer — Real-time Action Tracker & Learning Log</p>
+
+    <button class="refresh-btn" onclick="refresh()">⟳ Refresh</button>
+
+    <div class="grid" id="stats-grid">
+        <div class="card">
+            <h3>Total Events</h3>
+            <div class="value" id="total-events">—</div>
+        </div>
+        <div class="card">
+            <h3>Last 24h</h3>
+            <div class="value" id="recent-events">—</div>
+        </div>
+        <div class="card">
+            <h3>State Changes</h3>
+            <div class="value" id="state-changes">—</div>
+        </div>
+        <div class="card">
+            <h3>Chat Messages</h3>
+            <div class="value" id="chat-messages">—</div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 1rem;">
+        <h3>Event Types</h3>
+        <div id="event-types"></div>
+    </div>
+
+    <h3 style="color: #888; margin-bottom: 0.75rem;">Recent Events</h3>
+    <div class="events-list" id="events-list"></div>
+
+    <div class="learning-log" id="learning-log">
+        <h3>📚 Learning Log</h3>
+        <ul id="learning-items"></ul>
+    </div>
+
+    <script>
+        async function refresh() {
+            try {
+                const res = await fetch('/api/po/monitor/');
+                const data = await res.json();
+
+                document.getElementById('total-events').textContent = data.summary.total_events;
+                document.getElementById('recent-events').textContent = data.summary.last_24h_events;
+                document.getElementById('state-changes').textContent = data.summary.total_state_changes;
+                document.getElementById('chat-messages').textContent = data.summary.total_chat_messages;
+
+                // Event types
+                const typesEl = document.getElementById('event-types');
+                typesEl.innerHTML = data.event_types.map(t =>
+                    `<div class="event-item">
+                        <span class="event-type">${t.event_type}</span>
+                        <span>${t.count}</span>
+                    </div>`
+                ).join('');
+
+                // Recent events
+                const eventsEl = document.getElementById('events-list');
+                eventsEl.innerHTML = data.recent_events.map(e => {
+                    const data = typeof e.data === 'string' ? JSON.parse(e.data || '{}') : (e.data || {});
+                    const detail = data.domain ? `${data.domain}/${data.complexity || ''}` : JSON.stringify(data).slice(0, 60);
+                    return `<div class="event-item">
+                        <span class="event-type">${e.event_type}</span>
+                        <span class="event-source">${e.source}</span>
+                        <span style="color:#666;font-size:0.75rem;">${detail}</span>
+                        <span class="event-time">${e.timestamp ? e.timestamp.slice(11, 19) : ''}</span>
+                    </div>`;
+                }).join('');
+
+                // Learning log
+                const lr = await fetch('/api/po/monitor/learning-log');
+                const ldata = await lr.json();
+                const itemsEl = document.getElementById('learning-items');
+                itemsEl.innerHTML = ldata.learning_prompts.map(p => `<li>${p}</li>`).join('');
+
+            } catch (e) {
+                console.error('Refresh failed:', e);
+            }
+        }
+
+        refresh();
+        setInterval(refresh, 10000);
+    </script>
+</body>
+</html>

@@ -137,7 +137,7 @@ def register_resonance_endpoints(app: FastAPI) -> None:
     async def get_field_state():
         """Get current field state."""
         try:
-            state = _field_manager.state
+            state = _field_manager.current_state
             coherence = _coherence_engine.measure(_signal_field)
             return {
                 "field": state.to_dict(),
@@ -379,10 +379,10 @@ def register_resonance_endpoints(app: FastAPI) -> None:
         """Get comprehensive resonance subsystem stats."""
         try:
             return {
-                "signals": _signal_field.stats(),
-                "field": _field_manager.stats(),
-                "resonance": _resonance_engine.stats(),
-                "pressure": _pressure_tracker.stats(),
+                "signals": _signal_field.stats,
+                "field": _field_manager.stats,
+                "resonance": _resonance_engine.stats,
+                "pressure": _pressure_tracker.stats,
             }
         except Exception as e:
             logger.error(f"Stats error: {e}")

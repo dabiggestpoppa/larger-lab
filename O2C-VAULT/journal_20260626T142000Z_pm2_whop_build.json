@@ -1,0 +1,51 @@
+{
+  "type": "pm2_whop_verification",
+  "timestamp": "2026-06-26T10:12:46Z",
+  "results": {
+    "step1_health": {
+      "status": 200,
+      "data": "{'status': 'healthy', 'service': 'oce-continuity-core'}"
+    },
+    "step2_memory_store": {
+      "status": 200,
+      "data": "{'entry_id': '670a1e84-30a8-41f9-8dc3-fe2a158cb647', 'status': 'stored'}"
+    },
+    "step3_observer": {
+      "status": 200,
+      "data": "{'observer_id': '78eb9d7b-cdf4-4535-b73e-3157d937d4c6', 'state': 'created', 'created_at': '2026-06-26T14:12:46.102538+00:00'}"
+    },
+    "step4_event": {
+      "status": 200,
+      "data": "{'status': 'ingested', 'event_id': '54bbffff-9f99-4ff0-bce0-f5df3ac394d8'}"
+    },
+    "step5_governance": {
+      "status": 200,
+      "data": "{'proposal_id': '37574100-5828-41f6-b3b9-dbe86b54f40d', 'status': 'proposed'}"
+    },
+    "step6_resonance": {
+      "status": 200,
+      "data": "{'status': 'injected', 'signal_id': 'efd8936e'}"
+    },
+    "step7_memory_stats": {
+      "status": 200,
+      "data": "{'total_entries': 5, 'work_count': 3, 'learned_count': 1, 'knowledge_count': 1, 'oldest_entry': '2026-06-26T13:46:31.605266+00:00', 'newest_entry': '2026-06-26T14:12:46.016846+00:00', 'db_size_bytes':"
+    },
+    "step7_event_stats": {
+      "status": 200,
+      "data": "{'total_ingested': 6, 'total_routed': 0, 'total_persisted': 0, 'active_subscribers': 0, 'active_streams': 0, 'history_size': 6, 'events_by_type': {'system.startup': 1, 'test.pm2': 2, 'observer.created"
+    },
+    "step7_resonance_stats": {
+      "status": 200,
+      "data": "{'signals': {'total_signals': 3, 'injections': 3, 'resonances': 0, 'field_coherence': 0.85, 'field_entropy': 0.15, 'resonant_count': 3, 'entropic_count': 0}, 'field': {'state': {'field_id': 'main', 't"
+    },
+    "step7_governance_status": {
+      "status": 200,
+      "data": "{'status': 'active', 'recent_proposals': [{'proposal_id': '37574100-5828-41f6-b3b9-dbe86b54f40d', 'proposal_type': 'business_decision', 'title': 'MAD LABS Whop Store Launch', 'description': 'Approve l"
+    }
+  },
+  "summary": {
+    "passed": 10,
+    "failed": 0,
+    "total": 10
+  }
+}

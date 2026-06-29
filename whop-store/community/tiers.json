@@ -1,0 +1,48 @@
+{
+  "tiers": [
+    {
+      "id": "free",
+      "name": "Public Discord Community",
+      "type": "free",
+      "price": 0,
+      "billing": "one_time",
+      "features": [
+        "Announcements channel",
+        "Public discussions",
+        "General networking"
+      ],
+      "status": "active",
+      "discord_role": "community"
+    },
+    {
+      "id": "premium",
+      "name": "Research Community",
+      "type": "subscription",
+      "price": 0,
+      "billing": "monthly",
+      "features": [
+        "Private research channels",
+        "Research releases",
+        "Premium discussions",
+        "Advanced market breakdowns"
+      ],
+      "status": "coming_soon",
+      "discord_role": "research"
+    },
+    {
+      "id": "vip",
+      "name": "Operator Circle",
+      "type": "subscription",
+      "price": 0,
+      "billing": "monthly",
+      "features": [
+        "Founder access",
+        "Private discussions",
+        "Early access products",
+        "Technical development discussions"
+      ],
+      "status": "coming_soon",
+      "discord_role": "operator"
+    }
+  ]
+}
