@@ -1,4 +1,4 @@
-# Workspace State — 2026-06-24 23:00 UTC (Auto-Sync)
+# Workspace State — 2026-06-29 11:30 UTC (Auto-Sync)
 
 ## System Status
 - OCE Backend: ✅ Healthy
@@ -15,14 +15,26 @@
 - **Build Notes:** `quant-lab/ml/BUILD_NOTES_CEREBUS.md`
 - **Tests:** 70/70 macro engine + 40/40 existing = 110/110 passing
 
-## Quant Bible — COMPLETE (2026-06-24)
-- **File:** `quant-lab/QUANT_BIBLE.md` — 600+ lines, 5 sections
-- **Section 1:** 21 core formulas (AU, P90, MLR, Fib, kill-switch, ILM, regime, etc.)
+## Quant Bible — UPDATED (2026-06-29)
+- **File:** `quant-lab/QUANT_BIBLE.md` — 700+ lines, 6 sections
+- **Section 1:** 21 core formulas (AU, P90, MLR, Fib, kill-switch, ILM, regime, DMR, ST)
 - **Section 1B:** Native tier master table — all 36 pairs with K-Means calibrated tiers
-- **Section 2:** All backtest results (P90, ST, DMR, group combinatorics, macro engine)
+- **Section 2:** All backtest results (P90, ST, DMR v1+v2, group combinatorics, macro engine)
 - **Section 3:** Config parameters
 - **Section 4:** 12 ironclad rules + lessons learned
-- **Section 5:** Key files & references
+- **Section 5:** Key files & references (updated with DMR files)
+- **Section 6:** P90 binary excursion test — calibrated (34 pairs, all >85% WR)
+
+## DMR Strategy — COMPLETE (2026-06-29)
+- **v1 Backtest:** 14,582 trades, 92.6% WR, PF 134.2, +215,661p PnL
+- **v2 Multi-Entry Backtest:** 32,102 trades, 91.4% WR, +568,752p PnL (+164% vs v1)
+- **Live Deployment:** v1 engine running on demo (5 pairs: EURUSD, GBPUSD, USDJPY, GBPJPY, CHFJPY) — v2 paused for further testing
+- **Discord Bot:** DMR-only signals (entries, TP/SL results, EOD report)
+- **Mini Bible:** `quant-lab/reports/dmr_mc/DMR_BIBLE.md`
+- **Deep Analysis:** `quant-lab/reports/dmr_mc/dmr_deep_analysis_report.md`
+- **0% Ruin Rate:** All pairs across 10,000 MC simulations
+- **Max Consec Losses:** 2 (most forex pairs)
+- **Avg MaxDD:** 2.9 pips (forex)
 
 ## Tier Discovery — COMPLETE
 - **File:** `quant-lab/reports/tier_discovery_summary.md` — All 36 pairs

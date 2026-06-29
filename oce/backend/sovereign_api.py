@@ -103,7 +103,7 @@ def register_sovereign_endpoints(app: FastAPI) -> None:
 
     @app.get("/sovereign/shell/status")
     def get_shell_status():
-        return _get_shell().get_status()
+        return _get_shell().state.to_dict()
 
     @app.post("/sovereign/shell/update")
     def update_shell_state(request: dict):
@@ -123,7 +123,7 @@ def register_sovereign_endpoints(app: FastAPI) -> None:
 
     @app.get("/sovereign/router/stats")
     def get_router_stats():
-        return _get_router().stats
+        return _get_router().get_stats()
 
     @app.post("/sovereign/router/route")
     def route_task(req: RouteTaskRequest):
@@ -140,7 +140,7 @@ def register_sovereign_endpoints(app: FastAPI) -> None:
 
     @app.get("/sovereign/tools/stats")
     def get_tools_stats():
-        return _get_tools().stats
+        return _get_tools().get_stats()
 
     @app.post("/sovereign/tools/terminal")
     def execute_terminal(command: str, timeout: int = 30):

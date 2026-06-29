@@ -24,6 +24,7 @@ enforce_singleton("oce_backend", kill_others=True)
 from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, HTMLResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any, AsyncGenerator
 from datetime import datetime, timezone
@@ -74,6 +75,11 @@ app = FastAPI(
     description="Operator Continuity Engine API",
     version="1.0.0"
 )
+
+# Serve static frontend files (PO monitor dashboard)
+_frontend_dir = Path(__file__).resolve().parent.parent / "frontend"
+if _frontend_dir.exists():
+    app.mount("/static", StaticFiles(directory=str(_frontend_dir)), name="static")
 
 # CORS for Next.js frontend
 app.add_middleware(
@@ -189,6 +195,15 @@ def get_structural_memory() -> StructuralMemory:
 @app.get("/")
 async def root():
     return {"message": "OCE Continuity Core API", "version": "1.0.0"}
+
+
+@app.get("/po-monitor")
+async def po_monitor_page():
+    """Serve the PO Monitor HTML dashboard."""
+    _monitor_file = Path(__file__).resolve().parent.parent / "frontend" / "po-monitor.html"
+    if _monitor_file.exists():
+        return HTMLResponse(content=_monitor_file.read_text(), status_code=200)
+    raise HTTPException(status_code=404, detail="PO Monitor page not found")
 
 
 @app.get("/health")
@@ -1392,6 +1407,10 @@ register_research_endpoints(app)
 # Register RCE (Research Cognition Engine) API endpoints
 from .rce_api import router as rce_router
 app.include_router(rce_router)
+
+# Register PO Monitor (action tracker + learning log)
+from .po_monitor import router as po_monitor_router
+app.include_router(po_monitor_router)
 
 # Register PO API endpoints (PO × VTuber integration)
 app.include_router(po_router)

@@ -1,0 +1,41 @@
+{
+  "brand": {
+    "name": "MAD LABS",
+    "tagline": "Applied Intelligence for High Performance Operators.",
+    "category": "Technology + AI + Trading + Financial Intelligence + Automation",
+    "aesthetic": {
+      "background": "#000000",
+      "primary_color": "#ffffff",
+      "accent_color": "#c96442",
+      "style": "premium_minimalist",
+      "feel": "futuristic_technology"
+    },
+    "keywords": [
+      "Precision",
+      "Intelligence",
+      "Research",
+      "Automation",
+      "High Performance",
+      "Engineering",
+      "Systems"
+    ],
+    "avoid": [
+      "forex education branding",
+      "retail trading influencer",
+      "trading signal services",
+      "beginner mentorship language"
+    ],
+    "resemble": [
+      "research lab",
+      "financial technology company",
+      "AI systems company",
+      "institutional intelligence brand",
+      "premium consulting ecosystem"
+    ]
+  },
+  "external_links": {
+    "calendly": "https://calendly.com/madlabs",
+    "discord": "https://discord.gg/madlabs",
+    "linktree": "https://linktr.ee/madlabs"
+  }
+}

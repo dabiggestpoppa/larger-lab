@@ -152,7 +152,7 @@ export default function ChatPage() {
     // If there's an active session, load its history
     if (store.activeSessionId) {
       const msgs = loadMessagesFromStorage(store.activeSessionId);
-      if (msgs.length > 0) setMessages(msgs);
+      if (msgs.length > 0) store.setMessages(msgs);
     }
   }, []);
 

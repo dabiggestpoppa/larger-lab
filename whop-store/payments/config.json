@@ -1,0 +1,14 @@
+{
+  "payment": {
+    "primary": "whop_payments",
+    "secondary": "stripe",
+    "fallback": "paypal",
+    "supported_types": [
+      "one_time_purchase",
+      "subscription_billing",
+      "recurring_memberships",
+      "future_digital_products"
+    ],
+    "currency": "USD"
+  }
+}
