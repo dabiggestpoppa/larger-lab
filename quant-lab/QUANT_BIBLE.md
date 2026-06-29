@@ -1,6 +1,6 @@
 # 📖 THE QUANT BIBLE — CEREBUS Trading System
 
-> **Compiled:** 2026-06-16
+> **Compiled:** 2026-06-29 (DMR v2 multi-entry + live deployment)
 > **Source:** OC2 Telegram chat export + `cost_analysis_all.json` + `SWEEP_MATRIX_V2.md` + `run_9k_config_results.json` + Symmetry Trap reports + DMR reports + CEREBUS full reports + Group Combinatorics + P90 v2 backtest + Holy Grail PDF extraction
 > **Purpose:** Single source of truth for all trading configs, formulas, results, and deployment parameters
 > **⚠️ RULE #1: NEVER TOUCH THE ENGINE FOR A TEST. ALWAYS CLONE/WRAP. ENGINE IS SACRED.**
@@ -16,10 +16,15 @@
 - ✅ 8 live execution bugs identified and documented
 - ✅ Nautilus strategy diff documented (4 diffs from CSV engine)
 - ✅ Symmetry Trap multi-asset backtest complete (19 assets, 14,088 trades incl. OILUSD)
-- ✅ DMR standalone backtest complete (4Y, 284 trades)
+- ✅ DMR v1 backtest complete (14,582 trades, 92.6% WR, PF 134.2)
+- ✅ DMR v2 multi-entry backtest complete (32,102 trades, 91.4% WR, +568,752p PnL, +164% vs v1)
+- ✅ DMR live deployment on demo (v1 engine, 5 pairs, ~5 tr/day)
+- ✅ DMR Discord bot (clean signals, no scanner noise)
 - ✅ P90 Kinetic Engine 4Y backtest complete (1,038 trades, 78.7% WR, PF 3.09)
 - ✅ Group combinatorics complete (36 pairs ranked by net profit)
 - ✅ P90 v2 backtest complete (9,228 trades unlocked config)
+- ✅ **Rekey Intraday Engine complete** (bifurcation model, 7 pairs, 25.8% occurrence, PF 1.25-1.92)
+- ✅ **Stall Harvest Engine complete** (P90 deep retracement, 7 pairs, PF 1.07-2.23, CHF/NZD strongest)
 - ✅ Holy Grail PDF extraction complete (decision trees, playbooks, pattern definitions)
 - ✅ Macro feature engine complete (18 pattern detectors, 102 features/bar)
 - ✅ 70/70 macro engine unit tests passing
@@ -589,7 +594,70 @@ T1 ar_max = T2 boundary, T2 ar_max = T3 boundary. NO_GO = AR > T3 ar_max.
 
 ---
 
-## �📊 SECTION 2: BACKTEST RESULTS
+## 📊 SECTION 2: BACKTEST RESULTS
+
+### 2.10 Rekey Intraday Engine — Bifurcation Model (2026-06-29)
+
+**Source:** Holy Grail Phase 4 — Bifurcation Mechanics
+**Engine:** `quant-lab/engines/rekey_intraday.py`
+**Config:** `quant-lab/config/rekey_strategy.yaml`
+
+**Session Windows (EST):**
+| Session | Time | Duration | Purpose |
+|---------|------|----------|---------|
+| Asian Range | 7:00 PM - 3:00 AM | 8 hours | Range observation + bias |
+| London Open | 2:00 AM - 6:00 AM | 4 hours | Anchor establishment |
+| Trading Window | 3:00 AM - 12:00 PM | 9 hours | Entry execution |
+
+**Trade Setup:**
+| Parameter | Value |
+|-----------|-------|
+| Entry | 50% consolidation between band edge and 132% |
+| SL | 132% level + 5 pips |
+| TP | 0 level (opposite band) |
+| Bifurcation Rate | 49.4% (EURUSD) |
+| Trade Occurrence | 25.8% of sessions |
+
+**Results (7 FX pairs):**
+| Pair | Trades | WR | Net PnL | PF |
+|------|--------|-----|---------|-----|
+| AUDNZD | 220 | 60.9% | +659p | 1.92 |
+| EURGBP | 198 | 60.6% | +387p | 1.58 |
+| GBPCAD | 270 | 50.4% | +917p | 1.31 |
+| EURUSD | 194 | 52.1% | +317p | 1.25 |
+| EURCHF | 231 | 55.8% | +298p | 1.26 |
+
+**Key Finding:** Bifurcation rate matches Holy Grail prediction (42-51%). TP2 (extension) hit 97% of wins.
+
+---
+
+### 2.11 Stall Harvest — P90 Deep Retracement (2026-06-29)
+
+**Source:** CEREBUS Manual — Stall Harvest Trading System
+**Engine:** `quant-lab/engines/stall_harvest_test.py`
+
+**Trade Setup:**
+| Parameter | Value |
+|-----------|-------|
+| Entry | 168% of P90 body from P90 extreme |
+| SL | 200% + 1.5x body buffer |
+| TP1 | P90 close (0% = return to range) |
+| TP2 | P90 extension (high + 85% body for bullish) |
+
+**Results (7 FX pairs):**
+| Pair | Trades | WR | Net PnL | PF |
+|------|--------|-----|---------|-----|
+| USDCHF | 300 | 65.7% | +1247p | 2.23 |
+| NZDUSD | 240 | 62.5% | +708p | 1.81 |
+| AUDUSD | 268 | 60.4% | +659p | 1.67 |
+| EURUSD | 270 | 57.8% | +547p | 1.46 |
+| GBPUSD | 298 | 55.0% | +493p | 1.35 |
+| USDCAD | 318 | 54.1% | +481p | 1.34 |
+| USDJPY | 148 | 48.6% | +51p | 1.07 |
+
+**Key Finding:** TP2 (extension) hit 97% of winning trades. TP1 (P90 close) hit 0% — deep 168% entry means price hits extension target before returning to P90 close. CHF and NZD pairs strongest.
+
+---
 
 ### 2.1 P90 Kinetic Engine — 4Y EURUSD (2023-07 to 2026-05)
 
@@ -1004,6 +1072,9 @@ Each pair's trigger = native_trigger × coefficient (NOT universal 8-10p). Coeff
 | File | Purpose |
 |------|---------|
 | `quant-lab/engines/symmetry_trap.py` | Symmetry Trap engine (Model B) |
+| `quant-lab/engines/rekey_intraday.py` | Rekey Intraday engine (bifurcation model) |
+| `quant-lab/engines/stall_harvest_test.py` | Stall Harvest engine (P90 deep retracement) |
+| `quant-lab/config/rekey_strategy.yaml` | Rekey strategy configuration |
 | `quant-lab/engines/dmr_standalone_backtest.py` | DMR standalone backtest |
 | `quant-lab/backtest/run_p90_v2.py` | P90 Kinetic Engine v2 |
 | `quant-lab/ml/phase1_data/macro/` | Macro feature engine (18 pattern detectors) |
