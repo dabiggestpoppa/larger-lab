@@ -1,0 +1,36 @@
+{
+  "symbol": "EURCHF",
+  "pip_size": 0.0001,
+  "engines": {
+    "p90": {
+      "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+    },
+    "symmetry_trap": {
+      "trades": 2859,
+      "win_rate": 78.24414130814971,
+      "net_pnl_pips": 14785.587000000121,
+      "profit_factor": 10.739829413182985,
+      "max_dd_pips": 23.406999999999925,
+      "avg_trade_pips": 5.171593913955971
+    },
+    "dmr": {
+      "trades": 297,
+      "win_rate": 22.6,
+      "net_pnl_pips": 401.20000000000005,
+      "profit_factor": 2.15,
+      "max_dd_pips": 35.7,
+      "avg_trade_pips": 1.35
+    },
+    "rekey_intraday": {
+      "trades": 231,
+      "win_rate": 53.7,
+      "net_pnl_pips": 203.8,
+      "profit_factor": 1.17,
+      "max_dd_pips": 218.9,
+      "avg_trade_pips": 0.88
+    },
+    "rekey_dead_simple": {
+      "note": "Run separately for stats"
+    }
+  }
+}

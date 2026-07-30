@@ -1,0 +1,41 @@
+{
+  "symbol": "US500",
+  "pip_size": 1.0,
+  "engines": {
+    "p90": {
+      "trades": 193,
+      "win_rate": 53.4,
+      "net_pnl_pips": -552.6,
+      "profit_factor": 0.4,
+      "max_dd_pips": 560.9,
+      "avg_trade_pips": -2.86
+    },
+    "symmetry_trap": {
+      "trades": 3084,
+      "win_rate": 76.58884565499352,
+      "net_pnl_pips": 15174.01200000025,
+      "profit_factor": 7.961341509179553,
+      "max_dd_pips": 40.248999999999796,
+      "avg_trade_pips": 4.9202373540856845
+    },
+    "dmr": {
+      "trades": 0,
+      "win_rate": 0,
+      "net_pnl_pips": 0,
+      "profit_factor": 0,
+      "max_dd_pips": 0,
+      "avg_trade_pips": 0
+    },
+    "rekey_intraday": {
+      "trades": 362,
+      "win_rate": 40.1,
+      "net_pnl_pips": -1311.0,
+      "profit_factor": 0.56,
+      "max_dd_pips": 1381.8,
+      "avg_trade_pips": -3.62
+    },
+    "rekey_dead_simple": {
+      "note": "Run separately for stats"
+    }
+  }
+}

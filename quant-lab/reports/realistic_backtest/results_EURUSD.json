@@ -1,0 +1,41 @@
+{
+  "symbol": "EURUSD",
+  "pip_size": 0.0001,
+  "engines": {
+    "p90": {
+      "trades": 411,
+      "win_rate": 44.8,
+      "net_pnl_pips": 218.70000000000005,
+      "profit_factor": 1.17,
+      "max_dd_pips": 99.5,
+      "avg_trade_pips": 0.53
+    },
+    "symmetry_trap": {
+      "trades": 3058,
+      "win_rate": 76.68410725964682,
+      "net_pnl_pips": 14327.294000000225,
+      "profit_factor": 7.758505036343938,
+      "max_dd_pips": 36.028000000002066,
+      "avg_trade_pips": 4.685184434270839
+    },
+    "dmr": {
+      "trades": 284,
+      "win_rate": 19.0,
+      "net_pnl_pips": 238.2,
+      "profit_factor": 1.69,
+      "max_dd_pips": 49.7,
+      "avg_trade_pips": 0.84
+    },
+    "rekey_intraday": {
+      "trades": 194,
+      "win_rate": 51.5,
+      "net_pnl_pips": 257.5,
+      "profit_factor": 1.2,
+      "max_dd_pips": 142.5,
+      "avg_trade_pips": 1.33
+    },
+    "rekey_dead_simple": {
+      "note": "Run separately for stats"
+    }
+  }
+}

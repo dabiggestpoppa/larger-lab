@@ -26,6 +26,7 @@ from __future__ import annotations
 import argparse
 import csv
 import logging
+import os
 import random
 import sys
 from collections import defaultdict
@@ -41,6 +42,9 @@ from p90_engine import (
     Bar,
     TradeDirection,
 )
+
+# Import trading costs for realistic backtesting
+from trading_costs import apply_costs_to_pnl
 
 # Monkey-patch Bar with is_bullish/is_bearish (needed by Symmetry Trap engine)
 if not hasattr(Bar, 'is_bullish'):
@@ -234,7 +238,7 @@ def check_convergence(
 
 # --- STATISTICS -------------------------------------------------------------
 
-def _pnl_pips(sig: P90Signal, pip_size: float) -> Optional[float]:
+def _pnl_pips(sig: P90Signal, pip_size: float, symbol: str = "EURUSD") -> Optional[float]:
     if sig.entry_price is None:
         return None
     if sig.event == "TP_HIT":
@@ -249,14 +253,19 @@ def _pnl_pips(sig: P90Signal, pip_size: float) -> Optional[float]:
         return None
 
     if sig.direction.name == "LONG":
-        return (exit_price - sig.entry_price) / pip_size
+        gross_pnl = (exit_price - sig.entry_price) / pip_size
     else:
-        return (sig.entry_price - exit_price) / pip_size
+        gross_pnl = (sig.entry_price - exit_price) / pip_size
+    
+    # Apply trading costs (spread + commission)
+    net_pnl = apply_costs_to_pnl(gross_pnl, symbol, sig.direction.name)
+    return net_pnl
 
 
 def apply_dmr_boost(
     signals: List[P90Signal],
     convergence_flags: List[bool],
+    symbol: str = "EURUSD",
     rng_seed: int = 42,
 ) -> List[float]:
     """
@@ -282,7 +291,7 @@ def apply_dmr_boost(
         if sig.event not in ("TP_HIT", "SL_HIT", "EWS_EXIT"):
             continue
 
-        pnl = _pnl_pips(sig, 0.0001)  # Will be re-scaled below
+        pnl = _pnl_pips(sig, 0.0001, symbol)  # Will be re-scaled below
         if pnl is None:
             continue
 
@@ -308,6 +317,7 @@ def apply_dmr_boost(
 def compute_stats(
     signals: List[P90Signal],
     pip_size: float,
+    symbol: str = "EURUSD",
     convergence_flags: Optional[List[bool]] = None,
 ) -> Dict:
     """
@@ -320,7 +330,7 @@ def compute_stats(
 
     pnls_pips: List[float] = []
     for sig in completed:
-        pnl = _pnl_pips(sig, pip_size)
+        pnl = _pnl_pips(sig, pip_size, symbol)
         if pnl is not None:
             pnls_pips.append(pnl)
 
@@ -449,7 +459,7 @@ def compute_stats(
             }
 
         # DMR-boosted combined PnL
-        boosted_pnls = apply_dmr_boost(completed, convergence_flags)
+        boosted_pnls = apply_dmr_boost(completed, convergence_flags, symbol)
         boosted_stats = _calc_stats_block(boosted_pnls)
 
         result["convergence"] = {
@@ -684,9 +694,9 @@ def run_backtest(
 
     # Compute stats
     if convergence_mode:
-        stats = compute_stats(all_signals, pip_size, convergence_flags=conv_aligned)
+        stats = compute_stats(all_signals, pip_size, symbol=symbol, convergence_flags=conv_aligned)
     else:
-        stats = compute_stats(all_signals, pip_size)
+        stats = compute_stats(all_signals, pip_size, symbol=symbol)
 
     print_report(stats, symbol, len(sessions), total_bars_processed,
                  convergence_mode=convergence_mode)

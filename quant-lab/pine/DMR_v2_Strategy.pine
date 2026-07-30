@@ -1,0 +1,482 @@
+// ══════════════════════════════════════════════════════════════════════════════
+// DMR v2 Strategy — Deep Mean Rebalancing
+// CEREBUS FX v4.0 | Strategy B: Resolution Output Stall Play
+// Multi-Entry: One P90 per 2-hour window, rolls the chain
+// ══════════════════════════════════════════════════════════════════════════════
+//@version=5
+strategy("DMR v2 Multi-Entry [CEREBUS B]", 
+     overlay=true, 
+     initial_capital=10000, 
+     default_qty_type=strategy.percent_of_equity, 
+     default_qty_value=0.25,
+     commission_type=strategy.commission.pips, 
+     commission_value=0.3,
+     slippage=1,
+     calc_on_every_tick=false,
+     max_bars_back=5000,
+     process_orders_on_close=true,
+     pyramiding=0)
+
+// ══════════════════════════════════════════════════════════════════════════════
+// INPUTS
+// ══════════════════════════════════════════════════════════════════════════════
+grp_gen    = "═══ General ═══"
+i_symSel   = input.string("Auto", "Symbol Override", options=["Auto","EURUSD","GBPUSD","USDCHF","USDJPY","AUDUSD","NZDUSD","USDCAD","EURGBP","EURJPY","EURAUD","EURCHF","EURNZD","GBPJPY","GBPAUD","GBPCHF","GBPNZD","AUDJPY","AUDNZD","AUDCAD","AUDCHF","CADJPY","CADCHF","NZDCHF","NZDJPY","NZDCAD","CHFJPY","BTCUSD","ETHUSD","XAUUSD","XAGUSD","US500"], tooltip="Leave Auto to detect from chart", group=grp_gen)
+i_estOff   = input.int(-5, "EST Offset (hours)", minval=-12, maxval=12, tooltip="Hours from UTC to EST", group=grp_gen)
+i_showDS   = input.bool(true, "Show DS Levels", group=grp_gen)
+i_showInfo = input.bool(true, "Show Info Table", group=grp_gen)
+
+grp_dmr    = "═══ DMR Parameters ═══"
+i_deepM    = input.float(2.0, "Deep State Multiplier", minval=1.0, maxval=5.0, step=0.1, group=grp_dmr)
+i_killM    = input.float(2.2, "Kill Switch Multiplier", minval=1.5, maxval=5.0, step=0.1, group=grp_dmr)
+i_minAR    = input.float(3.0, "Min Asian Range (pips)", minval=0.0, maxval=20.0, step=0.5, group=grp_dmr)
+i_maxAR    = input.float(45.0, "Max Asian Range (pips)", minval=10.0, maxval=100.0, step=1.0, group=grp_dmr)
+i_maxDaily = input.int(999, "Max Daily Trades", minval=1, maxval=999, group=grp_dmr)
+
+grp_risk   = "═══ Risk Management ═══"
+i_riskPct  = input.float(0.25, "Risk Per Trade (%)", minval=0.01, maxval=5.0, step=0.05, group=grp_risk)
+i_maxDD    = input.float(0.40, "Max Daily Loss (%)", minval=0.05, maxval=5.0, step=0.05, group=grp_risk)
+i_kelly    = input.float(0.45, "Kelly Fraction", minval=0.0, maxval=1.0, step=0.05, group=grp_risk)
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SYMBOL DETECTION & PIP SIZE
+// ══════════════════════════════════════════════════════════════════════════════
+var string sym = i_symSel == "Auto" ? syminfo.ticker : i_symSel
+
+getPipSize(string s) =>
+    switch s
+        "BTCUSD" => 1.0
+        "ETHUSD" => 0.01
+        "XAUUSD" => 0.1
+        "XAGUSD" => 0.001
+        "US500"  => 1.0
+        "USTEC100" => 1.0
+        =>
+            // JPY pairs
+            str.contains(s, "JPY") ? 0.01 : 0.0001
+
+var float pipSize = getPipSize(sym)
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PER-HOUR P90 CALIBRATION TABLES (from backtest v2)
+// Each pair's own 90th percentile per EST hour
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Returns P90 threshold for a given hour (2-10 AM EST) per pair
+// Uses per-hour calibration from backtest v2 (90th percentile of M5 body sizes)
+getP90ThresholdForHour(string s, int h) =>
+    // Default to EURUSD if pair not found
+    float t2 = 2.6, t3 = 3.4, t4 = 3.3, t5 = 2.7, t6 = 2.3, t7 = 2.3, t8 = 3.0, t9 = 4.5, t10 = 5.2
+    if s == "GBPUSD"
+        t2 := 3.3, t3 := 4.3, t4 := 4.2, t5 := 3.5, t6 := 3.0, t7 := 3.1, t8 := 4.0, t9 := 6.5, t10 := 7.6
+    else if s == "USDCHF"
+        t2 := 2.0, t3 := 2.6, t4 := 4.0, t5 := 4.7, t6 := 4.2, t7 := 3.8, t8 := 3.4, t9 := 3.8, t10 := 5.7
+    else if s == "USDJPY"
+        t2 := 8.0, t3 := 9.3, t4 := 8.0, t5 := 6.4, t6 := 5.7, t7 := 6.0, t8 := 6.8, t9 := 8.4, t10 := 9.3
+    else if s == "AUDUSD"
+        t2 := 2.9, t3 := 4.0, t4 := 4.3, t5 := 3.6, t6 := 3.1, t7 := 3.0, t8 := 3.4, t9 := 4.1, t10 := 4.4
+    else if s == "NZDUSD"
+        t2 := 2.9, t3 := 3.8, t4 := 3.9, t5 := 3.3, t6 := 2.7, t7 := 2.6, t8 := 2.9, t9 := 3.8, t10 := 4.2
+    else if s == "USDCAD"
+        t2 := 2.6, t3 := 2.6, t4 := 3.6, t5 := 4.6, t6 := 4.8, t7 := 4.3, t8 := 3.9, t9 := 4.2, t10 := 5.5
+    else if s == "EURGBP"
+        t2 := 1.2, t3 := 1.4, t4 := 2.4, t5 := 3.3, t6 := 3.6, t7 := 3.3, t8 := 3.1, t9 := 3.1, t10 := 3.4
+    else if s == "EURJPY"
+        t2 := 5.8, t3 := 6.3, t4 := 7.8, t5 := 9.5, t6 := 10.1, t7 := 8.6, t8 := 7.7, t9 := 7.3, t10 := 8.3
+    else if s == "EURAUD"
+        t2 := 6.2, t3 := 6.1, t4 := 7.2, t5 := 8.5, t6 := 8.7, t7 := 7.5, t8 := 6.9, t9 := 6.7, t10 := 7.6
+    else if s == "EURCHF"
+        t2 := 1.6, t3 := 1.8, t4 := 2.8, t5 := 3.9, t6 := 4.5, t7 := 4.1, t8 := 3.7, t9 := 3.4, t10 := 3.8
+    else if s == "EURNZD"
+        t2 := 6.7, t3 := 6.5, t4 := 7.6, t5 := 9.4, t6 := 9.6, t7 := 8.4, t8 := 7.7, t9 := 7.5, t10 := 8.4
+    else if s == "GBPJPY"
+        t2 := 9.2, t3 := 10.6, t4 := 9.1, t5 := 7.6, t6 := 6.9, t7 := 7.2, t8 := 8.3, t9 := 11.6, t10 := 13.2
+    else if s == "GBPAUD"
+        t2 := 6.5, t3 := 8.4, t4 := 9.1, t5 := 7.8, t6 := 7.0, t7 := 6.6, t8 := 7.4, t9 := 9.8, t10 := 10.3
+    else if s == "GBPCHF"
+        t2 := 2.5, t3 := 3.0, t4 := 2.7, t5 := 2.4, t6 := 2.1, t7 := 2.3, t8 := 3.0, t9 := 5.4, t10 := 6.6
+    else if s == "GBPNZD"
+        t2 := 7.9, t3 := 9.6, t4 := 9.9, t5 := 8.9, t6 := 7.6, t7 := 7.1, t8 := 7.8, t9 := 10.8, t10 := 11.4
+    else if s == "AUDJPY"
+        t2 := 5.1, t3 := 5.1, t4 := 5.9, t5 := 6.8, t6 := 6.7, t7 := 5.9, t8 := 5.2, t9 := 5.0, t10 := 5.7
+    else if s == "AUDNZD"
+        t2 := 3.2, t3 := 3.0, t4 := 3.3, t5 := 3.8, t6 := 3.6, t7 := 3.2, t8 := 3.0, t9 := 2.8, t10 := 3.1
+    else if s == "AUDCAD"
+        t2 := 3.2, t3 := 3.1, t4 := 3.6, t5 := 4.2, t6 := 4.1, t7 := 3.6, t8 := 3.3, t9 := 3.3, t10 := 4.1
+    else if s == "AUDCHF"
+        t2 := 2.4, t3 := 2.4, t4 := 2.9, t5 := 3.5, t6 := 3.7, t7 := 3.3, t8 := 2.9, t9 := 2.8, t10 := 3.1
+    else if s == "CADJPY"
+        t2 := 4.1, t3 := 4.4, t4 := 5.2, t5 := 6.2, t6 := 6.4, t7 := 5.5, t8 := 4.9, t9 := 4.9, t10 := 6.0
+    else if s == "CADCHF"
+        t2 := 1.3, t3 := 1.5, t4 := 2.2, t5 := 3.1, t6 := 3.5, t7 := 3.2, t8 := 2.8, t9 := 2.8, t10 := 3.4
+    else if s == "NZDCHF"
+        t2 := 2.1, t3 := 2.0, t4 := 2.5, t5 := 3.2, t6 := 3.3, t7 := 3.0, t8 := 2.7, t9 := 2.6, t10 := 2.8
+    else if s == "NZDJPY"
+        t2 := 4.5, t3 := 4.5, t4 := 5.1, t5 := 6.0, t6 := 6.0, t7 := 5.2, t8 := 4.7, t9 := 4.4, t10 := 5.0
+    else if s == "NZDCAD"
+        t2 := 3.0, t3 := 2.9, t4 := 3.3, t5 := 4.0, t6 := 4.0, t7 := 3.6, t8 := 3.4, t9 := 3.3, t10 := 4.1
+    else if s == "CHFJPY"
+        t2 := 7.4, t3 := 8.7, t4 := 7.3, t5 := 6.1, t6 := 5.6, t7 := 5.8, t8 := 6.7, t9 := 9.2, t10 := 10.7
+    else if s == "BTCUSD"
+        t2 := 124.0, t3 := 142.0, t4 := 134.0, t5 := 119.0, t6 := 108.0, t7 := 101.0, t8 := 102.0, t9 := 103.0, t10 := 112.0
+    else if s == "ETHUSD"
+        t2 := 720.0, t3 := 801.0, t4 := 744.0, t5 := 673.0, t6 := 614.0, t7 := 579.0, t8 := 590.0, t9 := 596.0, t10 := 643.0
+    else if s == "XAUUSD"
+        t2 := 20.5, t3 := 28.7, t4 := 29.8, t5 := 23.9, t6 := 18.5, t7 := 18.1, t8 := 23.3, t9 := 25.0, t10 := 26.5
+    else if s == "XAGUSD"
+        t2 := 44.0, t3 := 69.0, t4 := 83.0, t5 := 65.0, t6 := 51.0, t7 := 49.0, t8 := 65.0, t9 := 66.0, t10 := 71.0
+    else if s == "US500"
+        t2 := 2.4, t3 := 2.8, t4 := 2.4, t5 := 2.0, t6 := 1.8, t7 := 1.7, t8 := 2.1, t9 := 2.6, t10 := 3.7
+    else if s == "USTEC100"
+        t2 := 8.0, t3 := 9.0, t4 := 8.5, t5 := 7.0, t6 := 6.5, t7 := 6.0, t8 := 7.0, t9 := 8.0, t10 := 9.0
+    // Return threshold for the requested hour
+    switch h
+        2  => t2
+        3  => t3
+        4  => t4
+        5  => t5
+        6  => t6
+        7  => t7
+        8  => t8
+        9  => t9
+        10 => t10
+        => 999.0
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TIME CALCULATIONS
+// ══════════════════════════════════════════════════════════════════════════════
+estHour() =>
+    hour(time, "UTC") + i_estOff
+
+// estMin available if needed
+// estMin() => minute(time, "UTC")
+
+// Session date: if EST hour >= 19, session is next day
+// Uses day of month + year to uniquely identify each session
+sessionDate() =>
+    h = estHour()
+    if h >= 19
+        dayofmonth + 100  // Next day identifier
+    else
+        dayofmonth
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CONSTANTS
+// ══════════════════════════════════════════════════════════════════════════════
+var int    ASIAN_START_H   = 19
+var int    ASIAN_END_H     = 3
+var int    TRADING_START_H = 2
+var int    TRADING_END_H   = 11
+var int    DS_SCAN_END_H   = 12
+var int    HARD_EXIT_H     = 17
+
+// ══════════════════════════════════════════════════════════════════════════════
+// STATE VARIABLES (per session)
+// ══════════════════════════════════════════════════════════════════════════════
+var int    sessDate        = 0
+var float  asianHigh       = 0.0
+var float  asianLow        = 1e10
+var bool   arComputed      = false
+var bool   skipDay         = false
+var float  arPips          = 0.0
+var int    dailyTrades     = 0
+var float  dailyPnL        = 0.0
+var bool   dayKilled       = false
+
+// P90 tracking per 2-hour window
+var bool   p90Fired2_4     = false
+var bool   p90Fired4_6     = false
+var bool   p90Fired6_8     = false
+var bool   p90Fired8_10    = false
+var bool   p90Fired10_11   = false
+
+// Active trade tracking
+var bool   hasActiveTrade  = false
+var int    tradeDir        = 0      // 1 = LONG, -1 = SHORT
+var float  tradeEntry      = 0.0
+var float  tradeSL         = 0.0
+var float  tradeTP         = 0.0
+var int    tradeBar        = 0
+
+// DS level visualization
+var float  dsLevel         = 0.0
+var float  ksLevel         = 0.0
+var float  activationLevel = 0.0
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SESSION DETECTION
+// ══════════════════════════════════════════════════════════════════════════════
+currentSD = sessionDate()
+isNewSession = currentSD != sessDate
+
+if isNewSession
+    sessDate    := currentSD
+    asianHigh   := 0.0
+    asianLow    := 1e10
+    arComputed  := false
+    skipDay     := false
+    arPips      := 0.0
+    dailyTrades := 0
+    dailyPnL    := 0.0
+    dayKilled   := false
+    p90Fired2_4   := false
+    p90Fired4_6   := false
+    p90Fired6_8   := false
+    p90Fired8_10  := false
+    p90Fired10_11 := false
+    hasActiveTrade := false
+    tradeDir     := 0
+    dsLevel      := 0.0
+    ksLevel      := 0.0
+    activationLevel := 0.0
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ASIAN RANGE COMPUTATION
+// ══════════════════════════════════════════════════════════════════════════════
+eh = estHour()
+
+// Accumulate Asian Range (19:00 - 03:00 EST)
+if eh >= ASIAN_START_H or eh < ASIAN_END_H
+    asianHigh := math.max(asianHigh, high)
+    asianLow  := math.min(asianLow, low)
+
+// Lock AR at 3:00 EST
+if eh == ASIAN_END_H and not arComputed
+    arComputed := true
+    if asianHigh > 0 and asianLow < 1e9
+        arPips := (asianHigh - asianLow) / pipSize
+        if arPips < i_minAR or arPips > i_maxAR
+            skipDay := true
+
+// ══════════════════════════════════════════════════════════════════════════════
+// P90 THRESHOLD LOOKUP
+// ══════════════════════════════════════════════════════════════════════════════
+getP90Threshold(int h) =>
+    getP90ThresholdForHour(sym, h)
+
+// ══════════════════════════════════════════════════════════════════════════════
+// WINDOW CLASSIFICATION
+// ══════════════════════════════════════════════════════════════════════════════
+inWindow2_4()  => eh >= 2 and eh < 4
+inWindow4_6()  => eh >= 4 and eh < 6
+inWindow6_8()  => eh >= 6 and eh < 8
+inWindow8_10() => eh >= 8 and eh < 10
+inWindow10_11()=> eh >= 10 and eh < 11
+
+// ══════════════════════════════════════════════════════════════════════════════
+// P90 DETECTION (per candle in trading window)
+// ══════════════════════════════════════════════════════════════════════════════
+inTradingWindow = eh >= TRADING_START_H and eh < TRADING_END_H
+isFreshBar = barstate.isconfirmed
+
+bodyPips = math.abs(close - open) / pipSize
+p90Threshold = getP90Threshold(eh)
+isP90 = bodyPips >= p90Threshold and inTradingWindow and isFreshBar
+
+// Direction: bullish candle = SHORT setup (reversal down), bearish = LONG setup
+p90Dir = close > open ? 1 : -1
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DEEP STATE CALCULATION
+// ══════════════════════════════════════════════════════════════════════════════
+calcDS(float act, float bp, int dir) =>
+    act + (bp * i_deepM * pipSize) * dir
+
+calcKS(float act, float bp, int dir) =>
+    act + (bp * i_killM * pipSize) * dir
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MULTI-ENTRY LOGIC: One P90 per 2-hour window
+// ══════════════════════════════════════════════════════════════════════════════
+var float pendingAct     = 0.0
+var float pendingDS      = 0.0
+var float pendingKS      = 0.0
+var int   pendingDir     = 0
+var float pendingBP      = 0.0
+var int   pendingWindow  = 0  // 2, 4, 6, 8, 10
+var bool  pendingP90     = false
+
+// Detect P90 in each window
+if isP90 and not skipDay and not dayKilled and dailyTrades < i_maxDaily
+    if inWindow2_4() and not p90Fired2_4
+        p90Fired2_4  := true
+        pendingAct   := close
+        pendingBP    := bodyPips
+        pendingDir   := p90Dir
+        pendingDS    := calcDS(close, bodyPips, p90Dir)
+        pendingKS    := calcKS(close, bodyPips, p90Dir)
+        pendingWindow := 2
+        pendingP90   := true
+    else if inWindow4_6() and not p90Fired4_6
+        p90Fired4_6  := true
+        pendingAct   := close
+        pendingBP    := bodyPips
+        pendingDir   := p90Dir
+        pendingDS    := calcDS(close, bodyPips, p90Dir)
+        pendingKS    := calcKS(close, bodyPips, p90Dir)
+        pendingWindow := 4
+        pendingP90   := true
+    else if inWindow6_8() and not p90Fired6_8
+        p90Fired6_8  := true
+        pendingAct   := close
+        pendingBP    := bodyPips
+        pendingDir   := p90Dir
+        pendingDS    := calcDS(close, bodyPips, p90Dir)
+        pendingKS    := calcKS(close, bodyPips, p90Dir)
+        pendingWindow := 6
+        pendingP90   := true
+    else if inWindow8_10() and not p90Fired8_10
+        p90Fired8_10 := true
+        pendingAct   := close
+        pendingBP    := bodyPips
+        pendingDir   := p90Dir
+        pendingDS    := calcDS(close, bodyPips, p90Dir)
+        pendingKS    := calcKS(close, bodyPips, p90Dir)
+        pendingWindow := 8
+        pendingP90   := true
+    else if inWindow10_11() and not p90Fired10_11
+        p90Fired10_11 := true
+        pendingAct   := close
+        pendingBP    := bodyPips
+        pendingDir   := p90Dir
+        pendingDS    := calcDS(close, bodyPips, p90Dir)
+        pendingKS    := calcKS(close, bodyPips, p90Dir)
+        pendingWindow := 10
+        pendingP90   := true
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DS TOUCH DETECTION & ENTRY
+// ══════════════════════════════════════════════════════════════════════════════
+dsTouched = false
+
+if pendingP90 and not hasActiveTrade and eh < DS_SCAN_END_H
+    if pendingDir == 1  // Bullish P90 → SHORT at DS
+        if low <= pendingDS
+            dsTouched := true
+    else if pendingDir == -1  // Bearish P90 → LONG at DS
+        if high >= pendingDS
+            dsTouched := true
+
+// Validate geometry before entry
+validGeometry = false
+isShort = pendingDir == 1
+if dsTouched
+    if isShort
+        // SHORT: activation > entry, KS > entry
+        validGeometry := pendingAct > pendingDS and pendingKS > pendingDS
+    else
+        // LONG: activation < entry, KS < entry
+        validGeometry := pendingAct < pendingDS and pendingKS < pendingDS
+
+// Execute entry
+if validGeometry and not hasActiveTrade
+    entryPrice = pendingDS
+    slPrice = pendingKS
+    tpPrice = pendingAct
+    
+    // Position sizing: use fixed percentage of equity
+    if isShort
+        strategy.entry("DMR_S", strategy.short, comment="DMR_v2_S")
+    else
+        strategy.entry("DMR_L", strategy.long, comment="DMR_v2_L")
+    
+    if isShort
+        strategy.exit("DMR_EXIT", "DMR_S", stop=slPrice, limit=tpPrice)
+    else
+        strategy.exit("DMR_EXIT", "DMR_L", stop=slPrice, limit=tpPrice)
+    
+    hasActiveTrade := true
+    tradeDir     := pendingDir
+    tradeEntry   := entryPrice
+    tradeSL      := slPrice
+    tradeTP      := tpPrice
+    tradeBar     := bar_index
+    dailyTrades  += 1
+    
+    // Update visualization levels
+    dsLevel      := pendingDS
+    ksLevel      := pendingKS
+    activationLevel := pendingAct
+
+// Clear pending after touch or scan window closes
+if dsTouched or eh >= DS_SCAN_END_H
+    pendingP90 := false
+
+// ══════════════════════════════════════════════════════════════════════════════
+// HARD EXIT (5:00 PM EST)
+// ══════════════════════════════════════════════════════════════════════════════
+if eh >= HARD_EXIT_H and hasActiveTrade
+    strategy.close_all(comment="DMR_HARD_EXIT")
+    hasActiveTrade := false
+
+// Reset active trade flag when flat
+if strategy.position_size == 0
+    hasActiveTrade := false
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PLOTTING & VISUALIZATION
+// ══════════════════════════════════════════════════════════════════════════════
+// Asian Range plot
+plot(arComputed ? asianHigh : na, "Asian High", color=color.new(color.blue, 70), linewidth=1, style=plot.style_stepline)
+plot(arComputed ? asianLow : na, "Asian Low", color=color.new(color.blue, 70), linewidth=1, style=plot.style_stepline)
+
+// DS Level
+plot(i_showDS and dsLevel > 0 ? dsLevel : na, "Deep State", color=color.new(color.orange, 30), linewidth=2, style=plot.style_linebr)
+
+// Kill Switch Level
+plot(i_showDS and ksLevel > 0 ? ksLevel : na, "Kill Switch", color=color.new(color.red, 30), linewidth=1, style=plot.style_linebr)
+
+// Activation Level
+plot(i_showDS and activationLevel > 0 ? activationLevel : na, "Activation", color=color.new(color.green, 30), linewidth=1, style=plot.style_linebr)
+
+// ══════════════════════════════════════════════════════════════════════════════
+// INFO TABLE
+// ══════════════════════════════════════════════════════════════════════════════
+var table infoTable = table.new(position.top_right, 2, 14, bgcolor=color.new(color.black, 80), border_width=1)
+
+if i_showInfo and barstate.islast
+    table.cell(infoTable, 0, 0, "DMR v2", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 0, sym, text_color=color.yellow, text_size=size.small)
+    table.cell(infoTable, 0, 1, "Day", text_color=color.gray, text_size=size.tiny)
+    table.cell(infoTable, 1, 1, str.tostring(dayofmonth) + "/" + str.tostring(month), text_color=color.white, text_size=size.tiny)
+    table.cell(infoTable, 0, 2, "Asian Range", text_color=color.gray, text_size=size.tiny)
+    table.cell(infoTable, 1, 2, str.tostring(arPips, "#.1f") + "p", text_color=arPips > 0 ? color.aqua : color.gray, text_size=size.tiny)
+    table.cell(infoTable, 0, 3, "Skip Day", text_color=color.gray, text_size=size.tiny)
+    table.cell(infoTable, 1, 3, skipDay ? "YES" : "NO", text_color=skipDay ? color.red : color.green, text_size=size.tiny)
+    table.cell(infoTable, 0, 4, "Daily Trades", text_color=color.gray, text_size=size.tiny)
+    table.cell(infoTable, 1, 4, str.tostring(dailyTrades), text_color=color.white, text_size=size.tiny)
+    table.cell(infoTable, 0, 5, "Position", text_color=color.gray, text_size=size.tiny)
+    posText = strategy.position_size > 0 ? "SHORT" : strategy.position_size < 0 ? "LONG" : "FLAT"
+    posColor = strategy.position_size != 0 ? color.yellow : color.gray
+    table.cell(infoTable, 1, 5, posText, text_color=posColor, text_size=size.tiny)
+    table.cell(infoTable, 0, 6, "Body (pips)", text_color=color.gray, text_size=size.tiny)
+    table.cell(infoTable, 1, 6, str.tostring(bodyPips, "#.1f"), text_color=color.white, text_size=size.tiny)
+    table.cell(infoTable, 0, 7, "P90 Thresh", text_color=color.gray, text_size=size.tiny)
+    table.cell(infoTable, 1, 7, str.tostring(p90Threshold, "#.1f"), text_color=color.white, text_size=size.tiny)
+    table.cell(infoTable, 0, 8, "EST Hour", text_color=color.gray, text_size=size.tiny)
+    table.cell(infoTable, 1, 8, str.tostring(eh), text_color=color.white, text_size=size.tiny)
+    table.cell(infoTable, 0, 9, "W 2-4", text_color=color.gray, text_size=size.tiny)
+    table.cell(infoTable, 1, 9, p90Fired2_4 ? "✓" : "—", text_color=p90Fired2_4 ? color.green : color.gray, text_size=size.tiny)
+    table.cell(infoTable, 0, 10, "W 4-6", text_color=color.gray, text_size=size.tiny)
+    table.cell(infoTable, 1, 10, p90Fired4_6 ? "✓" : "—", text_color=p90Fired4_6 ? color.green : color.gray, text_size=size.tiny)
+    table.cell(infoTable, 0, 11, "W 6-8", text_color=color.gray, text_size=size.tiny)
+    table.cell(infoTable, 1, 11, p90Fired6_8 ? "✓" : "—", text_color=p90Fired6_8 ? color.green : color.gray, text_size=size.tiny)
+    table.cell(infoTable, 0, 12, "W 8-10", text_color=color.gray, text_size=size.tiny)
+    table.cell(infoTable, 1, 12, p90Fired8_10 ? "✓" : "—", text_color=p90Fired8_10 ? color.green : color.gray, text_size=size.tiny)
+    table.cell(infoTable, 0, 13, "W 10-11", text_color=color.gray, text_size=size.tiny)
+    table.cell(infoTable, 1, 13, p90Fired10_11 ? "✓" : "—", text_color=p90Fired10_11 ? color.green : color.gray, text_size=size.tiny)
+
+// ══════════════════════════════════════════════════════════════════════════════
+// BACKGROUND COLOR FOR ACTIVE WINDOWS
+// ══════════════════════════════════════════════════════════════════════════════
+bgColor = inTradingWindow and not skipDay ? color.new(color.green, 95) : 
+          eh >= ASIAN_START_H or eh < ASIAN_END_H ? color.new(color.blue, 95) : 
+          na
+bgcolor(bgColor)
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ALERTS
+// ══════════════════════════════════════════════════════════════════════════════
+alertcondition(isP90 and not skipDay, "DMR P90 Detected", "DMR v2: P90 detected on {{ticker}} at {{close}}")
+alertcondition(validGeometry and not hasActiveTrade, "DMR Entry Signal", "DMR v2: Entry signal on {{ticker}}")
+alertcondition(eh >= HARD_EXIT_H and hasActiveTrade, "DMR Hard Exit", "DMR v2: Hard exit on {{ticker}}")

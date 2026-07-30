@@ -1,0 +1,41 @@
+{
+  "symbol": "HK50",
+  "pip_size": 1.0,
+  "engines": {
+    "p90": {
+      "trades": 3,
+      "win_rate": 0.0,
+      "net_pnl_pips": -28.9,
+      "profit_factor": 0.0,
+      "max_dd_pips": 28.9,
+      "avg_trade_pips": -9.62
+    },
+    "symmetry_trap": {
+      "trades": 0,
+      "win_rate": 0.0,
+      "net_pnl_pips": 0.0,
+      "profit_factor": 0.0,
+      "max_dd_pips": 0.0,
+      "avg_trade_pips": 0.0
+    },
+    "dmr": {
+      "trades": 0,
+      "win_rate": 0,
+      "net_pnl_pips": 0,
+      "profit_factor": 0,
+      "max_dd_pips": 0,
+      "avg_trade_pips": 0
+    },
+    "rekey_intraday": {
+      "trades": 101,
+      "win_rate": 37.6,
+      "net_pnl_pips": -1443.3,
+      "profit_factor": 0.62,
+      "max_dd_pips": 1822.6,
+      "avg_trade_pips": -14.29
+    },
+    "rekey_dead_simple": {
+      "note": "Run separately for stats"
+    }
+  }
+}
