@@ -17,6 +17,9 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Optional, Dict
 
+# Import trading costs for realistic backtesting
+from trading_costs import apply_costs_to_pnl
+
 # ── SESSIONS (EST) ───────────────────────────────────────────────────────────
 ASIAN_START, ASIAN_END = 19, 3
 LONDON_START, LONDON_END = 2, 6
@@ -172,7 +175,10 @@ def run(path: str, symbol: str, pip: float = None):
         if not triggered:
             continue
 
-        trade.pnl = (trade.exit_price - trade.entry) / pip if direction == "LONG" else (trade.entry - trade.exit_price) / pip
+        # Calculate gross PnL in pips
+        gross_pnl = (trade.exit_price - trade.entry) / pip if direction == "LONG" else (trade.entry - trade.exit_price) / pip
+        # Apply trading costs (spread + commission)
+        trade.pnl = apply_costs_to_pnl(gross_pnl, symbol, direction)
         trades.append(trade)
 
     # Stats

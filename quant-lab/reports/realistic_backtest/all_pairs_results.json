@@ -1,0 +1,1181 @@
+{
+  "timestamp": "2026-07-29T16:06:47.233390",
+  "pairs": {
+    "EURUSD": {
+      "symbol": "EURUSD",
+      "pip_size": 0.0001,
+      "engines": {
+        "p90": {
+          "trades": 411,
+          "win_rate": 44.8,
+          "net_pnl_pips": 218.70000000000005,
+          "profit_factor": 1.17,
+          "max_dd_pips": 99.5,
+          "avg_trade_pips": 0.53
+        },
+        "symmetry_trap": {
+          "trades": 3058,
+          "win_rate": 76.68410725964682,
+          "net_pnl_pips": 14327.294000000225,
+          "profit_factor": 7.758505036343938,
+          "max_dd_pips": 36.028000000002066,
+          "avg_trade_pips": 4.685184434270839
+        },
+        "dmr": {
+          "trades": 284,
+          "win_rate": 19.0,
+          "net_pnl_pips": 238.2,
+          "profit_factor": 1.69,
+          "max_dd_pips": 49.7,
+          "avg_trade_pips": 0.84
+        },
+        "rekey_intraday": {
+          "trades": 194,
+          "win_rate": 51.5,
+          "net_pnl_pips": 257.5,
+          "profit_factor": 1.2,
+          "max_dd_pips": 142.5,
+          "avg_trade_pips": 1.33
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "GBPUSD": {
+      "symbol": "GBPUSD",
+      "pip_size": 0.0001,
+      "engines": {
+        "p90": {
+          "trades": 973,
+          "win_rate": 49.2,
+          "net_pnl_pips": 1127.0,
+          "profit_factor": 1.36,
+          "max_dd_pips": 138.5,
+          "avg_trade_pips": 1.16
+        },
+        "symmetry_trap": {
+          "trades": 3926,
+          "win_rate": 77.94192562404483,
+          "net_pnl_pips": 23786.117999999966,
+          "profit_factor": 8.304058083340644,
+          "max_dd_pips": 63.22100000000046,
+          "avg_trade_pips": 6.058613856342324
+        },
+        "dmr": {
+          "trades": 230,
+          "win_rate": 20.9,
+          "net_pnl_pips": 252.39999999999998,
+          "profit_factor": 1.89,
+          "max_dd_pips": 24.3,
+          "avg_trade_pips": 1.1
+        },
+        "rekey_intraday": {
+          "trades": 302,
+          "win_rate": 43.7,
+          "net_pnl_pips": -637.8,
+          "profit_factor": 0.81,
+          "max_dd_pips": 837.0,
+          "avg_trade_pips": -2.11
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "USDCHF": {
+      "symbol": "USDCHF",
+      "pip_size": 0.0001,
+      "engines": {
+        "p90": {
+          "error": "Cannot parse timestamp '1688342400'. Tried: ['%Y.%m.%d %H:%M:%S', '%Y.%m.%d %H:%M', '%Y-%m-%d %H:%M:%S', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%dT%H:%M:%SZ', '%Y-%m-%dT%H:%M:%S%z', '%Y-%m-%d %H:%M', '%Y-%m-%d', '%m/%d/%Y %H:%M:%S', '%m/%d/%Y %H:%M', '%d.%m.%Y %H:%M:%S', '%d.%m.%Y %H:%M', '%Y%m%d %H:%M:%S']"
+        },
+        "symmetry_trap": {
+          "trades": 0,
+          "win_rate": 0.0,
+          "net_pnl_pips": 0.0,
+          "profit_factor": 0.0,
+          "max_dd_pips": 0.0,
+          "avg_trade_pips": 0.0
+        },
+        "dmr": {
+          "trades": 0,
+          "win_rate": 0,
+          "net_pnl_pips": 0,
+          "profit_factor": 0,
+          "max_dd_pips": 0,
+          "avg_trade_pips": 0
+        },
+        "rekey_intraday": {
+          "error": "Cannot parse timestamp '1688342400'"
+        },
+        "rekey_dead_simple": {
+          "error": "time data '1688342400' does not match format '%Y-%m-%d %H:%M:%S'"
+        }
+      }
+    },
+    "USDJPY": {
+      "symbol": "USDJPY",
+      "pip_size": 0.01,
+      "engines": {
+        "p90": {
+          "trades": 238,
+          "win_rate": 53.4,
+          "net_pnl_pips": -271.29999999999995,
+          "profit_factor": 0.77,
+          "max_dd_pips": 285.1,
+          "avg_trade_pips": -1.14
+        },
+        "symmetry_trap": {
+          "trades": 2727,
+          "win_rate": 79.97799779977997,
+          "net_pnl_pips": 18055.211000000163,
+          "profit_factor": 9.75225093338478,
+          "max_dd_pips": 35.90699999999924,
+          "avg_trade_pips": 6.620906123945788
+        },
+        "dmr": {
+          "trades": 0,
+          "win_rate": 0,
+          "net_pnl_pips": 0,
+          "profit_factor": 0,
+          "max_dd_pips": 0,
+          "avg_trade_pips": 0
+        },
+        "rekey_intraday": {
+          "trades": 346,
+          "win_rate": 44.2,
+          "net_pnl_pips": -1251.7,
+          "profit_factor": 0.73,
+          "max_dd_pips": 1414.3,
+          "avg_trade_pips": -3.62
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "AUDUSD": {
+      "symbol": "AUDUSD",
+      "pip_size": 0.0001,
+      "engines": {
+        "p90": {
+          "trades": 577,
+          "win_rate": 48.4,
+          "net_pnl_pips": 605.1999999999998,
+          "profit_factor": 1.35,
+          "max_dd_pips": 110.3,
+          "avg_trade_pips": 1.05
+        },
+        "symmetry_trap": {
+          "trades": 3271,
+          "win_rate": 76.73494344237236,
+          "net_pnl_pips": 16085.903000000195,
+          "profit_factor": 9.53487162862316,
+          "max_dd_pips": 35.40699999999924,
+          "avg_trade_pips": 4.917732497707183
+        },
+        "dmr": {
+          "trades": 306,
+          "win_rate": 18.3,
+          "net_pnl_pips": 240.09999999999997,
+          "profit_factor": 1.66,
+          "max_dd_pips": 38.4,
+          "avg_trade_pips": 0.78
+        },
+        "rekey_intraday": {
+          "trades": 368,
+          "win_rate": 47.3,
+          "net_pnl_pips": -251.1,
+          "profit_factor": 0.91,
+          "max_dd_pips": 318.8,
+          "avg_trade_pips": -0.68
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "NZDUSD": {
+      "symbol": "NZDUSD",
+      "pip_size": 0.0001,
+      "engines": {
+        "p90": {
+          "trades": 398,
+          "win_rate": 50.0,
+          "net_pnl_pips": 362.0,
+          "profit_factor": 1.31,
+          "max_dd_pips": 82.8,
+          "avg_trade_pips": 0.91
+        },
+        "symmetry_trap": {
+          "trades": 2819,
+          "win_rate": 80.20574671869457,
+          "net_pnl_pips": 15315.467000000148,
+          "profit_factor": 12.203657482117931,
+          "max_dd_pips": 21.407000000000153,
+          "avg_trade_pips": 5.4329432422845505
+        },
+        "dmr": {
+          "trades": 245,
+          "win_rate": 21.6,
+          "net_pnl_pips": 296.7,
+          "profit_factor": 2.03,
+          "max_dd_pips": 34.8,
+          "avg_trade_pips": 1.21
+        },
+        "rekey_intraday": {
+          "trades": 302,
+          "win_rate": 49.0,
+          "net_pnl_pips": -123.5,
+          "profit_factor": 0.93,
+          "max_dd_pips": 277.4,
+          "avg_trade_pips": -0.41
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "USDCAD": {
+      "symbol": "USDCAD",
+      "pip_size": 0.0001,
+      "engines": {
+        "p90": {
+          "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+        },
+        "symmetry_trap": {
+          "trades": 3706,
+          "win_rate": 77.33405288720992,
+          "net_pnl_pips": 20423.55800000006,
+          "profit_factor": 9.922558519515198,
+          "max_dd_pips": 25.748999999999796,
+          "avg_trade_pips": 5.510943874797642
+        },
+        "dmr": {
+          "trades": 322,
+          "win_rate": 19.3,
+          "net_pnl_pips": 324.6,
+          "profit_factor": 1.87,
+          "max_dd_pips": 28.2,
+          "avg_trade_pips": 1.01
+        },
+        "rekey_intraday": {
+          "trades": 328,
+          "win_rate": 43.9,
+          "net_pnl_pips": -337.6,
+          "profit_factor": 0.89,
+          "max_dd_pips": 644.6,
+          "avg_trade_pips": -1.03
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "EURGBP": {
+      "symbol": "EURGBP",
+      "pip_size": 0.0001,
+      "engines": {
+        "p90": {
+          "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+        },
+        "symmetry_trap": {
+          "trades": 1975,
+          "win_rate": 78.0759493670886,
+          "net_pnl_pips": 7657.77500000006,
+          "profit_factor": 9.756436307003488,
+          "max_dd_pips": 21.706999999999994,
+          "avg_trade_pips": 3.877354430379777
+        },
+        "dmr": {
+          "trades": 209,
+          "win_rate": 15.8,
+          "net_pnl_pips": 99.10000000000002,
+          "profit_factor": 1.43,
+          "max_dd_pips": 33.6,
+          "avg_trade_pips": 0.47
+        },
+        "rekey_intraday": {
+          "trades": 198,
+          "win_rate": 59.6,
+          "net_pnl_pips": 345.6,
+          "profit_factor": 1.51,
+          "max_dd_pips": 65.5,
+          "avg_trade_pips": 1.75
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "EURJPY": {
+      "symbol": "EURJPY",
+      "pip_size": 0.01,
+      "engines": {
+        "p90": {
+          "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+        },
+        "symmetry_trap": {
+          "trades": 2071,
+          "win_rate": 77.54707870593917,
+          "net_pnl_pips": 14414.60300000015,
+          "profit_factor": 9.82677129674145,
+          "max_dd_pips": 33.31399999999985,
+          "avg_trade_pips": 6.960213906325519
+        },
+        "dmr": {
+          "trades": 0,
+          "win_rate": 0,
+          "net_pnl_pips": 0,
+          "profit_factor": 0,
+          "max_dd_pips": 0,
+          "avg_trade_pips": 0
+        },
+        "rekey_intraday": {
+          "trades": 239,
+          "win_rate": 49.4,
+          "net_pnl_pips": -264.0,
+          "profit_factor": 0.92,
+          "max_dd_pips": 599.4,
+          "avg_trade_pips": -1.1
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "EURAUD": {
+      "symbol": "EURAUD",
+      "pip_size": 0.0001,
+      "engines": {
+        "p90": {
+          "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+        },
+        "symmetry_trap": {
+          "trades": 2602,
+          "win_rate": 76.5564950038432,
+          "net_pnl_pips": 16399.086000000247,
+          "profit_factor": 8.09158864763654,
+          "max_dd_pips": 86.65599999999904,
+          "avg_trade_pips": 6.302492697924768
+        },
+        "dmr": {
+          "trades": 127,
+          "win_rate": 14.2,
+          "net_pnl_pips": 57.400000000000006,
+          "profit_factor": 1.35,
+          "max_dd_pips": 31.3,
+          "avg_trade_pips": 0.45
+        },
+        "rekey_intraday": {
+          "trades": 282,
+          "win_rate": 45.0,
+          "net_pnl_pips": -1413.2,
+          "profit_factor": 0.62,
+          "max_dd_pips": 1427.5,
+          "avg_trade_pips": -5.01
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "EURNZD": {
+      "symbol": "EURNZD",
+      "pip_size": 0.0001,
+      "engines": {
+        "p90": {
+          "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+        },
+        "symmetry_trap": {
+          "trades": 2427,
+          "win_rate": 77.95632468067572,
+          "net_pnl_pips": 17541.7110000001,
+          "profit_factor": 8.806568626796524,
+          "max_dd_pips": 104.11399999999958,
+          "avg_trade_pips": 7.227734239802267
+        },
+        "dmr": {
+          "trades": 95,
+          "win_rate": 23.2,
+          "net_pnl_pips": 147.0,
+          "profit_factor": 2.18,
+          "max_dd_pips": 22.9,
+          "avg_trade_pips": 1.55
+        },
+        "rekey_intraday": {
+          "trades": 270,
+          "win_rate": 48.1,
+          "net_pnl_pips": 649.7,
+          "profit_factor": 1.19,
+          "max_dd_pips": 583.2,
+          "avg_trade_pips": 2.41
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "EURCHF": {
+      "symbol": "EURCHF",
+      "pip_size": 0.0001,
+      "engines": {
+        "p90": {
+          "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+        },
+        "symmetry_trap": {
+          "trades": 2859,
+          "win_rate": 78.24414130814971,
+          "net_pnl_pips": 14785.587000000121,
+          "profit_factor": 10.739829413182985,
+          "max_dd_pips": 23.406999999999925,
+          "avg_trade_pips": 5.171593913955971
+        },
+        "dmr": {
+          "trades": 297,
+          "win_rate": 22.6,
+          "net_pnl_pips": 401.20000000000005,
+          "profit_factor": 2.15,
+          "max_dd_pips": 35.7,
+          "avg_trade_pips": 1.35
+        },
+        "rekey_intraday": {
+          "trades": 231,
+          "win_rate": 53.7,
+          "net_pnl_pips": 203.8,
+          "profit_factor": 1.17,
+          "max_dd_pips": 218.9,
+          "avg_trade_pips": 0.88
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "EURCAD": {
+      "symbol": "EURCAD",
+      "pip_size": 0.0001,
+      "engines": {
+        "p90": {
+          "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+        },
+        "symmetry_trap": {
+          "trades": 3995,
+          "win_rate": 77.24655819774718,
+          "net_pnl_pips": 23671.53499999997,
+          "profit_factor": 8.76379870795412,
+          "max_dd_pips": 58.22099999999999,
+          "avg_trade_pips": 5.925290362953684
+        },
+        "dmr": {
+          "trades": 281,
+          "win_rate": 20.6,
+          "net_pnl_pips": 274.70000000000005,
+          "profit_factor": 1.82,
+          "max_dd_pips": 31.1,
+          "avg_trade_pips": 0.98
+        },
+        "rekey_intraday": {
+          "trades": 310,
+          "win_rate": 46.8,
+          "net_pnl_pips": -282.1,
+          "profit_factor": 0.91,
+          "max_dd_pips": 738.1,
+          "avg_trade_pips": -0.91
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "GBPCAD": {
+      "symbol": "GBPCAD",
+      "pip_size": 0.0001,
+      "engines": {
+        "p90": {
+          "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+        },
+        "symmetry_trap": {
+          "trades": 3737,
+          "win_rate": 77.70939256087772,
+          "net_pnl_pips": 23664.140999999963,
+          "profit_factor": 8.492135109644284,
+          "max_dd_pips": 65.01399999999921,
+          "avg_trade_pips": 6.33238988493443
+        },
+        "dmr": {
+          "trades": 195,
+          "win_rate": 23.6,
+          "net_pnl_pips": 199.39999999999998,
+          "profit_factor": 1.71,
+          "max_dd_pips": 23.7,
+          "avg_trade_pips": 1.02
+        },
+        "rekey_intraday": {
+          "trades": 270,
+          "win_rate": 50.4,
+          "net_pnl_pips": 726.5,
+          "profit_factor": 1.24,
+          "max_dd_pips": 515.7,
+          "avg_trade_pips": 2.69
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "AUDJPY": {
+      "symbol": "AUDJPY",
+      "pip_size": 0.01,
+      "engines": {
+        "p90": {
+          "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+        },
+        "symmetry_trap": {
+          "trades": 2604,
+          "win_rate": 78.11059907834101,
+          "net_pnl_pips": 15632.07200000016,
+          "profit_factor": 9.636551583157948,
+          "max_dd_pips": 50.20699999999988,
+          "avg_trade_pips": 6.0030998463902305
+        },
+        "dmr": {
+          "trades": 0,
+          "win_rate": 0,
+          "net_pnl_pips": 0,
+          "profit_factor": 0,
+          "max_dd_pips": 0,
+          "avg_trade_pips": 0
+        },
+        "rekey_intraday": {
+          "trades": 293,
+          "win_rate": 45.4,
+          "net_pnl_pips": -481.5,
+          "profit_factor": 0.84,
+          "max_dd_pips": 612.6,
+          "avg_trade_pips": -1.64
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "AUDNZD": {
+      "symbol": "AUDNZD",
+      "pip_size": 0.0001,
+      "engines": {
+        "p90": {
+          "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+        },
+        "symmetry_trap": {
+          "trades": 2816,
+          "win_rate": 79.93607954545455,
+          "net_pnl_pips": 18677.888000000043,
+          "profit_factor": 14.299029160777655,
+          "max_dd_pips": 29.362999999999943,
+          "avg_trade_pips": 6.632772727272743
+        },
+        "dmr": {
+          "trades": 227,
+          "win_rate": 34.4,
+          "net_pnl_pips": 640.6999999999999,
+          "profit_factor": 3.5,
+          "max_dd_pips": 16.4,
+          "avg_trade_pips": 2.82
+        },
+        "rekey_intraday": {
+          "trades": 220,
+          "win_rate": 57.7,
+          "net_pnl_pips": 525.4,
+          "profit_factor": 1.68,
+          "max_dd_pips": 78.2,
+          "avg_trade_pips": 2.39
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "AUDCHF": {
+      "symbol": "AUDCHF",
+      "pip_size": 0.0001,
+      "engines": {
+        "p90": {
+          "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+        },
+        "symmetry_trap": {
+          "trades": 2341,
+          "win_rate": 80.09397693293464,
+          "net_pnl_pips": 10996.413000000073,
+          "profit_factor": 11.71292751217296,
+          "max_dd_pips": 44.29099999999971,
+          "avg_trade_pips": 4.697314395557485
+        },
+        "dmr": {
+          "trades": 215,
+          "win_rate": 22.3,
+          "net_pnl_pips": 247.40000000000003,
+          "profit_factor": 1.98,
+          "max_dd_pips": 35.0,
+          "avg_trade_pips": 1.15
+        },
+        "rekey_intraday": {
+          "trades": 253,
+          "win_rate": 52.2,
+          "net_pnl_pips": 232.9,
+          "profit_factor": 1.2,
+          "max_dd_pips": 170.6,
+          "avg_trade_pips": 0.92
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "AUDCAD": {
+      "symbol": "AUDCAD",
+      "pip_size": 0.0001,
+      "engines": {
+        "p90": {
+          "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+        },
+        "symmetry_trap": {
+          "trades": 2933,
+          "win_rate": 75.96317763382203,
+          "net_pnl_pips": 13851.76900000021,
+          "profit_factor": 8.395755325198229,
+          "max_dd_pips": 26.814000000000306,
+          "avg_trade_pips": 4.722730651210436
+        },
+        "dmr": {
+          "trades": 268,
+          "win_rate": 23.1,
+          "net_pnl_pips": 406.80000000000007,
+          "profit_factor": 2.35,
+          "max_dd_pips": 28.3,
+          "avg_trade_pips": 1.52
+        },
+        "rekey_intraday": {
+          "trades": 295,
+          "win_rate": 50.2,
+          "net_pnl_pips": 325.5,
+          "profit_factor": 1.19,
+          "max_dd_pips": 172.8,
+          "avg_trade_pips": 1.1
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "NZDJPY": {
+      "symbol": "NZDJPY",
+      "pip_size": 0.01,
+      "engines": {
+        "p90": {
+          "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+        },
+        "symmetry_trap": {
+          "trades": 2919,
+          "win_rate": 77.18396711202466,
+          "net_pnl_pips": 16321.667000000187,
+          "profit_factor": 8.606112135822361,
+          "max_dd_pips": 38.406999999999925,
+          "avg_trade_pips": 5.591526892771561
+        },
+        "dmr": {
+          "trades": 0,
+          "win_rate": 0,
+          "net_pnl_pips": 0,
+          "profit_factor": 0,
+          "max_dd_pips": 0,
+          "avg_trade_pips": 0
+        },
+        "rekey_intraday": {
+          "trades": 300,
+          "win_rate": 39.0,
+          "net_pnl_pips": -1468.3,
+          "profit_factor": 0.58,
+          "max_dd_pips": 1539.1,
+          "avg_trade_pips": -4.89
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "NZDCHF": {
+      "symbol": "NZDCHF",
+      "pip_size": 0.0001,
+      "engines": {
+        "p90": {
+          "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+        },
+        "symmetry_trap": {
+          "trades": 2356,
+          "win_rate": 80.1358234295416,
+          "net_pnl_pips": 12715.408000000074,
+          "profit_factor": 12.632684278128927,
+          "max_dd_pips": 32.93499999999949,
+          "avg_trade_pips": 5.397032258064548
+        },
+        "dmr": {
+          "trades": 216,
+          "win_rate": 30.1,
+          "net_pnl_pips": 513.7,
+          "profit_factor": 3.01,
+          "max_dd_pips": 22.5,
+          "avg_trade_pips": 2.38
+        },
+        "rekey_intraday": {
+          "trades": 250,
+          "win_rate": 52.4,
+          "net_pnl_pips": 128.6,
+          "profit_factor": 1.13,
+          "max_dd_pips": 261.9,
+          "avg_trade_pips": 0.51
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "NZDCAD": {
+      "symbol": "NZDCAD",
+      "pip_size": 0.0001,
+      "engines": {
+        "p90": {
+          "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+        },
+        "symmetry_trap": {
+          "trades": 3260,
+          "win_rate": 78.03680981595093,
+          "net_pnl_pips": 17939.38000000012,
+          "profit_factor": 10.445696425675514,
+          "max_dd_pips": 24.828000000000003,
+          "avg_trade_pips": 5.502877300613534
+        },
+        "dmr": {
+          "trades": 300,
+          "win_rate": 24.0,
+          "net_pnl_pips": 436.90000000000003,
+          "profit_factor": 2.16,
+          "max_dd_pips": 27.0,
+          "avg_trade_pips": 1.46
+        },
+        "rekey_intraday": {
+          "trades": 283,
+          "win_rate": 54.4,
+          "net_pnl_pips": 182.5,
+          "profit_factor": 1.11,
+          "max_dd_pips": 281.1,
+          "avg_trade_pips": 0.64
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "CADJPY": {
+      "symbol": "CADJPY",
+      "pip_size": 0.01,
+      "engines": {
+        "p90": {
+          "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+        },
+        "symmetry_trap": {
+          "trades": 2947,
+          "win_rate": 77.33288089582626,
+          "net_pnl_pips": 16893.971000000143,
+          "profit_factor": 9.763451251597708,
+          "max_dd_pips": 42.314000000000306,
+          "avg_trade_pips": 5.7325995928062925
+        },
+        "dmr": {
+          "trades": 0,
+          "win_rate": 0,
+          "net_pnl_pips": 0,
+          "profit_factor": 0,
+          "max_dd_pips": 0,
+          "avg_trade_pips": 0
+        },
+        "rekey_intraday": {
+          "trades": 303,
+          "win_rate": 42.9,
+          "net_pnl_pips": -889.4,
+          "profit_factor": 0.75,
+          "max_dd_pips": 909.7,
+          "avg_trade_pips": -2.94
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "CADCHF": {
+      "symbol": "CADCHF",
+      "pip_size": 0.0001,
+      "engines": {
+        "p90": {
+          "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+        },
+        "symmetry_trap": {
+          "trades": 2521,
+          "win_rate": 78.89726299087664,
+          "net_pnl_pips": 11030.553000000093,
+          "profit_factor": 10.15152523304944,
+          "max_dd_pips": 23.335000000000946,
+          "avg_trade_pips": 4.375467274890953
+        },
+        "dmr": {
+          "trades": 285,
+          "win_rate": 20.0,
+          "net_pnl_pips": 285.40000000000003,
+          "profit_factor": 1.82,
+          "max_dd_pips": 30.3,
+          "avg_trade_pips": 1.0
+        },
+        "rekey_intraday": {
+          "trades": 297,
+          "win_rate": 53.5,
+          "net_pnl_pips": 243.4,
+          "profit_factor": 1.18,
+          "max_dd_pips": 236.9,
+          "avg_trade_pips": 0.82
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "XAUUSD": {
+      "symbol": "XAUUSD",
+      "pip_size": 0.1,
+      "engines": {
+        "p90": {
+          "trades": 120,
+          "win_rate": 55.8,
+          "net_pnl_pips": 76.29999999999995,
+          "profit_factor": 1.15,
+          "max_dd_pips": 94.6,
+          "avg_trade_pips": 0.64
+        },
+        "symmetry_trap": {
+          "trades": 681,
+          "win_rate": 83.25991189427313,
+          "net_pnl_pips": 8101.93300000006,
+          "profit_factor": 9.599883451615502,
+          "max_dd_pips": 75.40700000000015,
+          "avg_trade_pips": 11.89711160058746
+        },
+        "dmr": {
+          "trades": 0,
+          "win_rate": 0,
+          "net_pnl_pips": 0,
+          "profit_factor": 0,
+          "max_dd_pips": 0,
+          "avg_trade_pips": 0
+        },
+        "rekey_intraday": {
+          "trades": 363,
+          "win_rate": 40.8,
+          "net_pnl_pips": -4766.5,
+          "profit_factor": 0.73,
+          "max_dd_pips": 4857.3,
+          "avg_trade_pips": -13.13
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "XAGUSD": {
+      "symbol": "XAGUSD",
+      "pip_size": 0.01,
+      "engines": {
+        "p90": {
+          "trades": 754,
+          "win_rate": 50.5,
+          "net_pnl_pips": -1833.1999999999998,
+          "profit_factor": 0.49,
+          "max_dd_pips": 1847.8,
+          "avg_trade_pips": -2.43
+        },
+        "symmetry_trap": {
+          "trades": 3205,
+          "win_rate": 78.59594383775351,
+          "net_pnl_pips": 19783.365000000034,
+          "profit_factor": 10.076178762050935,
+          "max_dd_pips": 49.47000000000298,
+          "avg_trade_pips": 6.172656786271461
+        },
+        "dmr": {
+          "trades": 0,
+          "win_rate": 0,
+          "net_pnl_pips": 0,
+          "profit_factor": 0,
+          "max_dd_pips": 0,
+          "avg_trade_pips": 0
+        },
+        "rekey_intraday": {
+          "trades": 411,
+          "win_rate": 44.0,
+          "net_pnl_pips": -2768.4,
+          "profit_factor": 0.55,
+          "max_dd_pips": 2900.5,
+          "avg_trade_pips": -6.74
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "US500": {
+      "symbol": "US500",
+      "pip_size": 1.0,
+      "engines": {
+        "p90": {
+          "trades": 193,
+          "win_rate": 53.4,
+          "net_pnl_pips": -552.6,
+          "profit_factor": 0.4,
+          "max_dd_pips": 560.9,
+          "avg_trade_pips": -2.86
+        },
+        "symmetry_trap": {
+          "trades": 3084,
+          "win_rate": 76.58884565499352,
+          "net_pnl_pips": 15174.01200000025,
+          "profit_factor": 7.961341509179553,
+          "max_dd_pips": 40.248999999999796,
+          "avg_trade_pips": 4.9202373540856845
+        },
+        "dmr": {
+          "trades": 0,
+          "win_rate": 0,
+          "net_pnl_pips": 0,
+          "profit_factor": 0,
+          "max_dd_pips": 0,
+          "avg_trade_pips": 0
+        },
+        "rekey_intraday": {
+          "trades": 362,
+          "win_rate": 40.1,
+          "net_pnl_pips": -1311.0,
+          "profit_factor": 0.56,
+          "max_dd_pips": 1381.8,
+          "avg_trade_pips": -3.62
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "DE30": {
+      "symbol": "DE30",
+      "pip_size": 1.0,
+      "engines": {
+        "p90": {
+          "trades": 1384,
+          "win_rate": 38.1,
+          "net_pnl_pips": -6823.699999999999,
+          "profit_factor": 0.23,
+          "max_dd_pips": 6825.9,
+          "avg_trade_pips": -4.93
+        },
+        "symmetry_trap": {
+          "trades": 3337,
+          "win_rate": 81.81000899011089,
+          "net_pnl_pips": 34426.840999999156,
+          "profit_factor": 9.47649225682739,
+          "max_dd_pips": 112.01399999999921,
+          "avg_trade_pips": 10.316703925681498
+        },
+        "dmr": {
+          "trades": 0,
+          "win_rate": 0,
+          "net_pnl_pips": 0,
+          "profit_factor": 0,
+          "max_dd_pips": 0,
+          "avg_trade_pips": 0
+        },
+        "rekey_intraday": {
+          "trades": 178,
+          "win_rate": 39.9,
+          "net_pnl_pips": -2221.7,
+          "profit_factor": 0.63,
+          "max_dd_pips": 2752.4,
+          "avg_trade_pips": -12.48
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "FR40": {
+      "symbol": "FR40",
+      "pip_size": 1.0,
+      "engines": {
+        "p90": {
+          "trades": 989,
+          "win_rate": 46.6,
+          "net_pnl_pips": -3833.4,
+          "profit_factor": 0.28,
+          "max_dd_pips": 3834.2,
+          "avg_trade_pips": -3.88
+        },
+        "symmetry_trap": {
+          "trades": 4676,
+          "win_rate": 77.18135158254918,
+          "net_pnl_pips": 30295.56799999973,
+          "profit_factor": 8.179607689607733,
+          "max_dd_pips": 38.52099999999882,
+          "avg_trade_pips": 6.478949529512346
+        },
+        "dmr": {
+          "trades": 0,
+          "win_rate": 0,
+          "net_pnl_pips": 0,
+          "profit_factor": 0,
+          "max_dd_pips": 0,
+          "avg_trade_pips": 0
+        },
+        "rekey_intraday": {
+          "trades": 134,
+          "win_rate": 41.0,
+          "net_pnl_pips": -591.6,
+          "profit_factor": 0.65,
+          "max_dd_pips": 758.3,
+          "avg_trade_pips": -4.42
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "HK50": {
+      "symbol": "HK50",
+      "pip_size": 1.0,
+      "engines": {
+        "p90": {
+          "trades": 3,
+          "win_rate": 0.0,
+          "net_pnl_pips": -28.9,
+          "profit_factor": 0.0,
+          "max_dd_pips": 28.9,
+          "avg_trade_pips": -9.62
+        },
+        "symmetry_trap": {
+          "trades": 0,
+          "win_rate": 0.0,
+          "net_pnl_pips": 0.0,
+          "profit_factor": 0.0,
+          "max_dd_pips": 0.0,
+          "avg_trade_pips": 0.0
+        },
+        "dmr": {
+          "trades": 0,
+          "win_rate": 0,
+          "net_pnl_pips": 0,
+          "profit_factor": 0,
+          "max_dd_pips": 0,
+          "avg_trade_pips": 0
+        },
+        "rekey_intraday": {
+          "trades": 101,
+          "win_rate": 37.6,
+          "net_pnl_pips": -1443.3,
+          "profit_factor": 0.62,
+          "max_dd_pips": 1822.6,
+          "avg_trade_pips": -14.29
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "BTCUSD": {
+      "symbol": "BTCUSD",
+      "pip_size": 1.0,
+      "engines": {
+        "p90": {
+          "trades": 0,
+          "win_rate": 0.0,
+          "net_pnl_pips": 0.0,
+          "profit_factor": 0.0,
+          "max_dd_pips": 0.0,
+          "avg_trade_pips": 0.0
+        },
+        "symmetry_trap": {
+          "trades": 14,
+          "win_rate": 85.71428571428571,
+          "net_pnl_pips": 89.80199999999999,
+          "profit_factor": 13.623278043294913,
+          "max_dd_pips": 6.307000000000002,
+          "avg_trade_pips": 6.414428571428571
+        },
+        "dmr": {
+          "trades": 0,
+          "win_rate": 0,
+          "net_pnl_pips": 0,
+          "profit_factor": 0,
+          "max_dd_pips": 0,
+          "avg_trade_pips": 0
+        },
+        "rekey_intraday": {
+          "trades": 469,
+          "win_rate": 26.2,
+          "net_pnl_pips": -73348.0,
+          "profit_factor": 0.38,
+          "max_dd_pips": 73367.0,
+          "avg_trade_pips": -156.39
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    },
+    "ETHUSD": {
+      "symbol": "ETHUSD",
+      "pip_size": 1.0,
+      "engines": {
+        "p90": {
+          "trades": 142,
+          "win_rate": 0.0,
+          "net_pnl_pips": -4157.8,
+          "profit_factor": 0.0,
+          "max_dd_pips": 4157.8,
+          "avg_trade_pips": -29.28
+        },
+        "symmetry_trap": {
+          "trades": 2574,
+          "win_rate": 81.002331002331,
+          "net_pnl_pips": 13819.88200000017,
+          "profit_factor": 8.81127195384648,
+          "max_dd_pips": 44.014000000000124,
+          "avg_trade_pips": 5.369029526029593
+        },
+        "dmr": {
+          "trades": 0,
+          "win_rate": 0,
+          "net_pnl_pips": 0,
+          "profit_factor": 0,
+          "max_dd_pips": 0,
+          "avg_trade_pips": 0
+        },
+        "rekey_intraday": {
+          "trades": 463,
+          "win_rate": 10.6,
+          "net_pnl_pips": -13228.5,
+          "profit_factor": 0.08,
+          "max_dd_pips": 13238.7,
+          "avg_trade_pips": -28.57
+        },
+        "rekey_dead_simple": {
+          "note": "Run separately for stats"
+        }
+      }
+    }
+  }
+}

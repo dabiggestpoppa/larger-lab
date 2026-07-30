@@ -79,6 +79,13 @@ def format_result(sig):
     exit_price = sig.get("exit_price", 0)
     ts = sig.get("timestamp", datetime.now(EST).strftime("%H:%M:%S"))
     
+    # Normalize result type
+    result = sig.get("result", "?")
+    if result == "TP_HIT":
+        result = "TP"
+    elif result == "SL_HIT":
+        result = "SL"
+    
     if result == "TP":
         emoji = "✅ TP HIT"
         color = "🟢"
@@ -109,21 +116,25 @@ def format_eod_report(day_stats):
     """Format end-of-day summary."""
     date = day_stats.get("date", datetime.now(EST).strftime("%Y-%m-%d"))
     total = day_stats.get("total_trades", 0)
+    executed = day_stats.get("orders_placed", 0)
     wins = day_stats.get("wins", 0)
     losses = day_stats.get("losses", 0)
+    skipped_stale = day_stats.get("skipped_stale", 0)
     pnl = day_stats.get("total_pnl", 0)
-    wr = (wins / total * 100) if total > 0 else 0
+    wr = (wins / executed * 100) if executed > 0 else 0
     
     return (
         "```\n"
         "📊 DMR EOD REPORT — %s\n"
         "━━━━━━━━━━━━━━━━━━━━━\n"
-        "Trades:     %d\n"
+        "Signals:    %d\n"
+        "Executed:   %d\n"
         "Wins:       %d (%.0f%%)\n"
         "Losses:     %d\n"
+        "Skipped:    %d (stale)\n"
         "Net PnL:    %+.1f pips\n"
         "```"
-    ) % (date, total, wins, wr, losses, pnl)
+    ) % (date, total, executed, wins, wr, losses, skipped_stale, pnl)
 
 
 def scan_dmr_signals():
@@ -160,7 +171,7 @@ def check_mt5_results():
             return []
         
         results = []
-        magic_ids = [20260601, 20260602, 20260603, 20260604, 20260605]
+        magic_ids = [20260601, 20260602, 20260603, 20260604, 20260605, 20260606, 20260607, 20260608, 20260609, 20260610]
         
         positions = mt5.positions_get()
         if positions:
@@ -250,7 +261,7 @@ def main():
                         "lot": 0.01,
                         "ticket": None,  # Will be filled when order is placed
                     }
-                elif sig_type in ("TP", "SL", "HARD_EXIT"):
+                elif sig_type in ("TP_HIT", "SL_HIT", "HARD_EXIT"):
                     msg = format_result(sig)
                 else:
                     continue
@@ -272,13 +283,21 @@ def main():
             now = datetime.now(EST)
             if now.hour == 17 and now.minute == 0 and last_eod_date != now.date():
                 last_eod_date = now.date()
-                day_stats = {
-                    "date": now.strftime("%Y-%m-%d"),
-                    "total_trades": 0,  # Would need to track from signals
-                    "wins": 0,
-                    "losses": 0,
-                    "total_pnl": 0,
-                }
+                # Load stats from daily_stats.json
+                stats_file = REPO_ROOT / "quant-lab" / "mt5" / "live_logs" / "dmr_daily_stats.json"
+                day_stats = {"date": now.strftime("%Y-%m-%d"), "total_trades": 0, "wins": 0, "losses": 0, "total_pnl": 0}
+                if stats_file.exists():
+                    try:
+                        with open(stats_file, "r", encoding="utf-8") as f:
+                            saved = json.load(f)
+                            day_stats["total_trades"] = saved.get("signals_detected", 0)
+                            day_stats["wins"] = saved.get("tp_hits", 0)
+                            day_stats["losses"] = saved.get("sl_hits", 0)
+                            day_stats["total_pnl"] = saved.get("tp_hits", 0) - saved.get("sl_hits", 0)
+                            day_stats["skipped_stale"] = saved.get("skipped_stale", 0)
+                            day_stats["orders_placed"] = saved.get("orders_placed", 0)
+                    except:
+                        pass
                 send_discord(format_eod_report(day_stats))
             
             time.sleep(10)

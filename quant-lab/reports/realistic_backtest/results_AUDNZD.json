@@ -1,0 +1,36 @@
+{
+  "symbol": "AUDNZD",
+  "pip_size": 0.0001,
+  "engines": {
+    "p90": {
+      "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+    },
+    "symmetry_trap": {
+      "trades": 2816,
+      "win_rate": 79.93607954545455,
+      "net_pnl_pips": 18677.888000000043,
+      "profit_factor": 14.299029160777655,
+      "max_dd_pips": 29.362999999999943,
+      "avg_trade_pips": 6.632772727272743
+    },
+    "dmr": {
+      "trades": 227,
+      "win_rate": 34.4,
+      "net_pnl_pips": 640.6999999999999,
+      "profit_factor": 3.5,
+      "max_dd_pips": 16.4,
+      "avg_trade_pips": 2.82
+    },
+    "rekey_intraday": {
+      "trades": 220,
+      "win_rate": 57.7,
+      "net_pnl_pips": 525.4,
+      "profit_factor": 1.68,
+      "max_dd_pips": 78.2,
+      "avg_trade_pips": 2.39
+    },
+    "rekey_dead_simple": {
+      "note": "Run separately for stats"
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "symbol": "NZDCHF",
+  "pip_size": 0.0001,
+  "engines": {
+    "p90": {
+      "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+    },
+    "symmetry_trap": {
+      "trades": 2356,
+      "win_rate": 80.1358234295416,
+      "net_pnl_pips": 12715.408000000074,
+      "profit_factor": 12.632684278128927,
+      "max_dd_pips": 32.93499999999949,
+      "avg_trade_pips": 5.397032258064548
+    },
+    "dmr": {
+      "trades": 216,
+      "win_rate": 30.1,
+      "net_pnl_pips": 513.7,
+      "profit_factor": 3.01,
+      "max_dd_pips": 22.5,
+      "avg_trade_pips": 2.38
+    },
+    "rekey_intraday": {
+      "trades": 250,
+      "win_rate": 52.4,
+      "net_pnl_pips": 128.6,
+      "profit_factor": 1.13,
+      "max_dd_pips": 261.9,
+      "avg_trade_pips": 0.51
+    },
+    "rekey_dead_simple": {
+      "note": "Run separately for stats"
+    }
+  }
+}

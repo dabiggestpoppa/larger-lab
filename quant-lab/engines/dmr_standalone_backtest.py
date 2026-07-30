@@ -13,6 +13,7 @@ from pathlib import Path
 ENGINES_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, ENGINES_DIR)
 from p90_engine import Bar, classify_tier, DEFAULT_TIER_CONFIG, get_p90_threshold
+from trading_costs import apply_costs_to_pnl
 
 PIP_SIZE = 0.0001
 EST_OFFSET = -5
@@ -85,7 +86,7 @@ def group_sessions(bars):
         sessions[sd]["trading"].sort(key=lambda b: b.timestamp)
     return dict(sorted(sessions.items()))
 
-def run_backtest(bars):
+def run_backtest(bars, symbol: str = "EURUSD"):
     sessions = group_sessions(bars)
     trades = []
     total_bars = 0
@@ -219,15 +220,18 @@ def run_backtest(bars):
 
         # Calculate PnL
         if direction_str == "SHORT":
-            pnl_pips = (dmr_entry - exit_price) / PIP_SIZE
+            gross_pnl_pips = (dmr_entry - exit_price) / PIP_SIZE
         else:
-            pnl_pips = (exit_price - dmr_entry) / PIP_SIZE
+            gross_pnl_pips = (exit_price - dmr_entry) / PIP_SIZE
+        
+        # Apply trading costs (spread + commission)
+        net_pnl_pips = apply_costs_to_pnl(gross_pnl_pips, symbol, direction_str)
 
         trades.append({
             "date": str(sd),
             "direction": direction_str,
             "result": trade_result,
-            "pnl_pips": round(pnl_pips, 1),
+            "pnl_pips": round(net_pnl_pips, 1),
             "p90_hour": p90_hour,
             "tier": tier_name,
             "ar_pips": round(ar_pips, 1),
@@ -320,10 +324,11 @@ def compute_stats(trades):
 
 if __name__ == "__main__":
     csv_path = sys.argv[1] if len(sys.argv) > 1 else r"quant-lab\data\EURUSDPRO_M5_2023_2026.csv"
+    symbol = sys.argv[2] if len(sys.argv) > 2 else "EURUSD"
     print(f"[DMR BT] Loading: {csv_path}")
     bars = load_csv(csv_path)
     print(f"[DMR BT] Loaded {len(bars):,} bars")
-    trades, n_sessions, n_bars = run_backtest(bars)
+    trades, n_sessions, n_bars = run_backtest(bars, symbol)
     print(f"[DMR BT] Sessions: {n_sessions} | Bars processed: {n_bars:,}")
     print(f"[DMR BT] DMR trades: {len(trades)}")
 
