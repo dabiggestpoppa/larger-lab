@@ -1,0 +1,41 @@
+{
+  "symbol": "AUDUSD",
+  "pip_size": 0.0001,
+  "engines": {
+    "p90": {
+      "trades": 577,
+      "win_rate": 48.4,
+      "net_pnl_pips": 605.1999999999998,
+      "profit_factor": 1.35,
+      "max_dd_pips": 110.3,
+      "avg_trade_pips": 1.05
+    },
+    "symmetry_trap": {
+      "trades": 3271,
+      "win_rate": 76.73494344237236,
+      "net_pnl_pips": 16085.903000000195,
+      "profit_factor": 9.53487162862316,
+      "max_dd_pips": 35.40699999999924,
+      "avg_trade_pips": 4.917732497707183
+    },
+    "dmr": {
+      "trades": 306,
+      "win_rate": 18.3,
+      "net_pnl_pips": 240.09999999999997,
+      "profit_factor": 1.66,
+      "max_dd_pips": 38.4,
+      "avg_trade_pips": 0.78
+    },
+    "rekey_intraday": {
+      "trades": 368,
+      "win_rate": 47.3,
+      "net_pnl_pips": -251.1,
+      "profit_factor": 0.91,
+      "max_dd_pips": 318.8,
+      "avg_trade_pips": -0.68
+    },
+    "rekey_dead_simple": {
+      "note": "Run separately for stats"
+    }
+  }
+}

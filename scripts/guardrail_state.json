@@ -1,5 +1,7 @@
 {
-  "known_tasks": {},
+  "known_tasks": {
+    "\\ZoomUpdateTaskUser-S-1-5-21-4204742516-198655256-1099670796-1001": true
+  },
   "known_startup": [],
-  "last_check": "2026-06-11T07:53:35.752403"
+  "last_check": "2026-07-26T16:04:11.852724"
 }

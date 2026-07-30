@@ -1,0 +1,36 @@
+{
+  "symbol": "EURJPY",
+  "pip_size": 0.01,
+  "engines": {
+    "p90": {
+      "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+    },
+    "symmetry_trap": {
+      "trades": 2071,
+      "win_rate": 77.54707870593917,
+      "net_pnl_pips": 14414.60300000015,
+      "profit_factor": 9.82677129674145,
+      "max_dd_pips": 33.31399999999985,
+      "avg_trade_pips": 6.960213906325519
+    },
+    "dmr": {
+      "trades": 0,
+      "win_rate": 0,
+      "net_pnl_pips": 0,
+      "profit_factor": 0,
+      "max_dd_pips": 0,
+      "avg_trade_pips": 0
+    },
+    "rekey_intraday": {
+      "trades": 239,
+      "win_rate": 49.4,
+      "net_pnl_pips": -264.0,
+      "profit_factor": 0.92,
+      "max_dd_pips": 599.4,
+      "avg_trade_pips": -1.1
+    },
+    "rekey_dead_simple": {
+      "note": "Run separately for stats"
+    }
+  }
+}

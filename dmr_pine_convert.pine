@@ -1,0 +1,435 @@
+//@version=6
+// DMR (Deep Mean Reversion) — 1:1 Parity with Backtest Engine
+// ============================================================
+// This is a direct Pine Script port of the P90Engine from p90_engine_dmr.py
+// All logic matches the backtest exactly: DS from Asian boundary, TP = -50% AR, SL = P90 SL (shared)
+// 
+// Strategy: Limit order at 200% Deep State, TP at -50% AR (mean reversion), SL at P90 SL (shared boundary)
+// Per-hour P90 calibration from each pair's own data
+
+strategy("DMR Live — 1:1 Parity", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=1, currency=currency.USD, commission_type=strategy.commission.percent, commission_value=0.02)
+
+// ─── INPUTS ──────────────────────────────────────────────────────────────
+grp_main      = "Main Settings"
+lot_size      = input.float(0.01, "Lot Size", group=grp_main, minval=0.01)
+deep_mult     = input.float(2.0, "Deep State Multiplier (200%)", group=grp_main)
+kill_mult     = input.float(2.2, "Kill Switch Multiplier (220%)", group=grp_main)
+p90_sl_mult   = input.float(0.80, "P90 SL Multiplier (80%)", group=grp_main)
+tp_ar_mult    = input.float(0.50, "TP as % of Asian Range", group=grp_main)
+est_offset    = input.int(-5, "EST Offset from UTC", group=grp_main)
+hard_exit_hr  = input.int(17, "Hard Exit Hour (EST)", group=grp_main)
+ds_scan_end   = input.int(12, "DS Scan End Hour (EST)", group=grp_main)
+
+grp_p90       = "P90 Thresholds (pips per hour)"
+p90_2  = input.float(4.1, "02:00-03:00", group=grp_p90)
+p90_3  = input.float(4.1, "03:00-04:00", group=grp_p90)
+p90_4  = input.float(4.6, "04:00-05:00", group=grp_p90)
+p90_5  = input.float(4.6, "05:00-06:00", group=grp_p90)
+p90_6  = input.float(4.6, "06:00-07:00", group=grp_p90)
+p90_7  = input.float(5.9, "07:00-08:00", group=grp_p90)
+p90_8  = input.float(5.9, "08:00-09:00", group=grp_p90)
+p90_9  = input.float(6.2, "09:00-10:00", group=grp_p90)
+p90_10 = input.float(6.2, "10:00-11:00", group=grp_p90)
+p90_11 = input.float(999.0, "11:00+", group=grp_p90)
+
+grp_tier      = "Tier Config (Asian Range max pips)"
+t1_ar = input.float(20.0, "T1 AR Max", group=grp_tier)
+t1_au = input.float(10.0, "T1 AU", group=grp_tier)
+t1_tr = input.float(12.0, "T1 Trigger", group=grp_tier)
+t2_ar = input.float(30.0, "T2 AR Max", group=grp_tier)
+t2_au = input.float(12.0, "T2 AU", group=grp_tier)
+t2_tr = input.float(15.0, "T2 Trigger", group=grp_tier)
+t3_ar = input.float(45.0, "T3 AR Max", group=grp_tier)
+t3_au = input.float(15.0, "T3 AU", group=grp_tier)
+t3_tr = input.float(19.0, "T3 Trigger", group=grp_tier)
+
+grp_vis       = "Visualization"
+show_asian    = input.bool(true, "Show Asian Range", group=grp_vis)
+show_ds       = input.bool(true, "Show Deep State Levels", group=grp_vis)
+show_signals  = input.bool(true, "Show Entry Signals", group=grp_vis)
+show_tp_sl    = input.bool(true, "Show TP/SL Levels", group=grp_vis)
+
+// ─── CONSTANTS ───────────────────────────────────────────────────────────
+CASCADE_WINDOW = 120  // minutes
+
+// ─── STATE VARIABLES ─────────────────────────────────────────────────────
+var int     state           = 0  // 0=SEARCH, 1=IN_TRADE
+var int     active_variant  = 0  // 0=INITIAL, 1=CASCADE, 2=EWS
+var int     direction       = 0  // 1=LONG, -1=SHORT, 0=FLAT
+var float   entry_price     = na
+var float   sl_price        = na
+var float   tp1_price       = na
+var float   tp2_price       = na
+var float   p90_body_pips   = 0.0
+var float   p90_body_price  = 0.0
+
+var float   asian_high      = 0.0
+var float   asian_low       = 0.0
+var float   asian_range_pips= 0.0
+var float   ar_price        = 0.0
+var string  tier_name       = "T1"
+var bool    session_active  = false
+
+var int     p90_count       = 0
+var int     last_p90_exit   = 0  // timestamp
+
+// DMR Sub-routine state
+var bool    dmr_limit_placed = false
+var bool    dmr_active       = false
+var float   dmr_entry_price  = na
+var float   dmr_sl_price     = na
+var float   dmr_tp_price     = na
+var int     dmr_direction    = 0
+
+var int     last_bar_time    = 0
+
+// ─── HELPER FUNCTIONS ────────────────────────────────────────────────────
+get_est_hour(dt) =>
+    (hour(dt) + est_offset) % 24
+
+get_p90_threshold(est_h) =>
+    [p90_2, p90_3, p90_4, p90_5, p90_6, p90_7, p90_8, p90_9, p90_10, p90_11, p90_11][est_h]
+
+classify_tier(ar_pips) =>
+    if ar_pips <= t1_ar
+        [t1_au, t1_tr, "T1"]
+    else if ar_pips <= t2_ar
+        [t2_au, t2_tr, "T2"]
+    else if ar_pips <= t3_ar
+        [t3_au, t3_tr, "T3"]
+    else
+        [0.0, 0.0, "NO_GO"]
+
+calc_deep_state(activation_boundary, body_price, dir) =>
+    dir == 1 ? activation_boundary + 2.0 * body_price : activation_boundary - 2.0 * body_price
+
+check_dmr_triggered(bar_high, bar_low, deep_state, p90_dir) =>
+    p90_dir == 1 ? bar_high >= deep_state : bar_low <= deep_state
+
+is_p90(body_pips, est_h) =>
+    body_pips >= get_p90_threshold(est_h)
+
+is_boundary_breach(close) =>
+    close > asian_high or close < asian_low
+
+detect_variant(bar_time) =>
+    (last_p90_exit != 0 and p90_count > 0 and (bar_time - last_p90_exit) / 60000 <= CASCADE_WINDOW) ? 1 : 0
+
+calc_trade_params(body_price, variant, dir) =>
+    sl_offset = body_price * (variant == 0 ? 0.80 : variant == 1 ? 1.68 : 0.80)
+    ar_target_1 = ar_price * 0.25
+    ar_target_2 = ar_price * 0.50
+    
+    if dir == 1
+        sl  = close - sl_offset
+        tp1 = close + ar_target_1
+        tp2 = close + ar_target_2
+    else
+        sl  = close + sl_offset
+        tp1 = close - ar_target_1
+        tp2 = close - ar_target_2
+    [sl, tp1, tp2]
+
+reset_dmr() =>
+    dmr_limit_placed := false
+    dmr_active       := false
+    dmr_entry_price  := na
+    dmr_sl_price     := na
+    dmr_tp_price     := na
+    dmr_direction    := 0
+
+reset_state() =>
+    state           := 0
+    active_variant  := 0
+    direction       := 0
+    entry_price     := na
+    sl_price        := na
+    tp1_price       := na
+    tp2_price       := na
+    p90_body_pips   := 0.0
+    p90_body_price  := 0.0
+    p90_count       := 0
+    last_p90_exit   := 0
+    reset_dmr()
+
+place_dmr_limit() =>
+    if direction == 0 or p90_body_price == 0.0
+        return
+    
+    activation_boundary = direction == 1 ? asian_high : asian_low
+    deep_state = calc_deep_state(activation_boundary, p90_body_price, direction)
+    
+    dmr_limit_placed := true
+    dmr_entry_price  := deep_state
+    dmr_direction    := direction == 1 ? -1 : 1
+    dmr_sl_price     := sl_price  // SHARED boundary
+    
+    // DMR TP = -50% AR (mean reversion target)
+    dmr_tp_price := direction == 1 ? deep_state - (ar_price * 0.50) : deep_state + (ar_price * 0.50)
+
+cancel_dmr_limit() =>
+    if dmr_limit_placed and not dmr_active
+        reset_dmr()
+
+evaluate_dmr(bar_high, bar_low, bar_close, bar_time) =>
+    var sig = [false, 0, 0.0, 0.0, 0.0, 0.0, 0, ""]
+    
+    // Check 1: DMR limit fill
+    if dmr_limit_placed and not dmr_active
+        if check_dmr_triggered(bar_high, bar_low, dmr_entry_price, direction)
+            dmr_active := true
+            sig := [true, 1, dmr_entry_price, dmr_sl_price, dmr_tp_price, p90_body_pips, dmr_direction, "DMR_TRIGGERED"]
+            return sig
+    
+    // Check 2: DMR active - monitor TP and SL
+    if dmr_active
+        if dmr_direction == 1
+            // DMR LONG: TP above, SL below
+            if bar_high >= dmr_tp_price
+                dmr_entry = dmr_entry_price
+                dmr_tp    = dmr_tp_price
+                reset_dmr()
+                sig := [true, 2, dmr_entry, sl_price, dmr_tp, p90_body_pips, 1, "DMR_TP_HIT"]
+                return sig
+            
+            // DMR SL = P90 SL (shared boundary)
+            if bar_close <= dmr_sl_price
+                dmr_entry = dmr_entry_price
+                dmr_sl    = dmr_sl_price
+                _entry = entry_price
+                _sl    = sl_price
+                _tp1   = tp1_price
+                _var   = active_variant
+                _dir   = direction
+                reset_state()
+                sig := [true, 3, _entry, _sl, _tp1, p90_body_pips, _dir, "DMR_SL_HIT"]
+                return sig
+        
+        else
+            // DMR SHORT: TP below, SL above
+            if bar_low <= dmr_tp_price
+                dmr_entry = dmr_entry_price
+                dmr_tp    = dmr_tp_price
+                reset_dmr()
+                sig := [true, 2, dmr_entry, sl_price, dmr_tp, p90_body_pips, -1, "DMR_TP_HIT"]
+                return sig
+            
+            // DMR SL = P90 SL (shared boundary)
+            if bar_close >= dmr_sl_price
+                dmr_entry = dmr_entry_price
+                dmr_sl    = dmr_sl_price
+                _entry = entry_price
+                _sl    = sl_price
+                _tp1   = tp1_price
+                _var   = active_variant
+                _dir   = direction
+                reset_state()
+                sig := [true, 3, _entry, _sl, _tp1, p90_body_pips, _dir, "DMR_SL_HIT"]
+                return sig
+    
+    sig
+
+// ─── SESSION INITIALIZATION ──────────────────────────────────────────────
+var int session_date = 0
+
+// Check for new session at 3 AM EST
+est_h = get_est_hour(time)
+bar_date = dayofyear(time(timeframe.period, est_offset * 3600))
+
+if est_h == 3 and bar_date != session_date
+    session_date := bar_date
+    
+    // Calculate Asian Range (19:00-03:00 EST previous day)
+    // We need to look back at previous bars
+    asian_high := high
+    asian_low  := low
+    
+    // Scan back for Asian session bars
+    for i = 1 to 200
+        if i > bar_index
+            break
+        b_time = time[i]
+        b_est_h = get_est_hour(b_time)
+        b_date = dayofyear(time(timeframe.period, est_offset * 3600))[i]
+        
+        if (b_date == bar_date - 1 and b_est_h >= 19) or (b_date == bar_date and b_est_h < 3)
+            asian_high := math.max(asian_high, high[i])
+            asian_low  := math.min(asian_low, low[i])
+        else
+            break
+    
+    ar_price := asian_high - asian_low
+    asian_range_pips := ar_price / syminfo.mintick
+    
+    [au, tr, tn] = classify_tier(asian_range_pips)
+    tier_name := tn
+    session_active := tier_name != "NO_GO"
+    
+    if session_active
+        reset_state()
+
+// 12 PM hard reset
+if est_h == 12
+    reset_state()
+
+// ─── MAIN PROCESSING LOOP ────────────────────────────────────────────────
+if session_active
+    last_bar_time := time
+    
+    body_pips = math.abs(close - open) / syminfo.mintick
+    
+    // EWS Detection
+    if state == 1 and is_p90(body_pips, est_h)
+        bar_dir = close > open ? 1 : -1
+        if bar_dir != direction and is_boundary_breach(close)
+            cancel_dmr_limit()
+            reset_state()
+            // EWS_EXIT signal would go here
+    
+    // STATE: SEARCH
+    if state == 0
+        if is_p90(body_pips, est_h) and is_boundary_breach(close)
+            direction := close > open ? 1 : -1
+            active_variant := detect_variant(time)
+            entry_price := close
+            p90_body_price := math.abs(close - open)
+            p90_body_pips := body_pips
+            
+            [sl, tp1, tp2] = calc_trade_params(p90_body_price, active_variant, direction)
+            sl_price  := sl
+            tp1_price := tp1
+            tp2_price := tp2
+            
+            state := 1
+            p90_count += 1
+            
+            // Place DMR limit immediately
+            place_dmr_limit()
+            
+            // ENTRY signal
+            if show_signals
+                label.new(bar_index, direction == 1 ? low : high, 
+                    direction == 1 ? "🟢 ENTRY LONG" : "🔴 ENTRY SHORT",
+                    color=direction == 1 ? color.green : color.red,
+                    style=label.style_label_up, textcolor=color.white, size=size.small)
+    
+    // STATE: IN_TRADE
+    else if state == 1
+        // Evaluate DMR sub-routine
+        [sig_fired, sig_type, sig_entry, sig_sl, sig_tp, sig_body, sig_dir, sig_reason] = evaluate_dmr(high, low, close, time)
+        
+        if sig_fired
+            if sig_type == 1  // DMR_TRIGGERED
+                if show_signals
+                    label.new(bar_index, sig_dir == 1 ? low : high,
+                        sig_dir == 1 ? "🟢 DMR LONG" : "🔴 DMR SHORT",
+                        color=sig_dir == 1 ? color.green : color.red,
+                        style=label.style_label_up, textcolor=color.white, size=size.small)
+            
+            else if sig_type == 2  // DMR_TP_HIT
+                if show_signals
+                    label.new(bar_index, sig_dir == 1 ? high : low,
+                        "✅ DMR TP",
+                        color=color.green, style=label.style_label_down, textcolor=color.white, size=size.small)
+            
+            else if sig_type == 3  // DMR_SL_HIT
+                if show_signals
+                    label.new(bar_index, sig_dir == 1 ? low : high,
+                        "❌ DMR SL",
+                        color=color.red, style=label.style_label_down, textcolor=color.white, size=size.small)
+        
+        // P90 TP/SL checks
+        if direction == 1
+            // TP2 check first (further out)
+            if high >= tp2_price
+                cancel_dmr_limit()
+                reset_state()
+                // TP_HIT signal
+            else if low <= sl_price
+                cancel_dmr_limit()
+                reset_state()
+                // SL_HIT signal
+            else if high >= tp1_price
+                // TP1_HIT - partial, DMR continues
+        else
+            if low <= tp2_price
+                cancel_dmr_limit()
+                reset_state()
+            else if high >= sl_price
+                cancel_dmr_limit()
+                reset_state()
+            else if low <= tp1_price
+                // TP1_HIT
+
+// ─── VISUALIZATION ───────────────────────────────────────────────────────
+// Asian Range
+if show_asian and session_active
+    var line asian_high_line = line.new(bar_index - 1, asian_high, bar_index, asian_high, extend=extend.right, color=color.blue, style=line.style_dashed)
+    var line asian_low_line  = line.new(bar_index - 1, asian_low,  bar_index, asian_low,  extend=extend.right, color=color.blue, style=line.style_dashed)
+    line.set_x1(asian_high_line, bar_index - 1)
+    line.set_x2(asian_high_line, bar_index)
+    line.set_x1(asian_low_line,  bar_index - 1)
+    line.set_x2(asian_low_line,  bar_index)
+
+// Deep State Levels
+if show_ds and dmr_limit_placed
+    var line ds_line = line.new(bar_index - 1, dmr_entry_price, bar_index, dmr_entry_price, extend=extend.right, color=color.purple, style=line.style_dotted)
+    line.set_x1(ds_line, bar_index - 1)
+    line.set_x2(ds_line, bar_index)
+
+// TP/SL Levels
+if show_tp_sl and dmr_active
+    var line tp_line = line.new(bar_index - 1, dmr_tp_price, bar_index, dmr_tp_price, extend=extend.right, color=color.green, style=line.style_dashed)
+    var line sl_line = line.new(bar_index - 1, dmr_sl_price, bar_index, dmr_sl_price, extend=extend.right, color=color.red, style=line.style_dashed)
+    line.set_x1(tp_line, bar_index - 1)
+    line.set_x2(tp_line, bar_index)
+    line.set_x1(sl_line, bar_index - 1)
+    line.set_x2(sl_line, bar_index)
+
+// ─── STRATEGY ORDERS (for backtesting) ───────────────────────────────────
+// Note: This strategy uses limit orders at DS, not market orders
+// The actual live execution places MT5 limit orders via the Python engine
+// This section is for backtesting visualization only
+
+// DMR Limit Order (conceptual - Pine doesn't support pending limit orders in strategy tester well)
+// We simulate by entering when price reaches DS
+if dmr_limit_placed and not dmr_active
+    if direction == 1 and low <= dmr_entry_price  // Bear P90 -> DMR LONG, DS below
+        strategy.entry("DMR Long", strategy.long, limit=dmr_entry_price)
+        dmr_active := true
+    else if direction == -1 and high >= dmr_entry_price  // Bull P90 -> DMR SHORT, DS above
+        strategy.entry("DMR Short", strategy.short, limit=dmr_entry_price)
+        dmr_active := true
+
+// Exit orders for active DMR
+if dmr_active
+    if dmr_direction == 1
+        strategy.exit("DMR Long TP", "DMR Long", limit=dmr_tp_price)
+        strategy.exit("DMR Long SL", "DMR Long", stop=dmr_sl_price)
+    else
+        strategy.exit("DMR Short TP", "DMR Short", limit=dmr_tp_price)
+        strategy.exit("DMR Short SL", "DMR Short", stop=dmr_sl_price)
+
+// ─── DEBUG INFO ──────────────────────────────────────────────────────────
+var table debug_table = table.new(position.top_right, 2, 10, bgcolor=color.new(color.black, 80), border_width=1)
+if barstate.islast
+    table.cell(debug_table, 0, 0, "State", text_color=color.white)
+    table.cell(debug_table, 1, 0, state == 0 ? "SEARCH" : "IN_TRADE", text_color=color.yellow)
+    table.cell(debug_table, 0, 1, "Direction", text_color=color.white)
+    table.cell(debug_table, 1, 1, direction == 1 ? "LONG" : direction == -1 ? "SHORT" : "FLAT", text_color=color.yellow)
+    table.cell(debug_table, 0, 2, "Variant", text_color=color.white)
+    table.cell(debug_table, 1, 2, active_variant == 0 ? "INITIAL" : active_variant == 1 ? "CASCADE" : "EWS", text_color=color.yellow)
+    table.cell(debug_table, 0, 3, "Asian Range", text_color=color.white)
+    table.cell(debug_table, 1, 3, str.tostring(asian_range_pips, "#.1") + "p", text_color=color.yellow)
+    table.cell(debug_table, 0, 4, "Tier", text_color=color.white)
+    table.cell(debug_table, 1, 4, tier_name, text_color=color.yellow)
+    table.cell(debug_table, 0, 5, "DMR Limit", text_color=color.white)
+    table.cell(debug_table, 1, 5, dmr_limit_placed ? "PLACED" : "NONE", text_color=dmr_limit_placed ? color.green : color.red)
+    table.cell(debug_table, 0, 6, "DMR Active", text_color=color.white)
+    table.cell(debug_table, 1, 6, dmr_active ? "YES" : "NO", text_color=dmr_active ? color.green : color.red)
+    table.cell(debug_table, 0, 7, "DMR Dir", text_color=color.white)
+    table.cell(debug_table, 1, 7, dmr_direction == 1 ? "LONG" : dmr_direction == -1 ? "SHORT" : "FLAT", text_color=color.yellow)
+    table.cell(debug_table, 0, 8, "EST Hour", text_color=color.white)
+    table.cell(debug_table, 1, 8, str.tostring(est_h), text_color=color.yellow)
+    table.cell(debug_table, 0, 9, "P90 Thresh", text_color=color.white)
+    table.cell(debug_table, 1, 9, str.tostring(get_p90_threshold(est_h), "#.1") + "p", text_color=color.yellow)

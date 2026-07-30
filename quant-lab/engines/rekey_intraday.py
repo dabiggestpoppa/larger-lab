@@ -36,6 +36,9 @@ from enum import Enum
 from pathlib import Path
 from typing import Dict, List, Optional
 
+# Import trading costs for realistic backtesting
+from trading_costs import apply_costs_to_pnl
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # CONSTANTS (EST)
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -415,9 +418,12 @@ def run_backtest(csv_path: str, symbol: str, pip_size: float = None) -> Dict:
         # PnL
         if trade.exit_price is not None:
             if trade.direction == Direction.LONG:
-                trade.pnl_pips = (trade.exit_price - trade.entry_price) / pip_size
+                gross_pnl_pips = (trade.exit_price - trade.entry_price) / pip_size
             else:
-                trade.pnl_pips = (trade.entry_price - trade.exit_price) / pip_size
+                gross_pnl_pips = (trade.entry_price - trade.exit_price) / pip_size
+            
+            # Apply trading costs (spread + commission)
+            trade.pnl_pips = apply_costs_to_pnl(gross_pnl_pips, symbol, trade.direction.name)
         else:
             continue  # Skip if no exit price
 

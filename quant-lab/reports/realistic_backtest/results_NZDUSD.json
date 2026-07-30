@@ -1,0 +1,41 @@
+{
+  "symbol": "NZDUSD",
+  "pip_size": 0.0001,
+  "engines": {
+    "p90": {
+      "trades": 398,
+      "win_rate": 50.0,
+      "net_pnl_pips": 362.0,
+      "profit_factor": 1.31,
+      "max_dd_pips": 82.8,
+      "avg_trade_pips": 0.91
+    },
+    "symmetry_trap": {
+      "trades": 2819,
+      "win_rate": 80.20574671869457,
+      "net_pnl_pips": 15315.467000000148,
+      "profit_factor": 12.203657482117931,
+      "max_dd_pips": 21.407000000000153,
+      "avg_trade_pips": 5.4329432422845505
+    },
+    "dmr": {
+      "trades": 245,
+      "win_rate": 21.6,
+      "net_pnl_pips": 296.7,
+      "profit_factor": 2.03,
+      "max_dd_pips": 34.8,
+      "avg_trade_pips": 1.21
+    },
+    "rekey_intraday": {
+      "trades": 302,
+      "win_rate": 49.0,
+      "net_pnl_pips": -123.5,
+      "profit_factor": 0.93,
+      "max_dd_pips": 277.4,
+      "avg_trade_pips": -0.41
+    },
+    "rekey_dead_simple": {
+      "note": "Run separately for stats"
+    }
+  }
+}

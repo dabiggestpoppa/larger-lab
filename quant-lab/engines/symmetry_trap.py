@@ -52,6 +52,9 @@ ACTIVATION_END = time(16, 0)        # 4:00 PM EST — hard termination (optimize
 # Hard structural law (manual_ontology.md Computable Mechanics Q11)
 KILL_SWITCH_PCT = 0.80              # 80% of impulse leg — CLOSE ONLY
 
+# TP Mode: "AU" = 1 AU from entry (default), "TIER" = use tier's AU value
+TP_MODE = "AU"
+
 # Default tier config — EUR/USD reference (Quick Reference Card Page 2)
 # OPTIMIZED June 4: AR gate decoupled from tier (ar_max=60 for all)
 # Tier is classified by impulse size, NOT by AR
@@ -60,6 +63,18 @@ DEFAULT_TIER_CONFIG: Dict[str, Dict[str, float]] = {
     "T2": {"ar_max": 60.0, "au": 12.0, "trigger": 15.0},
     "T3": {"ar_max": 60.0, "au": 15.0, "trigger": 19.0},
 }
+
+# TP Mode Configuration
+# "AU" = 1 AU from entry (original)
+# "TIER" = Use tier's AU value as TP distance (e.g., T1=10p, T2=12p, T3=15p)
+# "TIER_X2" = 2x tier's AU value
+# "TIER_X1_5" = 1.5x tier's AU value
+# "FIXED_20" = Fixed 20 pips
+# "FIXED_30" = Fixed 30 pips
+# "FIXED_40" = Fixed 40 pips
+# "AU_X1_5" = 1.5x AU from entry
+# "AU_X2" = 2x AU from entry
+TP_MODE = "AU"  # Options: "AU", "TIER", "TIER_X2", "TIER_X1_5", "FIXED_20", "FIXED_30", "FIXED_40", "AU_X1_5", "AU_X2"
 
 
 # ─── ENUMS ────────────────────────────────────────────────────────────────
@@ -472,8 +487,41 @@ class SymmetryTrapEngine:
                 #   SHORT -> bar.low of impulse bar
                 # No spread buffer, no OCC extreme — exact impulse extreme only.
                 self.sl_price = self.impulse_extreme
+                
+                # TP calculation based on mode
+                if TP_MODE == "TIER":
+                    # Use tier's AU value as TP distance
+                    tier_au = self.tier_config.get(self.tier_name, {}).get("au", self.au_pips)
+                    tp_distance = tier_au * self.pip_size
+                elif TP_MODE == "TIER_X2":
+                    # 2x tier's AU value
+                    tier_au = self.tier_config.get(self.tier_name, {}).get("au", self.au_pips)
+                    tp_distance = tier_au * self.pip_size * 2.0
+                elif TP_MODE == "TIER_X1_5":
+                    # 1.5x tier's AU value
+                    tier_au = self.tier_config.get(self.tier_name, {}).get("au", self.au_pips)
+                    tp_distance = tier_au * self.pip_size * 1.5
+                elif TP_MODE == "AU_X1_5":
+                    # 1.5x AU from entry
+                    tp_distance = self.active_au * 1.5
+                elif TP_MODE == "AU_X2":
+                    # 2x AU from entry
+                    tp_distance = self.active_au * 2.0
+                elif TP_MODE == "FIXED_20":
+                    # Fixed 20 pips
+                    tp_distance = 20.0 * self.pip_size
+                elif TP_MODE == "FIXED_30":
+                    # Fixed 30 pips
+                    tp_distance = 30.0 * self.pip_size
+                elif TP_MODE == "FIXED_40":
+                    # Fixed 40 pips
+                    tp_distance = 40.0 * self.pip_size
+                else:
+                    # Default: 1 AU from entry
+                    tp_distance = self.active_au
+                
                 self.tp_price = (
-                    bar.close + self.active_au * self.impulse_direction.value
+                    bar.close + tp_distance * self.impulse_direction.value
                 )
                 self.state = EngineState.IN_TRADE
                 self._just_entered = True  # Skip SL/TP check on entry bar (Nautilus fills on NEXT bar)
@@ -533,8 +581,8 @@ class SymmetryTrapEngine:
                     self.logger.info(f"TP HIT: exit={exit_price:.5f} (loop {_loop} -> {self.loop_count})")
                     return sig
 
-                # SL check: CLOSE-ONLY (wicks don't count)
-                if bar.close <= self.sl_price:
+                # SL check: WICK-BASED (realistic - stop orders trigger on touch)
+                if bar.low <= self.sl_price:
                     exit_price = self.sl_price
                     _entry = self.entry_price
                     _sl = self.sl_price
@@ -586,8 +634,8 @@ class SymmetryTrapEngine:
                     self.logger.info(f"TP HIT: exit={exit_price:.5f} (loop {_loop} -> {self.loop_count})")
                     return sig
 
-                # SL check: CLOSE-ONLY
-                if bar.close >= self.sl_price:
+                # SL check: WICK-BASED (realistic - stop orders trigger on touch)
+                if bar.high >= self.sl_price:
                     exit_price = self.sl_price
                     _entry = self.entry_price
                     _sl = self.sl_price

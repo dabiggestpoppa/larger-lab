@@ -38,7 +38,11 @@ from symmetry_trap import (
     Bar,
     EngineState,
     DEFAULT_TIER_CONFIG,
+    TP_MODE,
 )
+
+# Import trading costs for realistic backtesting
+from trading_costs import apply_costs_to_pnl
 
 logging.basicConfig(
     level=logging.WARNING,
@@ -482,9 +486,13 @@ class SymmetryTrapBacktest:
                             signal.tp_price if signal.event == "TP_HIT"
                             else signal.sl_price if signal.sl_price else bar.close
                         )
-                        active_trade.pnl_pips = round(
+                        # Calculate gross PnL in pips
+                        gross_pnl_pips = round(
                             (active_trade.exit_price - active_trade.entry_price) / self.pip_size
                             * (1 if active_trade.direction == "LONG" else -1), 1)
+                        # Apply trading costs (spread + commission)
+                        active_trade.pnl_pips = apply_costs_to_pnl(
+                            gross_pnl_pips, self.symbol, active_trade.direction)
                         all_trades.append(active_trade)
                         active_trade = None
 
@@ -493,9 +501,11 @@ class SymmetryTrapBacktest:
                 active_trade.exit_time = last.timestamp
                 active_trade.exit_price = last.close
                 active_trade.result = "EOD_EXIT"
-                active_trade.pnl_pips = round(
+                gross_pnl_pips = round(
                     (active_trade.exit_price - active_trade.entry_price) / self.pip_size
                     * (1 if active_trade.direction == "LONG" else -1), 1)
+                active_trade.pnl_pips = apply_costs_to_pnl(
+                    gross_pnl_pips, self.symbol, active_trade.direction)
                 all_trades.append(active_trade)
 
         result = compute_stats(all_trades)

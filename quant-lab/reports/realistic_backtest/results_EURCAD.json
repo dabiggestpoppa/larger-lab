@@ -1,0 +1,36 @@
+{
+  "symbol": "EURCAD",
+  "pip_size": 0.0001,
+  "engines": {
+    "p90": {
+      "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+    },
+    "symmetry_trap": {
+      "trades": 3995,
+      "win_rate": 77.24655819774718,
+      "net_pnl_pips": 23671.53499999997,
+      "profit_factor": 8.76379870795412,
+      "max_dd_pips": 58.22099999999999,
+      "avg_trade_pips": 5.925290362953684
+    },
+    "dmr": {
+      "trades": 281,
+      "win_rate": 20.6,
+      "net_pnl_pips": 274.70000000000005,
+      "profit_factor": 1.82,
+      "max_dd_pips": 31.1,
+      "avg_trade_pips": 0.98
+    },
+    "rekey_intraday": {
+      "trades": 310,
+      "win_rate": 46.8,
+      "net_pnl_pips": -282.1,
+      "profit_factor": 0.91,
+      "max_dd_pips": 738.1,
+      "avg_trade_pips": -0.91
+    },
+    "rekey_dead_simple": {
+      "note": "Run separately for stats"
+    }
+  }
+}

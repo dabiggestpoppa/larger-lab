@@ -1,0 +1,36 @@
+{
+  "symbol": "GBPCAD",
+  "pip_size": 0.0001,
+  "engines": {
+    "p90": {
+      "error": "Row 2: no timestamp. Columns: ['time', 'open', 'high', 'low', 'close', 'volume', 'spread']"
+    },
+    "symmetry_trap": {
+      "trades": 3737,
+      "win_rate": 77.70939256087772,
+      "net_pnl_pips": 23664.140999999963,
+      "profit_factor": 8.492135109644284,
+      "max_dd_pips": 65.01399999999921,
+      "avg_trade_pips": 6.33238988493443
+    },
+    "dmr": {
+      "trades": 195,
+      "win_rate": 23.6,
+      "net_pnl_pips": 199.39999999999998,
+      "profit_factor": 1.71,
+      "max_dd_pips": 23.7,
+      "avg_trade_pips": 1.02
+    },
+    "rekey_intraday": {
+      "trades": 270,
+      "win_rate": 50.4,
+      "net_pnl_pips": 726.5,
+      "profit_factor": 1.24,
+      "max_dd_pips": 515.7,
+      "avg_trade_pips": 2.69
+    },
+    "rekey_dead_simple": {
+      "note": "Run separately for stats"
+    }
+  }
+}

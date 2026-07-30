@@ -1,0 +1,41 @@
+{
+  "symbol": "GBPUSD",
+  "pip_size": 0.0001,
+  "engines": {
+    "p90": {
+      "trades": 973,
+      "win_rate": 49.2,
+      "net_pnl_pips": 1127.0,
+      "profit_factor": 1.36,
+      "max_dd_pips": 138.5,
+      "avg_trade_pips": 1.16
+    },
+    "symmetry_trap": {
+      "trades": 3926,
+      "win_rate": 77.94192562404483,
+      "net_pnl_pips": 23786.117999999966,
+      "profit_factor": 8.304058083340644,
+      "max_dd_pips": 63.22100000000046,
+      "avg_trade_pips": 6.058613856342324
+    },
+    "dmr": {
+      "trades": 230,
+      "win_rate": 20.9,
+      "net_pnl_pips": 252.39999999999998,
+      "profit_factor": 1.89,
+      "max_dd_pips": 24.3,
+      "avg_trade_pips": 1.1
+    },
+    "rekey_intraday": {
+      "trades": 302,
+      "win_rate": 43.7,
+      "net_pnl_pips": -637.8,
+      "profit_factor": 0.81,
+      "max_dd_pips": 837.0,
+      "avg_trade_pips": -2.11
+    },
+    "rekey_dead_simple": {
+      "note": "Run separately for stats"
+    }
+  }
+}
