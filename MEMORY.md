@@ -1,6 +1,6 @@
 # MEMORY.md — OWL (OC2) Persistent Memory
 
-> **Last Updated:** 2026-06-10 12:40 EDT — Content engine created, credentials stored, memory update cron set up
+> **Last Updated:** 2026-07-30 14:20 EDT — Major commit to GitHub: quant-lab backtest engines, MT5 live trading, booking-service, whop-landing
 > **THE BIBLE locked:** AR gate decoupled from tier, impulse-based classification, 4PM cutoff, 10p trigger
 > **LIVE:** Low Cost Hex (6 pairs, all FLOOR) | Demo: Profit Quad (BTCUSD+ETHUSD+EURNZD+GBPNZD)
 > **Hermes Gateway:** Running on port 8642 (PID 22156) — Discord connected, API server active
@@ -15,6 +15,78 @@
 - **Model:** openrouter/owl-alpha
 - **Gateway:** OpenClaw port 18790
 - **Workspace:** C:\Users\wifik\Desktop\projects\larger-lab
+
+---
+
+## 🚀 MAJOR COMMIT — 2026-07-30
+**Commit:** `ab3159003` | **Branch:** master | **Remote:** origin/master ✅
+
+### 📦 Changes Committed (78 files, +12,609/-1,200 lines)
+
+**New Quant-Lab Backtest Engines:**
+- `quant-lab/backtest/_rank_diversified.py`
+- `quant-lab/backtest/_rank_final.py`
+- `quant-lab/backtest/_rank_pairs.py`
+- `quant-lab/backtest/_rank_pairs_v2.py`
+- `quant-lab/backtest/run_nautilus_symmetry_trap.py`
+
+**New Quant-Lab Engines:**
+- `quant-lab/engines/cerebus_universal_asian_breakout.py`
+- `quant-lab/engines/spread_commission_config.py`
+- `quant-lab/engines/trading_costs.py`
+
+**New MT5 Live Trading:**
+- `quant-lab/mt5/dmr_live_engine.py`
+- `quant-lab/mt5/dmr_multi_pair_live_fixed.py`
+- `quant-lab/mt5/dmr_signal_engine.py`
+- `quant-lab/mt5/production_runtime.py`
+- `quant-lab/mt5/symmetry_trap_executor_fixed.py`
+- `quant-lab/mt5/live_logs/dmr_daily_stats.json`
+- `quant-lab/mt5/live_logs/signaled_windows.json`
+
+**New Strategies & Scripts:**
+- `quant-lab/strategies/symmetry_trap_nautilus.py`
+- `quant-lab/scripts/leakage_detection.py`
+- `quant-lab/scripts/run_all_pairs_realistic.py`
+- `quant-lab/pine/DMR_v2_Strategy.pine`
+
+**New Project Directories:**
+- `booking-service/` (git submodule)
+- `whop-landing/` (git submodule)
+
+**New Scripts:**
+- `scripts/captain_hook_discord.py`
+- `scripts/start_captain_hook.bat`
+- `scripts/start_captain_hook_monday.bat`
+- `scripts/start_captain_hook_monday.ps1`
+
+**Realistic Backtest Reports (30 pairs):**
+- `quant-lab/reports/realistic_backtest/` — Full pair results + SUMMARY_REPORT.md
+
+**Updated Engines:**
+- `quant-lab/engines/dmr_standalone_backtest.py`
+- `quant-lab/engines/p90_backtest.py`
+- `quant-lab/engines/rekey_dead_simple.py`
+- `quant-lab/engines/rekey_intraday.py`
+- `quant-lab/engines/symmetry_trap.py`
+- `quant-lab/engines/symmetry_trap_backtest.py`
+
+**Updated MT5:**
+- `quant-lab/mt5/dmr_multi_pair_live_v2.py`
+- `quant-lab/mt5/live_logs/dmr_signals.jsonl`
+
+**Updated Scripts & Config:**
+- `scripts/discord_dmr_bot.py`
+- `scripts/guardrail_state.json`
+- `quant-lab/config/spread_commission_config.py` (moved from configs/)
+
+**Submodule Updates:**
+- `tools/tradingview-mcp`
+- `vtuber_integration/Open-LLM-VTuber`
+
+**Cleanup:**
+- Removed 4 stale PID files (.discord_bot.pid, .memory-sync-daemon.pid, .scanner.pid, .signal_bot.pid)
+- Removed deprecated `quant-lab/configs/trading_costs.py`
 
 ---
 
