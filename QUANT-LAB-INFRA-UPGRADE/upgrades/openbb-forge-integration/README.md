@@ -12,7 +12,7 @@
 
 This directory is the canonical planning and continuation surface for the OpenBB/FORGE integration program.
 
-It does not replace the existing Phase 0–11 GLX FORGE blueprint. It extends that work through a focused four-phase operating-integration track.
+It does not replace the existing Phase 0–11 GLX FORGE blueprint. It extends that work through a focused four-phase operating-integration track. The [Final Anchor and Build Guideline](FINAL-ANCHOR-AND-BUILD-GUIDELINE.md) and [Implementation Crosswalk](IMPLEMENTATION-CROSSWALK.md) make that relationship explicit: one build, two lenses, no duplicate roadmap.
 
 Current evidence shows that the repository contains a broad FORGE contract scaffold and a demonstration dashboard, but real OpenBB, Workspace, research-agent, Nautilus, paper/shadow, and reconciliation integrations remain unproven. This package preserves that distinction.
 
@@ -74,6 +74,8 @@ A design plan, source file, passed local test, real integration, and production 
 ## Current Documentation Bundle
 
 - [Build Guide](BUILD_GUIDE.md)
+- [Final Anchor and Build Guideline](FINAL-ANCHOR-AND-BUILD-GUIDELINE.md)
+- [Implementation Crosswalk](IMPLEMENTATION-CROSSWALK.md)
 - [Continuation Guide](CODEX_START_HERE.md)
 - [OBB-01 — Truth and Seam Lock](OBB-01-TRUTH-AND-SEAM-LOCK.md)
 - [OBB-02 — OpenBB Foundation](OBB-02-OPENBB-FOUNDATION.md)
@@ -100,6 +102,8 @@ QUANT-LAB-INFRA-UPGRADE/
     └── openbb-forge-integration/
         ├── README.md
         ├── BUILD_GUIDE.md
+        ├── FINAL-ANCHOR-AND-BUILD-GUIDELINE.md
+        ├── IMPLEMENTATION-CROSSWALK.md
         ├── CODEX_START_HERE.md
         ├── OBB-01-TRUTH-AND-SEAM-LOCK.md
         ├── OBB-02-OPENBB-FOUNDATION.md
