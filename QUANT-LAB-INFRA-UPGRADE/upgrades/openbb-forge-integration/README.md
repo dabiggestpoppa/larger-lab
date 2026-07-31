@@ -78,6 +78,7 @@ A design plan, source file, passed local test, real integration, and production 
 - [OBB-01 — Truth and Seam Lock](OBB-01-TRUTH-AND-SEAM-LOCK.md)
 - [OBB-02 — OpenBB Foundation](OBB-02-OPENBB-FOUNDATION.md)
 - [OBB-03 — Agent Research and Discovery](OBB-03-AGENT-RESEARCH-AND-DISCOVERY.md)
+- [OBB-04 — Quant Validation and Governed Operations](OBB-04-QUANT-VALIDATION-AND-OPERATIONS.md)
 
 ## Non-Negotiable Boundaries
 
