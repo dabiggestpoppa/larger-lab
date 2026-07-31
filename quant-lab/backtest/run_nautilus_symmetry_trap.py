@@ -48,13 +48,19 @@ def load_csv_to_nautilus_bars(csv_path: str, instrument_id: str, bar_type: BarTy
     
     bars = []
     for _, row in df.iterrows():
+        # Use Price constructor with explicit precision to match instrument
+        open_price = Price(round(float(row['open']), 5), 5)
+        high_price = Price(round(float(row['high']), 5), 5)
+        low_price = Price(round(float(row['low']), 5), 5)
+        close_price = Price(round(float(row['close']), 5), 5)
+        
         bar = Bar(
             bar_type=bar_type,
-            open=Price.from_str(str(row['open'])),
-            high=Price.from_str(str(row['high'])),
-            low=Price.from_str(str(row['low'])),
-            close=Price.from_str(str(row['close'])),
-            volume=Quantity.from_str(str(row.get('tick_volume', 1))),
+            open=open_price,
+            high=high_price,
+            low=low_price,
+            close=close_price,
+            volume=Quantity(int(row.get('tick_volume', 1)), 2),
             ts_event=int(row['ts_event'].timestamp() * 1e9),
             ts_init=int(row['ts_event'].timestamp() * 1e9),
         )
@@ -162,14 +168,39 @@ def run_nautilus_backtest(
     # Get results
     result = engine.get_result()
     
-    # Extract metrics
+    # Extract metrics from fills report
+    fills = engine.trader.generate_order_fills_report()
+    total_trades = len(fills) if fills is not None else 0
+    
+    # Calculate win rate from fills
+    wins = 0
+    losses = 0
+    total_pnl = 0.0
+    if fills is not None and len(fills) > 0:
+        for _, row in fills.iterrows():
+            pnl = float(row.get('realized_pnl', 0))
+            total_pnl += pnl
+            if pnl > 0:
+                wins += 1
+            elif pnl < 0:
+                losses += 1
+    
+    win_rate = (wins / total_trades * 100) if total_trades > 0 else 0
+    
+    # Get portfolio stats
+    stats_pnls = result.stats_pnls
+    net_pnl = stats_pnls.get('USD', {}).get('PnL (total)', 0.0) if stats_pnls else 0.0
+    profit_factor = stats_pnls.get('USD', {}).get('Profit Factor', 0.0) if stats_pnls else 0.0
+    max_drawdown = 0.0  # Not directly available
+    avg_trade = net_pnl / total_trades if total_trades > 0 else 0.0
+    
     metrics = {
-        "total_trades": result.total_trades,
-        "win_rate": result.win_rate * 100 if result.win_rate else 0,
-        "net_pnl": float(result.net_pnl) if result.net_pnl else 0,
-        "profit_factor": float(result.profit_factor) if result.profit_factor else 0,
-        "max_drawdown": float(result.max_drawdown) if result.max_drawdown else 0,
-        "avg_trade": float(result.avg_trade) if result.avg_trade else 0,
+        "total_trades": total_trades,
+        "win_rate": win_rate,
+        "net_pnl": net_pnl,
+        "profit_factor": profit_factor,
+        "max_drawdown": max_drawdown,
+        "avg_trade": avg_trade,
     }
     
     print(f"\n=== NAUTILUS BACKTEST RESULTS ===")
