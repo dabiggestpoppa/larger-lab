@@ -385,16 +385,18 @@ class SymmetryTrapStrategy(Strategy):
         # NOTE: trigger_pips stays at T1 value for all loops (per June 4 calibration)
     
     def _place_bracket_order(self, entry_price: float):
-        """Place LIMIT entry + LIMIT TP orders. SL monitored manually (CLOSE-ONLY like Python engine)."""
+        """Place LIMIT entry + LIMIT TP + STOP_MARKET SL orders (OCO bracket)."""
         from nautilus_trader.model.enums import OrderType
         
         # Determine order sides
         if self.impulse_direction == 1:  # LONG
             entry_side = OrderSide.BUY
             tp_side = OrderSide.SELL
+            sl_side = OrderSide.SELL
         else:  # SHORT
             entry_side = OrderSide.SELL
             tp_side = OrderSide.BUY
+            sl_side = OrderSide.BUY
         
         # Place LIMIT entry order
         entry_order = self.order_factory.limit(
@@ -414,11 +416,20 @@ class SymmetryTrapStrategy(Strategy):
             time_in_force=TimeInForce.GTC,
         )
         
-        # Create order list and submit
-        order_list = self.order_factory.create_list([entry_order, tp_order])
+        # Place STOP_MARKET SL order (zero-buffer at impulse extreme)
+        sl_order = self.order_factory.stop_market(
+            instrument_id=self.instrument_id,
+            order_side=sl_side,
+            quantity=Quantity.from_str(str(self.lot_size)),
+            trigger_price=Price.from_str(f"{self.sl_price:.5f}"),
+            time_in_force=TimeInForce.GTC,
+        )
+        
+        # Create order list and submit (OCO - one cancels others)
+        order_list = self.order_factory.create_list([entry_order, tp_order, sl_order])
         self.submit_order_list(order_list)
         
-        self.log.debug(f"Entry + TP orders placed: entry={entry_order.client_order_id}, tp={tp_order.client_order_id}")
+        self.log.debug(f"Bracket orders placed: entry={entry_order.client_order_id}, tp={tp_order.client_order_id}, sl={sl_order.client_order_id}")
     
     def _exit_trade(self, reason: str, exit_price: float):
         """Exit trade and reset state for next loop."""

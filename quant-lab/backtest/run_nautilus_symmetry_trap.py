@@ -123,7 +123,6 @@ def run_nautilus_backtest(
         fee_model=FixedFeeModel(commission=Money.from_str("0.035 USD")),  # $0.035 per side for 0.01 lot
         fill_model=FillModel(
             prob_fill_on_limit=1.0,
-            prob_fill_on_stop=1.0,
             prob_slippage=0.0,
         ),
     )
