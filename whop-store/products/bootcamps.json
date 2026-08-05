@@ -1,0 +1,24 @@
+{
+  "bootcamps": [
+    {
+      "id": "algo-trading-bootcamp",
+      "name": "Algorithmic Trading Bootcamp",
+      "type": "service",
+      "price": 0,
+      "currency": "USD",
+      "description": "Structured implementation program teaching system development, strategy engineering, backtesting, and automation design.",
+      "status": "coming_soon",
+      "delivery": "whop_community"
+    },
+    {
+      "id": "ai-systems-bootcamp",
+      "name": "AI Systems Build Bootcamp",
+      "type": "service",
+      "price": 0,
+      "currency": "USD",
+      "description": "Structured implementation service focused on AI workflows, agents, automation systems, and technical infrastructure.",
+      "status": "coming_soon",
+      "delivery": "whop_community"
+    }
+  ]
+}

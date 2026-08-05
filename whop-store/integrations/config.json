@@ -1,0 +1,19 @@
+{
+  "integrations": {
+    "calendly": {
+      "status": "active",
+      "purpose": "booking_system",
+      "url": "https://calendly.com/madlabs"
+    },
+    "discord": {
+      "status": "active",
+      "purpose": "community_infrastructure",
+      "url": "https://discord.gg/madlabs"
+    },
+    "linktree": {
+      "status": "active",
+      "purpose": "traffic_hub",
+      "url": "https://linktr.ee/madlabs"
+    }
+  }
+}

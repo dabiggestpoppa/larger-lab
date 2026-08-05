@@ -1,0 +1,54 @@
+{
+  "digital_products": [
+    {
+      "id": "beginner-framework",
+      "name": "The Beginner Trading Framework",
+      "type": "digital_download",
+      "price": 0,
+      "currency": "USD",
+      "description": "Foundational framework for systematic trading approach.",
+      "status": "coming_soon",
+      "delivery": "whop_digital"
+    },
+    {
+      "id": "risk-playbook",
+      "name": "Risk Management Playbook",
+      "type": "digital_download",
+      "price": 0,
+      "currency": "USD",
+      "description": "Comprehensive risk management framework and guidelines.",
+      "status": "coming_soon",
+      "delivery": "whop_digital"
+    },
+    {
+      "id": "ai-blueprint",
+      "name": "AI Automation Blueprint",
+      "type": "digital_download",
+      "price": 0,
+      "currency": "USD",
+      "description": "Complete guide to AI workflow automation systems.",
+      "status": "coming_soon",
+      "delivery": "whop_digital"
+    },
+    {
+      "id": "systems-guide",
+      "name": "Trading Systems Architecture Guide",
+      "type": "digital_download",
+      "price": 0,
+      "currency": "USD",
+      "description": "Technical guide to building institutional-grade trading systems.",
+      "status": "coming_soon",
+      "delivery": "whop_digital"
+    },
+    {
+      "id": "market-structure",
+      "name": "Market Structure Engineering Framework",
+      "type": "digital_download",
+      "price": 0,
+      "currency": "USD",
+      "description": "Advanced market structure analysis and engineering methodology.",
+      "status": "coming_soon",
+      "delivery": "whop_digital"
+    }
+  ]
+}
