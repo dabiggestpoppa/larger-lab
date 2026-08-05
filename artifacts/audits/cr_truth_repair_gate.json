@@ -1,0 +1,6 @@
+{
+  "gate_id": "CR-P0-TRUTH-REPAIR-01",
+  "decision": "partial_repair",
+  "phase_1_accepted": false,
+  "notes": "Phase 1 implemented but pending independent validation; external claims moved/marked unverified."
+}

@@ -1,0 +1,16 @@
+{
+  "note": "Placeholder: tests must be run locally to generate full execution evidence.",
+  "command": "pytest -q tests/",
+  "returncode": null,
+  "start": null,
+  "end": null,
+  "duration_seconds": null,
+  "counts": {
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0,
+    "errors": 0
+  },
+  "raw_output": "",
+  "commit_sha": null
+}

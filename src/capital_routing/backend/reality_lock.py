@@ -31,11 +31,11 @@ import jsonschema
 
 
 # Paths to required artifacts (relative to repo root)
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
-ARTIFACTS_DIR = REPO_ROOT / "capital-routing" / "artifacts"
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent
+ARTIFACTS_DIR = REPO_ROOT / "artifacts"
 BOOK_2_PATH = ARTIFACTS_DIR / "book_2_nautilus_evidence.json"
 BOOK_3_PATH = ARTIFACTS_DIR / "book_3_classification.json"
-EVIDENCE_REPO_PATH = REPO_ROOT / "capital-routing" / "evidence"  # Evidence repository
+EVIDENCE_REPO_PATH = REPO_ROOT / "evidence"  # Evidence repository
 APPROVAL_ARTIFACT_PATH = ARTIFACTS_DIR / "independent_approval.json"
 
 # Schemas for artifact validation (simplified examples)

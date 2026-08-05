@@ -1,0 +1,23 @@
+{
+  "created_at": "REPLACE_WITH_TIMESTAMP",
+  "source": "migrated_unverified_external_claims",
+  "items": {
+    "book_2": {
+      "verified": false,
+      "original_file": "evidence/book_2_nautilus_evidence.json",
+      "note": "Original Nautilus run entries migrated here for archival and manual independent validation.",
+      "original": {}
+    },
+    "book_3": {
+      "verified": false,
+      "original_file": "artifacts/book_3_classification.json",
+      "note": "Original classification claims migrated here for archival and independent validation.",
+      "original": {}
+    },
+    "independent_approval": {
+      "verified": false,
+      "original_file": "artifacts/independent_approval.json",
+      "note": "Approval statement migrated; lacks provenance."
+    }
+  }
+}

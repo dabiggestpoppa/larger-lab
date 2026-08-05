@@ -1,0 +1,4 @@
+{
+  "phases_implemented": ["phase_1_data_discovery"],
+  "modules": ["Phase1DataDiscovery","SymbolAliases","ProviderRegistry","SchemaDetector","BasicChecks","DataDiscoverer"]
+}

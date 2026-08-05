@@ -1,16 +1,11 @@
 {
-  "classification": "QUANT_LAB_COMPLETE",
-  "evidence_based": true,
+  "classification": "EXTERNAL_UNVERIFIED",
+  "evidence_based": false,
   "legacy": false,
-  "summary": "Capital Routing research system completed with comprehensive factor analysis and backtesting",
-  "key_achievements": [
-    "DMR v2 multi-entry backtest: +164% PnL improvement over v1",
-    "CEREBUS scanner: 110/110 tests passing",
-    "Symmetry Trap: 14,088 trades across 19 assets",
-    "Quant Bible: 700+ lines of formulas and per-asset configurations",
-    "Phase 1-11 complete: 1460+ tests passing"
-  ],
-  "research_status": "EVIDENCE_BASED",
-  "deployment_status": "LIVE_DEMO",
-  "validation_status": "COMPREHENSIVE"
+  "summary": "Original classification migrated and marked unverified by CR-P0 truth-repair.",
+  "key_achievements": [],
+  "research_status": "UNVERIFIED",
+  "deployment_status": "NOT_DEPLOYED",
+  "validation_status": "UNVERIFIED",
+  "notes": "Original classification claims were moved to evidence/external_claims_register.json and marked unverified pending independent validation."
 }
