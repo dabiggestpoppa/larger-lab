@@ -1,0 +1,32 @@
+{
+  "store": {
+    "name": "MAD LABS",
+    "url": "madlabs.whop.com",
+    "status": "pre_launch",
+    "created": "2026-06-26",
+    "version": "1.0.0"
+  },
+  "sections": [
+    "hero_banner",
+    "company_overview",
+    "services",
+    "community_access",
+    "research_products",
+    "software_tools",
+    "book_consultation"
+  ],
+  "active_offerings": [
+    "private_trading_consultation",
+    "ai_systems_consultation",
+    "investment_strategy_consultation"
+  ],
+  "future_offerings": [
+    "ebooks",
+    "bootcamps",
+    "tradingview_indicators",
+    "discord_memberships",
+    "ai_products",
+    "trading_software",
+    "research_subscriptions"
+  ]
+}

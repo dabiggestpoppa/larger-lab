@@ -1,0 +1,55 @@
+{
+  "software": [
+    {
+      "id": "tv-indicators",
+      "name": "TradingView Indicator Suite",
+      "type": "digital_download",
+      "price": 0,
+      "currency": "USD",
+      "description": "Professional TradingView indicator package for market analysis.",
+      "status": "pending",
+      "note": "TradingView Essential Plan not yet purchased",
+      "delivery": "whop_digital"
+    },
+    {
+      "id": "automation-engine",
+      "name": "Trading Automation Engine",
+      "type": "digital_download",
+      "price": 0,
+      "currency": "USD",
+      "description": "Automated trading execution engine for systematic strategies.",
+      "status": "in_development",
+      "delivery": "whop_digital"
+    },
+    {
+      "id": "backtesting-dashboard",
+      "name": "Backtesting Dashboard",
+      "type": "digital_download",
+      "price": 0,
+      "currency": "USD",
+      "description": "Professional backtesting infrastructure for strategy validation.",
+      "status": "in_development",
+      "delivery": "whop_digital"
+    },
+    {
+      "id": "strategy-scanner",
+      "name": "Strategy Scanner Engine",
+      "type": "digital_download",
+      "price": 0,
+      "currency": "USD",
+      "description": "Real-time market scanning and opportunity detection system.",
+      "status": "in_development",
+      "delivery": "whop_digital"
+    },
+    {
+      "id": "prop-optimizer",
+      "name": "Prop Firm Optimization Engine",
+      "type": "digital_download",
+      "price": 0,
+      "currency": "USD",
+      "description": "Optimization system for prop firm challenge completion.",
+      "status": "in_development",
+      "delivery": "whop_digital"
+    }
+  ]
+}

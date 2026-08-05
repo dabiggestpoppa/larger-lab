@@ -1,0 +1,37 @@
+{
+  "consultations": [
+    {
+      "id": "trading-consultation",
+      "name": "Private Trading Consultation",
+      "type": "service",
+      "price": 100,
+      "currency": "USD",
+      "description": "One-on-one strategy consulting focused on market structure, execution systems, and trading performance optimization.",
+      "status": "active",
+      "booking_url": "https://calendly.com/madlabs/trading",
+      "delivery": "external_calendly"
+    },
+    {
+      "id": "ai-consultation",
+      "name": "AI Systems Consultation",
+      "type": "service",
+      "price": 150,
+      "currency": "USD",
+      "description": "Private consulting focused on AI systems, workflow automation, infrastructure design, and technical implementation strategy.",
+      "status": "active",
+      "booking_url": "https://calendly.com/madlabs/ai-systems",
+      "delivery": "external_calendly"
+    },
+    {
+      "id": "investment-consultation",
+      "name": "Investment Strategy Consultation",
+      "type": "service",
+      "price": 200,
+      "currency": "USD",
+      "description": "Consultation focused on financial systems design, capital deployment, strategic allocation, and long-term investment architecture.",
+      "status": "active",
+      "booking_url": "https://calendly.com/madlabs/investment",
+      "delivery": "external_calendly"
+    }
+  ]
+}
