@@ -10,7 +10,7 @@ import json
 import pandas as pd
 import numpy as np
 from typing import Dict, List, Any, Optional, Set
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from ..ingestion import (
@@ -245,15 +245,17 @@ class Phase2DataProcessing:
         data_points = []
         
         # Generate data for the last 100 periods
+        base_time = datetime.now()
         for i in range(100):
-            # Calculate timestamp
-            timestamp = datetime.now()
+            # Calculate timestamp using timedelta
             if timeframe.endswith('m'):
-                timestamp = timestamp.replace(minute=timestamp.minute - i)
+                timestamp = base_time - timedelta(minutes=i)
             elif timeframe.endswith('h'):
-                timestamp = timestamp.replace(hour=timestamp.hour - i)
+                timestamp = base_time - timedelta(hours=i)
             elif timeframe.endswith('d'):
-                timestamp = timestamp.replace(day=timestamp.day - i)
+                timestamp = base_time - timedelta(days=i)
+            else:
+                timestamp = base_time - timedelta(hours=i)
             
             # Generate sample price data
             base_price = 1.0 if symbol == 'EURUSD' else 1.2 if symbol == 'GBPUSD' else 110.0
@@ -1024,7 +1026,13 @@ class Phase2DataProcessing:
             transformation_report: Transformation report
         """
         # Create directory if it doesn't exist
-        os.makedirs(os.path.dirname(self.processed_data_path), exist_ok=True)
+        for path in [self.processed_data_path, self.validation_report_path, self.transformation_report_path]:
+            dir_path = os.path.dirname(path)
+            if dir_path:
+                os.makedirs(dir_path, exist_ok=True)
+            else:
+                # Current directory
+                pass
         
         # Save processed data
         with open(self.processed_data_path, 'w') as f:

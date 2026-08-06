@@ -236,26 +236,30 @@ class Phase1DataDiscovery:
         # Extract timeframe from file name
         # Common patterns: SYMBOL_TIMEFRAME.csv, SYMBOL_DATA.csv, etc.
         timeframe_patterns = [
-            r'.*_(\d+)m$',  # SYMBOL_5m.csv
-            r'.*_(\d+)h$',  # SYMBOL_1h.csv
-            r'.*_(\d+)d$',  # SYMBOL_1d.csv
-            r'.*_(\d+)w$',  # SYMBOL_1w.csv
-            r'.*_(\d+)M$',  # SYMBOL_1M.csv
+            r'.*_(\d+)m\.csv$',  # SYMBOL_5m.csv
+            r'.*_(\d+)h\.csv$',  # SYMBOL_1h.csv
+            r'.*_(\d+)d\.csv$',  # SYMBOL_1d.csv
+            r'.*_(\d+)w\.csv$',  # SYMBOL_1w.csv
+            r'.*_(\d+)M\.csv$',  # SYMBOL_1M.csv
+            r'.*_H(\d+)\.csv$',  # SYMBOL_H1.csv
+            r'.*_(\d+)min\.csv$',  # SYMBOL_5min.csv
+            r'.*_(\d+)hour\.csv$',  # SYMBOL_1hour.csv
+            r'.*_(\d+)day\.csv$',  # SYMBOL_1day.csv
         ]
         
         for pattern in timeframe_patterns:
             match = re.match(pattern, file_name)
             if match:
                 timeframe = match.group(1)
-                if pattern.endswith('m$'):
+                if pattern.endswith('m\.csv$') or pattern.endswith('min\.csv$'):
                     return f'{timeframe}m'
-                elif pattern.endswith('h$'):
+                elif pattern.endswith('h\.csv$') or pattern.endswith('hour\.csv$') or pattern.endswith('H(\d+)\.csv$'):
                     return f'{timeframe}h'
-                elif pattern.endswith('d$'):
+                elif pattern.endswith('d\.csv$') or pattern.endswith('day\.csv$'):
                     return f'{timeframe}d'
-                elif pattern.endswith('w$'):
+                elif pattern.endswith('w\.csv$'):
                     return f'{timeframe}w'
-                elif pattern.endswith('M$'):
+                elif pattern.endswith('M\.csv$'):
                     return f'{timeframe}M'
         
         # Default to unknown

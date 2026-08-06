@@ -1,0 +1,89 @@
+{
+  "transformation_timestamp": "2026-08-06T14:51:01.803103",
+  "total_files": 10,
+  "transformation_status": "pending",
+  "transformation_results": {
+    "CHFJPY": {
+      "symbol": "CHFJPY",
+      "transformation_timestamp": "2026-08-06T14:51:01.803103",
+      "transformation_status": "pending",
+      "quality_score": 60.0,
+      "issues": [],
+      "overall_score": 80.0
+    },
+    "EURCHF": {
+      "symbol": "EURCHF",
+      "transformation_timestamp": "2026-08-06T14:51:01.806107",
+      "transformation_status": "pending",
+      "quality_score": 60.0,
+      "issues": [],
+      "overall_score": 80.0
+    },
+    "EURGBP": {
+      "symbol": "EURGBP",
+      "transformation_timestamp": "2026-08-06T14:51:01.809101",
+      "transformation_status": "pending",
+      "quality_score": 60.0,
+      "issues": [],
+      "overall_score": 80.0
+    },
+    "EURJPY": {
+      "symbol": "EURJPY",
+      "transformation_timestamp": "2026-08-06T14:51:01.814111",
+      "transformation_status": "pending",
+      "quality_score": 60.0,
+      "issues": [],
+      "overall_score": 80.0
+    },
+    "EURUSD": {
+      "symbol": "EURUSD",
+      "transformation_timestamp": "2026-08-06T14:51:01.817110",
+      "transformation_status": "pending",
+      "quality_score": 60.0,
+      "issues": [],
+      "overall_score": 80.0
+    },
+    "GBPCHF": {
+      "symbol": "GBPCHF",
+      "transformation_timestamp": "2026-08-06T14:51:01.820106",
+      "transformation_status": "pending",
+      "quality_score": 60.0,
+      "issues": [],
+      "overall_score": 80.0
+    },
+    "GBPJPY": {
+      "symbol": "GBPJPY",
+      "transformation_timestamp": "2026-08-06T14:51:01.823106",
+      "transformation_status": "pending",
+      "quality_score": 60.0,
+      "issues": [],
+      "overall_score": 80.0
+    },
+    "GBPUSD": {
+      "symbol": "GBPUSD",
+      "transformation_timestamp": "2026-08-06T14:51:01.826106",
+      "transformation_status": "pending",
+      "quality_score": 60.0,
+      "issues": [],
+      "overall_score": 80.0
+    },
+    "USDCHF": {
+      "symbol": "USDCHF",
+      "transformation_timestamp": "2026-08-06T14:51:01.830113",
+      "transformation_status": "pending",
+      "quality_score": 60.0,
+      "issues": [],
+      "overall_score": 80.0
+    },
+    "USDJPY": {
+      "symbol": "USDJPY",
+      "transformation_timestamp": "2026-08-06T14:51:01.834103",
+      "transformation_status": "pending",
+      "quality_score": 60.0,
+      "issues": [],
+      "overall_score": 80.0
+    }
+  },
+  "overall_score": 80.0,
+  "issues": []
+}

@@ -1,0 +1,17 @@
+{
+  "report_timestamp": "2026-08-06T14:51:01.646188",
+  "report_id": "discovery_report_20260806_145101",
+  "total_files_discovered": 10,
+  "total_symbols": 10,
+  "total_providers": 1,
+  "total_timeframes": 1,
+  "total_formats": 1,
+  "average_quality_score": 60.0,
+  "coverage_gaps": [],
+  "batch_a_queue_size": 10,
+  "recommendations": [
+    "Consider adding data from additional providers for redundancy",
+    "Consider adding data from additional timeframes for comprehensive analysis",
+    "Consider adding data from additional formats for flexibility"
+  ]
+}

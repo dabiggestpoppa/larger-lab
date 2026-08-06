@@ -1,0 +1,163 @@
+{
+  "inventory_timestamp": "2026-08-06T14:51:01.646188",
+  "total_files": 10,
+  "providers": [
+    "unknown"
+  ],
+  "symbols": [
+    "CHFJPY",
+    "EURCHF",
+    "EURGBP",
+    "EURJPY",
+    "EURUSD",
+    "GBPCHF",
+    "GBPJPY",
+    "GBPUSD",
+    "USDCHF",
+    "USDJPY"
+  ],
+  "timeframes": [
+    "1h"
+  ],
+  "formats": [
+    "csv"
+  ],
+  "quality_metrics": {
+    "quality_scores": [
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0
+    ],
+    "average_quality_score": 60.0
+  },
+  "coverage_gaps": [],
+  "symbol_details": {
+    "CHFJPY": {
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "1h"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 60.0
+    },
+    "EURCHF": {
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "1h"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 60.0
+    },
+    "EURGBP": {
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "1h"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 60.0
+    },
+    "EURJPY": {
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "1h"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 60.0
+    },
+    "EURUSD": {
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "1h"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 60.0
+    },
+    "GBPCHF": {
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "1h"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 60.0
+    },
+    "GBPJPY": {
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "1h"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 60.0
+    },
+    "GBPUSD": {
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "1h"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 60.0
+    },
+    "USDCHF": {
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "1h"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 60.0
+    },
+    "USDJPY": {
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "1h"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 60.0
+    }
+  }
+}

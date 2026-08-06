@@ -1,0 +1,89 @@
+{
+  "validation_timestamp": "2026-08-06T14:51:01.803103",
+  "total_files": 10,
+  "validation_status": "pending",
+  "validation_results": {
+    "CHFJPY": {
+      "symbol": "CHFJPY",
+      "validation_timestamp": "2026-08-06T14:51:01.803103",
+      "validation_status": "pending",
+      "quality_score": 60.0,
+      "issues": [],
+      "overall_score": 80.0
+    },
+    "EURCHF": {
+      "symbol": "EURCHF",
+      "validation_timestamp": "2026-08-06T14:51:01.803103",
+      "validation_status": "pending",
+      "quality_score": 60.0,
+      "issues": [],
+      "overall_score": 80.0
+    },
+    "EURGBP": {
+      "symbol": "EURGBP",
+      "validation_timestamp": "2026-08-06T14:51:01.803103",
+      "validation_status": "pending",
+      "quality_score": 60.0,
+      "issues": [],
+      "overall_score": 80.0
+    },
+    "EURJPY": {
+      "symbol": "EURJPY",
+      "validation_timestamp": "2026-08-06T14:51:01.803103",
+      "validation_status": "pending",
+      "quality_score": 60.0,
+      "issues": [],
+      "overall_score": 80.0
+    },
+    "EURUSD": {
+      "symbol": "EURUSD",
+      "validation_timestamp": "2026-08-06T14:51:01.803103",
+      "validation_status": "pending",
+      "quality_score": 60.0,
+      "issues": [],
+      "overall_score": 80.0
+    },
+    "GBPCHF": {
+      "symbol": "GBPCHF",
+      "validation_timestamp": "2026-08-06T14:51:01.803103",
+      "validation_status": "pending",
+      "quality_score": 60.0,
+      "issues": [],
+      "overall_score": 80.0
+    },
+    "GBPJPY": {
+      "symbol": "GBPJPY",
+      "validation_timestamp": "2026-08-06T14:51:01.803103",
+      "validation_status": "pending",
+      "quality_score": 60.0,
+      "issues": [],
+      "overall_score": 80.0
+    },
+    "GBPUSD": {
+      "symbol": "GBPUSD",
+      "validation_timestamp": "2026-08-06T14:51:01.803103",
+      "validation_status": "pending",
+      "quality_score": 60.0,
+      "issues": [],
+      "overall_score": 80.0
+    },
+    "USDCHF": {
+      "symbol": "USDCHF",
+      "validation_timestamp": "2026-08-06T14:51:01.803103",
+      "validation_status": "pending",
+      "quality_score": 60.0,
+      "issues": [],
+      "overall_score": 80.0
+    },
+    "USDJPY": {
+      "symbol": "USDJPY",
+      "validation_timestamp": "2026-08-06T14:51:01.803103",
+      "validation_status": "pending",
+      "quality_score": 60.0,
+      "issues": [],
+      "overall_score": 80.0
+    }
+  },
+  "overall_score": 80.0,
+  "issues": []
+}

@@ -1,0 +1,86 @@
+name: Capital Routing CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .
+        pip install pytest jsonschema
+    
+    - name: Run tests
+      run: |
+        python -m pytest -q tests/
+    
+    - name: Run Phase 1
+      run: |
+        python -c "
+        config = {
+            'scan_directories': ['data', 'input', 'raw_data', 'sources'],
+            'supported_extensions': ['.csv', '.parquet', '.zip'],
+            'max_file_size': 100 * 1024 * 1024,
+            'canonical_inventory_path': 'canonical_inventory.json',
+            'batch_a_queue_path': 'batch_a_queue.json',
+            'discovery_report_path': 'discovery_report.json',
+        }
+        from capital_routing.phases.phase_1 import Phase1DataDiscovery
+        p1 = Phase1DataDiscovery(config)
+        results = p1.run_phase_1()
+        print('Phase 1 completed:', results['status'])
+        "
+    
+    - name: Run Phase 2
+      run: |
+        python -c "
+        config = {
+            'scan_directories': ['data', 'input', 'raw_data', 'sources'],
+            'supported_extensions': ['.csv', '.parquet', '.zip'],
+            'max_file_size': 100 * 1024 * 1024,
+            'canonical_inventory_path': 'canonical_inventory.json',
+            'batch_a_queue_path': 'batch_a_queue.json',
+            'discovery_report_path': 'discovery_report.json',
+        }
+        from capital_routing.phases.phase_1 import Phase1DataDiscovery
+        p1 = Phase1DataDiscovery(config)
+        results = p1.run_phase_1()
+        
+        from capital_routing.phases.phase_2 import Phase2DataProcessing
+        config2 = {
+            'processed_data_path': 'processed_data.json',
+            'validation_report_path': 'validation_report.json',
+            'transformation_report_path': 'transformation_report.json',
+        }
+        p2 = Phase2DataProcessing(config2)
+        results2 = p2.run_phase_2(results)
+        print('Phase 2 completed:', results2['status'])
+        "
+    
+    - name: Run Reality Lock
+      run: |
+        python -c "
+        from capital_routing.backend.reality_lock import ready_for_phase_1, get_failure_reasons
+        ready = ready_for_phase_1()
+        reasons = get_failure_reasons()
+        print('READY_FOR_PHASE_1:', ready)
+        print('Reasons:', reasons)
+        if not ready:
+            exit(1)
+        "

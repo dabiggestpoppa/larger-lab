@@ -1,0 +1,169 @@
+{
+  "queue_timestamp": "2026-08-06T14:51:01.646188",
+  "queue_id": "batch_a_20260806_145101",
+  "priority": "high",
+  "estimated_processing_time": "2-4 hours",
+  "queue_items": [
+    {
+      "symbol": "CHFJPY",
+      "priority": "high",
+      "estimated_processing_time": "30-60 minutes",
+      "status": "pending",
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "1h"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 60.0
+    },
+    {
+      "symbol": "EURCHF",
+      "priority": "high",
+      "estimated_processing_time": "30-60 minutes",
+      "status": "pending",
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "1h"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 60.0
+    },
+    {
+      "symbol": "EURGBP",
+      "priority": "high",
+      "estimated_processing_time": "30-60 minutes",
+      "status": "pending",
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "1h"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 60.0
+    },
+    {
+      "symbol": "EURJPY",
+      "priority": "high",
+      "estimated_processing_time": "30-60 minutes",
+      "status": "pending",
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "1h"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 60.0
+    },
+    {
+      "symbol": "EURUSD",
+      "priority": "high",
+      "estimated_processing_time": "30-60 minutes",
+      "status": "pending",
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "1h"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 60.0
+    },
+    {
+      "symbol": "GBPCHF",
+      "priority": "high",
+      "estimated_processing_time": "30-60 minutes",
+      "status": "pending",
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "1h"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 60.0
+    },
+    {
+      "symbol": "GBPJPY",
+      "priority": "high",
+      "estimated_processing_time": "30-60 minutes",
+      "status": "pending",
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "1h"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 60.0
+    },
+    {
+      "symbol": "GBPUSD",
+      "priority": "high",
+      "estimated_processing_time": "30-60 minutes",
+      "status": "pending",
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "1h"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 60.0
+    },
+    {
+      "symbol": "USDCHF",
+      "priority": "high",
+      "estimated_processing_time": "30-60 minutes",
+      "status": "pending",
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "1h"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 60.0
+    },
+    {
+      "symbol": "USDJPY",
+      "priority": "high",
+      "estimated_processing_time": "30-60 minutes",
+      "status": "pending",
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "1h"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 60.0
+    }
+  ],
+  "processing_status": "pending"
+}
