@@ -1,6 +1,6 @@
 {
-  "queue_timestamp": "2026-08-06T14:51:01.646188",
-  "queue_id": "batch_a_20260806_145101",
+  "queue_timestamp": "2026-08-06T17:37:29.123602",
+  "queue_id": "batch_a_20260806_173729",
   "priority": "high",
   "estimated_processing_time": "2-4 hours",
   "queue_items": [
@@ -10,15 +10,21 @@
       "estimated_processing_time": "30-60 minutes",
       "status": "pending",
       "providers": [
+        "mt5_fetched",
+        "mt5_pro",
         "unknown"
       ],
       "timeframes": [
-        "1h"
+        "unknown",
+        "D1",
+        "MN1",
+        "W1",
+        "5m"
       ],
       "formats": [
         "csv"
       ],
-      "quality_score": 60.0
+      "quality_score": 80.0
     },
     {
       "symbol": "EURCHF",
@@ -26,15 +32,20 @@
       "estimated_processing_time": "30-60 minutes",
       "status": "pending",
       "providers": [
-        "unknown"
+        "mt5_fetched",
+        "mt5_pro"
       ],
       "timeframes": [
-        "1h"
+        "unknown",
+        "D1",
+        "M5",
+        "MN1",
+        "W1"
       ],
       "formats": [
         "csv"
       ],
-      "quality_score": 60.0
+      "quality_score": 80.0
     },
     {
       "symbol": "EURGBP",
@@ -42,15 +53,20 @@
       "estimated_processing_time": "30-60 minutes",
       "status": "pending",
       "providers": [
-        "unknown"
+        "mt5_fetched",
+        "mt5_pro"
       ],
       "timeframes": [
-        "1h"
+        "unknown",
+        "D1",
+        "M5",
+        "MN1",
+        "W1"
       ],
       "formats": [
         "csv"
       ],
-      "quality_score": 60.0
+      "quality_score": 80.0
     },
     {
       "symbol": "EURJPY",
@@ -58,15 +74,20 @@
       "estimated_processing_time": "30-60 minutes",
       "status": "pending",
       "providers": [
-        "unknown"
+        "mt5_fetched",
+        "mt5_pro"
       ],
       "timeframes": [
-        "1h"
+        "unknown",
+        "D1",
+        "M5",
+        "MN1",
+        "W1"
       ],
       "formats": [
         "csv"
       ],
-      "quality_score": 60.0
+      "quality_score": 80.0
     },
     {
       "symbol": "EURUSD",
@@ -74,15 +95,19 @@
       "estimated_processing_time": "30-60 minutes",
       "status": "pending",
       "providers": [
+        "mt5_pro",
         "unknown"
       ],
       "timeframes": [
-        "1h"
+        "D1",
+        "MN1",
+        "W1",
+        "5m"
       ],
       "formats": [
         "csv"
       ],
-      "quality_score": 60.0
+      "quality_score": 80.0
     },
     {
       "symbol": "GBPCHF",
@@ -90,15 +115,21 @@
       "estimated_processing_time": "30-60 minutes",
       "status": "pending",
       "providers": [
+        "mt5_fetched",
+        "mt5_pro",
         "unknown"
       ],
       "timeframes": [
-        "1h"
+        "unknown",
+        "D1",
+        "MN1",
+        "W1",
+        "5m"
       ],
       "formats": [
         "csv"
       ],
-      "quality_score": 60.0
+      "quality_score": 80.0
     },
     {
       "symbol": "GBPJPY",
@@ -106,15 +137,21 @@
       "estimated_processing_time": "30-60 minutes",
       "status": "pending",
       "providers": [
+        "mt5_fetched",
+        "mt5_pro",
         "unknown"
       ],
       "timeframes": [
-        "1h"
+        "unknown",
+        "D1",
+        "MN1",
+        "W1",
+        "5m"
       ],
       "formats": [
         "csv"
       ],
-      "quality_score": 60.0
+      "quality_score": 80.0
     },
     {
       "symbol": "GBPUSD",
@@ -122,15 +159,21 @@
       "estimated_processing_time": "30-60 minutes",
       "status": "pending",
       "providers": [
+        "mt5_fetched",
+        "mt5_pro",
         "unknown"
       ],
       "timeframes": [
-        "1h"
+        "unknown",
+        "D1",
+        "MN1",
+        "W1",
+        "5m"
       ],
       "formats": [
         "csv"
       ],
-      "quality_score": 60.0
+      "quality_score": 80.0
     },
     {
       "symbol": "USDCHF",
@@ -138,15 +181,19 @@
       "estimated_processing_time": "30-60 minutes",
       "status": "pending",
       "providers": [
+        "mt5_pro",
         "unknown"
       ],
       "timeframes": [
-        "1h"
+        "D1",
+        "MN1",
+        "W1",
+        "5m"
       ],
       "formats": [
         "csv"
       ],
-      "quality_score": 60.0
+      "quality_score": 80.0
     },
     {
       "symbol": "USDJPY",
@@ -154,15 +201,21 @@
       "estimated_processing_time": "30-60 minutes",
       "status": "pending",
       "providers": [
+        "mt5_fetched",
+        "mt5_pro",
         "unknown"
       ],
       "timeframes": [
-        "1h"
+        "unknown",
+        "D1",
+        "MN1",
+        "W1",
+        "5m"
       ],
       "formats": [
         "csv"
       ],
-      "quality_score": 60.0
+      "quality_score": 80.0
     }
   ],
   "processing_status": "pending"

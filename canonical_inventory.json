@@ -1,29 +1,229 @@
 {
-  "inventory_timestamp": "2026-08-06T14:51:01.646188",
-  "total_files": 10,
+  "inventory_timestamp": "2026-08-06T17:37:29.122610",
+  "total_files": 255,
   "providers": [
-    "unknown"
+    "mt5_fetched",
+    "mt5_pro",
+    "unknown",
+    "rekey"
   ],
   "symbols": [
+    "AUDCAD",
+    "AUDCHF",
+    "AUDJPY",
+    "AUDNZD",
+    "AUDUSD",
+    "BCHUSD",
+    "BNBUSD",
+    "BTCUSD",
+    "CADCHF",
+    "CADJPY",
     "CHFJPY",
+    "ETHUSD",
+    "EURAUD",
+    "EURCAD",
     "EURCHF",
     "EURGBP",
     "EURJPY",
+    "EURNZD",
     "EURUSD",
+    "GBPAUD",
+    "GBPCAD",
     "GBPCHF",
     "GBPJPY",
+    "GBPNZD",
     "GBPUSD",
+    "LTCUSD",
+    "NZDCAD",
+    "NZDCHF",
+    "NZDJPY",
+    "NZDUSD",
+    "OILUSD",
+    "SOLUSD",
+    "USDCAD",
     "USDCHF",
-    "USDJPY"
+    "USDJPY",
+    "XAGUSD",
+    "XAUUSD",
+    "XLMUSD",
+    "XRPUSD",
+    "unknown"
   ],
   "timeframes": [
-    "1h"
+    "unknown",
+    "D1",
+    "M5",
+    "MN1",
+    "W1",
+    "5m",
+    "1h",
+    "M5_JUNE"
   ],
   "formats": [
-    "csv"
+    "csv",
+    "parquet"
   ],
   "quality_metrics": {
     "quality_scores": [
+      55.0,
+      60.0,
+      55.0,
+      60.0,
+      60.0,
+      55.0,
+      60.0,
+      55.0,
+      60.0,
+      60.0,
+      55.0,
+      60.0,
+      55.0,
+      60.0,
+      60.0,
+      55.0,
+      55.0,
+      55.0,
+      55.0,
+      60.0,
+      60.0,
+      60.0,
+      55.0,
+      55.0,
+      60.0,
+      55.0,
+      60.0,
+      60.0,
+      55.0,
+      60.0,
+      55.0,
+      60.0,
+      60.0,
+      55.0,
+      60.0,
+      55.0,
+      60.0,
+      60.0,
+      55.0,
+      55.0,
+      60.0,
+      60.0,
+      60.0,
+      55.0,
+      60.0,
+      55.0,
+      60.0,
+      60.0,
+      55.0,
+      60.0,
+      55.0,
+      60.0,
+      60.0,
+      55.0,
+      55.0,
+      55.0,
+      60.0,
+      55.0,
+      60.0,
+      60.0,
+      55.0,
+      60.0,
+      55.0,
+      60.0,
+      60.0,
+      55.0,
+      60.0,
+      55.0,
+      60.0,
+      60.0,
+      55.0,
+      55.0,
+      55.0,
+      55.0,
+      55.0,
+      60.0,
+      60.0,
+      60.0,
+      55.0,
+      55.0,
+      55.0,
+      60.0,
+      60.0,
+      60.0,
+      55.0,
+      55.0,
+      55.0,
+      55.0,
+      60.0,
+      60.0,
+      60.0,
+      55.0,
+      55.0,
+      60.0,
+      60.0,
+      60.0,
+      55.0,
+      55.0,
+      55.0,
+      55.0,
+      60.0,
+      60.0,
+      60.0,
+      55.0,
+      60.0,
+      60.0,
+      55.0,
+      55.0,
+      55.0,
+      60.0,
+      55.0,
+      60.0,
+      60.0,
+      55.0,
+      60.0,
+      55.0,
+      60.0,
+      60.0,
+      55.0,
+      60.0,
+      55.0,
+      60.0,
+      60.0,
+      55.0,
+      55.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      55.0,
+      60.0,
+      55.0,
+      60.0,
+      55.0,
+      55.0,
+      60.0,
+      55.0,
+      60.0,
+      60.0,
+      55.0,
+      60.0,
+      55.0,
+      55.0,
+      55.0,
+      60.0,
+      60.0,
+      60.0,
+      55.0,
+      55.0,
+      60.0,
+      60.0,
+      60.0,
+      55.0,
+      55.0,
+      55.0,
+      55.0,
+      55.0,
+      55.0,
       60.0,
       60.0,
       60.0,
@@ -33,129 +233,717 @@
       60.0,
       60.0,
       60.0,
-      60.0
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      55.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      60.0,
+      70.0,
+      70.0
     ],
-    "average_quality_score": 60.0
+    "average_quality_score": 58.549019607843135
   },
   "coverage_gaps": [],
   "symbol_details": {
-    "CHFJPY": {
+    "AUDCAD": {
       "providers": [
-        "unknown"
+        "mt5_fetched",
+        "mt5_pro"
       ],
       "timeframes": [
-        "1h"
+        "unknown",
+        "D1",
+        "M5",
+        "MN1",
+        "W1"
       ],
       "formats": [
         "csv"
       ],
-      "quality_score": 60.0
+      "quality_score": 50.0
+    },
+    "AUDCHF": {
+      "providers": [
+        "mt5_fetched",
+        "mt5_pro"
+      ],
+      "timeframes": [
+        "unknown",
+        "D1",
+        "M5",
+        "MN1",
+        "W1"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 50.0
+    },
+    "AUDJPY": {
+      "providers": [
+        "mt5_fetched",
+        "mt5_pro"
+      ],
+      "timeframes": [
+        "unknown",
+        "D1",
+        "M5",
+        "MN1",
+        "W1"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 50.0
+    },
+    "AUDNZD": {
+      "providers": [
+        "mt5_fetched",
+        "mt5_pro"
+      ],
+      "timeframes": [
+        "unknown",
+        "M5"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 45.0
+    },
+    "AUDUSD": {
+      "providers": [
+        "mt5_fetched",
+        "mt5_pro",
+        "unknown"
+      ],
+      "timeframes": [
+        "unknown",
+        "D1",
+        "MN1",
+        "W1",
+        "5m"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 50.0
+    },
+    "BCHUSD": {
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "5m"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 30.0
+    },
+    "BNBUSD": {
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "5m"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 30.0
+    },
+    "BTCUSD": {
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "unknown",
+        "5m"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 35.0
+    },
+    "CADCHF": {
+      "providers": [
+        "mt5_fetched",
+        "mt5_pro"
+      ],
+      "timeframes": [
+        "unknown",
+        "D1",
+        "M5",
+        "MN1",
+        "W1"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 50.0
+    },
+    "CADJPY": {
+      "providers": [
+        "mt5_fetched",
+        "mt5_pro"
+      ],
+      "timeframes": [
+        "unknown",
+        "D1",
+        "M5",
+        "MN1",
+        "W1"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 50.0
+    },
+    "CHFJPY": {
+      "providers": [
+        "mt5_fetched",
+        "mt5_pro",
+        "unknown"
+      ],
+      "timeframes": [
+        "unknown",
+        "D1",
+        "MN1",
+        "W1",
+        "5m"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 80.0
+    },
+    "ETHUSD": {
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "unknown",
+        "5m"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 35.0
+    },
+    "EURAUD": {
+      "providers": [
+        "mt5_fetched",
+        "mt5_pro"
+      ],
+      "timeframes": [
+        "unknown",
+        "D1",
+        "M5",
+        "MN1",
+        "W1"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 50.0
+    },
+    "EURCAD": {
+      "providers": [
+        "mt5_fetched",
+        "mt5_pro"
+      ],
+      "timeframes": [
+        "unknown",
+        "M5"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 45.0
     },
     "EURCHF": {
       "providers": [
-        "unknown"
+        "mt5_fetched",
+        "mt5_pro"
       ],
       "timeframes": [
-        "1h"
+        "unknown",
+        "D1",
+        "M5",
+        "MN1",
+        "W1"
       ],
       "formats": [
         "csv"
       ],
-      "quality_score": 60.0
+      "quality_score": 80.0
     },
     "EURGBP": {
       "providers": [
-        "unknown"
+        "mt5_fetched",
+        "mt5_pro"
       ],
       "timeframes": [
-        "1h"
+        "unknown",
+        "D1",
+        "M5",
+        "MN1",
+        "W1"
       ],
       "formats": [
         "csv"
       ],
-      "quality_score": 60.0
+      "quality_score": 80.0
     },
     "EURJPY": {
       "providers": [
-        "unknown"
+        "mt5_fetched",
+        "mt5_pro"
       ],
       "timeframes": [
-        "1h"
+        "unknown",
+        "D1",
+        "M5",
+        "MN1",
+        "W1"
       ],
       "formats": [
         "csv"
       ],
-      "quality_score": 60.0
+      "quality_score": 80.0
+    },
+    "EURNZD": {
+      "providers": [
+        "mt5_fetched",
+        "mt5_pro"
+      ],
+      "timeframes": [
+        "unknown",
+        "M5"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 45.0
     },
     "EURUSD": {
       "providers": [
+        "mt5_pro",
         "unknown"
       ],
       "timeframes": [
-        "1h"
+        "D1",
+        "MN1",
+        "W1",
+        "5m"
       ],
       "formats": [
         "csv"
       ],
-      "quality_score": 60.0
+      "quality_score": 80.0
+    },
+    "GBPAUD": {
+      "providers": [
+        "mt5_fetched",
+        "mt5_pro",
+        "unknown"
+      ],
+      "timeframes": [
+        "unknown",
+        "D1",
+        "MN1",
+        "W1",
+        "5m"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 50.0
+    },
+    "GBPCAD": {
+      "providers": [
+        "mt5_fetched",
+        "mt5_pro"
+      ],
+      "timeframes": [
+        "unknown",
+        "M5"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 45.0
     },
     "GBPCHF": {
       "providers": [
+        "mt5_fetched",
+        "mt5_pro",
         "unknown"
       ],
       "timeframes": [
-        "1h"
+        "unknown",
+        "D1",
+        "MN1",
+        "W1",
+        "5m"
       ],
       "formats": [
         "csv"
       ],
-      "quality_score": 60.0
+      "quality_score": 80.0
     },
     "GBPJPY": {
       "providers": [
+        "mt5_fetched",
+        "mt5_pro",
         "unknown"
       ],
       "timeframes": [
-        "1h"
+        "unknown",
+        "D1",
+        "MN1",
+        "W1",
+        "5m"
       ],
       "formats": [
         "csv"
       ],
-      "quality_score": 60.0
+      "quality_score": 80.0
+    },
+    "GBPNZD": {
+      "providers": [
+        "mt5_fetched",
+        "unknown"
+      ],
+      "timeframes": [
+        "unknown",
+        "5m"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 45.0
     },
     "GBPUSD": {
       "providers": [
+        "mt5_fetched",
+        "mt5_pro",
         "unknown"
       ],
       "timeframes": [
-        "1h"
+        "unknown",
+        "D1",
+        "MN1",
+        "W1",
+        "5m"
       ],
       "formats": [
         "csv"
       ],
-      "quality_score": 60.0
+      "quality_score": 80.0
+    },
+    "LTCUSD": {
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "5m"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 30.0
+    },
+    "NZDCAD": {
+      "providers": [
+        "mt5_fetched",
+        "mt5_pro"
+      ],
+      "timeframes": [
+        "unknown",
+        "D1",
+        "M5",
+        "MN1",
+        "W1"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 50.0
+    },
+    "NZDCHF": {
+      "providers": [
+        "mt5_fetched",
+        "mt5_pro"
+      ],
+      "timeframes": [
+        "unknown",
+        "D1",
+        "M5",
+        "MN1",
+        "W1"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 50.0
+    },
+    "NZDJPY": {
+      "providers": [
+        "mt5_fetched",
+        "mt5_pro"
+      ],
+      "timeframes": [
+        "unknown",
+        "D1",
+        "M5",
+        "MN1",
+        "W1"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 50.0
+    },
+    "NZDUSD": {
+      "providers": [
+        "mt5_fetched",
+        "mt5_pro",
+        "unknown"
+      ],
+      "timeframes": [
+        "unknown",
+        "D1",
+        "MN1",
+        "W1",
+        "5m"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 50.0
+    },
+    "OILUSD": {
+      "providers": [
+        "mt5_pro"
+      ],
+      "timeframes": [
+        "M5_JUNE"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 30.0
+    },
+    "SOLUSD": {
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "5m"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 30.0
+    },
+    "USDCAD": {
+      "providers": [
+        "mt5_fetched",
+        "mt5_pro"
+      ],
+      "timeframes": [
+        "unknown",
+        "D1",
+        "M5",
+        "MN1",
+        "W1"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 50.0
     },
     "USDCHF": {
       "providers": [
+        "mt5_pro",
         "unknown"
       ],
       "timeframes": [
-        "1h"
+        "D1",
+        "MN1",
+        "W1",
+        "5m"
       ],
       "formats": [
         "csv"
       ],
-      "quality_score": 60.0
+      "quality_score": 80.0
     },
     "USDJPY": {
+      "providers": [
+        "mt5_fetched",
+        "mt5_pro",
+        "unknown"
+      ],
+      "timeframes": [
+        "unknown",
+        "D1",
+        "MN1",
+        "W1",
+        "5m"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 80.0
+    },
+    "XAGUSD": {
+      "providers": [
+        "mt5_fetched",
+        "unknown"
+      ],
+      "timeframes": [
+        "unknown",
+        "5m"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 45.0
+    },
+    "XAUUSD": {
+      "providers": [
+        "mt5_fetched",
+        "unknown"
+      ],
+      "timeframes": [
+        "unknown",
+        "5m"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 45.0
+    },
+    "XLMUSD": {
       "providers": [
         "unknown"
       ],
       "timeframes": [
-        "1h"
+        "5m"
       ],
       "formats": [
         "csv"
+      ],
+      "quality_score": 30.0
+    },
+    "XRPUSD": {
+      "providers": [
+        "unknown"
+      ],
+      "timeframes": [
+        "5m"
+      ],
+      "formats": [
+        "csv"
+      ],
+      "quality_score": 30.0
+    },
+    "unknown": {
+      "providers": [
+        "mt5_pro",
+        "unknown",
+        "rekey"
+      ],
+      "timeframes": [
+        "unknown",
+        "5m",
+        "1h"
+      ],
+      "formats": [
+        "csv",
+        "parquet"
       ],
       "quality_score": 60.0
     }

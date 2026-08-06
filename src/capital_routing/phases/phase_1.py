@@ -187,6 +187,10 @@ class Phase1DataDiscovery:
             return 'oanda'
         elif 'dukascopy' in file_name:
             return 'dukascopy'
+        elif 'pro' in file_name or '_pro_' in file_name:
+            return 'mt5_pro'
+        elif 'fetched' in file_name:
+            return 'mt5_fetched'
         else:
             return 'unknown'
     
@@ -245,6 +249,8 @@ class Phase1DataDiscovery:
             r'.*_(\d+)min\.csv$',  # SYMBOL_5min.csv
             r'.*_(\d+)hour\.csv$',  # SYMBOL_1hour.csv
             r'.*_(\d+)day\.csv$',  # SYMBOL_1day.csv
+            r'.*_PRO_(\w+)\.csv$',  # SYMBOL_PRO_D1.csv, SYMBOL_PRO_M5.csv, etc.
+            r'.*_M(\d+)\.csv$',  # SYMBOL_M5.csv
         ]
         
         for pattern in timeframe_patterns:
@@ -261,6 +267,20 @@ class Phase1DataDiscovery:
                     return f'{timeframe}w'
                 elif pattern.endswith('M\.csv$'):
                     return f'{timeframe}M'
+                elif pattern.endswith('PRO_(\w+)\.csv$'):
+                    # Handle PRO_D1, PRO_M5, PRO_MN1, PRO_W1
+                    tf = timeframe.upper()
+                    if tf == 'D1':
+                        return 'D1'
+                    elif tf == 'W1':
+                        return 'W1'
+                    elif tf == 'MN1':
+                        return 'MN1'
+                    elif tf.startswith('M'):
+                        return tf
+                    return tf
+                elif pattern.endswith('M(\d+)\.csv$'):
+                    return f'{timeframe}m'
         
         # Default to unknown
         return 'unknown'
