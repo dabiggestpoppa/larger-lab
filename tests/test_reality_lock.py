@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from src.capital_routing.backend.reality_lock import (
+from capital_routing.backend.reality_lock import (
     _validate_artifact,
     ready_for_phase_1,
     get_failure_reasons,
@@ -64,7 +64,7 @@ class TestValidateArtifact:
             temp_path = Path(f.name)
         
         try:
-            schema = {"type": "object", "properties": {"correct_type": {"type": "string"}}}
+            schema = {"type": "object", "required": ["correct_type"], "properties": {"correct_type": {"type": "string"}}}
             is_valid, error = _validate_artifact(temp_path, schema)
             assert is_valid == False
             assert "Schema validation failed" in error
@@ -84,6 +84,10 @@ class TestReadyForPhase1:
             # Create artifacts directory
             artifacts_dir = temp_path / "artifacts"
             artifacts_dir.mkdir()
+            
+            # Create evidence directory
+            evidence_dir = temp_path / "evidence"
+            evidence_dir.mkdir()
             
             # Create valid Book 2 artifact
             book_2_path = artifacts_dir / "book_2_nautilus_evidence.json"
@@ -123,12 +127,16 @@ class TestReadyForPhase1:
             original_book_2_path = reality_lock_module.BOOK_2_PATH
             original_book_3_path = reality_lock_module.BOOK_3_PATH
             original_approval_path = reality_lock_module.APPROVAL_ARTIFACT_PATH
+            original_evidence_repo = reality_lock_module.EVIDENCE_REPO_PATH
+            original_repo_root = reality_lock_module.REPO_ROOT
             
             try:
                 reality_lock_module.ARTIFACTS_DIR = artifacts_dir
                 reality_lock_module.BOOK_2_PATH = book_2_path
                 reality_lock_module.BOOK_3_PATH = book_3_path
                 reality_lock_module.APPROVAL_ARTIFACT_PATH = approval_path
+                reality_lock_module.EVIDENCE_REPO_PATH = evidence_dir
+                reality_lock_module.REPO_ROOT = temp_path
                 
                 # Test the function
                 result = ready_for_phase_1()
@@ -139,6 +147,8 @@ class TestReadyForPhase1:
                 reality_lock_module.BOOK_2_PATH = original_book_2_path
                 reality_lock_module.BOOK_3_PATH = original_book_3_path
                 reality_lock_module.APPROVAL_ARTIFACT_PATH = original_approval_path
+                reality_lock_module.EVIDENCE_REPO_PATH = original_evidence_repo
+                reality_lock_module.REPO_ROOT = original_repo_root
 
     def test_ready_for_phase_1_missing_artifact(self):
         """Test that missing artifacts cause failure."""
@@ -148,17 +158,23 @@ class TestReadyForPhase1:
         original_book_2_path = reality_lock_module.BOOK_2_PATH
         original_book_3_path = reality_lock_module.BOOK_3_PATH
         original_approval_path = reality_lock_module.APPROVAL_ARTIFACT_PATH
+        original_evidence_repo = reality_lock_module.EVIDENCE_REPO_PATH
+        original_repo_root = reality_lock_module.REPO_ROOT
         
         try:
             # Create artifacts directory but don't create artifacts
             with tempfile.TemporaryDirectory() as temp_dir:
                 artifacts_dir = Path(temp_dir) / "artifacts"
                 artifacts_dir.mkdir()
+                evidence_dir = Path(temp_dir) / "evidence"
+                evidence_dir.mkdir()
                 
                 reality_lock_module.ARTIFACTS_DIR = artifacts_dir
                 reality_lock_module.BOOK_2_PATH = artifacts_dir / "book_2_nautilus_evidence.json"
                 reality_lock_module.BOOK_3_PATH = artifacts_dir / "book_3_classification.json"
                 reality_lock_module.APPROVAL_ARTIFACT_PATH = artifacts_dir / "independent_approval.json"
+                reality_lock_module.EVIDENCE_REPO_PATH = evidence_dir
+                reality_lock_module.REPO_ROOT = Path(temp_dir)
                 
                 # Test the function
                 result = ready_for_phase_1()
@@ -174,6 +190,8 @@ class TestReadyForPhase1:
             reality_lock_module.BOOK_2_PATH = original_book_2_path
             reality_lock_module.BOOK_3_PATH = original_book_3_path
             reality_lock_module.APPROVAL_ARTIFACT_PATH = original_approval_path
+            reality_lock_module.EVIDENCE_REPO_PATH = original_evidence_repo
+            reality_lock_module.REPO_ROOT = original_repo_root
 
     def test_ready_for_phase_1_invalid_artifact(self):
         """Test that invalid artifacts cause failure."""
@@ -184,6 +202,8 @@ class TestReadyForPhase1:
             # Create artifacts directory
             artifacts_dir = temp_path / "artifacts"
             artifacts_dir.mkdir()
+            evidence_dir = temp_path / "evidence"
+            evidence_dir.mkdir()
             
             # Create invalid Book 2 artifact (wrong schema)
             book_2_path = artifacts_dir / "book_2_nautilus_evidence.json"
@@ -219,12 +239,16 @@ class TestReadyForPhase1:
             original_book_2_path = reality_lock_module.BOOK_2_PATH
             original_book_3_path = reality_lock_module.BOOK_3_PATH
             original_approval_path = reality_lock_module.APPROVAL_ARTIFACT_PATH
+            original_evidence_repo = reality_lock_module.EVIDENCE_REPO_PATH
+            original_repo_root = reality_lock_module.REPO_ROOT
             
             try:
                 reality_lock_module.ARTIFACTS_DIR = artifacts_dir
                 reality_lock_module.BOOK_2_PATH = book_2_path
                 reality_lock_module.BOOK_3_PATH = book_3_path
                 reality_lock_module.APPROVAL_ARTIFACT_PATH = approval_path
+                reality_lock_module.EVIDENCE_REPO_PATH = evidence_dir
+                reality_lock_module.REPO_ROOT = temp_path
                 
                 # Test the function
                 result = ready_for_phase_1()
@@ -240,6 +264,8 @@ class TestReadyForPhase1:
                 reality_lock_module.BOOK_2_PATH = original_book_2_path
                 reality_lock_module.BOOK_3_PATH = original_book_3_path
                 reality_lock_module.APPROVAL_ARTIFACT_PATH = original_approval_path
+                reality_lock_module.EVIDENCE_REPO_PATH = original_evidence_repo
+                reality_lock_module.REPO_ROOT = original_repo_root
 
 
 class TestGetFailureReasons:
@@ -254,6 +280,8 @@ class TestGetFailureReasons:
             # Create artifacts directory
             artifacts_dir = temp_path / "artifacts"
             artifacts_dir.mkdir()
+            evidence_dir = temp_path / "evidence"
+            evidence_dir.mkdir()
             
             # Create valid Book 2 artifact
             book_2_path = artifacts_dir / "book_2_nautilus_evidence.json"
@@ -293,12 +321,16 @@ class TestGetFailureReasons:
             original_book_2_path = reality_lock_module.BOOK_2_PATH
             original_book_3_path = reality_lock_module.BOOK_3_PATH
             original_approval_path = reality_lock_module.APPROVAL_ARTIFACT_PATH
+            original_evidence_repo = reality_lock_module.EVIDENCE_REPO_PATH
+            original_repo_root = reality_lock_module.REPO_ROOT
             
             try:
                 reality_lock_module.ARTIFACTS_DIR = artifacts_dir
                 reality_lock_module.BOOK_2_PATH = book_2_path
                 reality_lock_module.BOOK_3_PATH = book_3_path
                 reality_lock_module.APPROVAL_ARTIFACT_PATH = approval_path
+                reality_lock_module.EVIDENCE_REPO_PATH = evidence_dir
+                reality_lock_module.REPO_ROOT = temp_path
                 
                 # Test the function
                 reasons = get_failure_reasons()
@@ -309,6 +341,8 @@ class TestGetFailureReasons:
                 reality_lock_module.BOOK_2_PATH = original_book_2_path
                 reality_lock_module.BOOK_3_PATH = original_book_3_path
                 reality_lock_module.APPROVAL_ARTIFACT_PATH = original_approval_path
+                reality_lock_module.EVIDENCE_REPO_PATH = original_evidence_repo
+                reality_lock_module.REPO_ROOT = original_repo_root
 
     def test_get_failure_reasons_missing_artifact(self):
         """Test that missing artifacts return appropriate failure reasons."""
@@ -318,17 +352,23 @@ class TestGetFailureReasons:
         original_book_2_path = reality_lock_module.BOOK_2_PATH
         original_book_3_path = reality_lock_module.BOOK_3_PATH
         original_approval_path = reality_lock_module.APPROVAL_ARTIFACT_PATH
+        original_evidence_repo = reality_lock_module.EVIDENCE_REPO_PATH
+        original_repo_root = reality_lock_module.REPO_ROOT
         
         try:
             # Create artifacts directory but don't create artifacts
             with tempfile.TemporaryDirectory() as temp_dir:
                 artifacts_dir = Path(temp_dir) / "artifacts"
                 artifacts_dir.mkdir()
+                evidence_dir = Path(temp_dir) / "evidence"
+                evidence_dir.mkdir()
                 
                 reality_lock_module.ARTIFACTS_DIR = artifacts_dir
                 reality_lock_module.BOOK_2_PATH = artifacts_dir / "book_2_nautilus_evidence.json"
                 reality_lock_module.BOOK_3_PATH = artifacts_dir / "book_3_classification.json"
                 reality_lock_module.APPROVAL_ARTIFACT_PATH = artifacts_dir / "independent_approval.json"
+                reality_lock_module.EVIDENCE_REPO_PATH = evidence_dir
+                reality_lock_module.REPO_ROOT = Path(temp_dir)
                 
                 # Test the function
                 reasons = get_failure_reasons()
@@ -340,6 +380,8 @@ class TestGetFailureReasons:
             reality_lock_module.BOOK_2_PATH = original_book_2_path
             reality_lock_module.BOOK_3_PATH = original_book_3_path
             reality_lock_module.APPROVAL_ARTIFACT_PATH = original_approval_path
+            reality_lock_module.EVIDENCE_REPO_PATH = original_evidence_repo
+            reality_lock_module.REPO_ROOT = original_repo_root
 
 
 if __name__ == "__main__":
