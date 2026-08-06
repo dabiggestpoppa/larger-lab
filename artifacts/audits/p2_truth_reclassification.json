@@ -1,0 +1,32 @@
+{
+  "task": "CR-P2-REAL-DATA-REPAIR-01",
+  "timestamp": "2026-08-06T15:00:00Z",
+  "parent_commit": "cf01b754d22656b6554259e9fb27272e3ff7573e",
+  "capital_routing_commit": "03d2bf9d803bdcccfba44cb40359cb6cf76a7ca4",
+  "assessment": {
+    "phase_2_scaffold": "implemented",
+    "phase_2_real_acquisition": "not_complete",
+    "phase_2_real_normalization": "not_complete",
+    "batch_a_queue": "pending",
+    "synthetic_output": "test_only_untrusted"
+  },
+  "issues_found": [
+    "src/capital_routing/phases/phase_2.py generates synthetic random market data using NumPy",
+    "Batch A queue reports all symbols as pending with provider=unknown",
+    "No real raw files exist or are preserved",
+    "No checksums recorded",
+    "No source provenance retained",
+    "Synthetic data presented as historical data"
+  ],
+  "required_actions": [
+    "Remove synthetic production path from phase_2.py",
+    "Move synthetic generators to tests/fixtures/",
+    "Implement real raw-data acquisition from MT5 and local data library",
+    "Implement canonical normalization with provenance",
+    "Create quality validation and gap analysis",
+    "Produce real output files with manifests",
+    "Implement fail-closed gate",
+    "Add comprehensive tests",
+    "Fix CI workflow"
+  ]
+}

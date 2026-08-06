@@ -11,6 +11,8 @@ from .schema_detection import SchemaDetector
 from .provider_registry import ProviderRegistry
 from .symbol_aliases import SymbolAliases
 from .basic_checks import BasicChecks
+from .mt5_adapter import MT5Adapter, MT5ExportConfig, MT5ExportResult, create_batch_a_mt5_queue
+from .normalize import OHLCNormalizer, NormalizationConfig, NormalizationResult, create_batch_a_normalization_configs
 
 __all__ = [
     'DataDiscoverer',
@@ -18,4 +20,12 @@ __all__ = [
     'ProviderRegistry',
     'SymbolAliases',
     'BasicChecks',
+    'MT5Adapter',
+    'MT5ExportConfig',
+    'MT5ExportResult',
+    'create_batch_a_mt5_queue',
+    'OHLCNormalizer',
+    'NormalizationConfig',
+    'NormalizationResult',
+    'create_batch_a_normalization_configs',
 ]

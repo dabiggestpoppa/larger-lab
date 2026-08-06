@@ -1,103 +1,28 @@
 """
-Phase 2: Data Processing Pipeline for Capital Routing Research System.
+Phase 2: Real Data Acquisition and Normalization Pipeline
 
-This module implements the complete Phase 2 data processing pipeline,
-including data validation, transformation, and enrichment.
+This module implements the Phase 2 pipeline for real market data acquisition
+and normalization. It replaces the synthetic data generation with a truthful,
+reproducible pipeline using actual historical data files.
+
+NON-NEGOTIABLE RULES:
+1. Production Phase 2 must never generate random OHLC or volume.
+2. Synthetic data is allowed only under tests/fixtures/ and must be clearly labeled synthetic.
+3. No Phase 2 PASS unless real raw files exist and their hashes are recorded.
+4. Do not mark a symbol processed merely because it exists in the acquisition queue.
+5. Provider, timezone and price side may not default to "unknown" while still passing the gate.
+6. Do not forward-fill OHLC bars.
+7. Preserve raw source files unchanged.
+8. Every normalized file must retain source provenance.
 """
 
-import os
-import json
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Any, Optional, Set
-from datetime import datetime, timedelta
-from pathlib import Path
+from .phase_2_real import Phase2RealDataPipeline, Phase2Config
 
-from ..ingestion import (
-    DataDiscoverer,
-    SchemaDetector,
-    ProviderRegistry,
-    SymbolAliases,
-    BasicChecks,
-)
+# Re-export for backward compatibility
+__all__ = ['Phase2RealDataPipeline', 'Phase2Config']
 
-
-class Phase2DataProcessing:
-    """Phase 2 data processing pipeline for Capital Routing Research System."""
-    
-    def __init__(self, config: Dict[str, Any]):
-        """
-        Initialize Phase 2 data processing pipeline.
-        
-        Args:
-            config: Configuration dictionary containing pipeline settings
-        """
-        self.config = config
-        self.provider_registry = ProviderRegistry()
-        self.symbol_aliases = SymbolAliases()
-        self.schema_detector = SchemaDetector()
-        self.basic_checks = BasicChecks()
-        
-        # Phase 2 specific settings
-        self.processed_data_path = config.get(
-            'processed_data_path',
-            'processed_data.json'
-        )
-        self.validation_report_path = config.get(
-            'validation_report_path',
-            'validation_report.json'
-        )
-        self.transformation_report_path = config.get(
-            'transformation_report_path',
-            'transformation_report.json'
-        )
-        
-        # Initialize data discoverer
-        self.data_discoverer = DataDiscoverer(config)
-    
-    def run_phase_2(self, phase_1_results: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Run the complete Phase 2 data processing pipeline.
-        
-        Args:
-            phase_1_results: Results from Phase 1
-            
-        Returns:
-            Dictionary containing Phase 2 results
-        """
-        print("Starting Phase 2: Data Processing Pipeline")
-        print("=" * 50)
-        
-        # Step 1: Load canonical inventory
-        print("Step 1: Loading canonical inventory...")
-        canonical_inventory = phase_1_results.get('canonical_inventory', {})
-        
-        # Step 2: Load Batch A queue
-        print("Step 2: Loading Batch A queue...")
-        batch_a_queue = phase_1_results.get('batch_a_queue', {})
-        
-        # Step 3: Process data files
-        print("Step 3: Processing data files...")
-        processed_data = self._process_data_files(canonical_inventory, batch_a_queue)
-        
-        # Step 4: Validate processed data
-        print("Step 4: Validating processed data...")
-        validation_report = self._validate_processed_data(processed_data)
-        
-        # Step 5: Transform processed data
-        print("Step 5: Transforming processed data...")
-        transformation_report = self._transform_processed_data(processed_data)
-        
-        # Step 6: Save results
-        print("Step 6: Saving results...")
-        self._save_phase_2_results(
-            processed_data, validation_report, transformation_report
-        )
-        
-        # Compile Phase 2 results
-        phase_2_results = {
-            'phase': '2',
-            'phase_name': 'Data Processing',
+# Alias for backward compatibility
+Phase2DataProcessing = Phase2RealDataPipeline
             'timestamp': datetime.now().isoformat(),
             'processed_data_count': len(processed_data.get('processed_files', [])),
             'processed_data': processed_data,
