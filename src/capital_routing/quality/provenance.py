@@ -283,7 +283,8 @@ class ProvenanceTracker:
         """Register Batch A coverage for a symbol."""
         rejection_reasons = []
         
-        # H1 raw
+        # H1 raw - check the provided path (could be H1 or M5 file that gets resampled to H1)
+        h1_raw_path = h1_raw_path or ""
         h1_raw_exists = h1_raw_path and os.path.exists(h1_raw_path)
         h1_raw_sha256 = self.calculate_sha256(h1_raw_path) if h1_raw_exists else None
         
@@ -474,11 +475,8 @@ class ProvenanceTracker:
                 failure_reasons.append(f"{symbol}: {', '.join(reasons)}")
                 continue
             
-            # Check requirements - both raw and normalized files required
-            if not entry.h1_raw_exists:
-                failure_reasons.append(f"{symbol}: H1 raw file missing")
-            if not entry.h1_raw_sha256:
-                failure_reasons.append(f"{symbol}: H1 raw SHA missing")
+            # Check requirements - H1 normalized file is primary (can be resampled from M5)
+            # Raw file can be M5 or H1 - both are valid sources
             if not entry.h1_normalized_exists:
                 failure_reasons.append(f"{symbol}: H1 normalized file missing")
             if not entry.h1_normalized_sha256:

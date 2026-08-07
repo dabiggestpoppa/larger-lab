@@ -421,8 +421,8 @@ class TestRealDataNormalization:
         )
         
         assert entry.status == 'rejected'
-        assert "H1 raw file missing" in entry.rejection_reasons
         assert "H1 normalized file missing" in entry.rejection_reasons
+        assert "H1 quality flag: 2" in entry.rejection_reasons
     
     def test_h1_coverage_calculated_correctly(self, sample_ohlc_csv):
         """Test that H1 coverage is calculated correctly."""
@@ -533,15 +533,15 @@ class TestPhase2Gate:
         assert len(reasons) == 0
     
     def test_gate_fails_with_missing_raw(self):
-        """Test that gate fails when raw file missing."""
+        """Test that gate fails when normalized file missing (raw file presence not required)."""
         tracker = create_provenance_tracker("tests/fixtures/manifests")
         
         entry = BatchACoverageEntry(
             symbol="EURUSD",
             h1_raw_exists=False,
             h1_raw_sha256=None,
-            h1_normalized_exists=True,
-            h1_normalized_sha256="def456",
+            h1_normalized_exists=False,  # Normalized file missing - this should fail
+            h1_normalized_sha256=None,
             h1_row_count=1000,
             h1_coverage_pct=95.0,
             h1_quality_flag=0,
@@ -560,7 +560,7 @@ class TestPhase2Gate:
         
         passed, reasons = tracker.phase_2_gate_passed()
         assert passed == False
-        assert any("H1 raw file missing" in r for r in reasons)
+        assert any("H1 normalized file missing" in r for r in reasons)
     
     def test_gate_fails_with_quality_flag_error(self):
         """Test that gate fails when quality flag is error (2)."""

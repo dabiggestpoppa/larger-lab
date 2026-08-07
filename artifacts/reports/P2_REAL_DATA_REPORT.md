@@ -1,6 +1,6 @@
 # Phase 2 Real Data Acquisition and Normalization Report
 
-**Generated:** 2026-08-07T09:22:22.750529
+**Generated:** 2026-08-07T15:09:17.703020
 **Pipeline Version:** 1.0
 
 ## Executive Summary
@@ -91,7 +91,7 @@ None
 - Target timezone: UTC
 - Price side: bid
 - Source timezone: UTC
-- Provider: MetaQuotes-Demo
+- Provider: mt5_pro
 
 ## Gate Decision
 

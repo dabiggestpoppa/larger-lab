@@ -41,7 +41,7 @@ class Phase2Config:
     manifests_dir: str = "data/manifests"
     
     # MT5 settings
-    mt5_provider: str = "MetaQuotes-Demo"
+    mt5_provider: str = "mt5_pro"
     mt5_timezone: str = "UTC"
     mt5_price_side: str = "bid"
     mt5_start_date_h1: str = "2022-01-01"
@@ -345,9 +345,9 @@ class Phase2RealDataPipeline:
         
         for result in self.normalization_results:
             if result.success:
-                print(f"  ✓ {result.config.symbol} {result.config.timeframe}: {result.row_count} rows")
+                print(f"  [OK] {result.config.symbol} {result.config.timeframe}: {result.row_count} rows")
             else:
-                print(f"  ✗ {result.config.symbol} {result.config.timeframe}: {result.error_message}")
+                print(f"  [FAIL] {result.config.symbol} {result.config.timeframe}: {result.error_message}")
     
     def _validate_normalized_data(self) -> None:
         """Validate all normalized files."""
@@ -370,13 +370,13 @@ class Phase2RealDataPipeline:
                     self.validation_results.append(result)
                     
                     if result.quality_flag == 2:
-                        print(f"  ✗ {symbol} {timeframe}: ERROR - {result.issues}")
+                        print(f"  [ERROR] {symbol} {timeframe}: ERROR - {result.issues}")
                     elif result.quality_flag == 1:
-                        print(f"  ⚠ {symbol} {timeframe}: WARNING - {result.issues}")
+                        print(f"  [WARN] {symbol} {timeframe}: WARNING - {result.issues}")
                     else:
-                        print(f"  ✓ {symbol} {timeframe}: OK ({result.coverage_pct:.1f}% coverage)")
+                        print(f"  [OK] {symbol} {timeframe}: OK ({result.coverage_pct:.1f}% coverage)")
                 except Exception as e:
-                    print(f"  ✗ {symbol} {timeframe}: Validation error - {e}")
+                    print(f"  [FAIL] {symbol} {timeframe}: Validation error - {e}")
     
     def _analyze_gaps(self) -> None:
         """Analyze gaps in normalized data."""
@@ -399,23 +399,29 @@ class Phase2RealDataPipeline:
                     self.gap_results.append(result)
                     
                     if result.unexplained_gaps:
-                        print(f"  ⚠ {symbol} {timeframe}: {len(result.unexplained_gaps)} unexplained gaps")
+                        print(f"  [WARN] {symbol} {timeframe}: {len(result.unexplained_gaps)} unexplained gaps")
                     else:
-                        print(f"  ✓ {symbol} {timeframe}: No unexplained gaps ({result.coverage_pct:.1f}% coverage)")
+                        print(f"  [OK] {symbol} {timeframe}: No unexplained gaps ({result.coverage_pct:.1f}% coverage)")
                 except Exception as e:
-                    print(f"  ✗ {symbol} {timeframe}: Gap analysis error - {e}")
+                    print(f"  [FAIL] {symbol} {timeframe}: Gap analysis error - {e}")
     
     def _register_batch_a_coverage(self) -> None:
         """Register Batch A coverage for all symbols."""
         for symbol in self.config.batch_a_symbols:
+            # Check for H1 raw file first, then M5 raw file (which gets resampled to H1)
             h1_raw = os.path.join(self.config.raw_data_base, self.config.mt5_provider, symbol, f"{symbol}_H1.csv")
+            m5_raw = os.path.join(self.config.raw_data_base, self.config.mt5_provider, symbol, f"{symbol}_M5.csv")
+            
+            # Use H1 if exists, otherwise M5 (will be resampled to H1)
+            h1_raw_path = h1_raw if os.path.exists(h1_raw) else (m5_raw if os.path.exists(m5_raw) else None)
+            
             h1_norm = os.path.join(self.config.normalized_base, "h1", f"{symbol}_H1.parquet")
             d1_raw = os.path.join(self.config.raw_data_base, self.config.mt5_provider, symbol, f"{symbol}_D1.csv")
             d1_norm = os.path.join(self.config.normalized_base, "d1", f"{symbol}_D1.parquet")
             
             entry = self.provenance.register_batch_a_coverage(
                 symbol=symbol,
-                h1_raw_path=h1_raw if os.path.exists(h1_raw) else None,
+                h1_raw_path=h1_raw_path,
                 h1_norm_path=h1_norm if os.path.exists(h1_norm) else None,
                 d1_raw_path=d1_raw if os.path.exists(d1_raw) else None,
                 d1_norm_path=d1_norm if os.path.exists(d1_norm) else None,
@@ -426,7 +432,7 @@ class Phase2RealDataPipeline:
             
             self.batch_a_coverage.append(entry)
             
-            status_icon = "✓" if entry.status == 'accepted' else "✗"
+            status_icon = "[OK]" if entry.status == 'accepted' else "[FAIL]"
             print(f"  {status_icon} {symbol}: {entry.status}")
             if entry.rejection_reasons:
                 for reason in entry.rejection_reasons:
