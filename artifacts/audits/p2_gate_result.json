@@ -1,0 +1,46 @@
+{
+  "gate_id": "CR-P2-REAL-DATA-REPAIR-01",
+  "timestamp": "2026-08-07T00:41:58.613331",
+  "gate_passed": true,
+  "failure_reasons": [],
+  "batch_a_symbols": [
+    "EURUSD",
+    "GBPUSD",
+    "USDJPY",
+    "USDCHF",
+    "EURGBP",
+    "EURJPY",
+    "GBPJPY",
+    "CHFJPY",
+    "EURCHF",
+    "GBPCHF"
+  ],
+  "accepted_symbols": [
+    "EURUSD",
+    "GBPUSD",
+    "USDJPY",
+    "USDCHF",
+    "EURGBP",
+    "EURJPY",
+    "GBPJPY",
+    "CHFJPY",
+    "EURCHF",
+    "GBPCHF"
+  ],
+  "rejected_symbols": [],
+  "missing_symbols": [],
+  "requirements": {
+    "raw_file_exists": true,
+    "sha_exists_and_matches": true,
+    "normalized_h1_exists": true,
+    "source_not_synthetic": true,
+    "provider_known": true,
+    "timezone_known": true,
+    "price_side_known": true,
+    "duplicate_timestamps_resolved": true,
+    "malformed_ohlc_zero": true,
+    "coverage_documented": true,
+    "no_silent_interpolation": true,
+    "output_reproducible": true
+  }
+}

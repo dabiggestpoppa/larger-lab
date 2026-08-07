@@ -249,28 +249,57 @@ class Phase2RealDataPipeline:
         print(f"  Total export jobs: {len(adapter.export_queue)}")
     
     def _discover_raw_files(self, phase_1_results: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Discover existing raw data files."""
-        # Use Phase 1 data discoverer
-        discoverer_config = {
-            'scan_directories': [self.config.raw_data_base],
-            'supported_extensions': ['.csv', '.parquet', '.zip'],
-            'max_file_size': 100 * 1024 * 1024
-        }
-        discoverer = DataDiscoverer(discoverer_config)
-        discovered = discoverer.discover_files()
+        """Discover existing raw data files from quant-lab data directory."""
+        all_discovered = []
         
-        # Enhance with provider info from directory structure
-        for file_meta in discovered:
-            file_path = file_meta.get('file_path', '')
-            # Extract provider from path: data/raw/<provider>/<symbol>/<file>
-            parts = Path(file_path).parts
-            if 'raw' in parts:
-                idx = parts.index('raw')
-                if idx + 1 < len(parts):
-                    file_meta['provider'] = parts[idx + 1]
+        # Discover from quant-lab data directory (real MT5 data)
+        quant_lab_data = "C:/Users/wifik/Desktop/projects/larger-lab/quant-lab/data"
+        if os.path.exists(quant_lab_data):
+            discoverer_config = {
+                'scan_directories': [quant_lab_data],
+                'supported_extensions': ['.csv', '.parquet', '.zip'],
+                'max_file_size': 100 * 1024 * 1024
+            }
+            discoverer = DataDiscoverer(discoverer_config)
+            discovered = discoverer.discover_files()
+            
+            for file_meta in discovered:
+                file_path = file_meta.get('file_path', '')
+                file_name = os.path.basename(file_path).lower()
+                
+                # Determine provider from filename
+                if 'fetched' in file_name:
+                    file_meta['provider'] = 'mt5_fetched'
+                elif '_pro_' in file_name or file_name.endswith('_pro.csv') or 'pro_' in file_name:
+                    file_meta['provider'] = 'mt5_pro'
+                else:
+                    file_meta['provider'] = 'mt5_unknown'
+                
+                # Copy file to raw data directory structure for preservation
+                symbol = file_meta.get('symbol', 'unknown')
+                timeframe = file_meta.get('timeframe', 'unknown')
+                provider = file_meta.get('provider', 'mt5_unknown')
+                
+                if symbol in self.config.batch_a_symbols:
+                    # Create target directory
+                    target_dir = Path(self.config.raw_data_base) / provider / symbol
+                    target_dir.mkdir(parents=True, exist_ok=True)
+                    
+                    # Copy file preserving original
+                    target_file = target_dir / os.path.basename(file_path)
+                    if not target_file.exists():
+                        import shutil
+                        shutil.copy2(file_path, target_file)
+                        print(f"  Copied {file_path} -> {target_file}")
+                    
+                    # Update file_meta to point to preserved copy
+                    file_meta['file_path'] = str(target_file)
+                    file_meta['original_source'] = file_path
+            
+            all_discovered.extend(discovered)
         
-        print(f"  Discovered {len(discovered)} raw files")
-        return discovered
+        print(f"  Discovered {len(all_discovered)} raw files total")
+        return all_discovered
     
     def _register_raw_files(self, raw_files: List[Dict[str, Any]]) -> None:
         """Register raw files with provenance tracker."""
@@ -429,11 +458,31 @@ class Phase2RealDataPipeline:
         quality_df.to_csv(self.config.quality_report_path, index=False)
         
         # 2. Normalization report JSON
+        import numpy as np
+        
+        def convert_to_serializable(obj):
+            """Convert numpy types to Python native types for JSON serialization."""
+            if isinstance(obj, (np.integer, np.int64, np.int32)):
+                return int(obj)
+            elif isinstance(obj, (np.floating, np.float64, np.float32)):
+                return float(obj)
+            elif isinstance(obj, np.ndarray):
+                return obj.tolist()
+            elif isinstance(obj, dict):
+                return {k: convert_to_serializable(v) for k, v in obj.items()}
+            elif isinstance(obj, list):
+                return [convert_to_serializable(v) for v in obj]
+            elif isinstance(obj, tuple):
+                return tuple(convert_to_serializable(v) for v in obj)
+            elif hasattr(obj, 'item'):  # numpy scalar
+                return obj.item()
+            return obj
+        
         norm_report = {
             "generated_at": datetime.now().isoformat(),
-            "normalization_results": [r.to_dict() for r in self.normalization_results],
-            "validation_results": [r.to_dict() for r in self.validation_results],
-            "gap_results": [r.to_dict() for r in self.gap_results]
+            "normalization_results": [convert_to_serializable(r.to_dict()) for r in self.normalization_results],
+            "validation_results": [convert_to_serializable(r.to_dict()) for r in self.validation_results],
+            "gap_results": [convert_to_serializable(r.to_dict()) for r in self.gap_results]
         }
         with open(self.config.normalization_report_path, 'w') as f:
             json.dump(norm_report, f, indent=2)

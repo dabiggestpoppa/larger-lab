@@ -140,6 +140,9 @@ class OHLCNormalizer:
             # Load raw data
             df = self._load_raw_data(config)
             
+            # Resample if needed (e.g., M5 -> H1)
+            df = self._resample_if_needed(df, config)
+            
             # Validate and clean
             df, metrics = self._validate_and_clean(df, config)
             
@@ -198,6 +201,81 @@ class OHLCNormalizer:
                 encoding=config.encoding
             )
         return df
+    
+    def _resample_if_needed(self, df: pd.DataFrame, config: NormalizationConfig) -> pd.DataFrame:
+        """Resample data to target timeframe if needed (e.g., M5 -> H1)."""
+        # Check if resampling is needed based on config timeframe vs detected timeframe
+        # For now, we'll detect the timeframe from the data frequency
+        if len(df) < 2:
+            return df
+        
+        # Parse timestamps to detect frequency
+        try:
+            df['_ts'] = pd.to_datetime(df[config.timestamp_column], errors='coerce')
+            df = df.dropna(subset=['_ts'])
+            if len(df) < 2:
+                return df
+            
+            df = df.sort_values('_ts')
+            time_diffs = df['_ts'].diff().dropna()
+            median_diff = time_diffs.median()
+            
+            # Determine source timeframe
+            if median_diff <= pd.Timedelta(minutes=5):
+                source_tf = 'M5'
+            elif median_diff <= pd.Timedelta(minutes=15):
+                source_tf = 'M15'
+            elif median_diff <= pd.Timedelta(minutes=30):
+                source_tf = 'M30'
+            elif median_diff <= pd.Timedelta(hours=1):
+                source_tf = 'H1'
+            elif median_diff <= pd.Timedelta(hours=4):
+                source_tf = 'H4'
+            elif median_diff <= pd.Timedelta(days=1):
+                source_tf = 'D1'
+            else:
+                source_tf = 'unknown'
+            
+            target_tf = config.timeframe
+            
+            # If source is higher frequency than target, resample
+            freq_map = {'M5': '5min', 'M15': '15min', 'M30': '30min', 'H1': '1H', 'H4': '4H', 'D1': '1D'}
+            
+            if source_tf in freq_map and target_tf in freq_map:
+                source_freq = freq_map[source_tf]
+                target_freq = freq_map[target_tf]
+                
+                # Only resample if source is higher frequency (shorter period)
+                if pd.Timedelta(source_freq) < pd.Timedelta(target_freq):
+                    print(f"  Resampling {source_tf} -> {target_tf} ({len(df)} bars)")
+                    
+                    # Set timestamp as index for resampling
+                    df = df.set_index('_ts')
+                    
+                    # Resample OHLC
+                    ohlc_dict = {
+                        config.open_column: 'first',
+                        config.high_column: 'max',
+                        config.low_column: 'min',
+                        config.close_column: 'last',
+                        config.volume_column: 'sum'
+                    }
+                    
+                    df_resampled = df.resample(target_freq).agg(ohlc_dict).dropna()
+                    df_resampled = df_resampled.reset_index()
+                    df_resampled = df_resampled.rename(columns={'_ts': config.timestamp_column})
+                    
+                    print(f"  Resampled {len(df)} -> {len(df_resampled)} bars")
+                    return df_resampled
+            
+            df = df.drop(columns=['_ts'])
+            return df
+            
+        except Exception as e:
+            print(f"  Warning: Resampling failed: {e}")
+            if '_ts' in df.columns:
+                df = df.drop(columns=['_ts'])
+            return df
     
     def _validate_and_clean(self, df: pd.DataFrame, config: NormalizationConfig) -> Tuple[pd.DataFrame, Dict[str, Any]]:
         """Validate OHLC data and clean."""
@@ -382,7 +460,7 @@ def create_batch_a_normalization_configs(
     price_side: str = "bid",
     source_timezone: str = "UTC"
 ) -> List[NormalizationConfig]:
-    """Create normalization configs for Batch A symbols."""
+    """Create normalization configs for Batch A symbols by finding actual H1/D1 files."""
     configs = []
     
     batch_a_symbols = [
@@ -390,49 +468,160 @@ def create_batch_a_normalization_configs(
         'EURJPY', 'GBPJPY', 'CHFJPY', 'EURCHF', 'GBPCHF'
     ]
     
+    def detect_columns(file_path: str) -> Dict[str, str]:
+        """Detect column names from CSV file."""
+        try:
+            df = pd.read_csv(file_path, nrows=1)
+            cols = df.columns.tolist()
+            
+            # Detect timestamp column
+            timestamp_col = None
+            for c in cols:
+                if c.lower() in ['time', 'timestamp', 'date', 'datetime']:
+                    timestamp_col = c
+                    break
+            
+            # Detect volume column
+            volume_col = None
+            for c in cols:
+                if c.lower() in ['volume', 'tick_volume', 'real_volume', 'vol']:
+                    volume_col = c
+                    break
+            
+            return {
+                'timestamp_column': timestamp_col or 'timestamp',
+                'volume_column': volume_col or 'volume',
+                'open_column': 'open' if 'open' in cols else 'open',
+                'high_column': 'high' if 'high' in cols else 'high',
+                'low_column': 'low' if 'low' in cols else 'low',
+                'close_column': 'close' if 'close' in cols else 'close',
+            }
+        except Exception:
+            return {
+                'timestamp_column': 'timestamp',
+                'volume_column': 'volume',
+                'open_column': 'open',
+                'high_column': 'high',
+                'low_column': 'low',
+                'close_column': 'close',
+            }
+    
+    batch_a_symbols = [
+        'EURUSD', 'GBPUSD', 'USDJPY', 'USDCHF', 'EURGBP',
+        'EURJPY', 'GBPJPY', 'CHFJPY', 'EURCHF', 'GBPCHF'
+    ]
+    
     for symbol in batch_a_symbols:
-        # H1 config
-        h1_raw = os.path.join(raw_base, provider, symbol, f"{symbol}_H1.csv")
-        h1_norm = os.path.join(normalized_base, "h1")
+        # Search for H1 files in all provider subdirectories
+        h1_files = []
+        provider_dir = Path(raw_base)
+        if provider_dir.exists():
+            for prov_dir in provider_dir.iterdir():
+                if prov_dir.is_dir():
+                    symbol_dir = prov_dir / symbol
+                    if symbol_dir.exists():
+                        # Look for H1 files (various naming patterns)
+                        for pattern in ['*H1*.csv', '*_H1.csv', '*_1h.csv', '*_1H.csv', '*PRO_H1.csv']:
+                            h1_files.extend(symbol_dir.glob(pattern))
         
-        if os.path.exists(h1_raw):
+        # If no H1 files found, look for M5 files that can be resampled
+        if not h1_files:
+            m5_files = []
+            provider_dir = Path(raw_base)
+            if provider_dir.exists():
+                for prov_dir in provider_dir.iterdir():
+                    if prov_dir.is_dir():
+                        symbol_dir = prov_dir / symbol
+                        if symbol_dir.exists():
+                            for pattern in ['*M5*.csv', '*_M5.csv', '*_5m.csv', '*_5M.csv']:
+                                m5_files.extend(symbol_dir.glob(pattern))
+            
+            # Use the first M5 file found (will need resampling in normalizer)
+            if m5_files:
+                h1_files = m5_files[:1]
+        
+        # Process H1 files
+        for h1_raw in h1_files:
+            if not h1_raw.exists():
+                continue
+                
+            # Calculate checksum
             sha256 = hashlib.sha256()
             with open(h1_raw, "rb") as f:
                 for chunk in iter(lambda: f.read(4096), b""):
                     sha256.update(chunk)
             
+            # Detect column names
+            col_map = detect_columns(str(h1_raw))
+            
+            # Determine provider from path
+            rel_path = h1_raw.relative_to(raw_base)
+            prov = rel_path.parts[0] if len(rel_path.parts) > 0 else provider
+            
+            h1_norm = os.path.join(normalized_base, "h1")
+            
             configs.append(NormalizationConfig(
-                source_file=h1_raw,
+                source_file=str(h1_raw),
                 source_sha256=sha256.hexdigest(),
                 symbol=symbol,
                 vendor_symbol=symbol,
                 timeframe="H1",
-                provider=provider,
+                provider=prov,
                 price_side=price_side,
                 source_timezone=source_timezone,
-                output_dir=h1_norm
+                output_dir=h1_norm,
+                timestamp_column=col_map['timestamp_column'],
+                volume_column=col_map['volume_column'],
+                open_column=col_map['open_column'],
+                high_column=col_map['high_column'],
+                low_column=col_map['low_column'],
+                close_column=col_map['close_column'],
             ))
         
-        # D1 config
-        d1_raw = os.path.join(raw_base, provider, symbol, f"{symbol}_D1.csv")
-        d1_norm = os.path.join(normalized_base, "d1")
+        # D1 config - search for D1 files
+        d1_files = []
+        provider_dir = Path(raw_base)
+        if provider_dir.exists():
+            for prov_dir in provider_dir.iterdir():
+                if prov_dir.is_dir():
+                    symbol_dir = prov_dir / symbol
+                    if symbol_dir.exists():
+                        for pattern in ['*D1*.csv', '*_D1.csv', '*_1d.csv', '*_1D.csv', '*PRO_D1.csv']:
+                            d1_files.extend(symbol_dir.glob(pattern))
         
-        if os.path.exists(d1_raw):
+        for d1_raw in d1_files:
+            if not d1_raw.exists():
+                continue
+                
             sha256 = hashlib.sha256()
             with open(d1_raw, "rb") as f:
                 for chunk in iter(lambda: f.read(4096), b""):
                     sha256.update(chunk)
             
+            # Detect column names
+            col_map = detect_columns(str(d1_raw))
+            
+            rel_path = d1_raw.relative_to(raw_base)
+            prov = rel_path.parts[0] if len(rel_path.parts) > 0 else provider
+            
+            d1_norm = os.path.join(normalized_base, "d1")
+            
             configs.append(NormalizationConfig(
-                source_file=d1_raw,
+                source_file=str(d1_raw),
                 source_sha256=sha256.hexdigest(),
                 symbol=symbol,
                 vendor_symbol=symbol,
                 timeframe="D1",
-                provider=provider,
+                provider=prov,
                 price_side=price_side,
                 source_timezone=source_timezone,
-                output_dir=d1_norm
+                output_dir=d1_norm,
+                timestamp_column=col_map['timestamp_column'],
+                volume_column=col_map['volume_column'],
+                open_column=col_map['open_column'],
+                high_column=col_map['high_column'],
+                low_column=col_map['low_column'],
+                close_column=col_map['close_column'],
             ))
     
     return configs

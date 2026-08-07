@@ -1,0 +1,526 @@
+{
+  "generated_at": "2026-08-07T00:29:30.292171",
+  "mt5_script_path": null,
+  "operator_queue": [
+    {
+      "config": {
+        "symbol": "EURUSD",
+        "timeframe": "H1",
+        "start_date": "2022-01-01",
+        "end_date": "2024-12-31",
+        "output_path": "data/raw\\raw\\MetaQuotes-Demo\\EURUSD\\EURUSD_H1.csv",
+        "provider": "MetaQuotes-Demo",
+        "timezone": "UTC",
+        "price_side": "bid",
+        "output_format": "csv"
+      },
+      "command": [
+        "mt5_terminal.exe",
+        "/export:data/raw\\raw\\MetaQuotes-Demo\\EURUSD\\EURUSD_H1.csv",
+        "/symbol:EURUSD",
+        "/timeframe:H1",
+        "/from:2022-01-01",
+        "/to:2024-12-31"
+      ],
+      "command_string": "mt5_terminal.exe /export:data/raw\\raw\\MetaQuotes-Demo\\EURUSD\\EURUSD_H1.csv /symbol:EURUSD /timeframe:H1 /from:2022-01-01 /to:2024-12-31",
+      "working_directory": ".",
+      "estimated_duration_seconds": 30,
+      "requires_mt5_running": true,
+      "notes": "Execute manually if automated export fails"
+    },
+    {
+      "config": {
+        "symbol": "GBPUSD",
+        "timeframe": "H1",
+        "start_date": "2022-01-01",
+        "end_date": "2024-12-31",
+        "output_path": "data/raw\\raw\\MetaQuotes-Demo\\GBPUSD\\GBPUSD_H1.csv",
+        "provider": "MetaQuotes-Demo",
+        "timezone": "UTC",
+        "price_side": "bid",
+        "output_format": "csv"
+      },
+      "command": [
+        "mt5_terminal.exe",
+        "/export:data/raw\\raw\\MetaQuotes-Demo\\GBPUSD\\GBPUSD_H1.csv",
+        "/symbol:GBPUSD",
+        "/timeframe:H1",
+        "/from:2022-01-01",
+        "/to:2024-12-31"
+      ],
+      "command_string": "mt5_terminal.exe /export:data/raw\\raw\\MetaQuotes-Demo\\GBPUSD\\GBPUSD_H1.csv /symbol:GBPUSD /timeframe:H1 /from:2022-01-01 /to:2024-12-31",
+      "working_directory": ".",
+      "estimated_duration_seconds": 30,
+      "requires_mt5_running": true,
+      "notes": "Execute manually if automated export fails"
+    },
+    {
+      "config": {
+        "symbol": "USDJPY",
+        "timeframe": "H1",
+        "start_date": "2022-01-01",
+        "end_date": "2024-12-31",
+        "output_path": "data/raw\\raw\\MetaQuotes-Demo\\USDJPY\\USDJPY_H1.csv",
+        "provider": "MetaQuotes-Demo",
+        "timezone": "UTC",
+        "price_side": "bid",
+        "output_format": "csv"
+      },
+      "command": [
+        "mt5_terminal.exe",
+        "/export:data/raw\\raw\\MetaQuotes-Demo\\USDJPY\\USDJPY_H1.csv",
+        "/symbol:USDJPY",
+        "/timeframe:H1",
+        "/from:2022-01-01",
+        "/to:2024-12-31"
+      ],
+      "command_string": "mt5_terminal.exe /export:data/raw\\raw\\MetaQuotes-Demo\\USDJPY\\USDJPY_H1.csv /symbol:USDJPY /timeframe:H1 /from:2022-01-01 /to:2024-12-31",
+      "working_directory": ".",
+      "estimated_duration_seconds": 30,
+      "requires_mt5_running": true,
+      "notes": "Execute manually if automated export fails"
+    },
+    {
+      "config": {
+        "symbol": "USDCHF",
+        "timeframe": "H1",
+        "start_date": "2022-01-01",
+        "end_date": "2024-12-31",
+        "output_path": "data/raw\\raw\\MetaQuotes-Demo\\USDCHF\\USDCHF_H1.csv",
+        "provider": "MetaQuotes-Demo",
+        "timezone": "UTC",
+        "price_side": "bid",
+        "output_format": "csv"
+      },
+      "command": [
+        "mt5_terminal.exe",
+        "/export:data/raw\\raw\\MetaQuotes-Demo\\USDCHF\\USDCHF_H1.csv",
+        "/symbol:USDCHF",
+        "/timeframe:H1",
+        "/from:2022-01-01",
+        "/to:2024-12-31"
+      ],
+      "command_string": "mt5_terminal.exe /export:data/raw\\raw\\MetaQuotes-Demo\\USDCHF\\USDCHF_H1.csv /symbol:USDCHF /timeframe:H1 /from:2022-01-01 /to:2024-12-31",
+      "working_directory": ".",
+      "estimated_duration_seconds": 30,
+      "requires_mt5_running": true,
+      "notes": "Execute manually if automated export fails"
+    },
+    {
+      "config": {
+        "symbol": "EURGBP",
+        "timeframe": "H1",
+        "start_date": "2022-01-01",
+        "end_date": "2024-12-31",
+        "output_path": "data/raw\\raw\\MetaQuotes-Demo\\EURGBP\\EURGBP_H1.csv",
+        "provider": "MetaQuotes-Demo",
+        "timezone": "UTC",
+        "price_side": "bid",
+        "output_format": "csv"
+      },
+      "command": [
+        "mt5_terminal.exe",
+        "/export:data/raw\\raw\\MetaQuotes-Demo\\EURGBP\\EURGBP_H1.csv",
+        "/symbol:EURGBP",
+        "/timeframe:H1",
+        "/from:2022-01-01",
+        "/to:2024-12-31"
+      ],
+      "command_string": "mt5_terminal.exe /export:data/raw\\raw\\MetaQuotes-Demo\\EURGBP\\EURGBP_H1.csv /symbol:EURGBP /timeframe:H1 /from:2022-01-01 /to:2024-12-31",
+      "working_directory": ".",
+      "estimated_duration_seconds": 30,
+      "requires_mt5_running": true,
+      "notes": "Execute manually if automated export fails"
+    },
+    {
+      "config": {
+        "symbol": "EURJPY",
+        "timeframe": "H1",
+        "start_date": "2022-01-01",
+        "end_date": "2024-12-31",
+        "output_path": "data/raw\\raw\\MetaQuotes-Demo\\EURJPY\\EURJPY_H1.csv",
+        "provider": "MetaQuotes-Demo",
+        "timezone": "UTC",
+        "price_side": "bid",
+        "output_format": "csv"
+      },
+      "command": [
+        "mt5_terminal.exe",
+        "/export:data/raw\\raw\\MetaQuotes-Demo\\EURJPY\\EURJPY_H1.csv",
+        "/symbol:EURJPY",
+        "/timeframe:H1",
+        "/from:2022-01-01",
+        "/to:2024-12-31"
+      ],
+      "command_string": "mt5_terminal.exe /export:data/raw\\raw\\MetaQuotes-Demo\\EURJPY\\EURJPY_H1.csv /symbol:EURJPY /timeframe:H1 /from:2022-01-01 /to:2024-12-31",
+      "working_directory": ".",
+      "estimated_duration_seconds": 30,
+      "requires_mt5_running": true,
+      "notes": "Execute manually if automated export fails"
+    },
+    {
+      "config": {
+        "symbol": "GBPJPY",
+        "timeframe": "H1",
+        "start_date": "2022-01-01",
+        "end_date": "2024-12-31",
+        "output_path": "data/raw\\raw\\MetaQuotes-Demo\\GBPJPY\\GBPJPY_H1.csv",
+        "provider": "MetaQuotes-Demo",
+        "timezone": "UTC",
+        "price_side": "bid",
+        "output_format": "csv"
+      },
+      "command": [
+        "mt5_terminal.exe",
+        "/export:data/raw\\raw\\MetaQuotes-Demo\\GBPJPY\\GBPJPY_H1.csv",
+        "/symbol:GBPJPY",
+        "/timeframe:H1",
+        "/from:2022-01-01",
+        "/to:2024-12-31"
+      ],
+      "command_string": "mt5_terminal.exe /export:data/raw\\raw\\MetaQuotes-Demo\\GBPJPY\\GBPJPY_H1.csv /symbol:GBPJPY /timeframe:H1 /from:2022-01-01 /to:2024-12-31",
+      "working_directory": ".",
+      "estimated_duration_seconds": 30,
+      "requires_mt5_running": true,
+      "notes": "Execute manually if automated export fails"
+    },
+    {
+      "config": {
+        "symbol": "CHFJPY",
+        "timeframe": "H1",
+        "start_date": "2022-01-01",
+        "end_date": "2024-12-31",
+        "output_path": "data/raw\\raw\\MetaQuotes-Demo\\CHFJPY\\CHFJPY_H1.csv",
+        "provider": "MetaQuotes-Demo",
+        "timezone": "UTC",
+        "price_side": "bid",
+        "output_format": "csv"
+      },
+      "command": [
+        "mt5_terminal.exe",
+        "/export:data/raw\\raw\\MetaQuotes-Demo\\CHFJPY\\CHFJPY_H1.csv",
+        "/symbol:CHFJPY",
+        "/timeframe:H1",
+        "/from:2022-01-01",
+        "/to:2024-12-31"
+      ],
+      "command_string": "mt5_terminal.exe /export:data/raw\\raw\\MetaQuotes-Demo\\CHFJPY\\CHFJPY_H1.csv /symbol:CHFJPY /timeframe:H1 /from:2022-01-01 /to:2024-12-31",
+      "working_directory": ".",
+      "estimated_duration_seconds": 30,
+      "requires_mt5_running": true,
+      "notes": "Execute manually if automated export fails"
+    },
+    {
+      "config": {
+        "symbol": "EURCHF",
+        "timeframe": "H1",
+        "start_date": "2022-01-01",
+        "end_date": "2024-12-31",
+        "output_path": "data/raw\\raw\\MetaQuotes-Demo\\EURCHF\\EURCHF_H1.csv",
+        "provider": "MetaQuotes-Demo",
+        "timezone": "UTC",
+        "price_side": "bid",
+        "output_format": "csv"
+      },
+      "command": [
+        "mt5_terminal.exe",
+        "/export:data/raw\\raw\\MetaQuotes-Demo\\EURCHF\\EURCHF_H1.csv",
+        "/symbol:EURCHF",
+        "/timeframe:H1",
+        "/from:2022-01-01",
+        "/to:2024-12-31"
+      ],
+      "command_string": "mt5_terminal.exe /export:data/raw\\raw\\MetaQuotes-Demo\\EURCHF\\EURCHF_H1.csv /symbol:EURCHF /timeframe:H1 /from:2022-01-01 /to:2024-12-31",
+      "working_directory": ".",
+      "estimated_duration_seconds": 30,
+      "requires_mt5_running": true,
+      "notes": "Execute manually if automated export fails"
+    },
+    {
+      "config": {
+        "symbol": "GBPCHF",
+        "timeframe": "H1",
+        "start_date": "2022-01-01",
+        "end_date": "2024-12-31",
+        "output_path": "data/raw\\raw\\MetaQuotes-Demo\\GBPCHF\\GBPCHF_H1.csv",
+        "provider": "MetaQuotes-Demo",
+        "timezone": "UTC",
+        "price_side": "bid",
+        "output_format": "csv"
+      },
+      "command": [
+        "mt5_terminal.exe",
+        "/export:data/raw\\raw\\MetaQuotes-Demo\\GBPCHF\\GBPCHF_H1.csv",
+        "/symbol:GBPCHF",
+        "/timeframe:H1",
+        "/from:2022-01-01",
+        "/to:2024-12-31"
+      ],
+      "command_string": "mt5_terminal.exe /export:data/raw\\raw\\MetaQuotes-Demo\\GBPCHF\\GBPCHF_H1.csv /symbol:GBPCHF /timeframe:H1 /from:2022-01-01 /to:2024-12-31",
+      "working_directory": ".",
+      "estimated_duration_seconds": 30,
+      "requires_mt5_running": true,
+      "notes": "Execute manually if automated export fails"
+    },
+    {
+      "config": {
+        "symbol": "EURUSD",
+        "timeframe": "D1",
+        "start_date": "2019-01-01",
+        "end_date": "2024-12-31",
+        "output_path": "data/raw\\raw\\MetaQuotes-Demo\\EURUSD\\EURUSD_D1.csv",
+        "provider": "MetaQuotes-Demo",
+        "timezone": "UTC",
+        "price_side": "bid",
+        "output_format": "csv"
+      },
+      "command": [
+        "mt5_terminal.exe",
+        "/export:data/raw\\raw\\MetaQuotes-Demo\\EURUSD\\EURUSD_D1.csv",
+        "/symbol:EURUSD",
+        "/timeframe:D1",
+        "/from:2019-01-01",
+        "/to:2024-12-31"
+      ],
+      "command_string": "mt5_terminal.exe /export:data/raw\\raw\\MetaQuotes-Demo\\EURUSD\\EURUSD_D1.csv /symbol:EURUSD /timeframe:D1 /from:2019-01-01 /to:2024-12-31",
+      "working_directory": ".",
+      "estimated_duration_seconds": 30,
+      "requires_mt5_running": true,
+      "notes": "Execute manually if automated export fails"
+    },
+    {
+      "config": {
+        "symbol": "GBPUSD",
+        "timeframe": "D1",
+        "start_date": "2019-01-01",
+        "end_date": "2024-12-31",
+        "output_path": "data/raw\\raw\\MetaQuotes-Demo\\GBPUSD\\GBPUSD_D1.csv",
+        "provider": "MetaQuotes-Demo",
+        "timezone": "UTC",
+        "price_side": "bid",
+        "output_format": "csv"
+      },
+      "command": [
+        "mt5_terminal.exe",
+        "/export:data/raw\\raw\\MetaQuotes-Demo\\GBPUSD\\GBPUSD_D1.csv",
+        "/symbol:GBPUSD",
+        "/timeframe:D1",
+        "/from:2019-01-01",
+        "/to:2024-12-31"
+      ],
+      "command_string": "mt5_terminal.exe /export:data/raw\\raw\\MetaQuotes-Demo\\GBPUSD\\GBPUSD_D1.csv /symbol:GBPUSD /timeframe:D1 /from:2019-01-01 /to:2024-12-31",
+      "working_directory": ".",
+      "estimated_duration_seconds": 30,
+      "requires_mt5_running": true,
+      "notes": "Execute manually if automated export fails"
+    },
+    {
+      "config": {
+        "symbol": "USDJPY",
+        "timeframe": "D1",
+        "start_date": "2019-01-01",
+        "end_date": "2024-12-31",
+        "output_path": "data/raw\\raw\\MetaQuotes-Demo\\USDJPY\\USDJPY_D1.csv",
+        "provider": "MetaQuotes-Demo",
+        "timezone": "UTC",
+        "price_side": "bid",
+        "output_format": "csv"
+      },
+      "command": [
+        "mt5_terminal.exe",
+        "/export:data/raw\\raw\\MetaQuotes-Demo\\USDJPY\\USDJPY_D1.csv",
+        "/symbol:USDJPY",
+        "/timeframe:D1",
+        "/from:2019-01-01",
+        "/to:2024-12-31"
+      ],
+      "command_string": "mt5_terminal.exe /export:data/raw\\raw\\MetaQuotes-Demo\\USDJPY\\USDJPY_D1.csv /symbol:USDJPY /timeframe:D1 /from:2019-01-01 /to:2024-12-31",
+      "working_directory": ".",
+      "estimated_duration_seconds": 30,
+      "requires_mt5_running": true,
+      "notes": "Execute manually if automated export fails"
+    },
+    {
+      "config": {
+        "symbol": "USDCHF",
+        "timeframe": "D1",
+        "start_date": "2019-01-01",
+        "end_date": "2024-12-31",
+        "output_path": "data/raw\\raw\\MetaQuotes-Demo\\USDCHF\\USDCHF_D1.csv",
+        "provider": "MetaQuotes-Demo",
+        "timezone": "UTC",
+        "price_side": "bid",
+        "output_format": "csv"
+      },
+      "command": [
+        "mt5_terminal.exe",
+        "/export:data/raw\\raw\\MetaQuotes-Demo\\USDCHF\\USDCHF_D1.csv",
+        "/symbol:USDCHF",
+        "/timeframe:D1",
+        "/from:2019-01-01",
+        "/to:2024-12-31"
+      ],
+      "command_string": "mt5_terminal.exe /export:data/raw\\raw\\MetaQuotes-Demo\\USDCHF\\USDCHF_D1.csv /symbol:USDCHF /timeframe:D1 /from:2019-01-01 /to:2024-12-31",
+      "working_directory": ".",
+      "estimated_duration_seconds": 30,
+      "requires_mt5_running": true,
+      "notes": "Execute manually if automated export fails"
+    },
+    {
+      "config": {
+        "symbol": "EURGBP",
+        "timeframe": "D1",
+        "start_date": "2019-01-01",
+        "end_date": "2024-12-31",
+        "output_path": "data/raw\\raw\\MetaQuotes-Demo\\EURGBP\\EURGBP_D1.csv",
+        "provider": "MetaQuotes-Demo",
+        "timezone": "UTC",
+        "price_side": "bid",
+        "output_format": "csv"
+      },
+      "command": [
+        "mt5_terminal.exe",
+        "/export:data/raw\\raw\\MetaQuotes-Demo\\EURGBP\\EURGBP_D1.csv",
+        "/symbol:EURGBP",
+        "/timeframe:D1",
+        "/from:2019-01-01",
+        "/to:2024-12-31"
+      ],
+      "command_string": "mt5_terminal.exe /export:data/raw\\raw\\MetaQuotes-Demo\\EURGBP\\EURGBP_D1.csv /symbol:EURGBP /timeframe:D1 /from:2019-01-01 /to:2024-12-31",
+      "working_directory": ".",
+      "estimated_duration_seconds": 30,
+      "requires_mt5_running": true,
+      "notes": "Execute manually if automated export fails"
+    },
+    {
+      "config": {
+        "symbol": "EURJPY",
+        "timeframe": "D1",
+        "start_date": "2019-01-01",
+        "end_date": "2024-12-31",
+        "output_path": "data/raw\\raw\\MetaQuotes-Demo\\EURJPY\\EURJPY_D1.csv",
+        "provider": "MetaQuotes-Demo",
+        "timezone": "UTC",
+        "price_side": "bid",
+        "output_format": "csv"
+      },
+      "command": [
+        "mt5_terminal.exe",
+        "/export:data/raw\\raw\\MetaQuotes-Demo\\EURJPY\\EURJPY_D1.csv",
+        "/symbol:EURJPY",
+        "/timeframe:D1",
+        "/from:2019-01-01",
+        "/to:2024-12-31"
+      ],
+      "command_string": "mt5_terminal.exe /export:data/raw\\raw\\MetaQuotes-Demo\\EURJPY\\EURJPY_D1.csv /symbol:EURJPY /timeframe:D1 /from:2019-01-01 /to:2024-12-31",
+      "working_directory": ".",
+      "estimated_duration_seconds": 30,
+      "requires_mt5_running": true,
+      "notes": "Execute manually if automated export fails"
+    },
+    {
+      "config": {
+        "symbol": "GBPJPY",
+        "timeframe": "D1",
+        "start_date": "2019-01-01",
+        "end_date": "2024-12-31",
+        "output_path": "data/raw\\raw\\MetaQuotes-Demo\\GBPJPY\\GBPJPY_D1.csv",
+        "provider": "MetaQuotes-Demo",
+        "timezone": "UTC",
+        "price_side": "bid",
+        "output_format": "csv"
+      },
+      "command": [
+        "mt5_terminal.exe",
+        "/export:data/raw\\raw\\MetaQuotes-Demo\\GBPJPY\\GBPJPY_D1.csv",
+        "/symbol:GBPJPY",
+        "/timeframe:D1",
+        "/from:2019-01-01",
+        "/to:2024-12-31"
+      ],
+      "command_string": "mt5_terminal.exe /export:data/raw\\raw\\MetaQuotes-Demo\\GBPJPY\\GBPJPY_D1.csv /symbol:GBPJPY /timeframe:D1 /from:2019-01-01 /to:2024-12-31",
+      "working_directory": ".",
+      "estimated_duration_seconds": 30,
+      "requires_mt5_running": true,
+      "notes": "Execute manually if automated export fails"
+    },
+    {
+      "config": {
+        "symbol": "CHFJPY",
+        "timeframe": "D1",
+        "start_date": "2019-01-01",
+        "end_date": "2024-12-31",
+        "output_path": "data/raw\\raw\\MetaQuotes-Demo\\CHFJPY\\CHFJPY_D1.csv",
+        "provider": "MetaQuotes-Demo",
+        "timezone": "UTC",
+        "price_side": "bid",
+        "output_format": "csv"
+      },
+      "command": [
+        "mt5_terminal.exe",
+        "/export:data/raw\\raw\\MetaQuotes-Demo\\CHFJPY\\CHFJPY_D1.csv",
+        "/symbol:CHFJPY",
+        "/timeframe:D1",
+        "/from:2019-01-01",
+        "/to:2024-12-31"
+      ],
+      "command_string": "mt5_terminal.exe /export:data/raw\\raw\\MetaQuotes-Demo\\CHFJPY\\CHFJPY_D1.csv /symbol:CHFJPY /timeframe:D1 /from:2019-01-01 /to:2024-12-31",
+      "working_directory": ".",
+      "estimated_duration_seconds": 30,
+      "requires_mt5_running": true,
+      "notes": "Execute manually if automated export fails"
+    },
+    {
+      "config": {
+        "symbol": "EURCHF",
+        "timeframe": "D1",
+        "start_date": "2019-01-01",
+        "end_date": "2024-12-31",
+        "output_path": "data/raw\\raw\\MetaQuotes-Demo\\EURCHF\\EURCHF_D1.csv",
+        "provider": "MetaQuotes-Demo",
+        "timezone": "UTC",
+        "price_side": "bid",
+        "output_format": "csv"
+      },
+      "command": [
+        "mt5_terminal.exe",
+        "/export:data/raw\\raw\\MetaQuotes-Demo\\EURCHF\\EURCHF_D1.csv",
+        "/symbol:EURCHF",
+        "/timeframe:D1",
+        "/from:2019-01-01",
+        "/to:2024-12-31"
+      ],
+      "command_string": "mt5_terminal.exe /export:data/raw\\raw\\MetaQuotes-Demo\\EURCHF\\EURCHF_D1.csv /symbol:EURCHF /timeframe:D1 /from:2019-01-01 /to:2024-12-31",
+      "working_directory": ".",
+      "estimated_duration_seconds": 30,
+      "requires_mt5_running": true,
+      "notes": "Execute manually if automated export fails"
+    },
+    {
+      "config": {
+        "symbol": "GBPCHF",
+        "timeframe": "D1",
+        "start_date": "2019-01-01",
+        "end_date": "2024-12-31",
+        "output_path": "data/raw\\raw\\MetaQuotes-Demo\\GBPCHF\\GBPCHF_D1.csv",
+        "provider": "MetaQuotes-Demo",
+        "timezone": "UTC",
+        "price_side": "bid",
+        "output_format": "csv"
+      },
+      "command": [
+        "mt5_terminal.exe",
+        "/export:data/raw\\raw\\MetaQuotes-Demo\\GBPCHF\\GBPCHF_D1.csv",
+        "/symbol:GBPCHF",
+        "/timeframe:D1",
+        "/from:2019-01-01",
+        "/to:2024-12-31"
+      ],
+      "command_string": "mt5_terminal.exe /export:data/raw\\raw\\MetaQuotes-Demo\\GBPCHF\\GBPCHF_D1.csv /symbol:GBPCHF /timeframe:D1 /from:2019-01-01 /to:2024-12-31",
+      "working_directory": ".",
+      "estimated_duration_seconds": 30,
+      "requires_mt5_running": true,
+      "notes": "Execute manually if automated export fails"
+    }
+  ]
+}

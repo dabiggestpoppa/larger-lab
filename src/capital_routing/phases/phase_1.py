@@ -175,21 +175,22 @@ class Phase1DataDiscovery:
         """
         file_path = file_metadata.get('file_path', '')
         file_name = os.path.basename(file_path).lower()
+        dir_path = os.path.dirname(file_path).lower()
         
         # Determine provider based on file name or path
-        if 'nautilus' in file_name:
+        if 'nautilus' in file_name or 'nautilus' in dir_path:
             return 'nautilus'
-        elif 'rekey' in file_name:
+        elif 'rekey' in file_name or 'rekey' in dir_path:
             return 'rekey'
-        elif 'cerebus' in file_name:
+        elif 'cerebus' in file_name or 'cerebus' in dir_path:
             return 'cerebus'
-        elif 'oanda' in file_name:
+        elif 'oanda' in file_name or 'oanda' in dir_path:
             return 'oanda'
-        elif 'dukascopy' in file_name:
+        elif 'dukascopy' in file_name or 'dukascopy' in dir_path:
             return 'dukascopy'
-        elif 'pro' in file_name or '_pro_' in file_name:
+        elif 'mt5_pro' in dir_path or 'pro' in file_name or '_pro_' in file_name:
             return 'mt5_pro'
-        elif 'fetched' in file_name:
+        elif 'mt5_fetched' in dir_path or 'fetched' in file_name:
             return 'mt5_fetched'
         else:
             return 'unknown'
@@ -251,6 +252,7 @@ class Phase1DataDiscovery:
             r'.*_(\d+)day\.csv$',  # SYMBOL_1day.csv
             r'.*_PRO_(\w+)\.csv$',  # SYMBOL_PRO_D1.csv, SYMBOL_PRO_M5.csv, etc.
             r'.*_M(\d+)\.csv$',  # SYMBOL_M5.csv
+            r'.*_(M5|M15|M30|H1|H4|D1|W1|MN1)\.csv$',  # SYMBOL_M5.csv, SYMBOL_D1.csv, etc.
         ]
         
         for pattern in timeframe_patterns:
@@ -279,8 +281,8 @@ class Phase1DataDiscovery:
                     elif tf.startswith('M'):
                         return tf
                     return tf
-                elif pattern.endswith('M(\d+)\.csv$'):
-                    return f'{timeframe}m'
+                elif pattern.endswith('(M5|M15|M30|H1|H4|D1|W1|MN1)\.csv$'):
+                    return timeframe.upper()
         
         # Default to unknown
         return 'unknown'

@@ -1,13 +1,16 @@
 {
-  "report_timestamp": "2026-08-06T17:37:29.123602",
-  "report_id": "discovery_report_20260806_173729",
-  "total_files_discovered": 255,
-  "total_symbols": 40,
-  "total_providers": 4,
-  "total_timeframes": 8,
-  "total_formats": 2,
-  "average_quality_score": 58.549019607843135,
+  "report_timestamp": "2026-08-07T00:29:30.239328",
+  "report_id": "discovery_report_20260807_002930",
+  "total_files_discovered": 20,
+  "total_symbols": 10,
+  "total_providers": 1,
+  "total_timeframes": 2,
+  "total_formats": 1,
+  "average_quality_score": 57.5,
   "coverage_gaps": [],
   "batch_a_queue_size": 10,
-  "recommendations": []
+  "recommendations": [
+    "Consider adding data from additional providers for redundancy",
+    "Consider adding data from additional formats for flexibility"
+  ]
 }

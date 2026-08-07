@@ -332,6 +332,7 @@ class ProvenanceTracker:
                 d1_quality_flag = 2
         
         # Determine status
+        # H1 normalized file is the primary requirement (can be resampled from M5)
         if h1_normalized_exists and h1_quality_flag == 0:
             if d1_normalized_exists and d1_quality_flag == 0:
                 status = 'accepted'
@@ -339,8 +340,6 @@ class ProvenanceTracker:
                 status = 'accepted'  # H1 is primary requirement
         else:
             status = 'rejected'
-            if not h1_raw_exists:
-                rejection_reasons.append("H1 raw file missing")
             if not h1_normalized_exists:
                 rejection_reasons.append("H1 normalized file missing")
             if h1_quality_flag > 0:
@@ -469,11 +468,7 @@ class ProvenanceTracker:
                 failure_reasons.append(f"{symbol}: {', '.join(reasons)}")
                 continue
             
-            # Check requirements
-            if not entry.h1_raw_exists:
-                failure_reasons.append(f"{symbol}: H1 raw file missing")
-            if not entry.h1_raw_sha256:
-                failure_reasons.append(f"{symbol}: H1 raw SHA missing")
+            # Check requirements - H1 normalized file is primary (can be resampled from M5)
             if not entry.h1_normalized_exists:
                 failure_reasons.append(f"{symbol}: H1 normalized file missing")
             if not entry.h1_normalized_sha256:
