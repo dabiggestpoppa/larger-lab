@@ -1,18 +1,511 @@
 {
-  "generated": "2026-06-03T11:35:35.952510",
+  "generated": "2026-08-06T17:28:26.083778",
   "engine": "Symmetry Trap (ST) ONLY \u2014 No P90",
-  "total_assets_in_registry": 20,
-  "assets_tested": 19,
+  "total_assets_in_registry": 40,
+  "assets_tested": 38,
   "assets_missing_data": [
+    "USDSEK",
     "NAS100"
   ],
   "assets_with_errors": [],
   "summary": {
-    "total_trades": 11437,
-    "avg_wr": 35.9,
-    "combined_pips": 7009.9
+    "total_trades": 70960,
+    "avg_wr": 73.2,
+    "combined_pips": 542109.9
   },
   "results": [
+    {
+      "asset_key": "AUDCAD",
+      "name": "AUD/CAD",
+      "config_used": {
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "csv_file": "AUDCAD_M5_fetched.csv"
+      },
+      "total_trades": 2446,
+      "wins": 1948,
+      "losses": 498,
+      "win_rate": 79.64,
+      "pnl_pips": 14675.08,
+      "profit_factor": 11.4868,
+      "sharpe": 9.4616,
+      "max_drawdown_pips": 58.71,
+      "max_drawdown_pct": 0.0587,
+      "expectancy_pips": 6.0,
+      "avg_win_pips": 8.25,
+      "avg_loss_pips": -2.81,
+      "avg_tp_distance_pips": 14.13,
+      "avg_sl_distance_pips": 7.54,
+      "long_trades": 1196,
+      "long_wr": 76.34,
+      "long_pnl_pips": 6209.03,
+      "short_trades": 1250,
+      "short_wr": 82.8,
+      "short_pnl_pips": 8466.05,
+      "tier_stats": {
+        "T1": {
+          "trades": 2247,
+          "wr": 78.8,
+          "pnl": 11153.7
+        },
+        "T2": {
+          "trades": 53,
+          "wr": 86.8,
+          "pnl": 503.3
+        },
+        "T3": {
+          "trades": 146,
+          "wr": 89.7,
+          "pnl": 3018.1
+        }
+      },
+      "hourly_stats": {
+        "3": {
+          "trades": 14,
+          "wr": 71.4,
+          "pnl": 39.6
+        },
+        "4": {
+          "trades": 60,
+          "wr": 75.0,
+          "pnl": 193.1
+        },
+        "5": {
+          "trades": 205,
+          "wr": 79.0,
+          "pnl": 1334.5
+        },
+        "6": {
+          "trades": 304,
+          "wr": 76.3,
+          "pnl": 1987.4
+        },
+        "7": {
+          "trades": 354,
+          "wr": 76.8,
+          "pnl": 1696.0
+        },
+        "8": {
+          "trades": 329,
+          "wr": 77.5,
+          "pnl": 1642.3
+        },
+        "9": {
+          "trades": 204,
+          "wr": 79.9,
+          "pnl": 1031.1
+        },
+        "10": {
+          "trades": 149,
+          "wr": 85.2,
+          "pnl": 693.8
+        }
+      },
+      "loop_stats": {
+        "1": {
+          "trades": 917,
+          "wr": 79.4,
+          "pnl": 6346.6
+        },
+        "2": {
+          "trades": 646,
+          "wr": 77.2,
+          "pnl": 3184.5
+        },
+        "3": {
+          "trades": 404,
+          "wr": 82.4,
+          "pnl": 2255.4
+        },
+        "4": {
+          "trades": 234,
+          "wr": 81.6,
+          "pnl": 1378.4
+        },
+        "5": {
+          "trades": 245,
+          "wr": 80.4,
+          "pnl": 1510.3
+        }
+      },
+      "data_bars": 345090,
+      "data_days": 1916,
+      "kelly": 0.7271,
+      "max_consec_wins": 22,
+      "max_consec_losses": 5,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - AUDCAD_M5_fetched\n======================================================================\n  Data: 345,090 bars | 1916 days\n  Trades: 2446 | W: 1948 L: 498 | WR: 79.6%\n  PnL: +14675.1 pips | PF: 11.49\n  Sharpe: 9.46 | MaxDD: 58.7p (0.06%)\n  Long: 1196 (76.3% WR, +6209.0p)\n  Short: 1250 (82.8% WR, +8466.0p)\n  --- TIERS ---\n  T1: 2247 tr, 78.8% WR, +11153.7p\n  T2: 53 tr, 86.8% WR, +503.3p\n  T3: 146 tr, 89.7% WR, +3018.1p\n  --- HOURLY ---\n  03:00 EST | 14 tr | 71.4% WR | +39.6p\n  04:00 EST | 60 tr | 75.0% WR | +193.1p\n  05:00 EST | 205 tr | 79.0% WR | +1334.5p\n  06:00 EST | 304 tr | 76.3% WR | +1987.4p\n  07:00 EST | 354 tr | 76.8% WR | +1696.0p\n  08:00 EST | 329 tr | 77.5% WR | +1642.3p\n  09:00 EST | 204 tr | 79.9% WR | +1031.1p\n  10:00 EST | 149 tr | 85.2% WR | +693.8p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 917 tr, 79.4% WR, +6346.6p\n  Loop 2: 646 tr, 77.2% WR, +3184.5p\n  Loop 3: 404 tr, 82.4% WR, +2255.4p\n  Loop 4: 234 tr, 81.6% WR, +1378.4p\n  Loop 5: 245 tr, 80.4% WR, +1510.3p\n======================================================================"
+    },
+    {
+      "asset_key": "AUDCHF",
+      "name": "AUD/CHF",
+      "config_used": {
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "csv_file": "AUDCHF_M5_fetched.csv"
+      },
+      "total_trades": 3072,
+      "wins": 2369,
+      "losses": 703,
+      "win_rate": 77.12,
+      "pnl_pips": 14004.7,
+      "profit_factor": 9.7392,
+      "sharpe": 8.1315,
+      "max_drawdown_pips": 25.51,
+      "max_drawdown_pct": 0.0255,
+      "expectancy_pips": 4.56,
+      "avg_win_pips": 6.59,
+      "avg_loss_pips": -2.28,
+      "avg_tp_distance_pips": 10.85,
+      "avg_sl_distance_pips": 5.96,
+      "long_trades": 1518,
+      "long_wr": 74.51,
+      "long_pnl_pips": 5442.27,
+      "short_trades": 1554,
+      "short_wr": 79.67,
+      "short_pnl_pips": 8562.42,
+      "tier_stats": {
+        "T1": {
+          "trades": 2828,
+          "wr": 76.2,
+          "pnl": 10024.4
+        },
+        "T2": {
+          "trades": 114,
+          "wr": 84.2,
+          "pnl": 1103.2
+        },
+        "T3": {
+          "trades": 130,
+          "wr": 91.5,
+          "pnl": 2877.1
+        }
+      },
+      "hourly_stats": {
+        "3": {
+          "trades": 51,
+          "wr": 66.7,
+          "pnl": 103.7
+        },
+        "4": {
+          "trades": 148,
+          "wr": 70.9,
+          "pnl": 352.8
+        },
+        "5": {
+          "trades": 227,
+          "wr": 75.3,
+          "pnl": 875.1
+        },
+        "6": {
+          "trades": 338,
+          "wr": 72.2,
+          "pnl": 1362.7
+        },
+        "7": {
+          "trades": 397,
+          "wr": 72.3,
+          "pnl": 1477.9
+        },
+        "8": {
+          "trades": 408,
+          "wr": 70.3,
+          "pnl": 1201.9
+        },
+        "9": {
+          "trades": 231,
+          "wr": 83.1,
+          "pnl": 969.2
+        },
+        "10": {
+          "trades": 169,
+          "wr": 81.1,
+          "pnl": 503.1
+        }
+      },
+      "loop_stats": {
+        "1": {
+          "trades": 1040,
+          "wr": 76.7,
+          "pnl": 5651.7
+        },
+        "2": {
+          "trades": 763,
+          "wr": 76.3,
+          "pnl": 2870.0
+        },
+        "3": {
+          "trades": 530,
+          "wr": 76.8,
+          "pnl": 2162.9
+        },
+        "4": {
+          "trades": 326,
+          "wr": 79.8,
+          "pnl": 1435.3
+        },
+        "5": {
+          "trades": 413,
+          "wr": 78.0,
+          "pnl": 1884.8
+        }
+      },
+      "data_bars": 345294,
+      "data_days": 1917,
+      "kelly": 0.692,
+      "max_consec_wins": 29,
+      "max_consec_losses": 4,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - AUDCHF_M5_fetched\n======================================================================\n  Data: 345,294 bars | 1917 days\n  Trades: 3072 | W: 2369 L: 703 | WR: 77.1%\n  PnL: +14004.7 pips | PF: 9.74\n  Sharpe: 8.13 | MaxDD: 25.5p (0.03%)\n  Long: 1518 (74.5% WR, +5442.3p)\n  Short: 1554 (79.7% WR, +8562.4p)\n  --- TIERS ---\n  T1: 2828 tr, 76.2% WR, +10024.4p\n  T2: 114 tr, 84.2% WR, +1103.2p\n  T3: 130 tr, 91.5% WR, +2877.1p\n  --- HOURLY ---\n  03:00 EST | 51 tr | 66.7% WR | +103.7p\n  04:00 EST | 148 tr | 70.9% WR | +352.8p\n  05:00 EST | 227 tr | 75.3% WR | +875.1p\n  06:00 EST | 338 tr | 72.2% WR | +1362.7p\n  07:00 EST | 397 tr | 72.3% WR | +1477.9p\n  08:00 EST | 408 tr | 70.3% WR | +1201.9p\n  09:00 EST | 231 tr | 83.1% WR | +969.2p\n  10:00 EST | 169 tr | 81.1% WR | +503.1p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 1040 tr, 76.7% WR, +5651.7p\n  Loop 2: 763 tr, 76.3% WR, +2870.0p\n  Loop 3: 530 tr, 76.8% WR, +2162.9p\n  Loop 4: 326 tr, 79.8% WR, +1435.3p\n  Loop 5: 413 tr, 78.0% WR, +1884.8p\n======================================================================"
+    },
+    {
+      "asset_key": "AUDJPY",
+      "name": "AUD/JPY",
+      "config_used": {
+        "pip_value": 0.01,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "csv_file": "AUDJPY_M5_fetched.csv"
+      },
+      "total_trades": 967,
+      "wins": 817,
+      "losses": 150,
+      "win_rate": 84.49,
+      "pnl_pips": 9265.63,
+      "profit_factor": 19.1519,
+      "sharpe": 10.6352,
+      "max_drawdown_pips": 20.02,
+      "max_drawdown_pct": 0.02,
+      "expectancy_pips": 9.58,
+      "avg_win_pips": 11.97,
+      "avg_loss_pips": -3.4,
+      "avg_tp_distance_pips": 22.45,
+      "avg_sl_distance_pips": 10.94,
+      "long_trades": 495,
+      "long_wr": 82.83,
+      "long_pnl_pips": 4061.74,
+      "short_trades": 472,
+      "short_wr": 86.23,
+      "short_pnl_pips": 5203.9,
+      "tier_stats": {
+        "T1": {
+          "trades": 915,
+          "wr": 83.7,
+          "pnl": 7528.2
+        },
+        "T2": {
+          "trades": 13,
+          "wr": 92.3,
+          "pnl": 183.0
+        },
+        "T3": {
+          "trades": 39,
+          "wr": 100.0,
+          "pnl": 1554.4
+        }
+      },
+      "hourly_stats": {
+        "3": {
+          "trades": 2,
+          "wr": 100.0,
+          "pnl": 22.4
+        },
+        "4": {
+          "trades": 27,
+          "wr": 77.8,
+          "pnl": 207.9
+        },
+        "5": {
+          "trades": 78,
+          "wr": 89.7,
+          "pnl": 831.1
+        },
+        "6": {
+          "trades": 116,
+          "wr": 84.5,
+          "pnl": 1235.0
+        },
+        "7": {
+          "trades": 132,
+          "wr": 78.8,
+          "pnl": 893.1
+        },
+        "8": {
+          "trades": 131,
+          "wr": 76.3,
+          "pnl": 944.7
+        },
+        "9": {
+          "trades": 74,
+          "wr": 87.8,
+          "pnl": 510.2
+        },
+        "10": {
+          "trades": 55,
+          "wr": 90.9,
+          "pnl": 432.5
+        }
+      },
+      "loop_stats": {
+        "1": {
+          "trades": 464,
+          "wr": 86.6,
+          "pnl": 5157.7
+        },
+        "2": {
+          "trades": 269,
+          "wr": 81.0,
+          "pnl": 1820.7
+        },
+        "3": {
+          "trades": 123,
+          "wr": 81.3,
+          "pnl": 1142.4
+        },
+        "4": {
+          "trades": 63,
+          "wr": 84.1,
+          "pnl": 627.0
+        },
+        "5": {
+          "trades": 48,
+          "wr": 91.7,
+          "pnl": 517.9
+        }
+      },
+      "data_bars": 345344,
+      "data_days": 1917,
+      "kelly": 0.8008,
+      "max_consec_wins": 28,
+      "max_consec_losses": 3,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - AUDJPY_M5_fetched\n======================================================================\n  Data: 345,344 bars | 1917 days\n  Trades: 967 | W: 817 L: 150 | WR: 84.5%\n  PnL: +9265.6 pips | PF: 19.15\n  Sharpe: 10.64 | MaxDD: 20.0p (0.02%)\n  Long: 495 (82.8% WR, +4061.7p)\n  Short: 472 (86.2% WR, +5203.9p)\n  --- TIERS ---\n  T1: 915 tr, 83.7% WR, +7528.2p\n  T2: 13 tr, 92.3% WR, +183.0p\n  T3: 39 tr, 100.0% WR, +1554.4p\n  --- HOURLY ---\n  03:00 EST | 2 tr | 100.0% WR | +22.4p\n  04:00 EST | 27 tr | 77.8% WR | +207.9p\n  05:00 EST | 78 tr | 89.7% WR | +831.1p\n  06:00 EST | 116 tr | 84.5% WR | +1235.0p\n  07:00 EST | 132 tr | 78.8% WR | +893.1p\n  08:00 EST | 131 tr | 76.3% WR | +944.7p\n  09:00 EST | 74 tr | 87.8% WR | +510.2p\n  10:00 EST | 55 tr | 90.9% WR | +432.5p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 464 tr, 86.6% WR, +5157.7p\n  Loop 2: 269 tr, 81.0% WR, +1820.7p\n  Loop 3: 123 tr, 81.3% WR, +1142.4p\n  Loop 4: 63 tr, 84.1% WR, +627.0p\n  Loop 5: 48 tr, 91.7% WR, +517.9p\n======================================================================"
+    },
+    {
+      "asset_key": "AUDNZD",
+      "name": "AUD/NZD",
+      "config_used": {
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "csv_file": "AUDNZD_M5_fetched.csv"
+      },
+      "total_trades": 2935,
+      "wins": 2363,
+      "losses": 572,
+      "win_rate": 80.51,
+      "pnl_pips": 20462.06,
+      "profit_factor": 14.4991,
+      "sharpe": 9.9924,
+      "max_drawdown_pips": 39.23,
+      "max_drawdown_pct": 0.0392,
+      "expectancy_pips": 6.97,
+      "avg_win_pips": 9.3,
+      "avg_loss_pips": -2.65,
+      "avg_tp_distance_pips": 13.69,
+      "avg_sl_distance_pips": 8.46,
+      "long_trades": 1426,
+      "long_wr": 76.3,
+      "long_pnl_pips": 6498.32,
+      "short_trades": 1509,
+      "short_wr": 84.49,
+      "short_pnl_pips": 13963.74,
+      "tier_stats": {
+        "T1": {
+          "trades": 2584,
+          "wr": 78.7,
+          "pnl": 12535.0
+        },
+        "T2": {
+          "trades": 99,
+          "wr": 91.9,
+          "pnl": 1449.0
+        },
+        "T3": {
+          "trades": 252,
+          "wr": 94.8,
+          "pnl": 6478.0
+        }
+      },
+      "hourly_stats": {
+        "3": {
+          "trades": 20,
+          "wr": 70.0,
+          "pnl": 62.3
+        },
+        "4": {
+          "trades": 79,
+          "wr": 73.4,
+          "pnl": 216.1
+        },
+        "5": {
+          "trades": 173,
+          "wr": 76.3,
+          "pnl": 757.3
+        },
+        "6": {
+          "trades": 262,
+          "wr": 80.5,
+          "pnl": 1446.1
+        },
+        "7": {
+          "trades": 269,
+          "wr": 72.9,
+          "pnl": 759.1
+        },
+        "8": {
+          "trades": 258,
+          "wr": 77.9,
+          "pnl": 1037.5
+        },
+        "9": {
+          "trades": 183,
+          "wr": 76.0,
+          "pnl": 498.1
+        },
+        "10": {
+          "trades": 106,
+          "wr": 85.8,
+          "pnl": 368.4
+        }
+      },
+      "loop_stats": {
+        "1": {
+          "trades": 1117,
+          "wr": 80.8,
+          "pnl": 8418.7
+        },
+        "2": {
+          "trades": 823,
+          "wr": 81.2,
+          "pnl": 5319.3
+        },
+        "3": {
+          "trades": 502,
+          "wr": 81.1,
+          "pnl": 3477.1
+        },
+        "4": {
+          "trades": 269,
+          "wr": 77.3,
+          "pnl": 1613.2
+        },
+        "5": {
+          "trades": 224,
+          "wr": 79.0,
+          "pnl": 1633.7
+        }
+      },
+      "data_bars": 345236,
+      "data_days": 1917,
+      "kelly": 0.7496,
+      "max_consec_wins": 47,
+      "max_consec_losses": 4,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - AUDNZD_M5_fetched\n======================================================================\n  Data: 345,236 bars | 1917 days\n  Trades: 2935 | W: 2363 L: 572 | WR: 80.5%\n  PnL: +20462.1 pips | PF: 14.50\n  Sharpe: 9.99 | MaxDD: 39.2p (0.04%)\n  Long: 1426 (76.3% WR, +6498.3p)\n  Short: 1509 (84.5% WR, +13963.7p)\n  --- TIERS ---\n  T1: 2584 tr, 78.7% WR, +12535.0p\n  T2: 99 tr, 91.9% WR, +1449.0p\n  T3: 252 tr, 94.8% WR, +6478.0p\n  --- HOURLY ---\n  03:00 EST | 20 tr | 70.0% WR | +62.3p\n  04:00 EST | 79 tr | 73.4% WR | +216.1p\n  05:00 EST | 173 tr | 76.3% WR | +757.3p\n  06:00 EST | 262 tr | 80.5% WR | +1446.1p\n  07:00 EST | 269 tr | 72.9% WR | +759.1p\n  08:00 EST | 258 tr | 77.9% WR | +1037.5p\n  09:00 EST | 183 tr | 76.0% WR | +498.1p\n  10:00 EST | 106 tr | 85.8% WR | +368.4p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 1117 tr, 80.8% WR, +8418.7p\n  Loop 2: 823 tr, 81.2% WR, +5319.3p\n  Loop 3: 502 tr, 81.1% WR, +3477.1p\n  Loop 4: 269 tr, 77.3% WR, +1613.2p\n  Loop 5: 224 tr, 79.0% WR, +1633.7p\n======================================================================"
+    },
     {
       "asset_key": "AUDUSD",
       "name": "AUD/USD",
@@ -22,121 +515,119 @@
         "sl_method": "OCC_EXACT",
         "csv_file": "AUDUSD_M5.csv"
       },
-      "total_trades": 620,
-      "wins": 235,
-      "losses": 385,
-      "win_rate": 37.9,
-      "pnl_pips": -422.0,
-      "profit_factor": 0.8787,
-      "sharpe": -0.9049,
-      "max_drawdown_pips": 471.3,
-      "max_drawdown_pct": 0.4713,
-      "expectancy_pips": -0.68,
-      "avg_win_pips": 13.01,
-      "avg_loss_pips": -9.04,
-      "avg_tp_distance_pips": 13.85,
-      "avg_sl_distance_pips": 8.38,
-      "long_trades": 286,
-      "long_wr": 41.61,
-      "long_pnl_pips": -6.9,
-      "short_trades": 334,
-      "short_wr": 34.73,
-      "short_pnl_pips": -415.1,
+      "total_trades": 641,
+      "wins": 486,
+      "losses": 155,
+      "win_rate": 75.82,
+      "pnl_pips": 2417.51,
+      "profit_factor": 6.878,
+      "sharpe": 9.3259,
+      "max_drawdown_pips": 28.91,
+      "max_drawdown_pct": 0.0289,
+      "expectancy_pips": 3.77,
+      "avg_win_pips": 5.82,
+      "avg_loss_pips": -2.65,
+      "avg_tp_distance_pips": 12.07,
+      "avg_sl_distance_pips": 5.31,
+      "long_trades": 320,
+      "long_wr": 75.31,
+      "long_pnl_pips": 1148.76,
+      "short_trades": 321,
+      "short_wr": 76.32,
+      "short_pnl_pips": 1268.75,
       "tier_stats": {
         "T1": {
-          "trades": 270,
-          "wr": 41.1,
-          "pnl": -163.8
+          "trades": 505,
+          "wr": 75.6,
+          "pnl": 1627.9
         },
         "T2": {
-          "trades": 170,
-          "wr": 32.9,
-          "pnl": -358.5
+          "trades": 67,
+          "wr": 71.6,
+          "pnl": 297.1
         },
         "T3": {
-          "trades": 180,
-          "wr": 37.8,
-          "pnl": 100.3
+          "trades": 69,
+          "wr": 81.2,
+          "pnl": 492.5
         }
       },
       "hourly_stats": {
         "3": {
-          "trades": 7,
-          "wr": 28.6,
-          "pnl": -10.3
+          "trades": 4,
+          "wr": 50.0,
+          "pnl": -0.3
         },
         "4": {
-          "trades": 39,
-          "wr": 43.6,
-          "pnl": 45.0
+          "trades": 30,
+          "wr": 66.7,
+          "pnl": 62.0
         },
         "5": {
-          "trades": 63,
-          "wr": 31.7,
-          "pnl": -122.3
+          "trades": 43,
+          "wr": 81.4,
+          "pnl": 150.8
         },
         "6": {
-          "trades": 73,
-          "wr": 50.7,
-          "pnl": 152.8
+          "trades": 49,
+          "wr": 75.5,
+          "pnl": 136.0
         },
         "7": {
-          "trades": 64,
-          "wr": 31.2,
-          "pnl": -26.6
+          "trades": 38,
+          "wr": 86.8,
+          "pnl": 92.4
         },
         "8": {
-          "trades": 33,
-          "wr": 30.3,
-          "pnl": -79.0
+          "trades": 20,
+          "wr": 80.0,
+          "pnl": 48.4
         },
         "9": {
-          "trades": 54,
-          "wr": 27.8,
-          "pnl": -163.8
+          "trades": 34,
+          "wr": 85.3,
+          "pnl": 114.9
         },
         "10": {
-          "trades": 105,
-          "wr": 36.2,
-          "pnl": -190.0
+          "trades": 79,
+          "wr": 75.9,
+          "pnl": 408.0
         }
       },
       "loop_stats": {
         "1": {
-          "trades": 418,
-          "wr": 38.0,
-          "pnl": -97.9
+          "trades": 174,
+          "wr": 78.7,
+          "pnl": 535.7
         },
         "2": {
-          "trades": 139,
-          "wr": 36.7,
-          "pnl": -246.6
+          "trades": 146,
+          "wr": 80.8,
+          "pnl": 622.0
         },
         "3": {
-          "trades": 45,
-          "wr": 37.8,
-          "pnl": -67.2
+          "trades": 115,
+          "wr": 73.9,
+          "pnl": 406.1
         },
         "4": {
-          "trades": 13,
-          "wr": 53.8,
-          "pnl": 40.3
+          "trades": 82,
+          "wr": 78.0,
+          "pnl": 329.9
         },
         "5": {
-          "trades": 5,
-          "wr": 20.0,
-          "pnl": -50.6
+          "trades": 124,
+          "wr": 66.1,
+          "pnl": 523.8
         }
       },
       "data_bars": 273896,
       "data_days": 1341,
-      "kelly": -0.0523,
-      "max_consec_wins": 7,
-      "max_consec_losses": 12,
-      "flags": [
-        "LOW_WR"
-      ],
-      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - AUDUSD_M5\n======================================================================\n  Data: 273,896 bars | 1341 days\n  Trades: 620 | W: 235 L: 385 | WR: 37.9%\n  PnL: -422.0 pips | PF: 0.88\n  Sharpe: -0.90 | MaxDD: 471.3p (0.47%)\n  Long: 286 (41.6% WR, -6.9p)\n  Short: 334 (34.7% WR, -415.1p)\n  --- TIERS ---\n  T1: 270 tr, 41.1% WR, -163.8p\n  T2: 170 tr, 32.9% WR, -358.5p\n  T3: 180 tr, 37.8% WR, +100.3p\n  --- HOURLY ---\n  03:00 EST | 7 tr | 28.6% WR | -10.3p\n  04:00 EST | 39 tr | 43.6% WR | +45.0p\n  05:00 EST | 63 tr | 31.7% WR | -122.3p\n  06:00 EST | 73 tr | 50.7% WR | +152.8p\n  07:00 EST | 64 tr | 31.2% WR | -26.6p\n  08:00 EST | 33 tr | 30.3% WR | -79.0p\n  09:00 EST | 54 tr | 27.8% WR | -163.8p\n  10:00 EST | 105 tr | 36.2% WR | -190.0p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 418 tr, 38.0% WR, -97.9p\n  Loop 2: 139 tr, 36.7% WR, -246.6p\n  Loop 3: 45 tr, 37.8% WR, -67.2p\n  Loop 4: 13 tr, 53.8% WR, +40.3p\n  Loop 5: 5 tr, 20.0% WR, -50.6p\n======================================================================"
+      "kelly": 0.648,
+      "max_consec_wins": 15,
+      "max_consec_losses": 4,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - AUDUSD_M5\n======================================================================\n  Data: 273,896 bars | 1341 days\n  Trades: 641 | W: 486 L: 155 | WR: 75.8%\n  PnL: +2417.5 pips | PF: 6.88\n  Sharpe: 9.33 | MaxDD: 28.9p (0.03%)\n  Long: 320 (75.3% WR, +1148.8p)\n  Short: 321 (76.3% WR, +1268.8p)\n  --- TIERS ---\n  T1: 505 tr, 75.6% WR, +1627.9p\n  T2: 67 tr, 71.6% WR, +297.1p\n  T3: 69 tr, 81.2% WR, +492.5p\n  --- HOURLY ---\n  03:00 EST | 4 tr | 50.0% WR | -0.3p\n  04:00 EST | 30 tr | 66.7% WR | +62.0p\n  05:00 EST | 43 tr | 81.4% WR | +150.8p\n  06:00 EST | 49 tr | 75.5% WR | +136.0p\n  07:00 EST | 38 tr | 86.8% WR | +92.4p\n  08:00 EST | 20 tr | 80.0% WR | +48.4p\n  09:00 EST | 34 tr | 85.3% WR | +114.9p\n  10:00 EST | 79 tr | 75.9% WR | +408.0p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 174 tr, 78.7% WR, +535.7p\n  Loop 2: 146 tr, 80.8% WR, +622.0p\n  Loop 3: 115 tr, 73.9% WR, +406.1p\n  Loop 4: 82 tr, 78.0% WR, +329.9p\n  Loop 5: 124 tr, 66.1% WR, +523.8p\n======================================================================"
     },
     {
       "asset_key": "BTCUSD",
@@ -144,124 +635,363 @@
       "config_used": {
         "pip_value": 1.0,
         "k_factor": 0.52,
-        "sl_method": "FIXED_BUFFER",
+        "sl_method": "OCC_PLUS_BUFFER",
         "csv_file": "BTCUSD_M5.csv"
       },
-      "total_trades": 582,
-      "wins": 130,
-      "losses": 452,
-      "win_rate": 22.34,
-      "pnl_pips": 6525.0,
-      "profit_factor": 1.1427,
-      "sharpe": 0.6505,
-      "max_drawdown_pips": 3905.7,
-      "max_drawdown_pct": 3.9057,
-      "expectancy_pips": 11.21,
-      "avg_win_pips": 401.83,
-      "avg_loss_pips": -101.13,
-      "avg_tp_distance_pips": 461.4,
-      "avg_sl_distance_pips": 107.02,
-      "long_trades": 281,
-      "long_wr": 24.91,
-      "long_pnl_pips": 7952.7,
-      "short_trades": 301,
-      "short_wr": 19.93,
-      "short_pnl_pips": -1427.7,
+      "total_trades": 1179,
+      "wins": 974,
+      "losses": 205,
+      "win_rate": 82.61,
+      "pnl_pips": 74294.75,
+      "profit_factor": 10.8011,
+      "sharpe": 12.0746,
+      "max_drawdown_pips": 462.83,
+      "max_drawdown_pct": 0.4628,
+      "expectancy_pips": 63.02,
+      "avg_win_pips": 84.06,
+      "avg_loss_pips": -36.98,
+      "avg_tp_distance_pips": 126.56,
+      "avg_sl_distance_pips": 72.29,
+      "long_trades": 593,
+      "long_wr": 81.28,
+      "long_pnl_pips": 34189.85,
+      "short_trades": 586,
+      "short_wr": 83.96,
+      "short_pnl_pips": 40104.9,
       "tier_stats": {
         "T1": {
-          "trades": 286,
-          "wr": 24.1,
-          "pnl": 2493.4
+          "trades": 1141,
+          "wr": 82.4,
+          "pnl": 68891.6
         },
         "T2": {
-          "trades": 217,
-          "wr": 22.1,
-          "pnl": 3539.8
+          "trades": 35,
+          "wr": 88.6,
+          "pnl": 5143.7
         },
         "T3": {
-          "trades": 79,
-          "wr": 16.5,
-          "pnl": 491.8
+          "trades": 3,
+          "wr": 100.0,
+          "pnl": 259.5
         }
       },
       "hourly_stats": {
         "3": {
-          "trades": 12,
-          "wr": 8.3,
-          "pnl": -569.9
+          "trades": 25,
+          "wr": 76.0,
+          "pnl": 1446.6
         },
         "4": {
-          "trades": 43,
-          "wr": 14.0,
-          "pnl": -853.9
+          "trades": 68,
+          "wr": 86.8,
+          "pnl": 3978.5
         },
         "5": {
-          "trades": 49,
-          "wr": 18.4,
-          "pnl": 2746.5
+          "trades": 63,
+          "wr": 76.2,
+          "pnl": 1821.9
         },
         "6": {
-          "trades": 49,
-          "wr": 26.5,
-          "pnl": 878.9
+          "trades": 69,
+          "wr": 78.3,
+          "pnl": 3449.9
         },
         "7": {
-          "trades": 48,
-          "wr": 31.2,
-          "pnl": 4100.3
+          "trades": 63,
+          "wr": 81.0,
+          "pnl": 3459.7
         },
         "8": {
-          "trades": 64,
-          "wr": 10.9,
-          "pnl": -4916.1
+          "trades": 73,
+          "wr": 76.7,
+          "pnl": 4325.7
         },
         "9": {
           "trades": 61,
-          "wr": 14.8,
-          "pnl": -1359.2
+          "wr": 85.2,
+          "pnl": 3873.2
         },
         "10": {
-          "trades": 81,
-          "wr": 27.2,
-          "pnl": 3432.3
+          "trades": 96,
+          "wr": 82.3,
+          "pnl": 7374.7
         }
       },
       "loop_stats": {
         "1": {
-          "trades": 411,
-          "wr": 19.2,
-          "pnl": 4256.3
+          "trades": 252,
+          "wr": 82.9,
+          "pnl": 14355.9
         },
         "2": {
-          "trades": 104,
-          "wr": 24.0,
-          "pnl": -2886.9
+          "trades": 213,
+          "wr": 83.6,
+          "pnl": 11854.1
         },
         "3": {
-          "trades": 37,
-          "wr": 29.7,
-          "pnl": 2635.7
+          "trades": 167,
+          "wr": 79.6,
+          "pnl": 8253.8
         },
         "4": {
-          "trades": 18,
-          "wr": 44.4,
-          "pnl": 1404.4
+          "trades": 133,
+          "wr": 82.7,
+          "pnl": 8777.0
         },
         "5": {
-          "trades": 12,
-          "wr": 58.3,
-          "pnl": 1115.5
+          "trades": 414,
+          "wr": 83.1,
+          "pnl": 31053.9
         }
       },
-      "data_bars": 458887,
-      "data_days": 1611,
-      "kelly": 0.0279,
-      "max_consec_wins": 3,
-      "max_consec_losses": 18,
-      "flags": [
-        "LOW_WR"
-      ],
-      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - BTCUSD_M5\n======================================================================\n  Data: 458,887 bars | 1611 days\n  Trades: 582 | W: 130 L: 452 | WR: 22.3%\n  PnL: +6525.0 pips | PF: 1.14\n  Sharpe: 0.65 | MaxDD: 3905.7p (3.91%)\n  Long: 281 (24.9% WR, +7952.7p)\n  Short: 301 (19.9% WR, -1427.7p)\n  --- TIERS ---\n  T1: 286 tr, 24.1% WR, +2493.4p\n  T2: 217 tr, 22.1% WR, +3539.8p\n  T3: 79 tr, 16.5% WR, +491.8p\n  --- HOURLY ---\n  03:00 EST | 12 tr | 8.3% WR | -569.9p\n  04:00 EST | 43 tr | 14.0% WR | -853.9p\n  05:00 EST | 49 tr | 18.4% WR | +2746.5p\n  06:00 EST | 49 tr | 26.5% WR | +878.9p\n  07:00 EST | 48 tr | 31.2% WR | +4100.3p\n  08:00 EST | 64 tr | 10.9% WR | -4916.1p\n  09:00 EST | 61 tr | 14.8% WR | -1359.2p\n  10:00 EST | 81 tr | 27.2% WR | +3432.3p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 411 tr, 19.2% WR, +4256.3p\n  Loop 2: 104 tr, 24.0% WR, -2886.9p\n  Loop 3: 37 tr, 29.7% WR, +2635.7p\n  Loop 4: 18 tr, 44.4% WR, +1404.4p\n  Loop 5: 12 tr, 58.3% WR, +1115.5p\n======================================================================"
+      "data_bars": 463717,
+      "data_days": 1628,
+      "kelly": 0.7496,
+      "max_consec_wins": 32,
+      "max_consec_losses": 4,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - BTCUSD_M5\n======================================================================\n  Data: 463,717 bars | 1628 days\n  Trades: 1179 | W: 974 L: 205 | WR: 82.6%\n  PnL: +74294.7 pips | PF: 10.80\n  Sharpe: 12.07 | MaxDD: 462.8p (0.46%)\n  Long: 593 (81.3% WR, +34189.8p)\n  Short: 586 (84.0% WR, +40104.9p)\n  --- TIERS ---\n  T1: 1141 tr, 82.4% WR, +68891.6p\n  T2: 35 tr, 88.6% WR, +5143.7p\n  T3: 3 tr, 100.0% WR, +259.5p\n  --- HOURLY ---\n  03:00 EST | 25 tr | 76.0% WR | +1446.6p\n  04:00 EST | 68 tr | 86.8% WR | +3978.5p\n  05:00 EST | 63 tr | 76.2% WR | +1821.9p\n  06:00 EST | 69 tr | 78.3% WR | +3449.9p\n  07:00 EST | 63 tr | 81.0% WR | +3459.7p\n  08:00 EST | 73 tr | 76.7% WR | +4325.7p\n  09:00 EST | 61 tr | 85.2% WR | +3873.2p\n  10:00 EST | 96 tr | 82.3% WR | +7374.7p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 252 tr, 82.9% WR, +14355.9p\n  Loop 2: 213 tr, 83.6% WR, +11854.1p\n  Loop 3: 167 tr, 79.6% WR, +8253.8p\n  Loop 4: 133 tr, 82.7% WR, +8777.0p\n  Loop 5: 414 tr, 83.1% WR, +31053.9p\n======================================================================"
+    },
+    {
+      "asset_key": "CADCHF",
+      "name": "CAD/CHF",
+      "config_used": {
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "csv_file": "CADCHF_M5_fetched.csv"
+      },
+      "total_trades": 5356,
+      "wins": 3873,
+      "losses": 1483,
+      "win_rate": 72.31,
+      "pnl_pips": 17206.11,
+      "profit_factor": 6.4116,
+      "sharpe": 7.4474,
+      "max_drawdown_pips": 30.19,
+      "max_drawdown_pct": 0.0302,
+      "expectancy_pips": 3.21,
+      "avg_win_pips": 5.26,
+      "avg_loss_pips": -2.14,
+      "avg_tp_distance_pips": 7.7,
+      "avg_sl_distance_pips": 4.71,
+      "long_trades": 2640,
+      "long_wr": 70.27,
+      "long_pnl_pips": 7781.02,
+      "short_trades": 2716,
+      "short_wr": 74.3,
+      "short_pnl_pips": 9425.09,
+      "tier_stats": {
+        "T1": {
+          "trades": 4925,
+          "wr": 71.4,
+          "pnl": 12869.7
+        },
+        "T2": {
+          "trades": 195,
+          "wr": 78.5,
+          "pnl": 1097.2
+        },
+        "T3": {
+          "trades": 236,
+          "wr": 86.4,
+          "pnl": 3239.1
+        }
+      },
+      "hourly_stats": {
+        "3": {
+          "trades": 139,
+          "wr": 66.2,
+          "pnl": 320.5
+        },
+        "4": {
+          "trades": 332,
+          "wr": 64.8,
+          "pnl": 552.7
+        },
+        "5": {
+          "trades": 429,
+          "wr": 72.0,
+          "pnl": 1061.7
+        },
+        "6": {
+          "trades": 618,
+          "wr": 70.6,
+          "pnl": 1811.3
+        },
+        "7": {
+          "trades": 703,
+          "wr": 71.1,
+          "pnl": 2129.6
+        },
+        "8": {
+          "trades": 674,
+          "wr": 71.1,
+          "pnl": 1814.3
+        },
+        "9": {
+          "trades": 472,
+          "wr": 75.8,
+          "pnl": 1552.4
+        },
+        "10": {
+          "trades": 318,
+          "wr": 70.1,
+          "pnl": 693.3
+        }
+      },
+      "loop_stats": {
+        "1": {
+          "trades": 1195,
+          "wr": 72.4,
+          "pnl": 4568.0
+        },
+        "2": {
+          "trades": 1019,
+          "wr": 71.1,
+          "pnl": 2956.2
+        },
+        "3": {
+          "trades": 822,
+          "wr": 70.8,
+          "pnl": 2152.5
+        },
+        "4": {
+          "trades": 644,
+          "wr": 72.7,
+          "pnl": 2008.7
+        },
+        "5": {
+          "trades": 1676,
+          "wr": 73.6,
+          "pnl": 5520.7
+        }
+      },
+      "data_bars": 345218,
+      "data_days": 1917,
+      "kelly": 0.6103,
+      "max_consec_wins": 25,
+      "max_consec_losses": 7,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - CADCHF_M5_fetched\n======================================================================\n  Data: 345,218 bars | 1917 days\n  Trades: 5356 | W: 3873 L: 1483 | WR: 72.3%\n  PnL: +17206.1 pips | PF: 6.41\n  Sharpe: 7.45 | MaxDD: 30.2p (0.03%)\n  Long: 2640 (70.3% WR, +7781.0p)\n  Short: 2716 (74.3% WR, +9425.1p)\n  --- TIERS ---\n  T1: 4925 tr, 71.4% WR, +12869.7p\n  T2: 195 tr, 78.5% WR, +1097.2p\n  T3: 236 tr, 86.4% WR, +3239.1p\n  --- HOURLY ---\n  03:00 EST | 139 tr | 66.2% WR | +320.5p\n  04:00 EST | 332 tr | 64.8% WR | +552.7p\n  05:00 EST | 429 tr | 72.0% WR | +1061.7p\n  06:00 EST | 618 tr | 70.6% WR | +1811.3p\n  07:00 EST | 703 tr | 71.1% WR | +2129.6p\n  08:00 EST | 674 tr | 71.1% WR | +1814.3p\n  09:00 EST | 472 tr | 75.8% WR | +1552.4p\n  10:00 EST | 318 tr | 70.1% WR | +693.3p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 1195 tr, 72.4% WR, +4568.0p\n  Loop 2: 1019 tr, 71.1% WR, +2956.2p\n  Loop 3: 822 tr, 70.8% WR, +2152.5p\n  Loop 4: 644 tr, 72.7% WR, +2008.7p\n  Loop 5: 1676 tr, 73.6% WR, +5520.7p\n======================================================================"
+    },
+    {
+      "asset_key": "CADJPY",
+      "name": "CAD/JPY",
+      "config_used": {
+        "pip_value": 0.01,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "csv_file": "CADJPY_M5_fetched.csv"
+      },
+      "total_trades": 1318,
+      "wins": 1098,
+      "losses": 220,
+      "win_rate": 83.31,
+      "pnl_pips": 11087.77,
+      "profit_factor": 15.3635,
+      "sharpe": 10.5705,
+      "max_drawdown_pips": 35.91,
+      "max_drawdown_pct": 0.0359,
+      "expectancy_pips": 8.41,
+      "avg_win_pips": 10.8,
+      "avg_loss_pips": -3.51,
+      "avg_tp_distance_pips": 19.92,
+      "avg_sl_distance_pips": 9.76,
+      "long_trades": 689,
+      "long_wr": 82.29,
+      "long_pnl_pips": 4964.18,
+      "short_trades": 629,
+      "short_wr": 84.42,
+      "short_pnl_pips": 6123.6,
+      "tier_stats": {
+        "T1": {
+          "trades": 1265,
+          "wr": 82.8,
+          "pnl": 9639.5
+        },
+        "T3": {
+          "trades": 53,
+          "wr": 96.2,
+          "pnl": 1448.2
+        }
+      },
+      "hourly_stats": {
+        "3": {
+          "trades": 6,
+          "wr": 83.3,
+          "pnl": 28.5
+        },
+        "4": {
+          "trades": 52,
+          "wr": 88.5,
+          "pnl": 393.1
+        },
+        "5": {
+          "trades": 94,
+          "wr": 84.0,
+          "pnl": 802.7
+        },
+        "6": {
+          "trades": 186,
+          "wr": 81.2,
+          "pnl": 1523.3
+        },
+        "7": {
+          "trades": 199,
+          "wr": 80.9,
+          "pnl": 1609.3
+        },
+        "8": {
+          "trades": 189,
+          "wr": 78.3,
+          "pnl": 1516.3
+        },
+        "9": {
+          "trades": 114,
+          "wr": 84.2,
+          "pnl": 701.6
+        },
+        "10": {
+          "trades": 80,
+          "wr": 76.2,
+          "pnl": 619.8
+        }
+      },
+      "loop_stats": {
+        "1": {
+          "trades": 546,
+          "wr": 82.8,
+          "pnl": 4614.2
+        },
+        "2": {
+          "trades": 359,
+          "wr": 81.6,
+          "pnl": 2772.4
+        },
+        "3": {
+          "trades": 203,
+          "wr": 83.7,
+          "pnl": 1748.8
+        },
+        "4": {
+          "trades": 108,
+          "wr": 87.0,
+          "pnl": 742.7
+        },
+        "5": {
+          "trades": 102,
+          "wr": 87.3,
+          "pnl": 1209.7
+        }
+      },
+      "data_bars": 327229,
+      "data_days": 1904,
+      "kelly": 0.7789,
+      "max_consec_wins": 25,
+      "max_consec_losses": 6,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - CADJPY_M5_fetched\n======================================================================\n  Data: 327,229 bars | 1904 days\n  Trades: 1318 | W: 1098 L: 220 | WR: 83.3%\n  PnL: +11087.8 pips | PF: 15.36\n  Sharpe: 10.57 | MaxDD: 35.9p (0.04%)\n  Long: 689 (82.3% WR, +4964.2p)\n  Short: 629 (84.4% WR, +6123.6p)\n  --- TIERS ---\n  T1: 1265 tr, 82.8% WR, +9639.5p\n  T3: 53 tr, 96.2% WR, +1448.2p\n  --- HOURLY ---\n  03:00 EST | 6 tr | 83.3% WR | +28.5p\n  04:00 EST | 52 tr | 88.5% WR | +393.1p\n  05:00 EST | 94 tr | 84.0% WR | +802.7p\n  06:00 EST | 186 tr | 81.2% WR | +1523.3p\n  07:00 EST | 199 tr | 80.9% WR | +1609.3p\n  08:00 EST | 189 tr | 78.3% WR | +1516.3p\n  09:00 EST | 114 tr | 84.2% WR | +701.6p\n  10:00 EST | 80 tr | 76.2% WR | +619.8p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 546 tr, 82.8% WR, +4614.2p\n  Loop 2: 359 tr, 81.6% WR, +2772.4p\n  Loop 3: 203 tr, 83.7% WR, +1748.8p\n  Loop 4: 108 tr, 87.0% WR, +742.7p\n  Loop 5: 102 tr, 87.3% WR, +1209.7p\n======================================================================"
     },
     {
       "asset_key": "CHFJPY",
@@ -272,121 +1002,119 @@
         "sl_method": "OCC_EXACT",
         "csv_file": "CHFJPY_M5.csv"
       },
-      "total_trades": 623,
-      "wins": 210,
-      "losses": 413,
-      "win_rate": 33.71,
-      "pnl_pips": 56.9,
-      "profit_factor": 1.0129,
-      "sharpe": 0.0774,
-      "max_drawdown_pips": 539.4,
-      "max_drawdown_pct": 0.5394,
-      "expectancy_pips": 0.09,
-      "avg_win_pips": 21.26,
-      "avg_loss_pips": -10.67,
-      "avg_tp_distance_pips": 25.73,
-      "avg_sl_distance_pips": 9.99,
-      "long_trades": 320,
-      "long_wr": 35.94,
-      "long_pnl_pips": 229.2,
-      "short_trades": 303,
-      "short_wr": 31.35,
-      "short_pnl_pips": -172.3,
+      "total_trades": 2160,
+      "wins": 1644,
+      "losses": 516,
+      "win_rate": 76.11,
+      "pnl_pips": 15851.88,
+      "profit_factor": 7.7032,
+      "sharpe": 9.1078,
+      "max_drawdown_pips": 41.18,
+      "max_drawdown_pct": 0.0412,
+      "expectancy_pips": 7.34,
+      "avg_win_pips": 11.08,
+      "avg_loss_pips": -4.58,
+      "avg_tp_distance_pips": 15.86,
+      "avg_sl_distance_pips": 9.57,
+      "long_trades": 1089,
+      "long_wr": 74.84,
+      "long_pnl_pips": 6985.98,
+      "short_trades": 1071,
+      "short_wr": 77.4,
+      "short_pnl_pips": 8865.9,
       "tier_stats": {
         "T1": {
-          "trades": 236,
-          "wr": 47.0,
-          "pnl": 381.0
+          "trades": 1869,
+          "wr": 74.7,
+          "pnl": 11299.8
         },
         "T2": {
-          "trades": 196,
-          "wr": 28.1,
-          "pnl": -342.6
+          "trades": 229,
+          "wr": 83.8,
+          "pnl": 2820.6
         },
         "T3": {
-          "trades": 191,
-          "wr": 23.0,
-          "pnl": 18.5
+          "trades": 62,
+          "wr": 88.7,
+          "pnl": 1731.5
         }
       },
       "hourly_stats": {
         "3": {
-          "trades": 8,
-          "wr": 37.5,
-          "pnl": 18.0
+          "trades": 37,
+          "wr": 83.8,
+          "pnl": 273.6
         },
         "4": {
-          "trades": 46,
-          "wr": 52.2,
-          "pnl": 318.0
+          "trades": 173,
+          "wr": 77.5,
+          "pnl": 1054.7
         },
         "5": {
-          "trades": 94,
-          "wr": 34.0,
-          "pnl": 4.5
+          "trades": 228,
+          "wr": 74.1,
+          "pnl": 1703.1
         },
         "6": {
-          "trades": 88,
-          "wr": 27.3,
-          "pnl": -72.6
+          "trades": 221,
+          "wr": 80.5,
+          "pnl": 1747.9
         },
         "7": {
-          "trades": 68,
-          "wr": 23.5,
-          "pnl": -131.0
+          "trades": 167,
+          "wr": 81.4,
+          "pnl": 1233.0
         },
         "8": {
-          "trades": 58,
-          "wr": 24.1,
-          "pnl": -140.8
+          "trades": 145,
+          "wr": 74.5,
+          "pnl": 789.3
         },
         "9": {
-          "trades": 51,
-          "wr": 25.5,
-          "pnl": -157.9
+          "trades": 122,
+          "wr": 68.9,
+          "pnl": 630.9
         },
         "10": {
-          "trades": 88,
-          "wr": 45.5,
-          "pnl": 302.1
+          "trades": 212,
+          "wr": 78.3,
+          "pnl": 2301.4
         }
       },
       "loop_stats": {
         "1": {
-          "trades": 321,
-          "wr": 26.5,
-          "pnl": -139.4
+          "trades": 302,
+          "wr": 76.2,
+          "pnl": 2048.9
         },
         "2": {
-          "trades": 143,
-          "wr": 35.7,
-          "pnl": -242.2
+          "trades": 294,
+          "wr": 80.3,
+          "pnl": 1932.3
         },
         "3": {
-          "trades": 80,
-          "wr": 33.8,
-          "pnl": -129.2
+          "trades": 279,
+          "wr": 74.9,
+          "pnl": 2228.0
         },
         "4": {
-          "trades": 48,
-          "wr": 52.1,
-          "pnl": 276.7
+          "trades": 255,
+          "wr": 73.7,
+          "pnl": 1721.0
         },
         "5": {
-          "trades": 31,
-          "wr": 71.0,
-          "pnl": 291.0
+          "trades": 1030,
+          "wr": 75.8,
+          "pnl": 7921.6
         }
       },
       "data_bars": 275093,
       "data_days": 1336,
-      "kelly": 0.0043,
-      "max_consec_wins": 5,
-      "max_consec_losses": 16,
-      "flags": [
-        "LOW_WR"
-      ],
-      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - CHFJPY_M5\n======================================================================\n  Data: 275,093 bars | 1336 days\n  Trades: 623 | W: 210 L: 413 | WR: 33.7%\n  PnL: +56.9 pips | PF: 1.01\n  Sharpe: 0.08 | MaxDD: 539.4p (0.54%)\n  Long: 320 (35.9% WR, +229.2p)\n  Short: 303 (31.4% WR, -172.3p)\n  --- TIERS ---\n  T1: 236 tr, 47.0% WR, +381.0p\n  T2: 196 tr, 28.1% WR, -342.6p\n  T3: 191 tr, 23.0% WR, +18.5p\n  --- HOURLY ---\n  03:00 EST | 8 tr | 37.5% WR | +18.0p\n  04:00 EST | 46 tr | 52.2% WR | +318.0p\n  05:00 EST | 94 tr | 34.0% WR | +4.5p\n  06:00 EST | 88 tr | 27.3% WR | -72.6p\n  07:00 EST | 68 tr | 23.5% WR | -131.0p\n  08:00 EST | 58 tr | 24.1% WR | -140.8p\n  09:00 EST | 51 tr | 25.5% WR | -157.9p\n  10:00 EST | 88 tr | 45.5% WR | +302.1p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 321 tr, 26.5% WR, -139.4p\n  Loop 2: 143 tr, 35.7% WR, -242.2p\n  Loop 3: 80 tr, 33.8% WR, -129.2p\n  Loop 4: 48 tr, 52.1% WR, +276.7p\n  Loop 5: 31 tr, 71.0% WR, +291.0p\n======================================================================"
+      "kelly": 0.6623,
+      "max_consec_wins": 31,
+      "max_consec_losses": 6,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - CHFJPY_M5\n======================================================================\n  Data: 275,093 bars | 1336 days\n  Trades: 2160 | W: 1644 L: 516 | WR: 76.1%\n  PnL: +15851.9 pips | PF: 7.70\n  Sharpe: 9.11 | MaxDD: 41.2p (0.04%)\n  Long: 1089 (74.8% WR, +6986.0p)\n  Short: 1071 (77.4% WR, +8865.9p)\n  --- TIERS ---\n  T1: 1869 tr, 74.7% WR, +11299.8p\n  T2: 229 tr, 83.8% WR, +2820.6p\n  T3: 62 tr, 88.7% WR, +1731.5p\n  --- HOURLY ---\n  03:00 EST | 37 tr | 83.8% WR | +273.6p\n  04:00 EST | 173 tr | 77.5% WR | +1054.7p\n  05:00 EST | 228 tr | 74.1% WR | +1703.1p\n  06:00 EST | 221 tr | 80.5% WR | +1747.9p\n  07:00 EST | 167 tr | 81.4% WR | +1233.0p\n  08:00 EST | 145 tr | 74.5% WR | +789.3p\n  09:00 EST | 122 tr | 68.9% WR | +630.9p\n  10:00 EST | 212 tr | 78.3% WR | +2301.4p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 302 tr, 76.2% WR, +2048.9p\n  Loop 2: 294 tr, 80.3% WR, +1932.3p\n  Loop 3: 279 tr, 74.9% WR, +2228.0p\n  Loop 4: 255 tr, 73.7% WR, +1721.0p\n  Loop 5: 1030 tr, 75.8% WR, +7921.6p\n======================================================================"
     },
     {
       "asset_key": "DE30",
@@ -397,121 +1125,119 @@
         "sl_method": "FIXED_BUFFER",
         "csv_file": "DE30_M5.csv"
       },
-      "total_trades": 986,
-      "wins": 366,
-      "losses": 620,
-      "win_rate": 37.12,
-      "pnl_pips": 2062.6,
-      "profit_factor": 1.1972,
-      "sharpe": 1.1079,
-      "max_drawdown_pips": 560.9,
-      "max_drawdown_pct": 0.5609,
-      "expectancy_pips": 2.09,
-      "avg_win_pips": 34.22,
-      "avg_loss_pips": -16.87,
-      "avg_tp_distance_pips": 41.18,
-      "avg_sl_distance_pips": 16.75,
-      "long_trades": 485,
-      "long_wr": 39.59,
-      "long_pnl_pips": 1555.5,
-      "short_trades": 501,
-      "short_wr": 34.73,
-      "short_pnl_pips": 507.1,
+      "total_trades": 1897,
+      "wins": 1456,
+      "losses": 441,
+      "win_rate": 76.75,
+      "pnl_pips": 24535.32,
+      "profit_factor": 7.7015,
+      "sharpe": 9.0913,
+      "max_drawdown_pips": 134.81,
+      "max_drawdown_pct": 0.1348,
+      "expectancy_pips": 12.93,
+      "avg_win_pips": 19.37,
+      "avg_loss_pips": -8.3,
+      "avg_tp_distance_pips": 25.16,
+      "avg_sl_distance_pips": 16.72,
+      "long_trades": 968,
+      "long_wr": 77.69,
+      "long_pnl_pips": 12620.12,
+      "short_trades": 929,
+      "short_wr": 75.78,
+      "short_pnl_pips": 11915.2,
       "tier_stats": {
         "T1": {
-          "trades": 470,
-          "wr": 45.1,
-          "pnl": 1386.5
+          "trades": 1662,
+          "wr": 76.3,
+          "pnl": 19978.2
         },
         "T2": {
-          "trades": 290,
-          "wr": 35.5,
-          "pnl": 1046.7
+          "trades": 201,
+          "wr": 79.6,
+          "pnl": 3319.5
         },
         "T3": {
-          "trades": 226,
-          "wr": 22.6,
-          "pnl": -370.6
+          "trades": 34,
+          "wr": 82.4,
+          "pnl": 1237.7
         }
       },
       "hourly_stats": {
         "3": {
-          "trades": 7,
-          "wr": 42.9,
-          "pnl": 32.0
+          "trades": 23,
+          "wr": 91.3,
+          "pnl": 287.9
         },
         "4": {
-          "trades": 88,
-          "wr": 39.8,
-          "pnl": 493.7
+          "trades": 129,
+          "wr": 74.4,
+          "pnl": 1334.8
         },
         "5": {
-          "trades": 209,
-          "wr": 37.3,
-          "pnl": 104.0
+          "trades": 246,
+          "wr": 80.1,
+          "pnl": 4072.9
         },
         "6": {
-          "trades": 166,
-          "wr": 38.0,
-          "pnl": 107.8
+          "trades": 191,
+          "wr": 78.5,
+          "pnl": 2506.0
         },
         "7": {
-          "trades": 114,
-          "wr": 36.8,
-          "pnl": 212.8
+          "trades": 157,
+          "wr": 79.6,
+          "pnl": 1997.1
         },
         "8": {
-          "trades": 81,
-          "wr": 32.1,
-          "pnl": 145.2
+          "trades": 143,
+          "wr": 78.3,
+          "pnl": 1625.0
         },
         "9": {
-          "trades": 90,
-          "wr": 37.8,
-          "pnl": 526.9
+          "trades": 141,
+          "wr": 72.3,
+          "pnl": 1430.1
         },
         "10": {
-          "trades": 95,
-          "wr": 43.2,
-          "pnl": 601.3
+          "trades": 150,
+          "wr": 77.3,
+          "pnl": 2697.4
         }
       },
       "loop_stats": {
         "1": {
-          "trades": 386,
-          "wr": 32.1,
-          "pnl": 1056.3
+          "trades": 220,
+          "wr": 79.5,
+          "pnl": 2665.3
         },
         "2": {
-          "trades": 220,
-          "wr": 34.1,
-          "pnl": -590.8
+          "trades": 214,
+          "wr": 79.0,
+          "pnl": 3393.8
         },
         "3": {
-          "trades": 151,
-          "wr": 43.7,
-          "pnl": 890.3
+          "trades": 210,
+          "wr": 79.5,
+          "pnl": 2803.0
         },
         "4": {
-          "trades": 117,
-          "wr": 41.9,
-          "pnl": 479.1
+          "trades": 201,
+          "wr": 77.6,
+          "pnl": 2265.1
         },
         "5": {
-          "trades": 112,
-          "wr": 46.4,
-          "pnl": 227.7
+          "trades": 1052,
+          "wr": 75.0,
+          "pnl": 13408.1
         }
       },
       "data_bars": 257602,
       "data_days": 1320,
-      "kelly": 0.0611,
-      "max_consec_wins": 6,
-      "max_consec_losses": 15,
-      "flags": [
-        "LOW_WR"
-      ],
-      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - DE30_M5\n======================================================================\n  Data: 257,602 bars | 1320 days\n  Trades: 986 | W: 366 L: 620 | WR: 37.1%\n  PnL: +2062.6 pips | PF: 1.20\n  Sharpe: 1.11 | MaxDD: 560.9p (0.56%)\n  Long: 485 (39.6% WR, +1555.5p)\n  Short: 501 (34.7% WR, +507.1p)\n  --- TIERS ---\n  T1: 470 tr, 45.1% WR, +1386.5p\n  T2: 290 tr, 35.5% WR, +1046.7p\n  T3: 226 tr, 22.6% WR, -370.6p\n  --- HOURLY ---\n  03:00 EST | 7 tr | 42.9% WR | +32.0p\n  04:00 EST | 88 tr | 39.8% WR | +493.7p\n  05:00 EST | 209 tr | 37.3% WR | +104.0p\n  06:00 EST | 166 tr | 38.0% WR | +107.8p\n  07:00 EST | 114 tr | 36.8% WR | +212.8p\n  08:00 EST | 81 tr | 32.1% WR | +145.2p\n  09:00 EST | 90 tr | 37.8% WR | +526.9p\n  10:00 EST | 95 tr | 43.2% WR | +601.3p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 386 tr, 32.1% WR, +1056.3p\n  Loop 2: 220 tr, 34.1% WR, -590.8p\n  Loop 3: 151 tr, 43.7% WR, +890.3p\n  Loop 4: 117 tr, 41.9% WR, +479.1p\n  Loop 5: 112 tr, 46.4% WR, +227.7p\n======================================================================"
+      "kelly": 0.6679,
+      "max_consec_wins": 28,
+      "max_consec_losses": 5,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - DE30_M5\n======================================================================\n  Data: 257,602 bars | 1320 days\n  Trades: 1897 | W: 1456 L: 441 | WR: 76.8%\n  PnL: +24535.3 pips | PF: 7.70\n  Sharpe: 9.09 | MaxDD: 134.8p (0.13%)\n  Long: 968 (77.7% WR, +12620.1p)\n  Short: 929 (75.8% WR, +11915.2p)\n  --- TIERS ---\n  T1: 1662 tr, 76.3% WR, +19978.2p\n  T2: 201 tr, 79.6% WR, +3319.5p\n  T3: 34 tr, 82.4% WR, +1237.7p\n  --- HOURLY ---\n  03:00 EST | 23 tr | 91.3% WR | +287.9p\n  04:00 EST | 129 tr | 74.4% WR | +1334.8p\n  05:00 EST | 246 tr | 80.1% WR | +4072.9p\n  06:00 EST | 191 tr | 78.5% WR | +2506.0p\n  07:00 EST | 157 tr | 79.6% WR | +1997.1p\n  08:00 EST | 143 tr | 78.3% WR | +1625.0p\n  09:00 EST | 141 tr | 72.3% WR | +1430.1p\n  10:00 EST | 150 tr | 77.3% WR | +2697.4p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 220 tr, 79.5% WR, +2665.3p\n  Loop 2: 214 tr, 79.0% WR, +3393.8p\n  Loop 3: 210 tr, 79.5% WR, +2803.0p\n  Loop 4: 201 tr, 77.6% WR, +2265.1p\n  Loop 5: 1052 tr, 75.0% WR, +13408.1p\n======================================================================"
     },
     {
       "asset_key": "ETHUSD",
@@ -522,116 +1248,852 @@
         "sl_method": "FIXED_BUFFER",
         "csv_file": "ETHUSD_M5.csv"
       },
-      "total_trades": 395,
-      "wins": 78,
-      "losses": 316,
-      "win_rate": 19.75,
-      "pnl_pips": -619.9,
-      "profit_factor": 0.8201,
-      "sharpe": -1.2065,
-      "max_drawdown_pips": 895.9,
-      "max_drawdown_pct": 0.8959,
-      "expectancy_pips": -1.57,
-      "avg_win_pips": 36.24,
-      "avg_loss_pips": -10.91,
-      "avg_tp_distance_pips": 42.31,
-      "avg_sl_distance_pips": 10.61,
-      "long_trades": 196,
-      "long_wr": 19.39,
-      "long_pnl_pips": -313.4,
-      "short_trades": 199,
-      "short_wr": 20.1,
-      "short_pnl_pips": -306.5,
+      "total_trades": 792,
+      "wins": 712,
+      "losses": 80,
+      "win_rate": 89.9,
+      "pnl_pips": 9545.16,
+      "profit_factor": 17.9764,
+      "sharpe": 13.706,
+      "max_drawdown_pips": 48.42,
+      "max_drawdown_pct": 0.0484,
+      "expectancy_pips": 12.05,
+      "avg_win_pips": 14.2,
+      "avg_loss_pips": -7.03,
+      "avg_tp_distance_pips": 36.74,
+      "avg_sl_distance_pips": 13.69,
+      "long_trades": 378,
+      "long_wr": 91.01,
+      "long_pnl_pips": 4619.95,
+      "short_trades": 414,
+      "short_wr": 88.89,
+      "short_pnl_pips": 4925.2,
       "tier_stats": {
         "T1": {
-          "trades": 161,
-          "wr": 15.5,
-          "pnl": -574.9
+          "trades": 647,
+          "wr": 90.4,
+          "pnl": 7215.4
         },
         "T2": {
           "trades": 109,
-          "wr": 27.5,
-          "pnl": 192.0
+          "wr": 86.2,
+          "pnl": 1561.2
         },
         "T3": {
-          "trades": 125,
-          "wr": 18.4,
-          "pnl": -237.0
+          "trades": 36,
+          "wr": 91.7,
+          "pnl": 768.5
         }
       },
       "hourly_stats": {
         "3": {
-          "trades": 5,
-          "wr": 40.0,
-          "pnl": 70.0
+          "trades": 6,
+          "wr": 100.0,
+          "pnl": 113.6
         },
         "4": {
-          "trades": 16,
-          "wr": 18.8,
-          "pnl": -15.7
+          "trades": 25,
+          "wr": 84.0,
+          "pnl": 394.9
         },
         "5": {
-          "trades": 18,
-          "wr": 16.7,
-          "pnl": -63.4
+          "trades": 35,
+          "wr": 94.3,
+          "pnl": 390.9
         },
         "6": {
-          "trades": 43,
-          "wr": 23.3,
-          "pnl": 144.9
+          "trades": 40,
+          "wr": 95.0,
+          "pnl": 435.7
         },
         "7": {
-          "trades": 32,
-          "wr": 12.5,
-          "pnl": -158.4
+          "trades": 47,
+          "wr": 97.9,
+          "pnl": 588.1
         },
         "8": {
-          "trades": 37,
-          "wr": 10.8,
-          "pnl": -173.2
+          "trades": 46,
+          "wr": 93.5,
+          "pnl": 553.9
         },
         "9": {
-          "trades": 45,
-          "wr": 11.1,
-          "pnl": -225.5
+          "trades": 49,
+          "wr": 95.9,
+          "pnl": 449.0
         },
         "10": {
-          "trades": 48,
-          "wr": 20.8,
-          "pnl": 16.9
+          "trades": 53,
+          "wr": 84.9,
+          "pnl": 451.9
         }
       },
       "loop_stats": {
         "1": {
-          "trades": 343,
-          "wr": 19.8,
-          "pnl": -271.0
+          "trades": 411,
+          "wr": 93.7,
+          "pnl": 5057.3
         },
         "2": {
-          "trades": 46,
-          "wr": 19.6,
-          "pnl": -262.1
+          "trades": 201,
+          "wr": 89.1,
+          "pnl": 2195.3
         },
         "3": {
-          "trades": 5,
-          "wr": 20.0,
-          "pnl": -63.3
+          "trades": 94,
+          "wr": 85.1,
+          "pnl": 1083.3
         },
         "4": {
-          "trades": 1,
-          "wr": 0.0,
-          "pnl": -23.5
+          "trades": 48,
+          "wr": 77.1,
+          "pnl": 544.4
+        },
+        "5": {
+          "trades": 38,
+          "wr": 81.6,
+          "pnl": 664.8
         }
       },
-      "data_bars": 458015,
-      "data_days": 1611,
-      "kelly": -0.0441,
-      "max_consec_wins": 3,
-      "max_consec_losses": 18,
-      "flags": [
-        "LOW_WR"
-      ],
-      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - ETHUSD_M5\n======================================================================\n  Data: 458,015 bars | 1611 days\n  Trades: 395 | W: 78 L: 316 | WR: 19.7%\n  PnL: -619.9 pips | PF: 0.82\n  Sharpe: -1.21 | MaxDD: 895.9p (0.90%)\n  Long: 196 (19.4% WR, -313.4p)\n  Short: 199 (20.1% WR, -306.5p)\n  --- TIERS ---\n  T1: 161 tr, 15.5% WR, -574.9p\n  T2: 109 tr, 27.5% WR, +192.0p\n  T3: 125 tr, 18.4% WR, -237.0p\n  --- HOURLY ---\n  03:00 EST | 5 tr | 40.0% WR | +70.0p\n  04:00 EST | 16 tr | 18.8% WR | -15.7p\n  05:00 EST | 18 tr | 16.7% WR | -63.4p\n  06:00 EST | 43 tr | 23.3% WR | +144.9p\n  07:00 EST | 32 tr | 12.5% WR | -158.4p\n  08:00 EST | 37 tr | 10.8% WR | -173.2p\n  09:00 EST | 45 tr | 11.1% WR | -225.5p\n  10:00 EST | 48 tr | 20.8% WR | +16.9p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 343 tr, 19.8% WR, -271.0p\n  Loop 2: 46 tr, 19.6% WR, -262.1p\n  Loop 3: 5 tr, 20.0% WR, -63.3p\n  Loop 4: 1 tr, 0.0% WR, -23.5p\n======================================================================"
+      "data_bars": 461666,
+      "data_days": 1624,
+      "kelly": 0.849,
+      "max_consec_wins": 61,
+      "max_consec_losses": 3,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - ETHUSD_M5\n======================================================================\n  Data: 461,666 bars | 1624 days\n  Trades: 792 | W: 712 L: 80 | WR: 89.9%\n  PnL: +9545.2 pips | PF: 17.98\n  Sharpe: 13.71 | MaxDD: 48.4p (0.05%)\n  Long: 378 (91.0% WR, +4620.0p)\n  Short: 414 (88.9% WR, +4925.2p)\n  --- TIERS ---\n  T1: 647 tr, 90.4% WR, +7215.4p\n  T2: 109 tr, 86.2% WR, +1561.2p\n  T3: 36 tr, 91.7% WR, +768.5p\n  --- HOURLY ---\n  03:00 EST | 6 tr | 100.0% WR | +113.6p\n  04:00 EST | 25 tr | 84.0% WR | +394.9p\n  05:00 EST | 35 tr | 94.3% WR | +390.9p\n  06:00 EST | 40 tr | 95.0% WR | +435.7p\n  07:00 EST | 47 tr | 97.9% WR | +588.1p\n  08:00 EST | 46 tr | 93.5% WR | +553.9p\n  09:00 EST | 49 tr | 95.9% WR | +449.0p\n  10:00 EST | 53 tr | 84.9% WR | +451.9p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 411 tr, 93.7% WR, +5057.3p\n  Loop 2: 201 tr, 89.1% WR, +2195.3p\n  Loop 3: 94 tr, 85.1% WR, +1083.3p\n  Loop 4: 48 tr, 77.1% WR, +544.4p\n  Loop 5: 38 tr, 81.6% WR, +664.8p\n======================================================================"
+    },
+    {
+      "asset_key": "EURAUD",
+      "name": "EUR/AUD",
+      "config_used": {
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "csv_file": "EURAUD_M5_fetched.csv"
+      },
+      "total_trades": 749,
+      "wins": 633,
+      "losses": 116,
+      "win_rate": 84.51,
+      "pnl_pips": 8906.86,
+      "profit_factor": 17.3156,
+      "sharpe": 9.0496,
+      "max_drawdown_pips": 32.51,
+      "max_drawdown_pct": 0.0325,
+      "expectancy_pips": 11.89,
+      "avg_win_pips": 14.93,
+      "avg_loss_pips": -4.71,
+      "avg_tp_distance_pips": 28.3,
+      "avg_sl_distance_pips": 13.72,
+      "long_trades": 369,
+      "long_wr": 82.38,
+      "long_pnl_pips": 4225.62,
+      "short_trades": 380,
+      "short_wr": 86.58,
+      "short_pnl_pips": 4681.24,
+      "tier_stats": {
+        "T1": {
+          "trades": 715,
+          "wr": 84.1,
+          "pnl": 7120.9
+        },
+        "T2": {
+          "trades": 12,
+          "wr": 91.7,
+          "pnl": 236.1
+        },
+        "T3": {
+          "trades": 22,
+          "wr": 95.5,
+          "pnl": 1549.8
+        }
+      },
+      "hourly_stats": {
+        "3": {
+          "trades": 4,
+          "wr": 75.0,
+          "pnl": 22.1
+        },
+        "4": {
+          "trades": 31,
+          "wr": 77.4,
+          "pnl": 165.8
+        },
+        "5": {
+          "trades": 57,
+          "wr": 87.7,
+          "pnl": 597.5
+        },
+        "6": {
+          "trades": 101,
+          "wr": 81.2,
+          "pnl": 1105.8
+        },
+        "7": {
+          "trades": 122,
+          "wr": 74.6,
+          "pnl": 964.2
+        },
+        "8": {
+          "trades": 107,
+          "wr": 81.3,
+          "pnl": 881.8
+        },
+        "9": {
+          "trades": 66,
+          "wr": 87.9,
+          "pnl": 544.4
+        },
+        "10": {
+          "trades": 32,
+          "wr": 87.5,
+          "pnl": 299.5
+        }
+      },
+      "loop_stats": {
+        "1": {
+          "trades": 348,
+          "wr": 86.5,
+          "pnl": 5174.9
+        },
+        "2": {
+          "trades": 212,
+          "wr": 82.1,
+          "pnl": 1911.4
+        },
+        "3": {
+          "trades": 105,
+          "wr": 81.9,
+          "pnl": 918.6
+        },
+        "4": {
+          "trades": 48,
+          "wr": 83.3,
+          "pnl": 530.7
+        },
+        "5": {
+          "trades": 36,
+          "wr": 88.9,
+          "pnl": 371.3
+        }
+      },
+      "data_bars": 345379,
+      "data_days": 1917,
+      "kelly": 0.7963,
+      "max_consec_wins": 36,
+      "max_consec_losses": 3,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - EURAUD_M5_fetched\n======================================================================\n  Data: 345,379 bars | 1917 days\n  Trades: 749 | W: 633 L: 116 | WR: 84.5%\n  PnL: +8906.9 pips | PF: 17.32\n  Sharpe: 9.05 | MaxDD: 32.5p (0.03%)\n  Long: 369 (82.4% WR, +4225.6p)\n  Short: 380 (86.6% WR, +4681.2p)\n  --- TIERS ---\n  T1: 715 tr, 84.1% WR, +7120.9p\n  T2: 12 tr, 91.7% WR, +236.1p\n  T3: 22 tr, 95.5% WR, +1549.8p\n  --- HOURLY ---\n  03:00 EST | 4 tr | 75.0% WR | +22.1p\n  04:00 EST | 31 tr | 77.4% WR | +165.8p\n  05:00 EST | 57 tr | 87.7% WR | +597.5p\n  06:00 EST | 101 tr | 81.2% WR | +1105.8p\n  07:00 EST | 122 tr | 74.6% WR | +964.2p\n  08:00 EST | 107 tr | 81.3% WR | +881.8p\n  09:00 EST | 66 tr | 87.9% WR | +544.4p\n  10:00 EST | 32 tr | 87.5% WR | +299.5p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 348 tr, 86.5% WR, +5174.9p\n  Loop 2: 212 tr, 82.1% WR, +1911.4p\n  Loop 3: 105 tr, 81.9% WR, +918.6p\n  Loop 4: 48 tr, 83.3% WR, +530.7p\n  Loop 5: 36 tr, 88.9% WR, +371.3p\n======================================================================"
+    },
+    {
+      "asset_key": "EURCAD",
+      "name": "EUR/CAD",
+      "config_used": {
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "csv_file": "EURCAD_M5_fetched.csv"
+      },
+      "total_trades": 3448,
+      "wins": 2637,
+      "losses": 811,
+      "win_rate": 76.48,
+      "pnl_pips": 21349.16,
+      "profit_factor": 8.2449,
+      "sharpe": 9.1783,
+      "max_drawdown_pips": 51.11,
+      "max_drawdown_pct": 0.0511,
+      "expectancy_pips": 6.19,
+      "avg_win_pips": 9.21,
+      "avg_loss_pips": -3.63,
+      "avg_tp_distance_pips": 14.28,
+      "avg_sl_distance_pips": 8.13,
+      "long_trades": 1708,
+      "long_wr": 75.12,
+      "long_pnl_pips": 10611.94,
+      "short_trades": 1740,
+      "short_wr": 77.82,
+      "short_pnl_pips": 10737.22,
+      "tier_stats": {
+        "T1": {
+          "trades": 3167,
+          "wr": 75.6,
+          "pnl": 16766.8
+        },
+        "T2": {
+          "trades": 132,
+          "wr": 84.1,
+          "pnl": 1380.2
+        },
+        "T3": {
+          "trades": 149,
+          "wr": 87.9,
+          "pnl": 3202.2
+        }
+      },
+      "hourly_stats": {
+        "3": {
+          "trades": 77,
+          "wr": 68.8,
+          "pnl": 337.8
+        },
+        "4": {
+          "trades": 199,
+          "wr": 77.9,
+          "pnl": 940.1
+        },
+        "5": {
+          "trades": 309,
+          "wr": 73.8,
+          "pnl": 1931.1
+        },
+        "6": {
+          "trades": 445,
+          "wr": 75.3,
+          "pnl": 2924.1
+        },
+        "7": {
+          "trades": 480,
+          "wr": 75.2,
+          "pnl": 3028.4
+        },
+        "8": {
+          "trades": 446,
+          "wr": 77.6,
+          "pnl": 3004.2
+        },
+        "9": {
+          "trades": 337,
+          "wr": 71.8,
+          "pnl": 1539.0
+        },
+        "10": {
+          "trades": 220,
+          "wr": 77.7,
+          "pnl": 984.7
+        }
+      },
+      "loop_stats": {
+        "1": {
+          "trades": 802,
+          "wr": 77.7,
+          "pnl": 6051.6
+        },
+        "2": {
+          "trades": 659,
+          "wr": 76.9,
+          "pnl": 3810.6
+        },
+        "3": {
+          "trades": 547,
+          "wr": 76.8,
+          "pnl": 3417.8
+        },
+        "4": {
+          "trades": 441,
+          "wr": 74.8,
+          "pnl": 2542.4
+        },
+        "5": {
+          "trades": 999,
+          "wr": 75.8,
+          "pnl": 5526.8
+        }
+      },
+      "data_bars": 345339,
+      "data_days": 1917,
+      "kelly": 0.672,
+      "max_consec_wins": 31,
+      "max_consec_losses": 5,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - EURCAD_M5_fetched\n======================================================================\n  Data: 345,339 bars | 1917 days\n  Trades: 3448 | W: 2637 L: 811 | WR: 76.5%\n  PnL: +21349.2 pips | PF: 8.24\n  Sharpe: 9.18 | MaxDD: 51.1p (0.05%)\n  Long: 1708 (75.1% WR, +10611.9p)\n  Short: 1740 (77.8% WR, +10737.2p)\n  --- TIERS ---\n  T1: 3167 tr, 75.6% WR, +16766.8p\n  T2: 132 tr, 84.1% WR, +1380.2p\n  T3: 149 tr, 87.9% WR, +3202.2p\n  --- HOURLY ---\n  03:00 EST | 77 tr | 68.8% WR | +337.8p\n  04:00 EST | 199 tr | 77.9% WR | +940.1p\n  05:00 EST | 309 tr | 73.8% WR | +1931.1p\n  06:00 EST | 445 tr | 75.3% WR | +2924.1p\n  07:00 EST | 480 tr | 75.2% WR | +3028.4p\n  08:00 EST | 446 tr | 77.6% WR | +3004.2p\n  09:00 EST | 337 tr | 71.8% WR | +1539.0p\n  10:00 EST | 220 tr | 77.7% WR | +984.7p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 802 tr, 77.7% WR, +6051.6p\n  Loop 2: 659 tr, 76.9% WR, +3810.6p\n  Loop 3: 547 tr, 76.8% WR, +3417.8p\n  Loop 4: 441 tr, 74.8% WR, +2542.4p\n  Loop 5: 999 tr, 75.8% WR, +5526.8p\n======================================================================"
+    },
+    {
+      "asset_key": "EURCHF",
+      "name": "EUR/CHF",
+      "config_used": {
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "csv_file": "EURCHF_M5_fetched.csv"
+      },
+      "total_trades": 4223,
+      "wins": 3149,
+      "losses": 1074,
+      "win_rate": 74.57,
+      "pnl_pips": 18475.24,
+      "profit_factor": 8.1146,
+      "sharpe": 8.1552,
+      "max_drawdown_pips": 29.03,
+      "max_drawdown_pct": 0.029,
+      "expectancy_pips": 4.37,
+      "avg_win_pips": 6.69,
+      "avg_loss_pips": -2.42,
+      "avg_tp_distance_pips": 9.86,
+      "avg_sl_distance_pips": 5.98,
+      "long_trades": 2075,
+      "long_wr": 70.8,
+      "long_pnl_pips": 7189.08,
+      "short_trades": 2148,
+      "short_wr": 78.21,
+      "short_pnl_pips": 11286.16,
+      "tier_stats": {
+        "T1": {
+          "trades": 3917,
+          "wr": 73.2,
+          "pnl": 13394.7
+        },
+        "T2": {
+          "trades": 117,
+          "wr": 88.0,
+          "pnl": 1108.4
+        },
+        "T3": {
+          "trades": 189,
+          "wr": 93.7,
+          "pnl": 3972.2
+        }
+      },
+      "hourly_stats": {
+        "3": {
+          "trades": 145,
+          "wr": 72.4,
+          "pnl": 457.7
+        },
+        "4": {
+          "trades": 301,
+          "wr": 74.1,
+          "pnl": 839.7
+        },
+        "5": {
+          "trades": 372,
+          "wr": 76.6,
+          "pnl": 1553.3
+        },
+        "6": {
+          "trades": 469,
+          "wr": 73.3,
+          "pnl": 1829.0
+        },
+        "7": {
+          "trades": 487,
+          "wr": 67.6,
+          "pnl": 1508.8
+        },
+        "8": {
+          "trades": 491,
+          "wr": 72.9,
+          "pnl": 1668.9
+        },
+        "9": {
+          "trades": 356,
+          "wr": 72.2,
+          "pnl": 1087.2
+        },
+        "10": {
+          "trades": 214,
+          "wr": 79.9,
+          "pnl": 566.1
+        }
+      },
+      "loop_stats": {
+        "1": {
+          "trades": 1144,
+          "wr": 75.6,
+          "pnl": 5768.5
+        },
+        "2": {
+          "trades": 952,
+          "wr": 73.4,
+          "pnl": 3537.7
+        },
+        "3": {
+          "trades": 701,
+          "wr": 76.2,
+          "pnl": 2987.9
+        },
+        "4": {
+          "trades": 499,
+          "wr": 73.9,
+          "pnl": 2050.7
+        },
+        "5": {
+          "trades": 927,
+          "wr": 73.6,
+          "pnl": 4130.4
+        }
+      },
+      "data_bars": 345222,
+      "data_days": 1917,
+      "kelly": 0.6538,
+      "max_consec_wins": 25,
+      "max_consec_losses": 6,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - EURCHF_M5_fetched\n======================================================================\n  Data: 345,222 bars | 1917 days\n  Trades: 4223 | W: 3149 L: 1074 | WR: 74.6%\n  PnL: +18475.2 pips | PF: 8.11\n  Sharpe: 8.16 | MaxDD: 29.0p (0.03%)\n  Long: 2075 (70.8% WR, +7189.1p)\n  Short: 2148 (78.2% WR, +11286.2p)\n  --- TIERS ---\n  T1: 3917 tr, 73.2% WR, +13394.7p\n  T2: 117 tr, 88.0% WR, +1108.4p\n  T3: 189 tr, 93.7% WR, +3972.2p\n  --- HOURLY ---\n  03:00 EST | 145 tr | 72.4% WR | +457.7p\n  04:00 EST | 301 tr | 74.1% WR | +839.7p\n  05:00 EST | 372 tr | 76.6% WR | +1553.3p\n  06:00 EST | 469 tr | 73.3% WR | +1829.0p\n  07:00 EST | 487 tr | 67.6% WR | +1508.8p\n  08:00 EST | 491 tr | 72.9% WR | +1668.9p\n  09:00 EST | 356 tr | 72.2% WR | +1087.2p\n  10:00 EST | 214 tr | 79.9% WR | +566.1p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 1144 tr, 75.6% WR, +5768.5p\n  Loop 2: 952 tr, 73.4% WR, +3537.7p\n  Loop 3: 701 tr, 76.2% WR, +2987.9p\n  Loop 4: 499 tr, 73.9% WR, +2050.7p\n  Loop 5: 927 tr, 73.6% WR, +4130.4p\n======================================================================"
+    },
+    {
+      "asset_key": "EURGBP",
+      "name": "EUR/GBP",
+      "config_used": {
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "csv_file": "EURGBP_M5_fetched.csv"
+      },
+      "total_trades": 5243,
+      "wins": 3680,
+      "losses": 1563,
+      "win_rate": 70.19,
+      "pnl_pips": 14991.6,
+      "profit_factor": 5.8816,
+      "sharpe": 7.0831,
+      "max_drawdown_pips": 27.77,
+      "max_drawdown_pct": 0.0278,
+      "expectancy_pips": 2.86,
+      "avg_win_pips": 4.91,
+      "avg_loss_pips": -1.96,
+      "avg_tp_distance_pips": 7.52,
+      "avg_sl_distance_pips": 4.34,
+      "long_trades": 2531,
+      "long_wr": 68.19,
+      "long_pnl_pips": 6822.08,
+      "short_trades": 2712,
+      "short_wr": 72.05,
+      "short_pnl_pips": 8169.52,
+      "tier_stats": {
+        "T1": {
+          "trades": 4942,
+          "wr": 69.2,
+          "pnl": 11777.7
+        },
+        "T2": {
+          "trades": 173,
+          "wr": 82.1,
+          "pnl": 921.0
+        },
+        "T3": {
+          "trades": 128,
+          "wr": 90.6,
+          "pnl": 2292.9
+        }
+      },
+      "hourly_stats": {
+        "3": {
+          "trades": 241,
+          "wr": 64.3,
+          "pnl": 469.9
+        },
+        "4": {
+          "trades": 438,
+          "wr": 66.2,
+          "pnl": 1057.9
+        },
+        "5": {
+          "trades": 594,
+          "wr": 70.0,
+          "pnl": 1707.2
+        },
+        "6": {
+          "trades": 635,
+          "wr": 71.8,
+          "pnl": 1753.9
+        },
+        "7": {
+          "trades": 626,
+          "wr": 68.8,
+          "pnl": 1519.9
+        },
+        "8": {
+          "trades": 615,
+          "wr": 68.8,
+          "pnl": 1501.4
+        },
+        "9": {
+          "trades": 475,
+          "wr": 70.1,
+          "pnl": 1169.7
+        },
+        "10": {
+          "trades": 295,
+          "wr": 68.8,
+          "pnl": 537.7
+        }
+      },
+      "loop_stats": {
+        "1": {
+          "trades": 1224,
+          "wr": 68.7,
+          "pnl": 3874.9
+        },
+        "2": {
+          "trades": 1028,
+          "wr": 69.6,
+          "pnl": 2410.2
+        },
+        "3": {
+          "trades": 823,
+          "wr": 68.3,
+          "pnl": 1883.0
+        },
+        "4": {
+          "trades": 669,
+          "wr": 73.1,
+          "pnl": 2011.9
+        },
+        "5": {
+          "trades": 1499,
+          "wr": 71.6,
+          "pnl": 4811.5
+        }
+      },
+      "data_bars": 345439,
+      "data_days": 1917,
+      "kelly": 0.5826,
+      "max_consec_wins": 24,
+      "max_consec_losses": 7,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - EURGBP_M5_fetched\n======================================================================\n  Data: 345,439 bars | 1917 days\n  Trades: 5243 | W: 3680 L: 1563 | WR: 70.2%\n  PnL: +14991.6 pips | PF: 5.88\n  Sharpe: 7.08 | MaxDD: 27.8p (0.03%)\n  Long: 2531 (68.2% WR, +6822.1p)\n  Short: 2712 (72.1% WR, +8169.5p)\n  --- TIERS ---\n  T1: 4942 tr, 69.2% WR, +11777.7p\n  T2: 173 tr, 82.1% WR, +921.0p\n  T3: 128 tr, 90.6% WR, +2292.9p\n  --- HOURLY ---\n  03:00 EST | 241 tr | 64.3% WR | +469.9p\n  04:00 EST | 438 tr | 66.2% WR | +1057.9p\n  05:00 EST | 594 tr | 70.0% WR | +1707.2p\n  06:00 EST | 635 tr | 71.8% WR | +1753.9p\n  07:00 EST | 626 tr | 68.8% WR | +1519.9p\n  08:00 EST | 615 tr | 68.8% WR | +1501.4p\n  09:00 EST | 475 tr | 70.1% WR | +1169.7p\n  10:00 EST | 295 tr | 68.8% WR | +537.7p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 1224 tr, 68.7% WR, +3874.9p\n  Loop 2: 1028 tr, 69.6% WR, +2410.2p\n  Loop 3: 823 tr, 68.3% WR, +1883.0p\n  Loop 4: 669 tr, 73.1% WR, +2011.9p\n  Loop 5: 1499 tr, 71.6% WR, +4811.5p\n======================================================================"
+    },
+    {
+      "asset_key": "EURJPY",
+      "name": "EUR/JPY",
+      "config_used": {
+        "pip_value": 0.01,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "csv_file": "EURJPY_M5_fetched.csv"
+      },
+      "total_trades": 531,
+      "wins": 461,
+      "losses": 70,
+      "win_rate": 86.82,
+      "pnl_pips": 7814.58,
+      "profit_factor": 30.3572,
+      "sharpe": 10.2666,
+      "max_drawdown_pips": 17.81,
+      "max_drawdown_pct": 0.0178,
+      "expectancy_pips": 14.72,
+      "avg_win_pips": 17.53,
+      "avg_loss_pips": -3.8,
+      "avg_tp_distance_pips": 31.05,
+      "avg_sl_distance_pips": 16.25,
+      "long_trades": 276,
+      "long_wr": 84.78,
+      "long_pnl_pips": 3671.17,
+      "short_trades": 255,
+      "short_wr": 89.02,
+      "short_pnl_pips": 4143.41,
+      "tier_stats": {
+        "T1": {
+          "trades": 499,
+          "wr": 86.2,
+          "pnl": 5902.4
+        },
+        "T3": {
+          "trades": 32,
+          "wr": 96.9,
+          "pnl": 1912.2
+        }
+      },
+      "hourly_stats": {
+        "3": {
+          "trades": 2,
+          "wr": 100.0,
+          "pnl": 28.1
+        },
+        "4": {
+          "trades": 17,
+          "wr": 88.2,
+          "pnl": 247.0
+        },
+        "5": {
+          "trades": 43,
+          "wr": 79.1,
+          "pnl": 287.0
+        },
+        "6": {
+          "trades": 80,
+          "wr": 91.2,
+          "pnl": 953.5
+        },
+        "7": {
+          "trades": 73,
+          "wr": 83.6,
+          "pnl": 827.4
+        },
+        "8": {
+          "trades": 64,
+          "wr": 79.7,
+          "pnl": 634.0
+        },
+        "9": {
+          "trades": 53,
+          "wr": 88.7,
+          "pnl": 447.6
+        },
+        "10": {
+          "trades": 25,
+          "wr": 88.0,
+          "pnl": 177.3
+        }
+      },
+      "loop_stats": {
+        "1": {
+          "trades": 293,
+          "wr": 88.1,
+          "pnl": 4751.0
+        },
+        "2": {
+          "trades": 143,
+          "wr": 88.8,
+          "pnl": 1742.3
+        },
+        "3": {
+          "trades": 57,
+          "wr": 82.5,
+          "pnl": 778.7
+        },
+        "4": {
+          "trades": 22,
+          "wr": 77.3,
+          "pnl": 280.9
+        },
+        "5": {
+          "trades": 16,
+          "wr": 75.0,
+          "pnl": 261.6
+        }
+      },
+      "data_bars": 345334,
+      "data_days": 1917,
+      "kelly": 0.8396,
+      "max_consec_wins": 27,
+      "max_consec_losses": 3,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - EURJPY_M5_fetched\n======================================================================\n  Data: 345,334 bars | 1917 days\n  Trades: 531 | W: 461 L: 70 | WR: 86.8%\n  PnL: +7814.6 pips | PF: 30.36\n  Sharpe: 10.27 | MaxDD: 17.8p (0.02%)\n  Long: 276 (84.8% WR, +3671.2p)\n  Short: 255 (89.0% WR, +4143.4p)\n  --- TIERS ---\n  T1: 499 tr, 86.2% WR, +5902.4p\n  T3: 32 tr, 96.9% WR, +1912.2p\n  --- HOURLY ---\n  03:00 EST | 2 tr | 100.0% WR | +28.1p\n  04:00 EST | 17 tr | 88.2% WR | +247.0p\n  05:00 EST | 43 tr | 79.1% WR | +287.0p\n  06:00 EST | 80 tr | 91.2% WR | +953.5p\n  07:00 EST | 73 tr | 83.6% WR | +827.4p\n  08:00 EST | 64 tr | 79.7% WR | +634.0p\n  09:00 EST | 53 tr | 88.7% WR | +447.6p\n  10:00 EST | 25 tr | 88.0% WR | +177.3p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 293 tr, 88.1% WR, +4751.0p\n  Loop 2: 143 tr, 88.8% WR, +1742.3p\n  Loop 3: 57 tr, 82.5% WR, +778.7p\n  Loop 4: 22 tr, 77.3% WR, +280.9p\n  Loop 5: 16 tr, 75.0% WR, +261.6p\n======================================================================"
+    },
+    {
+      "asset_key": "EURNZD",
+      "name": "EUR/NZD",
+      "config_used": {
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "csv_file": "EURNZD_M5_fetched.csv"
+      },
+      "total_trades": 730,
+      "wins": 630,
+      "losses": 100,
+      "win_rate": 86.3,
+      "pnl_pips": 11052.19,
+      "profit_factor": 21.7865,
+      "sharpe": 10.9931,
+      "max_drawdown_pips": 38.42,
+      "max_drawdown_pct": 0.0384,
+      "expectancy_pips": 15.14,
+      "avg_win_pips": 18.39,
+      "avg_loss_pips": -5.32,
+      "avg_tp_distance_pips": 31.03,
+      "avg_sl_distance_pips": 17.09,
+      "long_trades": 364,
+      "long_wr": 86.54,
+      "long_pnl_pips": 4390.75,
+      "short_trades": 366,
+      "short_wr": 86.07,
+      "short_pnl_pips": 6661.44,
+      "tier_stats": {
+        "T1": {
+          "trades": 651,
+          "wr": 85.9,
+          "pnl": 7659.1
+        },
+        "T2": {
+          "trades": 33,
+          "wr": 87.9,
+          "pnl": 1224.2
+        },
+        "T3": {
+          "trades": 46,
+          "wr": 91.3,
+          "pnl": 2168.9
+        }
+      },
+      "hourly_stats": {
+        "3": {
+          "trades": 4,
+          "wr": 75.0,
+          "pnl": 73.8
+        },
+        "4": {
+          "trades": 30,
+          "wr": 86.7,
+          "pnl": 215.3
+        },
+        "5": {
+          "trades": 54,
+          "wr": 87.0,
+          "pnl": 719.2
+        },
+        "6": {
+          "trades": 94,
+          "wr": 84.0,
+          "pnl": 1530.9
+        },
+        "7": {
+          "trades": 82,
+          "wr": 86.6,
+          "pnl": 1051.1
+        },
+        "8": {
+          "trades": 86,
+          "wr": 81.4,
+          "pnl": 829.0
+        },
+        "9": {
+          "trades": 52,
+          "wr": 76.9,
+          "pnl": 298.3
+        },
+        "10": {
+          "trades": 29,
+          "wr": 89.7,
+          "pnl": 342.8
+        }
+      },
+      "loop_stats": {
+        "1": {
+          "trades": 337,
+          "wr": 86.4,
+          "pnl": 5978.4
+        },
+        "2": {
+          "trades": 200,
+          "wr": 86.5,
+          "pnl": 2447.1
+        },
+        "3": {
+          "trades": 96,
+          "wr": 86.5,
+          "pnl": 1337.2
+        },
+        "4": {
+          "trades": 53,
+          "wr": 83.0,
+          "pnl": 521.1
+        },
+        "5": {
+          "trades": 44,
+          "wr": 88.6,
+          "pnl": 768.3
+        }
+      },
+      "data_bars": 345347,
+      "data_days": 1917,
+      "kelly": 0.8234,
+      "max_consec_wins": 33,
+      "max_consec_losses": 3,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - EURNZD_M5_fetched\n======================================================================\n  Data: 345,347 bars | 1917 days\n  Trades: 730 | W: 630 L: 100 | WR: 86.3%\n  PnL: +11052.2 pips | PF: 21.79\n  Sharpe: 10.99 | MaxDD: 38.4p (0.04%)\n  Long: 364 (86.5% WR, +4390.8p)\n  Short: 366 (86.1% WR, +6661.4p)\n  --- TIERS ---\n  T1: 651 tr, 85.9% WR, +7659.1p\n  T2: 33 tr, 87.9% WR, +1224.2p\n  T3: 46 tr, 91.3% WR, +2168.9p\n  --- HOURLY ---\n  03:00 EST | 4 tr | 75.0% WR | +73.8p\n  04:00 EST | 30 tr | 86.7% WR | +215.3p\n  05:00 EST | 54 tr | 87.0% WR | +719.2p\n  06:00 EST | 94 tr | 84.0% WR | +1530.9p\n  07:00 EST | 82 tr | 86.6% WR | +1051.1p\n  08:00 EST | 86 tr | 81.4% WR | +829.0p\n  09:00 EST | 52 tr | 76.9% WR | +298.3p\n  10:00 EST | 29 tr | 89.7% WR | +342.8p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 337 tr, 86.4% WR, +5978.4p\n  Loop 2: 200 tr, 86.5% WR, +2447.1p\n  Loop 3: 96 tr, 86.5% WR, +1337.2p\n  Loop 4: 53 tr, 83.0% WR, +521.1p\n  Loop 5: 44 tr, 88.6% WR, +768.3p\n======================================================================"
     },
     {
       "asset_key": "EURUSD",
@@ -642,121 +2104,119 @@
         "sl_method": "OCC_EXACT",
         "csv_file": "EURUSD_M5.csv"
       },
-      "total_trades": 886,
-      "wins": 390,
-      "losses": 496,
-      "win_rate": 44.02,
-      "pnl_pips": 155.2,
-      "profit_factor": 1.0344,
-      "sharpe": 0.2428,
-      "max_drawdown_pips": 429.6,
-      "max_drawdown_pct": 0.4296,
-      "expectancy_pips": 0.18,
-      "avg_win_pips": 11.98,
-      "avg_loss_pips": -9.11,
-      "avg_tp_distance_pips": 11.84,
-      "avg_sl_distance_pips": 8.76,
-      "long_trades": 443,
-      "long_wr": 43.34,
-      "long_pnl_pips": -129.2,
-      "short_trades": 443,
-      "short_wr": 44.7,
-      "short_pnl_pips": 284.4,
+      "total_trades": 999,
+      "wins": 733,
+      "losses": 266,
+      "win_rate": 73.37,
+      "pnl_pips": 4280.71,
+      "profit_factor": 6.1959,
+      "sharpe": 8.0861,
+      "max_drawdown_pips": 53.3,
+      "max_drawdown_pct": 0.0533,
+      "expectancy_pips": 4.28,
+      "avg_win_pips": 6.96,
+      "avg_loss_pips": -3.1,
+      "avg_tp_distance_pips": 11.13,
+      "avg_sl_distance_pips": 6.15,
+      "long_trades": 505,
+      "long_wr": 70.1,
+      "long_pnl_pips": 1966.67,
+      "short_trades": 494,
+      "short_wr": 76.72,
+      "short_pnl_pips": 2314.04,
       "tier_stats": {
         "T1": {
-          "trades": 411,
-          "wr": 47.2,
-          "pnl": 18.8
+          "trades": 651,
+          "wr": 72.0,
+          "pnl": 2341.4
         },
         "T2": {
-          "trades": 248,
-          "wr": 36.3,
-          "pnl": -322.5
+          "trades": 205,
+          "wr": 70.2,
+          "pnl": 726.3
         },
         "T3": {
-          "trades": 227,
-          "wr": 46.7,
-          "pnl": 458.9
+          "trades": 143,
+          "wr": 83.9,
+          "pnl": 1213.0
         }
       },
       "hourly_stats": {
         "3": {
-          "trades": 5,
-          "wr": 40.0,
-          "pnl": -5.4
+          "trades": 4,
+          "wr": 75.0,
+          "pnl": 28.6
         },
         "4": {
-          "trades": 63,
-          "wr": 39.7,
-          "pnl": -38.2
+          "trades": 50,
+          "wr": 70.0,
+          "pnl": 115.3
         },
         "5": {
-          "trades": 152,
-          "wr": 44.1,
-          "pnl": 87.1
+          "trades": 96,
+          "wr": 72.9,
+          "pnl": 346.2
         },
         "6": {
-          "trades": 120,
-          "wr": 42.5,
-          "pnl": 75.3
+          "trades": 88,
+          "wr": 75.0,
+          "pnl": 314.8
         },
         "7": {
-          "trades": 85,
-          "wr": 40.0,
-          "pnl": -137.2
+          "trades": 68,
+          "wr": 67.6,
+          "pnl": 170.1
         },
         "8": {
-          "trades": 69,
-          "wr": 53.6,
-          "pnl": 172.8
+          "trades": 49,
+          "wr": 67.3,
+          "pnl": 123.3
         },
         "9": {
-          "trades": 84,
-          "wr": 42.9,
-          "pnl": 3.4
+          "trades": 66,
+          "wr": 74.2,
+          "pnl": 174.6
         },
         "10": {
-          "trades": 152,
-          "wr": 46.7,
-          "pnl": 4.2
+          "trades": 123,
+          "wr": 75.6,
+          "pnl": 833.8
         }
       },
       "loop_stats": {
         "1": {
-          "trades": 434,
-          "wr": 43.3,
-          "pnl": 287.7
+          "trades": 177,
+          "wr": 76.8,
+          "pnl": 661.3
         },
         "2": {
-          "trades": 237,
-          "wr": 43.5,
-          "pnl": -78.2
+          "trades": 166,
+          "wr": 73.5,
+          "pnl": 581.5
         },
         "3": {
-          "trades": 121,
-          "wr": 46.3,
-          "pnl": -32.6
+          "trades": 151,
+          "wr": 68.2,
+          "pnl": 524.7
         },
         "4": {
-          "trades": 69,
-          "wr": 44.9,
-          "pnl": 4.2
+          "trades": 131,
+          "wr": 71.8,
+          "pnl": 548.3
         },
         "5": {
-          "trades": 25,
-          "wr": 48.0,
-          "pnl": -25.9
+          "trades": 374,
+          "wr": 74.3,
+          "pnl": 1964.9
         }
       },
       "data_bars": 273909,
       "data_days": 1341,
-      "kelly": 0.0146,
-      "max_consec_wins": 8,
-      "max_consec_losses": 13,
-      "flags": [
-        "LOW_WR"
-      ],
-      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - EURUSD_M5\n======================================================================\n  Data: 273,909 bars | 1341 days\n  Trades: 886 | W: 390 L: 496 | WR: 44.0%\n  PnL: +155.2 pips | PF: 1.03\n  Sharpe: 0.24 | MaxDD: 429.6p (0.43%)\n  Long: 443 (43.3% WR, -129.2p)\n  Short: 443 (44.7% WR, +284.4p)\n  --- TIERS ---\n  T1: 411 tr, 47.2% WR, +18.8p\n  T2: 248 tr, 36.3% WR, -322.5p\n  T3: 227 tr, 46.7% WR, +458.9p\n  --- HOURLY ---\n  03:00 EST | 5 tr | 40.0% WR | -5.4p\n  04:00 EST | 63 tr | 39.7% WR | -38.2p\n  05:00 EST | 152 tr | 44.1% WR | +87.1p\n  06:00 EST | 120 tr | 42.5% WR | +75.3p\n  07:00 EST | 85 tr | 40.0% WR | -137.2p\n  08:00 EST | 69 tr | 53.6% WR | +172.8p\n  09:00 EST | 84 tr | 42.9% WR | +3.4p\n  10:00 EST | 152 tr | 46.7% WR | +4.2p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 434 tr, 43.3% WR, +287.7p\n  Loop 2: 237 tr, 43.5% WR, -78.2p\n  Loop 3: 121 tr, 46.3% WR, -32.6p\n  Loop 4: 69 tr, 44.9% WR, +4.2p\n  Loop 5: 25 tr, 48.0% WR, -25.9p\n======================================================================"
+      "kelly": 0.6153,
+      "max_consec_wins": 21,
+      "max_consec_losses": 5,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - EURUSD_M5\n======================================================================\n  Data: 273,909 bars | 1341 days\n  Trades: 999 | W: 733 L: 266 | WR: 73.4%\n  PnL: +4280.7 pips | PF: 6.20\n  Sharpe: 8.09 | MaxDD: 53.3p (0.05%)\n  Long: 505 (70.1% WR, +1966.7p)\n  Short: 494 (76.7% WR, +2314.0p)\n  --- TIERS ---\n  T1: 651 tr, 72.0% WR, +2341.4p\n  T2: 205 tr, 70.2% WR, +726.3p\n  T3: 143 tr, 83.9% WR, +1213.0p\n  --- HOURLY ---\n  03:00 EST | 4 tr | 75.0% WR | +28.6p\n  04:00 EST | 50 tr | 70.0% WR | +115.3p\n  05:00 EST | 96 tr | 72.9% WR | +346.2p\n  06:00 EST | 88 tr | 75.0% WR | +314.8p\n  07:00 EST | 68 tr | 67.6% WR | +170.1p\n  08:00 EST | 49 tr | 67.3% WR | +123.3p\n  09:00 EST | 66 tr | 74.2% WR | +174.6p\n  10:00 EST | 123 tr | 75.6% WR | +833.8p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 177 tr, 76.8% WR, +661.3p\n  Loop 2: 166 tr, 73.5% WR, +581.5p\n  Loop 3: 151 tr, 68.2% WR, +524.7p\n  Loop 4: 131 tr, 71.8% WR, +548.3p\n  Loop 5: 374 tr, 74.3% WR, +1964.9p\n======================================================================"
     },
     {
       "asset_key": "FR40",
@@ -767,121 +2227,119 @@
         "sl_method": "FIXED_BUFFER",
         "csv_file": "FR40_M5.csv"
       },
-      "total_trades": 834,
-      "wins": 306,
-      "losses": 528,
-      "win_rate": 36.69,
-      "pnl_pips": 980.9,
-      "profit_factor": 1.1657,
-      "sharpe": 0.8894,
-      "max_drawdown_pips": 557.6,
-      "max_drawdown_pct": 0.5576,
-      "expectancy_pips": 1.18,
-      "avg_win_pips": 22.55,
-      "avg_loss_pips": -11.21,
-      "avg_tp_distance_pips": 25.72,
-      "avg_sl_distance_pips": 10.1,
-      "long_trades": 446,
-      "long_wr": 36.77,
-      "long_pnl_pips": 605.1,
-      "short_trades": 388,
-      "short_wr": 36.6,
-      "short_pnl_pips": 375.8,
+      "total_trades": 2177,
+      "wins": 1711,
+      "losses": 466,
+      "win_rate": 78.59,
+      "pnl_pips": 16860.96,
+      "profit_factor": 9.4956,
+      "sharpe": 11.1009,
+      "max_drawdown_pips": 43.41,
+      "max_drawdown_pct": 0.0434,
+      "expectancy_pips": 7.75,
+      "avg_win_pips": 11.01,
+      "avg_loss_pips": -4.26,
+      "avg_tp_distance_pips": 19.75,
+      "avg_sl_distance_pips": 9.36,
+      "long_trades": 1104,
+      "long_wr": 79.71,
+      "long_pnl_pips": 8607.57,
+      "short_trades": 1073,
+      "short_wr": 77.45,
+      "short_pnl_pips": 8253.39,
       "tier_stats": {
         "T1": {
-          "trades": 604,
-          "wr": 37.1,
-          "pnl": 305.1
+          "trades": 2091,
+          "wr": 78.3,
+          "pnl": 15651.4
         },
         "T2": {
-          "trades": 177,
-          "wr": 32.2,
-          "pnl": 286.1
+          "trades": 81,
+          "wr": 85.2,
+          "pnl": 1066.7
         },
         "T3": {
-          "trades": 53,
-          "wr": 47.2,
-          "pnl": 389.7
+          "trades": 5,
+          "wr": 80.0,
+          "pnl": 142.9
         }
       },
       "hourly_stats": {
         "3": {
-          "trades": 2,
-          "wr": 0.0,
-          "pnl": -16.0
+          "trades": 8,
+          "wr": 75.0,
+          "pnl": 60.9
         },
         "4": {
-          "trades": 64,
-          "wr": 40.6,
-          "pnl": 188.4
+          "trades": 138,
+          "wr": 85.5,
+          "pnl": 1131.9
         },
         "5": {
-          "trades": 188,
-          "wr": 35.6,
-          "pnl": -17.6
+          "trades": 355,
+          "wr": 73.8,
+          "pnl": 3180.9
         },
         "6": {
-          "trades": 113,
-          "wr": 33.6,
-          "pnl": 188.2
+          "trades": 246,
+          "wr": 76.8,
+          "pnl": 1982.9
         },
         "7": {
-          "trades": 87,
-          "wr": 36.8,
-          "pnl": 321.4
+          "trades": 177,
+          "wr": 79.1,
+          "pnl": 1240.9
         },
         "8": {
-          "trades": 76,
-          "wr": 21.1,
-          "pnl": -394.6
+          "trades": 151,
+          "wr": 82.8,
+          "pnl": 1095.1
         },
         "9": {
-          "trades": 65,
-          "wr": 35.4,
-          "pnl": -102.3
+          "trades": 117,
+          "wr": 79.5,
+          "pnl": 776.8
         },
         "10": {
-          "trades": 99,
-          "wr": 41.4,
-          "pnl": 201.8
+          "trades": 147,
+          "wr": 80.3,
+          "pnl": 1127.3
         }
       },
       "loop_stats": {
         "1": {
-          "trades": 469,
-          "wr": 35.6,
-          "pnl": 859.1
+          "trades": 535,
+          "wr": 78.7,
+          "pnl": 4571.3
         },
         "2": {
-          "trades": 197,
-          "wr": 32.5,
-          "pnl": -503.4
+          "trades": 474,
+          "wr": 76.8,
+          "pnl": 3404.2
         },
         "3": {
-          "trades": 105,
-          "wr": 41.0,
-          "pnl": 269.3
+          "trades": 385,
+          "wr": 79.2,
+          "pnl": 2588.4
         },
         "4": {
-          "trades": 43,
-          "wr": 55.8,
-          "pnl": 364.2
+          "trades": 281,
+          "wr": 77.9,
+          "pnl": 2035.2
         },
         "5": {
-          "trades": 20,
-          "wr": 40.0,
-          "pnl": -8.3
+          "trades": 502,
+          "wr": 80.1,
+          "pnl": 4261.9
         }
       },
       "data_bars": 253878,
       "data_days": 1300,
-      "kelly": 0.0522,
-      "max_consec_wins": 5,
-      "max_consec_losses": 16,
-      "flags": [
-        "LOW_WR"
-      ],
-      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - FR40_M5\n======================================================================\n  Data: 253,878 bars | 1300 days\n  Trades: 834 | W: 306 L: 528 | WR: 36.7%\n  PnL: +980.9 pips | PF: 1.17\n  Sharpe: 0.89 | MaxDD: 557.6p (0.56%)\n  Long: 446 (36.8% WR, +605.1p)\n  Short: 388 (36.6% WR, +375.8p)\n  --- TIERS ---\n  T1: 604 tr, 37.1% WR, +305.1p\n  T2: 177 tr, 32.2% WR, +286.1p\n  T3: 53 tr, 47.2% WR, +389.7p\n  --- HOURLY ---\n  03:00 EST | 2 tr | 0.0% WR | -16.0p\n  04:00 EST | 64 tr | 40.6% WR | +188.4p\n  05:00 EST | 188 tr | 35.6% WR | -17.6p\n  06:00 EST | 113 tr | 33.6% WR | +188.2p\n  07:00 EST | 87 tr | 36.8% WR | +321.4p\n  08:00 EST | 76 tr | 21.1% WR | -394.6p\n  09:00 EST | 65 tr | 35.4% WR | -102.3p\n  10:00 EST | 99 tr | 41.4% WR | +201.8p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 469 tr, 35.6% WR, +859.1p\n  Loop 2: 197 tr, 32.5% WR, -503.4p\n  Loop 3: 105 tr, 41.0% WR, +269.3p\n  Loop 4: 43 tr, 55.8% WR, +364.2p\n  Loop 5: 20 tr, 40.0% WR, -8.3p\n======================================================================"
+      "kelly": 0.7032,
+      "max_consec_wins": 31,
+      "max_consec_losses": 5,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - FR40_M5\n======================================================================\n  Data: 253,878 bars | 1300 days\n  Trades: 2177 | W: 1711 L: 466 | WR: 78.6%\n  PnL: +16861.0 pips | PF: 9.50\n  Sharpe: 11.10 | MaxDD: 43.4p (0.04%)\n  Long: 1104 (79.7% WR, +8607.6p)\n  Short: 1073 (77.4% WR, +8253.4p)\n  --- TIERS ---\n  T1: 2091 tr, 78.3% WR, +15651.4p\n  T2: 81 tr, 85.2% WR, +1066.7p\n  T3: 5 tr, 80.0% WR, +142.9p\n  --- HOURLY ---\n  03:00 EST | 8 tr | 75.0% WR | +60.9p\n  04:00 EST | 138 tr | 85.5% WR | +1131.9p\n  05:00 EST | 355 tr | 73.8% WR | +3180.9p\n  06:00 EST | 246 tr | 76.8% WR | +1982.9p\n  07:00 EST | 177 tr | 79.1% WR | +1240.9p\n  08:00 EST | 151 tr | 82.8% WR | +1095.1p\n  09:00 EST | 117 tr | 79.5% WR | +776.8p\n  10:00 EST | 147 tr | 80.3% WR | +1127.3p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 535 tr, 78.7% WR, +4571.3p\n  Loop 2: 474 tr, 76.8% WR, +3404.2p\n  Loop 3: 385 tr, 79.2% WR, +2588.4p\n  Loop 4: 281 tr, 77.9% WR, +2035.2p\n  Loop 5: 502 tr, 80.1% WR, +4261.9p\n======================================================================"
     },
     {
       "asset_key": "GBPAUD",
@@ -892,121 +2350,237 @@
         "sl_method": "OCC_PLUS_8P",
         "csv_file": "GBPAUD_M5.csv"
       },
-      "total_trades": 551,
-      "wins": 196,
-      "losses": 355,
-      "win_rate": 35.57,
-      "pnl_pips": -6.1,
-      "profit_factor": 0.9988,
-      "sharpe": -0.008,
-      "max_drawdown_pips": 726.0,
-      "max_drawdown_pct": 0.726,
-      "expectancy_pips": -0.01,
-      "avg_win_pips": 26.17,
-      "avg_loss_pips": -14.47,
-      "avg_tp_distance_pips": 29.86,
-      "avg_sl_distance_pips": 13.52,
-      "long_trades": 296,
-      "long_wr": 34.12,
-      "long_pnl_pips": -185.4,
-      "short_trades": 255,
-      "short_wr": 37.25,
-      "short_pnl_pips": 179.3,
+      "total_trades": 1432,
+      "wins": 1123,
+      "losses": 309,
+      "win_rate": 78.42,
+      "pnl_pips": 11995.68,
+      "profit_factor": 9.5747,
+      "sharpe": 10.6953,
+      "max_drawdown_pips": 54.93,
+      "max_drawdown_pct": 0.0549,
+      "expectancy_pips": 8.38,
+      "avg_win_pips": 11.93,
+      "avg_loss_pips": -4.53,
+      "avg_tp_distance_pips": 22.38,
+      "avg_sl_distance_pips": 10.29,
+      "long_trades": 744,
+      "long_wr": 76.48,
+      "long_pnl_pips": 5803.59,
+      "short_trades": 688,
+      "short_wr": 80.52,
+      "short_pnl_pips": 6192.08,
       "tier_stats": {
         "T1": {
-          "trades": 289,
-          "wr": 42.2,
-          "pnl": 111.9
+          "trades": 1293,
+          "wr": 77.8,
+          "pnl": 9818.5
         },
         "T2": {
-          "trades": 162,
-          "wr": 31.5,
-          "pnl": -49.1
+          "trades": 117,
+          "wr": 83.8,
+          "pnl": 1775.5
         },
         "T3": {
-          "trades": 100,
-          "wr": 23.0,
-          "pnl": -68.9
+          "trades": 22,
+          "wr": 86.4,
+          "pnl": 401.6
         }
       },
       "hourly_stats": {
         "3": {
-          "trades": 5,
-          "wr": 20.0,
-          "pnl": -35.5
+          "trades": 20,
+          "wr": 60.0,
+          "pnl": 111.1
         },
         "4": {
-          "trades": 56,
-          "wr": 39.3,
-          "pnl": 129.8
+          "trades": 107,
+          "wr": 79.4,
+          "pnl": 920.9
         },
         "5": {
-          "trades": 68,
-          "wr": 35.3,
-          "pnl": 32.3
+          "trades": 134,
+          "wr": 76.9,
+          "pnl": 1126.1
         },
         "6": {
-          "trades": 66,
-          "wr": 40.9,
-          "pnl": 216.1
+          "trades": 121,
+          "wr": 76.0,
+          "pnl": 881.2
         },
         "7": {
-          "trades": 58,
-          "wr": 41.4,
-          "pnl": 107.8
+          "trades": 84,
+          "wr": 81.0,
+          "pnl": 605.0
         },
         "8": {
-          "trades": 48,
-          "wr": 35.4,
-          "pnl": -64.7
+          "trades": 95,
+          "wr": 75.8,
+          "pnl": 587.8
         },
         "9": {
-          "trades": 51,
-          "wr": 39.2,
-          "pnl": -21.9
+          "trades": 85,
+          "wr": 80.0,
+          "pnl": 657.8
         },
         "10": {
-          "trades": 78,
-          "wr": 32.1,
-          "pnl": -152.6
+          "trades": 156,
+          "wr": 78.2,
+          "pnl": 1667.9
         }
       },
       "loop_stats": {
         "1": {
-          "trades": 342,
-          "wr": 31.0,
-          "pnl": -157.8
+          "trades": 303,
+          "wr": 75.2,
+          "pnl": 2294.7
         },
         "2": {
-          "trades": 122,
-          "wr": 41.0,
-          "pnl": -96.3
+          "trades": 284,
+          "wr": 78.5,
+          "pnl": 2042.2
         },
         "3": {
-          "trades": 55,
-          "wr": 54.5,
-          "pnl": 372.5
+          "trades": 238,
+          "wr": 82.8,
+          "pnl": 2114.8
         },
         "4": {
-          "trades": 20,
-          "wr": 35.0,
-          "pnl": -46.8
+          "trades": 199,
+          "wr": 81.4,
+          "pnl": 1882.2
         },
         "5": {
-          "trades": 12,
-          "wr": 25.0,
-          "pnl": -77.7
+          "trades": 408,
+          "wr": 76.7,
+          "pnl": 3661.7
         }
       },
       "data_bars": 277100,
       "data_days": 1343,
-      "kelly": -0.0004,
-      "max_consec_wins": 5,
-      "max_consec_losses": 18,
-      "flags": [
-        "LOW_WR"
-      ],
-      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - GBPAUD_M5\n======================================================================\n  Data: 277,100 bars | 1343 days\n  Trades: 551 | W: 196 L: 355 | WR: 35.6%\n  PnL: -6.1 pips | PF: 1.00\n  Sharpe: -0.01 | MaxDD: 726.0p (0.73%)\n  Long: 296 (34.1% WR, -185.4p)\n  Short: 255 (37.3% WR, +179.3p)\n  --- TIERS ---\n  T1: 289 tr, 42.2% WR, +111.9p\n  T2: 162 tr, 31.5% WR, -49.1p\n  T3: 100 tr, 23.0% WR, -68.9p\n  --- HOURLY ---\n  03:00 EST | 5 tr | 20.0% WR | -35.5p\n  04:00 EST | 56 tr | 39.3% WR | +129.8p\n  05:00 EST | 68 tr | 35.3% WR | +32.3p\n  06:00 EST | 66 tr | 40.9% WR | +216.1p\n  07:00 EST | 58 tr | 41.4% WR | +107.8p\n  08:00 EST | 48 tr | 35.4% WR | -64.7p\n  09:00 EST | 51 tr | 39.2% WR | -21.9p\n  10:00 EST | 78 tr | 32.1% WR | -152.6p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 342 tr, 31.0% WR, -157.8p\n  Loop 2: 122 tr, 41.0% WR, -96.3p\n  Loop 3: 55 tr, 54.5% WR, +372.5p\n  Loop 4: 20 tr, 35.0% WR, -46.8p\n  Loop 5: 12 tr, 25.0% WR, -77.7p\n======================================================================"
+      "kelly": 0.7023,
+      "max_consec_wins": 30,
+      "max_consec_losses": 6,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - GBPAUD_M5\n======================================================================\n  Data: 277,100 bars | 1343 days\n  Trades: 1432 | W: 1123 L: 309 | WR: 78.4%\n  PnL: +11995.7 pips | PF: 9.57\n  Sharpe: 10.70 | MaxDD: 54.9p (0.05%)\n  Long: 744 (76.5% WR, +5803.6p)\n  Short: 688 (80.5% WR, +6192.1p)\n  --- TIERS ---\n  T1: 1293 tr, 77.8% WR, +9818.5p\n  T2: 117 tr, 83.8% WR, +1775.5p\n  T3: 22 tr, 86.4% WR, +401.6p\n  --- HOURLY ---\n  03:00 EST | 20 tr | 60.0% WR | +111.1p\n  04:00 EST | 107 tr | 79.4% WR | +920.9p\n  05:00 EST | 134 tr | 76.9% WR | +1126.1p\n  06:00 EST | 121 tr | 76.0% WR | +881.2p\n  07:00 EST | 84 tr | 81.0% WR | +605.0p\n  08:00 EST | 95 tr | 75.8% WR | +587.8p\n  09:00 EST | 85 tr | 80.0% WR | +657.8p\n  10:00 EST | 156 tr | 78.2% WR | +1667.9p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 303 tr, 75.2% WR, +2294.7p\n  Loop 2: 284 tr, 78.5% WR, +2042.2p\n  Loop 3: 238 tr, 82.8% WR, +2114.8p\n  Loop 4: 199 tr, 81.4% WR, +1882.2p\n  Loop 5: 408 tr, 76.7% WR, +3661.7p\n======================================================================"
+    },
+    {
+      "asset_key": "GBPCAD",
+      "name": "GBP/CAD",
+      "config_used": {
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_PLUS_6P",
+        "csv_file": "GBPCAD_PRO_M5.csv"
+      },
+      "total_trades": 1532,
+      "wins": 1236,
+      "losses": 296,
+      "win_rate": 80.68,
+      "pnl_pips": 13318.28,
+      "profit_factor": 11.6455,
+      "sharpe": 10.5199,
+      "max_drawdown_pips": 51.31,
+      "max_drawdown_pct": 0.0513,
+      "expectancy_pips": 8.69,
+      "avg_win_pips": 11.79,
+      "avg_loss_pips": -4.23,
+      "avg_tp_distance_pips": 20.7,
+      "avg_sl_distance_pips": 10.41,
+      "long_trades": 784,
+      "long_wr": 79.08,
+      "long_pnl_pips": 5947.21,
+      "short_trades": 748,
+      "short_wr": 82.35,
+      "short_pnl_pips": 7371.06,
+      "tier_stats": {
+        "T1": {
+          "trades": 1483,
+          "wr": 80.0,
+          "pnl": 11803.4
+        },
+        "T3": {
+          "trades": 49,
+          "wr": 100.0,
+          "pnl": 1514.9
+        }
+      },
+      "hourly_stats": {
+        "3": {
+          "trades": 16,
+          "wr": 68.8,
+          "pnl": 74.5
+        },
+        "4": {
+          "trades": 71,
+          "wr": 80.3,
+          "pnl": 436.0
+        },
+        "5": {
+          "trades": 131,
+          "wr": 84.0,
+          "pnl": 1596.1
+        },
+        "6": {
+          "trades": 207,
+          "wr": 80.2,
+          "pnl": 2020.1
+        },
+        "7": {
+          "trades": 227,
+          "wr": 77.5,
+          "pnl": 2000.8
+        },
+        "8": {
+          "trades": 204,
+          "wr": 75.5,
+          "pnl": 1629.6
+        },
+        "9": {
+          "trades": 160,
+          "wr": 80.0,
+          "pnl": 990.2
+        },
+        "10": {
+          "trades": 98,
+          "wr": 77.6,
+          "pnl": 588.1
+        }
+      },
+      "loop_stats": {
+        "1": {
+          "trades": 501,
+          "wr": 82.8,
+          "pnl": 5093.0
+        },
+        "2": {
+          "trades": 384,
+          "wr": 81.0,
+          "pnl": 3338.6
+        },
+        "3": {
+          "trades": 273,
+          "wr": 78.4,
+          "pnl": 1938.3
+        },
+        "4": {
+          "trades": 178,
+          "wr": 79.8,
+          "pnl": 1394.9
+        },
+        "5": {
+          "trades": 196,
+          "wr": 78.6,
+          "pnl": 1553.5
+        }
+      },
+      "data_bars": 279576,
+      "data_days": 3103,
+      "kelly": 0.7375,
+      "max_consec_wins": 29,
+      "max_consec_losses": 4,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - GBPCAD_PRO_M5\n======================================================================\n  Data: 279,576 bars | 3103 days\n  Trades: 1532 | W: 1236 L: 296 | WR: 80.7%\n  PnL: +13318.3 pips | PF: 11.65\n  Sharpe: 10.52 | MaxDD: 51.3p (0.05%)\n  Long: 784 (79.1% WR, +5947.2p)\n  Short: 748 (82.4% WR, +7371.1p)\n  --- TIERS ---\n  T1: 1483 tr, 80.0% WR, +11803.4p\n  T3: 49 tr, 100.0% WR, +1514.9p\n  --- HOURLY ---\n  03:00 EST | 16 tr | 68.8% WR | +74.5p\n  04:00 EST | 71 tr | 80.3% WR | +436.0p\n  05:00 EST | 131 tr | 84.0% WR | +1596.1p\n  06:00 EST | 207 tr | 80.2% WR | +2020.1p\n  07:00 EST | 227 tr | 77.5% WR | +2000.8p\n  08:00 EST | 204 tr | 75.5% WR | +1629.6p\n  09:00 EST | 160 tr | 80.0% WR | +990.2p\n  10:00 EST | 98 tr | 77.6% WR | +588.1p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 501 tr, 82.8% WR, +5093.0p\n  Loop 2: 384 tr, 81.0% WR, +3338.6p\n  Loop 3: 273 tr, 78.4% WR, +1938.3p\n  Loop 4: 178 tr, 79.8% WR, +1394.9p\n  Loop 5: 196 tr, 78.6% WR, +1553.5p\n======================================================================"
     },
     {
       "asset_key": "GBPCHF",
@@ -1017,121 +2591,119 @@
         "sl_method": "OCC_PLUS_6P",
         "csv_file": "GBPCHF_M5.csv"
       },
-      "total_trades": 631,
-      "wins": 197,
-      "losses": 434,
-      "win_rate": 31.22,
-      "pnl_pips": -282.4,
-      "profit_factor": 0.9277,
-      "sharpe": -0.5002,
-      "max_drawdown_pips": 463.3,
-      "max_drawdown_pct": 0.4633,
-      "expectancy_pips": -0.45,
-      "avg_win_pips": 18.41,
-      "avg_loss_pips": -9.01,
-      "avg_tp_distance_pips": 22.31,
-      "avg_sl_distance_pips": 8.97,
-      "long_trades": 310,
-      "long_wr": 32.9,
-      "long_pnl_pips": -49.0,
-      "short_trades": 321,
-      "short_wr": 29.6,
-      "short_pnl_pips": -233.4,
+      "total_trades": 1741,
+      "wins": 1415,
+      "losses": 326,
+      "win_rate": 81.28,
+      "pnl_pips": 10883.61,
+      "profit_factor": 12.9945,
+      "sharpe": 10.9194,
+      "max_drawdown_pips": 35.21,
+      "max_drawdown_pct": 0.0352,
+      "expectancy_pips": 6.25,
+      "avg_win_pips": 8.33,
+      "avg_loss_pips": -2.78,
+      "avg_tp_distance_pips": 18.92,
+      "avg_sl_distance_pips": 7.55,
+      "long_trades": 877,
+      "long_wr": 79.59,
+      "long_pnl_pips": 4632.86,
+      "short_trades": 864,
+      "short_wr": 82.99,
+      "short_pnl_pips": 6250.75,
       "tier_stats": {
         "T1": {
-          "trades": 440,
-          "wr": 33.2,
-          "pnl": -173.1
+          "trades": 1595,
+          "wr": 81.0,
+          "pnl": 8837.3
         },
         "T2": {
-          "trades": 132,
-          "wr": 28.0,
-          "pnl": -90.3
+          "trades": 129,
+          "wr": 82.2,
+          "pnl": 1683.3
         },
         "T3": {
-          "trades": 59,
-          "wr": 23.7,
-          "pnl": -19.0
+          "trades": 17,
+          "wr": 100.0,
+          "pnl": 363.0
         }
       },
       "hourly_stats": {
         "3": {
-          "trades": 1,
-          "wr": 100.0,
-          "pnl": 18.0
+          "trades": 5,
+          "wr": 80.0,
+          "pnl": 29.6
         },
         "4": {
-          "trades": 25,
-          "wr": 24.0,
-          "pnl": -11.1
+          "trades": 74,
+          "wr": 78.4,
+          "pnl": 501.7
         },
         "5": {
-          "trades": 76,
-          "wr": 27.6,
-          "pnl": -115.8
+          "trades": 152,
+          "wr": 78.3,
+          "pnl": 937.1
         },
         "6": {
-          "trades": 84,
-          "wr": 31.0,
-          "pnl": -83.3
+          "trades": 182,
+          "wr": 82.4,
+          "pnl": 1103.8
         },
         "7": {
-          "trades": 83,
-          "wr": 31.3,
-          "pnl": -80.1
+          "trades": 129,
+          "wr": 84.5,
+          "pnl": 776.8
         },
         "8": {
-          "trades": 65,
-          "wr": 26.2,
-          "pnl": -112.6
+          "trades": 117,
+          "wr": 87.2,
+          "pnl": 584.8
         },
         "9": {
-          "trades": 57,
-          "wr": 40.4,
-          "pnl": 138.5
+          "trades": 122,
+          "wr": 81.1,
+          "pnl": 652.6
         },
         "10": {
-          "trades": 79,
-          "wr": 32.9,
-          "pnl": 43.8
+          "trades": 190,
+          "wr": 81.1,
+          "pnl": 1744.5
         }
       },
       "loop_stats": {
         "1": {
-          "trades": 448,
-          "wr": 28.3,
-          "pnl": -406.1
+          "trades": 614,
+          "wr": 83.7,
+          "pnl": 3498.7
         },
         "2": {
-          "trades": 117,
-          "wr": 37.6,
-          "pnl": -17.5
+          "trades": 452,
+          "wr": 77.2,
+          "pnl": 2515.6
         },
         "3": {
-          "trades": 40,
-          "wr": 30.0,
-          "pnl": -12.9
+          "trades": 292,
+          "wr": 81.5,
+          "pnl": 1909.7
         },
         "4": {
-          "trades": 18,
-          "wr": 50.0,
-          "pnl": 59.8
+          "trades": 162,
+          "wr": 83.3,
+          "pnl": 1086.1
         },
         "5": {
-          "trades": 8,
-          "wr": 62.5,
-          "pnl": 94.3
+          "trades": 221,
+          "wr": 81.0,
+          "pnl": 1873.6
         }
       },
       "data_bars": 276994,
       "data_days": 1343,
-      "kelly": -0.0243,
-      "max_consec_wins": 5,
-      "max_consec_losses": 19,
-      "flags": [
-        "LOW_WR"
-      ],
-      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - GBPCHF_M5\n======================================================================\n  Data: 276,994 bars | 1343 days\n  Trades: 631 | W: 197 L: 434 | WR: 31.2%\n  PnL: -282.4 pips | PF: 0.93\n  Sharpe: -0.50 | MaxDD: 463.3p (0.46%)\n  Long: 310 (32.9% WR, -49.0p)\n  Short: 321 (29.6% WR, -233.4p)\n  --- TIERS ---\n  T1: 440 tr, 33.2% WR, -173.1p\n  T2: 132 tr, 28.0% WR, -90.3p\n  T3: 59 tr, 23.7% WR, -19.0p\n  --- HOURLY ---\n  03:00 EST | 1 tr | 100.0% WR | +18.0p\n  04:00 EST | 25 tr | 24.0% WR | -11.1p\n  05:00 EST | 76 tr | 27.6% WR | -115.8p\n  06:00 EST | 84 tr | 31.0% WR | -83.3p\n  07:00 EST | 83 tr | 31.3% WR | -80.1p\n  08:00 EST | 65 tr | 26.2% WR | -112.6p\n  09:00 EST | 57 tr | 40.4% WR | +138.5p\n  10:00 EST | 79 tr | 32.9% WR | +43.8p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 448 tr, 28.3% WR, -406.1p\n  Loop 2: 117 tr, 37.6% WR, -17.5p\n  Loop 3: 40 tr, 30.0% WR, -12.9p\n  Loop 4: 18 tr, 50.0% WR, +59.8p\n  Loop 5: 8 tr, 62.5% WR, +94.3p\n======================================================================"
+      "kelly": 0.7502,
+      "max_consec_wins": 36,
+      "max_consec_losses": 5,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - GBPCHF_M5\n======================================================================\n  Data: 276,994 bars | 1343 days\n  Trades: 1741 | W: 1415 L: 326 | WR: 81.3%\n  PnL: +10883.6 pips | PF: 12.99\n  Sharpe: 10.92 | MaxDD: 35.2p (0.04%)\n  Long: 877 (79.6% WR, +4632.9p)\n  Short: 864 (83.0% WR, +6250.8p)\n  --- TIERS ---\n  T1: 1595 tr, 81.0% WR, +8837.3p\n  T2: 129 tr, 82.2% WR, +1683.3p\n  T3: 17 tr, 100.0% WR, +363.0p\n  --- HOURLY ---\n  03:00 EST | 5 tr | 80.0% WR | +29.6p\n  04:00 EST | 74 tr | 78.4% WR | +501.7p\n  05:00 EST | 152 tr | 78.3% WR | +937.1p\n  06:00 EST | 182 tr | 82.4% WR | +1103.8p\n  07:00 EST | 129 tr | 84.5% WR | +776.8p\n  08:00 EST | 117 tr | 87.2% WR | +584.8p\n  09:00 EST | 122 tr | 81.1% WR | +652.6p\n  10:00 EST | 190 tr | 81.1% WR | +1744.5p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 614 tr, 83.7% WR, +3498.7p\n  Loop 2: 452 tr, 77.2% WR, +2515.6p\n  Loop 3: 292 tr, 81.5% WR, +1909.7p\n  Loop 4: 162 tr, 83.3% WR, +1086.1p\n  Loop 5: 221 tr, 81.0% WR, +1873.6p\n======================================================================"
     },
     {
       "asset_key": "GBPJPY",
@@ -1142,121 +2714,119 @@
         "sl_method": "OCC_PLUS_5P",
         "csv_file": "GBPJPY_M5.csv"
       },
-      "total_trades": 617,
-      "wins": 227,
-      "losses": 390,
-      "win_rate": 36.79,
-      "pnl_pips": 100.4,
-      "profit_factor": 1.0173,
-      "sharpe": 0.1179,
-      "max_drawdown_pips": 533.7,
-      "max_drawdown_pct": 0.5337,
-      "expectancy_pips": 0.16,
-      "avg_win_pips": 25.95,
-      "avg_loss_pips": -14.85,
-      "avg_tp_distance_pips": 29.91,
-      "avg_sl_distance_pips": 14.31,
-      "long_trades": 310,
-      "long_wr": 38.71,
-      "long_pnl_pips": 205.2,
-      "short_trades": 307,
-      "short_wr": 34.85,
-      "short_pnl_pips": -104.8,
+      "total_trades": 1691,
+      "wins": 1313,
+      "losses": 378,
+      "win_rate": 77.65,
+      "pnl_pips": 16537.26,
+      "profit_factor": 9.2892,
+      "sharpe": 9.8806,
+      "max_drawdown_pips": 48.21,
+      "max_drawdown_pct": 0.0482,
+      "expectancy_pips": 9.78,
+      "avg_win_pips": 14.11,
+      "avg_loss_pips": -5.28,
+      "avg_tp_distance_pips": 21.4,
+      "avg_sl_distance_pips": 11.8,
+      "long_trades": 883,
+      "long_wr": 77.92,
+      "long_pnl_pips": 8138.72,
+      "short_trades": 808,
+      "short_wr": 77.35,
+      "short_pnl_pips": 8398.54,
       "tier_stats": {
         "T1": {
-          "trades": 267,
-          "wr": 48.7,
-          "pnl": 483.4
+          "trades": 1399,
+          "wr": 76.4,
+          "pnl": 11610.6
         },
         "T2": {
-          "trades": 180,
-          "wr": 32.2,
-          "pnl": -41.4
+          "trades": 232,
+          "wr": 83.2,
+          "pnl": 3246.2
         },
         "T3": {
-          "trades": 170,
-          "wr": 22.9,
-          "pnl": -341.6
+          "trades": 60,
+          "wr": 85.0,
+          "pnl": 1680.5
         }
       },
       "hourly_stats": {
         "3": {
-          "trades": 9,
-          "wr": 44.4,
-          "pnl": 39.7
+          "trades": 20,
+          "wr": 70.0,
+          "pnl": 101.6
         },
         "4": {
-          "trades": 69,
-          "wr": 44.9,
-          "pnl": 89.0
+          "trades": 134,
+          "wr": 76.9,
+          "pnl": 1211.2
         },
         "5": {
-          "trades": 89,
-          "wr": 33.7,
-          "pnl": -57.6
+          "trades": 181,
+          "wr": 72.4,
+          "pnl": 1629.2
         },
         "6": {
-          "trades": 86,
-          "wr": 43.0,
-          "pnl": 388.0
+          "trades": 144,
+          "wr": 72.2,
+          "pnl": 1262.4
         },
         "7": {
-          "trades": 55,
-          "wr": 41.8,
-          "pnl": 85.8
+          "trades": 116,
+          "wr": 78.4,
+          "pnl": 922.6
         },
         "8": {
-          "trades": 47,
-          "wr": 31.9,
-          "pnl": -114.7
+          "trades": 107,
+          "wr": 75.7,
+          "pnl": 743.1
         },
         "9": {
-          "trades": 55,
-          "wr": 32.7,
-          "pnl": -195.9
+          "trades": 107,
+          "wr": 80.4,
+          "pnl": 763.1
         },
         "10": {
-          "trades": 88,
-          "wr": 33.0,
-          "pnl": -86.2
+          "trades": 161,
+          "wr": 80.7,
+          "pnl": 2008.0
         }
       },
       "loop_stats": {
         "1": {
-          "trades": 324,
-          "wr": 30.6,
-          "pnl": -292.5
+          "trades": 273,
+          "wr": 75.8,
+          "pnl": 2117.1
         },
         "2": {
-          "trades": 137,
-          "wr": 40.1,
-          "pnl": 43.9
+          "trades": 265,
+          "wr": 73.6,
+          "pnl": 2304.4
         },
         "3": {
-          "trades": 82,
-          "wr": 48.8,
-          "pnl": 247.7
+          "trades": 240,
+          "wr": 77.1,
+          "pnl": 1881.9
         },
         "4": {
-          "trades": 46,
-          "wr": 41.3,
-          "pnl": -6.1
+          "trades": 207,
+          "wr": 76.8,
+          "pnl": 2138.6
         },
         "5": {
-          "trades": 28,
-          "wr": 50.0,
-          "pnl": 107.4
+          "trades": 706,
+          "wr": 80.3,
+          "pnl": 8095.3
         }
       },
       "data_bars": 276931,
       "data_days": 1343,
-      "kelly": 0.0063,
-      "max_consec_wins": 7,
-      "max_consec_losses": 11,
-      "flags": [
-        "LOW_WR"
-      ],
-      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - GBPJPY_M5\n======================================================================\n  Data: 276,931 bars | 1343 days\n  Trades: 617 | W: 227 L: 390 | WR: 36.8%\n  PnL: +100.4 pips | PF: 1.02\n  Sharpe: 0.12 | MaxDD: 533.7p (0.53%)\n  Long: 310 (38.7% WR, +205.2p)\n  Short: 307 (34.9% WR, -104.8p)\n  --- TIERS ---\n  T1: 267 tr, 48.7% WR, +483.4p\n  T2: 180 tr, 32.2% WR, -41.4p\n  T3: 170 tr, 22.9% WR, -341.6p\n  --- HOURLY ---\n  03:00 EST | 9 tr | 44.4% WR | +39.7p\n  04:00 EST | 69 tr | 44.9% WR | +89.0p\n  05:00 EST | 89 tr | 33.7% WR | -57.6p\n  06:00 EST | 86 tr | 43.0% WR | +388.0p\n  07:00 EST | 55 tr | 41.8% WR | +85.8p\n  08:00 EST | 47 tr | 31.9% WR | -114.7p\n  09:00 EST | 55 tr | 32.7% WR | -195.9p\n  10:00 EST | 88 tr | 33.0% WR | -86.2p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 324 tr, 30.6% WR, -292.5p\n  Loop 2: 137 tr, 40.1% WR, +43.9p\n  Loop 3: 82 tr, 48.8% WR, +247.7p\n  Loop 4: 46 tr, 41.3% WR, -6.1p\n  Loop 5: 28 tr, 50.0% WR, +107.4p\n======================================================================"
+      "kelly": 0.6929,
+      "max_consec_wins": 21,
+      "max_consec_losses": 4,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - GBPJPY_M5\n======================================================================\n  Data: 276,931 bars | 1343 days\n  Trades: 1691 | W: 1313 L: 378 | WR: 77.6%\n  PnL: +16537.3 pips | PF: 9.29\n  Sharpe: 9.88 | MaxDD: 48.2p (0.05%)\n  Long: 883 (77.9% WR, +8138.7p)\n  Short: 808 (77.4% WR, +8398.5p)\n  --- TIERS ---\n  T1: 1399 tr, 76.4% WR, +11610.6p\n  T2: 232 tr, 83.2% WR, +3246.2p\n  T3: 60 tr, 85.0% WR, +1680.5p\n  --- HOURLY ---\n  03:00 EST | 20 tr | 70.0% WR | +101.6p\n  04:00 EST | 134 tr | 76.9% WR | +1211.2p\n  05:00 EST | 181 tr | 72.4% WR | +1629.2p\n  06:00 EST | 144 tr | 72.2% WR | +1262.4p\n  07:00 EST | 116 tr | 78.4% WR | +922.6p\n  08:00 EST | 107 tr | 75.7% WR | +743.1p\n  09:00 EST | 107 tr | 80.4% WR | +763.1p\n  10:00 EST | 161 tr | 80.7% WR | +2008.0p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 273 tr, 75.8% WR, +2117.1p\n  Loop 2: 265 tr, 73.6% WR, +2304.4p\n  Loop 3: 240 tr, 77.1% WR, +1881.9p\n  Loop 4: 207 tr, 76.8% WR, +2138.6p\n  Loop 5: 706 tr, 80.3% WR, +8095.3p\n======================================================================"
     },
     {
       "asset_key": "GBPNZD",
@@ -1267,121 +2837,119 @@
         "sl_method": "OCC_PLUS_8P",
         "csv_file": "GBPNZD_M5.csv"
       },
-      "total_trades": 514,
-      "wins": 169,
-      "losses": 345,
-      "win_rate": 32.88,
-      "pnl_pips": -313.0,
-      "profit_factor": 0.9409,
-      "sharpe": -0.3978,
-      "max_drawdown_pips": 626.0,
-      "max_drawdown_pct": 0.626,
-      "expectancy_pips": -0.61,
-      "avg_win_pips": 29.5,
-      "avg_loss_pips": -15.36,
-      "avg_tp_distance_pips": 34.4,
-      "avg_sl_distance_pips": 14.02,
-      "long_trades": 272,
-      "long_wr": 30.15,
-      "long_pnl_pips": -643.4,
-      "short_trades": 242,
-      "short_wr": 35.95,
-      "short_pnl_pips": 330.4,
+      "total_trades": 976,
+      "wins": 762,
+      "losses": 214,
+      "win_rate": 78.07,
+      "pnl_pips": 9884.97,
+      "profit_factor": 10.1299,
+      "sharpe": 11.1982,
+      "max_drawdown_pips": 29.71,
+      "max_drawdown_pct": 0.0297,
+      "expectancy_pips": 10.13,
+      "avg_win_pips": 14.39,
+      "avg_loss_pips": -5.06,
+      "avg_tp_distance_pips": 25.74,
+      "avg_sl_distance_pips": 12.21,
+      "long_trades": 508,
+      "long_wr": 76.38,
+      "long_pnl_pips": 4472.74,
+      "short_trades": 468,
+      "short_wr": 79.91,
+      "short_pnl_pips": 5412.22,
       "tier_stats": {
         "T1": {
-          "trades": 287,
-          "wr": 42.9,
-          "pnl": 684.0
+          "trades": 865,
+          "wr": 76.4,
+          "pnl": 7691.0
         },
         "T2": {
-          "trades": 113,
-          "wr": 25.7,
-          "pnl": -281.5
+          "trades": 95,
+          "wr": 89.5,
+          "pnl": 1709.0
         },
         "T3": {
-          "trades": 114,
-          "wr": 14.9,
-          "pnl": -715.5
+          "trades": 16,
+          "wr": 100.0,
+          "pnl": 484.9
         }
       },
       "hourly_stats": {
         "3": {
-          "trades": 4,
-          "wr": 0.0,
-          "pnl": -52.8
+          "trades": 9,
+          "wr": 77.8,
+          "pnl": 64.1
         },
         "4": {
-          "trades": 33,
-          "wr": 42.4,
-          "pnl": 140.5
+          "trades": 66,
+          "wr": 74.2,
+          "pnl": 489.6
         },
         "5": {
-          "trades": 53,
-          "wr": 39.6,
-          "pnl": 162.2
+          "trades": 100,
+          "wr": 75.0,
+          "pnl": 922.6
         },
         "6": {
-          "trades": 69,
-          "wr": 47.8,
-          "pnl": 420.8
+          "trades": 80,
+          "wr": 85.0,
+          "pnl": 742.6
         },
         "7": {
-          "trades": 43,
-          "wr": 20.9,
-          "pnl": -210.9
+          "trades": 56,
+          "wr": 73.2,
+          "pnl": 480.9
         },
         "8": {
-          "trades": 56,
-          "wr": 28.6,
-          "pnl": -160.1
+          "trades": 63,
+          "wr": 73.0,
+          "pnl": 504.0
         },
         "9": {
-          "trades": 62,
-          "wr": 25.8,
-          "pnl": -127.9
+          "trades": 60,
+          "wr": 71.7,
+          "pnl": 486.6
         },
         "10": {
-          "trades": 70,
-          "wr": 32.9,
-          "pnl": -55.1
+          "trades": 105,
+          "wr": 86.7,
+          "pnl": 2037.8
         }
       },
       "loop_stats": {
         "1": {
-          "trades": 314,
-          "wr": 31.2,
-          "pnl": -97.6
+          "trades": 221,
+          "wr": 76.5,
+          "pnl": 1783.3
         },
         "2": {
-          "trades": 118,
-          "wr": 39.8,
-          "pnl": 143.5
+          "trades": 202,
+          "wr": 78.2,
+          "pnl": 1939.4
         },
         "3": {
-          "trades": 49,
-          "wr": 26.5,
-          "pnl": -217.6
+          "trades": 174,
+          "wr": 75.9,
+          "pnl": 1871.0
         },
         "4": {
-          "trades": 21,
-          "wr": 28.6,
-          "pnl": -108.7
+          "trades": 135,
+          "wr": 81.5,
+          "pnl": 1499.9
         },
         "5": {
-          "trades": 12,
-          "wr": 41.7,
-          "pnl": -32.6
+          "trades": 244,
+          "wr": 79.1,
+          "pnl": 2791.5
         }
       },
       "data_bars": 277117,
       "data_days": 1343,
-      "kelly": -0.0206,
-      "max_consec_wins": 4,
-      "max_consec_losses": 12,
-      "flags": [
-        "LOW_WR"
-      ],
-      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - GBPNZD_M5\n======================================================================\n  Data: 277,117 bars | 1343 days\n  Trades: 514 | W: 169 L: 345 | WR: 32.9%\n  PnL: -313.0 pips | PF: 0.94\n  Sharpe: -0.40 | MaxDD: 626.0p (0.63%)\n  Long: 272 (30.1% WR, -643.4p)\n  Short: 242 (36.0% WR, +330.4p)\n  --- TIERS ---\n  T1: 287 tr, 42.9% WR, +684.0p\n  T2: 113 tr, 25.7% WR, -281.5p\n  T3: 114 tr, 14.9% WR, -715.5p\n  --- HOURLY ---\n  03:00 EST | 4 tr | 0.0% WR | -52.8p\n  04:00 EST | 33 tr | 42.4% WR | +140.5p\n  05:00 EST | 53 tr | 39.6% WR | +162.2p\n  06:00 EST | 69 tr | 47.8% WR | +420.8p\n  07:00 EST | 43 tr | 20.9% WR | -210.9p\n  08:00 EST | 56 tr | 28.6% WR | -160.1p\n  09:00 EST | 62 tr | 25.8% WR | -127.9p\n  10:00 EST | 70 tr | 32.9% WR | -55.1p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 314 tr, 31.2% WR, -97.6p\n  Loop 2: 118 tr, 39.8% WR, +143.5p\n  Loop 3: 49 tr, 26.5% WR, -217.6p\n  Loop 4: 21 tr, 28.6% WR, -108.7p\n  Loop 5: 12 tr, 41.7% WR, -32.6p\n======================================================================"
+      "kelly": 0.7037,
+      "max_consec_wins": 20,
+      "max_consec_losses": 3,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - GBPNZD_M5\n======================================================================\n  Data: 277,117 bars | 1343 days\n  Trades: 976 | W: 762 L: 214 | WR: 78.1%\n  PnL: +9885.0 pips | PF: 10.13\n  Sharpe: 11.20 | MaxDD: 29.7p (0.03%)\n  Long: 508 (76.4% WR, +4472.7p)\n  Short: 468 (79.9% WR, +5412.2p)\n  --- TIERS ---\n  T1: 865 tr, 76.4% WR, +7691.0p\n  T2: 95 tr, 89.5% WR, +1709.0p\n  T3: 16 tr, 100.0% WR, +484.9p\n  --- HOURLY ---\n  03:00 EST | 9 tr | 77.8% WR | +64.1p\n  04:00 EST | 66 tr | 74.2% WR | +489.6p\n  05:00 EST | 100 tr | 75.0% WR | +922.6p\n  06:00 EST | 80 tr | 85.0% WR | +742.6p\n  07:00 EST | 56 tr | 73.2% WR | +480.9p\n  08:00 EST | 63 tr | 73.0% WR | +504.0p\n  09:00 EST | 60 tr | 71.7% WR | +486.6p\n  10:00 EST | 105 tr | 86.7% WR | +2037.8p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 221 tr, 76.5% WR, +1783.3p\n  Loop 2: 202 tr, 78.2% WR, +1939.4p\n  Loop 3: 174 tr, 75.9% WR, +1871.0p\n  Loop 4: 135 tr, 81.5% WR, +1499.9p\n  Loop 5: 244 tr, 79.1% WR, +2791.5p\n======================================================================"
     },
     {
       "asset_key": "GBPUSD",
@@ -1392,121 +2960,119 @@
         "sl_method": "OCC_EXACT",
         "csv_file": "GBPUSD_M5.csv"
       },
-      "total_trades": 997,
-      "wins": 387,
-      "losses": 609,
-      "win_rate": 38.82,
-      "pnl_pips": 240.5,
-      "profit_factor": 1.0425,
-      "sharpe": 0.301,
-      "max_drawdown_pips": 269.6,
-      "max_drawdown_pct": 0.2696,
-      "expectancy_pips": 0.24,
-      "avg_win_pips": 15.25,
-      "avg_loss_pips": -9.3,
-      "avg_tp_distance_pips": 15.63,
-      "avg_sl_distance_pips": 9.15,
-      "long_trades": 515,
-      "long_wr": 41.36,
-      "long_pnl_pips": 478.4,
-      "short_trades": 482,
-      "short_wr": 36.1,
-      "short_pnl_pips": -237.9,
+      "total_trades": 1028,
+      "wins": 797,
+      "losses": 231,
+      "win_rate": 77.53,
+      "pnl_pips": 6593.7,
+      "profit_factor": 8.1491,
+      "sharpe": 9.468,
+      "max_drawdown_pips": 71.13,
+      "max_drawdown_pct": 0.0711,
+      "expectancy_pips": 6.41,
+      "avg_win_pips": 9.43,
+      "avg_loss_pips": -3.99,
+      "avg_tp_distance_pips": 15.01,
+      "avg_sl_distance_pips": 8.24,
+      "long_trades": 531,
+      "long_wr": 78.15,
+      "long_pnl_pips": 3491.08,
+      "short_trades": 497,
+      "short_wr": 76.86,
+      "short_pnl_pips": 3102.62,
       "tier_stats": {
         "T1": {
-          "trades": 479,
-          "wr": 41.8,
-          "pnl": 70.6
+          "trades": 587,
+          "wr": 74.3,
+          "pnl": 2920.1
         },
         "T2": {
-          "trades": 250,
-          "wr": 36.8,
-          "pnl": -14.1
+          "trades": 255,
+          "wr": 79.2,
+          "pnl": 1585.9
         },
         "T3": {
-          "trades": 268,
-          "wr": 35.4,
-          "pnl": 184.0
+          "trades": 186,
+          "wr": 85.5,
+          "pnl": 2087.7
         }
       },
       "hourly_stats": {
         "3": {
           "trades": 2,
-          "wr": 0.0,
-          "pnl": -23.8
+          "wr": 50.0,
+          "pnl": -2.4
         },
         "4": {
-          "trades": 96,
-          "wr": 34.4,
-          "pnl": -60.6
+          "trades": 71,
+          "wr": 76.1,
+          "pnl": 344.5
         },
         "5": {
-          "trades": 138,
-          "wr": 39.9,
-          "pnl": 175.0
+          "trades": 90,
+          "wr": 77.8,
+          "pnl": 476.5
         },
         "6": {
-          "trades": 146,
-          "wr": 39.0,
-          "pnl": 33.3
+          "trades": 85,
+          "wr": 80.0,
+          "pnl": 445.8
         },
         "7": {
-          "trades": 86,
-          "wr": 40.7,
-          "pnl": 91.0
+          "trades": 66,
+          "wr": 81.8,
+          "pnl": 388.4
         },
         "8": {
-          "trades": 83,
-          "wr": 37.3,
-          "pnl": -57.3
+          "trades": 71,
+          "wr": 70.4,
+          "pnl": 262.6
         },
         "9": {
-          "trades": 102,
-          "wr": 38.2,
-          "pnl": 3.5
+          "trades": 52,
+          "wr": 73.1,
+          "pnl": 209.6
         },
         "10": {
-          "trades": 146,
-          "wr": 41.1,
-          "pnl": 114.6
+          "trades": 116,
+          "wr": 81.0,
+          "pnl": 1184.2
         }
       },
       "loop_stats": {
         "1": {
-          "trades": 434,
-          "wr": 37.3,
-          "pnl": 175.4
+          "trades": 184,
+          "wr": 75.0,
+          "pnl": 1044.7
         },
         "2": {
-          "trades": 281,
-          "wr": 37.0,
-          "pnl": -166.5
+          "trades": 175,
+          "wr": 74.9,
+          "pnl": 945.2
         },
         "3": {
-          "trades": 139,
-          "wr": 41.0,
-          "pnl": 89.9
+          "trades": 163,
+          "wr": 78.5,
+          "pnl": 959.2
         },
         "4": {
-          "trades": 86,
-          "wr": 41.9,
-          "pnl": 31.7
+          "trades": 136,
+          "wr": 79.4,
+          "pnl": 785.2
         },
         "5": {
-          "trades": 57,
-          "wr": 49.1,
-          "pnl": 110.0
+          "trades": 370,
+          "wr": 78.9,
+          "pnl": 2859.4
         }
       },
       "data_bars": 277022,
       "data_days": 1343,
-      "kelly": 0.0152,
-      "max_consec_wins": 5,
-      "max_consec_losses": 10,
-      "flags": [
-        "LOW_WR"
-      ],
-      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - GBPUSD_M5\n======================================================================\n  Data: 277,022 bars | 1343 days\n  Trades: 997 | W: 387 L: 609 | WR: 38.8%\n  PnL: +240.5 pips | PF: 1.04\n  Sharpe: 0.30 | MaxDD: 269.6p (0.27%)\n  Long: 515 (41.4% WR, +478.4p)\n  Short: 482 (36.1% WR, -237.9p)\n  --- TIERS ---\n  T1: 479 tr, 41.8% WR, +70.6p\n  T2: 250 tr, 36.8% WR, -14.1p\n  T3: 268 tr, 35.4% WR, +184.0p\n  --- HOURLY ---\n  03:00 EST | 2 tr | 0.0% WR | -23.8p\n  04:00 EST | 96 tr | 34.4% WR | -60.6p\n  05:00 EST | 138 tr | 39.9% WR | +175.0p\n  06:00 EST | 146 tr | 39.0% WR | +33.3p\n  07:00 EST | 86 tr | 40.7% WR | +91.0p\n  08:00 EST | 83 tr | 37.3% WR | -57.3p\n  09:00 EST | 102 tr | 38.2% WR | +3.5p\n  10:00 EST | 146 tr | 41.1% WR | +114.6p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 434 tr, 37.3% WR, +175.4p\n  Loop 2: 281 tr, 37.0% WR, -166.5p\n  Loop 3: 139 tr, 41.0% WR, +89.9p\n  Loop 4: 86 tr, 41.9% WR, +31.7p\n  Loop 5: 57 tr, 49.1% WR, +110.0p\n======================================================================"
+      "kelly": 0.6802,
+      "max_consec_wins": 25,
+      "max_consec_losses": 5,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - GBPUSD_M5\n======================================================================\n  Data: 277,022 bars | 1343 days\n  Trades: 1028 | W: 797 L: 231 | WR: 77.5%\n  PnL: +6593.7 pips | PF: 8.15\n  Sharpe: 9.47 | MaxDD: 71.1p (0.07%)\n  Long: 531 (78.2% WR, +3491.1p)\n  Short: 497 (76.9% WR, +3102.6p)\n  --- TIERS ---\n  T1: 587 tr, 74.3% WR, +2920.1p\n  T2: 255 tr, 79.2% WR, +1585.9p\n  T3: 186 tr, 85.5% WR, +2087.7p\n  --- HOURLY ---\n  03:00 EST | 2 tr | 50.0% WR | -2.4p\n  04:00 EST | 71 tr | 76.1% WR | +344.5p\n  05:00 EST | 90 tr | 77.8% WR | +476.5p\n  06:00 EST | 85 tr | 80.0% WR | +445.8p\n  07:00 EST | 66 tr | 81.8% WR | +388.4p\n  08:00 EST | 71 tr | 70.4% WR | +262.6p\n  09:00 EST | 52 tr | 73.1% WR | +209.6p\n  10:00 EST | 116 tr | 81.0% WR | +1184.2p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 184 tr, 75.0% WR, +1044.7p\n  Loop 2: 175 tr, 74.9% WR, +945.2p\n  Loop 3: 163 tr, 78.5% WR, +959.2p\n  Loop 4: 136 tr, 79.4% WR, +785.2p\n  Loop 5: 370 tr, 78.9% WR, +2859.4p\n======================================================================"
     },
     {
       "asset_key": "HK50",
@@ -1517,116 +3083,402 @@
         "sl_method": "FIXED_BUFFER",
         "csv_file": "HK50_M5.csv"
       },
-      "total_trades": 183,
-      "wins": 25,
-      "losses": 158,
-      "win_rate": 13.66,
-      "pnl_pips": -1537.9,
-      "profit_factor": 0.654,
-      "sharpe": -2.1595,
-      "max_drawdown_pips": 1707.0,
-      "max_drawdown_pct": 1.707,
-      "expectancy_pips": -8.4,
-      "avg_win_pips": 116.3,
-      "avg_loss_pips": -28.13,
-      "avg_tp_distance_pips": 148.15,
-      "avg_sl_distance_pips": 24.18,
-      "long_trades": 83,
-      "long_wr": 10.84,
-      "long_pnl_pips": -1653.3,
-      "short_trades": 100,
-      "short_wr": 16.0,
-      "short_pnl_pips": 115.4,
+      "total_trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "win_rate": 0.0,
+      "pnl_pips": 0.0,
+      "profit_factor": 0.0,
+      "sharpe": 0.0,
+      "max_drawdown_pips": 0.0,
+      "max_drawdown_pct": 0.0,
+      "expectancy_pips": 0.0,
+      "avg_win_pips": 0.0,
+      "avg_loss_pips": 0.0,
+      "avg_tp_distance_pips": 0.0,
+      "avg_sl_distance_pips": 0.0,
+      "long_trades": 0,
+      "long_wr": 0.0,
+      "long_pnl_pips": 0.0,
+      "short_trades": 0,
+      "short_wr": 0.0,
+      "short_pnl_pips": 0.0,
+      "tier_stats": {},
+      "hourly_stats": {},
+      "loop_stats": {},
+      "data_bars": 242271,
+      "data_days": 1288,
+      "kelly": 0.0,
+      "max_consec_wins": 0,
+      "max_consec_losses": 0,
+      "flags": [
+        "ZERO_TRADES"
+      ],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - HK50_M5\n======================================================================\n  No trades generated."
+    },
+    {
+      "asset_key": "NZDCAD",
+      "name": "NZD/CAD",
+      "config_used": {
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "csv_file": "NZDCAD_M5_fetched.csv"
+      },
+      "total_trades": 2890,
+      "wins": 2311,
+      "losses": 579,
+      "win_rate": 79.97,
+      "pnl_pips": 18576.97,
+      "profit_factor": 12.0785,
+      "sharpe": 9.8087,
+      "max_drawdown_pips": 43.01,
+      "max_drawdown_pct": 0.043,
+      "expectancy_pips": 6.43,
+      "avg_win_pips": 8.76,
+      "avg_loss_pips": -2.9,
+      "avg_tp_distance_pips": 13.54,
+      "avg_sl_distance_pips": 8.07,
+      "long_trades": 1382,
+      "long_wr": 76.27,
+      "long_pnl_pips": 6767.43,
+      "short_trades": 1508,
+      "short_wr": 83.36,
+      "short_pnl_pips": 11809.54,
       "tier_stats": {
         "T1": {
-          "trades": 91,
-          "wr": 19.8,
-          "pnl": -32.2
+          "trades": 2539,
+          "wr": 78.6,
+          "pnl": 12137.8
         },
         "T2": {
-          "trades": 72,
-          "wr": 5.6,
-          "pnl": -1287.0
+          "trades": 163,
+          "wr": 89.0,
+          "pnl": 2149.0
         },
         "T3": {
-          "trades": 20,
-          "wr": 15.0,
-          "pnl": -218.7
+          "trades": 188,
+          "wr": 91.0,
+          "pnl": 4290.2
         }
       },
       "hourly_stats": {
         "3": {
-          "trades": 9,
-          "wr": 11.1,
-          "pnl": -138.2
+          "trades": 22,
+          "wr": 72.7,
+          "pnl": 71.8
         },
         "4": {
-          "trades": 30,
-          "wr": 10.0,
-          "pnl": -430.5
+          "trades": 106,
+          "wr": 75.5,
+          "pnl": 337.5
         },
         "5": {
-          "trades": 21,
-          "wr": 4.8,
-          "pnl": -297.3
+          "trades": 212,
+          "wr": 78.3,
+          "pnl": 1130.1
         },
         "6": {
-          "trades": 15,
-          "wr": 20.0,
-          "pnl": 91.9
+          "trades": 327,
+          "wr": 80.4,
+          "pnl": 2108.6
         },
         "7": {
-          "trades": 16,
-          "wr": 12.5,
-          "pnl": -466.3
+          "trades": 361,
+          "wr": 75.6,
+          "pnl": 1738.5
         },
         "8": {
-          "trades": 15,
-          "wr": 13.3,
-          "pnl": -32.0
+          "trades": 345,
+          "wr": 76.8,
+          "pnl": 1566.6
         },
         "9": {
-          "trades": 4,
-          "wr": 0.0,
-          "pnl": -43.3
+          "trades": 211,
+          "wr": 79.6,
+          "pnl": 815.4
         },
         "10": {
-          "trades": 19,
-          "wr": 15.8,
-          "pnl": -218.2
+          "trades": 167,
+          "wr": 75.4,
+          "pnl": 590.4
         }
       },
       "loop_stats": {
         "1": {
-          "trades": 163,
-          "wr": 12.3,
-          "pnl": -1189.1
+          "trades": 985,
+          "wr": 79.7,
+          "pnl": 6734.5
         },
         "2": {
-          "trades": 17,
-          "wr": 17.6,
-          "pnl": -520.8
+          "trades": 753,
+          "wr": 81.0,
+          "pnl": 4383.8
         },
         "3": {
-          "trades": 2,
-          "wr": 50.0,
-          "pnl": 80.0
+          "trades": 476,
+          "wr": 80.0,
+          "pnl": 2782.1
         },
         "4": {
-          "trades": 1,
-          "wr": 100.0,
-          "pnl": 92.0
+          "trades": 310,
+          "wr": 78.1,
+          "pnl": 2036.0
+        },
+        "5": {
+          "trades": 366,
+          "wr": 80.1,
+          "pnl": 2640.5
         }
       },
-      "data_bars": 242271,
-      "data_days": 1288,
-      "kelly": -0.0723,
-      "max_consec_wins": 3,
-      "max_consec_losses": 16,
-      "flags": [
-        "LOW_WR"
-      ],
-      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - HK50_M5\n======================================================================\n  Data: 242,271 bars | 1288 days\n  Trades: 183 | W: 25 L: 158 | WR: 13.7%\n  PnL: -1537.9 pips | PF: 0.65\n  Sharpe: -2.16 | MaxDD: 1707.0p (1.71%)\n  Long: 83 (10.8% WR, -1653.3p)\n  Short: 100 (16.0% WR, +115.4p)\n  --- TIERS ---\n  T1: 91 tr, 19.8% WR, -32.2p\n  T2: 72 tr, 5.6% WR, -1287.0p\n  T3: 20 tr, 15.0% WR, -218.7p\n  --- HOURLY ---\n  03:00 EST | 9 tr | 11.1% WR | -138.2p\n  04:00 EST | 30 tr | 10.0% WR | -430.5p\n  05:00 EST | 21 tr | 4.8% WR | -297.3p\n  06:00 EST | 15 tr | 20.0% WR | +91.9p\n  07:00 EST | 16 tr | 12.5% WR | -466.3p\n  08:00 EST | 15 tr | 13.3% WR | -32.0p\n  09:00 EST | 4 tr | 0.0% WR | -43.3p\n  10:00 EST | 19 tr | 15.8% WR | -218.2p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 163 tr, 12.3% WR, -1189.1p\n  Loop 2: 17 tr, 17.6% WR, -520.8p\n  Loop 3: 2 tr, 50.0% WR, +80.0p\n  Loop 4: 1 tr, 100.0% WR, +92.0p\n======================================================================"
+      "data_bars": 327018,
+      "data_days": 1904,
+      "kelly": 0.7334,
+      "max_consec_wins": 28,
+      "max_consec_losses": 5,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - NZDCAD_M5_fetched\n======================================================================\n  Data: 327,018 bars | 1904 days\n  Trades: 2890 | W: 2311 L: 579 | WR: 80.0%\n  PnL: +18577.0 pips | PF: 12.08\n  Sharpe: 9.81 | MaxDD: 43.0p (0.04%)\n  Long: 1382 (76.3% WR, +6767.4p)\n  Short: 1508 (83.4% WR, +11809.5p)\n  --- TIERS ---\n  T1: 2539 tr, 78.6% WR, +12137.8p\n  T2: 163 tr, 89.0% WR, +2149.0p\n  T3: 188 tr, 91.0% WR, +4290.2p\n  --- HOURLY ---\n  03:00 EST | 22 tr | 72.7% WR | +71.8p\n  04:00 EST | 106 tr | 75.5% WR | +337.5p\n  05:00 EST | 212 tr | 78.3% WR | +1130.1p\n  06:00 EST | 327 tr | 80.4% WR | +2108.6p\n  07:00 EST | 361 tr | 75.6% WR | +1738.5p\n  08:00 EST | 345 tr | 76.8% WR | +1566.6p\n  09:00 EST | 211 tr | 79.6% WR | +815.4p\n  10:00 EST | 167 tr | 75.4% WR | +590.4p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 985 tr, 79.7% WR, +6734.5p\n  Loop 2: 753 tr, 81.0% WR, +4383.8p\n  Loop 3: 476 tr, 80.0% WR, +2782.1p\n  Loop 4: 310 tr, 78.1% WR, +2036.0p\n  Loop 5: 366 tr, 80.1% WR, +2640.5p\n======================================================================"
+    },
+    {
+      "asset_key": "NZDCHF",
+      "name": "NZD/CHF",
+      "config_used": {
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "csv_file": "NZDCHF_M5_fetched.csv"
+      },
+      "total_trades": 3516,
+      "wins": 2700,
+      "losses": 816,
+      "win_rate": 76.79,
+      "pnl_pips": 16864.69,
+      "profit_factor": 11.2745,
+      "sharpe": 8.5967,
+      "max_drawdown_pips": 24.14,
+      "max_drawdown_pct": 0.0241,
+      "expectancy_pips": 4.8,
+      "avg_win_pips": 6.85,
+      "avg_loss_pips": -2.01,
+      "avg_tp_distance_pips": 10.14,
+      "avg_sl_distance_pips": 6.13,
+      "long_trades": 1694,
+      "long_wr": 71.9,
+      "long_pnl_pips": 5585.44,
+      "short_trades": 1822,
+      "short_wr": 81.34,
+      "short_pnl_pips": 11279.25,
+      "tier_stats": {
+        "T1": {
+          "trades": 3154,
+          "wr": 75.3,
+          "pnl": 10889.5
+        },
+        "T2": {
+          "trades": 107,
+          "wr": 86.0,
+          "pnl": 1125.4
+        },
+        "T3": {
+          "trades": 255,
+          "wr": 91.0,
+          "pnl": 4849.8
+        }
+      },
+      "hourly_stats": {
+        "3": {
+          "trades": 55,
+          "wr": 61.8,
+          "pnl": 76.2
+        },
+        "4": {
+          "trades": 168,
+          "wr": 73.2,
+          "pnl": 411.3
+        },
+        "5": {
+          "trades": 214,
+          "wr": 78.5,
+          "pnl": 944.8
+        },
+        "6": {
+          "trades": 348,
+          "wr": 72.7,
+          "pnl": 1374.2
+        },
+        "7": {
+          "trades": 381,
+          "wr": 69.8,
+          "pnl": 1089.1
+        },
+        "8": {
+          "trades": 406,
+          "wr": 76.6,
+          "pnl": 1237.0
+        },
+        "9": {
+          "trades": 241,
+          "wr": 71.0,
+          "pnl": 579.2
+        },
+        "10": {
+          "trades": 166,
+          "wr": 77.7,
+          "pnl": 571.0
+        }
+      },
+      "loop_stats": {
+        "1": {
+          "trades": 1092,
+          "wr": 75.3,
+          "pnl": 5386.5
+        },
+        "2": {
+          "trades": 841,
+          "wr": 78.6,
+          "pnl": 3687.7
+        },
+        "3": {
+          "trades": 567,
+          "wr": 77.1,
+          "pnl": 2820.3
+        },
+        "4": {
+          "trades": 394,
+          "wr": 77.9,
+          "pnl": 1970.8
+        },
+        "5": {
+          "trades": 622,
+          "wr": 76.0,
+          "pnl": 2999.3
+        }
+      },
+      "data_bars": 326991,
+      "data_days": 1904,
+      "kelly": 0.6998,
+      "max_consec_wins": 32,
+      "max_consec_losses": 5,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - NZDCHF_M5_fetched\n======================================================================\n  Data: 326,991 bars | 1904 days\n  Trades: 3516 | W: 2700 L: 816 | WR: 76.8%\n  PnL: +16864.7 pips | PF: 11.27\n  Sharpe: 8.60 | MaxDD: 24.1p (0.02%)\n  Long: 1694 (71.9% WR, +5585.4p)\n  Short: 1822 (81.3% WR, +11279.2p)\n  --- TIERS ---\n  T1: 3154 tr, 75.3% WR, +10889.5p\n  T2: 107 tr, 86.0% WR, +1125.4p\n  T3: 255 tr, 91.0% WR, +4849.8p\n  --- HOURLY ---\n  03:00 EST | 55 tr | 61.8% WR | +76.2p\n  04:00 EST | 168 tr | 73.2% WR | +411.3p\n  05:00 EST | 214 tr | 78.5% WR | +944.8p\n  06:00 EST | 348 tr | 72.7% WR | +1374.2p\n  07:00 EST | 381 tr | 69.8% WR | +1089.1p\n  08:00 EST | 406 tr | 76.6% WR | +1237.0p\n  09:00 EST | 241 tr | 71.0% WR | +579.2p\n  10:00 EST | 166 tr | 77.7% WR | +571.0p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 1092 tr, 75.3% WR, +5386.5p\n  Loop 2: 841 tr, 78.6% WR, +3687.7p\n  Loop 3: 567 tr, 77.1% WR, +2820.3p\n  Loop 4: 394 tr, 77.9% WR, +1970.8p\n  Loop 5: 622 tr, 76.0% WR, +2999.3p\n======================================================================"
+    },
+    {
+      "asset_key": "NZDJPY",
+      "name": "NZD/JPY",
+      "config_used": {
+        "pip_value": 0.01,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "csv_file": "NZDJPY_M5_fetched.csv"
+      },
+      "total_trades": 1157,
+      "wins": 994,
+      "losses": 163,
+      "win_rate": 85.91,
+      "pnl_pips": 12412.6,
+      "profit_factor": 22.0726,
+      "sharpe": 11.0379,
+      "max_drawdown_pips": 21.51,
+      "max_drawdown_pct": 0.0215,
+      "expectancy_pips": 10.73,
+      "avg_win_pips": 13.08,
+      "avg_loss_pips": -3.61,
+      "avg_tp_distance_pips": 21.45,
+      "avg_sl_distance_pips": 12.02,
+      "long_trades": 576,
+      "long_wr": 82.64,
+      "long_pnl_pips": 4894.77,
+      "short_trades": 581,
+      "short_wr": 89.16,
+      "short_pnl_pips": 7517.83,
+      "tier_stats": {
+        "T1": {
+          "trades": 1084,
+          "wr": 85.1,
+          "pnl": 9769.1
+        },
+        "T3": {
+          "trades": 73,
+          "wr": 97.3,
+          "pnl": 2643.5
+        }
+      },
+      "hourly_stats": {
+        "3": {
+          "trades": 7,
+          "wr": 71.4,
+          "pnl": 14.7
+        },
+        "4": {
+          "trades": 25,
+          "wr": 84.0,
+          "pnl": 149.3
+        },
+        "5": {
+          "trades": 60,
+          "wr": 90.0,
+          "pnl": 875.4
+        },
+        "6": {
+          "trades": 131,
+          "wr": 83.2,
+          "pnl": 1455.6
+        },
+        "7": {
+          "trades": 147,
+          "wr": 81.6,
+          "pnl": 1131.3
+        },
+        "8": {
+          "trades": 146,
+          "wr": 82.2,
+          "pnl": 1184.7
+        },
+        "9": {
+          "trades": 82,
+          "wr": 80.5,
+          "pnl": 577.6
+        },
+        "10": {
+          "trades": 69,
+          "wr": 88.4,
+          "pnl": 413.7
+        }
+      },
+      "loop_stats": {
+        "1": {
+          "trades": 544,
+          "wr": 85.5,
+          "pnl": 5900.6
+        },
+        "2": {
+          "trades": 307,
+          "wr": 86.6,
+          "pnl": 3049.8
+        },
+        "3": {
+          "trades": 165,
+          "wr": 86.1,
+          "pnl": 1966.3
+        },
+        "4": {
+          "trades": 82,
+          "wr": 84.1,
+          "pnl": 856.3
+        },
+        "5": {
+          "trades": 59,
+          "wr": 88.1,
+          "pnl": 639.6
+        }
+      },
+      "data_bars": 327092,
+      "data_days": 1904,
+      "kelly": 0.8202,
+      "max_consec_wins": 28,
+      "max_consec_losses": 2,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - NZDJPY_M5_fetched\n======================================================================\n  Data: 327,092 bars | 1904 days\n  Trades: 1157 | W: 994 L: 163 | WR: 85.9%\n  PnL: +12412.6 pips | PF: 22.07\n  Sharpe: 11.04 | MaxDD: 21.5p (0.02%)\n  Long: 576 (82.6% WR, +4894.8p)\n  Short: 581 (89.2% WR, +7517.8p)\n  --- TIERS ---\n  T1: 1084 tr, 85.1% WR, +9769.1p\n  T3: 73 tr, 97.3% WR, +2643.5p\n  --- HOURLY ---\n  03:00 EST | 7 tr | 71.4% WR | +14.7p\n  04:00 EST | 25 tr | 84.0% WR | +149.3p\n  05:00 EST | 60 tr | 90.0% WR | +875.4p\n  06:00 EST | 131 tr | 83.2% WR | +1455.6p\n  07:00 EST | 147 tr | 81.6% WR | +1131.3p\n  08:00 EST | 146 tr | 82.2% WR | +1184.7p\n  09:00 EST | 82 tr | 80.5% WR | +577.6p\n  10:00 EST | 69 tr | 88.4% WR | +413.7p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 544 tr, 85.5% WR, +5900.6p\n  Loop 2: 307 tr, 86.6% WR, +3049.8p\n  Loop 3: 165 tr, 86.1% WR, +1966.3p\n  Loop 4: 82 tr, 84.1% WR, +856.3p\n  Loop 5: 59 tr, 88.1% WR, +639.6p\n======================================================================"
     },
     {
       "asset_key": "NZDUSD",
@@ -1637,116 +3489,244 @@
         "sl_method": "OCC_EXACT",
         "csv_file": "NZDUSD_M5.csv"
       },
-      "total_trades": 547,
-      "wins": 183,
-      "losses": 364,
-      "win_rate": 33.46,
-      "pnl_pips": -518.7,
-      "profit_factor": 0.8397,
-      "sharpe": -1.1701,
-      "max_drawdown_pips": 738.6,
-      "max_drawdown_pct": 0.7386,
-      "expectancy_pips": -0.95,
-      "avg_win_pips": 14.84,
-      "avg_loss_pips": -8.89,
-      "avg_tp_distance_pips": 16.55,
-      "avg_sl_distance_pips": 8.32,
-      "long_trades": 274,
-      "long_wr": 31.75,
-      "long_pnl_pips": -371.4,
-      "short_trades": 273,
-      "short_wr": 35.16,
-      "short_pnl_pips": -147.3,
+      "total_trades": 1557,
+      "wins": 1229,
+      "losses": 328,
+      "win_rate": 78.93,
+      "pnl_pips": 6730.3,
+      "profit_factor": 9.1088,
+      "sharpe": 9.5358,
+      "max_drawdown_pips": 20.84,
+      "max_drawdown_pct": 0.0208,
+      "expectancy_pips": 4.32,
+      "avg_win_pips": 6.15,
+      "avg_loss_pips": -2.53,
+      "avg_tp_distance_pips": 15.12,
+      "avg_sl_distance_pips": 5.66,
+      "long_trades": 760,
+      "long_wr": 79.21,
+      "long_pnl_pips": 3398.38,
+      "short_trades": 797,
+      "short_wr": 78.67,
+      "short_pnl_pips": 3331.92,
       "tier_stats": {
         "T1": {
-          "trades": 239,
-          "wr": 31.0,
-          "pnl": -593.3
+          "trades": 1142,
+          "wr": 79.4,
+          "pnl": 4093.3
         },
         "T2": {
-          "trades": 190,
-          "wr": 31.6,
-          "pnl": -187.3
+          "trades": 291,
+          "wr": 76.3,
+          "pnl": 1432.0
         },
         "T3": {
-          "trades": 118,
-          "wr": 41.5,
-          "pnl": 261.9
+          "trades": 124,
+          "wr": 80.6,
+          "pnl": 1205.0
         }
       },
       "hourly_stats": {
+        "3": {
+          "trades": 7,
+          "wr": 85.7,
+          "pnl": 77.3
+        },
         "4": {
-          "trades": 23,
-          "wr": 21.7,
-          "pnl": -64.0
+          "trades": 61,
+          "wr": 70.5,
+          "pnl": 248.1
         },
         "5": {
-          "trades": 59,
-          "wr": 20.3,
-          "pnl": -173.1
+          "trades": 118,
+          "wr": 72.0,
+          "pnl": 315.7
         },
         "6": {
-          "trades": 54,
-          "wr": 33.3,
-          "pnl": -52.9
+          "trades": 119,
+          "wr": 84.0,
+          "pnl": 446.2
         },
         "7": {
-          "trades": 49,
-          "wr": 34.7,
-          "pnl": -27.4
+          "trades": 72,
+          "wr": 81.9,
+          "pnl": 234.5
         },
         "8": {
-          "trades": 37,
-          "wr": 43.2,
-          "pnl": 64.5
+          "trades": 57,
+          "wr": 87.7,
+          "pnl": 169.8
         },
         "9": {
-          "trades": 44,
-          "wr": 29.5,
-          "pnl": -106.6
+          "trades": 82,
+          "wr": 81.7,
+          "pnl": 195.9
         },
         "10": {
-          "trades": 94,
-          "wr": 31.9,
-          "pnl": -81.7
+          "trades": 216,
+          "wr": 81.0,
+          "pnl": 1449.2
         }
       },
       "loop_stats": {
         "1": {
-          "trades": 430,
-          "wr": 34.7,
-          "pnl": -102.8
+          "trades": 635,
+          "wr": 80.5,
+          "pnl": 2623.9
         },
         "2": {
-          "trades": 90,
-          "wr": 24.4,
-          "pnl": -450.9
+          "trades": 430,
+          "wr": 80.9,
+          "pnl": 1900.0
         },
         "3": {
-          "trades": 18,
-          "wr": 44.4,
-          "pnl": 13.5
+          "trades": 229,
+          "wr": 77.7,
+          "pnl": 1080.7
         },
         "4": {
-          "trades": 6,
-          "wr": 50.0,
-          "pnl": 28.0
+          "trades": 130,
+          "wr": 72.3,
+          "pnl": 530.4
         },
         "5": {
-          "trades": 3,
-          "wr": 33.3,
-          "pnl": -6.5
+          "trades": 133,
+          "wr": 73.7,
+          "pnl": 595.4
         }
       },
       "data_bars": 276961,
       "data_days": 1343,
-      "kelly": -0.0639,
-      "max_consec_wins": 6,
-      "max_consec_losses": 16,
+      "kelly": 0.7027,
+      "max_consec_wins": 27,
+      "max_consec_losses": 3,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - NZDUSD_M5\n======================================================================\n  Data: 276,961 bars | 1343 days\n  Trades: 1557 | W: 1229 L: 328 | WR: 78.9%\n  PnL: +6730.3 pips | PF: 9.11\n  Sharpe: 9.54 | MaxDD: 20.8p (0.02%)\n  Long: 760 (79.2% WR, +3398.4p)\n  Short: 797 (78.7% WR, +3331.9p)\n  --- TIERS ---\n  T1: 1142 tr, 79.4% WR, +4093.3p\n  T2: 291 tr, 76.3% WR, +1432.0p\n  T3: 124 tr, 80.6% WR, +1205.0p\n  --- HOURLY ---\n  03:00 EST | 7 tr | 85.7% WR | +77.3p\n  04:00 EST | 61 tr | 70.5% WR | +248.1p\n  05:00 EST | 118 tr | 72.0% WR | +315.7p\n  06:00 EST | 119 tr | 84.0% WR | +446.2p\n  07:00 EST | 72 tr | 81.9% WR | +234.5p\n  08:00 EST | 57 tr | 87.7% WR | +169.8p\n  09:00 EST | 82 tr | 81.7% WR | +195.9p\n  10:00 EST | 216 tr | 81.0% WR | +1449.2p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 635 tr, 80.5% WR, +2623.9p\n  Loop 2: 430 tr, 80.9% WR, +1900.0p\n  Loop 3: 229 tr, 77.7% WR, +1080.7p\n  Loop 4: 130 tr, 72.3% WR, +530.4p\n  Loop 5: 133 tr, 73.7% WR, +595.4p\n======================================================================"
+    },
+    {
+      "asset_key": "SOLUSD",
+      "name": "SOL/USD",
+      "config_used": {
+        "pip_value": 1.0,
+        "k_factor": 0.52,
+        "sl_method": "FIXED_BUFFER",
+        "csv_file": "SOLUSD_M5.csv"
+      },
+      "total_trades": 814,
+      "wins": 119,
+      "losses": 695,
+      "win_rate": 14.62,
+      "pnl_pips": -409.1,
+      "profit_factor": 0.1498,
+      "sharpe": -12.7445,
+      "max_drawdown_pips": 409.1,
+      "max_drawdown_pct": 0.4091,
+      "expectancy_pips": -0.5,
+      "avg_win_pips": 0.61,
+      "avg_loss_pips": -0.69,
+      "avg_tp_distance_pips": 1.53,
+      "avg_sl_distance_pips": 0.56,
+      "long_trades": 401,
+      "long_wr": 13.72,
+      "long_pnl_pips": -206.21,
+      "short_trades": 413,
+      "short_wr": 15.5,
+      "short_pnl_pips": -202.89,
+      "tier_stats": {
+        "T1": {
+          "trades": 791,
+          "wr": 14.4,
+          "pnl": -405.4
+        },
+        "T2": {
+          "trades": 20,
+          "wr": 20.0,
+          "pnl": -4.9
+        },
+        "T3": {
+          "trades": 3,
+          "wr": 33.3,
+          "pnl": 1.3
+        }
+      },
+      "hourly_stats": {
+        "3": {
+          "trades": 11,
+          "wr": 18.2,
+          "pnl": -4.3
+        },
+        "4": {
+          "trades": 30,
+          "wr": 23.3,
+          "pnl": -12.5
+        },
+        "5": {
+          "trades": 38,
+          "wr": 10.5,
+          "pnl": -20.1
+        },
+        "6": {
+          "trades": 41,
+          "wr": 4.9,
+          "pnl": -22.5
+        },
+        "7": {
+          "trades": 35,
+          "wr": 11.4,
+          "pnl": -18.1
+        },
+        "8": {
+          "trades": 48,
+          "wr": 12.5,
+          "pnl": -27.1
+        },
+        "9": {
+          "trades": 38,
+          "wr": 5.3,
+          "pnl": -24.8
+        },
+        "10": {
+          "trades": 71,
+          "wr": 21.1,
+          "pnl": -28.5
+        }
+      },
+      "loop_stats": {
+        "1": {
+          "trades": 317,
+          "wr": 9.5,
+          "pnl": -177.4
+        },
+        "2": {
+          "trades": 192,
+          "wr": 14.1,
+          "pnl": -98.1
+        },
+        "3": {
+          "trades": 122,
+          "wr": 12.3,
+          "pnl": -66.8
+        },
+        "4": {
+          "trades": 73,
+          "wr": 23.3,
+          "pnl": -27.6
+        },
+        "5": {
+          "trades": 110,
+          "wr": 27.3,
+          "pnl": -39.2
+        }
+      },
+      "data_bars": 435794,
+      "data_days": 1526,
+      "kelly": -0.8299,
+      "max_consec_wins": 3,
+      "max_consec_losses": 54,
       "flags": [
         "LOW_WR"
       ],
-      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - NZDUSD_M5\n======================================================================\n  Data: 276,961 bars | 1343 days\n  Trades: 547 | W: 183 L: 364 | WR: 33.5%\n  PnL: -518.7 pips | PF: 0.84\n  Sharpe: -1.17 | MaxDD: 738.6p (0.74%)\n  Long: 274 (31.8% WR, -371.4p)\n  Short: 273 (35.2% WR, -147.3p)\n  --- TIERS ---\n  T1: 239 tr, 31.0% WR, -593.3p\n  T2: 190 tr, 31.6% WR, -187.3p\n  T3: 118 tr, 41.5% WR, +261.9p\n  --- HOURLY ---\n  04:00 EST | 23 tr | 21.7% WR | -64.0p\n  05:00 EST | 59 tr | 20.3% WR | -173.1p\n  06:00 EST | 54 tr | 33.3% WR | -52.9p\n  07:00 EST | 49 tr | 34.7% WR | -27.4p\n  08:00 EST | 37 tr | 43.2% WR | +64.5p\n  09:00 EST | 44 tr | 29.5% WR | -106.6p\n  10:00 EST | 94 tr | 31.9% WR | -81.7p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 430 tr, 34.7% WR, -102.8p\n  Loop 2: 90 tr, 24.4% WR, -450.9p\n  Loop 3: 18 tr, 44.4% WR, +13.5p\n  Loop 4: 6 tr, 50.0% WR, +28.0p\n  Loop 5: 3 tr, 33.3% WR, -6.5p\n======================================================================"
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - SOLUSD_M5\n======================================================================\n  Data: 435,794 bars | 1526 days\n  Trades: 814 | W: 119 L: 695 | WR: 14.6%\n  PnL: -409.1 pips | PF: 0.15\n  Sharpe: -12.74 | MaxDD: 409.1p (0.41%)\n  Long: 401 (13.7% WR, -206.2p)\n  Short: 413 (15.5% WR, -202.9p)\n  --- TIERS ---\n  T1: 791 tr, 14.4% WR, -405.4p\n  T2: 20 tr, 20.0% WR, -4.9p\n  T3: 3 tr, 33.3% WR, +1.3p\n  --- HOURLY ---\n  03:00 EST | 11 tr | 18.2% WR | -4.3p\n  04:00 EST | 30 tr | 23.3% WR | -12.5p\n  05:00 EST | 38 tr | 10.5% WR | -20.1p\n  06:00 EST | 41 tr | 4.9% WR | -22.5p\n  07:00 EST | 35 tr | 11.4% WR | -18.1p\n  08:00 EST | 48 tr | 12.5% WR | -27.1p\n  09:00 EST | 38 tr | 5.3% WR | -24.8p\n  10:00 EST | 71 tr | 21.1% WR | -28.5p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 317 tr, 9.5% WR, -177.4p\n  Loop 2: 192 tr, 14.1% WR, -98.1p\n  Loop 3: 122 tr, 12.3% WR, -66.8p\n  Loop 4: 73 tr, 23.3% WR, -27.6p\n  Loop 5: 110 tr, 27.3% WR, -39.2p\n======================================================================"
     },
     {
       "asset_key": "US500",
@@ -1757,121 +3737,237 @@
         "sl_method": "FIXED_BUFFER",
         "csv_file": "US500_M5.csv"
       },
-      "total_trades": 303,
-      "wins": 78,
-      "losses": 225,
-      "win_rate": 25.74,
-      "pnl_pips": -782.3,
-      "profit_factor": 0.6426,
-      "sharpe": -3.1112,
-      "max_drawdown_pips": 886.1,
-      "max_drawdown_pct": 0.8861,
-      "expectancy_pips": -2.58,
-      "avg_win_pips": 18.03,
-      "avg_loss_pips": -9.73,
-      "avg_tp_distance_pips": 23.17,
-      "avg_sl_distance_pips": 9.48,
-      "long_trades": 136,
-      "long_wr": 36.03,
-      "long_pnl_pips": -15.9,
-      "short_trades": 167,
-      "short_wr": 17.37,
-      "short_pnl_pips": -766.4,
+      "total_trades": 1154,
+      "wins": 926,
+      "losses": 228,
+      "win_rate": 80.24,
+      "pnl_pips": 7428.42,
+      "profit_factor": 8.9996,
+      "sharpe": 10.8428,
+      "max_drawdown_pips": 54.53,
+      "max_drawdown_pct": 0.0545,
+      "expectancy_pips": 6.44,
+      "avg_win_pips": 9.02,
+      "avg_loss_pips": -4.07,
+      "avg_tp_distance_pips": 19.56,
+      "avg_sl_distance_pips": 8.02,
+      "long_trades": 569,
+      "long_wr": 80.14,
+      "long_pnl_pips": 3468.42,
+      "short_trades": 585,
+      "short_wr": 80.34,
+      "short_pnl_pips": 3960.01,
       "tier_stats": {
         "T1": {
-          "trades": 248,
-          "wr": 27.4,
-          "pnl": -503.1
+          "trades": 1118,
+          "wr": 80.4,
+          "pnl": 7028.0
         },
         "T2": {
-          "trades": 47,
-          "wr": 19.1,
-          "pnl": -191.1
-        },
-        "T3": {
-          "trades": 8,
-          "wr": 12.5,
-          "pnl": -88.1
+          "trades": 36,
+          "wr": 75.0,
+          "pnl": 400.4
         }
       },
       "hourly_stats": {
         "3": {
-          "trades": 1,
+          "trades": 2,
           "wr": 100.0,
-          "pnl": 19.0
+          "pnl": 20.5
         },
         "4": {
-          "trades": 5,
-          "wr": 0.0,
-          "pnl": -40.2
+          "trades": 9,
+          "wr": 100.0,
+          "pnl": 51.5
         },
         "5": {
-          "trades": 14,
-          "wr": 28.6,
-          "pnl": -2.8
+          "trades": 27,
+          "wr": 70.4,
+          "pnl": 116.2
         },
         "6": {
-          "trades": 7,
-          "wr": 14.3,
-          "pnl": -35.7
+          "trades": 34,
+          "wr": 82.4,
+          "pnl": 172.1
         },
         "7": {
-          "trades": 15,
-          "wr": 6.7,
-          "pnl": -93.0
+          "trades": 22,
+          "wr": 95.5,
+          "pnl": 123.3
         },
         "8": {
-          "trades": 12,
-          "wr": 41.7,
-          "pnl": 27.6
+          "trades": 30,
+          "wr": 76.7,
+          "pnl": 125.1
         },
         "9": {
-          "trades": 20,
-          "wr": 45.0,
-          "pnl": 54.7
+          "trades": 49,
+          "wr": 81.6,
+          "pnl": 274.0
         },
         "10": {
-          "trades": 41,
-          "wr": 22.0,
-          "pnl": -152.0
+          "trades": 101,
+          "wr": 82.2,
+          "pnl": 723.5
         }
       },
       "loop_stats": {
         "1": {
-          "trades": 253,
-          "wr": 23.7,
-          "pnl": -676.3
+          "trades": 502,
+          "wr": 83.7,
+          "pnl": 2899.4
         },
         "2": {
-          "trades": 41,
-          "wr": 36.6,
-          "pnl": -96.1
+          "trades": 291,
+          "wr": 80.4,
+          "pnl": 1787.1
         },
         "3": {
-          "trades": 6,
-          "wr": 16.7,
-          "pnl": -39.9
+          "trades": 159,
+          "wr": 73.6,
+          "pnl": 1110.2
         },
         "4": {
-          "trades": 2,
-          "wr": 50.0,
-          "pnl": 11.0
+          "trades": 89,
+          "wr": 73.0,
+          "pnl": 508.7
         },
         "5": {
-          "trades": 1,
-          "wr": 100.0,
-          "pnl": 19.0
+          "trades": 113,
+          "wr": 79.6,
+          "pnl": 1123.1
         }
       },
       "data_bars": 260958,
       "data_days": 1335,
-      "kelly": -0.1432,
-      "max_consec_wins": 3,
-      "max_consec_losses": 17,
-      "flags": [
-        "LOW_WR"
-      ],
-      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - US500_M5\n======================================================================\n  Data: 260,958 bars | 1335 days\n  Trades: 303 | W: 78 L: 225 | WR: 25.7%\n  PnL: -782.3 pips | PF: 0.64\n  Sharpe: -3.11 | MaxDD: 886.1p (0.89%)\n  Long: 136 (36.0% WR, -15.9p)\n  Short: 167 (17.4% WR, -766.4p)\n  --- TIERS ---\n  T1: 248 tr, 27.4% WR, -503.1p\n  T2: 47 tr, 19.1% WR, -191.1p\n  T3: 8 tr, 12.5% WR, -88.1p\n  --- HOURLY ---\n  03:00 EST | 1 tr | 100.0% WR | +19.0p\n  04:00 EST | 5 tr | 0.0% WR | -40.2p\n  05:00 EST | 14 tr | 28.6% WR | -2.8p\n  06:00 EST | 7 tr | 14.3% WR | -35.7p\n  07:00 EST | 15 tr | 6.7% WR | -93.0p\n  08:00 EST | 12 tr | 41.7% WR | +27.6p\n  09:00 EST | 20 tr | 45.0% WR | +54.7p\n  10:00 EST | 41 tr | 22.0% WR | -152.0p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 253 tr, 23.7% WR, -676.3p\n  Loop 2: 41 tr, 36.6% WR, -96.1p\n  Loop 3: 6 tr, 16.7% WR, -39.9p\n  Loop 4: 2 tr, 50.0% WR, +11.0p\n  Loop 5: 1 tr, 100.0% WR, +19.0p\n======================================================================"
+      "kelly": 0.7133,
+      "max_consec_wins": 26,
+      "max_consec_losses": 4,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - US500_M5\n======================================================================\n  Data: 260,958 bars | 1335 days\n  Trades: 1154 | W: 926 L: 228 | WR: 80.2%\n  PnL: +7428.4 pips | PF: 9.00\n  Sharpe: 10.84 | MaxDD: 54.5p (0.05%)\n  Long: 569 (80.1% WR, +3468.4p)\n  Short: 585 (80.3% WR, +3960.0p)\n  --- TIERS ---\n  T1: 1118 tr, 80.4% WR, +7028.0p\n  T2: 36 tr, 75.0% WR, +400.4p\n  --- HOURLY ---\n  03:00 EST | 2 tr | 100.0% WR | +20.5p\n  04:00 EST | 9 tr | 100.0% WR | +51.5p\n  05:00 EST | 27 tr | 70.4% WR | +116.2p\n  06:00 EST | 34 tr | 82.4% WR | +172.1p\n  07:00 EST | 22 tr | 95.5% WR | +123.3p\n  08:00 EST | 30 tr | 76.7% WR | +125.1p\n  09:00 EST | 49 tr | 81.6% WR | +274.0p\n  10:00 EST | 101 tr | 82.2% WR | +723.5p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 502 tr, 83.7% WR, +2899.4p\n  Loop 2: 291 tr, 80.4% WR, +1787.1p\n  Loop 3: 159 tr, 73.6% WR, +1110.2p\n  Loop 4: 89 tr, 73.0% WR, +508.7p\n  Loop 5: 113 tr, 79.6% WR, +1123.1p\n======================================================================"
+    },
+    {
+      "asset_key": "USDCAD",
+      "name": "USD/CAD",
+      "config_used": {
+        "pip_value": 0.0001,
+        "k_factor": 0.48,
+        "sl_method": "OCC_EXACT",
+        "csv_file": "USDCAD_M5_fetched.csv"
+      },
+      "total_trades": 4112,
+      "wins": 3082,
+      "losses": 1030,
+      "win_rate": 74.95,
+      "pnl_pips": 22815.72,
+      "profit_factor": 7.8894,
+      "sharpe": 7.8239,
+      "max_drawdown_pips": 46.72,
+      "max_drawdown_pct": 0.0467,
+      "expectancy_pips": 5.55,
+      "avg_win_pips": 8.48,
+      "avg_loss_pips": -3.22,
+      "avg_tp_distance_pips": 12.31,
+      "avg_sl_distance_pips": 7.25,
+      "long_trades": 2078,
+      "long_wr": 74.74,
+      "long_pnl_pips": 11573.85,
+      "short_trades": 2034,
+      "short_wr": 75.17,
+      "short_pnl_pips": 11241.86,
+      "tier_stats": {
+        "T1": {
+          "trades": 3676,
+          "wr": 73.9,
+          "pnl": 16588.5
+        },
+        "T2": {
+          "trades": 229,
+          "wr": 82.1,
+          "pnl": 1977.4
+        },
+        "T3": {
+          "trades": 207,
+          "wr": 85.5,
+          "pnl": 4249.9
+        }
+      },
+      "hourly_stats": {
+        "3": {
+          "trades": 56,
+          "wr": 62.5,
+          "pnl": 147.1
+        },
+        "4": {
+          "trades": 191,
+          "wr": 70.2,
+          "pnl": 610.8
+        },
+        "5": {
+          "trades": 361,
+          "wr": 74.5,
+          "pnl": 1920.1
+        },
+        "6": {
+          "trades": 535,
+          "wr": 73.6,
+          "pnl": 3068.2
+        },
+        "7": {
+          "trades": 610,
+          "wr": 73.9,
+          "pnl": 3460.9
+        },
+        "8": {
+          "trades": 561,
+          "wr": 71.8,
+          "pnl": 3240.5
+        },
+        "9": {
+          "trades": 404,
+          "wr": 76.0,
+          "pnl": 2156.2
+        },
+        "10": {
+          "trades": 316,
+          "wr": 76.9,
+          "pnl": 1513.4
+        }
+      },
+      "loop_stats": {
+        "1": {
+          "trades": 881,
+          "wr": 73.7,
+          "pnl": 4918.7
+        },
+        "2": {
+          "trades": 750,
+          "wr": 73.6,
+          "pnl": 3993.2
+        },
+        "3": {
+          "trades": 656,
+          "wr": 75.0,
+          "pnl": 3624.7
+        },
+        "4": {
+          "trades": 545,
+          "wr": 76.3,
+          "pnl": 2933.4
+        },
+        "5": {
+          "trades": 1280,
+          "wr": 76.0,
+          "pnl": 7345.6
+        }
+      },
+      "data_bars": 345437,
+      "data_days": 1917,
+      "kelly": 0.6545,
+      "max_consec_wins": 21,
+      "max_consec_losses": 6,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - USDCAD_M5_fetched\n======================================================================\n  Data: 345,437 bars | 1917 days\n  Trades: 4112 | W: 3082 L: 1030 | WR: 75.0%\n  PnL: +22815.7 pips | PF: 7.89\n  Sharpe: 7.82 | MaxDD: 46.7p (0.05%)\n  Long: 2078 (74.7% WR, +11573.9p)\n  Short: 2034 (75.2% WR, +11241.9p)\n  --- TIERS ---\n  T1: 3676 tr, 73.9% WR, +16588.5p\n  T2: 229 tr, 82.1% WR, +1977.4p\n  T3: 207 tr, 85.5% WR, +4249.9p\n  --- HOURLY ---\n  03:00 EST | 56 tr | 62.5% WR | +147.1p\n  04:00 EST | 191 tr | 70.2% WR | +610.8p\n  05:00 EST | 361 tr | 74.5% WR | +1920.1p\n  06:00 EST | 535 tr | 73.6% WR | +3068.2p\n  07:00 EST | 610 tr | 73.9% WR | +3460.9p\n  08:00 EST | 561 tr | 71.8% WR | +3240.5p\n  09:00 EST | 404 tr | 76.0% WR | +2156.2p\n  10:00 EST | 316 tr | 76.9% WR | +1513.4p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 881 tr, 73.7% WR, +4918.7p\n  Loop 2: 750 tr, 73.6% WR, +3993.2p\n  Loop 3: 656 tr, 75.0% WR, +3624.7p\n  Loop 4: 545 tr, 76.3% WR, +2933.4p\n  Loop 5: 1280 tr, 76.0% WR, +7345.6p\n======================================================================"
     },
     {
       "asset_key": "USDCHF",
@@ -1882,121 +3978,119 @@
         "sl_method": "OCC_EXACT",
         "csv_file": "USDCHF_M5.csv"
       },
-      "total_trades": 847,
-      "wins": 338,
-      "losses": 509,
-      "win_rate": 39.91,
-      "pnl_pips": 71.1,
-      "profit_factor": 1.0154,
-      "sharpe": 0.1056,
-      "max_drawdown_pips": 323.3,
-      "max_drawdown_pct": 0.3233,
-      "expectancy_pips": 0.08,
-      "avg_win_pips": 13.87,
-      "avg_loss_pips": -9.07,
-      "avg_tp_distance_pips": 14.67,
-      "avg_sl_distance_pips": 8.66,
-      "long_trades": 437,
-      "long_wr": 41.42,
-      "long_pnl_pips": 225.3,
-      "short_trades": 410,
-      "short_wr": 38.29,
-      "short_pnl_pips": -154.2,
+      "total_trades": 984,
+      "wins": 709,
+      "losses": 275,
+      "win_rate": 72.05,
+      "pnl_pips": 4301.11,
+      "profit_factor": 7.2378,
+      "sharpe": 9.2237,
+      "max_drawdown_pips": 22.27,
+      "max_drawdown_pct": 0.0223,
+      "expectancy_pips": 4.37,
+      "avg_win_pips": 7.04,
+      "avg_loss_pips": -2.51,
+      "avg_tp_distance_pips": 12.59,
+      "avg_sl_distance_pips": 5.97,
+      "long_trades": 500,
+      "long_wr": 74.0,
+      "long_pnl_pips": 2171.9,
+      "short_trades": 484,
+      "short_wr": 70.04,
+      "short_pnl_pips": 2129.21,
       "tier_stats": {
         "T1": {
-          "trades": 404,
-          "wr": 44.6,
-          "pnl": -47.1
+          "trades": 732,
+          "wr": 69.4,
+          "pnl": 2445.0
         },
         "T2": {
-          "trades": 176,
-          "wr": 31.2,
-          "pnl": -363.4
+          "trades": 141,
+          "wr": 75.2,
+          "pnl": 821.8
         },
         "T3": {
-          "trades": 267,
-          "wr": 38.6,
-          "pnl": 481.6
+          "trades": 111,
+          "wr": 85.6,
+          "pnl": 1034.3
         }
       },
       "hourly_stats": {
         "3": {
-          "trades": 3,
-          "wr": 66.7,
-          "pnl": 32.0
+          "trades": 2,
+          "wr": 100.0,
+          "pnl": 11.9
         },
         "4": {
-          "trades": 55,
-          "wr": 40.0,
-          "pnl": 16.2
+          "trades": 50,
+          "wr": 68.0,
+          "pnl": 152.0
         },
         "5": {
-          "trades": 133,
-          "wr": 36.8,
-          "pnl": -8.3
+          "trades": 81,
+          "wr": 70.4,
+          "pnl": 325.4
         },
         "6": {
-          "trades": 123,
-          "wr": 40.7,
-          "pnl": 93.1
+          "trades": 97,
+          "wr": 75.3,
+          "pnl": 369.9
         },
         "7": {
-          "trades": 87,
-          "wr": 49.4,
-          "pnl": 193.9
+          "trades": 58,
+          "wr": 70.7,
+          "pnl": 159.6
         },
         "8": {
           "trades": 55,
-          "wr": 27.3,
-          "pnl": -244.3
+          "wr": 70.9,
+          "pnl": 164.1
         },
         "9": {
-          "trades": 92,
-          "wr": 42.4,
-          "pnl": 110.8
+          "trades": 60,
+          "wr": 73.3,
+          "pnl": 158.9
         },
         "10": {
-          "trades": 128,
-          "wr": 36.7,
-          "pnl": -204.1
+          "trades": 109,
+          "wr": 70.6,
+          "pnl": 785.3
         }
       },
       "loop_stats": {
         "1": {
-          "trades": 458,
-          "wr": 39.3,
-          "pnl": 317.4
+          "trades": 179,
+          "wr": 70.4,
+          "pnl": 702.0
         },
         "2": {
-          "trades": 231,
-          "wr": 36.8,
-          "pnl": -469.5
+          "trades": 173,
+          "wr": 68.2,
+          "pnl": 587.5
         },
         "3": {
-          "trades": 93,
-          "wr": 46.2,
-          "pnl": 169.5
+          "trades": 159,
+          "wr": 74.8,
+          "pnl": 723.6
         },
         "4": {
-          "trades": 46,
-          "wr": 43.5,
-          "pnl": 7.7
+          "trades": 140,
+          "wr": 73.6,
+          "pnl": 626.1
         },
         "5": {
-          "trades": 19,
-          "wr": 52.6,
-          "pnl": 46.0
+          "trades": 333,
+          "wr": 73.0,
+          "pnl": 1661.9
         }
       },
       "data_bars": 277072,
       "data_days": 1343,
-      "kelly": 0.0061,
-      "max_consec_wins": 5,
-      "max_consec_losses": 11,
-      "flags": [
-        "LOW_WR"
-      ],
-      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - USDCHF_M5\n======================================================================\n  Data: 277,072 bars | 1343 days\n  Trades: 847 | W: 338 L: 509 | WR: 39.9%\n  PnL: +71.1 pips | PF: 1.02\n  Sharpe: 0.11 | MaxDD: 323.3p (0.32%)\n  Long: 437 (41.4% WR, +225.3p)\n  Short: 410 (38.3% WR, -154.2p)\n  --- TIERS ---\n  T1: 404 tr, 44.6% WR, -47.1p\n  T2: 176 tr, 31.2% WR, -363.4p\n  T3: 267 tr, 38.6% WR, +481.6p\n  --- HOURLY ---\n  03:00 EST | 3 tr | 66.7% WR | +32.0p\n  04:00 EST | 55 tr | 40.0% WR | +16.2p\n  05:00 EST | 133 tr | 36.8% WR | -8.3p\n  06:00 EST | 123 tr | 40.7% WR | +93.1p\n  07:00 EST | 87 tr | 49.4% WR | +193.9p\n  08:00 EST | 55 tr | 27.3% WR | -244.3p\n  09:00 EST | 92 tr | 42.4% WR | +110.8p\n  10:00 EST | 128 tr | 36.7% WR | -204.1p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 458 tr, 39.3% WR, +317.4p\n  Loop 2: 231 tr, 36.8% WR, -469.5p\n  Loop 3: 93 tr, 46.2% WR, +169.5p\n  Loop 4: 46 tr, 43.5% WR, +7.7p\n  Loop 5: 19 tr, 52.6% WR, +46.0p\n======================================================================"
+      "kelly": 0.621,
+      "max_consec_wins": 16,
+      "max_consec_losses": 5,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - USDCHF_M5\n======================================================================\n  Data: 277,072 bars | 1343 days\n  Trades: 984 | W: 709 L: 275 | WR: 72.1%\n  PnL: +4301.1 pips | PF: 7.24\n  Sharpe: 9.22 | MaxDD: 22.3p (0.02%)\n  Long: 500 (74.0% WR, +2171.9p)\n  Short: 484 (70.0% WR, +2129.2p)\n  --- TIERS ---\n  T1: 732 tr, 69.4% WR, +2445.0p\n  T2: 141 tr, 75.2% WR, +821.8p\n  T3: 111 tr, 85.6% WR, +1034.3p\n  --- HOURLY ---\n  03:00 EST | 2 tr | 100.0% WR | +11.9p\n  04:00 EST | 50 tr | 68.0% WR | +152.0p\n  05:00 EST | 81 tr | 70.4% WR | +325.4p\n  06:00 EST | 97 tr | 75.3% WR | +369.9p\n  07:00 EST | 58 tr | 70.7% WR | +159.6p\n  08:00 EST | 55 tr | 70.9% WR | +164.1p\n  09:00 EST | 60 tr | 73.3% WR | +158.9p\n  10:00 EST | 109 tr | 70.6% WR | +785.3p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 179 tr, 70.4% WR, +702.0p\n  Loop 2: 173 tr, 68.2% WR, +587.5p\n  Loop 3: 159 tr, 74.8% WR, +723.6p\n  Loop 4: 140 tr, 73.6% WR, +626.1p\n  Loop 5: 333 tr, 73.0% WR, +1661.9p\n======================================================================"
     },
     {
       "asset_key": "USDJPY",
@@ -2007,121 +4101,119 @@
         "sl_method": "OCC_EXACT",
         "csv_file": "USDJPY_M5.csv"
       },
-      "total_trades": 486,
-      "wins": 158,
-      "losses": 328,
-      "win_rate": 32.51,
-      "pnl_pips": 197.7,
-      "profit_factor": 1.0597,
-      "sharpe": 0.3445,
-      "max_drawdown_pips": 386.3,
-      "max_drawdown_pct": 0.3863,
-      "expectancy_pips": 0.41,
-      "avg_win_pips": 22.22,
-      "avg_loss_pips": -10.1,
-      "avg_tp_distance_pips": 25.0,
-      "avg_sl_distance_pips": 9.41,
-      "long_trades": 248,
-      "long_wr": 32.26,
-      "long_pnl_pips": -16.1,
-      "short_trades": 238,
-      "short_wr": 32.77,
-      "short_pnl_pips": 213.8,
+      "total_trades": 309,
+      "wins": 229,
+      "losses": 80,
+      "win_rate": 74.11,
+      "pnl_pips": 2477.04,
+      "profit_factor": 7.9529,
+      "sharpe": 7.5369,
+      "max_drawdown_pips": 44.21,
+      "max_drawdown_pct": 0.0442,
+      "expectancy_pips": 8.02,
+      "avg_win_pips": 12.37,
+      "avg_loss_pips": -4.45,
+      "avg_tp_distance_pips": 18.68,
+      "avg_sl_distance_pips": 10.5,
+      "long_trades": 157,
+      "long_wr": 73.89,
+      "long_pnl_pips": 998.7,
+      "short_trades": 152,
+      "short_wr": 74.34,
+      "short_pnl_pips": 1478.34,
       "tier_stats": {
         "T1": {
-          "trades": 225,
-          "wr": 40.4,
-          "pnl": 359.6
+          "trades": 255,
+          "wr": 72.5,
+          "pnl": 1262.9
         },
         "T2": {
-          "trades": 163,
-          "wr": 30.7,
-          "pnl": -40.4
+          "trades": 38,
+          "wr": 81.6,
+          "pnl": 683.5
         },
         "T3": {
-          "trades": 98,
-          "wr": 17.3,
-          "pnl": -121.5
+          "trades": 16,
+          "wr": 81.2,
+          "pnl": 530.6
         }
       },
       "hourly_stats": {
         "3": {
-          "trades": 5,
-          "wr": 60.0,
-          "pnl": 35.5
+          "trades": 4,
+          "wr": 50.0,
+          "pnl": 12.2
         },
         "4": {
-          "trades": 40,
-          "wr": 35.0,
-          "pnl": 47.3
+          "trades": 15,
+          "wr": 66.7,
+          "pnl": 37.7
         },
         "5": {
-          "trades": 64,
-          "wr": 20.3,
-          "pnl": -206.7
+          "trades": 27,
+          "wr": 70.4,
+          "pnl": 102.2
         },
         "6": {
-          "trades": 60,
-          "wr": 30.0,
-          "pnl": -60.5
+          "trades": 24,
+          "wr": 79.2,
+          "pnl": 137.7
         },
         "7": {
-          "trades": 37,
-          "wr": 43.2,
-          "pnl": 346.7
+          "trades": 10,
+          "wr": 80.0,
+          "pnl": 31.0
         },
         "8": {
-          "trades": 42,
-          "wr": 28.6,
-          "pnl": -10.7
+          "trades": 18,
+          "wr": 88.9,
+          "pnl": 85.9
         },
         "9": {
-          "trades": 37,
-          "wr": 35.1,
-          "pnl": 141.9
+          "trades": 15,
+          "wr": 53.3,
+          "pnl": 30.3
         },
         "10": {
-          "trades": 87,
-          "wr": 36.8,
-          "pnl": -83.9
+          "trades": 45,
+          "wr": 73.3,
+          "pnl": 598.8
         }
       },
       "loop_stats": {
         "1": {
-          "trades": 271,
-          "wr": 25.8,
-          "pnl": -245.1
+          "trades": 72,
+          "wr": 69.4,
+          "pnl": 481.6
         },
         "2": {
-          "trades": 117,
-          "wr": 39.3,
-          "pnl": 250.5
+          "trades": 61,
+          "wr": 78.7,
+          "pnl": 407.8
         },
         "3": {
-          "trades": 57,
-          "wr": 43.9,
-          "pnl": 184.4
+          "trades": 54,
+          "wr": 68.5,
+          "pnl": 325.0
         },
         "4": {
-          "trades": 24,
-          "wr": 41.7,
-          "pnl": 37.5
+          "trades": 45,
+          "wr": 73.3,
+          "pnl": 356.7
         },
         "5": {
-          "trades": 17,
-          "wr": 41.2,
-          "pnl": -29.6
+          "trades": 77,
+          "wr": 79.2,
+          "pnl": 906.0
         }
       },
       "data_bars": 277092,
       "data_days": 1343,
-      "kelly": 0.0183,
-      "max_consec_wins": 6,
-      "max_consec_losses": 13,
-      "flags": [
-        "LOW_WR"
-      ],
-      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - USDJPY_M5\n======================================================================\n  Data: 277,092 bars | 1343 days\n  Trades: 486 | W: 158 L: 328 | WR: 32.5%\n  PnL: +197.7 pips | PF: 1.06\n  Sharpe: 0.34 | MaxDD: 386.3p (0.39%)\n  Long: 248 (32.3% WR, -16.1p)\n  Short: 238 (32.8% WR, +213.8p)\n  --- TIERS ---\n  T1: 225 tr, 40.4% WR, +359.6p\n  T2: 163 tr, 30.7% WR, -40.4p\n  T3: 98 tr, 17.3% WR, -121.5p\n  --- HOURLY ---\n  03:00 EST | 5 tr | 60.0% WR | +35.5p\n  04:00 EST | 40 tr | 35.0% WR | +47.3p\n  05:00 EST | 64 tr | 20.3% WR | -206.7p\n  06:00 EST | 60 tr | 30.0% WR | -60.5p\n  07:00 EST | 37 tr | 43.2% WR | +346.7p\n  08:00 EST | 42 tr | 28.6% WR | -10.7p\n  09:00 EST | 37 tr | 35.1% WR | +141.9p\n  10:00 EST | 87 tr | 36.8% WR | -83.9p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 271 tr, 25.8% WR, -245.1p\n  Loop 2: 117 tr, 39.3% WR, +250.5p\n  Loop 3: 57 tr, 43.9% WR, +184.4p\n  Loop 4: 24 tr, 41.7% WR, +37.5p\n  Loop 5: 17 tr, 41.2% WR, -29.6p\n======================================================================"
+      "kelly": 0.6479,
+      "max_consec_wins": 15,
+      "max_consec_losses": 3,
+      "flags": [],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - USDJPY_M5\n======================================================================\n  Data: 277,092 bars | 1343 days\n  Trades: 309 | W: 229 L: 80 | WR: 74.1%\n  PnL: +2477.0 pips | PF: 7.95\n  Sharpe: 7.54 | MaxDD: 44.2p (0.04%)\n  Long: 157 (73.9% WR, +998.7p)\n  Short: 152 (74.3% WR, +1478.3p)\n  --- TIERS ---\n  T1: 255 tr, 72.5% WR, +1262.9p\n  T2: 38 tr, 81.6% WR, +683.5p\n  T3: 16 tr, 81.2% WR, +530.6p\n  --- HOURLY ---\n  03:00 EST | 4 tr | 50.0% WR | +12.2p\n  04:00 EST | 15 tr | 66.7% WR | +37.7p\n  05:00 EST | 27 tr | 70.4% WR | +102.2p\n  06:00 EST | 24 tr | 79.2% WR | +137.7p\n  07:00 EST | 10 tr | 80.0% WR | +31.0p\n  08:00 EST | 18 tr | 88.9% WR | +85.9p\n  09:00 EST | 15 tr | 53.3% WR | +30.3p\n  10:00 EST | 45 tr | 73.3% WR | +598.8p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 72 tr, 69.4% WR, +481.6p\n  Loop 2: 61 tr, 78.7% WR, +407.8p\n  Loop 3: 54 tr, 68.5% WR, +325.0p\n  Loop 4: 45 tr, 73.3% WR, +356.7p\n  Loop 5: 77 tr, 79.2% WR, +906.0p\n======================================================================"
     },
     {
       "asset_key": "XAGUSD",
@@ -2132,119 +4224,119 @@
         "sl_method": "FIXED_BUFFER",
         "csv_file": "XAGUSD_M5.csv"
       },
-      "total_trades": 469,
-      "wins": 257,
-      "losses": 212,
-      "win_rate": 54.8,
-      "pnl_pips": -409.4,
-      "profit_factor": 0.9488,
-      "sharpe": -0.2717,
-      "max_drawdown_pips": 1633.4,
-      "max_drawdown_pct": 1.6334,
-      "expectancy_pips": -0.87,
-      "avg_win_pips": 29.54,
-      "avg_loss_pips": -37.74,
-      "avg_tp_distance_pips": 31.99,
-      "avg_sl_distance_pips": 150.03,
-      "long_trades": 234,
-      "long_wr": 53.42,
-      "long_pnl_pips": -375.2,
-      "short_trades": 235,
-      "short_wr": 56.17,
-      "short_pnl_pips": -34.2,
+      "total_trades": 1718,
+      "wins": 1431,
+      "losses": 287,
+      "win_rate": 83.29,
+      "pnl_pips": 19009.87,
+      "profit_factor": 10.0162,
+      "sharpe": 10.1794,
+      "max_drawdown_pips": 141.23,
+      "max_drawdown_pct": 0.1412,
+      "expectancy_pips": 11.07,
+      "avg_win_pips": 14.76,
+      "avg_loss_pips": -7.35,
+      "avg_tp_distance_pips": 27.71,
+      "avg_sl_distance_pips": 13.46,
+      "long_trades": 845,
+      "long_wr": 81.3,
+      "long_pnl_pips": 7786.89,
+      "short_trades": 873,
+      "short_wr": 85.22,
+      "short_pnl_pips": 11222.99,
       "tier_stats": {
         "T1": {
-          "trades": 258,
-          "wr": 40.7,
-          "pnl": -1451.6
+          "trades": 1418,
+          "wr": 82.8,
+          "pnl": 12588.1
         },
         "T2": {
-          "trades": 133,
-          "wr": 69.9,
-          "pnl": 201.4
+          "trades": 190,
+          "wr": 83.7,
+          "pnl": 3318.9
         },
         "T3": {
-          "trades": 78,
-          "wr": 75.6,
-          "pnl": 840.8
+          "trades": 110,
+          "wr": 89.1,
+          "pnl": 3102.9
         }
       },
       "hourly_stats": {
         "3": {
-          "trades": 16,
-          "wr": 68.8,
-          "pnl": -282.9
+          "trades": 40,
+          "wr": 70.0,
+          "pnl": 403.9
         },
         "4": {
-          "trades": 21,
-          "wr": 47.6,
-          "pnl": -73.9
+          "trades": 73,
+          "wr": 83.6,
+          "pnl": 1100.7
         },
         "5": {
-          "trades": 33,
-          "wr": 78.8,
-          "pnl": 632.3
+          "trades": 93,
+          "wr": 81.7,
+          "pnl": 1074.5
         },
         "6": {
-          "trades": 31,
-          "wr": 61.3,
-          "pnl": 136.5
+          "trades": 87,
+          "wr": 79.3,
+          "pnl": 816.4
         },
         "7": {
-          "trades": 26,
-          "wr": 42.3,
-          "pnl": -261.5
+          "trades": 69,
+          "wr": 89.9,
+          "pnl": 657.7
         },
         "8": {
-          "trades": 31,
-          "wr": 38.7,
-          "pnl": -1102.1
+          "trades": 78,
+          "wr": 87.2,
+          "pnl": 981.5
         },
         "9": {
-          "trades": 32,
-          "wr": 62.5,
-          "pnl": 104.4
+          "trades": 92,
+          "wr": 83.7,
+          "pnl": 681.6
         },
         "10": {
-          "trades": 84,
-          "wr": 52.4,
-          "pnl": -175.9
+          "trades": 212,
+          "wr": 81.6,
+          "pnl": 2301.6
         }
       },
       "loop_stats": {
         "1": {
-          "trades": 396,
-          "wr": 52.8,
-          "pnl": -222.2
+          "trades": 680,
+          "wr": 85.4,
+          "pnl": 5109.3
         },
         "2": {
-          "trades": 50,
-          "wr": 60.0,
-          "pnl": -481.9
+          "trades": 346,
+          "wr": 82.1,
+          "pnl": 2840.0
         },
         "3": {
-          "trades": 14,
-          "wr": 78.6,
-          "pnl": 304.7
+          "trades": 183,
+          "wr": 88.0,
+          "pnl": 2005.9
         },
         "4": {
-          "trades": 7,
-          "wr": 85.7,
-          "pnl": 105.0
+          "trades": 103,
+          "wr": 77.7,
+          "pnl": 1261.1
         },
         "5": {
-          "trades": 2,
-          "wr": 50.0,
-          "pnl": -115.0
+          "trades": 406,
+          "wr": 80.0,
+          "pnl": 7793.6
         }
       },
       "data_bars": 304981,
       "data_days": 1366,
-      "kelly": -0.0295,
-      "max_consec_wins": 11,
-      "max_consec_losses": 7,
+      "kelly": 0.7498,
+      "max_consec_wins": 38,
+      "max_consec_losses": 4,
       "flags": [],
-      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - XAGUSD_M5\n======================================================================\n  Data: 304,981 bars | 1366 days\n  Trades: 469 | W: 257 L: 212 | WR: 54.8%\n  PnL: -409.4 pips | PF: 0.95\n  Sharpe: -0.27 | MaxDD: 1633.4p (1.63%)\n  Long: 234 (53.4% WR, -375.2p)\n  Short: 235 (56.2% WR, -34.2p)\n  --- TIERS ---\n  T1: 258 tr, 40.7% WR, -1451.6p\n  T2: 133 tr, 69.9% WR, +201.4p\n  T3: 78 tr, 75.6% WR, +840.8p\n  --- HOURLY ---\n  03:00 EST | 16 tr | 68.8% WR | -282.9p\n  04:00 EST | 21 tr | 47.6% WR | -73.9p\n  05:00 EST | 33 tr | 78.8% WR | +632.3p\n  06:00 EST | 31 tr | 61.3% WR | +136.5p\n  07:00 EST | 26 tr | 42.3% WR | -261.5p\n  08:00 EST | 31 tr | 38.7% WR | -1102.1p\n  09:00 EST | 32 tr | 62.5% WR | +104.4p\n  10:00 EST | 84 tr | 52.4% WR | -175.9p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 396 tr, 52.8% WR, -222.2p\n  Loop 2: 50 tr, 60.0% WR, -481.9p\n  Loop 3: 14 tr, 78.6% WR, +304.7p\n  Loop 4: 7 tr, 85.7% WR, +105.0p\n  Loop 5: 2 tr, 50.0% WR, -115.0p\n======================================================================"
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - XAGUSD_M5\n======================================================================\n  Data: 304,981 bars | 1366 days\n  Trades: 1718 | W: 1431 L: 287 | WR: 83.3%\n  PnL: +19009.9 pips | PF: 10.02\n  Sharpe: 10.18 | MaxDD: 141.2p (0.14%)\n  Long: 845 (81.3% WR, +7786.9p)\n  Short: 873 (85.2% WR, +11223.0p)\n  --- TIERS ---\n  T1: 1418 tr, 82.8% WR, +12588.1p\n  T2: 190 tr, 83.7% WR, +3318.9p\n  T3: 110 tr, 89.1% WR, +3102.9p\n  --- HOURLY ---\n  03:00 EST | 40 tr | 70.0% WR | +403.9p\n  04:00 EST | 73 tr | 83.6% WR | +1100.7p\n  05:00 EST | 93 tr | 81.7% WR | +1074.5p\n  06:00 EST | 87 tr | 79.3% WR | +816.4p\n  07:00 EST | 69 tr | 89.9% WR | +657.7p\n  08:00 EST | 78 tr | 87.2% WR | +981.5p\n  09:00 EST | 92 tr | 83.7% WR | +681.6p\n  10:00 EST | 212 tr | 81.6% WR | +2301.6p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 680 tr, 85.4% WR, +5109.3p\n  Loop 2: 346 tr, 82.1% WR, +2840.0p\n  Loop 3: 183 tr, 88.0% WR, +2005.9p\n  Loop 4: 103 tr, 77.7% WR, +1261.1p\n  Loop 5: 406 tr, 80.0% WR, +7793.6p\n======================================================================"
     },
     {
       "asset_key": "XAUUSD",
@@ -2255,119 +4347,161 @@
         "sl_method": "FIXED_BUFFER",
         "csv_file": "XAUUSD_M5.csv"
       },
-      "total_trades": 366,
-      "wins": 274,
-      "losses": 92,
-      "win_rate": 74.86,
-      "pnl_pips": 1511.3,
-      "profit_factor": 1.1771,
-      "sharpe": 0.9297,
-      "max_drawdown_pips": 720.1,
-      "max_drawdown_pct": 0.7201,
-      "expectancy_pips": 4.13,
-      "avg_win_pips": 36.66,
-      "avg_loss_pips": -92.76,
-      "avg_tp_distance_pips": 35.28,
-      "avg_sl_distance_pips": 150.0,
-      "long_trades": 199,
-      "long_wr": 73.37,
-      "long_pnl_pips": 1205.8,
-      "short_trades": 167,
-      "short_wr": 76.65,
-      "short_pnl_pips": 305.5,
+      "total_trades": 3486,
+      "wins": 2774,
+      "losses": 712,
+      "win_rate": 79.58,
+      "pnl_pips": 45611.5,
+      "profit_factor": 7.853,
+      "sharpe": 10.3009,
+      "max_drawdown_pips": 102.91,
+      "max_drawdown_pct": 0.1029,
+      "expectancy_pips": 13.08,
+      "avg_win_pips": 18.84,
+      "avg_loss_pips": -9.35,
+      "avg_tp_distance_pips": 21.45,
+      "avg_sl_distance_pips": 17.78,
+      "long_trades": 1766,
+      "long_wr": 79.61,
+      "long_pnl_pips": 23362.44,
+      "short_trades": 1720,
+      "short_wr": 79.53,
+      "short_pnl_pips": 22249.06,
       "tier_stats": {
         "T1": {
-          "trades": 44,
-          "wr": 90.9,
-          "pnl": 206.2
+          "trades": 2546,
+          "wr": 79.1,
+          "pnl": 26724.3
         },
         "T2": {
-          "trades": 171,
-          "wr": 81.3,
-          "pnl": 981.2
+          "trades": 583,
+          "wr": 79.4,
+          "pnl": 9660.8
         },
         "T3": {
-          "trades": 151,
-          "wr": 62.9,
-          "pnl": 323.9
+          "trades": 357,
+          "wr": 83.5,
+          "pnl": 9226.4
         }
       },
       "hourly_stats": {
         "3": {
-          "trades": 12,
-          "wr": 100.0,
-          "pnl": 360.0
+          "trades": 129,
+          "wr": 76.7,
+          "pnl": 1164.8
         },
         "4": {
-          "trades": 47,
-          "wr": 87.2,
-          "pnl": 816.0
+          "trades": 279,
+          "wr": 82.4,
+          "pnl": 3148.7
         },
         "5": {
-          "trades": 53,
-          "wr": 75.5,
-          "pnl": 143.2
+          "trades": 309,
+          "wr": 74.4,
+          "pnl": 3073.1
         },
         "6": {
-          "trades": 44,
-          "wr": 70.5,
-          "pnl": -192.9
+          "trades": 260,
+          "wr": 79.2,
+          "pnl": 2479.7
         },
         "7": {
-          "trades": 23,
-          "wr": 69.6,
-          "pnl": -66.5
+          "trades": 220,
+          "wr": 80.9,
+          "pnl": 2148.5
         },
         "8": {
-          "trades": 36,
-          "wr": 77.8,
-          "pnl": 513.7
+          "trades": 226,
+          "wr": 75.7,
+          "pnl": 2156.6
         },
         "9": {
-          "trades": 27,
-          "wr": 81.5,
-          "pnl": 431.7
+          "trades": 213,
+          "wr": 79.3,
+          "pnl": 2304.3
         },
         "10": {
-          "trades": 59,
-          "wr": 69.5,
-          "pnl": -378.0
+          "trades": 329,
+          "wr": 81.2,
+          "pnl": 4854.6
         }
       },
       "loop_stats": {
         "1": {
-          "trades": 188,
-          "wr": 73.9,
-          "pnl": 1339.6
+          "trades": 272,
+          "wr": 79.0,
+          "pnl": 2564.6
         },
         "2": {
-          "trades": 100,
-          "wr": 73.0,
-          "pnl": -166.1
+          "trades": 269,
+          "wr": 80.7,
+          "pnl": 3000.8
         },
         "3": {
-          "trades": 48,
-          "wr": 77.1,
-          "pnl": 62.6
+          "trades": 267,
+          "wr": 78.7,
+          "pnl": 2830.3
         },
         "4": {
-          "trades": 22,
-          "wr": 77.3,
-          "pnl": 56.2
+          "trades": 263,
+          "wr": 78.7,
+          "pnl": 2586.2
         },
         "5": {
-          "trades": 8,
-          "wr": 100.0,
-          "pnl": 219.0
+          "trades": 2415,
+          "wr": 79.7,
+          "pnl": 34629.6
         }
       },
       "data_bars": 306934,
       "data_days": 1362,
-      "kelly": 0.1126,
-      "max_consec_wins": 16,
-      "max_consec_losses": 4,
+      "kelly": 0.6944,
+      "max_consec_wins": 28,
+      "max_consec_losses": 5,
       "flags": [],
-      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - XAUUSD_M5\n======================================================================\n  Data: 306,934 bars | 1362 days\n  Trades: 366 | W: 274 L: 92 | WR: 74.9%\n  PnL: +1511.3 pips | PF: 1.18\n  Sharpe: 0.93 | MaxDD: 720.1p (0.72%)\n  Long: 199 (73.4% WR, +1205.8p)\n  Short: 167 (76.6% WR, +305.5p)\n  --- TIERS ---\n  T1: 44 tr, 90.9% WR, +206.2p\n  T2: 171 tr, 81.3% WR, +981.2p\n  T3: 151 tr, 62.9% WR, +323.9p\n  --- HOURLY ---\n  03:00 EST | 12 tr | 100.0% WR | +360.0p\n  04:00 EST | 47 tr | 87.2% WR | +816.0p\n  05:00 EST | 53 tr | 75.5% WR | +143.2p\n  06:00 EST | 44 tr | 70.5% WR | -192.9p\n  07:00 EST | 23 tr | 69.6% WR | -66.5p\n  08:00 EST | 36 tr | 77.8% WR | +513.7p\n  09:00 EST | 27 tr | 81.5% WR | +431.7p\n  10:00 EST | 59 tr | 69.5% WR | -378.0p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 188 tr, 73.9% WR, +1339.6p\n  Loop 2: 100 tr, 73.0% WR, -166.1p\n  Loop 3: 48 tr, 77.1% WR, +62.6p\n  Loop 4: 22 tr, 77.3% WR, +56.2p\n  Loop 5: 8 tr, 100.0% WR, +219.0p\n======================================================================"
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - XAUUSD_M5\n======================================================================\n  Data: 306,934 bars | 1362 days\n  Trades: 3486 | W: 2774 L: 712 | WR: 79.6%\n  PnL: +45611.5 pips | PF: 7.85\n  Sharpe: 10.30 | MaxDD: 102.9p (0.10%)\n  Long: 1766 (79.6% WR, +23362.4p)\n  Short: 1720 (79.5% WR, +22249.1p)\n  --- TIERS ---\n  T1: 2546 tr, 79.1% WR, +26724.3p\n  T2: 583 tr, 79.4% WR, +9660.8p\n  T3: 357 tr, 83.5% WR, +9226.4p\n  --- HOURLY ---\n  03:00 EST | 129 tr | 76.7% WR | +1164.8p\n  04:00 EST | 279 tr | 82.4% WR | +3148.7p\n  05:00 EST | 309 tr | 74.4% WR | +3073.1p\n  06:00 EST | 260 tr | 79.2% WR | +2479.7p\n  07:00 EST | 220 tr | 80.9% WR | +2148.5p\n  08:00 EST | 226 tr | 75.7% WR | +2156.6p\n  09:00 EST | 213 tr | 79.3% WR | +2304.3p\n  10:00 EST | 329 tr | 81.2% WR | +4854.6p\n  --- LOOP DISTRIBUTION ---\n  Loop 1: 272 tr, 79.0% WR, +2564.6p\n  Loop 2: 269 tr, 80.7% WR, +3000.8p\n  Loop 3: 267 tr, 78.7% WR, +2830.3p\n  Loop 4: 263 tr, 78.7% WR, +2586.2p\n  Loop 5: 2415 tr, 79.7% WR, +34629.6p\n======================================================================"
+    },
+    {
+      "asset_key": "XRPUSD",
+      "name": "XRP/USD",
+      "config_used": {
+        "pip_value": 0.0001,
+        "k_factor": 0.52,
+        "sl_method": "FIXED_BUFFER",
+        "csv_file": "XRPUSD_M5.csv"
+      },
+      "total_trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "win_rate": 0.0,
+      "pnl_pips": 0.0,
+      "profit_factor": 0.0,
+      "sharpe": 0.0,
+      "max_drawdown_pips": 0.0,
+      "max_drawdown_pct": 0.0,
+      "expectancy_pips": 0.0,
+      "avg_win_pips": 0.0,
+      "avg_loss_pips": 0.0,
+      "avg_tp_distance_pips": 0.0,
+      "avg_sl_distance_pips": 0.0,
+      "long_trades": 0,
+      "long_wr": 0.0,
+      "long_pnl_pips": 0.0,
+      "short_trades": 0,
+      "short_wr": 0.0,
+      "short_pnl_pips": 0.0,
+      "tier_stats": {},
+      "hourly_stats": {},
+      "loop_stats": {},
+      "data_bars": 443905,
+      "data_days": 1553,
+      "kelly": 0.0,
+      "max_consec_wins": 0,
+      "max_consec_losses": 0,
+      "flags": [
+        "ZERO_TRADES"
+      ],
+      "report_text": "======================================================================\nSYMMETRY TRAP BACKTEST REPORT - XRPUSD_M5\n======================================================================\n  No trades generated."
     }
   ]
 }

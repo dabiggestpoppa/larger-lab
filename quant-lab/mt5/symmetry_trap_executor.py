@@ -151,6 +151,83 @@ def check_pending_orders():
     return 0
 
 
+def get_exit_trigger(direction, bar_high: float, bar_low: float, sl_price: float, tp_price: Optional[float] = None, current_price: Optional[float] = None):
+    """Return whether the latest bar or current price touched the stop or target.
+
+    This is the live-market equivalent of the engine's wick-based exits:
+    a trade exits if price touches the SL or TP level, not only if the bar closes beyond it.
+    """
+    direction_name = direction
+    if hasattr(direction, "name"):
+        direction_name = direction.name
+    if isinstance(direction_name, str):
+        direction_name = direction_name.upper()
+
+    if tp_price is None:
+        if direction_name == "LONG":
+            if bar_high >= sl_price:
+                return "TP"
+            if bar_low <= sl_price:
+                return "SL"
+        elif direction_name == "SHORT":
+            if bar_low <= sl_price:
+                return "SL"
+            if bar_high >= sl_price:
+                return "TP"
+        return None
+
+    if direction_name == "LONG":
+        if (current_price is not None and current_price >= tp_price) or bar_high >= tp_price:
+            return "TP"
+        if (current_price is not None and current_price <= sl_price) or bar_low <= sl_price:
+            return "SL"
+    elif direction_name == "SHORT":
+        if (current_price is not None and current_price <= tp_price) or bar_low <= tp_price:
+            return "TP"
+        if (current_price is not None and current_price >= sl_price) or bar_high >= sl_price:
+            return "SL"
+    return None
+
+
+def manage_open_position(pos):
+    """Monitor an open position and close it if the latest bar touched the SL/TP."""
+    if pos is None:
+        return False
+
+    direction = "LONG" if pos.type == mt5.POSITION_TYPE_BUY else "SHORT"
+    sl_price = getattr(pos, "sl", None)
+    tp_price = getattr(pos, "tp", None)
+    if not sl_price or not tp_price:
+        return False
+
+    tick = mt5.symbol_info_tick(SYMBOL)
+    bars = fetch_recent_bars(2)
+    if bars is None or len(bars) < 1:
+        return False
+
+    latest_bar = bars[-1]
+    current_price = None
+    if tick:
+        current_price = tick.bid if direction == "LONG" else tick.ask
+
+    trigger = get_exit_trigger(
+        direction,
+        float(latest_bar["high"]),
+        float(latest_bar["low"]),
+        float(sl_price),
+        float(tp_price),
+        current_price=current_price,
+    )
+    if trigger:
+        log(
+            f"WICK/TOUCH EXIT: {direction} ticket={pos.ticket} trigger={trigger} "
+            f"bar_high={latest_bar['high']:.5f} bar_low={latest_bar['low']:.5f} "
+            f"sl={sl_price:.5f} tp={tp_price:.5f}"
+        )
+        return close_position(pos, reason=f"TOUCH_{trigger}")
+    return False
+
+
 # ─── ORDER PLACEMENT ───────────────────────────────────────────────────────
 
 
@@ -481,6 +558,9 @@ def run_once():
         if est_hour >= PARAMS["HardExitHour"]:
             close_position(pos, "HARD_EXIT")
             return {"action": "hard_exit"}
+
+        if manage_open_position(pos):
+            return {"action": "position_closed", "ticket": pos.ticket}
 
         tick = mt5.symbol_info_tick(SYMBOL)
         if tick:
