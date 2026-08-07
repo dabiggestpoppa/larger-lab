@@ -215,7 +215,7 @@ def send_order(symbol: str, direction: str, volume: float,
     """
     Send order to MT5.
     If no_sl=True, SL is not included in the order request.
-    Used for ST trades where SL is monitored by the engine (close-only).
+    Used for ST trades where SL is monitored by the engine on touch/wick, matching real-market exits.
     """
     if not check_autotrading():
         log.warning("MT5 AutoTrading DISABLED")
@@ -248,9 +248,9 @@ def send_order(symbol: str, direction: str, volume: float,
     tp = round(tp, info.digits)
 
     # ── ALIEN EDGE: No hard SL for ST trades ──────────────────────
-    # Per ARC directive: ST uses monitored close, not broker SL.
-    # The engine monitors M5 closes and returns SL_HIT when price
-    # breaches the impulse extreme. No hard SL sent to broker.
+    # Per ARC directive: ST uses monitored touch/wick exits, not a synthetic close-only stop.
+    # The engine monitors live bar highs/lows and returns SL_HIT when price touches the
+    # impulse extreme. No hard SL is sent to broker for this path.
     if no_sl:
         sl = 0.0  # No SL in broker order
         sl_pips = to_pips(abs(sl - price), symbol) if sl > 0 else 0.0
