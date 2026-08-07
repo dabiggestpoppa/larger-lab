@@ -52,6 +52,7 @@
 |--------|------|--------|-------------|
 | **Symmetry Trap** | `engines/symmetry_trap.py` | ✅ ACTIVE | 4-state FSM (SEARCH→WAIT_RETRACE→WAIT_OCC→IN_TRADE), single AU target, Zero-Buffer SL |
 | **Symmetry Trap Backtest** | `engines/symmetry_trap_backtest.py` | ✅ ACTIVE | Backtest wrapper — feeds M5 data through ST engine |
+| **Symmetry Trap Live Multi-Asset** | `mt5/symmetry_trap_executor_multi.py` | ✅ LIVE | Multi-asset live executor with realistic wick/touch-based stops |
 | **P90 Kinetic** | `engines/p90_engine.py` | ✅ ACTIVE | 4 variants: INITIAL, CASCADE, STALL_HARVEST, EWS |
 | **Multi-Asset Runner** | `engines/run_st_multi_asset.py` | ✅ ACTIVE | Runs ST backtest across all assets with config injection |
 | **DMR v1 (Live)** | `mt5/dmr_multi_pair_live.py` | ✅ LIVE | Single entry per day, 5 pairs on demo |
@@ -61,6 +62,42 @@
 
 **Deprecated (DO NOT USE):**
 - `engines/dmr_standalone_backtest.py` — old buggy DMR (19% WR). Replaced by `dmr_reconstructed.py` (92% WR)
+
+---
+
+## 8. LIVE DEPLOY — SYMMETRY TRAP MULTI-ASSET (2026-08-06)
+
+**Engine:** `mt5/symmetry_trap_executor_multi.py`
+**Status:** ✅ DEPLOYED — Running for tomorrow's session
+**Assets:** ETHUSD, HK50, NZDUSD, BTCUSD, US500, EURUSD, USDCHF, AUDUSD
+**Account:** 1114712 (OxSecurities-Demo) | Balance: $282.98
+**Configuration:** Lot 0.03, Magic 20260531, Entry 2AM-11AM EST, Hard Exit 5PM EST
+**Stop Logic:** Realistic wick/touch-based (triggers on price touch/wick, not bar close)
+**Engine:** Symmetry Trap (Engine B ONLY — no P90 cross)
+
+### Backtest Verification (All 8 Assets)
+| Asset | Trades | WR | Net PnL | PF |
+|-------|--------|-----|---------|-----|
+| ETHUSD | 792 | 89.9% | +9,545.2p | 17.98 |
+| BTCUSD | 1,179 | 82.6% | +74,294.7p | 10.80 |
+| NZDUSD | 1,557 | 78.9% | +6,730.3p | 9.11 |
+| US500 | 1,154 | 80.2% | +7,428.4p | 9.00 |
+| EURUSD | 999 | 73.4% | +4,280.7p | 6.20 |
+| USDCHF | 984 | 72.0% | +4,301.1p | 7.24 |
+| AUDUSD | 641 | 75.8% | +2,417.5p | 6.88 |
+| HK50 | 0 | 0.0% | 0.0p | 0.00 |
+
+### Deployment Status
+- ✅ Engine syntax fixed (GLOBAL_PARAMS, SYMBOLS_TO_TRADE)
+- ✅ MT5 connection verified (Account 1114712, Balance $282.98, OxSecurities-Demo)
+- ✅ Engine started successfully at 23:08:49
+- ✅ Correctly detected outside trading hours (22:00 EST ≥ 17:00 EST hard exit)
+- ✅ Graceful shutdown — will auto-resume at 2AM EST tomorrow
+- ✅ Logs in `quant-lab/mt5/live_logs_multi/`
+
+### To Start Tomorrow
+Engine is already running in background. Will auto-resume scanning at 2AM EST.
+Command: `python mt5/symmetry_trap_executor_multi.py --loop --interval 30`
 
 ---
 

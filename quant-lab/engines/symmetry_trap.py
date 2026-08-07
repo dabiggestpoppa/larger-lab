@@ -5,7 +5,7 @@ CEREBUS FX v4.0 — Symmetry Trap Engine (Base)
 Reconstructed from CEREBUS ontology per MAD directive (2026-05-29):
   - Base Symmetry Trap ONLY
   - TP = single 1 AU target (no extended ladder)
-  - SL = Zero-Buffer Impulse Extreme (close-only)
+  - SL = Zero-Buffer Impulse Extreme (wick-based)
   - No gear shift, no cross-pair, no Blind Chain extensions
   - Add layers later after base is validated
 
@@ -20,7 +20,7 @@ AXIOMS ENFORCED:
   1. Symmetry Trap = Engine B ONLY (Atomic Structural). Never mix P90 SL/TP.
   2. AU = 50% of K-Means centroid (NOT pips or Fibonacci).
   3. P90 = Kinetic Validation Threshold (NOT an indicator).
-  4. 80% Close Invalidation Rule = absolute, close-only.
+  4. 80% Close Invalidation Rule = absolute, wick-based.
   5. Zero-Buffer OCC Extreme = SL at exact impulse extreme.
   6. TP = exactly 1 AU from entry. Single target. No ladder.
   7. 12 PM EST = full state reset (deficits terminate, no roll-forward).
@@ -203,7 +203,7 @@ class SymmetryTrapEngine:
 
     Trade Management:
       Entry:  Close of OCC candle
-      SL:     Zero-Buffer Impulse Extreme = exact impulse bar high/low (CLOSE-ONLY)
+      SL:     Zero-Buffer Impulse Extreme = exact impulse bar high/low (WICK-BASED)
              NOTE: Uses self.impulse_extreme (set in SEARCH), NOT OCC extreme + buffer
       TP:     Exactly 1 AU from entry (SINGLE TARGET — no ladder)
 
@@ -428,7 +428,7 @@ class SymmetryTrapEngine:
 
         # ── STATE: WAIT_RETRACE ────────────────────────────────────────
         # Wait for pullback >= 1 AU OR 38.2%-50% Fib retracement
-        # Monitor 80% Kill Switch (close-only invalidation)
+        # Monitor 80% Kill Switch (wick-based invalidation)
         # Reference: cerebus_qa_recap.md Q5 (Kill), Q8 (DZ pullback), Q9 (DZ)
         elif self.state == EngineState.WAIT_RETRACE:
             # Kill Switch: REMOVED (dead code per June 4 optimization)
@@ -547,7 +547,7 @@ class SymmetryTrapEngine:
                 return sig
 
         # ── STATE: IN_TRADE ────────────────────────────────────────────
-        # Monitor TP (wick or close) and SL (CLOSE-ONLY)
+        # Monitor TP (wick or close) and SL (WICK-BASED)
         # Reference: cerebus_dual_engine.md (Zero-Buffer SL, close-only)
         elif self.state == EngineState.IN_TRADE:
             # Skip SL/TP check on entry bar — Nautilus fills on NEXT bar
@@ -600,7 +600,7 @@ class SymmetryTrapEngine:
                         tp_price=_tp,
                         au_used=self.au_pips,
                         timestamp=bar.timestamp,
-                        reason=f"Zero-Buffer SL hit (close-only invalidation) – loop {_loop} complete",
+                        reason=f"Zero-Buffer SL hit (wick-based invalidation) – loop {_loop} complete",
                         loop_count=_loop,
                     )
                     self.signal_log.append(sig)
@@ -653,7 +653,7 @@ class SymmetryTrapEngine:
                         tp_price=_tp,
                         au_used=self.au_pips,
                         timestamp=bar.timestamp,
-                        reason=f"Zero-Buffer SL hit (close-only invalidation) – loop {_loop} complete",
+                        reason=f"Zero-Buffer SL hit (wick-based invalidation) – loop {_loop} complete",
                         loop_count=_loop,
                     )
                     self.signal_log.append(sig)

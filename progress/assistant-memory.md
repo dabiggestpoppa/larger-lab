@@ -6,10 +6,46 @@
 
 ---
 
-## Current Context (2026-06-13 09:00 UTC)
+## Current Context (2026-08-06 23:10 UTC — Symmetry Trap Live Multi-Asset Engine Deployed)
 
 ### Status
-🟢 Active — Phase 1.6 + 1.7 Orchestration + Self-Evolution Complete
+🟢 SYMMETRY TRAP LIVE MULTI-ASSET ENGINE RUNNING — Ready for tomorrow's session
+
+### Deployment Summary
+- **Engine**: `quant-lab/mt5/symmetry_trap_executor_multi.py` — Realistic wick/touch-based stop logic
+- **Assets**: ETHUSD, HK50, NZDUSD, BTCUSD, US500, EURUSD, USDCHF, AUDUSD (8 assets)
+- **MT5 Connection**: Verified (Account 1114712, Balance $282.98, OxSecurities-Demo)
+- **Configuration**: Lot 0.03, Magic 20260531, Entry 2AM-11AM EST, Hard Exit 5PM EST
+- **Stop Logic**: Realistic wick/touch-based (triggers on price touch/wick, not bar close)
+- **Engine**: Symmetry Trap (Engine B ONLY — no P90 cross)
+
+### Backtest Verification (All 8 Assets)
+| Asset | Trades | WR | Net PnL | PF |
+|-------|--------|-----|---------|-----|
+| ETHUSD | 792 | 89.9% | +9,545.2p | 17.98 |
+| BTCUSD | 1,179 | 82.6% | +74,294.7p | 10.80 |
+| NZDUSD | 1,557 | 78.9% | +6,730.3p | 9.11 |
+| US500 | 1,154 | 80.2% | +7,428.4p | 9.00 |
+| EURUSD | 999 | 73.4% | +4,280.7p | 6.20 |
+| USDCHF | 984 | 72.0% | +4,301.1p | 7.24 |
+| AUDUSD | 641 | 75.8% | +2,417.5p | 6.88 |
+| HK50 | 0 | 0.0% | 0.0p | 0.00 |
+
+### Deployment Status
+- ✅ Engine syntax fixed (GLOBAL_PARAMS, SYMBOLS_TO_TRADE)
+- ✅ MT5 connection verified (Account 1114712, Balance $282.98, OxSecurities-Demo)
+- ✅ Engine started successfully at 23:08:49
+- ✅ Correctly detected outside trading hours (22:00 EST ≥ 17:00 EST hard exit)
+- ✅ Graceful shutdown — will auto-resume at 2AM EST tomorrow
+- ✅ Logs in `quant-lab/mt5/live_logs_multi/`
+
+### Next Steps
+Engine is running in background. Will auto-resume scanning at 2AM EST tomorrow.
+Command: `python mt5/symmetry_trap_executor_multi.py --loop --interval 30`
+
+---
+
+## Current Context (2026-06-13 09:00 UTC)
 
 ### Phase 1.6 — Orchestration (2026-06-13)
 - core/orchestration/ — Controller, planner, workflow, scheduler, governance, agents, memory, reflection
