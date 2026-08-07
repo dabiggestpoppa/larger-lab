@@ -211,7 +211,22 @@ class OHLCNormalizer:
         
         # Parse timestamps to detect frequency
         try:
-            df['_ts'] = pd.to_datetime(df[config.timestamp_column], errors='coerce')
+            # Detect if timestamps are Unix timestamps (seconds since epoch)
+            sample_values = df[config.timestamp_column].dropna().head(100)
+            is_unix_timestamp = False
+            
+            if sample_values.dtype in ['int64', 'float64', 'int32', 'float32']:
+                # Check if values are in reasonable Unix timestamp range (year 2000-2030)
+                min_val = sample_values.min()
+                max_val = sample_values.max()
+                if 946684800 <= min_val <= 1893456000 and 946684800 <= max_val <= 1893456000:
+                    is_unix_timestamp = True
+            
+            if is_unix_timestamp:
+                df['_ts'] = pd.to_datetime(df[config.timestamp_column], unit='s', utc=True, errors='coerce')
+            else:
+                df['_ts'] = pd.to_datetime(df[config.timestamp_column], errors='coerce')
+            
             df = df.dropna(subset=['_ts'])
             if len(df) < 2:
                 return df
@@ -339,7 +354,24 @@ class OHLCNormalizer:
         if config.timestamp_format:
             df['timestamp_parsed'] = pd.to_datetime(df['timestamp_raw'], format=config.timestamp_format, errors='coerce')
         else:
-            df['timestamp_parsed'] = pd.to_datetime(df['timestamp_raw'], errors='coerce', utc=False)
+            # Try to detect if timestamps are Unix timestamps (seconds since epoch)
+            # Check if values are numeric and in reasonable Unix timestamp range
+            sample_values = df['timestamp_raw'].dropna().head(100)
+            is_unix_timestamp = False
+            
+            if sample_values.dtype in ['int64', 'float64', 'int32', 'float32']:
+                # Check if values are in reasonable Unix timestamp range (year 2000-2030)
+                # Unix timestamps for 2000-01-01 to 2030-01-01 are roughly 946684800 to 1893456000
+                min_val = sample_values.min()
+                max_val = sample_values.max()
+                if 946684800 <= min_val <= 1893456000 and 946684800 <= max_val <= 1893456000:
+                    is_unix_timestamp = True
+            
+            if is_unix_timestamp:
+                # Parse as Unix timestamps (seconds since epoch)
+                df['timestamp_parsed'] = pd.to_datetime(df['timestamp_raw'], unit='s', utc=True, errors='coerce')
+            else:
+                df['timestamp_parsed'] = pd.to_datetime(df['timestamp_raw'], errors='coerce', utc=False)
         
         # Drop unparseable timestamps
         initial_count = len(df)

@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-08-07T09:22:21.578692",
+  "generated_at": "2026-08-07T00:41:57.759564",
   "coverage": [
     {
       "symbol": "EURUSD",
       "h1_raw_exists": null,
       "h1_raw_sha256": null,
       "h1_normalized_exists": true,
-      "h1_normalized_sha256": "daf562f0418a4d2b7513fd86ef3156377438495f5e81bb801ea8408db5d250de",
-      "h1_row_count": 18089,
+      "h1_normalized_sha256": "4a72d6267956739e561a740ef43cae327a18723d0e31b8afb9f76e7670763a1b",
+      "h1_row_count": 1,
       "h1_coverage_pct": 100.0,
       "h1_quality_flag": 0,
       "d1_raw_exists": null,
@@ -66,8 +66,8 @@
       "h1_raw_exists": null,
       "h1_raw_sha256": null,
       "h1_normalized_exists": true,
-      "h1_normalized_sha256": "7273a11d2fa59c5b1d487457c90222d40dc420dd3754effae937234148e1e12a",
-      "h1_row_count": 18120,
+      "h1_normalized_sha256": "939847073523215d5f165a3f122afdc2f29c6022500e1ba29d2188dc81c60430",
+      "h1_row_count": 1,
       "h1_coverage_pct": 100.0,
       "h1_quality_flag": 0,
       "d1_raw_exists": null,

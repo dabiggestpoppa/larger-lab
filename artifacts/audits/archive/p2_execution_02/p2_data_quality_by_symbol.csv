@@ -3,11 +3,11 @@ CHFJPY,H1,23138,23138,0,0,0,4313,153,0,84.28836836545118,1,Missing weekday bars:
 EURCHF,H1,25124,25124,0,0,1343,42889,1222,0,37.684115794210285,1,Weekend bars present: 1343 (reporting only); Missing weekday bars: 42889; Unexplained gaps: 1222; Low coverage: 37.7% (25124/66670 expected bars)
 EURGBP,H1,24872,24872,0,0,1337,43134,1229,1,37.3066942657007,1,Weekend bars present: 1337 (reporting only); Missing weekday bars: 43134; Unexplained gaps: 1229; Stale bars (identical OHLC): 1; Low coverage: 37.3% (24872/66669 expected bars)
 EURJPY,H1,24866,24866,0,0,1337,43141,1230,0,37.29713514324284,1,Weekend bars present: 1337 (reporting only); Missing weekday bars: 43141; Unexplained gaps: 1230; Low coverage: 37.3% (24866/66670 expected bars)
-EURUSD,H1,18089,18089,0,0,0,128,6,0,99.29735960915627,1,Missing weekday bars: 128; Unexplained gaps: 6
+EURUSD,H1,1,1,0,0,0,0,0,0,100.0,0,
 GBPCHF,H1,23301,23301,0,0,0,4299,152,0,84.42391304347827,1,Missing weekday bars: 4299; Unexplained gaps: 152; Low coverage: 84.4% (23301/27600 expected bars)
 GBPJPY,H1,23293,23293,0,0,0,4307,153,0,84.39492753623189,1,Missing weekday bars: 4307; Unexplained gaps: 153; Low coverage: 84.4% (23293/27600 expected bars)
 GBPUSD,H1,23303,23303,0,0,0,4297,152,0,84.43115942028986,1,Missing weekday bars: 4297; Unexplained gaps: 152; Low coverage: 84.4% (23303/27600 expected bars)
-USDCHF,H1,18120,18120,0,0,0,120,6,0,99.3421052631579,1,Missing weekday bars: 120; Unexplained gaps: 6
+USDCHF,H1,1,1,0,0,0,0,0,0,100.0,0,
 USDJPY,H1,23302,23302,0,0,0,4298,152,1,84.42753623188406,1,Missing weekday bars: 4298; Unexplained gaps: 152; Stale bars (identical OHLC): 1; Low coverage: 84.4% (23302/27600 expected bars)
 CHFJPY,D1,2912,2912,0,0,695,2784,144,0,104.59770114942528,1,Weekend bars present: 695 (reporting only); Missing weekday bars: 2784; Unexplained gaps: 144
 EURCHF,D1,2912,2912,0,0,695,2784,144,0,104.59770114942528,1,Weekend bars present: 695 (reporting only); Missing weekday bars: 2784; Unexplained gaps: 144
