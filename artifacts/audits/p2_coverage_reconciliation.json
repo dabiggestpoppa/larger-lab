@@ -1,0 +1,128 @@
+{
+  "phase": 2,
+  "task": "CR-P2-FINAL-SEAL-04",
+  "target_window": {
+    "start": "2022-01-01T00:00:00+00:00",
+    "end": "2026-05-21T18:00:00+00:00",
+    "expected_fx_h1_hours": 27451
+  },
+  "common_window": {
+    "start": "2023-07-03T00:00:00+00:00",
+    "end": "2026-05-21T18:00:00+00:00",
+    "expected_common_hours": 18091,
+    "intersection_hours": 17273,
+    "intersection_coverage_pct": 95.48
+  },
+  "per_symbol": {
+    "EURUSD": {
+      "target_coverage_pct": 65.44,
+      "common_coverage_pct": 99.29,
+      "gaps_gt_24h": 154,
+      "passes_target_97": false,
+      "passes_common_97": true,
+      "blocking_issues": ["target_coverage_below_97", "gaps_gt_24h"]
+    },
+    "GBPUSD": {
+      "target_coverage_pct": 84.35,
+      "common_coverage_pct": 99.34,
+      "gaps_gt_24h": 232,
+      "passes_target_97": false,
+      "passes_common_97": true,
+      "blocking_issues": ["target_coverage_below_97", "gaps_gt_24h"]
+    },
+    "USDJPY": {
+      "target_coverage_pct": 84.34,
+      "common_coverage_pct": 99.34,
+      "gaps_gt_24h": 232,
+      "passes_target_97": false,
+      "passes_common_97": true,
+      "blocking_issues": ["target_coverage_below_97", "gaps_gt_24h"]
+    },
+    "USDCHF": {
+      "target_coverage_pct": 65.47,
+      "common_coverage_pct": 99.34,
+      "gaps_gt_24h": 154,
+      "passes_target_97": false,
+      "passes_common_97": true,
+      "blocking_issues": ["target_coverage_below_97", "gaps_gt_24h"]
+    },
+    "EURGBP": {
+      "target_coverage_pct": 80.26,
+      "common_coverage_pct": 95.74,
+      "gaps_gt_24h": 232,
+      "passes_target_97": false,
+      "passes_common_97": false,
+      "blocking_issues": ["target_coverage_below_97", "common_coverage_below_97", "gaps_gt_24h"]
+    },
+    "EURJPY": {
+      "target_coverage_pct": 80.23,
+      "common_coverage_pct": 95.71,
+      "gaps_gt_24h": 232,
+      "passes_target_97": false,
+      "passes_common_97": false,
+      "blocking_issues": ["target_coverage_below_97", "common_coverage_below_97", "gaps_gt_24h"]
+    },
+    "GBPJPY": {
+      "target_coverage_pct": 84.31,
+      "common_coverage_pct": 99.29,
+      "gaps_gt_24h": 232,
+      "passes_target_97": false,
+      "passes_common_97": true,
+      "blocking_issues": ["target_coverage_below_97", "gaps_gt_24h"]
+    },
+    "CHFJPY": {
+      "target_coverage_pct": 84.29,
+      "common_coverage_pct": 99.25,
+      "gaps_gt_24h": 232,
+      "passes_target_97": false,
+      "passes_common_97": true,
+      "blocking_issues": ["target_coverage_below_97", "gaps_gt_24h"]
+    },
+    "EURCHF": {
+      "target_coverage_pct": 81.15,
+      "common_coverage_pct": 95.71,
+      "gaps_gt_24h": 232,
+      "passes_target_97": false,
+      "passes_common_97": false,
+      "blocking_issues": ["target_coverage_below_97", "common_coverage_below_97", "gaps_gt_24h"]
+    },
+    "GBPCHF": {
+      "target_coverage_pct": 84.34,
+      "common_coverage_pct": 99.33,
+      "gaps_gt_24h": 232,
+      "passes_target_97": false,
+      "passes_common_97": true,
+      "blocking_issues": ["target_coverage_below_97", "gaps_gt_24h"]
+    }
+  },
+  "gate_requirements": {
+    "real_raw_file_exists": true,
+    "raw_sha_valid": true,
+    "normalized_h1_exists": true,
+    "provider_known": true,
+    "timezone_known": true,
+    "price_side_known": true,
+    "malformed_ohlc_zero": true,
+    "duplicates_zero": true,
+    "target_coverage_ge_97": false,
+    "no_unexplained_gap_gt_24h": false,
+    "no_synthetic_source": true,
+    "hashes_reproducible": true
+  },
+  "gate_passed": false,
+  "phase_2_complete": false,
+  "phase_3_cleared": false,
+  "blocking_symbols": [
+    "EURUSD",
+    "GBPUSD",
+    "USDJPY",
+    "USDCHF",
+    "EURGBP",
+    "EURJPY",
+    "GBPJPY",
+    "CHFJPY",
+    "EURCHF",
+    "GBPCHF"
+  ],
+  "summary": "All 10 symbols fail target-window coverage (>=97%) and have gaps >24h. Common window coverage is better but EURGBP, EURJPY, EURCHF still below 97%."
+}

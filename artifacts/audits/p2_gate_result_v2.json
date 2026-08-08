@@ -1,0 +1,101 @@
+{
+  "phase": 2,
+  "task": "CR-P2-FINAL-SEAL-04",
+  "gate_version": 2,
+  "target_window": {
+    "start": "2022-01-01T00:00:00+00:00",
+    "end": "2026-05-21T18:00:00+00:00",
+    "expected_fx_h1_hours": 27451
+  },
+  "common_window": {
+    "start": "2023-07-03T00:00:00+00:00",
+    "end": "2026-05-21T18:00:00+00:00",
+    "expected_common_hours": 18091,
+    "intersection_hours": 17273,
+    "intersection_coverage_pct": 95.48
+  },
+  "per_symbol_results": {
+    "EURUSD": {
+      "target_coverage_pct": 65.44,
+      "common_coverage_pct": 99.29,
+      "gaps_gt_24h": 154,
+      "passes": false,
+      "failures": ["target_coverage_below_97", "gaps_gt_24h"]
+    },
+    "GBPUSD": {
+      "target_coverage_pct": 84.35,
+      "common_coverage_pct": 99.34,
+      "gaps_gt_24h": 232,
+      "passes": false,
+      "failures": ["target_coverage_below_97", "gaps_gt_24h"]
+    },
+    "USDJPY": {
+      "target_coverage_pct": 84.34,
+      "common_coverage_pct": 99.34,
+      "gaps_gt_24h": 232,
+      "passes": false,
+      "failures": ["target_coverage_below_97", "gaps_gt_24h"]
+    },
+    "USDCHF": {
+      "target_coverage_pct": 65.47,
+      "common_coverage_pct": 99.34,
+      "gaps_gt_24h": 154,
+      "passes": false,
+      "failures": ["target_coverage_below_97", "gaps_gt_24h"]
+    },
+    "EURGBP": {
+      "target_coverage_pct": 80.26,
+      "common_coverage_pct": 95.74,
+      "gaps_gt_24h": 232,
+      "passes": false,
+      "failures": ["target_coverage_below_97", "common_coverage_below_97", "gaps_gt_24h"]
+    },
+    "EURJPY": {
+      "target_coverage_pct": 80.23,
+      "common_coverage_pct": 95.71,
+      "gaps_gt_24h": 232,
+      "passes": false,
+      "failures": ["target_coverage_below_97", "common_coverage_below_97", "gaps_gt_24h"]
+    },
+    "GBPJPY": {
+      "target_coverage_pct": 84.31,
+      "common_coverage_pct": 99.29,
+      "gaps_gt_24h": 232,
+      "passes": false,
+      "failures": ["target_coverage_below_97", "gaps_gt_24h"]
+    },
+    "CHFJPY": {
+      "target_coverage_pct": 84.29,
+      "common_coverage_pct": 99.25,
+      "gaps_gt_24h": 232,
+      "passes": false,
+      "failures": ["target_coverage_below_97", "gaps_gt_24h"]
+    },
+    "EURCHF": {
+      "target_coverage_pct": 81.15,
+      "common_coverage_pct": 95.71,
+      "gaps_gt_24h": 232,
+      "passes": false,
+      "failures": ["target_coverage_below_97", "common_coverage_below_97", "gaps_gt_24h"]
+    },
+    "GBPCHF": {
+      "target_coverage_pct": 84.34,
+      "common_coverage_pct": 99.33,
+      "gaps_gt_24h": 232,
+      "passes": false,
+      "failures": ["target_coverage_below_97", "gaps_gt_24h"]
+    }
+  },
+  "gate_passed": false,
+  "phase_2_complete": false,
+  "phase_3_cleared": false,
+  "regression_tests": {
+    "one_bar_not_100pct": "PASS - single bar over multi-year window yields ~0% coverage",
+    "coverage_not_exceed_100": "PASS - coverage capped at 100%",
+    "missing_raw_fails": "PASS - missing raw path fails gate",
+    "missing_sha_fails": "PASS - missing SHA fails gate",
+    "96_9_pct_fails": "PASS - 96.9% fails 97% threshold",
+    "97_0_pct_passes": "PASS - 97.0% passes if all other requirements met",
+    "common_window_reconciles": "PASS - common window math reconciles to actual timestamps"
+  }
+}
