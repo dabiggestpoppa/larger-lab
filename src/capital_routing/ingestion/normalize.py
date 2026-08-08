@@ -280,7 +280,27 @@ class OHLCNormalizer:
                     df_resampled = df_resampled.reset_index()
                     df_resampled = df_resampled.rename(columns={'_ts': config.timestamp_column})
                     
-                    print(f"  Resampled {len(df)} -> {len(df_resampled)} bars")
+                    # Filter out weekend and holiday bars for FX data
+                    if config.timeframe in ['H1', 'H4'] and config.symbol in ['EURUSD', 'GBPUSD', 'USDJPY', 'USDCHF', 'EURGBP', 'EURJPY', 'GBPJPY', 'CHFJPY', 'EURCHF', 'GBPCHF']:
+                        # Remove weekend bars (Saturday=5, Sunday=6)
+                        df_resampled = df_resampled[df_resampled[config.timestamp_column].dt.weekday < 5].copy()
+                        
+                        # Remove major FX holiday bars
+                        fx_holidays = [
+                            '2022-01-01', '2022-04-15', '2022-04-18', '2022-05-30', '2022-07-04', '2022-09-05', '2022-11-24', '2022-12-26',
+                            '2023-01-02', '2023-04-07', '2023-04-10', '2023-05-29', '2023-07-04', '2023-09-04', '2023-11-23', '2023-12-25',
+                            '2024-01-01', '2024-03-29', '2024-04-01', '2024-05-27', '2024-07-04', '2024-09-02', '2024-11-28', '2024-12-25',
+                            '2025-01-01', '2025-04-18', '2025-04-21', '2025-05-26', '2025-07-04', '2025-09-01', '2025-11-27', '2025-12-25',
+                            '2026-01-01', '2026-04-03', '2026-04-06', '2026-05-25',
+                        ]
+                        holiday_timestamps = set()
+                        for h in fx_holidays:
+                            day_ts = pd.date_range(h, h + ' 23:00', freq='h', tz='UTC')
+                            holiday_timestamps.update(day_ts)
+                        
+                        df_resampled = df_resampled[~df_resampled[config.timestamp_column].isin(holiday_timestamps)].copy()
+                    
+                    print(f"  Resampled {len(df)} -> {len(df_resampled)} bars (after filtering weekends/holidays)")
                     return df_resampled
             
             df = df.drop(columns=['_ts'])

@@ -1,0 +1,138 @@
+{
+  "phase": 2,
+  "task": "CR-P2-DATA-COMPLETION-05",
+  "target_window": {
+    "start": "2022-01-01T00:00:00+00:00",
+    "end": "2026-05-21T18:00:00+00:00",
+    "expected_hours_no_weekends_late_friday_holidays": 25969
+  },
+  "common_window": {
+    "start": "2023-07-03T00:00:00+00:00",
+    "end": "2026-05-21T18:00:00+00:00",
+    "expected_hours_no_weekends_late_friday_holidays": 17101,
+    "intersection_hours": 16871,
+    "intersection_coverage_pct": 98.66
+  },
+  "per_symbol": {
+    "EURUSD": {
+      "target_coverage_pct": 65.84,
+      "common_coverage_pct": 99.98,
+      "gaps_gt_24h": 78,
+      "passes_target_97": false,
+      "passes_common_97": true,
+      "blocking_issues": ["target_coverage_below_97", "gaps_gt_24h", "missing_2022_2023_history"]
+    },
+    "GBPUSD": {
+      "target_coverage_pct": 84.80,
+      "common_coverage_pct": 99.97,
+      "gaps_gt_24h": 0,
+      "passes_target_97": false,
+      "passes_common_97": true,
+      "blocking_issues": ["target_coverage_below_97"]
+    },
+    "USDJPY": {
+      "target_coverage_pct": 84.80,
+      "common_coverage_pct": 99.97,
+      "gaps_gt_24h": 0,
+      "passes_target_97": false,
+      "passes_common_97": true,
+      "blocking_issues": ["target_coverage_below_97"]
+    },
+    "USDCHF": {
+      "target_coverage_pct": 65.83,
+      "common_coverage_pct": 99.97,
+      "gaps_gt_24h": 78,
+      "passes_target_97": false,
+      "passes_common_97": true,
+      "blocking_issues": ["target_coverage_below_97", "gaps_gt_24h", "missing_2022_2023_history"]
+    },
+    "EURGBP": {
+      "target_coverage_pct": 82.63,
+      "common_coverage_pct": 98.68,
+      "gaps_gt_24h": 10,
+      "passes_target_97": false,
+      "passes_common_97": true,
+      "blocking_issues": ["target_coverage_below_97", "gaps_gt_24h"]
+    },
+    "EURJPY": {
+      "target_coverage_pct": 82.63,
+      "common_coverage_pct": 98.68,
+      "gaps_gt_24h": 10,
+      "passes_target_97": false,
+      "passes_common_97": true,
+      "blocking_issues": ["target_coverage_below_97", "gaps_gt_24h"]
+    },
+    "GBPJPY": {
+      "target_coverage_pct": 84.80,
+      "common_coverage_pct": 99.97,
+      "gaps_gt_24h": 0,
+      "passes_target_97": false,
+      "passes_common_97": true,
+      "blocking_issues": ["target_coverage_below_97"]
+    },
+    "CHFJPY": {
+      "target_coverage_pct": 84.80,
+      "common_coverage_pct": 99.97,
+      "gaps_gt_24h": 0,
+      "passes_target_97": false,
+      "passes_common_97": true,
+      "blocking_issues": ["target_coverage_below_97"]
+    },
+    "EURCHF": {
+      "target_coverage_pct": 83.60,
+      "common_coverage_pct": 98.68,
+      "gaps_gt_24h": 10,
+      "passes_target_97": false,
+      "passes_common_97": true,
+      "blocking_issues": ["target_coverage_below_97", "gaps_gt_24h"]
+    },
+    "GBPCHF": {
+      "target_coverage_pct": 84.80,
+      "common_coverage_pct": 99.97,
+      "gaps_gt_24h": 0,
+      "passes_target_97": false,
+      "passes_common_97": true,
+      "blocking_issues": ["target_coverage_below_97"]
+    }
+  },
+  "gate_requirements": {
+    "real_raw_file_exists": true,
+    "raw_sha_valid": true,
+    "normalized_h1_exists": true,
+    "provider_known": true,
+    "timezone_known": true,
+    "price_side_known": true,
+    "malformed_ohlc_zero": true,
+    "duplicates_zero": true,
+    "target_coverage_ge_97": false,
+    "no_unexplained_gap_gt_24h": false,
+    "no_synthetic_source": true,
+    "hashes_reproducible": true,
+    "common_intersection_coverage_ge_97": true
+  },
+  "gate_passed": false,
+  "phase_2_complete": false,
+  "phase_3_cleared": false,
+  "blocking_symbols": [
+    "EURUSD",
+    "GBPUSD",
+    "USDJPY",
+    "USDCHF",
+    "EURGBP",
+    "EURJPY",
+    "GBPJPY",
+    "CHFJPY",
+    "EURCHF",
+    "GBPCHF"
+  ],
+  "regression_tests": {
+    "weekend_gaps_not_unexplained": "PASS - weekend gaps classified as 'weekend_closure'",
+    "holiday_exclusions": "PASS - holiday hours excluded from expected",
+    "provider_outage_classification": "PASS - provider outages tracked separately",
+    "true_missing_48h_weekday_gap_fails": "PASS - 48h unexplained gap fails gate",
+    "partial_interval_backfill_merges_deterministically": "NOT_TESTED - no backfill performed",
+    "duplicate_overlap_during_backfill_resolves_deterministically": "NOT_TESTED - no backfill performed",
+    "provider_mismatch_during_backfill_fails": "NOT_TESTED - no backfill performed"
+  },
+  "summary": "Common window intersection coverage 98.66% (PASS). All 10 symbols pass common window >=97%. However, target window coverage fails for all 10 symbols: EURUSD/USDCHF at ~66% (missing 2022-2023 history), others at 82-85% (gaps >24h). No older raw data found for EURUSD/USDCHF backfill."
+}
