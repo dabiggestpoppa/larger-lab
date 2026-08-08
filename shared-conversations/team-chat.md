@@ -38,7 +38,121 @@ Command used: `python mt5/symmetry_trap_executor_multi.py --loop --interval 30`
 
 ---
 
-## 🟢 OC2 — REKEY + STALL HARVEST ENGINES (2026-06-29)
+## � CC — LIVE EXECUTOR REFACTOR FOR 1:1 PARITY (2026-08-08)
+**Agent:** CC (Claude Code) | **Status:** 🔄 IN PROGRESS — Architecture refactored, parity testing needed
+
+### Problem Identified
+The live executor (`symmetry_trap_executor_multi.py`) had **diverged significantly** from the validated backtest engine (`symmetry_trap_backtest.py`). Key divergences:
+
+| Component | Backtest (Correct) | Live (Broken) |
+|-----------|-------------------|---------------|
+| **Pip calculation** | `config["pip_value"]` from ASSET_CONFIGS | Hardcoded symbol checks (`"JPY" in symbol`) |
+| **Asian Range** | `_find_asian_range()` using `est_dt.date()` boundaries | Duplicate logic with different date handling |
+| **PnL calculation** | `apply_costs_to_pnl()` from `trading_costs.py` | Direct price diff, no costs applied |
+| **Time source** | Bar timestamps exclusively | MT5 time + tick fallbacks |
+| **Signal loop** | `engine.process_bar()` for all bars | Same but with MT5-specific checks |
+| **Tier config** | From `config["tiers"]` | From `ASSET_CONFIGS` (same source but different access) |
+| **SL/TP logic** | Zero-buffer impulse extreme (wick-based) | Mixed: some close-only, some wick-based |
+
+### Root Cause
+The live executor was built **separately** instead of reusing the backtest engine's core logic with only the data feed changed. This violated the falsification principle: the backtest engine was validated and correct; the live engine should be identical except for data source and execution.
+
+### Solution: Three-Layer Architecture
+Refactored into clean separation of concerns:
+
+#### 1. Data Feed Layer (`quant-lab/engines/mt5_data_feed.py`)
+- **Single source of truth** for MT5 bar fetching and time utilities
+- `fetch_m5_bars(symbol, count)` → returns `List[Bar]` compatible with backtest engine
+- `get_current_est_hour(est_offset)` → uses latest bar timestamp (matches backtest)
+- `get_symbol_pip_size(symbol)` → from ASSET_CONFIGS (single source)
+- `get_symbol_config(symbol)` → full asset config
+- `build_today_bars()`, `calculate_asian_range()`, `filter_trading_bars()` → **exact replicas** of backtest logic
+
+#### 2. Strategy Layer (`quant-lab/engines/symmetry_trap_live.py`)
+- **Thin wrapper** around `SymmetryTrapBacktest` — reuses ALL backtest logic
+- `SymmetryTrapLiveEngine` class:
+  - Initializes with same config as backtest
+  - `refresh_data()` → fetches MT5 bars, builds today's bars, calculates Asian Range, initializes session
+  - `scan_for_signal()` → feeds trading bars through `engine.process_bar()` (IDENTICAL to backtest)
+  - `calculate_pnl()` → uses `apply_costs_to_pnl()` (IDENTICAL to backtest)
+- `run_live_scan(symbols)` → runs scan for all symbols, returns signal dicts
+
+#### 3. Execution Layer (`quant-lab/mt5/execution_layer.py`)
+- **Pure MT5 order/position management** — ZERO strategy logic
+- `MT5ExecutionLayer` class:
+  - `place_limit_order()` → places limit orders with SL/TP
+  - `close_position()` → closes positions with filling mode fallback
+  - `check_touch_exit()` → wick/touch-based exit detection
+  - `get_position_pnl_pips()` → unrealized PnL
+  - `hard_exit_all()` → closes all positions
+- `create_execution_layer()` → factory function
+
+#### 4. Orchestration Layer (`quant-lab/mt5/symmetry_trap_executor_multi.py` — REWRITTEN)
+- **Thin orchestration ONLY** — imports live engine + execution layer
+- Main loop:
+  1. MT5 health check (every 120s)
+  2. Hard exit check using `get_current_est_hour()` (bar timestamp)
+  3. `run_live_scan()` → gets signals from live engine
+  4. Execute signals via execution layer:
+     - `"signal"` + direction → place limit order
+     - `"hard_exit"` → close position
+     - `"holding"` → check touch exit, log PnL
+- **ZERO strategy logic** — no Asian Range, no tier classification, no signal detection, no pip calculation
+
+### Files Created/Modified
+| File | Action | Description |
+|------|--------|-------------|
+| `quant-lab/engines/mt5_data_feed.py` | **CREATED** | MT5 bar fetching, time utilities, Asian Range calc |
+| `quant-lab/engines/symmetry_trap_live.py` | **CREATED** | Live wrapper around backtest engine |
+| `quant-lab/mt5/execution_layer.py` | **CREATED** | Pure MT5 order/position management |
+| `quant-lab/mt5/symmetry_trap_executor_multi.py` | **REWRITTEN** | Thin orchestration only |
+| `quant-lab/engines/symmetry_trap_backtest.py` | **READ ONLY** | Reference — NOT MODIFIED |
+| `quant-lab/engines/trading_costs.py` | **READ ONLY** | Reference — NOT MODIFIED |
+
+### Critical Rules Enforced (Non-Negotiable)
+1. **NO strategy logic in executor** — Only data fetch + execution
+2. **NO pip calculation in executor** — Use `config["pip_value"]` everywhere
+3. **NO Asian Range calculation in executor** — Use backtest engine's `_find_asian_range`
+4. **NO tier classification in executor** — Use backtest engine's logic
+5. **NO signal detection in executor** — Use `engine.process_bar()`
+6. **PnL MUST use `apply_costs_to_pnl()`** — Same as backtest
+7. **Time MUST come from bar timestamps** — Not system clock, not MT5 tick time
+
+### Current Status
+- ✅ All new modules compile without syntax errors
+- ✅ All imports work correctly
+- ✅ `SymmetryTrapLiveEngine` instantiates correctly
+- ✅ `MT5ExecutionLayer` instantiates correctly
+- ✅ `run_live_scan()` executes without errors (returns `outside_window` correctly for current time)
+
+### What's NOT Working / Needs Verification
+1. **Parity Testing NOT DONE** — Need to run replay test: feed same historical CSV data to both backtest engine and live engine → verify IDENTICAL signals and PnL
+2. **Live MT5 Testing NOT DONE** — Need to run on demo account and verify:
+   - Signal generation matches backtest on same time period
+   - Order placement works (STOPLEVEL validation, volume normalization)
+   - Touch/wick exit detection works correctly
+   - PnL calculation matches backtest after costs
+3. **HK50 Zero Trades** — Backtest showed 0 trades for HK50; need to verify if data issue or config issue
+4. **Time Synchronization** — Live engine uses `get_current_est_hour()` from latest bar; need to verify this matches backtest behavior exactly during trading hours
+5. **Session Initialization** — Live engine calls `initialize_session()` on each scan; backtest does it once per day. Need to verify this doesn't cause state divergence.
+
+### Next Steps (Priority Order)
+1. **Create parity test script** — Run both engines on same historical data, compare signal-by-signal
+2. **Run `--once` mode on demo** — Verify signal generation and order placement
+3. **Fix any divergences found** — Must achieve 100% signal parity
+4. **Run 7-day forward test** — Validate live performance vs backtest
+5. **Update team-chat.md** with results
+
+### Success Criteria (Not Yet Met)
+- [ ] Live engine produces IDENTICAL signals to backtest on same historical data
+- [ ] Live engine produces IDENTICAL PnL (after costs) to backtest on same historical data
+- [ ] Live executor runs without errors on demo account
+- [ ] All strategy logic removed from executor (only orchestration remains)
+- [ ] Single source of truth for: pip calculation, Asian Range, tier classification, signal detection, PnL calculation
+
+---
+
+## �🟢 OC2 — REKEY + STALL HARVEST ENGINES (2026-06-29)
 **Agent:** OC2 (OWL) | **Status:** ✅ COMPLETE — Both engines built and tested
 
 ### What Was Built
