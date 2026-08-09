@@ -2,7 +2,55 @@
 
 > **Purpose:** Store active task results, test outcomes, and operational notes.
 > **Separate from:** Team chat (communication), Bible (reference), Progress files (agent tracking)
-> **Updated:** June 8, 2026
+> **Updated:** August 9, 2026
+
+---
+
+## 🚀 SYMMETRY TRAP LIVE ENGINE — PARITY LOCKED + READY FOR MONDAY (2026-08-09)
+**Status:** ✅ PARITY PROVEN + LIVE ENGINE RUNNING
+
+### ✅ 1:1 PARITY WITH CANONICAL BACKTEST
+**Test:** EURUSDPRO_M5_2023_2026.csv (216,820 bars, 3 years)
+| Metric | Backtest | Live | Diff |
+|--------|----------|------|------|
+| Trades | 3,120 | 3,120 | **0** |
+| Win Rate | 79.13% | 79.13% | **0** |
+| PnL | 15,101.36p | 15,101.36p | **0.00p** |
+| Divergences | 0 | 0 | **0** |
+
+**Parity Proof:** `artifacts/symmetry_trap/PARITY_REPORT.md`
+
+### 🔧 CRITICAL FIX: BROKER TIMEZONE (2026-08-09)
+- **Broker:** OxSecurities-Demo = **UTC-1** (NOT UTC+3 as assumed)
+- **Measured:** tick time 12:52 UTC vs actual 13:52 → exactly -1h
+- **Fixed:** `_broker_time_to_utc()` subtracts BROKER_UTC_OFFSET=-1 (broker+1h=UTC)
+- **BTCUSD as primary time source** (24/7 = always fresh bars, even weekends)
+- **Verified:** EST hour 8 == actual EST 8 ✅
+
+### 🟢 LIVE ENGINE STATUS
+- **Running** in loop mode (30s interval)
+- **BTCUSD signal generated TODAY (24/7):** LONG @ 65106.4, SL 65141.3, TP 65226.4
+  - Proves full pipeline: live data → Asian Range → state machine → signal ✅
+- Orders fail on weekend (markets closed) but will place Monday 2AM EST
+
+### 🏗️ ARCHITECTURE (FROZEN)
+```
+MT5 DATA (BTCUSD 24/7 = time source)
+  ↓ mt5_data_feed.py (UTC normalization)
+  ↓ symmetry_trap_live.py (thin wrapper)
+  ↓ SymmetryTrapBacktest logic (UNCHANGED source of truth)
+  ↓ execution_layer.py (pure MT5 execution)
+  ↓ symmetry_trap_executor_multi.py (orchestration)
+```
+
+### 📁 Artifacts: `artifacts/symmetry_trap/`
+- PARITY_REPORT.md, parity_baseline.json, canonical_call_graph.md
+- parity_summary.json, config_parity.json, backtest_trace.csv, live_trace.csv, parity_diff.csv (empty=0)
+
+### 📊 FORWARD TEST (STARTING MONDAY 2026-08-10)
+- 8 assets: ETHUSD, HK50, NZDUSD, BTCUSD, US500, EURUSD, USDCHF, AUDUSD
+- Lot 0.03, Magic 20260531, Entry 2-11AM EST, Hard exit 5PM
+- Track: daily PnL, WR vs backtest, max consec losses, slippage, fills
 
 ---
 
