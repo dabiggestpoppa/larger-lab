@@ -1,0 +1,4 @@
+{
+  "restart_while_open": "query MT5 first, match magic+basket_id, recover tickets, resume; do NOT open new basket",
+  "restart_during_partial": "detect orphan partial -> BROKEN_HEDGE -> flatten owned -> verify flat -> halt"
+}
