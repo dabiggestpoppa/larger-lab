@@ -1,0 +1,13 @@
+{
+  "rules": [
+    "PLACED != FILLED",
+    "OPEN only after verifying 3 strategy-owned positions (positions_get + deals)",
+    "of 3 fills verified -> OPEN; <3 -> BROKEN_HEDGE -> flatten -> ABORTED_FLAT",
+    "market/deal orders (BUY@ASK, SELL@BID) at closed M5 signal",
+    "fill mode read per symbol (FOK/IOC/RETURN)",
+    "spread from ask-bid, not tick.spread",
+    "separate order/deal/position tickets"
+  ],
+  "order_placement": "TRADE_ACTION_DEAL (executable market)",
+  "closing": "basket-level, all 3 legs must be flat"
+}

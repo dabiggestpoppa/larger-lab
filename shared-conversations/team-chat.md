@@ -1525,3 +1525,76 @@ strategy_freeze.json, bar_parity.csv, time_parity.csv, basis_parity.csv, rolling
 
 Ready for **TB-LIVE-EXEC-03** (guarded three-leg basket execution + recovery). The mathematical engine is frozen and the live adapter matches it exactly. No demo orders yet.
 ---
+
+---
+
+## 🟢 RL — TB-LIVE-EXEC-03: TRUTHFUL THREE-LEG BROKER EXECUTION HARDENED (2026-08-09)
+**Agent:** RL (Research Lead) | **Status:** ✅ PASS — All execution gates green, simulator-verified
+
+### What Was Hardened
+Translated the validated Triangular Basis signal into truthful, recoverable MT5 execution. NO strategy math changed. This is the transaction layer, not the signal layer.
+
+### Defects Repaired (per audit)
+1. **Contract mismatch** → unified into BrokerLegIntent / BasketExecutionIntent in engines/triangular_execution_contract.py
+2. **PLACED≠FILLED** → OPEN only after broker confirms 3 strategy-owned positions; TRADE_RETCODE_PLACED no longer equals a fill
+3. **Model weight≠lot size** → canonical inverse-ATR weights are NEVER sent as lots; they become notional → MT5 lots via model_weight_to_notional() + 
+otional_to_mt5_lots()
+4. **Unsafe CLOSE state** → CLOSED only after broker confirms all 3 legs flat; partial close = CLOSING_PARTIAL (not deleted)
+5. **Strategy/execution ack** → strategy emits INTENT; execution owns OPEN/BROKEN_HEDGE/CLOSED via callbacks
+
+### New File: engines/triangular_execution_contract.py
+- BrokerLegIntent: canonical_symbol, broker_symbol, side, model_weight, target_notional, requested_lots, rounded_lots, signal_reference_price, magic, basket_id, leg_id
+- BasketExecutionIntent: full 3-leg basket
+- model_weight_to_notional(): weight share × basket capital
+- 
+otional_to_mt5_lots(): notional / (contract_size × price × quote_to_account) → round to step, clamp min/max
+- compute_currency_exposure(): GBP/AUD/NZD neutrality residual
+- **NO per-leg SL/TP** — Triangular Basis exits by basket z-score
+
+### Rewritten: mt5/triangular_execution_layer.py
+- **Market/deal orders** (BUY@ASK, SELL@BID) at closed M5 signal — NOT resting LIMITs at stale closes
+- **order_check all three BEFORE any send** → ABORTED_PRECHECK if any fails
+- **Broker fill mode** read per symbol (FOK/IOC/RETURN), not hardcoded
+- **Spread from ask-bid** (not tick.spread), converted to pips
+- **Separate order/deal/position tickets** tracked in LegExecutionRecord
+- **Fill verification** via positions_get / deals (broker truth)
+- **Basket state machine**: PENDING→PRECHECK→SENDING→VERIFYING→OPEN; BROKEN_HEDGE→flatten→ABORTED_FLAT; unresolved→BROKEN_HEDGE_UNRESOLVED (halt)
+- **Emergency flatten + VERIFY FLAT** (0 owned positions + 0 pending)
+- **Close basket** → verify all 3 flat → CLOSED; else CLOSING_PARTIAL
+- **Reconcile on restart** → recover exact tickets by magic+basket_id, resume; no duplicate basket
+- **Detect orphan partial** → BROKEN_HEDGE → flatten → ABORTED_FLAT
+
+### Simulator Results (engines/tb_live_exec_sim.py, no broker)
+| Scenario | →state | Correct |
+|----------|--------|---------|
+| all_three_success | open | ✅ |
+| leg1_reject | aborted_flat | ✅ |
+| leg2_reject_partial | aborted_flat | ✅ |
+| leg3_reject_two_fills | aborted_flat | ✅ |
+| placed_not_filled | aborted_flat | ✅ (no OPEN) |
+| fill_timeout | aborted_flat | ✅ |
+| spread_explosion | aborted_precheck | ✅ |
+| lot_rounding_rejection | open (min-lot clamp) | ✅ |
+| close 3/3 | closed | ✅ |
+| foreign magic isolation | untouched | ✅ |
+
+### Execution Gates: ALL PASS
+- GATE D (foreign touched=0): **PASS**
+- GATE E (partial recovers flat): **PASS**
+- GATE I (no OPEN from PLACED): **PASS**
+- GATE J (model weight→lots deterministic): **PASS**
+- GATE L (CLOSED only after 3 flat): **PASS**
+- GATE M (order_check all pass before send): **PASS**
+
+### Terminology Change
+`	ext
+model_weight  →  capital scaler (basket_notional_usd)  →  target notional  →  MT5 lot conversion  →  broker rounding  →  actual hedge ratio
+`
+Canonical weights (0.65/0.58/1.77) are NEVER sent as lots. E.g. GBPAUD weight 0.65 → ~ notional → ~0.01 lots (min lot) → realized hedge.
+
+### Artifacts (10 files, artifacts/triangular_basis/live/execution/)
+execution_contract.json, lot_translation_tests.csv, neutrality_tests.csv, broker_fill_semantics.json, partial_fill_matrix.json, close_recovery_matrix.json, restart_execution_tests.json, foreign_strategy_isolation.json, account_mode.json, TB_LIVE_EXECUTION_REPORT.md
+
+### Demo NOTE
+This is simulator-verified only. NO demo orders placed (as required). Next: TB-LIVE-SHADOW-04 (real MT5 feed, real spreads, Symmetry Trap simultaneous, but Triangular order_send disabled).
+---

@@ -79,8 +79,7 @@ class LegConfig:
     canonical_symbol: str
     broker_symbol: str
     side: Direction
-    target_lots: float = 0.0
-    actual_lots: float = 0.0
+    model_weight: float = 0.0  # canonical inverse-ATR normalized weight (NOT lots)
     entry_price: float = 0.0
     ticket: int = 0
 
@@ -110,7 +109,7 @@ class BasketIntent:
                     "canonical_symbol": leg.canonical_symbol,
                     "broker_symbol": leg.broker_symbol,
                     "side": leg.side.name,
-                    "target_lots": leg.target_lots,
+                    "model_weight": leg.model_weight,
                     "entry_price": leg.entry_price,
                     "ticket": leg.ticket,
                 }
@@ -290,9 +289,12 @@ class TriangularBasisLiveEngine:
         minutes_to_exit = (self.config.HARD_EXIT_H_EST - est_hour) * 60
         enough_time = minutes_to_exit >= self.config.MIN_MINUTES_TO_EXIT
 
-        # Close any active basket if its exit condition is met
+        # Close any active OPEN basket if its exit condition is met.
+        # INTENT baskets (not yet confirmed by execution) are NOT closed here.
         if self._active_baskets:
             for bid, bstate in list(self._active_baskets.items()):
+                if bstate.status != "OPEN":
+                    continue
                 if self._check_close_condition(bstate, z_score, est_hour):
                     intent = BasketIntent(
                         decision=BasketDecision.CLOSE_BASKET,
@@ -324,6 +326,7 @@ class TriangularBasisLiveEngine:
                     entry_zscore=entry_intent.zscore,
                     entry_time=tri_bar.timestamp,
                     exit_deadline=tri_bar.timestamp + timedelta(minutes=self.config.MIN_MINUTES_TO_EXIT),
+                    status="INTENT",  # NOT OPEN until execution confirms 3-leg fill
                 )
                 self._active_baskets[basket_state.basket_id] = basket_state
                 self._last_processed_timestamp = snapshot.timestamp
@@ -374,11 +377,11 @@ class TriangularBasisLiveEngine:
         if z_score > self.config.BASIS_ENTRY_Z:
             legs = [
                 LegConfig(canonical_symbol="GBPAUD", broker_symbol="GBPAUD.PRO",
-                          side=Direction.SHORT, target_lots=size_gbp_aud, entry_price=tri_bar.gbp_aud),
+                          side=Direction.SHORT, model_weight=size_gbp_aud, entry_price=tri_bar.gbp_aud),
                 LegConfig(canonical_symbol="GBPNZD", broker_symbol="GBPNZD.PRO",
-                          side=Direction.LONG, target_lots=size_gbp_nzd, entry_price=tri_bar.gbp_nzd),
+                          side=Direction.LONG, model_weight=size_gbp_nzd, entry_price=tri_bar.gbp_nzd),
                 LegConfig(canonical_symbol="AUDNZD", broker_symbol="AUDNZD.PRO",
-                          side=Direction.SHORT, target_lots=size_aud_nzd, entry_price=tri_bar.aud_nzd),
+                          side=Direction.SHORT, model_weight=size_aud_nzd, entry_price=tri_bar.aud_nzd),
             ]
             return BasketIntent(
                 decision=BasketDecision.OPEN_BASKET,
@@ -394,11 +397,11 @@ class TriangularBasisLiveEngine:
         elif z_score < -self.config.BASIS_ENTRY_Z:
             legs = [
                 LegConfig(canonical_symbol="GBPAUD", broker_symbol="GBPAUD.PRO",
-                          side=Direction.LONG, target_lots=size_gbp_aud, entry_price=tri_bar.gbp_aud),
+                          side=Direction.LONG, model_weight=size_gbp_aud, entry_price=tri_bar.gbp_aud),
                 LegConfig(canonical_symbol="GBPNZD", broker_symbol="GBPNZD.PRO",
-                          side=Direction.SHORT, target_lots=size_gbp_nzd, entry_price=tri_bar.gbp_nzd),
+                          side=Direction.SHORT, model_weight=size_gbp_nzd, entry_price=tri_bar.gbp_nzd),
                 LegConfig(canonical_symbol="AUDNZD", broker_symbol="AUDNZD.PRO",
-                          side=Direction.LONG, target_lots=size_aud_nzd, entry_price=tri_bar.aud_nzd),
+                          side=Direction.LONG, model_weight=size_aud_nzd, entry_price=tri_bar.aud_nzd),
             ]
             return BasketIntent(
                 decision=BasketDecision.OPEN_BASKET,
@@ -457,6 +460,37 @@ class TriangularBasisLiveEngine:
 
     def get_active_baskets(self) -> Dict[str, BasketState]:
         return self._active_baskets.copy()
+
+    # ── Strategy <-> Execution Acknowledgement ──────────────────────────
+    # Strategy emits OPEN_BASKET_INTENT with status INTENT. Execution owns the
+    # OPEN/BROKEN_HEDGE/CLOSED lifecycle. These callbacks let execution confirm
+    # or reject. On failure the pending INTENT basket is cleanly reverted while
+    # the mathematical rolling buffer continues normally.
+
+    def on_basket_open_confirmed(self, basket_id: str, execution_result: dict = None):
+        """Execution confirmed the full three-leg basket is filled -> OPEN."""
+        bs = self._active_baskets.get(basket_id)
+        if bs:
+            bs.status = "OPEN"
+
+    def on_basket_open_failed(self, basket_id: str, execution_result: dict = None):
+        """Execution failed to complete the three-leg basket -> revert INTENT."""
+        if basket_id in self._active_baskets:
+            del self._active_baskets[basket_id]
+
+    def on_basket_close_confirmed(self, basket_id: str, execution_result: dict = None):
+        """Execution confirmed all three legs flat -> CLOSED."""
+        if basket_id in self._active_baskets:
+            bs = self._active_baskets[basket_id]
+            bs.status = "CLOSED"
+            del self._active_baskets[basket_id]
+
+    def on_basket_open_partial(self, basket_id: str, execution_result: dict = None):
+        """Partial fill detected -> execution is flattening; mark broken, revert."""
+        if basket_id in self._active_baskets:
+            bs = self._active_baskets[basket_id]
+            bs.status = "BROKEN_HEDGE"
+            del self._active_baskets[basket_id]
 
     def get_config_hash(self) -> str:
         return self._config_hash

@@ -1,0 +1,5 @@
+{
+  "detection": "AccountGuard.get_broker_mode() at startup",
+  "hedging": "continue with magic/ticket isolation",
+  "netting_with_overlap": "FAIL CLOSED unless centralized allocation"
+}
