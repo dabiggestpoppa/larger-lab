@@ -1,0 +1,106 @@
+{
+  "task": "CR-P2-MARKET-CALENDAR-AUDIT-06",
+  "window": {
+    "start": "2023-07-03 00:00:00+00:00",
+    "end": "2026-05-21 18:00:00+00:00"
+  },
+  "classification_categories": {
+    "weekend_closure": "Sat + Sun excluded (all symbols)",
+    "friday_close": "Group2: Fri >19h excluded",
+    "scheduled_closure": "Excluded from expected - not counted as missing",
+    "unknown": "Residual genuine missing market-open hour"
+  },
+  "per_symbol": {
+    "EURUSD": {
+      "total_missing_hours": 128,
+      "num_gaps": 7,
+      "gaps_gt_2h": 7,
+      "gaps_gt_6h": 6,
+      "gaps_gt_24h": 0,
+      "max_gap_hours": 24,
+      "scheduled_closed_excluded": "weekend + Friday close (per session group)"
+    },
+    "GBPUSD": {
+      "total_missing_hours": 119,
+      "num_gaps": 7,
+      "gaps_gt_2h": 6,
+      "gaps_gt_6h": 5,
+      "gaps_gt_24h": 0,
+      "max_gap_hours": 24,
+      "scheduled_closed_excluded": "weekend + Friday close (per session group)"
+    },
+    "USDJPY": {
+      "total_missing_hours": 120,
+      "num_gaps": 7,
+      "gaps_gt_2h": 6,
+      "gaps_gt_6h": 5,
+      "gaps_gt_24h": 0,
+      "max_gap_hours": 24,
+      "scheduled_closed_excluded": "weekend + Friday close (per session group)"
+    },
+    "USDCHF": {
+      "total_missing_hours": 120,
+      "num_gaps": 7,
+      "gaps_gt_2h": 6,
+      "gaps_gt_6h": 5,
+      "gaps_gt_24h": 0,
+      "max_gap_hours": 24,
+      "scheduled_closed_excluded": "weekend + Friday close (per session group)"
+    },
+    "EURGBP": {
+      "total_missing_hours": 170,
+      "num_gaps": 61,
+      "gaps_gt_2h": 6,
+      "gaps_gt_6h": 5,
+      "gaps_gt_24h": 0,
+      "max_gap_hours": 24,
+      "scheduled_closed_excluded": "weekend + Friday close (per session group)"
+    },
+    "EURJPY": {
+      "total_missing_hours": 177,
+      "num_gaps": 62,
+      "gaps_gt_2h": 7,
+      "gaps_gt_6h": 6,
+      "gaps_gt_24h": 0,
+      "max_gap_hours": 24,
+      "scheduled_closed_excluded": "weekend + Friday close (per session group)"
+    },
+    "GBPJPY": {
+      "total_missing_hours": 129,
+      "num_gaps": 8,
+      "gaps_gt_2h": 7,
+      "gaps_gt_6h": 6,
+      "gaps_gt_24h": 0,
+      "max_gap_hours": 24,
+      "scheduled_closed_excluded": "weekend + Friday close (per session group)"
+    },
+    "CHFJPY": {
+      "total_missing_hours": 135,
+      "num_gaps": 9,
+      "gaps_gt_2h": 7,
+      "gaps_gt_6h": 6,
+      "gaps_gt_24h": 0,
+      "max_gap_hours": 24,
+      "scheduled_closed_excluded": "weekend + Friday close (per session group)"
+    },
+    "EURCHF": {
+      "total_missing_hours": 177,
+      "num_gaps": 62,
+      "gaps_gt_2h": 7,
+      "gaps_gt_6h": 6,
+      "gaps_gt_24h": 0,
+      "max_gap_hours": 24,
+      "scheduled_closed_excluded": "weekend + Friday close (per session group)"
+    },
+    "GBPCHF": {
+      "total_missing_hours": 121,
+      "num_gaps": 7,
+      "gaps_gt_2h": 6,
+      "gaps_gt_6h": 5,
+      "gaps_gt_24h": 0,
+      "max_gap_hours": 24,
+      "scheduled_closed_excluded": "weekend + Friday close (per session group)"
+    }
+  },
+  "note": "All scheduled closures (weekend + Friday close) are excluded from expected, never counted as missing."
+}

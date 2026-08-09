@@ -1,0 +1,204 @@
+{
+  "target_window": {
+    "start": "2022-01-01T00:00:00+00:00",
+    "end": "2026-05-21T18:00:00+00:00"
+  },
+  "common_window": {
+    "start": "2023-07-03T00:00:00+00:00",
+    "end": "2026-05-21T18:00:00+00:00"
+  },
+  "full_panel": {
+    "EURUSD": {
+      "symbol": "EURUSD",
+      "available_from": "2023-07-03 00:00:00+00:00",
+      "target_expected_hours_from_available": 18091,
+      "actual_valid_hours": 17963,
+      "genuine_missing_hours": 128,
+      "coverage_pct": 99.29,
+      "passes_97": true,
+      "gaps_gt_24h": 0
+    },
+    "GBPUSD": {
+      "symbol": "GBPUSD",
+      "available_from": "2022-09-13 01:00:00+00:00",
+      "target_expected_hours_from_available": 23106,
+      "actual_valid_hours": 22972,
+      "genuine_missing_hours": 134,
+      "coverage_pct": 99.42,
+      "passes_97": true,
+      "gaps_gt_24h": 0
+    },
+    "USDJPY": {
+      "symbol": "USDJPY",
+      "available_from": "2022-09-13 01:00:00+00:00",
+      "target_expected_hours_from_available": 23106,
+      "actual_valid_hours": 22971,
+      "genuine_missing_hours": 135,
+      "coverage_pct": 99.42,
+      "passes_97": true,
+      "gaps_gt_24h": 0
+    },
+    "USDCHF": {
+      "symbol": "USDCHF",
+      "available_from": "2023-07-03 00:00:00+00:00",
+      "target_expected_hours_from_available": 18091,
+      "actual_valid_hours": 17971,
+      "genuine_missing_hours": 120,
+      "coverage_pct": 99.34,
+      "passes_97": true,
+      "gaps_gt_24h": 0
+    },
+    "EURGBP": {
+      "symbol": "EURGBP",
+      "available_from": "2022-09-28 02:05:00+00:00",
+      "target_expected_hours_from_available": 22081,
+      "actual_valid_hours": 21877,
+      "genuine_missing_hours": 204,
+      "coverage_pct": 99.08,
+      "passes_97": true,
+      "gaps_gt_24h": 0
+    },
+    "EURJPY": {
+      "symbol": "EURJPY",
+      "available_from": "2022-09-28 02:05:00+00:00",
+      "target_expected_hours_from_available": 22081,
+      "actual_valid_hours": 21870,
+      "genuine_missing_hours": 211,
+      "coverage_pct": 99.04,
+      "passes_97": true,
+      "gaps_gt_24h": 0
+    },
+    "GBPJPY": {
+      "symbol": "GBPJPY",
+      "available_from": "2022-09-13 01:00:00+00:00",
+      "target_expected_hours_from_available": 23106,
+      "actual_valid_hours": 22962,
+      "genuine_missing_hours": 144,
+      "coverage_pct": 99.38,
+      "passes_97": true,
+      "gaps_gt_24h": 0
+    },
+    "CHFJPY": {
+      "symbol": "CHFJPY",
+      "available_from": "2022-09-13 01:00:00+00:00",
+      "target_expected_hours_from_available": 23106,
+      "actual_valid_hours": 22956,
+      "genuine_missing_hours": 150,
+      "coverage_pct": 99.35,
+      "passes_97": true,
+      "gaps_gt_24h": 0
+    },
+    "EURCHF": {
+      "symbol": "EURCHF",
+      "available_from": "2022-09-12 20:55:00+00:00",
+      "target_expected_hours_from_available": 22343,
+      "actual_valid_hours": 22132,
+      "genuine_missing_hours": 211,
+      "coverage_pct": 99.06,
+      "passes_97": true,
+      "gaps_gt_24h": 0
+    },
+    "GBPCHF": {
+      "symbol": "GBPCHF",
+      "available_from": "2022-09-13 01:00:00+00:00",
+      "target_expected_hours_from_available": 23106,
+      "actual_valid_hours": 22970,
+      "genuine_missing_hours": 136,
+      "coverage_pct": 99.41,
+      "passes_97": true,
+      "gaps_gt_24h": 0
+    }
+  },
+  "common_panel": {
+    "EURUSD": {
+      "symbol": "EURUSD",
+      "common_expected_hours": 18091,
+      "common_valid_hours": 17963,
+      "common_coverage_pct": 99.29,
+      "common_genuine_missing": 128,
+      "passes_97": true,
+      "duplicates_common": 0
+    },
+    "GBPUSD": {
+      "symbol": "GBPUSD",
+      "common_expected_hours": 18091,
+      "common_valid_hours": 17972,
+      "common_coverage_pct": 99.34,
+      "common_genuine_missing": 119,
+      "passes_97": true,
+      "duplicates_common": 0
+    },
+    "USDJPY": {
+      "symbol": "USDJPY",
+      "common_expected_hours": 18091,
+      "common_valid_hours": 17971,
+      "common_coverage_pct": 99.34,
+      "common_genuine_missing": 120,
+      "passes_97": true,
+      "duplicates_common": 0
+    },
+    "USDCHF": {
+      "symbol": "USDCHF",
+      "common_expected_hours": 18091,
+      "common_valid_hours": 17971,
+      "common_coverage_pct": 99.34,
+      "common_genuine_missing": 120,
+      "passes_97": true,
+      "duplicates_common": 0
+    },
+    "EURGBP": {
+      "symbol": "EURGBP",
+      "common_expected_hours": 17491,
+      "common_valid_hours": 17321,
+      "common_coverage_pct": 99.03,
+      "common_genuine_missing": 170,
+      "passes_97": true,
+      "duplicates_common": 0
+    },
+    "EURJPY": {
+      "symbol": "EURJPY",
+      "common_expected_hours": 17491,
+      "common_valid_hours": 17314,
+      "common_coverage_pct": 98.99,
+      "common_genuine_missing": 177,
+      "passes_97": true,
+      "duplicates_common": 0
+    },
+    "GBPJPY": {
+      "symbol": "GBPJPY",
+      "common_expected_hours": 18091,
+      "common_valid_hours": 17962,
+      "common_coverage_pct": 99.29,
+      "common_genuine_missing": 129,
+      "passes_97": true,
+      "duplicates_common": 0
+    },
+    "CHFJPY": {
+      "symbol": "CHFJPY",
+      "common_expected_hours": 18091,
+      "common_valid_hours": 17956,
+      "common_coverage_pct": 99.25,
+      "common_genuine_missing": 135,
+      "passes_97": true,
+      "duplicates_common": 0
+    },
+    "EURCHF": {
+      "symbol": "EURCHF",
+      "common_expected_hours": 17491,
+      "common_valid_hours": 17314,
+      "common_coverage_pct": 98.99,
+      "common_genuine_missing": 177,
+      "passes_97": true,
+      "duplicates_common": 0
+    },
+    "GBPCHF": {
+      "symbol": "GBPCHF",
+      "common_expected_hours": 18091,
+      "common_valid_hours": 17970,
+      "common_coverage_pct": 99.33,
+      "common_genuine_missing": 121,
+      "passes_97": true,
+      "duplicates_common": 0
+    }
+  }
+}

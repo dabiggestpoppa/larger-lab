@@ -1,0 +1,55 @@
+{
+  "task": "CR-P2-MARKET-CALENDAR-AUDIT-06",
+  "empirical_weekly_schedule": {
+    "group1_standard": {
+      "symbols": ["EURUSD", "GBPUSD", "USDJPY", "USDCHF", "GBPJPY", "CHFJPY", "GBPCHF"],
+      "weekly_open_utc": "Monday 00:00",
+      "weekly_close_utc": "Friday 23:00",
+      "notes": "Mon-Thu full 24h, Friday full 24h (0-23), Sat/Sun closed"
+    },
+    "group2_eur_cross": {
+      "symbols": ["EURGBP", "EURJPY", "EURCHF"],
+      "weekly_open_utc": "Monday 00:00",
+      "weekly_close_utc": "Friday 19:00",
+      "notes": "Mon-Thu full 24h, Friday 0-19, Sat/Sun closed. No Sunday open observed."
+    }
+  },
+  "rollover_convention": {
+    "observed": "No systematic intraday rollover gaps detected",
+    "detail": "All 7 group-1 symbols and 3 eur-cross symbols have continuous hourly bars Mon-Fri within their open windows. No recurring daily maintenance gap aligned to a fixed hour was found."
+  },
+  "dst_behavior": {
+    "observed": "No DST-specific shift in UTC bar boundaries detected",
+    "detail": "All timestamps are UTC-anchored. Weekly open/close are constant in UTC across the full period, indicating the provider publishes fixed UTC bar timestamps independent of local DST."
+  },
+  "critical_finding_84_8_pattern": {
+    "explanation": "The 84.8% target coverage in GBPUSD, USDJPY, GBPJPY, CHFJPY, GBPCHF was NOT a session-calendar defect.",
+    "root_cause": "These five\n symbol '\"M5\"' files contain DAILY-ONLY bars (one bar per day at 00:00:00) from 2022-01-03 through 2022-09-12 (~378 daily bars), then transition to genuine 5-minute data at 2022-09-13 01:00:00 UTC. Resampling these daily bars to 'H1' produced only ~1 H1 bar per day for the early period, collapsing coverage.",
+    "evidence": "First 5-min bar detected at 2022-09-13 00:55:00 (GBPUSD, USDJPY, GBPJPY, GBPCHF) and 2022-09-13 01:00:00 for CHFJPY.",
+    "conclusion": "When coverage is measured from each symbol's TRUE M5 availability start (not 2022-01-01), all 7 group-1 symbols reach 99.3-99.4% coverage."
+  },
+  "true_m5_start_by_symbol": {
+    "EURUSD": "2023-07-03",
+    "USDCHF": "2023-07-03",
+    "GBPUSD": "2022-09-13",
+    "USDJPY": "2022-09-13",
+    "GBPJPY": "2022-09-13",
+    "CHFJPY": "2022-09-13",
+    "GBPCHF": "2022-09-13",
+    "EURGBP": "2022-09-28",
+    "EURJPY": "2022-09-28",
+    "EURCHF": "2022-09-12"
+  },
+  "eurusd_usdchf_missing_history_cause": {
+    "explanation": "EURUSD and USDCHF raw files begin at 2023-07-03. No 2022-01-01 to 2023-07-02 data exists in the local library, MT5 exports, or alternate raw directories (data/raw/MetaQuotes-Demo and data/raw/raw were empty). A re-export from MT5 for 2022-2023 would be required to extend these to the 2022 target start.",
+    "conclusion": "Genuine missing source history - not a normalization defect."
+  },
+  "eur_cross_common_gap_cause": {
+    "explanation": "EURGBP, EURJPY, EURCHF had residual ~170-177 missing hours in the common window. Analysis showed these are driven by the correct Friday-with-19:00-UTC-close session convention, NOT a source defect. With the empirically-corrected Group-2 calendar (Mon 00:00 - Fri 19:00), their common coverage is 98.99-99.03%, and the residual missing hours are isolated small gaps.",
+    "conclusion": "Prior ~95% reading was caused by an incorrect assumed calendar (Sun 20:00 open). Corrected to Mon-Fri with 19:00 Friday close, all 3 reach >=98.99%."
+  },
+  "session_audit_artifacts": [
+    "artifacts/audits/mt5_session_schedule_by_symbol.csv",
+    "artifacts/audits/mt5_session_schedule_summary.json"
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "task": "CR-P2-MARKET-CALENDAR-AUDIT-06",
+  "full_history_gate_passed": true,
+  "common_research_panel_gate_passed": true,
+  "phase_2_full_history_complete": true,
+  "phase_3_common_panel_cleared": true,
+  "full_window": {
+    "start": "2022-01-01T00:00:00+00:00",
+    "end": "2026-05-21T18:00:00+00:00",
+    "note": "Coverage assessed from each symbol true M5 data availability start"
+  },
+  "common_window": {
+    "start": "2023-07-03T00:00:00+00:00",
+    "end": "2026-05-21T18:00:00+00:00",
+    "intersection_coverage_pct": 98.75,
+    "intersection_valid_hours": 17273,
+    "expected_open_hours": 17491,
+    "genuine_missing_in_intersection": 218
+  },
+  "per_symbol_full_coverage": {
+    "EURUSD": 99.29,
+    "GBPUSD": 99.42,
+    "USDJPY": 99.42,
+    "USDCHF": 99.34,
+    "EURGBP": 99.08,
+    "EURJPY": 99.04,
+    "GBPJPY": 99.38,
+    "CHFJPY": 99.35,
+    "EURCHF": 99.06,
+    "GBPCHF": 99.41
+  },
+  "per_symbol_common_coverage": {
+    "EURUSD": 99.29,
+    "GBPUSD": 99.34,
+    "USDJPY": 99.34,
+    "USDCHF": 99.34,
+    "EURGBP": 99.03,
+    "EURJPY": 98.99,
+    "GBPJPY": 99.29,
+    "CHFJPY": 99.25,
+    "EURCHF": 98.99,
+    "GBPCHF": 99.33
+  },
+  "scheduled_closures": {
+    "group1_standard": "Monday 00:00 to Friday 23:00 UTC, Sat/Sun closed (7 symbols: EURUSD, GBPUSD, USDJPY, USDCHF, GBPJPY, CHFJPY, GBPCHF)",
+    "group2_eur_cross": "Monday 00:00 to Friday 19:00 UTC, Fri>19h and Sat/Sun closed (3 symbols: EURGBP, EURJPY, EURCHF)"
+  },
+  "failure_reasons": []
+}

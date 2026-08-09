@@ -1,0 +1,46 @@
+{
+  "calendar_id": "mt5_pro_v1",
+  "provider": "mt5_pro",
+  "version": "1.0",
+  "effective_date_range": {
+    "start": "2022-01-01",
+    "end": "present"
+  },
+  "evidence_source": "Raw MT5 M5 exports - 7 symbols have D1-only data before Sep 2022",
+  "session_groups": {
+    "group1_standard": {
+      "weekly_open_utc": "Mon 00:00",
+      "weekly_close_utc": "Fri 23:00",
+      "symbols": [
+        "CHFJPY",
+        "EURUSD",
+        "GBPCHF",
+        "GBPJPY",
+        "GBPUSD",
+        "USDCHF",
+        "USDJPY"
+      ]
+    },
+    "group2_eur_cross": {
+      "weekly_open_utc": "Sun 20:00",
+      "weekly_close_utc": "Thu 19:00",
+      "symbols": [
+        "EURCHF",
+        "EURGBP",
+        "EURJPY"
+      ]
+    }
+  },
+  "true_m5_start": {
+    "EURUSD": "2023-07-03 00:00:00+00:00",
+    "GBPUSD": "2022-09-13 01:00:00+00:00",
+    "USDJPY": "2022-09-13 01:00:00+00:00",
+    "USDCHF": "2023-07-03 00:00:00+00:00",
+    "GBPJPY": "2022-09-13 01:00:00+00:00",
+    "CHFJPY": "2022-09-13 01:00:00+00:00",
+    "GBPCHF": "2022-09-13 01:00:00+00:00",
+    "EURGBP": "2022-09-28 02:05:00+00:00",
+    "EURJPY": "2022-09-28 02:05:00+00:00",
+    "EURCHF": "2022-09-12 20:55:00+00:00"
+  }
+}

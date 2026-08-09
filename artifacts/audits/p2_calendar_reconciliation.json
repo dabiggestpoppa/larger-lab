@@ -1,0 +1,31 @@
+{
+  "calendar_id": "mt5_pro_v1",
+  "task": "CR-P2-MARKET-CALENDAR-AUDIT-06",
+  "reconciliation": {
+    "prior_model": {
+      "description": "Weekday<5 with manually enumerated full-day holiday list",
+      "errors": [
+        "Assumed Mon-Fri all hours valid for every symbol",
+        "Incorrectly treated EUR crosses (EURGBP/EURJPY/EURCHF) as Sun-20:00 open / Thu-19:00 close (they are actually Mon 00:00 - Fri 19:00)",
+        "Missed that some M5 files contain D1-only early data"
+      ]
+    },
+    "evidence_based_model": {
+      "group1_standard": ["EURUSD", "GBPUSD", "USDJPY", "USDCHF", "GBPJPY", "CHFJPY", "GBPCHF"],
+      "group1_hours": "Mon 00:00 to Fri 23:00 UTC",
+      "group2_eur_cross": ["EURGBP", "EURJPY", "EURCHF"],
+      "group2_hours": "Mon 00:00 to Fri 19:00 UTC"
+    },
+    "coverage_impact": {
+      "group1_before": "~84.8% (false - due to D1-only early data)",
+      "group1_after_true_start": "99.29%-99.42%",
+      "eur_cross_before": "~95% (false - due to wrong calendar assumption)",
+      "eur_cross_after": "98.99%-99.08%"
+    }
+  },
+  "us_holiday_policy": {
+    "description": "US-only holidays (Memorial Day, Labor Day, July 4, Thanksgiving) are NOT automatically treated as full FX closures.",
+    "evidence": "Observed continuous trading on US holidays across all 10 pairs; no provider-wide full-day closure on those dates unless corroborated by data.",
+    "action": "Only hours the provider is demonstrably closed are excluded; holidays are reported separately when an actual closure is observed."
+  }
+}
