@@ -252,6 +252,7 @@ class SymmetryTrapEngine:
         self.kill_switch_level: float = 0.0
         self.active_au: float = 0.0    # AU in price units
         self._just_entered: bool = False  # Skip SL/TP check on entry bar
+        self._prev_bar: Optional[Bar] = None  # Previous bar (for OCC extreme SL calc)
 
         # ── Trade State ────────────────────────────────────────────────
         self.entry_price: Optional[float] = None
@@ -350,6 +351,7 @@ class SymmetryTrapEngine:
         self.entry_price = None
         self.sl_price = None
         self.tp_price = None
+        self._prev_bar = None
 
         # ── Option B: Reset loop tracking for new session ─────────────
         self.loop_count = 1
@@ -377,6 +379,12 @@ class SymmetryTrapEngine:
         """
         if not self.session_active:
             return None
+
+        # Capture previous bar (bar N-1) for OCC extreme SL calculation.
+        # self._prev_bar holds the candle from the PRIOR call; save it as
+        # prev_bar, then update self._prev_bar to the current bar for next call.
+        prev_bar = self._prev_bar
+        self._prev_bar = bar
 
         # Set swing origin from first bar if not set
         if self.swing_origin is None:
@@ -479,14 +487,26 @@ class SymmetryTrapEngine:
 
             if occ_confirmed:
                 self.entry_price = bar.close
-                # SL = Zero-Buffer Impulse Extreme (exact high/low of impulse bar)
-                # Per Nautilus strategy line 503: self.sl_price = self.impulse_extreme
-                # Per ontology cerebus_qa_recap.md: "SL = impulse_extreme (Zero Buffer)"
-                # The impulse_extreme is set in SEARCH state:
-                #   LONG  -> bar.high of impulse bar
-                #   SHORT -> bar.low of impulse bar
-                # No spread buffer, no OCC extreme — exact impulse extreme only.
-                self.sl_price = self.impulse_extreme
+                # SL = Extreme of the OCC candle + the candle BEFORE it
+                # (i.e. the last two candles), placed on the LOSING side.
+                #   LONG  -> SL = min(low of OCC, low of prev bar)  (below entry)
+                #   SHORT -> SL = max(high of OCC, high of prev bar) (above entry)
+                # This is NOT impulse_extreme (which is on the winning side), and
+                # NOT below/above entry arbitrarily — it is the OCC extreme.
+                # A spread/SNR buffer is added so tight OCC extremes aren't
+                # stopped out by normal spread noise.
+                occ_extreme = bar.high if self.impulse_direction == TradeDirection.SHORT else bar.low
+                if prev_bar is not None:
+                    if self.impulse_direction == TradeDirection.SHORT:
+                        occ_extreme = max(occ_extreme, prev_bar.high)
+                    else:
+                        occ_extreme = min(occ_extreme, prev_bar.low)
+                sl_buffer_pips = self.min_sl_buffer + self.spread_buffer
+                sl_buffer = sl_buffer_pips * self.pip_size
+                if self.impulse_direction == TradeDirection.LONG:
+                    self.sl_price = occ_extreme - sl_buffer
+                else:
+                    self.sl_price = occ_extreme + sl_buffer
                 
                 # TP calculation based on mode
                 if TP_MODE == "TIER":
