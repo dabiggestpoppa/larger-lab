@@ -1298,3 +1298,83 @@ The **largest build yet** — a complete Neuro-Symbolic Scanner (4 Steps):
 
 
 
+
+---
+
+## 🟢 RL — TB-LIVE-ARCH-01: STRATEGY ISOLATION FOUNDATION COMPLETE (2026-08-09)
+**Agent:** RL (Research Lead) | **Status:** ✅ COMPLETE — All 7 files created, ready for PARITY stage
+
+### What Was Built
+Complete strategy isolation foundation for Triangular Basis live engine. This is the FIRST of 5 planned commits (TB-LIVE-ARCH-01 through TB-LIVE-DEMO-05).
+
+### Files Created (7 total)
+
+| File | Size | Purpose |
+|------|------|---------|
+| configs/strategy_registry.py | 2KB | Central magic number registry + uniqueness verification |
+| rtifacts/triangular_basis/live/strategy_freeze.json | 1KB | Canonical strategy freeze signature (commit SHA, config, costs) |
+| mt5/account_guard.py | 9.5KB | Shared account-level coordinator (identity, mode detection, halt signal) |
+| engines/mt5_triangular_data_feed.py | 12KB | Synchronized 3-leg MT5 data feed (exact-once M5 bar sync) |
+| engines/triangular_basis_live.py | 17.5KB | Thin live wrapper around canonical engine (NO formula rewrites) |
+| mt5/triangular_execution_layer.py | 21.8KB | 3-leg basket execution state machine (near-atomic fills, BROKEN_HEDGE recovery) |
+| mt5/triangular_basis_executor.py | 15.4KB | Thin orchestration loop (health checks, signal dispatch, heartbeat) |
+
+### Architecture (4 Clean Layers)
+`
+SHARED MT5 DATA / CONNECTION INFRASTRUCTURE
+    ├── mt5/account_guard.py          → identity, mode, halt, health
+    └── engines/mt5_triangular_data_feed.py → synchronized 3-leg M5 bars
+
+TRIANGULAR BASIS STRATEGY WRAPPER
+    └── engines/triangular_basis_live.py → thin wrapper, calls canonical engine
+
+TRIANGULAR BASKET EXECUTION LAYER
+    └── mt5/triangular_execution_layer.py → 3-leg near-atomic execution
+
+THIN ORCHESTRATOR
+    └── mt5/triangular_basis_executor.py → loop, health, dispatch
+`
+
+### Strategy Isolation Details
+- **Magic Number:** 31082026 (unique, registered in strategy_registry.py)
+- **Symmetry Trap Magic:** 20260531 (unchanged, no collision)
+- **Ownership:** Every order tagged with TB|{basket_id}|{symbol}|L{N} comment
+- **State Stores:** Separate per-strategy (state/triangular_basis/, state/symmetry_trap/)
+- **Logs:** Separate per-strategy (logs/triangular_basis/, 	rades/triangular_basis/)
+- **No Cross-Strategy Position Netting:** AccountGuard detects HEDGING vs NETTING at startup
+- **Startup Verification:** Magic uniqueness asserted on import, FAILS if collision
+
+### Key Design Decisions
+1. **Canonical engine UNTOUCHED** — triangular_basis_engine.py from commit 2435d04e is read-only; live wrapper calls it directly
+2. **Balanced config only** — z=2.5, stop=6.0, lookback=200 (NOT high-PF z=3/stop=7)
+3. **Max 1 concurrent basket** for first demo phase (simplifies verification)
+4. **Near-atomic execution** — pre-check all 3 legs, send all 3 orders, flatten on partial fill (BROKEN_HEDGE)
+5. **Exactly-once processing** — tracks last_processed_m5_timestamp, rejects duplicates
+6. **Timezone normalization** — broker time → UTC → canonical EST (no broker-time assumptions)
+7. **Demo/LIVE environment switch** — same engine, different account config only
+
+### Next Stage: TB-LIVE-PARITY-02
+After review/approval, next commit will prove exact historical replay parity between:
+- Canonical triangular_basis_engine.py (backtest)
+- triangular_basis_live.py (live wrapper)
+
+Parity requires 100% decision match on every timestamp: basis, z-score, entry, exit, stop, holding timer.
+
+### Run Modes Supported
+- --mode replay — historical MT5 bars, no orders, prove parity
+- --mode shadow — real-time signals, no orders, log would-enter/would-exit
+- --mode trade — actual demo orders
+
+### Usage
+`ash
+# Shadow test (no orders)
+python mt5/triangular_basis_executor.py --loop --interval 30 --mode shadow
+
+# Trade mode (demo orders)
+python mt5/triangular_basis_executor.py --loop --interval 30 --mode trade --env demo
+
+# Single scan for testing
+python mt5/triangular_basis_executor.py --once
+`
+
+---
