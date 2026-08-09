@@ -164,7 +164,7 @@ class MT5ExecutionLayer:
                     f"@ {entry_r:.5f} SL={sl_r:.5f} TP={tp_r:.5f}"
                 )
                 return result
-            elif result and result.retcode == mt5.TRADE_RETCODE_BUSY:
+            elif result and result.retcode == 10027:  # TRADE_RETCODE_BUSY (not exposed in all MT5 versions)
                 logger.warning(f"RETRY {attempt+1}/{max_retries}: {symbol} trade context busy")
                 time.sleep(0.5 * (attempt + 1))
                 continue

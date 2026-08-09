@@ -4,6 +4,11 @@ MT5 Data Feed Module
 Provides MT5 bar fetching and time utilities compatible with the backtest engine.
 This is the ONLY place where MT5-specific data fetching logic lives.
 All strategy logic remains in symmetry_trap_backtest.py and symmetry_trap.py.
+
+CRITICAL: MT5 broker timestamps are in broker local time (EET = UTC+2/+3).
+The canonical backtest CSV data is in UTC.
+This module normalizes broker time → UTC before creating Bar objects,
+so est_offset=-5 converts UTC → EST correctly (matching backtest).
 """
 
 from __future__ import annotations
@@ -11,7 +16,7 @@ from __future__ import annotations
 import logging
 import sys
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 
 # Add engines directory to path
@@ -24,17 +29,34 @@ from configs.asset_configs import ASSET_CONFIGS
 
 logger = logging.getLogger("cerebus.mt5_data_feed")
 
+# Broker timezone offset from UTC.
+# OxSecurities-Demo uses UTC-1 (measured dynamically: tick time is 1h behind UTC)
+# This means broker_time + 1h = UTC
+BROKER_UTC_OFFSET = -1
+
+
+def _broker_time_to_utc(broker_dt: datetime) -> datetime:
+    """Convert broker local time to UTC.
+    
+    Broker (OxSecurities) uses UTC-1.
+    UTC = broker_time - BROKER_UTC_OFFSET = broker_time + 1h
+    """
+    return broker_dt - timedelta(hours=BROKER_UTC_OFFSET)
+
 
 def fetch_m5_bars(symbol: str, count: int = 1000) -> Optional[List[Bar]]:
     """
     Fetch M5 bars from MT5 and convert to Bar objects compatible with backtest engine.
+    
+    CRITICAL: Converts broker local time → UTC before creating Bar objects.
+    This ensures est_offset=-5 converts UTC → EST correctly (matching backtest CSV).
     
     Args:
         symbol: MT5 symbol (e.g., "EURUSD.PRO", "BTCUSD")
         count: Number of bars to fetch
         
     Returns:
-        List of Bar objects sorted by timestamp, or None on failure
+        List of Bar objects (timestamps in UTC) sorted by timestamp, or None on failure
     """
     rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_M5, 0, count)
     if rates is None or len(rates) == 0:
@@ -43,9 +65,12 @@ def fetch_m5_bars(symbol: str, count: int = 1000) -> Optional[List[Bar]]:
     
     bars = []
     for rate in rates:
-        dt = datetime.fromtimestamp(rate["time"])
+        # MT5 returns timestamps in broker local time (EET = UTC+3 in summer)
+        # Convert to UTC to match canonical backtest CSV data
+        broker_dt = datetime.fromtimestamp(rate["time"])
+        utc_dt = _broker_time_to_utc(broker_dt)
         bars.append(Bar(
-            timestamp=dt,
+            timestamp=utc_dt,
             open=rate["open"],
             high=rate["high"],
             low=rate["low"],
@@ -53,31 +78,34 @@ def fetch_m5_bars(symbol: str, count: int = 1000) -> Optional[List[Bar]]:
         ))
     
     bars.sort(key=lambda b: b.timestamp)
-    logger.debug(f"Fetched {len(bars)} bars for {symbol}")
+    logger.debug(f"Fetched {len(bars)} bars for {symbol} (normalized to UTC)")
     return bars
 
 
 def get_latest_bar_timestamp(symbol: str) -> Optional[datetime]:
     """
-    Get the timestamp of the most recent M5 bar for a symbol.
+    Get the timestamp of the most recent M5 bar for a symbol (in UTC).
     Used for time synchronization - matches backtest engine behavior of using bar timestamps.
     
     Args:
         symbol: MT5 symbol
         
     Returns:
-        datetime of latest bar, or None on failure
+        datetime of latest bar in UTC, or None on failure
     """
     rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_M5, 0, 1)
     if rates is None or len(rates) == 0:
         return None
-    return datetime.fromtimestamp(rates[-1]["time"])
+    # Convert broker local time to UTC
+    broker_dt = datetime.fromtimestamp(rates[-1]["time"])
+    return _broker_time_to_utc(broker_dt)
 
 
 def get_current_est_hour(est_offset: int = -5) -> int:
     """
-    Get current EST hour using the latest bar timestamp from any traded symbol.
-    This matches the backtest engine's approach of using bar timestamps exclusively.
+    Get current EST hour using the latest bar timestamp.
+    Uses BTCUSD first (24/7 market - always has fresh bars even on weekends),
+    then falls back to other symbols.
     
     Args:
         est_offset: EST offset from UTC (default -5)
@@ -85,10 +113,12 @@ def get_current_est_hour(est_offset: int = -5) -> int:
     Returns:
         Current EST hour (0-23)
     """
-    # Try to get time from any available symbol
+    # BTCUSD is 24/7 - always has fresh bars even on weekends/holidays
+    # Try crypto first, then forex/indices
     symbols_to_try = [
+        "BTCUSD", "ETHUSD",  # 24/7 crypto - primary source
         "EURUSD.PRO", "GBPUSD.PRO", "USDCHF.PRO", "USDJPY.PRO",
-        "AUDUSD.PRO", "NZDUSD.PRO", "BTCUSD", "ETHUSD", "US500"
+        "AUDUSD.PRO", "NZDUSD.PRO", "US500"
     ]
     
     for symbol in symbols_to_try:
