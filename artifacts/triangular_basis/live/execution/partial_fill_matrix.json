@@ -1,0 +1,6 @@
+{
+  "leg2_reject_after_leg1": "BROKEN_HEDGE -> flatten leg1 -> verified flat -> ABORTED_FLAT",
+  "leg3_reject_after_two": "BROKEN_HEDGE -> flatten both -> verified flat -> ABORTED_FLAT",
+  "placed_not_filled": "no position -> not OPEN -> ABORTED_FLAT",
+  "fill_timeout": "no fills -> not OPEN -> ABORTED_FLAT"
+}

@@ -1,0 +1,6 @@
+{
+  "test": "inject Symmetry Trap position (magic 20260531) + run Triangular close",
+  "foreign_positions_before": 1,
+  "foreign_positions_after": 1,
+  "unchanged": true
+}

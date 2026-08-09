@@ -1,0 +1,16 @@
+{
+  "contract": {
+    "canonical_symbol": "str",
+    "broker_symbol": "str",
+    "side": "Direction",
+    "model_weight": "float (canonical inverse-ATR normalized, NOT lots)",
+    "target_notional_account_ccy": "float (USD)",
+    "requested_lots": "float",
+    "rounded_lots": "float after vol_min/step/max",
+    "signal_reference_price": "float (closed M5 close)",
+    "magic": "int",
+    "basket_id": "str",
+    "leg_id": "L1/L2/L3"
+  },
+  "rule": "model_weight is NEVER interpreted as MT5 lots"
+}
