@@ -1,4 +1,4 @@
-# Workspace State — 2026-08-06 23:15 UTC (Auto-Sync)
+# Workspace State — 2026-08-09 (Macro Sync)
 
 ## System Status
 - OCE Backend: ✅ Healthy
@@ -8,20 +8,39 @@
 - OCE Frontend (3000): ✅ UP
 - VTuber/POALA: 🔴 Offline per MAD directive
 - Git: Synced to origin/master
-- **Symmetry Trap Live Multi-Asset Engine: ✅ DEPLOYED — Running for tomorrow's session**
+- **Symmetry Trap Live Multi-Asset Engine: ✅ PARITY LOCKED — READY FOR MONDAY (2026-08-09)**
+- **Capital Routing Phase 2: ✅ AUDIT COMPLETE — PHASE 3 CLEARED ON COMMON PANEL (2026-08-09)**
 
-## Active Build: Symmetry Trap Live Multi-Asset Engine (2026-08-06)
-- **Status:** ✅ DEPLOYED — Running for tomorrow's session
-- **Engine:** `quant-lab/mt5/symmetry_trap_executor_multi.py`
+## Active Build: Symmetry Trap Live Multi-Asset Engine (2026-08-09)
+- **Status:** ✅ PARITY LOCKED (ST-PARITY-LOCK-01) — identical backtest vs live
+- **Parity proof:** EURUSD 3yr — 3,120 trades / 79.13% WR / 15,101.36 pips, 0 divergences
 - **Assets:** ETHUSD, HK50, NZDUSD, BTCUSD, US500, EURUSD, USDCHF, AUDUSD (8 assets)
-- **MT5 Connection:** Verified (Account 1114712, Balance $282.98, OxSecurities-Demo)
-- **Configuration:** Lot 0.03, Magic 20260531, Entry 2AM-11AM EST, Hard Exit 5PM EST
-- **Stop Logic:** Realistic wick/touch-based (triggers on price touch/wick, not bar close)
-- **Engine:** Symmetry Trap (Engine B ONLY — no P90 cross)
-- **Backtest Verification:** All 8 assets show strong performance (ETHUSD: 89.9% WR, BTCUSD: 82.6% WR, etc.)
-- **Deployment Status:** Engine started at 23:08:49, correctly detected outside trading hours, graceful shutdown, will auto-resume at 2AM EST tomorrow
-- **Logs:** `quant-lab/mt5/live_logs_multi/`
+- **MT5 Connection:** Verified — OxSecurities-Demo, broker timezone measured UTC-1
+- **Architecture:** MT5 data → mt5_data_feed (timezone norm) → symmetry_trap_live → SymmetryTrapBacktest (UNCHANGED) → execution_layer → symmetry_trap_executor_multi
+- **Live engine:** generated real BTCUSD signal today (LONG @ 65106.4)
 - **Command:** `python mt5/symmetry_trap_executor_multi.py --loop --interval 30`
+
+## Active Build: Triangular Basis LIVE — TB-LIVE-ARCH-01 (2026-08-09)
+- **Status:** ✅ STRATEGY ISOLATION FOUNDATION COMPLETE (RL)
+- **7 files** — strategy_registry.py, strategy_freeze.json, account_guard.py, mt5_triangular_data_feed.py, triangular_basis_live.py, triangular_execution_layer.py, triangular_basis_executor.py
+- **Magic number:** 31082026 (unique, no collision with Symmetry Trap 20260531)
+- **Architecture (4 layers):** Shared MT5 infra → TB wrapper → basket execution → orchestrator
+- **Canonical engine UNTOUCHED:** triangular_basis_engine.py read-only; live wrapper calls directly
+- **Config:** z=2.5, stop=6.0, lookback=200 (balanced), max 1 concurrent basket
+- **Next: TB-LIVE-PARITY-02** — prove 100% backtest↔live decision parity
+
+## Capital Routing — Phase 2 (CR-P2-MARKET-CALENDAR-AUDIT-06, 2026-08-09)
+- **Status:** ✅ GATES PASS — `phase_3_common_panel_cleared = true`
+- **Capital Routing SHA:** f64c58b · **Parent:** 258255c8a
+- **Empirical session groups:** Group1 (7 majors) Mon 00:00-Fri 23:00 UTC; Group2 (3 EUR crosses) Mon 00:00-Fri 19:00 UTC
+- **84.8% pattern root cause:** "M5" files had D1-only bars until 2022-09-13 → real coverage 99.29-99.42% from true start
+- **EUR cross gap root cause:** wrong assumed calendar (Sun open) → corrected → 98.99-99.03%
+- **EURUSD/USDCHF pre-2023:** genuine missing source history (needs MT5 re-export)
+- **Common intersection:** 98.75% (17,273/17,491), no unexplained >24h gap
+- **Full history coverage:** all 10 symbols 99.06-99.42%
+- **Tests:** 42/42 (29 + 13 FX calendar regression)
+- **New module:** `src/capital_routing/quality/fx_trading_calendar.py` (calendar_id mt5_pro_v1)
+- **Artifacts:** P2_MARKET_CALENDAR_AUDIT.md, p2_gate_result_v4.json, fx_calendar_v1.json, batch_a_coverage_v4.json, batch_a_common_window_v3.json
 
 ## Quant Bible — UPDATED (2026-08-06)
 - **File:** `quant-lab/QUANT_BIBLE.md` — Updated with Symmetry Trap Live Multi-Asset deployment
@@ -71,6 +90,9 @@
 6. USDJPY: 2.30 tr/day
 
 ## Auto-Sync Log
+- 2026-08-09 — Capital Routing Phase 2 audit complete; Phase 3 cleared on common panel (CR-P2-MARKET-CALENDAR-AUDIT-06)
+- 2026-08-09 — Triangular Basis TB-LIVE-ARCH-01 strategy isolation foundation complete (RL)
+- 2026-08-09 — Symmetry Trap parity locked (ST-PARITY-LOCK-01), live engine ready for Monday
 - 2026-08-06 — Symmetry Trap Live Multi-Asset Engine deployed for tomorrow's session
 - 2026-06-29 — DMR v2 multi-entry + live deployment
 - 2026-06-29 — Quant Bible updated with all formulas + results
