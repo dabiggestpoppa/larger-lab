@@ -27,12 +27,12 @@
       }
     }
   },
-  "canonical_trades": 3120,
-  "canonical_wr": 79.13461538461539,
-  "canonical_pnl": 15101.360000000013,
-  "live_trades": 3120,
-  "live_wr": 79.13461538461539,
-  "live_pnl": 15101.360000000013,
+  "canonical_trades": 1947,
+  "canonical_wr": 55.880842321520284,
+  "canonical_pnl": -889.1290000000054,
+  "live_trades": 1947,
+  "live_wr": 55.880842321520284,
+  "live_pnl": -889.1290000000054,
   "trade_count_diff": 0,
   "pnl_diff": 0.0,
   "divergence_count": 0,
