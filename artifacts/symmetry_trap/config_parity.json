@@ -1,0 +1,53 @@
+{
+  "diff_count": 0,
+  "diffs": [],
+  "canonical_config": {
+    "pip_size": 0.0001,
+    "tier_config": {
+      "T1": {
+        "ar_max": 60.0,
+        "au": 10.0,
+        "trigger": 12.0
+      },
+      "T2": {
+        "ar_max": 60.0,
+        "au": 12.0,
+        "trigger": 15.0
+      },
+      "T3": {
+        "ar_max": 60.0,
+        "au": 15.0,
+        "trigger": 19.0
+      }
+    },
+    "symbol": "EURUSD",
+    "min_sl_buffer": 8.0,
+    "spread_buffer": 1.5,
+    "max_loops": 5
+  },
+  "live_config": {
+    "pip_size": 0.0001,
+    "tier_config": {
+      "T1": {
+        "ar_max": 60.0,
+        "au": 10.0,
+        "trigger": 12.0
+      },
+      "T2": {
+        "ar_max": 60.0,
+        "au": 12.0,
+        "trigger": 15.0
+      },
+      "T3": {
+        "ar_max": 60.0,
+        "au": 15.0,
+        "trigger": 19.0
+      }
+    },
+    "symbol": "EURUSD",
+    "min_sl_buffer": 8.0,
+    "spread_buffer": 1.5,
+    "max_loops": 5
+  },
+  "parity": true
+}

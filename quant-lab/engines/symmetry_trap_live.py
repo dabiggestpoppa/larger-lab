@@ -62,6 +62,7 @@ class SymmetryTrapLiveEngine:
         entry_window_end: int = 11,
         hard_exit_hour: int = 17,
         lot_size: float = 0.01,
+        config_override: Optional[Dict] = None,
     ):
         self.symbol = symbol
         self.est_offset = est_offset
@@ -71,10 +72,23 @@ class SymmetryTrapLiveEngine:
         self.lot_size = lot_size
         
         # Get config from ASSET_CONFIGS (single source of truth)
-        self.config = get_symbol_config(symbol)
+        # OR use override if provided (for parity testing)
+        if config_override is not None:
+            self.config = config_override
+        else:
+            self.config = get_symbol_config(symbol)
         self.pip_size = self.config["pip_value"]
         
-        # Initialize backtest engine with same config
+        # Initialize the SAME engine as backtest (SymmetryTrapEngine directly)
+        # This mirrors what SymmetryTrapBacktest.run() does internally
+        self.engine = SymmetryTrapEngine(
+            pip_size=self.pip_size,
+            tier_config=self.config.get("tiers", DEFAULT_TIER_CONFIG.copy()),
+            symbol=symbol,
+            config=self.config,
+        )
+        
+        # Also keep backtest_engine for compute_stats etc if needed
         self.backtest_engine = SymmetryTrapBacktest(
             pip_size=self.pip_size,
             config=self.config,
@@ -132,8 +146,8 @@ class SymmetryTrapLiveEngine:
             return False
         
         # Initialize session in engine (same as backtest)
-        self.backtest_engine.engine.initialize_session(self.asian_high, self.asian_low)
-        self.session_initialized = self.backtest_engine.engine.session_active
+        self.engine.initialize_session(self.asian_high, self.asian_low)
+        self.session_initialized = self.engine.session_active
         
         if not self.session_initialized:
             logger.info(f"Session not active for {self.symbol} (AR={self.asian_range_pips:.1f}p)")
@@ -141,7 +155,7 @@ class SymmetryTrapLiveEngine:
         
         logger.debug(
             f"{self.symbol}: AR={self.asian_range_pips:.1f}p, "
-            f"tier={self.backtest_engine.engine.tier_name}, "
+            f"tier={self.engine.tier_name}, "
             f"trading_bars={len(self.trading_bars)}"
         )
         return True
@@ -172,7 +186,7 @@ class SymmetryTrapLiveEngine:
                 low=b["low"],
                 close=b["close"],
             )
-            signal = self.backtest_engine.engine.process_bar(bar)
+            signal = self.engine.process_bar(bar)
             
             if signal and signal.event == "ENTRY":
                 direction = "LONG" if signal.direction == TradeDirection.LONG else "SHORT"
@@ -182,7 +196,7 @@ class SymmetryTrapLiveEngine:
                     f"entry={signal.entry_price:.5f} "
                     f"SL={signal.sl_price:.5f} (Zero-Buffer) "
                     f"TP={signal.tp_price:.5f} (1 AU = {signal.au_used:.1f}p) "
-                    f"tier={self.backtest_engine.engine.tier_name}"
+                    f"tier={self.engine.tier_name}"
                 )
                 
                 return {
@@ -192,10 +206,10 @@ class SymmetryTrapLiveEngine:
                     "entry_price": signal.entry_price,
                     "sl": signal.sl_price,
                     "tp": signal.tp_price,
-                    "ar_pips": round(self.backtest_engine.engine.asian_range_pips, 1),
-                    "tier": self.backtest_engine.engine.tier_name,
+                    "ar_pips": round(self.engine.asian_range_pips, 1),
+                    "tier": self.engine.tier_name,
                     "au_pips": signal.au_used,
-                    "impulse_size_pips": round(self.backtest_engine.engine.impulse_size_pips, 1),
+                    "impulse_size_pips": round(self.engine.impulse_size_pips, 1),
                 }
             
             elif signal and signal.event == "KILL_SWITCH":

@@ -1,0 +1,41 @@
+{
+  "symbol": "EURUSD",
+  "csv_file": "data/EURUSDPRO_M5_2023_2026.csv",
+  "config": {
+    "pip_value": 0.0001,
+    "est_offset": -5,
+    "entry_window_start": 2,
+    "entry_window_end": 11,
+    "hard_exit_hour": 17,
+    "lot_size": 0.01,
+    "name": "EURUSD",
+    "tiers": {
+      "T1": {
+        "ar_max": 60.0,
+        "au": 10.0,
+        "trigger": 12.0
+      },
+      "T2": {
+        "ar_max": 60.0,
+        "au": 12.0,
+        "trigger": 15.0
+      },
+      "T3": {
+        "ar_max": 60.0,
+        "au": 15.0,
+        "trigger": 19.0
+      }
+    }
+  },
+  "canonical_trades": 3120,
+  "canonical_wr": 79.13461538461539,
+  "canonical_pnl": 15101.360000000013,
+  "live_trades": 3120,
+  "live_wr": 79.13461538461539,
+  "live_pnl": 15101.360000000013,
+  "trade_count_diff": 0,
+  "pnl_diff": 0.0,
+  "divergence_count": 0,
+  "first_divergence": null,
+  "parity_achieved": true
+}
