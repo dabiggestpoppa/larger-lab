@@ -1,0 +1,139 @@
+{
+  "phase": "3",
+  "gate_source": "CR-P2-MARKET-CALENDAR-AUDIT-06",
+  "rule": "Phase 3 consumes accepted normalized Phase 2 outputs only",
+  "symbols": [
+    "EURUSD",
+    "GBPUSD",
+    "USDJPY",
+    "USDCHF",
+    "EURGBP",
+    "EURJPY",
+    "GBPJPY",
+    "CHFJPY",
+    "EURCHF",
+    "GBPCHF"
+  ],
+  "inputs": [
+    {
+      "symbol": "EURUSD",
+      "asset_class": "fx",
+      "provider": "mt5_pro",
+      "timeframe": "H1",
+      "start": "2023-07-03 00:00:00+00:00",
+      "end": "2026-05-29 00:00:00+00:00",
+      "timezone": "UTC",
+      "row_count": 18089,
+      "sha256": "daf562f0418a4d2b7513fd86ef3156377438495f5e81bb801ea8408db5d250de",
+      "phase2_qc_status": "accepted"
+    },
+    {
+      "symbol": "GBPUSD",
+      "asset_class": "fx",
+      "provider": "mt5_pro",
+      "timeframe": "H1",
+      "start": "2022-01-03 00:00:00+00:00",
+      "end": "2026-05-29 23:00:00+00:00",
+      "timezone": "UTC",
+      "row_count": 23303,
+      "sha256": "7c3d7965608ef8d9d511bf7b438245edfa7dc2db59cabf86de30eb328b16162d",
+      "phase2_qc_status": "accepted"
+    },
+    {
+      "symbol": "USDJPY",
+      "asset_class": "fx",
+      "provider": "mt5_pro",
+      "timeframe": "H1",
+      "start": "2022-01-03 00:00:00+00:00",
+      "end": "2026-05-29 23:00:00+00:00",
+      "timezone": "UTC",
+      "row_count": 23302,
+      "sha256": "3f23961233d34e83048a3b2a607b475dc2e1f97a8d34ebf173021f8de8bbcd1e",
+      "phase2_qc_status": "accepted"
+    },
+    {
+      "symbol": "USDCHF",
+      "asset_class": "fx",
+      "provider": "mt5_pro",
+      "timeframe": "H1",
+      "start": "2023-07-03 00:00:00+00:00",
+      "end": "2026-05-29 23:00:00+00:00",
+      "timezone": "UTC",
+      "row_count": 18120,
+      "sha256": "7273a11d2fa59c5b1d487457c90222d40dc420dd3754effae937234148e1e12a",
+      "phase2_qc_status": "accepted"
+    },
+    {
+      "symbol": "EURGBP",
+      "asset_class": "fx",
+      "provider": "mt5_pro",
+      "timeframe": "H1",
+      "start": "2015-10-12 20:00:00+00:00",
+      "end": "2026-06-03 20:00:00+00:00",
+      "timezone": "UTC",
+      "row_count": 23535,
+      "sha256": "83935c83270cf40286b3b8bb77a570ef5e1668cf73db960ceca6283c7c5057b8",
+      "phase2_qc_status": "accepted"
+    },
+    {
+      "symbol": "EURJPY",
+      "asset_class": "fx",
+      "provider": "mt5_pro",
+      "timeframe": "H1",
+      "start": "2015-10-12 20:00:00+00:00",
+      "end": "2026-06-03 21:00:00+00:00",
+      "timezone": "UTC",
+      "row_count": 23529,
+      "sha256": "5299a3bc8aa13c1db590df3e245ec43fb536ee241ce998d96d945ebe3745989f",
+      "phase2_qc_status": "accepted"
+    },
+    {
+      "symbol": "GBPJPY",
+      "asset_class": "fx",
+      "provider": "mt5_pro",
+      "timeframe": "H1",
+      "start": "2022-01-03 00:00:00+00:00",
+      "end": "2026-05-29 23:00:00+00:00",
+      "timezone": "UTC",
+      "row_count": 23293,
+      "sha256": "1569088290dccb66979ed1cda72442670fcc7ee2c96263902339168a612e682a",
+      "phase2_qc_status": "accepted"
+    },
+    {
+      "symbol": "CHFJPY",
+      "asset_class": "fx",
+      "provider": "mt5_pro",
+      "timeframe": "H1",
+      "start": "2022-01-03 00:00:00+00:00",
+      "end": "2026-05-21 18:00:00+00:00",
+      "timezone": "UTC",
+      "row_count": 23138,
+      "sha256": "1a486409895a2bae24c028ae1ee503903d7d0d3be219acc4c70dc9b0634eca64",
+      "phase2_qc_status": "accepted"
+    },
+    {
+      "symbol": "EURCHF",
+      "asset_class": "fx",
+      "provider": "mt5_pro",
+      "timeframe": "H1",
+      "start": "2015-10-12 20:00:00+00:00",
+      "end": "2026-06-03 21:00:00+00:00",
+      "timezone": "UTC",
+      "row_count": 23781,
+      "sha256": "023f6c4b0eec11152076519cf8725834a775342d6b28fda75ac58c16808dbd0c",
+      "phase2_qc_status": "accepted"
+    },
+    {
+      "symbol": "GBPCHF",
+      "asset_class": "fx",
+      "provider": "mt5_pro",
+      "timeframe": "H1",
+      "start": "2022-01-03 00:00:00+00:00",
+      "end": "2026-05-29 23:00:00+00:00",
+      "timezone": "UTC",
+      "row_count": 23301,
+      "sha256": "a06dc3c63ac5776b083809c4e564243e41002fb25f30b0df8a971d3cff5e048a",
+      "phase2_qc_status": "accepted"
+    }
+  ]
+}

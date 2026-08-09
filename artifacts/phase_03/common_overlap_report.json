@@ -1,0 +1,42 @@
+{
+  "universe": [
+    "EURUSD",
+    "GBPUSD",
+    "USDJPY",
+    "USDCHF",
+    "EURGBP",
+    "EURJPY",
+    "GBPJPY",
+    "CHFJPY",
+    "EURCHF",
+    "GBPCHF"
+  ],
+  "universe_size": 10,
+  "intersection_valid_hours": 17273,
+  "earliest_common_ts": "2023-07-03 00:00:00+00:00",
+  "latest_common_ts": "2026-05-21 18:00:00+00:00",
+  "per_symbol_valid_hours": {
+    "EURUSD": 18089,
+    "GBPUSD": 23303,
+    "USDJPY": 23302,
+    "USDCHF": 18120,
+    "EURGBP": 23535,
+    "EURJPY": 23529,
+    "GBPJPY": 23293,
+    "CHFJPY": 23138,
+    "EURCHF": 23781,
+    "GBPCHF": 23301
+  },
+  "per_symbol_common_window_coverage_pct": {
+    "EURUSD": 99.79,
+    "GBPUSD": 99.84,
+    "USDJPY": 99.83,
+    "USDCHF": 99.83,
+    "EURGBP": 99.54,
+    "EURJPY": 99.5,
+    "GBPJPY": 99.78,
+    "CHFJPY": 99.75,
+    "EURCHF": 99.5,
+    "GBPCHF": 99.83
+  }
+}

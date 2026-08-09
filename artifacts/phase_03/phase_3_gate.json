@@ -1,0 +1,51 @@
+{
+  "phase": "3",
+  "task": "CR-P3-COMMON-PANEL-01",
+  "gate_passed": true,
+  "phase_3_panel_complete": true,
+  "phase_4_cleared": true,
+  "failures": [],
+  "universe": [
+    "EURUSD",
+    "GBPUSD",
+    "USDJPY",
+    "USDCHF",
+    "EURGBP",
+    "EURJPY",
+    "GBPJPY",
+    "CHFJPY",
+    "EURCHF",
+    "GBPCHF"
+  ],
+  "n_symbols": 10,
+  "master_h1_rows": 24848,
+  "h4_rows": 7431,
+  "d1_rows": 2446,
+  "strict_common_intersection_hours": 17273,
+  "common_window_earliest": "2023-07-03 00:00:00+00:00",
+  "common_window_latest": "2026-05-21 18:00:00+00:00",
+  "max_unexplained_gap_hours_common": 13,
+  "per_symbol_common_window_coverage_pct": {
+    "EURUSD": 99.79,
+    "GBPUSD": 99.84,
+    "USDJPY": 99.83,
+    "USDCHF": 99.83,
+    "EURGBP": 99.54,
+    "EURJPY": 99.5,
+    "GBPJPY": 99.78,
+    "CHFJPY": 99.75,
+    "EURCHF": 99.5,
+    "GBPCHF": 99.83
+  },
+  "rules": [
+    "accepted Phase 2 inputs only",
+    "no duplicate timestamps",
+    "no malformed OHLC",
+    "no forward-filled OHLC",
+    "market-calendar masks applied",
+    "cross-rate QC generated",
+    "coverage report generated",
+    "common overlap explicitly measured",
+    "no unexplained market-open gap >24h in common window"
+  ]
+}
