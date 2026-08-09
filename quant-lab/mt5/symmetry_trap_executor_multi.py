@@ -60,11 +60,13 @@ LOG_DIR = os.path.join(
 # ─── LOGGING ──────────────────────────────────────────────────────────────
 
 def log(msg: str):
-    """Log with timestamp from latest bar (matches backtest engine time source)."""
-    # Use MT5 time from latest bar - same as backtest engine
+    """Log with timestamp from latest bar (matches backtest engine time source).
+    Uses BTCUSD first (24/7 market) for accurate time even on weekends."""
     from engines.mt5_data_feed import get_latest_bar_timestamp
+    # Try BTCUSD first (24/7), then ETHUSD, then other symbols
+    time_symbols = ["BTCUSD", "ETHUSD"] + [s for s in SYMBOLS_TO_TRADE if s not in ("BTCUSD", "ETHUSD")]
     ts = None
-    for symbol in SYMBOLS_TO_TRADE:
+    for symbol in time_symbols:
         bar_ts = get_latest_bar_timestamp(symbol)
         if bar_ts:
             ts = bar_ts
