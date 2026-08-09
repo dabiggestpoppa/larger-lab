@@ -1,0 +1,32 @@
+﻿{
+    "canonical_commit_sha": "2435d04e77eb31b42ab14ba76482efb729965b83",
+    "strategy_file": "quant-lab/engines/triangular_basis_engine.py",
+    "strategy_file_hash": "pending_sha256_at_runtime",
+    "config": {
+        "triangle_symbols": ["GBPAUD", "GBPNZD", "AUDNZD"],
+        "timeframe": "M5",
+        "basis_formula": "ln(GBPAUD) - ln(GBPNZD) + ln(AUDNZD)",
+        "lookback_bars": 200,
+        "entry_z_threshold": 2.5,
+        "stop_z_threshold": 6.0,
+        "exit_z_target": 0.0,
+        "session": {
+            "name": "London Only",
+            "start_est": 3,
+            "end_est": 12,
+            "min_minutes_to_exit": 120
+        },
+        "max_concurrent_baskets": 1,
+        "cost_assumptions": {
+            "gbpaud_spread_pips": 1.5,
+            "gbpnzd_spread_pips": 2.5,
+            "audnzd_spread_pips": 2.0,
+            "commission_per_leg_pips": 1.4,
+            "total_round_trip_cost_pips": 10.2
+        }
+    },
+    "strategy_id": "TRIANGULAR_BASIS_GBP_AUD_NZD",
+    "magic_number": 31082026,
+    "environment": "demo",
+    "freeze_timestamp": "2026-08-09T00:00:00Z"
+}
