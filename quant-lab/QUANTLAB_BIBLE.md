@@ -1,7 +1,39 @@
 # 📖 QUANTLAB BIBLE — Living Reference
-> **Last Updated:** 2026-06-29 (DMR v2 multi-entry + live deployment)
+> **Last Updated:** 2026-08-09 (Symmetry Trap live parity locked + deployed)
 > **DO NOT FREEZE** — every backtest, optimization, or discovery updates this file  
 > **All roads lead here:** every report, every engine, every config file routes through this index  
+
+---
+
+## 🟢 LIVE DEPLOYMENT STATUS (2026-08-09)
+**Symmetry Trap Live Engine — PARITY LOCKED + READY FOR MONDAY**
+
+### Parity Proven (ST-PARITY-LOCK-01)
+Live engine produces IDENTICAL results to validated backtest on same data:
+- EURUSD 3-year backtest: 3,120 trades / 79.13% WR / 15,101.36p
+- Live wrapper: 3,120 trades / 79.13% WR / 15,101.36p
+- Trace divergences: 0, Config diff: 0
+
+### Architecture (FROZEN)
+```
+MT5 DATA (BTCUSD 24/7 = time source)
+  ↓ mt5_data_feed.py (broker time→UTC normalization)
+  ↓ symmetry_trap_live.py (thin wrapper)
+  ↓ SymmetryTrapBacktest logic (UNCHANGED source of truth)
+  ↓ execution_layer.py (pure MT5 order management)
+  ↓ symmetry_trap_executor_multi.py (orchestration)
+```
+
+### Key Fixes (2026-08-09)
+1. **Broker timezone:** OxSecurities-Demo = UTC-1 (measured dynamically). Bar timestamps normalized to UTC before est_offset=-5 applied.
+2. **BTCUSD time source:** Primary for time sync (24/7 = fresh bars even weekends when forex closed).
+3. **TRADE_RETCODE_BUSY:** Use numeric 10027 (not exposed as constant in this MT5 version).
+
+### Live Config (8 assets)
+- ETHUSD, HK50, NZDUSD, BTCUSD, US500, EURUSD, USDCHF, AUDUSD
+- Lot 0.03 | Magic 20260531 | Entry 2-11AM EST | Hard exit 5PM EST
+
+**Parity report:** `artifacts/symmetry_trap/PARITY_REPORT.md`
 
 ---
 
