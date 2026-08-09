@@ -1378,3 +1378,82 @@ python mt5/triangular_basis_executor.py --once
 `
 
 ---
+
+
+## 🟢 OWL — WORKSPACE STATUS REVIEW + CAPITAL ROUTING PHASE 2 AUDIT COMPLETE (2026-08-09)
+**Agent:** OWL (Primary Operator) | **Status:** ✅ LATEST CHANGES SYNCED FOR REVIEW
+
+### What Changed Today (2026-08-09)
+
+Two independent workstreams completed and ready for review:
+
+---
+
+### 1. ⚡ TB-LIVE-ARCH-01 — STRATEGY ISOLATION FOUNDATION (RL)
+Complete strategy isolation for the Triangular Basis LIVE engine. First of 5 planned commits before live demo.
+
+**7 files created (2,206 lines):**
+| File | Purpose |
+|------|---------|
+| configs/strategy_registry.py | Central magic-number registry + uniqueness verification |
+| artifacts/triangular_basis/live/strategy_freeze.json | Canonical strategy freeze signature |
+| mt5/account_guard.py | Shared account coordinator (identity, mode detection, halt signal) |
+| engines/mt5_triangular_data_feed.py | Synchronized 3-leg M5 bar feed (exact-once sync) |
+| engines/triangular_basis_live.py | Thin live wrapper (NO formula rewrites) |
+| mt5/triangular_execution_layer.py | 3-leg basket execution state machine (BROKEN_HEDGE recovery) |
+| mt5/triangular_basis_executor.py | Thin orchestration loop |
+
+**Architecture (4 clean layers):** Shared MT5 infra → Triangular strategy wrapper → Basket execution layer → Thin orchestrator
+
+**Key decisions:**
+- Magic number 31082026 (unique, no collision with Symmetry Trap 20260531)
+- Canonical engine UNTOUCHED — live wrapper calls triangular_basis_engine.py directly
+- Balanced config: z=2.5, stop=6.0, lookback=200
+- Max 1 concurrent basket for first demo phase
+- Near-atomic execution: pre-check all 3 legs, flatten on partial fill
+- Demo/LIVE switch = same engine, different account config only
+
+**Next: TB-LIVE-PARITY-02** — prove 100% decision parity between canonical backtest and live wrapper (basis, z-score, entry, exit, stop, holding timer).
+
+---
+
+### 2. 📊 CAPITAL ROUTING — PHASE 2 (CR-P2-MARKET-CALENDAR-AUDIT-06)
+Completed the market-calendar & source-session audit. Phase 2 gates now PASS.
+
+**Capital Routing SHA:** f64c58b · **Parent SHA:** 258255c8a
+
+**Two empirical session groups discovered:**
+- Group 1 (standard): EURUSD, GBPUSD, USDJPY, USDCHF, GBPJPY, CHFJPY, GBPCHF → Mon 00:00 - Fri 23:00 UTC
+- Group 2 (EUR crosses): EURGBP, EURJPY, EURCHF → Mon 00:00 - Fri 19:00 UTC
+
+**Root causes diagnosed:**
+| Issue | Cause | Resolution |
+|-------|-------|-----------|
+| 84.8% coverage "pattern" | "M5" files contained D1-only bars (1/day) until 2022-09-13 | Measure from true M5 start → 99.29-99.42% |
+| EUR crosses ~95% | Wrong assumed calendar (Sun open) | Corrected to Mon-Fri 19:00 close → 98.99-99.03% |
+| EURUSD/USDCHF pre-2023 | Genuine missing source history | Requires MT5 re-export (independent of clearance) |
+
+**Final coverage (all 10 symbols):**
+- Full history (from true data availability): 99.06-99.42%
+- Common panel (2023-07-03 → 2026-05-21): 98.99-99.34%
+- Common intersection: 98.75% (17,273/17,491 open hours)
+- No symbol has unexplained market-open gap >24h
+
+**Gate results:**
+- ✅ full_history_gate_passed = TRUE
+- ✅ common_research_panel_gate_passed = TRUE
+- ✅ phase_2_full_history_complete = TRUE
+- ✅ phase_3_common_panel_cleared = TRUE (research can begin on labeled common panel)
+
+**Tests:** 42/42 passing (29 existing + 13 new FX calendar regression tests)
+
+**New module:** src/capital_routing/quality/fx_trading_calendar.py — evidence-based expected-bar calendar (calendar_id mt5_pro_v1). Key policy: US-only holidays (July 4, Labor Day, Memorial Day) are NOT auto-treated as full FX closures — only hours with evidence the provider was closed are excluded.
+
+---
+
+### ⏭️ Next Steps (awaiting your plan)
+1. TB parity — approve TB-LIVE-ARCH-01 to start TB-LIVE-PARITY-02 replay proof
+2. Capital Routing Phase 3 — cleared for the 2023-07-03 → 2026-05-21 common panel
+3. Optional — MT5 re-export of 2022-2023 EURUSD/USDCHF to extend full-history panel
+
+---
