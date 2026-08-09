@@ -1,0 +1,9 @@
+{
+  "phase": "4",
+  "task": "CR-P4-FACTOR-SEAL-02",
+  "currency_factors_h1.parquet": "04ec94e515287f96d98c5093926410c062cf9971c1703b78752851a7b5064c2d",
+  "currency_factors_h4.parquet": "f31a65760d073e31396e6d343469a79017ff82d4247727bcc9422b52c0b645c1",
+  "currency_factors_d1.parquet": "60536359425730df48ab36b5be26a9797a3676af702f13cc2d1b07ffe3c32fdd",
+  "pair_residuals_h1.parquet": "ea5edc04eefcbc9d4771ad8bcca4b88e14d63c9b45a51f0320548c9491ec44c8",
+  "factor_features_h1.parquet": "0c464199988ddf68635ae7311977a3315f4dbf9f6db48e669cc90f8d14cc7302"
+}

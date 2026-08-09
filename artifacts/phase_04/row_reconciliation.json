@@ -1,0 +1,13 @@
+{
+  "phase": "4",
+  "task": "CR-P4-FACTOR-SEAL-02",
+  "input_rows": 17273,
+  "rows_lost_to_return_init": 1,
+  "rows_lost_to_missingness": 0,
+  "final_factor_rows": 17272,
+  "explanation": "Strict common panel is fully populated (no missing OHLC). The first H1 return is NaN (no prior close), so no factor is solved at t=0; therefore exactly one row is lost to log-return initialisation. No row is lost to missingness within the strict common window.",
+  "canonical_expected": {
+    "input": 17273,
+    "factors": 17272
+  }
+}

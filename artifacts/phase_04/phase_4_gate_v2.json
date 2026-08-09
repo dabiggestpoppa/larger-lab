@@ -1,0 +1,97 @@
+{
+  "phase": "4",
+  "task": "CR-P4-FACTOR-SEAL-02",
+  "gate_passed": true,
+  "phase_4_complete": true,
+  "phase_5_cleared": true,
+  "proven": {
+    "phase3_input_hash": true,
+    "factor_row_reconciliation": true,
+    "incidence_rank": true,
+    "zero_sum": true,
+    "no_lookahead": true,
+    "determinism": true,
+    "synthetic_reconstruction": true,
+    "residual_math": true,
+    "breadth": true,
+    "h4": true,
+    "d1": true,
+    "tests_passed": true,
+    "finite_outputs": true,
+    "artifacts": true
+  },
+  "checks": {
+    "phase3_input_hash": {
+      "valid": true,
+      "expected": "a0da64a3b0cd8976b61e3f4e8defa55906098373efa1bcdf79dc2d628b8c6896",
+      "actual": "a0da64a3b0cd8976b61e3f4e8defa55906098373efa1bcdf79dc2d628b8c6896"
+    },
+    "factor_row_reconciliation": {
+      "valid": true,
+      "input_rows": 17273,
+      "rows_lost_to_return_init": 1,
+      "rows_lost_to_missingness": 0,
+      "final_factor_rows": 17272,
+      "expected_input_rows": 17273,
+      "expected_factor_rows": 17272,
+      "explanation": "Strict common panel is fully populated (0 missing). The single row reduction is the first H1 return being NaN (no prior close), so factor estimation has no return to solve for at t=0."
+    },
+    "incidence_rank": {
+      "valid": true,
+      "rank": 4,
+      "expected": 4
+    },
+    "zero_sum": {
+      "valid": true,
+      "tolerance": 1e-09,
+      "max_abs_zero_sum_error": 0.0,
+      "mean_abs_zero_sum_error": 0.0
+    },
+    "finite_outputs": {
+      "valid": true,
+      "counts": {
+        "max_abs_inf_in_factors": 0,
+        "max_abs_nan_in_factors": 0,
+        "inf_in_residuals": 0,
+        "nan_in_residuals": 0,
+        "inf_in_features": 0,
+        "nan_in_features": 40029
+      }
+    },
+    "artifacts": {
+      "valid": true,
+      "present": {
+        "currency_factors_h1.parquet": true,
+        "currency_factors_h4.parquet": true,
+        "currency_factors_d1.parquet": true,
+        "pair_residuals_h1.parquet": true,
+        "factor_features_h1.parquet": true,
+        "factor_reconstruction_qc.csv": true,
+        "factor_correlation_matrix.csv": true,
+        "factor_covariance_matrix.csv": true,
+        "factor_eigenvalues.csv": true,
+        "breadth_report.csv": true,
+        "volatility_report.csv": true,
+        "network_consistency_report.csv": true,
+        "p3_preflight_audit.json": true,
+        "PHASE_4_FACTOR_REPORT.md": true
+      },
+      "missing": []
+    }
+  },
+  "test_counts": {
+    "collected": 22,
+    "passed": 22,
+    "failed": 0,
+    "skipped": 0,
+    "errors": 0,
+    "duration_s": null,
+    "python_version": "3.12.13 (main, May 10 2026, 19:35:37) [MSC v.1944 64 bit (AMD64)]",
+    "commit_sha": "f54ffff8b6041242e707d332075dea1c7b96f0d1"
+  },
+  "warnings": [],
+  "failures": [],
+  "phase3_commit": "11c6d77b3eccc670367e98e02ef77d92fc539a0f",
+  "phase4_commit": "f54ffff8b6041242e707d332075dea1c7b96f0d1",
+  "note": "Acceptance is infrastructure/statistical representation only. It does NOT depend on finding a profitable trading result."
+}

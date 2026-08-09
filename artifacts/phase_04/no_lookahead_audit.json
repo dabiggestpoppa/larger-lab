@@ -1,0 +1,75 @@
+{
+  "phase": "4",
+  "task": "CR-P4-FACTOR-SEAL-02",
+  "method_prompt": [
+    "prefix-invariance: features at T computed from data <= T equal those computed from the full dataset"
+  ],
+  "timestamps_checked": [
+    3454,
+    6909,
+    10363,
+    13818
+  ],
+  "features_checked": [
+    "1h_factor",
+    "4h_cum",
+    "12h_cum",
+    "24h_cum",
+    "velocity",
+    "acceleration",
+    "volatility",
+    "rank",
+    "breadth"
+  ],
+  "rows": [
+    {
+      "T": "2024-01-30 00:00:00+00:00",
+      "1h_factor": true,
+      "4h_cum": true,
+      "12h_cum": true,
+      "24h_cum": true,
+      "velocity": true,
+      "acceleration": true,
+      "volatility": true,
+      "rank": true,
+      "breadth": true
+    },
+    {
+      "T": "2024-08-26 05:00:00+00:00",
+      "1h_factor": true,
+      "4h_cum": true,
+      "12h_cum": true,
+      "24h_cum": true,
+      "velocity": true,
+      "acceleration": true,
+      "volatility": true,
+      "rank": true,
+      "breadth": true
+    },
+    {
+      "T": "2025-03-26 15:00:00+00:00",
+      "1h_factor": true,
+      "4h_cum": true,
+      "12h_cum": true,
+      "24h_cum": true,
+      "velocity": true,
+      "acceleration": true,
+      "volatility": true,
+      "rank": true,
+      "breadth": true
+    },
+    {
+      "T": "2025-10-21 16:00:00+00:00",
+      "1h_factor": true,
+      "4h_cum": true,
+      "12h_cum": true,
+      "24h_cum": true,
+      "velocity": true,
+      "acceleration": true,
+      "volatility": true,
+      "rank": true,
+      "breadth": true
+    }
+  ],
+  "passes": true
+}

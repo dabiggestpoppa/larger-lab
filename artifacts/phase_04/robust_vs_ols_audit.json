@@ -1,0 +1,43 @@
+{
+  "phase": "4",
+  "task": "CR-P4-FACTOR-SEAL-02",
+  "per_currency": {
+    "EUR": {
+      "correlation": 0.87564049514909,
+      "mean_abs_diff": 0.00011794139240728821,
+      "p95_diff": 0.0003805481620524258,
+      "p99_diff": 0.000687876446025689,
+      "max_diff": 0.0037906727407390588
+    },
+    "GBP": {
+      "correlation": 0.9844052289354998,
+      "mean_abs_diff": 4.541793566568191e-05,
+      "p95_diff": 0.00021921988891081192,
+      "p99_diff": 0.0004135799270917827,
+      "max_diff": 0.0011230155307401686
+    },
+    "USD": {
+      "correlation": 0.9957057863657955,
+      "mean_abs_diff": 2.518920481048178e-05,
+      "p95_diff": 0.0001388023630931826,
+      "p99_diff": 0.0002756721512443578,
+      "max_diff": 0.0008167675528783732
+    },
+    "CHF": {
+      "correlation": 0.9798392356285851,
+      "mean_abs_diff": 4.7121944538912604e-05,
+      "p95_diff": 0.00022435030794258032,
+      "p99_diff": 0.00041592367993787793,
+      "max_diff": 0.0017494738605520412
+    },
+    "JPY": {
+      "correlation": 0.9669819782800949,
+      "mean_abs_diff": 0.0001053063151674523,
+      "p95_diff": 0.00040819908131486,
+      "p99_diff": 0.0007312634392540345,
+      "max_diff": 0.003908526795893149
+    }
+  },
+  "material_disagreement": false,
+  "statement": "OLS and robust (IRLS-Huber) factors are compared but neither is selected based on downstream profitability. If they disagree materially it is recorded, not silently chosen."
+}

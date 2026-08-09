@@ -1,0 +1,25 @@
+{
+  "phase": "4",
+  "task": "CR-P4-FACTOR-SEAL-02",
+  "pairs": {
+    "EURGBP": {
+      "r2": -0.042935,
+      "resid_p95_abs": 0.00123524,
+      "resid_p99_abs": 0.00205361,
+      "classification": "HIGH_RESIDUAL_INFORMATION"
+    },
+    "EURJPY": {
+      "r2": 0.403863,
+      "resid_p95_abs": 0.0016833,
+      "resid_p99_abs": 0.00284573,
+      "classification": "HIGH_RESIDUAL_INFORMATION"
+    },
+    "EURCHF": {
+      "r2": 0.400539,
+      "resid_p95_abs": 0.00109464,
+      "resid_p99_abs": 0.00185556,
+      "classification": "HIGH_RESIDUAL_INFORMATION"
+    }
+  },
+  "note": "These EUR crosses carry substantial pair-specific flow the broad currency network does not explain. The residual is statistically informative for Phase 5. No attempt is made to raise R2 by changing the factor model; doing so would destroy the residual signal."
+}
