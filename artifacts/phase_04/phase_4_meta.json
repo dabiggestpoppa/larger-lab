@@ -1,0 +1,46 @@
+{
+  "phase": "4",
+  "task": "CR-P4-LATENT-FACTOR-ENGINE-01",
+  "phase3_commit": "11c6d77b3eccc670367e98e02ef77d92fc539a0f",
+  "input_panel_sha256": "a0da64a3b0cd8976b61e3f4e8defa55906098373efa1bcdf79dc2d628b8c6896",
+  "currencies": [
+    "EUR",
+    "GBP",
+    "USD",
+    "CHF",
+    "JPY"
+  ],
+  "pairs": [
+    "EURUSD",
+    "GBPUSD",
+    "USDJPY",
+    "USDCHF",
+    "EURGBP",
+    "EURJPY",
+    "GBPJPY",
+    "CHFJPY",
+    "EURCHF",
+    "GBPCHF"
+  ],
+  "n_currencies": 5,
+  "incidence_matrix_rank": 4,
+  "common_window_earliest": "2023-07-03 00:00:00+00:00",
+  "common_window_latest": "2026-05-21 18:00:00+00:00",
+  "factor_rows_h1": 17272,
+  "factor_rows_h4_B": 7132,
+  "factor_rows_d1_B": 2445,
+  "identification_constraint": "sum(f_t)=0 (EUR+GBP+USD+CHF+JPY=0)",
+  "horizon_bars": {
+    "1h": 1,
+    "2h": 2,
+    "4h": 4,
+    "8h": 8,
+    "12h": 12,
+    "24h": 24,
+    "48h": 48,
+    "5d": 120
+  },
+  "robust_method": "IRLS-Huber (c=1.345), deterministic, not PnL-tuned",
+  "generated_at": "2026-08-09T19:35:35.824751+00:00",
+  "elapsed_seconds": 56.29
+}

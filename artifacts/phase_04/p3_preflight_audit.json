@@ -1,0 +1,19 @@
+{
+  "phase3_commit": "11c6d77b3eccc670367e98e02ef77d92fc539a0f",
+  "input_panel_sha256": "a0da64a3b0cd8976b61e3f4e8defa55906098373efa1bcdf79dc2d628b8c6896",
+  "input_panel_file": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab\\capital-routing\\artifacts\\phase_03\\h1_strict_common_panel.parquet",
+  "actual_first_timestamp": "2023-07-03 00:00:00+00:00",
+  "actual_last_timestamp": "2026-05-21 18:00:00+00:00",
+  "panel_rows": 17273,
+  "coverage_report_discrepancy": {
+    "coverage_min_month": "2015-10",
+    "coverage_max_month": "2026-06",
+    "rows_before_canonical_window": 930,
+    "rows_with_valid_bars_zero": 568,
+    "pre_window_valid_bars_zero": 561,
+    "root_cause": "coverage_matrix.csv was generated over the master_h1 index, which spans the full union history (from 2015-10) of the accepted Phase 2 datasets.  Months before the canonical 2023 common research window therefore appear with valid_bars=0 because those symbols had no data in that range yet.  The data itself is unaffected."
+  },
+  "repair_performed": "For Phase 4 the report range is clipped to the canonical common window; a corrected canonical coverage is written under phase_04.  No valid H1 observation was altered, dropped or forward-filled.  The Phase 3 file is left untouched.",
+  "factor_research_remains_valid": true,
+  "canonical_cov_rows": 350
+}
