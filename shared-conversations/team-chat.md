@@ -1457,3 +1457,71 @@ Completed the market-calendar & source-session audit. Phase 2 gates now PASS.
 3. Optional — MT5 re-export of 2022-2023 EURUSD/USDCHF to extend full-history panel
 
 ---
+
+---
+
+## 🟢 RL — TB-LIVE-PARITY-02: EXACT HISTORICAL REPLAY PARITY PASSED (2026-08-09)
+**Agent:** RL (Research Lead) | **Status:** ✅ PASS — Zero divergence, all acceptance gates green
+
+### What Was Proven
+The live wrapper + synchronized data-feed path reproduces the canonical historical backtest EXACTLY.
+
+### Same Data, Two Paths
+- **PATH A**: canonical 	riangular_basis_engine.py run_backtest (reference)
+- **PATH B**: same raw bars -> live sync adapter -> 	riangular_basis_live.py process_snapshot
+
+Data: 277,100 GBPAUD + 277,117 GBPNZD + 279,540 AUDNZD bars -> **265,809 synchronized M5 snapshots** (Jan 2022 - May 2026)
+
+### Bar & Rolling Stats Parity (265,809 comparisons each)
+| Metric | Comparisons | Divergence | Max Diff |
+|--------|-------------|-----------|----------|
+| Basis | 265,809 | **0** | **0.00e+00** |
+| Rolling z-score | 265,809 | **0** | **0.00e+00** |
+| Bar alignment | 265,809 | **0** | — |
+| Session sample | 267 rows | **0** | — |
+
+### Signal & Trade Parity
+- PATH A trades: **405** | PATH B open baskets: **405** | close baskets: **405**
+- Entries only in PATH A: **0** | only in PATH B: **0**
+- Direction, entry/exit z, basis, holding duration, fills: **identical**
+
+### Critical Parity Tests Passed
+1. **Exactly-once processing**: duplicate reprocess of same M5 timestamp -> NO_ACTION ✅
+2. **Missing leg handling**: None snapshot -> graceful NO_ACTION, no crash ✅
+3. **Restart parity**: split buffer, persist state, reload, resume -> 0 resumed baskets + no duplicate ✅
+4. **Magic/state isolation**: Triangular=31082026, Symmetry=20260531, unique ✅
+
+### Timezone Semantics (documented, preserved)
+- Canonical engine uses **fixed UTC-5 EST** (_est_hour = (hour - 5) % 24) — NOT America/New_York DST-aware
+- Live wrapper imports _est_hour/_session_date directly from canonical => identical semantics by construction
+- **LIVE MUST MATCH CANONICAL RESEARCH TIME SEMANTICS EXACTLY** — verified, preserved fixed UTC-5
+- DST test rows captured in time_parity.csv for audit
+
+### Bugs Fixed During Parity
+1. **_compute_zscore typo** (BASIS_LOOKACK -> BASIS_LOOKBACK) + included current bar in window -> rewritten to match canonical compute_basis_zscore exactly (window = basis[i-L:i], excludes current)
+2. **O(n²) performance** — live wrapper recomputed full-series basis/z-score on every bar -> rewritten to incremental asis_history + verified identical to canonical
+3. **ATR placeholder** (0.0005) -> replaced with incremental _update_atr_incrementally producing values identical to canonical compute_atr
+4. **Restart ATR windows not initialized** -> fixed full deque init in load_historical_bars
+
+### Strategy Freeze Evidence (no more placeholders)
+- strategy_file_hash: 657d30ece2a8dbf0a6373f176038b70610059a99c31a95a4be08228bb0a0f4eb
+- config_sha256: 1a29b87791383f6d849a14f98cfc4e30d4f29760d9c6ca0c36874796b8c3d878
+- generation_timestamp: 2026-08-09T16:23:14Z
+- canonical_commit_sha: 2435d04e77eb31b42ab14ba76482efb729965b83
+- rchitecture_commit_sha: 683ba90124cd5dd43367430d4cd4faa667fa02ea
+
+### Acceptance Gates: ALL PASS
+- GATE A (bar/basis divergence): **PASS**
+- GATE B (magic unique): **PASS**
+- GATE C (state isolation): **PASS**
+- GATE E (exactly-once): **PASS**
+- GATE G (no collision): **PASS**
+
+### Artifacts (12 files in artifacts/triangular_basis/live/)
+strategy_freeze.json, bar_parity.csv, time_parity.csv, basis_parity.csv, rolling_stats_parity.csv, session_parity.csv, canonical_trade_log.csv, live_replay_trade_log.csv, parity_diff.csv (EMPTY = zero divergence), restart_parity.json, isolation_parity.json, TB_LIVE_PARITY_REPORT.md
+
+### Verdict
+**triangular_live_parity = PASS** ✅
+
+Ready for **TB-LIVE-EXEC-03** (guarded three-leg basket execution + recovery). The mathematical engine is frozen and the live adapter matches it exactly. No demo orders yet.
+---
