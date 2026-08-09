@@ -1,0 +1,26 @@
+{
+  "timestamp": "2026-08-09T01:41:02.180101Z",
+  "commit": "88c8f4af4",
+  "files": {
+    "quant-lab/engines/mt5_data_feed.py": {
+      "sha256": "0b763427287c85045d03cf761d3c03d4096fa66b8fca0803ddf92af0015f5fa6",
+      "size": 8137
+    },
+    "quant-lab/engines/symmetry_trap_live.py": {
+      "sha256": "839d5207dd80f0974b287c2d12dc59bb7ef6b1c3884fe376a5bf55a32fcbefda",
+      "size": 9167
+    },
+    "quant-lab/mt5/execution_layer.py": {
+      "sha256": "4386ceb62848724add4ae7e8535c24e758268f0063c1b57ec6d3908539e908bc",
+      "size": 12044
+    },
+    "quant-lab/mt5/symmetry_trap_executor_multi.py": {
+      "sha256": "67c5415583a2afe34aaf4b121f2acc0b794c4423ffab6417538d3fae72caec33",
+      "size": 12552
+    },
+    "quant-lab/engines/symmetry_trap_backtest.py": {
+      "sha256": "88815e913c3cbf46cedb9238fa0220ed176f8a89a2194422fdb9fa3db96a4be0",
+      "size": 25604
+    }
+  }
+}

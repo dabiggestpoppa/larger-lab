@@ -1,0 +1,2 @@
+bar_index,type,field,canonical_value,live_value,event_type,canonical_event,live_event
+0,EVENT_TYPE_MISMATCH,,,,,session_init,bar_processed
