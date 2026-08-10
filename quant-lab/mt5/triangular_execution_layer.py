@@ -60,8 +60,10 @@ from engines.triangular_execution_contract import (  # noqa: E402
     ContractSpec,
     AccountSpec,
     model_weight_to_notional,
-    notional_to_mt5_lots,
-)
+    notional_to_mt5_lots,    compute_currency_exposure,
+    assess_basket_neutrality,
+    lot_translation_has_min_lot_distortion,
+    MIN_LOT_HEDGE_DISTORTION,)
 from engines.triangular_basis_engine import Direction  # noqa: E402
 
 
@@ -195,7 +197,9 @@ class TriangularExecutionLayer:
                  contract_specs: Dict[str, ContractSpec] = None,
                  basket_notional_usd: float = 1000.0,
                  max_weight_error_pct: float = 10.0,
-                 max_residual_exposure_pct: float = 10.0):
+                 max_residual_exposure_pct: float = 10.0,
+                 cur_to_usd: Dict[str, float] = None,
+                 reject_on_min_lot_distortion: bool = True):
         self.magic_number = magic_number
         self.strategy_id = strategy_id
         self.account = account_spec or AccountSpec(balance=0.0, equity=0.0)
@@ -203,6 +207,12 @@ class TriangularExecutionLayer:
         self.basket_notional_usd = basket_notional_usd
         self.max_weight_error_pct = max_weight_error_pct
         self.max_residual_exposure_pct = max_residual_exposure_pct
+        # Real conversion rates: currency -> account (USD). Critical for
+        # computing TRUE market-neutral exposure (GATE K).
+        self.cur_to_usd = cur_to_usd or {}
+        # Policy #7: if requested lots < volume_min and the min-lot clamp
+        # breaks the hedge, REJECT rather than silently accept.
+        self.reject_on_min_lot_distortion = reject_on_min_lot_distortion
 
         self._active_baskets: Dict[str, dict] = {}
         self.max_retries = 2
@@ -377,6 +387,41 @@ class TriangularExecutionLayer:
                 verified[sym] = rec
         return verified
 
+    # ── NEUTRALITY PREFLIGHT (GATE K) ──────────────────────────────────
+    def _neutrality_preflight(self, sized_legs: List[BrokerLegIntent],
+                              prices: Dict[str, Tuple[float, float]]) -> dict:
+        """Assess REAL USD-normalized currency neutrality of the sized basket.
+
+        Uses custom contract specs AND real conversion rates. Fails the basket
+        if the currency residual (GATE K) is above configured threshold, or if
+        a min-lot clamp breaks the hedge (policy #7).
+
+        Returns dict {"ok": bool, "assessment": {...}, "reason": str}.
+        """
+        entry_prices = {}
+        for leg in sized_legs:
+            bid, ask = prices.get(leg.canonical_symbol,
+                                  (leg.signal_reference_price, leg.signal_reference_price))
+            entry_prices[leg.canonical_symbol] = ask if leg.side == Direction.LONG else bid
+
+        contracts = {}
+        for leg in sized_legs:
+            c = self._get_contract(leg.broker_symbol)
+            if c is not None:
+                contracts[leg.broker_symbol] = c
+
+        assessment = assess_basket_neutrality(
+            sized_legs, entry_prices, contracts, self.cur_to_usd,
+            self.max_residual_exposure_pct, self.max_weight_error_pct)
+
+        # GATE K: actual residual <= configured threshold. reject_reason already
+        # folds in MIN_LOT_HEDGE_DISTORTION when a min-lot clamp breaks the hedge
+        # (spec #7: requested < volume_min AND clamp distorts above tolerance).
+        if not assessment["passed_gate_k"] or assessment["reject_reason"]:
+            reason = assessment["reject_reason"] or "CURRENCY_RESIDUAL_OVER_THRESHOLD"
+            return {"ok": False, "assessment": assessment, "reason": reason}
+        return {"ok": True, "assessment": assessment, "reason": ""}
+
     # ── OPEN BASKET ──────────────────────────────────────────────────────
     def open_basket(self, intent: BasketExecutionIntent) -> BasketExecutionResult:
         """Execute a three-leg basket with truthful fill verification."""
@@ -394,9 +439,19 @@ class TriangularExecutionLayer:
         prices = self._get_current_prices(intent)
         sized_legs = self._size_legs(intent, prices)
 
-        # 2) Pre-check ALL three before sending any
+        # 1b) NEUTRALITY PREFLIGHT (GATE K) — REAL market neutrality, derived
+        #     from the execution contract, not a documentation-only boolean.
         state = BasketState.PRECHECK
         self._active_baskets[basket_id]["state"] = state
+        gate = self._neutrality_preflight(sized_legs, prices)
+        if not gate["ok"]:
+            self._active_baskets[basket_id]["state"] = BasketState.ABORTED_PRECHECK
+            self._active_baskets[basket_id]["neutrality"] = gate["assessment"]
+            return self._result(basket_id, False, BasketState.ABORTED_PRECHECK,
+                                error_message="Neutrality preflight: " + gate["reason"],
+                                t_start=t_start)
+
+        # 2) Pre-check ALL three before sending any
         ok, errors = self._precheck_all_three(intent, sized_legs)
         if not ok:
             self._active_baskets[basket_id]["state"] = BasketState.ABORTED_PRECHECK
@@ -613,45 +668,154 @@ class TriangularExecutionLayer:
                                 records=records,
                                 error_message=f"Partial close {closed}/3; remaining pos={remaining} orders={remaining_orders}")
 
-    # ── RECONCILE / RESTART ─────────────────────────────────────────────
-    def reconcile_open_baskets(self) -> Dict[str, BasketState]:
-        """On startup/restart: match magic+basket ids to recover tickets.
+    # ── RECONCILE / RESTART (GATE F) ────────────────────────────────────
+    def _broker_positions(self) -> list:
+        """Return the current broker's strategy-owned positions (broker-agnostic).
 
-        Returns mapping basket_id -> recovery state.
+        Real MT5: mt5.positions_get() filtered by magic.
+        Simulator: MockExecutionLayer overrides this with its FakeBroker.
         """
         if mt5 is None:
-            return {}
-        positions = mt5.positions_get() or []
-        owned = [p for p in positions if p.magic == self.magic_number]
-        # group by comment basket id
+            return getattr(self, "_sim_positions", [])
+        return [p for p in (mt5.positions_get() or []) if p.magic == self.magic_number]
+
+    def _set_sim_positions(self, positions: list):
+        """Simulator hook: inject broker positions directly."""
+        self._sim_positions = list(positions)
+
+    def _extract_basket_id(self, comment: str) -> Optional[str]:
+        """Recover the basket id token from a position comment.
+
+        Comment format (set in _build_market_order):
+            "TB|<basket_id>|<canonical_symbol>|<leg_id>"
+        e.g. "TB|TB_20220914_152000_ab12cd34|GBPAUD|L1"
+        So the basket id is the token right after the leading "TB|".
+        """
+        if not comment:
+            return None
+        tokens = [t.strip() for t in comment.split("|")]
+        if len(tokens) >= 2 and tokens[0] == "TB" and tokens[1]:
+            return tokens[1]
+        # fallback scan
+        for token in tokens:
+            if token.startswith("TB") and token != "TB" and len(token) > 16:
+                return token
+        return None
+
+    def reconcile_open_baskets(self) -> Dict[str, BasketExecutionResult]:
+        """On startup/restart: recover fully-filled strategy baskets from broker
+        truth and resume them WITHOUT sending any new orders (GATE F, scenario A).
+
+        Returns mapping basket_id -> recovered result. A basket is recovered
+        ONLY when ALL of its expected legs (by basket id) are present as broker
+        positions. Partial baskets are left for `recover_partial_basket`.
+        """
+        recovered = {}
+        positions = self._broker_positions()
+
+        # group broker positions by basket id extracted from comment
         by_basket = defaultdict(list)
-        for p in owned:
-            c = p.comment or ""
-            for token in c.split("|"):
-                if token.startswith("TB") and len(token) > 16:
-                    by_basket[token].append(p)
-        # For each recovered basket, rebuild record + mark OPEN
+        for p in positions:
+            bid = self._extract_basket_id(p.comment if hasattr(p, "comment") else "")
+            if bid:
+                by_basket[bid].append(p)
+            else:
+                # fallback: recover by magic alone (single open basket scenario)
+                by_basket["__magic_only__"].append(p)
+
         for bid, poss in by_basket.items():
+            # Skip magic-only group unless it's the sole strategy position set.
+            if bid == "__magic_only__" and len(by_basket) > 1:
+                continue
+            # Only recover as a full basket when we see EXACTLY 3 positions.
+            # (One basket per strategy at a time, max_concurrent_baskets=1.)
+            if len(poss) != 3:
+                continue
             recs = []
             for p in poss:
                 recs.append(LegExecutionRecord(
-                    canonical_symbol=p.symbol.split(".")[0],
-                    broker_symbol=p.symbol,
-                    side="LONG" if p.type == mt5.POSITION_TYPE_BUY else "SHORT",
+                    canonical_symbol=(p.symbol.split(".")[0] if hasattr(p, "symbol") else "?"),
+                    broker_symbol=getattr(p, "symbol", "?"),
+                    side="LONG" if getattr(p, "type", 0) == 0 else "SHORT",
                     leg_id="L?", basket_id=bid, magic=self.magic_number,
-                    model_weight=0.0, requested_lots=0.0, rounded_lots=p.volume,
-                    signal_reference_price=p.price_open, position_ticket=p.ticket,
-                    fill_price=p.price_open, fill_volume=p.volume,
+                    model_weight=0.0, requested_lots=0.0,
+                    rounded_lots=getattr(p, "volume", 0.0),
+                    signal_reference_price=getattr(p, "price_open", 0.0),
+                    position_ticket=getattr(p, "ticket", 0),
+                    fill_price=getattr(p, "price_open", 0.0),
+                    fill_volume=getattr(p, "volume", 0.0),
                     status="open", fill_status="verified",
                 ))
             self._active_baskets[bid] = {
                 "state": BasketState.OPEN, "records": recs, "recovered": True,
             }
-        return {b: d["state"] for b, d in self._active_baskets.items()}
+            recovered[bid] = BasketExecutionResult(
+                success=True, basket_id=bid, state=BasketState.OPEN,
+                legs=recs, error_message="recovered_after_restart_no_new_orders",
+            )
+        return recovered
+
+    def recover_partial_basket(self) -> List[dict]:
+        """Detect + resolve a partial basket after restart (GATE F, scenario B).
+
+        A partial basket exists when strategy-owned broker positions are present
+        but fewer than 3 per basket id (or ungroupable by id). The safe action is
+        to FLATTEN the owned exposure and verify flat -> ABORTED_FLAT. This never
+        opens a NEW basket, so duplicate orders = 0.
+
+        Returns list of {basket_id, action, state} records.
+        """
+        outcomes = []
+        positions = self._broker_positions()
+        cur = self.get_active_baskets()
+
+        # Identify ungrouped owned positions (partial / orphan).
+        by_basket = defaultdict(list)
+        for p in positions:
+            bid = self._extract_basket_id(getattr(p, "comment", ""))
+            by_basket[bid if bid else "__orphan__"].append(p)
+
+        for bid, poss in by_basket.items():
+            # A full basket (3) already reconciled; skip.
+            if bid != "__orphan__" and len(poss) == 3 and bid in cur:
+                continue
+            # Partial / orphan: flatten owned and verify flat.
+            recs = []
+            for p in poss:
+                recs.append(LegExecutionRecord(
+                    canonical_symbol=(p.symbol.split(".")[0] if hasattr(p, "symbol") else "?"),
+                    broker_symbol=getattr(p, "symbol", "?"),
+                    side="LONG" if getattr(p, "type", 0) == 0 else "SHORT",
+                    leg_id="L?", basket_id=bid if bid != "__orphan__" else "",
+                    magic=self.magic_number,
+                    model_weight=0.0, requested_lots=0.0,
+                    rounded_lots=getattr(p, "volume", 0.0),
+                    signal_reference_price=getattr(p, "price_open", 0.0),
+                    position_ticket=getattr(p, "ticket", 0),
+                    fill_price=getattr(p, "price_open", 0.0),
+                    fill_volume=getattr(p, "volume", 0.0),
+                    status="filled", fill_status="verified",
+                ))
+                self._close_single(bid, recs[-1])
+
+            # Verify flat.
+            remaining = len(self._broker_positions())
+            if remaining == 0:
+                state = BasketState.ABORTED_FLAT
+            else:
+                state = BasketState.BROKEN_HEDGE_UNRESOLVED
+            outcomes.append({
+                "basket_id": bid if bid != "__orphan__" else "orphan",
+                "positions_flattened": len(poss),
+                "remaining": remaining,
+                "state": state.value,
+                "duplicate_orders": 0,
+            })
+        return outcomes
 
     def detect_orphan_partial(self) -> List[str]:
         """Detect partial baskets (leg1 filled, others not) after restart."""
-        return []
+        return [o["basket_id"] for o in self.recover_partial_basket()]
 
     # ── SIMULATOR HOOKS ─────────────────────────────────────────────────
     def _simulator_flattened(self, basket_id: str, records):
