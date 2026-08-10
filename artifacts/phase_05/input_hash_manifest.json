@@ -1,0 +1,30 @@
+{
+  "phase": "5",
+  "task": "CR-P5-ROUTING-EVENT-ENGINE-01",
+  "phase4_seal_commit": "71b8188dd9a83c78e51ea5f8e6028c8066d95079",
+  "phase4_engine_commit": "f54ffff8b6041242e707d332075dea1c7b96f0d1",
+  "inputs": {
+    "currency_factors_h1.parquet": {
+      "sha256": "04ec94e515287f96d98c5093926410c062cf9971c1703b78752851a7b5064c2d",
+      "rows": 17272,
+      "first_ts": "2023-07-03 01:00:00+00:00",
+      "last_ts": "2026-05-21 18:00:00+00:00"
+    },
+    "pair_residuals_h1.parquet": {
+      "sha256": "ea5edc04eefcbc9d4771ad8bcca4b88e14d63c9b45a51f0320548c9491ec44c8",
+      "rows": 17272,
+      "first_ts": "2023-07-03 01:00:00+00:00",
+      "last_ts": "2026-05-21 18:00:00+00:00"
+    },
+    "factor_features_h1.parquet": {
+      "sha256": "0c464199988ddf68635ae7311977a3315f4dbf9f6db48e669cc90f8d14cc7302",
+      "rows": 17272,
+      "first_ts": "2023-07-03 01:00:00+00:00",
+      "last_ts": "2026-05-21 18:00:00+00:00"
+    }
+  },
+  "canonical_h1_rows": 17272,
+  "window_start": "2023-07-03 01:00:00+00:00",
+  "window_end": "2026-05-21 18:00:00+00:00",
+  "note": "Input hashes frozen at Phase 4 seal. Mismatch => refused."
+}

@@ -1,0 +1,78 @@
+{
+  "phase": "5",
+  "task": "CR-P5-ROUTING-EVENT-ENGINE-01",
+  "method": "prefix-invariance: event state at T from data<=T equals full-data state",
+  "timestamps_checked": [
+    "2024-05-13 18:00:00+00:00",
+    "2024-12-09 06:00:00+00:00",
+    "2025-07-09 05:00:00+00:00"
+  ],
+  "aspects_checked": [
+    "origin_status",
+    "severity",
+    "bridge_candidate",
+    "parking_candidate",
+    "destination_rank",
+    "residual_shock",
+    "network_dislocation"
+  ],
+  "rows": [
+    {
+      "timestamp": "2024-05-13 18:00:00+00:00",
+      "passes": true,
+      "full_state": {
+        "EUR_origin_active": false,
+        "GBP_origin_active": false,
+        "USD_origin_active": false,
+        "CHF_origin_active": true,
+        "CHF_dest1": "JPY",
+        "JPY_origin_active": false
+      },
+      "truncated_state": {
+        "EUR_origin_active": false,
+        "GBP_origin_active": false,
+        "USD_origin_active": false,
+        "CHF_origin_active": true,
+        "CHF_dest1": "JPY",
+        "JPY_origin_active": false
+      }
+    },
+    {
+      "timestamp": "2024-12-09 06:00:00+00:00",
+      "passes": true,
+      "full_state": {
+        "EUR_origin_active": false,
+        "GBP_origin_active": false,
+        "USD_origin_active": false,
+        "CHF_origin_active": false,
+        "JPY_origin_active": false
+      },
+      "truncated_state": {
+        "EUR_origin_active": false,
+        "GBP_origin_active": false,
+        "USD_origin_active": false,
+        "CHF_origin_active": false,
+        "JPY_origin_active": false
+      }
+    },
+    {
+      "timestamp": "2025-07-09 05:00:00+00:00",
+      "passes": true,
+      "full_state": {
+        "EUR_origin_active": false,
+        "GBP_origin_active": false,
+        "USD_origin_active": false,
+        "CHF_origin_active": false,
+        "JPY_origin_active": false
+      },
+      "truncated_state": {
+        "EUR_origin_active": false,
+        "GBP_origin_active": false,
+        "USD_origin_active": false,
+        "CHF_origin_active": false,
+        "JPY_origin_active": false
+      }
+    }
+  ],
+  "passes": true
+}

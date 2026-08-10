@@ -1,0 +1,17 @@
+session,year,count
+Asia,2023,260
+Asia,2024,648
+Asia,2025,731
+Asia,2026,294
+London,2023,488
+London,2024,938
+London,2025,824
+London,2026,313
+NY_Late,2023,254
+NY_Late,2024,510
+NY_Late,2025,720
+NY_Late,2026,242
+NY_Overlap,2023,343
+NY_Overlap,2024,680
+NY_Overlap,2025,630
+NY_Overlap,2026,201

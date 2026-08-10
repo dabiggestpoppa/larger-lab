@@ -1,0 +1,37 @@
+{
+  "phase": "5",
+  "task": "CR-P5-ROUTING-EVENT-ENGINE-01",
+  "statistical_method": "trailing rolling percentiles / MAD / z-score over a fixed run_length. Fixed from statistical logic, NOT chosen using future returns.",
+  "run_length_h1": 120,
+  "origin_factor_p95_threshold": 0.005051920266884771,
+  "residual_p95_threshold": 0.005019452046280365,
+  "network_dispersion_z_threshold": 2.0,
+  "network_rmse_p95": 0.0008732331983665064,
+  "severity_buckets": {
+    "LOW": [
+      0.0,
+      1.0
+    ],
+    "MEDIUM": [
+      1.0,
+      1.5
+    ],
+    "HIGH": [
+      1.5,
+      2.0
+    ],
+    "EXTREME": [
+      2.0,
+      Infinity
+    ]
+  },
+  "hysteresis": {
+    "entry_percentile": 0.95,
+    "reset_percentile": 0.8
+  },
+  "sample_size": {
+    "ADEQUATE_SAMPLE": 50,
+    "THIN_SAMPLE": 20,
+    "INSUFFICIENT_SAMPLE": 5
+  }
+}
