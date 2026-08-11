@@ -1,0 +1,34 @@
+{
+  "configured_max_residual_pct": 10.0,
+  "metric_gate": "max_currency_residual_pct <= configured_max_residual_pct",
+  "L1_residual_pct": "kept as supplementary metric",
+  "demo_basket_notional_usd": null,
+  "median_residual_pct": 34.9275,
+  "max_residual_pct": 72.4727,
+  "rule": "requested < volume_min AND clamp breaks hedge => REJECT (MIN_LOT_HEDGE_DISTORTION)",
+  "cur_to_usd_used": {
+    "GBP": 1.34852,
+    "AUD": 0.70583,
+    "NZD": 0.58844
+  },
+  "contract_specs_used": {
+    "GBPAUD.PRO": {
+      "contract_size": 100000.0,
+      "volume_min": 0.01,
+      "volume_step": 0.01,
+      "volume_max": 200.0
+    },
+    "GBPNZD.PRO": {
+      "contract_size": 100000.0,
+      "volume_min": 0.01,
+      "volume_step": 0.01,
+      "volume_max": 200.0
+    },
+    "AUDNZD.PRO": {
+      "contract_size": 100000.0,
+      "volume_min": 0.01,
+      "volume_step": 0.01,
+      "volume_max": 200.0
+    }
+  }
+}

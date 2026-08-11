@@ -1,4 +1,16 @@
 {
-  "restart_while_open": "query MT5 first, match magic+basket_id, recover tickets, resume; do NOT open new basket",
-  "restart_during_partial": "detect orphan partial -> BROKEN_HEDGE -> flatten owned -> verify flat -> halt"
+  "gate": "F",
+  "recovered_baskets": {},
+  "partial_resolutions": [],
+  "foreign_symmetry_positions_before": [],
+  "foreign_symmetry_positions_after": [],
+  "foreign_touched": [],
+  "foreign_positions_closed": 0,
+  "foreign_orders_cancelled": 0,
+  "foreign_positions_modified": 0,
+  "orders_before": 0,
+  "orders_after": 0,
+  "duplicate_orders": 0,
+  "gate_d_foreign_untouched": true,
+  "note": "reconcile/recover NEVER sends orders; ran against real broker truth"
 }

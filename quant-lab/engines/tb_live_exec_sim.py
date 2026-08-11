@@ -302,6 +302,10 @@ class MockExecutionLayer(TriangularExecutionLayer):
     def _count_owned_orders(self, basket_id):
         return 0
 
+    # Route broker-truth position queries to the FakeBroker (GATE F restart).
+    def _broker_positions(self):
+        return [p for p in self._broker.positions if p.magic == self.magic_number]
+
 
 def make_intent(basket_id="TB_TEST_001", direction=Direction.SHORT,
                 weights=None, notional=1000.0):
@@ -327,6 +331,13 @@ def make_intent(basket_id="TB_TEST_001", direction=Direction.SHORT,
     )
 
 
+# TB-LIVE-EXEC-REPAIR-03B: larger default notional so GATE K passes and
+# min-lot distortion does not reject the all_success scenario.
+SALIENT_NOTIONAL = 25000.0
+# Realistic conversion rates (AUDUSD/NZDUSD/GBPUSD for this demo).
+DEFAULT_CUR_TO_USD = {"GBP": 1.27, "AUD": 0.66, "NZD": 0.61}
+
+
 def run_scenarios():
     """Run all execution scenarios and return a results matrix."""
     results = []
@@ -340,8 +351,9 @@ def run_scenarios():
         broker = FakeBroker(profile)
         layer = MockExecutionLayer(broker, magic_number=31082026,
                                    contract_specs=contracts,
-                                   basket_notional_usd=1000.0)
-        intent = make_intent(basket_id=f"TB_{name}")
+                                   basket_notional_usd=SALIENT_NOTIONAL,
+                                   cur_to_usd=dict(DEFAULT_CUR_TO_USD))
+        intent = make_intent(basket_id=f"TB_{name}", notional=SALIENT_NOTIONAL)
         res = layer.open_basket(intent)
         resdict = res.to_dict()
         # GATE I: no OPEN from PLACED-only
@@ -421,8 +433,8 @@ def main():
         "GBPAUD.PRO": ContractSpec(100000,0.01,100,0.01,0.0001,5),
         "GBPNZD.PRO": ContractSpec(100000,0.01,100,0.01,0.0001,5),
         "AUDNZD.PRO": ContractSpec(100000,0.01,100,0.01,0.0001,5),
-    })
-    intent = make_intent("TB_CLOSE3")
+    }, basket_notional_usd=SALIENT_NOTIONAL, cur_to_usd=dict(DEFAULT_CUR_TO_USD))
+    intent = make_intent("TB_CLOSE3", notional=SALIENT_NOTIONAL)
     open_res = layer.open_basket(intent)
     print(f"  open -> {open_res.state.value}")
     close_res = layer.close_basket("TB_CLOSE3", intent)
@@ -437,8 +449,8 @@ def main():
         "GBPAUD.PRO": ContractSpec(100000,0.01,100,0.01,0.0001,5),
         "GBPNZD.PRO": ContractSpec(100000,0.01,100,0.01,0.0001,5),
         "AUDNZD.PRO": ContractSpec(100000,0.01,100,0.01,0.0001,5),
-    })
-    intent2 = make_intent("TB_ISOL")
+    }, basket_notional_usd=SALIENT_NOTIONAL, cur_to_usd=dict(DEFAULT_CUR_TO_USD))
+    intent2 = make_intent("TB_ISOL", notional=SALIENT_NOTIONAL)
     open2 = layer2.open_basket(intent2)
     # after open, our positions only (foreign untouched)
     foreign_before = len([p for p in broker2.positions if p.magic == 20260531])

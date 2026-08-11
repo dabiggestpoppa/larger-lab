@@ -1,0 +1,76 @@
+{
+  "title": "TB-LIVE-EXEC-SEAL-03B execution gate summary (REAL BROKER)",
+  "timestamp": "2026-08-10T04:15:07.738658",
+  "account": {
+    "login": 1114712,
+    "server": "OxSecurities-Demo",
+    "currency": "USD",
+    "balance": 281.28,
+    "equity": 281.28,
+    "leverage": 500,
+    "trade_mode": 0
+  },
+  "data_source": "live MT5 demo broker (no mocks)",
+  "gates": {
+    "J": {
+      "gate": "J",
+      "passed": true,
+      "message": "weights translate deterministically (real economics)"
+    },
+    "K": {
+      "gate": "K",
+      "passed": false,
+      "configured_max_residual_pct": 10.0,
+      "median_residual_pct": 34.9275,
+      "max_residual_pct": 72.4727
+    },
+    "M": {
+      "gate": "M",
+      "passed": true,
+      "legs": [
+        {
+          "symbol": "GBPAUD.PRO",
+          "volume": 0.03,
+          "direction": "SELL",
+          "order_check_retcode": 0,
+          "order_check_done": true,
+          "comment": "Done"
+        },
+        {
+          "symbol": "GBPNZD.PRO",
+          "volume": 0.02,
+          "direction": "BUY",
+          "order_check_retcode": 0,
+          "order_check_done": true,
+          "comment": "Done"
+        },
+        {
+          "symbol": "AUDNZD.PRO",
+          "volume": 0.11,
+          "direction": "SELL",
+          "order_check_retcode": 0,
+          "order_check_done": true,
+          "comment": "Done"
+        }
+      ]
+    },
+    "F": {
+      "gate": "F",
+      "passed": true
+    },
+    "D": {
+      "gate": "D",
+      "passed": true,
+      "foreign_symmetry_positions": []
+    }
+  },
+  "overall": false,
+  "notes": [
+    "E (partial recovers flat/halt) \u2014 exercised live by recover_partial_basket()",
+    "I (PLACED-only cannot OPEN) \u2014 retained from EXEC-03 execution layer",
+    "L (CLOSED only after broker confirms flat) \u2014 retained live close path",
+    "M \u2014 REAL mt5.order_check() preflight on 3 legs, no order_send",
+    "D/F \u2014 REAL mt5.positions_get()/orders_get() broker truth",
+    "No demo orders were sent during this seal."
+  ]
+}
