@@ -1,0 +1,229 @@
+{
+  "candidates": [
+    {
+      "notional": 500,
+      "baskets_passed": 0,
+      "baskets_total": 405,
+      "pass_rate_pct": 0.0,
+      "failures": [
+        {
+          "entry_time": "2022-09-14 15:20:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        },
+        {
+          "entry_time": "2022-09-19 12:50:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        },
+        {
+          "entry_time": "2022-09-20 10:45:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        },
+        {
+          "entry_time": "2022-09-21 09:55:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        },
+        {
+          "entry_time": "2022-09-22 15:55:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        }
+      ],
+      "failure_count": 405,
+      "max_residual_pct": 18.8885,
+      "median_residual_pct": 18.8885
+    },
+    {
+      "notional": 1000,
+      "baskets_passed": 0,
+      "baskets_total": 405,
+      "pass_rate_pct": 0.0,
+      "failures": [
+        {
+          "entry_time": "2022-09-14 15:20:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        },
+        {
+          "entry_time": "2022-09-19 12:50:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        },
+        {
+          "entry_time": "2022-09-20 10:45:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        },
+        {
+          "entry_time": "2022-09-21 09:55:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        },
+        {
+          "entry_time": "2022-09-22 15:55:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        }
+      ],
+      "failure_count": 405,
+      "max_residual_pct": 18.8885,
+      "median_residual_pct": 18.8885
+    },
+    {
+      "notional": 2500,
+      "baskets_passed": 0,
+      "baskets_total": 405,
+      "pass_rate_pct": 0.0,
+      "failures": [
+        {
+          "entry_time": "2022-09-14 15:20:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        },
+        {
+          "entry_time": "2022-09-19 12:50:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        },
+        {
+          "entry_time": "2022-09-20 10:45:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        },
+        {
+          "entry_time": "2022-09-21 09:55:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        },
+        {
+          "entry_time": "2022-09-22 15:55:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        }
+      ],
+      "failure_count": 405,
+      "max_residual_pct": 18.8885,
+      "median_residual_pct": 18.8885
+    },
+    {
+      "notional": 5000,
+      "baskets_passed": 4,
+      "baskets_total": 405,
+      "pass_rate_pct": 0.99,
+      "failures": [
+        {
+          "entry_time": "2022-09-14 15:20:00",
+          "reason": "WEIGHT_ERROR_OVER_TOLERANCE"
+        },
+        {
+          "entry_time": "2022-09-19 12:50:00",
+          "reason": "WEIGHT_ERROR_OVER_TOLERANCE"
+        },
+        {
+          "entry_time": "2022-09-20 10:45:00",
+          "reason": "WEIGHT_ERROR_OVER_TOLERANCE"
+        },
+        {
+          "entry_time": "2022-09-21 09:55:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        },
+        {
+          "entry_time": "2022-09-22 15:55:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        }
+      ],
+      "failure_count": 401,
+      "max_residual_pct": 18.8885,
+      "median_residual_pct": 1.5383
+    },
+    {
+      "notional": 10000,
+      "baskets_passed": 0,
+      "baskets_total": 405,
+      "pass_rate_pct": 0.0,
+      "failures": [
+        {
+          "entry_time": "2022-09-14 15:20:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        },
+        {
+          "entry_time": "2022-09-19 12:50:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        },
+        {
+          "entry_time": "2022-09-20 10:45:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        },
+        {
+          "entry_time": "2022-09-21 09:55:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        },
+        {
+          "entry_time": "2022-09-22 15:55:00",
+          "reason": "MIN_LOT_HEDGE_DISTORTION"
+        }
+      ],
+      "failure_count": 405,
+      "max_residual_pct": 47.034,
+      "median_residual_pct": 35.0244
+    },
+    {
+      "notional": 25000,
+      "baskets_passed": 1,
+      "baskets_total": 405,
+      "pass_rate_pct": 0.25,
+      "failures": [
+        {
+          "entry_time": "2022-09-14 15:20:00",
+          "reason": "CURRENCY_RESIDUAL_OVER_THRESHOLD"
+        },
+        {
+          "entry_time": "2022-09-19 12:50:00",
+          "reason": "CURRENCY_RESIDUAL_OVER_THRESHOLD"
+        },
+        {
+          "entry_time": "2022-09-20 10:45:00",
+          "reason": "CURRENCY_RESIDUAL_OVER_THRESHOLD"
+        },
+        {
+          "entry_time": "2022-09-21 09:55:00",
+          "reason": "CURRENCY_RESIDUAL_OVER_THRESHOLD"
+        },
+        {
+          "entry_time": "2022-09-22 15:55:00",
+          "reason": "CURRENCY_RESIDUAL_OVER_THRESHOLD"
+        }
+      ],
+      "failure_count": 404,
+      "max_residual_pct": 72.4727,
+      "median_residual_pct": 34.9275
+    },
+    {
+      "notional": 50000,
+      "baskets_passed": 3,
+      "baskets_total": 405,
+      "pass_rate_pct": 0.74,
+      "failures": [
+        {
+          "entry_time": "2022-09-14 15:20:00",
+          "reason": "CURRENCY_RESIDUAL_OVER_THRESHOLD"
+        },
+        {
+          "entry_time": "2022-09-19 12:50:00",
+          "reason": "CURRENCY_RESIDUAL_OVER_THRESHOLD"
+        },
+        {
+          "entry_time": "2022-09-20 10:45:00",
+          "reason": "CURRENCY_RESIDUAL_OVER_THRESHOLD"
+        },
+        {
+          "entry_time": "2022-09-21 09:55:00",
+          "reason": "CURRENCY_RESIDUAL_OVER_THRESHOLD"
+        },
+        {
+          "entry_time": "2022-09-22 15:55:00",
+          "reason": "CURRENCY_RESIDUAL_OVER_THRESHOLD"
+        }
+      ],
+      "failure_count": 402,
+      "max_residual_pct": 72.4727,
+      "median_residual_pct": 30.549
+    }
+  ],
+  "demo_basket_notional_usd": null,
+  "found": false,
+  "margin_check": {
+    "balance": 281.28,
+    "leverage": 500,
+    "est_basket_margin_usd": null,
+    "affordable": false
+  }
+}

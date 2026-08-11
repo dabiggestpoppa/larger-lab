@@ -1,0 +1,11 @@
+{
+  "gate": "D",
+  "symmetry_magic": 20260531,
+  "triangular_magic": 31082026,
+  "foreign_positions_closed": 0,
+  "foreign_orders_cancelled": 0,
+  "foreign_positions_modified": 0,
+  "foreign_symmetry_positions": [],
+  "gate_d_foreign_untouched": true,
+  "duplicate_orders_from_restart": 0
+}
