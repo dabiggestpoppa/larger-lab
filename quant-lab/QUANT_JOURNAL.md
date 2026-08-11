@@ -6,7 +6,59 @@
 
 ---
 
-## 🚀 SYMMETRY TRAP LIVE ENGINE — PARITY LOCKED + READY FOR MONDAY (2026-08-09)
+## � EURCHF TRIANGULAR BASIS v1 — BACKTESTED: NOT READY (2026-08-09)
+**Status:** ❌ FAILED FAIL-FAST CHECK — daily frequency has no gross edge
+
+### Strategy Tested
+Market-neutral mean reversion on the EURUSD / USDCHF / EURCHF triangle:
+- Basis `B = ln(EURCHF) - ln(EURUSD) - ln(USDCHF)` (log no-arbitrage)
+- Robust median/MAD z-score (window 90, ×1.4826), gated by rolling half-life<25 and EURUSD↔USDCHF inverse corr<-0.50
+- Pos +1 = long basis (Long EURCHF / Short EURUSD / Short USDCHF); -1 = short basis
+- Entry z=±2.0, exit z=∓0.3, stop z=∓3.5, max hold 20 bars
+- Costs 6 bps per position change (12 bps round trip) — spec §6
+
+### Result (MT5 PRO D1, 2015-10-11 → 2026-06-11, 2,912 bars)
+| Metric | Value | Verdict |
+|--------|-------|---------|
+| Cum gross (10.7y) | +0.0080 | ≈ +0.24 bps/trade — NO edge |
+| Cum net @ 6bps | **-0.383** | all years 2016-2026 negative |
+| Ann Sharpe (net) | -6.08 | — |
+| Max DD (net) | -0.383 | monotone decline |
+| Gross win fraction (per held bar) | 52.4% | ~coin flip |
+| Avg \|Δbasis\| on held bars | 2.7 bps | too small vs 6-12bps cost |
+| Avg hold | 2.56 bars | short, but not profitable |
+| Cost drag | 0.391 | = ~49× total gross |
+
+### Data Quality (GOOD)
+- Identity residual `mean|EURCHF/(EURUSD·USDCHF)-1| ≈ 0.017%` → triangle internally consistent
+- Basis std ≈ 3 bps → no-arbitrage identity is tight, departures are tiny
+- Spec oracle `pos.shift(1)·Δbasis` reproduces engine gross exactly (+0.0080) ✅
+
+### Robustness Sweep (spec §10): uniformly negative
+- z_window{60,90,120}, entry_z{1.8..2.5}, exit_z{0,0.3,0.5}, stop_z{3,3.5,4},
+  max_hold{10..30}, max_half_life{15..30}, min_corr{-0.4,-0.6} → ALL negative
+- Only cost changes magnitude monotonically (-0.19→-0.64) → result is COST-DRIVEN,
+  not a parameter artifact. NOT overfit (opposite — no profitable neighborhood).
+
+### Why it fails (spec §9 fail-fast)
+Mean reversion is real but too weak at **daily** frequency: avg basis move per held
+bar ~2.7bps vs 6-12bps cost to act. Gross is essentially zero before costs.
+
+### Decision
+- ❌ **Do NOT forward-test the daily v1.**
+- ➡️ Follow-ons (research-only): **4H / M5** (higher freq = stronger MR) — engine,
+  tests + sweep harness left in place for a fast rerun; compare with the existing
+  GBPAUD/GBPNZD/AUDNZD triangular live engine which already trades a basis MR.
+- Revisit only when gross >> 12bps round-trip per trade.
+
+### Files
+- Engine: `quant-lab/engines/eurchf_triangular_basis.py` (canonical, runnable)
+- Tests: `quant-lab/tests/test_eurchf_triangular_basis.py` (8/8 passing)
+- Report: `quant-lab/reports/triangular_basis_eurchf_report.md`
+
+---
+
+## �🚀 SYMMETRY TRAP LIVE ENGINE — PARITY LOCKED + READY FOR MONDAY (2026-08-09)
 **Status:** ✅ PARITY PROVEN + LIVE ENGINE RUNNING
 
 ### ✅ 1:1 PARITY WITH CANONICAL BACKTEST

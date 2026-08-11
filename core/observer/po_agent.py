@@ -97,7 +97,7 @@ except ImportError:
 # ─── Model Configuration ────────────────────────────────────────────────────
 
 MODEL_CHAIN = [
-    "openrouter/owl-alpha",
+    "nvidia/nemotron-3-super",
     "minimax/minimax-m2.5",
     "inclusionai/ring-2.6-1t",
 ]
