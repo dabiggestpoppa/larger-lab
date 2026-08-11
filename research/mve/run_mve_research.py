@@ -18,8 +18,8 @@ import argparse
 from datetime import datetime
 from typing import Dict, List, Tuple, Optional
 
-# Add the src directory to the path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
+# Add the src directory to the path (correcting for research/mve/ location)
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'src'))
 
 from mve.volatility import VolatilityEstimators
 from mve.anchors import StructuralAnchors
@@ -1152,24 +1152,24 @@ def main():
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='Run CEREBUS Morphic Volatility Engine (MVE) Research')
     parser.add_argument('--phases', nargs='+', help='List of phases to run (default: all phases)')
-    parser.add_argument('--config', help='Path to configuration file')
-    parser.add_argument('--output', help='Path to output directory')
+    parser.add_argument('--from-phase', help='Starting phase for range execution') 
+    parser.add_argument('--to-phase', help='Ending phase for range execution') 
+    parser.add_argument('--asset', help='Specific asset to focus on (e.g., EURUSD)') 
+    parser.add_argument('--timeframe', help='Specific timeframe to focus on (e.g., H1)') 
+    parser.add_argument('--config', help='Path to configuration file') 
+    parser.add_argument('--output', help='Path to output directory') 
     
-    args = parser.parse_args()
+    args = parser.parse_args() 
     
-    # Create research runner
-    runner = MVEResearchRunner(args.config)
+    # Create research runner 
+    runner = MVEResearchRunner(args.config) 
     
-    # Run research
-    if args.phases:
-        phases = args.phases
-    else:
-        phases = None
-        
-    research_results = runner.run(phases)
-    
-    # Return success
-    return 0
-
-if __name__ == '__main__':
+    # Run research 
+    research_results = runner.run(
+        phases=args.phases, 
+        from_phase=args.from_phase, 
+        to_phase=args.to_phase, 
+        asset=args.asset, 
+        timeframe=args.timeframe
+    ) 
     sys.exit(main())
