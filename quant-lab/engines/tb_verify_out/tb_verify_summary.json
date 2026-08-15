@@ -1,0 +1,296 @@
+{
+ "integrity": {
+  "bars": 265809,
+  "trades": 405,
+  "miss_entry": 0,
+  "miss_exit": 0,
+  "max_basis_abs_diff": 4.2256779672622535e-16,
+  "max_pnl_gross_abs_diff_pips": 8.817835350782843e-12,
+  "max_pnl_gross_rel_diff_pct": 5.344141795760038e-10
+ },
+ "tb_a": {
+  "label": "TB-A canonical",
+  "trades": 405.0,
+  "wins": 286.0,
+  "losses": 119.0,
+  "win_rate_pct": 70.61728395061728,
+  "net_pips": 3539.8208714698812,
+  "expectancy_pips": 8.74029844807378,
+  "profit_factor": 2.873422734019585,
+  "avg_win_pips": 18.98361816309769,
+  "avg_loss_pips": -15.878100194756787,
+  "payoff_ratio": 1.195584983735422,
+  "max_dd_pips": -132.96268678784645,
+  "sharpe_ann": 6.927559543245227,
+  "sortino_ann": 10.262494198799411,
+  "total_R": 222.9373053483306,
+  "R_per_trade": 0.5504624823415569,
+  "mfe_avg_pips": 24.098433181382863,
+  "mae_avg_pips": -11.78523167653611,
+  "mfe_mae_ratio": 2.04479927444802,
+  "median_residual_pct": 34.838054070033905,
+  "p95_residual_pct": 57.17601750590533,
+  "max_residual_pct": 78.5884116891742,
+  "alpha_retention_pct": 100.0
+ },
+ "tb_b": {
+  "label": "TB-B exact-neutral",
+  "trades": 405.0,
+  "wins": 348.0,
+  "losses": 57.0,
+  "win_rate_pct": 85.92592592592592,
+  "net_pips": 7233.99460152173,
+  "expectancy_pips": 17.861715065485754,
+  "profit_factor": 12.415090161204672,
+  "avg_win_pips": 22.60838124889784,
+  "avg_loss_pips": -11.117931106924857,
+  "payoff_ratio": 2.0335061470938687,
+  "max_dd_pips": -35.429346968660866,
+  "sharpe_ann": 14.736516328783935,
+  "sortino_ann": 36.24970565665001,
+  "total_R": 650.6601391886663,
+  "R_per_trade": 1.6065682449102872,
+  "median_residual_pct": 0.0204550331434461,
+  "p95_residual_pct": 0.04901669861130272,
+  "max_residual_pct": 0.0722626604265364,
+  "alpha_retention_pct": 204.36047088783548,
+  "mfe_avg_pips": 31.035169702756964,
+  "mae_avg_pips": -9.125399598003481
+ },
+ "tb_c_sweep": [
+  {
+   "label": "TB-C eps=2.5%",
+   "trades": 405.0,
+   "wins": 346.0,
+   "losses": 59.0,
+   "win_rate_pct": 85.4320987654321,
+   "net_pips": 6989.074410786956,
+   "expectancy_pips": 17.256973853794953,
+   "profit_factor": 11.493769985257872,
+   "avg_win_pips": 22.12455410036252,
+   "avg_loss_pips": -11.288496744719911,
+   "payoff_ratio": 1.9599203154052443,
+   "max_dd_pips": -36.73444130432836,
+   "sharpe_ann": 14.485645222184262,
+   "sortino_ann": 34.57474274292631,
+   "total_R": 619.1324291302144,
+   "R_per_trade": 1.5287220472350973,
+   "median_residual_pct": 2.498067786048255,
+   "p95_residual_pct": 2.4996233686302816,
+   "max_residual_pct": 2.4998978141831203,
+   "alpha_retention_pct": 197.44147132181865,
+   "mfe_avg_pips": 30.440869543586405,
+   "mae_avg_pips": -9.159152768933076
+  },
+  {
+   "label": "TB-C eps=5.0%",
+   "trades": 405.0,
+   "wins": 345.0,
+   "losses": 60.0,
+   "win_rate_pct": 85.18518518518519,
+   "net_pips": 6745.427391205154,
+   "expectancy_pips": 16.65537627458063,
+   "profit_factor": 10.647904336363736,
+   "avg_win_pips": 21.5785137554157,
+   "avg_loss_pips": -11.652664240221043,
+   "payoff_ratio": 1.8518094498023887,
+   "max_dd_pips": -39.85788571179887,
+   "sharpe_ann": 14.214140503252533,
+   "sortino_ann": 33.02070593126505,
+   "total_R": 578.8742601818242,
+   "R_per_trade": 1.4293191609427758,
+   "median_residual_pct": 4.99782693699286,
+   "p95_residual_pct": 4.9995587325536635,
+   "max_residual_pct": 4.999961182113642,
+   "alpha_retention_pct": 190.5584388625906,
+   "mfe_avg_pips": 29.862915822227915,
+   "mae_avg_pips": -9.205102467314864
+  },
+  {
+   "label": "TB-C eps=7.5%",
+   "trades": 405.0,
+   "wins": 342.0,
+   "losses": 63.0,
+   "win_rate_pct": 84.44444444444444,
+   "net_pips": 6502.159703422659,
+   "expectancy_pips": 16.054715317092985,
+   "profit_factor": 9.800355144353288,
+   "avg_win_pips": 21.17254874217114,
+   "avg_loss_pips": -11.727808990474161,
+   "payoff_ratio": 1.8053285792229743,
+   "max_dd_pips": -43.4149599390978,
+   "sharpe_ann": 13.897360598720066,
+   "sortino_ann": 31.51870960981676,
+   "total_R": 554.4223740942573,
+   "R_per_trade": 1.3689441335660673,
+   "median_residual_pct": 7.497826984008695,
+   "p95_residual_pct": 7.499641579533411,
+   "max_residual_pct": 7.499974771596827,
+   "alpha_retention_pct": 183.68612253316343,
+   "mfe_avg_pips": 29.297307882109614,
+   "mae_avg_pips": -9.257391756804424
+  },
+  {
+   "label": "TB-C eps=10.0%",
+   "trades": 405.0,
+   "wins": 338.0,
+   "losses": 67.0,
+   "win_rate_pct": 83.4567901234568,
+   "net_pips": 6257.726570623739,
+   "expectancy_pips": 15.451176717589478,
+   "profit_factor": 8.972737614142401,
+   "avg_win_pips": 20.836145386534636,
+   "avg_loss_pips": -11.714784627238338,
+   "payoff_ratio": 1.7786195862353282,
+   "max_dd_pips": -46.97258907537446,
+   "sharpe_ann": 13.531435959063238,
+   "sortino_ann": 29.655416872021323,
+   "total_R": 534.1734201475409,
+   "R_per_trade": 1.3189467164136814,
+   "median_residual_pct": 9.997888082638207,
+   "p95_residual_pct": 9.99960575301903,
+   "max_residual_pct": 9.999953640223378,
+   "alpha_retention_pct": 176.78088236214253,
+   "mfe_avg_pips": 28.7387273295818,
+   "mae_avg_pips": -9.324865052842295
+  },
+  {
+   "label": "TB-C eps=15.0%",
+   "trades": 405.0,
+   "wins": 335.0,
+   "losses": 70.0,
+   "win_rate_pct": 82.71604938271605,
+   "net_pips": 5789.552846139828,
+   "expectancy_pips": 14.295192212690933,
+   "profit_factor": 7.531965198763728,
+   "avg_win_pips": 19.92804328765414,
+   "avg_loss_pips": -12.662023646061563,
+   "payoff_ratio": 1.57384347436854,
+   "max_dd_pips": -56.44331073226567,
+   "sharpe_ann": 12.720007404711938,
+   "sortino_ann": 26.75263781798573,
+   "total_R": 457.237563913461,
+   "R_per_trade": 1.1289816392924963,
+   "median_residual_pct": 14.997361097339681,
+   "p95_residual_pct": 14.999643160912084,
+   "max_residual_pct": 14.999975145324532,
+   "alpha_retention_pct": 163.5549666595351,
+   "mfe_avg_pips": 27.690074305556095,
+   "mae_avg_pips": -9.522748575264355
+  },
+  {
+   "label": "TB-C eps=20.0%",
+   "trades": 405.0,
+   "wins": 325.0,
+   "losses": 80.0,
+   "win_rate_pct": 80.24691358024691,
+   "net_pips": 5332.929997083941,
+   "expectancy_pips": 13.167728387861583,
+   "profit_factor": 6.324238375012197,
+   "avg_win_pips": 19.49096141559745,
+   "avg_loss_pips": -12.520405787315365,
+   "payoff_ratio": 1.5567356000030026,
+   "max_dd_pips": -61.853669420699134,
+   "sharpe_ann": 11.792994398596662,
+   "sortino_ann": 23.59289717365724,
+   "total_R": 425.93907000097573,
+   "R_per_trade": 1.0517014074098168,
+   "median_residual_pct": 19.997599296087483,
+   "p95_residual_pct": 19.99969219578352,
+   "max_residual_pct": 19.999943471515863,
+   "alpha_retention_pct": 150.65536338479995,
+   "mfe_avg_pips": 26.722288609297063,
+   "mae_avg_pips": -9.795297939406453
+  }
+ ],
+ "attribution": {
+  "sum_basis": 8036.669799619236,
+  "sum_rot_ga": -277.9121333836173,
+  "sum_rot_an": -89.12406644531816,
+  "sum_gross": 7670.82087146988,
+  "share_gross_basis_pct": 104.76935825095408,
+  "share_gross_rot_ga_pct": -3.622977749581628,
+  "share_gross_rot_an_pct": -1.161858267044114,
+  "share_abs_basis_pct": 76.04404923547872,
+  "share_abs_rot_ga_pct": 7.326862147816714,
+  "share_abs_rot_an_pct": 16.629088616704554,
+  "sum_eps": 1.187271679579873,
+  "regressions": {
+   "const": {
+    "beta": [
+     8.74029844807378
+    ],
+    "se": [
+     1.040904738475192
+    ],
+    "r2": 0.0,
+    "resid_std": 20.921926310222094
+   },
+   "delta_b": {
+    "beta": [
+     8.724216060796717,
+     -174.0293477100331
+    ],
+    "se": [
+     1.0433802107734165,
+     565.0495530437383
+    ],
+    "r2": 0.000235323151322131,
+    "resid_std": 20.919464458565372
+   },
+   "r_ga,r_an": {
+    "beta": [
+     8.803230707524103,
+     175.36179967733057,
+     922.2815139495062
+    ],
+    "se": [
+     1.045376812285125,
+     495.5498786298865,
+     932.4757049995605
+    ],
+    "r2": 0.00244324940966667,
+    "resid_std": 20.896351937472783
+   },
+   "r_ga,r_an,delta_b": {
+    "beta": [
+     8.79638126901684,
+     448.65311287672665,
+     1500.7034998622748,
+     -708.1355755741242
+    ],
+    "se": [
+     1.0453585541071453,
+     563.9222129409203,
+     1092.7138151653999,
+     697.4802514017657
+    ],
+    "r2": 0.005000935815439367,
+    "resid_std": 20.869546135362558
+   },
+   "pnl_basis": {
+    "beta": [
+     -13.406642326848356,
+     1.1160731045922063
+    ],
+    "se": [
+     0.7383363935857086,
+     0.028479022108374177
+    ],
+    "r2": 0.7921396482993223,
+    "resid_std": 9.538662813996735
+   }
+  }
+ },
+ "hedge_reconciliation": {
+  "claimed_hedges_5k": [
+   17.45,
+   10.47,
+   8.78
+  ],
+  "claimed_total_cost_131_13": true,
+  "claim_math": "hedges == residual_pct*notional/100 (units error); costs reuse 25k hedge values; no code formula",
+  "correct_max_residual_usd_5k": 1741.9027035016954,
+  "honest_hedge_cost_25k_usd": 1.001594054513475
+ }
+}
