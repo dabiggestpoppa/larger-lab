@@ -17,7 +17,7 @@
 | Decision | ✅ `CR_P8_DECISION.json` — **phase_9_optimization_cleared = FALSE** |
 | Tests | ✅ 19 new (`test_phase_8_overlay.py`) — **207/207 repo-wide** |
 | Determinism | ✅ byte-identical re-run (6 sampled outputs) |
-| Commit | ⏳ (pending push) |
+| Commit | ✅ `95fb6f20` — pushed to GitHub (`7bc1c024..95fb6f20`), synced to `Desktop\projects\larger-lab` (19/19 tests there) |
 
 ## Key results
 
