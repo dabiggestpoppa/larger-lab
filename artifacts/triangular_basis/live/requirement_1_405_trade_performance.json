@@ -1,0 +1,20 @@
+{
+  "trades": 405,
+  "winners": 286,
+  "losers": 119,
+  "win_rate": 70.61728395061728,
+  "net_pnl": 3539.8208714698935,
+  "net_R": 35.39820871469894,
+  "expectancy_per_trade": 8.740298448073812,
+  "profit_factor": 2.8734227340196146,
+  "sharpe_ratio": 0.4172417566954251,
+  "sortino_ratio": 0.5609961716388074,
+  "max_drawdown": 132.96268678784645,
+  "average_winner": 18.98361816309765,
+  "average_loser": 15.87810019475659,
+  "payoff_ratio": 1.195584983735434,
+  "mfe": 18.940298448073815,
+  "mae": 14.884551812359998,
+  "total_transaction_costs": 4131.000000000001,
+  "avg_cost_per_trade": 10.200000000000003
+}
