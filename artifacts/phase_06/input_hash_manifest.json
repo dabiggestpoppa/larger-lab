@@ -1,0 +1,49 @@
+{
+  "phase": "6",
+  "task": "CR-P6-FORWARD-ROUTING-STUDY-01",
+  "phase5_seal_commit": "f0fc54ab3a2c182df8653569c6805db08f257bab",
+  "phase4_seal_commit": "71b8188dd9a83c78e51ea5f8e6028c8066d95079",
+  "phase4_engine_commit": "f54ffff8b6041242e707d332075dea1c7b96f0d1",
+  "inputs": {
+    "phase_05/routing_events.parquet": {
+      "sha256": "de08df601a008e0efd6c0bc1523e8a9be25105324466ed3c7a19a0e561cf8607"
+    },
+    "phase_05/origin_events.parquet": {
+      "sha256": "072b80b277bafc152ebe51e794023610bab2cb0a2acb043fa05a954297bca5dd"
+    },
+    "phase_05/residual_shock_events.parquet": {
+      "sha256": "ded85fed8a09efaee5967ad55a460ec68a75fe14556f38498c1bd3f68c6db0a4"
+    },
+    "phase_05/network_dislocation_events.parquet": {
+      "sha256": "15d30cfbf09e4110af496623c17c5775e36b38337a755ac42d7b4e2715a2b055"
+    },
+    "phase_05/event_components.parquet": {
+      "sha256": "a1c96a006288cefa6eeac7a1a2bc655cfd8f77ac8fa4b24d6b12075dc7e903b6"
+    },
+    "phase_05/threshold_manifest.json": {
+      "sha256": "dedebb88dacfc32e6bfdfd9f74e93f58ff67a0525971b55e6b26a24c3c980093"
+    },
+    "phase_04/currency_factors_h1.parquet": {
+      "sha256": "04ec94e515287f96d98c5093926410c062cf9971c1703b78752851a7b5064c2d"
+    },
+    "phase_04/pair_residuals_h1.parquet": {
+      "sha256": "ea5edc04eefcbc9d4771ad8bcca4b88e14d63c9b45a51f0320548c9491ec44c8"
+    },
+    "phase_04/factor_features_h1.parquet": {
+      "sha256": "0c464199988ddf68635ae7311977a3315f4dbf9f6db48e669cc90f8d14cc7302"
+    },
+    "phase_04/output_hash_manifest.json": {
+      "sha256": "402b768fccda95bc0640de83a065ec20dac873561b6d38499e9714a85adeece1"
+    },
+    "phase_03/h1_strict_common_panel.parquet": {
+      "sha256": "a0da64a3b0cd8976b61e3f4e8defa55906098373efa1bcdf79dc2d628b8c6896"
+    },
+    "phase_05/input_hash_manifest.json": {
+      "sha256": "49dd9d1ace05952a61247a4a267cae2ee1cf7faabfb1340d3ff68a0ac80cb947"
+    }
+  },
+  "event_rows": 8076,
+  "event_window_start": "2023-07-06 13:00:00+00:00",
+  "event_window_end": "2026-05-21 13:00:00+00:00",
+  "note": "All inputs frozen at Phase 5 seal. Mismatch => refused."
+}

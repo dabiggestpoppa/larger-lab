@@ -1,0 +1,39 @@
+{
+  "phase": "6",
+  "task": "CR-P6-FORWARD-ROUTING-STUDY-01",
+  "phase5_seal_commit": "f0fc54ab3a2c182df8653569c6805db08f257bab",
+  "frozen_at_commit": "f0fc54ab3a2c182df8653569c6805db08f257bab",
+  "note": "Frozen Phase 5 event set. No Phase 6 routine may alter or regenerate event timestamps.",
+  "inputs": {
+    "routing_events.parquet": {
+      "sha256": "de08df601a008e0efd6c0bc1523e8a9be25105324466ed3c7a19a0e561cf8607",
+      "expected": "de08df601a008e0efd6c0bc1523e8a9be25105324466ed3c7a19a0e561cf8607",
+      "bytes": 1167357
+    },
+    "origin_events.parquet": {
+      "sha256": "072b80b277bafc152ebe51e794023610bab2cb0a2acb043fa05a954297bca5dd",
+      "expected": "072b80b277bafc152ebe51e794023610bab2cb0a2acb043fa05a954297bca5dd",
+      "bytes": 950554
+    },
+    "residual_shock_events.parquet": {
+      "sha256": "ded85fed8a09efaee5967ad55a460ec68a75fe14556f38498c1bd3f68c6db0a4",
+      "expected": "ded85fed8a09efaee5967ad55a460ec68a75fe14556f38498c1bd3f68c6db0a4",
+      "bytes": 100821
+    },
+    "network_dislocation_events.parquet": {
+      "sha256": "15d30cfbf09e4110af496623c17c5775e36b38337a755ac42d7b4e2715a2b055",
+      "expected": "15d30cfbf09e4110af496623c17c5775e36b38337a755ac42d7b4e2715a2b055",
+      "bytes": 62413
+    },
+    "event_components.parquet": {
+      "sha256": "a1c96a006288cefa6eeac7a1a2bc655cfd8f77ac8fa4b24d6b12075dc7e903b6",
+      "expected": "a1c96a006288cefa6eeac7a1a2bc655cfd8f77ac8fa4b24d6b12075dc7e903b6",
+      "bytes": 11542786
+    },
+    "threshold_manifest.json": {
+      "sha256": "dedebb88dacfc32e6bfdfd9f74e93f58ff67a0525971b55e6b26a24c3c980093",
+      "expected": "dedebb88dacfc32e6bfdfd9f74e93f58ff67a0525971b55e6b26a24c3c980093",
+      "bytes": 861
+    }
+  }
+}

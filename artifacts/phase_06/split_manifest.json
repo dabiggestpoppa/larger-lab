@@ -1,0 +1,17 @@
+{
+  "phase": "6",
+  "task": "CR-P6-FORWARD-ROUTING-STUDY-01",
+  "development": {
+    "start": "2023-07-01 00:00:00+00:00",
+    "end": "2025-06-30 23:59:59+00:00",
+    "n_events": 5613
+  },
+  "holdout": {
+    "start": "2025-07-01 00:00:00+00:00",
+    "end": "2026-05-31 23:59:59+00:00",
+    "n_events": 2463
+  },
+  "outside_window": 0,
+  "frozen_before_discovery": true,
+  "holdout_policy": "Holdout is touched ONLY after candidate relationships are frozen from development."
+}
