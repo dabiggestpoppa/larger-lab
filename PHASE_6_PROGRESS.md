@@ -36,8 +36,10 @@
 | Gate + report | ✅ Done | Gate ordering fixed (build → report → write); **`gate_passed: true`, `phase_7_cleared: true`** |
 | Tests (15 required, brief §35) | ✅ Done | `tests/test_phase_6_routing.py` — **34/34 passing** (15 required families + exported-naming contract) |
 | Determinism (Batch 3) | ✅ Done | Full SHA-256 comparison across two pipeline runs: **9 key outputs byte-identical** (DETERMINISTIC_OK) |
-| Commit | ❌ Pending | Batch 4 |
-| Report back (brief §37) | ❌ Pending | Batch 5 |
+| Commit | ✅ Done | Batch 4 — **`5726bf02`** on `capital-routing` (34 files, +103,411) |
+| Report back (brief §37) | ✅ Done | Batch 5 — full §37 report delivered to user |
+| Sync to `Desktop\\projects\\larger-lab` checkout | ✅ Done | Committed implementation copied over draft modules (src/scripts/tests/artifacts/progress); `PHASE_6_PLAN.md` updated with ✅ ALREADY IMPLEMENTED AND COMPLETE note; 34/34 tests pass in that checkout too |
+| Push to GitHub | ✅ Done | `f0fc54ab..5726bf02 capital-routing -> capital-routing` on `dabigestpoppa/larger-lab` |
 
 ## 3. Environment Notes
 
@@ -116,3 +118,4 @@
 | 2026-08-15 | Fixed searchsorted OOB clamps in sleeper comp/panel lookups + outcomes event_pos (min(., len-1)); guarded `_comp_lookup` upper bound (pos >= len -> NaN) |
 | 2026-08-15 | Determinism verified: two full runs -> identical SHA-256 on all 9 sampled outputs |
 | 2026-08-15 | Discovered parallel in-progress Phase 6 implementation in `Desktop\projects\larger-lab` checkout (uncommitted, incomplete) |
+| 2026-08-15 | **Committed CR-P6 as `5726bf02`** on `capital-routing` branch (not pushed) |

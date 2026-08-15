@@ -1,0 +1,351 @@
+{
+  "phase": "7",
+  "task": "CR-P7-ROUTING-TRANSLATION-01",
+  "gate": "ALPHA_PROMOTION_GATE",
+  "criteria": [
+    "1 same holdout sign",
+    "2 holdout effect >= 50% dev",
+    "3 bootstrap CI excludes zero",
+    "4 adequate holdout N",
+    "5 no collapse under overlap cooldowns",
+    "6 no single-horizon dependence"
+  ],
+  "families": [
+    {
+      "family": "EUR_ACCUMULATION_JPY_WEAKNESS",
+      "trade": "long",
+      "promoted": true,
+      "checks": {
+        "1_same_holdout_sign": {
+          "pass": true,
+          "detail": "all validated horizons same sign on holdout"
+        },
+        "2_holdout_effect_50pct": {
+          "pass": true,
+          "min_holdout_dev_ratio": 0.8009722661388913
+        },
+        "3_bootstrap_ci_excludes_zero": {
+          "pass": true,
+          "per_horizon": {
+            "6": {
+              "n": 147,
+              "effect": -0.3020290174090399,
+              "ci_low": -0.42616136502177726,
+              "ci_high": -0.16962371837797469
+            },
+            "8": {
+              "n": 147,
+              "effect": -0.3006502600736175,
+              "ci_low": -0.4154886051042858,
+              "ci_high": -0.16040652208541817
+            },
+            "12": {
+              "n": 147,
+              "effect": -0.2777291985505499,
+              "ci_low": -0.399331387586079,
+              "ci_high": -0.14089140833558053
+            }
+          }
+        },
+        "4_adequate_holdout_n": {
+          "pass": true,
+          "min_holdout_n": 147,
+          "threshold": 100
+        },
+        "5_overlap_cooldown_stability": {
+          "pass": true,
+          "rows": [
+            {
+              "horizon_h": 6,
+              "cooldown_h": 6,
+              "n": 377,
+              "effect": -0.3283811034523259,
+              "ratio_vs_all": 0.9369007314103104
+            },
+            {
+              "horizon_h": 6,
+              "cooldown_h": 12,
+              "n": 336,
+              "effect": -0.3386848282593073,
+              "ratio_vs_all": 0.9662981821357689
+            },
+            {
+              "horizon_h": 6,
+              "cooldown_h": 24,
+              "n": 280,
+              "effect": -0.3164914985147837,
+              "ratio_vs_all": 0.9029786224793983
+            },
+            {
+              "horizon_h": 8,
+              "cooldown_h": 6,
+              "n": 377,
+              "effect": -0.3085945623975363,
+              "ratio_vs_all": 0.9437731218601969
+            },
+            {
+              "horizon_h": 8,
+              "cooldown_h": 12,
+              "n": 336,
+              "effect": -0.30612493673049235,
+              "ratio_vs_all": 0.9362202787138241
+            },
+            {
+              "horizon_h": 8,
+              "cooldown_h": 24,
+              "n": 280,
+              "effect": -0.27727258840187213,
+              "ratio_vs_all": 0.8479812940617824
+            },
+            {
+              "horizon_h": 12,
+              "cooldown_h": 6,
+              "n": 377,
+              "effect": -0.24262745548708806,
+              "ratio_vs_all": 0.9080318209597632
+            },
+            {
+              "horizon_h": 12,
+              "cooldown_h": 12,
+              "n": 336,
+              "effect": -0.24305428864324605,
+              "ratio_vs_all": 0.9096292415288989
+            },
+            {
+              "horizon_h": 12,
+              "cooldown_h": 24,
+              "n": 280,
+              "effect": -0.2416183725950766,
+              "ratio_vs_all": 0.9042553341887462
+            }
+          ],
+          "worst_ratio_vs_all_events": 0.8479812940617824,
+          "note": "effect recomputed on non-overlapping subsets (6/12/24h cooldowns); same sign and >=50% magnitude required"
+        },
+        "6_no_single_horizon_dependence": {
+          "pass": true,
+          "detail": "3 validated horizons; execution plateau found",
+          "multi_horizon_definition": true,
+          "plateau_found": true
+        }
+      },
+      "note": "Phase 6 gate remains RESEARCH_GATE. This is the ALPHA_PROMOTION_GATE for Phase 7 eligibility."
+    },
+    {
+      "family": "EUR_LIQUIDATION_JPY_STRENGTH",
+      "trade": "short",
+      "promoted": true,
+      "checks": {
+        "1_same_holdout_sign": {
+          "pass": true,
+          "detail": "all validated horizons same sign on holdout"
+        },
+        "2_holdout_effect_50pct": {
+          "pass": true,
+          "min_holdout_dev_ratio": 0.7353497722194341
+        },
+        "3_bootstrap_ci_excludes_zero": {
+          "pass": true,
+          "per_horizon": {
+            "4": {
+              "n": 136,
+              "effect": 0.2805553143660999,
+              "ci_low": 0.1562420991946071,
+              "ci_high": 0.4004886324143808
+            },
+            "6": {
+              "n": 136,
+              "effect": 0.2908175664479989,
+              "ci_low": 0.1606292235885767,
+              "ci_high": 0.41586733704805784
+            },
+            "8": {
+              "n": 136,
+              "effect": 0.2565936303608915,
+              "ci_low": 0.1503234215978513,
+              "ci_high": 0.3715811814017535
+            },
+            "12": {
+              "n": 136,
+              "effect": 0.18244817896108967,
+              "ci_low": 0.05371071634145111,
+              "ci_high": 0.30448152688175717
+            }
+          }
+        },
+        "4_adequate_holdout_n": {
+          "pass": true,
+          "min_holdout_n": 136,
+          "threshold": 100
+        },
+        "5_overlap_cooldown_stability": {
+          "pass": true,
+          "rows": [
+            {
+              "horizon_h": 4,
+              "cooldown_h": 6,
+              "n": 386,
+              "effect": 0.28040015047204564,
+              "ratio_vs_all": 0.9160821405020436
+            },
+            {
+              "horizon_h": 4,
+              "cooldown_h": 12,
+              "n": 339,
+              "effect": 0.2892572621168,
+              "ratio_vs_all": 0.9450187932839081
+            },
+            {
+              "horizon_h": 4,
+              "cooldown_h": 24,
+              "n": 289,
+              "effect": 0.2709922855601453,
+              "ratio_vs_all": 0.8853461476306457
+            },
+            {
+              "horizon_h": 6,
+              "cooldown_h": 6,
+              "n": 386,
+              "effect": 0.3112856214757359,
+              "ratio_vs_all": 0.9553414912106994
+            },
+            {
+              "horizon_h": 6,
+              "cooldown_h": 12,
+              "n": 339,
+              "effect": 0.31847435047236605,
+              "ratio_vs_all": 0.9774038371905492
+            },
+            {
+              "horizon_h": 6,
+              "cooldown_h": 24,
+              "n": 289,
+              "effect": 0.297953153820185,
+              "ratio_vs_all": 0.9144238944672687
+            },
+            {
+              "horizon_h": 8,
+              "cooldown_h": 6,
+              "n": 386,
+              "effect": 0.2667486123030331,
+              "ratio_vs_all": 0.9228536756825283
+            },
+            {
+              "horizon_h": 8,
+              "cooldown_h": 12,
+              "n": 339,
+              "effect": 0.2678341145401016,
+              "ratio_vs_all": 0.9266091206342053
+            },
+            {
+              "horizon_h": 8,
+              "cooldown_h": 24,
+              "n": 289,
+              "effect": 0.26021411370482533,
+              "ratio_vs_all": 0.9002466750386123
+            },
+            {
+              "horizon_h": 12,
+              "cooldown_h": 6,
+              "n": 386,
+              "effect": 0.22293193640501344,
+              "ratio_vs_all": 0.9695911318505978
+            },
+            {
+              "horizon_h": 12,
+              "cooldown_h": 12,
+              "n": 339,
+              "effect": 0.22448977654427135,
+              "ratio_vs_all": 0.9763665988753009
+            },
+            {
+              "horizon_h": 12,
+              "cooldown_h": 24,
+              "n": 289,
+              "effect": 0.19731456597224079,
+              "ratio_vs_all": 0.858174277031633
+            }
+          ],
+          "worst_ratio_vs_all_events": 0.858174277031633,
+          "note": "effect recomputed on non-overlapping subsets (6/12/24h cooldowns); same sign and >=50% magnitude required"
+        },
+        "6_no_single_horizon_dependence": {
+          "pass": true,
+          "detail": "4 validated horizons; execution plateau found",
+          "multi_horizon_definition": true,
+          "plateau_found": true
+        }
+      },
+      "note": "Phase 6 gate remains RESEARCH_GATE. This is the ALPHA_PROMOTION_GATE for Phase 7 eligibility."
+    },
+    {
+      "family": "JPY_LIQUIDATION_CHF_STRENGTH",
+      "trade": "long_chf",
+      "promoted": true,
+      "checks": {
+        "1_same_holdout_sign": {
+          "pass": true,
+          "detail": "all validated horizons same sign on holdout"
+        },
+        "2_holdout_effect_50pct": {
+          "pass": true,
+          "min_holdout_dev_ratio": 0.9987942170724908
+        },
+        "3_bootstrap_ci_excludes_zero": {
+          "pass": true,
+          "per_horizon": {
+            "48": {
+              "n": 121,
+              "effect": 0.15951574290468667,
+              "ci_low": 0.01899200845431827,
+              "ci_high": 0.32370672606226975
+            }
+          }
+        },
+        "4_adequate_holdout_n": {
+          "pass": true,
+          "min_holdout_n": 121,
+          "threshold": 100
+        },
+        "5_overlap_cooldown_stability": {
+          "pass": true,
+          "rows": [
+            {
+              "horizon_h": 48,
+              "cooldown_h": 6,
+              "n": 345,
+              "effect": 0.1356603567951212,
+              "ratio_vs_all": 0.8592615431136678
+            },
+            {
+              "horizon_h": 48,
+              "cooldown_h": 12,
+              "n": 305,
+              "effect": 0.14218431951517585,
+              "ratio_vs_all": 0.9005837864460825
+            },
+            {
+              "horizon_h": 48,
+              "cooldown_h": 24,
+              "n": 261,
+              "effect": 0.1526123867240498,
+              "ratio_vs_all": 0.9666343065337042
+            }
+          ],
+          "worst_ratio_vs_all_events": 0.8592615431136678,
+          "note": "effect recomputed on non-overlapping subsets (6/12/24h cooldowns); same sign and >=50% magnitude required"
+        },
+        "6_no_single_horizon_dependence": {
+          "pass": true,
+          "detail": "36/48/60h same sign on inner_sel",
+          "holds_36_48_60_mean_net_bps": [
+            0.9519,
+            1.0653,
+            1.1493
+          ]
+        }
+      },
+      "note": "Phase 6 gate remains RESEARCH_GATE. This is the ALPHA_PROMOTION_GATE for Phase 7 eligibility."
+    }
+  ]
+}

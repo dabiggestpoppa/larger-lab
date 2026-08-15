@@ -1,0 +1,291 @@
+{
+  "phase": "7",
+  "task": "CR-P7-ROUTING-TRANSLATION-01",
+  "alpha_promotion": {
+    "EUR_ACCUMULATION_JPY_WEAKNESS": true,
+    "EUR_LIQUIDATION_JPY_STRENGTH": true,
+    "JPY_LIQUIDATION_CHF_STRENGTH": true
+  },
+  "recommended_configs": {
+    "A": {
+      "delay_h": 2,
+      "hold_h": 6,
+      "pair": "USDJPY"
+    },
+    "B": {
+      "delay_h": 1,
+      "hold_h": 6,
+      "pair": "USDJPY"
+    },
+    "C": {
+      "delay_h": 0,
+      "hold_h": 48,
+      "pair": "USDCHF"
+    }
+  },
+  "plateaus": {
+    "A": {
+      "family": "EUR_ACCUMULATION_JPY_WEAKNESS",
+      "plateaus": [
+        {
+          "delay_h": 0,
+          "holds": [
+            4,
+            6,
+            8,
+            12
+          ],
+          "representative_hold": 12,
+          "representative_mean_net_bps": 8.74072462797881
+        },
+        {
+          "delay_h": 1,
+          "holds": [
+            4,
+            6,
+            8,
+            12
+          ],
+          "representative_hold": 6,
+          "representative_mean_net_bps": 8.519092744288862
+        },
+        {
+          "delay_h": 2,
+          "holds": [
+            4,
+            6,
+            8,
+            12
+          ],
+          "representative_hold": 6,
+          "representative_mean_net_bps": 9.151950887593278
+        },
+        {
+          "delay_h": 3,
+          "holds": [
+            4,
+            6,
+            8,
+            12
+          ],
+          "representative_hold": 12,
+          "representative_mean_net_bps": 1.396030872731973
+        }
+      ],
+      "recommended_delay": 2,
+      "recommended_hold": 6,
+      "recommended_mean_net_bps": 9.151950887593278
+    },
+    "B": {
+      "family": "EUR_LIQUIDATION_JPY_STRENGTH",
+      "plateaus": [
+        {
+          "delay_h": 0,
+          "holds": [
+            4,
+            6,
+            8,
+            12
+          ],
+          "representative_hold": 6,
+          "representative_mean_net_bps": 10.546816613795146
+        },
+        {
+          "delay_h": 1,
+          "holds": [
+            4,
+            6,
+            8,
+            12
+          ],
+          "representative_hold": 6,
+          "representative_mean_net_bps": 10.838241837979542
+        },
+        {
+          "delay_h": 2,
+          "holds": [
+            4,
+            6,
+            8,
+            12
+          ],
+          "representative_hold": 4,
+          "representative_mean_net_bps": 10.429380681464465
+        },
+        {
+          "delay_h": 3,
+          "holds": [
+            4,
+            6,
+            8
+          ],
+          "representative_hold": 4,
+          "representative_mean_net_bps": 1.591173719849304
+        }
+      ],
+      "recommended_delay": 1,
+      "recommended_hold": 6,
+      "recommended_mean_net_bps": 10.838241837979542
+    },
+    "C": {
+      "family": "JPY_LIQUIDATION_CHF_STRENGTH",
+      "plateaus": [
+        {
+          "delay_h": 0,
+          "holds": [
+            24,
+            36,
+            48,
+            60,
+            72
+          ],
+          "representative_hold": 24,
+          "representative_mean_net_bps": 1.6830316995362478
+        },
+        {
+          "delay_h": 1,
+          "holds": [
+            24,
+            36,
+            48,
+            60
+          ],
+          "representative_hold": 36,
+          "representative_mean_net_bps": 0.7713842389571784
+        },
+        {
+          "delay_h": 2,
+          "holds": [
+            24,
+            36,
+            48,
+            60,
+            72
+          ],
+          "representative_hold": 36,
+          "representative_mean_net_bps": 1.5325015189518991
+        },
+        {
+          "delay_h": 3,
+          "holds": [
+            24,
+            36,
+            48,
+            60
+          ],
+          "representative_hold": 36,
+          "representative_mean_net_bps": 0.823130325262031
+        }
+      ],
+      "recommended_delay": 0,
+      "recommended_hold": 48,
+      "recommended_mean_net_bps": 1.065261258979298
+    }
+  },
+  "validation": {
+    "A": {
+      "untouched_n_trades": 144,
+      "untouched_expectancy_bps": 10.134925032378009,
+      "untouched_win_rate": 0.6041666666666666
+    },
+    "B": {
+      "untouched_n_trades": 136,
+      "untouched_expectancy_bps": 6.175370671343724,
+      "untouched_win_rate": 0.5735294117647058
+    },
+    "C": {
+      "untouched_n_trades": 121,
+      "untouched_expectancy_bps": 1.1732119900995779,
+      "untouched_win_rate": 0.45454545454545453
+    }
+  },
+  "baseline_summaries": {
+    "P7_EUR_JPY_BASELINE": [
+      {
+        "split": "inner_sel",
+        "n_trades": 211,
+        "win_rate": 0.6682464454976303,
+        "expectancy_bps": 10.061673738083938,
+        "profit_factor": 2.426666795920322,
+        "sharpe_annualized": 4.042638989855395,
+        "max_drawdown": 0.9687891522329807
+      },
+      {
+        "split": "inner_val",
+        "n_trades": 77,
+        "win_rate": 0.6233766233766234,
+        "expectancy_bps": 7.520711954757058,
+        "profit_factor": 1.8994482698345607,
+        "sharpe_annualized": 2.9828570189556656,
+        "max_drawdown": 0.874780984943214
+      },
+      {
+        "split": "untouched",
+        "n_trades": 144,
+        "win_rate": 0.6041666666666666,
+        "expectancy_bps": 10.134925032378009,
+        "profit_factor": 2.38908280488973,
+        "sharpe_annualized": 3.9553819266731702,
+        "max_drawdown": 0.1899303411970369
+      },
+      {
+        "split": "inner_sel",
+        "n_trades": 250,
+        "win_rate": 0.628,
+        "expectancy_bps": 7.419424812997378,
+        "profit_factor": 1.8646104377116994,
+        "sharpe_annualized": 3.0758532969266175,
+        "max_drawdown": 1.137161682638043
+      },
+      {
+        "split": "inner_val",
+        "n_trades": 72,
+        "win_rate": 0.6388888888888888,
+        "expectancy_bps": 10.53262676971724,
+        "profit_factor": 2.570413054149854,
+        "sharpe_annualized": 4.200124239622787,
+        "max_drawdown": 0.3133971114389231
+      },
+      {
+        "split": "untouched",
+        "n_trades": 136,
+        "win_rate": 0.5735294117647058,
+        "expectancy_bps": 6.175370671343724,
+        "profit_factor": 1.809766078013067,
+        "sharpe_annualized": 2.885606652341843,
+        "max_drawdown": 1.1497917156750228
+      }
+    ],
+    "P7_JPY_CHF_BASELINE": [
+      {
+        "split": "inner_sel",
+        "n_trades": 211,
+        "win_rate": 0.5071090047393365,
+        "expectancy_bps": 0.7545385761394842,
+        "profit_factor": 1.0372762650550014,
+        "sharpe_annualized": 0.16479094756192003,
+        "max_drawdown": 1.752013888458686
+      },
+      {
+        "split": "inner_val",
+        "n_trades": 68,
+        "win_rate": 0.6470588235294118,
+        "expectancy_bps": 34.55878373671773,
+        "profit_factor": 3.9275569349448176,
+        "sharpe_annualized": 6.081867752283167,
+        "max_drawdown": 0.25525917202422566
+      },
+      {
+        "split": "untouched",
+        "n_trades": 121,
+        "win_rate": 0.45454545454545453,
+        "expectancy_bps": 1.1732119900995779,
+        "profit_factor": 1.051220018337138,
+        "sharpe_annualized": 0.220508011773915,
+        "max_drawdown": 3.442496336891204
+      }
+    ]
+  },
+  "gate_status": "PASS",
+  "stop_after_baseline": true
+}
