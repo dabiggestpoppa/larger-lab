@@ -1,0 +1,92 @@
+{
+  "protocol": [
+    "1. selection data: inner_sel (2023-07-01..2025-01-01) only",
+    "2. stability confirmation: inner_val (2025-01-01..2025-07-01)",
+    "3. RELATIONSHIP_CONFIRMED_OOS (2025-07-01..2026-05-31) NOT used for selection",
+    "4. config must be positive on inner_sel and inner_val with same sign",
+    "5. config must sit on a plateau of >= 2 adjacent positive holds",
+    "6. hold must be inside the Phase-6 validated horizon envelope"
+  ],
+  "families": {
+    "A": {
+      "frozen_config": {
+        "pair": "USDJPY",
+        "delay_h": 2,
+        "hold_h": 6,
+        "trade": "long",
+        "family": "EUR_ACCUMULATION_JPY_WEAKNESS"
+      },
+      "inner_sel_mean_net_bps": 9.151950887593278,
+      "inner_val_mean_net_bps": 8.986874808386743,
+      "positive_inner_sel": true,
+      "positive_inner_val": true,
+      "same_sign": true,
+      "on_plateau": true,
+      "plateau_holds": [
+        [
+          4,
+          6,
+          8,
+          12
+        ]
+      ],
+      "hold_in_validated_envelope": true,
+      "envelope_horizons": [
+        6,
+        8,
+        12
+      ],
+      "discipline_pass": true
+    },
+    "B": {
+      "frozen_config": {
+        "pair": "USDJPY",
+        "delay_h": 1,
+        "hold_h": 6,
+        "trade": "short",
+        "family": "EUR_LIQUIDATION_JPY_STRENGTH"
+      },
+      "inner_sel_mean_net_bps": 10.838241837979542,
+      "inner_val_mean_net_bps": 6.775866548602803,
+      "positive_inner_sel": true,
+      "positive_inner_val": true,
+      "same_sign": true,
+      "on_plateau": true,
+      "plateau_holds": [
+        [
+          4,
+          6,
+          8,
+          12
+        ]
+      ],
+      "hold_in_validated_envelope": true,
+      "envelope_horizons": [
+        4,
+        6,
+        8,
+        12
+      ],
+      "discipline_pass": true
+    }
+  },
+  "selection_used_only_inner_sel": true,
+  "oos_not_used_in_selection": true,
+  "all_frozen_configs_disciplined": true,
+  "frozen_configs": {
+    "A": {
+      "pair": "USDJPY",
+      "delay_h": 2,
+      "hold_h": 6,
+      "trade": "long",
+      "family": "EUR_ACCUMULATION_JPY_WEAKNESS"
+    },
+    "B": {
+      "pair": "USDJPY",
+      "delay_h": 1,
+      "hold_h": 6,
+      "trade": "short",
+      "family": "EUR_LIQUIDATION_JPY_STRENGTH"
+    }
+  }
+}

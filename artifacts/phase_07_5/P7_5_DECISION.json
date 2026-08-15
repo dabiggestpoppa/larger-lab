@@ -1,0 +1,31 @@
+{
+  "phase": "7.5",
+  "task": "CR-P7.5-ROUTING-BASELINE-SEAL-01",
+  "base_commit": "db9f8c62",
+  "accept": {
+    "A": "STRONG",
+    "B": "STRONG",
+    "A+B": "STRONG"
+  },
+  "family_C": "WATCHLIST",
+  "frozen_configs": {
+    "A": {
+      "pair": "USDJPY",
+      "delay_h": 2,
+      "hold_h": 6,
+      "trade": "long",
+      "family": "EUR_ACCUMULATION_JPY_WEAKNESS"
+    },
+    "B": {
+      "pair": "USDJPY",
+      "delay_h": 1,
+      "hold_h": 6,
+      "trade": "short",
+      "family": "EUR_LIQUIDATION_JPY_STRENGTH"
+    }
+  },
+  "frozen_policy": "P0",
+  "validation_label": "RELATIONSHIP_CONFIRMED_OOS",
+  "forward_oos": "PENDING",
+  "stop": "baseline sealed; no CEREBUS / deploy / MT5"
+}

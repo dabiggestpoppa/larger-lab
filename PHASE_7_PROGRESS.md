@@ -37,8 +37,9 @@ All 6 alpha-promotion criteria PASS for every family:
 | `PHASE_7_STRATEGY_STUDY.md` + `PHASE_7_DECISION.json` | ✅ | gate PASS, 3/3 promoted |
 | Tests (`tests/test_phase_7_translation.py`) | ✅ | **19/19 passing** (168/168 repo-wide) |
 | Determinism | ✅ | two full runs → identical SHA-256 on 8 key outputs |
-| Commit | ❌ pending | Batch 6 |
-| Push + sync to `Desktop\projects\larger-lab` | ❌ pending | user decision |
+| Commit | ✅ | **`db9f8c62`** on `capital-routing` (22 files, +3,722) |
+| Sync to `Desktop\projects\larger-lab` | ✅ | source/tests/artifacts copied; 19/19 tests pass there |
+| Push to GitHub | ✅ | `5726bf02..db9f8c62 capital-routing -> capital-routing` |
 
 ## 3. Baseline Results (fixed vol-normalized risk, per split)
 

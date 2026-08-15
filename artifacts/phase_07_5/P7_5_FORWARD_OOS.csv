@@ -1,0 +1,2 @@
+period,available_data_through,n_events,status,note
+2026-06-01 onward,2026-05-21 13:00:00+00:00,0,FORWARD_OOS_PENDING,No price/event data after 2026-05-31. Move to shadow observation; this is the first true post-discovery OOS period and must NOT be combined with earlier samples.
