@@ -1,0 +1,2 @@
+status,research_cutoff_last_bar,new_data_available,reason,next_step
+FORWARD_OOS_PENDING,2026-05-29 19:50:00,False,no synchronized continuation of the frozen feed exists after the cutoff; post-cutoff *_M5_fetched.csv is a different price source (mean diff vs canonical ~0.003) and the only same-source extension is single-leg AUDNZD,"shadow collection on live MT5 demo feed (frozen signal + TB-C 5% sizing, per-bar basis/z/size logging)"
