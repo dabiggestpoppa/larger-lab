@@ -1,0 +1,245 @@
+{
+  "1_future_perturbation": {
+    "max_diff": 0.0,
+    "all_zero": true,
+    "measured_models": {
+      "MODEL_A": 0.0,
+      "MODEL_B": 0.0,
+      "MODEL_C": 0.0
+    },
+    "note": "sealed signal generators, delay=0 (signal at bar p known at bar p close); field truncated at 2025-12-31"
+  },
+  "2_truncation_invariance": {
+    "max_diff": 0.0,
+    "all_zero": true,
+    "measured_models": {
+      "MODEL_A": 0.0,
+      "MODEL_B": 0.0,
+      "MODEL_C": 0.0
+    }
+  },
+  "3_blocked_component_isolation": {
+    "models_D_E_consumed": false,
+    "generate_all_signals_consumed": false,
+    "mechanical_evidence": {
+      "generate_all_signals_calls": [
+        "generate_accepted_sigma_breakout_signals",
+        "generate_morphic_trend_score_signals",
+        "generate_recursive_morphic_trend_signals",
+        "generate_sigma_escape_signals"
+      ],
+      "model_E_called_by_aggregate": true,
+      "model_D_entry_contradiction": true,
+      "model_E_whole_sample_Q": true,
+      "note": "AST-level verification; asserted by tests/mve/test_p65_seal.py"
+    },
+    "note": "P6.5 consumes only sealed generators A/B/C on coordinates; D/E and the aggregate are never called (test-enforced)"
+  },
+  "4_static_leakage": {
+    "pass": true,
+    "findings": [
+      {
+        "module": "run_p65",
+        "line": 504,
+        "pattern": "rolling()",
+        "code": "h1['close'].rolling(pa.P4_TRAILING_WINDOW, min_periods=pa.P4_TRAILING_MIN_PERIODS)",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "run_p65",
+        "line": 505,
+        "pattern": "rolling()",
+        "code": "h1['close'].rolling(pa.P4_TRAILING_WINDOW, min_periods=pa.P4_TRAILING_MIN_PERIODS)",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 481,
+        "pattern": "std()",
+        "code": "morphic_coordinates.rolling(window=5).std()",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "signals",
+        "line": 482,
+        "pattern": "std()",
+        "code": "morphic_coordinates.rolling(window=20).std()",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "signals",
+        "line": 156,
+        "pattern": "iloc[]",
+        "code": "morphic_coordinates.iloc[i]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 157,
+        "pattern": "iloc[]",
+        "code": "occupancy.iloc[i]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 278,
+        "pattern": "iloc[]",
+        "code": "morphic_coordinates_h1.iloc[i]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 279,
+        "pattern": "iloc[]",
+        "code": "morphic_coordinates_d1.iloc[i]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 162,
+        "pattern": "iloc[]",
+        "code": "signals.iloc[i]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 213,
+        "pattern": "iloc[]",
+        "code": "signals.iloc[i]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 291,
+        "pattern": "iloc[]",
+        "code": "signals.iloc[i]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 404,
+        "pattern": "iloc[]",
+        "code": "trend_score.iloc[i]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 405,
+        "pattern": "iloc[]",
+        "code": "signals.iloc[i]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 440,
+        "pattern": "iloc[]",
+        "code": "occupancy.iloc[i]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 481,
+        "pattern": "rolling()",
+        "code": "morphic_coordinates.rolling(window=5)",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 482,
+        "pattern": "rolling()",
+        "code": "morphic_coordinates.rolling(window=20)",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 629,
+        "pattern": "iloc[]",
+        "code": "combined_signal.iloc[i]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 630,
+        "pattern": "iloc[]",
+        "code": "final_signal.iloc[i]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 94,
+        "pattern": "iloc[]",
+        "code": "signals.iloc[i + 1]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 223,
+        "pattern": "iloc[]",
+        "code": "signals.iloc[i]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 296,
+        "pattern": "iloc[]",
+        "code": "signals.iloc[i]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 406,
+        "pattern": "iloc[]",
+        "code": "trend_score.iloc[i]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 407,
+        "pattern": "iloc[]",
+        "code": "signals.iloc[i]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 631,
+        "pattern": "iloc[]",
+        "code": "combined_signal.iloc[i]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 632,
+        "pattern": "iloc[]",
+        "code": "final_signal.iloc[i]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 101,
+        "pattern": "iloc[]",
+        "code": "signals.iloc[i + 1]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "signals",
+        "line": 300,
+        "pattern": "iloc[]",
+        "code": "signals.iloc[i]",
+        "classification": "CAUSAL"
+      }
+    ],
+    "blocked": [],
+    "rule": "rolling()/iloc[] -> CAUSAL (trailing windows; output writes at current/confirmation bar); mean()/std() -> EX_POST_ONLY when aggregating measured outcomes; anything else BLOCKED"
+  },
+  "5_causal_to_expost_dependency": {
+    "count": 0,
+    "note": "no outcome/ex-post columns exist in this checkpoint; generators consume only causal coordinates"
+  },
+  "6_holdout_guard": {
+    "pass": true,
+    "violations": [],
+    "status": "FINAL_HOLDOUT_PENDING",
+    "rows_read": 0
+  },
+  "causality_pass": true
+}

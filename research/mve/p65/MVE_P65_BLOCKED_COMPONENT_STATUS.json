@@ -1,0 +1,19 @@
+{
+  "checkpoint": "MVE-P6.5-STRUCTURAL-PRUNING-SEAL",
+  "MODEL_D": {
+    "status": "BLOCKED_LOGIC_SPEC",
+    "reason": "contradictory internal logic: 'M_M > 0, M_W > +1, M_D < 0' test encodes 'd1_coord > 0 and ... and d1_coord < 0' \u2014 unsatisfiable; unresolved timeframe mapping",
+    "repair_allowed_in_p65": false
+  },
+  "MODEL_E": {
+    "status": "BLOCKED_LOGIC_SPEC",
+    "reason": "whole-sample Q repaint: Q = state_transitions.sum() / len(morphic_coordinates) is a full-sample scalar injected as a per-bar series",
+    "repair_allowed_in_p65": false
+  },
+  "generate_all_signals": {
+    "status": "BLOCKED_AGGREGATE",
+    "reason": "calls generate_morphic_trend_score_signals (Model E); must remain excluded from all executable science while Model E is blocked",
+    "repair_allowed_in_p65": false
+  },
+  "note": "Mechanical evidence: AST call graph of src/mve/signals.py. Verified by tests."
+}

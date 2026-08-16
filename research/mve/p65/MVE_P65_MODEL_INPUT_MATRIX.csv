@@ -1,0 +1,9 @@
+component,model,input,dependency_type,causal_status,scientific_status,required_for_model,pruned_dependency,blocked_dependency,survives_pruning,note
+signals/model_A_escape,MODEL_A,coordinates,CAUSAL_STATE,CAUSAL_DELAYED_CONFIRMATION,FROZEN_SEALED,True,False,False,True,morphic coordinate series only
+signals/model_B_breakout,MODEL_B,coordinates,CAUSAL_STATE,CAUSAL_REALTIME,FROZEN_SEALED,True,False,False,True,morphic coordinate series only; occupancy recomputed internally from coordinates
+signals/model_C_recursive,MODEL_C,coordinates,CAUSAL_STATE,CAUSAL_DELAYED_CONFIRMATION,FROZEN_SEALED,True,False,False,True,morphic coordinate series only
+signals/model_D_mtf,MODEL_D,coordinates_h1,CAUSAL_STATE,BLOCKED_LOGIC_SPEC,BLOCKED_LOGIC_SPEC,True,False,False,True,H1 morphic coordinates
+signals/model_D_mtf,MODEL_D,coordinates_d1,CAUSAL_STATE,BLOCKED_LOGIC_SPEC,BLOCKED_LOGIC_SPEC,True,False,False,True,D1 morphic coordinates
+signals/model_D_mtf,MODEL_D,blocked,BLOCKED,BLOCKED_LOGIC_SPEC,BLOCKED_LOGIC_SPEC,True,False,True,False,contradictory logic spec (unsatisfiable d1 conditions)
+signals/model_E_trend_score,MODEL_E,coordinates,CAUSAL_STATE,BLOCKED_LOGIC_SPEC,BLOCKED_LOGIC_SPEC,True,False,False,True,morphic coordinate series
+signals/model_E_trend_score,MODEL_E,blocked,BLOCKED,BLOCKED_LOGIC_SPEC,BLOCKED_LOGIC_SPEC,True,False,True,False,whole-sample Q repaint (sum()/len() scalar)

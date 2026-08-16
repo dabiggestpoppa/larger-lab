@@ -1,0 +1,6 @@
+model,causal,independent_of_blocked,coherent_after_pruning,falsifiable_hypothesis,baseline_defined,no_2026_access_required,p7_ready
+MODEL_A,"YES (delayed confirmation, sealed)",YES,YES — consumes only morphic coordinates; acceptance/rekey science never imported,YES,YES,True,True
+MODEL_B,YES,YES,YES — consumes only morphic coordinates; acceptance/rekey science never imported,YES,YES,True,True
+MODEL_C,"YES (delayed confirmation, sealed)",YES,YES — consumes only morphic coordinates; acceptance/rekey science never imported,YES,YES,True,True
+MODEL_D,N/A (blocked),N/A,N/A,N/A,N/A,True,False
+MODEL_E,N/A (blocked),N/A,N/A,N/A,N/A,True,False

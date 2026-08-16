@@ -1,0 +1,15 @@
+{
+  "checkpoint": "MVE-P6.5-STRUCTURAL-PRUNING-SEAL",
+  "acceptance_predictive_layer": "PRUNED",
+  "acceptance_role": "DESCRIPTIVE_ONLY (may appear as a descriptive control in future analyses; never as an alpha feature)",
+  "rkey_a_predictive_layer": "PRUNED",
+  "rkey_b_predictive_layer": "PRUNED",
+  "rkey_c_predictive_layer": "INSUFFICIENT_N",
+  "rkey_state_maintenance_role": "NOT_REQUIRED \u2014 the executed coordinate field uses trailing-extreme anchors (P4_TRAILING_WINDOW=50, shifted); rekey.py is never consumed by coordinate construction",
+  "reentry_rule": "Acceptance or Rekey A/B may NOT re-enter P7 as alpha features without a separate future research authorization.",
+  "sources": {
+    "p4": "acceptance_information_validated = false (MVE_P4_DECISION.json)",
+    "p6": "rekey_information_validated = false (MVE_P6_DECISION.json)",
+    "rkey_c": "N=20 dev, INSUFFICIENT_N (MVE_P6_EVIDENCE_STATUS_MATRIX.csv)"
+  }
+}

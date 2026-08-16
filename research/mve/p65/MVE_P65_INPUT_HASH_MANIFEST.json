@@ -1,0 +1,24 @@
+{
+  "checkpoint": "MVE-P6.5-STRUCTURAL-PRUNING-SEAL",
+  "canonical_data": {
+    "relpath": "quant-lab/data/EURUSDPRO_M5_2023_2026.csv",
+    "sha256": "630b8a4052fe962bc7d87c6d49d83bc1524c7ddd83cd15e902fe504c998d3f77"
+  },
+  "files": {
+    "research/mve/p65/MVE_P65_PROTOCOL.md": "c9286bfc8477bcf910b7fb58f3bf6e02a7745b31cd11503ec4117d1d4e259370",
+    "research/mve/MVE_R05_2_COMPONENT_MATRIX.csv": "6a283a060b39ad937ba65ee132b402b436b92c18b1272e032e9a466c847d7ead",
+    "research/mve/p4/MVE_P4_DECISION.json": "9023939dfdea2fbda7e7e2ed1f8abb588957089b9b95d0ecdc55e667539d590d",
+    "research/mve/p6/MVE_P6_DECISION.json": "c0a90e8f1f5f8238f32e4e2bdfe4045f24a1870128d6f591a6ffb5e8915b7b7c",
+    "src/mve/signals.py": "0addab570bf044a35672afa0e5e9cc505cacde46d9075a40e4346e0e24f7cf31",
+    "src/mve/anchors.py": "3692836256319fad3ab69f9179b06ebe45558e78a583a04713a33410adeb9490",
+    "src/mve/volatility.py": "1b6854ea0171f1d5ee55484d073b619adeb1e610e0ea4c5c3c1a52a32feead53",
+    "src/mve/morphic_coordinates.py": "f63559fb5ab1d065f4e7949d72624716b8177df0bdf3cedfdc9c97240110bfe3",
+    "src/mve/sigma_states.py": "36b7ad20c2e6b98507c86517becd47a1b82407b71e21c385c9db76d47f80f15a",
+    "src/mve/acceptance.py": "08e59e5d19563bcbfb4a7f274db54af4c6d3733d8f5debccd37fc7ff622e9806",
+    "src/mve/rekey.py": "1b6a4f79a9c6f6f1193ebc66d8f559b52081f0696a6ae2b4b0cb716cb9e190de",
+    "src/mve/p4_acceptance.py": "6c953b00a8dab9320f4f498477615ebe88ebf735232fd4ac125d924aae43aabc"
+  },
+  "python": "3.11.9",
+  "numpy": "2.4.6",
+  "pandas": "2.2.3"
+}

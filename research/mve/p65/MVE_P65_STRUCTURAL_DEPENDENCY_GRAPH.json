@@ -1,0 +1,314 @@
+{
+  "graph_version": "1.0",
+  "method": "AST import scan + source-verified contract edges overlaid with sealed R0.5.2 matrix and P4/P6 decisions",
+  "nodes": [
+    {
+      "component": "volatility",
+      "module": "src/mve/volatility.py",
+      "causal_status": "CAUSAL_REALTIME",
+      "inputs": [
+        {
+          "input": "price_ohlcv",
+          "dependency_type": "INPUT_PRICE",
+          "note": "close/high/low/volume series"
+        }
+      ],
+      "pruned_role": null,
+      "survives_pruning": true,
+      "scientific_status": "FROZEN_SEALED"
+    },
+    {
+      "component": "anchors",
+      "module": "src/mve/anchors.py",
+      "causal_status": "CAUSAL_REALTIME",
+      "inputs": [
+        {
+          "input": "price_ohlcv",
+          "dependency_type": "INPUT_PRICE",
+          "note": "close/high/low/volume series"
+        }
+      ],
+      "pruned_role": null,
+      "survives_pruning": true,
+      "scientific_status": "FROZEN_SEALED"
+    },
+    {
+      "component": "coordinates/morphic",
+      "module": "src/mve/coordinates.py",
+      "causal_status": "CAUSAL_REALTIME",
+      "inputs": [
+        {
+          "input": "price",
+          "dependency_type": "INPUT_PRICE",
+          "note": "close series"
+        },
+        {
+          "input": "anchors",
+          "dependency_type": "CAUSAL_STATE",
+          "note": "anchor series (trailing extremes in executed field)"
+        },
+        {
+          "input": "volatility",
+          "dependency_type": "CAUSAL_STATE",
+          "note": "volatility series for expansion ratio"
+        }
+      ],
+      "pruned_role": null,
+      "survives_pruning": true,
+      "scientific_status": "FROZEN_SEALED"
+    },
+    {
+      "component": "coordinates/frozen_sigma",
+      "module": "src/mve/coordinates.py",
+      "causal_status": "CAUSAL_REALTIME",
+      "inputs": [],
+      "pruned_role": null,
+      "survives_pruning": true,
+      "scientific_status": "FROZEN_SEALED"
+    },
+    {
+      "component": "sigma_states",
+      "module": "src/mve/sigma_states.py",
+      "causal_status": "CAUSAL_REALTIME",
+      "inputs": [
+        {
+          "input": "coordinates",
+          "dependency_type": "CAUSAL_STATE",
+          "note": "morphic coordinate series"
+        }
+      ],
+      "pruned_role": null,
+      "survives_pruning": true,
+      "scientific_status": "FROZEN_SEALED"
+    },
+    {
+      "component": "acceptance",
+      "module": "src/mve/acceptance.py",
+      "causal_status": "CAUSAL_REALTIME",
+      "inputs": [
+        {
+          "input": "coordinates",
+          "dependency_type": "CAUSAL_STATE",
+          "note": "morphic coordinate series"
+        },
+        {
+          "input": "price",
+          "dependency_type": "INPUT_PRICE",
+          "note": "rebalancing fraction"
+        }
+      ],
+      "pruned_role": "PRUNED_PREDICTIVE (DESCRIPTIVE_ONLY)",
+      "survives_pruning": false,
+      "scientific_status": "FROZEN_SEALED"
+    },
+    {
+      "component": "rekey/RKEY_A",
+      "module": "src/mve/rekey.py",
+      "causal_status": "CAUSAL_REALTIME",
+      "inputs": [
+        {
+          "input": "coordinates",
+          "dependency_type": "CAUSAL_STATE",
+          "note": "morphic coordinate series"
+        }
+      ],
+      "pruned_role": "PRUNED_PREDICTIVE (not required for coordinate maintenance)",
+      "survives_pruning": false,
+      "scientific_status": "FROZEN_SEALED"
+    },
+    {
+      "component": "rekey/RKEY_B",
+      "module": "src/mve/rekey.py",
+      "causal_status": "CAUSAL_DELAYED_CONFIRMATION",
+      "inputs": [
+        {
+          "input": "coordinates",
+          "dependency_type": "CAUSAL_STATE",
+          "note": "morphic coordinate series"
+        }
+      ],
+      "pruned_role": "PRUNED_PREDICTIVE (not required for coordinate maintenance)",
+      "survives_pruning": false,
+      "scientific_status": "FROZEN_SEALED"
+    },
+    {
+      "component": "rekey/RKEY_C",
+      "module": "src/mve/rekey.py",
+      "causal_status": "CAUSAL_REALTIME",
+      "inputs": [
+        {
+          "input": "coordinates",
+          "dependency_type": "CAUSAL_STATE",
+          "note": "morphic coordinate series"
+        }
+      ],
+      "pruned_role": "INSUFFICIENT_N (archived; not promoted)",
+      "survives_pruning": false,
+      "scientific_status": "FROZEN_SEALED"
+    },
+    {
+      "component": "signals/model_A_escape",
+      "module": "src/mve/signals.py",
+      "causal_status": "CAUSAL_DELAYED_CONFIRMATION",
+      "inputs": [
+        {
+          "input": "coordinates",
+          "dependency_type": "CAUSAL_STATE",
+          "note": "morphic coordinate series only"
+        }
+      ],
+      "pruned_role": null,
+      "survives_pruning": true,
+      "scientific_status": "FROZEN_SEALED"
+    },
+    {
+      "component": "signals/model_B_breakout",
+      "module": "src/mve/signals.py",
+      "causal_status": "CAUSAL_REALTIME",
+      "inputs": [
+        {
+          "input": "coordinates",
+          "dependency_type": "CAUSAL_STATE",
+          "note": "morphic coordinate series only; occupancy recomputed internally from coordinates"
+        }
+      ],
+      "pruned_role": null,
+      "survives_pruning": true,
+      "scientific_status": "FROZEN_SEALED"
+    },
+    {
+      "component": "signals/model_C_recursive",
+      "module": "src/mve/signals.py",
+      "causal_status": "CAUSAL_DELAYED_CONFIRMATION",
+      "inputs": [
+        {
+          "input": "coordinates",
+          "dependency_type": "CAUSAL_STATE",
+          "note": "morphic coordinate series only"
+        }
+      ],
+      "pruned_role": null,
+      "survives_pruning": true,
+      "scientific_status": "FROZEN_SEALED"
+    },
+    {
+      "component": "signals/model_D_mtf",
+      "module": "src/mve/signals.py",
+      "causal_status": "BLOCKED_LOGIC_SPEC",
+      "inputs": [
+        {
+          "input": "coordinates_h1",
+          "dependency_type": "CAUSAL_STATE",
+          "note": "H1 morphic coordinates"
+        },
+        {
+          "input": "coordinates_d1",
+          "dependency_type": "CAUSAL_STATE",
+          "note": "D1 morphic coordinates"
+        },
+        {
+          "input": "blocked",
+          "dependency_type": "BLOCKED",
+          "note": "contradictory logic spec (unsatisfiable d1 conditions)"
+        }
+      ],
+      "pruned_role": null,
+      "survives_pruning": false,
+      "scientific_status": "BLOCKED_LOGIC_SPEC"
+    },
+    {
+      "component": "signals/model_E_trend_score",
+      "module": "src/mve/signals.py",
+      "causal_status": "BLOCKED_LOGIC_SPEC",
+      "inputs": [
+        {
+          "input": "coordinates",
+          "dependency_type": "CAUSAL_STATE",
+          "note": "morphic coordinate series"
+        },
+        {
+          "input": "blocked",
+          "dependency_type": "BLOCKED",
+          "note": "whole-sample Q repaint (sum()/len() scalar)"
+        }
+      ],
+      "pruned_role": null,
+      "survives_pruning": false,
+      "scientific_status": "BLOCKED_LOGIC_SPEC"
+    }
+  ],
+  "import_edges": {
+    "acceptance.py": {
+      "mve_imports": {},
+      "note": "no intra-mve imports; all coupling is by data contract (Series in -> Series out)"
+    },
+    "anchors.py": {
+      "mve_imports": {},
+      "note": "no intra-mve imports; all coupling is by data contract (Series in -> Series out)"
+    },
+    "backtest.py": {
+      "mve_imports": {},
+      "note": "no intra-mve imports; all coupling is by data contract (Series in -> Series out)"
+    },
+    "causality.py": {
+      "mve_imports": {},
+      "note": "no intra-mve imports; all coupling is by data contract (Series in -> Series out)"
+    },
+    "data_loader.py": {
+      "mve_imports": {},
+      "note": "no intra-mve imports; all coupling is by data contract (Series in -> Series out)"
+    },
+    "morphic_coordinates.py": {
+      "mve_imports": {},
+      "note": "no intra-mve imports; all coupling is by data contract (Series in -> Series out)"
+    },
+    "persistence.py": {
+      "mve_imports": {},
+      "note": "no intra-mve imports; all coupling is by data contract (Series in -> Series out)"
+    },
+    "regime.py": {
+      "mve_imports": {},
+      "note": "no intra-mve imports; all coupling is by data contract (Series in -> Series out)"
+    },
+    "rekey.py": {
+      "mve_imports": {},
+      "note": "no intra-mve imports; all coupling is by data contract (Series in -> Series out)"
+    },
+    "runner.py": {
+      "mve_imports": {
+        "mve": [
+          "CANONICAL_EURUSD",
+          "DataPipelineError",
+          "load_canonical_m5",
+          "resample_m5_to_h1",
+          "slice_data",
+          "PersistenceError",
+          "persist_run",
+          "sha256_file",
+          "sha256_json",
+          "VolatilityEstimators",
+          "StructuralAnchors"
+        ]
+      },
+      "note": "intra-mve import(s) present"
+    },
+    "sigma_states.py": {
+      "mve_imports": {},
+      "note": "no intra-mve imports; all coupling is by data contract (Series in -> Series out)"
+    },
+    "signals.py": {
+      "mve_imports": {},
+      "note": "no intra-mve imports; all coupling is by data contract (Series in -> Series out)"
+    },
+    "volatility.py": {
+      "mve_imports": {},
+      "note": "no intra-mve imports; all coupling is by data contract (Series in -> Series out)"
+    }
+  },
+  "summary": {
+    "total_nodes": 14,
+    "surviving_nodes": 8,
+    "pruned_predictive": 3,
+    "blocked": 2
+  }
+}

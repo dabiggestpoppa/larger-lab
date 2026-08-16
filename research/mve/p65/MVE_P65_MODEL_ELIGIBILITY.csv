@@ -1,0 +1,6 @@
+model,causal_at_action_time,independent_of_blocked_components,coherent_after_pruning,falsifiable_hypothesis,baseline_defined,eligibility,reason
+MODEL_A,"YES (delayed confirmation, sealed)",YES,YES — consumes only morphic coordinates; acceptance/rekey science never imported,YES,YES,ELIGIBLE_BUT_REDUCIBLE_BASELINE_REQUIRED,coordinate-only transform; P7 must falsify against simple coordinate/sigma baselines (see crosswalk)
+MODEL_B,YES,YES,YES — consumes only morphic coordinates; acceptance/rekey science never imported,YES,YES,ELIGIBLE_BUT_REDUCIBLE_BASELINE_REQUIRED,coordinate-only transform; P7 must falsify against simple coordinate/sigma baselines (see crosswalk)
+MODEL_C,"YES (delayed confirmation, sealed)",YES,YES — consumes only morphic coordinates; acceptance/rekey science never imported,YES,YES,ELIGIBLE_BUT_REDUCIBLE_BASELINE_REQUIRED,coordinate-only transform; P7 must falsify against simple coordinate/sigma baselines (see crosswalk)
+MODEL_D,N/A (blocked),N/A,N/A,N/A,N/A,BLOCKED_LOGIC_SPEC,unsatisfiable d1 conditions (d1_coord > 0 AND d1_coord < 0); unresolved timeframe mapping
+MODEL_E,N/A (blocked),N/A,N/A,N/A,N/A,BLOCKED_LOGIC_SPEC,whole-sample Q repaint: state_transitions.sum() / len() injected as per-bar series
