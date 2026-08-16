@@ -1,0 +1,38 @@
+{
+  "phase": "R3",
+  "task": "CR-RISK-BLOCK1-R3-PROFIT-ANATOMY",
+  "base_commits": {
+    "p75_seal": "7bc1c0242cd05a205da62b34904d7308c63f2acb",
+    "r1": "32374cc051de056120e24525a4a70c2ecbf6b616",
+    "r2": "8c0a59d72b40560f4843997134ea89742de38cbf",
+    "r2_bookkeeping": "116bb2de4930726d7007816177416130e8f9e7a9"
+  },
+  "inputs": {
+    "phase_07_5/P7_5_TRADES.csv": {
+      "sha256": "ad19e08f16aeb65c17305041182c591401d28c32b418287f45d76a678ddfcd07",
+      "rows": 890
+    },
+    "phase_05/routing_events.parquet": {
+      "sha256": "de08df601a008e0efd6c0bc1523e8a9be25105324466ed3c7a19a0e561cf8607"
+    },
+    "phase_03/h1_strict_common_panel.parquet": {
+      "sha256": "a0da64a3b0cd8976b61e3f4e8defa55906098373efa1bcdf79dc2d628b8c6896"
+    }
+  },
+  "code": {
+    "phase_r1_concurrency.py": "f00d020c66ab02bbfd9df64f8cbb5d568b5af773f6f00f8f7ae7f803796f9131",
+    "phase_r1_episodes.py": "b2300de682183a8e95a684da2a970d45a7cc287ba78d20d71fa8031c0da7dee0",
+    "phase_r1_heat.py": "88eedb3d6b329895337b4ecbbe384e6a196df68659ff5ab9415582069b7fb8a4",
+    "phase_r1_ledger.py": "c35b2b078831e6e0ca638d5de7320f1b3b8a667d129b817604b76f8d8fabbfbd",
+    "phase_r1_orchestrator.py": "e2f0ed8f4a897bde1090b557a0c797a48af2d88339880b9bfcdc89e1375272ce",
+    "phase_r2_analysis.py": "2071ba0610d46f0418fb9ccd15e0bb3eb57b4ee247a084f3ce6f79f78f1d2f70",
+    "phase_r2_common.py": "4a146a4dcbf514d0166d3dfe9cb20d7056bc8e389cc070720745fb62a76d03c2",
+    "phase_r2_context.py": "96bc466778f2503eb319fd0e3d24f169fb2a341462970b5850c0041c62aae400",
+    "phase_r2_orchestrator.py": "46e89b25f7d9a0e338e4e3ff4f83be400852ffd5e12d49e2ffd9f707b77fc32e",
+    "phase_r3_analysis.py": "e169df876eaf35aa12b0b789e2d6286a08d3558e2735b80bb7df9eaf88e92861",
+    "phase_r3_context.py": "ae7d5edd31b37fa4272da64d56f16a09661995ce733659eb7ea979c217f32f75",
+    "phase_r3_orchestrator.py": "c6acd41488c6ba3cd6fa99948f66f24d3d56f182912408e9e2da72d5772af51c"
+  },
+  "determinism": "no random sampling; deterministic outputs verified by tests",
+  "subhour_note": "M5 feed rejected in R2 (p95 |diff| 22 bps vs frozen panel); R3 uses hourly frozen H1 paths only - no fabricated sub-hour timing."
+}

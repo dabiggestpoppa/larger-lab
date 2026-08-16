@@ -1,0 +1,142 @@
+{
+  "phase": "R3",
+  "task": "CR-RISK-BLOCK1-R3-PROFIT-ANATOMY",
+  "base_commits": {
+    "p75_seal": "7bc1c0242cd05a205da62b34904d7308c63f2acb",
+    "r2": "8c0a59d72b40560f4843997134ea89742de38cbf",
+    "r2_bookkeeping": "116bb2de4930726d7007816177416130e8f9e7a9"
+  },
+  "status": "R3_COMPLETE",
+  "r4_static_frontier_cleared": true,
+  "r4_waits_for_human_review": true,
+  "gate_checks": {
+    "artifacts_complete": true,
+    "no_alpha_changes": true,
+    "deterministic_rerun_passes": true,
+    "tests_pass": true,
+    "profit_anatomy_stable": true
+  },
+  "answers": {
+    "median_mfe_winners_R": 1.0708392582159272,
+    "p90_mfe_winners_R": 2.1452250612805357,
+    "median_mfe_losers_R": 0.029538212626108083,
+    "time_to_first_profit": {
+      "0.25": {
+        "share_of_winners": 1.1543985637342908,
+        "median_time_h": 2.0
+      },
+      "0.5": {
+        "share_of_winners": 0.9982046678635548,
+        "median_time_h": 2.0
+      },
+      "1.0": {
+        "share_of_winners": 0.5493716337522442,
+        "median_time_h": 3.0
+      }
+    },
+    "time_to_mfe_median_hour_all": 4.0,
+    "time_to_mfe_median_hour_winners": 5.0,
+    "median_capture_ratio_winners": 0.9186595997281858,
+    "median_giveback_winners_R": 0.08601982046539558,
+    "p_finish_negative_after_1R": 0.0,
+    "pct_final_pnl_by_hour3": 0.6948012305632376,
+    "pct_final_pnl_by_hour5": 0.8756673293488949,
+    "remaining_gain_at_h5_R": 0.027562552341750125,
+    "family": {
+      "A": {
+        "median_mfe_R": 0.7339945958898855,
+        "median_time_to_first_0_5R_h": 2.0,
+        "median_capture_winners": 0.9141688641142192,
+        "late_hold_share": -0.12815075691009364
+      },
+      "B": {
+        "median_mfe_R": 0.6977675091931836,
+        "median_time_to_first_0_5R_h": 2.0,
+        "median_capture_winners": 0.9361062649549972,
+        "late_hold_share": 0.4237158107482489
+      }
+    },
+    "winner_tail": {
+      "best_1pct_share": 0.05475867109914305,
+      "best_10pct_share": 0.2837378498651785,
+      "expectancy_excl_best_5pct_R": 0.1980620772101283
+    },
+    "maturity": {
+      "NOT_YET_DELIVERED": {
+        "N": 247,
+        "win_rate": 0.07692307692307693,
+        "final_expectancy_R": -0.947336645584725
+      },
+      "EARLY_DELIVERY": {
+        "N": 42,
+        "win_rate": 0.47619047619047616,
+        "final_expectancy_R": -0.0971632577162474
+      },
+      "MID_HOLD_DELIVERY": {
+        "N": 157,
+        "win_rate": 0.8471337579617835,
+        "final_expectancy_R": 0.6937885663706074
+      },
+      "LATE_DELIVERY": {
+        "N": 303,
+        "win_rate": 0.9834983498349835,
+        "final_expectancy_R": 1.4244189473003537
+      },
+      "PEAKED_AND_GIVING_BACK": {
+        "N": 141,
+        "win_rate": 0.6170212765957447,
+        "final_expectancy_R": 0.059671750272639865
+      }
+    },
+    "temporal": {
+      "inner_sel": {
+        "median_mfe_R": 0.7415831023372353,
+        "median_capture": 0.8978673589744646,
+        "winner_tail5_share": 0.17463621811809252
+      },
+      "inner_val": {
+        "median_mfe_R": 0.6516337579332077,
+        "median_capture": 0.9570372411927233,
+        "winner_tail5_share": 0.1768620609840176
+      },
+      "RELATIONSHIP_CONFIRMED_OOS": {
+        "median_mfe_R": 0.6897034901841126,
+        "median_capture": 0.9598672922176803,
+        "winner_tail5_share": 0.17875583601455483
+      }
+    }
+  },
+  "hypotheses_only": [
+    "by hour 5, 88% of final PnL is already earned while remaining expected gain is +0.03R \u2014 possible profit-lock / time-decay concept (late-hold capital efficiency).",
+    "trades that reach +1R still finish negative 0% of the time \u2014 possible partial/breakeven-lock concept after strong delivery.",
+    "winners give back a median 8% of peak MFE \u2014 possible trailing/exit-smoothing concept (needs R4 risk context)."
+  ],
+  "inputs": {
+    "phase_07_5/P7_5_TRADES.csv": {
+      "sha256": "ad19e08f16aeb65c17305041182c591401d28c32b418287f45d76a678ddfcd07",
+      "rows": 890
+    },
+    "phase_05/routing_events.parquet": {
+      "sha256": "de08df601a008e0efd6c0bc1523e8a9be25105324466ed3c7a19a0e561cf8607"
+    },
+    "phase_03/h1_strict_common_panel.parquet": {
+      "sha256": "a0da64a3b0cd8976b61e3f4e8defa55906098373efa1bcdf79dc2d628b8c6896"
+    }
+  },
+  "code_hashes": {
+    "phase_r1_concurrency.py": "f00d020c66ab02bbfd9df64f8cbb5d568b5af773f6f00f8f7ae7f803796f9131",
+    "phase_r1_episodes.py": "b2300de682183a8e95a684da2a970d45a7cc287ba78d20d71fa8031c0da7dee0",
+    "phase_r1_heat.py": "88eedb3d6b329895337b4ecbbe384e6a196df68659ff5ab9415582069b7fb8a4",
+    "phase_r1_ledger.py": "c35b2b078831e6e0ca638d5de7320f1b3b8a667d129b817604b76f8d8fabbfbd",
+    "phase_r1_orchestrator.py": "e2f0ed8f4a897bde1090b557a0c797a48af2d88339880b9bfcdc89e1375272ce",
+    "phase_r2_analysis.py": "2071ba0610d46f0418fb9ccd15e0bb3eb57b4ee247a084f3ce6f79f78f1d2f70",
+    "phase_r2_common.py": "4a146a4dcbf514d0166d3dfe9cb20d7056bc8e389cc070720745fb62a76d03c2",
+    "phase_r2_context.py": "96bc466778f2503eb319fd0e3d24f169fb2a341462970b5850c0041c62aae400",
+    "phase_r2_orchestrator.py": "46e89b25f7d9a0e338e4e3ff4f83be400852ffd5e12d49e2ffd9f707b77fc32e",
+    "phase_r3_analysis.py": "e169df876eaf35aa12b0b789e2d6286a08d3558e2735b80bb7df9eaf88e92861",
+    "phase_r3_context.py": "ae7d5edd31b37fa4272da64d56f16a09661995ce733659eb7ea979c217f32f75",
+    "phase_r3_orchestrator.py": "c6acd41488c6ba3cd6fa99948f66f24d3d56f182912408e9e2da72d5772af51c"
+  },
+  "deterministic": true,
+  "stop": "R3 checkpoint complete; R4 begins only after human review. No TP, early exit, trailing, breakeven, partial, family weighting, sizing, or alpha modification."
+}
