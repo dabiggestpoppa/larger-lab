@@ -3,7 +3,7 @@
 ## R0.5 Infrastructure Status (2026-08-15)
 
 > The MVE research stack has been rebuilt from a nonfunctional skeleton into a
-> deterministic, fail-closed research environment. Four checkpoints are
+> deterministic, fail-closed research environment. Six checkpoints are
 > complete (commits on `cerebus-mve-implementation`):
 >
 > 1. `MVE-R0.5-SOURCE-IMPORT-REPAIR` — all `src/mve` modules compile and import
@@ -20,11 +20,22 @@
 >    **all repaired components max mutation diff = 0.0**; only Model E's
 >    whole-sample Q component remains a (blocked, excluded) violation.
 >    `r05_1_causal_repair_pass = true`
+> 6. `MVE-R0.5.2-CAUSALITY-REGATE` + **R0.5 INFRASTRUCTURE SEAL** — independent
+>    verification (fresh process, fresh mutation routine, protocol frozen
+>    before the run): all 28 gate-eligible components max mutation diff 0.0
+>    (504 measurements), truncation all-pass, event-time schemas enforced,
+>    RKEY-B never backdated, Models A/B/C causal, eligible pipeline
+>    uncontaminated (Model E injection detected), ex-post separation clean,
+>    holdout untouched. Tests: 82/82. `infrastructure_sealed = true`,
+>    `scientific_phase4_ready = true` (**infrastructure only**)
 >
-> **Phase 4 remains BLOCKED.** `scientific_phase4_ready = false` until the
-> independent R0.5.2 regate + infrastructure seal. See `MVE_R05_1_DECISION.json`,
-> `MVE_R05_1_CAUSAL_REPAIR_REPORT.md`, `MVE_R05_1_STUB_CLASSIFICATION.json`,
-> `MVE_SCIENTIFIC_EVENT_TIME_SCHEMA.json`, `MVE_CAUSALITY_CONTRACT.md`.
+> **Phase 4 science remains NOT authorized.** The infrastructure is sealed and
+> ready to IMPLEMENT P4 (`scientific_phase4_ready = true` means ready-to-build,
+> not built); P4/P5/P6/P7 execution requires separate human authorization.
+> Model D/E stay BLOCKED_LOGIC_SPEC (excluded; P6/P7 prerequisites). See
+> `MVE_R05_2_DECISION.json`, `MVE_R05_2_REGATE_REPORT.md`,
+> `MVE_R05_INFRASTRUCTURE_SEAL.md`/`.json`, `MVE_R05_1_DECISION.json`,
+> `MVE_CAUSALITY_CONTRACT.md`.
 
 ## Overview
 

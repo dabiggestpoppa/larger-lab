@@ -1,0 +1,32 @@
+component,classification,future_perturbation_pass,truncation_pass,event_schema_pass,robustness_pass,execution_eligible,blocked_reason,final_status
+volatility/close_to_close,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+volatility/ewma,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+volatility/parkinson,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+volatility/garman_klass,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+volatility/atr_normalized,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+volatility/mad,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+volatility/garch,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+anchors/support_resistance,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+anchors/resistance_levels,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+anchors/trend_line,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+anchors/volume_profile,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+anchors/time_based,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+anchors/volatility_based,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+anchors/pivot_high,CAUSAL_DELAYED_CONFIRMATION,True,True,DELAYED,True,True,,PASS
+anchors/pivot_low,CAUSAL_DELAYED_CONFIRMATION,True,True,DELAYED,True,True,,PASS
+coordinates/morphic,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+coordinates/frozen_sigma,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+coordinates/live_sigma,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+sigma_states/classification,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+sigma_states/occupation,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+acceptance/occupancy,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+acceptance/classification,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+regime/state_map,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+rekey/RKEY_A,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+rekey/RKEY_B,CAUSAL_DELAYED_CONFIRMATION,True,True,DELAYED,True,True,,PASS
+rekey/RKEY_C,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+signals/model_A_escape,CAUSAL_DELAYED_CONFIRMATION,True,True,DELAYED,True,True,,PASS
+signals/model_B_breakout,CAUSAL_REALTIME,True,True,N/A,True,True,,PASS
+signals/model_C_recursive,CAUSAL_DELAYED_CONFIRMATION,True,True,DELAYED,True,True,,PASS
+signals/model_D_mtf,BLOCKED_LOGIC_SPEC,True,,N/A,True,False,contradictory logic untouched,BLOCKED_LOGIC_SPEC
+signals/model_E_trend_score,BLOCKED_LOGIC_SPEC,False,,N/A,True,False,whole-sample Q repaint,BLOCKED_LOGIC_SPEC

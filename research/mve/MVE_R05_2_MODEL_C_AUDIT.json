@@ -1,0 +1,5 @@
+{
+  "crossing_bar_not_backdated": true,
+  "entry_known_at_confirmation_bar": true,
+  "same_bar_exit_overwritten_by_confirmed_entry": true
+}

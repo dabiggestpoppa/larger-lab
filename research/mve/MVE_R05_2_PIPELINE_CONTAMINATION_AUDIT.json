@@ -1,0 +1,24 @@
+{
+  "eligible_pipeline_max_historical_diff": 0.0,
+  "eligible_pipeline_pass": true,
+  "injected_model_e_max_historical_diff": 1.0,
+  "contamination_detected": true,
+  "m5_resample_hour_boundary_invariance": true,
+  "components_in_eligible_aggregate": [
+    "volatility",
+    "morphic_coordinates",
+    "sigma_states",
+    "occupancy",
+    "acceptance",
+    "RKEY_A",
+    "RKEY_B",
+    "RKEY_C",
+    "Model A",
+    "Model B",
+    "Model C"
+  ],
+  "blocked_excluded": [
+    "Model D",
+    "Model E"
+  ]
+}

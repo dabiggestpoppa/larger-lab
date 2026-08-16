@@ -1,0 +1,25 @@
+{
+  "fixture": {
+    "breakout_bar": 40,
+    "retest_confirmation_bar": 43,
+    "full_series_bar40_is_identity": true,
+    "truncate_before_breakout_no_rekey_anywhere": true,
+    "truncate_at_breakout_no_active_rekey": true,
+    "truncate_during_retest_wait_no_active_rekey": true,
+    "truncate_at_confirmation_bar43_displaced": true,
+    "history_before_confirmation_identical_across_truncations": true,
+    "history_after_confirmation_matches_full": true
+  },
+  "future_mutation_after_confirmation_cannot_move_anchor_earlier": true,
+  "detected_events": {
+    "count": 77,
+    "anchor_formula_unchanged": true,
+    "timing_schema_valid": true,
+    "no_backdated_active_anchor": true
+  },
+  "real_data_events": {
+    "count": 3803,
+    "schema_valid": true,
+    "anchor_formula_unchanged": true
+  }
+}

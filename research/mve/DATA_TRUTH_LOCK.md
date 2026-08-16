@@ -125,6 +125,26 @@ See `MVE_DATA_ACCESS_LEDGER.csv` and `MVE_DATA_SPLIT_LOCK.json`.
 > `MVE_SCIENTIFIC_EVENT_TIME_SCHEMA.json`. P4 remains blocked until the
 > independent R0.5.2 regate.
 
+> **UPDATED (R0.5.2, 2026-08-15):** the independent causality regate
+> (`MVE-R0.5.2-CAUSALITY-REGATE`) **PASSED** — verification only, no code
+> changes. Fresh process + fresh mutation routine (per-row `exp(U(-m,+m))`,
+> m ∈ {3,6,9}, sign-flipped tails, seeds 5001/5002, cutoffs 0.35/0.65/0.85,
+> 18 combos × 28 eligible components = 504 measurements): **every executable
+> component max historical mutation diff = 0.0; truncation invariance all
+> pass; event-time schemas enforce ordering (fail-closed incl. NaT); RKEY-B
+> never backdates (77 synthetic + 3,803 real events schema-valid, anchor
+> formula unchanged); Models A/B/C causal at their frozen known times;
+> RKEY-C NaN-robust; Model D/E remain BLOCKED_LOGIC_SPEC and excluded;
+> eligible pipeline aggregate uncontaminated (injecting Model E is detected,
+> diff 1.0); causal→ex-post dependency count = 0; static leakage re-audit:
+> 0 unclassified; holdout untouched (`FINAL_HOLDOUT_PENDING`,
+> holdout_rows_read = 0). Tests: 82/82. **`infrastructure_sealed = true`,
+> `scientific_phase4_ready = true` (infrastructure only). P4 NOT authorized.**
+> See `MVE_R05_2_DECISION.json`, `MVE_R05_2_REGATE_REPORT.md`,
+> `MVE_R05_2_FUTURE_PERTURBATION_RESULTS.json`, `MVE_R05_2_COMPONENT_MATRIX.csv`,
+> `MVE_R05_2_PIPELINE_CONTAMINATION_AUDIT.json`, `MVE_R05_2_INPUT_HASH_MANIFEST.json`,
+> `MVE_R05_INFRASTRUCTURE_SEAL.md`/`.json`.
+
 ---
 
 **Data truth established (partial):** the real files are measured above.

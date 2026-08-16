@@ -1,0 +1,8 @@
+{
+  "long_crossing_bar": 0,
+  "long_confirmation_bar": 1,
+  "long_not_backdated": true,
+  "short_mirror_not_backdated": true,
+  "invalidated_no_signal": true,
+  "known_signal_unchanged_after_future_mutation": true
+}

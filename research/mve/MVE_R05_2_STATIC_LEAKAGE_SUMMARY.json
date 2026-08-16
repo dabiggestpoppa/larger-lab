@@ -1,0 +1,176 @@
+{
+  "hits": [
+    {
+      "file": "acceptance.py",
+      "line": 247,
+      "pattern": "idx+horizon",
+      "function": "analyze_acceptance_forward_returns",
+      "classification": "EX_POST_ONLY"
+    },
+    {
+      "file": "acceptance.py",
+      "line": 248,
+      "pattern": "idx+horizon",
+      "function": "analyze_acceptance_forward_returns",
+      "classification": "EX_POST_ONLY"
+    },
+    {
+      "file": "anchors.py",
+      "line": 130,
+      "pattern": "iloc[i+",
+      "function": "_calculate_pivot_high",
+      "classification": "CAUSAL_DELAYED_CONFIRMATION"
+    },
+    {
+      "file": "anchors.py",
+      "line": 158,
+      "pattern": "iloc[i+",
+      "function": "_calculate_pivot_low",
+      "classification": "CAUSAL_DELAYED_CONFIRMATION"
+    },
+    {
+      "file": "anchors.py",
+      "line": 11,
+      "pattern": "find_peaks",
+      "function": null,
+      "classification": "SAFE_CAUSAL",
+      "note": "imported but never called (dead import)"
+    },
+    {
+      "file": "anchors.py",
+      "line": 130,
+      "pattern": "pivot right window",
+      "function": "_calculate_pivot_high",
+      "classification": "CAUSAL_DELAYED_CONFIRMATION"
+    },
+    {
+      "file": "anchors.py",
+      "line": 158,
+      "pattern": "pivot right window",
+      "function": "_calculate_pivot_low",
+      "classification": "CAUSAL_DELAYED_CONFIRMATION"
+    },
+    {
+      "file": "morphic_coordinates.py",
+      "line": 334,
+      "pattern": "shift(-",
+      "function": "analyze_coordinate_trends",
+      "classification": "EX_POST_ONLY"
+    },
+    {
+      "file": "morphic_coordinates.py",
+      "line": 300,
+      "pattern": "iloc[i+",
+      "function": "calculate_coordinate_transitions",
+      "classification": "EX_POST_ONLY"
+    },
+    {
+      "file": "regime.py",
+      "line": 121,
+      "pattern": "iloc[i+",
+      "function": "analyze_regime_transitions",
+      "classification": "EX_POST_ONLY"
+    },
+    {
+      "file": "regime.py",
+      "line": 165,
+      "pattern": "iloc[i+",
+      "function": "analyze_regime_persistence",
+      "classification": "EX_POST_ONLY"
+    },
+    {
+      "file": "regime.py",
+      "line": 284,
+      "pattern": "iloc[i+",
+      "function": "analyze_high_displacement_high_expansion",
+      "classification": "EX_POST_ONLY"
+    },
+    {
+      "file": "rekey.py",
+      "line": 324,
+      "pattern": "iloc[i+",
+      "function": "analyze_rekey_variants",
+      "classification": "EX_POST_ONLY"
+    },
+    {
+      "file": "rekey.py",
+      "line": 375,
+      "pattern": "iloc[i+",
+      "function": "analyze_rekey_effectiveness",
+      "classification": "EX_POST_ONLY"
+    },
+    {
+      "file": "rekey.py",
+      "line": 376,
+      "pattern": "iloc[i+",
+      "function": "analyze_rekey_effectiveness",
+      "classification": "EX_POST_ONLY"
+    },
+    {
+      "file": "rekey.py",
+      "line": 441,
+      "pattern": "iloc[i+",
+      "function": "analyze_rekey_continuation",
+      "classification": "EX_POST_ONLY"
+    },
+    {
+      "file": "sigma_states.py",
+      "line": 317,
+      "pattern": "shift(-",
+      "function": "analyze_event_trends",
+      "classification": "EX_POST_ONLY"
+    },
+    {
+      "file": "sigma_states.py",
+      "line": 278,
+      "pattern": "iloc[i+",
+      "function": "calculate_event_transitions",
+      "classification": "EX_POST_ONLY"
+    },
+    {
+      "file": "sigma_states.py",
+      "line": 12,
+      "pattern": "find_peaks",
+      "function": null,
+      "classification": "SAFE_CAUSAL",
+      "note": "imported but never called (dead import)"
+    },
+    {
+      "file": "signals.py",
+      "line": 94,
+      "pattern": "iloc[i+",
+      "function": "generate_sigma_escape_signals",
+      "classification": "CAUSAL_DELAYED_CONFIRMATION"
+    },
+    {
+      "file": "signals.py",
+      "line": 101,
+      "pattern": "iloc[i+",
+      "function": "generate_sigma_escape_signals",
+      "classification": "CAUSAL_DELAYED_CONFIRMATION"
+    },
+    {
+      "file": "signals.py",
+      "line": 555,
+      "pattern": "whole-sample diff().abs()",
+      "function": "_calculate_state_progression_quality",
+      "classification": "BLOCKED_LOGIC_SPEC"
+    },
+    {
+      "file": "volatility.py",
+      "line": 534,
+      "pattern": "iloc[i+",
+      "function": "_calculate_regime_transitions",
+      "classification": "EX_POST_ONLY"
+    },
+    {
+      "file": "volatility.py",
+      "line": 11,
+      "pattern": "find_peaks",
+      "function": null,
+      "classification": "SAFE_CAUSAL",
+      "note": "imported but never called (dead import)"
+    }
+  ],
+  "unclassified": []
+}

@@ -1,0 +1,31 @@
+{
+  "repo": "dabiggestpoppa/larger-lab",
+  "branch": "cerebus-mve-implementation",
+  "git_sha": "30d4f1adf5ce58b6be4445537b9c5ab22d85ed73",
+  "python": "3.11.9",
+  "numpy": "2.4.6",
+  "pandas": "2.2.3",
+  "scipy": "1.17.1",
+  "files": {
+    "src/mve/__init__.py": "1d19c4ce7a43215e1867d8c84b87eb7c6fec7f9d944c6b3df5cb943843d63164",
+    "src/mve/acceptance.py": "08e59e5d19563bcbfb4a7f274db54af4c6d3733d8f5debccd37fc7ff622e9806",
+    "src/mve/anchors.py": "3692836256319fad3ab69f9179b06ebe45558e78a583a04713a33410adeb9490",
+    "src/mve/backtest.py": "c1f1f1769cdd429a818495e89dfaf939e45a71f5428e7e7a343d47a0917e8492",
+    "src/mve/causality.py": "f89b24e8a2f739c9c2ae0c98d49ecdc3442793c260788355b984eaa85ab8ca8c",
+    "src/mve/data_loader.py": "c1933d366e3dd9cb45c510317bdc07f24b716b00378bd1922b048af20e3e244f",
+    "src/mve/morphic_coordinates.py": "f63559fb5ab1d065f4e7949d72624716b8177df0bdf3cedfdc9c97240110bfe3",
+    "src/mve/persistence.py": "bed2878bb5c24c0ed64558f860e7d117638773609b783ac3c93a2a49ec57912f",
+    "src/mve/regime.py": "e8b788b630183b8d35d9f95baed7656a6a1509da6299f1da39182fb68a094f57",
+    "src/mve/rekey.py": "1b6a4f79a9c6f6f1193ebc66d8f559b52081f0696a6ae2b4b0cb716cb9e190de",
+    "src/mve/runner.py": "116c91798db38c4ed9727c90f86fc33def2aabe143eeb78d3938b3bf990a01b4",
+    "src/mve/sigma_states.py": "36b7ad20c2e6b98507c86517becd47a1b82407b71e21c385c9db76d47f80f15a",
+    "src/mve/signals.py": "0addab570bf044a35672afa0e5e9cc505cacde46d9075a40e4346e0e24f7cf31",
+    "src/mve/volatility.py": "a31ee0acc0a364e28db5245927de5b5c39728d2d9c351d8afec16786fdf24ef5",
+    "tests/mve/test_causality.py": "7d815098324503ea68504725edb061b2f05e26ad9ee7031c6a6826052e1182f0",
+    "tests/mve/test_data_pipeline.py": "d306b833db8d173c90c4379d6e67b649f38d09bd16d580f46e813d21bae312f3",
+    "tests/mve/test_mve_package_import.py": "accb8168fa29cf7bbc7216d9eeb1d4df10f32e40f38903d900a5de45caa473fa",
+    "tests/mve/test_runner.py": "95436714995a2c5f465feb6fd31062c91b3619f4936f28c9aaf4aa6e72140150",
+    "research/mve/r0_tools/generate_regate_outputs.py": "54c43e0661e72c3f7dbd17f09dffbb0faa4db00acbb2c698a8920ab4ec408f1c",
+    "quant-lab/data/EURUSDPRO_M5_2023_2026.csv": "630b8a4052fe962bc7d87c6d49d83bc1524c7ddd83cd15e902fe504c998d3f77"
+  }
+}

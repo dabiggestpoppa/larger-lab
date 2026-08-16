@@ -1,0 +1,21 @@
+{
+  "leading_nan_warmup": {
+    "no_crash": true,
+    "nan_positions_stay_nan": true,
+    "post_warmup_identity_until_first_valid_rekey": true
+  },
+  "isolated_nan": {
+    "no_crash": true,
+    "history_before_nan_identical_to_clean": true,
+    "nan_bar_is_nan": true,
+    "recovers_after_nan": true
+  },
+  "nan_run": {
+    "no_crash": true,
+    "nan_run_stays_nan": true,
+    "history_before_run_identical": true
+  },
+  "no_synthetic_rekeys": {
+    "warmup_identity": true
+  }
+}

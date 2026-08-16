@@ -1,0 +1,5 @@
+{
+  "accepted_state_signal_at_i": 1,
+  "signal_at_i_independent_of_bar_i_plus_1": true,
+  "note": "implemented realtime accepted-state signal; unimplemented retest-entry semantics remain BLOCKED_LOGIC_SPEC"
+}

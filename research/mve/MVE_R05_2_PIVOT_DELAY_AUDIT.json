@@ -1,0 +1,9 @@
+{
+  "pivot_window": 5,
+  "first_window_rows_nan_in_usable_series": true,
+  "raw_pivot_max_historical_diff_no_delay_filter": 0.0,
+  "raw_pivot_max_historical_diff_knowledge_filtered": 0.0,
+  "coords_from_raw_pivots_max_diff_no_delay": 0.0,
+  "coords_from_delayed_pivots_max_diff_knowledge_filtered": 0.0,
+  "interpretation": "raw pivot values whose confirmation window crosses T legitimately change under future mutation (DELAYED_CONFIRMATION); with the knowledge filter (delay=window) and via apply_anchor_delay consumption, history is invariant."
+}

@@ -1,0 +1,9 @@
+{
+  "measured_repaint_max_diff": 1.0,
+  "measured_repaint_confirmed": true,
+  "generate_all_signals_includes_model_E": true,
+  "aggregate_generator_classification": "BLOCKED_AGGREGATE (cannot be gate-eligible until Model E resolved)",
+  "runner_cannot_enable": true,
+  "blocked_status_machine_readable": true,
+  "reason": "Q component is a whole-sample scalar (signals.py _calculate_state_progression_quality: state_transitions.sum()/len) -> historical signals repaint under future mutation"
+}

@@ -1,0 +1,7 @@
+{
+  "no_crash_on_warmup_nan": true,
+  "contradictory_logic_untouched": true,
+  "excluded_from_eligible_pipeline": true,
+  "runner_cannot_enable": true,
+  "runner_note": "runner.py imports only data_loader/persistence; phases 4-7 are BLOCKED_SCIENTIFIC_IMPLEMENTATION"
+}

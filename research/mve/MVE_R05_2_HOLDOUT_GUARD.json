@@ -1,0 +1,7 @@
+{
+  "holdout_status": "FINAL_HOLDOUT_PENDING",
+  "holdout_rows_read": 0,
+  "holdout_slice_blocked": true,
+  "block_reason": "Slice [2026-01-01, 2026-03-01] is outside authorized ranges [('2023-07-03', '2024-12-31'), ('2025-01-01', '2025-12-31')] (holdout status: FINAL_HOLDOUT_PENDING)",
+  "note": "all regate measurements used only the development slice 2023-07-03..2024-03-31 (H1); 2026 never sliced"
+}

@@ -1,0 +1,63 @@
+{
+  "scientific_event_schema": {
+    "realtime_good": {
+      "outcome": "VALID",
+      "problems": []
+    },
+    "delayed_good": {
+      "outcome": "VALID",
+      "problems": []
+    },
+    "known_before_evidence": {
+      "outcome": "REJECTED",
+      "reason": "event 3: ordering violated (event <= evidence <= known <= action required)"
+    },
+    "action_before_known": {
+      "outcome": "REJECTED",
+      "reason": "event 4: ordering violated (event <= evidence <= known <= action required)"
+    },
+    "missing_fields": {
+      "outcome": "REJECTED",
+      "reason": "event 5: missing evidence_complete_time; event 5: missing known_time; event 5: missing action_time"
+    },
+    "nat_timestamp": {
+      "outcome": "REJECTED",
+      "reason": "'<=' not supported between instances of 'NaTType' and 'int'"
+    }
+  },
+  "acceptance_schema": {
+    "good": {
+      "outcome": "VALID",
+      "problems": []
+    },
+    "bad_order": {
+      "outcome": "REJECTED",
+      "reason": "acceptance event 2: timestamp ordering violated (state <= evidence <= known required)"
+    },
+    "missing": {
+      "outcome": "REJECTED",
+      "reason": "acceptance event ?: missing evidence_complete_time; acceptance event ?: missing acceptance_known_time"
+    }
+  },
+  "rekey_schema": {
+    "good": {
+      "outcome": "VALID",
+      "problems": []
+    },
+    "bad_order": {
+      "outcome": "REJECTED",
+      "reason": "rekey event 2: timestamp ordering violated (event <= evidence <= known <= active required)"
+    },
+    "missing": {
+      "outcome": "REJECTED",
+      "reason": "rekey event ?: missing rekey_evidence_complete_time; rekey event ?: missing rekey_known_time; rekey event ?: missing new_anchor_active_time"
+    },
+    "rkey_b_real_data_events": {
+      "count": 3803,
+      "validation": {
+        "outcome": "VALID",
+        "problems": []
+      }
+    }
+  }
+}
