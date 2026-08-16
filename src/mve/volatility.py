@@ -100,7 +100,8 @@ class VolatilityEstimators:
         estimators = {}
         
         # Calculate each estimator
-        estimators['close_to_close'] = self._close_to_close_volatility(prices)
+        returns = np.log(prices / prices.shift(1))
+        estimators['close_to_close'] = self._close_to_close_volatility(returns)
         estimators['ewma'] = self._ewma_volatility(prices)
         estimators['parkinson'] = self._parkinson_volatility(highs, lows)
         estimators['garman_klass'] = self._garman_klass_volatility(highs, lows)
@@ -109,58 +110,10 @@ class VolatilityEstimators:
         estimators['garch'] = self._garch_volatility(prices)
         
         return estimators
-        
-        Args:
-            prices: Price series (typically close prices)
-            highs: High price series (for range-based estimators)
-            lows: Low price series (for range-based estimators)
-            volumes: Volume series (for ATR calculation)
-            
-        Returns:
-            Dictionary with estimator names as keys and volatility series as values
-        """
-        # Calculate log returns
-        returns = np.log(prices / prices.shift(1))
-        
-        # Initialize dictionary
-        estimators = {}
-        
-        # 1. Close-to-Close Rolling Standard Deviation
-        estimators['close_to_close'] = self._close_to_close_volatility(returns)
-        
-        # 2. EWMA Volatility
-        estimators['ewma'] = self._ewma_volatility(returns)
-        
-        # 3. Parkinson Range Volatility (requires highs and lows)
-        if highs is not None and lows is not None:
-            estimators['parkinson'] = self._parkinson_volatility(highs, lows)
-        else:
-            estimators['parkinson'] = pd.Series(np.nan, index=prices.index)
-            
-        # 4. Garman-Klass Volatility (requires highs and lows)
-        if highs is not None and lows is not None:
-            estimators['garman_klass'] = self._garman_klass_volatility(prices, highs, lows)
-        else:
-            estimators['garman_klass'] = pd.Series(np.nan, index=prices.index)
-            
-        # 5. ATR-Normalized Realized Volatility (requires volumes)
-        if volumes is not None:
-            estimators['atr_normalized'] = self._atr_normalized_volatility(prices, volumes)
-        else:
-            estimators['atr_normalized'] = pd.Series(np.nan, index=prices.index)
-            
-        # 6. MAD-Based Robust Volatility
-        estimators['mad'] = self._mad_volatility(returns)
-        
-        # 7. GARCH(1,1) Volatility
-        estimators['garch'] = self._garch_volatility(returns)
-        
-        self.estimators = estimators
-        return estimators
-        
+
     def _close_to_close_volatility(self, returns: pd.Series) -> pd.Series:
         """Calculate close-to-close rolling standard deviation."""
-        return returns.rolling(window=self.window).std()
+        return returns.rolling(window=self.config['close_to_close']['window']).std()
         
     def _ewma_volatility(self, prices: pd.Series) -> pd.Series:
         """

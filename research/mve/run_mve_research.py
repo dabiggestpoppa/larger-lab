@@ -18,8 +18,11 @@ import argparse
 from datetime import datetime
 from typing import Dict, List, Tuple, Optional
 
-# Add the src directory to the path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
+# Add the repo-root src directory to the path so `import mve` works
+# regardless of the current working directory. This file lives at
+# research/mve/run_mve_research.py, so the repo root is two levels up.
+_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.join(_REPO_ROOT, 'src'))
 
 from mve.volatility import VolatilityEstimators
 from mve.anchors import StructuralAnchors

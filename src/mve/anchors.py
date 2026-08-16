@@ -126,8 +126,8 @@ class StructuralAnchors:
         
         for i in range(window, len(prices) - window):
             # Check if current price is higher than surrounding prices
-            if (prices.iloc[i] > prices.iloc[i-window:i] and 
-                prices.iloc[i] > prices.iloc[i+1:i+window+1]):
+            if ((prices.iloc[i] > prices.iloc[i-window:i]).all() and 
+                (prices.iloc[i] > prices.iloc[i+1:i+window+1]).all()):
                 # Check pivot height
                 pivot_height = (prices.iloc[i] - min(prices.iloc[i-window:i])) / prices.iloc[i]
                 if pivot_height >= min_pivot_height:
@@ -154,8 +154,8 @@ class StructuralAnchors:
         
         for i in range(window, len(prices) - window):
             # Check if current price is lower than surrounding prices
-            if (prices.iloc[i] < prices.iloc[i-window:i] and 
-                prices.iloc[i] < prices.iloc[i+1:i+window+1]):
+            if ((prices.iloc[i] < prices.iloc[i-window:i]).all() and 
+                (prices.iloc[i] < prices.iloc[i+1:i+window+1]).all()):
                 # Check pivot height
                 pivot_height = (max(prices.iloc[i-window:i]) - prices.iloc[i]) / prices.iloc[i]
                 if pivot_height >= min_pivot_height:
@@ -477,13 +477,3 @@ class StructuralAnchors:
         best_anchors = sorted(scores.items(), key=lambda x: x[1], reverse=True)[:top_n]
         
         return [name for name, score in best_anchors]
-                        
-                        comparison[f'{anchor1}_vs_{anchor2}'] = {
-                            'correlation': correlation,
-                            'anchor1_mean': anchor1_aligned.mean(),
-                            'anchor2_mean': anchor2_aligned.mean(),
-                            'anchor1_std': anchor1_aligned.std(),
-                            'anchor2_std': anchor2_aligned.std()
-                        }
-                        
-        return comparison
