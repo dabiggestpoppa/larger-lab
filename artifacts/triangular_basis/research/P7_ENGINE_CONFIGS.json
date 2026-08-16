@@ -1,0 +1,29 @@
+{
+  "engines": [
+    {
+      "name": "E0",
+      "exit_target": 0.0,
+      "max_hold_min": null,
+      "invalidate_zones": [],
+      "evidence": "frozen control — z*=0 convergence exit, frozen hold (session-end timeout), frozen stop |z|>=6"
+    },
+    {
+      "name": "E1",
+      "exit_target": -0.25,
+      "max_hold_min": null,
+      "invalidate_zones": [],
+      "evidence": "P7.1 overshoot plateau: targets -0.50/-0.25 beat z*=0 for both entries on TB-B (EV 19.60/21.31 vs 17.86 @entry 2.5; 24.86/26.84 vs 23.07 @entry 3.0), same maxDD (-35), BE>=2.92x. Conservative plateau member -0.25 chosen (neighbors 0.00 and -0.50 both work). Earlier exits (0.25..1.00) strictly worse — not used."
+    },
+    {
+      "name": "E3",
+      "exit_target": -0.25,
+      "max_hold_min": null,
+      "invalidate_zones": [[2.5, 3.0, 180, 1000000]],
+      "evidence": "P7.4 recovery cliff: state (|z| in [2.5,3.0), age >= 180m) has P(conv) 19-24% vs 66% fresh (age-only B + distance x age C; N=67/36 support entry 2.5/3.0). Built to MEASURE the downside/capital-time tradeoff (P7.2 E(remaining) stays positive in that state, so the expectancy impact of invalidating must be tested on D/C/H, not assumed)."
+    }
+  ],
+  "omitted": {
+    "E2": "no validated time limit — P7.2 found NO negative or economically weak remaining-expectancy cell (min support N>=10) within the tested horizon; a pure time cap has no independent expectancy evidence",
+    "E4": "would require E2's time component, which was not validated"
+  }
+}
