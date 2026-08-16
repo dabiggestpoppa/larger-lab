@@ -1,0 +1,43 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-II-STATIC-ARCHITECTURE-SEAL",
+  "repo": "dabiggestpoppa/larger-lab",
+  "branch": "capital-routing",
+  "base_commit": "8abb7c21e907254f75618deb3c9095c971c6b9be",
+  "block1_seal_commit": "8ca072d0d939acf581770a99ce45b333deddd8c",
+  "r5_commit": "150a93dec8edf2997652cd20724298fe9927c0dc",
+  "r6_substantive_commit": "1e8cc01fe34bf44418eb367fc35f885d7579691c",
+  "r6_correction_commit": "0cb3b51088d95ff8537cf503ce036fbc1e1b698e",
+  "block2_intermediate_commit": "8abb7c21e907254f75618deb3c9095c971c6b9be",
+  "python_version": "3.11.9",
+  "timestamp": "2026-08-16T21:48:24Z",
+  "frozen_inputs": {
+    "artifacts\\phase_07_5\\P7_5_TRADES.csv": "ad19e08f16aeb65c17305041182c591401d28c32b418287f45d76a678ddfcd07",
+    "artifacts\\phase_05\\routing_events.parquet": "de08df601a008e0efd6c0bc1523e8a9be25105324466ed3c7a19a0e561cf8607",
+    "artifacts\\phase_03\\h1_strict_common_panel.parquet": "a0da64a3b0cd8976b61e3f4e8defa55906098373efa1bcdf79dc2d628b8c6896",
+    "artifacts\\risk_block1\\R1_EVENT_RISK_LEDGER.csv": "6c98b0d218c66f3f5893733f26c51490138e658046487e3ea108c5feeee2d26f",
+    "artifacts\\risk_block1\\R1_CONCURRENCY_SUMMARY.csv": "f6fb67b9659fc8f8202d9bf86bddaf9292bdab6cd18c06a882542d319879cfcb",
+    "artifacts\\risk_block1\\R1_ROUTING_EPISODES.csv": "e87b8083690bef88bb4479e6fb23add19220f7d510c0bb60004d8dc62b337233",
+    "artifacts\\risk_block1\\BLOCK1_DECISION.json": "db8450303ee7f70512a0531d43442c3005a139d1759c303a07ae4d5206bd5bff",
+    "artifacts\\risk_block2\\r5\\R5_DECISION.json": "d7f7dcabc41cd25c5d6df8ada3a30bf3d8f5034a799036b7bf2810f03552cacf",
+    "artifacts\\risk_block2\\r5\\R5_FAMILY_DISTRIBUTIONS.csv": "2fd063a4965d479d5287f59f6b6e05610c556d8d15ff2ed00235ac98e4986b93",
+    "artifacts\\risk_block2\\r5\\R5_ALLOCATION_FRONTIER.csv": "1bf446d5278882e7e26d67c9b611b50ad1d26cefd1a03c45f2624ca409a5f69d",
+    "artifacts\\risk_block2\\r5\\R5_FAMILY_DEPENDENCY.csv": "66482ce30f3117c76efba091c672481aff23b27d2a64878cf81269012c49a1c1",
+    "artifacts\\risk_block2\\r5\\R5_FAMILY_EDGE_DEGRADATION.csv": "59db8c0a60975a4e3d69dbb739251e4fbbc6c9e87ffc523bdf004a58956f6b75",
+    "artifacts\\risk_block2\\r6\\R6_DECISION.json": "b9d794e89c597c4f198b3969ad08c9d8fcc6dad20b0a36ca7f8c3048125ed373",
+    "artifacts\\risk_block2\\r6\\R6_EVENT_EPISODE_LEDGER.csv": "c62dba26616a51c1fda14c10da3e956b03dbaf729db1281bf7dfc586c727c39a",
+    "artifacts\\risk_block2\\r6\\R6_ADMISSION_DECISION_LEDGER.csv": "a6e53a780af826ad6dba58b395929609058f60327c3d340e00576c6c3fe4105c",
+    "artifacts\\risk_block2\\r6\\R6_HEAT_POLICY_FRONTIER.csv": "b33140512db11afc204abbed1aeca1b2ca1846a33db714ca9a54ce3a69d58424",
+    "artifacts\\risk_block2\\r6\\R6_HEAT_POLICY_MONTE_CARLO.csv": "640a9e47267c3d01312d3294c9daeacc35b23f23b0afcd79c846dfacaed8e507",
+    "artifacts\\risk_block2\\r6\\R6_NONDOMINATED_HEAT_FRONTIER.csv": "414b3a9f26676bf8a4d9db981b77c775da882424318d81665574ea0d2b789368",
+    "artifacts\\risk_block2\\CR_RISK_BLOCK2_DECISION.json": "4608df862c5fe7bf392c1d8e4c1875f8c6a966132db663bfd9ad20599c5242a8",
+    "artifacts\\risk_block2\\CR_RISK_BLOCK2_COMPONENT_CLASSIFICATION.csv": "119a1baf083aa366fbade4f295ff22d0424bedde97d6048e10af8960c8e8eb0f",
+    "artifacts\\risk_block2\\CR_RISK_BLOCK2_COMPLEXITY_PRUNING.csv": "dc7108b46d0b1c47960369849dd07294014d600f57b2451e0de2f5be0aa1573b",
+    "artifacts\\risk_block2\\CR_RISK_BLOCK2_EDGE_RETENTION_WARNING.json": "d68fdb79295aecffb01766e0d0a5d2ce833cc3324c26105b243bbbd6f5d81d4c",
+    "artifacts\\risk_block2\\CR_RISK_BLOCK2_SUPPORTED_DESIGN_REGION.csv": "fd30cbb351be3042740ca3226997de126fbbe988b0a7541fc99fb085c4065f2c"
+  },
+  "analysis_scripts": {
+    "src\\capital_routing\\static_risk_architecture.py": "3f867b40063dbf9c179ed9c51677f2861fcb45613909ed4b961e666a8e587326",
+    "scripts\\run_risk_block2_static_seal.py": "61d6de0285f0fdef938cfb5296abca496d9e245745e9f0a34445a5da10eaa57c"
+  },
+  "note": "Frozen authoritative sources only. Rebuilt ledger must reconcile with the sealed R1 ledger (890 events, 432 A / 458 B)."
+}

@@ -1,0 +1,10 @@
+policy,role,rationale
+H0,KEEP_AS_UNCONSTRAINED_CONTROL,baseline reference; reproduces sealed math
+H1,ADOPT_AS_CANONICAL_SIMPLE_HEAT_MECHANISM,simplest cap with material tail reduction at A-heavy allocation
+H2,PRUNE_FROM_DEFAULT_DIAGNOSTIC_ONLY,matches H1; no incremental value
+H3,SECONDARY_OPTIONAL,supported-not-required; weaker than equal gross cap
+H4,PRUNED_REDUNDANT,dominated by H1 (rejects 180 vs 14 at 1.0x)
+H5,DEFERRED_COMPLEXITY,no demonstrated incremental gain over H1
+DD-adaptive (R7),DEFERRED_NO_MECHANISM,no unresolved state-dependent risk mechanism demonstrated
+Kelly (R8),DEFERRED,growth rules follow exposure limits; not authorized
+Hybrid (R9),DEFERRED,not authorized; deferred with R7/R8

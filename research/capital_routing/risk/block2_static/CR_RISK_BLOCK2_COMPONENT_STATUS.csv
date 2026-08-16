@@ -1,0 +1,10 @@
+component,status,basis
+STATIC_RISK_ARCHITECTURE,VALIDATED,minimum architecture justified by R1-R6
+FAMILY_ALLOCATION_PRIMITIVE,VALIDATED,static family allocation materially lowers DD (50/50 5.2% vs A-solo 10.3% / B-solo 11.1%)
+GROSS_HEAT_PRIMITIVE,VALIDATED,H1 gross cap materially lowers resampled tail at A-heavy alloc
+DYNAMIC_SIZING,NOT_REQUIRED_BY_CURRENT_EVIDENCE,no unresolved state-dependent risk mechanism; R7 deferred
+EPISODE_MEMORY_BUDGET,PRUNED_REDUNDANT,H4 dominated by H1
+KELLY,DEFERRED,not authorized
+HYBRID_SIZING,DEFERRED,not authorized
+DEPLOYMENT,NOT_AUTHORIZED,plan
+MT5,NOT_AUTHORIZED,plan

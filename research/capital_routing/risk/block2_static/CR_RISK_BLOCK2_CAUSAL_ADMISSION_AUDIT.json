@@ -1,0 +1,56 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-II-STATIC-ARCHITECTURE-SEAL",
+  "method": "static_risk_architecture.admit_book reproduced the frozen R6_ADMISSION_DECISION_LEDGER.csv decisions for the four reference configs (H0 50/50, H0 70/30, H0 100/0 A, H1-1.00-REJ 70/30).",
+  "configs": {
+    "H0_50_50": {
+      "policy_id": "H0",
+      "w_A": 0.5,
+      "w_B": 0.5,
+      "n_rejected_static": 0,
+      "n_rejected_frozen": 0,
+      "n_scaled_static": 0,
+      "decision_match": true,
+      "admitted_f_match": true,
+      "max_gross_heat": 1.5,
+      "ok": true
+    },
+    "H0_70_30": {
+      "policy_id": "H0",
+      "w_A": 0.7,
+      "w_B": 0.3,
+      "n_rejected_static": 0,
+      "n_rejected_frozen": 0,
+      "n_scaled_static": 0,
+      "decision_match": true,
+      "admitted_f_match": true,
+      "max_gross_heat": 2.0999999999999996,
+      "ok": true
+    },
+    "H0_100_0_A": {
+      "policy_id": "H0",
+      "w_A": 1.0,
+      "w_B": 0.0,
+      "n_rejected_static": 0,
+      "n_rejected_frozen": 0,
+      "n_scaled_static": 0,
+      "decision_match": true,
+      "admitted_f_match": true,
+      "max_gross_heat": 3.0,
+      "ok": true
+    },
+    "H1_70_30_1x": {
+      "policy_id": "H1-1.00-REJ",
+      "w_A": 0.7,
+      "w_B": 0.3,
+      "n_rejected_static": 64,
+      "n_rejected_frozen": 64,
+      "n_scaled_static": 0,
+      "decision_match": true,
+      "admitted_f_match": true,
+      "max_gross_heat": 1.0,
+      "ok": true
+    }
+  },
+  "all_ok": true,
+  "causality_note": "Admission uses only information available at entry time: active positions that entered earlier. Future returns / episode membership / DD never inspected."
+}

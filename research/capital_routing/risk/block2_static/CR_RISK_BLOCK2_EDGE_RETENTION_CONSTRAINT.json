@@ -1,0 +1,8 @@
+{
+  "edge_retention_binding_constraint": true,
+  "at_75pct_retention": "viable",
+  "at_50pct_retention": "fragile (H0 50/50 f=1% CAGR ~+3%, p95 DD ~23%; heat caps do not rescue)",
+  "at_25pct_retention": "not viable (CAGR ~-21%, p95 DD ~58%)",
+  "core_principle": "Risk controls shape losses; they do NOT create expectancy. Edge retention dominates risk outcome.",
+  "guard": "No risk policy should be considered production-safe if expected retained edge falls below the project's chosen edge-retention floor (floor NOT defined in this checkpoint)."
+}

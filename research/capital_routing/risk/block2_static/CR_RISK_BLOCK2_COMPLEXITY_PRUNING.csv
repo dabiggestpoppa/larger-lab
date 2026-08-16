@@ -1,0 +1,8 @@
+complexity_level,component,pruning_decision,rationale
+0.0,H0 static,KEEP_DIAGNOSTIC,baseline reference
+1.0,H1 gross cap,ADOPT,canonical simple heat mechanism; material tail reduction at A-heavy
+2.0,H2 same-direction,PRUNE_REDUNDANT,matches H1; no incremental value
+2.0,H3 B-family,KEEP_SECONDARY,supported-not-required; weaker than equal gross cap
+3.0,H4 episode budget,PRUNE_REDUNDANT,dominated by H1
+4.0,H5 combined,OPTIONAL_ONLY_WITH_INCREMENTAL_GAIN,no demonstrated incremental gain over H1
+,DD-adaptive / Kelly / hybrid,DEFERRED,no unresolved state-dependent risk mechanism

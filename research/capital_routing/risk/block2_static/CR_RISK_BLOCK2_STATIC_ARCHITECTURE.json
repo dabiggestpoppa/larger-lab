@@ -1,0 +1,67 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-II-STATIC-ARCHITECTURE-SEAL",
+  "architecture": {
+    "name": "BLOCK-II_STATIC_RISK_ARCHITECTURE",
+    "pipeline": [
+      "VALID_ALPHA_EVENTS",
+      "FAMILY_CLASSIFICATION",
+      "STATIC_FAMILY_ALLOCATION",
+      "SIMPLE_GROSS_SIMULTANEOUS_HEAT_LIMIT",
+      "PORTFOLIO"
+    ],
+    "canonical_heat_mechanism": "H1_SIMPLE_GROSS_HEAT_CAP"
+  },
+  "allocation": {
+    "form": "family_weights = {'A': x, 'B': 1-x}",
+    "references": [
+      "50/50",
+      "70/30",
+      "100/0 A"
+    ],
+    "diagnostic": [
+      "0/100 B"
+    ],
+    "optimized": false
+  },
+  "heat_cap": {
+    "form": "max_gross_heat = H (multiplier of base_f)",
+    "references": [
+      1.0,
+      1.5,
+      2.0,
+      3.0
+    ],
+    "optimized": false
+  },
+  "admission": {
+    "causal": true,
+    "decisions": [
+      "ACCEPT_FULL",
+      "ACCEPT_SCALED",
+      "REJECT_HEAT_CAP"
+    ],
+    "forbidden_inputs": [
+      "future events",
+      "future episode membership",
+      "future returns",
+      "future DD path",
+      "past PnL",
+      "drawdown state"
+    ]
+  },
+  "explicitly_not_selected": [
+    "production allocation",
+    "production heat cap",
+    "production size",
+    "best policy"
+  ],
+  "deferred": [
+    "DD-adaptive (R7)",
+    "Kelly (R8)",
+    "Hybrid (R9)"
+  ],
+  "not_authorized": [
+    "deployment",
+    "mt5"
+  ]
+}
