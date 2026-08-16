@@ -1,0 +1,23 @@
+{
+  "checkpoint": "MVE-P7-SIGNAL-MODEL-FALSIFICATION",
+  "MODEL_A": {
+    "lr_p": 0.210018,
+    "n": 322,
+    "model_flag_coef": 1.03267
+  },
+  "MODEL_B": {
+    "lr_p": 0.084468,
+    "n": 227,
+    "model_flag_coef": 1.28078
+  },
+  "MODEL_C": {
+    "lr_p": 0.014692,
+    "n": 124,
+    "model_flag_coef": 1.635
+  },
+  "bh_fdr_q": {
+    "MODEL_A": 0.21,
+    "MODEL_B": 0.1267,
+    "MODEL_C": 0.0441
+  }
+}

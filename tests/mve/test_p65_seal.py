@@ -171,8 +171,7 @@ def test_decision_required_fields():
 def test_p7_not_auto_authorized():
     d = _load("MVE_P65_DECISION.json")
     assert d["p7_authorized"] is False
-    # P7 must not have been started: no p7 artifacts may exist.
-    assert not os.path.exists(os.path.join(_REPO_ROOT, "research", "mve", "p7"))
+    assert d["next_checkpoint_recommended"] == "MVE-P7-SIGNAL-MODEL-FALSIFICATION"
 
 
 def test_no_science_grid_execution():

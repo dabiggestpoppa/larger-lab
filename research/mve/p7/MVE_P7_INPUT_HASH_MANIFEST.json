@@ -1,0 +1,19 @@
+{
+  "checkpoint": "MVE-P7-SIGNAL-MODEL-FALSIFICATION",
+  "canonical_data": {
+    "relpath": "quant-lab/data/EURUSDPRO_M5_2023_2026.csv",
+    "sha256": "630b8a4052fe962bc7d87c6d49d83bc1524c7ddd83cd15e902fe504c998d3f77"
+  },
+  "files": {
+    "research/mve/p7/MVE_P7_PROTOCOL.md": "b3a8f2512f577a1e64dc082976eba8e2413fc68846cca0079bbe8f9cc41b93c1",
+    "research/mve/MVE_R05_2_COMPONENT_MATRIX.csv": "6a283a060b39ad937ba65ee132b402b436b92c18b1272e032e9a466c847d7ead",
+    "research/mve/p65/MVE_P65_BASELINE_CROSSWALK.csv": "ae418b49bf3a6160e5ade3318747ab6682d05f72bbb0e1f56743aa0bb90833e2",
+    "src/mve/signals.py": "0addab570bf044a35672afa0e5e9cc505cacde46d9075a40e4346e0e24f7cf31",
+    "src/mve/p7_falsification.py": "6f8af5827a33b5fd127c7a805ca316a5eaa48e0ed2577e8b691e7ac3bb9ed62a",
+    "src/mve/p4_acceptance.py": "6c953b00a8dab9320f4f498477615ebe88ebf735232fd4ac125d924aae43aabc",
+    "src/mve/p4_statistics.py": "c1c1e3dc0f70fdb4c5db4764e373a32e5f61c75ec6941e06df0ff464ac1ec580"
+  },
+  "python": "3.11.9",
+  "numpy": "2.4.6",
+  "pandas": "2.2.3"
+}

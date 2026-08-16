@@ -1,0 +1,7 @@
+model,stage,n,null_deviance,full_deviance,lr_p,model_flag_coef,model_flag_z,n_model_flagged
+MODEL_A,development,322,349.5418,347.9705,0.210018,1.03267,1.2492,315
+MODEL_B,development,227,234.218,231.2413,0.084468,1.28078,1.7264,216
+MODEL_C,development,124,121.0588,115.1058,0.014692,1.635,2.4162,111
+MODEL_A,confirmation,234,254.3102,252.7192,0.207189,-44.50315,-0.0001,231
+MODEL_B,confirmation,158,123.0778,121.7439,0.248108,-44.00952,-0.0001,153
+MODEL_C,confirmation,87,76.3759,74.6746,0.192122,-44.21828,-0.0001,83

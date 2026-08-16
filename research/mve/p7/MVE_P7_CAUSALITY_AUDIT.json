@@ -1,0 +1,130 @@
+{
+  "1_future_perturbation": {
+    "max_diff": 0.0,
+    "all_zero": true,
+    "measured": {
+      "MODEL_A": 0.0,
+      "MODEL_B": 0.0,
+      "MODEL_C": 0.0,
+      "B3_PLAIN_BREAKOUT": 0.0,
+      "A_BASE": 0.0,
+      "B_BASE": 0.0,
+      "C_BASE": 0.0,
+      "C_DIRECT_2SIGMA": 0.0
+    }
+  },
+  "2_truncation_invariance": {
+    "max_diff": 0.0,
+    "all_zero": true,
+    "measured": {
+      "MODEL_A": 0.0,
+      "MODEL_B": 0.0,
+      "MODEL_C": 0.0,
+      "B3_PLAIN_BREAKOUT": 0.0,
+      "A_BASE": 0.0,
+      "B_BASE": 0.0,
+      "C_BASE": 0.0,
+      "C_DIRECT_2SIGMA": 0.0
+    }
+  },
+  "3_timestamp_schema": {
+    "note": "validated per-stage on event catalogs"
+  },
+  "4_blocked_component_isolation": {
+    "models_D_E_consumed": false,
+    "generate_all_signals_consumed": false,
+    "note": "P7 consumes only sealed generators A/B/C + frozen simple baselines; D/E/aggregate excluded (tests enforce no references)."
+  },
+  "5_static_leakage": {
+    "findings": [
+      {
+        "module": "mve.p7_falsification",
+        "line": 118,
+        "pattern": "mean()",
+        "code": "np.mean(np.abs(valid) > level)",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "mve.p7_falsification",
+        "line": 367,
+        "pattern": "iloc[]",
+        "code": "base_eps.iloc[j]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "mve.p7_falsification",
+        "line": 373,
+        "pattern": "iloc[]",
+        "code": "base_eps.iloc[j]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "mve.p7_falsification",
+        "line": 302,
+        "pattern": "iloc[]",
+        "code": "base_eps.iloc[j]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "mve.p7_falsification",
+        "line": 308,
+        "pattern": "iloc[]",
+        "code": "base_eps.iloc[j]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "mve.p7_falsification",
+        "line": 335,
+        "pattern": "iloc[]",
+        "code": "model_eps.iloc[i]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "mve.p7_falsification",
+        "line": 341,
+        "pattern": "iloc[]",
+        "code": "base_eps.iloc[best]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "mve.p7_falsification",
+        "line": 349,
+        "pattern": "iloc[]",
+        "code": "model_eps.iloc[i]",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "run_p7",
+        "line": 528,
+        "pattern": "mean()",
+        "code": "np.mean(signs)",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p7",
+        "line": 111,
+        "pattern": "rolling()",
+        "code": "h1['close'].rolling(pa.P4_TRAILING_WINDOW, min_periods=pa.P4_TRAILING_MIN_PERIODS)",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "run_p7",
+        "line": 112,
+        "pattern": "rolling()",
+        "code": "h1['close'].rolling(pa.P4_TRAILING_WINDOW, min_periods=pa.P4_TRAILING_MIN_PERIODS)",
+        "classification": "CAUSAL"
+      }
+    ],
+    "unclassified": [],
+    "blocked": [],
+    "rule": "rolling()/iloc[] -> CAUSAL; mean()/std() -> EX_POST_ONLY when aggregating measured outcomes; else BLOCKED"
+  },
+  "6_causal_to_expost_dependency": {
+    "count": 0,
+    "note": "outcome/control columns never feed detection (test-enforced)"
+  },
+  "holdout": {
+    "status": "FINAL_HOLDOUT_PENDING",
+    "rows_read": 0
+  }
+}

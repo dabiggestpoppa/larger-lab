@@ -1,0 +1,70 @@
+{
+  "checkpoint": "MVE-P7-SIGNAL-MODEL-FALSIFICATION",
+  "protocol_hash": "b3a8f2512f577a1e64dc082976eba8e2413fc68846cca0079bbe8f9cc41b93c1",
+  "registry_hash": "8ca4ba4d3f5d1bfea098af7eb50ea642046e64839b4642acc0009ddc24df7379",
+  "models": [
+    "MODEL_A",
+    "MODEL_B",
+    "MODEL_C"
+  ],
+  "baselines": [
+    "B3_PLAIN_BREAKOUT",
+    "A_BASE",
+    "B_BASE",
+    "C_BASE",
+    "C_DIRECT_2SIGMA"
+  ],
+  "contrast_baseline": {
+    "MODEL_A": "B3_PLAIN_BREAKOUT",
+    "MODEL_B": "B3_PLAIN_BREAKOUT",
+    "MODEL_C": "C_DIRECT_2SIGMA"
+  },
+  "structural_baseline": {
+    "MODEL_A": "A_BASE",
+    "MODEL_B": "B_BASE",
+    "MODEL_C": "C_BASE"
+  },
+  "boundary": 1.0,
+  "step": 1.0,
+  "occupancy_threshold": 0.8,
+  "occupancy_window": 3,
+  "horizons": [
+    1,
+    2,
+    3,
+    6,
+    12,
+    24
+  ],
+  "match_window": 2,
+  "primary_h": 6,
+  "n_gates": {
+    "HIGH": 200,
+    "MEDIUM": 75,
+    "LOW": 30
+  },
+  "dev_range": {
+    "start": "2023-07-03",
+    "end": "2024-12-31"
+  },
+  "conf_range": {
+    "start": "2025-01-01",
+    "end": "2025-12-31"
+  },
+  "blocks": {
+    "2023H2": [
+      "2023-07-03",
+      "2023-12-31"
+    ],
+    "2024H1": [
+      "2024-01-01",
+      "2024-06-30"
+    ],
+    "2024H2": [
+      "2024-07-01",
+      "2024-12-31"
+    ]
+  },
+  "bootstrap_seed": 7777,
+  "n_boot": 2000
+}

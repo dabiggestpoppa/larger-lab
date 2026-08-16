@@ -1,0 +1,4 @@
+model,evidence_category,promoted_to_economic_translation
+MODEL_A,REDUNDANT,False
+MODEL_B,REDUNDANT,False
+MODEL_C,CONDITIONAL,False
