@@ -1,0 +1,25 @@
+{
+  "checkpoint": "MVE-P4-CAUSAL-ACCEPTANCE-ENGINE",
+  "dataset": "quant-lab/data/EURUSDPRO_M5_2023_2026.csv",
+  "dataset_sha256": "630b8a4052fe962bc7d87c6d49d83bc1524c7ddd83cd15e902fe504c998d3f77",
+  "dev": {
+    "start": "2023-07-03",
+    "end": "2024-12-31",
+    "rows": 9329,
+    "timeframe": "H1",
+    "purpose": "development discovery"
+  },
+  "confirmation": {
+    "start": "2025-01-01",
+    "end": "2025-12-31",
+    "rows": 6193,
+    "timeframe": "H1",
+    "purpose": "single frozen confirmation pass"
+  },
+  "holdout": {
+    "status": "FINAL_HOLDOUT_PENDING",
+    "rows_read": 0,
+    "access_attempt": "slice_data(2026...) raised DataPipelineError (fail-closed)"
+  },
+  "generated_at": "2026-08-16T05:29:48.379772+00:00"
+}

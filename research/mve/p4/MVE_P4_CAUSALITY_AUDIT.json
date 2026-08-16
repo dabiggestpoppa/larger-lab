@@ -1,0 +1,124 @@
+{
+  "future_perturbation": {
+    "A0": {
+      "max_diff": 0.0,
+      "n_tests": 6,
+      "pass": true,
+      "delay": 0
+    },
+    "A1": {
+      "max_diff": 0.0,
+      "n_tests": 6,
+      "pass": true,
+      "delay": 0
+    },
+    "A2_2of3": {
+      "max_diff": 0.0,
+      "n_tests": 6,
+      "pass": true,
+      "delay": 4
+    },
+    "A2_3of4": {
+      "max_diff": 0.0,
+      "n_tests": 6,
+      "pass": true,
+      "delay": 4
+    },
+    "A2_3of5": {
+      "max_diff": 0.0,
+      "n_tests": 6,
+      "pass": true,
+      "delay": 4
+    },
+    "A3_n2": {
+      "max_diff": 0.0,
+      "n_tests": 6,
+      "pass": true,
+      "delay": 3
+    },
+    "A3_n3": {
+      "max_diff": 0.0,
+      "n_tests": 6,
+      "pass": true,
+      "delay": 3
+    },
+    "A3_n4": {
+      "max_diff": 0.0,
+      "n_tests": 6,
+      "pass": true,
+      "delay": 3
+    },
+    "A4_R1": {
+      "max_diff": 0.0,
+      "n_tests": 6,
+      "pass": true,
+      "delay": 12
+    },
+    "A4_R2": {
+      "max_diff": 0.0,
+      "n_tests": 6,
+      "pass": true,
+      "delay": 12
+    },
+    "A5": {
+      "max_diff": 0.0,
+      "n_tests": 6,
+      "pass": true,
+      "delay": 0
+    }
+  },
+  "truncation": {
+    "A0": {
+      "max_diff": 0.0,
+      "pass": true
+    },
+    "A1": {
+      "max_diff": 0.0,
+      "pass": true
+    },
+    "A2_2of3": {
+      "max_diff": 0.0,
+      "pass": true
+    },
+    "A2_3of4": {
+      "max_diff": 0.0,
+      "pass": true
+    },
+    "A2_3of5": {
+      "max_diff": 0.0,
+      "pass": true
+    },
+    "A3_n2": {
+      "max_diff": 0.0,
+      "pass": true
+    },
+    "A3_n3": {
+      "max_diff": 0.0,
+      "pass": true
+    },
+    "A3_n4": {
+      "max_diff": 0.0,
+      "pass": true
+    },
+    "A4_R1": {
+      "max_diff": 0.0,
+      "pass": true
+    },
+    "A4_R2": {
+      "max_diff": 0.0,
+      "pass": true
+    },
+    "A5": {
+      "max_diff": 0.0,
+      "pass": true
+    }
+  },
+  "schema": {
+    "problems": [],
+    "pass": true,
+    "n_events_validated": 15771
+  },
+  "dedup": {
+    "pass": true
+  }
+}

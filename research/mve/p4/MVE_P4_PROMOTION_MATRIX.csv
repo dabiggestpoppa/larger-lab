@@ -1,0 +1,12 @@
+variant,promote_to_p5,reason,grade,coverage
+A0,False,causal PASS; coverage HIGH_COVERAGE; dev lift 0.0000; incremental False; temporal UNSTABLE; confirmation n=1043 delta=-0.0052,D,HIGH_COVERAGE
+A1,False,causal PASS; coverage HIGH_COVERAGE; dev lift 0.1371; incremental False; temporal STABLE; confirmation n=468 delta=-0.0240,B,HIGH_COVERAGE
+A2_2of3,True,causal PASS; coverage HIGH_COVERAGE; dev lift 0.2282; incremental True; temporal STABLE; confirmation n=344 delta=-0.0254,A,HIGH_COVERAGE
+A2_3of4,True,causal PASS; coverage HIGH_COVERAGE; dev lift 0.2839; incremental True; temporal STABLE; confirmation n=291 delta=-0.0412,A,HIGH_COVERAGE
+A2_3of5,True,causal PASS; coverage HIGH_COVERAGE; dev lift 0.2839; incremental True; temporal STABLE; confirmation n=291 delta=-0.0412,A,HIGH_COVERAGE
+A3_n2,True,causal PASS; coverage HIGH_COVERAGE; dev lift 0.2282; incremental True; temporal STABLE; confirmation n=344 delta=-0.0254,A,HIGH_COVERAGE
+A3_n3,True,causal PASS; coverage HIGH_COVERAGE; dev lift 0.2839; incremental True; temporal STABLE; confirmation n=291 delta=-0.0412,A,HIGH_COVERAGE
+A3_n4,True,causal PASS; coverage HIGH_COVERAGE; dev lift 0.3232; incremental True; temporal STABLE; confirmation n=254 delta=-0.0463,A,HIGH_COVERAGE
+A4_R1,True,causal PASS; coverage HIGH_COVERAGE; dev lift 0.1923; incremental True; temporal STABLE; confirmation n=310 delta=-0.0089,A,HIGH_COVERAGE
+A4_R2,False,causal PASS; coverage HIGH_COVERAGE; dev lift 0.1593; incremental False; temporal STABLE; confirmation n=221 delta=-0.0128,B,HIGH_COVERAGE
+A5,False,causal PASS; coverage HIGH_COVERAGE; dev lift -0.0962; incremental False; temporal STABLE; confirmation n=575 delta=-0.0050,D,HIGH_COVERAGE

@@ -37,6 +37,37 @@
 > `MVE_R05_INFRASTRUCTURE_SEAL.md`/`.json`, `MVE_R05_1_DECISION.json`,
 > `MVE_CAUSALITY_CONTRACT.md`.
 
+## P4 Causal Acceptance Engine (2026-08-16)
+
+> **`MVE-P4-CAUSAL-ACCEPTANCE-ENGINE` — human-authorized, complete.** The first
+> real Phase-4 scientific question is answered on the sealed infrastructure:
+> **acceptance is a real state transition, not a descriptive label.** Protocol
+> frozen before computation (`research/mve/p4/MVE_P4_PROTOCOL.md`); engine at
+> `src/mve/p4_acceptance.py` (variants A0-A5, episode dedup, frozen event-time
+> schemas); 40 adversarial tests in `tests/mve/test_p4_acceptance.py`.
+>
+> - Data: dev 2023-07-03..2024-12-31 (9,329 H1 bars) → single frozen 2025
+>   confirmation (6,193 H1 bars); 2026 holdout untouched (fail-closed).
+> - Causality: all 11 variants future-perturbation and truncation invariant
+>   (max historical diff 0.0), schema-valid, dedup'd.
+> - Findings: occupancy (A2), persistence (A3), 0.5σ retest-hold (A4-R1) add
+>   incremental continuation info beyond displacement/volatility controls
+>   (FDR q=0.10 significant); close-beyond (A1) and exact-recross (A4-R2)
+>   don't; A5 failed-acceptance control confirms the effect. Direction
+>   compatible with symmetry; transitions accepted→DEEP 0.36 vs 0.15-0.17
+>   for touch/failed; 2025 confirmation retains the effect.
+> - Promotion: 7 variants grade A and promoted to P5 (A2_2of3/3of4/3of5,
+>   A3_n2/n3/n4, A4_R1). A1/A4_R2 grade B; A0/A5 grade D. **No trading rule
+>   selected**; P5/P6/P7 remain unauthorized; `P5_ready = true`.
+> - Tests: 122/122 MVE suite (82 prior + 40 P4).
+>
+> See `research/mve/p4/` (MVE_P4_REPORT.md, MVE_P4_DECISION.json,
+> MVE_P4_CAUSALITY_AUDIT.json, MVE_P4_ACCEPTANCE_RANKING.csv,
+> MVE_P4_PROMOTION_MATRIX.csv, MVE_P4_INCREMENTAL_INFORMATION.csv,
+> MVE_P4_TRANSITION_MATRIX.csv, MVE_P4_ACCEPTANCE_SURVIVAL.csv,
+> MVE_P4_DIRECTION_SYMMETRY.csv, MVE_P4_TEMPORAL_STABILITY.csv,
+> MVE_P4_CONFIRMATION_RESULTS.csv, MVE_P4_STATISTICAL_INFERENCE.json).
+
 ## Overview
 
 This repository contains the complete research program for the **CEREBUS Morphic Volatility Engine (MVE)**, a quantitative research initiative investigating whether financial markets exhibit statistically persistent directional movement after occupying and accepting volatility-normalized sigma states.

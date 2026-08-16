@@ -145,6 +145,28 @@ See `MVE_DATA_ACCESS_LEDGER.csv` and `MVE_DATA_SPLIT_LOCK.json`.
 > `MVE_R05_2_PIPELINE_CONTAMINATION_AUDIT.json`, `MVE_R05_2_INPUT_HASH_MANIFEST.json`,
 > `MVE_R05_INFRASTRUCTURE_SEAL.md`/`.json`.
 
+> **UPDATED (P4, 2026-08-16):** the causal acceptance engine is implemented
+> and evaluated (`MVE-P4-CAUSAL-ACCEPTANCE-ENGINE`, human-authorized). Protocol
+> frozen before any computation (`research/mve/p4/MVE_P4_PROTOCOL.md`);
+> development 2023-07-03..2024-12-31 (9,329 H1 bars), single frozen 2025
+> confirmation pass (6,193 H1 bars), 2026 holdout untouched (`holdout_rows_read
+> = 0`, fail-closed slice). 15,771 dev events across 965 episodes; every event
+> schema-valid (acceptance + standard event-time schemas), episode-dedup'd,
+> and future-perturbation/truncation invariant (all 11 variants max historical
+> diff 0.0). Findings: occupancy (A2), persistence (A3) and 0.5σ retest-hold
+> (A4-R1) carry incremental continuation information beyond displacement/
+> volatility controls (FDR q=0.10 significant, 314/324 family discoveries);
+> close-beyond (A1) and exact-recross retest (A4-R2) do not; A5 failed-
+> acceptance control validates the effect (negative continuation lift).
+> Direction-compatible-with-symmetry; transitions: accepted→DEEP 0.36 vs
+> 0.15-0.17 for touch/failed; confirmation retains the effect (no material
+> reversal). 7 variants promoted to P5 (A2_2of3/3of4/3of5, A3_n2/n3/n4,
+> A4_R1); A1/A4_R2 grade B; A0/A5 grade D. `acceptance_information_validated
+> = TRUE`, `best_trading_rule_selected = false`. Tests: 122/122 (82 prior +
+> 40 P4). See `research/mve/p4/MVE_P4_REPORT.md`, `MVE_P4_DECISION.json`,
+> `MVE_P4_CAUSALITY_AUDIT.json`, `MVE_P4_ACCEPTANCE_RANKING.csv`,
+> `MVE_P4_PROMOTION_MATRIX.csv`. P5/P6/P7 remain unauthorized.
+
 ---
 
 **Data truth established (partial):** the real files are measured above.

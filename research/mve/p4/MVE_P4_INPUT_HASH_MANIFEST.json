@@ -1,0 +1,21 @@
+{
+  "checkpoint": "MVE-P4-CAUSAL-ACCEPTANCE-ENGINE",
+  "repo": "dabiggestpoppa/larger-lab",
+  "branch": "cerebus-mve-implementation",
+  "git_sha": "54bce6cd27d0fe60fcdad62f4273bb3c23e0c2a6",
+  "base_seal_commit": "54bce6cd27d0fe60fcdad62f4273bb3c23e0c2a6",
+  "python": "3.11.9",
+  "dataset": {
+    "quant-lab/data/EURUSDPRO_M5_2023_2026.csv": "630b8a4052fe962bc7d87c6d49d83bc1524c7ddd83cd15e902fe504c998d3f77"
+  },
+  "protocol": "MVE_P4_PROTOCOL.md",
+  "sources": {
+    "p4_acceptance.py": "2dddd51a9d7243c8fdddb9a6f6ab5e64cccdb0164dac0490353ff8e28f558940",
+    "causality.py": "f89b24e8a2f739c9c2ae0c98d49ecdc3442793c260788355b984eaa85ab8ca8c",
+    "anchors.py": "3692836256319fad3ab69f9179b06ebe45558e78a583a04713a33410adeb9490",
+    "morphic_coordinates.py": "f63559fb5ab1d065f4e7949d72624716b8177df0bdf3cedfdc9c97240110bfe3",
+    "volatility.py": "a31ee0acc0a364e28db5245927de5b5c39728d2d9c351d8afec16786fdf24ef5",
+    "data_loader.py": "c1933d366e3dd9cb45c510317bdc07f24b716b00378bd1922b048af20e3e244f",
+    "rekey.py": "1b6a4f79a9c6f6f1193ebc66d8f559b52081f0696a6ae2b4b0cb716cb9e190de"
+  }
+}
