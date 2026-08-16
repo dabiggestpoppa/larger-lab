@@ -1027,20 +1027,23 @@ class MVEResearchRunner:
         
     def _load_research_data(self) -> Dict:
         """
-        Load research data.
-        
+        Load real research data (canonical EURUSD M5 -> H1).
+
         Returns:
-            Dictionary with research data
+            Dictionary with H1 OHLCV series and timestamps.
         """
-        # This would load the actual research data
-        # For now, return a placeholder
+        from mve.data_loader import load_canonical_m5, resample_m5_to_h1
+
+        m5 = load_canonical_m5()
+        h1 = resample_m5_to_h1(m5)
         return {
-            'prices': pd.Series(),
-            'highs': pd.Series(),
-            'lows': pd.Series(),
-            'volumes': pd.Series(),
-            'symbols': ['EURUSD', 'GBPUSD', 'USDJPY'],
-            'timeframes': ['H1', 'D1']
+            'prices': h1['close'],
+            'highs': h1['high'],
+            'lows': h1['low'],
+            'volumes': h1['volume'],
+            'timestamps': h1.index,
+            'symbols': ['EURUSD'],
+            'timeframes': ['H1'],
         }
         
     def _save_intermediate_results(self, phase_name: str, phase_results: Dict):

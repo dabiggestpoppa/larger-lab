@@ -1,0 +1,59 @@
+{
+  "asset": "EURUSD",
+  "file": "quant-lab/data/EURUSDPRO_M5_2023_2026.csv",
+  "actual_rows": 216820,
+  "first_timestamp": "2023-07-03 00:00:00+00:00",
+  "last_timestamp": "2026-05-29 00:25:00+00:00",
+  "sha256": "630b8a4052fe962bc7d87c6d49d83bc1524c7ddd83cd15e902fe504c998d3f77",
+  "duplicates": 0,
+  "non_monotonic": 0,
+  "weekend_gaps": 151,
+  "abnormal_gaps": 37,
+  "largest_abnormal_gaps": [
+    {
+      "after_epoch": 1735084500,
+      "gap_minutes": 1445
+    },
+    {
+      "after_epoch": 1735689300,
+      "gap_minutes": 1445
+    },
+    {
+      "after_epoch": 1766620500,
+      "gap_minutes": 1445
+    },
+    {
+      "after_epoch": 1767225300,
+      "gap_minutes": 1445
+    },
+    {
+      "after_epoch": 1703500200,
+      "gap_minutes": 570
+    },
+    {
+      "after_epoch": 1725951000,
+      "gap_minutes": 300
+    },
+    {
+      "after_epoch": 1745865600,
+      "gap_minutes": 40
+    },
+    {
+      "after_epoch": 1747269000,
+      "gap_minutes": 35
+    },
+    {
+      "after_epoch": 1745281800,
+      "gap_minutes": 30
+    },
+    {
+      "after_epoch": 1745886600,
+      "gap_minutes": 30
+    }
+  ],
+  "invalid_bars": 0,
+  "chosen_volume_field": "tick_volume",
+  "tick_volume_min": 1,
+  "tick_volume_max": 13925,
+  "real_volume_all_zero": true
+}

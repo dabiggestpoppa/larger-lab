@@ -1,0 +1,71 @@
+{
+  "status": "VALIDATION_ONLY_NOT_AUTHORIZED",
+  "assets": {
+    "GBPUSD": {
+      "GBPUSD_M5.csv": {
+        "path": "quant-lab/data/GBPUSD_M5.csv",
+        "sha256": "7e20180add1607d6d74b31b5c89c36c6977a806b74deabd687cbdae51cf19c30",
+        "rows": 277022,
+        "first_timestamp": "2022-01-03 00:00:00",
+        "last_timestamp": "2026-05-29 23:50:00",
+        "columns": [
+          "timestamp",
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume"
+        ],
+        "schema_status": "measured"
+      },
+      "GBPUSD_M5_fetched.csv": {
+        "path": "quant-lab/data/GBPUSD_M5_fetched.csv",
+        "sha256": "1375a24c6c0578fc18f60c4d1279e86154f05e230aeca5ef720f449eab3c4d32",
+        "rows": 345507,
+        "first_timestamp": "2020-01-01 19:00:00",
+        "last_timestamp": "2026-06-08 00:00:00",
+        "columns": [
+          "timestamp",
+          "open",
+          "high",
+          "low",
+          "close"
+        ],
+        "schema_status": "measured"
+      }
+    },
+    "USDJPY": {
+      "USDJPY_M5.csv": {
+        "path": "quant-lab/data/USDJPY_M5.csv",
+        "sha256": "ee081796cb1b48e005e66c0c5bf548e825138b2a36fcc9c04fc2417b1bd3da31",
+        "rows": 277092,
+        "first_timestamp": "2022-01-03 00:00:00",
+        "last_timestamp": "2026-05-29 23:50:00",
+        "columns": [
+          "timestamp",
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume"
+        ],
+        "schema_status": "measured"
+      },
+      "USDJPY_M5_fetched.csv": {
+        "path": "quant-lab/data/USDJPY_M5_fetched.csv",
+        "sha256": "4bbd621762f30ec76473b3c662397d46f2e0dffb72b1dfd52d3f2031cb5bb02e",
+        "rows": 345412,
+        "first_timestamp": "2020-01-01 19:00:00",
+        "last_timestamp": "2026-06-08 00:00:00",
+        "columns": [
+          "timestamp",
+          "open",
+          "high",
+          "low",
+          "close"
+        ],
+        "schema_status": "measured"
+      }
+    }
+  }
+}

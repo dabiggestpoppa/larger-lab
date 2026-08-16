@@ -1,0 +1,9 @@
+metric,audit_value,committed_value,match
+raw_H1_bar_count,25465,25465,True
+committed_H1_bar_count,18089,18089,True
+dropped_empty_weekend_hours,7376,7376,True
+open_equality,exact,exact,True
+high_equality,exact,exact,True
+low_equality,exact,exact,True
+close_equality,exact,exact,True
+volume_equality,exact,exact,True

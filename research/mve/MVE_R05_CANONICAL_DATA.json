@@ -1,0 +1,32 @@
+{
+  "asset": "EURUSD",
+  "relpath": "quant-lab/data/EURUSDPRO_M5_2023_2026.csv",
+  "repo_resolution_method": "Repository root resolved as two levels above src/mve/data_loader.py; path joined relative to that root. No absolute user-machine path, no glob, no first-match.",
+  "sha256": "630b8a4052fe962bc7d87c6d49d83bc1524c7ddd83cd15e902fe504c998d3f77",
+  "size_bytes": 15882861,
+  "rows": 216820,
+  "first_timestamp": "2023-07-03 00:00:00+00:00",
+  "last_timestamp": "2026-05-29 00:25:00+00:00",
+  "timezone": "UTC",
+  "columns": ["time", "open", "high", "low", "close", "tick_volume", "spread", "real_volume", "timestamp"],
+  "ohlc_field_mapping": {
+    "open": "open",
+    "high": "high",
+    "low": "low",
+    "close": "close"
+  },
+  "timestamp_columns": {
+    "authoritative_epoch": "time",
+    "human_readable": "timestamp"
+  },
+  "volume_field_selected": "tick_volume",
+  "volume_policy": "real_volume is preferred only if it contains meaningful positive observations; it is all-zero here, so tick_volume is selected.",
+  "duplicate_timestamps": 0,
+  "non_monotonic_timestamps": 0,
+  "zero_or_negative_ohlc": 0,
+  "ohlc_inconsistencies": 0,
+  "weekend_gaps": 151,
+  "abnormal_gaps": 37,
+  "provenance_note": "File committed in-repo under quant-lab/data (LFS-tracked). It is the primary file named in the repaired DATA_TRUTH_LOCK and is consumed by the repo's own DMR/rekey backtest engines, giving consistent provenance.",
+  "selection_rationale": "Chosen over EURUSDPRO_M5_2023_2025.csv and EURUSD_M5.csv on objective criteria, not on MVE outcomes: (1) it is the primary asset named in the repaired truth lock and R0 inventory; (2) richest explicit schema (epoch `time` plus human `timestamp`, `tick_volume`, `spread`, `real_volume`); (3) longest *_2023_2026 coverage (2023-07-03 to 2026-05-29); (4) epoch `time` enables unambiguous deterministic timestamp parsing. EURUSD_M5.csv has longer history (2022 start) but a sparser schema (string timestamp only, single `volume` field) and no spread/tick volume distinction."
+}

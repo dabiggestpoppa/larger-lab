@@ -1,0 +1,15 @@
+{
+  "row_count": 18089,
+  "first_timestamp": "2023-07-03 00:00:00+00:00",
+  "last_timestamp": "2026-05-29 00:00:00+00:00",
+  "sha256_of_serialized_csv": "274495092614dbb9933396d5dd8afe889f16ce875deed194c71882d670e2862b",
+  "ohlc_summary": {
+    "open_mean": 1.1108933578417823,
+    "high_mean": 1.1115595826192715,
+    "low_mean": 1.1102448548841837,
+    "close_mean": 1.1109051677815247
+  },
+  "volume_sum": 73881243,
+  "deterministic_rerun_match": true,
+  "volume_field": "tick_volume"
+}

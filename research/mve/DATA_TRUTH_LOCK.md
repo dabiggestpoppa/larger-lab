@@ -59,10 +59,16 @@ specific row counts and hashes. Those citations were fabricated.
 
 ## Resampling (M5 → H1)
 
-- No resampling code exists anywhere in `src/mve/` or `research/mve/`.
-- Independent reproduction (see `r0_tools/audit_resample.py`): 25,465 H1 bars
-  after dropping 7,376 empty weekend-hour slots. Methodology: open=first,
-  high=max, low=min, close=last, volume=sum. See `MVE_RESAMPLING_AUDIT.md`.
+> **UPDATED (R0.5 Commit 2):** a committed resampler now exists at
+> `src/mve/data_loader.py::resample_m5_to_h1`. It matches the R0 independent
+> audit bar-for-bar (raw 25,465 H1 bars; 18,089 after dropping 7,376 empty
+> weekend-hour slots per the incomplete-hour policy). See
+> `MVE_R05_RESAMPLING_REPORT.md`. The earlier finding (no resampling code) was
+> true at R0 time; it is superseded, not erased.
+
+- R0 finding (preserved): no resampling code existed in the MVE path at R0.
+- Methodology frozen: open=first, high=max, low=min, close=last, volume=sum of
+  the selected volume field (`tick_volume`).
 
 ## Holdout status
 
@@ -72,8 +78,12 @@ See `MVE_DATA_ACCESS_LEDGER.csv` and `MVE_DATA_SPLIT_LOCK.json`.
 
 ## Runner status
 
-**BROKEN.** See `MVE_RUNNER_AUDIT.md`. Import fails, two modules do not compile,
-no real data is loaded, no results are written.
+> **UPDATED (R0.5):** Commit 1 fixed import + two broken modules; Commit 2 wired
+> `_load_research_data()` to the real loader. Remaining blocker: result
+> persistence (print-only) — due for `MVE-R0.5-RUNNER-PERSISTENCE`.
+
+- R0 finding (preserved): the runner crashed on import, two modules did not
+  compile, loaded no real data, and wrote no results (see `MVE_RUNNER_AUDIT.md`).
 
 ---
 
