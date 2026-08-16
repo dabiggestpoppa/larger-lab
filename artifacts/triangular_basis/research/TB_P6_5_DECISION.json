@@ -1,0 +1,53 @@
+{
+ "phase": "TB-P6.5-COST-GATE-SEAL-REPAIR",
+ "base": "31e7ad5e",
+ "root_cause": "break_even_mult NaN (EV positive at max tested 3.0x) evaluated as False by the gate `be >= 1.5`; now encoded truthfully as >= 3.0x and treated as passing the pre-registered break-even >= 1.5x gate",
+ "gate_changes": "none",
+ "changed_grades": [
+  {
+   "candidate": "TB-B @ 3.00",
+   "old_grade": "B",
+   "new_grade": "A",
+   "break_even_bound": ">=3.0",
+   "cost_survives_3x": true
+  },
+  {
+   "candidate": "TB-C-2.5% @ 3.00",
+   "old_grade": "B",
+   "new_grade": "A",
+   "break_even_bound": ">=3.0",
+   "cost_survives_3x": true
+  },
+  {
+   "candidate": "TB-C-5% @ 3.00",
+   "old_grade": "B",
+   "new_grade": "A",
+   "break_even_bound": ">=3.0",
+   "cost_survives_3x": true
+  },
+  {
+   "candidate": "TB-C-7.5% @ 3.00",
+   "old_grade": "B",
+   "new_grade": "A",
+   "break_even_bound": ">=3.0",
+   "cost_survives_3x": true
+  }
+ ],
+ "grade_counts_before": {
+  "A": 1,
+  "B": 14,
+  "C": 10,
+  "D": 25
+ },
+ "grade_counts_after": {
+  "D": 25,
+  "A": 5,
+  "B": 10,
+  "C": 10
+ },
+ "all_z3_cells_pass_cost_gate": true,
+ "scientific_conclusions_changed": false,
+ "note": "z=3.00 now grades A for ALL five neutral models (was 1 A + 4 B); plateau region, candidate set, basis attribution and cost ordering unchanged; no downgrades; p7_convergence_optimization_cleared remains true",
+ "stop_for_human_review": false,
+ "generated": "2026-08-16T01:01:23.196624Z"
+}

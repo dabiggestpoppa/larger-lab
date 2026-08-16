@@ -1223,6 +1223,12 @@ def build_candidates(df: pd.DataFrame) -> list:
             top5 = _mean_no_top(net_t) - _mean_no_top(net_b) > 0
             coverage = n_t / n_b * 100
             be = float(cost[(cost["threshold"] == thr) & (cost["model"] == m)]["break_even_mult"].iloc[0])
+            # P6.5 repair: break_even_mult is NaN exactly when EV stays positive at
+            # the maximum tested 3.0x cost level (break-even beyond the tested
+            # range). Encode truthfully as >= 3.0x and treat as PASSING the
+            # pre-registered "break-even >= 1.5x" gate (no gate changed).
+            be_uncapped = bool(np.isnan(be))
+            cost_ok = (be >= 1.5) or be_uncapped
             bshare = basis_share_for(pt_t, m, df)
             gates = {
                 "uplift": (ci_lo > 0) and (qv < 0.10),
@@ -1230,7 +1236,7 @@ def build_candidates(df: pd.DataFrame) -> list:
                 "holdout": (hold_ok is None) or bool(hold_ok),
                 "plateau": bool(in_plat[thr]),
                 "coverage": coverage >= 40,
-                "cost": be >= 1.5,
+                "cost": bool(cost_ok),
                 "basis": bshare >= 60,
                 "top5": bool(top5),
             }
@@ -1250,7 +1256,10 @@ def build_candidates(df: pd.DataFrame) -> list:
                           "ev_uplift_ci": [ci_lo, ci_hi], "perm_p": float(pv),
                           "fdr_q": qv, "block_ev_d_c_h": [d_ev, c_ev, h_ev],
                           "holdout_dir_ok": hold_ok, "plateau_member": bool(in_plat[thr]),
-                          "break_even_mult": be, "basis_share_pct": bshare, "top5_ok": bool(top5),
+                          "break_even_mult": be,
+                          "break_even_bound": ">=3.0" if be_uncapped else f"{be:.2f}x",
+                          "cost_survives_3x": be_uncapped,
+                          "basis_share_pct": bshare, "top5_ok": bool(top5),
                           "gates": gates})
     return cands
 
