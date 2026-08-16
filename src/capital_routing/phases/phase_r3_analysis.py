@@ -93,6 +93,19 @@ def mfe_distributions(ledger: pd.DataFrame, paths: pd.DataFrame) -> pd.DataFrame
 # ---------------------------------------------------------------------------
 
 def time_to_profit(ledger: pd.DataFrame, paths: pd.DataFrame) -> pd.DataFrame:
+    """Time to first profit by threshold, with population-correct shares.
+
+    For each family and each +threshold:
+      N_reached_all   = all trades that reach the level
+      N_winners_reached / N_losers_reached = eventual winners/losers that reach
+    Shares are each computed against their own population so every value lies
+    in [0, 1]: share_of_all = N_reached_all / N_trades,
+    share_of_winners = N_winners_reached / N_winners,
+    share_of_losers = N_losers_reached / N_losers.
+
+    First-passage TIMES are unchanged by the repair (they only depend on the
+    net-R path); winner-only and loser-only timing are reported in addition.
+    """
     ev_paths = per_event_paths(paths)
     net = ledger.set_index("event_id")
     rows = []
@@ -100,6 +113,7 @@ def time_to_profit(ledger: pd.DataFrame, paths: pd.DataFrame) -> pd.DataFrame:
         fam = net if fam_lbl == "A+B" else net[net["family"] == fam_lbl]
         n = len(fam)
         n_win = int((fam["pnl_bps"] > 0).sum())
+        n_los = n - n_win
         for th in PROFIT_LEVELS_R:
             reached = {}
             for eid in fam.index:
@@ -107,19 +121,32 @@ def time_to_profit(ledger: pd.DataFrame, paths: pd.DataFrame) -> pd.DataFrame:
                 if t is not None and np.isfinite(t):
                     reached[eid] = t
             if not reached:
-                rows.append({"family": fam_lbl, "level_R": th, "N_reached": 0})
+                rows.append({"family": fam_lbl, "level_R": th, "N_reached_all": 0})
                 continue
             finals = np.array([float(fam.loc[e, "pnl_bps"])
                                / float(fam.loc[e, "risk_unit_bps"])
                                for e in reached])
             times = np.array(list(reached.values()))
+            eids = list(reached.keys())
+            winners = [e for e in eids if fam.loc[e, "pnl_bps"] > 0]
+            losers = [e for e in eids if fam.loc[e, "pnl_bps"] <= 0]
+            w_times = np.array([reached[e] for e in winners])
+            l_times = np.array([reached[e] for e in losers])
             rows.append({
-                "family": fam_lbl, "level_R": th, "N_reached": int(len(reached)),
-                "share_of_trades": float(len(reached)) / n if n else np.nan,
-                "share_of_winners": float(len(reached)) / n_win if n_win else np.nan,
+                "family": fam_lbl, "level_R": th,
+                "N_reached_all": int(len(reached)),
+                "N_winners_reached": int(len(winners)),
+                "N_losers_reached": int(len(losers)),
+                "share_of_all_trades_reaching": float(len(reached)) / n if n else np.nan,
+                "share_of_winners_reaching": float(len(winners)) / n_win if n_win else np.nan,
+                "share_of_losers_reaching": float(len(losers)) / n_los if n_los else np.nan,
                 "median_time_h": float(np.median(times)),
                 "p25_time_h": float(np.percentile(times, 25)),
                 "p75_time_h": float(np.percentile(times, 75)),
+                "median_time_winners_h": float(np.median(w_times)) if len(w_times) else np.nan,
+                "median_time_losers_h": float(np.median(l_times)) if len(l_times) else np.nan,
+                "p25_time_winners_h": float(np.percentile(w_times, 25)) if len(w_times) else np.nan,
+                "p75_time_winners_h": float(np.percentile(w_times, 75)) if len(w_times) else np.nan,
                 "final_expectancy_R_after_reaching": float(np.mean(finals)),
                 "final_loss_probability_after_reaching": float((finals < 0).mean()),
             })

@@ -4,7 +4,7 @@
 
 - **Q1** median MFE: winners 1.07R (p90 2.15R) vs losers 0.03R (p90 0.59R).
 
-- **Q2** +0.25R: 115% of winners reach in median 2h (p25 1 / p75 2); +0.5R: 100% of winners reach in median 2h (p25 1 / p75 3); +1.0R: 55% of winners reach in median 3h (p25 2 / p75 4).
+- **Q2** +0.25R: 97% of winners reach (of all trades 72%), median 2h (p25 1 / p75 2); +0.5R: 90% of winners reach (of all trades 62%), median 2h (p25 1 / p75 3); +1.0R: 55% of winners reach (of all trades 34%), median 3h (p25 2 / p75 4).
 
 - **Q3** time to MFE (all): median hour 4 (p75 5); winners median hour 5 (p75 6). Peak distribution: h1 15%; h2 11%; h3 18%; h4 17%; h5 15%; h6 24%.
 

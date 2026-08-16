@@ -1,0 +1,44 @@
+{
+  "phase": "R3.1",
+  "task": "CR-RISK-R3.1-TIME-TO-PROFIT-METRIC-REPAIR",
+  "base_commits": {
+    "r3_scientific": "ee4516a6115e679d694013d8371740e547dd09df",
+    "r3_bookkeeping": "27164766d76c0e2afc539088e5682c6e1f25423e",
+    "p75_seal": "7bc1c0242cd05a205da62b34904d7308c63f2acb",
+    "r1": "32374cc051de056120e24525a4a70c2ecbf6b616",
+    "r2": "8c0a59d72b40560f4843997134ea89742de38cbf"
+  },
+  "defect": "share_of_winners computed as N_reached_all / N_winners (all reaching trades over winners population), yielding values > 1.0 (e.g. 1.1544 pooled at +0.25R).",
+  "fix": "Separate N_reached_all / N_winners_reached / N_losers_reached with own-population denominators; winner-only and loser-only first-passage timing added; timestamps untouched.",
+  "r3_conclusions_changed": false,
+  "conclusion": "R3_CONCLUSIONS_UNCHANGED",
+  "r3_repair_pass": true,
+  "r4_static_frontier_cleared": true,
+  "gate_checks": {
+    "shares_in_unit_interval": true,
+    "numerators_match_populations": true,
+    "n_reconciles": true,
+    "pooled_equals_a_plus_b": true,
+    "first_passage_timestamps_unchanged": true,
+    "unaffected_artifacts_byte_identical": true,
+    "tests_pass": true,
+    "deterministic_rerun_passes": true,
+    "no_alpha_changes": true
+  },
+  "corrected_pooled_shares": {
+    "0.10": {"N_reached_all": 694, "share_winners": 0.991, "share_losers": 0.426},
+    "0.25": {"N_reached_all": 643, "share_winners": 0.966, "share_losers": 0.315},
+    "0.50": {"N_reached_all": 556, "share_winners": 0.901, "share_losers": 0.162},
+    "0.75": {"N_reached_all": 424, "share_winners": 0.749, "share_losers": 0.021},
+    "1.00": {"N_reached_all": 306, "share_winners": 0.549, "share_losers": 0.0},
+    "1.50": {"N_reached_all": 143, "share_winners": 0.257, "share_losers": 0.0},
+    "2.00": {"N_reached_all": 71, "share_winners": 0.127, "share_losers": 0.0}
+  },
+  "affected_artifacts": [
+    "R3_TIME_TO_PROFIT.csv",
+    "R3_PROFIT_ANATOMY_REPORT.md",
+    "R3_DECISION.json",
+    "R3_INPUT_HASH_MANIFEST.json"
+  ],
+  "stop": "R3 conclusions unchanged -> proceed to R4 (Static Risk Frontier). No TP, early exit, trailing, breakeven, partial, family weighting, sizing, or alpha modification."
+}

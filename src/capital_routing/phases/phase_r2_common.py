@@ -110,6 +110,21 @@ def first_passage(net_R_path: np.ndarray, threshold_R: float) -> Optional[float]
     return float(hit[0])
 
 
+def first_passage_positive(net_R_path: np.ndarray, threshold_R: float) -> Optional[float]:
+    """Age (hours since entry bar) at which net_R >= +threshold_R, else NaN."""
+    hit = np.where(net_R_path >= threshold_R)[0]
+    if len(hit) == 0:
+        return np.nan
+    return float(hit[0])
+
+
+def time_to_mfe(net_R_path: np.ndarray) -> float:
+    """Age (hours since entry bar) at which the running maximum occurs."""
+    if len(net_R_path) == 0:
+        return np.nan
+    return float(np.argmax(net_R_path))
+
+
 def time_to_worst_mae(net_R_path: np.ndarray) -> float:
     """Age at which the running minimum is achieved (first occurrence)."""
     if len(net_R_path) == 0:

@@ -215,13 +215,16 @@ class PhaseR3ProfitAnatomy:
           f"losers {l['median']:.2f}R (p90 {l['p90']:.2f}R).")
         a("")
 
-        # Q2: time to first +0.25/+0.5/+1R (pooled, share of winners + median)
+        # Q2: time to first +0.25/+0.5/+1R (pooled; winner share of winners,
+        # all-trade share, winner-only median first-passage)
         q2 = []
         for lvl in [0.25, 0.5, 1.0]:
             r = ttp[(ttp["family"] == "A+B") & (ttp["level_R"] == lvl)].iloc[0]
-            q2.append(f"+{lvl}R: {r['share_of_winners']*100:.0f}% of winners reach "
-                      f"in median {r['median_time_h']:.0f}h (p25 {r['p25_time_h']:.0f} / "
-                      f"p75 {r['p75_time_h']:.0f})")
+            q2.append(f"+{lvl}R: {r['share_of_winners_reaching']*100:.0f}% of "
+                      f"winners reach (of all trades "
+                      f"{r['share_of_all_trades_reaching']*100:.0f}%), median "
+                      f"{r['median_time_winners_h']:.0f}h (p25 {r['p25_time_winners_h']:.0f} / "
+                      f"p75 {r['p75_time_winners_h']:.0f})")
         a("- **Q2** " + "; ".join(q2) + ".")
         a("")
 
@@ -405,8 +408,14 @@ class PhaseR3ProfitAnatomy:
                 "median_mfe_losers_R": float(l["median"]),
                 "time_to_first_profit": {
                     str(lvl): {
-                        "share_of_winners": float(ttp[(ttp["family"] == "A+B") & (ttp["level_R"] == lvl)]["share_of_winners"].iloc[0]),
-                        "median_time_h": float(ttp[(ttp["family"] == "A+B") & (ttp["level_R"] == lvl)]["median_time_h"].iloc[0]),
+                        "share_of_winners_reaching": float(ttp[(ttp["family"] == "A+B") & (ttp["level_R"] == lvl)]["share_of_winners_reaching"].iloc[0]),
+                        "share_of_all_trades_reaching": float(ttp[(ttp["family"] == "A+B") & (ttp["level_R"] == lvl)]["share_of_all_trades_reaching"].iloc[0]),
+                        "share_of_losers_reaching": float(ttp[(ttp["family"] == "A+B") & (ttp["level_R"] == lvl)]["share_of_losers_reaching"].iloc[0]),
+                        "N_reached_all": int(ttp[(ttp["family"] == "A+B") & (ttp["level_R"] == lvl)]["N_reached_all"].iloc[0]),
+                        "median_time_winners_h": float(ttp[(ttp["family"] == "A+B") & (ttp["level_R"] == lvl)]["median_time_winners_h"].iloc[0]),
+                        "median_time_all_h": float(ttp[(ttp["family"] == "A+B") & (ttp["level_R"] == lvl)]["median_time_h"].iloc[0]),
+                        "final_expectancy_after_reaching_R": float(ttp[(ttp["family"] == "A+B") & (ttp["level_R"] == lvl)]["final_expectancy_R_after_reaching"].iloc[0]),
+                        "final_loss_probability_after_reaching": float(ttp[(ttp["family"] == "A+B") & (ttp["level_R"] == lvl)]["final_loss_probability_after_reaching"].iloc[0]),
                     } for lvl in [0.25, 0.5, 1.0]},
                 "time_to_mfe_median_hour_all": float(ttm[(ttm["family"] == "A+B") & (ttm["group"] == "all")]["median_hour"].iloc[0]),
                 "time_to_mfe_median_hour_winners": float(ttm[(ttm["family"] == "A+B") & (ttm["group"] == "winners")]["median_hour"].iloc[0]),

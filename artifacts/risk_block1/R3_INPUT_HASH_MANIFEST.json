@@ -29,9 +29,9 @@
     "phase_r2_common.py": "4a146a4dcbf514d0166d3dfe9cb20d7056bc8e389cc070720745fb62a76d03c2",
     "phase_r2_context.py": "96bc466778f2503eb319fd0e3d24f169fb2a341462970b5850c0041c62aae400",
     "phase_r2_orchestrator.py": "46e89b25f7d9a0e338e4e3ff4f83be400852ffd5e12d49e2ffd9f707b77fc32e",
-    "phase_r3_analysis.py": "e169df876eaf35aa12b0b789e2d6286a08d3558e2735b80bb7df9eaf88e92861",
+    "phase_r3_analysis.py": "726a8aaf6b2bf86486627a1f36b9009fe4cc33e1a500639fd34c4f850cffe8fc",
     "phase_r3_context.py": "ae7d5edd31b37fa4272da64d56f16a09661995ce733659eb7ea979c217f32f75",
-    "phase_r3_orchestrator.py": "c6acd41488c6ba3cd6fa99948f66f24d3d56f182912408e9e2da72d5772af51c"
+    "phase_r3_orchestrator.py": "7c19489d9804b28ac7d19a2e4cecd093939544c7225de2abc0e67fb6f96f5147"
   },
   "determinism": "no random sampling; deterministic outputs verified by tests",
   "subhour_note": "M5 feed rejected in R2 (p95 |diff| 22 bps vs frozen panel); R3 uses hourly frozen H1 paths only - no fabricated sub-hour timing."

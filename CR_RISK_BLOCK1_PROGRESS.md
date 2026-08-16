@@ -18,12 +18,61 @@ through full-press) so the user can deliberately choose a risk-return regime. Al
 | `CR-RISK-R1-EXPOSURE-TRUTH` | R1: event-risk ledger, concurrency map, portfolio heat, episode clustering | ✅ Complete (`32374cc0`) |
 | `CR-RISK-R1.1-EPISODE-METRIC-REPAIR` | R1.1: fix multi_event_share (was 1.0 everywhere) | ✅ Complete (`413a05fe`) — R1_CONCLUSIONS_UNCHANGED |
 | `CR-RISK-R2-LOSS-ANATOMY` | R2: winner/loser MAE, failure speed, recovery surface, tail attribution | ✅ Complete — 248/248 tests |
-| `CR-RISK-R3-PROFIT-ANATOMY` | R3: MFE distributions, time-to-MFE, giveback, remaining expectancy | ⏳ Blocked on R2 review |
+| `CR-RISK-R3-PROFIT-ANATOMY` | R3: MFE distributions, time-to-MFE, giveback, remaining expectancy | ✅ Complete — 267/267 tests |
+| `CR-RISK-R3.1-TIME-TO-PROFIT-METRIC-REPAIR` | R3.1: fix share_of_winners > 1.0 in R3_TIME_TO_PROFIT | ✅ Complete — R3_CONCLUSIONS_UNCHANGED |
 | `CR-RISK-R4-STATIC-FRONTIER` | R4: fixed-fractional ladder, DD probability map, ruin defs, full-press envelopes | ⏳ |
 | `CR-RISK-BLOCK1-FOUNDATION-SEAL` | Master report + RM-S0..S4 profile library | ⏳ |
 
 `block_2_cleared = false` until human review after the Block-I seal. No R5-R9, Kelly, hybrid sizing,
 deploy, or MT5.
+
+## R3.1 — Time-to-Profit Metric Repair ✅ COMPLETE
+
+**Commit:** `CR-RISK-R3.1-TIME-TO-PROFIT-METRIC-REPAIR` · **Defect:** `share_of_winners`
+was `N_reached_all / N_winners` (all reaching trades over the winners population) → values
+>1.0 (e.g. **1.1544** pooled at +0.25R). **Fix:** separate `N_reached_all` /
+`N_winners_reached` / `N_losers_reached` with own-population denominators; winner-only /
+loser-only first-passage timing added; timestamps untouched. Corrected pooled shares:
++0.25R → 72.2% all / **96.6% winners** / 31.5% losers; +0.5R → 62.5% / 90.1% / 16.2%;
++1R → 34.4% / 54.9% / 0%. Verdict: **R3_CONCLUSIONS_UNCHANGED** (the corrected reading
+strengthens the same story: ~90% of winners deliver +0.5R by median 2h; +1R is a minority
+with 0% failure). 4 regression tests added (shares in [0,1], numerator populations,
+N reconciliation pooled=A+B, timestamps unchanged); unaffected R3 artifacts verified
+byte-identical. Also carried a commit fixup: `phase_r2_common.first_passage_positive` /
+`time_to_mfe` (R3 prerequisites) were never staged by the R3 commit (first `git add`
+failed on a pathspec and aborted the whole stage) — now committed.
+`r3_repair_pass = true` · `r4_static_frontier_cleared = true` → proceed to R4.
+
+## R3 — Profit Anatomy ✅ COMPLETE
+
+**Commit:** `CR-RISK-R3-PROFIT-ANATOMY` (pushed) · Tests: 19 new (`tests/test_risk_r3.py`) · **267/267 repo-wide** (207 main + 23 R1 + 18 R2 + 19 R3) · deterministic (byte-identical) · inputs hash-frozen (`R3_INPUT_HASH_MANIFEST.json`)
+
+### Key findings
+
+- **Winner MFE is large and late:** winners' median MFE **+1.07R** (p90 +2.15R); losers' median +0.03R (half of losers still touch +0.5R and then fail). Winners peak at median **hour 5** (p75 6); losers peak at hour 2 — the strategy's winners are late-delivery, losers are early-impulse.
+- **Time to first profit:** +0.25R median 2h, +0.5R median 2h (p75 3h), +1R median 3h (p75 4h). After reaching +1R, **0% finish negative** (n=306); after +0.5R, 9.7% finish negative; after +0.25R, 16.3%.
+- **Capture/giveback:** winners retain a median **92%** of peak MFE (p25 64%, p75 100%; 65% keep ≥75%); winners give back a median 0.086R (8% of peak). Giveback by MFE hour: hour-1 peaks give back 1.04R (losers masquerading as early winners); hour-6 peaks give back 0.00R.
+- **Remaining expectancy:** N-weighted remaining at 1/2/3/4/5h = **+0.29 / +0.11 / +0.04 / +0.03 / +0.00R**. Deep states at any age: at −0.75R or worse, remaining expectancy is negative by hour 2 (−0.24R) — matches the R2 cliff. States above +1R keep +0.25..+0.42R of remaining edge.
+- **Delivery curve:** by hour 3, **69%** of total final PnL is on the book; by hour 4, 88%; by hour 6, 92% (hour 6 is the frozen exit; 48 truncated events cap the ratio below 1). ~40% of winners are past their MFE by hour 5.
+- **Maturity classes (quantile-declared):** LATE_DELIVERY n=303, win 98.3%, +1.42R — the core money-maker; NOT_YET_DELIVERED n=247, win 7.7%, −0.95R — the core loser; PEAKED_AND_GIVING_BACK n=141, win 61.7%, +0.06R — capital parked near breakeven after early peaks; EARLY_DELIVERY n=42, −0.10R (early peaks don't persist).
+- **Family:** A and B deliver similarly in size (median MFE 0.73 vs 0.70R, capture 91% vs 94%), but **B needs patience**: 42% of B's winner PnL arrives after hour 3 vs A −13% (A winners are already past their peak at hour 3).
+- **Concurrency:** no-overlap expectancy +0.41R vs same-direction overlap +0.28R, opposite +0.35R — overlap mildly dilutes profit quality (consistent with R2's downside finding).
+- **Episode ranks (12h):** profit delivery is rank-flat — time to MFE 4h across ranks, capture 88–96%. Later ranks deliver as cleanly as the first; R2's tail-risk skew is not accompanied by slower/uglier profit delivery.
+- **Winner tails:** best 1% → 5.5% of positive PnL; best 5% → 17%; best 10% → 28%. Excluding the best 5% leaves expectancy **+0.20R** (vs +0.35R full) — the alpha is not a tiny-winner-tail artifact.
+- **Temporal:** stable — median MFE 0.74/0.65/0.69R, capture 90/96/96%, winner-tail5 share 17.5/17.7/17.9% across sel/val/OOS.
+
+### Bugs caught during R3 build
+
+- **Delivery-curve denominator inflation (6×):** `final_net_R` is repeated once per path bar, so the long-frame sum inflated the %-of-final denominator; the exit bar read 0.156 instead of ~0.92. Fixed by deduplicating per event; locked by a regression test (exit-bar ratio must equal finals-weighted full-window share).
+- Report/decision Q12 selected the N=28 share row instead of the N=845 ex-best-5% row (NaN expectancy); fixed by selecting on the non-null exclusion value.
+
+### HYPOTHESIS_ONLY (no execution change)
+
+1. Late-hold capital efficiency: by hour 5, 88% of final PnL is earned with only +0.03R remaining — a profit-lock/time-decay concept.
+2. +1R trades never finish negative (n=306) — a partial/breakeven-lock concept after strong delivery.
+3. Winners give back a median 8% of peak — a trailing/exit-smoothing concept (needs R4 risk context).
+
+`r4_static_frontier_cleared = true` — but **R4 does NOT start until human review** (per brief's FINAL STOP). No TP, early exit, trailing, breakeven, partial, family weighting, sizing, or alpha modification.
 
 ## R2 — Loss Anatomy ✅ COMPLETE
 

@@ -22,16 +22,34 @@
     "median_mfe_losers_R": 0.029538212626108083,
     "time_to_first_profit": {
       "0.25": {
-        "share_of_winners": 1.1543985637342908,
-        "median_time_h": 2.0
+        "share_of_winners_reaching": 0.9658886894075404,
+        "share_of_all_trades_reaching": 0.7224719101123596,
+        "share_of_losers_reaching": 0.3153153153153153,
+        "N_reached_all": 643,
+        "median_time_winners_h": 2.0,
+        "median_time_all_h": 2.0,
+        "final_expectancy_after_reaching_R": 0.8473664166664888,
+        "final_loss_probability_after_reaching": 0.16329704510108864
       },
       "0.5": {
-        "share_of_winners": 0.9982046678635548,
-        "median_time_h": 2.0
+        "share_of_winners_reaching": 0.9012567324955116,
+        "share_of_all_trades_reaching": 0.6247191011235955,
+        "share_of_losers_reaching": 0.16216216216216217,
+        "N_reached_all": 556,
+        "median_time_winners_h": 2.0,
+        "median_time_all_h": 2.0,
+        "final_expectancy_after_reaching_R": 1.0131332136699576,
+        "final_loss_probability_after_reaching": 0.09712230215827339
       },
       "1.0": {
-        "share_of_winners": 0.5493716337522442,
-        "median_time_h": 3.0
+        "share_of_winners_reaching": 0.5493716337522442,
+        "share_of_all_trades_reaching": 0.3438202247191011,
+        "share_of_losers_reaching": 0.0,
+        "N_reached_all": 306,
+        "median_time_winners_h": 3.0,
+        "median_time_all_h": 3.0,
+        "final_expectancy_after_reaching_R": 1.5716066583647936,
+        "final_loss_probability_after_reaching": 0.0
       }
     },
     "time_to_mfe_median_hour_all": 4.0,
@@ -133,12 +151,10 @@
     "phase_r2_common.py": "4a146a4dcbf514d0166d3dfe9cb20d7056bc8e389cc070720745fb62a76d03c2",
     "phase_r2_context.py": "96bc466778f2503eb319fd0e3d24f169fb2a341462970b5850c0041c62aae400",
     "phase_r2_orchestrator.py": "46e89b25f7d9a0e338e4e3ff4f83be400852ffd5e12d49e2ffd9f707b77fc32e",
-    "phase_r3_analysis.py": "e169df876eaf35aa12b0b789e2d6286a08d3558e2735b80bb7df9eaf88e92861",
+    "phase_r3_analysis.py": "726a8aaf6b2bf86486627a1f36b9009fe4cc33e1a500639fd34c4f850cffe8fc",
     "phase_r3_context.py": "ae7d5edd31b37fa4272da64d56f16a09661995ce733659eb7ea979c217f32f75",
-    "phase_r3_orchestrator.py": "c6acd41488c6ba3cd6fa99948f66f24d3d56f182912408e9e2da72d5772af51c"
+    "phase_r3_orchestrator.py": "7c19489d9804b28ac7d19a2e4cecd093939544c7225de2abc0e67fb6f96f5147"
   },
   "deterministic": true,
-  "stop": "R3 checkpoint complete; R4 begins only after human review. No TP, early exit, trailing, breakeven, partial, family weighting, sizing, or alpha modification.",
-  "commit_sha": "ee4516a6",
-  "commit_message": "CR-RISK-R3-PROFIT-ANATOMY: map how the sealed strategy makes money"
+  "stop": "R3 checkpoint complete; R4 begins only after human review. No TP, early exit, trailing, breakeven, partial, family weighting, sizing, or alpha modification."
 }

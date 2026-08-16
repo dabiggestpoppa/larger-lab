@@ -128,11 +128,76 @@ def test_time_to_profit_monotonic(r3_data):
     for fam in ["A", "B", "A+B"]:
         sub = ttp[ttp["family"] == fam].sort_values("level_R")
         # deeper levels are reached by fewer trades
-        assert (np.diff(sub["N_reached"].to_numpy()) <= 0).all()
+        assert (np.diff(sub["N_reached_all"].to_numpy()) <= 0).all()
         # after reaching +1R, no trade finishes negative (documented effect)
         r1 = sub[sub["level_R"] == 1.0].iloc[0]
         assert r1["final_loss_probability_after_reaching"] == 0.0
-        assert r1["share_of_trades"] < 0.5  # +1R is a minority event
+        assert r1["share_of_all_trades_reaching"] < 0.5  # +1R is a minority event
+
+
+# ---------------------------------------------------------------------------
+# R3.1 — time-to-profit metric repair regression
+# ---------------------------------------------------------------------------
+
+def test_ttp_all_shares_in_unit_interval(r3_data):
+    """Regression: every share/probability in R3_TIME_TO_PROFIT must be in
+    [0, 1] - the pre-repair share_of_winners (N_reached_all / N_winners)
+    exceeded 1.0 when losers also reached the level."""
+    ttp = time_to_profit(r3_data["ledger"], r3_data["paths"])
+    for col in ["share_of_all_trades_reaching", "share_of_winners_reaching",
+                "share_of_losers_reaching", "final_loss_probability_after_reaching"]:
+        v = ttp[col].dropna().to_numpy(dtype=float)
+        assert v.size > 0
+        assert (v >= 0.0).all() and (v <= 1.0).all()
+
+
+def test_ttp_numerators_match_populations(r3_data):
+    ttp = time_to_profit(r3_data["ledger"], r3_data["paths"])
+    for fam in ["A", "B", "A+B"]:
+        fam_mask = (r3_data["ledger"]["family"] == fam) if fam != "A+B" \
+            else pd.Series(True, index=r3_data["ledger"].index)
+        n_fam_win = int((fam_mask & (r3_data["ledger"]["pnl_bps"] > 0)).sum())
+        n_fam_los = int((fam_mask & (r3_data["ledger"]["pnl_bps"] <= 0)).sum())
+        for _, r in ttp[ttp["family"] == fam].iterrows():
+            assert r["N_winners_reached"] <= n_fam_win
+            assert r["N_losers_reached"] <= n_fam_los
+            # shares use their own population denominators
+            if n_fam_win:
+                assert r["share_of_winners_reaching"] == pytest.approx(
+                    r["N_winners_reached"] / n_fam_win, abs=1e-12)
+            if n_fam_los:
+                assert r["share_of_losers_reaching"] == pytest.approx(
+                    r["N_losers_reached"] / n_fam_los, abs=1e-12)
+            # A/B split reconciles to pooled
+            if fam == "A+B":
+                a = ttp[(ttp["family"] == "A") & (ttp["level_R"] == r["level_R"])].iloc[0]
+                b = ttp[(ttp["family"] == "B") & (ttp["level_R"] == r["level_R"])].iloc[0]
+                assert r["N_reached_all"] == a["N_reached_all"] + b["N_reached_all"]
+                assert r["N_winners_reached"] == a["N_winners_reached"] + b["N_winners_reached"]
+                assert r["N_losers_reached"] == a["N_losers_reached"] + b["N_losers_reached"]
+
+
+def test_ttp_partition_reconciliation(r3_data):
+    ttp = time_to_profit(r3_data["ledger"], r3_data["paths"])
+    for _, r in ttp.iterrows():
+        assert r["N_reached_all"] == r["N_winners_reached"] + r["N_losers_reached"]
+
+
+def test_ttp_first_passage_times_unchanged(r3_data):
+    """The repair must not alter first-passage timestamps: median all-trade
+    time equals a direct recomputation from the net-R paths."""
+    from capital_routing.phases.phase_r2_common import first_passage_positive
+    ev_paths = per_event_paths(r3_data["paths"])
+    ledger = r3_data["ledger"].set_index("event_id")
+    ttp = time_to_profit(r3_data["ledger"], r3_data["paths"])
+    for _, r in ttp.iterrows():
+        th = r["level_R"]
+        fam_ids = (ledger.index if r["family"] == "A+B"
+                   else ledger.index[ledger["family"] == r["family"]])
+        times = [first_passage_positive(ev_paths[e], th) for e in fam_ids]
+        times = np.array([t for t in times if t is not None and np.isfinite(t)])
+        if len(times):
+            assert r["median_time_h"] == pytest.approx(np.median(times), abs=1e-12)
 
 
 def test_time_to_mfe_hour_conventions(r3_data):
