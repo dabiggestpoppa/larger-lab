@@ -1,0 +1,7 @@
+stage,variant,n,latency_mean_bars,latency_median_bars,latency_p90_bars,crossing_latency_mean_bars,crossing_latency_median_bars,pct_zero_latency
+development,RKEY_A,308,0.0,0.0,0.0,0.0,0.0,1.0
+development,RKEY_B,347,2.515850144092219,2.0,4.0,0.11239193083573487,0.0,0.0
+development,RKEY_C,23,0.0,0.0,0.0,0.0,0.0,1.0
+confirmation,RKEY_A,238,0.0,0.0,0.0,0.0,0.0,1.0
+confirmation,RKEY_B,240,2.6875,3.0,4.0,0.03333333333333333,0.0,0.0
+confirmation,RKEY_C,12,0.0,0.0,0.0,0.0,0.0,1.0

@@ -1,0 +1,27 @@
+{
+  "dataset": "quant-lab/data/EURUSDPRO_M5_2023_2026.csv",
+  "hash": "630b8a4052fe962bc7d87c6d49d83bc1524c7ddd83cd15e902fe504c998d3f77",
+  "timeframe": "H1 (resampled from M5)",
+  "entries": [
+    {
+      "purpose": "P6 development discovery",
+      "range": [
+        "2023-07-03",
+        "2024-12-31"
+      ],
+      "rows": 9329,
+      "holdout_accessed": false
+    },
+    {
+      "purpose": "P6 confirmation (single pass, frozen params)",
+      "range": [
+        "2025-01-01",
+        "2025-12-31"
+      ],
+      "rows": 6193,
+      "holdout_accessed": false
+    }
+  ],
+  "holdout_rows_read": 0,
+  "frozen_params_hash": "7a4d2668b8d94745e29b83bcc096e163d189fbfeff9584dbd9743bed3d42f29a"
+}

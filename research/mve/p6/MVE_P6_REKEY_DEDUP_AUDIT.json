@@ -1,0 +1,135 @@
+{
+  "total_episodes": 1168,
+  "duplicate_episode_ids_within_cells": 0,
+  "cells_with_duplicates": [],
+  "cross_variant_shared_crossings": 474,
+  "note": "episode_ids unique within (stage, variant, boundary, direction); cross-variant rows sharing a structural crossing carry the same duplicate_episode_id by design.",
+  "per_cell": {
+    "confirmation|RKEY_A|b1.0|d-1": {
+      "n_episodes": 69,
+      "unique_episode_ids": true,
+      "monotonic_known_pos": true,
+      "unique_crossings": true
+    },
+    "confirmation|RKEY_A|b1.0|d+1": {
+      "n_episodes": 98,
+      "unique_episode_ids": true,
+      "monotonic_known_pos": true,
+      "unique_crossings": true
+    },
+    "confirmation|RKEY_A|b2.0|d-1": {
+      "n_episodes": 30,
+      "unique_episode_ids": true,
+      "monotonic_known_pos": true,
+      "unique_crossings": true
+    },
+    "confirmation|RKEY_A|b2.0|d+1": {
+      "n_episodes": 41,
+      "unique_episode_ids": true,
+      "monotonic_known_pos": true,
+      "unique_crossings": true
+    },
+    "confirmation|RKEY_B|b1.0|d-1": {
+      "n_episodes": 75,
+      "unique_episode_ids": true,
+      "monotonic_known_pos": true,
+      "unique_crossings": true
+    },
+    "confirmation|RKEY_B|b1.0|d+1": {
+      "n_episodes": 95,
+      "unique_episode_ids": true,
+      "monotonic_known_pos": true,
+      "unique_crossings": true
+    },
+    "confirmation|RKEY_B|b2.0|d-1": {
+      "n_episodes": 31,
+      "unique_episode_ids": true,
+      "monotonic_known_pos": true,
+      "unique_crossings": true
+    },
+    "confirmation|RKEY_B|b2.0|d+1": {
+      "n_episodes": 39,
+      "unique_episode_ids": true,
+      "monotonic_known_pos": true,
+      "unique_crossings": true
+    },
+    "confirmation|RKEY_C|b1.0|d-1": {
+      "n_episodes": 6,
+      "unique_episode_ids": true,
+      "monotonic_known_pos": true,
+      "unique_crossings": true
+    },
+    "confirmation|RKEY_C|b1.0|d+1": {
+      "n_episodes": 6,
+      "unique_episode_ids": true,
+      "monotonic_known_pos": true,
+      "unique_crossings": true
+    },
+    "development|RKEY_A|b1.0|d-1": {
+      "n_episodes": 101,
+      "unique_episode_ids": true,
+      "monotonic_known_pos": true,
+      "unique_crossings": true
+    },
+    "development|RKEY_A|b1.0|d+1": {
+      "n_episodes": 114,
+      "unique_episode_ids": true,
+      "monotonic_known_pos": true,
+      "unique_crossings": true
+    },
+    "development|RKEY_A|b2.0|d-1": {
+      "n_episodes": 50,
+      "unique_episode_ids": true,
+      "monotonic_known_pos": true,
+      "unique_crossings": true
+    },
+    "development|RKEY_A|b2.0|d+1": {
+      "n_episodes": 43,
+      "unique_episode_ids": true,
+      "monotonic_known_pos": true,
+      "unique_crossings": true
+    },
+    "development|RKEY_B|b1.0|d-1": {
+      "n_episodes": 122,
+      "unique_episode_ids": true,
+      "monotonic_known_pos": true,
+      "unique_crossings": true
+    },
+    "development|RKEY_B|b1.0|d+1": {
+      "n_episodes": 124,
+      "unique_episode_ids": true,
+      "monotonic_known_pos": true,
+      "unique_crossings": true
+    },
+    "development|RKEY_B|b2.0|d-1": {
+      "n_episodes": 57,
+      "unique_episode_ids": true,
+      "monotonic_known_pos": true,
+      "unique_crossings": true
+    },
+    "development|RKEY_B|b2.0|d+1": {
+      "n_episodes": 44,
+      "unique_episode_ids": true,
+      "monotonic_known_pos": true,
+      "unique_crossings": true
+    },
+    "development|RKEY_C|b1.0|d-1": {
+      "n_episodes": 11,
+      "unique_episode_ids": true,
+      "monotonic_known_pos": true,
+      "unique_crossings": true
+    },
+    "development|RKEY_C|b1.0|d+1": {
+      "n_episodes": 9,
+      "unique_episode_ids": true,
+      "monotonic_known_pos": true,
+      "unique_crossings": true
+    },
+    "development|RKEY_C|b2.0|d+1": {
+      "n_episodes": 3,
+      "unique_episode_ids": true,
+      "monotonic_known_pos": true,
+      "unique_crossings": true
+    }
+  }
+}

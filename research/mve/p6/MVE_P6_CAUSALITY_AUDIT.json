@@ -1,0 +1,182 @@
+{
+  "1_future_perturbation": {
+    "max_diff": 0.0,
+    "all_zero": true,
+    "measured_cells": 6
+  },
+  "2_truncation_invariance": {
+    "max_diff": 0.0,
+    "all_zero": true,
+    "measured_cells": 6
+  },
+  "3_timestamp_schema": {
+    "events_validated": 1168,
+    "ordering_pass": true
+  },
+  "4_blocked_component_isolation": {
+    "models_D_E_consumed": false,
+    "note": "P6 consumes only the sealed MorphicRekey detector + causal coordinates; Model D/E excluded by construction (tests enforce no references)."
+  },
+  "5_static_leakage": {
+    "findings": [
+      {
+        "module": "mve.p6_rekey",
+        "line": 513,
+        "pattern": "mean()",
+        "code": "np.mean(np.abs(seg_s))",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "mve.p6_rekey",
+        "line": 514,
+        "pattern": "mean()",
+        "code": "np.mean(np.abs(seg_z))",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p6",
+        "line": 698,
+        "pattern": "mean()",
+        "code": "np.mean(va)",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p6",
+        "line": 108,
+        "pattern": "rolling()",
+        "code": "h1['close'].rolling(pa.P4_TRAILING_WINDOW, min_periods=pa.P4_TRAILING_MIN_PERIODS)",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "run_p6",
+        "line": 109,
+        "pattern": "rolling()",
+        "code": "h1['close'].rolling(pa.P4_TRAILING_WINDOW, min_periods=pa.P4_TRAILING_MIN_PERIODS)",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "run_p6",
+        "line": 419,
+        "pattern": "mean()",
+        "code": "lb.mean()",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p6",
+        "line": 422,
+        "pattern": "mean()",
+        "code": "cl.mean()",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p6",
+        "line": 424,
+        "pattern": "mean()",
+        "code": "(lb == 0).mean()",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p6",
+        "line": 560,
+        "pattern": "mean()",
+        "code": "np.mean(va)",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p6",
+        "line": 561,
+        "pattern": "mean()",
+        "code": "np.mean(rej)",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p6",
+        "line": 607,
+        "pattern": "mean()",
+        "code": "np.mean(cont)",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p6",
+        "line": 608,
+        "pattern": "mean()",
+        "code": "np.mean(rej)",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p6",
+        "line": 682,
+        "pattern": "mean()",
+        "code": "np.mean(va)",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p6",
+        "line": 336,
+        "pattern": "mean()",
+        "code": "np.mean(va_d)",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p6",
+        "line": 634,
+        "pattern": "mean()",
+        "code": "np.mean(cb)",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p6",
+        "line": 635,
+        "pattern": "mean()",
+        "code": "np.mean(ca)",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p6",
+        "line": 639,
+        "pattern": "mean()",
+        "code": "np.mean(rb)",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p6",
+        "line": 640,
+        "pattern": "mean()",
+        "code": "np.mean(ra)",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p6",
+        "line": 659,
+        "pattern": "mean()",
+        "code": "np.mean(cont_g)",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p6",
+        "line": 660,
+        "pattern": "mean()",
+        "code": "np.mean(rej_g)",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p6",
+        "line": 735,
+        "pattern": "mean()",
+        "code": "np.mean(va)",
+        "classification": "EX_POST_ONLY"
+      }
+    ],
+    "classification_rule": "rolling() -> CAUSAL when trailing on bars <= t; mean()/std() -> EX_POST_ONLY when aggregating measured outcomes; shift(-/center=True/bfill()/backfill()/iloc[] would be BLOCKED.",
+    "unclassified": [],
+    "blocked": []
+  },
+  "6_causal_to_expost_dependency": {
+    "count": 0,
+    "note": "Outcome/counterfactual columns are never consumed by detection (test-enforced); RKEY-B delay is emitted at its known bar."
+  },
+  "holdout": {
+    "status": "FINAL_HOLDOUT_PENDING",
+    "rows_read": 0
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "repo": "dabiggestpoppa/larger-lab",
+  "branch": "cerebus-mve-implementation",
+  "git_sha": "e8f5600cb138ecf54c5bf39c432c0d80649f45a8",
+  "python": "3.11.9",
+  "numpy": "2.4.6",
+  "pandas": "2.2.3",
+  "scipy": "1.17.1",
+  "files": {
+    "src/mve/p6_rekey.py": "cc7675797d23c0b56fb1d23737fdc89219db289c50c0c97347814a5415eb82fd",
+    "src/mve/p4_statistics.py": "c1c1e3dc0f70fdb4c5db4764e373a32e5f61c75ec6941e06df0ff464ac1ec580",
+    "src/mve/p4_acceptance.py": "6c953b00a8dab9320f4f498477615ebe88ebf735232fd4ac125d924aae43aabc",
+    "src/mve/rekey.py": "1b6a4f79a9c6f6f1193ebc66d8f559b52081f0696a6ae2b4b0cb716cb9e190de",
+    "src/mve/data_loader.py": "5620aab3749ccf3707a764c596d2c64224026c733d632a643a410b4c35a5e7c1",
+    "src/mve/volatility.py": "1b6854ea0171f1d5ee55484d073b619adeb1e610e0ea4c5c3c1a52a32feead53",
+    "src/mve/anchors.py": "3692836256319fad3ab69f9179b06ebe45558e78a583a04713a33410adeb9490",
+    "src/mve/causality.py": "8f09b5a63a5af15ff1a8731d755b2de41f043a869af7e8aa0cef68699c289997",
+    "research/mve/p6/MVE_P6_PROTOCOL.md": "6e5a080fd6b831d4f5442828d375f8da4998f445de46f436524cbdbfe59cb7eb",
+    "research/mve/p6_tools/run_p6.py": "bc4398a4ebfe729c5efa66c2d0c81c987054c892eda852096756650407c2359c",
+    "quant-lab/data/EURUSDPRO_M5_2023_2026.csv": "630b8a4052fe962bc7d87c6d49d83bc1524c7ddd83cd15e902fe504c998d3f77"
+  }
+}

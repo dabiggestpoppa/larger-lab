@@ -1,0 +1,67 @@
+{
+  "checkpoint": "MVE-P6-REKEY-MECHANICS",
+  "protocol_hash": "6e5a080fd6b831d4f5442828d375f8da4998f445de46f436524cbdbfe59cb7eb",
+  "registry_hash": "1a74494c964d388f529751c993dd012bbdafa582fd03b075bf3480d84fd532fa",
+  "variants": [
+    "RKEY_A",
+    "RKEY_B",
+    "RKEY_C"
+  ],
+  "boundaries": [
+    1.0,
+    2.0
+  ],
+  "directions": [
+    1.0,
+    -1.0
+  ],
+  "horizons": [
+    1,
+    2,
+    3,
+    6,
+    12,
+    24
+  ],
+  "max_horizon": 24,
+  "step": 1.0,
+  "b_retest_window": 4,
+  "vol_terciles_dev": [
+    0.00057,
+    0.000811
+  ],
+  "bootstrap_seed": 7777,
+  "bootstrap_n": 2000,
+  "primary_horizon": 6,
+  "primary_boundary": 1.0,
+  "promotion_criteria": {
+    "min_n_dev": 200,
+    "min_delta_dev": 0.03,
+    "fdr_q_threshold": 0.05,
+    "min_n_per_direction": 30,
+    "confirmation_reversal_rule": "delta_conf < 0 with CI excluding 0"
+  },
+  "dev_range": [
+    "2023-07-03",
+    "2024-12-31"
+  ],
+  "conf_range": [
+    "2025-01-01",
+    "2025-12-31"
+  ],
+  "blocks": {
+    "2023H2": [
+      "2023-07-03",
+      "2023-12-31"
+    ],
+    "2024H1": [
+      "2024-01-01",
+      "2024-06-30"
+    ],
+    "2024H2": [
+      "2024-07-01",
+      "2024-12-31"
+    ]
+  },
+  "frozen_at": "2026-08-16T15:08:49.228054+00:00"
+}

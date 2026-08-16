@@ -251,3 +251,29 @@ def transition_matrix(
     out = probs.copy()
     out["N"] = counts.sum(axis=1)
     return out
+
+
+# ---------------------------------------------------------------------------
+# Entropy (P6 — state-organization measures)
+# ---------------------------------------------------------------------------
+
+def shannon_entropy(values: np.ndarray, base: float = 2.0) -> float:
+    """Empirical Shannon entropy of the discrete distribution of `values`.
+
+    Entropy is computed from the relative frequencies of distinct values
+    (NaN dropped). Returns 0.0 for fewer than 2 observations (a degenerate
+    distribution has zero entropy). Deterministic.
+    """
+    v = np.asarray(values, dtype=float)
+    v = v[~np.isnan(v)]
+    if len(v) < 2:
+        return 0.0
+    _, counts = np.unique(v, return_counts=True)
+    p = counts / counts.sum()
+    return float(-np.sum(p * np.log(p) / np.log(base)))
+
+
+def entropy_reduction(h_a: float, h_b: float) -> float:
+    """Reduction from frame B to frame A: h_b - h_a (positive = A more
+    concentrated / organized)."""
+    return float(h_b - h_a)
