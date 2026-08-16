@@ -1,0 +1,24 @@
+{
+  "checkpoint": "TB-R2-SYNCHRONIZED-MARKET-DATA",
+  "audit": "TB_R2_SYMBOL_RESOLUTION_AUDIT",
+  "canonical_symbols": ["GBPAUD", "GBPNZD", "AUDNZD"],
+  "expected_live_suffix": ".PRO",
+  "resolution_method": "runtime probe of candidate suffixes in order ('', '.PRO', 'm', '.raw', '.stp', '.a') against adapter.symbol_info(); candidate accepted only if trade_mode != 0 (tradeable) and contract_size > 0; mapping LOCKED after first successful resolve (no silent re-mapping).",
+  "no_guessing": "suffix is never assumed; plain-name, .PRO, and other variants are all probed at runtime. Test L_symbol_suffix_resolution proves .PRO-only brokers resolve correctly; test L_symbol_resolution_fails_on_no_tradeable proves disabled symbols fail closed.",
+  "metadata_captured_per_leg": {
+    "visible": "bool",
+    "trade_mode": "int (0 = disabled)",
+    "digits": "int",
+    "point": "float",
+    "contract_size": "float",
+    "min_volume": "float",
+    "volume_step": "float",
+    "max_volume": "float",
+    "tick_size": "float",
+    "tick_value": "float",
+    "stops_level": "int",
+    "filling_mode": "int"
+  },
+  "note": "Broker metadata is DESCRIPTIVE in R2 — nothing is executed. The frozen contract specs in the R0 truth lock are RESEARCH_REFERENCE_ONLY; live metadata is read dynamically from MT5 (broker_metadata_layer already ADOPTED per R1).",
+  "scientific_changes": "NONE"
+}

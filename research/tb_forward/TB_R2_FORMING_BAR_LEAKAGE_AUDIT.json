@@ -1,0 +1,10 @@
+{
+  "leak_detected": false,
+  "leaked_snapshots": [],
+  "control_snapshots": 499,
+  "adversarial_snapshots": 499,
+  "snapshot_sequence_identical": true,
+  "strategy_state_unchanged": true,
+  "forming_bar_price_used": false,
+  "audit_pass": true
+}

@@ -1,0 +1,35 @@
+{
+  "checkpoint": "TB-R2-SYNCHRONIZED-MARKET-DATA",
+  "suite": "quant-lab/engines/tb_r2_tests.py",
+  "result": {"collected": 26, "passed": 26, "failed": 0, "skipped": 0},
+  "matrix": [
+    {"id": "A", "scenario": "PERFECT STATE — 3 legs same closed bar, fresh ticks, low skew", "expected": "signal valid + execution valid", "result": "PASS"},
+    {"id": "B", "scenario": "ONE LEG STUCK TWO BARS BEHIND", "expected": "fail/wait (stale-common rule)", "result": "PASS (STALE_SIGNAL_BAR)"},
+    {"id": "C", "scenario": "FORMING BAR with extreme price present", "expected": "last common closed bar used; forming bar never enters", "result": "PASS"},
+    {"id": "D", "scenario": "NO COMMON BAR across legs", "expected": "fail", "result": "PASS (NO_COMMON_CLOSED_BAR)"},
+    {"id": "E", "scenario": "STALE TICK (1h old)", "expected": "execution invalid", "result": "PASS (STALE_EXECUTION_QUOTES)"},
+    {"id": "F", "scenario": "CROSS-LEG SKEW > 1000ms (fresh ticks)", "expected": "execution invalid", "result": "PASS (CROSS_LEG_SKEW)"},
+    {"id": "G", "scenario": "ZERO BID", "expected": "invalid", "result": "PASS (INVALID_QUOTE)"},
+    {"id": "H", "scenario": "ASK < BID", "expected": "invalid", "result": "PASS (INVALID_QUOTE)"},
+    {"id": "I", "scenario": "PER-LEG DUPLICATE BAR timestamp", "expected": "deterministic dedup/fail per contract", "result": "PASS (fail closed)"},
+    {"id": "J", "scenario": "CLOCK REGRESSION (tick older than previous)", "expected": "flag", "result": "PASS (CLOCK_REGRESSION)"},
+    {"id": "K", "scenario": "DISCONNECT", "expected": "fail closed", "result": "PASS"},
+    {"id": "L", "scenario": "SYMBOL SUFFIX RESOLUTION (.PRO only broker)", "expected": "canonical mapping works; disabled symbols fail", "result": "PASS"},
+    {"id": "M", "scenario": "SAME SIGNAL BAR LOOPED 10 TIMES", "expected": "one evaluation only", "result": "PASS (snapshots_emitted=1)"},
+    {"id": "N", "scenario": "NEXT M5 BAR", "expected": "exactly one new evaluation", "result": "PASS (snapshots_emitted=2)"}
+  ],
+  "additional_tests": [
+    {"test": "stale_signal_bar_fails_closed", "result": "PASS"},
+    {"test": "strategy_gets_closed_bar_and_ticks_do_not_enter_basis", "result": "PASS"},
+    {"test": "signal_validation_invalid_ohlc_nan_and_high_below_low", "result": "PASS"},
+    {"test": "execution_validation_skew_threshold_semantics (== passes, > fails)", "result": "PASS"},
+    {"test": "session_semantics_fixed_utc_minus_5", "result": "PASS"},
+    {"test": "bar_timestamp_semantics_locked", "result": "PASS"},
+    {"test": "mt5_adapter_exposes_no_order_functions", "result": "PASS"},
+    {"test": "fresh_signal_fresh_ticks_valid_weights_produce_zero_orders", "result": "PASS"},
+    {"test": "health_state_mapping", "result": "PASS"},
+    {"test": "config_is_centralized_no_magic_constants", "result": "PASS"},
+    {"test": "executor_integration_fail_closed_modes", "result": "PASS"}
+  ],
+  "scientific_changes": "NONE"
+}

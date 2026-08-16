@@ -62,10 +62,13 @@ from engines.triangular_basis_live import (
     BasketDecision,
     BasketIntent,
 )
-from engines.mt5_triangular_data_feed import (
-    TriangularDataFeed,
-    SYMBOL_MAP,
-    TRIANGLE_SYMBOLS,
+# TB-R2: synchronized three-leg market-data layer (fail-closed). Replaces the
+# legacy TriangularDataFeed (no quote freshness / skew / staleness gates).
+from tb_live.market_data import TBMarketDataConfig
+from tb_live.snapshot import (
+    MT5MarketDataAdapter,
+    SymbolResolver,
+    SynchronizedTriangleFeed,
 )
 from mt5.account_guard import AccountGuard, HaltStatus
 from mt5.triangular_execution_layer import (
@@ -168,7 +171,7 @@ def log_trade(basket_intent: BasketIntent, result=None):
 
 
 def write_heartbeat(guard: AccountGuard, engine: TriangularBasisLiveEngine,
-                   data_feed: TriangularDataFeed, current_z: float = 0.0,
+                   data_feed, current_z: float = 0.0,
                    basket_status: str = "none"):
     """Write/update heartbeat JSON for monitoring."""
     heartbeat_file = os.path.join(STATE_DIR, "heartbeat.json")
@@ -185,6 +188,8 @@ def write_heartbeat(guard: AccountGuard, engine: TriangularBasisLiveEngine,
         "config_hash": engine.get_config_hash(),
         "magic_number": TRIANGULAR_BASIS_MAGIC,
         "active_baskets": len(engine.get_active_baskets()),
+        "data_layer": "TB-R2-SYNCHRONIZED-TRIANGLE",
+        "market_data_health": getattr(data_feed, "_last_health", None),
     }
     
     try:
@@ -216,9 +221,13 @@ def run_loop(interval_seconds: int = 30, mode: str = DEFAULT_MODE):
     log(f"Poll Interval: {interval_seconds}s")
     log("=" * 60)
     
-    # Initialize components
+    # Initialize components (TB-R2 synchronized market-data layer)
     guard = AccountGuard()
-    data_feed = TriangularDataFeed()
+    cfg = TBMarketDataConfig()
+    md_adapter = MT5MarketDataAdapter(bar_seconds=cfg.bar_seconds)
+    resolver = SymbolResolver(md_adapter)
+    data_feed = SynchronizedTriangleFeed(adapter=md_adapter, config=cfg,
+                                         resolver=resolver)
     engine = TriangularBasisLiveEngine()
     execution_layer = TriangularExecutionLayer(magic_number=TRIANGULAR_BASIS_MAGIC)
     
@@ -253,6 +262,19 @@ def run_loop(interval_seconds: int = 30, mode: str = DEFAULT_MODE):
     except ValueError as e:
         log(f"FATAL: Magic number collision — FAIL STARTUP")
         log(str(e))
+        return
+
+    # Initialize the R2 market-data adapter + resolve triangle symbols
+    # (fail closed: no resolution -> no loop).
+    if not md_adapter.initialize():
+        log("FATAL: MT5 data adapter failed to initialize — FAIL CLOSED")
+        return
+    try:
+        resolution = resolver.require_resolved()
+        log(f"Symbols resolved: {resolution.mapping}")
+    except RuntimeError as e:
+        log(f"FATAL: Triangle symbol resolution failed — FAIL CLOSED: {e}")
+        md_adapter.shutdown()
         return
     
     # Ensure directories
@@ -293,11 +315,22 @@ def run_loop(interval_seconds: int = 30, mode: str = DEFAULT_MODE):
                 time.sleep(interval_seconds)
                 continue
             
-            # ── Fetch synchronized snapshot ─────────────────────────────
-            snapshot = data_feed.fetch_latest_snapshot()
-            
-            if snapshot is None:
-                log(f"Cycle {cycle}: No synchronized snapshot available")
+            # ── Fetch synchronized closed-M5 triangle (TB-R2, fail-closed) ─
+            snapshot = data_feed.get_synchronized_closed_triangle()
+            health = data_feed.get_health()
+            data_feed._last_health = {
+                "state": health.overall_state().value,
+                "signal_valid": health.signal_valid,
+                "execution_valid": health.execution_valid,
+                "signal_reason": health.signal_reason,
+                "execution_reason": health.execution_reason,
+                "selected_bar": str(health.selected_bar_close_time),
+                "max_quote_age_ms": health.max_quote_age_ms,
+                "cross_leg_skew_ms": health.cross_leg_skew_ms,
+            }
+            if not snapshot.signal_snapshot_valid:
+                log(f"Cycle {cycle}: {health.overall_state().value} "
+                    f"({snapshot.failure_code.value})")
                 time.sleep(interval_seconds)
                 continue
             
@@ -410,17 +443,23 @@ if __name__ == "__main__":
             except AssertionError:
                 log("Demo identity verification failed")
             
-            data_feed = TriangularDataFeed()
+            cfg = TBMarketDataConfig()
+            md_adapter = MT5MarketDataAdapter(bar_seconds=cfg.bar_seconds)
+            md_adapter.initialize()
+            data_feed = SynchronizedTriangleFeed(
+                adapter=md_adapter, config=cfg)
+            data_feed.resolver.resolve()
             engine = TriangularBasisLiveEngine()
             
-            snapshot = data_feed.fetch_latest_snapshot()
-            if snapshot:
+            snapshot = data_feed.get_synchronized_closed_triangle()
+            if snapshot.signal_snapshot_valid:
                 decision = engine.process_snapshot(snapshot)
                 print(f"Decision: {decision.decision.value}")
                 print(f"Basis: {decision.basis:.8f}")
                 print(f"Z-score: {decision.zscore:.4f}")
             else:
-                print("No synchronized snapshot available")
+                print(f"No synchronized closed snapshot "
+                      f"({snapshot.failure_code.value})")
             
             data_feed.shutdown()
             engine.shutdown()

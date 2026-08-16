@@ -1,0 +1,41 @@
+{
+  "checkpoint": "TB-R2-SYNCHRONIZED-MARKET-DATA",
+  "status": "PASS",
+  "base_commit": "2181c4832e760caf873ca93a0ed6d7ac1b1b5480",
+  "canonical_research_commit": "6769ad31ac737946dae54e3660e22cb36f72e2b7",
+
+  "signal_bar_sync_pass": true,
+  "closed_bar_only_pass": true,
+  "forming_bar_leakage_pass": true,
+  "bar_timestamp_semantics_locked": true,
+
+  "execution_quote_snapshot_pass": true,
+  "quote_age_gate_pass": true,
+  "cross_leg_skew_gate_pass": true,
+
+  "symbol_resolution_pass": true,
+  "historical_signal_parity_pass": true,
+
+  "primary_event_count": 194,
+  "control_event_count": 405,
+  "primary_lifecycle_mismatches": 0,
+  "control_lifecycle_mismatches": 0,
+
+  "bars_total": 265809,
+  "bars_emitted_through_r2": 265809,
+
+  "strategy_math_changed": false,
+  "weighting_changed": false,
+  "session_semantics_changed": false,
+
+  "market_data_layer_adopted": true,
+  "persistence_pending": true,
+
+  "execution_authorization": "NOT_AUTHORIZED",
+  "demo_authorized": false,
+  "live_authorized": false,
+
+  "tb_r2_synchronized_market_data_pass": true,
+  "next_checkpoint_recommended": "TB-R3-PERSISTENCE-RECONCILIATION",
+  "human_review_required": true
+}

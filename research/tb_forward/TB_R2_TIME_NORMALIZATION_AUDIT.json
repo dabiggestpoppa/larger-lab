@@ -1,0 +1,21 @@
+{
+  "checkpoint": "TB-R2-SYNCHRONIZED-MARKET-DATA",
+  "audit": "TB_R2_TIME_NORMALIZATION_AUDIT",
+  "internal_transport_clock": "UTC-aware datetime (timezone.utc) for all freshness/skew/age math; to_utc_aware() normalizes naive -> UTC without shifting wall clock",
+  "strategy_session_clock": "raw bar hour + fixed UTC-5 (est_hour=(hour-5)%24), NO DST correction, NO America/New_York, NO broker-local",
+  "mixing_guard": "no naive-datetime subtraction across mixed tz-awareness (all comparisons go through to_utc_aware)",
+  "tables": {
+    "canonical_research_timestamp": "raw bar open time from CSV (naive, server time) — used verbatim as strategy key",
+    "broker_timestamp": "MT5 copy_rates open time / symbol_info_tick time — normalized to UTC-aware for transport",
+    "runtime_timestamp": "datetime.now(timezone.utc) receipt time — recorded alongside broker time",
+    "session_classification_timestamp": "raw bar hour with fixed UTC-5 (same object as the strategy key)"
+  },
+  "session_boundary_tests": {
+    "02:55_UTC": {"est": 2, "session": "outside"},
+    "03:00_UTC": {"est": 3, "session": "open"},
+    "11:55_UTC": {"est": 11, "session": "active"},
+    "12:00_UTC": {"est": 12, "session": "hard-exit boundary"},
+    "12:05_UTC": {"est": 12, "session": "after hard exit"}
+  },
+  "scientific_changes": "NONE"
+}

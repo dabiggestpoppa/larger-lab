@@ -1,0 +1,19 @@
+{
+  "checkpoint": "TB-R2-SYNCHRONIZED-MARKET-DATA",
+  "base_commit": "2181c4832e760caf873ca93a0ed6d7ac1b1b5480",
+  "component_status": {
+    "strategy_wrapper": "ADOPTED",
+    "normalization_engine": "ADOPTED",
+    "weight_engine": "ADOPTED",
+    "execution_contract": "ADOPTED",
+    "atomic_execution_layer": "ADOPTED",
+    "market_data_layer": "ADOPTED",
+    "persistence_layer": "PENDING_REPLACEMENT",
+    "broker_metadata_layer": "ADOPTED",
+    "session_time_layer": "ADOPTED",
+    "parity_harness": "ADOPTED",
+    "execution_safety": "FAIL_CLOSED"
+  },
+  "tb_r2_synchronized_market_data_pass": true,
+  "scientific_changes": "NONE"
+}

@@ -1,0 +1,24 @@
+{
+  "checkpoint": "TB-R2-SYNCHRONIZED-MARKET-DATA",
+  "failure_codes": [
+    {"code": "MISSING_LEG", "trigger": "a required leg has no closed bars / adapter returned none / symbol resolution failed", "action": "NO strategy decision"},
+    {"code": "NO_COMMON_CLOSED_BAR", "trigger": "no bar open-time is present in all three legs (timestamp intersection empty)", "action": "NO strategy decision; wait for legs to catch up"},
+    {"code": "FORMING_BAR", "trigger": "a bar in the snapshot is not closed (is_closed=false)", "action": "NO strategy decision; forming bars never enter"},
+    {"code": "STALE_SIGNAL_BAR", "trigger": "selected common closed bar older than max_signal_bar_age_s, or >max_signal_bar_lag_bars behind a leg's newest closed bar", "action": "NO strategy decision; invalidate stale common intersection"},
+    {"code": "INVALID_OHLC", "trigger": "NaN/inf, nonpositive price, high<low, open/close outside [low,high]", "action": "NO strategy decision"},
+    {"code": "TIMESTAMP_MISMATCH", "trigger": "the three legs do not share the same bar open time", "action": "NO strategy decision"},
+    {"code": "DUPLICATE_BAR", "trigger": "per-leg duplicate bar open times in the fetched window", "action": "NO strategy decision; deterministic dedup/fail"},
+    {"code": "NO_NEW_SIGNAL_BAR", "trigger": "dedup: the same synchronized closed bar was already processed", "action": "skip evaluation (exactly-once per bar)"}
+  ],
+  "execution_codes": [
+    {"code": "STALE_EXECUTION_QUOTES", "trigger": "any leg quote age > max_quote_age_ms", "action": "NO basket translation"},
+    {"code": "CROSS_LEG_SKEW", "trigger": "max(tick_times)-min(tick_times) > max_cross_leg_skew_ms", "action": "NO basket translation (not a coherent simultaneous market state)"},
+    {"code": "INVALID_QUOTE", "trigger": "bid<=0, ask<=0, ask<bid, missing tick time", "action": "NO basket translation"},
+    {"code": "SYMBOL_UNAVAILABLE", "trigger": "resolution failed or symbol info unavailable", "action": "NO basket translation"},
+    {"code": "BROKER_DISCONNECTED", "trigger": "adapter disconnected", "action": "NO basket translation"},
+    {"code": "CLOCK_REGRESSION", "trigger": "tick timestamp older than previous by > tolerance", "action": "NO basket translation; flag clock"},
+    {"code": "NOT_TRADEABLE", "trigger": "symbol trade_mode disabled or contract_size<=0", "action": "resolution fails; NO basket translation"}
+  ],
+  "skew_threshold_semantics": "strictly greater than threshold fails; exactly equal passes (tested: 1000ms valid, 1000ms+1us invalid)",
+  "scientific_changes": "NONE"
+}

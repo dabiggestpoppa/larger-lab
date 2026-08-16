@@ -1,0 +1,21 @@
+{
+  "checkpoint": "TB-R2-SYNCHRONIZED-MARKET-DATA",
+  "audit": "TB_R2_BAR_TIME_AUDIT",
+  "broker_bar_timestamp_semantics": "OPEN_TIME",
+  "broker_bar_timestamp_detail": "MT5 copy_rates_from_pos / copy_rates_range return the bar OPEN time in SERVER time. The timestamp is the start of the M5 interval, not the close.",
+  "canonical_signal_timestamp_semantics": "RAW_BAR_OPEN_TIME_VERBATIM",
+  "canonical_signal_timestamp_detail": "The sealed research CSVs (GBPAUD_M5.csv / GBPNZD_M5.csv / AUDNZD_PRO_M5.csv) carry the raw MT5 open-time timestamps and the sealed pipeline applies the session rule est_hour=(hour-5)%24 DIRECTLY to them. R2 preserves this verbatim; the strategy key is the raw open time.",
+  "timeframe": "M5",
+  "timeframe_seconds": 300,
+  "close_time_conversion": "bar_close_time = bar_open_time + 300s, used ONLY for freshness/age math. The strategy key is NOT shifted to close time (shifting would break session classification and the sealed 194/405 parity).",
+  "strategy_snapshot_key": "canonical bar OPEN time (raw MT5 server time)",
+  "tested": true,
+  "evidence": {
+    "parity_bars": 265809,
+    "primary_events": {"canonical": 194, "live": 194, "mismatches": 0},
+    "control_events": {"canonical": 405, "live": 405, "mismatches": 0},
+    "max_z_diff": 9.245937349078304e-13,
+    "session_boundary_tests": "02:55 EST=2 (outside), 03:00 EST=3 (open), 11:55 EST=11, 12:00 EST=12 (hard exit), 12:05 EST=12 (after) — fixed UTC-5, no DST"
+  },
+  "scientific_changes": "NONE"
+}
