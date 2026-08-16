@@ -149,5 +149,6 @@
     }
   },
   "deterministic": true,
-  "stop": "R5 complete. No allocation selected. R6 (episode/heat sizing) does NOT start until human review. No Kelly, no dynamic/DD-adaptive sizing, no deployment, no MT5."
+  "stop": "R5 complete. No allocation selected. R6 (episode/heat sizing) does NOT start until human review. No Kelly, no dynamic/DD-adaptive sizing, no deployment, no MT5.",
+  "r5_commit_sha": "150a93dec8edf2997652cd20724298fe9927c0dc"
 }

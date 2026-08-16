@@ -55,5 +55,6 @@
     "stress": 5000
   },
   "determinism": "fixed seeds; chronological block + R1 episode block joint bootstrap",
-  "timestamp": "2026-08-16T03:30:12.748617+00:00"
+  "timestamp": "2026-08-16T03:30:12.748617+00:00",
+  "r5_commit_sha": "150a93dec8edf2997652cd20724298fe9927c0dc"
 }
