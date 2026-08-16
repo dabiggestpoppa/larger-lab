@@ -1,0 +1,71 @@
+{
+  "checkpoint": "CR-RISK-BLOCK1-FOUNDATION-SEAL",
+  "status": "PASS",
+  "block1_foundation_sealed": true,
+  "r1_accepted": true,
+  "r1_1_accepted": true,
+  "r2_accepted": true,
+  "r3_accepted": true,
+  "r3_1_accepted": true,
+  "r4_accepted": true,
+  "risk_unit_locked": true,
+  "exposure_truth_locked": true,
+  "loss_anatomy_locked": true,
+  "profit_anatomy_locked": true,
+  "static_frontier_locked": true,
+  "edge_degradation_locked": true,
+  "tail_risk_locked": true,
+  "family_risk_locked": true,
+  "rm_profile_library_created": true,
+  "alpha_changed": false,
+  "entry_changed": false,
+  "exit_changed": false,
+  "trade_management_changed": false,
+  "best_size_selected": false,
+  "kelly_authorized": false,
+  "dynamic_sizing_authorized": false,
+  "family_allocation_authorized": false,
+  "cluster_sizing_authorized": false,
+  "dd_adaptive_authorized": false,
+  "deployment_authorized": false,
+  "mt5_authorized": false,
+  "block_2_cleared": false,
+  "human_review_required": true,
+  "profiles": {
+    "RM-S0_PRESERVATION": {
+      "f_min": 0.05,
+      "f_max": 0.4,
+      "representative_f": 0.4
+    },
+    "RM-S1_CONSERVATIVE": {
+      "f_min": 0.5,
+      "f_max": 0.75,
+      "representative_f": 0.75
+    },
+    "RM-S2_BALANCED": {
+      "f_min": 1.0,
+      "f_max": 2.0,
+      "representative_f": 2.0
+    },
+    "RM-S3_GROWTH": {
+      "f_min": 2.5,
+      "f_max": 3.0,
+      "representative_f": 3.0
+    },
+    "RM-S4_FULL_PRESS_RESEARCH": {
+      "f_min": 4.0,
+      "f_max": 5.0,
+      "representative_f": 5.0
+    }
+  },
+  "family_capital_limiter": "B (static equal-f, every tested f)",
+  "risk_unit": {
+    "1R_bps": 24.49489742783178,
+    "account_mapping": "account_return ~= trade_return_R x f",
+    "A_worst_R": -3.6553836279681793,
+    "B_worst_R": -3.313025441980525,
+    "is_stop": false
+  },
+  "next_checkpoint_recommended": "BLOCK-II-R5-FAMILY-QUALITY-ALLOCATION",
+  "stop": "Block I sealed. Block II (R5-R9, Kelly, dynamic/family/cluster/DD sizing, deployment, MT5) does NOT start until human review."
+}

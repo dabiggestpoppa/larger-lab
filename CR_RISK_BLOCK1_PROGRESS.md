@@ -21,10 +21,41 @@ through full-press) so the user can deliberately choose a risk-return regime. Al
 | `CR-RISK-R3-PROFIT-ANATOMY` | R3: MFE distributions, time-to-MFE, giveback, remaining expectancy | ✅ Complete — 267/267 tests |
 | `CR-RISK-R3.1-TIME-TO-PROFIT-METRIC-REPAIR` | R3.1: fix share_of_winners > 1.0 in R3_TIME_TO_PROFIT | ✅ Complete — R3_CONCLUSIONS_UNCHANGED |
 | `CR-RISK-R4-STATIC-FRONTIER` | R4: fixed-fractional ladder, DD probability map, ruin defs, full-press envelopes | ✅ Complete — 286/286 tests |
-| `CR-RISK-BLOCK1-FOUNDATION-SEAL` | Master report + RM-S0..S4 profile library | ⏳ (R4 stop condition — awaits human review) |
+| `CR-RISK-BLOCK1-FOUNDATION-SEAL` | Master report + RM-S0..S4 profile library | ✅ Complete — 305/305 tests |
 
-`block_2_cleared = false` until human review after the Block-I seal. No R5-R9, Kelly, hybrid sizing,
+`block_1_foundation_sealed = true` · `block_2_cleared = false` until human review. No R5-R9, Kelly, hybrid sizing,
 deploy, or MT5.
+
+## Block-I Foundation Seal ✅ COMPLETE
+
+**Commit:** `CR-RISK-BLOCK1-FOUNDATION-SEAL` (pushed) · Tests: 19 new (`tests/test_risk_block1_seal.py`) · **305/305 repo-wide** (207 main + 23 R1 + 18 R2 + 23 R3 + 15 R4 + 19 seal) · deterministic (byte-identical re-run, all BLOCK1_* outputs) · provenance locked (`BLOCK1_INPUT_HASH_MANIFEST.json`, full 40-char SHAs for R1/R1.1/R2/R3/R3.1/R4)
+
+### What was sealed (18 outputs)
+
+Doctrine library: `BLOCK1_RISK_UNIT_LOCK.md` · `LOSS_DOCTRINE.md` · `PROFIT_DOCTRINE.md` · `EXPOSURE_DOCTRINE.md` · `EDGE_DEGRADATION_DOCTRINE.md` · `TAIL_RISK_DOCTRINE.md` · `FAMILY_RISK_DOCTRINE.md`; tables: `BLOCK1_STATIC_FRONTIER.csv` (R4 landmarks preserved exactly) · `BLOCK1_RM_PROFILE_LIBRARY.csv/.md` (non-overlapping bands) · `BLOCK1_ACCOUNT_TRANSLATION.csv` · `BLOCK1_PROP_CONSTRAINT_MAP.csv` · `BLOCK1_EVIDENCE_STATUS_MATRIX.csv`; docs: `BLOCK1_FOUNDATION_REPORT.md` (15 sections) · `BLOCK2_RESEARCH_QUEUE.md` (R5→R9, defined NOT authorized) · `BLOCK1_CONTRADICTIONS.md` (all resolved / non-material); `BLOCK1_DECISION.json` (all 34 required keys, `status: PASS`) · `BLOCK1_INPUT_HASH_MANIFEST.json`.
+
+### RM-S0..S4 profile library (REFRAMED, non-overlapping — breakpoints from historical max DD: ≤5/≤10/≤20/≤30/>30%)
+
+| profile | f band | hist max DD | p95 resampled DD | rep f | rep CAGR | P(DD≥40%) | edge-75 CAGR | edge-50 CAGR |
+|---|---|---|---|---|---|---|---|---|
+| RM-S0 PRESERVATION | 0.05–0.40% | 0.5–4.2% | 0.8–6.3% | 0.40% | +54% | 0% | +25% | +2% |
+| RM-S1 CONSERVATIVE | 0.50–0.75% | 5.2–7.7% | 7.8–11.5% | 0.75% | +123% | 0% | +53% | +4% |
+| RM-S2 BALANCED | 1.00–2.00% | 10.2–19.7% | 15.1–28.5% | 2.00% | +711% | 0% | +200% | +9% |
+| RM-S3 GROWTH | 2.50–3.00% | 24.3–28.7% | 34.6–40.2% | 3.00% | +2080% | 0.06% | +404% | +11% |
+| RM-S4 FULL-PRESS RESEARCH | 4.00–5.00% | 36.9–44.6% | 50.4–59.4% | 5.00% | +13950% | 1.4% | +1232% | +12% |
+
+Every profile: **NOT safe / NOT recommended / NOT production**. RM-S4 is explicitly RESEARCH / FULL-PRESS ONLY.
+
+### Seal verdicts
+
+- **Risk unit LOCKED:** 1R = 24.4949 bps, IS NOT A STOP; account_return ≈ trade_return_R × f; measured extremes A −3.655R / B −3.313R (exact from ledger, decision now carries measured values).
+- **Contradictions:** all resolved — R3.1 share repair, R4 zone collapse (non-material, reframed here), R4 worst_cluster/worst_seq fixes, R3 Q12 row fix.
+- **Tail concentration (artifact-exact):** worst 1% (n=9) = 9.7% of losses + 45% of worst-24h; worst 10% (n=89) = 60% of losses, 92% of max-DD window, 81% of worst-24h. (Worst-winner MAE verified from ledger: −1.69R — a deep-recovery winner, not the ~−0.59R previously quoted.)
+- **Edge doctrine:** EDGE-FULL/ROBUST (100/75%) viable; EDGE-FRAGILE (50%) — 5% CAGR / 43% p95 DD at f=1%; EDGE-BROKEN (25%) — negative CAGR at every fraction. Binding constraint = edge retention.
+- **Family:** B capital-limiting at every f (solo DD A 10.3% vs B 11.1% at f=1%; 43.4% vs 45.7% at f=5%). Descriptive only — allocation is Block-II R5.
+- **No best size selected. Block II locked. Kelly unauthorized. No alpha/entry/exit/management change.**
+
+`block_1_foundation_sealed = true` · `human_review_required = true` · **Block II (R5 family allocation → R6 episode/heat → R7 DD-adaptive → R8 Kelly → R9 hybrid) does NOT start until human review.**
 
 ## R4 — Static Risk Frontier ✅ COMPLETE
 
