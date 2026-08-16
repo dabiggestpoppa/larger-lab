@@ -1,0 +1,98 @@
+{
+  "1_future_perturbation": {
+    "max_diff": 0.0,
+    "all_zero": true,
+    "measured_cells": 20
+  },
+  "2_truncation_invariance": {
+    "max_diff": 0.0,
+    "all_zero": true,
+    "measured_cells": 20
+  },
+  "3_timestamp_schema": {
+    "events_validated": 9752,
+    "ordering_pass": true
+  },
+  "4_blocked_component_isolation": {
+    "models_D_E_consumed": false,
+    "note": "P4 detection consumes only causal coordinates/signals; Model D/E excluded by construction (tests enforce no references)."
+  },
+  "5_static_leakage": {
+    "findings": [
+      {
+        "module": "run_p4",
+        "line": 329,
+        "pattern": "mean()",
+        "code": "np.mean(ba[idx])",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p4",
+        "line": 330,
+        "pattern": "mean()",
+        "code": "np.mean(va[:n])",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p4",
+        "line": 121,
+        "pattern": "rolling()",
+        "code": "h1['close'].rolling(pa.P4_TRAILING_WINDOW, min_periods=pa.P4_TRAILING_MIN_PERIODS)",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "run_p4",
+        "line": 122,
+        "pattern": "rolling()",
+        "code": "h1['close'].rolling(pa.P4_TRAILING_WINDOW, min_periods=pa.P4_TRAILING_MIN_PERIODS)",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "run_p4",
+        "line": 520,
+        "pattern": "mean()",
+        "code": "np.mean(va)",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p4",
+        "line": 928,
+        "pattern": "mean()",
+        "code": "valid.mean()",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p4",
+        "line": 929,
+        "pattern": "mean()",
+        "code": "tt[valid].mean()",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p4",
+        "line": 906,
+        "pattern": "mean()",
+        "code": "v.mean()",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p4",
+        "line": 370,
+        "pattern": "mean()",
+        "code": "np.mean(va_d)",
+        "classification": "EX_POST_ONLY"
+      }
+    ],
+    "classification_rule": "rolling() -> CAUSAL when it is a trailing window on bars <= t (the P4 primary anchor is the prior-50-bar extreme); mean()/std() -> EX_POST_ONLY when they aggregate already-measured outcomes (statistics); shift(-/center=True/bfill()/backfill()/iloc[] would be BLOCKED.",
+    "unclassified": [],
+    "blocked": []
+  },
+  "6_causal_to_expost_dependency": {
+    "count": 0,
+    "note": "Outcome measurement consumes episodes + signals only after detection; no outcome column is ever consumed by a detection function (test-enforced)."
+  },
+  "holdout": {
+    "status": "FINAL_HOLDOUT_PENDING",
+    "rows_read": 0
+  }
+}

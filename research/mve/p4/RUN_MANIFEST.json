@@ -1,0 +1,15 @@
+{
+  "checkpoint": "MVE-P4-CAUSAL-ACCEPTANCE-ENGINE",
+  "git_sha": "54bce6cd27d0fe60fcdad62f4273bb3c23e0c2a6",
+  "branch": "cerebus-mve-implementation",
+  "canonical_sha256": "630b8a4052fe962bc7d87c6d49d83bc1524c7ddd83cd15e902fe504c998d3f77",
+  "dev_rows": 9329,
+  "conf_rows": 6193,
+  "dev_episodes": 5752,
+  "conf_episodes": 4000,
+  "registry_hash": "67eb205503c8ded2a2e8955fdcec54f7172782af51af19efe89a4469bbb442e5",
+  "frozen_params_hash": "22bdc549ccee0fbe0e9e0de18a6193d0aec59f02b75f22519750ea126c0b4b2e",
+  "execution_timestamp": "2026-08-16T13:50:32.662215+00:00",
+  "elapsed_seconds": 185.1,
+  "holdout_status": "FINAL_HOLDOUT_PENDING"
+}

@@ -1,0 +1,368 @@
+{
+  "total_episodes": 9752,
+  "duplicate_episode_ids_within_cells": 0,
+  "cells_with_duplicates": [],
+  "per_cell": {
+    "confirmation|A0_TOUCH|b1.0|d-1": {
+      "n_episodes": 236,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A0_TOUCH|b1.0|d+1": {
+      "n_episodes": 304,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A0_TOUCH|b2.0|d-1": {
+      "n_episodes": 78,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A0_TOUCH|b2.0|d+1": {
+      "n_episodes": 124,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A1_CLOSE|b1.0|d-1": {
+      "n_episodes": 236,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A1_CLOSE|b1.0|d+1": {
+      "n_episodes": 304,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A1_CLOSE|b2.0|d-1": {
+      "n_episodes": 78,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A1_CLOSE|b2.0|d+1": {
+      "n_episodes": 124,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A2_2OF3|b1.0|d-1": {
+      "n_episodes": 78,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A2_2OF3|b1.0|d+1": {
+      "n_episodes": 108,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A2_2OF3|b2.0|d-1": {
+      "n_episodes": 46,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A2_2OF3|b2.0|d+1": {
+      "n_episodes": 53,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A2_3OF4|b1.0|d-1": {
+      "n_episodes": 71,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A2_3OF4|b1.0|d+1": {
+      "n_episodes": 83,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A2_3OF4|b2.0|d-1": {
+      "n_episodes": 46,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A2_3OF4|b2.0|d+1": {
+      "n_episodes": 53,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A2_3OF5|b1.0|d-1": {
+      "n_episodes": 71,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A2_3OF5|b1.0|d+1": {
+      "n_episodes": 85,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A2_3OF5|b2.0|d-1": {
+      "n_episodes": 46,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A2_3OF5|b2.0|d+1": {
+      "n_episodes": 53,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A3_PERS_2|b1.0|d-1": {
+      "n_episodes": 120,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A3_PERS_2|b1.0|d+1": {
+      "n_episodes": 148,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A3_PERS_2|b2.0|d-1": {
+      "n_episodes": 52,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A3_PERS_2|b2.0|d+1": {
+      "n_episodes": 74,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A3_PERS_3|b1.0|d-1": {
+      "n_episodes": 119,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A3_PERS_3|b1.0|d+1": {
+      "n_episodes": 143,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A3_PERS_3|b2.0|d-1": {
+      "n_episodes": 52,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A3_PERS_3|b2.0|d+1": {
+      "n_episodes": 74,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A3_PERS_4|b1.0|d-1": {
+      "n_episodes": 119,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A3_PERS_4|b1.0|d+1": {
+      "n_episodes": 143,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A3_PERS_4|b2.0|d-1": {
+      "n_episodes": 52,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A3_PERS_4|b2.0|d+1": {
+      "n_episodes": 74,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A4_RETEST_HOLD|b1.0|d-1": {
+      "n_episodes": 179,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A4_RETEST_HOLD|b1.0|d+1": {
+      "n_episodes": 203,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A4_RETEST_HOLD|b2.0|d-1": {
+      "n_episodes": 69,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "confirmation|A4_RETEST_HOLD|b2.0|d+1": {
+      "n_episodes": 102,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A0_TOUCH|b1.0|d-1": {
+      "n_episodes": 385,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A0_TOUCH|b1.0|d+1": {
+      "n_episodes": 384,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A0_TOUCH|b2.0|d-1": {
+      "n_episodes": 138,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A0_TOUCH|b2.0|d+1": {
+      "n_episodes": 127,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A1_CLOSE|b1.0|d-1": {
+      "n_episodes": 385,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A1_CLOSE|b1.0|d+1": {
+      "n_episodes": 384,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A1_CLOSE|b2.0|d-1": {
+      "n_episodes": 138,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A1_CLOSE|b2.0|d+1": {
+      "n_episodes": 127,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A2_2OF3|b1.0|d-1": {
+      "n_episodes": 141,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A2_2OF3|b1.0|d+1": {
+      "n_episodes": 137,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A2_2OF3|b2.0|d-1": {
+      "n_episodes": 76,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A2_2OF3|b2.0|d+1": {
+      "n_episodes": 78,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A2_3OF4|b1.0|d-1": {
+      "n_episodes": 116,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A2_3OF4|b1.0|d+1": {
+      "n_episodes": 121,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A2_3OF4|b2.0|d-1": {
+      "n_episodes": 75,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A2_3OF4|b2.0|d+1": {
+      "n_episodes": 77,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A2_3OF5|b1.0|d-1": {
+      "n_episodes": 120,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A2_3OF5|b1.0|d+1": {
+      "n_episodes": 123,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A2_3OF5|b2.0|d-1": {
+      "n_episodes": 75,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A2_3OF5|b2.0|d+1": {
+      "n_episodes": 77,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A3_PERS_2|b1.0|d-1": {
+      "n_episodes": 189,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A3_PERS_2|b1.0|d+1": {
+      "n_episodes": 201,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A3_PERS_2|b2.0|d-1": {
+      "n_episodes": 87,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A3_PERS_2|b2.0|d+1": {
+      "n_episodes": 91,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A3_PERS_3|b1.0|d-1": {
+      "n_episodes": 182,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A3_PERS_3|b1.0|d+1": {
+      "n_episodes": 195,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A3_PERS_3|b2.0|d-1": {
+      "n_episodes": 87,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A3_PERS_3|b2.0|d+1": {
+      "n_episodes": 90,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A3_PERS_4|b1.0|d-1": {
+      "n_episodes": 182,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A3_PERS_4|b1.0|d+1": {
+      "n_episodes": 195,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A3_PERS_4|b2.0|d-1": {
+      "n_episodes": 87,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A3_PERS_4|b2.0|d+1": {
+      "n_episodes": 90,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A4_RETEST_HOLD|b1.0|d-1": {
+      "n_episodes": 272,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A4_RETEST_HOLD|b1.0|d+1": {
+      "n_episodes": 287,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A4_RETEST_HOLD|b2.0|d-1": {
+      "n_episodes": 120,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    },
+    "development|A4_RETEST_HOLD|b2.0|d+1": {
+      "n_episodes": 113,
+      "unique_episode_ids": true,
+      "monotonic_event_pos": true
+    }
+  },
+  "note": "episode_ids are unique within (stage, variant, boundary, direction); the same touch bar legitimately opens one episode per variant (cross-variant id sharing is by design and not a duplicate)."
+}

@@ -1,0 +1,17 @@
+variant,boundary,promoted_to_P5,evidence_category,reason
+A1_CLOSE,1.0,False,REDUNDANT,"N=366, delta_dev=0.133 (0.068,0.192), delta_conf=0.098"
+A2_2OF3,1.0,False,INSUFFICIENT_N,"N=98, delta_dev=0.165 (0.064,0.265), delta_conf=0.080"
+A2_3OF4,1.0,False,INSUFFICIENT_N,"N=20, delta_dev=-0.018 (-0.234,0.205), delta_conf=0.210"
+A2_3OF5,1.0,False,INSUFFICIENT_N,"N=31, delta_dev=0.048 (-0.135,0.229), delta_conf=0.161"
+A3_PERS_2,1.0,False,INSUFFICIENT_N,"N=56, delta_dev=0.193 (0.065,0.318), delta_conf=0.113"
+A3_PERS_3,1.0,False,INSUFFICIENT_N,"N=10, delta_dev=0.132 (-0.180,0.432), delta_conf=0.077"
+A3_PERS_4,1.0,False,INSUFFICIENT_N,no data
+A4_RETEST_HOLD,1.0,False,INSUFFICIENT_N,"N=10, delta_dev=0.432 (0.220,0.558), delta_conf=-0.273"
+A1_CLOSE,2.0,False,INSUFFICIENT_N,"N=118, delta_dev=0.164 (0.055,0.266), delta_conf=0.147"
+A2_2OF3,2.0,False,INSUFFICIENT_N,"N=14, delta_dev=0.100 (-0.186,0.352), delta_conf=0.290"
+A2_3OF4,2.0,False,INSUFFICIENT_N,"N=1, delta_dev=-0.472 (-0.532,-0.411), delta_conf=nan"
+A2_3OF5,2.0,False,INSUFFICIENT_N,"N=1, delta_dev=-0.472 (-0.532,-0.411), delta_conf=nan"
+A3_PERS_2,2.0,False,INSUFFICIENT_N,"N=8, delta_dev=0.028 (-0.335,0.388), delta_conf=0.540"
+A3_PERS_3,2.0,False,INSUFFICIENT_N,"N=1, delta_dev=-0.472 (-0.532,-0.411), delta_conf=nan"
+A3_PERS_4,2.0,False,INSUFFICIENT_N,no data
+A4_RETEST_HOLD,2.0,False,INSUFFICIENT_N,"N=2, delta_dev=0.528 (0.468,0.585), delta_conf=0.540"

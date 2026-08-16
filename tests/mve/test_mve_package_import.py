@@ -19,6 +19,8 @@ MODULES = [
     "mve.rekey",
     "mve.signals",
     "mve.backtest",
+    "mve.p4_acceptance",
+    "mve.p4_statistics",
 ]
 
 

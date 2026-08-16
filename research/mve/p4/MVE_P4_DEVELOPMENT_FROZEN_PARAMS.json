@@ -1,0 +1,79 @@
+{
+  "checkpoint": "MVE-P4-CAUSAL-ACCEPTANCE-ENGINE",
+  "protocol_hash": "97cb681a38cb62656a39d4562b36e00d06ddda8293c9651e81f2cb88eb0eefc0",
+  "registry_hash": "67eb205503c8ded2a2e8955fdcec54f7172782af51af19efe89a4469bbb442e5",
+  "variants": [
+    "A0_TOUCH",
+    "A1_CLOSE",
+    "A2_2OF3",
+    "A2_3OF4",
+    "A2_3OF5",
+    "A3_PERS_2",
+    "A3_PERS_3",
+    "A3_PERS_4",
+    "A4_RETEST_HOLD"
+  ],
+  "a2_grid": {
+    "A2_2OF3": [
+      2,
+      3
+    ],
+    "A2_3OF4": [
+      3,
+      4
+    ],
+    "A2_3OF5": [
+      3,
+      5
+    ]
+  },
+  "a3_grid": {
+    "A3_PERS_2": 2,
+    "A3_PERS_3": 3,
+    "A3_PERS_4": 4
+  },
+  "boundaries": [
+    1.0,
+    2.0
+  ],
+  "directions": [
+    1.0,
+    -1.0
+  ],
+  "horizons": [
+    1,
+    2,
+    3,
+    6,
+    12,
+    24
+  ],
+  "max_horizon": 24,
+  "retest_low": 0.5,
+  "pivot_window": 5,
+  "vol_estimator": "close_to_close",
+  "vol_terciles_dev": [
+    0.00057,
+    0.000811
+  ],
+  "bootstrap_seed": 7777,
+  "bootstrap_n": 2000,
+  "match_seed": 4242,
+  "primary_horizon": 6,
+  "ranking_criteria": {
+    "min_n_accepted_dev": 200,
+    "min_delta_dev": 0.03,
+    "fdr_q_threshold": 0.05,
+    "confirmation_reversal_rule": "delta_conf <= 0 with CI excluding 0"
+  },
+  "dev_range": [
+    "2023-07-03",
+    "2024-12-31"
+  ],
+  "conf_range": [
+    "2025-01-01",
+    "2025-12-31"
+  ],
+  "half1_end": "2024-03-31",
+  "frozen_at": "2026-08-16T13:48:35.766940+00:00"
+}
