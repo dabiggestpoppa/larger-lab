@@ -24,7 +24,8 @@ from .phase_7_execution import build_execution_grid, orient_trade
 from .phase_7_families import FAMILIES
 from .phase_r1_concurrency import build_concurrency
 from .phase_r1_episodes import (INTERVALS_H, cluster_events,
-                                conditional_results, independence_verdict)
+                                conditional_results, independence_verdict,
+                                multi_event_share)
 from .phase_r1_heat import build_heat, build_marks, heat_distributions
 from .phase_r1_ledger import build_ledger, unit_mapping_formulas
 
@@ -340,8 +341,11 @@ class PhaseR1ExposureTruth:
             "episodes": {
                 "intervals_h": INTERVALS_H,
                 "multi_event_share_by_interval": {
-                    str(iv): float(episodes[episodes["interval_h"] == iv]["n_events"].sum()
-                                   / len(ledger)) for iv in INTERVALS_H},
+                    str(iv): multi_event_share(episodes, iv, len(ledger))
+                    for iv in INTERVALS_H},
+                "multi_event_share_definition": "share of raw events belonging to a "
+                                                 "cluster containing >= 2 events "
+                                                 "(singletons excluded)",
                 "independence_verdicts": verdicts,
             },
             "inputs": manifest["inputs"],

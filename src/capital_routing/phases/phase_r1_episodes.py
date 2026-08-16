@@ -90,6 +90,22 @@ def _avg_pairwise_corr(piv: pd.DataFrame, event_ids: List[str]) -> float:
     return float(np.mean(corrs))
 
 
+def multi_event_share(episodes: pd.DataFrame, interval_h: float,
+                      n_total: int) -> float:
+    """Share of raw events belonging to a cluster containing >= 2 events.
+
+    Definition (documented): only events whose cluster has at least 2 members
+    count as 'multi-event'; singletons do not. This is NOT the same as
+    sum(n_events)/n_total (which is always 1.0 because clusters partition the
+    events). Returns 0.0 when n_total <= 0.
+    """
+    if n_total <= 0:
+        return 0.0
+    sub = episodes[episodes["interval_h"] == interval_h]
+    multi = sub[sub["n_events"] > 1]
+    return float(multi["n_events"].sum()) / float(n_total)
+
+
 def rank_bucket(r: int) -> str:
     if r <= 3:
         return str(r)

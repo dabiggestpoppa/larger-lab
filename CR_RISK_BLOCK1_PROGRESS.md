@@ -24,6 +24,19 @@ through full-press) so the user can deliberately choose a risk-return regime. Al
 `block_2_cleared = false` until human review after the Block-I seal. No R5-R9, Kelly, hybrid sizing,
 deploy, or MT5.
 
+## R1.1 — Episode-metric repair ✅ COMPLETE
+
+**Commit:** `CR-RISK-R1.1-EPISODE-METRIC-REPAIR` · **Root cause:** `_decision()` computed
+`sum(n_events)/n_total` = 1.0 for every interval (clusters partition all events), instead of
+the documented metric. **Fix:** canonical `multi_event_share()` = share of raw events in
+≥2-event clusters; used by the decision builder; definition recorded in the JSON.
+Corrected values: 0.5h **0.0** · 1h **0.0** · 2h **14.5%** · 3h **23.9%** · 6h **52.9%** · 12h **71.5%**
+(match the report/CSV narrative exactly). 4 regression tests added (≤1h = 0 by construction;
+6h/12h reproduce artifacts; decision JSON cannot silently emit all-1.0).
+Verdict: **R1_CONCLUSIONS_UNCHANGED** — the field was display-only; ledger, returns, 1R,
+concurrency, heat, and clustering memberships untouched. (Note: 3h rank-2 already showed a
+−4.4 bps dip in the R1 conditional table — unchanged by this repair.) → proceed to R2.
+
 ## R1 — Exposure Truth & Portfolio Heat ✅ COMPLETE
 
 **Commit:** `32374cc0` (`CR-RISK-R1-EXPOSURE-TRUTH`) — pushed to GitHub (`45149ee1..32374cc0`), synced to `Desktop\projects\larger-lab` · Tests: 19 new (`tests/test_risk_r1.py`) · 226/226 repo-wide · deterministic (byte-identical re-run) · inputs hash-frozen (`R1_INPUT_HASH_MANIFEST.json`)

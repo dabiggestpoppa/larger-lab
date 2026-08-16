@@ -21,7 +21,8 @@ from capital_routing.phases.phase_7_families import FAMILIES
 from capital_routing.phases.phase_r1_concurrency import build_concurrency
 from capital_routing.phases.phase_r1_episodes import (INTERVALS_H,
                                                       cluster_events,
-                                                      conditional_results)
+                                                      conditional_results,
+                                                      multi_event_share)
 from capital_routing.phases.phase_r1_heat import build_heat, build_marks, heat_distributions
 from capital_routing.phases.phase_r1_ledger import (RISK_PER_R_PCT, TARGET_VOL,
                                                     build_ledger, risk_unit_bps)
@@ -236,3 +237,64 @@ def test_concurrency_deterministic(ledger):
     a, _ = build_concurrency(ledger)
     b, _ = build_concurrency(ledger)
     assert a.equals(b)
+
+
+# ---------------------------------------------------------------------------
+# 7. R1.1 episode-metric repair (multi_event_share_by_interval)
+# ---------------------------------------------------------------------------
+
+def _share_from_episodes(episodes, iv, n_total):
+    sub = episodes[episodes["interval_h"] == iv]
+    return float(sub[sub["n_events"] > 1]["n_events"].sum()) / float(n_total)
+
+
+def test_multi_event_share_definition(ledger, marks):
+    """The repaired metric = share of events in >=2-event clusters, which is
+    NOT sum(n_events)/n_total (that is always 1.0)."""
+    for iv in INTERVALS_H:
+        ep = cluster_events(ledger, marks, iv)
+        share = multi_event_share(ep, iv, len(ledger))
+        expected = _share_from_episodes(ep, iv, len(ledger))
+        assert share == pytest.approx(expected, rel=1e-12)
+        # partition identity: share <= 1, and strictly < 1 whenever singletons exist
+        assert 0.0 <= share <= 1.0
+
+
+def test_multi_event_share_below_1h_is_zero(ledger, marks):
+    """Events are >=1h apart by construction: no >=2-event clusters at <=1h."""
+    for iv in [0.5, 1.0]:
+        ep = cluster_events(ledger, marks, iv)
+        assert multi_event_share(ep, iv, len(ledger)) == 0.0
+        assert (ep["n_events"] == 1).all()
+
+
+def test_multi_event_share_reproduces_source_artifacts():
+    """6h/12h shares must match the committed episode CSV and the report
+    narrative (52.9% at 6h, 71.5% at 12h)."""
+    ep = pd.read_csv(ROOT / "artifacts" / "risk_block1" / "R1_ROUTING_EPISODES.csv")
+    n = 890
+    s6 = multi_event_share(ep, 6.0, n)
+    s12 = multi_event_share(ep, 12.0, n)
+    assert s6 == pytest.approx(471 / n, rel=1e-12)
+    assert s12 == pytest.approx(636 / n, rel=1e-12)
+    assert 0.5 < s6 < 0.6
+    assert 0.7 < s12 < 0.8
+
+
+def test_decision_json_not_all_ones():
+    """Regression: the committed R1 decision must not silently emit 1.0 for
+    every interval (the R1.1 repair). Recompute from the source artifacts and
+    compare against the decision field."""
+    import json as _json
+    ep = pd.read_csv(ROOT / "artifacts" / "risk_block1" / "R1_ROUTING_EPISODES.csv")
+    dec = _json.loads((ROOT / "artifacts" / "risk_block1" / "R1_DECISION.json")
+                      .read_text(encoding="utf-8"))
+    field = dec["episodes"]["multi_event_share_by_interval"]
+    assert len(field) == len(INTERVALS_H)
+    for iv in INTERVALS_H:
+        expected = _share_from_episodes(ep, iv, 890)
+        assert field[str(iv)] == pytest.approx(expected, rel=1e-9), \
+            f"decision share for {iv}h does not match the episode artifact"
+    # guard: 0.5h/1h must be 0.0 and 6h/12h must be in (0, 1)
+    assert field["0.5"] == 0.0 and field["1.0"] == 0.0
+    assert 0.0 < field["6.0"] < 1.0 and 0.0 < field["12.0"] < 1.0

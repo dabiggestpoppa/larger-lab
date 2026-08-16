@@ -49,13 +49,14 @@
       12.0
     ],
     "multi_event_share_by_interval": {
-      "0.5": 1.0,
-      "1.0": 1.0,
-      "2.0": 1.0,
-      "3.0": 1.0,
-      "6.0": 1.0,
-      "12.0": 1.0
+      "0.5": 0.0,
+      "1.0": 0.0,
+      "2.0": 0.1449438202247191,
+      "3.0": 0.2393258426966292,
+      "6.0": 0.5292134831460674,
+      "12.0": 0.7146067415730337
     },
+    "multi_event_share_definition": "share of raw events belonging to a cluster containing >= 2 events (singletons excluded)",
     "independence_verdicts": {
       "0.5": {
         "verdict": "later ranks consistent with rank 1 (or too small to judge)",
@@ -176,14 +177,11 @@
   },
   "code_hashes": {
     "phase_r1_concurrency.py": "f00d020c66ab02bbfd9df64f8cbb5d568b5af773f6f00f8f7ae7f803796f9131",
-    "phase_r1_episodes.py": "070f9000cc9c2ae27ebc764b5da7769000121ba249fc1729ed98870bf05685fc",
+    "phase_r1_episodes.py": "b2300de682183a8e95a684da2a970d45a7cc287ba78d20d71fa8031c0da7dee0",
     "phase_r1_heat.py": "88eedb3d6b329895337b4ecbbe384e6a196df68659ff5ab9415582069b7fb8a4",
     "phase_r1_ledger.py": "c35b2b078831e6e0ca638d5de7320f1b3b8a667d129b817604b76f8d8fabbfbd",
-    "phase_r1_orchestrator.py": "455c0bc77a2ab7f64dadcbe34fba5c91b08c4bc9cb4f6493f73e470e282d66ad"
+    "phase_r1_orchestrator.py": "e2f0ed8f4a897bde1090b557a0c797a48af2d88339880b9bfcdc89e1375272ce"
   },
   "deterministic": true,
-  "stop": "R1 checkpoint complete; R2 begins only after human review. No stops, filters, sizing, or alpha modification.",
-  "commit_sha": "32374cc0",
-  "commit_message": "CR-RISK-R1-EXPOSURE-TRUTH",
-  "pushed": true
+  "stop": "R1 checkpoint complete; R2 begins only after human review. No stops, filters, sizing, or alpha modification."
 }
