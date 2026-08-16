@@ -1,0 +1,34 @@
+{
+  "phase": "R2",
+  "task": "CR-RISK-BLOCK1-R2-LOSS-ANATOMY",
+  "base_commits": {
+    "p75_seal": "7bc1c0242cd05a205da62b34904d7308c63f2acb",
+    "r1": "32374cc051de056120e24525a4a70c2ecbf6b616",
+    "r1_bookkeeping": "95320f31e306626f91eeef8fda38ac776a975940"
+  },
+  "inputs": {
+    "phase_07_5/P7_5_TRADES.csv": {
+      "sha256": "ad19e08f16aeb65c17305041182c591401d28c32b418287f45d76a678ddfcd07",
+      "rows": 890
+    },
+    "phase_05/routing_events.parquet": {
+      "sha256": "de08df601a008e0efd6c0bc1523e8a9be25105324466ed3c7a19a0e561cf8607"
+    },
+    "phase_03/h1_strict_common_panel.parquet": {
+      "sha256": "a0da64a3b0cd8976b61e3f4e8defa55906098373efa1bcdf79dc2d628b8c6896"
+    }
+  },
+  "code": {
+    "phase_r1_concurrency.py": "f00d020c66ab02bbfd9df64f8cbb5d568b5af773f6f00f8f7ae7f803796f9131",
+    "phase_r1_episodes.py": "b2300de682183a8e95a684da2a970d45a7cc287ba78d20d71fa8031c0da7dee0",
+    "phase_r1_heat.py": "88eedb3d6b329895337b4ecbbe384e6a196df68659ff5ab9415582069b7fb8a4",
+    "phase_r1_ledger.py": "c35b2b078831e6e0ca638d5de7320f1b3b8a667d129b817604b76f8d8fabbfbd",
+    "phase_r1_orchestrator.py": "e2f0ed8f4a897bde1090b557a0c797a48af2d88339880b9bfcdc89e1375272ce",
+    "phase_r2_analysis.py": "2071ba0610d46f0418fb9ccd15e0bb3eb57b4ee247a084f3ce6f79f78f1d2f70",
+    "phase_r2_common.py": "b19e895a0285e582d464cecb3b665c2d75ee566f94920b6e256225fc7001441e",
+    "phase_r2_context.py": "96bc466778f2503eb319fd0e3d24f169fb2a341462970b5850c0041c62aae400",
+    "phase_r2_orchestrator.py": "46e89b25f7d9a0e338e4e3ff4f83be400852ffd5e12d49e2ffd9f707b77fc32e"
+  },
+  "determinism": "no random sampling except fixed-seed bootstrap; byte-identical outputs verified by tests",
+  "subhour_note": "M5 feed rejected (median -0.7 bps, p95 |diff| 22 bps vs frozen panel); R2 uses hourly frozen H1 paths only."
+}

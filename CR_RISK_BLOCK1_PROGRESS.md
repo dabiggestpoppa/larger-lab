@@ -15,14 +15,35 @@ through full-press) so the user can deliberately choose a risk-return regime. Al
 
 | Commit | Scope | Status |
 |--------|-------|--------|
-| `CR-RISK-R1-EXPOSURE-TRUTH` | R1: event-risk ledger, concurrency map, portfolio heat, episode clustering | ✅ Complete — 226/226 tests |
-| `CR-RISK-R2-LOSS-ANATOMY` | R2: winner/loser MAE, failure speed, recovery surface, tail attribution | ⏳ Blocked on R1 review |
-| `CR-RISK-R3-PROFIT-ANATOMY` | R3: MFE distributions, time-to-MFE, giveback, remaining expectancy | ⏳ |
+| `CR-RISK-R1-EXPOSURE-TRUTH` | R1: event-risk ledger, concurrency map, portfolio heat, episode clustering | ✅ Complete (`32374cc0`) |
+| `CR-RISK-R1.1-EPISODE-METRIC-REPAIR` | R1.1: fix multi_event_share (was 1.0 everywhere) | ✅ Complete (`413a05fe`) — R1_CONCLUSIONS_UNCHANGED |
+| `CR-RISK-R2-LOSS-ANATOMY` | R2: winner/loser MAE, failure speed, recovery surface, tail attribution | ✅ Complete — 248/248 tests |
+| `CR-RISK-R3-PROFIT-ANATOMY` | R3: MFE distributions, time-to-MFE, giveback, remaining expectancy | ⏳ Blocked on R2 review |
 | `CR-RISK-R4-STATIC-FRONTIER` | R4: fixed-fractional ladder, DD probability map, ruin defs, full-press envelopes | ⏳ |
 | `CR-RISK-BLOCK1-FOUNDATION-SEAL` | Master report + RM-S0..S4 profile library | ⏳ |
 
 `block_2_cleared = false` until human review after the Block-I seal. No R5-R9, Kelly, hybrid sizing,
 deploy, or MT5.
+
+## R2 — Loss Anatomy ✅ COMPLETE
+
+**Commit:** `CR-RISK-R2-LOSS-ANATOMY` (pushed) · Tests: 18 new (`tests/test_risk_r2.py`) · 248/248 repo-wide · deterministic (byte-identical) · inputs hash-frozen (`R2_INPUT_HASH_MANIFEST.json`)
+
+### Key findings
+
+- **Winner/loser MAE separation is stark:** winners' median MAE −0.09R (95% never go below −0.57R); losers' median −0.88R. Worst winner MAE ≈ −0.59R → **MAE ≤ −1R ⇒ 0% recovery** (134 trades breached, none recovered).
+- **Failure speed:** losers breach −0.5R by median 2h, −1R by 3h (p75 4h); 40% of losers reach −1R. Classes: FAST (reveal ≤2h, n=158, median loss −0.86R) are worse than SLOW (n=103, −0.32R) — 11% of FAST recover after −0.5R breach, 0% of SLOW.
+- **Recovery surface:** MAE ∈ [−0.75,−1.00)R → ~2–5% recovery at any age; MAE ∈ [−0.5,−0.75)R → 30–43% (age-dependent); remaining expectancy turns negative below −0.75R by 2–3h. Broad cliff zone = HYPOTHESIS_ONLY.
+- **Tails:** worst 1% (9 trades) carry 10% of total losses (100% FAST failures); worst 10% carry 60% of losses and **92% of the historical max drawdown**; worst 1% = 45% of worst-24h loss.
+- **Concurrency:** entry with 0 existing: +0.38R, P(<-1R) 11%; entry with 2+: +0.25R, P(<-1R) 6% (n=16, small). Same-direction overlap raises P(<-1R) to 16% vs 9% no-overlap.
+- **Episode ranks (12h):** later ranks carry mildly higher downside — P(<-1R) 11% → 17% rank 4+; p95 loss −1.7R → −2.2R. Independence holds on expectancy, weakens on tails.
+- **Family:** B has worse median MAE (−0.26R vs −0.22R) and P(<-1R) (14% vs 10%); A has the worst extreme (−3.66R vs −3.31R).
+- **Temporal:** stable — median MAE −0.22/−0.20/−0.28R, P(<-1R) 14%/9%/11%, tail5 share 38/42/34% across sel/val/OOS.
+- **Streaks:** max 10 consecutive losing trades (block-bootstrap p95: 11, max 13); max 6 negative days; worst 24h window −153 bps.
+
+### M5 note
+
+The committed M5 feed differs from the frozen H1 panel (p95 |diff| 22 bps — different feed). R2 refuses to mix it: paths are hourly from the frozen H1 panel only; the brief's 30m/60m age sub-bins are structurally unavailable and documented as such. 15-min failure-speed resolution is a Phase-9+ option with a reconciled feed.
 
 ## R1.1 — Episode-metric repair ✅ COMPLETE
 

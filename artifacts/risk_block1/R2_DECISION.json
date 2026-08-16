@@ -1,0 +1,146 @@
+{
+  "phase": "R2",
+  "task": "CR-RISK-BLOCK1-R2-LOSS-ANATOMY",
+  "base_commits": {
+    "p75_seal": "7bc1c0242cd05a205da62b34904d7308c63f2acb",
+    "r1": "32374cc051de056120e24525a4a70c2ecbf6b616",
+    "r1_bookkeeping": "95320f31e306626f91eeef8fda38ac776a975940"
+  },
+  "status": "R2_COMPLETE",
+  "r3_profit_anatomy_cleared": true,
+  "r3_waits_for_human_review": true,
+  "gate_checks": {
+    "artifacts_complete": true,
+    "no_alpha_changes": true,
+    "r1_repaired_metric_verified": true,
+    "deterministic_rerun_passes": true,
+    "tests_pass": true
+  },
+  "answers": {
+    "median_mae_winners_R": -0.09202630873696128,
+    "median_mae_losers_R": -0.8839028025622094,
+    "winners_p90_mae_R": -0.46168886331344433,
+    "recovery_after_breach": {
+      "0.5": {
+        "recover_freq": 0.15483870967741936,
+        "final_expectancy_R": -0.7923052482445199
+      },
+      "1.0": {
+        "recover_freq": 0.0,
+        "final_expectancy_R": -1.5241798595050084
+      },
+      "1.5": {
+        "recover_freq": 0.0,
+        "final_expectancy_R": -2.0366447628451843
+      },
+      "2.0": {
+        "recover_freq": 0.0,
+        "final_expectancy_R": -2.462348210320279
+      }
+    },
+    "failure_speed_median_time_to_neg1R_losers_h": 3.0,
+    "tail_1pct_share_of_losses": 0.09716854948368461,
+    "tail_10pct_share_of_losses": 0.5958272496338154,
+    "max_loss_streak_pooled": 10,
+    "max_loss_streak_block_boot": {
+      "n": 890,
+      "block_size": 25,
+      "observed_max_streak": 10.0,
+      "boot_median": 10.0,
+      "boot_p90": 10.0,
+      "boot_p95": 11.0,
+      "boot_max": 13.0
+    },
+    "concurrency": {
+      "entry_0_expectancy_R": 0.38128079412051136,
+      "entry_2plus_expectancy_R": 0.25209370800490866,
+      "entry_2plus_p_neg1R": 0.0625
+    },
+    "episode_12h": {
+      "1": {
+        "expectancy_R": 0.35134225073623016,
+        "p_less_neg1R": 0.10995850622406639,
+        "p95_loss_R": -1.7068117314643605
+      },
+      "2": {
+        "expectancy_R": 0.34106347142821564,
+        "p_less_neg1R": 0.13596491228070176,
+        "p95_loss_R": -1.849052094633642
+      },
+      "3": {
+        "expectancy_R": 0.3046687811079744,
+        "p_less_neg1R": 0.10416666666666667,
+        "p95_loss_R": -1.4246122429262384
+      },
+      "4+": {
+        "expectancy_R": 0.4107954182174255,
+        "p_less_neg1R": 0.16666666666666666,
+        "p95_loss_R": -2.1990546985249373
+      }
+    },
+    "family": {
+      "A": {
+        "median_mae_R": -0.21897880558214572,
+        "p_recover_from_neg1R": 0.0,
+        "p_less_neg1R": 0.10416666666666667,
+        "worst_loss_R": -3.6553836279681793
+      },
+      "B": {
+        "median_mae_R": -0.26035588780332053,
+        "p_recover_from_neg1R": 0.0,
+        "p_less_neg1R": 0.13755458515283842,
+        "worst_loss_R": -3.313025441980525
+      }
+    },
+    "temporal": {
+      "inner_sel": {
+        "median_mae_R": -0.2228411636958241,
+        "p95_loss_R": -1.7803523382796822,
+        "p_less_neg1R": 0.13665943600867678,
+        "tail5_share": 0.3775488530867102
+      },
+      "inner_val": {
+        "median_mae_R": -0.19873833262327706,
+        "p95_loss_R": -1.9499122355115166,
+        "p_less_neg1R": 0.09395973154362416,
+        "tail5_share": 0.4225841958547059
+      },
+      "RELATIONSHIP_CONFIRMED_OOS": {
+        "median_mae_R": -0.2756068794293328,
+        "p95_loss_R": -1.4974085431587942,
+        "p_less_neg1R": 0.11071428571428571,
+        "tail5_share": 0.34133727406840036
+      }
+    }
+  },
+  "hypotheses_only": [
+    "MAE reaching -1.00 to -1.50R or deeper is associated with 0% eventual recovery (pooled, N>=30, earliest at age 2-3h) \u2014 possible MAE invalidation zone (needs exact threshold research).",
+    "losers typically breach -1R by 3h (p75 4h) \u2014 possible time+MAE invalidation (trades still adverse at that age rarely recover).",
+    "worst 1% of trades carry 10% of total losses with 100% fast failures \u2014 possible failure-speed invalidation."
+  ],
+  "inputs": {
+    "phase_07_5/P7_5_TRADES.csv": {
+      "sha256": "ad19e08f16aeb65c17305041182c591401d28c32b418287f45d76a678ddfcd07",
+      "rows": 890
+    },
+    "phase_05/routing_events.parquet": {
+      "sha256": "de08df601a008e0efd6c0bc1523e8a9be25105324466ed3c7a19a0e561cf8607"
+    },
+    "phase_03/h1_strict_common_panel.parquet": {
+      "sha256": "a0da64a3b0cd8976b61e3f4e8defa55906098373efa1bcdf79dc2d628b8c6896"
+    }
+  },
+  "code_hashes": {
+    "phase_r1_concurrency.py": "f00d020c66ab02bbfd9df64f8cbb5d568b5af773f6f00f8f7ae7f803796f9131",
+    "phase_r1_episodes.py": "b2300de682183a8e95a684da2a970d45a7cc287ba78d20d71fa8031c0da7dee0",
+    "phase_r1_heat.py": "88eedb3d6b329895337b4ecbbe384e6a196df68659ff5ab9415582069b7fb8a4",
+    "phase_r1_ledger.py": "c35b2b078831e6e0ca638d5de7320f1b3b8a667d129b817604b76f8d8fabbfbd",
+    "phase_r1_orchestrator.py": "e2f0ed8f4a897bde1090b557a0c797a48af2d88339880b9bfcdc89e1375272ce",
+    "phase_r2_analysis.py": "2071ba0610d46f0418fb9ccd15e0bb3eb57b4ee247a084f3ce6f79f78f1d2f70",
+    "phase_r2_common.py": "b19e895a0285e582d464cecb3b665c2d75ee566f94920b6e256225fc7001441e",
+    "phase_r2_context.py": "96bc466778f2503eb319fd0e3d24f169fb2a341462970b5850c0041c62aae400",
+    "phase_r2_orchestrator.py": "46e89b25f7d9a0e338e4e3ff4f83be400852ffd5e12d49e2ffd9f707b77fc32e"
+  },
+  "deterministic": true,
+  "stop": "R2 checkpoint complete; R3 begins only after human review. No stops, filters, early exits, sizing, or alpha modification."
+}

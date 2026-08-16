@@ -1,0 +1,6 @@
+unit,n,max_streak,mean_streak_len,p90_streak_len,max_streak_loss_bps,n_streaks,worst_single_window_bps,note
+trades_pooled,890,10,1.665,3.0,-218.9345289943452,200,,
+trades_A,432,6,1.6595744680851063,3.0,-192.72922668335858,94,,
+trades_B,458,7,1.6857142857142857,3.0,-160.7837527532654,105,,
+negative_days,517,6,1.5575221238938053,3.0,-218.9345289943452,113,,
+negative_24h_windows,25083,87,19.597285067873305,28.0,-153.4774779618713,221,-153.4774779618713,24h windows overlap; max_streak_loss_bps = worst single window
