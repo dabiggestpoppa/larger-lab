@@ -10,10 +10,13 @@ from pathlib import Path
 
 import pytest
 
+# NOTE: functions that read module-level paths are called through the live
+# module object (reality_lock_module) so that monkeypatched globals and the
+# called function always refer to the same module instance - other test
+# modules reload capital_routing during collection, which would otherwise
+# leave these module-level bindings pointing at a stale instance.
 from capital_routing.backend.reality_lock import (
     _validate_artifact,
-    ready_for_phase_1,
-    get_failure_reasons,
     BOOK_2_SCHEMA,
     BOOK_3_SCHEMA,
     APPROVAL_SCHEMA,
@@ -139,7 +142,7 @@ class TestReadyForPhase1:
                 reality_lock_module.REPO_ROOT = temp_path
                 
                 # Test the function
-                result = ready_for_phase_1()
+                result = reality_lock_module.ready_for_phase_1()
                 assert result == True
             finally:
                 # Restore original paths
@@ -177,11 +180,11 @@ class TestReadyForPhase1:
                 reality_lock_module.REPO_ROOT = Path(temp_dir)
                 
                 # Test the function
-                result = ready_for_phase_1()
+                result = reality_lock_module.ready_for_phase_1()
                 assert result == False
                 
                 # Check failure reasons
-                reasons = get_failure_reasons()
+                reasons = reality_lock_module.get_failure_reasons()
                 assert len(reasons) > 0
                 assert any("Missing artifact" in r for r in reasons)
         finally:
@@ -251,11 +254,11 @@ class TestReadyForPhase1:
                 reality_lock_module.REPO_ROOT = temp_path
                 
                 # Test the function
-                result = ready_for_phase_1()
+                result = reality_lock_module.ready_for_phase_1()
                 assert result == False
                 
                 # Check failure reasons
-                reasons = get_failure_reasons()
+                reasons = reality_lock_module.get_failure_reasons()
                 assert len(reasons) > 0
                 assert any("Invalid artifact" in r for r in reasons)
             finally:
@@ -333,7 +336,7 @@ class TestGetFailureReasons:
                 reality_lock_module.REPO_ROOT = temp_path
                 
                 # Test the function
-                reasons = get_failure_reasons()
+                reasons = reality_lock_module.get_failure_reasons()
                 assert len(reasons) == 0
             finally:
                 # Restore original paths
@@ -371,7 +374,7 @@ class TestGetFailureReasons:
                 reality_lock_module.REPO_ROOT = Path(temp_dir)
                 
                 # Test the function
-                reasons = get_failure_reasons()
+                reasons = reality_lock_module.get_failure_reasons()
                 assert len(reasons) > 0
                 assert any("Missing artifact" in r for r in reasons)
         finally:

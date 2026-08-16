@@ -1,0 +1,115 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-II-INTERMEDIATE-SEAL",
+  "status": "PASS",
+  "base_commit": "0cb3b51088d95ff8537cf503ce036fbc1e1b698e",
+  "r5_commit": "150a93dec8edf2997652cd20724298fe9927c0dc",
+  "r5_stamp_commit": "c7cedb975e99d7d9d5fede3aee5ec170600a0c88",
+  "r6_substantive_commit": "1e8cc01fe34bf44418eb367fc35f885d7579691c",
+  "r6_correction_commit": "0cb3b51088d95ff8537cf503ce036fbc1e1b698e",
+  "block1_seal_commit": "8ca072d0d939acf581770a99ce45b333deddd8c",
+  "r5_accepted": true,
+  "r6_accepted": true,
+  "r6_correction_accepted": true,
+  "total_events": 890,
+  "episode_count": 482,
+  "max_concurrency": 3,
+  "family_allocation_supported": true,
+  "gross_heat_cap_supported": true,
+  "same_direction_cap_incremental": false,
+  "b_family_cap_required": false,
+  "episode_budget_incremental": false,
+  "h0_corrected_frontier_status": "DOMINATED",
+  "single_position_loss_share": 0.8471,
+  "multi_position_loss_share": 0.1529,
+  "edge_retention_is_binding_constraint": true,
+  "best_allocation_selected": false,
+  "best_heat_policy_selected": false,
+  "best_size_selected": false,
+  "dd_adaptive_authorized": false,
+  "kelly_authorized": false,
+  "hybrid_authorized": false,
+  "deployment_authorized": false,
+  "mt5_authorized": false,
+  "r7_scientifically_justified": false,
+  "r7_ready": true,
+  "r7_authorized": false,
+  "r7_readiness_label": "R7_DEFERRED_SIMPLE_STATIC_STRUCTURE_SUFFICIENT",
+  "block2_intermediate_seal_pass": true,
+  "human_review_required": true,
+  "next_checkpoint_recommended": "CR-RISK-BLOCK-II-STATIC-ARCHITECTURE-SEAL",
+  "next_checkpoint_note": "Case A: static family allocation + simple gross heat cap address the material Block-II overlap risk. R7 (DD-adaptive) stays defined but is NOT authorized.",
+  "scientific_changes": "None - Block-II synthesis/seal only; alpha/entry/exit/trade-management/families/1R unchanged",
+  "integrity_recheck": {
+    "total_events": 890,
+    "episode_count": 482,
+    "max_concurrency": 3,
+    "family_counts": {
+      "A": 432,
+      "B": 458
+    },
+    "r1_ledger_rows": 890,
+    "r1_max_concurrency": 3,
+    "events_ok": true,
+    "episodes_ok": true,
+    "concurrency_ok": true,
+    "h0_baseline_ok": "True",
+    "h0_baselines": {
+      "50_50_f1_pct": {
+        "cagr": 71.21,
+        "max_dd": 5.19
+      },
+      "50_50_f2_pct": {
+        "cagr": 190.31,
+        "max_dd": 10.17
+      },
+      "70_30_f1_pct": {
+        "cagr": 74.57,
+        "max_dd": 6.97
+      },
+      "100_0_f1_pct": {
+        "cagr": 79.15,
+        "max_dd": 10.3
+      }
+    },
+    "r5_family_metrics": {
+      "A": {
+        "mean_R": 0.3932732502395528,
+        "PF": 2.307603162746292,
+        "WR": 0.6388888888888888,
+        "breach_1R": 0.10416666666666667,
+        "max_dd_at_f1_solo_pct": 10.303906622383465
+      },
+      "B": {
+        "mean_R": 0.3077956557939707,
+        "PF": 1.9420786211383418,
+        "WR": 0.6135371179039302,
+        "breach_1R": 0.13755458515283842,
+        "max_dd_at_f1_solo_pct": 11.10779882629639
+      }
+    },
+    "mc_duplicate_keys": 0,
+    "mc_schemes": [
+      "block",
+      "episode",
+      "iid"
+    ],
+    "mc_duplicate_keys_ok": true,
+    "h0_blockmc50_status": "DOMINATED",
+    "h0_blockmc50_ok": true,
+    "gross_cap_70_30": {
+      "H0_p95_dd_pct": 9.5,
+      "H0_P_dd_ge_10_pct": 3.6,
+      "H1_1x_p95_dd_pct": 6.26,
+      "H1_1x_P_dd_ge_10_pct": 0.0,
+      "cagr_cost_pp": 5.4
+    },
+    "dd_shares": {
+      "single": 0.8471,
+      "two": 0.1433,
+      "three_plus": 0.0096,
+      "multi_total": 0.1529
+    },
+    "dd_share_ok": true,
+    "all_ok": true
+  }
+}

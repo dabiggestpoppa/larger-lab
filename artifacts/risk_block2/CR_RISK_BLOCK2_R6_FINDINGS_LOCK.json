@@ -1,0 +1,72 @@
+{
+  "checkpoint": "CR-RISK-BLOCK2-R6-EPISODE-HEAT-SIZING",
+  "sealed_by": "CR-RISK-BLOCK-II-INTERMEDIATE-SEAL",
+  "accepted": true,
+  "r6_commit": "1e8cc01fe34bf44418eb367fc35f885d7579691c",
+  "r6_correction_commit": "0cb3b51088d95ff8537cf503ce036fbc1e1b698e",
+  "total_events": 890,
+  "episode_count": 482,
+  "max_concurrency": 3,
+  "overlap": {
+    "events_in_multi_event_episodes_share": 0.7146,
+    "events_with_overlap_at_entry_share": 0.2652,
+    "hours_with_2plus": 585,
+    "hours_with_3plus": 20,
+    "conclusion": "overlap is real but bounded; portfolio DD is NOT mainly an overlap problem"
+  },
+  "dd_shares": {
+    "single": 0.8471,
+    "two": 0.1433,
+    "three_plus": 0.0096,
+    "multi_total": 0.1529
+  },
+  "h0_baselines": {
+    "50_50_f1_pct": {
+      "cagr": 71.21,
+      "max_dd": 5.19
+    },
+    "50_50_f2_pct": {
+      "cagr": 190.31,
+      "max_dd": 10.17
+    },
+    "70_30_f1_pct": {
+      "cagr": 74.57,
+      "max_dd": 6.97
+    },
+    "100_0_f1_pct": {
+      "cagr": 79.15,
+      "max_dd": 10.3
+    }
+  },
+  "h0_baseline_reproduction_pass": "True",
+  "heat_caps": {
+    "gross_70_30_1x": {
+      "H0_p95_dd_pct": 9.5,
+      "H0_P_dd_ge_10_pct": 3.6,
+      "H1_1x_p95_dd_pct": 6.26,
+      "H1_1x_P_dd_ge_10_pct": 0.0,
+      "cagr_cost_pp": 5.4
+    },
+    "at_50_50_1x_gross_binds_on": "only the rare 3-position state (14 events; historical max DD unchanged at 5.2%)",
+    "same_direction": "replicates gross-cap behavior, no material superiority",
+    "episode_budget": "REDUNDANT (H4-1.0x strictly worse than H1-1.0x)",
+    "b_family": "SUPPORTED but NOT REQUIRED; weaker than an equal gross cap at 70/30; destroys diversification at 50/50"
+  },
+  "corrected_mc": {
+    "duplicate_policy_scheme_alloc_f_keys": 0,
+    "schemes": [
+      "block",
+      "episode",
+      "iid"
+    ],
+    "h0_blockmc_50_f1_status": "DOMINATED",
+    "note": "H0 is DOMINATED in block-MC 50/50 space under the corrected (deduplicated) frontier"
+  },
+  "edge_degradation": {
+    "50pct_retention": "portfolio viability fragile (H0 50/50 f=1% exp CAGR ~+3%, p95 DD ~23%)",
+    "25pct_retention": "not viable (exp CAGR ~-21%)",
+    "conclusion": "risk controls shape losses; they do NOT create expectancy; heat caps do not rescue a halved edge"
+  },
+  "best_heat_policy_selected": false,
+  "r6_episode_heat_sizing_pass": true
+}

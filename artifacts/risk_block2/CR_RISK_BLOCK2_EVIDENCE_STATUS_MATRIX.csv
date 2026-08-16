@@ -1,0 +1,15 @@
+conclusion,status
+Static family allocation materially reduces DD (50/50 max DD 5.2% vs 10.3%/11.1% solo),ROBUST_FRONTIER_FINDING
+No allocation is selected as best,VALIDATED_DESCRIPTIVE
+Portfolio DD is NOT mainly an overlap problem (84.7% single-position share of in-DD hourly loss),ROBUST_FRONTIER_FINDING
+"Overlap worsens single-day/24h tail risk (worst day -2.8% at 2 concurrent, worst 24h -3.3% at 3)",VALIDATED_DESCRIPTIVE
+Simple 1.0x gross heat cap materially reduces resampled tail risk at 70/30 (p95 DD 9.5% -> 6.26%; P(DD>=10%) 3.6% -> 0.0%),ROBUST_FRONTIER_FINDING
+Same-direction cap replicates gross cap without superiority,ROBUST_FRONTIER_FINDING
+B-family cap supported-not-required; weaker than equal gross cap,ROBUST_FRONTIER_FINDING
+Episode budgets REDUNDANT with instantaneous gross caps,ROBUST_FRONTIER_FINDING
+Edge retention is the binding constraint; heat caps do not rescue a halved edge,ROBUST_FRONTIER_FINDING
+A 'best' heat policy exists,REJECTED (not selected - forbidden)
+DD-adaptive sizing would beat static heat caps,NOT TESTED
+Kelly would improve on static heat caps,NOT TESTED
+R7 is scientifically justified by unresolved state-dependent risk,REJECTED (no unresolved mechanism)
+Block-II static architecture is sufficient; next step is a Block-II static-architecture seal,CONDITIONAL

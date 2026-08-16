@@ -1,0 +1,11 @@
+region_type,component,role,basis
+allocation_reference,50/50,diversification reference,R5/R6 frozen; not a selection
+allocation_reference,70/30,robust A-heavy reference; preferred A-heavy stress region,R5 nondominated_edge50; R6 heat-cap effect largest here
+allocation_reference,100/0 A,stress / edge-resilience reference,A-only stays positive at 50% edge
+allocation_diagnostic,0/100 B,fragility diagnostic only,B-only negative at 50% edge
+heat_reference,H0 unconstrained,diagnostic baseline only,H0 reproduces sealed baselines
+heat_supported,H1 gross heat cap (1.0x-3.0x),primary supported simple cap; research across multiples,70/30 1.0x: block-MC p95 DD 9.5%->6.3%
+heat_secondary,H2 same-direction (1.0x-2.0x),secondary reference; matches gross cap,no systematic superiority over H1
+heat_secondary,H3 B-family (0.5x-1.0x),secondary reference; supported-not-required,weaker than equal gross cap
+heat_diagnostic,H4 episode budget / H5 combined,diagnostic only; complexity-unjustified at present,H4 REDUNDANT; H5 optional
+base_total_f_band,0.25% - 2.00%,frozen R6 F_GRID research band (do not invent a new ladder),3.00% is outer stress reference only

@@ -1,0 +1,8 @@
+complexity_level,policy_family,pruning_decision,rationale
+0.0,H0 static,KEEP_DIAGNOSTIC,baseline reference; reproduces sealed math
+1.0,H1 gross cap,ADOPT,simplest cap with material tail reduction at A-heavy allocation
+2.0,H2 same-direction,PRUNE_REDUNDANT,matches H1; no incremental value
+2.0,H3 B-family,KEEP_SECONDARY,supported-not-required; weaker than equal gross cap
+3.0,H4 episode budget,PRUNE_REDUNDANT,dominated by H1; rejects 180 vs 14 at 1.0x
+4.0,H5 combined,OPTIONAL_ONLY_WITH_INCREMENTAL_GAIN,no demonstrated incremental gain over H1
+,DD-adaptive / Kelly / hybrid,DEFERRED,no unresolved state-dependent risk mechanism

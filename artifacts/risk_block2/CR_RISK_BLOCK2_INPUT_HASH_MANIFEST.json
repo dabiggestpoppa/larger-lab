@@ -1,0 +1,157 @@
+{
+  "phase": "BLOCK-II-INTERMEDIATE-SEAL",
+  "task": "CR-RISK-BLOCK-II-INTERMEDIATE-SEAL",
+  "repo": "dabiggestpoppa/larger-lab",
+  "branch": "capital-routing",
+  "git_sha_at_generation": "0cb3b51088d95ff8537cf503ce036fbc1e1b698e",
+  "block1_seal_sha": "8ca072d0d939acf581770a99ce45b333deddd8c",
+  "r5_commit": "150a93dec8edf2997652cd20724298fe9927c0dc",
+  "r5_stamp_sha": "c7cedb975e99d7d9d5fede3aee5ec170600a0c88",
+  "r6_commit": "1e8cc01fe34bf44418eb367fc35f885d7579691c",
+  "r6_correction_commit": "0cb3b51088d95ff8537cf503ce036fbc1e1b698e",
+  "inputs": {
+    "R5_DECISION.json": {
+      "sha256": "d7f7dcabc41cd25c5d6df8ada3a30bf3d8f5034a799036b7bf2810f03552cacf",
+      "path": "artifacts\\risk_block2\\r5\\R5_DECISION.json"
+    },
+    "R5_FAMILY_DISTRIBUTIONS.csv": {
+      "sha256": "2fd063a4965d479d5287f59f6b6e05610c556d8d15ff2ed00235ac98e4986b93",
+      "path": "artifacts\\risk_block2\\r5\\R5_FAMILY_DISTRIBUTIONS.csv"
+    },
+    "R5_ALLOCATION_FRONTIER.csv": {
+      "sha256": "1bf446d5278882e7e26d67c9b611b50ad1d26cefd1a03c45f2624ca409a5f69d",
+      "path": "artifacts\\risk_block2\\r5\\R5_ALLOCATION_FRONTIER.csv"
+    },
+    "R5_FAMILY_DEPENDENCY.csv": {
+      "sha256": "66482ce30f3117c76efba091c672481aff23b27d2a64878cf81269012c49a1c1",
+      "path": "artifacts\\risk_block2\\r5\\R5_FAMILY_DEPENDENCY.csv"
+    },
+    "R5_FAMILY_EDGE_DEGRADATION.csv": {
+      "sha256": "59db8c0a60975a4e3d69dbb739251e4fbbc6c9e87ffc523bdf004a58956f6b75",
+      "path": "artifacts\\risk_block2\\r5\\R5_FAMILY_EDGE_DEGRADATION.csv"
+    },
+    "R6_DECISION.json": {
+      "sha256": "b9d794e89c597c4f198b3969ad08c9d8fcc6dad20b0a36ca7f8c3048125ed373",
+      "path": "artifacts\\risk_block2\\r6\\R6_DECISION.json"
+    },
+    "R6_EVENT_EPISODE_LEDGER.csv": {
+      "sha256": "c62dba26616a51c1fda14c10da3e956b03dbaf729db1281bf7dfc586c727c39a",
+      "path": "artifacts\\risk_block2\\r6\\R6_EVENT_EPISODE_LEDGER.csv"
+    },
+    "R6_OVERLAP_ANATOMY.csv": {
+      "sha256": "1b4a9cd17c83a8214cd39c7205718f5b915cb9b52080a2a0e45ee37c37218f29",
+      "path": "artifacts\\risk_block2\\r6\\R6_OVERLAP_ANATOMY.csv"
+    },
+    "R6_HEAT_POLICY_FRONTIER.csv": {
+      "sha256": "b33140512db11afc204abbed1aeca1b2ca1846a33db714ca9a54ce3a69d58424",
+      "path": "artifacts\\risk_block2\\r6\\R6_HEAT_POLICY_FRONTIER.csv"
+    },
+    "R6_HEAT_POLICY_MONTE_CARLO.csv": {
+      "sha256": "640a9e47267c3d01312d3294c9daeacc35b23f23b0afcd79c846dfacaed8e507",
+      "path": "artifacts\\risk_block2\\r6\\R6_HEAT_POLICY_MONTE_CARLO.csv"
+    },
+    "R6_NONDOMINATED_HEAT_FRONTIER.csv": {
+      "sha256": "414b3a9f26676bf8a4d9db981b77c775da882424318d81665574ea0d2b789368",
+      "path": "artifacts\\risk_block2\\r6\\R6_NONDOMINATED_HEAT_FRONTIER.csv"
+    },
+    "R6_EVIDENCE_STATUS_MATRIX.csv": {
+      "sha256": "44f1884739b14dfe230275cabd8d4e35246b090644aa90bc47362dceb1f37f4e",
+      "path": "artifacts\\risk_block2\\r6\\R6_EVIDENCE_STATUS_MATRIX.csv"
+    },
+    "R6_POLICY_COMPLEXITY_MATRIX.csv": {
+      "sha256": "1608d621eca88835bbe03f922c857ada72471077a5469050f107307ce61bc79a",
+      "path": "artifacts\\risk_block2\\r6\\R6_POLICY_COMPLEXITY_MATRIX.csv"
+    },
+    "R1_EVENT_RISK_LEDGER.csv": {
+      "sha256": "6c98b0d218c66f3f5893733f26c51490138e658046487e3ea108c5feeee2d26f",
+      "path": "artifacts\\risk_block1\\R1_EVENT_RISK_LEDGER.csv"
+    },
+    "R1_CONCURRENCY_SUMMARY.csv": {
+      "sha256": "f6fb67b9659fc8f8202d9bf86bddaf9292bdab6cd18c06a882542d319879cfcb",
+      "path": "artifacts\\risk_block1\\R1_CONCURRENCY_SUMMARY.csv"
+    },
+    "BLOCK1_DECISION.json": {
+      "sha256": "db8450303ee7f70512a0531d43442c3005a139d1759c303a07ae4d5206bd5bff",
+      "path": "artifacts\\risk_block1\\BLOCK1_DECISION.json"
+    }
+  },
+  "code_hashes": {
+    "run_risk_block2_seal.py": "563bdaeab06dc3b7449a073d79c2f0c2a82fb1035dad58d1a3320df17eec61b0"
+  },
+  "python_version": "3.11.9",
+  "integrity": {
+    "total_events": 890,
+    "episode_count": 482,
+    "max_concurrency": 3,
+    "family_counts": {
+      "A": 432,
+      "B": 458
+    },
+    "r1_ledger_rows": 890,
+    "r1_max_concurrency": 3,
+    "events_ok": true,
+    "episodes_ok": true,
+    "concurrency_ok": true,
+    "h0_baseline_ok": "True",
+    "h0_baselines": {
+      "50_50_f1_pct": {
+        "cagr": 71.21,
+        "max_dd": 5.19
+      },
+      "50_50_f2_pct": {
+        "cagr": 190.31,
+        "max_dd": 10.17
+      },
+      "70_30_f1_pct": {
+        "cagr": 74.57,
+        "max_dd": 6.97
+      },
+      "100_0_f1_pct": {
+        "cagr": 79.15,
+        "max_dd": 10.3
+      }
+    },
+    "r5_family_metrics": {
+      "A": {
+        "mean_R": 0.3932732502395528,
+        "PF": 2.307603162746292,
+        "WR": 0.6388888888888888,
+        "breach_1R": 0.10416666666666667,
+        "max_dd_at_f1_solo_pct": 10.303906622383465
+      },
+      "B": {
+        "mean_R": 0.3077956557939707,
+        "PF": 1.9420786211383418,
+        "WR": 0.6135371179039302,
+        "breach_1R": 0.13755458515283842,
+        "max_dd_at_f1_solo_pct": 11.10779882629639
+      }
+    },
+    "mc_duplicate_keys": 0,
+    "mc_schemes": [
+      "block",
+      "episode",
+      "iid"
+    ],
+    "mc_duplicate_keys_ok": true,
+    "h0_blockmc50_status": "DOMINATED",
+    "h0_blockmc50_ok": true,
+    "gross_cap_70_30": {
+      "H0_p95_dd_pct": 9.5,
+      "H0_P_dd_ge_10_pct": 3.6,
+      "H1_1x_p95_dd_pct": 6.26,
+      "H1_1x_P_dd_ge_10_pct": 0.0,
+      "cagr_cost_pp": 5.4
+    },
+    "dd_shares": {
+      "single": 0.8471,
+      "two": 0.1433,
+      "three_plus": 0.0096,
+      "multi_total": 0.1529
+    },
+    "dd_share_ok": true,
+    "all_ok": true
+  },
+  "determinism": "deterministic synthesis from frozen artifacts; no new science",
+  "timestamp": "2026-08-16T16:57:10.436648+00:00"
+}

@@ -1,0 +1,8 @@
+{
+  "edge_retention_is_binding_constraint": true,
+  "at_75pct_retention": "viable; heat-capped H1-1.00/1.50 and H3-0.75 remain non-dominated (edge75)",
+  "at_50pct_retention": "fragile; H0 50/50 f=1% expected CAGR ~+3% with p95 DD ~23%; heat caps do not rescue",
+  "at_25pct_retention": "not viable; expected CAGR ~-21%, p95 DD ~58%",
+  "core_principle": "Risk controls shape losses; they do NOT create expectancy. Edge retention dominates risk outcome regardless of heat policy.",
+  "implication_for_seal": "Block-II seals exposure structure, not edge; any future sizing work (R7/R8) must assume a retained-edge budget."
+}

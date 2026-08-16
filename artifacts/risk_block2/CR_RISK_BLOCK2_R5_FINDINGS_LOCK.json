@@ -1,0 +1,53 @@
+{
+  "checkpoint": "CR-RISK-BLOCK2-R5-FAMILY-QUALITY-ALLOCATION",
+  "sealed_by": "CR-RISK-BLOCK-II-INTERMEDIATE-SEAL",
+  "accepted": true,
+  "A_quality_status": {
+    "mean_R": 0.3932732502395528,
+    "PF": 2.307603162746292,
+    "WR": 0.6388888888888888,
+    "breach_1R": 0.10416666666666667,
+    "max_dd_at_f1_solo_pct": 10.303906622383465,
+    "tail_classification": "deepest single trade (-3.66R), otherwise lighter deep-loss frequency than B",
+    "edge_resilience": "WEAK (A-only expected CAGR stays positive at 50% edge)"
+  },
+  "B_quality_status": {
+    "mean_R": 0.3077956557939707,
+    "PF": 1.9420786211383418,
+    "WR": 0.6135371179039302,
+    "breach_1R": 0.13755458515283842,
+    "max_dd_at_f1_solo_pct": 11.10779882629639,
+    "tail_classification": "higher deep-loss frequency (-1R 13.8%, streak 7) - the capital limiter",
+    "edge_resilience": "WEAK (B-only expected CAGR NEGATIVE at 50% edge - the edge-fragile family)"
+  },
+  "B_capital_limiter_confirmed": true,
+  "b_capital_limiter_reason": "higher deep-loss frequency + longer streaks, not bigger extremes (deepest trade: A -3.66R vs B -3.31R)",
+  "dependency": {
+    "same_day_corr": -0.085,
+    "P_B_loss_given_A_loss": 0.12,
+    "P_B_loss_unconditional": 0.23,
+    "co_tail_coincidence": 0.0
+  },
+  "diversification": {
+    "50_50_f1_cagr_pct": 71.2,
+    "50_50_f1_max_dd_pct": 5.2,
+    "A_solo_f1_cagr_pct": 79.0,
+    "A_solo_f1_max_dd_pct": 10.3,
+    "B_solo_f1_max_dd_pct": 11.1,
+    "note": "50/50 materially lowers DD vs either solo family"
+  },
+  "edge_resilience": {
+    "A_at_50pct_edge": "still positive",
+    "B_at_50pct_edge": "approximately negative (edge-fragile)",
+    "warning": "B is more fragile under edge degradation"
+  },
+  "best_allocation_selected": false,
+  "frozen_reference_allocations": [
+    "50/50",
+    "70/30",
+    "100/0 A",
+    "0/100 B diagnostic-only"
+  ],
+  "block1_seal_sha": "8ca072d0d939acf581770a99ce45b333deddd8c",
+  "r5_commit_sha": "150a93dec8edf2997652cd20724298fe9927c0dc"
+}

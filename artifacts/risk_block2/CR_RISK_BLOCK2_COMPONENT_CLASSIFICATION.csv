@@ -1,0 +1,16 @@
+component,classification,complexity_level,incremental_value,evidence,seal_status
+static_family_allocation,SUPPORTED,0.0,material DD reduction (50/50 max DD 5.2% vs A-solo 10.3% / B-solo 11.1%) without selecting a winner,R5_DECISION: diversification 50/50 f=1% max DD 5.2%,FROZEN
+allocation_50_50,ADOPT_AS_REFERENCE,0.0,diversification reference; H0 71.2% CAGR / 5.2% DD at f=1%,R6 H0 baseline reproduction,FROZEN
+allocation_70_30,ADOPT_AS_REFERENCE,0.0,robust A-heavy reference; survives 50% edge retention (R5 nondominated_edge50); where heat caps matter most,R5 nondominated_edge50; R6 70/30 MC tail collapse under 1.0x cap,FROZEN
+allocation_100_0_A,ADOPT_AS_REFERENCE,0.0,stress / edge-resilience reference (A-only stays positive at 50% edge; solo DD 10.3%),R5 edge_resilience,FROZEN
+allocation_0_100_B,OPTIONAL,0.0,diagnostic fragility reference only; B-only CAGR negative at 50% edge,R5 edge_resilience,FROZEN
+simple_gross_heat_cap_H1,SUPPORTED,1.0,"material resampled tail reduction at A-heavy allocation (70/30 p95 DD 9.5%->6.3%, P(DD>=10%) 3.6%->0.0%)",ROBUST_FRONTIER_FINDING,FROZEN
+same_direction_cap_H2,SUPPORTED_BUT_NOT_INCREMENTAL,2.0,replicates gross cap without systematic superiority,ROBUST_FRONTIER_FINDING,FROZEN
+b_family_cap_H3,SUPPORTED_NOT_REQUIRED,2.0,trims the capital-limiting family but weaker than an equal gross cap at 70/30; destroys A/B diversification at 50/50,ROBUST_FRONTIER_FINDING,FROZEN
+episode_budget_H4,REDUNDANT,3.0,H4-1.0x dominated by H1-1.0x (rejects 180 vs 14; CAGR 53% vs 71%); H4-1.5x equals H1-1.5x,ROBUST_FRONTIER_FINDING,FROZEN
+combined_H5,OPTIONAL,4.0,no clear incremental gain over simple H1; complexity must be justified before preference,REJECTED (not selected - forbidden),FROZEN
+dd_adaptive_R7,DEFERRED,,no unresolved state-dependent risk mechanism demonstrated; 84.7% of in-DD loss is single-position; static caps already solve overlap tails,R6 overlap anatomy + evidence matrix,FROZEN
+kelly_R8,DEFERRED,,Kelly remains later; growth rules follow exposure limits,R6 report section 18,FROZEN
+hybrid_R9,DEFERRED,,no authorization; deferred with R7/R8,plan,FROZEN
+deployment,DEFERRED,,not authorized,plan,FROZEN
+mt5,DEFERRED,,not authorized,plan,FROZEN
