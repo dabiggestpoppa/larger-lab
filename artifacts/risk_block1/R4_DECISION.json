@@ -618,5 +618,7 @@
     "phase_r4_stress.py": "ff9ecc6b15de8a186ba071b61690fdbae44a0cbea6d01aa083c16cf2afff254c"
   },
   "deterministic": true,
-  "stop": "R4 complete; no best size selected. Block II (dynamic sizing) starts only after human review. No Kelly, no DD-adaptive, no cluster sizing, no deployment, no MT5."
+  "stop": "R4 complete; no best size selected. Block II (dynamic sizing) starts only after human review. No Kelly, no DD-adaptive, no cluster sizing, no deployment, no MT5.",
+  "commit_sha": "6ab9da3a",
+  "commit_message": "CR-RISK-R4-STATIC-FRONTIER: map the sealed edge across static risk fractions"
 }
