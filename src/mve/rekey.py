@@ -72,9 +72,78 @@ an accepted sigma boundary behaves like a new local equilibrium / structural ori
         
         # No rekey (baseline)
         rekey_variants['NO_REKEY'] = morphic_coordinates
-        
+
         return rekey_variants
-        
+
+    def detect_rekey_events(self, morphic_coordinates: pd.Series,
+                            step: float = 1.0, n: int = 1,
+                            variant: str = "B") -> List[Dict]:
+        """Return structured rekey events with explicit causal timestamps.
+
+        Variants A/C are realtime (all timestamps equal the rekey bar).
+        Variant B is delayed confirmation: rekey_event_time = scan-origin i,
+        rekey_evidence_complete_time = rekey_known_time =
+        new_anchor_active_time = retest bar j.
+
+        Fields follow MVE_SCIENTIFIC_EVENT_TIME_SCHEMA.json. source_anchor is
+        not tracked by the isolated detection (prior anchor state) and is None.
+        """
+        boundary = n * step
+        coords = morphic_coordinates
+        events: List[Dict] = []
+
+        if variant == "A":
+            for i in range(len(coords)):
+                current = coords.iloc[i]
+                prev = coords.iloc[i - 1] if i > 0 else 0.0
+                if (not np.isnan(current) and abs(current) > boundary and i > 0
+                        and not np.isnan(prev) and abs(prev) <= boundary):
+                    events.append(self._rekey_event("RKEY_A", i, i, i, i, current))
+        elif variant == "B":
+            breakout_occurred = False
+            for i in range(len(coords)):
+                current = coords.iloc[i]
+                if not np.isnan(current) and abs(current) > boundary:
+                    breakout_occurred = True
+                if breakout_occurred and i > 0:
+                    for j in range(i + 1, min(i + 5, len(coords))):
+                        if not np.isnan(coords.iloc[j]) and abs(coords.iloc[j]) > boundary:
+                            events.append(self._rekey_event("RKEY_B", i, j, j, j, coords.iloc[i]))
+                            breakout_occurred = False
+                            break
+        elif variant == "C":
+            for i in range(len(coords)):
+                current = coords.iloc[i]
+                prev = coords.iloc[i - 1] if i > 0 else 0.0
+                if (not np.isnan(current) and abs(current) > boundary and i > 0
+                        and not np.isnan(prev)):
+                    prev_state = int(abs(prev) // step)
+                    current_state = int(abs(current) // step)
+                    if current_state > prev_state and i >= 5:
+                        window = coords.iloc[max(0, i - 2):i + 1]
+                        if window.notna().all():
+                            above_count = sum(abs(window) > boundary)
+                            if above_count >= 3:
+                                events.append(self._rekey_event("RKEY_C", i, i, i, i, current))
+        else:
+            raise ValueError(f"Unknown rekey variant: {variant}")
+
+        return events
+
+    @staticmethod
+    def _rekey_event(variant: str, event_time: int, evidence_time: int,
+                     known_time: int, active_time: int, new_anchor: float) -> Dict:
+        """Build a schema-valid rekey event record."""
+        return {
+            "variant": variant,
+            "rekey_event_time": int(event_time),
+            "rekey_evidence_complete_time": int(evidence_time),
+            "rekey_known_time": int(known_time),
+            "new_anchor_active_time": int(active_time),
+            "source_anchor": None,
+            "new_anchor": float(new_anchor),
+        }
+
     def _rekey_variant_a(self, morphic_coordinates: pd.Series,
                         boundary: float, step: float) -> pd.Series:
         """
@@ -120,98 +189,117 @@ an accepted sigma boundary behaves like a new local equilibrium / structural ori
                         boundary: float, step: float) -> pd.Series:
         """
         RKEY-B: Re-anchor only after breakout + successful retest.
-        
+
+        CAUSAL (R0.5.1 repair): the retest is confirmed by a future bar, so the
+        new anchor's VALUE (coordinate at the scan-origin bar, unchanged
+        formula) becomes ACTIVE only at the retest bar j - never at the
+        scan-origin bar i. Bars between i and j keep the previous anchor.
+        rekey_event_time = i, rekey_evidence_complete_time = j,
+        rekey_known_time = j, new_anchor_active_time = j.
+
         Args:
             morphic_coordinates: Original morphic coordinates
             boundary: Sigma state boundary
             step: Sigma state step size
-            
+
         Returns:
             Rekeyed coordinates
         """
-        # Create a copy to avoid modifying original
         rekeyed = pd.Series(index=morphic_coordinates.index)
-        
+
         # Initialize rekey anchor
         rekey_anchor = 0.0
         breakout_occurred = False
-        
+        pending_anchor = None  # (value, activation_bar) scheduled by retest scan
+
         # Calculate rekeyed coordinates
         for i in range(len(morphic_coordinates)):
             current_coord = morphic_coordinates.iloc[i]
-            
+
+            # Activate a scheduled rekey once its confirmation bar is reached.
+            if pending_anchor is not None and i >= pending_anchor[1]:
+                rekey_anchor = pending_anchor[0]
+                pending_anchor = None
+
             # Check if we've had a breakout
             if abs(current_coord) > boundary:
                 breakout_occurred = True
-                
-            # Check if we've had a successful retest
+
+            # Check if we've had a successful retest (evidence in i+1..i+4)
             if breakout_occurred and i > 0:
-                # Look for retest within next few bars
-                retest_found = False
                 for j in range(i + 1, min(i + 5, len(morphic_coordinates))):
                     if abs(morphic_coordinates.iloc[j]) > boundary:
-                        retest_found = True
+                        # Schedule the re-anchor at the retest bar j; the
+                        # earliest confirmed activation wins.
+                        if pending_anchor is None or j < pending_anchor[1]:
+                            pending_anchor = (current_coord, j)
+                        breakout_occurred = False
                         break
-                        
-                if retest_found:
-                    # Re-anchor after breakout + retest
-                    rekey_anchor = current_coord
-                    breakout_occurred = False
-                    
+
             # Calculate rekeyed coordinate
             if rekey_anchor != 0.0:
                 displacement = current_coord - rekey_anchor
                 rekeyed.iloc[i] = displacement
             else:
                 rekeyed.iloc[i] = current_coord
-                
+
         return rekeyed
         
     def _rekey_variant_c(self, morphic_coordinates: pd.Series,
                         boundary: float, step: float) -> pd.Series:
         """
         RKEY-C: Re-anchor only after next sigma state is reached and previous state survives.
-        
+
+        ROBUST (R0.5.1 repair): NaN inputs (warm-up) emit NO rekey decision at
+        that bar (ready-guard). NaN is never coerced and no default values are
+        invented; int() conversions are guarded so int(NaN) cannot crash.
+
         Args:
             morphic_coordinates: Original morphic coordinates
             boundary: Sigma state boundary
             step: Sigma state step size
-            
+
         Returns:
             Rekeyed coordinates
         """
-        # Create a copy to avoid modifying original
         rekeyed = pd.Series(index=morphic_coordinates.index)
-        
+
         # Initialize rekey anchor
         rekey_anchor = 0.0
-        
+
         # Calculate rekeyed coordinates
         for i in range(len(morphic_coordinates)):
             current_coord = morphic_coordinates.iloc[i]
-            
-            # Check if we've accepted the sigma state
-            if abs(current_coord) > boundary:
-                # Check if we've advanced to next sigma state
-                prev_state = int(abs(morphic_coordinates.iloc[i-1]) // step) if i > 0 else 0
+
+            # Ready-guard: a rekey decision requires the current coordinate to
+            # be finite. Not-ready bars emit no new rekey (no synthetic
+            # rekeys) and keep the current anchor state.
+            if not np.isnan(current_coord) and abs(current_coord) > boundary:
+                prev_coord = morphic_coordinates.iloc[i - 1] if i > 0 else 0.0
+                if np.isnan(prev_coord):
+                    prev_state = 0  # not ready: no prior state (guarded below)
+                else:
+                    prev_state = int(abs(prev_coord) // step)
                 current_state = int(abs(current_coord) // step)
-                
+
                 if current_state > prev_state:
-                    # Check if previous state survives
                     if i >= 5:  # Need at least 5 bars
-                        # Check if we've been above boundary for the last 3 bars
-                        above_count = sum(abs(morphic_coordinates.iloc[max(0, i - 2):i + 1]) > boundary)
-                        if above_count >= 3:  # 3 consecutive bars above boundary
-                            # Re-anchor after next sigma state is reached and previous state survives
-                            rekey_anchor = current_coord
-                            
+                        # Check if previous state survives (3 consecutive bars
+                        # above boundary); a NaN in the window = not ready.
+                        window = morphic_coordinates.iloc[max(0, i - 2):i + 1]
+                        if window.notna().all():
+                            above_count = sum(abs(window) > boundary)
+                            if above_count >= 3:
+                                # Re-anchor after next sigma state is reached and previous state survives
+                                rekey_anchor = current_coord
+
             # Calculate rekeyed coordinate
             if rekey_anchor != 0.0:
                 displacement = current_coord - rekey_anchor
                 rekeyed.iloc[i] = displacement
             else:
                 rekeyed.iloc[i] = current_coord
-                
+
         return rekeyed
         
     def analyze_rekey_variants(self, rekey_variants: Dict[str, pd.Series],

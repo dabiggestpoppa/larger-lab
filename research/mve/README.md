@@ -12,13 +12,19 @@
 > 3. `MVE-R0.5-RUNNER-PERSISTENCE` — phase-isolated CLI, prerequisite gates,
 >    real persistence with full provenance
 > 4. `MVE-R0.5-CAUSALITY-GATE` — causality harness; infrastructure is
->    future-mutation/truncation invariant; **gate formally NOT passed** due to
->    4 recorded violations in blocked scientific stubs (RKEY-B repaint; signal
->    Models A/B/C 1-bar backdating)
+>    future-mutation/truncation invariant; gate formally NOT passed due to
+>    4 recorded violations in blocked scientific stubs
+> 5. `MVE-R0.5.1-SCIENTIFIC-STUB-CAUSAL-REPAIR` — the 4 violations repaired
+>    (RKEY-B delayed activation; Models A/C confirmation-bar known times;
+>    Model B realtime; RKEY-C/Model D NaN-robust). Same-harness re-run:
+>    **all repaired components max mutation diff = 0.0**; only Model E's
+>    whole-sample Q component remains a (blocked, excluded) violation.
+>    `r05_1_causal_repair_pass = true`
 >
-> **Phase 4 remains BLOCKED.** `scientific_phase4_ready = false` pending human
-> authorization to repair the 4 causality violations. See `MVE_R05_FINAL_DECISION.json`,
-> `MVE_R05_CAUSALITY_REPORT.md`, `MVE_CAUSALITY_CONTRACT.md`.
+> **Phase 4 remains BLOCKED.** `scientific_phase4_ready = false` until the
+> independent R0.5.2 regate + infrastructure seal. See `MVE_R05_1_DECISION.json`,
+> `MVE_R05_1_CAUSAL_REPAIR_REPORT.md`, `MVE_R05_1_STUB_CLASSIFICATION.json`,
+> `MVE_SCIENTIFIC_EVENT_TIME_SCHEMA.json`, `MVE_CAUSALITY_CONTRACT.md`.
 
 ## Overview
 

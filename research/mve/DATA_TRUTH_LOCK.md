@@ -110,6 +110,21 @@ See `MVE_DATA_ACCESS_LEDGER.csv` and `MVE_DATA_SPLIT_LOCK.json`.
 - Holdout remains `FINAL_HOLDOUT_PENDING`; the causality slice (2023-07-03..
   2024-03-31) is entirely inside the development range.
 
+> **UPDATED (R0.5.1, 2026-08-15):** the four causality violations were repaired
+> under human authorization (`MVE-R0.5.1-SCIENTIFIC-STUB-CAUSAL-REPAIR`):
+> RKEY-B now activates the anchor at the retest bar (delayed confirmation),
+> Models A/C emit at their confirmation bar, Model B is realtime, RKEY-C and
+> Model D are NaN-robust. Same-harness re-run: **all repaired components max
+> historical mutation diff = 0.0; truncation invariance all_pass**; the only
+> remaining perturbation violation is Model E's whole-sample Q component
+> (BLOCKED_LOGIC_SPEC, excluded from execution). `r05_1_causal_repair_pass = true`.
+> Record corrections: Model E has NO undefined-`n` bug (prior claim was a
+> misreading); Model D additionally crashed on warm-up NaN (now guarded).
+> See `MVE_R05_1_DECISION.json`, `MVE_R05_1_CAUSAL_REPAIR_REPORT.md`,
+> `MVE_R05_1_STUB_CLASSIFICATION.json`, `MVE_R05_1_MODEL_D_AUDIT.md`,
+> `MVE_SCIENTIFIC_EVENT_TIME_SCHEMA.json`. P4 remains blocked until the
+> independent R0.5.2 regate.
+
 ---
 
 **Data truth established (partial):** the real files are measured above.

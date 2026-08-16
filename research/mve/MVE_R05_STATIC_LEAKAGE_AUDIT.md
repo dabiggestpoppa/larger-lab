@@ -26,7 +26,7 @@ classification, never a live signal. SAFE with that restriction.
 | `rekey.py:236,287,353` (rekey analyze forward returns) | EX_POST_ONLY |
 | `sigma_states.py:278,569` (transition counting) | EX_POST_ONLY |
 | `morphic_coordinates.py:300`, `regime.py:121,165,284` (transition matrices) | EX_POST_ONLY |
-| **`signals.py:87,156,211` (`next_coord = morphic_coordinates.iloc[i+1]`)** | **CAUSAL_VIOLATION** — Models A/B/C gate the signal AT bar i on bar i+1's coordinate (backdated confirmation) |
+| ~~`signals.py:87,156,211`~~ **REMOVED (R0.5.1 repair)** — Models A/B/C no longer read bar i+1 to emit a signal at bar i; A/C emit at the confirmation bar i+1, B is realtime |
 
 ### 3. Pivot right-side lookahead (`i+1:i+window+1`)
 | Location | Class |
@@ -37,7 +37,12 @@ classification, never a live signal. SAFE with that restriction.
 ### 4. RKEY-B future retest scan (`range(i + 1, min(i + 5, ...))`)
 | Location | Class |
 |---|---|
-| `rekey.py` `_rekey_variant_b` (`for j in range(i + 1, ...)` then `rekey_anchor = current_coord`) | **CAUSAL_VIOLATION** — anchor at bar i decided by bars i+1..i+4; historical rekey moves with future data (measured diff 1.033) |
+| `rekey.py` `_rekey_variant_b` | **REPAIRED (R0.5.1):** the retest scan still looks ahead, but the anchor is now scheduled and activated only AT the retest bar j (never at the scan-origin bar i) — CAUSAL_DELAYED_CONFIRMATION; verified diff 0.0 |
+
+### 4b. Model E whole-sample scalar (new finding)
+| Location | Class |
+|---|---|
+| `signals.py` `_calculate_state_progression_quality` (Q) — `(coords.diff().abs() > step).sum()/len` broadcast into every bar | **VIOLATION (BLOCKED)** — full-sample scalar repaints historical scores; Model E classified BLOCKED_LOGIC_SPEC and excluded from future scientific execution |
 
 ### 5. Trailing windows ending at i — all safe (CAUSAL_REALTIME)
 - `acceptance.py:65` (occupancy `max(0, i - n_bars + 1):i + 1`)
@@ -58,22 +63,23 @@ classification, never a live signal. SAFE with that restriction.
 | `backtest.py:139,319,500` (drawdown via running max) | causal evaluation |
 | `backtest.py:397-398` (walk-forward train slices) | causal (train = past) |
 
-## Summary
+## Summary (post-R0.5.1-repair re-audit)
 
 | Class | Count |
 |---|---|
-| CAUSAL_REALTIME (trailing/elementwise) | ~25 sites |
-| CAUSAL_DELAYED_CONFIRMATION | 2 (pivot high/low) |
-| EX_POST_ONLY (whole-sample descriptive / forward-return labeling) | ~20 sites |
-| **CAUSAL_VIOLATION** | **4 (RKEY-B; signal Models A/B/C)** |
-| BLOCKED (crash/NameError) | 2 (RKEY-C `int(NaN)`, Model E undefined `n`) |
+| CAUSAL_REALTIME (trailing/elementwise) | ~25 sites + repaired Models B |
+| CAUSAL_DELAYED_CONFIRMATION | pivots (2) + RKEY-B + Models A/C |
+| EX_POST_ONLY (whole-sample descriptive / forward-return labeling) | ~20 sites (unchanged, per R0.5.1-N) |
+| **CAUSAL_VIOLATION (unresolved)** | **0 in code eligible for future scientific execution** |
+| BLOCKED (excluded) | Model D (contradictory logic), Model E (Q whole-sample scalar) |
 
 ## Verdict
 
-**No unresolved critical violation in the causal research infrastructure**
-(loader, resampler, volatility, coordinates, sigma states, occupancy,
-acceptance, regime labeling, runner, persistence). All 4 violations live in
-`BLOCKED_SCIENTIFIC_IMPLEMENTATION` scientific stubs that no phase executes.
-They are recorded as blockers for P6 (rekey) and P7 (signals), not repaired —
-per the immutable-rule STOP/escalate protocol, repairing them requires human
-authorization (`SCIENTIFIC_LOGIC_CHANGE_REQUIRED`).
+**No unresolved CAUSAL_VIOLATION remains in code eligible for future
+scientific execution.** The four R0.5-gate violations were repaired with
+human authorization (RKEY-B delayed activation; Models A/C confirmation-bar
+known times; Model B cosmetic-read removal). Two components remain BLOCKED
+and excluded per the R0.5.1 pass gate: Model D (ambiguous contradictory
+conditions, audit in `MVE_R05_1_MODEL_D_AUDIT.md`) and Model E (whole-sample
+Q component). The remaining forward-references in `src/mve/` are all
+`EX_POST_ONLY` descriptive analyzers, preserved unchanged per R0.5.1-N.

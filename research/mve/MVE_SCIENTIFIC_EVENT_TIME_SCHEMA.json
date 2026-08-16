@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "checkpoint": "MVE-R0.5.1-SCIENTIFIC-STUB-CAUSAL-REPAIR",
+  "purpose": "Reusable standard event-time schema for every scientific event (pivots, rekey, signal Models A/B/C, future acceptance/retest science).",
+  "required_fields": [
+    "event_time",
+    "evidence_complete_time",
+    "known_time",
+    "action_time"
+  ],
+  "ordering_rule": "event_time <= evidence_complete_time <= known_time <= action_time",
+  "notes": [
+    "Not every event needs all delays. For immediate causal events all four may be the same bar/time as allowed by bar-close convention.",
+    "For delayed confirmation, known_time must be later than event_time.",
+    "action_time may equal known_time (e.g. close-known, next-open execution is the frozen convention).",
+    "Realtime components: event_time == evidence_complete_time == known_time == action_time."
+  ],
+  "component_mappings": {
+    "anchors/pivot_high_low": {
+      "event_time": "bar i (local extremum)",
+      "evidence_complete_time": "bar i + window (right-side confirmation complete)",
+      "known_time": "bar i + window",
+      "action_time": "bar i + window (after close); consume via apply_anchor_delay(pivots, window)"
+    },
+    "rekey/RKEY_B": {
+      "event_time": "scan-origin bar i (breakout)",
+      "evidence_complete_time": "retest bar j",
+      "known_time": "retest bar j",
+      "action_time": "retest bar j (new_anchor_active_time = j)"
+    },
+    "signal Model A": {
+      "event_time": "crossing bar i",
+      "evidence_complete_time": "bar i+1 close (no immediate close back below)",
+      "known_time": "bar i+1",
+      "action_time": ">= bar i+1 close (next bar open per convention)"
+    },
+    "signal Model B": {
+      "event_time": "accepted-state bar i",
+      "evidence_complete_time": "bar i",
+      "known_time": "bar i",
+      "action_time": ">= bar i close (next bar open per convention)"
+    },
+    "signal Model C": {
+      "event_time": "crossing bar i",
+      "evidence_complete_time": "bar i+1 (+2 sigma acceptance)",
+      "known_time": "bar i+1",
+      "action_time": ">= bar i+1 close (next bar open per convention)"
+    }
+  },
+  "validation": "src/mve/causality.validate_scientific_event_times() enforces field presence and ordering; tested in tests/mve/test_causality.py::test_scientific_event_schema_validation"
+}

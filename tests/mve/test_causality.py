@@ -353,11 +353,10 @@ def test_rkey_c_causal():
     assert truncation_check(rkey_c, data, t) == 0.0
 
 
-def test_rkey_b_repaint_detected():
-    """RKEY-B scans bars i+1..i+4 to set the anchor at bar i: a backdated,
-    repainting implementation. This test asserts the violation EXISTS (the
-    historical series changes under future mutation) so it is a recorded
-    blocker, never a silent pass."""
+def test_rkey_b_causal_after_repair():
+    """RKEY-B is now causally delayed: the anchor becomes active only at the
+    retest bar j, never at the scan-origin bar i. Future mutation and
+    truncation must not alter historical rekeyed values."""
     coords = make_coord_series(n=500, seed=31)
     t = len(coords) // 2
     rk = MorphicRekey()
@@ -365,32 +364,76 @@ def test_rkey_b_repaint_detected():
     def rkey_b(d: pd.DataFrame) -> pd.Series:
         return rk.calculate_rekey_variants(d["coord"], step=1.0, n=1)["RKEY_B"]
 
-    # The flip can land anywhere in [t-4, t] depending on the seed, so probe
-    # several deterministic perturbations and require at least one hit.
     data = coords.to_frame("coord")
+    # Multiple seeds + signed perturbation (radical, inverted paths): history
+    # through t must be invariant.
     diffs = [
         future_perturbation_check(rkey_b, data, t, seed=s) for s in (1003, 1004, 1005, 1006, 1007)
     ]
-    assert max(diffs) > 0.0, "expected RKEY-B repaint; implementation changed?"
+    assert all(d == 0.0 for d in diffs), f"RKEY-B repaints under future mutation: {diffs}"
+    assert truncation_check(rkey_b, data, t) == 0.0
 
-    # Static proof: the anchor assigned at bar i is decided by scanning bars
-    # i+1..i+4 (future). Future data can therefore move a historical rekey.
-    import inspect
 
-    src = inspect.getsource(MorphicRekey._rekey_variant_b)
-    assert "range(i + 1" in src
-    assert "rekey_anchor = current_coord" in src
+def test_rkey_b_truncation_before_retest_no_active_rekey():
+    """Truncating before a retest confirms must NOT produce an active rekey at
+    the scan-origin bar; truncating at the confirmation must activate only
+    then. Changing future data must never move an emitted anchor earlier."""
+    # Construct a deterministic crossing + retest: scan-origin at 40 (crossing
+    # from <=1 to >1), retest bar at 43 (bar beyond boundary within lookahead).
+    coords = pd.Series(np.full(120, 0.3), index=pd.date_range("2023-07-03", periods=120, freq="h", tz="UTC"))
+    coords.iloc[40] = 1.4   # breakout crossing at 40
+    coords.iloc[41] = 0.7   # pull back inside (no retest yet)
+    coords.iloc[42] = 0.6   # still inside
+    coords.iloc[43] = 1.3   # retest beyond boundary -> confirmation at 43
+    coords.iloc[44:] = 1.1
+    rk = MorphicRekey()
+
+    def rkey_b(d: pd.DataFrame) -> pd.Series:
+        return rk.calculate_rekey_variants(d["coord"], step=1.0, n=1)["RKEY_B"]
+
+    full = rkey_b(coords.to_frame("coord"))
+    # The scan-origin bar 40 must NOT be re-anchored (it is before confirmation):
+    # bar 40's value must be its own coordinate minus the PREVIOUS anchor (none
+    # yet, so identity).
+    assert full.iloc[40] == coords.iloc[40]
+    # Truncated just before the retest (at 42): bar 40 still not re-anchored.
+    trunc_before = rkey_b(coords.iloc[:43].to_frame("coord"))
+    assert trunc_before.iloc[40] == coords.iloc[40]
+    # Truncated at the confirmation (43): the rekey is active from 43 onward;
+    # bar 43 = coord_43 - anchor (anchor = coord at scan-origin 40).
+    trunc_at = rkey_b(coords.iloc[:44].to_frame("coord"))
+    assert abs(trunc_at.iloc[43] - (coords.iloc[43] - coords.iloc[40])) < 1e-9
+    # Historical values before confirmation are identical across truncations.
+    assert (trunc_before.iloc[:40] == trunc_at.iloc[:40]).all()
+
+
+def test_rkey_b_detected_events_schema_valid():
+    """detect_rekey_events emits schema-valid RKEY-B events with explicit
+    causal timestamps (event_time <= evidence <= known <= active)."""
+    coords = make_coord_series(n=500, seed=61)
+    rk = MorphicRekey()
+    events = rk.detect_rekey_events(coords, step=1.0, n=1, variant="B")
+    assert len(events) > 0
+    for ev in events:
+        assert ev["rekey_event_time"] <= ev["rekey_evidence_complete_time"]
+        assert ev["rekey_evidence_complete_time"] == ev["rekey_known_time"]
+        assert ev["rekey_known_time"] <= ev["new_anchor_active_time"]
+        assert ev["new_anchor"] is not None
+    validate_rekey_events(events)  # no raise
+    # Real-time variants also validate.
+    for variant in ("A", "C"):
+        evs = rk.detect_rekey_events(coords, step=1.0, n=1, variant=variant)
+        validate_rekey_events(evs)
 
 
 # ---------------------------------------------------------------------------
 # 6. Signal-generator next-bar leakage (documented violation)
 # ---------------------------------------------------------------------------
 
-def test_sigma_escape_signal_next_bar_leak_detected():
-    """Escape signals gate the signal at bar i on bar i+1's close ('no
-    immediate close back below boundary'): a 1-bar backdated confirmation.
-    Perturbing only bar t+1 must change the signal at bar t. The test asserts
-    the leak exists (recorded blocker)."""
+def test_sigma_escape_signal_causal_after_repair():
+    """Model A is now causally delayed: the signal is KNOWN at the
+    confirmation bar i+1, never at the crossing bar i. Future mutation after
+    the known time must not repaint earlier signal history."""
     coords = make_coord_series(n=500, seed=41)
     t = 300
     sg = SignalGenerator()
@@ -399,8 +442,159 @@ def test_sigma_escape_signal_next_bar_leak_detected():
         return sg.generate_sigma_escape_signals(d["coord"], step=1.0, n=1)
 
     data = coords.to_frame("coord")
-    diff = future_perturbation_check(sig, data, t, seed=1004)
-    assert diff > 0.0, "expected escape-signal backdate leak; implementation changed?"
+    diffs = [future_perturbation_check(sig, data, t, seed=s) for s in (1004, 1005, 1006)]
+    assert all(d == 0.0 for d in diffs), f"Model A repaints under future mutation: {diffs}"
+    assert truncation_check(sig, data, t) == 0.0
+
+
+def test_sigma_escape_signal_knowledge_time_i_plus_1():
+    """A crossing at bar i whose confirmation exists only at bar i+1 must
+    produce a signal at i+1, never at i."""
+    coords = pd.Series(np.full(60, 0.5), index=pd.date_range("2023-07-03", periods=60, freq="h", tz="UTC"))
+    coords.iloc[20] = 1.4   # crossing +1 sigma at 20
+    coords.iloc[21] = 1.3   # confirmation: no immediate close back below
+    coords.iloc[22] = 1.1
+    sg = SignalGenerator()
+    sig = sg.generate_sigma_escape_signals(coords, step=1.0, n=1)
+    assert sig.iloc[20] == 0          # not known at the crossing bar
+    assert sig.iloc[21] == 1          # known at the confirmation bar
+    # Mirror (short): crossing -1 sigma at 30, confirmed at 31.
+    coords.iloc[30] = -1.4
+    coords.iloc[31] = -1.3
+    sig2 = sg.generate_sigma_escape_signals(coords, step=1.0, n=1)
+    assert sig2.iloc[30] == 0
+    assert sig2.iloc[31] == -1
+    # Invalidation: crossing at 40 with an immediate close back inside at 41
+    # emits NO signal anywhere.
+    coords.iloc[40] = 1.4
+    coords.iloc[41] = 0.6   # close back below boundary
+    sig3 = sg.generate_sigma_escape_signals(coords, step=1.0, n=1)
+    assert sig3.iloc[40] == 0
+    assert sig3.iloc[41] == 0
+
+
+def test_signal_model_b_causal_after_repair():
+    """Model B is a realtime accepted-state signal after repair: no future
+    dependency, no last-bar suppression artifact."""
+    coords = make_coord_series(n=500, seed=71)
+    t = len(coords) // 2
+    sg = SignalGenerator()
+
+    def sig(d: pd.DataFrame) -> pd.Series:
+        return sg.generate_accepted_sigma_breakout_signals(d["coord"], step=1.0, n=1)
+
+    data = coords.to_frame("coord")
+    assert future_perturbation_check(sig, data, t, seed=1101) == 0.0
+    assert truncation_check(sig, data, t) == 0.0
+
+
+def test_signal_model_c_causal_after_repair():
+    """Model C entry is known at the +2-sigma confirmation bar i+1; the exit
+    path uses only trailing bars."""
+    coords = pd.Series(np.full(80, 0.4), index=pd.date_range("2023-07-03", periods=80, freq="h", tz="UTC"))
+    coords.iloc[30] = 1.2    # crossing +1 at 30
+    coords.iloc[31] = 2.3    # +2 sigma accepted at 31 -> entry known at 31
+    sg = SignalGenerator()
+    sig = sg.generate_recursive_morphic_trend_signals(coords, step=1.0, n=1)
+    assert sig.iloc[30] == 0   # not backdated to the crossing bar
+    assert sig.iloc[31] == 1   # known at the confirmation bar
+
+    # Perturbation + truncation invariance on the full-series level.
+    coords_long = make_coord_series(n=500, seed=81)
+    t = len(coords_long) // 2
+
+    def sigfn(d: pd.DataFrame) -> pd.Series:
+        return sg.generate_recursive_morphic_trend_signals(d["coord"], step=1.0, n=1)
+
+    data = coords_long.to_frame("coord")
+    assert future_perturbation_check(sigfn, data, t, seed=1102) == 0.0
+    assert truncation_check(sigfn, data, t) == 0.0
+
+
+def test_rkey_c_nan_robustness():
+    """RKEY-C must not crash on warm-up NaN and must not invent synthetic
+    rekeys during the not-ready window."""
+    coords = make_coord_series(n=400, seed=91)
+    coords_nan = coords.copy()
+    coords_nan.iloc[:30] = np.nan
+    rk = MorphicRekey()
+
+    def rkey_c(d: pd.DataFrame) -> pd.Series:
+        return rk.calculate_rekey_variants(d["coord"], step=1.0, n=1)["RKEY_C"]
+
+    out = rkey_c(coords_nan.to_frame("coord"))  # must not raise
+    # NaN input positions produce NaN output (no invented values).
+    assert np.isnan(out.iloc[:30]).all()
+    # No synthetic default rekeys: before any rekey can be ready (first fully
+    # valid window needs 5 bars + a NaN-free trailing window), the output is
+    # the identity coordinate.
+    assert (out.iloc[30:35].to_numpy() == coords.iloc[30:35].to_numpy()).all()
+    # Intermittent NaN mid-series: history before the NaN is identical to the
+    # clean run; the NaN bar itself is NaN; no crash.
+    clean = rkey_c(coords.to_frame("coord"))
+    coords_nan2 = coords.copy()
+    coords_nan2.iloc[150] = np.nan
+    out2 = rkey_c(coords_nan2.to_frame("coord"))
+    pd.testing.assert_series_equal(clean.iloc[:150], out2.iloc[:150], check_names=False)
+    assert np.isnan(out2.iloc[150])
+    assert len(out2) == len(coords)
+
+
+def test_model_e_q_whole_sample_leak_detected():
+    """Model E's Q component is a whole-sample scalar broadcast into every
+    bar, so the emitted signals repaint under future mutation. The violation
+    is documented (BLOCKED_LOGIC_SPEC, excluded from execution), not silently
+    repaired."""
+    coords = make_coord_series(n=500, seed=101)
+    t = len(coords) // 2
+    sg = SignalGenerator()
+
+    def sig(d: pd.DataFrame) -> pd.Series:
+        return sg.generate_morphic_trend_score_signals(d["coord"], step=1.0)
+
+    data = coords.to_frame("coord")
+    diff = future_perturbation_check(sig, data, t, seed=1103)
+    assert diff > 0.0, "expected Model E Q-component repaint; implementation changed?"
+
+
+def test_model_d_nan_no_crash_and_logic_unchanged():
+    """Model D no longer crashes on NaN (robustness guard), and its logic
+    conditions are untouched (BLOCKED_LOGIC_SPEC - audit only)."""
+    coords = make_coord_series(n=200, seed=111)
+    coords_nan = coords.copy()
+    coords_nan.iloc[:20] = np.nan
+    sg = SignalGenerator()
+    # NaN input must not raise after the robustness guard.
+    out = sg.generate_multi_timeframe_morphic_alignment_signals(coords_nan, coords_nan * 1.5)
+    assert len(out) == len(coords_nan)
+    # Clean input unchanged (same elementwise logic as before).
+    import inspect
+
+    src = inspect.getsource(SignalGenerator.generate_multi_timeframe_morphic_alignment_signals)
+    assert "d1_coord > 0 and h1_coord > n_h1 and d1_coord < 0" in src  # untouched
+
+
+def test_scientific_event_schema_validation():
+    """Standard 4-field scientific-event schema (event <= evidence <= known
+    <= action) validates; violations raise."""
+    from mve.causality import validate_scientific_event_times
+
+    good = [
+        {"id": 1, "event_time": 10, "evidence_complete_time": 11,
+         "known_time": 11, "action_time": 12},
+        {"id": 2, "event_time": 20, "evidence_complete_time": 20,
+         "known_time": 20, "action_time": 20},  # realtime
+    ]
+    validate_scientific_event_times(good)  # no raise
+
+    bad = [{"id": 3, "event_time": 30, "evidence_complete_time": 30,
+            "known_time": 29, "action_time": 30}]
+    with pytest.raises(Exception, match="ordering"):
+        validate_scientific_event_times(bad)
+
+    missing = [{"event_time": 40}]
+    with pytest.raises(Exception, match="missing"):
+        validate_scientific_event_times(missing)
 
 
 def test_mtf_alignment_signal_causal():
@@ -513,15 +707,15 @@ def test_rekey_schema_validation():
     good = [
         {
             "id": 1,
-            "original_state_time": 100,
-            "acceptance_known_time": 102,
-            "rekey_trigger_time": 105,
-            "new_anchor_active_time": 105,
+            "rekey_event_time": 100,
+            "rekey_evidence_complete_time": 102,
+            "rekey_known_time": 102,
+            "new_anchor_active_time": 102,
         }
     ]
     validate_rekey_events(good)
 
-    bad = [dict(good[0], new_anchor_active_time=104)]  # < rekey_trigger_time
+    bad = [dict(good[0], rekey_known_time=101)]  # < evidence_complete_time
     with pytest.raises(Exception, match="ordering"):
         validate_rekey_events(bad)
 

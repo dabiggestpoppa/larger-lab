@@ -1,0 +1,43 @@
+{
+  "checkpoint": "MVE-R0.5.1-SCIENTIFIC-STUB-CAUSAL-REPAIR",
+  "perturbation_violations_after_repair": [
+    "signals/model_E_trend_score"
+  ],
+  "truncation_all_pass": true,
+  "components": {
+    "RKEY_A": {
+      "classification": "CAUSAL_IMPLEMENTABLE",
+      "perturb_diff": 0.0
+    },
+    "RKEY_B": {
+      "classification": "CAUSAL_DELAYED_IMPLEMENTABLE",
+      "perturb_diff": 0.0
+    },
+    "RKEY_C": {
+      "classification": "CAUSAL_IMPLEMENTABLE",
+      "perturb_diff": 0.0
+    },
+    "MODEL_A": {
+      "classification": "CAUSAL_DELAYED_IMPLEMENTABLE",
+      "perturb_diff": 0.0
+    },
+    "MODEL_B": {
+      "classification": "CAUSAL_IMPLEMENTABLE",
+      "perturb_diff": 0.0
+    },
+    "MODEL_C": {
+      "classification": "CAUSAL_DELAYED_IMPLEMENTABLE",
+      "perturb_diff": 0.0
+    },
+    "MODEL_D": {
+      "classification": "BLOCKED_LOGIC_SPEC",
+      "perturb_diff": 0.0,
+      "note": "contradictory conditions untouched; NaN guard added"
+    },
+    "MODEL_E": {
+      "classification": "BLOCKED_LOGIC_SPEC",
+      "perturb_diff": 1.0,
+      "note": "Q component whole-sample scalar; excluded from future scientific execution"
+    }
+  }
+}

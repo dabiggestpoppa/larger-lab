@@ -1,0 +1,27 @@
+{
+  "checkpoint": "MVE-R0.5.1-SCIENTIFIC-STUB-CAUSAL-REPAIR",
+  "base_commit": "cb0020cee33a493abf358991effb1a7bf74d1c3f",
+  "r05_1_causal_repair_pass": true,
+  "r05_2_causality_regate_cleared": true,
+  "scientific_phase4_ready": false,
+  "holdout_status": "FINAL_HOLDOUT_PENDING",
+  "holdout_note": "slice used: 2023-07-03..2024-03-31 (development range); 2026 untouched",
+  "no_remaining_causal_violation_in_executable_code": true,
+  "blocked_and_excluded": [
+    "MODEL_D (BLOCKED_LOGIC_SPEC)",
+    "MODEL_E (BLOCKED_LOGIC_SPEC - Q whole-sample)"
+  ],
+  "blocked_note": "excluded from future scientific execution per R0.5.1 pass gate; the runner's phase gates keep all signal/rekey research blocked until the independent R0.5.2 regate",
+  "corrected_prior_record": [
+    "Model E 'undefined n' (reported in MVE-R0.5-CAUSALITY-GATE) was a misreading of the _calculate_occupancy helper: Model E actually runs. Its real defect is the whole-sample Q component (measured repaint).",
+    "Model D additionally crashed on warm-up NaN (int(NaN)) - now robustness-guarded."
+  ],
+  "scientific_changes": [
+    "RKEY-B: anchor activation moved from scan-origin bar i to the retest bar j (anchor value formula unchanged) - causal timing repair.",
+    "Model A: signal known time moved from crossing bar i to confirmation bar i+1; documented 'SHORT = mirror' implemented (prior elif was dead code).",
+    "Model B: cosmetic next-bar read removed (behaviorally realtime already); realtime accepted-state signal.",
+    "Model C: entry known time moved to the +2-sigma confirmation bar i+1; confirmed entry takes priority over a same-bar exit.",
+    "RKEY-C / Model D: NaN robustness guards (no int(NaN), no synthetic rekeys)."
+  ],
+  "next_authorized_checkpoint": "MVE-R0.5.2-CAUSALITY-REGATE (independent re-run + seal). P4 remains blocked."
+}

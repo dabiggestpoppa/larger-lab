@@ -87,20 +87,21 @@
 ### `rekey.py` — MorphicRekey
 | Method | Class |
 |---|---|
-| `_rekey_variant_a` (RKEY-A) | CAUSAL_REALTIME (re-anchor at the crossing bar using bars <= i) |
-| `_rekey_variant_b` (RKEY-B) | **CAUSAL_VIOLATION** — scans bars i+1..i+4 (future) and assigns `rekey_anchor = current_coord` at bar i; future data can move a historical rekey earlier (verified numerically: max real-data diff 1.033 across cutoffs x seeds) |
-| `_rekey_variant_c` (RKEY-C) | CAUSAL_REALTIME (trailing window only) — **but crashes on warm-up NaN (`int(NaN)`): BLOCKED robustness defect** |
-| `calculate_rekey_variants` | composition; inherits RKEY-B violation + RKEY-C crash |
+| `_rekey_variant_a` (RKEY-A) | CAUSAL_REALTIME (re-anchor at the crossing bar using bars <= i) — CAUSAL_IMPLEMENTABLE |
+| `_rekey_variant_b` (RKEY-B) | CAUSAL_DELAYED_CONFIRMATION — **repaired (R0.5.1):** anchor value formula unchanged, but activation moved from scan-origin i to the retest bar j (`rekey_event_time = i`, `known/active = j`); verified future-mutation and truncation invariant (max diff 0.0, was 1.033 pre-repair) |
+| `_rekey_variant_c` (RKEY-C) | CAUSAL_REALTIME (trailing window only) — **repaired (R0.5.1):** NaN ready-guard, no `int(NaN)` crash, no synthetic rekeys |
+| `calculate_rekey_variants` | composition of the repaired variants |
+| `detect_rekey_events` | CAUSAL — emits schema-valid rekey events (R0.5.1) |
 | `analyze_rekey_variants` / `analyze_rekey_effectiveness` / `analyze_rekey_continuation` / `analyze_rekey_trends` | EX_POST_ONLY (**use `prices.iloc[i+1]` forward returns**) |
 
 ### `signals.py` — SignalGenerator
 | Method | Class |
 |---|---|
-| `generate_sigma_escape_signals` (Model A) | **CAUSAL_VIOLATION** — signal at bar i is gated by bar i+1's close ("no immediate close back below boundary"): 1-bar backdated confirmation (proven on fixtures) |
-| `generate_accepted_sigma_breakout_signals` (Model B) | **CAUSAL_VIOLATION** — uses bar i+1 ("retest rejection / next close higher") to emit the signal at bar i |
-| `generate_recursive_morphic_trend_signals` (Model C) | **CAUSAL_VIOLATION** — entry at bar i decided by bar i+1's coordinate |
-| `generate_multi_timeframe_morphic_alignment_signals` (Model D) | CAUSAL_REALTIME given causal coords (**note:** internally contradictory conditions, e.g. `d1_coord > 0 and ... d1_coord < 0` — logic defect, not causality) |
-| `generate_morphic_trend_score_signals` (Model E) | BLOCKED — references undefined `n` (NameError) and returns occupancy despite its name; trailing windows are causal |
+| `generate_sigma_escape_signals` (Model A) | CAUSAL_DELAYED_CONFIRMATION — **repaired (R0.5.1):** signal known at the confirmation bar i+1; documented SHORT = mirror implemented (prior elif was dead code) |
+| `generate_accepted_sigma_breakout_signals` (Model B) | CAUSAL_REALTIME — **repaired (R0.5.1):** cosmetic next-bar read removed (output never depended on bar i+1); realtime accepted-state signal; docstring retest-entry = BLOCKED_LOGIC_SPEC (never implemented) |
+| `generate_recursive_morphic_trend_signals` (Model C) | CAUSAL_DELAYED_CONFIRMATION — **repaired (R0.5.1):** entry known at the +2-sigma confirmation bar; exit realtime trailing window |
+| `generate_multi_timeframe_morphic_alignment_signals` (Model D) | BLOCKED_LOGIC_SPEC (contradictory conditions, ambiguous mapping — `MVE_R05_1_MODEL_D_AUDIT.md`); realtime elementwise; NaN guard added |
+| `generate_morphic_trend_score_signals` (Model E) | BLOCKED_LOGIC_SPEC — **record corrected:** no NameError (prior "undefined n" was a misreading); Q component is a whole-sample scalar (measured repaint); excluded from execution |
 | `generate_all_signals` / `combine_signals` | compositional |
 
 ### `backtest.py` — evaluation harness, not a signal source

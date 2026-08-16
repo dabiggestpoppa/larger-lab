@@ -1,24 +1,26 @@
 {
-  "schema_version": "1.0",
-  "checkpoint": "MVE-R0.5-CAUSALITY-GATE",
-  "purpose": "Required timestamp fields and rules for any future P6 rekey implementation. Infrastructure contract only; scientific rekey research is NOT yet implemented (RKEY-B currently violates this schema).",
+  "schema_version": "1.1",
+  "checkpoint": "MVE-R0.5.1-SCIENTIFIC-STUB-CAUSAL-REPAIR",
+  "supersedes": "schema_version 1.0 (MVE-R0.5-CAUSALITY-GATE)",
+  "supersession_note": "field set changed from (original_state_time, acceptance_known_time, rekey_trigger_time) to (rekey_event_time, rekey_evidence_complete_time, rekey_known_time) per R0.5.1-B required fields. Historical record preserved in git.",
+  "purpose": "Required timestamp fields and rules for rekey events. Infrastructure contract; scientific rekey research is NOT yet implemented, but the repaired RKEY-B now complies with this schema.",
   "required_fields": [
-    "original_state_time",
-    "acceptance_known_time",
-    "rekey_trigger_time",
+    "rekey_event_time",
+    "rekey_evidence_complete_time",
+    "rekey_known_time",
     "new_anchor_active_time"
   ],
-  "ordering_rule": "original_state_time <= acceptance_known_time <= rekey_trigger_time <= new_anchor_active_time",
-  "hard_rule": "new_anchor_active_time >= rekey_trigger_time; changing future data must NEVER move a historical rekey earlier",
+  "ordering_rule": "rekey_event_time <= rekey_evidence_complete_time <= rekey_known_time <= new_anchor_active_time",
+  "hard_rule": "new_anchor_active_time >= rekey_known_time; changing future data must NEVER move an already emitted historical anchor earlier",
   "prohibitions": [
     "no retroactive rekey",
     "no backdated signals from a rekey that was not yet knowable",
-    "no repainting of the coordinate system before the rekey trigger is confirmed"
+    "no repainting of the coordinate system before the rekey is confirmed"
   ],
   "current_status": {
-    "RKEY_A": "compliant (re-anchor at the crossing bar, causal)",
-    "RKEY_B": "VIOLATION - scans bars i+1..i+4 (future) and assigns the anchor at bar i; rekey_trigger_time effectively moves with future data (measured repaint diff 1.033 on real data)",
-    "RKEY_C": "timing-compliant (trailing only) but crashes on warm-up NaN (int(NaN)) - blocked robustness defect"
+    "RKEY_A": "compliant (realtime: all timestamps = re-anchor bar)",
+    "RKEY_B": "COMPLIANT AFTER R0.5.1 REPAIR - rekey_event_time = scan-origin i, rekey_evidence_complete_time = rekey_known_time = new_anchor_active_time = retest bar j; anchor value formula unchanged (coordinate at scan-origin bar); verified future-mutation and truncation invariant (max diff 0.0)",
+    "RKEY_C": "compliant (realtime) and NaN-robust after R0.5.1 repair (ready-guard, no int(NaN))"
   },
-  "validation": "src/mve/causality.validate_rekey_events() enforces field presence and ordering; tested in tests/mve/test_causality.py::test_rekey_schema_validation"
+  "validation": "src/mve/causality.validate_rekey_events() enforces field presence and ordering; detect_rekey_events() in src/mve/rekey.py emits schema-valid events; tested in tests/mve/test_causality.py::test_rekey_schema_validation"
 }

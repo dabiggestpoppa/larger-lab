@@ -11,8 +11,11 @@ coordinates/frozen_sigma,1163,0,0.0
 sigma_states/classification,1163,0,0.0
 acceptance/occupancy,1163,0,0.0
 rekey/RKEY_A,1163,0,0.0
+rekey/RKEY_B,1163,0,0.0
 rekey/RKEY_C,1163,0,0.0
-anchors/pivot_confirmed,1163,5,0.0
+signals/model_A_escape,1163,0,0.0
+signals/model_B_breakout,1163,0,0.0
+signals/model_C_recursive,1163,0,0.0
 volatility/close_to_close,2326,0,0.0
 volatility/ewma,2326,0,0.0
 volatility/parkinson,2326,0,0.0
@@ -25,8 +28,11 @@ coordinates/frozen_sigma,2326,0,0.0
 sigma_states/classification,2326,0,0.0
 acceptance/occupancy,2326,0,0.0
 rekey/RKEY_A,2326,0,0.0
+rekey/RKEY_B,2326,0,0.0
 rekey/RKEY_C,2326,0,0.0
-anchors/pivot_confirmed,2326,5,0.0
+signals/model_A_escape,2326,0,0.0
+signals/model_B_breakout,2326,0,0.0
+signals/model_C_recursive,2326,0,0.0
 volatility/close_to_close,3489,0,0.0
 volatility/ewma,3489,0,0.0
 volatility/parkinson,3489,0,0.0
@@ -39,5 +45,8 @@ coordinates/frozen_sigma,3489,0,0.0
 sigma_states/classification,3489,0,0.0
 acceptance/occupancy,3489,0,0.0
 rekey/RKEY_A,3489,0,0.0
+rekey/RKEY_B,3489,0,0.0
 rekey/RKEY_C,3489,0,0.0
-anchors/pivot_confirmed,3489,5,0.0
+signals/model_A_escape,3489,0,0.0
+signals/model_B_breakout,3489,0,0.0
+signals/model_C_recursive,3489,0,0.0

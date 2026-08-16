@@ -151,10 +151,14 @@ ACCEPTANCE_SCHEMA_FIELDS = (
     "acceptance_known_time",
 )
 
+# R0.5.1 field set (supersedes the R0.5-gate field names
+# original_state_time/acceptance_known_time/rekey_trigger_time):
+# rekey_event_time <= rekey_evidence_complete_time <= rekey_known_time
+# <= new_anchor_active_time.
 REKEY_SCHEMA_FIELDS = (
-    "original_state_time",
-    "acceptance_known_time",
-    "rekey_trigger_time",
+    "rekey_event_time",
+    "rekey_evidence_complete_time",
+    "rekey_known_time",
     "new_anchor_active_time",
 )
 
@@ -192,9 +196,9 @@ def validate_acceptance_events(
 def validate_rekey_events(
     rekeys: Sequence[Dict], raise_on_error: bool = True
 ) -> List[str]:
-    """Validate rekey events against the frozen causal schema.
+    """Validate rekey events against the frozen causal schema (R0.5.1 field set).
 
-    Rule: original_state_time <= acceptance_known_time <= rekey_trigger_time
+    Rule: rekey_event_time <= rekey_evidence_complete_time <= rekey_known_time
     <= new_anchor_active_time. Changing future data must never move a
     historical rekey earlier.
     """
@@ -205,15 +209,60 @@ def validate_rekey_events(
                 problems.append(f"rekey event {ev.get('id', '?')}: missing {field}")
         if all(f in ev for f in REKEY_SCHEMA_FIELDS):
             ordered = (
-                ev["original_state_time"]
-                <= ev["acceptance_known_time"]
-                <= ev["rekey_trigger_time"]
+                ev["rekey_event_time"]
+                <= ev["rekey_evidence_complete_time"]
+                <= ev["rekey_known_time"]
                 <= ev["new_anchor_active_time"]
             )
             if not ordered:
                 problems.append(
                     f"rekey event {ev.get('id', '?')}: timestamp ordering "
-                    "violated (new_anchor_active_time >= rekey_trigger_time required)"
+                    "violated (event <= evidence <= known <= active required)"
+                )
+    if problems and raise_on_error:
+        raise CausalityError("; ".join(problems))
+    return problems
+
+
+# ---------------------------------------------------------------------------
+# Standard scientific-event schema (R0.5.1-I)
+# ---------------------------------------------------------------------------
+
+SCIENTIFIC_EVENT_SCHEMA_FIELDS = (
+    "event_time",
+    "evidence_complete_time",
+    "known_time",
+    "action_time",
+)
+
+
+def validate_scientific_event_times(
+    events: Sequence[Dict], raise_on_error: bool = True
+) -> List[str]:
+    """Validate events against the standard scientific-event schema.
+
+    Rule: event_time <= evidence_complete_time <= known_time <= action_time.
+    Not every event needs all delays: for immediate causal events all four may
+    be the same bar (as allowed by bar-close convention); for delayed
+    confirmation, known_time must be later than event_time. action_time may
+    equal known_time (e.g. close-known, next-open execution).
+    """
+    problems: List[str] = []
+    for ev in events:
+        for field in SCIENTIFIC_EVENT_SCHEMA_FIELDS:
+            if field not in ev:
+                problems.append(f"event {ev.get('id', '?')}: missing {field}")
+        if all(f in ev for f in SCIENTIFIC_EVENT_SCHEMA_FIELDS):
+            ordered = (
+                ev["event_time"]
+                <= ev["evidence_complete_time"]
+                <= ev["known_time"]
+                <= ev["action_time"]
+            )
+            if not ordered:
+                problems.append(
+                    f"event {ev.get('id', '?')}: ordering violated "
+                    "(event <= evidence <= known <= action required)"
                 )
     if problems and raise_on_error:
         raise CausalityError("; ".join(problems))

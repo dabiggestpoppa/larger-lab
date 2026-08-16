@@ -1,0 +1,71 @@
+{
+  "checkpoint": "MVE-R0.5.1-SCIENTIFIC-STUB-CAUSAL-REPAIR",
+  "classifications": {
+    "RKEY_A": {
+      "classification": "CAUSAL_IMPLEMENTABLE",
+      "timing": "realtime (re-anchor at the crossing bar)",
+      "leakage": "none (measured perturb diff 0.0)",
+      "crashes": "none"
+    },
+    "RKEY_B": {
+      "classification": "CAUSAL_DELAYED_IMPLEMENTABLE",
+      "timing": "rekey_event_time = scan-origin i; rekey_evidence_complete_time = rekey_known_time = new_anchor_active_time = retest bar j",
+      "leakage": "none after repair (measured perturb diff 0.0; was 1.033 pre-repair)",
+      "crashes": "none",
+      "repair": "anchor activation moved from i to j; anchor value formula unchanged"
+    },
+    "RKEY_C": {
+      "classification": "CAUSAL_IMPLEMENTABLE",
+      "timing": "realtime (trailing 3-bar window)",
+      "leakage": "none (measured perturb diff 0.0)",
+      "crashes": "none after NaN ready-guard (was conditional int(NaN))",
+      "repair": "robustness only"
+    },
+    "MODEL_A": {
+      "classification": "CAUSAL_DELAYED_IMPLEMENTABLE",
+      "timing": "signal_event_time = crossing bar i; signal_evidence_complete_time = signal_known_time = confirmation bar i+1",
+      "leakage": "none after repair (measured perturb diff 0.0)",
+      "crashes": "none",
+      "repair": "signal known time moved to i+1; documented SHORT = mirror implemented (prior elif dead code)"
+    },
+    "MODEL_B": {
+      "classification": "CAUSAL_IMPLEMENTABLE",
+      "timing": "realtime accepted-state signal (known at bar i)",
+      "leakage": "none after repair (cosmetic next-bar read removed; output never depended on bar i+1)",
+      "crashes": "none",
+      "note": "docstring's 'retest rejection / next close higher' ENTRY was never implemented -> BLOCKED_LOGIC_SPEC (excluded)"
+    },
+    "MODEL_C": {
+      "classification": "CAUSAL_DELAYED_IMPLEMENTABLE",
+      "timing": "entry: signal_event_time = crossing bar i-1; signal_evidence_complete_time = signal_known_time = +2-sigma confirmation bar i; exit: realtime trailing window",
+      "leakage": "none after repair (measured perturb diff 0.0)",
+      "crashes": "none",
+      "repair": "entry known time moved to the confirmation bar; confirmed entry takes priority over a same-bar exit"
+    },
+    "MODEL_D": {
+      "classification": "BLOCKED_LOGIC_SPEC",
+      "leakage": "none (realtime elementwise; measured perturb diff 0.0)",
+      "crashes": "none after NaN robustness guard (was int(NaN) on warm-up)",
+      "note": "contradictory conditions untouched (MVE_R05_1_MODEL_D_AUDIT.md); excluded from future scientific execution"
+    },
+    "MODEL_E": {
+      "classification": "BLOCKED_LOGIC_SPEC",
+      "leakage": "VIOLATION (Q component = whole-sample scalar; measured perturb diff > 0)",
+      "crashes": "none",
+      "note": "no NameError exists (prior 'undefined n' record corrected); placeholder-quality subcomponents (V/P/Q 'basic approximation') documented, not upgraded; excluded from future scientific execution"
+    }
+  },
+  "eligible_for_future_scientific_execution": [
+    "RKEY_A",
+    "RKEY_B",
+    "RKEY_C",
+    "MODEL_A",
+    "MODEL_B",
+    "MODEL_C"
+  ],
+  "blocked_and_excluded": [
+    "MODEL_D",
+    "MODEL_E"
+  ],
+  "no_unresolved_causal_violation_in_eligible_code": true
+}

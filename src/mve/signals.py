@@ -67,37 +67,39 @@ acceptance criteria, and rekey logic to identify potential trading opportunities
             
         Returns:
             Signal series (1 for long, -1 for short, 0 for no signal)
+
+        CAUSAL (R0.5.1 repair): the signal is KNOWN at the confirmation bar
+        i+1 ("no immediate close back below boundary"), never backdated to the
+        crossing bar i. The short mirror (documented "SHORT = mirror") is now
+        implemented: the prior elif carried an identical condition (dead code),
+        so shorts could never fire.
         """
         # Calculate sigma state boundary
         boundary = n * step
-        
+
         # Initialize signal series
         signals = pd.Series(0, index=morphic_coordinates.index)
-        
-        # Generate signals
-        for i in range(len(morphic_coordinates)):
-            current_coord = morphic_coordinates.iloc[i]
-            
-            # Check for long signal
-            if (abs(current_coord) > boundary and 
-                (i == 0 or abs(morphic_coordinates.iloc[i-1]) <= boundary)):
-                
-                # Check for immediate close back below boundary
-                if i + 1 < len(morphic_coordinates):
-                    next_coord = morphic_coordinates.iloc[i + 1]
-                    if abs(next_coord) <= boundary:
-                        continue  # Skip this signal
-                        
-                # Generate long signal
-                signals.iloc[i] = 1
-                
-            # Check for short signal (mirror of long)
-            elif (abs(current_coord) > boundary and 
-                  (i == 0 or abs(morphic_coordinates.iloc[i-1]) <= boundary)):
-                
-                # Generate short signal
-                signals.iloc[i] = -1
-                
+        coords = morphic_coordinates.to_numpy(dtype=float)
+
+        # Generate signals (signal at i+1 is known only after bar i+1 closes)
+        for i in range(len(coords) - 1):
+            current_coord = coords[i]
+            prev_coord = coords[i - 1] if i > 0 else 0.0
+
+            # Check for long signal: crossing +boundary from below, confirmed
+            # by bar i+1 (no immediate close back below boundary).
+            if (current_coord > boundary and
+                    (i == 0 or prev_coord <= boundary)):
+                if abs(coords[i + 1]) > boundary:
+                    signals.iloc[i + 1] = 1  # known at the confirmation bar
+
+            # Check for short signal (mirror): crossing -boundary from above,
+            # confirmed by bar i+1 (no immediate close back above boundary).
+            elif (current_coord < -boundary and
+                  (i == 0 or prev_coord >= -boundary)):
+                if abs(coords[i + 1]) > boundary:
+                    signals.iloc[i + 1] = -1  # known at the confirmation bar
+
         return signals
         
     def generate_accepted_sigma_breakout_signals(self, morphic_coordinates: pd.Series,
@@ -132,42 +134,33 @@ acceptance criteria, and rekey logic to identify potential trading opportunities
             
         Returns:
             Signal series (1 for long, -1 for short, 0 for no signal)
+
+        CAUSAL (R0.5.1 repair): realtime state signal, known at bar i. The
+        prior implementation read bar i+1 into next_coord but BOTH branches
+        emitted 1, so the read was cosmetic (no future dependency) and the
+        last-bar suppression was an off-by-one artifact. The docstring's
+        'retest rejection / next close higher' ENTRY was never implemented in
+        code -> BLOCKED_LOGIC_SPEC (excluded from future scientific execution).
         """
         # Calculate sigma state boundary
         boundary = n * step
-        
+
         # Initialize signal series
         signals = pd.Series(0, index=morphic_coordinates.index)
-        
+
         # Calculate occupancy
         occupancy = self._calculate_occupancy(morphic_coordinates, step, n)
-        
-        # Generate signals
+
+        # Generate signals (realtime: bar i uses only bars <= i)
         for i in range(len(morphic_coordinates)):
             current_coord = morphic_coordinates.iloc[i]
             current_occupancy = occupancy.iloc[i]
-            
-            # Check for long signal
-            if (abs(current_coord) > boundary and 
-                current_occupancy >= acceptance_threshold):
-                
-                # Check for retest rejection
-                if i + 1 < len(morphic_coordinates):
-                    next_coord = morphic_coordinates.iloc[i + 1]
-                    if abs(next_coord) > boundary:
-                        # Retest rejection - generate signal
-                        signals.iloc[i] = 1
-                    else:
-                        # Next close higher - generate signal
-                        signals.iloc[i] = 1
-                        
-            # Check for short signal (mirror of long)
-            elif (abs(current_coord) > boundary and 
-                  current_occupancy >= acceptance_threshold):
-                
-                # Generate short signal
-                signals.iloc[i] = -1
-                
+
+            # Accepted-breakout state signal
+            if (abs(current_coord) > boundary and
+                    current_occupancy >= acceptance_threshold):
+                signals.iloc[i] = 1
+
         return signals
         
     def generate_recursive_morphic_trend_signals(self, morphic_coordinates: pd.Series,
@@ -190,41 +183,45 @@ acceptance criteria, and rekey logic to identify potential trading opportunities
             n: Sigma state level
             
         Returns:
-            Signal series (1 for long, -1 for short, 0 for no signal)
+            Signal series (1 for entry, -1 for exit, 0 for no signal)
+
+        CAUSAL (R0.5.1 repair): entry is KNOWN at the +2-sigma CONFIRMATION bar
+        i+1, never backdated to the crossing bar i. The exit check uses a
+        trailing 3-bar window (already causal).
         """
         # Calculate sigma state boundary
         boundary = n * step
-        
+
         # Initialize signal series
         signals = pd.Series(0, index=morphic_coordinates.index)
-        
+        coords = morphic_coordinates.to_numpy(dtype=float)
+
         # Generate signals
-        for i in range(len(morphic_coordinates)):
-            current_coord = morphic_coordinates.iloc[i]
-            
-            # Check for entry signal
-            if (abs(current_coord) > boundary and 
-                (i == 0 or abs(morphic_coordinates.iloc[i-1]) <= boundary)):
-                
-                # Check for +2 sigma acceptance
-                if i + 1 < len(morphic_coordinates):
-                    next_coord = morphic_coordinates.iloc[i + 1]
-                    if abs(next_coord) > 2 * boundary:
-                        # +2 sigma accepted - generate signal
-                        signals.iloc[i] = 1
-                        
-            # Check for exit signal
-            elif (abs(current_coord) > boundary and 
-                  (i == 0 or abs(morphic_coordinates.iloc[i-1]) > boundary)):
-                
-                # Check if active rekey field fails
-                if i >= 5:  # Need at least 5 bars
-                    # Check if we've been above boundary for the last 3 bars
-                    above_count = sum(abs(morphic_coordinates.iloc[max(0, i - 2):i + 1]) > boundary)
-                    if above_count < 3:  # Less than 3 consecutive bars above boundary
-                        # Exit signal
-                        signals.iloc[i] = -1
-                        
+        for i in range(len(coords)):
+            current_coord = coords[i]
+            prev_coord = coords[i - 1] if i > 0 else 0.0
+            prev_prev = coords[i - 2] if i > 1 else 0.0
+
+            # Check for entry signal: crossing at bar i-1 (from inside the
+            # boundary to beyond it) confirmed by +2-sigma acceptance at bar i.
+            # The signal is KNOWN at the confirmation bar i, never backdated
+            # to the crossing bar i-1. A confirmed entry takes priority over a
+            # same-bar exit (no overwrite).
+            crossed_prev = (abs(prev_coord) > boundary and
+                            (i == 1 or abs(prev_prev) <= boundary))
+            if crossed_prev and abs(current_coord) > 2 * boundary:
+                signals.iloc[i] = 1
+                continue
+
+            # Check for exit signal: active rekey field fails (trailing 3-bar
+            # window, already causal).
+            exit_path = (abs(current_coord) > boundary and
+                         (i == 0 or abs(prev_coord) > boundary))
+            if exit_path and i >= 5:
+                above_count = sum(abs(coords[max(0, i - 2):i + 1]) > boundary)
+                if above_count < 3:  # Less than 3 consecutive bars above boundary
+                    signals.iloc[i] = -1
+
         return signals
         
     def generate_multi_timeframe_morphic_alignment_signals(self, morphic_coordinates_h1: pd.Series,
@@ -280,10 +277,13 @@ acceptance criteria, and rekey logic to identify potential trading opportunities
             # Get coordinates for this time
             h1_coord = morphic_coordinates_h1.iloc[i]
             d1_coord = morphic_coordinates_d1.iloc[i]
-            
-            # Calculate sigma states
-            h1_state = int(abs(h1_coord) // step_h1) if h1_coord != 0 else 0
-            d1_state = int(abs(d1_coord) // step_d1) if d1_coord != 0 else 0
+
+            # ROBUST (R0.5.1): NaN guard on int() conversions - warm-up NaN
+            # coordinates previously crashed with int(NaN). Logic conditions
+            # are UNTOUCHED (contradictions classified BLOCKED_LOGIC_SPEC in
+            # MVE_R05_1_MODEL_D_AUDIT.md).
+            h1_state = int(abs(h1_coord) // step_h1) if (not np.isnan(h1_coord) and h1_coord != 0) else 0
+            d1_state = int(abs(d1_coord) // step_d1) if (not np.isnan(d1_coord) and d1_coord != 0) else 0
             
             # Test candidate pullback-long regime
             # M_M > 0, M_W > +1, M_D < 0

@@ -43,12 +43,30 @@ hour's OHLC as knowable).
 - No component may mix its feature timestamp with a hypothetical execution
   timestamp.
 
-## Current known violations (blocked scientific stubs)
+## Execution contract (frozen, R0.5.1-J)
 
-| Component | Violation |
-|---|---|
-| `generate_sigma_escape_signals` (A) | signal at i gated by bar i+1's close — 1-bar backdate |
-| `generate_accepted_sigma_breakout_signals` (B) | signal at i decided by bar i+1 |
-| `generate_recursive_morphic_trend_signals` (C) | entry at i decided by bar i+1 |
+Every scientific signal declares exactly one of:
 
-Repair (when authorized): emit these signals at the confirmation bar i+1.
+| Convention | Meaning | Used by |
+|---|---|---|
+| `CLOSE_KNOWN` | signal becomes known after the current bar closes | Models B, C (exit), RKEY-A/C |
+| `NEXT_OPEN_EXECUTABLE` | signal known after bar close; hypothetical execution only on the next bar open | Models A, C (entry), B — the frozen execution convention for all repaired signals |
+| `INTRABAR_CAUSAL` | allowed only when the input itself is genuinely observable intrabar | none currently |
+
+Event timestamps and executable timestamps are NEVER mixed: a signal's
+`known_time` is where it appears in the series; execution is always >= the
+next bar open after `known_time`.
+
+## Repaired timings (R0.5.1)
+
+| Component | event_time | evidence_complete_time | known_time | action_time |
+|---|---|---|---|---|
+| Model A (escape) | crossing bar i | bar i+1 close | i+1 | >= i+1 close / next open |
+| Model B (breakout) | accepted-state bar i | bar i | i | >= i close / next open |
+| Model C (entry) | crossing bar i-1 | +2-sigma bar i | i | >= i close / next open |
+| Model C (exit) | trailing-window bar i | bar i | i | >= i close / next open |
+| RKEY-B | scan-origin bar i | retest bar j | j | j (anchor active) |
+
+All repaired timestamps are enforced by `MVE_SCIENTIFIC_EVENT_TIME_SCHEMA.json`
+and validated by `src/mve/causality.validate_scientific_event_times()` +
+`validate_rekey_events()`.
