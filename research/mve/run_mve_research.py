@@ -1151,31 +1151,82 @@ class MVEResearchRunner:
         return research_results
 
 
-def main():
+def main(argv=None):
     """
-    Main function to run the MVE research program.
+    Phase-isolated, fail-closed MVE orchestration entry point.
+
+    Examples:
+        python research/mve/run_mve_research.py --phase 4
+        python research/mve/run_mve_research.py --diagnostic --slice 2023-08-01,2023-08-31
+        python research/mve/run_mve_research.py --phase 5 --dry-run
     """
-    # Parse command line arguments
+    from mve import runner as mve_runner
+
     parser = argparse.ArgumentParser(description='Run CEREBUS Morphic Volatility Engine (MVE) Research')
-    parser.add_argument('--phases', nargs='+', help='List of phases to run (default: all phases)')
-    parser.add_argument('--config', help='Path to configuration file')
-    parser.add_argument('--output', help='Path to output directory')
-    
-    args = parser.parse_args()
-    
-    # Create research runner
-    runner = MVEResearchRunner(args.config)
-    
-    # Run research
-    if args.phases:
-        phases = args.phases
-    else:
-        phases = None
-        
-    research_results = runner.run(phases)
-    
-    # Return success
-    return 0
+    parser.add_argument('--phase', type=int, choices=[4, 5, 6, 7],
+                        help='Run exactly one phase (no auto-advance)')
+    parser.add_argument('--diagnostic', action='store_true',
+                        help='Run the NON_RESEARCH infrastructure diagnostic')
+    parser.add_argument('--dry-run', '--validate-only', action='store_true', dest='dry_run',
+                        help='Validate prerequisites without executing')
+    parser.add_argument('--output', default='results/mve',
+                        help='Output root directory (default: results/mve)')
+    parser.add_argument('--slice', default='2023-08-01,2024-12-31',
+                        help='Data slice START,END in UTC YYYY-MM-DD (default: development window)')
+    parser.add_argument('--seed', type=int, default=42,
+                        help='Deterministic seed (default: 42)')
+
+    args = parser.parse_args(argv)
+
+    if args.phase is None and not args.diagnostic:
+        parser.error('one of --phase or --diagnostic is required')
+    if args.phase is not None and args.diagnostic:
+        parser.error('--phase and --diagnostic are mutually exclusive')
+
+    parts = args.slice.split(',')
+    if len(parts) != 2:
+        parser.error('--slice must be START,END')
+    start, end = parts[0].strip(), parts[1].strip()
+
+    config = mve_runner.ResearchConfig(
+        task='phase' if args.phase is not None else 'diagnostic',
+        phase_id=args.phase,
+        asset='EURUSD',
+        timeframe='H1',
+        start=start,
+        end=end,
+        seed=args.seed,
+        output_root=args.output,
+        repo_root=_REPO_ROOT,
+    )
+
+    requested = f'PHASE{args.phase}' if args.phase is not None else 'DIAGNOSTIC'
+
+    if args.dry_run:
+        env_missing = mve_runner.check_environment_prereqs(_REPO_ROOT)
+        dep_missing = (
+            mve_runner.check_phase_dependencies(_REPO_ROOT, args.phase)
+            if args.phase is not None else []
+        )
+        print(f'[dry-run] requested={requested}')
+        print(f'[dry-run] config_hash={config.config_hash()}')
+        print(f'[dry-run] environment_prereqs_missing={env_missing or "none"}')
+        print(f'[dry-run] phase_dependencies_missing={dep_missing or "none"}')
+        print(f'[dry-run] scientific_status={mve_runner.PHASE_REGISTRY[args.phase]["scientific_status"] if args.phase else "N/A (diagnostic)"}')
+        return 0
+
+    try:
+        if args.diagnostic:
+            result = mve_runner.run_diagnostic(config)
+            print(f'[diagnostic] wrote {result["output_dir"]}')
+            print(f'[diagnostic] summary rows={result["summary"]["rows"]}')
+            return 0
+        mve_runner.execute_phase(config)
+        return 0
+    except mve_runner.RunnerError as exc:
+        print(f'[FAILED] {exc}')
+        return 1
+
 
 if __name__ == '__main__':
     sys.exit(main())

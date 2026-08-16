@@ -1,0 +1,29 @@
+{
+  "invalid_phase": {
+    "exit_code": 2,
+    "fail_closed": true,
+    "message": "usage: run_mve_research.py [-h] [--phase {4,5,6,7}] [--diagnostic] [--dry-run]\n                           [--output OUTPUT] [--slice SLICE] [--seed SEED]\nrun_mve_research.py: error: argument --phase: "
+  },
+  "missing_phase5_prerequisite": {
+    "exit_code": 1,
+    "fail_closed": true,
+    "message": "[FAILED] Phase 5 requires completed phase artifacts for: [4]"
+  },
+  "holdout_range_rejected": {
+    "exit_code": 1,
+    "fail_closed": true,
+    "message": "[FAILED] Diagnostic data error: Slice [2026-01-01, 2026-01-31] is outside authorized ranges [('2023-07-03', '2024-12-31'), ('2025-01-01', '2025-12-31')] (holdout status: FINAL_HOLDOUT_PENDING)"
+  },
+  "missing_canonical_data": {
+    "fail_closed": true,
+    "message": "Diagnostic prerequisites missing: ['canonical_data_pipeline (file missing)']"
+  },
+  "hash_mismatch": {
+    "fail_closed": true,
+    "message": "SHA-256 mismatch for quant-lab/data/EURUSDPRO_M5_2023_2026.csv: expected 0000000000000000000000000000000000000000000000000000000000000000, got 630b8a4052fe962bc7d87c6d49d83bc1524c7ddd83cd15e902fe504c9"
+  },
+  "stale_artifact_mismatch": {
+    "fail_closed": true,
+    "message": "Refusing to overwrite C:\\Users\\wifik\\AppData\\Local\\Temp\\tmp98bz14de: prior run config_hash hashA != requested hashB"
+  }
+}

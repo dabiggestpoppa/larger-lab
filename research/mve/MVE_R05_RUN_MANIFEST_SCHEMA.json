@@ -1,0 +1,29 @@
+{
+  "document": "RUN_MANIFEST.json",
+  "fields": {
+    "git_sha": {"type": "string(40)", "description": "full commit SHA at execution time"},
+    "branch": {"type": "string", "description": "current branch"},
+    "requested_phase": {"type": "string", "description": "PHASE4..PHASE7 or DIAGNOSTIC"},
+    "canonical_data_path": {"type": "string", "description": "frozen canonical dataset relative path"},
+    "canonical_sha256": {"type": "string(64)", "description": "frozen canonical SHA-256 (full)"},
+    "m5_row_count": {"type": "integer", "description": "loaded M5 row count"},
+    "h1_row_count": {"type": "integer", "description": "resampled H1 row count"},
+    "h1_fingerprint": {"type": "string", "description": "deterministic fingerprint of the H1 slice used"},
+    "slice_start": {"type": "string", "description": "inclusive slice start (UTC YYYY-MM-DD)"},
+    "slice_end": {"type": "string", "description": "inclusive slice end (UTC YYYY-MM-DD)"},
+    "config_hash": {"type": "string(64)", "description": "SHA-256 of the canonical serialized research config"},
+    "config": {"type": "object", "description": "the frozen ResearchConfig as a dict"},
+    "runner_version": {"type": "string", "description": "orchestration layer version"},
+    "runner_status": {"type": "string", "description": "INFRASTRUCTURE_ONLY during this checkpoint"},
+    "deterministic_seed": {"type": "integer", "description": "deterministic seed"},
+    "input_artifact_hashes": {"type": "object", "description": "map of input path -> SHA-256"},
+    "output_hashes": {"type": "object", "description": "map of output filename -> SHA-256"},
+    "execution_timestamp": {"type": "string", "description": "UTC ISO-8601 (excluded from determinism equivalence)"},
+    "holdout_status": {"type": "string", "description": "FINAL_HOLDOUT_PENDING"}
+  },
+  "rules": [
+    "No abbreviated hashes anywhere in machine-readable provenance.",
+    "output_hashes is attached by persist_run after artifacts are written.",
+    "execution_timestamp is the only field allowed to differ between deterministic reruns."
+  ]
+}

@@ -1,0 +1,1 @@
+{'label': 'NON_RESEARCH_INFRASTRUCTURE_DIAGNOSTIC', 'rows': 529, 'first_timestamp': '2023-08-01 00:00:00+00:00', 'last_timestamp': '2023-08-31 00:00:00+00:00', 'close_mean': 1.0912228355387525, 'close_std': 0.006453683049161747, 'volume_sum': 1093305, 'volume_field': 'tick_volume', 'components_instantiated': ['VolatilityEstimators', 'StructuralAnchors']}

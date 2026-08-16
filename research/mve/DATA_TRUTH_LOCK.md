@@ -79,8 +79,11 @@ See `MVE_DATA_ACCESS_LEDGER.csv` and `MVE_DATA_SPLIT_LOCK.json`.
 ## Runner status
 
 > **UPDATED (R0.5):** Commit 1 fixed import + two broken modules; Commit 2 wired
-> `_load_research_data()` to the real loader. Remaining blocker: result
-> persistence (print-only) — due for `MVE-R0.5-RUNNER-PERSISTENCE`.
+> `_load_research_data()` to the real loader; Commit 3 added phase-isolated
+> orchestration, prerequisite gates, and real result persistence
+> (`MVE-R0.5-RUNNER-PERSISTENCE`). Remaining: causality harness (next
+> checkpoint) and the scientific phase internals, which remain
+> `BLOCKED_SCIENTIFIC_IMPLEMENTATION`.
 
 - R0 finding (preserved): the runner crashed on import, two modules did not
   compile, loaded no real data, and wrote no results (see `MVE_RUNNER_AUDIT.md`).

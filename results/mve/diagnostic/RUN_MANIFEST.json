@@ -1,0 +1,38 @@
+{
+  "git_sha": "a3a5c81ce11ad3ae47b948dba7416b7a623eb9bc",
+  "branch": "cerebus-mve-implementation",
+  "requested_phase": "DIAGNOSTIC",
+  "canonical_data_path": "quant-lab/data/EURUSDPRO_M5_2023_2026.csv",
+  "canonical_sha256": "630b8a4052fe962bc7d87c6d49d83bc1524c7ddd83cd15e902fe504c998d3f77",
+  "m5_row_count": 216820,
+  "h1_row_count": 18089,
+  "h1_fingerprint": "b3736f8b62421575617f1fa61dcd015415488fdc7ddc3172d317d10a065ab645",
+  "slice_start": "2023-08-01",
+  "slice_end": "2023-08-31",
+  "config_hash": "84106ce77c730b74e4a9ec2a23b429832db41817c78820e32ee18aec04161766",
+  "config": {
+    "task": "diagnostic",
+    "phase_id": null,
+    "asset": "EURUSD",
+    "timeframe": "H1",
+    "start": "2023-08-01",
+    "end": "2023-08-31",
+    "seed": 42,
+    "output_root": "results/mve",
+    "repo_root": "C:\\Users\\wifik\\Desktop\\projects\\larger-lab-mve-r0"
+  },
+  "runner_version": "0.5.0",
+  "runner_status": "INFRASTRUCTURE_ONLY",
+  "deterministic_seed": 42,
+  "input_artifact_hashes": {
+    "quant-lab/data/EURUSDPRO_M5_2023_2026.csv": "630b8a4052fe962bc7d87c6d49d83bc1524c7ddd83cd15e902fe504c998d3f77"
+  },
+  "execution_timestamp": "2026-08-16T00:51:09.826564+00:00",
+  "holdout_status": "FINAL_HOLDOUT_PENDING",
+  "output_label": "NON_RESEARCH_INFRASTRUCTURE_DIAGNOSTIC",
+  "output_hashes": {
+    "DIAGNOSTIC_OHLCV.csv": "fb53fc979cb5f904092f3f87b246649a163b521a79b27c69ba7124d05e524e77",
+    "DIAGNOSTIC_SUMMARY.json": "83d60f41061084c9655d1ea5e8599398d9db607cda47e3c64b2e56d0a0d2d532",
+    "DIAGNOSTIC_SUMMARY.md": "4d701687ab9251536c72b551f4e43de9791f467baa1b5ed5bf4af54f20809eb0"
+  }
+}

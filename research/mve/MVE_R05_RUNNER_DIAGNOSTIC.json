@@ -1,0 +1,26 @@
+{
+  "label": "NON_RESEARCH_INFRASTRUCTURE_DIAGNOSTIC",
+  "summary": {
+    "label": "NON_RESEARCH_INFRASTRUCTURE_DIAGNOSTIC",
+    "rows": 529,
+    "first_timestamp": "2023-08-01 00:00:00+00:00",
+    "last_timestamp": "2023-08-31 00:00:00+00:00",
+    "close_mean": 1.0912228355387525,
+    "close_std": 0.006453683049161747,
+    "volume_sum": 1093305,
+    "volume_field": "tick_volume",
+    "components_instantiated": [
+      "VolatilityEstimators",
+      "StructuralAnchors"
+    ]
+  },
+  "output_dir": "results/mve/diagnostic",
+  "output_hashes": {
+    "DIAGNOSTIC_OHLCV.csv": "fb53fc979cb5f904092f3f87b246649a163b521a79b27c69ba7124d05e524e77",
+    "DIAGNOSTIC_SUMMARY.json": "83d60f41061084c9655d1ea5e8599398d9db607cda47e3c64b2e56d0a0d2d532",
+    "DIAGNOSTIC_SUMMARY.md": "4d701687ab9251536c72b551f4e43de9791f467baa1b5ed5bf4af54f20809eb0",
+    "RUN_MANIFEST.json": "bb425622019464a89b05676b3a72980ce8386a31bf3866ff380f5688ad120114"
+  },
+  "git_sha": "a3a5c81ce11ad3ae47b948dba7416b7a623eb9bc",
+  "branch": "cerebus-mve-implementation"
+}

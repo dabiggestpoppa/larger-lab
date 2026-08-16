@@ -1,0 +1,55 @@
+{
+  "4": {
+    "name": "PHASE4_ACCEPTANCE",
+    "title": "Causal acceptance law",
+    "dependencies": [],
+    "environment_prereqs": [
+      "canonical_data_pipeline",
+      "valid_h1_dataset"
+    ],
+    "output_dir": "results/mve/phase4",
+    "scientific_status": "BLOCKED_SCIENTIFIC_IMPLEMENTATION"
+  },
+  "5": {
+    "name": "PHASE5_REGIME_TRANSITIONS",
+    "title": "Transition law / constraint entropy",
+    "dependencies": [
+      4
+    ],
+    "environment_prereqs": [
+      "canonical_data_pipeline",
+      "valid_h1_dataset"
+    ],
+    "output_dir": "results/mve/phase5",
+    "scientific_status": "BLOCKED_SCIENTIFIC_IMPLEMENTATION"
+  },
+  "6": {
+    "name": "PHASE6_REKEY",
+    "title": "Rekey / recursive constraint law",
+    "dependencies": [
+      4,
+      5
+    ],
+    "environment_prereqs": [
+      "canonical_data_pipeline",
+      "valid_h1_dataset"
+    ],
+    "output_dir": "results/mve/phase6",
+    "scientific_status": "BLOCKED_SCIENTIFIC_IMPLEMENTATION"
+  },
+  "7": {
+    "name": "PHASE7_BASELINE_COMPARISON",
+    "title": "Baseline falsification",
+    "dependencies": [
+      4,
+      5,
+      6
+    ],
+    "environment_prereqs": [
+      "canonical_data_pipeline",
+      "valid_h1_dataset"
+    ],
+    "output_dir": "results/mve/phase7",
+    "scientific_status": "BLOCKED_SCIENTIFIC_IMPLEMENTATION"
+  }
+}

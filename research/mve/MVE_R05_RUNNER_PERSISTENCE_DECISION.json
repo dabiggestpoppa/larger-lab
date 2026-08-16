@@ -1,0 +1,35 @@
+{
+  "gate": "MVE-R0.5-RUNNER-PERSISTENCE",
+  "runner_persistence_pass": true,
+  "decision_timestamp": "2026-08-15T00:00:00Z",
+  "head": "a3a5c81ce11ad3ae47b948dba7416b7a623eb9bc",
+  "conditions": {
+    "phase_isolated_cli_works": true,
+    "prerequisites_fail_closed": true,
+    "no_auto_advance_occurs": true,
+    "outputs_persist": true,
+    "outputs_nonempty": true,
+    "manifests_include_complete_provenance": true,
+    "artifact_hashes_verified": true,
+    "deterministic_reruns_match": true,
+    "failure_mode_tests_pass": true,
+    "holdout_status_truthful": true
+  },
+  "test_count": 38,
+  "cli_examples": [
+    "python research/mve/run_mve_research.py --phase 4",
+    "python research/mve/run_mve_research.py --phase 5 --dry-run",
+    "python research/mve/run_mve_research.py --diagnostic --slice 2023-08-01,2023-08-31"
+  ],
+  "diagnostic_artifact_paths": [
+    "results/mve/diagnostic/DIAGNOSTIC_OHLCV.csv",
+    "results/mve/diagnostic/DIAGNOSTIC_SUMMARY.json",
+    "results/mve/diagnostic/DIAGNOSTIC_SUMMARY.md",
+    "results/mve/diagnostic/RUN_MANIFEST.json"
+  ],
+  "unresolved_scientific_gaps": [
+    "Phases 4-7 are BLOCKED_SCIENTIFIC_IMPLEMENTATION: their internals (morphic coordinates, occupancy, acceptance, rekey, baselines) are not implemented and refuse to execute.",
+    "The runner's legacy phase methods call helper functions that do not exist; they are bypassed, not fabricated."
+  ],
+  "next": "STOP for human review. Next authorized checkpoint: MVE-R0.5-CAUSALITY-GATE."
+}
