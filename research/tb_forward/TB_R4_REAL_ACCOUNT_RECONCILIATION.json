@@ -1,0 +1,57 @@
+{
+  "status": "CONNECTED",
+  "positions_total": 0,
+  "tb_magic_positions": 0,
+  "foreign_positions_protected": 0,
+  "pending_orders_total": 0,
+  "tb_magic_pending_orders": 0,
+  "history_last_7d_orders": 2,
+  "history_last_7d_deals": 3,
+  "tb_positions": [],
+  "foreign_positions": [],
+  "history_sample": {
+    "orders": [
+      {
+        "ticket": 11831384,
+        "symbol": "BTCUSD",
+        "magic": 20260531,
+        "type": 2,
+        "state": 4
+      },
+      {
+        "ticket": 11831402,
+        "symbol": "BTCUSD",
+        "magic": 20260531,
+        "type": 1,
+        "state": 4
+      }
+    ],
+    "deals": [
+      {
+        "ticket": 9445145,
+        "order": 11831384,
+        "symbol": "BTCUSD",
+        "magic": 20260531,
+        "type": 0,
+        "volume": 0.03
+      },
+      {
+        "ticket": 9445146,
+        "order": 11831402,
+        "symbol": "BTCUSD",
+        "magic": 20260531,
+        "type": 1,
+        "volume": 0.03
+      },
+      {
+        "ticket": 9553826,
+        "order": 0,
+        "symbol": "",
+        "magic": 0,
+        "type": 2,
+        "volume": 0.0
+      }
+    ]
+  },
+  "ownership_rule": "positions only TB-owned via magic 31082026 + linkage; foreign/magic-mismatch positions never touched"
+}

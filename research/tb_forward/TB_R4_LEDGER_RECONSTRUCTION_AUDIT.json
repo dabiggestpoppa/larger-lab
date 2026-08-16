@@ -1,0 +1,27 @@
+{
+  "checkpoint": "TB-R4-REAL-MT5-FULL-ENGINE-SHADOW-SEAL",
+  "method": "After the full 265,809-bar integrated PRIMARY replay, a FRESH BasketLedger object reconstructs every basket solely from the durable append-only records (no in-memory harness state), mirroring a process restart.",
+  "ledger_events_total": 2594,
+  "baskets_reconstructed": 194,
+  "reconstructed_terminal_states": {
+    "CLOSED_VERIFIED": 194,
+    "OPEN_VERIFIED": 0,
+    "NO_BASKET": 0,
+    "BLOCKED_UNKNOWN_STATE": 0,
+    "BROKEN_HEDGE": 0
+  },
+  "reconstructs_strategy_event": true,
+  "reconstructs_direction": true,
+  "reconstructs_weights": true,
+  "reconstructs_lot_translation": true,
+  "reconstructs_ticket_linkage": true,
+  "reconstructs_exit_reason": true,
+  "integrity_problems": [],
+  "pass": true,
+  "evidence": {
+    "per_basket_events": "SIGNAL_OBSERVED -> BASKET_INTENT_CREATED -> ENTRY_ATTEMPT_STARTED -> LEG_FILL_CONFIRMED x3 -> BASKET_OPEN_VERIFIED -> EXIT_SIGNAL_OBSERVED -> EXIT_ATTEMPT_STARTED -> BASKET_CLOSED_VERIFIED",
+    "r3_durable_only_test": "R3 test reconstruction_solely_from_durable_records (40/40 suite) proves reconstruction from durable records alone",
+    "write_ahead": "BASKET_INTENT_CREATED persisted BEFORE any execution; ENTRY_ATTEMPT_STARTED before broker action; EXIT_SIGNAL_OBSERVED before close attempt"
+  },
+  "note": "open_verified_at_terminal = 0 because all 194 baskets completed their lifecycle to CLOSED_VERIFIED; 194 BASKET_OPEN_VERIFIED events exist in the ledger."
+}

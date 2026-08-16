@@ -1,0 +1,12 @@
+{
+  "bars_replayed": 50000,
+  "bars_emitted": 50000,
+  "ledger_events": 451,
+  "primary_opens": 50,
+  "integrity_clean": true,
+  "open_db_handles": 1,
+  "peak_memory_bytes": 407957704,
+  "current_memory_bytes": 406112867,
+  "engine_buffer_size": 400,
+  "basis_history_size": 400
+}

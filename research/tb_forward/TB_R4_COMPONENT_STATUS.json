@@ -1,0 +1,33 @@
+{
+  "checkpoint": "TB-R4-REAL-MT5-FULL-ENGINE-SHADOW-SEAL",
+  "base_commit": "4685d7f0ec66d64d3e44739b5aee650b2e803604",
+  "components": {
+    "strategy_wrapper": "ADOPTED",
+    "normalization_engine": "ADOPTED",
+    "weight_engine": "ADOPTED",
+    "execution_contract": "ADOPTED",
+    "atomic_execution_layer": "ADOPTED",
+    "market_data_layer": "ADOPTED",
+    "persistence_layer": "ADOPTED",
+    "broker_metadata_layer": "ADOPTED",
+    "session_time_layer": "ADOPTED",
+    "parity_harness": "ADOPTED",
+    "execution_safety": "FAIL_CLOSED"
+  },
+  "r4_additions": {
+    "real_mt5_read_layer": "ADOPTED (R2 MT5MarketDataAdapter exercised against the real terminal; numpy structured-array support added)",
+    "full_engine_harness": "ADOPTED (integrated replay harness)",
+    "shadow_forward_seal": "READY (engine frozen; demo/live remain unauthorized)"
+  },
+  "pending": {
+    "broker_partial_fill_validation": "PENDING_DEMO_EXECUTION_VALIDATION",
+    "broker_fill_mode_validation": "PENDING_DEMO_EXECUTION_VALIDATION",
+    "broker_slippage_validation": "PENDING_DEMO_EXECUTION_VALIDATION",
+    "broker_atomic_close_validation": "PENDING_DEMO_EXECUTION_VALIDATION"
+  },
+  "authorization": {
+    "execution_authorization": "NOT_AUTHORIZED",
+    "demo_authorized": false,
+    "live_authorized": false
+  }
+}

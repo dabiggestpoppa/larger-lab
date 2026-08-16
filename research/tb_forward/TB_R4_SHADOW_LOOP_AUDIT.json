@@ -1,0 +1,102 @@
+{
+  "status": "CONNECTED",
+  "cycles": [
+    {
+      "cycle": 1,
+      "ref_utc": "2026-08-16 16:41:44.116329+00:00",
+      "signal_valid": false,
+      "failure_code": "STALE_SIGNAL_BAR",
+      "selected_bar_close": null,
+      "execution_valid": false
+    },
+    {
+      "cycle": 2,
+      "ref_utc": "2026-08-16 16:41:48.121285+00:00",
+      "signal_valid": false,
+      "failure_code": "STALE_SIGNAL_BAR",
+      "selected_bar_close": null,
+      "execution_valid": false
+    },
+    {
+      "cycle": 3,
+      "ref_utc": "2026-08-16 16:41:52.122719+00:00",
+      "signal_valid": false,
+      "failure_code": "STALE_SIGNAL_BAR",
+      "selected_bar_close": null,
+      "execution_valid": false
+    },
+    {
+      "cycle": 4,
+      "ref_utc": "2026-08-16 16:41:56.124382+00:00",
+      "signal_valid": false,
+      "failure_code": "STALE_SIGNAL_BAR",
+      "selected_bar_close": null,
+      "execution_valid": false
+    },
+    {
+      "cycle": 5,
+      "ref_utc": "2026-08-16 16:42:00.125935+00:00",
+      "signal_valid": false,
+      "failure_code": "STALE_SIGNAL_BAR",
+      "selected_bar_close": null,
+      "execution_valid": false
+    },
+    {
+      "cycle": 6,
+      "ref_utc": "2026-08-16 16:42:04.127234+00:00",
+      "signal_valid": false,
+      "failure_code": "STALE_SIGNAL_BAR",
+      "selected_bar_close": null,
+      "execution_valid": false
+    },
+    {
+      "cycle": 7,
+      "ref_utc": "2026-08-16 16:42:08.129117+00:00",
+      "signal_valid": false,
+      "failure_code": "STALE_SIGNAL_BAR",
+      "selected_bar_close": null,
+      "execution_valid": false
+    },
+    {
+      "cycle": 8,
+      "ref_utc": "2026-08-16 16:42:12.130259+00:00",
+      "signal_valid": false,
+      "failure_code": "STALE_SIGNAL_BAR",
+      "selected_bar_close": null,
+      "execution_valid": false
+    },
+    {
+      "cycle": 9,
+      "ref_utc": "2026-08-16 16:42:16.131563+00:00",
+      "signal_valid": false,
+      "failure_code": "STALE_SIGNAL_BAR",
+      "selected_bar_close": null,
+      "execution_valid": false
+    },
+    {
+      "cycle": 10,
+      "ref_utc": "2026-08-16 16:42:20.133466+00:00",
+      "signal_valid": false,
+      "failure_code": "STALE_SIGNAL_BAR",
+      "selected_bar_close": null,
+      "execution_valid": false
+    }
+  ],
+  "valid_snapshots": 0,
+  "sync_failures": [
+    "STALE_SIGNAL_BAR",
+    "STALE_SIGNAL_BAR",
+    "STALE_SIGNAL_BAR",
+    "STALE_SIGNAL_BAR",
+    "STALE_SIGNAL_BAR",
+    "STALE_SIGNAL_BAR",
+    "STALE_SIGNAL_BAR",
+    "STALE_SIGNAL_BAR",
+    "STALE_SIGNAL_BAR",
+    "STALE_SIGNAL_BAR"
+  ],
+  "shadow_order_would_send_total": 0,
+  "order_send_attempts": 0,
+  "ledger_events": 0,
+  "ledger_integrity_problems": []
+}

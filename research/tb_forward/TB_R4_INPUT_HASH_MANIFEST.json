@@ -1,0 +1,27 @@
+{
+  "checkpoint": "TB-R4-REAL-MT5-FULL-ENGINE-SHADOW-SEAL",
+  "base_commit": "4685d7f0ec66d64d3e44739b5aee650b2e803604",
+  "hash_algorithm": "sha256 (first 16 hex chars of the blob at base commit)",
+  "inputs": {
+    "canonical_m5_gbpaud": {"path": "quant-lab/data/GBPAUD_M5.csv", "sha256_prefix": "cedf3453bcbffde0"},
+    "canonical_m5_gbpnzd": {"path": "quant-lab/data/GBPNZD_M5.csv", "sha256_prefix": "9e421aa1310a41b5"},
+    "canonical_m5_audnzd": {"path": "quant-lab/data/AUDNZD_PRO_M5.csv", "sha256_prefix": "8a0f08e34853b27d"},
+    "r0_truth_lock": {"path": "research/tb_forward/TB_FORWARD_TRUTH_LOCK.json", "sha256_prefix": "0821c20d7c736eb8"},
+    "r1_1_forward_config": {"path": "quant-lab/engines/tb_forward_config.py", "sha256_prefix": "f90883bf1e4b83de"},
+    "r1_1_strategy_wrapper": {"path": "quant-lab/engines/triangular_basis_live.py", "sha256_prefix": "bb2afa36d3fadbce"},
+    "execution_contract": {"path": "quant-lab/engines/triangular_execution_contract.py", "sha256_prefix": "1123bdc81caddc07"},
+    "atomic_execution_layer": {"path": "quant-lab/mt5/triangular_execution_layer.py", "sha256_prefix": "4f07eefa36411a01"},
+    "forward_executor": {"path": "quant-lab/mt5/triangular_basis_executor.py", "sha256_prefix": "a1db28d1c35cbe6a"},
+    "r2_market_data_contract": {"path": "quant-lab/tb_live/market_data.py", "sha256_prefix": "9f3f874b3d50861f"},
+    "r2_market_data_adapter": {"path": "quant-lab/tb_live/snapshot.py", "sha256_prefix": "eb35b7cb7bb4e26a"},
+    "r3_state_machine": {"path": "quant-lab/tb_live/state_machine.py", "sha256_prefix": "c44c5721792c652a"},
+    "r3_persistence_ledger": {"path": "quant-lab/tb_live/persistence.py", "sha256_prefix": "7afc47e6c4a7486c"},
+    "r3_reconciliation": {"path": "quant-lab/tb_live/reconciliation.py", "sha256_prefix": "7ff236b4c2daba60"}
+  },
+  "r4_new_modules": {
+    "full_engine_harness": "quant-lab/tb_live/full_engine.py (new, committed with this checkpoint)",
+    "integrated_replay_harness": "quant-lab/engines/tb_r4_replay.py (new, committed with this checkpoint)",
+    "real_mt5_audit_harness": "quant-lab/engines/tb_r4_real_mt5.py (new, committed with this checkpoint)"
+  },
+  "note": "R4 adds no scientific inputs; all strategy inputs above are byte-identical to the R3 base. The only adopted-file modification is snapshot.py (numpy structured-array support for real MT5 copy_rates); R2 tests (26/26) and the integrated replay (194/405 exact) prove no behavioral drift."
+}

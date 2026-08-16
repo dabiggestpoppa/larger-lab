@@ -1,0 +1,32 @@
+{
+  "primary": {
+    "expected": 194,
+    "actual": 194,
+    "opens": 194,
+    "closes": 194,
+    "canonical": 194,
+    "entry_mismatches": 0,
+    "direction_mismatches": 0,
+    "exit_mismatches": 0,
+    "reason_mismatches": 0,
+    "weight_mismatches": 0,
+    "max_z_diff": 1e-12,
+    "bars_emitted": 265809,
+    "bars_skipped": 1,
+    "parity_pass": true
+  },
+  "control": {
+    "expected": 405,
+    "actual": 405,
+    "canonical": 405,
+    "entry_mismatches": 0,
+    "direction_mismatches": 0,
+    "exit_mismatches": 0,
+    "reason_mismatches": 0,
+    "weight_mismatches": 0,
+    "bars_emitted": 265809,
+    "bars_skipped": 1,
+    "parity_pass": true
+  },
+  "parity_pass": true
+}

@@ -130,6 +130,13 @@ class MT5MarketDataAdapter:
         return None
 
     def _to_closed_bar(self, symbol: str, raw) -> ClosedBar:
+        # raw is either a dict (mock adapter) or a numpy structured-array
+        # record (real MT5 copy_rates_from_pos). Support both.
+        if hasattr(raw, "get"):
+            volume = float(raw.get("real_volume", raw.get("tick_volume", 0)))
+        else:
+            names = set(raw.dtype.names or [])
+            volume = float(raw["tick_volume"] if "tick_volume" in names else 0.0)
         t = datetime.utcfromtimestamp(raw["time"]).replace(tzinfo=timezone.utc)
         return ClosedBar(
             symbol=symbol,
@@ -139,7 +146,7 @@ class MT5MarketDataAdapter:
             high=float(raw["high"]),
             low=float(raw["low"]),
             close=float(raw["close"]),
-            volume=float(raw.get("real_volume", raw.get("tick_volume", 0))),
+            volume=volume,
             source_timestamp=t,
             is_closed=True,
             bar_id=f"{symbol}:{int(raw['time'])}",

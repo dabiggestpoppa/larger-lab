@@ -1,0 +1,62 @@
+{
+  "checkpoint": "TB-R4-REAL-MT5-FULL-ENGINE-SHADOW-SEAL",
+  "status": "PASS",
+  "base_commit": "4685d7f0ec66d64d3e44739b5aee650b2e803604",
+
+  "real_mt5_connected": true,
+  "real_broker_verified": true,
+  "real_account_environment_verified": true,
+  "real_symbol_resolution_pass": true,
+  "real_symbol_specs_pass": true,
+  "real_m5_feed_pass": true,
+  "real_closed_bar_sync_pass": true,
+  "real_tick_feed_pass": true,
+  "real_quote_quality_measured": true,
+  "real_lot_translation_pass": true,
+  "real_broker_reconciliation_readonly_pass": true,
+
+  "historical_parity_pass": true,
+  "primary_event_count": 194,
+  "control_event_count": 405,
+  "primary_lifecycle_mismatches": 0,
+  "control_lifecycle_mismatches": 0,
+
+  "ledger_pass": true,
+  "restart_reconciliation_pass": true,
+  "control_isolation_pass": true,
+  "order_send_guard_pass": true,
+
+  "broker_partial_fill_validation": "PENDING_DEMO_EXECUTION_VALIDATION",
+  "broker_fill_mode_validation": "PENDING_DEMO_EXECUTION_VALIDATION",
+  "broker_slippage_validation": "PENDING_DEMO_EXECUTION_VALIDATION",
+  "broker_atomic_close_validation": "PENDING_DEMO_EXECUTION_VALIDATION",
+
+  "strategy_math_changed": false,
+  "weighting_changed": false,
+  "market_data_semantics_changed": false,
+  "session_semantics_changed": false,
+
+  "execution_authorization": "NOT_AUTHORIZED",
+  "demo_authorized": false,
+  "live_authorized": false,
+
+  "shadow_forward_seal_ready": true,
+  "human_review_required": true,
+  "next_checkpoint_recommended": "TB-R5-SHADOW-FORWARD-SEAL",
+
+  "real_environment": {
+    "terminal": "Ox Securities MetaTrader 5",
+    "server": "OxSecurities-Demo",
+    "account_type": "DEMO",
+    "account_currency": "USD",
+    "resolved_symbols": ["GBPAUD.PRO", "GBPNZD.PRO", "AUDNZD.PRO"]
+  },
+  "scientific_changes": "NONE",
+  "honest_notes": [
+    "Real-terminal evidence captured on a closed market weekend: all 10 shadow cycles fail-closed with STALE_SIGNAL_BAR (no new M5 since Friday) -- the expected safe behavior, not a defect.",
+    "Tick/spread/skew distributions are a static closed-market sample; live-market distributions are PENDING_TERMINAL_VALIDATION during active hours.",
+    "CLASS-B broker execution behavior (partial fills, fill modes, slippage, atomic close) is CODE-PATH VERIFIED in simulation only and marked PENDING_DEMO_EXECUTION_VALIDATION.",
+    "Snapshot.py (adopted R2) gained numpy structured-array support to read real MT5 copy_rates; R2 26/26 + integrated replay 194/405 exact prove no drift.",
+    "Prior-art tb_live_exec_sim.py fails at the R3 base with an AttributeError (ExposureSummary fields renamed in an older refactor) -- pre-existing, untouched by R4, not part of the R4 seal."
+  ]
+}

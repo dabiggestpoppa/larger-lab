@@ -1,0 +1,18 @@
+{
+  "status": "CONNECTED",
+  "terminal_connected": true,
+  "terminal_name": "Ox Securities MetaTrader 5",
+  "broker_company": "Ox Securities Pty Ltd",
+  "server": "OxSecurities-Demo",
+  "account_login_masked": "11***12",
+  "account_currency": "USD",
+  "account_trade_mode": 0,
+  "account_type": "DEMO",
+  "leverage": 500,
+  "balance": 25281.28,
+  "equity": 25281.28,
+  "margin": 0.0,
+  "trade_allowed": true,
+  "terminal_trade_allowed": true,
+  "tradeapi_disabled": false
+}

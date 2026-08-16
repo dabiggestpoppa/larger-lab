@@ -1,0 +1,27 @@
+ledger_reconstructed_state,broker_state,reconciliation_classification,allowed_next_action,blocked_flag,verified_by
+NO_BASKET,FLAT,FLAT_MATCH,normal strategy processing,false,R3 crash_restart_while_flat / reconciliation_case_matrix_a_through_n (A)
+NO_BASKET,3 TB-magic legs w/ linkage,ORPHAN_BASKET_DETECTED,no new entry until reconciled,true,R3 orphan_broker_basket_detected (H)
+NO_BASKET,foreign magic positions,IGNORED_PROTECTED,normal strategy processing; foreign untouched,false,R3 extra_unknown_broker_leg_protected / reconciliation_case_matrix (I)
+SIGNAL_DETECTED,FLAT,LOCAL_ONLY,persist intent then normal entry path,false,R3 crash_before_order_attempt (C)
+INTENT_CREATED,FLAT,LOCAL_ONLY,entry attempt may proceed (write-ahead durable),false,R3 write_ahead_intent_persisted_before_action / crash_before_order_attempt
+ENTRY_SUBMITTING,FLAT,LOCAL_ONLY,re-attempt entry per execution contract,false,R3 crash_before_order_attempt (C)
+ENTRY_SUBMITTING,1 owned leg,PARTIAL_BASKET -> BROKEN_HEDGE,classify + block (no auto flatten outside mock),true,R3 crash_after_leg1_broker_ack (D)
+ENTRY_SUBMITTING,2 owned legs,PARTIAL_BASKET -> BROKEN_HEDGE,classify + block (no auto flatten outside mock),true,R3 crash_after_leg2_broker_ack (E)
+ENTRY_SUBMITTING,3 exact owned legs,OPEN_RESTORED -> OPEN_VERIFIED,resume open lifecycle,false,R3 crash_after_leg3_broker_ack_before_open_verify (F)
+PARTIALLY_FILLED,1/2 owned legs,BROKEN_HEDGE,classify + block (mock flatten verified; broker flatten PENDING_DEMO),true,R3 crash_after_leg1/leg2_broker_ack / R4 failure injection 8/8
+PARTIALLY_FILLED,3 exact owned legs,OPEN_RESTORED -> OPEN_VERIFIED,resume open lifecycle,false,R3 crash_after_leg3_broker_ack_before_open_verify
+OPEN_VERIFIED,3 exact owned legs,OPEN_MATCH,normal exit processing,false,R3 crash_restart_while_fully_open (B)
+OPEN_VERIFIED,2 owned legs,MANUAL_INTERVENTION_DETECTED,block basket automation,true,R3 manual_leg_close_detected (G-variant)
+OPEN_VERIFIED,0 legs (flat),BROKER_FLAT_LOCAL_OPEN,BROKEN_HEDGE / reconcile before exit intent,true,R3 local_closed_but_broker_has_legs_blocks (G)
+CLOSE_REQUESTED,3 owned legs,EXIT_PENDING,close attempt may proceed,false,R3 crash_during_close_leg1/leg2 (F-series)
+CLOSE_SUBMITTING,3 owned legs,EXIT_PENDING,close attempt may proceed,false,R3 crash_during_close_leg1/leg2
+CLOSE_SUBMITTING,1/2 owned legs,PARTIAL_CLOSED,classify + block (mock close verified; broker PENDING_DEMO),true,R3 crash_during_close_leg1/leg2
+CLOSE_SUBMITTING,0 legs (flat),CLOSED_RESTORED -> CLOSED_VERIFIED,resume flat lifecycle,false,R3 broker_already_flat_after_close (F)
+PARTIALLY_CLOSED,0 legs (flat),CLOSED_RESTORED -> CLOSED_VERIFIED,resume flat lifecycle,false,R3 broker_already_flat_after_close
+PARTIALLY_CLOSED,1/2 owned legs,BROKEN_HEDGE,classify + block,true,R3 crash_during_close_leg1/leg2
+BROKEN_HEDGE,owned partial legs,BROKEN_HEDGE,block; recovery intent only in mock,true,R3 reconciliation_case_matrix / R4 failure injection
+FLATTENING,owned partial legs,BROKEN_HEDGE,block; mock flatten verified,true,R3 crash_after_leg1/leg2_broker_ack
+FLAT_VERIFIED,FLAT,FLAT_MATCH,normal strategy processing,false,R3 crash_restart_while_flat / crash_after_leg1_broker_ack
+CLOSED_VERIFIED,FLAT,FLAT_MATCH,normal strategy processing (re-entry allowed),false,R3 broker_already_flat_after_close / append_after_close_reentry
+RECONCILIATION_REQUIRED,any,MISMATCH,block until explicit reconciliation,true,R3 local_closed_but_broker_has_legs_blocks / broker_local_mismatch
+BLOCKED_UNKNOWN_STATE,any,UNKNOWN,block forever (no normal continuation),true,R3 ledger_corrupt_db_fails_closed / invalid_transition_persisted_blocks_integrity / schema_version_mismatch_blocks

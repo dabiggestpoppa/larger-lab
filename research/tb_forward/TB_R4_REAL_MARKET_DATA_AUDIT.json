@@ -1,0 +1,25 @@
+{
+  "status": "CONNECTED",
+  "bars_requested_per_leg": 200,
+  "bars_returned_per_leg": {
+    "GBPAUD": 200,
+    "GBPNZD": 200,
+    "AUDNZD": 200
+  },
+  "timestamp_semantics": "OPEN_TIME",
+  "timeframe_seconds": 300,
+  "last_bar_each_leg": {
+    "GBPAUD": "2026-08-14 23:50:00+00:00",
+    "GBPNZD": "2026-08-14 23:50:00+00:00",
+    "AUDNZD": "2026-08-14 23:50:00+00:00"
+  },
+  "forming_bar_each_leg": {
+    "GBPAUD": "2026-08-14 23:50:00+00:00",
+    "GBPNZD": "2026-08-14 23:50:00+00:00",
+    "AUDNZD": "2026-08-14 23:50:00+00:00"
+  },
+  "common_closed_count": 200,
+  "last_common_closed_open_time": "2026-08-14 23:50:00+00:00",
+  "three_leg_sync_now": true,
+  "gap_seconds_between_leg_last_bars": 0.0
+}

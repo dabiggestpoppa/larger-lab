@@ -1,0 +1,28 @@
+{
+  "checkpoint": "TB-R4-REAL-MT5-FULL-ENGINE-SHADOW-SEAL",
+  "execution_authorization": "NOT_AUTHORIZED",
+  "real_order_send_calls": 0,
+  "evidence": {
+    "real_terminal_guard": {
+      "mechanism": "tb_r4_real_mt5.py install_order_send_guard() wraps mt5.order_send; ANY invocation raises AssertionError and fails the run",
+      "attempts_during_shadow_loop": 0,
+      "restore": "the real function is restored in shutdown()"
+    },
+    "static_scan": {
+      "full_engine_harness": "no MetaTrader5 import, no order_send call sites; atomic layer driven through MockExecutionLayer subclass",
+      "replay_harness": "no MetaTrader5 import, no order_send call sites",
+      "persistence_modules": "no order_send call sites (R3 zero_orders_in_persistence_path test)",
+      "adapter": "MT5MarketDataAdapter exposes bars/ticks/symbol_info/positions reads only; no order functions by construction (R2)"
+    },
+    "mock_engine_orders": "1164 simulated sends (194 opens + 194 closes x 3 legs) routed through the FakeBroker in-process; these are NOT mt5.order_send and cannot reach any broker",
+    "r3_test": "executor_shadow_loop_writes_ledger_and_never_orders + zero_orders_in_persistence_path",
+    "fresh_valid_state": "R4 replay proves fresh signal + fresh ticks + valid weights + valid intent still results in ZERO broker orders (guard + shadow-only paths)"
+  },
+  "demo_live_unreachable": {
+    "demo_authorized": false,
+    "live_authorized": false,
+    "mode_strings": ["trade", "live", "demo", "production", "real"],
+    "note": "none of these strings can enable execution in R4; the R1.1 default mode is SHADOW and unknown modes fail closed"
+  },
+  "pass": true
+}

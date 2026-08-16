@@ -1,0 +1,10 @@
+{
+  "open_events": 194,
+  "close_events": 194,
+  "executed_results": 388,
+  "order_send_calls": 1164,
+  "open_verified_persisted": 0,
+  "closed_verified_persisted": 194,
+  "no_basket_terminal": 194,
+  "runtime_seconds": 118.2
+}

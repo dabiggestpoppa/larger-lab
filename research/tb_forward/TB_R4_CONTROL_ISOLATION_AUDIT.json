@@ -1,0 +1,21 @@
+{
+  "checkpoint": "TB-R4-REAL-MT5-FULL-ENGINE-SHADOW-SEAL",
+  "control_model": "TB-FROZEN-CONTROL (entry |z|>2.5, exit z=0)",
+  "control_role": "shadow-only, non-executing, observation benchmark",
+  "control_events_full_replay": 405,
+  "control_open_events_full_replay": 405,
+  "control_close_events_full_replay": 405,
+  "broker_intents_created_by_control": 0,
+  "broker_orders_sent_by_control": 0,
+  "broker_positions_opened_by_control": 0,
+  "primary_state_mutations_by_control": 0,
+  "ledger_stream": "CONTROL_SIGNAL_OBSERVED only (separate dedup namespace CTRL|...), never executable basket events",
+  "coincident_signal_injection": "control/primary signals evaluated independently each bar; control decision never gates, blocks, sizes, or modifies the primary basket",
+  "r3_test": "control_state_isolation (40/40 suite): control events cannot touch broker/primary state",
+  "evidence": {
+    "process_bar": "PRIMARY intent path and CONTROL path are disjoint code branches; only PRIMARY may call _handle_open/_handle_close -> atomic layer",
+    "executor_shadow_loop": "R3 executor test proves the shadow loop writes ledger events for both models but the broker adapter records zero order calls",
+    "real_mt5_run": "control.process_snapshot invoked each cycle; zero order_send attempts across the whole real-terminal shadow run"
+  },
+  "pass": true
+}
