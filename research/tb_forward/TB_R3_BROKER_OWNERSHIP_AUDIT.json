@@ -1,0 +1,14 @@
+{
+  "checkpoint": "TB-R3-PERSISTENCE-RECONCILIATION",
+  "rule": "A broker position is TB-owned ONLY through explicit identity evidence: magic number == 31082026 AND (comment carries the TB basket token, OR a persisted LEG_FILL_CONFIRMED event recorded its position ticket).",
+  "cases": [
+    {"position": "magic=31082026, comment 'TB|TB_X|GBPAUD|L1'", "owned": true, "classification": "grouped to basket TB_X", "test": "crash_restart_while_fully_open"},
+    {"position": "magic=31082026, ticket recorded in LEG_FILL_CONFIRMED", "owned": true, "classification": "grouped via persisted linkage", "test": "manual_leg_close_detected"},
+    {"position": "magic=31082026, no comment, no persisted linkage", "owned": false, "classification": "ORPHAN_POSITION, BLOCKED", "test": "tb_magic_without_linkage_is_orphan_blocked"},
+    {"position": "magic=12345678 (foreign strategy)", "owned": false, "classification": "UNKNOWN_POSITION, never altered, never blocks TB engine", "test": "extra_unknown_broker_leg_protected"}
+  ],
+  "no_blind_flatten": "The engine may never flatten unrelated user positions; ambiguous ownership => BLOCK (no action).",
+  "unknown_positions": "Reported in reconciliation output as UNKNOWN:<ticket> with action=NONE and blocked=false (off-limits, not the TB engine's problem).",
+  "magic_number": "31082026 preserved (execution-contract versioning may change it later, not here).",
+  "scientific_changes": "NONE"
+}

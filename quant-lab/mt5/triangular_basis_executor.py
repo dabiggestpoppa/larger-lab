@@ -70,6 +70,16 @@ from tb_live.snapshot import (
     SymbolResolver,
     SynchronizedTriangleFeed,
 )
+# TB-R3: durable append-only ledger + broker/local reconciliation (fail-closed
+# startup gate). Persistence NEVER sends orders; order_send stays unreachable.
+from tb_live.persistence import BasketLedger, EventType
+from tb_live.reconciliation import (
+    Reconciler,
+    BrokerStateView,
+    BrokerPosition,
+    ReconciliationClass,
+)
+from tb_live.state_machine import BasketLifecycleState
 from mt5.account_guard import AccountGuard, HaltStatus
 from mt5.triangular_execution_layer import (
     TriangularExecutionLayer,
@@ -82,6 +92,8 @@ from mt5.triangular_execution_layer import (
 # Strategy identification
 TRIANGULAR_BASIS_MAGIC = get_magic("TRIANGULAR_BASIS_GBP_AUD_NZD")
 TRIANGULAR_BASIS_STRATEGY_ID = "TRIANGULAR_BASIS_GBP_AUD_NZD"
+TRIANGLE_SYMBOLS = ("GBPAUD", "GBPNZD", "AUDNZD")
+TB_LEDGER_FILE = "tb_ledger.db"   # SQLite+WAL append-only durable truth
 
 # ─── TB-R1.1 EXECUTION AUTHORIZATION (fail-closed) ───────────────────────
 # No checkpoint in the TB Forward program authorizes live-money execution.
@@ -139,6 +151,68 @@ def ensure_directories():
     os.makedirs(LOG_DIR, exist_ok=True)
     os.makedirs(STATE_DIR, exist_ok=True)
     os.makedirs(TRADE_LOG_DIR, exist_ok=True)
+
+
+# ─── TB-R3 DURABLE TRUTH (ledger + reconciliation) ────────────────────────
+
+class ExecutionLayerBrokerView(BrokerStateView):
+    """Adapter exposing the execution layer's broker positions to the
+    reconciler as normalized BrokerPosition objects."""
+
+    def __init__(self, execution_layer):
+        self._layer = execution_layer
+
+    def positions(self):
+        out = []
+        for p in self._layer._broker_positions():
+            out.append(BrokerPosition(
+                ticket=int(getattr(p, "ticket", 0)),
+                symbol=getattr(p, "symbol", ""),
+                magic=int(getattr(p, "magic", 0)),
+                comment=getattr(p, "comment", "") or "",
+                volume=float(getattr(p, "volume", 0.0)),
+                side="LONG" if int(getattr(p, "type", 0)) == 0 else "SHORT",
+                price_open=float(getattr(p, "price_open", 0.0)),
+            ))
+        return out
+
+
+def open_ledger() -> BasketLedger:
+    """Open (create if needed) the durable TB ledger and verify integrity.
+
+    Raises RuntimeError (fail closed) on any integrity problem — the engine
+    MUST NOT proceed to normal processing with a suspect ledger.
+    """
+    ensure_directories()
+    ledger = BasketLedger(os.path.join(STATE_DIR, TB_LEDGER_FILE))
+    ledger.initialize()
+    problems = ledger.integrity_check()
+    if problems:
+        ledger.close()
+        raise RuntimeError(
+            "LEDGER INTEGRITY FAILED (fail closed): " + "; ".join(problems))
+    return ledger
+
+
+def reconcile_on_startup(ledger: BasketLedger, execution_layer) -> dict:
+    """Reconcile durable local truth vs broker truth BEFORE the loop starts.
+
+    Returns {"results": ..., "blocked": bool, "log": [lines]}. A blocked
+    reconciliation must stop the engine (no new signals processed).
+    """
+    view = ExecutionLayerBrokerView(execution_layer)
+    recon = Reconciler(ledger, view, tb_magic=TRIANGULAR_BASIS_MAGIC)
+    results = recon.reconcile()
+    log_lines = []
+    blocked = []
+    for key, r in results.items():
+        line = (f"  RECON {key}: {r.classification.value} "
+                f"local={r.local_state} broker={r.broker_legs}/{r.expected_legs} "
+                f"action={r.action} blocked={r.blocked} {r.detail}")
+        log_lines.append(line)
+        if r.blocked:
+            blocked.append(key)
+    return {"results": results, "blocked_keys": blocked, "log": log_lines}
 
 
 # ─── LOGGING ─────────────────────────────────────────────────────────────
@@ -280,15 +354,40 @@ def run_loop(interval_seconds: int = 30, mode: str = DEFAULT_MODE):
     # Ensure directories
     ensure_directories()
     
-    # Load previous state if available
-    state_file = os.path.join(STATE_DIR, "state.json")
-    if os.path.exists(state_file):
-        try:
-            with open(state_file, "r") as f:
-                saved_state = json.load(f)
-            log(f"Loaded state from {state_file}")
-        except Exception as e:
-            log(f"WARNING: Failed to load state: {e}")
+    # ── TB-R3: open durable ledger + integrity check (fail closed) ──────
+    try:
+        ledger = open_ledger()
+        log(f"Ledger open: {os.path.join(STATE_DIR, TB_LEDGER_FILE)} "
+            f"(schema v{ledger.schema_version()})")
+    except RuntimeError as e:
+        log(f"FATAL: {e}")
+        md_adapter.shutdown()
+        return
+    ledger.append_event(EventType.ENGINE_STARTED, source="executor",
+                        reason="shadow loop start")
+    
+    # ── TB-R3: reconcile BEFORE processing any new signal ───────────────
+    try:
+        rec = reconcile_on_startup(ledger, execution_layer)
+    except Exception as e:
+        log(f"FATAL: reconciliation failed — FAIL CLOSED: {e}")
+        ledger.append_event(EventType.ENGINE_BLOCKED, source="executor",
+                            reason=f"reconciliation error: {e}")
+        ledger.close()
+        md_adapter.shutdown()
+        return
+    for line in rec["log"]:
+        log(line)
+    if rec["blocked_keys"]:
+        log("FATAL: reconciliation BLOCKED for "
+            + ", ".join(rec["blocked_keys"]) + " — FAIL CLOSED")
+        ledger.append_event(EventType.ENGINE_BLOCKED, source="executor",
+                            reason="reconciliation blocked: "
+                                   + ",".join(rec["blocked_keys"]))
+        ledger.close()
+        md_adapter.shutdown()
+        return
+    log("Reconciliation PASS — engine may proceed (SHADOW)")
     
     cycle = 0
     last_mt5_check = time.time()
@@ -331,6 +430,13 @@ def run_loop(interval_seconds: int = 30, mode: str = DEFAULT_MODE):
             if not snapshot.signal_snapshot_valid:
                 log(f"Cycle {cycle}: {health.overall_state().value} "
                     f"({snapshot.failure_code.value})")
+                ledger.append_event(
+                    EventType.SIGNAL_REJECTED, source="executor",
+                    reason=snapshot.failure_code.value,
+                    dedup_key=f"SIGREJ|{snapshot.signal_bar_close_time}",
+                    payload={"bar_key": str(snapshot.signal_bar_close_time),
+                             "reason": snapshot.failure_code.value,
+                             "health": health.overall_state().value})
                 time.sleep(interval_seconds)
                 continue
             
@@ -339,9 +445,40 @@ def run_loop(interval_seconds: int = 30, mode: str = DEFAULT_MODE):
             
             if decision.decision == BasketDecision.NO_ACTION:
                 log(f"Cycle {cycle}: NO_ACTION (z={decision.zscore:.2f})")
+                ledger.append_event(
+                    EventType.SIGNAL_OBSERVED, source="executor",
+                    dedup_key=f"SIG|{snapshot.signal_bar_close_time}",
+                    payload={"bar_key": str(snapshot.signal_bar_close_time),
+                             "z": decision.zscore,
+                             "basis": decision.basis,
+                             "strategy_id": decision.strategy_id or "",
+                             "snapshot_id": snapshot.snapshot_id})
             elif decision.decision == BasketDecision.OPEN_BASKET:
                 log(f"Cycle {cycle}: OPEN_BASKET {decision.basket_id} "
                    f"dir={decision.direction.name} z={decision.zscore:.2f}")
+                
+                # ── TB-R3 WRITE-AHEAD: persist intent BEFORE any execution ──
+                try:
+                    ledger.append_event(
+                        EventType.BASKET_INTENT_CREATED,
+                        basket_id=decision.basket_id,
+                        strategy_id=decision.strategy_id or TRIANGULAR_BASIS_STRATEGY_ID,
+                        prior_state=BasketLifecycleState.SIGNAL_DETECTED.value,
+                        new_state=BasketLifecycleState.INTENT_CREATED.value,
+                        dedup_key=f"INTENT|{decision.basket_id}",
+                        source="executor",
+                        payload=decision.to_dict() | {
+                            "signal_bar_key": str(snapshot.signal_bar_close_time),
+                            "signal_snapshot_id": snapshot.snapshot_id,
+                            "entry_time_utc": decision.timestamp.isoformat(),
+                            "entry_basis": decision.basis,
+                            "entry_z": decision.zscore,
+                        })
+                except Exception as e:
+                    log(f"FATAL: intent persistence failed — FAIL CLOSED: {e}")
+                    ledger.append_event(EventType.ENGINE_BLOCKED, source="executor",
+                                        reason=f"intent persist failed: {e}")
+                    break
                 
                 if can_execute:
                     # Execute basket (only reachable when demo is authorized).
@@ -356,6 +493,27 @@ def run_loop(interval_seconds: int = 30, mode: str = DEFAULT_MODE):
             
             elif decision.decision == BasketDecision.CLOSE_BASKET:
                 log(f"Cycle {cycle}: CLOSE_BASKET {decision.basket_id}")
+                
+                # ── TB-R3: durable exit signal record ───────────────────
+                try:
+                    ledger.append_event(
+                        EventType.EXIT_SIGNAL_OBSERVED,
+                        basket_id=decision.basket_id,
+                        strategy_id=decision.strategy_id or TRIANGULAR_BASIS_STRATEGY_ID,
+                        prior_state=BasketLifecycleState.OPEN_VERIFIED.value,
+                        new_state=BasketLifecycleState.CLOSE_REQUESTED.value,
+                        dedup_key=f"EXIT|{decision.basket_id}|{snapshot.signal_bar_close_time}",
+                        source="executor",
+                        payload=decision.to_dict() | {
+                            "signal_bar_key": str(snapshot.signal_bar_close_time),
+                            "exit_reason": decision.exit_reason,
+                            "exit_z": decision.zscore,
+                        })
+                except Exception as e:
+                    log(f"FATAL: exit persistence failed — FAIL CLOSED: {e}")
+                    ledger.append_event(EventType.ENGINE_BLOCKED, source="executor",
+                                        reason=f"exit persist failed: {e}")
+                    break
                 
                 if can_execute:
                     result = execution_layer.close_basket(decision.basket_id)
@@ -372,32 +530,6 @@ def run_loop(interval_seconds: int = 30, mode: str = DEFAULT_MODE):
                 write_heartbeat(guard, engine, data_feed, decision.zscore, basket_status)
                 last_heartbeat = time.time()
             
-            # ── Save state ─────────────────────────────────────────────
-            state_file_tmp = os.path.join(STATE_DIR, "state.json.tmp")
-            state_file_final = os.path.join(STATE_DIR, "state.json")
-            try:
-                state_data = {
-                    "last_processed_timestamp": str(engine._last_processed_timestamp) 
-                        if engine._last_processed_timestamp else None,
-                    "active_baskets": {
-                        bid: {
-                            "direction": bs.direction.name,
-                            "entry_basis": bs.entry_basis,
-                            "entry_zscore": bs.entry_zscore,
-                            "entry_time": str(bs.entry_time),
-                            "status": bs.status,
-                            "leg_tickets": bs.leg_tickets,
-                        }
-                        for bid, bs in engine.get_active_baskets().items()
-                    },
-                    "config_hash": engine.get_config_hash(),
-                }
-                with open(state_file_tmp, "w", encoding="utf-8") as f:
-                    json.dump(state_data, f, indent=2)
-                os.replace(state_file_tmp, state_file_final)
-            except Exception as e:
-                log(f"WARNING: Failed to save state: {e}")
-            
             # ── Sleep until next cycle ─────────────────────────────────
             time.sleep(interval_seconds)
     
@@ -409,6 +541,12 @@ def run_loop(interval_seconds: int = 30, mode: str = DEFAULT_MODE):
     finally:
         # Cleanup
         log("Shutting down...")
+        try:
+            ledger.append_event(EventType.ENGINE_SHUTDOWN, source="executor",
+                                reason="shadow loop end")
+        except Exception:
+            pass
+        ledger.close()
         execution_layer.shutdown()
         engine.shutdown()
         data_feed.shutdown()

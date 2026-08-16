@@ -1,0 +1,17 @@
+case,local_state,broker_state,classification,action,recovered_state,blocked,test
+A,FLAT/NO_BASKET,FLAT,MATCHED,NONE,NO_BASKET,false,crash_restart_while_flat
+B,OPEN_VERIFIED,exact 3 legs,MATCHED,RECONCILE,OPEN_VERIFIED,false,crash_restart_while_fully_open
+C,OPEN_VERIFIED,2 of 3 legs,PARTIAL_MATCH,BLOCK,BROKEN_HEDGE,true,crash_after_leg2_broker_ack
+D,ENTRY_SUBMITTING,3 fills present,MATCHED,RECONCILE,OPEN_VERIFIED,false,crash_after_leg3_broker_ack_before_open_verify
+E,ENTRY_SUBMITTING,1 fill,PARTIAL_MATCH,BLOCK,BROKEN_HEDGE,true,crash_after_leg1_broker_ack
+F,CLOSE_SUBMITTING,FLAT,MATCHED,RECONCILE,CLOSED_VERIFIED,false,reconciliation_case_matrix_a_through_n
+G,CLOSED_VERIFIED,1 leg remains,BROKER_ONLY,BLOCK,RECONCILIATION_REQUIRED,true,local_closed_but_broker_has_legs_blocks
+H,NO_BASKET (no local),3 TB-tagged legs,BROKER_ONLY,BLOCK,,true,orphan_broker_basket_detected
+I,any,foreign-magic position,UNKNOWN_POSITION,NONE,,false,extra_unknown_broker_leg_protected
+J,any,duplicate broker response,idempotent no-op,,,false,idempotent_duplicate_fill_response
+K,any,same deal returned twice,no double counting,,,false,idempotent_duplicate_fill_response
+L,any,DB transaction interrupted,recovered from last committed,,,false,reconciliation_case_matrix_a_through_n
+M,any,ledger corruption,BLOCKED_UNKNOWN_STATE,BLOCK,,true,ledger_corrupt_db_fails_closed
+N,any,TB magic without linkage,ORPHAN_POSITION,BLOCK,,true,tb_magic_without_linkage_is_orphan_blocked
+O,OPEN_VERIFIED,missing recorded ticket,MANUAL_INTERVENTION_DETECTED,BLOCK,RECONCILIATION_REQUIRED,true,manual_leg_close_detected
+P,INTENT_CREATED/ENTRY_SUBMITTING,FLAT,LOCAL_ONLY,RECONCILE,FLAT_VERIFIED,false,write_ahead_intent_persisted_before_action

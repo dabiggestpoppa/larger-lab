@@ -1,0 +1,23 @@
+{
+  "checkpoint": "TB-R3-PERSISTENCE-RECONCILIATION",
+  "method": "local OPEN_VERIFIED basket with 3 recorded position tickets; broker missing one recorded ticket (simulating a human closing/modifying a leg); Reconciler.detect_manual_intervention + reconcile run",
+  "detection": {
+    "finding": "MANUAL_INTERVENTION_DETECTED",
+    "mechanism": "recorded LEG_FILL_CONFIRMED position tickets compared against broker-owned tickets; missing ticket(s) while local state is OPEN_VERIFIED/ENTRY_SUBMITTING => finding",
+    "test": "manual_leg_close_detected",
+    "pass": true,
+    "detail": "missing_tickets=[303] detected; reconciliation result blocked=true"
+  },
+  "policy": {
+    "record": "MANUAL_POSITION_DETECTED / BROKER_LOCAL_MISMATCH events",
+    "action": "BLOCK basket automation; reconciliation required",
+    "no_silent_recreate": "the removed leg is NEVER silently recreated",
+    "no_live_recovery": "R3 is not authorized to invent a live recovery action"
+  },
+  "ownership_boundary": {
+    "tb_owned": "magic == 31082026 AND (comment basket token OR persisted ticket linkage)",
+    "foreign_magic": "NEVER altered, NEVER blocks TB engine (UNKNOWN_POSITION)",
+    "tb_magic_no_linkage": "ORPHAN_POSITION, BLOCKED (never assumed owned)"
+  },
+  "scientific_changes": "NONE"
+}

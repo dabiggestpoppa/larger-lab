@@ -1,0 +1,18 @@
+{
+  "checkpoint": "TB-R3-PERSISTENCE-RECONCILIATION",
+  "base_commit": "0f196feaafa59434139890d3e6106e096208cc51",
+  "canonical_research_commit": "6769ad31ac737946dae54e3660e22cb36f72e2b7",
+  "repo": "dabiggestpoppa/larger-lab",
+  "branch": "tb-forward-engine",
+  "input_hashes": {
+    "quant-lab/tb_live/state_machine.py": "sha256:implemented-this-checkpoint",
+    "quant-lab/tb_live/persistence.py": "sha256:implemented-this-checkpoint",
+    "quant-lab/tb_live/reconciliation.py": "sha256:implemented-this-checkpoint",
+    "quant-lab/mt5/triangular_basis_executor.py": "sha256:modified-this-checkpoint",
+    "quant-lab/tb_live/__init__.py": "sha256:modified-this-checkpoint",
+    "quant-lab/engines/tb_r3_tests.py": "sha256:implemented-this-checkpoint",
+    "research/tb_forward/TB_R3_*.json|md|csv": "sha256:generated-this-checkpoint"
+  },
+  "note": "Blob SHAs are recorded by the git commit itself (TB-R3-PERSISTENCE-RECONCILIATION). See git show --stat for full 40-char commit hash and per-file SHAs.",
+  "scientific_changes": "NONE"
+}

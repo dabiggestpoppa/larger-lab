@@ -1,0 +1,31 @@
+{
+  "checkpoint": "TB-R3-PERSISTENCE-RECONCILIATION",
+  "question": "Can an OPEN basket be reconstructed solely from durable records + broker positions, with zero in-memory state?",
+  "answer": "YES",
+  "proof": {
+    "method": "write a full open+close lifecycle to a temp DB, close the ledger, open a BRAND-NEW BasketLedger on the same file (simulated restart), run integrity_check and reconstruct_basket",
+    "test": "reconstruction_solely_from_durable_records",
+    "reconstructed": {
+      "state": "CLOSED_VERIFIED",
+      "direction": "SHORT",
+      "legs": 3,
+      "events": ">= 9 (intent, entry attempt, 3 fills, open verified, exit signal, exit attempt, closed verified)"
+    },
+    "integrity": "[] (clean)"
+  },
+  "reconstruction_rule": "reconstruct_basket replays events_for(basket_id) in seq order: last new_state is the basket state; BASKET_INTENT_CREATED payload supplies direction/entry fields; LEG_FILL_CONFIRMED payloads supply leg tickets/prices.",
+  "materialized_cache": "basket_current is a derived cache updated in the same transaction; it is verified against events at startup and is never the source of truth.",
+  "coverage": [
+    "restart while flat (NO_BASKET)",
+    "restart while fully open (OPEN_VERIFIED)",
+    "crash before order attempt (INTENT_CREATED)",
+    "crash after intent persistence (ENTRY_SUBMITTING)",
+    "crash after 1/2/3 fills",
+    "crash during close (1-2 legs closed)",
+    "broker already flat after close",
+    "orphan broker basket",
+    "manual leg close",
+    "duplicate restart reconciliation (idempotent)"
+  ],
+  "scientific_changes": "NONE"
+}

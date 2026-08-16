@@ -1,0 +1,22 @@
+{
+  "checkpoint": "TB-R3-PERSISTENCE-RECONCILIATION",
+  "base_commit": "0f196feaafa59434139890d3e6106e096208cc51",
+  "method": "deterministic simulated crash: durable records written up to a point, process 'dies', fresh BasketLedger opened on the same file, reconstruction + broker reconciliation run; broker state mocked",
+  "execution_authorization": "NOT_AUTHORIZED",
+  "scenarios": [
+    {"crash_point": "restart while FLAT", "durable_records": "ENGINE_STARTED only", "broker": "flat", "classification": "MATCHED", "recovered_state": "NO_BASKET", "blocked": false, "test": "crash_restart_while_flat", "pass": true},
+    {"crash_point": "restart while fully OPEN", "durable_records": "intent+entry+3 fills+open_verified", "broker": "exact 3 legs", "classification": "MATCHED", "recovered_state": "OPEN_VERIFIED", "blocked": false, "test": "crash_restart_while_fully_open", "pass": true},
+    {"crash_point": "crash before order attempt", "durable_records": "intent only", "broker": "flat", "classification": "LOCAL_ONLY", "recovered_state": "FLAT_VERIFIED", "blocked": false, "test": "crash_before_order_attempt", "pass": true},
+    {"crash_point": "crash after intent persistence", "durable_records": "intent + entry_attempt_started", "broker": "flat", "classification": "LOCAL_ONLY", "recovered_state": "FLAT_VERIFIED", "blocked": false, "test": "write_ahead_intent_persisted_before_action", "pass": true},
+    {"crash_point": "crash after leg1 broker ack", "durable_records": "intent+entry+1 fill", "broker": "1 leg", "classification": "PARTIAL_MATCH", "recovered_state": "BROKEN_HEDGE", "blocked": true, "test": "crash_after_leg1_broker_ack", "pass": true},
+    {"crash_point": "crash after leg2 broker ack", "durable_records": "intent+entry+2 fills", "broker": "2 legs", "classification": "PARTIAL_MATCH", "recovered_state": "BROKEN_HEDGE", "blocked": true, "test": "crash_after_leg2_broker_ack", "pass": true},
+    {"crash_point": "crash after leg3 broker ack", "durable_records": "intent+entry+3 fills, NO open_verified", "broker": "3 legs", "classification": "MATCHED", "recovered_state": "OPEN_VERIFIED", "blocked": false, "test": "crash_after_leg3_broker_ack_before_open_verify", "pass": true},
+    {"crash_point": "crash before open verification", "durable_records": "3 fills, no verification event", "broker": "3 legs", "classification": "MATCHED", "recovered_state": "OPEN_VERIFIED", "blocked": false, "test": "crash_after_leg3_broker_ack_before_open_verify", "pass": true},
+    {"crash_point": "crash during close leg1", "durable_records": "exit signal + attempt + 1 exit fill", "broker": "2 legs remain", "classification": "PARTIAL_MATCH", "recovered_state": "BROKEN_HEDGE", "blocked": true, "test": "crash_during_close_leg1", "pass": true},
+    {"crash_point": "crash during close leg2", "durable_records": "exit signal + attempt + 2 exit fills", "broker": "1 leg remains", "classification": "PARTIAL_MATCH", "recovered_state": "BROKEN_HEDGE", "blocked": true, "test": "crash_during_close_leg2", "pass": true},
+    {"crash_point": "broker already flat after close", "durable_records": "full open + close", "broker": "flat", "classification": "MATCHED", "recovered_state": "CLOSED_VERIFIED", "blocked": false, "test": "broker_already_flat_after_close", "pass": true},
+    {"crash_point": "duplicate restart reconciliation", "durable_records": "full open", "broker": "3 legs", "classification": "MATCHED (both runs)", "recovered_state": "OPEN_VERIFIED", "blocked": false, "test": "idempotent_duplicate_restart_reconciliation", "pass": true}
+  ],
+  "conclusion": "An OPEN basket is fully reconstructable from durable records + broker positions alone (restart test proves a fresh ledger object on the same file reconstructs state, direction, legs, event count). Partial baskets are classified BROKEN_HEDGE and BLOCKED (no auto-flatten: R3 is not authorized to invent live recovery actions).",
+  "scientific_changes": "NONE"
+}

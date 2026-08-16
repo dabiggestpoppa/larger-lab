@@ -1,0 +1,74 @@
+{
+  "checkpoint": "TB-R3-PERSISTENCE-RECONCILIATION",
+  "schema_version": 1,
+  "app_version": "TB-R3-PERSISTENCE-RECONCILIATION-01",
+  "events_table": {
+    "columns": [
+      {"name": "event_id", "type": "TEXT", "constraints": "PRIMARY KEY", "notes": "uuid4"},
+      {"name": "seq", "type": "INTEGER", "constraints": "NOT NULL UNIQUE", "notes": "monotonic, contiguous from 1"},
+      {"name": "event_type", "type": "TEXT", "constraints": "NOT NULL", "notes": "frozen EventType set"},
+      {"name": "ts_utc", "type": "TEXT", "constraints": "NOT NULL", "notes": "ISO-8601 UTC microsecond"},
+      {"name": "basket_id", "type": "TEXT", "constraints": "NOT NULL DEFAULT ''"},
+      {"name": "strategy_id", "type": "TEXT", "constraints": "NOT NULL DEFAULT ''"},
+      {"name": "prior_state", "type": "TEXT", "constraints": "NOT NULL DEFAULT ''", "notes": "lifecycle state, validated"},
+      {"name": "new_state", "type": "TEXT", "constraints": "NOT NULL DEFAULT ''", "notes": "lifecycle state, validated"},
+      {"name": "dedup_key", "type": "TEXT", "constraints": "UNIQUE", "notes": "idempotency key; NULL allowed for non-repeatable events"},
+      {"name": "payload", "type": "TEXT", "constraints": "NOT NULL DEFAULT '{}'", "notes": "JSON"},
+      {"name": "payload_hash", "type": "TEXT", "constraints": "NOT NULL DEFAULT ''", "notes": "sha256 of canonical JSON; integrity-checked"},
+      {"name": "source", "type": "TEXT", "constraints": "NOT NULL DEFAULT ''", "notes": "executor / reconciler / tests"},
+      {"name": "reason", "type": "TEXT", "constraints": "NOT NULL DEFAULT ''"}
+    ],
+    "indexes": ["idx_events_basket(basket_id)", "idx_events_type(event_type)", "idx_events_seq(seq)"]
+  },
+  "basket_current_table": {
+    "notes": "Derived materialized cache updated in the SAME transaction as the event that changed it. NEVER the source of truth; reconstruction always replays events.",
+    "columns": [
+      {"name": "basket_id", "type": "TEXT", "constraints": "PRIMARY KEY"},
+      {"name": "strategy_id", "type": "TEXT"},
+      {"name": "direction", "type": "TEXT"},
+      {"name": "state", "type": "TEXT"},
+      {"name": "last_seq", "type": "INTEGER"},
+      {"name": "entry_time_utc", "type": "TEXT"},
+      {"name": "entry_basis", "type": "REAL"},
+      {"name": "entry_z", "type": "REAL"}
+    ]
+  },
+  "event_types": {
+    "lifecycle_transition_required": [
+      "BASKET_INTENT_CREATED", "ENTRY_ATTEMPT_STARTED", "BASKET_OPEN_VERIFIED",
+      "BROKEN_HEDGE_DETECTED", "FLATTEN_STARTED", "BASKET_FLAT_VERIFIED",
+      "EXIT_SIGNAL_OBSERVED", "EXIT_ATTEMPT_STARTED", "BASKET_CLOSED_VERIFIED",
+      "MANUAL_POSITION_DETECTED", "BROKER_LOCAL_MISMATCH"
+    ],
+    "informational": [
+      "SIGNAL_OBSERVED", "SIGNAL_REJECTED", "LEG_ORDER_SENT", "LEG_FILL_CONFIRMED",
+      "LEG_FILL_FAILED", "EXIT_FILL_CONFIRMED", "FLATTEN_LEG_CONFIRMED",
+      "ENGINE_STARTED", "ENGINE_SHUTDOWN", "CONTROL_SIGNAL_OBSERVED",
+      "RECONCILIATION_STARTED", "RECONCILIATION_COMPLETED", "ENGINE_BLOCKED"
+    ]
+  },
+  "idempotency_keys": {
+    "INTENT|<basket_id>": "basket intent",
+    "ENTRY|<basket_id>": "entry attempt",
+    "FILL|<basket_id>|<symbol>": "leg fill",
+    "OPEN|<basket_id>": "basket open verified",
+    "EXIT|<basket_id>": "exit signal",
+    "EXITAT|<basket_id>": "exit attempt",
+    "EXITF|<basket_id>|<symbol>": "exit leg fill",
+    "CLOSED|<basket_id>": "basket closed verified",
+    "SIG|<bar_key>": "signal observed per closed M5 bar",
+    "SIGREJ|<bar_key>": "signal rejected per bar"
+  },
+  "integrity_checks": [
+    "schema_version == 1",
+    "required tables exist",
+    "seq contiguous from 1 (no gaps/dups)",
+    "event_id unique",
+    "dedup_key unique",
+    "payload_hash matches stored payload",
+    "every required-transition event's (prior,new) pair is in the frozen graph",
+    "basket_current.last_seq == max events seq for that basket",
+    "basket_current.state == last event's new_state"
+  ],
+  "scientific_changes": "NONE"
+}

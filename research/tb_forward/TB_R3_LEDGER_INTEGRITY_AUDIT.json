@@ -1,0 +1,25 @@
+{
+  "checkpoint": "TB-R3-PERSISTENCE-RECONCILIATION",
+  "integrity_checks": [
+    "schema version == TB_STATE_SCHEMA_VERSION (1)",
+    "required tables exist (schema_meta, events, basket_current)",
+    "event sequence contiguous from 1 (no gaps, no duplicates)",
+    "event_id unique",
+    "dedup_key unique",
+    "payload_hash matches stored payload",
+    "required-transition events carry valid (prior,new) state pairs from the frozen graph",
+    "basket_current consistent with last event per basket (state + last_seq)"
+  ],
+  "failure_modes_tested": [
+    {"failure": "corrupt/non-database file", "result": "DatabaseError at open/PRAGMA or integrity problems; fail closed", "test": "ledger_corrupt_db_fails_closed"},
+    {"failure": "DB locked by another connection", "result": "append times out/fails; ledger stays consistent", "test": "ledger_db_locked_fails_closed"},
+    {"failure": "schema version mismatch", "result": "SCHEMA_VERSION_MISMATCH; fail closed", "test": "ledger_schema_version_mismatch_blocks"},
+    {"failure": "missing ledger row (sequence hole)", "result": "SEQUENCE_GAP; fail closed", "test": "ledger_sequence_gap_detected"},
+    {"failure": "payload mutated after insert", "result": "PAYLOAD_HASH_MISMATCH; fail closed", "test": "ledger_payload_hash_integrity"},
+    {"failure": "invalid state transition in events", "result": "INVALID_TRANSITION; fail closed", "test": "invalid_transition_persisted_blocks_integrity"},
+    {"failure": "required-transition event without states", "result": "append rejected (ValueError), nothing written", "test": "missing_required_states_blocks"},
+    {"failure": "DB transaction interrupted mid-write", "result": "rollback; last committed state recovered", "test": "reconciliation_case_matrix_a_through_n (case L)"}
+  ],
+  "conclusion": "The ledger fails closed under every corruption mode tested. No corrupted state can silently enter the engine.",
+  "scientific_changes": "NONE"
+}
