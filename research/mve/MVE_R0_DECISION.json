@@ -1,0 +1,36 @@
+{
+  "gate": "R0 - DATA / INFRASTRUCTURE REALITY LOCK",
+  "decision": "FAIL",
+  "decision_timestamp": "2026-08-15T00:00:00Z",
+  "audited_head": "ccfd084be02a7331bd5b8410ae98cb48d6ebb584",
+  "summary": "The MVE foundation is not scientifically executable. The DATA_TRUTH_LOCK contained fabricated hashes, fabricated row counts, fabricated date ranges, and two of its three claimed datasets do not exist on disk. The research runner crashes on import (ModuleNotFoundError), two of ten src/mve modules do not compile (SyntaxError/IndentationError), the runner never loads real data (returns empty Series), and it never writes results to disk (print-only). P4 must not execute.",
+  "pass_rule_check": {
+    "hashes_are_genuine": false,
+    "splits_are_honest": false,
+    "runner_behavior_proven": false,
+    "causal_tests_pass": false,
+    "no_synthetic_fallback_exists": false,
+    "holdout_status_explicitly_truthful": false
+  },
+  "blockers": [
+    "src/mve/volatility.py is truncated (unterminated docstring at line 575; file ends mid-method _calculate_regime_transitions).",
+    "src/mve/anchors.py has mangled code at line 481 (orphaned indented block from a different method).",
+    "run_mve_research.py inserts the wrong sys.path (research/mve/src) so `import mve` fails with ModuleNotFoundError.",
+    "run_mve_research.py _load_research_data() returns empty pd.Series for prices/highs/lows/volumes; no real CSV is ever read.",
+    "run_mve_research.py _save_intermediate_results() and _save_final_results() only print; no result files are ever written.",
+    "No resampling (M5->H1) code exists anywhere in the MVE path; the H1 methodology in DATA_TRUTH_LOCK is prose only.",
+    "DATA_TRUTH_LOCK referenced GBPUSDPRO_M5_2023_2026.csv and USDJPYPRO_M5_2023_2026.csv, which do not exist.",
+    "No causality test harness exists for sigma/anchor/acceptance/rekey.",
+    "2026 data cannot be certified as an untouched holdout: the same CSV is consumed by quant-lab DMR/rekey backtest engines."
+  ],
+  "required_before_p4": [
+    "Repair src/mve so all 10 modules import and compile.",
+    "Wire the runner to load real CSV data (or replace with a loader that does).",
+    "Implement disk output for phase results.",
+    "Implement and pass the causality test harness (R0.6).",
+    "Freeze an honest development/confirmation/holdout split (or declare FINAL_HOLDOUT_PENDING).",
+    "Re-run this R0 gate and obtain a PASS before any P4 execution."
+  ],
+  "strategy_design_cleared": false,
+  "next_action": "STOP FOR HUMAN REVIEW. Authorize code repair + runner rewiring before any research execution."
+}

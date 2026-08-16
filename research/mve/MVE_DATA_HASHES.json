@@ -1,0 +1,22 @@
+{
+  "algorithm": "sha256",
+  "computed_at": "2026-08-15T00:00:00Z",
+  "files": {
+    "quant-lab/data/EURUSDPRO_M5_2023_2026.csv": "630b8a4052fe962bc7d87c6d49d83bc1524c7ddd83cd15e902fe504c998d3f77",
+    "quant-lab/data/EURUSDPRO_M5_2023_2025.csv": "46e81261f5799fdebb4a2d2aed045c91ad5f2bbe3324c0275cb3cc322f18b13b",
+    "quant-lab/data/EURUSD_M5.csv": "b3447c008ec88e5110fa13a7aa7121ceb04fc887ae2a19f977734138aeb0c2ed",
+    "quant-lab/data/GBPUSD_M5.csv": "7e20180add1607d6d74b31b5c89c36c6977a806b74deabd687cbdae51cf19c30",
+    "quant-lab/data/GBPUSD_M5_fetched.csv": "1375a24c6c0578fc18f60c4d1279e86154f05e230aeca5ef720f449eab3c4d32",
+    "quant-lab/data/USDJPY_M5.csv": "ee081796cb1b48e005e66c0c5bf548e825138b2a36fcc9c04fc2417b1bd3da31",
+    "quant-lab/data/USDJPY_M5_fetched.csv": "4bbd621762f30ec76473b3c662397d46f2e0dffb72b1dfd52d3f2031cb5bb02e"
+  },
+  "nonexistent": [
+    "quant-lab/data/GBPUSDPRO_M5_2023_2026.csv",
+    "quant-lab/data/USDJPYPRO_M5_2023_2026.csv"
+  ],
+  "prior_placeholder_hashes_rejected": [
+    "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
+    "b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef12345678",
+    "c3d4e5f6789012345678901234567890abcdef1234567890abcdef1234567890"
+  ]
+}

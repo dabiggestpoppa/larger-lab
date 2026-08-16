@@ -1,0 +1,8 @@
+data_segment,file,first_use,consumer,purpose,outcome_inspected,eligible_development,eligible_confirmation,eligible_final_holdout,note
+EURUSDPRO_M5_2023_2026.csv (2023-07-03 to 2026-05-29),quant-lab/data/EURUSDPRO_M5_2023_2026.csv,prior commits (a6fec27ee,3b12b0844),quant-lab DMR + rekey backtest engines,backtesting,likely,true,true,false,consumed by non-MVE engines; cannot certify untouched
+EURUSD_M5.csv (2022-01-03 to 2026-05-29),quant-lab/data/EURUSD_M5.csv,unknown,quant-lab backtests,backtesting,likely,true,false,false,older source series
+GBPUSD_M5.csv,quant-lab/data/GBPUSD_M5.csv,unknown,quant-lab backtests,backtesting,likely,true,false,false,
+USDJPY_M5.csv,quant-lab/data/USDJPY_M5.csv,unknown,quant-lab backtests,backtesting,likely,true,false,false,
+MVE runner executions,n/a,never,run_mve_research.py,research,never (runner never loads data),n/a,n/a,n/a,runner returns empty Series
+GBPUSDPRO_M5_2023_2026.csv,n/a,n/a,data truth lock only,cited in prior truth lock,fabricated,n/a,n/a,n/a,file does not exist
+USDJPYPRO_M5_2023_2026.csv,n/a,n/a,data truth lock only,cited in prior truth lock,fabricated,n/a,n/a,n/a,file does not exist

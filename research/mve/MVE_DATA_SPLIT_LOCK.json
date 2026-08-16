@@ -1,0 +1,17 @@
+{
+  "status": "FINAL_HOLDOUT_PENDING",
+  "reason": "The 2026 segment of EURUSDPRO_M5_2023_2026.csv is consumed by quant-lab DMR/rekey backtest engines, so it cannot be certified as an untouched holdout. No true holdout exists for the MVE program until forward shadow data is collected or an unused dataset is identified.",
+  "proposed_split_on_real_data": {
+    "development": "2023-07-03 to 2024-12-31 (EURUSDPRO_M5_2023_2026.csv)",
+    "confirmation": "2025-01-01 to 2025-12-31",
+    "final_holdout": "PENDING - 2026-01-01 to 2026-05-29 is NOT untouched"
+  },
+  "rules": [
+    "Chronological, no random shuffling",
+    "No parameter discovery on confirmation or holdout segments",
+    "Holdout read-only until the P7 seal",
+    "If no untouched block exists, forward shadow collection begins and this lock stays FINAL_HOLDOUT_PENDING"
+  ],
+  "frozen_at": "2026-08-15T00:00:00Z",
+  "frozen_head": "ccfd084be02a7331bd5b8410ae98cb48d6ebb584"
+}
