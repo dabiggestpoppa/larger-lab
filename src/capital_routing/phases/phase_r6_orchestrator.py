@@ -471,9 +471,11 @@ acceptable: if heat caps do not materially help, that is the finding.
             frames.append(heat_policy_mc(load, rest70, 0.7, 0.3,
                                          4000, self._mc_episode_paths(),
                                          MC_F, seed=MC_SEED + 3))
-        # iid reference (H0, 50/50)
+        # iid reference (H0, 50/50) - emitted as scheme "iid" so it never
+        # duplicates the block/episode H0 rows above.
         frames.append(heat_policy_mc(load, [self._pol("H0")], 0.5, 0.5,
-                                     3000, 3000, MC_F, seed=MC_SEED + 4))
+                                     3000, 3000, MC_F, seed=MC_SEED + 4,
+                                     schemes=[("iid", 3000)]))
         return pd.concat(frames, ignore_index=True)
 
     def _nondominated(self, frontier: pd.DataFrame, mc: pd.DataFrame,
@@ -749,7 +751,8 @@ acceptable: if heat caps do not materially help, that is the finding.
         for reg in ["historical_50", "historical_70", "blockmc_50", "blockmc_70",
                     "edge75", "edge50", "tail_insert"]:
             sub = nd[nd.regime == reg]
-            lbl = sub[sub.status == "NON_DOMINATED"]["policy_id"].tolist()
+            lbl = (sub[sub.status == "NON_DOMINATED"]["policy_id"]
+                   .drop_duplicates().tolist())
             a(f"- **{reg}:** {'; '.join(lbl) if lbl else '(none)'}")
         a("")
         a("## 17. Complexity comparison")

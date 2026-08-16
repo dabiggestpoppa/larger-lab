@@ -6,7 +6,7 @@
 Overlap is real but bounded in the sealed book: max concurrency 3, 26.5% of events enter with an active position, and only 20h carry 3 positions. 84.7% of in-drawdown hourly loss occurs in single-position hours, so overlap is NOT the dominant historical DD driver at 50/50. It does worsen single-day risk: the worst day (-2.8%) and worst 24h (-3.3%) both occur with 2-3 concurrent positions. Simple heat caps reduce that state-dependent risk mainly where events pile up: at A-heavy 70/30 a 1.0x gross cap cuts block-MC p95 max DD from 9.5% to 6.3% and P(DD>=10%) from 3.6% to 0.0% at ~7% CAGR cost, while at 50/50 the same cap binds only on the rare 3-position state (historical max DD unchanged at 5.2%; worst day -2.8% -> -2.6%). Same-direction caps (H2) match gross caps without being systematically better; episode budgets (H4) are redundant with H1 (H4-1.0x is strictly worse); B-family caps (H3) trim the capital-limiting family but are weaker than an equal gross cap at 70/30. Caps reject approximately fair events (WR 57-66%, positive mean R), so they buy DD reduction by cutting exposure, not by cherry-picking losers. Under 50% edge retention every policy collapses - heat caps do not rescue a halved edge. No policy is selected; the mapping is descriptive, and a Block-II seal is recommended before R7.
 
 ## 2. Provenance
-Pre-registered in R6_PROTOCOL.md; inputs hash-locked in R6_INPUT_HASH_MANIFEST.json (git c7cedb97 at generation).
+Pre-registered in R6_PROTOCOL.md; inputs hash-locked in R6_INPUT_HASH_MANIFEST.json (git 1e8cc01f at generation).
 
 ## 3. Episode truth
 - 12h episodes: **482**; mean events/episode 1.85; max events in one episode 10
@@ -88,9 +88,9 @@ H0 (unconstrained) reproduces the sealed baselines: 50/50 @ f=1% -> CAGR 71%, ma
 Rejection behavior is stable across inner_sel/inner_val/OOS and years (see R6_HEAT_TEMPORAL_STABILITY.csv); no policy helps only one period.
 
 ## 16. Non-dominated policies
-- **historical_50:** H0; H1-1.50-REJ; H1-2.00-REJ; H1-3.00-REJ; H1-1.50-SCA; H1-2.00-SCA; H2-1.50-REJ; H2-2.00-REJ; H2-1.50-SCA; H5-2.00-REJ; H5-2.00-SCA; H0; H1-1.50-REJ; H1-2.00-REJ; H1-3.00-REJ; H1-1.50-SCA; H1-2.00-SCA; H2-1.50-REJ; H2-2.00-REJ; H2-1.50-SCA; H5-2.00-REJ; H5-2.00-SCA; H0; H1-1.50-REJ; H1-2.00-REJ; H1-3.00-REJ; H1-1.50-SCA; H1-2.00-SCA; H2-1.50-REJ; H2-2.00-REJ; H2-1.50-SCA; H5-2.00-REJ; H5-2.00-SCA; H0; H1-1.50-REJ; H1-2.00-REJ; H1-3.00-REJ; H1-1.50-SCA; H1-2.00-SCA; H2-1.50-REJ; H2-2.00-REJ; H2-1.50-SCA; H5-2.00-REJ; H5-2.00-SCA; H0; H1-1.50-REJ; H1-2.00-REJ; H1-3.00-REJ; H1-1.50-SCA; H1-2.00-SCA; H2-1.50-REJ; H2-2.00-REJ; H2-1.50-SCA; H5-2.00-REJ; H5-2.00-SCA; H0; H1-1.50-REJ; H1-2.00-REJ; H1-3.00-REJ; H1-1.50-SCA; H1-2.00-SCA; H2-1.50-REJ; H2-2.00-REJ; H2-1.50-SCA; H3-0.75-SCA; H5-2.00-REJ; H5-2.00-SCA
-- **historical_70:** H1-1.00-SCA; H2-1.00-REJ; H3-0.50-SCA; H4-1.00-REJ; H4-3.00-REJ; H5-1.50-REJ; H1-1.00-SCA; H2-1.00-REJ; H3-0.50-SCA; H4-1.00-REJ; H4-3.00-REJ; H5-1.50-REJ; H1-1.00-SCA; H2-1.00-REJ; H3-0.50-SCA; H4-1.00-REJ; H4-3.00-REJ; H5-1.50-REJ; H1-1.00-SCA; H2-1.00-REJ; H3-0.50-SCA; H4-1.00-REJ; H4-3.00-REJ; H5-1.50-REJ; H1-1.00-SCA; H2-1.00-REJ; H3-0.50-SCA; H4-1.00-REJ; H4-3.00-REJ; H5-1.50-REJ; H1-1.00-SCA; H2-1.00-REJ; H3-0.50-SCA; H4-1.00-REJ; H4-3.00-REJ; H5-1.50-REJ
-- **blockmc_50:** H0; H3-0.75-REJ; H5-1.50-REJ; H1-1.00-REJ; H1-2.00-REJ; H3-0.50-REJ; H4-1.00-REJ; H0
+- **historical_50:** H0; H1-1.50-REJ; H1-2.00-REJ; H1-3.00-REJ; H1-1.50-SCA; H1-2.00-SCA; H2-1.50-REJ; H2-2.00-REJ; H2-1.50-SCA; H5-2.00-REJ; H5-2.00-SCA; H3-0.75-SCA
+- **historical_70:** H1-1.00-SCA; H2-1.00-REJ; H3-0.50-SCA; H4-1.00-REJ; H4-3.00-REJ; H5-1.50-REJ
+- **blockmc_50:** H3-0.75-REJ; H5-1.50-REJ; H1-1.00-REJ; H1-2.00-REJ; H3-0.50-REJ; H4-1.00-REJ
 - **blockmc_70:** H1-1.50-REJ; H0; H2-1.00-REJ; H3-0.50-REJ
 - **edge75:** H0; H1-1.00-REJ; H1-1.50-REJ; H2-1.50-REJ; H3-0.75-REJ
 - **edge50:** H1-1.00-REJ; H3-0.75-REJ

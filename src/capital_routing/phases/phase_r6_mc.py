@@ -204,15 +204,19 @@ def _path_stats_matrix(eq: np.ndarray, years: float) -> Dict[str, np.ndarray]:
 def heat_policy_mc(load: Dict, policies: List[Dict],
                    w_A: float, w_B: float,
                    n_block: int, n_episode: int,
-                   f_grid: List[float], seed: int = MC_SEED) -> pd.DataFrame:
-    """Monte Carlo for every policy x f x scheme (block/episode). Rows carry
+                   f_grid: List[float], seed: int = MC_SEED,
+                   schemes: Optional[List[Tuple[str, int]]] = None) -> pd.DataFrame:
+    """Monte Carlo for every policy x f x scheme (block/episode, or an
+    explicit scheme list e.g. [("iid", n)] for the reference). Rows carry
     percentile distributions + DD-threshold probabilities + ruin."""
     years = load["years"]
     ba = load["ba"]
     n = len(ba["tb"])
     rows = []
     need_h4 = any(p["kind"] == "H4" for p in policies)
-    for scheme, n_paths in [("block", n_block), ("episode", n_episode)]:
+    if schemes is None:
+        schemes = [("block", n_block), ("episode", n_episode)]
+    for scheme, n_paths in schemes:
         layouts, lay = _path_layouts(load, scheme, n_paths, n, seed)
         r_mat = np.stack([lay["r_R"][l["idx"]] for l in layouts])
         ep_ids = _path_episode_ids(load, layouts, scheme) if need_h4 else None

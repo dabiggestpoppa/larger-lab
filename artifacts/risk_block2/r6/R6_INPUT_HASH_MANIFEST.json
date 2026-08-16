@@ -3,7 +3,7 @@
   "task": "CR-RISK-BLOCK2-R6-EPISODE-HEAT-SIZING",
   "repo": "dabiggestpoppa/larger-lab",
   "branch": "capital-routing",
-  "git_sha_at_generation": "c7cedb975e99d7d9d5fede3aee5ec170600a0c88",
+  "git_sha_at_generation": "1e8cc01fe34bf44418eb367fc35f885d7579691c",
   "block1_seal_sha": "8ca072d0d939acf581770a99ce45b333deddd8c",
   "block1_stamp_sha": "470702c2bb445e1f7a1be949efd6ec3a75b74878",
   "r5_substantive_sha": "150a93dec8edf2997652cd20724298fe9927c0dc",
@@ -97,8 +97,8 @@
   "code_hashes": {
     "phase_r6_analysis.py": "47bf3489453fbaa9ddf3de86b5f2cdd072a975c2d736597ef6435e7bf1fa9984",
     "phase_r6_common.py": "7fc964f71e167ff034b82a5a9f6b8154f5e5b1b5be75f1a2a04517f075b94661",
-    "phase_r6_mc.py": "d366003f3801a8e2ad538f3aed560c191f48baed73b54e70d572bcc6cb109b70",
-    "phase_r6_orchestrator.py": "4ccf860aa3de18773fc1443ac4fcbc9769c869ef02b25d0e09935adfe60d00fc",
+    "phase_r6_mc.py": "289d3e020e364cba670ffb1914ed888c01e6ff77b595bf48cc2905102e0be5b4",
+    "phase_r6_orchestrator.py": "638081916b49b3a16aef7353197d375127959ef52fef999762ae5d9b97a844fb",
     "phase_r6_stress.py": "aaf8b9b05d15a39dee292cdd734baade9ef377c1ca396da9db86b833eea2833e"
   },
   "python_version": "3.11.9",
@@ -119,5 +119,5 @@
     "edge_block": 2000
   },
   "determinism": "fixed seeds; chronological block + R1 episode block bootstrap",
-  "timestamp": "2026-08-16T15:05:50.422644+00:00"
+  "timestamp": "2026-08-16T16:25:29.196922+00:00"
 }
