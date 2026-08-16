@@ -40,5 +40,5 @@
  },
  "stats_method": "matched-pairs (aligned per-E0-trade diffs; paired bootstrap CI + sign-flip permutation)",
  "p75_gate_repair": "initial P7.5 run used the two-sample bootstrap/permutation intended for the P6 entry grid; candidate exit engines share E0's matched signal set, so the correct test is on the per-trade difference. Gates unchanged; test statistic corrected (same class as TB-P6.5 cost-gate repair).",
- "generated": "2026-08-16T01:32:43.601066+00:00Z"
+ "generated": "2026-08-16T01:43:47.389043+00:00Z"
 }

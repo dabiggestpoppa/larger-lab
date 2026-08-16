@@ -359,7 +359,18 @@ def cache_write(thr: float, pt: pd.DataFrame):
 
 
 def cache_load(thr: float, df: pd.DataFrame) -> pd.DataFrame:
-    zf = np.load(CACHE / f"thr_{thr:g}.npz")
+    path = CACHE / f"thr_{thr:g}.npz"
+    if not path.exists():
+        # derived data: rebuild from the raw bars when the cache is missing
+        # (fresh clone / worktree), so P6/P7 run standalone. Values are
+        # identical to the cached form (same simulate+enrich pipeline).
+        if df is None:
+            raise FileNotFoundError(
+                f"cache {path} missing and no bar data to rebuild from")
+        pt = enrich(simulate(df, thr), df)
+        cache_write(thr, pt)
+        return pt
+    zf = np.load(path)
     pt = pd.DataFrame({
         "entry_time": pd.to_datetime(zf["entry_ts"]), "exit_time": pd.to_datetime(zf["exit_ts"]),
         "entry_idx": zf["entry_idx"], "exit_idx": zf["exit_idx"],
