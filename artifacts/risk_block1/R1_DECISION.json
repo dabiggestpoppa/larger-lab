@@ -182,5 +182,8 @@
     "phase_r1_orchestrator.py": "455c0bc77a2ab7f64dadcbe34fba5c91b08c4bc9cb4f6493f73e470e282d66ad"
   },
   "deterministic": true,
-  "stop": "R1 checkpoint complete; R2 begins only after human review. No stops, filters, sizing, or alpha modification."
+  "stop": "R1 checkpoint complete; R2 begins only after human review. No stops, filters, sizing, or alpha modification.",
+  "commit_sha": "32374cc0",
+  "commit_message": "CR-RISK-R1-EXPOSURE-TRUTH",
+  "pushed": true
 }

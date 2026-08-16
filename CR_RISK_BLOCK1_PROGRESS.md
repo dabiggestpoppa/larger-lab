@@ -26,7 +26,7 @@ deploy, or MT5.
 
 ## R1 — Exposure Truth & Portfolio Heat ✅ COMPLETE
 
-**Commit:** `CR-RISK-R1-EXPOSURE-TRUTH` (pushed) · Tests: 19 new (`tests/test_risk_r1.py`) · 226/226 repo-wide · deterministic (byte-identical re-run) · inputs hash-frozen (`R1_INPUT_HASH_MANIFEST.json`)
+**Commit:** `32374cc0` (`CR-RISK-R1-EXPOSURE-TRUTH`) — pushed to GitHub (`45149ee1..32374cc0`), synced to `Desktop\projects\larger-lab` · Tests: 19 new (`tests/test_risk_r1.py`) · 226/226 repo-wide · deterministic (byte-identical re-run) · inputs hash-frozen (`R1_INPUT_HASH_MANIFEST.json`)
 
 ### Key findings
 
