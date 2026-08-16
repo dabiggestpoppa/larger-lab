@@ -138,5 +138,7 @@
     "phase_r3_orchestrator.py": "c6acd41488c6ba3cd6fa99948f66f24d3d56f182912408e9e2da72d5772af51c"
   },
   "deterministic": true,
-  "stop": "R3 checkpoint complete; R4 begins only after human review. No TP, early exit, trailing, breakeven, partial, family weighting, sizing, or alpha modification."
+  "stop": "R3 checkpoint complete; R4 begins only after human review. No TP, early exit, trailing, breakeven, partial, family weighting, sizing, or alpha modification.",
+  "commit_sha": "ee4516a6",
+  "commit_message": "CR-RISK-R3-PROFIT-ANATOMY: map how the sealed strategy makes money"
 }
