@@ -1,0 +1,23 @@
+{
+  "repo": "dabiggestpoppa/larger-lab",
+  "branch": "cerebus-mve-implementation",
+  "base_commit": "bda32020d439a780e9aa4b7c2c45dd4254e533f0",
+  "p7_commit": "bda32020d439a780e9aa4b7c2c45dd4254e533f0",
+  "dataset": {
+    "path": "quant-lab/data/EURUSDPRO_M5_2023_2026.csv",
+    "sha256": "630b8a4052fe962bc7d87c6d49d83bc1524c7ddd83cd15e902fe504c998d3f77"
+  },
+  "python_version": "3.11.9",
+  "packages": {
+    "numpy": "2.4.6",
+    "pandas": "2.2.3",
+    "scipy": "1.17.1"
+  },
+  "scripts": {
+    "core_state.py": "43fb71cdb0e0a8e8b2031b7bbd9d308f8b9be16b135324279987ce068cc5cad6",
+    "run_p75.py": "46a34539f88eabc619450de42b691094ae987ba4cdfc074832fabb34f2b904a5"
+  },
+  "m5_rows": 216820,
+  "h1_rows": 15545,
+  "holdout_rows_read": 0
+}

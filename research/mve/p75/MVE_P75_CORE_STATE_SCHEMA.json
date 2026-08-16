@@ -1,0 +1,21 @@
+{
+  "timestamp": "bar time (index); causal_known_time == timestamp",
+  "anchor_type": "trailing_extreme_50 (constant)",
+  "anchor_up": "causal trailing max of close, rolling 50, shift(1)",
+  "anchor_lo": "causal trailing min of close, rolling 50, shift(1)",
+  "volatility_estimate": "sealed close_to_close volatility",
+  "volatility_quality": "1.0 if volatility_estimate not NaN else 0.0",
+  "coordinate": "signed morphic coordinate (close basis, upper family)",
+  "abs_coordinate": "|coordinate|",
+  "sigma_band": "unsigned band floor(|x|/STEP) \u2014 P4/P6 convention",
+  "sigma_state": "signed quantization sign(x)*floor(|x|/STEP) \u2014 P7 convention",
+  "previous_sigma_state": "sigma_state.shift(1)",
+  "state_age": "consecutive bars in the same sigma_state (causal)",
+  "transition_type": "UP/DOWN/STAY vs previous sigma_state; NA when undefined",
+  "distance_to_nearest_sigma_boundary": "|x| - floor(|x|/STEP)*STEP",
+  "coordinate_velocity": "coordinate - coordinate.shift(1)",
+  "coordinate_acceleration": "velocity - velocity.shift(1)",
+  "anchor_age": "bars since the trailing extreme last changed",
+  "data_quality": "1.0 if anchor_up/anchor_lo/vol/coordinate all valid",
+  "causal_known_time": "timestamp (all inputs at bar t use data <= t)"
+}

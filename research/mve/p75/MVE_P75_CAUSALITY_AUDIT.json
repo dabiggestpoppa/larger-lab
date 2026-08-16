@@ -1,0 +1,85 @@
+{
+  "1_future_perturbation": {
+    "max_diff": 0.0,
+    "all_zero": true,
+    "measured": {
+      "coordinate": 0.0,
+      "sigma_state": 0.0,
+      "anchor_up": 0.0,
+      "volatility_estimate": 0.0
+    }
+  },
+  "2_truncation_invariance": {
+    "max_diff": 0.0,
+    "all_zero": true,
+    "measured": {
+      "coordinate": 0.0,
+      "sigma_state": 0.0,
+      "anchor_up": 0.0,
+      "volatility_estimate": 0.0
+    }
+  },
+  "3_timestamp_schema": {
+    "note": "core_state causal_known_time == timestamp for every row (wrapper contract)",
+    "pass": true
+  },
+  "4_blocked_component_isolation": {
+    "pass": true,
+    "models_D_E_consumed": false,
+    "generate_all_signals_consumed": false,
+    "note": "core_state.py imports only sealed primitives (anchors/vol/coordinates); no signals, no rekey, no acceptance events"
+  },
+  "5_static_leakage": {
+    "findings": [
+      {
+        "module": "mve.core_state",
+        "line": 73,
+        "pattern": "rolling()",
+        "code": "close.rolling(P4_TRAILING_WINDOW, min_periods=P4_TRAILING_MIN_PERIODS)",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "mve.core_state",
+        "line": 78,
+        "pattern": "rolling()",
+        "code": "close.rolling(P4_TRAILING_WINDOW, min_periods=P4_TRAILING_MIN_PERIODS)",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "run_p75",
+        "line": 410,
+        "pattern": "mean()",
+        "code": "valid['abs_coordinate'].mean()",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p75",
+        "line": 411,
+        "pattern": "mean()",
+        "code": "valid['state_age'].mean()",
+        "classification": "EX_POST_ONLY"
+      },
+      {
+        "module": "run_p75",
+        "line": 86,
+        "pattern": "rolling()",
+        "code": "h1['close'].rolling(pa.P4_TRAILING_WINDOW, min_periods=pa.P4_TRAILING_MIN_PERIODS)",
+        "classification": "CAUSAL"
+      },
+      {
+        "module": "run_p75",
+        "line": 92,
+        "pattern": "rolling()",
+        "code": "h1['close'].rolling(pa.P4_TRAILING_WINDOW, min_periods=pa.P4_TRAILING_MIN_PERIODS)",
+        "classification": "CAUSAL"
+      }
+    ],
+    "unclassified": [],
+    "blocked": [],
+    "rule": "rolling()/iloc[]/shift() -> CAUSAL; mean()/std() -> EX_POST_ONLY when aggregating measured outcomes; else BLOCKED"
+  },
+  "6_causal_to_expost_dependency": {
+    "count": 0,
+    "note": "core_state columns are per-bar causal transforms; outcome/control columns never feed state (test-enforced)"
+  }
+}

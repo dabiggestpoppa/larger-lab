@@ -1,0 +1,14 @@
+{
+  "tolerance": 1e-09,
+  "max_diff": 0.0,
+  "pass": true,
+  "checks": {
+    "anchor_up": 0.0,
+    "anchor_lo": 0.0,
+    "volatility": 0.0,
+    "coordinate": 0.0,
+    "sigma_state": 0.0,
+    "sigma_band": 0.0
+  },
+  "note": "core_state wrapper vs sealed P7 pipeline series (anchor/vol/coordinate/sigma); band convention additionally checked vs sealed P4/P6 floor(|x|)"
+}

@@ -1,0 +1,8 @@
+{
+  "status": "FINAL_HOLDOUT_PENDING",
+  "rows_read": 0,
+  "rows_2026_in_field": 0,
+  "field_max_timestamp": "2025-12-31 00:00:00+00:00",
+  "guard_pass": true,
+  "note": "field truncated at 2025-12-31 before any computation (identical to P4/P6/P7)"
+}
