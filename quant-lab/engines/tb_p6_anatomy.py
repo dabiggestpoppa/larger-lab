@@ -156,13 +156,22 @@ def eps_of(m: str) -> float:
 # FROZEN-SIGNAL REPLAY, PARAMETERIZED BY ENTRY THRESHOLD (causal)
 # ═══════════════════════════════════════════════════════════════════════
 
-def simulate(df: pd.DataFrame, thr: float) -> pd.DataFrame:
+def simulate(df: pd.DataFrame, thr: float, exit_target: float = EXIT_Z,
+             max_hold_min: float = None, invalidate=None) -> pd.DataFrame:
     """Mirror of tb_p5_validate.run_frozen_signal with the entry threshold
     parameterized. Uses only past data: rolling-200 z with window ending
     before the current bar, ATR-20 window ending at the entry bar, London
-    session 3-12 EST, min 120 min to session end, exit z->0 / |z|->6 /
-    session-end timeout, daily -500 pips cap. At thr=2.5 it must reproduce
-    the canonical 405-trade log exactly (asserted by load_and_verify)."""
+    session 3-12 EST, min 120 min to session end, exit z->target / |z|->6 /
+    session-end timeout, daily -500 pips cap. At thr=2.5 with defaults it must
+    reproduce the canonical 405-trade log exactly (asserted by load_and_verify).
+
+    P7 extensions (defaults preserve the frozen P6 behavior bit-for-bit):
+      exit_target: profit target in z units, symmetric by |z| geometry
+                   (SHORT exits when z <= target; LONG when z >= -target).
+      max_hold_min: close as HOLD when a trade's age reaches this many minutes
+                    (checked after TP/SL, before session-end timeout).
+      invalidate: callable(|z|, age_min) -> bool; close as INVALIDATED when True
+                  (checked after TP/SL and hold)."""
     idx = df.index
     n = len(df)
     basis = (np.log(df["ga"]) - np.log(df["gn"]) + np.log(df["an"])).values
@@ -203,15 +212,23 @@ def simulate(df: pd.DataFrame, thr: float) -> pd.DataFrame:
                 continue
             res = None
             if t["direction"] == "SHORT":
-                if zi <= EXIT_Z:
+                if zi <= exit_target:
                     res = "TP_HIT"
                 elif zi >= STOP_Z:
                     res = "SL_HIT"
             else:
-                if zi >= EXIT_Z:
+                if zi >= -exit_target:
                     res = "TP_HIT"
                 elif zi <= -STOP_Z:
                     res = "SL_HIT"
+            if res is None and max_hold_min is not None:
+                age_min = (idx[i] - t["entry_time"]).total_seconds() / 60
+                if age_min >= max_hold_min:
+                    res = "HOLD"
+            if res is None and invalidate is not None:
+                age_min = (idx[i] - t["entry_time"]).total_seconds() / 60
+                if invalidate(abs(zi), age_min):
+                    res = "INVALIDATED"
             if res:
                 tr = _close_t(t, i, idx[i], zi, b_l[i], ga, gn, an, res)
                 daily[sd] = dpl + tr["pnl_net_pips"]
