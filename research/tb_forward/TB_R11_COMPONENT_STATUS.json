@@ -1,0 +1,21 @@
+{
+  "checkpoint": "TB-R1.1-PRIOR-STACK-MECHANICAL-REPAIR",
+  "status_after_repair": {
+    "strategy_wrapper": "ADOPTED",
+    "normalization_engine": "ADOPTED",
+    "weight_engine": "ADOPTED",
+    "execution_contract": "ADOPTED",
+    "atomic_execution_layer": "ADOPTED",
+    "market_data_layer": "PENDING_R2",
+    "persistence_layer": "PENDING_REPLACEMENT",
+    "broker_metadata_layer": "ADOPTED",
+    "session_time_layer": "ADOPTED",
+    "parity_harness": "ADOPTED",
+    "execution_safety": "REPAIRED_FAIL_CLOSED"
+  },
+  "notes": {
+    "strategy_wrapper": "primary 3.0 / signed +-0.25 and control 2.5/0 both represented; exact P7 lifecycle parity (194/194) and control parity (405/405).",
+    "weight_engine": "canonical TB-B exact-neutral weights now flow into basket execution; weight parity 194/194 (0 mismatches).",
+    "execution_safety": "default SHADOW, order_send unreachable in default mode, control execution permanently disabled."
+  }
+}

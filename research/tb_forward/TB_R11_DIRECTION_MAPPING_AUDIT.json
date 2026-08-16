@@ -1,0 +1,22 @@
+{
+  "checkpoint": "TB-R1.1-PRIOR-STACK-MECHANICAL-REPAIR",
+  "direction_convention": "z > 0 (basis rich) -> SHORT basket; z < 0 (basis cheap) -> LONG basket",
+  "z_positive_mapping": {
+    "basket": "SHORT",
+    "GBPAUD": "SELL",
+    "GBPNZD": "BUY",
+    "AUDNZD": "SELL"
+  },
+  "z_negative_mapping": {
+    "basket": "LONG",
+    "GBPAUD": "BUY",
+    "GBPNZD": "SELL",
+    "AUDNZD": "BUY"
+  },
+  "model_weight_vs_side_separation": "model_weight encodes allocation MAGNITUDE only (always >= 0, sum = 3); basket direction and per-leg execution side are encoded separately in BasketDirection and LegConfig.side. Model weights are never interpreted as signed lots.",
+  "verification": {
+    "z_positive_maps_to_short_basket_test": "PASS (legs [SHORT, LONG, SHORT] over GBPAUD/GBPNZD/AUDNZD)",
+    "z_negative_maps_to_long_basket_test": "PASS (legs [LONG, SHORT, LONG] over GBPAUD/GBPNZD/AUDNZD)"
+  },
+  "matches_canonical": true
+}

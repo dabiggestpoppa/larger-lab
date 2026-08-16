@@ -15,15 +15,25 @@ PARITY BY CONSTRUCTION
 The wrapper maintains a growing buffer of synchronized TriangularBar objects
 and delegates computation to the canonical engine's pure functions
 (compute_basis, compute_basis_zscore, compute_atr). This guarantees the live
-wrapper produces IDENTICAL basis / z-score / ATR / sizing output to the
-canonical historical backtest engine on the same chronological data.
+wrapper produces IDENTICAL basis / z-score / ATR output to the canonical
+historical backtest engine on the same chronological data.
 
-Canonical commit: 2435d04e77eb31b42ab14ba76482efb729965b83
-Balanced config: z=2.5, stop=6.0, lookback=200, London-only
+TB-R1.1 MECHANICAL REPAIR (config transition, NOT research):
+- PRIMARY   TB-FWD-V1          entry |z| > 3.0, signed exit +-0.25 (P6/P7)
+- CONTROL   TB-FROZEN-CONTROL  entry |z| > 2.5, exit z=0 (shadow only)
+- Model weights are canonical TB-B exact-neutral (verify_tb_04a.project_basket)
+  fed as model_weight; NEVER interpreted as MT5 lots.
+- Exit-condition check order matches the canonical P7 simulate():
+    1. session hard exit (TIMEOUT)  2. convergence/overshoot (TP_HIT)
+    3. structural stop (SL_HIT)
+- Entry strict |z| > threshold. Direction convention unchanged.
+
+Canonical research commit (sealed P5/P6/P7): 6769ad31ac737946dae54e3660e22cb36f72e2b7
 
 Usage:
     from engines.triangular_basis_live import TriangularBasisLiveEngine
-    engine = TriangularBasisLiveEngine()
+    from engines.tb_forward_config import PRIMARY_CONFIG, CONTROL_CONFIG
+    engine = TriangularBasisLiveEngine(model_config=PRIMARY_CONFIG)
     decision = engine.process_snapshot(snapshot)
 """
 
@@ -67,6 +77,25 @@ except ImportError as e:
     print(f"[TRIANGULAR_LIVE] ERROR importing canonical engine: {e}")
     raise
 
+# TB-R1.1: frozen forward config (primary/control separation) + canonical
+# TB-B exact-neutral weighting shared from the sealed research engine.
+# The sealed research modules import each other as TOP-LEVEL modules with
+# quant-lab/engines on sys.path; mirror that so we share the SAME module
+# objects (no duplicate-import of the exposure/projection code).
+sys.path.insert(0, str(Path(__file__).parent))
+try:
+    from tb_forward_config import (
+        StrategyModelConfig,
+        PRIMARY_CONFIG,
+        CONTROL_CONFIG,
+        CANONICAL_RESEARCH_TIME_SEMANTICS,
+    )
+    from verify_tb_04a import exposure_matrix, residual_pct
+    from tb_p6_anatomy import project_basket
+except ImportError as e:
+    print(f"[TRIANGULAR_LIVE] ERROR importing TB forward config/weights: {e}")
+    raise
+
 
 class BasketDecision(Enum):
     NO_ACTION = "no_action"
@@ -79,7 +108,8 @@ class LegConfig:
     canonical_symbol: str
     broker_symbol: str
     side: Direction
-    model_weight: float = 0.0  # canonical inverse-ATR normalized weight (NOT lots)
+    model_weight: float = 0.0  # canonical TB-B exact-neutral weight (NOT lots)
+    reference_weight: float = 0.0  # raw inverse-ATR size (audit only, NOT lots)
     entry_price: float = 0.0
     ticket: int = 0
 
@@ -95,6 +125,12 @@ class BasketIntent:
     legs: List[LegConfig] = field(default_factory=list)
     hedge_weights: Dict[str, float] = field(default_factory=dict)
     expected_cost_pips: float = 10.2
+    # TB-R1.1 additions for model separation + lifecycle parity
+    model_id: str = ""
+    strategy_id: str = ""
+    entry_threshold: float = 0.0
+    exit_reason: str = ""
+    residual_pct: float = 0.0
 
     def to_dict(self) -> dict:
         return {
@@ -110,6 +146,7 @@ class BasketIntent:
                     "broker_symbol": leg.broker_symbol,
                     "side": leg.side.name,
                     "model_weight": leg.model_weight,
+                    "reference_weight": leg.reference_weight,
                     "entry_price": leg.entry_price,
                     "ticket": leg.ticket,
                 }
@@ -117,6 +154,11 @@ class BasketIntent:
             ],
             "hedge_weights": self.hedge_weights,
             "expected_cost_pips": self.expected_cost_pips,
+            "model_id": self.model_id,
+            "strategy_id": self.strategy_id,
+            "entry_threshold": self.entry_threshold,
+            "exit_reason": self.exit_reason,
+            "residual_pct": round(self.residual_pct, 6),
         }
 
 
@@ -142,7 +184,22 @@ class TriangularBasisLiveEngine:
     Does NOT rewrite any formula.
     """
 
-    def __init__(self, config: Config = None):
+    def __init__(self, config: Config = None, model_config: StrategyModelConfig = None):
+        self.model_config = model_config or CONTROL_CONFIG
+
+        # TB-R1.1 strategy fields (primary/control separation). These are the
+        # strategy truth; the shared Config below only carries math/session
+        # parameters (lookback, ATR, London hours). Set BEFORE _default_config()
+        # because that builds the shared Config from these values.
+        self.strategy_id = self.model_config.strategy_id
+        self.model_id = self.model_config.model_id
+        self.entry_z = self.model_config.entry_z
+        self.short_exit_z = self.model_config.short_exit_z
+        self.long_exit_z = self.model_config.long_exit_z
+        self.stop_z = self.model_config.stop_z
+        self.shadow_only = self.model_config.shadow_only
+        self.execution_allowed = self.model_config.execution_allowed
+
         self.config = config or self._default_config()
         self._active_baskets: Dict[str, BasketState] = {}
         self._last_processed_timestamp: Optional[datetime] = None
@@ -150,16 +207,17 @@ class TriangularBasisLiveEngine:
         self._tri_bars: List[TriangularBar] = []
         # Rolling basis values (incremental, parity with canonical)
         self._basis_history: List[float] = []
+
         self._config_hash = self._compute_config_hash()
-        self.canonical_commit_sha = "2435d04e77eb31b42ab14ba76482efb729965b83"
+        self.canonical_commit_sha = "6769ad31ac737946dae54e3660e22cb36f72e2b7"
         self.max_concurrent_baskets = 1
 
     def _default_config(self) -> Config:
         cfg = Config()
         cfg.BASIS_LOOKBACK = 200
-        cfg.BASIS_ENTRY_Z = 2.5
-        cfg.BASIS_STOP_Z = 6.0
-        cfg.BASIS_EXIT_Z = 0.0
+        cfg.BASIS_ENTRY_Z = self.entry_z
+        cfg.BASIS_STOP_Z = self.stop_z
+        cfg.BASIS_EXIT_Z = 0.0  # legacy symmetric slot; signed exits use self.short/long_exit_z
         cfg.TRADE_LONDON_ONLY = True
         cfg.MIN_MINUTES_TO_EXIT = 120
         cfg.LONDON_START_H_EST = 3
@@ -171,10 +229,13 @@ class TriangularBasisLiveEngine:
 
     def _compute_config_hash(self) -> str:
         config_str = json.dumps({
+            "strategy_id": self.strategy_id,
+            "model_id": self.model_id,
             "lookback": self.config.BASIS_LOOKBACK,
-            "entry_z": self.config.BASIS_ENTRY_Z,
-            "stop_z": self.config.BASIS_STOP_Z,
-            "exit_z": self.config.BASIS_EXIT_Z,
+            "entry_z": self.entry_z,
+            "short_exit_z": self.short_exit_z,
+            "long_exit_z": self.long_exit_z,
+            "stop_z": self.stop_z,
             "london_start": self.config.LONDON_START_H_EST,
             "london_end": self.config.LONDON_END_H_EST,
             "hard_exit": self.config.HARD_EXIT_H_EST,
@@ -295,7 +356,8 @@ class TriangularBasisLiveEngine:
             for bid, bstate in list(self._active_baskets.items()):
                 if bstate.status != "OPEN":
                     continue
-                if self._check_close_condition(bstate, z_score, est_hour):
+                exit_reason = self._check_close_condition(bstate, z_score, est_hour)
+                if exit_reason:
                     intent = BasketIntent(
                         decision=BasketDecision.CLOSE_BASKET,
                         basket_id=bid,
@@ -303,6 +365,10 @@ class TriangularBasisLiveEngine:
                         direction=bstate.direction,
                         basis=bstate.entry_basis,
                         zscore=z_score,
+                        model_id=self.model_id,
+                        strategy_id=self.strategy_id,
+                        entry_threshold=self.entry_z,
+                        exit_reason=exit_reason,
                     )
                     bstate.status = "CLOSED"
                     del self._active_baskets[bid]
@@ -359,8 +425,21 @@ class TriangularBasisLiveEngine:
                             atr_aud_nzd: float) -> BasketIntent:
         """Build a basket intent based on z-score entry conditions.
 
-        Uses canonical volatility-weighted sizing formula.
+        Direction convention (unchanged, canonical):
+            z > 0 (basis rich) -> SHORT basket
+                (short GBPAUD, long GBPNZD, short AUDNZD)
+            z < 0 (basis cheap) -> LONG basket
+                (long GBPAUD, short GBPNZD, long AUDNZD)
+
+        Entry is STRICT: |z| > entry_z.
+
+        Weighting: canonical inverse-ATR reference shares -> TB-B exact-neutral
+        projection (verify_tb_04a.exposure_matrix + tb_p6_anatomy.project_basket
+        at eps=0). model_weight carries the TB-B size (sum |s| = 3); the raw
+        inverse-ATR size is retained as reference_weight for audit. NEITHER is
+        an MT5 lot size.
         """
+        # Raw inverse-ATR reference sizes (matches canonical _open_t exactly).
         size_gbp_aud = 1.0 / atr_gbp_aud if atr_gbp_aud > 0 else 1.0
         size_gbp_nzd = 1.0 / atr_gbp_nzd if atr_gbp_nzd > 0 else 1.0
         size_aud_nzd = 1.0 / atr_aud_nzd if atr_aud_nzd > 0 else 1.0
@@ -371,64 +450,112 @@ class TriangularBasisLiveEngine:
         size_gbp_nzd *= scale
         size_aud_nzd *= scale
 
+        if abs(z_score) <= self.entry_z:
+            return self._no_action(basis_value, z_score)
+
+        direction = Direction.SHORT if z_score > 0 else Direction.LONG
+
+        # Canonical TB-B exact-neutral weights (entry-time function).
+        # FAIL CLOSED: if the exposure matrix has no acceptable exact-neutral
+        # solution (degenerate prices / broken triangle), emit NO trade rather
+        # than a non-neutral basket.
+        try:
+            w_ga, w_gn, w_an, residual = self._compute_tb_b_weights(
+                direction, tri_bar.gbp_aud, tri_bar.gbp_nzd, tri_bar.aud_nzd,
+                size_gbp_aud, size_gbp_nzd, size_aud_nzd,
+            )
+        except RuntimeError as e:
+            print(f"[TRIANGULAR_LIVE] FAIL-CLOSED: TB-B projection failed at "
+                  f"{tri_bar.timestamp}: {e} — no entry")
+            return self._no_action(basis_value, z_score)
+
         basket_id = (f"TB_{tri_bar.timestamp.strftime('%Y%m%d_%H%M%S')}_"
                      f"{hashlib.md5(str(basis_value).encode()).hexdigest()[:8]}")
 
-        if z_score > self.config.BASIS_ENTRY_Z:
+        if direction == Direction.SHORT:
             legs = [
                 LegConfig(canonical_symbol="GBPAUD", broker_symbol="GBPAUD.PRO",
-                          side=Direction.SHORT, model_weight=size_gbp_aud, entry_price=tri_bar.gbp_aud),
+                          side=Direction.SHORT, model_weight=w_ga, reference_weight=size_gbp_aud,
+                          entry_price=tri_bar.gbp_aud),
                 LegConfig(canonical_symbol="GBPNZD", broker_symbol="GBPNZD.PRO",
-                          side=Direction.LONG, model_weight=size_gbp_nzd, entry_price=tri_bar.gbp_nzd),
+                          side=Direction.LONG, model_weight=w_gn, reference_weight=size_gbp_nzd,
+                          entry_price=tri_bar.gbp_nzd),
                 LegConfig(canonical_symbol="AUDNZD", broker_symbol="AUDNZD.PRO",
-                          side=Direction.SHORT, model_weight=size_aud_nzd, entry_price=tri_bar.aud_nzd),
+                          side=Direction.SHORT, model_weight=w_an, reference_weight=size_aud_nzd,
+                          entry_price=tri_bar.aud_nzd),
             ]
-            return BasketIntent(
-                decision=BasketDecision.OPEN_BASKET,
-                basket_id=basket_id,
-                timestamp=tri_bar.timestamp,
-                direction=Direction.SHORT,
-                basis=basis_value,
-                zscore=z_score,
-                legs=legs,
-                hedge_weights={"GBPAUD": size_gbp_aud, "GBPNZD": size_gbp_nzd, "AUDNZD": size_aud_nzd},
-            )
-
-        elif z_score < -self.config.BASIS_ENTRY_Z:
+        else:
             legs = [
                 LegConfig(canonical_symbol="GBPAUD", broker_symbol="GBPAUD.PRO",
-                          side=Direction.LONG, model_weight=size_gbp_aud, entry_price=tri_bar.gbp_aud),
+                          side=Direction.LONG, model_weight=w_ga, reference_weight=size_gbp_aud,
+                          entry_price=tri_bar.gbp_aud),
                 LegConfig(canonical_symbol="GBPNZD", broker_symbol="GBPNZD.PRO",
-                          side=Direction.SHORT, model_weight=size_gbp_nzd, entry_price=tri_bar.gbp_nzd),
+                          side=Direction.SHORT, model_weight=w_gn, reference_weight=size_gbp_nzd,
+                          entry_price=tri_bar.gbp_nzd),
                 LegConfig(canonical_symbol="AUDNZD", broker_symbol="AUDNZD.PRO",
-                          side=Direction.LONG, model_weight=size_aud_nzd, entry_price=tri_bar.aud_nzd),
+                          side=Direction.LONG, model_weight=w_an, reference_weight=size_aud_nzd,
+                          entry_price=tri_bar.aud_nzd),
             ]
-            return BasketIntent(
-                decision=BasketDecision.OPEN_BASKET,
-                basket_id=basket_id,
-                timestamp=tri_bar.timestamp,
-                direction=Direction.LONG,
-                basis=basis_value,
-                zscore=z_score,
-                legs=legs,
-                hedge_weights={"GBPAUD": size_gbp_aud, "GBPNZD": size_gbp_nzd, "AUDNZD": size_aud_nzd},
-            )
 
-        return self._no_action(basis_value, z_score)
+        return BasketIntent(
+            decision=BasketDecision.OPEN_BASKET,
+            basket_id=basket_id,
+            timestamp=tri_bar.timestamp,
+            direction=direction,
+            basis=basis_value,
+            zscore=z_score,
+            legs=legs,
+            hedge_weights={"GBPAUD": w_ga, "GBPNZD": w_gn, "AUDNZD": w_an},
+            model_id=self.model_id,
+            strategy_id=self.strategy_id,
+            entry_threshold=self.entry_z,
+            residual_pct=residual,
+        )
+
+    def _compute_tb_b_weights(self, direction: Direction,
+                              gbp_aud: float, gbp_nzd: float, aud_nzd: float,
+                              raw_ga: float, raw_gn: float, raw_an: float):
+        """Canonical TB-B exact-neutral projection (shared research code).
+
+        q_alpha = inverse-ATR reference shares (normalized), E = exposure
+        matrix, sB = project_basket(q_alpha, E, 0.0) -> sizes summing to 3.
+        Returns (w_ga, w_gn, w_an, residual_pct).
+        """
+        q_alpha = np.asarray([raw_ga, raw_gn, raw_an], dtype=float)
+        tot = q_alpha.sum()
+        q_alpha = q_alpha / tot if tot > 0 else np.array([1.0 / 3.0] * 3)
+        E = exposure_matrix(
+            {"gbpaud": gbp_aud, "gbpnzd": gbp_nzd, "audnzd": aud_nzd},
+            direction.name,
+        )
+        sB = project_basket(q_alpha, E, 0.0)
+        residual = float(residual_pct(sB / 3.0, E))
+        return float(sB[0]), float(sB[1]), float(sB[2]), residual
 
     def _check_close_condition(self, bstate: BasketState, z_score: float,
-                              est_hour: int) -> bool:
-        if bstate.direction == Direction.SHORT and z_score <= self.config.BASIS_EXIT_Z:
-            return True
-        if bstate.direction == Direction.LONG and z_score >= self.config.BASIS_EXIT_Z:
-            return True
-        if bstate.direction == Direction.SHORT and z_score >= self.config.BASIS_STOP_Z:
-            return True
-        if bstate.direction == Direction.LONG and z_score <= -self.config.BASIS_STOP_Z:
-            return True
+                              est_hour: int) -> str:
+        """Return the exit reason when a close condition is met, else "".
+
+        Check order matches the canonical P7 simulate() exactly:
+          1. session hard exit            -> TIMEOUT
+          2. convergence/overshoot exit   -> TP_HIT  (signed, per direction)
+          3. structural stop              -> SL_HIT  (symmetric magnitude)
+
+        Signed exit semantics (authoritative, per R0 truth lock):
+          SHORT exits when z <= short_exit_z  (primary -0.25, control 0.0)
+          LONG  exits when z >= long_exit_z   (primary +0.25, control 0.0)
+        """
         if est_hour >= self.config.HARD_EXIT_H_EST:
-            return True
-        return False
+            return "TIMEOUT"
+        if bstate.direction == Direction.SHORT and z_score <= self.short_exit_z:
+            return "TP_HIT"
+        if bstate.direction == Direction.LONG and z_score >= self.long_exit_z:
+            return "TP_HIT"
+        if bstate.direction == Direction.SHORT and z_score >= self.stop_z:
+            return "SL_HIT"
+        if bstate.direction == Direction.LONG and z_score <= -self.stop_z:
+            return "SL_HIT"
+        return ""
 
     def load_historical_bars(self, bars: List[TriangularBar]):
         """Load a historical buffer for replay/parity."""

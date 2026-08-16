@@ -1,0 +1,22 @@
+{
+  "checkpoint": "TB-R1.1-PRIOR-STACK-MECHANICAL-REPAIR",
+  "default_mode": "SHADOW",
+  "order_send_reachable_in_default_mode": false,
+  "demo_authorized": false,
+  "live_authorized": false,
+  "control_execution_authorized": false,
+  "accepted_explicit_modes": ["shadow", "demo"],
+  "trade_live_mode_policy": "NOT_AUTHORIZED (fails closed to SHADOW)",
+  "execution_authorized_this_checkpoint": false,
+  "global_gates": {
+    "EXECUTION_AUTHORIZED": false,
+    "DEMO_AUTHORIZED": false,
+    "LIVE_AUTHORIZED": false
+  },
+  "live_activation_requirements": [
+    "explicit config value",
+    "explicit environment variable",
+    "explicit account allowlist"
+  ],
+  "notes": "Executing a live order in this checkpoint is impossible by construction: the executor CLI accepts only shadow/demo, demo itself is gated behind DEMO_AUTHORIZED=false, and the loop calls order_send only when resolve_mode returns can_execute=True (never true here)."
+}

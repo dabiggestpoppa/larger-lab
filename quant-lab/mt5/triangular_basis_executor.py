@@ -17,11 +17,18 @@ Main loop responsibilities:
 DO NOT copy Symmetry Trap strategy logic.
 DO NOT create duplicate generic MT5 connection code if a stable shared helper exists.
 
+TB-R1.1 EXECUTION-SAFETY REPAIR (fail-closed):
+- Default mode is SHADOW. There is NO default path that reaches order_send.
+- Accepted explicit modes: shadow, demo. "trade"/"live" are NOT accepted and
+  fail closed to SHADOW (NOT_AUTHORIZED).
+- Execution is still globally disabled in this checkpoint
+  (EXECUTION_AUTHORIZED = False): even --mode demo will not place orders.
+
 Usage:
     python mt5/triangular_basis_executor.py --loop --interval 30
     python mt5/triangular_basis_executor.py --once
     python mt5/triangular_basis_executor.py --mode shadow
-    python mt5/triangular_basis_executor.py --mode trade
+    python mt5/triangular_basis_executor.py --mode demo
 """
 
 from __future__ import annotations
@@ -72,6 +79,49 @@ from mt5.triangular_execution_layer import (
 # Strategy identification
 TRIANGULAR_BASIS_MAGIC = get_magic("TRIANGULAR_BASIS_GBP_AUD_NZD")
 TRIANGULAR_BASIS_STRATEGY_ID = "TRIANGULAR_BASIS_GBP_AUD_NZD"
+
+# ─── TB-R1.1 EXECUTION AUTHORIZATION (fail-closed) ───────────────────────
+# No checkpoint in the TB Forward program authorizes live-money execution.
+# This checkpoint authorizes NOTHING: SHADOW is the only safe default.
+# Live activation (future, R9) requires ALL THREE of: explicit config value,
+# explicit environment variable, and an explicit account allowlist.
+EXECUTION_AUTHORIZED = False
+DEMO_AUTHORIZED = False
+LIVE_AUTHORIZED = False
+
+# Modes that may (when separately authorized) reach order_send.
+EXECUTING_MODES = ("demo",)
+
+# Mode resolution is fail-closed: anything not explicitly accepted maps to
+# SHADOW. In particular the legacy "trade" mode and "live" are NOT accepted
+# and MUST NOT reach order_send.
+ACCEPTED_MODES = ("shadow", "demo")
+DEFAULT_MODE = "shadow"
+
+
+def resolve_mode(mode: str) -> tuple:
+    """Resolve a requested mode to (effective_mode, can_execute).
+
+    Fail-closed: an invalid/legacy/execution mode never enables execution.
+    """
+    if mode is None:
+        return DEFAULT_MODE, False
+    m = str(mode).lower()
+    if m in ("trade", "live"):
+        log(f"MODE REJECTED: '{m}' is NOT_AUTHORIZED in this checkpoint "
+            f"— falling back to SHADOW")
+        return DEFAULT_MODE, False
+    if m not in ACCEPTED_MODES:
+        log(f"MODE INVALID: '{m}' not in {ACCEPTED_MODES} — falling back to SHADOW")
+        return DEFAULT_MODE, False
+    if m == "demo":
+        can_execute = DEMO_AUTHORIZED and EXECUTION_AUTHORIZED
+        if not can_execute:
+            log("MODE demo requested but DEMO execution is NOT AUTHORIZED — "
+                "running SHADOW")
+        return m, can_execute
+    # shadow
+    return "shadow", False
 
 # Directories
 LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "live_logs_triangular")
@@ -146,13 +196,17 @@ def write_heartbeat(guard: AccountGuard, engine: TriangularBasisLiveEngine,
 
 # ─── MAIN EXECUTION LOOP ────────────────────────────────────────────────
 
-def run_loop(interval_seconds: int = 30, mode: str = "trade"):
+def run_loop(interval_seconds: int = 30, mode: str = DEFAULT_MODE):
     """Main orchestration loop for Triangular Basis executor.
-    
+
     Args:
         interval_seconds: Poll interval in seconds
-        mode: "replay", "shadow", or "trade"
+        mode: "shadow" (default) or "demo". Execution is fail-closed:
+              "trade"/"live"/unknown modes resolve to shadow, and demo only
+              executes when DEMO_AUTHORIZED and EXECUTION_AUTHORIZED are both
+              True (both False in this checkpoint).
     """
+    mode, can_execute = resolve_mode(mode)
     log("=" * 60)
     log("TRIANGULAR BASIS LIVE EXECUTOR — CEREBUS FX v4.0")
     log(f"Strategy ID: {TRIANGULAR_BASIS_STRATEGY_ID}")
@@ -256,8 +310,8 @@ def run_loop(interval_seconds: int = 30, mode: str = "trade"):
                 log(f"Cycle {cycle}: OPEN_BASKET {decision.basket_id} "
                    f"dir={decision.direction.name} z={decision.zscore:.2f}")
                 
-                if mode == "trade":
-                    # Execute basket
+                if can_execute:
+                    # Execute basket (only reachable when demo is authorized).
                     result = execution_layer.open_basket(decision)
                     log(f"  Execution: success={result.success} state={result.state.value}")
                     if result.error_message:
@@ -270,7 +324,7 @@ def run_loop(interval_seconds: int = 30, mode: str = "trade"):
             elif decision.decision == BasketDecision.CLOSE_BASKET:
                 log(f"Cycle {cycle}: CLOSE_BASKET {decision.basket_id}")
                 
-                if mode == "trade":
+                if can_execute:
                     result = execution_layer.close_basket(decision.basket_id)
                     log(f"  Execution: success={result.success} state={result.state.value}")
                     
@@ -338,10 +392,10 @@ if __name__ == "__main__":
     parser.add_argument("--once", action="store_true", help="Run single scan")
     parser.add_argument("--loop", action="store_true", help="Run continuous loop")
     parser.add_argument("--interval", type=int, default=30, help="Scan interval (seconds)")
-    parser.add_argument("--mode", choices=["replay", "shadow", "trade"], 
-                       default="trade", help="Execution mode")
+    parser.add_argument("--mode", choices=["shadow", "demo"],
+                       default="shadow", help="Execution mode (fail-closed: shadow default; trade/live NOT accepted)")
     parser.add_argument("--env", choices=["demo", "live"], default="demo",
-                       help="Environment")
+                       help="Environment (NOT an execution authorization; execution remains disabled)")
     
     args = parser.parse_args()
     

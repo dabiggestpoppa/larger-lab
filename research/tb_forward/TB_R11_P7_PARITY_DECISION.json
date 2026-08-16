@@ -1,0 +1,27 @@
+{
+  "primary": {
+    "event_count_canonical": 194,
+    "event_count_live": 194,
+    "entry_mismatches": 0,
+    "direction_mismatches": 0,
+    "exit_mismatches": 0,
+    "exit_reason_mismatches": 0,
+    "weight_mismatches": 0,
+    "max_z_diff": 8.473222123939195e-13,
+    "max_weight_diff": 0.0,
+    "parity_pass": true
+  },
+  "control": {
+    "event_count_canonical": 405,
+    "event_count_live": 405,
+    "entry_mismatches": 0,
+    "direction_mismatches": 0,
+    "exit_mismatches": 0,
+    "exit_reason_mismatches": 0,
+    "weight_mismatches": 0,
+    "max_z_diff": 9.245937349078304e-13,
+    "max_weight_diff": 0.0,
+    "parity_pass": true,
+    "primary": true
+  }
+}
