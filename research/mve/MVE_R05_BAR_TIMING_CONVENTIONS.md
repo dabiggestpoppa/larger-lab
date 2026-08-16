@@ -1,0 +1,54 @@
+# MVE R0.5 — BAR TIMING CONVENTIONS (FROZEN)
+
+> Checkpoint: MVE-R0.5-CAUSALITY-GATE · 2026-08-15
+
+These conventions bind all future P4-P7 implementations. They prevent the
+feature-timestamp / execution-timestamp confusion that produces off-by-one
+leakage.
+
+## H1 resampling (frozen in `data_loader.py`)
+
+| Convention | Value |
+|---|---|
+| Source | canonical EURUSD M5 (`quant-lab/data/EURUSDPRO_M5_2023_2026.csv`) |
+| Aggregation | open=first, high=max, low=min, close=last, volume=sum (`tick_volume`) |
+| H1 label | left edge (`label='left'`) |
+| H1 closed | left (`closed='left'`) — an H1 bar spans [t, t+1h) |
+| Timezone | UTC |
+| `h1_interval_time` | the bar's left-edge label t |
+| `h1_knowledge_time` | the end of the hour (t + 1h) — H1 OHLC is NOT knowable before the hour completes |
+| Empty hours | dropped (weekend gaps); never forward-filled |
+| Partial hours | retained with `source_bar_count < 12` recorded; research filters may exclude them; the bar is not knowable until the hour completes |
+
+**Tested:** `test_h1_knowledge_timing_hour_boundary` (identical H1 through a
+completed hour when truncated at the hour boundary) and
+`test_h1_partial_hour_not_knowable` (a mid-hour cut never yields the complete
+hour's OHLC as knowable).
+
+## Bar-level timing (frozen)
+
+| Quantity | Timing |
+|---|---|
+| `close_t` | only knowable after bar t closes |
+| `high_t` / `low_t` | only knowable after bar t closes |
+| `open_t` | knowable at bar t open |
+| Signal timestamp | the bar at which the signal is FIRST knowable |
+| Execution timestamp | always >= signal timestamp + 1 bar (next-bar open or breakout close) |
+
+## Off-by-one rule
+
+- A signal computed from `close_t` must not be timestamped earlier than bar t.
+- A signal that needs bar t+1 for confirmation must be timestamped at bar t+1
+  (delayed confirmation), never backdated to t.
+- No component may mix its feature timestamp with a hypothetical execution
+  timestamp.
+
+## Current known violations (blocked scientific stubs)
+
+| Component | Violation |
+|---|---|
+| `generate_sigma_escape_signals` (A) | signal at i gated by bar i+1's close — 1-bar backdate |
+| `generate_accepted_sigma_breakout_signals` (B) | signal at i decided by bar i+1 |
+| `generate_recursive_morphic_trend_signals` (C) | entry at i decided by bar i+1 |
+
+Repair (when authorized): emit these signals at the confirmation bar i+1.

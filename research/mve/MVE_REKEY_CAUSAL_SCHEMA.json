@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "checkpoint": "MVE-R0.5-CAUSALITY-GATE",
+  "purpose": "Required timestamp fields and rules for any future P6 rekey implementation. Infrastructure contract only; scientific rekey research is NOT yet implemented (RKEY-B currently violates this schema).",
+  "required_fields": [
+    "original_state_time",
+    "acceptance_known_time",
+    "rekey_trigger_time",
+    "new_anchor_active_time"
+  ],
+  "ordering_rule": "original_state_time <= acceptance_known_time <= rekey_trigger_time <= new_anchor_active_time",
+  "hard_rule": "new_anchor_active_time >= rekey_trigger_time; changing future data must NEVER move a historical rekey earlier",
+  "prohibitions": [
+    "no retroactive rekey",
+    "no backdated signals from a rekey that was not yet knowable",
+    "no repainting of the coordinate system before the rekey trigger is confirmed"
+  ],
+  "current_status": {
+    "RKEY_A": "compliant (re-anchor at the crossing bar, causal)",
+    "RKEY_B": "VIOLATION - scans bars i+1..i+4 (future) and assigns the anchor at bar i; rekey_trigger_time effectively moves with future data (measured repaint diff 1.033 on real data)",
+    "RKEY_C": "timing-compliant (trailing only) but crashes on warm-up NaN (int(NaN)) - blocked robustness defect"
+  },
+  "validation": "src/mve/causality.validate_rekey_events() enforces field presence and ordering; tested in tests/mve/test_causality.py::test_rekey_schema_validation"
+}

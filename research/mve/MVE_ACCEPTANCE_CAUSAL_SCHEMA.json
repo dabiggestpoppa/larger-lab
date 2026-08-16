@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "checkpoint": "MVE-R0.5-CAUSALITY-GATE",
+  "purpose": "Required timestamp fields and rules for any future P4 acceptance-event implementation. Infrastructure contract only; scientific acceptance research is NOT yet implemented.",
+  "required_fields": [
+    "state_event_time",
+    "evidence_complete_time",
+    "acceptance_known_time"
+  ],
+  "ordering_rule": "state_event_time <= evidence_complete_time <= acceptance_known_time",
+  "consumption_rule": "an acceptance event is consumable ONLY at acceptance_known_time; never earlier",
+  "prohibitions": [
+    "no backdating: an event may not be marked accepted on a bar before its evidence is complete",
+    "no post-hoc acceptance used as an entry signal",
+    "no future occupancy leakage"
+  ],
+  "variant_examples": {
+    "touch_A0": {
+      "state_event_time": "bar at which price touches/breaches the boundary",
+      "evidence_complete_time": "same bar (touch is instant)",
+      "acceptance_known_time": "same bar close / next bar open"
+    },
+    "close_A1": {
+      "state_event_time": "bar at which price first closes beyond the boundary",
+      "evidence_complete_time": "bar close",
+      "acceptance_known_time": "after that bar close"
+    },
+    "occupancy_A2": {
+      "note": "3-of-last-4 occupancy cannot be marked accepted on the first bar",
+      "state_event_time": "first bar of the qualifying window",
+      "evidence_complete_time": "bar at which the Nth-of-M occupancy condition is met",
+      "acceptance_known_time": "evidence_complete_time (the confirming bar)"
+    },
+    "persistence_A3": {
+      "note": "persistence requiring N surviving bars cannot be backdated",
+      "state_event_time": "initial crossing bar",
+      "evidence_complete_time": "bar at which the Nth survival bar closes",
+      "acceptance_known_time": "evidence_complete_time"
+    },
+    "retest_A4": {
+      "note": "retest acceptance cannot be backdated to the initial breakout",
+      "state_event_time": "initial breakout bar",
+      "evidence_complete_time": "retest-hold confirmation bar",
+      "acceptance_known_time": "evidence_complete_time"
+    }
+  },
+  "validation": "src/mve/causality.validate_acceptance_events() enforces field presence and ordering; tested in tests/mve/test_causality.py::test_acceptance_schema_validation"
+}

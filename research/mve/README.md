@@ -1,5 +1,25 @@
 # 📊 CEREBUS MORPHIC VOLATILITY ENGINE (MVE) RESEARCH PROJECT
 
+## R0.5 Infrastructure Status (2026-08-15)
+
+> The MVE research stack has been rebuilt from a nonfunctional skeleton into a
+> deterministic, fail-closed research environment. Four checkpoints are
+> complete (commits on `cerebus-mve-implementation`):
+>
+> 1. `MVE-R0.5-SOURCE-IMPORT-REPAIR` — all `src/mve` modules compile and import
+> 2. `MVE-R0.5-DATA-PIPELINE` — canonical EURUSD frozen (`630b8a40…d3f77`),
+>    fail-closed loader, deterministic M5→H1 resampler
+> 3. `MVE-R0.5-RUNNER-PERSISTENCE` — phase-isolated CLI, prerequisite gates,
+>    real persistence with full provenance
+> 4. `MVE-R0.5-CAUSALITY-GATE` — causality harness; infrastructure is
+>    future-mutation/truncation invariant; **gate formally NOT passed** due to
+>    4 recorded violations in blocked scientific stubs (RKEY-B repaint; signal
+>    Models A/B/C 1-bar backdating)
+>
+> **Phase 4 remains BLOCKED.** `scientific_phase4_ready = false` pending human
+> authorization to repair the 4 causality violations. See `MVE_R05_FINAL_DECISION.json`,
+> `MVE_R05_CAUSALITY_REPORT.md`, `MVE_CAUSALITY_CONTRACT.md`.
+
 ## Overview
 
 This repository contains the complete research program for the **CEREBUS Morphic Volatility Engine (MVE)**, a quantitative research initiative investigating whether financial markets exhibit statistically persistent directional movement after occupying and accepting volatility-normalized sigma states.

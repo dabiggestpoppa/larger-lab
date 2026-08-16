@@ -1,0 +1,85 @@
+{
+  "checkpoint": "MVE-R0.5-CAUSALITY-GATE",
+  "causality_gate_pass": false,
+  "infrastructure_causality_pass": true,
+  "scientific_stub_causality_pass": false,
+  "perturbed_violations": [
+    "rekey/RKEY_B",
+    "rekey/RKEY_B (_rekey_variant_b)",
+    "rekey/calculate_rekey_variants",
+    "signals/escape_model_A",
+    "signals/generate_accepted_sigma_breakout_signals (Model B)",
+    "signals/generate_recursive_morphic_trend_signals (Model C)",
+    "signals/generate_sigma_escape_signals (Model A)"
+  ],
+  "static_violations": [
+    {
+      "component": "rekey/RKEY_B (_rekey_variant_b)",
+      "classification": "CAUSAL_VIOLATION",
+      "evidence": "scans bars i+1..i+4 (future) to set rekey_anchor at bar i; future data can move a historical rekey earlier",
+      "status": "BLOCKED_SCIENTIFIC_IMPLEMENTATION (P6)"
+    },
+    {
+      "component": "signals/generate_sigma_escape_signals (Model A)",
+      "classification": "CAUSAL_VIOLATION",
+      "evidence": "signal at bar i is suppressed/emitted using bar i+1's close ('no immediate close back below boundary') - 1-bar backdated confirmation",
+      "status": "BLOCKED_SCIENTIFIC_IMPLEMENTATION (P7)"
+    },
+    {
+      "component": "signals/generate_accepted_sigma_breakout_signals (Model B)",
+      "classification": "CAUSAL_VIOLATION",
+      "evidence": "uses bar i+1 ('retest rejection / next close higher') to emit the signal at bar i",
+      "status": "BLOCKED_SCIENTIFIC_IMPLEMENTATION (P7)"
+    },
+    {
+      "component": "signals/generate_recursive_morphic_trend_signals (Model C)",
+      "classification": "CAUSAL_VIOLATION",
+      "evidence": "entry at bar i decided by bar i+1's coordinate ('+2 sigma accepted')",
+      "status": "BLOCKED_SCIENTIFIC_IMPLEMENTATION (P7)"
+    },
+    {
+      "component": "rekey/calculate_rekey_variants",
+      "classification": "BLOCKED_SCIENTIFIC_IMPLEMENTATION (robustness defect)",
+      "evidence": "_rekey_variant_c and generate_multi_timeframe_morphic_alignment_signals crash with ValueError on warm-up NaN coordinates (int(NaN)); probes in this matrix used NaN-cleaned coordinates (documented harness adaptation)",
+      "status": "BLOCKED_SCIENTIFIC_IMPLEMENTATION (P6/P7)"
+    }
+  ],
+  "delayed_confirmation_components": [
+    "anchors/pivot_high",
+    "anchors/pivot_low"
+  ],
+  "delayed_confirmation_note": "pivot event time = bar i; pivot known time = bar i + window; consumers must use apply_anchor_delay(pivots, window)",
+  "ex_post_only_components": [
+    "volatility/analyze_estimator_quality",
+    "volatility/evaluate_estimator_quality",
+    "volatility/get_best_estimators",
+    "anchors/evaluate_anchor_quality",
+    "anchors/get_best_anchors",
+    "morphic_coordinates/analyze_coordinate_trends",
+    "morphic_coordinates/analyze_coordinate_statistics",
+    "morphic_coordinates/analyze_coordinate_regimes",
+    "morphic_coordinates/analyze_coordinate_persistence",
+    "morphic_coordinates/calculate_coordinate_transitions",
+    "sigma_states/analyze_event_trends",
+    "sigma_states/analyze_event_statistics",
+    "sigma_states/analyze_event_regimes",
+    "sigma_states/calculate_event_transitions",
+    "sigma_states/evaluate_state_quality",
+    "sigma_states/analyze_event_state_transitions",
+    "sigma_states/analyze_event_time_metrics",
+    "acceptance/analyze_acceptance_forward_returns",
+    "acceptance/analyze_acceptance_regime_effects",
+    "regime/analyze_regime_specific_behavior",
+    "regime/analyze_high_displacement_high_expansion",
+    "rekey/analyze_rekey_variants",
+    "rekey/analyze_rekey_effectiveness",
+    "rekey/analyze_rekey_continuation",
+    "rekey/analyze_rekey_trends"
+  ],
+  "ex_post_only_note": "event-study labeling only; never available to a live signal",
+  "holdout_status": "FINAL_HOLDOUT_PENDING",
+  "holdout_note": "slice used here is 2023-07-03..2024-03-31 (development range); 2026 remains untouched",
+  "scientific_phase4_ready": false,
+  "phase4_blocked_reason": "causality gate did not pass: 4 recorded violations in blocked scientific stub code (RKEY-B repaint; escape/breakout/recursive signal 1-bar backdating). Infrastructure itself is causal.",
+  "required_authorization": "human must authorize the minimal causal repairs (emit delayed-confirmation signals at the confirmation bar; anchor RKEY-B at the retest bar) before the gate can be re-run to PASS."
+}

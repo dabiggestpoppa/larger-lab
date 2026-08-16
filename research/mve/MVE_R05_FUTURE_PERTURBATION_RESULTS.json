@@ -1,0 +1,235 @@
+{
+  "volatility/close_to_close": {
+    "t_pos": 3256,
+    "seed": 101,
+    "delay_bars": 0,
+    "max_abs_diff": 0.0,
+    "verdict": "PASS"
+  },
+  "volatility/ewma": {
+    "t_pos": 3256,
+    "seed": 101,
+    "delay_bars": 0,
+    "max_abs_diff": 0.0,
+    "verdict": "PASS"
+  },
+  "volatility/parkinson": {
+    "t_pos": 3256,
+    "seed": 101,
+    "delay_bars": 0,
+    "max_abs_diff": 0.0,
+    "verdict": "PASS"
+  },
+  "volatility/garman_klass": {
+    "t_pos": 3256,
+    "seed": 101,
+    "delay_bars": 0,
+    "max_abs_diff": 0.0,
+    "verdict": "PASS"
+  },
+  "volatility/atr_normalized": {
+    "t_pos": 3256,
+    "seed": 101,
+    "delay_bars": 0,
+    "max_abs_diff": 0.0,
+    "verdict": "PASS"
+  },
+  "volatility/mad": {
+    "t_pos": 3256,
+    "seed": 101,
+    "delay_bars": 0,
+    "max_abs_diff": 0.0,
+    "verdict": "PASS"
+  },
+  "volatility/garch": {
+    "t_pos": 3256,
+    "seed": 101,
+    "delay_bars": 0,
+    "max_abs_diff": 0.0,
+    "verdict": "PASS"
+  },
+  "coordinates/live_sigma": {
+    "t_pos": 3256,
+    "seed": 101,
+    "delay_bars": 0,
+    "max_abs_diff": 0.0,
+    "verdict": "PASS"
+  },
+  "coordinates/frozen_sigma": {
+    "t_pos": 3256,
+    "seed": 101,
+    "delay_bars": 0,
+    "max_abs_diff": 0.0,
+    "verdict": "PASS"
+  },
+  "coordinates/morphic": {
+    "t_pos": 3256,
+    "seed": 101,
+    "delay_bars": 0,
+    "max_abs_diff": 0.0,
+    "verdict": "PASS"
+  },
+  "sigma_states/classification": {
+    "t_pos": 3256,
+    "seed": 101,
+    "delay_bars": 0,
+    "max_abs_diff": 0.0,
+    "verdict": "PASS"
+  },
+  "sigma_states/occupation": {
+    "t_pos": 3256,
+    "seed": 101,
+    "delay_bars": 0,
+    "max_abs_diff": 0.0,
+    "verdict": "PASS"
+  },
+  "acceptance/occupancy": {
+    "t_pos": 3256,
+    "seed": 101,
+    "delay_bars": 0,
+    "max_abs_diff": 0.0,
+    "verdict": "PASS"
+  },
+  "acceptance/classification": {
+    "t_pos": 3256,
+    "seed": 101,
+    "delay_bars": 0,
+    "max_abs_diff": 0.0,
+    "verdict": "PASS"
+  },
+  "anchors/pivot_confirmed_delayed": {
+    "t_pos": 3256,
+    "seed": 101,
+    "delay_bars": 5,
+    "note": "values with knowledge time <= t only (event time + window <= t)",
+    "max_abs_diff": 0.0,
+    "verdict": "PASS"
+  },
+  "anchors/pivot_raw_undelayed": {
+    "t_pos": 3256,
+    "seed": 101,
+    "delay_bars": 0,
+    "note": "raw consumption: near-T pivots may repaint (demonstrates the danger)",
+    "max_abs_diff": 0.0,
+    "verdict": "PASS"
+  },
+  "rekey/RKEY_A": {
+    "t_pos": 3256,
+    "seed": 101,
+    "delay_bars": 0,
+    "max_abs_diff": 0.0,
+    "verdict": "PASS"
+  },
+  "rekey/RKEY_C": {
+    "t_pos": 3256,
+    "seed": 101,
+    "delay_bars": 0,
+    "max_abs_diff": 0.0,
+    "verdict": "PASS"
+  },
+  "rekey/RKEY_B": {
+    "cutoffs": [
+      0.3,
+      0.5,
+      0.7,
+      0.85
+    ],
+    "seeds": [
+      101,
+      202,
+      303,
+      404,
+      505
+    ],
+    "delay_bars": 0,
+    "signed": false,
+    "max_abs_diff_over_probes": 1.0333612424257816,
+    "all_diffs": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.8702437470364689,
+      1.0333612424257816,
+      1.0333612424257816,
+      1.0333612424257816,
+      0.8702437470364689,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "note": "static CAUSAL_VIOLATION (future scan i+1..i+4 backdates the anchor); numerically demonstrated on fixtures and here where a cutoff lands near a crossing",
+    "verdict": "VIOLATION"
+  },
+  "signals/escape_model_A": {
+    "cutoffs": [
+      0.3,
+      0.5,
+      0.7,
+      0.85
+    ],
+    "seeds": [
+      101,
+      202,
+      303,
+      404,
+      505
+    ],
+    "delay_bars": 0,
+    "signed": false,
+    "max_abs_diff_over_probes": 0.0,
+    "all_diffs": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "note": "static CAUSAL_VIOLATION (bar i+1 gates the signal at bar i); numerically demonstrated on fixtures and here where a cutoff lands near a crossing",
+    "verdict": "PASS_MEASURED_STATIC_VIOLATION"
+  },
+  "signals/mtf_model_D": {
+    "t_pos": 3256,
+    "seed": 101,
+    "delay_bars": 0,
+    "max_abs_diff": 0.0,
+    "verdict": "PASS"
+  },
+  "coordinates/pivot_delayed_pipeline": {
+    "t_pos": 3256,
+    "seed": 101,
+    "delay_bars": 5,
+    "max_abs_diff": 0.0,
+    "verdict": "PASS"
+  },
+  "coordinates/pivot_raw_pipeline": {
+    "t_pos": 3256,
+    "seed": 101,
+    "delay_bars": 0,
+    "max_abs_diff": 0.0,
+    "verdict": "PASS"
+  }
+}

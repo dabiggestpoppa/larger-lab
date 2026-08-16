@@ -88,6 +88,28 @@ See `MVE_DATA_ACCESS_LEDGER.csv` and `MVE_DATA_SPLIT_LOCK.json`.
 - R0 finding (preserved): the runner crashed on import, two modules did not
   compile, loaded no real data, and wrote no results (see `MVE_RUNNER_AUDIT.md`).
 
+## Causality status
+
+> **UPDATED (R0.5 Commit 4):** the causality harness is built and the full MVE
+> source has been classified (`MVE_CAUSALITY_CONTRACT.md`, `MVE_R05_STATIC_LEAKAGE_AUDIT.md`).
+> The research infrastructure (loader, resampler, volatility, coordinates, sigma,
+> occupancy/acceptance, runner, persistence) is **future-mutation and truncation
+> invariant** on real data. The causality gate formally did NOT pass because 4
+> recorded violations live in blocked scientific stubs: RKEY-B repaints (future
+> retest scan backdates the anchor; measured diff 1.033) and signal Models A/B/C
+> gate the signal at bar i on bar i+1. Per the immutable rule these are recorded
+> as blockers, not repaired. See `MVE_R05_CAUSALITY_RESULTS.json`,
+> `MVE_R05_FUTURE_PERTURBATION_RESULTS.json`, `MVE_R05_TRUNCATION_INVARIANCE.csv`,
+> `MVE_R05_FINAL_DECISION.json`, `MVE_R05_CAUSALITY_REPORT.md`.
+
+- Infrastructure causality: **PASS** (all measured diffs 0.0).
+- Scientific stubs: **FAIL** (4 violations + 2 robustness defects: RKEY-C
+  `int(NaN)` crash, Model E undefined `n`).
+- Delayed confirmation: pivots (event at i, known at i+window) - consumption
+  must use `apply_anchor_delay(pivots, window)`.
+- Holdout remains `FINAL_HOLDOUT_PENDING`; the causality slice (2023-07-03..
+  2024-03-31) is entirely inside the development range.
+
 ---
 
 **Data truth established (partial):** the real files are measured above.
