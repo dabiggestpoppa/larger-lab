@@ -20,11 +20,50 @@ through full-press) so the user can deliberately choose a risk-return regime. Al
 | `CR-RISK-R2-LOSS-ANATOMY` | R2: winner/loser MAE, failure speed, recovery surface, tail attribution | ✅ Complete — 248/248 tests |
 | `CR-RISK-R3-PROFIT-ANATOMY` | R3: MFE distributions, time-to-MFE, giveback, remaining expectancy | ✅ Complete — 267/267 tests |
 | `CR-RISK-R3.1-TIME-TO-PROFIT-METRIC-REPAIR` | R3.1: fix share_of_winners > 1.0 in R3_TIME_TO_PROFIT | ✅ Complete — R3_CONCLUSIONS_UNCHANGED |
-| `CR-RISK-R4-STATIC-FRONTIER` | R4: fixed-fractional ladder, DD probability map, ruin defs, full-press envelopes | ⏳ |
-| `CR-RISK-BLOCK1-FOUNDATION-SEAL` | Master report + RM-S0..S4 profile library | ⏳ |
+| `CR-RISK-R4-STATIC-FRONTIER` | R4: fixed-fractional ladder, DD probability map, ruin defs, full-press envelopes | ✅ Complete — 286/286 tests |
+| `CR-RISK-BLOCK1-FOUNDATION-SEAL` | Master report + RM-S0..S4 profile library | ⏳ (R4 stop condition — awaits human review) |
 
 `block_2_cleared = false` until human review after the Block-I seal. No R5-R9, Kelly, hybrid sizing,
 deploy, or MT5.
+
+## R4 — Static Risk Frontier ✅ COMPLETE
+
+**Commit:** `CR-RISK-R4-STATIC-FRONTIER` (pushed) · Tests: 15 new (`tests/test_risk_r4.py`) · **286/286 repo-wide** (207 main + 23 R1 + 18 R2 + 23 R3 + 15 R4) · deterministic (byte-identical) · inputs hash-frozen (`R4_INPUT_HASH_MANIFEST.json`)
+
+### The map (research ladder, NOT recommendations)
+
+| f% | CAGR | max DD | Calmar | worst day | P(DD>=20%) | P(DD>=40%) | P(tech) |
+|---|---|---|---|---|---|---|---|
+| 0.25 | +31% | 2.6% | 11.8 | -1.4% | 0% | 0% | 0 |
+| 0.50 | +71% | 5.2% | 13.7 | -2.8% | 0% | 0% | 0 |
+| 1.00 | +190% | 10.2% | 18.7 | -5.6% | 0% | 0% | 0 |
+| 2.00 | +711% | 19.7% | 36.0 | -10.9% | 1% | 0% | 0 |
+| 3.00 | +2080% | 28.7% | 72.5 | -16.1% | 4% | 0.1% | 0 |
+| 5.00 | +13950% | 44.6% | 313 | -25.8% | 12% | 1.4% | 0 |
+
+(Historical max DD is the peak-to-trough of the overlap-exact hourly equity path; ruin/DD probabilities are 10k-path chronological block bootstrap. `block1_static_risk_complete = true`, `block_2_cleared = false`.)
+
+### Key findings
+
+- **Risk-unit truth (Q1):** f maps DIRECTLY into equity — a -3R trade at f=1% costs ~-3%. 1R = 24.49 bps is the expected-move unit, NOT a stop; A worst -3.66R, B worst -3.31R. Historical max DD is **near-linear in f** (7.6-10.5% per 1% f); the nonlinearity lives in the **tail**: block-bootstrap p95 max DD at f=5% is 59.4% vs 44.6% historical.
+- **Overlap-exact hourly compounding** preserves real overlap (max 3 concurrent): worst day at f=1% is -5.6% (vs -3.7% sequential) — overlap is a real cost driver on the downside. Sequential CAGR tracks hourly within 5% up to f=1.5%.
+- **Ruin map (block bootstrap):** P(DD>=40%) stays under 1% up to f=2%; at f=5% it is 1.4% and P(DD>=50%) 0.3%; technical ruin = 0 across the whole ladder (the edge dominates resampled sequences).
+- **Edge degradation:** at f=1%, expected CAGR falls 190% -> 75% -> 5% -> -37% as edge drops 100/75/50/25%; p95 max DD balloons 15% -> 20% -> 43% -> 83%. **The strategy is not viable below ~50% of its historical edge at any static fraction.**
+- **Tail stress:** amplifying the worst 5% of losses 2x raises max DD 10.2% -> 16.0% at f=1%; inserting a 5-trade p99-loss cluster raises it to 17.6% (terminal 20.8x -> 17.9x).
+- **Loss streaks:** 10 median-loser streak at f=1% = 6.3% DD (13-streak 8.1%, 15-streak 9.2%); at f=5% a 10-streak of median losers = 27.2% DD.
+- **Family:** B is the capital-limiting family at every f (higher solo max DD at every fraction: e.g. f=1% A 10.3% vs B 11.1%; f=5% A 43.4% vs B 45.7%).
+- **Heat:** 3-position overlap exists only 20h (0.1% of in-market time); gross R max 2.39R at 3 positions (heat decays 10x sqrt(rem)). Worst portfolio CAE 3.06R -> at f=1% that is a -3.1% account event.
+- **Zones (data-driven, block-bootstrap; the frontier is steep):** RM-S0 f=1.5% (CAGR 392%, p95 DD 22%), RM-S1 f=3.0% (2080%, 40%), RM-S2/S3/S4 all collapse to f=5.0% (P(DD>=30%) 5.4% and P(DD>=40%) 1.4% at 5% - the edge is so strong that even 5% per event stays inside every full-press band). Reported as-is per the brief; no 'best size' selected.
+- **Envelopes:** SURVIVAL (P50DD<=5%) allows 5% at 100%/75% edge and 1.5% at 50% edge; PROP (P10DD<=5%) allows 1.5%/1.0%/0.3% at 100/75/50% edge.
+
+### Bugs caught during R4 build
+
+- `worst_cluster_pct` returned 0 everywhere (init `max(-inf, ...)` locked 0 once a positive cluster iterated first) — now `min(...)`; worst 12h-cluster at f=1% is -6.0%.
+- `worst_seq_pct` measured min-absolute-equity below start instead of peak-to-trough DD (equity never dips below 1.0 after trade 2) — now relative max DD (10.0% at f=1%, matching the hourly 10.2%).
+
+### STOP condition
+
+`block1_static_risk_complete = true` — but **Block II (compounding families, allocation, episode sizing, heat management, DD-adaptive, Kelly, hybrid) does NOT start** until human review. No 'best size' selected; no alpha, entry, exit, or trade-management change.
 
 ## R3.1 — Time-to-Profit Metric Repair ✅ COMPLETE
 
