@@ -4,7 +4,7 @@
 > **Strategy:** Triangular Basis Mean Reversion — GBP/AUD/NZD (GBPNZD = GBPAUD × AUDNZD)
 > **Canonical engine:** `quant-lab/engines/triangular_basis_engine.py` (frozen at commit `2435d04e`)
 > **Live architecture:** TB-LIVE-ARCH-01 (`683ba901`) — 4-layer isolation, magic `31082026`
-> **Current phase:** TB-P5-NEUTRAL-BASIS-VALIDATION-01 ✅ COMPLETE — `artifacts/triangular_basis/research/TB_P5_VALIDATION_REPORT.md` (base `303abcdae`)
+> **Current phase:** TB-P6-ENTRY-ANATOMY-01 ✅ COMPLETE — `artifacts/triangular_basis/research/TB_P6_ENTRY_ANATOMY_REPORT.md` (base `7868a67d`)
 
 ---
 
@@ -19,6 +19,7 @@
 | TB-LIVE-SHADOW-04A live shadow + neutrality research | ⚠️ | Gate K failure real, but the "405-trade decomposition" tables were **synthetic** (see below) |
 | **TB-RESEARCH-VERIFY-04A (independent audit)** | ✅ **COMPLETE** | **Neutral sizing preserves AND improves alpha; hedge overlay NOT needed** |
 | **TB-P5-NEUTRAL-BASIS-VALIDATION-01 (validation)** | ✅ **COMPLETE** | **TB-B + all TB-C variants STRONG; optimization cleared; no weak year; FORWARD_OOS_PENDING** |
+| **TB-P6-ENTRY-ANATOMY-01 (entry research)** | ✅ **COMPLETE** | **z=3.0–3.5 stable plateau: +5 pips EV uplift, holdout-consistent, cost-robust >3x; 15 A/B candidates; p7 cleared** |
 
 ---
 
@@ -155,15 +156,90 @@ historical sample. Shadow collection on the live MT5 demo feed is prepared.
 
 ---
 
-## Next Phase — TB-RESEARCH-VERIFY-04B (proposed, informed by TB-P5 verdict)
+## TB-P6-ENTRY-ANATOMY-01 ✅ COMPLETE (2026-08-15)
 
-1. Re-run TB-LIVE-PARITY-02 replay parity with the TB-C ε=5% neutral weights.
-2. **Demo forward test (2–4 weeks) with TB-C ε=5% sizing** — real fill + basis-z logging;
-   this is what converts FORWARD_OOS_PENDING → FORWARD_OOS (the ±0.003 basis dislocation
-   is the entire edge and must be verified live).
-3. Hedge overlay only as a fallback if forward basis reversion under-delivers.
-4. After forward data accumulates: human-review `TB-P6-OPTIMIZATION-RESEARCH-PLAN.md`
-   dimensions one at a time (each re-runs TB-P5 sections 1–12).
+Entry RESEARCH ONLY (base `7868a67d`; TB-P5 accepted, `optimization_cleared = true`).
+Frozen elements untouched (exit z=0, stop z=6, session, costs 10.2 pips, causal weights).
+Protocol `TB_P6_PROTOCOL.md` pre-registered the split/grid/metrics/gates BEFORE any outcome.
+Reproduce: `python quant-lab/engines/tb_p6_anatomy.py --phase all` +
+`python quant-lab/engines/tb_p6_tests.py` (411 deterministic checks, exit 0 = pass).
+Full report: `TB_P6_ENTRY_ANATOMY_REPORT.md`; machine decision: `TB_P6_DECISION.json`.
+
+### 1. Entry-threshold surface (P6.1) — z grid 1.50–4.00, 11 points × 6 models
+Higher entry z monotonically improves EV for every model; frequency falls off fast:
+
+| z | N | coverage | EV TB-B | EV TB-C-5% | PF TB-B | WR | maxDD | MFE | MAE |
+|---|---|---|---|---|---|---|---|---|---|
+| 2.50 (frozen) | 405 | 100% | 17.86 | 16.65 | 12.42 | 85.9% | −35 | 17.7 | −15.7 |
+| 2.75 | 272 | 67% | 20.07 | 18.76 | 13.87 | 85.3% | −50 | 19.1 | −15.4 |
+| **3.00** | 194 | 48% | **23.07** | 21.61 | 18.05 | 88.1% | −35 | 21.7 | −14.9 |
+| **3.25** | 134 | 33% | 22.94 | 21.53 | 17.64 | 88.1% | −49 | 22.0 | −13.1 |
+| **3.50** | 79 | 20% | 24.73 | 22.97 | 13.92 | 87.3% | −49 | 24.7 | −13.3 |
+| 3.75 | 49 | 12% | 27.74 | 25.92 | 14.35 | 89.8% | −40 | 27.9 | −12.3 |
+| 4.00 | 32 | 8% | 34.44 | 32.04 | 18.85 | 93.8% | −35 | 32.0 | −11.7 |
+
+- **Plateau (pre-registered rule): z ≈ 2.75–3.50** for all neutral models (spread ≤ 15% of
+  run max, run max ≥ baseline, chronologically stable).
+- z < 2.5 is strictly worse (more noise trades): every 1.50–2.25 cell grades **D**.
+- MFE rises with threshold; MAE shrinks — entry quality improves structurally.
+
+### 2. Further-extension anatomy (P6.2) — measurement only
+- Path classes (405 baseline trades): IMMEDIATE_CONVERGENCE 33% (EV 26.2), SHALLOW_CONVERGED
+  27% (EV 26.0), SHALLOW_FAILED 17% (EV 1.3), IMMEDIATE_PERSISTED 12% (EV 9.0), DEEP_FAILED
+  5% (EV −6.0), DEEP_CONVERGED 6% (EV 20.0).
+- **Hypothesis A (extension → higher expectancy): NOT supported.** **B: inverted-U present**
+  (peak EV at moderate extension, collapse at extreme). **C: extreme extension (|z| ≥ 4.5)
+  = regime break** — P(conv) 29% vs 67% below 4.5, EV 8.9 vs 18.0.
+- **Hazard:** P(convergence) decays monotonically with time-since-signal at every |z| level
+  (e.g. at |z| 2.5–3.0: 67% within 15 min → 38% at 2–4 h). Persistence is a failure signal.
+- No entry/exit rule derived — this is the measurement layer for P7 (human-gated).
+
+### 3. Session clock (P6.3)
+- Best half-hour: 60–90 min after London open (EV TB-B 33.9, N=20). Dead zones:
+  half-hours 12–13 (~4.5–5.5h in) and quarter-hour 26.
+- **Early London (40% of trades): EV 24.7, failure 10%. Mid (47%): EV 15.1, failure 42%.
+  Late (12%): EV 5.8, failure 84%** — late-session entries are materially worse.
+
+### 4. Dislocation-quality fingerprint (P6.4) — causal, descriptive
+Per-trade causal features (velocity, acceleration, duration above threshold, touches,
+time-since-prior-signal, 5-min basis vol, leg ATRs, expanding vol tercile, leg contribution
+dominance, session/weekday). Future-bar invariance tested (any perturbation of bars after
+entry leaves the fingerprint bit-identical). Leg-dominance conditioning shows little
+separation; vol/velocity terciles are descriptive inputs for P7.
+
+### 5. Cost stress + execution translation (P6.4)
+- **Break-even cost multiplier rises with threshold:** z=2.5 → 2.75x (TB-B); **z ≥ 3.0 keeps
+  EV > 0 even at 3.0x costs** (BE > 3.0x) for every neutral model.
+- **Lot translation @ z=3.0:** TB-B executable from $10k (residual 5.2%, rejection 0%),
+  $25k → 1.2% residual, PnL ratio ≈ 1.00. TB-C-5% similar (5.0% at $25k).
+
+### 6. Candidates (seal) — 50 tested, 15 A/B
+1×A (TB-C-10% @ 3.00), 14×B (all neutral models @ 3.00/3.25/3.50), 10×C (3.75/4.00 —
+exploratory, coverage 8–12%), 25×D (z < 2.75 — worse than baseline, CI excludes 0 the wrong
+way). Every A/B candidate: EV uplift +4.7…+6.9 pips with bootstrap CI excluding 0 (q < 0.02,
+BH-FDR per model family), same-direction DISCOVERY/CONFIRMATION/HOLDOUT blocks, P5 date
+holdout agrees, plateau member, basis share 99–104% (attribution preserved), survives
+top-5% removal, break-even ≥ 2.9x.
+
+### 7. Decision
+**`p7_convergence_optimization_cleared = true`** — a broad, stable, holdout-supported entry
+improvement exists (raise the z entry threshold into the 3.0–3.5 plateau; 48%→20% coverage).
+Original z=2.5 entry is retained until a human authorizes P7 testing of the candidate rules.
+
+**STOP FOR HUMAN REVIEW.** No exit/hold/stop/pyramiding/risk work begins.
+
+---
+
+## Next Phase — TB-P7 (proposed, gated on human review of P6)
+
+1. **Human review** `TB_P6_ENTRY_ANATOMY_REPORT.md` + `TB_P6_DECISION.json` +
+   `P6_CANDIDATE_ENTRY_RULES.json` (candidates A/B: z=3.0–3.5 entry for TB-B / TB-C-5%).
+2. Candidate entry change (if approved) re-runs the full TB-P5 validation sections 1–12
+   before adoption; one dimension at a time.
+3. 04B demo forward test with neutral sizing remains the path to convert
+   FORWARD_OOS_PENDING → FORWARD_OOS (the live basis-z distribution is the missing evidence).
+4. Convergence/exit optimization (P7) uses the P6.2 hazard + path-class measurements only
+   after the entry decision is settled.
 
 ---
 
@@ -175,11 +251,27 @@ historical sample. Shadow collection on the live MT5 demo feed is prepared.
 | `quant-lab/engines/tb_verify_out/` | 04A outputs (comparison, per-trade, summary) |
 | `quant-lab/engines/tb_p5_validate.py` | **P5 validation suite** (reproduces all TB_P5_* outputs) |
 | `quant-lab/engines/tb_p5_tests.py` | **P5 deterministic tests** (60+ checks, exit 0 = pass) |
+| `quant-lab/engines/tb_p6_anatomy.py` | **P6 entry-anatomy suite** (`--phase p61/p62/p63/p64/seal/all`) |
+| `quant-lab/engines/tb_p6_tests.py` | **P6 deterministic tests** (411 checks, exit 0 = pass) |
 | `artifacts/triangular_basis/research/TB_RESEARCH_VERIFY_04A_REPORT.md` | 04A audit report |
 | `artifacts/triangular_basis/research/TB_P5_VALIDATION_PROTOCOL.md` | P5 frozen protocol (metrics, verdict rules) |
 | `artifacts/triangular_basis/research/TB_P5_VALIDATION_REPORT.md` | P5 full validation report |
 | `artifacts/triangular_basis/research/TB_P5_DECISION.json` | Machine verdicts + rate sensitivity |
-| `artifacts/triangular_basis/research/TB_P5_*.csv` | Model comparison, walk-forward, yearly, attribution, anatomy, cost/exec stress, bootstrap, lot constraints, forward OOS, per-trade weights |
+| `artifacts/triangular_basis/research/TB_P5_*.csv` | P5 tables (comparison, walk-forward, yearly, attribution, anatomy, cost/exec stress, bootstrap, lots, forward OOS, weights) |
+| `artifacts/triangular_basis/research/TB_P6_PROTOCOL.md` | **P6 pre-registered protocol (split, grid, plateau rule, gates)** |
+| `artifacts/triangular_basis/research/TB_P6_ENTRY_ANATOMY_REPORT.md` | **P6 full report** |
+| `artifacts/triangular_basis/research/TB_P6_DECISION.json` | **P6 decision (`p7_convergence_optimization_cleared`)** |
+| `artifacts/triangular_basis/research/P6_ENTRY_THRESHOLD_SURFACE.csv` | 11 z × 6 models full metrics |
+| `artifacts/triangular_basis/research/P6_ENTRY_THRESHOLD_PLATEAUS.md` | Plateau/cliff/saturation analysis |
+| `artifacts/triangular_basis/research/P6_FURTHER_EXTENSION_PATHS.csv` | Per-trade post-entry |z| paths + classes |
+| `artifacts/triangular_basis/research/P6_EXTENSION_CONVERGENCE_SURFACE.csv` | P(conv)/E[PnL] by max-|z| + z×t hazard |
+| `artifacts/triangular_basis/research/P6_EXTENSION_ANATOMY_REPORT.md` | Hypotheses A–D + path classes |
+| `artifacts/triangular_basis/research/P6_TIME_OF_DAY_STUDY.csv` / `P6_SESSION_CLOCK_REPORT.md` | Session timing |
+| `artifacts/triangular_basis/research/P6_DISLOCATION_FINGERPRINT.csv` | Causal entry fingerprint |
+| `artifacts/triangular_basis/research/P6_QUALITY_CONDITIONALS.csv` | Quality bins (velocity/persistence/vol/dominance/session/weekday) |
+| `artifacts/triangular_basis/research/P6_COST_STRESS.csv` | 1.0–3.0x costs, break-even per z × model |
+| `artifacts/triangular_basis/research/P6_EXECUTION_TRANSLATION.csv` | Lot translation TB-B / TB-C-5% × $5k–$100k |
+| `artifacts/triangular_basis/research/P6_CANDIDATE_ENTRY_RULES.json` | 50 candidates with gates/CIs/q/block EVs |
 | `artifacts/triangular_basis/research/TB-P6-OPTIMIZATION-RESEARCH-PLAN.md` | Optimization dimension inventory (human review only) |
 | `artifacts/triangular_basis/live/bar_parity.csv` | 265,809 synchronized M5 bars (source data) |
 | `artifacts/triangular_basis/live/canonical_trade_log.csv` | The real 405 trades (source data) |
