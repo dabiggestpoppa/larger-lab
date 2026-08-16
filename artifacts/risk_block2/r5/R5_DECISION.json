@@ -1,0 +1,153 @@
+{
+  "checkpoint": "CR-RISK-BLOCK2-R5-FAMILY-QUALITY-ALLOCATION",
+  "status": "PASS",
+  "block1_seal_sha": "8ca072d0d9390acf581770a99ce45b333deddd8c",
+  "family_analysis_complete": true,
+  "A_quality_status": {
+    "mean_R": 0.3932732502395528,
+    "PF": 2.307603162746292,
+    "WR": 0.6388888888888888,
+    "breach_1R": 0.10416666666666667,
+    "max_dd_at_f1_solo_pct": 10.303906622383465,
+    "tail_classification": "deepest single trade (-3.66R), otherwise lighter deep-loss frequency than B",
+    "edge_resilience": "WEAK (A-only expected CAGR stays positive at 50% edge)"
+  },
+  "B_quality_status": {
+    "mean_R": 0.3077956557939707,
+    "PF": 1.9420786211383418,
+    "WR": 0.6135371179039302,
+    "breach_1R": 0.13755458515283842,
+    "max_dd_at_f1_solo_pct": 11.10779882629639,
+    "tail_classification": "higher deep-loss frequency (-1R 13.8%, streak 7) - the capital limiter",
+    "edge_resilience": "WEAK (B-only expected CAGR NEGATIVE at 50% edge - the edge-fragile family)"
+  },
+  "B_capital_limiter_confirmed": true,
+  "dependency_structure_measured": true,
+  "allocation_frontier_complete": true,
+  "edge_degradation_by_family_complete": true,
+  "tail_stress_by_family_complete": true,
+  "non_dominated_frontier_complete": true,
+  "best_allocation_selected": false,
+  "kelly_authorized": false,
+  "dd_adaptive_authorized": false,
+  "episode_sizing_authorized": false,
+  "cluster_sizing_authorized": false,
+  "deployment_authorized": false,
+  "mt5_authorized": false,
+  "next_checkpoint_recommended": "CR-RISK-R6-EPISODE-HEAT-SIZING",
+  "human_review_required": true,
+  "block_2_r6_cleared": false,
+  "r5_family_quality_allocation_pass": true,
+  "key_findings": {
+    "expectancy": "A 0.393R vs B 0.308R (disjoint CIs); both PF>1.9",
+    "b_capital_limiter_reason": "higher deep-loss frequency + longer streaks, not bigger extremes",
+    "dependency": "same-day corr -0.085; P(B loss|A loss) 12% vs base 23%; co-tail 0%",
+    "diversification": "50/50 @ f=1% max DD 5.2% vs A-solo 10.3% / B-solo 11.1%",
+    "nondominated_historical": [
+      "40/60@0.25",
+      "40/60@0.5",
+      "40/60@1.0",
+      "40/60@1.5",
+      "40/60@2.0",
+      "40/60@3.0",
+      "40/60@5.0",
+      "50/50@0.25",
+      "50/50@0.5",
+      "50/50@1.0",
+      "50/50@1.5",
+      "50/50@2.0",
+      "50/50@3.0",
+      "50/50@5.0",
+      "60/40@0.25",
+      "60/40@0.5",
+      "60/40@1.0",
+      "60/40@1.5",
+      "60/40@2.0",
+      "60/40@3.0",
+      "60/40@5.0",
+      "70/30@0.25",
+      "70/30@0.5",
+      "70/30@1.0",
+      "70/30@2.0",
+      "70/30@3.0",
+      "70/30@5.0",
+      "80/20@0.25",
+      "80/20@0.5",
+      "80/20@3.0",
+      "80/20@5.0",
+      "90/10@0.25",
+      "90/10@0.5",
+      "90/10@5.0",
+      "100/0@5.0"
+    ],
+    "nondominated_edge75": [
+      "50/50@0.25",
+      "50/50@0.5",
+      "50/50@1.0",
+      "50/50@1.5",
+      "50/50@2.0",
+      "50/50@3.0",
+      "50/50@5.0",
+      "70/30@0.25",
+      "70/30@0.5",
+      "70/30@1.0",
+      "70/30@1.5",
+      "70/30@2.0",
+      "70/30@3.0",
+      "70/30@5.0",
+      "100/0@0.25",
+      "100/0@0.5",
+      "100/0@1.0",
+      "100/0@1.5",
+      "100/0@2.0",
+      "100/0@3.0",
+      "100/0@5.0"
+    ],
+    "nondominated_edge50": [
+      "70/30@0.25",
+      "70/30@0.5",
+      "70/30@1.0",
+      "70/30@1.5",
+      "70/30@2.0",
+      "70/30@3.0",
+      "70/30@5.0",
+      "100/0@0.25",
+      "100/0@0.5",
+      "100/0@1.0",
+      "100/0@1.5",
+      "100/0@2.0",
+      "100/0@3.0",
+      "100/0@5.0"
+    ],
+    "edge_50pct_5050": "exp CAGR +3%",
+    "no_best_weight": true
+  },
+  "inputs": {
+    "P7_5_TRADES.csv": {
+      "sha256": "ad19e08f16aeb65c17305041182c591401d28c32b418287f45d76a678ddfcd07",
+      "path": "artifacts\\phase_07_5\\P7_5_TRADES.csv"
+    },
+    "routing_events.parquet": {
+      "sha256": "de08df601a008e0efd6c0bc1523e8a9be25105324466ed3c7a19a0e561cf8607",
+      "path": "artifacts\\phase_05\\routing_events.parquet"
+    },
+    "h1_strict_common_panel.parquet": {
+      "sha256": "a0da64a3b0cd8976b61e3f4e8defa55906098373efa1bcdf79dc2d628b8c6896",
+      "path": "artifacts\\phase_03\\h1_strict_common_panel.parquet"
+    },
+    "R1_EVENT_RISK_LEDGER.csv": {
+      "sha256": "6c98b0d218c66f3f5893733f26c51490138e658046487e3ea108c5feeee2d26f",
+      "path": "artifacts\\risk_block1\\R1_EVENT_RISK_LEDGER.csv"
+    },
+    "R1_CONCURRENCY_SUMMARY.csv": {
+      "sha256": "f6fb67b9659fc8f8202d9bf86bddaf9292bdab6cd18c06a882542d319879cfcb",
+      "path": "artifacts\\risk_block1\\R1_CONCURRENCY_SUMMARY.csv"
+    },
+    "BLOCK1_DECISION.json": {
+      "sha256": "db8450303ee7f70512a0531d43442c3005a139d1759c303a07ae4d5206bd5bff",
+      "path": "artifacts\\risk_block1\\BLOCK1_DECISION.json"
+    }
+  },
+  "deterministic": true,
+  "stop": "R5 complete. No allocation selected. R6 (episode/heat sizing) does NOT start until human review. No Kelly, no dynamic/DD-adaptive sizing, no deployment, no MT5."
+}

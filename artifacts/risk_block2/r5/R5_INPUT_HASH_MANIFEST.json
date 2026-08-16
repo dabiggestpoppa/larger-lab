@@ -1,0 +1,59 @@
+{
+  "phase": "R5",
+  "task": "CR-RISK-BLOCK2-R5-FAMILY-QUALITY-ALLOCATION",
+  "repo": "dabiggestpoppa/larger-lab",
+  "branch": "capital-routing",
+  "git_sha_at_generation": "470702c2bb445e1f7a1be949efd6ec3a75b74878",
+  "block1_seal_sha": "8ca072d0d9390acf581770a99ce45b333deddd8c",
+  "block1_stamp_sha": "470702c2bb445e1f7a1be949efd6ec3a75b74878",
+  "inputs": {
+    "P7_5_TRADES.csv": {
+      "sha256": "ad19e08f16aeb65c17305041182c591401d28c32b418287f45d76a678ddfcd07",
+      "path": "artifacts\\phase_07_5\\P7_5_TRADES.csv"
+    },
+    "routing_events.parquet": {
+      "sha256": "de08df601a008e0efd6c0bc1523e8a9be25105324466ed3c7a19a0e561cf8607",
+      "path": "artifacts\\phase_05\\routing_events.parquet"
+    },
+    "h1_strict_common_panel.parquet": {
+      "sha256": "a0da64a3b0cd8976b61e3f4e8defa55906098373efa1bcdf79dc2d628b8c6896",
+      "path": "artifacts\\phase_03\\h1_strict_common_panel.parquet"
+    },
+    "R1_EVENT_RISK_LEDGER.csv": {
+      "sha256": "6c98b0d218c66f3f5893733f26c51490138e658046487e3ea108c5feeee2d26f",
+      "path": "artifacts\\risk_block1\\R1_EVENT_RISK_LEDGER.csv"
+    },
+    "R1_CONCURRENCY_SUMMARY.csv": {
+      "sha256": "f6fb67b9659fc8f8202d9bf86bddaf9292bdab6cd18c06a882542d319879cfcb",
+      "path": "artifacts\\risk_block1\\R1_CONCURRENCY_SUMMARY.csv"
+    },
+    "BLOCK1_DECISION.json": {
+      "sha256": "db8450303ee7f70512a0531d43442c3005a139d1759c303a07ae4d5206bd5bff",
+      "path": "artifacts\\risk_block1\\BLOCK1_DECISION.json"
+    }
+  },
+  "code_hashes": {
+    "phase_r5_analysis.py": "c0892f300906daf2a4bde328e3ab1c61daf4a48326332bd4a5c0362885bb3d8b",
+    "phase_r5_common.py": "cf12298c09f5da2e5859f77be522e048fe7c0c9cbbf6c5825a508f1056175f5f",
+    "phase_r5_dependency.py": "7a10afa288274b5ae49032a712d3d639f9e76f9ff7579ecf45d0558060f8ba2b",
+    "phase_r5_orchestrator.py": "5f76a75f9f2ac48ba06ce3068e3f8082320a2a2cc7a0a27d70aba42778e05c0b",
+    "phase_r5_portfolio.py": "9bc84de2b6208a80e3813c51f92f1a701cc863a431b07f7bf0035b24f355914c",
+    "phase_r5_stress.py": "258942c6720090f183a13a7fcc37a1afb7470bdeee00700aa9978e7def283225"
+  },
+  "python_version": "3.11.9",
+  "sample_size": 890,
+  "family_counts": {
+    "A": 432,
+    "B": 458
+  },
+  "date_span": [
+    "2023-07-10",
+    "2026-05-21"
+  ],
+  "mc_paths": {
+    "allocation": 10000,
+    "stress": 5000
+  },
+  "determinism": "fixed seeds; chronological block + R1 episode block joint bootstrap",
+  "timestamp": "2026-08-16T03:30:12.748617+00:00"
+}

@@ -1,9 +1,10 @@
 # CR-RISK-BLOCK1 — RISK-ENGINEERING FOUNDATION (Progress)
 
-> **Repo:** dabiggestpoppa/larger-lab · branch `capital-routing`
+> **Repo:** dabigestpoppa/larger-lab · branch `capital-routing`
 > **Frozen alpha base:** `7bc1c024` (P7.5 seal) · Phase-8 negative overlay: `95fb6f20`
-> **Block:** R1 Exposure Truth → R2 Loss Anatomy → R3 Profit Anatomy → R4 Static Frontier → Block-I Seal
-> **Last updated:** 2026-08-15
+> **Block I:** R1 Exposure Truth → R2 Loss Anatomy → R3 Profit Anatomy → R4 Static Frontier → Block-I Seal ✅
+> **Block II:** R5 Family Quality/Allocation ✅ → R6 Episode/Heat (pending review) → R7 DD-adaptive → R8 Kelly → R9 Hybrid
+> **Last updated:** 2026-08-16
 
 ## Mission
 
@@ -25,6 +26,25 @@ through full-press) so the user can deliberately choose a risk-return regime. Al
 
 `block_1_foundation_sealed = true` · `block_2_cleared = false` until human review. No R5-R9, Kelly, hybrid sizing,
 deploy, or MT5.
+
+## R5 — Family Quality / Allocation Anatomy ✅ COMPLETE (Block II opened for R5 only)
+
+**Commit:** `CR-RISK-R5-FAMILY-QUALITY-ALLOCATION` (pushed) · Tests: 16 new (`tests/test_risk_r5.py`) · **321/321 repo-wide** (207 main + 23 R1 + 18 R2 + 23 R3 + 15 R4 + 19 seal + 16 R5) · deterministic (byte-identical re-run of all R5 outputs) · inputs hash-locked (`R5_INPUT_HASH_MANIFEST.json`, full SHAs; inputs rebuilt from the same frozen phase-03/05 + P7_5 sources and cross-checked against the sealed R1 ledger)
+
+### The core finding: A and B are NOT equivalent capital consumers — but not in the obvious direction
+
+- **A is the better standalone edge:** mean 0.393R vs B 0.308R (disjoint bootstrap CIs); PF 2.31 vs 1.94; WR 63.9% vs 61.4%.
+- **B is the capital limiter by deep-loss FREQUENCY, not by size:** B breaches −1R at 13.8% vs A 10.4%, streaks max 7 vs 6; A holds the single deepest trade (−3.66R vs −3.31R). Worst-10% loss shares are similar (29-31%).
+- **B is also the EDGE-FRAGILE family:** at 50% edge retention B-only expected CAGR goes **negative (−1.8%)** while A-only stays **positive (+7%)** (A PF cushion 2.31 vs 1.94).
+- **A and B are near-independent:** same-day realized PnL corr **−0.09**; P(B loss | A loss) 12% vs 23% base; **zero co-tail coincidence**; 45% of A events sit in 12h clusters containing B.
+- **Pooling is genuinely diversifying:** 50/50 equal-heat at f=1% cuts historical max DD to **5.2%** vs 10.3% A-only / 11.1% B-only while keeping 71% CAGR (vs 79% A-only). 50/50@2% total reproduces the sealed R4 pooled baseline exactly (190% CAGR / 10.2% DD) — engine validated.
+- **Non-dominated:** historical — middle band 40/60..90/10 (50/50 everywhere); block-MC — 40/60..100/0; 75%-edge — 50/50, 70/30, 100/0; **50%-edge — narrows to A-heavy 70/30 and 100/0 only** (B's fragility).
+- **Marginal:** at f=1%: A-only 79% CAGR/10.3% DD · B-only 62%/11.1% · pooled each-at-1% 190%/10.2% · equal-heat 50/50 71%/5.2% (worst day −2.8% vs −5.4% A-only).
+- **Tail stress (50/50, f=1%):** doubling either family's worst-5% losses raises max DD to 7.2% (A) / 6.1% (B) from 5.1%; a 5-trade p99-loss cluster of either family → ~9%.
+- **Quality matrix (ordinal):** expectancy STRONG/STRONG · left-tail NEUTRAL/NEUTRAL · temporal STABLE · dependency STRONG · edge-resilience WEAK/WEAK (B negative at 50% edge) · marginal-DD A NEUTRAL / **B STRONG** (B diversifies A more than A diversifies B).
+- **Temporal:** A>B ranking STABLE at year/half granularity, MIXED at quarter/split.
+
+`r5_family_quality_allocation_pass = true` · `best_allocation_selected = false` · **R6 (episode/heat-aware sizing) does NOT start until human review.** No Kelly, no dynamic/DD-adaptive sizing, no deployment, no MT5.
 
 ## Block-I Foundation Seal ✅ COMPLETE
 

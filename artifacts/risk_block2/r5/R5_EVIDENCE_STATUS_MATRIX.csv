@@ -1,0 +1,19 @@
+conclusion,status
+A EXPECTANCY > B (mean R 0.393 vs 0.308; CI disjoint),VALIDATED_DESCRIPTIVE
+B CAPITAL-LIMITING under equal static f (higher solo max DD at every f),VALIDATED_DESCRIPTIVE
+B deep-loss frequency higher (breach -1R 13.8% vs 10.4%; streak 7 vs 6),VALIDATED_DESCRIPTIVE
+A holds the single deepest trade (-3.66R vs -3.31R),VALIDATED_DESCRIPTIVE
+A/B daily PnL near-independent (same-day corr ~ -0.09; no co-tail),VALIDATED_DESCRIPTIVE
+50/50 equal-heat materially cuts max DD vs either solo (5.2% vs 10.3/11.1%),ROBUST_FRONTIER_FINDING
+50/50 non-dominated across the whole historical f grid,ROBUST_FRONTIER_FINDING
+Middle allocations (40/60..70/30) occupy the historical non-dominated region,ROBUST_FRONTIER_FINDING
+A-heavy allocations enter the non-dominated set under 75%/50% edge stress,ROBUST_FRONTIER_FINDING
+B captures a higher share of its MFE than A (94% vs 91%),VALIDATED_DESCRIPTIVE
++1R reach is safe for BOTH families (0% fail after +1R),VALIDATED_DESCRIPTIVE
+Neither family depends on a tiny winner tail (top-5% ~17% both),VALIDATED_DESCRIPTIVE
+Edge degradation binds at the pooled level (50% edge -> 2.6% CAGR at 50/50 f=1%),ROBUST_FRONTIER_FINDING
+B is the edge-fragile family: B-only expected CAGR NEGATIVE at 50% edge vs A-only positive,VALIDATED_DESCRIPTIVE
+Under 50% edge stress the non-dominated set narrows to A-heavy 70/30 and 100/0,ROBUST_FRONTIER_FINDING
+Family-specific allocation is beneficial,HYPOTHESIS
+A/B ranking stable across years/halves (MIXED at quarter granularity),VALIDATED_DESCRIPTIVE
+Best allocation weight exists,REJECTED (not selected - forbidden by protocol)

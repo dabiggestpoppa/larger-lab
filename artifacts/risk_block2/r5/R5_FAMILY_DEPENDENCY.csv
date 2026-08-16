@@ -1,0 +1,16 @@
+metric,value,base_rate,N
+A_loss_rate_with_other_open,0.425,0.3611111111111111,40
+A_loss_rate_without_other_open,0.35459183673469385,0.3611111111111111,392
+B_loss_rate_with_other_open,0.49019607843137253,0.3864628820960699,51
+B_loss_rate_without_other_open,0.37346437346437344,0.3864628820960699,407
+same_hour_realized_pnl_corr,-0.0376852301349991,,890
+same_day_realized_pnl_corr,-0.08542207426713251,,520
+rolling_90d_daily_corr_mean,-0.11266213829120059,,431
+P_B_loss_day,0.23461538461538461,,520
+P_A_loss_day,0.2076923076923077,,520
+P_B_loss_given_A_loss,0.12037037037037036,0.23461538461538461,108
+P_A_loss_given_B_loss,0.10655737704918032,0.2076923076923077,122
+P_B_tail_loss_given_A_tail_loss,0.0,0.23461538461538461,52
+P_A_tail_loss_given_B_tail_loss,0.0,0.2076923076923077,52
+A_share_in_12h_mixed_clusters,0.4537037037037037,,432
+share_12h_clusters_with_both_families,0.2551867219917012,,482
