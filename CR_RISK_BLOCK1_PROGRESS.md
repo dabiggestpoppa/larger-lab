@@ -1,6 +1,6 @@
 # CR-RISK-BLOCK1 — RISK-ENGINEERING FOUNDATION (Progress)
 
-> **Repo:** dabigestpoppa/larger-lab · branch `capital-routing`
+> **Repo:** dabiggestpoppa/larger-lab · branch `capital-routing`
 > **Frozen alpha base:** `7bc1c024` (P7.5 seal) · Phase-8 negative overlay: `95fb6f20`
 > **Block I:** R1 Exposure Truth → R2 Loss Anatomy → R3 Profit Anatomy → R4 Static Frontier → Block-I Seal ✅
 > **Block II:** R5 Family Quality/Allocation ✅ → R6 Episode/Heat (pending review) → R7 DD-adaptive → R8 Kelly → R9 Hybrid

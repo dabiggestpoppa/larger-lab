@@ -1,0 +1,29 @@
+policy_id,kind,cap_mult,treatment,complexity_level,description
+H0,H0,,REJECT,0,unconstrained static (no heat cap)
+H1-1.00-REJ,H1,1.0,REJECT,1,gross heat cap
+H1-1.50-REJ,H1,1.5,REJECT,1,gross heat cap
+H1-2.00-REJ,H1,2.0,REJECT,1,gross heat cap
+H1-3.00-REJ,H1,3.0,REJECT,1,gross heat cap
+H1-1.00-SCA,H1,1.0,SCALE,1,gross heat cap
+H1-1.50-SCA,H1,1.5,SCALE,1,gross heat cap
+H1-2.00-SCA,H1,2.0,SCALE,1,gross heat cap
+H2-1.00-REJ,H2,1.0,REJECT,2,same-direction heat cap
+H2-1.50-REJ,H2,1.5,REJECT,2,same-direction heat cap
+H2-2.00-REJ,H2,2.0,REJECT,2,same-direction heat cap
+H2-1.00-SCA,H2,1.0,SCALE,2,same-direction heat cap
+H2-1.50-SCA,H2,1.5,SCALE,2,same-direction heat cap
+H3-0.50-REJ,H3,0.5,REJECT,2,family-B heat cap
+H3-0.75-REJ,H3,0.75,REJECT,2,family-B heat cap
+H3-1.00-REJ,H3,1.0,REJECT,2,family-B heat cap
+H3-0.50-SCA,H3,0.5,SCALE,2,family-B heat cap
+H3-0.75-SCA,H3,0.75,SCALE,2,family-B heat cap
+H4-1.00-REJ,H4,1.0,REJECT,3,12h episode budget
+H4-1.50-REJ,H4,1.5,REJECT,3,12h episode budget
+H4-2.00-REJ,H4,2.0,REJECT,3,12h episode budget
+H4-3.00-REJ,H4,3.0,REJECT,3,12h episode budget
+H4-1.00-SCA,H4,1.0,SCALE,3,12h episode budget
+H4-1.50-SCA,H4,1.5,SCALE,3,12h episode budget
+H5-1.50-REJ,H5,1.5,REJECT,4,hybrid gross + same-direction
+H5-1.50-SCA,H5,1.5,SCALE,4,hybrid gross + same-direction
+H5-2.00-REJ,H5,2.0,REJECT,4,hybrid gross + same-direction
+H5-2.00-SCA,H5,2.0,SCALE,4,hybrid gross + same-direction

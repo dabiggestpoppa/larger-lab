@@ -1,7 +1,7 @@
 # CAPITAL ROUTING — PHASE 7.5 PROGRESS (CR-P7.5-ROUTING-BASELINE-SEAL-01)
 
 > **Task:** CR-P7.5-ROUTING-BASELINE-SEAL-01 (Baseline Seal)
-> **Repo:** dabigestpoppa/larger-lab | branch: `capital-routing`
+> **Repo:** dabiggestpoppa/larger-lab | branch: `capital-routing`
 > **Base:** Phase 7 commit `db9f8c62` (ACCEPTED)
 > **Last updated:** 2026-08-15
 

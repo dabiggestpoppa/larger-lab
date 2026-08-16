@@ -1,7 +1,7 @@
 # CAPITAL ROUTING — PHASE 7 PROGRESS (CR-P7-ROUTING-TRANSLATION-01)
 
 > **Task:** CR-P7-ROUTING-TRANSLATION-01 (Routing Translation / Baseline Strategies)
-> **Repo:** dabigestpoppa/larger-lab | branch: `capital-routing`
+> **Repo:** dabiggestpoppa/larger-lab | branch: `capital-routing`
 > **Base:** Phase 6 commit `5726bf02` (ACCEPTED)
 > **Last updated:** 2026-08-15
 

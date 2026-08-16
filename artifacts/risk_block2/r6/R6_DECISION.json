@@ -1,0 +1,94 @@
+{
+  "checkpoint": "CR-RISK-BLOCK2-R6-EPISODE-HEAT-SIZING",
+  "status": "PASS",
+  "base_r5_commit": "150a93dec8edf2997652cd20724298fe9927c0dc",
+  "r5_stamp_commit": "c7cedb975e99d7d9d5fede3aee5ec170600a0c88",
+  "block1_seal_commit": "8ca072d0d939acf581770a99ce45b333deddd8c",
+  "total_events": 890,
+  "episode_count": 482,
+  "max_concurrency": 3,
+  "episode_reconstruction_pass": true,
+  "baseline_reproduction_pass": true,
+  "heat_definition_locked": true,
+  "policy_surface_complete": true,
+  "admission_causality_pass": true,
+  "historical_frontier_complete": true,
+  "monte_carlo_complete": true,
+  "edge_degradation_complete": true,
+  "tail_stress_complete": true,
+  "temporal_stability_complete": true,
+  "rejected_event_audit_complete": true,
+  "non_dominated_frontier_complete": true,
+  "overlap_material": true,
+  "gross_heat_material": true,
+  "same_direction_heat_material": true,
+  "opposing_heat_material": true,
+  "B_heat_special_treatment_supported": true,
+  "episode_budget_incremental_value": "LOW",
+  "h0_baseline_reproduction": {
+    "50_50_f1_cagr_pct": 71.21308579330467,
+    "50_50_f1_max_dd_pct": 5.188579112735645,
+    "50_50_f2_cagr_pct": 190.31117903356588,
+    "50_50_f2_max_dd_pct": 10.169539210315689,
+    "target": "R5 50/50 f=1% 71% / 5.2%; R4 pooled f=1% 190% / 10.2%",
+    "pass": true
+  },
+  "best_heat_policy_selected": false,
+  "dynamic_sizing_authorized": false,
+  "dd_adaptive_authorized": false,
+  "kelly_authorized": false,
+  "hybrid_authorized": false,
+  "deployment_authorized": false,
+  "mt5_authorized": false,
+  "R7_ready": true,
+  "R7_authorized": false,
+  "human_review_required": true,
+  "next_checkpoint_recommended": "CR-RISK-BLOCK-II-INTERMEDIATE-SEAL",
+  "next_checkpoint_note": "Simple static heat caps + family allocation address the material overlap risk (plan XXXIV); R7 (DD-adaptive) stays defined but is NOT the automatic next step. Kelly remains later.",
+  "stop": true,
+  "r6_episode_heat_sizing_pass": true,
+  "key_heat_results": {
+    "H0_50_50_f1": {
+      "cagr_pct": 71.21308579330467,
+      "max_dd_pct": 5.188579112735645,
+      "worst_day_pct": -2.8057861799503483,
+      "p95_dd_block_pct": 7.7911292837371064
+    },
+    "H1_1x_50_50_f1": {
+      "cagr_pct": 70.55459797175025,
+      "max_dd_pct": 5.18857911273565,
+      "p95_dd_block_pct": 7.618418975314288
+    },
+    "nondominated_historical_50": [
+      "H0",
+      "H1-1.50-REJ",
+      "H1-2.00-REJ",
+      "H1-3.00-REJ",
+      "H1-1.50-SCA",
+      "H1-2.00-SCA",
+      "H2-1.50-REJ",
+      "H2-2.00-REJ",
+      "H2-1.50-SCA",
+      "H5-2.00-REJ",
+      "H5-2.00-SCA",
+      "H3-0.75-SCA"
+    ],
+    "nondominated_edge75": [
+      "H0",
+      "H1-1.00-REJ",
+      "H1-1.50-REJ",
+      "H2-1.50-REJ",
+      "H3-0.75-REJ"
+    ],
+    "nondominated_edge50": [
+      "H1-1.00-REJ",
+      "H3-0.75-REJ"
+    ],
+    "overlap_share_of_worst_day": "worst day at 50/50 f=1% is -2.8% (2 concurrent) and worst 24h -3.3% (3 concurrent); 84.7% of in-drawdown hourly loss is single-position hours"
+  },
+  "scientific_changes": "R6 heat-admission research only; ALPHA/ENTRY/EXIT/TRADE_MANAGEMENT/R_UNIT/FAMILIES unchanged",
+  "repo_typo": {
+    "typo_corrected": "repo spelling corrected to dabiggestpoppa (documentation only)",
+    "scientific_effect": "NONE"
+  }
+}

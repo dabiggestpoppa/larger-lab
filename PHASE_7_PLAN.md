@@ -1,7 +1,7 @@
 # CAPITAL ROUTING — PHASE 7 PLAN (CR-P7-ROUTING-TRANSLATION-01)
 
 > **Base:** Phase 6 commit `5726bf02` (ACCEPTED — empirical routing study)
-> **Repo:** dabigestpoppa/larger-lab | branch: `capital-routing`
+> **Repo:** dabiggestpoppa/larger-lab | branch: `capital-routing`
 > **Last updated:** 2026-08-15
 > **Scope:** Translate holdout-validated Phase 6 routing relationships into executable
 > pair-space expressions and baseline strategies. STOP after baseline evaluation.

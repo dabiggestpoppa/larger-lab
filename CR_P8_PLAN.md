@@ -1,7 +1,7 @@
 # CAPITAL ROUTING — CR-P8-CEREBUS-ROUTING-OVERLAY-DISCOVERY-01
 
 > **Base:** Phase 7.5 sealed baseline — commit `7bc1c024` (ACCEPTED)
-> **Repo:** dabigestpoppa/larger-lab | branch: `capital-routing`
+> **Repo:** dabiggestpoppa/larger-lab | branch: `capital-routing`
 > **Last updated:** 2026-08-15
 > **Scope:** Discover whether canonical CEREBUS primitives (daily tier, P90 prints,
 > tier impulses, Asian midpoint, 132% rekey) observed inside the post-routing-event

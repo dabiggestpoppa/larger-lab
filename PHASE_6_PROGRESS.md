@@ -39,7 +39,7 @@
 | Commit | ✅ Done | Batch 4 — **`5726bf02`** on `capital-routing` (34 files, +103,411) |
 | Report back (brief §37) | ✅ Done | Batch 5 — full §37 report delivered to user |
 | Sync to `Desktop\\projects\\larger-lab` checkout | ✅ Done | Committed implementation copied over draft modules (src/scripts/tests/artifacts/progress); `PHASE_6_PLAN.md` updated with ✅ ALREADY IMPLEMENTED AND COMPLETE note; 34/34 tests pass in that checkout too |
-| Push to GitHub | ✅ Done | `f0fc54ab..5726bf02 capital-routing -> capital-routing` on `dabigestpoppa/larger-lab` |
+| Push to GitHub | ✅ Done | `f0fc54ab..5726bf02 capital-routing -> capital-routing` on `dabiggestpoppa/larger-lab` |
 
 ## 3. Environment Notes
 

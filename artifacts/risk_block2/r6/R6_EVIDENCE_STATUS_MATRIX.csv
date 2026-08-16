@@ -1,0 +1,16 @@
+conclusion,status
+"Overlap is real but bounded: 26.5% of events enter with an active position, only 20h (0.4% of in-market time) carry 3 positions; 84.7% of in-drawdown hourly loss occurs in single-position hours",VALIDATED_DESCRIPTIVE
+"Worst day (-2.81%) and worst 24h (-3.35%) at 50/50 f=1% both occur with 2-3 concurrent positions, so overlap worsens single-day risk even though it is not the dominant DD driver",VALIDATED_DESCRIPTIVE
+Gross heat cap H1-1.0x binds only on the rare 3-position state at 50/50; historical max DD unchanged (5.19%) while worst day improves (-2.81% to -2.58%),VALIDATED_DESCRIPTIVE
+At A-heavy 70/30 the same 1.0x cap is material in resampled space: block-MC p95 max DD 9.50% -> 6.26% and P(DD>=10%) 3.6% -> 0.0% at ~7% CAGR cost,ROBUST_FRONTIER_FINDING
+Same-direction capping (H2) is comparable to gross capping at 70/30; no systematic superiority over H1,ROBUST_FRONTIER_FINDING
+Opposing (A/B) overlap still carries gross heat and a 12.2% tail-loss probability vs 9.4% for non-overlapping events; not riskless,VALIDATED_DESCRIPTIVE
+B-family heat cap (H3) trims the capital-limiting family but is weaker than an equal gross cap at 70/30 (p95 DD 9.07% vs 6.26%) and costs ~11% CAGR at 50/50,ROBUST_FRONTIER_FINDING
+"Episode budgets (H4) are REDUNDANT: H4-1.0x is dominated by H1-1.0x (historical max DD 5.43% vs 5.19%, CAGR 53% vs 71%); H4-1.5x equals H1-1.5x",ROBUST_FRONTIER_FINDING
+A/B diversification persists inside concurrent episodes (A+B clusters' negative-loss share 43% is proportional to their 44.5% event share),VALIDATED_DESCRIPTIVE
+"Rejected events are approximately fair (WR 57-66%, positive mean R); caps cut exposure rather than cherry-pick losers",VALIDATED_DESCRIPTIVE
+A 'best' heat policy exists,REJECTED (not selected - forbidden)
+DD-adaptive sizing would beat static heat caps,NOT TESTED
+Kelly would improve on static heat caps,NOT TESTED
+Heat-capped portfolio remains edge-fragile under 50% edge retention,ROBUST_FRONTIER_FINDING
+"Simple static 1.0x heat caps + family allocation address the material overlap risk, so a Block-II seal is recommended before R7",CONDITIONAL

@@ -1,0 +1,23 @@
+metric,value,detail
+events_total,890.0,sealed 890-event A/B book
+events_with_overlap_at_entry_share,0.2651685393258427,share of events entering while >=1 other position active
+events_in_multi_event_episodes_share,0.7146067415730337,share of events whose 12h episode contains >=2 events
+time_share_1_active,1.0,share of in-market hours with >=k active positions (R1 hourly frame)
+time_share_2_active,0.1235480464625132,share of in-market hours with >=k active positions (R1 hourly frame)
+time_share_3plus_active,0.004223864836325237,share of in-market hours with >=k active positions (R1 hourly frame)
+in_market_hours,4735.0,hours with >=1 position in R1_PORTFOLIO_HEAT
+hours_with_2plus,585.0,absolute hours with 2+ positions
+hours_with_3plus,20.0,absolute hours with 3+ positions
+dd_hours,21557.0,hours below running peak in H0 50/50 f=1% hourly path
+dd_share_single_position,0.8471236691700572,share of summed in-drawdown hourly loss occurring with 1 active position(s)
+dd_share_2_overlap,0.14328063260639995,share of summed in-drawdown hourly loss occurring with 2 active position(s)
+dd_share_3plus_overlap,0.00959569822354289,share of summed in-drawdown hourly loss occurring with 3 active position(s)
+worst_day_return_pct,-3.0685232166139738,"worst calendar-day account return, H0 50/50 f=1%"
+worst_day_max_active,2.0,max concurrent positions on the worst day
+worst_day_exceeded_1_event_unit,1.0,gross heat > 1 event-unit on worst day
+worst_24h_return_pct,-3.346658303118988,"worst rolling-24h account return, H0 50/50 f=1%"
+worst_24h_max_active,3.0,max concurrent positions in the worst 24h window
+worst_24h_exceeded_1_event_unit,1.0,gross heat > 1 event-unit in worst 24h
+worst_episode_loss_R,-3.0685232166139733,"worst 12h-episode realized loss (admitted f * R), episode 152"
+worst_episode_max_active,2.0,peak R1 n_open inside the worst episode
+worst_episode_exceeded_1_event_unit,1.0,gross heat > 1 event-unit in worst episode
