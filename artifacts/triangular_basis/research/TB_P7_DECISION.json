@@ -1,0 +1,44 @@
+{
+ "p8_structural_geometry_cleared": true,
+ "engine_grades": {
+  "E0@2.5/TB-B": "D",
+  "E0@2.5/TB-C-10%": "D",
+  "E0@2.5/TB-C-2.5%": "D",
+  "E0@2.5/TB-C-5%": "D",
+  "E0@3/TB-B": "D",
+  "E0@3/TB-C-10%": "D",
+  "E0@3/TB-C-2.5%": "D",
+  "E0@3/TB-C-5%": "D",
+  "E1@2.5/TB-B": "A",
+  "E1@2.5/TB-C-10%": "A",
+  "E1@2.5/TB-C-2.5%": "A",
+  "E1@2.5/TB-C-5%": "A",
+  "E1@3/TB-B": "A",
+  "E1@3/TB-C-10%": "A",
+  "E1@3/TB-C-2.5%": "A",
+  "E1@3/TB-C-5%": "A",
+  "E3@2.5/TB-B": "D",
+  "E3@2.5/TB-C-10%": "D",
+  "E3@2.5/TB-C-2.5%": "D",
+  "E3@2.5/TB-C-5%": "D",
+  "E3@3/TB-B": "D",
+  "E3@3/TB-C-10%": "D",
+  "E3@3/TB-C-2.5%": "D",
+  "E3@3/TB-C-5%": "D"
+ },
+ "grade_counts": {
+  "A": 8,
+  "B": 0,
+  "C": 0,
+  "D": 16
+ },
+ "split": {
+  "discovery": "earliest 60% by entry time",
+  "confirmation": "60-80%",
+  "holdout": "latest 20%",
+  "p5_date_holdout": "exit >= 2025-07-01 (N>=20)"
+ },
+ "stats_method": "matched-pairs (aligned per-E0-trade diffs; paired bootstrap CI + sign-flip permutation)",
+ "p75_gate_repair": "initial P7.5 run used the two-sample bootstrap/permutation intended for the P6 entry grid; candidate exit engines share E0's matched signal set, so the correct test is on the per-trade difference. Gates unchanged; test statistic corrected (same class as TB-P6.5 cost-gate repair).",
+ "generated": "2026-08-16T01:32:43.601066+00:00Z"
+}

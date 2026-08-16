@@ -230,16 +230,77 @@ Original z=2.5 entry is retained until a human authorizes P7 testing of the cand
 
 ---
 
-## Next Phase — TB-P7 (proposed, gated on human review of P6)
+## TB-P6.5-SEAL-REPAIR ✅ COMPLETE + TB-P7-CONVERGENCE-ENGINE-01 ✅ COMPLETE (2026-08-15)
 
-1. **Human review** `TB_P6_ENTRY_ANATOMY_REPORT.md` + `TB_P6_DECISION.json` +
-   `P6_CANDIDATE_ENTRY_RULES.json` (candidates A/B: z=3.0–3.5 entry for TB-B / TB-C-5%).
-2. Candidate entry change (if approved) re-runs the full TB-P5 validation sections 1–12
-   before adoption; one dimension at a time.
-3. 04B demo forward test with neutral sizing remains the path to convert
-   FORWARD_OOS_PENDING → FORWARD_OOS (the live basis-z distribution is the missing evidence).
-4. Convergence/exit optimization (P7) uses the P6.2 hazard + path-class measurements only
-   after the entry decision is settled.
+**Base:** master `31e7ad5e` (P6 seal) + P6.5 repair `a7a1fddd`. **P7 protocol pre-registered**
+(`TB_P7_PROTOCOL.md`) before any outcome. **Commit chain on `tb-research-verify-04a`:** P6.5
+`a7a1fddd` → P7.1 → P7.2 → P7.3 → P7.4 → P7.5 → seal. **Reproduce:**
+`python quant-lab/engines/tb_p7_convergence.py --phase all` + `python quant-lab/engines/tb_p7_tests.py`
+(160 checks).
+
+### P6.5 — cost-gate seal repair (a7a1fddd)
+- **Root cause:** `build_candidates` wrote `break_even_mult = NaN` for cost stress surviving past
+  the 3.0x maximum tested level; the cost gate read `NaN >= 1.5` as False → spurious gate failures.
+- **Fix:** `NaN` is now encoded truthfully as `break_even_mult >= 3.0` (no extrapolation beyond the
+  tested range). **Gates unchanged.**
+- **Result:** exactly **4 upgrades** (z=3.00 B→A for TB-B + TB-C-2.5/5/10%), **zero downgrades**,
+  no change below z=3.00. Scientific conclusions unchanged → no STOP; P7 proceeded.
+
+### P7.1 — Convergence target
+- Exit-z grid −0.50…+1.00 × entries {2.5, 3.0} × 5 models. **Overshoot beats z=0:** EV rises
+  monotonically as the target moves from +1.0 to −0.5 (TB-B@2.5: 17.86 → **19.60** (−0.25) →
+  **21.31** (−0.50); TB-B@3.0: 23.07 → **24.86** → **26.84**).
+- Max DD is **unchanged** for TB-B across −0.50…+0.75 (−35.43); overshoot never deepens DD
+  materially for any model (worst: TB-C-10%@3.0 −47.8 → −62.2). Earlier exits (+0.25…+1.0)
+  uniformly give up EV (and +1.0 changes the trade sequence, DD −59).
+- **Core question answered:** waiting for z=0 DOES add profit vs any earlier target, and slight
+  overshoot to −0.25/−0.50 adds reliably more without extra drawdown — full normalization is not
+  the economic optimum. Capital-time cost is small (+0.25h/trade).
+
+### P7.2 — Hold survival
+- Remaining expectancy stays **positive at every trade age and |z| state** — no economically
+  weak/negative region → a pure time limit is **not** supported (E2 correctly omitted).
+- P(convergence | unresolved) decays with age at every |z| (entry 2.5: 66% at 15m → 59% at 6h);
+  low-|z| states (2.5–3.0) lose convergence probability fastest with age.
+
+### P7.3 — Profit giveback
+- Winner giveback is tiny (median 0.02 pips; p95 8.3 pips; median capture ratio 0.999) —
+  **winners are not leaking profit.**
+- **59.6% of eventual losers were materially profitable first** (TB-B@2.5) → profit-lock /
+  time-conditioned realization is the promising hypothesis for downside, not trailing winners.
+
+### P7.4 — Structural invalidation
+- Recovery cliff found: **age-only failure at (|z| 2.5–3.0, age ≥ 180m): P(conv) 19–24% vs 66%
+  fresh** (same z + different age = different recovery probability → B+C failure modes).
+- Extreme |z| ≥ 4.5 cells correctly LOW-N → **never declared** structural stops (P6 lesson held).
+- E3 (target + invalidation) built from this evidence but **FAILS as an engine**: EV flat/slightly
+  down, **max DD doubles** (−35 → −80/−92), paired CI contains 0, perm p 0.44–0.95 → **D**.
+
+### P7.5 — Candidate exit engines + gate repair (same class as P6.5)
+- E0 (control) / E1 (overshoot −0.25) / E3 (invalidation) × entries {2.5, 3.0} × 4 neutral models.
+- **P7.5 gate repair:** the first run reused the P6 two-sample bootstrap/permutation, which is
+  wrong for exit engines — E1/E3 share E0's matched signal set (only the exit differs), so the
+  correct test is on the **per-trade difference** (aligned to E0's trade set; merges/splits
+  absorbed; sum(diffs) == total PnL delta exactly). Unpaired CI was [−1.2, +4.7] (p=0.24, C);
+  **paired CI [+1.05, +2.15] (sign-flip p<0.001)**. No gate changed; statistic corrected.
+- **E1 = A (STRONG) in all 8 cells** (4 models × 2 entries): EV +1.7…+1.8 pips, PF up, CI
+  excluding 0, same-direction D/C/H blocks, P5-date holdout agrees, top-5% independent, basis
+  share 101–104%, break-even ≥ 2.9x (≥3.0x at entry 3.0), cost-robust. E1@2.5 also improves
+  pips/capital-hour; E1@3.0 EV improves with flat capital-time efficiency.
+- E3 = **D (REJECT)** in all 8 cells (DD doubles, no EV gain, not significant).
+- E0 = control (D by construction vs itself).
+
+### Decision (TB_P7_DECISION.json)
+**`p8_structural_geometry_cleared = true`** — E1 (exit when the basis overshoots to z = −0.25)
+is a robust exit architecture that improves the validated strategy **without changing its
+underlying edge** (basis share unchanged, DD unchanged for TB-B). The frozen z=0 exit is retained
+until human adoption. **STOP FOR HUMAN REVIEW — no P8 structural geometry work begins.**
+
+**P7 answers:** (1) repair should run slightly past full normalization (z=−0.25/−0.50 plateau,
+z=0 not optimal); (2) no pure time limit is justified — remaining expectancy never goes weak;
+(3) winners surrender almost nothing — losers-that-were-profitable (59.6%) are the leakage;
+(4) non-convergence becomes statistical invalidation only via the age×low-|z| cliff (≥180m),
+and as an engine it does not pay (E3 rejected).
 
 ---
 
@@ -253,6 +314,8 @@ Original z=2.5 entry is retained until a human authorizes P7 testing of the cand
 | `quant-lab/engines/tb_p5_tests.py` | **P5 deterministic tests** (60+ checks, exit 0 = pass) |
 | `quant-lab/engines/tb_p6_anatomy.py` | **P6 entry-anatomy suite** (`--phase p61/p62/p63/p64/seal/all`) |
 | `quant-lab/engines/tb_p6_tests.py` | **P6 deterministic tests** (411 checks, exit 0 = pass) |
+| `quant-lab/engines/tb_p7_convergence.py` | **P7 convergence-engine suite** (`--phase p71..p75/seal/all`) |
+| `quant-lab/engines/tb_p7_tests.py` | **P7 deterministic tests** (160 checks, exit 0 = pass) |
 | `artifacts/triangular_basis/research/TB_RESEARCH_VERIFY_04A_REPORT.md` | 04A audit report |
 | `artifacts/triangular_basis/research/TB_P5_VALIDATION_PROTOCOL.md` | P5 frozen protocol (metrics, verdict rules) |
 | `artifacts/triangular_basis/research/TB_P5_VALIDATION_REPORT.md` | P5 full validation report |
@@ -273,6 +336,11 @@ Original z=2.5 entry is retained until a human authorizes P7 testing of the cand
 | `artifacts/triangular_basis/research/P6_EXECUTION_TRANSLATION.csv` | Lot translation TB-B / TB-C-5% × $5k–$100k |
 | `artifacts/triangular_basis/research/P6_CANDIDATE_ENTRY_RULES.json` | 50 candidates with gates/CIs/q/block EVs |
 | `artifacts/triangular_basis/research/TB-P6-OPTIMIZATION-RESEARCH-PLAN.md` | Optimization dimension inventory (human review only) |
+| `artifacts/triangular_basis/research/TB_P6_5_COST_GATE_REPAIR.md` / `TB_P6_5_REVISED_CANDIDATES.json` / `TB_P6_5_DECISION.json` | P6.5 cost-gate repair (4 upgrades, 0 downgrades) |
+| `artifacts/triangular_basis/research/TB_P7_PROTOCOL.md` | **P7 pre-registered protocol** |
+| `artifacts/triangular_basis/research/TB_P7_CONVERGENCE_ENGINE_REPORT.md` | **P7 full report** |
+| `artifacts/triangular_basis/research/TB_P7_DECISION.json` | **P7 decision (`p8_structural_geometry_cleared`)** |
+| `artifacts/triangular_basis/research/P7_*.csv / *.md` | P7.1 exit surface, P7.2 survival, P7.3 giveback/capture, P7.4 invalidation, P7.5 engine comparison, P7_ENGINE_CONFIGS.json |
 | `artifacts/triangular_basis/live/bar_parity.csv` | 265,809 synchronized M5 bars (source data) |
 | `artifacts/triangular_basis/live/canonical_trade_log.csv` | The real 405 trades (source data) |
 | `artifacts/triangular_basis/live/execution/neutrality_gate.json` | Broker seal Gate-K artifact |
