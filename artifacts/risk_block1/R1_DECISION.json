@@ -1,0 +1,186 @@
+{
+  "phase": "R1",
+  "task": "CR-RISK-BLOCK1-R1-EXPOSURE-TRUTH",
+  "base_commits": {
+    "p75_seal": "7bc1c0242cd05a205da62b34904d7308c63f2acb",
+    "p8_overlay": "95fb6f207db37cfc3c44af0e67cd716dd7171679"
+  },
+  "status": "R1_COMPLETE",
+  "r2_cleared": true,
+  "r2_waits_for_human_review": true,
+  "ledger": {
+    "n_events": 890,
+    "n_A": 432,
+    "n_B": 458,
+    "risk_unit_1R_bps": 24.49489742783178,
+    "expectancy_A_bps": 9.633187925727864,
+    "expectancy_B_bps": 7.539423017405529,
+    "expectancy_A_R": 0.3932732502395528,
+    "expectancy_B_R": 0.3077956557939707
+  },
+  "concurrency": {
+    "max_concurrent": 3,
+    "mean_in_market": 1.1277719112988385,
+    "median_in_market": 1.0,
+    "hours_2pos": 565,
+    "hours_3pos": 20,
+    "opposite_overlap_hours": 228,
+    "A_B_overlap_hours": 228,
+    "max_gross_exposure": 18.18781280480144,
+    "max_abs_net_exposure": 18.18781280480144
+  },
+  "heat": {
+    "gross_heat_median_bps": 0.0,
+    "gross_heat_p90_bps": 20.0,
+    "gross_heat_p99_bps": 37.32050807568877,
+    "gross_heat_max_bps": 58.63703305156273,
+    "gross_heat_in_market_median_bps": 20.0,
+    "portfolio_cae_p99_bps": 23.156548085342134,
+    "per_position_entry_heat_bps": 24.49489742783178,
+    "units": "bps of PnL (vol-normalized position)"
+  },
+  "episodes": {
+    "intervals_h": [
+      0.5,
+      1.0,
+      2.0,
+      3.0,
+      6.0,
+      12.0
+    ],
+    "multi_event_share_by_interval": {
+      "0.5": 1.0,
+      "1.0": 1.0,
+      "2.0": 1.0,
+      "3.0": 1.0,
+      "6.0": 1.0,
+      "12.0": 1.0
+    },
+    "independence_verdicts": {
+      "0.5": {
+        "verdict": "later ranks consistent with rank 1 (or too small to judge)",
+        "rank1_expectancy_bps": 8.555722388636145,
+        "ranks": []
+      },
+      "1.0": {
+        "verdict": "later ranks consistent with rank 1 (or too small to judge)",
+        "rank1_expectancy_bps": 8.555722388636145,
+        "ranks": []
+      },
+      "2.0": {
+        "verdict": "later ranks consistent with rank 1 (or too small to judge)",
+        "rank1_expectancy_bps": 8.614112194941255,
+        "ranks": [
+          {
+            "rank": "2",
+            "n": 63,
+            "expectancy_bps": 8.065013563189579,
+            "diff_vs_rank1_bps": -0.5490986317516757
+          },
+          {
+            "rank": "3",
+            "n": 3,
+            "expectancy_bps": 2.8228742578777446,
+            "diff_vs_rank1_bps": -5.79123793706351
+          }
+        ]
+      },
+      "3.0": {
+        "verdict": "later ranks differ materially",
+        "rank1_expectancy_bps": 8.924043733334436,
+        "ranks": [
+          {
+            "rank": "2",
+            "n": 98,
+            "expectancy_bps": 4.564544995422926,
+            "diff_vs_rank1_bps": -4.35949873791151
+          },
+          {
+            "rank": "3",
+            "n": 16,
+            "expectancy_bps": 15.081025655806531,
+            "diff_vs_rank1_bps": 6.156981922472095
+          },
+          {
+            "rank": "4+",
+            "n": 1,
+            "expectancy_bps": 9.837212507630872,
+            "diff_vs_rank1_bps": 0.9131687742964356
+          }
+        ]
+      },
+      "6.0": {
+        "verdict": "later ranks consistent with rank 1 (or too small to judge)",
+        "rank1_expectancy_bps": 9.141114892736404,
+        "ranks": [
+          {
+            "rank": "2",
+            "n": 195,
+            "expectancy_bps": 6.99703494604145,
+            "diff_vs_rank1_bps": -2.144079946694954
+          },
+          {
+            "rank": "3",
+            "n": 64,
+            "expectancy_bps": 7.737567569816892,
+            "diff_vs_rank1_bps": -1.4035473229195121
+          },
+          {
+            "rank": "4+",
+            "n": 17,
+            "expectancy_bps": 8.371896635273748,
+            "diff_vs_rank1_bps": -0.769218257462656
+          }
+        ]
+      },
+      "12.0": {
+        "verdict": "later ranks consistent with rank 1 (or too small to judge)",
+        "rank1_expectancy_bps": 8.606092393847513,
+        "ranks": [
+          {
+            "rank": "2",
+            "n": 228,
+            "expectancy_bps": 8.354314749014378,
+            "diff_vs_rank1_bps": -0.25177764483313503
+          },
+          {
+            "rank": "3",
+            "n": 96,
+            "expectancy_bps": 7.462830542702366,
+            "diff_vs_rank1_bps": -1.1432618511451471
+          },
+          {
+            "rank": "4+",
+            "n": 84,
+            "expectancy_bps": 10.062391633059095,
+            "diff_vs_rank1_bps": 1.4562992392115817
+          }
+        ]
+      }
+    }
+  },
+  "inputs": {
+    "phase_07_5/P7_5_TRADES.csv": {
+      "sha256": "ad19e08f16aeb65c17305041182c591401d28c32b418287f45d76a678ddfcd07",
+      "bytes": 179770,
+      "rows": 890
+    },
+    "phase_05/routing_events.parquet": {
+      "sha256": "de08df601a008e0efd6c0bc1523e8a9be25105324466ed3c7a19a0e561cf8607",
+      "frozen_expected": "de08df601a008e0efd6c0bc1523e8a9be25105324466ed3c7a19a0e561cf8607"
+    },
+    "phase_03/h1_strict_common_panel.parquet": {
+      "sha256": "a0da64a3b0cd8976b61e3f4e8defa55906098373efa1bcdf79dc2d628b8c6896",
+      "frozen_expected": "a0da64a3b0cd8976b61e3f4e8defa55906098373efa1bcdf79dc2d628b8c6896"
+    }
+  },
+  "code_hashes": {
+    "phase_r1_concurrency.py": "f00d020c66ab02bbfd9df64f8cbb5d568b5af773f6f00f8f7ae7f803796f9131",
+    "phase_r1_episodes.py": "070f9000cc9c2ae27ebc764b5da7769000121ba249fc1729ed98870bf05685fc",
+    "phase_r1_heat.py": "88eedb3d6b329895337b4ecbbe384e6a196df68659ff5ab9415582069b7fb8a4",
+    "phase_r1_ledger.py": "c35b2b078831e6e0ca638d5de7320f1b3b8a667d129b817604b76f8d8fabbfbd",
+    "phase_r1_orchestrator.py": "455c0bc77a2ab7f64dadcbe34fba5c91b08c4bc9cb4f6493f73e470e282d66ad"
+  },
+  "deterministic": true,
+  "stop": "R1 checkpoint complete; R2 begins only after human review. No stops, filters, sizing, or alpha modification."
+}
