@@ -1,0 +1,29 @@
+{
+ "short_path": [
+  2.0,
+  1.0,
+  0.0,
+  -0.1,
+  -0.25
+ ],
+ "long_path": [
+  -2.0,
+  -1.0,
+  0.0,
+  0.1,
+  0.25
+ ],
+ "results": {
+  "SHORT": {
+   "canonical_signed_p7": "-0.25",
+   "wrapper_naive_neg025": "-0.25",
+   "wrapper_control_zero": "0.0"
+  },
+  "LONG": {
+   "canonical_signed_p7": "0.25",
+   "wrapper_naive_neg025": "0.0",
+   "wrapper_control_zero": "0.0"
+  }
+ },
+ "finding": "canonical P7 exit is SIGNED: SHORT z<=-0.25, LONG z>=+0.25. The wrapper's single BASIS_EXIT_Z cannot express this: setting EXIT_Z=-0.25 makes LONG exit at z>=-0.25 (wrong)."
+}

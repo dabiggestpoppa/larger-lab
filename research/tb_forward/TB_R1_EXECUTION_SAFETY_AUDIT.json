@@ -1,0 +1,44 @@
+{
+  "checkpoint": "TB-R1-PRIOR-LIVE-STACK-AUDIT",
+  "execution_authorization": "NOT_AUTHORIZED",
+  "findings": [
+    {
+      "component": "triangular_basis_executor.py CLI --mode",
+      "issue": "argparse --mode choices=[replay,shadow,trade] default='trade' - running --loop without an explicit --mode sends real orders",
+      "severity": "CRITICAL (fail-open)",
+      "classification": "ADOPT_WITH_MECHANICAL_REPAIR",
+      "repair": "default must be 'shadow'; 'trade' requires an explicit --mode trade AND a separate --acknowledge-live flag; LIVE env must be disabled by default"
+    },
+    {
+      "component": "triangular_basis_executor.py --once path",
+      "issue": "verify_demo_identity() AssertionError is caught and logged but execution continues (does not fail closed)",
+      "severity": "HIGH",
+      "repair": "exit on demo-identity failure in every path"
+    },
+    {
+      "component": "triangular_basis_executor.py run_loop netting check",
+      "issue": "netting mode only logs a WARNING and continues; R0 account_mode.json says netting-with-overlap FAIL CLOSED",
+      "severity": "MEDIUM",
+      "repair": "fail closed on netting-with-overlap"
+    },
+    {
+      "component": "triangular_basis_executor.py --env",
+      "issue": "--env choices=[demo,live] default='demo' with no hard live-disable; no TB_LIVE_ENABLE env gate",
+      "severity": "HIGH",
+      "repair": "R9 three-factor LIVE gate (config + env + account allowlist); TB_LIVE_ENABLE=false default"
+    },
+    {
+      "component": "tb_live_shadow_04a.py + triangular_basis_shadow_guard.py",
+      "issue": "shadow runtime monkeypatches mt5.order_send to a no-op via a non-bypassable guard",
+      "severity": "NONE (correct)",
+      "classification": "ADOPT_AS_IS"
+    },
+    {
+      "component": "tb_live_exec_seal.py",
+      "issue": "uses mt5.order_check() only (no order_send)",
+      "severity": "NONE (correct)",
+      "classification": "ADOPT_AS_IS"
+    }
+  ],
+  "summary": "shadow and seal paths are safe (order_send disabled / order_check only). The executor's fail-open default --mode=trade is a CRITICAL defect to repair before any demo execution (R9)."
+}

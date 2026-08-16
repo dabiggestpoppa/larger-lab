@@ -1,0 +1,29 @@
+{
+  "checkpoint": "TB-R1-PRIOR-LIVE-STACK-AUDIT",
+  "expected_broker_symbols": ["GBPAUD.PRO", "GBPNZD.PRO", "AUDNZD.PRO"],
+  "symbol_resolution": {
+    "execution_layer": "reads mt5.symbol_info(broker_symbol) at runtime (dynamic)",
+    "data_feed": "hardcoded SYMBOL_MAP {GBPAUD: GBPAUD.PRO, ...} (NOT runtime-verified)",
+    "classification": "hardcoded map = RESEARCH_REFERENCE_ONLY until runtime probe is added (R2)"
+  },
+  "dynamic_metadata": {
+    "contract_size": "READS mt5.symbol_info.trade_contract_size (TriangularExecutionLayer._get_contract)",
+    "volume_min": "READS info.volume_min",
+    "volume_step": "READS info.volume_step",
+    "volume_max": "READS info.volume_max",
+    "point": "READS info.point",
+    "digits": "READS info.digits",
+    "filling_mode": "READS info.filling_mode bits (_supported_filling_modes)",
+    "tick": "READS mt5.symbol_info_tick bid/ask",
+    "verdict": "execution layer reads real broker metadata dynamically; ADOPT_AS_IS"
+  },
+  "frozen_reference_values": {
+    "note": "neutrality_gate.json stores contract_size 100000 / vol 0.01/0.01/200 and cur_to_usd {GBP 1.34852, AUD 0.70583, NZD 0.58844}",
+    "classification": "RESEARCH_REFERENCE_ONLY - must be re-read from the live broker at runtime, never silently substituted (R0 invariant #5)"
+  },
+  "account_currency_conversion": {
+    "note": "execution contract accepts cur_to_usd as a caller-supplied dict and fails quantifiable=false when a rate is missing; the seal reads live GBPUSD/AUDUSD/NZDUSD ticks. The default DEFAULT_QUOTE_TO_USD = {AUD: 0.0, NZD: 0.0} is a fail-closed sentinel (0 -> non-quantifiable).",
+    "verdict": "ADOPT_AS_IS (fail-closed on missing rate); R4 must feed live rates"
+  },
+  "classification": "ADOPT_AS_IS (execution layer) / hardcoded data-feed map needs runtime probe"
+}

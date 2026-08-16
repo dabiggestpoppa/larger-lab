@@ -1,0 +1,48 @@
+{
+  "checkpoint": "TB-R1-PRIOR-LIVE-STACK-AUDIT",
+  "tb_r1_audit_pass": true,
+  "base_commit": "d665ea04e04656db5233b20b9598afd44fdfbbb6",
+  "canonical_research_commit": "6769ad31ac737946dae54e3660e22cb36f72e2b7",
+  "classifications": {
+    "strategy_wrapper": "ADOPT_WITH_MECHANICAL_REPAIR",
+    "normalization_engine": "ADOPT_AS_IS",
+    "weight_engine": "ADOPT_WITH_MECHANICAL_REPAIR",
+    "execution_contract": "ADOPT_AS_IS",
+    "atomic_execution_layer": "ADOPT_AS_IS",
+    "market_data_layer": "ADOPT_WITH_MECHANICAL_REPAIR",
+    "persistence_layer": "REPLACE",
+    "broker_metadata_layer": "ADOPT_AS_IS",
+    "session_time_layer": "ADOPT_AS_IS",
+    "parity_harness": "ADOPT_WITH_MECHANICAL_REPAIR",
+    "execution_safety": "ADOPT_WITH_MECHANICAL_REPAIR"
+  },
+  "strategy_wrapper_detail": {
+    "architecture": "ADOPT_AS_IS",
+    "forward_config": "ADOPT_WITH_MECHANICAL_REPAIR",
+    "reason": "thin wrapper with exact causal normalization (z parity 2.25e-12, 0/265809 entry mismatches); still frozen to control 2.5/0 and its single BASIS_EXIT_Z cannot express the P7 signed exit (SHORT z<=-0.25, LONG z>=+0.25); daily-loss cap missing"
+  },
+  "greenfield_work_required": {
+    "greenfield_r1_needed": false,
+    "greenfield_r2_needed": true,
+    "greenfield_r3_needed": false,
+    "greenfield_r4_needed": false,
+    "greenfield_r5_needed": false
+  },
+  "greenfield_r1_note": "login/symbols/market/execution/positions/account-guard already exist (extract into quant-lab/live/ + add mock adapter), no greenfield",
+  "greenfield_r2_note": "tick-level TriangleSnapshot with max_quote_age / max_cross_leg_skew fail-closed gates is NOT implemented (only bar-level sync with no staleness rejection)",
+  "key_measurements": {
+    "z_parity_max_abs_diff": 2.252e-12,
+    "z_parity_entry_mismatches": 0,
+    "z_parity_bars": 265809,
+    "live_raw_weight_median_residual_pct": 34.84,
+    "tb_b_weight_median_residual_pct": 0.021,
+    "tb_b_solved": "405/405",
+    "prior_parity_harness_result": "PASS (old 2.5/0 config, 405/405)",
+    "min_viable_notional_500usd_pass_rate": "0/405 (raw weights fail MIN_LOT_HEDGE_DISTORTION)"
+  },
+  "next_checkpoint_recommendation": "TB-R2-SYNCHRONIZED-MARKET-DATA (greenfield tick snapshot) preceded by a small TB-R1.1-PRIOR-STACK-MECHANICAL-REPAIR for the execution-safety default-mode defect",
+  "next_checkpoint_reason": "evidence shows the largest genuine gap is the fail-closed tick-level synchronized snapshot (greenfield_r2=true) and the fail-open --mode default=trade safety defect; all other layers are adoptable or repairable",
+  "execution_authorization": "NOT_AUTHORIZED",
+  "scientific_changes": "NONE",
+  "generated_by": "TB-R1 prior-live-stack audit"
+}

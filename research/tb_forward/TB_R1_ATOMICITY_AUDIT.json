@@ -1,0 +1,34 @@
+{
+  "checkpoint": "TB-R1-PRIOR-LIVE-STACK-AUDIT",
+  "component": "quant-lab/mt5/triangular_execution_layer.py (TriangularExecutionLayer)",
+  "method": "static review of state machine + order/fill/close code paths; execution mechanics mock-tested in tb_live_exec_sim.py (not re-run here)",
+  "state_machine": {
+    "entry": "PENDING -> PRECHECK -> SENDING -> VERIFYING -> OPEN",
+    "prerecheck_fail": "ABORTED_PRECHECK",
+    "partial_fill": "BROKEN_HEDGE -> flatten -> ABORTED_FLAT",
+    "unresolved": "BROKEN_HEDGE_UNRESOLVED (halt)",
+    "exit": "OPEN -> CLOSING -> CLOSING_PARTIAL (reconcile/retry) -> CLOSED"
+  },
+  "requirements": {
+    "one_basket_id": "PASS (basket_id keyed _active_baskets)",
+    "three_leg_intents": "PASS (BasketExecutionIntent.legs x3)",
+    "three_fill_verification": "PASS (_verify_fills queries positions_get by magic+basket comment; OPEN only when 3 owned)",
+    "no_open_until_all_established": "PASS (PLACED != FILLED doctrine; VERIFYING before OPEN)",
+    "partial_entry_detection": "PASS (count_owned_positions < 3 -> BROKEN_HEDGE)",
+    "bounded_retry": "PASS (max_retries=2, retry_delay_ms=400, fill_verify_timeout_s=10)",
+    "broken_hedge_status": "PASS (BROKEN_HEDGE enum)",
+    "flatten_opened_legs_after_failure": "PASS (_flatten_and_verify closes each opened leg then verifies flat)",
+    "partial_close_handling": "PASS (CLOSING_PARTIAL state + reconcile/retry)",
+    "orphan_identification": "PASS (_count_owned_positions/_count_owned_orders by magic)",
+    "duplicate_basket_prevention": "PARTIAL (basket_id keyed; duplicate-signal guard lives in the strategy wrapper via exactly-once timestamp + _active_baskets)",
+    "magic_comment_tagging": "PASS (comment 'TB|{basket_id}|{symbol}|{leg_id}', magic = leg.magic)",
+    "state_transitions": "PASS (explicit enum transitions, no hidden states)"
+  },
+  "failure_simulations": {
+    "note": "tb_live_exec_sim.py exists and covers all-three-fill / leg1-fail / leg2-fail / leg3-fail / 1+2-fill / 1-fill / duplicate-response / delayed-fill / close-one-fail / manual-close / disconnect-entry / disconnect-exit via a mock MT5 truth model",
+    "verdict": "existing harness satisfies the R5 failure-scenario requirement; will be re-validated at R5"
+  },
+  "classification": "ADOPT_AS_IS",
+  "satisfies_future_r5": true,
+  "repair_required": "none for atomicity; persistence (R6) must be layered on top (in-memory _active_baskets not persisted)"
+}
