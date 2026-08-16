@@ -1,0 +1,12 @@
+{
+  "status": "CONNECTED_WEEKEND_FAIL_CLOSED",
+  "cycles_total": 16,
+  "valid_synchronized_snapshots": 0,
+  "stale_cycles": 16,
+  "missing_bar_rate": 1.0,
+  "duplicate_bar_rate": 0.0,
+  "stale_cycle_rate": 1.0,
+  "synchronized_bar_success_rate": 0.0,
+  "active_market_evidence": "PENDING_ACTIVE_MARKET",
+  "note": "Weekend observation: all cycles fail closed STALE_SIGNAL_BAR as designed. Active-market distributions require a market-hours run (see TB_R5_PROTOCOL.md)."
+}

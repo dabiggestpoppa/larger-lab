@@ -1,0 +1,12 @@
+{
+  "checkpoint": "TB-R5-SHADOW-FORWARD-SEAL",
+  "status": "PENDING_DEMO_EXECUTION_VALIDATION",
+  "rule": "R5 does not test broker execution. Actual order behavior can only be validated when DEMO execution is separately authorized (R6).",
+  "items": {
+    "broker_partial_fill_validation": "PENDING_DEMO_EXECUTION_VALIDATION (code path verified in simulation: R4 failure injection 8/8, R3 matrix)",
+    "broker_fill_mode_validation": "PENDING_DEMO_EXECUTION_VALIDATION (real specs show filling_mode=2 IOC|RETURN; broker behavior untested)",
+    "broker_slippage_validation": "PENDING_DEMO_EXECUTION_VALIDATION (no live measurement without orders)",
+    "broker_atomic_close_validation": "PENDING_DEMO_EXECUTION_VALIDATION (partial-close branches verified in simulation only)"
+  },
+  "acceptance_note": "This is acceptable for R5 PASS; these four remain pending until R6 (demo execution validation) is separately human-authorized."
+}

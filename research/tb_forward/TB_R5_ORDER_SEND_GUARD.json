@@ -1,0 +1,15 @@
+{
+  "checkpoint": "TB-R5-SHADOW-FORWARD-SEAL",
+  "execution_authorization": "NOT_AUTHORIZED",
+  "order_send_attempts": 0,
+  "guard": {
+    "mechanism": "mt5.order_send wrapped in tb_r5_shadow.py; ANY invocation raises AssertionError and fails the run; the real function is restored on shutdown",
+    "state_across_all_runtime_cycles": "ACTIVE",
+    "shadow_order_would_send": "recorded as intents only (weekend sample produced no signals)",
+    "demo_authorized": false,
+    "live_authorized": false,
+    "mode_strings_cannot_enable_execution": ["trade", "live", "demo", "production", "real"],
+    "static_scan": "tb_r5_shadow.py imports no MetaTrader5 order functions; adapter is read-only by construction"
+  },
+  "pass": true
+}

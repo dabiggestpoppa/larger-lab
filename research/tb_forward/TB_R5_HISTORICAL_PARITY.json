@@ -1,0 +1,31 @@
+{
+  "checkpoint": "TB-R5-SHADOW-FORWARD-SEAL",
+  "source": "tb_r4_replay.py integrated replay re-run on the R5 base (R4 code, unchanged)",
+  "bars_processed": 265809,
+  "primary": {
+    "expected": 194,
+    "actual": 194,
+    "entry_mismatches": 0,
+    "direction_mismatches": 0,
+    "exit_mismatches": 0,
+    "reason_mismatches": 0,
+    "weight_mismatches": 0,
+    "max_z_diff": 1e-12,
+    "parity_pass": true
+  },
+  "control": {
+    "expected": 405,
+    "actual": 405,
+    "entry_mismatches": 0,
+    "direction_mismatches": 0,
+    "exit_mismatches": 0,
+    "reason_mismatches": 0,
+    "weight_mismatches": 0,
+    "max_z_diff": 1e-12,
+    "parity_pass": true
+  },
+  "failure_injection": {"signals_injected": 8, "classification_safe": true},
+  "long_run": {"bars_replayed": 50000, "integrity_clean": true, "open_db_handles": 1},
+  "overall_parity_pass": true,
+  "strategy_science": "UNCHANGED"
+}

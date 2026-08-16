@@ -1,0 +1,22 @@
+{
+  "checkpoint": "TB-R5-SHADOW-FORWARD-SEAL",
+  "status": "PASS",
+  "method": "Broker symbol metadata (digits, point, tick size/value, contract size, volume min/max/step, trade mode, filling mode) hashed per cycle over the live shadow runtime; any drift blocks the engine (METADATA_DRIFT_BLOCKED).",
+  "resolved_symbols": {
+    "GBPAUD": "GBPAUD.PRO",
+    "GBPNZD": "GBPNZD.PRO",
+    "AUDNZD": "AUDNZD.PRO"
+  },
+  "metadata_hash_baseline": "8c82667a5c71b167",
+  "hash_stable_across_all_cycles": true,
+  "cycles_checked": 12,
+  "drift_detected": false,
+  "specs_snapshot": {
+    "GBPAUD.PRO": {"digits": 5, "point": 1e-05, "trade_tick_size": 1e-05, "trade_tick_value": 0.70834, "contract_size": 100000.0, "volume_min": 0.01, "volume_max": 200.0, "volume_step": 0.01, "trade_mode": 4, "filling_mode": 2},
+    "GBPNZD.PRO": {"digits": 5, "point": 1e-05, "trade_tick_size": 1e-05, "trade_tick_value": 0.58894, "contract_size": 100000.0, "volume_min": 0.01, "volume_max": 200.0, "volume_step": 0.01, "trade_mode": 4, "filling_mode": 2},
+    "AUDNZD.PRO": {"digits": 5, "point": 1e-05, "trade_tick_size": 1e-05, "trade_tick_value": 0.58894, "contract_size": 100000.0, "volume_min": 0.01, "volume_max": 200.0, "volume_step": 0.01, "trade_mode": 4, "filling_mode": 2}
+  },
+  "independent_probe_hash": "6a3ace6ffcb7bb74",
+  "note": "The independent probe hash uses trade_contract_size field naming (MT5 native); the runtime hash uses the R2 resolver's normalized contract_size key. Both are internally stable; the runtime baseline is the authority for drift detection.",
+  "blocking_rule": "metadata change -> METADATA_DRIFT_BLOCKED, no strategy evaluation"
+}

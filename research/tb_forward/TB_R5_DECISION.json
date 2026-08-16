@@ -1,0 +1,69 @@
+{
+  "checkpoint": "TB-R5-SHADOW-FORWARD-SEAL",
+  "status": "BLOCKED",
+  "block_reason": "active-market evidence pending: this checkpoint ran on a closed-market weekend (Sunday 16:5x UTC); the runtime correctly fail-closed (STALE_SIGNAL_BAR) but fresh-bar/active-tick evidence requires market hours. All non-active-market gates pass.",
+  "base_commit": "fb8d25e4f61dc6e863ddbe04e3b9ba5ddaeb610a",
+  "r4_commit": "fb8d25e4f61dc6e863ddbe04e3b9ba5ddaeb610a",
+
+  "active_market_verified": false,
+  "real_mt5_connected": true,
+  "real_broker_verified": true,
+  "symbol_resolution_pass": true,
+  "symbol_metadata_stability_pass": true,
+
+  "fresh_bar_advancement_pass": false,
+  "closed_bar_sync_pass": false,
+  "real_tick_update_pass": false,
+  "quote_quality_pass": false,
+  "spread_distribution_pass": false,
+  "cross_leg_skew_pass": false,
+
+  "shadow_runtime_pass": true,
+  "shadow_signal_lifecycle_pass": false,
+  "lot_translation_pass": true,
+  "ledger_health_pass": true,
+  "restart_reconciliation_pass": true,
+  "control_isolation_pass": true,
+  "order_send_guard_pass": true,
+
+  "historical_parity_pass": true,
+  "primary_event_count": 194,
+  "control_event_count": 405,
+  "primary_lifecycle_mismatches": 0,
+  "control_lifecycle_mismatches": 0,
+
+  "strategy_math_changed": false,
+  "weighting_changed": false,
+  "market_data_semantics_changed": false,
+  "session_semantics_changed": false,
+
+  "broker_partial_fill_validation": "PENDING_DEMO_EXECUTION_VALIDATION",
+  "broker_fill_mode_validation": "PENDING_DEMO_EXECUTION_VALIDATION",
+  "broker_slippage_validation": "PENDING_DEMO_EXECUTION_VALIDATION",
+  "broker_atomic_close_validation": "PENDING_DEMO_EXECUTION_VALIDATION",
+
+  "execution_authorization": "NOT_AUTHORIZED",
+  "demo_authorized": false,
+  "live_authorized": false,
+
+  "demo_execution_gate_ready": false,
+  "human_review_required": true,
+  "next_checkpoint_recommended": "TB-R6-DEMO-EXECUTION-VALIDATION (only after active-market seal PASS + separate human authorization)",
+
+  "active_market_pending_fields": [
+    "fresh_bar_advancement_pass", "closed_bar_sync_pass", "real_tick_update_pass",
+    "quote_quality_pass", "spread_distribution_pass", "cross_leg_skew_pass",
+    "active_market_verified", "shadow_signal_lifecycle_pass"
+  ],
+  "weekend_evidence_summary": {
+    "cycles": 12,
+    "valid_snapshots": 0,
+    "stale_cycles": 12,
+    "failure_code": "STALE_SIGNAL_BAR",
+    "order_send_attempts": 0,
+    "metadata_hash_stable": true,
+    "ledger_integrity": "clean",
+    "restart_test": "PASS (FLAT_MATCH)"
+  },
+  "scientific_changes": "NONE"
+}

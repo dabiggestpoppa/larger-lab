@@ -1,0 +1,21 @@
+{
+  "mt5_connected": true,
+  "market_open_status": "CLOSED (weekend)",
+  "symbol_resolution": {
+    "GBPAUD": "GBPAUD.PRO",
+    "GBPNZD": "GBPNZD.PRO",
+    "AUDNZD": "AUDNZD.PRO"
+  },
+  "latest_synchronized_bar": null,
+  "bar_age": null,
+  "latest_z": null,
+  "primary_state": "NO_BASKET",
+  "control_state": "NO_BASKET",
+  "ledger_health": "OK",
+  "broker_reconciliation_state": "FLAT_MATCH",
+  "quote_health": "STALE_EXECUTION_QUOTES (closed market)",
+  "order_send": "DISABLED (guard ACTIVE)",
+  "last_error_rejection": "STALE_SIGNAL_BAR (expected on weekend)",
+  "uptime_sample_seconds": 60,
+  "status": "FAIL_CLOSED_WEEKEND"
+}

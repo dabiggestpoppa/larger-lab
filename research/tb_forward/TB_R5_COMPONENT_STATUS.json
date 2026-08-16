@@ -1,0 +1,31 @@
+{
+  "checkpoint": "TB-R5-SHADOW-FORWARD-SEAL",
+  "base_commit": "fb8d25e4f61dc6e863ddbe04e3b9ba5ddaeb610a",
+  "components": {
+    "strategy_wrapper": "ADOPTED",
+    "normalization_engine": "ADOPTED",
+    "weight_engine": "ADOPTED",
+    "execution_contract": "ADOPTED",
+    "atomic_execution_layer": "ADOPTED",
+    "market_data_layer": "ADOPTED",
+    "persistence_layer": "ADOPTED",
+    "broker_metadata_layer": "ADOPTED",
+    "session_time_layer": "ADOPTED",
+    "parity_harness": "ADOPTED",
+    "execution_safety": "FAIL_CLOSED",
+    "real_mt5_read_layer": "ADOPTED",
+    "shadow_forward_runtime": "ADOPTED (tb_r5_shadow.py; active-market evidence PENDING)"
+  },
+  "pending": {
+    "active_market_shadow_seal": "PENDING_ACTIVE_MARKET (weekend sample proves fail-closed only)",
+    "broker_partial_fill_validation": "PENDING_DEMO_EXECUTION_VALIDATION",
+    "broker_fill_mode_validation": "PENDING_DEMO_EXECUTION_VALIDATION",
+    "broker_slippage_validation": "PENDING_DEMO_EXECUTION_VALIDATION",
+    "broker_atomic_close_validation": "PENDING_DEMO_EXECUTION_VALIDATION"
+  },
+  "authorization": {
+    "execution_authorization": "NOT_AUTHORIZED",
+    "demo_authorized": false,
+    "live_authorized": false
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "checkpoint": "TB-R5-SHADOW-FORWARD-SEAL",
+  "status": "PASS",
+  "method": "Controlled restart during the live shadow run: fresh BasketLedger object on the SAME SQLite DB file -> integrity check -> reconstruct -> real MT5 broker-state read -> reconcile -> resume gate.",
+  "restart_test_result": {
+    "status": "PASS",
+    "integrity_problems": [],
+    "baskets_reconstructed": 0,
+    "broker_positions_total": 0,
+    "tb_magic_positions": 0,
+    "foreign_positions_protected": 0,
+    "resume_allowed": true,
+    "reconciliation": "FLAT_MATCH"
+  },
+  "restart_states_verified": {
+    "flat_restart_live": "PASS (this audit)",
+    "flat_restart_replay": "PASS (R3 40/40 crash_restart_while_flat)",
+    "open_restart_replay": "PASS (R3 40/40 crash_restart_while_fully_open)",
+    "mid_entry_crash_replay": "PASS (R3 crash_after_leg1/leg2/leg3_broker_ack)",
+    "mid_close_crash_replay": "PASS (R3 crash_during_close_leg1/leg2)",
+    "signal_observed_state": "no live open shadow basket occurred during the weekend sample; deeper lifecycle states use deterministic R3/R4 replay (not fabricated live state)"
+  },
+  "sequence": "integrity -> reconstruct -> real MT5 broker read -> ownership classification -> reconcile -> resume only if safe",
+  "ledger_path": "quant-lab/state/triangular_basis/tb_r5_ledger.db (gitignored)"
+}

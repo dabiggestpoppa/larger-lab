@@ -1,0 +1,23 @@
+{
+  "checkpoint": "TB-R5-SHADOW-FORWARD-SEAL",
+  "base_commit": "fb8d25e4f61dc6e863ddbe04e3b9ba5ddaeb610a",
+  "r4_commit": "fb8d25e4f61dc6e863ddbe04e3b9ba5ddaeb610a",
+  "hash_algorithm": "sha256 (first 16 hex chars of blob at base commit)",
+  "inputs_unchanged_from_r4": {
+    "canonical_m5_gbpaud": "cedf3453bcbffde0",
+    "canonical_m5_gbpnzd": "9e421aa1310a41b5",
+    "canonical_m5_audnzd": "8a0f08e34853b27d",
+    "r0_truth_lock": "0821c20d7c736eb8",
+    "r1_1_forward_config": "f90883bf1e4b83de",
+    "r1_1_strategy_wrapper": "bb2afa36d3fadbce",
+    "execution_contract": "1123bdc81caddc07",
+    "atomic_execution_layer": "4f07eefa36411a01",
+    "r2_market_data_contract": "9f3f874b3d50861f",
+    "r2_market_data_adapter": "eb35b7cb7bb4e26a",
+    "r3_state_machine": "c44c5721792c652a",
+    "r3_persistence_ledger": "7afc47e6c4a7486c",
+    "r3_reconciliation": "7ff236b4c2daba60"
+  },
+  "r5_new_module": "quant-lab/engines/tb_r5_shadow.py (new, committed with this checkpoint)",
+  "note": "R5 adds only the shadow runtime module; every scientific/strategy input is byte-identical to the R4 base. Historical parity re-verified at 194/194 + 405/405 with 0 mismatches."
+}

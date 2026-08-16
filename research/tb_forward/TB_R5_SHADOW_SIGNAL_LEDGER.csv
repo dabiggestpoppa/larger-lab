@@ -1,0 +1,2 @@
+signal_time_utc,strategy,bar_open_time,z,decision,direction,gate_k,residual_pct,order_send
+NO_SIGNALS_DURING_WEEKEND_SAMPLE,,,,,,,,NOT_CALLED

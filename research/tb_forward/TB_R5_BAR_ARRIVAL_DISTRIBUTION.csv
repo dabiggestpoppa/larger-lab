@@ -1,0 +1,2 @@
+metric,n,median,p90,p95,p99,max,note
+bar_arrival_delay_sec,0,,,,,,market closed; no new M5 bars during sample (PENDING_ACTIVE_MARKET)
