@@ -1,0 +1,29 @@
+{
+  "checkpoint": "TB-R6.1",
+  "url": "http://127.0.0.1:8765",
+  "bind": "127.0.0.1 ONLY",
+  "read_only": true,
+  "no_trading_controls": true,
+  "data_source": "tb_runtime.db (durable DB only; no log scraping, no MT5 from dashboard)",
+  "evidence": {
+    "http_200_json": true,
+    "engine_status": "ONLINE",
+    "heartbeat_age_s": 5.7,
+    "worker_pid": 15564,
+    "worker_state": "FLAT",
+    "mt5_status": "CONNECTED",
+    "account_gate": "PASS",
+    "strategy_state": "FLAT",
+    "market_open": true,
+    "last_closed_bar": "2026-08-17 14:30:00+00:00",
+    "open_basket": "NO",
+    "today_tb_pnl": 0.0,
+    "deploy_tb_pnl": 0.0,
+    "account_equity": 25254.35,
+    "disk_free_gb": 9.39,
+    "last_error": "none",
+    "read_only_flag": true
+  },
+  "fields_present": ["ENGINE STATUS", "UPTIME", "LAST HEARTBEAT", "MT5 STATUS", "ACCOUNT GATE", "STRATEGY STATE", "LAST CLOSED M5 BAR", "LAST SIGNAL TIME", "OPEN BASKET", "TODAY TB PNL", "OPEN BASKET PNL", "TB SINCE DEPLOY", "ACCOUNT EQUITY", "LAST ERROR", "DISK FREE"],
+  "pass": true
+}

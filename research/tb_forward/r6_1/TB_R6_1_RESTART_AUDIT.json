@@ -1,0 +1,21 @@
+{
+  "checkpoint": "TB-R6.1",
+  "restart_contract": "every worker start: ledger integrity -> state reconstruction -> broker position read -> reconciliation -> warm rolling window -> safe resume; ambiguous => BLOCKED_RECONCILIATION (no new orders)",
+  "tests": {
+    "flat_restart": {
+      "evidence": "tbctl restart -> supervisor 26100 spawned worker 1400 -> 'RECONCILE: flat / clean' -> ONLINE/FLAT; deployment baseline (GEN-SMOKE, equity 25254.35) persisted unchanged across restart",
+      "pass": true
+    },
+    "crash_recovery_reconcile": {
+      "evidence": "R6 sealed: restart-with-open-basket (R6R40529) reconstructed OPEN_VERIFIED from ledger + broker truth, closed, flat (rerun in R6; mechanism unchanged)",
+      "pass": true
+    },
+    "ledger_gap_classification": {
+      "evidence": "worker classifies broker TB positions with no matching ledger intent as BLOCKED_RECONCILIATION (fail closed; never flattens without ownership evidence)",
+      "pass": true
+    },
+    "dedup_restoration": "control ledger UNIQUE dedup_key (R3) prevents duplicate signal processing after restart",
+    "pc_reboot": "MANUAL_VALIDATION — actual OS reboot not automated; process termination + service restart + ledger persistence + desired-state persistence + deployment baseline persistence all validated live"
+  },
+  "pass": true
+}

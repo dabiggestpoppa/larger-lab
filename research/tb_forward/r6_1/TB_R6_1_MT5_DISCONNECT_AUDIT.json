@@ -1,0 +1,13 @@
+{
+  "checkpoint": "TB-R6.1",
+  "policy": "MT5 unavailable => WAITING_FOR_MT5, bounded retry every 30 s (no crash loop); execution impossible while disconnected. When connectivity returns: reconcile broker state FIRST, then resume. Mid-loop terminal loss => DEGRADED, execution disabled.",
+  "tests": {
+    "unit_waiting_for_mt5": {
+      "evidence": "stubbed adapter connect()=False -> _ensure_mt5()=False, state WAITING_FOR_MT5, heartbeat records mt5_connected=0",
+      "pass": true
+    },
+    "reconnect_contract": "on reconnect, _post_connect_setup() reruns ledger integrity + broker read + reconciliation before any strategy processing",
+    "execution_while_disconnected": "impossible by construction: order path requires mt5_ok + account_gate + reconciled"
+  },
+  "pass": true
+}

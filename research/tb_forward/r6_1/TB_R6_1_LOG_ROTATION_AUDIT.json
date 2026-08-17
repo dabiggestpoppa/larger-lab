@@ -1,0 +1,15 @@
+{
+  "checkpoint": "TB-R6.1",
+  "mechanism": "RotatingFileHandler 5 MB x 5 backups for tb_runtime.log, tb_supervisor.log, tb_dashboard.log; months of uptime cannot consume the disk",
+  "tests": {
+    "rotation_occurs": {
+      "evidence": "400 x ~90-byte lines with 1 KB maxBytes produced multiple .log.N backups",
+      "pass": true
+    },
+    "total_bounded": {
+      "evidence": "sum of rotated files bounded (< 200 KB in test)",
+      "pass": true
+    }
+  },
+  "pass": true
+}

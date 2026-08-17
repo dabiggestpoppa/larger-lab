@@ -1,0 +1,153 @@
+{
+  "suite": "tb_r6_1_tests",
+  "passed": 29,
+  "failed": 0,
+  "total": 29,
+  "tests": [
+    {
+      "name": "db integrity clean",
+      "pass": true,
+      "detail": "{'ok': True, 'tables': ['daily_nav', 'deployment_nav', 'runtime_errors', 'runtime_heartbeat', 'runtime_status', 'sqlite_sequence'], 'heartbeat_rows': 0, 'monotonic_ids': True, 'errors': [], 'journal_mode': 'wal'}"
+    },
+    {
+      "name": "desired-state persisted",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "desired-state flip",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "daily nav frozen once",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "deployment nav frozen once",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "heartbeat monotonic",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "error trail",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "first acquires",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "second blocked (live holder)",
+      "pass": true,
+      "detail": "worker singleton already held by live pid 19016"
+    },
+    {
+      "name": "stale reclaim after release",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "stale dead-pid reclaimed",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no heartbeat => OFFLINE",
+      "pass": true,
+      "detail": "OFFLINE"
+    },
+    {
+      "name": "fresh heartbeat => ONLINE",
+      "pass": true,
+      "detail": "ONLINE"
+    },
+    {
+      "name": "mt5 status derived",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "strategy FLAT",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "open basket NO",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "stale heartbeat => OFFLINE",
+      "pass": true,
+      "detail": "OFFLINE"
+    },
+    {
+      "name": "user stop => STOPPED",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "mt5 down => not ok",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "state WAITING_FOR_MT5",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "heartbeat records mt5 down",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "market closed => ONLINE_MARKET_CLOSED",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "market flag off",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "disk guard => DEGRADED_DISK",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "today PnL = 22 (10+5+7), foreign excluded",
+      "pass": true,
+      "detail": "22.0"
+    },
+    {
+      "name": "open PnL = 7, foreign excluded",
+      "pass": true,
+      "detail": "7.0"
+    },
+    {
+      "name": "deploy PnL = 22 (10+5+7)",
+      "pass": true,
+      "detail": "22.0"
+    },
+    {
+      "name": "rotated backups exist",
+      "pass": true,
+      "detail": "['rot.log', 'rot.log.1', 'rot.log.2']"
+    },
+    {
+      "name": "rotated total bounded",
+      "pass": true,
+      "detail": "2366 bytes"
+    }
+  ]
+}

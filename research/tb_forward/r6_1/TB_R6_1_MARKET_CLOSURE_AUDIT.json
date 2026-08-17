@@ -1,0 +1,19 @@
+{
+  "checkpoint": "TB-R6.1",
+  "policy": "normal market/weekend closure is NOT engine failure: state ONLINE_MARKET_CLOSED, supervisor stays alive, no order attempts; when fresh synchronized bars resume, worker resumes automatically after normal health gates pass (no manual Monday restart)",
+  "tests": {
+    "unit_stale_feed": {
+      "evidence": "stubbed feed returning STALE_SIGNAL_BAR -> cycle() sets state ONLINE_MARKET_CLOSED, market_open=False; no order path reached",
+      "pass": true
+    },
+    "live_weekend_evidence": {
+      "evidence": "R5.1 demonstrated weekend fail-closed (STALE_SIGNAL_BAR) and automatic Monday resume after calibration (21 advancing bars in the 2026-08-16/17 window)",
+      "pass": true
+    },
+    "no_order_attempts_while_closed": {
+      "evidence": "cycle() returns before any execution branch when the snapshot is invalid",
+      "pass": true
+    }
+  },
+  "pass": true
+}

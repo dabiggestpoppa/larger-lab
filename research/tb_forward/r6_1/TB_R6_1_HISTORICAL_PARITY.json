@@ -1,0 +1,22 @@
+{
+  "checkpoint": "TB-R6.1-PERSISTENT-DEMO-RUNTIME-AND-NATURAL-CANARY",
+  "replay": "R4 full-engine integrated replay rerun fresh in the R6.1 worktree (same code; runtime changes are new files only)",
+  "bars": {"expected": 265809, "emitted": 265809, "skipped": 1},
+  "primary": {
+    "expected": 194, "actual": 194, "opens": 194, "closes": 194,
+    "entry_mismatches": 0, "direction_mismatches": 0, "exit_mismatches": 0,
+    "reason_mismatches": 0, "weight_mismatches": 0, "max_z_diff": 1e-12,
+    "parity_pass": true
+  },
+  "control": {
+    "expected": 405, "actual": 405, "opens": 405, "closes": 405,
+    "entry_mismatches": 0, "direction_mismatches": 0, "exit_mismatches": 0,
+    "reason_mismatches": 0, "weight_mismatches": 0, "max_z_diff": 1e-12,
+    "parity_pass": true
+  },
+  "failure_injection": {"signals_injected": 8, "classification_safe": true},
+  "long_run": {"pass": true, "note": "50k bars, engine buffer capped at 400"},
+  "ledger_reconstruction": {"baskets": 194, "open_verified": 0, "integrity_problems": []},
+  "parity_pass": true,
+  "strategy_science_unchanged": true
+}

@@ -1,0 +1,22 @@
+{
+  "checkpoint": "TB-R6.1",
+  "mechanism": "worker writes durable heartbeat every 10 s to tb_runtime.db (runtime_heartbeat)",
+  "fields": ["ts", "pid", "generation", "state", "mt5_connected", "account_gate", "market_open", "last_closed_bar", "last_signal_time", "open_basket_id", "today_pnl", "open_pnl", "deploy_pnl", "deploy_pnl_pct", "account_equity", "disk_free_gb", "last_error"],
+  "evidence": {
+    "heartbeat_rows": 58,
+    "ids_monotonic": true,
+    "journal_mode": "wal",
+    "fresh_age_s": "0-10 s typical at run time",
+    "latest_state": "FLAT",
+    "mt5_connected": true,
+    "account_gate": true,
+    "last_closed_bar": "2026-08-17 14:40:00+00:00 (advancing; server-time M5 key)"
+  },
+  "status_derivation": {
+    "green_online": "heartbeat age <= 30 s",
+    "yellow_degraded": "30-90 s or MT5/feed issue",
+    "red_offline": "> 90 s"
+  },
+  "dashboard_uses_heartbeat_only": true,
+  "pass": true
+}

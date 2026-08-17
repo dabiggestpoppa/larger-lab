@@ -1,0 +1,35 @@
+{
+  "checkpoint": "TB-R6.1",
+  "runtime": {
+    "supervisor": "PASS (spawns worker, bounded backoff restart, honors desired state)",
+    "worker": "PASS (MT5 connect, identity gate, reconcile, warm, monitor loop, heartbeat)",
+    "dashboard": "PASS (http://127.0.0.1:8765, read-only, DB-backed)",
+    "tbctl": "PASS (status/start/stop/restart)",
+    "windows_task": "PENDING_APPROVAL (install script ready; registration requires explicit user approval)"
+  },
+  "tests": {
+    "r1_1": {"collected": 36, "passed": 36, "failed": 0},
+    "r2": {"collected": 26, "passed": 26, "failed": 0},
+    "r3": {"collected": 40, "passed": 40, "failed": 0},
+    "p6": {"collected": 411, "passed": 411, "failed": 0},
+    "p7": {"collected": 160, "passed": 160, "failed": 0},
+    "r6_1_runtime_audits": {"collected": 29, "passed": 29, "failed": 0},
+    "r4_replay": {"primary": "194/194 PASS", "control": "405/405 PASS",
+                  "failure_injection": "8/8 safe", "long_run": "PASS"}
+  },
+  "live_state": {
+    "engine": "ONLINE",
+    "mt5": "CONNECTED",
+    "account_gate": "PASS",
+    "state": "FLAT",
+    "market_open": true,
+    "open_basket": "none",
+    "desired": "RUNNING"
+  },
+  "safety": {
+    "primary_execution_calls": 0,
+    "foreign_positions_modified": 0,
+    "duplicate_orders": 0,
+    "strategy_science_changed": false
+  }
+}

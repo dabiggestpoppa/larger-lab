@@ -1,0 +1,26 @@
+{
+  "checkpoint": "TB-R6.1",
+  "ownership_filter": "positions/deals counted ONLY when magic in (31082026, 31082027) AND comment contains 'TB|'",
+  "daily_definition": "today TB PnL = realized TB deals since UTC day start + unrealized TB-owned open PnL; % relative to frozen start-of-day account equity (freeze at first observation of the day)",
+  "deployment_definition": "TB return since deployment = realized TB deals since deployment_start_epoch + unrealized open PnL; % relative to frozen deployment_start_equity; baseline persists across worker restarts / PC reboots (only a new deployment generation resets it)",
+  "tests": {
+    "foreign_magic_excluded": {
+      "evidence": "deal with magic 99999999 (manual) excluded from today/open/deploy PnL",
+      "pass": true
+    },
+    "same_magic_no_tag_excluded": {
+      "evidence": "deal with CONTROL_MAGIC but comment 'other-ea' (no TB| tag) excluded",
+      "pass": true
+    },
+    "window_filter": {
+      "evidence": "owned deal older than the deployment epoch excluded from deployment PnL",
+      "pass": true
+    },
+    "today_realized_plus_open": {
+      "evidence": "today = 10 + 5 (realized) + 7 (open) = 22, foreign excluded; open = 7 (foreign -999 excluded)",
+      "pass": true
+    }
+  },
+  "timezone": "UTC day boundary (documented; not silently changed)",
+  "pass": true
+}

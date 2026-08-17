@@ -1,0 +1,22 @@
+{
+  "checkpoint": "TB-R6.1",
+  "mechanism": "Task Scheduler logon task 'TB-Runtime-Supervisor' (current user, Interactive, limited privilege)",
+  "registered": true,
+  "approval": "explicit user approval granted for the exact schtasks command (request_elevation)",
+  "query_evidence": {
+    "task_name": "\\TB-Runtime-Supervisor",
+    "status": "Ready",
+    "logon_mode": "Interactive only",
+    "host": "BLRRR"
+  },
+  "command": "cmd /c cd /d <runtime_dir> && <python> -u <runtime_dir>\\quant-lab\\runtime\\tb_supervisor.py",
+  "runtime_dir": "C:\\Users\\wifik\\AppData\\Local\\Temp\\tb-r6 (current live deployment)",
+  "repoint_note": "when the tb-forward-engine branch is relocated to a stable path (e.g. the user's main checkout), re-run quant-lab/runtime/install_windows_runtime.ps1 to repoint the task; uninstall via uninstall_windows_runtime.ps1",
+  "behavior": {
+    "at_logon": "supervisor starts; reads durable desired-state flag",
+    "after_tbctl_stop": "task starts supervisor but worker stays stopped (STOPPED_BY_USER)",
+    "after_tbctl_start": "worker resumes automatically",
+    "removal": "schtasks /Delete /TN \"TB-Runtime-Supervisor\" /F (user-owned ACLs; no takeown/icacls needed)"
+  },
+  "pass": true
+}

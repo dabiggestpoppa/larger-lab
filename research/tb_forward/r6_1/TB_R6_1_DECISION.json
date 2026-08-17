@@ -1,0 +1,62 @@
+{
+  "checkpoint": "TB-R6.1-PERSISTENT-DEMO-RUNTIME-AND-NATURAL-CANARY",
+  "status": "DEPLOYED_WAITING_NATURAL_CANARY",
+  "base_commit": "68112be136c80eab9b992a339132c4162528a6d7",
+
+  "deployment_profile": "local_windows",
+
+  "windows_autostart_installed": true,
+  "supervisor_installed": true,
+  "worker_installed": true,
+  "dashboard_installed": true,
+
+  "service_running": true,
+  "worker_pid": 18412,
+  "dashboard_url": "http://127.0.0.1:8765",
+
+  "heartbeat_pass": true,
+  "heartbeat_age_seconds": 7,
+
+  "singleton_pass": true,
+  "auto_restart_pass": true,
+  "intentional_stop_pass": true,
+
+  "mt5_connected": true,
+  "account_gate_pass": true,
+  "broker_reconciliation_pass": true,
+
+  "market_closure_resume_pass": true,
+
+  "daily_pnl_tracking_pass": true,
+  "deployment_pnl_tracking_pass": true,
+
+  "runtime_deployment_pass": true,
+
+  "natural_signal_candidates": 0,
+  "natural_control_baskets_opened": 0,
+  "natural_control_baskets_completed": 0,
+  "natural_canary_pass": false,
+
+  "primary_execution_calls": 0,
+  "control_execution_calls": 0,
+
+  "foreign_positions_modified": 0,
+  "duplicate_orders": 0,
+
+  "historical_parity_pass": true,
+  "primary_event_count": 194,
+  "control_event_count": 405,
+  "lifecycle_mismatches": 0,
+
+  "strategy_math_changed": false,
+
+  "r7_ready": false,
+  "r7_authorized": false,
+
+  "live_authorized": false,
+
+  "next_checkpoint_recommended": "TB-R7-CANARY-DEMO-OPERATIONS-SEAL (after the first natural canary basket; not auto-started)",
+  "human_review_required": true,
+
+  "notes": "Runtime deployment fully passes and the local demo runtime is left RUNNING (per the checkpoint instruction). No z2.5 signal occurred during the observation window, so natural_canary_pass=false and the overall status is the healthy expected DEPLOYED_WAITING_NATURAL_CANARY. The natural canary continues under the persistent runtime; a later evidence-only commit will seal the first natural basket. Task Scheduler logon task registered with explicit user approval; points at the current live deployment path (repoint via install script when the branch is relocated)."
+}

@@ -1,0 +1,24 @@
+{
+  "checkpoint": "TB-R6.1",
+  "supervisor": "quant-lab/runtime/tb_supervisor.py",
+  "responsibility": "worker process lifecycle only (never strategy logic)",
+  "start_method": "tbctl start / Task Scheduler logon task",
+  "backoff_policy": [5, 15, 30, 60],
+  "max_backoff_s": 60,
+  "evidence": {
+    "supervisor_started": true,
+    "supervisor_pid": 24936,
+    "spawned_worker_pid": 18412,
+    "worker_survive_reset_s": 120,
+    "auto_restart_observed": {
+      "test": "taskkill /F on worker pid 15564 while desired=RUNNING",
+      "result": "supervisor respawned worker as pid 16056 within ~25 s",
+      "backoff_used": "initial 5 s + poll 5 s",
+      "pass": true
+    },
+    "stale_heartbeat_restart_s": 300,
+    "no_rapid_restart_storm": "backoff caps at 60 s; failures counter resets after 120 s survival"
+  },
+  "supervisor_state_tracked": "RUNNING / STOPPED_BY_USER / BACKOFF_<delay>s",
+  "pass": true
+}

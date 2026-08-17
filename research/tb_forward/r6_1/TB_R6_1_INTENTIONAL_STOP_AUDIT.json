@@ -1,0 +1,19 @@
+{
+  "checkpoint": "TB-R6.1",
+  "mechanism": "tbctl stop persists desired-state STOPPED_BY_USER in tb_runtime.db AND terminates supervisor+worker; supervisor (incl. logon-task relaunch on next boot) reads desired state and does NOT restart the worker until tbctl start",
+  "tests": {
+    "stop_terminates_worker": {
+      "evidence": "tbctl stop -> worker pid alive=False, supervisor pid alive=False after 15 s",
+      "pass": true
+    },
+    "stays_stopped": {
+      "evidence": "no worker/supervisor process after an additional 10 s; tbctl status => 'TB Runtime: STOPPED'",
+      "pass": true
+    },
+    "restart_reenables": {
+      "evidence": "tbctl restart -> desired RUNNING -> supervisor + worker ONLINE/FLAT",
+      "pass": true
+    }
+  },
+  "pass": true
+}
