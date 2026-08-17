@@ -163,6 +163,42 @@ class BasketExecutionResult:
         }
 
 
+# ─── RETCODE SUCCESS ─────────────────────────────────────────────────────
+# TB-R6 mechanical repair (real-broker validation): this broker's terminal
+# returns retcode 0 for a successful order_check / order_send instead of
+# TRADE_RETCODE_DONE (10009). Accept both. Verified against real order_check
+# during TB-R6-DEMO-EXECUTION-CANARY; regression-tested via the sealed R4
+# FakeBroker (whose DONE is 10009) and the full suite battery.
+def _is_success_retcode(retcode) -> bool:
+    if retcode is None:
+        return False
+    return int(retcode) == 0 or int(retcode) == 10009
+
+
+# ─── COMMENT / BASKET LINKAGE ───────────────────────────────────────────
+# TB-R6 mechanical repair: the broker's python API returns None from
+# order_check for request comments >= 30 chars (verified empirically during
+# TB-R6-DEMO-EXECUTION-CANARY; e.g. "TB|TB_20220914_152000_ab12cd34|GBPAUD|L1"
+# is 40 chars). Position comments must stay <= 29 chars while still carrying
+# basket linkage. Short basket ids are used verbatim; long ids are reduced to
+# a deterministic 16-char tag (last 8 of the id + 8 hex digest chars). The
+# linkage checks use the same tag so open/close/reconcile stay consistent.
+_MAX_COMMENT = 29
+
+def _basket_comment_tag(basket_id: str) -> str:
+    if len(basket_id) <= 16:
+        return basket_id
+    import hashlib as _hl
+    return basket_id[-8:] + _hl.md5(basket_id.encode()).hexdigest()[:8]
+
+
+def _comment_links_basket(comment: str, basket_id: str) -> bool:
+    if not comment:
+        return False
+    tag = _basket_comment_tag(basket_id)
+    return tag in comment or basket_id in comment
+
+
 # ─── FILL MODE DETECTION ─────────────────────────────────────────────────
 
 def _supported_filling_modes(symbol: str) -> List[int]:
@@ -295,7 +331,8 @@ class TriangularExecutionLayer:
         is_long = leg.side.value > 0  # Direction.LONG = 1
         price = leg.preflight_ask if is_long else leg.preflight_bid
         order_type = mt5.ORDER_TYPE_BUY if is_long else mt5.ORDER_TYPE_SELL
-        comment = f"TB|{leg.basket_id}|{leg.canonical_symbol}|{leg.leg_id}"
+        comment = f"TB|{_basket_comment_tag(leg.basket_id)}|" \
+                  f"{leg.canonical_symbol}|{leg.leg_id}"
         return {
             "action": mt5.TRADE_ACTION_DEAL,
             "symbol": leg.broker_symbol,
@@ -332,7 +369,7 @@ class TriangularExecutionLayer:
                 if result is None:
                     errors.append(f"{leg.canonical_symbol}: order_check returned None")
                     continue
-                if result.retcode != mt5.TRADE_RETCODE_DONE:
+                if not _is_success_retcode(result.retcode):
                     errors.append(f"{leg.canonical_symbol}: order_check={result.retcode} {result.comment}")
                     continue
                 checks.append(result)
@@ -366,24 +403,40 @@ class TriangularExecutionLayer:
             # Simulator — caller injects fills via set_fills(); treat as filled
             return empty
 
+        # TB-R6 discovery: positions_get() can return a STALE snapshot while
+        # the terminal is still registering rapid successive fills, which made
+        # verification pick up the PREVIOUS basket's tickets (and closes then
+        # closed the wrong legs). Poll until THIS basket's comment-tagged
+        # positions appear for all three symbols (comment linkage is the
+        # reliable discriminator, not magic+symbol alone).
+        tag = _basket_comment_tag(basket_id)
+        deadline = time.time() + self.fill_verify_timeout_s
+        matched: Dict[str, object] = {}
+        while time.time() < deadline:
+            matched = {}
+            positions = mt5.positions_get() or []
+            for sym in [l.canonical_symbol for l in intent.legs]:
+                broker = empty[sym].broker_symbol
+                for p in positions:
+                    if (p.magic == self.magic_number
+                            and p.symbol == broker
+                            and _comment_links_basket(p.comment or "", basket_id)):
+                        matched[sym] = p
+                        break
+            if len(matched) == len(intent.legs):
+                break
+            time.sleep(0.15)
+
         verified = {}
-        # Use positions + history deals to find our strategy positions
-        positions = mt5.positions_get() or []
         for sym in [l.canonical_symbol for l in intent.legs]:
             rec = empty[sym]
-            broker = rec.broker_symbol
-            # find strategy position for this symbol with our magic
-            pos = next((p for p in positions if p.magic == self.magic_number
-                        and p.symbol == broker), None)
+            pos = matched.get(sym)
             if pos:
                 rec.position_ticket = pos.ticket
                 rec.fill_price = pos.price_open
                 rec.fill_volume = pos.volume
                 rec.status = "filled"
-                # match via comment for basket id if possible
-                comment = pos.comment or ""
-                if basket_id in comment:
-                    rec.deal_ticket = pos.ticket  # approximate; real deal from history
+                rec.deal_ticket = pos.ticket  # approximate; real deal via history
                 verified[sym] = rec
         return verified
 
@@ -532,15 +585,23 @@ class TriangularExecutionLayer:
 
     # ── SEND WITH RETRY ─────────────────────────────────────────────────
     def _send_with_retry(self, req: dict):
-        for _ in range(self.max_retries + 1):
+        for attempt in range(self.max_retries + 1):
             try:
                 result = mt5.order_send(req)
-                if result and result.retcode == mt5.TRADE_RETCODE_DONE:
+                if result is None:
+                    # TB-R6 discovery: order_send may transiently return None
+                    # (no broker truth) under rapid successive requests. None
+                    # is never a definitive rejection — back off and retry.
+                    if attempt < self.max_retries:
+                        time.sleep(self.retry_delay_ms / 1000.0)
+                        continue
+                    return None
+                if _is_success_retcode(result.retcode):
                     return result
-                if result and result.retcode == 10027:  # context busy
+                if result.retcode == 10027:  # context busy
                     time.sleep(self.retry_delay_ms / 1000.0)
                     continue
-                if result and result.retcode == mt5.TRADE_RETCODE_REQUOTE:
+                if result.retcode == mt5.TRADE_RETCODE_REQUOTE:
                     time.sleep(self.retry_delay_ms / 1000.0)
                     continue
                 return result
@@ -598,11 +659,11 @@ class TriangularExecutionLayer:
                 "price": price,
                 "position": pos.ticket,
                 "magic": self.magic_number,
-                "comment": f"TB_FLAT|{basket_id}",
+                "comment": f"TB_FLAT|{_basket_comment_tag(basket_id)}",
                 "type_filling": fill_mode,
             }
             res = mt5.order_send(req)
-            if res and res.retcode == mt5.TRADE_RETCODE_DONE:
+            if res and _is_success_retcode(res.retcode):
                 rec.status = "flattened"
                 return True
             return False
@@ -616,17 +677,21 @@ class TriangularExecutionLayer:
         positions = mt5.positions_get() or []
         owned = [p for p in positions if p.magic == self.magic_number]
         # filter by basket id in comment if present
-        owned_basket = [p for p in owned if basket_id in (p.comment or "")]
+        owned_basket = [p for p in owned if _comment_links_basket(p.comment or "", basket_id)]
         # Fallback: if comments don't carry basket id, count all strategy positions
-        return len(owned_basket) if any(basket_id in (p.comment or "") for p in owned) else len(owned)
+        return (len(owned_basket)
+                if any(_comment_links_basket(p.comment or "", basket_id)
+                       for p in owned) else len(owned))
 
     def _count_owned_orders(self, basket_id: str) -> int:
         if mt5 is None:
             return 0
         orders = mt5.orders_get() or []
         owned = [o for o in orders if o.magic == self.magic_number]
-        owned_basket = [o for o in owned if basket_id in (o.comment or "")]
-        return len(owned_basket) if any(basket_id in (o.comment or "") for o in owned) else len(owned)
+        owned_basket = [o for o in owned if _comment_links_basket(o.comment or "", basket_id)]
+        return (len(owned_basket)
+                if any(_comment_links_basket(o.comment or "", basket_id)
+                       for o in owned) else len(owned))
 
     # ── CLOSE BASKET (basket-level, truthful) ───────────────────────────
     def close_basket(self, basket_id: str, intent: BasketExecutionIntent = None) -> BasketExecutionResult:

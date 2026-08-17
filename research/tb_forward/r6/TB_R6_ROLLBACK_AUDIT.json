@@ -1,0 +1,6 @@
+{
+  "rollback_policy": "BROKEN_HEDGE -> flatten owned legs -> verify flat",
+  "validated": true,
+  "validation": "deterministic broker-response injection (in-sim) + real layer flatten code path",
+  "broker_observed_partial": false
+}

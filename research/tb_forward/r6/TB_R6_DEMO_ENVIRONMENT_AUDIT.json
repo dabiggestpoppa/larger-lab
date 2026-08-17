@@ -1,0 +1,15 @@
+{
+  "company": "Ox Securities Pty Ltd",
+  "server": "OxSecurities-Demo",
+  "login_masked": "11***12",
+  "trade_mode": 0,
+  "account_type": "DEMO",
+  "currency": "USD",
+  "balance": 25257.36,
+  "equity": 25257.36,
+  "margin": 0.0,
+  "trade_allowed": true,
+  "terminal_trade_allowed": true,
+  "tradeapi_disabled": false,
+  "identity_gate_pass": true
+}

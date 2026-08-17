@@ -1,0 +1,40 @@
+{
+  "checkpoint": "TB-R6-DEMO-EXECUTION-CANARY",
+  "base_commit": "9d0a3951413d153d494b8b1e81afcde5894cd40b",
+  "r51_commit": "9d0a3951413d153d494b8b1e81afcde5894cd40b",
+  "hash_algorithm": "sha256 (first 16 hex chars of blob at base commit unless noted)",
+  "scientific_inputs_unchanged_from_r5_1": {
+    "canonical_m5_gbpaud": "cedf3453bcbffde0",
+    "canonical_m5_gbpnzd": "9e421aa1310a41b5",
+    "canonical_m5_audnzd": "8a0f08e34853b27d",
+    "r0_truth_lock": "0821c20d7c736eb8",
+    "r1_1_forward_config": "f90883bf1e4b83de",
+    "r1_1_strategy_wrapper": "bb2afa36d3fadbce",
+    "execution_contract": "1123bdc81caddc07",
+    "r2_market_data_contract": "9f3f874b3d50861f",
+    "r3_state_machine": "c44c5721792c652a",
+    "r3_persistence_ledger": "7afc47e6c4a7486c",
+    "r3_reconciliation": "7ff236b4c2daba60",
+    "full_engine_harness": "a5bf226e2f028a2a"
+  },
+  "modified_in_r6": {
+    "triangular_execution_layer": {
+      "base_hash": "4f07eefa36411a01",
+      "working_hash": "dfd1ca66d2c174580262f4893dfd621b96fef9d9f0e016ac9d133ab2914db01d",
+      "change": "MECHANICAL — real-broker repairs discovered by R6 Phase A demo execution: (1) this broker returns retcode 0 (not 10009) for successful order_check/order_send; accept both. (2) order_check returns None for request comments >= 30 chars; comments are now a deterministic <= 29-char tag (short basket id verbatim, else last-8 + md5-8) with consistent linkage helpers. (3) order_send may transiently return None (no broker truth) under rapid successive requests; None is now retried with backoff, never treated as a definitive result. (4) positions_get() can return a stale snapshot while rapid fills register, so fill verification polls until THIS basket's comment-tagged positions appear (comment linkage, not magic+symbol alone). (5) close/flatten requests use the bounded tag too. Strategy math untouched.",
+      "science_impact": "none — full replay 194/194 + 405/405, max z diff 1e-12; all suites green"
+    }
+  },
+  "new_in_r6": {
+    "tb_r6_demo_canary": {
+      "working_hash": "e57bc6955305d6c587eb26d2100d74d7433dbdbb1eac16adff50e9655cbf24d1",
+      "role": "R6 demo execution harness — Phase A controlled execution tests (TB-DEMO-EXEC-TEST), Phase B natural canary observation (TB-FROZEN-CONTROL), restart-with-open-basket, recovery-path injection, order_send accounting"
+    }
+  },
+  "canonical_csvs_in_repo": {
+    "quant-lab/data/GBPAUD_M5.csv": "cedf3453bcbffde0",
+    "quant-lab/data/GBPNZD_M5.csv": "9e421aa1310a41b5",
+    "quant-lab/data/AUDNZD_M5.csv": "8a0f08e34853b27d"
+  },
+  "note": "All scientific inputs byte-identical to R5.1. Only mechanical execution-layer repairs + the R6 harness. Historical parity: PRIMARY 194/194, CONTROL 405/405, 0 lifecycle mismatches."
+}

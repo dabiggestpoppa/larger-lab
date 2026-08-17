@@ -1,0 +1,109 @@
+{
+  "basket_id": "R6R40529",
+  "ledger_integrity_issues": [],
+  "ledger_reconstructed_state": "OPEN_VERIFIED",
+  "broker_positions": [
+    {
+      "ticket": 11958418,
+      "symbol": "GBPAUD.PRO",
+      "volume": 0.01,
+      "price_open": 1.90811,
+      "type": 0,
+      "comment": "TB|R6R40529|GBPAUD|L1",
+      "time_msc": 1786951326713
+    },
+    {
+      "ticket": 11958419,
+      "symbol": "GBPNZD.PRO",
+      "volume": 0.01,
+      "price_open": 2.2942,
+      "type": 1,
+      "comment": "TB|R6R40529|GBPNZD|L2",
+      "time_msc": 1786951326750
+    },
+    {
+      "ticket": 11958420,
+      "symbol": "AUDNZD.PRO",
+      "volume": 0.02,
+      "price_open": 1.20246,
+      "type": 0,
+      "comment": "TB|R6R40529|AUDNZD|L3",
+      "time_msc": 1786951326785
+    }
+  ],
+  "expected_legs": 3,
+  "classification": "OPEN_VERIFIED",
+  "recovered_baskets": [
+    "R6R40529"
+  ],
+  "close_result": {
+    "success": true,
+    "basket_id": "R6R40529",
+    "state": "closed",
+    "legs": [
+      {
+        "canonical_symbol": "GBPAUD",
+        "broker_symbol": "GBPAUD.PRO",
+        "side": "LONG",
+        "leg_id": "L?",
+        "basket_id": "R6R40529",
+        "magic": 31082027,
+        "model_weight": 0.0,
+        "requested_lots": 0.0,
+        "rounded_lots": 0.01,
+        "signal_reference_price": 1.90811,
+        "order_ticket": 0,
+        "deal_ticket": 0,
+        "position_ticket": 11958418,
+        "fill_price": 1.90811,
+        "fill_volume": 0.01,
+        "status": "closed",
+        "fill_status": "verified"
+      },
+      {
+        "canonical_symbol": "GBPNZD",
+        "broker_symbol": "GBPNZD.PRO",
+        "side": "SHORT",
+        "leg_id": "L?",
+        "basket_id": "R6R40529",
+        "magic": 31082027,
+        "model_weight": 0.0,
+        "requested_lots": 0.0,
+        "rounded_lots": 0.01,
+        "signal_reference_price": 2.2942,
+        "order_ticket": 0,
+        "deal_ticket": 0,
+        "position_ticket": 11958419,
+        "fill_price": 2.2942,
+        "fill_volume": 0.01,
+        "status": "closed",
+        "fill_status": "verified"
+      },
+      {
+        "canonical_symbol": "AUDNZD",
+        "broker_symbol": "AUDNZD.PRO",
+        "side": "LONG",
+        "leg_id": "L?",
+        "basket_id": "R6R40529",
+        "magic": 31082027,
+        "model_weight": 0.0,
+        "requested_lots": 0.0,
+        "rounded_lots": 0.02,
+        "signal_reference_price": 1.20246,
+        "order_ticket": 0,
+        "deal_ticket": 0,
+        "position_ticket": 11958420,
+        "fill_price": 1.20246,
+        "fill_volume": 0.02,
+        "status": "closed",
+        "fill_status": "verified"
+      }
+    ],
+    "error_message": "",
+    "leg_skew_ms": 0,
+    "total_execution_latency_ms": 0,
+    "actual_cost_pips": 0.0,
+    "expected_cost_pips": 10.2
+  },
+  "flat_after_close": true
+}

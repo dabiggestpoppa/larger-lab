@@ -1,0 +1,77 @@
+{
+  "checkpoint": "TB-R6-DEMO-EXECUTION-CANARY",
+  "status": "PARTIAL_PASS_WAITING_NATURAL_CANARY",
+  "base_commit": "9d0a3951413d153d494b8b1e81afcde5894cd40b",
+  "r51_commit": "9d0a3951413d153d494b8b1e81afcde5894cd40b",
+
+  "demo_environment_verified": true,
+  "demo_account_login": "11***12",
+  "server": "OxSecurities-Demo",
+  "account_currency": "USD",
+
+  "execution_test_magic": 31082027,
+  "control_magic": 31082026,
+  "primary_magic": 31082026,
+
+  "fixed_demo_basket_notional": 5000.0,
+  "basket_notional_frozen": true,
+
+  "controlled_test_baskets_completed": 5,
+  "natural_canary_baskets_completed": 0,
+
+  "preflight_gate_pass": true,
+  "quote_age_gate_pass": true,
+  "spread_gate_pass": true,
+  "cross_leg_skew_gate_pass": true,
+  "gate_k_pass": true,
+
+  "actual_order_send_calls": 36,
+  "actual_orders_accepted": 36,
+  "actual_orders_rejected": 0,
+  "actual_deals_verified": 18,
+
+  "fill_mode_validation": "PASS",
+  "slippage_validation": "PASS",
+  "legging_latency_measured": true,
+
+  "actual_partial_fill_observed": false,
+  "partial_fill_recovery_path_validated": true,
+
+  "rollback_validation": "PASS",
+  "atomic_close_validation": "PASS",
+
+  "restart_open_basket_validation": "PASS",
+  "crash_recovery_validation": "PASS",
+  "manual_intervention_detection_pass": true,
+
+  "foreign_positions_modified": 0,
+  "duplicate_orders": 0,
+
+  "ledger_integrity_pass": true,
+  "broker_reconciliation_pass": true,
+
+  "primary_execution_calls": 0,
+  "control_execution_calls": 0,
+  "test_harness_execution_calls": 36,
+
+  "historical_parity_pass": true,
+  "primary_event_count": 194,
+  "control_event_count": 405,
+  "lifecycle_mismatches": 0,
+
+  "strategy_math_changed": false,
+  "weighting_changed": false,
+  "session_semantics_changed": false,
+  "market_data_semantics_changed": false,
+
+  "demo_execution_canary_pass": false,
+  "status_note": "All controlled broker-execution mechanics PASS. No natural z2.5 signal occurred during the observation window (expected at ~0.4/day frequency); natural canary observation continues under R7. Per the R6 status logic this is PARTIAL_PASS_WAITING_NATURAL_CANARY, not FAIL: execution infrastructure is proven.",
+
+  "r7_ready": false,
+  "r7_authorized": false,
+
+  "live_authorized": false,
+
+  "human_review_required": true,
+  "next_checkpoint_recommended": "TB-R7-CANARY-DEMO-OPERATIONS-SEAL"
+}

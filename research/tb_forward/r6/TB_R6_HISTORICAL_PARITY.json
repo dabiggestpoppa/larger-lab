@@ -1,0 +1,47 @@
+{
+  "checkpoint": "TB-R6-DEMO-EXECUTION-CANARY",
+  "generated": "2026-08-17T00:40:00Z",
+  "replay": "integrated full-engine historical replay (R4 harness stages rerun in R6 worktree)",
+  "bars": {
+    "expected": 265809,
+    "emitted": 265809,
+    "skipped": 1
+  },
+  "primary": {
+    "expected": 194,
+    "actual": 194,
+    "opens": 194,
+    "closes": 194,
+    "entry_mismatches": 0,
+    "direction_mismatches": 0,
+    "exit_mismatches": 0,
+    "reason_mismatches": 0,
+    "weight_mismatches": 0,
+    "max_z_diff": 1e-12,
+    "parity_pass": true
+  },
+  "control": {
+    "expected": 405,
+    "actual": 405,
+    "opens": 405,
+    "closes": 405,
+    "entry_mismatches": 0,
+    "direction_mismatches": 0,
+    "exit_mismatches": 0,
+    "reason_mismatches": 0,
+    "weight_mismatches": 0,
+    "max_z_diff": 1e-12,
+    "parity_pass": true
+  },
+  "failure_injection": {
+    "signals_injected": 8,
+    "classification_safe": true,
+    "unsafe_states": []
+  },
+  "long_run": {
+    "pass": true,
+    "note": "50k bars, 451 events, 1 open DB handle, ledger integrity clean"
+  },
+  "parity_pass": true,
+  "strategy_science_unchanged": true
+}

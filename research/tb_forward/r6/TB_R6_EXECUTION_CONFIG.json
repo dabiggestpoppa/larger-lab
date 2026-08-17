@@ -1,0 +1,22 @@
+{
+  "basket_notional_usd": 5000.0,
+  "basket_notional_frozen": true,
+  "basket_notional_source": "BROKER_MINIMUM_EXECUTION_TEST",
+  "test_magic": 31082027,
+  "control_magic": 31082026,
+  "primary_magic": 31082026,
+  "max_quote_age_ms": 2000,
+  "max_cross_leg_skew_ms": 1000,
+  "spread_max_pts": 100,
+  "gate_k_max_residual_pct": 10.0,
+  "cur_to_usd": {
+    "GBP": 1.34852,
+    "AUD": 0.70583,
+    "NZD": 0.58844
+  },
+  "test_weights": {
+    "GBPAUD": 1.04364452,
+    "GBPNZD": 0.97756661,
+    "AUDNZD": 0.97878887
+  }
+}

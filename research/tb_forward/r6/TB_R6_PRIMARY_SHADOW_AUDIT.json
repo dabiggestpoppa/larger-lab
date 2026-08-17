@@ -1,0 +1,6 @@
+{
+  "primary_strategy": "TB-FWD-V1",
+  "primary_execution_calls": 0,
+  "primary_mode": "SHADOW ONLY",
+  "note": "primary generates/logs decisions only; never reaches the execution layer in R6"
+}

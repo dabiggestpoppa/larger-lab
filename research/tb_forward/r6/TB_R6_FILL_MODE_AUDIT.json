@@ -1,0 +1,45 @@
+{
+  "resolution": "order_check probe per symbol (FOK/IOC/RETURN candidates)",
+  "per_symbol": {
+    "GBPAUD.PRO": {
+      "canonical": "GBPAUD",
+      "declared_bits": 2,
+      "declared_modes": [
+        2
+      ],
+      "order_check_retcodes": {
+        "1": 0,
+        "2": 10030,
+        "0": 10030
+      },
+      "resolved_filling_mode": 1
+    },
+    "GBPNZD.PRO": {
+      "canonical": "GBPNZD",
+      "declared_bits": 2,
+      "declared_modes": [
+        2
+      ],
+      "order_check_retcodes": {
+        "1": 0,
+        "2": 10030,
+        "0": 10030
+      },
+      "resolved_filling_mode": 1
+    },
+    "AUDNZD.PRO": {
+      "canonical": "AUDNZD",
+      "declared_bits": 2,
+      "declared_modes": [
+        2
+      ],
+      "order_check_retcodes": {
+        "1": 0,
+        "2": 10030,
+        "0": 10030
+      },
+      "resolved_filling_mode": 1
+    }
+  },
+  "note": "requested filling mode recorded per order in TB_R6_ORDER_REQUESTS.csv; broker retcodes per candidate captured above"
+}

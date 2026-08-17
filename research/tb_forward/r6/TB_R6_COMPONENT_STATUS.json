@@ -1,0 +1,20 @@
+{
+  "identity_gate": true,
+  "real_order_send_exercised": true,
+  "order_send_counts": {
+    "test": 30,
+    "control": 0,
+    "primary": 0,
+    "unknown": 0
+  },
+  "controlled_baskets_completed": 5,
+  "phase_b": {
+    "cycles": 40,
+    "healthy": 2,
+    "blocked": 38,
+    "primary_open_signals": 0,
+    "control_open_signals": 0,
+    "control_baskets_completed": 0,
+    "bars_seen": 2
+  }
+}

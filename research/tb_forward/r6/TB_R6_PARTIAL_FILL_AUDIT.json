@@ -1,0 +1,35 @@
+{
+  "two_of_three": {
+    "final_state": "aborted_flat",
+    "filled_legs": 2,
+    "leg_statuses": [
+      "flattened",
+      "flattened",
+      "failed"
+    ],
+    "flat": true,
+    "safe": true
+  },
+  "one_of_three": {
+    "final_state": "aborted_flat",
+    "filled_legs": 1,
+    "leg_statuses": [
+      "flattened",
+      "failed",
+      "failed"
+    ],
+    "flat": true,
+    "safe": true
+  },
+  "zero_of_three": {
+    "final_state": "aborted_flat",
+    "filled_legs": 0,
+    "leg_statuses": [
+      "failed",
+      "failed",
+      "failed"
+    ],
+    "flat": true,
+    "safe": true
+  }
+}

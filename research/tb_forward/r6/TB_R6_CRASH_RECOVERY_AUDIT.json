@@ -1,0 +1,20 @@
+{
+  "crash_windows": [
+    {
+      "window": "after intent persisted, before leg1",
+      "validation": "R3/R4 deterministic suites (sealed)"
+    },
+    {
+      "window": "after leg1/leg2 fill",
+      "validation": "recovery_path_validation (in-sim, real state machine)"
+    },
+    {
+      "window": "after leg3 fill before open claim",
+      "validation": "restart_with_open_basket (real demo)"
+    },
+    {
+      "window": "during close",
+      "validation": "atomic close audit (real demo)"
+    }
+  ]
+}
