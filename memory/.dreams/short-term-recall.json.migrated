@@ -1,0 +1,1915 @@
+{
+  "version": 1,
+  "updatedAt": "2026-06-10T17:45:15.824Z",
+  "entries": {
+    "memory:memory/2026-05-18.md:387:414": {
+      "key": "memory:memory/2026-05-18.md:387:414",
+      "path": "memory/2026-05-18.md",
+      "startLine": 387,
+      "endLine": 414,
+      "source": "memory",
+      "snippet": "- **resourceadapterpermanent:** Integration layer for entire workflow - Tasks: Registry cleanup, validation gate, zero-dependency content track, tool integration, repo assessment, Google accounts strategy - This is a CONTINUOUS role — RA works until all integrations complete - Home file: `tools/INTEGRATION_STATUS.md` ### 28. Current Active Agents (14:27 EDT) | Agent | Task | Status | |-------|------|--------| | labmanagerfull | Fix all 10 strategies → convert to Pine | ⏳ Running | | farmmanagerfull | Day 2 execution + Day 3 plan | ⏳ Running | | resourceadapterpermanent | Tool integration + registry cleanup | ⏳ Running | ### 29. Agent Environment Activated (14:33 EDT) - Server was already r",
+      "recallCount": 3,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 3,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-19T04:34:19.611Z",
+      "lastRecalledAt": "2026-05-19T23:54:58.824Z",
+      "queryHashes": [
+        "34a5851f36a3",
+        "2e2fb034155b",
+        "b9d802b9c422"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "zero-dependency",
+        "tools/integration-status.md",
+        "resourceadapterpermanent",
+        "integration",
+        "layer",
+        "entire",
+        "workflow",
+        "tasks"
+      ]
+    },
+    "memory:memory/2026-05-18.md:359:391": {
+      "key": "memory:memory/2026-05-18.md:359:391",
+      "path": "memory/2026-05-18.md",
+      "startLine": 359,
+      "endLine": 391,
+      "source": "memory",
+      "snippet": "- Cost model void is systemic — 10/10 profitable claim is misleading - Content Farm is planning exercise, not operation (0 content produced) - Agent Environment is shelfware (0 agents use it) - Researcher wasted on mechanical conversion instead of gap analysis - \"70+ agents\" claim is misleading — only 5-6 operational - Biggest risk: validation debt - Top recommendations: 1. Halt conversion until cost validation 2. Assign Researcher to BSC gap NOW 3. Build zero-dependency content track 4. Deprioritize Agent Environment 5. Consolidate agent registry 6. Implement validation gates 7. Define \"done\" for each system - From scratch test: Start with ONE vertical, not three",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-19T04:34:19.611Z",
+      "lastRecalledAt": "2026-05-19T04:34:47.342Z",
+      "queryHashes": [
+        "34a5851f36a3",
+        "2e2fb034155b"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "10/10",
+        "5-6",
+        "zero-dependency",
+        "cost",
+        "model",
+        "void",
+        "systemic",
+        "profitable"
+      ]
+    },
+    "memory:memory/2026-05-18.md:66:101": {
+      "key": "memory:memory/2026-05-18.md:66:101",
+      "path": "memory/2026-05-18.md",
+      "startLine": 66,
+      "endLine": 101,
+      "source": "memory",
+      "snippet": "- Works for venv (local) AND global production (workspace) - Everything designed to plug into SRRA+OCE later - Output: `tools/INTEGRATION_STATUS.md` --- ## Active Agents (as of 08:49 EDT) | Agent | Task | Status | |-------|------|--------| | optimizertaska | Cost validation (10 strategies) | ⏳ Running | | researcherbscgap | BSC gap analysis | ⏳ Running | | resourceadapter | Tool integration (Open Design, ViMax, Netviz, UI-TARS) | ⏳ Running | ## Key Decisions 1. **Conversion pipeline FROZEN** — no TV push until cost validation complete 2. **POLYGENT defined** — helper function, on-demand only, not idle 3. **Spread = points/10** — CSV spread column is broker units, divide by 10 for pips 4.",
+      "recallCount": 3,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 3,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-19T04:34:19.611Z",
+      "lastRecalledAt": "2026-05-22T10:39:39.679Z",
+      "queryHashes": [
+        "34a5851f36a3",
+        "2e2fb034155b",
+        "f7b300265193"
+      ],
+      "recallDays": [
+        "2026-05-19",
+        "2026-05-22"
+      ],
+      "conceptTags": [
+        "tools/integration-status.md",
+        "ui-tars",
+        "on-demand",
+        "points/10",
+        "works",
+        "venv",
+        "local",
+        "global"
+      ]
+    },
+    "memory:memory/2026-05-18.md:47:76": {
+      "key": "memory:memory/2026-05-18.md:47:76",
+      "path": "memory/2026-05-18.md",
+      "startLine": 47,
+      "endLine": 76,
+      "source": "memory",
+      "snippet": "- Example: 144 points = 14.4 pips for EUR/USD - Updated Task Brief A with correct conversion ### 7. Optimizer + Researcher Spawned (08:17 EDT) - **optimizertaska:** Task A — cost validation, all 10 strategies, real spread from CSV - **researcherbscgap:** Task B — BSC gap analysis (64pp gap) - Both outputting to `quant-lab/results/` and `quant-lab/research/` ### 8. New Tools & Repos from MAD (08:28 EDT) - **Open Design (nexu-io/open-design):** 40k stars, open-source Claude Design alt. HTML output. For Content Farm visual production. - **ViMax (HKUDS/ViMax):** Agentic video generation. Multi-agent workflow. For TikTok/Shorts/Reels. - **Netviz (ShadowArcanist/netviz):** Network architecture v",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-19T04:34:19.611Z",
+      "lastRecalledAt": "2026-05-19T04:34:19.611Z",
+      "queryHashes": [
+        "34a5851f36a3"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "network",
+        "14.4",
+        "eur/usd",
+        "quant-lab/results",
+        "quant-lab/research",
+        "nexu-io/open-design",
+        "open-source",
+        "hkuds/vimax"
+      ]
+    },
+    "memory:memory/2026-05-18.md:227:254": {
+      "key": "memory:memory/2026-05-18.md:227:254",
+      "path": "memory/2026-05-18.md",
+      "startLine": 227,
+      "endLine": 254,
+      "source": "memory",
+      "snippet": "- **Public APIs** (public-apis/public-apis) — 🔥 HIGH. 1,500+ free APIs. Cross-reference with APIS_NEEDED.md. - **Hello Agents** (datawhale/hello-agents) — 📚 Educational resource. - **Guizang PPT Skill** (op7418/guizang-ppt-skill) — 🟡 PPT generation. - **Lonkero** (bountyyfi/lonkero) — ⏳ Unknown, needs investigation. - All documented in: `research/TOOLS_AND_REPOS.md` --- ## Active Agents (as of 09:42 EDT) | Agent | Task | Status | |-------|------|--------| | optimizertaska | Cost validation (10 strategies) | ✅ COMPLETE | | researcherbscgap | BSC gap analysis | ✅ COMPLETE | | resourceadapter | Tool integration | ✅ COMPLETE (status doc written) | ## Key Decisions 1. **Conversion pipeline",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-19T04:34:19.611Z",
+      "lastRecalledAt": "2026-05-22T10:39:39.679Z",
+      "queryHashes": [
+        "34a5851f36a3",
+        "f7b300265193"
+      ],
+      "recallDays": [
+        "2026-05-19",
+        "2026-05-22"
+      ],
+      "conceptTags": [
+        "public-apis/public-apis",
+        "cross-reference",
+        "apis-needed.md",
+        "datawhale/hello-agents",
+        "op7418/guizang-ppt-skill",
+        "bountyyfi/lonkero",
+        "research/tools-and-repos.md",
+        "public"
+      ]
+    },
+    "memory:memory/2026-05-18.md:725:758": {
+      "key": "memory:memory/2026-05-18.md:725:758",
+      "path": "memory/2026-05-18.md",
+      "startLine": 725,
+      "endLine": 758,
+      "source": "memory",
+      "snippet": "- Full situation report with IACER structure - Intent, Abstraction, Context, Expectations, Results all addressed - Pending: phone integration, remaining MC, MQL5 --- ### 65. MAD Removes All Restrictions (23:28 EDT) - MAD removed all restrictions on OWL — full capability restored - VS Code team (CC/AS/PM) reserved ONLY for SRRA+OPH testing and building - No more memory flush write restrictions - MAD is a trader, CEREBUS is his system ### 66. Meditations Completed (23:43 EDT) - Farm Manager meditation: ✅ Complete (agent-generated) - Lab Manager meditation: ❌ Timed out — written directly by OWL - SW Dev Manager meditation: ❌ Timed out — written directly by OWL - All 3 files now exist in medi",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-19T04:34:19.611Z",
+      "lastRecalledAt": "2026-05-19T04:34:19.611Z",
+      "queryHashes": [
+        "34a5851f36a3"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "cc/as/pm",
+        "agent-generated",
+        "full",
+        "situation",
+        "report",
+        "iacer",
+        "structure",
+        "intent"
+      ]
+    },
+    "memory:memory/2026-05-18.md:409:435": {
+      "key": "memory:memory/2026-05-18.md:409:435",
+      "path": "memory/2026-05-18.md",
+      "startLine": 409,
+      "endLine": 435,
+      "source": "memory",
+      "snippet": "- MAD explicitly said: \"MAKE SURE AGENT ENVIORMENT IS WORKING TO AND ALL AGENTS USE IT THATS A KEY RN\" - This is now the #1 priority alongside Quant Lab and Content Farm - All active agents are now registered and visible in the environment - Next: Ensure sub-agents spawned by managers also register themselves ### 31. Agent Timeout & Respawn (15:05 EDT) - All 3 previous agents timed out: labmanagerfull (0 fixes), farmmanagerfull (Day 2 partial), resourceadapterpermanent (validation-gate done) - Root cause: too much work per spawn, no checkpointing - Fix: smaller task scopes, progress files after each step, sequential spawns - Respawned 3 new agents: - resourceadaptertimeout: timeout analys",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-19T23:54:58.824Z",
+      "lastRecalledAt": "2026-05-19T23:54:58.824Z",
+      "queryHashes": [
+        "b9d802b9c422"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "sub-agents",
+        "validation-gate",
+        "mad",
+        "explicitly",
+        "said",
+        "sure",
+        "enviorment",
+        "working"
+      ]
+    },
+    "memory:memory/2026-05-19.md:131:151": {
+      "key": "memory:memory/2026-05-19.md:131:151",
+      "path": "memory/2026-05-19.md",
+      "startLine": 131,
+      "endLine": 151,
+      "source": "memory",
+      "snippet": "- **MAD's UI direction:** Simple chat for regular use + rooms for complex tasks. Take best from Genspark/Claude/Manus. Agent terminal showing PowerShell/work output. Good+good=great philosophy. ## 15:46-16:00 EDT — MAD'S LATEST DIRECTIVES (Message #2918) - **MAD's #1 priority:** Forward test DMR on MT5 demo account - **MAD's #2:** Farm — \"have the farm move unto first post you check and just post update i got @\" - **MAD provided ProtonMail credentials:** wifiking999@protonmail.com / Teflondon1718! - **MAD:** \"Use iacer for last response and begin I'm gone for the day\" - **GitHub repos sent for review:** 1. https://github.com/ruvnet/RuView.git — Agent visualization 2. https://github.com/",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T01:39:59.831Z",
+      "lastRecalledAt": "2026-05-22T11:31:52.911Z",
+      "queryHashes": [
+        "be93e21b81f4",
+        "18ecf2a03b41"
+      ],
+      "recallDays": [
+        "2026-05-19",
+        "2026-05-22"
+      ],
+      "conceptTags": [
+        "genspark/claude/manus",
+        "powershell/work",
+        "46-16",
+        "protonmail.com",
+        "github.com/ruvnet/ruview.git",
+        "github.com",
+        "mad's",
+        "direction"
+      ]
+    },
+    "memory:memory/2026-05-19.md:147:172": {
+      "key": "memory:memory/2026-05-19.md:147:172",
+      "path": "memory/2026-05-19.md",
+      "startLine": 147,
+      "endLine": 172,
+      "source": "memory",
+      "snippet": "- **MAD:** \"TRADING INSIGHT TO INTERGRATE STRATEGICALLY WE DONT COPY WE IMPLEMENT THE LOGIC\" - **MAD:** \"check ra he should know the best way\" (Resource Adapter should review repos) - **Key insight:** MAD is stepping away for the day. OWL should execute autonomously and report back. ## 15:56 EDT — 3 MEDITATION CRON JOBS CREATED - **CEO Meditation** (657439f0): Every 2h — Strategic review, entropy governance, system alignment - **SW Dev Meditation** (0a7e28fc): Every 3h — UI/UX review, agent environment upgrades - **Optimizer Meditation** (1573fa37): Every 4h — Strategy review, backtest analysis, optimization - All write insights to `meditation-room/*_MEDITATION_LATEST.md` - **Total cron job",
+      "recallCount": 4,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 4,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T01:39:59.831Z",
+      "lastRecalledAt": "2026-05-21T10:08:23.239Z",
+      "queryHashes": [
+        "be93e21b81f4",
+        "dd65dd2620cf",
+        "769052bb2313",
+        "d8142493cca0"
+      ],
+      "recallDays": [
+        "2026-05-19",
+        "2026-05-20",
+        "2026-05-21"
+      ],
+      "conceptTags": [
+        "ui/ux",
+        "meditation-room",
+        "meditation-latest.md",
+        "mad",
+        "trading",
+        "insight",
+        "intergrate",
+        "strategically"
+      ]
+    },
+    "memory:memory/2026-05-19.md:120:135": {
+      "key": "memory:memory/2026-05-19.md:120:135",
+      "path": "memory/2026-05-19.md",
+      "startLine": 120,
+      "endLine": 135,
+      "source": "memory",
+      "snippet": "- **MAD:** SRRA+OPH is a feature in the full system, not the end product. - **Spawned:** farmregister (agent:main:subagent:4c35f199) — register accounts on IG, TikTok, X, Reddit - **Spawned:** swdevuiupgrade (agent:main:subagent:306855b3) — UI v3 upgrade - **Pipeline complete:** Local backtest → MC → MT5 cross-validation. All passed. Next: forward test on demo. ## 15:14 EDT — MC COMPLETE, FARM DAY 4-5 DONE, SW DEV UI v3 IN PROGRESS - **MC on MT5 DMR results:** 10K iterations, 0% ruin, 100% prob profit. Fixed lot (0.01) = +10.5% return, 0% MaxDD. PRODUCTION READY. - **Farm Day 4 COMPLETE:** @CerebusFX handles created for all 7 platforms (IG, TikTok, X, Reddit, Pinterest, YouTube, Gumroad). A",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T01:39:59.831Z",
+      "lastRecalledAt": "2026-05-20T01:39:59.831Z",
+      "queryHashes": [
+        "be93e21b81f4"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "cross-validation",
+        "4-5",
+        "0.01",
+        "10.5",
+        "mad",
+        "srra",
+        "oph",
+        "feature"
+      ]
+    },
+    "memory:memory/2026-05-19.md:60:79": {
+      "key": "memory:memory/2026-05-19.md:60:79",
+      "path": "memory/2026-05-19.md",
+      "startLine": 60,
+      "endLine": 79,
+      "source": "memory",
+      "snippet": "- **Key files:** agent-environment/public/css/chat-v3.css (new), agent-environment/public/js/chat-v3.js (new), agent-environment/public/index.html (upgraded) ## 15:46-16:00 EDT — MAD'S LATEST DIRECTIVES (Message #2918) - **MAD's #1 priority:** Forward test DMR on MT5 demo account (\"now that the mt5 is good forward test on the demo account\") - **MAD's #2:** Farm — \"have the farm move unto first post you check and just post update i got @\" - **MAD provided ProtonMail credentials:** wifiking999@protonmail.com / Teflondon1718! (for account registration) - **MAD:** \"Use iacer for last response and begin I'm gone for the day\" - **MAD:** \"have the farm move unto first post you check and just post",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T01:39:59.831Z",
+      "lastRecalledAt": "2026-05-22T11:31:52.911Z",
+      "queryHashes": [
+        "be93e21b81f4",
+        "18ecf2a03b41"
+      ],
+      "recallDays": [
+        "2026-05-19",
+        "2026-05-22"
+      ],
+      "conceptTags": [
+        "46-16",
+        "protonmail.com",
+        "key",
+        "environment",
+        "public",
+        "css",
+        "chat",
+        "new"
+      ]
+    },
+    "memory:memory/2026-05-19.md:49:63": {
+      "key": "memory:memory/2026-05-19.md:49:63",
+      "path": "memory/2026-05-19.md",
+      "startLine": 49,
+      "endLine": 63,
+      "source": "memory",
+      "snippet": "- **MAD's pipeline:** local backtest → MC → MT5 cross-validation. DMR passed MT5. Next: MC on MT5 results. - **Farm:** farmday4create timed out. Need to re-spawn for Day 4-5. - **MAD directive:** PAUSE all non-lab work. Focus on MT5 production. Farm can continue in background. ## 15:14 EDT — MC COMPLETE, FARM DAY 4-5 DONE, SW DEV UI v3 IN PROGRESS - **MC on MT5 DMR results:** 10K iterations, 0% ruin, 100% prob profit. Fixed lot (0.01) = +10.5% return, 0% MaxDD. PRODUCTION READY. - **Farm Day 4 COMPLETE:** @CerebusFX handles created for all 7 platforms (IG, TikTok, X, Reddit, Pinterest, YouTube, Gumroad). All content written and organized. PUBLISHING_READY.md created. - **Farm Day 5 plan:**",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T01:39:59.831Z",
+      "lastRecalledAt": "2026-05-20T01:39:59.831Z",
+      "queryHashes": [
+        "be93e21b81f4"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "cross-validation",
+        "re-spawn",
+        "4-5",
+        "non-lab",
+        "0.01",
+        "10.5",
+        "publishing-ready.md",
+        "mad's"
+      ]
+    },
+    "memory:memory/2026-05-19.md:91:110": {
+      "key": "memory:memory/2026-05-19.md:91:110",
+      "path": "memory/2026-05-19.md",
+      "startLine": 91,
+      "endLine": 110,
+      "source": "memory",
+      "snippet": "## 17:35-17:50 EDT — MT5 FORWARD TEST DEPLOYED - **DMR forward test LIVE on MT5 demo account 1114712 (OxSecurities-Demo)** - Script: `quant-lab/mt5/dmr_mt5_forward_test.py` - Connected successfully: Balance $289.17 | EURUSD.PRO | Spread 3.6 pips - Symbol name on this broker: EURUSD.PRO (not EURUSD) - Script running in background (session vivid-orbit, pid 21344) - Currently idle — P90 window is 2-11 AM EST, currently ~5:35 PM - Will auto-scan starting 2 AM EST tonight - Lot size: 0.01 | Magic: 20260519 | Hard exit: 5 PM EST - Logs to: quant-lab/mt5/dmr_forward_test_log.csv - State: quant-lab/mt5/dmr_forward_test_state.json - **MAD credentials used:** Login 1114712, Server OxSecurities-Demo, P",
+      "recallCount": 5,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 5,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T01:58:06.835Z",
+      "lastRecalledAt": "2026-05-22T01:17:51.034Z",
+      "queryHashes": [
+        "dd65dd2620cf",
+        "769052bb2313",
+        "ac384b89f0de",
+        "8c760f679dc1",
+        "371946845e22"
+      ],
+      "recallDays": [
+        "2026-05-19",
+        "2026-05-20",
+        "2026-05-21"
+      ],
+      "conceptTags": [
+        "35-17",
+        "oxsecurities-demo",
+        "289.17",
+        "eurusd.pro",
+        "3.6",
+        "vivid-orbit",
+        "2-11",
+        "auto-scan"
+      ]
+    },
+    "memory:memory/2026-05-19.md:76:96": {
+      "key": "memory:memory/2026-05-19.md:76:96",
+      "path": "memory/2026-05-19.md",
+      "startLine": 76,
+      "endLine": 96,
+      "source": "memory",
+      "snippet": "8. https://github.com/kaktusesquire6rmu/ai-polymarket-agent.git - **MAD:** \"TRADING INSIGHT TO INTERGRATE STRATEGICALLY WE DONT COPY WE IMPLEMENT THE LOGIC\" - **MAD:** \"check ra he should know the best way\" (Resource Adapter should review repos) - **SW Dev:** Keep upgrading venv UI — all-in-one platform similar to Genspark/Claude/Hermes workspace - **SW Dev:** Chat feature where you can see agent using power (agent terminal showing live work) - **Key insight:** MAD is stepping away for the day. OWL should execute autonomously and report back. ## Actions Taken (15:46-16:00 EDT) - Assessed all v3 UI files: env-v3.css (complete, 1050+ lines), app-v3.js (complete, 1000+ lines), index.html (up",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T01:58:06.835Z",
+      "lastRecalledAt": "2026-05-20T12:55:59.747Z",
+      "queryHashes": [
+        "dd65dd2620cf",
+        "769052bb2313"
+      ],
+      "recallDays": [
+        "2026-05-19",
+        "2026-05-20"
+      ],
+      "conceptTags": [
+        "all-in-one",
+        "genspark/claude/hermes",
+        "46-16",
+        "env-v3.css",
+        "app-v3.js",
+        "index.html",
+        "https",
+        "github.com"
+      ]
+    },
+    "memory:memory/2026-05-19.md:251:275": {
+      "key": "memory:memory/2026-05-19.md:251:275",
+      "path": "memory/2026-05-19.md",
+      "startLine": 251,
+      "endLine": 275,
+      "source": "memory",
+      "snippet": "- 7 non-negotiable rules for pipeline pattern - Manager → Workers pipeline model - Failure recovery decision tree - **Spawned RA** (raworkflowimpl) — reviewing Shaw's analysis + implementing changes to AGENTS.md - RA is updating AGENTS.md with mandatory pipeline section ## 20:30-21:00 EDT — MT5 BACKTEST FINALIZED + CRON JOBS PAUSED - **MAD directive (19:29):** \"Pause the dev team until sage is back from meditation. Just focus on mt5 backtest\" - **MAD directive (19:29):** \"Once you successfully get a actual mt5 run history backtest tell me results and make download it so i can verify after test all assets same way\" - Wrote new DMR_Backtest.mq5 EA (sequential bar processing for Strategy",
+      "recallCount": 3,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 3,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T01:58:06.835Z",
+      "lastRecalledAt": "2026-05-21T10:45:48.074Z",
+      "queryHashes": [
+        "dd65dd2620cf",
+        "769052bb2313",
+        "97b34c338cbe"
+      ],
+      "recallDays": [
+        "2026-05-19",
+        "2026-05-20",
+        "2026-05-21"
+      ],
+      "conceptTags": [
+        "non-negotiable",
+        "agents.md",
+        "30-21",
+        "dmr-backtest.mq5",
+        "non",
+        "negotiable",
+        "rules",
+        "pipeline"
+      ]
+    },
+    "memory:memory/2026-05-18.md:590:622": {
+      "key": "memory:memory/2026-05-18.md:590:622",
+      "path": "memory/2026-05-18.md",
+      "startLine": 590,
+      "endLine": 622,
+      "source": "memory",
+      "snippet": "- Both have 10-min timeouts. 3 slots still free. ### 49. MAD's Directives at 18:28 EDT - Check RAM → done (89.4%, VS Code culprit) - Check VS space → done (SW Dev room: only PROJECT_BOARD.md + PROGRESS.md, no code changes) - Spawn sub-agents → done (2 spawned) - Farm: Day 4 plans → spawned - Lab: Monte Carlo on production-ready strategies → spawned (DMR first) - Monte Carlo format: same as CEREBUS manual Part 6 (10K iterations, percentiles, shuffle) --- ### 51. Farm Day 3 + Day 4 Completion (19:32 EDT) - Farm agent (farmday3and4) timed out after creating only carousel-post.html - OWL completed remaining files directly: - `content-farm/day3/ad-copies.md` — 20 ad variations (FB/IG, Google",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T01:58:06.835Z",
+      "lastRecalledAt": "2026-05-20T01:58:06.835Z",
+      "queryHashes": [
+        "dd65dd2620cf"
+      ],
+      "recallDays": [
+        "2026-05-19"
+      ],
+      "conceptTags": [
+        "10-min",
+        "89.4",
+        "project-board.md",
+        "progress.md",
+        "sub-agents",
+        "production-ready",
+        "carousel-post.html",
+        "content-farm/day3/ad-copies.md"
+      ]
+    },
+    "memory:memory/2026-05-19.md:269:296": {
+      "key": "memory:memory/2026-05-19.md:269:296",
+      "path": "memory/2026-05-19.md",
+      "startLine": 269,
+      "endLine": 296,
+      "source": "memory",
+      "snippet": "- RA completed: sw-dev/RA_WORKFLOW_IMPLEMENTATION.md (10KB) - Shaw completed: sw-dev/SHAW_AGENT_WORKFLOW_ANALYSIS.md (16KB) ## 21:00-21:30 EDT — MULTI-ASSET BACKTEST COMPLETE - Ran DMR backtest on all 4 available forex pairs - **EURUSD.PRO**: 671 trades, 94.8% WR, +7,903p, PF 205.9 - **USDCHF.PRO**: 721 trades, 92.1% WR, +8,128p, PF 125.0 - **CHFJPY.PRO**: 191 trades, 95.3% WR, +2,154p, PF 226.4 - **XAUUSD.PRO**: 347 trades, 94.5% WR, +4,489p, PF 223.0 - **TOTAL**: 1,930 trades, 94.0% avg WR, +22,676 pips - All 4 assets 92%+ WR — consistent across forex AND gold - Sent results + HTML report to MAD - Disabled all 3 meditation cron jobs (all timing out) - Awaiting MAD's next directive ## 21:",
+      "recallCount": 3,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 3,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T12:55:59.747Z",
+      "lastRecalledAt": "2026-05-21T10:45:48.074Z",
+      "queryHashes": [
+        "769052bb2313",
+        "83a92ad4c842",
+        "97b34c338cbe"
+      ],
+      "recallDays": [
+        "2026-05-20",
+        "2026-05-21"
+      ],
+      "conceptTags": [
+        "00-21",
+        "multi-asset",
+        "eurusd.pro",
+        "94.8",
+        "205.9",
+        "usdchf.pro",
+        "92.1",
+        "125.0"
+      ]
+    },
+    "memory:memory/2026-05-19.md:293:312": {
+      "key": "memory:memory/2026-05-19.md:293:312",
+      "path": "memory/2026-05-19.md",
+      "startLine": 293,
+      "endLine": 312,
+      "source": "memory",
+      "snippet": "- Result 2 (eurusd_analysis.py trade-level CSV): 92.7pct WR � SAME as Result 1 - Result 3 (sub-agent dmr_full_analysis_v2.py): 4.6pct WR � WRONG STRATEGY - Result 3 used: wrong Asian range (2-8AM vs 7PM-3AM), no Deep State, entered WITH move not AGAINST - Root cause: sub-agent wrote new code from scratch instead of using WORKING code - EURUSD Deep Analysis: 915 trades, 92.7pct WR, MC 100pct prob profit, MaxDD 2.68p, Sharpe 42.67 - Tiers: T3 (Expanded, 25-40p) = sweet spot, 93.6pct WR. T4 (>40p) = 98.2pct WR - Injection Zones: 200+ compression->expansion events, cluster in 02:00-05:00 EST - Overlay Strategy: Time 03:00-05:00 + Tier T3/T4 + Day Tue-Thu + Multi-asset confirmation",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T12:55:59.747Z",
+      "lastRecalledAt": "2026-05-20T12:55:59.747Z",
+      "queryHashes": [
+        "769052bb2313"
+      ],
+      "recallDays": [
+        "2026-05-20"
+      ],
+      "conceptTags": [
+        "eurusd-analysis.py",
+        "trade-level",
+        "92.7pct",
+        "sub-agent",
+        "dmr-full-analysis-v2.py",
+        "4.6pct",
+        "2-8am",
+        "7pm-3am"
+      ]
+    },
+    "memory:memory/2026-05-18.md:474:495": {
+      "key": "memory:memory/2026-05-18.md:474:495",
+      "path": "memory/2026-05-18.md",
+      "startLine": 474,
+      "endLine": 495,
+      "source": "memory",
+      "snippet": "### 37. Current Active Agents (15:58 EDT) | Agent | Task | Status | |-------|------|--------| | resourceadaptertimeout | Timeout analysis + Navtoor + tools | ⏳ Running | | labmanagercheckpoint | Fix 10 strategies w/ checkpointing | ⏳ Running | | farmmanagerday3 | Day 2 gaps + Day 3 plan | ⏳ Running | | envbuilderfix | Fix agent environment UI | ⏳ Running | | softwareceo | Meditate on rooms/venv | ⏳ Running (NEW) | | capitalmaxer | Meditate on biz opportunities | ⏳ Running (NEW) | | swdevmanager | SW Dev project board + spawn team | ⏳ Running (NEW) | ### 38. DeepWiki + 18 New Repos + Resource Index (16:21 EDT) - MAD's final large idea for the day: install DeepWiki, clone all shared repos, cr",
+      "recallCount": 3,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 3,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T12:55:59.791Z",
+      "lastRecalledAt": "2026-05-21T20:16:18.839Z",
+      "queryHashes": [
+        "966b560b2d5c",
+        "f0cd565af327",
+        "20197b92d43f"
+      ],
+      "recallDays": [
+        "2026-05-20",
+        "2026-05-21"
+      ],
+      "conceptTags": [
+        "rooms/venv",
+        "current",
+        "active",
+        "agents",
+        "edt",
+        "task",
+        "status",
+        "resourceadaptertimeout"
+      ]
+    },
+    "memory:memory/2026-05-17.md:1:14": {
+      "key": "memory:memory/2026-05-17.md:1:14",
+      "path": "memory/2026-05-17.md",
+      "startLine": 1,
+      "endLine": 14,
+      "source": "memory",
+      "snippet": "28. **Agent Environment — FULLY OPERATIONAL** (23:48 EDT) - agent_env_setup timed out at 4m57s but completed ALL tasks before timeout - Server running on port 9000 (PID 18456, uptime 277s) - npm install: ✅ 72 packages, 0 vulnerabilities - Health check: ✅ {\"status\":\"ok\",\"rooms\":4,\"agents\":0} - Rooms API: ✅ 4 rooms (meditation, quant, chat, war) - Python sandbox: ✅ \"hello from sandbox\" - Node sandbox: ✅ \"hello from node sandbox\" - Dashboard: ✅ 200 OK, 29KB served - Issue fixed: stale node process (PID 14100) on port 9000 killed - SETUP_REPORT.md written to agent-environment/ - **Priority 2 COMPLETE** — Agent environment ready for use",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T17:41:09.005Z",
+      "lastRecalledAt": "2026-05-20T17:41:09.005Z",
+      "queryHashes": [
+        "f3cb31722e84"
+      ],
+      "recallDays": [
+        "2026-05-20"
+      ],
+      "conceptTags": [
+        "agent-env-setup",
+        "setup-report.md",
+        "agent-environment",
+        "environment",
+        "fully",
+        "operational",
+        "edt",
+        "timed"
+      ]
+    },
+    "memory:memory/2026-05-19.md:166:188": {
+      "key": "memory:memory/2026-05-19.md:166:188",
+      "path": "memory/2026-05-19.md",
+      "startLine": 166,
+      "endLine": 188,
+      "source": "memory",
+      "snippet": "- Lot size: 0.01 | Magic: 20260519 | Hard exit: 5 PM EST - Logs to: quant-lab/mt5/dmr_forward_test_log.csv - State: quant-lab/mt5/dmr_forward_test_state.json - **MAD credentials used:** Login 1114712, Server OxSecurities-Demo, Password Teflondon1718! ## 17:50-18:09 EDT — MAD QUESTIONS & FARM UPDATE - **MAD asked:** \"whats a memory flush restriction?\" - Answer: During OpenClaw context compaction, the `write` tool is restricted to only append to `memory/2026-05-19.md`. Prevents accidental file corruption during context compaction. Normal ops resume after flush. - **MAD asked:** Farm update - Farm Day 4 COMPLETE: All content written, @CerebusFX handles configured for 7 platforms - Day 5",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T17:41:09.005Z",
+      "lastRecalledAt": "2026-05-22T11:31:52.911Z",
+      "queryHashes": [
+        "f3cb31722e84",
+        "18ecf2a03b41"
+      ],
+      "recallDays": [
+        "2026-05-20",
+        "2026-05-22"
+      ],
+      "conceptTags": [
+        "0.01",
+        "oxsecurities-demo",
+        "50-18",
+        "memory/2026-05-19.md",
+        "lot",
+        "size",
+        "magic",
+        "hard"
+      ]
+    },
+    "memory:memory/2026-05-19.md:184:208": {
+      "key": "memory:memory/2026-05-19.md:184:208",
+      "path": "memory/2026-05-19.md",
+      "startLine": 184,
+      "endLine": 208,
+      "source": "memory",
+      "snippet": "- **OCE:** Full-stack app — FastAPI backend (port 8000) + Next.js frontend (port 3000) - Frontend has 4 pages: `/` (dashboard), `/command-center`, `/execution`, `/observability` - Uses React, Recharts, D3, Tailwind CSS, Socket.IO - Had to run `npm run build` first (no production build existed) - Then `npm run start` — ready in 898ms - **SRRA-OPH:** Python-only (no frontend). `srrs_opc/` has ~50 Python modules, no web UI - **All 3 servers confirmed running:** OCE backend (:8000) ✅ | OCE frontend (:3000) ✅ | Agent env (:9000) ✅ - **MAD said:** After looking, take all agents offline except Dev Manager to monitor frontends + backends - **MT5 forward test:** Still running (session vivid-o",
+      "recallCount": 4,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 4,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T17:41:09.005Z",
+      "lastRecalledAt": "2026-05-22T01:17:51.034Z",
+      "queryHashes": [
+        "f3cb31722e84",
+        "ac384b89f0de",
+        "8c760f679dc1",
+        "371946845e22"
+      ],
+      "recallDays": [
+        "2026-05-20",
+        "2026-05-21"
+      ],
+      "conceptTags": [
+        "full-stack",
+        "next.js",
+        "command-center",
+        "socket.io",
+        "srra-oph",
+        "python-only",
+        "srrs-opc",
+        "vivid-o"
+      ]
+    },
+    "memory:memory/2026-05-20.md:30:64": {
+      "key": "memory:memory/2026-05-20.md:30:64",
+      "path": "memory/2026-05-20.md",
+      "startLine": 30,
+      "endLine": 64,
+      "source": "memory",
+      "snippet": "- Focus: Priority ranking, risk assessment, actionable plans **SAGE Meditation (subagent: 80e9e9bd):** - Task: Mathematical analysis of income potential - Output: `meditation-room/SAGE_INCOME_MEDITATION.md` - Focus: Kelly criterion, risk of ruin, revenue models, follower-to-revenue math **Algo Readiness Check:** - Created `tools/algo_readiness_check.py` - Report: `quant-lab/reports/ALGO_READINESS_REPORT.md` - Found 2 critical issues (see below) ### Critical Issues Found: 1. **MT5 AutoTrading DISABLED** — 108 P90s detected today, 0 trades placed. MAD must enable AutoTrading in MT5 toolbar before tomorrow. 2. **DMR Live process had died** — Restarted successfully. ### System State (13:53 E",
+      "recallCount": 4,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 4,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-20T18:35:26.067Z",
+      "lastRecalledAt": "2026-05-22T01:17:51.034Z",
+      "queryHashes": [
+        "ac384b89f0de",
+        "83a92ad4c842",
+        "8c760f679dc1",
+        "371946845e22"
+      ],
+      "recallDays": [
+        "2026-05-20",
+        "2026-05-21"
+      ],
+      "conceptTags": [
+        "follower-to-revenue",
+        "tools/algo-readiness-check.py",
+        "focus",
+        "priority",
+        "ranking",
+        "risk",
+        "assessment",
+        "actionable"
+      ]
+    },
+    "memory:memory/2026-05-18.md:298:326": {
+      "key": "memory:memory/2026-05-18.md:298:326",
+      "path": "memory/2026-05-18.md",
+      "startLine": 298,
+      "endLine": 326,
+      "source": "memory",
+      "snippet": "### 17. Master Plan Written - Comprehensive plan for all rooms: `plans/MASTER_PLAN_2026-05-18.md` - Quant Lab: Convert only DMR, forward test Composite_Alpha, document fix specs for 8 failing - Content Farm: Day 2 execution + Day 3 planning, credentials now available - Agent Environment: Test agent-client.js SDK, integrate with team workflow - Meditation Room: Formalized as permanent facility for any agent - Resource Adapter: Post-meditation tasks (install tools, read repos, integrate APIs) ### 18. Meditation Agent Spawned - **resourceadaptermeditation:** Neutral assessment of current system state - Prompt: unbiased review balancing philosophy and practicality - Output: `meditation-room/RES",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-21T10:08:23.239Z",
+      "lastRecalledAt": "2026-05-21T10:08:23.239Z",
+      "queryHashes": [
+        "d8142493cca0"
+      ],
+      "recallDays": [
+        "2026-05-21"
+      ],
+      "conceptTags": [
+        "plans/master-plan-2026-05-18.md",
+        "composite-alpha",
+        "agent-client.js",
+        "post-meditation",
+        "meditation-room/res",
+        "master",
+        "plan",
+        "written"
+      ]
+    },
+    "memory:memory/2026-05-20.md:1:38": {
+      "key": "memory:memory/2026-05-20.md:1:38",
+      "path": "memory/2026-05-20.md",
+      "startLine": 1,
+      "endLine": 38,
+      "source": "memory",
+      "snippet": "# 2026-05-20 Daily Log ## 13:32-13:53 EDT — MAD AWAY, OWL AUTONOMOUS OPERATIONS ### MAD Directives: 1. Fix dashboard toggle visibility (show updates when toggled, not just on page load) 2. Create 2-hour monitoring cron for workspace + scripts 3. Send CEO + SAGE to meditation — focus on INCOME GENERATION 4. Full algo trading readiness check for tomorrow's trading day 5. Keep systems running while MAD is away ### Actions Taken: **Dashboard Toggle Fix:** - Added dedicated `/api/toggle` endpoint to dashboard server (`quant-lab/dashboard/server.py`) - Toggle now writes to both config.json AND state.json for immediate visibility - Dashboard JS updated: toggle shows green/red color feedback + t",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-21T10:08:23.239Z",
+      "lastRecalledAt": "2026-05-21T10:08:23.239Z",
+      "queryHashes": [
+        "d8142493cca0"
+      ],
+      "recallDays": [
+        "2026-05-21"
+      ],
+      "conceptTags": [
+        "32-13",
+        "2-hour",
+        "api/toggle",
+        "quant-lab/dashboard/server.py",
+        "config.json",
+        "state.json",
+        "green/red",
+        "log"
+      ]
+    },
+    "memory:memory/2026-05-20.md:79:112": {
+      "key": "memory:memory/2026-05-20.md:79:112",
+      "path": "memory/2026-05-20.md",
+      "startLine": 79,
+      "endLine": 112,
+      "source": "memory",
+      "snippet": "- DB dedup protection active **Meditation Room:** CEO_INCOME_MEDITATION.md (18KB) + SAGE_INCOME_MEDITATION.md (17KB) — both written by sub-agents ## 16:23-17:17 EDT — MAD DIRECTIVE: PORTFOLIO + AUTO TRADING **MAD Directives:** 1. Remove 1 trade/day filter (not how backtest worked) 2. Cancel old pending orders when new P90 prints 3. Use computer use to toggle AutoTrading on 4. Check meditation room **Actions Taken:** - Removed `max_daily_trades_per_symbol` from dmr_config.json - Removed daily trade limit skip condition from dmr_live_v2.py - Added cancel-old-pending-orders logic before placing new orders (filters by magic_number) - Used screen capture + mouse click to toggle MT5 AutoTradin",
+      "recallCount": 5,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 5,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-21T10:08:23.239Z",
+      "lastRecalledAt": "2026-05-22T01:17:51.034Z",
+      "queryHashes": [
+        "d8142493cca0",
+        "83a92ad4c842",
+        "97b34c338cbe",
+        "8c760f679dc1",
+        "371946845e22"
+      ],
+      "recallDays": [
+        "2026-05-21"
+      ],
+      "conceptTags": [
+        "ceo-income-meditation.md",
+        "sage-income-meditation.md",
+        "sub-agents",
+        "23-17",
+        "trade/day",
+        "max-daily-trades-per-symbol",
+        "dmr-config.json",
+        "dmr-live-v2.py"
+      ]
+    },
+    "memory:memory/2026-05-18.md:773:801": {
+      "key": "memory:memory/2026-05-18.md:773:801",
+      "path": "memory/2026-05-18.md",
+      "startLine": 773,
+      "endLine": 801,
+      "source": "memory",
+      "snippet": "- `worldbuilder` (bd7498b9) — VENV lead engineer — 🔄 Running - `rlworldbuilder` (1663381f) — VENV observer/FAM CHAT design — 🔄 Running - `pmworldbuilder` (0105d25b) — VENV visual effects — 🔄 Running - `sagereviewceo` (73d15627) — SAGE review of CEO rundown — 🔄 Running ### 71. Cron Jobs Activated - `OWL Overnight Monitor` — Every 30 min, check agents/RAM/output files - `Farm POLYGENT Standby` — Every 60 min, check farm blockers/credentials ### 72. Key Outputs Generated - `meditation-room/CEO_RUNDOWN.md` — 300+ line strategic assessment - `sw-dev/TESTING_REPORT.md` — Full system test (OCE 27/27, SRRA 56/56, agent env all green, OCE backend import broken) - `meditation-room/QUANT_LAB_MANA",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-21T10:08:23.239Z",
+      "lastRecalledAt": "2026-05-21T10:08:23.239Z",
+      "queryHashes": [
+        "d8142493cca0"
+      ],
+      "recallDays": [
+        "2026-05-21"
+      ],
+      "conceptTags": [
+        "observer/fam",
+        "agents/ram/output",
+        "blockers/credentials",
+        "meditation-room/ceo-rundown.md",
+        "sw-dev/testing-report.md",
+        "27/27",
+        "56/56",
+        "meditation-room/quant-lab-mana"
+      ]
+    },
+    "memory:memory/2026-05-20.md:104:117": {
+      "key": "memory:memory/2026-05-20.md:104:117",
+      "path": "memory/2026-05-20.md",
+      "startLine": 104,
+      "endLine": 117,
+      "source": "memory",
+      "snippet": "- AutoTrading: ENABLED ✅ - 3 pairs: EURUSD.PRO, USDCHF.PRO, CHFJPY.PRO - No trade frequency limits - Old pending orders auto-canceled on new P90 - Next P90 window: tomorrow 2-11 AM EST ### Key Files Modified: - `quant-lab/dashboard/server.py` — toggle endpoint + state sync - `tools/workspace_monitor.py` — new 2-hour monitor script - `tools/algo_readiness_check.py` — new readiness check script - `tools/quick_syscheck.ps1` — new quick system check - `tools/restart_dmr.ps1` — new DMR restart script - `HEARTBEAT.md` — updated with latest status",
+      "recallCount": 4,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 4,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-21T10:35:58.449Z",
+      "lastRecalledAt": "2026-05-22T01:17:51.034Z",
+      "queryHashes": [
+        "83a92ad4c842",
+        "97b34c338cbe",
+        "8c760f679dc1",
+        "371946845e22"
+      ],
+      "recallDays": [
+        "2026-05-21"
+      ],
+      "conceptTags": [
+        "eurusd.pro",
+        "usdchf.pro",
+        "chfjpy.pro",
+        "auto-canceled",
+        "2-11",
+        "quant-lab/dashboard/server.py",
+        "tools/workspace-monitor.py",
+        "2-hour"
+      ]
+    },
+    "memory:memory/2026-05-20.md:57:87": {
+      "key": "memory:memory/2026-05-20.md:57:87",
+      "path": "memory/2026-05-20.md",
+      "startLine": 57,
+      "endLine": 87,
+      "source": "memory",
+      "snippet": "**Root Cause:** Dashboard toggle endpoint wrote flat state structure (`found_p90s: []`) that overwrote the nested structure (`state.symbols.EURUSD.PRO.known_p90s`). Live script read empty `known_p90s` every loop → re-inserted same P90s. **Fixes:** 1. State file corrected to nested `symbols` structure 2. Added DB-level dedup in `log_p90()` — SELECT COUNT before INSERT 3. Dashboard toggle/config endpoints no longer write to state file (only config.json) 4. 104 duplicate rows deleted from DB **4 Real P90s Today:** 07:30 SHORT 4.4p, 08:25 SHORT 4.9p, 09:15 LONG 4.9p, 11:10 SHORT 5.3p **0 trades placed** — AutoTrading was disabled in MT5 all day. ## 14:31 EDT — PORTFOLIO MODE ACTIVATED (MAD D",
+      "recallCount": 4,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 4,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-21T10:35:58.449Z",
+      "lastRecalledAt": "2026-05-22T01:17:51.034Z",
+      "queryHashes": [
+        "83a92ad4c842",
+        "97b34c338cbe",
+        "8c760f679dc1",
+        "371946845e22"
+      ],
+      "recallDays": [
+        "2026-05-21"
+      ],
+      "conceptTags": [
+        "found-p90s",
+        "known-p90s",
+        "re-inserted",
+        "db-level",
+        "log-p90",
+        "toggle/config",
+        "config.json",
+        "4.4p"
+      ]
+    },
+    "memory:memory/2026-05-18.md:526:551": {
+      "key": "memory:memory/2026-05-18.md:526:551",
+      "path": "memory/2026-05-18.md",
+      "startLine": 526,
+      "endLine": 551,
+      "source": "memory",
+      "snippet": "- **Recommendation:** 2×16GB DDR4 3200MHz kit (~$50-70) for 32GB total - **Deep_Mean_Reversion real stats:** 764 trades, 91.8% WR, +8746p, PF 112 — confirmed production ready - **Composite Alpha REAL stats:** 114 trades, 64% WR, +23.5p, PF 1.06 — NOT the 98.6% WR from optimizer - The 98.6% WR was a reporting artifact from optimizer_v4b (different scoring metric) - Composite Alpha is MARGINALLY profitable at best — needs re-optimization - Octa.space: decentralized GPU cloud, ~$0.40-0.60/hr for RTX 4090, ~$2.50-3.50/day for lab use - Octa setup: create account, fund with OCTA token, launch Docker container with Python backtesting stack ### 42. Active Agents (17:13 EDT) - ragapanalysis: RA gap",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-21T20:08:16.951Z",
+      "lastRecalledAt": "2026-05-21T20:16:18.839Z",
+      "queryHashes": [
+        "f0cd565af327",
+        "20197b92d43f"
+      ],
+      "recallDays": [
+        "2026-05-21"
+      ],
+      "conceptTags": [
+        "50-70",
+        "deep-mean-reversion",
+        "91.8",
+        "23.5p",
+        "1.06",
+        "98.6",
+        "optimizer-v4b",
+        "re-optimization"
+      ]
+    },
+    "memory:memory/2026-05-18.md:546:575": {
+      "key": "memory:memory/2026-05-18.md:546:575",
+      "path": "memory/2026-05-18.md",
+      "startLine": 546,
+      "endLine": 575,
+      "source": "memory",
+      "snippet": "- Conversion report: `quant-lab/results/pinescript-conversion-complete.md` - Composite Alpha reality check: 64% WR / +23.5p / PF 1.06 (NOT 97% WR from optimizer) - Next: MQL5 conversion, then TradingView paper trading ### 44. MAD's HP Desktop RAM Upgrade (17:33 EDT) - Model: HP Desktop M01-F1214 (DESKTOP, not laptop) - Specs: 2 DIMM slots, DDR4-3200 UDIMM (288-pin), 1.2V, Non-ECC - Current: 1× 8GB DDR4-3200 - Max: 64GB (2× 32GB) - Recommended: Crucial 32GB Kit (2× 16GB) DDR4-3200 UDIMM ~$55-70 - Amazon: https://www.amazon.com/dp/B08C4VHQV2 - Local install options: - Best Buy Peachtree City (Geek Squad): 2703 Hwy 54, Peachtree City, GA 30269, (678) 364-1025, ~$39.99 install - Fairburn Co",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-21T20:08:16.951Z",
+      "lastRecalledAt": "2026-05-21T20:16:18.839Z",
+      "queryHashes": [
+        "f0cd565af327",
+        "20197b92d43f"
+      ],
+      "recallDays": [
+        "2026-05-21"
+      ],
+      "conceptTags": [
+        "23.5p",
+        "1.06",
+        "m01-f1214",
+        "ddr4-3200",
+        "288-pin",
+        "1.2v",
+        "non-ecc",
+        "55-70"
+      ]
+    },
+    "memory:memory/2026-05-18.md:696:733": {
+      "key": "memory:memory/2026-05-18.md:696:733",
+      "path": "memory/2026-05-18.md",
+      "startLine": 696,
+      "endLine": 733,
+      "source": "memory",
+      "snippet": "- Farm Day 3: ALL complete (8 files) - Farm Day 4: Plan complete - Sent MAD comprehensive update (msg #2722) - Awaiting MAD response on: remaining MC, MQL5, phone integration --- ### 61. MAD's Major Directive (23:14 EDT) - GitHub missing Phase 10 → Created docs/PHASE10.md, pushed to origin/master - Local git synced ✅ - RAM: 6.2/7.4GB (83.8%) — improved after VS Code close - Lab: Portfolio strategies (30% max DD, 3-4 year data) + C2 CEREBUS manual - ALL managers must meditate before tasking - CEO+RA discuss → CEO gives OWL rundown → OWL passes to SAGE - SW Dev room: Start testing the system - Use IACER for response ### 62. Meditation Agents Spawned (23:14 EDT) - `labmanagermeditation` (age",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-22T10:39:39.679Z",
+      "lastRecalledAt": "2026-05-22T10:39:39.679Z",
+      "queryHashes": [
+        "f7b300265193"
+      ],
+      "recallDays": [
+        "2026-05-22"
+      ],
+      "conceptTags": [
+        "docs/phase10.md",
+        "origin/master",
+        "6.2/7.4gb",
+        "83.8",
+        "3-4",
+        "farm",
+        "day",
+        "all"
+      ]
+    },
+    "memory:memory/2026-05-18.md:250:283": {
+      "key": "memory:memory/2026-05-18.md:250:283",
+      "path": "memory/2026-05-18.md",
+      "startLine": 250,
+      "endLine": 283,
+      "source": "memory",
+      "snippet": "8. **IACER for all handoffs** — not just OWL responses, but Manager→agent delegations too 9. **Soft coding trick:** 1 prompt → OWL IACER framing → Manager refinement → execution agent (3x absorption) 10. **Agents read HTML better than MD** — Open Design outputs HTML artifacts natively ## Files Created/Updated This Session - `quant-lab/results/cost-validation-2026-05-18.md` — Full cost validation report - `quant-lab/results/spread-analysis.json` — Spread data for 12 pairs - `quant-lab/research/BSC_GAP_ANALYSIS.md` — BSC gap analysis - `tools/INTEGRATION_STATUS.md` — Tool integration status - `research/TOOLS_AND_REPOS.md` — All evaluated repos (updated with Batch 2) - `memory/2026-05-18.md` —",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-22T10:39:39.679Z",
+      "lastRecalledAt": "2026-05-22T10:39:39.679Z",
+      "queryHashes": [
+        "f7b300265193"
+      ],
+      "recallDays": [
+        "2026-05-22"
+      ],
+      "conceptTags": [
+        "created/updated",
+        "tools/integration-status.md",
+        "research/tools-and-repos.md",
+        "memory/2026-05-18.md",
+        "iacer",
+        "all",
+        "handoffs",
+        "not"
+      ]
+    },
+    "memory:memory/2026-05-19.md:26:41": {
+      "key": "memory:memory/2026-05-19.md:26:41",
+      "path": "memory/2026-05-19.md",
+      "startLine": 26,
+      "endLine": 41,
+      "source": "memory",
+      "snippet": "- **Farm Day 5 plan:** A/B testing framework, content repurposing system, advanced content series, growth acceleration strategies. - **Farm blocker:** MAD needs to register @CerebusFX on each platform. - **SW Dev UI v3:** Agent timed out. OWL building directly — adding Simple Chat tab (Claude/Genspark style) + Agent Terminal tab (PowerShell-style live output). - **MAD's UI direction:** Simple chat for regular use + rooms for complex tasks. Take best from Genspark/Claude/Manus. Agent terminal showing PowerShell/work output. Good+good=great philosophy. - **Key files:** agent-environment/public/css/chat-v3.css (new), agent-environment/public/js/chat-v3.js (new), agent-environment/public/index.h",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-22T11:31:52.911Z",
+      "lastRecalledAt": "2026-05-22T11:31:52.911Z",
+      "queryHashes": [
+        "18ecf2a03b41"
+      ],
+      "recallDays": [
+        "2026-05-22"
+      ],
+      "conceptTags": [
+        "a/b",
+        "claude/genspark",
+        "powershell-style",
+        "genspark/claude/manus",
+        "powershell/work",
+        "agent-environment/public/index.h",
+        "farm",
+        "day"
+      ]
+    },
+    "memory:memory/2026-05-19.md:108:124": {
+      "key": "memory:memory/2026-05-19.md:108:124",
+      "path": "memory/2026-05-19.md",
+      "startLine": 108,
+      "endLine": 124,
+      "source": "memory",
+      "snippet": "- **ROOT CAUSE FOUND:** The full CEREBUS code in conversions/strategy-code/ is a DIFFERENT strategy from what the optimizer ran. The optimizer used CLEAN, SIMPLE mean reversion: P90 → Deep State touch → mean reversion (against P90 direction), SL at 220%, TP at activation. - **The complex CEREBUS code (cascade, pyramid, regime filters) produces TERRIBLE results on raw data (11.1% WR on MT5, 40.4% on CSV backtest).** - **The SIMPLE optimizer_v2 code produces 90%+ WR consistently.** - **MAD's pipeline:** local backtest → MC → MT5 cross-validation. DMR passed MT5. Next: MC on MT5 results. - **Farm:** farmday4create timed out. Need to re-spawn for Day 4-5. - **MAD directive:** PAUSE all non-lab w",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-22T11:31:52.911Z",
+      "lastRecalledAt": "2026-05-22T11:31:52.911Z",
+      "queryHashes": [
+        "18ecf2a03b41"
+      ],
+      "recallDays": [
+        "2026-05-22"
+      ],
+      "conceptTags": [
+        "conversions/strategy-code",
+        "11.1",
+        "40.4",
+        "optimizer-v2",
+        "cross-validation",
+        "re-spawn",
+        "4-5",
+        "non-lab"
+      ]
+    },
+    "memory:memory/2026-06-04.md:162:200": {
+      "key": "memory:memory/2026-06-04.md:162:200",
+      "path": "memory/2026-06-04.md",
+      "startLine": 162,
+      "endLine": 200,
+      "source": "memory",
+      "snippet": "### Files - `reports/trigger_sweep_max_accuracy.json` — Full curve data for all pairs - `tests/trigger_sweep_max_accuracy_all.py` — Sweep script - `tests/PLAN_max_accuracy_sweep.md` — ARC-approved plan --- ## DEPLOYMENT — LIVE (09:40 EDT) MAD Directive: Go live with 7 pairs. No demo. ### Deployment Config - **Floor (3):** EURUSD (T1=12p), USDJPY (T1=19p), CHFJPY (T1=17p) - **Ceiling (3):** NZDUSD (T1=26p), AUDUSD (T1=27p), USDCHF (T1=25.81p) - **Hedge/Knee (1):** GBPJPY (T1=35p) - **Lot size:** 0.01 for all pairs - **Engine:** Nautilus symmetry trap v4.0 (zero-buffer impulse extreme SL) - **Bridge:** cerebus_live_bridge.py v3.0 (execution only, no signal computation)",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-07T15:01:26.675Z",
+      "lastRecalledAt": "2026-06-07T15:01:26.675Z",
+      "queryHashes": [
+        "b056d889cb59"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "tests/plan-max-accuracy-sweep.md",
+        "arc-approved",
+        "25.81p",
+        "hedge/knee",
+        "0.01",
+        "v4.0",
+        "zero-buffer",
+        "cerebus-live-bridge.py"
+      ]
+    },
+    "memory:memory/2026-06-03.md:384:414": {
+      "key": "memory:memory/2026-06-03.md:384:414",
+      "path": "memory/2026-06-03.md",
+      "startLine": 384,
+      "endLine": 414,
+      "source": "memory",
+      "snippet": "- backtest/check_st_multi.py, check_wr.py, check_data.py - backtest/test1_eurusd_direct.py, test2_old_engine.py, test3_old_engine.py - backtest/debug_eurusd.py, run_old_eurusd.py, final_check.py - backtest/mc_vs_backtest.py - backtest/portfolio_matrix/asset_stats.py, mc_vs_backtest.py - backtest/portfolio_matrix/run_matrix.py, matrix_quick.py, test_imports.py - backtest/run_portfolio_mc_no_eu_uchf.py, gen_thresholds_5assets.py - engines/symmetry_trap_old.py (empty placeholder — for testing only) ## PM2 OCE Chat Fix (Final) - Fixed chat to use real LLM (ChatAgent/OpenRouter) instead of template synthesizer - All messages now route through claude-haiku-4 via OpenRouter - Chat resp",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-07T15:01:26.675Z",
+      "lastRecalledAt": "2026-06-07T15:01:26.675Z",
+      "queryHashes": [
+        "b056d889cb59"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "router",
+        "backtest/check-st-multi.py",
+        "check-wr.py",
+        "check-data.py",
+        "backtest/test1-eurusd-direct.py",
+        "test2-old-engine.py",
+        "test3-old-engine.py",
+        "backtest/debug-eurusd.py"
+      ]
+    },
+    "memory:memory/2026-06-04.md:26:60": {
+      "key": "memory:memory/2026-06-04.md:26:60",
+      "path": "memory/2026-06-04.md",
+      "startLine": 26,
+      "endLine": 60,
+      "source": "memory",
+      "snippet": "The accuracy-frequency curve is now fully mapped. For any pair, the optimal operating point can be selected between floor (max trades, ~81% WR) and ceiling (max accuracy, ~90%+ WR). The \"knee\" — where WR gains become marginal — is the natural target for portfolio optimization. ### Files - `reports/trigger_sweep_max_accuracy.json` — Full curve data for all pairs - `tests/trigger_sweep_max_accuracy_all.py` — Sweep script - `tests/PLAN_max_accuracy_sweep.md` — ARC-approved plan --- ## DEPLOYMENT — LIVE (09:40 EDT) MAD Directive: Go live with 7 pairs. No demo. ### Deployment Config - **Floor (3):** EURUSD (T1=12p), USDJPY (T1=19p), CHFJPY (T1=17p) - **Ceiling (3):** NZDUSD (T",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-07T15:01:26.675Z",
+      "lastRecalledAt": "2026-06-07T15:01:26.675Z",
+      "queryHashes": [
+        "b056d889cb59"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "accuracy-frequency",
+        "tests/plan-max-accuracy-sweep.md",
+        "arc-approved",
+        "accuracy",
+        "frequency",
+        "curve",
+        "now",
+        "fully"
+      ]
+    },
+    "memory:memory/2026-06-05.md:1:31": {
+      "key": "memory:memory/2026-06-05.md:1:31",
+      "path": "memory/2026-06-05.md",
+      "startLine": 1,
+      "endLine": 31,
+      "source": "memory",
+      "snippet": "# 2026-06-05 — Daily Notes ## Group Combinatorics Matrix — COMPLETE - Built full combinatorics script: `quant-lab/scripts/group_combinatorics.py` - Output: `quant-lab/reports/GROUP_COMBINATORICS.md` - Top 3 per category at every size 2-14 - MAD's Phase 1 (low cost → $250) and Phase 2 (max profit at $250+) documented ## Low Cost Hex — CRITICAL FAILURE & FIX - **FAILURE**: Bridge running Sign 7 pairs (EURUSD, USDJPY, CHFJPY, etc.) instead of Low Cost Hex - **Root Cause**: cerebus_guardian.py had HARDCODED Sign 7 symbols in PROCESSES[\"bridge\"][\"args\"] - When guardian/autopilot restarted, it passed old symbols to bridge, ignoring deploy_config.py - Bridge uses --symbols CLI arg if provided",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-07T15:01:26.675Z",
+      "lastRecalledAt": "2026-06-07T15:01:26.675Z",
+      "queryHashes": [
+        "b056d889cb59"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "2-14",
+        "cerebus-guardian.py",
+        "guardian/autopilot",
+        "deploy-config.py",
+        "group",
+        "combinatorics",
+        "matrix",
+        "complete"
+      ]
+    },
+    "memory:memory/archive/2026-05-20.md:57:87": {
+      "key": "memory:memory/archive/2026-05-20.md:57:87",
+      "path": "memory/archive/2026-05-20.md",
+      "startLine": 57,
+      "endLine": 87,
+      "source": "memory",
+      "snippet": "**Root Cause:** Dashboard toggle endpoint wrote flat state structure (`found_p90s: []`) that overwrote the nested structure (`state.symbols.EURUSD.PRO.known_p90s`). Live script read empty `known_p90s` every loop → re-inserted same P90s. **Fixes:** 1. State file corrected to nested `symbols` structure 2. Added DB-level dedup in `log_p90()` — SELECT COUNT before INSERT 3. Dashboard toggle/config endpoints no longer write to state file (only config.json) 4. 104 duplicate rows deleted from DB **4 Real P90s Today:** 07:30 SHORT 4.4p, 08:25 SHORT 4.9p, 09:15 LONG 4.9p, 11:10 SHORT 5.3p **0 trades placed** — AutoTrading was disabled in MT5 all day. ## 14:31 EDT — PORTFOLIO MODE ACTI",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-07T15:01:26.675Z",
+      "lastRecalledAt": "2026-06-07T15:01:26.675Z",
+      "queryHashes": [
+        "b056d889cb59"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "found-p90s",
+        "known-p90s",
+        "re-inserted",
+        "db-level",
+        "log-p90",
+        "toggle/config",
+        "config.json",
+        "4.4p"
+      ]
+    },
+    "memory:memory/2026-06-07.md:34:71": {
+      "key": "memory:memory/2026-06-07.md:34:71",
+      "path": "memory/2026-06-07.md",
+      "startLine": 34,
+      "endLine": 71,
+      "source": "memory",
+      "snippet": "3. Next loop iteration now requires 15p impulse instead of 12p 4. Subsequent loops have HIGHER threshold → fewer trades ### The Fix - Tier reclassification now ONLY updates `self.au_pips` (for DZ calculation) - `self.trigger_pips` stays at T1's value for ALL loop iterations - EURUSD validation: 5,850 trades vs 5,593 baseline = **+4.6%** ✅ ### Key Transcript Findings - June 3rd session ran 7 baskets: 39,866 trades | 87.5% WR ✅ - Percentile fix from Arch made things WORSE (-57% trades on EURGBP) - The 3 \"extras\" (4h timeout, 80% kill switch, dynamic DZ) were already removed/commented out in my engine — they're dead code - The June 4th sweep used **ar_max=999** (no AR gate), not ar_max=60 -",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-07T22:02:50.132Z",
+      "lastRecalledAt": "2026-06-07T22:02:50.132Z",
+      "queryHashes": [
+        "4ec439e7a2d3"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "self.au-pips",
+        "self.trigger-pips",
+        "4.6",
+        "87.5",
+        "removed/commented",
+        "ar-max",
+        "loop",
+        "iteration"
+      ]
+    },
+    "memory:memory/2026-06-04.md:137:173": {
+      "key": "memory:memory/2026-06-04.md:137:173",
+      "path": "memory/2026-06-04.md",
+      "startLine": 137,
+      "endLine": 173,
+      "source": "memory",
+      "snippet": "## Max Accuracy Sweep — COMPLETE (07:30 EDT) ARC-approved max accuracy sweep executed across all 28 pairs. Swept triggers UPWARD from native to find maximum WR (ceiling of accuracy-frequency curve). ### Results Summary - **Ceiling grand total:** 29,438 trades across 21 valid pairs - **Floor grand total:** ~158,375 trades (from max-trades sweep) - **Average WR ceiling:** 90.8% | **Average WR floor:** 81.1% - **Full curve data** stored in `reports/trigger_sweep_max_accuracy.json` ### Top Performers (Max Accuracy) - NZDUSD: 95.5% WR, 796tr, 0.59/d, PF 58.41 - AUDUSD: 94.2% WR, 790tr, 0.59/d, PF 63.14 - GBPAUD: 93.4% WR, 699tr, 0.52/d, PF 38.81 - GBPNZD: 93.3% WR, 682tr, 0.51/d,",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-07T22:34:02.730Z",
+      "lastRecalledAt": "2026-06-07T22:34:02.730Z",
+      "queryHashes": [
+        "61f5dbbe48d3"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "arc-approved",
+        "accuracy-frequency",
+        "max-trades",
+        "90.8",
+        "81.1",
+        "95.5",
+        "0.59/d",
+        "58.41"
+      ]
+    },
+    "memory:memory/2026-06-04.md:1:38": {
+      "key": "memory:memory/2026-06-04.md:1:38",
+      "path": "memory/2026-06-04.md",
+      "startLine": 1,
+      "endLine": 38,
+      "source": "memory",
+      "snippet": "# 2026-06-04 — Daily Log ## Max Accuracy Sweep — COMPLETE (07:30 EDT) ARC-approved max accuracy sweep executed across all 28 pairs. Swept triggers UPWARD from native to find maximum WR (ceiling of accuracy-frequency curve). ### Results Summary - **Ceiling grand total:** 29,438 trades across 21 valid pairs - **Floor grand total:** ~158,375 trades (from max-trades sweep) - **Average WR ceiling:** 90.8% | **Average WR floor:** 81.1% - **Full curve data** stored in `reports/trigger_sweep_max_accuracy.json` ### Top Performers (Max Accuracy) - NZDUSD: 95.5% WR, 796tr, 0.59/d, PF 58.41 - AUDUSD: 94.2% WR, 790tr, 0.59/d, PF 63.14 - GBPAUD: 93.4% WR, 699tr, 0.52/d, PF 38.81 - GBPN",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-07T22:34:02.730Z",
+      "lastRecalledAt": "2026-06-07T22:34:02.730Z",
+      "queryHashes": [
+        "61f5dbbe48d3"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "arc-approved",
+        "accuracy-frequency",
+        "max-trades",
+        "90.8",
+        "81.1",
+        "95.5",
+        "0.59/d",
+        "58.41"
+      ]
+    },
+    "memory:memory/2026-06-07.md:124:159": {
+      "key": "memory:memory/2026-06-07.md:124:159",
+      "path": "memory/2026-06-07.md",
+      "startLine": 124,
+      "endLine": 159,
+      "source": "memory",
+      "snippet": "- Top adjusted PF: NZDJPY 16.0, EURJPY 12.9, AUDJPY 13.0, NZDCAD 12.6 ### METALS/INDICES: DEAD AFTER COSTS (BUT COSTS WERE WRONG) - XAUUSD: 4.26 PF (cost 8.5p/trade) — **COST WAS WRONG** - XAGUSD: 3.34 PF (cost 8.5p/trade) — **COST WAS WRONG** - US500: 1.53 PF DEAD (cost 7.5p/trade) — **COST WAS WRONG** - FR40: 1.92 PF DEAD (cost 7.5p/trade) — **COST WAS WRONG** - BTCUSD: 6.64 PF | ETHUSD: 6.34 PF (marginal) ## 🔴 MAD'S CORRECTIVE (22:16 EDT) — COST CALCULATION IS WRONG ### The Problem MAD sent 3 transcript files and explained the cost calculation is fundamentally broken: 1. **Commission is $7/LOT, not $7 per 0.01 lot** - I was calculating commission correctly for 0.01 lot ($0.07 per",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-07T22:34:02.939Z",
+      "lastRecalledAt": "2026-06-07T23:03:44.253Z",
+      "queryHashes": [
+        "3dde30556aa5",
+        "b87e710697b5"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "16.0",
+        "12.9",
+        "13.0",
+        "12.6",
+        "metals/indices",
+        "4.26",
+        "8.5p/trade",
+        "3.34"
+      ]
+    },
+    "memory:memory/2026-06-07.md:97:130": {
+      "key": "memory:memory/2026-06-07.md:97:130",
+      "path": "memory/2026-06-07.md",
+      "startLine": 97,
+      "endLine": 130,
+      "source": "memory",
+      "snippet": "1. Session starts with T1 trigger (e.g., 12p for EURUSD) 2. First impulse detected at 25p → reclassified as T2 → trigger becomes 15p 3. Next loop iteration now requires 15p impulse instead of 12p 4. Subsequent loops have HIGHER threshold → fewer trades ### The Fix - Tier reclassification now ONLY updates `self.au_pips` (for DZ calculation) - `self.trigger_pips` stays at T1's value for ALL loop iterations - EURUSD validation: 5,850 trades vs 5,593 baseline = **+4.6%** ✅ ### Key Transcript Findings - June 3rd session ran 7 baskets: 39,866 trades | 87.5% WR ✅ - Percentile fix from Arch made things WORSE (-57% trades on EURGBP) - The 3 \"extras\" (4h timeout, 80% kill switch, dynamic DZ) were al",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-07T22:34:02.939Z",
+      "lastRecalledAt": "2026-06-07T23:03:44.253Z",
+      "queryHashes": [
+        "3dde30556aa5",
+        "b87e710697b5"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "e.g",
+        "self.au-pips",
+        "self.trigger-pips",
+        "4.6",
+        "87.5",
+        "starts",
+        "trigger",
+        "12p"
+      ]
+    },
+    "memory:memory/2026-06-03.md:202:226": {
+      "key": "memory:memory/2026-06-03.md:202:226",
+      "path": "memory/2026-06-03.md",
+      "startLine": 202,
+      "endLine": 226,
+      "source": "memory",
+      "snippet": "**Bug**: `to_pips(abs(sl - price), sym)` and `to_pips(abs(tp - price), sym)` — `sym` is not defined in `send_order()` scope. Parameter is `symbol`. **Impact**: Every ST entry crashes with `NameError: name 'sym' is not defined`. No ST trades can be entered. **Fix**: Replace all `sym` with `symbol` in `send_order()` function. ### Engine Fix Confirmed Working - `engines/symmetry_trap.py`: SL = impulse_extreme (zero-buffer), matches Nautilus line 503 - `_just_entered` flag prevents SL/TP check on entry bar - Bridge `send_order(no_sl=True)` omits SL from broker order - No SL/TP clamping in bridge — trusts engine values ### Next Steps 1. Fix `sym` → `symbol` in `send_order()` (4 lines",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-08T01:06:43.468Z",
+      "lastRecalledAt": "2026-06-10T12:04:01.814Z",
+      "queryHashes": [
+        "bb0032c5bdf2",
+        "899c59f9abef"
+      ],
+      "recallDays": [
+        "2026-06-07",
+        "2026-06-10"
+      ],
+      "conceptTags": [
+        "to-pips",
+        "send-order",
+        "engines/symmetry-trap.py",
+        "impulse-extreme",
+        "zero-buffer",
+        "just-entered",
+        "sl/tp",
+        "no-sl"
+      ]
+    },
+    "memory:memory/2026-06-03.md:164:189": {
+      "key": "memory:memory/2026-06-03.md:164:189",
+      "path": "memory/2026-06-03.md",
+      "startLine": 164,
+      "endLine": 189,
+      "source": "memory",
+      "snippet": "- engines/symmetry_trap_old.py (empty placeholder — for testing only) ## PM2 Monitoring Session (12:00 UTC) ### Sync Infrastructure Audit - Audited all 9 sync/monitoring scripts for syntax and correctness - Fixed ools/progress-sync.py — REPO_MEMORY path was broken (pointed to non-existent external path) - Fixed ools/po_watchdog.py — indentation error on line 96 - Disabled ools/pm2_autopilot.py — renamed to .disabled after identifying it as source of ~50 spam git commits - Identified Telegram gateway crash: TELEGRAM_TOKEN missing from .env (only hardcoded in watchdog) - Updated workspace-state.md with current phase status - Updated PM2-progress.md and PM2-memory.md with monito",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-08T01:06:43.468Z",
+      "lastRecalledAt": "2026-06-10T12:04:01.814Z",
+      "queryHashes": [
+        "bb0032c5bdf2",
+        "899c59f9abef"
+      ],
+      "recallDays": [
+        "2026-06-07",
+        "2026-06-10"
+      ],
+      "conceptTags": [
+        "gateway",
+        "engines/symmetry-trap-old.py",
+        "sync/monitoring",
+        "ools/progress-sync.py",
+        "repo-memory",
+        "non-existent",
+        "ools/po-watchdog.py",
+        "ools/pm2-autopilot.py"
+      ]
+    },
+    "memory:memory/2026-06-03.md:187:205": {
+      "key": "memory:memory/2026-06-03.md:187:205",
+      "path": "memory/2026-06-03.md",
+      "startLine": 187,
+      "endLine": 205,
+      "source": "memory",
+      "snippet": "1. **`.pyc` cache stale** — `__pycache__` had old bytecode from before fixes. Both `cerebus_live_bridge.cpython-311.pyc` and `symmetry_trap.cpython-311.pyc` needed deletion. 2. **12 PM hard exit in bridge** — Removed from bridge main loop (was never in old bridge, old bridge traded through afternoon) 3. **Multiple bridge instances** — Disabled cron \"Bridge Health Check + Auto-Restart\" was spawning 11+ instances. Killed all, confirmed single instance. 4. **`sym` vs `symbol` bug in `send_order()`** — Lines 229, 230, 235, 236 used `sym` (undefined in function scope) instead of `symbol` (the parameter name). This caused `name 'sym' is not defined` error on ST entry (GBPAUD.PRO). **NOT YET FIX",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-08T01:06:43.468Z",
+      "lastRecalledAt": "2026-06-10T12:04:01.814Z",
+      "queryHashes": [
+        "bb0032c5bdf2",
+        "899c59f9abef"
+      ],
+      "recallDays": [
+        "2026-06-07",
+        "2026-06-10"
+      ],
+      "conceptTags": [
+        "symmetry-trap.cpython-311.pyc",
+        "auto-restart",
+        "send-order",
+        "gbpaud.pro",
+        "pyc",
+        "cache",
+        "stale",
+        "pycache"
+      ]
+    },
+    "memory:memory/2026-06-03.md:224:243": {
+      "key": "memory:memory/2026-06-03.md:224:243",
+      "path": "memory/2026-06-03.md",
+      "startLine": 224,
+      "endLine": 243,
+      "source": "memory",
+      "snippet": "1. **`.pyc` cache stale** — `__pycache__` had old bytecode from before fixes. Both `cerebus_live_bridge.cpython-311.pyc` and `symmetry_trap.cpython-311.pyc` needed deletion. 2. **12 PM hard exit in bridge** — Removed from bridge main loop (was never in old bridge, old bridge traded through afternoon) 3. **Multiple bridge instances** — Disabled cron \"Bridge Health Check + Auto-Restart\" was spawning 11+ instances. Killed all, confirmed single instance. 4. **`sym` vs `symbol` bug in `send_order()`** — Lines 229, 230, 235, 236 used `sym` (undefined in function scope) instead of `symbol` (the parameter name). This caused `name 'sym' is not defined` error on ST entry (GBPAUD.PRO). ### Bridge",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-08T01:06:43.468Z",
+      "lastRecalledAt": "2026-06-10T12:04:01.814Z",
+      "queryHashes": [
+        "bb0032c5bdf2",
+        "899c59f9abef"
+      ],
+      "recallDays": [
+        "2026-06-07",
+        "2026-06-10"
+      ],
+      "conceptTags": [
+        "symmetry-trap.cpython-311.pyc",
+        "auto-restart",
+        "send-order",
+        "gbpaud.pro",
+        "pyc",
+        "cache",
+        "stale",
+        "pycache"
+      ]
+    },
+    "memory:memory/2026-06-04.md:274:285": {
+      "key": "memory:memory/2026-06-04.md:274:285",
+      "path": "memory/2026-06-04.md",
+      "startLine": 274,
+      "endLine": 285,
+      "source": "memory",
+      "snippet": "**ISSUE:** Bridge log shows TWO scan lines per timestamp (e.g., Scan #35 and Scan #25 at 13:55:00 with slightly different equity readings). This indicates two bridge processes are running simultaneously. **Risk:** Duplicate entries, conflicting closes, race conditions on MT5 positions. **Action needed:** Kill the older bridge process, keep only the latest one. Requires checking PIDs and killing the stale one. ### Status at 13:55 EDT - Equity: ~$65.00 (trending up from $64.62 at 13:00) - Open positions: 2 (CHFJPY BUY, EURUSD SELL) - No new signals since deploy - Bridge scanning normally otherwise",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-08T01:06:43.468Z",
+      "lastRecalledAt": "2026-06-10T12:04:01.814Z",
+      "queryHashes": [
+        "bb0032c5bdf2",
+        "899c59f9abef"
+      ],
+      "recallDays": [
+        "2026-06-07",
+        "2026-06-10"
+      ],
+      "conceptTags": [
+        "e.g",
+        "65.00",
+        "64.62",
+        "issue",
+        "bridge",
+        "log",
+        "shows",
+        "two"
+      ]
+    },
+    "memory:memory/obsidian-vault/2026-05-31.md:1:49": {
+      "key": "memory:memory/obsidian-vault/2026-05-31.md:1:49",
+      "path": "memory/obsidian-vault/2026-05-31.md",
+      "startLine": 1,
+      "endLine": 49,
+      "source": "memory",
+      "snippet": "# 2026-05-31 — Daily Log > **Last Update:** 2026-06-01 01:16 EDT > **Mode:** UNIFIED FIELD | **Memory:** PERSISTENT --- ## Phase Status ### Track A — Tradovate/NinjaScript Migration **Status: COMPLETE (7/7 deliverables)** - `crypto/CryptoAssetScanner.py` — 23.8KB - `tradovate/CEREBUS_ST_NT8.cs` — 21.9KB - `tradovate/CEREBUS_P90_NT8.cs` — 25.4KB - `tradovate/CEREBUS_BacktestHarness.cs` — 12.4KB - `tradovate/CEREBUS_DeployConfig.json` — 3.1KB - `tradovate/CEREBUS_TradeCopier.cs` — 7.0KB - `tradovate/CEREBUS_AssetPresets.cs` — 10.1KB - All files written, awaiting MAD to import in NT8 GUI ### Track B — Crypto **Status: BLOCKED (needs MAD approval to retry)** - Previous",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-08T02:06:30.452Z",
+      "lastRecalledAt": "2026-06-08T02:06:30.452Z",
+      "queryHashes": [
+        "9e5671136ef0"
+      ],
+      "recallDays": [
+        "2026-06-07"
+      ],
+      "conceptTags": [
+        "tradovate/ninjascript",
+        "7/7",
+        "crypto/cryptoassetscanner.py",
+        "23.8kb",
+        "tradovate/cerebus-st-nt8.cs",
+        "21.9kb",
+        "tradovate/cerebus-p90-nt8.cs",
+        "25.4kb"
+      ]
+    },
+    "memory:memory/archive/2026-05-19.md:131:151": {
+      "key": "memory:memory/archive/2026-05-19.md:131:151",
+      "path": "memory/archive/2026-05-19.md",
+      "startLine": 131,
+      "endLine": 151,
+      "source": "memory",
+      "snippet": "- **MAD's UI direction:** Simple chat for regular use + rooms for complex tasks. Take best from Genspark/Claude/Manus. Agent terminal showing PowerShell/work output. Good+good=great philosophy. ## 15:46-16:00 EDT — MAD'S LATEST DIRECTIVES (Message #2918) - **MAD's #1 priority:** Forward test DMR on MT5 demo account - **MAD's #2:** Farm — \"have the farm move unto first post you check and just post update i got @\" - **MAD provided ProtonMail credentials:** wifiking999@protonmail.com / Teflondon1718! - **MAD:** \"Use iacer for last response and begin I'm gone for the day\" - **GitHub repos sent for review:** 1. https://github.com/ruvnet/RuView.git — Agent visualization 2. https://gi",
+      "recallCount": 6,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 6,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-10T12:04:18.188Z",
+      "lastRecalledAt": "2026-06-10T17:45:15.824Z",
+      "queryHashes": [
+        "ac9de9aa0875",
+        "7e3fbec73a43",
+        "6735e3319693",
+        "e78a4e182633",
+        "b37f96315cdd",
+        "3e0d2224851e"
+      ],
+      "recallDays": [
+        "2026-06-10"
+      ],
+      "conceptTags": [
+        "genspark/claude/manus",
+        "powershell/work",
+        "46-16",
+        "protonmail.com",
+        "github.com/ruvnet/ruview.git",
+        "mad's",
+        "direction",
+        "simple"
+      ]
+    },
+    "memory:memory/2026-05-31.md:141:165": {
+      "key": "memory:memory/2026-05-31.md:141:165",
+      "path": "memory/2026-05-31.md",
+      "startLine": 141,
+      "endLine": 165,
+      "source": "memory",
+      "snippet": "**Real fix applied (structural, not declarative):** 1. MEMORY.md: Added HARD GATE block at top — after ANY deliverable: write HEARTBEAT → send Telegram to MAD → STOP — no exceptions 2. HEARTBEAT.md: Added AWAITING DIRECTIVE status + hard stop rule 3. The LAST action before idle is now a Telegram message to MAD — not just writing a file **Current state:** Everything complete, nothing running. Backtest campaign wrapper bug identified but NOT fixed (awaiting MAD directive). Track B crypto failed (awaiting MAD directive on whether to retry). **Backtest wrapper bug details (for when MAD gives go-ahead):** - ST engine: SymmetryTrapEngine.process_bar() exists, not run_backtest() - P90 en",
+      "recallCount": 3,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 3,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-10T12:04:18.188Z",
+      "lastRecalledAt": "2026-06-10T17:43:08.634Z",
+      "queryHashes": [
+        "ac9de9aa0875",
+        "e78a4e182633",
+        "b37f96315cdd"
+      ],
+      "recallDays": [
+        "2026-06-10"
+      ],
+      "conceptTags": [
+        "memory.md",
+        "heartbeat.md",
+        "go-ahead",
+        "symmetrytrapengine.process-bar",
+        "run-backtest",
+        "real",
+        "fix",
+        "applied"
+      ]
+    },
+    "memory:memory/2026-05-31.md:252:279": {
+      "key": "memory:memory/2026-05-31.md:252:279",
+      "path": "memory/2026-05-31.md",
+      "startLine": 252,
+      "endLine": 279,
+      "source": "memory",
+      "snippet": "2. HEARTBEAT.md: Added AWAITING DIRECTIVE status + hard stop rule 3. The LAST action before idle is now a Telegram message to MAD — not just writing a file **Current state:** Everything complete, nothing running. Backtest campaign wrapper bug identified but NOT fixed (awaiting MAD directive). Track B crypto failed (awaiting MAD directive on whether to retry). **Backtest wrapper bug details (for when MAD gives go-ahead):** - ST engine: SymmetryTrapEngine.process_bar() exists, not run_backtest() - P90 engine: module function is run_backtest(), not run_p90_backtest() - Campaign script calls wrong method names → 0 trades for all assets - Fix is straightforward: correct the wrapper to",
+      "recallCount": 3,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 3,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-10T12:04:18.188Z",
+      "lastRecalledAt": "2026-06-10T17:43:08.634Z",
+      "queryHashes": [
+        "ac9de9aa0875",
+        "e78a4e182633",
+        "b37f96315cdd"
+      ],
+      "recallDays": [
+        "2026-06-10"
+      ],
+      "conceptTags": [
+        "heartbeat.md",
+        "go-ahead",
+        "symmetrytrapengine.process-bar",
+        "run-backtest",
+        "run-p90-backtest",
+        "added",
+        "awaiting",
+        "directive"
+      ]
+    },
+    "memory:memory/obsidian-vault/2026-05-31.md:94:106": {
+      "key": "memory:memory/obsidian-vault/2026-05-31.md:94:106",
+      "path": "memory/obsidian-vault/2026-05-31.md",
+      "startLine": 94,
+      "endLine": 106,
+      "source": "memory",
+      "snippet": "- Cron fleet: 2 active (Overnight Report 5AM, DRIFT 6:45AM Sun/Wed/Sat) - Watchdog: Active - Vault writes: Configured, needs improvement (per SAGE audit) --- ## SAGE Audit v2 **Status: COMPLETE** - Report: `execution/SAGE_AUDIT_20260531_Environment_Utilization_v2.md` - Key finding: OWL writes to `progress/` (53 files) instead of Obsidian vault (10 files) - 3 structural fixes recommended: External checkpoint gate, vault-first write wrapper, context injection pipeline - Verdict: \"Improving in structure, degrading in practice\"",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-10T15:37:29.010Z",
+      "lastRecalledAt": "2026-06-10T15:38:40.915Z",
+      "queryHashes": [
+        "d086611df159",
+        "03737ae293f8"
+      ],
+      "recallDays": [
+        "2026-06-10"
+      ],
+      "conceptTags": [
+        "sun/wed/sat",
+        "vault-first",
+        "cron",
+        "fleet",
+        "active",
+        "overnight",
+        "report",
+        "5am"
+      ]
+    },
+    "memory:memory/archive/2026-05-19.md:60:79": {
+      "key": "memory:memory/archive/2026-05-19.md:60:79",
+      "path": "memory/archive/2026-05-19.md",
+      "startLine": 60,
+      "endLine": 79,
+      "source": "memory",
+      "snippet": "- **Key files:** agent-environment/public/css/chat-v3.css (new), agent-environment/public/js/chat-v3.js (new), agent-environment/public/index.html (upgraded) ## 15:46-16:00 EDT — MAD'S LATEST DIRECTIVES (Message #2918) - **MAD's #1 priority:** Forward test DMR on MT5 demo account (\"now that the mt5 is good forward test on the demo account\") - **MAD's #2:** Farm — \"have the farm move unto first post you check and just post update i got @\" - **MAD provided ProtonMail credentials:** wifiking999@protonmail.com / Teflondon1718! (for account registration) - **MAD:** \"Use iacer for last response and begin I'm gone for the day\" - **MAD:** \"have the farm move unto first post you check and jus",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-10T17:41:03.858Z",
+      "lastRecalledAt": "2026-06-10T17:45:15.824Z",
+      "queryHashes": [
+        "6735e3319693",
+        "3e0d2224851e"
+      ],
+      "recallDays": [
+        "2026-06-10"
+      ],
+      "conceptTags": [
+        "46-16",
+        "protonmail.com",
+        "key",
+        "environment",
+        "public",
+        "css",
+        "chat",
+        "new"
+      ]
+    },
+    "memory:memory/2026-05-31.md:90:113": {
+      "key": "memory:memory/2026-05-31.md:90:113",
+      "path": "memory/2026-05-31.md",
+      "startLine": 90,
+      "endLine": 113,
+      "source": "memory",
+      "snippet": "- VaultWriter import + write tested and confirmed working - Real Obsidian vault at C:\\Users\\wifik\\Downloads\\o2c accessible (12 categories) - Vault access guide written to vault: execution/OC2_VAULT_ACCESS_GUIDE.md - Created tools/obsidian_access.py (vault_write, vault_read, vault_list) — zero-dependency utility for subagents - Subagents can now write directly to Obsidian — no routing through OWL - MEMORY.md updated with Obsidian access block at top - continuity_memory.json bumped to v2.2 - Reviewed team-chat: PM wrote full vault architecture breakdown (two-vault design, VaultWriter fix, API endpoints) ## 04:20 EDT - MAD STEPPING AWAY + DASHBOARD BUILD GREEN-LIT - MAD directive:",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-10T17:45:15.824Z",
+      "lastRecalledAt": "2026-06-10T17:45:15.824Z",
+      "queryHashes": [
+        "3e0d2224851e"
+      ],
+      "recallDays": [
+        "2026-06-10"
+      ],
+      "conceptTags": [
+        "tools/obsidian-access.py",
+        "vault-write",
+        "vault-read",
+        "vault-list",
+        "zero-dependency",
+        "memory.md",
+        "continuity-memory.json",
+        "v2.2"
+      ]
+    },
+    "memory:memory/2026-05-31.md:201:224": {
+      "key": "memory:memory/2026-05-31.md:201:224",
+      "path": "memory/2026-05-31.md",
+      "startLine": 201,
+      "endLine": 224,
+      "source": "memory",
+      "snippet": "- Vault access guide written to vault: execution/OC2_VAULT_ACCESS_GUIDE.md - Created tools/obsidian_access.py (vault_write, vault_read, vault_list) — zero-dependency utility for subagents - Subagents can now write directly to Obsidian — no routing through OWL - MEMORY.md updated with Obsidian access block at top - continuity_memory.json bumped to v2.2 - Reviewed team-chat: PM wrote full vault architecture breakdown (two-vault design, VaultWriter fix, API endpoints) ## 04:20 EDT - MAD STEPPING AWAY + DASHBOARD BUILD GREEN-LIT - MAD directive: \"last task I'm stepping away\" — build dashboard, use cron jobs, report when team done - MAD provided GitHub repos list (6 repos) for design",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-10T17:45:15.824Z",
+      "lastRecalledAt": "2026-06-10T17:45:15.824Z",
+      "queryHashes": [
+        "3e0d2224851e"
+      ],
+      "recallDays": [
+        "2026-06-10"
+      ],
+      "conceptTags": [
+        "tools/obsidian-access.py",
+        "vault-write",
+        "vault-read",
+        "vault-list",
+        "zero-dependency",
+        "memory.md",
+        "continuity-memory.json",
+        "v2.2"
+      ]
+    },
+    "memory:memory/archive/2026-05-18.md:469:492": {
+      "key": "memory:memory/archive/2026-05-18.md:469:492",
+      "path": "memory/archive/2026-05-18.md",
+      "startLine": 469,
+      "endLine": 492,
+      "source": "memory",
+      "snippet": "- RA role expanded: librarian for resources, highly organized structures - Agent environment: 6 rooms, 11 agents - Fork/white-label strategy: take GitHub repos, repackage as apps/services - Capital Maxer principle: maximum gain with lowest overhead/effort ### 37. Current Active Agents (15:58 EDT) | Agent | Task | Status | |-------|------|--------| | resourceadaptertimeout | Timeout analysis + Navtoor + tools | ⏳ Running | | labmanagercheckpoint | Fix 10 strategies w/ checkpointing | ⏳ Running | | farmmanagerday3 | Day 2 gaps + Day 3 plan | ⏳ Running | | envbuilderfix | Fix agent environment UI | ⏳ Running | | softwareceo | Meditate on rooms/venv | ⏳ Running (NEW) | | capitalmax",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-06-10T17:45:15.824Z",
+      "lastRecalledAt": "2026-06-10T17:45:15.824Z",
+      "queryHashes": [
+        "3e0d2224851e"
+      ],
+      "recallDays": [
+        "2026-06-10"
+      ],
+      "conceptTags": [
+        "fork/white-label",
+        "apps/services",
+        "overhead/effort",
+        "rooms/venv",
+        "role",
+        "expanded",
+        "librarian",
+        "resources"
+      ]
+    }
+  }
+}
