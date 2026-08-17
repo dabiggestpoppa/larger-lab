@@ -1,0 +1,46 @@
+{
+  "base_commit": "0edb1c72f2a42ab6305ae9cd34071019d47f29a2",
+  "references": [
+    {
+      "alloc_id": "A0_50_50",
+      "heat_id": "H0",
+      "f_pct": 1.0,
+      "expected_cagr_pct": 71.2131,
+      "got_cagr_pct": 71.2131,
+      "expected_max_dd_pct": 5.1886,
+      "got_max_dd_pct": 5.1886,
+      "pass": true
+    },
+    {
+      "alloc_id": "A0_50_50",
+      "heat_id": "H0",
+      "f_pct": 2.0,
+      "expected_cagr_pct": 190.3112,
+      "got_cagr_pct": 190.3112,
+      "expected_max_dd_pct": 10.1695,
+      "got_max_dd_pct": 10.1695,
+      "pass": true
+    },
+    {
+      "alloc_id": "A1_70_30",
+      "heat_id": "H0",
+      "f_pct": 1.0,
+      "expected_cagr_pct": 74.5699,
+      "got_cagr_pct": 74.5699,
+      "expected_max_dd_pct": 6.9684,
+      "got_max_dd_pct": 6.9684,
+      "pass": true
+    },
+    {
+      "alloc_id": "A2_100_0_A",
+      "heat_id": "H0",
+      "f_pct": 1.0,
+      "expected_cagr_pct": 79.1548,
+      "got_cagr_pct": 79.1548,
+      "expected_max_dd_pct": 10.3039,
+      "got_max_dd_pct": 10.3039,
+      "pass": true
+    }
+  ],
+  "pass": true
+}

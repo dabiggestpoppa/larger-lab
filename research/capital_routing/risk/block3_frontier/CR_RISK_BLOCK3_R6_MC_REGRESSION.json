@@ -1,0 +1,29 @@
+{
+  "reference": "R6_HEAT_POLICY_MONTE_CARLO.csv H1-1.00-REJ 70/30 block f=1.0 n=4000 seed=MC_SEED+3",
+  "policy": "H1-1.00-REJ",
+  "w_A_pct": 70.0,
+  "scheme": "block",
+  "f_pct": 1.0,
+  "n_paths": 4000,
+  "seed": 20260818,
+  "reproduced": {
+    "max_dd_p95": 0.06255654012486321,
+    "max_dd_p99": 0.07294349088687693,
+    "exp_cagr": 0.6922843089504896,
+    "median_cagr": 0.6904679486727081,
+    "P_dd_ge_10": 0.0,
+    "P_dd_ge_20": 0.0,
+    "P_technical_ruin": 0.0
+  },
+  "sealed": {
+    "max_dd_p95": 0.0625565401248632,
+    "max_dd_p99": 0.0729434908868769,
+    "exp_cagr": 0.6922843089504896,
+    "median_cagr": 0.6904679486727081,
+    "P_dd_ge_10": 0.0,
+    "P_dd_ge_20": 0.0,
+    "P_technical_ruin": 0.0
+  },
+  "max_abs_diff": 2.7755575615628914e-17,
+  "pass": true
+}

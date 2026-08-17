@@ -1,0 +1,32 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-III-STATIC-SCALE-FRONTIER",
+  "seed": 20260815,
+  "banks": {
+    "block": {
+      "n_paths": 10000,
+      "seed": 20260815,
+      "layout_hash": "0a58d8914ca2748c7e57d5b589adef754c210878feb2def9cb665e811e7979e4"
+    },
+    "episode": {
+      "n_paths": 10000,
+      "seed": 20260815,
+      "layout_hash": "ae172cfba76ac29dbf741b5cce91a87a7b06c48b330691165dacac507a6d6d5a"
+    },
+    "iid": {
+      "n_paths": 2000,
+      "seed": 20260815,
+      "layout_hash": "e8a80f39af4c68ee2170d96dc456795d82714d110a500f3bd8545905acbbc42e"
+    }
+  },
+  "block_params": {
+    "size_events": 25,
+    "scheme": "stationary-block"
+  },
+  "episode_params": {
+    "interval_h": 12,
+    "structure": "R1/R6 frozen"
+  },
+  "iid_note": "diagnostic only; lower path count documented",
+  "source_ledger_hash": "n/a",
+  "common_random_numbers": "one canonical bank per scheme reused across all alloc/heat/scale/edge cells"
+}
