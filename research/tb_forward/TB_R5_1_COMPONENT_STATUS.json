@@ -1,0 +1,33 @@
+{
+  "checkpoint": "TB-R5.1-ACTIVE-MARKET-SHADOW-COMPLETION",
+  "status": "PASS",
+  "components": {
+    "real_mt5_connectivity": "PASS",
+    "real_broker_environment": "PASS (OxSecurities-Demo, USD, DEMO trade mode)",
+    "real_symbol_resolution": "PASS (GBPAUD.PRO, GBPNZD.PRO, AUDNZD.PRO)",
+    "real_symbol_specs": "PASS",
+    "server_clock_calibration": "PASS (server = UTC+3; tick-clock calibrated reference; strategy bar key raw/verbatim)",
+    "real_synchronized_closed_m5_feed": "PASS (21 unique advancing bars, ages 300-576 s)",
+    "forming_bar_exclusion": "PASS",
+    "real_ticks": "PASS (quote age p50 0 ms, p99 19 s)",
+    "quote_quality_measured": "PASS",
+    "spread_distribution_measured": "PASS (active-market)",
+    "cross_leg_skew_measured": "PASS (p50 2 ms, p99 14 ms)",
+    "bar_arrival_distribution_measured": "PASS",
+    "metadata_stability": "PASS (static fields 0 variants / 40 re-reads)",
+    "tb_b_exact_neutral_weights": "PASS (194/194, median residual 6.62%, frozen 10% GATE K)",
+    "lot_translation": "PASS (real specs, 194/194)",
+    "r3_durable_ledger": "PASS",
+    "restart_reconciliation": "PASS (FLAT_MATCH)",
+    "broker_ownership_protection": "PASS (foreign magic history protected)",
+    "control_isolation": "PASS (405 control events, zero broker interaction)",
+    "order_send_guard": "PASS (0 calls, 506 cycles guarded)",
+    "historical_parity": "PASS (194/194, 405/405, 0 mismatches)",
+    "strategy_science": "UNCHANGED",
+    "suite_battery": "PASS (R1.1 36/36, R2 26/26, R3 40/40, P6 411/411, P7 160/160)"
+  },
+  "execution_authorization": "NOT_AUTHORIZED",
+  "demo_authorized": false,
+  "live_authorized": false,
+  "shadow_forward_seal": "PASS (active-market evidence complete)"
+}

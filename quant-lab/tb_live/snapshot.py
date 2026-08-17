@@ -109,6 +109,8 @@ class MT5MarketDataAdapter:
         self._mt5 = _mt5
         self.bar_seconds = bar_seconds
         self._initialized = False
+        self._server_offset_s: Optional[float] = None
+        self._offset_measured_at: Optional[datetime] = None
 
     def initialize(self, **kwargs) -> bool:
         if self._mt5 is None:
@@ -128,6 +130,53 @@ class MT5MarketDataAdapter:
         """MT5 has no direct server-time call; use the newest tick time across
         the triangle as the broker-time reference."""
         return None
+
+    # ── server-clock calibration ────────────────────────────────────────
+    # MT5 returns tick/bar epochs in SERVER time (here UTC+3, verified). The
+    # sealed strategy key is the RAW server epoch (parity-frozen; session math
+    # est_hour=(hour-5)%24 runs on it verbatim). But bar-closure and quote-age
+    # math must run on ONE consistent clock: we calibrate the server offset
+    # from a FRESH tick and express the reference in server time. If no fresh
+    # tick is available the offset stays None and the feed fails closed (it
+    # cannot prove closure) -- never silently mix clocks.
+
+    def calibrate_server_clock(self,
+                               symbol: Optional[str] = None) -> Optional[float]:
+        """(Re)measure the broker server-vs-UTC offset from a live tick.
+
+        Accepts only |offset| < 12h (a real server timezone). A stale tick
+        (weekend/closed market, hours old) falls outside that window and the
+        previous calibration is retained; a fresh tick refreshes it.
+        """
+        if self._mt5 is None or not self._initialized:
+            return None
+        try:
+            tk = self._mt5.symbol_info_tick(symbol or "GBPAUD.PRO")
+        except Exception:  # noqa: BLE001
+            return None
+        if tk is None:
+            return None
+        now = utcnow()
+        off = float(tk.time) - now.timestamp()
+        if abs(off) < 12 * 3600:
+            self._server_offset_s = off
+            self._offset_measured_at = now
+        return self._server_offset_s
+
+    def server_offset_seconds(self) -> Optional[float]:
+        return self._server_offset_s
+
+    def server_reference(self,
+                         real_now: Optional[datetime] = None) -> datetime:
+        """Reference clock expressed in SERVER time, for closure/age math.
+
+        Falls back to the raw real-UTC reference when uncalibrated; the feed
+        then fails closed on bars it cannot prove closed.
+        """
+        now = to_utc_aware(real_now) or utcnow()
+        if self._server_offset_s is None:
+            return now
+        return now + timedelta(seconds=self._server_offset_s)
 
     def _to_closed_bar(self, symbol: str, raw) -> ClosedBar:
         # raw is either a dict (mock adapter) or a numpy structured-array

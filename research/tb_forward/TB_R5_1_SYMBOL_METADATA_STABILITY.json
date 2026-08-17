@@ -1,0 +1,29 @@
+{
+  "checkpoint": "TB-R5.1-ACTIVE-MARKET-SHADOW-COMPLETION",
+  "status": "PASS",
+  "method": "Broker symbol metadata (digits, point, tick size/value, contract size, volume min/max/step, trade mode, filling mode) re-read live during active market. Static-field stability: 40 re-reads across ~234 s. Hash per cycle during runtime; any drift blocks the engine (METADATA_DRIFT_BLOCKED).",
+  "resolved_symbols": {
+    "GBPAUD": "GBPAUD.PRO",
+    "GBPNZD": "GBPNZD.PRO",
+    "AUDNZD": "AUDNZD.PRO"
+  },
+  "static_fields_stability": {
+    "re_reads": 40,
+    "window_seconds": 234,
+    "variants": 0,
+    "result": "PASS — digits/point/tick_size/contract_size/volume_min/volume_max/volume_step/trade_mode/filling_mode identical across all re-reads"
+  },
+  "price_derived_field": {
+    "trade_tick_value": "drifts with price (0.003% over window) — expected, price-derived, not metadata drift",
+    "note": "the per-cycle metadata hash includes trade_tick_value, which legitimately varies across processes; static fields show 0 variants"
+  },
+  "runtime_hash_variants": 14,
+  "runtime_hash_note": "variants driven solely by price-derived trade_tick_value; no static-field drift; drift-block rule active and never fired",
+  "specs_snapshot": {
+    "GBPAUD.PRO": {"digits": 5, "point": 1e-05, "trade_tick_size": 1e-05, "trade_tick_value": 0.70834, "contract_size": 100000.0, "volume_min": 0.01, "volume_max": 200.0, "volume_step": 0.01, "trade_mode": 4, "filling_mode": 2},
+    "GBPNZD.PRO": {"digits": 5, "point": 1e-05, "trade_tick_size": 1e-05, "trade_tick_value": 0.58894, "contract_size": 100000.0, "volume_min": 0.01, "volume_max": 200.0, "volume_step": 0.01, "trade_mode": 4, "filling_mode": 2},
+    "AUDNZD.PRO": {"digits": 5, "point": 1e-05, "trade_tick_size": 1e-05, "trade_tick_value": 0.58894, "contract_size": 100000.0, "volume_min": 0.01, "volume_max": 200.0, "volume_step": 0.01, "trade_mode": 4, "filling_mode": 2}
+  },
+  "blocking_rule": "metadata change -> METADATA_DRIFT_BLOCKED, no strategy evaluation",
+  "result": "PASS"
+}

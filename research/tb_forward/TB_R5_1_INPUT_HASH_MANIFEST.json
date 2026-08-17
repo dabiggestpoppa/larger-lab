@@ -1,0 +1,43 @@
+{
+  "checkpoint": "TB-R5.1-ACTIVE-MARKET-SHADOW-COMPLETION",
+  "base_commit": "59a42cd64bb9e658b01b2313559609226f72485a",
+  "r5_commit": "59a42cd64bb9e658b01b2313559609226f72485a",
+  "hash_algorithm": "sha256 (first 16 hex chars of blob at base commit unless noted)",
+  "inputs_unchanged_from_r5": {
+    "canonical_m5_gbpaud": "cedf3453bcbffde0",
+    "canonical_m5_gbpnzd": "9e421aa1310a41b5",
+    "canonical_m5_audnzd": "8a0f08e34853b27d",
+    "r0_truth_lock": "0821c20d7c736eb8",
+    "r1_1_forward_config": "f90883bf1e4b83de",
+    "r1_1_strategy_wrapper": "bb2afa36d3fadbce",
+    "execution_contract": "1123bdc81caddc07",
+    "atomic_execution_layer": "4f07eefa36411a01",
+    "r2_market_data_contract": "9f3f874b3d50861f",
+    "r3_state_machine": "c44c5721792c652a",
+    "r3_persistence_ledger": "7afc47e6c4a7486c",
+    "r3_reconciliation": "7ff236b4c2daba60"
+  },
+  "inputs_modified_in_r5_1": {
+    "r2_market_data_adapter_snapshot_py": {
+      "base_hash": "8459a23cb65da175",
+      "working_hash": "c858f201bcee0171",
+      "change": "MECHANICAL — real MT5 returns numpy structured arrays, not dicts; adapter now accepts both. Plus server-clock calibration: closure/age math uses a server-calibrated reference (tick-clock delta) instead of assuming MT5 epochs are UTC. Strategy bar key unchanged (raw server-time M5 open time, verbatim per R2).",
+      "science_impact": "none — R2 suite 26/26 and 265,809-bar parity unchanged"
+    },
+    "r5_shadow_runtime": {
+      "base_hash": "4632501177a5bdce",
+      "working_hash": "bd0f8f545e818f30",
+      "change": "MECHANICAL — --out-csv flag so R5.1 writes its own artifact; server-clock calibration wiring; metadata re-read evidence. No strategy logic change.",
+      "science_impact": "none"
+    }
+  },
+  "r4_replay_harness": "bed0546ec284eaf8",
+  "r4_real_mt5_harness": "2d629d906611b6ef",
+  "full_engine_harness": "a5bf226e2f028a2a",
+  "canonical_csvs_in_repo": {
+    "quant-lab/data/GBPAUD_M5.csv": "cedf3453bcbffde0",
+    "quant-lab/data/GBPNZD_M5.csv": "9e421aa1310a41b5",
+    "quant-lab/data/AUDNZD_M5.csv": "8a0f08e34853b27d"
+  },
+  "note": "All scientific inputs byte-identical to R5. Only mechanical adapter/runtime changes. Historical parity: PRIMARY 194/194, CONTROL 405/405, 0 lifecycle mismatches."
+}

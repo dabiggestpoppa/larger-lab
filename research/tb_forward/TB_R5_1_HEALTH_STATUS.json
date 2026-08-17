@@ -1,0 +1,21 @@
+{
+  "mt5_connected": true,
+  "market_open_status": "OPEN (active FX session observed)",
+  "observation_window_utc": ["2026-08-16 21:41:21", "2026-08-16 23:20:25"],
+  "symbol_resolution": {
+    "GBPAUD": "GBPAUD.PRO",
+    "GBPNZD": "GBPNZD.PRO",
+    "AUDNZD": "AUDNZD.PRO"
+  },
+  "latest_synchronized_bar": "21 unique advancing synchronized M5 bars",
+  "bar_age": "300-576 s (all signal bars within one M5 cycle of close)",
+  "latest_z": "0.0 across window (no threshold breach observed)",
+  "primary_state": "NO_BASKET",
+  "control_state": "NO_BASKET",
+  "ledger_health": "OK (integrity clean, 21 SIGNAL_OBSERVED events, monotonic sequence)",
+  "broker_reconciliation_state": "FLAT_MATCH",
+  "quote_health": "ACTIVE (quote age p50 0 ms, p99 19 s; skew p50 2 ms, p99 14 ms)",
+  "order_send": "DISABLED (guard ACTIVE, 0 calls)",
+  "last_error_rejection": "none during active-market window (NO_NEW_SIGNAL_BAR dedup cycles are healthy no-ops)",
+  "status": "HEALTHY"
+}

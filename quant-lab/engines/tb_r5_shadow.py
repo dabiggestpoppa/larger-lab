@@ -63,6 +63,7 @@ from engines.tb_r4_real_mt5 import (  # noqa: E402
 
 ROOT = Path(__file__).parent.parent.parent
 OUT = ROOT / "research" / "tb_forward"
+RUNTIME_CSV_DEFAULT = "TB_R5_ACTIVE_MARKET_RUNTIME.csv"
 OUT.mkdir(parents=True, exist_ok=True)
 STATE_DIR = ROOT / "quant-lab" / "state" / "triangular_basis"
 LEDGER_PATH = STATE_DIR / "tb_r5_ledger.db"
@@ -87,7 +88,7 @@ RUNTIME_CSV_HEADER = [
     "quote_age_ms_ga", "quote_age_ms_gn", "quote_age_ms_an",
     "cross_leg_skew_ms", "metadata_hash", "ledger_seq", "engine_health",
     "reconciliation_state", "order_send_guard", "shadow_order_would_send",
-    "note",
+    "server_offset_s", "clock_calibration", "note",
 ]
 
 
@@ -105,10 +106,12 @@ class ShadowForwardRuntime:
     """Continuous active-market SHADOW observation of the full engine."""
 
     def __init__(self, cycles: int = 60, cycle_sleep: float = 15.0,
-                 ledger_path=None, offline: bool = False):
+                 ledger_path=None, offline: bool = False,
+                 csv_path: str = RUNTIME_CSV_DEFAULT):
         self.cycles = cycles
         self.cycle_sleep = cycle_sleep
         self.ledger_path = str(ledger_path or LEDGER_PATH)
+        self.csv_path = csv_path
         self.offline = offline
         self.audit = RealMT5Audit(offline=offline)
         self.feed: Optional[SynchronizedTriangleFeed] = None
@@ -121,6 +124,7 @@ class ShadowForwardRuntime:
         self.metadata_baseline: Optional[str] = None
         self.rows: List[dict] = []
         self.started_at = datetime.now(timezone.utc)
+        self.server_offset_s: Optional[float] = None
 
     # ── lifecycle ─────────────────────────────────────────────────────
     def start(self) -> bool:
@@ -137,6 +141,8 @@ class ShadowForwardRuntime:
         self._install_order_send_guard()
         # metadata baseline hash (locked at first successful read)
         self.metadata_baseline = self._current_spec_hash()
+        # server-clock calibration (best effort; None until a fresh tick)
+        self.server_offset_s = self.audit.adapter.calibrate_server_clock()
         return True
 
     def stop(self) -> None:
@@ -202,9 +208,21 @@ class ShadowForwardRuntime:
             "reconciliation_state": "FLAT_OK",
             "order_send_guard": "ACTIVE",
             "shadow_order_would_send": "",
+            "server_offset_s": "",
+            "clock_calibration": "",
             "note": "",
         }
-        ref = datetime.now(timezone.utc)
+        # server-clock calibration: closure/age math runs in SERVER time (the
+        # frozen strategy key is the raw server epoch; see snapshot.py). A
+        # fresh tick refreshes the offset; a stale tick keeps the last good
+        # value; None => feed fails closed (cannot prove closure).
+        self.server_offset_s = self.audit.adapter.calibrate_server_clock()
+        ref = self.audit.adapter.server_reference(datetime.now(timezone.utc))
+        row["server_offset_s"] = (
+            "" if self.server_offset_s is None
+            else round(self.server_offset_s, 1))
+        row["clock_calibration"] = (
+            "OK" if self.server_offset_s is not None else "NO_FRESH_TICK")
 
         # 1) synchronized closed M5 signal snapshot
         snap = self.feed.get_synchronized_closed_triangle(reference_time=ref)
@@ -343,7 +361,7 @@ class ShadowForwardRuntime:
                             "PENDING_TERMINAL_VALIDATION (never PASS from mocks)."}
         summary = {"cycles_run": 0, "valid_snapshots": 0,
                    "stale_cycles": 0, "order_send_attempts": 0}
-        with open(OUT / "TB_R5_ACTIVE_MARKET_RUNTIME.csv", "a",
+        with open(OUT / self.csv_path, "a",
                   newline="", encoding="utf-8") as f:
             w = csv.DictWriter(f, fieldnames=RUNTIME_CSV_HEADER)
             if f.tell() == 0:
@@ -373,6 +391,9 @@ class ShadowForwardRuntime:
                 c: self.resolution.mapping.get(c) for c in CANONICAL
             } if self.resolution else None,
             "metadata_hash_baseline": self.metadata_baseline,
+            "server_offset_s": self.server_offset_s,
+            "clock_calibration": ("OK" if self.server_offset_s is not None
+                                  else "NO_FRESH_TICK"),
             "order_send_guard": "ACTIVE",
             "ledger_path": self.ledger_path,
             "ledger_integrity_problems":
@@ -428,11 +449,14 @@ def main() -> int:
     ap.add_argument("--cycle-sleep", type=float, default=15.0)
     ap.add_argument("--restart-test", action="store_true")
     ap.add_argument("--offline", action="store_true")
+    ap.add_argument("--out-csv", default=RUNTIME_CSV_DEFAULT,
+                    help="runtime CSV filename under research/tb_forward/")
     args = ap.parse_args()
 
     rt = ShadowForwardRuntime(cycles=args.cycles,
                               cycle_sleep=args.cycle_sleep,
-                              offline=args.offline)
+                              offline=args.offline,
+                              csv_path=args.out_csv)
     if args.restart_test:
         if not rt.start():
             print(json.dumps({"status": PENDING}, indent=2))

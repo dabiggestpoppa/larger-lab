@@ -1,0 +1,22 @@
+{
+  "checkpoint": "TB-R5.1-ACTIVE-MARKET-SHADOW-COMPLETION",
+  "status": "PASS",
+  "real_broker_state": {
+    "terminal": "Ox Securities MetaTrader 5",
+    "server": "OxSecurities-Demo",
+    "account_trade_mode": 0,
+    "positions_total": 0,
+    "tb_magic_positions": 0,
+    "pending_orders_total": 0,
+    "tb_magic_pending_orders": 0,
+    "tb_magic_orders_last_7d": 0,
+    "foreign_positions_protected": 0,
+    "foreign_magic_history_present": "BTCUSD history with foreign magic observed and ignored (protected)"
+  },
+  "reconciliation_result": "FLAT_MATCH (local ledger flat, broker flat, resume allowed)",
+  "ownership_rule": "positions are TB-owned only via magic 31082026 + durable basket linkage; foreign/manual positions never touched; TB magic without linkage = ORPHAN -> block (R3)",
+  "manual_intervention_detection": "PASS (R3 manual_leg_close_detected; live account has no positions so no manual divergence present)",
+  "orphan_detection": "PASS (R3 orphan_broker_basket_detected; live account has zero TB-magic positions)",
+  "note": "Reconciliation is READ-ONLY in R5.1 (R3 classification only, never recovery orders).",
+  "evidence_sources": ["TB_R5_1_RESTART_AUDIT.json", "R3 tb_r3_tests.py reconciliation_case_matrix_a_through_n"]
+}

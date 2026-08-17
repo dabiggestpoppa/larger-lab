@@ -1,0 +1,47 @@
+{
+  "checkpoint": "TB-R5.1-ACTIVE-MARKET-SHADOW-COMPLETION",
+  "status": "PASS",
+  "bars_replayed": 265809,
+  "primary": {
+    "expected": 194,
+    "actual": 194,
+    "canonical": 194,
+    "entry_mismatches": 0,
+    "direction_mismatches": 0,
+    "exit_mismatches": 0,
+    "reason_mismatches": 0,
+    "weight_mismatches": 0,
+    "max_z_diff": 1e-12,
+    "parity_pass": true
+  },
+  "control": {
+    "expected": 405,
+    "actual": 405,
+    "canonical": 405,
+    "entry_mismatches": 0,
+    "direction_mismatches": 0,
+    "exit_mismatches": 0,
+    "reason_mismatches": 0,
+    "weight_mismatches": 0,
+    "parity_pass": true
+  },
+  "parity_pass": true,
+  "failure_injection": {
+    "signals_injected": 8,
+    "classification_safe": true,
+    "note": "deterministic failures (leg1 reject -> 2/3 partial -> BROKEN_HEDGE -> mock flatten) — CODE-PATH VERIFIED in simulation; broker partial-fill behavior remains PENDING_DEMO_EXECUTION_VALIDATION"
+  },
+  "long_run": {
+    "bars_replayed": 50000,
+    "ledger_events": 451,
+    "primary_opens": 50,
+    "integrity_clean": true,
+    "open_db_handles": 1,
+    "note": "bounded buffers (400), no leak"
+  },
+  "strategy_math_changed": false,
+  "weighting_changed": false,
+  "market_data_semantics_changed": false,
+  "session_semantics_changed": false,
+  "note": "PRIMARY 194/194 + CONTROL 405/405 lifecycle parity exact; all five mismatch classes measured at 0."
+}

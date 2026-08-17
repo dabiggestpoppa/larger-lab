@@ -1,0 +1,29 @@
+{
+  "checkpoint": "TB-R5.1-ACTIVE-MARKET-SHADOW-COMPLETION",
+  "window_utc": [
+    "2026-08-16 21:41:21",
+    "2026-08-16 23:20:25"
+  ],
+  "cycles": 506,
+  "unique_synchronized_bars": 21,
+  "health_distribution": {
+    "HEALTHY": 35,
+    "NO_NEW_SIGNAL_BAR": 471
+  },
+  "sync_rate_pct": 6.92,
+  "dedup_rate_pct": 93.08,
+  "server_offset_s": {
+    "first": 10769.5,
+    "last": 10797.9,
+    "drift_s": 28.4
+  },
+  "metadata_hash_variants": 14,
+  "metadata_hash_note": "hash includes price-derived trade_tick_value (0.003% drift); static fields stable (0 variants / 40 re-reads)",
+  "order_send_calls": 0,
+  "signals_observed": 35,
+  "primary_intents": 0,
+  "z_range": [
+    0.0,
+    0.0
+  ]
+}

@@ -1,0 +1,8 @@
+metric,value
+unique_bars,21
+bar_open_deltas_s,"[300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300]"
+bar_age_s_p50,308.0
+bar_age_s_p90,517.0
+bar_age_s_p95,543.0
+bar_age_s_p99,576.0
+bar_age_s_max,576

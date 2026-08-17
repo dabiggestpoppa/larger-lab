@@ -1,0 +1,13 @@
+{
+  "checkpoint": "TB-R5.1-ACTIVE-MARKET-SHADOW-COMPLETION",
+  "status": "PASS",
+  "guard_mechanism": "mt5.order_send is hard-trapped: any attempted call raises and fails the run immediately. The shadow runtime records order_send_guard state per cycle and SHADOW_ORDER_WOULD_SEND as the terminal shadow-intent record.",
+  "order_send_calls": 0,
+  "cycles_guarded": 506,
+  "shadow_intents_recorded": 0,
+  "real_orders": 0,
+  "execution_authorization": "NOT_AUTHORIZED",
+  "demo_authorized": false,
+  "live_authorized": false,
+  "result": "PASS — zero order_send attempts across 506 active-market cycles"
+}

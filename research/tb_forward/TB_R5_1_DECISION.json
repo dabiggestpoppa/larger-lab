@@ -1,0 +1,68 @@
+{
+  "checkpoint": "TB-R5.1-ACTIVE-MARKET-SHADOW-COMPLETION",
+  "status": "PASS",
+  "base_commit": "59a42cd64bb9e658b01b2313559609226f72485a",
+  "r5_commit": "59a42cd64bb9e658b01b2313559609226f72485a",
+
+  "active_market_verified": true,
+  "real_mt5_connected": true,
+  "real_broker_verified": true,
+  "symbol_resolution_pass": true,
+  "symbol_metadata_stability_pass": true,
+
+  "fresh_bar_advancement_pass": true,
+  "closed_bar_sync_pass": true,
+  "real_tick_update_pass": true,
+  "quote_quality_pass": true,
+  "spread_distribution_pass": true,
+  "cross_leg_skew_pass": true,
+
+  "shadow_runtime_pass": true,
+  "shadow_signal_lifecycle_pass": true,
+  "lot_translation_pass": true,
+  "ledger_health_pass": true,
+  "restart_reconciliation_pass": true,
+  "control_isolation_pass": true,
+  "order_send_guard_pass": true,
+
+  "historical_parity_pass": true,
+  "primary_event_count": 194,
+  "control_event_count": 405,
+  "primary_lifecycle_mismatches": 0,
+  "control_lifecycle_mismatches": 0,
+
+  "strategy_math_changed": false,
+  "weighting_changed": false,
+  "market_data_semantics_changed": false,
+  "session_semantics_changed": false,
+
+  "broker_partial_fill_validation": "PENDING_DEMO_EXECUTION_VALIDATION",
+  "broker_fill_mode_validation": "PENDING_DEMO_EXECUTION_VALIDATION",
+  "broker_slippage_validation": "PENDING_DEMO_EXECUTION_VALIDATION",
+  "broker_atomic_close_validation": "PENDING_DEMO_EXECUTION_VALIDATION",
+
+  "execution_authorization": "NOT_AUTHORIZED",
+  "demo_authorized": false,
+  "live_authorized": false,
+
+  "demo_execution_gate_ready": true,
+  "human_review_required": true,
+  "next_checkpoint_recommended": "TB-R6-DEMO-EXECUTION-CANARY",
+
+  "observation_summary": {
+    "window_utc": ["2026-08-16 21:41:21", "2026-08-16 23:20:25"],
+    "cycles": 506,
+    "unique_advancing_synchronized_bars": 21,
+    "healthy_cycles": 35,
+    "dedup_cycles": 471,
+    "signal_bar_age_sec": "300-576 (all within one M5 cycle of close)",
+    "quote_age_ms_p50_p90_p99": [0, 5000, 19000],
+    "spread_points_p50_by_leg": {"GBPAUD": 12, "GBPNZD": 16, "AUDNZD": 10},
+    "cross_leg_skew_ms_p50_p99": [2, 14],
+    "order_send_calls": 0,
+    "primary_signals_observed": 0,
+    "control_signals_observed": 0
+  },
+
+  "note": "Active-market shadow seal complete. No threshold breach occurred during the observation window (z stayed within normal band) — R5.1 proves continuous active-market plumbing, not signal frequency; signal lifecycle remains covered by the 194/405 historical replay. R6 would be the first order-submitting checkpoint and requires separate human authorization."
+}
