@@ -1,0 +1,32 @@
+{
+  "checkpoint": "TB-R6.1A",
+  "url": "http://127.0.0.1:8765",
+  "bind": "127.0.0.1 only",
+  "read_only": true,
+  "no_trading_controls": true,
+  "serving_from": "stable path C:\\Users\\wifik\\Desktop\\larger-lab-tb-forward-engine (old temp dashboard process terminated and replaced)",
+  "fields": [
+    "ENGINE", "UPTIME", "LAST HEARTBEAT", "HEARTBEAT AGE", "WORKER PID",
+    "WORKER STATE", "DESIRED", "MT5", "ACCOUNT GATE", "STRATEGY STATE",
+    "MARKET", "LAST M5 BAR", "LAST SIGNAL", "OPEN BASKET",
+    "TODAY TB PNL $", "TODAY TB RETURN %", "OPEN BASKET PNL $",
+    "TB SINCE DEPLOY $", "TB SINCE DEPLOY %", "ACCOUNT EQUITY",
+    "FREE DISK GB", "LAST ERROR"
+  ],
+  "colors": {
+    "green": "ONLINE / fresh heartbeat / MT5+account healthy",
+    "yellow": "DEGRADED / worker alive but execution blocked",
+    "red": "OFFLINE / heartbeat dead",
+    "stopped": "explicit user stop",
+    "market_closed": "shown as WAITING (not failure)"
+  },
+  "evidence": {
+    "http_200_json": true,
+    "engine": "ONLINE",
+    "strategy_state": "FLAT",
+    "heartbeat_age": "2 s",
+    "today_tb_pnl_pct": 0.0,
+    "deploy_tb_pnl_pct": 0.0
+  },
+  "pass": true
+}

@@ -1,0 +1,23 @@
+{
+  "checkpoint": "TB-R6.1A",
+  "mechanism": "worker writes durable heartbeat every 10 s to tb_runtime.db (WAL); dashboard reads DB only",
+  "stable_path_evidence": {
+    "heartbeat_rows": 105,
+    "ids_monotonic": true,
+    "journal_mode": "wal",
+    "worker_pid": 15444,
+    "state": "FLAT",
+    "mt5_connected": true,
+    "account_gate": true,
+    "last_closed_bar": "2026-08-17 15:40:00+00:00 (advancing server-time M5 key)",
+    "schema": "v2 with today_pnl_pct (migration auto-applied to older DBs)"
+  },
+  "status_derivation": {
+    "green": "heartbeat age <= 30 s",
+    "yellow": "30-90 s or MT5/feed issue",
+    "red": "> 90 s",
+    "stopped": "explicit user stop (desired state)"
+  },
+  "market_closure_not_failure": "ONLINE_MARKET_CLOSED state; supervisor alive; no orders",
+  "pass": true
+}

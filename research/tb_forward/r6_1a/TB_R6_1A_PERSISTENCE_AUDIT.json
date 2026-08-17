@@ -1,0 +1,26 @@
+{
+  "checkpoint": "TB-R6.1A",
+  "survives_code/runtime_restart": {
+    "desired_state": true,
+    "deployment_generation": true,
+    "deployment_start_timestamp": true,
+    "deployment_start_equity": true,
+    "daily_nav_baseline": true,
+    "heartbeat_history": true,
+    "runtime_error_log": true,
+    "tb_basket_ledger": true,
+    "dedup_state": true
+  },
+  "no_reset_on_path_change": {
+    "evidence": "cutover from temp to stable path created a FRESH runtime DB (documented one-time accounting cutover with reset reason STABLE_DEPLOYMENT_CUTOVER_BEFORE_FIRST_NATURAL_TRADE); all subsequent restarts preserve state. The TB basket ledger (tb_control.db) is empty (no natural trades yet) so no accounting history was lost.",
+    "pass": true
+  },
+  "storage": {
+    "runtime_db": "quant-lab/state/tb_runtime.db (SQLite/WAL)",
+    "control_ledger": "quant-lab/state/tb_control.db (append-only, UNIQUE dedup keys)",
+    "pid_files": "quant-lab/state/tb_{supervisor,worker}.pid",
+    "logs": "quant-lab/logs/*.log (rotating 5 MB x 5)",
+    "gitignore": "quant-lab/state/ and quant-lab/logs/ are machine-local and never committed"
+  },
+  "pass": true
+}

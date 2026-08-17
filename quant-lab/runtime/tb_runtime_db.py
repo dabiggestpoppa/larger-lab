@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS runtime_heartbeat (
     last_signal_time TEXT NOT NULL,
     open_basket_id TEXT NOT NULL,
     today_pnl REAL NOT NULL,
+    today_pnl_pct REAL NOT NULL,
     open_pnl REAL NOT NULL,
     deploy_pnl REAL NOT NULL,
     deploy_pnl_pct REAL NOT NULL,
@@ -88,7 +89,17 @@ class RuntimeDB:
         self._conn.row_factory = sqlite3.Row
         self._conn.execute("PRAGMA journal_mode=WAL")
         self._conn.executescript(_SCHEMA)
+        self._migrate()
         self._conn.commit()
+
+    def _migrate(self) -> None:
+        """v1 -> v2: add today_pnl_pct to runtime_heartbeat (older DBs)."""
+        cols = {r[1] for r in self._conn.execute(
+            "PRAGMA table_info(runtime_heartbeat)")}
+        if "today_pnl_pct" not in cols:
+            self._conn.execute(
+                "ALTER TABLE runtime_heartbeat ADD COLUMN today_pnl_pct REAL NOT NULL DEFAULT 0")
+            self._conn.commit()
 
     # ── status kv ────────────────────────────────────────────────────────
     def get_status(self, key: str, default: str = "") -> str:
@@ -134,9 +145,10 @@ class RuntimeDB:
             cur = self._conn.execute(
                 "INSERT INTO runtime_heartbeat(ts,pid,generation,state,"
                 "mt5_connected,account_gate,market_open,last_closed_bar,"
-                "last_signal_time,open_basket_id,today_pnl,open_pnl,"
-                "deploy_pnl,deploy_pnl_pct,account_equity,disk_free_gb,"
-                "last_error) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                "last_signal_time,open_basket_id,today_pnl,today_pnl_pct,"
+                "open_pnl,deploy_pnl,deploy_pnl_pct,account_equity,"
+                "disk_free_gb,last_error) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,"
+                "?,?,?,?,?,?)",
                 (hb.get("ts", _now_iso()), int(hb.get("pid", 0)),
                  str(hb.get("generation", "")), str(hb.get("state", "")),
                  1 if hb.get("mt5_connected") else 0,
@@ -146,6 +158,7 @@ class RuntimeDB:
                  str(hb.get("last_signal_time", "")),
                  str(hb.get("open_basket_id", "")),
                  float(hb.get("today_pnl", 0.0)),
+                 float(hb.get("today_pnl_pct", 0.0)),
                  float(hb.get("open_pnl", 0.0)),
                  float(hb.get("deploy_pnl", 0.0)),
                  float(hb.get("deploy_pnl_pct", 0.0)),

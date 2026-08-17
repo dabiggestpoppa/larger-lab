@@ -1,0 +1,18 @@
+{
+  "checkpoint": "TB-R6.1A",
+  "task_name": "TB-Runtime-Supervisor",
+  "repointed": true,
+  "approval": "explicit user approval for the exact schtasks command (request_elevation)",
+  "verified_xml": {
+    "command": "cmd",
+    "arguments": "/c cd /d C:\\Users\\wifik\\Desktop\\larger-lab-tb-forward-engine && C:\\Users\\wifik\\AppData\\Local\\Programs\\Python\\Python311\\python.exe -u C:\\Users\\wifik\\Desktop\\larger-lab-tb-forward-engine\\quant-lab\\runtime\\tb_supervisor.py",
+    "principal": "current user SID (interactive, limited privilege)",
+    "trigger": "AtLogOn",
+    "settings": "StartWhenAvailable; restart policy (3 attempts, 1 min interval); no time limit",
+    "status": "Ready"
+  },
+  "old_task_reference": "C:\\Users\\wifik\\AppData\\Local\\Temp\\tb-r6 (replaced)",
+  "no_duplicate_task": "single task entry; recreated with /F (overwrite)",
+  "task_scheduler_path_correct": true,
+  "pass": true
+}

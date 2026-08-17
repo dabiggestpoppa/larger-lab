@@ -127,7 +127,7 @@ def build_status(rdb: RuntimeDB) -> dict:
                         else "NO"),
         "open_basket_pnl": (hb["open_pnl"] if hb else 0.0),
         "today_tb_pnl": (hb["today_pnl"] if hb else 0.0),
-        "today_tb_pnl_pct": None,
+        "today_tb_pnl_pct": (hb["today_pnl_pct"] if hb else 0.0),
         "deploy_tb_pnl": (hb["deploy_pnl"] if hb else 0.0),
         "deploy_tb_pnl_pct": (hb["deploy_pnl_pct"] if hb else 0.0),
         "account_equity": (hb["account_equity"] if hb else 0.0),
@@ -157,18 +157,21 @@ table{border-collapse:collapse}td{padding:3px 12px 3px 0}
 const E=['engine_status','uptime','last_heartbeat','heartbeat_age','worker_pid',
 'worker_state','desired_state','mt5_status','account_gate','strategy_state',
 'market_open','last_closed_bar','last_signal_time','open_basket',
-'today_tb_pnl','deploy_tb_pnl','open_basket_pnl','account_equity',
+'today_tb_pnl','today_tb_pnl_pct','open_basket_pnl',
+'deploy_tb_pnl','deploy_tb_pnl_pct','account_equity',
 'disk_free_gb','last_error'];
 const LBL={engine_status:'ENGINE',uptime:'UPTIME',last_heartbeat:'LAST HEARTBEAT',
 heartbeat_age:'HEARTBEAT',worker_pid:'WORKER PID',worker_state:'WORKER STATE',
 desired_state:'DESIRED',mt5_status:'MT5',account_gate:'ACCOUNT GATE',
 strategy_state:'STRATEGY',market_open:'MARKET',last_closed_bar:'LAST M5 BAR',
 last_signal_time:'LAST SIGNAL',open_basket:'OPEN BASKET',
-today_tb_pnl:'TODAY TB PNL',deploy_tb_pnl:'TB SINCE DEPLOY',
-open_basket_pnl:'OPEN PNL',account_equity:'ACCOUNT EQUITY',
+today_tb_pnl:'TODAY TB PNL $',today_tb_pnl_pct:'TODAY TB RETURN %',
+open_basket_pnl:'OPEN BASKET PNL $',deploy_tb_pnl:'TB SINCE DEPLOY $',
+deploy_tb_pnl_pct:'TB SINCE DEPLOY %',account_equity:'ACCOUNT EQUITY',
 disk_free_gb:'FREE DISK GB',last_error:'LAST ERROR'};
-const FMT={today_tb_pnl:v=>'$'+v.toFixed(2),deploy_tb_pnl:v=>'$'+v.toFixed(2),
-open_basket_pnl:v=>'$'+v.toFixed(2),account_equity:v=>'$'+v.toFixed(2),
+const FMT={today_tb_pnl:v=>'$'+v.toFixed(2),today_tb_pnl_pct:v=>v.toFixed(3)+'%',
+open_basket_pnl:v=>'$'+v.toFixed(2),deploy_tb_pnl:v=>'$'+v.toFixed(2),
+deploy_tb_pnl_pct:v=>v.toFixed(3)+'%',account_equity:v=>'$'+v.toFixed(2),
 disk_free_gb:v=>v.toFixed(2)};
 async function load(){try{
  const r=await fetch('/api/status');const d=await r.json();

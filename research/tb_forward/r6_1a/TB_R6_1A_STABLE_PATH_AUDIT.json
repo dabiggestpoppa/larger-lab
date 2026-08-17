@@ -1,0 +1,26 @@
+{
+  "checkpoint": "TB-R6.1A",
+  "old_runtime_path": "C:\\Users\\wifik\\AppData\\Local\\Temp\\tb-r6",
+  "old_path_temporary": true,
+  "stable_runtime_path": "C:\\Users\\wifik\\Desktop\\larger-lab-tb-forward-engine",
+  "stable_path_selection": "user's permanent larger-lab repository via the established Desktop worktree convention (siblings: larger-lab-cerebus, tbx-d01-seal); durable git worktree of branch tb-forward-engine owned by C:\\Users\\wifik\\Desktop\\larger-lab",
+  "branch": "tb-forward-engine",
+  "commit": "61cecf7d2a44c7a9f33b0f1bd060f79a15cf613f (base)",
+  "temporary_path_removed_from_authority": true,
+  "evidence": {
+    "temp_worktree_removed": "git worktree remove --force (branch freed; no longer in git worktree list)",
+    "temp_runtime_stopped": "tbctl stop -> worker and supervisor both down (pid_alive=False) before removal",
+    "temp_path_not_temp_no_longer_used": "Task Scheduler task action now references the stable path only"
+  },
+  "runtime_files_present_at_stable": [
+    "quant-lab/runtime/tb_supervisor.py",
+    "quant-lab/runtime/tb_worker.py",
+    "quant-lab/runtime/tb_dashboard.py",
+    "quant-lab/runtime/tbctl.py",
+    "quant-lab/runtime/tb_runtime_db.py",
+    "quant-lab/runtime/tb_runtime_config.py",
+    "quant-lab/runtime/tb_proc.py",
+    "quant-lab/runtime/tb_r6_1_tests.py"
+  ],
+  "pass": true
+}

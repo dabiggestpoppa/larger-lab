@@ -1,0 +1,15 @@
+{
+  "checkpoint": "TB-R6.1A",
+  "mechanism": "PID-file lock (worker + supervisor); stale-pid reclaim when owner dead",
+  "handoff_singleton": {
+    "evidence": "during stable-path startup a duplicate worker attempt logged 'SINGLETON BLOCKED: worker singleton already held by live pid 15444' — the guard fired correctly",
+    "live_workers": 1,
+    "pass": true
+  },
+  "unit_tests": {
+    "second_worker_blocked": true,
+    "stale_pid_reclaim": true,
+    "split_brain_policy": "BLOCKED_SINGLETON_AMBIGUITY — never spawn a second trader; heartbeat + pid-file liveness both required"
+  },
+  "pass": true
+}

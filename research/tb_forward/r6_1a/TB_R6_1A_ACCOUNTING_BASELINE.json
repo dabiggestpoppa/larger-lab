@@ -1,0 +1,17 @@
+{
+  "checkpoint": "TB-R6.1A",
+  "deployment_generation": "TB-R6-FWD-DEMO-001",
+  "previous_generation": "GEN-SMOKE (R6.1) -> GEN-20260817T123026 (transient fresh-start auto-gen) -> TB-R6-FWD-DEMO-001",
+  "conversion_performed_once": true,
+  "baseline_reset_reason": "STABLE_DEPLOYMENT_CUTOVER_BEFORE_FIRST_NATURAL_TRADE",
+  "baseline_reset_ts": "2026-08-17T12:40:00Z (approx)",
+  "deployment_baseline_equity": 25254.35,
+  "deployment_baseline_persistent": true,
+  "no_natural_trades_before_cutover": true,
+  "no_further_reset_on_restart": true,
+  "stable_path_recorded": "C:\\Users\\wifik\\Desktop\\larger-lab-tb-forward-engine",
+  "daily_boundary_frozen": "broker/server account day (calibrated server clock; this broker UTC+3; 00:00 server = 21:00 UTC)",
+  "daily_nav_persists_across": ["worker restart", "dashboard restart", "supervisor restart", "PC reboot"],
+  "deployment_equity_source": "real MT5 account_info().equity at cutover",
+  "pass": true
+}

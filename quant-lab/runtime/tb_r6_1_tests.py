@@ -281,6 +281,48 @@ def _iso_from_epoch(epoch: float) -> str:
     return datetime.fromtimestamp(epoch, tz=timezone.utc).isoformat()
 
 
+def test_daily_return_server_day(tmp: Path) -> None:
+    """Server-day daily boundary + today return % (R6.1A accounting)."""
+    import tb_worker as W
+    from tb_runtime_db import RuntimeDB
+    from tb_runtime_config import CONTROL_MAGIC
+    from datetime import datetime
+
+    w = W.DemoWorker("GEN-T")
+    w.rdb = RuntimeDB(tmp / "sr.db")
+    w.mt5_ok = True
+    # server clock = UTC+3 (this broker); day rolls at 00:00 server = 21:00 UTC
+    w.env.server_offset_s = 3 * 3600.0
+
+    day, midnight = w._server_day()
+    now_server = time.time() + w.env.server_offset_s
+    check("server-day key = server-local date",
+          day == datetime.utcfromtimestamp(now_server).date().isoformat())
+    # midnight_utc must be exactly 21:00 UTC of the previous UTC date
+    check("server midnight in UTC = 21:00 prev-day UTC",
+          datetime.utcfromtimestamp(midnight).hour == 21)
+
+    # freeze server-day NAV + one owned deal today, one just before midnight
+    w.rdb.freeze_daily_nav(day, 1000.0)
+    w.rdb.set_status("deployment_start_equity", "1000")
+    w.rdb.set_status("deployment_start_epoch", str(midnight - 86400))
+    deals = [
+        SimpleNamespace(magic=CONTROL_MAGIC, comment="TB|B1|GBPAUD|L1",
+                        profit=10.0, time=midnight + 60),      # today (server)
+        SimpleNamespace(magic=CONTROL_MAGIC, comment="TB|B2|GBPNZD|L2",
+                        profit=99.0, time=midnight - 60),      # yesterday (server)
+    ]
+    W.mt5 = SimpleNamespace(history_deals_get=lambda s, e: deals,
+                            positions_get=lambda: [])
+    pnl = w._pnl()
+    check("today PnL uses server-day boundary (99 excluded)",
+          abs(pnl["today_pnl"] - 10.0) < 1e-6, f"{pnl['today_pnl']}")
+    check("today return % = 1.0%", abs(pnl["today_pnl_pct"] - 1.0) < 1e-9,
+          f"{pnl['today_pnl_pct']}")
+    check("server_day key in pnl", pnl["server_day"] == day)
+    w.rdb.close()
+
+
 def main() -> int:
     print("TB-R6.1 runtime audits")
     with tempfile.TemporaryDirectory() as td:
@@ -290,6 +332,7 @@ def main() -> int:
         test_dashboard_status(tmp)
         test_worker_paths(tmp)
         test_pnl_accounting(tmp)
+        test_daily_return_server_day(tmp)
         test_log_rotation(tmp)
     out = QUANT_LAB.parent / "research" / "tb_forward" / "r6_1"
     out.mkdir(parents=True, exist_ok=True)

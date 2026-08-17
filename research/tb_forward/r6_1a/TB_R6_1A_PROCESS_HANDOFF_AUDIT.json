@@ -1,0 +1,21 @@
+{
+  "checkpoint": "TB-R6.1A",
+  "handoff_sequence": [
+    "1. old runtime final evidence: 275 heartbeats, FLAT, no open basket, generation GEN-SMOKE",
+    "2. intentional stop (tbctl stop): worker alive=False, supervisor alive=False after 12 s",
+    "3. temp worktree removed; branch freed",
+    "4. stable worktree created at C:\\Users\\wifik\\Desktop\\larger-lab-tb-forward-engine @ 61cecf7d",
+    "5. Task Scheduler repointed to stable supervisor (user-approved)",
+    "6. start from stable path (tbctl start)",
+    "7. worker startup: RECONCILE flat/clean -> WARM 220 synchronized historical M5 bars -> DAILY NAV frozen (server day) -> DEPLOYMENT NAV frozen",
+    "8. singleton: exactly one worker (pid 15444); a duplicate worker attempt logged SINGLETON_BLOCKED",
+    "9. heartbeat fresh (<= 10 s); dashboard ONLINE from stable path"
+  ],
+  "never_two_workers": true,
+  "old_supervisor_pid": "stopped before stable start",
+  "old_worker_pid": "stopped before stable start",
+  "new_supervisor_pid": 13720,
+  "new_worker_pid": 15444,
+  "reconciliation_before_execution": true,
+  "pass": true
+}

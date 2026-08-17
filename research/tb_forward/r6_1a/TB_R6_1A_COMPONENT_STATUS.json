@@ -1,0 +1,37 @@
+{
+  "checkpoint": "TB-R6.1A",
+  "components": {
+    "stable_path": "C:\\Users\\wifik\\Desktop\\larger-lab-tb-forward-engine",
+    "supervisor": "RUNNING (pid 13720)",
+    "worker": "RUNNING (pid 15444)",
+    "dashboard": "RUNNING (http://127.0.0.1:8765)",
+    "tbctl": "status/start/stop/restart verified",
+    "task_scheduler": "repointed to stable path (Ready, AtLogOn, current user)"
+  },
+  "live": {
+    "engine": "ONLINE",
+    "mt5": "CONNECTED",
+    "account_gate": "PASS",
+    "state": "FLAT",
+    "market_open": true,
+    "open_basket": "none",
+    "heartbeat": "2-10 s",
+    "today_pnl_usd": 0.0,
+    "today_return_pct": 0.0,
+    "deploy_pnl_usd": 0.0,
+    "deploy_return_pct": 0.0
+  },
+  "safety": {
+    "primary_execution_calls": 0,
+    "control_execution_calls": 0,
+    "foreign_positions_modified": 0,
+    "duplicate_orders": 0,
+    "singleton": "1 worker",
+    "strategy_science_changed": false
+  },
+  "tests": {
+    "r1_1": "36/36", "r2": "26/26", "r3": "40/40", "p6": "411/411",
+    "p7": "160/160", "runtime_audits": "34/34",
+    "replay": "primary 194/194, control 405/405, mismatches 0"
+  }
+}

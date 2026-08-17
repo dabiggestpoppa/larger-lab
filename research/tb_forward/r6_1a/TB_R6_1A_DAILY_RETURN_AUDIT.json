@@ -1,0 +1,22 @@
+{
+  "checkpoint": "TB-R6.1A",
+  "definition": "TODAY TB RETURN % = (realized TB-owned PnL for current broker/server account day + current unrealized TB-owned PnL) / start-of-day account equity",
+  "ownership": "TB magic (31082026/31082027) + comment tag 'TB|' + ledger linkage ONLY; manual trades / foreign EAs / other strategies excluded",
+  "daily_boundary": "broker/server account day; this broker server clock = UTC+3, so the day rolls at 00:00 server = 21:00 UTC (documented in runtime status; derived from the live calibrated offset at runtime, not hardcoded)",
+  "implementation": {
+    "worker": "_server_day() computes (server-day key, UTC epoch of server midnight) from the calibrated offset; _pnl() filters owned deals by that epoch and divides by the frozen daily NAV",
+    "dashboard": "TODAY TB PNL $ and TODAY TB RETURN % rendered from the heartbeat (schema v2)",
+    "heartbeat_schema": "added today_pnl_pct with ALTER TABLE migration for older DBs"
+  },
+  "unit_tests": [
+    {"name": "server-day key = server-local date", "pass": true},
+    {"name": "server midnight in UTC = 21:00 prev-day UTC (UTC+3)", "pass": true},
+    {"name": "today PnL uses server-day boundary (pre-midnight deal excluded)", "pass": true},
+    {"name": "today return % = 1.0% for $10 on $1000 baseline", "pass": true},
+    {"name": "foreign magic + same-magic-no-tag excluded", "pass": true}
+  ],
+  "live": {"today_pnl": 0.0, "today_pnl_pct": 0.0, "deploy_pnl": 0.0, "deploy_pnl_pct": 0.0},
+  "daily_pnl_usd_pass": true,
+  "daily_return_pct_pass": true,
+  "pass": true
+}

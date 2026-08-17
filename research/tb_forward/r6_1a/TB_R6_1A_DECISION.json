@@ -1,0 +1,60 @@
+{
+  "checkpoint": "TB-R6.1A-STABLE-LOCAL-RUNTIME-SEAL",
+  "status": "STABLE_DEPLOYED_WAITING_NATURAL_CANARY",
+  "base_commit": "61cecf7d2a44c7a9f33b0f1bd060f79a15cf613f",
+
+  "old_runtime_path": "C:\\Users\\wifik\\AppData\\Local\\Temp\\tb-r6",
+  "stable_runtime_path": "C:\\Users\\wifik\\Desktop\\larger-lab-tb-forward-engine",
+
+  "temporary_path_removed_from_authority": true,
+  "task_scheduler_path_correct": true,
+
+  "stable_supervisor_running": true,
+  "stable_worker_running": true,
+  "stable_dashboard_running": true,
+
+  "singleton_pass": true,
+  "heartbeat_pass": true,
+
+  "mt5_connected": true,
+  "account_gate_pass": true,
+  "broker_reconciliation_pass": true,
+
+  "deployment_generation": "TB-R6-FWD-DEMO-001",
+  "deployment_baseline_equity": 25254.35,
+  "deployment_baseline_persistent": true,
+
+  "daily_pnl_usd_pass": true,
+  "daily_return_pct_pass": true,
+  "deployment_pnl_usd_pass": true,
+  "deployment_return_pct_pass": true,
+
+  "dashboard_pass": true,
+
+  "auto_restart_pass": true,
+  "intentional_stop_pass": true,
+  "market_closure_resume_pass": true,
+
+  "runtime_stable_seal_pass": true,
+
+  "natural_canary_pass": false,
+
+  "primary_execution_calls": 0,
+  "foreign_positions_modified": 0,
+  "duplicate_orders": 0,
+
+  "historical_parity_pass": true,
+  "primary_event_count": 194,
+  "control_event_count": 405,
+  "lifecycle_mismatches": 0,
+
+  "strategy_math_changed": false,
+
+  "r6_full_pass": false,
+  "r7_ready": false,
+  "r7_authorized": false,
+  "live_authorized": false,
+
+  "next_checkpoint_recommended": "TB-R6.2-NATURAL-CANARY-EVIDENCE-SEAL (evidence-only, when the first natural z2.5 basket lifecycle completes; no strategy code changes)",
+  "notes": "Stable deployment fully sealed and the local demo runtime is left RUNNING from the stable Desktop worktree. Natural canary continues (event-driven; may wait days). One-time accounting cutover performed before any natural trade: generation converted to TB-R6-FWD-DEMO-001, baseline reset reason recorded, daily boundary frozen to broker/server day. Actual OS reboot marked MANUAL_VALIDATION_PENDING (not automated)."
+}

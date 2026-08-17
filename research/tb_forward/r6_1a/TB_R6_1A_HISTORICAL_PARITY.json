@@ -1,0 +1,27 @@
+{
+  "checkpoint": "TB-R6.1A",
+  "replay": "R4 full-engine integrated replay rerun fresh from the STABLE worktree (C:\\Users\\wifik\\Desktop\\larger-lab-tb-forward-engine)",
+  "bars": {"expected": 265809, "emitted": 265809, "skipped": 1},
+  "primary": {
+    "expected": 194, "actual": 194, "opens": 194, "closes": 194,
+    "entry_mismatches": 0, "direction_mismatches": 0, "exit_mismatches": 0,
+    "reason_mismatches": 0, "weight_mismatches": 0, "max_z_diff": 1e-12,
+    "parity_pass": true
+  },
+  "control": {
+    "expected": 405, "actual": 405, "opens": 405, "closes": 405,
+    "entry_mismatches": 0, "direction_mismatches": 0, "exit_mismatches": 0,
+    "reason_mismatches": 0, "weight_mismatches": 0, "max_z_diff": 1e-12,
+    "parity_pass": true
+  },
+  "failure_injection": {"signals_injected": 8, "classification_safe": true, "source": "R6.1 sealed artifact (strategy path untouched by R6.1A)"},
+  "long_run": {"pass": true, "source": "R6.1 sealed artifact"},
+  "ledger_reconstruction": {"baskets": 194, "open_verified": 0, "integrity_problems": []},
+  "suite_battery": {
+    "r1_1": "36/36", "r2": "26/26", "r3": "40/40",
+    "p6": "411/411 (cache rebuilt in fresh worktree)", "p7": "160/160",
+    "runtime_audits": "34/34 (incl. 5 new server-day/return-% tests)"
+  },
+  "parity_pass": true,
+  "strategy_math_changed": false
+}

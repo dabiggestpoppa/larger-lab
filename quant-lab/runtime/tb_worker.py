@@ -264,22 +264,36 @@ class DemoWorker:
         except Exception:
             return []
 
+    def _server_day(self) -> tuple:
+        """Broker/server account day (execution accounting boundary).
+
+        Server time = calibrated broker clock (this broker: UTC+3). The day
+        rolls at 00:00 SERVER time; the epoch of that midnight in UTC is
+        returned so deal windows and the daily NAV key are consistent.
+        Falls back to UTC when calibration is unavailable (fail-safe).
+        """
+        off = float(self.env.server_offset_s or 0.0)
+        server_now = time.time() + off
+        day = datetime.utcfromtimestamp(server_now).date().isoformat()
+        midnight_utc = int(server_now // 86400) * 86400 - off
+        return day, midnight_utc
+
     def _pnl(self) -> dict:
-        day_start = datetime.utcnow().replace(hour=0, minute=0, second=0,
-                                              microsecond=0)
+        day, day_start = self._server_day()
         dep_epoch = float(self.rdb.get_status("deployment_start_epoch", "0") or 0)
-        day_deals = [d for d in self._owned_deals(day_start.timestamp())
-                     if d.time >= day_start.timestamp()]
-        dep_deals = [d for d in self._owned_deals(dep_epoch or day_start.timestamp())]
+        day_deals = [d for d in self._owned_deals(day_start)
+                     if d.time >= day_start]
+        dep_deals = [d for d in self._owned_deals(dep_epoch or day_start)]
         open_pos = self._owned_positions()
         today_realized = sum(float(d.profit) for d in day_deals)
         open_pnl = sum(float(p.profit) for p in open_pos)
         dep_realized = sum(float(d.profit) for d in dep_deals)
         today_pnl = today_realized + open_pnl
         deploy_pnl = dep_realized + open_pnl
-        daily_eq = self.rdb.daily_nav(datetime.utcnow().date().isoformat()) or 0.0
+        daily_eq = self.rdb.daily_nav(day) or 0.0
         dep_eq = float(self.rdb.get_status("deployment_start_equity", "0") or 0)
         return {
+            "server_day": day,
             "today_pnl": today_pnl,
             "today_pnl_pct": (today_pnl / daily_eq * 100.0) if daily_eq else 0.0,
             "open_pnl": open_pnl,
@@ -293,10 +307,16 @@ class DemoWorker:
         if ai is None:
             return
         equity = float(ai.equity)
-        day = datetime.utcnow().date().isoformat()
+        # daily boundary = broker/server account day (calibrated server clock)
+        if self.env.server_offset_s is None:
+            try:
+                self.env.calibrate()
+            except Exception:
+                pass
+        day, _ = self._server_day()
         if self.rdb.daily_nav(day) is None:
             self.rdb.freeze_daily_nav(day, equity)
-            log.info("DAILY NAV frozen: %s equity=%.2f", day, equity)
+            log.info("DAILY NAV frozen (server day %s): equity=%.2f", day, equity)
         if not self.rdb.get_status("deployment_generation"):
             self.rdb.set_status("deployment_generation", self.generation)
             self.rdb.set_status("deployment_start_timestamp", _now_iso())
@@ -454,7 +474,9 @@ class DemoWorker:
             "last_closed_bar": self.last_bar_key,
             "last_signal_time": self.last_signal_time,
             "open_basket_id": self.open_basket_id or "",
-            "today_pnl": pnl["today_pnl"], "open_pnl": pnl["open_pnl"],
+            "today_pnl": pnl["today_pnl"],
+            "today_pnl_pct": pnl["today_pnl_pct"],
+            "open_pnl": pnl["open_pnl"],
             "deploy_pnl": pnl["deploy_pnl"],
             "deploy_pnl_pct": pnl["deploy_pnl_pct"],
             "account_equity": float(ai.equity) if ai else 0.0,
