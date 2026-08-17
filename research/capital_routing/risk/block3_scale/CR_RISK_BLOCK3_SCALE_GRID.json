@@ -1,0 +1,69 @@
+{
+  "allocations": {
+    "A0_50_50": {
+      "A": 0.5,
+      "B": 0.5,
+      "role": "diversification reference"
+    },
+    "A1_70_30": {
+      "A": 0.7,
+      "B": 0.3,
+      "role": "A-heavy robust reference"
+    },
+    "A2_100_0_A": {
+      "A": 1.0,
+      "B": 0.0,
+      "role": "edge-resilience / concentration reference"
+    },
+    "A3_0_100_B": {
+      "A": 0.0,
+      "B": 1.0,
+      "role": "DIAGNOSTIC ONLY"
+    }
+  },
+  "heat": {
+    "H0": {
+      "cap_mult": null,
+      "role": "unconstrained diagnostic"
+    },
+    "H1-1.00-REJ": {
+      "cap_mult": 1.0,
+      "role": "frozen R6 gross cap"
+    },
+    "H1-1.50-REJ": {
+      "cap_mult": 1.5,
+      "role": "frozen R6 gross cap"
+    },
+    "H1-2.00-REJ": {
+      "cap_mult": 2.0,
+      "role": "frozen R6 gross cap"
+    },
+    "H1-3.00-REJ": {
+      "cap_mult": 3.0,
+      "role": "frozen R6 gross cap"
+    }
+  },
+  "scale_ladder_pct": [
+    0.25,
+    0.5,
+    0.75,
+    1.0,
+    1.5,
+    2.0
+  ],
+  "outer_stress_pct": 3.0,
+  "edge_retention_states": [
+    1.0,
+    0.75,
+    0.5,
+    0.25
+  ],
+  "mc_schemes": [
+    "block",
+    "episode",
+    "iid"
+  ],
+  "primary_mc_path_count_min": 10000,
+  "mc_seed": 20260815,
+  "note": "Scale x allocation x heat x edge x scheme = the frozen surface executed in the NEXT checkpoint (CR-RISK-BLOCK-III-STATIC-SCALE-FRONTIER). No new caps / allocations created here."
+}

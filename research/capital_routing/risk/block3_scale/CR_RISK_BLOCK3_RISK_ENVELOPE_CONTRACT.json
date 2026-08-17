@@ -1,0 +1,34 @@
+{
+  "risk_envelopes_pct": [
+    5.0,
+    10.0,
+    15.0,
+    20.0,
+    25.0,
+    30.0
+  ],
+  "meaning": "For each scale/configuration, report whether historical and resampled max DD clears each envelope. Envelopes are research reference lines; human review chooses the eventual production risk tolerance. No single DD tolerance is selected here.",
+  "dd_threshold_ladder_pct": [
+    5.0,
+    10.0,
+    15.0,
+    20.0,
+    25.0,
+    30.0
+  ],
+  "survival_floors": [
+    0.9,
+    0.8,
+    0.75,
+    0.5
+  ],
+  "return_thresholds": {
+    "terminal_below_1_0": 1.0,
+    "cagr_below": [
+      0.0,
+      0.1,
+      0.25,
+      0.5
+    ]
+  }
+}

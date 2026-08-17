@@ -1,0 +1,63 @@
+{
+  "ScaleConfig": {
+    "description": "Typed immutable configuration for one scale run. No hidden global config.",
+    "fields": {
+      "allocation": {
+        "type": "FamilyAllocation",
+        "description": "Frozen family allocation weights {A: x, B: 1-x}. Never optimized.",
+        "valid": [
+          "A0_50_50",
+          "A1_70_30",
+          "A2_100_0_A",
+          "A3_0_100_B"
+        ]
+      },
+      "f_total_pct": {
+        "type": "float",
+        "units": "percent (1.0 == 1% of account)",
+        "description": "TOTAL portfolio base risk fraction. Event fraction = family_weight * f_total_pct / 100.",
+        "frozen_ladder": [
+          0.25,
+          0.5,
+          0.75,
+          1.0,
+          1.5,
+          2.0
+        ],
+        "outer_stress": 3.0
+      },
+      "gross_heat_cap_mult": {
+        "type": "float | null",
+        "units": "multiples of f_total",
+        "description": "H1 gross-cap multiplier RELATIVE TO f_total; cap scales linearly with f_total. None == H0 unconstrained diagnostic.",
+        "frozen_references": [
+          null,
+          1.0,
+          1.5,
+          2.0,
+          3.0
+        ]
+      },
+      "treatment": {
+        "type": "str",
+        "valid": [
+          "REJECT",
+          "SCALE"
+        ],
+        "description": "Frozen H1 admission semantics."
+      }
+    }
+  },
+  "admission": {
+    "module": "src/capital_routing/static_risk_architecture.py",
+    "function": "admit_book",
+    "causal": true,
+    "invariant_to_f_total": true,
+    "never_reads_returns": true
+  },
+  "compounding": {
+    "historical": "overlap-exact hourly geometric compounding (frozen R6 primitive)",
+    "monte_carlo": "per-path cumprod(1 + f_total * admitted_w * r) on the frozen R6 path layout",
+    "insolvency": "paths with equity <= 0 flagged INSOLVENT_PATH, never clipped"
+  }
+}

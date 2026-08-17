@@ -1,0 +1,20 @@
+{
+  "cutoff": "2025-04-01 07:48:00+00:00",
+  "cutoff_fraction": 0.6,
+  "future_perturbation": {
+    "factor": 1.5,
+    "decisions_identical": true,
+    "admitted_f_identical": true,
+    "equity_before_cutoff_identical": true,
+    "equity_after_cutoff_differs": true,
+    "pass": true
+  },
+  "truncation": {
+    "retained_events": 534,
+    "decision_records_match": true,
+    "admitted_f_match": true,
+    "equity_through_cutoff_match": true,
+    "pass": true
+  },
+  "all_pass": true
+}

@@ -1,0 +1,12 @@
+component,status,evidence
+capital_scale_engine,COMPLETE,frozen H0 parity + H1 admission parity reproduced
+static_architecture_reuse,PASS,admission routes through static_risk_architecture.admit_book
+f_total_scale_semantics,LOCKED,event fraction = family_weight * f_total; unit tests
+compounding_semantics,LOCKED,geometric equity; overlap-exact historical; per-path MC
+mc_schemes,LOCKED,block/episode/iid frozen; >= 10000 paths for frontier
+edge_retention_transform,LOCKED,R5/R6 positive-return scaling reused; 100/75/50/25
+empirical_kelly_diagnostic,DIAGNOSTIC_ONLY,computed at 4 edges x 3 scopes; unstable at 12/12 cells
+causality,PASS,future perturbation + truncation
+dd_adaptive_sizing,NOT_CREATED,forbidden in D0
+new_heat_policy,NOT_CREATED,only frozen R6 H1 caps reused
+production_selection,NOT_SELECTED,no best scale/allocation/cap
