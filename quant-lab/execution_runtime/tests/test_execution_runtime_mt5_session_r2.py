@@ -4,8 +4,9 @@ Pure: FakeMT5 only. No real MetaTrader5, no terminal, no orders.
 """  # noqa: E501
 from __future__ import annotations
 
+from execution_runtime.brokers.fake_mt5 import ox_observed_execution_profile
 from execution_runtime.brokers.mt5 import MT5BrokerSession, normalize_trade_mode
-from execution_runtime.enums import Environment
+from execution_runtime.enums import Environment, FillPolicy
 
 
 # ── AUTH / CONNECTION (1-5) ───────────────────────────────────────────────
@@ -159,8 +160,18 @@ def test_25_digits(session):
 
 
 def test_symbol_declared_fill_policies(fake_mt5):
-    # filling_mode=7 -> FOK + IOC + RETURN under the observed bit mapping
+    # generic default: standard MT5 bits (FOK + IOC; standard bit 4 = BOC is
+    # deliberately unmapped in the provider-neutral default).
     s = MT5BrokerSession(fake_mt5)
     s.connect()
     info = s.symbol_info("EURUSD")
-    assert len(info.declared_fill_policies) == 3
+    assert list(info.declared_fill_policies) == [
+        FillPolicy.FILL_OR_KILL,
+        FillPolicy.IMMEDIATE_OR_CANCEL,
+    ]
+
+    # Ox-observed bit interpretation (bit 4 -> RETURN) requires explicit profile
+    s_ox = MT5BrokerSession(fake_mt5, profile=ox_observed_execution_profile())
+    s_ox.connect()
+    info_ox = s_ox.symbol_info("EURUSD")
+    assert len(info_ox.declared_fill_policies) == 3

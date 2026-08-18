@@ -12,6 +12,7 @@ strategy code.
 from __future__ import annotations
 
 import time
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Optional
 
@@ -56,37 +57,58 @@ _POSITION_TYPE_SELL = 1
 
 _TIMEFRAME = {"M1": 1, "M5": 5, "M15": 15, "M30": 30, "H1": 16385}
 
-# TB-R6 validated observation: THIS broker build accepts ``type_filling``
-# values permuted from the standard MT5 enum. Standard MT5 constants are
-# FOK=0 / IOC=1 / RETURN=2; the validated TB path observed FOK=1 / IOC=2 /
-# RETURN=0 via order_check probing. This is a BROKER-SPECIFIC observation, kept
-# injectable rather than universal. The generic FillPolicy enum is untouched.
-_DEFAULT_FILL_POLICY_CODES = {
-    FillPolicy.FILL_OR_KILL: 1,
-    FillPolicy.IMMEDIATE_OR_CANCEL: 2,
-    FillPolicy.RETURN_OR_PARTIAL: 0,
+# Provider-neutral MT5 trade-request filling constants. The adapter derives
+# fill codes from the INJECTED module (see standard_fill_policy_codes) so a
+# future MT5 build with different enum values is honored rather than guessed.
+# No broker-specific (e.g. Ox) fill mapping is used as a universal default.
+_STANDARD_FILL_CONSTANTS = {
+    FillPolicy.FILL_OR_KILL: "ORDER_FILLING_FOK",
+    FillPolicy.IMMEDIATE_OR_CANCEL: "ORDER_FILLING_IOC",
+    FillPolicy.RETURN_OR_PARTIAL: "ORDER_FILLING_RETURN",
 }
-# filling_mode bitfield (broker-observed): bit value -> generic FillPolicy.
-_DEFAULT_FILL_POLICY_BITS = {
-    1: FillPolicy.FILL_OR_KILL,
-    2: FillPolicy.IMMEDIATE_OR_CANCEL,
-    4: FillPolicy.RETURN_OR_PARTIAL,
+# Standard MT5 symbol ``filling_mode`` bits (SYMBOL_FILLING_*). Standard bit 4
+# is SYMBOL_FILLING_BOC, which has no generic FillPolicy member, so the
+# provider-neutral default maps only FOK/IOC bits. The TB/Ox interpretation of
+# bit 4 as RETURN lives in an explicit execution profile, not here.
+_STANDARD_FILL_BIT_CONSTANTS = {
+    FillPolicy.FILL_OR_KILL: "SYMBOL_FILLING_FOK",
+    FillPolicy.IMMEDIATE_OR_CANCEL: "SYMBOL_FILLING_IOC",
 }
 
-# Server-clock plausibility gate (from TB's validated calibration): only
-# |offset| < 12h is accepted as a real server timezone. Stale ticks retain the
-# previous calibration.
+# Server-clock plausibility gate: only |offset| < 12h is accepted as a real
+# server timezone. Stale ticks retain the previous calibration. This is a
+# GENERIC_RUNTIME_POLICY sanity bound, not a broker-specific truth.
 _MAX_CLOCK_OFFSET_SECONDS = 12 * 3600
-
-# TB-R6 discovery: this broker's Python API returns None from order_check for
-# request comments >= 30 chars. Comments are therefore bounded to 29 chars.
-_MAX_COMMENT_LENGTH = 29
 
 _TRADE_MODE_ENV = {0: Environment.DEMO, 1: Environment.CONTEST, 2: Environment.REAL}
 
 
+@dataclass(frozen=True)
+class MT5ExecutionProfile:
+    """Immutable, instance-scoped MT5 execution profile (broker-quirk override).
+
+    Provider-neutral defaults come from the injected MT5 module, never from
+    this profile. This object carries ONLY explicit broker-observed
+    deviations and is supplied per-session — never a mutable module global.
+    A field left ``None`` means "no override; use the provider-neutral
+    default". ``max_comment_length=None`` means "do not truncate" (preserve the
+    full ownership tag).
+    """
+
+    fill_policy_codes: Optional[dict] = None  # FillPolicy -> type_filling int
+    fill_policy_bits: Optional[dict] = None   # filling_mode bit -> FillPolicy
+    max_comment_length: Optional[int] = None  # None => no truncation
+    version: str = "r2.1"
+
+
 def is_success_retcode(retcode: Any) -> bool:
-    """TB-R6 validated success retcodes: 0 and TRADE_RETCODE_DONE (10009)."""
+    """Accepted success retcodes: TRADE_RETCODE_DONE (10009) and 0.
+
+    10009 is the STANDARD MT5 success retcode. 0 is a TB/Ox-observed broker
+    quirk (that terminal returns 0 instead of 10009 on success). Accepting both
+    is a safe superset: 0 is never a valid MT5 rejection code, so a generic
+    broker that never emits 0 is unaffected.
+    """
     if retcode is None:
         return False
     try:
@@ -103,15 +125,53 @@ def normalize_trade_mode(trade_mode: Any) -> Environment:
         return Environment.UNKNOWN
 
 
+def standard_fill_policy_codes(mt5_module: Any) -> dict:
+    """Provider-neutral fill codes derived from the injected MT5 module.
+
+    Maps generic FillPolicy -> the module's ORDER_FILLING_* integer. If ANY
+    constant is missing the mapping is empty (FAIL CLOSED): callers must not
+    submit a guessed fill mode.
+    """
+    if mt5_module is None:
+        return {}
+    codes: dict = {}
+    for policy, name in _STANDARD_FILL_CONSTANTS.items():
+        code = getattr(mt5_module, name, None)
+        if code is None:
+            return {}
+        codes[policy] = int(code)
+    return codes
+
+
+def standard_fill_policy_bits(mt5_module: Any) -> dict:
+    """Provider-neutral declared-capability bits from the injected module.
+
+    Maps filling_mode bit -> generic FillPolicy for the module's
+    SYMBOL_FILLING_* constants. BOC (standard bit 4) is deliberately unmapped
+    (no generic member). If a constant is missing the mapping is empty
+    (FAIL CLOSED).
+    """
+    if mt5_module is None:
+        return {}
+    bits: dict = {}
+    for policy, name in _STANDARD_FILL_BIT_CONSTANTS.items():
+        bit = getattr(mt5_module, name, None)
+        if bit is None:
+            return {}
+        bits[int(bit)] = policy
+    return bits
+
+
 def normalize_fill_policy_bits(
     filling_mode: Any, bit_map: Optional[dict] = None
 ) -> tuple[FillPolicy, ...]:
     """Normalize symbol filling_mode bits into generic FillPolicy values.
 
     The declared bits are a DECLARED capability, not a guarantee of accepted
-    behavior (TB R6 showed declared and accepted modes can differ).
+    behavior (TB R6 showed declared and accepted modes can differ). With no
+    explicit bit_map, no policies are recognized (FAIL CLOSED).
     """
-    mapping = bit_map or _DEFAULT_FILL_POLICY_BITS
+    mapping = bit_map or {}
     try:
         bits = int(filling_mode)
     except (TypeError, ValueError):
@@ -130,7 +190,7 @@ def build_mt5_order_request(
     fill_code: Optional[int] = None,
     *,
     action: int = _ACTION_DEAL,
-    max_comment_length: int = _MAX_COMMENT_LENGTH,
+    max_comment_length: Optional[int] = None,
     position_ticket: Optional[int] = None,
 ) -> Optional[dict]:
     """Pure MT5 order-request construction. No scattered dict creation.
@@ -138,6 +198,11 @@ def build_mt5_order_request(
     Market side mapping follows the validated TB semantics: BUY at ASK,
     SELL at BID (unless an explicit reference price is supplied). The request
     never invents a strategy notional or a universal slippage default.
+
+    ``max_comment_length`` is an EXPLICIT broker-observed override: ``None``
+    means no truncation (the provider-neutral default that preserves the full
+    ownership tag). Broker-specific limits (e.g. Ox's 29-char bound) must be
+    supplied explicitly via an MT5ExecutionProfile.
     """
     if intent.volume <= 0:
         return None
@@ -201,19 +266,32 @@ class MT5BrokerSession(BrokerSession):
         self,
         mt5_module: Any = None,
         *,
-        fill_policy_codes: Optional[dict] = None,
-        fill_policy_bits: Optional[dict] = None,
-        max_comment_length: int = _MAX_COMMENT_LENGTH,
+        profile: Optional[MT5ExecutionProfile] = None,
         clock_probe_symbol: str = "",
     ) -> None:
         self._mt5 = mt5_module
         self._connected = False
-        self._fill_policy_codes = dict(fill_policy_codes or _DEFAULT_FILL_POLICY_CODES)
-        self._fill_policy_bits = dict(fill_policy_bits or _DEFAULT_FILL_POLICY_BITS)
-        self._max_comment_length = max_comment_length
+        self._profile = profile or MT5ExecutionProfile()
+        # Provider-specific mappings are instance-scoped, resolved once from
+        # the immutable profile (or standard module constants), never a global.
+        self._fill_policy_codes = self._resolve_fill_policy_codes()
+        self._fill_policy_bits = self._resolve_fill_policy_bits()
+        self._max_comment_length = self._profile.max_comment_length  # None => no truncation
         self._clock_probe_symbol = clock_probe_symbol
         self._server_offset_s: Optional[float] = None
         self._last_error_category: Optional[BrokerErrorCategory] = None
+
+    def _resolve_fill_policy_codes(self) -> dict:
+        """Explicit profile override wins; otherwise standard module truth."""
+        if self._profile.fill_policy_codes:
+            return dict(self._profile.fill_policy_codes)
+        return standard_fill_policy_codes(self._mt5)
+
+    def _resolve_fill_policy_bits(self) -> dict:
+        """Explicit profile override wins; otherwise standard module truth."""
+        if self._profile.fill_policy_bits:
+            return dict(self._profile.fill_policy_bits)
+        return standard_fill_policy_bits(self._mt5)
 
     # ── transport lifecycle ───────────────────────────────────────────────
 
@@ -567,26 +645,40 @@ class MT5BrokerSession(BrokerSession):
     # ── order lifecycle ───────────────────────────────────────────────────
 
     def order_check(self, intent: OrderIntent) -> CheckResult:
-        req, fill_code, err = self._prepare_order(intent)
+        req, fill_code, err, category = self._prepare_order(intent)
         if req is None:
-            return CheckResult(ok=False, reason=err or "cannot build order request")
+            return CheckResult(
+                ok=False,
+                reason=err or "cannot build order request",
+                error_category=category,
+            )
         raw = self._safe_order_check(req)
         retcode = None if raw is None else getattr(raw, "retcode", None)
         ok = is_success_retcode(retcode)
+        if ok:
+            error_category = BrokerErrorCategory.NONE
+            reason = ""
+        elif raw is None:
+            error_category = BrokerErrorCategory.ORDER_CHECK_FAILED
+            reason = "order_check returned None"
+        else:
+            error_category = BrokerErrorCategory.ORDER_CHECK_FAILED
+            reason = f"order_check failed (retcode={retcode})"
         return CheckResult(
             ok=ok,
             retcode=None if retcode is None else int(retcode),
             broker_message=str(getattr(raw, "comment", "") or "") if raw is not None else "",
-            reason="" if ok else f"order_check failed (retcode={retcode})",
+            reason=reason,
+            error_category=error_category,
         )
 
     def submit_order(self, intent: OrderIntent) -> OrderResult:
-        req, fill_code, err = self._prepare_order(intent)
+        req, fill_code, err, category = self._prepare_order(intent)
         if req is None:
             return OrderResult(
                 ok=False,
                 reason=err or "cannot build order request",
-                error_category=BrokerErrorCategory.INVALID_REQUEST,
+                error_category=category,
             )
         raw = self._safe_order_send(req)
         retcode = None if raw is None else getattr(raw, "retcode", None)
@@ -594,38 +686,61 @@ class MT5BrokerSession(BrokerSession):
         order_id = ""
         if ok and raw is not None and getattr(raw, "order", None) is not None:
             order_id = str(getattr(raw, "order"))
+        if ok:
+            error_category = BrokerErrorCategory.NONE
+            reason = ""
+        elif raw is None:
+            error_category = BrokerErrorCategory.TRANSPORT_ERROR
+            reason = "order_send returned None"
+        else:
+            error_category = BrokerErrorCategory.ORDER_REJECTED
+            reason = f"order rejected (retcode={retcode})"
         return OrderResult(
             ok=ok,
             broker_order_id=order_id,
             retcode=None if retcode is None else int(retcode),
             broker_message=str(getattr(raw, "comment", "") or "") if raw is not None else "",
-            reason="" if ok else f"order rejected (retcode={retcode})",
-            error_category=(
-                BrokerErrorCategory.UNKNOWN_BROKER_ERROR
-                if ok
-                else BrokerErrorCategory.ORDER_REJECTED
-            ),
+            reason=reason,
+            error_category=error_category,
         )
 
     def cancel_order(self, order_id: str) -> CancelResult:
         if self._mt5 is None or not self._connected:
-            return CancelResult(ok=False, reason="not connected")
+            return CancelResult(
+                ok=False,
+                reason="not connected",
+                error_category=BrokerErrorCategory.NOT_CONNECTED,
+            )
         req = {"action": _ACTION_REMOVE, "order": int(order_id)}
         raw = self._safe_order_send(req)
         retcode = None if raw is None else getattr(raw, "retcode", None)
         ok = is_success_retcode(retcode)
-        return CancelResult(
-            ok=ok,
-            reason="" if ok else f"cancel rejected (retcode={retcode})",
-        )
+        if ok:
+            error_category = BrokerErrorCategory.NONE
+            reason = ""
+        elif raw is None:
+            error_category = BrokerErrorCategory.TRANSPORT_ERROR
+            reason = "order_send returned None"
+        else:
+            error_category = BrokerErrorCategory.ORDER_REJECTED
+            reason = f"cancel rejected (retcode={retcode})"
+        return CancelResult(ok=ok, reason=reason, error_category=error_category)
 
     def close_position(self, position_id: str, reason: str = "") -> CloseResult:
         pos = next((p for p in self.positions() if p.position_id == position_id), None)
         if pos is None:
-            return CloseResult(ok=False, reason="position not found")
+            return CloseResult(
+                ok=False,
+                reason="position not found",
+                error_category=BrokerErrorCategory.INVALID_REQUEST,
+            )
         tick = self.tick(pos.symbol)
         if tick is None or not tick.valid:
-            return CloseResult(ok=False, reason="no valid tick for position symbol")
+            return CloseResult(
+                ok=False,
+                reason="no valid tick for position symbol",
+                error_category=BrokerErrorCategory.SYMBOL_UNAVAILABLE,
+            )
         side = OrderSide.SELL if pos.side == "LONG" else OrderSide.BUY
         price = tick.bid if side is OrderSide.SELL else tick.ask
         intent = OrderIntent(
@@ -638,14 +753,27 @@ class MT5BrokerSession(BrokerSession):
             broker_magic=pos.magic,
             ownership_tag=pos.ownership_tag,
         )
-        req, fill_code, err = self._prepare_order(intent)
+        req, fill_code, err, category = self._prepare_order(intent)
         if req is None:
-            return CloseResult(ok=False, reason=err or "cannot build close request")
+            return CloseResult(
+                ok=False,
+                reason=err or "cannot build close request",
+                error_category=category,
+            )
         req["position"] = int(position_id)
         raw = self._safe_order_send(req)
         retcode = None if raw is None else getattr(raw, "retcode", None)
         ok = is_success_retcode(retcode)
-        return CloseResult(ok=ok, reason="" if ok else f"close rejected (retcode={retcode})")
+        if ok:
+            error_category = BrokerErrorCategory.NONE
+            reason = ""
+        elif raw is None:
+            error_category = BrokerErrorCategory.TRANSPORT_ERROR
+            reason = "order_send returned None"
+        else:
+            error_category = BrokerErrorCategory.ORDER_REJECTED
+            reason = f"close rejected (retcode={retcode})"
+        return CloseResult(ok=ok, reason=reason, error_category=error_category)
 
     def reconcile_snapshot(self) -> BrokerSnapshot:
         return BrokerSnapshot(
@@ -659,20 +787,32 @@ class MT5BrokerSession(BrokerSession):
 
     def _prepare_order(
         self, intent: OrderIntent
-    ) -> tuple[Optional[dict], Optional[int], str]:
+    ) -> tuple[Optional[dict], Optional[int], str, BrokerErrorCategory]:
         """Shared validation + request construction for order_check/send.
 
-        Returns (request, fill_code, error). error is "" on success.
+        Returns (request, fill_code, error, error_category). error is "" and
+        error_category is NONE on success.
         """
         if self._mt5 is None or not self._connected:
-            return None, None, "not connected"
+            return None, None, "not connected", BrokerErrorCategory.NOT_CONNECTED
         if intent.volume <= 0:
-            return None, None, "zero quantity"
+            return None, None, "zero quantity", BrokerErrorCategory.INVALID_REQUEST
         info = self.symbol_info(intent.symbol)
+        if info is None:
+            return (
+                None,
+                None,
+                f"symbol unavailable: {intent.symbol}",
+                BrokerErrorCategory.SYMBOL_UNAVAILABLE,
+            )
         tick = self.tick(intent.symbol)
         fill_code = self._resolve_fill_code(intent, info)
         if fill_code is None:
-            return None, None, f"unsupported fill policy: {intent.fill_policy.value}"
+            if intent.fill_policy in (FillPolicy.BROKER_DEFAULT, FillPolicy.UNKNOWN):
+                reason = f"fill policy unresolved: {intent.fill_policy.value}"
+            else:
+                reason = f"unsupported fill policy: {intent.fill_policy.value}"
+            return None, None, reason, BrokerErrorCategory.UNSUPPORTED_CAPABILITY
         req = build_mt5_order_request(
             intent,
             info,
@@ -681,20 +821,30 @@ class MT5BrokerSession(BrokerSession):
             max_comment_length=self._max_comment_length,
         )
         if req is None:
-            return None, None, "cannot build order request"
-        return req, fill_code, ""
+            return None, None, "cannot build order request", BrokerErrorCategory.INVALID_REQUEST
+        return req, fill_code, "", BrokerErrorCategory.NONE
 
     def _resolve_fill_code(
         self, intent: OrderIntent, info: Optional[SymbolInfo]
     ) -> Optional[int]:
+        """Resolve a type_filling code for the intent's fill policy.
+
+        BROKER_DEFAULT / UNKNOWN resolve through EVIDENCE only:
+        1. a successful order_check probe (proven accepted mode), else
+        2. the first usable DECLARED symbol policy (advisory), else
+        3. FAIL CLOSED (None) — never a silent RETURN fallback.
+        """
         policy = intent.fill_policy
         if policy in (FillPolicy.BROKER_DEFAULT, FillPolicy.UNKNOWN):
             resolved = self.probe_fill_policies(intent.symbol)
             if resolved is not None:
                 return self._fill_policy_codes.get(resolved)
             if info is not None and info.declared_fill_policies:
-                return self._fill_policy_codes.get(info.declared_fill_policies[0])
-            return self._fill_policy_codes.get(FillPolicy.RETURN_OR_PARTIAL, 0)
+                for declared in info.declared_fill_policies:
+                    code = self._fill_policy_codes.get(declared)
+                    if code is not None:
+                        return code
+            return None  # FAIL CLOSED: never invent a fill mode
         return self._fill_policy_codes.get(policy)
 
     def _safe_order_check(self, req: dict) -> Any:

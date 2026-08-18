@@ -1,0 +1,9 @@
+behavior,tb_observed,mt5_broker_session_r2_1,status
+fill code quirk (Ox),FOK=1 IOC=2 RETURN=0,explicit profile ox_observed_execution_profile(),EXACT_PARITY_VIA_PROFILE
+standard MT5 fill,FOK=0 IOC=1 RETURN=2,module-derived standard_fill_policy_codes(),EXACT_PARITY
+comment bound,29 chars + deterministic reduction,profile max_comment_length=29 (Ox only),EXACT_PARITY_VIA_PROFILE
+success retcode,0 and 10009,is_success_retcode {0,10009},EXACT_PARITY
+fill probe,order_check FOK->IOC->RETURN,probe_fill_policies same order,EXACT_PARITY
+declared vs actual,mismatch representable,SymbolInfo.declared + probe,EXACT_PARITY
+connect/disconnect/identity/symbol/clock/bars/positions/orders/deals,unchanged,unchanged,EXACT_PARITY
+strategy sizing / basket atomicity / retry,upstream,NOT in BrokerSession,INTENTIONAL_GENERIC_DIFFERENCE

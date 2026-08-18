@@ -6,13 +6,21 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from execution_runtime.brokers.fake_mt5 import FakeMT5, _Rec
+from execution_runtime.brokers.fake_mt5 import FakeMT5, _Rec, ox_observed_execution_profile
 from execution_runtime.brokers.mt5 import (
     MT5BrokerSession,
+    MT5ExecutionProfile,
     build_mt5_order_request,
     is_success_retcode,
 )
-from execution_runtime.enums import FillPolicy, OrderSide, OrderType, QuantityUnit, SlippageUnit
+from execution_runtime.enums import (
+    BrokerErrorCategory,
+    FillPolicy,
+    OrderSide,
+    OrderType,
+    QuantityUnit,
+    SlippageUnit,
+)
 from execution_runtime.types import OrderIntent
 
 PKG_DIR = Path(__file__).resolve().parents[1]
@@ -216,10 +224,15 @@ def test_66_ownership_tag_included(fake_mt5):
 
 def test_67_comment_encoding_deterministic():
     long_tag = "X" * 60
+    # generic default: no broker-specific truncation (full ownership preserved)
     a = build_mt5_order_request(_intent(ownership_tag=long_tag), None, None, 1)
     b = build_mt5_order_request(_intent(ownership_tag=long_tag), None, None, 1)
-    assert a["comment"] == b["comment"]
-    assert len(a["comment"]) == 29
+    assert a["comment"] == b["comment"] == long_tag
+    # Ox-observed 29-char bound is an explicit profile override
+    c = build_mt5_order_request(_intent(ownership_tag=long_tag), None, None, 1, max_comment_length=29)
+    d = build_mt5_order_request(_intent(ownership_tag=long_tag), None, None, 1, max_comment_length=29)
+    assert c["comment"] == d["comment"]
+    assert len(c["comment"]) == 29
 
 
 # ── FILL (68-72) ──────────────────────────────────────────────────────────
@@ -240,22 +253,26 @@ def test_70_return_mapping():
 
 
 def test_71_unsupported_fill_fails(fake_mt5):
-    # omit IOC from the adapter's code table -> IOC becomes unsupported
+    # omit IOC from an explicit profile's code table -> IOC becomes unsupported
     s = MT5BrokerSession(
         fake_mt5,
-        fill_policy_codes={
-            FillPolicy.FILL_OR_KILL: 1,
-            FillPolicy.RETURN_OR_PARTIAL: 0,
-        },
+        profile=MT5ExecutionProfile(
+            fill_policy_codes={
+                FillPolicy.FILL_OR_KILL: FakeMT5.ORDER_FILLING_FOK,
+                FillPolicy.RETURN_OR_PARTIAL: FakeMT5.ORDER_FILLING_RETURN,
+            },
+        ),
     )
     s.connect()
     r = s.order_check(_intent(fill_policy=FillPolicy.IMMEDIATE_OR_CANCEL))
     assert r.ok is False
     assert "unsupported fill policy" in r.reason
+    assert r.error_category is BrokerErrorCategory.UNSUPPORTED_CAPABILITY
 
 
 def test_72_declared_fill_capability_mismatch_representable(fake_mt5):
-    # broker DECLARES IOC (bit 2) but order_check only accepts FOK (code 1)
+    # broker DECLARES IOC (bit 2) but order_check only accepts FOK (Ox code 1);
+    # this broker-observed mismatch is exercised via the explicit Ox profile.
     fake_mt5.set_symbol_info("EURUSD", visible=True, digits=5, point=0.00001,
                              trade_contract_size=100000.0, volume_min=0.01,
                              volume_step=0.01, volume_max=100.0, filling_mode=2)
@@ -263,7 +280,7 @@ def test_72_declared_fill_capability_mismatch_representable(fake_mt5):
         lambda req: _Rec(retcode=0, comment="ok") if req.get("type_filling") == 1
         else _Rec(retcode=10030, comment="invalid fill")
     )
-    s = MT5BrokerSession(fake_mt5); s.connect()
+    s = MT5BrokerSession(fake_mt5, profile=ox_observed_execution_profile()); s.connect()
     declared = s.symbol_info("EURUSD").declared_fill_policies
     resolved = s.probe_fill_policies("EURUSD")
     assert FillPolicy.IMMEDIATE_OR_CANCEL in declared

@@ -199,8 +199,13 @@ class SlippageUnit(str, Enum):
 
 
 class BrokerErrorCategory(str, Enum):
-    """Normalized broker failure categories (no raw MT5 exceptions leak)."""
+    """Normalized broker result categories (no raw MT5 exceptions leak).
 
+    ``NONE`` is the truthful success state: a result with ``ok == True``
+    always carries ``NONE`` (never an error category).
+    """
+
+    NONE = "NONE"
     NOT_CONNECTED = "NOT_CONNECTED"
     AUTH_FAILED = "AUTH_FAILED"
     IDENTITY_UNAVAILABLE = "IDENTITY_UNAVAILABLE"

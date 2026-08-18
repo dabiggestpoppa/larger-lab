@@ -244,13 +244,18 @@ class OrderIntent:
 
 @dataclass(frozen=True)
 class CheckResult:
-    """Normalized order_check result. ``retcode`` is adapter-normalized."""
+    """Normalized order_check result. ``retcode`` is adapter-normalized.
+
+    ``error_category`` is ``NONE`` when ``ok`` is True; a successful check
+    never carries a failure reason or error.
+    """
 
     ok: bool = False
     retcode: int | None = None
     broker_message: str = ""
     reason: str = ""
     detail: dict = field(default_factory=dict)
+    error_category: BrokerErrorCategory = BrokerErrorCategory.NONE
 
 
 @dataclass(frozen=True)
@@ -262,26 +267,36 @@ class SubmitResult:
 
 @dataclass(frozen=True)
 class OrderResult:
-    """Normalized order-submission result (no raw mutable broker objects)."""
+    """Normalized order-submission result (no raw mutable broker objects).
+
+    Truth invariant: ``ok == True`` => ``error_category`` is ``NONE``.
+    ``ok == False`` => a meaningful non-success category (never ``NONE``).
+    """
 
     ok: bool = False
     broker_order_id: str = ""
     retcode: int | None = None
     broker_message: str = ""
     reason: str = ""
-    error_category: BrokerErrorCategory = BrokerErrorCategory.UNKNOWN_BROKER_ERROR
+    error_category: BrokerErrorCategory = BrokerErrorCategory.NONE
 
 
 @dataclass(frozen=True)
 class CancelResult:
+    """Normalized cancel result. ``error_category`` is ``NONE`` on success."""
+
     ok: bool = False
     reason: str = ""
+    error_category: BrokerErrorCategory = BrokerErrorCategory.NONE
 
 
 @dataclass(frozen=True)
 class CloseResult:
+    """Normalized close result. ``error_category`` is ``NONE`` on success."""
+
     ok: bool = False
     reason: str = ""
+    error_category: BrokerErrorCategory = BrokerErrorCategory.NONE
 
 
 @dataclass(frozen=True)

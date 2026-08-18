@@ -9,6 +9,9 @@ from __future__ import annotations
 
 from typing import Any, Callable, Optional
 
+from ..enums import FillPolicy
+from .mt5 import MT5ExecutionProfile
+
 
 class _Rec:
     """Attribute + mapping access, mimicking MT5's returned named tuples.
@@ -57,6 +60,9 @@ class FakeMT5:
     ORDER_FILLING_FOK = 0
     ORDER_FILLING_IOC = 1
     ORDER_FILLING_RETURN = 2
+    SYMBOL_FILLING_FOK = 1
+    SYMBOL_FILLING_IOC = 2
+    SYMBOL_FILLING_BOC = 4
     TRADE_RETCODE_DONE = 10009
     TRADE_RETCODE_PLACED = 10008
     TRADE_RETCODE_INVALID_FILL = 10030
@@ -216,3 +222,27 @@ class FakeMT5:
             trade_allowed=True,
         )
         return fake
+
+
+def ox_observed_execution_profile() -> MT5ExecutionProfile:
+    """TB-R6 validated Ox Securities demo quirks, expressed as an EXPLICIT
+    broker execution profile (fixture).
+
+    The observed permuted fill mapping (FOK=1 / IOC=2 / RETURN=0) and the
+    29-char comment bound are NOT universal MT5 defaults; a generic
+    ``MT5BrokerSession`` must opt in via
+    ``profile=ox_observed_execution_profile()``.
+    """
+    return MT5ExecutionProfile(
+        fill_policy_codes={
+            FillPolicy.FILL_OR_KILL: 1,
+            FillPolicy.IMMEDIATE_OR_CANCEL: 2,
+            FillPolicy.RETURN_OR_PARTIAL: 0,
+        },
+        fill_policy_bits={
+            1: FillPolicy.FILL_OR_KILL,
+            2: FillPolicy.IMMEDIATE_OR_CANCEL,
+            4: FillPolicy.RETURN_OR_PARTIAL,
+        },
+        max_comment_length=29,
+    )

@@ -1,0 +1,31 @@
+{
+  "checkpoint": "QL-EXEC-R2.1-MT5-FILL-POLICY-AND-RESULT-TRUTH-REPAIR",
+  "runner": "pytest",
+  "tests_total": 226,
+  "tests_passed": 226,
+  "tests_failed": 0,
+  "r1_r1_1_suite_count": 111,
+  "r2_suite_count": 90,
+  "r2_1_suite_count": 25,
+  "r2_1_suite": "test_execution_runtime_mt5_fill_result_r2_1.py",
+  "categories": {
+    "fill_policy_truth": 14,
+    "result_truth": 10,
+    "extra_fail_closed": 1
+  },
+  "standard_mt5_mapping_default": true,
+  "ox_override_explicit_only": true,
+  "multi_broker_isolation": true,
+  "unknown_fill_fails_closed": true,
+  "return_fallback_removed": true,
+  "success_result_has_no_error": true,
+  "fake_mt5_only_order_send": true,
+  "no_real_order_send": true,
+  "no_real_metatrader5_import": true,
+  "no_network_dependency": true,
+  "dict_bar_supported": true,
+  "numpy_structured_bar_supported": true,
+  "retcode_zero_supported": true,
+  "retcode_10009_supported": true,
+  "fill_declared_vs_actual_mismatch_representable": true
+}

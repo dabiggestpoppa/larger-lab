@@ -1,0 +1,6 @@
+value,classification,generic_default,decision,action_taken
+29-char comment limit,TB/OX_OBSERVED_BROKER_QUIRK,None (no truncation),Moved to profile override,MT5ExecutionProfile.max_comment_length; Ox fixture sets 29
+12-hour clock plausibility,GENERIC_RUNTIME_POLICY,|offset|<12h,Unchanged,Documented as sanity bound not broker truth
+retcode 0 success,TB/OX_OBSERVED_BROKER_QUIRK,{0,10009} superset,Kept for compatibility,Documented 0 as Ox-observed / 10009 as standard
+fill code mapping (type_filling),TB/OX_OBSERVED_BROKER_QUIRK,module ORDER_FILLING_*,Replaced with standard,standard_fill_policy_codes(); Ox via profile
+fill bits mapping (bit 4 -> RETURN),TB/OX_OBSERVED_BROKER_QUIRK,FOK/IOC bits only,Replaced with standard,standard_fill_policy_bits(); Ox bits via profile
