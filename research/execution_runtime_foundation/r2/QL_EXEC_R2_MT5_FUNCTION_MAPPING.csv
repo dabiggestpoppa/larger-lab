@@ -1,0 +1,17 @@
+mt5_function,generic_method,normalized_input,normalized_output,side_effects,failure_semantics,tested,broker_execution
+initialize,connect,none,bool,terminal attach,fail closed,true,false
+shutdown,disconnect,none,None,terminal detach,idempotent best-effort,true,false
+terminal_info,identity,None,BrokerIdentity partial,none,fail closed,true,false
+account_info,identity + account_state,None,BrokerIdentity + AccountState,none,fail closed,true,false
+symbol_info,symbol_info,symbol,SymbolInfo,none,fail closed,true,false
+symbol_select,ensure_symbol,symbol,bool,makes symbol available,no-op success where unsupported,true,false
+symbol_info_tick,tick,symbol,Tick,none,fail closed / invalid flagged,true,false
+copy_rates_from_pos,bars,symbol+timeframe+count,list[Bar],none,fail closed / empty,true,false
+positions_get,positions,None,list[Position],none,fail closed,true,false
+orders_get,orders,None,list[Order],none,fail closed,true,false
+history_deals_get,deals,start+end epoch,list[Deal],none,fail closed,true,false
+order_check,order_check,OrderIntent,CheckResult,none,retcode normalized,true,false
+order_send,submit_order,OrderIntent,OrderResult,order submit,retcode normalized,true,true
+order_send (remove),cancel_order,order_id,CancelResult,order cancel,retcode normalized,true,true
+order_send (deal),close_position,position_id,CloseResult,position close,retcode normalized,true,true
+last_error,health / result reasons,None,normalized text,none,fail closed,true,false

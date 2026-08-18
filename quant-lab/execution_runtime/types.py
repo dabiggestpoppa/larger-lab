@@ -12,11 +12,17 @@ from typing import NewType
 
 from .enums import (
     AccountRole,
+    BrokerErrorCategory,
     CapitalDecisionKind,
     ClockStatus,
     Environment,
+    FillPolicy,
     HedgingNetting,
+    OrderSide,
+    OrderType,
+    QuantityUnit,
     SecretKind,
+    SlippageUnit,
 )
 
 # Explicit concepts (NOT a tiny provider enum): a broker company is an
@@ -63,6 +69,9 @@ class BrokerIdentity:
     currency: str = ""
     account_mode: str = ""
     hedging_netting: HedgingNetting = HedgingNetting.UNKNOWN
+    trade_allowed: bool = True
+    terminal_trade_allowed: bool = True
+    tradeapi_disabled: bool = False
 
 
 @dataclass(frozen=True)
@@ -80,6 +89,13 @@ class AccountState:
 
 @dataclass(frozen=True)
 class SymbolInfo:
+    """Broker-neutral symbol contract.
+
+    ``declared_fill_policies`` is the broker's DECLARED capability; it is NOT
+    a guarantee of accepted behavior (TB R6 showed declared and accepted fill
+    modes can differ).
+    """
+
     symbol: str
     digits: int = 0
     point: float = 0.0
@@ -87,6 +103,11 @@ class SymbolInfo:
     volume_min: float = 0.0
     volume_max: float = 0.0
     volume_step: float = 0.0
+    visible: bool = True
+    trade_mode: str = "UNKNOWN"
+    trade_tick_size: float = 0.0
+    trade_tick_value: float = 0.0
+    declared_fill_policies: tuple = ()
 
 
 @dataclass(frozen=True)
@@ -111,7 +132,8 @@ class Tick:
     """Quote tick. ``time`` is the RAW source timestamp (provider clock).
 
     The generic runtime never normalizes ``time`` into UTC; strategy parity
-    keys must be preserved as-is.
+    keys must be preserved as-is. ``valid`` is False for an unusable quote
+    (zero/negative or crossed bid/ask); raw values are preserved, not invented.
     """
 
     symbol: str
@@ -121,6 +143,7 @@ class Tick:
     observed_at_utc: float = 0.0  # local observation/received time
     source_clock_name: str = ""  # which source clock ``time`` is in
     offset_seconds: float = 0.0  # calibrated source-minus-UTC offset
+    valid: bool = True
 
 
 @dataclass(frozen=True)
@@ -137,6 +160,7 @@ class Bar:
     high: float = 0.0
     low: float = 0.0
     close: float = 0.0
+    volume: float = 0.0  # real_volume with tick_volume fallback
     observed_at_utc: float = 0.0  # local observation/received time
     source_clock_name: str = ""
     offset_seconds: float = 0.0  # calibrated source-minus-UTC offset
@@ -144,50 +168,87 @@ class Bar:
 
 @dataclass(frozen=True)
 class Position:
+    """Normalized open position. Broker truth; ownership is evaluated later."""
+
     position_id: str
     symbol: str
     volume: float = 0.0
     side: str = ""  # LONG / SHORT
     price_open: float = 0.0
+    current_price: float | None = None
+    magic: int = 0
     ownership_tag: str = ""
+    time: float = 0.0
+    profit: float | None = None
 
 
 @dataclass(frozen=True)
 class Order:
+    """Normalized pending order (NOT a filled position)."""
+
     order_id: str
     symbol: str
     volume: float = 0.0
     order_type: str = ""
+    magic: int = 0
     ownership_tag: str = ""
+    time: float = 0.0
 
 
 @dataclass(frozen=True)
 class Deal:
+    """Normalized history deal. order/deal/position IDs remain distinct."""
+
     deal_id: str
     symbol: str
     volume: float = 0.0
     price: float = 0.0
     entry: bool = True
+    order_id: str = ""
+    position_id: str = ""
+    side: str = ""
+    magic: int = 0
     ownership_tag: str = ""
+    time: float = 0.0
+    profit: float | None = None
+    commission: float | None = None
+    swap: float | None = None
+    fee: float | None = None
 
 
 @dataclass(frozen=True)
 class OrderIntent:
-    """Broker-neutral order intent. Filled by execution translation later."""
+    """Broker-neutral order intent (R2-amended: no opaque critical fields).
+
+    ``volume`` is the BROKER-NATIVE quantity (MT5 lots) at the BrokerSession
+    boundary; ``quantity_unit`` makes that explicit. Economic notional -> lots
+    conversion is upstream, NOT part of the broker session.
+    """
 
     intent_id: str
     account_id: str
     symbol: str
-    side: str = ""
+    side: OrderSide = OrderSide.BUY
     volume: float = 0.0
-    order_type: str = "MARKET"
+    quantity_unit: QuantityUnit = QuantityUnit.LOT
+    order_type: OrderType = OrderType.MARKET
+    reference_price: float | None = None
+    price_constraint: float | None = None
+    fill_policy: FillPolicy = FillPolicy.BROKER_DEFAULT
+    slippage_constraint: float | None = None
+    slippage_unit: SlippageUnit = SlippageUnit.POINTS
+    broker_magic: int = 0
     ownership_tag: str = ""
     metadata: dict = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
 class CheckResult:
+    """Normalized order_check result. ``retcode`` is adapter-normalized."""
+
     ok: bool = False
+    retcode: int | None = None
+    broker_message: str = ""
     reason: str = ""
     detail: dict = field(default_factory=dict)
 
@@ -197,6 +258,18 @@ class SubmitResult:
     ok: bool = False
     broker_order_id: str = ""
     reason: str = ""
+
+
+@dataclass(frozen=True)
+class OrderResult:
+    """Normalized order-submission result (no raw mutable broker objects)."""
+
+    ok: bool = False
+    broker_order_id: str = ""
+    retcode: int | None = None
+    broker_message: str = ""
+    reason: str = ""
+    error_category: BrokerErrorCategory = BrokerErrorCategory.UNKNOWN_BROKER_ERROR
 
 
 @dataclass(frozen=True)

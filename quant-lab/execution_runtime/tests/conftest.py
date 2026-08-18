@@ -104,3 +104,44 @@ def compat_factory():
         return CompatibilityState(**defaults)
 
     return _make
+
+
+# ── R2 MT5 broker-session fixtures (pure; no real MetaTrader5) ───────────
+
+import time as _time  # noqa: E402
+
+
+@pytest.fixture
+def fake_mt5():
+    from execution_runtime.brokers.fake_mt5 import FakeMT5
+
+    fake = FakeMT5.ox_demo()
+    fake.set_symbol_info(
+        "EURUSD",
+        visible=True,
+        trade_mode=4,
+        digits=5,
+        point=0.00001,
+        trade_contract_size=100000.0,
+        volume_min=0.01,
+        volume_max=100.0,
+        volume_step=0.01,
+        filling_mode=7,
+    )
+    fake.set_tick(
+        "EURUSD",
+        bid=1.10000,
+        ask=1.10005,
+        last=1.10005,
+        time=_time.time() + 3 * 3600,  # UTC+3-style source clock
+    )
+    return fake
+
+
+@pytest.fixture
+def session(fake_mt5):
+    from execution_runtime.brokers.mt5 import MT5BrokerSession
+
+    s = MT5BrokerSession(fake_mt5)
+    s.connect()
+    return s

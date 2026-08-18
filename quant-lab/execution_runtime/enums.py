@@ -54,6 +54,7 @@ class Environment(str, Enum):
     REAL = "REAL"
     SIM = "SIM"
     REPLAY = "REPLAY"
+    UNKNOWN = "UNKNOWN"
 
 
 class HedgingNetting(str, Enum):
@@ -156,3 +157,58 @@ class CompatibilityStatus(str, Enum):
 class CapitalDecisionKind(str, Enum):
     ADMITTED = "ADMITTED"
     REJECTED = "REJECTED"
+
+
+class OrderType(str, Enum):
+    """Broker-neutral order type. R2 supports only what execution needs."""
+
+    MARKET = "MARKET"
+    LIMIT = "LIMIT"
+
+
+class OrderSide(str, Enum):
+    """Broker-neutral market side."""
+
+    BUY = "BUY"
+    SELL = "SELL"
+
+
+class FillPolicy(str, Enum):
+    """Broker-neutral fill semantics. MT5 enum integers never leak here."""
+
+    FILL_OR_KILL = "FILL_OR_KILL"
+    IMMEDIATE_OR_CANCEL = "IMMEDIATE_OR_CANCEL"
+    RETURN_OR_PARTIAL = "RETURN_OR_PARTIAL"
+    BROKER_DEFAULT = "BROKER_DEFAULT"
+    UNKNOWN = "UNKNOWN"
+
+
+class QuantityUnit(str, Enum):
+    """Unit of OrderIntent.volume at the BrokerSession boundary."""
+
+    LOT = "LOT"
+    UNKNOWN = "UNKNOWN"
+
+
+class SlippageUnit(str, Enum):
+    """Unit of a slippage/deviation constraint. Never a naked number."""
+
+    PRICE = "PRICE"
+    POINTS = "POINTS"
+    UNKNOWN = "UNKNOWN"
+
+
+class BrokerErrorCategory(str, Enum):
+    """Normalized broker failure categories (no raw MT5 exceptions leak)."""
+
+    NOT_CONNECTED = "NOT_CONNECTED"
+    AUTH_FAILED = "AUTH_FAILED"
+    IDENTITY_UNAVAILABLE = "IDENTITY_UNAVAILABLE"
+    SYMBOL_UNAVAILABLE = "SYMBOL_UNAVAILABLE"
+    CLOCK_UNCALIBRATED = "CLOCK_UNCALIBRATED"
+    INVALID_REQUEST = "INVALID_REQUEST"
+    ORDER_CHECK_FAILED = "ORDER_CHECK_FAILED"
+    ORDER_REJECTED = "ORDER_REJECTED"
+    TRANSPORT_ERROR = "TRANSPORT_ERROR"
+    UNSUPPORTED_CAPABILITY = "UNSUPPORTED_CAPABILITY"
+    UNKNOWN_BROKER_ERROR = "UNKNOWN_BROKER_ERROR"

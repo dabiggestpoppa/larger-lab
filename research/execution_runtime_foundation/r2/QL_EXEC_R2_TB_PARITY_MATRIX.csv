@@ -1,0 +1,26 @@
+behavior,tb_current,mt5_broker_session,status
+connect (external session),initialize + terminal_info not None,connect() same,EXACT_PARITY
+disconnect,shutdown best-effort,disconnect() idempotent,NORMALIZED_EQUIVALENT
+identity,company/server/login/trade_mode/currency/trade flags,BrokerIdentity same fields,NORMALIZED_EQUIVALENT
+trade mode 0/1/2 -> DEMO/CONTEST/REAL,same,same,EXACT_PARITY
+symbol contracts,contract_size/volume_min/step/max/point/digits,same,EXACT_PARITY
+symbol activation,symbol_select(symbol, True),ensure_symbol(),NORMALIZED_EQUIVALENT
+tick normalization,bid>0/ask>0/ask>=bid valid,spread=ask-bid,Tick.valid,EXACT_PARITY
+bar normalization,raw bar open time preserved + dict/numpy,Bar.time preserved + dict/numpy,EXACT_PARITY
+volume fallback,real_volume else tick_volume,same,EXACT_PARITY
+clock calibration,|offset|<12h retain prior,|offset|<12h retain prior,EXACT_PARITY
+source timestamp,raw server epoch preserved,same,EXACT_PARITY
+positions,positions_get -> ticket/symbol/volume/type/magic/comment,Position same,EXACT_PARITY
+orders,orders_get -> pending (not positions),Order same,EXACT_PARITY
+deals,history_deals_get distinct ids,Deal distinct ids,EXACT_PARITY
+order_check,retcode 0/10009 success,is_success_retcode,EXACT_PARITY
+success retcode,0 and 10009,same,EXACT_PARITY
+order request side,BUY@ask SELL@bid,BUY@ask SELL@bid,EXACT_PARITY
+fill policy,order_check probe FOK->IOC->RETURN,probe_fill_policies,EXACT_PARITY
+fill code quirk,FOK=1 IOC=2 RETURN=0,injectable fill_policy_codes,EXACT_PARITY
+comment bound,29 chars + deterministic reduction,max_comment_length=29,EXACT_PARITY
+close,opposite order + position ticket,close_position,EXACT_PARITY
+reconcile snapshot,broker truth only,reconcile_snapshot,EXACT_PARITY
+strategy notional sizing,model_weight_to_notional + notional_to_mt5_lots,NOT implemented (upstream),INTENTIONAL_GENERIC_DIFFERENCE
+basket atomicity,BROKEN_HEDGE/FLATTENING state machine,NOT in BrokerSession,INTENTIONAL_GENERIC_DIFFERENCE
+retry loop,bounded retry in execution layer,NOT in BrokerSession (upstream),INTENTIONAL_GENERIC_DIFFERENCE

@@ -27,6 +27,7 @@ from .types import (
     MarketReference,
     Order,
     OrderIntent,
+    OrderResult,
     Position,
     StrategyEvent,
     StrategyExposureContext,
@@ -127,7 +128,7 @@ class BrokerSession(Protocol):
 
     def order_check(self, intent: OrderIntent) -> CheckResult: ...
 
-    def submit_order(self, intent: OrderIntent) -> SubmitResult: ...
+    def submit_order(self, intent: OrderIntent) -> OrderResult: ...
 
     def cancel_order(self, order_id: str) -> CancelResult: ...
 

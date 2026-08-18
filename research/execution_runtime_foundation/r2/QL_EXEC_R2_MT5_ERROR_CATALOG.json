@@ -1,0 +1,26 @@
+{
+  "contract": "BROKER_ERROR_CATEGORY",
+  "categories": [
+    "NOT_CONNECTED",
+    "AUTH_FAILED",
+    "IDENTITY_UNAVAILABLE",
+    "SYMBOL_UNAVAILABLE",
+    "CLOCK_UNCALIBRATED",
+    "INVALID_REQUEST",
+    "ORDER_CHECK_FAILED",
+    "ORDER_REJECTED",
+    "TRANSPORT_ERROR",
+    "UNSUPPORTED_CAPABILITY",
+    "UNKNOWN_BROKER_ERROR"
+  ],
+  "rules": [
+    "Raw AttributeError / NoneType / MetaTrader5 exceptions never escape the adapter.",
+    "connect failure -> TRANSPORT_ERROR or NOT_CONNECTED.",
+    "terminal unavailable -> NOT_CONNECTED.",
+    "zero quantity / cannot build request -> INVALID_REQUEST.",
+    "unsupported fill policy -> INVALID_REQUEST (with reason).",
+    "order_send rejection -> ORDER_REJECTED.",
+    "any unclassified failure -> UNKNOWN_BROKER_ERROR."
+  ],
+  "no_retry_loop_inside_broker_session": true
+}

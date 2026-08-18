@@ -1,0 +1,15 @@
+{
+  "checkpoint": "QL-EXEC-R2-MT5-BROKER-SESSION-EXTRACTION",
+  "r1_suite_preserved": true,
+  "r1_1_suite_preserved": true,
+  "r1_r1_1_count": 111,
+  "r2_suite_count": 90,
+  "market_recovery_observation_freshness": true,
+  "source_timestamp_semantics_preserved": true,
+  "success_retcode_behavior_preserved": true,
+  "tb_active_runtime_modified": false,
+  "tb_strategy_science_modified": false,
+  "capital_routing_science_modified": false,
+  "broker_connection_real_attempted": false,
+  "broker_order_real_attempted": false
+}

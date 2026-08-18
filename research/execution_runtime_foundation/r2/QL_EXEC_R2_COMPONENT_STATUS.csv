@@ -1,0 +1,33 @@
+component,status,notes
+OrderIntent amendment,IMPLEMENTED,broker-neutral explicit fields
+OrderType/OrderSide/FillPolicy/QuantityUnit/SlippageUnit,IMPLEMENTED,generic enums
+BrokerErrorCategory,IMPLEMENTED,normalized failure categories
+OrderResult,IMPLEMENTED,normalized submission result
+BrokerIdentity trade flags,IMPLEMENTED,trade_allowed/terminal_trade_allowed/tradeapi_disabled
+Tick.valid,IMPLEMENTED,invalid quote truth
+Bar.volume,IMPLEMENTED,real_volume -> tick_volume fallback
+Position/Order/Deal extensions,IMPLEMENTED,magic/comment/time/id relationships
+FakeMT5,IMPLEMENTED,deterministic injection framework
+MT5BrokerSession,IMPLEMENTED,concrete BrokerSession over injected mt5 module
+connect/disconnect,IMPLEMENTED,external session / idempotent
+identity mapping,IMPLEMENTED,trade mode normalization
+account_state mapping,IMPLEMENTED,free margin != buying power
+symbol mapping,IMPLEMENTED,contracts + declared fill policies
+ensure_symbol,IMPLEMENTED,symbol_select
+probe_fill_policies,IMPLEMENTED,order_check-based discovery
+clock_state,IMPLEMENTED,12h plausibility gate
+tick/bar normalization,IMPLEMENTED,source timestamp preserved + numpy/dict
+positions/orders/deals,IMPLEMENTED,distinct ids
+order_check,IMPLEMENTED,retcode normalized
+submit_order,IMPLEMENTED,FakeMT5 only in tests
+cancel_order,IMPLEMENTED,pending removal
+close_position,IMPLEMENTED,position-ticket referenced
+reconcile_snapshot,IMPLEMENTED,broker truth only
+retcode 0/10009,IMPLEMENTED,central is_success_retcode
+fill policy normalization,IMPLEMENTED,broker-neutral externally
+ownership encoding,IMPLEMENTED,magic/comment bounded deterministic
+no TB/Capital Routing import,VERIFIED,AST-based purity tests
+real MetaTrader5 import,FALSE,none
+real broker connection,FALSE,none
+real broker order,FALSE,none
+TB active runtime,FALSE,untouched

@@ -1,0 +1,9 @@
+retcode,meaning,success,generic_outcome
+0,broker success (TB-observed),true,ok
+10009,TRADE_RETCODE_DONE,true,ok
+10008,TRADE_RETCODE_PLACED,false,pending-only (not treated as success in R2)
+10004,TRADE_RETCODE_REQUOTE,false,rejected / requote
+10027,TRADE_RETCODE_BUSY,false,rejected / retry upstream
+10030,TRADE_RETCODE_INVALID_FILL,false,rejected / invalid fill
+None,no result (API returned None),false,failure
+other,unknown retcode,false,failure
