@@ -1,0 +1,17 @@
+component,status,verdict
+Block III scale seal,SEALED,PASS
+R1 position-scaling repair,SEALED,PASS
+R1.1 truth-sync + handoff seal,SEALED,PASS
+R1.1B cross-branch provenance,SEALED,PASS
+D0 capital translation core,SEALED,PASS
+D0.1 contract/idempotency repair,SEALED,PASS
+D1 exposure-feasibility plan,PREREGISTERED,PASS
+D1.1 notional feasibility surface,PLANNED,NOT_STARTED
+D1.2 quantity representability,PLANNED,NOT_STARTED
+D1.3 margin feasibility,PLANNED,NOT_STARTED
+D1.4 concurrent account-resource replay,PLANNED,NOT_STARTED
+D1.5 physical-book distortion seal,PLANNED,NOT_STARTED
+D1.6 broker quantity translation contract,PLANNED,NOT_STARTED
+execution-runtime-foundation (cross-workstream),EXTERNAL,AUTHORITATIVE_AT_52e39b13
+tb-forward-engine (engineering reference),EXTERNAL,REFERENCE_AT_b48fd352
+broker execution,NOT_PERMITTED,FALSE

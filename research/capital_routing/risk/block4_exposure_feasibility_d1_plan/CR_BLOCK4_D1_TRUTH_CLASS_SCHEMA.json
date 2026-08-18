@@ -1,0 +1,21 @@
+{
+  "$id": "cr-block4.d1.truth-class",
+  "title": "PhysicalTruthClass",
+  "description": "Every physical scenario must be labeled; classes never silently upgrade.",
+  "enum": [
+    "ACTUAL_OBSERVED",
+    "BROKER_DOCUMENTED",
+    "PROFILE_FROZEN",
+    "HYPOTHETICAL_DIAGNOSTIC",
+    "UNKNOWN"
+  ],
+  "rank_high_to_low": [
+    "ACTUAL_OBSERVED",
+    "BROKER_DOCUMENTED",
+    "PROFILE_FROZEN",
+    "HYPOTHETICAL_DIAGNOSTIC",
+    "UNKNOWN"
+  ],
+  "upgrade_rule": "BLOCKED",
+  "note": "A scenario may only be labeled by the authority that produced it. HYPOTHETICAL_DIAGNOSTIC never becomes ACTUAL_OBSERVED without a real observation; FakeMT5 fixtures are HYPOTHETICAL_DIAGNOSTIC at best."
+}

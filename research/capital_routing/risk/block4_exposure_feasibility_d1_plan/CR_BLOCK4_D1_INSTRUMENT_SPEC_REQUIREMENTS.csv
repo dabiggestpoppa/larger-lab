@@ -1,0 +1,33 @@
+field,type,semantics,status
+research_instrument,"string","USDJPY (frozen research identity)",REQUIRED
+broker_symbol,"string|null","MISSING_EXECUTION_TRANSLATION_FIELD until broker binding",UNKNOWN
+broker_company,"string|null","unresolved",UNKNOWN
+transport,"string|null","unresolved",UNKNOWN
+environment,"DEMO|CONTEST|REAL|SIM|REPLAY|UNKNOWN|null","unresolved",UNKNOWN
+product_type,"string|null","spot FX vs CFD unresolved",UNKNOWN
+base_currency,"string|null","unresolved",UNKNOWN
+quote_currency,"string|null","unresolved",UNKNOWN
+settlement_or_margin_currency,"string|null","unresolved",UNKNOWN
+account_currency,"string|null","executable account currency unresolved until binding",UNKNOWN
+contract_size,"number|null","trade_contract_size",REQUIRED
+point,"number|null","point size",REQUIRED
+digits,"integer|null","digits",REQUIRED
+tick_size,"number|null","trade_tick_size",REQUIRED
+tick_value,"number|null","trade_tick_value",REQUIRED
+volume_min,"number|null","minimum lot/volume",REQUIRED
+volume_step,"number|null","volume step",REQUIRED
+volume_max,"number|null","maximum volume",REQUIRED
+margin_model,"string|null","symbol margin mode; tiered if applicable",REQUIRED
+account_leverage,"number|null","FakeMT5 demo leverage is NOT actual truth",REQUIRED
+symbol_leverage,"number|null","symbol-specific leverage",REQUIRED
+margin_tiers,"array|null","margin tiers if applicable",REQUIRED
+hedging_or_netting,"HEDGING|NETTING|UNKNOWN|null","unresolved",UNKNOWN
+trading_hours,"string|null","unresolved",UNKNOWN
+extended_hours,"boolean|null","unresolved",UNKNOWN
+order_types_supported,"array|null","from broker capability truth",REQUIRED
+fill_policies,"array|null","declared vs probed fill policy",REQUIRED
+shortable,"boolean|null","unresolved",UNKNOWN
+borrow_requirements,"string|null","unresolved",UNKNOWN
+source,"string","evidence location / document",REQUIRED
+truth_class,"enum","['ACTUAL_OBSERVED', 'BROKER_DOCUMENTED', 'PROFILE_FROZEN', 'HYPOTHETICAL_DIAGNOSTIC', 'UNKNOWN']",UNKNOWN
+observation_or_freeze_timestamp,"string|null","when the spec was observed/frozen",REQUIRED

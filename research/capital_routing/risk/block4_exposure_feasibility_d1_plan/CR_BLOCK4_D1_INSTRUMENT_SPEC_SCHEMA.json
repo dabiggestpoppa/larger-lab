@@ -1,0 +1,185 @@
+{
+  "$id": "cr-block4.d1.instrument-spec",
+  "title": "InstrumentSpec",
+  "description": "Required field inventory for instrument physical truth.",
+  "required": [
+    "research_instrument",
+    "broker_symbol",
+    "product_type",
+    "contract_size",
+    "volume_min",
+    "volume_step",
+    "volume_max",
+    "source",
+    "truth_class"
+  ],
+  "fields": [
+    {
+      "name": "research_instrument",
+      "type": "string",
+      "semantics": "USDJPY (frozen research identity)"
+    },
+    {
+      "name": "broker_symbol",
+      "type": "string|null",
+      "semantics": "MISSING_EXECUTION_TRANSLATION_FIELD until broker binding"
+    },
+    {
+      "name": "broker_company",
+      "type": "string|null",
+      "semantics": "unresolved"
+    },
+    {
+      "name": "transport",
+      "type": "string|null",
+      "semantics": "unresolved"
+    },
+    {
+      "name": "environment",
+      "type": "DEMO|CONTEST|REAL|SIM|REPLAY|UNKNOWN|null",
+      "semantics": "unresolved"
+    },
+    {
+      "name": "product_type",
+      "type": "string|null",
+      "semantics": "spot FX vs CFD unresolved"
+    },
+    {
+      "name": "base_currency",
+      "type": "string|null",
+      "semantics": "unresolved"
+    },
+    {
+      "name": "quote_currency",
+      "type": "string|null",
+      "semantics": "unresolved"
+    },
+    {
+      "name": "settlement_or_margin_currency",
+      "type": "string|null",
+      "semantics": "unresolved"
+    },
+    {
+      "name": "account_currency",
+      "type": "string|null",
+      "semantics": "executable account currency unresolved until binding"
+    },
+    {
+      "name": "contract_size",
+      "type": "number|null",
+      "semantics": "trade_contract_size"
+    },
+    {
+      "name": "point",
+      "type": "number|null",
+      "semantics": "point size"
+    },
+    {
+      "name": "digits",
+      "type": "integer|null",
+      "semantics": "digits"
+    },
+    {
+      "name": "tick_size",
+      "type": "number|null",
+      "semantics": "trade_tick_size"
+    },
+    {
+      "name": "tick_value",
+      "type": "number|null",
+      "semantics": "trade_tick_value"
+    },
+    {
+      "name": "volume_min",
+      "type": "number|null",
+      "semantics": "minimum lot/volume"
+    },
+    {
+      "name": "volume_step",
+      "type": "number|null",
+      "semantics": "volume step"
+    },
+    {
+      "name": "volume_max",
+      "type": "number|null",
+      "semantics": "maximum volume"
+    },
+    {
+      "name": "margin_model",
+      "type": "string|null",
+      "semantics": "symbol margin mode; tiered if applicable"
+    },
+    {
+      "name": "account_leverage",
+      "type": "number|null",
+      "semantics": "FakeMT5 demo leverage is NOT actual truth"
+    },
+    {
+      "name": "symbol_leverage",
+      "type": "number|null",
+      "semantics": "symbol-specific leverage"
+    },
+    {
+      "name": "margin_tiers",
+      "type": "array|null",
+      "semantics": "margin tiers if applicable"
+    },
+    {
+      "name": "hedging_or_netting",
+      "type": "HEDGING|NETTING|UNKNOWN|null",
+      "semantics": "unresolved"
+    },
+    {
+      "name": "trading_hours",
+      "type": "string|null",
+      "semantics": "unresolved"
+    },
+    {
+      "name": "extended_hours",
+      "type": "boolean|null",
+      "semantics": "unresolved"
+    },
+    {
+      "name": "order_types_supported",
+      "type": "array|null",
+      "semantics": "from broker capability truth"
+    },
+    {
+      "name": "fill_policies",
+      "type": "array|null",
+      "semantics": "declared vs probed fill policy"
+    },
+    {
+      "name": "shortable",
+      "type": "boolean|null",
+      "semantics": "unresolved"
+    },
+    {
+      "name": "borrow_requirements",
+      "type": "string|null",
+      "semantics": "unresolved"
+    },
+    {
+      "name": "source",
+      "type": "string",
+      "semantics": "evidence location / document"
+    },
+    {
+      "name": "truth_class",
+      "type": "enum",
+      "semantics": [
+        "ACTUAL_OBSERVED",
+        "BROKER_DOCUMENTED",
+        "PROFILE_FROZEN",
+        "HYPOTHETICAL_DIAGNOSTIC",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "name": "observation_or_freeze_timestamp",
+      "type": "string|null",
+      "semantics": "when the spec was observed/frozen"
+    }
+  ],
+  "missing_critical_field": "MISSING_REQUIRED_EXECUTION_TRUTH"
+}

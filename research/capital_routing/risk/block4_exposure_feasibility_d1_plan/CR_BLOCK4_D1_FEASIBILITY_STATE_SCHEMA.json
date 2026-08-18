@@ -1,0 +1,29 @@
+{
+  "$id": "cr-block4.d1.feasibility-state",
+  "title": "PhysicalFeasibilityState",
+  "description": "Primary state taxonomy for a feasibility assessment. One primary state per result plus optional secondary flags.",
+  "primary_states": [
+    "EXACTLY_REPRESENTABLE",
+    "REPRESENTABLE_WITH_IMMATERIAL_ROUNDING",
+    "ROUNDING_DISTORTED",
+    "MIN_QUANTITY_BLOCKED",
+    "MAX_QUANTITY_BLOCKED",
+    "NOTIONAL_LIMIT_BLOCKED",
+    "MARGIN_BLOCKED",
+    "BUYING_POWER_BLOCKED",
+    "CURRENCY_CONVERSION_UNRESOLVED",
+    "INSTRUMENT_SPEC_UNRESOLVED",
+    "ACCOUNT_SPEC_UNRESOLVED",
+    "BROKER_CAPABILITY_UNRESOLVED",
+    "OTHER_FAIL_CLOSED"
+  ],
+  "secondary_flags": [
+    "ROUNDING_ACTIVE",
+    "POSITIVE_BOOK_ALTERED",
+    "CLIPPED",
+    "MIN_LOT_OVERSHOOT",
+    "FOREIGN_RESOURCE_CONSUMPTION"
+  ],
+  "fail_closed_default": "OTHER_FAIL_CLOSED",
+  "rule": "A result with any unresolved required truth must take the corresponding *_UNRESOLVED or fail-closed state, never a representable state."
+}

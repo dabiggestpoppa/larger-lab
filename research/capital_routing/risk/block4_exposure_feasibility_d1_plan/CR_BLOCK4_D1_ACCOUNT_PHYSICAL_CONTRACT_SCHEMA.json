@@ -1,0 +1,90 @@
+{
+  "$id": "cr-block4.d1.account-physical-contract",
+  "title": "AccountPhysicalContract",
+  "description": "Frozen or observed account-level physical truth for feasibility lanes.",
+  "fields": [
+    {
+      "name": "account_id",
+      "type": "string",
+      "semantics": "account identity"
+    },
+    {
+      "name": "portfolio_group_id",
+      "type": "string",
+      "semantics": "shared A+B portfolio authority"
+    },
+    {
+      "name": "account_role",
+      "type": "string",
+      "semantics": "PORTFOLIO_MASTER required for canonical A/B"
+    },
+    {
+      "name": "account_currency",
+      "type": "string|null",
+      "semantics": "executable currency"
+    },
+    {
+      "name": "equity_at_reference",
+      "type": "number|null",
+      "semantics": "causal equity snapshot"
+    },
+    {
+      "name": "leverage",
+      "type": "number|null",
+      "semantics": "account leverage; never from FakeMT5 fixtures"
+    },
+    {
+      "name": "margin_model",
+      "type": "string|null",
+      "semantics": "actual broker margin semantics"
+    },
+    {
+      "name": "hedging_or_netting",
+      "type": "HEDGING|NETTING|UNKNOWN",
+      "semantics": "position mode"
+    },
+    {
+      "name": "buying_power_semantics",
+      "type": "string|null",
+      "semantics": "how buying power is defined"
+    },
+    {
+      "name": "quantity_limits",
+      "type": "object|null",
+      "semantics": "min/step/max per instrument"
+    },
+    {
+      "name": "max_notional_or_leverage_limit",
+      "type": "number|null",
+      "semantics": "externally imposed cap if any"
+    },
+    {
+      "name": "foreign_positions",
+      "type": "array",
+      "semantics": "non-CR positions consuming resources"
+    },
+    {
+      "name": "truth_class",
+      "type": "enum",
+      "semantics": [
+        "ACTUAL_OBSERVED",
+        "BROKER_DOCUMENTED",
+        "PROFILE_FROZEN",
+        "HYPOTHETICAL_DIAGNOSTIC",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "name": "source",
+      "type": "string",
+      "semantics": "evidence location"
+    },
+    {
+      "name": "freeze_timestamp",
+      "type": "string|null",
+      "semantics": "when frozen/observed"
+    }
+  ],
+  "missing_critical_field": "MISSING_REQUIRED_EXECUTION_TRUTH",
+  "note": "Structural feasibility (clean account) is separate from momentary operational feasibility (current resources)."
+}

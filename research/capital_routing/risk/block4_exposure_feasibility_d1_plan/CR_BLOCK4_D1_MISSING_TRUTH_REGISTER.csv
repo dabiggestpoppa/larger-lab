@@ -1,0 +1,23 @@
+field,truth_class,detail,blocking
+broker_symbol,UNKNOWN,"research instrument USDJPY; broker representation (USDJPY / USDJPY.PRO / CFD / spot) unresolved",yes
+broker_company,UNKNOWN,"broker identity unresolved",yes
+transport,UNKNOWN,"MT5 / other transport unresolved",yes
+environment,UNKNOWN,"DEMO / REAL environment unresolved",yes
+product_type,UNKNOWN,"spot FX vs CFD representation unresolved",yes
+contract_size,UNKNOWN,"trade_contract_size unknown",yes
+point,UNKNOWN,"point size unknown",yes
+digits,UNKNOWN,"digits unknown",yes
+tick_size,UNKNOWN,"trade_tick_size unknown",yes
+tick_value,UNKNOWN,"trade_tick_value unknown",yes
+volume_min,UNKNOWN,"minimum lot/volume unknown",yes
+volume_step,UNKNOWN,"volume step unknown",yes
+volume_max,UNKNOWN,"maximum volume unknown",yes
+margin_model,UNKNOWN,"symbol margin mode / tiers unknown",yes
+account_leverage,UNKNOWN,"account leverage unknown (FakeMT5 demo fixtures are NOT truth)",yes
+symbol_leverage,UNKNOWN,"symbol-specific leverage unknown",yes
+hedging_netting,UNKNOWN,"HEDGING vs NETTING mode unknown",yes
+executable_account_currency,UNKNOWN,"account currency unresolved until account binding",yes
+account_size,UNKNOWN,"intended account size unresolved",yes
+equity_snapshot,UNKNOWN,"causal account equity snapshot unavailable",yes
+fx_conversion_price,UNKNOWN,"causal conversion price for non-USD legs unknown",yes
+order_fill_policy,UNKNOWN,"declared vs probed fill policy unknown until broker session",yes
