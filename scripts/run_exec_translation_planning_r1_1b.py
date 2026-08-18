@@ -208,14 +208,18 @@ def provenance_audit(repo: Optional[Path]) -> Dict:
                    and d.get("tb_frozen_authority_sha") == TB_ENGINEERING_SHA)
         manifest_agreement = manifest_agreement and self_ok
 
-    # D. no cross-branch write by R1.1: ancestry + changed-file truth
+    # D. no cross-branch write by R1.1: ancestry + changed-file truth.
+    # CR-side facts (R1.1 commit existence, on-capital-routing) resolve against
+    # ROOT (the capital-routing worktree/nested repo always carries its own
+    # branch + commits); foreign-side facts resolve against the repo that holds
+    # the frozen foreign objects.
     r1_1_commits = {}
     for label, sha in [("seal_2bbe52ea", R1_1_SEAL), ("test_child_d51b9b47", R1_1_TEST_CHILD)]:
         r1_1_commits[label] = {
             "sha": sha,
-            "exists": bool(repo and commit_exists(repo, sha)),
+            "exists": bool(commit_exists(ROOT, sha)),
             "on_capital_routing": bool(
-                repo and is_ancestor(repo, sha, "refs/heads/capital-routing")),
+                is_ancestor(ROOT, sha, "refs/heads/capital-routing")),
             "ancestor_of_exec_foundation_frozen": bool(
                 repo and is_ancestor(repo, sha, EXEC_FOUNDATION_SHA)),
             "ancestor_of_tb_frozen": bool(
@@ -251,6 +255,7 @@ def provenance_audit(repo: Optional[Path]) -> Dict:
         "semantics": "IMMUTABLE_COMMIT_SHA — branch tips are mutable and are "
                      "NEVER frozen; historical provenance locks commit objects only",
         "provenance_repo": str(repo) if repo else None,
+        "capital_routing_repo": str(ROOT),
         "frozen": frozen,
         "frozen_commits_exist": frozen_commits_exist,
         "identity_matches": identity_matches,

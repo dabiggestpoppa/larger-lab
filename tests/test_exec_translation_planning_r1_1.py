@@ -250,9 +250,10 @@ def test_no_cross_branch_write():
     # A. frozen commit objects exist (immutable provenance)
     assert r11b.commit_exists(repo, EXEC_FOUNDATION_FROZEN)
     assert r11b.commit_exists(repo, TB_ENGINEERING_FROZEN)
-    # R1.1 commits are descendants of capital-routing
-    assert r11b.is_ancestor(repo, R1_1_SEAL, "refs/heads/capital-routing")
-    assert r11b.is_ancestor(repo, R1_1_TEST_CHILD, "refs/heads/capital-routing")
+    # R1.1 commits are descendants of capital-routing (branch ref lives in the
+    # capital-routing repo itself, not necessarily in the foreign object store)
+    assert r11b.is_ancestor(ROOT, R1_1_SEAL, "refs/heads/capital-routing")
+    assert r11b.is_ancestor(ROOT, R1_1_TEST_CHILD, "refs/heads/capital-routing")
     # R1.1 commits are NOT ancestors of the frozen foreign commits
     for commit in (R1_1_SEAL, R1_1_TEST_CHILD):
         assert not r11b.is_ancestor(repo, commit, EXEC_FOUNDATION_FROZEN)

@@ -153,9 +153,12 @@ def test_tb_checkpoint_identity_matches_frozen_sha():
 def test_r1_1_commits_do_not_mutate_foreign_branch_refs():
     repo = _provenance_repo_or_skip()
     pa = r11b.provenance_audit(repo)
-    # R1.1 commits are descendants of capital-routing
+    # R1.1 commits are descendants of capital-routing (branch ref lives in the
+    # capital-routing repo itself, not necessarily in the foreign object store)
     for sha in (R1_1_SEAL, R1_1_TEST_CHILD):
-        assert r11b.is_ancestor(repo, sha, "refs/heads/capital-routing")
+        assert r11b.is_ancestor(ROOT, sha, "refs/heads/capital-routing")
+        assert pa["r1_1_commits"]["seal_2bbe52ea" if sha == R1_1_SEAL
+                  else "test_child_d51b9b47"]["on_capital_routing"] is True
     # R1.1 commits are NOT ancestors of the frozen foreign commits
     for sha in (R1_1_SEAL, R1_1_TEST_CHILD):
         assert not r11b.is_ancestor(repo, sha, EXEC_FOUNDATION_FROZEN)
