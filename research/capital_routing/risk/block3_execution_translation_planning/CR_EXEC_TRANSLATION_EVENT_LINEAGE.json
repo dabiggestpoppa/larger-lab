@@ -1,0 +1,54 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-III-EXECUTION-TRANSLATION-PLANNING",
+  "base_commit": "40d237123ac2b709cc0ebce1d7f057bbfde25dab",
+  "lineage": [
+    {
+      "stage": "RAW MARKET DATA",
+      "source": "capital-routing/data/raw/mt5_pro (MT5 historical export, data only) + data/USDJPY_M5.parquet (canonical panel)",
+      "status": "FROZEN"
+    },
+    {
+      "stage": "ALPHA EVENT",
+      "source": "Phase 5 routing events -> Phase 6 outcomes -> Phase 7 validated families (phase_7_families.py)",
+      "status": "SEALED"
+    },
+    {
+      "stage": "SEALED EVENT LEDGER",
+      "source": "artifacts/phase_07_5/P7_5_TRADES.csv (890 events, A 432 / B 458, all splits)",
+      "sha256": "ad19e08f16aeb65c17305041182c591401d28c32b418287f45d76a678ddfcd07",
+      "status": "SEALED"
+    },
+    {
+      "stage": "FAMILY -> CAPITAL ROUTING",
+      "source": "artifacts/risk_block1/R1_EVENT_RISK_LEDGER.csv (prices, 1R, r_multiple, mfe/mae, rv, costs) + Block II/III scale",
+      "sha256": "6c98b0d218c66f3f5893733f26c51490138e658046487e3ea108c5feeee2d26f",
+      "status": "SEALED"
+    }
+  ],
+  "event_counts": {
+    "total": 890,
+    "A": 432,
+    "B": 458
+  },
+  "splits": {
+    "inner_sel": 461,
+    "RELATIONSHIP_CONFIRMED_OOS": 280,
+    "inner_val": 149
+  },
+  "instrument": "USDJPY",
+  "missing_execution_fields": [
+    "broker_symbol",
+    "venue_exchange",
+    "tick_size",
+    "tick_value",
+    "minimum_quantity",
+    "quantity_step",
+    "maximum_quantity",
+    "fractional_support",
+    "shortability_confirm",
+    "margin_requirement",
+    "buying_power_semantics",
+    "order_types_supported",
+    "account_currency"
+  ]
+}

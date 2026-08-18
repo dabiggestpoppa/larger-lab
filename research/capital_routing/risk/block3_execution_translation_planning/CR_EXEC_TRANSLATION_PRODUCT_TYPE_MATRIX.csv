@@ -1,0 +1,5 @@
+product_type,research_expression,translation_contract,status
+FX SPOT,"CANONICAL -- USDJPY, pnl in bps of rate, 6h hold, two-sided",notional in base USD; quantity = notional / (contract units per lot); broker pip conventions,CANONICAL
+CFD (USDJPY CFD),Broker-dependent equivalent of the same USDJPY exposure,contract size/leverage per broker spec; must reproduce notional USD exposure,BROKER_DEPENDENT / NOT AUTHORIZED
+FX FUTURES (e.g. JPY futures),Not used by the sealed science,contracts x multiplier; tick value mapping; would need contract-level proof,NOT_USED / NOT_AUTHORIZED
+CASH EQUITY / ETF / OPTION / CRYPTO,Not used by the sealed science,N/A -- separate product contracts would be required,N/A

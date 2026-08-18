@@ -1,0 +1,87 @@
+[
+  {
+    "failure_class": "NO_ACCOUNT_STATE",
+    "fail_closed": true,
+    "description": "All failure classes block new risk and never auto-resolve."
+  },
+  {
+    "failure_class": "STALE_ACCOUNT_STATE",
+    "fail_closed": true,
+    "description": "All failure classes block new risk and never auto-resolve."
+  },
+  {
+    "failure_class": "STALE_PRICE",
+    "fail_closed": true,
+    "description": "All failure classes block new risk and never auto-resolve."
+  },
+  {
+    "failure_class": "UNKNOWN_SYMBOL",
+    "fail_closed": true,
+    "description": "All failure classes block new risk and never auto-resolve."
+  },
+  {
+    "failure_class": "UNKNOWN_INSTRUMENT_SPEC",
+    "fail_closed": true,
+    "description": "All failure classes block new risk and never auto-resolve."
+  },
+  {
+    "failure_class": "INVALID_QUANTITY",
+    "fail_closed": true,
+    "description": "All failure classes block new risk and never auto-resolve."
+  },
+  {
+    "failure_class": "MIN_QUANTITY_RISK_OVERSHOOT",
+    "fail_closed": true,
+    "description": "All failure classes block new risk and never auto-resolve."
+  },
+  {
+    "failure_class": "MARGIN_BLOCKED",
+    "fail_closed": true,
+    "description": "All failure classes block new risk and never auto-resolve."
+  },
+  {
+    "failure_class": "BUYING_POWER_BLOCKED",
+    "fail_closed": true,
+    "description": "All failure classes block new risk and never auto-resolve."
+  },
+  {
+    "failure_class": "SHORT_NOT_AVAILABLE",
+    "fail_closed": true,
+    "description": "All failure classes block new risk and never auto-resolve."
+  },
+  {
+    "failure_class": "MARKET_CLOSED",
+    "fail_closed": true,
+    "description": "All failure classes block new risk and never auto-resolve."
+  },
+  {
+    "failure_class": "H1_MODEL_HEAT_BLOCKED",
+    "fail_closed": true,
+    "description": "All failure classes block new risk and never auto-resolve."
+  },
+  {
+    "failure_class": "H1_TRANSLATED_HEAT_BLOCKED",
+    "fail_closed": true,
+    "description": "All failure classes block new risk and never auto-resolve."
+  },
+  {
+    "failure_class": "DUPLICATE_EVENT",
+    "fail_closed": true,
+    "description": "All failure classes block new risk and never auto-resolve."
+  },
+  {
+    "failure_class": "ORDER_REJECTED",
+    "fail_closed": true,
+    "description": "All failure classes block new risk and never auto-resolve."
+  },
+  {
+    "failure_class": "PARTIAL_FILL",
+    "fail_closed": true,
+    "description": "All failure classes block new risk and never auto-resolve."
+  },
+  {
+    "failure_class": "RECONCILIATION_AMBIGUITY",
+    "fail_closed": true,
+    "description": "All failure classes block new risk and never auto-resolve."
+  }
+]

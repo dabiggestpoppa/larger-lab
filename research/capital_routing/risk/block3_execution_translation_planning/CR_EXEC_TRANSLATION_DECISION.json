@@ -1,0 +1,93 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-III-EXECUTION-TRANSLATION-PLANNING",
+  "status": "PASS",
+  "base_commit": "40d237123ac2b709cc0ebce1d7f057bbfde25dab",
+  "block3_scale_seal_verified": true,
+  "risk_unit_bps": 24.49489742783178,
+  "risk_unit_semantics_verified": true,
+  "risk_unit_is_hard_stop": false,
+  "pnl_bps_semantics_resolved": true,
+  "event_source_lineage_resolved": true,
+  "instrument_universe_resolved": true,
+  "product_types_resolved": true,
+  "account_currency_resolved": true,
+  "equity_basis_proposed": "CURRENT_ACCOUNT_EQUITY_AT_CAUSAL_ADMISSION",
+  "one_r_to_notional_formula_resolved": true,
+  "formula_proven_against_fixtures": true,
+  "cost_scaling_resolved": true,
+  "rounding_policy_resolved": true,
+  "post_rounding_heat_contract_resolved": true,
+  "margin_gate_design_resolved": true,
+  "reservation_state_design_resolved": true,
+  "ownership_design_resolved": true,
+  "restart_reconciliation_design_resolved": true,
+  "broker_path_inventory_complete": true,
+  "historical_890_event_parity_plan_complete": true,
+  "preferred_research_default": {
+    "allocation": "A1_70_30",
+    "heat_architecture": "H1-1.00-REJ",
+    "f_total_pct": 1.0,
+    "family_A_event_fraction_pct": 0.7,
+    "family_B_event_fraction_pct": 0.3,
+    "role": "PREFERRED RESEARCH DEFAULT for execution-translation research only -- NOT production sizing"
+  },
+  "production_scale_selected": false,
+  "broker_selected": false,
+  "broker_execution_authorized": false,
+  "deployment_authorized": false,
+  "mt5_authorized": false,
+  "planning_pass": true,
+  "implementation_ready": true,
+  "implementation_authorized": false,
+  "next_checkpoint_recommended": "CR-RISK-BLOCK-IV-EXECUTION-TRANSLATION-ENGINE-D0",
+  "human_review_required": true,
+  "audit_facts": {
+    "n_events": 890,
+    "n_A": 432,
+    "n_B": 458,
+    "splits": {
+      "inner_sel": 461,
+      "RELATIONSHIP_CONFIRMED_OOS": 280,
+      "inner_val": 149
+    },
+    "worst_A_R": -3.6554,
+    "worst_B_R": -3.313,
+    "admission": {
+      "n_events": 890,
+      "decisions": {
+        "ACCEPT_FULL": 826,
+        "REJECT_HEAT_CAP": 64
+      },
+      "n_accepted_A": 371,
+      "n_accepted_B": 455,
+      "requested_f_A": 0.7,
+      "requested_f_B": 0.3
+    },
+    "notional_per_equity": {
+      "A": 2.8577,
+      "B": 1.2247
+    },
+    "fixture": {
+      "event_id": "EUR_ORIGIN_202307101100",
+      "family": "A",
+      "dir": 1.0,
+      "entry_price": 142.131,
+      "exit_price": 141.479,
+      "price_return_bps": -45.978713629919454,
+      "pos": 0.4427573973380781,
+      "gross_pnl_bps": -20.35741557973596,
+      "cost_bps": 0.6298678864871152,
+      "pnl_bps": -20.987283466223072,
+      "risk_unit_bps": 24.49489742783178,
+      "r_multiple": -0.8568022596566067
+    },
+    "input_hashes": {
+      "P7_5_TRADES.csv": "ad19e08f16aeb65c17305041182c591401d28c32b418287f45d76a678ddfcd07",
+      "R1_EVENT_RISK_LEDGER.csv": "6c98b0d218c66f3f5893733f26c51490138e658046487e3ea108c5feeee2d26f"
+    }
+  },
+  "unresolved_facts": [
+    "broker_symbol/venue/tick/margin/quantity specs: MISSING_EXECUTION_TRANSLATION_FIELD (broker-dependent; recorded, not fabricated)",
+    "account_currency: USD proposed (pair base) -- frozen at the executable-environment checkpoint, not here"
+  ]
+}

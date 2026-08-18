@@ -1,0 +1,52 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-III-EXECUTION-TRANSLATION-PLANNING",
+  "base_commit": "40d237123ac2b709cc0ebce1d7f057bbfde25dab",
+  "sealed_event_schema": {
+    "event_id": "str (deterministic unique, e.g. EUR_ORIGIN_202307101100)",
+    "event_start": "datetime UTC (alpha event timestamp; research and broker timestamps are different fields)",
+    "family": "A | B",
+    "dir": "+1 A long / -1 B short",
+    "pos": "TARGET_VOL/rv vol-normalized research sizing unit (NOT executed notional)",
+    "entry_ts": "event_start + family delay (A 2h, B 1h)",
+    "exit_ts": "entry_ts + 6h (fixed sealed hold)",
+    "pnl_bps": "net PnL bps = dir x pos x price_return - cost",
+    "gross_pnl_bps": "gross before modeled cost",
+    "cost_pnl_bps": "modeled cost (1.2 bps round trip + signed swap)",
+    "split": "inner_sel | inner_val | RELATIONSHIP_CONFIRMED_OOS",
+    "hold_h": "6.0 always"
+  },
+  "ledger_extensions": [
+    "entry_price",
+    "exit_price",
+    "price_return_bps",
+    "risk_unit_bps",
+    "r_multiple",
+    "account_return_pct",
+    "mfe_r",
+    "mae_r",
+    "rv_bps_per_h",
+    "severity",
+    "session",
+    "spread_commission_bps",
+    "swap_bps"
+  ],
+  "required_for_execution_but_missing": [
+    "broker_symbol",
+    "venue",
+    "tick_size",
+    "tick_value",
+    "minimum_quantity",
+    "quantity_step",
+    "margin_requirement",
+    "buying_power_semantics",
+    "account_currency",
+    "equity_source",
+    "order_types_supported",
+    "trading_hours_definition"
+  ],
+  "downstream_only_fields": [
+    "account_equity",
+    "broker_quantity",
+    "portfolio_f"
+  ]
+}

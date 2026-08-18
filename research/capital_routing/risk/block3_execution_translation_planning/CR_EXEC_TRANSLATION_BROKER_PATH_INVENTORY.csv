@@ -1,0 +1,8 @@
+path,capability,classification,reusable_for_execution,notes
+capital-routing/src/capital_routing/ingestion/mt5_adapter.py,MT5 HISTORICAL DATA EXPORT ONLY (explicitly no live trading / broker orders),SUPPORTING (data) / execution UNAVAILABLE,NO,Provider/broker of record for historical data; no order path
+oce/ (Operator Continuity Engine),Planning-phase continuity shell; no broker authority,EXPERIMENTAL,NO,"Authority/continuity shell, not an execution engine"
+core/execution/journal.py,Agent execution journal (O2C vault) -- pattern reference for ledger/idempotency,SUPPORTING (pattern reference),NO,Reuse engineering patterns only; no trading semantics
+TB forward engine (.freebuff/tb-verify/quant-lab/engines),Requested for pattern inspection; engines dir empty in this checkout,UNAVAILABLE,NO,Not present; do NOT import TB strategy/fx math
+Alpaca,No adapter found,UNAVAILABLE,NO,
+Nautilus,Evidence files only (artifacts/evidence book_2_nautilus_evidence.json) -- no engine,UNAVAILABLE,NO,
+Robinhood,No adapter found,UNAVAILABLE,NO,

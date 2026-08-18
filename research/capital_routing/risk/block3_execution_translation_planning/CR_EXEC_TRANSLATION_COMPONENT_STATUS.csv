@@ -1,0 +1,7 @@
+component,role,status,source
+A ALPHA ENGINE,Outputs valid A/B routing events (890 sealed),SEALED,Phase 5-7 families + P7_5_TRADES.csv
+B CAPITAL ROUTER,"Outputs family + admitted_f (A1_70_30, H1-1.00-REJ)",SEALED,phase_r6_common.py + Block III seal
+C CAPITAL TRANSLATOR,Outputs economic target quantity (1R->notional),DESIGNED (this checkpoint),quantity-formula contract
+D EXECUTION GATE,"Validates account/market/broker constraints (margin, buying power, fail-closed)",DESIGNED,margin/buying-power + failure catalog
+E BROKER ADAPTER,Submits actual order,UNAVAILABLE (new implementation required),no execution adapter in repo
+F RECONCILIATION,"Confirms reality (fills, ownership, restart)",DESIGNED,ownership/reconciliation + restart plans
