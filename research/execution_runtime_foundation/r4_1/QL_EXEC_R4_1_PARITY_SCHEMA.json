@@ -1,0 +1,37 @@
+{
+  "schema": "QL_EXEC_R4_1_PARITY_SCHEMA",
+  "version": 1,
+  "description": "Frozen live shadow parity observation record, one entry per synchronized closed common bar.",
+  "required_fields": [
+    "observed_at_utc",
+    "common_bar_key",
+    "strategy_id",
+    "basis",
+    "z_score",
+    "decision",
+    "direction",
+    "model_weights",
+    "target_lots",
+    "active_basket_state",
+    "blocker",
+    "parity_tier"
+  ],
+  "fields": {
+    "observed_at_utc": { "type": "string", "format": "ISO-8601 UTC" },
+    "common_bar_key": { "type": "string", "note": "bar-open timestamp, exact string equality" },
+    "strategy_id": { "type": "string", "enum": ["TB-FROZEN-CONTROL", "TB-FWD-V1"] },
+    "basis": { "type": "number", "note": "ln(GBPAUD) - ln(GBPNZD) + ln(AUDNZD)" },
+    "z_score": { "type": "number" },
+    "decision": { "type": "string", "enum": ["NO_SIGNAL", "ENTRY", "EXIT", "HARD_STOP", "SESSION_EXIT"] },
+    "direction": { "type": "string", "enum": ["LONG", "SHORT", "NONE"] },
+    "model_weights": { "type": "object", "note": "sum|s| = 3 (TB-B exact neutral)" },
+    "target_lots": { "type": "object", "note": "per-leg target lots, 2dp" },
+    "active_basket_state": { "type": "string", "enum": ["FLAT", "OPENING", "OPEN", "BROKEN_HEDGE", "FLATTENING", "CLOSED"] },
+    "blocker": { "type": ["string", "null"] },
+    "parity_tier": { "type": "string", "enum": ["EXACT", "NORMALIZED_EQUIVALENT", "SAFETY_STRENGTHENING_NONREGRESSIVE", "INTENTIONAL_ARCHITECTURE_DIFFERENCE", "MISMATCH", "NOT_TESTED"] }
+  },
+  "comparison_source": {
+    "legacy": "exported read-only snapshot (Option B) or tb_runtime.db heartbeat",
+    "generic": "shadow runtime normalized state"
+  }
+}

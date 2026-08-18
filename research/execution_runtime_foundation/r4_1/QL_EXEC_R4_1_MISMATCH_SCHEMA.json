@@ -1,0 +1,38 @@
+{
+  "schema": "QL_EXEC_R4_1_MISMATCH_SCHEMA",
+  "version": 1,
+  "description": "Frozen live parity mismatch alert record.",
+  "required_fields": [
+    "mismatch_id",
+    "observed_at_utc",
+    "common_bar_key",
+    "mismatch_class",
+    "legacy_value",
+    "generic_value",
+    "tolerance",
+    "parity_tier"
+  ],
+  "mismatch_classes": [
+    "MARKET_DATA_KEY_MISMATCH",
+    "BASIS_MISMATCH",
+    "ZSCORE_MISMATCH",
+    "ENTRY_DECISION_MISMATCH",
+    "EXIT_DECISION_MISMATCH",
+    "DIRECTION_MISMATCH",
+    "WEIGHT_MISMATCH",
+    "LOT_MISMATCH",
+    "SESSION_MISMATCH",
+    "STATE_RECONSTRUCTION_MISMATCH"
+  ],
+  "fields": {
+    "mismatch_id": { "type": "string", "note": "deterministic, non-random" },
+    "observed_at_utc": { "type": "string", "format": "ISO-8601 UTC" },
+    "common_bar_key": { "type": "string" },
+    "mismatch_class": { "type": "string", "enum_ref": "mismatch_classes" },
+    "legacy_value": { "type": "any" },
+    "generic_value": { "type": "any" },
+    "tolerance": { "type": "any", "note": "frozen tolerance from NUMERIC_TOLERANCE" },
+    "parity_tier": { "type": "string", "enum": ["MISMATCH", "NOT_TESTED"] }
+  },
+  "handling_policy": "Every MISMATCH is recorded and alerted. It NEVER auto-repairs science, NEVER alters live TB, and NEVER promotes the shadow."
+}

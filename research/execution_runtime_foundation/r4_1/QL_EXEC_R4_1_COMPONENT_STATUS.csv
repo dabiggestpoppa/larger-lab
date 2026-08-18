@@ -1,0 +1,25 @@
+component,status,notes
+SHADOW_OBSERVE_ONLY runtime mode,PLANNED,first-class mode; pinned can_submit_new_risk=false
+ReadOnlyBrokerSession,PLANNED,write API absent; denylist __getattr__; G1 excludes order_check
+Runtime execution gate,PLANNED,R3 authority gate reused; shadow pins false
+Deployment profile (immutable),PLANNED,TB-GENERIC-SHADOW-G1 hashed at startup
+Process capability denial,PLANNED_OPTIONAL,no broker creds / no MT5 client in shadow process
+Independent state directory,PLANNED,shadow_state/tb-generic-shadow-g1/
+Independent PID lock,PLANNED,shadow.pid (never active TB pid)
+Independent desired state,PLANNED,shadow_desired_state (RUNNING/STOPPED_BY_USER)
+Independent supervisor (shadowctl),PLANNED,start/stop/status separate from tbctl
+Legacy observation (read-only),PLANNED,tb_runtime.db + logs; export side-channel if needed
+Market-data sharing path,PLANNED,LEGACY_EXPORT_READ_ONLY_SNAPSHOT (Option B)
+MT5 concurrent read audit,PLANNED_UNRESOLVED,not assumed safe; audit before any Option A
+Parity schema,PLANNED,frozen PARITY_SCHEMA v1
+Mismatch schema,PLANNED,frozen MISMATCH_SCHEMA v1
+Shadow telemetry schema,PLANNED,frozen TELEMETRY_SCHEMA v1
+Numeric tolerances,PLANNED,frozen pre-observation
+Resource budget,PLANNED,CPU<=5% mem<=256MB disk<=10MB/h log<=5MB
+Restart drill,PLANNED,controlled restart + crash drill
+Market close drill,PLANNED,non-latching recovery
+Evidence stopping rule,PLANNED,1000 bars + 5 days + drills
+Rollback plan,PLANNED,stop shadow; delete/retain isolated dir
+Active TB non-interference,PLANNED,no active-TB write path
+Security audit,PLANNED,no secrets; no order authority
+Automatic failover/promotion,FORBIDDEN,no leader election / takeover

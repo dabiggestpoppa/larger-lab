@@ -1,0 +1,29 @@
+{
+  "checkpoint": "QL-EXEC-R4.1-TB-GENERIC-RUNTIME-SHADOW-DEPLOYMENT-PLAN",
+  "frozen_at": "2026-08-18",
+  "base_commit": "750a14bf20bf0869f452d8df20138e58bbb091e5",
+  "branches": {
+    "execution_runtime_foundation": "750a14bf20bf0869f452d8df20138e58bbb091e5",
+    "tb_forward_engine": "b48fd35255b41865026a3cba333ae2a2a0d6a004",
+    "capital_routing": "73f760ce09e7109b23732fb7ff2ec8ad455a563e",
+    "main": "dfdca6acd829cda4c084cd3bd217ab606348b660"
+  },
+  "authority_delta_vs_r4": {
+    "tb_forward_engine": "UNCHANGED (still b48fd3525, TB-R6.1D-BOOT-FLOW-STACK)",
+    "main": "UNCHANGED (still dfdca6ac)",
+    "capital_routing": "MOVED FORWARD: f52d5f482 -> 73f760ce0 (added CR-RISK-BLOCK-IV-D1.1-BROKER-INDEPENDENT-NOTIONAL-FEASIBILITY-SURFACE and CR-RISK-BLOCK-IV-D1.1A-ARTIFACT-TRUTH-AND-QUANTILE-RECONCILIATION). R4.1 does NOT import capital-routing science, so this delta has no effect on R4.1 parity or safety."
+  },
+  "active_tb_readonly_sources": {
+    "quant-lab/runtime/tb_runtime_config.py": "ed3922e503c695749f5b2fcaff7565818279627e940414173fc7818927f61a80",
+    "quant-lab/runtime/tb_runtime_db.py": "read-only reference for legacy observation (runtime_status / runtime_heartbeat / runtime_errors / daily_nav / deployment_nav)",
+    "quant-lab/tb_live/snapshot_capture.py": "read-only reference: existing data-collection-only audit tool (never submits orders)"
+  },
+  "r4_harness_reused": [
+    "quant-lab/execution_runtime/tb/adapters.py",
+    "quant-lab/execution_runtime/tb/basket.py",
+    "quant-lab/execution_runtime/tb/parity.py",
+    "quant-lab/execution_runtime/tb/reference.py",
+    "quant-lab/execution_runtime/tb/harness.py"
+  ],
+  "note": "R4.1 is PLAN ONLY. No source files were modified; no tests were added or run. The R4 baseline of 355/355 tests remains the verified engineering truth for the generic TB parity harness."
+}
