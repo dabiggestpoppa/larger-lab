@@ -372,7 +372,11 @@ class TestProgramRegistry:
         assert SPECIES_REGISTER["X1-SYNTHESIS"]["status"] == "NOT_AUTHORIZED"
 
     def test_formula_register_schema(self):
-        reg = formula_register_dict()
+        # B1 schema: formulas must carry implementation mapping fields.
+        from strategy_foundry.pft.spec.implementation_map import enrich_formula_register
+
+        formulas = enrich_formula_register(formula_register_dict()["formulas"])
+        reg = {"schema_version": "1.1", "formulas": formulas}
         assert schemas.validate_formula_register(reg) == []
         ids = [f["id"] for f in reg["formulas"]]
         assert len(ids) == len(set(ids)) == 19

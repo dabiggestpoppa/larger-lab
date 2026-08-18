@@ -1,0 +1,362 @@
+"""Machine-readable A1 v2.2 (Deepers) frozen RAW specification.
+
+Transcribed verbatim from SPECIFICATION_V2_2.md. Every kernel constant is
+referenced by parameter id so the parameter register can be cross-checked
+(no unregistered constants, no non-RAW classes).
+"""
+
+from __future__ import annotations
+
+from ..governance.parameters import ParameterRegister
+
+SPEC_ID = "A1-DEEPERS-v2.2"
+SPEC_STATUS = "FROZEN"
+SPEC_LINEAGE = ["v1.x", "v2.0", "v2.1", "v2.2"]
+
+# Frozen precedence chain (build prompt section 15.1 / spec RAW invariants).
+PRECEDENCE = [
+    "features",
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "FSM",
+    "gross_cap",
+    "fade",
+    "drawdown_overlay",
+    "leg_stop",
+    "final_target",
+    "execution",
+]
+
+# Every kernel must enumerate a fail-closed behavior for its invalid states.
+FAIL_CLOSED_TABLE = {
+    "K1": [
+        {"condition": "no eligible DMD mode (0.95<|lambda|<1.0, Im>0)",
+         "behavior": "w3=0, K1_VALID=false, reason code logged"},
+        {"condition": "same mode wins both P_W and P_EC",
+         "behavior": "DeltaPhi=0, w3=0"},
+        {"condition": "Brent or DAX state stale > 2h",
+         "behavior": "K1 calculation disabled for that slot, stale metadata retained"},
+    ],
+    "K2": [
+        {"condition": "H==L",
+         "behavior": "gamma=0"},
+        {"condition": "previous sigma_W==0",
+         "behavior": "acceleration=0"},
+        {"condition": "activation thresholds not met",
+         "behavior": "w1=0"},
+    ],
+    "K3": [
+        {"condition": "X^T X cannot be stably inverted under preregistered tolerance",
+         "behavior": "K3_OLS_VALID=false, w2=0, reason code logged; no pseudoinverse/ridge"},
+        {"condition": "no eligible topology (beta1(epsilon)==0)",
+         "behavior": "topology multiplier 0, w2=0"},
+        {"condition": "Brent or DAX state stale > 2h",
+         "behavior": "K3 calculation disabled for that slot"},
+    ],
+    "K4": [
+        {"condition": "insufficient history (N<20 or RV6 window unavailable)",
+         "behavior": "alpha_D invalid, w_total=0, reason code logged"},
+        {"condition": "alpha_D non-finite",
+         "behavior": "w_total=0, reason code logged"},
+    ],
+    "FSM": [
+        {"condition": "w_total non-finite",
+         "behavior": "treated as neutral, W_base=[0,0,0], reason code logged"},
+    ],
+    "DRAWDOWN": [
+        {"condition": "DD >= 0.195",
+         "behavior": "flatten all legs, strategy_terminal=true, no automatic restart"},
+    ],
+    "LEG_STOP": [
+        {"condition": "(LE_t - LE_{t-6})/NAV_t < -0.02",
+         "behavior": "leg target=0, 12 completed H1 bar execution ban; signal continues"},
+    ],
+}
+
+
+def build_a1_v22_spec() -> dict:
+    """The frozen machine-readable A1 v2.2 specification."""
+    return {
+        "spec_id": SPEC_ID,
+        "spec_status": SPEC_STATUS,
+        "spec_lineage": SPEC_LINEAGE,
+        "source_document": "quant-lab/research/strategy_foundry/pft/a1_deepers_v2/SPECIFICATION_V2_2.md",
+        "universe": {
+            "W": {
+                "role": "signal",
+                "instrument": "ICE Brent continuous/front-month reference",
+                "execution": "Brent CFD proxy replicating front future",
+            },
+            "E": {"role": "signal+execution", "instrument": "EURUSD"},
+            "C": {"role": "signal+execution", "instrument": "USDCAD"},
+            "EC": {
+                "role": "execution",
+                "instrument": "direct EURCAD CFD/spot series",
+                "signal_returns": "synthetic r_E + r_C where specified",
+            },
+            "I": {
+                "role": "signal",
+                "instrument": "GDAXI cash DAX",
+                "execution": "DAX CFD",
+            },
+        },
+        "time": {
+            "base_interval": "H1",
+            "timezone": "America/New_York",
+            "dst_aware": True,
+            "k1_refresh": "every completed H1 bar",
+            "k2_refresh": "every completed H1 bar",
+            "k4_refresh": "every completed H1 bar",
+            "k3_classification_snapshot": "H1 candle ending 12:00 New York",
+            "k3_implementation": "13:00 bar open",
+            "k3_classification_frozen_until": "following 12:00 snapshot",
+            "k3_transition_gap": "11:00-13:00 retains prior topology classification",
+            "k3_base_alpha_recompute": "hourly despite frozen topology classification",
+        },
+        "returns": {
+            "formula": "r_t = ln(P_t / P_{t-1}) on observed H1 closes",
+            "raw_stale_closed_market": "r_t = 0, staleness explicitly flagged",
+        },
+        "state_720_slot": {
+            "window": "720 synchronized chronological H1 slots",
+            "closed_slot_behavior": "carry last known price, stale=true, RAW return=0",
+            "stale_disable_rule": "required Brent/DAX state stale > 2 hours disables "
+                                  "affected K1/K3 calculation",
+            "stale_metadata": "never erased",
+        },
+        "kernels": {
+            "K1": {
+                "name": "DMD/Koopman phase kernel",
+                "observable": ["r_W", "|r_W|", "r_E", "|r_E|", "r_C", "|r_C|"],
+                "operator": {"formula_ref": "A1.F06.DMD_OPERATOR", "A": "Y X^+", "eig": "A Phi = Phi Lambda"},
+                "eligibility": {
+                    "param_refs": ["A1.F06.DMD_LAMBDA_LOW", "A1.F06.DMD_LAMBDA_HIGH"],
+                    "rule": "0.95 < |lambda| < 1.0 and Im(lambda) > 0; upper-half-plane "
+                            "mode represents the conjugate pair",
+                },
+                "normalization": "every eigenvector unit-L2",
+                "participation": {"formula_ref": "A1.F07.MODE_PARTICIPATION",
+                                  "P_W": "sum(abs(Phi rows 1-2))", "P_EC": "sum(abs(Phi rows 3-6))",
+                                  "selection": "lambda_W = argmax P_W among eligible; "
+                                               "lambda_EC = argmax P_EC among eligible"},
+                "phase_distance": {"formula_ref": "A1.F08.PHASE_DISTANCE",
+                                   "rule": "DeltaPhi = min(|phi_W-phi_EC|, 2pi-|phi_W-phi_EC|) "
+                                           "bounded [0, pi]",
+                                   "same_mode_rule": "same mode wins both -> DeltaPhi=0"},
+                "activation": {"param_ref": "A1.F06.DMD_PHASE_THRESHOLD",
+                               "rule": "DeltaPhi > 1.57 activates w3"},
+                "weight": {"formula_ref": "A1.F08.PHASE_DISTANCE",
+                           "rule": "w3 = -sign(r_I) * min(DeltaPhi/2.0, 0.35)",
+                           "param_refs": ["A1.F06.W3_PHASE_DIVISOR", "A1.F06.W3_MAGNITUDE_CAP"],
+                           "inactive_rule": "w3=0"},
+            },
+            "K2": {
+                "name": "Brent range-asymmetry / volatility acceleration kernel",
+                "gamma": {"formula_ref": "A1.F03.GAMMA_RAW",
+                          "rule": "gamma = ((H-C)-(C-L))/(H-L); H==L -> 0",
+                          "param_ref": "A1.F03.GAMMA_HL_ZERO"},
+                "smooth": {"formula_ref": "A1.F04.GAMMA_SMA3",
+                           "rule": "gamma_bar = (gamma_t + gamma_{t-1} + gamma_{t-2})/3",
+                           "param_ref": "A1.F04.GAMMA_SMA_WINDOW"},
+                "acceleration": {"formula_ref": "A1.F05.ACCELERATION",
+                                 "rule": "A_t = sigma_t/sigma_{t-1} - 1; prev sigma==0 -> 0"},
+                "activation": {"param_refs": ["A1.F05.GAMMA_BAR_THRESHOLD", "A1.F05.ACCEL_THRESHOLD"],
+                               "rule": "requires |gamma_bar| > 0.10 AND A_t > 0.025"},
+                "weight": {"formula_ref": "A1.F05.ACCELERATION",
+                           "rule": "w1 = -0.45 * sign(gamma_bar) * min(A_t/0.04, 1)",
+                           "param_refs": ["A1.F05.W1_LEADING_SCALE", "A1.F05.ACCEL_CAP_DIVISOR"],
+                           "inactive_rule": "w1=0",
+                           "note": "leading negative sign intentional in v2.2"},
+            },
+            "K3": {
+                "name": "topological EURCAD kernel",
+                "nodes": ["W", "E", "C", "I"],
+                "zscore": "z-score H1 returns using RAW 720-slot rolling state",
+                "distance": {"formula_ref": "A1.F09.VR_DISTANCE",
+                             "rule": "D_ij = sqrt(sum_{tau=0..5}(z_i(t-tau)-z_j(t-tau))^2)",
+                             "param_ref": "A1.F09.VR_PATH_WINDOW"},
+                "epsilon": {"rule": "epsilon = 0.45*median(D_ij) + 0.015*sigma_W(t)",
+                            "param_refs": ["A1.F09.VR_MEDIAN_COEFF", "A1.F09.VR_SIGMA_COEFF"],
+                            "note": "do NOT divide sigma by oil price"},
+                "vr_construction": {"rule": "vertices included; edge iff D_ij <= epsilon; "
+                                            "every 3-clique filled 2-simplex; every 4-clique "
+                                            "filled 3-simplex"},
+                "classification": {"formula_ref": "A1.F10.VR_CLASSIFICATION",
+                                   "persistent": "beta1(epsilon)>0 AND beta1(1.15*epsilon)>0",
+                                   "fragile": "beta1(epsilon)>0 AND beta1(1.15*epsilon)==0",
+                                   "no_hole": "beta1(epsilon)==0",
+                                   "param_ref": "A1.F10.VR_PERSISTENCE_SCALE"},
+                "ols": {"formula_ref": "A1.F11.K3_OLS",
+                        "y": "[D_EC,t-1 ... D_EC,t-20]^T",
+                        "X_columns": ["1", "D_WE,t-1..t-20", "D_WC,t-1..t-20"],
+                        "estimator": "beta = (X^T X)^-1 X^T y (literal RAW)",
+                        "current_t_excluded": True,
+                        "param_ref": "A1.F11.K3_OLS_LAG",
+                        "fail_closed": "singular/unstable inverse -> K3_OLS_VALID=false, w2=0, "
+                                       "reason logged; no pseudoinverse/ridge (TWIN only)"},
+                "alpha": {"formula_ref": "A1.F12.K3_ALPHA",
+                          "rule": "alpha2 = sign(r_E+r_C) * |D_EC - Dhat_EC|",
+                          "base2": "0.30 * sign(alpha2) * |alpha2|/0.002",
+                          "param_refs": ["A1.F12.K3_BASE2_SCALE", "A1.F12.K3_ALPHA2_DIVISOR"]},
+                "sizing": {"rule": "w2 = clip(base2 * topology_multiplier, -0.30, +0.30)",
+                           "param_refs": ["A1.F12.K3_W2_CLIP",
+                                          "A1.F12.K3_TOPOLOGY_PERSISTENT_MULT",
+                                          "A1.F12.K3_TOPOLOGY_FRAGILE_MULT",
+                                          "A1.F12.K3_TOPOLOGY_NOHOLE_MULT"]},
+                "schedule": {"snapshot": "H1 candle ending 12:00 NY",
+                             "implementation": "13:00 bar open",
+                             "param_refs": ["A1.K3.NOON_SNAPSHOT_HOUR", "A1.K3.IMPLEMENTATION_HOUR"],
+                             "frozen_until": "following 12:00 snapshot"},
+            },
+            "K4": {
+                "name": "antisymmetric commutator kernel",
+                "oil_state": "A_t = r_W,t * sigma_W,t",
+                "eurcad_rv": {"formula_ref": "A1.F13.RV6",
+                              "rule": "B_t = sample_std(r_EC,t-5..t, ddof=1), exactly six H1 "
+                                      "returns, hourly, nonannualized",
+                              "param_refs": ["A1.F13.RV6_WINDOW", "A1.F13.RV6_DDOF"]},
+                "commutator": {"formula_ref": "A1.F14.COMMUTATOR",
+                               "rule": "alpha_D = (1/20) sum_{k=1..20}(A_{t-k}B_{t-k+1} - "
+                                       "B_{t-k}A_{t-k+1}); k=1 intentionally uses current A_t,B_t",
+                               "param_ref": "A1.F14.COMMUTATOR_N"},
+                "aggregator": {"rule": "w_total = clip(sign(alpha_D)*min(|alpha_D|/0.0005,1), -1, 1)",
+                               "param_ref": "A1.F14.COMMUTATOR_DIVISOR"},
+            },
+        },
+        "fsm": {
+            "neutral": "|w_total| < 0.05",
+            "long": "w_total >= +0.05",
+            "short": "w_total <= -0.05",
+            "param_ref": "A1.F15.FSM_NEUTRAL_THRESHOLD",
+            "resize": "weights continuously resize hourly while state remains active",
+            "formula_ref": "A1.F15.CLUSTER_FSM",
+        },
+        "base_cluster": {
+            "neutral_target": "[0,0,0]",
+            "active_target": "[w_total*w1, w_total*w2, w_total*0.5*w3]",
+            "param_ref": "A1.F15.CLUSTER_W3_SCALE",
+        },
+        "gross_cap": {
+            "rule": "g = sum(abs(W_base)); if g>1: W_cap = W_base/g else W_cap = W_base",
+            "cap": "1.0 x NAV",
+            "param_ref": "A1.F16.GROSS_CAP",
+            "formula_ref": "A1.F16.GROSS_CAP",
+        },
+        "reversal_fade": {
+            "hour_1": "67% of existing exposure remains",
+            "hour_2": "exactly flat for the full hour",
+            "hour_3": "linearly ramp new target to 100%",
+            "param_refs": ["A1.F17.FADE_HOUR1_RETAIN", "A1.F17.FADE_HOUR2_FLAT",
+                           "A1.F17.FADE_HOUR3_RAMP"],
+            "reflip_rule": "signal flips again during fade -> restart fade from current "
+                           "exposure toward newest target",
+            "neutral_rule": "signal becomes neutral -> continue fade toward zero then stop",
+            "formula_ref": "A1.F17.FADE",
+        },
+        "drawdown_overlay": {
+            "definition": "DD = 1 - NAV/max_{s<=t}(NAV_s), mark-to-market incl. open unrealized PnL",
+            "zones": [
+                {"param_ref": "A1.F18.DD_ZONE1", "condition": "DD < 0.12", "behavior": "W_DD = W_fade"},
+                {"param_refs": ["A1.F18.DD_ZONE1", "A1.F18.DD_ZONE2", "A1.F18.DD_SCALE_WINDOW"],
+                 "condition": "0.12 <= DD < 0.18",
+                 "behavior": "W_DD = W_fade * (1 - (DD-0.12)/0.06)"},
+                {"param_refs": ["A1.F18.DD_ZONE2", "A1.F18.DD_ZONE3", "A1.F18.DD_REFLECTOR"],
+                 "condition": "0.18 <= DD < 0.195", "behavior": "W_DD = -0.50 * W_fade"},
+                {"param_ref": "A1.F18.DD_TERMINAL", "condition": "DD >= 0.195",
+                 "behavior": "flatten all, strategy_terminal=true, no automatic restart"},
+            ],
+            "formula_ref": "A1.F18.DRAWDOWN",
+            "note": "kill is a liquidation instruction; not a guarantee realized DD cannot gap past 20%",
+        },
+        "leg_stop": {
+            "trigger": "(MarkedLegEquity_t - MarkedLegEquity_{t-6}) / Current_NAV_t < -0.02",
+            "param_refs": ["A1.F19.LEG_STOP_WINDOW", "A1.F19.LEG_STOP_TRIGGER",
+                           "A1.F19.LEG_STOP_BAN"],
+            "behavior": "final target for that leg = 0; ban execution for 12 completed H1 bars; "
+                        "leg remains in signal calculations; rolling clock not reset by resizing",
+            "formula_ref": "A1.F19.LEG_STOP",
+        },
+        "precedence": PRECEDENCE,
+        "execution_timing": {
+            "general_rule": "signal from H1 close at t -> first executable target = next "
+                            "eligible quote/bar open after signal calculation",
+            "k3_special": "12:00 completed H1 snapshot -> 13:00 implementation",
+            "same_close_rule": "no same-close hindsight fill; RAW default next executable quote",
+        },
+        "costs": {
+            "alpha_assumption": "alpha equations assume zero costs",
+            "backtester_requirement": "separately model and report spread, slippage, "
+                                      "swap/financing, CFD-specific execution costs; gross and "
+                                      "net both retained",
+        },
+        "fail_closed": FAIL_CLOSED_TABLE,
+    }
+
+
+def validate_a1_spec(spec: dict, register: ParameterRegister) -> list:
+    """Return violations. A1 spec must reference only registered RAW-usable parameters."""
+    errors = []
+    if spec.get("spec_id") != SPEC_ID:
+        errors.append(f"spec_id must be {SPEC_ID!r}")
+    if spec.get("spec_status") != SPEC_STATUS:
+        errors.append(f"spec_status must be {SPEC_STATUS!r}")
+    if spec.get("precedence") != PRECEDENCE:
+        errors.append("precedence chain does not match the frozen order")
+
+    # Collect every param_ref (scalar or list) anywhere in the spec.
+    refs: set[str] = set()
+
+    def walk(node):
+        if isinstance(node, dict):
+            for k, v in node.items():
+                if k == "param_ref":
+                    refs.add(v)
+                elif k == "param_refs":
+                    refs.update(v)
+                else:
+                    walk(v)
+        elif isinstance(node, list):
+            for item in node:
+                walk(item)
+
+    walk(spec)
+
+    for ref in sorted(refs):
+        try:
+            param = register.get(ref)
+        except Exception:  # noqa: BLE001
+            errors.append(f"spec references unregistered parameter {ref!r}")
+            continue
+        if param.parameter_class not in ("AUTHOR_CONSTANT", "RESEARCH_CONSTANT"):
+            errors.append(f"spec references {ref} with non-RAW class {param.parameter_class}")
+
+    # Kernel completeness
+    for kernel_id in ("K1", "K2", "K3", "K4"):
+        if kernel_id not in spec.get("kernels", {}):
+            errors.append(f"kernel {kernel_id} missing from spec")
+    # Fail-closed coverage: every kernel must appear in the fail-closed table.
+    for kernel_id in ("K1", "K2", "K3", "K4"):
+        if kernel_id not in spec.get("fail_closed", {}):
+            errors.append(f"fail-closed table missing kernel {kernel_id}")
+    for overlay in ("FSM", "DRAWDOWN", "LEG_STOP"):
+        if overlay not in spec.get("fail_closed", {}):
+            errors.append(f"fail-closed table missing {overlay}")
+
+    # Formula refs must be registered formula ids.
+    from ..program_registry import FORMULA_IDS
+
+    formula_refs = set()
+    for kernel in spec.get("kernels", {}).values():
+        for section in kernel.values():
+            if isinstance(section, dict) and section.get("formula_ref"):
+                formula_refs.add(section["formula_ref"])
+    for section_key in ("fsm", "gross_cap", "reversal_fade", "drawdown_overlay", "leg_stop"):
+        section = spec.get(section_key, {})
+        if isinstance(section, dict) and section.get("formula_ref"):
+            formula_refs.add(section["formula_ref"])
+    for ref in sorted(formula_refs):
+        if ref not in FORMULA_IDS:
+            errors.append(f"spec references unregistered formula {ref!r}")
+    return errors

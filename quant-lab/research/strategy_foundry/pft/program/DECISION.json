@@ -1,5 +1,5 @@
 {
-  "checkpoint_id": "PFT-B0-PROGRAM-CONSTITUTION",
+  "checkpoint_id": "PFT-B1-SPECIFICATION-SEAL",
   "program_id": "PFT",
   "branch": "agent/deepers-strategy-foundry",
   "base_sha": "9f61288679eea56a298e08f718c314f2ca509bc5",
@@ -21,6 +21,6 @@
   "next_checkpoint_authorized": false,
   "blockers": [],
   "warnings": [
-    "B0 does not evaluate data truth, math conformance or causality; those gates first apply at PFT-B2/PFT-B3."
+    "B1 seals specifications; data truth / math / causality gates first apply at PFT-B2/PFT-B3."
   ]
 }

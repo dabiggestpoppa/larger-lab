@@ -27,6 +27,7 @@ if SRC.exists() and str(SRC) not in sys.path:
 
 QUANT_LAB_DIR = Path(__file__).resolve().parents[3]
 
+from strategy_foundry.pft.evidence import parse_pytest_junit  # noqa: E402
 from strategy_foundry.pft.governance import ledger as ledger_mod  # noqa: E402
 from strategy_foundry.pft.governance import schemas  # noqa: E402
 from strategy_foundry.pft.governance.authority import default_authority  # noqa: E402
@@ -56,26 +57,6 @@ JSON_ARTIFACTS = [
     "AUTHORITY.json",
     "DATA_USAGE_LEDGER.json",
 ]
-
-
-def parse_pytest_junit(path: Path) -> dict:
-    """Return {'passed': bool, 'tests': n, 'failures': n, 'errors': n}."""
-    try:
-        import xml.etree.ElementTree as ET
-
-        tree = ET.parse(path)
-        root = tree.getroot()
-        tests = int(root.attrib.get("tests", 0))
-        failures = int(root.attrib.get("failures", 0))
-        errors = int(root.attrib.get("errors", 0))
-        return {
-            "passed": failures == 0 and errors == 0,
-            "tests": tests,
-            "failures": failures,
-            "errors": errors,
-        }
-    except Exception as exc:  # noqa: BLE001
-        return {"passed": False, "tests": 0, "failures": 0, "errors": 0, "error": str(exc)}
 
 
 def evidence_checks() -> dict:

@@ -35,3 +35,4 @@ seals their content.
 | Generation | Reason | Files | Defect class |
 |---|---|---|---|
 | B0 | ratify program constitution | program/*, governance/*, tests | N/A (initial) |
+| B0.1-doc | B0 REPORT.md displayed pytest count as 0 (junit parser read the outer `<testsuites>` element; counts live on `<testsuite>`). Actual B0 evidence: 48 tests, 0 failures. B0 gate conclusion (PASS) is unaffected; only the human-readable count was misreported. Parser fixed in `evidence.py` (single canonical path); the committed B0 REPORT.md is left untouched per immutability. | evidence.py, build_b0_artifacts.py, build_b1_artifacts.py | DOCUMENTATION / evidence-display defect |
