@@ -129,11 +129,22 @@ class SimBrokerSession(BrokerSession):
         self._fail_mode = "FULL_FILL"
         self._order_check_ok = True
         self._connect_ok = True
+        self._symbol_fail: dict[str, str] = {}  # broker_symbol -> mode override
 
     # ── test configuration helpers ────────────────────────────────────────
 
     def set_fail_mode(self, mode: str) -> None:
         self._fail_mode = mode
+
+    def set_symbol_fail_mode(self, symbol: str, mode: str) -> None:
+        """Per-symbol failure override (e.g. leg2 partial, leg3 reject)."""
+        self._symbol_fail[symbol] = mode
+
+    def clear_symbol_fail_modes(self) -> None:
+        self._symbol_fail.clear()
+
+    def _mode_for(self, symbol: str) -> str:
+        return self._symbol_fail.get(symbol, self._fail_mode)
 
     def set_order_check_ok(self, ok: bool) -> None:
         self._order_check_ok = ok
@@ -332,14 +343,15 @@ class SimBrokerSession(BrokerSession):
             return OrderResult(
                 ok=False, reason="zero quantity", error_category=BrokerErrorCategory.INVALID_REQUEST
             )
-        if self._fail_mode == "ORDER_REJECT":
+        mode = self._mode_for(intent.symbol)
+        if mode == "ORDER_REJECT":
             return OrderResult(
                 ok=False,
                 retcode=REJECT_RETCODE,
                 reason="order rejected",
                 error_category=BrokerErrorCategory.ORDER_REJECTED,
             )
-        if self._fail_mode == "TRANSPORT_ERROR":
+        if mode == "TRANSPORT_ERROR":
             return OrderResult(
                 ok=False,
                 reason="order_send transport error",
@@ -359,7 +371,7 @@ class SimBrokerSession(BrokerSession):
             time=0.0,
         )
 
-        if self._fail_mode == "ZERO_FILL":
+        if mode == "ZERO_FILL":
             # Accepted order, but no position/deal materializes.
             return OrderResult(
                 ok=True, broker_order_id=order_id, retcode=SUCCESS_RETCODE,
@@ -367,7 +379,7 @@ class SimBrokerSession(BrokerSession):
             )
 
         filled = intent.volume
-        if self._fail_mode == "PARTIAL_FILL":
+        if mode == "PARTIAL_FILL":
             filled = round(intent.volume * self._partial_ratio, 6)
 
         position_id = str(self._next_id)

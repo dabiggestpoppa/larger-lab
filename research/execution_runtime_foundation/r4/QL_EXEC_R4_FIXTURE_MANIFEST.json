@@ -1,0 +1,25 @@
+{
+  "checkpoint": "QL-EXEC-R4-TB-FULL-NONREGRESSION-MIGRATION-HARNESS",
+  "fixture": "make_control_fixture",
+  "description": "Deterministic, causal TB replay fixture: 200 warmup bars (tiny GA oscillation) + a GA up-spike SHORT entry bar + a GA down-spike exit bar, both inside the frozen London session (raw 10:00 => est hour 5).",
+  "params": {
+    "warmup_bars": 200,
+    "warmup_ga": "1.808000 +- 0.000100 alternating",
+    "gn": 1.978000,
+    "an": 1.094000,
+    "signal_ga": 1.820000,
+    "exit_ga": 1.796000,
+    "signal_time": "2024-01-02T10:00:00",
+    "exit_time": "2024-01-02T10:05:00"
+  },
+  "basket_notional_usd": 25000.0,
+  "notional_note": "Frozen harness notional (engineering scalar, NOT alpha): the smallest value proven to pass the canonical GATE K neutrality preflight under the reference contract specs.",
+  "scenario_classes": [
+    "no_signal", "primary_shadow", "control_long", "control_short",
+    "control_exit", "leg_reject", "partial_leg", "broken_hedge",
+    "restart_flat", "restart_open", "restart_partial", "restart_close",
+    "crash_after_plan_commit", "crash_after_leg1", "crash_before_verify",
+    "duplicate_event", "foreign_positions", "future_perturbation", "truncation"
+  ],
+  "purity": "No real MT5, no real broker, no active TB state; deterministic SyntheticEngineering fixtures only."
+}

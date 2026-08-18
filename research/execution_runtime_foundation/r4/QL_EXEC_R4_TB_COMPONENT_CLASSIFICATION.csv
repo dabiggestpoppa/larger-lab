@@ -1,0 +1,18 @@
+component,category,generic_mapping,notes
+triangular_basis_live (PRIMARY/CONTROL),STRATEGY_SCIENCE,TBStrategyAdapter,reused verbatim
+triangular_basis_engine,STRATEGY_SCIENCE,TBStrategyAdapter (delegated),reused verbatim
+tb_forward_config,STRATEGY_SCIENCE,frozen config,reused verbatim
+verify_tb_04a / tb_p6_anatomy,STRATEGY_SCIENCE,TBStrategyAdapter,reused verbatim (weights)
+triangular_execution_contract,STRATEGY_SCIENCE,TBTranslationAdapter,reused verbatim (translation)
+triangular_execution_layer,BROKER_TRANSPORT,ReferenceExecutor (pure port),canonical imports MetaTrader5 -> ported for purity
+tb_live.market_data,MARKET_DATA,generic market contract,R3+ types
+tb_live.snapshot (feed),MARKET_DATA,generic feed boundary,future runtime runner
+tb_live.persistence (BasketLedger),CORE_RUNTIME_SEMANTICS,generic RuntimeStore,superseded by R3 durable store
+tb_live.reconciliation,CORE_RUNTIME_SEMANTICS,generic Reconciler,R3 reconciler
+tb_live.state_machine,CORE_RUNTIME_SEMANTICS,generic basket plan states,mapped 1:1
+tb_worker,PROCESS_SUPERVISION,GENERIC_RUNTIME_CORE,future RuntimeRunner
+tb_supervisor,PROCESS_SUPERVISION,GENERIC_PROCESS_SUPERVISOR_FUTURE,deferred to R5
+tb_basket_watcher,AUX_SERVICE,TB_AUX_SERVICE,not absorbed
+tb_dashboard,MONITORING,TB_AUX_SERVICE,read-only; not absorbed
+tb_probe_market,MONITORING,TB_AUX_SERVICE,not absorbed
+tb_telegram,MONITORING,TB_AUX_SERVICE,not absorbed

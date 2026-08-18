@@ -1,0 +1,15 @@
+component,status,implemented_by,notes
+GenericRuntime,R3_PASS,execution_runtime/runtime/engine.py,reused unchanged for single-instance lifecycle
+RuntimeStore,R3_PASS,execution_runtime/runtime/store.py,SQLite/WAL + distinct_plan_ids + run_id hardening
+SimBrokerSession,R3_PASS,execution_runtime/brokers/sim_broker.py,additive per-symbol failure injection
+TBStrategyAdapter,R4_PASS,execution_runtime/tb/adapters.py,wraps canonical TriangularBasisLiveEngine
+TBTranslationAdapter,R4_PASS,execution_runtime/tb/adapters.py,reuses model_weight_to_notional + notional_to_mt5_lots
+TBCapitalPolicyAdapter,R4_PASS,execution_runtime/tb/adapters.py,transparent (no CR science)
+BasketOrchestrator,R4_PASS,execution_runtime/tb/basket.py,write-ahead multi-leg + broken hedge + close + recover
+ReferenceExecutor,R4_PASS,execution_runtime/tb/reference.py,pure port of canonical execution simulator path
+LegacyTBHarness,R4_PASS,execution_runtime/tb/harness.py,reference PATH A
+GenericTBHarness,R4_PASS,execution_runtime/tb/harness.py,generic PATH B
+ParityRunner,R4_PASS,execution_runtime/tb/harness.py,trace + state comparison
+ParityTier,R4_PASS,execution_runtime/tb/parity.py,6-tier classification
+FleetSupervisor,NOT_BUILT,n/a,deferred to R5+
+TradeLocker,NOT_BUILT,n/a,

@@ -1,0 +1,36 @@
+{
+  "checkpoint": "QL-EXEC-R4-TB-FULL-NONREGRESSION-MIGRATION-HARNESS",
+  "normalization_rules": [
+    "strip timestamps (date/time tokens)",
+    "strip internal hex ids",
+    "NEVER strip event order, side, quantity, state, broker result, ownership"
+  ],
+  "normal_path_control_open_close": {
+    "reference_trace": [
+      "BAR_ACCEPTED", "SIGNAL_PRIMARY_SHADOW", "SIGNAL_CONTROL_SHORT",
+      "BASKET_INTENT_WRITTEN", "LEG_CHECK", "LEG_CHECK", "LEG_CHECK",
+      "LEG_SEND", "LEG_SEND", "LEG_SEND",
+      "LEG_FILL_FULL", "LEG_FILL_FULL", "LEG_FILL_FULL", "BASKET_OPEN_VERIFIED",
+      "BAR_ACCEPTED", "EXIT_SIGNAL", "LEG_CLOSE", "LEG_CLOSE", "LEG_CLOSE",
+      "BASKET_CLOSED_VERIFIED"
+    ],
+    "generic_trace": [
+      "BAR_ACCEPTED", "SIGNAL_PRIMARY_SHADOW", "SIGNAL_CONTROL_SHORT",
+      "BASKET_INTENT_WRITTEN", "LEG_CHECK", "LEG_CHECK", "LEG_CHECK",
+      "LEG_SEND", "LEG_SEND", "LEG_SEND",
+      "LEG_FILL_FULL", "LEG_FILL_FULL", "LEG_FILL_FULL", "BASKET_OPEN_VERIFIED",
+      "BAR_ACCEPTED", "EXIT_SIGNAL", "LEG_CLOSE", "LEG_CLOSE", "LEG_CLOSE",
+      "BASKET_CLOSED_VERIFIED"
+    ],
+    "tier": "EXACT"
+  },
+  "broken_hedge": {
+    "tier": "SAFETY_STRENGTHENING_NONREGRESSIVE",
+    "detail": "Generic path emits explicit per-leg fill confirmation (LEG_FILL_FULL) before BROKEN_HEDGE_DETECTED; reference collapses to flatten directly. Final broker state identical (ABORTED_FLAT, zero owned exposure, same sends)."
+  },
+  "open_state_lots": {
+    "reference": [["AUDNZD.PRO", "SHORT", 0.13], ["GBPAUD.PRO", "SHORT", 0.07], ["GBPNZD.PRO", "LONG", 0.07]],
+    "generic": [["AUDNZD.PRO", "SHORT", 0.13], ["GBPAUD.PRO", "SHORT", 0.07], ["GBPNZD.PRO", "LONG", 0.07]],
+    "tier": "EXACT"
+  }
+}

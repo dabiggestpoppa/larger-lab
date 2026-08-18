@@ -1,0 +1,10 @@
+surface,tier,reference,generic,note
+desired_state,EXACT,RUNNING/STOPPED_BY_USER persist,same,R3 proven; TB file-backed vs generic DB-backed
+startup_sequence,EXACT,fail-closed gates,same,
+identity_gate,EXACT,account identity must pass before order,same,R1/R3 gate reused
+reconciliation_gate,EXACT,required before RUNNING,same,
+blocker_visibility,EXACT,explicit blocking reason,same,
+heartbeat_semantics,EXACT,state/desired/blocker telemetry,same,normalized-equivalent
+market_recovery,EXACT,non-latching fresh recompute,same,
+profile_drift,EXACT,BLOCK on mismatch,same,R3 store startup_check
+generation_drift,EXACT,detected,same,R3 store startup_check

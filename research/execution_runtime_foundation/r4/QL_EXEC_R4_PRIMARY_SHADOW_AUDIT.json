@@ -1,0 +1,23 @@
+{
+  "checkpoint": "QL-EXEC-R4-TB-FULL-NONREGRESSION-MIGRATION-HARNESS",
+  "authority": "tb_worker.py (TB-R6.1D, b48fd35255b41865026a3cba333ae2a2a0d6a004)",
+  "primary": {
+    "strategy_id": "TB-FWD-V1",
+    "entry_z": 3.0,
+    "exit": "signed +-0.25 overshoot",
+    "authority": "SHADOW ONLY (never reaches execution in the live worker)",
+    "worker_evidence": "tb_worker.py cycle(): PRIMARY process_snapshot -> if OPEN_BASKET: log 'PRIMARY SHADOW ONLY'; no _try_open_control call."
+  },
+  "control": {
+    "strategy_id": "TB-FROZEN-CONTROL",
+    "entry_z": 2.5,
+    "exit": "z=0 symmetric",
+    "authority": "EXECUTABLE on approved DEMO (account identity gate + quote health)"
+  },
+  "r4_parity_result": {
+    "primary_zero_order_reference": 0,
+    "primary_zero_order_generic": 0,
+    "tier": "EXACT"
+  },
+  "conclusion": "A valid PRIMARY z3 event produces zero broker orders in both the reference and the generic path. No primary order path was introduced into GenericRuntime."
+}

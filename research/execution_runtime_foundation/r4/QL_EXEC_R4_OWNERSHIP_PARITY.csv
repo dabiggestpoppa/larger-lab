@@ -1,0 +1,9 @@
+surface,tier,reference,generic,note
+owned_leg_classification,EXACT,magic+TB| tag,same,logical ownership + broker tag
+foreign_same_symbol,EXACT,untouched,same,never closed/modified/claimed
+foreign_other_symbol,EXACT,untouched,same,
+manual_trade,EXACT,untouched,same,
+unknown_magic_comment,EXACT,untouched,same,
+ownership_survives_restart,EXACT,reconstructed,same,
+duplicate_owned_leg,SAFETY_STRENGTHENING_NONREGRESSIVE,reference tolerates,generic flags DUPLICATE_OWNED_EXPOSURE,generic blocks new risk
+pnl_ownership,EXACT,owned-only (no foreign),same,no PF/EV math

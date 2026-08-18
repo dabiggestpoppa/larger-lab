@@ -1,0 +1,11 @@
+surface,tier,reference,generic,note
+model_weight_to_notional,EXACT,model_weight/basket_notional share,same,canonical model_weight_to_notional
+notional_to_lots,EXACT,notional_to_mt5_lots with quote-to-account rate,same,canonical function
+lot_rounding,EXACT,volume_step round + min/max clamp,same,
+neutrality_gate,EXACT,GATE K currency residual <=10%,same,assess_basket_neutrality reused
+leg_order,EXACT,L1 GBPAUD L2 GBPNZD L3 AUDNZD,same,frozen
+basket_open,EXACT,OPEN only after 3 verified fills,same,
+leg_fill_volumes,EXACT,GBPAUD 0.07 / GBPNZD 0.07 / AUDNZD 0.13,same,EXACT lot parity
+basket_close,EXACT,CLOSED only after all owned legs flat,same,
+primary_shadow_zero_order,EXACT,0 orders,0 orders,
+control_execution,EXACT,3-leg basket via control,same,

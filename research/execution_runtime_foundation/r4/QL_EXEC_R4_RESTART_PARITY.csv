@@ -1,0 +1,10 @@
+surface,tier,reference,generic,note
+restart_flat,EXACT,FLAT/no exposure,same,
+restart_open,EXACT,adopt 3 owned legs no new orders,same,reconstruct from broker+ledger
+restart_partial,EXACT,flatten partial,same,
+restart_close,EXACT,flat verified,same,
+crash_after_plan_commit,EXACT,no broker exposure no resubmit,same,
+crash_after_leg1,EXACT,flatten leg1 no duplicate,same,
+crash_after_all_sends_before_verify,EXACT,adopt OPEN no duplicate,same,
+unresolved_intent,SAFETY_STRENGTHENING_NONREGRESSIVE,reference re-derives from ledger,generic aborts + blocks new risk,never blind resubmission
+duplicate_event,EXACT,idempotent plan no second exposure,same,deterministic leg intent ids + plan dedup

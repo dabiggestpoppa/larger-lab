@@ -1,0 +1,10 @@
+surface,tier,reference,generic,note
+leg1_reject,EXACT,BROKEN_HEDGE -> flatten -> ABORTED_FLAT,same,final broker flat + 3 sends
+leg2_reject,EXACT,BROKEN_HEDGE -> flatten -> ABORTED_FLAT,same,
+leg3_reject,EXACT,BROKEN_HEDGE -> flatten -> ABORTED_FLAT,same,
+partial_leg,EXACT,never treated as full fill -> flatten,same,partial fill truth preserved
+zero_fill,EXACT,never OPEN -> ABORTED_FLAT,same,no position materializes
+transport_timeout,NOT_TESTED,deferred to R4.1 operational harness,n/a,engineering fault only
+broken_hedge_detected,EXACT,filled>0 detected,same,
+flatten_recovery,EXACT,close only owned legs verify flat,same,risk reduction prioritized
+close_one_leg_failure,SAFETY_STRENGTHENING_NONREGRESSIVE,reference collapses,generic stays RECONCILIATION_REQUIRED,generic does not mark CLOSED while owned remains

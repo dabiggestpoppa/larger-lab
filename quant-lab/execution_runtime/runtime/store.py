@@ -771,6 +771,13 @@ class RuntimeStore:
             )
             self._conn.commit()
 
+    def distinct_plan_ids(self) -> list[str]:
+        """Distinct parent plan ids recorded in the intent ledger (R4 multi-leg)."""
+        rows = self._conn.execute(
+            "SELECT DISTINCT event_id FROM execution_intents WHERE event_id != '' ORDER BY event_id"
+        ).fetchall()
+        return [str(r["event_id"]) for r in rows]
+
     def owned_positions(self, state: Optional[str] = None) -> list[OwnedPositionRecord]:
         if state:
             rows = self._conn.execute(
@@ -842,6 +849,16 @@ class RuntimeStore:
     ) -> None:
         with self._write_lock:
             cur = self._conn.cursor()
+            # Wall-clock-derived run ids can collide within one millisecond when
+            # start()+step() reconcile in rapid succession; disambiguate with a
+            # monotonic suffix rather than dropping a run.
+            final_id = run_id
+            n = 1
+            while cur.execute(
+                "SELECT 1 FROM reconciliation_runs WHERE run_id=?", (final_id,)
+            ).fetchone() is not None:
+                final_id = f"{run_id}_{n}"
+                n += 1
             cur.execute(
                 """
                 INSERT INTO reconciliation_runs
@@ -850,7 +867,7 @@ class RuntimeStore:
                 VALUES (?,?,?,?,?,?,?,?)
                 """,
                 (
-                    run_id,
+                    final_id,
                     state,
                     1 if clean else 0,
                     blocked_reason,

@@ -1,0 +1,10 @@
+surface,tier,reference,generic,note
+raw_source_timestamp,EXACT,MT5 bar OPEN time used verbatim,same,strategy key never normalized to UTC
+bar_close_time,EXACT,open+bar_seconds (freshness only),same,not the strategy key
+common_closed_bar,EXACT,three legs share one closed open-time,same,validate_signal_snapshot
+lagging_symbol,EXACT,fail closed TIMESTAMP_MISMATCH,same,one leg at t-5m rejected
+forming_bar,EXACT,fail closed FORMING_BAR,same,is_closed=False rejected
+missing_leg,EXACT,fail closed MISSING_LEG,same,
+stale_bar,EXACT,fail closed STALE_SIGNAL_BAR,same,absolute age gate
+market_closed,EXACT,NO_COMMON_CLOSED_BAR -> ONLINE_MARKET_CLOSED,same,transient
+market_recovery,EXACT,fresh healthy bar recomputes status,same,no latching

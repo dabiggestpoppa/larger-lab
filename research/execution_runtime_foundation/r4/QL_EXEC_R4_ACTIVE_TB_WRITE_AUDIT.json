@@ -1,0 +1,16 @@
+{
+  "checkpoint": "QL-EXEC-R4-TB-FULL-NONREGRESSION-MIGRATION-HARNESS",
+  "active_tb_branch_modified": false,
+  "active_tb_state_written": false,
+  "task_scheduler_modified": false,
+  "real_mt5_connection_attempted": false,
+  "real_broker_order_attempted": false,
+  "tb_runtime_pid_files_written": false,
+  "evidence": [
+    "R4 code lives under quant-lab/execution_runtime/tb/ (new package) and quant-lab/execution_runtime/tests/test_execution_runtime_r4_*.py (new tests).",
+    "Canonical TB sources (quant-lab/engines/*, quant-lab/tb_live/*, quant-lab/runtime/*) were READ-ONLY; git status shows no modification to them.",
+    "The generic harness writes only to a temp/in-memory SQLite path (RuntimeStore db_path) and an in-memory SimBrokerSession; it never opens quant-lab/state, tb_control.db, tb_runtime.db, pid files, or the desired-state file.",
+    "No MetaTrader5 module is imported by the execution_runtime runtime or the tb harness (reference path is a pure port in tb/reference.py)."
+  ],
+  "conclusion": "R4 did not write active TB state, did not mutate Task Scheduler, and did not touch the live broker."
+}

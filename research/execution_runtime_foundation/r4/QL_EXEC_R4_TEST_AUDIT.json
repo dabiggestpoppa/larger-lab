@@ -1,0 +1,61 @@
+{
+  "checkpoint": "QL-EXEC-R4-TB-FULL-NONREGRESSION-MIGRATION-HARNESS",
+  "total_tests": 355,
+  "passed": 355,
+  "failed": 0,
+  "r4_new_tests": 46,
+  "prior_r1_r3_tests": 309,
+  "test_files": {
+    "test_execution_runtime_r4_strategy.py": {
+      "checks": [
+        "basis formula parity", "z previous-200-bars excluding current", "z ddof=0",
+        "frozen thresholds (primary 3.0 / control 2.5 / stop 6.0 / signed exits)",
+        "frozen London session (3-12 EST, fixed UTC-5, no DST, min 120, hard exit 12)",
+        "est-hour fixed UTC-5 (no DST)", "direction mapping SHORT/LONG",
+        "control signal direction parity", "primary shadow zero broker orders",
+        "adapter delegates to canonical engine", "one concurrent basket",
+        "re-entry after close"
+      ],
+      "count": 11
+    },
+    "test_execution_runtime_r4_market_data.py": {
+      "checks": [
+        "raw timestamp = bar open time", "closed bar validation",
+        "forming bar fails closed", "common closed bar valid",
+        "lagging symbol fails closed", "duplicate-bar vs common-bar distinction",
+        "harness snapshot preserves raw open time", "market recovery not latched"
+      ],
+      "count": 8
+    },
+    "test_execution_runtime_r4_execution.py": {
+      "checks": [
+        "normal open/close full trace+state parity", "lot translation exact parity",
+        "model weight != lot", "broken hedge flattens owned exposure",
+        "leg1/leg2/leg3 reject parity", "partial fill is not full fill",
+        "no OPEN before broker verification", "primary shadow zero order both paths"
+      ],
+      "count": 9
+    },
+    "test_execution_runtime_r4_restart.py": {
+      "checks": [
+        "restart flat", "restart open no duplicate", "crash after leg1 recover",
+        "crash after all sends before verify", "crash after plan commit",
+        "restart after close", "duplicate event no duplicate exposure"
+      ],
+      "count": 7
+    },
+    "test_execution_runtime_r4_ownership.py": {
+      "checks": [
+        "foreign same-symbol untouched", "foreign never closed",
+        "ownership survives restart", "future perturbation invariant",
+        "truncation invariance", "no Capital Routing science import",
+        "no MetaTrader5 in generic runtime", "no active TB write paths",
+        "supervision layer classification"
+      ],
+      "count": 9
+    }
+  },
+  "real_broker_used": false,
+  "real_mt5_used": false,
+  "fixture_brokers": ["ReferenceBroker", "SimBrokerSession"]
+}

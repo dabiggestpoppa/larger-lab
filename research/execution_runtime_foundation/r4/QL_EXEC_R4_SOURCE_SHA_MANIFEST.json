@@ -1,0 +1,30 @@
+{
+  "checkpoint": "QL-EXEC-R4-TB-FULL-NONREGRESSION-MIGRATION-HARNESS",
+  "frozen_at": "2026-08-18",
+  "branches": {
+    "execution_runtime_foundation_base": "b94fbbae897cd8b81e21408ee91bdbb7b0925553",
+    "tb_forward_engine": "b48fd35255b41865026a3cba333ae2a2a0d6a004",
+    "capital_routing": "f52d5f482a3d5ff5b133a6335e9996ab98cb0bb3",
+    "main": "dfdca6acd829cda4c084cd3bd217ab606348b660"
+  },
+  "tb_science_sources": {
+    "quant-lab/engines/triangular_basis_live.py": "fddb4ca8827ab84227f5be4b3dfa2afab59a5430f8e923f36615c039812e92b9",
+    "quant-lab/engines/triangular_basis_engine.py": "657d30ece2a8dbf0a6373f176038b70610059a99c31a95a4be08228bb0a0f4eb",
+    "quant-lab/engines/tb_forward_config.py": "e3069451162d89cf28d05b31993f44ae3496a657d45aa7d8ab528f167e0b03b6",
+    "quant-lab/engines/verify_tb_04a.py": "b3c0d8b70d102989b7b4bde6c212d23e07542bc68a6815dfe5398eeeb2d562ab",
+    "quant-lab/engines/tb_p6_anatomy.py": "3b7c19efbd1b10677b18ffcff9351889cfd134e1923307833bd93d11a1ba3de5",
+    "quant-lab/engines/triangular_execution_contract.py": "6f2eef0061cf307c2b910def806714e930375c17a4317c66f05fb7f54be79620",
+    "quant-lab/tb_live/market_data.py": "acad1211173fb8178aa783cbc5c2fc2eec2552eb5329f23c6bff2b6c4d804fb0",
+    "quant-lab/tb_live/state_machine.py": "42a4c8659e910aaaa5246f00b189e419b1703812e7151d2485a7763086c455d2",
+    "quant-lab/runtime/tb_worker.py": "8e7e4104c765e41aaa72439caf21254ca998e9aef5943d6e8368314c5fce2fc7",
+    "quant-lab/runtime/tb_runtime_config.py": "ed3922e503c695749f5b2fcaff7565818279627e940414173fc7818927f61a80"
+  },
+  "r4_harness_sources": {
+    "quant-lab/execution_runtime/tb/adapters.py": "6368771833f9c70c20cf09ce508dca9bfb9e1e1547d01b843af45b43babfc7b2",
+    "quant-lab/execution_runtime/tb/basket.py": "f0771ebfa7e009f367f282df7816789f968c537fcdaf4255cc72f11e5b283762",
+    "quant-lab/execution_runtime/tb/parity.py": "3e940634154fefd44f4b920adf602486efc759f54d91edd84d0554b1f98a0f68",
+    "quant-lab/execution_runtime/tb/reference.py": "a698e3d866bbd972c22aa8726b0d82e0fa39762a86a128e06398572160318d8a",
+    "quant-lab/execution_runtime/tb/harness.py": "4da8570db58af47ebf4d6a1cc27a766a94f5c00658cad6c97461b50435f0fe9a"
+  },
+  "note": "TB science sources are READ-ONLY reuse; the canonical mt5.triangular_execution_layer is NOT imported by the harness (it hard-imports MetaTrader5), so the reference execution path is ported in tb/reference.py to preserve runtime purity."
+}

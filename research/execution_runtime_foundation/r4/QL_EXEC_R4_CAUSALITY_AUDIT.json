@@ -1,0 +1,19 @@
+{
+  "checkpoint": "QL-EXEC-R4-TB-FULL-NONREGRESSION-MIGRATION-HARNESS",
+  "future_perturbation": {
+    "procedure": "Feed identical bars up to the decision bar; then append a radically different future bar. The decision at the decision bar must be bit-identical.",
+    "result": "basket_id, zscore, and direction unchanged",
+    "tier": "EXACT"
+  },
+  "truncation_invariance": {
+    "procedure": "Truncate the fixture immediately after the decision bar (no future bars at all).",
+    "result": "same ENTRY decision and SHORT direction",
+    "tier": "EXACT"
+  },
+  "causal_inputs": [
+    "rolling-z uses only [i-200, i) previous bars (current excluded)",
+    "no future bar, no future broker result, no future account state in either harness",
+    "execution identities are deterministic hashes, never wall-clock time"
+  ],
+  "conclusion": "No future leakage in the extracted TB strategy adapter."
+}

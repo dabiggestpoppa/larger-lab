@@ -1,0 +1,16 @@
+surface,tier,reference,generic,note
+basis_formula,EXACT,ln(GBPAUD)-ln(GBPNZD)+ln(AUDNZD),same,canonical compute_basis reused
+rolling_z_lookback,EXACT,[i-200,i) previous bars only,same,current bar excluded
+rolling_z_std,EXACT,np.std ddof=0 (population),same,canonical compute_basis_zscore reused
+primary_entry_threshold,EXACT,strict |z|>3.0,same,frozen tb_forward_config
+control_entry_threshold,EXACT,strict |z|>2.5,same,frozen tb_forward_config
+primary_signed_exit,EXACT,SHORT z<=-0.25 / LONG z>=+0.25,same,frozen
+control_exit,EXACT,SHORT z<=0 / LONG z>=0,same,frozen
+stop,EXACT,SHORT z>=+6 / LONG z<=-6,same,symmetric magnitude
+session,EXACT,London 03:00-12:00 EST fixed UTC-5 no DST,same,frozen
+min_exit_minutes,EXACT,120,same,frozen
+hard_exit,EXACT,12:00 EST,same,frozen
+direction_mapping,EXACT,z>0 SHORT (sell GA,buy GN,sell AN),same,canonical _build_entry_intent reused
+one_concurrent_basket,EXACT,max 1 no pyramiding,same,frozen
+reentry,EXACT,allowed after close no cooldown,same,frozen
+model_weights,EXACT,TB-B exact-neutral sum|s|=3,same,exposure_matrix+project_basket reused

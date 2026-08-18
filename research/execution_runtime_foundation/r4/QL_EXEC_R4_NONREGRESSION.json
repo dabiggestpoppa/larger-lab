@@ -1,0 +1,19 @@
+{
+  "checkpoint": "QL-EXEC-R4-TB-FULL-NONREGRESSION-MIGRATION-HARNESS",
+  "base_commit": "b94fbbae897cd8b81e21408ee91bdbb7b0925553",
+  "prior_suite": "R1, R1.1, R2, R2.1, R3",
+  "prior_test_count": 309,
+  "r4_test_count": 46,
+  "total": 355,
+  "passed": 355,
+  "failed": 0,
+  "r1_r3_unchanged": true,
+  "notes": [
+    "R1-R3 test files were not modified; they still pass unchanged.",
+    "One latent R3 flake was surfaced (reconciliation_runs.run_id UNIQUE collision when start()+step() reconcile within the same millisecond). Fixed in RuntimeStore.record_reconciliation_run by disambiguating the run_id with a monotonic suffix; deterministic prefix is preserved. This is a store-integrity hardening, not a behavior change."
+  ],
+  "touched_generic_runtime_sources": [
+    "quant-lab/execution_runtime/brokers/sim_broker.py (additive per-symbol failure injection)",
+    "quant-lab/execution_runtime/runtime/store.py (additive distinct_plan_ids + run_id disambiguation)"
+  ]
+}
