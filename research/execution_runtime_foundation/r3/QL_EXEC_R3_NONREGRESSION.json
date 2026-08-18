@@ -1,0 +1,20 @@
+{
+  "checkpoint": "QL-EXEC-R3-GENERIC-SINGLE-INSTANCE-RUNTIME",
+  "base_commit": "52e39b13f37812221cab7c283afc302623a61bc6",
+  "prior_suites": {
+    "R1_contracts": "pass (included in 226)",
+    "R1_1_auth_session_clock": "pass (included in 226)",
+    "R2_mt5_broker_session": "pass (included in 226)",
+    "R2_1_fill_result_repair": "pass (included in 226)"
+  },
+  "prior_suite_total": 226,
+  "r3_new_suite_total": 83,
+  "overall_total": 309,
+  "overall_passed": 309,
+  "overall_failed": 0,
+  "command": "python -m pytest quant-lab/execution_runtime/tests/ -q",
+  "verdict": "ALL PRIOR SUITES RETAINED; R3 ADDS 83 NEW TESTS; 309/309 PASS",
+  "tb_active_runtime_modified": false,
+  "real_broker_connection_attempted": false,
+  "real_broker_order_attempted": false
+}

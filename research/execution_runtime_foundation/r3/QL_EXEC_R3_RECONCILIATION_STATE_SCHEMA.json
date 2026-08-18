@@ -1,0 +1,41 @@
+{
+  "$schema": "QL-EXEC-R3-RECONCILIATION-STATE",
+  "reconciliation_states": [
+    "FLAT_MATCH",
+    "OPEN_MATCH",
+    "CLOSED_MATCH",
+    "LOCAL_INTENT_BROKER_MISSING",
+    "BROKER_OWNED_LOCAL_MISSING",
+    "DUPLICATE_OWNED_EXPOSURE",
+    "FOREIGN_ONLY",
+    "AMBIGUOUS",
+    "ERROR"
+  ],
+  "clean_states": [
+    "FLAT_MATCH",
+    "OPEN_MATCH",
+    "CLOSED_MATCH",
+    "FOREIGN_ONLY"
+  ],
+  "result_shape": {
+    "state": "string (one of reconciliation_states)",
+    "clean": "boolean",
+    "blocked_reason": "string",
+    "owned_count": "integer",
+    "foreign_count": "integer",
+    "recoverable": "boolean",
+    "action": "NONE | RETRY | RECONSTRUCT | CLOSE_RETRY | BLOCK",
+    "detail": "string"
+  },
+  "actions": {
+    "NONE": "no recovery action; state is already consistent",
+    "RETRY": "pending intent with broker flat -> safe idempotent resubmit",
+    "RECONSTRUCT": "reconstruct local owned truth from broker (no resubmit) OR mark close-pending as closed",
+    "CLOSE_RETRY": "close-pending position still at broker -> retry close",
+    "BLOCK": "divergence cannot be resolved automatically; block new risk"
+  },
+  "ownership_rule": {
+    "runtime_owned": "broker position ownership_tag matches a durable intent/owned-position tag OR broker magic equals the runtime magic",
+    "foreign": "any other position; reported and NEVER modified, never blocks the runtime on its own"
+  }
+}

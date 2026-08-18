@@ -1,0 +1,13 @@
+fault,mechanism,expected_runtime_state,new_risk_authority,durable_record,restart_behavior
+BROKER_CONNECT_FAIL,SimBrokerSession.set_connect_ok(False),WAITING_FOR_BROKER,denied,blocking_reason=broker unavailable,reconnect then recover to RUNNING
+IDENTITY_MISMATCH,SimBrokerSession(server=WRONG-Server),BLOCKED,denied,blocking_reason=identity mismatch: server,stays BLOCKED until profile/broker fixed
+RECONCILIATION_AMBIGUOUS,seed FILLED owned position with no broker match,BLOCKED,denied,reconciliation run AMBIGUOUS + RECONCILED journal,stays BLOCKED until reconciled
+ORDER_CHECK_REJECT,SimBrokerSession.set_order_check_ok(False),RUNNING (no order),n/a for Sim flow,ORDER_CHECK not part of Sim submit path,event remains observable
+ORDER_SEND_REJECT,SimBrokerSession.set_fail_mode(ORDER_REJECT),RUNNING,denied for this event,intent=INTENT_REJECTED + ORDER_REJECTED journal,no position; dedup prevents resubmit
+ORDER_SEND_TRANSPORT_ERROR,SimBrokerSession.set_fail_mode(TRANSPORT_ERROR),RUNNING,denied for this event,intent=INTENT_TRANSPORT_ERROR + journal,no position; dedup prevents resubmit
+CRASH_AFTER_INTENT,CrashPoint.AFTER_INTENT_COMMIT,raised SimulatedCrash,n/a,intent=INTENT_CREATED committed,broker flat; reconcile LOCAL_INTENT_BROKER_MISSING -> safe retry
+CRASH_AFTER_BROKER_ACCEPT,CrashPoint.AFTER_BROKER_SUBMIT,raised SimulatedCrash,n/a,intent=INTENT_CREATED + broker position exists,reconcile BROKER_OWNED_LOCAL_MISSING -> reconstruct (no resubmit)
+PARTIAL_FILL,SimBrokerSession.set_fail_mode(PARTIAL_FILL),RUNNING,denied (not clean full),intent=INTENT_PARTIALLY_FILLED + owned PARTIALLY_FILLED,partial truth preserved; not treated as full
+CLOSE_REJECT,subclass SimBrokerSession.close_position -> ok=False,RUNNING,close retried/recorded,CLOSE_REJECTED journal,position stays open; close can be retried
+STORE_WRITE_FAIL,not injected (documented),FAILED,n/a,store errors propagate,n/a
+STRATEGY_RESTORE_FAIL,ScriptedStrategyAdapter.set_restore_failure(True),BLOCKED,denied,blocking_reason=strategy warm failed,n/a

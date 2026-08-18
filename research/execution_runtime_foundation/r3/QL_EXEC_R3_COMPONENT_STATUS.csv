@@ -1,0 +1,17 @@
+component,module,status,notes
+GenericRuntime,runtime/engine.py,IMPLEMENTED,injected deps + fail-closed lifecycle + step() + crash injection
+RuntimeStateMachine,runtime/state.py,IMPLEMENTED,frozen enum + validated transition graph (BLOCKED != FAILED)
+DurableStore,runtime/store.py,IMPLEMENTED,SQLite+WAL append-only journal + materialized tables + startup_check
+ExecutionIntent,runtime/intent.py,IMPLEMENTED,deterministic intent id (no UUID/wall-time)
+Reconciler,runtime/reconciliation.py,IMPLEMENTED,frozen taxonomy + recovery actions
+SingletonLock,runtime/singleton.py,IMPLEMENTED,file lock keyed by runtime_id + stale-pid reclaim
+Heartbeat,runtime/heartbeat.py,IMPLEMENTED,durable lightweight heartbeat record
+Telemetry,runtime/heartbeat.py,IMPLEMENTED,read-only TelemetrySnapshot (no control surface)
+ScriptedStrategyAdapter,runtime/adapters.py,IMPLEMENTED,TEST/SIM replay adapter
+PassThroughCapitalPolicyAdapter,runtime/adapters.py,IMPLEMENTED,TEST/SIM admission (no sizing math)
+TestCapitalTranslationAdapter,runtime/adapters.py,IMPLEMENTED,TEST/SIM deterministic translation
+SimBrokerSession,brokers/sim_broker.py,IMPLEMENTED,BrokerSession in-memory + fault injection
+MT5BrokerSession,brokers/mt5.py,UNCHANGED,R2/R2.1 proven adapter (not wired into runtime)
+FleetSupervisor,NOT_BUILT,DEFERRED,out of R3 scope (R5-ish)
+CapitalRouting,NOT_IMPORTED,EXCLUDED,no A/B/H1/pos_t/1R science
+TBStrategy,NOT_IMPORTED,EXCLUDED,no tb_live/triangular import

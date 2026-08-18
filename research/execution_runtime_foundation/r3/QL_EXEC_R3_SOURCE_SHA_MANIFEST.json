@@ -1,0 +1,29 @@
+{
+  "checkpoint": "QL-EXEC-R3-GENERIC-SINGLE-INSTANCE-RUNTIME",
+  "frozen_at": "2026-08-18",
+  "authorities": {
+    "execution_runtime_foundation_base_commit": "52e39b13f37812221cab7c283afc302623a61bc6",
+    "tb_forward_engine": "b48fd35255b41865026a3cba333ae2a2a0d6a004",
+    "capital_routing": "3fde3bb1cf590c554241c23daa14e3d2242998aa",
+    "main_origin": "9f61288679eea56a298e08f718c314f2ca509bc5",
+    "main_local": "dfdca6acd829cda4c084cd3bd217ab606348b660"
+  },
+  "notes": [
+    "tb-forward-engine authority frozen at local/origin b48fd35 (current branch truth at checkpoint start; the d120059 expected anchor was superseded by the current branch head).",
+    "capital-routing authority frozen at 3fde3bb (current branch truth).",
+    "origin/main advanced to 9f61288 after git fetch; local main remains dfdca6a. origin/main recorded as the authoritative remote main truth.",
+    "No authority was changed mid-checkpoint; these SHAs were frozen at checkpoint start after git fetch."
+  ],
+  "r3_new_source_modules": [
+    "quant-lab/execution_runtime/runtime/__init__.py",
+    "quant-lab/execution_runtime/runtime/state.py",
+    "quant-lab/execution_runtime/runtime/intent.py",
+    "quant-lab/execution_runtime/runtime/store.py",
+    "quant-lab/execution_runtime/runtime/reconciliation.py",
+    "quant-lab/execution_runtime/runtime/singleton.py",
+    "quant-lab/execution_runtime/runtime/heartbeat.py",
+    "quant-lab/execution_runtime/runtime/adapters.py",
+    "quant-lab/execution_runtime/runtime/engine.py",
+    "quant-lab/execution_runtime/brokers/sim_broker.py"
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "QL-EXEC-R3-TELEMETRY",
+  "telemetry_snapshot": {
+    "runtime_id": "string",
+    "account_id": "string",
+    "strategy_id": "string",
+    "runtime_state": "string (RuntimeState)",
+    "desired_state": "string (RUNNING | STOPPED_BY_USER)",
+    "broker_connected": "boolean",
+    "identity_match": "boolean",
+    "reconciliation_state": "string (ReconciliationState)",
+    "reconciliation_clean": "boolean",
+    "new_risk_authorized": "boolean",
+    "owned_positions_count": "integer",
+    "foreign_positions_count": "integer",
+    "unresolved_intents": "integer",
+    "last_heartbeat": "string",
+    "last_error": "string",
+    "blocking_reason": "string",
+    "blockers": "array<string>"
+  },
+  "heartbeat": {
+    "runtime_id": "string",
+    "state": "string (RuntimeState)",
+    "desired_state": "string",
+    "observed_at": "string",
+    "broker_connected": "boolean",
+    "last_reconciliation_state": "string",
+    "last_strategy_event_id": "string",
+    "blocking_reason": "string"
+  },
+  "secrets_policy": "No credential/secret field exists in either object. Dashboard is read-only by default; this schema exposes data only."
+}
