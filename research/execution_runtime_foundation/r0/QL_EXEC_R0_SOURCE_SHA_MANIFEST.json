@@ -1,0 +1,89 @@
+{
+  "checkpoint": "QL-EXEC-R0-ACCOUNT-TOPOLOGY-AND-RUNTIME-GENERALIZATION-PLAN",
+  "recorded_utc": "2026-08-18",
+  "authorities": {
+    "execution_runtime_foundation": {
+      "branch": "execution-runtime-foundation",
+      "base_commit": "df5f349e02ac932491cb067df7aff25cb71c50ac",
+      "note": "Workstream branch created at the frozen TB authority SHA."
+    },
+    "tb_forward_engine": {
+      "branch": "tb-forward-engine",
+      "frozen_authority_sha": "df5f349e02ac932491cb067df7aff25cb71c50ac",
+      "frozen_authority_label": "TB-R6.2-NATURAL-CANARY-EVIDENCE-PLAN",
+      "stable_runtime_seal": "223fd024418db2e1bb2c6ed9ac7334488f263f5b",
+      "stable_runtime_seal_label": "TB-R6.1A-STABLE-LOCAL-RUNTIME-SEAL",
+      "drift_detected": true,
+      "current_remote_head": "d12005988ce61170d9bc5478089baa5ce54cc2a9",
+      "post_freeze_commits": [
+        "d1200598 TB-R6.1B-FIX-WORKER-STATE-LATCH: ONLINE_MARKET_CLOSED no longer sticks after market recovery"
+      ],
+      "drift_disposition": "FINISH_AGAINST_FROZEN_SHA",
+      "drift_note": "tb-forward-engine advanced by exactly one post-freeze commit (a worker state-latch bug fix, not strategy math). Per protocol section 60, this checkpoint finishes against the frozen SHA df5f349e and flags the drift for human review."
+    },
+    "capital_routing": {
+      "branch": "capital-routing",
+      "frozen_authority_sha": "40d237123ac2b709cc0ebce1d7f057bbfde25dab",
+      "checkpoint": "CR-RISK-BLOCK-III-SCALE-SEAL-R1-FAIL-CLOSED-GATE",
+      "drift_detected": false
+    },
+    "main_authority": {
+      "branch": "main",
+      "authority_sha": "9f61288679eea56a298e08f718c314f2ca509bc5",
+      "note": "OCE Block 0: ratify constitutional control checkpoint. Governance docs: OCE-GOLDEN-SYSTEM-ARCHITECTURE-CONSTITUTION_v1.1, OCE-MASTER-PROGRAM-ATLAS_v1.0, OCE-BLOCK-00-CONSTITUTIONAL-CONTROL-PLAN_v1.0."
+    }
+  },
+  "key_source_files": {
+    "runtime": [
+      "quant-lab/runtime/tb_runtime_config.py",
+      "quant-lab/runtime/tb_worker.py",
+      "quant-lab/runtime/tb_supervisor.py",
+      "quant-lab/runtime/tb_runtime_db.py",
+      "quant-lab/runtime/tb_proc.py",
+      "quant-lab/runtime/tb_dashboard.py",
+      "quant-lab/runtime/tbctl.py",
+      "quant-lab/runtime/DEPLOYMENT_PROFILES.md"
+    ],
+    "tb_live": [
+      "quant-lab/tb_live/market_data.py",
+      "quant-lab/tb_live/snapshot.py",
+      "quant-lab/tb_live/state_machine.py",
+      "quant-lab/tb_live/persistence.py",
+      "quant-lab/tb_live/reconciliation.py",
+      "quant-lab/tb_live/full_engine.py"
+    ],
+    "engines": [
+      "quant-lab/engines/tb_forward_config.py",
+      "quant-lab/engines/triangular_basis_live.py",
+      "quant-lab/engines/triangular_basis_engine.py",
+      "quant-lab/engines/triangular_execution_contract.py",
+      "quant-lab/engines/tb_r6_demo_canary.py"
+    ],
+    "mt5": [
+      "quant-lab/mt5/triangular_execution_layer.py",
+      "quant-lab/mt5/execution_layer.py"
+    ],
+    "capital_routing": [
+      "src/capital_routing/static_risk_architecture.py",
+      "src/capital_routing/capital_scale.py",
+      "src/capital_routing/capital_scale_seal.py",
+      "research/capital_routing/risk/block3_scale_seal_r1/CR_RISK_BLOCK3_SCALE_SEAL_R1_DECISION.json",
+      "artifacts/risk_block1/R4_RISK_UNIT_DEFINITION.md",
+      "artifacts/risk_block1/BLOCK1_RISK_UNIT_LOCK.md"
+    ],
+    "oce": [
+      "docs/oce-golden-system/OCE_GOLDEN_SYSTEM_ARCHITECTURE_CONSTITUTION_v1.1.md",
+      "docs/oce-golden-system/OCE_MASTER_PROGRAM_ATLAS_v1.0.md",
+      "docs/oce-golden-system/OCE_BLOCK_00_CONSTITUTIONAL_CONTROL_PLAN_v1.0.md",
+      "oce/backend/governance_engine.py"
+    ]
+  },
+  "invariant_checks": {
+    "tb_active_runtime_modified": false,
+    "tb_strategy_math_modified": false,
+    "capital_routing_math_modified": false,
+    "broker_execution_performed": false,
+    "live_authorized": false,
+    "production_authorized": false
+  }
+}

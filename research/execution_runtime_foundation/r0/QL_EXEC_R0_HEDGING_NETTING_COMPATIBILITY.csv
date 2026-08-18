@@ -1,0 +1,10 @@
+combination,status,reasoning
+exclusive_strategy + hedging,SUPPORTED_BY_CURRENT_MODEL,Ticket-level position isolation; a single strategy's positions are unambiguous under magic + comment ownership.
+exclusive_strategy + netting,SUPPORTABLE_WITH_WORK,Same-symbol collapse is acceptable only when one strategy owns the whole book; must verify broker-consolidated volume against ledger and block if ambiguous.
+shared_portfolio + hedging,SUPPORTABLE_WITH_WORK,Hedging isolates tickets per strategy on the same symbol; requires deterministic per-strategy magic/comment namespace + virtual allocation ledger for equity attribution.
+shared_portfolio + netting,BLOCKED_PENDING_VIRTUAL_LEDGER,Broker collapses same-symbol positions across strategies; ownership cannot be reconstructed from broker truth alone. Default UNSUPPORTED/BLOCKED until a virtual allocation ledger and tested reconciliation model explicitly support it.
+same_symbol_overlap (shared + netting),BLOCKED_PENDING_VIRTUAL_LEDGER,Do not silently pretend magic numbers preserve ownership in a netting book; block new risk.
+same_symbol_overlap (shared + hedging),SUPPORTABLE_WITH_WORK,Requires per-strategy magic/comment namespace and ticket-level attribution ledger; foreign/unknown tickets still block.
+different_symbol_overlap (shared + netting),SUPPORTABLE_WITH_WORK,No position collapse across symbols; heat must still come from the one authoritative shared ledger.
+different_symbol_overlap (shared + hedging),SUPPORTABLE_WITH_WORK,Distinct symbols; heat from shared ledger; ownership via namespace.
+unknown_account_mode,UNSAFE,Fail closed: any shared/portfolio account whose hedging_or_netting is UNKNOWN is BLOCKED for execution.

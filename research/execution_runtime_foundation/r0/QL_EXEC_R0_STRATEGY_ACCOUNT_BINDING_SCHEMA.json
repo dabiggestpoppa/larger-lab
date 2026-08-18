@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ql-exec.r0.strategy-account-binding",
+  "title": "StrategyAccountBinding",
+  "description": "Authority for where and how a strategy executes. Replaces hardcoded per-worker constants.",
+  "type": "object",
+  "required": [
+    "strategy_id",
+    "runtime_id",
+    "account_id",
+    "account_role",
+    "execution_mode",
+    "ownership_namespace",
+    "strategy_adapter",
+    "enabled"
+  ],
+  "properties": {
+    "strategy_id": {"type": "string"},
+    "runtime_id": {"type": "string", "description": "Runtime instance hosting this binding."},
+    "account_id": {"type": "string"},
+    "portfolio_group_id": {"type": ["string", "null"], "description": "Set only for PORTFOLIO_MASTER bindings."},
+    "account_role": {
+      "type": "string",
+      "enum": ["EXCLUSIVE_STRATEGY_MASTER", "PORTFOLIO_MASTER", "FOLLOWER", "MIRROR"]
+    },
+    "execution_mode": {
+      "type": "string",
+      "enum": ["SHADOW_ONLY", "PAPER", "DEMO", "LIVE"],
+      "description": "LIVE requires explicit human authorization. SHADOW_ONLY never reaches broker submission."
+    },
+    "ownership_namespace": {
+      "type": "object",
+      "description": "Deterministic identity mapping into broker magic/comment fields.",
+      "required": ["account_id", "runtime_id", "strategy_id", "deployment_generation"],
+      "properties": {
+        "account_id": {"type": "string"},
+        "runtime_id": {"type": "string"},
+        "strategy_id": {"type": "string"},
+        "deployment_generation": {"type": "string"},
+        "magic_mapping": {"type": "string", "description": "Stable per-binding magic derivation (not one global magic)."}
+      }
+    },
+    "strategy_adapter": {"type": "string", "description": "StrategyAdapter implementation selector."},
+    "capital_policy_adapter": {"type": ["string", "null"], "description": "CapitalPolicyAdapter selector; null for strategy-native fixed research allocation."},
+    "broker_session_profile": {"type": "string", "description": "BrokerSession profile selector for the bound account."},
+    "allowed_symbols": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Broker symbols this binding may trade. Empty = none (fail closed)."
+    },
+    "deployment_generation": {"type": "string"},
+    "enabled": {"type": "boolean", "description": "Effective only when account identity matches and account is execution-enabled."},
+    "metadata_version": {"type": "integer"}
+  },
+  "additionalProperties": false
+}

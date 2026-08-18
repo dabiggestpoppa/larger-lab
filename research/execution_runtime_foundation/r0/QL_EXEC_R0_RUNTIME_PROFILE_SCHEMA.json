@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ql-exec.r0.runtime-profile",
+  "title": "RuntimeProfile",
+  "description": "One generic worker launched as many runtime instances. Separates MACHINE PROFILE from RUNTIME PROFILE.",
+  "type": "object",
+  "required": [
+    "runtime_id",
+    "strategy_adapter",
+    "account_binding",
+    "broker_profile",
+    "state_dir",
+    "ledger_path",
+    "log_path",
+    "deployment_generation",
+    "ownership_namespace",
+    "execution_mode"
+  ],
+  "properties": {
+    "runtime_id": {"type": "string", "description": "Unique per instance (e.g. tb-master-01, rekey-master-01, portfolio-master-01)."},
+    "strategy_adapter": {"type": "string"},
+    "account_binding": {"$ref": "ql-exec.r0.strategy-account-binding"},
+    "broker_profile": {"type": "string"},
+    "capital_policy": {"type": ["string", "null"]},
+    "machine_profile": {
+      "type": "string",
+      "enum": ["local_windows", "windows_vps"],
+      "description": "Where the process runs; not the identity of the runtime."
+    },
+    "state_dir": {"type": "string", "description": "state/<runtime_id>/"},
+    "ledger_path": {"type": "string", "description": "ledger/<runtime_id>/<runtime_id>.db"},
+    "log_path": {"type": "string", "description": "logs/<runtime_id>/"},
+    "dashboard_identity": {"type": "string"},
+    "telemetry_identity": {"type": "string"},
+    "deployment_generation": {"type": "string"},
+    "ownership_namespace": {
+      "type": "object",
+      "required": ["account_id", "runtime_id", "strategy_id", "deployment_generation"],
+      "properties": {
+        "account_id": {"type": "string"},
+        "runtime_id": {"type": "string"},
+        "strategy_id": {"type": "string"},
+        "deployment_generation": {"type": "string"}
+      }
+    },
+    "execution_mode": {
+      "type": "string",
+      "enum": ["SHADOW_ONLY", "PAPER", "DEMO", "LIVE"]
+    },
+    "metadata_version": {"type": "integer"}
+  },
+  "additionalProperties": false
+}

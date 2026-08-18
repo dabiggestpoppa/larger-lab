@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ql-exec.r0.portfolio-group",
+  "title": "PortfolioGroup",
+  "description": "Strategies sharing one capital policy/account. Prevents account structure from silently changing Capital Routing science.",
+  "type": "object",
+  "required": [
+    "portfolio_group_id",
+    "account_id",
+    "strategy_ids",
+    "capital_policy_id",
+    "account_role",
+    "ownership_mode",
+    "enabled"
+  ],
+  "properties": {
+    "portfolio_group_id": {"type": "string"},
+    "account_id": {"type": "string", "description": "The PORTFOLIO_MASTER account hosting this group."},
+    "strategy_ids": {
+      "type": "array",
+      "items": {"type": "string"},
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "capital_policy_id": {
+      "type": "string",
+      "description": "References a CapitalPolicyAdapter (e.g. CapitalRoutingPolicy with sealed A/B + H1 semantics)."
+    },
+    "allocation_config": {
+      "type": "object",
+      "description": "Opaque-to-infra allocation payload owned by the capital policy adapter.",
+      "properties": {
+        "allocation": {"type": "string", "enum": ["A0_50_50", "A1_70_30", "A2_100_0_A", "A3_0_100_B"]},
+        "heat_policy": {"type": "string"},
+        "f_total_pct": {"type": "number"}
+      },
+      "required": ["allocation", "heat_policy", "f_total_pct"]
+    },
+    "heat_policy": {
+      "type": "string",
+      "description": "Human-readable heat policy id (e.g. H1-1.00-REJ). Must match capital_policy_id semantics."
+    },
+    "account_role": {
+      "type": "string",
+      "const": "PORTFOLIO_MASTER"
+    },
+    "ownership_mode": {
+      "type": "string",
+      "enum": ["SINGLE_RUNTIME_MULTI_ADAPTER", "MULTI_PRODUCER_SINGLE_ROUTER"],
+      "description": "R0 recommends SINGLE_RUNTIME_MULTI_ADAPTER (one shared heat ledger, one account snapshot)."
+    },
+    "enabled": {"type": "boolean"},
+    "metadata_version": {"type": "integer"}
+  },
+  "additionalProperties": false
+}

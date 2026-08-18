@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ql-exec.r0.account-role",
+  "title": "AccountRole",
+  "description": "Conceptually frozen account roles. Not a universal one-strategy-one-account rule.",
+  "type": "object",
+  "definitions": {
+    "role": {
+      "type": "object",
+      "required": ["role_id", "cardinality", "capital_policy_required", "heat_ledger", "in_execution_authority"],
+      "properties": {
+        "role_id": {"type": "string"},
+        "cardinality": {
+          "type": "string",
+          "enum": ["ONE_STRATEGY_ONE_ACCOUNT", "MANY_STRATEGIES_ONE_ACCOUNT", "EXTERNAL_COPIER"]
+        },
+        "capital_policy_required": {"type": "boolean"},
+        "heat_ledger": {
+          "type": "string",
+          "enum": ["STRATEGY_OWNED", "SHARED_PORTFOLIO", "NONE"]
+        },
+        "in_execution_authority": {"type": "boolean"},
+        "notes": {"type": "string"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "roles": {
+    "EXCLUSIVE_STRATEGY_MASTER": {
+      "role_id": "EXCLUSIVE_STRATEGY_MASTER",
+      "cardinality": "ONE_STRATEGY_ONE_ACCOUNT",
+      "capital_policy_required": false,
+      "heat_ledger": "STRATEGY_OWNED",
+      "in_execution_authority": true,
+      "notes": "One strategy owns one execution account (TB master, Rekey master, P90 master). Isolation, simple reconciliation, copier-master use. TB may remain an exclusive master."
+    },
+    "PORTFOLIO_MASTER": {
+      "role_id": "PORTFOLIO_MASTER",
+      "cardinality": "MANY_STRATEGIES_ONE_ACCOUNT",
+      "capital_policy_required": true,
+      "heat_ledger": "SHARED_PORTFOLIO",
+      "in_execution_authority": true,
+      "notes": "Multiple explicitly approved strategies share one account under ONE capital routing policy. Requires one authoritative shared heat ledger (no independent per-worker H1 state)."
+    },
+    "FOLLOWER": {
+      "role_id": "FOLLOWER",
+      "cardinality": "EXTERNAL_COPIER",
+      "capital_policy_required": false,
+      "heat_ledger": "NONE",
+      "in_execution_authority": false,
+      "notes": "Receives trades from an external copier. Observability only; Larger Lab does not directly manage follower replication in the first generation."
+    },
+    "MIRROR": {
+      "role_id": "MIRROR",
+      "cardinality": "EXTERNAL_COPIER",
+      "capital_policy_required": false,
+      "heat_ledger": "NONE",
+      "in_execution_authority": false,
+      "notes": "Alias for a follower-type account used only for observability."
+    }
+  }
+}

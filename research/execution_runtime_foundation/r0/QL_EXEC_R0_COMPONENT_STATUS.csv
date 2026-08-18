@@ -1,0 +1,33 @@
+component,status,evidence,notes
+TB runtime audit,COMPLETE,QL_EXEC_R0_TB_RUNTIME_ARCHITECTURE.md,Audited runtime/ tb_live/ engines/ mt5/ research/tb_forward at frozen df5f349e
+TB extraction matrix,COMPLETE,QL_EXEC_R0_TB_EXTRACTION_MATRIX.csv,23 components classified
+Direct MT5 coupling inventory,COMPLETE,QL_EXEC_R0_DIRECT_MT5_COUPLING_AUDIT.csv,4 canonical runtime modules + legacy surface
+Account Control Plane,COMPLETE,QL_EXEC_R0_ACCOUNT_CONTROL_PLANE.md,Registry/roles/portfolio/binding/routing defined
+AccountRegistry schema,COMPLETE,QL_EXEC_R0_ACCOUNT_REGISTRY_SCHEMA.json,Defined
+AccountRole schema,COMPLETE,QL_EXEC_R0_ACCOUNT_ROLE_SCHEMA.json,3 roles + MIRROR alias
+PortfolioGroup schema,COMPLETE,QL_EXEC_R0_PORTFOLIO_GROUP_SCHEMA.json,Defined
+StrategyAccountBinding schema,COMPLETE,QL_EXEC_R0_STRATEGY_ACCOUNT_BINDING_SCHEMA.json,Defined
+RuntimeProfile schema,COMPLETE,QL_EXEC_R0_RUNTIME_PROFILE_SCHEMA.json,Defined
+StrategyAdapter contract,COMPLETE,QL_EXEC_R0_STRATEGY_ADAPTER_CONTRACT.md,Defined
+CapitalPolicyAdapter contract,COMPLETE,QL_EXEC_R0_CAPITAL_POLICY_ADAPTER_CONTRACT.md,Defined
+BrokerSession contract,COMPLETE,QL_EXEC_R0_BROKER_SESSION_CONTRACT.md,Defined
+Broker capability matrix,COMPLETE,QL_EXEC_R0_BROKER_CAPABILITY_MATRIX.csv,MT5/Sim/Replay/TradeLocker(UNKNOWN)
+Hedging/netting matrix,COMPLETE,QL_EXEC_R0_HEDGING_NETTING_COMPATIBILITY.csv,6 combinations classified
+Ownership namespace,COMPLETE,QL_EXEC_R0_OWNERSHIP_NAMESPACE.md,Defined
+Secret handling contract,COMPLETE,QL_EXEC_R0_SECRET_HANDLING_CONTRACT.md,Defined
+State isolation plan,COMPLETE,QL_EXEC_R0_STATE_ISOLATION_PLAN.md,Defined
+Reservation model,COMPLETE,QL_EXEC_R0_RESERVATION_MODEL.md,Defined
+Restart/reconciliation plan,COMPLETE,QL_EXEC_R0_RESTART_RECONCILIATION_PLAN.md,Defined
+Fleet supervisor plan,COMPLETE,QL_EXEC_R0_FLEET_SUPERVISOR_PLAN.md,Defined
+External copier boundary,COMPLETE,QL_EXEC_R0_EXTERNAL_COPIER_BOUNDARY.md,Defined
+Capital Routing integration,COMPLETE,QL_EXEC_R0_CAPITAL_ROUTING_INTEGRATION.md,Defined
+TB non-regression plan,COMPLETE,QL_EXEC_R0_TB_NONREGRESSION_PLAN.md,Defined
+Implementation block plan,COMPLETE,QL_EXEC_R0_IMPLEMENTATION_BLOCK_PLAN.md,R1-R10 bounded
+Test plan,COMPLETE,QL_EXEC_R0_TEST_PLAN.md,Defined
+Report,COMPLETE,QL_EXEC_R0_REPORT.md,Defined
+Decision file,COMPLETE,QL_EXEC_R0_DECISION.json,Defined
+TB active runtime modified,FALSE,invariant,none
+TB strategy math modified,FALSE,invariant,none
+Capital Routing math modified,FALSE,invariant,none
+Broker execution performed,FALSE,invariant,none
+Live/production authorized,FALSE,invariant,none

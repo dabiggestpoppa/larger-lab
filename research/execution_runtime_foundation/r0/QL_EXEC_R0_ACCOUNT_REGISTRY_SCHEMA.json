@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ql-exec.r0.account-registry",
+  "title": "AccountRegistryEntry",
+  "description": "Logical execution account. Stores metadata and secret references; NEVER credentials.",
+  "type": "object",
+  "required": [
+    "account_id",
+    "broker_provider",
+    "broker_adapter",
+    "environment",
+    "account_role",
+    "secret_reference",
+    "status",
+    "metadata_version"
+  ],
+  "properties": {
+    "account_id": {
+      "type": "string",
+      "description": "Stable logical account id (e.g. tb-master-01). Unique across the registry."
+    },
+    "broker_provider": {
+      "type": "string",
+      "enum": ["MT5", "SIM", "REPLAY", "TRADELOCKER"],
+      "description": "Provider family. TRADELOCKER is UNKNOWN/future only in R0."
+    },
+    "broker_adapter": {
+      "type": "string",
+      "description": "Adapter implementation selector, e.g. MT5BrokerSession."
+    },
+    "environment": {
+      "type": "string",
+      "enum": ["DEMO", "CONTEST", "REAL", "SIM", "REPLAY"],
+      "description": "Broker-reported environment. REAL requires explicit human authorization."
+    },
+    "server": {
+      "type": "string",
+      "description": "Broker server name for identity matching (e.g. OxSecurities-Demo)."
+    },
+    "login_identifier_reference": {
+      "type": "string",
+      "description": "Reference to the login/account id (masked in metadata; value held in secret store)."
+    },
+    "account_currency": {
+      "type": "string",
+      "description": "Account currency (e.g. USD)."
+    },
+    "account_mode": {
+      "type": "string",
+      "description": "Broker account mode (e.g. HEDGING, NETTING)."
+    },
+    "margin_mode": {
+      "type": "string",
+      "description": "Margin mode reported by broker where available."
+    },
+    "hedging_or_netting": {
+      "type": "string",
+      "enum": ["HEDGING", "NETTING", "UNKNOWN"],
+      "description": "Position-accounting model. UNKNOWN must fail closed for shared accounts."
+    },
+    "account_role": {
+      "type": "string",
+      "enum": ["EXCLUSIVE_STRATEGY_MASTER", "PORTFOLIO_MASTER", "FOLLOWER", "MIRROR"],
+      "description": "See QL_EXEC_R0_ACCOUNT_ROLE_SCHEMA.json."
+    },
+    "portfolio_group_id": {
+      "type": ["string", "null"],
+      "description": "Set when the account is a PORTFOLIO_MASTER or participates in a shared group."
+    },
+    "strategy_allowlist": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Strategy ids permitted to bind to this account. Empty = none (fail closed)."
+    },
+    "execution_enabled": {
+      "type": "boolean",
+      "description": "Operator intent flag; independent from identity match. Both must be true to trade."
+    },
+    "copier_role": {
+      "type": ["string", "null"],
+      "enum": ["MASTER", "FOLLOWER", null],
+      "description": "Observability only. FOLLOWER replication is outside execution authority."
+    },
+    "terminal_or_session_binding": {
+      "type": ["string", "null"],
+      "description": "Terminal path / session identity for fail-closed account-terminal matching (MT5)."
+    },
+    "secret_reference": {
+      "type": "string",
+      "description": "Reference only: env-var key, OS keyring id, or encrypted secret-store id."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "CONFIGURED", "CONNECTING", "CONNECTED", "IDENTITY_MISMATCH",
+        "AUTH_FAILED", "WAITING_FOR_BROKER", "MARKET_CLOSED", "RECONCILING",
+        "READY", "BLOCKED", "DEGRADED", "STOPPED"
+      ]
+    },
+    "identity_matched": {
+      "type": "boolean",
+      "description": "Derived: broker-reported identity matches the bound profile."
+    },
+    "metadata_version": {
+      "type": "integer",
+      "description": "Bump on schema/semantic changes for hashable config lineage."
+    }
+  },
+  "additionalProperties": false
+}

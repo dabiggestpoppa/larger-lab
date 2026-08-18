@@ -1,0 +1,24 @@
+capability,MT5_current,Sim_Fake,Replay,TradeLocker_future
+connect,SUPPORTED (initialize/terminal_info),SUPPORTED (no-op),SUPPORTED (load snapshot),UNKNOWN
+identity,SUPPORTED (account_info/terminal_info),SUPPORTED (scripted),SUPPORTED (recorded),UNKNOWN
+account_state,SUPPORTED (equity/balance/margin/currency/mode),SUPPORTED (scripted),SUPPORTED (recorded),UNKNOWN
+buying_power,SUPPORTED (account_info),SUPPORTED (scripted),SUPPORTED (recorded),UNKNOWN
+margin_state,SUPPORTED (account_info),SUPPORTED (scripted),SUPPORTED (recorded),UNKNOWN
+ticks,SUPPORTED (symbol_info_tick),SUPPORTED (scripted),SUPPORTED (recorded),UNKNOWN
+bars,SUPPORTED (copy_rates_from_pos),SUPPORTED (scripted),SUPPORTED (recorded),UNKNOWN
+symbol_specs,SUPPORTED (symbol_info),SUPPORTED (scripted ContractSpec),SUPPORTED (recorded),UNKNOWN
+positions,SUPPORTED (positions_get),SUPPORTED (scripted),SUPPORTED (recorded),UNKNOWN
+orders,SUPPORTED (orders_get),SUPPORTED (scripted),SUPPORTED (recorded),UNKNOWN
+deals,SUPPORTED (history_deals_get),SUPPORTED (scripted),SUPPORTED (recorded),UNKNOWN
+order_check,SUPPORTED (order_check),SUPPORTED (scripted retcode),SUPPORTED (recorded),UNKNOWN
+market_order,SUPPORTED (TRADE_ACTION_DEAL),SUPPORTED,NOT_APPLICABLE (no live submit),UNKNOWN
+limit_order,SUPPORTED (TRADE_ACTION_PENDING),SUPPORTED,NOT_APPLICABLE,UNKNOWN
+cancel_order,SUPPORTED (via order_send cancel),SUPPORTED,NOT_APPLICABLE,UNKNOWN
+close_position,SUPPORTED (position ticket),SUPPORTED,NOT_APPLICABLE,UNKNOWN
+partial_fill_reporting,SUPPORTED (deal/position volume),SUPPORTED (scripted fill modes),SUPPORTED (recorded),UNKNOWN
+fill_mode_resolution,SUPPORTED (filling_mode bits + order_check probe),SUPPORTED (scripted),SUPPORTED (recorded),UNKNOWN
+hedging_support,SUPPORTED (account model dependent),SUPPORTED (scripted),SUPPORTED (recorded),UNKNOWN
+netting_support,SUPPORTED (account model dependent),SUPPORTED (scripted),SUPPORTED (recorded),UNKNOWN
+client_order_id_or_comment,SUPPORTED (comment field),SUPPORTED (scripted),SUPPORTED (recorded),UNKNOWN
+magic_field,SUPPORTED (order magic),SUPPORTED (scripted),SUPPORTED (recorded),UNKNOWN
+history,SUPPORTED (history_orders_get/history_deals_get),SUPPORTED (scripted),SUPPORTED (recorded),UNKNOWN
