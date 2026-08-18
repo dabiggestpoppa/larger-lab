@@ -1,0 +1,10 @@
+fixture,pos,one_R_price_move_bps,one_R_price_move_fraction,raw_quote_move_at_150,pip_move_at_150_pip_0.01,note
+accepted pos min (0.1104),0.110383,221.908696,0.02219087,3.32863,332.863,one_R_price_move = RISK_UNIT_BPS / pos_t (event-specific); pip_move = P x bps / 1e4 / pip_size; pip_size broker-confirm
+accepted pos p1 (0.2080),0.207984,117.77302,0.0117773,1.766595,176.6595,one_R_price_move = RISK_UNIT_BPS / pos_t (event-specific); pip_move = P x bps / 1e4 / pip_size; pip_size broker-confirm
+accepted pos p5 (0.3531),0.353117,69.36765,0.00693677,1.040515,104.0515,one_R_price_move = RISK_UNIT_BPS / pos_t (event-specific); pip_move = P x bps / 1e4 / pip_size; pip_size broker-confirm
+accepted pos median (1.1079),1.107932,22.10867,0.00221087,0.33163,33.163,one_R_price_move = RISK_UNIT_BPS / pos_t (event-specific); pip_move = P x bps / 1e4 / pip_size; pip_size broker-confirm
+accepted pos p95 (3.6004),3.600438,6.80331,0.00068033,0.10205,10.205,one_R_price_move = RISK_UNIT_BPS / pos_t (event-specific); pip_move = P x bps / 1e4 / pip_size; pip_size broker-confirm
+accepted pos p99 (5.7918),5.791791,4.229244,0.00042292,0.063439,6.3439,one_R_price_move = RISK_UNIT_BPS / pos_t (event-specific); pip_move = P x bps / 1e4 / pip_size; pip_size broker-confirm
+accepted pos max (18.1878),18.187813,1.346775,0.00013468,0.020202,2.0202,one_R_price_move = RISK_UNIT_BPS / pos_t (event-specific); pip_move = P x bps / 1e4 / pip_size; pip_size broker-confirm
+lowest-pos accepted event EUR_ORIGIN_202405011900 (pos 0.1104),0.110383,221.908696,0.02219087,3.32863,332.863,one_R_price_move = RISK_UNIT_BPS / pos_t (event-specific); pip_move = P x bps / 1e4 / pip_size; pip_size broker-confirm
+highest-pos accepted event EUR_ORIGIN_202404221000 (pos 18.1878),18.187813,1.346775,0.00013468,0.020202,2.0202,one_R_price_move = RISK_UNIT_BPS / pos_t (event-specific); pip_move = P x bps / 1e4 / pip_size; pip_size broker-confirm

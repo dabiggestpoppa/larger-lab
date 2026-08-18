@@ -1,0 +1,41 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-III-EXECUTION-TRANSLATION-PLANNING-R1-POSITION-SCALING-ACCOUNT-BOUNDARY-TRUTH-REPAIR",
+  "schema_name": "CR_EXEC_R1_CAPITAL_TRANSLATION_REQUEST_SCHEMA",
+  "version": "r1-1",
+  "input_from_capital_router": {
+    "event_id": "str",
+    "family": "A|B",
+    "requested_f_pct": "A 0.70 / B 0.30",
+    "admitted_f_pct": "from H1 causal admission (0 for rejected)",
+    "pos_t": "TARGET_VOL/rv_t (sealed ledger)",
+    "risk_unit_bps": 24.49489742783178,
+    "policy_id": "H1-1.00-REJ",
+    "configuration_hash": "hash of allocation/heat config",
+    "decision_timestamp": "known-time admission time"
+  },
+  "input_from_account_control_plane": {
+    "account_id": "str (bound account)",
+    "account_role": "EXCLUSIVE_STRATEGY_MASTER | PORTFOLIO_MASTER | FOLLOWER",
+    "portfolio_group_id": "binds A+B to ONE heat ledger (Portfolio Master)",
+    "equity_at_admission": "account currency units",
+    "account_currency": "executable account currency (UNRESOLVED_UNTIL_ACCOUNT_BINDING)",
+    "staleness_tolerance": "config"
+  },
+  "computed_by_capital_translation_core": {
+    "one_R_budget_account_ccy": "equity_at_admission x admitted_f_pct/100",
+    "target_notional_account_ccy": "one_R_budget x pos_t x 1e4 / RISK_UNIT_BPS",
+    "one_R_price_move_bps": "RISK_UNIT_BPS / pos_t (event-specific)",
+    "model_heat_after": "sum of admitted_f over active events (<= 1.00)"
+  },
+  "execution_side_fields": {
+    "broker_symbol": "MISSING_EXECUTION_TRANSLATION_FIELD",
+    "broker_product_type": "MISSING_EXECUTION_TRANSLATION_FIELD",
+    "raw_quantity": "broker spec",
+    "rounded_quantity": "round toward lower exposure",
+    "realized_f_pct": "post-rounding",
+    "margin_required": "broker function",
+    "buying_power_after": "broker function",
+    "order_intent_id": "idempotency"
+  },
+  "no_future_data": true
+}

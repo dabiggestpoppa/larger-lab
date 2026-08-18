@@ -1,0 +1,8 @@
+component,status,owner,notes
+A ALPHA ENGINE,SEALED,capital-routing,890 valid A/B events
+B CAPITAL ROUTER,SEALED,capital-routing,"family + admitted_f (A1_70_30, H1-1.00-REJ)"
+C CAPITAL TRANSLATION CORE,DESIGNED (repaired this checkpoint),capital-routing,event pos -> one-R sensitivity -> target notional -> translation request
+D EXECUTION GATE (margin/buying-power),DESIGNED,execution-runtime-foundation,margin/buying-power fail-closed gates
+E BROKER ADAPTER,"UNAVAILABLE (new, in execution-runtime-foundation)",execution-runtime-foundation,no execution adapter exists in capital-routing
+F RECONCILIATION / LEDGER,DESIGNED,execution-runtime-foundation,"ownership, fills, restart recovery"
+ACCOUNT CONTROL PLANE,DESIGNED (by execution-runtime-foundation),execution-runtime-foundation,"account_id, equity snapshot, currency, roles"

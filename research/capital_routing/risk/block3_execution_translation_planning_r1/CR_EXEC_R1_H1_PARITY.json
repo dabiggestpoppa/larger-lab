@@ -1,0 +1,16 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-III-EXECUTION-TRANSLATION-PLANNING-R1-POSITION-SCALING-ACCOUNT-BOUNDARY-TRUTH-REPAIR",
+  "base_commit": "5a79bf2323ac2657de74e3efa7c4a29d8715db33",
+  "policy": "H1-1.00-REJ @ A1_70_30 (f_total 1.00%)",
+  "requested_f_A_pct": 0.7,
+  "requested_f_B_pct": 0.3,
+  "cap_f_units": 1.0,
+  "treatment": "REJECT",
+  "n_events": 890,
+  "n_accepted": 826,
+  "n_rejected": 64,
+  "accepted_A": 371,
+  "accepted_B": 455,
+  "rejected_zero_exposure": true,
+  "note": "rejected events carry notional_multiple = 0 and account impact = 0 in every R1 artifact (verified in tests)"
+}

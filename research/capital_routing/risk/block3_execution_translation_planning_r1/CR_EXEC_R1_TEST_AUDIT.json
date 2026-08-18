@@ -1,0 +1,174 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-III-EXECUTION-TRANSLATION-PLANNING-R1-POSITION-SCALING-ACCOUNT-BOUNDARY-TRUTH-REPAIR",
+  "n_tests": 28,
+  "tests": [
+    {
+      "id": 1,
+      "requirement": "risk_unit definition unchanged",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 2,
+      "requirement": "pos reconstruction pos=TARGET_VOL/rv",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 3,
+      "requirement": "gross_pnl reconstruction all 890",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 4,
+      "requirement": "corrected notional includes pos",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 5,
+      "requirement": "removing pos causes parity failure",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 6,
+      "requirement": "one-R underlying price move R_bps/pos",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 7,
+      "requirement": "event-specific one-R moves vary",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 8,
+      "requirement": "correct USDJPY pip conversion fixture",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 9,
+      "requirement": "historical worst A account impact units",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 10,
+      "requirement": "historical worst B account impact units",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 11,
+      "requirement": "rejected H1 event -> zero exposure",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 12,
+      "requirement": "accepted A requested f = 0.70",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 13,
+      "requirement": "accepted B requested f = 0.30",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 14,
+      "requirement": "826/64 admission preserved",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 15,
+      "requirement": "corrected gross account parity across every accepted event",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 16,
+      "requirement": "long and short parity",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 17,
+      "requirement": "low-pos fixture",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 18,
+      "requirement": "high-pos fixture",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 19,
+      "requirement": "account currency unresolved until account binding",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 20,
+      "requirement": "research reporting currency kept distinct",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 21,
+      "requirement": "broker symbol unresolved",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 22,
+      "requirement": "broker product type unresolved if not proven",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 23,
+      "requirement": "no broker calls",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 24,
+      "requirement": "no strategy science changes",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 25,
+      "requirement": "no capital-routing math changes except translation repair",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 26,
+      "requirement": "cross-branch inventory includes TB Forward as engineering reference",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 27,
+      "requirement": "Capital Routing does not import TB strategy/runtime code",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    },
+    {
+      "id": 28,
+      "requirement": "execution-foundation handoff schema complete",
+      "implemented": true,
+      "suite": "tests/test_exec_translation_planning_r1.py"
+    }
+  ]
+}

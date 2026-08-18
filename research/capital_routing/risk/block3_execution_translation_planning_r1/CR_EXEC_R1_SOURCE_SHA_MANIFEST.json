@@ -1,0 +1,9 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-III-EXECUTION-TRANSLATION-PLANNING-R1-POSITION-SCALING-ACCOUNT-BOUNDARY-TRUTH-REPAIR",
+  "base_commit": "5a79bf2323ac2657de74e3efa7c4a29d8715db33",
+  "frozen_inputs": {
+    "P7_5_TRADES.csv": "ad19e08f16aeb65c17305041182c591401d28c32b418287f45d76a678ddfcd07",
+    "R1_EVENT_RISK_LEDGER.csv": "6c98b0d218c66f3f5893733f26c51490138e658046487e3ea108c5feeee2d26f"
+  },
+  "note": "Sealed science inputs consumed read-only; no regeneration."
+}

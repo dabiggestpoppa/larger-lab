@@ -1,0 +1,6 @@
+resource,head,authority_anchor,classification,reusable_for_cr_execution,notes
+tb-forward-engine (branch),d12005988ce61170d9bc5478089baa5ce54cc2a9,df5f349e02ac932491cb067df7aff25cb71c50ac,PROVEN ENGINEERING REFERENCE (read-only),NO -- pattern reference only; do NOT copy TB runtime/strategy code,Persistent runtime + canary evidence; not a direct CR execution dependency
+execution-runtime-foundation (branch),df5f349e02ac932491cb067df7aff25cb71c50ac,df5f349e02ac932491cb067df7aff25cb71c50ac,FUTURE GENERIC EXECUTION DEPENDENCY (read-only today),"CONSUME ITS EVENTUAL INTERFACES (AccountRegistry, BrokerSession, reconciliation, supervisor)",Owns generic execution; CR must not duplicate it
+main / OCE,main,,AUTHORITY/PLANNING (read-only),NO,OCE continuity shell; no broker authority
+capital-routing mt5_adapter.py,5a79bf2323ac2657de74e3efa7c4a29d8715db33,,SUPPORTING (data only),NO -- historical data export only,
+Alpaca / Nautilus / Robinhood / TB-forward runtime inside capital-routing checkout,,,UNAVAILABLE,NO,not present in the capital-routing checkout

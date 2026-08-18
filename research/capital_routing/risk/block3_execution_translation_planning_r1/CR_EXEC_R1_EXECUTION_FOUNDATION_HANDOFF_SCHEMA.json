@@ -1,0 +1,34 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-III-EXECUTION-TRANSLATION-PLANNING-R1-POSITION-SCALING-ACCOUNT-BOUNDARY-TRUTH-REPAIR",
+  "schema_name": "CR_EXEC_R1_EXECUTION_FOUNDATION_HANDOFF_SCHEMA",
+  "from": "CapitalTranslationCore (capital-routing)",
+  "to": "execution-runtime-foundation -> Account Control Plane -> BrokerSession",
+  "fields": {
+    "translation_request_id": "str (idempotent)",
+    "event_id": "str",
+    "family": "A|B",
+    "portfolio_group_id": "str",
+    "account_id": "str",
+    "side": "BUY (A long USDJPY) | SELL (B short USDJPY)",
+    "admitted_f_pct": "float",
+    "pos_t": "float",
+    "target_notional_account_ccy": "float",
+    "account_currency": "str",
+    "one_R_price_move_bps": "float (event-specific)",
+    "model_heat_before": "float",
+    "model_heat_after": "float",
+    "policy_id": "H1-1.00-REJ",
+    "configuration_hash": "str",
+    "ownership_tag": "CAPITAL_ROUTING",
+    "decision_timestamp": "known-time",
+    "expiration_timestamp": "known-time",
+    "exit_contract": "fixed 6h hold from entry (sealed); execution confirms close before heat release"
+  },
+  "capital_routing_does_not_send": [
+    "broker credentials",
+    "runtime supervision",
+    "MT5/TradeLocker calls",
+    "generic reconciliation",
+    "fleet account registry"
+  ]
+}
