@@ -7,6 +7,7 @@ Deterministic, offline (MT5 stubbed) audits for the persistent demo runtime:
 
   runtime DB integrity / desired state / NAV baselines
   PID singleton (blocked + stale reclaim)
+  supervisor aux-child supervision (adopt live / bounded-backoff respawn)
   dashboard status derivation (ONLINE/DEGRADED/OFFLINE/STOPPED)
   worker WAITING_FOR_MT5 path (fail-closed, bounded retry)
   worker market-closure path (ONLINE_MARKET_CLOSED, no orders)
@@ -344,6 +345,63 @@ def test_daily_return_server_day(tmp: Path) -> None:
     w.rdb.close()
 
 
+def test_supervisor_aux_supervision(tmp: Path) -> None:
+    """Watcher/dashboard supervision: adopt a live pid, respawn a dead
+    one with bounded exponential backoff; crash counter resets after a
+    stable run; terminate on a dead pid is a safe no-op."""
+    import tb_supervisor as S
+    from tb_runtime_config import RESTART_BACKOFF_S
+
+    sup = S.Supervisor.__new__(S.Supervisor)  # skip __init__ (no rdb)
+    cfg = {"script": "faux.py", "pid_file": tmp / "faux.pid",
+           "log": tmp / "faux.log", "failures": 0,
+           "last_spawn_ts": 0.0, "spawned_at": 0.0}
+    sup.aux = {"watcher": cfg}
+    spawned: list[float] = []
+
+    def fake_spawn(role: str) -> None:  # noqa: ARG001
+        c = sup.aux[role]
+        c["last_spawn_ts"] = time.time()
+        c["spawned_at"] = time.time()
+        c["failures"] += 1
+        spawned.append(time.time())
+
+    sup._spawn_aux = fake_spawn  # type: ignore[method-assign]
+    t0 = time.time()
+
+    # 1. no pid file => spawn scheduled immediately (delay 5 s at 0)
+    sup._check_aux("watcher", t0)
+    check("aux: spawns when pid missing", len(spawned) == 1)
+
+    # 2. live pid => adopted, no spawn
+    (tmp / "faux.pid").write_text(str(os.getpid()))
+    sup._check_aux("watcher", t0 + 10)
+    check("aux: adopts live pid (no spawn)", len(spawned) == 1)
+
+    # 3. dead pid inside the backoff window => waits
+    (tmp / "faux.pid").write_text("999999999")
+    cfg["failures"] = 1
+    cfg["last_spawn_ts"] = t0
+    sup._check_aux("watcher", t0 + RESTART_BACKOFF_S[1] - 1)
+    check("aux: respects backoff window", len(spawned) == 1)
+
+    # 4. backoff elapsed => respawns
+    sup._check_aux("watcher", t0 + RESTART_BACKOFF_S[1] + 1)
+    check("aux: respawns after backoff", len(spawned) == 2)
+
+    # 5. crash counter resets once the child survives a stable run
+    (tmp / "faux.pid").write_text(str(os.getpid()))
+    sup._check_aux("watcher", t0 + RESTART_BACKOFF_S[1] + 1
+                   + S.WORKER_ALIVE_RESET_S + 1)
+    check("aux: crash counter resets after stable run",
+          cfg["failures"] == 0, str(cfg["failures"]))
+
+    # 6. terminate with a dead pid is a safe no-op
+    (tmp / "faux.pid").write_text("999999999")
+    sup._terminate_aux("watcher", "test")  # must not raise
+    check("aux: terminate with dead pid is no-op", True)
+
+
 def main() -> int:
     print("TB-R6.1 runtime audits")
     with tempfile.TemporaryDirectory() as td:
@@ -355,6 +413,7 @@ def main() -> int:
         test_pnl_accounting(tmp)
         test_daily_return_server_day(tmp)
         test_log_rotation(tmp)
+        test_supervisor_aux_supervision(tmp)
     out = QUANT_LAB.parent / "research" / "tb_forward" / "r6_1"
     out.mkdir(parents=True, exist_ok=True)
     (out / "TB_R6_1_RUNTIME_AUDITS.json").write_text(

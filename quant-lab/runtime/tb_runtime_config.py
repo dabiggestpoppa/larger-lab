@@ -33,10 +33,13 @@ CONTROL_LEDGER = STATE_DIR / "tb_control.db"
 
 SUPERVISOR_PID_FILE = STATE_DIR / "tb_supervisor.pid"
 WORKER_PID_FILE = STATE_DIR / "tb_worker.pid"
+WATCHER_PID_FILE = STATE_DIR / "tb_basket_watch.pid"    # owned by tb_basket_watcher.py
+DASHBOARD_PID_FILE = STATE_DIR / "tb_dashboard.pid"     # owned by tb_dashboard.py
 DESIRED_STATE_FILE = STATE_DIR / "tb_desired_state"     # RUNNING | STOPPED_BY_USER
 
 SUPERVISOR_LOG = LOGS_DIR / "tb_supervisor.log"
 WORKER_LOG = LOGS_DIR / "tb_runtime.log"
+WATCHER_LOG = LOGS_DIR / "tb_basket_watch.log"          # owned by tb_basket_watcher.py
 DASHBOARD_LOG = LOGS_DIR / "tb_dashboard.log"
 
 # ─── DEPLOYMENT PROFILE ──────────────────────────────────────────────────

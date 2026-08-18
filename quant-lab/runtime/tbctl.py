@@ -10,7 +10,9 @@ TB-R6.1 — tbctl — RUNTIME CONTROL CLI
 
 `tbctl stop` is an INTENTIONAL STOP: it persists desired-state
 STOPPED_BY_USER, so the supervisor (and the logon task on the next boot)
-will NOT restart the worker until `tbctl start` is issued.
+will NOT restart the worker (or the watcher/dashboard) until `tbctl start`
+is issued. `tbctl start` brings up the full stack: supervisor spawns
+worker + basket watcher + dashboard.
 """
 
 from __future__ import annotations
@@ -26,8 +28,9 @@ QUANT_LAB = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(QUANT_LAB / "runtime"))
 
 from tb_runtime_config import (  # noqa: E402
-    SUPERVISOR_PID_FILE, WORKER_PID_FILE, SUPERVISOR_LOG, RUNNING,
-    STOPPED_BY_USER, REQUIRED_SERVER,
+    SUPERVISOR_PID_FILE, WORKER_PID_FILE, WATCHER_PID_FILE,
+    DASHBOARD_PID_FILE, SUPERVISOR_LOG, RUNNING, STOPPED_BY_USER,
+    REQUIRED_SERVER,
 )
 from tb_runtime_db import RuntimeDB  # noqa: E402
 from tb_proc import PidLock, pid_alive, spawn_detached  # noqa: E402
@@ -66,6 +69,8 @@ def cmd_status() -> int:
     desired = rdb.desired_state()
     sup = _read_pid(SUPERVISOR_PID_FILE)
     wrk = _read_pid(WORKER_PID_FILE)
+    wch = _read_pid(WATCHER_PID_FILE)
+    dsh = _read_pid(DASHBOARD_PID_FILE)
 
     if desired == STOPPED_BY_USER:
         runtime = "STOPPED"
@@ -117,6 +122,7 @@ def cmd_status() -> int:
     print(f"State: {state}")
     print(f"Last M5: {last_bar or 'n/a'}")
     print(f"Open basket: {basket}")
+    print(f"Watcher: {wch or '-'}  Dashboard: {dsh or '-'}")
     print(f"Today TB PnL: ${today:,.2f}")
     print(f"Since deploy: ${deploy:,.2f}")
     rdb.close()
@@ -139,7 +145,8 @@ def cmd_start() -> int:
     p = spawn_detached([sys.executable, "-u",
                         str(QUANT_LAB / "runtime" / "tb_supervisor.py")],
                        SUPERVISOR_LOG)
-    print(f"supervisor starting (pid {p.pid}); desired=RUNNING")
+    print(f"supervisor starting (pid {p.pid}); desired=RUNNING "
+          f"(full stack: worker + watcher + dashboard)")
     return 0
 
 
@@ -149,10 +156,16 @@ def cmd_stop() -> int:
     rdb.close()
     sup = _read_pid(SUPERVISOR_PID_FILE)
     wrk = _read_pid(WORKER_PID_FILE)
+    wch = _read_pid(WATCHER_PID_FILE)
+    dsh = _read_pid(DASHBOARD_PID_FILE)
     if sup:
         _kill(sup, "supervisor")
     if wrk:  # belt and braces: ensure the worker is down too
         _kill(wrk, "worker")
+    if wch:
+        _kill(wch, "watcher")
+    if dsh:
+        _kill(dsh, "dashboard")
     print("stop requested; desired=STOPPED_BY_USER (no auto-restart)")
     return 0
 

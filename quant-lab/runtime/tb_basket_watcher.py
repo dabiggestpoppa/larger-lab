@@ -42,14 +42,13 @@ QUANT_LAB = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(QUANT_LAB / "runtime"))
 
 from tb_runtime_config import (  # noqa: E402
-    STATE_DIR, LOGS_DIR, LOG_MAX_BYTES, LOG_BACKUP_COUNT,
+    STATE_DIR, LOG_MAX_BYTES, LOG_BACKUP_COUNT,
+    WATCHER_PID_FILE, WATCHER_LOG,
 )
 from tb_proc import PidLock  # noqa: E402
 from tb_telegram import TelegramNotifier  # noqa: E402
 
 POLL_S = 10.0
-WATCH_PID_FILE = STATE_DIR / "tb_basket_watch.pid"
-WATCH_LOG = LOGS_DIR / "tb_basket_watch.log"
 WATCH_STATE = STATE_DIR / "tb_basket_watch.json"
 
 RUNTIME_DB = STATE_DIR / "tb_runtime.db"
@@ -63,7 +62,7 @@ log = logging.getLogger("tb.basketwatch")
 
 
 def _setup_logging() -> None:
-    h = RotatingFileHandler(WATCH_LOG, maxBytes=LOG_MAX_BYTES,
+    h = RotatingFileHandler(WATCHER_LOG, maxBytes=LOG_MAX_BYTES,
                             backupCount=LOG_BACKUP_COUNT, encoding="utf-8")
     h.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
     root = logging.getLogger()
@@ -132,7 +131,7 @@ def save_state(st: dict) -> None:
 
 
 def main() -> int:
-    lock = PidLock(WATCH_PID_FILE, "basket-watcher")
+    lock = PidLock(WATCHER_PID_FILE, "basket-watcher")
     if not lock.try_acquire().get("ok"):
         log.error("singleton held by live pid — exiting")
         return 2

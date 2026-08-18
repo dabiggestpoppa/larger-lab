@@ -28,11 +28,11 @@ sys.path.insert(0, str(QUANT_LAB / "runtime"))
 
 from tb_runtime_config import (  # noqa: E402
     DASHBOARD_HOST, DASHBOARD_PORT, HEARTBEAT_GREEN_MAX_S,
-    HEARTBEAT_YELLOW_MAX_S, DASHBOARD_LOG, LOG_MAX_BYTES, LOG_BACKUP_COUNT,
-    RUNNING, STOPPED_BY_USER,
+    HEARTBEAT_YELLOW_MAX_S, DASHBOARD_LOG, DASHBOARD_PID_FILE,
+    LOG_MAX_BYTES, LOG_BACKUP_COUNT, RUNNING, STOPPED_BY_USER,
 )
 from tb_runtime_db import RuntimeDB  # noqa: E402
-from tb_proc import pid_alive  # noqa: E402
+from tb_proc import PidLock, pid_alive  # noqa: E402
 
 log = logging.getLogger("tb.dashboard")
 
@@ -225,22 +225,29 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--port", type=int, default=DASHBOARD_PORT)
-    args = ap.parse_args()
-    h = RotatingFileHandler(DASHBOARD_LOG, maxBytes=LOG_MAX_BYTES,
-                            backupCount=LOG_BACKUP_COUNT, encoding="utf-8")
-    h.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
-    logging.getLogger().addHandler(h)
-    logging.getLogger().setLevel(logging.INFO)
-    srv = ThreadingHTTPServer((DASHBOARD_HOST, args.port), Handler)
-    log.info("dashboard on http://%s:%d", DASHBOARD_HOST, args.port)
-    print(f"DASHBOARD http://{DASHBOARD_HOST}:{args.port}", flush=True)
+    lock = PidLock(DASHBOARD_PID_FILE, "dashboard")
+    got = lock.try_acquire()
+    if not got["ok"]:
+        print(f"SINGLETON_BLOCKED: {got['reason']}", flush=True)
+        return 2
     try:
+        ap = argparse.ArgumentParser()
+        ap.add_argument("--port", type=int, default=DASHBOARD_PORT)
+        args = ap.parse_args()
+        h = RotatingFileHandler(DASHBOARD_LOG, maxBytes=LOG_MAX_BYTES,
+                                backupCount=LOG_BACKUP_COUNT, encoding="utf-8")
+        h.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+        logging.getLogger().addHandler(h)
+        logging.getLogger().setLevel(logging.INFO)
+        srv = ThreadingHTTPServer((DASHBOARD_HOST, args.port), Handler)
+        log.info("dashboard on http://%s:%d", DASHBOARD_HOST, args.port)
+        print(f"DASHBOARD http://{DASHBOARD_HOST}:{args.port}", flush=True)
         srv.serve_forever()
+        return 0
     except KeyboardInterrupt:
-        pass
-    return 0
+        return 0
+    finally:
+        lock.release()
 
 
 if __name__ == "__main__":

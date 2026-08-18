@@ -7,8 +7,9 @@
 # or via Task Scheduler UI — no takeown/icacls gymnastics.
 #
 # The supervisor honors the durable desired-state flag: if the user ran
-# `tbctl stop`, the task starts the supervisor but the worker stays stopped
-# until `tbctl start`.
+# `tbctl stop`, the task starts the supervisor but the worker, watcher, and
+# dashboard stay stopped until `tbctl start`. With desired-state RUNNING the
+# supervisor brings up the whole stack (worker + basket watcher + dashboard).
 #
 # Run (PowerShell, as the current user):
 #     powershell -ExecutionPolicy Bypass -File .\install_windows_runtime.ps1

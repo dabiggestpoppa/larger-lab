@@ -3,18 +3,23 @@
 TB-R6.1 — TB SUPERVISOR
 =======================
 
-Owns the WORKER process lifecycle ONLY (never strategy logic):
+Owns the runtime process stack (never strategy logic):
 
-  * spawn the worker when desired-state == RUNNING
-  * bounded exponential backoff restart after unexpected worker failure
-  * kill + restart a worker whose heartbeat is dead while the process lives
-  * NEVER restart after an intentional `tbctl stop` (durable desired state)
+  * worker:    spawn when desired-state == RUNNING; bounded exponential
+               backoff restart after unexpected failure; kill + restart
+               a worker whose heartbeat is dead while the process lives
+  * watcher:   basket alert monitor (tb_basket_watcher.py) — adopted if
+               already live, respawned (bounded backoff) if dead
+  * dashboard: monitoring web UI (tb_dashboard.py) — same supervision
+  * NEVER restart any child after an intentional `tbctl stop` (durable
+    desired state)
   * singleton: a second supervisor fails closed (split-brain protection)
 
 The supervisor itself is started by tbctl, or by the Windows Task Scheduler
 entry at logon (see install_windows_runtime.ps1). It stays alive across
-market closures and PC reboots (via the scheduled task); the worker is
-started/stopped underneath it.
+market closures and PC reboots (via the scheduled task); the full stack is
+started/stopped underneath it. After a reboot with desired-state RUNNING,
+the logon task brings up worker + watcher + dashboard automatically.
 
     python -u quant-lab/runtime/tb_supervisor.py
 """
@@ -36,11 +41,12 @@ sys.path.insert(0, str(QUANT_LAB / "runtime"))
 
 from tb_runtime_config import (  # noqa: E402
     RESTART_BACKOFF_S, STALE_HEARTBEAT_RESTART_S, SUPERVISOR_PID_FILE,
-    WORKER_PID_FILE, SUPERVISOR_LOG, LOG_MAX_BYTES, LOG_BACKUP_COUNT,
-    RUNNING, STOPPED_BY_USER,
+    WORKER_PID_FILE, WATCHER_PID_FILE, DASHBOARD_PID_FILE,
+    SUPERVISOR_LOG, WATCHER_LOG, DASHBOARD_LOG,
+    LOG_MAX_BYTES, LOG_BACKUP_COUNT, RUNNING, STOPPED_BY_USER,
 )
 from tb_runtime_db import RuntimeDB  # noqa: E402
-from tb_proc import PidLock, pid_alive  # noqa: E402
+from tb_proc import PidLock, pid_alive, spawn_detached  # noqa: E402
 
 log = logging.getLogger("tb.supervisor")
 POLL_S = 5
@@ -68,6 +74,18 @@ class Supervisor:
         self.last_spawn_ts = 0.0
         self.worker_spawned_at = 0.0
         self.stop_requested = False
+        # watcher + dashboard: same adopt/respawn supervision as the
+        # worker, driven by their own PID locks (state/*.pid)
+        self.aux: dict[str, dict] = {
+            "watcher": {"script": "tb_basket_watcher.py",
+                        "pid_file": WATCHER_PID_FILE, "log": WATCHER_LOG,
+                        "failures": 0, "last_spawn_ts": 0.0,
+                        "spawned_at": 0.0},
+            "dashboard": {"script": "tb_dashboard.py",
+                          "pid_file": DASHBOARD_PID_FILE,
+                          "log": DASHBOARD_LOG, "failures": 0,
+                          "last_spawn_ts": 0.0, "spawned_at": 0.0},
+        }
 
     # ── worker helpers ──────────────────────────────────────────────────
     def _worker_pid(self) -> int | None:
@@ -105,6 +123,50 @@ class Supervisor:
         log.info("worker stopped (%s)", reason)
         self.worker_proc = None
 
+    # ── aux children (watcher + dashboard) ───────────────────────────
+    def _pid_from_file(self, pid_file: Path) -> int | None:
+        try:
+            p = int(pid_file.read_text().strip())
+            return p if pid_alive(p) else None
+        except Exception:
+            return None
+
+    def _spawn_aux(self, role: str) -> None:
+        cfg = self.aux[role]
+        args = [sys.executable, "-u",
+                str(QUANT_LAB / "runtime" / cfg["script"])]
+        p = spawn_detached(args, cfg["log"])
+        cfg["last_spawn_ts"] = time.time()
+        cfg["spawned_at"] = time.time()
+        cfg["failures"] += 1
+        log.info("%s spawned pid=%d (supervised)", role, p.pid)
+
+    def _terminate_aux(self, role: str, reason: str) -> None:
+        pid = self._pid_from_file(self.aux[role]["pid_file"])
+        if pid:
+            try:
+                os.kill(pid, signal.SIGTERM)
+                time.sleep(1)
+            except Exception:
+                pass
+            log.info("%s stopped (%s)", role, reason)
+
+    def _check_aux(self, role: str, now: float) -> None:
+        """Adopt a live watcher/dashboard; respawn a dead one with
+        bounded exponential backoff (same RESTART_BACKOFF_S schedule)."""
+        cfg = self.aux[role]
+        if self._pid_from_file(cfg["pid_file"]):
+            # alive: reset the crash counter once it has survived a while
+            if (cfg["spawned_at"] and now - cfg["spawned_at"]
+                    > WORKER_ALIVE_RESET_S and cfg["failures"]):
+                cfg["failures"] = 0
+            return
+        delay = RESTART_BACKOFF_S[
+            min(cfg["failures"], len(RESTART_BACKOFF_S) - 1)]
+        if now - cfg["last_spawn_ts"] >= delay:
+            self._spawn_aux(role)
+        # else: still inside the backoff window -> wait for the next poll
+
     # ── main loop ───────────────────────────────────────────────────────
     def run(self) -> int:
         got = self.lock.try_acquire()
@@ -129,6 +191,8 @@ class Supervisor:
                 if desired == STOPPED_BY_USER:
                     if self._worker_pid() or self.worker_proc:
                         self._terminate_worker("intentional user stop")
+                    for role in ("watcher", "dashboard"):
+                        self._terminate_aux(role, "intentional user stop")
                     self.rdb.set_status("supervisor_state", "STOPPED_BY_USER")
                     time.sleep(POLL_S)
                     continue
@@ -163,9 +227,15 @@ class Supervisor:
                         # worker alive but never heartbeated yet -> give it time
                         pass
                     self.rdb.set_status("supervisor_state", "RUNNING")
+                # watcher + dashboard: adopt live, respawn dead
+                now = time.time()
+                self._check_aux("watcher", now)
+                self._check_aux("dashboard", now)
                 time.sleep(POLL_S)
         finally:
             self._terminate_worker("supervisor shutdown")
+            for role in ("watcher", "dashboard"):
+                self._terminate_aux(role, "supervisor shutdown")
             self.rdb.set_status("supervisor_state", "STOPPED")
             self.lock.release()
             self.rdb.close()
