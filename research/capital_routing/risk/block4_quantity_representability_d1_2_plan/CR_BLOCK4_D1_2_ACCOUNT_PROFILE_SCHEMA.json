@@ -1,0 +1,75 @@
+{
+  "$id": "cr-block4.d1.2.account-profile",
+  "title": "AccountPhysicalProfile",
+  "description": "Frozen or observed account-level physical truth (Lane B fields).",
+  "fields": [
+    {
+      "name": "account_id",
+      "type": "string",
+      "semantics": "account identity"
+    },
+    {
+      "name": "observed_at",
+      "type": "string|null",
+      "semantics": "causal observation timestamp"
+    },
+    {
+      "name": "balance",
+      "type": "number|null",
+      "semantics": "account balance"
+    },
+    {
+      "name": "equity",
+      "type": "number|null",
+      "semantics": "causal equity snapshot"
+    },
+    {
+      "name": "account_currency",
+      "type": "string|null",
+      "semantics": "executable currency"
+    },
+    {
+      "name": "leverage",
+      "type": "string|null",
+      "semantics": "recorded; margin semantics deferred to D1.3"
+    },
+    {
+      "name": "margin_mode",
+      "type": "string|null",
+      "semantics": "recorded; deferred to D1.3"
+    },
+    {
+      "name": "hedging_netting",
+      "type": "HEDGING|NETTING|UNKNOWN|null",
+      "semantics": "position mode"
+    },
+    {
+      "name": "broker_company",
+      "type": "string|null",
+      "semantics": "unresolved"
+    },
+    {
+      "name": "environment",
+      "type": "string|null",
+      "semantics": "unresolved"
+    },
+    {
+      "name": "truth_class",
+      "type": "enum",
+      "semantics": [
+        "ACTUAL_OBSERVED",
+        "BROKER_DOCUMENTED",
+        "PROFILE_FROZEN",
+        "USER_SPECIFIED_SCENARIO",
+        "HYPOTHETICAL_DIAGNOSTIC",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "name": "source",
+      "type": "string",
+      "semantics": "evidence location"
+    }
+  ],
+  "missing_critical_field": "MISSING_REQUIRED_EXECUTION_TRUTH"
+}

@@ -1,0 +1,13 @@
+component,status,verdict
+D1.1 notional feasibility surface (Lane A),SEALED,PASS
+D1.1A artifact truth / quantile reconciliation,SEALED,PASS
+D1.2 quantity representability plan (Lane B),PREREGISTERED,PASS
+D1.2A physical-profile truth ingest + seal,PLANNED,NOT_STARTED
+D1.2B quantity-representability surface,PLANNED,NOT_STARTED
+D1.3 margin-contract feasibility (Lane C),PLANNED,NOT_STARTED
+D1.4 concurrent account-resource replay,PLANNED,NOT_STARTED
+D1.5 physical-book distortion seal,PLANNED,NOT_STARTED
+D1.6 broker quantity translation contract,PLANNED,NOT_STARTED
+execution-runtime-foundation (cross-workstream),EXTERNAL,AUTHORITATIVE_AT_62e6d040
+tb-forward-engine (engineering reference),EXTERNAL,REFERENCE_AT_b48fd352
+broker execution,NOT_PERMITTED,FALSE

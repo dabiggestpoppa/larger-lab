@@ -1,0 +1,66 @@
+{
+  "$id": "cr-block4.d1.2.physical-profile",
+  "title": "PhysicalProfile",
+  "description": "A frozen or scenario account/product pairing for Lane B. Research scenario labels (PROP_*/OX_*) imply NO broker truth; every profile carries exactly one truth class.",
+  "fields": [
+    {
+      "name": "profile_id",
+      "type": "string",
+      "semantics": "immutable profile identity"
+    },
+    {
+      "name": "equity",
+      "type": "number|null",
+      "semantics": "account equity; None = UNRESOLVED"
+    },
+    {
+      "name": "account_currency",
+      "type": "string|null",
+      "semantics": "executable currency"
+    },
+    {
+      "name": "leverage",
+      "type": "string|null",
+      "semantics": "recorded metadata; belongs to D1.3 margin, not Lane B"
+    },
+    {
+      "name": "account_size",
+      "type": "number|null",
+      "semantics": "distinct from leverage"
+    },
+    {
+      "name": "instrument_spec_hash",
+      "type": "string|null",
+      "semantics": "immutable spec hash; None until sealed"
+    },
+    {
+      "name": "account_profile_hash",
+      "type": "string|null",
+      "semantics": "immutable account profile hash"
+    },
+    {
+      "name": "truth_class",
+      "type": "enum",
+      "semantics": [
+        "ACTUAL_OBSERVED",
+        "BROKER_DOCUMENTED",
+        "PROFILE_FROZEN",
+        "USER_SPECIFIED_SCENARIO",
+        "HYPOTHETICAL_DIAGNOSTIC",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "name": "source",
+      "type": "string",
+      "semantics": "evidence location / scenario provenance"
+    },
+    {
+      "name": "freeze_timestamp",
+      "type": "string|null",
+      "semantics": "when frozen/observed"
+    }
+  ],
+  "rule": "Changing contract size / volume step / volume max / account currency / broker symbol requires a NEW profile generation. No silent mutable profile.",
+  "missing_critical_field": "MISSING_REQUIRED_EXECUTION_TRUTH"
+}

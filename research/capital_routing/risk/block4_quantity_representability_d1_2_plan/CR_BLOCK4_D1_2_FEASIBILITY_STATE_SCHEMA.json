@@ -1,0 +1,27 @@
+{
+  "$id": "cr-block4.d1.2.feasibility-state",
+  "title": "QuantityFeasibilityState",
+  "description": "Lane B primary-state taxonomy. One primary state per result plus optional secondary flags. Margin / buying power / leverage states belong to Lane C (D1.3), NOT Lane B.",
+  "primary_states": [
+    "EXACTLY_REPRESENTABLE",
+    "REPRESENTABLE_WITH_IMMATERIAL_ROUNDING",
+    "ROUNDING_DISTORTED",
+    "MIN_QUANTITY_BLOCKED",
+    "MAX_QUANTITY_BLOCKED",
+    "BROKER_SYMBOL_UNRESOLVED",
+    "CONTRACT_SIZE_UNRESOLVED",
+    "VOLUME_RULE_UNRESOLVED",
+    "ACCOUNT_CURRENCY_UNRESOLVED",
+    "CURRENCY_CONVERSION_UNRESOLVED",
+    "PRODUCT_TYPE_UNRESOLVED",
+    "ACCOUNT_PROFILE_UNRESOLVED"
+  ],
+  "secondary_flags": [
+    "ROUNDING_ACTIVE",
+    "MIN_QUANTITY_OVERSHOOT_PROHIBITED",
+    "MAX_QUANTITY_OVERSHOOT_PROHIBITED",
+    "MULTI_TICKET_SPLIT_PROHIBITED"
+  ],
+  "fail_closed_default": "OTHER_FAIL_CLOSED",
+  "rule": "A result with any unresolved required truth takes the corresponding *_UNRESOLVED or fail-closed state, never a representable state. An event can be QUANTITY_REPRESENTABLE and later MARGIN_BLOCKED (D1.3) \u2014 lanes are never combined."
+}

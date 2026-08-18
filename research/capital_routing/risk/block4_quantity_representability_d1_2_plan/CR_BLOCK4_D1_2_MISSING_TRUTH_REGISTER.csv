@@ -1,0 +1,19 @@
+field,truth_class,detail,blocking_for_d1_2_empirical
+actual_intended_broker,UNKNOWN,actual broker identity unresolved,yes
+actual_account,UNKNOWN,actual account / account id unresolved,yes
+actual_broker_symbol,UNKNOWN,USDJPY broker representation (USDJPY / USDJPY.PRO / CFD / spot) unresolved,yes
+product_type,UNKNOWN,spot FX vs CFD representation unresolved,yes
+contract_size,UNKNOWN,trade_contract_size unknown,yes
+volume_min,UNKNOWN,minimum volume unknown,yes
+volume_step,UNKNOWN,volume step unknown,yes
+volume_max,UNKNOWN,maximum volume unknown,yes
+volume_limit,UNKNOWN,separate volume limit unknown,yes
+account_currency,UNKNOWN,executable account currency unresolved until account binding,yes
+margin_currency,UNKNOWN,margin currency unresolved,yes
+tick_size,UNKNOWN,trade_tick_size unknown,yes
+tick_value,UNKNOWN,trade_tick_value unknown,yes
+point,UNKNOWN,point size unknown,yes
+digits,UNKNOWN,digits unknown,yes
+hedging_netting,UNKNOWN,HEDGING vs NETTING mode unknown,yes
+causal_conversion_source,UNKNOWN,causal FX conversion price source unresolved,yes
+actual_account_size,UNKNOWN,intended account size unresolved,yes

@@ -1,0 +1,148 @@
+{
+  "$id": "cr-block4.d1.2.instrument-spec",
+  "title": "InstrumentPhysicalSpec",
+  "description": "Field inventory for USDJPY physical instrument truth. NO generic FX defaults (100000 / 0.01 / 0.01 / 100) are assumed unless inside a labeled HYPOTHETICAL_DIAGNOSTIC_PROFILE.",
+  "required": [
+    "research_symbol",
+    "broker_symbol",
+    "product_type",
+    "contract_size",
+    "volume_min",
+    "volume_step",
+    "volume_max",
+    "base_currency",
+    "quote_currency",
+    "truth_class",
+    "source"
+  ],
+  "fields": [
+    {
+      "name": "source_id",
+      "type": "string|null",
+      "semantics": "observation/spec source id"
+    },
+    {
+      "name": "observed_at",
+      "type": "string|null",
+      "semantics": "causal observation timestamp"
+    },
+    {
+      "name": "broker_company",
+      "type": "string|null",
+      "semantics": "unresolved"
+    },
+    {
+      "name": "environment",
+      "type": "DEMO|CONTEST|REAL|SIM|REPLAY|UNKNOWN|null",
+      "semantics": "unresolved"
+    },
+    {
+      "name": "transport",
+      "type": "string|null",
+      "semantics": "MT5 / other transport unresolved"
+    },
+    {
+      "name": "research_symbol",
+      "type": "string",
+      "semantics": "USDJPY (frozen research identity)"
+    },
+    {
+      "name": "broker_symbol",
+      "type": "string|null",
+      "semantics": "MISSING_EXECUTION_TRANSLATION_FIELD until binding"
+    },
+    {
+      "name": "product_type",
+      "type": "string|null",
+      "semantics": "spot FX vs CFD representation unresolved"
+    },
+    {
+      "name": "contract_size",
+      "type": "number|null",
+      "semantics": "trade_contract_size"
+    },
+    {
+      "name": "point",
+      "type": "number|null",
+      "semantics": "point size"
+    },
+    {
+      "name": "digits",
+      "type": "integer|null",
+      "semantics": "digits"
+    },
+    {
+      "name": "tick_size",
+      "type": "number|null",
+      "semantics": "trade_tick_size"
+    },
+    {
+      "name": "tick_value",
+      "type": "number|null",
+      "semantics": "trade_tick_value"
+    },
+    {
+      "name": "volume_min",
+      "type": "number|null",
+      "semantics": "minimum volume"
+    },
+    {
+      "name": "volume_step",
+      "type": "number|null",
+      "semantics": "volume step"
+    },
+    {
+      "name": "volume_max",
+      "type": "number|null",
+      "semantics": "maximum volume"
+    },
+    {
+      "name": "volume_limit",
+      "type": "number|null",
+      "semantics": "separate volume limit if any"
+    },
+    {
+      "name": "volume_semantics",
+      "type": "string|null",
+      "semantics": "lot / units / base-currency semantics"
+    },
+    {
+      "name": "base_currency",
+      "type": "string|null",
+      "semantics": "unresolved"
+    },
+    {
+      "name": "quote_currency",
+      "type": "string|null",
+      "semantics": "unresolved"
+    },
+    {
+      "name": "margin_currency",
+      "type": "string|null",
+      "semantics": "unresolved"
+    },
+    {
+      "name": "hedging_or_netting",
+      "type": "HEDGING|NETTING|UNKNOWN|null",
+      "semantics": "position mode"
+    },
+    {
+      "name": "truth_class",
+      "type": "enum",
+      "semantics": [
+        "ACTUAL_OBSERVED",
+        "BROKER_DOCUMENTED",
+        "PROFILE_FROZEN",
+        "USER_SPECIFIED_SCENARIO",
+        "HYPOTHETICAL_DIAGNOSTIC",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "name": "source",
+      "type": "string",
+      "semantics": "evidence location"
+    }
+  ],
+  "missing_critical_field": "MISSING_REQUIRED_EXECUTION_TRUTH"
+}
