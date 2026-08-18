@@ -1,0 +1,53 @@
+{
+  "capture_id": "D1_2A1-CAP-1",
+  "observed_at": "2026-08-18T18:22:00Z",
+  "method": "MetaTrader5 read-only APIs via live terminal: account_info(), symbol_select(\"USDJPY.PRO\") [Market Watch only, non-mutating], symbol_info(\"USDJPY.PRO\"), symbol_info_tick(\"USDJPY.PRO\"), terminal_info()",
+  "mutating_calls": "none",
+  "truth_class": "ACTUAL_OBSERVED",
+  "environment": "DEMO",
+  "account": {
+    "pseudonymous_account_id": "OX-DEMO-0ac70a75d537",
+    "login_pseudonym_hash": "0ac70a75d537036fac4b978669e760504fb68c3b1e6bd72173bbee5939269ade",
+    "server": "OxSecurities-Demo",
+    "company": "Ox Securities Pty Ltd",
+    "transport": "MT5",
+    "currency": "USD",
+    "currency_digits": 2,
+    "leverage": 500,
+    "margin_mode": 2,
+    "trade_mode": 0,
+    "fifo_close": false,
+    "balance": 25254.35,
+    "equity": 25254.35,
+    "margin": 0.0,
+    "margin_free": 25254.35,
+    "name": "REDACTED (not committed)"
+  },
+  "symbol": {
+    "broker_symbol": "USDJPY.PRO",
+    "description": "US Dollar vs Japanese Yen",
+    "path": "Forex PRO\\USDJPY.PRO",
+    "product_type": "FX",
+    "digits": 3,
+    "point": 0.001,
+    "trade_contract_size": 100000.0,
+    "trade_tick_size": 0.001,
+    "trade_tick_value": 0.626731345341506,
+    "volume_min": 0.01,
+    "volume_max": 200.0,
+    "volume_step": 0.01,
+    "trade_calc_mode": 0,
+    "trade_mode": 4,
+    "currency_base": "USD",
+    "currency_profit": "JPY",
+    "currency_margin": "USD",
+    "spread": 1,
+    "spread_float": true
+  },
+  "tick": {
+    "bid": 159.557,
+    "ask": 159.558,
+    "time_unix": 1787106140
+  },
+  "source": "live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API"
+}

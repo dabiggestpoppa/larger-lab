@@ -1,0 +1,26 @@
+field,value,truth_class,source,observed_at
+research_symbol,USDJPY,PROFILE_FROZEN,Block III seal,n/a
+broker_symbol,USDJPY.PRO,ACTUAL_OBSERVED,"live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",2026-08-18T18:22:00Z
+product_type,FX,ACTUAL_OBSERVED,"live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",2026-08-18T18:22:00Z
+broker_company,Ox Securities Pty Ltd,ACTUAL_OBSERVED,"live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",2026-08-18T18:22:00Z
+environment,DEMO,ACTUAL_OBSERVED,"live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",2026-08-18T18:22:00Z
+transport,MT5,ACTUAL_OBSERVED,"live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",2026-08-18T18:22:00Z
+contract_size,100000.0,ACTUAL_OBSERVED,"live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",2026-08-18T18:22:00Z
+volume_min,0.01,ACTUAL_OBSERVED,"live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",2026-08-18T18:22:00Z
+volume_step,0.01,ACTUAL_OBSERVED,"live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",2026-08-18T18:22:00Z
+volume_max,200.0,ACTUAL_OBSERVED,"live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",2026-08-18T18:22:00Z
+digits,3,ACTUAL_OBSERVED,"live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",2026-08-18T18:22:00Z
+point,0.001,ACTUAL_OBSERVED,"live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",2026-08-18T18:22:00Z
+tick_size,0.001,ACTUAL_OBSERVED,"live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",2026-08-18T18:22:00Z
+tick_value,0.626731345341506,ACTUAL_OBSERVED,"live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",2026-08-18T18:22:00Z
+base_currency,USD,ACTUAL_OBSERVED,"live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",2026-08-18T18:22:00Z
+quote_currency,JPY,ACTUAL_OBSERVED,"live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",2026-08-18T18:22:00Z
+margin_currency,USD,ACTUAL_OBSERVED,"live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",2026-08-18T18:22:00Z
+account_currency,USD,ACTUAL_OBSERVED,"live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",2026-08-18T18:22:00Z
+leverage,500,ACTUAL_OBSERVED,"live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",2026-08-18T18:22:00Z
+balance,25254.35,ACTUAL_OBSERVED,"live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",2026-08-18T18:22:00Z
+equity,25254.35,ACTUAL_OBSERVED,"live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",2026-08-18T18:22:00Z
+margin_mode,2,ACTUAL_OBSERVED,"live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",2026-08-18T18:22:00Z
+quantity_conversion_rule,volume = target_USD_notional / 100000 (base-USD direct),DERIVED_OBSERVED,derived from observed contract_size + base currency == account currency,2026-08-18T18:22:00Z
+quantity_mapping_symmetric,true,DERIVED_OBSERVED,SymbolInfo carries no side-dependent volume/contract fields,2026-08-18T18:22:00Z
+hedging_netting,UNKNOWN,UNKNOWN,not observable via used APIs,n/a

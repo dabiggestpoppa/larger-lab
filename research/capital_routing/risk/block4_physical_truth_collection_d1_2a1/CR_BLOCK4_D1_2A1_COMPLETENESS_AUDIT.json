@@ -1,0 +1,25 @@
+{
+  "quantity_minimum_complete": true,
+  "margin_complete": false,
+  "completeness_level": "SEALED_ACTUAL_QUANTITY_COMPLETE",
+  "required_fields": {
+    "research_symbol": "USDJPY",
+    "broker_symbol": "USDJPY.PRO",
+    "product_type": "FX",
+    "account_currency": "USD",
+    "contract_size": 100000.0,
+    "volume_min": 0.01,
+    "volume_step": 0.01,
+    "volume_max": 200.0,
+    "base_currency": "USD",
+    "quote_currency": "JPY",
+    "quantity_conversion_rule": "volume = USD_notional / contract_size"
+  },
+  "margin_blockers": [
+    "symbol_leverage",
+    "margin_tiers",
+    "hedging_netting"
+  ],
+  "margin_note": "leverage, margin_mode, margin currency, trade_calc_mode are OBSERVED; symbol leverage/tiers and hedging/netting remain for D1.3",
+  "rule": "any change to contract_size / volume_min / volume_step / volume_max / account_currency / broker_symbol / product_type requires a NEW profile generation"
+}

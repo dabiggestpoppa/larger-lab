@@ -1,0 +1,7 @@
+{
+  "quantity_mapping_symmetric": true,
+  "resolved": true,
+  "rationale": "Observed SymbolInfo for USDJPY.PRO carries no side-dependent volume / contract-size fields; volume semantics are identical for BUY and SELL under the observed contract (contract_size, volume_min/step/max, calc mode apply direction-independently).",
+  "evidence": "D1_2A1-CAP-1",
+  "truth_class": "ACTUAL_OBSERVED"
+}

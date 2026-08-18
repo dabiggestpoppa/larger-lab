@@ -1,0 +1,20 @@
+{
+  "account_id": "OX-DEMO-0ac70a75d537",
+  "observed_at": "2026-08-18T18:22:00Z",
+  "balance": 25254.35,
+  "equity": 25254.35,
+  "margin_free": 25254.35,
+  "account_currency": "USD",
+  "leverage": 500,
+  "margin_mode": 2,
+  "trade_mode": 0,
+  "fifo_close": false,
+  "broker_company": "Ox Securities Pty Ltd",
+  "server": "OxSecurities-Demo",
+  "environment": "DEMO",
+  "transport": "MT5",
+  "hedging_netting": "UNKNOWN",
+  "truth_class": "ACTUAL_OBSERVED",
+  "source": "live MT5 terminal on this machine (Ox Securities MetaTrader 5), read-only MetaTrader5 API",
+  "note": "Account equity is a time-varying OBSERVED state, NOT a permanent account specification; static fields (currency, leverage contract, margin mode, broker, environment) are kept separate."
+}

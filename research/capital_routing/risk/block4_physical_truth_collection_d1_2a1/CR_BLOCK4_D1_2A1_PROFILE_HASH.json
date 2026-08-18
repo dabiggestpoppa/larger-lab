@@ -1,0 +1,24 @@
+{
+  "profile_generation_id": "PHYSICAL_PROFILE_GENERATION_G1",
+  "profile_id": "OX_DEMO_USDJPY_PRO_G1",
+  "profile_hash": "125ba55dd889051979d5cdbb4d15fbad273fb6a08f6586deda8d22e40fe74c83",
+  "hash_rule": "canonical field values + provenance + truth class; any contract-field change -> NEW profile generation",
+  "canonical_fields": {
+    "profile_id": "OX_DEMO_USDJPY_PRO_G1",
+    "account_id": "OX-DEMO-0ac70a75d537",
+    "broker_symbol": "USDJPY.PRO",
+    "product_type": "FX",
+    "contract_size": 100000.0,
+    "volume_min": 0.01,
+    "volume_step": 0.01,
+    "volume_max": 200.0,
+    "account_currency": "USD",
+    "base_currency": "USD",
+    "quote_currency": "JPY",
+    "margin_currency": "USD",
+    "quantity_conversion_rule": "volume = USD_notional / contract_size",
+    "truth_class": "ACTUAL_OBSERVED",
+    "environment": "DEMO",
+    "observed_at": "2026-08-18T18:22:00Z"
+  }
+}

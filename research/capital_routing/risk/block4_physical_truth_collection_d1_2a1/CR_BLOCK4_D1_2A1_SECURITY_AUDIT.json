@@ -1,0 +1,14 @@
+{
+  "secrets_committed": false,
+  "plaintext_passwords": 0,
+  "api_keys": 0,
+  "mt5_login_secrets": 0,
+  "session_tokens": 0,
+  "login_committed": false,
+  "personal_name_committed": false,
+  "account_id": "pseudonymous (OX-DEMO-<sha256(login)[:12]>)",
+  "raw_evidence_check": {
+    "login_pseudonym_hash_present": true,
+    "name_value": "REDACTED (not committed)"
+  }
+}
