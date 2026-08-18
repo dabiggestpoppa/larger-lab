@@ -1,0 +1,26 @@
+{
+  "checkpoint_id": "PFT-B0-PROGRAM-CONSTITUTION",
+  "program_id": "PFT",
+  "branch": "agent/deepers-strategy-foundry",
+  "base_sha": "9f61288679eea56a298e08f718c314f2ca509bc5",
+  "commit_sha": "225393631406200909cda8106f09edb2e456fee1",
+  "status": "PASS",
+  "spec_generation": "",
+  "data_generation": "",
+  "engine_generation": "",
+  "data_truth_pass": true,
+  "math_conformance_pass": true,
+  "causality_pass": true,
+  "protected_data_touched": false,
+  "economic_pnl_computed": false,
+  "optimization_performed": false,
+  "confirmation_consumed": false,
+  "holdout_consumed": false,
+  "production_authorized": false,
+  "human_review_required": true,
+  "next_checkpoint_authorized": false,
+  "blockers": [],
+  "warnings": [
+    "B0 does not evaluate data truth, math conformance or causality; those gates first apply at PFT-B2/PFT-B3."
+  ]
+}

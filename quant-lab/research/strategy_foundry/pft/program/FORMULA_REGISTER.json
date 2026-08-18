@@ -1,0 +1,140 @@
+{
+  "schema_version": "1.0",
+  "program_id": "PFT",
+  "formula_count": 19,
+  "formulas": [
+    {
+      "id": "A1.F01.LOG_RETURN",
+      "name": "log return",
+      "equation": "r_t = ln(P_t / P_{t-1}) on H1 closes; stale closed-market slot r_t = 0 (flagged)",
+      "source_ref": "SPECIFICATION_V2_2.md (Returns)",
+      "implementation_status": "REGISTERED"
+    },
+    {
+      "id": "A1.F02.PARKINSON_14H",
+      "name": "Parkinson 14H oil volatility",
+      "equation": "sigma_W = sqrt((1/(4 ln 2)) * (1/14) * sum(ln(H/L)^2, i=0..13)) * sqrt(365*24)",
+      "source_ref": "SPECIFICATION_V2_2.md (Parkinson Oil Volatility)",
+      "implementation_status": "REGISTERED"
+    },
+    {
+      "id": "A1.F03.GAMMA_RAW",
+      "name": "raw range skew",
+      "equation": "gamma = ((H-C)-(C-L))/(H-L); H==L -> 0",
+      "source_ref": "SPECIFICATION_V2_2.md (K2)",
+      "implementation_status": "REGISTERED"
+    },
+    {
+      "id": "A1.F04.GAMMA_SMA3",
+      "name": "three-hour gamma smooth",
+      "equation": "gamma_bar_t = (gamma_t + gamma_{t-1} + gamma_{t-2})/3",
+      "source_ref": "SPECIFICATION_V2_2.md (K2)",
+      "implementation_status": "REGISTERED"
+    },
+    {
+      "id": "A1.F05.ACCELERATION",
+      "name": "volatility acceleration",
+      "equation": "A_t = sigma_t/sigma_{t-1} - 1; previous sigma==0 -> A_t=0",
+      "source_ref": "SPECIFICATION_V2_2.md (K2)",
+      "implementation_status": "REGISTERED"
+    },
+    {
+      "id": "A1.F06.DMD_OPERATOR",
+      "name": "DMD / Koopman phase operator",
+      "equation": "A = Y X^+; A Phi = Phi Lambda; eligible: 0.95<|lambda|<1.0, Im(lambda)>0; unit-L2 eigenvectors",
+      "source_ref": "SPECIFICATION_V2_2.md (K1)",
+      "implementation_status": "REGISTERED"
+    },
+    {
+      "id": "A1.F07.MODE_PARTICIPATION",
+      "name": "mode participation assignment",
+      "equation": "P_W = sum|Phi rows 1-2|; P_EC = sum|Phi rows 3-6|; lambda_W/EC = argmax eligible; same mode -> DeltaPhi=0",
+      "source_ref": "SPECIFICATION_V2_2.md (K1)",
+      "implementation_status": "REGISTERED"
+    },
+    {
+      "id": "A1.F08.PHASE_DISTANCE",
+      "name": "circular phase distance",
+      "equation": "DeltaPhi = min(|phi_W-phi_EC|, 2pi - |phi_W-phi_EC|), bounded [0, pi]",
+      "source_ref": "SPECIFICATION_V2_2.md (K1)",
+      "implementation_status": "REGISTERED"
+    },
+    {
+      "id": "A1.F09.VR_DISTANCE",
+      "name": "Vietoris-Rips path distance",
+      "equation": "z-score H1 returns on 720-slot state; D_ij = sqrt(sum_{tau=0..5}(z_i-z_j)^2)",
+      "source_ref": "SPECIFICATION_V2_2.md (K3)",
+      "implementation_status": "REGISTERED"
+    },
+    {
+      "id": "A1.F10.VR_CLASSIFICATION",
+      "name": "runtime topology classification",
+      "equation": "epsilon = 0.45*median(D_ij) + 0.015*sigma_W; VR 2-simplices for 3-cliques, 3-simplices for 4-cliques; PERSISTENT/FRAGILE/NO_HOLE via beta1 at epsilon and 1.15*epsilon",
+      "source_ref": "SPECIFICATION_V2_2.md (K3)",
+      "implementation_status": "REGISTERED"
+    },
+    {
+      "id": "A1.F11.K3_OLS",
+      "name": "causal OLS expected EC distance",
+      "equation": "beta = (X^T X)^-1 X^T y, y = lagged D_EC (t-1..t-20), X = [1, D_WE, D_WC] lagged; current t excluded; singular -> K3_OLS_VALID=false, w2=0, no pseudoinverse",
+      "source_ref": "SPECIFICATION_V2_2.md (K3 - Causal theoretical EC distance)",
+      "implementation_status": "REGISTERED"
+    },
+    {
+      "id": "A1.F12.K3_ALPHA",
+      "name": "EURCAD directional alpha and sizing",
+      "equation": "alpha2 = sign(r_E+r_C)*|D_EC-Dhat_EC|; base2 = 0.30*sign(alpha2)*|alpha2|/0.002; w2 = clip(base2*mult, -0.30, +0.30), mult in {1.8, 0.6, 0.0}",
+      "source_ref": "SPECIFICATION_V2_2.md (K3 - EURCAD alpha / K3 sizing)",
+      "implementation_status": "REGISTERED"
+    },
+    {
+      "id": "A1.F13.RV6",
+      "name": "six-hour EURCAD realized volatility",
+      "equation": "B_t = sample_std(r_EC,t-5..r_EC,t), ddof=1, hourly, nonannualized",
+      "source_ref": "SPECIFICATION_V2_2.md (K4)",
+      "implementation_status": "REGISTERED"
+    },
+    {
+      "id": "A1.F14.COMMUTATOR",
+      "name": "antisymmetric commutator",
+      "equation": "alpha_D = (1/20) sum_{k=1..20}(A_{t-k}B_{t-k+1} - B_{t-k}A_{t-k+1}); k=1 uses current A_t,B_t; w_total = clip(sign(alpha_D)*min(|alpha_D|/0.0005,1), -1, 1)",
+      "source_ref": "SPECIFICATION_V2_2.md (K4)",
+      "implementation_status": "REGISTERED"
+    },
+    {
+      "id": "A1.F15.CLUSTER_FSM",
+      "name": "cluster state machine and base weights",
+      "equation": "neutral |w_total|<0.05; long >= +0.05; short <= -0.05; W_base = [w_tot*w1, w_tot*w2, w_tot*0.5*w3] else zeros",
+      "source_ref": "SPECIFICATION_V2_2.md (FSM / Base Portfolio Target)",
+      "implementation_status": "REGISTERED"
+    },
+    {
+      "id": "A1.F16.GROSS_CAP",
+      "name": "gross leverage cap",
+      "equation": "g = sum(abs(W_base)); if g>1: W_cap = W_base/g else W_cap = W_base; cap 1.0x NAV",
+      "source_ref": "SPECIFICATION_V2_2.md (Gross Cap)",
+      "implementation_status": "REGISTERED"
+    },
+    {
+      "id": "A1.F17.FADE",
+      "name": "reversal fade",
+      "equation": "sign reversal: hour1 67% retained, hour2 exactly flat, hour3 linear ramp to 100%; re-flip restarts fade from current exposure; neutral fades to zero",
+      "source_ref": "SPECIFICATION_V2_2.md (Reversal Fade)",
+      "implementation_status": "REGISTERED"
+    },
+    {
+      "id": "A1.F18.DRAWDOWN",
+      "name": "drawdown overlay",
+      "equation": "DD = 1 - NAV/max NAV; zones <0.12 full, 0.12-0.18 linear, 0.18-0.195 reflector -0.50, >=0.195 terminal flatten",
+      "source_ref": "SPECIFICATION_V2_2.md (Drawdown Overlay)",
+      "implementation_status": "REGISTERED"
+    },
+    {
+      "id": "A1.F19.LEG_STOP",
+      "name": "per-leg stop",
+      "equation": "(LE_t - LE_{t-6})/NAV_t < -0.02 -> leg target 0, 12-bar execution ban; signal continues; rolling clock not reset by resizing",
+      "source_ref": "SPECIFICATION_V2_2.md (Per-Leg Stop)",
+      "implementation_status": "REGISTERED"
+    }
+  ]
+}

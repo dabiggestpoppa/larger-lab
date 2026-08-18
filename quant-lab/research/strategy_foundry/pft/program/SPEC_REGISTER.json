@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "program_id": "PFT",
+  "program_version": "1.0",
+  "species": {
+    "A0-GENESIS": {
+      "name": "PFT-A0-GENESIS",
+      "status": "SPECIMEN_REGISTERED",
+      "description": "Original agent formulation. Preserved as historical raw specimen; Deepers v2.2 is not retrofitted into it.",
+      "raw_source": "TBD (B1 registers lineage)"
+    },
+    "A1-DEEPERS": {
+      "name": "PFT-A1-DEEPERS",
+      "status": "FROZEN_PRIMARY_RAW_SPEC",
+      "description": "Deepers Specification Closure v2.2. Primary RAW model. Frozen: no reinterpretation, repair, or optimization.",
+      "raw_source": "quant-lab/research/strategy_foundry/pft/a1_deepers_v2/SPECIFICATION_V2_2.md"
+    },
+    "Q0-TRANSMISSION": {
+      "name": "PFT-Q0-TRANSMISSION",
+      "status": "SPECIMEN_REGISTERED",
+      "description": "Independent Quant Box transmission-deficit / self-resolution model. Does not borrow information from A1 results.",
+      "raw_source": "TBD (B1 registers lineage)"
+    },
+    "X1-SYNTHESIS": {
+      "name": "PFT-X1-SYNTHESIS",
+      "status": "NOT_AUTHORIZED",
+      "description": "Hybrid synthesis. Not authorized before A0/A1/Q0 attribution, falsification and validation.",
+      "raw_source": "N/A"
+    }
+  },
+  "registered_species_ids": [
+    "A0",
+    "A1",
+    "Q0",
+    "X1"
+  ]
+}

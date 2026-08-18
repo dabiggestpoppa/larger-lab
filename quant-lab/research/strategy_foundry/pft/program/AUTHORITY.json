@@ -1,0 +1,10 @@
+{
+  "confirmation_authorized": false,
+  "deployment_authorized": false,
+  "economic_testing_authorized": false,
+  "holdout_authorized": false,
+  "next_checkpoint_authorized": false,
+  "optimization_authorized": false,
+  "production_capital_authorized": false,
+  "extra": {}
+}
