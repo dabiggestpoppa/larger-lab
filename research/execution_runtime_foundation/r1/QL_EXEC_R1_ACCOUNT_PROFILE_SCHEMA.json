@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ql-exec.r1.account-profile",
+  "title": "AccountProfile",
+  "description": "Static/configured account expectation. NO runtime truth, NO credentials.",
+  "type": "object",
+  "required": [
+    "account_id",
+    "broker_company",
+    "transport",
+    "adapter_id",
+    "expected_environment",
+    "account_role",
+    "metadata_version"
+  ],
+  "properties": {
+    "account_id": {"type": "string", "minLength": 1},
+    "broker_company": {"type": "string", "minLength": 1, "description": "BrokerCompanyId; NOT the transport."},
+    "transport": {"enum": ["MT5", "SIM", "REPLAY", "TRADELOCKER_FUTURE"]},
+    "adapter_id": {"type": "string", "minLength": 1, "description": "BrokerAdapterId (e.g. MT5BrokerSession)."},
+    "expected_environment": {"enum": ["DEMO", "CONTEST", "REAL", "SIM", "REPLAY"]},
+    "account_role": {"enum": ["EXCLUSIVE_STRATEGY_MASTER", "PORTFOLIO_MASTER", "FOLLOWER", "MIRROR"]},
+    "metadata_version": {"type": "integer", "minimum": 1},
+    "expected_server": {"type": "string", "default": ""},
+    "expected_currency": {"type": "string", "default": ""},
+    "expected_account_mode": {"type": "string", "default": ""},
+    "expected_account_identifier": {"type": "string", "default": ""},
+    "expected_hedging_netting": {"enum": ["HEDGING", "NETTING", "UNKNOWN"], "default": "UNKNOWN"},
+    "portfolio_group_id": {"type": ["string", "null"]},
+    "strategy_allowlist": {"type": "array", "items": {"type": "string"}, "default": []},
+    "operator_execution_requested": {"type": "boolean", "default": false},
+    "copier_role": {"type": ["string", "null"]},
+    "terminal_or_session_binding": {"type": ["string", "null"]},
+    "secret_reference": {"$ref": "ql-exec.r1.secret-reference"}
+  },
+  "additionalProperties": false
+}

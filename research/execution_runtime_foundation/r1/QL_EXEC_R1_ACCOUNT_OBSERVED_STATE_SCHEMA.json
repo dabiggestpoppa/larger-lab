@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ql-exec.r1.account-observed-state",
+  "title": "AccountObservedState",
+  "description": "Dynamic runtime/broker truth. Never committed as operator configuration.",
+  "type": "object",
+  "required": ["account_id"],
+  "properties": {
+    "account_id": {"type": "string", "minLength": 1},
+    "observed_at": {"type": "string"},
+    "transport_connected": {"type": "boolean", "default": false},
+    "authenticated": {"type": "boolean", "default": false},
+    "observed_broker_company": {"type": "string"},
+    "observed_server": {"type": "string"},
+    "observed_account_identifier": {"type": "string"},
+    "observed_environment": {"enum": ["DEMO", "CONTEST", "REAL", "SIM", "REPLAY", null]},
+    "observed_currency": {"type": "string"},
+    "observed_account_mode": {"type": "string"},
+    "hedging_or_netting": {"enum": ["HEDGING", "NETTING", "UNKNOWN"], "default": "UNKNOWN"},
+    "observed_terminal_binding": {"type": "string"},
+    "equity": {"type": ["number", "null"]},
+    "balance": {"type": ["number", "null"]},
+    "margin": {"type": ["number", "null"]},
+    "free_margin": {"type": ["number", "null"]},
+    "buying_power": {"type": ["number", "null"]},
+    "market_status": {"enum": ["OPEN", "CLOSED", "UNKNOWN"], "default": "UNKNOWN"},
+    "reconciled": {"type": "boolean", "default": false},
+    "runtime_health": {"enum": ["HEALTHY", "DEGRADED", "OFFLINE", "BLOCKED", "STOPPED", "UNKNOWN"], "default": "UNKNOWN"},
+    "blocking_reasons": {"type": "array", "items": {"type": "string"}, "default": []}
+  },
+  "additionalProperties": false
+}

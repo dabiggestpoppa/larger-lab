@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ql-exec.r1.strategy-account-binding",
+  "title": "StrategyAccountBinding",
+  "type": "object",
+  "required": ["binding_id", "strategy_id", "runtime_id", "account_id", "account_role", "execution_mode", "metadata_version"],
+  "properties": {
+    "binding_id": {"type": "string", "minLength": 1},
+    "strategy_id": {"type": "string", "minLength": 1},
+    "runtime_id": {"type": "string", "minLength": 1},
+    "account_id": {"type": "string", "minLength": 1},
+    "account_role": {"enum": ["EXCLUSIVE_STRATEGY_MASTER", "PORTFOLIO_MASTER", "FOLLOWER", "MIRROR"]},
+    "execution_mode": {"enum": ["SHADOW", "SIM", "DEMO", "LIVE"], "default": "SHADOW"},
+    "metadata_version": {"type": "integer", "minimum": 1},
+    "portfolio_group_id": {"type": ["string", "null"]},
+    "ownership_namespace": {"$ref": "ql-exec.r1.ownership-namespace"},
+    "strategy_adapter_id": {"type": "string"},
+    "capital_policy_adapter_id": {"type": ["string", "null"]},
+    "capital_translation_adapter_id": {"type": ["string", "null"]},
+    "allowed_symbols": {"type": "array", "items": {"type": "string"}, "default": []},
+    "deployment_generation": {"type": "string", "default": ""},
+    "operator_enabled": {"type": "boolean", "default": false}
+  },
+  "additionalProperties": false
+}

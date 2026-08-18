@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ql-exec.r1.runtime-profile",
+  "title": "RuntimeProfile",
+  "type": "object",
+  "required": ["runtime_id", "machine_profile", "account_id", "metadata_version"],
+  "properties": {
+    "runtime_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"},
+    "machine_profile": {"enum": ["local_windows", "windows_vps"]},
+    "account_id": {"type": "string", "minLength": 1},
+    "metadata_version": {"type": "integer", "minimum": 1},
+    "strategy_adapter_ids": {"type": "array", "items": {"type": "string"}, "default": []},
+    "capital_policy_id": {"type": ["string", "null"]},
+    "capital_translation_id": {"type": ["string", "null"]},
+    "state_root": {"type": "string"},
+    "ledger_root": {"type": "string"},
+    "log_root": {"type": "string"},
+    "desired_state_key": {"type": "string"},
+    "deployment_generation": {"type": "string"},
+    "ownership_namespace": {"$ref": "ql-exec.r1.ownership-namespace"}
+  },
+  "additionalProperties": false
+}

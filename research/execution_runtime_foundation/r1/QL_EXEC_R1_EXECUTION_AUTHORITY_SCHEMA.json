@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ql-exec.r1.execution-authority",
+  "title": "ExecutionAuthorityDecision",
+  "description": "Derived, fail-closed execution authority. DEFAULT DENY.",
+  "type": "object",
+  "required": ["can_submit_new_risk", "can_modify_foreign_risk"],
+  "properties": {
+    "can_observe": {"type": "boolean", "default": false},
+    "can_manage_owned_existing_risk": {"type": "boolean", "default": false},
+    "can_submit_new_risk": {"type": "boolean", "default": false},
+    "can_close_owned_risk": {"type": "boolean", "default": false},
+    "can_modify_foreign_risk": {"type": "boolean", "const": false},
+    "reasons": {"type": "array", "items": {"type": "string"}},
+    "decision_timestamp": {"type": "string"},
+    "profile_hash": {"type": "string"}
+  },
+  "additionalProperties": false
+}

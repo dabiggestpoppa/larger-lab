@@ -1,0 +1,10 @@
+combination,status,mode_compatible,reason
+EXCLUSIVE_STRATEGY_MASTER + HEDGING,SUPPORTED,true,ticket-level isolation; single strategy ownership unambiguous
+EXCLUSIVE_STRATEGY_MASTER + NETTING (no overlap),SUPPORTED,true,single strategy owns the book; same-symbol collapse unambiguous
+EXCLUSIVE_STRATEGY_MASTER + NETTING (same-symbol overlap),FAIL_CLOSED,false,ownership becomes ambiguous
+PORTFOLIO_MASTER + HEDGING,SUPPORTABLE_WITH_WORK,true,requires per-strategy namespace + shared heat ledger
+PORTFOLIO_MASTER + NETTING (no same-symbol overlap),SUPPORTABLE_WITH_WORK,true,distinct symbols; heat from one shared ledger
+PORTFOLIO_MASTER + NETTING (same-symbol overlap),BLOCKED_PENDING_VIRTUAL_LEDGER,false,broker collapses positions across strategies; virtual allocation ledger required
+UNKNOWN mode (any shared execution),FAIL_CLOSED,false,account mode must be known where it matters
+FOLLOWER,FAIL_CLOSED,false,observability only; no direct execution
+MIRROR,FAIL_CLOSED,false,observability only; no direct execution

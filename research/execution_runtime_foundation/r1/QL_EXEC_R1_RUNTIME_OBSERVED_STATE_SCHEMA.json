@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ql-exec.r1.runtime-observed-state",
+  "title": "RuntimeObservedState",
+  "type": "object",
+  "required": ["runtime_id"],
+  "properties": {
+    "runtime_id": {"type": "string"},
+    "pid": {"type": ["integer", "null"]},
+    "process_alive": {"type": "boolean", "default": false},
+    "heartbeat_ts": {"type": "string"},
+    "desired_state": {"enum": ["RUNNING", "STOPPED_BY_USER"], "default": "RUNNING"},
+    "health": {"enum": ["HEALTHY", "DEGRADED", "OFFLINE", "BLOCKED", "STOPPED", "UNKNOWN"], "default": "UNKNOWN"},
+    "last_error": {"type": "string"},
+    "reconciliation_state": {"type": "string"},
+    "observed_at": {"type": "string"},
+    "safety_blocked": {"type": "boolean", "default": false}
+  },
+  "additionalProperties": false
+}

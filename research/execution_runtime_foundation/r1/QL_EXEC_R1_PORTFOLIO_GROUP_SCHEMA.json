@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ql-exec.r1.portfolio-group",
+  "title": "PortfolioGroup",
+  "type": "object",
+  "required": ["portfolio_group_id", "account_id", "strategy_ids", "capital_policy_id", "metadata_version"],
+  "properties": {
+    "portfolio_group_id": {"type": "string", "minLength": 1},
+    "account_id": {"type": "string", "minLength": 1},
+    "strategy_ids": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "capital_policy_id": {"type": "string", "minLength": 1},
+    "heat_policy_id": {"type": "string", "default": ""},
+    "ownership_mode": {"enum": ["SINGLE_RUNTIME_MULTI_ADAPTER", "MULTI_PRODUCER_SINGLE_ROUTER"], "default": "SINGLE_RUNTIME_MULTI_ADAPTER"},
+    "enabled": {"type": "boolean", "default": false},
+    "metadata_version": {"type": "integer", "minimum": 1}
+  },
+  "additionalProperties": false
+}

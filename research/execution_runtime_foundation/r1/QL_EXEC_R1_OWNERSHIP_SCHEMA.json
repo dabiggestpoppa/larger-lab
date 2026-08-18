@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ql-exec.r1.ownership",
+  "title": "OwnershipNamespace and LogicalOwnershipId",
+  "definitions": {
+    "ownership_namespace": {
+      "type": "object",
+      "required": ["account_id", "runtime_id", "strategy_id", "deployment_generation"],
+      "properties": {
+        "account_id": {"type": "string"},
+        "runtime_id": {"type": "string"},
+        "strategy_id": {"type": "string"},
+        "deployment_generation": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "logical_ownership_id": {
+      "type": "object",
+      "required": ["account_id", "runtime_id", "strategy_id", "deployment_generation", "intent_id"],
+      "properties": {
+        "account_id": {"type": "string"},
+        "runtime_id": {"type": "string"},
+        "strategy_id": {"type": "string"},
+        "deployment_generation": {"type": "string"},
+        "intent_id": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "broker_ownership_tag": {
+      "type": "object",
+      "required": ["magic", "comment", "encoding_version"],
+      "properties": {
+        "magic": {"type": "integer", "minimum": 1},
+        "comment": {"type": "string"},
+        "encoding_version": {"type": "string"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

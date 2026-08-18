@@ -1,0 +1,29 @@
+component,status,evidence,notes
+AccountProfile,COMPLETE,quant-lab/execution_runtime/account.py,static expectation; no runtime truth
+AccountObservedState,COMPLETE,quant-lab/execution_runtime/account.py,dynamic truth; never committed config
+ExecutionAuthorityDecision,COMPLETE,quant-lab/execution_runtime/authority.py,derived fail-closed DEFAULT DENY
+identity_gate,COMPLETE,quant-lab/execution_runtime/authority.py,explicit company/server/env/currency/mode/id/binding matching
+AccountRegistry,COMPLETE,quant-lab/execution_runtime/registry.py,deterministic; duplicate account_id rejected
+PortfolioGroupRegistry,COMPLETE,quant-lab/execution_runtime/registry.py,one shared capital authority invariant
+BindingRegistry,COMPLETE,quant-lab/execution_runtime/registry.py,duplicate binding rejected
+RuntimeProfileRegistry,COMPLETE,quant-lab/execution_runtime/registry.py,normalized runtime_id collision rejected
+StrategyAccountBinding,COMPLETE,quant-lab/execution_runtime/binding.py,role invariants enforced
+RuntimeProfile + RuntimeObservedState,COMPLETE,quant-lab/execution_runtime/profiles.py,machine vs runtime profile split
+SecretReference,COMPLETE,quant-lab/execution_runtime/types.py,reference only; never a value
+OwnershipNamespace + LogicalOwnershipId,COMPLETE,quant-lab/execution_runtime/ownership.py,versioned deterministic; per-binding magic
+ReservationRecord + transitions,COMPLETE,quant-lab/execution_runtime/reservation.py,data + frozen graph only
+StrategyAdapter,COMPLETE,quant-lab/execution_runtime/interfaces.py,broker-neutral protocol
+CapitalPolicyAdapter,COMPLETE,quant-lab/execution_runtime/interfaces.py,admission/release only; no translate_heat_to_notional
+CapitalTranslationAdapter,COMPLETE,quant-lab/execution_runtime/interfaces.py,separate economic-target bridge
+BrokerSession,COMPLETE,quant-lab/execution_runtime/interfaces.py,broker-neutral; no MetaTrader5
+BrokerCapabilities,COMPLETE,quant-lab/execution_runtime/capabilities.py,tri-state; UNKNOWN fails closed
+CompatibilityValidator,COMPLETE,quant-lab/execution_runtime/compatibility.py,hedging/netting fail-closed
+AccountRouter,COMPLETE,quant-lab/execution_runtime/routing.py,pure selection; ambiguous/zero/multi REJECT
+ConfigHashing,COMPLETE,quant-lab/execution_runtime/hashing.py,deterministic; secrets excluded
+StatePathIsolation,COMPLETE,quant-lab/execution_runtime/profiles.py,state/ledger/log per runtime_id; traversal rejected
+Generic strategy math present,FALSE,test_enforced,none
+MetaTrader5 import in package,FALSE,test_enforced,none
+Broker connection attempted,FALSE,invariant,none
+Broker orders attempted,FALSE,invariant,none
+TB active runtime modified,FALSE,invariant,none
+Capital Routing math modified,FALSE,invariant,none

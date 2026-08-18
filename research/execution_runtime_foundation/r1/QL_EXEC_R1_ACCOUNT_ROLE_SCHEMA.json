@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ql-exec.r1.account-role",
+  "title": "AccountRole",
+  "type": "object",
+  "roles": {
+    "EXCLUSIVE_STRATEGY_MASTER": {
+      "cardinality": "ONE_STRATEGY_ONE_ACCOUNT",
+      "capital_policy_required": false,
+      "heat_ledger": "STRATEGY_OWNED",
+      "direct_execution": true,
+      "invariants": [
+        "may bind at most one execution-authorized strategy",
+        "additional SHADOW strategy adapters allowed only if output can never reach broker authority"
+      ]
+    },
+    "PORTFOLIO_MASTER": {
+      "cardinality": "MANY_STRATEGIES_ONE_ACCOUNT",
+      "capital_policy_required": true,
+      "heat_ledger": "SHARED_PORTFOLIO",
+      "direct_execution": true,
+      "invariants": [
+        "requires portfolio_group_id",
+        "requires capital_policy_id",
+        "requires non-empty approved strategy set",
+        "one authoritative shared heat ledger"
+      ]
+    },
+    "FOLLOWER": {
+      "cardinality": "EXTERNAL_COPIER",
+      "capital_policy_required": false,
+      "heat_ledger": "NONE",
+      "direct_execution": false,
+      "invariants": ["observability only; cannot create new-risk authority"]
+    },
+    "MIRROR": {
+      "cardinality": "EXTERNAL_COPIER",
+      "capital_policy_required": false,
+      "heat_ledger": "NONE",
+      "direct_execution": false,
+      "invariants": ["observability only; cannot create new-risk authority"]
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ql-exec.r1.reservation",
+  "title": "ReservationRecord",
+  "type": "object",
+  "required": [
+    "reservation_id",
+    "portfolio_group_id",
+    "account_id",
+    "strategy_id",
+    "event_id",
+    "deployment_generation",
+    "state"
+  ],
+  "properties": {
+    "reservation_id": {"type": "string"},
+    "portfolio_group_id": {"type": "string"},
+    "account_id": {"type": "string"},
+    "strategy_id": {"type": "string"},
+    "event_id": {"type": "string"},
+    "deployment_generation": {"type": "string"},
+    "state": {
+      "enum": [
+        "PROPOSED", "ADMITTED_RESERVED", "ORDER_SUBMITTED", "FILLED_ACTIVE",
+        "EXIT_PENDING", "CLOSED_RELEASED", "REJECTED", "RELEASED_ABORTED",
+        "RESERVATION_UNRESOLVED"
+      ]
+    },
+    "requested_f": {"type": ["number", "null"]},
+    "admitted_f": {"type": ["number", "null"]},
+    "created_ts": {"type": "string"},
+    "released_ts": {"type": "string"}
+  },
+  "additionalProperties": false
+}

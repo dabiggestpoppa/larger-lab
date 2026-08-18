@@ -1,0 +1,19 @@
+{
+  "checkpoint": "QL-EXEC-R1-GENERIC-CONTRACTS-AND-ACCOUNT-REGISTRY",
+  "recorded_utc": "2026-08-18",
+  "base_commit": "17cfe08eccadf77f5089f7c776bafdf671fbf5cd",
+  "r0_pass_verified": true,
+  "tb_r0_authority_sha": "df5f349e02ac932491cb067df7aff25cb71c50ac",
+  "tb_r1_authority_sha": "d12005988ce61170d9bc5478089baa5ce54cc2a9",
+  "tb_authority_drift_acknowledged": true,
+  "tb_authority_drift": "TB Forward advanced one engineering-only commit after the R0 freeze: d1200598 TB-R6.1B-FIX-WORKER-STATE-LATCH. Change: ONLINE_MARKET_CLOSED no longer latches after market/feed recovery. Strategy math UNCHANGED; runtime tests 38/38. R1 does NOT cherry-pick/merge TB runtime code; only the authority manifest and future parity expectations are updated.",
+  "future_r2_r4_parity_includes_market_recovery_regression": true,
+  "future_r2_r4_parity_notes": "R2/R4 parity must include: market closed -> market recovery -> FLAT/OPEN state recomputation (the d120 ONLINE_MARKET_CLOSED state-latch regression).",
+  "capital_scale_authority_sha": "40d237123ac2b709cc0ebce1d7f057bbfde25dab",
+  "capital_translation_authority_sha": "00bef1b5b52db63c22a29b3287799742631930db",
+  "capital_translation_authority_status": "PENDING_SEALED_REPAIR",
+  "capital_translation_authority_note": "origin/capital-routing advanced to 00bef1b5 (CR-RISK-BLOCK-III-EXECUTION-TRANSLATION-PLANNING-R1-POSITION-SCALING-ACCOUNT-BOUNDARY-TRUTH-REPAIR) on top of 5a79bf23. That repair is PASS in its own planning decision but implementation_authorized=false; the 1R->notional formula is Capital Routing science and is NOT encoded into generic runtime code.",
+  "main_authority_sha": "9f61288679eea56a298e08f718c314f2ca509bc5",
+  "no_source_sync": true,
+  "no_source_sync_note": "No merge/cherry-pick of tb-forward-engine, capital-routing, or main into execution-runtime-foundation during R1."
+}

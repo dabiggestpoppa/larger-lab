@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ql-exec.r1.broker-capability",
+  "title": "BrokerCapabilities",
+  "description": "Tri-state capabilities. UNKNOWN is NOT FALSE; an unknown required capability fails closed.",
+  "type": "object",
+  "properties": {
+    "supports_market_order": {"enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN"], "default": "UNKNOWN"},
+    "supports_limit_order": {"enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN"], "default": "UNKNOWN"},
+    "supports_cancel": {"enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN"], "default": "UNKNOWN"},
+    "supports_partial_fill_reporting": {"enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN"], "default": "UNKNOWN"},
+    "supports_hedging": {"enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN"], "default": "UNKNOWN"},
+    "supports_netting": {"enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN"], "default": "UNKNOWN"},
+    "supports_order_check": {"enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN"], "default": "UNKNOWN"},
+    "supports_client_tag": {"enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN"], "default": "UNKNOWN"},
+    "supports_deal_history": {"enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN"], "default": "UNKNOWN"},
+    "supports_margin_estimate": {"enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN"], "default": "UNKNOWN"}
+  },
+  "additionalProperties": false
+}
