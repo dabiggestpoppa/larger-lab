@@ -1,0 +1,113 @@
+{
+  "replication_pass": true,
+  "grid_levels": [
+    0.5,
+    1.0,
+    2.0,
+    4.0,
+    8.0,
+    16.0,
+    32.0,
+    64.0
+  ],
+  "expected_counts": {
+    "0.5": 39,
+    "1.0": 178,
+    "2.0": 417,
+    "4.0": 655,
+    "8.0": 786,
+    "16.0": 817,
+    "32.0": 825,
+    "64.0": 826
+  },
+  "quantile_boundaries_frozen_from_original_826": {
+    "q25": 1.102320085105,
+    "q50": 1.979422975748,
+    "q75": 3.524935294373,
+    "q95": 7.61103477694,
+    "q99": 16.159547393888
+  },
+  "rows": [
+    {
+      "max_notional_multiple": 0.5,
+      "n_surviving": 39,
+      "n_A": 2,
+      "n_B": 37,
+      "A_coverage_pct": 0.5391,
+      "B_coverage_pct": 8.1319,
+      "expected_n": 39,
+      "replicates_d1": true
+    },
+    {
+      "max_notional_multiple": 1.0,
+      "n_surviving": 178,
+      "n_A": 17,
+      "n_B": 161,
+      "A_coverage_pct": 4.5822,
+      "B_coverage_pct": 35.3846,
+      "expected_n": 178,
+      "replicates_d1": true
+    },
+    {
+      "max_notional_multiple": 2.0,
+      "n_surviving": 417,
+      "n_A": 77,
+      "n_B": 340,
+      "A_coverage_pct": 20.7547,
+      "B_coverage_pct": 74.7253,
+      "expected_n": 417,
+      "replicates_d1": true
+    },
+    {
+      "max_notional_multiple": 4.0,
+      "n_surviving": 655,
+      "n_A": 227,
+      "n_B": 428,
+      "A_coverage_pct": 61.186,
+      "B_coverage_pct": 94.0659,
+      "expected_n": 655,
+      "replicates_d1": true
+    },
+    {
+      "max_notional_multiple": 8.0,
+      "n_surviving": 786,
+      "n_A": 333,
+      "n_B": 453,
+      "A_coverage_pct": 89.7574,
+      "B_coverage_pct": 99.5604,
+      "expected_n": 786,
+      "replicates_d1": true
+    },
+    {
+      "max_notional_multiple": 16.0,
+      "n_surviving": 817,
+      "n_A": 363,
+      "n_B": 454,
+      "A_coverage_pct": 97.8437,
+      "B_coverage_pct": 99.7802,
+      "expected_n": 817,
+      "replicates_d1": true
+    },
+    {
+      "max_notional_multiple": 32.0,
+      "n_surviving": 825,
+      "n_A": 370,
+      "n_B": 455,
+      "A_coverage_pct": 99.7305,
+      "B_coverage_pct": 100.0,
+      "expected_n": 825,
+      "replicates_d1": true
+    },
+    {
+      "max_notional_multiple": 64.0,
+      "n_surviving": 826,
+      "n_A": 371,
+      "n_B": 455,
+      "A_coverage_pct": 100.0,
+      "B_coverage_pct": 100.0,
+      "expected_n": 826,
+      "replicates_d1": true
+    }
+  ],
+  "cross_check_multipliers_ledger": true
+}

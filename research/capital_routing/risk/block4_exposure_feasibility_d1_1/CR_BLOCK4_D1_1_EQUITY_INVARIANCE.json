@@ -1,0 +1,4012 @@
+{
+  "equity_fixtures": [
+    5000,
+    25000,
+    100000
+  ],
+  "n_events_checked": 20,
+  "classification_invariant": true,
+  "multiple_invariance": true,
+  "per_event_checks": [
+    {
+      "event_id": "EUR_ORIGIN_202307101100",
+      "target_notional_multiple": 1.265284653874,
+      "max_notional_multiple": 0.5,
+      "notional_by_equity": {
+        "5000": 6326.423269,
+        "25000": 31632.116347,
+        "100000": 126528.465387
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307101100",
+      "target_notional_multiple": 1.265284653874,
+      "max_notional_multiple": 1.0,
+      "notional_by_equity": {
+        "5000": 6326.423269,
+        "25000": 31632.116347,
+        "100000": 126528.465387
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307101100",
+      "target_notional_multiple": 1.265284653874,
+      "max_notional_multiple": 2.0,
+      "notional_by_equity": {
+        "5000": 6326.423269,
+        "25000": 31632.116347,
+        "100000": 126528.465387
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307101100",
+      "target_notional_multiple": 1.265284653874,
+      "max_notional_multiple": 4.0,
+      "notional_by_equity": {
+        "5000": 6326.423269,
+        "25000": 31632.116347,
+        "100000": 126528.465387
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307101100",
+      "target_notional_multiple": 1.265284653874,
+      "max_notional_multiple": 8.0,
+      "notional_by_equity": {
+        "5000": 6326.423269,
+        "25000": 31632.116347,
+        "100000": 126528.465387
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307101100",
+      "target_notional_multiple": 1.265284653874,
+      "max_notional_multiple": 16.0,
+      "notional_by_equity": {
+        "5000": 6326.423269,
+        "25000": 31632.116347,
+        "100000": 126528.465387
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307101100",
+      "target_notional_multiple": 1.265284653874,
+      "max_notional_multiple": 32.0,
+      "notional_by_equity": {
+        "5000": 6326.423269,
+        "25000": 31632.116347,
+        "100000": 126528.465387
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307101100",
+      "target_notional_multiple": 1.265284653874,
+      "max_notional_multiple": 64.0,
+      "notional_by_equity": {
+        "5000": 6326.423269,
+        "25000": 31632.116347,
+        "100000": 126528.465387
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307111000",
+      "target_notional_multiple": 0.914063433503,
+      "max_notional_multiple": 0.5,
+      "notional_by_equity": {
+        "5000": 4570.317168,
+        "25000": 22851.585838,
+        "100000": 91406.34335
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307111000",
+      "target_notional_multiple": 0.914063433503,
+      "max_notional_multiple": 1.0,
+      "notional_by_equity": {
+        "5000": 4570.317168,
+        "25000": 22851.585838,
+        "100000": 91406.34335
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307111000",
+      "target_notional_multiple": 0.914063433503,
+      "max_notional_multiple": 2.0,
+      "notional_by_equity": {
+        "5000": 4570.317168,
+        "25000": 22851.585838,
+        "100000": 91406.34335
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307111000",
+      "target_notional_multiple": 0.914063433503,
+      "max_notional_multiple": 4.0,
+      "notional_by_equity": {
+        "5000": 4570.317168,
+        "25000": 22851.585838,
+        "100000": 91406.34335
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307111000",
+      "target_notional_multiple": 0.914063433503,
+      "max_notional_multiple": 8.0,
+      "notional_by_equity": {
+        "5000": 4570.317168,
+        "25000": 22851.585838,
+        "100000": 91406.34335
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307111000",
+      "target_notional_multiple": 0.914063433503,
+      "max_notional_multiple": 16.0,
+      "notional_by_equity": {
+        "5000": 4570.317168,
+        "25000": 22851.585838,
+        "100000": 91406.34335
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307111000",
+      "target_notional_multiple": 0.914063433503,
+      "max_notional_multiple": 32.0,
+      "notional_by_equity": {
+        "5000": 4570.317168,
+        "25000": 22851.585838,
+        "100000": 91406.34335
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307111000",
+      "target_notional_multiple": 0.914063433503,
+      "max_notional_multiple": 64.0,
+      "notional_by_equity": {
+        "5000": 4570.317168,
+        "25000": 22851.585838,
+        "100000": 91406.34335
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307111400",
+      "target_notional_multiple": 1.385707694242,
+      "max_notional_multiple": 0.5,
+      "notional_by_equity": {
+        "5000": 6928.538471,
+        "25000": 34642.692356,
+        "100000": 138570.769424
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307111400",
+      "target_notional_multiple": 1.385707694242,
+      "max_notional_multiple": 1.0,
+      "notional_by_equity": {
+        "5000": 6928.538471,
+        "25000": 34642.692356,
+        "100000": 138570.769424
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307111400",
+      "target_notional_multiple": 1.385707694242,
+      "max_notional_multiple": 2.0,
+      "notional_by_equity": {
+        "5000": 6928.538471,
+        "25000": 34642.692356,
+        "100000": 138570.769424
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307111400",
+      "target_notional_multiple": 1.385707694242,
+      "max_notional_multiple": 4.0,
+      "notional_by_equity": {
+        "5000": 6928.538471,
+        "25000": 34642.692356,
+        "100000": 138570.769424
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307111400",
+      "target_notional_multiple": 1.385707694242,
+      "max_notional_multiple": 8.0,
+      "notional_by_equity": {
+        "5000": 6928.538471,
+        "25000": 34642.692356,
+        "100000": 138570.769424
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307111400",
+      "target_notional_multiple": 1.385707694242,
+      "max_notional_multiple": 16.0,
+      "notional_by_equity": {
+        "5000": 6928.538471,
+        "25000": 34642.692356,
+        "100000": 138570.769424
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307111400",
+      "target_notional_multiple": 1.385707694242,
+      "max_notional_multiple": 32.0,
+      "notional_by_equity": {
+        "5000": 6928.538471,
+        "25000": 34642.692356,
+        "100000": 138570.769424
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307111400",
+      "target_notional_multiple": 1.385707694242,
+      "max_notional_multiple": 64.0,
+      "notional_by_equity": {
+        "5000": 6928.538471,
+        "25000": 34642.692356,
+        "100000": 138570.769424
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307121500",
+      "target_notional_multiple": 4.182944828241,
+      "max_notional_multiple": 0.5,
+      "notional_by_equity": {
+        "5000": 20914.724141,
+        "25000": 104573.620706,
+        "100000": 418294.482824
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307121500",
+      "target_notional_multiple": 4.182944828241,
+      "max_notional_multiple": 1.0,
+      "notional_by_equity": {
+        "5000": 20914.724141,
+        "25000": 104573.620706,
+        "100000": 418294.482824
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307121500",
+      "target_notional_multiple": 4.182944828241,
+      "max_notional_multiple": 2.0,
+      "notional_by_equity": {
+        "5000": 20914.724141,
+        "25000": 104573.620706,
+        "100000": 418294.482824
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307121500",
+      "target_notional_multiple": 4.182944828241,
+      "max_notional_multiple": 4.0,
+      "notional_by_equity": {
+        "5000": 20914.724141,
+        "25000": 104573.620706,
+        "100000": 418294.482824
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307121500",
+      "target_notional_multiple": 4.182944828241,
+      "max_notional_multiple": 8.0,
+      "notional_by_equity": {
+        "5000": 20914.724141,
+        "25000": 104573.620706,
+        "100000": 418294.482824
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307121500",
+      "target_notional_multiple": 4.182944828241,
+      "max_notional_multiple": 16.0,
+      "notional_by_equity": {
+        "5000": 20914.724141,
+        "25000": 104573.620706,
+        "100000": 418294.482824
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307121500",
+      "target_notional_multiple": 4.182944828241,
+      "max_notional_multiple": 32.0,
+      "notional_by_equity": {
+        "5000": 20914.724141,
+        "25000": 104573.620706,
+        "100000": 418294.482824
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307121500",
+      "target_notional_multiple": 4.182944828241,
+      "max_notional_multiple": 64.0,
+      "notional_by_equity": {
+        "5000": 20914.724141,
+        "25000": 104573.620706,
+        "100000": 418294.482824
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307131600",
+      "target_notional_multiple": 12.13403761396,
+      "max_notional_multiple": 0.5,
+      "notional_by_equity": {
+        "5000": 60670.18807,
+        "25000": 303350.940349,
+        "100000": 1213403.761396
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307131600",
+      "target_notional_multiple": 12.13403761396,
+      "max_notional_multiple": 1.0,
+      "notional_by_equity": {
+        "5000": 60670.18807,
+        "25000": 303350.940349,
+        "100000": 1213403.761396
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307131600",
+      "target_notional_multiple": 12.13403761396,
+      "max_notional_multiple": 2.0,
+      "notional_by_equity": {
+        "5000": 60670.18807,
+        "25000": 303350.940349,
+        "100000": 1213403.761396
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307131600",
+      "target_notional_multiple": 12.13403761396,
+      "max_notional_multiple": 4.0,
+      "notional_by_equity": {
+        "5000": 60670.18807,
+        "25000": 303350.940349,
+        "100000": 1213403.761396
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307131600",
+      "target_notional_multiple": 12.13403761396,
+      "max_notional_multiple": 8.0,
+      "notional_by_equity": {
+        "5000": 60670.18807,
+        "25000": 303350.940349,
+        "100000": 1213403.761396
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307131600",
+      "target_notional_multiple": 12.13403761396,
+      "max_notional_multiple": 16.0,
+      "notional_by_equity": {
+        "5000": 60670.18807,
+        "25000": 303350.940349,
+        "100000": 1213403.761396
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307131600",
+      "target_notional_multiple": 12.13403761396,
+      "max_notional_multiple": 32.0,
+      "notional_by_equity": {
+        "5000": 60670.18807,
+        "25000": 303350.940349,
+        "100000": 1213403.761396
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307131600",
+      "target_notional_multiple": 12.13403761396,
+      "max_notional_multiple": 64.0,
+      "notional_by_equity": {
+        "5000": 60670.18807,
+        "25000": 303350.940349,
+        "100000": 1213403.761396
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307140500",
+      "target_notional_multiple": 1.949778885385,
+      "max_notional_multiple": 0.5,
+      "notional_by_equity": {
+        "5000": 9748.894427,
+        "25000": 48744.472135,
+        "100000": 194977.888539
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307140500",
+      "target_notional_multiple": 1.949778885385,
+      "max_notional_multiple": 1.0,
+      "notional_by_equity": {
+        "5000": 9748.894427,
+        "25000": 48744.472135,
+        "100000": 194977.888539
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307140500",
+      "target_notional_multiple": 1.949778885385,
+      "max_notional_multiple": 2.0,
+      "notional_by_equity": {
+        "5000": 9748.894427,
+        "25000": 48744.472135,
+        "100000": 194977.888539
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307140500",
+      "target_notional_multiple": 1.949778885385,
+      "max_notional_multiple": 4.0,
+      "notional_by_equity": {
+        "5000": 9748.894427,
+        "25000": 48744.472135,
+        "100000": 194977.888539
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307140500",
+      "target_notional_multiple": 1.949778885385,
+      "max_notional_multiple": 8.0,
+      "notional_by_equity": {
+        "5000": 9748.894427,
+        "25000": 48744.472135,
+        "100000": 194977.888539
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307140500",
+      "target_notional_multiple": 1.949778885385,
+      "max_notional_multiple": 16.0,
+      "notional_by_equity": {
+        "5000": 9748.894427,
+        "25000": 48744.472135,
+        "100000": 194977.888539
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307140500",
+      "target_notional_multiple": 1.949778885385,
+      "max_notional_multiple": 32.0,
+      "notional_by_equity": {
+        "5000": 9748.894427,
+        "25000": 48744.472135,
+        "100000": 194977.888539
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307140500",
+      "target_notional_multiple": 1.949778885385,
+      "max_notional_multiple": 64.0,
+      "notional_by_equity": {
+        "5000": 9748.894427,
+        "25000": 48744.472135,
+        "100000": 194977.888539
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307141100",
+      "target_notional_multiple": 2.144443628072,
+      "max_notional_multiple": 0.5,
+      "notional_by_equity": {
+        "5000": 10722.21814,
+        "25000": 53611.090702,
+        "100000": 214444.362807
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307141100",
+      "target_notional_multiple": 2.144443628072,
+      "max_notional_multiple": 1.0,
+      "notional_by_equity": {
+        "5000": 10722.21814,
+        "25000": 53611.090702,
+        "100000": 214444.362807
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307141100",
+      "target_notional_multiple": 2.144443628072,
+      "max_notional_multiple": 2.0,
+      "notional_by_equity": {
+        "5000": 10722.21814,
+        "25000": 53611.090702,
+        "100000": 214444.362807
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307141100",
+      "target_notional_multiple": 2.144443628072,
+      "max_notional_multiple": 4.0,
+      "notional_by_equity": {
+        "5000": 10722.21814,
+        "25000": 53611.090702,
+        "100000": 214444.362807
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307141100",
+      "target_notional_multiple": 2.144443628072,
+      "max_notional_multiple": 8.0,
+      "notional_by_equity": {
+        "5000": 10722.21814,
+        "25000": 53611.090702,
+        "100000": 214444.362807
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307141100",
+      "target_notional_multiple": 2.144443628072,
+      "max_notional_multiple": 16.0,
+      "notional_by_equity": {
+        "5000": 10722.21814,
+        "25000": 53611.090702,
+        "100000": 214444.362807
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307141100",
+      "target_notional_multiple": 2.144443628072,
+      "max_notional_multiple": 32.0,
+      "notional_by_equity": {
+        "5000": 10722.21814,
+        "25000": 53611.090702,
+        "100000": 214444.362807
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307141100",
+      "target_notional_multiple": 2.144443628072,
+      "max_notional_multiple": 64.0,
+      "notional_by_equity": {
+        "5000": 10722.21814,
+        "25000": 53611.090702,
+        "100000": 214444.362807
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307170000",
+      "target_notional_multiple": 1.00227113742,
+      "max_notional_multiple": 0.5,
+      "notional_by_equity": {
+        "5000": 5011.355687,
+        "25000": 25056.778436,
+        "100000": 100227.113742
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307170000",
+      "target_notional_multiple": 1.00227113742,
+      "max_notional_multiple": 1.0,
+      "notional_by_equity": {
+        "5000": 5011.355687,
+        "25000": 25056.778436,
+        "100000": 100227.113742
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307170000",
+      "target_notional_multiple": 1.00227113742,
+      "max_notional_multiple": 2.0,
+      "notional_by_equity": {
+        "5000": 5011.355687,
+        "25000": 25056.778436,
+        "100000": 100227.113742
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307170000",
+      "target_notional_multiple": 1.00227113742,
+      "max_notional_multiple": 4.0,
+      "notional_by_equity": {
+        "5000": 5011.355687,
+        "25000": 25056.778436,
+        "100000": 100227.113742
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307170000",
+      "target_notional_multiple": 1.00227113742,
+      "max_notional_multiple": 8.0,
+      "notional_by_equity": {
+        "5000": 5011.355687,
+        "25000": 25056.778436,
+        "100000": 100227.113742
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307170000",
+      "target_notional_multiple": 1.00227113742,
+      "max_notional_multiple": 16.0,
+      "notional_by_equity": {
+        "5000": 5011.355687,
+        "25000": 25056.778436,
+        "100000": 100227.113742
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307170000",
+      "target_notional_multiple": 1.00227113742,
+      "max_notional_multiple": 32.0,
+      "notional_by_equity": {
+        "5000": 5011.355687,
+        "25000": 25056.778436,
+        "100000": 100227.113742
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307170000",
+      "target_notional_multiple": 1.00227113742,
+      "max_notional_multiple": 64.0,
+      "notional_by_equity": {
+        "5000": 5011.355687,
+        "25000": 25056.778436,
+        "100000": 100227.113742
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307171100",
+      "target_notional_multiple": 1.452589466418,
+      "max_notional_multiple": 0.5,
+      "notional_by_equity": {
+        "5000": 7262.947332,
+        "25000": 36314.73666,
+        "100000": 145258.946642
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307171100",
+      "target_notional_multiple": 1.452589466418,
+      "max_notional_multiple": 1.0,
+      "notional_by_equity": {
+        "5000": 7262.947332,
+        "25000": 36314.73666,
+        "100000": 145258.946642
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307171100",
+      "target_notional_multiple": 1.452589466418,
+      "max_notional_multiple": 2.0,
+      "notional_by_equity": {
+        "5000": 7262.947332,
+        "25000": 36314.73666,
+        "100000": 145258.946642
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307171100",
+      "target_notional_multiple": 1.452589466418,
+      "max_notional_multiple": 4.0,
+      "notional_by_equity": {
+        "5000": 7262.947332,
+        "25000": 36314.73666,
+        "100000": 145258.946642
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307171100",
+      "target_notional_multiple": 1.452589466418,
+      "max_notional_multiple": 8.0,
+      "notional_by_equity": {
+        "5000": 7262.947332,
+        "25000": 36314.73666,
+        "100000": 145258.946642
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307171100",
+      "target_notional_multiple": 1.452589466418,
+      "max_notional_multiple": 16.0,
+      "notional_by_equity": {
+        "5000": 7262.947332,
+        "25000": 36314.73666,
+        "100000": 145258.946642
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307171100",
+      "target_notional_multiple": 1.452589466418,
+      "max_notional_multiple": 32.0,
+      "notional_by_equity": {
+        "5000": 7262.947332,
+        "25000": 36314.73666,
+        "100000": 145258.946642
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307171100",
+      "target_notional_multiple": 1.452589466418,
+      "max_notional_multiple": 64.0,
+      "notional_by_equity": {
+        "5000": 7262.947332,
+        "25000": 36314.73666,
+        "100000": 145258.946642
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307181100",
+      "target_notional_multiple": 0.609848022739,
+      "max_notional_multiple": 0.5,
+      "notional_by_equity": {
+        "5000": 3049.240114,
+        "25000": 15246.200568,
+        "100000": 60984.802274
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307181100",
+      "target_notional_multiple": 0.609848022739,
+      "max_notional_multiple": 1.0,
+      "notional_by_equity": {
+        "5000": 3049.240114,
+        "25000": 15246.200568,
+        "100000": 60984.802274
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307181100",
+      "target_notional_multiple": 0.609848022739,
+      "max_notional_multiple": 2.0,
+      "notional_by_equity": {
+        "5000": 3049.240114,
+        "25000": 15246.200568,
+        "100000": 60984.802274
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307181100",
+      "target_notional_multiple": 0.609848022739,
+      "max_notional_multiple": 4.0,
+      "notional_by_equity": {
+        "5000": 3049.240114,
+        "25000": 15246.200568,
+        "100000": 60984.802274
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307181100",
+      "target_notional_multiple": 0.609848022739,
+      "max_notional_multiple": 8.0,
+      "notional_by_equity": {
+        "5000": 3049.240114,
+        "25000": 15246.200568,
+        "100000": 60984.802274
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307181100",
+      "target_notional_multiple": 0.609848022739,
+      "max_notional_multiple": 16.0,
+      "notional_by_equity": {
+        "5000": 3049.240114,
+        "25000": 15246.200568,
+        "100000": 60984.802274
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307181100",
+      "target_notional_multiple": 0.609848022739,
+      "max_notional_multiple": 32.0,
+      "notional_by_equity": {
+        "5000": 3049.240114,
+        "25000": 15246.200568,
+        "100000": 60984.802274
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307181100",
+      "target_notional_multiple": 0.609848022739,
+      "max_notional_multiple": 64.0,
+      "notional_by_equity": {
+        "5000": 3049.240114,
+        "25000": 15246.200568,
+        "100000": 60984.802274
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307190600",
+      "target_notional_multiple": 3.554605889499,
+      "max_notional_multiple": 0.5,
+      "notional_by_equity": {
+        "5000": 17773.029447,
+        "25000": 88865.147237,
+        "100000": 355460.58895
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307190600",
+      "target_notional_multiple": 3.554605889499,
+      "max_notional_multiple": 1.0,
+      "notional_by_equity": {
+        "5000": 17773.029447,
+        "25000": 88865.147237,
+        "100000": 355460.58895
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307190600",
+      "target_notional_multiple": 3.554605889499,
+      "max_notional_multiple": 2.0,
+      "notional_by_equity": {
+        "5000": 17773.029447,
+        "25000": 88865.147237,
+        "100000": 355460.58895
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307190600",
+      "target_notional_multiple": 3.554605889499,
+      "max_notional_multiple": 4.0,
+      "notional_by_equity": {
+        "5000": 17773.029447,
+        "25000": 88865.147237,
+        "100000": 355460.58895
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307190600",
+      "target_notional_multiple": 3.554605889499,
+      "max_notional_multiple": 8.0,
+      "notional_by_equity": {
+        "5000": 17773.029447,
+        "25000": 88865.147237,
+        "100000": 355460.58895
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307190600",
+      "target_notional_multiple": 3.554605889499,
+      "max_notional_multiple": 16.0,
+      "notional_by_equity": {
+        "5000": 17773.029447,
+        "25000": 88865.147237,
+        "100000": 355460.58895
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307190600",
+      "target_notional_multiple": 3.554605889499,
+      "max_notional_multiple": 32.0,
+      "notional_by_equity": {
+        "5000": 17773.029447,
+        "25000": 88865.147237,
+        "100000": 355460.58895
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307190600",
+      "target_notional_multiple": 3.554605889499,
+      "max_notional_multiple": 64.0,
+      "notional_by_equity": {
+        "5000": 17773.029447,
+        "25000": 88865.147237,
+        "100000": 355460.58895
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307191300",
+      "target_notional_multiple": 1.578941169416,
+      "max_notional_multiple": 0.5,
+      "notional_by_equity": {
+        "5000": 7894.705847,
+        "25000": 39473.529235,
+        "100000": 157894.116942
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307191300",
+      "target_notional_multiple": 1.578941169416,
+      "max_notional_multiple": 1.0,
+      "notional_by_equity": {
+        "5000": 7894.705847,
+        "25000": 39473.529235,
+        "100000": 157894.116942
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307191300",
+      "target_notional_multiple": 1.578941169416,
+      "max_notional_multiple": 2.0,
+      "notional_by_equity": {
+        "5000": 7894.705847,
+        "25000": 39473.529235,
+        "100000": 157894.116942
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307191300",
+      "target_notional_multiple": 1.578941169416,
+      "max_notional_multiple": 4.0,
+      "notional_by_equity": {
+        "5000": 7894.705847,
+        "25000": 39473.529235,
+        "100000": 157894.116942
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307191300",
+      "target_notional_multiple": 1.578941169416,
+      "max_notional_multiple": 8.0,
+      "notional_by_equity": {
+        "5000": 7894.705847,
+        "25000": 39473.529235,
+        "100000": 157894.116942
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307191300",
+      "target_notional_multiple": 1.578941169416,
+      "max_notional_multiple": 16.0,
+      "notional_by_equity": {
+        "5000": 7894.705847,
+        "25000": 39473.529235,
+        "100000": 157894.116942
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307191300",
+      "target_notional_multiple": 1.578941169416,
+      "max_notional_multiple": 32.0,
+      "notional_by_equity": {
+        "5000": 7894.705847,
+        "25000": 39473.529235,
+        "100000": 157894.116942
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307191300",
+      "target_notional_multiple": 1.578941169416,
+      "max_notional_multiple": 64.0,
+      "notional_by_equity": {
+        "5000": 7894.705847,
+        "25000": 39473.529235,
+        "100000": 157894.116942
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307201500",
+      "target_notional_multiple": 1.31046163032,
+      "max_notional_multiple": 0.5,
+      "notional_by_equity": {
+        "5000": 6552.308152,
+        "25000": 32761.540758,
+        "100000": 131046.163032
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307201500",
+      "target_notional_multiple": 1.31046163032,
+      "max_notional_multiple": 1.0,
+      "notional_by_equity": {
+        "5000": 6552.308152,
+        "25000": 32761.540758,
+        "100000": 131046.163032
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307201500",
+      "target_notional_multiple": 1.31046163032,
+      "max_notional_multiple": 2.0,
+      "notional_by_equity": {
+        "5000": 6552.308152,
+        "25000": 32761.540758,
+        "100000": 131046.163032
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307201500",
+      "target_notional_multiple": 1.31046163032,
+      "max_notional_multiple": 4.0,
+      "notional_by_equity": {
+        "5000": 6552.308152,
+        "25000": 32761.540758,
+        "100000": 131046.163032
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307201500",
+      "target_notional_multiple": 1.31046163032,
+      "max_notional_multiple": 8.0,
+      "notional_by_equity": {
+        "5000": 6552.308152,
+        "25000": 32761.540758,
+        "100000": 131046.163032
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307201500",
+      "target_notional_multiple": 1.31046163032,
+      "max_notional_multiple": 16.0,
+      "notional_by_equity": {
+        "5000": 6552.308152,
+        "25000": 32761.540758,
+        "100000": 131046.163032
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307201500",
+      "target_notional_multiple": 1.31046163032,
+      "max_notional_multiple": 32.0,
+      "notional_by_equity": {
+        "5000": 6552.308152,
+        "25000": 32761.540758,
+        "100000": 131046.163032
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307201500",
+      "target_notional_multiple": 1.31046163032,
+      "max_notional_multiple": 64.0,
+      "notional_by_equity": {
+        "5000": 6552.308152,
+        "25000": 32761.540758,
+        "100000": 131046.163032
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307210600",
+      "target_notional_multiple": 0.835084041685,
+      "max_notional_multiple": 0.5,
+      "notional_by_equity": {
+        "5000": 4175.420208,
+        "25000": 20877.101042,
+        "100000": 83508.404168
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307210600",
+      "target_notional_multiple": 0.835084041685,
+      "max_notional_multiple": 1.0,
+      "notional_by_equity": {
+        "5000": 4175.420208,
+        "25000": 20877.101042,
+        "100000": 83508.404168
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307210600",
+      "target_notional_multiple": 0.835084041685,
+      "max_notional_multiple": 2.0,
+      "notional_by_equity": {
+        "5000": 4175.420208,
+        "25000": 20877.101042,
+        "100000": 83508.404168
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307210600",
+      "target_notional_multiple": 0.835084041685,
+      "max_notional_multiple": 4.0,
+      "notional_by_equity": {
+        "5000": 4175.420208,
+        "25000": 20877.101042,
+        "100000": 83508.404168
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307210600",
+      "target_notional_multiple": 0.835084041685,
+      "max_notional_multiple": 8.0,
+      "notional_by_equity": {
+        "5000": 4175.420208,
+        "25000": 20877.101042,
+        "100000": 83508.404168
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307210600",
+      "target_notional_multiple": 0.835084041685,
+      "max_notional_multiple": 16.0,
+      "notional_by_equity": {
+        "5000": 4175.420208,
+        "25000": 20877.101042,
+        "100000": 83508.404168
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307210600",
+      "target_notional_multiple": 0.835084041685,
+      "max_notional_multiple": 32.0,
+      "notional_by_equity": {
+        "5000": 4175.420208,
+        "25000": 20877.101042,
+        "100000": 83508.404168
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307210600",
+      "target_notional_multiple": 0.835084041685,
+      "max_notional_multiple": 64.0,
+      "notional_by_equity": {
+        "5000": 4175.420208,
+        "25000": 20877.101042,
+        "100000": 83508.404168
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307240600",
+      "target_notional_multiple": 2.58520156825,
+      "max_notional_multiple": 0.5,
+      "notional_by_equity": {
+        "5000": 12926.007841,
+        "25000": 64630.039206,
+        "100000": 258520.156825
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307240600",
+      "target_notional_multiple": 2.58520156825,
+      "max_notional_multiple": 1.0,
+      "notional_by_equity": {
+        "5000": 12926.007841,
+        "25000": 64630.039206,
+        "100000": 258520.156825
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307240600",
+      "target_notional_multiple": 2.58520156825,
+      "max_notional_multiple": 2.0,
+      "notional_by_equity": {
+        "5000": 12926.007841,
+        "25000": 64630.039206,
+        "100000": 258520.156825
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307240600",
+      "target_notional_multiple": 2.58520156825,
+      "max_notional_multiple": 4.0,
+      "notional_by_equity": {
+        "5000": 12926.007841,
+        "25000": 64630.039206,
+        "100000": 258520.156825
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307240600",
+      "target_notional_multiple": 2.58520156825,
+      "max_notional_multiple": 8.0,
+      "notional_by_equity": {
+        "5000": 12926.007841,
+        "25000": 64630.039206,
+        "100000": 258520.156825
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307240600",
+      "target_notional_multiple": 2.58520156825,
+      "max_notional_multiple": 16.0,
+      "notional_by_equity": {
+        "5000": 12926.007841,
+        "25000": 64630.039206,
+        "100000": 258520.156825
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307240600",
+      "target_notional_multiple": 2.58520156825,
+      "max_notional_multiple": 32.0,
+      "notional_by_equity": {
+        "5000": 12926.007841,
+        "25000": 64630.039206,
+        "100000": 258520.156825
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307240600",
+      "target_notional_multiple": 2.58520156825,
+      "max_notional_multiple": 64.0,
+      "notional_by_equity": {
+        "5000": 12926.007841,
+        "25000": 64630.039206,
+        "100000": 258520.156825
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307241000",
+      "target_notional_multiple": 1.503899183045,
+      "max_notional_multiple": 0.5,
+      "notional_by_equity": {
+        "5000": 7519.495915,
+        "25000": 37597.479576,
+        "100000": 150389.918304
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307241000",
+      "target_notional_multiple": 1.503899183045,
+      "max_notional_multiple": 1.0,
+      "notional_by_equity": {
+        "5000": 7519.495915,
+        "25000": 37597.479576,
+        "100000": 150389.918304
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307241000",
+      "target_notional_multiple": 1.503899183045,
+      "max_notional_multiple": 2.0,
+      "notional_by_equity": {
+        "5000": 7519.495915,
+        "25000": 37597.479576,
+        "100000": 150389.918304
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307241000",
+      "target_notional_multiple": 1.503899183045,
+      "max_notional_multiple": 4.0,
+      "notional_by_equity": {
+        "5000": 7519.495915,
+        "25000": 37597.479576,
+        "100000": 150389.918304
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307241000",
+      "target_notional_multiple": 1.503899183045,
+      "max_notional_multiple": 8.0,
+      "notional_by_equity": {
+        "5000": 7519.495915,
+        "25000": 37597.479576,
+        "100000": 150389.918304
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307241000",
+      "target_notional_multiple": 1.503899183045,
+      "max_notional_multiple": 16.0,
+      "notional_by_equity": {
+        "5000": 7519.495915,
+        "25000": 37597.479576,
+        "100000": 150389.918304
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307241000",
+      "target_notional_multiple": 1.503899183045,
+      "max_notional_multiple": 32.0,
+      "notional_by_equity": {
+        "5000": 7519.495915,
+        "25000": 37597.479576,
+        "100000": 150389.918304
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307241000",
+      "target_notional_multiple": 1.503899183045,
+      "max_notional_multiple": 64.0,
+      "notional_by_equity": {
+        "5000": 7519.495915,
+        "25000": 37597.479576,
+        "100000": 150389.918304
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307262100",
+      "target_notional_multiple": 1.469050475485,
+      "max_notional_multiple": 0.5,
+      "notional_by_equity": {
+        "5000": 7345.252377,
+        "25000": 36726.261887,
+        "100000": 146905.047549
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307262100",
+      "target_notional_multiple": 1.469050475485,
+      "max_notional_multiple": 1.0,
+      "notional_by_equity": {
+        "5000": 7345.252377,
+        "25000": 36726.261887,
+        "100000": 146905.047549
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307262100",
+      "target_notional_multiple": 1.469050475485,
+      "max_notional_multiple": 2.0,
+      "notional_by_equity": {
+        "5000": 7345.252377,
+        "25000": 36726.261887,
+        "100000": 146905.047549
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307262100",
+      "target_notional_multiple": 1.469050475485,
+      "max_notional_multiple": 4.0,
+      "notional_by_equity": {
+        "5000": 7345.252377,
+        "25000": 36726.261887,
+        "100000": 146905.047549
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307262100",
+      "target_notional_multiple": 1.469050475485,
+      "max_notional_multiple": 8.0,
+      "notional_by_equity": {
+        "5000": 7345.252377,
+        "25000": 36726.261887,
+        "100000": 146905.047549
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307262100",
+      "target_notional_multiple": 1.469050475485,
+      "max_notional_multiple": 16.0,
+      "notional_by_equity": {
+        "5000": 7345.252377,
+        "25000": 36726.261887,
+        "100000": 146905.047549
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307262100",
+      "target_notional_multiple": 1.469050475485,
+      "max_notional_multiple": 32.0,
+      "notional_by_equity": {
+        "5000": 7345.252377,
+        "25000": 36726.261887,
+        "100000": 146905.047549
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307262100",
+      "target_notional_multiple": 1.469050475485,
+      "max_notional_multiple": 64.0,
+      "notional_by_equity": {
+        "5000": 7345.252377,
+        "25000": 36726.261887,
+        "100000": 146905.047549
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307270900",
+      "target_notional_multiple": 1.525036635706,
+      "max_notional_multiple": 0.5,
+      "notional_by_equity": {
+        "5000": 7625.183179,
+        "25000": 38125.915893,
+        "100000": 152503.663571
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307270900",
+      "target_notional_multiple": 1.525036635706,
+      "max_notional_multiple": 1.0,
+      "notional_by_equity": {
+        "5000": 7625.183179,
+        "25000": 38125.915893,
+        "100000": 152503.663571
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307270900",
+      "target_notional_multiple": 1.525036635706,
+      "max_notional_multiple": 2.0,
+      "notional_by_equity": {
+        "5000": 7625.183179,
+        "25000": 38125.915893,
+        "100000": 152503.663571
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307270900",
+      "target_notional_multiple": 1.525036635706,
+      "max_notional_multiple": 4.0,
+      "notional_by_equity": {
+        "5000": 7625.183179,
+        "25000": 38125.915893,
+        "100000": 152503.663571
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307270900",
+      "target_notional_multiple": 1.525036635706,
+      "max_notional_multiple": 8.0,
+      "notional_by_equity": {
+        "5000": 7625.183179,
+        "25000": 38125.915893,
+        "100000": 152503.663571
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307270900",
+      "target_notional_multiple": 1.525036635706,
+      "max_notional_multiple": 16.0,
+      "notional_by_equity": {
+        "5000": 7625.183179,
+        "25000": 38125.915893,
+        "100000": 152503.663571
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307270900",
+      "target_notional_multiple": 1.525036635706,
+      "max_notional_multiple": 32.0,
+      "notional_by_equity": {
+        "5000": 7625.183179,
+        "25000": 38125.915893,
+        "100000": 152503.663571
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307270900",
+      "target_notional_multiple": 1.525036635706,
+      "max_notional_multiple": 64.0,
+      "notional_by_equity": {
+        "5000": 7625.183179,
+        "25000": 38125.915893,
+        "100000": 152503.663571
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307271100",
+      "target_notional_multiple": 0.536440839824,
+      "max_notional_multiple": 0.5,
+      "notional_by_equity": {
+        "5000": 2682.204199,
+        "25000": 13411.020996,
+        "100000": 53644.083982
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307271100",
+      "target_notional_multiple": 0.536440839824,
+      "max_notional_multiple": 1.0,
+      "notional_by_equity": {
+        "5000": 2682.204199,
+        "25000": 13411.020996,
+        "100000": 53644.083982
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307271100",
+      "target_notional_multiple": 0.536440839824,
+      "max_notional_multiple": 2.0,
+      "notional_by_equity": {
+        "5000": 2682.204199,
+        "25000": 13411.020996,
+        "100000": 53644.083982
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307271100",
+      "target_notional_multiple": 0.536440839824,
+      "max_notional_multiple": 4.0,
+      "notional_by_equity": {
+        "5000": 2682.204199,
+        "25000": 13411.020996,
+        "100000": 53644.083982
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307271100",
+      "target_notional_multiple": 0.536440839824,
+      "max_notional_multiple": 8.0,
+      "notional_by_equity": {
+        "5000": 2682.204199,
+        "25000": 13411.020996,
+        "100000": 53644.083982
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307271100",
+      "target_notional_multiple": 0.536440839824,
+      "max_notional_multiple": 16.0,
+      "notional_by_equity": {
+        "5000": 2682.204199,
+        "25000": 13411.020996,
+        "100000": 53644.083982
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307271100",
+      "target_notional_multiple": 0.536440839824,
+      "max_notional_multiple": 32.0,
+      "notional_by_equity": {
+        "5000": 2682.204199,
+        "25000": 13411.020996,
+        "100000": 53644.083982
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307271100",
+      "target_notional_multiple": 0.536440839824,
+      "max_notional_multiple": 64.0,
+      "notional_by_equity": {
+        "5000": 2682.204199,
+        "25000": 13411.020996,
+        "100000": 53644.083982
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307272300",
+      "target_notional_multiple": 0.71225598453,
+      "max_notional_multiple": 0.5,
+      "notional_by_equity": {
+        "5000": 3561.279923,
+        "25000": 17806.399613,
+        "100000": 71225.598453
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "25000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        },
+        "100000": {
+          "state": "NOTIONAL_LIMIT_BLOCKED",
+          "survives": false
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307272300",
+      "target_notional_multiple": 0.71225598453,
+      "max_notional_multiple": 1.0,
+      "notional_by_equity": {
+        "5000": 3561.279923,
+        "25000": 17806.399613,
+        "100000": 71225.598453
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307272300",
+      "target_notional_multiple": 0.71225598453,
+      "max_notional_multiple": 2.0,
+      "notional_by_equity": {
+        "5000": 3561.279923,
+        "25000": 17806.399613,
+        "100000": 71225.598453
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307272300",
+      "target_notional_multiple": 0.71225598453,
+      "max_notional_multiple": 4.0,
+      "notional_by_equity": {
+        "5000": 3561.279923,
+        "25000": 17806.399613,
+        "100000": 71225.598453
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307272300",
+      "target_notional_multiple": 0.71225598453,
+      "max_notional_multiple": 8.0,
+      "notional_by_equity": {
+        "5000": 3561.279923,
+        "25000": 17806.399613,
+        "100000": 71225.598453
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307272300",
+      "target_notional_multiple": 0.71225598453,
+      "max_notional_multiple": 16.0,
+      "notional_by_equity": {
+        "5000": 3561.279923,
+        "25000": 17806.399613,
+        "100000": 71225.598453
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307272300",
+      "target_notional_multiple": 0.71225598453,
+      "max_notional_multiple": 32.0,
+      "notional_by_equity": {
+        "5000": 3561.279923,
+        "25000": 17806.399613,
+        "100000": 71225.598453
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    },
+    {
+      "event_id": "EUR_ORIGIN_202307272300",
+      "target_notional_multiple": 0.71225598453,
+      "max_notional_multiple": 64.0,
+      "notional_by_equity": {
+        "5000": 3561.279923,
+        "25000": 17806.399613,
+        "100000": 71225.598453
+      },
+      "classification_by_equity": {
+        "5000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "25000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        },
+        "100000": {
+          "state": "EXACTLY_REPRESENTABLE_NOTIONAL_ONLY",
+          "survives": true
+        }
+      },
+      "classification_invariant": true
+    }
+  ]
+}

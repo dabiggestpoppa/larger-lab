@@ -1,0 +1,23 @@
+field,truth_class,detail,blocking,used_in_d1_1
+broker_symbol,UNKNOWN,research instrument USDJPY; broker representation (USDJPY / USDJPY.PRO / CFD / spot) unresolved,yes,no
+broker_company,UNKNOWN,broker identity unresolved,yes,no
+transport,UNKNOWN,MT5 / other transport unresolved,yes,no
+environment,UNKNOWN,DEMO / REAL environment unresolved,yes,no
+product_type,UNKNOWN,spot FX vs CFD representation unresolved,yes,no
+contract_size,UNKNOWN,trade_contract_size unknown,yes,no
+point,UNKNOWN,point size unknown,yes,no
+digits,UNKNOWN,digits unknown,yes,no
+tick_size,UNKNOWN,trade_tick_size unknown,yes,no
+tick_value,UNKNOWN,trade_tick_value unknown,yes,no
+volume_min,UNKNOWN,minimum lot/volume unknown,yes,no
+volume_step,UNKNOWN,volume step unknown,yes,no
+volume_max,UNKNOWN,maximum volume unknown,yes,no
+margin_model,UNKNOWN,symbol margin mode / tiers unknown,yes,no
+account_leverage,UNKNOWN,account leverage unknown (FakeMT5 demo fixtures are NOT truth),yes,no
+symbol_leverage,UNKNOWN,symbol-specific leverage unknown,yes,no
+hedging_netting,UNKNOWN,HEDGING vs NETTING mode unknown,yes,no
+executable_account_currency,UNKNOWN,account currency unresolved until account binding,yes,no
+account_size,UNKNOWN,intended account size unresolved,yes,no
+equity_snapshot,UNKNOWN,causal account equity snapshot unavailable,yes,no
+fx_conversion_price,UNKNOWN,causal conversion price for non-USD legs unknown,yes,no
+order_fill_policy,UNKNOWN,declared vs probed fill policy unknown until broker session,yes,no

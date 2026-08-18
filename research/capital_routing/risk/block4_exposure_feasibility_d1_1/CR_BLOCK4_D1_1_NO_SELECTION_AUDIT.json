@@ -1,0 +1,12 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-IV-D1.1-BROKER-INDEPENDENT-NOTIONAL-FEASIBILITY-SURFACE",
+  "grid_modified_after_results": false,
+  "cells_removed": 0,
+  "cells_added": 0,
+  "performance_based_selection": false,
+  "preferred_cap_selected": false,
+  "production_cap_selected": false,
+  "broker_selected": false,
+  "account_size_selected": false,
+  "note": "All preregistered grid cells are reported.  No cap is recommended, ranked, or promoted; no physical constraint is optimized against PF / WR / EV / CAGR / DD."
+}

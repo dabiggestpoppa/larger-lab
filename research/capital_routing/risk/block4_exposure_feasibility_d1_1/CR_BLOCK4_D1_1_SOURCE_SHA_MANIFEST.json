@@ -1,0 +1,25 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-IV-D1.1-BROKER-INDEPENDENT-NOTIONAL-FEASIBILITY-SURFACE",
+  "base_commit": "f52d5f482a3d5ff5b133a6335e9996ab98cb0bb3",
+  "science_inputs": {
+    "event_risk_ledger_sha256": "6c98b0d218c66f3f5893733f26c51490138e658046487e3ea108c5feeee2d26f",
+    "r1_notional_multipliers_sha256": "b45876c6e5e06b114d2129315f67d9f72710bed456664a804ad4dd0ecb1be1ff",
+    "d0_1_translations_sha256": "409f386c311c43e724c19553cf6dbce8119835c24d8d077839019878a5108b2e",
+    "d0_1_decision_sha256": "f196df92c8f8def81bf9c7a16677c93f5d7607ec79ee57c8085d1cc5d3e84a00",
+    "d1_plan_decision_sha256": "55e7fc129810e7f4d738affdde49f7c9c303c1f69aee5d5b05e03559d0095274",
+    "r1_1_decision_sha256": "65ef1598e84dabf22a857d544257d829c0db8c74257be9060c01a0525282d798",
+    "concurrency_summary_sha256": "f6fb67b9659fc8f8202d9bf86bddaf9292bdab6cd18c06a882542d319879cfcb",
+    "routing_episodes_sha256": "e87b8083690bef88bb4479e6fb23add19220f7d510c0bb60004d8dc62b337233"
+  },
+  "engine": {
+    "module": "src/capital_routing/feasibility/notional_feasibility.py",
+    "study_version": "D1.1",
+    "grid_generation": "G1"
+  },
+  "cross_workstream_heads_frozen_at_start": {
+    "execution_runtime_foundation": "b94fbbae897cd8b81e21408ee91bdbb7b0925553",
+    "tb_forward_engine": "b48fd35255b41865026a3cba333ae2a2a0d6a004",
+    "main": "9f61288679eea56a298e08f718c314f2ca509bc5"
+  },
+  "note": "Cross-workstream heads are recorded diagnostically; their later movement is NOT a failure of this historical checkpoint."
+}
