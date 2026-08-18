@@ -225,15 +225,28 @@ def test_tb_engineering_head_recorded():
 
 
 # --- 12: no cross-branch write ----------------------------------------------
+def _branch_tip(repo: Path, branch: str) -> str:
+    """Resolve branch tip: local ref -> remote-tracking ref -> fetch fallback."""
+    for ref in (branch, f"refs/remotes/origin/{branch}"):
+        out = subprocess.run(["git", "rev-parse", "--verify", ref],
+                             cwd=repo, capture_output=True, text=True)
+        if out.returncode == 0:
+            return out.stdout.strip()
+    subprocess.run(["git", "fetch", "origin", branch], cwd=repo,
+                   capture_output=True, text=True, check=True)
+    out = subprocess.run(["git", "rev-parse", "--verify",
+                          f"refs/remotes/origin/{branch}"],
+                         cwd=repo, capture_output=True, text=True)
+    assert out.returncode == 0, out.stderr
+    return out.stdout.strip()
+
+
 def test_no_cross_branch_write():
     repo = ROOT.parent
     for branch, head in [("execution-runtime-foundation", EXEC_FOUNDATION_HEAD),
                          ("tb-forward-engine", TB_ENGINEERING_HEAD)]:
-        out = subprocess.run(["git", "log", branch, "--oneline", "-1"],
-                             cwd=repo, capture_output=True, text=True)
-        assert out.returncode == 0, out.stderr
-        got = out.stdout.split()[0]
-        assert head.startswith(got), f"{branch} head moved: {out.stdout}"
+        got = _branch_tip(repo, branch)
+        assert head == got, f"{branch} head moved: {got}"
     # the R1.1 runner only writes into its own artifact dir
     runner_src = (ROOT / "scripts" / "run_exec_translation_planning_r1_1.py").read_text(
         encoding="utf-8")
