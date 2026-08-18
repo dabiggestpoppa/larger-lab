@@ -680,6 +680,201 @@ def region_definition(rc: pd.DataFrame, knee: pd.DataFrame,
 
 
 # ---------------------------------------------------------------------------
+# Fail-closed decision gate (R1 repair: CR-RISK-BLOCK-III-SCALE-SEAL-R1-
+# FAIL-CLOSED-GATE).  Pure functions so the gate can be exercised directly
+# by negative tests -- no artifact inspection required.
+# ---------------------------------------------------------------------------
+
+REQUIRED_GATE_FIELDS: List[Tuple[str, str]] = [
+    ("frontier_nonregression_pass",
+     "frontier reference nonregression PASS"),
+    ("block_episode_agreement_pass",
+     "block/episode dependency agreement within the robust core"),
+    ("knee_seal_pass", "robust core at or below the knee start"),
+    ("adjacent_scale_seal_pass",
+     "no tail acceleration inside the core; acceleration at 1.00->1.50"),
+    ("survives_100_edge", "100% retained edge survival in the band"),
+    ("survives_75_edge", "75% retained edge survival in the band"),
+]
+
+PROHIBITED_AUTH_FIELDS: List[Tuple[str, str]] = [
+    ("kelly_used", "kelly sizing is prohibited"),
+    ("dd_adaptive_used", "drawdown-adaptive sizing is prohibited"),
+    ("production_scale_selected", "production scale selection is prohibited"),
+    ("deployment_authorized", "deployment is not authorized"),
+    ("mt5_authorized", "MT5 execution is not authorized"),
+]
+
+
+def fail_closed_gate(gates: Dict[str, bool],
+                     authorizations: Dict[str, bool]) -> Dict:
+    """Fail-closed truth gate for the scale-seal decision.
+
+    block3_scale_seal_pass = true ONLY IF every required gate passes AND no
+    prohibited authorization state is present.  status is DERIVED from the
+    pass (never hardcoded).  Missing gate inputs fail closed; missing
+    authorization inputs default to not-authorized (safe).
+
+    Returns the machine-readable gate verdict:
+      block3_scale_seal_pass, status (PASS/FAIL), status_reason,
+      seal_gate_passes, seal_gate_failures, authorization_invariants_failed.
+    """
+    seal_gate_passes = [name for name, _ in REQUIRED_GATE_FIELDS
+                        if bool(gates.get(name)) is True]
+    seal_gate_failures = [name for name, _ in REQUIRED_GATE_FIELDS
+                          if bool(gates.get(name)) is not True]
+    auth_invariants_failed = [name for name, _ in PROHIBITED_AUTH_FIELDS
+                              if bool(authorizations.get(name)) is True]
+    block3_scale_seal_pass = (not seal_gate_failures
+                              and not auth_invariants_failed)
+    if block3_scale_seal_pass:
+        status = "PASS"
+        status_reason = "All required gates pass; no prohibited authorization " \
+                        "state present."
+    else:
+        reasons = []
+        if seal_gate_failures:
+            reasons.append("required gate(s) failed: "
+                           + ", ".join(seal_gate_failures))
+        if auth_invariants_failed:
+            reasons.append("prohibited authorization state: "
+                           + ", ".join(auth_invariants_failed))
+        status = "FAIL"
+        status_reason = "; ".join(reasons)
+    return {
+        "block3_scale_seal_pass": block3_scale_seal_pass,
+        "status": status,
+        "status_reason": status_reason,
+        "seal_gate_passes": seal_gate_passes,
+        "seal_gate_failures": seal_gate_failures,
+        "authorization_invariants_failed": auth_invariants_failed,
+    }
+
+
+def build_scale_seal_decision(
+        *,
+        base_commit: str,
+        checkpoint: str = "CR-RISK-BLOCK-III-SCALE-SEAL",
+        frontier_nonregression_pass: bool,
+        block_episode_agreement_pass: bool,
+        knee_seal_pass: bool,
+        adjacent_scale_seal_pass: bool,
+        survives_100_edge: bool,
+        survives_75_edge: bool,
+        survives_50_edge: bool,
+        survives_25_edge: bool,
+        kelly_used: bool = False,
+        dd_adaptive_used: bool = False,
+        production_scale_selected: bool = False,
+        deployment_authorized: bool = False,
+        mt5_authorized: bool = False,
+        scale_bands: Optional[Dict] = None,
+        allowed_allocations: Optional[List[str]] = None,
+        diagnostic_only_allocations: Optional[List[str]] = None,
+        heat_architecture_status: str = "H1_OPTIONAL_SAFETY_LAYER_RETAINED",
+        preferred_research_default: Optional[Dict] = None,
+        robust_core_median_cagr_range: Optional[List[float]] = None,
+        robust_core_p95_dd_range: Optional[List[float]] = None,
+        robust_core_p_dd_ge_10_range: Optional[List[float]] = None,
+        robust_core_p_dd_ge_15_range: Optional[List[float]] = None,
+        next_checkpoint_recommended: str =
+            "CR-RISK-BLOCK-III-EXECUTION-TRANSLATION-PLANNING",
+) -> Dict:
+    """Assemble the full scale-seal decision with fail-closed governance.
+
+    The pass/status fields are ALWAYS computed by fail_closed_gate() -- the
+    caller supplies the gate inputs (typically derived from the frozen
+    region/edge evidence) and the scientific fields, and the gate decides.
+    This is the single decision path used by the canonical seal runner and
+    the R1 fail-closed repair runner.
+    """
+    gates = {
+        "frontier_nonregression_pass": bool(frontier_nonregression_pass),
+        "block_episode_agreement_pass": bool(block_episode_agreement_pass),
+        "knee_seal_pass": bool(knee_seal_pass),
+        "adjacent_scale_seal_pass": bool(adjacent_scale_seal_pass),
+        "survives_100_edge": bool(survives_100_edge),
+        "survives_75_edge": bool(survives_75_edge),
+    }
+    auths = {
+        "kelly_used": bool(kelly_used),
+        "dd_adaptive_used": bool(dd_adaptive_used),
+        "production_scale_selected": bool(production_scale_selected),
+        "deployment_authorized": bool(deployment_authorized),
+        "mt5_authorized": bool(mt5_authorized),
+    }
+    gate = fail_closed_gate(gates, auths)
+    bands = scale_bands if scale_bands is not None else {
+        "CONSERVATIVE": CONSERVATIVE_BAND,
+        "ROBUST_CORE": ROBUST_CORE_BAND,
+        "AGGRESSIVE": AGGRESSIVE_BAND,
+        "STRESS_ONLY": STRESS_BAND,
+    }
+    return {
+        "checkpoint": checkpoint,
+        "status": gate["status"],
+        "status_reason": gate["status_reason"],
+        "base_commit": base_commit,
+        "frontier_nonregression_pass": bool(frontier_nonregression_pass),
+        "conservative_scale_band": bands["CONSERVATIVE"],
+        "robust_core_scale_band": bands["ROBUST_CORE"],
+        "aggressive_scale_band": bands["AGGRESSIVE"],
+        "stress_scale_band": bands["STRESS_ONLY"],
+        "allowed_allocations": (allowed_allocations
+                                 if allowed_allocations is not None
+                                 else list(OPERATING_ALLOCS)),
+        "diagnostic_only_allocations": (
+            diagnostic_only_allocations
+            if diagnostic_only_allocations is not None
+            else ["A2_100_0_A", "A3_0_100_B"]),
+        "heat_architecture_status": heat_architecture_status,
+        "preferred_research_default": (
+            preferred_research_default
+            if preferred_research_default is not None
+            else {
+                "allocation": PREFERRED_ALLOC,
+                "heat_architecture": PREFERRED_HEAT,
+                "f_total_pct": PREFERRED_F_PCT,
+                "role": "PREFERRED_RESEARCH_DEFAULT for demo/execution "
+                        "translation research ONLY -- not production sizing",
+            }),
+        "robust_core_median_cagr_range": (
+            robust_core_median_cagr_range
+            if robust_core_median_cagr_range is not None
+            else []),
+        "robust_core_p95_dd_range": (
+            robust_core_p95_dd_range if robust_core_p95_dd_range is not None
+            else []),
+        "robust_core_p_dd_ge_10_range": (
+            robust_core_p_dd_ge_10_range
+            if robust_core_p_dd_ge_10_range is not None else []),
+        "robust_core_p_dd_ge_15_range": (
+            robust_core_p_dd_ge_15_range
+            if robust_core_p_dd_ge_15_range is not None else []),
+        "survives_100_edge": bool(survives_100_edge),
+        "survives_75_edge": bool(survives_75_edge),
+        "survives_50_edge": bool(survives_50_edge),
+        "survives_25_edge": bool(survives_25_edge),
+        "block_episode_agreement_pass": bool(block_episode_agreement_pass),
+        "knee_seal_pass": bool(knee_seal_pass),
+        "adjacent_scale_seal_pass": bool(adjacent_scale_seal_pass),
+        "kelly_used": bool(kelly_used),
+        "dd_adaptive_used": bool(dd_adaptive_used),
+        "production_scale_selected": bool(production_scale_selected),
+        "deployment_authorized": bool(deployment_authorized),
+        "mt5_authorized": bool(mt5_authorized),
+        "block3_scale_seal_pass": gate["block3_scale_seal_pass"],
+        "seal_gate_passes": gate["seal_gate_passes"],
+        "seal_gate_failures": gate["seal_gate_failures"],
+        "authorization_invariants_failed": (
+            gate["authorization_invariants_failed"]),
+        "human_review_required": True,
+        "next_checkpoint_recommended": next_checkpoint_recommended,
+        "next_checkpoint_authorized": False,
+    }
+
+
+# ---------------------------------------------------------------------------
 # Risk contract
 # ---------------------------------------------------------------------------
 

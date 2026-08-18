@@ -1,0 +1,144 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-III-SCALE-SEAL-R1-FAIL-CLOSED-GATE",
+  "base_commit": "78dca3a7453205241bdbe935b985e3e7be7b8144",
+  "positive_control": {
+    "block3_scale_seal_pass": true,
+    "status": "PASS",
+    "seal_gate_failures": []
+  },
+  "negative_tests": [
+    {
+      "injection": "frontier_nonregression_pass=False",
+      "kind": "gate",
+      "block3_scale_seal_pass": false,
+      "status": "FAIL",
+      "seal_gate_failures": [
+        "frontier_nonregression_pass"
+      ],
+      "authorization_invariants_failed": [],
+      "fail_closed": true,
+      "expected_failure_recorded": true
+    },
+    {
+      "injection": "block_episode_agreement_pass=False",
+      "kind": "gate",
+      "block3_scale_seal_pass": false,
+      "status": "FAIL",
+      "seal_gate_failures": [
+        "block_episode_agreement_pass"
+      ],
+      "authorization_invariants_failed": [],
+      "fail_closed": true,
+      "expected_failure_recorded": true
+    },
+    {
+      "injection": "knee_seal_pass=False",
+      "kind": "gate",
+      "block3_scale_seal_pass": false,
+      "status": "FAIL",
+      "seal_gate_failures": [
+        "knee_seal_pass"
+      ],
+      "authorization_invariants_failed": [],
+      "fail_closed": true,
+      "expected_failure_recorded": true
+    },
+    {
+      "injection": "adjacent_scale_seal_pass=False",
+      "kind": "gate",
+      "block3_scale_seal_pass": false,
+      "status": "FAIL",
+      "seal_gate_failures": [
+        "adjacent_scale_seal_pass"
+      ],
+      "authorization_invariants_failed": [],
+      "fail_closed": true,
+      "expected_failure_recorded": true
+    },
+    {
+      "injection": "survives_100_edge=False",
+      "kind": "gate",
+      "block3_scale_seal_pass": false,
+      "status": "FAIL",
+      "seal_gate_failures": [
+        "survives_100_edge"
+      ],
+      "authorization_invariants_failed": [],
+      "fail_closed": true,
+      "expected_failure_recorded": true
+    },
+    {
+      "injection": "survives_75_edge=False",
+      "kind": "gate",
+      "block3_scale_seal_pass": false,
+      "status": "FAIL",
+      "seal_gate_failures": [
+        "survives_75_edge"
+      ],
+      "authorization_invariants_failed": [],
+      "fail_closed": true,
+      "expected_failure_recorded": true
+    },
+    {
+      "injection": "kelly_used=True",
+      "kind": "auth",
+      "block3_scale_seal_pass": false,
+      "status": "FAIL",
+      "seal_gate_failures": [],
+      "authorization_invariants_failed": [
+        "kelly_used"
+      ],
+      "fail_closed": true,
+      "expected_failure_recorded": true
+    },
+    {
+      "injection": "dd_adaptive_used=True",
+      "kind": "auth",
+      "block3_scale_seal_pass": false,
+      "status": "FAIL",
+      "seal_gate_failures": [],
+      "authorization_invariants_failed": [
+        "dd_adaptive_used"
+      ],
+      "fail_closed": true,
+      "expected_failure_recorded": true
+    },
+    {
+      "injection": "production_scale_selected=True",
+      "kind": "auth",
+      "block3_scale_seal_pass": false,
+      "status": "FAIL",
+      "seal_gate_failures": [],
+      "authorization_invariants_failed": [
+        "production_scale_selected"
+      ],
+      "fail_closed": true,
+      "expected_failure_recorded": true
+    },
+    {
+      "injection": "deployment_authorized=True",
+      "kind": "auth",
+      "block3_scale_seal_pass": false,
+      "status": "FAIL",
+      "seal_gate_failures": [],
+      "authorization_invariants_failed": [
+        "deployment_authorized"
+      ],
+      "fail_closed": true,
+      "expected_failure_recorded": true
+    },
+    {
+      "injection": "mt5_authorized=True",
+      "kind": "auth",
+      "block3_scale_seal_pass": false,
+      "status": "FAIL",
+      "seal_gate_failures": [],
+      "authorization_invariants_failed": [
+        "mt5_authorized"
+      ],
+      "fail_closed": true,
+      "expected_failure_recorded": true
+    }
+  ],
+  "all_negative_tests_fail_closed": true
+}

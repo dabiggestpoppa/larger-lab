@@ -1,0 +1,81 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-III-SCALE-SEAL-R1-FAIL-CLOSED-GATE",
+  "status": "PASS",
+  "status_reason": "All required gates pass; no prohibited authorization state present.",
+  "base_commit": "78dca3a7453205241bdbe935b985e3e7be7b8144",
+  "frontier_nonregression_pass": true,
+  "conservative_scale_band": [
+    0.25,
+    0.5
+  ],
+  "robust_core_scale_band": [
+    0.75,
+    1.0
+  ],
+  "aggressive_scale_band": [
+    1.5,
+    2.0
+  ],
+  "stress_scale_band": [
+    3.0,
+    3.0
+  ],
+  "allowed_allocations": [
+    "A0_50_50",
+    "A1_70_30"
+  ],
+  "diagnostic_only_allocations": [
+    "A2_100_0_A",
+    "A3_0_100_B"
+  ],
+  "heat_architecture_status": "H1_OPTIONAL_SAFETY_LAYER_RETAINED",
+  "preferred_research_default": {
+    "allocation": "A1_70_30",
+    "heat_architecture": "H1-1.00-REJ",
+    "f_total_pct": 1.0,
+    "role": "PREFERRED_RESEARCH_DEFAULT for demo/execution translation research ONLY -- not production sizing, not live authorization",
+    "justification": "best tail-efficiency allocation (A1_70_30) at the top of the robust core (0.75-1.00), at the knee start [1.0, 1.5], under the operating heat H1-1.00-REJ"
+  },
+  "robust_core_median_cagr_range": [
+    0.4814,
+    0.7038
+  ],
+  "robust_core_p95_dd_range": [
+    0.0474,
+    0.0829
+  ],
+  "robust_core_p_dd_ge_10_range": [
+    0.0,
+    0.0072
+  ],
+  "robust_core_p_dd_ge_15_range": [
+    0.0,
+    0.0
+  ],
+  "survives_100_edge": true,
+  "survives_75_edge": true,
+  "survives_50_edge": true,
+  "survives_25_edge": false,
+  "block_episode_agreement_pass": true,
+  "knee_seal_pass": true,
+  "adjacent_scale_seal_pass": true,
+  "kelly_used": false,
+  "dd_adaptive_used": false,
+  "production_scale_selected": false,
+  "deployment_authorized": false,
+  "mt5_authorized": false,
+  "block3_scale_seal_pass": true,
+  "seal_gate_passes": [
+    "frontier_nonregression_pass",
+    "block_episode_agreement_pass",
+    "knee_seal_pass",
+    "adjacent_scale_seal_pass",
+    "survives_100_edge",
+    "survives_75_edge"
+  ],
+  "seal_gate_failures": [],
+  "authorization_invariants_failed": [],
+  "human_review_required": true,
+  "next_checkpoint_recommended": "CR-RISK-BLOCK-III-EXECUTION-TRANSLATION-PLANNING",
+  "next_checkpoint_authorized": false
+}

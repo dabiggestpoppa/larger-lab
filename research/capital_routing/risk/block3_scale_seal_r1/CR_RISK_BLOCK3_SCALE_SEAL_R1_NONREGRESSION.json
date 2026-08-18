@@ -1,0 +1,258 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-III-SCALE-SEAL-R1-FAIL-CLOSED-GATE",
+  "base_commit": "78dca3a7453205241bdbe935b985e3e7be7b8144",
+  "nonregression_pass": true,
+  "n_fields": 18,
+  "fields": [
+    {
+      "field": "conservative_scale_band",
+      "recomputed": [
+        0.25,
+        0.5
+      ],
+      "sealed": [
+        0.25,
+        0.5
+      ],
+      "expected": [
+        0.25,
+        0.5
+      ],
+      "matches_expected": true,
+      "matches_sealed": true,
+      "pass": true
+    },
+    {
+      "field": "robust_core_scale_band",
+      "recomputed": [
+        0.75,
+        1.0
+      ],
+      "sealed": [
+        0.75,
+        1.0
+      ],
+      "expected": [
+        0.75,
+        1.0
+      ],
+      "matches_expected": true,
+      "matches_sealed": true,
+      "pass": true
+    },
+    {
+      "field": "aggressive_scale_band",
+      "recomputed": [
+        1.5,
+        2.0
+      ],
+      "sealed": [
+        1.5,
+        2.0
+      ],
+      "expected": [
+        1.5,
+        2.0
+      ],
+      "matches_expected": true,
+      "matches_sealed": true,
+      "pass": true
+    },
+    {
+      "field": "stress_scale_band",
+      "recomputed": [
+        3.0,
+        3.0
+      ],
+      "sealed": [
+        3.0,
+        3.0
+      ],
+      "expected": [
+        3.0,
+        3.0
+      ],
+      "matches_expected": true,
+      "matches_sealed": true,
+      "pass": true
+    },
+    {
+      "field": "knee_band",
+      "recomputed": [
+        1.0,
+        1.5
+      ],
+      "sealed": null,
+      "expected": [
+        1.0,
+        1.5
+      ],
+      "matches_expected": true,
+      "matches_sealed": true,
+      "pass": true
+    },
+    {
+      "field": "allowed_allocations",
+      "recomputed": [
+        "A0_50_50",
+        "A1_70_30"
+      ],
+      "sealed": [
+        "A0_50_50",
+        "A1_70_30"
+      ],
+      "expected": [
+        "A0_50_50",
+        "A1_70_30"
+      ],
+      "matches_expected": true,
+      "matches_sealed": true,
+      "pass": true
+    },
+    {
+      "field": "operating_heat",
+      "recomputed": "H1-1.00-REJ",
+      "sealed": null,
+      "expected": "H1-1.00-REJ",
+      "matches_expected": true,
+      "matches_sealed": true,
+      "pass": true
+    },
+    {
+      "field": "preferred_allocation",
+      "recomputed": "A1_70_30",
+      "sealed": null,
+      "expected": "A1_70_30",
+      "matches_expected": true,
+      "matches_sealed": true,
+      "pass": true
+    },
+    {
+      "field": "preferred_heat",
+      "recomputed": "H1-1.00-REJ",
+      "sealed": null,
+      "expected": "H1-1.00-REJ",
+      "matches_expected": true,
+      "matches_sealed": true,
+      "pass": true
+    },
+    {
+      "field": "preferred_f_total_pct",
+      "recomputed": 1.0,
+      "sealed": null,
+      "expected": 1.0,
+      "matches_expected": true,
+      "matches_sealed": true,
+      "pass": true
+    },
+    {
+      "field": "robust_core_median_cagr_range",
+      "recomputed": [
+        0.4814,
+        0.7038
+      ],
+      "sealed": [
+        0.4814,
+        0.7038
+      ],
+      "expected": [
+        0.4814,
+        0.7038
+      ],
+      "matches_expected": true,
+      "matches_sealed": true,
+      "pass": true
+    },
+    {
+      "field": "robust_core_p95_dd_range",
+      "recomputed": [
+        0.0474,
+        0.0829
+      ],
+      "sealed": [
+        0.0474,
+        0.0829
+      ],
+      "expected": [
+        0.0474,
+        0.0829
+      ],
+      "matches_expected": true,
+      "matches_sealed": true,
+      "pass": true
+    },
+    {
+      "field": "robust_core_p_dd_ge_10_range",
+      "recomputed": [
+        0.0,
+        0.0072
+      ],
+      "sealed": [
+        0.0,
+        0.0072
+      ],
+      "expected": [
+        0.0,
+        0.0072
+      ],
+      "matches_expected": true,
+      "matches_sealed": true,
+      "pass": true
+    },
+    {
+      "field": "robust_core_p_dd_ge_15_range",
+      "recomputed": [
+        0.0,
+        0.0
+      ],
+      "sealed": [
+        0.0,
+        0.0
+      ],
+      "expected": [
+        0.0,
+        0.0
+      ],
+      "matches_expected": true,
+      "matches_sealed": true,
+      "pass": true
+    },
+    {
+      "field": "survives_100_edge",
+      "recomputed": true,
+      "sealed": true,
+      "expected": true,
+      "matches_expected": true,
+      "matches_sealed": true,
+      "pass": true
+    },
+    {
+      "field": "survives_75_edge",
+      "recomputed": true,
+      "sealed": true,
+      "expected": true,
+      "matches_expected": true,
+      "matches_sealed": true,
+      "pass": true
+    },
+    {
+      "field": "survives_50_edge",
+      "recomputed": true,
+      "sealed": true,
+      "expected": true,
+      "matches_expected": true,
+      "matches_sealed": true,
+      "pass": true
+    },
+    {
+      "field": "survives_25_edge",
+      "recomputed": false,
+      "sealed": false,
+      "expected": false,
+      "matches_expected": true,
+      "matches_sealed": true,
+      "pass": true
+    }
+  ],
+  "note": "Scientific outputs recomputed from the frozen frontier inputs via the same pure functions and compared to the sealed artifacts and the frozen brief expectations. The R1 repair changes ONLY decision/governance mechanics."
+}

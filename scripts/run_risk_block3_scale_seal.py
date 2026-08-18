@@ -40,9 +40,9 @@ from capital_routing.capital_scale_seal import (
     OPERATING_HEAT, PRIMARY_SCHEMES, RECOMMENDATION_ALLOCS, PREFERRED_ALLOC,
     PREFERRED_F_PCT, PREFERRED_HEAT,
     adjacent_scale_review, adjacent_scale_seal_pass, allocation_review,
-    edge_review, edge_seal_state, heat_review, input_hash_manifest,
-    knee_band, knee_review, load_frontier, region_definition, risk_contract,
-    robust_core, robust_core_ranges,
+    build_scale_seal_decision, edge_review, edge_seal_state, heat_review,
+    input_hash_manifest, knee_band, knee_review, load_frontier,
+    region_definition, risk_contract, robust_core, robust_core_ranges,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -161,50 +161,42 @@ def main() -> None:
 
 def _decision(region: Dict, contract: Dict, edge_state: Dict,
               base_commit: str) -> Dict:
+    """Fail-closed decision assembly (R1 repair).
+
+    block3_scale_seal_pass and status are computed by
+    build_scale_seal_decision -> fail_closed_gate: the seal passes ONLY IF
+    every required gate (including frontier_nonregression_pass) passes AND
+    no prohibited authorization state is present; status is derived from the
+    pass, never hardcoded.
+    """
     r = region
-    ranges = contract
-    bands = r["scale_bands"]
-    return {
-        "checkpoint": "CR-RISK-BLOCK-III-SCALE-SEAL",
-        "status": "PASS",
-        "base_commit": base_commit,
-        "frontier_nonregression_pass": bool(
-            r["frontier_nonregression_pass"]),
-        "conservative_scale_band": bands["CONSERVATIVE"],
-        "robust_core_scale_band": bands["ROBUST_CORE"],
-        "aggressive_scale_band": bands["AGGRESSIVE"],
-        "stress_scale_band": bands["STRESS_ONLY"],
-        "allowed_allocations": r["allowed_allocations"],
-        "diagnostic_only_allocations": r["diagnostic_only_allocations"],
-        "heat_architecture_status": "H1_OPTIONAL_SAFETY_LAYER_RETAINED",
-        "preferred_research_default": r["preferred_research_default"],
-        "robust_core_median_cagr_range": ranges["median_cagr_range"],
-        "robust_core_p95_dd_range": ranges["p95_max_dd_range"],
-        "robust_core_p_dd_ge_10_range": ranges["P_dd_ge_10_range"],
-        "robust_core_p_dd_ge_15_range": ranges["P_dd_ge_15_range"],
-        "survives_100_edge": bool(edge_state["survives_100"]),
-        "survives_75_edge": bool(edge_state["survives_75"]),
-        "survives_50_edge": bool(edge_state["survives_50"]),
-        "survives_25_edge": bool(edge_state["survives_25"]),
-        "block_episode_agreement_pass": bool(
-            r["block_episode_agreement_pass"]),
-        "knee_seal_pass": bool(r["knee_seal_pass"]),
-        "adjacent_scale_seal_pass": bool(r["adjacent_scale_seal"]["pass"]),
-        "kelly_used": False,
-        "dd_adaptive_used": False,
-        "production_scale_selected": False,
-        "deployment_authorized": False,
-        "mt5_authorized": False,
-        "block3_scale_seal_pass": bool(
-            r["block_episode_agreement_pass"]
-            and r["knee_seal_pass"]
-            and r["adjacent_scale_seal"]["pass"]
-            and edge_state["survives_100"]
-            and edge_state["survives_75"]),
-        "human_review_required": True,
-        "next_checkpoint_recommended": r["next_checkpoint_recommended"],
-        "next_checkpoint_authorized": False,
-    }
+    return build_scale_seal_decision(
+        base_commit=base_commit,
+        checkpoint="CR-RISK-BLOCK-III-SCALE-SEAL",
+        frontier_nonregression_pass=r["frontier_nonregression_pass"],
+        block_episode_agreement_pass=r["block_episode_agreement_pass"],
+        knee_seal_pass=r["knee_seal_pass"],
+        adjacent_scale_seal_pass=r["adjacent_scale_seal"]["pass"],
+        survives_100_edge=edge_state["survives_100"],
+        survives_75_edge=edge_state["survives_75"],
+        survives_50_edge=edge_state["survives_50"],
+        survives_25_edge=edge_state["survives_25"],
+        kelly_used=False,
+        dd_adaptive_used=False,
+        production_scale_selected=False,
+        deployment_authorized=False,
+        mt5_authorized=False,
+        scale_bands=r["scale_bands"],
+        allowed_allocations=r["allowed_allocations"],
+        diagnostic_only_allocations=r["diagnostic_only_allocations"],
+        heat_architecture_status="H1_OPTIONAL_SAFETY_LAYER_RETAINED",
+        preferred_research_default=r["preferred_research_default"],
+        robust_core_median_cagr_range=contract["median_cagr_range"],
+        robust_core_p95_dd_range=contract["p95_max_dd_range"],
+        robust_core_p_dd_ge_10_range=contract["P_dd_ge_10_range"],
+        robust_core_p_dd_ge_15_range=contract["P_dd_ge_15_range"],
+        next_checkpoint_recommended=r["next_checkpoint_recommended"],
+    )
 
 
 def _protocol_md() -> str:
