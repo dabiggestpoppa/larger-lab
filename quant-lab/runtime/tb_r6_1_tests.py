@@ -193,6 +193,27 @@ def test_worker_paths(tmp: Path) -> None:
               w.state == "ONLINE_MARKET_CLOSED")
         check("market flag off", w.market_open is False)
 
+        # 2b) market recovery: state must NOT latch in MARKET_CLOSED.
+        # Once the feed delivers a valid snapshot again, the recompute
+        # must flip the state back to FLAT (regression: the exclusion of
+        # ONLINE_MARKET_CLOSED from the recompute left it stuck forever).
+        w.market_open = True
+        w._refresh_state()
+        check("market reopened => FLAT (no latch)",
+              w.state == "FLAT", w.state)
+        w.market_open = False
+        w._refresh_state()
+        check("market closed again => ONLINE_MARKET_CLOSED",
+              w.state == "ONLINE_MARKET_CLOSED", w.state)
+        w.open_basket_id = "B1"
+        w._refresh_state()
+        check("open basket => OPEN", w.state == "OPEN", w.state)
+        w.open_basket_id = None
+        w.state = "DEGRADED_DISK"
+        w.market_open = True
+        w._refresh_state()
+        check("DEGRADED_DISK is sticky", w.state == "DEGRADED_DISK", w.state)
+
         # 3) disk guard: critically low disk blocks execution decision
         w.disk_ok = True
         orig_disk = shutil.disk_usage

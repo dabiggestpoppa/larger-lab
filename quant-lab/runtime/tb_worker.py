@@ -446,6 +446,20 @@ class DemoWorker:
             self.last_error = f"close of {bid} not verified flat"
             self.rdb.record_error("worker", self.last_error)
 
+    # ── state refresh ──────────────────────────────────────────────────
+    def _refresh_state(self) -> None:
+        """Recompute the operational state each cycle.
+
+        The market can recover, so ONLINE_MARKET_CLOSED must NOT latch
+        forever (it used to be excluded here, leaving the state stuck
+        after a transient stale feed). DEGRADED_DISK is intentionally
+        sticky until the disk condition clears elsewhere.
+        """
+        if self.open_basket_id:
+            self.state = "OPEN"
+        elif self.state != "DEGRADED_DISK":
+            self.state = "FLAT" if self.market_open else "ONLINE_MARKET_CLOSED"
+
     # ── heartbeat / disk ────────────────────────────────────────────────
     def _check_disk(self) -> None:
         try:
@@ -507,10 +521,7 @@ class DemoWorker:
                 self._update_nav()
                 self.cycles += 1
                 self.cycle()
-                if self.open_basket_id:
-                    self.state = "OPEN"
-                elif self.state not in ("DEGRADED_DISK", "ONLINE_MARKET_CLOSED"):
-                    self.state = "FLAT" if self.market_open else "ONLINE_MARKET_CLOSED"
+                self._refresh_state()
                 self.last_error = ""
                 self.heartbeat()
                 time.sleep(HEARTBEAT_INTERVAL_S)
