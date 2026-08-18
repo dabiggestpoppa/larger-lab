@@ -1,0 +1,18 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-IV-D1.2A-PHYSICAL-PROFILE-TRUTH-INGEST-AND-SEAL",
+  "base_commit": "aaf3e0548ec9bff85b38b7f8a853a7becffce4c3",
+  "science_inputs": {
+    "d0_1_translations_sha256": "409f386c311c43e724c19553cf6dbce8119835c24d8d077839019878a5108b2e",
+    "d1_2_plan_decision_sha256": "fd6087a631cfa1d8fd6724ab59741806b73b6e6f3f4c484626ba6d9cf8bcc81c",
+    "d1_1a_decision_sha256": "199c949e32f2c11a96e843bcd35de08ca3d7afe720e6c38fd7cb8a64ee5d1223",
+    "d1_1_grid_replication_sha256": "2015b0cc63ed1bd5c9007848d3d271e38d9694f641594ff459d9200f99002c69"
+  },
+  "canonical_book_hash": "b64be26010171801104518db72df63abe01714079a5081fef18c42f990a2580a",
+  "cross_workstream_heads_frozen_at_start": {
+    "execution_runtime_foundation": "62e6d0402a780d171a8b81c2070567045e341be7",
+    "tb_forward_engine": "b48fd35255b41865026a3cba333ae2a2a0d6a004",
+    "main": "9f61288679eea56a298e08f718c314f2ca509bc5",
+    "capital_routing": "aaf3e0548ec9bff85b38b7f8a853a7becffce4c3"
+  },
+  "note": "Cross-workstream heads recorded diagnostically; their later movement is NOT a failure of this historical checkpoint."
+}

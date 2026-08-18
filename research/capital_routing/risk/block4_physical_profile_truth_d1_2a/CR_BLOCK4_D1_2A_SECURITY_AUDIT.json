@@ -1,0 +1,10 @@
+{
+  "secrets_committed": false,
+  "plaintext_passwords": 0,
+  "api_keys": 0,
+  "mt5_login_secrets": 0,
+  "session_tokens": 0,
+  "account_identifiers": "pseudonymous (SCENARIO-*)",
+  "full_account_numbers": 0,
+  "rule": "Never store plaintext passwords / API keys / MT5 login secrets / session tokens; account identifiers minimized and pseudonymized."
+}

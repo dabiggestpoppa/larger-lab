@@ -1,0 +1,23 @@
+{
+  "$id": "cr-block4.d1.2a.field-provenance",
+  "title": "FieldProvenance",
+  "description": "Every physical field carries value, truth_class, source, observed_at/effective_at, source_hash, completeness status.  Profile-level truth is derived from the weakest required field.",
+  "fields": [
+    "value",
+    "truth_class",
+    "source",
+    "observed_at",
+    "effective_at",
+    "source_hash",
+    "status"
+  ],
+  "truth_classes": [
+    "ACTUAL_OBSERVED",
+    "BROKER_DOCUMENTED",
+    "PROFILE_FROZEN",
+    "USER_SPECIFIED_SCENARIO",
+    "HYPOTHETICAL_DIAGNOSTIC",
+    "UNKNOWN"
+  ],
+  "rule": "Do not assign one truth_class to an entire profile if sources differ; provenance is per field.  Profile-level truth = weakest required field or explicit completeness function."
+}

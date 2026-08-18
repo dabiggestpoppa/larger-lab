@@ -1,0 +1,24 @@
+field,value,truth_class,source,observed_at,status
+research_symbol,USDJPY,PROFILE_FROZEN,Block III seal / D0.1 translations,2023-07-10 (sealed),resolved
+broker_symbol,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,missing
+broker_company,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,missing
+environment,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,missing
+transport,UNKNOWN,UNKNOWN,MT5 price data exists (CR-MT5-SCHEDULE) but no account proof,UNKNOWN,missing
+product_type,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,missing
+base_currency,UNKNOWN,UNKNOWN,research identity implies USD but executable unresolved,UNKNOWN,missing
+quote_currency,UNKNOWN,UNKNOWN,research identity implies JPY but executable unresolved,UNKNOWN,missing
+margin_currency,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,missing
+account_currency,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,missing
+contract_size,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,missing
+point,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,missing
+digits,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,missing
+trade_tick_size,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,missing
+trade_tick_value,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,missing
+volume_min,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,missing
+volume_step,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,missing
+volume_max,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,missing
+volume_limit,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,missing
+trade_calc_mode,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,missing
+hedging_netting,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,missing
+quantity_conversion_rule,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,missing
+volume_semantics_1_0,UNKNOWN,UNKNOWN,"whether broker 1.0 volume = 100,000 base units is NOT inferred",UNKNOWN,missing

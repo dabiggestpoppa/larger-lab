@@ -1,0 +1,37 @@
+{
+  "generation": "GEN-1",
+  "sealed_at": "aaf3e0548ec9bff85b38b7f8a853a7becffce4c3",
+  "hash_rule": "canonical field values + provenance + truth classes; any contract field change -> NEW profile generation",
+  "profiles": {
+    "PROP_25K_L50_SCENARIO": {
+      "profile_generation_id": "GEN-1",
+      "profile_hash": "154d7cba8fef2fcc6efd1bde8caae5619cdd7399a45ca34ef7f57e02d1387e79",
+      "sealed_at_base": "aaf3e0548ec9bff85b38b7f8a853a7becffce4c3",
+      "quantity_complete": false
+    },
+    "PROP_25K_L100_SCENARIO": {
+      "profile_generation_id": "GEN-1",
+      "profile_hash": "35dea8101810c8160a644fbb350281ba41d702147d1475b3ca04a1e5e2cb17d9",
+      "sealed_at_base": "aaf3e0548ec9bff85b38b7f8a853a7becffce4c3",
+      "quantity_complete": false
+    },
+    "PROP_25K_L500_SCENARIO": {
+      "profile_generation_id": "GEN-1",
+      "profile_hash": "5dbb46c93ab8d57af2bd086b115497e2eb8cfc38c0dab3a5f6ddc8ce700f3169",
+      "sealed_at_base": "aaf3e0548ec9bff85b38b7f8a853a7becffce4c3",
+      "quantity_complete": false
+    },
+    "OX_SMALL_L1000_SCENARIO": {
+      "profile_generation_id": "GEN-1",
+      "profile_hash": "b68f9f0e06f77ddd811bbce89f6fa3416d49d9c1ef90d892c1eae7aaeaf57ba2",
+      "sealed_at_base": "aaf3e0548ec9bff85b38b7f8a853a7becffce4c3",
+      "quantity_complete": false
+    },
+    "UNKNOWN_PROFILE": {
+      "profile_generation_id": "GEN-1",
+      "profile_hash": "3a997a5ce639d71c8a95a10be71ae539c7020714bca2a06020dc515fb5b75374",
+      "sealed_at_base": "aaf3e0548ec9bff85b38b7f8a853a7becffce4c3",
+      "quantity_complete": false
+    }
+  }
+}

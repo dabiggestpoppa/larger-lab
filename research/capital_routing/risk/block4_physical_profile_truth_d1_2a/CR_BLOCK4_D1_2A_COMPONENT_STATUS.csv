@@ -1,0 +1,9 @@
+component,status,verdict
+D1.2 quantity representability plan,SEALED,PASS
+D1.2A truth ingest + seal,EXECUTED,PARTIAL_PASS_WAITING_PHYSICAL_TRUTH
+D1.2A1 physical-truth collection,RECOMMENDED,NOT_STARTED
+D1.2B quantity-representability surface,BLOCKED,WAITING_QUANTITY_TRUTH
+D1.3 margin-contract feasibility,PLANNED,NOT_STARTED
+execution-runtime-foundation (cross-workstream),EXTERNAL,AUTHORITATIVE_AT_62e6d040
+tb-forward-engine (engineering reference),EXTERNAL,REFERENCE_AT_b48fd352
+broker execution,NOT_PERMITTED,FALSE

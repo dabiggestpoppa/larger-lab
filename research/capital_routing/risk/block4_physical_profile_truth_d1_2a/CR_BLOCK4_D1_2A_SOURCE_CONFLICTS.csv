@@ -1,0 +1,2 @@
+conflict_id,field,source_a,source_b,finding,blocking
+NONE,all,no actual/documented source,no actual/documented source,no conflicts; ACTUAL_OBSERVED vs BROKER_DOCUMENTED comparison is vacuous until such sources exist,no

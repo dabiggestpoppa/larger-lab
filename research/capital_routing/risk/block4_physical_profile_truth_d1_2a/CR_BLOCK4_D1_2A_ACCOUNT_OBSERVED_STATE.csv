@@ -1,0 +1,6 @@
+account_id,balance,equity,free_margin,observed_at,truth_class,note
+SCENARIO-PROP_25K_L50,UNKNOWN,25000.0,UNKNOWN,,USER_SPECIFIED_SCENARIO,"scenario assumption, NOT an observed state"
+SCENARIO-PROP_25K_L100,UNKNOWN,25000.0,UNKNOWN,,USER_SPECIFIED_SCENARIO,"scenario assumption, NOT an observed state"
+SCENARIO-PROP_25K_L500,UNKNOWN,25000.0,UNKNOWN,,USER_SPECIFIED_SCENARIO,"scenario assumption, NOT an observed state"
+SCENARIO-OX_SMALL_L1000,UNKNOWN,UNRESOLVED,UNKNOWN,,USER_SPECIFIED_SCENARIO,"scenario assumption, NOT an observed state"
+ACTUAL-UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,,UNKNOWN,no actual account observation exists in the repository

@@ -1,0 +1,8 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-IV-D1.2A-PHYSICAL-PROFILE-TRUTH-INGEST-AND-SEAL",
+  "status": "PARTIAL_PASS_WAITING_PHYSICAL_TRUTH",
+  "test_audit": "see tests/test_physical_profile_truth_d1_2a.py",
+  "tests_total": 35,
+  "tests_passed": 35,
+  "tests_failed": 0
+}
