@@ -1,0 +1,77 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-III-EXECUTION-TRANSLATION-R1.1B-CROSS-BRANCH-PROVENANCE-TEST-REPAIR",
+  "tests": [
+    {
+      "id": 1,
+      "name": "frozen execution-runtime SHA exists as commit object",
+      "covers": "A"
+    },
+    {
+      "id": 2,
+      "name": "frozen TB SHA exists as commit object",
+      "covers": "A"
+    },
+    {
+      "id": 3,
+      "name": "decision and source manifest agree on execution-runtime SHA",
+      "covers": "C"
+    },
+    {
+      "id": 4,
+      "name": "decision and source manifest agree on TB SHA",
+      "covers": "C"
+    },
+    {
+      "id": 5,
+      "name": "expected execution-runtime checkpoint identity matches frozen SHA",
+      "covers": "B"
+    },
+    {
+      "id": 6,
+      "name": "expected TB checkpoint identity matches frozen SHA",
+      "covers": "B"
+    },
+    {
+      "id": 7,
+      "name": "R1.1 capital-routing commit does not mutate foreign branch refs",
+      "covers": "D"
+    },
+    {
+      "id": 8,
+      "name": "later branch advancement simulated \u2014 does NOT fail provenance",
+      "covers": "E / semantics"
+    },
+    {
+      "id": 9,
+      "name": "no test performs git fetch",
+      "covers": "hard rule"
+    },
+    {
+      "id": 10,
+      "name": "no test requires network",
+      "covers": "hard rule"
+    },
+    {
+      "id": 11,
+      "name": "scientific nonregression still passes",
+      "covers": "NONREGRESSION"
+    },
+    {
+      "id": 12,
+      "name": "890/826/64 unchanged",
+      "covers": "NONREGRESSION"
+    },
+    {
+      "id": 13,
+      "name": "canonical accepted notional statistics unchanged",
+      "covers": "NONREGRESSION"
+    },
+    {
+      "id": 14,
+      "name": "no broker call",
+      "covers": "MISSION"
+    }
+  ],
+  "offline": true,
+  "network_dependent": false
+}

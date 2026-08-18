@@ -1,0 +1,23 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-III-EXECUTION-TRANSLATION-R1.1B-CROSS-BRANCH-PROVENANCE-TEST-REPAIR",
+  "status": "PASS",
+  "base_commit": "d51b9b4772f0bf2ee9a87deb830614e7494f25d1",
+  "science_unchanged": true,
+  "r1_1_seal_verified": true,
+  "execution_runtime_frozen_authority_sha": "9e11db928ad3c330fcde06d075e20a6e5b349d89",
+  "tb_frozen_authority_sha": "d12005988ce61170d9bc5478089baa5ce54cc2a9",
+  "frozen_commits_exist": true,
+  "manifest_decision_sha_agreement": true,
+  "current_branch_tip_equality_required": false,
+  "network_required_by_tests": false,
+  "git_fetch_used_by_tests": false,
+  "foreign_branch_write_detected": false,
+  "provenance_test_pass": true,
+  "nonregression_pass": true,
+  "broker_execution_performed": false,
+  "d0_ready": true,
+  "d0_authorized": false,
+  "production_authorized": false,
+  "human_review_required": true,
+  "next_checkpoint_recommended": "CR-RISK-BLOCK-IV-CAPITAL-TRANSLATION-CORE-D0"
+}

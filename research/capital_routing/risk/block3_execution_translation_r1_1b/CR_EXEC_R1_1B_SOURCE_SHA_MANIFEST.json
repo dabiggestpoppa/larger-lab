@@ -1,0 +1,25 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-III-EXECUTION-TRANSLATION-R1.1B-CROSS-BRANCH-PROVENANCE-TEST-REPAIR",
+  "base_commit": "d51b9b4772f0bf2ee9a87deb830614e7494f25d1",
+  "scientific_seal": "2bbe52ea8798549ed9c03bd90684fd3a0d408a99",
+  "cross_workstream_authority": {
+    "execution_runtime_foundation": {
+      "head_sha": "9e11db928ad3c330fcde06d075e20a6e5b349d89",
+      "checkpoint": "QL-EXEC-R1-GENERIC-CONTRACTS-AND-ACCOUNT-REGISTRY"
+    },
+    "tb_forward_engine": {
+      "head_sha": "d12005988ce61170d9bc5478089baa5ce54cc2a9",
+      "checkpoint": "TB-R6.1B-FIX-WORKER-STATE-LATCH"
+    }
+  },
+  "r1_1_commits": [
+    "2bbe52ea8798549ed9c03bd90684fd3a0d408a99",
+    "d51b9b4772f0bf2ee9a87deb830614e7494f25d1"
+  ],
+  "frozen_semantics": "IMMUTABLE_COMMIT_SHA \u2014 branch tips are mutable and never frozen; frozen SHAs are never replaced",
+  "event_level_source": "research\\capital_routing\\risk\\block3_execution_translation_planning_r1\\CR_EXEC_R1_EVENT_NOTIONAL_MULTIPLIERS.csv",
+  "event_level_source_sha256": "b45876c6e5e06b114d2129315f67d9f72710bed456664a804ad4dd0ecb1be1ff",
+  "r1_1_decision_sha256": "65ef1598e84dabf22a857d544257d829c0db8c74257be9060c01a0525282d798",
+  "r1_1_manifest_sha256": "363549eb5371dafd51d7eb6b039170d9177c41168a82ec82ae83ccc8e9b4e142",
+  "note": "All inputs consumed read-only; no science regeneration; no network; no git fetch."
+}
