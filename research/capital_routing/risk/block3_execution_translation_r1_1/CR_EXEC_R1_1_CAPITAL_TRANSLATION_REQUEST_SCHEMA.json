@@ -1,0 +1,56 @@
+{
+  "contract": "CAPITAL_TRANSLATION_REQUEST",
+  "version": "R1.1",
+  "produced_by": "Capital Routing (sealed)",
+  "consumed_by": "execution-runtime-foundation (future generic runtime)",
+  "input_components": {
+    "A_StrategyEventReference": {
+      "event_id": "string (deterministic unique id)",
+      "strategy_id": "string",
+      "family": "enum A|B (classified UPSTREAM; translator never classifies)",
+      "direction": "enum LONG|SHORT",
+      "instrument_research_identity": "string (USDJPY / FX_PAIR)",
+      "entry_known_timestamp": "datetime (causal signal/knowledge time)",
+      "pos_t": "number (TARGET_VOL / rv_t; frozen science)",
+      "risk_unit_bps": 24.49489742783178,
+      "translation_science_version": "string"
+    },
+    "B_CapitalDecisionReference": {
+      "decision_id": "string",
+      "policy_id": "string",
+      "requested_f_pct": "number",
+      "admitted_f_pct": "number",
+      "status": "enum ACCEPT_FULL|REJECT_HEAT_CAP",
+      "model_heat_before": "number (f-units; upstream audit truth)",
+      "model_heat_after": "number (f-units; upstream audit truth, NOT translator output)",
+      "decision_timestamp": "datetime",
+      "configuration_hash": "string"
+    },
+    "C_AccountBindingReference": {
+      "account_id": "string (from Account Control Plane)",
+      "portfolio_group_id": "string (ONE shared A+B portfolio master)",
+      "account_role": "enum EXCLUSIVE_STRATEGY_MASTER|PORTFOLIO_MASTER|FOLLOWER",
+      "note": "no equity here; equity comes only from BoundAccountSnapshot"
+    },
+    "D_BoundAccountSnapshot": {
+      "account_id": "string",
+      "account_currency": "string (e.g. USD; unresolved until binding)",
+      "equity_at_admission": "number (current equity at causal admission)",
+      "observed_at": "datetime",
+      "staleness_status": "enum FRESH|STALE|UNKNOWN",
+      "profile_config_hash": "string"
+    }
+  },
+  "no_broker_fields_in_pure_output": true,
+  "broker_owned_fields": [
+    "broker lot",
+    "broker contract quantity",
+    "margin",
+    "buying power",
+    "order type",
+    "fill mode",
+    "slippage",
+    "broker symbol mapping"
+  ],
+  "broker_owned_fields_owner": "later explicit broker/instrument translation layer within execution-runtime-foundation"
+}

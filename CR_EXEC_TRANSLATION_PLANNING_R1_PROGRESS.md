@@ -33,9 +33,12 @@ range 1.35–221.9 bps (the old "always 24.4949 bps" statement is removed).
 ## Parity (all 890 events)
 - GROSS: PASS (826 accepted at machine precision) · NET (research cost): PASS ·
   H1: 826 ACCEPT_FULL (A 371 / B 455), 64 REJECT → **zero exposure** (verified).
-- Corrected notional/equity (accepted): median 2.29×, p95 8.77×, p99 12.9×,
-  max 32.77× (A) / 22.28× (B). **NO clipping** (new science); extreme states
-  flagged for a future feasibility study.
+- Corrected notional/equity (accepted, from event-level CSV): pooled median
+  1.9842×, p95 7.6105×, p99 16.0364×, max 32.7663×; A median 3.3513× / p95
+  11.4407× / max 32.7663×; B median 1.2850× / p95 4.1231× / max 22.2754×.
+  **NO clipping** (new science); extreme states flagged for a future feasibility
+  study. (R1.1 truth-sync: earlier prose 2.29/8.77/12.9 was stale — canonical
+  stats in CR_EXEC_R1_ACCEPTED_NOTIONAL_SUMMARY.csv.)
 
 ## Account Control Plane boundary (frozen)
 Capital Routing owns ONLY: A/B allocation, H1, f semantics, event pos/1R truth,

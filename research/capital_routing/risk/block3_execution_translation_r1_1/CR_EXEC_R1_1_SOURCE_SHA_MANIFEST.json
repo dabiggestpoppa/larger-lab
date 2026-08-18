@@ -1,0 +1,14 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-III-EXECUTION-TRANSLATION-R1.1-TRUTH-SYNC-AND-HANDOFF-SEAL",
+  "base_commit": "00bef1b5b52db63c22a29b3287799742631930db",
+  "event_level_source": "research\\capital_routing\\risk\\block3_execution_translation_planning_r1\\CR_EXEC_R1_EVENT_NOTIONAL_MULTIPLIERS.csv",
+  "event_level_source_sha256": "b45876c6e5e06b114d2129315f67d9f72710bed456664a804ad4dd0ecb1be1ff",
+  "r1_decision_sha256": "83c9b9a6f5bdafdc4778f5af185f3752d4bfb737ad6963b633f5f400cd3fa506",
+  "r1_report_sha256": "097e0c9e763438a2a2c6edf48aa027b32dcd67f4f912968b9bc53018fa1785ab",
+  "r1_progress_sha256": "a0ce36d7967da048cbc97d0fe4a937f08b6d852cf774e6d2855e48eb3916f501",
+  "science_inputs": {
+    "P7_5_TRADES.csv": "ad19e08f16aeb65c17305041182c591401d28c32b418287f45d76a678ddfcd07",
+    "R1_EVENT_RISK_LEDGER.csv": "6c98b0d218c66f3f5893733f26c51490138e658046487e3ea108c5feeee2d26f"
+  },
+  "note": "All inputs consumed read-only; no science regeneration."
+}

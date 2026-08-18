@@ -1,0 +1,75 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-III-EXECUTION-TRANSLATION-R1.1-TRUTH-SYNC-AND-HANDOFF-SEAL",
+  "tests": [
+    {
+      "id": 1,
+      "name": "pooled accepted summary from event-level rows",
+      "covers": "ISSUE 1"
+    },
+    {
+      "id": 2,
+      "name": "A accepted summary from event-level rows",
+      "covers": "ISSUE 2"
+    },
+    {
+      "id": 3,
+      "name": "B accepted summary from event-level rows",
+      "covers": "ISSUE 2"
+    },
+    {
+      "id": 4,
+      "name": "no prose/report summary disagrees with canonical stats",
+      "covers": "ISSUE 1"
+    },
+    {
+      "id": 5,
+      "name": "CapitalTranslationRequest includes immutable CapitalDecision reference",
+      "covers": "ISSUE 5"
+    },
+    {
+      "id": 6,
+      "name": "translation core does NOT compute H1",
+      "covers": "ISSUE 5"
+    },
+    {
+      "id": 7,
+      "name": "translation core does NOT classify family",
+      "covers": "ISSUE 5"
+    },
+    {
+      "id": 8,
+      "name": "rejected event maps to zero exposure",
+      "covers": "R1.1"
+    },
+    {
+      "id": 9,
+      "name": "model_heat_after is INPUT audit truth, not translator calc",
+      "covers": "ISSUE 5"
+    },
+    {
+      "id": 10,
+      "name": "execution-runtime-foundation HEAD recorded accurately",
+      "covers": "ISSUE 3"
+    },
+    {
+      "id": 11,
+      "name": "TB engineering HEAD recorded accurately",
+      "covers": "ISSUE 4"
+    },
+    {
+      "id": 12,
+      "name": "no cross-branch write",
+      "covers": "MISSION"
+    },
+    {
+      "id": 13,
+      "name": "no broker call",
+      "covers": "MISSION"
+    },
+    {
+      "id": 14,
+      "name": "no science changes",
+      "covers": "NONREGRESSION"
+    }
+  ]
+}

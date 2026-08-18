@@ -1,0 +1,37 @@
+{
+  "science_unchanged": true,
+  "n_events": 890,
+  "n_A": 432,
+  "n_B": 458,
+  "n_accepted": 826,
+  "n_rejected": 64,
+  "accepted_A": 371,
+  "accepted_B": 455,
+  "risk_unit_bps": 24.49489742783178,
+  "risk_unit_is_hard_stop": false,
+  "position_scaling_formula": "N = E * admitted_f_decimal * pos_t * 10000 / R",
+  "old_fixed_notional_formula_rejected": true,
+  "pos_percentiles_total": {
+    "p0": 0.110383,
+    "p1": 0.208103,
+    "p5": 0.355539,
+    "p25": 0.708625,
+    "p50": 1.10902,
+    "p75": 1.710361,
+    "p95": 3.6247,
+    "p99": 5.73355,
+    "p100": 18.187813
+  },
+  "gross_parity_pass": true,
+  "gross_parity_max_err": 6.938893903907228e-18,
+  "research_net_parity_pass": true,
+  "research_net_parity_max_err": 6.938893903907228e-18,
+  "execution_net_parity_status": "BROKER_DEPENDENT_UNRESOLVED",
+  "h1_parity_pass": true,
+  "historical_worst_observed_account_impact_A_pct": -2.5588,
+  "historical_worst_observed_account_impact_B_pct": -0.9939,
+  "source_hashes": {
+    "P7_5_TRADES.csv": "ad19e08f16aeb65c17305041182c591401d28c32b418287f45d76a678ddfcd07",
+    "R1_EVENT_RISK_LEDGER.csv": "6c98b0d218c66f3f5893733f26c51490138e658046487e3ea108c5feeee2d26f"
+  }
+}

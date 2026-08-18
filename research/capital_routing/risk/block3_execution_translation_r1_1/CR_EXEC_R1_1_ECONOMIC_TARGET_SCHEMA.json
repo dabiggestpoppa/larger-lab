@@ -1,0 +1,88 @@
+{
+  "contract": "ECONOMIC_EXPOSURE_TARGET",
+  "version": "R1.1",
+  "produced_by": "Capital Translation Core (pure)",
+  "fields": [
+    {
+      "name": "event_id",
+      "type": "string"
+    },
+    {
+      "name": "account_id",
+      "type": "string"
+    },
+    {
+      "name": "strategy_id",
+      "type": "string"
+    },
+    {
+      "name": "family",
+      "type": "enum A|B (input passthrough)"
+    },
+    {
+      "name": "direction",
+      "type": "enum LONG|SHORT"
+    },
+    {
+      "name": "research_instrument",
+      "type": "string (USDJPY / FX_PAIR)"
+    },
+    {
+      "name": "admitted_f_pct",
+      "type": "number (input passthrough)"
+    },
+    {
+      "name": "pos_t",
+      "type": "number (input passthrough)"
+    },
+    {
+      "name": "risk_unit_bps",
+      "type": "number (24.49489742783178)"
+    },
+    {
+      "name": "equity_reference",
+      "type": "number (account ccy; snapshot at admission)"
+    },
+    {
+      "name": "account_currency",
+      "type": "string"
+    },
+    {
+      "name": "one_R_budget_account_ccy",
+      "type": "number",
+      "formula": "equity_reference x admitted_f_pct / 100"
+    },
+    {
+      "name": "target_notional_account_ccy",
+      "type": "number",
+      "formula": "equity_reference x admitted_f_pct/100 x pos_t x 1e4 / risk_unit_bps"
+    },
+    {
+      "name": "one_R_price_move_bps",
+      "type": "number",
+      "formula": "risk_unit_bps / pos_t (event-specific)"
+    },
+    {
+      "name": "capital_policy_id",
+      "type": "string (input passthrough)"
+    },
+    {
+      "name": "translation_version",
+      "type": "string (R1.1)"
+    },
+    {
+      "name": "known_time",
+      "type": "datetime (all inputs causal)"
+    },
+    {
+      "name": "status",
+      "type": "enum ECONOMIC_TARGET|NO_EXPOSURE",
+      "note": "NO_EXPOSURE iff CapitalDecision status != ACCEPT_FULL"
+    }
+  ],
+  "rejected_event": {
+    "status": "NO_EXPOSURE",
+    "target_notional_account_ccy": 0.0
+  },
+  "note": "Pure economic output; no broker quantity, margin, order type, or fill semantics (those live in execution-runtime-foundation)."
+}

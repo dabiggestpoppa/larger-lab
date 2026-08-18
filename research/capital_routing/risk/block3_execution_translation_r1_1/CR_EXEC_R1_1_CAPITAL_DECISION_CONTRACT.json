@@ -1,0 +1,66 @@
+{
+  "contract": "CAPITAL_DECISION_REFERENCE",
+  "owner": "Capital Router / CapitalPolicy authority (upstream)",
+  "consumer": "Capital Translation Core (read-only consumption)",
+  "immutable_fields": [
+    {
+      "name": "decision_id",
+      "type": "string",
+      "note": "unique admission decision"
+    },
+    {
+      "name": "policy_id",
+      "type": "string",
+      "note": "frozen policy, e.g. A1_70_30 + H1-1.00-REJ"
+    },
+    {
+      "name": "requested_f_pct",
+      "type": "number",
+      "note": "A: 0.70, B: 0.30 (frozen family weights)"
+    },
+    {
+      "name": "admitted_f_pct",
+      "type": "number",
+      "note": "0 for REJECT_HEAT_CAP; 0.70/0.30 for ACCEPT_FULL"
+    },
+    {
+      "name": "status",
+      "type": "enum",
+      "values": [
+        "ACCEPT_FULL",
+        "REJECT_HEAT_CAP"
+      ]
+    },
+    {
+      "name": "model_heat_before",
+      "type": "number",
+      "unit": "f-units",
+      "note": "gross model heat before this event (H1 ledger, upstream)"
+    },
+    {
+      "name": "model_heat_after",
+      "type": "number",
+      "unit": "f-units",
+      "note": "gross model heat after admission \u2014 INPUT audit truth, computed by CapitalPolicy, NOT by the translator"
+    },
+    {
+      "name": "decision_timestamp",
+      "type": "datetime",
+      "note": "causal admission time"
+    },
+    {
+      "name": "configuration_hash",
+      "type": "string",
+      "note": "frozen capital-policy + heat-config hash"
+    }
+  ],
+  "translation_recomputes_h1": false,
+  "translation_recomputes_family": false,
+  "translation_recomputes_model_heat": false,
+  "rejected_event_behavior": {
+    "status": "REJECT_HEAT_CAP",
+    "translation_result": "NO_EXPOSURE",
+    "target_notional_account_ccy": 0.0,
+    "note": "translation returns zero exposure WITHOUT independently reconsidering H1"
+  }
+}

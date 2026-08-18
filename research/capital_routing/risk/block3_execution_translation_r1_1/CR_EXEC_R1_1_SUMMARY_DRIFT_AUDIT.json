@@ -1,0 +1,86 @@
+{
+  "canonical_source": "research\\capital_routing\\risk\\block3_execution_translation_planning_r1\\CR_EXEC_R1_EVENT_NOTIONAL_MULTIPLIERS.csv",
+  "filter": "status == ACCEPT_FULL",
+  "canonical_stats": {
+    "POOLED_ACCEPTED": {
+      "n": 826.0,
+      "min": 0.1352,
+      "p0": 0.1352,
+      "p1": 0.2693,
+      "p5": 0.5145,
+      "p25": 1.1023,
+      "p50": 1.9842,
+      "p75": 3.5134,
+      "p95": 7.6105,
+      "p99": 16.0364,
+      "p100": 32.7663,
+      "max": 32.7663
+    },
+    "A_ACCEPTED": {
+      "n": 371.0,
+      "min": 0.4713,
+      "p0": 0.4713,
+      "p1": 0.6202,
+      "p5": 1.0231,
+      "p25": 2.1407,
+      "p50": 3.3513,
+      "p75": 5.3053,
+      "p95": 11.4407,
+      "p99": 17.2065,
+      "p100": 32.7663,
+      "max": 32.7663
+    },
+    "B_ACCEPTED": {
+      "n": 455.0,
+      "min": 0.1352,
+      "p0": 0.1352,
+      "p1": 0.25,
+      "p5": 0.4313,
+      "p25": 0.7952,
+      "p50": 1.285,
+      "p75": 2.0116,
+      "p95": 4.1231,
+      "p99": 6.7105,
+      "p100": 22.2754,
+      "max": 22.2754
+    }
+  },
+  "r1_decision_audit_facts": {
+    "matches_canonical": true,
+    "reported": {
+      "median": 1.9842,
+      "p95": 7.61,
+      "p99": 16.036,
+      "max": 32.766
+    }
+  },
+  "r1_report_prose": {
+    "stale_tokens_found": [],
+    "has_canonical_stats": true
+  },
+  "r1_progress_file": {
+    "stale_tokens_found_before_repair": [
+      "median 2.29x",
+      "p95 8.77x",
+      "p99 12.9x"
+    ],
+    "stale_tokens_found_now": [],
+    "has_canonical_stats_now": true,
+    "repaired": true
+  },
+  "engine_recomputed_crosscheck": {
+    "matches_canonical": true,
+    "engine_pooled": {
+      "p0": 0.1352,
+      "p1": 0.2693,
+      "p5": 0.5145,
+      "p25": 1.1023,
+      "p50": 1.9842,
+      "p75": 3.5134,
+      "p95": 7.6105,
+      "p99": 16.0364,
+      "p100": 32.7663
+    }
+  },
+  "summary_drift_repaired": true
+}
