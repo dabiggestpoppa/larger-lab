@@ -1,0 +1,115 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-III-SCALE-SEAL",
+  "base_commit": "a58f84833b920175f88a5e5c6c127a12bd5cdafe",
+  "scale_bands": {
+    "CONSERVATIVE": [
+      0.25,
+      0.5
+    ],
+    "ROBUST_CORE": [
+      0.75,
+      1.0
+    ],
+    "AGGRESSIVE": [
+      1.5,
+      2.0
+    ],
+    "STRESS_ONLY": [
+      3.0,
+      3.0
+    ]
+  },
+  "knee_band": [
+    1.0,
+    1.5
+  ],
+  "knee_stats": {
+    "n_cells": 120,
+    "n_found": 53,
+    "distinct_intervals": {
+      "[1.00, 1.50]": 53
+    },
+    "modal_interval": "[1.00, 1.50]"
+  },
+  "adjacent_scale_seal": {
+    "pass": true,
+    "core_accelerating_cells": 0,
+    "boundary_accelerating_cells": 3,
+    "boundary_scheme_agreement": true,
+    "boundary_agree_count": 4,
+    "boundary_agree_total": 4,
+    "note": "tail risk must NOT accelerate inside 0.75->1.00 and MUST accelerate at 1.00->1.50 under the operating heat; block and episode must each independently show the boundary jump relative to the inside-core max"
+  },
+  "allowed_allocations": [
+    "A0_50_50",
+    "A1_70_30"
+  ],
+  "diagnostic_only_allocations": [
+    "A2_100_0_A",
+    "A3_0_100_B"
+  ],
+  "alloc_verdicts": {
+    "A0_50_50": {
+      "tail_efficiency": 8.844721895026366,
+      "P_dd_ge_10_at_f1": 0.0072,
+      "survives_75": true
+    },
+    "A1_70_30": {
+      "tail_efficiency": 9.996298602040033,
+      "P_dd_ge_10_at_f1": 0.00245,
+      "survives_75": true
+    },
+    "A2_100_0_A": {
+      "tail_efficiency": 7.306246966226066,
+      "P_dd_ge_10_at_f1": 0.0463,
+      "survives_75": true
+    }
+  },
+  "heat_verdicts": {
+    "H1-1.00-REJ": "RETAIN_OPERATING_REFERENCE",
+    "H1-1.50-REJ": "NOT_RETAINED_NO_PROTECTION",
+    "H1-2.00-REJ": "NOT_RETAINED_NO_PROTECTION",
+    "H1-3.00-REJ": "NOT_RETAINED_NEVER_BINDS"
+  },
+  "operating_heat_reference": "H1-1.00-REJ",
+  "h0_sufficient": true,
+  "edge_retention": {
+    "survives_100": true,
+    "survives_75": true,
+    "survives_50": true,
+    "survives_25": false,
+    "n_cells": 4
+  },
+  "robust_core_ranges": {
+    "median_cagr_min": 0.4813709820060411,
+    "median_cagr_max": 0.7037586084704798,
+    "p95_dd_min": 0.0473755943386768,
+    "p95_dd_max": 0.0829439278421146,
+    "P_dd_ge_10_min": 0.0,
+    "P_dd_ge_10_max": 0.0072,
+    "P_dd_ge_15_min": 0.0,
+    "P_dd_ge_15_max": 0.0,
+    "P_technical_ruin_max": 0.0,
+    "dependency_sensitive_cells": 0,
+    "n_cells": 4
+  },
+  "preferred_research_default": {
+    "allocation": "A1_70_30",
+    "heat_architecture": "H1-1.00-REJ",
+    "f_total_pct": 1.0,
+    "role": "PREFERRED_RESEARCH_DEFAULT for demo/execution translation research ONLY -- not production sizing, not live authorization",
+    "justification": "best tail-efficiency allocation (A1_70_30) at the top of the robust core (0.75-1.00), at the knee start [1.0, 1.5], under the operating heat H1-1.00-REJ"
+  },
+  "knee_seal_pass": true,
+  "block_episode_agreement_pass": true,
+  "survives_25_edge": false,
+  "kelly_used": false,
+  "dd_adaptive_used": false,
+  "production_scale_selected": false,
+  "deployment_authorized": false,
+  "mt5_authorized": false,
+  "frontier_nonregression_pass": true,
+  "human_review_required": true,
+  "next_checkpoint_recommended": "CR-RISK-BLOCK-III-EXECUTION-TRANSLATION-PLANNING",
+  "next_checkpoint_authorized": false
+}

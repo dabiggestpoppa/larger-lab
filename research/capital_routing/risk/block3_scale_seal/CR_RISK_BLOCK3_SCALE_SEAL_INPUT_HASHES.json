@@ -1,0 +1,18 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-III-SCALE-SEAL",
+  "base_commit": "a58f84833b920175f88a5e5c6c127a12bd5cdafe",
+  "frontier_dir": "research\\capital_routing\\risk\\block3_frontier",
+  "files": {
+    "CR_RISK_BLOCK3_MC_SURFACE.csv": "7bfaf986251acc215bbf55cf325e52e566fc97182a4bc39fcd2fce850e16d89e",
+    "CR_RISK_BLOCK3_HISTORICAL_SURFACE.csv": "725b492d4fc7a403309b794e7d7ce6127ba4ac842b10037cd93d761c466d4466",
+    "CR_RISK_BLOCK3_EDGE_SURVIVAL.csv": "00f86de31fc8b2a4c04f6e7ddd5f0f95d86e9dab8065fabf51d3770e5c76cd45",
+    "CR_RISK_BLOCK3_KNEE_ANALYSIS.csv": "375a5275744b8538196d59163c3ab4c8ed678d10ffc823d5f73644996c28dd1d",
+    "CR_RISK_BLOCK3_PAIRED_H1_VS_H0.csv": "693ccefeba504c6a8a343ab8fb108dc42ccb56e3e5b7587ee019b6094db7548c",
+    "CR_RISK_BLOCK3_DEPENDENCY_SENSITIVITY.csv": "c1916577f93a9ffd7165aeb422bc080b783eb79f26a6a6c32e4ceb099ebe283a",
+    "CR_RISK_BLOCK3_REGION_CLASSIFICATION.csv": "2eb4a42e8121b0374eedfd220e567c6c628a2751b0ac2d0d966eb2bc11edacd2",
+    "CR_RISK_BLOCK3_DECISION.json": "b54c0f8c770ec029c8dd4769f7fd7a33be702f6b1e4500029afd27a44ad011aa",
+    "CR_RISK_BLOCK3_REFERENCE_NONREGRESSION.json": "2f568d3771e698e1e0d4664cbed2056202dc29350919a8284353e8ce755c506d",
+    "CR_RISK_BLOCK3_R6_MC_REGRESSION.json": "d028c6ce921b38b70c46b36f0c74c593e2f7fe0b9222b63a165cbb22a1b00e1b"
+  },
+  "note": "All seal review tables are pure functions of these frozen inputs; no new MC / optimization is run by this checkpoint."
+}

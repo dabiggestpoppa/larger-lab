@@ -1,0 +1,48 @@
+{
+  "scope": "Sealed ROBUST CORE: allocations ['A0_50_50', 'A1_70_30'], scale band [0.75, 1.0], operating heat H1-1.00-REJ, 100% retained edge (75%/50% behavior reported separately)",
+  "median_cagr_range": [
+    0.4814,
+    0.7038
+  ],
+  "p95_max_dd_range": [
+    0.0474,
+    0.0829
+  ],
+  "P_dd_ge_10_range": [
+    0.0,
+    0.0072
+  ],
+  "P_dd_ge_15_range": [
+    0.0,
+    0.0
+  ],
+  "P_technical_ruin_max": 0.0,
+  "dependency_sensitive_cells_in_band": 0,
+  "edge_100_behavior": {
+    "survives": true,
+    "note": "median CAGR and p95 DD ranges above (both primary schemes agree directionally)"
+  },
+  "edge_75_behavior": {
+    "survives": true
+  },
+  "edge_50_behavior": {
+    "survives": true
+  },
+  "edge_25_behavior": {
+    "survives": false,
+    "note": "25% retained edge is the recorded ALPHA-LOSS BOUNDARY; risk controls are not expected to rescue destroyed expectancy"
+  },
+  "units": {
+    "cagr": "decimal (e.g. 0.70 = 70% annualized)",
+    "max_dd": "decimal fraction of equity (e.g. 0.08 = 8%)",
+    "P_dd_ge_10": "probability (0..1) that max DD >= 10%",
+    "scale_f_total_pct": "percent of equity risked per unit event (0.75 = 0.75%)"
+  },
+  "authorizations": {
+    "production_scale_selected": false,
+    "deployment_authorized": false,
+    "mt5_authorized": false,
+    "kelly_used": false,
+    "dd_adaptive_used": false
+  }
+}
