@@ -155,7 +155,7 @@ def test_long_translation():
 
 
 def test_short_translation():
-    t = translate(_event("B", "SHORT", 2.0), _decision("ACCEPT_FULL", 0.30),
+    t = translate(_event("B", "SHORT", 2.0), _decision("ACCEPT_FULL", 0.30, "B"),
                   _binding(), _snapshot())
     assert t.status == "ECONOMIC_TARGET"
     assert t.direction == "SHORT" and t.family == "B"
@@ -165,9 +165,9 @@ def test_short_translation():
 
 def test_requested_f_A_070_B_030():
     assert FAMILY_W["A"] == 0.70 and FAMILY_W["B"] == 0.30
-    ta = translate(_event("A", "LONG", 1.0), _decision("ACCEPT_FULL", 0.70),
+    ta = translate(_event("A", "LONG", 1.0), _decision("ACCEPT_FULL", 0.70, "A"),
                    _binding(), _snapshot())
-    tb = translate(_event("B", "SHORT", 1.0), _decision("ACCEPT_FULL", 0.30),
+    tb = translate(_event("B", "SHORT", 1.0), _decision("ACCEPT_FULL", 0.30, "B"),
                    _binding(), _snapshot())
     assert abs(ta.one_R_budget_account_ccy / tb.one_R_budget_account_ccy
                - 0.70 / 0.30) < 1e-9
@@ -251,6 +251,10 @@ def test_no_active_position_dynamic_resizing():
     # D0 is stateless: the snapshot is the ONLY equity source. Translating the
     # same event with a different snapshot uses the supplied equity; the
     # admission decision and admitted_f never change (no revaluation).
+    #
+    # D0.1: different frozen equity snapshots are DIFFERENT economic targets,
+    # so the account/snapshot-bound translation_id differs; the admission
+    # facts (admitted_f, status) and the pure scaling relationship do not.
     t1 = translate(_event("A", "LONG", 1.5), _decision("ACCEPT_FULL", 0.70),
                    _binding(), _snapshot(equity=10000.0))
     t2 = translate(_event("A", "LONG", 1.5), _decision("ACCEPT_FULL", 0.70),
@@ -258,7 +262,8 @@ def test_no_active_position_dynamic_resizing():
     assert t1.admitted_f_pct == t2.admitted_f_pct == 0.70
     assert t1.status == t2.status == "ECONOMIC_TARGET"
     assert abs(t2.target_notional_account_ccy / t1.target_notional_account_ccy - 5.0) < 1e-9
-    assert t1.translation_id == t2.translation_id  # same event/decision idempotency
+    assert t1.translation_id != t2.translation_id  # snapshot-bound identity
+    assert t1.account_snapshot_id != t2.account_snapshot_id
 
 
 # --- fail-closed validation ----------------------------------------------------
@@ -430,6 +435,9 @@ def test_no_science_changes():
     assert d["implementation_authorized"] is False
     assert d["production_authorized"] is False
     assert d["human_review_required"] is True
-    assert d["translation_version"] == TRANSLATION_VERSION
+    # D0 is a historical sealed checkpoint: its decision artifact records its
+    # own translation version (D0-1). The module version later advanced to
+    # D0.1-1 in the D0.1 repair — the artifact is not regenerated.
+    assert d["translation_version"] == "D0-1"
     assert d["next_checkpoint_recommended"] == (
         "CR-RISK-BLOCK-IV-CAPITAL-TRANSLATION-CORE-D1")

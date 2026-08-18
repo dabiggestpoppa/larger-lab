@@ -1,0 +1,208 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-IV-CAPITAL-TRANSLATION-CORE-D0.1-CONTRACT-AND-IDEMPOTENCY-TRUTH-REPAIR",
+  "n_required": 33,
+  "n_implemented": 33,
+  "offline": true,
+  "network_dependent": false,
+  "adversarial_facts_pass": true,
+  "tests": [
+    {
+      "id": 1,
+      "requirement": "risk_unit definition unchanged",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 2,
+      "requirement": "helper uses provided risk_unit_bps",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 3,
+      "requirement": "different helper R changes notional",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 4,
+      "requirement": "translate rejects non-frozen R",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 5,
+      "requirement": "NaN risk unit rejected",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 6,
+      "requirement": "inf risk unit rejected",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 7,
+      "requirement": "NaN pos rejected",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 8,
+      "requirement": "inf pos rejected",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 9,
+      "requirement": "NaN equity rejected",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 10,
+      "requirement": "inf equity rejected",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 11,
+      "requirement": "NaN admitted f rejected",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 12,
+      "requirement": "inf admitted f rejected",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 13,
+      "requirement": "rejected + admitted_f > 0 rejected",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 14,
+      "requirement": "accepted + admitted_f = 0 rejected",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 15,
+      "requirement": "A requested f != 0.70 rejected",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 16,
+      "requirement": "A admitted f != 0.70 rejected",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 17,
+      "requirement": "B requested f != 0.30 rejected",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 18,
+      "requirement": "B admitted f != 0.30 rejected",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 19,
+      "requirement": "EXCLUSIVE_STRATEGY_MASTER rejected for canonical A/B",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 20,
+      "requirement": "FOLLOWER rejected",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 21,
+      "requirement": "PORTFOLIO_MASTER accepted",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 22,
+      "requirement": "empty portfolio_group_id rejected",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 23,
+      "requirement": "same event/decision different account ID -> different translation ID",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 24,
+      "requirement": "different account profile hash -> different translation ID",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 25,
+      "requirement": "different equity snapshot -> different translation ID",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 26,
+      "requirement": "delimiter-collision fixture cannot collide",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 27,
+      "requirement": "same complete input -> same translation ID",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 28,
+      "requirement": "later snapshot changes known_time (causal rule)",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 29,
+      "requirement": "malformed timestamp fails closed",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 30,
+      "requirement": "890-event parity unchanged",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 31,
+      "requirement": "no broker fields introduced",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 32,
+      "requirement": "no H1 recomputation",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    },
+    {
+      "id": 33,
+      "requirement": "no family classification",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0_1.py"
+    }
+  ]
+}

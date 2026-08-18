@@ -1,0 +1,7 @@
+component,kind,status,note
+capital_translation_core.py,core,REPAIRED,risk-unit arg used; account/snapshot-bound id; PORTFOLIO_MASTER gate; decision consistency; NaN/inf fail-closed; causal known_time
+tests/test_capital_translation_core_d0.py,tests,GREEN,D0 suite updated for snapshot-bound id semantics (32 pass)
+tests/test_capital_translation_core_d0_1.py,tests,GREEN,D0.1 adversarial suite (32 required checks + parity)
+scripts/run_capital_translation_core_d0_1.py,runner,GREEN,890-event harness through repaired core; 16 artifacts
+execution-runtime-foundation,external,DIAGNOSTIC,HEAD 4f318a8f QL-EXEC-R2 (read-only; not imported; compatibility documented)
+broker / MT5 / TradeLocker / runtime,external,NOT_TOUCHED,out of scope for D0.1; execution-runtime-foundation owns these

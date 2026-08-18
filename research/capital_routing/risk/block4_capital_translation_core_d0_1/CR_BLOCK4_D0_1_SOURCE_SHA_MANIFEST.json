@@ -1,0 +1,18 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-IV-CAPITAL-TRANSLATION-CORE-D0.1-CONTRACT-AND-IDEMPOTENCY-TRUTH-REPAIR",
+  "base_commit": "18bd63aa36f9174aa3fb340f50c631e05edc5580",
+  "science_inputs": {
+    "ledger_sha256": "6c98b0d218c66f3f5893733f26c51490138e658046487e3ea108c5feeee2d26f",
+    "trades_sha256": "ad19e08f16aeb65c17305041182c591401d28c32b418287f45d76a678ddfcd07",
+    "r1_decision_sha256": "83c9b9a6f5bdafdc4778f5af185f3752d4bfb737ad6963b633f5f400cd3fa506",
+    "r1_1b_seal_sha256": "41a934536de5e44bd9cc759004a41074bb2d0b0574e94edbdb506f716e31fbf6"
+  },
+  "d0_artifacts": {
+    "d0_decision_sha256": "db941a649142ae950ee830d59a5fe5a25ef2d7922c48f8ebb8939f2073673273",
+    "d0_translations_sha256": "c857f1cc058d0f6cd1200d93977df100f2d9fa4f92e647f15c8f90a655e92b58"
+  },
+  "core_module_sha256": "e78496f618783428288dbda849271fe4f60b53c094198c53977b5362e074495e",
+  "configuration_hash": "335f255df411774738b9d038acbb010562e8ecd80c803e24a3e9f873cdc4a2a5",
+  "execution_runtime_foundation_head_diagnostic": "4f318a8f6716d5db3406c2ace8785944c4f8a50c QL-EXEC-R2-MT5-BROKER-SESSION-EXTRACTION (read-only; compatibility documented, not imported)",
+  "note": "Sealed science consumed read-only; no regeneration. Cross-workstream SHAs are historical provenance (immutable commits), recorded diagnostically."
+}
