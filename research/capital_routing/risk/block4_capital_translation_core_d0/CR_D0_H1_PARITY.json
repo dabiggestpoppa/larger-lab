@@ -1,0 +1,73 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-IV-CAPITAL-TRANSLATION-CORE-D0",
+  "policy": "H1-1.00-REJ",
+  "requested_f_A_pct": 0.7,
+  "requested_f_B_pct": 0.3,
+  "cap_f_units": 1.0,
+  "treatment": "REJECT",
+  "n_events": 890,
+  "n_accepted": 826,
+  "n_rejected": 64,
+  "accepted_A": 371,
+  "accepted_B": 455,
+  "examples": [
+    {
+      "case": "A_then_A_over_cap",
+      "families": [
+        "A",
+        "A"
+      ],
+      "expected_decisions": [
+        "ACCEPT_FULL",
+        "REJECT_HEAT_CAP"
+      ],
+      "got_decisions": [
+        "ACCEPT_FULL",
+        "REJECT_HEAT_CAP"
+      ],
+      "admission_matches": true,
+      "max_gross_heat_f_units": 0.7,
+      "note": "upstream H1 authority; D0 consumes these decisions as immutable inputs and never recomputes them"
+    },
+    {
+      "case": "A_then_B_exact_cap",
+      "families": [
+        "A",
+        "B"
+      ],
+      "expected_decisions": [
+        "ACCEPT_FULL",
+        "ACCEPT_FULL"
+      ],
+      "got_decisions": [
+        "ACCEPT_FULL",
+        "ACCEPT_FULL"
+      ],
+      "admission_matches": true,
+      "max_gross_heat_f_units": 1.0,
+      "note": "upstream H1 authority; D0 consumes these decisions as immutable inputs and never recomputes them"
+    },
+    {
+      "case": "B_then_B_then_B",
+      "families": [
+        "B",
+        "B",
+        "B"
+      ],
+      "expected_decisions": [
+        "ACCEPT_FULL",
+        "ACCEPT_FULL",
+        "ACCEPT_FULL"
+      ],
+      "got_decisions": [
+        "ACCEPT_FULL",
+        "ACCEPT_FULL",
+        "ACCEPT_FULL"
+      ],
+      "admission_matches": true,
+      "max_gross_heat_f_units": 0.8999999999999999,
+      "note": "upstream H1 authority; D0 consumes these decisions as immutable inputs and never recomputes them"
+    }
+  ],
+  "note": "H1 admission is UPSTREAM authority; the pure core consumes CapitalDecision status and never recomputes it"
+}

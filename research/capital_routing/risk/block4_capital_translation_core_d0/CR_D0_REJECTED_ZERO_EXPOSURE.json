@@ -1,0 +1,327 @@
+{
+  "n_rejected": 64,
+  "all_no_exposure": true,
+  "note": "NO_EXPOSURE without independently reconsidering H1 (status passthrough from the immutable CapitalDecision)",
+  "events": [
+    {
+      "event_id": "EUR_ORIGIN_202307271500",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202309122300",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202309221400",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202310231300",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202310231500",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202310301200",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202311141100",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202312141600",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202401041000",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202401241500",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202403011200",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202403191000",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202403202100",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202404031700",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202404231000",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202405141300",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202405141600",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202405151700",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202405161100",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202405231100",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202406101400",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202406121700",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202407011100",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202407112300",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202409191100",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202409200900",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202409261300",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202409301100",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202410220900",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202410301300",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202412121300",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202501061300",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202501141700",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202501301500",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202502240200",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202503041500",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202503041800",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202503051100",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202504030900",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202504031700",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202505010500",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202505291500",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202506051600",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202506111500",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202506130500",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202506230800",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202506271100",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202507111200",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202507241400",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202508260800",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202509161300",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202509181000",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202510300700",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202511071000",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202511112000",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202512102100",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202512111500",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202601120200",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202601200600",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202601200800",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202604080100",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202604132100",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202604302100",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    },
+    {
+      "event_id": "EUR_ORIGIN_202605202100",
+      "status": "NO_EXPOSURE",
+      "target_notional_account_ccy": 0.0
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-IV-CAPITAL-TRANSLATION-CORE-D0",
+  "base_commit": "991d8126ae9822e3b5457000c560626ea590a3a0",
+  "frozen_inputs": {
+    "P7_5_TRADES.csv": "ad19e08f16aeb65c17305041182c591401d28c32b418287f45d76a678ddfcd07",
+    "R1_EVENT_RISK_LEDGER.csv": "6c98b0d218c66f3f5893733f26c51490138e658046487e3ea108c5feeee2d26f"
+  },
+  "ledger_sha256": "6c98b0d218c66f3f5893733f26c51490138e658046487e3ea108c5feeee2d26f",
+  "trades_sha256": "ad19e08f16aeb65c17305041182c591401d28c32b418287f45d76a678ddfcd07",
+  "r1_decision_sha256": "83c9b9a6f5bdafdc4778f5af185f3752d4bfb737ad6963b633f5f400cd3fa506",
+  "configuration_hash": "b8261bb7eb0689e9e18af7e5f80fbf19d24cbf9f6f0589a292de891636166a20",
+  "note": "Sealed science consumed read-only; no regeneration."
+}

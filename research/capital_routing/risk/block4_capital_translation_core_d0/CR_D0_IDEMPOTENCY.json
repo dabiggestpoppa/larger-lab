@@ -1,0 +1,7 @@
+{
+  "idempotency_pass": true,
+  "n_repeated": 25,
+  "translation_ids_stable": true,
+  "snapshot_driven_scaling_pass": true,
+  "note": "translate() is pure: same inputs -> same output; equity comes only from the frozen BoundAccountSnapshot (no dynamic resizing, no mark-to-market, no internal state)"
+}

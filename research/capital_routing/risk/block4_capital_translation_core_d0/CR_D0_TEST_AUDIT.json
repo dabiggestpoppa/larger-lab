@@ -1,0 +1,200 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-IV-CAPITAL-TRANSLATION-CORE-D0",
+  "n_tests": 32,
+  "tests": [
+    {
+      "id": 1,
+      "requirement": "1R exact definition unchanged",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 2,
+      "requirement": "pnl_bps reconstruction via core",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 3,
+      "requirement": "long translation",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 4,
+      "requirement": "short translation",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 5,
+      "requirement": "family A requested f 0.70",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 6,
+      "requirement": "family B requested f 0.30",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 7,
+      "requirement": "H1 A+B exact cap (upstream, consumed)",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 8,
+      "requirement": "H1 second A rejected -> NO_EXPOSURE",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 9,
+      "requirement": "three B events = 0.90 accepted",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 10,
+      "requirement": "same-timestamp events deterministic",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 11,
+      "requirement": "exit/release ordering (causality)",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 12,
+      "requirement": "equity snapshot frozen at admission",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 13,
+      "requirement": "no active-position dynamic resizing",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 14,
+      "requirement": "raw notional formula includes pos",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 15,
+      "requirement": "one-R price move event-specific",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 16,
+      "requirement": "rejected event -> zero exposure (all 64)",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 17,
+      "requirement": "admission parity over 890",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 18,
+      "requirement": "gross parity every accepted event",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 19,
+      "requirement": "long and short parity",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 20,
+      "requirement": "research-modeled net parity",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 21,
+      "requirement": "stale account state fail-closed",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 22,
+      "requirement": "unknown instrument spec fail-closed",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 23,
+      "requirement": "account binding mismatch fail-closed",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 24,
+      "requirement": "missing equity fail-closed",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 25,
+      "requirement": "unresolved account currency fail-closed",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 26,
+      "requirement": "duplicate event idempotency",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 27,
+      "requirement": "no broker fields in output",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 28,
+      "requirement": "no H1/family/model-heat recompute",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 29,
+      "requirement": "no broker call",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 30,
+      "requirement": "no strategy science changes",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 31,
+      "requirement": "no capital-routing math changes (translation repair only)",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    },
+    {
+      "id": 32,
+      "requirement": "canonical accepted notional stats unchanged",
+      "implemented": true,
+      "suite": "tests/test_capital_translation_core_d0.py"
+    }
+  ],
+  "offline": true,
+  "network_dependent": false
+}
