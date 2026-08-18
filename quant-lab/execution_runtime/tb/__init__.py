@@ -33,6 +33,32 @@ from .parity import (
     compare_state_snapshot,
     normalize_trace,
 )
+from .shadow import (
+    ReadOnlyBrokerSession,
+    ShadowExecutionPlan,
+    ShadowLeg,
+    ShadowRuntimeAuthority,
+    ShadowWriteForbiddenError,
+    SHADOW_OBSERVE_ONLY,
+)
+from .shadow_feed import (
+    ShadowExportFeed,
+    ShadowFeedError,
+    validate_record,
+    content_hash,
+)
+from .shadow_parity import (
+    ShadowMismatchClass,
+    LiveParityVerdict,
+    compare_live_record,
+    SHADOW_EXPORT_SCHEMA_VERSION,
+)
+from .shadow_runner import (
+    ShadowRuntime,
+    ShadowCounters,
+    build_snapshot,
+    build_tri_bar,
+)
 from .harness import (
     LegacyTBHarness,
     GenericTBHarness,
@@ -72,4 +98,22 @@ __all__ = [
     "make_snapshot",
     "make_tri_bar",
     "BASKET_NOTIONAL_USD",
+    "ReadOnlyBrokerSession",
+    "ShadowExecutionPlan",
+    "ShadowLeg",
+    "ShadowRuntimeAuthority",
+    "ShadowWriteForbiddenError",
+    "SHADOW_OBSERVE_ONLY",
+    "ShadowExportFeed",
+    "ShadowFeedError",
+    "validate_record",
+    "content_hash",
+    "ShadowMismatchClass",
+    "LiveParityVerdict",
+    "compare_live_record",
+    "SHADOW_EXPORT_SCHEMA_VERSION",
+    "ShadowRuntime",
+    "ShadowCounters",
+    "build_snapshot",
+    "build_tri_bar",
 ]

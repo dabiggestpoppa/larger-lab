@@ -1,0 +1,37 @@
+{
+  "checkpoint": "QL-EXEC-R4.2",
+  "drill": "restart (offline; controlled shadow-only restart)",
+  "result": "PASS",
+  "phase_1_freeze": {
+    "last_processed_seq": 205,
+    "bars_compared": 205,
+    "parity_exact": 3280,
+    "hypothetical_intents": 3,
+    "desired_state": "RUNNING"
+  },
+  "restart": {
+    "new_runtime_object_same_store": true,
+    "start_result": "RUNNING",
+    "resume_from_seq": 205,
+    "records_replayed": 0,
+    "no_duplicate_bars": true,
+    "no_replayed_hypothetical_basket": true,
+    "no_new_signals": true,
+    "mismatches_after_restart": 0,
+    "broker_write_calls": 0
+  },
+  "mid_stream_variant": {
+    "freeze_at_seq": 150,
+    "resume_from_seq": 151,
+    "processed_after_restart": 55,
+    "control_signals": 1,
+    "full_lifecycles": 1,
+    "hypothetical_intents": 3,
+    "no_duplicate": true
+  },
+  "desired_state_drill": {
+    "STOPPED_BY_USER_persists": true,
+    "restart_stays_stopped": true
+  },
+  "note": "Live restart drill (legacy TB running throughout) is scheduled for the live canary phase."
+}

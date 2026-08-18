@@ -1,0 +1,41 @@
+{
+  "checkpoint": "QL-EXEC-R4.2",
+  "status": "RUNNING_SHADOW_WAITING_EVIDENCE",
+  "live": {
+    "bars_compared": 0,
+    "decision_opportunities": 0,
+    "primary_signals_observed": 0,
+    "control_signals_observed": 0,
+    "full_lifecycles_observed": 0,
+    "parity_exact": 0,
+    "parity_normalized": 0,
+    "mismatches": 0,
+    "broker_write_calls": 0,
+    "shadow_order_attempts": 0
+  },
+  "offline_drill_evidence": {
+    "bars_compared": 205,
+    "decision_opportunities": 205,
+    "primary_signals": 1,
+    "control_signals": 1,
+    "full_lifecycles": 1,
+    "parity_exact": 3280,
+    "parity_normalized": 0,
+    "mismatches": 0,
+    "hypothetical_intents": 3,
+    "execution_gate_denials": 3,
+    "broker_write_calls": 0,
+    "last_processed_seq": 205
+  },
+  "evidence_rule": {
+    "minimum_bars": 1000,
+    "minimum_decision_opportunities": 1000,
+    "minimum_wall_clock_days": 5,
+    "market_close_reopen": 1,
+    "restart_drill": 1,
+    "natural_control_signal": ">=1 if feasible (no forcing)",
+    "natural_primary_signal": ">=1 if feasible (no forcing)",
+    "satisfied": false
+  },
+  "note": "The first true canary is a NATURAL strategy decision with legacy/generic EXACT parity and broker_write_calls == 0 — not an order."
+}

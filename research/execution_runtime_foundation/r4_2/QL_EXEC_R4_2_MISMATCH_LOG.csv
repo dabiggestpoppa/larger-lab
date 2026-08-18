@@ -1,0 +1,4 @@
+bar_key,mismatch_class,legacy_value,generic_value,detail,source
+(empty),, , ,offline_drill produced ZERO mismatches (3280 surfaces EXACT),offline fixture
+(empty),, , ,corrupt-record drill: tampered record blocked as feed_corrupt (never inferred); downstream z-divergence alerts fire as expected fail-safe,corrupt drill
+(empty),, , ,live mismatches: NONE YET (live shadow not started; counters at 0),live pending

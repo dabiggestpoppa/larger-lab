@@ -1,0 +1,34 @@
+{
+  "checkpoint": "QL-EXEC-R4.2",
+  "result": "PASS",
+  "order_authority_denial": {
+    "runtime_authority_gate": "can_submit_new_risk=false (immutable)",
+    "read_only_broker": "no write API; ShadowWriteForbiddenError on violation",
+    "immutable_profile": "TB-GENERIC-SHADOW-G1 hash persisted; drift blocks",
+    "process_capability": "no MT5 client / no broker credentials in shadow process"
+  },
+  "no_automatic_failover": true,
+  "no_automatic_promotion": true,
+  "secrets": {
+    "plaintext_credentials": false,
+    "no_password_fields_in_telemetry": true,
+    "no_secrets_in_logs_or_artifacts": true
+  },
+  "isolation": {
+    "separate_runtime_id": true,
+    "separate_state_dir": true,
+    "separate_pid": true,
+    "separate_desired_state": true,
+    "separate_sqlite": true,
+    "separate_logs_heartbeat_telemetry": true
+  },
+  "tests": [
+    "test_no_plaintext_secrets_in_shadow_surface",
+    "test_no_mt5_import_in_shadow_process",
+    "test_shadowctl_never_touches_tbctl_or_active_paths"
+  ],
+  "residual_risks": [
+    "MT5 concurrent-read safety remains UNRESOLVED -> mitigated by Option B (no concurrent attach in G1)",
+    "a live legacy export hook adds a read-only side-channel -> additive, enabled only under operator supervision"
+  ]
+}

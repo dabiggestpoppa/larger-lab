@@ -1,0 +1,16 @@
+{
+  "checkpoint": "QL-EXEC-R4.2",
+  "drill": "market close / reopen (offline)",
+  "result": "PASS",
+  "observed": {
+    "market_closed_bars": 2,
+    "market_close_cycles": 2,
+    "state_during_close": "WAITING_FOR_MARKET",
+    "state_after_reopen": "RUNNING",
+    "zero_execution_attempts": true,
+    "mismatches": 0,
+    "non_latching": true
+  },
+  "non_latching_rule": "A cached 'market closed' observation is never permanent truth; each fresh healthy observation recomputes state.",
+  "note": "Live market close/reopen observation is scheduled for the live canary phase (1 observed cycle required by the frozen evidence rule)."
+}

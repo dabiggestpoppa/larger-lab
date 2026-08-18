@@ -1,0 +1,9 @@
+metric,baseline,status
+worker_heartbeat,green before start,NOT_YET_MEASURED (live canary pending)
+supervisor_health,healthy,NOT_YET_MEASURED
+watcher_health,healthy,NOT_YET_MEASURED
+dashboard_health,healthy,NOT_YET_MEASURED
+execution_latency,unchanged,NOT_YET_MEASURED
+order_failures,unchanged,NOT_YET_MEASURED
+market_data_freshness,unchanged,NOT_YET_MEASURED
+note,Baseline is frozen pre-start; live canary compares shadow-ON vs shadow-OFF,if any degradation -> STOP SHADOW

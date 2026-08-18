@@ -1,0 +1,18 @@
+component,status,evidence
+SHADOW_OBSERVE_ONLY mode,IMPLEMENTED,ShadowRuntimeAuthority immutable
+can_submit_new_risk false,IMPLEMENTED,authority gate + tests
+ReadOnlyBrokerSession,IMPLEMENTED,write API absent; denylist raises
+ShadowExecutionPlan,IMPLEMENTED,distinct from OrderIntent; never submittable
+Legacy export writer (Option B),IMPLEMENTED,additive; worker hook NOT wired
+Shadow feed consumer,IMPLEMENTED,hash/seq/gap/corrupt handling
+Frozen-tolerance parity comparator,IMPLEMENTED,basis 1e-12 / z 1e-9 / exact elsewhere
+Isolated shadow store,IMPLEMENTED,SQLite WAL under shadow_state dir
+Shadow process (tb_generic_shadow.py),IMPLEMENTED,manual start; --once mode
+shadowctl,IMPLEMENTED,start/stop/status/tail/parity (independent of tbctl)
+Desired state,IMPLEMENTED,RUNNING / STOPPED_BY_USER persistent
+PID singleton,IMPLEMENTED,shadow.pid exclusive
+Heartbeat + telemetry,IMPLEMENTED,isolated json + store
+Resource instrumentation,IMPLEMENTED,cpu/mem fields in telemetry
+Mismatch handling,IMPLEMENTED,record + alert; never alters science/authority
+MT5 concurrent read audit,UNRESOLVED,Option B used; audit deferred (R4.2 audit plan)
+Live canary evidence,WAITING_EVIDENCE,0 live bars; operator start + exporter hook required

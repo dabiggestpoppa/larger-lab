@@ -1,0 +1,13 @@
+metric,budget,frozen,offline_drill,status
+cpu_pct_sustained,5.0,pct one core 60s,NOT_YET_MEASURED (instrumented),live pending
+mem_rss_bytes,268435456,256 MB,131715072 (offline process snapshot),within budget
+disk_growth_bytes_per_hour,10485760,10 MB/h,NOT_YET_MEASURED,live pending
+log_active_bytes,5242880,5 MB active,NOT_YET_MEASURED,live pending
+export_emit_ms_per_record,N/A,,2.55,measured
+shadow_step_ms_per_record,N/A,,2.60,measured
+p50_cpu,N/A,,NOT_YET_MEASURED,live pending
+p95_cpu,N/A,,NOT_YET_MEASURED,live pending
+max_cpu,N/A,,NOT_YET_MEASURED,live pending
+p50_mem,N/A,,NOT_YET_MEASURED,live pending
+p95_mem,N/A,,NOT_YET_MEASURED,live pending
+max_mem,N/A,,NOT_YET_MEASURED,live pending

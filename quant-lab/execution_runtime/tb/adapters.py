@@ -122,13 +122,55 @@ class TBStrategyAdapter:
             self._engine.load_historical_bars(list(historical))
 
     def on_market_snapshot(self, snapshot: object) -> None:
+        # Delegates to process_observation so R4.2 shadow observation and the
+        # R4 harness path share ONE canonical processing call per snapshot.
+        self.process_observation(snapshot)
+
+    def process_observation(self, snapshot: object) -> dict:
+        """Process one snapshot, buffer any pending events, and return the
+        per-bar observation truth (basis / z / decision / direction / weights).
+
+        Added for QL-EXEC-R4.2 (shadow parity): the canonical engine returns a
+        BasketIntent for EVERY bar (NO_ACTION intents carry basis+z), which is
+        exactly what the shadow needs to compare per-bar science outputs.
+        """
         intent: BasketIntent = self._engine.process_snapshot(snapshot)
         if intent is None or intent.decision is BasketDecision.NO_ACTION:
-            return
+            self._last_observation = {
+                "basis": float(intent.basis) if intent is not None else 0.0,
+                "z": float(intent.zscore) if intent is not None else 0.0,
+                "decision": "NO_SIGNAL", "direction": "NONE",
+                "basket_id": "", "exit_reason": "", "weights": {},
+            }
+            return self._last_observation
         if intent.decision is BasketDecision.OPEN_BASKET:
             self._pending.append(self._entry_event(intent))
+            self._last_observation = {
+                "basis": float(intent.basis), "z": float(intent.zscore),
+                "decision": "ENTRY", "direction": intent.direction.name,
+                "basket_id": intent.basket_id, "exit_reason": "",
+                "weights": {
+                    leg.canonical_symbol: float(leg.model_weight)
+                    for leg in intent.legs
+                },
+            }
         elif intent.decision is BasketDecision.CLOSE_BASKET:
             self._pending.append(self._exit_event(intent))
+            self._last_observation = {
+                "basis": float(intent.basis), "z": float(intent.zscore),
+                "decision": "EXIT", "direction": intent.direction.name,
+                "basket_id": intent.basket_id,
+                "exit_reason": str(intent.exit_reason), "weights": {},
+            }
+        return self._last_observation
+
+    def last_observation(self) -> dict:
+        """Last per-bar observation truth (R4.2 shadow parity)."""
+        if not hasattr(self, "_last_observation"):
+            return {"basis": 0.0, "z": 0.0, "decision": "NO_SIGNAL",
+                    "direction": "NONE", "basket_id": "", "exit_reason": "",
+                    "weights": {}}
+        return self._last_observation
 
     def produce_events(self) -> tuple[StrategyEvent, ...]:
         out = tuple(self._pending)

@@ -1,0 +1,24 @@
+{
+  "checkpoint": "QL-EXEC-R4.2",
+  "result": "PASS",
+  "class": "ReadOnlyBrokerSession",
+  "allowed": [
+    "connect", "disconnect", "health", "identity", "account_state",
+    "clock_state", "symbol_info", "ensure_symbol (read-only)", "tick", "bars",
+    "positions", "orders", "deals", "reconcile_snapshot"
+  ],
+  "forbidden": {
+    "submit_order": "absent; ShadowWriteForbiddenError on access",
+    "close_position": "absent; ShadowWriteForbiddenError on access",
+    "cancel_order": "absent; ShadowWriteForbiddenError on access",
+    "order_check": "absent (not needed in G1; treated as non-read-only until proven)",
+    "order_send / modify_order / place_order": "absent; denylist"
+  },
+  "behavior_on_violation": "Raises ShadowWriteForbiddenError; counts write_attempts; NEVER returns fake success.",
+  "tests": [
+    "test_read_only_broker_forbids_writes",
+    "test_broker_write_calls_stays_zero_through_shadow_run"
+  ],
+  "offline_drill_counters": { "broker_write_calls": 0, "write_attempts": 0 },
+  "note": "G1 consumes exported market/account truth (Option B); the read-only session has no independent MT5 attach."
+}

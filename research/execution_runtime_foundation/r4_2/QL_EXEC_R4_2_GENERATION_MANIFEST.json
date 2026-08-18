@@ -1,0 +1,21 @@
+{
+  "generation": "TB-GENERIC-SHADOW-G1",
+  "bound_to": {
+    "r4_2_base_commit": "62e6d0402a780d171a8b81c2070567045e341be7",
+    "tb_authority_sha": "b48fd35255b41865026a3cba333ae2a2a0d6a004",
+    "r4_authority_sha": "750a14bf20bf0869f452d8df20138e58bbb091e5",
+    "runtime_profile_hash": "tb-generic-shadow-g1-profile-hash",
+    "shadow_profile_hash": "tb-generic-shadow-g1-profile-hash",
+    "parity_schema_version": 1,
+    "tolerance_version": "r4_1_v1"
+  },
+  "semantics": {
+    "legacy_tb": "SOLE OPERATIONAL AUTHORITY (unchanged)",
+    "generic_primary": "SHADOW ONLY (zero orders)",
+    "generic_control": "SHADOW ONLY (hypothetical plans only)",
+    "automatic_failover": "IMPOSSIBLE",
+    "automatic_promotion": "IMPOSSIBLE"
+  },
+  "auto_start": false,
+  "note": "G1 starts manually via shadowctl. Task Scheduler / logon autostart is future work only."
+}

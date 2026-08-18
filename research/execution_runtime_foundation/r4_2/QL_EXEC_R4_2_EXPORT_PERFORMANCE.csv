@@ -1,0 +1,15 @@
+metric,value,source
+records_emitted,205,offline_drill
+emit_total_s,0.5224,offline_drill
+emit_ms_per_record,2.55,offline_drill
+emit_failures,0,offline_drill
+emit_blocks,0,offline_drill
+shadow_step_total_s,0.532,offline_drill
+shadow_step_ms_per_record,2.60,offline_drill
+export_file_size_bytes,211186,offline_drill
+cpu_pct_sustained,NOT_YET_MEASURED,live canary pending
+mem_rss_bytes_peak,131715072,offline process snapshot
+disk_growth_bytes_per_hour,NOT_YET_MEASURED,live canary pending
+export_latency_p50_ms,NOT_YET_MEASURED,live canary pending
+export_latency_p95_ms,NOT_YET_MEASURED,live canary pending
+export_latency_max_ms,NOT_YET_MEASURED,live canary pending

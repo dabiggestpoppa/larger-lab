@@ -1,0 +1,42 @@
+{
+  "checkpoint": "QL-EXEC-R4.2",
+  "result": "PASS",
+  "barriers": [
+    {
+      "layer": 1,
+      "name": "runtime authority gate",
+      "implementation": "ShadowRuntimeAuthority (SHADOW_OBSERVE_ONLY, can_submit_new_risk=false, can_close_existing=false, can_cancel=false)",
+      "immutable": true,
+      "test": "test_authority_immutable_gate_always_false"
+    },
+    {
+      "layer": 2,
+      "name": "ReadOnlyBrokerSession",
+      "implementation": "write methods absent; __getattr__ denylist raises ShadowWriteForbiddenError for order_check/submit_order/cancel_order/close_position/order_send/modify_order",
+      "test": "test_read_only_broker_forbids_writes"
+    },
+    {
+      "layer": 3,
+      "name": "immutable deployment profile",
+      "implementation": "TB-GENERIC-SHADOW-G1 profile hash persisted at startup; drift blocks",
+      "test": "test_shadow_profile_hash_persisted (shadow_store meta)"
+    },
+    {
+      "layer": 4,
+      "name": "process capability denial",
+      "implementation": "shadow process consumes exported market truth; no MT5 client, no broker credentials",
+      "test": "test_no_mt5_import_in_shadow_process"
+    }
+  ],
+  "counters_offline_drill": {
+    "broker_write_calls": 0,
+    "submit_attempts": 0,
+    "close_attempts": 0,
+    "cancel_attempts": 0,
+    "order_check_attempts": 0,
+    "write_attempts": 0
+  },
+  "blocked_hypothetical_attempts": 3,
+  "gate_denials": 3,
+  "conclusion": "A broker write is impossible by construction: all four barriers must fail simultaneously, which is a hard design failure. Any single configuration mistake cannot enable orders."
+}

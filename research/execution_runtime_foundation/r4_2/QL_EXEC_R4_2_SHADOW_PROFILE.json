@@ -1,0 +1,25 @@
+{
+  "profile": "tb-generic-shadow-g1",
+  "mode": "SHADOW_OBSERVE_ONLY",
+  "immutable": true,
+  "authority": {
+    "can_submit_new_risk": false,
+    "can_close_existing": false,
+    "can_cancel": false,
+    "order_check_allowed": false
+  },
+  "barriers": [
+    "1_runtime_authority_gate_can_submit_new_risk_false",
+    "2_read_only_broker_session_no_write_api",
+    "3_immutable_deployment_profile_hashed_at_startup",
+    "4_process_capability_denial_no_mt5_client_no_broker_credentials"
+  ],
+  "market_data_path": "LEGACY_EXPORT_READ_ONLY_SNAPSHOT",
+  "independent_mt5_attach": false,
+  "runtime_id": "tb-generic-shadow-g1",
+  "deployment_generation": "TB-GENERIC-SHADOW-G1",
+  "parity_schema_version": 1,
+  "tolerance_version": "r4_1_v1",
+  "profile_hash": "tb-generic-shadow-g1-profile-hash",
+  "note": "Any semantic config change creates a NEW generation; the profile hash is persisted at startup and drift blocks the runtime."
+}

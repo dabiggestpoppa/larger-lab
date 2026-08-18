@@ -1,0 +1,43 @@
+{
+  "schema": "QL_EXEC_R4_2_LEGACY_EXPORT_SCHEMA",
+  "version": 1,
+  "transport": "append-only JSONL",
+  "owner": "LEGACY TB WORKER (writes; additive, after-decision)",
+  "consumer": "GENERIC TB SHADOW (reads only)",
+  "per_record_fields": {
+    "schema_version": "int = 1",
+    "seq": "monotonic int owned by exporter (never caller-clobberable)",
+    "generation": "TB-GENERIC-SHADOW-G1",
+    "legacy_authority_sha": "b48fd35255b41865026a3cba333ae2a2a0d6a004",
+    "observed_at_utc": "ISO-8601 UTC",
+    "bar_key": "raw bar-open time (strategy key, exact)",
+    "source_timestamp": "raw MT5 source timestamp (bar open time)",
+    "market_open": "bool",
+    "session": "bool (London window per canonical fixed UTC-5)",
+    "bars": {
+      "GBPAUD": {"bar_open_time": "iso", "open": "f", "high": "f", "low": "f", "close": "f"},
+      "GBPNZD": "same fields as GBPAUD",
+      "AUDNZD": "same fields as GBPAUD"
+    },
+    "primary": {"basis": "f|null", "z": "f|null", "decision": "NO_SIGNAL|ENTRY|EXIT",
+                "direction": "SHORT|LONG|NONE", "weights": "dict",
+                "lots": "dict"},
+    "control": "same shape as primary",
+    "basket_state": "FLAT|OPEN|CLOSED|BROKEN_HEDGE|FLATTENING",
+    "content_hash": "sha256 over canonical JSON excluding content_hash"
+  },
+  "integrity_rules": [
+    "monotonic seq (gap => record + alert)",
+    "schema_version must equal 1 (else block)",
+    "content_hash must verify (else block, never infer)",
+    "partial final line skipped and retried",
+    "duplicate seq deduped",
+    "corrupt record blocked from parity processing"
+  ],
+  "tests": [
+    "test_export_schema_and_hash_validation",
+    "test_feed_partial_line_and_seq_gap",
+    "test_feed_dedup_by_seq",
+    "test_mismatch_records_never_alter_science_or_authority"
+  ]
+}

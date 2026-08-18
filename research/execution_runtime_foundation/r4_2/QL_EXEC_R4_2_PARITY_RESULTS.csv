@@ -1,0 +1,20 @@
+surface,offline_drill_result,detail
+market_data_key,EXACT,205/205 bars
+source_timestamp,EXACT,205/205 bars
+session,EXACT,205/205 bars
+primary_basis,EXACT,1e-12 relative tolerance
+primary_z,EXACT,1e-9 absolute tolerance
+primary_decision,EXACT,ENTRY on signal bar; NO_SIGNAL elsewhere
+primary_direction,EXACT,SHORT on signal bar
+primary_weights,EXACT,{GBPAUD: 1.064616, GBPNZD: 0.966454, AUDNZD: 0.96893}
+primary_lots,EXACT,{GBPAUD.PRO: 0.01, GBPNZD.PRO: 0.01, AUDNZD.PRO: 0.03}
+control_basis,EXACT,1e-12 relative tolerance
+control_z,EXACT,1e-9 absolute tolerance
+control_decision,EXACT,ENTRY then EXIT (natural control lifecycle)
+control_direction,EXACT,SHORT entry / SHORT exit
+control_weights,EXACT,{GBPAUD: 1.064616, GBPNZD: 0.966454, AUDNZD: 0.96893}
+control_lots,EXACT,{GBPAUD.PRO: 0.01, GBPNZD.PRO: 0.01, AUDNZD.PRO: 0.03}
+basket_state,EXACT,FLAT -> OPEN (entry) -> CLOSED (exit)
+parity_exact_count,3280,per-surface verdicts over 205 bars (16 surfaces/bar)
+parity_normalized_count,0,
+mismatch_count,0,

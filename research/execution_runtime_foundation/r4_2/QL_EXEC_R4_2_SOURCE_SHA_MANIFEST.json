@@ -1,0 +1,34 @@
+{
+  "checkpoint": "QL-EXEC-R4.2-TB-GENERIC-RUNTIME-LIVE-SHADOW-CANARY",
+  "frozen_at": "2026-08-18",
+  "base_commit": "62e6d0402a780d171a8b81c2070567045e341be7",
+  "branches": {
+    "execution_runtime_foundation": "62e6d0402a780d171a8b81c2070567045e341be7",
+    "tb_forward_engine": "b48fd35255b41865026a3cba333ae2a2a0d6a004",
+    "capital_routing": "73f760ce09e7109b23732fb7ff2ec8ad455a563e",
+    "main": "dfdca6acd829cda4c084cd3bd217ab606348b660"
+  },
+  "authority_delta_vs_r4_1": {
+    "tb_forward_engine": "UNCHANGED (b48fd3525, TB-R6.1D-BOOT-FLOW-STACK)",
+    "capital_routing": "UNCHANGED from R4.1 freeze (73f760ce0); not imported by the shadow",
+    "main": "UNCHANGED (dfdca6ac)"
+  },
+  "tb_science_reuse": {
+    "note": "Shadow PRIMARY/CONTROL adapters delegate to the canonical TriangularBasisLiveEngine (frozen TB authority). No TB science was modified.",
+    "canonical_engines": "engines/triangular_basis_live.py",
+    "configs": "engines/tb_forward_config.py",
+    "execution_contract": "engines/triangular_execution_contract.py"
+  },
+  "new_r4_2_sources": {
+    "quant-lab/execution_runtime/tb/shadow.py": "ReadOnlyBrokerSession + ShadowExecutionPlan + ShadowRuntimeAuthority",
+    "quant-lab/execution_runtime/tb/shadow_feed.py": "Option B export consumer (hash/seq/gap/corrupt handling)",
+    "quant-lab/execution_runtime/tb/shadow_parity.py": "frozen-tolerance live parity comparator + mismatch classes",
+    "quant-lab/execution_runtime/tb/shadow_runner.py": "ShadowRuntime observation loop",
+    "quant-lab/execution_runtime/tb/shadow_store.py": "isolated SQLite/WAL shadow store",
+    "quant-lab/runtime/tb_shadow_config.py": "isolated shadow paths + frozen budget",
+    "quant-lab/runtime/tb_shadow_export.py": "additive legacy export writer (Option B)",
+    "quant-lab/runtime/tb_generic_shadow.py": "shadow process entrypoint",
+    "quant-lab/runtime/shadowctl.py": "independent shadow control CLI"
+  },
+  "note": "The legacy exporter hook in the live worker is NOT wired in this checkpoint (additive module + integration point only). Live shadow observation requires operator enablement + manual shadowctl start."
+}

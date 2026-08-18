@@ -1,0 +1,31 @@
+{
+  "checkpoint": "QL-EXEC-R4.2",
+  "result": "PASS",
+  "active_tb_modified": false,
+  "active_tb_state_written": false,
+  "task_scheduler_modified": false,
+  "active_dashboard_modified": false,
+  "watcher_modified": false,
+  "active_supervisor_modified": false,
+  "never_opened_for_write": [
+    "quant-lab/state/tb_runtime.db",
+    "quant-lab/state/tb_control.db",
+    "quant-lab/state/tb_supervisor.pid",
+    "quant-lab/state/tb_worker.pid",
+    "quant-lab/state/tb_desired_state",
+    "quant-lab/logs/tb_supervisor.log",
+    "quant-lab/logs/tb_runtime.log",
+    "quant-lab/logs/tb_dashboard.log"
+  ],
+  "shadow_writes_only": [
+    "shadow_state/tb-generic-shadow-g1/** (runtime.sqlite, shadow.pid, logs, heartbeat.json, telemetry.json, parity.jsonl, mismatches.jsonl)"
+  ],
+  "export_stream_owner": "legacy worker WRITES its own export; the shadow only READS it. R4.2 ships the exporter module but does NOT wire it into the live worker (active_tb_modified = false).",
+  "tests": [
+    "test_shadowctl_never_touches_tbctl_or_active_paths",
+    "test_no_active_tb_path_references",
+    "test_no_task_scheduler_dashboard_watcher_supervisor",
+    "test_shadow_process_once_smoke"
+  ],
+  "live_closeout_audit": "Scheduled: at live canary close-out, verify via file mtimes / access logs that no active-TB path was written by the shadow PID."
+}
