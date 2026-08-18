@@ -1,0 +1,27 @@
+{
+  "grid_nonregression_pass": true,
+  "grid_counts": [
+    39,
+    178,
+    417,
+    655,
+    786,
+    817,
+    825,
+    826
+  ],
+  "family_nonregression_pass": true,
+  "episode_nonregression_pass": true,
+  "episode_count_12h": 482,
+  "original_max_concurrency": 3,
+  "performance_nonregression_pass": true,
+  "performance_rows": 8,
+  "science_counts": {
+    "n_events": 890,
+    "n_accepted": 826,
+    "n_rejected": 64,
+    "accepted_A": 371,
+    "accepted_B": 455
+  },
+  "science_unchanged": true
+}

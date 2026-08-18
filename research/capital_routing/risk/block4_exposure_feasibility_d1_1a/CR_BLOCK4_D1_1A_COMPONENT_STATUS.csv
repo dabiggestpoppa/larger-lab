@@ -1,0 +1,12 @@
+component,status,verdict
+D1.1 notional feasibility surface (Lane A),EXECUTED,PASS
+D1.1 test-count truth repair,REPAIRED,PASS
+D1.1 quantile definition reconciliation,RECONCILED,PASS
+D1 plan descriptive distribution quantiles,SEALED,DESCRIPTIVE_DISTRIBUTION_QUANTILE
+D1.1 rank bin edges,SEALED,RANK_BIN_EDGE
+D1.2 quantity representability,PLANNED,NOT_STARTED
+D1.3 margin feasibility,PLANNED,NOT_STARTED
+D1.4 concurrent account-resource replay,PLANNED,NOT_STARTED
+D1.5 physical-book distortion seal,PLANNED,NOT_STARTED
+D1.6 broker quantity translation contract,PLANNED,NOT_STARTED
+broker execution,NOT_PERMITTED,FALSE

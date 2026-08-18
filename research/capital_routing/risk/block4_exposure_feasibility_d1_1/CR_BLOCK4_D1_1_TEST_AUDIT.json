@@ -2,6 +2,7 @@
   "checkpoint": "CR-RISK-BLOCK-IV-D1.1-BROKER-INDEPENDENT-NOTIONAL-FEASIBILITY-SURFACE",
   "status": "PASS",
   "test_audit": "see tests/test_exposure_feasibility_d1_1.py",
-  "tests_total": 52,
+  "tests_total": 62,
+  "tests_passed": 62,
   "tests_failed": 0
 }

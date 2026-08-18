@@ -1,0 +1,22 @@
+{
+  "dedicated_tests_collected": 62,
+  "dedicated_tests_passed": 62,
+  "dedicated_tests_failed": 0,
+  "combined_suite_tests_passed": 261,
+  "combined_suite_tests_failed": 0,
+  "combined_suite_files": [
+    "test_exposure_feasibility_d1_1.py",
+    "test_exposure_feasibility_d1_plan.py",
+    "test_capital_translation_core_d0_1.py",
+    "test_capital_translation_core_d0.py",
+    "test_exec_translation_planning_r1_1b.py",
+    "test_exec_translation_planning_r1_1.py",
+    "test_exec_translation_planning_r1.py",
+    "test_risk_block3_scale_seal_r1.py"
+  ],
+  "prior_test_count_claim_62_correct": true,
+  "prior_test_count_claim_52_correct": false,
+  "claim_52_provenance": "52 was the D1.1 brief's MINIMUM-REQUIREMENTS list count, NOT the collected suite count; it was copied into TEST_AUDIT/DECISION verbatim.",
+  "collection_method": "pytest --collect-only -q tests/test_exposure_feasibility_d1_1.py -> 62; 8-suite combined -> 261; AST count of top-level def test_* matches both.",
+  "test_count_truth_reconciled": true
+}

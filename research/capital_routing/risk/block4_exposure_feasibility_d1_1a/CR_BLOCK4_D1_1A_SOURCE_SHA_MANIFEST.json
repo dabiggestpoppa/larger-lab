@@ -1,0 +1,14 @@
+{
+  "checkpoint": "CR-RISK-BLOCK-IV-D1.1A-ARTIFACT-TRUTH-AND-QUANTILE-RECONCILIATION",
+  "base_commit": "2a44e824c269d62545fa44538b0df3cea3f51e60",
+  "science_inputs": {
+    "r1_notional_multipliers_sha256": "b45876c6e5e06b114d2129315f67d9f72710bed456664a804ad4dd0ecb1be1ff",
+    "d0_1_translations_sha256": "409f386c311c43e724c19553cf6dbce8119835c24d8d077839019878a5108b2e",
+    "d1_plan_decision_sha256": "55e7fc129810e7f4d738affdde49f7c9c303c1f69aee5d5b05e03559d0095274",
+    "d1_1_decision_sha256": "be39dd5cc0c6e9bcde8c0c39b3fe2f3c932827a024bd4f1954321b673676cf4a",
+    "d1_1_test_audit_sha256": "4fb3cfdcc785e19b28777265a4c2d21d260ba2bdaeffd6a296e913ad5513b706",
+    "d1_1_event_results_sha256": "429a9f209d99d35d086bf1da2d896c5521e52d45d60da9092a2522703b12df44",
+    "routing_episodes_sha256": "e87b8083690bef88bb4479e6fb23add19220f7d510c0bb60004d8dc62b337233"
+  },
+  "note": "d1_1_decision / d1_1_test_audit hashes are the REPAIRED (post-correction) files committed in this checkpoint."
+}

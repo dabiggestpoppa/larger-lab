@@ -1,0 +1,42 @@
+{
+  "same_source_book": true,
+  "n_accepted_events": 826,
+  "d1_distribution_source_hash": "b64be26010171801104518db72df63abe01714079a5081fef18c42f990a2580a",
+  "d1_1_distribution_source_hash": "b64be26010171801104518db72df63abe01714079a5081fef18c42f990a2580a",
+  "d1_source": "CR_EXEC_R1_EVENT_NOTIONAL_MULTIPLIERS.csv -> notional_multiple_equity (ACCEPT_FULL)",
+  "d1_1_source": "CR_BLOCK4_D0_1_EVENT_TRANSLATIONS.csv -> target_notional_account_ccy at E=1 (ACCEPT_FULL)",
+  "max_abs_value_diff_between_sources": 4.982680934517703e-13,
+  "d1_quantile_definition": "DESCRIPTIVE_DISTRIBUTION_QUANTILE",
+  "d1_quantile_formula": "pandas Series.quantile(q) \u2014 linear interpolation between order statistics (numpy type-7 / R-7 default); estimates of the underlying distribution.",
+  "d1_descriptive_quantiles": {
+    "q25": 1.1023374233055268,
+    "q50": 1.9842341231185205,
+    "q75": 3.513366582731397,
+    "q95": 7.61048370479638,
+    "q99": 16.036374775248472
+  },
+  "d1_recorded_reference": {
+    "q50": 1.9842341231185,
+    "q75": 3.51336658273125,
+    "q95": 7.6104837047965,
+    "q99": 16.0363747752485
+  },
+  "d1_1_bin_edge_definition": "RANK_BIN_EDGE",
+  "d1_1_bin_edge_formula": "nearest-rank (inverted CDF): sorted value at index ceil(n*q)-1 of the 826-event book; the event VALUE at that rank fraction, used to assign events to frozen quantile bins.",
+  "d1_1_rank_bin_edges": {
+    "q25": 1.102320085105,
+    "q50": 1.979422975748,
+    "q75": 3.524935294373,
+    "q95": 7.61103477694,
+    "q99": 16.159547393888
+  },
+  "d1_1_recorded_reference": {
+    "q50": 1.979422975748,
+    "q75": 3.524935294373,
+    "q95": 7.61103477694,
+    "q99": 16.159547393888
+  },
+  "classification": "A. same source book, different statistical definitions \u2014 DESCRIPTIVE_DISTRIBUTION_QUANTILE (interpolated distribution estimate) vs RANK_BIN_EDGE (rank-fraction event value).",
+  "quantile_difference_explained": true,
+  "source_distribution_mismatch": false
+}
