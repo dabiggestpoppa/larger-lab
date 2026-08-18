@@ -1,0 +1,23 @@
+{
+  "data_generation": "PFT-DATA-GEN-001",
+  "program_id": "PFT",
+  "created_utc": "2026-08-18T18:23:14.655375+00:00",
+  "split_freeze": {
+    "development": {
+      "start": "2023-01-03T03:00:00Z",
+      "end": "2024-12-31T23:00:00Z"
+    },
+    "confirmation": {
+      "start": "2025-01-01T00:00:00Z",
+      "end": "2025-12-31T23:00:00Z"
+    },
+    "holdout": {
+      "start": "2026-01-01T00:00:00Z",
+      "end": "2026-05-29T23:00:00Z",
+      "note": "partial: repository data ends 2026-05-29; remainder of 2026 must be forward-earned before holdout use"
+    },
+    "change_reason": "Repository has no Brent (W) data before 2023-01-03; the tentative 2020 development start is not viable on objective data-availability grounds (never performance grounds).",
+    "frozen_before_pnl": true
+  },
+  "input_hash_manifest_sha256": "26fe50aac69c6d0ef1e5e7175fc6919efacbf6ea20eb54af0b4a1d097ac06317"
+}

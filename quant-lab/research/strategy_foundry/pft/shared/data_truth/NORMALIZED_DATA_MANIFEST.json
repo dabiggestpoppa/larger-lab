@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "method": "M5->H1 resample on UTC hour boundaries (O=first,H=max,L=min,C=last,V=sum); native H1 used for W; canonical NY label added; carried prices ffilled with explicit provenance flags; no fabricated bars",
+  "series": {
+    "W": "LCOUSDPRO_H1.csv",
+    "E": "EURUSD_M5.csv",
+    "C": "USDCAD_M5_fetched.csv",
+    "EC": "EURCAD_M5_fetched.csv",
+    "I": "DE30_M5.csv"
+  },
+  "native_h1": [
+    "W"
+  ],
+  "panel_range_utc": [
+    "2023-01-03T03:00:00+00:00",
+    "2026-05-29T23:00:00+00:00"
+  ]
+}

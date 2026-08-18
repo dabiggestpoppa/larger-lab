@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "raw_files": {
+    "LCOUSDPRO_H1.csv": "09b324a805f0022845a43593365d92aa2bde28e8e01ee77a431cd17562582ffb",
+    "EURUSD_M5.csv": "b3447c008ec88e5110fa13a7aa7121ceb04fc887ae2a19f977734138aeb0c2ed",
+    "USDCAD_M5_fetched.csv": "3601c35ac7a0b2e8b703b777a6db0c4d59bea522eed270f50bc455afd713febe",
+    "EURCAD_M5_fetched.csv": "53c0fc093b6d51f6ac4de9a491a6f0fa9e642c88e9377dcd4ea15b94de2b5084",
+    "DE30_M5.csv": "8bc1aea2d2a99f6e915676621e6ff1acbd05bc00f2c1b895b7d46be9b4df102d",
+    "OILUSDPRO_H1.csv": "9c886d9da29a5e412245480630341f9a774687150e91d5e6a74eadece3c7db4d",
+    "EURUSDPRO_M5_2023_2025.csv": "46e81261f5799fdebb4a2d2aed045c91ad5f2bbe3324c0275cb3cc322f18b13b",
+    "USDCAD_PRO_M5.csv": "8e2553ed2da971e96a9967841ab48ad4bcb909437b63595b89e0c21af91b2939",
+    "EURCAD_PRO_M5.csv": "0e53d1aa8e7becb95b856a6ac007ef015b0d6e8ee6189bd2ebdd8b217180be8b"
+  },
+  "normalized_h1_series": {
+    "W": "4558e8dc1b0855bde6accdda5cbeffd5027c34c136b61eb079c5a139f7c0ba75",
+    "E": "f5a3ff26794e9f7b0b58eaff98db7fc5a338566d1dc0938bc2f453a0ea4d274c",
+    "C": "7573d8824eb49c2c5c5248ff28488b976053cd5218fccd1e30021cdfafd68f2c",
+    "EC": "acde593c32e08c50d7c296aa33f51084e6fdeadeb1e61f91f658f93058eb487d",
+    "I": "4316b00797781f3bd613d0c8fdfe006e8b2a3f7d9bca9805cb7c61679da8c6d8"
+  },
+  "synchronized_panel": "9d6f5706e008b6d07607b7594ba2f8d1bdfc4dd2a0829c583f145bbb442c97f2",
+  "hash_algorithm": "sha256"
+}

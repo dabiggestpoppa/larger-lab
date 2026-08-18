@@ -1,0 +1,5 @@
+asset,total_canonical_slots,valid_observed,stale_carried,expected_closed,unexpected_missing,bad,stale_gt_2h,usable_K1_K3
+W,29829,18767,11062,8496,2566,0,9303,20170
+E,29829,21204,8625,8496,129,0,8258,20170
+C,29829,21208,8621,7611,1010,0,8254,20170
+I,29829,19885,9944,9384,640,0,8964,20170

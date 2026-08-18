@@ -1,0 +1,32 @@
+{
+  "checkpoint_id": "PFT-B2-DATA-TRUTH-SEAL",
+  "program_id": "PFT",
+  "branch": "agent/deepers-strategy-foundry",
+  "base_sha": "9f61288679eea56a298e08f718c314f2ca509bc5",
+  "commit_sha": "",
+  "status": "PASS",
+  "spec_generation": "",
+  "data_generation": "PFT-DATA-GEN-001",
+  "engine_generation": "",
+  "data_truth_pass": true,
+  "math_conformance_pass": true,
+  "causality_pass": true,
+  "protected_data_touched": false,
+  "economic_pnl_computed": false,
+  "optimization_performed": false,
+  "confirmation_consumed": false,
+  "holdout_consumed": false,
+  "production_authorized": false,
+  "human_review_required": true,
+  "next_checkpoint_authorized": false,
+  "blockers": [],
+  "warnings": [
+    "ICE Brent continuous REFERENCE is not separately available; LCO CFD (LCOUSDPRO_H1, evidence grade A for execution / D for reference role) serves as the W signal source. A true ICE continuous series should be sourced before economic testing if the operator requires it.",
+    "Roll metadata (contracts, expiry, roll dates) is absent; extreme oil moves are flagged UNRESOLVED, never auto-classified or deleted.",
+    "PRO M5 exports (USDCAD/EURCAD) contain a leading daily-bar segment and were used only for cross-checks; panel uses the fetched/vendor M5 series.",
+    "Timestamp conventions empirically resolved to UTC naive for all candidates (est-anchored PRO file + exact cross-file timestamp coincidence).",
+    "Holdout partition is partial (data ends 2026-05-29); the remainder of 2026 must be forward-earned before holdout evaluation.",
+    "EURUSD candidates (vendor + PRO) contain no Sunday 22:00+ bars (feed artifact); Sunday-evening E slots are carried-stale while C/EC show observed Sunday bars. Cross-asset Sunday-evening signals see E as stale.",
+    "5-min FX triangular parity holds at the mean (residual ~4.9e-07) but residual std (~4.5e-4) is bar-scale: the E vendor feed and C/EC fetched feed differ at the intra-bar/venue level. Parity is a data-quality diagnostic, not a strategy result."
+  ]
+}

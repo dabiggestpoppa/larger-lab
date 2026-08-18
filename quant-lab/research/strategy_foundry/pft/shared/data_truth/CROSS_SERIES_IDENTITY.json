@@ -1,0 +1,22 @@
+{
+  "LCO_vs_OILUSD": {
+    "common_bars": 18775,
+    "return_corr": 0.90863,
+    "exact_price_match_fraction": 0.0
+  },
+  "EURUSD_vendor_vs_PRO": {
+    "common_bars": 223982,
+    "return_corr": 0.999794,
+    "exact_price_match_fraction": 0.98582
+  },
+  "USDCAD_fetched_vs_PRO": {
+    "common_bars": 278480,
+    "return_corr": 0.925101,
+    "exact_price_match_fraction": 1.8e-05
+  },
+  "EURCAD_fetched_vs_PRO": {
+    "common_bars": 278370,
+    "return_corr": 0.922625,
+    "exact_price_match_fraction": 0.120236
+  }
+}
