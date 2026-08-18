@@ -24,7 +24,11 @@ SPECIES_REGISTER = {
         "status": "SPECIMEN_REGISTERED",
         "description": "Original agent formulation. Preserved as historical "
                        "raw specimen; Deepers v2.2 is not retrofitted into it.",
-        "raw_source": "TBD (B1 registers lineage)",
+        "raw_source": "quant-lab/research/strategy_foundry/pft/a0_genesis/spec/LINEAGE.md",
+        "spec_files": [
+            "quant-lab/research/strategy_foundry/pft/a0_genesis/spec/LINEAGE.md",
+        ],
+        "spec_status": "LINEAGE_SEALED_AT_B1",
     },
     "A1-DEEPERS": {
         "name": "PFT-A1-DEEPERS",
@@ -32,6 +36,11 @@ SPECIES_REGISTER = {
         "description": "Deepers Specification Closure v2.2. Primary RAW model. "
                        "Frozen: no reinterpretation, repair, or optimization.",
         "raw_source": "quant-lab/research/strategy_foundry/pft/a1_deepers_v2/SPECIFICATION_V2_2.md",
+        "spec_files": [
+            "quant-lab/research/strategy_foundry/pft/a1_deepers_v2/SPECIFICATION_V2_2.md",
+            "quant-lab/research/strategy_foundry/pft/a1_deepers_v2/spec/SPEC_A1_V2_2.json",
+        ],
+        "spec_status": "FROZEN_MACHINE_SPEC_SEALED_AT_B1",
     },
     "Q0-TRANSMISSION": {
         "name": "PFT-Q0-TRANSMISSION",
@@ -39,7 +48,11 @@ SPECIES_REGISTER = {
         "description": "Independent Quant Box transmission-deficit / "
                        "self-resolution model. Does not borrow information "
                        "from A1 results.",
-        "raw_source": "TBD (B1 registers lineage)",
+        "raw_source": "quant-lab/research/strategy_foundry/pft/q0_transmission/spec/LINEAGE.md",
+        "spec_files": [
+            "quant-lab/research/strategy_foundry/pft/q0_transmission/spec/LINEAGE.md",
+        ],
+        "spec_status": "LINEAGE_SEALED_AT_B1",
     },
     "X1-SYNTHESIS": {
         "name": "PFT-X1-SYNTHESIS",
@@ -47,6 +60,8 @@ SPECIES_REGISTER = {
         "description": "Hybrid synthesis. Not authorized before A0/A1/Q0 "
                        "attribution, falsification and validation.",
         "raw_source": "N/A",
+        "spec_files": [],
+        "spec_status": "NOT_AUTHORIZED",
     },
 }
 

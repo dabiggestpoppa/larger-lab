@@ -113,7 +113,10 @@ def validate_formula_register(data: dict) -> list:
         if fid in seen:
             errors.append(f"duplicate formula id {fid!r}")
         seen.add(fid)
-        for required in ("name", "source_ref", "implementation_status"):
+        # B1 seal: every formula must map to an implementation, a test target
+        # and a fail-closed failure behavior.
+        for required in ("name", "source_ref", "implementation_status",
+                         "implementation_target", "test_target", "failure_behavior"):
             if required not in f:
                 errors.append(f"formula {fid} missing {required!r}")
     return errors
