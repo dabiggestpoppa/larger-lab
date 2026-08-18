@@ -16,6 +16,18 @@ class ExecutionTransport(str, Enum):
     TRADELOCKER_FUTURE = "TRADELOCKER_FUTURE"
 
 
+class AuthenticationMode(str, Enum):
+    """How a session authenticates. Secret requirement depends on THIS,
+
+    never on transport type alone (R1.1 repair: authentication is separated
+    from secret possession).
+    """
+
+    NONE = "NONE"
+    EXTERNAL_SESSION = "EXTERNAL_SESSION"
+    RUNTIME_CREDENTIALS = "RUNTIME_CREDENTIALS"
+
+
 class AccountRole(str, Enum):
     """Frozen R0 account roles."""
 
@@ -98,6 +110,16 @@ class OwnershipMode(str, Enum):
 class MarketStatus(str, Enum):
     OPEN = "OPEN"
     CLOSED = "CLOSED"
+    UNKNOWN = "UNKNOWN"
+
+
+class ClockStatus(str, Enum):
+    """Broker/server clock health/status. Value is observed/calibrated."""
+
+    CALIBRATED = "CALIBRATED"
+    UNCALIBRATED = "UNCALIBRATED"
+    STALE = "STALE"
+    FAILED = "FAILED"
     UNKNOWN = "UNKNOWN"
 
 

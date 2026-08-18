@@ -17,6 +17,7 @@ from execution_runtime.compatibility import (  # noqa: E402
 )
 from execution_runtime.enums import (  # noqa: E402
     AccountRole,
+    AuthenticationMode,
     DesiredState,
     Environment,
     ExecutionTransport,
@@ -40,6 +41,7 @@ def mt5_profile_factory():
             account_id="tb-master-01",
             broker_company=BrokerCompanyId("Ox Securities"),
             transport=ExecutionTransport.MT5,
+            authentication_mode=AuthenticationMode.EXTERNAL_SESSION,
             adapter_id=BrokerAdapterId("MT5BrokerSession"),
             expected_environment=Environment.DEMO,
             account_role=AccountRole.EXCLUSIVE_STRATEGY_MASTER,
@@ -47,9 +49,7 @@ def mt5_profile_factory():
             expected_server="OxSecurities-Demo",
             expected_currency="USD",
             operator_execution_requested=True,
-            secret_reference=SecretReference(
-                kind=SecretKind.ENV_VAR, reference="TB_DEMO_SECRET"
-            ),
+            secret_reference=None,
             strategy_allowlist=("STRAT-A",),
         )
         defaults.update(overrides)

@@ -13,6 +13,7 @@ from typing import NewType
 from .enums import (
     AccountRole,
     CapitalDecisionKind,
+    ClockStatus,
     Environment,
     HedgingNetting,
     SecretKind,
@@ -89,21 +90,56 @@ class SymbolInfo:
 
 
 @dataclass(frozen=True)
+class BrokerClockState:
+    """Broker/server clock truth (source time vs local observation time).
+
+    ``source_offset_seconds`` is source-clock minus UTC and is ALWAYS
+    observed/calibrated — never a hardcoded value such as UTC+3.
+    """
+
+    source_clock_name: str = ""
+    source_offset_seconds: float = 0.0
+    calibrated: bool = False
+    calibration_age_seconds: float | None = None
+    status: ClockStatus = ClockStatus.UNKNOWN
+    observed_at_utc: str = ""
+    failure_reason: str = ""
+
+
+@dataclass(frozen=True)
 class Tick:
+    """Quote tick. ``time`` is the RAW source timestamp (provider clock).
+
+    The generic runtime never normalizes ``time`` into UTC; strategy parity
+    keys must be preserved as-is.
+    """
+
     symbol: str
     bid: float = 0.0
     ask: float = 0.0
-    time: float = 0.0
+    time: float = 0.0  # raw source timestamp, never silently normalized
+    observed_at_utc: float = 0.0  # local observation/received time
+    source_clock_name: str = ""  # which source clock ``time`` is in
+    offset_seconds: float = 0.0  # calibrated source-minus-UTC offset
 
 
 @dataclass(frozen=True)
 class Bar:
+    """OHLC bar. ``time`` is the RAW source timestamp.
+
+    For MT5 this is the BAR OPEN time and is canonical strategy parity.
+    Closure/freshness uses a separately calibrated server-time reference.
+    """
+
     symbol: str
-    time: float = 0.0
+    time: float = 0.0  # raw source timestamp (MT5 = bar open time)
     open: float = 0.0
     high: float = 0.0
     low: float = 0.0
     close: float = 0.0
+    observed_at_utc: float = 0.0  # local observation/received time
+    source_clock_name: str = ""
+    offset_seconds: float = 0.0  # calibrated source-minus-UTC offset
 
 
 @dataclass(frozen=True)

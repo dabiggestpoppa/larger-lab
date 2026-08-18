@@ -13,6 +13,7 @@ from typing import Protocol
 from .types import (
     AccountState,
     Bar,
+    BrokerClockState,
     BrokerIdentity,
     BrokerSnapshot,
     BoundAccountSnapshot,
@@ -108,7 +109,11 @@ class BrokerSession(Protocol):
 
     def account_state(self) -> AccountState: ...
 
+    def clock_state(self) -> BrokerClockState: ...
+
     def symbol_info(self, symbol: str) -> SymbolInfo | None: ...
+
+    def ensure_symbol(self, symbol: str) -> bool: ...
 
     def tick(self, symbol: str) -> Tick | None: ...
 

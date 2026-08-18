@@ -1,0 +1,29 @@
+{
+  "checkpoint": "QL-EXEC-R1.1-MT5-AUTH-SESSION-AND-CLOCK-CONTRACT-REPAIR",
+  "base_commit": "9e11db928ad3c330fcde06d075e20a6e5b349d89",
+  "frozen_at_utc": "2026-08-18T00:00:00.000+00:00",
+  "authorities": {
+    "execution_runtime_foundation_head_sha": "9e11db928ad3c330fcde06d075e20a6e5b349d89",
+    "tb_forward_engine_head_sha": "d12005988ce61170d9bc5478089baa5ce54cc2a9",
+    "tb_r0_authority_sha": "df5f349e02ac932491cb067df7aff25cb71c50ac",
+    "tb_r1_authority_sha": "d12005988ce61170d9bc5478089baa5ce54cc2a9",
+    "capital_routing_branch_head_sha": "d51b9b4772f0bf2ee9a87deb830614e7494f25d1",
+    "capital_scale_authority_sha": "40d237123ac2b709cc0ebce1d7f057bbfde25dab",
+    "capital_translation_scientific_authority_sha": "2bbe52ea8798549ed9c03bd90684fd3a0d408a99",
+    "capital_translation_authority_status": "PENDING_SEALED_REPAIR",
+    "main_head_sha": "9f61288679eea56a298e08f718c314f2ca509bc5"
+  },
+  "tb_authority_drift": {
+    "acknowledged": true,
+    "r0_sha": "df5f349e02ac932491cb067df7aff25cb71c50ac",
+    "r1_sha": "d12005988ce61170d9bc5478089baa5ce54cc2a9",
+    "drift": "TB-R6.1B-FIX-WORKER-STATE-LATCH: ONLINE_MARKET_CLOSED no longer latches after market/feed recovery. Strategy math unchanged (runtime tests 38/38)."
+  },
+  "capital_routing_drift": {
+    "scale_authority_frozen": true,
+    "scientific_translation_seal": "2bbe52ea8798549ed9c03bd90684fd3a0d408a99",
+    "branch_head": "d51b9b4772f0bf2ee9a87deb830614e7494f25d1",
+    "branch_head_note": "test-only cross-branch head check; no science change after the scientific seal",
+    "generic_code_encodes_capital_routing_math": false
+  }
+}

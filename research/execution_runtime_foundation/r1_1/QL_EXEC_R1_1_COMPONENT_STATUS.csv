@@ -1,0 +1,22 @@
+component,status,notes
+AuthenticationMode,IMPLEMENTED,NONE / EXTERNAL_SESSION / RUNTIME_CREDENTIALS
+authentication_satisfied,IMPLEMENTED,centralized pure function feeding authority
+requires_secret,IMPLEMENTED,function of authentication mode not transport
+requires_identity_verification,IMPLEMENTED,EXTERNAL_SESSION + RUNTIME_CREDENTIALS
+identity_gate,UNCHANGED_OR_STRENGTHENED,mode-driven; fail-closed
+derive_execution_authority,REFACTORED,consumes centralized auth
+AccountProfile.authentication_mode,IMPLEMENTED,required field
+MT5 external session,SUPPORTED,secret_reference optional
+BrokerClockState,IMPLEMENTED,observed/calibrated offset; no UTC+3
+BrokerSession.clock_state,IMPLEMENTED,broker-neutral
+BrokerSession.ensure_symbol,IMPLEMENTED,generic symbol activation
+BrokerCapabilities.supports_symbol_activation,IMPLEMENTED,tri-state
+Tick timestamp truth,IMPLEMENTED,source/observed/offset distinct
+Bar timestamp truth,IMPLEMENTED,source bar-open time preserved
+OrderIntent,NO_CHANGE_REQUIRED,R2_BOUNDED_EXTENSION for price/fill/slippage
+CapitalTranslationAdapter,NO_CHANGE_REQUIRED,separate interface unchanged
+MT5BrokerSession,NOT_IMPLEMENTED,deferred to R2
+generic MT5 import,FALSE,no MetaTrader5 in generic package
+broker connection,FALSE,none attempted
+broker order,FALSE,none attempted
+TB active runtime,FALSE,untouched

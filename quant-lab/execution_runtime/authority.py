@@ -1,46 +1,93 @@
-"""QL-EXEC-R1 — derived execution authority (pure, fail-closed, DEFAULT DENY).
+"""QL-EXEC-R1.1 — derived execution authority (pure, fail-closed, DEFAULT DENY).
 
 A config profile can never declare itself READY. Effective authority is
 derived from static profile + observed truth + runtime state + compatibility.
-"""
+
+R1.1 repair: authentication is separated from secret possession. The proven
+TB MT5 pattern attaches to an EXTERNAL_SESSION (an already-logged-in terminal)
+and therefore does NOT require the Python runtime to hold credentials. Secret
+requirement now depends on AUTHENTICATION MODE, never on transport type alone.
+"""  # noqa: E501
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 
 from .account import AccountObservedState, AccountProfile
 from .compatibility import CompatibilityState
-from .enums import AccountRole, DesiredState, ExecutionTransport
+from .enums import AccountRole, AuthenticationMode, DesiredState
 from .hashing import config_hash
 from .profiles import RuntimeState
 from .types import utcnow_iso
 
 
-def transport_requires_authentication(transport: ExecutionTransport) -> bool:
-    """Externally authenticated transports must prove identity."""
-    return transport in (
-        ExecutionTransport.MT5,
-        ExecutionTransport.TRADELOCKER_FUTURE,
+def requires_identity_verification(profile: AccountProfile) -> bool:
+    """Broker identity must be matched for any externally authenticated mode.
+
+    SIM/REPLAY (NONE) have no external broker identity to verify.
+    """
+    return profile.authentication_mode in (
+        AuthenticationMode.EXTERNAL_SESSION,
+        AuthenticationMode.RUNTIME_CREDENTIALS,
     )
 
 
-def transport_requires_secret(transport: ExecutionTransport) -> bool:
-    """Externally authenticated transports require a secret reference."""
-    return transport_requires_authentication(transport)
+def requires_secret(profile: AccountProfile) -> bool:
+    """Secret possession is required ONLY for runtime-credential auth.
+
+    This is the R1.1 repair: requires_secret(profile), not
+    requires_secret(transport).
+    """
+    return profile.authentication_mode is AuthenticationMode.RUNTIME_CREDENTIALS
+
+
+def authentication_satisfied(
+    profile: AccountProfile, observed: AccountObservedState
+) -> tuple[bool, list[str]]:
+    """Centralized authentication satisfaction. Feeds authority derivation.
+
+    NONE                -> no external auth; local transport/session state is
+                           the only session requirement (checked as the
+                           transport gate in derive_execution_authority).
+    EXTERNAL_SESSION    -> observed authenticated session must be true.
+    RUNTIME_CREDENTIALS -> required SecretReference present AND observed
+                           authentication successful.
+    """
+    mode = profile.authentication_mode
+    blockers: list[str] = []
+
+    if mode is AuthenticationMode.NONE:
+        # No external authentication requirement; nothing further to check.
+        pass
+    elif mode is AuthenticationMode.EXTERNAL_SESSION:
+        if not observed.authenticated:
+            blockers.append("external session not authenticated")
+    elif mode is AuthenticationMode.RUNTIME_CREDENTIALS:
+        if profile.secret_reference is None or not profile.secret_reference.is_present():
+            blockers.append("missing secret reference for runtime credentials")
+        if not observed.authenticated:
+            blockers.append("not authenticated")
+    else:  # defensive: never admit an unrecognized mode
+        blockers.append(f"unknown authentication mode: {mode}")
+
+    return (not blockers), blockers
 
 
 def identity_gate(profile: AccountProfile, observed: AccountObservedState) -> tuple[bool, list[str]]:
     """Explicit identity comparison. Never infer identity from connection.
 
     Returns (matched, blockers). Empty blockers == matched.
+
+    CONNECTED is not enough; AUTHENTICATED is not enough; identity must match
+    for EXTERNAL_SESSION and RUNTIME_CREDENTIALS modes.
     """
     blockers: list[str] = []
-    needs_auth = transport_requires_authentication(profile.transport)
+    needs_identity = requires_identity_verification(profile)
 
     # Broker company (required field; compared case-insensitively).
     if observed.observed_broker_company:
         if profile.broker_company.casefold() != observed.observed_broker_company.casefold():
             blockers.append("identity mismatch: broker company")
-    elif needs_auth:
+    elif needs_identity:
         blockers.append("identity not verifiable: broker company missing")
 
     # Server.
@@ -49,12 +96,12 @@ def identity_gate(profile: AccountProfile, observed: AccountObservedState) -> tu
             blockers.append("identity mismatch: server")
         elif not observed.observed_server:
             blockers.append("identity not verifiable: server missing")
-    elif needs_auth:
+    elif needs_identity:
         blockers.append("missing identity expectation: server")
 
     # Environment.
     if observed.observed_environment is None:
-        if needs_auth:
+        if needs_identity:
             blockers.append("identity not verifiable: environment missing")
     elif observed.observed_environment != profile.expected_environment:
         blockers.append("identity mismatch: environment")
@@ -122,27 +169,36 @@ def derive_execution_authority(
     runtime_state: RuntimeState,
     compatibility_state: CompatibilityState,
 ) -> ExecutionAuthorityDecision:
-    """Pure fail-closed derivation of effective execution authority."""
+    """Pure fail-closed derivation of effective execution authority.
+
+    Policy (frozen in R1.1): closing/managing already-owned risk does NOT
+    require operator new-risk permission, but DOES require transport
+    connectivity, satisfied authentication, matched identity, a RUNNING
+    unblocked runtime. Identity must stay strong enough to prevent acting on
+    the wrong account. Foreign risk is never manageable.
+    """
 
     identity_ok, identity_blockers = identity_gate(profile, observed_state)
+    auth_ok, auth_blockers = authentication_satisfied(profile, observed_state)
 
     can_observe = observed_state.transport_connected
 
     runtime_running = runtime_state.desired_state is DesiredState.RUNNING
     not_safety_blocked = not runtime_state.safety_blocked
 
-    # Managing/closing owned existing risk requires connection, auth, identity,
-    # and an alive, unblocked runtime. It does NOT require new-risk admission.
+    # Managing/closing owned existing risk requires connection, satisfied
+    # authentication, matched identity, and an alive, unblocked runtime.
     can_manage_owned = (
         observed_state.transport_connected
-        and observed_state.authenticated
+        and auth_ok
         and identity_ok
         and runtime_running
         and not_safety_blocked
     )
 
-    # New risk requires everything above plus operator intent, role, secret,
-    # reconciliation, and compatibility.
+    # New risk requires everything above plus operator intent, direct-execution
+    # role, reconciliation, and compatibility. Auth blockers (including the
+    # RUNTIME_CREDENTIALS secret requirement) flow in here.
     blockers: list[str] = []
 
     if not profile.operator_execution_requested:
@@ -151,14 +207,9 @@ def derive_execution_authority(
         blockers.append(
             f"account role {profile.account_role.value} cannot submit direct orders"
         )
-    if transport_requires_secret(profile.transport) and (
-        profile.secret_reference is None or not profile.secret_reference.is_present()
-    ):
-        blockers.append("missing secret reference for authenticated transport")
+    blockers.extend(auth_blockers)
     if not observed_state.transport_connected:
         blockers.append("transport not connected")
-    if not observed_state.authenticated:
-        blockers.append("not authenticated")
     blockers.extend(identity_blockers)
     if not runtime_running:
         blockers.append("runtime intentionally stopped")

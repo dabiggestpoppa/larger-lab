@@ -8,16 +8,15 @@ from execution_runtime.authority import (
 )
 from execution_runtime.enums import (
     AccountRole,
+    AuthenticationMode,
     DesiredState,
     Environment,
     ExecutionTransport,
     HedgingNetting,
-    SecretKind,
 )
 from execution_runtime.types import (
     BrokerAdapterId,
     BrokerCompanyId,
-    SecretReference,
 )
 
 
@@ -26,6 +25,7 @@ def _profile(**overrides) -> AccountProfile:
         account_id="tb-master-01",
         broker_company=BrokerCompanyId("Ox Securities"),
         transport=ExecutionTransport.MT5,
+        authentication_mode=AuthenticationMode.EXTERNAL_SESSION,
         adapter_id=BrokerAdapterId("MT5BrokerSession"),
         expected_environment=Environment.DEMO,
         account_role=AccountRole.EXCLUSIVE_STRATEGY_MASTER,
@@ -33,7 +33,7 @@ def _profile(**overrides) -> AccountProfile:
         expected_server="OxSecurities-Demo",
         expected_currency="USD",
         operator_execution_requested=True,
-        secret_reference=SecretReference(kind=SecretKind.ENV_VAR, reference="TB_DEMO_SECRET"),
+        secret_reference=None,
         strategy_allowlist=("STRAT-A",),
     )
     d.update(overrides)
@@ -113,6 +113,7 @@ def test_04_operator_execution_requested_defaults_false():
         account_id="x",
         broker_company=BrokerCompanyId("Ox Securities"),
         transport=ExecutionTransport.MT5,
+        authentication_mode=AuthenticationMode.EXTERNAL_SESSION,
         adapter_id=BrokerAdapterId("MT5BrokerSession"),
         expected_environment=Environment.DEMO,
         account_role=AccountRole.EXCLUSIVE_STRATEGY_MASTER,
@@ -136,7 +137,12 @@ def test_06_missing_required_identity_expectation_handled_explicitly():
 
 def test_07_sim_replay_do_not_require_fake_credentials():
     for transport in (ExecutionTransport.SIM, ExecutionTransport.REPLAY):
-        p = _profile(transport=transport, secret_reference=None, expected_server="")
+        p = _profile(
+            transport=transport,
+            authentication_mode=AuthenticationMode.NONE,
+            secret_reference=None,
+            expected_server="",
+        )
         assert p.secret_reference is None
         o = _observed(
             transport_connected=True,
@@ -148,12 +154,15 @@ def test_07_sim_replay_do_not_require_fake_credentials():
             ),
         )
         d = _auth(profile=p, observed=o)
-        # no secret required for SIM/REPLAY transport
+        # no secret required for SIM/REPLAY (NONE auth mode)
         assert not any("secret reference" in r for r in d.reasons)
 
 
-def test_08_authenticated_transport_without_secret_fails_authority():
-    p = _profile(secret_reference=None)
+def test_08_runtime_credentials_without_secret_fails_authority():
+    p = _profile(
+        authentication_mode=AuthenticationMode.RUNTIME_CREDENTIALS,
+        secret_reference=None,
+    )
     d = _auth(profile=p)
     assert d.can_submit_new_risk is False
     assert any("missing secret reference" in r for r in d.reasons)

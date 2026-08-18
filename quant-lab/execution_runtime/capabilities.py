@@ -22,6 +22,7 @@ class BrokerCapabilities:
     supports_client_tag: CapabilityState = CapabilityState.UNKNOWN
     supports_deal_history: CapabilityState = CapabilityState.UNKNOWN
     supports_margin_estimate: CapabilityState = CapabilityState.UNKNOWN
+    supports_symbol_activation: CapabilityState = CapabilityState.UNKNOWN
 
     def is_supported(self, cap: CapabilityState) -> bool:
         """True only for SUPPORTED. UNKNOWN and UNSUPPORTED both fail closed."""

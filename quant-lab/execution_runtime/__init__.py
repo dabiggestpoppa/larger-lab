@@ -8,17 +8,20 @@ from __future__ import annotations
 from .account import AccountObservedState, AccountProfile
 from .authority import (
     ExecutionAuthorityDecision,
+    authentication_satisfied,
     derive_execution_authority,
     identity_gate,
-    transport_requires_authentication,
-    transport_requires_secret,
+    requires_identity_verification,
+    requires_secret,
 )
 from .binding import StrategyAccountBinding
 from .capabilities import BrokerCapabilities
 from .compatibility import CompatibilityState, evaluate_compatibility
 from .enums import (
     AccountRole,
+    AuthenticationMode,
     CapabilityState,
+    ClockStatus,
     CompatibilityStatus,
     DesiredState,
     Environment,
@@ -76,6 +79,7 @@ from .types import (
     Bar,
     BoundAccountSnapshot,
     BrokerAdapterId,
+    BrokerClockState,
     BrokerCompanyId,
     BrokerIdentity,
     BrokerSnapshot,
@@ -106,11 +110,13 @@ __all__ = [
     "AccountRole",
     "AccountRouter",
     "AccountState",
+    "AuthenticationMode",
     "Bar",
     "BindingRegistry",
     "BoundAccountSnapshot",
     "BrokerAdapterId",
     "BrokerCapabilities",
+    "BrokerClockState",
     "BrokerCompanyId",
     "BrokerIdentity",
     "BrokerOwnershipTag",
@@ -123,6 +129,7 @@ __all__ = [
     "CapitalRequest",
     "CapitalTranslationAdapter",
     "CheckResult",
+    "ClockStatus",
     "CloseResult",
     "CompatibilityState",
     "CompatibilityStatus",
@@ -166,6 +173,7 @@ __all__ = [
     "SymbolInfo",
     "Tick",
     "assert_no_path_collision",
+    "authentication_satisfied",
     "build_runtime_paths",
     "canonical_json",
     "canonical_runtime_id",
@@ -177,9 +185,9 @@ __all__ = [
     "identity_gate",
     "magic_for_namespace",
     "normalize_runtime_id",
+    "requires_identity_verification",
+    "requires_secret",
     "reservation_id_for",
-    "transport_requires_authentication",
-    "transport_requires_secret",
     "validate_reservation_transition",
     "validate_runtime_id",
 ]

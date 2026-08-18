@@ -1,0 +1,47 @@
+{
+  "checkpoint": "QL-EXEC-R1.1-MT5-AUTH-SESSION-AND-CLOCK-CONTRACT-REPAIR",
+  "runner": "pytest",
+  "tests_total": 111,
+  "tests_passed": 111,
+  "tests_failed": 0,
+  "r1_suite_preserved": true,
+  "r1_suite_count": 75,
+  "r1_1_suite_count": 36,
+  "categories": {
+    "auth": 14,
+    "symbol": 3,
+    "clock": 8,
+    "purity": 5,
+    "nonregression": 6
+  },
+  "negative_authority_injections_verified": [
+    "operator_execution_requested=false",
+    "identity_mismatch",
+    "reconciled=false",
+    "runtime_stopped_by_user",
+    "safety_block=true",
+    "role_follower",
+    "role_mirror",
+    "unknown_shared_account_mode",
+    "external_session_not_authenticated",
+    "runtime_credentials_missing_secret",
+    "runtime_credentials_not_authenticated"
+  ],
+  "purity_verified": {
+    "no_metatrader5_import": true,
+    "no_broker_connection": true,
+    "no_broker_order": true,
+    "no_tb_science_constants": true,
+    "no_capital_routing_ab_constants": true,
+    "no_symbol_select_name_leak": true,
+    "no_utc3_hardcoding": true
+  },
+  "nonregression_verified": [
+    "account_registry",
+    "routing",
+    "ownership",
+    "reservation",
+    "config_hashing",
+    "state_path_isolation"
+  ]
+}

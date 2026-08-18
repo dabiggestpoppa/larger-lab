@@ -7,6 +7,7 @@ from execution_runtime.account import AccountProfile
 from execution_runtime.binding import StrategyAccountBinding
 from execution_runtime.enums import (
     AccountRole,
+    AuthenticationMode,
     Environment,
     ExecutionMode,
     ExecutionTransport,
@@ -45,6 +46,7 @@ def _account(**overrides) -> AccountProfile:
         account_id="acct-1",
         broker_company=BrokerCompanyId("Ox Securities"),
         transport=ExecutionTransport.SIM,
+        authentication_mode=AuthenticationMode.NONE,
         adapter_id=BrokerAdapterId("SimBrokerSession"),
         expected_environment=Environment.SIM,
         account_role=AccountRole.EXCLUSIVE_STRATEGY_MASTER,
@@ -117,6 +119,7 @@ def test_22_follower_direct_execution_denied():
         account_id=p.account_id,
         broker_company=p.broker_company,
         transport=ExecutionTransport.MT5,
+        authentication_mode=AuthenticationMode.EXTERNAL_SESSION,
         adapter_id=BrokerAdapterId("MT5BrokerSession"),
         expected_environment=Environment.DEMO,
         account_role=AccountRole.FOLLOWER,
@@ -155,6 +158,7 @@ def test_23_mirror_direct_execution_denied():
         account_id="acct-1",
         broker_company=BrokerCompanyId("Ox Securities"),
         transport=ExecutionTransport.MT5,
+        authentication_mode=AuthenticationMode.EXTERNAL_SESSION,
         adapter_id=BrokerAdapterId("MT5BrokerSession"),
         expected_environment=Environment.DEMO,
         account_role=AccountRole.MIRROR,

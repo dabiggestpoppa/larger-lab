@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 
 from .enums import (
     AccountRole,
+    AuthenticationMode,
     Environment,
     ExecutionTransport,
     HedgingNetting,
@@ -29,6 +30,7 @@ class AccountProfile:
     account_id: str
     broker_company: BrokerCompanyId
     transport: ExecutionTransport
+    authentication_mode: AuthenticationMode
     adapter_id: BrokerAdapterId
     expected_environment: Environment
     account_role: AccountRole
