@@ -1,0 +1,32 @@
+{
+  "checkpoint_id": "PFT-B3-MATH-CAUSALITY-CONFORMANCE",
+  "program_id": "PFT",
+  "branch": "agent/deepers-strategy-foundry",
+  "base_sha": "9f61288679eea56a298e08f718c314f2ca509bc5",
+  "commit_sha": "",
+  "status": "PASS",
+  "spec_generation": "PFT-SPEC-GEN-001",
+  "data_generation": "PFT-DATA-GEN-001",
+  "engine_generation": "PFT-ENGINE-GEN-001",
+  "data_truth_pass": true,
+  "math_conformance_pass": true,
+  "causality_pass": true,
+  "protected_data_touched": false,
+  "economic_pnl_computed": false,
+  "optimization_performed": false,
+  "confirmation_consumed": false,
+  "holdout_consumed": false,
+  "production_authorized": false,
+  "human_review_required": true,
+  "next_checkpoint_authorized": false,
+  "blockers": [],
+  "warnings": [
+    "ICE Brent reference is a CFD proxy (grade D reference role); W signal uses LCO CFD (see B2 warnings).",
+    "DMD window fixed at 720 slots (preregistered RESEARCH_CONSTANT; spec leaves n open) \u2014 parameter, not optimized.",
+    "Drawdown (F18) and leg-stop (F19) overlays validated ONLY on synthetic fixture NAV/equity paths; they require NAV and are not run on real data pre-economic.",
+    "Census/funnel are descriptive activation statistics on DEVELOPMENT only; they are NOT economic performance.",
+    "Truncation audit cutoff=2000 slots (beyond all warmup windows); bit-exact match required and verified on the real panel.",
+    "RAW DORMANCY FINDING (descriptive, pre-economic): the frozen Deepers v2.2 engine never produces a nonzero target on DEVELOPMENT - {\"K1\": \"eligibility band 0.95<|lambda|<1.0 with Im>0 is EMPTY on real data (|lambda| p99 ~ 0.82); K1_VALID rate 0.0 -> w3 always 0. DMD is fixture-correct; the band is a genuine property of this observable.\", \"K3\": \"edge density ~7% (D_ij <= epsilon rarely) -> no 4-node cycle -> NO_HOLE on 100% of valid slots -> topology multiplier 0 -> w2 always 0.\", \"K4\": \"alpha_D p99 ~5.3e-07 vs FSM threshold |w_total|>=0.05 (~2.5e-05 alpha_D); w_total max 0.0046 -> FSM always NEUTRAL -> W_base=[0,0,0] -> executable target rate 0.0.\", \"K2\": \"only kernel that activates (22.6% of slots) but is downstream-gated to zero by the always-neutral FSM.\"}",
+    "Dormancy is a mechanism-level truth for B4 discussion, NOT a spec repair: no parameter may be changed without operator authorization (no result shopping)."
+  ]
+}

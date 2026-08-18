@@ -1,0 +1,19 @@
+{
+  "engine_generation": "PFT-ENGINE-GEN-001",
+  "spec_generation": "PFT-SPEC-GEN-001",
+  "data_generation": "PFT-DATA-GEN-001",
+  "branch": "agent/deepers-strategy-foundry",
+  "base_sha": "9f61288679eea56a298e08f718c314f2ca509bc5",
+  "kernels": [
+    "returns",
+    "parkinson",
+    "k1",
+    "k2",
+    "k3",
+    "k4",
+    "portfolio",
+    "pipeline",
+    "census"
+  ],
+  "created_utc": "2026-08-18T18:41:36.160505+00:00"
+}

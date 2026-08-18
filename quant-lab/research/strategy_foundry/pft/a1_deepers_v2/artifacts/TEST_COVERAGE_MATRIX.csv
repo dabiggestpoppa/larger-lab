@@ -1,0 +1,20 @@
+formula_id,name,implementation_target,reference_fixture_class,causality_test_class,fixture_status,causality_status,failure_behavior
+A1.F01.LOG_RETURN,log return,strategy_foundry.pft.engine.returns.log_return,TestLogReturn,TestReturnsCausal,PASS,PASS,stale/closed slot: r=0 with stale flag; missing/NaN input -> INVALID with reason
+A1.F02.PARKINSON_14H,Parkinson 14H oil volatility,strategy_foundry.pft.engine.parkinson.parkinson_14h,TestParkinson,TestParkinsonCausal,PASS,PASS,insufficient closed bars (<14) -> INVALID with reason; zero ranges contribute 0
+A1.F03.GAMMA_RAW,raw range skew,strategy_foundry.pft.engine.k2.gamma_raw,TestGamma,TestK2Causal,PASS,PASS,H==L -> gamma=0; invalid OHLC -> INVALID with reason
+A1.F04.GAMMA_SMA3,three-hour gamma smooth,strategy_foundry.pft.engine.k2.gamma_sma3,TestGammaSmooth,TestK2Causal,PASS,PASS,insufficient history (<3) -> INVALID with reason
+A1.F05.ACCELERATION,volatility acceleration,strategy_foundry.pft.engine.k2.acceleration,TestAcceleration,TestK2Causal,PASS,PASS,previous sigma==0 -> acceleration=0; non-finite -> 0 with reason
+A1.F06.DMD_OPERATOR,DMD / Koopman phase operator,strategy_foundry.pft.engine.k1.dmd_operator,TestDMD,TestK1Causal,PASS,PASS,"no eligible mode -> w3=0, K1_VALID=false, reason; singular X -> INVALID"
+A1.F07.MODE_PARTICIPATION,mode participation assignment,strategy_foundry.pft.engine.k1.mode_participation,TestDMDParticipation,TestK1Causal,PASS,PASS,same mode wins both -> DeltaPhi=0; no eligible mode -> w3=0
+A1.F08.PHASE_DISTANCE,circular phase distance,strategy_foundry.pft.engine.k1.phase_distance,TestCircularPhase,TestK1Causal,PASS,PASS,"non-finite phase -> INVALID; result bounded [0, pi]"
+A1.F09.VR_DISTANCE,Vietoris-Rips path distance,strategy_foundry.pft.engine.k3.vr_distance,TestVRDistance,TestK3Causal,PASS,PASS,insufficient z-history (<6) -> INVALID with reason
+A1.F10.VR_CLASSIFICATION,runtime topology classification,strategy_foundry.pft.engine.k3.vr_classification,TestVRTopology,TestK3Causal,PASS,PASS,degenerate point cloud (all distances 0) -> NO_HOLE (mult 0)
+A1.F11.K3_OLS,causal OLS expected EC distance,strategy_foundry.pft.engine.k3.k3_ols,TestK3OLS,TestK3Causal,PASS,PASS,"singular/unstable (X^T X)^-1 -> K3_OLS_VALID=false, w2=0, reason; NO pseudoinverse"
+A1.F12.K3_ALPHA,EURCAD directional alpha and sizing,strategy_foundry.pft.engine.k3.k3_alpha,TestK3Alpha,TestK3Causal,PASS,PASS,K3_OLS_VALID=false -> w2=0; non-finite alpha2 -> w2=0 with reason
+A1.F13.RV6,six-hour EURCAD realized volatility,strategy_foundry.pft.engine.k4.rv6,TestRV6,TestK4Causal,PASS,PASS,fewer than six valid returns -> INVALID with reason; ddof=1 enforced
+A1.F14.COMMUTATOR,antisymmetric commutator,strategy_foundry.pft.engine.k4.commutator,TestCommutator,TestK4Causal,PASS,PASS,"insufficient history (N<20) -> alpha_D invalid, w_total=0, reason"
+A1.F15.CLUSTER_FSM,cluster state machine and base weights,strategy_foundry.pft.engine.portfolio.cluster_fsm,TestFSM,TestPortfolioCausal,PASS,PASS,"non-finite w_total -> neutral, W_base=[0,0,0], reason"
+A1.F16.GROSS_CAP,gross leverage cap,strategy_foundry.pft.engine.portfolio.gross_cap,TestGrossCap,TestPortfolioCausal,PASS,PASS,non-finite weights -> target rejected with reason; g>1 -> scale by 1/g
+A1.F17.FADE,reversal fade,strategy_foundry.pft.engine.portfolio.fade,TestFade,TestPortfolioCausal,PASS,PASS,signal flip during fade -> restart from current exposure; neutral -> fade to zero
+A1.F18.DRAWDOWN,drawdown overlay,strategy_foundry.pft.engine.portfolio.drawdown_overlay,TestDrawdown,TestPortfolioCausal,PASS,PASS,"DD>=0.195 -> flatten, terminal lock (manual/new-generation reset only)"
+A1.F19.LEG_STOP,per-leg stop,strategy_foundry.pft.engine.portfolio.leg_stop,TestLegStop,TestPortfolioCausal,PASS,PASS,trigger -> leg target 0 + 12-bar execution ban; signal continues

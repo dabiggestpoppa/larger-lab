@@ -1,0 +1,13 @@
+stage,count,fraction_of_total,pre_economic_note
+total_h1_slots,17493,1.0,
+synchronized_valid_slots,12915,0.738295,>=1 observed bar across assets
+K4_cluster_active,0,0.0,
+K1_valid,0,0.0,
+K2_active,3955,0.22609,
+K3_topology_nonzero,0,0.0,
+nonzero_target,0,0.0,
+gross_cap_applied,0,0.0,sum(abs(W_base)) > 1 scaled to 1.0
+fade_adjusted,0,0.0,
+DD_adjusted,0,0.0,NOT EVALUATED PRE-ECONOMIC (fixture-only overlay; requires NAV)
+leg_stop_adjusted,0,0.0,NOT EVALUATED PRE-ECONOMIC (fixture-only overlay; requires marked equity)
+executable_target,0,0.0,pre-economic: W_fade carried through DD/leg-stop

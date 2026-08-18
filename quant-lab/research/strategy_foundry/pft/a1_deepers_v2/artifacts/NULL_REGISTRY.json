@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "status": "REGISTERED_PRE_ECONOMIC_NO_COMPUTATION",
+  "purpose": "dependency-aware null models for B4+ statistical inference; registered now so future tests are preregistered",
+  "models": [
+    {
+      "id": "NULL-IID",
+      "kind": "iid",
+      "note": "diagnostic only; ignores dependency"
+    },
+    {
+      "id": "NULL-CAL-WEEK-BLOCK",
+      "kind": "block_bootstrap",
+      "block_unit": "calendar week (UTC Mon 00:00)",
+      "note": "primary for FX/hourly"
+    },
+    {
+      "id": "NULL-SESSION-BLOCK",
+      "kind": "block_bootstrap",
+      "block_unit": "session block (NY-session hours)",
+      "note": "session dependency"
+    },
+    {
+      "id": "NULL-EPISODE-BLOCK",
+      "kind": "block_bootstrap",
+      "block_unit": "contiguous activation episode",
+      "note": "episode dependency"
+    }
+  ],
+  "preregistered_estimands": [
+    "activation count under null",
+    "signal funnel stage counts under null"
+  ],
+  "seed_policy": "seed fixed per model id in B4 preregistration; paths >= 10000"
+}

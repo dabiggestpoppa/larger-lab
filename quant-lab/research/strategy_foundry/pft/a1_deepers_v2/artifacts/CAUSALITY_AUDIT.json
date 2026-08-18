@@ -1,0 +1,15 @@
+{
+  "kernel_level": "all rolling kernels: truncation + future-perturbation invariance tested in test_causality.py (177-test suite)",
+  "pipeline_determinism": {
+    "reruns_compared": 2,
+    "numeric_ledger_hash_match": true,
+    "hash": "e0a58d34be179b8733f81599282b80f9a94dfdbf4c0455096e3124ed0b0ff49b"
+  },
+  "pipeline_truncation": {
+    "cutoff_slots": 2000,
+    "bit_exact_match": true,
+    "max_abs_diff_through_cutoff": 0.0
+  },
+  "protected_partitions": "CONFIRMATION/HOLDOUT raise ProtectedPartitionError (guard enforced; pipeline accepts DEVELOPMENT only)",
+  "result": "PASS"
+}

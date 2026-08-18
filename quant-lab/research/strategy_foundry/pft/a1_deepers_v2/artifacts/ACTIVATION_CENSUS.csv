@@ -1,0 +1,5 @@
+kernel,valid_observations,activation_count,activation_rate,mean_duration_h,median_duration_h,overlap_with_K1,overlap_with_K2,overlap_with_K3,overlap_with_K4,stale_market_fraction,session_distribution,year_distribution
+K1,17493,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.313554,{},{}
+K2,17493,3955,0.22609,2.452,2.0,0.0,0.22609,0.0,0.0,0.313554,"{2: 74, 3: 97, 4: 103, 5: 74, 6: 45, 7: 38, 8: 57, 9: 95, 10: 206, 11: 257, 12: 348, 13: 246, 14: 300, 15: 347, 16: 402, 17: 382, 18: 326, 19: 210, 20: 161, 21: 164, 22: 9, 23: 14}","{2023: 1936, 2024: 2019}"
+K3,17493,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.313554,{},{}
+K4,17493,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.313554,{},{}

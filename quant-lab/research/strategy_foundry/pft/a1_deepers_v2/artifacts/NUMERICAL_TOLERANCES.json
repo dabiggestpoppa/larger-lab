@@ -1,0 +1,11 @@
+{
+  "OLS_COND_TOL": 1000000000000.0,
+  "DMD_REFERENCE_ATOL": 1e-06,
+  "DMD_EIGVEC_NORM_TOL": 1e-09,
+  "OLS_COEFF_ATOL": 1e-08,
+  "OLS_DHAT_ATOL": 1e-06,
+  "CIRCULAR_PHASE_ABS": 1e-12,
+  "PARITY_MEAN_TOL": 1e-06,
+  "DETERMINISM_BIT_EXACT": "sha256 of numeric ledger frames must match",
+  "TRUNCATION_BIT_EXACT": "real-panel truncation audit max |diff| must be 0.0"
+}

@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "A1.F01.LOG_RETURN": {
+    "fixture": "P=[100,101] -> r[1]=ln(1.01)",
+    "expected": "0.00995033"
+  },
+  "A1.F02.PARKINSON_14H": {
+    "fixture": "H/L=2.0 constant x14, annualization sqrt(365*24)",
+    "expected": "sqrt(ln2^2/(4ln2))*sqrt(365*24)"
+  },
+  "A1.F03.GAMMA_RAW": {
+    "fixture": "H=100,C=99,L=90 -> gamma=(1-9)/10=-0.8",
+    "expected": "-0.8",
+    "regression_lock": true
+  },
+  "A1.F06.DMD_OPERATOR": {
+    "fixture": "block-diag A, mag 0.97 theta 0.5",
+    "expected": "recovers |lambda|=0.97, |angle|=0.5, ||phi||=1 (atol 1e-6/1e-9)"
+  },
+  "A1.F08.PHASE_DISTANCE": {
+    "fixture": "phi=(3.10,-3.10)",
+    "expected": "2pi-6.20 (circular)",
+    "bound": "[0, pi]"
+  },
+  "A1.F10.VR_CLASSIFICATION": {
+    "fixture": "4-cycle at eps; diagonals beyond 1.15eps -> FRAGILE; complete graph -> NO_HOLE; cycle surviving 1.15eps -> PERSISTENT",
+    "expected": "class per spec 12.3"
+  },
+  "A1.F11.K3_OLS": {
+    "fixture": "dec=1+2*dwe-0.5*dwc, noise=0",
+    "expected": "beta=(1,2,-0.5) atol 1e-8; singular X^T X -> K3_OLS_VALID=false (cond tol 1e12)"
+  },
+  "A1.F14.COMMUTATOR": {
+    "fixture": "a=k*0.1, b=k*0.01 over t-20..t",
+    "expected": "hand sum /20; current A_t enters k=1"
+  },
+  "A1.F15.CLUSTER_FSM": {
+    "fixture": "w_total thresholds +/-0.05",
+    "expected": "neutral/long/short transitions"
+  },
+  "A1.F17.FADE": {
+    "fixture": "reversal 0.3->-0.2",
+    "expected": "0.67*0.3, flat, -0.2 (hours 1-3)"
+  },
+  "A1.F18.DRAWDOWN": {
+    "fixture": "NAV path 100->80.4->110",
+    "expected": "terminal at DD>=0.195 latches despite recovery"
+  },
+  "A1.F19.LEG_STOP": {
+    "fixture": "LE drop -3% of NAV over 6 bars",
+    "expected": "trigger + 12 completed H1 bar ban"
+  }
+}
