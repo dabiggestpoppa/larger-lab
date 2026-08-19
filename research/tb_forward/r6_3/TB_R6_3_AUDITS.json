@@ -1,0 +1,203 @@
+{
+  "suite": "tb_weekly_audit_tests",
+  "passed": 39,
+  "failed": 0,
+  "total": 39,
+  "tests": [
+    {
+      "name": "1 raw bars independently replay canonical primary",
+      "pass": true,
+      "detail": "entries=1 first=SHORT z=56.452693949465754"
+    },
+    {
+      "name": "2 raw bars independently replay canonical control",
+      "pass": true,
+      "detail": "entries=1"
+    },
+    {
+      "name": "1a frozen historical anchor: CONTROL == 405",
+      "pass": true,
+      "detail": "control entries=405"
+    },
+    {
+      "name": "2a frozen historical anchor: PRIMARY == 194",
+      "pass": true,
+      "detail": "primary entries=194"
+    },
+    {
+      "name": "3 correct 200-bar warmup (cold start -> no signal)",
+      "pass": true,
+      "detail": "entries=0"
+    },
+    {
+      "name": "4 current bar excluded (z == canonical prev-200, ddof=0)",
+      "pass": true,
+      "detail": "verified over 31 bars"
+    },
+    {
+      "name": "5a frozen entry thresholds",
+      "pass": true,
+      "detail": "primary=3.0 control=2.5"
+    },
+    {
+      "name": "5b primary strict |z| > threshold",
+      "pass": true,
+      "detail": "entries with |z| <= 3.0: 0"
+    },
+    {
+      "name": "5b control strict |z| > threshold",
+      "pass": true,
+      "detail": "entries with |z| <= 2.5: 0"
+    },
+    {
+      "name": "6 signed primary exit (control exits at z<=0 BEFORE primary z<=-0.25)",
+      "pass": true,
+      "detail": "control@2024-03-04 08:05 z=-0.0694 / primary@2024-03-04 08:10 z=-0.4148"
+    },
+    {
+      "name": "7a frozen control exit = 0.0",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "7b control zero exit respected (SHORT exits z<=0)",
+      "pass": true,
+      "detail": "exit z=-0.06940126058486416"
+    },
+    {
+      "name": "8 z6 stop respected (SHORT z>=+6 -> SL_HIT)",
+      "pass": true,
+      "detail": "exit=SL_HIT z=13.685438284073143"
+    },
+    {
+      "name": "9a session contract (no entry 02:55 EST; entry 03:00 EST)",
+      "pass": true,
+      "detail": "entries=['2024-03-04 08:00'] blocks=['OUTSIDE_LONDON_SESSION']"
+    },
+    {
+      "name": "9b session hard exit (TIMEOUT at 12 EST)",
+      "pass": true,
+      "detail": "exit=TIMEOUT @ 2024-03-04 17:00"
+    },
+    {
+      "name": "10 lifecycle contract (INTENT->OPEN, no dup while open, re-entry after close)",
+      "pass": true,
+      "detail": "entries=['2024-03-04 08:00', '2024-03-04 08:35'] exits=2 blocks=2"
+    },
+    {
+      "name": "11 runtime matched event classified MATCHED_TAKEN",
+      "pass": true,
+      "detail": "outcome=MATCHED_TAKEN"
+    },
+    {
+      "name": "12 shadow event classified MATCHED_SHADOW",
+      "pass": true,
+      "detail": "outcome=MATCHED_SHADOW"
+    },
+    {
+      "name": "13 valid runtime blocker classified VALID_RUNTIME_BLOCK",
+      "pass": true,
+      "detail": "outcome=VALID_RUNTIME_BLOCK"
+    },
+    {
+      "name": "14 missing live event becomes MISSED_SIGNAL",
+      "pass": true,
+      "detail": "outcome=MISSED_SIGNAL"
+    },
+    {
+      "name": "15 extra runtime event becomes RUNTIME_ONLY_SIGNAL",
+      "pass": true,
+      "detail": "outcome=RUNTIME_ONLY_SIGNAL"
+    },
+    {
+      "name": "16 price divergence becomes DATA_DIVERGENCE (fail closed)",
+      "pass": true,
+      "detail": "outcome=DATA_DIVERGENCE"
+    },
+    {
+      "name": "17 missing bars invalidates disputed comparison",
+      "pass": true,
+      "detail": "DataCompletenessError raised (fail closed)"
+    },
+    {
+      "name": "18 no-signal week handled (NO_SIGNAL)",
+      "pass": true,
+      "detail": "no_signal=[True, True]"
+    },
+    {
+      "name": "19 two-signal week handled (2 expected entries)",
+      "pass": true,
+      "detail": "entries=2 exits=2"
+    },
+    {
+      "name": "20 open basket prevents duplicate expected entry",
+      "pass": true,
+      "detail": "entries=1 blocked=3"
+    },
+    {
+      "name": "21 deterministic expected_event_id",
+      "pass": true,
+      "detail": "n=2 stable=True"
+    },
+    {
+      "name": "22 weekly historical counts deterministic",
+      "pass": true,
+      "detail": "weeks=30 mean=1"
+    },
+    {
+      "name": "23 monthly historical counts deterministic",
+      "pass": true,
+      "detail": "months=7 total=30"
+    },
+    {
+      "name": "24 4-week rolling counts correct",
+      "pass": true,
+      "detail": "t4=4 weeks=4"
+    },
+    {
+      "name": "25 8-week rolling counts correct",
+      "pass": true,
+      "detail": "t8=8"
+    },
+    {
+      "name": "26 12-week rolling counts correct",
+      "pass": true,
+      "detail": "t12=12"
+    },
+    {
+      "name": "26b current week count + classification diagnostic-only",
+      "pass": true,
+      "detail": "current=2 class=UNUSUALLY_HIGH_ACTIVITY"
+    },
+    {
+      "name": "27 no threshold change from low frequency",
+      "pass": true,
+      "detail": "valid=True primary_z=3.0 control_z=2.5"
+    },
+    {
+      "name": "28a audit path never imports MetaTrader5",
+      "pass": true,
+      "detail": "MetaTrader5 imported during standard audit"
+    },
+    {
+      "name": "28b no broker-write tokens in audit package",
+      "pass": true,
+      "detail": "found []"
+    },
+    {
+      "name": "29 no runtime DB writes (ledger byte-identical, no wal/journal)",
+      "pass": true,
+      "detail": "events=1 wal=0"
+    },
+    {
+      "name": "29b live bar-key normalized from dedup key",
+      "pass": true,
+      "detail": "bar_key='2024-03-04 09:00' direction=SHORT"
+    },
+    {
+      "name": "30 no execution authority (static scan clean)",
+      "pass": true,
+      "detail": "audit package has no order capability; readers use mode=ro"
+    }
+  ]
+}
