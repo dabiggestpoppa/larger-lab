@@ -1,0 +1,35 @@
+{
+  "checkpoint": "QL-EXEC-R5-TRADELOCKER-PROVIDER-FOUNDATION-AND-DUAL-PROVIDER-CONFORMANCE",
+  "secrets": {
+    "principle": "NEVER persist plaintext broker credentials in repo, database, or logs.",
+    "mechanism": "TradeLockerAuthProvider resolves credentials at call time from an injected secret_provider keyed by REFERENCE names (email_ref/password_ref/server/developer_api_key_ref).",
+    "repo_scan": "credentials appear ONLY as fake test values inside test fixtures and FakeTradeLocker defaults (user@example.com / s3cret). No real credential values exist anywhere in the tree.",
+    "log_rule": "tokens never logged; auth failures log status + truncated body only"
+  },
+  "connectivity": {
+    "real_tradelocker_demo_connected": false,
+    "real_tradelocker_order_attempted": false,
+    "real_tradelocker_live_connected": false,
+    "real_tradelocker_live_order_attempted": false,
+    "mt5_regression_pass": true,
+    "r4_2_unmodified": true,
+    "network_in_tests": "ZERO — FakeTradeLocker implements the transport protocol in-process; tests never open sockets"
+  },
+  "write_surface": {
+    "submit_order": "gated by local preflight (order_check) + provider route validity + validity mapping; ambiguous sends NEVER retried; acceptance != fill",
+    "close_position": "places closing ORDER only; flatness must be confirmed via positions truth",
+    "cancel_order": "single-order delete; 404 fails closed",
+    "rate_limiter": "bounded retries; no infinite retry; order POST retry policy conservative (no blind resend after timeout)"
+  },
+  "active_deployment_safety": {
+    "active_tb_modified": false,
+    "active_tb_state_written": false,
+    "task_scheduler_modified": false,
+    "active_dashboard_modified": false,
+    "watcher_modified": false,
+    "active_supervisor_modified": false,
+    "r4_2_shadow_unaffected": true,
+    "live_execution_authorized": false,
+    "production_authorized": false
+  }
+}

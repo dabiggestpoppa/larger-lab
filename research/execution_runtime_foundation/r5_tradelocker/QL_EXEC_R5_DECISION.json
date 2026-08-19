@@ -1,0 +1,47 @@
+{
+  "checkpoint": "QL-EXEC-R5-TRADELOCKER-PROVIDER-FOUNDATION-AND-DUAL-PROVIDER-CONFORMANCE",
+  "status": "PASS",
+  "base_commit": "26b9b80d0b336f3c422fe187ece9075b68ffdf1b",
+
+  "generic_runtime_provider_neutral": true,
+  "mt5_provider_supported": true,
+  "tradelocker_provider_supported": true,
+
+  "tradelocker_auth_implemented": true,
+  "tradelocker_account_discovery_implemented": true,
+  "tradelocker_multi_account_supported": true,
+  "tradelocker_instrument_discovery_implemented": true,
+  "tradelocker_config_parsing_implemented": true,
+  "tradelocker_rate_limit_handling_implemented": true,
+
+  "tradelocker_order_submit_implemented_offline": true,
+  "tradelocker_order_reconcile_implemented_offline": true,
+  "tradelocker_position_close_implemented_offline": true,
+
+  "order_position_identity_correct": true,
+  "ambiguous_submit_fail_closed": true,
+  "restart_dedup_pass": true,
+  "foreign_position_protection_pass": true,
+  "multi_account_isolation_pass": true,
+
+  "tb_tradelocker_offline_compatibility_pass": true,
+
+  "real_tradelocker_demo_connected": false,
+  "real_tradelocker_order_attempted": false,
+  "real_tradelocker_live_connected": false,
+  "real_tradelocker_live_order_attempted": false,
+
+  "mt5_regression_pass": true,
+  "r4_2_unmodified": true,
+
+  "tests_total": 459,
+  "tests_passed": 459,
+  "tests_failed": 0,
+
+  "live_execution_authorized": false,
+  "production_authorized": false,
+  "human_review_required": true,
+
+  "next_checkpoint_recommended": "QL-EXEC-R5.1-TRADELOCKER-DEMO-READ-ONLY-INTEGRATION",
+  "next_checkpoint_authorized": false
+}

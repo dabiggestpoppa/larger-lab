@@ -1,0 +1,20 @@
+component,status,notes
+GenericRuntime provider-neutral,IMPLEMENTED,no provider branch above BrokerSession; conformance suite proves it
+BrokerSession protocol,UNCHANGED,peer adapters behind the same contract
+MT5BrokerSession,UNCHANGED,R2 frozen; regression pass (459 suite)
+TradeLockerAuthProvider,IMPLEMENTED,JWT + singleflight refresh + injected secrets
+TradeLockerClient,IMPLEMENTED,transport-injected; 401 refresh-retry; no blind write retry
+TradeLockerConfigSnapshot,IMPLEMENTED,dynamic columns + version hash + rateLimits
+TradeLockerRateLimiter,IMPLEMENTED,per-route windows + Retry-After + bounded backoff
+TradeLockerBrokerSession,IMPLEMENTED,full BrokerSession surface + capabilities()
+FakeTradeLocker,IMPLEMENTED,in-memory provider (auth/accounts/config/instruments/orders/positions/executions/quotes/history + failure injection)
+Multi-account binding,IMPLEMENTED,accountId/accNum distinct; per-account isolation proven
+Order/position identity,IMPLEMENTED,orderId != positionId; acceptance != fill; close != flat
+Foreign position protection,IMPLEMENTED,never modified (test_48 + conformance)
+Ambiguous send handling,IMPLEMENTED,no blind retry; reconcile first (test_33/34/44)
+Rate limiting,IMPLEMENTED,bounded; no infinite retry
+TB TradeLocker offline parity,IMPLEMENTED,3-leg basket/lifecycle/restart tests
+Conformance suite,IMPLEMENTED,Sim + TradeLocker (MT5 leg = R2/R2.1 suites)
+MT5 regression,IMPLEMENTED,459/459 full suite pass
+R4.2 TB shadow,UNCHANGED,shadow tests pass; no shadow source modified
+Live/demo TradeLocker,NOT CONNECTED,out of scope; R5.1 pending human review

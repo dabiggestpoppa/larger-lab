@@ -1,0 +1,40 @@
+{
+  "checkpoint": "QL-EXEC-R5-TRADELOCKER-PROVIDER-FOUNDATION-AND-DUAL-PROVIDER-CONFORMANCE",
+  "frozen_at": "2026-08-18",
+  "current_authority": "26b9b80d0b336f3c422fe187ece9075b68ffdf1b (QL-EXEC-R4.2-TB-GENERIC-RUNTIME-LIVE-SHADOW-CANARY)",
+  "branches": {
+    "execution_runtime_foundation": "26b9b80d0b336f3c422fe187ece9075b68ffdf1b",
+    "tb_forward_engine": "b48fd35255b41865026a3cba333ae2a2a0d6a004",
+    "capital_routing": "43a6473c1bc01bb79efd3b415e482d65640e1226",
+    "main": "dfdca6acd829cda4c084cd3bd217ab606348b660"
+  },
+  "authority_delta": {
+    "tb_forward_engine": "UNCHANGED (b48fd3525, TB-R6.1D-BOOT-FLOW-STACK); no TB source imported or modified by R5",
+    "capital_routing": "MOVED vs R4.2 freeze: 73f760ce -> 43a6473c (+3 commits CR-RISK-BLOCK-IV-D1.2 physical-truth work). ZERO effect on R5: no Capital Routing science is imported by the provider foundation.",
+    "main": "UNCHANGED (dfdca6ac)"
+  },
+  "api_authority": {
+    "documentation": "https://public-api.tradelocker.com/ (official Public API reference)",
+    "official_client_source": "https://github.com/TradeLocker/tradelocker-python (src/tradelocker/tradelocker_api.py)",
+    "retrieved_at": "2026-08-18",
+    "api_contract_frozen": "JWT auth (/auth/jwt/token, /auth/jwt/refresh, /auth/jwt/all-accounts); /trade/config dynamic columns + rateLimits; INFO/TRADE route ids; market=IOC, limit/stop=GTC validity; orderId != positionId; close = closing order (IOC then GTC); strategyId <= 32 chars"
+  },
+  "new_r5_sources": {
+    "quant-lab/execution_runtime/tradelocker/__init__.py": "provider package exports",
+    "quant-lab/execution_runtime/tradelocker/types.py": "provider-native value objects (accountId/accNum, routes, config snapshot)",
+    "quant-lab/execution_runtime/tradelocker/transport.py": "injectable HTTP transport; before-send vs ambiguous-send timeout semantics; stdlib UrllibTransport",
+    "quant-lab/execution_runtime/tradelocker/auth.py": "TradeLockerAuthProvider: JWT + singleflight refresh + injected secrets",
+    "quant-lab/execution_runtime/tradelocker/ratelimit.py": "provider-aware per-route rate limiter (Retry-After, bounded backoff)",
+    "quant-lab/execution_runtime/tradelocker/config.py": "/config snapshot parser (dynamic columns, limits, rateLimits, version hash)",
+    "quant-lab/execution_runtime/tradelocker/client.py": "REST client (endpoint truth, column resolution, 401 refresh-retry, no blind write retry)",
+    "quant-lab/execution_runtime/tradelocker/session.py": "TradeLockerBrokerSession implementing BrokerSession",
+    "quant-lab/execution_runtime/tradelocker/fake_server.py": "FakeTradeLocker deterministic provider (transport-level, zero network)",
+    "quant-lab/execution_runtime/tests/test_execution_runtime_r5_tradelocker.py": "59-test matrix (R5 items 1-60)",
+    "quant-lab/execution_runtime/tests/test_execution_runtime_r5_conformance.py": "BrokerSession conformance suite (Sim + TradeLocker; MT5 leg = R2/R2.1 suites)"
+  },
+  "modified_generic_sources": {
+    "quant-lab/execution_runtime/enums.py": "ExecutionTransport.TRADELOCKER added; OrderType.STOP added (provider-neutral stop order)",
+    "quant-lab/execution_runtime/capabilities.py": "BrokerCapabilities extended with R5 capability fields (all default UNKNOWN -> fail closed)"
+  },
+  "note": "R5 is OFFLINE/MOCK/DEMO-READ foundation. No live TradeLocker connection, no demo connection, no order attempted, no production authorization. Active MT5/TB stack and R4.2 shadow untouched."
+}

@@ -13,6 +13,7 @@ class ExecutionTransport(str, Enum):
     MT5 = "MT5"
     SIM = "SIM"
     REPLAY = "REPLAY"
+    TRADELOCKER = "TRADELOCKER"
     TRADELOCKER_FUTURE = "TRADELOCKER_FUTURE"
 
 
@@ -160,10 +161,15 @@ class CapitalDecisionKind(str, Enum):
 
 
 class OrderType(str, Enum):
-    """Broker-neutral order type. R2 supports only what execution needs."""
+    """Broker-neutral order type. R2 supports only what execution needs;
+
+    R5 adds STOP as the provider-neutral stop-order concept (TradeLocker
+    ``type=stop`` and the MT5 buy/sell stop variants share this semantic).
+    """
 
     MARKET = "MARKET"
     LIMIT = "LIMIT"
+    STOP = "STOP"
 
 
 class OrderSide(str, Enum):

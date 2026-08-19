@@ -1,0 +1,29 @@
+{
+  "schema_version": "r5",
+  "principle": "accountId and accNum are DIFFERENT provider-native identities and are NEVER collapsed into one integer. TradeLocker account identity binds environment + accountId + accNum + server.",
+  "provider_native": {
+    "accountId": "integer id used in REST paths: /trade/accounts/{accountId}/...",
+    "accNum": "integer account number used in the accNum HTTP header",
+    "server": "broker server name used at login (/auth/jwt/token body)",
+    "environment": "base URL environment (demo/live) — R5 uses demo base only in code/config, never connected"
+  },
+  "generic_binding": {
+    "BrokerIdentity.account_identifier": "str(accNum) — operator-visible account number",
+    "TradeLockerBrokerSession.account_id": "int accountId",
+    "TradeLockerBrokerSession.acc_num": "int accNum",
+    "account_id": "bound EconomicTarget -> TradeLockerBrokerSession execution path; provider adapter NEVER chooses the account",
+    "ownership_truth": "logical strategy id + runtime id + account id + provider order id + provider position id"
+  },
+  "multi_account": {
+    "session_model": "ONE authenticated session manages MULTIPLE authorized accounts where the API contract permits",
+    "discovery": "GET /auth/jwt/all-accounts (read-only) returns id, accNum, name per account",
+    "isolation": "each GenericRuntime instance keeps separate runtime_id, account binding, ledger, desired state; NO cross-account ownership contamination (test_08/test_50)",
+    "unlike_mt5": "MT5 local-terminal deployment is one process/terminal per account; TradeLocker is a native multi-account REST session — the provider supports both models without generic changes"
+  },
+  "test_evidence": [
+    "test_06_all_accounts_parsing: {(101,1000001),(102,1000002)} retained separately",
+    "test_07_account_id_acc_num_retained_separately",
+    "test_08_multi_account_isolation",
+    "test_50_no_cross_account_contamination"
+  ]
+}

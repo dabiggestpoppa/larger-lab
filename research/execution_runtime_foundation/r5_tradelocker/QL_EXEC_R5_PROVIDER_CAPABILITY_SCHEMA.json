@@ -1,0 +1,33 @@
+{
+  "schema_version": "r5",
+  "semantics": "Tri-state per capability: SUPPORTED / UNSUPPORTED / UNKNOWN. UNKNOWN is NOT FALSE — any REQUIRED capability that is UNKNOWN fails closed. Provider absence never contaminates GenericRuntime.",
+  "fields": {
+    "supports_market_order": "SUPPORTED (TradeLocker market orders, IOC)",
+    "supports_limit_order": "SUPPORTED (GTC)",
+    "supports_stop_order": "SUPPORTED (GTC)",
+    "supports_cancel": "SUPPORTED (DELETE /trade/accounts/{id}/orders/{orderId} and bulk)",
+    "supports_partial_fill_reporting": "UNKNOWN (no official partial-fill reporting contract observed)",
+    "supports_partial_close": "SUPPORTED (DELETE /trade/positions/{positionId} with qty)",
+    "supports_modify_order": "UNKNOWN (cancel+replace is the safe policy until official modify contract is verified)",
+    "supports_native_sl_tp": "SUPPORTED (stopLoss/takeProfit + absolute/offset types on create_order)",
+    "supports_trailing_stop": "UNKNOWN (no official contract observed)",
+    "supports_client_order_id": "UNSUPPORTED (strategyId is an ownership TAG, not a client order id; durable ledger is idempotency authority)",
+    "supports_hedging": "UNKNOWN (per-account accounting mode; not asserted without account truth)",
+    "supports_netting": "UNKNOWN (deprecated netting param in official client; not asserted)",
+    "supports_order_check": "UNSUPPORTED (no broker-side preflight endpoint; adapter performs LOCAL structural preflight only, zero network)",
+    "supports_client_tag": "SUPPORTED (strategyId <= 32 chars)",
+    "supports_deal_history": "SUPPORTED (executions + ordersHistory)",
+    "supports_margin_estimate": "UNKNOWN",
+    "supports_symbol_activation": "UNKNOWN",
+    "supports_multi_account_session": "SUPPORTED (one authenticated session, many authorized accounts via /auth/jwt/all-accounts)",
+    "supports_history": "SUPPORTED (/trade/history, resolution-based, bounded by QUOTES_HISTORY_BARS limit)",
+    "supports_streaming_quotes": "UNSUPPORTED (REST polling only in R5)",
+    "supports_rest_quotes": "SUPPORTED (/trade/quotes with INFO route)"
+  },
+  "provider_truth": {
+    "mt5": "Declared by MT5BrokerSession per injected module (R2 frozen); NOT modified by R5.",
+    "tradelocker": "As above, frozen from official client source at 2026-08-18.",
+    "sim": "Full capability surface for deterministic harness."
+  },
+  "fail_closed_rule": "GenericRuntime must call capabilities().require(cap, what) before any path that depends on a capability; UNKNOWN and UNSUPPORTED both block."
+}

@@ -1,0 +1,24 @@
+generic_contract,mt5_support,tradelocker_support,semantic_difference,normalization_rule,test_status
+connect_authenticate,EXACT (R2),EXACT (R5),TL uses JWT REST auth vs MT5 terminal session,adapter owns auth; identity/account truth normalized,PASS
+identity,EXACT,EXACT,TL accNum vs MT5 login/account_number,BrokerIdentity.account_identifier=PASS
+account_state,EXACT,EXACT,TL dynamic columns via /config,column-id resolution,PASS
+clock_state,EXACT,NORMALIZED_EQUIVALENT,TL serverTime from quotes vs MT5 server time,calibrated offset vs local; UNCALIBRATED until quote truth,PASS
+symbol_info,EXACT,NORMALIZED_EQUIVALENT,TL instruments discovery vs MT5 symbol info,provider-native fields preserved; unknown fields fail closed,PASS
+bars,EXACT,NORMALIZED_EQUIVALENT,TL /trade/history resolution vs MT5 copy_rates,resolution map adapter-owned,PASS
+tick_quotes,EXACT,NORMALIZED_EQUIVALENT,TL INFO route quotes vs MT5 symbol_info_tick,route-owned; raw source timestamp preserved,PASS
+positions,EXACT,EXACT,orderId/positionId differ,positions truth is the only exposure authority,PASS
+orders,EXACT,NORMALIZED_EQUIVALENT,TL non-final vs MT5 pending,status-based non-final filter,PASS
+deals_fills,EXACT,NORMALIZED_EQUIVALENT,TL executions/ordersHistory vs MT5 deals,entry/exit normalized vs positions truth (documented),PASS
+order_check,EXACT,UNSUPPORTED,TL has no broker preflight,LOCAL structural preflight only; capability UNSUPPORTED,PASS (fail-closed)
+submit_order,EXACT,NORMALIZED_EQUIVALENT,market=IOC / resting=GTC validity,validity mapping adapter-owned; acceptance != fill,PASS
+cancel_order,EXACT,EXACT,per-order delete,404 fails closed,PASS
+close_position,EXACT,NORMALIZED_EQUIVALENT,close is a closing ORDER not guaranteed close,flatness confirmed via positions truth,PASS
+reconcile_snapshot,EXACT,EXACT,same classification surface,same BrokerSnapshot contract,PASS
+rate_limiting,N/A,SUPPORTED,TL /config rateLimits,provider-aware limiter + Retry-After + bounded backoff,PASS
+multi_account,N/A,SUPPORTED,TL native multi-account session,per-account binding; no cross-account contamination,PASS
+market_order,SUPPORTED,SUPPORTED,IOC both (TL mandatory),adapter-owned,PASS
+limit_order,SUPPORTED,SUPPORTED,GTC for TL resting,adapter-owned,PASS
+stop_order,SUPPORTED (R5 OrderType.STOP),SUPPORTED,TL stopPrice semantics,adapter-owned,PASS
+ownership_tag,SUPPORTED (magic/comment),SUPPORTED (strategyId<=32),provider-native tag,ownership binds strategy+runtime+account+order+position,PASS
+partial_close,SUPPORTED,SUPPORTED,TL qty-based close,remaining qty reconciled from positions,PASS
+ambiguous_send,handled (R2),handled (R5),no blind retry; reconcile first,TRANSPORT_ERROR + reconcile-before-retry,PASS
