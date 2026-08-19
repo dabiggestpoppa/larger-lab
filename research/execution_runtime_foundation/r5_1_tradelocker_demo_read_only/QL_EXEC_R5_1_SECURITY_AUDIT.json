@@ -1,0 +1,30 @@
+{
+  "checkpoint": "QL-EXEC-R5.1-TRADELOCKER-DEMO-READ-ONLY-INTEGRATION",
+  "secrets_handling": {
+    "credentials_source": "environment only (TRADELOCKER_EMAIL, TRADELOCKER_PASSWORD, TRADELOCKER_SERVER, optional TRADELOCKER_DEV_API_KEY)",
+    "plaintext_in_repo": false,
+    "plaintext_in_db": false,
+    "plaintext_in_logs": false,
+    "credential_values_in_artifacts": false,
+    "secret_scan": "source audit: no email/password literals in runner or provider modules (test-enforced); fixture credentials exist only in FakeTradeLocker/tests and are documented as fixtures",
+    "auth_headers_in_logs": false,
+    "header_logging_scan": "code-only tokenize scan proves no print()/logging usage in real provider modules (test-enforced)"
+  },
+  "write_barriers": {
+    "barrier_1_runtime_authority_gate": {"can_submit_new_risk": false},
+    "barrier_2_session_guard": "ReadOnlyTradeLockerBrokerSession raises ReadOnlyProviderWriteForbiddenError on submit/close/cancel; never fake success",
+    "barrier_3_transport_deny": "ReadOnlyTransport denies every non-GET except /auth/jwt/token and /auth/jwt/refresh before it leaves the process",
+    "barrier_4_capability_profile": "can_submit_new_risk=false; demo-only environment gate refuses any non-demo base URL before connection"
+  },
+  "environment": {
+    "demo_only": true,
+    "live_connection": false,
+    "contest_connection": false,
+    "unknown_environment_fallback": false
+  },
+  "redaction": {
+    "audit_artifacts_contain_tokens": false,
+    "audit_artifacts_contain_passwords": false
+  },
+  "verdict": "SECURE_READ_ONLY_BY_CONSTRUCTION"
+}

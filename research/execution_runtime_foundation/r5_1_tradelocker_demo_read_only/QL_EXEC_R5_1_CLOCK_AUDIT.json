@@ -1,0 +1,18 @@
+{
+  "per_account": {
+    "101": {
+      "local_utc_ms": 1787159725195,
+      "offset_seconds": -0.001,
+      "provider_server_ms": 1787159725195,
+      "provider_time_preserved": true,
+      "source_clock_name": "TRADELOCKER_SERVER_TIME"
+    },
+    "102": {
+      "local_utc_ms": 1787159725196,
+      "offset_seconds": -0.001,
+      "provider_server_ms": 1787159725196,
+      "provider_time_preserved": true,
+      "source_clock_name": "TRADELOCKER_SERVER_TIME"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "account_count": 2,
+  "accounts": [
+    {
+      "acc_num": 1000001,
+      "account_id": 101,
+      "environment": "DEMO",
+      "name": "Demo USD 1"
+    },
+    {
+      "acc_num": 1000002,
+      "account_id": 102,
+      "environment": "DEMO",
+      "name": "Demo USD 2"
+    }
+  ],
+  "demo_environment_verified": true
+}

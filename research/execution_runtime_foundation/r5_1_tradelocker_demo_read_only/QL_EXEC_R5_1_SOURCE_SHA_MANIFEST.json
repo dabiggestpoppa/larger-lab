@@ -1,0 +1,21 @@
+{
+  "checkpoint": "QL-EXEC-R5.1-TRADELOCKER-DEMO-READ-ONLY-INTEGRATION",
+  "frozen_at_utc": "2026-08-19",
+  "branches": {
+    "execution-runtime-foundation": "832ac0f43ab8cce8f3a09057740668fc25e07ce8",
+    "tb-forward-engine": "0c0272ad",
+    "capital-routing": "43a6473c",
+    "main": "9f612886"
+  },
+  "authoritative_base_sha": "832ac0f43ab8cce8f3a09057740668fc25e07ce8",
+  "parent_r5_commit": "832ac0f43ab8cce8f3a09057740668fc25e07ce8",
+  "tb_authority_note": "tb-forward-engine moved to 0c0272ad (TB-R6.3 weekly signal-completeness auditor, additive side-service). Audited: no market-data export, runtime DB, decision telemetry, supervision, desired-state, or watcher/dashboard changes affecting R5.1 read-only demo work.",
+  "capital_routing_note": "43a6473c (CR-RISK-BLOCK-IV-D1.2A1-PHYSICAL-TRUTH-COLLECTION). Capital Routing science is NOT imported by R5.1.",
+  "main_note": "main moved to 9f612886 (OCE Block 0 constitutional checkpoint). No execution-runtime impact.",
+  "official_api_truth": {
+    "retrieval_date": "2026-08-19",
+    "source": "official TradeLocker Public API documentation (public-api.tradelocker.com) + official tradelocker-python client source",
+    "api_drift_from_r5": "NONE_DETECTED",
+    "frozen_truth": "base {environment}/backend-api; JWT access+refresh; accNum header; developer-api-key header; /auth/jwt/token, /auth/jwt/refresh, /auth/jwt/all-accounts; /trade/config dynamic columns + rateLimits; INFO route for market data, TRADE route for execution; market=IOC, limit/stop=GTC; qty as string; orderId != positionId; close is an order (IOC then GTC); strategyId <= 32 chars; min lot 0.01"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "checkpoint": "QL-EXEC-R5.1-TRADELOCKER-DEMO-READ-ONLY-INTEGRATION",
+  "audit_method": "git diff of the checkpoint against base 832ac0f4; R4.2 shadow tests re-run in the full offline gate (490/490)",
+  "active_tb_modified": false,
+  "r4_2_shadow_state_written": false,
+  "mt5_worker_modified": false,
+  "mt5_supervisor_modified": false,
+  "watcher_modified": false,
+  "dashboard_modified": false,
+  "task_scheduler_modified": false,
+  "active_tb_files_written": false,
+  "tb_runtime_db_written": false,
+  "tb_pid_files_written": false,
+  "tb_desired_state_written": false,
+  "mt5_regression_pass": true,
+  "r4_2_shadow_regression_pass": true,
+  "full_offline_gate": "490/490 tests pass (459 R5 baseline + 31 new R5.1 read-only tests)",
+  "changes_scope": "additive only: execution_runtime/tradelocker/readonly.py, runtime/tradelocker_demo_readonly.py, R5.1 test file, research/r5_1 artifacts",
+  "verdict": "NONINTERFERENCE_PASS"
+}

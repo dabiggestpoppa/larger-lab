@@ -1,0 +1,23 @@
+{
+  "symbols": {
+    "AUDNZD": {
+      "available": true,
+      "info_route_id": "a",
+      "tradable_instrument_id": 5006,
+      "trade_route_id": "b"
+    },
+    "GBPAUD": {
+      "available": true,
+      "info_route_id": "a",
+      "tradable_instrument_id": 5004,
+      "trade_route_id": "b"
+    },
+    "GBPNZD": {
+      "available": true,
+      "info_route_id": "a",
+      "tradable_instrument_id": 5005,
+      "trade_route_id": "b"
+    }
+  },
+  "verdict": "ALL_3_AVAILABLE"
+}

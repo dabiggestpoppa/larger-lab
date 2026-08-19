@@ -1,0 +1,68 @@
+{
+  "config_hash_by_account": {
+    "101": "cfg_749505c211917720",
+    "102": "cfg_749505c211917720"
+  },
+  "rate_limits": [
+    {
+      "limit": 10,
+      "route_name": "QUOTES_HISTORY",
+      "seconds": 60
+    },
+    {
+      "limit": 100,
+      "route_name": "GET_CONFIG",
+      "seconds": 60
+    },
+    {
+      "limit": 60,
+      "route_name": "GET_ORDERS",
+      "seconds": 60
+    },
+    {
+      "limit": 60,
+      "route_name": "GET_POSITIONS",
+      "seconds": 60
+    },
+    {
+      "limit": 30,
+      "route_name": "PLACE_ORDER",
+      "seconds": 60
+    },
+    {
+      "limit": 30,
+      "route_name": "CLOSE_POSITION",
+      "seconds": 60
+    },
+    {
+      "limit": 10,
+      "route_name": "QUOTES_HISTORY",
+      "seconds": 60
+    },
+    {
+      "limit": 100,
+      "route_name": "GET_CONFIG",
+      "seconds": 60
+    },
+    {
+      "limit": 60,
+      "route_name": "GET_ORDERS",
+      "seconds": 60
+    },
+    {
+      "limit": 60,
+      "route_name": "GET_POSITIONS",
+      "seconds": 60
+    },
+    {
+      "limit": 30,
+      "route_name": "PLACE_ORDER",
+      "seconds": 60
+    },
+    {
+      "limit": 30,
+      "route_name": "CLOSE_POSITION",
+      "seconds": 60
+    }
+  ]
+}

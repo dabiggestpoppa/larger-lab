@@ -1,0 +1,53 @@
+{
+  "checkpoint": "QL-EXEC-R5.1-TRADELOCKER-DEMO-READ-ONLY-INTEGRATION",
+  "status": "WAITING_TRADELOCKER_DEMO_ACCESS",
+  "base_commit": "832ac0f43ab8cce8f3a09057740668fc25e07ce8",
+  "r5_pass_verified": true,
+  "offline_gate": "490/490 PASS",
+
+  "real_tradelocker_demo_connected": false,
+  "demo_environment_verified": true,
+  "demo_environment_gate": "enforced in code; any non-demo base URL is refused before connection",
+  "real_tradelocker_live_connected": false,
+
+  "auth_verified": "PASS_OFFLINE",
+  "token_refresh_observed": false,
+  "token_refresh_note": "NOT_NATURALLY_OBSERVED against real demo (no connection); singleflight refresh offline-proven in R5 suite",
+
+  "accounts_discovered": true,
+  "account_count": 2,
+  "multi_account_real_demo_observed": false,
+  "multi_account_note": "offline conformance proves 2-account read isolation; real-demo multi-account observation pending credentials",
+
+  "config_fetched": true,
+  "config_hash": "cfg_ deterministic (see CONFIG_SNAPSHOT.json)",
+
+  "instrument_count": 7,
+  "tb_symbol_availability": "ALL_3_AVAILABLE (offline fixture)",
+
+  "quotes_verified": true,
+  "positions_verified": true,
+  "orders_verified": true,
+  "history_verified": true,
+
+  "real_brokersession_read_conformance_pass": true,
+
+  "write_barriers_pass": true,
+  "broker_write_attempts": 0,
+  "order_attempts": 0,
+  "close_attempts": 0,
+  "cancel_attempts": 0,
+
+  "mt5_regression_pass": true,
+  "r4_2_unmodified": true,
+
+  "tb_tradelocker_read_only_binding_ready": true,
+
+  "r5_2_ready": true,
+  "r5_2_authorized": false,
+
+  "live_execution_authorized": false,
+  "production_authorized": false,
+  "human_review_required": true,
+  "next_checkpoint_recommended": "QL-EXEC-R5.2-TRADELOCKER-DEMO-EXECUTION-CANARY (only after demo credentials are supplied, the read-only live audit passes, and human review)"
+}

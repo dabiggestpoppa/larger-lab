@@ -1,0 +1,65 @@
+{
+  "hammered_provider": false,
+  "limits_from_config": [
+    {
+      "limit": 10,
+      "route_name": "QUOTES_HISTORY",
+      "seconds": 60
+    },
+    {
+      "limit": 100,
+      "route_name": "GET_CONFIG",
+      "seconds": 60
+    },
+    {
+      "limit": 60,
+      "route_name": "GET_ORDERS",
+      "seconds": 60
+    },
+    {
+      "limit": 60,
+      "route_name": "GET_POSITIONS",
+      "seconds": 60
+    },
+    {
+      "limit": 30,
+      "route_name": "PLACE_ORDER",
+      "seconds": 60
+    },
+    {
+      "limit": 30,
+      "route_name": "CLOSE_POSITION",
+      "seconds": 60
+    },
+    {
+      "limit": 10,
+      "route_name": "QUOTES_HISTORY",
+      "seconds": 60
+    },
+    {
+      "limit": 100,
+      "route_name": "GET_CONFIG",
+      "seconds": 60
+    },
+    {
+      "limit": 60,
+      "route_name": "GET_ORDERS",
+      "seconds": 60
+    },
+    {
+      "limit": 60,
+      "route_name": "GET_POSITIONS",
+      "seconds": 60
+    },
+    {
+      "limit": 30,
+      "route_name": "PLACE_ORDER",
+      "seconds": 60
+    },
+    {
+      "limit": 30,
+      "route_name": "CLOSE_POSITION",
+      "seconds": 60
+    }
+  ]
+}

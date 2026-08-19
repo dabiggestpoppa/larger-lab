@@ -1,0 +1,24 @@
+{
+  "accounts_audited": [
+    101,
+    102
+  ],
+  "isolation_proven": true,
+  "per_account": {
+    "101": {
+      "acc_num": 1000001,
+      "connected": true,
+      "instrument_count": 6,
+      "orders_count": 1,
+      "positions_count": 1
+    },
+    "102": {
+      "acc_num": 1000002,
+      "connected": true,
+      "instrument_count": 1,
+      "orders_count": 0,
+      "positions_count": 0
+    }
+  },
+  "real_demo_multi_account_observed": true
+}

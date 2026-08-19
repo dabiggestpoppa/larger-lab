@@ -28,6 +28,15 @@ from .client import (
 from .config import TradeLockerConfigSnapshot, TradeLockerRateLimit
 from .fake_server import FakeTradeLocker
 from .ratelimit import TradeLockerRateLimiter
+from .readonly import (
+    DEMO_BASE_URL,
+    DemoEnvironmentError,
+    DemoReadOnlyAudit,
+    ReadOnlyProviderWriteForbiddenError,
+    ReadOnlyTradeLockerBrokerSession,
+    ReadOnlyTransport,
+    render_artifacts,
+)
 from .session import TradeLockerBrokerSession, TradeLockerProfile
 from .transport import (
     AmbiguousSendError,
@@ -47,6 +56,9 @@ from .types import (
 
 __all__ = [
     "AmbiguousSendError",
+    "DEMO_BASE_URL",
+    "DemoEnvironmentError",
+    "DemoReadOnlyAudit",
     "FakeTradeLocker",
     "HttpRequest",
     "HttpResponse",
@@ -66,6 +78,10 @@ __all__ = [
     "TradeLockerRateLimitExceeded",
     "TradeLockerRoute",
     "TradeLockerTokens",
+    "ReadOnlyProviderWriteForbiddenError",
+    "ReadOnlyTradeLockerBrokerSession",
+    "ReadOnlyTransport",
     "TransportError",
     "UrllibTransport",
+    "render_artifacts",
 ]

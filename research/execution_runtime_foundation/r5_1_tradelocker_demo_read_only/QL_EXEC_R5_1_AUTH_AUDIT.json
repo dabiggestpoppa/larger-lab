@@ -1,0 +1,9 @@
+{
+  "access_token_expiry_seconds": 3599.807113647461,
+  "auth_count": 1,
+  "auth_headers_in_logs": false,
+  "auth_succeeded": true,
+  "credentials_in_repo": false,
+  "refresh_count": 0,
+  "token_refresh_observed": false
+}

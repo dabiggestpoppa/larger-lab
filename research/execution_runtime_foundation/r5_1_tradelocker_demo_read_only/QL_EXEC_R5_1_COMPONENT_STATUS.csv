@@ -1,0 +1,17 @@
+component,status,evidence
+ReadOnlyTransport (barrier 3),IMPLEMENTED_AND_PROVEN,orders POST/DELETE + positions DELETE denied; auth POSTs + GETs pass (tests)
+ReadOnlyTradeLockerBrokerSession (barrier 2),IMPLEMENTED_AND_PROVEN,submit/close/cancel raise ReadOnlyProviderWriteForbiddenError; reads delegate
+Runtime authority gate (barrier 1),IMPLEMENTED_AND_PROVEN,can_submit_new_risk=false on every audit
+Demo environment gate (barrier 4),IMPLEMENTED_AND_PROVEN,non-demo host refused pre-connection incl. substring-spoof host
+DemoReadOnlyAudit pipeline,IMPLEMENTED_AND_PROVEN_OFFLINE,auth/accounts/config/instruments/quotes/positions/orders/history/clock/isolation/TB availability
+runtime/tradelocker_demo_readonly.py runner,IMPLEMENTED,WAITING_TRADELOCKER_DEMO_ACCESS without credentials; zero network
+Multi-account read isolation,PROVEN_OFFLINE,2 accounts no cross-account leakage
+TB symbol availability audit,PROVEN_OFFLINE,ALL_3_AVAILABLE (GBPAUD/GBPNZD/AUDNZD fixture)
+orderId != positionId normalization,PROVEN_OFFLINE,execution fixture with distinct order/position ids
+Config snapshot + hash,PROVEN_OFFLINE,deterministic cfg_ hash from /config columns
+Rate-limit truth,PROVEN_OFFLINE,limits from /config rateLimits; provider never hammered
+Clock audit,PROVEN_OFFLINE,provider serverTime preserved vs local UTC
+Secrets hygiene,PROVEN,no credential literals; no print/logging in provider modules
+Real demo connection,WAITING_TRADELOCKER_DEMO_ACCESS,no credentials in environment; runner ready
+Real demo order authority,BLOCKED_BY_CONSTRUCTION,four independent barriers
+MT5/TB R4.2 noninterference,PASS,490/490 suite; additive-only diff

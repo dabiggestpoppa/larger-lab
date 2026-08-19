@@ -1,0 +1,8 @@
+account_id,symbol,tradable_instrument_id,info_route_id,trade_route_id,price_precision,contract_size,volume_min,volume_max,volume_step
+101,EURUSD,5001,a,b,5,100000.0,0.01,100.0,0.01
+101,GBPUSD,5002,a,b,5,100000.0,0.01,100.0,0.01
+101,USDJPY,5003,a,b,5,100000.0,0.01,100.0,0.01
+101,GBPAUD,5004,a,b,5,100000.0,0.01,100.0,0.01
+101,GBPNZD,5005,a,b,5,100000.0,0.01,100.0,0.01
+101,AUDNZD,5006,a,b,5,100000.0,0.01,100.0,0.01
+102,GBPUSD,5007,a,b,5,100000.0,0.01,100.0,0.01

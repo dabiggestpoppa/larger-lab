@@ -1,0 +1,20 @@
+{
+  "all_barriers_hold": true,
+  "barriers_independent": true,
+  "capability_profile": {
+    "can_submit_new_risk": false
+  },
+  "runtime_authority_gate": {
+    "can_submit_new_risk": false
+  },
+  "session_barrier": {
+    "cancel_calls": 0,
+    "close_calls": 0,
+    "submit_calls": 0,
+    "total_write_calls": 0
+  },
+  "transport_barrier": {
+    "blocked_methods": "all non-GET except auth POST",
+    "write_attempts_blocked": 0
+  }
+}
