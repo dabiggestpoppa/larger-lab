@@ -1,0 +1,152 @@
+{
+  "checkpoint": "SW-CTBT-T4.1-FORWARD-COLLECTOR-AND-TRANSFER-DASHBOARD-ACTIVATION",
+  "total_checks": 24,
+  "passed": 24,
+  "all_pass": true,
+  "checks": [
+    {
+      "check": 1,
+      "description": "base SHA exact",
+      "pass": true,
+      "detail": "0758608f509d4402bf82dc69e51f091e3609a355"
+    },
+    {
+      "check": 2,
+      "description": "activation seal unchanged",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 3,
+      "description": "forward timestamp unchanged",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 4,
+      "description": "collector single-instance",
+      "pass": true,
+      "detail": "pid=21940"
+    },
+    {
+      "check": 5,
+      "description": "provider connected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 6,
+      "description": "M5 bars updating (at/after first eligible)",
+      "pass": true,
+      "detail": "{'EUR_GBP_USD': '2026-08-20T13:40:00', 'GBP_NZD_USD': '2026-08-20T13:40:00'}"
+    },
+    {
+      "check": 7,
+      "description": "EUR_GBP_USD hash exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 8,
+      "description": "GBP_NZD_USD hash exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 9,
+      "description": "separate ledgers",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 10,
+      "description": "replay active",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 11,
+      "description": "cost capture active (quote read)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 12,
+      "description": "no broker write API reachable (order-prevention tests pass)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 13,
+      "description": "restart does not duplicate events (processed markers)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 14,
+      "description": "canonical dashboard unaffected",
+      "pass": true,
+      "detail": "8765 (canonical) + 8766 (transfer) both listening"
+    },
+    {
+      "check": 15,
+      "description": "transfer dashboard loads",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 16,
+      "description": "correct zero-event state",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 17,
+      "description": "10-event progress correct",
+      "pass": true,
+      "detail": "shows 0/10 progress logic"
+    },
+    {
+      "check": 18,
+      "description": "28-day progress correct",
+      "pass": true,
+      "detail": "days=0.0306"
+    },
+    {
+      "check": 19,
+      "description": "15/30/50 progress correct",
+      "pass": true,
+      "detail": "horizons 10/15/30/50 progress bars rendered"
+    },
+    {
+      "check": 20,
+      "description": "completeness panel accurate",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 21,
+      "description": "historical/forward evidence not pooled",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 22,
+      "description": "no fake metrics",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 23,
+      "description": "production false",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 24,
+      "description": "capital false",
+      "pass": true,
+      "detail": ""
+    }
+  ]
+}

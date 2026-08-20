@@ -2,7 +2,7 @@
   "activation_timestamp_utc": "2026-08-20T12:59:33.677636Z",
   "activation_commit": "cbb916d345bf5f845c4c1cf48212dab9ff3a946b",
   "first_eligible_m5_bar": "2026-08-20T13:05:00Z",
-  "elapsed_days": 0.0,
+  "elapsed_days": 0.0319,
   "completed_events": {
     "EUR_GBP_USD": 0,
     "GBP_NZD_USD": 0

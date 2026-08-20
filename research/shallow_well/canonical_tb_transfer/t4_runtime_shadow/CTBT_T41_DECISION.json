@@ -1,0 +1,45 @@
+{
+  "checkpoint": "SW-CTBT-T4.1-FORWARD-COLLECTOR-AND-TRANSFER-DASHBOARD-ACTIVATION",
+  "status": "PASS_FORWARD_COLLECTOR_RUNNING_AND_DASHBOARD_LIVE",
+  "base_commit": "0758608f509d4402bf82dc69e51f091e3609a355",
+  "t4_activation_commit": "cbb916d345bf5f845c4c1cf48212dab9ff3a946b",
+  "activation_timestamp_utc": "2026-08-20T12:59:33.677636Z",
+  "first_eligible_m5_bar": "2026-08-20T13:05:00Z",
+  "collector": {
+    "running": true,
+    "pid": 21940,
+    "mechanism": "ctbt_runtime/run_shadow_loop.py --start (PID-locked, nohup detached, read-only)",
+    "single_instance": true,
+    "provider_connected": true,
+    "last_completed_m5_bar_utc": "2026-08-20T13:40:00",
+    "time_axis": "real UTC (broker server offset +3:00 measured and normalized)",
+    "forward_evidence_rule_enforced": true,
+    "restart_safety": true,
+    "events": {"EUR_GBP_USD": 0, "GBP_NZD_USD": 0}
+  },
+  "dashboard": {
+    "url": "http://127.0.0.1:8766",
+    "architecture": "cloned from canonical TB dashboard (stdlib ThreadingHTTPServer, dark monospace theme, status cards, 5s refresh)",
+    "navigation": ["FAMILY OVERVIEW", "EUR / GBP / USD", "GBP / NZD / USD", "CANONICAL TB (link)"],
+    "evidence_isolation": "reads only CTBT state (seal, clock, operator status, ledgers); never reads canonical data; canonical page on 8765 unchanged",
+    "zero_event_state": "0 EVENT / WAITING FOR NATURAL SIGNAL",
+    "canary_display": "NOT ELIGIBLE (0/10 events, 0/28 days); never shown as FORWARD VALIDATED / LIVE READY / PRODUCTION READY"
+  },
+  "verification": "24/24 checks pass (see CTBT_T4_VERIFICATION.json)",
+  "final_state": {
+    "collector": "RUNNING",
+    "forward_shadow": "ACTIVE",
+    "dashboard": "TRANSFER FAMILY VIEW LIVE",
+    "canonical_tb": "UNCHANGED",
+    "historical_lab": "CLOSED",
+    "research_mode": "PROSPECTIVE_ONLY",
+    "demo_execution": "NOT AUTHORIZED",
+    "production": "NOT AUTHORIZED"
+  },
+  "demo_execution_authorized": false,
+  "capital_routing_authorized": false,
+  "production_authorized": false,
+  "human_review_required": true,
+  "next_checkpoint": "NONE UNTIL EVIDENCE HINGE (candidate reaches >=10 clean forward events AND >=28 days AND all demo-canary gates -> then recommend SW-CTBT-T5-DEMO-EXECUTION-CANARY)",
+  "waiting_mode": "WAITING / FORWARD OBSERVATION. No daily commits because no signal occurred."
+}

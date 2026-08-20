@@ -1,0 +1,17 @@
+{
+  "collector_running": true,
+  "collector_pid": 10420,
+  "provider_connected": true,
+  "last_bar_timestamp": {
+    "EUR_GBP_USD": "2026-08-20T13:45:02",
+    "GBP_NZD_USD": "2026-08-20T13:45:02"
+  },
+  "last_heartbeat_utc": "2026-08-20T13:45:32.731005Z",
+  "EUR_GBP_USD_events": 0,
+  "GBP_NZD_USD_events": 0,
+  "signal_recognition_rate": 100.0,
+  "dashboard_data_freshness": "2026-08-20T13:45:32.731005Z",
+  "order_prevention_pass": true,
+  "forward_rule": "events only at/after 2026-08-20T13:05:00Z",
+  "activation_timestamp_utc": "2026-08-20T12:59:33.677636Z"
+}

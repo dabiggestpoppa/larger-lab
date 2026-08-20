@@ -51,17 +51,52 @@ class TriSnapshot:
 
 
 class CTBTDataFeed:
-    """Synchronized 3-leg M5 feed over the read-only MT5 proxy."""
+    """Synchronized 3-leg M5 feed over the read-only MT5 proxy.
+
+    Broker MT5 epochs are SERVER time (e.g. UTC+3 for this provider).  The
+    research engine axis (CSV data, activation timestamps, forward filter,
+    session mapping) is REAL UTC, so every timestamp is normalized:
+
+        real_utc = utcfromtimestamp(raw) - server_offset
+
+    where server_offset is measured once at init from the latest tick
+    (server_now_as_utc - utcnow).  If it cannot be measured the feed refuses
+    to run rather than silently mislabel time.
+    """
 
     def __init__(self, proxy: Optional[ReadOnlyMT5Proxy] = None):
         self.mt5 = proxy if proxy is not None else wrap_read_only()
         self._last_processed: Dict[str, Optional[datetime]] = {}
         self.initialized = False
+        self.server_offset = None
+        self._probe_symbol = None
 
     def init(self) -> bool:
         ok = bool(self.mt5.initialize())
         self.initialized = ok
+        if ok:
+            self.server_offset = self._measure_server_offset()
         return ok
+
+    def _measure_server_offset(self) -> Optional[timedelta]:
+        """Measure broker server time offset vs real UTC from a live tick."""
+        for sym in ("EURUSD.PRO", "GBPUSD.PRO", "EURGBP.PRO"):
+            tick = self.mt5.symbol_info_tick(sym)
+            if tick is not None and getattr(tick, "time", None):
+                self._probe_symbol = sym
+                server_as_utc = datetime.utcfromtimestamp(tick.time)
+                # broker offsets are whole or half hours; rounding to the
+                # nearest 30 min makes normalized bars land on clean :00/:05
+                # marks despite tick-age noise (a few seconds)
+                secs = round((server_as_utc - datetime.utcnow()).total_seconds() / 1800.0) * 1800
+                return timedelta(seconds=secs)
+        return None
+
+    def _to_utc(self, raw_epoch: int) -> datetime:
+        ts = datetime.utcfromtimestamp(raw_epoch)
+        if self.server_offset is not None:
+            ts = ts - self.server_offset
+        return ts
 
     def shutdown(self) -> None:
         try:
@@ -91,7 +126,7 @@ class CTBTDataFeed:
         bars = []
         for r in rates:
             bars.append(M5Bar(
-                timestamp=datetime.utcfromtimestamp(r[0]),
+                timestamp=self._to_utc(int(r[0])),
                 open=float(r[1]), high=float(r[2]), low=float(r[3]),
                 close=float(r[4]), volume=int(r[5]), raw_time=int(r[0])))
         return bars
@@ -105,7 +140,7 @@ class CTBTDataFeed:
         bars = []
         for r in rates:
             bars.append(M5Bar(
-                timestamp=datetime.utcfromtimestamp(r[0]),
+                timestamp=self._to_utc(int(r[0])),
                 open=float(r[1]), high=float(r[2]), low=float(r[3]),
                 close=float(r[4]), volume=int(r[5]), raw_time=int(r[0])))
         return bars
@@ -120,7 +155,7 @@ class CTBTDataFeed:
         tick = self.mt5.symbol_info_tick(broker_sym)
         if tick is None:
             return None
-        ts = datetime.utcfromtimestamp(tick.time)
+        ts = self._to_utc(int(tick.time))
         fresh = (datetime.utcnow() - ts).total_seconds() <= max_age_seconds
         spread = max(tick.ask - tick.bid, 0.0)
         pts = spread / (getattr(self.mt5.symbol_info(broker_sym), "point", 1e-5) or 1e-5)
