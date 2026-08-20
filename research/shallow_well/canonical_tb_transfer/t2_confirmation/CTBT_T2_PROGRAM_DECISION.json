@@ -1,0 +1,46 @@
+{
+  "checkpoint": "SW-CTBT-T2-ONE-SHOT-CANONICAL-TRANSFER-CONFIRMATION",
+  "program_decision": "FOCUSED_TRANSFER_FAMILY",
+  "decision_basis": "Both T1.1 survivors passed ALL ten mandatory preregistered confirmation gates on the frozen 2025 window at the frozen 1.0x conservative cost contract.",
+  "confirmed_count": 2,
+  "confirmed_candidates": [
+    {
+      "triangle": "EUR_GBP_USD",
+      "confirmation_state": "FULL_CONFIRMATION",
+      "net_ev_bps": 17.75497366226873,
+      "pf_net": 5.5231,
+      "edge_cost_ratio": 3.2039,
+      "bootstrap_ci": [14.252547084484135, 21.465891220178797],
+      "bootstrap_p": 0.0,
+      "q_value": 0.0,
+      "decay_classification": "TRANSPORT_CONFIRMED"
+    },
+    {
+      "triangle": "GBP_NZD_USD",
+      "confirmation_state": "FULL_CONFIRMATION",
+      "net_ev_bps": 11.868148261529543,
+      "pf_net": 5.8179,
+      "edge_cost_ratio": 2.3346,
+      "bootstrap_ci": [6.156912350905494, 17.224603222356052],
+      "bootstrap_p": 0.0,
+      "q_value": 0.0,
+      "decay_classification": "TRANSPORT_DECAYED_BUT_POSITIVE"
+    }
+  ],
+  "failed_candidates": [],
+  "candidate_status": "HISTORICALLY_CONFIRMED_TRANSFER_CANDIDATES (both)",
+  "no_winner_picking": "Both candidates advance as a family; forward evidence may differentiate them later. PF is NOT a selection tie-breaker.",
+  "historical_optimization_complete": true,
+  "additional_historical_testing_authorized": false,
+  "forward_shadow_ready": true,
+  "forward_shadow_authorized": false,
+  "production_authorized": false,
+  "human_review_required": true,
+  "next_checkpoint_recommended": "SW-CTBT-T3-TRANSFER-CANDIDATE-SEAL-AND-FORWARD-SHADOW-PREREGISTRATION",
+  "stop_rules_acknowledged": [
+    "final historical test in the canonical-transfer program",
+    "no T2.x optimization, no T3 historical research, no alternate exits/sessions/costs/filters",
+    "no forward deployment, no demo orders, no live orders",
+    "canonical AUD_GBP_NZD remains independent"
+  ]
+}

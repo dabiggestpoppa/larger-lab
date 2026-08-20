@@ -1,0 +1,3 @@
+triangle,A_net_ev_gt_0,B_pf_net_ge_1.20,C_n_ge_30,D_edge_cost_ratio_ge_1.50,E_break_even_multiple_ge_1.50,F_same_mechanism_sign_as_t11,G_no_catastrophic_tail_failure,H_no_cost_regime_collapse,I_no_data_causality_invalidation,J_no_config_deviation,G_tail_flag,all_mandatory
+EUR_GBP_USD,True,True,True,True,True,True,True,True,True,True,False,True
+GBP_NZD_USD,True,True,True,True,True,True,True,True,True,True,False,True

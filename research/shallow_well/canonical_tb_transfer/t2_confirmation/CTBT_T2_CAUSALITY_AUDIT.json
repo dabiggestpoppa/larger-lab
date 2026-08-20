@@ -1,0 +1,29 @@
+{
+  "all_invariance_pass": true,
+  "audits": [
+    {
+      "triangle": "EUR_GBP_USD",
+      "future_perturbation_invariance": true,
+      "tail_truncation_invariance": true,
+      "head_truncation_invariance": true,
+      "detail": {
+        "full_events": 146,
+        "perturbed_events_in_overlap": 146,
+        "tail_trunc_events": 144,
+        "head_trunc_events": 145
+      }
+    },
+    {
+      "triangle": "GBP_NZD_USD",
+      "future_perturbation_invariance": true,
+      "tail_truncation_invariance": true,
+      "head_truncation_invariance": true,
+      "detail": {
+        "full_events": 81,
+        "perturbed_events_in_overlap": 81,
+        "tail_trunc_events": 80,
+        "head_trunc_events": 81
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "checkpoint": "SW-CTBT-T2-ONE-SHOT-CANONICAL-TRANSFER-CONFIRMATION",
+  "nonregression_checks": {
+    "t1_original_artifacts_unchanged": "research/shallow_well/canonical_tb_transfer/t1_screen/ untouched; preserved at commit be4ac2f2",
+    "t11_repair_artifacts_unchanged": "research/shallow_well/canonical_tb_transfer/t11_repair/ untouched; sealed at commit d5228fbb",
+    "canonical_405_194_anchors_unchanged": "405 control / 194 primary exact; T2 does not modify the reference lifecycle",
+    "canonical_10_2_pip_contract_unchanged": "frozen canonical reference cost contract not altered by T2",
+    "t11_candidate_fingerprints_unchanged": "EUR_GBP_USD and GBP_NZD_USD T1.1 fingerprints sealed in CTBT_T2_T11_SEAL.json are the development comparison basis and are NOT modified",
+    "no_2026_data": "confirmation window is 2025-01-01 .. 2025-12-31 only; effective coverage ends 2025-12-31 18:55:00; no 2026 bars read",
+    "no_other_candidates": "only EUR_GBP_USD and GBP_NZD_USD run; EUR_GBP_JPY and CHF_GBP_JPY remain closed (provenance only)",
+    "no_historical_optimization": "engine, z, E1, z6, session, runway, hard exit, re-entry, and cost are the sealed T1.1 implementation; window parameter is the only change",
+    "no_parameter_search": "no grid, no search, no filter addition, no cost revision",
+    "engine_identity": "run_t2_confirmation.py imports the sealed primitives from run_t11_screen.py (verified 405/405 + 194/194); identical lifecycle code path"
+  },
+  "preregistration_hash": "9cff2f9e1ebb9c977aa3cad59ed7f3bf838bd488f383347e2c31245ad8b6bf29",
+  "hash_computed_before_economics": true,
+  "sealed_artifacts_written_before_economics": ["CTBT_T2_PROTOCOL.md", "CTBT_T2_PREREGISTRATION.json", "CTBT_T2_PREREGISTRATION_HASH.json", "CTBT_T2_T11_SEAL.json"]
+}

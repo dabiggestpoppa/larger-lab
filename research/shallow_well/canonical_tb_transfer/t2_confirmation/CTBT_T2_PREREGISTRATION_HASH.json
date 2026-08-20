@@ -1,0 +1,8 @@
+{
+  "file": "CTBT_T2_PREREGISTRATION.json",
+  "sha256": "9cff2f9e1ebb9c977aa3cad59ed7f3bf838bd488f383347e2c31245ad8b6bf29",
+  "hash_algorithm": "sha256",
+  "frozen_at": "2026-08-20T12:11:55.795805Z",
+  "economics_opened_after_hash": true,
+  "note": "Hash computed BEFORE any 2025 strategy economics were read or computed."
+}

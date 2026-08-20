@@ -1,0 +1,71 @@
+{
+  "checkpoint": "SW-CTBT-T2-ONE-SHOT-CANONICAL-TRANSFER-CONFIRMATION",
+  "status": "FOCUSED_TRANSFER_FAMILY",
+  "base_commit": "d5228fbbee23c8f85644ebc36f0ac578a76270a1",
+  "t11_verified": {
+    "status": "PASS_STEP1_SURVIVOR_CONFIRMED",
+    "reference_parity": true,
+    "qualified_candidates": ["EUR_GBP_USD", "GBP_NZD_USD"]
+  },
+  "confirmation_window": {
+    "frozen_period": ["2025-01-01 00:00:00", "2025-12-31 23:59:59"],
+    "effective_per_candidate": {
+      "EUR_GBP_USD": {"start": "2025-01-02 00:00:00", "end": "2025-12-31 18:55:00", "n_bars": 71530},
+      "GBP_NZD_USD": {"start": "2025-01-02 00:00:00", "end": "2025-12-31 18:55:00", "n_bars": 71508}
+    },
+    "no_2026_data": true
+  },
+  "candidate_count": 2,
+  "candidate_results": {
+    "EUR_GBP_USD": {
+      "N": 146,
+      "net_ev_bps": 17.75497366226873,
+      "pf_net": 5.5231,
+      "edge_cost_ratio": 3.2039,
+      "break_even_multiple": 3.2039,
+      "win_rate_pct": 77.3973,
+      "bootstrap_ci": [14.252547084484135, 21.465891220178797],
+      "bootstrap_p": 0.0,
+      "q_value": 0.0,
+      "fdr_significant": true,
+      "confirmation_state": "FULL_CONFIRMATION",
+      "decay_classification": "TRANSPORT_CONFIRMED",
+      "all_gates_pass": true
+    },
+    "GBP_NZD_USD": {
+      "N": 81,
+      "net_ev_bps": 11.868148261529543,
+      "pf_net": 5.8179,
+      "edge_cost_ratio": 2.3346,
+      "break_even_multiple": 2.3346,
+      "win_rate_pct": 74.0741,
+      "bootstrap_ci": [6.156912350905494, 17.224603222356052],
+      "bootstrap_p": 0.0,
+      "q_value": 0.0,
+      "fdr_significant": true,
+      "confirmation_state": "FULL_CONFIRMATION",
+      "decay_classification": "TRANSPORT_DECAYED_BUT_POSITIVE",
+      "all_gates_pass": true
+    }
+  },
+  "confirmed_count": 2,
+  "confirmed_candidates": ["EUR_GBP_USD", "GBP_NZD_USD"],
+  "failed_candidates": [],
+  "program_decision": "FOCUSED_TRANSFER_FAMILY",
+  "historical_optimization_complete": true,
+  "additional_historical_testing_authorized": false,
+  "forward_shadow_ready": true,
+  "forward_shadow_authorized": false,
+  "production_authorized": false,
+  "human_review_required": true,
+  "next_checkpoint_recommended": "SW-CTBT-T3-TRANSFER-CANDIDATE-SEAL-AND-FORWARD-SHADOW-PREREGISTRATION",
+  "canonical_reference_status": "REFERENCE_RUN_DESCRIPTIVE_ONLY (AUD_GBP_NZD 2025: 47 events, net EV +7.97 bps, PF 4.87; descriptive, gates unchanged)",
+  "notes": [
+    "Both survivors confirm the canonical TB mechanism transfers to a new calendar period.",
+    "GBP_NZD_USD shows material but non-catastrophic decay vs development (EV retention 0.52) and is labeled TRANSPORT_DECAYED_BUT_POSITIVE — weaker, but positive, transfer evidence.",
+    "EUR_GBP_USD confirms at or above development quality (EV retention 1.13, PF retention 1.02).",
+    "Bootstrap (week-block, 2000 reps, seed 20260820) CIs exclude zero for both; BH-FDR q < 0.05 for both.",
+    "No 2026 data consumed. No parameter search. No filters. Failed candidates sealed.",
+    "Forward-shadow preregistration (T3) requires explicit human authorization."
+  ]
+}

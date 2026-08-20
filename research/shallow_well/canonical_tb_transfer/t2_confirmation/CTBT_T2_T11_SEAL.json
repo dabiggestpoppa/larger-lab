@@ -1,0 +1,65 @@
+{
+  "checkpoint": "SW-CTBT-T2-ONE-SHOT-CANONICAL-TRANSFER-CONFIRMATION",
+  "artifact_role": "T1.1 SEAL — frozen fingerprints and configurations of the two Step-1 survivors; written before 2025 confirmation economics",
+  "t11_commit": "d5228fbbee23c8f85644ebc36f0ac578a76270a1",
+  "t11_status": "PASS_STEP1_SURVIVOR_CONFIRMED",
+  "reference_parity": {
+    "control_z25_events": 405,
+    "primary_z3_events": 194,
+    "match": "405/405 control and 194/194 primary exact (entry/exit timestamps, direction, exit reason, z-score, gross PnL, cost, net PnL, leg sizes; max float diff 0.0)",
+    "canonical_cost_contract_pips": 10.2
+  },
+  "survivors": {
+    "EUR_GBP_USD": {
+      "development_window": "2022-09-28 00:00:00 -> 2024-12-31 18:55:00",
+      "n_bars": 162186,
+      "cost_bps": 8.3594270651793,
+      "cost_evidence_class": "VERIFIED_STATIC_PROVIDER",
+      "z30_fingerprint": {
+        "events": 435,
+        "net_ev_bps": 15.73933847048037,
+        "pf_net": 5.4152,
+        "win_rate_pct": 78.16091954022988,
+        "median_net_bps": 15.657350068793743,
+        "p5_bps": -22.921734519025254,
+        "worst_bps": -61.72346582835661,
+        "edge_cost_ratio": 2.8828250247007543,
+        "positive_years": "3/3 (2022:41, 2023:198, 2024:196 all net positive)",
+        "monotonicity": "MONOTONIC_STRONG"
+      }
+    },
+    "GBP_NZD_USD": {
+      "development_window": "2022-09-12 00:00:00 -> 2024-12-31 18:55:00",
+      "n_bars": 165234,
+      "cost_bps": 8.935843290676996,
+      "cost_evidence_class": "VERIFIED_STATIC_PROVIDER",
+      "z30_fingerprint": {
+        "events": 210,
+        "net_ev_bps": 22.837364916431905,
+        "pf_net": 8.0184,
+        "win_rate_pct": 84.28571428571429,
+        "median_net_bps": 21.907452919789833,
+        "p5_bps": -17.215203081106758,
+        "worst_bps": -183.2855804679332,
+        "edge_cost_ratio": 3.5557033817120245,
+        "positive_years": "3/3 (2022:50, 2023:87, 2024:73 all net positive)",
+        "monotonicity": "MONOTONIC_STRONG"
+      }
+    }
+  },
+  "frozen_contract": {
+    "entry": "strict |z| > 3.0 primary / |z| > 2.5 control",
+    "rolling_z": "200 completed M5 bars, population std ddof=0, current bar excluded, causal only",
+    "weight": "W2 exact-neutral",
+    "exit": "E1 signed overshoot +-0.25 (primary), zero-crossing (control)",
+    "stop": "|z| > 6",
+    "session": "canonical London 03:00-12:00 EST fixed-time contract",
+    "min_runway": 120,
+    "hard_exit": "canonical noon (12:00 EST)",
+    "concurrency": 1,
+    "reentry": "canonical deterministic lifecycle",
+    "cost": "T1.1 conservative contract: 1.5 pip floor spread + 1.4 pip/leg commission, pip_size/median_close conversion"
+  },
+  "sealed_before_2025_economics": true,
+  "nonregression": "T1 and T1.1 artifacts, canonical 405/194 anchors, 10.2-pip contract, and these fingerprints are NOT modified by T2"
+}

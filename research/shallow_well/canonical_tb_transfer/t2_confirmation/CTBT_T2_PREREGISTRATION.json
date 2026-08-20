@@ -1,0 +1,140 @@
+{
+  "checkpoint": "SW-CTBT-T2-ONE-SHOT-CANONICAL-TRANSFER-CONFIRMATION",
+  "base_commit": "d5228fbbee23c8f85644ebc36f0ac578a76270a1",
+  "parent_checkpoint": "SW-CTBT-T1.1-REFERENCE-PARITY-AND-GATE-ENFORCEMENT-REPAIR",
+  "parent_status": "PASS_STEP1_SURVIVOR_CONFIRMED",
+  "human_authorization": "STEP 2 AUTHORIZED",
+  "frozen_before": "2025-01-01T00:00:00",
+  "preregistration_note": "No 2025 strategy economics are read before this file is frozen and hashed.",
+
+  "candidates": ["EUR_GBP_USD", "GBP_NZD_USD"],
+  "closed_candidates": ["EUR_GBP_JPY", "CHF_GBP_JPY"],
+
+  "confirmation_window": {
+    "start": "2025-01-01 00:00:00",
+    "end": "2025-12-31 23:59:59",
+    "data_rule": "actual causally complete M5 coverage only; no synthetic bars; no forward filling; no interpolation; no 2026 data",
+    "window_frozen_before_economics": true
+  },
+
+  "engine": {
+    "source": "research/shallow_well/canonical_tb_transfer/t11_repair/run_t11_screen.py (sealed, verified 405/405 control + 194/194 primary against canonical trade log)",
+    "basis": "b = ln(A) - ln(B) + ln(C); A*C == B triangular identity",
+    "eur_gbp_usd_legs": {"A": "EURGBP", "B": "EURUSD", "C": "GBPUSD"},
+    "gbp_nzd_usd_legs": {"A": "GBPNZD", "B": "GBPUSD", "C": "NZDUSD"},
+    "rolling_z_lookback": 200,
+    "rolling_z_ddof": 0,
+    "rolling_z_population": true,
+    "current_bar_excluded": true,
+    "causal_only": true,
+    "weight": "W2 exact-neutral (uniform unit-free log-weight per leg)",
+    "entry_primary": {"threshold": 3.0, "strict": true, "short": "z > +3.0", "long": "z < -3.0"},
+    "entry_control_descriptive": {"threshold": 2.5, "strict": true},
+    "exit_e1": {"short_exit_z": -0.25, "long_exit_z": 0.25, "family": "canonical signed overshoot", "control_lane_exit": 0.0},
+    "stop_z6": 6.0,
+    "session": {"london_start_h_est": 3, "london_end_h_est": 12, "fixed_utc_offset": -5, "contract": "canonical London 03:00-12:00 EST"},
+    "min_minutes_to_exit": 120,
+    "hard_exit": {"h_est": 12, "checked_before_tp_sl": true},
+    "concurrency": 1,
+    "reentry": "canonical deterministic lifecycle; no cooldown"
+  },
+
+  "cost_contract": {
+    "method": "basket round-trip = sum over legs (spread_pips + commission_pips) * pip_size / median_close * 1e4 bps",
+    "spread_pips": 1.5,
+    "spread_floor_note": "conservative canonical-consistent floor; STRICTER than documented OxSecurities MT5 spec",
+    "reference_spread_canonical": {"GBPAUD": 1.5, "GBPNZD": 2.5, "AUDNZD": 2.0},
+    "commission_pips_per_leg": 1.4,
+    "evidence_class": "VERIFIED_STATIC_PROVIDER",
+    "base_multiple": 1.0,
+    "stress_lanes_diagnostic_only": [1.0, 1.25, 1.5, 2.0],
+    "observed_signal_cost": "OBSERVED_SIGNAL_COST_NOT_AVAILABLE (frozen engine leg files carry no spread columns)",
+    "no_cost_reduction": true
+  },
+
+  "sample_states": {
+    "FULL_CONFIRMATION": "N >= 30",
+    "PROVISIONAL_CONFIRMATION": "15 <= N <= 29",
+    "LOW_N": "N < 15 (may not receive full confirmation)"
+  },
+
+  "pass_gates": {
+    "A_net_ev_gt_0": true,
+    "B_pf_net_ge_1.20": true,
+    "C_n_ge_30_full": true,
+    "D_edge_cost_ratio_ge_1.50": true,
+    "E_break_even_multiple_ge_1.50": true,
+    "F_same_mechanism_sign_as_t11": true,
+    "G_no_catastrophic_tail_failure": true,
+    "H_no_material_cost_regime_collapse": true,
+    "I_no_data_or_causality_invalidation": true,
+    "J_no_config_deviation": true,
+    "all_mandatory_required": true,
+    "no_9_of_10_pass": true
+  },
+
+  "tail_failure_rule": {
+    "flag_if": "worst_event_worse AND p5_worse AND per_event_scaled_max_dd_worse_by_gt_50pct",
+    "note": "single noisy metric in shorter sample does not fail a candidate"
+  },
+
+  "bootstrap": {
+    "method": "week-block bootstrap (ISO week of entry)",
+    "replicates": 2000,
+    "seed": 20260820,
+    "estimand": "mean net bps/event",
+    "outputs": ["mean", "ci_2.5", "ci_97.5", "p_value_two_sided_vs_zero"]
+  },
+
+  "multiple_testing": {
+    "method": "BH-FDR",
+    "alpha": 0.05,
+    "primary_hypotheses": ["EUR_GBP_USD", "GBP_NZD_USD"],
+    "reference_excluded": true,
+    "stress_lanes_excluded": true,
+    "role": "corroborative only; mechanical economic gates remain mandatory"
+  },
+
+  "decay_classification": {
+    "TRANSPORT_CONFIRMED": "all pass gates + reasonable metric retention",
+    "TRANSPORT_DECAYED_BUT_POSITIVE": "pass gates satisfied but material decay vs development (still positive transfer evidence, labeled weaker)",
+    "FAILED_EDGE": "net EV <= 0 or PF below floor",
+    "FAILED_COST_ECONOMICS": "gross mechanism exists but transaction cost destroys required margin",
+    "FAILED_MECHANISM": "mechanism sign / structural behavior changes",
+    "LOW_N": "N < 15",
+    "INVALID_DATA": "data or causality invalidation"
+  },
+
+  "program_decision_rules": {
+    "both_fail": "STOP_CANONICAL_TB_TRANSFER",
+    "exactly_one_confirms": "SINGLE_TRANSFER_CANDIDATE",
+    "both_confirm": "FOCUSED_TRANSFER_FAMILY",
+    "test_invalid": "INVALID_TEST",
+    "sparse_evidence": "LOW_N_WAIT_FOR_FORWARD_ONLY",
+    "winner_picking": "FORBIDDEN",
+    "rescue_of_failed": "FORBIDDEN"
+  },
+
+  "canonical_reference": {
+    "run_role": "descriptive only",
+    "cost": "frozen 10.2-pip canonical contract",
+    "may_alter_challenger_gates": false,
+    "if_forward_separation_violated": "REFERENCE_NOT_RUN_DUE_FORWARD_SEPARATION"
+  },
+
+  "stop_rules": {
+    "final_historical_test": true,
+    "no_t2x_optimization": true,
+    "no_t3_historical_research": true,
+    "stop_for_human_review": true,
+    "no_forward_deployment": true,
+    "no_demo_orders": true,
+    "no_live_orders": true
+  },
+
+  "production_authorized": false,
+  "human_review_required": true,
+  "step2_authorized": true,
+  "next_checkpoint_if_any_confirms": "SW-CTBT-T3-TRANSFER-CANDIDATE-SEAL-AND-FORWARD-SHADOW-PREREGISTRATION",
+  "next_checkpoint_if_none_confirm": "NONE"
+}

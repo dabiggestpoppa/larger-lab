@@ -1,0 +1,19 @@
+{
+  "EUR_GBP_USD": {
+    "window_start": "2025-01-02 00:00:00",
+    "window_end": "2025-12-31 18:55:00",
+    "n_bars": 71530,
+    "weeks": 51.86
+  },
+  "GBP_NZD_USD": {
+    "window_start": "2025-01-02 00:00:00",
+    "window_end": "2025-12-31 18:55:00",
+    "n_bars": 71508,
+    "weeks": 51.86
+  },
+  "frozen_period": {
+    "start": "2025-01-01 00:00:00",
+    "end": "2025-12-31 23:59:59"
+  },
+  "note": "Effective window = largest common causally valid M5 coverage within the frozen period; window recorded before economics interpreted."
+}

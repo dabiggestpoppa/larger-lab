@@ -1,0 +1,12 @@
+field,value
+status,PARTIAL_AUXILIARY_OBSERVED
+notes,[]
+source,EURUSDPRO_M5_2023_2025.csv
+leg,EURUSD
+field,spread
+n_observed,4740
+median_points,16.0
+p75_points,26.0
+p90_points,43.0
+p95_points,58.0
+note,Auxiliary observed layer only. Frozen engine uses EURUSD_M5.csv (no spread col); decision lane = OBSERVED_SIGNAL_COST_NOT_AVAILABLE.

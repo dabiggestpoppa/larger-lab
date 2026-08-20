@@ -1,0 +1,212 @@
+{
+  "checkpoint": "SW-CTBT-T2-ONE-SHOT-CANONICAL-TRANSFER-CONFIRMATION",
+  "total_checks": 34,
+  "passed": 34,
+  "all_pass": true,
+  "checks": [
+    {
+      "check": 1,
+      "description": "exact base SHA",
+      "pass": true,
+      "detail": "d5228fbbee23c8f85644ebc36f0ac578a76270a1"
+    },
+    {
+      "check": 2,
+      "description": "T1.1 PASS verified",
+      "pass": true,
+      "detail": "PASS_STEP1_SURVIVOR_CONFIRMED"
+    },
+    {
+      "check": 3,
+      "description": "candidate list exactly two",
+      "pass": true,
+      "detail": "['EUR_GBP_USD', 'GBP_NZD_USD']"
+    },
+    {
+      "check": 4,
+      "description": "no failed candidate included",
+      "pass": true,
+      "detail": "{'GBP_NZD_USD', 'EUR_GBP_USD'}"
+    },
+    {
+      "check": 5,
+      "description": "z3 exact (entry 3.0)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 6,
+      "description": "W2 exact-neutral",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 7,
+      "description": "E1 exit +-0.25",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 8,
+      "description": "z6 stop",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 9,
+      "description": "causal 200-bar z",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 10,
+      "description": "current bar excluded",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 11,
+      "description": "session 03-12 EST",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 12,
+      "description": "min runway 120",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 13,
+      "description": "hard exit noon",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 14,
+      "description": "concurrency 1",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 15,
+      "description": "reentry deterministic",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 16,
+      "description": "cost contract unchanged",
+      "pass": true,
+      "detail": "floor=1.5 commission=1.4"
+    },
+    {
+      "check": 17,
+      "description": "window frozen before economics",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 18,
+      "description": "2025 only",
+      "pass": true,
+      "detail": "2025-12-31 11:45:00"
+    },
+    {
+      "check": 19,
+      "description": "no 2026 reads",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 20,
+      "description": "no parameter search",
+      "pass": true,
+      "detail": "engine source identical to sealed T1.1; window-only change"
+    },
+    {
+      "check": 21,
+      "description": "no filters added",
+      "pass": true,
+      "detail": "no filter logic added in T2 runner"
+    },
+    {
+      "check": 22,
+      "description": "full event ledger",
+      "pass": true,
+      "detail": "227 rows vs 227 expected"
+    },
+    {
+      "check": 23,
+      "description": "future perturbation passes",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 24,
+      "description": "truncation invariance passes",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 25,
+      "description": "sample-state logic correct",
+      "pass": true,
+      "detail": "{'EUR_GBP_USD': 'FULL_CONFIRMATION', 'GBP_NZD_USD': 'FULL_CONFIRMATION'}"
+    },
+    {
+      "check": 26,
+      "description": "pass gates all enforced",
+      "pass": true,
+      "detail": "{'EUR_GBP_USD': 'True', 'GBP_NZD_USD': 'True'}"
+    },
+    {
+      "check": 27,
+      "description": "cost stress diagnostic only",
+      "pass": true,
+      "detail": "['1.00x', '1.25x', '1.50x', '2.00x']"
+    },
+    {
+      "check": 28,
+      "description": "bootstrap seed exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 29,
+      "description": "2000 bootstrap replicates",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 30,
+      "description": "BH-FDR exactly two primaries",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 31,
+      "description": "failed candidate not rescued",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 32,
+      "description": "program STOP logic correct",
+      "pass": true,
+      "detail": "FOCUSED_TRANSFER_FAMILY"
+    },
+    {
+      "check": 33,
+      "description": "production false",
+      "pass": true,
+      "detail": "False"
+    },
+    {
+      "check": 34,
+      "description": "human review required",
+      "pass": true,
+      "detail": "True"
+    }
+  ]
+}

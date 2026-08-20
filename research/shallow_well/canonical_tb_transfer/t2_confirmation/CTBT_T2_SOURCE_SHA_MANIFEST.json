@@ -1,0 +1,17 @@
+{
+  "data/GBPAUD_M5.csv": "6ca2b4824e80c4846b69f58a4e3d32fded722cf4d1b8435174f6fe696ebc697a",
+  "data/GBPNZD_M5.csv": "1175f80e17bda87cc1eba4a49468fa41fea8f2b681719930cab008d9e6f07667",
+  "data/AUDNZD_PRO_M5.csv": "5a9bd85233ff8f179bd1a55b6e09639b46a4e7a91c6c573e0a5da310e7bd4dad",
+  "data/EURGBP_M5_fetched.csv": "2fa8d676651787a93113432c02de709054944756504b95fff28d1f22258d85b6",
+  "data/EURJPY_M5_fetched.csv": "11a9c34761e2be2cafbd2eebddd4c7cdc2311b75ef1f1e9938f348f2c2aee832",
+  "data/GBPJPY_M5_fetched.csv": "5c604838005561563b1597e577cded2b4194fab90dee6ce07d9f0d30408d5e70",
+  "data/GBPCHF_M5_fetched.csv": "120b91095d1f5c95fcfe7ee17e61f2682013f2fb468070f94dfa843c6f5c86d2",
+  "data/CHFJPY_M5_fetched.csv": "70a7a1aa9bf031f75f98a3723f7f42d3f637c6fb32903f2a768b7b760f508736",
+  "data/EURUSD_M5.csv": "b3447c008ec88e5110fa13a7aa7121ceb04fc887ae2a19f977734138aeb0c2ed",
+  "data/GBPUSD_M5_fetched.csv": "1375a24c6c0578fc18f60c4d1279e86154f05e230aeca5ef720f449eab3c4d32",
+  "data/NZDUSD_M5_fetched.csv": "da42d8a557cb006bd0a4b88a337a034f670507b74b9a6fecd977f5d00c8435ed",
+  "t11_repair/run_t11_screen.py": "c994c5785a8c9470581ea1998cdda3f9c8e4ca03b0a89b2c4b0f009f71afd212",
+  "t11_repair/run_t11_reference_parity.py": "0e52f3aed9de4988149ce0f77ff6518ac16d8543be309a5e15734bf70e346897",
+  "t2/run_t2_confirmation.py": "9d145c7f19fd148cd3cee1647ba71e8ec914a157d88f10fa4fb5ee27c7082fbd",
+  "preregistration": "9cff2f9e1ebb9c977aa3cad59ed7f3bf838bd488f383347e2c31245ad8b6bf29"
+}
