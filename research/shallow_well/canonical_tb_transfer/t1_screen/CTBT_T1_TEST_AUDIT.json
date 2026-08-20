@@ -1,0 +1,38 @@
+{
+  "checkpoint": "SW-CTBT-T1-CANONICAL-TB-TRANSFER-MECHANISM-SCREEN",
+  "program": "CANONICAL-TB-TRANSFER",
+  "step": 1,
+  "frozen_contract": {
+    "lookback": 200,
+    "entry_z_control": 2.5,
+    "entry_z_primary": 3.0,
+    "exit_family": "E1",
+    "exit_threshold": 0.25,
+    "weight_family": "W2",
+    "stop_z": 6.0,
+    "min_time_to_exit_min": 120,
+    "hard_exit_est": 12,
+    "session": "LONDON",
+    "concurrency": 1
+  },
+  "triangles_tested": [
+    "AUD_GBP_NZD",
+    "EUR_GBP_JPY",
+    "CHF_GBP_JPY",
+    "EUR_GBP_USD",
+    "GBP_NZD_USD"
+  ],
+  "data_window_ref": [
+    "2020-01-01",
+    "2024-12-31"
+  ],
+  "data_window_eurusd": [
+    "2023-01-01",
+    "2024-12-31"
+  ],
+  "no_optimization": true,
+  "no_new_exits": true,
+  "no_new_filters": true,
+  "no_posthoc_rescue": true,
+  "generated": "2026-08-19T22:45:31.096206"
+}

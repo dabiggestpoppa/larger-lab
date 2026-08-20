@@ -1,0 +1,5 @@
+triangle_id,passed_gate,gate_reasons
+EUR_GBP_JPY,False,A: net EV=-72.84 bps <= 0; B: PF_net=0.33 < 1.20; D: edge/cost=0.29 < 1.50; E: BE cost mult=0.29 < 1.50; G: 0 positive years < 3
+CHF_GBP_JPY,False,A: net EV=-109.66 bps <= 0; B: PF_net=0.71 < 1.20; D: edge/cost=0.13 < 1.50; E: BE cost mult=0.13 < 1.50; G: 0 positive years < 3; H: mechanism classification = MECHANISM_COLLAPSE
+EUR_GBP_USD,True,
+GBP_NZD_USD,False,B: PF_net=1.14 < 1.20; D: edge/cost=1.14 < 1.50; E: BE cost mult=1.14 < 1.50; F: year 2022 contributes 81.4% > 60%; G: 2 positive years < 3

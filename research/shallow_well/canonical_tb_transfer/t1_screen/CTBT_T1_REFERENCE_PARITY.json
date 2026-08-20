@@ -1,0 +1,9 @@
+{
+  "triangle_id": "AUD_GBP_NZD",
+  "parity_pass": true,
+  "issues": [],
+  "ref_z30_events": 206,
+  "ref_z25_events": 288,
+  "ref_z30_net_ev": -73.63592233009834,
+  "ref_z25_net_ev": -94.81944444444552
+}

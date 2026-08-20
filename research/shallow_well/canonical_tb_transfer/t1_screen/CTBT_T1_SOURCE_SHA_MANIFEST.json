@@ -1,0 +1,16 @@
+{
+  "generated": "2026-08-19T22:45:31.050412",
+  "data_hashes": {
+    "GBPAUD_M5_fetched.csv": "6d946012da0c85c4",
+    "GBPNZD_M5_fetched.csv": "fc12b9a662745a1a",
+    "AUDNZD_M5_fetched.csv": "9704a8c478fd79b9",
+    "EURGBP_M5_fetched.csv": "2fa8d676651787a9",
+    "EURJPY_M5_fetched.csv": "11a9c34761e2be2c",
+    "GBPJPY_M5_fetched.csv": "5c60483800556156",
+    "GBPCHF_M5_fetched.csv": "120b91095d1f5c95",
+    "CHFJPY_M5_fetched.csv": "70a7a1aa9bf031f7",
+    "EURUSD_M5.csv": "b3447c008ec88e51",
+    "GBPUSD_M5_fetched.csv": "1375a24c6c0578fc",
+    "NZDUSD_M5_fetched.csv": "da42d8a557cb006b"
+  }
+}

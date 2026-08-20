@@ -1,0 +1,14 @@
+{
+  "canonical_tb_reference_unchanged": true,
+  "basis_orientation": "ln(GBPAUD) - ln(GBPNZD) + ln(AUDNZD)",
+  "rolling_z_lookback": 200,
+  "weight": "W2_EXACT_NEUTRAL",
+  "session": "LONDON_03_12_EST",
+  "entry_z_control": 2.5,
+  "entry_z_primary": 3.0,
+  "exit": "E1_SIGNED_OVERSHOOT_025",
+  "stop": "Z6_STRUCTURAL_6.0",
+  "min_time_to_exit": 120,
+  "hard_exit": "NOON_EST_12",
+  "concurrency": 1
+}

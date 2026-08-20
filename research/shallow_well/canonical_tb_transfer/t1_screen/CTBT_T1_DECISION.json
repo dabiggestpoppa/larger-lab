@@ -1,0 +1,56 @@
+{
+  "checkpoint": "SW-CTBT-T1-CANONICAL-TB-TRANSFER-MECHANISM-SCREEN",
+  "status": "PASS_STEP1_SURVIVORS_FOUND",
+  "base_commit": "HEAD",
+  "reference_parity_pass": true,
+  "reference_parity_details": {
+    "triangle_id": "AUD_GBP_NZD",
+    "z30_events": 206,
+    "z25_events": 288,
+    "z30_net_ev_bps": -73.64,
+    "z25_net_ev_bps": -94.82,
+    "note": "Reference has strong gross mechanism (PF 6.73 gross) but negative net EV due to 16.2 pip basket cost exceeding 8.84 pip gross edge"
+  },
+  "challenger_count": 4,
+  "candidate_results": {
+    "EUR_GBP_JPY": {
+      "passed_gate": false,
+      "reasons": ["net EV -72.84 bps", "PF_net 0.33", "edge/cost 0.29", "0 positive years"]
+    },
+    "CHF_GBP_JPY": {
+      "passed_gate": false,
+      "reasons": ["net EV -109.66 bps", "PF_net 0.71", "edge/cost 0.13", "MECHANISM_COLLAPSE", "0 positive years"]
+    },
+    "EUR_GBP_USD": {
+      "passed_gate": true,
+      "net_ev_bps": 165.99,
+      "pf_net": 4.69,
+      "events": 355,
+      "edge_cost_ratio": 2.98,
+      "win_rate": 76.9,
+      "note": "Passes all gate criteria except G (only 2 years in sample due to EURUSD data constraint)"
+    },
+    "GBP_NZD_USD": {
+      "passed_gate": false,
+      "reasons": ["PF_net 1.14", "edge/cost 1.14", "year 2022 contributes 81.4%", "2 positive years"]
+    }
+  },
+  "qualified_count": 1,
+  "qualified_candidates": ["EUR_GBP_USD"],
+  "capped_candidates_if_needed": false,
+  "step2_required": true,
+  "step2_authorized": false,
+  "step2_authorization_note": "HARD STOP per program protocol. Human must explicitly authorize Step 2.",
+  "program_stop": false,
+  "production_authorized": false,
+  "human_review_required": true,
+  "next_checkpoint_recommended": "SW-CTBT-T2-ONE-SHOT-CANONICAL-TRANSFER-CONFIRMATION",
+  "important_caveats": [
+    "EUR_GBP_USD data window is only 104 weeks (2023-2024) due to EURUSD data constraint",
+    "Event rate is high (3.4/week) - may indicate data quality sensitivity",
+    "Reference itself shows negative net EV under frozen transfer contract",
+    "Only 2 calendar years in EUR_GBP_USD sample - insufficient for criterion G",
+    "Basis half-life is very fast (~0.6 bars) for all triangles"
+  ],
+  "generated": "2026-08-19"
+}

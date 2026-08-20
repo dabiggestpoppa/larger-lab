@@ -1,0 +1,31 @@
+{
+  "reference": "AUD_GBP_NZD",
+  "challengers": [
+    "EUR_GBP_JPY",
+    "CHF_GBP_JPY",
+    "EUR_GBP_USD",
+    "GBP_NZD_USD"
+  ],
+  "windows": {
+    "AUD_GBP_NZD": [
+      "2020-01-01",
+      "2024-12-31"
+    ],
+    "EUR_GBP_JPY": [
+      "2020-01-01",
+      "2024-12-31"
+    ],
+    "CHF_GBP_JPY": [
+      "2020-01-01",
+      "2024-12-31"
+    ],
+    "EUR_GBP_USD": [
+      "2023-01-01",
+      "2024-12-31"
+    ],
+    "GBP_NZD_USD": [
+      "2020-01-01",
+      "2024-12-31"
+    ]
+  }
+}

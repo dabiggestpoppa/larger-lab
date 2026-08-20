@@ -1,0 +1,56 @@
+{
+  "cost_source": "ASSUMED",
+  "model": {
+    "GBPAUD": {
+      "spread_pips": 1.5,
+      "commission_pips": 0.7
+    },
+    "GBPNZD": {
+      "spread_pips": 2.5,
+      "commission_pips": 0.7
+    },
+    "AUDNZD": {
+      "spread_pips": 2.0,
+      "commission_pips": 0.7
+    },
+    "EURGBP": {
+      "spread_pips": 1.0,
+      "commission_pips": 0.5
+    },
+    "EURJPY": {
+      "spread_pips": 1.0,
+      "commission_pips": 0.5
+    },
+    "GBPJPY": {
+      "spread_pips": 1.5,
+      "commission_pips": 0.6
+    },
+    "GBPCHF": {
+      "spread_pips": 1.5,
+      "commission_pips": 0.6
+    },
+    "CHFJPY": {
+      "spread_pips": 1.5,
+      "commission_pips": 0.6
+    },
+    "EURUSD": {
+      "spread_pips": 0.8,
+      "commission_pips": 0.4
+    },
+    "GBPUSD": {
+      "spread_pips": 1.0,
+      "commission_pips": 0.5
+    },
+    "NZDUSD": {
+      "spread_pips": 1.2,
+      "commission_pips": 0.5
+    }
+  },
+  "basket_costs_pips": {
+    "AUD_GBP_NZD": 16.200000000000003,
+    "EUR_GBP_JPY": 10.2,
+    "CHF_GBP_JPY": 12.600000000000001,
+    "EUR_GBP_USD": 8.4,
+    "GBP_NZD_USD": 12.8
+  }
+}

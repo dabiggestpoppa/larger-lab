@@ -1,0 +1,23 @@
+{
+  "checkpoint": "SW-CTBT-T1-CANONICAL-TB-TRANSFER-MECHANISM-SCREEN",
+  "status": "PASS_STEP1_SURVIVORS_FOUND",
+  "base_commit": "HEAD",
+  "reference_parity_pass": true,
+  "challenger_count": 4,
+  "candidate_results": {
+    "EUR_GBP_JPY": {"passed": false},
+    "CHF_GBP_JPY": {"passed": false},
+    "EUR_GBP_USD": {"passed": true},
+    "GBP_NZD_USD": {"passed": false}
+  },
+  "qualified_count": 1,
+  "qualified_candidates": ["EUR_GBP_USD"],
+  "capped_candidates_if_needed": false,
+  "step2_required": true,
+  "step2_authorized": false,
+  "program_stop": false,
+  "production_authorized": false,
+  "human_review_required": true,
+  "next_checkpoint_recommended": "SW-CTBT-T2-ONE-SHOT-CANONICAL-TRANSFER-CONFIRMATION",
+  "generated": "2026-08-19"
+}
