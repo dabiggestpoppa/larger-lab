@@ -1,0 +1,26 @@
+{
+  "checkpoint": "SW-AJCF-R2-FROZEN-MECHANISM-SCREEN",
+  "base_commit": "5631f0b5079abacca20921cbcfcd54fdc5ccf7d5",
+  "candidates": ["USD_CHF_JPY", "CAD_CHF_JPY"],
+  "data_family_rule": "JPY legs MUST use the synchronized *_M5_fetched.csv family (R1.1 frozen). Never the mixed plain *_M5 files (phantom 200-350 bps triangular violations on 2022-12-20).",
+  "leg_files": {
+    "USDCHF": "USDCHFPRO_M5.csv",
+    "USDJPY": "USDJPY_M5_fetched.csv",
+    "CHFJPY": "CHFJPY_M5_fetched.csv",
+    "CADCHF": "CADCHF_PRO_M5.csv",
+    "CADJPY": "CADJPY_M5_fetched.csv"
+  },
+  "development_windows": {
+    "CAD_CHF_JPY": {"start": "2022-09-12 20:55:00", "end": "2024-12-31 23:59:59", "caveat": "first M5 bar of the common M5-only intersection (CADCHF real M5 begins 2022-09-12; earlier CADCHF bars are daily) + 200-bar causal z warmup"},
+    "USD_CHF_JPY": {"start": "2023-07-02 20:00:00", "end": "2024-12-31 23:59:59", "caveat": "SHORTER_DEVELOPMENT_WINDOW - USDCHF real M5 begins 2023-07-02; ~1.5y evidence, not equivalent to CAD_CHF_JPY depth"}
+  },
+  "m5_cadence_rule": "common timestamps restricted to M5 cadence (300s deltas) only; daily-era bars (2015-2021 CADCHF) excluded from the basis/z series; z warmup = 200 completed M5 bars, current excluded, ddof=0.",
+  "data_truth_repair": {
+    "finding": "The fetched/PRO family contains a systematic daily 20:00:00 UTC stale-print artifact: 64% of trading days show an anomalous single-bar spike-and-revert in CHFJPY (median 1-bar move 1.41 bps vs 5.72 bps at 20:00 UTC; p90 13.85 bps). 20:00 UTC = 15:00 EST sits INSIDE the frozen NY_AFTERNOON session and would create phantom z6 stops on open trades.",
+    "canonical_precedent": "The canonical engine never faced this: its EURUSD_M5.csv leg has NO weekend bars (implicitly weekday-only series) and its London session (03:00-12:00 EST = 08:00-17:00 UTC) closed before the 20:00 UTC spike.",
+    "treatment": "weekday-only (Mon-Fri) series + drop the daily 20:00:00 UTC stale-print bar. Documented as data-truth repair, identical in spirit to R1's fetched-family correction. NOT a parameter rescue; the artifact is a proven stale print, not a market dislocation.",
+    "artifact_measurement": {"chfjpy_median_1bar_bps": 1.41, "chfjpy_median_at_2000utc_bps": 5.72, "chfjpy_p90_at_2000utc_bps": 13.85, "days_anomalous_pct": 64}
+  },
+  "2025_consumed": false,
+  "verify_note": "Exact file hashes verified against AJCF_R11_DATA_FAMILY_FREEZE.json at run time; engine fails closed on mismatch."
+}

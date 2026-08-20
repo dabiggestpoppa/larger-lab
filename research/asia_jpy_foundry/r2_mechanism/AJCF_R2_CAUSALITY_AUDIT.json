@@ -1,0 +1,24 @@
+{
+ "USD_CHF_JPY": {
+  "future_perturbation_invariance": true,
+  "tail_truncation_invariance": true,
+  "head_truncation_invariance": true,
+  "base_events": 478,
+  "perturbed_events_in_overlap": 478,
+  "tail_trunc_events": 473,
+  "head_trunc_events": 475,
+  "tail_cut_bar": "2024-12-30T09:25:00",
+  "head_cut_bar": "2023-07-05T02:10:00"
+ },
+ "CAD_CHF_JPY": {
+  "future_perturbation_invariance": true,
+  "tail_truncation_invariance": true,
+  "head_truncation_invariance": true,
+  "base_events": 783,
+  "perturbed_events_in_overlap": 783,
+  "tail_trunc_events": 778,
+  "head_trunc_events": 783,
+  "tail_cut_bar": "2024-12-30T09:25:00",
+  "head_cut_bar": "2022-09-15T00:55:00"
+ }
+}

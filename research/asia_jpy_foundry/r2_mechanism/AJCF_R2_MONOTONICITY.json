@@ -1,0 +1,56 @@
+{
+ "USD_CHF_JPY": {
+  "classification": "MECHANISM_INVERTED",
+  "reason": "primary net EV <= 0",
+  "delta_EV": -0.1902,
+  "delta_PF": 0.0037,
+  "delta_p5": -0.2531,
+  "delta_edge_cost_ratio": -0.0396,
+  "bands": {
+   "B1_low": {
+    "n": 120,
+    "net_ev_bps": -8.974
+   },
+   "B2": {
+    "n": 119,
+    "net_ev_bps": -5.3098
+   },
+   "B3": {
+    "n": 119,
+    "net_ev_bps": -3.287
+   },
+   "B4_high": {
+    "n": 120,
+    "net_ev_bps": -5.8629
+   },
+   "_spearman": 0.6228710297386317
+  }
+ },
+ "CAD_CHF_JPY": {
+  "classification": "MECHANISM_INVERTED",
+  "reason": "primary net EV <= 0",
+  "delta_EV": 0.4051,
+  "delta_PF": 0.0427,
+  "delta_p5": 0.0851,
+  "delta_edge_cost_ratio": 0.0738,
+  "bands": {
+   "B1_low": {
+    "n": 196,
+    "net_ev_bps": -7.9133
+   },
+   "B2": {
+    "n": 196,
+    "net_ev_bps": -5.3563
+   },
+   "B3": {
+    "n": 195,
+    "net_ev_bps": -3.3569
+   },
+   "B4_high": {
+    "n": 196,
+    "net_ev_bps": -6.418
+   },
+   "_spearman": 0.43708939511192463
+  }
+ }
+}

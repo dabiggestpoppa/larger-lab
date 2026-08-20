@@ -1,0 +1,33 @@
+{
+  "checkpoint": "SW-AJCF-R2-FROZEN-MECHANISM-SCREEN",
+  "base_commit": "5631f0b5079abacca20921cbcfcd54fdc5ccf7d5",
+  "formula": "basket_cost_bps = sum over legs of (spread_pips + commission_pips) * pip_size / median_close * 1e4; median_close over candidate development window (identical to R1 engine)",
+  "commission_pips_per_leg": 1.4,
+  "documented_spreads_pips": {
+    "source": "OxSecurities MT5 documented provider spreads (level 4, spread_commission_config.py)",
+    "USDCHF": 0.9,
+    "USDJPY": 0.3,
+    "CHFJPY": 0.4,
+    "CADCHF": 0.4,
+    "CADJPY": 0.4
+  },
+  "conservative_floor_pips": 1.5,
+  "pip_size": {
+    "USDCHF": 0.0001,
+    "USDJPY": 0.01,
+    "CHFJPY": 0.01,
+    "CADCHF": 0.0001,
+    "CADJPY": 0.01
+  },
+  "expected_basket_costs_bps": {
+    "USD_CHF_JPY": 4.801,
+    "CAD_CHF_JPY": 5.487
+  },
+  "truth_layers": {
+    "modeled_historical_cost": "this frozen contract",
+    "observed_provider_spread": "level-2 provider bar spread columns, reported separately (R1 observed_spreads)",
+    "actual_realized_execution_cost": "NOT_AVAILABLE - no slippage claimed"
+  },
+  "no_cost_revision": true,
+  "frozen_before_results": true
+}

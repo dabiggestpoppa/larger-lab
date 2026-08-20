@@ -1,0 +1,18 @@
+{
+ "checkpoint": "SW-AJCF-R2-FROZEN-MECHANISM-SCREEN",
+ "base_commit": "5631f0b5079abacca20921cbcfcd54fdc5ccf7d5",
+ "files": {
+  "research/asia_jpy_foundry/r2_mechanism/AJCF_R2_PROTOCOL.md": "82acf6b2c457d459a879c5eb3785627c4e80ab77aecb84adbf28cab63b156752",
+  "research/asia_jpy_foundry/r2_mechanism/AJCF_R2_DATA_FREEZE.json": "62e439c13702f681a83fbdf7f5951464cdb2ba041fe40a8cc288fb19a047d247",
+  "research/asia_jpy_foundry/r2_mechanism/AJCF_R2_STRATEGY_FREEZE.json": "cc4fc7abcc50a3db1631c05e83a5e590321a91684c6c3c5fe9eccde890f9fe5d",
+  "research/asia_jpy_foundry/r2_mechanism/AJCF_R2_COST_FREEZE.json": "ce07039edbfd2d9f8f31c6ead93b0be94dfb55209eef180fbb78511c77a68900",
+  "research/asia_jpy_foundry/r2_mechanism/run_r2_mechanism.py": "296d09f18c8391976c030ab3678bf6a74df4f1d932c4f487ca67096d20b49423",
+  "research/asia_jpy_foundry/r1_anatomy/AJCF_R11_DATA_FAMILY_FREEZE.json": "61bc3b7100a51a5066d926cf9fd473b458fd5c37b77292b9a325c7bbc1be52eb",
+  "research/asia_jpy_foundry/r1_anatomy/AJCF_R11_SESSION_FREEZE.json": "575a7d1aa0f82d48ccf8f0beb23f035df757c4015cb7f05bd31d507617a40aec",
+  "quant-lab/data/USDCHFPRO_M5.csv": "8af6de6bedf58794d5182c52f85507091cafbb9ced067443740775bc47dbf09a",
+  "quant-lab/data/USDJPY_M5_fetched.csv": "4bbd621762f30ec76473b3c662397d46f2e0dffb72b1dfd52d3f2031cb5bb02e",
+  "quant-lab/data/CHFJPY_M5_fetched.csv": "70a7a1aa9bf031f75f98a3723f7f42d3f637c6fb32903f2a768b7b760f508736",
+  "quant-lab/data/CADCHF_PRO_M5.csv": "3c27fefd7580d15266bb60c01b5e266cccd0a4b25e7c3b3abb71ca09c2f23643",
+  "quant-lab/data/CADJPY_M5_fetched.csv": "9a5d831041d67ef290ac3d4c690a346cd389199c1cf5e6cc6fcadba0f1efcbc1"
+ }
+}

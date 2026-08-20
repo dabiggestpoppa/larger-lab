@@ -1,0 +1,48 @@
+{
+ "checkpoint": "SW-AJCF-R2-FROZEN-MECHANISM-SCREEN",
+ "note": "Descriptive only. No portfolio weights, no combined PnL, no claim of independence merely because symbols differ.",
+ "existing_family": [
+  "AUD_GBP_NZD (canonical)",
+  "EUR_GBP_USD (CTBT)",
+  "GBP_NZD_USD (CTBT)"
+ ],
+ "existing_session": "canonical LONDON 03:00-12:00 EST (both CTBT survivors)",
+ "ajcf_session": "NY_AFTERNOON_13_16_EST (13:00-16:00 EST, entries 13-14 EST)",
+ "session_overlap_hours_est": [],
+ "session_overlap": "DISJOINT - canonical London window (3-12 EST) and AJCF NY afternoon (13-16 EST) share zero EST hours",
+ "candidate_legs": {
+  "USD_CHF_JPY": [
+   "USDCHF",
+   "USDJPY",
+   "CHFJPY"
+  ],
+  "CAD_CHF_JPY": [
+   "CADCHF",
+   "CADJPY",
+   "CHFJPY"
+  ]
+ },
+ "existing_legs": {
+  "AUD_GBP_NZD": [
+   "GBPAUD",
+   "GBPNZD",
+   "AUDNZD"
+  ],
+  "EUR_GBP_USD": [
+   "EURGBP",
+   "EURUSD",
+   "GBPUSD"
+  ],
+  "GBP_NZD_USD": [
+   "GBPNZD",
+   "GBPUSD",
+   "NZDUSD"
+  ]
+ },
+ "shared_leg_analysis": {
+  "USD_CHF_JPY_vs_family": "NO shared legs with any existing member (USD appears in EURUSD/GBPUSD/NZDUSD but as different leg pairs; no identical leg symbol reused in the same triangle)",
+  "CAD_CHF_JPY_vs_family": "NO shared legs with any existing member",
+  "currency_overlap": "USD appears in EUR_GBP_USD and GBP_NZD_USD; CHF/JPY appear in no existing family member. Meaningfully different currency exposure."
+ },
+ "event_time_overlap": "Historical session windows are disjoint; forward event-time overlap will be measured prospectively, not pooled here."
+}

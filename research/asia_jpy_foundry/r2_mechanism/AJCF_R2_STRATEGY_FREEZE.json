@@ -1,0 +1,38 @@
+{
+  "checkpoint": "SW-AJCF-R2-FROZEN-MECHANISM-SCREEN",
+  "base_commit": "5631f0b5079abacca20921cbcfcd54fdc5ccf7d5",
+  "lifecycle": "canonical TB lifecycle translated ONLY for session environment (R1.1 anatomy). No other translation.",
+  "session": {
+    "id": "NY_AFTERNOON_13_16_EST",
+    "session_start_est": 13,
+    "entry_window_est": "13:00-14:00 EST",
+    "hard_exit_est": 16,
+    "min_runway_minutes": 120,
+    "time_semantics": "FIXED EST = UTC-5, NO DST",
+    "rollover_boundary": "Hour 16 EST is exit boundary only; NO entries in rollover/fix zone (entry est_hour <= 14 by runway rule)."
+  },
+  "primary": {
+    "timeframe": "M5 completed bars only",
+    "rolling_lookback": 200,
+    "std": "population ddof=0",
+    "current_bar": "excluded",
+    "entry": "strict |z| > 3.0",
+    "weights": "W2 exact-neutral (uniform unit-free log-weight per leg; basket market-neutral in log space)",
+    "exit": "E1 signed overshoot: SHORT exit z <= -0.25, LONG exit z >= +0.25",
+    "structural_stop": "|z| > 6.0",
+    "concurrency": 1,
+    "reentry": "canonical deterministic lifecycle, no discretionary cooldown"
+  },
+  "control": {
+    "purpose": "descriptive mechanism reference only - displacement monotonicity",
+    "entry": "strict |z| > 2.5",
+    "exit": "zero crossing: SHORT z >= 0.0, LONG z <= 0.0",
+    "stop": "|z| > 6.0",
+    "session": "same NY_AFTERNOON_13_16_EST",
+    "cannot_replace_primary": true
+  },
+  "no_grid": true,
+  "no_filters": true,
+  "causality": "closed completed M5 bar only; z at bar i uses bars [i-200, i-1]; current bar excluded; no forming bar; no future information",
+  "strategy_contract_hashes": "computed in AJCF_R2_SOURCE_SHA_MANIFEST.json"
+}
