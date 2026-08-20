@@ -1,0 +1,236 @@
+{
+  "checkpoint": "SW-CTBT-T4-TRANSFER-FAMILY-RUNTIME-SHADOW-INTEGRATION",
+  "total_checks": 38,
+  "passed": 38,
+  "all_pass": true,
+  "checks": [
+    {
+      "check": 1,
+      "description": "exact base SHA (T3 = parent of T4 activation commit)",
+      "pass": true,
+      "detail": "cbb916d345bf5f845c4c1cf48212dab9ff3a946b~1=44379e416c1c49dd055f0d818f10bafccefec131"
+    },
+    {
+      "check": 2,
+      "description": "T3 PASS",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 3,
+      "description": "exact candidate hashes + activation commit in history",
+      "pass": true,
+      "detail": "activation_commit=cbb916d345bf5f845c4c1cf48212dab9ff3a946b head=cbb916d345bf5f845c4c1cf48212dab9ff3a946b"
+    },
+    {
+      "check": 4,
+      "description": "no candidate config changes",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 5,
+      "description": "exact basis formulas",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 6,
+      "description": "symbol mappings complete",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 7,
+      "description": "causal completed bars only",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 8,
+      "description": "current bar excluded",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 9,
+      "description": "W2 exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 10,
+      "description": "E1 exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 11,
+      "description": "z6 exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 12,
+      "description": "session exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 13,
+      "description": "120m runway exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 14,
+      "description": "hard exit exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 15,
+      "description": "concurrency exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 16,
+      "description": "reentry exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 17,
+      "description": "provider market data functional",
+      "pass": true,
+      "detail": "{'connected': True, 'login': 1114712, 'server': 'OxSecurities-Demo', 'trade_mode': 0, 'currency': 'USD'}"
+    },
+    {
+      "check": 18,
+      "description": "bid/ask capture functional",
+      "pass": true,
+      "detail": "{'EURGBP': True, 'EURUSD': True, 'GBPUSD': True}"
+    },
+    {
+      "check": 19,
+      "description": "spread capture functional",
+      "pass": true,
+      "detail": "spread = ask - bid captured per leg"
+    },
+    {
+      "check": 20,
+      "description": "event ledger functional",
+      "pass": true,
+      "detail": "append+read back 1"
+    },
+    {
+      "check": 21,
+      "description": "independent replay functional",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 22,
+      "description": "completeness classifications exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 23,
+      "description": "canonical ledger isolated",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 24,
+      "description": "no portfolio PnL pooling",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 25,
+      "description": "no historical optimization",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 26,
+      "description": "no broker order API reachable",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 27,
+      "description": "no account mutation",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 28,
+      "description": "activation timestamp after T3",
+      "pass": true,
+      "detail": "t3=2026-08-20T08:43:48-04:00 activation=2026-08-20T12:59:33.677636Z"
+    },
+    {
+      "check": 29,
+      "description": "forward events only after activation",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 30,
+      "description": "15-event diagnostic preserved",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 31,
+      "description": "30-event minimum preserved",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 32,
+      "description": "50-event preferred preserved",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 33,
+      "description": "10-event demo review threshold exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 34,
+      "description": "28-day demo review threshold exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 35,
+      "description": "demo eligibility does not authorize orders",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 36,
+      "description": "production false",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 37,
+      "description": "capital false",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 38,
+      "description": "human review true",
+      "pass": true,
+      "detail": ""
+    }
+  ]
+}

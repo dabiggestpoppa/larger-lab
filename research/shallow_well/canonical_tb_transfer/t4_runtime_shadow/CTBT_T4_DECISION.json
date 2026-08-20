@@ -1,0 +1,51 @@
+{
+  "checkpoint": "SW-CTBT-T4-TRANSFER-FAMILY-RUNTIME-SHADOW-INTEGRATION",
+  "status": "PASS_FORWARD_SHADOW_ACTIVE",
+  "base_commit": "44379e416c1c49dd055f0d818f10bafccefec131",
+  "t4_activation_commit": "cbb916d345bf5f845c4c1cf48212dab9ff3a946b",
+  "t3_verified": {
+    "status": "PASS_TRANSFER_FAMILY_SEALED_FORWARD_PREREGISTERED",
+    "sealed_hashes": {
+      "EUR_GBP_USD": "aad0a8e64c6964952eb9129ac2cdebd34d308e6df87ebf45e4584c351044b1a7",
+      "GBP_NZD_USD": "5538d63a8acb29883b117fc23c76b1fe389db47ed89009ab3cd258b864f62485"
+    }
+  },
+  "runtime_provider": "Ox Securities MetaTrader 5 — OxSecurities-Demo (account 1114712, trade_mode 0 = DEMO)",
+  "provider_connected": true,
+  "candidate_count": 2,
+  "candidate_versions": {
+    "EUR_GBP_USD": "CTBT-EUR-GBP-USD-v1",
+    "GBP_NZD_USD": "CTBT-GBP-NZD-USD-v1"
+  },
+  "candidate_hashes": {
+    "EUR_GBP_USD": "aad0a8e64c6964952eb9129ac2cdebd34d308e6df87ebf45e4584c351044b1a7",
+    "GBP_NZD_USD": "5538d63a8acb29883b117fc23c76b1fe389db47ed89009ab3cd258b864f62485"
+  },
+  "symbol_mapping_ready": true,
+  "activation_timestamp_utc": "2026-08-20T12:59:33.677636Z",
+  "first_eligible_m5_bar": "2026-08-20T13:05:00Z",
+  "forward_clock_active": true,
+  "historical_lab_closed": true,
+  "forward_observation_state": "ACTIVE",
+  "research_mode": "PROSPECTIVE_ONLY",
+  "historical_strategy_optimization": "PROHIBITED",
+  "eur_gbp_usd_shadow_active": true,
+  "gbp_nzd_usd_shadow_active": true,
+  "independent_replay_active": true,
+  "cost_capture_active": true,
+  "order_prevention_pass": true,
+  "early_scientific_diagnostic_events": 15,
+  "minimum_useful_events": 30,
+  "preferred_events": 50,
+  "demo_canary_min_events": 10,
+  "demo_canary_min_days": 28,
+  "eur_gbp_usd_demo_canary_review_eligible": false,
+  "gbp_nzd_usd_demo_canary_review_eligible": false,
+  "demo_execution_authorized": false,
+  "capital_routing_authorized": false,
+  "production_authorized": false,
+  "canonical_tb_unchanged": true,
+  "human_review_required": true,
+  "next_checkpoint_recommended": "NONE UNTIL EVIDENCE HINGE (SW-CTBT-T5-DEMO-EXECUTION-CANARY eligible only when a candidate reaches >=10 clean natural forward events AND >=28 elapsed days AND all demo-canary gates)",
+  "evidence_note": "Forward evidence starts strictly after activation_timestamp_utc. No earlier bar may be relabeled. WAITING / FORWARD OBSERVATION mode: no daily commits merely because no signal occurred."
+}

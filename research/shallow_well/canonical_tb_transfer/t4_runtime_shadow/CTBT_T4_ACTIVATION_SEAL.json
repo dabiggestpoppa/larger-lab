@@ -1,7 +1,35 @@
 {
-  "status": "PENDING_ACTIVATION",
-  "note": "Stamped by ctbt_runtime/activate.py after the T4 commit exists (seal contains its own commit SHA).",
-  "activation_commit": null,
-  "activation_timestamp_utc": null,
-  "first_eligible_m5_bar": null
+  "checkpoint": "SW-CTBT-T4-TRANSFER-FAMILY-RUNTIME-SHADOW-INTEGRATION",
+  "activation_commit": "cbb916d345bf5f845c4c1cf48212dab9ff3a946b",
+  "activation_timestamp_utc": "2026-08-20T12:59:33.677636Z",
+  "provider": {
+    "name": "Ox Securities MetaTrader 5",
+    "server": "OxSecurities-Demo",
+    "account": 1114712,
+    "trade_mode": 0,
+    "currency": "USD",
+    "leverage": 500,
+    "terminal_build": 6090,
+    "role": "READ_ONLY_MARKET_DATA_SOURCE",
+    "no_orders": true
+  },
+  "runtime_version": "ctbt-runtime-0.1.0",
+  "strategy_hashes": {
+    "EUR_GBP_USD": "aad0a8e64c6964952eb9129ac2cdebd34d308e6df87ebf45e4584c351044b1a7",
+    "GBP_NZD_USD": "5538d63a8acb29883b117fc23c76b1fe389db47ed89009ab3cd258b864f62485"
+  },
+  "strategy_versions": {
+    "EUR_GBP_USD": "CTBT-EUR-GBP-USD-v1",
+    "GBP_NZD_USD": "CTBT-GBP-NZD-USD-v1"
+  },
+  "symbol_mappings": {
+    "EURGBP": "EURGBP.PRO",
+    "EURUSD": "EURUSD.PRO",
+    "GBPUSD": "GBPUSD.PRO",
+    "GBPNZD": "GBPNZD.PRO",
+    "NZDUSD": "NZDUSD.PRO"
+  },
+  "first_eligible_m5_bar": "2026-08-20T13:05:00Z",
+  "forward_evidence_rule": "Every eligible event strictly after activation_timestamp_utc is FORWARD evidence. No earlier bar may be relabeled as forward evidence.",
+  "status": "ACTIVE"
 }
