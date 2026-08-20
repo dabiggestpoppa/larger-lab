@@ -1,11 +1,18 @@
 ---
 # Tailscale role — install and configure Tailscale
-# B1-I1 — Static skeleton (placeholder auth key)
+# B1-I1R — Uses dynamic Ubuntu codename, no hardcoded jammy
+#
 # WARNING: Auth key must be replaced with actual value during B1-I2
+# WARNING: --accept-routes is used for subnet routing; review before production
+
+- name: Detect Ubuntu codename
+  ansible.builtin.set_fact:
+    ubuntu_codename: "{{ ansible_distribution_release }}"
+  tags: [tailscale, detect]
 
 - name: Add Tailscale GPG key
   ansible.builtin.shell: |
-    curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.noarmor.gpg | \
+    curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/{{ ubuntu_codename }}.noarmor.gpg | \
     sudo tee /usr/share/keyrings/tailscale-archive-keyring.gpg > /dev/null
   args:
     creates: /usr/share/keyrings/tailscale-archive-keyring.gpg
@@ -13,7 +20,7 @@
 
 - name: Add Tailscale repository
   ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu jammy main"
+    repo: "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu {{ ubuntu_codename }} main"
     state: present
   tags: [tailscale, install]
 
@@ -31,19 +38,29 @@
     enabled: true
   tags: [tailscale, service]
 
-- name: Authenticate Tailscale (PLACEHOLDER — replace auth key)
+# Authentication is conditional: only runs when a real auth key is provided
+- name: Authenticate Tailscale
   ansible.builtin.command: >
     tailscale up
-    --authkey={{ tailscale_auth_key | default('tskey-auth-PLACEHOLDER-REPLACE-ME') }}
+    --authkey={{ tailscale_auth_key }}
     --hostname={{ inventory_hostname }}
-    --accept-routes
   register: tailscale_result
   changed_when: "'Success' in tailscale_result.stdout"
-  when: tailscale_auth_key is defined and tailscale_auth_key != 'tskey-auth-PLACEHOLDER-REPLACE-ME'
+  when:
+    - tailscale_auth_key is defined
+    - tailscale_auth_key | length > 0
+    - not tailscale_auth_key.startswith('tskey-auth-PLACEHOLDER')
   tags: [tailscale, auth]
+
+- name: Document Tailscale authentication status
+  ansible.builtin.debug:
+    msg: >
+      Tailscale authentication: {% if tailscale_auth_key is defined and not tailscale_auth_key.startswith('tskey-auth-PLACEHOLDER') %}configured{% else %}PENDING — provide tailscale_auth_key{% endif %}
+  tags: [tailscale, status]
 
 - name: Get Tailscale status
   ansible.builtin.command: tailscale status
   register: tailscale_status
   changed_when: false
+  ignore_errors: true
   tags: [tailscale, verify]

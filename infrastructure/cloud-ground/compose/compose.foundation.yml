@@ -1,11 +1,14 @@
 # OCE Cloud Ground — Foundation Services
-# B1-I1 — Static skeleton (syntactically valid, unrendered)
+# B1-I1R — Foundation compose (validated by validate_engine.py)
 #
 # This file defines PostgreSQL (durable truth) and Redis (transient transport)
 # for the OCE control plane.
 #
-# WARNING: This file has NOT been rendered or tested on a live host.
-# All values are design-time specifications.
+# Status: IMPLEMENTED_UNVERIFIED — syntactically valid, not deployed
+# Validation: Passes compose config, schema, and security checks
+#
+# NOTE: WAL archive to postgres_wal volume is LOCAL STAGING only.
+# Off-server backup requires pgBackRest or equivalent (B1-I4).
 #
 # Usage:
 #   docker compose -f compose.foundation.yml up -d

@@ -1,22 +1,20 @@
 ---
 # Host manifest role — collect host state for audit trail
-# B1-I1 — Static skeleton
+# B1-I1R — Handles missing variables gracefully
 
 - name: Collect host information
   ansible.builtin.set_fact:
     host_manifest:
-      collected_at: "{{ ansible_date_time.iso8601 }}"
+      collected_at: "{{ ansible_date_time.iso8601 | default('unknown') }}"
       hostname: "{{ inventory_hostname }}"
-      os: "{{ ansible_distribution }} {{ ansible_distribution_version }}"
-      kernel: "{{ ansible_kernel }}"
-      architecture: "{{ ansible_architecture }}"
-      cpu_cores: "{{ ansible_processor_vcpus }}"
-      memory_mb: "{{ ansible_memtotal_mb }}"
-      disk_total_gb: "{{ (ansible_mounts | selectattr('mount', 'equalto', '/') | map(attribute='size_total') | first / 1073741824) | round(1) }}"
-      docker_version: "{{ docker_info.version.Version | default('unknown') }}"
-      compose_version: "{{ docker_compose_version.stdout | default('unknown') }}"
-      tailscale_version: "{{ tailscale_status.stdout_lines[0] | default('unknown') }}"
-      restic_version: "{{ restic_version.stdout | default('unknown') }}"
+      os: "{{ ansible_distribution | default('unknown') }} {{ ansible_distribution_version | default('unknown') }}"
+      kernel: "{{ ansible_kernel | default('unknown') }}"
+      architecture: "{{ ansible_architecture | default('unknown') }}"
+      cpu_cores: "{{ ansible_processor_vcpus | default(0) }}"
+      memory_mb: "{{ ansible_memtotal_mb | default(0) }}"
+      docker_version: "{{ docker_info.version.Version | default('not-installed') }}"
+      compose_version: "{{ docker_compose_version.stdout | default('not-installed') }}"
+      tailscale_version: "{{ tailscale_status.stdout_lines[0] | default('not-installed') }}"
   tags: [manifest]
 
 - name: Write host manifest
@@ -26,6 +24,7 @@
     owner: root
     group: oce-operator
     mode: '0644'
+    remote_src: true
   tags: [manifest]
 
 - name: Display host manifest

@@ -1,30 +1,46 @@
-# OCE Cloud Ground — Observability Stack
-# B1-I1 — Design specification (NOT YET IMPLEMENTED)
-# Full observability deployment deferred to B1-I5
-#
-# This file documents the TARGET observability architecture.
-# It is NOT intended to be rendered or deployed during B1-I1.
+# OCE Cloud Ground — Observability Stack SPECIFICATION
+# B1-I1R — Design specification ONLY (NOT deployable)
 #
 # Status: SPECIFIED — awaiting B1-I5 implementation
 # Consumer: B1-C4.S4 Observability
+#
+# This file is NOT a deployable Compose configuration.
+# It documents the TARGET architecture for future implementation.
+# All values are design-time specifications.
+# Do not run `docker compose -f compose.observability.yml up`.
+#
+# When implemented during B1-I5, all images will be pinned to
+# specific versions with digest locks. No `latest` tags.
 
-services:
-  # Placeholder for future structured log aggregation
-  # log-aggregator:
-  #   image: grafana/loki:latest  # Will be pinned to specific version
-  #   status: UNVERIFIED_DEPENDENCY_B1_I5
-
-  # Placeholder for future metrics collection
-  # metrics-collector:
-  #   image: prom/prometheus:latest  # Will be pinned to specific version
-  #   status: UNVERIFIED_DEPENDENCY_B1_I5
-
-  # Placeholder for future dashboards
-  # dashboards:
-  #   image: grafana/grafana:latest  # Will be pinned to specific version
-  #   status: UNVERIFIED_DEPENDENCY_B1_I5
-
-# NOTE: All images will be pinned to specific versions with digest locks
-# after B1-I5 verification. No `latest` tags in production.
-# All services will use the oce_internal network.
-# All services will have health checks, resource limits, and security options.
+# Target services (to be implemented in B1-I5):
+#
+# log-aggregator:
+#   Purpose: Structured log aggregation (e.g., Loki)
+#   Image: To be pinned during B1-I5
+#   Network: oce_internal only
+#   Health check: Required
+#   Resource limits: Required
+#   Security: no-new-privileges
+#
+# metrics-collector:
+#   Purpose: Metrics collection (e.g., Prometheus)
+#   Image: To be pinned during B1-I5
+#   Network: oce_internal only
+#   Health check: Required
+#   Resource limits: Required
+#   Security: no-new-privileges
+#
+# dashboards:
+#   Purpose: Operator-visible dashboards (e.g., Grafana)
+#   Image: To be pinned during B1-I5
+#   Network: oce_internal only (Tailscale access via reverse proxy)
+#   Health check: Required
+#   Resource limits: Required
+#   Security: no-new-privileges
+#
+# Design constraints:
+# - All images pinned to specific versions with digest locks
+# - All services on oce_internal network
+# - All services have health checks, resource limits, security options
+# - No public ports — Tailscale-only access
+# - No latest tags in production

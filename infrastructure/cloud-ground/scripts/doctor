@@ -1,67 +1,113 @@
 #!/usr/bin/env bash
 # OCE Cloud Ground — Doctor Script
-# B1-I1 — Check prerequisites
-# Version: 1.0.0
+# B1-I1R — Check prerequisites without failing on missing tools
+# Version: 2.0.0
 #
-# This script checks what tools are available in the current environment.
-# It does NOT install anything.
+# Exit code: nonzero when mandatory tools are missing
 
-set -euo pipefail
+set -uo pipefail
+# NOTE: no -e to avoid premature termination
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="$(dirname "$SCRIPT_DIR")"
+
+MISSING_REQUIRED=0
+MISSING_OPTIONAL=0
 
 echo "=== OCE Cloud Ground Doctor ==="
-echo "Date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+echo "Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+echo "Base: $BASE_DIR"
 echo ""
 
 check_tool() {
     local name="$1"
     local required="${2:-false}"
-    
+    local result=""
+
     if command -v "$name" &>/dev/null; then
-        version=$("$name" --version 2>/dev/null | head -1 || echo "unknown")
-        echo "✅ $name: $version"
-        return 0
+        version=$("$name" --version 2>/dev/null | head -1 || echo "version-unknown")
+        echo "  PASS  $name: $version"
+        result="PASS"
     else
         if [ "$required" = "true" ]; then
-            echo "❌ $name: NOT INSTALLED (required for B1-I2+)"
+            echo "  FAIL  $name: NOT INSTALLED (mandatory)"
+            MISSING_REQUIRED=$((MISSING_REQUIRED + 1))
+            result="FAIL"
         else
-            echo "⚠️  $name: not installed (optional for B1-I1)"
+            echo "  BLOCKED  $name: not installed (optional)"
+            MISSING_OPTIONAL=$((MISSING_OPTIONAL + 1))
+            result="BLOCKED"
         fi
-        return 1
     fi
 }
 
-echo "--- Required for B1-I1 ---"
+echo "--- Mandatory for B1-I1R validation ---"
 check_tool "python3" "true"
 check_tool "bash" "true"
-check_tool "jq" "false"
 
 echo ""
-echo "--- Required for B1-I2+ (not needed for B1-I1) ---"
-check_tool "ansible" "false"
-check_tool "ansible-playbook" "false"
-check_tool "docker" "false"
-check_tool "docker-compose" "false"
-check_tool "terraform" "false"
+echo "--- Mandatory for B1-I1R full validation ---"
+check_tool "ansible-playbook" "true"
+check_tool "shellcheck" "true"
+check_tool "jq" "true"
+check_tool "docker" "true"
 
 echo ""
-echo "--- Optional tools ---"
-check_tool "shellcheck" "false"
+echo "--- Optional (enhance validation when present) ---"
 check_tool "yamllint" "false"
 check_tool "yq" "false"
+check_tool "gitleaks" "false"
 check_tool "restic" "false"
 check_tool "pg_isready" "false"
 check_tool "redis-cli" "false"
 
 echo ""
 echo "--- Python packages ---"
-python3 -c "import yaml; print('✅ pyyaml: available')" 2>/dev/null || echo "⚠️  pyyaml: not installed"
-python3 -c "import json; print('✅ json: available')" 2>/dev/null || echo "⚠️  json: not installed"
-python3 -c "import jsonschema; print('✅ jsonschema: available')" 2>/dev/null || echo "⚠️  jsonschema: not installed (needed for schema validation)"
-python3 -c "import jsonschema; print('✅ jsonschema: available')" 2>/dev/null || true
+check_python_pkg() {
+    local name="$1"
+    local import_name="${2:-$1}"
+    if python3 -c "import $import_name; print(f'  PASS  $name: {${import_name}.__version__}')" 2>/dev/null; then
+        :
+    else
+        echo "  FAIL  $name: not installed (mandatory for validation)"
+        MISSING_REQUIRED=$((MISSING_REQUIRED + 1))
+    fi
+}
+check_python_pkg "pyyaml" "yaml"
+check_python_pkg "jsonschema" "jsonschema"
 
 echo ""
-echo "--- Docker images (pinned) ---"
-echo "PostgreSQL target: postgres:16.4-alpine"
-echo "Redis target: redis:7.4-alpine"
+echo "--- Evidence structure ---"
+if [ -d "$BASE_DIR/evidence" ] && [ -d "$BASE_DIR/evidence/templates" ]; then
+    echo "  PASS  evidence/ directory with templates"
+else
+    echo "  FAIL  evidence/ directory missing"
+    MISSING_REQUIRED=$((MISSING_REQUIRED + 1))
+fi
+
 echo ""
-echo "Run validate-static to check B1-I1 completeness."
+echo "--- Configuration files ---"
+for f in compose/compose.foundation.yml policy/cost-guardrails.yml policy/network-access.yml ansible/playbooks/site.yml; do
+    if [ -f "$BASE_DIR/$f" ]; then
+        echo "  PASS  $f"
+    else
+        echo "  FAIL  $f missing"
+        MISSING_REQUIRED=$((MISSING_REQUIRED + 1))
+    fi
+done
+
+echo ""
+echo "========================================="
+echo "  Doctor Results"
+echo "========================================="
+echo "  Missing required: $MISSING_REQUIRED"
+echo "  Missing optional: $MISSING_OPTIONAL"
+if [ "$MISSING_REQUIRED" -gt 0 ]; then
+    echo "  OVERALL: FAIL"
+    echo "  Install missing mandatory tools before running full validation."
+    exit 1
+else
+    echo "  OVERALL: PASS"
+    echo "  All mandatory tools available."
+    exit 0
+fi

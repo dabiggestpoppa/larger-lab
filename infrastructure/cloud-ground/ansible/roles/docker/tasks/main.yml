@@ -1,12 +1,14 @@
 ---
 # Docker role — install Docker Engine and Compose plugin
-# B1-I1 — Static skeleton
+# B1-I1R — Uses safer download practices
 
 - name: Add Docker GPG key
   ansible.builtin.shell: |
+    set -o pipefail
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
     gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
   args:
+    executable: /bin/bash
     creates: /usr/share/keyrings/docker-archive-keyring.gpg
   tags: [docker, install]
 
@@ -47,7 +49,7 @@
   changed_when: false
   tags: [docker, verify]
 
-- name: Configure Docker daemon (json)
+- name: Configure Docker daemon
   ansible.builtin.copy:
     dest: /etc/docker/daemon.json
     content: |

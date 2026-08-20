@@ -1,24 +1,125 @@
 #!/usr/bin/env bash
 # OCE Cloud Ground — Render Config
-# B1-I1 — Placeholder (NOT YET IMPLEMENTED)
-# Status: SCAFFOLDED
-# Consumer: B1-I2 host baseline
+# B1-I1R — Validate configuration templates can be rendered
+# Version: 2.0.0
 #
-# Future: will render Ansible/Compose templates with actual values
-# from .env files or operator-provided configuration.
+# This script validates that compose and ansible configurations are
+# internally consistent and can be parsed. It does NOT deploy anything.
 #
-# UNVERIFIED: No template rendering is performed during B1-I1.
+# Exit code: nonzero if validation fails
 
-set -euo pipefail
+set -uo pipefail
 
-echo "=== OCE Cloud Ground — Render Config ==="
-echo "Status: SCAFFOLDED — not implemented in B1-I1"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="$(dirname "$SCRIPT_DIR")"
+COMPOSE_DIR="$BASE_DIR/compose"
+ANSIBLE_DIR="$BASE_DIR/ansible"
+
+ERRORS=0
+
+echo "=== OCE Cloud Ground — Config Validation ==="
+echo "Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo ""
-echo "This script will render configuration templates from:"
-echo "  - compose/examples/oce.env.example → .env"
-echo "  - ansible/inventories/example/ → actual inventory"
-echo "  - backup templates → backup configuration"
+
+# 1. Validate compose.foundation.yml with docker compose config
+echo "--- Compose Foundation Validation ---"
+FOUNDATION="$COMPOSE_DIR/compose.foundation.yml"
+if [ -f "$FOUNDATION" ]; then
+    if command -v docker &>/dev/null; then
+        # Set required env vars for validation
+        export POSTGRES_PASSWORD="validation-placeholder"
+        export POSTGRES_DB="oce"
+        export POSTGRES_USER="oce_admin"
+        if docker compose -f "$FOUNDATION" config --quiet 2>/dev/null; then
+            echo "  PASS  compose.foundation.yml renders"
+        else
+            echo "  FAIL  compose.foundation.yml failed to render"
+            ERRORS=$((ERRORS + 1))
+        fi
+    else
+        echo "  BLOCKED  docker not installed — compose render skipped"
+    fi
+else
+    echo "  FAIL  compose.foundation.yml not found"
+    ERRORS=$((ERRORS + 1))
+fi
+
+# 2. Validate ansible playbook syntax
 echo ""
-echo "B1-I1 only validates the static skeleton."
-echo "Template rendering will be implemented during B1-I2."
-exit 0
+echo "--- Ansible Syntax Validation ---"
+PLAYBOOK="$ANSIBLE_DIR/playbooks/site.yml"
+INVENTORY="$ANSIBLE_DIR/inventories/example/hosts.yml"
+if [ -f "$PLAYBOOK" ]; then
+    if command -v ansible-playbook &>/dev/null; then
+        if ansible-playbook --syntax-check "$PLAYBOOK" -i "$INVENTORY" 2>/dev/null; then
+            echo "  PASS  ansible playbook syntax valid"
+        else
+            echo "  FAIL  ansible playbook has syntax errors"
+            ERRORS=$((ERRORS + 1))
+        fi
+    else
+        echo "  BLOCKED  ansible-playbook not installed — syntax check skipped"
+    fi
+else
+    echo "  FAIL  site.yml not found"
+    ERRORS=$((ERRORS + 1))
+fi
+
+# 3. Validate ansible-lint
+echo ""
+echo "--- Ansible Lint ---"
+if [ -f "$PLAYBOOK" ]; then
+    if command -v ansible-lint &>/dev/null; then
+        if ansible-lint "$PLAYBOOK" 2>/dev/null; then
+            echo "  PASS  ansible-lint clean"
+        else
+            echo "  FAIL  ansible-lint found issues"
+            ERRORS=$((ERRORS + 1))
+        fi
+    else
+        echo "  BLOCKED  ansible-lint not installed"
+    fi
+fi
+
+# 4. Validate configuration consistency
+echo ""
+echo "--- Configuration Consistency ---"
+
+# Check postgresql.conf exists and is referenced
+PGCONF="$COMPOSE_DIR/config/postgresql.conf"
+if [ -f "$PGCONF" ]; then
+    echo "  PASS  postgresql.conf exists"
+    # Check it has required settings
+    for setting in "listen_addresses" "port" "shared_buffers" "wal_level"; do
+        if grep -q "$setting" "$PGCONF" 2>/dev/null; then
+            echo "  PASS    $setting configured"
+        else
+            echo "  FAIL    $setting missing from postgresql.conf"
+            ERRORS=$((ERRORS + 1))
+        fi
+    done
+else
+    echo "  FAIL  postgresql.conf missing"
+    ERRORS=$((ERRORS + 1))
+fi
+
+# Check env example exists
+if [ -f "$COMPOSE_DIR/examples/oce.env.example" ]; then
+    echo "  PASS  oce.env.example exists"
+else
+    echo "  FAIL  oce.env.example missing"
+    ERRORS=$((ERRORS + 1))
+fi
+
+echo ""
+echo "========================================="
+echo "  Config Validation Results"
+echo "========================================="
+if [ "$ERRORS" -gt 0 ]; then
+    echo "  Errors: $ERRORS"
+    echo "  OVERALL: FAIL"
+    exit 1
+else
+    echo "  OVERALL: PASS"
+    exit 0
+fi
