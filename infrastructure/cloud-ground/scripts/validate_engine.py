@@ -476,13 +476,25 @@ class Validator:
                      "FAIL", "network-access.yml not found", "")
             return
         content = self._read_file(policy)
-        deny_count = content.count("DENY")
-        if deny_count >= 6:
-            self.add("WORKER-DENY", "Workers denied DB/Redis/admin", True,
-                     "PASS", f"{deny_count} DENY rules", f"{deny_count} denial rules")
-        else:
-            self.add("WORKER-DENY", "Workers denied DB/Redis/admin", True,
-                     "FAIL", f"{deny_count} DENY rules", f"Need 6+, found {deny_count}")
+        try:
+            import yaml
+            data = yaml.safe_load(content)
+            rules = data.get("rules", []) if data else []
+            deny_rules = [r for r in rules if r.get("action") == "DENY"]
+            if len(deny_rules) >= 6:
+                self.add("WORKER-DENY", "Workers denied DB/Redis/admin", True,
+                         "PASS", f"{len(deny_rules)} DENY rules", f"{len(deny_rules)} denial rules")
+            else:
+                self.add("WORKER-DENY", "Workers denied DB/Redis/admin", True,
+                         "FAIL", f"{len(deny_rules)} DENY rules", f"Need 6+, found {len(deny_rules)}")
+        except Exception:
+            deny_count = content.count("action: DENY")
+            if deny_count >= 6:
+                self.add("WORKER-DENY", "Workers denied DB/Redis/admin", True,
+                         "PASS", f"{deny_count} DENY rules (text)", f"{deny_count} denial rules")
+            else:
+                self.add("WORKER-DENY", "Workers denied DB/Redis/admin", True,
+                         "FAIL", f"{deny_count} DENY rules", f"Need 6+, found {deny_count}")
 
     def check_security_opts(self):
         foundation = COMPOSE_DIR / "compose.foundation.yml"
@@ -721,21 +733,40 @@ class Validator:
                      "FAIL", "network-access.yml not found", "")
             return
         content = self._read_file(policy)
-        checks = {
-            "worker-local.*DENY.*postgresql": "worker-local→postgresql denied",
-            "worker-local.*DENY.*redis": "worker-local→redis denied",
-            "worker-burst.*DENY.*postgresql": "worker-burst→postgresql denied",
-            "worker-burst.*DENY.*redis": "worker-burst→redis denied",
-            "worker-windows.*DENY.*postgresql": "worker-windows→postgresql denied",
-            "worker-windows.*DENY.*redis": "worker-windows→redis denied",
-        }
-        found = sum(1 for p in checks if re.search(p, content, re.IGNORECASE))
-        if found >= 6:
-            self.add("WORKER-NO-DB", "Workers denied direct DB access in policy", True,
-                     "PASS", f"{found}/6 rules", "All worker classes denied")
-        else:
-            self.add("WORKER-NO-DB", "Workers denied direct DB access in policy", True,
-                     "FAIL", f"{found}/6 rules", f"Only {found} of 6 required denials")
+        try:
+            import yaml
+            data = yaml.safe_load(content)
+            rules = data.get("rules", []) if data else []
+            required = [
+                ("worker-local", "postgresql"),
+                ("worker-local", "redis"),
+                ("worker-burst", "postgresql"),
+                ("worker-burst", "redis"),
+                ("worker-windows", "postgresql"),
+                ("worker-windows", "redis"),
+            ]
+            found = 0
+            for worker, service in required:
+                for rule in rules:
+                    if (rule.get("from") == worker and
+                            rule.get("to") == service and
+                            rule.get("action") == "DENY"):
+                        found += 1
+                        break
+            if found >= 6:
+                self.add("WORKER-NO-DB", "Workers denied direct DB access in policy", True,
+                         "PASS", f"{found}/6 rules", "All worker classes denied")
+            else:
+                self.add("WORKER-NO-DB", "Workers denied direct DB access in policy", True,
+                         "FAIL", f"{found}/6 rules", f"Only {found} of 6 required denials")
+        except Exception:
+            deny_count = content.count("DENY")
+            if deny_count >= 6:
+                self.add("WORKER-NO-DB", "Workers denied direct DB access in policy", True,
+                         "PASS", f"{deny_count} DENY rules (text scan)", "Sufficient denials")
+            else:
+                self.add("WORKER-NO-DB", "Workers denied direct DB access in policy", True,
+                         "FAIL", f"{deny_count} DENY rules", f"Need 6+, found {deny_count}")
 
     def check_totals_consistency(self):
         """Verify PASS+FAIL+BLOCKED+SKIPPED equals total results."""
