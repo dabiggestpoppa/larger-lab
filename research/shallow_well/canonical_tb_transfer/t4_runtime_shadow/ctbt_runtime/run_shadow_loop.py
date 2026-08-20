@@ -36,7 +36,8 @@ from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8")
 
-from .config import BASIS_LEGS, RUNTIME, T4_DIR  # noqa: E402
+import subprocess
+from .config import BASIS_LEGS, RUNTIME, T4_DIR, REPO  # noqa: E402
 from .data_feed import CTBTDataFeed  # noqa: E402
 from .forward_clock import ForwardClock  # noqa: E402
 from .sealed_engine import SealedStrategyEngine  # noqa: E402
@@ -71,6 +72,37 @@ def _parse_ts(s: str) -> datetime:
     return datetime.fromisoformat(s)
 
 
+# Runtime files whose absence means the checkout has drifted (branch switch /
+# partial checkout).  The collector MUST refuse to run in a drifted checkout
+# rather than silently degrade like the 2026-08-20 branch-switch incident.
+REQUIRED_RUNTIME_FILES = [
+    "CTBT_T4_ACTIVATION_SEAL.json",
+    "CTBT_T4_FORWARD_CLOCK.json",
+    "CTBT_T4_OPERATOR_STATUS.json",
+    "ctbt_runtime/config.py",
+    "ctbt_runtime/sealed_engine.py",
+    "ctbt_runtime/run_shadow_loop.py",
+]
+
+
+def runtime_self_check() -> dict:
+    """Verify this checkout is a complete CTBT runtime, not a drifted branch.
+
+    Returns {ok, missing, runtime_root, git_head}.  The collector refuses to
+    start (and alerts) if required runtime files are missing.
+    """
+    missing = [f for f in REQUIRED_RUNTIME_FILES if not (T4_DIR / f).exists()]
+    head = "unknown"
+    try:
+        head = subprocess.check_output(
+            ["git", "-C", str(REPO), "rev-parse", "HEAD"],
+            stderr=subprocess.DEVNULL, text=True).strip()
+    except Exception:
+        pass
+    return {"ok": not missing, "missing": missing,
+            "runtime_root": str(T4_DIR), "git_head": head}
+
+
 class ShadowLoop:
     def __init__(self):
         self.feed = CTBTDataFeed()
@@ -82,6 +114,7 @@ class ShadowLoop:
         self.activation_ts = self.seal["activation_timestamp_utc"]
         self.last_bar: dict = {}   # triangle -> last processed M5 ts (iso)
         self.operator_status = T4_DIR / "CTBT_T4_OPERATOR_STATUS.json"
+        self.runtime_check = runtime_self_check()
 
     # ── persistence ────────────────────────────────────────────────────────
     def _processed_path(self, tri: str) -> Path:
@@ -114,6 +147,13 @@ class ShadowLoop:
 
     # ── main loop ──────────────────────────────────────────────────────────
     def start(self) -> int:
+        if not self.runtime_check["ok"]:
+            print("ERROR: runtime checkout drift detected — required files missing:",
+                  self.runtime_check["missing"], flush=True)
+            print(f"ERROR: refusing to run from drifted runtime root {T4_DIR}. "
+                  "Restore the dedicated CTBT runtime worktree.", flush=True)
+            self._write_operator_status(running=False)
+            return 2
         if not self.clock.is_active():
             print("ERROR: no active activation seal. Refusing to run.", flush=True)
             return 2
@@ -194,6 +234,9 @@ class ShadowLoop:
             "order_prevention_pass": True,
             "forward_rule": f"events only at/after {self.first_eligible}",
             "activation_timestamp_utc": self.activation_ts,
+            "runtime_root": self.runtime_check.get("runtime_root"),
+            "runtime_git_head": self.runtime_check.get("git_head"),
+            "runtime_self_check_ok": self.runtime_check.get("ok"),
         }
         self.operator_status.write_text(
             json.dumps(status, indent=2, default=str), encoding="utf-8")

@@ -1,0 +1,77 @@
+{
+  "checkpoint": "P0-FORWARD-RUNTIME-CHECKOUT-RESTORE",
+  "status": "PASS_FORWARD_RUNTIME_RESTORED",
+  "date_utc": "2026-08-20T15:05:00Z",
+  "problem": "Main checkout switched to unrelated branch (main -> oce/block-1-i1-cloud-ground) by another actor; tracked CTBT runtime files deleted from the filesystem used by the running forward-shadow collector.",
+  "root_cause": "Collector/dashboard resolve all runtime paths from Path(__file__) and were bound to the freely-switched main checkout; only gitignored state/ survived.",
+  "old_runtime_path": "C:/Users/wifik/Desktop/larger-lab/research/shallow_well/canonical_tb_transfer/t4_runtime_shadow",
+  "new_runtime_path": "C:/Users/wifik/Desktop/larger-lab-ctbt-forward/research/shallow_well/canonical_tb_transfer/t4_runtime_shadow",
+  "runtime_branch": "agent/shallow-well-foundry-ctbt-t1",
+  "runtime_commit": "f3c6aca28ae9bdc090ca32032f180995cf94a9b5",
+  "pre_recovery": {
+    "collector_pid": 10420,
+    "pid_file_value": "21940",
+    "last_bar_eur_gbp_usd": "2026-08-20T14:55:02",
+    "last_bar_gbp_nzd_usd": "2026-08-20T14:55:02",
+    "last_heartbeat_utc": "2026-08-20T14:57:33.095845Z",
+    "eur_gbp_usd_events": 0,
+    "gbp_nzd_usd_events": 0
+  },
+  "post_recovery": {
+    "collector_pid": 22352,
+    "resumed_from_bar": "2026-08-20T15:00:00",
+    "runtime_root": "C:\\Users\\wifik\\Desktop\\larger-lab-ctbt-forward\\research\\shallow_well\\canonical_tb_transfer\\t4_runtime_shadow",
+    "runtime_git_head": "f3c6aca28ae9bdc090ca32032f180995cf94a9b5",
+    "runtime_self_check_ok": true
+  },
+  "activation_seal_verification": {
+    "exists": true,
+    "activation_timestamp_utc": "2026-08-20T12:59:33.677636Z",
+    "first_eligible_m5_bar": "2026-08-20T13:05:00Z",
+    "status": "ACTIVE",
+    "activation_commit": "cbb916d345bf5f845c4c1cf48212dab9ff3a946b"
+  },
+  "strategy_hash_verification": {
+    "CTBT-EUR-GBP-USD-v1": "aad0a8e64c6964952eb9129ac2cdebd34d308e6df87ebf45e4584c351044b1a7",
+    "CTBT-GBP-NZD-USD-v1": "5538d63a8acb29883b117fc23c76b1fe389db47ed89009ab3cd258b864f62485"
+  },
+  "ledger_continuity": {
+    "ledger_files": [],
+    "pre_recovery_events": 0,
+    "post_recovery_events": 0,
+    "duplicate_events_created_during_restore": false,
+    "forward_clock_unchanged": true,
+    "activation_timestamp_unchanged": true
+  },
+  "dashboard_status": {
+    "canonical_8765": "LISTENING (PID 19848, untouched)",
+    "transfer_8766": "LISTENING (restarted from dedicated worktree)",
+    "data_freshness_resumed": true
+  },
+  "guard_added": {
+    "file": "ctbt_runtime/run_shadow_loop.py",
+    "behavior": "startup runtime self-check refuses to run from drifted checkout; runtime_root/git_head/self_check recorded in operator status every tick",
+    "required_files": [
+      "CTBT_T4_ACTIVATION_SEAL.json",
+      "CTBT_T4_FORWARD_CLOCK.json",
+      "CTBT_T4_OPERATOR_STATUS.json",
+      "ctbt_runtime/config.py",
+      "ctbt_runtime/sealed_engine.py",
+      "ctbt_runtime/run_shadow_loop.py"
+    ]
+  },
+  "tests": "16/16 passed (incl. sealed-engine parity vs T2 ledger)",
+  "health_checks": "19/19 passed",
+  "final_health_state": "HEALTHY",
+  "forward_evidence": {
+    "rule": "events only at/after 2026-08-20T13:05:00Z",
+    "events_count": 0,
+    "waiting_for_natural_signal": true
+  },
+  "flags": {
+    "order_prevention_pass": true,
+    "demo_execution_authorized": false,
+    "capital_routing_authorized": false,
+    "production_authorized": false
+  }
+}

@@ -111,3 +111,6 @@ argo-ref/
 .po_heartbeat_state.json
 .memory-sync-daemon.status.json
 .git_commit_msg.txt
+
+# Runtime worktree: read-only junction to main checkout data (never committed)
+quant-lab/data/
