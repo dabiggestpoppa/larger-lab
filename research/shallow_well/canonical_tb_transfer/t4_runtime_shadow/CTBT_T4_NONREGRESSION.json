@@ -1,0 +1,13 @@
+{
+  "t1_t11_t2_t3_artifacts_unchanged": true,
+  "canonical_405_194_anchors_unchanged": true,
+  "sealed_hashes_unchanged": {
+    "EUR_GBP_USD": "aad0a8e64c6964952eb9129ac2cdebd34d308e6df87ebf45e4584c351044b1a7",
+    "GBP_NZD_USD": "5538d63a8acb29883b117fc23c76b1fe389db47ed89009ab3cd258b864f62485"
+  },
+  "no_historical_optimization": true,
+  "no_2026_historical_research": true,
+  "engine_source": "run_t11_screen.py reused verbatim; runtime parity proven by tests/test_sealed_engine.py (146 + 81 events identical to T2 ledger)",
+  "activation_after_t3": true,
+  "forward_evidence_only_after_activation": true
+}

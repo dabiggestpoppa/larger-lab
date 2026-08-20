@@ -1,0 +1,34 @@
+{
+  "checkpoint": "SW-CTBT-T4-TRANSFER-FAMILY-RUNTIME-SHADOW-INTEGRATION",
+  "runtime_version": "ctbt-runtime-0.1.0",
+  "mode": "READ_ONLY_FORWARD_SHADOW",
+  "provider": {
+    "name": "Ox Securities MetaTrader 5",
+    "server": "OxSecurities-Demo",
+    "role": "READ_ONLY_MARKET_DATA_SOURCE",
+    "orders": "PROHIBITED"
+  },
+  "feed": {
+    "timeframe": "M5",
+    "poll_interval_seconds": 60,
+    "warmup_bars": 200,
+    "sync_rule": "all legs must share the exact same closed M5 timestamp; forming bars never evaluated"
+  },
+  "engine": {
+    "source": "sealed T1.1 lifecycle (verified 405/405 + 194/194)",
+    "entry": "strict |z| > 3.0",
+    "weight": "W2 exact-neutral",
+    "exit": "E1 +-0.25",
+    "stop": "|z| > 6",
+    "session": "London 03:00-12:00 EST",
+    "min_runway_minutes": 120,
+    "hard_exit": "noon",
+    "concurrency": 1,
+    "reentry": "canonical deterministic"
+  },
+  "ledgers": {
+    "format": "append-only JSONL",
+    "dir": "state/"
+  },
+  "order_prevention": "fail-closed ReadOnlyMT5Proxy; write capabilities unreachable by construction; automated tests"
+}

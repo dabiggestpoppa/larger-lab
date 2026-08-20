@@ -1,0 +1,38 @@
+{
+  "rule": "explicit deterministic mapping; no silent runtime inference",
+  "broker": "Ox Securities MetaTrader 5 (OxSecurities-Demo), terminal build 6090",
+  "mapping": {
+    "EURGBP": "EURGBP.PRO",
+    "EURUSD": "EURUSD.PRO",
+    "GBPUSD": "GBPUSD.PRO",
+    "GBPNZD": "GBPNZD.PRO",
+    "NZDUSD": "NZDUSD.PRO"
+  },
+  "candidates": {
+    "EUR_GBP_USD": {
+      "legs": [
+        "EURGBP",
+        "EURUSD",
+        "GBPUSD"
+      ],
+      "broker_symbols": [
+        "EURGBP.PRO",
+        "EURUSD.PRO",
+        "GBPUSD.PRO"
+      ]
+    },
+    "GBP_NZD_USD": {
+      "legs": [
+        "GBPNZD",
+        "GBPUSD",
+        "NZDUSD"
+      ],
+      "broker_symbols": [
+        "GBPNZD.PRO",
+        "GBPUSD.PRO",
+        "NZDUSD.PRO"
+      ]
+    }
+  },
+  "verified_live": true
+}

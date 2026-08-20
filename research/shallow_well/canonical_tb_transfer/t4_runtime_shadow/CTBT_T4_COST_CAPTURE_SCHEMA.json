@@ -1,0 +1,25 @@
+{
+  "per_leg_at_signal": [
+    "bid",
+    "ask",
+    "mid",
+    "spread",
+    "quote_timestamp"
+  ],
+  "quote_quality": [
+    "quote_freshness",
+    "cross_leg_timestamp_skew_seconds",
+    "missing_leg",
+    "stale_quote_status",
+    "spread_anomaly",
+    "data_validity"
+  ],
+  "quote_quality_note": "where true tick age/skew cannot be measured -> NOT_AVAILABLE; no invented precision",
+  "basket": {
+    "modeled_cost_bps": "frozen T1.1 conservative contract",
+    "observed_quote_crossing_cost_bps": "computed from captured quotes",
+    "observed_model_cost_multiple": "observed / modeled"
+  },
+  "slippage": "NOT_OBSERVED until actual demo fills exist",
+  "separation": "historical modeled cost remains separate from observed shadow quote-crossing cost"
+}

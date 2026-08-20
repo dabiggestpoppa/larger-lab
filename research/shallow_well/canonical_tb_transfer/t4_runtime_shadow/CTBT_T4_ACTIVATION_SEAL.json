@@ -1,0 +1,7 @@
+{
+  "status": "PENDING_ACTIVATION",
+  "note": "Stamped by ctbt_runtime/activate.py after the T4 commit exists (seal contains its own commit SHA).",
+  "activation_commit": null,
+  "activation_timestamp_utc": null,
+  "first_eligible_m5_bar": null
+}

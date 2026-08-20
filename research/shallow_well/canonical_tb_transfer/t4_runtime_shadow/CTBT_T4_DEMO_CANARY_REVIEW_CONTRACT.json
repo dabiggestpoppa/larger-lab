@@ -1,0 +1,24 @@
+{
+  "eligibility": "DEMO_CANARY_REVIEW_ELIGIBLE only if BOTH: >=10 clean natural forward shadow events AND >=28 elapsed calendar days since T4 activation",
+  "not_equal_to": [
+    "FORWARD_VALIDATED",
+    "PRODUCTION_READY",
+    "CAPITAL_READY"
+  ],
+  "gates": {
+    "A_min_10_events": ">=10 completed natural shadow events",
+    "B_min_28_days": ">=28 calendar days elapsed",
+    "C_100pct_recognition": "100% expected signal recognition",
+    "D_no_unexplained_missed": "zero unexplained MISSED_SIGNAL",
+    "E_no_unexplained_runtime_only": "zero unexplained RUNTIME_ONLY_SIGNAL",
+    "F_no_causality_failure": "no causality failure",
+    "G_no_config_drift": "no strategy-hash/config drift",
+    "H_no_persistent_divergence": "no persistent data divergence",
+    "I_cost_compatibility": "observed provider crossing costs economically compatible with historical gross edge",
+    "J_no_mechanism_inversion": "forward gross mechanism has not clearly inverted",
+    "K_no_runtime_defect": "no severe runtime/reconciliation defect"
+  },
+  "if_any_fails": "candidate remains SHADOW ONLY",
+  "independent_promotion": "EUR_GBP_USD and GBP_NZD_USD promote independently",
+  "orders": "DEMO_CANARY_REVIEW_ELIGIBLE does NOT authorize orders; demo execution requires SW-CTBT-T5 with human authorization"
+}

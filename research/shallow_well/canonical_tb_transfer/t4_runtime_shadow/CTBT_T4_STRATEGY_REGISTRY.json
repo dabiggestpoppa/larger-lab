@@ -1,0 +1,31 @@
+{
+  "entries": [
+    {
+      "strategy": "EUR_GBP_USD",
+      "version_id": "CTBT-EUR-GBP-USD-v1",
+      "strategy_hash": "aad0a8e64c6964952eb9129ac2cdebd34d308e6df87ebf45e4584c351044b1a7",
+      "status": "FORWARD_SHADOW_ONLY",
+      "input_symbols": [
+        "EURGBP.PRO",
+        "EURUSD.PRO",
+        "GBPUSD.PRO"
+      ],
+      "runtime_slot": "separate from canonical AUD_GBP_NZD"
+    },
+    {
+      "strategy": "GBP_NZD_USD",
+      "version_id": "CTBT-GBP-NZD-USD-v1",
+      "strategy_hash": "5538d63a8acb29883b117fc23c76b1fe389db47ed89009ab3cd258b864f62485",
+      "status": "FORWARD_SHADOW_ONLY",
+      "input_symbols": [
+        "GBPNZD.PRO",
+        "GBPUSD.PRO",
+        "NZDUSD.PRO"
+      ],
+      "runtime_slot": "separate from canonical AUD_GBP_NZD"
+    }
+  ],
+  "status_meaning": {
+    "FORWARD_SHADOW_ONLY": "observe + record only; NOT LIVE, NOT PRODUCTION, NOT CAPITAL_ELIGIBLE"
+  }
+}

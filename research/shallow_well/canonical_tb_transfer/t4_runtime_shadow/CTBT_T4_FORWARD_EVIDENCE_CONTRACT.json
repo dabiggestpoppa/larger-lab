@@ -1,0 +1,62 @@
+{
+  "forward_starts": "strictly after activation seal; no earlier bar relabeled",
+  "horizons": {
+    "early_diagnostic": 15,
+    "minimum_useful": 30,
+    "preferred": 50,
+    "note": "15 is diagnostic only, never validation; thresholds unchanged from T3"
+  },
+  "expectancy_states": [
+    "INSUFFICIENT_EVENTS",
+    "MECHANISM_ALIGNED",
+    "MECHANISM_WEAKENED",
+    "MECHANISM_BROKEN",
+    "COST_MARGIN_HEALTHY",
+    "COST_MARGIN_TIGHT",
+    "COST_MARGIN_BROKEN"
+  ],
+  "states_do_not_authorize_trading": true,
+  "early_scientific_stop": {
+    "permitted_only_for": [
+      "causality failure",
+      "strategy/runtime mismatch",
+      "gross mechanism inversion",
+      "severe cost impossibility",
+      "invalid data"
+    ],
+    "not_permitted_for": "ordinary drawdown or losing streak"
+  },
+  "metrics_per_candidate": [
+    "signals",
+    "completed_events",
+    "events_per_week",
+    "gross_ev",
+    "net_modeled_ev",
+    "net_observed_cost_ev",
+    "wr",
+    "median_ev",
+    "pf",
+    "payoff_ratio",
+    "max_dd",
+    "p5",
+    "worst_event",
+    "losing_streak",
+    "mae",
+    "mfe",
+    "hold_distribution",
+    "z6_rate",
+    "hard_exit_rate",
+    "signal_time_cost_median_p75_p90_p95",
+    "observed_model_cost_multiple"
+  ],
+  "monthly_engineering_audit": [
+    "runtime_uptime",
+    "missing_bars",
+    "data_divergences",
+    "signal_classifications",
+    "provider_costs",
+    "event_count",
+    "hash_integrity"
+  ],
+  "no_strategy_changes": true
+}

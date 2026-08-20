@@ -1,0 +1,22 @@
+{
+  "checkpoint": "SW-CTBT-T4-TRANSFER-FAMILY-RUNTIME-SHADOW-INTEGRATION",
+  "method": "future-perturbation + tail/head truncation invariance through the sealed runtime engine (2025 fixture)",
+  "all_invariance_pass": true,
+  "audits": [
+    {
+      "triangle": "EUR_GBP_USD",
+      "future_perturbation_invariance": true,
+      "tail_truncation_invariance": true,
+      "head_truncation_invariance": true,
+      "full_events": 146
+    },
+    {
+      "triangle": "GBP_NZD_USD",
+      "future_perturbation_invariance": true,
+      "tail_truncation_invariance": true,
+      "head_truncation_invariance": true,
+      "full_events": 81
+    }
+  ],
+  "design_note": "runtime evaluates only causally completed M5 bars; forming bar never enters"
+}

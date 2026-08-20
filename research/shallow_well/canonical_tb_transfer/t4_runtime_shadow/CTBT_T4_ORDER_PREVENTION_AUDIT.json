@@ -1,0 +1,13 @@
+{
+  "checkpoint": "SW-CTBT-T4-TRANSFER-FAMILY-RUNTIME-SHADOW-INTEGRATION",
+  "design": "fail-closed ReadOnlyMT5Proxy; runtime touches MT5 only through the proxy; write/order/position/history/deal capabilities unreachable by construction",
+  "static_scan": "no write-capable token in any runtime module except the barrier module's deny-list",
+  "dynamic_checks": [
+    "proxy blocks every WRITE_CAPABLE_ATTR",
+    "proxy blocks unknown attrs",
+    "read-only allowlist + TIMEFRAME_/COPY_* constants pass through",
+    "runtime imports MT5 only via wrap_read_only()"
+  ],
+  "tests": "tests/test_order_prevention.py \u2014 5/5 passed",
+  "conclusion": "PASS \u2014 no broker order API reachable; no account mutation possible"
+}

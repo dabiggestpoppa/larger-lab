@@ -1,0 +1,24 @@
+{
+  "canonical_aud_gbp_nzd": {
+    "may_share": [
+      "provider",
+      "market-data process",
+      "runtime infrastructure"
+    ],
+    "must_not_share": [
+      "strategy state",
+      "event ledger",
+      "completeness ledger",
+      "evidence count",
+      "candidate metrics"
+    ],
+    "continues_independently": true,
+    "priority": "canonical TB forward takes precedence"
+  },
+  "ctbt_ledgers": [
+    "state/ledger_EUR_GBP_USD.jsonl",
+    "state/ledger_GBP_NZD_USD.jsonl",
+    "state/ledger_EUR_GBP_USD.audit.jsonl",
+    "state/ledger_GBP_NZD_USD.audit.jsonl"
+  ]
+}

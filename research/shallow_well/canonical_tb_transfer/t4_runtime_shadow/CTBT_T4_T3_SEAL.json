@@ -1,0 +1,17 @@
+{
+  "t3_commit": "44379e416c1c49dd055f0d818f10bafccefec131",
+  "t3_status": "PASS_TRANSFER_FAMILY_SEALED_FORWARD_PREREGISTERED",
+  "t3_verified": true,
+  "sealed_candidates": [
+    {
+      "triangle": "EUR_GBP_USD",
+      "version": "CTBT-EUR-GBP-USD-v1",
+      "hash": "aad0a8e64c6964952eb9129ac2cdebd34d308e6df87ebf45e4584c351044b1a7"
+    },
+    {
+      "triangle": "GBP_NZD_USD",
+      "version": "CTBT-GBP-NZD-USD-v1",
+      "hash": "5538d63a8acb29883b117fc23c76b1fe389db47ed89009ab3cd258b864f62485"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "larger-lab\\research\\shallow_well\\canonical_tb_transfer\\t4_runtime_shadow\\ctbt_runtime\\__init__.py": "b02214adc1aa70b25aded6443975d4e63e838af08eb81cc4dcf1e64c4e3b753a",
+  "larger-lab\\research\\shallow_well\\canonical_tb_transfer\\t4_runtime_shadow\\ctbt_runtime\\activate.py": "3b9cca0f6876c9fa7e9250593e886eb571c7270aa555e3afcd47ce40853f3858",
+  "larger-lab\\research\\shallow_well\\canonical_tb_transfer\\t4_runtime_shadow\\ctbt_runtime\\config.py": "780066ab072133e813d7210336a5d8c5429f6918d13ad8cad47aace30c7ee223",
+  "larger-lab\\research\\shallow_well\\canonical_tb_transfer\\t4_runtime_shadow\\ctbt_runtime\\data_feed.py": "1c7cb1e6bf4ed3ce0bbe936f6ccc06576315ee56e5b817da029e65c85d9149ac",
+  "larger-lab\\research\\shallow_well\\canonical_tb_transfer\\t4_runtime_shadow\\ctbt_runtime\\forward_clock.py": "dc2af9b64db4f559df0e35224af88361b5d2b4d7ffab65bf46301987455d49b8",
+  "larger-lab\\research\\shallow_well\\canonical_tb_transfer\\t4_runtime_shadow\\ctbt_runtime\\read_only_proxy.py": "aeb4d42e69543613fe237bd15fb5aa0565db039ef7fb0d2df6818404625b4008",
+  "larger-lab\\research\\shallow_well\\canonical_tb_transfer\\t4_runtime_shadow\\ctbt_runtime\\replay_auditor.py": "fd245ff3f2042e9cd1e767cef574269fac475ad4183470d85fdf699fb385356e",
+  "larger-lab\\research\\shallow_well\\canonical_tb_transfer\\t4_runtime_shadow\\ctbt_runtime\\run_shadow_loop.py": "9335ee184ed0c5ea919f952a5440bcb3890e6d324e8160e701da5e8a6b7ee827",
+  "larger-lab\\research\\shallow_well\\canonical_tb_transfer\\t4_runtime_shadow\\ctbt_runtime\\sealed_engine.py": "70277885203b42020e5c0a6d0ad5eb00b589144fda25b74de6a6937eaf1e7deb",
+  "larger-lab\\research\\shallow_well\\canonical_tb_transfer\\t4_runtime_shadow\\ctbt_runtime\\shadow_ledger.py": "2ac8bdf89ebee579fa214c9b7f4e7d0d405818e53530916f60014a7fb3490a41",
+  "larger-lab\\research\\shallow_well\\canonical_tb_transfer\\t4_runtime_shadow\\tests\\test_forward_clock.py": "a76a3b35507fafea1b3cdda5319d11a85c098096b9fcbdb06d8246cff7f35324",
+  "larger-lab\\research\\shallow_well\\canonical_tb_transfer\\t4_runtime_shadow\\tests\\test_order_prevention.py": "41e0e5e3db535e6a402cb774e878f475c0abaab4eef1ecdfad2523289c611165",
+  "larger-lab\\research\\shallow_well\\canonical_tb_transfer\\t4_runtime_shadow\\tests\\test_replay_auditor.py": "1c16bf19bcfa7d379bd46b2da121b6e34fa8776e485fe7a33657c13d64734281",
+  "larger-lab\\research\\shallow_well\\canonical_tb_transfer\\t4_runtime_shadow\\tests\\test_sealed_engine.py": "afa25045df225fc164d0282c54910dcea4f13292ec32a7c594172c21863085f3",
+  "larger-lab\\research\\shallow_well\\canonical_tb_transfer\\t4_runtime_shadow\\write_t4_artifacts.py": "94637e7aa7ead91c2eb1e3bd38a21ef99545f6e374911e2e9a36c1f794ff034a",
+  "larger-lab\\research\\shallow_well\\canonical_tb_transfer\\t4_runtime_shadow\\CTBT_T4_PROTOCOL.md": "1fb7ccac0c092889b89d966e4353fb23c9ebb23d5d307fca6be64e11842d3b2b",
+  "larger-lab\\research\\shallow_well\\canonical_tb_transfer\\t4_runtime_shadow\\CTBT_T4_COMPLETENESS_SPEC.md": "b8e6e24f2e1f43acb3969f8c1e5da07ab3371209aab12ca0b54fb393c20a59cb",
+  "base_commit": "44379e416c1c49dd055f0d818f10bafccefec131"
+}

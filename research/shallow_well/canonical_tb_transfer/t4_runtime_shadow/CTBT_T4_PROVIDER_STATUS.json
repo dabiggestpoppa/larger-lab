@@ -1,0 +1,44 @@
+{
+  "provider_connected": true,
+  "account": {
+    "login": 1114712,
+    "server": "OxSecurities-Demo",
+    "trade_mode": 0,
+    "trade_mode_label": "DEMO",
+    "currency": "USD"
+  },
+  "terminal": {
+    "company": "Ox Securities Pty Ltd",
+    "build": 6090,
+    "connected": true
+  },
+  "symbols_mapped": true,
+  "symbols_verified": [
+    "EURGBP.PRO",
+    "EURUSD.PRO",
+    "GBPUSD.PRO",
+    "GBPNZD.PRO",
+    "NZDUSD.PRO"
+  ],
+  "m5_rates_available": true,
+  "m5_history_30d_per_leg": {
+    "EURGBP.PRO": 6320,
+    "EURUSD.PRO": 6320,
+    "GBPUSD.PRO": 6320,
+    "GBPNZD.PRO": 6320,
+    "NZDUSD.PRO": 6320
+  },
+  "observed_spread_points": {
+    "EURGBP.PRO": 2,
+    "EURUSD.PRO": 1,
+    "GBPUSD.PRO": 2,
+    "GBPNZD.PRO": 11,
+    "NZDUSD.PRO": 1
+  },
+  "leg_sync_at_probe": {
+    "EUR_GBP_USD": true,
+    "GBP_NZD_USD": true
+  },
+  "role": "READ_ONLY_MARKET_DATA_SOURCE \u2014 no orders, no account mutation",
+  "probe_ts_utc": "2026-08-20T15:55:00Z"
+}
