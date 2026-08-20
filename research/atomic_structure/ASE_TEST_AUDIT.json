@@ -1,0 +1,14 @@
+{
+  "checkpoint": "ASE-1-ATOMIC-TERRAIN-RECONSTRUCTION",
+  "tests": [
+    {"name":"timezone_and_column_normalization","status":"PASS"},
+    {"name":"kmeans_centroid_ordering","status":"PASS"},
+    {"name":"tier_assignment","status":"PASS"},
+    {"name":"au_first_hit_output_contract","status":"PASS"},
+    {"name":"session_spec_hash_determinism","status":"PASS"}
+  ],
+  "total": 5,
+  "passed": 5,
+  "failed": 0,
+  "scope_note": "Synthetic/reference conformance only. Full empirical future-perturbation and truncation invariance over the user's EURUSD history remain blocked until the complete raw file is runtime-readable."
+}

@@ -1,0 +1,18 @@
+{
+  "program": "ASE-v1",
+  "asset": "EURUSD",
+  "phase": "ASE-1",
+  "source_class": "CHATGPT_FILE_LIBRARY",
+  "source_title": "EURUSD.PRO_H1_202211080000_202607140000.csv",
+  "observed_schema": ["<DATE>","<TIME>","<OPEN>","<HIGH>","<LOW>","<CLOSE>","<TICKVOL>","<VOL>","<SPREAD>"],
+  "reported_coverage_start": "2022-11-08",
+  "reported_coverage_end": "2026-07-14",
+  "canonical_timezone": "America/New_York",
+  "asian_window": "19:00-03:00 America/New_York",
+  "development_preference": "2022-11-08 through 2024-12-31, subject to complete raw-file runtime access",
+  "confirmation_reserved": "2025-01-01 through 2025-12-31",
+  "holdout_reserved": "2026+",
+  "runtime_access": "BLOCKED_FULL_FILE",
+  "runtime_access_note": "The File Library source can be searched and parsed in excerpts, but the full referenced file is not mounted in the code execution filesystem in this session. No full-sample empirical ASE-1 statistics are claimed.",
+  "data_mutation": false
+}
