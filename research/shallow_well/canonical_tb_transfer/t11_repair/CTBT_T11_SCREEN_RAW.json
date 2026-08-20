@@ -1,0 +1,673 @@
+{
+  "AUD_GBP_NZD": {
+    "triangle_id": "AUD_GBP_NZD",
+    "window_start": "2022-09-13 00:00:00",
+    "window_end": "2024-12-31 18:55:00",
+    "n_bars": 164913,
+    "cost_bps": 6.531061818656232,
+    "cost_bps_documented": 3.901878705310979,
+    "cost_class": "VERIFIED_STATIC_PROVIDER",
+    "observed_spread_legs": [
+      "AUDNZD"
+    ],
+    "documented_spread_legs": [
+      "GBPAUD",
+      "GBPNZD",
+      "AUDNZD"
+    ],
+    "weeks": 120.0,
+    "z25": {
+      "events": 270,
+      "gross_ev_bps": 15.656127988071765,
+      "net_ev_bps": 9.125066169415533,
+      "pf_gross": 35.0781,
+      "pf_net": 7.6463,
+      "win_rate": 80.37037037037037,
+      "median_net_bps": 8.808205350020996,
+      "max_dd_bps": 39.7387631055127,
+      "worst_bps": -39.17408559695179,
+      "p5_bps": -9.609453382916946,
+      "avg_hold_min": 199.7037037037037,
+      "median_hold_min": 197.5,
+      "p90_hold_min": 330.0,
+      "z6_stop_rate": 0.0,
+      "hard_exit_rate": 30.74074074074074,
+      "gross_basket_edge_bps": 15.656127988071765,
+      "basket_cost_bps": 6.531061818656232,
+      "edge_cost_ratio": 2.39717957397822,
+      "break_even_multiple": 2.39717957397822
+    },
+    "z30": {
+      "events": 125,
+      "gross_ev_bps": 19.257302385260218,
+      "net_ev_bps": 12.726240566603984,
+      "pf_gross": 38.1357,
+      "pf_net": 10.9505,
+      "win_rate": 81.6,
+      "median_net_bps": 11.502715331952851,
+      "max_dd_bps": 55.96394564613354,
+      "worst_bps": -39.17408559695179,
+      "p5_bps": -8.262080691108455,
+      "avg_hold_min": 215.44,
+      "median_hold_min": 220.0,
+      "p90_hold_min": 365.0,
+      "z6_stop_rate": 0.0,
+      "hard_exit_rate": 41.6,
+      "gross_basket_edge_bps": 19.257302385260218,
+      "basket_cost_bps": 6.531061818656232,
+      "edge_cost_ratio": 2.9485714451899665,
+      "break_even_multiple": 2.9485714451899665
+    },
+    "yearly_z25": [
+      {
+        "year": 2022,
+        "events": 51,
+        "net_pnl_bps": 662.6779037990158,
+        "pf": 6.6183,
+        "net_positive": true
+      },
+      {
+        "year": 2023,
+        "events": 127,
+        "net_pnl_bps": 1199.8518977422996,
+        "pf": 7.6558,
+        "net_positive": true
+      },
+      {
+        "year": 2024,
+        "events": 92,
+        "net_pnl_bps": 601.2380642008789,
+        "pf": 9.2956,
+        "net_positive": true
+      }
+    ],
+    "yearly_z30": [
+      {
+        "year": 2022,
+        "events": 26,
+        "net_pnl_bps": 472.9254250542628,
+        "pf": 7.8919,
+        "net_positive": true
+      },
+      {
+        "year": 2023,
+        "events": 56,
+        "net_pnl_bps": 693.4890051614666,
+        "pf": 11.3539,
+        "net_positive": true
+      },
+      {
+        "year": 2024,
+        "events": 43,
+        "net_pnl_bps": 424.36564060976843,
+        "pf": 18.4843,
+        "net_positive": true
+      }
+    ],
+    "monotonicity": {
+      "delta_EV": 3.6011743971884513,
+      "delta_PF": 3.3042,
+      "delta_p5": 1.3473726918084914,
+      "delta_edge_cost_ratio": 0.5513918712117465,
+      "classification": "MONOTONIC_STRONG"
+    },
+    "gates": {
+      "A_net_ev_gt_0": true,
+      "B_pf_net_ge_1.20": true,
+      "C_events_ge_50": true,
+      "D_edge_cost_ratio_ge_1.50": true,
+      "E_break_even_multiple_ge_1.50": true,
+      "F_no_year_gt_60pct": true,
+      "G_year_stability": true,
+      "H_monotonicity": true,
+      "I_no_rollover_spread_artifact": true,
+      "J_no_data_invalidation": true,
+      "G_detail": "3/3 positive years",
+      "F_max_year_share": 0.4359
+    },
+    "events_z25": 270,
+    "events_z30": 125
+  },
+  "EUR_GBP_JPY": {
+    "triangle_id": "EUR_GBP_JPY",
+    "window_start": "2021-10-21 00:00:00",
+    "window_end": "2024-12-31 18:55:00",
+    "n_bars": 238275,
+    "cost_bps": 7.001583004799355,
+    "cost_bps_documented": 4.036294633992165,
+    "cost_class": "VERIFIED_STATIC_PROVIDER",
+    "observed_spread_legs": [
+      "EURGBP",
+      "EURJPY"
+    ],
+    "documented_spread_legs": [
+      "EURGBP",
+      "EURJPY",
+      "GBPJPY"
+    ],
+    "weeks": 166.71428571428572,
+    "z25": {
+      "events": 414,
+      "gross_ev_bps": 2.433213523586713,
+      "net_ev_bps": -4.568369481212644,
+      "pf_gross": 22.7077,
+      "pf_net": 0.0708,
+      "win_rate": 5.797101449275362,
+      "median_net_bps": -5.641837492746487,
+      "max_dd_bps": 1885.4843849006672,
+      "worst_bps": -27.958981631334805,
+      "p5_bps": -6.587001150603283,
+      "avg_hold_min": 16.944444444444443,
+      "median_hold_min": 10.0,
+      "p90_hold_min": 35.0,
+      "z6_stop_rate": 2.1739130434782608,
+      "hard_exit_rate": 1.2077294685990339,
+      "gross_basket_edge_bps": 2.433213523586713,
+      "basket_cost_bps": 7.001583004799355,
+      "edge_cost_ratio": 0.34752334178125505,
+      "break_even_multiple": 0.34752334178125505
+    },
+    "z30": {
+      "events": 256,
+      "gross_ev_bps": 3.4407438561119896,
+      "net_ev_bps": -3.560839148687366,
+      "pf_gross": 19.6583,
+      "pf_net": 0.1395,
+      "win_rate": 9.375,
+      "median_net_bps": -4.443023728474931,
+      "max_dd_bps": 905.3240832525543,
+      "worst_bps": -27.958981631334805,
+      "p5_bps": -6.582961248966062,
+      "avg_hold_min": 23.18359375,
+      "median_hold_min": 10.0,
+      "p90_hold_min": 50.0,
+      "z6_stop_rate": 3.90625,
+      "hard_exit_rate": 1.5625,
+      "gross_basket_edge_bps": 3.4407438561119896,
+      "basket_cost_bps": 7.001583004799355,
+      "edge_cost_ratio": 0.49142370428994026,
+      "break_even_multiple": 0.49142370428994026
+    },
+    "yearly_z25": [
+      {
+        "year": 2021,
+        "events": 42,
+        "net_pnl_bps": -247.51338273610972,
+        "pf": 0.0,
+        "net_positive": false
+      },
+      {
+        "year": 2022,
+        "events": 123,
+        "net_pnl_bps": -533.4672873133986,
+        "pf": 0.1714,
+        "net_positive": false
+      },
+      {
+        "year": 2023,
+        "events": 102,
+        "net_pnl_bps": -456.89757292690933,
+        "pf": 0.0343,
+        "net_positive": false
+      },
+      {
+        "year": 2024,
+        "events": 147,
+        "net_pnl_bps": -653.4267222456162,
+        "pf": 0.0263,
+        "net_positive": false
+      }
+    ],
+    "yearly_z30": [
+      {
+        "year": 2021,
+        "events": 25,
+        "net_pnl_bps": -143.5979044630929,
+        "pf": 0.0,
+        "net_positive": false
+      },
+      {
+        "year": 2022,
+        "events": 70,
+        "net_pnl_bps": -205.9076998231508,
+        "pf": 0.3509,
+        "net_positive": false
+      },
+      {
+        "year": 2023,
+        "events": 60,
+        "net_pnl_bps": -198.02790049375534,
+        "pf": 0.0823,
+        "net_positive": false
+      },
+      {
+        "year": 2024,
+        "events": 101,
+        "net_pnl_bps": -364.0413172839664,
+        "pf": 0.0488,
+        "net_positive": false
+      }
+    ],
+    "monotonicity": {
+      "delta_EV": 1.0075303325252776,
+      "delta_PF": 0.06870000000000001,
+      "delta_p5": 0.0040399016372205665,
+      "delta_edge_cost_ratio": 0.1439003625086852,
+      "classification": "MONOTONIC_STRONG"
+    },
+    "gates": {
+      "A_net_ev_gt_0": false,
+      "B_pf_net_ge_1.20": false,
+      "C_events_ge_50": true,
+      "D_edge_cost_ratio_ge_1.50": false,
+      "E_break_even_multiple_ge_1.50": false,
+      "F_no_year_gt_60pct": false,
+      "G_year_stability": false,
+      "H_monotonicity": true,
+      "I_no_rollover_spread_artifact": true,
+      "J_no_data_invalidation": true,
+      "G_detail": "0/4 positive years",
+      "F_max_year_share": 1.0
+    },
+    "events_z25": 414,
+    "events_z30": 256
+  },
+  "CHF_GBP_JPY": {
+    "triangle_id": "CHF_GBP_JPY",
+    "window_start": "2021-10-21 00:00:00",
+    "window_end": "2024-12-31 18:55:00",
+    "n_bars": 238141,
+    "cost_bps": 6.129021616802038,
+    "cost_bps_documented": 4.03903459716437,
+    "cost_class": "VERIFIED_STATIC_PROVIDER",
+    "observed_spread_legs": [],
+    "documented_spread_legs": [
+      "GBPCHF",
+      "GBPJPY",
+      "CHFJPY"
+    ],
+    "weeks": 166.71428571428572,
+    "z25": {
+      "events": 384,
+      "gross_ev_bps": 4.359557583437716,
+      "net_ev_bps": -1.7694640333643228,
+      "pf_gross": 38.0066,
+      "pf_net": 0.4961,
+      "win_rate": 26.302083333333332,
+      "median_net_bps": -4.991106882851287,
+      "max_dd_bps": 762.7100805014105,
+      "worst_bps": -20.34196940018504,
+      "p5_bps": -5.77812609489689,
+      "avg_hold_min": 12.513020833333334,
+      "median_hold_min": 5.0,
+      "p90_hold_min": 25.0,
+      "z6_stop_rate": 4.427083333333334,
+      "hard_exit_rate": 1.5625,
+      "gross_basket_edge_bps": 4.359557583437716,
+      "basket_cost_bps": 6.129021616802038,
+      "edge_cost_ratio": 0.7112974722566598,
+      "break_even_multiple": 0.7112974722566598
+    },
+    "z30": {
+      "events": 232,
+      "gross_ev_bps": 6.540006156676063,
+      "net_ev_bps": 0.410984539874026,
+      "pf_gross": 49.9065,
+      "pf_net": 1.1611,
+      "win_rate": 42.672413793103445,
+      "median_net_bps": -1.1130139784521758,
+      "max_dd_bps": 301.39313682754295,
+      "worst_bps": -11.398890461146255,
+      "p5_bps": -6.947084693778332,
+      "avg_hold_min": 17.823275862068964,
+      "median_hold_min": 10.0,
+      "p90_hold_min": 35.0,
+      "z6_stop_rate": 6.896551724137931,
+      "hard_exit_rate": 2.1551724137931036,
+      "gross_basket_edge_bps": 6.540006156676063,
+      "basket_cost_bps": 6.129021616802038,
+      "edge_cost_ratio": 1.0670554887173764,
+      "break_even_multiple": 1.0670554887173764
+    },
+    "yearly_z25": [
+      {
+        "year": 2021,
+        "events": 51,
+        "net_pnl_bps": -270.28309770293106,
+        "pf": 0.0,
+        "net_positive": false
+      },
+      {
+        "year": 2022,
+        "events": 114,
+        "net_pnl_bps": -379.4554402267973,
+        "pf": 0.2639,
+        "net_positive": false
+      },
+      {
+        "year": 2023,
+        "events": 109,
+        "net_pnl_bps": -102.9299646282657,
+        "pf": 0.6796,
+        "net_positive": false
+      },
+      {
+        "year": 2024,
+        "events": 110,
+        "net_pnl_bps": 73.19431374609421,
+        "pf": 1.3032,
+        "net_positive": true
+      }
+    ],
+    "yearly_z30": [
+      {
+        "year": 2021,
+        "events": 28,
+        "net_pnl_bps": -145.07641750040497,
+        "pf": 0.0,
+        "net_positive": false
+      },
+      {
+        "year": 2022,
+        "events": 52,
+        "net_pnl_bps": -63.651838882261416,
+        "pf": 0.6663,
+        "net_positive": false
+      },
+      {
+        "year": 2023,
+        "events": 72,
+        "net_pnl_bps": 110.97654729632049,
+        "pf": 1.8698,
+        "net_positive": true
+      },
+      {
+        "year": 2024,
+        "events": 80,
+        "net_pnl_bps": 193.10012233711987,
+        "pf": 2.5019,
+        "net_positive": true
+      }
+    ],
+    "monotonicity": {
+      "delta_EV": 2.180448573238349,
+      "delta_PF": 0.665,
+      "delta_p5": -1.1689585988814422,
+      "delta_edge_cost_ratio": 0.3557580164607166,
+      "classification": "MONOTONIC_STRONG"
+    },
+    "gates": {
+      "A_net_ev_gt_0": true,
+      "B_pf_net_ge_1.20": false,
+      "C_events_ge_50": true,
+      "D_edge_cost_ratio_ge_1.50": false,
+      "E_break_even_multiple_ge_1.50": false,
+      "F_no_year_gt_60pct": false,
+      "G_year_stability": false,
+      "H_monotonicity": true,
+      "I_no_rollover_spread_artifact": true,
+      "J_no_data_invalidation": true,
+      "G_detail": "2/4 positive years",
+      "F_max_year_share": 2.0252
+    },
+    "events_z25": 384,
+    "events_z30": 232
+  },
+  "EUR_GBP_USD": {
+    "triangle_id": "EUR_GBP_USD",
+    "window_start": "2022-09-28 00:00:00",
+    "window_end": "2024-12-31 18:55:00",
+    "n_bars": 162186,
+    "cost_bps": 8.3594270651793,
+    "cost_bps_documented": 4.863250983270274,
+    "cost_class": "VERIFIED_STATIC_PROVIDER",
+    "observed_spread_legs": [
+      "EURGBP",
+      "EURUSD"
+    ],
+    "documented_spread_legs": [
+      "EURGBP",
+      "EURUSD",
+      "GBPUSD"
+    ],
+    "weeks": 117.85714285714286,
+    "z25": {
+      "events": 665,
+      "gross_ev_bps": 20.05920928633723,
+      "net_ev_bps": 11.69978222115793,
+      "pf_gross": 11.8277,
+      "pf_net": 4.5835,
+      "win_rate": 79.84962406015038,
+      "median_net_bps": 11.378217613265445,
+      "max_dd_bps": 88.88420382687309,
+      "worst_bps": -64.86469543503095,
+      "p5_bps": -20.110531376976898,
+      "avg_hold_min": 171.54887218045113,
+      "median_hold_min": 165.0,
+      "p90_hold_min": 310.0,
+      "z6_stop_rate": 5.714285714285714,
+      "hard_exit_rate": 24.210526315789473,
+      "gross_basket_edge_bps": 20.05920928633723,
+      "basket_cost_bps": 8.3594270651793,
+      "edge_cost_ratio": 2.399591399019758,
+      "break_even_multiple": 2.399591399019758
+    },
+    "z30": {
+      "events": 435,
+      "gross_ev_bps": 24.09876553565967,
+      "net_ev_bps": 15.73933847048037,
+      "pf_gross": 13.0586,
+      "pf_net": 5.4152,
+      "win_rate": 78.16091954022988,
+      "median_net_bps": 15.657350068793743,
+      "max_dd_bps": 96.25858300728942,
+      "worst_bps": -61.72346582835661,
+      "p5_bps": -22.921734519025254,
+      "avg_hold_min": 185.83908045977012,
+      "median_hold_min": 190.0,
+      "p90_hold_min": 325.0,
+      "z6_stop_rate": 8.505747126436782,
+      "hard_exit_rate": 30.114942528735632,
+      "gross_basket_edge_bps": 24.09876553565967,
+      "basket_cost_bps": 8.3594270651793,
+      "edge_cost_ratio": 2.8828250247007543,
+      "break_even_multiple": 2.8828250247007543
+    },
+    "yearly_z25": [
+      {
+        "year": 2022,
+        "events": 66,
+        "net_pnl_bps": 1806.9408444103972,
+        "pf": 9.1068,
+        "net_positive": true
+      },
+      {
+        "year": 2023,
+        "events": 301,
+        "net_pnl_bps": 3668.4501496293515,
+        "pf": 4.9904,
+        "net_positive": true
+      },
+      {
+        "year": 2024,
+        "events": 298,
+        "net_pnl_bps": 2304.964183030274,
+        "pf": 3.2401,
+        "net_positive": true
+      }
+    ],
+    "yearly_z30": [
+      {
+        "year": 2022,
+        "events": 41,
+        "net_pnl_bps": 1367.7958027642621,
+        "pf": 8.4674,
+        "net_positive": true
+      },
+      {
+        "year": 2023,
+        "events": 198,
+        "net_pnl_bps": 3201.6258855160136,
+        "pf": 6.4674,
+        "net_positive": true
+      },
+      {
+        "year": 2024,
+        "events": 196,
+        "net_pnl_bps": 2277.190546378685,
+        "pf": 3.9122,
+        "net_positive": true
+      }
+    ],
+    "monotonicity": {
+      "delta_EV": 4.039556249322439,
+      "delta_PF": 0.8316999999999997,
+      "delta_p5": -2.811203142048356,
+      "delta_edge_cost_ratio": 0.48323362568099615,
+      "classification": "MONOTONIC_STRONG"
+    },
+    "gates": {
+      "A_net_ev_gt_0": true,
+      "B_pf_net_ge_1.20": true,
+      "C_events_ge_50": true,
+      "D_edge_cost_ratio_ge_1.50": true,
+      "E_break_even_multiple_ge_1.50": true,
+      "F_no_year_gt_60pct": true,
+      "G_year_stability": true,
+      "H_monotonicity": true,
+      "I_no_rollover_spread_artifact": true,
+      "J_no_data_invalidation": true,
+      "G_detail": "3/3 positive years",
+      "F_max_year_share": 0.4676
+    },
+    "events_z25": 665,
+    "events_z30": 435
+  },
+  "GBP_NZD_USD": {
+    "triangle_id": "GBP_NZD_USD",
+    "window_start": "2022-09-12 00:00:00",
+    "window_end": "2024-12-31 18:55:00",
+    "n_bars": 165234,
+    "cost_bps": 8.935843290676996,
+    "cost_bps_documented": 5.3914524734728415,
+    "cost_class": "VERIFIED_STATIC_PROVIDER",
+    "observed_spread_legs": [],
+    "documented_spread_legs": [
+      "GBPNZD",
+      "GBPUSD",
+      "NZDUSD"
+    ],
+    "weeks": 120.14285714285714,
+    "z25": {
+      "events": 378,
+      "gross_ev_bps": 24.464244654377744,
+      "net_ev_bps": 15.528401363700747,
+      "pf_gross": 14.9685,
+      "pf_net": 6.4984,
+      "win_rate": 83.33333333333334,
+      "median_net_bps": 14.881959640158023,
+      "max_dd_bps": 193.09572806041598,
+      "worst_bps": -193.09572806041598,
+      "p5_bps": -17.07168601546997,
+      "avg_hold_min": 186.0978835978836,
+      "median_hold_min": 185.0,
+      "p90_hold_min": 305.0,
+      "z6_stop_rate": 1.3227513227513228,
+      "hard_exit_rate": 29.365079365079367,
+      "gross_basket_edge_bps": 24.464244654377744,
+      "basket_cost_bps": 8.935843290676996,
+      "edge_cost_ratio": 2.737765632025121,
+      "break_even_multiple": 2.737765632025121
+    },
+    "z30": {
+      "events": 210,
+      "gross_ev_bps": 31.773208207108897,
+      "net_ev_bps": 22.837364916431905,
+      "pf_gross": 15.3708,
+      "pf_net": 8.0184,
+      "win_rate": 84.28571428571429,
+      "median_net_bps": 21.907452919789833,
+      "max_dd_bps": 183.2855804679332,
+      "worst_bps": -183.2855804679332,
+      "p5_bps": -17.215203081106758,
+      "avg_hold_min": 209.45238095238096,
+      "median_hold_min": 210.0,
+      "p90_hold_min": 325.0,
+      "z6_stop_rate": 2.380952380952381,
+      "hard_exit_rate": 37.142857142857146,
+      "gross_basket_edge_bps": 31.773208207108897,
+      "basket_cost_bps": 8.935843290676996,
+      "edge_cost_ratio": 3.5557033817120245,
+      "break_even_multiple": 3.5557033817120245
+    },
+    "yearly_z25": [
+      {
+        "year": 2022,
+        "events": 73,
+        "net_pnl_bps": 1725.8332420447964,
+        "pf": 4.7416,
+        "net_positive": true
+      },
+      {
+        "year": 2023,
+        "events": 161,
+        "net_pnl_bps": 2619.5738021720076,
+        "pf": 9.329,
+        "net_positive": true
+      },
+      {
+        "year": 2024,
+        "events": 144,
+        "net_pnl_bps": 1524.328671262078,
+        "pf": 6.2245,
+        "net_positive": true
+      }
+    ],
+    "yearly_z30": [
+      {
+        "year": 2022,
+        "events": 50,
+        "net_pnl_bps": 1695.4819587739435,
+        "pf": 5.569,
+        "net_positive": true
+      },
+      {
+        "year": 2023,
+        "events": 87,
+        "net_pnl_bps": 2065.3508585102354,
+        "pf": 14.8147,
+        "net_positive": true
+      },
+      {
+        "year": 2024,
+        "events": 73,
+        "net_pnl_bps": 1035.0138151665208,
+        "pf": 7.36,
+        "net_positive": true
+      }
+    ],
+    "monotonicity": {
+      "delta_EV": 7.308963552731159,
+      "delta_PF": 1.5199999999999996,
+      "delta_p5": -0.1435170656367859,
+      "delta_edge_cost_ratio": 0.8179377496869034,
+      "classification": "MONOTONIC_STRONG"
+    },
+    "gates": {
+      "A_net_ev_gt_0": true,
+      "B_pf_net_ge_1.20": true,
+      "C_events_ge_50": true,
+      "D_edge_cost_ratio_ge_1.50": true,
+      "E_break_even_multiple_ge_1.50": true,
+      "F_no_year_gt_60pct": true,
+      "G_year_stability": true,
+      "H_monotonicity": true,
+      "I_no_rollover_spread_artifact": true,
+      "J_no_data_invalidation": true,
+      "G_detail": "3/3 positive years",
+      "F_max_year_share": 0.4307
+    },
+    "events_z25": 378,
+    "events_z30": 210
+  }
+}

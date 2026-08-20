@@ -1,0 +1,42 @@
+{
+  "checkpoint": "SW-CTBT-T1.1-REFERENCE-PARITY-AND-GATE-ENFORCEMENT-REPAIR",
+  "reference": "AUD_GBP_NZD",
+  "canonical_symbols": [
+    "GBPAUD",
+    "GBPNZD",
+    "AUDNZD"
+  ],
+  "data_files": {
+    "GBPAUD": "GBPAUD_M5.csv",
+    "GBPNZD": "GBPNZD_M5.csv",
+    "AUDNZD": "AUDNZD_PRO_M5.csv"
+  },
+  "synced_bars": 265809,
+  "data_start": "2022-09-13 00:00:00",
+  "data_end": "2026-05-29 19:50:00",
+  "control": {
+    "label": "CONTROL z2.5",
+    "canon_count": 405,
+    "mine_count": 405,
+    "count_match": true,
+    "entry_time_match": 405,
+    "direction_match": 405,
+    "exit_time_match": 405,
+    "result_match": 405,
+    "entry_z_match": 405,
+    "gross_pnl_match": 405,
+    "cost_match": 405,
+    "net_pnl_match": 405,
+    "size_match": 405,
+    "max_gross_diff": 0.0,
+    "max_size_diff": 0.0,
+    "n_compared": 405,
+    "first_divergence": null
+  },
+  "primary": {
+    "label": "PRIMARY z3.0",
+    "canon_count": 194,
+    "mine_count": 194,
+    "count_match": true
+  }
+}

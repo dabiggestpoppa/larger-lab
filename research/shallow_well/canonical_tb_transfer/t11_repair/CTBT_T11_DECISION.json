@@ -1,0 +1,70 @@
+{
+  "checkpoint": "SW-CTBT-T1.1-REFERENCE-PARITY-AND-GATE-ENFORCEMENT-REPAIR",
+  "status": "PASS_STEP1_SURVIVOR_CONFIRMED",
+  "repair_base_commit": "be4ac2f2a105c886611ad9243b1e256ff3069ab9",
+  "original_t1_status": "PASS_STEP1_SURVIVORS_FOUND (reported; NOT ACCEPTED by human review)",
+  "reference_parity_pass": true,
+  "expected_control_events": 405,
+  "actual_control_events": 405,
+  "expected_primary_events": 194,
+  "actual_primary_events": 194,
+  "reference_cost_contract_match": true,
+  "reference_parity_note": "Independent reconstruction reproduces the canonical 405-trade log EXACTLY: 405/405 entry times, directions, exit times, exit reasons, z-scores, gross PnL, cost, net PnL, and all three leg sizes (max float diff 0.0). PRIMARY reproduces 194/194.",
+  "candidate_results": {
+    "EUR_GBP_JPY": {
+      "qualified": false,
+      "net_ev_bps": -3.5608,
+      "pf_net": 0.1395,
+      "edge_cost_ratio": 0.4914,
+      "positive_years": "0/4",
+      "monotonicity": "MONOTONIC_STRONG",
+      "failed_gates": ["A_net_ev_gt_0", "B_pf_net_ge_1.20", "D_edge_cost_ratio_ge_1.50", "E_break_even_multiple_ge_1.50", "F_no_year_gt_60pct", "G_year_stability"]
+    },
+    "CHF_GBP_JPY": {
+      "qualified": false,
+      "net_ev_bps": 0.4110,
+      "pf_net": 1.1611,
+      "edge_cost_ratio": 1.0671,
+      "positive_years": "2/4",
+      "monotonicity": "MONOTONIC_STRONG",
+      "failed_gates": ["B_pf_net_ge_1.20", "D_edge_cost_ratio_ge_1.50", "E_break_even_multiple_ge_1.50", "F_no_year_gt_60pct", "G_year_stability"]
+    },
+    "EUR_GBP_USD": {
+      "qualified": true,
+      "net_ev_bps": 15.7393,
+      "pf_net": 5.4152,
+      "win_rate": 78.16,
+      "edge_cost_ratio": 2.8828,
+      "events": 435,
+      "positive_years": "3/3",
+      "monotonicity": "MONOTONIC_STRONG",
+      "data_window": "2022-09-28 to 2024-12-31 (SHORTER_DEVELOPMENT_WINDOW, ~2.25 years M5)",
+      "cost_evidence_class": "VERIFIED_STATIC_PROVIDER"
+    },
+    "GBP_NZD_USD": {
+      "qualified": true,
+      "net_ev_bps": 22.8374,
+      "pf_net": 8.0184,
+      "win_rate": 84.29,
+      "edge_cost_ratio": 3.5557,
+      "events": 210,
+      "positive_years": "3/3",
+      "monotonicity": "MONOTONIC_STRONG",
+      "data_window": "2022-09-12 to 2024-12-31 (SHORTER_DEVELOPMENT_WINDOW, ~2.25 years M5)",
+      "cost_evidence_class": "VERIFIED_STATIC_PROVIDER"
+    }
+  },
+  "qualified_count": 2,
+  "qualified_candidates": ["EUR_GBP_USD", "GBP_NZD_USD"],
+  "eur_gbp_usd_data_window": "2022-09-28 to 2024-12-31",
+  "eur_gbp_usd_cost_evidence_class": "VERIFIED_STATIC_PROVIDER",
+  "eur_gbp_usd_monotonicity": "MONOTONIC_STRONG",
+  "year_gate_interpretation": "At least 3 net-positive calendar years (each containing >=1 completed event). The qualifying candidates span 3 calendar years (2022 partial, 2023, 2024), all net-positive. NOTE: 2022 is a ~3-month fragment; the M5 development window is ~2.25 years for all triangles because fetched data is daily (not M5) before ~2022-08.",
+  "year_depth_caveat": "All triangles (reference included) have only ~2.25 years of valid M5 development data (2022-09..2024-12). The '3 calendar years' gate is met literally (2022, 2023, 2024) but 2022 is a partial year. This is a material caveat the human must weigh before authorizing Step 2.",
+  "step2_ready": false,
+  "step2_authorized": false,
+  "program_stop": false,
+  "production_authorized": false,
+  "human_review_required": true,
+  "next_checkpoint_recommended": "SW-CTBT-T2-ONE-SHOT-CANONICAL-TRANSFER-CONFIRMATION (ONLY after explicit human authorization; 2025 window must be frozen before economics are opened)"
+}

@@ -1,0 +1,41 @@
+{
+  "checkpoint": "SW-CTBT-T1.1-REFERENCE-PARITY-AND-GATE-ENFORCEMENT-REPAIR",
+  "repair_base_commit": "be4ac2f2a105c886611ad9243b1e256ff3069ab9",
+  "data_files": {
+    "GBPAUD_M5.csv": "canonical reference leg",
+    "GBPNZD_M5.csv": "canonical reference leg",
+    "AUDNZD_PRO_M5.csv": "canonical reference leg (has spread column)"
+  },
+  "scripts": {
+    "run_t11_reference_parity.py": "independent canonical reconstruction + 405/194 parity",
+    "run_t11_screen.py": "repaired challenger screen",
+    "write_t11_artifacts.py": "artifact emitter"
+  },
+  "reference_parity_result": {
+    "control": {
+      "label": "CONTROL z2.5",
+      "canon_count": 405,
+      "mine_count": 405,
+      "count_match": true,
+      "entry_time_match": 405,
+      "direction_match": 405,
+      "exit_time_match": 405,
+      "result_match": 405,
+      "entry_z_match": 405,
+      "gross_pnl_match": 405,
+      "cost_match": 405,
+      "net_pnl_match": 405,
+      "size_match": 405,
+      "max_gross_diff": 0.0,
+      "max_size_diff": 0.0,
+      "n_compared": 405,
+      "first_divergence": null
+    },
+    "primary": {
+      "label": "PRIMARY z3.0",
+      "canon_count": 194,
+      "mine_count": 194,
+      "count_match": true
+    }
+  }
+}

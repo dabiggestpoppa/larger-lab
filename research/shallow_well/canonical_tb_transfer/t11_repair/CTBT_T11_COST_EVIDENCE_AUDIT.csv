@@ -1,0 +1,6 @@
+triangle,cost_evidence_class,provider,spread_basis,commission,basket_cost_bps_conservative,basket_cost_bps_documented,observed_spread_legs,documented_spread_legs
+AUD_GBP_NZD,VERIFIED_STATIC_PROVIDER,OxSecurities MT5 (spread_commission_config.py),conservative floor 1.5 pips/leg,1.4 pips/leg (canonical),6.5311,3.9019,AUDNZD,"GBPAUD,GBPNZD,AUDNZD"
+EUR_GBP_JPY,VERIFIED_STATIC_PROVIDER,OxSecurities MT5 (spread_commission_config.py),conservative floor 1.5 pips/leg,1.4 pips/leg (canonical),7.0016,4.0363,"EURGBP,EURJPY","EURGBP,EURJPY,GBPJPY"
+CHF_GBP_JPY,VERIFIED_STATIC_PROVIDER,OxSecurities MT5 (spread_commission_config.py),conservative floor 1.5 pips/leg,1.4 pips/leg (canonical),6.129,4.039,(none),"GBPCHF,GBPJPY,CHFJPY"
+EUR_GBP_USD,VERIFIED_STATIC_PROVIDER,OxSecurities MT5 (spread_commission_config.py),conservative floor 1.5 pips/leg,1.4 pips/leg (canonical),8.3594,4.8633,"EURGBP,EURUSD","EURGBP,EURUSD,GBPUSD"
+GBP_NZD_USD,VERIFIED_STATIC_PROVIDER,OxSecurities MT5 (spread_commission_config.py),conservative floor 1.5 pips/leg,1.4 pips/leg (canonical),8.9358,5.3915,(none),"GBPNZD,GBPUSD,NZDUSD"

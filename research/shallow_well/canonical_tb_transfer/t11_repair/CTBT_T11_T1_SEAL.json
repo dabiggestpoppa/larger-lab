@@ -1,0 +1,11 @@
+{
+  "checkpoint": "SW-CTBT-T1.1-REFERENCE-PARITY-AND-GATE-ENFORCEMENT-REPAIR",
+  "parent_checkpoint": "SW-CTBT-T1-CANONICAL-TB-TRANSFER-MECHANISM-SCREEN",
+  "repair_base_commit": "be4ac2f2a105c886611ad9243b1e256ff3069ab9",
+  "original_t1_status_reported": "PASS_STEP1_SURVIVORS_FOUND",
+  "human_review_verdict": "NOT ACCEPTED - REPAIR REQUIRED",
+  "original_t1_artifacts_dir": "research/shallow_well/canonical_tb_transfer/t1_screen/",
+  "original_t1_immutable": true,
+  "no_2025_economics_consumed": true,
+  "no_2026_economics_consumed": true
+}

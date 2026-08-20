@@ -1,0 +1,13 @@
+{
+  "checkpoint": "SW-CTBT-T1.1-REFERENCE-PARITY-AND-GATE-ENFORCEMENT-REPAIR",
+  "qualified_count": 2,
+  "qualified_candidates": [
+    "EUR_GBP_USD",
+    "GBP_NZD_USD"
+  ],
+  "advancement_rule": "1-2 survivors advance as-is; >2 capped at 2 by predefined structural score (not triggered)",
+  "capped_candidates": [
+    "EUR_GBP_USD",
+    "GBP_NZD_USD"
+  ]
+}

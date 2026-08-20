@@ -1,0 +1,24 @@
+{
+  "checkpoint": "SW-CTBT-T1.1-REFERENCE-PARITY-AND-GATE-ENFORCEMENT-REPAIR",
+  "reference": "AUD_GBP_NZD",
+  "cost_contract": {
+    "source": "strategy_freeze.json (frozen)",
+    "gbpaud_spread_pips": 1.5,
+    "gbpnzd_spread_pips": 2.5,
+    "audnzd_spread_pips": 2.0,
+    "commission_per_leg_pips": 1.4,
+    "total_round_trip_cost_pips": 10.2
+  },
+  "economic_cost_contract_match": true,
+  "control": {
+    "gross_pnl_match": 405,
+    "cost_match": 405,
+    "net_pnl_match": 405,
+    "size_match": 405,
+    "max_gross_diff": 0.0,
+    "max_size_diff": 0.0,
+    "n_compared": 405
+  },
+  "weight_max_abs_diff": 0.0,
+  "weight_parity_pass": true
+}

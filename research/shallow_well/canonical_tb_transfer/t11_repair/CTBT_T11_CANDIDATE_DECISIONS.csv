@@ -1,0 +1,5 @@
+triangle,qualified,failed_gates
+EUR_GBP_JPY,False,"A_net_ev_gt_0, B_pf_net_ge_1.20, D_edge_cost_ratio_ge_1.50, E_break_even_multiple_ge_1.50, F_no_year_gt_60pct, G_year_stability"
+CHF_GBP_JPY,False,"B_pf_net_ge_1.20, D_edge_cost_ratio_ge_1.50, E_break_even_multiple_ge_1.50, F_no_year_gt_60pct, G_year_stability"
+EUR_GBP_USD,True,
+GBP_NZD_USD,True,

@@ -1,0 +1,5 @@
+triangle,A_net_ev_gt_0,B_pf_net_ge_1.20,C_events_ge_50,D_edge_cost_ratio_ge_1.50,E_break_even_multiple_ge_1.50,F_no_year_gt_60pct,G_year_stability,H_monotonicity,I_no_rollover_spread_artifact,J_no_data_invalidation,G_detail,F_max_year_share
+EUR_GBP_JPY,False,False,True,False,False,False,False,True,True,True,0/4 positive years,1.0
+CHF_GBP_JPY,True,False,True,False,False,False,False,True,True,True,2/4 positive years,2.0252
+EUR_GBP_USD,True,True,True,True,True,True,True,True,True,True,3/3 positive years,0.4676
+GBP_NZD_USD,True,True,True,True,True,True,True,True,True,True,3/3 positive years,0.4307

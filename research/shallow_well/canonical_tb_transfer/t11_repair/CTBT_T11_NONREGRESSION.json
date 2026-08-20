@@ -1,0 +1,11 @@
+{
+  "checkpoint": "SW-CTBT-T1.1-REFERENCE-PARITY-AND-GATE-ENFORCEMENT-REPAIR",
+  "repair_base_commit": "be4ac2f2a105c886611ad9243b1e256ff3069ab9",
+  "original_t1_artifacts_unchanged": true,
+  "original_t1_commit_not_rewritten": true,
+  "canonical_tb_source_truth_unchanged": true,
+  "no_2025_data_consumed": true,
+  "no_optimization": true,
+  "no_new_candidate": true,
+  "production_authorized": false
+}

@@ -1,0 +1,34 @@
+{
+  "checkpoint": "SW-CTBT-T1.1-REFERENCE-PARITY-AND-GATE-ENFORCEMENT-REPAIR",
+  "source_branch": "tb-forward-engine",
+  "source_branch_tip_sha": "0c0272aded21ee15ccb968bc2eb9524572aaf41d",
+  "canonical_trade_log": {
+    "path": "artifacts/triangular_basis/live/canonical_trade_log.csv",
+    "blob_sha": "b753e114309df704be6eb659eb7fc5c75437affc",
+    "trades": 405
+  },
+  "strategy_freeze": {
+    "path": "artifacts/triangular_basis/live/strategy_freeze.json",
+    "blob_sha": "e17c0fabcb4e40dde30157edcaab2302f7ead3b8",
+    "frozen_cost_pips": 10.2,
+    "canonical_commit_sha": "2435d04e77eb31b42ab14ba76482efb729965b83",
+    "strategy_file_hash": "657d30ece2a8dbf0a6373f176038b70610059a99c31a95a4be08228bb0a0f4eb"
+  },
+  "tb_forward_config": {
+    "path": "quant-lab/engines/tb_forward_config.py",
+    "blob_sha": "e1c0f7e8852df0dea6d7ac0033a507be188539c9"
+  },
+  "triangular_basis_engine": {
+    "blob_sha": "c63cddf2bb15affdf7ce8028397cf1fe4dd680f2"
+  },
+  "triangular_basis_live": {
+    "blob_sha": "d82edd7c2bf27b393da48de664b671b3521efdbb"
+  },
+  "tb_audit_replay": {
+    "blob_sha": "89cd58e35c6b3fd03834cb2b1fb495d30eecbb7b"
+  },
+  "frozen_anchors": {
+    "control_z2.5_events": 405,
+    "primary_z3.0_events": 194
+  }
+}

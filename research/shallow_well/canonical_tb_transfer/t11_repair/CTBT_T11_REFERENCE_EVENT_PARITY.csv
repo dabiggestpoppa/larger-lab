@@ -1,0 +1,3 @@
+model,expected_events,actual_events,count_match,entry_time_match,direction_match,exit_time_match,result_match,entry_z_match,n_compared
+CONTROL z2.5,405,405,True,405,405,405,405,405,405
+PRIMARY z3.0,194,194,True,,,,,,

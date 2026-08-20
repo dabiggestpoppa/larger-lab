@@ -1,0 +1,6 @@
+{
+  "checkpoint": "SW-CTBT-T1.1-REFERENCE-PARITY-AND-GATE-ENFORCEMENT-REPAIR",
+  "control_first_divergence": null,
+  "primary_first_divergence": null,
+  "note": "Independent reconstruction reproduces the canonical 405-trade log exactly (0 divergences across entry/exit time, direction, exit reason, z-score, gross PnL, cost, net PnL and all 3 leg sizes)."
+}

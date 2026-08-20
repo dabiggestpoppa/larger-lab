@@ -1,0 +1,158 @@
+{
+  "checkpoint": "SW-CTBT-T1.1-REFERENCE-PARITY-AND-GATE-ENFORCEMENT-REPAIR",
+  "passed": 30,
+  "failed": 0,
+  "total": 30,
+  "tests": [
+    {
+      "name": "1 exact repair base SHA",
+      "pass": true,
+      "detail": "be4ac2f2a105c886611ad9243b1e256ff3069ab9"
+    },
+    {
+      "name": "2 original T1 artifacts immutable",
+      "pass": true,
+      "detail": "t1_screen/ untouched; repair lives in t11_repair/"
+    },
+    {
+      "name": "3 canonical basis exact",
+      "pass": true,
+      "detail": "ln(GBPAUD)-ln(GBPNZD)+ln(AUDNZD)"
+    },
+    {
+      "name": "4 causal z exact",
+      "pass": true,
+      "detail": "405/405"
+    },
+    {
+      "name": "5 ddof=0 exact",
+      "pass": true,
+      "detail": "np.std(window) population std"
+    },
+    {
+      "name": "6 current bar excluded",
+      "pass": true,
+      "detail": "window = basis[i-200:i]"
+    },
+    {
+      "name": "7 strict z2.5 threshold",
+      "pass": true,
+      "detail": "|z| > 2.5"
+    },
+    {
+      "name": "8 strict z3 threshold",
+      "pass": true,
+      "detail": "|z| > 3.0"
+    },
+    {
+      "name": "9 E1 exit exact",
+      "pass": true,
+      "detail": "control SHORT z<=0.0 / primary SHORT z<=-0.25"
+    },
+    {
+      "name": "10 z6 stop exact",
+      "pass": true,
+      "detail": "405/405"
+    },
+    {
+      "name": "11 session exact",
+      "pass": true,
+      "detail": "London 3-12 EST fixed UTC-5"
+    },
+    {
+      "name": "12 min runway exact",
+      "pass": true,
+      "detail": "entry only est_hour<=10 (>=120min)"
+    },
+    {
+      "name": "13 hard exit exact",
+      "pass": true,
+      "detail": "hard noon exit checked FIRST"
+    },
+    {
+      "name": "14 concurrency exact",
+      "pass": true,
+      "detail": "max 1 concurrent basket"
+    },
+    {
+      "name": "15 reentry exact",
+      "pass": true,
+      "detail": "re-entry after close"
+    },
+    {
+      "name": "16 W2 parity exact",
+      "pass": true,
+      "detail": "size_match=405/405 max_diff=0.0"
+    },
+    {
+      "name": "17 canonical cost contract exact",
+      "pass": true,
+      "detail": "10.2 pips"
+    },
+    {
+      "name": "18 control event-count parity",
+      "pass": true,
+      "detail": "405==405"
+    },
+    {
+      "name": "19 primary event-count parity",
+      "pass": true,
+      "detail": "194==194"
+    },
+    {
+      "name": "20 first divergence generated on mismatch",
+      "pass": true,
+      "detail": "first_divergence=None (exact match)"
+    },
+    {
+      "name": "21 challenger costs source-tagged",
+      "pass": true,
+      "detail": "COST_EVIDENCE_AUDIT.csv"
+    },
+    {
+      "name": "22 no assumed cost mislabeled observed",
+      "pass": true,
+      "detail": "all level-4 VERIFIED_STATIC_PROVIDER"
+    },
+    {
+      "name": "23 monotonicity deterministic",
+      "pass": true,
+      "detail": "frozen classifier"
+    },
+    {
+      "name": "24 NON_MONOTONIC cannot qualify",
+      "pass": true,
+      "detail": "classifier blocks"
+    },
+    {
+      "name": "25 year gate deterministic",
+      "pass": true,
+      "detail": ">=3 positive calendar years"
+    },
+    {
+      "name": "26 all mandatory gates enforced",
+      "pass": true,
+      "detail": "10/10 required"
+    },
+    {
+      "name": "27 no 2025 reads",
+      "pass": true,
+      "detail": "DEV_END=2024-12-31"
+    },
+    {
+      "name": "28 no optimization",
+      "pass": true,
+      "detail": "frozen contract only"
+    },
+    {
+      "name": "29 no new candidate",
+      "pass": true,
+      "detail": "4 preregistered challengers only"
+    },
+    {
+      "name": "30 production false",
+      "pass": true,
+      "detail": "production_authorized=False"
+    }
+  ]
+}
