@@ -1,0 +1,5 @@
+candidate,model_basket_cost_bps,AUDNZD_spread_median_pips,AUDNZD_spread_p90_pts,AUDJPY_spread_median_pips,AUDJPY_spread_p90_pts,NZDJPY_spread_median_pips,NZDJPY_spread_p90_pts,USDCHF_spread_median_pips,USDCHF_spread_p90_pts,USDJPY_spread_median_pips,USDJPY_spread_p90_pts,CHFJPY_spread_median_pips,CHFJPY_spread_p90_pts,AUDCAD_spread_median_pips,AUDCAD_spread_p90_pts,CADJPY_spread_median_pips,CADJPY_spread_p90_pts,CADCHF_spread_median_pips,CADCHF_spread_p90_pts
+AUD_NZD_JPY,5.989,0.5,11.0,NONE,NONE,NONE,NONE,,,,,,,,,,,,
+USD_CHF_JPY,4.801,,,,,,,0.4,6.0,NONE,NONE,NONE,NONE,,,,,,
+AUD_CAD_JPY,5.326,,,NONE,NONE,,,,,,,,,0.7,11.0,NONE,NONE,,
+CAD_CHF_JPY,5.487,,,,,,,,,,,NONE,NONE,,,NONE,NONE,0.3,8.0

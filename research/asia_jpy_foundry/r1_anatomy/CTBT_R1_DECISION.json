@@ -1,0 +1,88 @@
+{
+  "checkpoint": "SW-AJCF-R1-SESSION-AND-CONSTRAINT-ANATOMY",
+  "status": "R1_ANATOMY_COMPLETE",
+  "base_commit": "f3c6aca28ae9bdc090ca32032f180995cf94a9b5",
+  "protocol": "CTBT_R1_PROTOCOL.md",
+  "dev_window": {
+    "start": "2022-09-01",
+    "end": "2024-12-31",
+    "note": "USD_CHF_JPY constrained by USDCHF M5 leg start (2023-07-02); recorded as SHORTER_DEVELOPMENT_WINDOW. 2025 NOT consumed (reserved for R3)."
+  },
+  "data_family_correction": {
+    "issue": "Plain *_M5.csv files (USDJPY, CHFJPY) are NOT cross-synchronized with the PRO/fetched family: mixed-file triangles showed phantom 200-350 bps triangular violations during the 2022-12-20 BOJ YCC shock.",
+    "resolution": "Switched JPY legs to the *_M5_fetched.csv family (same family CTBT used for JPY legs). With the corrected mapping all four triangles satisfy the identity (mean basis ~ -1 bps) and BOJ-window violations drop to <2.3 bps.",
+    "verified": "AUD_NZD_JPY basis std 2.91 bps, USD_CHF_JPY 3.36 bps, AUD_CAD_JPY 1.59 bps, CAD_CHF_JPY 3.30 bps (all clean)"
+  },
+  "candidate_summary": [
+    {
+      "candidate": "AUD_NZD_JPY",
+      "data_validity": "VALID",
+      "dev_bars": 171724,
+      "n_events": 2471,
+      "events_per_week": 20.3,
+      "median_disp_bps": 3.49,
+      "disp_severity_p90_bps": null,
+      "median_resolution_min": 75,
+      "model_basket_cost_bps": 5.989,
+      "cost_ratio_all": 0.583,
+      "rollover_frac_all": 0.014,
+      "natural_session": "NY_MORNING_13-15_EST",
+      "r1_state": "FAIL_COST",
+      "fail_reason": "Median displacement 3.5 bps < basket cost 6.0 bps; gross excursion cannot cover 3-leg execution even before slippage. Mechanism exists but economically unexecutable."
+    },
+    {
+      "candidate": "USD_CHF_JPY",
+      "data_validity": "VALID",
+      "dev_bars": 111985,
+      "n_events": 804,
+      "events_per_week": 10.3,
+      "median_disp_bps": 11.22,
+      "median_resolution_min": 60,
+      "model_basket_cost_bps": 4.801,
+      "cost_ratio_all": 2.337,
+      "cost_ratio_ny13_15est": 2.59,
+      "rollover_frac_all": 0.01,
+      "natural_session": "NY_MORNING_13-15_EST",
+      "r1_state": "PROMOTE_TO_R2",
+      "note": "SHORTER_DEVELOPMENT_WINDOW (USDCHF leg 2023-07 onward). Displacement 11-12.5 bps vs cost 4.8 bps."
+    },
+    {
+      "candidate": "AUD_CAD_JPY",
+      "data_validity": "VALID",
+      "dev_bars": 169814,
+      "n_events": 1731,
+      "events_per_week": 14.2,
+      "median_disp_bps": 4.38,
+      "median_resolution_min": 35,
+      "model_basket_cost_bps": 5.326,
+      "cost_ratio_all": 0.822,
+      "rollover_frac_all": 0.02,
+      "natural_session": "NY_MORNING_13-15_EST",
+      "r1_state": "FAIL_COST",
+      "fail_reason": "Median displacement 4.4 bps < basket cost 5.3 bps; constraint too tight to cover 3-leg cost."
+    },
+    {
+      "candidate": "CAD_CHF_JPY",
+      "data_validity": "VALID",
+      "dev_bars": 171682,
+      "n_events": 1291,
+      "events_per_week": 10.6,
+      "median_disp_bps": 12.06,
+      "median_resolution_min": 60,
+      "model_basket_cost_bps": 5.487,
+      "cost_ratio_all": 2.198,
+      "cost_ratio_ny13_15est": 2.43,
+      "rollover_frac_all": 0.015,
+      "natural_session": "NY_MORNING_13-15_EST",
+      "r1_state": "PROMOTE_TO_R2"
+    }
+  ],
+  "survivors": ["USD_CHF_JPY", "CAD_CHF_JPY"],
+  "survivor_count": 2,
+  "program_stop": false,
+  "key_finding": "The dislocation->resolution mechanism for all four JPY triangles clusters in NY morning (13-15 EST), NOT the Tokyo/Asia session. The preregistered Asia lenses (ASIA_CORE, TOKYO_CORE, ASIA_LONDON_TRANSITION) contain <1.5% of all extreme events. The two CHF triangles are promoted on cost economics (2.2-2.6x); R2 must freeze the NY_MORNING window as the session translation.",
+  "r2_session_recommendation": "NY_MORNING 13:00-16:00 EST (frozen at R2 start, no tuning)",
+  "next_checkpoint_recommended": "SW-AJCF-R2-FROZEN-MECHANISM-SCREEN (requires human review first)",
+  "production_authorized": false,
+  "human_review_required": true
+}
