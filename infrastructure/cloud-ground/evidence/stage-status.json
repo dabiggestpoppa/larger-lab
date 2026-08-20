@@ -1,0 +1,34 @@
+{
+  "block": "B1",
+  "increment": "B1-I1R",
+  "implementation_commit": "329434caf4b340d866d229259f5825b54d3c5b40",
+  "evidence_commit": null,
+  "gate_status": "BLOCKED",
+  "totals": {
+    "PASS": 22,
+    "FAIL": 0,
+    "BLOCKED": 3,
+    "SKIPPED": 0,
+    "total": 25
+  },
+  "unresolved_blockers": [
+    {
+      "check_id": "ANSIBLE-SYNTAX",
+      "reason": "ansible-playbook not installed",
+      "dependency": "Install ansible-core to enable this check"
+    },
+    {
+      "check_id": "COMPOSE-RENDER",
+      "reason": "docker not installed",
+      "dependency": "Install Docker to enable this check"
+    },
+    {
+      "check_id": "SHELLCHECK",
+      "reason": "shellcheck not installed",
+      "dependency": "Install shellcheck"
+    }
+  ],
+  "cost_impact_usd": 0,
+  "cloud_mutations": 0,
+  "next_authorized_action": "Operator review of B1-I1R evidence"
+}

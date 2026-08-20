@@ -1,0 +1,252 @@
+{
+  "schema_version": "2.0.0",
+  "run_id": "89e725206313",
+  "validator_version": "2.0.0",
+  "start_time": "2026-08-20T15:34:42Z",
+  "end_time": "2026-08-20T15:34:50Z",
+  "tested_commit": "329434caf4b340d866d229259f5825b54d3c5b40",
+  "tested_tree": "189ae0893bb26454102d45a3c02381d6d5b01a30",
+  "tested_branch": "oce/block-1-i1r-truth-repair",
+  "command": "validate_engine.py --all",
+  "tools": {
+    "python": "Python 3.11.9",
+    "ansible": "not installed",
+    "docker": "not installed",
+    "shellcheck": "not installed"
+  },
+  "results": [
+    {
+      "check_id": "YAML-PARSE",
+      "description": "YAML files parse correctly",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "29/29 files",
+      "output": "All 29 YAML files parse",
+      "timestamp": "2026-08-20T15:34:43Z"
+    },
+    {
+      "check_id": "JSON-PARSE",
+      "description": "JSON contract files parse",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "7/7 files",
+      "output": "All 7 JSON files parse",
+      "timestamp": "2026-08-20T15:34:43Z"
+    },
+    {
+      "check_id": "SCHEMA-VALID",
+      "description": "JSON Schemas are valid Draft 2020-12",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "7/7 schemas",
+      "output": "All 7 schemas valid",
+      "timestamp": "2026-08-20T15:34:45Z"
+    },
+    {
+      "check_id": "SCHEMA-FIXTURES",
+      "description": "Schema fixture tests pass",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "15/15 fixtures",
+      "output": "All 15 fixture tests pass",
+      "timestamp": "2026-08-20T15:34:46Z"
+    },
+    {
+      "check_id": "NO-LATEST-TAGS",
+      "description": "No :latest image tags in active compose",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "0 violations",
+      "output": "Clean",
+      "timestamp": "2026-08-20T15:34:46Z"
+    },
+    {
+      "check_id": "NO-DB-PORTS",
+      "description": "No published DB/cache ports",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "0 violations",
+      "output": "Clean",
+      "timestamp": "2026-08-20T15:34:46Z"
+    },
+    {
+      "check_id": "NO-PRIV",
+      "description": "No privileged containers",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "0 violations",
+      "output": "Clean",
+      "timestamp": "2026-08-20T15:34:46Z"
+    },
+    {
+      "check_id": "NO-SOCKET",
+      "description": "No Docker socket mounts",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "0 violations",
+      "output": "Clean",
+      "timestamp": "2026-08-20T15:34:46Z"
+    },
+    {
+      "check_id": "NO-SECRETS",
+      "description": "No embedded secrets or tracked .env files",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "0 violations",
+      "output": "Clean",
+      "timestamp": "2026-08-20T15:34:48Z"
+    },
+    {
+      "check_id": "HEALTH-CHECKS",
+      "description": "Health checks on foundation services",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "2 health checks",
+      "output": "Both services have health checks",
+      "timestamp": "2026-08-20T15:34:48Z"
+    },
+    {
+      "check_id": "COST-THRESHOLDS",
+      "description": "Cost thresholds match ratification",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "All thresholds",
+      "output": "$60/$50/$100 match",
+      "timestamp": "2026-08-20T15:34:48Z"
+    },
+    {
+      "check_id": "WORKER-DENY",
+      "description": "Workers denied DB/Redis/admin",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "8 DENY rules",
+      "output": "8 denial rules",
+      "timestamp": "2026-08-20T15:34:48Z"
+    },
+    {
+      "check_id": "SECURITY-OPTS",
+      "description": "Security options (no-new-privileges)",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "2 declarations",
+      "output": "Both services hardened",
+      "timestamp": "2026-08-20T15:34:48Z"
+    },
+    {
+      "check_id": "NO-EXTERNAL-NET",
+      "description": "No external networks",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "0 violations",
+      "output": "Clean",
+      "timestamp": "2026-08-20T15:34:48Z"
+    },
+    {
+      "check_id": "ROLES-TASKS",
+      "description": "All Ansible roles have tasks",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "8 roles",
+      "output": "All roles have tasks/main.yml",
+      "timestamp": "2026-08-20T15:34:48Z"
+    },
+    {
+      "check_id": "EVIDENCE-DIR",
+      "description": "Evidence directory with templates",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "evidence/ and templates/",
+      "output": "Structure present",
+      "timestamp": "2026-08-20T15:34:48Z"
+    },
+    {
+      "check_id": "RUNBOOKS",
+      "description": "Operator runbooks present",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "2 runbooks",
+      "output": "Present",
+      "timestamp": "2026-08-20T15:34:48Z"
+    },
+    {
+      "check_id": "SINGLE-ROOT",
+      "description": "Single infrastructure root",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "1 roots",
+      "output": "Single canonical root",
+      "timestamp": "2026-08-20T15:34:49Z"
+    },
+    {
+      "check_id": "FAIL-CLOSED",
+      "description": "Validator rejects bad input (meta-check)",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "Validated by adversarial-tests.sh",
+      "output": "See adversarial results",
+      "timestamp": "2026-08-20T15:34:49Z"
+    },
+    {
+      "check_id": "ANSIBLE-SYNTAX",
+      "description": "Ansible playbook syntax valid",
+      "mandatory": true,
+      "result": "BLOCKED",
+      "evidence": "ansible-playbook not installed",
+      "output": "Install ansible-core to enable this check",
+      "timestamp": "2026-08-20T15:34:49Z"
+    },
+    {
+      "check_id": "COMPOSE-RENDER",
+      "description": "Compose foundation renders",
+      "mandatory": true,
+      "result": "BLOCKED",
+      "evidence": "docker not installed",
+      "output": "Install Docker to enable this check",
+      "timestamp": "2026-08-20T15:34:49Z"
+    },
+    {
+      "check_id": "SHELLCHECK",
+      "description": "Shell scripts pass shellcheck",
+      "mandatory": false,
+      "result": "BLOCKED",
+      "evidence": "shellcheck not installed",
+      "output": "Install shellcheck",
+      "timestamp": "2026-08-20T15:34:49Z"
+    },
+    {
+      "check_id": "SCAFFOLD-SCAN",
+      "description": "No unresolved scaffolds in executables",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "0 violations",
+      "output": "Clean",
+      "timestamp": "2026-08-20T15:34:49Z"
+    },
+    {
+      "check_id": "WORKER-NO-DB",
+      "description": "Workers denied direct DB access in policy",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "6/6 rules",
+      "output": "All worker classes denied",
+      "timestamp": "2026-08-20T15:34:49Z"
+    },
+    {
+      "check_id": "TOTALS-CONSIST",
+      "description": "Result totals are self-consistent",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "24 results",
+      "output": "P=21 F=0 B=3 S=0",
+      "timestamp": "2026-08-20T15:34:49Z"
+    }
+  ],
+  "totals": {
+    "PASS": 22,
+    "FAIL": 0,
+    "BLOCKED": 3,
+    "SKIPPED": 0,
+    "total": 25
+  },
+  "gate": "BLOCKED"
+}
