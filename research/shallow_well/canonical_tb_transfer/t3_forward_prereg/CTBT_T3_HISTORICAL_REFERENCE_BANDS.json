@@ -1,0 +1,19 @@
+{
+  "note": "Reference distributions, NOT quotas. Forward metrics are not required to equal these.",
+  "EUR_GBP_USD": {
+    "development_ev_bps": 15.74,
+    "confirmation_ev_bps": 17.75,
+    "confirmation_pf": 5.52,
+    "confirmation_wr_pct": 77.4,
+    "confirmation_cost_ratio": 3.2,
+    "monitoring_emphasis": "mechanism continuity at or near confirmation quality"
+  },
+  "GBP_NZD_USD": {
+    "development_ev_bps": 22.84,
+    "confirmation_ev_bps": 11.87,
+    "confirmation_pf": 5.82,
+    "confirmation_wr_pct": 74.1,
+    "confirmation_cost_ratio": 2.33,
+    "monitoring_emphasis": "already showed material transport decay; compare primarily against 2025 confirmation, not development; do not auto-kill for forward EV below development"
+  }
+}

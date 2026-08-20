@@ -1,0 +1,16 @@
+{
+  "purpose": "preregistered minimum candidate-level evidence BEFORE demo execution may even be considered",
+  "minimum_consideration_gates": {
+    "events": ">= 30 natural forward events",
+    "net_ev": "positive forward net EV",
+    "pf": "> 1.20",
+    "mechanism": "no mechanism break",
+    "cost_margin": "remains positive",
+    "completeness": "signal completeness acceptable",
+    "causality": "intact",
+    "runtime_data_parity": "acceptable"
+  },
+  "preferred_events": 50,
+  "not_automatic_authorization": true,
+  "family_promotion": "candidates promote independently (EUR_GBP_USD may pass forward while GBP_NZD_USD fails)"
+}

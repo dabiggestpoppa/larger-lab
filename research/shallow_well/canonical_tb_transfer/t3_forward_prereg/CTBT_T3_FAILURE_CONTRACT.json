@@ -1,0 +1,15 @@
+{
+  "forward_mechanism_failed": "marked if sufficient events show persistent negative EV, or clear mechanism-sign reversal, or transaction costs systematically dominate gross edge",
+  "no_automatic_retuning": true,
+  "failed_v1_is_sealed": true,
+  "early_stop_before_30_events": {
+    "permitted_only_for": [
+      "causality failure",
+      "strategy/runtime mismatch",
+      "gross mechanism inversion",
+      "severe cost impossibility",
+      "data invalidity"
+    ],
+    "not_permitted_for": "ordinary losing streak"
+  }
+}

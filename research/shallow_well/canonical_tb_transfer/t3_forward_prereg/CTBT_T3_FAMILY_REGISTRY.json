@@ -1,0 +1,29 @@
+{
+  "family": "CANONICAL_TB_TRANSFER_FAMILY",
+  "members": [
+    {
+      "strategy": "AUD_GBP_NZD",
+      "version": "CANONICAL_TB (reference)",
+      "role": "CANONICAL_REFERENCE",
+      "note": "separate strategy version, separate evidence program, separate runtime slot, separate completeness audit"
+    },
+    {
+      "strategy": "EUR_GBP_USD",
+      "version": "CTBT-EUR-GBP-USD-v1",
+      "role": "CONFIRMED_TRANSFER",
+      "hash": "aad0a8e64c6964952eb9129ac2cdebd34d308e6df87ebf45e4584c351044b1a7"
+    },
+    {
+      "strategy": "GBP_NZD_USD",
+      "version": "CTBT-GBP-NZD-USD-v1",
+      "role": "CONFIRMED_TRANSFER_DECAYED",
+      "hash": "5538d63a8acb29883b117fc23c76b1fe389db47ed89009ab3cd258b864f62485"
+    }
+  ],
+  "rules": {
+    "no_pnl_pooling": true,
+    "portfolio_correlation_capital_work": "LATER (after independent forward proof)",
+    "members_promote_independently": true
+  },
+  "family_hash": "059b6a759e5027a942e680c784d6512a4dc03820fd13738a6a5cd45ac5e8005f"
+}

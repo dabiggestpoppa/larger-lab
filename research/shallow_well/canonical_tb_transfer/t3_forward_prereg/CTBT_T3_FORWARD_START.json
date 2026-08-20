@@ -1,0 +1,6 @@
+{
+  "rule": "Forward evidence begins strictly AFTER the SW-CTBT-T3 commit timestamp. No historical event may be relabeled as forward evidence.",
+  "forward_start_timestamp": "first causally complete M5 bar strictly after the T3 sealing commit (to be stamped by T4 runtime integration once the T3 commit SHA and its commit timestamp are known)",
+  "t2_evidence_end": "2025-12-31 18:55:00",
+  "seal_commit": "recorded in CTBT_T3_DECISION.json after commit"
+}

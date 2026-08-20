@@ -1,0 +1,49 @@
+{
+  "t1_artifacts_unchanged": true,
+  "t11_artifacts_unchanged": true,
+  "t2_artifacts_unchanged": true,
+  "t11_reference_parity_exact": true,
+  "canonical_405_194_anchors": true,
+  "t2_metrics_preserved": {
+    "EUR_GBP_USD": {
+      "window": [
+        "2025-01-02 00:00:00",
+        "2025-12-31 18:55:00"
+      ],
+      "events": 146,
+      "net_ev_bps": 17.75497,
+      "pf_net": 5.5231,
+      "win_rate_pct": 77.3973,
+      "edge_cost_ratio": 3.2039,
+      "break_even_multiple": 3.2039,
+      "bootstrap_95_ci": [
+        14.2525,
+        21.4659
+      ],
+      "bh_fdr": "significant",
+      "transport": "TRANSPORT_CONFIRMED"
+    },
+    "GBP_NZD_USD": {
+      "window": [
+        "2025-01-02 00:00:00",
+        "2025-12-31 18:55:00"
+      ],
+      "events": 81,
+      "net_ev_bps": 11.86815,
+      "pf_net": 5.8179,
+      "win_rate_pct": 74.0741,
+      "edge_cost_ratio": 2.3346,
+      "break_even_multiple": 2.3346,
+      "bootstrap_95_ci": [
+        6.1569,
+        17.2246
+      ],
+      "bh_fdr": "significant",
+      "transport": "TRANSPORT_DECAYED_BUT_POSITIVE"
+    }
+  },
+  "t2_focused_transfer_family": true,
+  "historical_optimization_complete": true,
+  "no_additional_historical_testing": true,
+  "no_2026_historical_research": true
+}

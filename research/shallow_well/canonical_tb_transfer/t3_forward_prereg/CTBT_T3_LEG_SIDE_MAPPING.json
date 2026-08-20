@@ -1,0 +1,51 @@
+{
+  "note": "Deterministic buy/sell orientation per basket. Symbol mapping follows the frozen data path (quant-lab/data CSVs; MT5 provider-neutral runtime symbols mapped at integration). Bid/ask side: model prices are mid; execution cost applied via frozen modeled cost contract; forward shadow observes real bid/ask.",
+  "symbols": {
+    "EURGBP": {
+      "pair": "EUR/GBP",
+      "pip": 0.0001
+    },
+    "EURUSD": {
+      "pair": "EUR/USD",
+      "pip": 0.0001
+    },
+    "GBPUSD": {
+      "pair": "GBP/USD",
+      "pip": 0.0001
+    },
+    "GBPNZD": {
+      "pair": "GBP/NZD",
+      "pip": 0.0001
+    },
+    "NZDUSD": {
+      "pair": "NZD/USD",
+      "pip": 0.0001
+    }
+  },
+  "baskets": {
+    "EUR_GBP_USD": {
+      "SHORT": {
+        "EURGBP": "SELL",
+        "EURUSD": "BUY",
+        "GBPUSD": "SELL"
+      },
+      "LONG": {
+        "EURGBP": "BUY",
+        "EURUSD": "SELL",
+        "GBPUSD": "BUY"
+      }
+    },
+    "GBP_NZD_USD": {
+      "SHORT": {
+        "GBPNZD": "SELL",
+        "GBPUSD": "BUY",
+        "NZDUSD": "SELL"
+      },
+      "LONG": {
+        "GBPNZD": "BUY",
+        "GBPUSD": "SELL",
+        "NZDUSD": "BUY"
+      }
+    }
+  }
+}

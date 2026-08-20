@@ -1,0 +1,17 @@
+{
+  "canonical_aud_gbp_nzd": {
+    "separate_strategy_version": true,
+    "separate_evidence_program": true,
+    "separate_runtime_slot": true,
+    "separate_completeness_audit": true,
+    "may_share_infrastructure": true,
+    "must_not_share_evidence_ledgers": true,
+    "may_not_be_delayed_or_altered_by_candidates": true,
+    "priority": "canonical TB forward takes precedence over clone research if engineering attention is required"
+  },
+  "reference_parity_anchors": {
+    "control_z25": 405,
+    "primary_z3": 194,
+    "cost_contract_pips": 10.2
+  }
+}

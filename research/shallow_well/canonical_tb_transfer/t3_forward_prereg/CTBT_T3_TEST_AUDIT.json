@@ -1,0 +1,212 @@
+{
+  "checkpoint": "SW-CTBT-T3-TRANSFER-CANDIDATE-SEAL-AND-FORWARD-SHADOW-PREREGISTRATION",
+  "total_checks": 34,
+  "passed": 34,
+  "all_pass": true,
+  "checks": [
+    {
+      "check": 1,
+      "description": "exact base SHA",
+      "pass": true,
+      "detail": "d08502793fd0ca96eb65e78d12ed85eea6389073"
+    },
+    {
+      "check": 2,
+      "description": "T2 status verified",
+      "pass": true,
+      "detail": "FOCUSED_TRANSFER_FAMILY"
+    },
+    {
+      "check": 3,
+      "description": "exactly two candidates",
+      "pass": true,
+      "detail": "['EUR_GBP_USD', 'GBP_NZD_USD']"
+    },
+    {
+      "check": 4,
+      "description": "candidate IDs stable",
+      "pass": true,
+      "detail": "{'EUR_GBP_USD': 'CTBT-EUR-GBP-USD-v1', 'GBP_NZD_USD': 'CTBT-GBP-NZD-USD-v1'}"
+    },
+    {
+      "check": 5,
+      "description": "basis formulas exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 6,
+      "description": "z lookback exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 7,
+      "description": "ddof exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 8,
+      "description": "current bar excluded",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 9,
+      "description": "strict z3 exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 10,
+      "description": "W2 exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 11,
+      "description": "E1 exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 12,
+      "description": "z6 exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 13,
+      "description": "session exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 14,
+      "description": "min runway exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 15,
+      "description": "hard exit exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 16,
+      "description": "concurrency exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 17,
+      "description": "reentry exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 18,
+      "description": "strategy hashes generated",
+      "pass": true,
+      "detail": "{'EUR_GBP_USD': 'aad0a8e64c69', 'GBP_NZD_USD': '5538d63a8acb'}"
+    },
+    {
+      "check": 19,
+      "description": "no historical optimization (engine source unchanged)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 20,
+      "description": "no new candidate",
+      "pass": true,
+      "detail": "{'EUR_GBP_USD', 'GBP_NZD_USD', 'AUD_GBP_NZD'}"
+    },
+    {
+      "check": 21,
+      "description": "forward start strictly after seal",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 22,
+      "description": "event stopping frozen",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 23,
+      "description": "independent replay specified",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 24,
+      "description": "completeness classifications frozen",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 25,
+      "description": "provider costs separated",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 26,
+      "description": "canonical evidence isolated",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 27,
+      "description": "no portfolio optimization",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 28,
+      "description": "no capital routing",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 29,
+      "description": "no broker order calls",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 30,
+      "description": "no account mutation",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 31,
+      "description": "forward shadow false until runtime integration",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 32,
+      "description": "demo execution false",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 33,
+      "description": "production false",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": 34,
+      "description": "human review required",
+      "pass": true,
+      "detail": ""
+    }
+  ]
+}

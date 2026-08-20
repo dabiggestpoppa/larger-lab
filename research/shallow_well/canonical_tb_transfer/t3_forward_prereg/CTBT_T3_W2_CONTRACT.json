@@ -1,0 +1,7 @@
+{
+  "model": "W2 exact-neutral",
+  "definition": "Uniform unit-free log-weight per leg: each leg carries equal absolute log exposure, making the basket market-neutral in log space.",
+  "status": "MODEL GEOMETRY \u2014 not broker lots, not capital allocation, not leverage authorization",
+  "runtime_conversion": "separate concern (CapitalTranslationAdapter), NOT invoked in T3",
+  "sealed_behavior": "identical to the T1.1 engine that produced 405/405 + 194/194 reference parity and the T2 confirmations"
+}

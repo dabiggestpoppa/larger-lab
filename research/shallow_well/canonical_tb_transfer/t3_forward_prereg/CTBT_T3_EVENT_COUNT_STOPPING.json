@@ -1,0 +1,12 @@
+{
+  "horizon": "EVENT COUNT is the primary evidence horizon; calendar time reported but not decisive",
+  "early_diagnostic_events": 15,
+  "minimum_useful_events": 30,
+  "preferred_events": 50,
+  "note_15": "15 events is DIAGNOSTIC ONLY \u2014 not validation",
+  "time_review_points": [
+    "monthly engineering audit",
+    "quarterly scientific context review"
+  ],
+  "no_parameter_changes_at_reviews": true
+}

@@ -1,0 +1,37 @@
+{
+  "checkpoint": "SW-CTBT-T3-TRANSFER-CANDIDATE-SEAL-AND-FORWARD-SHADOW-PREREGISTRATION",
+  "status": "PASS_TRANSFER_FAMILY_SEALED_FORWARD_PREREGISTERED",
+  "base_commit": "d08502793fd0ca96eb65e78d12ed85eea6389073",
+  "t2_verified": {
+    "status": "FOCUSED_TRANSFER_FAMILY",
+    "commit": "d08502793fd0ca96eb65e78d12ed85eea6389073"
+  },
+  "family": "CANONICAL_TB_TRANSFER_FAMILY",
+  "candidate_count": 2,
+  "candidates": [
+    "EUR_GBP_USD",
+    "GBP_NZD_USD"
+  ],
+  "historical_research_closed": true,
+  "eur_gbp_usd_version": "CTBT-EUR-GBP-USD-v1",
+  "eur_gbp_usd_hash": "aad0a8e64c6964952eb9129ac2cdebd34d308e6df87ebf45e4584c351044b1a7",
+  "eur_gbp_usd_state": "HISTORICALLY_CONFIRMED_FORWARD_SHADOW_CANDIDATE",
+  "gbp_nzd_usd_version": "CTBT-GBP-NZD-USD-v1",
+  "gbp_nzd_usd_hash": "5538d63a8acb29883b117fc23c76b1fe389db47ed89009ab3cd258b864f62485",
+  "gbp_nzd_usd_state": "HISTORICALLY_CONFIRMED_FORWARD_SHADOW_CANDIDATE",
+  "forward_start_rule": "first causally complete M5 bar strictly after the T3 sealing commit timestamp",
+  "early_diagnostic_events": 15,
+  "minimum_useful_events": 30,
+  "preferred_events": 50,
+  "runtime_mapping_ready": true,
+  "runtime_shadow_ready": false,
+  "runtime_shadow_authorized": false,
+  "demo_execution_ready": false,
+  "demo_execution_authorized": false,
+  "capital_routing_authorized": false,
+  "canonical_tb_unchanged": true,
+  "production_authorized": false,
+  "human_review_required": true,
+  "next_checkpoint_recommended": "SW-CTBT-T4-TRANSFER-FAMILY-RUNTIME-SHADOW-INTEGRATION",
+  "t4_scope": "engineering integration only; does NOT authorize demo execution, live execution, or strategy-science changes"
+}

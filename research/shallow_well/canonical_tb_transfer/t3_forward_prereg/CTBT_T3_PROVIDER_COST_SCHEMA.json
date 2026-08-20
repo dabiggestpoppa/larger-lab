@@ -1,0 +1,27 @@
+{
+  "per_eligible_signal": {
+    "provider": null,
+    "account_environment": null,
+    "symbol_mapping": null,
+    "decision_timestamp": null,
+    "per_leg": {
+      "bid": null,
+      "ask": null,
+      "mid": null,
+      "spread": null
+    },
+    "basket_modeled_cost_bps": null,
+    "basket_observed_quote_crossing_cost_bps": null,
+    "observed_model_cost_multiple": null
+  },
+  "if_demo_fills_exist": {
+    "slippage": "measured separately",
+    "commissions": "measured separately"
+  },
+  "provider_separation": {
+    "rule": "providers remain separate in cost diagnostics; do NOT pool MT5 and TradeLocker observations blindly",
+    "primary": "existing MT5 provider-neutral runtime path",
+    "tradelocker": "may participate once its read-only provider layer is available"
+  },
+  "t3_places_no_orders": true
+}

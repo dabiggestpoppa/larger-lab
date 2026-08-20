@@ -1,0 +1,96 @@
+{
+  "candidate": "EUR_GBP_USD",
+  "version_id": "CTBT-EUR-GBP-USD-v1",
+  "strategy_hash": "aad0a8e64c6964952eb9129ac2cdebd34d308e6df87ebf45e4584c351044b1a7",
+  "strategy_spec": {
+    "version_id": "CTBT-EUR-GBP-USD-v1",
+    "family": "CANONICAL_TB_TRANSFER_FAMILY",
+    "timeframe": "M5",
+    "basis": {
+      "formula": "b = ln(A) - ln(B) + ln(C)",
+      "A": "EURGBP",
+      "B": "EURUSD",
+      "C": "GBPUSD",
+      "orientation_frozen": true,
+      "note": "EURGBP * GBPUSD == EURUSD triangular identity; basis = ln(EURGBP) - ln(EURUSD) + ln(GBPUSD)"
+    },
+    "direction_rule": {
+      "z_gt_3": "SHORT basket: short A, long B, short C (profits when basis declines)",
+      "z_lt_-3": "LONG basket: long A, short B, long C (profits when basis rises)"
+    },
+    "rolling_z": {
+      "lookback": 200,
+      "ddof": 0,
+      "population_std": true,
+      "current_bar_excluded": true,
+      "causality": "closed bar only"
+    },
+    "entry_primary": {
+      "strict": true,
+      "threshold": 3.0
+    },
+    "weight": {
+      "model": "W2 exact-neutral",
+      "note": "MODEL GEOMETRY only \u2014 not broker lots, not capital allocation, not leverage authorization"
+    },
+    "exit": {
+      "family": "E1 canonical signed overshoot",
+      "short_exit_z": -0.25,
+      "long_exit_z": 0.25
+    },
+    "structural_stop": {
+      "z_abs_gt": 6.0
+    },
+    "session": {
+      "name": "canonical London",
+      "start_h_est": 3,
+      "end_h_est": 12,
+      "utc_offset_hours": -5,
+      "fixed_contract": true
+    },
+    "min_runway_minutes": 120,
+    "hard_exit": {
+      "h_est": 12,
+      "checked_before_tp_sl": true
+    },
+    "concurrency": 1,
+    "reentry": "canonical deterministic lifecycle; no cooldown",
+    "cost_contract_reference": "HISTORICAL_MODELED_COST_CONTRACT",
+    "triangle_id": "EUR_GBP_USD"
+  },
+  "historical_truth": {
+    "version_id": "CTBT-EUR-GBP-USD-v1",
+    "development": {
+      "window": [
+        "2022-09-28 00:00:00",
+        "2024-12-31 18:55:00"
+      ],
+      "events": 435,
+      "net_ev_bps": 15.7393,
+      "pf_net": 5.4152,
+      "win_rate_pct": 78.16,
+      "edge_cost_ratio": 2.8828,
+      "monotonicity": "MONOTONIC_STRONG"
+    },
+    "confirmation_2025": {
+      "window": [
+        "2025-01-02 00:00:00",
+        "2025-12-31 18:55:00"
+      ],
+      "events": 146,
+      "net_ev_bps": 17.75497,
+      "pf_net": 5.5231,
+      "win_rate_pct": 77.3973,
+      "edge_cost_ratio": 3.2039,
+      "break_even_multiple": 3.2039,
+      "bootstrap_95_ci": [
+        14.2525,
+        21.4659
+      ],
+      "bh_fdr": "significant",
+      "transport": "TRANSPORT_CONFIRMED"
+    }
+  },
+  "state": "HISTORICALLY_CONFIRMED_FORWARD_SHADOW_CANDIDATE",
+  "evidence_consumed": "development 2020-2024 (effective 2022-09+) and 2025 confirmation; historical research CLOSED"
+}

@@ -1,0 +1,10 @@
+{
+  "historical_contract": "HISTORICAL_MODELED_COST_CONTRACT",
+  "method": "basket round-trip bps = sum over legs (spread_pips + commission_pips) * pip_size / median_close * 1e4",
+  "spread_pips_floor": 1.5,
+  "commission_pips_per_leg": 1.4,
+  "evidence_class": "VERIFIED_STATIC_PROVIDER (documented OxSecurities MT5 spec; floor stricter than documented)",
+  "canonical_reference_cost": "10.2 pips frozen (AUD_GBP_NZD)",
+  "disclaimer": "Historical modeled cost does NOT equal realized forward execution cost.",
+  "forward_requirement": "collect actual provider-side cost evidence per eligible signal (bid/ask/mid/spread, basket modeled vs observed quote-crossing cost, observed/model multiple)"
+}

@@ -1,0 +1,39 @@
+{
+  "per_strategy": [
+    "signals",
+    "completed_events",
+    "events_per_week",
+    "gross_ev_bps",
+    "net_modeled_ev_bps",
+    "net_observed_cost_ev_bps",
+    "win_rate_pct",
+    "median_ev_bps",
+    "pf",
+    "payoff_ratio",
+    "max_dd_bps",
+    "p5_bps",
+    "worst_bps",
+    "longest_losing_streak",
+    "mae",
+    "mfe",
+    "hold_distribution_min",
+    "z6_rate",
+    "hard_exit_rate",
+    "signal_time_cost_distribution_bps",
+    "provider_cost_multiple_distribution"
+  ],
+  "historical_comparison": {
+    "rule": "compare forward evidence SEPARATELY against development fingerprint and 2025 confirmation fingerprint",
+    "no_pooling": "do not pool all periods into one headline"
+  },
+  "expectancy_states": [
+    "INSUFFICIENT_EVENTS",
+    "MECHANISM_ALIGNED",
+    "MECHANISM_WEAKENED",
+    "MECHANISM_BROKEN",
+    "COST_MARGIN_HEALTHY",
+    "COST_MARGIN_TIGHT",
+    "COST_MARGIN_BROKEN"
+  ],
+  "expectancy_note": "evidence labels only; they do not authorize trading"
+}

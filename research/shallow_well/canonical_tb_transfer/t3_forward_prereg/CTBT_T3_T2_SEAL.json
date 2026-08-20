@@ -1,0 +1,78 @@
+{
+  "checkpoint": "SW-CTBT-T3-TRANSFER-CANDIDATE-SEAL-AND-FORWARD-SHADOW-PREREGISTRATION",
+  "t2_commit": "d08502793fd0ca96eb65e78d12ed85eea6389073",
+  "t2_status": "FOCUSED_TRANSFER_FAMILY",
+  "t2_verified": true,
+  "confirmed_candidates": [
+    "EUR_GBP_USD",
+    "GBP_NZD_USD"
+  ],
+  "sealed_truth": {
+    "EUR_GBP_USD": {
+      "version_id": "CTBT-EUR-GBP-USD-v1",
+      "development": {
+        "window": [
+          "2022-09-28 00:00:00",
+          "2024-12-31 18:55:00"
+        ],
+        "events": 435,
+        "net_ev_bps": 15.7393,
+        "pf_net": 5.4152,
+        "win_rate_pct": 78.16,
+        "edge_cost_ratio": 2.8828,
+        "monotonicity": "MONOTONIC_STRONG"
+      },
+      "confirmation_2025": {
+        "window": [
+          "2025-01-02 00:00:00",
+          "2025-12-31 18:55:00"
+        ],
+        "events": 146,
+        "net_ev_bps": 17.75497,
+        "pf_net": 5.5231,
+        "win_rate_pct": 77.3973,
+        "edge_cost_ratio": 3.2039,
+        "break_even_multiple": 3.2039,
+        "bootstrap_95_ci": [
+          14.2525,
+          21.4659
+        ],
+        "bh_fdr": "significant",
+        "transport": "TRANSPORT_CONFIRMED"
+      }
+    },
+    "GBP_NZD_USD": {
+      "version_id": "CTBT-GBP-NZD-USD-v1",
+      "development": {
+        "window": [
+          "2022-09-12 00:00:00",
+          "2024-12-31 18:55:00"
+        ],
+        "events": 210,
+        "net_ev_bps": 22.8374,
+        "pf_net": 8.0184,
+        "win_rate_pct": 84.29,
+        "edge_cost_ratio": 3.5557,
+        "monotonicity": "MONOTONIC_STRONG"
+      },
+      "confirmation_2025": {
+        "window": [
+          "2025-01-02 00:00:00",
+          "2025-12-31 18:55:00"
+        ],
+        "events": 81,
+        "net_ev_bps": 11.86815,
+        "pf_net": 5.8179,
+        "win_rate_pct": 74.0741,
+        "edge_cost_ratio": 2.3346,
+        "break_even_multiple": 2.3346,
+        "bootstrap_95_ci": [
+          6.1569,
+          17.2246
+        ],
+        "bh_fdr": "significant",
+        "transport": "TRANSPORT_DECAYED_BUT_POSITIVE"
+      }
+    }
+  }
+}

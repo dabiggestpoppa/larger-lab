@@ -1,0 +1,19 @@
+{
+  "note": "Exact log-basis orientations frozen from the T2 implementation. Runtime must NOT infer orientation dynamically.",
+  "EUR_GBP_USD": {
+    "basis": "b = ln(EURGBP) - ln(EURUSD) + ln(GBPUSD)",
+    "identity": "EURGBP * GBPUSD == EURUSD",
+    "z_gt_3": "SHORT basket (short EURGBP, long EURUSD, short GBPUSD)",
+    "z_lt_-3": "LONG basket (long EURGBP, short EURUSD, long GBPUSD)",
+    "gross_bps_SHORT": "+10000 * (b_entry - b_exit)",
+    "gross_bps_LONG": "+10000 * (b_exit - b_entry)"
+  },
+  "GBP_NZD_USD": {
+    "basis": "b = ln(GBPNZD) - ln(GBPUSD) + ln(NZDUSD)",
+    "identity": "GBPNZD * NZDUSD == GBPUSD",
+    "z_gt_3": "SHORT basket (short GBPNZD, long GBPUSD, short NZDUSD)",
+    "z_lt_-3": "LONG basket (long GBPNZD, short GBPUSD, long NZDUSD)",
+    "gross_bps_SHORT": "+10000 * (b_entry - b_exit)",
+    "gross_bps_LONG": "+10000 * (b_exit - b_entry)"
+  }
+}

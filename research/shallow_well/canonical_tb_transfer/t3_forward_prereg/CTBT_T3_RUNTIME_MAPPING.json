@@ -1,0 +1,22 @@
+{
+  "architecture_rule": "Use existing Execution Runtime abstractions; do NOT build a parallel broker stack inside Shallow Well",
+  "flow": [
+    "FrozenTransferCandidate",
+    "->",
+    "StrategyAdapter",
+    "->",
+    "provider-neutral market data",
+    "->",
+    "shadow signal/event ledger"
+  ],
+  "existing_abstractions": {
+    "market_data": "quant-lab/data M5 CSV path (frozen engine source) + provider-neutral runtime feed at integration",
+    "execution_contract": "quant-lab/engines/triangular_execution_contract.py (BrokerLegIntent, BasketExecutionIntent, model_weight_to_notional, notional_to_mt5_lots, assess_basket_neutrality)",
+    "mt5_layer": "quant-lab/mt5/execution_layer.py (MT5ExecutionLayer) \u2014 NOT invoked in T3",
+    "production_runtime": "quant-lab/mt5/production_runtime.py (ProductionRuntime, RuntimeConfig, StateStore, HealthMonitor) \u2014 shadow integration only, order path disabled",
+    "provider_cost_config": "quant-lab/config/spread_commission_config.py (SPREAD_CONFIG, get_spread_pips, get_commission_pips)"
+  },
+  "shadow_ledger": "per-candidate shadow signal/event ledger (event_id, entry/exit ts, direction, entry/exit z, exit reason, hold, leg weights, gross bps, modeled cost bps, net bps, z6 state, session state, hard-exit flag, provider cost snapshot)",
+  "no_order_path": true,
+  "no_account_mutation": true
+}

@@ -1,0 +1,10 @@
+{
+  "research\\shallow_well\\canonical_tb_transfer\\t11_repair\\run_t11_screen.py": "c994c5785a8c9470581ea1998cdda3f9c8e4ca03b0a89b2c4b0f009f71afd212",
+  "research\\shallow_well\\canonical_tb_transfer\\t11_repair\\run_t11_reference_parity.py": "0e52f3aed9de4988149ce0f77ff6518ac16d8543be309a5e15734bf70e346897",
+  "research\\shallow_well\\canonical_tb_transfer\\t2_confirmation\\run_t2_confirmation.py": "9d145c7f19fd148cd3cee1647ba71e8ec914a157d88f10fa4fb5ee27c7082fbd",
+  "research\\shallow_well\\canonical_tb_transfer\\t3_forward_prereg\\write_t3_artifacts.py": "f78230cb63840996bc6cbe09c8681e377aa913dd41e97232dda9a7f7cc9f0b9a",
+  "research\\shallow_well\\canonical_tb_transfer\\t3_forward_prereg\\CTBT_T3_PROTOCOL.md": "3d59b2b20463e9896bf5a66a7a19ac55b0bd2165baa2cfa03889f2b969011ed3",
+  "research\\shallow_well\\canonical_tb_transfer\\t3_forward_prereg\\CTBT_T3_SIGNAL_COMPLETENESS_SPEC.md": "7908ad931bb31485a5c9a1683ae338df3b13e949a92e10812d44c3aa51ae5211",
+  "base_commit": "d08502793fd0ca96eb65e78d12ed85eea6389073",
+  "t2_commit": "d08502793fd0ca96eb65e78d12ed85eea6389073"
+}

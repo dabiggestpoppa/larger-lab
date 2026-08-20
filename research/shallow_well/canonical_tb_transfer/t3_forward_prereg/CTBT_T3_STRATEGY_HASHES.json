@@ -1,0 +1,126 @@
+{
+  "hash_algorithm": "sha256",
+  "canonicalization": "json.dumps(sort_keys=True, separators=(',',':')) over the strategy specification (strategy params, basis, leg sides, lifecycle, session, cost reference); historical metrics are NOT part of the hash",
+  "strategies": {
+    "EUR_GBP_USD": {
+      "version_id": "CTBT-EUR-GBP-USD-v1",
+      "strategy_hash": "aad0a8e64c6964952eb9129ac2cdebd34d308e6df87ebf45e4584c351044b1a7",
+      "spec": {
+        "version_id": "CTBT-EUR-GBP-USD-v1",
+        "family": "CANONICAL_TB_TRANSFER_FAMILY",
+        "timeframe": "M5",
+        "basis": {
+          "formula": "b = ln(A) - ln(B) + ln(C)",
+          "A": "EURGBP",
+          "B": "EURUSD",
+          "C": "GBPUSD",
+          "orientation_frozen": true,
+          "note": "EURGBP * GBPUSD == EURUSD triangular identity; basis = ln(EURGBP) - ln(EURUSD) + ln(GBPUSD)"
+        },
+        "direction_rule": {
+          "z_gt_3": "SHORT basket: short A, long B, short C (profits when basis declines)",
+          "z_lt_-3": "LONG basket: long A, short B, long C (profits when basis rises)"
+        },
+        "rolling_z": {
+          "lookback": 200,
+          "ddof": 0,
+          "population_std": true,
+          "current_bar_excluded": true,
+          "causality": "closed bar only"
+        },
+        "entry_primary": {
+          "strict": true,
+          "threshold": 3.0
+        },
+        "weight": {
+          "model": "W2 exact-neutral",
+          "note": "MODEL GEOMETRY only \u2014 not broker lots, not capital allocation, not leverage authorization"
+        },
+        "exit": {
+          "family": "E1 canonical signed overshoot",
+          "short_exit_z": -0.25,
+          "long_exit_z": 0.25
+        },
+        "structural_stop": {
+          "z_abs_gt": 6.0
+        },
+        "session": {
+          "name": "canonical London",
+          "start_h_est": 3,
+          "end_h_est": 12,
+          "utc_offset_hours": -5,
+          "fixed_contract": true
+        },
+        "min_runway_minutes": 120,
+        "hard_exit": {
+          "h_est": 12,
+          "checked_before_tp_sl": true
+        },
+        "concurrency": 1,
+        "reentry": "canonical deterministic lifecycle; no cooldown",
+        "cost_contract_reference": "HISTORICAL_MODELED_COST_CONTRACT",
+        "triangle_id": "EUR_GBP_USD"
+      }
+    },
+    "GBP_NZD_USD": {
+      "version_id": "CTBT-GBP-NZD-USD-v1",
+      "strategy_hash": "5538d63a8acb29883b117fc23c76b1fe389db47ed89009ab3cd258b864f62485",
+      "spec": {
+        "version_id": "CTBT-GBP-NZD-USD-v1",
+        "family": "CANONICAL_TB_TRANSFER_FAMILY",
+        "timeframe": "M5",
+        "basis": {
+          "formula": "b = ln(A) - ln(B) + ln(C)",
+          "A": "GBPNZD",
+          "B": "GBPUSD",
+          "C": "NZDUSD",
+          "orientation_frozen": true,
+          "note": "GBPNZD * NZDUSD == GBPUSD triangular identity; basis = ln(GBPNZD) - ln(GBPUSD) + ln(NZDUSD)"
+        },
+        "direction_rule": {
+          "z_gt_3": "SHORT basket: short A, long B, short C (profits when basis declines)",
+          "z_lt_-3": "LONG basket: long A, short B, long C (profits when basis rises)"
+        },
+        "rolling_z": {
+          "lookback": 200,
+          "ddof": 0,
+          "population_std": true,
+          "current_bar_excluded": true,
+          "causality": "closed bar only"
+        },
+        "entry_primary": {
+          "strict": true,
+          "threshold": 3.0
+        },
+        "weight": {
+          "model": "W2 exact-neutral",
+          "note": "MODEL GEOMETRY only \u2014 not broker lots, not capital allocation, not leverage authorization"
+        },
+        "exit": {
+          "family": "E1 canonical signed overshoot",
+          "short_exit_z": -0.25,
+          "long_exit_z": 0.25
+        },
+        "structural_stop": {
+          "z_abs_gt": 6.0
+        },
+        "session": {
+          "name": "canonical London",
+          "start_h_est": 3,
+          "end_h_est": 12,
+          "utc_offset_hours": -5,
+          "fixed_contract": true
+        },
+        "min_runway_minutes": 120,
+        "hard_exit": {
+          "h_est": 12,
+          "checked_before_tp_sl": true
+        },
+        "concurrency": 1,
+        "reentry": "canonical deterministic lifecycle; no cooldown",
+        "cost_contract_reference": "HISTORICAL_MODELED_COST_CONTRACT",
+        "triangle_id": "GBP_NZD_USD"
+      }
+    }
+  }
+}
