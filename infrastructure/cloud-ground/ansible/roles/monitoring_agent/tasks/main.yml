@@ -1,0 +1,61 @@
+---
+# Monitoring agent role — basic host metrics collection
+# B1-I1 — Static skeleton
+# Full observability stack deferred to B1-I5
+
+- name: Install monitoring prerequisites
+  ansible.builtin.apt:
+    name:
+      - sysstat
+      - iotop
+      - netdata
+    state: present
+  tags: [monitoring]
+
+- name: Ensure sysstat is enabled
+  ansible.builtin.lineinfile:
+    path: /etc/default/sysstat
+    regexp: 'ENABLED='
+    line: 'ENABLED="true"'
+  notify: restart sysstat
+  tags: [monitoring]
+
+- name: Create monitoring configuration
+  ansible.builtin.copy:
+    dest: /opt/oce/config/monitoring.yml
+    content: |
+      # OCE Monitoring Configuration
+      # B1-I1 — Static skeleton
+      # Full observability deferred to B1-I5
+
+      health_checks:
+        postgresql:
+          command: "pg_isready -h localhost -p 5432"
+          interval: 30
+          timeout: 5
+        redis:
+          command: "redis-cli ping"
+          interval: 30
+          timeout: 5
+        docker:
+          command: "docker ps --format '{{.Names}}:{{.Status}}'"
+          interval: 60
+
+      alerts:
+        disk_warning_percent: 70
+        disk_critical_percent: 85
+        memory_warning_percent: 75
+        memory_critical_percent: 90
+        cpu_warning_percent: 70
+        backup_stale_hours: 24
+
+      status_labels:
+        - Healthy
+        - Degraded
+        - Blocked
+        - Recovering
+        - Unknown
+    owner: root
+    group: oce-operator
+    mode: '0644'
+  tags: [monitoring, config]

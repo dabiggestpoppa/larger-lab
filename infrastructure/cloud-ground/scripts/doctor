@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# OCE Cloud Ground — Doctor Script
+# B1-I1 — Check prerequisites
+# Version: 1.0.0
+#
+# This script checks what tools are available in the current environment.
+# It does NOT install anything.
+
+set -euo pipefail
+
+echo "=== OCE Cloud Ground Doctor ==="
+echo "Date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+echo ""
+
+check_tool() {
+    local name="$1"
+    local required="${2:-false}"
+    
+    if command -v "$name" &>/dev/null; then
+        version=$("$name" --version 2>/dev/null | head -1 || echo "unknown")
+        echo "✅ $name: $version"
+        return 0
+    else
+        if [ "$required" = "true" ]; then
+            echo "❌ $name: NOT INSTALLED (required for B1-I2+)"
+        else
+            echo "⚠️  $name: not installed (optional for B1-I1)"
+        fi
+        return 1
+    fi
+}
+
+echo "--- Required for B1-I1 ---"
+check_tool "python3" "true"
+check_tool "bash" "true"
+check_tool "jq" "false"
+
+echo ""
+echo "--- Required for B1-I2+ (not needed for B1-I1) ---"
+check_tool "ansible" "false"
+check_tool "ansible-playbook" "false"
+check_tool "docker" "false"
+check_tool "docker-compose" "false"
+check_tool "terraform" "false"
+
+echo ""
+echo "--- Optional tools ---"
+check_tool "shellcheck" "false"
+check_tool "yamllint" "false"
+check_tool "yq" "false"
+check_tool "restic" "false"
+check_tool "pg_isready" "false"
+check_tool "redis-cli" "false"
+
+echo ""
+echo "--- Python packages ---"
+python3 -c "import yaml; print('✅ pyyaml: available')" 2>/dev/null || echo "⚠️  pyyaml: not installed"
+python3 -c "import json; print('✅ json: available')" 2>/dev/null || echo "⚠️  json: not installed"
+python3 -c "import jsonschema; print('✅ jsonschema: available')" 2>/dev/null || echo "⚠️  jsonschema: not installed (needed for schema validation)"
+python3 -c "import jsonschema; print('✅ jsonschema: available')" 2>/dev/null || true
+
+echo ""
+echo "--- Docker images (pinned) ---"
+echo "PostgreSQL target: postgres:16.4-alpine"
+echo "Redis target: redis:7.4-alpine"
+echo ""
+echo "Run validate-static to check B1-I1 completeness."

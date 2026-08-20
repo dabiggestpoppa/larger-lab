@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+# OCE Cloud Ground — Collect Evidence
+# B1-I1 — Evidence collection for operator review
+# Version: 1.0.0
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="$(dirname "$SCRIPT_DIR")"
+EVIDENCE_DIR="$BASE_DIR/evidence"
+TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+mkdir -p "$EVIDENCE_DIR"
+
+echo "=== OCE Cloud Ground — Evidence Collection ==="
+echo "Timestamp: $TIMESTAMP"
+echo "Base directory: $BASE_DIR"
+echo ""
+
+# 1. File manifest with hashes
+echo "--- File Manifest ---"
+MANIFEST="$EVIDENCE_DIR/file-manifest.json"
+echo '{"timestamp":"'$TIMESTAMP'","files":[' > "$MANIFEST"
+FIRST=true
+find "$BASE_DIR" -type f -not -path "*/.git/*" -not -path "*/node_modules/*" | sort | while read -r f; do
+    HASH=$(sha256sum "$f" 2>/dev/null | cut -d' ' -f1 || echo "hash-unavailable")
+    SIZE=$(stat -c%s "$f" 2>/dev/null || echo 0)
+    if [ "$FIRST" = true ]; then
+        FIRST=false
+    else
+        echo ',' >> "$MANIFEST"
+    fi
+    REL=$(realpath --relative-to="$BASE_DIR" "$f")
+    echo '{"path":"'$REL'","sha256":"'$HASH'","size":'$SIZE'}' >> "$MANIFEST"
+done
+echo ']}' >> "$MANIFEST"
+echo "File manifest: $MANIFEST"
+
+# 2. Tool/version manifest
+echo ""
+echo "--- Tool/Version Manifest ---"
+TOOLMANIFEST="$EVIDENCE_DIR/tool-manifest.json"
+cat > "$TOOLMANIFEST" << EOF
+{
+  "timestamp": "$TIMESTAMP",
+  "tools": {
+    "python3": "$(python3 --version 2>/dev/null || echo 'not installed')",
+    "bash": "$(bash --version 2>/dev/null | head -1 || echo 'not installed')",
+    "ansible": "$(ansible --version 2>/dev/null | head -1 || echo 'not installed')",
+    "docker": "$(docker --version 2>/dev/null || echo 'not installed')",
+    "jq": "$(jq --version 2>/dev/null || echo 'not installed')",
+    "jsonschema": "$(python3 -c 'import jsonschema; print(jsonschema.__version__)' 2>/dev/null || echo 'not installed')",
+    "yaml": "$(python3 -c 'import yaml; print(yaml.__version__)' 2>/dev/null || echo 'not installed')"
+  },
+  "os": "$(uname -a)",
+  "python_impl": "$(python3 -c 'import sys; print(sys.implementation.name)' 2>/dev/null || echo 'unknown')"
+}
+EOF
+echo "Tool manifest: $TOOLMANIFEST"
+
+# 3. Stage status
+echo ""
+echo "--- Stage Status ---"
+STATUSFILE="$EVIDENCE_DIR/stage-status.json"
+cat > "$STATUSFILE" << EOF
+{
+  "timestamp": "$TIMESTAMP",
+  "stage": "B1-I1",
+  "branch": "$(git branch --show-current 2>/dev/null || echo 'unknown')",
+  "commit": "$(git rev-parse HEAD 2>/dev/null || echo 'unknown')",
+  "status": "VERIFYING",
+  "authorized_stage": "B1-I1",
+  "cloud_mutations": 0,
+  "cost_impact_usd": 0,
+  "public_exposure": false
+}
+EOF
+echo "Stage status: $STATUSFILE"
+
+echo ""
+echo "=== Evidence collection complete ==="

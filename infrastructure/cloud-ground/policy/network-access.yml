@@ -1,0 +1,113 @@
+# OCE Cloud Ground — Network Access Policy
+# B1-I1 — Static data (enforcement deferred to B1-I2+)
+# Document: B1-ARCH-TRUST-001
+# Ratified: Block 1 Cloud Ground Plan 1.0
+
+# Network zones
+zones:
+  operator:
+    description: "Operator administrative access via Tailscale"
+    interface: tailscale
+    allowed_services: [postgresql, redis, docker, ssh, observability]
+    trust_level: full
+
+  control:
+    description: "Internal control plane services"
+    interface: docker-internal
+    allowed_services: [postgresql, redis, observability]
+    trust_level: service-scoped
+
+  worker-local:
+    description: "Operator's local machine as worker"
+    interface: tailscale
+    allowed_services: [worker-task-api, artifact-storage]
+    trust_level: task-scoped
+
+  worker-burst:
+    description: "Ephemeral burst compute workers"
+    interface: tailscale
+    allowed_services: [worker-task-api, artifact-storage]
+    trust_level: task-scoped, expired
+
+  worker-windows:
+    description: "Windows/MT5 isolated worker"
+    interface: tailscale
+    allowed_services: [worker-task-api, artifact-storage]
+    trust_level: task-scoped, paper-only
+
+  backup:
+    description: "Backup agent access"
+    interface: tailscale
+    allowed_services: [object-storage]
+    trust_level: write-only, backup-scope
+
+# Access rules
+rules:
+  - from: worker-local
+    to: postgresql
+    action: DENY
+    reason: "Workers never receive direct database access"
+
+  - from: worker-local
+    to: redis
+    action: DENY
+    reason: "Workers never receive direct cache access"
+
+  - from: worker-burst
+    to: postgresql
+    action: DENY
+    reason: "Burst workers are untrusted, no database access"
+
+  - from: worker-burst
+    to: redis
+    action: DENY
+    reason: "Burst workers are untrusted, no cache access"
+
+  - from: worker-windows
+    to: postgresql
+    action: DENY
+    reason: "Windows worker is isolated from control plane data"
+
+  - from: worker-windows
+    to: redis
+    action: DENY
+    reason: "Windows worker is isolated from control plane data"
+
+  - from: backup
+    to: postgresql
+    action: DENY
+    reason: "Backup uses WAL archive, not direct DB connection"
+
+  - from: worker-local
+    to: worker-burst
+    action: DENY
+    reason: "Workers do not communicate directly"
+
+# Public access (Block 1)
+public_access:
+  enabled: false
+  approved_services: []
+  # Future: if Caddy is approved for public UI/API
+  # approved_services:
+  #   - service: caddy
+  #     ports: [80, 443]
+  #     owner: operator
+  #     review_date: TBD
+
+# Firewall
+firewall:
+  default_incoming: deny
+  default_outgoing: allow
+  allowed_inbound:
+    - port: 22
+      source: tailscale
+      protocol: tcp
+  # No other inbound ports allowed during Block 1
+
+# Enforcement state
+enforcement:
+  policy_file: this
+  consumer: "Ansible UFW role (B1-I2+), Docker network config"
+  verified: false
+  verification_date: null
+  notes: "B1-I1 creates the policy specification. Enforcement is applied during B1-I2 host baseline."

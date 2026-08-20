@@ -1,0 +1,7 @@
+---
+# Monitoring agent handlers
+
+- name: restart sysstat
+  ansible.builtin.service:
+    name: sysstat
+    state: restarted

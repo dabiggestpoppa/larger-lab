@@ -1,0 +1,49 @@
+---
+# Tailscale role — install and configure Tailscale
+# B1-I1 — Static skeleton (placeholder auth key)
+# WARNING: Auth key must be replaced with actual value during B1-I2
+
+- name: Add Tailscale GPG key
+  ansible.builtin.shell: |
+    curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.noarmor.gpg | \
+    sudo tee /usr/share/keyrings/tailscale-archive-keyring.gpg > /dev/null
+  args:
+    creates: /usr/share/keyrings/tailscale-archive-keyring.gpg
+  tags: [tailscale, install]
+
+- name: Add Tailscale repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu jammy main"
+    state: present
+  tags: [tailscale, install]
+
+- name: Install Tailscale
+  ansible.builtin.apt:
+    name: tailscale
+    state: present
+    update_cache: true
+  tags: [tailscale, install]
+
+- name: Enable Tailscale service
+  ansible.builtin.service:
+    name: tailscaled
+    state: started
+    enabled: true
+  tags: [tailscale, service]
+
+- name: Authenticate Tailscale (PLACEHOLDER — replace auth key)
+  ansible.builtin.command: >
+    tailscale up
+    --authkey={{ tailscale_auth_key | default('tskey-auth-PLACEHOLDER-REPLACE-ME') }}
+    --hostname={{ inventory_hostname }}
+    --accept-routes
+  register: tailscale_result
+  changed_when: "'Success' in tailscale_result.stdout"
+  when: tailscale_auth_key is defined and tailscale_auth_key != 'tskey-auth-PLACEHOLDER-REPLACE-ME'
+  tags: [tailscale, auth]
+
+- name: Get Tailscale status
+  ansible.builtin.command: tailscale status
+  register: tailscale_status
+  changed_when: false
+  tags: [tailscale, verify]

@@ -1,0 +1,30 @@
+# OCE Cloud Ground — Observability Stack
+# B1-I1 — Design specification (NOT YET IMPLEMENTED)
+# Full observability deployment deferred to B1-I5
+#
+# This file documents the TARGET observability architecture.
+# It is NOT intended to be rendered or deployed during B1-I1.
+#
+# Status: SPECIFIED — awaiting B1-I5 implementation
+# Consumer: B1-C4.S4 Observability
+
+services:
+  # Placeholder for future structured log aggregation
+  # log-aggregator:
+  #   image: grafana/loki:latest  # Will be pinned to specific version
+  #   status: UNVERIFIED_DEPENDENCY_B1_I5
+
+  # Placeholder for future metrics collection
+  # metrics-collector:
+  #   image: prom/prometheus:latest  # Will be pinned to specific version
+  #   status: UNVERIFIED_DEPENDENCY_B1_I5
+
+  # Placeholder for future dashboards
+  # dashboards:
+  #   image: grafana/grafana:latest  # Will be pinned to specific version
+  #   status: UNVERIFIED_DEPENDENCY_B1_I5
+
+# NOTE: All images will be pinned to specific versions with digest locks
+# after B1-I5 verification. No `latest` tags in production.
+# All services will use the oce_internal network.
+# All services will have health checks, resource limits, and security options.

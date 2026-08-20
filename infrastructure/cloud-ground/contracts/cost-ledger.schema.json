@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oce.dev/schemas/cost-ledger/v1.0.0",
+  "title": "OCE Cost Ledger Entry",
+  "description": "Schema for cost tracking entries. Version 1.0.0 — B1-I1.",
+  "type": "object",
+  "required": [
+    "entry_id",
+    "cost_class",
+    "provider",
+    "amount_usd",
+    "recorded_at",
+    "description",
+    "schema_version"
+  ],
+  "properties": {
+    "entry_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{7,63}$"
+    },
+    "cost_class": {
+      "type": "string",
+      "enum": ["fixed", "variable", "burst", "storage", "transfer", "backup", "domain", "exceptional"]
+    },
+    "provider": {
+      "type": "string",
+      "enum": ["netcup", "ovh", "hetzner", "digitalocean", "aws", "azure", "gcp", "octaspace", "runpod", "cloudflare", "backblaze", "tailscale", "other"]
+    },
+    "amount_usd": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 10000,
+      "description": "Cost in USD (converted if needed)"
+    },
+    "currency_original": {
+      "type": "string",
+      "default": "USD"
+    },
+    "amount_original": {
+      "type": "number",
+      "minimum": 0
+    },
+    "recorded_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "task_id": {
+      "type": "string",
+      "description": "Associated task if variable/burst"
+    },
+    "budget_category": {
+      "type": "string",
+      "enum": ["monthly-fixed", "burst-allowance", "burst-hard-stop", "total-gate"]
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    }
+  },
+  "additionalProperties": false
+}

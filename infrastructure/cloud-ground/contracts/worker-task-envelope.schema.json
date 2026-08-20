@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oce.dev/schemas/worker-task-envelope/v1.0.0",
+  "title": "OCE Worker Task Envelope",
+  "description": "Schema for tasks dispatched to OCE Cloud Ground workers. Version 1.0.0 — B1-I1 static validation.",
+  "type": "object",
+  "required": [
+    "task_id",
+    "attempt_id",
+    "project_id",
+    "actor_id",
+    "intent_ref",
+    "worker_class",
+    "container_digest",
+    "input_artifacts",
+    "resource_limits",
+    "sensitivity_class",
+    "heartbeat_config",
+    "cancellation_config",
+    "output_spec",
+    "cost_ceiling",
+    "deadline",
+    "cleanup_requirements",
+    "version",
+    "schema_version"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{7,63}$",
+      "description": "Globally unique task identifier"
+    },
+    "attempt_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{7,63}$",
+      "description": "Unique attempt identifier (new for each retry)"
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{3,63}$",
+      "description": "Project or application identifier"
+    },
+    "actor_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{3,63}$",
+      "description": "Identity of the entity that requested this task"
+    },
+    "intent_ref": {
+      "type": "string",
+      "description": "Reference to the task specification or plan"
+    },
+    "worker_class": {
+      "type": "string",
+      "enum": ["local", "burst-octaspace", "burst-runpod", "windows-mt5"],
+      "description": "Target worker class"
+    },
+    "container_digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Pinned container image digest (no floating tags)"
+    },
+    "input_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["artifact_id", "hash"],
+        "properties": {
+          "artifact_id": { "type": "string" },
+          "hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "size_bytes": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "description": "Input artifacts required for this task"
+    },
+    "resource_limits": {
+      "type": "object",
+      "required": ["cpu_cores", "memory_mb", "disk_gb", "max_runtime_seconds"],
+      "properties": {
+        "cpu_cores": { "type": "number", "minimum": 0.25, "maximum": 128 },
+        "memory_mb": { "type": "integer", "minimum": 256, "maximum": 524288 },
+        "disk_gb": { "type": "integer", "minimum": 1, "maximum": 4096 },
+        "gpu_type": { "type": "string", "description": "Optional GPU requirement" },
+        "gpu_count": { "type": "integer", "minimum": 0, "maximum": 8 },
+        "max_runtime_seconds": { "type": "integer", "minimum": 60, "maximum": 86400 },
+        "network_outbound": { "type": "boolean", "default": true }
+      },
+      "description": "Resource boundaries for this task"
+    },
+    "sensitivity_class": {
+      "type": "string",
+      "enum": ["public", "internal", "confidential", "restricted"],
+      "description": "Data sensitivity classification"
+    },
+    "heartbeat_config": {
+      "type": "object",
+      "required": ["interval_seconds", "timeout_seconds"],
+      "properties": {
+        "interval_seconds": { "type": "integer", "minimum": 10, "maximum": 300 },
+        "timeout_seconds": { "type": "integer", "minimum": 30, "maximum": 600 }
+      }
+    },
+    "cancellation_config": {
+      "type": "object",
+      "required": ["grace_period_seconds"],
+      "properties": {
+        "grace_period_seconds": { "type": "integer", "minimum": 10, "maximum": 300 }
+      }
+    },
+    "output_spec": {
+      "type": "object",
+      "required": ["output_schema", "artifact_class", "max_size_bytes"],
+      "properties": {
+        "output_schema": { "type": "string", "description": "Reference to output schema" },
+        "artifact_class": { "type": "string", "enum": ["code", "model", "data", "report", "log"] },
+        "max_size_bytes": { "type": "integer", "minimum": 1, "maximum": 10737418240 }
+      }
+    },
+    "cost_ceiling": {
+      "type": "object",
+      "required": ["max_usd"],
+      "properties": {
+        "max_usd": { "type": "number", "minimum": 0, "maximum": 1000 },
+        "currency": { "type": "string", "default": "USD" }
+      },
+      "description": "Maximum cost for this task execution"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 deadline after which task should be cancelled"
+    },
+    "cleanup_requirements": {
+      "type": "object",
+      "required": ["delete_on_complete", "remote_volume_cleanup"],
+      "properties": {
+        "delete_on_complete": { "type": "boolean" },
+        "remote_volume_cleanup": { "type": "boolean" },
+        "retention_hours": { "type": "integer", "minimum": 0, "maximum": 720 }
+      }
+    },
+    "version": {
+      "type": "string",
+      "description": "Task specification version"
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0",
+      "description": "Schema version for compatibility checking"
+    }
+  },
+  "additionalProperties": false
+}

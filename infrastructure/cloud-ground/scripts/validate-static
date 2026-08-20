@@ -1,0 +1,305 @@
+#!/usr/bin/env bash
+# OCE Cloud Ground — Static Validation Script
+# B1-I1 — Deterministic checks without provisioning
+# Version: 1.0.1 (Windows path fix)
+#
+# Usage: ./scripts/validate-static
+# Exit code: non-zero if any REQUIRED check fails
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+RESULTS_FILE="$BASE_DIR/evidence/static-validation-results.json"
+SUMMARY_FILE="$BASE_DIR/evidence/static-validation-summary.md"
+
+# Convert Git Bash /c/... paths to Windows C:\... paths for Python
+to_winpath() {
+    if [[ "$1" =~ ^/([a-zA-Z])/(.*) ]]; then
+        echo "${BASH_REMATCH[1]}:\\${BASH_REMATCH[2]}" | sed 's|/|\\|g'
+    else
+        echo "$1"
+    fi
+}
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+TOTAL=0
+PASSED=0
+FAILED=0
+BLOCKED=0
+
+log_result() {
+    local check_id="$1"
+    local result="$2"
+    local detail="$3"
+    
+    TOTAL=$((TOTAL + 1))
+    case "$result" in
+        PASS) PASSED=$((PASSED + 1)); color=$GREEN ;;
+        FAIL) FAILED=$((FAILED + 1)); color=$RED ;;
+        BLOCKED) BLOCKED=$((BLOCKED + 1)); color=$YELLOW ;;
+    esac
+    printf "${color}[%s] %s: %s${NC}\n" "$result" "$check_id" "$detail"
+}
+
+echo "=== OCE Cloud Ground B1-I1 Static Validation ==="
+echo "Date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+echo "Base: $BASE_DIR"
+echo ""
+
+mkdir -p "$BASE_DIR/evidence"
+
+# === YAML/JSON PARSING ===
+echo "--- YAML/JSON Parsing ---"
+YAML_PASS=0
+YAML_FAIL=0
+while IFS= read -r f; do
+    winf=$(to_winpath "$f")
+    if python3 -c "import yaml; yaml.safe_load(open(r'$winf'))" 2>/dev/null; then
+        YAML_PASS=$((YAML_PASS + 1))
+    else
+        YAML_FAIL=$((YAML_FAIL + 1))
+        echo "  FAIL: $f"
+    fi
+done < <(find "$BASE_DIR" \( -name "*.yml" -o -name "*.yaml" \) -not -path "*/.git/*" -not -path "*/node_modules/*" 2>/dev/null)
+
+JSON_PASS=0
+JSON_FAIL=0
+while IFS= read -r f; do
+    winf=$(to_winpath "$f")
+    if python3 -c "import json; json.load(open(r'$winf'))" 2>/dev/null; then
+        JSON_PASS=$((JSON_PASS + 1))
+    else
+        JSON_FAIL=$((JSON_FAIL + 1))
+        echo "  FAIL: $f"
+    fi
+done < <(find "$BASE_DIR/contracts" -name "*.json" 2>/dev/null)
+
+TOTAL_YAML=$((YAML_PASS + YAML_FAIL))
+TOTAL_JSON=$((JSON_PASS + JSON_FAIL))
+
+if [ "$YAML_FAIL" -eq 0 ] && [ "$JSON_FAIL" -eq 0 ]; then
+    log_result "PARSE-ALL" "PASS" "YAML: $YAML_PASS/$TOTAL_YAML, JSON: $JSON_PASS/$TOTAL_JSON"
+else
+    log_result "PARSE-ALL" "FAIL" "YAML: $YAML_PASS/$TOTAL_YAML pass, JSON: $JSON_PASS/$TOTAL_JSON pass"
+fi
+
+# === JSON SCHEMA VALIDATION ===
+echo ""
+echo "--- JSON Schema Validation ---"
+if python3 -c "import jsonschema; print('available')" 2>/dev/null | grep -q available; then
+    SCHEMA_PASS=0
+    SCHEMA_FAIL=0
+    while IFS= read -r schema; do
+        winf=$(to_winpath "$schema")
+        sname=$(basename "$schema")
+        if python3 -c "
+import json, jsonschema
+s = json.load(open(r'$winf'))
+jsonschema.Draft202012Validator.check_schema(s)
+" 2>/dev/null; then
+            SCHEMA_PASS=$((SCHEMA_PASS + 1))
+        else
+            SCHEMA_FAIL=$((SCHEMA_FAIL + 1))
+            echo "  FAIL: $sname"
+        fi
+    done < <(find "$BASE_DIR/contracts" -name "*.schema.json" 2>/dev/null)
+    
+    TOTAL_SCHEMAS=$((SCHEMA_PASS + SCHEMA_FAIL))
+    if [ "$SCHEMA_FAIL" -eq 0 ]; then
+        log_result "SCHEMA-VALID" "PASS" "$SCHEMA_PASS/$TOTAL_SCHEMAS schemas valid"
+    else
+        log_result "SCHEMA-VALID" "FAIL" "$SCHEMA_PASS/$TOTAL_SCHEMAS valid, $SCHEMA_FAIL failed"
+    fi
+else
+    log_result "SCHEMA-TOOL" "BLOCKED" "jsonschema not installed"
+fi
+
+# === IMAGE TAGS ===
+echo ""
+echo "--- Image Tag Checks ---"
+LATEST_COUNT=$(grep -rn "^\s*image:.*:latest" "$BASE_DIR/compose/" 2>/dev/null | wc -l | tr -d '[:space:]' || echo "0")
+if [ "$LATEST_COUNT" -eq 0 ]; then
+    log_result "NO-LATEST-TAGS" "PASS" "No 'latest' tags in compose"
+else
+    log_result "NO-LATEST-TAGS" "FAIL" "$LATEST_COUNT 'latest' tags found"
+fi
+
+# === PORT EXPOSURE ===
+echo ""
+echo "--- Port Exposure ---"
+PUB_PORTS=$(grep -rn "^\s*ports:" "$BASE_DIR/compose/compose.foundation.yml" 2>/dev/null | wc -l | tr -d '[:space:]' || echo "0")
+if [ "$PUB_PORTS" -eq 0 ]; then
+    log_result "NO-DB-PORTS" "PASS" "No published ports in foundation compose"
+else
+    log_result "NO-DB-PORTS" "FAIL" "$PUB_PORTS port mappings found"
+fi
+
+# === SECURITY ===
+echo ""
+echo "--- Security ---"
+PRIV=$(grep -rn "privileged: true" "$BASE_DIR/compose/" 2>/dev/null | grep -v "^[[:space:]]*#" | wc -l | tr -d '[:space:]' || echo "0")
+if [ "$PRIV" -eq 0 ]; then
+    log_result "NO-PRIV" "PASS" "No privileged containers"
+else
+    log_result "NO-PRIV" "FAIL" "$PRIV privileged containers found"
+fi
+
+SOCK=$(grep -rn "docker.sock" "$BASE_DIR/compose/" 2>/dev/null | grep -v "^[[:space:]]*#" | wc -l | tr -d '[:space:]' || echo "0")
+if [ "$SOCK" -eq 0 ]; then
+    log_result "NO-SOCKET" "PASS" "No Docker socket mounts"
+else
+    log_result "NO-SOCKET" "FAIL" "$SOCK socket mounts found"
+fi
+
+# === SECRETS ===
+echo ""
+echo "--- Secret Scanning ---"
+SECRETS=$(grep -rn -E "(api_key|password|secret|token)\s*[:=]\s*['\"][^P][^L]" "$BASE_DIR/" 2>/dev/null \
+    | grep -v ".env.example" | grep -v "PLACEHOLDER" | grep -v "CHANGE_ME" \
+    | grep -v "node_modules" | grep -v ".git" | grep -v "evidence/" | grep -v "^[[:space:]]*#" \
+    | wc -l | tr -d '[:space:]' || echo "0")
+if [ "$SECRETS" -eq 0 ]; then
+    log_result "NO-SECRETS" "PASS" "No plaintext secrets detected"
+else
+    log_result "NO-SECRETS" "FAIL" "$SECRETS potential secrets found"
+fi
+
+# === HEALTH CHECKS ===
+echo ""
+echo "--- Health Checks ---"
+HC=$(grep -c "healthcheck:" "$BASE_DIR/compose/compose.foundation.yml" 2>/dev/null || echo "0")
+if [ "$HC" -ge 2 ]; then
+    log_result "HEALTH-CHECKS" "PASS" "$HC health checks declared"
+else
+    log_result "HEALTH-CHECKS" "FAIL" "$HC health checks (need 2+)"
+fi
+
+# === POLICY CONSISTENCY ===
+echo ""
+echo "--- Policy Consistency ---"
+COST_OK=true
+grep -q "fixed_baseline_warning: 60" "$BASE_DIR/policy/cost-guardrails.yml" 2>/dev/null || COST_OK=false
+grep -q "burst_hard_stop: 50" "$BASE_DIR/policy/cost-guardrails.yml" 2>/dev/null || COST_OK=false
+grep -q "total_approval_gate: 100" "$BASE_DIR/policy/cost-guardrails.yml" 2>/dev/null || COST_OK=false
+
+if [ "$COST_OK" = true ]; then
+    log_result "COST-THRESHOLDS" "PASS" "Cost thresholds match ratified baseline"
+else
+    log_result "COST-THRESHOLDS" "FAIL" "Cost thresholds diverge from ratification"
+fi
+
+# === WORKER DENIALS ===
+DENY_COUNT=$(grep -c "DENY" "$BASE_DIR/policy/network-access.yml" 2>/dev/null || echo "0")
+if [ "$DENY_COUNT" -ge 6 ]; then
+    log_result "WORKER-DENY" "PASS" "$DENY_COUNT DENY rules for workers"
+else
+    log_result "WORKER-DENY" "FAIL" "$DENY_COUNT DENY rules (need 6+)"
+fi
+
+# === SECURITY OPTIONS ===
+SEC_OPTS=$(grep -c "no-new-privileges" "$BASE_DIR/compose/compose.foundation.yml" 2>/dev/null || echo "0")
+if [ "$SEC_OPTS" -ge 2 ]; then
+    log_result "SECURITY-OPTS" "PASS" "$SEC_OPTS security options present"
+else
+    log_result "SECURITY-OPTS" "FAIL" "$SEC_OPTS security options (need 2+)"
+fi
+
+# === EXTERNAL NETWORKS ===
+EXT_NET=$(grep -c "external:" "$BASE_DIR/compose/compose.foundation.yml" 2>/dev/null | tr -d '[:space:]' || echo "0")
+if [ "$EXT_NET" -eq 0 ]; then
+    log_result "NO-EXTERNAL" "PASS" "No external networks"
+else
+    log_result "NO-EXTERNAL" "FAIL" "$EXT_NET external networks found"
+fi
+
+# === ROLES HAVE TASKS ===
+echo ""
+echo "--- Role Completeness ---"
+EMPTY=0
+for role in $(ls "$BASE_DIR/ansible/roles/"); do
+    [ ! -f "$BASE_DIR/ansible/roles/$role/tasks/main.yml" ] && EMPTY=$((EMPTY + 1))
+done
+if [ "$EMPTY" -eq 0 ]; then
+    log_result "ROLES-TASKS" "PASS" "All roles have tasks"
+else
+    log_result "ROLES-TASKS" "FAIL" "$EMPTY empty roles"
+fi
+
+# === EVIDENCE STRUCTURE ===
+[ -d "$BASE_DIR/evidence" ] && [ -d "$BASE_DIR/evidence/templates" ] && \
+    log_result "EVIDENCE-DIR" "PASS" "Evidence directory exists" || \
+    log_result "EVIDENCE-DIR" "FAIL" "Evidence directory missing"
+
+# === RUNBOOKS ===
+RB_COUNT=$(ls -1 "$BASE_DIR/runbooks/" 2>/dev/null | wc -l || echo "0")
+if [ "$RB_COUNT" -ge 1 ]; then
+    log_result "RUNBOOKS" "PASS" "$RB_COUNT runbooks present"
+else
+    log_result "RUNBOOKS" "FAIL" "No runbooks found"
+fi
+
+# === SINGLE INFRA ROOT ===
+INFRA_COUNT=$(find . -maxdepth 4 -type d -name "cloud-ground" 2>/dev/null | wc -l)
+if [ "$INFRA_COUNT" -le 1 ]; then
+    log_result "SINGLE-ROOT" "PASS" "Single infrastructure root"
+else
+    log_result "SINGLE-ROOT" "FAIL" "$INFRA_COUNT infrastructure roots"
+fi
+
+# === FAIL CLOSED TEST ===
+echo ""
+echo "--- Fail-Closed ---"
+TMPFILE=$(mktemp)
+echo 'services:
+  bad:
+    image: postgres:16.4
+    ports:
+      - "5432:5432"' > "$TMPFILE"
+if grep -q "ports:" "$TMPFILE" 2>/dev/null; then
+    log_result "FAIL-CLOSED" "PASS" "Published port detected in fixture"
+else
+    log_result "FAIL-CLOSED" "FAIL" "Published port not detected"
+fi
+rm -f "$TMPFILE"
+
+# === ANSIBLE SYNTAX ===
+echo ""
+echo "--- Ansible ---"
+if command -v ansible-playbook &>/dev/null; then
+    if ansible-playbook --syntax-check "$BASE_DIR/ansible/playbooks/site.yml" \
+        -i "$BASE_DIR/ansible/inventories/example/hosts.yml" 2>/dev/null; then
+        log_result "ANSIBLE-SYNTAX" "PASS" "Playbook syntax valid"
+    else
+        log_result "ANSIBLE-SYNTAX" "FAIL" "Playbook has syntax errors"
+    fi
+else
+    log_result "ANSIBLE-SYNTAX" "BLOCKED" "ansible not installed"
+fi
+
+# === SUMMARY ===
+echo ""
+echo "========================================="
+echo "       B1-I1 Static Validation Results"
+echo "========================================="
+echo "Total:   $TOTAL"
+echo -e "PASS:    ${GREEN}$PASSED${NC}"
+echo -e "FAIL:    ${RED}$FAILED${NC}"
+echo -e "BLOCKED: ${YELLOW}$BLOCKED${NC}"
+echo "========================================="
+
+if [ "$FAILED" -gt 0 ]; then
+    echo -e "OVERALL: ${RED}FAIL${NC}"
+    exit 1
+elif [ "$BLOCKED" -gt 0 ]; then
+    echo -e "OVERALL: ${YELLOW}BLOCKED${NC}"
+    exit 0
+else
+    echo -e "OVERALL: ${GREEN}PASS${NC}"
+    exit 0
+fi

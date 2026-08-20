@@ -1,0 +1,68 @@
+---
+# Security role — SSH hardening and firewall
+# B1-I1 — Static skeleton
+
+- name: Harden SSH configuration
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  loop:
+    - { regexp: '^#?PermitRootLogin', line: 'PermitRootLogin no' }
+    - { regexp: '^#?PasswordAuthentication', line: 'PasswordAuthentication no' }
+    - { regexp: '^#?PubkeyAuthentication', line: 'PubkeyAuthentication yes' }
+    - { regexp: '^#?X11Forwarding', line: 'X11Forwarding no' }
+    - { regexp: '^#?MaxAuthTries', line: 'MaxAuthTries 3' }
+    - { regexp: '^#?ClientAliveInterval', line: 'ClientAliveInterval 300' }
+    - { regexp: '^#?ClientAliveCountMax', line: 'ClientAliveCountMax 2' }
+  notify: restart sshd
+  tags: [security, ssh]
+
+- name: Ensure fail2ban is installed
+  ansible.builtin.apt:
+    name: fail2ban
+    state: present
+  tags: [security, fail2ban]
+
+- name: Enable fail2ban service
+  ansible.builtin.service:
+    name: fail2ban
+    state: started
+    enabled: true
+  tags: [security, fail2ban]
+
+- name: Configure UFW default deny incoming
+  community.general.ufw:
+    direction: incoming
+    default: deny
+  tags: [security, firewall]
+
+- name: Configure UFW default allow outgoing
+  community.general.ufw:
+    direction: outgoing
+    default: allow
+  tags: [security, firewall]
+
+- name: Allow SSH through Tailscale interface
+  community.general.ufw:
+    rule: allow
+    from_ip: "{{ item }}"
+    to_port: "22"
+    proto: tcp
+  loop:
+    - "100.64.0.0/10"  # Tailscale CGNAT range
+  tags: [security, firewall, tailscale]
+
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled
+  tags: [security, firewall]
+
+- name: Disable password-based sudo
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    regexp: '^%sudo'
+    line: '%sudo ALL=(ALL:ALL) NOPASSWD:ALL'
+    validate: 'visudo -cf %s'
+  tags: [security, sudo]

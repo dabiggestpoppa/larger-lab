@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# OCE Cloud Ground — Render Config
+# B1-I1 — Placeholder (NOT YET IMPLEMENTED)
+# Status: SCAFFOLDED
+# Consumer: B1-I2 host baseline
+#
+# Future: will render Ansible/Compose templates with actual values
+# from .env files or operator-provided configuration.
+#
+# UNVERIFIED: No template rendering is performed during B1-I1.
+
+set -euo pipefail
+
+echo "=== OCE Cloud Ground — Render Config ==="
+echo "Status: SCAFFOLDED — not implemented in B1-I1"
+echo ""
+echo "This script will render configuration templates from:"
+echo "  - compose/examples/oce.env.example → .env"
+echo "  - ansible/inventories/example/ → actual inventory"
+echo "  - backup templates → backup configuration"
+echo ""
+echo "B1-I1 only validates the static skeleton."
+echo "Template rendering will be implemented during B1-I2."
+exit 0
