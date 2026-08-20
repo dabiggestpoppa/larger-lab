@@ -77,12 +77,26 @@
       "r1_state": "PROMOTE_TO_R2"
     }
   ],
-  "survivors": ["USD_CHF_JPY", "CAD_CHF_JPY"],
+  "survivors": [
+    "USD_CHF_JPY",
+    "CAD_CHF_JPY"
+  ],
   "survivor_count": 2,
   "program_stop": false,
   "key_finding": "The dislocation->resolution mechanism for all four JPY triangles clusters in NY morning (13-15 EST), NOT the Tokyo/Asia session. The preregistered Asia lenses (ASIA_CORE, TOKYO_CORE, ASIA_LONDON_TRANSITION) contain <1.5% of all extreme events. The two CHF triangles are promoted on cost economics (2.2-2.6x); R2 must freeze the NY_MORNING window as the session translation.",
   "r2_session_recommendation": "NY_MORNING 13:00-16:00 EST (frozen at R2 start, no tuning)",
   "next_checkpoint_recommended": "SW-AJCF-R2-FROZEN-MECHANISM-SCREEN (requires human review first)",
   "production_authorized": false,
-  "human_review_required": true
+  "human_review_required": true,
+  "r11_repair": {
+    "checkpoint": "SW-AJCF-R1.1-SESSION-TRUTH-AND-LABEL-REPAIR",
+    "note": "Original R1 decision preserved; corrected truth appended. See AJCF_R11_* artifacts.",
+    "session_label_corrected": "NY_MORNING -> NY_AFTERNOON_13_16_EST",
+    "asia_fraction_claim_corrected": "union 5.2% (USD_CHF_JPY) / 6.8% (CAD_CHF_JPY), not <1.5%",
+    "asia_classification": {
+      "USD_CHF_JPY": "ASIA_PRESENT_BUT_SPARSE",
+      "CAD_CHF_JPY": "ASIA_PRESENT_BUT_SPARSE"
+    },
+    "r2_session_frozen": "NY_AFTERNOON_13_16_EST (13:00-16:00 EST, 120m runway, hard exit 16:00 EST)"
+  }
 }

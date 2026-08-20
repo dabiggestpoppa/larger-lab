@@ -1,0 +1,26 @@
+{
+  "frozen_mapping": {
+    "AUDNZD": "AUDNZD_PRO_M5.csv",
+    "AUDJPY": "AUDJPY_M5_fetched.csv",
+    "NZDJPY": "NZDJPY_M5_fetched.csv",
+    "USDCHF": "USDCHFPRO_M5.csv",
+    "USDJPY": "USDJPY_M5_fetched.csv",
+    "CHFJPY": "CHFJPY_M5_fetched.csv",
+    "AUDCAD": "AUDCAD_PRO_M5.csv",
+    "CADJPY": "CADJPY_M5_fetched.csv",
+    "CADCHF": "CADCHF_PRO_M5.csv"
+  },
+  "rule": "JPY legs MUST use the synchronized fetched family; never the mixed plain *_M5 files (R1 finding: plain files produced phantom 200-350 bps triangular violations on 2022-12-20).",
+  "files": {
+    "USDCHFPRO_M5.csv": "8af6de6bedf58794d5182c52f85507091cafbb9ced067443740775bc47dbf09a",
+    "AUDCAD_PRO_M5.csv": "53804147fd1ee9a6782721d1e185edd1edd9a816d1ecf32c7f6e84a85b5a3093",
+    "AUDJPY_M5_fetched.csv": "33fd56518a1feb868d2ee25dffa47beac64af539d95c7fc101cdd3444613714c",
+    "AUDNZD_PRO_M5.csv": "5a9bd85233ff8f179bd1a55b6e09639b46a4e7a91c6c573e0a5da310e7bd4dad",
+    "CHFJPY_M5_fetched.csv": "70a7a1aa9bf031f75f98a3723f7f42d3f637c6fb32903f2a768b7b760f508736",
+    "USDJPY_M5_fetched.csv": "4bbd621762f30ec76473b3c662397d46f2e0dffb72b1dfd52d3f2031cb5bb02e",
+    "CADJPY_M5_fetched.csv": "9a5d831041d67ef290ac3d4c690a346cd389199c1cf5e6cc6fcadba0f1efcbc1",
+    "NZDJPY_M5_fetched.csv": "1329a7327ad732b7c8b7e8361fa0b2f216f92a65b237a68e2dab4c65932489f9",
+    "CADCHF_PRO_M5.csv": "3c27fefd7580d15266bb60c01b5e266cccd0a4b25e7c3b3abb71ca09c2f23643"
+  },
+  "usd_chf_jpy_caveat": "SHORTER_DEVELOPMENT_WINDOW: USDCHF M5 begins 2023-07-02; USD_CHF_JPY dev evidence is ~1.5y, not equivalent to CAD_CHF_JPY ~2.25y."
+}

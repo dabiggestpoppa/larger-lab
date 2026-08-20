@@ -93,3 +93,39 @@ See CTBT_R1_SESSION_ANATOMY.csv. Key numbers (all-hours baseline):
 - CTBT_R1_DECISION.json
 
 Next: SW-AJCF-R2-FROZEN-MECHANISM-SCREEN (human review required).
+
+---
+
+## ERRATA — SW-AJCF-R1.1-SESSION-TRUTH-AND-LABEL-REPAIR (2026-08-20)
+
+Original R1 text corrected by the R1.1 session-truth repair. Original evidence
+above is preserved verbatim; the corrected truth is authoritative.
+
+1. **Session label.** The window 13:00–15:00/16:00 EST was labeled
+   "NY_MORNING". That is a mislabel: 13:00–16:00 EST is afternoon.
+   Corrected identifier: **NY_AFTERNOON_13_16_EST** (fixed EST, UTC−5,
+   no DST).
+
+2. **Asia event-fraction claim.** The statement "the preregistered Asia
+   lenses contain <1.5% of all |z|>3 events" is INCORRECT as a blanket
+   claim. Per-lens and unique-union audit (no double counting):
+   - USD_CHF_JPY: ASIA_CORE 0.5%, TOKYO_CORE 0.4%,
+     ASIA_LONDON_TRANSITION 4.9%, union 5.2% (42/804 events).
+   - CAD_CHF_JPY: ASIA_CORE 0.8%, TOKYO_CORE 0.4%,
+     ASIA_LONDON_TRANSITION 6.1%, union 6.8% (88/1291 events).
+   Correct statement: Asia lenses contain ~5–7% of all extreme events
+   (unique union). Asia is present but sparse.
+
+3. **Asia hypothesis classification.** Both survivors are classified
+   **ASIA_PRESENT_BUT_SPARSE** (not "Asia has no mechanism"). Asia events
+   are economically real (median displacement 10.0 / 10.9 bps) but low
+   frequency.
+
+4. **R2 session freeze.** ONE session per survivor, from NON-PNL anatomy:
+   **NY_AFTERNOON_13_16_EST** (13:00–16:00 EST, 120-min runway, hard exit
+   16:00 EST; entries 13:00–14:00 EST keep clear of the 16:00 EST rollover
+   fix zone). No session grid in R2.
+
+See AJCF_R11_HOURLY_ANATOMY.csv, AJCF_R11_ASIA_EVENT_FRACTION_AUDIT.json,
+AJCF_R11_TIME_SEMANTICS.json, AJCF_R11_SESSION_FREEZE.json,
+AJCF_R11_DATA_FAMILY_FREEZE.json, AJCF_R11_REPORT.md, AJCF_R11_DECISION.json.

@@ -1,0 +1,20 @@
+{
+  "convention": "FIXED_EST_UTC_MINUS_5_NO_DST",
+  "formula": "hour_est = (hour_utc - 5) mod 24; hour_utc = (hour_est + 5) mod 24",
+  "verified": true,
+  "notes": "All research timestamps treated as UTC; EST window labels are fixed clock windows with no DST adjustment, consistent with CEREBUS / canonical TB convention.",
+  "examples": [
+    {
+      "hour_utc": 18,
+      "hour_est": 13
+    },
+    {
+      "hour_utc": 21,
+      "hour_est": 16
+    },
+    {
+      "hour_utc": 0,
+      "hour_est": 19
+    }
+  ]
+}

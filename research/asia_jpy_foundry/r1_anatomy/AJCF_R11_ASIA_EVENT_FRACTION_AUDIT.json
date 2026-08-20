@@ -1,0 +1,44 @@
+[
+  {
+    "candidate": "USD_CHF_JPY",
+    "total_events": 804,
+    "per_lens": {
+      "ASIA_CORE": {
+        "events": 4,
+        "fraction": 0.005
+      },
+      "TOKYO_CORE": {
+        "events": 3,
+        "fraction": 0.0037
+      },
+      "ASIA_LONDON_TRANSITION": {
+        "events": 39,
+        "fraction": 0.0485
+      }
+    },
+    "unique_union_events": 42,
+    "unique_union_fraction": 0.0522,
+    "non_asia_fraction": 0.9478
+  },
+  {
+    "candidate": "CAD_CHF_JPY",
+    "total_events": 1291,
+    "per_lens": {
+      "ASIA_CORE": {
+        "events": 10,
+        "fraction": 0.0077
+      },
+      "TOKYO_CORE": {
+        "events": 5,
+        "fraction": 0.0039
+      },
+      "ASIA_LONDON_TRANSITION": {
+        "events": 79,
+        "fraction": 0.0612
+      }
+    },
+    "unique_union_events": 88,
+    "unique_union_fraction": 0.0682,
+    "non_asia_fraction": 0.9318
+  }
+]

@@ -1,0 +1,83 @@
+{
+  "checkpoint": "SW-AJCF-R1.1-SESSION-TRUTH-AND-LABEL-REPAIR",
+  "status": "PASS_R1_SESSION_TRUTH_REPAIRED",
+  "base_commit": "623c760685dccc2bca073c916361db0739984d89",
+  "repairs": {
+    "1_session_label": "NY_MORNING -> NY_AFTERNOON_13_16_EST (clock-based, unambiguous)",
+    "2_asia_fraction_claim": "recomputed per-lens + unique-union; original blanket <1.5% claim corrected to ~5-7% union",
+    "3_hourly_anatomy": "AJCF_R11_HOURLY_ANATOMY.csv (24 fixed-EST hours x 2 survivors, non-PnL only)",
+    "4_time_semantics": "EST = UTC-5 fixed, no DST, verified; hour_est + hour_utc stored",
+    "5_r2_session": "ONE session frozen per survivor from mechanism evidence only",
+    "6_data_family": "fetched family frozen with sha256 hashes"
+  },
+  "time_semantics": {
+    "convention": "FIXED_EST_UTC_MINUS_5_NO_DST",
+    "verified": true,
+    "formula": "hour_est = (hour_utc - 5) mod 24"
+  },
+  "session_dominance": {
+    "USD_CHF_JPY": {
+      "session": "NY_AFTERNOON_13_16_EST",
+      "events_in_window": 681,
+      "fraction_of_all_events": 0.847,
+      "events_per_week_in_window": 8.7,
+      "median_disp_bps": 12.33,
+      "p90_disp_bps": 27.35,
+      "median_resolution_min": 60,
+      "gross_cost_ratio": 2.568,
+      "rollover_frac": 0.01
+    },
+    "CAD_CHF_JPY": {
+      "session": "NY_AFTERNOON_13_16_EST",
+      "events_in_window": 1046,
+      "fraction_of_all_events": 0.8102,
+      "events_per_week_in_window": 8.594,
+      "median_disp_bps": 13.19,
+      "p90_disp_bps": 28.34,
+      "median_resolution_min": 60,
+      "gross_cost_ratio": 2.405,
+      "rollover_frac": 0.017
+    }
+  },
+  "asia_classification": {
+    "USD_CHF_JPY": {
+      "classification": "ASIA_PRESENT_BUT_SPARSE",
+      "asia_union_fraction": 0.0522,
+      "asia_event_count": 42,
+      "asia_median_disp_bps": 10.04
+    },
+    "CAD_CHF_JPY": {
+      "classification": "ASIA_PRESENT_BUT_SPARSE",
+      "asia_union_fraction": 0.0682,
+      "asia_event_count": 88,
+      "asia_median_disp_bps": 10.85
+    }
+  },
+  "r2_session": {
+    "selected": "NY_AFTERNOON_13_16_EST",
+    "session_start_est": 13,
+    "session_end_est": 16,
+    "min_runway_minutes": 120,
+    "hard_exit_est": 16,
+    "entry_window_est": "13:00-14:00 EST (>=120 min runway before 16:00 hard exit)",
+    "rollover_boundary": "hours 13-15 EST rollover-free; hour 16 EST (UTC 21) is rollover fix zone used only as hard-exit boundary; entries kept outside it by 120-min runway",
+    "no_session_grid_in_r2": true
+  },
+  "survivors": ["USD_CHF_JPY", "CAD_CHF_JPY"],
+  "failed_sealed": ["AUD_NZD_JPY (FAIL_COST)", "AUD_CAD_JPY (FAIL_COST)"],
+  "data_family": {
+    "rule": "JPY legs use synchronized fetched family; never mixed plain *_M5 files",
+    "manifest": "AJCF_R11_DATA_FAMILY_FREEZE.json"
+  },
+  "caveats": {
+    "usd_chf_jpy": "SHORTER_DEVELOPMENT_WINDOW - USDCHF M5 begins 2023-07-02; ~1.5y evidence",
+    "cad_chf_jpy": "full ~2.25y window"
+  },
+  "no_2025_consumed": true,
+  "no_strategy_pnl": true,
+  "no_candidate_changes": true,
+  "forward_system_untouched": true,
+  "production_authorized": false,
+  "human_review_required": true,
+  "next_checkpoint_recommended": "SW-AJCF-R2-FROZEN-MECHANISM-SCREEN (USD_CHF_JPY, CAD_CHF_JPY only)"
+}
