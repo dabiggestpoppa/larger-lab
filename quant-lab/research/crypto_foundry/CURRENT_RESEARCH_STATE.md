@@ -1,9 +1,9 @@
 # QUANT BOX — Crypto Quant Foundry Current Research State
 
-**Checkpoint:** `CRYPTO-DATA-1.3-CANONICAL-FREEZE-AND-EVIDENCE-RECONCILIATION`
+**Checkpoint:** `CRYPTO-MECH-1-SPOT-PERP-AMM-CONSTRAINT-ANATOMY`
 **Branch:** `agent/crypto-quant-foundry`
-**Decision:** `PASS_CANONICAL_CRYPTO_DATA_FOUNDATION` (DATA-1 frozen)
-**Strategy research:** NOT STARTED
+**Decision:** `PASS_MECHANISM_ANATOMY`
+**Strategy research:** NOT STARTED (mechanism science only)
 **Execution:** NOT AUTHORIZED
 
 ## Completed Checkpoints
@@ -78,16 +78,41 @@ MECH-1 must consume only datasets listed there.
 
 Options / LP: DATA-2_CANDIDATE (not in DATA-1 scope)
 
-## Next Checkpoint
+## MECH-1 Summary (mechanism anatomy, PASS)
 
-`CRYPTO-DATA-1-CANONICAL-COLLECTOR-FOUNDATION`
+- Perp-spot basis (1h, causal): BTC/ETH 3,401 aligned rows (2026-01-25 →
+  2026-06-15); median basis BTC −4.78 bps, ETH −4.70 bps (perp below spot).
+- Dislocation episodes (|basis| > p90): BTC 202, ETH 176; median resolution
+  2h; resolution rate 0.995 vs block-shuffle null 0.995 (no dislocation-
+  specific convergence beyond unconditional).
+- Funding anatomy (3.3y deep): corr(funding, premium) ≈ 0.76; funding is
+  negative inside dislocations (BTC diff −0.131 bps, CI [−0.140,−0.122];
+  ETH −0.157 bps, CI [−0.167,−0.147]) — short-side pressure accompanies
+  perp-spot stress.
+- OI / mark-index: snapshot-only on frozen data (honest limitation;
+  OI mechanisms = INSUFFICIENT_EVIDENCE).
+- AMM pilot (PILOT_MECHANISM_EVIDENCE, days not years): WETH/USDC 1,057
+  swaps, WBTC/USDC 205, Base 4,035; AMM-perp basis aligned on 241 5m buckets.
+- Null models: vol-matched permutation shows high-|basis| states decay
+  SLOWER than i.i.d. (observed 5–7% vs null 15–18%) — dislocation
+  persistence, not fast convergence.
+- Mechanism registry: 10 candidates; SUPPORTED: FUNDING_CROWDING_UNWIND,
+  MARK_INDEX_STRESS; WEAK: SPOT_PERP_CONVERGENCE, AMM_REPRICE_LAG,
+  AMM_FLOW_CONFIRMATION; INSUFFICIENT: OI_* (snapshot-only);
+  CONDITIONAL: BTC_ETH_CAPITAL_ROTATION, VOLATILITY_STATE_TRANSITION,
+  TIME_EPOCH_RESOLUTION.
+- 83 tests pass (53 DATA-1 + 30 MECH-1); determinism verified.
+- Artifacts: `mech_1/` (MECH_1_REPORT.md, MECH_1_DECISION.json, 10 CSVs,
+  preregistration, data contract, research-extension manifest).
 
-Scope:
-1. Fetch fresh Hyperliquid BTC/ETH perp data (candles + funding + OI from May 2023)
-2. Backfill Binance deeper history if needed beyond existing 4yr files
-3. Build Uniswap v3 subgraph adapter for ETH/USDC on Ethereum
-4. Select and verify Base AMM pool candidates
-5. Store raw + normalized with provenance manifests
-6. Run data quality gates
-7. Cross-source parity check (Binance spot vs HL perp)
-8. Produce test fixtures for Git
+## Next Checkpoint (NOT STARTED)
+
+`CRYPTO-MECH-2-STATE-AND-DISLOCATION-TAXONOMY`
+
+Scope (per MECH-1 decision):
+1. State/dislocation taxonomy from the mechanism registry
+2. Conditional next-state matrices and transition tables
+3. Remaining-range quantile baselines
+4. Time-to-resolution survival curves by tier/state
+5. Deeper mark-index / OI lanes via frozen collectors (registered extensions)
+6. No strategy PnL, no optimization, no ML, no execution

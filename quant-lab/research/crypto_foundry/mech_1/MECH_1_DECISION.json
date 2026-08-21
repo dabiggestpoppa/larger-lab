@@ -1,0 +1,41 @@
+{
+  "checkpoint": "CRYPTO-MECH-1-SPOT-PERP-AMM-CONSTRAINT-ANATOMY",
+  "base_commit": "798dd903ca053f23c5d7e9defe202631562d7c2e",
+  "created_at_utc": "2026-08-21T23:09:32.791182+00:00",
+  "decision": "PASS_MECHANISM_ANATOMY",
+  "reasons": [
+    "Freeze parent verified (all 9 raw hashes match)",
+    "No causal violations (same-bucket/nearest-prior alignment)",
+    "Event segmentation reproducible",
+    "Basis anatomy produced (2 rows)",
+    "Funding anatomy produced (4 rows)",
+    "OI anatomy present (snapshot-level, honest limits)",
+    "BTC/ETH cross-asset comparison produced",
+    "All four null models completed",
+    "AMM findings labelled (PILOT_MECHANISM_EVIDENCE)",
+    "Negative mechanisms retained in registry",
+    "No strategy PnL computed",
+    "No optimization performed",
+    "Mechanism registry produced",
+    "No unsupported alpha claim"
+  ],
+  "blocking_issues": [],
+  "evidence": {
+    "freeze_verified": true,
+    "basis_rows": 2,
+    "event_ledger_rows": 378,
+    "funding_rows": 4,
+    "oi_rows": 2,
+    "cross_state_rows": 2,
+    "null_rows": 12,
+    "amm_rows": 3,
+    "registry_rows": 10
+  },
+  "prohibited_verification": {
+    "strategy_pnl_computed": false,
+    "optimization_performed": false,
+    "alpha_research_started": false,
+    "confirmation_consumed": false,
+    "holdout_consumed": false
+  }
+}
