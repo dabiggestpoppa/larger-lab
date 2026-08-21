@@ -25,7 +25,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import requests
 
-COLLECTOR_VERSION = "1.0.0"
+COLLECTOR_VERSION = "1.1.0"
 API_BASE = "https://api.hyperliquid.xyz"
 
 # Hyperliquid market specs from frozen contract
@@ -131,24 +131,33 @@ def fetch_funding_history(
     end_time_ms: Optional[int] = None,
 ) -> List[Dict]:
     """Fetch funding history. Returns normalized PERP_FUNDING records.
-    NOTE: fundingHistory endpoint requires req wrapper.
+
+    API NOTES (DATA-1.1):
+    - Flat format required: {type: 'fundingHistory', coin: 'BTC', startTime: <ms>}
+    - req wrapper returns HTTP 422
+    - Omitting startTime returns HTTP 422
+    - Max 500 records per request
     """
-    req: Dict[str, Any] = {
-        "coin": coin,
-    }
-    if start_time_ms is not None:
-        req["startTime"] = start_time_ms
-    if end_time_ms is not None:
-        req["endTime"] = end_time_ms
-    payload = {
+    if start_time_ms is None:
+        import time as _time
+        start_time_ms = int((_time.time() - 86400 * 7) * 1000)
+
+    payload: Dict[str, Any] = {
         "type": "fundingHistory",
-        "req": req,
+        "coin": coin,
+        "startTime": start_time_ms,
     }
+    if end_time_ms is not None:
+        payload["endTime"] = end_time_ms
 
     try:
         data = _post_info(payload)
     except Exception as e:
         return [{"error": str(e), "source": "hyperliquid", "market_id": coin}]
+
+    if not isinstance(data, list):
+        return [{"error": f"unexpected response type: {type(data).__name__}",
+                 "source": "hyperliquid", "market_id": coin}]
 
     records = []
     for entry in data:
@@ -166,10 +175,11 @@ def fetch_funding_history(
                 "source_version": COLLECTOR_VERSION,
                 "raw_identifier": f"hl_funding_{coin}_{t}",
                 "schema_version": "1.0.0",
-                "funding_rate": float(entry.get("rate", 0)),
+                "funding_rate": float(entry.get("fundingRate", 0)),
                 "funding_time_utc": ts,
                 "mark_price": None,
                 "index_price": None,
+                "premium": _safe_float(entry.get("premium")),
             }
             records.append(record)
         except (KeyError, ValueError, TypeError):
@@ -437,3 +447,80 @@ def _safe_float(val) -> Optional[float]:
         return float(val)
     except (ValueError, TypeError):
         return None
+
+
+def collect_full_funding_history(
+    coin: str,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    delay_between_requests: float = 0.15,
+) -> Tuple[List[Dict], Dict]:
+    """
+    Paginate through full funding history using forward pagination.
+    """
+    if start_date is None:
+        start_date = "2023-05-01"
+    if end_date is None:
+        end_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    start_ms = int(datetime.strptime(start_date, "%Y-%m-%d").replace(
+        tzinfo=timezone.utc
+    ).timestamp() * 1000)
+    end_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
+
+    all_records = []
+    current_start = start_ms
+    request_count = 0
+
+    while current_start < end_ms:
+        records = fetch_funding_history(coin=coin, start_time_ms=current_start, end_time_ms=end_ms)
+        if records and "error" in records[0]:
+            break
+        if not records:
+            break
+
+        request_count += 1
+        all_records.extend(records)
+
+        # Extract latest timestamp from raw_identifier
+        latest_ms = 0
+        for r in records:
+            if "error" not in r:
+                raw_id = r.get("raw_identifier", "")
+                parts = raw_id.split("_")
+                if len(parts) >= 4:
+                    try:
+                        latest_ms = max(latest_ms, int(parts[-1]))
+                    except ValueError:
+                        pass
+
+        if latest_ms == 0:
+            break
+        current_start = latest_ms + 1
+
+        if len(records) < 500:
+            break
+        time.sleep(delay_between_requests)
+
+    # Deduplicate
+    seen = set()
+    unique_records = []
+    for r in all_records:
+        key = r.get("raw_identifier", "")
+        if key not in seen:
+            seen.add(key)
+            unique_records.append(r)
+    unique_records.sort(key=lambda r: r.get("event_time_utc", ""))
+
+    metadata = {
+        "coin": coin,
+        "start_date": start_date,
+        "end_date": end_date,
+        "total_records": len(unique_records),
+        "requests_made": request_count,
+        "first_timestamp": unique_records[0]["event_time_utc"] if unique_records else None,
+        "last_timestamp": unique_records[-1]["event_time_utc"] if unique_records else None,
+        "status": "VALID" if len(unique_records) > 10 else "PARTIAL" if unique_records else "FAILED",
+        "funding_interval": "1h (hourly)",
+    }
+    return unique_records, metadata

@@ -94,7 +94,7 @@ BASE_POOL_CANDIDATES = {
 }
 
 # The Graph subgraph for Uniswap v3 on Base
-BASE_SUBGRAPH_URL = "https://gateway-arbitrum.network.thegraph.com/api/subgraphs/id/88ecHoTjxY9WJ暴力Z2GLX5B5JZKP1Y2QCv"
+BASE_SUBGRAPH_URL = None  # REMOVED: malformed URL from DATA-1
 
 # Alternative: public Base RPC for direct log queries
 BASE_RPC_URL = "https://mainnet.base.org"
@@ -105,6 +105,37 @@ SESSION.headers.update({"Content-Type": "application/json"})
 
 
 # ── Pool Verification ──────────────────────────────────────────────
+
+
+def verify_base_token(token_key: str) -> Dict:
+    """Verify a Base token contract exists and has correct decimals via RPC."""
+    token_info = BASE_TOKENS.get(token_key, {})
+    address = token_info.get('address', '')
+    rpc_url = BASE_RPC_URL
+
+    try:
+        # Check code exists
+        code_payload = {'jsonrpc': '2.0', 'method': 'eth_getCode', 'params': [address, 'latest'], 'id': 1}
+        code_resp = SESSION.post(rpc_url, json=code_payload, timeout=15)
+        code_data = code_resp.json()
+        has_code = code_data.get('result', '0x') not in ('0x', None) and len(code_data.get('result', '')) > 2
+
+        # Call decimals()
+        dec_payload = {'jsonrpc': '2.0', 'method': 'eth_call', 'params': [{'to': address, 'data': '0x313ce567'}, 'latest'], 'id': 1}
+        dec_resp = SESSION.post(rpc_url, json=dec_payload, timeout=15)
+        dec_data = dec_resp.json().get('result', '0x0')
+        decimals = int(dec_data[2:66], 16) if len(dec_data) >= 66 else None
+
+        return {
+            'token_key': token_key, 'address': address,
+            'has_code': has_code, 'decimals_onchain': decimals,
+            'expected_decimals': token_info.get('decimals'),
+            'decimals_match': decimals == token_info.get('decimals') if decimals is not None else None,
+            'verified': has_code and decimals == token_info.get('decimals'),
+        }
+    except Exception as e:
+        return {'token_key': token_key, 'address': address, 'verified': False, 'error': str(e)}
+
 
 def verify_base_pool(
     pool_address: str,

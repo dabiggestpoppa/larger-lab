@@ -1,1 +1,3 @@
-comparison_name,source_a,source_b,overlap_count,median_basis_bps,p95_basis_bps,correlation,status
+asset,overlap,median_bps,p95_bps,correlation,status
+BTC,0,0,0,0,INSUFFICIENT_DATA
+ETH,0,0,0,0,INSUFFICIENT_DATA

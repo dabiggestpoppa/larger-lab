@@ -1,0 +1,403 @@
+{
+  "checkpoint": "CRYPTO-DATA-1.1",
+  "base_commit": "f41e9c09",
+  "started_at": "2026-08-21T14:57:40.075752+00:00",
+  "lanes": {
+    "A_hyperliquid": {
+      "candles": {},
+      "funding": {}
+    },
+    "B_binance": {
+      "BTCUSDT": {
+        "count": 420464
+      },
+      "ETHUSDT": {
+        "count": 420464
+      }
+    },
+    "C_uniswap_v3": {
+      "verification": {
+        "WETH-USDC-500": {
+          "pool_key": "WETH-USDC-500",
+          "pool_address": "0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640",
+          "verified": true,
+          "checks": {
+            "code_exists": true,
+            "token0": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "token0_match": true,
+            "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "token1_match": true,
+            "fee": null,
+            "fee_match": null
+          }
+        },
+        "WBTC-USDC-3000": {
+          "pool_key": "WBTC-USDC-3000",
+          "pool_address": "0x99ac8cA7087fA4A2A1FB6357269965A2014ABc35",
+          "verified": true,
+          "checks": {
+            "code_exists": true,
+            "token0": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+            "token0_match": true,
+            "token1": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "token1_match": true,
+            "fee": null,
+            "fee_match": null
+          }
+        }
+      },
+      "events": {}
+    },
+    "D_base_amm": {
+      "token_verification": {
+        "WETH": {
+          "token_key": "WETH",
+          "address": "0x4200000000000000000000000000000000000006",
+          "has_code": true,
+          "decimals_onchain": 18,
+          "expected_decimals": 18,
+          "decimals_match": true,
+          "verified": true
+        },
+        "USDC": {
+          "token_key": "USDC",
+          "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "has_code": true,
+          "decimals_onchain": 6,
+          "expected_decimals": 6,
+          "decimals_match": true,
+          "verified": true
+        },
+        "cbBTC": {
+          "token_key": "cbBTC",
+          "address": "0xcbB7C09993bDa24813c5bc24990cD67Bd5C07c98",
+          "has_code": false,
+          "decimals_onchain": null,
+          "expected_decimals": 8,
+          "decimals_match": null,
+          "verified": false
+        }
+      },
+      "pool_verification": {
+        "WETH-USDC": {
+          "pool_address": "0xb2cc224c1c9feE385f8ad6a55b4d94E92359DC59",
+          "has_code": true,
+          "expected_token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "expected_token1": "0x4200000000000000000000000000000000000006",
+          "expected_fee_tier": 500,
+          "status": "CODE_EXISTS_NEEDS_FULL_VERIFICATION",
+          "note": "Full token0/token1/fee verification requires ABI decoding"
+        }
+      }
+    }
+  },
+  "quality_results": {
+    "bn_BTCUSDT": {
+      "total_gates": 6,
+      "passed": 4,
+      "failed": 2,
+      "blocked": 0,
+      "not_applicable": 0,
+      "gates": [
+        {
+          "gate_id": "Q1",
+          "gate_name": "duplicates",
+          "status": "PASS",
+          "evidence": "0 duplicate records found out of 420464",
+          "details": {
+            "duplicate_count": 0,
+            "sample_indices": []
+          },
+          "affected_rows": 0
+        },
+        {
+          "gate_id": "Q2",
+          "gate_name": "monotonic_timestamps",
+          "status": "PASS",
+          "evidence": "0 non-monotonic timestamp transitions",
+          "details": {
+            "non_monotonic_count": 0
+          },
+          "affected_rows": 0
+        },
+        {
+          "gate_id": "Q3",
+          "gate_name": "invalid_price",
+          "status": "PASS",
+          "evidence": "0 records with invalid/nonpositive price",
+          "details": {
+            "invalid_price_count": 0
+          },
+          "affected_rows": 0
+        },
+        {
+          "gate_id": "Q4",
+          "gate_name": "invalid_size",
+          "status": "FAIL",
+          "evidence": "14 records with invalid/nonpositive size",
+          "details": {
+            "invalid_size_count": 14
+          },
+          "affected_rows": 14
+        },
+        {
+          "gate_id": "Q5",
+          "gate_name": "missing_intervals",
+          "status": "FAIL",
+          "evidence": "1 interval gaps detected (expected every 300s)",
+          "details": {
+            "gap_count": 1,
+            "sample_gaps": [
+              {
+                "from": "2023-03-24T12:35:00+00:00",
+                "to": "2023-03-24T14:00:00+00:00",
+                "gap_seconds": 5100
+              }
+            ]
+          },
+          "affected_rows": 1
+        },
+        {
+          "gate_id": "Q13",
+          "gate_name": "replay_determinism",
+          "status": "PASS",
+          "evidence": "0 records differ between replay batches",
+          "details": {
+            "diff_count": 0
+          },
+          "affected_rows": 0
+        }
+      ]
+    },
+    "bn_ETHUSDT": {
+      "total_gates": 6,
+      "passed": 4,
+      "failed": 2,
+      "blocked": 0,
+      "not_applicable": 0,
+      "gates": [
+        {
+          "gate_id": "Q1",
+          "gate_name": "duplicates",
+          "status": "PASS",
+          "evidence": "0 duplicate records found out of 420464",
+          "details": {
+            "duplicate_count": 0,
+            "sample_indices": []
+          },
+          "affected_rows": 0
+        },
+        {
+          "gate_id": "Q2",
+          "gate_name": "monotonic_timestamps",
+          "status": "PASS",
+          "evidence": "0 non-monotonic timestamp transitions",
+          "details": {
+            "non_monotonic_count": 0
+          },
+          "affected_rows": 0
+        },
+        {
+          "gate_id": "Q3",
+          "gate_name": "invalid_price",
+          "status": "PASS",
+          "evidence": "0 records with invalid/nonpositive price",
+          "details": {
+            "invalid_price_count": 0
+          },
+          "affected_rows": 0
+        },
+        {
+          "gate_id": "Q4",
+          "gate_name": "invalid_size",
+          "status": "FAIL",
+          "evidence": "14 records with invalid/nonpositive size",
+          "details": {
+            "invalid_size_count": 14
+          },
+          "affected_rows": 14
+        },
+        {
+          "gate_id": "Q5",
+          "gate_name": "missing_intervals",
+          "status": "FAIL",
+          "evidence": "1 interval gaps detected (expected every 300s)",
+          "details": {
+            "gap_count": 1,
+            "sample_gaps": [
+              {
+                "from": "2023-03-24T12:35:00+00:00",
+                "to": "2023-03-24T14:00:00+00:00",
+                "gap_seconds": 5100
+              }
+            ]
+          },
+          "affected_rows": 1
+        },
+        {
+          "gate_id": "Q13",
+          "gate_name": "replay_determinism",
+          "status": "PASS",
+          "evidence": "0 records differ between replay batches",
+          "details": {
+            "diff_count": 0
+          },
+          "affected_rows": 0
+        }
+      ]
+    },
+    "eth_pool_WETH-USDC-500": {
+      "total_gates": 1,
+      "passed": 1,
+      "failed": 0,
+      "blocked": 0,
+      "not_applicable": 0,
+      "gates": [
+        {
+          "gate_id": "Q10",
+          "gate_name": "amm_token_order",
+          "status": "PASS",
+          "evidence": "Token ordering is valid",
+          "details": {},
+          "affected_rows": 0
+        }
+      ]
+    },
+    "eth_pool_WBTC-USDC-3000": {
+      "total_gates": 1,
+      "passed": 1,
+      "failed": 0,
+      "blocked": 0,
+      "not_applicable": 0,
+      "gates": [
+        {
+          "gate_id": "Q10",
+          "gate_name": "amm_token_order",
+          "status": "PASS",
+          "evidence": "Token ordering is valid",
+          "details": {},
+          "affected_rows": 0
+        }
+      ]
+    },
+    "base_WETH": {
+      "total_gates": 1,
+      "passed": 1,
+      "failed": 0,
+      "blocked": 0,
+      "not_applicable": 0,
+      "gates": [
+        {
+          "gate_id": "Q_BASE",
+          "gate_name": "base_WETH",
+          "status": "PASS",
+          "evidence": "verified=True",
+          "details": {},
+          "affected_rows": 0
+        }
+      ]
+    },
+    "base_USDC": {
+      "total_gates": 1,
+      "passed": 1,
+      "failed": 0,
+      "blocked": 0,
+      "not_applicable": 0,
+      "gates": [
+        {
+          "gate_id": "Q_BASE",
+          "gate_name": "base_USDC",
+          "status": "PASS",
+          "evidence": "verified=True",
+          "details": {},
+          "affected_rows": 0
+        }
+      ]
+    },
+    "base_cbBTC": {
+      "total_gates": 1,
+      "passed": 0,
+      "failed": 1,
+      "blocked": 0,
+      "not_applicable": 0,
+      "gates": [
+        {
+          "gate_id": "Q_BASE",
+          "gate_name": "base_cbBTC",
+          "status": "FAIL",
+          "evidence": "verified=False",
+          "details": {},
+          "affected_rows": 0
+        }
+      ]
+    },
+    "q14": {
+      "total_gates": 1,
+      "passed": 1,
+      "failed": 0,
+      "blocked": 0,
+      "not_applicable": 0,
+      "gates": [
+        {
+          "gate_id": "Q14",
+          "gate_name": "normalized_from_raw_determinism",
+          "status": "PASS",
+          "evidence": "Normalization produced 1 distinct outputs from 2 runs",
+          "details": {
+            "unique_outputs": 1
+          },
+          "affected_rows": 0
+        }
+      ]
+    },
+    "q15": {
+      "total_gates": 1,
+      "passed": 1,
+      "failed": 0,
+      "blocked": 0,
+      "not_applicable": 0,
+      "gates": [
+        {
+          "gate_id": "Q15",
+          "gate_name": "future_independent_normalization",
+          "status": "PASS",
+          "evidence": "Prefix normalization matches",
+          "details": {
+            "match": true
+          },
+          "affected_rows": 0
+        }
+      ]
+    }
+  },
+  "parity_results": {
+    "BTC": {
+      "status": "INSUFFICIENT_DATA"
+    },
+    "ETH": {
+      "status": "INSUFFICIENT_DATA"
+    }
+  },
+  "nautilus_audit": {
+    "hyperliquid": {
+      "importable": true,
+      "status": "REUSE_DIRECTLY"
+    },
+    "binance": {
+      "importable": true,
+      "status": "REUSE_DIRECTLY"
+    },
+    "coinbase_intx": {
+      "importable": true,
+      "status": "REUSE_DIRECTLY"
+    },
+    "bybit": {
+      "importable": true,
+      "status": "REUSE_DIRECTLY"
+    },
+    "okx": {
+      "importable": true,
+      "status": "REUSE_DIRECTLY"
+    }
+  }
+}
