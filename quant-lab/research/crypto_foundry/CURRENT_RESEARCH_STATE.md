@@ -1,8 +1,8 @@
 # QUANT BOX — Crypto Quant Foundry Current Research State
 
-**Checkpoint:** `CRYPTO-DATA-0.1-TRUTH-REPAIR-AND-DATA1-PREREGISTRATION`
+**Checkpoint:** `CRYPTO-DATA-1.3-CANONICAL-FREEZE-AND-EVIDENCE-RECONCILIATION`
 **Branch:** `agent/crypto-quant-foundry`
-**Decision:** `PASS_TRUTH_REPAIRED_DATA1_PREREGISTERED`
+**Decision:** `PASS_CANONICAL_CRYPTO_DATA_FOUNDATION` (DATA-1 frozen)
 **Strategy research:** NOT STARTED
 **Execution:** NOT AUTHORIZED
 
@@ -11,6 +11,32 @@
 ### CRYPTO-0-PLANNING-ANCHOR ✅
 ### CRYPTO-DATA-0-VENUE-AND-MARKET-REALITY-AUDIT ✅
 ### CRYPTO-DATA-0.1-TRUTH-REPAIR-AND-DATA1-PREREGISTRATION ✅
+### CRYPTO-DATA-1-CANONICAL-COLLECTOR-FOUNDATION ✅ (PARTIAL as delivered; full closure in 1.2/1.3)
+### CRYPTO-DATA-1.1-BLOCKED-LANES-AND-TRUTH-CLOSURE ✅ (PARTIAL)
+### CRYPTO-DATA-1.2-FINAL-DATA-TRUTH-CLOSURE ✅ (PARTIAL — corrected)
+### **CRYPTO-DATA-1.3-CANONICAL-FREEZE-AND-EVIDENCE-RECONCILIATION ✅ (PASS — DATA-1 FROZEN)**
+
+## DATA-1 Freeze Summary (1.3)
+
+All canonical datasets have persisted raw evidence, nonzero manifests with
+sha256, and consistent quality status:
+
+| dataset | rows | status |
+|---|---|---|
+| bn_btcusdt_spot_5m / bn_ethusdt_spot_5m | 420,464 each | VALID |
+| hl_btc/eth_perp_state_5m | 5,041 / 5,040 | VALID |
+| hl_btc/eth_funding_hourly | 28,175 each | VALID |
+| eth_weth_usdc_swap | 1,057 | VALID |
+| eth_wbtc_usdc_swap | 205 | VALID |
+| base_weth_usdc_swap | 4,035 | VALID |
+| cbBTC/Base | — | DEMOTED_NO_SUITABLE_CANONICAL_POOL |
+
+Parity (Binance spot 1H vs Hyperliquid 1H, persisted): BTC 3,400 overlap,
+median -4.78 bps, corr 0.999998; ETH 3,400 overlap, median -4.70 bps,
+corr 0.999999.
+
+Freeze evidence object: `data_1/CRYPTO_DATA_FOUNDATION_FREEZE.json`.
+MECH-1 must consume only datasets listed there.
 
 ## Truth Repairs Applied (DATA-0.1)
 
