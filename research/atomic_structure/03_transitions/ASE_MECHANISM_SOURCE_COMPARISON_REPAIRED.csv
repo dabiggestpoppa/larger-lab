@@ -1,0 +1,9 @@
+claim,anchor,n,estimate,estimate_p10,estimate_p90,agreement_status,estimate_hold_touch,estimate_hold_close,ci95_hold_touch,ci95_hold_close,estimate_close,ci95_touch_reversal,ci95_close_reversal
+afternoon variance share ~10-15%,RV_AFTERNOON / RV_19_TO_17,442.0,0.3306490545040171,0.19462163554169273,0.4911811507907562,DISAGREE,,,,,,,
+afternoon variance share ~10-15%,RV_AFTERNOON / RV_19_TO_NEXT_03,442.0,0.29036265231961866,0.1689442783032473,0.4538861198036449,DISAGREE,,,,,,,
+afternoon variance share ~10-15%,RV_AFTERNOON / RV_24H_19_TO_19,442.0,0.3151438003367272,0.1798810775427585,0.47499028670070786,DISAGREE,,,,,,,
+T3 noon hold ~12% (no new pre-noon extreme after 12),"FULL_PRE_NOON anchor, T3, H17",61.0,,,,DISAGREE_UNDER_REPAIRED_DEFINITION,0.360655737704918,0.4426229508196722,"[0.252, 0.486]","[0.325, 0.567]",,,
+T3 noon hold ~12% (no new pre-noon extreme after 12),"FULL_PRE_NOON anchor, overall, H17",442.0,,,,DISAGREE_UNDER_REPAIRED_DEFINITION,0.23303167420814475,0.29864253393665163,"[0.196, 0.275]","[0.258, 0.343]",,,
+-25 opposite-band lock ~95.8% / reversal ~4.2%,"E25_CEREBUS_VALID touch completion, Tier 3",52.0,0.23076923076923078,,,DISAGREE_OVERALL_TIER_DEPENDENT,,,,,0.23076923076923078,"[0.137, 0.361]","[0.137, 0.361]"
+-25 opposite-band lock ~95.8% / reversal ~4.2%,"E25_CEREBUS_VALID touch completion, overall",404.0,0.5024752475247525,,,DISAGREE_OVERALL_TIER_DEPENDENT,,,,,0.48514851485148514,"[0.454, 0.551]","[0.437, 0.534]"
+one loop releases ~50% stored coil energy; 1.2 confirms activation; 1.44 recursive counter,SOURCE_CLAIM / MECHANISTIC_HYPOTHESIS,,,,,NOT_INDEPENDENTLY_TESTED_THIS_CHECKPOINT,,,,,,,

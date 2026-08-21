@@ -1,0 +1,96 @@
+{
+  "checkpoint": "ASE-2.2-NOON-AND-POST25-EVENT-GEOMETRY-REPAIR",
+  "base_commit": "7d712ccd66ef854f4efa1f8cf9d9501dde02a2c9",
+  "in_commit": "ASE_R2_2",
+  "status": "PARTIAL_TRANSITION_STRUCTURE",
+  "strategy_pnl_computed": false,
+  "optimization_performed": false,
+  "confirmation_consumed": false,
+  "holdout_consumed": false,
+  "ASE3_authorized": false,
+  "dataset": {
+    "path": ".exec-runtime/quant-lab/data/EURUSDPRO_M5_2023_2025.csv",
+    "filename": "EURUSDPRO_M5_2023_2025.csv",
+    "sha256": "46e81261f5799fdebb4a2d2aed045c91ad5f2bbe3324c0275cb3cc322f18b13b",
+    "timeframe": "M5",
+    "development_start": "2023-01-03",
+    "development_end": "2024-12-31",
+    "sessions": 442
+  },
+  "repair_summary": {
+    "noon_anchor": "FULL_PRE_NOON_DAY_RANGE (19:00 D-1 -> 12:00 D); LONDON_NY_MORNING_03_12 secondary",
+    "noon_price": "last completed M5 close before 12:00 (11:55 close); 12:00-12:05 bar excluded",
+    "horizons": ["12-17", "12-19", "12-next03"],
+    "E25_definition": "AsianHigh+0.25*AR / AsianLow-0.25*AR",
+    "E50_definition": "AsianHigh+0.50*AR / AsianLow-0.50*AR (ANOTHER_25_EXTENSION)",
+    "E100_definition": "AsianHigh+1.00*AR / AsianLow-1.00*AR",
+    "retouch_vs_extension": "E25_RETOUCH separate first-event candidate",
+    "bias_contracts": ["E25_RAW_FIRST_SIDE", "E25_CEREBUS_VALID (bias-lock)"],
+    "completion_variants": ["touch", "close_beyond"],
+    "same_bar_ambiguity": "SAME_BAR_ORDER_UNRESOLVED",
+    "variance_denominators": ["RV_19_TO_17", "RV_19_TO_NEXT_03", "RV_24H_19_TO_19"],
+    "boundary_first_return": "not counted inside segment RV"
+  },
+  "noon_lock_evidence": {
+    "H17_touch_hold": {"OVERALL": 0.233, "T1": 0.194, "T2": 0.223, "T3": 0.361},
+    "H17_close_hold": {"OVERALL": 0.299, "T3": 0.443},
+    "H03_touch_hold": {"OVERALL": 0.167}
+  },
+  "post25_evidence": {
+    "E25_CEREBUS_VALID_touch_opposite_touch": {"OVERALL": 0.502, "T1": 0.596, "T2": 0.476, "T3": 0.231},
+    "E25_CEREBUS_VALID_close_opposite_touch": {"OVERALL": 0.462},
+    "median_time_to_opposite_min": 255,
+    "first_event": {"E25_RETOUCH": 0.81, "E50_EXTENSION": 0.10, "ASIAN_MIDPOINT": 0.008, "SAME_BAR_UNRESOLVED": 0.08}
+  },
+  "variance_clock": {
+    "share_17_median": 0.331,
+    "share_next03_median": 0.290,
+    "share_24h_median": 0.315,
+    "range_share_17": 0.291,
+    "range_share_next03": 0.238
+  },
+  "r_lock": {
+    "up_spearman": -0.588,
+    "down_spearman": -0.536,
+    "up_bucket_order_corr": -0.965,
+    "down_bucket_order_corr": -0.994,
+    "n_days": 431,
+    "bootstrap_seed": 20260821,
+    "replicates": 2000
+  },
+  "remaining_range": {
+    "matched_hierarchy_vs_b0_mae_delta": {"03AM": -0.24, "06AM": -0.25, "09AM": -0.53, "12PM": -0.24, "ALL": -0.31},
+    "pct_dates_hierarchy_better": 0.399,
+    "bootstrap_prob_delta_positive": 0.0005,
+    "verdict": "hierarchy does NOT beat B0 out of sample"
+  },
+  "transition_scores": {
+    "T0_logloss": 0.6954,
+    "T1_logloss": 0.6957,
+    "T5_logloss": 0.7003,
+    "n": 10820,
+    "verdict": "richer state does not improve direction calibration"
+  },
+  "source_claim_comparison": {
+    "afternoon_variance_10_15": "DISAGREE (median shares 0.29-0.33)",
+    "T3_noon_hold_98": "DISAGREE_UNDER_REPAIRED_DEFINITION (T3 36.1% touch hold H17)",
+    "post25_lock_95.8": "DISAGREE_OVERALL_TIER_DEPENDENT (T3 reversal 23.1%, overall 50.2%)"
+  },
+  "evidence_matrix": {
+    "SCALE": "WEAK",
+    "NORMALIZATION": "PASS",
+    "STATE": "PARTIAL",
+    "TIME": "PARTIAL",
+    "CAUSALITY": "PASS"
+  },
+  "notes": [
+    "First-event ordering shows E25_RETOUCH dominates (81%) across both contracts.",
+    "Noon lock is strongly disproven at the FULL_PRE_NOON anchor; 83% of sessions violate by next 03:00.",
+    "Same-bar ambiguity resolved honestly: 8% of E25_CEREBUS_VALID touch events.",
+    "Variance audit: afternoon RV shares 0.29-0.33 across denominators, boundary returns excluded.",
+    "Walk-forward remaining-range hierarchy does not beat B0 on identical dates (bootstrap prob>0 = 0.0005).",
+    "Next-loop direction: all conditioned models have worse log loss than unconditional."
+  ],
+  "human_review_required": true,
+  "next_checkpoint_recommended": "NONE (ASE-3 remains unauthorized; PARTIAL_TRANSITION_STRUCTURE)"
+}
