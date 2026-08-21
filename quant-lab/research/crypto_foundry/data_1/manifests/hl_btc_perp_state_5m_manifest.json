@@ -1,0 +1,20 @@
+{
+  "dataset_id": "hl_btc_perp_state_5m",
+  "venue": "hyperliquid",
+  "market": "BTC-PERP",
+  "source": "hyperliquid_rest",
+  "source_endpoint_or_contract": "hyperliquid_rest_api",
+  "collector_version": "1.2.0",
+  "schema_version": "1.0.0",
+  "first_timestamp": null,
+  "last_timestamp": null,
+  "row_count": 0,
+  "sha256": null,
+  "created_at_utc": "2026-08-21T15:25:34.628517+00:00",
+  "duplicate_count": 0,
+  "missing_interval_summary": null,
+  "known_limitations": [
+    "DATA-1.2 final closure"
+  ],
+  "status": "PARTIAL"
+}

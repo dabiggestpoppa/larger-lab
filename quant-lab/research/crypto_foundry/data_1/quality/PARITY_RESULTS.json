@@ -1,0 +1,30 @@
+{
+  "BTC": {
+    "overlap_rows": 3400,
+    "first_overlap": "2026-01-25T06:00:00+00:00",
+    "last_overlap": "2026-06-15T21:00:00+00:00",
+    "median_basis_bps": -4.78,
+    "mean_basis_bps": -4.73,
+    "p95_abs_basis_bps": 7.09,
+    "p99_abs_basis_bps": 8.38,
+    "max_abs_basis_bps": 28.97,
+    "correlation": 0.999998,
+    "hl_count": 3403,
+    "bn_1h_count": 35040,
+    "status": "VALID"
+  },
+  "ETH": {
+    "overlap_rows": 3400,
+    "first_overlap": "2026-01-25T06:00:00+00:00",
+    "last_overlap": "2026-06-15T21:00:00+00:00",
+    "median_basis_bps": -4.7,
+    "mean_basis_bps": -4.69,
+    "p95_abs_basis_bps": 7.46,
+    "p99_abs_basis_bps": 9.02,
+    "max_abs_basis_bps": 24.68,
+    "correlation": 0.999999,
+    "hl_count": 3403,
+    "bn_1h_count": 35040,
+    "status": "VALID"
+  }
+}

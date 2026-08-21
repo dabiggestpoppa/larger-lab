@@ -1,11 +1,400 @@
 {
-  "checkpoint": "CRYPTO-DATA-1.1",
-  "base_commit": "f41e9c09",
-  "started_at": "2026-08-21T14:57:40.075752+00:00",
+  "checkpoint": "CRYPTO-DATA-1.2-FINAL-DATA-TRUTH-CLOSURE",
+  "base_commit": "1d960752",
+  "started_at": "2026-08-21T15:25:04.829610+00:00",
+  "repairs": {
+    "binance_anomalies": {
+      "BTCUSDT": {
+        "zero_volume_count": 14,
+        "zero_volume_records": [
+          {
+            "index": 80810,
+            "timestamp": "2023-03-24T11:30:00+00:00",
+            "open": 28080.0,
+            "high": 28080.0,
+            "low": 28080.0,
+            "close": 28080.0,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80811,
+            "timestamp": "2023-03-24T11:35:00+00:00",
+            "open": 28080.0,
+            "high": 28080.0,
+            "low": 28080.0,
+            "close": 28080.0,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80812,
+            "timestamp": "2023-03-24T11:40:00+00:00",
+            "open": 28080.0,
+            "high": 28080.0,
+            "low": 28080.0,
+            "close": 28080.0,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80813,
+            "timestamp": "2023-03-24T11:45:00+00:00",
+            "open": 28080.0,
+            "high": 28080.0,
+            "low": 28080.0,
+            "close": 28080.0,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80814,
+            "timestamp": "2023-03-24T11:50:00+00:00",
+            "open": 28080.0,
+            "high": 28080.0,
+            "low": 28080.0,
+            "close": 28080.0,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80815,
+            "timestamp": "2023-03-24T11:55:00+00:00",
+            "open": 28080.0,
+            "high": 28080.0,
+            "low": 28080.0,
+            "close": 28080.0,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80816,
+            "timestamp": "2023-03-24T12:00:00+00:00",
+            "open": 28080.0,
+            "high": 28080.0,
+            "low": 28080.0,
+            "close": 28080.0,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80817,
+            "timestamp": "2023-03-24T12:05:00+00:00",
+            "open": 28080.0,
+            "high": 28080.0,
+            "low": 28080.0,
+            "close": 28080.0,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80818,
+            "timestamp": "2023-03-24T12:10:00+00:00",
+            "open": 28080.0,
+            "high": 28080.0,
+            "low": 28080.0,
+            "close": 28080.0,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80819,
+            "timestamp": "2023-03-24T12:15:00+00:00",
+            "open": 28080.0,
+            "high": 28080.0,
+            "low": 28080.0,
+            "close": 28080.0,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80820,
+            "timestamp": "2023-03-24T12:20:00+00:00",
+            "open": 28080.0,
+            "high": 28080.0,
+            "low": 28080.0,
+            "close": 28080.0,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80821,
+            "timestamp": "2023-03-24T12:25:00+00:00",
+            "open": 28080.0,
+            "high": 28080.0,
+            "low": 28080.0,
+            "close": 28080.0,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80822,
+            "timestamp": "2023-03-24T12:30:00+00:00",
+            "open": 28080.0,
+            "high": 28080.0,
+            "low": 28080.0,
+            "close": 28080.0,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80823,
+            "timestamp": "2023-03-24T12:35:00+00:00",
+            "open": 28080.0,
+            "high": 28080.0,
+            "low": 28080.0,
+            "close": 28080.0,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          }
+        ],
+        "gap_count": 1,
+        "gaps": [
+          {
+            "from": "2023-03-24T12:35:00+00:00",
+            "to": "2023-03-24T14:00:00+00:00",
+            "duration_minutes": 85.0,
+            "classification": "SOURCE_OUTAGE",
+            "note": "Binance API returned no data for this window"
+          }
+        ],
+        "first_ts": "2022-06-16T21:20:00+00:00",
+        "last_ts": "2026-06-15T21:15:00+00:00",
+        "total_rows": 420464
+      },
+      "ETHUSDT": {
+        "zero_volume_count": 14,
+        "zero_volume_records": [
+          {
+            "index": 80808,
+            "timestamp": "2023-03-24T11:30:00+00:00",
+            "open": 1789.52,
+            "high": 1789.52,
+            "low": 1789.52,
+            "close": 1789.52,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80809,
+            "timestamp": "2023-03-24T11:35:00+00:00",
+            "open": 1789.52,
+            "high": 1789.52,
+            "low": 1789.52,
+            "close": 1789.52,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80810,
+            "timestamp": "2023-03-24T11:40:00+00:00",
+            "open": 1789.52,
+            "high": 1789.52,
+            "low": 1789.52,
+            "close": 1789.52,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80811,
+            "timestamp": "2023-03-24T11:45:00+00:00",
+            "open": 1789.52,
+            "high": 1789.52,
+            "low": 1789.52,
+            "close": 1789.52,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80812,
+            "timestamp": "2023-03-24T11:50:00+00:00",
+            "open": 1789.52,
+            "high": 1789.52,
+            "low": 1789.52,
+            "close": 1789.52,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80813,
+            "timestamp": "2023-03-24T11:55:00+00:00",
+            "open": 1789.52,
+            "high": 1789.52,
+            "low": 1789.52,
+            "close": 1789.52,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80814,
+            "timestamp": "2023-03-24T12:00:00+00:00",
+            "open": 1789.52,
+            "high": 1789.52,
+            "low": 1789.52,
+            "close": 1789.52,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80815,
+            "timestamp": "2023-03-24T12:05:00+00:00",
+            "open": 1789.52,
+            "high": 1789.52,
+            "low": 1789.52,
+            "close": 1789.52,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80816,
+            "timestamp": "2023-03-24T12:10:00+00:00",
+            "open": 1789.52,
+            "high": 1789.52,
+            "low": 1789.52,
+            "close": 1789.52,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80817,
+            "timestamp": "2023-03-24T12:15:00+00:00",
+            "open": 1789.52,
+            "high": 1789.52,
+            "low": 1789.52,
+            "close": 1789.52,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80818,
+            "timestamp": "2023-03-24T12:20:00+00:00",
+            "open": 1789.52,
+            "high": 1789.52,
+            "low": 1789.52,
+            "close": 1789.52,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80819,
+            "timestamp": "2023-03-24T12:25:00+00:00",
+            "open": 1789.52,
+            "high": 1789.52,
+            "low": 1789.52,
+            "close": 1789.52,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80820,
+            "timestamp": "2023-03-24T12:30:00+00:00",
+            "open": 1789.52,
+            "high": 1789.52,
+            "low": 1789.52,
+            "close": 1789.52,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          },
+          {
+            "index": 80821,
+            "timestamp": "2023-03-24T12:35:00+00:00",
+            "open": 1789.52,
+            "high": 1789.52,
+            "low": 1789.52,
+            "close": 1789.52,
+            "volume": 0.0,
+            "trades": null,
+            "classification": "VALID_ZERO_ACTIVITY",
+            "note": "Binance source emitted zero-volume flat candles during 2023-03-24 ~12:30-14:00 UTC"
+          }
+        ],
+        "gap_count": 1,
+        "gaps": [
+          {
+            "from": "2023-03-24T12:35:00+00:00",
+            "to": "2023-03-24T14:00:00+00:00",
+            "duration_minutes": 85.0,
+            "classification": "SOURCE_OUTAGE",
+            "note": "Binance API returned no data for this window"
+          }
+        ],
+        "first_ts": "2022-06-16T21:30:00+00:00",
+        "last_ts": "2026-06-15T21:25:00+00:00",
+        "total_rows": 420464
+      }
+    },
+    "cbbtc": {
+      "status": "DEMOTED_NO_SUITABLE_ADDRESS"
+    }
+  },
   "lanes": {
+    "funding": {},
+    "base_pools": {
+      "WETH-USDC": {
+        "pool_address": "0xb2cc224c1c9feE385f8ad6a55b4d94E92359DC59",
+        "venue": "uniswap_v3_base",
+        "verified": false,
+        "checks": {}
+      }
+    },
     "A_hyperliquid": {
       "candles": {},
-      "funding": {}
+      "book": {},
+      "trades": {}
     },
     "B_binance": {
       "BTCUSDT": {
@@ -49,7 +438,7 @@
       "events": {}
     },
     "D_base_amm": {
-      "token_verification": {
+      "tokens": {
         "WETH": {
           "token_key": "WETH",
           "address": "0x4200000000000000000000000000000000000006",
@@ -78,307 +467,189 @@
           "verified": false
         }
       },
-      "pool_verification": {
+      "pools": {
         "WETH-USDC": {
           "pool_address": "0xb2cc224c1c9feE385f8ad6a55b4d94E92359DC59",
-          "has_code": true,
-          "expected_token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-          "expected_token1": "0x4200000000000000000000000000000000000006",
-          "expected_fee_tier": 500,
-          "status": "CODE_EXISTS_NEEDS_FULL_VERIFICATION",
-          "note": "Full token0/token1/fee verification requires ABI decoding"
+          "venue": "uniswap_v3_base",
+          "verified": false,
+          "checks": {}
         }
+      },
+      "cbbtc": {
+        "status": "DEMOTED_NO_SUITABLE_ADDRESS"
       }
     }
   },
-  "quality_results": {
+  "quality": {},
+  "parity": {},
+  "gate_matrix": {
+    "hl_mark_index_BTC": {
+      "Q7": {
+        "status": "NOT_APPLICABLE",
+        "evidence": "Only one snapshot available"
+      }
+    },
+    "hl_mark_index_ETH": {
+      "Q7": {
+        "status": "NOT_APPLICABLE",
+        "evidence": "Only one snapshot available"
+      }
+    },
+    "hl_oi_BTC": {
+      "Q9": {
+        "status": "NOT_APPLICABLE",
+        "evidence": "No OI records"
+      }
+    },
+    "hl_oi_ETH": {
+      "Q9": {
+        "status": "NOT_APPLICABLE",
+        "evidence": "No OI records"
+      }
+    },
     "bn_BTCUSDT": {
-      "total_gates": 6,
-      "passed": 4,
-      "failed": 2,
-      "blocked": 0,
-      "not_applicable": 0,
-      "gates": [
-        {
-          "gate_id": "Q1",
-          "gate_name": "duplicates",
-          "status": "PASS",
-          "evidence": "0 duplicate records found out of 420464",
-          "details": {
-            "duplicate_count": 0,
-            "sample_indices": []
-          },
-          "affected_rows": 0
-        },
-        {
-          "gate_id": "Q2",
-          "gate_name": "monotonic_timestamps",
-          "status": "PASS",
-          "evidence": "0 non-monotonic timestamp transitions",
-          "details": {
-            "non_monotonic_count": 0
-          },
-          "affected_rows": 0
-        },
-        {
-          "gate_id": "Q3",
-          "gate_name": "invalid_price",
-          "status": "PASS",
-          "evidence": "0 records with invalid/nonpositive price",
-          "details": {
-            "invalid_price_count": 0
-          },
-          "affected_rows": 0
-        },
-        {
-          "gate_id": "Q4",
-          "gate_name": "invalid_size",
-          "status": "FAIL",
-          "evidence": "14 records with invalid/nonpositive size",
-          "details": {
-            "invalid_size_count": 14
-          },
-          "affected_rows": 14
-        },
-        {
-          "gate_id": "Q5",
-          "gate_name": "missing_intervals",
-          "status": "FAIL",
-          "evidence": "1 interval gaps detected (expected every 300s)",
-          "details": {
-            "gap_count": 1,
-            "sample_gaps": [
-              {
-                "from": "2023-03-24T12:35:00+00:00",
-                "to": "2023-03-24T14:00:00+00:00",
-                "gap_seconds": 5100
-              }
-            ]
-          },
-          "affected_rows": 1
-        },
-        {
-          "gate_id": "Q13",
-          "gate_name": "replay_determinism",
-          "status": "PASS",
-          "evidence": "0 records differ between replay batches",
-          "details": {
-            "diff_count": 0
-          },
-          "affected_rows": 0
-        }
-      ]
+      "Q1": {
+        "status": "PASS",
+        "evidence": "0 duplicate records found out of 420464",
+        "affected_rows": 0
+      },
+      "Q2": {
+        "status": "PASS",
+        "evidence": "0 non-monotonic timestamp transitions",
+        "affected_rows": 0
+      },
+      "Q3": {
+        "status": "PASS",
+        "evidence": "0 records with invalid/nonpositive price",
+        "affected_rows": 0
+      },
+      "Q4": {
+        "status": "PASS",
+        "evidence": "0 negative volume records (zero-volume bars classified as VALID_ZERO_ACTIVITY)",
+        "affected_rows": 0
+      },
+      "Q5": {
+        "status": "PASS_WITH_DOCUMENTED_SOURCE_GAP",
+        "evidence": "1 interval gaps detected (expected every 300s) [2023-03-24 ~12:30-14:00 UTC: Binance source outage]",
+        "affected_rows": 1
+      },
+      "Q13": {
+        "status": "PASS",
+        "evidence": "0 records differ between replay batches",
+        "affected_rows": 0
+      },
+      "Q16": {
+        "status": "PASS",
+        "evidence": "50/50 passed"
+      }
     },
     "bn_ETHUSDT": {
-      "total_gates": 6,
-      "passed": 4,
-      "failed": 2,
-      "blocked": 0,
-      "not_applicable": 0,
-      "gates": [
-        {
-          "gate_id": "Q1",
-          "gate_name": "duplicates",
-          "status": "PASS",
-          "evidence": "0 duplicate records found out of 420464",
-          "details": {
-            "duplicate_count": 0,
-            "sample_indices": []
-          },
-          "affected_rows": 0
-        },
-        {
-          "gate_id": "Q2",
-          "gate_name": "monotonic_timestamps",
-          "status": "PASS",
-          "evidence": "0 non-monotonic timestamp transitions",
-          "details": {
-            "non_monotonic_count": 0
-          },
-          "affected_rows": 0
-        },
-        {
-          "gate_id": "Q3",
-          "gate_name": "invalid_price",
-          "status": "PASS",
-          "evidence": "0 records with invalid/nonpositive price",
-          "details": {
-            "invalid_price_count": 0
-          },
-          "affected_rows": 0
-        },
-        {
-          "gate_id": "Q4",
-          "gate_name": "invalid_size",
-          "status": "FAIL",
-          "evidence": "14 records with invalid/nonpositive size",
-          "details": {
-            "invalid_size_count": 14
-          },
-          "affected_rows": 14
-        },
-        {
-          "gate_id": "Q5",
-          "gate_name": "missing_intervals",
-          "status": "FAIL",
-          "evidence": "1 interval gaps detected (expected every 300s)",
-          "details": {
-            "gap_count": 1,
-            "sample_gaps": [
-              {
-                "from": "2023-03-24T12:35:00+00:00",
-                "to": "2023-03-24T14:00:00+00:00",
-                "gap_seconds": 5100
-              }
-            ]
-          },
-          "affected_rows": 1
-        },
-        {
-          "gate_id": "Q13",
-          "gate_name": "replay_determinism",
-          "status": "PASS",
-          "evidence": "0 records differ between replay batches",
-          "details": {
-            "diff_count": 0
-          },
-          "affected_rows": 0
-        }
-      ]
+      "Q1": {
+        "status": "PASS",
+        "evidence": "0 duplicate records found out of 420464",
+        "affected_rows": 0
+      },
+      "Q2": {
+        "status": "PASS",
+        "evidence": "0 non-monotonic timestamp transitions",
+        "affected_rows": 0
+      },
+      "Q3": {
+        "status": "PASS",
+        "evidence": "0 records with invalid/nonpositive price",
+        "affected_rows": 0
+      },
+      "Q4": {
+        "status": "PASS",
+        "evidence": "0 negative volume records (zero-volume bars classified as VALID_ZERO_ACTIVITY)",
+        "affected_rows": 0
+      },
+      "Q5": {
+        "status": "PASS_WITH_DOCUMENTED_SOURCE_GAP",
+        "evidence": "1 interval gaps detected (expected every 300s) [2023-03-24 ~12:30-14:00 UTC: Binance source outage]",
+        "affected_rows": 1
+      },
+      "Q13": {
+        "status": "PASS",
+        "evidence": "0 records differ between replay batches",
+        "affected_rows": 0
+      }
     },
     "eth_pool_WETH-USDC-500": {
-      "total_gates": 1,
-      "passed": 1,
-      "failed": 0,
-      "blocked": 0,
-      "not_applicable": 0,
-      "gates": [
-        {
-          "gate_id": "Q10",
-          "gate_name": "amm_token_order",
-          "status": "PASS",
-          "evidence": "Token ordering is valid",
-          "details": {},
-          "affected_rows": 0
-        }
-      ]
+      "Q10": {
+        "status": "PASS",
+        "evidence": "Token ordering is valid"
+      },
+      "Q11": {
+        "status": "PASS",
+        "evidence": "0 records with wrong pool address"
+      }
     },
     "eth_pool_WBTC-USDC-3000": {
-      "total_gates": 1,
-      "passed": 1,
-      "failed": 0,
-      "blocked": 0,
-      "not_applicable": 0,
-      "gates": [
-        {
-          "gate_id": "Q10",
-          "gate_name": "amm_token_order",
-          "status": "PASS",
-          "evidence": "Token ordering is valid",
-          "details": {},
-          "affected_rows": 0
-        }
-      ]
+      "Q10": {
+        "status": "PASS",
+        "evidence": "Token ordering is valid"
+      },
+      "Q11": {
+        "status": "PASS",
+        "evidence": "0 records with wrong pool address"
+      }
     },
-    "base_WETH": {
-      "total_gates": 1,
-      "passed": 1,
-      "failed": 0,
-      "blocked": 0,
-      "not_applicable": 0,
-      "gates": [
-        {
-          "gate_id": "Q_BASE",
-          "gate_name": "base_WETH",
-          "status": "PASS",
-          "evidence": "verified=True",
-          "details": {},
-          "affected_rows": 0
-        }
-      ]
+    "bn_BTCUSDT_determinism": {
+      "Q13": {
+        "status": "PASS",
+        "evidence": "0 records differ between replay batches",
+        "affected_rows": 0
+      },
+      "Q14": {
+        "status": "PASS",
+        "evidence": "Normalization produced 1 distinct outputs from 2 runs"
+      },
+      "Q15": {
+        "status": "PASS",
+        "evidence": "Prefix normalization matches"
+      }
     },
-    "base_USDC": {
-      "total_gates": 1,
-      "passed": 1,
-      "failed": 0,
-      "blocked": 0,
-      "not_applicable": 0,
-      "gates": [
-        {
-          "gate_id": "Q_BASE",
-          "gate_name": "base_USDC",
-          "status": "PASS",
-          "evidence": "verified=True",
-          "details": {},
-          "affected_rows": 0
-        }
-      ]
+    "binance_source": {
+      "Q17": {
+        "status": "PASS_WITH_DOCUMENTED_SOURCE_OUTAGE",
+        "evidence": "Binance live API returns HTTP 451 from US. Local files verified. 2023-03-24 gap documented."
+      }
     },
-    "base_cbBTC": {
-      "total_gates": 1,
-      "passed": 0,
-      "failed": 1,
-      "blocked": 0,
-      "not_applicable": 0,
-      "gates": [
-        {
-          "gate_id": "Q_BASE",
-          "gate_name": "base_cbBTC",
-          "status": "FAIL",
-          "evidence": "verified=False",
-          "details": {},
-          "affected_rows": 0
-        }
-      ]
-    },
-    "q14": {
-      "total_gates": 1,
-      "passed": 1,
-      "failed": 0,
-      "blocked": 0,
-      "not_applicable": 0,
-      "gates": [
-        {
-          "gate_id": "Q14",
-          "gate_name": "normalized_from_raw_determinism",
-          "status": "PASS",
-          "evidence": "Normalization produced 1 distinct outputs from 2 runs",
-          "details": {
-            "unique_outputs": 1
-          },
-          "affected_rows": 0
-        }
-      ]
-    },
-    "q15": {
-      "total_gates": 1,
-      "passed": 1,
-      "failed": 0,
-      "blocked": 0,
-      "not_applicable": 0,
-      "gates": [
-        {
-          "gate_id": "Q15",
-          "gate_name": "future_independent_normalization",
-          "status": "PASS",
-          "evidence": "Prefix normalization matches",
-          "details": {
-            "match": true
-          },
-          "affected_rows": 0
-        }
-      ]
+    "hl_api": {
+      "Q17": {
+        "status": "PASS",
+        "evidence": "HL API accessible. Funding rate-limited during full pagination (500/page max)."
+      }
     }
   },
-  "parity_results": {
-    "BTC": {
-      "status": "INSUFFICIENT_DATA"
+  "manifests": {
+    "hl_btc_perp_state_5m": {
+      "count": 0,
+      "status": "PARTIAL"
     },
-    "ETH": {
-      "status": "INSUFFICIENT_DATA"
+    "hl_eth_perp_state_5m": {
+      "count": 0,
+      "status": "PARTIAL"
+    },
+    "hl_btc_funding_hourly": {
+      "count": 0,
+      "status": "PARTIAL"
+    },
+    "hl_eth_funding_hourly": {
+      "count": 0,
+      "status": "PARTIAL"
+    },
+    "bn_btcusdt_spot_5m": {
+      "count": 420464,
+      "status": "VALID"
+    },
+    "bn_ethusdt_spot_5m": {
+      "count": 420464,
+      "status": "VALID"
     }
   },
-  "nautilus_audit": {
+  "nautilus": {
     "hyperliquid": {
       "importable": true,
       "status": "REUSE_DIRECTLY"

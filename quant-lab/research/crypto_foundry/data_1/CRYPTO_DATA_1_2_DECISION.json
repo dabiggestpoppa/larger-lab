@@ -1,0 +1,69 @@
+{
+  "checkpoint": "CRYPTO-DATA-1.2-FINAL-DATA-TRUTH-CLOSURE",
+  "base_commit": "1d960752",
+  "decision": "PASS_CANONICAL_CRYPTO_DATA_FOUNDATION",
+  "historical_decisions": {
+    "DATA-1": "PARTIAL_CRYPTO_DATA_FOUNDATION",
+    "DATA-1.1": "PARTIAL_CRYPTO_DATA_FOUNDATION",
+    "DATA-1.2": "PASS_CANONICAL_CRYPTO_DATA_FOUNDATION"
+  },
+  "evidence": {
+    "btc_parity": {
+      "overlap_rows": 3400,
+      "median_bps": -4.78,
+      "correlation": 0.999998
+    },
+    "eth_parity": {
+      "overlap_rows": 3400,
+      "median_bps": -4.7,
+      "correlation": 0.999999
+    },
+    "hl_btc_funding": {
+      "count": 28173,
+      "first": "2023-05-12",
+      "last": "2026-08-21"
+    },
+    "hl_eth_funding": {
+      "count": 22500,
+      "first": "2023-05-12T00:00:00.048000+00:00",
+      "last": "2025-12-28T05:00:00.062000+00:00"
+    },
+    "hl_state": {
+      "BTC_candles": 2017,
+      "BTC_book_bids": 20,
+      "BTC_book_asks": 20,
+      "BTC_trades": 10,
+      "ETH_candles": 2017,
+      "ETH_book_bids": 20,
+      "ETH_book_asks": 20,
+      "ETH_trades": 10,
+      "BTC_mark": 77635.0,
+      "BTC_index": 77630.5,
+      "BTC_oi": 33906.87878,
+      "ETH_mark": 2399.4,
+      "ETH_index": 2398.65,
+      "ETH_oi": 913018.1635999999,
+      "eth_WETH-USDC-500_swaps": 0
+    },
+    "binance_anomalies": {
+      "zero_volume": 14,
+      "gaps": 1,
+      "classification": "SOURCE_OUTAGE"
+    },
+    "eth_pools": {
+      "WETH_USDC": "VERIFIED",
+      "WBTC_USDC": "VERIFIED"
+    },
+    "base": {
+      "WETH": "VERIFIED",
+      "USDC": "VERIFIED",
+      "cbbtc": "DEMOTED_NO_SUITABLE_ADDRESS"
+    }
+  },
+  "blocking_conditions": [],
+  "prohibited": {
+    "pnl": false,
+    "optimization": false,
+    "alpha": false
+  }
+}
