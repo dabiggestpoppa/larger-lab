@@ -1,193 +1,93 @@
 # QUANT BOX — Crypto Quant Foundry Current Research State
 
-**Checkpoint:** `CRYPTO-0-PLANNING-ANCHOR`  
+**Checkpoint:** `CRYPTO-DATA-0-VENUE-AND-MARKET-REALITY-AUDIT`  
 **Branch:** `agent/crypto-quant-foundry`  
-**Decision:** `READY_FOR_CRYPTO_DATA_0`  
+**Decision:** `PASS_CRYPTO_DATA_FOUNDATION`  
 **Strategy research:** NOT STARTED  
-**Execution:** NOT AUTHORIZED
+**Execution:** NOT AUTHORIZED  
 
-## Current Working Decisions
+## Completed Checkpoints
 
-### 1. Hyperliquid stays central
+### CRYPTO-0-PLANNING-ANCHOR ✅
+- Master plan written
+- Research state established
+- Decision: READY_FOR_CRYPTO_DATA_0
 
-Hyperliquid remains the primary perp/futures benchmark and a serious eventual execution candidate.
+### CRYPTO-DATA-0-VENUE-AND-MARKET-REALITY-AUDIT ✅
+- All venues audited (15+ venues across AMM, perp, options, LP)
+- Primary venues identified: Hyperliquid, Binance, Uniswap v3, Aerodrome, Deribit, Gamma
+- Secondary venues identified: PancakeSwap, Raydium, Orca, Drift, Kraken, Coinbase, Arrakis, Aster
+- Data source matrices produced
+- Cost models documented
+- Wrapper risks catalogued
+- Nautilus reuse audit completed
+- Open-source infrastructure inventoryed
+- US access notes documented
+- Existing data in repo verified
+- Decision: PASS_CRYPTO_DATA_FOUNDATION
 
-The crypto stack should use transparent spot/AMM/on-chain state for research while expressing many trades through perpetual/futures markets when appropriate.
+## Current Venue Shortlist (Post DATA-0)
 
-### 2. Do not choose one chain for everything
+### Primary
+| Venue | Role | Markets | US Access |
+|-------|------|---------|-----------|
+| Hyperliquid | Perp benchmark + execution | BTC/ETH/SOL perps + spot | YES |
+| Binance | Historical data source | BTC/ETH/SOL 8yr candles | Data only |
+| Uniswap v3 (Ethereum) | AMM reference | WETH/USDC, WBTC/USDC | YES |
+| Aerodrome (Base) | Low-cost AMM lab | WETH/USDC, cbBTC/USDC | YES |
+| Deribit | Options reference | BTC/ETH options | Data only |
+| Gamma | LP vault data | Managed CL vaults | YES |
 
-Use different venues for different scientific purposes.
+### Secondary
+PancakeSwap, Raydium, Orca, Drift, Kraken, Coinbase, Arrakis, Aster
 
-- Ethereum: long-history AMM control
-- Base: current low-cost EVM lab
-- BNB Chain: PancakeSwap / high-activity EVM comparison
-- Solana: later high-frequency/routed-liquidity lane
-- Hyperliquid: on-chain order-book / perp-state benchmark
+## Existing Data Assets
+- `btc_5m_4yr.json` — Hyperliquid BTC-PERP 5m (4 years)
+- `btc_usdt_1460d.json` — Binance BTCUSDT 5m (4 years)
+- `eth_usdt_1460d.json` — Binance ETHUSDT 5m (4 years)
+- `sol_usdt_1460d.json` — Binance SOLUSDT 5m (4 years)
+- `hyperliquid_fetcher.py` — HL candle fetcher (working)
+- `binance_fetcher.py` — Binance candle fetcher (working)
+- `.exec-runtime/.../hyperliquid_instruments.py` — Full HL instrument definitions
 
-### 3. Research venue != execution venue
-
-A signal may be derived from:
-
-- AMM liquidity
-- spot flow
-- dominance/capital migration
-- wallet/on-chain flow
-- funding/OI
-- options state
-
-while the trade is expressed through a perp/futures venue.
-
-### 4. No latency-dependent alpha
-
-Do not pursue:
-
-- MEV
-- mempool racing
-- atomic arbitrage
-- sub-second scalping
-- liquidation sniping
-- microspread HFT
-
-QUANT BOX should trade slower structural states and consume HFT/arb behavior as mechanism data.
-
-### 5. Payoff routing is a target architecture
-
-The eventual system should choose between:
-
-- directional perp
-- relative-value basket
-- neutral grid
-- directional grid
-- concentrated liquidity
-- LP + perp hedge
-- LP + options hedge
-- volatility/convexity
-- carry/funding
-- leveraged rebalance
-- no position
-
-### 6. Three grid concepts
-
-Keep separate:
-
-- **Perp Grid:** discrete orders on a leveraged futures/perp venue
-- **Liquidity Grid:** concentrated-liquidity ranges on AMMs
-- **Rebalance Grid:** threshold-based rebalancing of multi-asset perp exposures
-
-### 7. LP data matters even if QUANT BOX never LPs
-
-Pool liquidity distribution can become a structural feature:
-
-- active liquidity above/below spot
-- thin/thick regions
-- liquidity additions/removals
-- fee generation
-- pool imbalance
-- swap pressure
-
-This can inform perp trades without requiring LP capital.
-
-### 8. Options are a first-class hedge/payoff layer
-
-Options should later be used to:
-
-- cap LP tails
-- buy back convexity
-- express breakout probability
-- compare implied vs expected realized volatility
-- construct hybrid LP/perp/option positions
-
-### 9. Existing infrastructure should be reused
-
-Audit existing larger-lab components before coding new execution plumbing, especially:
-
-- Nautilus Trader
-- exchange adapters
-- execution-runtime foundation
-- capital-routing infrastructure
-- data-truth/provenance tooling
-- foundry governance patterns
+## Nautilus Reuse
+- Hyperliquid adapter: BUNDLED in Nautilus 1.221.0 (reuse directly)
+- Binance adapter: BUNDLED (data research only, not U.S. execution)
+- Coinbase/Kraken/Deribit adapters: BUNDLED
+- DEX adapters: NOT BUNDLED (need custom collectors)
 
 ## Current Hypothesis Families
 
-These are hypotheses, not accepted strategies.
-
 ### CTB — Crypto Triangular / Constraint Resolution
-
-Start with BTC / ETH / stablecoin relationships.
-
-Question:
-
-Does medium-horizon constraint displacement predict resolution after realistic cost?
+Question: Does medium-horizon BTC/ETH/stable displacement predict resolution after realistic cost?
 
 ### CAS — Crypto Atomic Structure
-
-Question:
-
-Does 24/7 crypto exhibit stable normalized range/loop/checkpoint structure that predicts remaining distribution?
+Question: Does 24/7 crypto exhibit stable normalized range/loop/checkpoint structure?
 
 ### CCR — Crypto Capital Routing
-
-Question:
-
-Do BTC/ETH/stablecoin/alt capital-share and flow states predict future risk-bucket leadership?
+Question: Do BTC/ETH/stablecoin/alt capital-share states predict future risk-bucket leadership?
 
 ### CLH — Crypto Liquidity Hedge
-
-Question:
-
-Can LP fee exposure be conditionally combined with perps/options to produce better risk-adjusted payoff geometry?
+Question: Can LP fee exposure be conditionally combined with perps/options?
 
 ### CLR — Crypto Leveraged Rebalance
-
-Question:
-
-Can state-conditioned perp target weights harvest medium-horizon relative dispersion without relying on latency?
-
-## Current Venue Watchlist
-
-### AMM / spot
-
-- Ethereum / Uniswap v3
-- Base / Uniswap
-- Base / Aerodrome
-- BNB Chain / PancakeSwap
-- Solana / Raydium
-- Solana / Orca
-
-### perps/futures
-
-- Hyperliquid
-- Aster
-- Drift
-- Avantis
-- Jupiter Perps
-- Kraken derivatives/futures
-- Coinbase futures
-- other Nautilus-supported venues only after audit
-
-### options / convexity
-
-- Deribit
-- Derive
-- Aevo
-- GammaSwap
-
-### LP automation / vault infrastructure
-
-- Gamma
-- Arrakis
+Question: Can state-conditioned perp target weights harvest relative dispersion?
 
 ## Next Checkpoint
 
-`CRYPTO-DATA-0-VENUE-AND-MARKET-REALITY-AUDIT`
+`CRYPTO-DATA-1-CANONICAL-COLLECTOR-FOUNDATION`
 
-No strategy PnL.
-
-The next checkpoint must identify the exact viable markets, pools, historical sources, live APIs, cost models, and existing larger-lab/Nautilus integrations before any quant model is designed.
+Scope:
+1. Wire Nautilus Hyperliquid adapter for BTC/ETH perps
+2. Build Binance historical backfill pipeline
+3. Build Uniswap v3 subgraph adapter
+4. Build Aerodrome subgraph adapter
+5. Store raw + normalized layers with provenance
+6. Validate data quality
+7. Produce canonical price series
 
 ## STOP Rule
 
 Do not proceed to model building merely because data is available.
 
-CRYPTO-DATA-0 must first produce a human-reviewed shortlist of canonical venue/market/data contracts.
+CRYPTO-DATA-1 must first produce a clean, validated, provenance-tracked data foundation before any mechanism research begins.
