@@ -1,0 +1,24 @@
+{
+  "status":"FROZEN_FOR_ASE1_1",
+  "generations": [
+    {
+      "id":"GENERATION_A",
+      "session_tier_logic":"Asian Range AR: T1 <20, T2 20-<30, T3 30-<=45, AR >45 NO-GO",
+      "active_loop_logic":"Uses the session-calibrated AU for the deterministic loop terrain",
+      "gear_shift_logic":"NOT_IN_GENERATION_A_CALIBRATION",
+      "ar_gate":"AR >45 is AR_NO_GO_STATE; retain census row, exclude calibration",
+      "au_rule":"AU_RAW=0.5*gated centroid; AU_OPERATIONAL=T1 10/T2 12/T3 15 pips",
+      "trigger_rule":"TRIGGER_RAW=1.2*AU_RAW; TRIGGER_OPERATIONAL=T1 12/T2 15/T3 19 pips"
+    },
+    {
+      "id":"LATER_CONFIGURATIONS",
+      "session_tier_logic":"May use later operational/source-specific boundaries",
+      "active_loop_logic":"May translate impulse mechanics into active-loop scale",
+      "gear_shift_logic":"May permit later impulse-driven gear transitions",
+      "ar_gate":"Not retrofitted into Generation-A",
+      "au_rule":"Not used for this repair",
+      "trigger_rule":"Not used for this repair"
+    }
+  ],
+  "isolation_rule":"Do not retrofit later gear-shift logic into Generation-A calibration."
+}

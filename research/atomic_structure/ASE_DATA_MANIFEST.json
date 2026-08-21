@@ -160,5 +160,14 @@
     ],
     "session_completeness_rule": "exactly 96 Asian bars + 168 03:00-17:00 outcome bars at 5-minute cadence"
   },
-  "data_mutation": false
+  "data_mutation": false,
+  "ase_1_1_repair": {
+    "ar_max_pips": 45.0,
+    "ar_max_operator": ">",
+    "calibration_excludes_nogo": true,
+    "calibration_sessions": 432,
+    "nogo_sessions": 10,
+    "confirmation_consumed": false,
+    "holdout_consumed": false
+  }
 }

@@ -1,0 +1,2 @@
+source,timezone,asian_start,asian_end,final_included_bar,excluded_boundary,assignment_rule,development_valid_sessions,session_contract_result
+EURUSDPRO_M5_2023_2025.csv,America/New_York,19:00,03:00,02:55,03:00 and later,19:00-23:55 -> following research date; 00:00-02:55 -> current date,442,PASS

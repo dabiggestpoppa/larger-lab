@@ -1,0 +1,14 @@
+{
+  "status":"DESCRIPTIVE_CONTRACT_REGISTRY",
+  "asset":"EURUSD",
+  "layers": {
+    "ATOMIC_TARGET":{"value":"AU_OPERATIONAL","values_by_tier":{"T1":10,"T2":12,"T3":15},"units":"pips"},
+    "KINETIC_TRIGGER":{"value":"TRIGGER_OPERATIONAL","values_by_tier":{"T1":12,"T2":15,"T3":19},"units":"pips"},
+    "DENSITY_ZONE":{"low_multiplier":0.8,"high_multiplier":1.2,"basis":"AU_OPERATIONAL"},
+    "SHIFT_CEILING":{"raw_multiplier":1.44,"basis":"AU_OPERATIONAL","status":"SOURCE_CLAIM"},
+    "DAILY_DISTRIBUTION_TARGET":{"status":"SEPARATE_HIGHER_ORDER_GEOMETRY","not_used_as_ASE1_tier_or_AU"},
+    "WEEKLY_DISTRIBUTION_TARGET":{"status":"SEPARATE_HIGHER_ORDER_GEOMETRY","not_used_as_ASE1_tier_or_AU"},
+    "AR_MAX":{"value_pips":45,"operator":">","state":"AR_NO_GO_STATE"}
+  },
+  "prohibition":"Do not use daily or weekly source-claim hit rates as empirical ASE evidence."
+}

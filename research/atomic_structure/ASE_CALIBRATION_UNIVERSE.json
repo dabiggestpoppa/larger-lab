@@ -1,0 +1,17 @@
+{
+  "status": "FROZEN_AFTER_REPRODUCTION",
+  "asset": "EURUSD",
+  "development_interval": {
+    "start": "2023-01-03",
+    "end": "2024-12-31"
+  },
+  "total_development_sessions": 442,
+  "valid_sessions": 442,
+  "nogo_sessions": 10,
+  "excluded_invalid_sessions": 0,
+  "calibration_sessions": 432,
+  "membership_rule": "valid development sessions with AR <= 45 pips; AR > 45 retained in census as AR_NO_GO_STATE",
+  "membership_sha256": "46e81261f5799fdebb4a2d2aed045c91ad5f2bbe3324c0275cb3cc322f18b13b",
+  "confirmation_consumed": false,
+  "holdout_consumed": false
+}

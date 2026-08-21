@@ -1,0 +1,4 @@
+tier,raw_cluster_centroid_pips,raw_cluster_boundary_pips,operational_ar_lower_pips,operational_ar_upper_pips,au_raw_pips,au_operational_pips,trigger_raw_pips,trigger_operational_pips,calibration_n
+T1,13.7136842105,18.1318421053,,20,6.8568421053,10,8.2282105263,12,190
+T2,22.55,28.5886363636,20,30,11.275,12,13.53,15,176
+T3,34.6272727273,,30,45,17.3136363636,15,20.7763636364,19,66

@@ -96,10 +96,27 @@ def assign_tier(vals, centroids):
     c = np.asarray(centroids,float); a = np.asarray(vals,float)
     return np.abs(a[:,None]-c[None,:]).argmin(1) + 1
 
+def generation_a_tier(ar_pips: float) -> str | None:
+    if not np.isfinite(ar_pips) or ar_pips > 45.0:
+        return None
+    if ar_pips < 20.0:
+        return 'T1'
+    if ar_pips < 30.0:
+        return 'T2'
+    return 'T3'
+
+
 def add_tiers(census: pd.DataFrame, centroids):
-    z = census.copy(); z['tier'] = assign_tier(z.asian_range.values, centroids)
+    z = census.copy()
+    z['session_ar_tier'] = z['asian_range'].map(generation_a_tier)
+    z['ar_no_go_state'] = z['asian_range'] > 45.0
+    z['tier'] = z['session_ar_tier'].map({'T1': 1, 'T2': 2, 'T3': 3})
     z['tier_centroid'] = z.tier.map({i+1:v for i,v in enumerate(centroids)})
-    z['AU'] = .5 * z.tier_centroid; z['trigger_AU'] = 1.2 * z.AU
+    z['au_raw'] = .5 * z.tier_centroid
+    z['au_operational'] = z.session_ar_tier.map({'T1': 10.0, 'T2': 12.0, 'T3': 15.0})
+    z['trigger_raw'] = 1.2 * z.au_raw
+    z['trigger_operational'] = z.session_ar_tier.map({'T1': 12.0, 'T2': 15.0, 'T3': 19.0})
+    z['AU'] = z.au_operational; z['trigger_AU'] = z.trigger_operational
     return z
 
 def first_hit_from_anchor(day, anchor_t, anchor, au_pips):

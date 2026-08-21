@@ -12,6 +12,8 @@ from run_ase1_terrain import (  # noqa: E402
     kmeans_1d,
     run_loops,
     three_am_state,
+    generation_a_classify,
+    AR_MAX_PIPS,
 )
 from strategy_foundry.atomic_structure.atomic_structure import first_hit_from_anchor  # noqa: E402
 
@@ -25,6 +27,16 @@ def test_fixed_session_date_boundary_semantics():
     idx = pd.Series(pd.to_datetime(['2024-01-02 18:55', '2024-01-02 19:00', '2024-01-03 02:55', '2024-01-03 03:00']).tz_localize('America/New_York'))
     out = fixed_session_date(idx)
     assert list(out) == [pd.Timestamp('2024-01-02').date(), pd.Timestamp('2024-01-03').date(), pd.Timestamp('2024-01-03').date(), pd.Timestamp('2024-01-03').date()]
+
+
+def test_generation_a_boundaries_and_nogo():
+    assert generation_a_classify(19.9) == ('T1', False)
+    assert generation_a_classify(20.0) == ('T2', False)
+    assert generation_a_classify(29.9) == ('T2', False)
+    assert generation_a_classify(30.0) == ('T3', False)
+    assert generation_a_classify(45.0) == ('T3', False)
+    assert generation_a_classify(45.0001) == (None, True)
+    assert AR_MAX_PIPS == 45.0
 
 
 def test_kmeans_and_assignment_are_deterministic():

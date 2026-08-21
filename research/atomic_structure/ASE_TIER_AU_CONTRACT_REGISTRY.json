@@ -1,0 +1,15 @@
+{
+  "status": "FROZEN_FOR_ASE1_1",
+  "asset": "EURUSD",
+  "generation": "GENERATION_A",
+  "ar_max": {"value_pips": 45.0, "operator": ">", "nogo": "AR > 45", "equality_fixture_conflict": true},
+  "tiers": [
+    {"id":"T1","ar_min_inclusive":null,"ar_max_exclusive":20.0,"au_raw_formula":"0.5 * gated_kmeans_centroid","au_operational_pips":10.0,"trigger_raw_formula":"1.2 * AU_RAW","trigger_operational_pips":12.0},
+    {"id":"T2","ar_min_inclusive":20.0,"ar_max_exclusive":30.0,"au_raw_formula":"0.5 * gated_kmeans_centroid","au_operational_pips":12.0,"trigger_raw_formula":"1.2 * AU_RAW","trigger_operational_pips":15.0},
+    {"id":"T3","ar_min_inclusive":30.0,"ar_max_inclusive":45.0,"au_raw_formula":"0.5 * gated_kmeans_centroid","au_operational_pips":15.0,"trigger_raw_formula":"1.2 * AU_RAW","trigger_operational_pips":19.0}
+  ],
+  "nogo": {"state":"AR_NO_GO_STATE","retained_in_master_census":true,"excluded_from_calibration":true,"ordinary_session_tier":null},
+  "density_zone": {"low_multiplier":0.8,"high_multiplier":1.2,"basis":"AU_OPERATIONAL"},
+  "shift_ceiling": {"raw_multiplier":1.44,"basis":"AU_OPERATIONAL","status":"SOURCE_CLAIM"},
+  "source_claims_not_empirical": ["one loop releases approximately 50% stored coil energy","1.2 confirms kinetic activation","1.44 recursive counter-move"]
+}

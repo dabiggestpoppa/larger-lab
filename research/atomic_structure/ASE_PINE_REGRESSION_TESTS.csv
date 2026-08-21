@@ -1,0 +1,13 @@
+fixture,expected_result,source_or_status
+AR=10,SESSION_AR_TIER=T1; AU_OPERATIONAL=10; TRIGGER_OPERATIONAL=12,Generation-A operational reference
+AR=18,SESSION_AR_TIER=T1; AU_OPERATIONAL=10; TRIGGER_OPERATIONAL=12,Generation-A operational reference
+AR=19.9,SESSION_AR_TIER=T1; AU_OPERATIONAL=10; TRIGGER_OPERATIONAL=12,Generation-A operational reference
+AR=20,SESSION_AR_TIER=T2; AU_OPERATIONAL=12; TRIGGER_OPERATIONAL=15,Generation-A operational reference
+AR=25,SESSION_AR_TIER=T2; AU_OPERATIONAL=12; TRIGGER_OPERATIONAL=15,Generation-A operational reference
+AR=29.9,SESSION_AR_TIER=T2; AU_OPERATIONAL=12; TRIGGER_OPERATIONAL=15,Generation-A operational reference
+AR=30,SESSION_AR_TIER=T3; AU_OPERATIONAL=15; TRIGGER_OPERATIONAL=19,Generation-A operational reference
+AR=38,SESSION_AR_TIER=T3; AU_OPERATIONAL=15; TRIGGER_OPERATIONAL=19,Generation-A operational reference
+AR=44.9,SESSION_AR_TIER=T3; AU_OPERATIONAL=15; TRIGGER_OPERATIONAL=19,Generation-A operational reference
+AR=45,CONTRACT AMBIGUITY: executable Generation-A source says T3; supplied fixture says NO-GO,Boundary audit resolves to executable source
+AR=50,AR_NO_GO_STATE=true; excluded from calibration,Generation-A gate
+AR=218.4,AR_NO_GO_STATE=true; excluded from calibration; census retained,Extreme-day audit

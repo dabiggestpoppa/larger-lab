@@ -158,10 +158,36 @@ def kmeans_1d(values: Iterable[float], k: int = 3) -> tuple[np.ndarray, np.ndarr
     return c, (c[:-1] + c[1:]) / 2.0, labels
 
 
+AR_MAX_PIPS = 45.0
+OPERATIONAL_TIERS = {
+    "T1": {"min": -np.inf, "max": 20.0, "au": 10.0, "trigger": 12.0},
+    "T2": {"min": 20.0, "max": 30.0, "au": 12.0, "trigger": 15.0},
+    "T3": {"min": 30.0, "max": 45.0, "au": 15.0, "trigger": 19.0},
+}
+
+
 def assign(values: Iterable[float], centroids: Iterable[float]) -> np.ndarray:
     a = np.asarray(list(values), dtype=float)
     c = np.asarray(list(centroids), dtype=float)
     return np.abs(a[:, None] - c[None, :]).argmin(axis=1) + 1
+
+
+def generation_a_classify(ar_pips: float) -> tuple[str | None, bool]:
+    """Return operational Generation-A tier and explicit AR_NO_GO state."""
+    if not np.isfinite(ar_pips) or ar_pips > AR_MAX_PIPS:
+        return None, True
+    if ar_pips < 20.0:
+        return "T1", False
+    if ar_pips < 30.0:
+        return "T2", False
+    return "T3", False
+
+
+def gated_kmeans(values: Iterable[float], k: int = 3) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    a = np.asarray(list(values), dtype=float)
+    calibration = a[np.isfinite(a) & (a <= AR_MAX_PIPS)]
+    c, bounds, labels = kmeans_1d(calibration, k)
+    return c, bounds, labels, calibration
 
 
 def stats(values: Iterable[float]) -> dict:
@@ -282,8 +308,11 @@ def build_daily(days: list[tuple[str, pd.DataFrame]], centroids: np.ndarray) -> 
         outcome = g[(local.dt.hour >= 3) & (local.dt.hour < 17)].sort_values("local")
         ah, al, ao, ac = float(asian.high.max()), float(asian.low.min()), float(asian.open.iloc[0]), float(asian.close.iloc[-1])
         ar = (ah - al) / PIP
-        tier = int(assign([ar], centroids)[0]); tier_centroid = float(centroids[tier - 1]); au_pips = .5 * tier_centroid
-        state = three_am_state(ao, ah, al, ac, au_pips)
+        operational_tier, ar_no_go = generation_a_classify(ar)
+        tier = int(assign([ar], centroids)[0]) if not ar_no_go else None
+        tier_centroid = float(centroids[tier - 1]) if tier is not None else np.nan
+        au_pips = OPERATIONAL_TIERS[operational_tier]["au"] if operational_tier else np.nan
+        state = three_am_state(ao, ah, al, ac, au_pips) if operational_tier else "AR_NO_GO_STATE"
         def range_at(hour: int) -> float:
             z = post[post["local"].dt.hour < hour]
             return (max(ah, float(z.high.max())) - min(al, float(z.low.min()))) / PIP if len(z) else ar
@@ -296,7 +325,7 @@ def build_daily(days: list[tuple[str, pd.DataFrame]], centroids: np.ndarray) -> 
         for c in post.close:
             if c > ac: first_dir = "UP"; break
             if c < ac: first_dir = "DOWN"; break
-        day_loops = run_loops(post, ac, au_pips, date, tier, state, balance_bucket(bal))
+        day_loops = run_loops(post, ac, au_pips, date, tier, state, balance_bucket(bal)) if operational_tier else []
         loops.extend(day_loops)
         if len(day_loops):
             first_completion = next((e["failure_time"] if False else e["reset_time"] for e in day_loops if e["completed_1_AU"]), None)
@@ -306,24 +335,26 @@ def build_daily(days: list[tuple[str, pd.DataFrame]], centroids: np.ndarray) -> 
         cum_lo = outcome.low.cummin().clip(upper=al)
         final_candidates = outcome[(cum_hi >= final_hi) & (cum_lo <= final_lo)]
         final_ts = final_candidates.iloc[0]["local"] if len(final_candidates) else (outcome.iloc[-1]["local"] if len(outcome) else None)
-        daily.append({"date": date, "symbol": "EURUSD", "source_timeframe": "M5", "asian_range": ar, "asian_high": ah, "asian_low": al, "asian_mid": (ah + al) / 2, "asian_close": ac, "tier": tier, "tier_centroid": tier_centroid, "AU": au_pips, "trigger_AU": 1.2 * au_pips, "range_3am": ar, "range_6am": r6, "range_9am": r9, "range_12pm": r12, "final_range": final, "completion_6am": r6 / final if final else np.nan, "completion_9am": r9 / final if final else np.nan, "completion_12pm": r12 / final if final else np.nan, "distribution_deficit_6am": 1 - r6 / final if final else np.nan, "distribution_deficit_9am": 1 - r9 / final if final else np.nan, "distribution_deficit_12pm": 1 - r12 / final if final else np.nan, "time_completion_6am": 1 / 3, "time_completion_9am": 2 / 3, "time_completion_12pm": 1.0, "max_up_from_3am": up, "max_down_from_3am": down, "max_up_AU": up / au_pips if au_pips else np.nan, "max_down_AU": down / au_pips if au_pips else np.nan, "first_direction": first_dir, "directional_up_range": up, "directional_down_range": down, "directional_balance": bal, "directional_balance_bucket": balance_bucket(bal), "loop_count": len(day_loops), "time_of_first_loop_completion": first_completion, "time_of_daily_distribution_completion": iso(final_ts), "daily_distribution_size_AU": final / au_pips if au_pips else np.nan, "hard_exit_state": "TERMINAL_12PM", "data_validity": "VALID", "initial_3am_state": state})
+        daily.append({"date": date, "symbol": "EURUSD", "source_timeframe": "M5", "asian_range": ar, "asian_high": ah, "asian_low": al, "asian_mid": (ah + al) / 2, "asian_close": ac, "tier": tier, "session_ar_tier": operational_tier, "active_loop_tier": tier, "gear_shift_tier": None, "ar_no_go_state": bool(ar_no_go), "tier_centroid": tier_centroid, "au_raw": .5 * tier_centroid if tier is not None else np.nan, "au_operational": au_pips, "AU": au_pips, "trigger_raw": 1.2 * (.5 * tier_centroid) if tier is not None else np.nan, "trigger_operational": OPERATIONAL_TIERS[operational_tier]["trigger"] if operational_tier else np.nan, "trigger_AU": OPERATIONAL_TIERS[operational_tier]["trigger"] if operational_tier else np.nan, "range_3am": ar, "range_6am": r6, "range_9am": r9, "range_12pm": r12, "final_range": final, "completion_6am": r6 / final if final else np.nan, "completion_9am": r9 / final if final else np.nan, "completion_12pm": r12 / final if final else np.nan, "distribution_deficit_6am": 1 - r6 / final if final else np.nan, "distribution_deficit_9am": 1 - r9 / final if final else np.nan, "distribution_deficit_12pm": 1 - r12 / final if final else np.nan, "time_completion_6am": 1 / 3, "time_completion_9am": 2 / 3, "time_completion_12pm": 1.0, "max_up_from_3am": up, "max_down_from_3am": down, "max_up_AU": up / au_pips if au_pips else np.nan, "max_down_AU": down / au_pips if au_pips else np.nan, "first_direction": first_dir, "directional_up_range": up, "directional_down_range": down, "directional_balance": bal, "directional_balance_bucket": balance_bucket(bal), "loop_count": len(day_loops), "time_of_first_loop_completion": first_completion, "time_of_daily_distribution_completion": iso(final_ts), "daily_distribution_size_AU": final / au_pips if au_pips else np.nan, "hard_exit_state": "TERMINAL_12PM", "data_validity": "VALID", "initial_3am_state": state})
     return pd.DataFrame(daily), pd.DataFrame(loops)
 
 
 def tier_artifacts(census: pd.DataFrame, out: Path) -> tuple[np.ndarray, dict]:
-    c, bounds, labels = kmeans_1d(census.asian_range)
-    census["tier"] = labels
+    c, bounds, calibration_labels, calibration = gated_kmeans(census.asian_range)
+    census["tier"] = [int(assign([v], c)[0]) if np.isfinite(v) and v <= AR_MAX_PIPS else np.nan for v in census.asian_range]
+    census["ar_no_go_state"] = census.asian_range > AR_MAX_PIPS
     discovery = []
-    sil = float(silhouette_score(census[["asian_range"]], labels)) if len(set(labels)) > 1 else None
+    calibration_labels = assign(calibration, c)
+    sil = float(silhouette_score(np.asarray(calibration).reshape(-1, 1), calibration_labels)) if len(set(calibration_labels)) > 1 else None
     for i, centroid in enumerate(c, 1):
-        vals = census.loc[census.tier == i, "asian_range"]
+        vals = census.loc[(census.tier == i) & (~census.ar_no_go_state), "asian_range"]
         discovery.append({"artifact": "KMEANS", "tier": i, "centroid_pips": centroid, "lower_cutoff_pips": None if i == 1 else bounds[i - 2], "upper_cutoff_pips": None if i == 3 else bounds[i - 1], "cluster_size": len(vals), "cluster_fraction": len(vals) / len(census), "within_sd_pips": vals.std(ddof=0), "silhouette": sil, "init_policy": "quantile_0.2_0.5_0.8", "seed": 42})
     for q in [.1, .25, .5, .75, .9]: discovery.append({"artifact": "QUANTILE", "tier": "DISTRIBUTION", "quantile": q, "centroid_pips": census.asian_range.quantile(q), "cluster_size": len(census)})
     hist, edges = np.histogram(census.asian_range, bins="fd")
     for n, (left, right) in enumerate(zip(edges[:-1], edges[1:])): discovery.append({"artifact": "HISTOGRAM", "tier": "BIN", "bin": n, "lower_pips": left, "upper_pips": right, "count": int(hist[n])})
     pd.DataFrame(discovery).to_csv(out / "ASE_TIER_DISCOVERY.csv", index=False)
-    separation = float(np.min(np.diff(c))) / float(np.std(census.asian_range, ddof=0))
-    return c, {"centroids_pips": c.tolist(), "cutoffs_pips": bounds.tolist(), "silhouette": sil, "within_cluster_dispersion_pips": [float(census.loc[census.tier == i, "asian_range"].std(ddof=0)) for i in (1, 2, 3)], "between_cluster_separation_normalized": separation, "quantiles": {str(q): float(census.asian_range.quantile(q)) for q in [.1, .25, .5, .75, .9]}, "shape_note": "histogram bins recorded; no KDE or outcome selection"}
+    separation = float(np.min(np.diff(c))) / float(np.std(calibration, ddof=0))
+    return c, {"centroids_pips": c.tolist(), "cutoffs_pips": bounds.tolist(), "silhouette": sil, "within_cluster_dispersion_pips": [float(census.loc[(census.tier == i) & (~census.ar_no_go_state), "asian_range"].std(ddof=0)) for i in (1, 2, 3)], "between_cluster_separation_normalized": separation, "quantiles": {str(q): float(pd.Series(calibration).quantile(q)) for q in [.1, .25, .5, .75, .9]}, "shape_note": "histogram bins recorded; no KDE or outcome selection", "calibration_sessions": int(len(calibration)), "nogo_sessions": int(census.ar_no_go_state.sum())}
 
 
 def stability(census: pd.DataFrame, out: Path, centroids: np.ndarray):
@@ -332,9 +363,10 @@ def stability(census: pd.DataFrame, out: Path, centroids: np.ndarray):
     independent = {}
     for year in years:
         part = census[census.date.str.startswith(year)]
-        cc, bb, ll = kmeans_1d(part.asian_range)
+        cc, bb, ll = kmeans_1d(part.loc[part.asian_range <= AR_MAX_PIPS, "asian_range"])
         independent[year] = cc
-        for i in range(3): rows.append({"test": "SUBPERIOD_REDISCOVERY", "period": year, "tier": i + 1, "centroid_pips": cc[i], "cutoff_pips": None if i == 2 else bb[i], "cluster_fraction": float((ll == i + 1).mean()), "sample_size": len(part)})
+        calibration_part = part.loc[part.asian_range <= AR_MAX_PIPS, "asian_range"]
+        for i in range(3): rows.append({"test": "SUBPERIOD_REDISCOVERY", "period": year, "tier": i + 1, "centroid_pips": cc[i], "cutoff_pips": None if i == 2 else bb[i], "cluster_fraction": float((ll == i + 1).mean()), "sample_size": len(calibration_part), "nogo_excluded": int((part.asian_range > AR_MAX_PIPS).sum())})
     if len(years) >= 2:
         early, late = years[0], years[-1]
         later = census[census.date.str.startswith(late)].copy()
@@ -452,7 +484,15 @@ def causal_audit(x: pd.DataFrame, days: list[tuple[str,pd.DataFrame]], centroids
     future_pass=sig(before)==sig(after)
     tail=x[x.index <= cutoff]; tail_days,_=valid_day_groups(tail,"2023-01-01","2024-12-31"); tail_daily,_=build_daily(tail_days,centroids); tail_pass=sig(before)==sig(tail_daily[tail_daily.date < "2024-06-28"])
     head_cut=pd.Timestamp("2023-07-01",tz=UTC); head=x[x.index >= head_cut]; head_days,_=valid_day_groups(head,"2023-01-01","2024-12-31"); head_daily,_=build_daily(head_days,centroids); prefix=base[base.date >= "2023-07-03"]; head_prefix=head_daily[head_daily.date >= "2023-07-03"]; head_pass=sig(prefix)==sig(head_prefix)
-    stream=pd.concat([build_daily([item],centroids)[0] for item in days],ignore_index=True); prefix_pass=sig(base)==sig(stream)
+    # Incremental/batch parity compares the same repaired contract fields;
+    # build_daily's intermediate `tier` is raw cluster assignment, so apply
+    # the operational namespace before hashing.
+    stream=pd.concat([build_daily([item],centroids)[0] for item in days],ignore_index=True)
+    for frame in (base, stream):
+        frame["session_ar_tier"] = frame.apply(lambda r: generation_a_classify(float(r["asian_range"]))[0], axis=1)
+        frame["ar_no_go_state"] = frame["asian_range"] > AR_MAX_PIPS
+        frame["tier"] = frame["session_ar_tier"].map({"T1":1,"T2":2,"T3":3})
+    prefix_pass=sig(base)==sig(stream)
     return {"future_perturbation_invariance":"PASS" if future_pass else "FAIL", "tail_truncation_invariance":"PASS" if tail_pass else "FAIL", "head_truncation_invariance":"PASS" if head_pass else "FAIL", "prefix_consistency":"PASS" if prefix_pass else "FAIL", "current_bar_rule":"PASS_COMPLETED_M5_ONLY", "daily_reset":"PASS_EXPLICIT_SESSION_DATE", "cutoff_utc":iso(cutoff), "comparison_scope":"development only; fixed centroids; no 2025/2026 state calculations"}
 
 
@@ -475,6 +515,18 @@ def main():
         local=g.local; a=g[(local.dt.hour>=19)|(local.dt.hour<3)]; raw_census.append({"date":date,"asian_range":(float(a.high.max())-float(a.low.min()))/PIP})
     raw_census=pd.DataFrame(raw_census); centroids, tier_info=tier_artifacts(raw_census,out)
     census, loops=build_daily(raw_days,centroids)
+    census["session_ar_tier"] = census.apply(lambda r: generation_a_classify(float(r["asian_range"]))[0], axis=1)
+    census["ar_no_go_state"] = census["asian_range"] > AR_MAX_PIPS
+    census["au_raw"] = census["tier_centroid"].astype(float) * 0.5
+    census["au_operational"] = census["session_ar_tier"].map({k:v["au"] for k,v in OPERATIONAL_TIERS.items()})
+    census["trigger_raw"] = census["au_raw"] * 1.2
+    census["trigger_operational"] = census["session_ar_tier"].map({k:v["trigger"] for k,v in OPERATIONAL_TIERS.items()})
+    census["tier"] = census["session_ar_tier"].map({"T1":1,"T2":2,"T3":3})
+    census["AU"] = census["au_operational"]
+    census["trigger_AU"] = census["trigger_operational"]
+    loops["session_ar_tier"] = loops["date"].map(census.set_index("date")["session_ar_tier"])
+    loops["active_loop_tier"] = loops["tier_at_start"].map({1:"T1",2:"T2",3:"T3"})
+    loops["gear_shift_tier"] = None
     # Reapply the frozen discovery labels and ensure the source census matches
     # the downstream rows exactly.
     census.to_parquet(out/"ASE_DAILY_ATOMIC_CENSUS.parquet",index=False)
@@ -503,7 +555,7 @@ def main():
     time_summary = {str(r["checkpoint"]): {"median_remaining_pips": float(r["median"]), "iqr": float(r["iqr"]), "variance": float(r["variance"])} for _, r in pd.read_csv(out / "ASE_UNCERTAINTY_REDUCTION.csv").query("conditioning == 'TIME_ONLY'").iterrows()}
     # Compact machine-readable decision.  Evidence category labels are filled
     # from transparent terrain diagnostics, not from a performance objective.
-    tier_fractions = census.tier.value_counts(normalize=True)
+    tier_fractions = census.loc[~census.ar_no_go_state, "session_ar_tier"].value_counts(normalize=True)
     scale = "PASS" if tier_info["silhouette"] is not None and tier_info["silhouette"] > 0.2 and tier_fractions.min() >= 0.05 else "WEAK"
     pair_rows = [r for r in norm if r.get("group_type") == "tier_pair_wasserstein"]
     norm_flag = "PASS" if pair_rows and sum(r["au_wasserstein"] < r["raw_wasserstein"] for r in pair_rows) >= len(pair_rows) * 0.66 else "WEAK"

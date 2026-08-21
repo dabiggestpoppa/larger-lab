@@ -1,0 +1,4 @@
+tier,centroid_pips,au_raw_pips,au_operational_pips,au_transform_rule,trigger_raw_pips,trigger_operational_pips,trigger_transform_rule,density_zone_low,density_zone_high,shift_raw_multiplier
+T1,13.7136842105,6.8568421053,10,source operational EURUSD mapping,8.2282105263,12,source operational EURUSD mapping,8,12,1.44
+T2,22.55,11.275,12,source operational EURUSD mapping,13.53,15,source operational EURUSD mapping,9.6,14.4,1.44
+T3,34.6272727273,17.3136363636,15,source operational EURUSD mapping,20.7763636364,19,source operational EURUSD mapping,12,18,1.44

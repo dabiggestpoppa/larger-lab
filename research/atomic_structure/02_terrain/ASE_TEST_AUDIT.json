@@ -2,7 +2,7 @@
   "checkpoint": "ASE-1-EMPIRICAL-ATOMIC-TERRAIN-SEAL",
   "data_source": "M5",
   "development_days": 442,
-  "loops": 12565,
+  "loops": 11252,
   "unit_tests": {
     "total": 19,
     "passed": 19,
