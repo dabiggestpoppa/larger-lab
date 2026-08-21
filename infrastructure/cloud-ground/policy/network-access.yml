@@ -1,5 +1,5 @@
 # OCE Cloud Ground — Network Access Policy
-# B1-I1 — Static data (enforcement deferred to B1-I2+)
+# B1-I1R3A — Expanded worker denials for postgresql, redis, ssh, docker
 # Document: B1-ARCH-TRUST-001
 # Ratified: Block 1 Cloud Ground Plan 1.0
 
@@ -41,8 +41,9 @@ zones:
     allowed_services: [object-storage]
     trust_level: write-only, backup-scope
 
-# Access rules
+# Access rules — 14 worker denials (3 classes × 4 services) + admin rules
 rules:
+  # === worker-local denials ===
   - from: worker-local
     to: postgresql
     action: DENY
@@ -53,6 +54,17 @@ rules:
     action: DENY
     reason: "Workers never receive direct cache access"
 
+  - from: worker-local
+    to: ssh
+    action: DENY
+    reason: "Workers never access host SSH"
+
+  - from: worker-local
+    to: docker
+    action: DENY
+    reason: "Workers never access Docker daemon"
+
+  # === worker-burst denials ===
   - from: worker-burst
     to: postgresql
     action: DENY
@@ -63,6 +75,17 @@ rules:
     action: DENY
     reason: "Burst workers are untrusted, no cache access"
 
+  - from: worker-burst
+    to: ssh
+    action: DENY
+    reason: "Burst workers never access host SSH"
+
+  - from: worker-burst
+    to: docker
+    action: DENY
+    reason: "Burst workers never access Docker daemon"
+
+  # === worker-windows denials ===
   - from: worker-windows
     to: postgresql
     action: DENY
@@ -71,13 +94,25 @@ rules:
   - from: worker-windows
     to: redis
     action: DENY
-    reason: "Windows worker is isolated from control plane data"
+    reason: "Windows worker is isolated from control plane cache"
 
+  - from: worker-windows
+    to: ssh
+    action: DENY
+    reason: "Windows worker never accesses host SSH"
+
+  - from: worker-windows
+    to: docker
+    action: DENY
+    reason: "Windows worker never accesses Docker daemon"
+
+  # === backup denials ===
   - from: backup
     to: postgresql
     action: DENY
     reason: "Backup uses WAL archive, not direct DB connection"
 
+  # === worker isolation ===
   - from: worker-local
     to: worker-burst
     action: DENY
@@ -87,12 +122,6 @@ rules:
 public_access:
   enabled: false
   approved_services: []
-  # Future: if Caddy is approved for public UI/API
-  # approved_services:
-  #   - service: caddy
-  #     ports: [80, 443]
-  #     owner: operator
-  #     review_date: TBD
 
 # Firewall
 firewall:
@@ -102,7 +131,8 @@ firewall:
     - port: 22
       source: tailscale
       protocol: tcp
-  # No other inbound ports allowed during Block 1
+      interface: tailscale0
+      description: "SSH through Tailscale only"
 
 # Enforcement state
 enforcement:
@@ -110,4 +140,4 @@ enforcement:
   consumer: "Ansible UFW role (B1-I2+), Docker network config"
   verified: false
   verification_date: null
-  notes: "B1-I1 creates the policy specification. Enforcement is applied during B1-I2 host baseline."
+  notes: "B1-I1R3A expanded worker denials to cover SSH and Docker."

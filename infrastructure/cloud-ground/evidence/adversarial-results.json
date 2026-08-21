@@ -1,0 +1,224 @@
+{
+  "schema_version": "3.0.0",
+  "suite": "B1-I1R3A-adversarial",
+  "timestamp": "2026-08-21T17:09:41Z",
+  "totals": {
+    "total": 23,
+    "PASS": 23,
+    "FAIL": 0
+  },
+  "suite_result": "PASS",
+  "tests": [
+    {
+      "test_id": "ID-01",
+      "description": "Wrong repo owner",
+      "result": "PASS",
+      "expected_check": "SOURCE-IDENTITY",
+      "observed_check": "FAIL",
+      "validator_exit": 0,
+      "reason": "Mutation detected, restored, baseline clean"
+    },
+    {
+      "test_id": "ID-02",
+      "description": "Wrong repo name",
+      "result": "PASS",
+      "expected_check": "SOURCE-IDENTITY",
+      "observed_check": "FAIL",
+      "validator_exit": 0,
+      "reason": "Mutation detected, restored, baseline clean"
+    },
+    {
+      "test_id": "ID-03",
+      "description": "Wrong authorized branch",
+      "result": "PASS",
+      "expected_check": "SOURCE-IDENTITY",
+      "observed_check": "FAIL",
+      "validator_exit": 0,
+      "reason": "Mutation detected, restored, baseline clean"
+    },
+    {
+      "test_id": "ID-04",
+      "description": "Wrong authoritative base SHA",
+      "result": "PASS",
+      "expected_check": "SOURCE-IDENTITY",
+      "observed_check": "FAIL",
+      "validator_exit": 0,
+      "reason": "Mutation detected, restored, baseline clean"
+    },
+    {
+      "test_id": "ID-05",
+      "description": "Wrong expected project root",
+      "result": "PASS",
+      "expected_check": "SOURCE-IDENTITY",
+      "observed_check": "FAIL",
+      "validator_exit": 0,
+      "reason": "Mutation detected, restored, baseline clean"
+    },
+    {
+      "test_id": "ID-06",
+      "description": "Wrong accepted origins",
+      "result": "PASS",
+      "expected_check": "SOURCE-IDENTITY",
+      "observed_check": "FAIL",
+      "validator_exit": 0,
+      "reason": "Mutation detected, restored, baseline clean"
+    },
+    {
+      "test_id": "ID-07",
+      "description": "Crypto Data commit as expected SHA",
+      "result": "PASS",
+      "expected_check": "SOURCE-IDENTITY",
+      "observed_check": "FAIL",
+      "validator_exit": 0,
+      "reason": "Mutation detected, restored, baseline clean"
+    },
+    {
+      "test_id": "ID-08",
+      "description": "Wrong repository full_name",
+      "result": "PASS",
+      "expected_check": "SOURCE-IDENTITY",
+      "observed_check": "FAIL",
+      "validator_exit": 0,
+      "reason": "Mutation detected, restored, baseline clean"
+    },
+    {
+      "test_id": "ID-09",
+      "description": "Wrong expected tree SHA",
+      "result": "PASS",
+      "expected_check": "SOURCE-IDENTITY",
+      "observed_check": "FAIL",
+      "validator_exit": 0,
+      "reason": "Mutation detected, restored, baseline clean"
+    },
+    {
+      "test_id": "CM-01",
+      "description": "PostgreSQL tag-only (no digest)",
+      "result": "PASS",
+      "expected_check": "DIGEST-LOCK",
+      "observed_check": "FAIL",
+      "validator_exit": 0,
+      "reason": "Mutation detected, restored, baseline clean"
+    },
+    {
+      "test_id": "CM-02",
+      "description": "Redis tag-only (no digest)",
+      "result": "PASS",
+      "expected_check": "DIGEST-LOCK",
+      "observed_check": "FAIL",
+      "validator_exit": 0,
+      "reason": "Mutation detected, restored, baseline clean"
+    },
+    {
+      "test_id": "CM-03",
+      "description": "Remove healthcheck from compose",
+      "result": "PASS",
+      "expected_check": "HEALTH-CHECKS",
+      "observed_check": "FAIL",
+      "validator_exit": 0,
+      "reason": "Mutation detected, restored, baseline clean"
+    },
+    {
+      "test_id": "CM-04",
+      "description": "Add :latest tag to PostgreSQL",
+      "result": "PASS",
+      "expected_check": "NO-LATEST-TAGS",
+      "observed_check": "FAIL",
+      "validator_exit": 0,
+      "reason": "Mutation detected, restored, baseline clean"
+    },
+    {
+      "test_id": "CM-05",
+      "description": "Remove security_opt from compose",
+      "result": "PASS",
+      "expected_check": "SECURITY-OPTS",
+      "observed_check": "FAIL",
+      "validator_exit": 0,
+      "reason": "Mutation detected, restored, baseline clean"
+    },
+    {
+      "test_id": "PL-01",
+      "description": "Remove a worker DENY rule",
+      "result": "PASS",
+      "expected_check": "WORKER-NO-DB",
+      "observed_check": "FAIL",
+      "validator_exit": 0,
+      "reason": "Mutation detected, restored, baseline clean"
+    },
+    {
+      "test_id": "PL-02",
+      "description": "Remove worker-local postgresql denial only",
+      "result": "PASS",
+      "expected_check": "WORKER-NO-DB",
+      "observed_check": "FAIL",
+      "validator_exit": 0,
+      "reason": "Mutation detected, restored, baseline clean"
+    },
+    {
+      "test_id": "PL-03",
+      "description": "Remove all SSH denials from policy",
+      "result": "PASS",
+      "expected_check": "WORKER-NO-DB",
+      "observed_check": "FAIL",
+      "validator_exit": 0,
+      "reason": "Mutation detected, restored, baseline clean"
+    },
+    {
+      "test_id": "PL-04",
+      "description": "Remove all Docker denials from policy",
+      "result": "PASS",
+      "expected_check": "WORKER-NO-DB",
+      "observed_check": "FAIL",
+      "validator_exit": 0,
+      "reason": "Mutation detected, restored, baseline clean"
+    },
+    {
+      "test_id": "EV-01",
+      "description": "Source identity wrong repository",
+      "result": "PASS",
+      "expected_check": "SOURCE-IDENTITY",
+      "observed_check": "FAIL",
+      "mutation_type": "identity_swap",
+      "validator_exit": 0,
+      "reason": "Correctly rejected wrong repo"
+    },
+    {
+      "test_id": "EV-02",
+      "description": "Evidence wrong commit",
+      "result": "PASS",
+      "expected_check": "EVIDENCE-CONSISTENCY",
+      "observed_check": "FAIL",
+      "mutation_type": "evidence_tamper",
+      "validator_exit": 0,
+      "reason": "Detected tampered commit"
+    },
+    {
+      "test_id": "EV-03",
+      "description": "Evidence wrong tree",
+      "result": "PASS",
+      "expected_check": "EVIDENCE-CONSISTENCY",
+      "observed_check": "FAIL",
+      "mutation_type": "evidence_tamper",
+      "validator_exit": 0,
+      "reason": "Detected wrong tree"
+    },
+    {
+      "test_id": "EV-04",
+      "description": "Evidence inconsistent totals",
+      "result": "PASS",
+      "expected_check": "EVIDENCE-CONSISTENCY",
+      "observed_check": "FAIL",
+      "mutation_type": "evidence_tamper",
+      "validator_exit": 0,
+      "reason": "Detected wrong totals"
+    },
+    {
+      "test_id": "ST-01",
+      "description": "Remove required fields from schema",
+      "result": "PASS",
+      "expected_check": "SCHEMA-FIXTURES",
+      "observed_check": "FAIL",
+      "validator_exit": 0,
+      "reason": "Mutation detected, restored, baseline clean"
+    }
+  ]
+}

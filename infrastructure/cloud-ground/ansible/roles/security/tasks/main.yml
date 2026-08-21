@@ -1,12 +1,12 @@
 ---
 # Security role — SSH hardening and firewall
-# B1-I1R — Repaired for operator safety
+# B1-I1R3A — Repaired for operator safety
 #
 # SAFETY: This role MUST NOT lock out the operator.
 # Password auth is disabled ONLY after key-based access is verified.
-# Firewall changes happen ONLY after access preflight passes.
+# host_key_checking = True (not False).
 
-# === PREFLIGHT: Verify we can still access after changes ===
+# === PREFLIGHT ===
 - name: Preflight — verify SSH key exists
   ansible.builtin.stat:
     path: "/home/{{ ansible_user }}/.ssh/authorized_keys"
@@ -18,31 +18,16 @@
     msg: >
       ABORT: No SSH authorized_keys found for {{ ansible_user }}.
       Cannot safely disable password auth without key-based access.
-      Configure SSH keys first, then re-run this role.
   when: not ssh_key_stat.stat.exists
   tags: [security, preflight]
 
-- name: Preflight — verify current user has sudo access
-  ansible.builtin.command: sudo -n true
-  register: sudo_test
-  ignore_errors: true
-  changed_when: false
-  tags: [security, preflight]
-
-- name: Preflight — warn if passwordless sudo not yet configured
-  ansible.builtin.debug:
-    msg: >
-      WARNING: Passwordless sudo not yet configured.
-      The sudo hardening task will run, but verify access after.
-  when: sudo_test.rc != 0
-  tags: [security, preflight]
-
-# === SSH HARDENING ===
+# === SSH SERVICE DETECTION (dynamic, portable) ===
 - name: Detect SSH service name
   ansible.builtin.set_fact:
-    ssh_service_name: "{{ 'ssh' if ansible_distribution_version is version('22.04', '>=') else 'sshd' }}"
+    ssh_service_name: "{{ 'ssh' if (ansible_service_mgr == 'systemd' and ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('22.04', '>=')) else 'sshd' }}"
   tags: [security, ssh]
 
+# === SSH HARDENING ===
 - name: Harden SSH configuration
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
@@ -56,19 +41,34 @@
     - { regexp: '^#?MaxAuthTries', line: 'MaxAuthTries 3' }
     - { regexp: '^#?ClientAliveInterval', line: 'ClientAliveInterval 300' }
     - { regexp: '^#?ClientAliveCountMax', line: 'ClientAliveCountMax 2' }
+    - { regexp: '^#?HostKeyChecking', line: 'HostKeyChecking yes' }
   notify: restart ssh
   tags: [security, ssh]
 
 # NOTE: PasswordAuthentication is intentionally NOT disabled here.
-# It should only be disabled after the operator has verified key-based
-# access works. This is a deliberate safety measure.
 - name: Document SSH hardening status
   ansible.builtin.debug:
     msg: >
-      SSH hardened: PermitRootLogin=no, X11Forwarding=no, MaxAuthTries=3.
-      PasswordAuthentication is still enabled — disable manually after
-      verifying key-based access works.
+      SSH hardened: PermitRootLogin=no, X11Forwarding=no, MaxAuthTries=3,
+      HostKeyChecking=yes. PasswordAuthentication still enabled —
+      disable manually after verifying key-based access.
   tags: [security, ssh]
+
+# === KNOWN HOST BOOTSTRAP ===
+- name: Ensure .ssh directory exists
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user }}/.ssh"
+    state: directory
+    mode: '0700'
+  tags: [security, ssh, known-hosts]
+
+- name: Add host key to known_hosts (operator must verify)
+  ansible.builtin.known_hosts:
+    name: "{{ inventory_hostname }}"
+    key: "{{ lookup('pipe', 'ssh-keyscan ' + inventory_hostname) }}"
+    state: present
+  ignore_errors: true
+  tags: [security, ssh, known-hosts]
 
 # === FAIL2BAN ===
 - name: Ensure fail2ban is installed
@@ -97,27 +97,20 @@
     default: allow
   tags: [security, firewall]
 
-# Allow SSH only through Tailscale interface
-- name: Allow SSH through Tailscale interface
+# Allow SSH only through Tailscale interface (specific source range)
+- name: Allow SSH from Tailscale CGNAT range only
   community.general.ufw:
     rule: allow
     from_ip: "{{ item }}"
     to_port: "22"
     proto: tcp
   loop:
-    - "100.64.0.0/10"  # Tailscale CGNAT range
+    - "100.64.0.0/10"
   tags: [security, firewall, tailscale]
 
-# Allow all traffic through Tailscale interface (for internal services)
-- name: Allow all traffic through Tailscale interface
-  community.general.ufw:
-    rule: allow
-    from_ip: "{{ item }}"
-    to_interface: tailscale0
-  loop:
-    - "100.64.0.0/10"
-  ignore_errors: true  # tailscale0 may not exist yet
-  tags: [security, firewall, tailscale]
+# DO NOT: Allow all traffic through Tailscale interface.
+# Administrative traffic is restricted to SSH (port 22) only.
+# Service traffic is handled by Docker's internal bridge network.
 
 - name: Enable UFW
   community.general.ufw:
@@ -125,13 +118,12 @@
   tags: [security, firewall]
 
 # === SUDO HARDENING ===
-# Document that passwordless sudo + docker group = root-equivalent authority
 - name: Document sudo authority classification
   ansible.builtin.debug:
     msg: >
       SECURITY NOTE: Passwordless sudo and Docker group membership
-      are root-equivalent authority. These are appropriate for a
-      single-operator control plane but must be documented.
+      are root-equivalent authority. Appropriate for single-operator
+      control plane but must be documented.
   tags: [security, sudo, authority]
 
 - name: Configure passwordless sudo for operator group

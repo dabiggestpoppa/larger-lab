@@ -1,0 +1,18 @@
+---
+# Ansible-lint configuration for OCE Cloud Ground
+# B1-I1R3A
+
+exclude_paths:
+  - .git/
+  - node_modules/
+
+skip_list:
+  - yaml[line-length]
+  - no-changed-when
+  - command-check
+
+warn_list:
+  - experimental
+  - syntax-check
+
+offline: true

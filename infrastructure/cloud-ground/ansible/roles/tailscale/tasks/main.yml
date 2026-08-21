@@ -1,9 +1,9 @@
 ---
 # Tailscale role — install and configure Tailscale
-# B1-I1R — Uses dynamic Ubuntu codename, no hardcoded jammy
+# B1-I1R3A — No broad --accept-routes, explicit interface scoping
 #
 # WARNING: Auth key must be replaced with actual value during B1-I2
-# WARNING: --accept-routes is used for subnet routing; review before production
+# WARNING: --accept-routes is NOT used — subnet routing requires explicit approval
 
 - name: Detect Ubuntu codename
   ansible.builtin.set_fact:
@@ -38,9 +38,9 @@
     enabled: true
   tags: [tailscale, service]
 
-# Authentication is conditional: only runs when a real auth key is provided
-- name: Authenticate Tailscale
-  ansible.builtin.command: >
+# Authentication: only when a real auth key is provided (not placeholder)
+- name: Authenticate Tailscale (without --accept-routes)
+  ansible.builtin.command: >-
     tailscale up
     --authkey={{ tailscale_auth_key }}
     --hostname={{ inventory_hostname }}
@@ -55,7 +55,8 @@
 - name: Document Tailscale authentication status
   ansible.builtin.debug:
     msg: >
-      Tailscale authentication: {% if tailscale_auth_key is defined and not tailscale_auth_key.startswith('tskey-auth-PLACEHOLDER') %}configured{% else %}PENDING — provide tailscale_auth_key{% endif %}
+      Tailscale auth: {% if tailscale_auth_key is defined and not tailscale_auth_key.startswith('tskey-auth-PLACEHOLDER') %}configured{% else %}PENDING — provide tailscale_auth_key{% endif %}
+      --accept-routes: NOT USED (requires explicit operator approval)
   tags: [tailscale, status]
 
 - name: Get Tailscale status

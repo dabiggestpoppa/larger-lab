@@ -20,9 +20,10 @@
 
 services:
   postgresql:
-    image: postgres:16.4-alpine
+    image: postgres@sha256:920e3ad7f97b66e9b05f39d41b7a0c51a34b5cb5a5f60ee9ee80f4e7b4a0c3e8
     container_name: oce-postgresql
     restart: unless-stopped
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-oce}
       POSTGRES_USER: ${POSTGRES_USER:-oce_admin}
@@ -63,7 +64,7 @@ services:
       - no-new-privileges:true
 
   redis:
-    image: redis:7.4-alpine
+    image: redis@sha256:3295e1e5c21e74474c30c85e0c0c7e7c12e8a18c3c5f4591b5d5e8c0c4d3e2a1
     container_name: oce-redis
     restart: unless-stopped
     command: >

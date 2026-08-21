@@ -1,7 +1,8 @@
 ---
 # Security role handlers
+# Handler name MUST match the notify directive in tasks/main.yml
 
-- name: restart sshd
+- name: restart ssh
   ansible.builtin.service:
-    name: sshd
+    name: "{{ ssh_service_name }}"
     state: restarted
