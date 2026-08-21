@@ -3,18 +3,18 @@
   "venue": "hyperliquid",
   "market": "ETH-PERP",
   "source": "hyperliquid_rest",
-  "source_endpoint_or_contract": "hyperliquid_rest_api",
-  "collector_version": "1.2.0",
+  "source_endpoint_or_contract": "https://api.hyperliquid.xyz/info",
+  "collector_version": "1.1.0",
   "schema_version": "1.0.0",
   "first_timestamp": null,
   "last_timestamp": null,
-  "row_count": 0,
-  "sha256": null,
-  "created_at_utc": "2026-08-21T15:25:34.631524+00:00",
+  "row_count": 5040,
+  "sha256": "e8077a882fc0ed9682ac1255cec871a9c48d521c4dcf5e784db0147ca3c1046d",
+  "created_at_utc": "2026-08-21T16:53:24.580812+00:00",
   "duplicate_count": 0,
   "missing_interval_summary": null,
   "known_limitations": [
-    "DATA-1.2 final closure"
+    "30-day bounded canonical sample of 5m candles"
   ],
-  "status": "PARTIAL"
+  "status": "VALID"
 }

@@ -87,7 +87,12 @@ class CrossSourceParity:
         b_set = set(b_timestamps)
         overlap = a_set & b_set
 
-        # For timestamps that don't match exactly, find closest within tolerance
+        # For timestamps that don't match exactly, find closest within tolerance.
+        # Use bisect on sorted float timestamps for O(log n) nearest lookup.
+        import bisect
+
+        b_sorted = sorted(b_timestamps, key=_ts_to_float)
+        b_float = [_ts_to_float(ts) for ts in b_sorted]
         fuzzy_matches = []
         a_only = []
         b_only = []
@@ -96,14 +101,16 @@ class CrossSourceParity:
             if a_ts in overlap:
                 fuzzy_matches.append((a_ts, a_ts))
                 continue
-            # Find closest b timestamp
+            a_f = _ts_to_float(a_ts)
+            idx = bisect.bisect_left(b_float, a_f)
             best_diff = float("inf")
             best_b = None
-            for b_ts in b_timestamps:
-                diff = abs(_ts_to_float(a_ts) - _ts_to_float(b_ts))
-                if diff < best_diff:
-                    best_diff = diff
-                    best_b = b_ts
+            for cand in (idx - 1, idx):
+                if 0 <= cand < len(b_sorted):
+                    diff = abs(b_float[cand] - a_f)
+                    if diff < best_diff:
+                        best_diff = diff
+                        best_b = b_sorted[cand]
             if best_diff <= time_tolerance_seconds and best_b is not None:
                 fuzzy_matches.append((a_ts, best_b))
             else:

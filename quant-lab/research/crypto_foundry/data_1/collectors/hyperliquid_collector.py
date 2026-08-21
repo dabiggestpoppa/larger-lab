@@ -471,14 +471,25 @@ def collect_full_funding_history(
     all_records = []
     current_start = start_ms
     request_count = 0
+    empty_strikes = 0
 
     while current_start < end_ms:
-        records = fetch_funding_history(coin=coin, start_time_ms=current_start, end_time_ms=end_ms)
-        if records and "error" in records[0]:
-            break
-        if not records:
-            break
+        records = []
+        # Retry on empty/error pages (rate limiting) with backoff
+        for attempt in range(4):
+            records = fetch_funding_history(coin=coin, start_time_ms=current_start, end_time_ms=end_ms)
+            if records and "error" not in records[0] and len(records) > 0:
+                break
+            time.sleep(1.0 * (attempt + 1))
+        if not records or ("error" in records[0] if records else False):
+            empty_strikes += 1
+            if empty_strikes >= 3:
+                break
+            current_start += 500 * 3600 * 1000  # advance 500h if stuck
+            time.sleep(1.0)
+            continue
 
+        empty_strikes = 0
         request_count += 1
         all_records.extend(records)
 

@@ -1,12 +1,12 @@
 {
   "BTC": {
-    "comparison_name": "BTCUSDT_vs_BTC-PERP_1H",
+    "comparison_name": "BTC_spot_vs_perp_1h",
     "source_a_name": "Binance",
     "source_b_name": "Hyperliquid",
     "overlap_start": "2026-01-25T06:00:00+00:00",
     "overlap_end": "2026-06-15T21:00:00+00:00",
     "source_a_count": 35040,
-    "source_b_count": 3403,
+    "source_b_count": 5003,
     "overlapping_timestamps": 3400,
     "timestamp_alignment_pct": 9.7,
     "median_basis_bps": -4.78,
@@ -14,22 +14,20 @@
     "max_basis_bps": 28.97,
     "correlation": 0.999998,
     "source_a_only_gaps": 31639,
-    "source_b_only_gaps": 3,
+    "source_b_only_gaps": 1603,
     "extreme_divergence_count": 0,
     "extreme_divergence_threshold_bps": 100.0,
     "status": "VALID",
-    "notes": [],
-    "hl_count": 3403,
-    "bn_1h_count": 35040
+    "notes": []
   },
   "ETH": {
-    "comparison_name": "ETHUSDT_vs_ETH-PERP_1H",
+    "comparison_name": "ETH_spot_vs_perp_1h",
     "source_a_name": "Binance",
     "source_b_name": "Hyperliquid",
     "overlap_start": "2026-01-25T06:00:00+00:00",
     "overlap_end": "2026-06-15T21:00:00+00:00",
     "source_a_count": 35040,
-    "source_b_count": 3403,
+    "source_b_count": 5003,
     "overlapping_timestamps": 3400,
     "timestamp_alignment_pct": 9.7,
     "median_basis_bps": -4.7,
@@ -37,12 +35,10 @@
     "max_basis_bps": 24.68,
     "correlation": 0.999999,
     "source_a_only_gaps": 31639,
-    "source_b_only_gaps": 3,
+    "source_b_only_gaps": 1603,
     "extreme_divergence_count": 0,
     "extreme_divergence_threshold_bps": 100.0,
     "status": "VALID",
-    "notes": [],
-    "hl_count": 3403,
-    "bn_1h_count": 35040
+    "notes": []
   }
 }

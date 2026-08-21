@@ -3,18 +3,18 @@
   "venue": "hyperliquid",
   "market": "BTC-PERP",
   "source": "hyperliquid_rest",
-  "source_endpoint_or_contract": "hyperliquid_rest_api",
-  "collector_version": "1.2.0",
+  "source_endpoint_or_contract": "https://api.hyperliquid.xyz/info (fundingHistory)",
+  "collector_version": "1.1.0",
   "schema_version": "1.0.0",
-  "first_timestamp": null,
-  "last_timestamp": null,
-  "row_count": 0,
-  "sha256": null,
-  "created_at_utc": "2026-08-21T15:25:34.633521+00:00",
+  "first_timestamp": "2023-05-12T00:00:00.048000+00:00",
+  "last_timestamp": "2026-08-21T16:00:00.031000+00:00",
+  "row_count": 28175,
+  "sha256": "62ec8034d38ce48daadcdfe9fb79d49c1cfb2645487b0effd600341ced34728a",
+  "created_at_utc": "2026-08-21T16:53:21.664335+00:00",
   "duplicate_count": 0,
   "missing_interval_summary": null,
   "known_limitations": [
-    "DATA-1.2 final closure"
+    "500-record API page limit; forward pagination applied"
   ],
-  "status": "PARTIAL"
+  "status": "VALID"
 }

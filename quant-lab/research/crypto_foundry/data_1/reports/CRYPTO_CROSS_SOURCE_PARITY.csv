@@ -1,3 +1,3 @@
-asset,overlap,median_bps,p95_bps,correlation,status
-BTC,0,0,0,0,INSUFFICIENT_DATA
-ETH,0,0,0,0,INSUFFICIENT_DATA
+asset,overlapping_timestamps,median_basis_bps,p95_basis_bps,max_basis_bps,correlation,status
+BTC,3400,-4.78,7.09,28.97,0.999998,VALID
+ETH,3400,-4.7,7.46,24.68,0.999999,VALID

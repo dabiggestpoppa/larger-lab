@@ -1,7 +1,205 @@
 {
-  "checkpoint": "CRYPTO-DATA-1.3",
-  "created_at_utc": "2026-08-21T17:01:20.209937+00:00",
-  "summary": {
+  "checkpoint": "CRYPTO-DATA-1.3-CANONICAL-FREEZE-AND-EVIDENCE-RECONCILIATION",
+  "base_commit": "630875744c0c35d6414c5ad681f534bab2405968",
+  "created_at_utc": "2026-08-21T17:01:20.219997+00:00",
+  "decision": "PASS_CANONICAL_CRYPTO_DATA_FOUNDATION",
+  "reasons": [
+    "No canonical dataset has status FAIL or BLOCKED",
+    "All required canonical datasets have valid manifests",
+    "All applicable Q1-Q17 gates executed",
+    "All required lanes met",
+    "All evidence gates satisfied"
+  ],
+  "blocking_issues": [],
+  "lanes": {
+    "A_hyperliquid": {},
+    "B_binance": {},
+    "C_ethereum_amm": {},
+    "D_base_amm": {}
+  },
+  "manifest_completeness": {
+    "bn_btcusdt_spot_5m": {
+      "dataset_id": "bn_btcusdt_spot_5m",
+      "venue": "binance",
+      "market": "BTCUSDT",
+      "source": "binance_local_file",
+      "source_endpoint_or_contract": "local .exec-runtime/quant-lab/data/btc_usdt_1460d.json",
+      "collector_version": "1.2.0",
+      "schema_version": "1.0.0",
+      "first_timestamp": "2022-06-16T21:20:00+00:00",
+      "last_timestamp": "2026-06-15T21:15:00+00:00",
+      "row_count": 420464,
+      "sha256": "8b1a29bfa0ae2314038dcb7c071bffe39b0165b4b36450948bb11e5c0b5fcf3c",
+      "created_at_utc": "2026-08-21T16:27:06.867481+00:00",
+      "duplicate_count": 0,
+      "missing_interval_summary": null,
+      "known_limitations": [
+        "Binance REST geo-blocked (HTTP 451); local file provenance verified"
+      ],
+      "status": "VALID"
+    },
+    "bn_ethusdt_spot_5m": {
+      "dataset_id": "bn_ethusdt_spot_5m",
+      "venue": "binance",
+      "market": "ETHUSDT",
+      "source": "binance_local_file",
+      "source_endpoint_or_contract": "local .exec-runtime/quant-lab/data/eth_usdt_1460d.json",
+      "collector_version": "1.2.0",
+      "schema_version": "1.0.0",
+      "first_timestamp": "2022-06-16T21:30:00+00:00",
+      "last_timestamp": "2026-06-15T21:25:00+00:00",
+      "row_count": 420464,
+      "sha256": "ec517e6bb93a34a1fbd1de29a9dedfecdfdada054d35cf7326ebc3c01e6ecb01",
+      "created_at_utc": "2026-08-21T16:27:47.251584+00:00",
+      "duplicate_count": 0,
+      "missing_interval_summary": null,
+      "known_limitations": [
+        "Binance REST geo-blocked (HTTP 451); local file provenance verified"
+      ],
+      "status": "VALID"
+    },
+    "hl_btc_perp_state_5m": {
+      "dataset_id": "hl_btc_perp_state_5m",
+      "venue": "hyperliquid",
+      "market": "BTC-PERP",
+      "source": "hyperliquid_rest",
+      "source_endpoint_or_contract": "https://api.hyperliquid.xyz/info",
+      "collector_version": "1.1.0",
+      "schema_version": "1.0.0",
+      "first_timestamp": null,
+      "last_timestamp": null,
+      "row_count": 5041,
+      "sha256": "6aab8220a241438deb1a76add7b3003f8553b9fd6c306fa339e6b7b86ad5883c",
+      "created_at_utc": "2026-08-21T16:52:44.028432+00:00",
+      "duplicate_count": 0,
+      "missing_interval_summary": null,
+      "known_limitations": [
+        "30-day bounded canonical sample of 5m candles"
+      ],
+      "status": "VALID"
+    },
+    "hl_eth_perp_state_5m": {
+      "dataset_id": "hl_eth_perp_state_5m",
+      "venue": "hyperliquid",
+      "market": "ETH-PERP",
+      "source": "hyperliquid_rest",
+      "source_endpoint_or_contract": "https://api.hyperliquid.xyz/info",
+      "collector_version": "1.1.0",
+      "schema_version": "1.0.0",
+      "first_timestamp": null,
+      "last_timestamp": null,
+      "row_count": 5040,
+      "sha256": "e8077a882fc0ed9682ac1255cec871a9c48d521c4dcf5e784db0147ca3c1046d",
+      "created_at_utc": "2026-08-21T16:53:24.580812+00:00",
+      "duplicate_count": 0,
+      "missing_interval_summary": null,
+      "known_limitations": [
+        "30-day bounded canonical sample of 5m candles"
+      ],
+      "status": "VALID"
+    },
+    "hl_btc_funding_hourly": {
+      "dataset_id": "hl_btc_funding_hourly",
+      "venue": "hyperliquid",
+      "market": "BTC-PERP",
+      "source": "hyperliquid_rest",
+      "source_endpoint_or_contract": "https://api.hyperliquid.xyz/info (fundingHistory)",
+      "collector_version": "1.1.0",
+      "schema_version": "1.0.0",
+      "first_timestamp": "2023-05-12T00:00:00.048000+00:00",
+      "last_timestamp": "2026-08-21T16:00:00.031000+00:00",
+      "row_count": 28175,
+      "sha256": "62ec8034d38ce48daadcdfe9fb79d49c1cfb2645487b0effd600341ced34728a",
+      "created_at_utc": "2026-08-21T16:53:21.664335+00:00",
+      "duplicate_count": 0,
+      "missing_interval_summary": null,
+      "known_limitations": [
+        "500-record API page limit; forward pagination applied"
+      ],
+      "status": "VALID"
+    },
+    "hl_eth_funding_hourly": {
+      "dataset_id": "hl_eth_funding_hourly",
+      "venue": "hyperliquid",
+      "market": "ETH-PERP",
+      "source": "hyperliquid_rest",
+      "source_endpoint_or_contract": "https://api.hyperliquid.xyz/info (fundingHistory)",
+      "collector_version": "1.1.0",
+      "schema_version": "1.0.0",
+      "first_timestamp": "2023-05-12T00:00:00.048000+00:00",
+      "last_timestamp": "2026-08-21T16:00:00.031000+00:00",
+      "row_count": 28175,
+      "sha256": "a6c408245980083a22f2fbc076c7aef7f00d975121055adbfdb02a9a011a4974",
+      "created_at_utc": "2026-08-21T16:54:12.802781+00:00",
+      "duplicate_count": 0,
+      "missing_interval_summary": null,
+      "known_limitations": [
+        "500-record API page limit; forward pagination applied"
+      ],
+      "status": "VALID"
+    },
+    "eth_weth_usdc_swap": {
+      "dataset_id": "eth_weth_usdc_swap",
+      "venue": "uniswap_v3",
+      "market": "WETH-USDC-500",
+      "source": "ethereum_rpc",
+      "source_endpoint_or_contract": "0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640",
+      "collector_version": "1.3.0",
+      "schema_version": "1.0.0",
+      "first_timestamp": "2026-08-14T17:06:23+00:00",
+      "last_timestamp": "2026-08-15T03:08:23+00:00",
+      "row_count": 1057,
+      "sha256": "8191ba2e2369942bd1ac80c583b58ce426926a75e5763f027119691098789c08",
+      "created_at_utc": "2026-08-21T16:21:02.051214+00:00",
+      "duplicate_count": 0,
+      "missing_interval_summary": null,
+      "known_limitations": [
+        "RPC archive-range limitation on free tier; recent block window only"
+      ],
+      "status": "VALID"
+    },
+    "eth_wbtc_usdc_swap": {
+      "dataset_id": "eth_wbtc_usdc_swap",
+      "venue": "uniswap_v3",
+      "market": "WBTC-USDC-3000",
+      "source": "ethereum_rpc",
+      "source_endpoint_or_contract": "0x99ac8cA7087fA4A2A1FB6357269965A2014ABc35",
+      "collector_version": "1.3.0",
+      "schema_version": "1.0.0",
+      "first_timestamp": "2026-08-14T17:21:11+00:00",
+      "last_timestamp": "2026-08-18T00:41:47+00:00",
+      "row_count": 205,
+      "sha256": "37c2ee3759160b6d22b8785e945fdd44865c01a3c703d2bade1182ad49dd7743",
+      "created_at_utc": "2026-08-21T16:21:44.838458+00:00",
+      "duplicate_count": 0,
+      "missing_interval_summary": null,
+      "known_limitations": [
+        "RPC archive-range limitation on free tier; recent block window only"
+      ],
+      "status": "VALID"
+    },
+    "base_weth_usdc_swap": {
+      "dataset_id": "base_weth_usdc_swap",
+      "venue": "uniswap_v3_base",
+      "market": "WETH-USDC-500",
+      "source": "base_rpc",
+      "source_endpoint_or_contract": "0xd0b53d9277642d899df5c87a3966a349a798f224",
+      "collector_version": "1.3.0",
+      "schema_version": "1.0.0",
+      "first_timestamp": "2026-08-20T12:53:13+00:00",
+      "last_timestamp": "2026-08-20T14:33:05+00:00",
+      "row_count": 4035,
+      "sha256": "a8ad3b848213a96693c432d43039485e8eb9b325d575f1eb4e7858814bec5ec9",
+      "created_at_utc": "2026-08-21T16:43:21.597665+00:00",
+      "duplicate_count": 0,
+      "missing_interval_summary": null,
+      "known_limitations": [
+        "Recent block window via free Base RPC"
+      ],
+      "status": "VALID"
+    }
+  },
+  "quality": {
     "matrix_rows": 13,
     "datasets": {
       "bn_btcusdt_spot_5m": {
@@ -473,6 +671,57 @@
       }
     }
   },
-  "matrix_file": "quality/CRYPTO_Q1_Q17_FINAL_MATRIX.csv",
-  "evidence_file": "quality/CRYPTO_Q1_Q17_FINAL_EVIDENCE.csv"
+  "parity": {
+    "BTC": {
+      "comparison_name": "BTC_spot_vs_perp_1h",
+      "source_a_name": "Binance",
+      "source_b_name": "Hyperliquid",
+      "overlap_start": "2026-01-25T06:00:00+00:00",
+      "overlap_end": "2026-06-15T21:00:00+00:00",
+      "source_a_count": 35040,
+      "source_b_count": 5003,
+      "overlapping_timestamps": 3400,
+      "timestamp_alignment_pct": 9.7,
+      "median_basis_bps": -4.78,
+      "p95_basis_bps": 7.09,
+      "max_basis_bps": 28.97,
+      "correlation": 0.999998,
+      "source_a_only_gaps": 31639,
+      "source_b_only_gaps": 1603,
+      "extreme_divergence_count": 0,
+      "extreme_divergence_threshold_bps": 100.0,
+      "status": "VALID",
+      "notes": []
+    },
+    "ETH": {
+      "comparison_name": "ETH_spot_vs_perp_1h",
+      "source_a_name": "Binance",
+      "source_b_name": "Hyperliquid",
+      "overlap_start": "2026-01-25T06:00:00+00:00",
+      "overlap_end": "2026-06-15T21:00:00+00:00",
+      "source_a_count": 35040,
+      "source_b_count": 5003,
+      "overlapping_timestamps": 3400,
+      "timestamp_alignment_pct": 9.7,
+      "median_basis_bps": -4.7,
+      "p95_basis_bps": 7.46,
+      "max_basis_bps": 24.68,
+      "correlation": 0.999999,
+      "source_a_only_gaps": 31639,
+      "source_b_only_gaps": 1603,
+      "extreme_divergence_count": 0,
+      "extreme_divergence_threshold_bps": 100.0,
+      "status": "VALID",
+      "notes": []
+    }
+  },
+  "prohibited": {
+    "strategy_pnl_computed": false,
+    "optimization_performed": false,
+    "alpha_research_started": false,
+    "confirmation_consumed": false,
+    "holdout_consumed": false,
+    "live_capital_deployed": false,
+    "ase2_started": false
+  }
 }

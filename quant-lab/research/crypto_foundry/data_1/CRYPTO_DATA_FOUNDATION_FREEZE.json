@@ -1,0 +1,44 @@
+{
+  "checkpoint": "CRYPTO-DATA-1.3-CANONICAL-FREEZE-AND-EVIDENCE-RECONCILIATION",
+  "created_at_utc": "2026-08-21T17:01:20.217981+00:00",
+  "schema_version": "1.0.0",
+  "collector_versions": {
+    "hyperliquid": "1.1.0",
+    "binance": "1.2.0",
+    "ethereum_rpc": "1.3.0",
+    "base_rpc": "1.3.0"
+  },
+  "dataset_ids": [
+    "base_weth_usdc_swap",
+    "bn_btcusdt_spot_5m",
+    "bn_ethusdt_spot_5m",
+    "eth_wbtc_usdc_swap",
+    "eth_weth_usdc_swap",
+    "hl_btc_funding_hourly",
+    "hl_btc_perp_state_5m",
+    "hl_eth_funding_hourly",
+    "hl_eth_perp_state_5m"
+  ],
+  "manifest_hashes": {
+    "bn_btcusdt_spot_5m": "8b1a29bfa0ae2314038dcb7c071bffe39b0165b4b36450948bb11e5c0b5fcf3c",
+    "bn_ethusdt_spot_5m": "ec517e6bb93a34a1fbd1de29a9dedfecdfdada054d35cf7326ebc3c01e6ecb01",
+    "hl_btc_perp_state_5m": "6aab8220a241438deb1a76add7b3003f8553b9fd6c306fa339e6b7b86ad5883c",
+    "hl_eth_perp_state_5m": "e8077a882fc0ed9682ac1255cec871a9c48d521c4dcf5e784db0147ca3c1046d",
+    "hl_btc_funding_hourly": "62ec8034d38ce48daadcdfe9fb79d49c1cfb2645487b0effd600341ced34728a",
+    "hl_eth_funding_hourly": "a6c408245980083a22f2fbc076c7aef7f00d975121055adbfdb02a9a011a4974",
+    "eth_weth_usdc_swap": "8191ba2e2369942bd1ac80c583b58ce426926a75e5763f027119691098789c08",
+    "eth_wbtc_usdc_swap": "37c2ee3759160b6d22b8785e945fdd44865c01a3c703d2bade1182ad49dd7743",
+    "base_weth_usdc_swap": "a8ad3b848213a96693c432d43039485e8eb9b325d575f1eb4e7858814bec5ec9"
+  },
+  "quality_audit": "quality/CRYPTO_DATA_QUALITY_AUDIT.json",
+  "parity_report": "reports/CRYPTO_CROSS_SOURCE_PARITY.csv",
+  "decision": "PASS_CANONICAL_CRYPTO_DATA_FOUNDATION",
+  "decision_blocking_issues": [],
+  "decision_reasons": [
+    "No canonical dataset has status FAIL or BLOCKED",
+    "All required canonical datasets have valid manifests",
+    "All applicable Q1-Q17 gates executed",
+    "All required lanes met",
+    "All evidence gates satisfied"
+  ]
+}
