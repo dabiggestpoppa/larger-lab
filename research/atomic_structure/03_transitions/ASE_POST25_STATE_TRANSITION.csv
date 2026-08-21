@@ -1,2 +1,2 @@
-status,reason
-NOT_IDENTIFIABLE_FROM_EXISTING_TERRAIN_LEDGER,Requires retained post-hit OHLC path and exact -25 geometry
+status,n,note
+PATH_RECONSTRUCTED,433,windowed state comparison requires additional preregistered feature extraction

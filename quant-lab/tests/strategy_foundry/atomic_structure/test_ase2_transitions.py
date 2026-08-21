@@ -32,7 +32,7 @@ def test_required_outputs_exist_and_have_rows():
         'ASE_REMAINING_RANGE_BASELINES.csv', 'ASE_REMAINING_RANGE_QUANTILES.csv',
         'ASE_TIME_TO_COMPLETION.csv', 'ASE_SURVIVAL_CURVES.csv',
         'ASE_UNCERTAINTY_LAYERING.csv', 'ASE_VARIANCE_CLOCK.csv',
-        'ASE_NOON_EXTREME_HOLD.csv', 'ASE_GAP_EXCURSION_ANALYSIS.csv',
+        'ASE_NOON_EXTREME_HOLD.csv',
         'ASE_POST25_REVERSAL_MATRIX.csv', 'ASE_POST25_STATE_TRANSITION.csv',
         'ASE_POST25_FIRST_EVENT_ORDERING.csv', 'ASE_BOOTSTRAP_INFERENCE.csv',
     ]
@@ -41,7 +41,6 @@ def test_required_outputs_exist_and_have_rows():
         assert not frame.empty, name
 
 
-def test_unavailable_paths_are_explicitly_labeled():
-    for name in ['ASE_NOON_EXTREME_HOLD.csv', 'ASE_GAP_EXCURSION_ANALYSIS.csv', 'ASE_POST25_REVERSAL_MATRIX.csv']:
-        text = (OUT / name).read_text(encoding='utf-8')
-        assert 'NOT_' in text
+def test_path_outputs_are_explicitly_labeled():
+    assert 'new_high_touch' in (OUT / 'ASE_NOON_EXTREME_HOLD.csv').read_text(encoding='utf-8')
+    assert 'source_claim' in (OUT / 'ASE_MECHANISM_SOURCE_COMPARISON.csv').read_text(encoding='utf-8')

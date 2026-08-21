@@ -1,2 +1,5 @@
-status,reason
-NOT_IDENTIFIABLE_FROM_EXISTING_TERRAIN_LEDGER,Requires retained post-hit OHLC path and exact -25 geometry
+first_event,count
+ANOTHER_25_EXTENSION,406
+OPPOSITE_ASIAN_BAND,23
+12PM_OR_TERMINAL,3
+,1
