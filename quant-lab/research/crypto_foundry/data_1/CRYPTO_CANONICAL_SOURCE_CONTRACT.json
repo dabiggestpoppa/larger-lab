@@ -1,0 +1,71 @@
+{
+  "contract_version": "1.0.0",
+  "registered_at": "2026-08-20",
+  "sources": {
+    "hyperliquid_public": {
+      "venue": "Hyperliquid",
+      "api_base": "https://api.hyperliquid.xyz",
+      "websocket": "wss://api.hyperliquid.xyz/ws",
+      "sdk": "hyperliquid-python-sdk",
+      "sdk_install": "pip install hyperliquid",
+      "auth_required": false,
+      "rate_limit": "generous public",
+      "candles_endpoint": "POST /info with type: candleSnapshot",
+      "trades_endpoint": "WebSocket subscription: {type: 'trades', coin: 'BTC'}",
+      "book_endpoint": "WebSocket subscription: {type: 'l2Book', coin: 'BTC'}",
+      "funding_endpoint": "POST /info with type: fundingHistory",
+      "oi_endpoint": "POST /info with type: metaAndAssetCtxs",
+      "mark_index_endpoint": "POST /info with type: metaAndAssetCtxs",
+      "execution_endpoint": "POST /action (requires wallet — NOT USED IN DATA-1)",
+      "known_limitations": [
+        "No historical trade backfill — only live WebSocket or recent snapshots",
+        "Candles history back to ~2023-05 only",
+        "Funding history available but pagination limited"
+      ]
+    },
+    "binance_public": {
+      "venue": "Binance",
+      "api_base": "https://api.binance.com",
+      "auth_required": false,
+      "rate_limit": "1200 req/min (public endpoints)",
+      "klines_endpoint": "GET /api/v3/klines?symbol=BTCUSDT&interval=5m&limit=1000&endTime={ms}",
+      "pagination": "Backward by endTime. 1000 candles per request.",
+      "max_history": "2017-07 for BTCUSDT spot",
+      "execution_endpoint": "POST /api/v3/order (requires API key — NOT USED IN DATA-1)",
+      "known_limitations": [
+        "Rate limited at ~1200 req/min",
+        "Per-request limit 1000 candles",
+        "Not U.S.-accessible for execution"
+      ],
+      "existing_local": {
+        "btc_usdt_1460d.json": {"sha256": "e9c977e3ba9a027dcc6be35ee1d57acc3dcc4fc2ca5853b547f33fd02d8c9625", "rows": 420464},
+        "eth_usdt_1460d.json": {"sha256": "88fbaae38587b822cd568832f0e12f07788dae2c258de0d663373cb9b2a32299", "rows": 420464}
+      }
+    },
+    "uniswap_v3_subgraph": {
+      "venue": "Uniswap v3",
+      "chain": "Ethereum",
+      "chain_id": 1,
+      "subgraph_url": "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3",
+      "deprecated_url": "https://gateway-arbitrum.network.thegraph.com/api/subgraphs/id/5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV",
+      "auth_required": false,
+      "rate_limit": "100 queries/min (free tier)",
+      "events_available": ["Swap", "Mint", "Burn", "Collect"],
+      "state_available": ["tick", "sqrtPrice", "liquidity"],
+      "raw_path": "The Graph is an indexer — NOT the canonical source. Canonical source is Ethereum RPC + event logs.",
+      "rpc_endpoint": "Ethereum mainnet RPC (Alchemy/Infura/public)",
+      "known_limitations": [
+        "Subgraph has indexing lag (~12s blocks)",
+        "Subgraph free tier rate limited",
+        "For reproducibility, preserve path to raw RPC/log reproduction"
+      ]
+    },
+    "base_amm_subgraph": {
+      "venue": "Aerodrome / Uniswap v3 on Base",
+      "chain": "Base",
+      "chain_id": 8453,
+      "status": "TO_SELECT_IN_DATA-1",
+      "note": "Select between Aerodrome subgraph and Uniswap v3 Base subgraph based on pool depth"
+    }
+  }
+}
