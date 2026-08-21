@@ -28,6 +28,7 @@ import shutil
 import sys
 import tempfile
 import time
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -402,6 +403,113 @@ def test_supervisor_aux_supervision(tmp: Path) -> None:
     check("aux: terminate with dead pid is no-op", True)
 
 
+def test_engine_lifecycle_callbacks(tmp: Path) -> None:
+    """R6.4: prove the engine's INTENT->OPEN->CLOSED lifecycle works
+    when the worker fires the three callbacks.
+
+    Without callbacks the engine keeps baskets at INTENT forever,
+    blocking close logic and future entries.  With them, the engine
+    mirrors the broker truth and the close path fires correctly.
+    """
+    import random as _rng
+    from types import SimpleNamespace
+    sys.path.insert(0, str(QUANT_LAB / "engines"))
+    from engines.tb_forward_config import CONTROL_CONFIG
+    from engines.triangular_basis_live import (
+        TriangularBasisLiveEngine, BasketDecision,
+    )
+    from engines.triangular_basis_engine import TriangularBar
+
+    rng = _rng.Random(42)
+    GA0, GN0, AN0 = 1.9300, 2.1100, 1.0932
+
+    def _snap(t, ga, gn, an):
+        b = SimpleNamespace
+        return SimpleNamespace(
+            timestamp=t,
+            gbpaud_bar=b(close=ga, high=ga + 0.001, low=ga - 0.001),
+            gbpnzd_bar=b(close=gn, high=gn + 0.001, low=gn - 0.001),
+            audnzd_bar=b(close=an, high=an + 0.001, low=an - 0.001),
+        )
+
+    def _bar(t, ga, gn, an):
+        return TriangularBar(
+            timestamp=t, gbp_aud=ga, gbp_nzd=gn, aud_nzd=an,
+            gbp_aud_high=ga + 0.001, gbp_aud_low=ga - 0.001,
+            gbp_nzd_high=gn + 0.001, gbp_nzd_low=gn - 0.001,
+            aud_nzd_high=an + 0.001, aud_nzd_low=an - 0.001)
+
+    # warm-up: 250 bars with realistic basis noise, London hours (UTC 08-16)
+    warmup = []
+    for i in range(250):
+        day_off = i // 108
+        idx = i % 108
+        t = datetime(2026, 8, 1, 8, tzinfo=timezone.utc) + \
+            timedelta(days=day_off, minutes=5 * idx)
+        noise = rng.gauss(0, 5e-5)
+        warmup.append(_bar(t, GA0 + noise, GN0, AN0))
+    engine = TriangularBasisLiveEngine(model_config=CONTROL_CONFIG)
+    engine.load_historical_bars(warmup)
+
+    # push z above 3.0: shift GBPAUD on a fresh London-session day
+    shift = 0.005
+    base_t = datetime(2026, 8, 4, 8, tzinfo=timezone.utc)
+    result = None
+    for i in range(30):
+        t = base_t + timedelta(minutes=5 * i)
+        result = engine.process_snapshot(_snap(t, GA0 + shift, GN0, AN0))
+        if result.decision == BasketDecision.OPEN_BASKET:
+            break
+
+    assert result is not None and result.decision == BasketDecision.OPEN_BASKET, \
+        "test setup: engine did not emit OPEN_BASKET"
+
+    # --- lifecycle test: INTENT -> OPEN via callback ---
+    basket_id = result.basket_id
+    check("lifecycle: basket created as INTENT",
+          engine._active_baskets[basket_id].status == "INTENT")
+
+    # simulate worker confirming the open
+    engine.on_basket_open_confirmed(basket_id)
+    check("lifecycle: after confirm -> OPEN",
+          engine._active_baskets[basket_id].status == "OPEN")
+
+    # push z back to baseline to trigger close (same London session)
+    for i in range(30, 80):
+        t = base_t + timedelta(minutes=5 * i)
+        result = engine.process_snapshot(_snap(t, GA0, GN0, AN0))
+        if result.decision == BasketDecision.CLOSE_BASKET:
+            break
+
+    check("lifecycle: engine emits CLOSE after confirm",
+          result.decision == BasketDecision.CLOSE_BASKET)
+
+    # simulate worker confirming the close
+    engine.on_basket_close_confirmed(basket_id)
+    check("lifecycle: after close confirm -> removed",
+          basket_id not in engine._active_baskets)
+
+    # --- failure path: revert ghost INTENT ---
+    for i in range(80, 130):
+        t = base_t + timedelta(minutes=5 * i)
+        result2 = engine.process_snapshot(_snap(t, GA0 + shift, GN0, AN0))
+        if result2.decision == BasketDecision.OPEN_BASKET:
+            break
+
+    basket_id2 = result2.basket_id
+    check("lifecycle: second basket created",
+          basket_id2 in engine._active_baskets)
+    check("lifecycle: second basket is INTENT",
+          engine._active_baskets[basket_id2].status == "INTENT")
+
+    # simulate worker calling open_failed (broker rejected)
+    engine.on_basket_open_failed(basket_id2)
+    check("lifecycle: open_failed removes ghost INTENT",
+          basket_id2 not in engine._active_baskets)
+    check("lifecycle: engine ready for new entries",
+          len(engine._active_baskets) == 0)
+
+
 def main() -> int:
     print("TB-R6.1 runtime audits")
     with tempfile.TemporaryDirectory() as td:
@@ -414,6 +522,7 @@ def main() -> int:
         test_daily_return_server_day(tmp)
         test_log_rotation(tmp)
         test_supervisor_aux_supervision(tmp)
+        test_engine_lifecycle_callbacks(tmp)
     out = QUANT_LAB.parent / "research" / "tb_forward" / "r6_1"
     out.mkdir(parents=True, exist_ok=True)
     (out / "TB_R6_1_RUNTIME_AUDITS.json").write_text(

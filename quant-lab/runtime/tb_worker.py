@@ -410,6 +410,10 @@ class DemoWorker:
                        f"OPEN|{self.open_basket_id}",
                        payload={"positions": truth["positions"]},
                        prior_state="ENTRY_SUBMITTING", new_state="OPEN_VERIFIED")
+            # R6.4: confirm open back to the engine so INTENT -> OPEN
+            # (enables engine-side close logic and prevents ghost INTENT
+            # from blocking future entries)
+            self.control.on_basket_open_confirmed(intent.basket_id)
             log.info("CONTROL basket OPEN: %s (3 legs verified)",
                      self.open_basket_id)
         else:
@@ -417,6 +421,8 @@ class DemoWorker:
                        intent.basket_id, CONTROL_STRATEGY_ID,
                        f"REJ|{intent.basket_id}",
                        payload={"reason": res.error_message})
+            # R6.4: revert ghost INTENT so future entries are not blocked
+            self.control.on_basket_open_failed(intent.basket_id)
             log.warning("control open failed: %s", res.error_message)
 
     def _close_control(self, key: str) -> None:
@@ -438,6 +444,9 @@ class DemoWorker:
                    payload={"flat": flat},
                    prior_state="CLOSE_SUBMITTING", new_state=st)
         if flat:
+            # R6.4: confirm close back to the engine so it removes the
+            # basket from _active_baskets (enables future entries)
+            self.control.on_basket_close_confirmed(bid)
             self.control_baskets_completed += 1
             self.open_basket_id = None
             log.info("CONTROL basket CLOSED + flat verified: %s", bid)
