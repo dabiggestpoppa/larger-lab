@@ -1,0 +1,4 @@
+failure_type,n,p_next_loop_exists,p_next_flips,p_next_continues,p_next_reaches_0_5_AU,p_next_reaches_1_AU,median_next_loop_size_AU,median_time_to_next_loop_min,source_note
+OPPOSITE_LOOP_FORMATION,73,0.9863013698630136,0.4861111111111111,0.5138888888888888,,,0.870833333333302,,Observed loop ledger; censoring explicit; no manual priors
+ORIGIN_BREACH,8358,0.9911462072266093,0.5007242877836794,0.4992757122163206,,,0.3499999999998874,,Observed loop ledger; censoring explicit; no manual priors
+RETRACE_INVALIDATION,323,0.978328173374613,0.47468354430379744,0.5253164556962026,,,0.6000000000001005,,Observed loop ledger; censoring explicit; no manual priors

@@ -1,0 +1,2 @@
+tier,n,expected_pm_excursion,r_lock_up,r_lock_down,monotonicity
+ALL,442,NOT_COMPUTED,NOT_COMPUTED,NOT_COMPUTED,NOT_IDENTIFIABLE_FROM_CENSUS

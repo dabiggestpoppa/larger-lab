@@ -1,0 +1,2 @@
+metric,status,reason
+ATR_tail,DATA_SOURCE_REQUIRED,ASE-1 terrain artifact does not contain causal ATR series
