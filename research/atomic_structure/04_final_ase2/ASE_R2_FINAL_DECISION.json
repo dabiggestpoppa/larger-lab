@@ -1,0 +1,92 @@
+{
+  "checkpoint": "ASE-2.3-FINAL-MECHANISM-AND-RLOCK-FALSIFICATION-SEAL",
+  "base_commit": "846fa919f13fa50d67bcb734f6c297a0c35f5c80",
+  "status": "FAIL_ATOMIC_PREDICTIVE_ENGINE",
+  "strategy_pnl_computed": false,
+  "optimization_performed": false,
+  "confirmation_consumed": false,
+  "holdout_consumed": false,
+  "ASE3_authorized": false,
+  "evidence_lineage": {
+    "SCALE": "PASS",
+    "NORMALIZATION": "PASS",
+    "STATE": "PARTIAL",
+    "TIME": "PARTIAL",
+    "CAUSALITY": "PASS"
+  },
+  "falsified_hypotheses": [
+    {
+      "name": "NOON_LOCK_GENERAL",
+      "verdict": "NOT SUPPORTED",
+      "evidence": "T3 H17 touch hold 36% (not ~98%); overall 23%"
+    },
+    {
+      "name": "POST25_UNIVERSAL_LOCK",
+      "verdict": "NOT SUPPORTED",
+      "evidence": "Overall 50% reversal (not ~4.2%); T3 23% reversal"
+    },
+    {
+      "name": "REMAINING_RANGE_ATOMIC_HIERARCHY",
+      "verdict": "NOT SUPPORTED OUT OF SAMPLE",
+      "evidence": "Hierarchy MAE 17.55 vs B0 17.23; P(improve)=0.0005"
+    },
+    {
+      "name": "NEXT_LOOP_DIRECTION_ATOMIC_STATE",
+      "verdict": "NOT SUPPORTED OUT OF SAMPLE",
+      "evidence": "All conditioned models worse log-loss than unconditional"
+    },
+    {
+      "name": "FAILURE_TYPE_DIRECTIONAL_EDGE",
+      "verdict": "LOW / NOT SUPPORTED",
+      "evidence": "Near 50/50 next-direction probabilities"
+    },
+    {
+      "name": "RLOCK_ADDS_INCREMENTAL_INFO_BEYOND_GAP",
+      "verdict": "NOT SUPPORTED",
+      "evidence": "Conditional-G partial spearman -0.12/-0.15; log-loss RLOCK=0.488 vs G=0.488"
+    }
+  ],
+  "surviving_mechanisms": [
+    {
+      "name": "R_LOCK_RANK_EFFECT",
+      "verdict": "ROBUST_BUT_REDUNDANT",
+      "evidence": "Spearman -0.59/-0.54; subperiods 2023 (-0.52/-0.54) 2024 (-0.66/-0.54); estimator sensitivity E0-E3 stable; rolling windows stable; monotone buckets 87%→7%",
+      "note": "Effect is real but entirely driven by gap distance (G); expected excursion normalization adds no incremental information"
+    },
+    {
+      "name": "BALANCE_PREDICTOR",
+      "verdict": "STRONG_BUT_NOT_A_MECHANISM",
+      "evidence": "Brier 0.208 vs null 0.250; log-loss 0.612 vs null 0.693; strongest categorical predictor",
+      "note": "Directional balance is a descriptive state variable, not a mechanism"
+    }
+  ],
+  "rlock_falsification": {
+    "gap_vs_rlock_brier_up": {"gap": 0.1568, "rlock": 0.1569, "delta": 0.0001},
+    "gap_vs_rlock_brier_dn": {"gap": 0.1843, "rlock": 0.1887, "delta": 0.0044},
+    "gap_vs_rlock_logloss_up": {"gap": 0.4880, "rlock": 0.4877, "delta": -0.0003},
+    "gap_vs_rlock_logloss_dn": {"gap": 0.5538, "rlock": 0.5611, "delta": 0.0073},
+    "conditional_G_spearman_up": -0.1188,
+    "conditional_G_spearman_dn": -0.1526,
+    "verdict": "R_LOCK is a robust rank effect but does NOT add incremental predictive information beyond raw gap distance"
+  },
+  "state_compression": {
+    "top_predictors_by_brier": [
+      {"variable": "G", "brier": 0.1568, "log_loss": 0.4880},
+      {"variable": "RLOCK", "brier": 0.1569, "log_loss": 0.4877},
+      {"variable": "balance", "brier": 0.2079, "log_loss": 0.6125},
+      {"variable": "mr_atr", "brier": 0.2366, "log_loss": 0.6659},
+      {"variable": "tier", "brier": 0.2393, "log_loss": 0.6716},
+      {"variable": "E1", "brier": 0.2387, "log_loss": 0.6705},
+      {"variable": "3am_state", "brier": 0.2394, "log_loss": 0.6720},
+      {"variable": "loop_bucket", "brier": 0.2404, "log_loss": 0.7000}
+    ],
+    "note": "G and RLOCK dominate; all Atomic state variables (tier, 3am, loop, balance) add marginal value at best"
+  },
+  "minimum_surviving_state_representation": ["G (raw gap distance)", "directional_balance"],
+  "program_routing": {
+    "recommendation": "Seal ASE development as failed. No rescue chain.",
+    "next": "NONE",
+    "note": "The CCE (Constraint Capacity Engine) hypothesis is falsified: capacity ratio adds no info beyond gap distance. The broader Atomic transition engine hypotheses are all falsified. Directional balance is a strong descriptive predictor but not a mechanism."
+  },
+  "human_review_required": true
+}

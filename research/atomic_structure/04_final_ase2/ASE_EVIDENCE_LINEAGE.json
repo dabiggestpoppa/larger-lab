@@ -1,0 +1,49 @@
+{
+  "checkpoint": "ASE-2.3-FINAL-MECHANISM-AND-RLOCK-FALSIFICATION-SEAL",
+  "policy": "A sealed evidence category may only be downgraded if a later experiment directly falsifies it. Never silently alter evidence status.",
+  "lineage": [
+    {
+      "checkpoint": "ASE-1.1",
+      "file": "ASE_R1_1_DECISION.json",
+      "evidence": {"SCALE": "PASS", "NORMALIZATION": "PASS", "STATE": "PASS", "TIME": "PASS", "CAUSALITY": "PASS"},
+      "basis": "Generation-A gated k-means (AR>45 NO-GO), tier transport stability, tier reproduction"
+    },
+    {
+      "checkpoint": "ASE-2",
+      "file": "ASE_R2_DECISION.json",
+      "evidence": {},
+      "note": "no evidence matrix recorded (omission)"
+    },
+    {
+      "checkpoint": "ASE-2.1",
+      "file": "ASE_R2_1_DECISION.json",
+      "evidence": {"CAUSALITY": "PASS"},
+      "note": "only causality recorded"
+    },
+    {
+      "checkpoint": "ASE-2.2",
+      "file": "ASE_R2_2_DECISION.json",
+      "evidence": {"SCALE": "WEAK", "NORMALIZATION": "PASS", "STATE": "PARTIAL", "TIME": "PARTIAL", "CAUSALITY": "PASS"},
+      "note": "SCALE=WEAK unsupported: no scale-falsifying experiment was run in ASE-2.2"
+    }
+  ],
+  "resolution": {
+    "carried_evidence": {"SCALE": "PASS", "NORMALIZATION": "PASS", "STATE": "PARTIAL", "TIME": "PARTIAL", "CAUSALITY": "PASS"},
+    "scale_downgrade_supported": false,
+    "ruling": "SCALE=PASS from ASE-1.1 restored as the carried classification; ASE-2.2 WEAK value archived as unbacked editorial inference",
+    "ase23_scale_re_tested": false,
+    "ase23_scope": "R_LOCK / capacity-ratio falsification; STATE and TIME remain carried at PARTIAL pending this checkpoint"
+  },
+  "frozen_negative_results": {
+    "NOON_LOCK_GENERAL": "NOT SUPPORTED",
+    "POST25_UNIVERSAL_LOCK": "NOT SUPPORTED",
+    "REMAINING_RANGE_ATOMIC_HIERARCHY": "NOT SUPPORTED OUT OF SAMPLE",
+    "NEXT_LOOP_DIRECTION_ATOMIC_STATE": "NOT SUPPORTED OUT OF SAMPLE",
+    "FAILURE_TYPE_DIRECTIONAL_EDGE": "LOW / NOT SUPPORTED"
+  },
+  "source_claim_status": {
+    "afternoon_variance_10_15": "NOT REPRODUCED",
+    "T3_noon_lock_98": "NOT REPRODUCED UNDER TESTED CONTRACT",
+    "post25_lock_95.8": "NOT REPRODUCED UNDER TESTED CONTRACT"
+  }
+}
