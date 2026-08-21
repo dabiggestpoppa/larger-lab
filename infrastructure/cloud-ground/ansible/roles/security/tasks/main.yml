@@ -41,7 +41,6 @@
     - { regexp: '^#?MaxAuthTries', line: 'MaxAuthTries 3' }
     - { regexp: '^#?ClientAliveInterval', line: 'ClientAliveInterval 300' }
     - { regexp: '^#?ClientAliveCountMax', line: 'ClientAliveCountMax 2' }
-    - { regexp: '^#?HostKeyChecking', line: 'HostKeyChecking yes' }
   notify: restart ssh
   tags: [security, ssh]
 
@@ -49,9 +48,10 @@
 - name: Document SSH hardening status
   ansible.builtin.debug:
     msg: >
-      SSH hardened: PermitRootLogin=no, X11Forwarding=no, MaxAuthTries=3,
-      HostKeyChecking=yes. PasswordAuthentication still enabled —
+      SSH hardened: PermitRootLogin=no, X11Forwarding=no, MaxAuthTries=3.
+      PasswordAuthentication still enabled —
       disable manually after verifying key-based access.
+      host_key_checking=True enforced in ansible.cfg.
   tags: [security, ssh]
 
 # === KNOWN HOST BOOTSTRAP ===
@@ -62,12 +62,25 @@
     mode: '0700'
   tags: [security, ssh, known-hosts]
 
-- name: Add host key to known_hosts (operator must verify)
+# Operator-supplied verified host key (required)
+- name: Fail if no verified host key provided
+  ansible.builtin.fail:
+    msg: >
+      ABORT: No verified host public key or fingerprint provided for
+      {{ inventory_hostname }}. SSH trust requires operator-supplied
+      verified host-key material — never use unverified ssh-keyscan results.
+      Set 'verified_host_key' in the inventory or provide a fingerprint
+      via 'ansible_host_key_fingerprint'.
+  when: >
+    verified_host_key is not defined and verified_host_key_fingerprint is not defined
+  tags: [security, ssh, known-hosts]
+
+- name: Add verified host key to known_hosts
   ansible.builtin.known_hosts:
     name: "{{ inventory_hostname }}"
-    key: "{{ lookup('pipe', 'ssh-keyscan ' + inventory_hostname) }}"
+    key: "{{ verified_host_key }}"
     state: present
-  ignore_errors: true
+  when: verified_host_key is defined
   tags: [security, ssh, known-hosts]
 
 # === FAIL2BAN ===

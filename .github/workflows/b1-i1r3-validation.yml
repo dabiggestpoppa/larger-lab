@@ -29,9 +29,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y shellcheck
 
       - name: Install Docker Compose
-        run: |
-          sudo apt-get update && sudo apt-get install -y docker-compose-v2 || true
-          docker compose version || echo "Docker Compose not available"
+        run: sudo apt-get update && sudo apt-get install -y docker-compose-v2
 
       - name: Install Gitleaks
         run: |
@@ -39,7 +37,20 @@ jobs:
           tar xzf gitleaks_8.18.1_linux_x64.tar.gz
           sudo mv gitleaks /usr/local/bin/
 
+      - name: Assert tool versions
+        id: tool_versions
+        run: |
+          echo "=== TOOL VERSION ASSERTIONS ==="
+          python3 --version
+          ansible-playbook --version
+          ansible-lint --version
+          shellcheck --version
+          gitleaks version
+          docker compose version
+          echo "=== ALL TOOLS INSTALLED ==="
+
       - name: Record source identity
+        id: identity
         run: |
           echo "=== SOURCE IDENTITY ==="
           echo "Repository: $GITHUB_REPOSITORY"
@@ -47,20 +58,99 @@ jobs:
           echo "SHA: $GITHUB_SHA"
           echo "Workflow: $GITHUB_WORKFLOW"
           echo "Run ID: $GITHUB_RUN_ID"
-          git rev-parse HEAD
-          git rev-parse HEAD^{tree}
+          COMMIT=$(git rev-parse HEAD)
+          TREE=$(git rev-parse HEAD^{tree})
+          echo "commit=$COMMIT" >> "$GITHUB_OUTPUT"
+          echo "tree=$TREE" >> "$GITHUB_OUTPUT"
+          echo "HEAD commit: $COMMIT"
+          echo "HEAD tree:   $TREE"
 
-      - name: Run validation engine
-        run: python3 infrastructure/cloud-ground/scripts/validate_engine.py --all
+      - name: Authoritative source-identity validation
+        run: |
+          python3 infrastructure/cloud-ground/scripts/validate_engine.py \
+            --authoritative \
+            --target-commit "${{ steps.identity.outputs.commit }}" \
+            --target-tree "${{ steps.identity.outputs.tree }}" \
+            --target-branch "${{ github.ref_name }}"
 
-      - name: Run adversarial tests
-        run: bash infrastructure/cloud-ground/tests/adversarial-tests.sh
+      - name: Ansible syntax validation
+        run: |
+          cd infrastructure/cloud-ground/ansible
+          ansible-playbook --syntax-check playbooks/site.yml \
+            -i inventories/example/hosts.yml
 
-      - name: Generate final evidence
+      - name: Ansible lint
+        run: |
+          cd infrastructure/cloud-ground/ansible
+          ansible-lint playbooks/site.yml
+
+      - name: Render Docker Compose
+        run: |
+          cd infrastructure/cloud-ground/compose
+          POSTGRES_PASSWORD=test_validation docker compose \
+            -f compose.foundation.yml config
+
+      - name: Validate image digests
+        run: |
+          python3 -c "
+          import json, sys
+          evidence = json.load(open('infrastructure/cloud-ground/evidence/image-digests.json'))
+          errors = []
+          for img in evidence.get('images', []):
+              name = img.get('name', '')
+              digest = img.get('digest', '')
+              verified = img.get('verified_digest', False)
+              if not digest or not verified:
+                  errors.append(f'{name}: not verified')
+              print(f'{name}: {digest} verified={verified}')
+          if errors:
+              print(f'ERRORS: {errors}', file=sys.stderr)
+              sys.exit(1)
+          print('All digests verified in evidence')
+          "
+
+      - name: ShellCheck
+        run: |
+          shellcheck -s bash infrastructure/cloud-ground/tests/adversarial-tests.sh
+
+      - name: Gitleaks
+        run: |
+          gitleaks detect \
+            --source infrastructure/cloud-ground \
+            --no-banner \
+            --report-format json
+
+      - name: Run complete validator
         run: |
           python3 infrastructure/cloud-ground/scripts/validate_engine.py --all
-          echo "=== FINAL EVIDENCE ==="
-          cat infrastructure/cloud-ground/evidence/stage-status.json
+
+      - name: Run adversarial test suite
+        run: |
+          bash infrastructure/cloud-ground/tests/adversarial-tests.sh
+
+      - name: Assert final gate
+        run: |
+          echo "=== FINAL GATE ASSERTION ==="
+          STAGE_STATUS="infrastructure/cloud-ground/evidence/stage-status.json"
+          if [ ! -f "$STAGE_STATUS" ]; then
+            echo "ERROR: stage-status.json not found"
+            exit 1
+          fi
+          GATE=$(python3 -c "import json; print(json.load(open('$STAGE_STATUS'))['gate_status'])")
+          echo "Gate: $GATE"
+          if [ "$GATE" != "READY_FOR_OPERATOR_REVIEW" ]; then
+            echo "ERROR: Gate is $GATE, expected READY_FOR_OPERATOR_REVIEW"
+            exit 1
+          fi
+          # Assert no blocked or skipped in main results
+          BLOCKED=$(python3 -c "import json; d=json.load(open('infrastructure/cloud-ground/evidence/static-validation-results.json')); print(d['totals'].get('BLOCKED', 0))")
+          SKIPPED=$(python3 -c "import json; d=json.load(open('infrastructure/cloud-ground/evidence/static-validation-results.json')); print(d['totals'].get('SKIPPED', 0))")
+          echo "BLOCKED: $BLOCKED, SKIPPED: $SKIPPED"
+          if [ "$BLOCKED" -gt 0 ] || [ "$SKIPPED" -gt 0 ]; then
+            echo "ERROR: BLOCKED=$BLOCKED SKIPPED=$SKIPPED — must be zero"
+            exit 1
+          fi
+          echo "=== GATE: READY ==="
 
       - name: Upload evidence artifacts
         if: always()

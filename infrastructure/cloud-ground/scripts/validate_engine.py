@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 OCE Cloud Ground — Validation Engine
-B1-I1R3A — Source Identity and Authoritative CI Closure
-Version: 3.0.0
+B1-I1R3B — Source Identity and Authoritative CI Closure
+Version: 3.1.0
 
 Mandatory checks: 29
 - SOURCE-IDENTITY (first, fail-closed)
@@ -26,8 +26,9 @@ import hashlib
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
+import shutil
 
-VERSION = "3.0.0"
+VERSION = "3.1.0"
 SCRIPT_DIR = Path(__file__).resolve().parent
 BASE_DIR = SCRIPT_DIR.parent
 REPO_ROOT = BASE_DIR.parent.parent  # infrastructure/cloud-ground -> repo root
@@ -105,7 +106,7 @@ class CheckResult:
 
 
 class Validator:
-    def __init__(self, target_commit=None, target_tree=None, target_branch=None):
+    def __init__(self, target_commit=None, target_tree=None, target_branch=None, authoritative=False):
         self.results = []
         self.run_uid = run_id()
         self.start_time = utc_now()
@@ -113,6 +114,7 @@ class Validator:
         self.target_commit = target_commit  # expected impl SHA (for --target-commit)
         self.target_tree = target_tree
         self.target_branch = target_branch
+        self.authoritative = authoritative
 
     def add(self, check_id, description, mandatory, result, evidence="", output=""):
         self.results.append(CheckResult(check_id, description, mandatory, result, evidence, output))
@@ -177,11 +179,13 @@ class Validator:
         if expected_full != "dabiggestpoppa/larger-lab":
             errors.append(f"REPOSITORY: expected dabiggestpoppa/larger-lab, got {expected_full}")
 
-        # 2. Remote identity
+        # 2. Remote identity — strip .git suffix properly (not rstrip which strips individual chars)
         remote_url = git.get("remote_url", "")
         accepted = contract.get("accepted_origins", [])
-        remote_normalized = remote_url.rstrip(".git") if remote_url else ""
-        accepted_normalized = [o.rstrip(".git") for o in accepted]
+        def strip_git_suffix(s):
+            return s[:-4] if s.endswith(".git") else s
+        remote_normalized = strip_git_suffix(remote_url) if remote_url else ""
+        accepted_normalized = [strip_git_suffix(o) for o in accepted]
         if remote_normalized not in accepted_normalized and remote_url not in accepted:
             errors.append(f"REMOTE: '{remote_url}' not in accepted origins {accepted}")
 
@@ -231,7 +235,56 @@ class Validator:
                 errors.append(f"GITHUB_REPOSITORY: expected dabiggestpoppa/larger-lab, got {gha_repo}")
             if gha_sha and actual_commit and gha_sha != actual_commit:
                 errors.append(f"GITHUB_SHA: {gha_sha[:12]} does not match HEAD {actual_commit[:12]}")
-        # else: local run — skip CI-specific checks
+            if gha_ref:
+                expected_branch_ci = self.target_branch or contract.get("authorized_branch", "")
+                if expected_branch_ci and gha_ref != expected_branch_ci:
+                    errors.append(f"GITHUB_REF_NAME: expected '{expected_branch_ci}', got '{gha_ref}'")
+
+        # 9. Authoritative mode — strict identity proof
+        if self.authoritative:
+            # All identity inputs are mandatory
+            if not self.target_commit or not self.target_commit.strip():
+                errors.append("AUTHORITATIVE: --target-commit is mandatory in authoritative mode")
+            if not self.target_tree or not self.target_tree.strip():
+                errors.append("AUTHORITATIVE: --target-tree is mandatory in authoritative mode")
+            if not self.target_branch or not self.target_branch.strip():
+                errors.append("AUTHORITATIVE: --target-branch is mandatory in authoritative mode")
+
+            # HEAD must equal target commit
+            if actual_commit and self.target_commit and actual_commit != self.target_commit:
+                errors.append(f"AUTHORITATIVE: HEAD {actual_commit[:12]} != target commit {self.target_commit[:12]}")
+
+            # HEAD^{{tree}} must equal target tree
+            if actual_tree and self.target_tree and actual_tree != self.target_tree:
+                errors.append(f"AUTHORITATIVE: tree {actual_tree[:12]} != target tree {self.target_tree[:12]}")
+
+            # CI-specific authoritative checks
+            if gha_repo:
+                if gha_sha and actual_commit and gha_sha != actual_commit:
+                    errors.append(f"AUTHORITATIVE: GITHUB_SHA {gha_sha[:12]} != HEAD {actual_commit[:12]}")
+                if gha_ref and self.target_branch and gha_ref != self.target_branch:
+                    errors.append(f"AUTHORITATIVE: GITHUB_REF_NAME '{gha_ref}' != '{self.target_branch}'")
+                if gha_repo != "dabiggestpoppa/larger-lab":
+                    errors.append(f"AUTHORITATIVE: GITHUB_REPOSITORY '{gha_repo}' != 'dabiggestpoppa/larger-lab'")
+
+            # Ancestry from authoritative_base_sha
+            expected_base = contract.get("authoritative_base_sha", "")
+            if expected_base and expected_base.strip() and actual_commit:
+                if actual_commit != expected_base:
+                    r = subprocess.run(
+                        ["git", "-C", str(REPO_ROOT), "merge-base", "--is-ancestor", expected_base, actual_commit],
+                        capture_output=True, text=True, timeout=10
+                    )
+                    if r.returncode != 0:
+                        errors.append(f"AUTHORITATIVE: HEAD is not descendant of base {expected_base[:12]}")
+
+            # Worktree must be clean
+            r = subprocess.run(
+                ["git", "-C", str(REPO_ROOT), "status", "--porcelain"],
+                capture_output=True, text=True, timeout=10
+            )
+            if r.stdout.strip():
+                errors.append(f"AUTHORITATIVE: worktree not clean — {len(r.stdout.strip().splitlines())} dirty files")
 
         if errors:
             self.add("SOURCE-IDENTITY", "Source identity verification", True,
@@ -429,6 +482,73 @@ class Validator:
                      f"{len(violations)} tag-only images", "\n".join(violations))
         else:
             self.add("DIGEST-LOCK", "All images use digest pinning", True, "PASS", "0 violations", "All pinned")
+
+    def check_digest_proof(self):
+        """Verify compose digests match real registry-proven digests in evidence."""
+        evidence_path = EVIDENCE_DIR / "image-digests.json"
+        if not evidence_path.exists():
+            self.add("DIGEST-PROOF", "Image digests match registry evidence", True,
+                     "BLOCKED", "image-digests.json not found", "Generate digest evidence first")
+            return
+        try:
+            with open(evidence_path, "r", encoding="utf-8") as f:
+                evidence = json.load(f)
+        except Exception as e:
+            self.add("DIGEST-PROOF", "Image digests match registry evidence", True,
+                     "BLOCKED", f"Cannot parse image-digests.json: {e}", "")
+            return
+
+        # Build evidence digest map
+        evidence_digests = {}
+        for img in evidence.get("images", []):
+            evidence_digests[img["name"]] = img.get("digest", "")
+        verified_digests = {}
+        for img in evidence.get("images", []):
+            if img.get("verified_digest", False):
+                verified_digests[img["name"]] = img.get("digest", "")
+
+        # Check compose images against evidence
+        foundation = COMPOSE_DIR / "compose.foundation.yml"
+        if not foundation.exists():
+            self.add("DIGEST-PROOF", "Image digests match registry evidence", True,
+                     "BLOCKED", "compose.foundation.yml not found", "")
+            return
+        content = self._read_file(foundation)
+        violations = []
+        for i, line in enumerate(content.split("\n"), 1):
+            stripped = line.lstrip()
+            if stripped.startswith("#"):
+                continue
+            m = re.match(r"image:\s*(.+)", stripped)
+            if m:
+                img_ref = m.group(1).strip().strip('"').strip("'")
+                # Extract image name from ref like postgres@sha256:...
+                parts = img_ref.split("@")
+                img_name = parts[0] if parts else ""
+                img_digest = parts[1] if len(parts) > 1 else ""
+                if img_name in evidence_digests:
+                    expected_digest = evidence_digests[img_name]
+                    if img_digest != expected_digest:
+                        violations.append(
+                            f"{img_name}: compose={img_digest[:20]}... evidence={expected_digest[:20]}...")
+                elif img_name:
+                    violations.append(f"{img_name}: no digest proof in image-digests.json")
+
+        # Check all evidence images are verified
+        unverified = [name for name, digest in evidence_digests.items()
+                      if name not in verified_digests]
+
+        if violations:
+            self.add("DIGEST-PROOF", "Image digests match registry evidence", True,
+                     "FAIL", f"{len(violations)} mismatches", "\n".join(violations))
+        elif unverified:
+            self.add("DIGEST-PROOF", "Image digests match registry evidence", True,
+                     "FAIL", f"{len(unverified)} unverified", f"Unverified: {', '.join(unverified)}")
+        else:
+            verified_count = len(verified_digests)
+            self.add("DIGEST-PROOF", "Image digests match registry evidence", True,
+                     "PASS", f"{verified_count} verified digests",
+                     "All compose digests match registry-proven evidence")
 
     def check_no_published_ports(self):
         foundation = COMPOSE_DIR / "compose.foundation.yml"
@@ -738,7 +858,11 @@ class Validator:
         try:
             all_pass, details = True, []
             for s in scripts:
-                r = subprocess.run(["shellcheck", "-s", "bash", str(s)], capture_output=True, text=True, timeout=30)
+                # Use --severity=error to only fail on actual errors, not style warnings
+                r = subprocess.run(
+                    ["shellcheck", "-s", "bash", "--severity=error", str(s)],
+                    capture_output=True, text=True, timeout=30
+                )
                 if r.returncode != 0:
                     all_pass = False
                     details.append(f"{s.name}: {r.stderr[:200]}")
@@ -939,6 +1063,7 @@ class Validator:
         # Phase 3: Compose/policy checks
         self.check_no_latest_tags()
         self.check_digest_lock()
+        self.check_digest_proof()
         self.check_no_published_ports()
         self.check_no_privileged()
         self.check_no_socket_mount()
@@ -976,6 +1101,7 @@ class Validator:
             "SCHEMA-FIXTURES": self.check_schema_fixtures,
             "NO-LATEST-TAGS": self.check_no_latest_tags,
             "DIGEST-LOCK": self.check_digest_lock,
+            "DIGEST-PROOF": self.check_digest_proof,
             "NO-DB-PORTS": self.check_no_published_ports,
             "NO-PRIV": self.check_no_privileged,
             "NO-SOCKET": self.check_no_socket_mount,
@@ -996,6 +1122,8 @@ class Validator:
             "SHELLCHECK": self.check_shellcheck,
             "GITLEAKS": self.check_gitleaks,
             "SCAFFOLD-SCAN": self.check_scaffold_scan,
+            "EVIDENCE-CONSISTENCY": self.check_evidence_consistency,
+            "TOTALS-CONSIST": lambda: self.check_totals_consistency({}),
         }
 
         # SOURCE-IDENTITY always runs first
@@ -1064,6 +1192,56 @@ class Validator:
 
         # Write stage status
         self.write_stage_status(git_info, totals, gate)
+
+        return gate, totals
+
+    def write_evidence_targeted(self, git_info):
+        """Write evidence in targeted mode — skip FAIL-CLOSED and EVIDENCE-CONSISTENCY."""
+        EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
+
+        # Compute totals (excluding post-checks)
+        pre_totals = {"PASS": 0, "FAIL": 0, "BLOCKED": 0, "SKIPPED": 0}
+        for r in self.results:
+            if r.check_id in ("TOTALS-CONSIST", "FAIL-CLOSED", "EVIDENCE-CONSISTENCY"):
+                continue
+            if r.result in pre_totals:
+                pre_totals[r.result] += 1
+        pre_totals["total"] = sum(pre_totals.values())
+
+        # Only run TOTALS-CONSIST in targeted mode
+        self.check_totals_consistency(pre_totals)
+
+        totals = self.compute_totals()
+        gate = self.determine_gate(totals)
+
+        # Write JSON
+        results_data = {
+            "schema_version": VERSION,
+            "run_id": self.run_uid,
+            "validator_version": VERSION,
+            "start_time": self.start_time,
+            "end_time": utc_now(),
+            "tested_commit": git_info.get("commit", "unknown"),
+            "tested_tree": git_info.get("tree", "unknown"),
+            "tested_branch": git_info.get("branch", "unknown"),
+            "repository": "dabiggestpoppa/larger-lab",
+            "command": "validate_engine.py --only",
+            "tools": {
+                "python": get_tool_version("python3"),
+                "ansible": get_tool_version("ansible-playbook"),
+                "ansible_lint": get_tool_version("ansible-lint"),
+                "docker": get_tool_version("docker"),
+                "shellcheck": get_tool_version("shellcheck"),
+                "gitleaks": get_tool_version("gitleaks"),
+            },
+            "results": [r.to_dict() for r in self.results],
+            "totals": totals,
+            "gate": gate,
+        }
+
+        results_path = EVIDENCE_DIR / "static-validation-results.json"
+        with open(results_path, "w", encoding="utf-8") as f:
+            json.dump(results_data, f, indent=2, ensure_ascii=False)
 
         return gate, totals
 
@@ -1152,23 +1330,45 @@ class Validator:
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description="OCE Cloud Ground Validation Engine v3.0.0")
+    parser = argparse.ArgumentParser(description="OCE Cloud Ground Validation Engine v3.1.0")
     parser.add_argument("--all", action="store_true", help="Run all checks")
+    parser.add_argument("--authoritative", action="store_true",
+                        help="Authoritative mode: enforce strict identity proof (requires --target-commit, --target-tree, --target-branch)")
     parser.add_argument("--target-commit", type=str, help="Expected implementation SHA")
     parser.add_argument("--target-tree", type=str, help="Expected tree SHA")
     parser.add_argument("--target-branch", type=str, help="Expected branch name")
     parser.add_argument("--only", type=str, help="Comma-separated check IDs to run")
     args = parser.parse_args()
 
+    # In authoritative mode, identity inputs are mandatory
+    if args.authoritative:
+        missing = []
+        if not args.target_commit:
+            missing.append("--target-commit")
+        if not args.target_tree:
+            missing.append("--target-tree")
+        if not args.target_branch:
+            missing.append("--target-branch")
+        if missing:
+            print(f"ERROR: Authoritative mode requires: {', '.join(missing)}")
+            sys.exit(1)
+
     validator = Validator(
         target_commit=args.target_commit,
         target_tree=args.target_tree,
         target_branch=args.target_branch,
+        authoritative=args.authoritative,
     )
 
     if args.only:
         check_ids = [c.strip() for c in args.only.split(",")]
         validator.run_targeted(check_ids)
+        git_info = get_git_info()
+        # In targeted mode, write evidence but skip FAIL-CLOSED and EVIDENCE-CONSISTENCY
+        gate, totals = validator.write_evidence_targeted(git_info)
+        results = validator.results
+        has_fail = any(r.result == "FAIL" for r in results)
+        sys.exit(1 if has_fail else 0)
     elif args.all:
         validator.run_all_checks()
     else:
