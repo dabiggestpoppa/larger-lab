@@ -45,7 +45,15 @@ def normalize(df: pd.DataFrame, tz_assumption='UTC') -> pd.DataFrame:
     return x.set_index('dt')
 
 def session_key(index: pd.DatetimeIndex) -> pd.Series:
-    return pd.Series((index - pd.Timedelta(hours=3)).date, index=index)
+    """Return the research date at the 03:00 New York boundary.
+
+    The evening portion of the Asian session (19:00-23:55) belongs to the
+    following research day; subtracting three hours alone would incorrectly
+    split it from the 00:00-02:55 portion.
+    """
+    local = pd.Series(index, index=index)
+    dates = pd.Series(local.dt.date, index=index)
+    return dates.where(local.dt.hour < 19, dates + pd.Timedelta(days=1))
 
 def build_daily_ranges(x: pd.DataFrame) -> pd.DataFrame:
     y = x.copy(); y['session_date'] = session_key(y.index).values

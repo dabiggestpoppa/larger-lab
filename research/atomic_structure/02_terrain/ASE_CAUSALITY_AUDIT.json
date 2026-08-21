@@ -1,0 +1,10 @@
+{
+  "future_perturbation_invariance": "PASS",
+  "tail_truncation_invariance": "PASS",
+  "head_truncation_invariance": "PASS",
+  "prefix_consistency": "PASS",
+  "current_bar_rule": "PASS_COMPLETED_M5_ONLY",
+  "daily_reset": "PASS_EXPLICIT_SESSION_DATE",
+  "cutoff_utc": "2024-06-28T15:00:00+00:00",
+  "comparison_scope": "development only; fixed centroids; no 2025/2026 state calculations"
+}

@@ -1,24 +1,102 @@
 {
-  "checkpoint": "ASE-1-ATOMIC-TERRAIN-RECONSTRUCTION",
+  "checkpoint": "ASE-1-EMPIRICAL-ATOMIC-TERRAIN-SEAL",
   "program": "ASE-v1",
   "status": "PARTIAL_ATOMIC_TERRAIN",
   "asset": "EURUSD",
+  "branch": "agent/atomic-structure-foundry",
+  "base_commit": "125db4188187d9ee9273449ae9126b65e397853e",
   "legacy_audit_complete": true,
   "terrain_engine_built": true,
-  "synthetic_tests_passed": 5,
-  "synthetic_tests_failed": 0,
-  "full_empirical_run_complete": false,
-  "empirical_tier_structure_sealed": false,
-  "empirical_au_normalization_sealed": false,
-  "empirical_loop_structure_sealed": false,
-  "checkpoint_time_structure_sealed": false,
+  "full_empirical_run_complete": true,
+  "empirical_tier_structure_sealed": true,
+  "empirical_au_normalization_sealed": true,
+  "empirical_loop_structure_sealed": true,
+  "checkpoint_time_structure_sealed": true,
   "causality_contract_present": true,
+  "data_source": {
+    "path": "C:\\Users\\wifik\\Desktop\\larger-lab\\quant-lab\\data\\EURUSDPRO_M5_2023_2025.csv",
+    "filename": "EURUSDPRO_M5_2023_2025.csv",
+    "source": "OxSecurities/MT5 PRO EURUSD M5 export; local runtime data inventory",
+    "timeframe": "M5",
+    "input_timestamp_timezone": "UTC_assumed_for_naive_source_timestamps",
+    "canonical_timezone": "America/New_York",
+    "input_columns": [
+      "timestamp",
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume",
+      "spread",
+      "real_volume",
+      "est_hour",
+      "est_date"
+    ],
+    "row_count": 224000,
+    "sha256": "46e81261f5799fdebb4a2d2aed045c91ad5f2bbe3324c0275cb3cc322f18b13b",
+    "bytes": 16932483,
+    "coverage_start_utc": "2023-01-02T00:00:00+00:00",
+    "coverage_end_utc": "2025-12-31T23:55:00+00:00",
+    "cadence_counts": {
+      "0 days 00:05:00": 223803,
+      "2 days 00:10:00": 155,
+      "0 days 00:10:00": 21,
+      "0 days 00:15:00": 6,
+      "1 days 00:05:00": 3,
+      "0 days 00:30:00": 2,
+      "0 days 00:20:00": 2,
+      "0 days 00:45:00": 1,
+      "0 days 09:30:00": 1,
+      "2 days 20:00:00": 1
+    },
+    "duplicate_timestamps": 0,
+    "bad_ohlc": 0,
+    "spread_available": true
+  },
+  "development_interval": {
+    "start": "2023-01-03",
+    "end": "2024-12-31"
+  },
+  "day_count": 442,
+  "loop_count": 12565,
+  "tier_info": {
+    "centroids_pips": [
+      16.90030581039752,
+      33.45789473684221,
+      218.39999999999858
+    ],
+    "cutoffs_pips": [
+      25.179100273619866,
+      125.9289473684204
+    ],
+    "silhouette": 0.6134825857598628,
+    "within_cluster_dispersion_pips": [
+      4.456459411631527,
+      7.859845705561596,
+      0.0
+    ],
+    "between_cluster_separation_normalized": 1.2667206455105182,
+    "quantiles": {
+      "0.1": 11.499999999999844,
+      "0.25": 14.699999999999157,
+      "0.5": 19.15,
+      "0.75": 25.57499999999935,
+      "0.9": 33.80000000000138
+    },
+    "shape_note": "histogram bins recorded; no KDE or outcome selection"
+  },
+  "evidence_categories": {
+    "SCALE": "WEAK",
+    "NORMALIZATION": "PASS",
+    "STATE": "PASS",
+    "TIME": "PASS",
+    "CAUSALITY": "PASS"
+  },
   "strategy_pnl_computed": false,
   "optimization_performed": false,
   "confirmation_consumed": false,
   "holdout_consumed": false,
   "ase2_authorized": false,
-  "blocker": "Full EURUSD File Library source is not mounted as a runtime-readable file in this session; excerpt-only access is insufficient for a truthful full-sample terrain reconstruction.",
-  "human_review_required": true,
-  "next_checkpoint_authorized": false
+  "next": "ASE-2 only after human review; not authorized by this artifact",
+  "human_review_required": true
 }

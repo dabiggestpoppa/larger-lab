@@ -1,0 +1,12 @@
+{
+  "status": "FROZEN_FOR_ASE1_TERRAIN",
+  "time": {"timezone": "America/New_York", "window_start": "03:00", "terminal": "12:00", "bar_frequency": "5min", "completed_bar_only": true},
+  "origins": {"daily": "last_asian_close_before_03:00", "completion_reset": "next_bar_after_completion_with_completion_bar_close", "failure_reset": "next_bar_after_failure_with_failure_bar_close", "terminal_reset": "next_research_day"},
+  "direction": "first_post_origin_completed_bar_close_strictly_above_or_below_origin",
+  "completion": {"up": "+1.0_AU_high", "down": "-1.0_AU_low", "direction_bar_excursion_excluded": true},
+  "failure_precedence": ["SAME_BAR_AMBIGUITY_DATA_INVALID", "OPPOSITE_LOOP_FORMATION", "RETRACE_INVALIDATION", "ORIGIN_BREACH"],
+  "failure_thresholds": {"opposite_loop_formation": "1.0_AU_adverse", "retrace_invalidation": "0.5_AU_adverse", "origin_breach": "0.0_AU_adverse"},
+  "terminal_failure": "TERMINAL_12PM",
+  "invalidity": "DATA_INVALID",
+  "leakage_guard": "retrospective_final_range_and_checkpoint_outcomes_are_labels_only"
+}

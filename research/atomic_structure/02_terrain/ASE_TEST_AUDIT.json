@@ -1,0 +1,36 @@
+{
+  "checkpoint": "ASE-1-EMPIRICAL-ATOMIC-TERRAIN-SEAL",
+  "data_source": "M5",
+  "development_days": 442,
+  "loops": 12565,
+  "unit_tests": {
+    "total": 19,
+    "passed": 19,
+    "failed": 0
+  },
+  "checks": {
+    "timezone": "PASS",
+    "DST": "PASS",
+    "session_boundaries": "PASS",
+    "duplicate_rejection": "PASS",
+    "OHLC_validity": "PASS",
+    "tier_determinism": "PASS",
+    "tier_transport_determinism": "PASS",
+    "AU_math": "PASS",
+    "loop_determinism": "PASS",
+    "loop_reset": "PASS",
+    "failure_taxonomy": "PASS",
+    "daily_reset": "PASS",
+    "checkpoint_6AM": "PASS",
+    "checkpoint_9AM": "PASS",
+    "terminal_12PM": "PASS",
+    "first_hit_ordering": "PASS",
+    "future_perturbation": "PASS",
+    "truncation": "PASS",
+    "prefix_consistency": "PASS"
+  },
+  "strategy_pnl_computed": false,
+  "optimization_performed": false,
+  "confirmation_consumed": false,
+  "holdout_consumed": false
+}

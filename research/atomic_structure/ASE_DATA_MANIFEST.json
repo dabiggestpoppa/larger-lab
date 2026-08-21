@@ -1,18 +1,164 @@
 {
   "program": "ASE-v1",
-  "asset": "EURUSD",
   "phase": "ASE-1",
-  "source_class": "CHATGPT_FILE_LIBRARY",
-  "source_title": "EURUSD.PRO_H1_202211080000_202607140000.csv",
-  "observed_schema": ["<DATE>","<TIME>","<OPEN>","<HIGH>","<LOW>","<CLOSE>","<TICKVOL>","<VOL>","<SPREAD>"],
-  "reported_coverage_start": "2022-11-08",
-  "reported_coverage_end": "2026-07-14",
-  "canonical_timezone": "America/New_York",
-  "asian_window": "19:00-03:00 America/New_York",
-  "development_preference": "2022-11-08 through 2024-12-31, subject to complete raw-file runtime access",
-  "confirmation_reserved": "2025-01-01 through 2025-12-31",
-  "holdout_reserved": "2026+",
-  "runtime_access": "BLOCKED_FULL_FILE",
-  "runtime_access_note": "The File Library source can be searched and parsed in excerpts, but the full referenced file is not mounted in the code execution filesystem in this session. No full-sample empirical ASE-1 statistics are claimed.",
+  "asset": "EURUSD",
+  "source": {
+    "path": "C:\\Users\\wifik\\Desktop\\larger-lab\\quant-lab\\data\\EURUSDPRO_M5_2023_2025.csv",
+    "filename": "EURUSDPRO_M5_2023_2025.csv",
+    "source": "OxSecurities/MT5 PRO EURUSD M5 export; local runtime data inventory",
+    "timeframe": "M5",
+    "input_timestamp_timezone": "UTC_assumed_for_naive_source_timestamps",
+    "canonical_timezone": "America/New_York",
+    "input_columns": [
+      "timestamp",
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume",
+      "spread",
+      "real_volume",
+      "est_hour",
+      "est_date"
+    ],
+    "row_count": 224000,
+    "sha256": "46e81261f5799fdebb4a2d2aed045c91ad5f2bbe3324c0275cb3cc322f18b13b",
+    "bytes": 16932483,
+    "coverage_start_utc": "2023-01-02T00:00:00+00:00",
+    "coverage_end_utc": "2025-12-31T23:55:00+00:00",
+    "cadence_counts": {
+      "0 days 00:05:00": 223803,
+      "2 days 00:10:00": 155,
+      "0 days 00:10:00": 21,
+      "0 days 00:15:00": 6,
+      "1 days 00:05:00": 3,
+      "0 days 00:30:00": 2,
+      "0 days 00:20:00": 2,
+      "0 days 00:45:00": 1,
+      "0 days 09:30:00": 1,
+      "2 days 20:00:00": 1
+    },
+    "duplicate_timestamps": 0,
+    "bad_ohlc": 0,
+    "spread_available": true
+  },
+  "source_selection": "highest-resolution trustworthy complete M5 source available locally; no vendor mixing",
+  "development_split": {
+    "requested": "2022-01-01 through 2024-12-31",
+    "actual": "first complete source session through 2024-12-31",
+    "start": "2023-01-03",
+    "end": "2024-12-31",
+    "usable_valid_session_start": "2023-01-03"
+  },
+  "confirmation_reserved": {
+    "start": "2025-01-01",
+    "end": "2025-12-31",
+    "used_for_terrain": false
+  },
+  "holdout_reserved": {
+    "start": "2026-01-01",
+    "used_for_terrain": false
+  },
+  "session_contract": {
+    "timezone": "America/New_York",
+    "asian": "19:00-03:00",
+    "origin": "03:00",
+    "checkpoints": [
+      "06:00",
+      "09:00",
+      "12:00"
+    ],
+    "terminal": "12:00",
+    "dst": "IANA zone with DST"
+  },
+  "data_quality": {
+    "candidate_session_dates": 589,
+    "valid": 442,
+    "partial": 147,
+    "invalid": 0,
+    "partial_bars": 28625,
+    "missing_examples": [
+      {
+        "date": "2023-01-02",
+        "asian_bars": 94,
+        "research_bars": 108,
+        "outcome_bars_3_17": 168
+      },
+      {
+        "date": "2023-03-13",
+        "asian_bars": 84,
+        "research_bars": 108,
+        "outcome_bars_3_17": 168
+      },
+      {
+        "date": "2023-03-18",
+        "asian_bars": 11,
+        "research_bars": 0,
+        "outcome_bars_3_17": 0
+      },
+      {
+        "date": "2023-03-20",
+        "asian_bars": 84,
+        "research_bars": 108,
+        "outcome_bars_3_17": 168
+      },
+      {
+        "date": "2023-03-25",
+        "asian_bars": 11,
+        "research_bars": 0,
+        "outcome_bars_3_17": 0
+      },
+      {
+        "date": "2023-03-27",
+        "asian_bars": 84,
+        "research_bars": 108,
+        "outcome_bars_3_17": 168
+      },
+      {
+        "date": "2023-04-01",
+        "asian_bars": 11,
+        "research_bars": 0,
+        "outcome_bars_3_17": 0
+      },
+      {
+        "date": "2023-04-03",
+        "asian_bars": 84,
+        "research_bars": 108,
+        "outcome_bars_3_17": 168
+      },
+      {
+        "date": "2023-04-08",
+        "asian_bars": 11,
+        "research_bars": 0,
+        "outcome_bars_3_17": 0
+      },
+      {
+        "date": "2023-04-10",
+        "asian_bars": 84,
+        "research_bars": 108,
+        "outcome_bars_3_17": 168
+      },
+      {
+        "date": "2023-04-15",
+        "asian_bars": 11,
+        "research_bars": 0,
+        "outcome_bars_3_17": 0
+      },
+      {
+        "date": "2023-04-17",
+        "asian_bars": 84,
+        "research_bars": 108,
+        "outcome_bars_3_17": 168
+      }
+    ],
+    "valid_session_weekend_bars": 0,
+    "dst_transition_dates": [
+      "2023-03-12",
+      "2023-11-05",
+      "2024-03-10",
+      "2024-11-03"
+    ],
+    "session_completeness_rule": "exactly 96 Asian bars + 168 03:00-17:00 outcome bars at 5-minute cadence"
+  },
   "data_mutation": false
 }

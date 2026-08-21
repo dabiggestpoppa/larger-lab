@@ -1,42 +1,34 @@
-# ASE Round 1 Report — ASE-0 + ASE-1
+# ASE-1 Empirical Atomic Terrain Seal
 
-## Scope
-This checkpoint built the first EURUSD Atomic Structure terrain harness and audited legacy CEREBUS/ML research. It does not calculate strategy PnL and does not consume confirmation or holdout behavior.
+## Trader-language result
 
-## Legacy audit
-Useful engineering concepts were identified, but all historical Symmetry Trap, DTB, XGBoost and manually seeded transition results remain quarantined as UNTRUSTED_LEGACY_RESULT. The legacy source contains exactly the kinds of large historical performance claims this clean rebuild is designed to re-test causally.
+- **Tiers:** frozen AR-tier centroids: 16.900 pips, 33.458 pips, 218.400 pips; cutoffs: 25.179, 125.929. The high tier is a singleton in the full development sample and is not treated as stable evidence.
+- **Stability:** chronological subperiod rediscovery and frozen-centroid transport are in `02_terrain/ASE_TIER_STABILITY.csv` and `ASE_TIER_TRANSPORT.csv`; no 2025/2026 outcomes were used.
+- **AU normalization:** `ASE_AU_NORMALIZATION.csv` compares raw pips with AU units using CV, IQR/median, MAD/median and Wasserstein distances.
+- **1 AU completion:** first-hit probability of either side by tier is {"1": 0.9938837920489296, "2": 0.9824561403508772, "3": 0.0}; this is first-hit terrain, not a strategy result.
+- **Failure anatomy:** 74.6% of loop rows fail before 1 AU; the dominant taxonomy is `ORIGIN_BREACH`. Conditional next-event anatomy is in `ASE_LOOP_FAILURE_ANATOMY.csv`.
+- **Loops:** 12565 descriptive loop events across 442 valid research days; median 29.0 loops/day (IQR 23.0-34.0); see the parquet ledger.
+- **03:00 states:** later 06:00 completion medians by state are {"BALANCED_ASIA": 0.3885017421602805, "FULL_LOOP": 0.47234678624811577, "ONE_SIDED_DOWN": 0.34367365417797296, "ONE_SIDED_UP": 0.3399828767123353, "OVER_COMPLETED": 0.4851177185550042, "PARTIAL_LOOP": 0.4554561388536834}; see `ASE_3AM_STATE_PATHS.csv`.
+- **Delivered final range:** 06:00 median 0.442, 09:00 median 0.627, 12:00 median 0.851.
+- **Uncertainty:** time-only remaining-range summaries are {"03AM": {"iqr": 33.15000000000123, "median_remaining_pips": 42.80000000000173, "variance": 783.8856881001564}, "06AM": {"iqr": 30.27500000000238, "median_remaining_pips": 34.79999999999927, "variance": 726.0523990602132}, "09AM": {"iqr": 28.274999999999824, "median_remaining_pips": 21.59999999999939, "variance": 637.453609928133}, "12PM": {"iqr": 19.3500000000002, "median_remaining_pips": 8.549999999999386, "variance": 264.4441815790023}}; dispersion contracts across checkpoints, while all final-range fields remain retrospective denominators only.
+- **ASE-2:** PARTIAL_ATOMIC_TERRAIN; ASE-2 is not authorized here.
 
-## Data truth
-The intended EURUSD source is `EURUSD.PRO_H1_202211080000_202607140000.csv` from the user's ChatGPT File Library. Its visible schema is DATE/TIME/OHLC/TICKVOL/VOL/SPREAD and its library metadata reports coverage from 2022-11-08 through 2026-07-14.
+## Technical record
 
-The full file is not mounted into the code execution filesystem available in this research session. The source can be discovered and inspected in parsed excerpts, but a full empirical pass cannot be executed without fabricating or reconstructing unseen rows. The program therefore fails closed: no empirical centroids, AU hit probabilities, loop counts, or 6/9/12 completion distributions are claimed here.
+- Branch: `agent/atomic-structure-foundry`
+- Source: `EURUSDPRO_M5_2023_2025.csv`; SHA256 `46e81261f5799fdebb4a2d2aed045c91ad5f2bbe3324c0275cb3cc322f18b13b`
+- Timeframe: M5; timezone normalization: `America/New_York` with DST; valid development interval: `2023-01-03 through 2024-12-31`
+- Valid days: 442; loops: 12565
+- Tests: 19 unit/contract tests passed; empirical contract checks are recorded in `ASE_TEST_AUDIT.json`.
+- Causality: PASS; future perturbation, tail truncation, head truncation and prefix consistency are recorded in `ASE_CAUSALITY_AUDIT.json`.
+- Evidence matrix: {"SCALE": "WEAK", "NORMALIZATION": "PASS", "STATE": "PASS", "TIME": "PASS", "CAUSALITY": "PASS"}
 
-## Implemented ASE-1 engine
-Implemented:
-- DST-aware `America/New_York` normalization
-- explicit 19:00-03:00 Asian window
-- OHLC and duplicate-timestamp validation
-- one-row-per-day census builder
-- retrospective 6AM / 9AM / 12PM completion labels
-- deterministic 1D k-means candidate with k=3, seed=42
-- explicit AR-tier assignment
-- AU = 0.5 x empirical tier centroid source hypothesis
-- trigger = 1.2 x AU source hypothesis
-- first-hit ordering for +/-0.5, 1.0, 1.2, 1.5 and 2.0 AU
-- checkpoint distribution summary
-- immutable session-spec hash
+## Guardrails
 
-Retrospective fields such as final range and completion ratios remain labels/outcomes and are not authorized as live features.
+- `strategy_pnl_computed = false`
+- `optimization_performed = false`
+- `confirmation_consumed = false`
+- `holdout_consumed = false`
+- `ASE2_authorized = false`
 
-## Test result
-Synthetic/reference conformance tests executed before commit: 5 passed, 0 failed. These prove implementation mechanics only; they are not evidence that the market terrain exists.
-
-## Scientific decision
-`PARTIAL_ATOMIC_TERRAIN`
-
-Reason: the terrain engine and scientific contract are build-ready and causal by construction for the implemented primitives, but the empirical EURUSD terrain cannot be sealed until the complete source file is available to the execution runtime.
-
-ASE-2 is NOT authorized. No ML, execution policy optimization, new asset expansion, or strategy rescue is permitted from this checkpoint.
-
-## Exact next requirement
-Make the full EURUSD intraday source available as runtime-readable raw data (preferably the complete M5 source if available; otherwise the confirmed H1 source can support a lower-resolution terrain reconstruction with that limitation explicitly labeled). Then rerun ASE-1 on DEVELOPMENT only and produce the frozen empirical tier, AU, loop, first-hit, checkpoint and uncertainty-reduction artifacts.
+The 2025 confirmation interval and 2026+ holdout were read only for source metadata and were not used in state, outcome, tier, AU, loop, or uncertainty calculations.

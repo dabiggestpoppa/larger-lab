@@ -28,3 +28,8 @@ ASE-0 Legacy salvage/truth audit -> ASE-1 Terrain reconstruction -> ASE-2 empiri
 
 ## ASE-1 pass matrix
 PASS_ATOMIC_TERRAIN requires support in SCALE, NORMALIZATION, STATE, TIME and CAUSALITY categories. Mixed evidence -> PARTIAL_ATOMIC_TERRAIN. Failure of terrain -> FAIL_ATOMIC_TERRAIN and stop.
+
+## ASE-1 empirical completion
+The complete development-only reconstruction is sealed in `02_terrain/`. The primary source is the local OxSecurities/MT5 PRO EURUSD M5 export `EURUSDPRO_M5_2023_2025.csv`, with valid complete sessions from 2023-01-03 through 2024-12-31. The 2025 confirmation interval and 2026+ holdout are reserved and were not used for terrain calculations.
+
+The empirical result is `PARTIAL_ATOMIC_TERRAIN`: causal invariance and time/state structure are supported, while the k=3 AR-tier partition is not fully stable because the high tier is a one-day extreme outlier. This is a terrain finding, not strategy evidence. `ASE2_authorized` remains false pending human review.
