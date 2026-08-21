@@ -1,0 +1,21 @@
+{
+  "dataset_id": "bn_btcusdt_spot_5m",
+  "venue": "binance",
+  "market": "BTCUSDT",
+  "source": "binance_rest_or_local",
+  "source_endpoint_or_contract": "https://api.binance.com/api/v3/klines",
+  "collector_version": "1.0.0",
+  "schema_version": "1.0.0",
+  "first_timestamp": "2022-06-16T21:20:00+00:00",
+  "last_timestamp": "2026-06-15T21:15:00+00:00",
+  "row_count": 420464,
+  "sha256": null,
+  "created_at_utc": "2026-08-21T12:37:05.427134+00:00",
+  "duplicate_count": 0,
+  "missing_interval_summary": null,
+  "known_limitations": [
+    "Local file provenance verified as Binance origin",
+    "Rate limited at 1200 req/min"
+  ],
+  "status": "VALID"
+}

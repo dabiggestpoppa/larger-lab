@@ -1,0 +1,5 @@
+dataset_id,venue,market,status,row_count,first_timestamp,last_timestamp
+bn_btcusdt_spot_5m,binance,BTCUSDT,VALID,420464,2022-06-16T21:20:00+00:00,2026-06-15T21:15:00+00:00
+bn_ethusdt_spot_5m,binance,ETHUSDT,VALID,420464,2022-06-16T21:30:00+00:00,2026-06-15T21:25:00+00:00
+hl_btc_perp_candles_5m,hyperliquid,BTC-PERP,PARTIAL,0,None,None
+hl_eth_perp_candles_5m,hyperliquid,ETH-PERP,PARTIAL,0,None,None
