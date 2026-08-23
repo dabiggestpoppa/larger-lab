@@ -1,0 +1,29 @@
+{
+  "contract_id": "ALPHA1_COST_V1",
+  "frozen_at": "2026-08-23T15:51:23Z",
+  "description": "Conservative transaction cost assumptions for ALPHA-2 backtest. All in bps of notional.",
+  "perpetual": {
+    "maker_fee_bps": 0.2,
+    "taker_fee_bps": 0.5,
+    "spread_bps": 1.0,
+    "slippage_bps": 1.5,
+    "funding_roundtrip_note": "funding paid/received modeled explicitly per holding period"
+  },
+  "spot": {
+    "fee_bps": 1.0,
+    "spread_bps": 1.5,
+    "slippage_bps": 2.0
+  },
+  "relative_basket": {
+    "note": "cost each leg separately using perp and spot schedules above",
+    "rebalance_cost_bps": 1.0
+  },
+  "stress_cost_2x": {
+    "description": "STRESS_COST_2X = double all above for sensitivity test",
+    "multiplier": 2.0
+  },
+  "base_cost_total": {
+    "single_perp_roundtrip_bps": "taker_fee + taker_fee + spread + slippage = 3.5 bps per roundtrip (excl funding)",
+    "spot_perp_hedge_roundtrip_bps": "perp roundtrip + spot roundtrip = ~8.0 bps"
+  }
+}

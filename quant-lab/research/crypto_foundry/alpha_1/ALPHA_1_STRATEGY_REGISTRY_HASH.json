@@ -1,0 +1,8 @@
+{
+  "hash_algorithm": "SHA-256",
+  "frozen_at": "2026-08-23T15:51:23Z",
+  "registry_hash": "5f7c3b6024a6e5767cd49b49084c84795ef0b89ca8fcf65feb42eaa17bcbf5a7",
+  "contract_count": 13,
+  "control_count": 6,
+  "note": "This hash freezes the strategy contract registry before any ALPHA-2 backtest. Any strategy redesign must produce a new hash."
+}

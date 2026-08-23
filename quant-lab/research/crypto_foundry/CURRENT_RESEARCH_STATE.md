@@ -1,9 +1,10 @@
 # QUANT BOX — Crypto Quant Foundry Current Research State
 
-**Checkpoint:** `CRYPTO-MECH-2-STATE-AND-DISLOCATION-TAXONOMY`
+**Checkpoint:** `CRYPTO-ALPHA-1-MECHANISM-TO-STRATEGY-GENERATION`
 **Branch:** `agent/crypto-quant-foundry`
-**Decision:** `PASS_STATE_TAXONOMY`
-**Strategy research:** NOT STARTED (mechanism science only)
+**Decision:** `PASS_ALPHA_HYPOTHESIS_GENERATION`
+**Parent:** `PASS_STATE_TAXONOMY` (commit `1e0265c6`)
+**Strategy research:** FROZEN (13 contracts preregistered, 0 PnL observed)
 **Execution:** NOT AUTHORIZED
 
 ## Completed Checkpoints
@@ -141,9 +142,8 @@ Options / LP: DATA-2_CANDIDATE (not in DATA-1 scope)
 
 ## Next Checkpoint
 
-`CRYPTO-ALPHA-1-MECHANISM-TO-STRATEGY-GENERATION`
+`CRYPTO-ALPHA-2-PREREGISTERED-BACKTEST-AND-FALSIFICATION`
 
-Do NOT start ALPHA-1. Scope: convert promoted mechanism states into
-strategy hypotheses using named execution objects only (spot, perp,
-relative BTC/ETH, AMM-informed). No entry/stop/TP rules yet.
-6. No strategy PnL, no optimization, no ML, no execution
+Do NOT start ALPHA-2. Scope: run the 13 frozen strategy contracts and
+6 controls under preregistered costs, exits, invalidations, and
+falsification rules. No post-result tuning.

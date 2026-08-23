@@ -1,0 +1,31 @@
+{
+  "contract_id": "ALPHA1_DATA_SPLIT_V1",
+  "frozen_at": "2026-08-23T15:51:23Z",
+  "description": "Data-split contract for ALPHA-2 backtest. Development and stability periods defined. No genuine untouched confirmation period exists \u2014 2026 period already consumed by MECH-1/MECH-2 mechanism research.",
+  "periods": {
+    "development": {
+      "start": "2026-01-25",
+      "end": "2025-12-31",
+      "note": "Earliest common usable period through end of 2025. May be empty if DATA-1 starts in 2026.",
+      "available": false,
+      "reason": "DATA-1 frozen normalized data begins 2026-01-25; no pre-2026 common data exists."
+    },
+    "mechanism_research": {
+      "start": "2026-01-25",
+      "end": "2026-06-15",
+      "note": "Consumed by MECH-1 mechanism anatomy research.",
+      "consumed": true
+    },
+    "stability_extension": {
+      "start": "2026-07-01",
+      "end": "2026-08-21",
+      "note": "AMM 30d extension period; limited to AMM evidence. Not a full backtest period.",
+      "available_partial": true
+    }
+  },
+  "confirmation_period": {
+    "available": false,
+    "statement": "No genuine untouched confirmation period exists. All available common history has been consumed by mechanism research. ALPHA-2 must state this honestly and use the entire available history for development only, reporting that confirmation is DEFERRED."
+  },
+  "future_confirmation": "Requires new data collection beyond 2026-08-21 for any forward out-of-sample test."
+}
