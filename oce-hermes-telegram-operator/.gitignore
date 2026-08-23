@@ -1,0 +1,53 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# OCE Hermes Telegram Operator — .gitignore
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Secrets — NEVER commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Runtime
+logs/
+*.log
+.pids/
+*.pid
+
+# Evidence (audit logs are append-only, may contain sensitive data)
+# evidence/audit.jsonl  # Uncomment if you don't want to track audit logs
+
+# Docker
+.docker/
+
+# Hermes
+.heremes/

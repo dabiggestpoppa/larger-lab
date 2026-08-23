@@ -1,0 +1,10 @@
+# Pinned Hermes Agent Version
+# Update this when upgrading Hermes
+# Check latest: https://github.com/NousResearch/hermes-agent/releases
+
+HERMES_VERSION=latest
+HERMES_COMMIT=stable
+
+# At deployment time, pin to exact version:
+# HERMES_VERSION=2.5.0
+# HERMES_COMMIT=abc123def456

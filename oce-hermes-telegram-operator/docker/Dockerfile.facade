@@ -1,0 +1,25 @@
+FROM python:3.12-slim AS base
+
+# Security: non-root user
+RUN groupadd -r oce && useradd -r -g oce -d /app -s /bin/false oce
+
+WORKDIR /app
+
+# Install dependencies only
+COPY pyproject.toml .
+RUN pip install --no-cache-dir -e ".[dev]" 2>/dev/null || pip install --no-cache-dir httpx mcp aiohttp
+
+# Copy source
+COPY src/ src/
+COPY evidence/ evidence/
+
+# Create audit directory
+RUN mkdir -p /data/audit && chown oce:oce /data/audit
+
+# Security hardening
+RUN chmod -R 555 /app
+USER oce
+
+EXPOSE 9090
+
+CMD ["python", "-m", "src.oce_mcp_facade.facade"]

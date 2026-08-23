@@ -1,0 +1,255 @@
+{
+  "tools": {
+    "oce_health": {
+      "input": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "state": { "type": "string", "enum": ["PASS", "DEGRADED", "BLOCKED", "OFFLINE", "ERROR"] },
+          "request_id": { "type": "string", "format": "uuid" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "backend_version": { "type": "string" },
+          "tool": { "type": "string", "const": "oce_health" },
+          "data": {
+            "type": ["object", "null"],
+            "properties": {
+              "status": { "type": "string" },
+              "service": { "type": "string" },
+              "mock": { "type": "boolean" }
+            }
+          },
+          "error": { "type": ["string", "null"] },
+          "latency_ms": { "type": "number" }
+        },
+        "required": ["state", "request_id", "timestamp", "tool"]
+      }
+    },
+    "oce_system_status": {
+      "input": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "state": { "type": "string", "enum": ["PASS", "DEGRADED", "BLOCKED", "OFFLINE", "ERROR"] },
+          "request_id": { "type": "string", "format": "uuid" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "backend_version": { "type": "string" },
+          "tool": { "type": "string", "const": "oce_system_status" },
+          "data": {
+            "type": ["object", "null"],
+            "properties": {
+              "message": { "type": "string" },
+              "version": { "type": "string" },
+              "mock": { "type": "boolean" }
+            }
+          },
+          "error": { "type": ["string", "null"] },
+          "latency_ms": { "type": "number" }
+        },
+        "required": ["state", "request_id", "timestamp", "tool"]
+      }
+    },
+    "oce_component_status": {
+      "input": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "state": { "type": "string", "enum": ["PASS", "DEGRADED", "BLOCKED", "OFFLINE", "ERROR"] },
+          "request_id": { "type": "string", "format": "uuid" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "backend_version": { "type": "string" },
+          "tool": { "type": "string", "const": "oce_component_status" },
+          "data": {
+            "type": ["array", "null"],
+            "items": {
+              "type": "object",
+              "properties": {
+                "observer_id": { "type": "string" },
+                "state": { "type": "string" },
+                "entropy": { "type": "number" },
+                "task": { "type": "string" }
+              }
+            }
+          },
+          "error": { "type": ["string", "null"] },
+          "latency_ms": { "type": "number" }
+        },
+        "required": ["state", "request_id", "timestamp", "tool"]
+      }
+    },
+    "oce_list_jobs": {
+      "input": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          }
+        },
+        "required": []
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "state": { "type": "string", "enum": ["PASS", "DEGRADED", "BLOCKED", "OFFLINE", "ERROR"] },
+          "request_id": { "type": "string", "format": "uuid" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "backend_version": { "type": "string" },
+          "tool": { "type": "string", "const": "oce_list_jobs" },
+          "data": { "type": ["array", "null"] },
+          "error": { "type": ["string", "null"] },
+          "latency_ms": { "type": "number" }
+        },
+        "required": ["state", "request_id", "timestamp", "tool"]
+      }
+    },
+    "oce_get_job": {
+      "input": {
+        "type": "object",
+        "properties": {
+          "job_id": { "type": "string", "description": "Unique job identifier" }
+        },
+        "required": ["job_id"]
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "state": { "type": "string", "enum": ["PASS", "DEGRADED", "BLOCKED", "OFFLINE", "ERROR"] },
+          "request_id": { "type": "string", "format": "uuid" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "backend_version": { "type": "string" },
+          "tool": { "type": "string", "const": "oce_get_job" },
+          "data": { "type": ["object", "null"] },
+          "error": { "type": ["string", "null"] },
+          "latency_ms": { "type": "number" }
+        },
+        "required": ["state", "request_id", "timestamp", "tool"]
+      }
+    },
+    "oce_get_recent_events": {
+      "input": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          }
+        },
+        "required": []
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "state": { "type": "string", "enum": ["PASS", "DEGRADED", "BLOCKED", "OFFLINE", "ERROR"] },
+          "request_id": { "type": "string", "format": "uuid" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "backend_version": { "type": "string" },
+          "tool": { "type": "string", "const": "oce_get_recent_events" },
+          "data": { "type": ["array", "null"] },
+          "error": { "type": ["string", "null"] },
+          "latency_ms": { "type": "number" }
+        },
+        "required": ["state", "request_id", "timestamp", "tool"]
+      }
+    },
+    "oce_get_evidence_status": {
+      "input": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "state": { "type": "string", "enum": ["PASS", "DEGRADED", "BLOCKED", "OFFLINE", "ERROR"] },
+          "request_id": { "type": "string", "format": "uuid" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "backend_version": { "type": "string" },
+          "tool": { "type": "string", "const": "oce_get_evidence_status" },
+          "data": { "type": ["object", "null"] },
+          "error": { "type": ["string", "null"] },
+          "latency_ms": { "type": "number" }
+        },
+        "required": ["state", "request_id", "timestamp", "tool"]
+      }
+    },
+    "oce_get_cost_status": {
+      "input": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "state": { "type": "string", "enum": ["PASS", "DEGRADED", "BLOCKED", "OFFLINE", "ERROR"] },
+          "request_id": { "type": "string", "format": "uuid" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "backend_version": { "type": "string" },
+          "tool": { "type": "string", "const": "oce_get_cost_status" },
+          "data": { "type": ["object", "null"] },
+          "error": { "type": ["string", "null"] },
+          "latency_ms": { "type": "number" }
+        },
+        "required": ["state", "request_id", "timestamp", "tool"]
+      }
+    },
+    "oce_get_capability_manifest": {
+      "input": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "state": { "type": "string", "enum": ["PASS", "DEGRADED", "BLOCKED", "OFFLINE", "ERROR"] },
+          "request_id": { "type": "string", "format": "uuid" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "backend_version": { "type": "string" },
+          "tool": { "type": "string", "const": "oce_get_capability_manifest" },
+          "data": { "type": ["object", "null"] },
+          "error": { "type": ["string", "null"] },
+          "latency_ms": { "type": "number" }
+        },
+        "required": ["state", "request_id", "timestamp", "tool"]
+      }
+    },
+    "oce_get_backend_version": {
+      "input": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "state": { "type": "string", "enum": ["PASS", "DEGRADED", "BLOCKED", "OFFLINE", "ERROR"] },
+          "request_id": { "type": "string", "format": "uuid" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "backend_version": { "type": "string" },
+          "tool": { "type": "string", "const": "oce_get_backend_version" },
+          "data": { "type": ["object", "null"] },
+          "error": { "type": ["string", "null"] },
+          "latency_ms": { "type": "number" }
+        },
+        "required": ["state", "request_id", "timestamp", "tool"]
+      }
+    }
+  }
+}

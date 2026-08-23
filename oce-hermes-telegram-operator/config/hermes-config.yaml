@@ -1,0 +1,102 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# Hermes Agent Configuration — oce-operator profile
+# ══════════════════════════════════════════════════════════════════════════════
+# This config is security-hardened for OCE observer mode.
+# It exposes ONLY the OCE MCP facade tools.
+# No terminal, no filesystem write, no Docker, no shell.
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ─── Identity ─────────────────────────────────────────────────────────────────
+name: "OCE Observer"
+description: "Read-only observer for the Operator Continuity Engine"
+version: "0.1.0"
+
+# ─── Model ────────────────────────────────────────────────────────────────────
+# Configure your preferred LLM provider in ~/.hermes/.env
+model:
+  provider: "openrouter"  # or anthropic, openai, ollama
+  # Model is configured via provider credentials
+
+# ─── Terminal Backend ────────────────────────────────────────────────────────
+# SECURITY: Terminal is DISABLED for oce-operator profile
+terminal:
+  backend: "none"
+
+# ─── Telegram Gateway ────────────────────────────────────────────────────────
+gateway:
+  platforms:
+    telegram:
+      enabled: true
+      # Token loaded from TELEGRAM_BOT_TOKEN env var
+      # User IDs loaded from TELEGRAM_ALLOWED_USERS env var
+      extra:
+        # Long polling only — no webhook
+        # No inbound port required
+        status_indicator: true
+        status_online: "🟢 OCE Observer Online"
+        status_offline: "🔴 OCE Observer Offline"
+        command_menu:
+          max_commands: 20
+          priority_mode: replace
+          priority:
+            - start
+            - help
+            - health
+            - status
+            - components
+            - jobs
+            - job
+            - events
+            - evidence
+            - cost
+            - capabilities
+            - privacy
+            - audit
+
+# ─── MCP Servers ─────────────────────────────────────────────────────────────
+# SECURITY: Only the OCE observer facade is allowed.
+# No other MCP servers are configured.
+# No terminal, filesystem, Docker, SSH, Git, or deployment tools.
+mcp_servers:
+  oce-observer:
+    command: "python"
+    args: ["-m", "src.oce_mcp_facade.facade"]
+    timeout: 30
+    tools:
+      # ONLY these tools are allowed — explicit include list
+      include:
+        - oce_health
+        - oce_system_status
+        - oce_component_status
+        - oce_list_jobs
+        - oce_get_job
+        - oce_get_recent_events
+        - oce_get_evidence_status
+        - oce_get_cost_status
+        - oce_get_capability_manifest
+        - oce_get_backend_version
+      resources: false
+      prompts: false
+    trust: untrusted  # Force approval for any write-capable tools
+
+# ─── Security: Forbidden Tools ───────────────────────────────────────────────
+# These tools are explicitly NEVER exposed:
+# - terminal / execute_code
+# - filesystem (write operations)
+# - database / SQL queries
+# - Docker / container management
+# - SSH / remote access
+# - Git push / deployment
+# - Trading / order execution
+# - Cloud control APIs
+
+# ─── Memory ───────────────────────────────────────────────────────────────────
+# Approved memory only — no unrestricted filesystem access
+memory:
+  enabled: true
+  max_entries: 100
+
+# ─── Logging ──────────────────────────────────────────────────────────────────
+logging:
+  level: INFO
+  # Never log bot tokens, credentials, or sensitive paths

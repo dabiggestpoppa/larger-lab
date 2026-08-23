@@ -1,0 +1,28 @@
+FROM python:3.12-slim AS base
+
+# Install system dependencies for Hermes
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Security: non-root user
+RUN groupadd -r hermes && useradd -r -g hermes -d /home/hermes -s /bin/bash hermes \
+    && mkdir -p /home/hermes/.hermes && chown -R hermes:hermes /home/hermes
+
+WORKDIR /home/hermes
+
+# Install Hermes Agent (pinned version)
+# NOTE: Replace with actual pinned version at deployment time
+RUN pip install --no-cache-dir hermes-agent 2>/dev/null || echo "Hermes install deferred to entrypoint"
+
+# Copy profile config
+COPY hermes_profiles/oce-operator/ /home/hermes/.hermes/
+COPY config/hermes-config.yaml /config/config.yaml
+
+RUN chown -R hermes:hermes /home/hermes/.hermes /config
+
+USER hermes
+
+# Long polling only — no webhook, no inbound port
+CMD ["hermes", "gateway", "--profile", "oce-operator"]

@@ -1,0 +1,42 @@
+[Unit]
+Description=OCE MCP Facade — Read-only observer tools
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=oce
+Group=oce
+WorkingDirectory=/opt/oce-hermes-telegram-operator
+EnvironmentFile=/opt/oce-hermes-telegram-operator/.env
+ExecStart=/usr/bin/python3 -m src.oce_mcp_facade.facade
+Restart=always
+RestartSec=5
+TimeoutStartSec=30
+TimeoutStopSec=10
+
+# Security hardening
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/opt/oce-hermes-telegram-operator/evidence
+ReadWritePaths=/opt/oce-hermes-telegram-operator/logs
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+MemoryDenyWriteExecute=yes
+LockPersonality=yes
+SystemCallFilter=@system-service
+SystemCallArchitectures=native
+
+# Resource limits
+LimitNOFILE=1024
+MemoryMax=256M
+CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target

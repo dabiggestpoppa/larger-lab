@@ -1,0 +1,38 @@
+# OCE Operator Profile — Hermes Configuration
+# Copy to ~/.hermes/config.yaml when deploying the profile
+
+name: "OCE Observer"
+description: "Read-only observer for the Operator Continuity Engine"
+
+gateway:
+  platforms:
+    telegram:
+      enabled: true
+      extra:
+        status_indicator: true
+        status_online: "🟢 OCE Observer Online"
+        status_offline: "🔴 OCE Observer Offline"
+
+terminal:
+  backend: "none"
+
+mcp_servers:
+  oce-observer:
+    command: "python"
+    args: ["-m", "src.oce_mcp_facade.facade"]
+    timeout: 30
+    tools:
+      include:
+        - oce_health
+        - oce_system_status
+        - oce_component_status
+        - oce_list_jobs
+        - oce_get_job
+        - oce_get_recent_events
+        - oce_get_evidence_status
+        - oce_get_cost_status
+        - oce_get_capability_manifest
+        - oce_get_backend_version
+      resources: false
+      prompts: false
+    trust: untrusted
