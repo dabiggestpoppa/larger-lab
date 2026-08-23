@@ -1,11 +1,11 @@
 {
-  "schema_version": "3.0.0",
-  "run_id": "76eb20ca31a3",
-  "validator_version": "3.0.0",
-  "start_time": "2026-08-21T17:09:50Z",
-  "end_time": "2026-08-21T17:09:59Z",
-  "tested_commit": "dd376a4b9a2404479200f96a5871ddc03e7c4f3b",
-  "tested_tree": "b6d1a602dae343749cd8c5a57a6d57f0d0744305",
+  "schema_version": "3.2.0",
+  "run_id": "cd63bbaf400b",
+  "validator_version": "3.2.0",
+  "start_time": "2026-08-23T13:28:11Z",
+  "end_time": "2026-08-23T13:28:15Z",
+  "tested_commit": "21c47df9c0fc27d88d21bb493cdc0ac9b5718412",
+  "tested_tree": "96fad06151bc1d9ad81394841a7e927e9cd7881f",
   "tested_branch": "oce/block-1-i1r3-source-identity-ci-closure",
   "repository": "dabiggestpoppa/larger-lab",
   "command": "validate_engine.py --all",
@@ -14,7 +14,7 @@
     "ansible": "not installed",
     "ansible_lint": "not installed",
     "docker": "not installed",
-    "shellcheck": "not installed",
+    "shellcheck": "ShellCheck - shell script analysis tool",
     "gitleaks": "not installed"
   },
   "results": [
@@ -23,9 +23,9 @@
       "description": "Source identity verification",
       "mandatory": true,
       "result": "PASS",
-      "evidence": "repo=dabiggestpoppa/larger-lab, branch=oce/block-1-i1r3-source-identity-ci-closure, commit=dd376a4b9a24, tree=b6d1a602dae3, root=infrastructure/cloud-ground",
+      "evidence": "repo=dabiggestpoppa/larger-lab, branch=oce/block-1-i1r3-source-identity-ci-closure, commit=21c47df9c0fc, tree=96fad06151bc, root=infrastructure/cloud-ground",
       "output": "All identity checks passed",
-      "timestamp": "2026-08-21T17:09:50Z"
+      "timestamp": "2026-08-23T13:28:11Z"
     },
     {
       "check_id": "YAML-PARSE",
@@ -34,7 +34,7 @@
       "result": "PASS",
       "evidence": "29/29",
       "output": "All parse",
-      "timestamp": "2026-08-21T17:09:50Z"
+      "timestamp": "2026-08-23T13:28:11Z"
     },
     {
       "check_id": "JSON-PARSE",
@@ -43,7 +43,7 @@
       "result": "PASS",
       "evidence": "9/9",
       "output": "All parse",
-      "timestamp": "2026-08-21T17:09:50Z"
+      "timestamp": "2026-08-23T13:28:11Z"
     },
     {
       "check_id": "SCHEMA-VALID",
@@ -52,7 +52,7 @@
       "result": "PASS",
       "evidence": "7/7",
       "output": "All valid",
-      "timestamp": "2026-08-21T17:09:50Z"
+      "timestamp": "2026-08-23T13:28:11Z"
     },
     {
       "check_id": "SCHEMA-FIXTURES",
@@ -61,7 +61,7 @@
       "result": "PASS",
       "evidence": "15/15",
       "output": "All pass",
-      "timestamp": "2026-08-21T17:09:51Z"
+      "timestamp": "2026-08-23T13:28:12Z"
     },
     {
       "check_id": "NO-LATEST-TAGS",
@@ -70,7 +70,7 @@
       "result": "PASS",
       "evidence": "0 violations",
       "output": "Clean",
-      "timestamp": "2026-08-21T17:09:51Z"
+      "timestamp": "2026-08-23T13:28:12Z"
     },
     {
       "check_id": "DIGEST-LOCK",
@@ -79,7 +79,34 @@
       "result": "PASS",
       "evidence": "0 violations",
       "output": "All pinned",
-      "timestamp": "2026-08-21T17:09:51Z"
+      "timestamp": "2026-08-23T13:28:12Z"
+    },
+    {
+      "check_id": "DIGEST-PROOF",
+      "description": "Image digests match registry evidence",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "2 verified digests",
+      "output": "All compose digests match registry-proven evidence",
+      "timestamp": "2026-08-23T13:28:12Z"
+    },
+    {
+      "check_id": "DIGEST-REGISTRY",
+      "description": "Image digests resolve against registry",
+      "mandatory": true,
+      "result": "BLOCKED",
+      "evidence": "No registry verification tool available (need docker or skopeo)",
+      "output": "Install docker or skopeo for real-time digest verification",
+      "timestamp": "2026-08-23T13:28:12Z"
+    },
+    {
+      "check_id": "HOST-KEY-CHECKING",
+      "description": "Ansible host_key_checking is True",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "host_key_checking = True",
+      "output": "Verified",
+      "timestamp": "2026-08-23T13:28:12Z"
     },
     {
       "check_id": "NO-DB-PORTS",
@@ -88,7 +115,7 @@
       "result": "PASS",
       "evidence": "0 violations",
       "output": "Clean",
-      "timestamp": "2026-08-21T17:09:51Z"
+      "timestamp": "2026-08-23T13:28:12Z"
     },
     {
       "check_id": "NO-PRIV",
@@ -97,7 +124,7 @@
       "result": "PASS",
       "evidence": "0 violations",
       "output": "Clean",
-      "timestamp": "2026-08-21T17:09:51Z"
+      "timestamp": "2026-08-23T13:28:12Z"
     },
     {
       "check_id": "NO-SOCKET",
@@ -106,7 +133,7 @@
       "result": "PASS",
       "evidence": "0 violations",
       "output": "Clean",
-      "timestamp": "2026-08-21T17:09:51Z"
+      "timestamp": "2026-08-23T13:28:12Z"
     },
     {
       "check_id": "NO-SECRETS",
@@ -115,7 +142,7 @@
       "result": "PASS",
       "evidence": "0 violations",
       "output": "Clean",
-      "timestamp": "2026-08-21T17:09:51Z"
+      "timestamp": "2026-08-23T13:28:12Z"
     },
     {
       "check_id": "HEALTH-CHECKS",
@@ -124,7 +151,7 @@
       "result": "PASS",
       "evidence": "2 health checks",
       "output": "Both services",
-      "timestamp": "2026-08-21T17:09:51Z"
+      "timestamp": "2026-08-23T13:28:12Z"
     },
     {
       "check_id": "COST-THRESHOLDS",
@@ -133,7 +160,7 @@
       "result": "PASS",
       "evidence": "All thresholds",
       "output": "$60/$50/$100",
-      "timestamp": "2026-08-21T17:09:51Z"
+      "timestamp": "2026-08-23T13:28:12Z"
     },
     {
       "check_id": "WORKER-DENY",
@@ -142,7 +169,7 @@
       "result": "PASS",
       "evidence": "14 DENY rules",
       "output": "14 denial rules",
-      "timestamp": "2026-08-21T17:09:51Z"
+      "timestamp": "2026-08-23T13:28:12Z"
     },
     {
       "check_id": "WORKER-NO-DB",
@@ -151,7 +178,7 @@
       "result": "PASS",
       "evidence": "12/12 rules",
       "output": "All worker classes denied all protected services",
-      "timestamp": "2026-08-21T17:09:51Z"
+      "timestamp": "2026-08-23T13:28:12Z"
     },
     {
       "check_id": "SECURITY-OPTS",
@@ -160,7 +187,7 @@
       "result": "PASS",
       "evidence": "2 declarations",
       "output": "Both hardened",
-      "timestamp": "2026-08-21T17:09:51Z"
+      "timestamp": "2026-08-23T13:28:12Z"
     },
     {
       "check_id": "NO-EXTERNAL-NET",
@@ -169,7 +196,7 @@
       "result": "PASS",
       "evidence": "0 violations",
       "output": "Clean",
-      "timestamp": "2026-08-21T17:09:51Z"
+      "timestamp": "2026-08-23T13:28:12Z"
     },
     {
       "check_id": "ROLES-TASKS",
@@ -178,7 +205,7 @@
       "result": "PASS",
       "evidence": "8 roles",
       "output": "All have tasks/main.yml",
-      "timestamp": "2026-08-21T17:09:51Z"
+      "timestamp": "2026-08-23T13:28:12Z"
     },
     {
       "check_id": "EVIDENCE-DIR",
@@ -187,7 +214,7 @@
       "result": "PASS",
       "evidence": "evidence/ and templates/",
       "output": "Structure present",
-      "timestamp": "2026-08-21T17:09:51Z"
+      "timestamp": "2026-08-23T13:28:12Z"
     },
     {
       "check_id": "RUNBOOKS",
@@ -196,7 +223,7 @@
       "result": "PASS",
       "evidence": "2 runbooks",
       "output": "Present",
-      "timestamp": "2026-08-21T17:09:51Z"
+      "timestamp": "2026-08-23T13:28:12Z"
     },
     {
       "check_id": "SINGLE-ROOT",
@@ -205,7 +232,7 @@
       "result": "PASS",
       "evidence": "1 roots",
       "output": "Single canonical root",
-      "timestamp": "2026-08-21T17:09:59Z"
+      "timestamp": "2026-08-23T13:28:14Z"
     },
     {
       "check_id": "ANSIBLE-SYNTAX",
@@ -214,7 +241,7 @@
       "result": "BLOCKED",
       "evidence": "ansible-playbook not installed",
       "output": "",
-      "timestamp": "2026-08-21T17:09:59Z"
+      "timestamp": "2026-08-23T13:28:14Z"
     },
     {
       "check_id": "ANSIBLE-LINT",
@@ -223,7 +250,7 @@
       "result": "BLOCKED",
       "evidence": "ansible-lint not installed",
       "output": "",
-      "timestamp": "2026-08-21T17:09:59Z"
+      "timestamp": "2026-08-23T13:28:14Z"
     },
     {
       "check_id": "COMPOSE-RENDER",
@@ -232,16 +259,16 @@
       "result": "BLOCKED",
       "evidence": "docker not installed",
       "output": "",
-      "timestamp": "2026-08-21T17:09:59Z"
+      "timestamp": "2026-08-23T13:28:14Z"
     },
     {
       "check_id": "SHELLCHECK",
       "description": "Shell scripts pass shellcheck",
       "mandatory": true,
-      "result": "BLOCKED",
-      "evidence": "shellcheck not installed",
-      "output": "",
-      "timestamp": "2026-08-21T17:09:59Z"
+      "result": "PASS",
+      "evidence": "5 scripts",
+      "output": "All clean",
+      "timestamp": "2026-08-23T13:28:15Z"
     },
     {
       "check_id": "GITLEAKS",
@@ -250,7 +277,7 @@
       "result": "BLOCKED",
       "evidence": "gitleaks not installed",
       "output": "",
-      "timestamp": "2026-08-21T17:09:59Z"
+      "timestamp": "2026-08-23T13:28:15Z"
     },
     {
       "check_id": "SCAFFOLD-SCAN",
@@ -259,25 +286,25 @@
       "result": "PASS",
       "evidence": "0 violations",
       "output": "Clean",
-      "timestamp": "2026-08-21T17:09:59Z"
+      "timestamp": "2026-08-23T13:28:15Z"
     },
     {
       "check_id": "TOTALS-CONSIST",
       "description": "Result totals self-consistent",
       "mandatory": true,
       "result": "PASS",
-      "evidence": "27 results",
-      "output": "P=22 F=0 B=5 S=0",
-      "timestamp": "2026-08-21T17:09:59Z"
+      "evidence": "30 results",
+      "output": "P=25 F=0 B=5 S=0",
+      "timestamp": "2026-08-23T13:28:15Z"
     },
     {
       "check_id": "FAIL-CLOSED",
       "description": "Adversarial mutations detected and rejected",
       "mandatory": true,
       "result": "PASS",
-      "evidence": "23/23 pass",
+      "evidence": "32/32 pass",
       "output": "All mutations correctly rejected",
-      "timestamp": "2026-08-21T17:09:59Z"
+      "timestamp": "2026-08-23T13:28:15Z"
     },
     {
       "check_id": "EVIDENCE-CONSISTENCY",
@@ -286,15 +313,15 @@
       "result": "PASS",
       "evidence": "All identity fields match",
       "output": "Evidence is self-consistent",
-      "timestamp": "2026-08-21T17:09:59Z"
+      "timestamp": "2026-08-23T13:28:15Z"
     }
   ],
   "totals": {
-    "PASS": 25,
+    "PASS": 28,
     "FAIL": 0,
     "BLOCKED": 5,
     "SKIPPED": 0,
-    "total": 30
+    "total": 33
   },
   "gate": "BLOCKED"
 }

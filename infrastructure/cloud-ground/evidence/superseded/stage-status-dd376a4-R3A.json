@@ -1,18 +1,23 @@
 {
   "block": "B1",
   "increment": "B1-I1R3A",
-  "implementation_commit": "dd376a4b9a2404479200f96a5871ddc03e7c4f3b",
-  "implementation_tree": "b6d1a602dae343749cd8c5a57a6d57f0d0744305",
+  "implementation_commit": "21c47df9c0fc27d88d21bb493cdc0ac9b5718412",
+  "implementation_tree": "96fad06151bc1d9ad81394841a7e927e9cd7881f",
   "evidence_commit": null,
   "gate_status": "BLOCKED",
   "totals": {
-    "PASS": 25,
+    "PASS": 28,
     "FAIL": 0,
     "BLOCKED": 5,
     "SKIPPED": 0,
-    "total": 30
+    "total": 33
   },
   "unresolved_blockers": [
+    {
+      "check_id": "DIGEST-REGISTRY",
+      "reason": "No registry verification tool available (need docker or skopeo)",
+      "dependency": "Install docker or skopeo for real-time digest verification"
+    },
     {
       "check_id": "ANSIBLE-SYNTAX",
       "reason": "ansible-playbook not installed",
@@ -26,11 +31,6 @@
     {
       "check_id": "COMPOSE-RENDER",
       "reason": "docker not installed",
-      "dependency": ""
-    },
-    {
-      "check_id": "SHELLCHECK",
-      "reason": "shellcheck not installed",
       "dependency": ""
     },
     {

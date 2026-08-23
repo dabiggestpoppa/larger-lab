@@ -11,9 +11,21 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
+      # === A. Clean-worktree assertion ===
       - name: Checkout implementation commit
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
 
+      - name: Assert clean worktree
+        run: |
+          DIRTY=$(git status --porcelain | wc -l)
+          if [ "$DIRTY" -ne 0 ]; then
+            echo "ERROR: Worktree is not clean ($DIRTY dirty files)"
+            git status --porcelain
+            exit 1
+          fi
+          echo "=== WORKTREE CLEAN ==="
+
+      # === B. Tool-version assertions ===
       - name: Set up Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
         with:
@@ -45,52 +57,44 @@ jobs:
         id: tool_versions
         run: |
           echo "=== TOOL VERSION ASSERTIONS ==="
-
-          # Python
           PY_VER=$(python3 --version 2>&1)
           echo "Python: $PY_VER"
           echo "$PY_VER" | grep -q "Python 3" || { echo "FAIL: Python 3 required"; exit 1; }
 
-          # Ansible
           ANSIBLE_VER=$(ansible-playbook --version 2>&1 | head -1)
           echo "Ansible: $ANSIBLE_VER"
           echo "$ANSIBLE_VER" | grep -q "ansible" || { echo "FAIL: ansible-playbook required"; exit 1; }
 
-          # ansible-lint
           LINT_VER=$(ansible-lint --version 2>&1 | head -1)
           echo "ansible-lint: $LINT_VER"
           echo "$LINT_VER" | grep -q "ansible-lint" || { echo "FAIL: ansible-lint required"; exit 1; }
 
-          # ShellCheck
           SC_VER=$(shellcheck --version 2>&1 | grep "version:" | head -1)
           echo "ShellCheck: $SC_VER"
           echo "$SC_VER" | grep -q "[0-9]" || { echo "FAIL: shellcheck required"; exit 1; }
 
-          # Gitleaks
           GL_VER=$(gitleaks version 2>&1)
           echo "Gitleaks: $GL_VER"
           echo "$GL_VER" | grep -q "[0-9]" || { echo "FAIL: gitleaks required"; exit 1; }
 
-          # Docker Compose
           DC_VER=$(docker compose version 2>&1)
           echo "Docker Compose: $DC_VER"
           echo "$DC_VER" | grep -q "Docker Compose" || { echo "FAIL: docker compose required"; exit 1; }
 
           echo "=== ALL TOOLS INSTALLED ==="
 
+      # === C. Authoritative identity validation ===
       - name: Record source identity
         id: identity
         run: |
-          echo "=== SOURCE IDENTITY ==="
-          echo "Repository: $GITHUB_REPOSITORY"
-          echo "Branch: $GITHUB_REF_NAME"
-          echo "SHA: $GITHUB_SHA"
-          echo "Workflow: $GITHUB_WORKFLOW"
-          echo "Run ID: $GITHUB_RUN_ID"
           COMMIT=$(git rev-parse HEAD)
           TREE=$(git rev-parse HEAD^{tree})
           echo "commit=$COMMIT" >> "$GITHUB_OUTPUT"
           echo "tree=$TREE" >> "$GITHUB_OUTPUT"
+          echo "=== SOURCE IDENTITY ==="
+          echo "Repository: $GITHUB_REPOSITORY"
+          echo "Branch: $GITHUB_REF_NAME"
+          echo "SHA: $GITHUB_SHA"
           echo "HEAD commit: $COMMIT"
           echo "HEAD tree:   $TREE"
 
@@ -102,6 +106,7 @@ jobs:
             --target-tree "${{ steps.identity.outputs.tree }}" \
             --target-branch "${{ github.ref_name }}"
 
+      # === D. Ansible syntax and lint ===
       - name: Ansible syntax validation
         run: |
           cd infrastructure/cloud-ground/ansible
@@ -113,80 +118,61 @@ jobs:
           cd infrastructure/cloud-ground/ansible
           ansible-lint playbooks/site.yml
 
+      # === E. Compose render ===
       - name: Render Docker Compose
         run: |
           cd infrastructure/cloud-ground/compose
           POSTGRES_PASSWORD=test_validation docker compose \
             -f compose.foundation.yml config
 
+      # === F. Registry digest verification ===
       - name: Verify image digests against registry
         run: |
           echo "=== IMAGE DIGEST REGISTRY VERIFICATION ==="
           python3 -c "
           import json, sys, subprocess
-
           evidence = json.load(open('infrastructure/cloud-ground/evidence/image-digests.json'))
           compose = open('infrastructure/cloud-ground/compose/compose.foundation.yml').read()
-
           errors = []
           for img in evidence.get('images', []):
               name = img.get('name', '')
               digest = img.get('digest', '')
               verified = img.get('verified_digest', False)
               if not digest or not verified:
-                  errors.append(f'{name}: not verified in evidence')
-                  print(f'FAIL {name}: not verified', file=sys.stderr)
-                  continue
-
+                  errors.append(f'{name}: not verified'); continue
               full_ref = f'{name}@{digest}'
               print(f'Verifying {full_ref}...')
-
-              # Verify digest appears in compose file
               if full_ref not in compose:
-                  errors.append(f'{name}: digest {digest} not in compose.foundation.yml')
-                  continue
-
-              # Try docker buildx imagetools inspect
+                  errors.append(f'{name}: digest not in compose'); continue
               try:
-                  r = subprocess.run(
-                      ['docker', 'buildx', 'imagetools', 'inspect', full_ref],
-                      capture_output=True, text=True, timeout=30
-                  )
+                  r = subprocess.run(['docker', 'buildx', 'imagetools', 'inspect', full_ref],
+                      capture_output=True, text=True, timeout=30)
                   if r.returncode == 0 and ('Manifests' in r.stdout or 'MediaType' in r.stdout or 'SchemaVersion' in r.stdout):
-                      print(f'PASS {name}: {digest} resolved via buildx imagetools inspect')
+                      print(f'PASS {name}: resolved via buildx')
                   else:
-                      # Fallback: try docker manifest inspect
-                      r2 = subprocess.run(
-                          ['docker', 'manifest', 'inspect', full_ref],
-                          capture_output=True, text=True, timeout=30
-                      )
+                      r2 = subprocess.run(['docker', 'manifest', 'inspect', full_ref],
+                          capture_output=True, text=True, timeout=30)
                       if r2.returncode == 0:
-                          print(f'PASS {name}: {digest} resolved via manifest inspect')
+                          print(f'PASS {name}: resolved via manifest inspect')
                       else:
-                          # Fallback: try skopeo
-                          r3 = subprocess.run(
-                              ['skopeo', 'inspect', f'docker://{full_ref}'],
-                              capture_output=True, text=True, timeout=30
-                          )
+                          r3 = subprocess.run(['skopeo', 'inspect', f'docker://{full_ref}'],
+                              capture_output=True, text=True, timeout=30)
                           if r3.returncode == 0:
-                              print(f'PASS {name}: {digest} resolved via skopeo')
+                              print(f'PASS {name}: resolved via skopeo')
                           else:
-                              errors.append(f'{name}: {digest} failed all verification methods')
-                              print(f'FAIL {name}: {digest} could not be resolved', file=sys.stderr)
+                              errors.append(f'{name}: failed all methods')
               except FileNotFoundError:
-                  errors.append(f'{name}: no verification tool available')
+                  errors.append(f'{name}: no verification tool')
               except subprocess.TimeoutExpired:
-                  errors.append(f'{name}: verification timed out')
-
+                  errors.append(f'{name}: timeout')
           if errors:
-              print(f'ERRORS: {errors}', file=sys.stderr)
-              sys.exit(1)
-          print('All image digests verified against registry')
+              print(f'ERRORS: {errors}', file=sys.stderr); sys.exit(1)
+          print('All digests verified')
           "
 
+      # === G. ShellCheck and Gitleaks ===
       - name: ShellCheck
-        run: |
-          shellcheck -s bash infrastructure/cloud-ground/tests/adversarial-tests.sh
+        run: shellcheck -s bash infrastructure/cloud-ground/tests/adversarial-tests.sh
 
       - name: Gitleaks
         run: |
@@ -195,38 +181,110 @@ jobs:
             --no-banner \
             --report-format json
 
-      - name: Run complete validator
+      # === H. Adversarial suite using isolated evidence ===
+      - name: Run adversarial test suite (isolated evidence)
+        env:
+          OCE_EVIDENCE_DIR: /tmp/oce-adversarial-evidence
         run: |
-          python3 infrastructure/cloud-ground/scripts/validate_engine.py --all
-
-      - name: Run adversarial test suite
-        run: |
+          mkdir -p "$OCE_EVIDENCE_DIR"
           bash infrastructure/cloud-ground/tests/adversarial-tests.sh
 
+      # === I. Final complete authoritative validation (AFTER adversarial) ===
+      - name: Final authoritative validation
+        run: |
+          COMMIT=$(git rev-parse HEAD)
+          TREE=$(git rev-parse HEAD^{tree})
+          python3 infrastructure/cloud-ground/scripts/validate_engine.py \
+            --all \
+            --authoritative \
+            --target-commit "$COMMIT" \
+            --target-tree "$TREE" \
+            --target-branch "${{ github.ref_name }}"
+
+      # === J. Final gate assertion (strengthened) ===
       - name: Assert final gate
         run: |
           echo "=== FINAL GATE ASSERTION ==="
-          STAGE_STATUS="infrastructure/cloud-ground/evidence/stage-status.json"
-          if [ ! -f "$STAGE_STATUS" ]; then
-            echo "ERROR: stage-status.json not found"
-            exit 1
-          fi
-          GATE=$(python3 -c "import json; print(json.load(open('$STAGE_STATUS'))['gate_status'])")
-          echo "Gate: $GATE"
-          if [ "$GATE" != "READY_FOR_OPERATOR_REVIEW" ]; then
-            echo "ERROR: Gate is $GATE, expected READY_FOR_OPERATOR_REVIEW"
-            exit 1
-          fi
-          # Assert no blocked or skipped in main results
-          BLOCKED=$(python3 -c "import json; d=json.load(open('infrastructure/cloud-ground/evidence/static-validation-results.json')); print(d['totals'].get('BLOCKED', 0))")
-          SKIPPED=$(python3 -c "import json; d=json.load(open('infrastructure/cloud-ground/evidence/static-validation-results.json')); print(d['totals'].get('SKIPPED', 0))")
-          echo "BLOCKED: $BLOCKED, SKIPPED: $SKIPPED"
-          if [ "$BLOCKED" -gt 0 ] || [ "$SKIPPED" -gt 0 ]; then
-            echo "ERROR: BLOCKED=$BLOCKED SKIPPED=$SKIPPED — must be zero"
-            exit 1
-          fi
-          echo "=== GATE: READY ==="
+          RESULTS="infrastructure/cloud-ground/evidence/static-validation-results.json"
+          STAGE="infrastructure/cloud-ground/evidence/stage-status.json"
+          ADV="infrastructure/cloud-ground/evidence/adversarial-results.json"
 
+          # 1. Files exist
+          for f in "$RESULTS" "$STAGE" "$ADV"; do
+            [ -f "$f" ] || { echo "ERROR: $f not found"; exit 1; }
+          done
+
+          # 2. Gate == READY_FOR_OPERATOR_REVIEW
+          GATE=$(python3 -c "import json; print(json.load(open('$STAGE'))['gate_status'])")
+          [ "$GATE" = "READY_FOR_OPERATOR_REVIEW" ] || { echo "ERROR: Gate=$GATE"; exit 1; }
+
+          # 3. Validation totals: FAIL=0, BLOCKED=0, SKIPPED=0, total=PASS+FAIL+BLOCKED+SKIPPED
+          python3 -c "
+          import json, sys
+          d = json.load(open('$RESULTS'))
+          t = d['totals']
+          errors = []
+          if t.get('FAIL', 0) != 0: errors.append(f\"FAIL={t['FAIL']}\")
+          if t.get('BLOCKED', 0) != 0: errors.append(f\"BLOCKED={t['BLOCKED']}\")
+          if t.get('SKIPPED', 0) != 0: errors.append(f\"SKIPPED={t['SKIPPED']}\")
+          expected = t.get('PASS',0)+t.get('FAIL',0)+t.get('BLOCKED',0)+t.get('SKIPPED',0)
+          if t.get('total',0) != expected: errors.append(f\"total={t['total']} computed={expected}\")
+          if errors: print(f'ERROR: {errors}', file=sys.stderr); sys.exit(1)
+          print(f\"Totals OK: {t}\")
+          "
+
+          # 4. Identity fields match
+          python3 -c "
+          import json, subprocess, sys
+          d = json.load(open('$RESULTS'))
+          errors = []
+          actual_commit = subprocess.run(['git','rev-parse','HEAD'],capture_output=True,text=True).stdout.strip()
+          actual_tree = subprocess.run(['git','rev-parse','HEAD^{tree}'],capture_output=True,text=True).stdout.strip()
+          actual_branch = subprocess.run(['git','branch','--show-current'],capture_output=True,text=True).stdout.strip()
+          if d.get('tested_commit','') != actual_commit: errors.append(f\"commit mismatch\")
+          if d.get('tested_tree','') != actual_tree: errors.append(f\"tree mismatch\")
+          if d.get('tested_branch','') != actual_branch: errors.append(f\"branch mismatch\")
+          if d.get('repository','') != 'dabiggestpoppa/larger-lab': errors.append(f\"repository mismatch\")
+          if errors: print(f'ERROR: {errors}', file=sys.stderr); sys.exit(1)
+          print('Identity fields OK')
+          "
+
+          # 5. Validator version is R3C
+          python3 -c "
+          import json, sys
+          d = json.load(open('$RESULTS'))
+          v = d.get('validator_version', '')
+          if '3.3' not in v: print(f'ERROR: validator_version={v}', file=sys.stderr); sys.exit(1)
+          print(f'Version OK: {v}')
+          "
+
+          # 6. Adversarial suite
+          python3 -c "
+          import json, sys
+          a = json.load(open('$ADV'))
+          errors = []
+          if a.get('suite_result','') != 'PASS': errors.append(f\"suite_result={a.get('suite_result')}\")
+          if a.get('totals',{}).get('FAIL',0) != 0: errors.append(f\"adversarial FAIL={a['totals'].get('FAIL')}\")
+          # Every test with mutation_result must have FAIL + nonzero exit
+          for t in a.get('tests',[]):
+              mr = t.get('mutation_result','')
+              me = t.get('mutation_exit',0)
+              if mr in ('BLOCKED','SKIPPED','ERROR','NOT_FOUND','PASS',''):
+                  if t.get('result') == 'PASS':
+                      errors.append(f\"{t.get('test_id')}: mutation_result={mr}\")
+              if t.get('result') == 'PASS' and me == 0 and mr not in ('N/A',''):
+                  errors.append(f\"{t.get('test_id')}: mutation_exit=0\")
+              orig = t.get('original_sha256','')
+              rest = t.get('restored_sha256','')
+              if orig and rest and orig != 'N/A' and rest != 'N/A' and orig != rest:
+                  errors.append(f\"{t.get('test_id')}: hash mismatch\")
+          if errors: print(f'ERRORS: {errors}', file=sys.stderr); sys.exit(1)
+          print(f\"Adversarial OK: {a['totals']}\")
+          "
+
+          echo "=== ALL GATE CHECKS PASSED ==="
+
+      # === K. Upload immutable evidence artifact ===
       - name: Upload evidence artifacts
         if: always()
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808  # v4.3.3

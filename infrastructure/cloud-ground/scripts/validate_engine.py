@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 OCE Cloud Ground — Validation Engine
-B1-I1R3B — Source Identity and Authoritative CI Closure
-Version: 3.1.0
+B1-I1R3C — Evidence Isolation and Final Gate Closure
+Version: 3.3.0
 
 Mandatory checks: 29
 - SOURCE-IDENTITY (first, fail-closed)
@@ -28,7 +28,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 import shutil
 
-VERSION = "3.2.0"
+VERSION = "3.3.0"
 SCRIPT_DIR = Path(__file__).resolve().parent
 BASE_DIR = SCRIPT_DIR.parent
 REPO_ROOT = BASE_DIR.parent.parent  # infrastructure/cloud-ground -> repo root
@@ -106,7 +106,7 @@ class CheckResult:
 
 
 class Validator:
-    def __init__(self, target_commit=None, target_tree=None, target_branch=None, authoritative=False):
+    def __init__(self, target_commit=None, target_tree=None, target_branch=None, authoritative=False, evidence_dir=None):
         self.results = []
         self.run_uid = run_id()
         self.start_time = utc_now()
@@ -115,6 +115,7 @@ class Validator:
         self.target_tree = target_tree
         self.target_branch = target_branch
         self.authoritative = authoritative
+        self.evidence_dir_override = Path(evidence_dir) if evidence_dir else None
 
     def add(self, check_id, description, mandatory, result, evidence="", output=""):
         self.results.append(CheckResult(check_id, description, mandatory, result, evidence, output))
@@ -485,6 +486,7 @@ class Validator:
 
     def check_digest_proof(self):
         """Verify compose digests match real registry-proven digests in evidence."""
+        # Read canonical image-digests from the base evidence dir (not override)
         evidence_path = EVIDENCE_DIR / "image-digests.json"
         if not evidence_path.exists():
             self.add("DIGEST-PROOF", "Image digests match registry evidence", True,
@@ -552,6 +554,7 @@ class Validator:
 
     def check_digest_registry(self):
         """Verify image digests resolve against the registry using available tools."""
+        # Read canonical image-digests from the base evidence dir (not override)
         evidence_path = EVIDENCE_DIR / "image-digests.json"
         if not evidence_path.exists():
             self.add("DIGEST-REGISTRY", "Image digests resolve against registry", True,
@@ -1065,9 +1068,15 @@ class Validator:
                      f"total={actual_total} computed={expected_total}",
                      "Disagreement between recorded totals and actual count")
 
+    def _evidence_dir(self):
+        """Return the active evidence directory (override or canonical)."""
+        d = self.evidence_dir_override if self.evidence_dir_override else EVIDENCE_DIR
+        d.mkdir(parents=True, exist_ok=True)
+        return d
+
     def check_fail_closed(self):
         """The real fail-closed check: verify adversarial evidence exists and is valid."""
-        adv_path = EVIDENCE_DIR / "adversarial-results.json"
+        adv_path = self._evidence_dir() / "adversarial-results.json"
         if not adv_path.exists():
             self.add("FAIL-CLOSED", "Adversarial mutations detected and rejected", True,
                      "BLOCKED", "adversarial-results.json not found", "Run adversarial-tests.sh first")
@@ -1093,23 +1102,48 @@ class Validator:
         failed_tests = sum(1 for t in tests if t.get("result") == "FAIL")
         blocked_tests = sum(1 for t in tests if t.get("result") == "BLOCKED")
 
-        # All adversarial tests must pass (each mutation was correctly detected)
+        # Validate mutation_result field: must be FAIL (not BLOCKED/SKIPPED)
+        bad_mutation_results = []
+        bad_mutation_exits = []
+        bad_hash_restores = []
+        for t in tests:
+            mr = t.get("mutation_result", "")
+            me = t.get("mutation_exit", 0)
+            if mr in ("BLOCKED", "SKIPPED", "ERROR", "NOT_FOUND", "PASS", ""):
+                bad_mutation_results.append(f"{t.get('test_id','?')}: mutation_result={mr}")
+            if t.get("result") == "PASS" and me == 0 and mr not in ("N/A", ""):
+                bad_mutation_exits.append(f"{t.get('test_id','?')}: mutation_exit=0")
+            orig = t.get("original_sha256", "")
+            rest = t.get("restored_sha256", "")
+            if orig and rest and orig != "N/A" and rest != "N/A" and orig != rest:
+                bad_hash_restores.append(f"{t.get('test_id','?')}: orig!=rest")
+
+        errors = []
         if failed_tests > 0:
+            errors.append(f"{failed_tests}/{total_tests} tests failed")
+        if blocked_tests > 0:
+            errors.append(f"{blocked_tests}/{total_tests} tests blocked")
+        if passed_tests == 0:
+            errors.append("0 tests passed")
+        if bad_mutation_results:
+            errors.append(f"bad mutation_result: {'; '.join(bad_mutation_results[:5])}")
+        if bad_mutation_exits:
+            errors.append(f"mutation_exit=0 on PASS: {'; '.join(bad_mutation_exits[:5])}")
+        if bad_hash_restores:
+            errors.append(f"hash restore mismatch: {'; '.join(bad_hash_restores[:5])}")
+
+        if errors:
             self.add("FAIL-CLOSED", "Adversarial mutations detected and rejected", True,
-                     "FAIL", f"{failed_tests}/{total_tests} tests failed", "Some mutations not detected")
-        elif blocked_tests > 0:
-            self.add("FAIL-CLOSED", "Adversarial mutations detected and rejected", True,
-                     "BLOCKED", f"{blocked_tests}/{total_tests} tests blocked", "Some mutations could not run")
-        elif passed_tests == 0:
-            self.add("FAIL-CLOSED", "Adversarial mutations detected and rejected", True,
-                     "FAIL", "0 passed", "No tests executed")
+                     "FAIL", f"{len(errors)} issues",
+                     "\n".join(errors))
         else:
             self.add("FAIL-CLOSED", "Adversarial mutations detected and rejected", True,
-                     "PASS", f"{passed_tests}/{total_tests} pass", "All mutations correctly rejected")
+                     "PASS", f"{passed_tests}/{total_tests} pass",
+                     "All mutations correctly rejected with FAIL+nonzero exit")
 
     def check_evidence_consistency(self):
         """Verify evidence identity matches checkpoint identity."""
-        results_path = EVIDENCE_DIR / "static-validation-results.json"
+        results_path = self._evidence_dir() / "static-validation-results.json"
         if not results_path.exists():
             self.add("EVIDENCE-CONSISTENCY", "Evidence identity matches checkpoint", True,
                      "BLOCKED", "static-validation-results.json not found", "")
@@ -1248,6 +1282,7 @@ class Validator:
             "SHELLCHECK": self.check_shellcheck,
             "GITLEAKS": self.check_gitleaks,
             "SCAFFOLD-SCAN": self.check_scaffold_scan,
+            "FAIL-CLOSED": self.check_fail_closed,
             "EVIDENCE-CONSISTENCY": self.check_evidence_consistency,
             "TOTALS-CONSIST": lambda: self.check_totals_consistency({}),
         }
@@ -1264,7 +1299,8 @@ class Validator:
                 check_map[cid]()
 
     def write_evidence(self, git_info):
-        EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
+        ev_dir = self._evidence_dir()
+        ev_dir.mkdir(parents=True, exist_ok=True)
 
         # Compute totals (excluding TOTALS-CONSIST, FAIL-CLOSED, EVIDENCE-CONSISTENCY)
         pre_totals = {"PASS": 0, "FAIL": 0, "BLOCKED": 0, "SKIPPED": 0}
@@ -1309,21 +1345,22 @@ class Validator:
             "gate": gate,
         }
 
-        results_path = EVIDENCE_DIR / "static-validation-results.json"
+        results_path = ev_dir / "static-validation-results.json"
         with open(results_path, "w", encoding="utf-8") as f:
             json.dump(results_data, f, indent=2, ensure_ascii=False)
 
         # Write summary MD
-        self.write_summary_md(git_info, totals, gate)
+        self.write_summary_md(git_info, totals, gate, ev_dir)
 
         # Write stage status
-        self.write_stage_status(git_info, totals, gate)
+        self.write_stage_status(git_info, totals, gate, ev_dir)
 
         return gate, totals
 
     def write_evidence_targeted(self, git_info):
         """Write evidence in targeted mode — skip FAIL-CLOSED and EVIDENCE-CONSISTENCY."""
-        EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
+        ev_dir = self._evidence_dir()
+        ev_dir.mkdir(parents=True, exist_ok=True)
 
         # Compute totals (excluding post-checks)
         pre_totals = {"PASS": 0, "FAIL": 0, "BLOCKED": 0, "SKIPPED": 0}
@@ -1365,7 +1402,7 @@ class Validator:
             "gate": gate,
         }
 
-        results_path = EVIDENCE_DIR / "static-validation-results.json"
+        results_path = ev_dir / "static-validation-results.json"
         with open(results_path, "w", encoding="utf-8") as f:
             json.dump(results_data, f, indent=2, ensure_ascii=False)
 
@@ -1380,9 +1417,10 @@ class Validator:
             return "BLOCKED"
         return "READY_FOR_OPERATOR_REVIEW"
 
-    def write_summary_md(self, git_info, totals, gate):
+    def write_summary_md(self, git_info, totals, gate, ev_dir=None):
+        ev_dir = ev_dir or self._evidence_dir()
         lines = [
-            f"# B1-I1R3A Static Validation Summary",
+            f"# B1-I1R3C Static Validation Summary",
             f"",
             f"- **Run ID:** `{self.run_uid}`",
             f"- **Validator:** v{VERSION}",
@@ -1424,14 +1462,15 @@ class Validator:
             f"---", f"*Generated by validate_engine.py v{VERSION} — {utc_now()}*",
         ])
 
-        out_path = EVIDENCE_DIR / "static-validation-summary.md"
+        out_path = ev_dir / "static-validation-summary.md"
         with open(out_path, "w", encoding="utf-8") as f:
             f.write("\n".join(lines) + "\n")
 
-    def write_stage_status(self, git_info, totals, gate):
+    def write_stage_status(self, git_info, totals, gate, ev_dir=None):
+        ev_dir = ev_dir or self._evidence_dir()
         status = {
             "block": "B1",
-            "increment": "B1-I1R3A",
+            "increment": "B1-I1R3C",
             "implementation_commit": git_info.get("commit", "unknown"),
             "implementation_tree": git_info.get("tree", "unknown"),
             "evidence_commit": None,
@@ -1440,7 +1479,7 @@ class Validator:
             "unresolved_blockers": [],
             "cost_impact_usd": 0,
             "cloud_mutations": 0,
-            "next_authorized_action": "Operator review of B1-I1R3A evidence",
+            "next_authorized_action": "Operator review of B1-I1R3C evidence",
         }
         for r in self.results:
             if r.result == "BLOCKED":
@@ -1449,20 +1488,22 @@ class Validator:
                     "reason": r.evidence,
                     "dependency": r.output,
                 })
-        out_path = EVIDENCE_DIR / "stage-status.json"
+        out_path = ev_dir / "stage-status.json"
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(status, f, indent=2, ensure_ascii=False)
 
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description="OCE Cloud Ground Validation Engine v3.1.0")
+    parser = argparse.ArgumentParser(description="OCE Cloud Ground Validation Engine v3.3.0")
     parser.add_argument("--all", action="store_true", help="Run all checks")
     parser.add_argument("--authoritative", action="store_true",
                         help="Authoritative mode: enforce strict identity proof (requires --target-commit, --target-tree, --target-branch)")
     parser.add_argument("--target-commit", type=str, help="Expected implementation SHA")
     parser.add_argument("--target-tree", type=str, help="Expected tree SHA")
     parser.add_argument("--target-branch", type=str, help="Expected branch name")
+    parser.add_argument("--evidence-dir", type=str, default=None,
+                        help="Override evidence output directory (for isolation during adversarial testing)")
     parser.add_argument("--only", type=str, help="Comma-separated check IDs to run")
     args = parser.parse_args()
 
@@ -1484,6 +1525,7 @@ def main():
         target_tree=args.target_tree,
         target_branch=args.target_branch,
         authoritative=args.authoritative,
+        evidence_dir=args.evidence_dir,
     )
 
     if args.only:
@@ -1505,7 +1547,7 @@ def main():
 
     # Print summary
     print(f"\n{'='*50}")
-    print(f"  B1-I1R3A Validation — {gate}")
+    print(f"  B1-I1R3C Validation — {gate}")
     print(f"{'='*50}")
     print(f"  Run ID:    {validator.run_uid}")
     print(f"  Commit:    {git_info.get('commit', 'unknown')[:12]}")

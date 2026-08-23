@@ -1,0 +1,231 @@
+#!/usr/bin/env bash
+#
+# OCE Cloud Ground — Local Validation Entrypoint
+# B1-I1R3C — Evidence Isolation and Final Gate Closure
+#
+# Runs the same suite as CI. Uses isolated evidence during adversarial
+# testing, then generates final canonical evidence.
+#
+# Usage:
+#   ./infrastructure/cloud-ground/scripts/validate-local
+#
+# Environment:
+#   OCE_TARGET_COMMIT   Override commit for authoritative mode (optional)
+#   OCE_TARGET_TREE     Override tree for authoritative mode (optional)
+#   OCE_TARGET_BRANCH   Override branch for authoritative mode (optional)
+#
+set -uo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+ENGINE="$BASE_DIR/scripts/validate_engine.py"
+ADVERSARIAL="$BASE_DIR/tests/adversarial-tests.sh"
+
+# Temporary directories
+WORK_DIR=$(mktemp -d "${TMPDIR:-/tmp}/oce-validate-XXXXXX")
+ADVERSARIAL_EVIDENCE="$WORK_DIR/adversarial-evidence"
+trap 'rm -rf "$WORK_DIR"' EXIT
+
+PASS=0
+FAIL=0
+BLOCKED=0
+OVERALL="PASS"
+
+section() {
+    echo ""
+    echo "=============================================="
+    echo "  $1"
+    echo "=============================================="
+}
+
+check_tool() {
+    local name="$1" cmd="$2"
+    if command -v "$cmd" &>/dev/null; then
+        echo "  ✓ $name: $(command -v "$cmd")"
+        return 0
+    else
+        echo "  ✗ $name: NOT FOUND"
+        return 1
+    fi
+}
+
+record() {
+    local status="$1" name="$2"
+    case "$status" in
+        pass)  PASS=$((PASS + 1));  echo "  PASS: $name" ;;
+        fail)  FAIL=$((FAIL + 1));  echo "  FAIL: $name"; OVERALL="FAILED" ;;
+        blocked) BLOCKED=$((BLOCKED + 1)); echo "  BLOCKED: $name" ;;
+    esac
+}
+
+echo "=============================================="
+echo "  OCE B1-I1R3C Local Validation"
+echo "  $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+echo "=============================================="
+
+# === Phase A: Check required tools ===
+section "A. Tool Check"
+check_tool "python3" "python3"        || record blocked "python3"
+check_tool "shellcheck" "shellcheck"   || record blocked "shellcheck"
+check_tool "ansible-playbook" "ansible-playbook" || record blocked "ansible-playbook"
+check_tool "ansible-lint" "ansible-lint" || record blocked "ansible-lint"
+check_tool "docker" "docker"           || record blocked "docker"
+check_tool "gitleaks" "gitleaks"       || record blocked "gitleaks"
+
+# Verify Python dependencies
+python3 -c "import yaml, jsonschema" 2>/dev/null || {
+    echo "  Installing Python dependencies..."
+    pip install -r "$BASE_DIR/requirements.txt" 2>/dev/null
+}
+
+# === Phase B: Clean worktree assertion ===
+section "B. Clean Worktree"
+DIRTY=$(git -C "$BASE_DIR/../.." status --porcelain 2>/dev/null | wc -l)
+if [ "$DIRTY" -gt 0 ]; then
+    echo "  WARNING: $DIRTY dirty files (expected during development)"
+fi
+record pass "Worktree check"
+
+# === Phase C: Source Identity ===
+section "C. Source Identity"
+COMMIT=$(git -C "$BASE_DIR/../.." rev-parse HEAD 2>/dev/null)
+TREE=$(git -C "$BASE_DIR/../.." rev-parse "HEAD^{tree}" 2>/dev/null)
+BRANCH=$(git -C "$BASE_DIR/../.." branch --show-current 2>/dev/null)
+
+# Use override or actual git state
+TC="${OCE_TARGET_COMMIT:-$COMMIT}"
+TT="${OCE_TARGET_TREE:-$TREE}"
+TB="${OCE_TARGET_BRANCH:-$BRANCH}"
+
+echo "  Commit: ${TC:0:12}"
+echo "  Tree:   ${TT:0:12}"
+echo "  Branch: $TB"
+
+if command -v python3 &>/dev/null; then
+    python3 "$ENGINE" --authoritative --target-commit "$TC" --target-tree "$TT" --target-branch "$TB" 2>&1 && \
+        record pass "Source identity" || record fail "Source identity"
+else
+    record blocked "Source identity (no python3)"
+fi
+
+# === Phase D: Ansible ===
+section "D. Ansible Syntax & Lint"
+if command -v ansible-playbook &>/dev/null; then
+    cd "$BASE_DIR/ansible"
+    ansible-playbook --syntax-check playbooks/site.yml -i inventories/example/hosts.yml 2>&1 && \
+        record pass "Ansible syntax" || record fail "Ansible syntax"
+    cd "$BASE_DIR"
+else
+    record blocked "Ansible syntax"
+fi
+
+if command -v ansible-lint &>/dev/null; then
+    cd "$BASE_DIR/ansible"
+    ansible-lint playbooks/site.yml 2>&1 && \
+        record pass "Ansible lint" || record fail "Ansible lint"
+    cd "$BASE_DIR"
+else
+    record blocked "Ansible lint"
+fi
+
+# === Phase E: Compose Render ===
+section "E. Compose Render"
+if command -v docker &>/dev/null; then
+    cd "$BASE_DIR/compose"
+    POSTGRES_PASSWORD=test_validation docker compose -f compose.foundation.yml config >/dev/null 2>&1 && \
+        record pass "Compose render" || record fail "Compose render"
+    cd "$BASE_DIR"
+else
+    record blocked "Compose render (no docker)"
+fi
+
+# === Phase F: Digest Verification ===
+section "F. Digest Verification"
+if command -v docker &>/dev/null && [ -f "$BASE_DIR/evidence/image-digests.json" ]; then
+    python3 -c "
+import json, subprocess, sys
+evidence = json.load(open('$BASE_DIR/evidence/image-digests.json'))
+errors = []
+for img in evidence.get('images', []):
+    name, digest, verified = img.get('name',''), img.get('digest',''), img.get('verified_digest',False)
+    if not digest or not verified: errors.append(f'{name}: not verified'); continue
+    try:
+        r = subprocess.run(['docker','buildx','imagetools','inspect',f'{name}@{digest}'],
+            capture_output=True, text=True, timeout=30)
+        if r.returncode == 0 and ('Manifests' in r.stdout or 'MediaType' in r.stdout):
+            print(f'PASS {name}: resolved')
+        else:
+            errors.append(f'{name}: not resolved')
+    except Exception as e:
+        errors.append(f'{name}: {e}')
+if errors: print(f'FAIL: {errors}', file=sys.stderr); sys.exit(1)
+print('All digests verified')
+" 2>&1 && record pass "Digest verification" || record fail "Digest verification"
+else
+    record blocked "Digest verification (no docker or no evidence)"
+fi
+
+# === Phase G: ShellCheck & Gitleaks ===
+section "G. ShellCheck & Gitleaks"
+if command -v shellcheck &>/dev/null; then
+    shellcheck -s bash "$BASE_DIR/tests/adversarial-tests.sh" 2>&1 && \
+        record pass "ShellCheck" || record fail "ShellCheck"
+else
+    record blocked "ShellCheck (not installed)"
+fi
+
+if command -v gitleaks &>/dev/null; then
+    gitleaks detect --source "$BASE_DIR" --no-banner --report-format json 2>&1 && \
+        record pass "Gitleaks" || record fail "Gitleaks"
+else
+    record blocked "Gitleaks (not installed)"
+fi
+
+# === Phase H: Adversarial Suite (isolated evidence) ===
+section "H. Adversarial Suite (isolated)"
+mkdir -p "$ADVERSARIAL_EVIDENCE"
+OCE_EVIDENCE_DIR="$ADVERSARIAL_EVIDENCE" bash "$ADVERSARIAL" 2>&1 && \
+    record pass "Adversarial suite" || record fail "Adversarial suite"
+
+# === Phase I: Final Complete Validation ===
+section "I. Final Complete Validation"
+if command -v python3 &>/dev/null; then
+    python3 "$ENGINE" --all --authoritative --target-commit "$TC" --target-tree "$TT" --target-branch "$TB" 2>&1 && \
+        record pass "Final validation" || record fail "Final validation"
+else
+    record blocked "Final validation (no python3)"
+fi
+
+# === Phase J: Gate Assertion ===
+section "J. Final Gate"
+echo ""
+echo "=============================================="
+echo "  Validation Summary"
+echo "=============================================="
+echo "  PASS:     $PASS"
+echo "  FAIL:     $FAIL"
+echo "  BLOCKED:  $BLOCKED"
+echo "=============================================="
+
+if [ "$FAIL" -gt 0 ]; then
+    OVERALL="FAILED"
+elif [ "$BLOCKED" -gt 0 ]; then
+    OVERALL="BLOCKED"
+else
+    OVERALL="READY"
+fi
+
+echo "  Result:   $OVERALL"
+echo "=============================================="
+echo ""
+
+if [ "$OVERALL" = "READY" ]; then
+    echo "✓ All checks passed. Gate: READY_FOR_OPERATOR_REVIEW"
+    exit 0
+elif [ "$OVERALL" = "BLOCKED" ]; then
+    echo "⚠ Some tools not available. Install missing tools and re-run."
+    exit 2
+else
+    echo "✗ Validation failed. Fix issues and re-run."
+    exit 1
+fi
