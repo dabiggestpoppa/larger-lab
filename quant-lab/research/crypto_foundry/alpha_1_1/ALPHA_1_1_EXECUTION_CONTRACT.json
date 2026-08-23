@@ -1,0 +1,18 @@
+{
+  "contract_id": "ALPHA1_1_EXECUTION_V1",
+  "frozen_at": "2026-08-23T16:35:20Z",
+  "signal": "1h bar close",
+  "execution": "next bar open",
+  "no_same_bar": true,
+  "concurrency": "one position per strategy x asset",
+  "pyramiding": false,
+  "signal_collision": "IGNORE_NEW_SIGNAL",
+  "multi_strat": "independent",
+  "data_blocked": [
+    "L2",
+    "OI",
+    "mark/index",
+    "5m/15m/30m overlap"
+  ],
+  "confirmation": "DEFERRED"
+}

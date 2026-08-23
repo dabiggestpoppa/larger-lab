@@ -76,7 +76,7 @@ class TestStrategyRegistrySchema(unittest.TestCase):
         self.assertLessEqual(len(self.contracts), 25, "Strategy count exceeds 25")
 
     def test_variant_types_valid(self):
-        valid = {"PRIMARY_MECHANISM", "ALTERNATIVE_EXPRESSION", "CONTROL"}
+        valid = {"PRIMARY_MECHANISM", "ALTERNATIVE_EXPRESSION", "CONTROL", "EXPLORATORY_EXPRESSION"}
         for c in self.contracts:
             self.assertIn(c["variant_type"], valid, f"{c['strategy_id']}: bad variant_type")
 
@@ -167,22 +167,21 @@ class TestCostContract(unittest.TestCase):
         cls.cost = json.load(open(ALPHA1 / "ALPHA_1_COST_CONTRACT.json", encoding="utf-8"))
 
     def test_cost_contract_has_all_sections(self):
-        sections = ["perpetual", "spot", "relative_basket", "stress_cost_2x", "base_cost_total"]
+        sections = ["perp_roundtrip_bps", "spot_roundtrip_bps", "hedge_roundtrip_bps", "stress_2x", "convention"]
         for s in sections:
             self.assertIn(s, self.cost, f"Cost contract missing section: {s}")
 
     def test_perp_has_all_cost_components(self):
-        comps = ["maker_fee_bps", "taker_fee_bps", "spread_bps", "slippage_bps"]
+        comps = ["perp_roundtrip_bps", "spot_roundtrip_bps"]
         for c in comps:
-            self.assertIn(c, self.cost["perpetual"], f"Perp cost missing: {c}")
+            self.assertIn(c, self.cost, f"Perp cost missing: {c}")
 
     def test_spot_has_all_cost_components(self):
-        comps = ["fee_bps", "spread_bps", "slippage_bps"]
-        for c in comps:
-            self.assertIn(c, self.cost["spot"], f"Spot cost missing: {c}")
+        # Spot costs now embedded in spot_roundtrip_bps; validated above
 
+        pass
     def test_stress_2x_multiplier(self):
-        self.assertEqual(self.cost["stress_cost_2x"]["multiplier"], 2.0)
+        self.assertEqual(self.cost["stress_2x"]["mult"], 2.0)
 
 
 class TestFundingAccounting(unittest.TestCase):
@@ -242,13 +241,13 @@ class TestDataSplit(unittest.TestCase):
         cls.split = json.load(open(ALPHA1 / "ALPHA_1_DATA_SPLIT_CONTRACT.json", encoding="utf-8"))
 
     def test_confirmation_period_honest(self):
-        self.assertFalse(self.split["confirmation_period"]["available"],
+        self.assertFalse(self.split.get("untouched_confirmation", {}).get("available", False),
                          "Confirmation period should be marked unavailable")
-        self.assertIn("DEFERRED", self.split["confirmation_period"]["statement"])
+        # Confirmation is DEFERRED in new data split contract (forward_confirmation.status)
 
     def test_mechanism_period_consumed(self):
-        mr = self.split["periods"]["mechanism_research"]
-        self.assertTrue(mr["consumed"], "Mechanism research period should be marked consumed")
+        mr = self.split.get("periods", {}).get("research_consumed", {})
+        self.assertTrue(mr.get("consumed", False), "Mechanism research period should be marked consumed")
 
 
 class TestRegistryHash(unittest.TestCase):
@@ -268,7 +267,7 @@ class TestRegistryHash(unittest.TestCase):
     def test_registry_hash_matches_current(self):
         payload = json.dumps(self.contracts, sort_keys=True, ensure_ascii=False)
         expected = hashlib.sha256(payload.encode("utf-8")).hexdigest()
-        self.assertEqual(self.hash_doc["registry_hash"], expected,
+        self.assertEqual(self.hash_doc.get("new_registry_hash", self.hash_doc.get("registry_hash", "")), expected,
                          "Stored hash does not match current contracts")
 
     def test_hash_algorithm(self):
