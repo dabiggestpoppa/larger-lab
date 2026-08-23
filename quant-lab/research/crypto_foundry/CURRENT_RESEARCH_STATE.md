@@ -1,8 +1,8 @@
 # QUANT BOX — Crypto Quant Foundry Current Research State
 
-**Checkpoint:** `CRYPTO-MECH-1-SPOT-PERP-AMM-CONSTRAINT-ANATOMY`
+**Checkpoint:** `CRYPTO-MECH-2-STATE-AND-DISLOCATION-TAXONOMY`
 **Branch:** `agent/crypto-quant-foundry`
-**Decision:** `PASS_MECHANISM_ANATOMY`
+**Decision:** `PASS_STATE_TAXONOMY`
 **Strategy research:** NOT STARTED (mechanism science only)
 **Execution:** NOT AUTHORIZED
 
@@ -105,14 +105,45 @@ Options / LP: DATA-2_CANDIDATE (not in DATA-1 scope)
 - Artifacts: `mech_1/` (MECH_1_REPORT.md, MECH_1_DECISION.json, 10 CSVs,
   preregistration, data contract, research-extension manifest).
 
+### CRYPTO-MECH-2-STATE-AND-DISLOCATION-TAXONOMY ✅ (PASS — promoted 25, falsified 55)
+
 ## Next Checkpoint (NOT STARTED)
 
-`CRYPTO-MECH-2-STATE-AND-DISLOCATION-TAXONOMY`
+`CRYPTO-ALPHA-1-MECHANISM-TO-STRATEGY-GENERATION`
 
-Scope (per MECH-1 decision):
-1. State/dislocation taxonomy from the mechanism registry
-2. Conditional next-state matrices and transition tables
-3. Remaining-range quantile baselines
-4. Time-to-resolution survival curves by tier/state
-5. Deeper mark-index / OI lanes via frozen collectors (registered extensions)
+## MECH-2 Summary (state/dislocation taxonomy, PASS)
+
+- **Decision:** PASS_STATE_TAXONOMY. Base: 381681fd.
+- **State axes:** BASIS_STATE, FUNDING_STATE, FUNDING_ACCEL, VOL_STATE,
+  MARK_INDEX_STATE (provisional premium proxy), RELATIVE_STATE,
+  SYSTEMIC_STATE, L2/L3 composites. OI_STATE = DEFERRED (no temporal history).
+- **State grid:** 6,803 labeled hourly rows (BTC+ETH, 3,401 each)
+- **Transitions:** 12,556 matrix rows at 1h/4h/8h/24h across 9 axes
+  (5m/15m/30m not available on frozen data — no 5m spot-perp overlap)
+- **Path taxonomy:** 378 dislocation episodes with frozen classification
+- **Survival:** 737 KM curve points (episode + per-state)
+- **Information value:** 253 rows (entropy reduction, JS divergence, bootstrap CIs)
+- **Null comparisons:** 701 rows (unconditional, vol-matched, block-shuffled, AR1)
+- **Convergence re-test:** 10 conditional families — convergence remains WEAK
+- **Funding-crowding:** 4 cells (basis×funding sign matrix)
+- **BTC/ETH systemic:** 8 rows (joint state, lead-lag, cross-asset entropy)
+- **Time-epoch:** 96 rows (hourly entropy, anchor windows)
+- **AMM pilot:** 3 pools, PILOT_MECHANISM_EVIDENCE only
+- **FDR:** 214 cells tested, 175 significant at BH-FDR q=0.05
+- **Registry:** 107 states across L1/L2/L3
+- **Promotion (fail-closed with materiality gate |SMD|≥0.20, ER≥0.02):**
+  25 PROMOTED, 55 FALSIFIED, 22 SPARSE, 4 RESEARCH_ONLY, 1 REDUNDANT
+- **MECH-1 repair:** MARK_INDEX_STRESS → PROVISIONAL_SUPPORTED
+- **Research extensions:** ETH WETH/USDC 30d (144,697 swaps), ETH WBTC/USDC
+  30d (4,864), Base WETH/USDC 30d (~54k timestamped). HL mark/index/OI:
+  NOT AVAILABLE.
+- **No strategy PnL, no optimization, no ML, no execution**
+
+## Next Checkpoint
+
+`CRYPTO-ALPHA-1-MECHANISM-TO-STRATEGY-GENERATION`
+
+Do NOT start ALPHA-1. Scope: convert promoted mechanism states into
+strategy hypotheses using named execution objects only (spot, perp,
+relative BTC/ETH, AMM-informed). No entry/stop/TP rules yet.
 6. No strategy PnL, no optimization, no ML, no execution

@@ -1,0 +1,11 @@
+asset,family,n,conditional_mean_abs_change,unconditional_mean_abs_change,effect_vs_unconditional,effect_size_smd,boot_ci_p05,boot_ci_p95,beats_unconditional,ar1_baseline_effect,status
+BTC,basis_extreme_only,340,-1.670669,0.024151,-1.69482,-0.941375,-1.852118,-1.541573,True,0.539034,EVALUATED
+BTC,basis_extreme_plus_funding_extreme,124,-1.249659,0.024151,-1.27381,-0.682883,-1.535139,-1.019023,True,0.539034,EVALUATED
+BTC,basis_extreme_plus_high_vol,137,-1.607046,0.024151,-1.631197,-0.823447,-1.950178,-1.333372,True,0.539034,EVALUATED
+BTC,basis_extreme_plus_funding_plus_vol,66,-1.099789,0.024151,-1.12394,-0.547377,-1.52205,-0.740642,True,0.539034,EVALUATED
+BTC,basis_extreme_plus_systemic_stress,99,-1.795439,0.024151,-1.81959,-0.906349,-2.099252,-1.493652,True,0.539034,EVALUATED
+ETH,basis_extreme_only,342,-1.83749,0.048175,-1.885665,-0.73471,-2.07075,-1.667633,True,0.213792,EVALUATED
+ETH,basis_extreme_plus_funding_extreme,141,-1.351089,0.048175,-1.399264,-0.554649,-1.677252,-1.102047,True,0.213792,EVALUATED
+ETH,basis_extreme_plus_high_vol,127,-1.998797,0.048175,-2.046972,-0.757889,-2.375496,-1.748439,True,0.213792,EVALUATED
+ETH,basis_extreme_plus_funding_plus_vol,56,-1.475652,0.048175,-1.523827,-0.572411,-1.937198,-1.000653,True,0.213792,EVALUATED
+ETH,basis_extreme_plus_systemic_stress,118,-1.816897,0.048175,-1.865072,-0.729324,-2.178764,-1.625053,True,0.213792,EVALUATED

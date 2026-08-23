@@ -1,0 +1,12 @@
+# Large 30d extension data files (~350MB total) — 
+# sha256 + row counts in MECH_2_EXTENSION_MANIFEST.json
+*_30d.json
+
+# Temporary collector state files
+_base_*.json
+_base_*.jsonl
+_base_*.txt
+
+# Python cache
+__pycache__/
+*.pyc
