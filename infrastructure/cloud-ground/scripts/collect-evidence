@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# OCE Cloud Ground — Collect Evidence
-# B1-I1R — Calls validation engine then collects evidence
+# OCE Cloud Ground -- Collect Evidence
+# B1-I1R -- Calls validation engine then collects evidence
 # Version: 2.0.0
 #
 # This script:
@@ -18,7 +18,7 @@ TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
 mkdir -p "$EVIDENCE_DIR"
 
-echo "=== OCE Cloud Ground — Evidence Collection ==="
+echo "=== OCE Cloud Ground -- Evidence Collection ==="
 echo "Timestamp: $TIMESTAMP"
 
 # 1. Run validation engine

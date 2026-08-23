@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# OCE Cloud Ground — Render Config
-# B1-I1R — Validate configuration templates can be rendered
+# OCE Cloud Ground -- Render Config
+# B1-I1R -- Validate configuration templates can be rendered
 # Version: 2.0.0
 #
 # This script validates that compose and ansible configurations are
@@ -17,7 +17,7 @@ ANSIBLE_DIR="$BASE_DIR/ansible"
 
 ERRORS=0
 
-echo "=== OCE Cloud Ground — Config Validation ==="
+echo "=== OCE Cloud Ground -- Config Validation ==="
 echo "Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo ""
 
@@ -37,7 +37,7 @@ if [ -f "$FOUNDATION" ]; then
             ERRORS=$((ERRORS + 1))
         fi
     else
-        echo "  BLOCKED  docker not installed — compose render skipped"
+        echo "  BLOCKED  docker not installed -- compose render skipped"
     fi
 else
     echo "  FAIL  compose.foundation.yml not found"
@@ -58,7 +58,7 @@ if [ -f "$PLAYBOOK" ]; then
             ERRORS=$((ERRORS + 1))
         fi
     else
-        echo "  BLOCKED  ansible-playbook not installed — syntax check skipped"
+        echo "  BLOCKED  ansible-playbook not installed -- syntax check skipped"
     fi
 else
     echo "  FAIL  site.yml not found"

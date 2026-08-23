@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# OCE Cloud Ground — Static Validation Wrapper
-# B1-I1R — Calls the Python validation engine
+# OCE Cloud Ground -- Static Validation Wrapper
+# B1-I1R -- Calls the Python validation engine
 # Version: 2.0.0
 #
 # Usage: ./scripts/validate-static

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# OCE Cloud Ground — Doctor Script
-# B1-I1R — Check prerequisites without failing on missing tools
+# OCE Cloud Ground -- Doctor Script
+# B1-I1R -- Check prerequisites without failing on missing tools
 # Version: 2.0.0
 #
 # Exit code: nonzero when mandatory tools are missing

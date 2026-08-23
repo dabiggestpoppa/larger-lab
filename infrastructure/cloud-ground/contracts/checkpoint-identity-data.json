@@ -1,7 +1,7 @@
 {
-  "checkpoint_id": "B1-I1R3C-EVIDENCE-ISOLATION-AND-GATE-CLOSURE",
+  "checkpoint_id": "B1-I1R3D-AUTHORITATIVE-EVIDENCE-PIPELINE-CLOSURE",
   "block": "B1",
-  "increment": "B1-I1R3C",
+  "increment": "B1-I1R3D",
   "repository": {
     "owner": "dabiggestpoppa",
     "name": "larger-lab",
@@ -17,7 +17,7 @@
   "expected_implementation_commit_source": "",
   "expected_tree_sha": "",
   "ci_workflow_name": "b1-i1r3-validation.yml",
-  "evidence_schema_version": "3.3.0",
+  "evidence_schema_version": "3.4.0",
   "constitutional_gates": {
     "no_cloud_provisioning": true,
     "no_purchases": true,

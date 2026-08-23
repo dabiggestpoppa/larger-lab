@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 #
 # OCE Cloud Ground - Adversarial Test Suite
-# B1-I1R3C - Evidence Isolation and Final Gate Closure
+# B1-I1R3D - Authoritative Evidence Pipeline Closure
 #
 # Mutations apply to REAL source files with backup/restore.
 # Evidence is written to an isolated directory (not canonical evidence/).
 # Every negative test must record mutation_result=FAIL and mutation_exit>0.
+# Meta-tests prove the gate rejects malformed or forbidden evidence.
+# Test results are written to individual files to avoid cascading failures.
 #
 set -uo pipefail
 
@@ -14,10 +16,9 @@ BASE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 ENGINE="$BASE_DIR/scripts/validate_engine.py"
 PROJ_ROOT="$(cd "$BASE_DIR/../.." && pwd)"
 
-# Isolated evidence dir — use project-internal path for cross-platform compat
+# Isolated evidence dir
 EVIDENCE_DIR="${OCE_EVIDENCE_DIR:-$PROJ_ROOT/.oce-adversarial-evidence}"
 mkdir -p "$EVIDENCE_DIR"
-# Resolve to absolute path that Python can also read
 EVIDENCE_DIR=$(cd "$EVIDENCE_DIR" && pwd)
 
 # Temp dir for backups
@@ -25,16 +26,19 @@ BACKUP_DIR="$PROJ_ROOT/.oce-adversarial-backups"
 rm -rf "$BACKUP_DIR"
 mkdir -p "$BACKUP_DIR"
 
+# Temp dir for test result files
+RESULTS_DIR=$(mktemp -d "${TMPDIR:-$PROJ_ROOT}/oce-results-XXXXXX")
+trap 'rm -rf "$BACKUP_DIR" "$RESULTS_DIR"' EXIT
+
+PASS_COUNT=0
+FAIL_COUNT=0
+TOTAL_COUNT=0
+
 win_path() {
     if command -v cygpath &>/dev/null; then cygpath -m "$1"; else echo "$1"; fi
 }
 ENGINE_WIN=$(win_path "$ENGINE")
 EVIDENCE_DIR_WIN=$(win_path "$EVIDENCE_DIR")
-
-PASS_COUNT=0
-FAIL_COUNT=0
-TOTAL_COUNT=0
-TESTS_JSON="[]"
 EVIDENCE_FILE="$EVIDENCE_DIR_WIN/static-validation-results.json"
 
 run_check() {
@@ -49,8 +53,31 @@ get_result() {
     python3 -c "import json,sys; d=json.load(open(sys.argv[1])); results=[r['result'] for r in d.get('results',[]) if r['check_id']==sys.argv[2]]; sys.stdout.buffer.write((results[0] if results else 'NOT_FOUND').encode())" "$EVIDENCE_FILE" "$check_id" 2>/dev/null || echo -n ERROR
 }
 
-# run_one: mutate a REAL file, check detection, restore
-# Args: test_id description real_file expected_check mut_python_code
+# Write a single test result to a file
+write_result() {
+    local test_id="$1" result="$2" description="$3" expected_check="$4" observed_check="$5" \
+          baseline_result="$6" baseline_exit="$7" mutation_result="$8" mutation_exit="$9" \
+          post_restore_result="${10}" post_restore_exit="${11}" original_sha256="${12}" \
+          restored_sha256="${13}" reason="${14}"
+    python3 -c "
+import json, sys
+t = {
+    'test_id': sys.argv[1], 'result': sys.argv[2], 'description': sys.argv[3],
+    'expected_check': sys.argv[4], 'observed_check': sys.argv[5],
+    'baseline_result': sys.argv[6], 'baseline_exit': int(sys.argv[7]),
+    'mutation_result': sys.argv[8], 'mutation_exit': int(sys.argv[9]),
+    'post_restore_result': sys.argv[10], 'post_restore_exit': int(sys.argv[11]),
+    'original_sha256': sys.argv[12], 'restored_sha256': sys.argv[13],
+    'reason': sys.argv[14]
+}
+with open(sys.argv[15], 'w') as f: json.dump(t, f, indent=2)
+" "$test_id" "$result" "$description" "$expected_check" "$observed_check" \
+  "$baseline_result" "$baseline_exit" "$mutation_result" "$mutation_exit" \
+  "$post_restore_result" "$post_restore_exit" "$original_sha256" \
+  "$restored_sha256" "$reason" "$RESULTS_DIR/$test_id.json"
+}
+
+# Run one mutation test: backup -> mutate -> detect -> restore -> verify
 run_one() {
     local test_id="$1" desc="$2" target="$3" expect="$4" mut_code="$5"
     local target_win
@@ -66,9 +93,13 @@ run_one() {
     if [ "$baseline_result" != "PASS" ] || [ "$baseline_exit" -ne 0 ]; then
         echo "    FAIL: baseline $expect=$baseline_result (exit $baseline_exit)"
         FAIL_COUNT=$((FAIL_COUNT + 1))
-        TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':sys.argv[2],'description':sys.argv[3],'result':'FAIL','expected_check':sys.argv[4],'observed_check':sys.argv[5],'baseline_result':sys.argv[5],'baseline_exit':int(sys.argv[6]),'mutation_result':'NOT_RUN','mutation_exit':0,'post_restore_result':'NOT_RUN','post_restore_exit':0,'original_sha256':'','restored_sha256':'','reason':'baseline failed'});print(json.dumps(t))" "$TESTS_JSON" "$test_id" "$desc" "$expect" "$baseline_result" "$baseline_exit")
+        write_result "$test_id" "FAIL" "$desc" "$expect" "BASELINE_FAIL" \
+            "$baseline_result" "$baseline_exit" "NOT_RUN" "0" "NOT_RUN" "0" "" "" "baseline failed"
         return
     fi
+
+    # Ensure backup dir exists
+    mkdir -p "$BACKUP_DIR"
 
     # Hash + backup real file
     local orig_hash
@@ -82,7 +113,8 @@ run_one() {
         echo "    FAIL: mutation code failed (exit $mut_rc)"
         FAIL_COUNT=$((FAIL_COUNT + 1))
         cp "$BACKUP_DIR/pre-${test_id}.bak" "$target"
-        TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':sys.argv[2],'description':sys.argv[3],'result':'FAIL','expected_check':sys.argv[4],'observed_check':sys.argv[5],'baseline_result':'PASS','baseline_exit':0,'mutation_result':'MUTATION_ERROR','mutation_exit':int(sys.argv[6]),'post_restore_result':'NOT_RUN','post_restore_exit':0,'original_sha256':'','restored_sha256':'','reason':'mutation code failed'});print(json.dumps(t))" "$TESTS_JSON" "$test_id" "$desc" "$expect" "MUTATION_ERROR" "$mut_rc")
+        write_result "$test_id" "FAIL" "$desc" "$expect" "MUTATION_ERROR" \
+            "PASS" "0" "MUTATION_ERROR" "$mut_rc" "NOT_RUN" "0" "" "" "mutation code failed"
         return
     fi
 
@@ -103,30 +135,31 @@ run_one() {
     local post_restore_result
     post_restore_result=$(get_result "$expect")
 
-    # Evaluate
+    # Evaluate — EXACT EQUALITY REQUIREMENTS
     local pass=true reason=""
-    if [ "$mutation_result" = "PASS" ]; then pass=false; reason="mutation not detected"
-    elif [ "$mutation_result" = "NOT_FOUND" ] || [ "$mutation_result" = "ERROR" ]; then pass=false; reason="result=$mutation_result"
-    elif [ "$mutation_result" = "BLOCKED" ]; then pass=false; reason="result is BLOCKED not FAIL"
-    elif [ "$mutation_result" = "SKIPPED" ]; then pass=false; reason="result is SKIPPED not FAIL"
-    elif [ -z "$mutation_result" ]; then pass=false; reason="empty mutation_result"
-    elif [ "$mutation_exit" -eq 0 ]; then pass=false; reason="exit was 0"
+    if [ "$baseline_result" != "PASS" ]; then pass=false; reason="baseline=$baseline_result (must be PASS)"
+    elif [ "$baseline_exit" -ne 0 ]; then pass=false; reason="baseline_exit=$baseline_exit (must be 0)"
+    elif [ "$mutation_result" != "FAIL" ]; then pass=false; reason="mutation_result=$mutation_result (must be exactly FAIL)"
+    elif [ "$mutation_exit" -eq 0 ]; then pass=false; reason="mutation_exit=0 (must be nonzero)"
+    elif [ "$post_restore_result" != "PASS" ]; then pass=false; reason="post_restore_result=$post_restore_result (must be PASS)"
+    elif [ "$post_restore_exit" -ne 0 ]; then pass=false; reason="post_restore_exit=$post_restore_exit (must be 0)"
+    elif [ "$orig_hash" != "$rest_hash" ]; then pass=false; reason="hash mismatch orig=$orig_hash rest=$rest_hash"
     fi
-    [ "$orig_hash" != "$rest_hash" ] && pass=false && reason="hash mismatch"
-    [ "$post_restore_result" != "PASS" ] && pass=false && reason="post-restore=$post_restore_result"
-    [ "$post_restore_exit" -ne 0 ] && pass=false && reason="post-restore exit $post_restore_exit"
 
     if [ "$pass" = true ]; then
         echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
-        TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':sys.argv[2],'description':sys.argv[3],'result':'PASS','expected_check':sys.argv[4],'observed_check':sys.argv[5],'baseline_result':'PASS','baseline_exit':0,'mutation_result':sys.argv[5],'mutation_exit':int(sys.argv[6]),'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':sys.argv[7],'restored_sha256':sys.argv[8],'reason':'Mutation detected, restored, baseline clean'});print(json.dumps(t))" "$TESTS_JSON" "$test_id" "$desc" "$expect" "$mutation_result" "$mutation_exit" "$orig_hash" "$rest_hash")
+        write_result "$test_id" "PASS" "$desc" "$expect" "$mutation_result" \
+            "PASS" "0" "$mutation_result" "$mutation_exit" "PASS" "0" "$orig_hash" "$rest_hash" "Mutation detected, restored, baseline clean"
     else
         echo "    FAIL: $reason"; FAIL_COUNT=$((FAIL_COUNT + 1))
-        TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':sys.argv[2],'description':sys.argv[3],'result':'FAIL','expected_check':sys.argv[4],'observed_check':sys.argv[5],'baseline_result':'PASS','baseline_exit':0,'mutation_result':sys.argv[5],'mutation_exit':int(sys.argv[6]),'post_restore_result':sys.argv[7],'post_restore_exit':int(sys.argv[8]),'original_sha256':sys.argv[9],'restored_sha256':sys.argv[10],'reason':sys.argv[11]});print(json.dumps(t))" "$TESTS_JSON" "$test_id" "$desc" "$expect" "$mutation_result" "$mutation_exit" "$post_restore_result" "$post_restore_exit" "$orig_hash" "$rest_hash" "$reason")
+        write_result "$test_id" "FAIL" "$desc" "$expect" "$mutation_result" \
+            "$baseline_result" "$baseline_exit" "$mutation_result" "$mutation_exit" \
+            "$post_restore_result" "$post_restore_exit" "$orig_hash" "$rest_hash" "$reason"
     fi
 }
 
 echo "=============================================="
-echo "  OCE B1-I1R3C Adversarial Test Suite"
+echo "  OCE B1-I1R3D Adversarial Test Suite"
 echo "=============================================="
 echo "Engine: $ENGINE"
 echo "Evidence: $EVIDENCE_DIR"
@@ -189,22 +222,26 @@ run_one "ST-01" "Remove schema required" "$SCHEMA" "SCHEMA-FIXTURES" "import jso
 run_one "CF-01" "Disable host_key_checking" "$ANSIBLE_CFG" "HOST-KEY-CHECKING" "import sys;p=sys.argv[1];c=open(p).read();c=c.replace('host_key_checking = True','host_key_checking = False');open(p,'w').write(c)"
 run_one "CF-02" "Add :latest Redis" "$COMPOSE" "NO-LATEST-TAGS" "import sys,re;p=sys.argv[1];c=open(p).read();c=re.sub(r'image: redis@sha256:[a-f0-9]+','image: redis:latest',c);open(p,'w').write(c)"
 
-# EV-01: wrong repository in identity
+# EV-01: wrong repository in identity (inline, not using run_one for clarity)
 TOTAL_COUNT=$((TOTAL_COUNT + 1))
 echo "  [$TOTAL_COUNT] EV-01: Wrong repository rejected"
-run_check "SOURCE-IDENTITY"
+mkdir -p "$BACKUP_DIR"
+run_check "SOURCE-IDENTITY"; be=$_RUN_CHECK_EXIT; br=$(get_result "SOURCE-IDENTITY")
 cp "$IDENTITY" "$BACKUP_DIR/pre-EV-01.json"
-o=$(sha256sum "$IDENTITY"|cut -d' ' -f1)
+orig_h=$(sha256sum "$IDENTITY"|cut -d' ' -f1)
 python3 -c "import json,sys;p=sys.argv[1];d=json.load(open(p));d['repository']['owner']='bad';json.dump(d,open(p,'w'),indent=2)" "$(win_path "$IDENTITY")"
 run_check "SOURCE-IDENTITY"; me=$_RUN_CHECK_EXIT; mr=$(get_result "SOURCE-IDENTITY")
-cp "$BACKUP_DIR/pre-EV-01.json" "$IDENTITY"; r=$(sha256sum "$IDENTITY"|cut -d' ' -f1)
+cp "$BACKUP_DIR/pre-EV-01.json" "$IDENTITY"
+rest_h=$(sha256sum "$IDENTITY"|cut -d' ' -f1)
 run_check "SOURCE-IDENTITY"; pe=$_RUN_CHECK_EXIT; pr=$(get_result "SOURCE-IDENTITY")
-if [ "$mr" = "FAIL" ] && [ "$me" -ne 0 ] && [ "$pr" = "PASS" ] && [ "$pe" -eq 0 ] && [ "$o" = "$r" ]; then
+if [ "$br" = "PASS" ] && [ "$be" -eq 0 ] && [ "$mr" = "FAIL" ] && [ "$me" -ne 0 ] && [ "$pr" = "PASS" ] && [ "$pe" -eq 0 ] && [ "$orig_h" = "$rest_h" ]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
-    TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':'EV-01','description':'Wrong repository rejected','result':'PASS','expected_check':'SOURCE-IDENTITY','observed_check':'FAIL','baseline_result':'PASS','baseline_exit':0,'mutation_result':'FAIL','mutation_exit':int(sys.argv[2]),'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':sys.argv[3],'restored_sha256':sys.argv[4],'reason':'Correctly rejected'});print(json.dumps(t))" "$TESTS_JSON" "$me" "$o" "$r")
+    write_result "EV-01" "PASS" "Wrong repository rejected" "SOURCE-IDENTITY" "FAIL" \
+        "PASS" "0" "FAIL" "$me" "PASS" "0" "$orig_h" "$rest_h" "Correctly rejected"
 else
     echo "    FAIL"; FAIL_COUNT=$((FAIL_COUNT + 1))
-    TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':'EV-01','description':'Wrong repository rejected','result':'FAIL','expected_check':'SOURCE-IDENTITY','observed_check':sys.argv[2],'baseline_result':'PASS','baseline_exit':0,'mutation_result':sys.argv[2],'mutation_exit':int(sys.argv[3]),'post_restore_result':sys.argv[4],'post_restore_exit':int(sys.argv[5]),'original_sha256':sys.argv[6],'restored_sha256':sys.argv[7],'reason':'Not rejected'});print(json.dumps(t))" "$TESTS_JSON" "$mr" "$me" "$pr" "$pe" "$o" "$r")
+    write_result "EV-01" "FAIL" "Wrong repository rejected" "SOURCE-IDENTITY" "$mr" \
+        "$br" "$be" "$mr" "$me" "$pr" "$pe" "$orig_h" "$rest_h" "Not rejected"
 fi
 
 # EV-02: evidence wrong commit
@@ -217,53 +254,98 @@ run_one "EV-03" "Evidence wrong tree" "$EVIDENCE_FILE" "EVIDENCE-CONSISTENCY" "i
 run_one "EV-04" "Evidence inconsistent totals" "$EVIDENCE_FILE" "EVIDENCE-CONSISTENCY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['totals']['total']=999;json.dump(d,open(p,'w'),indent=2)"
 echo ""
 
-# === E: Fake Result Proofs ===
-echo "--- Block E: Fake Result Proofs ---"
-# FAKE-01: BLOCKED mutation_result must be rejected
-TOTAL_COUNT=$((TOTAL_COUNT + 1))
-echo "  [$TOTAL_COUNT] FAKE-01: BLOCKED mutation_result rejected"
-python3 -c "import json,sys;json.dump({'schema_version':'3.3.0','suite':'B1-I1R3C-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','tests':[{'test_id':'X','result':'PASS','mutation_result':'BLOCKED','mutation_exit':0,'baseline_result':'PASS','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'a','restored_sha256':'a','expected_check':'X','observed_check':'X','reason':'fake'}]},open(sys.argv[1],'w'),indent=2)" "$BACKUP_DIR/fake.json"
-mkdir -p "$EVIDENCE_DIR"
-cp "$BACKUP_DIR/fake.json" "$EVIDENCE_DIR/adversarial-results.json"
-python3 "$ENGINE_WIN" --only "FAIL-CLOSED" --evidence-dir "$EVIDENCE_DIR_WIN" >/dev/null 2>&1
-fr=$(get_result "FAIL-CLOSED")
-rm -f "$EVIDENCE_DIR/adversarial-results.json"
-if [ "$fr" = "FAIL" ] || [ "$fr" = "BLOCKED" ]; then
-    echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
-    TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':'FAKE-01','description':'BLOCKED mutation_result rejected','result':'PASS','expected_check':'FAIL-CLOSED','observed_check':sys.argv[2],'baseline_result':'N/A','baseline_exit':0,'mutation_result':'BLOCKED','mutation_exit':0,'post_restore_result':'N/A','post_restore_exit':0,'original_sha256':'N/A','restored_sha256':'N/A','reason':'BLOCKED rejected'});print(json.dumps(t))" "$TESTS_JSON" "$fr")
-else
-    echo "    FAIL: $fr"; FAIL_COUNT=$((FAIL_COUNT + 1))
-    TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':'FAKE-01','description':'BLOCKED mutation_result rejected','result':'FAIL','expected_check':'FAIL-CLOSED','observed_check':sys.argv[2],'baseline_result':'N/A','baseline_exit':0,'mutation_result':'PASS','mutation_exit':0,'post_restore_result':'N/A','post_restore_exit':0,'original_sha256':'N/A','restored_sha256':'N/A','reason':'BLOCKED accepted'});print(json.dumps(t))" "$TESTS_JSON" "$fr")
-fi
+# === E: Meta-Tests (Fake Result Proofs) ===
+echo "--- Block E: Meta-Tests ---"
 
-# FAKE-02: SKIPPED mutation_result must be rejected
-TOTAL_COUNT=$((TOTAL_COUNT + 1))
-echo "  [$TOTAL_COUNT] FAKE-02: SKIPPED mutation_result rejected"
-python3 -c "import json,sys;json.dump({'schema_version':'3.3.0','suite':'B1-I1R3C-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','tests':[{'test_id':'X','result':'PASS','mutation_result':'SKIPPED','mutation_exit':0,'baseline_result':'PASS','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'a','restored_sha256':'a','expected_check':'X','observed_check':'X','reason':'fake'}]},open(sys.argv[1],'w'),indent=2)" "$BACKUP_DIR/fake2.json"
-cp "$BACKUP_DIR/fake2.json" "$EVIDENCE_DIR/adversarial-results.json"
-python3 "$ENGINE_WIN" --only "FAIL-CLOSED" --evidence-dir "$EVIDENCE_DIR_WIN" >/dev/null 2>&1
-fr2=$(get_result "FAIL-CLOSED")
-rm -f "$EVIDENCE_DIR/adversarial-results.json"
-if [ "$fr2" = "FAIL" ] || [ "$fr2" = "BLOCKED" ]; then
-    echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
-    TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':'FAKE-02','description':'SKIPPED mutation_result rejected','result':'PASS','expected_check':'FAIL-CLOSED','observed_check':sys.argv[2],'baseline_result':'N/A','baseline_exit':0,'mutation_result':'SKIPPED','mutation_exit':0,'post_restore_result':'N/A','post_restore_exit':0,'original_sha256':'N/A','restored_sha256':'N/A','reason':'SKIPPED rejected'});print(json.dumps(t))" "$TESTS_JSON" "$fr2")
-else
-    echo "    FAIL: $fr2"; FAIL_COUNT=$((FAIL_COUNT + 1))
-    TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':'FAKE-02','description':'SKIPPED mutation_result rejected','result':'FAIL','expected_check':'FAIL-CLOSED','observed_check':sys.argv[2],'baseline_result':'N/A','baseline_exit':0,'mutation_result':'PASS','mutation_exit':0,'post_restore_result':'N/A','post_restore_exit':0,'original_sha256':'N/A','restored_sha256':'N/A','reason':'SKIPPED accepted'});print(json.dumps(t))" "$TESTS_JSON" "$fr2")
-fi
+# Helper: write a fake adversarial-results.json and check FAIL-CLOSED rejects it
+run_meta() {
+    local meta_id="$1" desc="$2" fake_json="$3"
+    TOTAL_COUNT=$((TOTAL_COUNT + 1))
+    echo "  [$TOTAL_COUNT] $meta_id: $desc"
+    mkdir -p "$BACKUP_DIR"
+    echo "$fake_json" > "$BACKUP_DIR/$meta_id-fake.json"
+    cp "$BACKUP_DIR/$meta_id-fake.json" "$EVIDENCE_DIR/adversarial-results.json"
+    local rc=0
+    python3 "$ENGINE_WIN" --only "FAIL-CLOSED" --evidence-dir "$EVIDENCE_DIR_WIN" >/dev/null 2>&1 || rc=$?
+    local fr
+    fr=$(get_result "FAIL-CLOSED")
+    rm -f "$EVIDENCE_DIR/adversarial-results.json"
+    if [ "$fr" = "FAIL" ] || [ "$fr" = "BLOCKED" ]; then
+        echo "    PASS (FAIL-CLOSED=$fr)"; PASS_COUNT=$((PASS_COUNT + 1))
+        write_result "$meta_id" "PASS" "$desc" "FAIL-CLOSED" "$fr" \
+            "N/A" "0" "N/A" "0" "N/A" "0" "N/A" "N/A" "Invalid fixture correctly rejected"
+    else
+        echo "    FAIL: FAIL-CLOSED=$fr"; FAIL_COUNT=$((FAIL_COUNT + 1))
+        write_result "$meta_id" "FAIL" "$desc" "FAIL-CLOSED" "$fr" \
+            "N/A" "0" "N/A" "0" "N/A" "0" "N/A" "N/A" "Invalid fixture was not rejected"
+    fi
+}
+
+mk_fake_neg() { python3 -c "import json,sys;print(json.dumps({'test_id':'X','result':'PASS','mutation_result':sys.argv[1],'mutation_exit':0,'baseline_result':'PASS','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'a','restored_sha256':'a','expected_check':'X','observed_check':'X','reason':'fake'}))" "$1"; }
+
+# FAKE-01: BLOCKED mutation_result
+FAKE_NEG=$(mk_fake_neg "BLOCKED")
+FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.4.0','suite':'B1-I1R3D-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[$FAKE_NEG],'meta_tests':[]}))")
+run_meta "FAKE-01" "BLOCKED mutation_result rejected" "$FAKE_ADV"
+
+# FAKE-02: SKIPPED mutation_result
+FAKE_NEG=$(mk_fake_neg "SKIPPED")
+FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.4.0','suite':'B1-I1R3D-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[$FAKE_NEG],'meta_tests':[]}))")
+run_meta "FAKE-02" "SKIPPED mutation_result rejected" "$FAKE_ADV"
+
+# FAKE-03: ERROR mutation_result
+FAKE_NEG=$(mk_fake_neg "ERROR")
+FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.4.0','suite':'B1-I1R3D-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[$FAKE_NEG],'meta_tests':[]}))")
+run_meta "FAKE-03" "ERROR mutation_result rejected" "$FAKE_ADV"
+
+# FAKE-04: NOT_FOUND mutation_result
+FAKE_NEG=$(mk_fake_neg "NOT_FOUND")
+FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.4.0','suite':'B1-I1R3D-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[$FAKE_NEG],'meta_tests':[]}))")
+run_meta "FAKE-04" "NOT_FOUND mutation_result rejected" "$FAKE_ADV"
+
+# FAKE-05: PASS mutation_result
+FAKE_NEG=$(mk_fake_neg "PASS")
+FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.4.0','suite':'B1-I1R3D-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[$FAKE_NEG],'meta_tests':[]}))")
+run_meta "FAKE-05" "PASS mutation_result rejected" "$FAKE_ADV"
+
+# FAKE-06: mutation_exit=0 with mutation_result=FAIL
+FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.4.0','suite':'B1-I1R3D-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[{'test_id':'X','result':'PASS','mutation_result':'FAIL','mutation_exit':0,'baseline_result':'PASS','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'a','restored_sha256':'a','expected_check':'X','observed_check':'X','reason':'fake'}],'meta_tests':[]}))")
+run_meta "FAKE-06" "mutation_exit=0 rejected" "$FAKE_ADV"
+# FAKE-07: empty mutation_result
+FAKE_NEG=$(mk_fake_neg "")
+FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.4.0','suite':'B1-I1R3D-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[$FAKE_NEG],'meta_tests':[]}))")
+run_meta "FAKE-07" "Empty mutation_result rejected" "$FAKE_ADV"
+
+# FAKE-08: empty test lists
+FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.4.0','suite':'B1-I1R3D-adversarial','totals':{'total':0,'PASS':0,'FAIL':0},'suite_result':'PASS','negative_tests':[],'meta_tests':[]}))")
+run_meta "FAKE-08" "Empty test lists rejected" "$FAKE_ADV"
+# FAKE-09: wrong schema version
+FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'1.0.0','suite':'B1-I1R3D-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[{'test_id':'X','result':'PASS','mutation_result':'FAIL','mutation_exit':1,'baseline_result':'PASS','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'a','restored_sha256':'a','expected_check':'X','observed_check':'X','reason':'fake'}],'meta_tests':[]}))")
+run_meta "FAKE-09" "Wrong schema version rejected" "$FAKE_ADV"
+# FAKE-10: suite_result=FAIL
+FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.4.0','suite':'B1-I1R3D-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'FAIL','negative_tests':[{'test_id':'X','result':'PASS','mutation_result':'FAIL','mutation_exit':1,'baseline_result':'PASS','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'a','restored_sha256':'a','expected_check':'X','observed_check':'X','reason':'fake'}],'meta_tests':[]}))")
+run_meta "FAKE-10" "suite_result=FAIL rejected" "$FAKE_ADV"
 echo ""
 
-# === F: CLI Negative Tests ===
+IDENTITY="$BASE_DIR/contracts/checkpoint-identity-data.json"
+COMPOSE="$BASE_DIR/compose/compose.foundation.yml"
+POLICY="$BASE_DIR/policy/network-access.yml"
+SCHEMA="$BASE_DIR/contracts/worker-task-envelope.schema.json"
+ANSIBLE_CFG="$BASE_DIR/ansible/ansible.cfg"
+
+# === A: Source Identity ===
 echo "--- Block F: CLI Negative Tests ---"
 TOTAL_COUNT=$((TOTAL_COUNT + 1))
 echo "  [$TOTAL_COUNT] CLI-01: Missing authoritative inputs"
 rc=0; python3 "$ENGINE_WIN" --authoritative >/dev/null 2>&1 || rc=$?
 if [ "$rc" -ne 0 ]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
-    TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':'CLI-01','description':'Missing authoritative inputs','result':'PASS','expected_check':'SOURCE-IDENTITY','observed_check':'BLOCKED','baseline_result':'N/A','baseline_exit':0,'mutation_result':'BLOCKED','mutation_exit':int(sys.argv[2]),'post_restore_result':'N/A','post_restore_exit':0,'original_sha256':'N/A','restored_sha256':'N/A','reason':'Rejected'});print(json.dumps(t))" "$TESTS_JSON" "$rc")
+    write_result "CLI-01" "PASS" "Missing authoritative inputs" "SOURCE-IDENTITY" "BLOCKED" \
+        "N/A" "0" "BLOCKED" "$rc" "N/A" "0" "N/A" "N/A" "Rejected"
 else
     echo "    FAIL"; FAIL_COUNT=$((FAIL_COUNT + 1))
-    TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':'CLI-01','description':'Missing authoritative inputs','result':'FAIL','expected_check':'SOURCE-IDENTITY','observed_check':'PASS','baseline_result':'N/A','baseline_exit':0,'mutation_result':'PASS','mutation_exit':int(sys.argv[2]),'post_restore_result':'N/A','post_restore_exit':0,'original_sha256':'N/A','restored_sha256':'N/A','reason':'Accepted'});print(json.dumps(t))" "$TESTS_JSON" "$rc")
+    write_result "CLI-01" "FAIL" "Missing authoritative inputs" "SOURCE-IDENTITY" "PASS" \
+        "N/A" "0" "PASS" "0" "N/A" "0" "N/A" "N/A" "Accepted"
 fi
 
 CC=$(git -C "$PROJ_ROOT" rev-parse HEAD); CT=$(git -C "$PROJ_ROOT" rev-parse "HEAD^{tree}"); CB=$(git -C "$PROJ_ROOT" branch --show-current)
@@ -274,10 +356,12 @@ echo "  [$TOTAL_COUNT] CLI-02: Wrong target commit"
 rc=0; python3 "$ENGINE_WIN" --authoritative --target-commit 0000000000000000000000000000000000000000 --target-tree "$CT" --target-branch "$CB" >/dev/null 2>&1 || rc=$?
 if [ "$rc" -ne 0 ]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
-    TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':'CLI-02','description':'Wrong target commit','result':'PASS','expected_check':'SOURCE-IDENTITY','observed_check':'FAIL','baseline_result':'N/A','baseline_exit':0,'mutation_result':'FAIL','mutation_exit':int(sys.argv[2]),'post_restore_result':'N/A','post_restore_exit':0,'original_sha256':'N/A','restored_sha256':'N/A','reason':'Rejected'});print(json.dumps(t))" "$TESTS_JSON" "$rc")
+    write_result "CLI-02" "PASS" "Wrong target commit" "SOURCE-IDENTITY" "FAIL" \
+        "N/A" "0" "FAIL" "$rc" "N/A" "0" "N/A" "N/A" "Rejected"
 else
     echo "    FAIL"; FAIL_COUNT=$((FAIL_COUNT + 1))
-    TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':'CLI-02','description':'Wrong target commit','result':'FAIL','expected_check':'SOURCE-IDENTITY','observed_check':'PASS','baseline_result':'N/A','baseline_exit':0,'mutation_result':'PASS','mutation_exit':int(sys.argv[2]),'post_restore_result':'N/A','post_restore_exit':0,'original_sha256':'N/A','restored_sha256':'N/A','reason':'Accepted'});print(json.dumps(t))" "$TESTS_JSON" "$rc")
+    write_result "CLI-02" "FAIL" "Wrong target commit" "SOURCE-IDENTITY" "PASS" \
+        "N/A" "0" "PASS" "0" "N/A" "0" "N/A" "N/A" "Accepted"
 fi
 
 # CLI-03: Wrong branch
@@ -286,10 +370,12 @@ echo "  [$TOTAL_COUNT] CLI-03: Wrong branch"
 rc=0; python3 "$ENGINE_WIN" --authoritative --target-commit "$CC" --target-tree "$CT" --target-branch wrong-branch >/dev/null 2>&1 || rc=$?
 if [ "$rc" -ne 0 ]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
-    TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':'CLI-03','description':'Wrong branch','result':'PASS','expected_check':'SOURCE-IDENTITY','observed_check':'FAIL','baseline_result':'N/A','baseline_exit':0,'mutation_result':'FAIL','mutation_exit':int(sys.argv[2]),'post_restore_result':'N/A','post_restore_exit':0,'original_sha256':'N/A','restored_sha256':'N/A','reason':'Rejected'});print(json.dumps(t))" "$TESTS_JSON" "$rc")
+    write_result "CLI-03" "PASS" "Wrong branch" "SOURCE-IDENTITY" "FAIL" \
+        "N/A" "0" "FAIL" "$rc" "N/A" "0" "N/A" "N/A" "Rejected"
 else
     echo "    FAIL"; FAIL_COUNT=$((FAIL_COUNT + 1))
-    TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':'CLI-03','description':'Wrong branch','result':'FAIL','expected_check':'SOURCE-IDENTITY','observed_check':'PASS','baseline_result':'N/A','baseline_exit':0,'mutation_result':'PASS','mutation_exit':int(sys.argv[2]),'post_restore_result':'N/A','post_restore_exit':0,'original_sha256':'N/A','restored_sha256':'N/A','reason':'Accepted'});print(json.dumps(t))" "$TESTS_JSON" "$rc")
+    write_result "CLI-03" "FAIL" "Wrong branch" "SOURCE-IDENTITY" "PASS" \
+        "N/A" "0" "PASS" "0" "N/A" "0" "N/A" "N/A" "Accepted"
 fi
 
 # CLI-04: Wrong repository
@@ -300,15 +386,18 @@ rc=0; python3 "$ENGINE_WIN" --authoritative --target-commit "$CC" --target-tree 
 if [ -n "$GR_ORIG" ]; then export GITHUB_REPOSITORY="$GR_ORIG"; else unset GITHUB_REPOSITORY; fi
 if [ "$rc" -ne 0 ]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
-    TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':'CLI-04','description':'Wrong repository','result':'PASS','expected_check':'SOURCE-IDENTITY','observed_check':'FAIL','baseline_result':'N/A','baseline_exit':0,'mutation_result':'FAIL','mutation_exit':int(sys.argv[2]),'post_restore_result':'N/A','post_restore_exit':0,'original_sha256':'N/A','restored_sha256':'N/A','reason':'Rejected'});print(json.dumps(t))" "$TESTS_JSON" "$rc")
+    write_result "CLI-04" "PASS" "Wrong repository" "SOURCE-IDENTITY" "FAIL" \
+        "N/A" "0" "FAIL" "$rc" "N/A" "0" "N/A" "N/A" "Rejected"
 else
     echo "    FAIL"; FAIL_COUNT=$((FAIL_COUNT + 1))
-    TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':'CLI-04','description':'Wrong repository','result':'FAIL','expected_check':'SOURCE-IDENTITY','observed_check':'PASS','baseline_result':'N/A','baseline_exit':0,'mutation_result':'PASS','mutation_exit':int(sys.argv[2]),'post_restore_result':'N/A','post_restore_exit':0,'original_sha256':'N/A','restored_sha256':'N/A','reason':'Accepted'});print(json.dumps(t))" "$TESTS_JSON" "$rc")
+    write_result "CLI-04" "FAIL" "Wrong repository" "SOURCE-IDENTITY" "PASS" \
+        "N/A" "0" "PASS" "0" "N/A" "0" "N/A" "N/A" "Accepted"
 fi
 
 # CLI-05: FAIL with exit 0
 TOTAL_COUNT=$((TOTAL_COUNT + 1))
 echo "  [$TOTAL_COUNT] CLI-05: FAIL paired with nonzero exit"
+mkdir -p "$BACKUP_DIR"
 cp "$IDENTITY" "$BACKUP_DIR/pre-CLI-05.json"
 python3 -c "import json,sys;p=sys.argv[1];d=json.load(open(p));d['repository']['owner']='bad';json.dump(d,open(p,'w'),indent=2)" "$(win_path "$IDENTITY")"
 rc=0; python3 "$ENGINE_WIN" --only "SOURCE-IDENTITY" --evidence-dir "$EVIDENCE_DIR_WIN" >/dev/null 2>&1 || rc=$?
@@ -316,10 +405,12 @@ cp "$BACKUP_DIR/pre-CLI-05.json" "$IDENTITY"
 res=$(get_result "SOURCE-IDENTITY")
 if [ "$res" = "FAIL" ] && [ "$rc" -ne 0 ]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
-    TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':'CLI-05','description':'FAIL+nonzero exit','result':'PASS','expected_check':'SOURCE-IDENTITY','observed_check':sys.argv[2],'baseline_result':'N/A','baseline_exit':0,'mutation_result':sys.argv[2],'mutation_exit':int(sys.argv[3]),'post_restore_result':'N/A','post_restore_exit':0,'original_sha256':'N/A','restored_sha256':'N/A','reason':'Correctly paired'});print(json.dumps(t))" "$TESTS_JSON" "$res" "$rc")
+    write_result "CLI-05" "PASS" "FAIL+nonzero exit" "SOURCE-IDENTITY" "$res" \
+        "N/A" "0" "$res" "$rc" "N/A" "0" "N/A" "N/A" "Correctly paired"
 else
     echo "    FAIL: $res/$rc"; FAIL_COUNT=$((FAIL_COUNT + 1))
-    TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':'CLI-05','description':'FAIL+nonzero exit','result':'FAIL','expected_check':'SOURCE-IDENTITY','observed_check':sys.argv[2],'baseline_result':'N/A','baseline_exit':0,'mutation_result':sys.argv[2],'mutation_exit':int(sys.argv[3]),'post_restore_result':'N/A','post_restore_exit':0,'original_sha256':'N/A','restored_sha256':'N/A','reason':'Mismatch'});print(json.dumps(t))" "$TESTS_JSON" "$res" "$rc")
+    write_result "CLI-05" "FAIL" "FAIL+nonzero exit" "SOURCE-IDENTITY" "$res" \
+        "N/A" "0" "$res" "$rc" "N/A" "0" "N/A" "N/A" "Mismatch"
 fi
 echo ""
 
@@ -332,10 +423,12 @@ rc=0; python3 "$ENGINE_WIN" --authoritative --target-commit "$CC" --target-tree 
 rm -f "$PROJ_ROOT/.oce-dirty-test"
 if [ "$rc" -ne 0 ]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
-    TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':'ST-02','description':'Dirty worktree rejected','result':'PASS','expected_check':'SOURCE-IDENTITY','observed_check':'FAIL','baseline_result':'N/A','baseline_exit':0,'mutation_result':'FAIL','mutation_exit':int(sys.argv[2]),'post_restore_result':'N/A','post_restore_exit':0,'original_sha256':'N/A','restored_sha256':'N/A','reason':'Rejected'});print(json.dumps(t))" "$TESTS_JSON" "$rc")
+    write_result "ST-02" "PASS" "Dirty worktree rejected" "SOURCE-IDENTITY" "FAIL" \
+        "N/A" "0" "FAIL" "$rc" "N/A" "0" "N/A" "N/A" "Rejected"
 else
     echo "    FAIL"; FAIL_COUNT=$((FAIL_COUNT + 1))
-    TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':'ST-02','description':'Dirty worktree rejected','result':'FAIL','expected_check':'SOURCE-IDENTITY','observed_check':'PASS','baseline_result':'N/A','baseline_exit':0,'mutation_result':'PASS','mutation_exit':int(sys.argv[2]),'post_restore_result':'N/A','post_restore_exit':0,'original_sha256':'N/A','restored_sha256':'N/A','reason':'Accepted'});print(json.dumps(t))" "$TESTS_JSON" "$rc")
+    write_result "ST-02" "FAIL" "Dirty worktree rejected" "SOURCE-IDENTITY" "PASS" \
+        "N/A" "0" "PASS" "0" "N/A" "0" "N/A" "N/A" "Accepted"
 fi
 
 TOTAL_COUNT=$((TOTAL_COUNT + 1))
@@ -343,14 +436,13 @@ echo "  [$TOTAL_COUNT] ST-03: Wrong tree rejected"
 rc=0; python3 "$ENGINE_WIN" --authoritative --target-commit "$CC" --target-tree "0000000000000000000000000000000000000000000000000000000000000000" --target-branch "$CB" >/dev/null 2>&1 || rc=$?
 if [ "$rc" -ne 0 ]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
-    TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':'ST-03','description':'Wrong tree rejected','result':'PASS','expected_check':'SOURCE-IDENTITY','observed_check':'FAIL','baseline_result':'N/A','baseline_exit':0,'mutation_result':'FAIL','mutation_exit':int(sys.argv[2]),'post_restore_result':'N/A','post_restore_exit':0,'original_sha256':'N/A','restored_sha256':'N/A','reason':'Rejected'});print(json.dumps(t))" "$TESTS_JSON" "$rc")
+    write_result "ST-03" "PASS" "Wrong tree rejected" "SOURCE-IDENTITY" "FAIL" \
+        "N/A" "0" "FAIL" "$rc" "N/A" "0" "N/A" "N/A" "Rejected"
 else
     echo "    FAIL"; FAIL_COUNT=$((FAIL_COUNT + 1))
-    TESTS_JSON=$(python3 -c "import json,sys;t=json.loads(sys.argv[1]);t.append({'test_id':'ST-03','description':'Wrong tree rejected','result':'FAIL','expected_check':'SOURCE-IDENTITY','observed_check':'PASS','baseline_result':'N/A','baseline_exit':0,'mutation_result':'PASS','mutation_exit':int(sys.argv[2]),'post_restore_result':'N/A','post_restore_exit':0,'original_sha256':'N/A','restored_sha256':'N/A','reason':'Accepted'});print(json.dumps(t))" "$TESTS_JSON" "$rc")
+    write_result "ST-03" "FAIL" "Wrong tree rejected" "SOURCE-IDENTITY" "PASS" \
+        "N/A" "0" "PASS" "0" "N/A" "0" "N/A" "N/A" "Accepted"
 fi
-
-# Cleanup
-rm -rf "$BACKUP_DIR"
 
 # === SUMMARY ===
 echo ""
@@ -367,16 +459,51 @@ SUITE_RESULT="PASS"
 [ "$TOTAL_COUNT" -lt 30 ] && SUITE_RESULT="FAIL"
 echo "  Suite:   $SUITE_RESULT"
 
+# Aggregate all test result files into adversarial-results.json
 python3 -c "
-import json,sys
-from datetime import datetime,timezone
-tests=json.loads(sys.argv[1])
-p=sum(1 for t in tests if t.get('result')=='PASS')
-f=sum(1 for t in tests if t.get('result')=='FAIL')
-r={'schema_version':'3.3.0','suite':'B1-I1R3C-adversarial','timestamp':datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
-   'totals':{'total':len(tests),'PASS':p,'FAIL':f},'suite_result':sys.argv[2],'tests':tests}
-with open(sys.argv[3],'w') as fp: json.dump(r,fp,indent=2)
-import shutil; shutil.copy(sys.argv[3],sys.argv[4])
-" "$TESTS_JSON" "$SUITE_RESULT" "/tmp/oce-adv-results.json" "$EVIDENCE_DIR/adversarial-results.json"
+import json, sys, os, glob
+from datetime import datetime, timezone
+
+results_dir = sys.argv[1]
+negative_tests = []
+meta_tests = []
+# Meta test IDs
+meta_ids = {'FAKE-01','FAKE-02','FAKE-03','FAKE-04','FAKE-05','FAKE-06','FAKE-07','FAKE-08','FAKE-09','FAKE-10'}
+
+for f in sorted(glob.glob(os.path.join(results_dir, '*.json'))):
+    with open(f) as fp:
+        t = json.load(fp)
+    tid = t.get('test_id', '')
+    if tid in meta_ids:
+        meta_tests.append(t)
+    else:
+        negative_tests.append(t)
+
+np = sum(1 for t in negative_tests if t.get('result') == 'PASS')
+nf = sum(1 for t in negative_tests if t.get('result') == 'FAIL')
+mp = sum(1 for t in meta_tests if t.get('result') == 'PASS')
+mf = sum(1 for t in meta_tests if t.get('result') == 'FAIL')
+
+r = {
+    'schema_version': '3.4.0',
+    'suite': 'B1-I1R3D-adversarial',
+    'validator_version': '3.4.0',
+    'timestamp': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+    'totals': {
+        'total': len(negative_tests) + len(meta_tests),
+        'PASS': np + mp, 'FAIL': nf + mf,
+        'negative_total': len(negative_tests), 'negative_pass': np, 'negative_fail': nf,
+        'meta_total': len(meta_tests), 'meta_pass': mp, 'meta_fail': mf
+    },
+    'suite_result': sys.argv[2],
+    'negative_tests': negative_tests,
+    'meta_tests': meta_tests
+}
+
+out_path = sys.argv[3]
+with open(out_path, 'w') as fp:
+    json.dump(r, fp, indent=2)
+print(f'Written {len(negative_tests)} negative + {len(meta_tests)} meta tests to {out_path}')
+" "$RESULTS_DIR" "$SUITE_RESULT" "$EVIDENCE_DIR/adversarial-results.json"
 
 [ "$SUITE_RESULT" = "PASS" ] && exit 0 || exit 1

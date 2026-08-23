@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # OCE Cloud Ground — Local Validation Entrypoint
-# B1-I1R3C — Evidence Isolation and Final Gate Closure
+# B1-I1R3D — Authoritative Evidence Pipeline Closure
 #
 # Runs the same suite as CI. Uses isolated evidence during adversarial
 # testing, then generates final canonical evidence.
@@ -59,7 +59,7 @@ record() {
 }
 
 echo "=============================================="
-echo "  OCE B1-I1R3C Local Validation"
+echo "  OCE B1-I1R3D Local Validation"
 echo "  $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo "=============================================="
 
