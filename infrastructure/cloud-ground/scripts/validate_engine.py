@@ -28,7 +28,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 import shutil
 
-VERSION = "3.1.0"
+VERSION = "3.2.0"
 SCRIPT_DIR = Path(__file__).resolve().parent
 BASE_DIR = SCRIPT_DIR.parent
 REPO_ROOT = BASE_DIR.parent.parent  # infrastructure/cloud-ground -> repo root
@@ -550,6 +550,128 @@ class Validator:
                      "PASS", f"{verified_count} verified digests",
                      "All compose digests match registry-proven evidence")
 
+    def check_digest_registry(self):
+        """Verify image digests resolve against the registry using available tools."""
+        evidence_path = EVIDENCE_DIR / "image-digests.json"
+        if not evidence_path.exists():
+            self.add("DIGEST-REGISTRY", "Image digests resolve against registry", True,
+                     "BLOCKED", "image-digests.json not found", "")
+            return
+        try:
+            with open(evidence_path, "r", encoding="utf-8") as f:
+                evidence = json.load(f)
+        except Exception as e:
+            self.add("DIGEST-REGISTRY", "Image digests resolve against registry", True,
+                     "BLOCKED", f"Cannot parse image-digests.json: {e}", "")
+            return
+
+        # Try available tools in order: docker buildx imagetools inspect, docker manifest inspect, skopeo
+        verify_cmd = None
+        verify_format = None
+        for cmd, fmt in [
+            ("docker", "buildx-inspect"),
+            ("skopeo", "skopeo"),
+        ]:
+            try:
+                r = subprocess.run([cmd, "--version"], capture_output=True, text=True, timeout=5)
+                if r.returncode == 0:
+                    verify_cmd = cmd
+                    verify_format = fmt
+                    break
+            except (FileNotFoundError, subprocess.TimeoutExpired):
+                continue
+
+        if not verify_cmd:
+            self.add("DIGEST-REGISTRY", "Image digests resolve against registry", True,
+                     "BLOCKED", "No registry verification tool available (need docker or skopeo)",
+                     "Install docker or skopeo for real-time digest verification")
+            return
+
+        images = evidence.get("images", [])
+        resolved, failed, details = 0, 0, []
+        for img in images:
+            name = img.get("name", "")
+            digest = img.get("digest", "")
+            if not digest:
+                failed += 1
+                details.append(f"{name}: no digest in evidence")
+                continue
+
+            full_ref = f"{name}@{digest}"
+            try:
+                if verify_format == "buildx-inspect":
+                    r = subprocess.run(
+                        ["docker", "buildx", "imagetools", "inspect", full_ref],
+                        capture_output=True, text=True, timeout=30
+                    )
+                elif verify_format == "skopeo":
+                    r = subprocess.run(
+                        ["skopeo", "inspect", f"docker://{full_ref}"],
+                        capture_output=True, text=True, timeout=30
+                    )
+                else:
+                    r = subprocess.CompletedProcess([], 1)
+
+                if r.returncode == 0 and ("Manifests" in r.stdout or "MediaType" in r.stdout or "SchemaVersion" in r.stdout):
+                    resolved += 1
+                    details.append(f"{name}@{digest[:20]}...: RESOLVED")
+                else:
+                    failed += 1
+                    details.append(f"{name}@{digest[:20]}...: FAILED ({r.stderr[:100] if r.stderr else 'no match in output'})")
+            except subprocess.TimeoutExpired:
+                failed += 1
+                details.append(f"{name}@{digest[:20]}...: TIMEOUT")
+            except FileNotFoundError:
+                failed += 1
+                details.append(f"{name}@{digest[:20]}...: TOOL NOT FOUND")
+
+        if failed > 0:
+            self.add("DIGEST-REGISTRY", "Image digests resolve against registry", True,
+                     "FAIL", f"{failed}/{len(images)} failed",
+                     "\n".join(details))
+        elif resolved == 0:
+            self.add("DIGEST-REGISTRY", "Image digests resolve against registry", True,
+                     "BLOCKED", "No images to verify", "")
+        else:
+            self.add("DIGEST-REGISTRY", "Image digests resolve against registry", True,
+                     "PASS", f"{resolved}/{len(images)} resolved",
+                     "\n".join(details))
+
+    def check_host_key_checking(self):
+        """Verify ansible.cfg has host_key_checking = True (not False)."""
+        cfg_path = ANSIBLE_DIR / "ansible.cfg"
+        if not cfg_path.exists():
+            self.add("HOST-KEY-CHECKING", "Ansible host_key_checking is True", True,
+                     "BLOCKED", "ansible.cfg not found", "")
+            return
+        content = self._read_file(cfg_path)
+        lines = content.split("\n")
+        violations = []
+        found = False
+        for i, line in enumerate(lines, 1):
+            stripped = line.strip()
+            if stripped.startswith("#"):
+                continue
+            if "host_key_checking" in stripped.lower():
+                found = True
+                if "false" in stripped.lower() or "= 0" in stripped or "=no" in stripped.lower():
+                    violations.append(f"Line {i}: {stripped}")
+                elif "true" in stripped.lower() or "= 1" in stripped or "=yes" in stripped.lower():
+                    pass  # Good
+                else:
+                    violations.append(f"Line {i}: unrecognised value: {stripped}")
+        if not found:
+            self.add("HOST-KEY-CHECKING", "Ansible host_key_checking is True", True,
+                     "FAIL", "host_key_checking not set in ansible.cfg",
+                     "Must explicitly set host_key_checking = True")
+        elif violations:
+            self.add("HOST-KEY-CHECKING", "Ansible host_key_checking is True", True,
+                     "FAIL", f"{len(violations)} violations",
+                     "\n".join(violations))
+        else:
+            self.add("HOST-KEY-CHECKING", "Ansible host_key_checking is True", True,
+                     "PASS", "host_key_checking = True", "Verified")
+
     def check_no_published_ports(self):
         foundation = COMPOSE_DIR / "compose.foundation.yml"
         if not foundation.exists():
@@ -926,7 +1048,7 @@ class Validator:
         return counts
 
     def check_totals_consistency(self, totals):
-        """Post-serialization integrity check — does NOT add itself to the results."""
+        """Post-serialization integrity check — verifies pre-check totals are self-consistent."""
         expected_total = totals["PASS"] + totals["FAIL"] + totals["BLOCKED"] + totals["SKIPPED"]
         actual_total = totals["total"]
 
@@ -1064,6 +1186,8 @@ class Validator:
         self.check_no_latest_tags()
         self.check_digest_lock()
         self.check_digest_proof()
+        self.check_digest_registry()
+        self.check_host_key_checking()
         self.check_no_published_ports()
         self.check_no_privileged()
         self.check_no_socket_mount()
@@ -1102,6 +1226,8 @@ class Validator:
             "NO-LATEST-TAGS": self.check_no_latest_tags,
             "DIGEST-LOCK": self.check_digest_lock,
             "DIGEST-PROOF": self.check_digest_proof,
+            "DIGEST-REGISTRY": self.check_digest_registry,
+            "HOST-KEY-CHECKING": self.check_host_key_checking,
             "NO-DB-PORTS": self.check_no_published_ports,
             "NO-PRIV": self.check_no_privileged,
             "NO-SOCKET": self.check_no_socket_mount,

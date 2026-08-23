@@ -1,7 +1,7 @@
 {
-  "checkpoint_id": "B1-I1R3A-SOURCE-IDENTITY-CI-CLOSURE",
+  "checkpoint_id": "B1-I1R3B-REPAIR-CHECKPOINT",
   "block": "B1",
-  "increment": "B1-I1R3A",
+  "increment": "B1-I1R3B",
   "repository": {
     "owner": "dabiggestpoppa",
     "name": "larger-lab",

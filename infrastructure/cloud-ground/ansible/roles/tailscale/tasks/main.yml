@@ -63,5 +63,4 @@
   ansible.builtin.command: tailscale status
   register: tailscale_status
   changed_when: false
-  ignore_errors: true
   tags: [tailscale, verify]

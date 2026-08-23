@@ -26,10 +26,14 @@ jobs:
         run: pip install ansible-core==2.16.0 ansible-lint==6.22.0
 
       - name: Install ShellCheck
-        run: sudo apt-get update && sudo apt-get install -y shellcheck
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y shellcheck
 
       - name: Install Docker Compose
-        run: sudo apt-get update && sudo apt-get install -y docker-compose-v2
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y docker-compose-v2
 
       - name: Install Gitleaks
         run: |
@@ -41,12 +45,37 @@ jobs:
         id: tool_versions
         run: |
           echo "=== TOOL VERSION ASSERTIONS ==="
-          python3 --version
-          ansible-playbook --version
-          ansible-lint --version
-          shellcheck --version
-          gitleaks version
-          docker compose version
+
+          # Python
+          PY_VER=$(python3 --version 2>&1)
+          echo "Python: $PY_VER"
+          echo "$PY_VER" | grep -q "Python 3" || { echo "FAIL: Python 3 required"; exit 1; }
+
+          # Ansible
+          ANSIBLE_VER=$(ansible-playbook --version 2>&1 | head -1)
+          echo "Ansible: $ANSIBLE_VER"
+          echo "$ANSIBLE_VER" | grep -q "ansible" || { echo "FAIL: ansible-playbook required"; exit 1; }
+
+          # ansible-lint
+          LINT_VER=$(ansible-lint --version 2>&1 | head -1)
+          echo "ansible-lint: $LINT_VER"
+          echo "$LINT_VER" | grep -q "ansible-lint" || { echo "FAIL: ansible-lint required"; exit 1; }
+
+          # ShellCheck
+          SC_VER=$(shellcheck --version 2>&1 | grep "version:" | head -1)
+          echo "ShellCheck: $SC_VER"
+          echo "$SC_VER" | grep -q "[0-9]" || { echo "FAIL: shellcheck required"; exit 1; }
+
+          # Gitleaks
+          GL_VER=$(gitleaks version 2>&1)
+          echo "Gitleaks: $GL_VER"
+          echo "$GL_VER" | grep -q "[0-9]" || { echo "FAIL: gitleaks required"; exit 1; }
+
+          # Docker Compose
+          DC_VER=$(docker compose version 2>&1)
+          echo "Docker Compose: $DC_VER"
+          echo "$DC_VER" | grep -q "Docker Compose" || { echo "FAIL: docker compose required"; exit 1; }
+
           echo "=== ALL TOOLS INSTALLED ==="
 
       - name: Record source identity
@@ -90,23 +119,69 @@ jobs:
           POSTGRES_PASSWORD=test_validation docker compose \
             -f compose.foundation.yml config
 
-      - name: Validate image digests
+      - name: Verify image digests against registry
         run: |
+          echo "=== IMAGE DIGEST REGISTRY VERIFICATION ==="
           python3 -c "
-          import json, sys
+          import json, sys, subprocess
+
           evidence = json.load(open('infrastructure/cloud-ground/evidence/image-digests.json'))
+          compose = open('infrastructure/cloud-ground/compose/compose.foundation.yml').read()
+
           errors = []
           for img in evidence.get('images', []):
               name = img.get('name', '')
               digest = img.get('digest', '')
               verified = img.get('verified_digest', False)
               if not digest or not verified:
-                  errors.append(f'{name}: not verified')
-              print(f'{name}: {digest} verified={verified}')
+                  errors.append(f'{name}: not verified in evidence')
+                  print(f'FAIL {name}: not verified', file=sys.stderr)
+                  continue
+
+              full_ref = f'{name}@{digest}'
+              print(f'Verifying {full_ref}...')
+
+              # Verify digest appears in compose file
+              if full_ref not in compose:
+                  errors.append(f'{name}: digest {digest} not in compose.foundation.yml')
+                  continue
+
+              # Try docker buildx imagetools inspect
+              try:
+                  r = subprocess.run(
+                      ['docker', 'buildx', 'imagetools', 'inspect', full_ref],
+                      capture_output=True, text=True, timeout=30
+                  )
+                  if r.returncode == 0 and ('Manifests' in r.stdout or 'MediaType' in r.stdout or 'SchemaVersion' in r.stdout):
+                      print(f'PASS {name}: {digest} resolved via buildx imagetools inspect')
+                  else:
+                      # Fallback: try docker manifest inspect
+                      r2 = subprocess.run(
+                          ['docker', 'manifest', 'inspect', full_ref],
+                          capture_output=True, text=True, timeout=30
+                      )
+                      if r2.returncode == 0:
+                          print(f'PASS {name}: {digest} resolved via manifest inspect')
+                      else:
+                          # Fallback: try skopeo
+                          r3 = subprocess.run(
+                              ['skopeo', 'inspect', f'docker://{full_ref}'],
+                              capture_output=True, text=True, timeout=30
+                          )
+                          if r3.returncode == 0:
+                              print(f'PASS {name}: {digest} resolved via skopeo')
+                          else:
+                              errors.append(f'{name}: {digest} failed all verification methods')
+                              print(f'FAIL {name}: {digest} could not be resolved', file=sys.stderr)
+              except FileNotFoundError:
+                  errors.append(f'{name}: no verification tool available')
+              except subprocess.TimeoutExpired:
+                  errors.append(f'{name}: verification timed out')
+
           if errors:
               print(f'ERRORS: {errors}', file=sys.stderr)
               sys.exit(1)
-          print('All digests verified in evidence')
+          print('All image digests verified against registry')
           "
 
       - name: ShellCheck
